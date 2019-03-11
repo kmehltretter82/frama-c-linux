@@ -10,7 +10,8 @@
 [wp] [Qed] Goal typed_jobG_assigns_normal : Valid
 [wp] Proved goals:    4 / 4
   Qed:             4
-[wp] Report 'tests/wp_acsl/assign_array.i.0.report.json'
+[wp] Report in:  'tests/wp_acsl/oracle_qualif/assign_array.0.report.json'
+[wp] Report out: 'tests/wp_acsl/result_qualif/assign_array.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
 jobA                 2     -                 2       100%

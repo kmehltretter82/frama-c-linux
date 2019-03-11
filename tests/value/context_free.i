@@ -58,7 +58,7 @@ void f(int x, float y, int **p, int (*g)(char const*), void *vv, void **vvv, int
   char* pvoid = svoid.p;
   *pvoid = 1;
   pvoid = qvoid;
-  *pvoid = &pvoid;
+  *pvoid = (char) &pvoid;
   if (vol) { g("toto"); }
 
 }

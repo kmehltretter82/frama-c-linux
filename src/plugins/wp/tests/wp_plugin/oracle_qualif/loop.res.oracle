@@ -12,11 +12,12 @@
 [wp] [Qed] Goal typed_init_loop_assigns_part1 : Valid
 [wp] [Qed] Goal typed_init_loop_assigns_part2 : Valid
 [wp] [Alt-Ergo] Goal typed_init_loop_assigns_part3 : Valid
-[wp] [Alt-Ergo] Goal typed_init_assigns : Unknown
+[wp] [Alt-Ergo] Goal typed_init_assigns : Unsuccess
 [wp] Proved goals:    8 / 9
   Qed:             3 
-  Alt-Ergo:        5  (unknown: 1)
-[wp] Report 'tests/wp_plugin/loop.i.0.report.json'
+  Alt-Ergo:        5  (unsuccess: 1)
+[wp] Report in:  'tests/wp_plugin/oracle_qualif/loop.0.report.json'
+[wp] Report out: 'tests/wp_plugin/result_qualif/loop.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
 init                 3      5 (104..128)     9      88.9%

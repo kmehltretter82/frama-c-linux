@@ -1,4 +1,6 @@
 [kernel] Parsing tests/builtins/alloc_weak.c (with preprocessing)
+[kernel:typing:int-conversion] tests/builtins/alloc_weak.c:37: Warning: 
+  Conversion from a pointer to an integer without an explicit cast
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed

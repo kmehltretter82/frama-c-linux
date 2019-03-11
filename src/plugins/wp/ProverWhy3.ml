@@ -314,7 +314,7 @@ type goal =
 module Goal =
 struct
   type t = goal
-  let compare = Pervasives.compare
+  let compare = Transitioning.Stdlib.compare
   let pretty fmt g =
     Format.fprintf fmt "[%s]%s.%s" g.file g.theory g.goal
 end

@@ -1443,7 +1443,7 @@ end
 
 (* @return [true] is the given logic real represents an exact float *)
 let is_exact_float r =
-  Pervasives.classify_float r.r_upper = FP_normal &&
+  classify_float r.r_upper = FP_normal &&
   Datatype.Float.equal r.r_upper r.r_lower
 
 let compare_logic_constant c1 c2 = match c1,c2 with
@@ -1584,7 +1584,7 @@ and compare_toffset off1 off2 =
 and compare_logic_label l1 l2 = match l1, l2 with
   | StmtLabel s1 , StmtLabel s2 -> Stmt.compare !s1 !s2
   | FormalLabel s1, FormalLabel s2 -> String.compare s1 s2
-  | BuiltinLabel l1, BuiltinLabel l2 -> Pervasives.compare l1 l2
+  | BuiltinLabel l1, BuiltinLabel l2 -> Transitioning.Stdlib.compare l1 l2
   | (StmtLabel _ | FormalLabel _), (FormalLabel _ | BuiltinLabel _) -> -1
   | (BuiltinLabel _ | FormalLabel _), (StmtLabel _ | FormalLabel _) -> 1
 
@@ -1932,7 +1932,7 @@ module Global_annotation = struct
             if res = 0 then Attributes.compare attr1 attr2 else res
           | Dcustom_annot _, _ -> -1
           | _, Dcustom_annot _ -> 1
-          | Dextended ((id1,_,_,_),_,_), Dextended((id2,_,_,_),_,_) ->
+          | Dextended ((id1,_,_,_,_),_,_), Dextended((id2,_,_,_,_),_,_) ->
             Datatype.Int.compare id1 id2
 
       let equal = Datatype.from_compare
@@ -1952,7 +1952,7 @@ module Global_annotation = struct
         | Dtype_annot(l,_) -> 17 * Logic_info.hash l
         | Dmodel_annot(l,_) -> 19 * Model_info.hash l
         | Dcustom_annot(_,n,_,_) -> 23 * Datatype.String.hash n
-        | Dextended ((id,_,_,_),_,_) -> 29 * Datatype.Int.hash id
+        | Dextended ((id,_,_,_,_),_,_) -> 29 * Datatype.Int.hash id
 
       let copy = Datatype.undefined
      end)
@@ -2178,7 +2178,7 @@ module Code_annotation = struct
      end)
 
   let loc ca = match ca.annot_content with
-    | AAssert(_,{pred_loc=loc})
+    | AAssert(_,_,{pred_loc=loc})
     | AInvariant(_,_,{pred_loc=loc})
     | AVariant({term_loc=loc},_) -> Some loc
     | AAssigns _ | AAllocation _ | APragma _ | AExtended _

@@ -100,7 +100,7 @@ module Properties =
       let arg_name = "p,..."
       let help = "Select properties having the one of the given tagnames (defaults to all properties).\n\
                   You may also replace the tagname by '@category' for the selection of all properties of the given category.\n\
-                  Accepted categories are: lemmas, requires, assigns, ensures, exits, complete_behaviors, disjoint_behaviors assert, invariant, variant, breaks, continues, returns.\n\
+                  Accepted categories are: lemmas, requires, assigns, ensures, exits, complete_behaviors, disjoint_behaviors, assert, check, invariant, variant, breaks, continues, returns.\n\
                   Starts by a minus character to remove properties from the selection."
     end)
 let () = on_reset Properties.clear
@@ -313,7 +313,7 @@ module SplitDepth =
 
 let () = Parameter_customize.set_group wp_strategy
 module DynCall =
-  False(struct
+  True(struct
     let option_name = "-wp-dynamic"
     let help = "Handle dynamic calls with specific annotations."
   end)

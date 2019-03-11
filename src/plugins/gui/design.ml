@@ -271,8 +271,9 @@ let filetree_selector
   end
 
 let pretty_predicate_status fmt p =
-  let s = Property_status.get p in
-  Format.fprintf fmt "Status: %a@." Property_status.pretty s
+  if Property.has_status p then
+    let s = Property_status.get p in
+    Format.fprintf fmt "Status: %a@." Property_status.pretty s
 
 (* This is called when a localizable is selected in the pretty-printed source
    buffer *)
@@ -419,7 +420,7 @@ let to_do_on_select
   in
   if button = 1 then begin
     match selected with
-    | PStart _ -> ()
+    | PStmtStart _ -> ()
     | PStmt (kf, stmt) ->
         current_statement_msg (Some kf) (Kstmt stmt);
         print_code_annotations main_ui kf stmt;
@@ -446,7 +447,7 @@ let to_do_on_select
         main_ui#pretty_information "This is a requires clause.@.%a@."
           pretty_predicate_status ip;
         main_ui#view_original (Property.location ip)
-    | PIP (Property.IPExtended(_,(_,name,_,_)) as ip) ->
+    | PIP (Property.IPExtended(_,(_,name,_,_,_)) as ip) ->
         main_ui#pretty_information "This clause is a %s extension.@.%a@."
           name
           pretty_predicate_status ip;
@@ -841,17 +842,16 @@ class main_window () : main_window_extension_points =
       width, if final_h then height else new_height
   in
   let main_window =
-    GWindow.window
+    Gtk_compat.window
       ?icon:framac_icon
       ~title:"Frama-C"
-      ~width
-      ~height
       ~position:`CENTER
       ~resizable:true
       ~show:false
       ()
   in
   let () = main_window#set_default_size ~width ~height in
+  let () = main_window#set_geometry_hints ~min_size:(1,1) main_window#coerce in
   let watch_cursor = Gdk.Cursor.create `WATCH in
   let arrow_cursor = Gdk.Cursor.create `ARROW in
 

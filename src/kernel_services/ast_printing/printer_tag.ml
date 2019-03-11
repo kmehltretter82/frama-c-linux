@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -29,7 +29,7 @@ open Cil_datatype
 
 type localizable =
   | PStmt of (kernel_function * stmt)
-  | PStart of (kernel_function * stmt)
+  | PStmtStart of (kernel_function * stmt)
   | PLval of (kernel_function option * kinstr * lval)
   | PExp of (kernel_function option * kinstr * exp)
   | PTermLval of (kernel_function option * kinstr * Property.t * term_lval)
@@ -48,7 +48,7 @@ module Localizable =
       let mem_project = Datatype.never_any_project
 
       let hash = function
-        | PStart (_,s) ->
+        | PStmtStart (_,s) ->
           Hashtbl.hash( 0, Stmt.hash s )
         | PStmt (_,s) ->
           Hashtbl.hash( 1, Stmt.hash s )
@@ -67,7 +67,7 @@ module Localizable =
 
       let equal l1 l2 = match l1,l2 with
         | PStmt (_,ki1), PStmt (_,ki2) -> ki1.sid = ki2.sid
-        | PStart (_,ki1), PStart (_,ki2) -> ki1.sid = ki2.sid
+        | PStmtStart (_,ki1), PStmtStart (_,ki2) -> ki1.sid = ki2.sid
         | PLval (_,ki1,lv1), PLval (_,ki2,lv2) ->
           Kinstr.equal ki1 ki2 && lv1 == lv2
         | PTermLval (_,ki1,pi1,lv1), PTermLval (_,ki2,pi2,lv2) ->
@@ -78,7 +78,7 @@ module Localizable =
         | PExp (_,_,e1), PExp(_,_,e2) -> Exp.equal e1 e2
         | PIP ip1, PIP ip2 -> Property.equal ip1 ip2
         | PGlobal g1, PGlobal g2 -> Global.equal g1 g2
-        | (PStmt _ | PStart _ | PLval _ | PExp _ | PTermLval _ | PVDecl _
+        | (PStmt _ | PStmtStart _ | PLval _ | PExp _ | PTermLval _ | PVDecl _
           | PIP _ | PGlobal _), _
           ->  false
 
@@ -90,7 +90,7 @@ module Localizable =
           Cil_datatype.Location.pretty fmt (Stmt.loc st)
 
       let pretty fmt = function
-        | PStart (_, s) ->
+        | PStmtStart (_, s) ->
           Format.fprintf fmt "LocalizableStart %d (%a)"
             s.sid Printer.pp_location (Cil_datatype.Stmt.loc s)
         | PStmt (_, s) ->
@@ -123,7 +123,7 @@ let kf_of_localizable loc =
   | PExp (kf_opt,_,_)
   | PTermLval(kf_opt, _,_,_)
   | PVDecl (kf_opt, _, _) -> kf_opt
-  | PStmt (kf, _) | PStart(kf,_) -> Some kf
+  | PStmt (kf, _) | PStmtStart(kf,_) -> Some kf
   | PIP ip -> Property.get_kf ip
   | PGlobal (GFun ({svar = vi}, _)) -> Some (Globals.Functions.get vi)
   | PGlobal _ -> None
@@ -133,7 +133,7 @@ let ki_of_localizable loc = match loc with
   | PExp (_, ki, _)
   | PTermLval(_, ki,_,_)
   | PVDecl (_, ki, _) -> ki
-  | PStmt (_, st) | PStart(_, st) -> Kstmt st
+  | PStmt (_, st) | PStmtStart(_, st) -> Kstmt st
   | PIP ip -> Property.get_kinstr ip
   | PGlobal _ -> Kglobal
 
@@ -147,7 +147,7 @@ let varinfo_of_localizable loc =
     | _ -> None
 
 let loc_of_localizable = function
-  | PStmt (_,st) | PStart(_,st)
+  | PStmt (_,st) | PStmtStart(_,st)
   | PLval (_,Kstmt st,_) | PExp(_,Kstmt st, _)
   | PTermLval(_,Kstmt st,_,_) ->
     Stmt.loc st
@@ -490,14 +490,13 @@ struct
         Format.fprintf fmt "@{<%s>%a@}"
           (Tag.create (PIP ip)) (super#allocation ~isloop) a;
 
-    method! stmtkind attrs next fmt sk =
+    method! stmtkind sattr next fmt sk =
       (* Special tag denoting the start of the statement, WITHOUT any ACSL
          assertion/statement contract, etc. *)
       let s = Extlib.the self#current_stmt in
       let f = Extlib.the self#current_kf in
-      let tag = Tag.create (PStart(f,s)) in
-      (* gui:stmt_start%d sk.sid *)
-      Format.fprintf fmt "@{<%s>%a@}" tag (super#stmtkind attrs next) sk
+      let tag = Tag.create (PStmtStart(f,s)) in
+      Format.fprintf fmt "@{<%s>%a@}" tag (super#stmtkind sattr next) sk
 
     initializer force_brace <- true
 

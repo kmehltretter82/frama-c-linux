@@ -879,7 +879,7 @@ and pp_spec fmt _spec = Format.fprintf fmt "pp_spec_TODO" (*{
                                                             mutable spec_disjoint_behaviors: string_list_list;
                                                             }*)
 
-and pp_acsl_extension fmt = pp_tuple4 pp_int pp_string pp_location pp_acsl_extension_kind fmt
+and pp_acsl_extension fmt = pp_tuple5 pp_int pp_string pp_location pp_bool pp_acsl_extension_kind fmt
 
 and pp_acsl_extension_kind fmt = function
   | Ext_id(int) -> Format.fprintf fmt "Ext_id(%a)"  pp_int int
@@ -922,9 +922,13 @@ and pp_pragma pp_term fmt = function
   | Slice_pragma(term) -> Format.fprintf fmt "Slice_pragma(%a)" (pp_slice_pragma pp_term) term
   | Impact_pragma(term) -> Format.fprintf fmt "Impact_pragma(%a)" (pp_impact_pragma pp_term) term
 
+and pp_assertion_kind fmt = function
+  | Assert -> Format.pp_print_string fmt "Assert"
+  | Check -> Format.pp_print_string fmt "Check"
+
 and pp_code_annotation_node fmt = function
-  | AAssert(string_list,predicate) ->
-    Format.fprintf fmt "AAssert(%a,%a)"  (pp_list pp_string) string_list  pp_predicate predicate
+  | AAssert(string_list,kind,predicate) ->
+    Format.fprintf fmt "AAssert(%a,%a,%a)"  (pp_list pp_string) string_list pp_assertion_kind kind pp_predicate predicate
   | AStmtSpec(string_list,spec) ->
     Format.fprintf fmt "AStmtSpec(%a,%a)"  (pp_list pp_string) string_list  pp_spec spec
   | AInvariant(string_list,bool,predicate) ->

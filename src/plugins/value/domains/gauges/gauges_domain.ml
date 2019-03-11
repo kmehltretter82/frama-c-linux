@@ -205,12 +205,12 @@ module G = struct
 
     let div_towards_minus_infty x y =
       if Integer.gt y Integer.zero
-      then Integer.pos_div x y
-      else Integer.(pos_div (neg x) (neg y))
+      then Integer.e_div x y
+      else Integer.(e_div (neg x) (neg y))
     let div_towards_plus_infty x y =
       if Integer.lt y Integer.zero
-      then Integer.pos_div x y
-      else Integer.(pos_div (neg x) (neg y))
+      then Integer.e_div x y
+      else Integer.(e_div (neg x) (neg y))
 
     (* Computes the possible [n] such that [(add b)^n = r], when [f^n]
        is [f] consecutive applications of [f]. *)
@@ -502,7 +502,7 @@ module G = struct
 
         let compare ii1 ii2 = match ii1, ii2 with
           | PreciseIteration i1, PreciseIteration i2 ->
-            Pervasives.compare i1 i2
+            Transitioning.Stdlib.compare i1 i2
           | MultipleIterations i1, MultipleIterations i2 ->
             MultipleIterations.compare i1 i2
           | PreciseIteration _, MultipleIterations _ -> -1

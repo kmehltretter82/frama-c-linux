@@ -33,7 +33,9 @@ type k =
   | Logic_var
   | Predicate
   | Type
-      
+  | Logic_type
+  | Logic_constructor
+
 let name_of_kind = function
   | Behavior -> "behavior"
   | Enum -> "enum"
@@ -47,6 +49,8 @@ let name_of_kind = function
   | Logic_var -> "logic variable"
   | Predicate -> "predicate"
   | Type -> "type"
+  | Logic_type -> "logic type"
+  | Logic_constructor -> "logic constructor"
 
 let prefix = function
   | Behavior -> "B"
@@ -61,6 +65,8 @@ let prefix = function
   | Logic_var -> "LV"
   | Predicate -> "P"
   | Type -> "T"
+  | Logic_type -> "LT"
+  | Logic_constructor -> "LC"
 
 include Datatype.Make_with_collections
 (struct
@@ -69,7 +75,7 @@ include Datatype.Make_with_collections
   let reprs = [ Global_var ]
   let hash (k:k) = Hashtbl.hash k
   let equal (k1:k) k2 = k1 = k2
-  let compare (k1:k) k2 = Pervasives.compare k1 k2
+  let compare (k1:k) k2 = Transitioning.Stdlib.compare k1 k2
   let varname _ = "k"
   let internal_pretty_code = Datatype.undefined
   let copy = Datatype.identity

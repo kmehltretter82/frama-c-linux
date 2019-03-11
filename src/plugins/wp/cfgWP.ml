@@ -220,8 +220,6 @@ struct
         | Some s -> S.add s vc.path in
       let deps = match hpid with
         | None -> [] | Some p -> [WpPropId.property_of_id p] in
-      let descr = match hpid with
-        | None -> descr | Some _ -> None in
       let dset = List.fold_right D.add deps vc.deps in
       let wrns = match warn with
         | None -> vc.warn
@@ -461,7 +459,6 @@ struct
 
   let add_hyp wenv (hpid,predicate) wp = in_wenv wenv wp
       (fun env wp ->
-         let descr = Pretty_utils.to_string WpPropId.pretty hpid in
          let outcome = Warning.catch
              ~severe:false ~effect:"Skip hypothesis"
              (L.pred `Negative env) predicate in
@@ -469,7 +466,7 @@ struct
            | Warning.Result(warn,p) -> warn , [p]
            | Warning.Failed warn -> warn , []
          in
-         let vcs = gmap (assume_vc ~hpid ~descr ~warn hs) wp.vcs in
+         let vcs = gmap (assume_vc ~hpid ~warn hs) wp.vcs in
          { wp with vcs = vcs })
 
   let add_goal wenv (gpid,predicate) wp = in_wenv wenv wp
@@ -865,22 +862,20 @@ struct
       (fun env wp ->
          let shere = L.current env in
          let sinit = L.mem_at env Clabels.init in
-         let hyp = C.unchanged shere sinit v in
-         let filter = true in
-         let init = true in
-         let descr = "Global Constant" in
-         let vcs = gmap (assume_vc ~filter ~init ~descr [hyp]) wp.vcs in
-         { wp with vcs = vcs })
+         let const_vc = assume_vc
+             ~init:true ~filter:true
+             ~descr:"Global Constant"
+             [C.unchanged shere sinit v]
+         in { wp with vcs = gmap const_vc wp.vcs })
 
   let init wenv var init wp = in_wenv wenv wp
       (fun env wp ->
          let sigma = L.current env in
-         let hyps = C.init ~sigma var init in
-         let filter = true in
-         let init = true in
-         let descr = "Initializer" in
-         let vcs = gmap (assume_vcs ~filter ~init ~descr hyps) wp.vcs in
-         { wp with vcs = vcs })
+         let init_vc = assume_vcs
+             ~init:true ~filter:true
+             ~descr:"Initializer"
+             (C.init ~sigma var init)
+         in { wp with vcs = gmap init_vc wp.vcs })
 
   (* -------------------------------------------------------------------------- *)
   (* --- WP RULE : tag                                                      --- *)
@@ -893,48 +888,45 @@ struct
   (* --- WP RULE : call dynamic                                             --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let call_instances sigma gpid fct calls vcs =
+  let call_pointer sigma fct =
     let outcome = Warning.catch
         ~severe:true ~effect:"Degenerated goal"
         (C.call sigma) fct in
-    let warn,goal = match outcome with
-      | Warning.Failed warn -> warn,F.p_false
-      | Warning.Result(warn,floc) ->
-          warn , F.p_any (C.instance_of floc) calls
+    match outcome with
+    | Warning.Failed warn -> warn,None
+    | Warning.Result(warn,floc) -> warn,Some floc
+
+  let call_instance_of gpid (warn,fopt) calls vcs =
+    let goal = match fopt with
+      | None -> F.p_false
+      | Some floc -> F.p_any (C.instance_of floc) calls
     in add_vc (Gprop gpid) ~warn goal vcs
 
-  let call_contract stmt sigma fptr (kf,wp) : vc Splitter.t Gmap.t =
+  let call_contract stmt sigma hpid (warn,fopt) (kf,wp) : vc Splitter.t Gmap.t =
     let pa = join_with sigma wp.sigma in
     let tag = Splitter.call stmt kf in
-    let descr = Printf.sprintf "Instance of '%s'" (Kernel_function.get_name kf) in
-    let instance_vc pa fptr vc =
-      passify_vc pa
-        begin match fptr with
-          | None -> vc
-          | Some(warn,floc) ->
-              let hyp = C.instance_of floc kf in
-              assume_vc ~stmt ~warn ~descr [hyp] vc
-        end
+    let descr =
+      Printf.sprintf "Instance of '%s'" (Kernel_function.get_name kf) in
+    let instance_of vc =
+      let hyp = match fopt with
+        | None -> F.p_true
+        | Some floc -> C.instance_of floc kf
+      in assume_vc ~stmt ~warn ~descr ~hpid [hyp] vc
     in
     Gmap.map
       (fun s ->
          Splitter.map
-           (instance_vc pa fptr)
+           (fun vc -> passify_vc pa (instance_of vc))
            (Splitter.group tag merge_vcs s)
       ) wp.vcs
 
   let call_dynamic wenv stmt gpid fct calls = L.in_frame wenv.frame
       begin fun () ->
         let sigma = Sigma.create () in
-        let outcome = Warning.catch
-            ~severe:false ~effect:"Ignored function pointer value"
-            (C.call sigma) fct in
-        let fptr = match outcome with
-          | Warning.Failed _warn -> None
-          | Warning.Result(warn,floc) -> Some(warn,floc) in
-        let vcs_calls = List.map (call_contract stmt sigma fptr) calls in
+        let called = call_pointer sigma fct in
+        let vcs_calls = List.map (call_contract stmt sigma gpid called) calls in
         let vcs = merge_all_vcs vcs_calls in
-        let vcs = call_instances sigma gpid fct (List.map fst calls) vcs in
+        let vcs = call_instance_of gpid called (List.map fst calls) vcs in
         let effects = List.fold_left
             (fun es (_,wp) -> Eset.union es wp.effects) Eset.empty calls in
         { sigma = Some sigma ; vcs = vcs ; effects = effects }
@@ -1474,7 +1466,7 @@ struct
                 begin
                   Wp_parameters.feedback ~ontty:`Transient "Collecting checks" ;
                   Bag.iter
-                    (fun w -> ignore (Wpo.resolve w))
+                    (fun w -> ignore (Wpo.reduce w))
                     !collection ;
                   Lang.F.Check.iter (add_qed_check collection m) ;
                 end

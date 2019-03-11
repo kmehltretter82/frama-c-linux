@@ -128,6 +128,8 @@ val dkey_visitor: category
 val wkey_annot_error: warn_category
 (** error in annotation. If only a warning, annotation will just be ignored. *)
 
+val wkey_acsl_float_compare: warn_category
+
 val wkey_drop_unused: warn_category
 
 val wkey_implicit_conv_void_ptr: warn_category
@@ -135,6 +137,8 @@ val wkey_implicit_conv_void_ptr: warn_category
 val wkey_incompatible_types_call: warn_category
 
 val wkey_incompatible_pointer_types: warn_category
+
+val wkey_int_conversion: warn_category
 
 val wkey_cert_exp_46: warn_category
 

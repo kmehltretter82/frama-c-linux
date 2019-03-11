@@ -42,7 +42,7 @@ module Behavior_extensions = struct
     | Ext_preds preds ->
       Pretty_utils.pp_list ~sep:",@ " printer#predicate fmt preds
 
-  let pp (printer) fmt (_, name, _, ext) =
+  let pp (printer) fmt (_,name,_,_,ext) =
     let pp =
       try
         Hashtbl.find printer_tbl name
@@ -109,9 +109,7 @@ let print_std_includes fmt globs =
     in
     let add_file acc g =
       let attrs = Cil_datatype.Global.attr g in
-      match Cil.findAttribute "fc_stdlib" attrs with
-      | [ arg ] -> extract_file acc arg
-      | _ -> acc
+      List.fold_left extract_file acc (Cil.findAttribute "fc_stdlib" attrs)
     in
     let includes = List.fold_left add_file Datatype.String.Set.empty globs in
     let print_one_include s = Format.fprintf fmt "#include \"%s\"@." s in
@@ -417,6 +415,13 @@ let extract_acsl_list t =
 
 let is_cfg_block =
   function Stmt_block _ -> false | Then_with_else | Other | Body -> true
+
+let rec has_unprotected_local_init s =
+  match s.skind with
+  | Instr (Local_init _) -> true
+  | UnspecifiedSequence((s,_,_,_,_) :: _) -> has_unprotected_local_init s
+  | Block { bscoping = false; bstmts = s :: _ } -> has_unprotected_local_init s
+  | _ -> false
 
 class cil_printer () = object (self)
 
@@ -1020,9 +1025,8 @@ class cil_printer () = object (self)
 
   method stmt_labels fmt (s:stmt) =
     let suf =
-      match s.skind with
-      | Instr (Local_init _) -> format_of_string ";@]@ "
-      | _ -> format_of_string "@]@ "
+      if has_unprotected_local_init s then format_of_string ";@]@ "
+      else format_of_string "@]@ "
     in
     if s.labels <> [] then
       Pretty_utils.pp_list
@@ -2675,8 +2679,8 @@ class cil_printer () = object (self)
       self#pp_acsl_keyword "requires"
       self#identified_predicate p
 
-  method extended fmt (id, name, l,ext) =
-    Behavior_extensions.pp (self :> extensible_printer_type) fmt (id,name,l,ext)
+  method extended fmt (ext : acsl_extension) =
+    Behavior_extensions.pp (self :> extensible_printer_type) fmt ext
 
   method post_cond fmt (k,p) =
     let kw = get_termination_kind_name k in
@@ -2887,10 +2891,15 @@ class cil_printer () = object (self)
           (Pretty_utils.pp_list ~sep:",@ " pp_print_string) l
     in
     match ca.annot_content with
-    | AAssert (behav,p) ->
+    | AAssert (behav,Assert,p) ->
       fprintf fmt "@[%a%a@ %a;@]"
         pp_for_behavs behav
         self#pp_acsl_keyword "assert"
+        self#predicate p
+    | AAssert (behav,Check,p) ->
+      fprintf fmt "@[%a%a@ %a;@]"
+        pp_for_behavs behav
+        self#pp_acsl_keyword "check"
         self#predicate p
     | APragma (Slice_pragma sp) ->
       fprintf fmt "@[%a@ %a;@]"
@@ -2932,7 +2941,7 @@ class cil_printer () = object (self)
       let prefix = if is_loop then "loop " else "" in
       fprintf fmt "@[<2>%a%s%a@]"
         pp_for_behavs behav prefix
-        (Behavior_extensions.pp (self:>Printer_api.extensible_printer_type)) e
+        self#extended e
 
   method private logicPrms fmt arg =
     let pvar fmt = self#logic_var fmt arg in

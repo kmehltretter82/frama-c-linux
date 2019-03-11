@@ -7,11 +7,12 @@
 [wp] [Qed] Goal typed_rotate_left_ensures_bit_zero : Valid
 [wp] [Alt-Ergo] Goal typed_rotate_left_ensures_other_bits : Valid
 [wp] [Qed] Goal typed_sum_ensures_ok : Valid
-[wp] [Alt-Ergo] Goal typed_sum_ensures_ko : Unknown
+[wp] [Alt-Ergo] Goal typed_sum_ensures_ko : Unsuccess
 [wp] Proved goals:    3 / 4
   Qed:             2 
-  Alt-Ergo:        1  (unknown: 1)
-[wp] Report 'tests/wp_acsl/unit_bit_test.c.0.report.json'
+  Alt-Ergo:        1  (unsuccess: 1)
+[wp] Report in:  'tests/wp_acsl/oracle_qualif/unit_bit_test.0.report.json'
+[wp] Report out: 'tests/wp_acsl/result_qualif/unit_bit_test.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
 sum                  1     -                 2      50.0%

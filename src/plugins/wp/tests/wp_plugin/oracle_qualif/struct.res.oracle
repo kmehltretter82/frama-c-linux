@@ -24,7 +24,8 @@
 [wp] [Qed] Goal typed_id_ensures_qed_ok_P2 : Valid
 [wp] Proved goals:   18 / 18
   Qed:            18
-[wp] Report 'tests/wp_plugin/struct.i.0.report.json'
+[wp] Report in:  'tests/wp_plugin/oracle_qualif/struct.0.report.json'
+[wp] Report out: 'tests/wp_plugin/result_qualif/struct.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
 id                   2     -                 2       100%

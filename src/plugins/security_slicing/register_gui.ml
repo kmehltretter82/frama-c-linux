@@ -57,7 +57,7 @@ let security_highlighter buffer loc ~start ~stop =
       if List.exists (fun k -> k.sid=s.sid) d then begin
         let tag = make_tag buffer"direct" [`BACKGROUND  "green" ] in
         apply_tag buffer tag start stop end
-  | PStart _
+  | PStmtStart _
   | PExp _ | PVDecl _ | PTermLval _ | PLval _ | PGlobal _ | PIP _ -> ()
 
 let security_selector

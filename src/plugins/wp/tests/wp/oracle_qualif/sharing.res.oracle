@@ -8,7 +8,8 @@
 [wp] Proved goals:    1 / 1
   Qed:             0 
   Alt-Ergo:        1
-[wp] Report 'tests/wp/sharing.c.0.report.json'
+[wp] Report in:  'tests/wp/oracle_qualif/sharing.0.report.json'
+[wp] Report out: 'tests/wp/result_qualif/sharing.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
 f                   -       1 (48..60)       1       100%

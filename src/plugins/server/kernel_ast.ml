@@ -81,7 +81,7 @@ struct
 
   let create_tag = function
     | PStmt(_,st) -> of_stmt st
-    | PStart(_,st) -> of_start st
+    | PStmtStart(_,st) -> of_start st
     | PVDecl(_,_,vi) -> of_varinfo vi
     | PLval _ -> Printf.sprintf "#l%d" (incr kid ; !kid)
     | PExp _ -> Printf.sprintf "#e%d" (incr kid ; !kid)

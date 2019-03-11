@@ -87,7 +87,7 @@ module Rel : sig
   val add_abs : Int.t -> t -> Int.t
   val add : t -> t -> t
   val sub_abs : Int.t -> Int.t -> t
-  val pos_rem: t -> Int.t -> t
+  val e_rem: t -> Int.t -> t
 
   val check: rem:t -> modu:Int.t -> bool
 end

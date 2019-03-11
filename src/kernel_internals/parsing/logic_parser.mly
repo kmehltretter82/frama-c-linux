@@ -247,7 +247,7 @@
 %token ALLOCATION STATIC REGISTER AUTOMATIC DYNAMIC UNALLOCATED
 %token ALLOCABLE FREEABLE FRESH
 %token DOLLAR QUESTION MINUS PLUS STAR AMP SLASH PERCENT LSQUARE RSQUARE EOF
-%token GLOBAL INVARIANT VARIANT DECREASES FOR LABEL ASSERT SEMICOLON NULL EMPTY
+%token GLOBAL INVARIANT VARIANT DECREASES FOR LABEL ASSERT CHECK SEMICOLON NULL EMPTY
 %token REQUIRES ENSURES ALLOCATES FREES ASSIGNS LOOP NOTHING SLICE IMPACT PRAGMA FROM
 %token <string> EXT_CODE_ANNOT EXT_GLOBAL EXT_CONTRACT
 %token EXITS BREAKS CONTINUES RETURNS
@@ -1430,6 +1430,7 @@ beg_pragma_or_code_annotation:
 | SLICE {}
 | FOR {}
 | ASSERT {}
+| CHECK {}
 | INVARIANT {}
 | EXT_CODE_ANNOT {}
 ;
@@ -1442,7 +1443,9 @@ pragma_or_code_annotation:
 
 code_annotation:
 | ASSERT full_lexpr SEMICOLON
-      { fun bhvs -> AAssert (bhvs,$2) }
+      { fun bhvs -> AAssert (bhvs,Assert,$2) }
+| CHECK full_lexpr SEMICOLON
+      { fun bhvs -> AAssert (bhvs,Check,$2) }
 | INVARIANT full_lexpr SEMICOLON { fun bhvs -> AInvariant (bhvs,false,$2) }
 | EXT_CODE_ANNOT grammar_extension SEMICOLON
   { fun bhvs ->
@@ -1837,6 +1840,7 @@ is_acsl_decl_or_code_annot:
 | EXT_GLOBAL     { $1 }
 | ASSUMES   { "assumes" }
 | ASSERT    { "assert" }
+| CHECK     { "check" }
 | GLOBAL    { "global" }
 | IMPACT    { "impact" }
 | INDUCTIVE { "inductive" }

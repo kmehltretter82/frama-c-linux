@@ -686,7 +686,7 @@ STARTUP_CMX=$(STARTUP_CMO:.cmo=.cmx)
 WTOOLKIT= \
 	wutil widget wbox wfile wpane wpalette wtext wtable
 
-ifeq ($(strip $(GTKSOURCEVIEW)),lablgtk3.sourceview3)
+ifeq ("$(LABLGTK_VERSION)","3")
 
 src/plugins/gui/GSourceView.ml: src/plugins/gui/GSourceView3.ml.in
 	$(CP) $< $@
@@ -735,6 +735,7 @@ endif
 GENERATED+=src/plugins/gui/gtk_compat.ml
 
 SINGLE_GUI_CMO:= \
+	wutil_once \
 	gtk_compat \
 	$(WTOOLKIT) \
 	$(SOURCEVIEWCOMPAT) \
@@ -958,7 +959,7 @@ $(eval $(call include_generic_plugin_Makefile,$(PLUGIN_NAME)))
 PLUGIN_ENABLE:=$(ENABLE_RTEGEN)
 PLUGIN_NAME:=RteGen
 PLUGIN_DIR:=src/plugins/rte
-PLUGIN_CMO:= options generator rte visit register
+PLUGIN_CMO:= options generator rte flags visit register
 PLUGIN_DISTRIBUTED:=yes
 PLUGIN_INTERNAL_TEST:=yes
 PLUGIN_TESTS_DIRS:=rte rte_manual
@@ -1300,7 +1301,7 @@ bin/viewer.byte$(EXE): $(filter-out $(GRAPH_GUICMO),$(ALL_GUI_CMO)) \
 			$(GEN_BYTE_LIBS) \
 			$(PLUGIN_DYN_CMO_LIST) $(PLUGIN_DYN_GUI_CMO_LIST)
 	$(PRINT_LINKING) $@
-	$(OCAMLC) $(BLINKFLAGS) -o $@ $(BYTE_LIBS) \
+	$(OCAMLC) $(BLINKFLAGS) $(THREAD) -o $@ $(BYTE_LIBS) \
 	  $(CMO) \
 	  $(filter-out \
 	    $(patsubst $(PLUGIN_GUI_LIB_DIR)/%,$(PLUGIN_LIB_DIR)/%,\
@@ -1314,7 +1315,7 @@ bin/viewer.opt$(EXE): $(filter-out $(GRAPH_GUICMX),$(ALL_GUI_CMX)) \
 			$(PLUGIN_DYN_CMX_LIST) $(PLUGIN_DYN_GUI_CMX_LIST) \
 			$(PLUGIN_CMX_LIST) $(PLUGIN_GUI_CMX_LIST)
 	$(PRINT_LINKING) $@
-	$(OCAMLOPT) $(OLINKFLAGS) -o $@ $(OPT_LIBS) \
+	$(OCAMLOPT) $(OLINKFLAGS) $(THREAD) -o $@ $(OPT_LIBS) \
 	  $(CMX) \
 	  $(filter-out \
 	    $(patsubst $(PLUGIN_GUI_LIB_DIR)/%,$(PLUGIN_LIB_DIR)/%,\
@@ -1424,9 +1425,9 @@ $(foreach file,$(LONELY_TESTS_ML_FILES),\
 $(foreach file,$(LONELY_TESTS_ML_FILES),\
   $(eval $(file:%.ml=%.cmxs): OFLAGS+=-I $(dir $(file))))
 .PRECIOUS: $(LONELY_TESTS_ML_FILES:%.ml=%.cmx) \
-           $(LONELY_TESTS_DYN_FILES:%.ml=%.cmxs) \
-           $(LONELY_TESTS_BYTE_FILES:%.ml=%.cmo) \
-           $(LONELY_TESTS_BYTE_FILES:%.ml=%.cmi)
+           $(LONELY_TESTS_ML_FILES:%.ml=%.cmxs) \
+           $(LONELY_TESTS_ML_FILES:%.ml=%.cmo) \
+           $(LONELY_TESTS_ML_FILES:%.ml=%.cmi)
 
 bin/ocamldep_transitive_closure: devel_tools/ocamldep_transitive_closure.ml
 	$(OCAMLOPT) -package ocamlgraph -package str -linkpkg -o $@ $<
@@ -1777,12 +1778,24 @@ indent: $(INDENT_TARGET)
 
 lint: $(LINT_TARGET)
 
+check-ocp-indent-version:
+	if command -v ocp-indent >/dev/null; then \
+		$(eval ocp_version_major := $(shell ocp-indent --version | $(SED) -E "s/^([0-9]+)\.[0-9]+\..*/\1/")) \
+		$(eval ocp_version_minor := $(shell ocp-indent --version | $(SED) -E "s/^[0-9]+\.([0-9]+)\..*/\1/")) \
+		if [ "$(ocp_version_major)" -gt 1 -o "$(ocp_version_minor)" -gt 7 ]; then \
+			echo "error: ocp-indent <1.7.0 required for linting (got $(ocp_version_major).$(ocp_version_minor))"; \
+			exit 1; \
+		fi; \
+	else \
+		exit 1; \
+	fi;
+
 fix-syntax: $(FIX_SYNTAX_TARGET)
 
-$(INDENT_TARGET): %.indent: %
+$(INDENT_TARGET): %.indent: % check-ocp-indent-version
 	ocp-indent -i $<
 
-$(LINT_TARGET): %.lint: %
+$(LINT_TARGET): %.lint: % check-ocp-indent-version
 	# See SO 1825552 on mixing grep and \t (and cry)
 	# For OK_NL, we have three cases:
 	# - for empty files, the computation boils down to 0 - 0 == 0
@@ -1970,15 +1983,19 @@ install:: install-lib
 	if [ -d "$(FRAMAC_PLUGIN)" ]; then \
 	  $(CP)  $(PLUGIN_DYN_CMI_LIST) $(PLUGIN_META_LIST) \
 		 $(FRAMAC_PLUGINDIR); \
-	  $(CP)  $(PLUGIN_DYN_CMO_LIST) $(PLUGIN_DYN_CMX_LIST) \
-		 $(FRAMAC_PLUGINDIR)/top; \
+	  $(CP)  $(PLUGIN_DYN_CMO_LIST) $(FRAMAC_PLUGINDIR)/top; \
+	  if [ "$(OCAMLBEST)" = "opt" ]; then \
+	    $(CP) $(PLUGIN_DYN_CMX_LIST) $(FRAMAC_PLUGINDIR)/top; \
+	  fi; \
 	fi
 	$(PRINT_INSTALL) gui plug-ins
 	if [ -d "$(FRAMAC_PLUGIN_GUI)" -a "$(PLUGIN_DYN_GUI_EXISTS)" = "yes" ]; \
 	then \
 	  $(CP) $(patsubst %.cma,%.cmi,$(PLUGIN_DYN_GUI_CMO_LIST:.cmo=.cmi)) \
-		$(PLUGIN_DYN_GUI_CMO_LIST) $(PLUGIN_DYN_GUI_CMX_LIST) \
-		$(FRAMAC_PLUGINDIR)/gui; \
+		$(PLUGIN_DYN_GUI_CMO_LIST) $(FRAMAC_PLUGINDIR)/gui; \
+	  if [ "$(OCAMLBEST)" = "opt" ]; then \
+	    $(CP) $(PLUGIN_DYN_GUI_CMX_LIST) $(FRAMAC_PLUGINDIR)/gui; \
+	  fi; \
 	fi
 	$(PRINT_INSTALL) man pages
 	$(CP) man/frama-c.1 $(MANDIR)/man1/frama-c.1

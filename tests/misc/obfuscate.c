@@ -46,3 +46,16 @@ int logic(int f1)
 int main(int* p) { 
   if ("ti\rti" == "ti\rti") f(p); 
 }
+
+/* Obfuscate logic types and logic constructors. */
+/*@ type t = T | F; */
+
+#include "stdint.h"
+
+/* Do not obfuscate builtins and stdlib types and functions. */
+int builtin_and_stdlib () {
+  int32_t x = 42;
+  Frama_C_show_each(x);
+  /*@ assert \true; */
+  return 1;
+}

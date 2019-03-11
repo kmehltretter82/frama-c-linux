@@ -54,8 +54,12 @@ val is_assigns : prop_id -> bool
 val is_requires : Property.t -> bool
 val is_loop_preservation : prop_id -> stmt option
 
+(** test if the prop_id does not have a [no_wp:] in its name(s). *)
+val select_default : prop_id -> bool
+
 (** test if the prop_id has to be selected for the asked name.
- * Also returns a debug message to explain then answer. *)
+    Also returns a debug message to explain then answer. Includes
+    a test for [no_wp:]. *)
 val select_by_name : string list -> prop_id -> bool
 
 (** test if the prop_id has to be selected when we want to select the call

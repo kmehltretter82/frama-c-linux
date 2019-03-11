@@ -864,20 +864,29 @@ let export gstat specfile =
 
 (* -------------------------------------------------------------------------- *)
 
-let export_json gstat jfile =
+let export_json gstat ?jinput ~joutput () =
   begin
-    Wp_parameters.feedback "Report '%s'" jfile ;
     let js =
       try
-        if Sys.file_exists jfile
-        then Json.load_file jfile else `Null
+        let jfile = match jinput with
+          | None ->
+              Wp_parameters.feedback "Report '%s'" joutput ;
+              joutput
+          | Some jinput ->
+              Wp_parameters.feedback "Report in:  '%s'" jinput ;
+              Wp_parameters.feedback "Report out: '%s'" joutput ;
+              jinput
+        in
+        if Sys.file_exists jfile then
+          Json.load_file jfile
+        else `Null
       with Json.Error(file,line,msg) ->
         let source = Log.source ~file ~line in
         Wp_parameters.error ~source "Incorrect json file: %s" msg ;
         `Null
     in
     rankify_fcstat gstat js ;
-    Json.save_file jfile (json_of_fcstat gstat) ;
+    Json.save_file joutput (json_of_fcstat gstat) ;
   end
 
 

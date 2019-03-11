@@ -285,10 +285,13 @@ end) = struct
     {data with over_inputs_d = Zone.join data.over_inputs_d new_inputs}
   ;;
 
-  let add_out state lv deps data =
+  (* Initialized const variables should be included as outputs of the function,
+     so [for_writing] must be false for local initializations. It should be
+     true for all other instructions. *)
+  let add_out ~for_writing state lv deps data =
     let deps, new_outs, exact =
       !Db.Value.lval_to_zone_with_deps_state state
-        ~deps:(Some deps) ~for_writing:true lv
+        ~deps:(Some deps) ~for_writing lv
     in
     store_non_terminating_outputs new_outs;
     let new_inputs = Zone.diff deps data.under_outputs_d in
@@ -304,7 +307,7 @@ end) = struct
       over_inputs_d = Zone.join data.over_inputs_d new_inputs;
       over_outputs_d = Zone.join data.over_outputs_d new_outs }
 
-  let transfer_call s dest f args _loc data =
+  let transfer_call ~for_writing s dest f args _loc data =
     let state = X.stmt_state s in
     let f_inputs, called =
       !Db.Value.expr_to_kernel_function_state
@@ -349,7 +352,7 @@ end) = struct
       (* Treatment for the possible assignment of the call result *)
       (match dest with
        | None -> result
-       | Some lv -> add_out state lv Zone.bottom result)
+       | Some lv -> add_out ~for_writing state lv Zone.bottom result)
     in result
 
   (* Transfer function on instructions. *)
@@ -360,14 +363,14 @@ end) = struct
       let e_inputs = 
         !Db.From.find_deps_no_transitivity_state state exp 
       in
-      add_out state lv e_inputs data
+      add_out ~for_writing:true state lv e_inputs data
     | Local_init (v, AssignInit i, _) ->
       let state = X.stmt_state stmt in
       let rec aux lv i acc =
         match i with
         | SingleInit e ->
           let e_inputs = !Db.From.find_deps_no_transitivity_state state e in
-          add_out state lv e_inputs acc
+          add_out ~for_writing:false state lv e_inputs acc
         | CompoundInit(ct, initl) ->
           let implicit = true in
           let doinit o i _ data = aux (Cil.addOffsetLval o lv) i data in
@@ -375,9 +378,10 @@ end) = struct
       in
       aux (Cil.var v) i data
     | Call (lvaloption,funcexp,argl,loc) ->
-      transfer_call stmt lvaloption funcexp argl loc data
+      transfer_call ~for_writing:true stmt lvaloption funcexp argl loc data
     | Local_init(v, ConsInit(f, args, kind), loc) ->
-      Cil.treat_constructor_as_func (transfer_call stmt) v f args kind loc data
+      let transfer = transfer_call ~for_writing:false stmt in
+      Cil.treat_constructor_as_func transfer v f args kind loc data
     | Asm _ | Code_annot _ | Skip _ -> data
   ;;
 

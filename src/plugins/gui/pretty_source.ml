@@ -27,7 +27,7 @@ open Printer_tag
 
 type localizable = Printer_tag.localizable =
   | PStmt of (kernel_function * stmt)
-  | PStart of (kernel_function * stmt)
+  | PStmtStart of (kernel_function * stmt)
   | PLval of (kernel_function option * kinstr * lval)
   | PExp of (kernel_function option * kinstr * exp)
   | PTermLval of (kernel_function option * kinstr * Property.t * term_lval)
@@ -101,7 +101,7 @@ struct
      and not as a code annotation.
   *)
   let add state range = function
-    | Printer_tag.PStart(_,st) ->
+    | Printer_tag.PStmtStart(_,st) ->
       Datatype.Int.Hashtbl.add state.stmt_start st.sid (fst range)
     | localizable ->
       if not (Hashtbl.mem state.table range) then
@@ -164,8 +164,8 @@ struct
            if (pe1 = pe2) then 0
            else
              (* most englobing comes first *)
-             Pervasives.compare pe2 pe1
-         else Pervasives.compare pb1 pb2
+             Transitioning.Stdlib.compare pe2 pe1
+         else Transitioning.Stdlib.compare pb1 pb2
       ) arr
     ;
     arr
@@ -212,7 +212,7 @@ struct
   let current = ref 0
   let charcode = function
     | PStmt _ -> 's'
-    | PStart _ -> 'k'
+    | PStmtStart _ -> 'k'
     | PLval _ -> 'l'
     | PExp _ -> 'e'
     | PTermLval _ -> 't'
@@ -274,12 +274,14 @@ let localizable_from_locs state ~file ~line =
 let buffer_formatter state source =
   let starts = Stack.create () in
   let emit_open_tag s =
+    let s = Transitioning.Format.string_of_stag s in
     (* Ignore tags that are not ours *)
     if Extlib.string_prefix "guitag:" s then
       Stack.push (source#end_iter#offset, Tag.get s) starts ;
     ""
   in
   let emit_close_tag s =
+    let s = Transitioning.Format.string_of_stag s in
     (try
        if Extlib.string_prefix "guitag:" s then
          let (p,sid) = Stack.pop starts in
@@ -292,10 +294,12 @@ let buffer_formatter state source =
   Format.pp_set_tags gtk_fmt true;
   Format.pp_set_print_tags gtk_fmt false;
   Format.pp_set_mark_tags gtk_fmt true;
-  Format.pp_set_formatter_tag_functions
-    gtk_fmt {(Format.pp_get_formatter_tag_functions gtk_fmt ()) with
-             Format.mark_open_tag = emit_open_tag;
-             Format.mark_close_tag = emit_close_tag;};
+  let open Transitioning.Format in
+  pp_set_formatter_stag_functions
+    gtk_fmt {(pp_get_formatter_stag_functions gtk_fmt ())
+             with
+              mark_open_stag = emit_open_tag;
+              mark_close_stag = emit_close_tag;};
 
   Format.pp_set_margin gtk_fmt 79;
   gtk_fmt
@@ -344,7 +348,7 @@ let display_source globals
                     in
                     highlighter v ~start:pb ~stop:pe
                   with Not_found -> ())
-             | PStart _
+             | PStmtStart _
              | PTermLval _ | PLval _ | PVDecl _ | PGlobal _
              | PIP _ | PExp _ ->
                  highlighter v  ~start:pb ~stop:pe

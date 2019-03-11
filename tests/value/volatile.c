@@ -80,7 +80,7 @@ int * volatile main2() {
   int * volatile p1, * volatile p2, * volatile p3;
   p1 = G ? 0 : &X;
   p2 = &X;
-  k = G ? 0 : &X;
+  k = G ? 0 : (int) &X;
   p3 = k;
   return k;
 }

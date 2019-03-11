@@ -255,7 +255,7 @@ let translate_history_elt old_helt =
   | Global old_g -> global_Global old_g
   | Localizable (PGlobal old_g) -> global_Global old_g
   | Localizable(PVDecl(Some kf,_,_)) -> global_Global (kf_to_global kf)
-  | Localizable ( PStmt(kf,_) | PStart(kf,_) |
+  | Localizable ( PStmt(kf,_) | PStmtStart(kf,_) |
                   PLval(Some kf,_,_) | PExp(Some kf,_,_)
                 | PTermLval(Some kf,_,_,_) as loc) ->
       begin match global (kf_to_global kf) with

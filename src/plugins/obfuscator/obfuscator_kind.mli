@@ -33,6 +33,8 @@ type k =
   | Logic_var
   | Predicate
   | Type
+  | Logic_type
+  | Logic_constructor
 
 include Datatype.S_with_collections with type t = k
 val prefix: t -> string

@@ -170,7 +170,7 @@ let search_range kind ~min ~max (v, v_size, _v_shift) acc =
     read_char kind offset v acc
   else
     (* The value [v] contains [nb_chars] characters: need [nb_chars] reads. *)
-    let nb_chars = Integer.div v_size kind.size in
+    let nb_chars = Integer.e_div v_size kind.size in
     (* Reads the [count]-nth character in [v]. *)
     let rec do_one_char count ~max res =
       let start = Integer.mul kind.size count in
@@ -222,9 +222,9 @@ let fold_offsm kind ~validity ~start ~max offsetmap acc =
            overlaps between two ranges of the offsetmap.
          - and either the value is isotropic, or the reads are aligned with the
            repeated values. *)
-      if Integer.is_zero (Integer.pos_rem (Integer.succ max) modu) &&
+      if Integer.is_zero (Integer.e_rem (Integer.succ max) modu) &&
          (Cvalue.V_Or_Uninitialized.is_isotropic v ||
-          Integer.(equal index v_start && is_zero (pos_rem v_size kind.size)))
+          Integer.(equal index v_start && is_zero (e_rem v_size kind.size)))
       then search_range kind ~min:index ~max (v, v_size, v_shift) acc
       else search_each_index kind ~validity ~index ~max offsetmap acc
   in

@@ -27,6 +27,7 @@
 let dkey_no_time_info = Wp_parameters.register_category "no-time-info"
 let dkey_no_step_info = Wp_parameters.register_category "no-step-info"
 let dkey_no_goals_info = Wp_parameters.register_category "no-goals-info"
+let dkey_success_only = Wp_parameters.register_category "success-only"
 
 type prover =
   | Why3 of string (* Prover via WHY *)
@@ -339,8 +340,12 @@ let pp_res ~extended fmt r =
   | NoResult -> Format.pp_print_string fmt (if extended then "No Result" else "-")
   | Invalid -> Format.pp_print_string fmt "Invalid"
   | Computing _ -> Format.pp_print_string fmt "Computing"
-  | Valid -> Format.fprintf fmt "Valid%a" (pp_perf ~extended) r
   | Checked -> Format.fprintf fmt "Typechecked"
+  | Valid when Wp_parameters.has_dkey dkey_success_only ->
+      Format.pp_print_string fmt "Valid"
+  | (Timeout|Stepout|Unknown) when Wp_parameters.has_dkey dkey_success_only ->
+      Format.pp_print_string fmt "Unsuccess"
+  | Valid -> Format.fprintf fmt "Valid%a" (pp_perf ~extended) r
   | Unknown -> Format.fprintf fmt "Unknown%a" (pp_perf ~extended) r
   | Timeout -> Format.fprintf fmt "Timeout%a" (pp_perf ~extended) r
   | Stepout -> Format.fprintf fmt "Step limit%a" (pp_perf ~extended) r
@@ -361,8 +366,37 @@ let compare p q =
   in
   let r = rank q.verdict - rank p.verdict in
   if r <> 0 then r else
-    let s = Pervasives.compare p.prover_steps q.prover_steps in
+    let s = Transitioning.Stdlib.compare p.prover_steps q.prover_steps in
     if s <> 0 then s else
-      let t = Pervasives.compare p.prover_time q.prover_time in
+      let t = Transitioning.Stdlib.compare p.prover_time q.prover_time in
       if t <> 0 then t else
-        Pervasives.compare p.solver_time q.solver_time
+        Transitioning.Stdlib.compare p.solver_time q.solver_time
+
+let combine v1 v2 =
+  match v1 , v2 with
+  | Valid , Valid -> Valid
+  | Failed , _ | _ , Failed -> Failed
+  | Invalid , _ | _ , Invalid -> Invalid
+  | Timeout , _ | _ , Timeout -> Timeout
+  | Stepout , _ | _ , Stepout -> Stepout
+  | _ -> Unknown
+
+let merge r1 r2 =
+  let err = if r1.prover_errmsg <> "" then r1 else r2 in
+  {
+    verdict = combine r1.verdict r2.verdict ;
+    solver_time = max r1.solver_time r2.solver_time ;
+    prover_time = max r1.prover_time r2.prover_time ;
+    prover_steps = max r1.prover_steps r2.prover_steps ;
+    prover_depth = max r1.prover_depth r2.prover_depth ;
+    prover_errpos = err.prover_errpos ;
+    prover_errmsg = err.prover_errmsg ;
+  }
+
+let choose r1 r2 =
+  match is_valid r1 , is_valid r2 with
+  | true , false -> r1
+  | false , true -> r2
+  | _ -> if compare r1 r2 <= 0 then r1 else r2
+
+let best = List.fold_left choose no_result

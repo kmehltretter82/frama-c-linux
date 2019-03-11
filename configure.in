@@ -121,6 +121,7 @@ AC_SUBST(HAS_OCAML403)
 AC_SUBST(HAS_OCAML404)
 AC_SUBST(HAS_OCAML405)
 AC_SUBST(HAS_OCAML407)
+AC_SUBST(HAS_OCAML408)
 
 OCAMLMAJORNB=$(echo $OCAMLVERSION | cut -f 1 -d .)
 OCAMLMINORNB=$(echo $OCAMLVERSION | cut -f 2 -d .)
@@ -131,11 +132,13 @@ if test $OCAMLMAJORNB -gt 4; then
   HAS_OCAML404=yes;
   HAS_OCAML405=yes;
   HAS_OCAML407=yes;
+  HAS_OCAML408=yes;
 else
   HAS_OCAML403=no;
   HAS_OCAML404=no;
   HAS_OCAML405=no;
   HAS_OCAML407=no;
+  HAS_OCAML408=no;
   if test $OCAMLMINORNB -ge 3; then
     HAS_OCAML403=yes;
   fi;
@@ -147,6 +150,9 @@ else
   fi;
   if test $OCAMLMINORNB -ge 7; then
     HAS_OCAML407=yes;
+  fi;
+  if test $OCAMLMINORNB -ge 8; then
+    HAS_OCAML408=yes;
   fi;
 fi;   # MAJORNB -gt 4
 
@@ -934,12 +940,17 @@ REQUIRE_LABLGTK="$REQUIRE_LABLGTK$REQUIRE_GNOMECANVAS"
 USE_LABLGTK="$USE_LABLGTK$USE_GNOMECANVAS"
 
 LABLGTK_PATH=""
+SOURCEVIEW_PATH=""
 
 if test "$ENABLE_LABLGTK3" = "yes"; then
   LABLGTK_PATH=`ocamlfind query lablgtk3 | tr -d '\\r\\n'`;
 fi
 
-if test "$LABLGTK_PATH" = ""; then
+if test "$LABLGTK_PATH" != ""; then
+  SOURCEVIEW_PATH=`ocamlfind query lablgtk3-sourceview3 | tr -d '\\r\\n'`;
+fi
+
+if test "$SOURCEVIEW_PATH" = ""; then
   LABLGTK_VERSION=2
   LABLGTK_PATH=`ocamlfind query lablgtk2 | tr -d '\\r\\n'`
   if test "$LABLGTK_PATH" = "" -o \
@@ -951,6 +962,7 @@ if test "$LABLGTK_PATH" = ""; then
        echo "Ocamlfind -> using $LABLGTK_PATH"
        LABLGTKPATH_FOR_CONFIGURE=$LABLGTK_PATH
   fi;
+  SOURCEVIEW_PATH=$LABLGTK_PATH;
 else
   LABLGTK_VERSION=3
   echo "ocamlfind -> using $LABLGTK_PATH"
@@ -958,8 +970,8 @@ else
 fi
 
 configure_library([GTKSOURCEVIEW],
-                  [$LABLGTKPATH_FOR_CONFIGURE/lablgtksourceview2.$LIB_SUFFIX,
-                   $LABLGTKPATH_FOR_CONFIGURE/lablgtksourceview3.$LIB_SUFFIX],
+                  [$SOURCEVIEW_PATH/lablgtksourceview2.$LIB_SUFFIX,
+                   $SOURCEVIEW_PATH/lablgtk3_sourceview3.$LIB_SUFFIX],
                   [lablgtksourceview not found],
                   no)
 
@@ -969,7 +981,8 @@ configure_library([GNOMECANVAS],
                   no)
 
 configure_library([LABLGTK],
-                  [$LABLGTKPATH_FOR_CONFIGURE/lablgtk.$LIB_SUFFIX],
+                  [$LABLGTKPATH_FOR_CONFIGURE/lablgtk.$LIB_SUFFIX,
+                   $LABLGTKPATH_FOR_CONFIGURE/lablgtk3.$LIB_SUFFIX],
                   [$LABLGTKPATH_FOR_CONFIGURE/lablgtk.$LIB_SUFFIX not found.],
                   no)
 

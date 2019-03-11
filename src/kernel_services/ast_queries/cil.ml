@@ -265,6 +265,25 @@ let mkBlock (slst: stmt list) : block =
 
 let mkBlockNonScoping l = let b = mkBlock l in b.bscoping <- false; b
 
+let rec enforceGhostStmtCoherence ?(force_ghost=false) stmt =
+  let force_ghost = force_ghost || stmt.ghost in
+  stmt.ghost <- force_ghost ;
+  begin match stmt.skind with
+    | Break(_) | Continue(_) | Goto(_) | Throw(_)
+    | Instr(_) | Return(_) -> ()
+    | UnspecifiedSequence(_) -> ()
+    | If(_, b1, b2, _) | TryFinally(b1, b2, _) | TryExcept(b1, _, b2, _) ->
+      enforceGhostBlockCoherence ~force_ghost b1 ;
+      enforceGhostBlockCoherence ~force_ghost b2
+    | Switch(_, b, _, _) | Loop(_, b, _, _, _) | Block(b) ->
+      enforceGhostBlockCoherence ~force_ghost b
+    | TryCatch(b, l, _) ->
+      enforceGhostBlockCoherence ~force_ghost b ;
+      List.iter (fun (_, b) -> enforceGhostBlockCoherence ~force_ghost b) l
+  end
+and enforceGhostBlockCoherence ?force_ghost block =
+  List.iter (enforceGhostStmtCoherence ?force_ghost) block.bstmts
+
 let mkStmt ?(ghost=false) ?(valid_sid=false) ?(sattr=[]) (sk: stmtkind) : stmt =
   { skind = sk;
     labels = [];
@@ -2931,14 +2950,15 @@ and childrenBehavior vis b =
    b.b_extended <- mapNoCopy (visitCilExtended vis) b.b_extended;
    b
 
-and visitCilExtended vis (i,s,l,p as orig) =
+and visitCilExtended vis (i,a,l,s,e as orig) =
   let visit =
-    try Hashtbl.find visitor_tbl s
+    try Hashtbl.find visitor_tbl a
     with Not_found -> (fun _ _ -> DoChildren)
   in
-  let p' = doVisitCil vis id (visit vis) childrenCilExtended p in
-  if is_fresh_behavior vis#behavior then Logic_const.new_acsl_extension s l p
-  else if p == p' then orig else (i,s,l,p')
+  let e' = doVisitCil vis id (visit vis) childrenCilExtended e in
+  if is_fresh_behavior vis#behavior then
+    Logic_const.new_acsl_extension a l s e'
+  else if e == e' then orig else (i,a,l,s,e')
 
 and childrenCilExtended vis p =
   match p with
@@ -3112,9 +3132,9 @@ and childrenSpec vis s =
    let vSpec s = visitCilFunspec vis s in
    let change_content annot = { ca with annot_content = annot } in
    match ca.annot_content with
-       AAssert (behav,p) ->
+       AAssert (behav,kind,p) ->
 	 let p' = vPred p in if p' != p then
-	   change_content (AAssert (behav,p'))
+	   change_content (AAssert (behav,kind,p'))
 	 else ca
      | APragma (Impact_pragma t) ->
 	 let t' = visitCilImpactPragma vis t in
@@ -3358,6 +3378,7 @@ and childrenExp (vis: cilVisitor) (e: exp) : exp =
    let res =
      doVisitCil vis
        vis#behavior.memo_stmt vis#vstmt (childrenStmt toPrepend) s in
+   let ghost = res.ghost in
    (* Now see if we have saved some instructions *)
    toPrepend := !toPrepend @ vis#unqueueInstr ();
    (match !toPrepend with
@@ -3365,8 +3386,8 @@ and childrenExp (vis: cilVisitor) (e: exp) : exp =
    | _ ->
      let b =
        mkBlockNonScoping
-         ((List.map (fun i -> mkStmt (Instr i)) !toPrepend)
-          @ [mkStmt res.skind])
+         ((List.map (fun i -> mkStmt ~ghost (Instr i)) !toPrepend)
+          @ [mkStmt ~ghost res.skind])
      in
      b.battrs <- addAttribute (Attr (vis_tmp_attr, [])) b.battrs;
      (* Make our statement contain the instructions to prepend *)
@@ -3493,6 +3514,7 @@ and childrenExp (vis: cilVisitor) (e: exp) : exp =
 	 else s.skind
    in
    if skind' != s.skind then s.skind <- skind';
+   enforceGhostStmtCoherence s ;
    (* Visit the labels *)
    let labels' =
      let fLabel = function
@@ -3994,7 +4016,7 @@ let truncateInteger64 (k: ikind) i =
     let i' = 
       let nrBits = Integer.of_int (8 * (bytesSizeOfInt k)) in
       let max_strict_bound = Integer.shift_left Integer.one nrBits in
-      let modulo = Integer.pos_rem i max_strict_bound in
+      let modulo = Integer.e_rem i max_strict_bound in
       let signed = isSigned k in
       if signed then 
         let max_signed_strict_bound = 
@@ -6636,7 +6658,7 @@ let childrenFileSameGlobals vis f =
    in
    List.iter
      (fun s ->
-       match s.skind with
+       begin match s.skind with
        | Instr i -> s.skind <- stmt_of_instr_list (doInstrList [i])
        | If (_e, tb, eb, _) ->
 	   peepHole1 doone tb.bstmts;
@@ -6656,7 +6678,9 @@ let childrenFileSameGlobals vis f =
 	   peepHole1 doone b.bstmts;
 	   peepHole1 doone h.bstmts;
 	   s.skind <- TryExcept(b, (doInstrList il, e), h, l);
-       | Return _ | Goto _ | Break _ | Continue _ | Throw _ -> ())
+       | Return _ | Goto _ | Break _ | Continue _ | Throw _ -> ()
+       end ;
+       enforceGhostStmtCoherence s)
      ss
 
  (* Process two statements and possibly replace them both *)

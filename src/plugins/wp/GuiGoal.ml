@@ -82,12 +82,7 @@ class pane (proverpane : GuiConfig.provers) =
   let composer = new GuiComposer.composer printer in
   let browser = new GuiComposer.browser printer in
   let layout = new Wutil.layout in
-  let scroll_palette =
-    GBin.scrolled_window ~vpolicy:`AUTOMATIC ~hpolicy:`NEVER ()
-  in
-  let scroll_palette_widget = new Wutil.gobj_widget scroll_palette in
   let palette = new Wpalette.panel () in
-  let () = scroll_palette#add palette#coerce in
   let help = new Widget.button
     ~label:"Tactics" ~border:false ~tooltip:"List Available Tactics" () in
   let delete = new Widget.button
@@ -122,7 +117,12 @@ class pane (proverpane : GuiConfig.provers) =
                     w play_script ; w save_script ;
                     w ~padding:6 icon ; h ~padding:6 status ]
                   [ w help ; w delete ]) in
-        layout#populate (Wbox.panel ~top:toolbar ~right:scroll_palette_widget text) ;
+        let content = Wbox.split ~dir:`HORIZONTAL
+            text#widget (Wbox.scroll palette#widget) in
+        Wutil.later (fun () ->
+            Config.config_float ~key:"GuiGoal.palette" ~default:0.8 content
+          );
+        layout#populate (Wbox.panel ~top:toolbar content#widget) ;
         provers <-
           VCS.([ new GuiProver.prover ~console:text ~prover:AltErgo ] @
                List.map
@@ -551,7 +551,7 @@ class pane (proverpane : GuiConfig.provers) =
           let n = Task.size pool in
           if n = 0 then
             begin
-              ignore (ProofEngine.commit ~resolve:false fork) ;
+              ignore (ProofEngine.commit fork) ;
               ProofEngine.validate proof ;
               ProofEngine.forward proof ;
               state <- Proof proof ;

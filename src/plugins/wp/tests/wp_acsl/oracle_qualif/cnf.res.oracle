@@ -303,9 +303,10 @@
 [wp] Proved goals:   43 / 43
   Qed:            11 
   Alt-Ergo:       32
-[wp] Report 'tests/wp_acsl/cnf.i.0.report.json'
+[wp] Report in:  'tests/wp_acsl/oracle_qualif/cnf.0.report.json'
+[wp] Report out: 'tests/wp_acsl/result_qualif/cnf.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
 f                   11     32 (336..384)    43       100%
 -------------------------------------------------------------
-[wp] Logging keys: shell,no-time-info,no-step-info,cnf.
+[wp] Logging keys: success-only,shell,cnf.

@@ -120,8 +120,8 @@ let stdout = {
   clean = true ;
   delayed = [] ;
   isatty = Unix.isatty Unix.stdout ;
-  output = Pervasives.output_substring Pervasives.stdout ;
-  flush =  (fun () -> Pervasives.flush Pervasives.stdout);
+  output = output_substring stdout ;
+  flush =  (fun () -> flush stdout);
 }
 
 let clean () = term_clean stdout

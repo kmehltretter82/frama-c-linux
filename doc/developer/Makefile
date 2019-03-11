@@ -49,7 +49,7 @@ else
 		-load-script ./examples/acsl_extension \
 		-load-script ./hello_world/hello_world.ml \
        | tee check.log
-	if grep -e "user error" check.log; then \
+	if grep -e "User Error" check.log; then \
            echo "Examples script do not compile with current Frama-C."; \
            echo "Please examine check.log and make appropriate changes"; \
            exit 1; \

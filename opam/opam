@@ -66,7 +66,8 @@ build: [
   ["autoconf"] {pinned}
   ["./configure" "--prefix" prefix
                  "--disable-gui" { !conf-gtksourceview:installed |
-                                   !conf-gnomecanvas:installed }
+                                   ( !conf-gnomecanvas:installed &
+                                     !lablgtk3:installed) }
                  "--mandir=%{man}%"
   ]
   [make "-j%{jobs}%"]
@@ -88,15 +89,15 @@ depends: [
   "ocamlfind" # needed beyond build stage, used by -load-module
   "zarith"
   "conf-autoconf" { build }
-  "lablgtk" { >= "2.18.2" } #for ocaml >= 4.02.1
+  ( ( "lablgtk" { >= "2.18.2" } & "conf-gnomecanvas" )
+  | ( "lablgtk3" { >= "3.0.beta4" } & "lablgtk3-sourceview3"))
   "conf-gtksourceview"
-  "conf-gnomecanvas"
   "alt-ergo"
   "conf-graphviz" { post }
 ]
 
 depopts: [
-  "yojson" { build }
+  "yojson" { build & >= "1.6.0" }
   "coq" { build }
   "why3" { build }
   "mlgmpidl" { build }

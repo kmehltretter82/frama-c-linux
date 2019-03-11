@@ -95,7 +95,7 @@ module Configuration: sig
 
   val set_int: string -> int -> unit
   (** Sets a ConfigInt *)
-  
+
   val find_bool : ?default:bool -> string -> bool
   (** Same as {find_int}. *)
 
@@ -127,13 +127,13 @@ module Configuration: sig
   (** Helpers to connect widgets to configuration values.
       The configuration value is first pushed to the widget
       using method [#set], or the [~default] value is used instead.
-      
+
       Then, a callback is registered
       into the widget via [#connect] such that subsequent
-      values from user's action are saved back into the 
+      values from user's action are saved back into the
       configuration file. *)
 
-  (** Abstract interface to the connected widget. 
+  (** Abstract interface to the connected widget.
       This API is consistent with the [Widget] ones. *)
   class type ['a] selector =
     object
@@ -142,15 +142,16 @@ module Configuration: sig
       method connect : ('a -> unit) -> unit
       (** Register a callback invoked by the widget each time the value is edited. *)
     end
-    
+
   val config_int : key:string -> default:int -> int #selector -> unit
   val config_bool : key:string -> default:bool -> bool #selector -> unit
   val config_string : key:string -> default:string -> string #selector -> unit
+  val config_float : key:string -> default:float -> float #selector -> unit
   val config_values : key:string -> default:'a ->
     values:('a * string) list -> 'a #selector -> unit
-  (** The [values] field is used as a dictionary of available values. 
+  (** The [values] field is used as a dictionary of available values.
       They are compared with [Pervasives.(=)]. *)
-  
+
 end
 
 (* ************************************************************************** *)

@@ -24,7 +24,7 @@
 (** Data Encoding *)
 (* -------------------------------------------------------------------------- *)
 
-type json = Yojson.Basic.json
+type json = Json.t
 
 val pretty : Format.formatter -> json -> unit
 

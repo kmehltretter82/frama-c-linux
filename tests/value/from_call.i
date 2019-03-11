@@ -67,8 +67,8 @@ int access_tab(int ind)
 }
 
 int AA,AR,AS;
-int At[2]={&AA};
-int Ar[2]={&AA};
+int At[2]={(int)&AA};
+int Ar[2]={(int)&AA};
 int *Ap=At;
 
 /*@ assigns AR \from Ap[..] ;

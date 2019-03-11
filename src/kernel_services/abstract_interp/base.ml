@@ -292,9 +292,9 @@ let is_aligned_by b alignment =
   else
     match b with
     | Var (v,_) | Allocated(v,_,_) ->
-        Int.is_zero (Int.rem (Int.of_int (Cil.bytesAlignOf v.vtype)) alignment)
+        Int.is_zero (Int.e_rem (Int.of_int (Cil.bytesAlignOf v.vtype)) alignment)
     | CLogic_Var (_, ty, _) ->
-      Int.is_zero (Int.rem (Int.of_int (Cil.bytesAlignOf ty)) alignment)
+      Int.is_zero (Int.e_rem (Int.of_int (Cil.bytesAlignOf ty)) alignment)
     | Null -> true
     | String _ -> Int.is_one alignment
 

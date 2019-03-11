@@ -112,7 +112,10 @@ let pp_named fmt nx =
 
 let pp_code_annot fmt ca =
   match ca.annot_content with
-  | AAssert(bs,np) -> Format.fprintf fmt "assertion%a%a" pp_for bs pp_named np
+  | AAssert(bs,Assert,np) ->
+    Format.fprintf fmt "assertion%a%a" pp_for bs pp_named np
+  | AAssert(bs,Check,np) ->
+    Format.fprintf fmt "check%a%a" pp_for bs pp_named np
   | AInvariant(bs,_,np) ->
     Format.fprintf fmt "invariant%a%a" pp_for bs pp_named np
   | AAssigns(bs,_) -> Format.fprintf fmt "assigns%a" pp_for bs
@@ -206,8 +209,10 @@ let pp_active fmt active =
     ~pre:" under active behaviors" ~sep:"," Format.pp_print_string fmt
     (Datatype.String.Set.elements active)
 
-let pp_acsl_extension fmt (_,s,_,_) =
-  Format.fprintf fmt "%s"  s
+let pp_capitalize fmt s =
+  Format.pp_print_string fmt (Transitioning.String.capitalize_ascii s)
+
+let pp_acsl_extension fmt (_,s,_,_,_) = pp_capitalize fmt s
 
 let rec pp_prop kfopt kiopt kloc fmt = function
   | IPAxiom (s,_,_,_,_) -> Format.fprintf fmt "Axiom '%s'" s
@@ -216,7 +221,7 @@ let rec pp_prop kfopt kiopt kloc fmt = function
   | IPGlobalInvariant (s,_,_) -> Format.fprintf fmt "Global invariant '%s'" s
   | IPAxiomatic (s,_) -> Format.fprintf fmt "Axiomatic '%s'" s
   | IPOther(s,le) ->
-    Format.fprintf fmt "%s%a" s (pp_other_loc kfopt kiopt kloc) le
+    Format.fprintf fmt "%a%a" pp_capitalize s (pp_other_loc kfopt kiopt kloc) le
   | IPPredicate(kind,kf,Kglobal,idpred) ->
     Format.fprintf fmt "%a%a%a"
       pp_predicate kind
@@ -227,9 +232,9 @@ let rec pp_prop kfopt kiopt kloc fmt = function
       pp_predicate kind
       (pp_idpred kloc) idpred
       (pp_kinstr kloc) ki
-  | IPExtended(le,(_,_,loc,_ as pred)) ->
+  | IPExtended(le,(_,_,loc,_,_ as ext)) ->
     Format.fprintf fmt "%a%a"
-      pp_acsl_extension pred
+      pp_acsl_extension ext
       (pp_extended_loc kfopt kiopt kloc) (loc,le)
   | IPBehavior(_,ki, active, bhv) ->
     if Cil.is_default_behavior bhv then
@@ -248,8 +253,13 @@ let rec pp_prop kfopt kiopt kloc fmt = function
       pp_bhvs bs
       (pp_opt kiopt (pp_kinstr kloc)) ki
       (pp_opt kiopt pp_active) active
-  | IPCodeAnnot(_,_,{annot_content=AAssert(bs,np)}) ->
+  | IPCodeAnnot(_,_,{annot_content=AAssert(bs,Assert,np)}) ->
     Format.fprintf fmt "Assertion%a%a%a"
+      pp_for bs
+      pp_named np
+      (pp_kloc kloc) np.pred_loc
+  | IPCodeAnnot(_,_,{annot_content=AAssert(bs,Check,np)}) ->
+    Format.fprintf fmt "Check%a%a%a"
       pp_for bs
       pp_named np
       (pp_kloc kloc) np.pred_loc
@@ -258,6 +268,9 @@ let rec pp_prop kfopt kiopt kloc fmt = function
       pp_for bs
       pp_named np
       (pp_kloc kloc) np.pred_loc
+  | IPCodeAnnot(_,stmt,{annot_content=AExtended(bs,_,(_,clause,_,_,_))}) ->
+    Format.fprintf fmt "%a%a %a"
+      pp_capitalize clause pp_for bs (pp_stmt kloc) stmt
   | IPCodeAnnot(_,stmt,_) ->
     Format.fprintf fmt "Annotation %a" (pp_stmt kloc) stmt
   | IPAllocation(kf,Kglobal,Id_contract (_,bhv),(frees,allocates)) ->
@@ -343,13 +356,15 @@ let to_string pp elt =
   Buffer.contents b
 
 let code_annot_kind_and_node code_annot = match code_annot.annot_content with
-  | AAssert (_, {pred_content; pred_name}) ->
+  | AAssert (_, kind, {pred_content; pred_name}) ->
     let kind = match Alarms.find code_annot with
       | Some alarm -> Alarms.get_name alarm
       | None ->
         if List.exists ((=) "missing_return") pred_name
         then "missing_return"
-        else "user assertion"
+        else match kind with
+          | Assert -> "user assertion"
+          | Check -> "user check"
     in
     Some (kind, to_string Printer.pp_predicate_node pred_content)
   | AInvariant (_, _, {pred_content}) ->
@@ -404,7 +419,7 @@ type order =
   | A of Datatype.String.Set.t
 
 let cmp_order a b = match a , b with
-  | I a , I b -> Pervasives.compare a b
+  | I a , I b -> Transitioning.Stdlib.compare a b
   | I _ , _ -> (-1)
   | _ , I _ -> 1
   | S a , S b -> String.compare a b
@@ -451,11 +466,13 @@ let for_order k = function
   | [] -> [I k]
   | bs -> I (succ k) :: named_order bs
 let annot_order = function
-  | {annot_content=AAssert(bs,np)} ->
+  | {annot_content=AAssert(bs,Check,np)} ->
     for_order 0 bs @ named_order np.pred_name
-  | {annot_content=AInvariant(bs,_,np)} ->
+  | {annot_content=AAssert(bs,Assert,np)} ->
     for_order 2 bs @ named_order np.pred_name
-  | _ -> [I 4]
+  | {annot_content=AInvariant(bs,_,np)} ->
+    for_order 4 bs @ named_order np.pred_name
+  | _ -> [I 6]
 let loop_order = function
   | Id_contract (active,b) -> [B b; A active]
   | Id_loop _ -> []
@@ -481,10 +498,10 @@ let rec ip_order = function
   | IPPropertyInstance (kf, s, _, ip) -> [I 18; F kf; K (Kstmt s)] @ ip_order ip
   | IPTypeInvariant(a,_,_,_) -> [I 19; S a]
   | IPGlobalInvariant(a,_,_) -> [I 20; S a]
-  | IPExtended(ELContract kf,(_,n,_,_)) -> [I 21;F kf; S n]
-  | IPExtended(ELStmt (kf, stmt), (_, n, _,_)) ->
+  | IPExtended(ELContract kf,(_,n,_,_,_)) -> [I 21;F kf; S n]
+  | IPExtended(ELStmt (kf, stmt), (_,n,_,_,_)) ->
     [ I 22; F kf; K (Kstmt stmt); S n]
-  | IPExtended(ELGlob, (_, n, _,_)) -> [ I 23; S n]
+  | IPExtended(ELGlob, (_,n,_,_,_)) -> [ I 23; S n]
 
 let pp_compare p q = cmp (ip_order p) (ip_order q)
 

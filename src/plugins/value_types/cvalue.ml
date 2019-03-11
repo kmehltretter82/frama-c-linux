@@ -32,7 +32,7 @@ module CardinalEstimate = struct
 
   let zero = None
   let one = Some 0.0
-  let of_integer x = Some(Pervasives.log10 (Integer.to_float x))
+  let of_integer x = Some(log10 (Integer.to_float x))
   let infinite = Some(infinity)
   let mul a b = match (a,b) with
     | None, _ | _, None -> None
@@ -979,7 +979,7 @@ module V_Offsetmap = struct
         if Integer.is_zero cardinal then Integer.one else cardinal
       in
       let cardinalf = CardinalEstimate.of_integer cardinal in
-      let repeat = Integer.(div (length start stop) size) in
+      let repeat = Integer.(e_div (length start stop) size) in
       (* If a value is "cut", we still count it as if it were whole. *)
       let repeat = Integer.(max repeat one) in
       let cardinalf_repeated = CardinalEstimate.power cardinalf repeat in

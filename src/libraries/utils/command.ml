@@ -59,9 +59,9 @@ let pp_from_file fmt file =
 
 let rec bincopy buffer cin cout =
   let s = Bytes.length buffer in
-  let n = Pervasives.input cin buffer 0 s in
+  let n = input cin buffer 0 s in
   if n > 0 then
-    ( Pervasives.output cout buffer 0 n ; bincopy buffer cin cout )
+    ( output cout buffer 0 n ; bincopy buffer cin cout )
   else
     ( flush cout )
 

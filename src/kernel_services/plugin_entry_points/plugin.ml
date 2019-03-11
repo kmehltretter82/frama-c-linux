@@ -166,7 +166,7 @@ struct
       let oc = open_out normalized_filename in
       let fmt = Format.formatter_of_out_channel oc in
       Hashtbl.add file_formatters normalized_filename fmt;
-      Extlib.safe_at_exit (fun () -> Pervasives.close_out oc);
+      Extlib.safe_at_exit (fun () -> close_out oc);
       fmt
 end
 
@@ -325,7 +325,7 @@ struct
 
     let mk_dir d =
       try
-        Unix.mkdir d 0o755;
+        Extlib.mkdir ~parents:true d 0o755;
         L.warning "creating %s directory `%s'" O.option_name d;
         d
       with Unix.Unix_error _ -> 
@@ -627,8 +627,8 @@ struct
         (fun old n ->
           (* the level of verbose is at least the level of debug *)
           if n > Verbose.get () then Verbose.set n;
-          if n = 0 then Pervasives.decr positive_debug_ref
-          else if old = 0 then Pervasives.incr positive_debug_ref);
+          if n = 0 then decr positive_debug_ref
+          else if old = 0 then Transitioning.Stdlib.incr positive_debug_ref);
       if is_kernel () then begin
         Cmdline.kernel_debug_atleast_ref := (fun n -> get () >= n);
         match !Cmdline.Kernel_debug_level.value_if_set with
@@ -734,7 +734,7 @@ struct
       let arg_name="k1[=s1][,...,kn[=sn]]"
       let help =
         "set warning status for category <k1> to <s1>,...,<kn> to <sn>. Use "
-        ^ debug_category_optname
+        ^ warn_category_optname
         ^ " help to get a list of available categories, and * to enable \
            all categories. Possible statuses are inactive, feedback-once, \
            once, active, error-once, error, and abort. Defaults to active"

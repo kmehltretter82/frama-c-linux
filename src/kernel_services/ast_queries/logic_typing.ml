@@ -326,6 +326,27 @@ module Lenv = struct
     *)
   }
 
+  let string_of_current_label env =
+    Extlib.opt_bind (
+      function
+      | FormalLabel _ -> None
+      | BuiltinLabel Init -> Some "Init"
+      | BuiltinLabel Pre -> Some "Pre"
+      | BuiltinLabel Old -> Some "Old"
+      | BuiltinLabel Post -> Some "Post"
+      | BuiltinLabel Here -> Some "Here"
+      | BuiltinLabel LoopCurrent -> Some "LoopCurrent"
+      | BuiltinLabel LoopEntry -> Some "LoopEntry"
+      | StmtLabel s ->
+        (match
+           Transitioning.List.find_opt
+             (function Label (_,_,b) -> b | _ -> false) !s.labels
+         with
+         | None -> None
+         | Some (Label (lab,_,_)) -> Some lab
+         | Some _ -> None))
+      env.current_logic_label
+
   let fresh_var env name kind typ =
     let name =
       let exists name =
@@ -457,7 +478,7 @@ module Type_namespace =
     let reprs = [Typedef]
     let name = "Logic_typing.type_namespace"
     type t = type_namespace
-    let compare : t -> t -> int = Pervasives.compare
+    let compare : t -> t -> int = Transitioning.Stdlib.compare
     let equal : t -> t -> bool = (=)
     let hash : t -> int = Hashtbl.hash
   end)
@@ -468,7 +489,7 @@ type typing_context = {
   anonCompFieldName : string;
   conditionalConversion : typ -> typ -> typ;
   find_macro : string -> lexpr;
-  find_var : string -> logic_var;
+  find_var : ?label:string -> var:string -> logic_var;
   find_enum_tag : string -> exp * typ;
   find_comp_field: compinfo -> string -> offset;
   find_type : type_namespace -> string -> typ;
@@ -507,19 +528,20 @@ module Extensions = struct
   let typer_tbl = Hashtbl.create 5
   let find_typer name = Hashtbl.find typer_tbl name
   let is_extension name = Hashtbl.mem typer_tbl name
-  let register name category typer =
+  let register name category status typer =
     if is_extension name then
       Kernel.warning ~wkey:Kernel.wkey_acsl_extension
         "Trying to register ACSL extension %s twice. Ignoring second extension"
         name
     else begin
       Logic_env.register_extension name category;
-      Hashtbl.add typer_tbl name typer
+      Hashtbl.add typer_tbl name (status,typer)
     end
 
   let typer name ~typing_context:typing_context ~loc p =
-    try let typ = find_typer name in
-      typ ~typing_context ~loc p
+    try
+      let status,typer = find_typer name in
+      status, typer ~typing_context ~loc p
     with Not_found ->
       Kernel.fatal ~source:(fst loc) "unsupported clause of name '%s'" name
 end
@@ -632,7 +654,7 @@ module Make
        val anonCompFieldName : string
        val conditionalConversion : typ -> typ -> typ
        val find_macro : string -> lexpr
-       val find_var : string -> logic_var
+       val find_var : ?label:string -> var:string -> logic_var
        val find_enum_tag : string -> exp * typ
        val find_comp_field: compinfo -> string -> offset
        val find_type : type_namespace -> string -> typ
@@ -1693,7 +1715,8 @@ struct
 
 
 
-  let conditional_conversion loc env t1 t2 =
+  let conditional_conversion loc env rel t1 t2 =
+    let is_rel = Extlib.has_some rel in
     (* a comparison is mainly a function of type 'a -> 'a -> Bool/Prop.
        performs the needed unifications on both sides.*)
     let var = fresh_type_var "cmp" in
@@ -1709,10 +1732,10 @@ struct
     in
     let rec aux lty1 lty2 =
       match (unroll_type lty1), (unroll_type lty2) with
-      | t1, t2 when is_same_type t1 t2 -> t1
       | Ctype ty1, Ctype ty2 ->
         if isIntegralType ty1 && isIntegralType ty2 then
-          if (isSignedInteger ty1) <> (isSignedInteger ty2) then
+          if is_same_type lty1 lty2 then lty1
+          else if (isSignedInteger ty1) <> (isSignedInteger ty2) then
             (* in ACSL, the comparison between 0xFFFFFFFF seen as int and
                unsigned int is not true: we really have to operate at
                the integer level.
@@ -1724,9 +1747,25 @@ struct
           else if is_enum_cst t1 lty2 then lty2
           else if is_enum_cst t2 lty1 then lty1
           else Ctype (C.conditionalConversion ty1 ty2)
-        else if isArithmeticType ty1 && isArithmeticType ty2 then
-          Lreal
-        else if is_same_ptr_type ty1 ty2 || is_same_array_type ty1 ty2 then
+        else if isArithmeticType ty1 && isArithmeticType ty2 then begin
+          if is_same_type lty1 lty2 then begin
+            if is_rel then begin
+              let rel = Extlib.the rel in
+              let kind =
+                match Cil.unrollType ty1 with
+                | TFloat (FFloat,_) -> "float"
+                | TFloat (FDouble,_) -> "double"
+                | TFloat (FLongDouble,_) -> "long double"
+                | _ -> Kernel.fatal "floating point type expected"
+              in
+              let source = fst loc in
+              Kernel.warning ~source ~wkey:Kernel.wkey_acsl_float_compare
+                "comparing two %s values as real values. You might \
+                 want to use \\%s_%s instead" kind rel kind;
+              Lreal
+            end else lty1
+          end else Lreal
+        end else if is_same_ptr_type ty1 ty2 || is_same_array_type ty1 ty2 then
           Ctype (C.conditionalConversion ty1 ty2)
         else if
           (isPointerType ty1 || isArrayType ty1) &&
@@ -1759,6 +1798,7 @@ struct
       (* implicit conversion to set *)
       | Ltype ({lt_name = "set"} as lt,[t1]), t2
       | t1, Ltype({lt_name="set"} as lt,[t2]) -> Ltype(lt,[aux t1 t2])
+      | t1, t2 when is_same_type t1 t2 -> t1
       | _ ->
         C.error loc "types %a and %a are not convertible"
           Cil_printer.pp_logic_type lty1 Cil_printer.pp_logic_type lty2
@@ -2493,7 +2533,8 @@ struct
            | _ -> old_val lv)
         with Not_found ->
         try
-          let info = ctxt.find_var x in
+          let label = Lenv.string_of_current_label env in
+          let info = ctxt.find_var ?label ~var:x in
           (match info.lv_origin with
            | Some lv ->
              check_current_label loc env;
@@ -2735,7 +2776,7 @@ struct
       let t2 = term env t2 in
       let t3 = term env t3 in
       let env,ty,ty2,ty3 =
-        conditional_conversion loc env t2 t3 in
+        conditional_conversion loc env None t2 t3 in
       let t2 = { t2 with term_type = instantiate env t2.term_type } in
       let _,t2 =
         implicit_conversion
@@ -2976,7 +3017,6 @@ struct
   and type_relation:
     'a. _ -> _ -> (_ -> _ -> _ -> _ -> 'a) -> _ -> _ -> _ -> 'a =
     fun ctxt env f t1 op t2 ->
-      let module C = struct end in
       let loc1 = t1.lexpr_loc in
       let loc2 = t2.lexpr_loc in
       let loc = loc_join t1.lexpr_loc t2.lexpr_loc in
@@ -2984,9 +3024,17 @@ struct
       let ty1 = t1.term_type in
       let t2 = ctxt.type_term ctxt env t2 in
       let ty2 = t2.term_type in
+      let rel = match op with
+        | Eq -> "eq"
+        | Neq -> "ne"
+        | Le -> "le"
+        | Lt -> "lt"
+        | Ge -> "ge"
+        | Gt -> "gt"
+      in
       let conditional_conversion t1 t2 =
         let env,t,ty1,ty2 =
-          conditional_conversion loc env t1 t2
+          conditional_conversion loc env (Some rel) t1 t2
         in
         let t1 = { t1 with term_type = instantiate env t1.term_type } in
         let _,t1 =
@@ -3554,7 +3602,8 @@ struct
       | p::_ -> p.lexpr_loc
     in
     if Extensions.is_extension name then
-      Logic_const.new_acsl_extension name loc (Extensions.typer name ~typing_context ~loc ps)
+      let status , kind = Extensions.typer name ~typing_context ~loc ps in
+      Logic_const.new_acsl_extension name loc status kind
     else
       C.error
         loc "No type-checking function registered for extension %s" name
@@ -3566,7 +3615,7 @@ struct
     struct
       type t = string list
       let compare s1 s2 =
-        Pervasives.(compare (List.sort compare s1) (List.sort compare s2))
+        Transitioning.Stdlib.(compare (List.sort compare s1) (List.sort compare s2))
     end)
 
   let type_spec old_behaviors loc is_stmt_contract result env s =
@@ -3725,18 +3774,24 @@ struct
     append_loop_labels (append_here_label (append_pre_label (append_init_label
                                                                (Lenv.empty()))))
 
+  let assertion_kind =
+    function Assert -> Cil_types.Assert | Check -> Cil_types.Check
+
   let code_annot loc current_behaviors current_return_type ca =
     let source = fst loc in
     let annot = match ca with
-      | AAssert (behav,p) ->
+      | AAssert (behav,k,p) ->
         check_behavior_names loc current_behaviors behav;
-        Cil_types.AAssert (behav,predicate (code_annot_env()) p)
+        Cil_types.AAssert(behav,assertion_kind k,predicate (code_annot_env()) p)
       | APragma (Impact_pragma sp) ->
-        Cil_types.APragma (Cil_types.Impact_pragma (impact_pragma (code_annot_env()) sp))
+        Cil_types.APragma
+          (Cil_types.Impact_pragma (impact_pragma (code_annot_env()) sp))
       | APragma (Slice_pragma sp) ->
-        Cil_types.APragma (Cil_types.Slice_pragma (slice_pragma (code_annot_env()) sp))
+        Cil_types.APragma
+          (Cil_types.Slice_pragma (slice_pragma (code_annot_env()) sp))
       | APragma (Loop_pragma lp) ->
-        Cil_types.APragma (Cil_types.Loop_pragma (loop_pragma (code_annot_env()) lp))
+        Cil_types.APragma
+          (Cil_types.Loop_pragma (loop_pragma (code_annot_env()) lp))
       | AStmtSpec (behav,s) ->
         (* function behaviors and statement behaviors are not at the
            same level. Do not mix them in a complete or disjoint clause
@@ -4176,8 +4231,8 @@ struct
       Dvolatile (tsets, rvi_opt, wvi_opt, [], loc)
     | LDextended (kind, content) ->
       let typing_context = base_ctxt (Lenv.empty ()) in
-      let tcontent = Extensions.typer kind ~typing_context ~loc content in
-      let textended = Logic_const.new_acsl_extension kind loc tcontent in
+      let status,tcontent = Extensions.typer kind ~typing_context ~loc content in
+      let textended = Logic_const.new_acsl_extension kind loc status tcontent in
       Dextended (textended, [], loc)
 
   let annot a =

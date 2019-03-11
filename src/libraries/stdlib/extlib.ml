@@ -341,11 +341,23 @@ let try_finally ~finally f x =
 
   The alternative, such as registering an daemon that raises an exception,
   hence interrupting the process, might not work: child processes still need to
-  run some daemons, such as [Pervasives.flush_all] which is registered by default. *)
+  run some daemons, such as [flush_all] which is registered by default. *)
+
+let rec mkdir ?(parents=false) name perm =
+  try Unix.mkdir name perm
+  with
+  | Unix.Unix_error (Unix.ENOENT,_,_) when parents ->
+    let parent_name = Filename.dirname name in
+    if name <> parent_name then
+      begin
+        mkdir ~parents parent_name perm;
+        Unix.mkdir name perm
+      end
+  | e -> raise e
 
 let pid = Unix.getpid ()
 let safe_at_exit f =
-  Pervasives.at_exit
+  at_exit
     begin fun () ->
       let child = Unix.getpid () in
       if child = pid then f ()

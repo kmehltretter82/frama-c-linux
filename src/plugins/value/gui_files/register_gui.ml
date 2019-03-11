@@ -454,7 +454,7 @@ module Select (Eval: Eval) = struct
         let lv = (Var vi, NoOffset) in
         select_lv main_ui (GL_Stmt (kf, stmt)) lv
       | PIP (IPCodeAnnot (kf, stmt,
-                          ({annot_content = AAssert (_, p) | AInvariant (_, true, p)} as ca)) as ip) ->
+                          ({annot_content = AAssert (_, _, p) | AInvariant (_, true, p)} as ca)) as ip) ->
         begin
           let loc = GL_Stmt (kf, stmt) in
           let alarm_or_property =
@@ -479,7 +479,7 @@ module Select (Eval: Eval) = struct
       | PExp ((_,Kglobal,_) | (None, Kstmt _, _))
       | PTermLval (None, _, _, _)-> ()
       | PVDecl (_kf,_ki,_vi) -> ()
-      | PGlobal _  | PIP _ | PStart _ -> ()
+      | PGlobal _  | PIP _ | PStmtStart _ -> ()
     with
     | Eval_terms.LogicEvalError ee ->
       main_ui#pretty_information "Cannot evaluate term: %a@."
@@ -519,7 +519,7 @@ module Select (Eval: Eval) = struct
          | _ -> ()
         )
       end
-    | PStart _
+    | PStmtStart _
     | PVDecl (None, _, _) | PExp _ | PTermLval _ | PGlobal _ | PIP _ -> ()
 
   let _right_click_value_not_computed (main_ui:main_ui) (menu:menu) localizable =
@@ -623,7 +623,7 @@ let add_keybord_shortcut_evaluate main_ui =
           select (find_loc kf fdec bl)
       end
     | PIP (Property.IPCodeAnnot (kf, stmt,
-                                 {annot_content = AAssert (_, _) | AInvariant (_, true, _)} )) ->
+                                 {annot_content = AAssert _ | AInvariant (_, true, _)} )) ->
       select (Some (GL_Stmt (kf, stmt)))
     | PIP (Property.IPPredicate (_, kf, Kglobal, _) as ip) ->
       select (Gui_eval.classify_pre_post kf ip)

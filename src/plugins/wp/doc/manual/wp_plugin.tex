@@ -754,7 +754,7 @@ interface of the programmatic API.
     \texttt{@<category>} of properties.
     \\
     Recognized categories are: \texttt{@lemma}, \texttt{@requires}, \texttt{@assigns},
-    \texttt{@ensures}, \texttt{@exits},  \texttt{@assert},
+    \texttt{@ensures}, \texttt{@exits}, \texttt{@assert}, \texttt{@check},
     \texttt{@invariant}, \texttt{@variant}, \texttt{@breaks},
     \texttt{@continues}, \texttt{@returns}, \\
     \texttt{\mbox{@complete\_behaviors}}, \texttt{\mbox{@disjoint\_behaviors}}.
@@ -762,6 +762,9 @@ interface of the programmatic API.
     Properties can be prefixed with a minus sign to \emph{skip} the associated annotations.
     For example \texttt{-wp-prop="-@assigns"} removes all \texttt{assigns} 
     and \texttt{loop assigns} properties from the selection.
+    \\
+    \textbf{Remark:} properties with name \verb+no_wp:+ are always and automatically
+    filtered and never proved by WP.
 \item [\tt -wp-(no)-status-all] includes in the goal selection all properties
   regardless of their current status (default is: \texttt{no}).
 \item [\tt -wp-(no)-status-valid] includes in the goal selection those properties
@@ -916,7 +919,12 @@ weakest precondition calculus.
   and it can generates a large number of verifications for structures
   with many (nested) fields (defaults to \texttt{no}).
 \item[\tt -wp-(no)-dynamic] handles calls \textit{via} function pointers
-  (experimental, default is: \texttt{no}).
+  thanks to the dedicated \verb+@calls f1,...,fn+ code annotation.
+  For each call to a function pointer \texttt{fp}
+  in the instruction or block under the annotaion,
+  \texttt{fp} is required to belongs to the set \texttt{f1,\ldots,fn} and
+  a case analysis is performed with the contract of each provided function
+  (default is: \texttt{yes}).
 \end{description}
 
 \subsection{Trigger Generation}

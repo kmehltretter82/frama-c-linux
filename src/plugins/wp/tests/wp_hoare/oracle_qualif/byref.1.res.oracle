@@ -18,7 +18,8 @@
 [wp] [Qed] Goal typed_ref_wrong_without_ref_call_f_requires : Valid
 [wp] Proved goals:   12 / 12
   Qed:            12
-[wp] Report 'tests/wp_hoare/byref.i.1.report.json'
+[wp] Report in:  'tests/wp_hoare/oracle_qualif/byref.1.report.json'
+[wp] Report out: 'tests/wp_hoare/result_qualif/byref.1.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
 f                    2     -                 2       100%

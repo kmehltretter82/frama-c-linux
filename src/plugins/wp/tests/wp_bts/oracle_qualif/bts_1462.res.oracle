@@ -9,7 +9,7 @@
 [wp] [Qed] Goal typed_local_loop_assigns_part1 : Valid
 [wp] [Qed] Goal typed_local_loop_assigns_part2 : Valid
 [wp] [Alt-Ergo] Goal typed_wrong_assert_for_value : Valid
-[wp] [Alt-Ergo] Goal typed_wrong_loop_invariant_A_KO_preserved : Unknown
+[wp] [Alt-Ergo] Goal typed_wrong_loop_invariant_A_KO_preserved : Unsuccess
 [wp] [Qed] Goal typed_wrong_loop_invariant_A_KO_established : Valid
 [wp] [Qed] Goal typed_wrong_loop_invariant_B_preserved : Valid
 [wp] [Qed] Goal typed_wrong_loop_invariant_B_established : Valid
@@ -19,8 +19,9 @@
 [wp] [Qed] Goal typed_wrong_loop_assigns : Valid
 [wp] Proved goals:   12 / 13
   Qed:            10 
-  Alt-Ergo:        2  (unknown: 1)
-[wp] Report 'tests/wp_bts/bts_1462.i.0.report.json'
+  Alt-Ergo:        2  (unsuccess: 1)
+[wp] Report in:  'tests/wp_bts/oracle_qualif/bts_1462.0.report.json'
+[wp] Report out: 'tests/wp_bts/result_qualif/bts_1462.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
 wrong                6      2 (4..16)        9      88.9%

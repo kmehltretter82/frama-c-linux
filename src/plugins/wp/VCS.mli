@@ -131,7 +131,11 @@ val pp_result : Format.formatter -> result -> unit
 val pp_result_perf : Format.formatter -> result -> unit
 
 val compare : result -> result -> int (* best is minimal *)
+val merge : result -> result -> result
+val choose : result -> result -> result
+val best : result list -> result
 
 val dkey_no_time_info: Wp_parameters.category
 val dkey_no_step_info: Wp_parameters.category
 val dkey_no_goals_info: Wp_parameters.category
+val dkey_success_only: Wp_parameters.category

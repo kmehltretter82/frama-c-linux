@@ -552,4 +552,33 @@ sig
 
 end
 
+(** {2 Simplifiers} *)
+
+exception Contradiction
+
+class type simplifier =
+  object
+    method name : string
+    method copy : simplifier
+    method assume : F.pred -> unit
+    (** Assumes the hypothesis *)
+    method target : F.pred -> unit
+    (** Give the predicate that will be simplified later *)
+    method fixpoint : unit
+    (** Called after assuming hypothesis and knowing the goal *)
+    method infer : F.pred list
+    (** Add new hypotheses implied by the original hypothesis. *)
+
+    method simplify_exp : F.term -> F.term
+    (** Currently simplify an expression. *)
+    method simplify_hyp : F.pred -> F.pred
+    (** Currently simplify an hypothesis before assuming it. In any
+        case must return a weaker formula. *)
+    method simplify_branch : F.pred -> F.pred
+    (** Currently simplify a branch condition. In any case must return an
+        equivalent formula. *)
+    method simplify_goal : F.pred -> F.pred
+    (** Simplify the goal. In any case must return a stronger formula. *)
+  end
+
 (* -------------------------------------------------------------------------- *)

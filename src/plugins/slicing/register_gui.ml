@@ -461,7 +461,7 @@ let slicing_highlighter(buffer:Design.reactive_buffer) localizable ~start ~stop=
         match localizable with
         | Pretty_source.PStmt (kf,stmt) -> tag_stmt kf stmt start stop
         | Pretty_source.PVDecl (Some kf,_,vi) -> tag_vdecl kf vi start stop
-        | Pretty_source.PStart _
+        | Pretty_source.PStmtStart _
         | Pretty_source.PVDecl (None,_,_)
         | Pretty_source.PLval _
         | Pretty_source.PTermLval _

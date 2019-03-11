@@ -41,31 +41,32 @@
 [wp] tests/wp_acsl/logic.i:62: Warning: 
   Logic cast to struct (Tint2) from (int [6]) not implemented yet
 [wp] 21 goals scheduled
-[wp] [Alt-Ergo] Goal typed_h_ensures : Unknown (Stronger)
+[wp] [Alt-Ergo] Goal typed_h_ensures : Unsuccess (Stronger)
 [wp] [Qed] Goal typed_h_assigns_exit : Valid
 [wp] [Qed] Goal typed_h_assigns_normal : Valid
 [wp] [Qed] Goal typed_main_requires_qed_ok : Valid
 [wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_2 : Valid
 [wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_3 : Valid
-[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_4 : Unknown (Stronger)
-[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_5 : Unknown (Stronger)
-[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_6 : Unknown (Stronger)
-[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_7 : Unknown (Stronger)
-[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_8 : Unknown (Stronger)
-[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_9 : Unknown (Stronger)
-[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_10 : Unknown (Stronger)
-[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_11 : Unknown (Stronger)
-[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_12 : Unknown (Stronger)
-[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_13 : Unknown (Stronger)
-[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_14 : Unknown (Stronger)
-[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_15 : Unknown (Stronger)
-[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_16 : Unknown (Stronger)
-[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_17 : Unknown (Stronger)
-[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_18 : Unknown (Stronger)
+[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_4 : Unsuccess (Stronger)
+[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_5 : Unsuccess (Stronger)
+[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_6 : Unsuccess (Stronger)
+[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_7 : Unsuccess (Stronger)
+[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_8 : Unsuccess (Stronger)
+[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_9 : Unsuccess (Stronger)
+[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_10 : Unsuccess (Stronger)
+[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_11 : Unsuccess (Stronger)
+[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_12 : Unsuccess (Stronger)
+[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_13 : Unsuccess (Stronger)
+[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_14 : Unsuccess (Stronger)
+[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_15 : Unsuccess (Stronger)
+[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_16 : Unsuccess (Stronger)
+[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_17 : Unsuccess (Stronger)
+[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_18 : Unsuccess (Stronger)
 [wp] Proved goals:    5 / 21
   Qed:             3 
-  Alt-Ergo:        2  (unknown: 16)
-[wp] Report 'tests/wp_acsl/logic.i.0.report.json'
+  Alt-Ergo:        2  (unsuccess: 16)
+[wp] Report in:  'tests/wp_acsl/oracle_qualif/logic.0.report.json'
+[wp] Report out: 'tests/wp_acsl/result_qualif/logic.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
 h                    2     -                 3      66.7%

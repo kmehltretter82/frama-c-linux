@@ -27,7 +27,7 @@ open Cil_types
 
 type localizable = Printer_tag.localizable =
   | PStmt of (kernel_function * stmt)
-  | PStart of (kernel_function * stmt)
+  | PStmtStart of (kernel_function * stmt)
   | PLval of (kernel_function option * kinstr * lval)
   | PExp of (kernel_function option * kinstr * exp)
   | PTermLval of (kernel_function option * kinstr * Property.t * term_lval)

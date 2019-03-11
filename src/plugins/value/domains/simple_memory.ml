@@ -141,7 +141,8 @@ module Make_Memory (Value: Value) = struct
         else add b v state
       | Imprecise -> remove b state
     in
-    Location_Bits.fold_topset_ok aux_base loc state
+    try Location_Bits.fold_topset_ok aux_base loc state
+    with Abstract_interp.Error_Top -> empty
 
   let remove_variables vars state =
     let remove_variable state v = remove (Base.of_varinfo v) state in
@@ -161,9 +162,11 @@ module Make_Memory (Value: Value) = struct
       | Precise -> Bottom.join Value.join r (`Value (find_or_top b state))
       | Imprecise -> `Value Value.top
     in
-    match Location_Bits.fold_topset_ok aux_base loc `Bottom with
-    | `Bottom -> Value.top (* does not happen if the location is not empty *)
-    | `Value v -> v
+    try
+      match Location_Bits.fold_topset_ok aux_base loc `Bottom with
+      | `Bottom -> Value.top (* does not happen if the location is not empty *)
+      | `Value v -> v
+    with Abstract_interp.Error_Top -> Value.top
 
 end
 
@@ -234,7 +237,10 @@ module Make_Internal (Info: sig val name: string end) (Value: Value) = struct
       | Lval lv -> begin
           match Valuation.find_loc valuation lv with
           | `Top -> state
-          | `Value {loc; typ} -> bind_loc loc typ record.value.v state
+          | `Value {loc; typ} ->
+            if Precise_locs.cardinal_zero_or_one loc
+            then bind_loc loc typ record.value.v state
+            else state
         end
       | _ -> state
 

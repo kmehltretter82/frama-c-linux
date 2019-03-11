@@ -54,7 +54,7 @@ let retrieve_annot lt =
   | _ -> LDefault (* be kind. Someone is bound to write a visitor that will
                      simplify our term into something unrecognizable... *)
 
-let () = Logic_typing.register_code_annot_next_stmt_extension "slevel"
+let () = Logic_typing.register_code_annot_next_stmt_extension "slevel" false
     (fun ~typing_context:_ ~loc args ->
        let abort () =
          Value_parameters.abort ~source:(fst loc) "Invalid slevel directive"
@@ -115,7 +115,7 @@ let extract_slevel_directive s =
   let rec find_one l =
     match l with
     | [] -> None
-    | {annot_content = AExtended(_,_,(_,"slevel", _, Ext_terms lp))} :: _ ->
+    | {annot_content = AExtended(_,_,(_,"slevel", _, _,Ext_terms lp))} :: _ ->
       Some (retrieve_annot lp)
     | _ :: q -> find_one q
   in
