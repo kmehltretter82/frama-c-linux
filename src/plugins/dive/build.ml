@@ -128,8 +128,11 @@ let stmt_to_node_locality stmt =
 let build_node_locality kinstr kind =
   match Node_kind.get_base kind with
   | Some vi ->
-    let loc_function = Kernel_function.find_defining_kf vi
-    and loc_file = get_loc_filename vi.vdecl in
+    let loc_function = Kernel_function.find_defining_kf vi in
+    (* Use the location of the defining function if it exists, as some
+       temporary variables do not have proper location *)
+    let def_vi = Extlib.may_map Kernel_function.get_vi ~dft:vi loc_function in
+    let loc_file = get_loc_filename def_vi.vdecl in
     { loc_file ; loc_function }
   | None ->
     match kinstr with
