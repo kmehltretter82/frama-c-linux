@@ -7444,7 +7444,9 @@ let isCompleteType ?allowZeroSizeArrays t =
 	   let undolist = ref [] in
 	   (* Process one local variable *)
 	   let processLocal (v: varinfo) =
-             let lookupname = v.vname in
+             (* start from original name to avoid putting another _0 in case
+                of conflicts. *)
+             let lookupname = v.vorig_name in
              let data = CurrentLoc.get () in
 	     let newname, oldloc =
                Alpha.newAlphaName

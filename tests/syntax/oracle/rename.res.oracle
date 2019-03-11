@@ -73,6 +73,23 @@ void f4(int *j_0_1)
   return;
 }
 
+void f5(void)
+{
+  int y_0_1;
+  int y_0_0;
+  return;
+}
+
+int y_0;
+void f6(void)
+{
+  int y_2_0;
+  int y_2;
+  return;
+}
+
+int y_1;
+
 struct not_anon s = {.__anonCompField1 = 0};
 struct anon a = {.__anonCompField1 = {.inner_i = 0}};
 
