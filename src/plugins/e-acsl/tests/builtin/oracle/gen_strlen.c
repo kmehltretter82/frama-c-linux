@@ -17,10 +17,6 @@ char *__gen_e_acsl_literal_string_5;
 char *__gen_e_acsl_literal_string;
 extern int __e_acsl_sound_verdict;
 
-/*@ assigns \result;
-    assigns \result \from \nothing; */
-extern int ( /* missing proto */ fork)(void);
-
 void __e_acsl_globals_init(void)
 {
   static char __e_acsl_already_run = 0;
@@ -98,6 +94,12 @@ void __e_acsl_globals_init(void)
     __e_acsl_full_init((void *)(& __fc_p_fopen));
     __e_acsl_store_block((void *)(__fc_fopen),(size_t)128);
     __e_acsl_full_init((void *)(& __fc_fopen));
+    __e_acsl_store_block((void *)(& __fc_p_random48_counter),(size_t)8);
+    __e_acsl_full_init((void *)(& __fc_p_random48_counter));
+    __e_acsl_store_block((void *)(random48_counter),(size_t)6);
+    __e_acsl_full_init((void *)(& random48_counter));
+    __e_acsl_store_block((void *)(& __fc_random48_init),(size_t)4);
+    __e_acsl_full_init((void *)(& __fc_random48_init));
     __e_acsl_store_block((void *)(& __fc_rand_max),(size_t)8);
     __e_acsl_full_init((void *)(& __fc_rand_max));
   }
@@ -434,6 +436,9 @@ int main(int argc, char const **argv)
   __e_acsl_delete_block((void *)(& __fc_strtok_ptr));
   __e_acsl_delete_block((void *)(& __fc_p_fopen));
   __e_acsl_delete_block((void *)(__fc_fopen));
+  __e_acsl_delete_block((void *)(& __fc_p_random48_counter));
+  __e_acsl_delete_block((void *)(random48_counter));
+  __e_acsl_delete_block((void *)(& __fc_random48_init));
   __e_acsl_delete_block((void *)(& __fc_rand_max));
   __e_acsl_delete_block((void *)(& const_str));
   __e_acsl_delete_block((void *)(stack_str));

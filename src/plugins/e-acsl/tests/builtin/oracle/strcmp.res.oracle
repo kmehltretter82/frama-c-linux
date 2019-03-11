@@ -28,7 +28,7 @@
   Neither code nor specification for function set_handler, generating default assigns from the prototype
 [kernel:annot:missing-spec] tests/builtin/signalled.h:22: Warning: 
   Neither code nor specification for function test_successful, generating default assigns from the prototype
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:394: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:457: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:469: Warning: 
@@ -67,7 +67,7 @@
 [e-acsl] FRAMAC_SHARE/libc/string.h:140: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:406: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:469: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
@@ -80,13 +80,7 @@
   __e_acsl_math_HUGE_VAL ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
   __e_acsl_math_HUGE_VALF ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
   __e_acsl_math_INFINITY ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
-<<<<<<< HEAD
-||||||| merged common ancestors
-  testno ∈ {0}
-=======
-  testno ∈ {0}
   __e_acsl_sound_verdict ∈ [--..--]
->>>>>>> new option -e-acsl-instrument
   __gen_e_acsl_literal_string ∈ {0}
   __gen_e_acsl_literal_string_2 ∈ {0}
   __gen_e_acsl_literal_string_3 ∈ {0}
