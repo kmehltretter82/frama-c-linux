@@ -39,6 +39,20 @@ void f4(int *j_0_1) {
     j_0_1+=j_0; }
 }
 
+void f5() {
+  { int y_0; }
+  int y_0;
+}
+
+int y_0;
+
+void f6() {
+  { int y_2; }
+  int y_2;
+}
+
+int y_1;
+
 struct not_anon {
     int __anonCompField1;
 };

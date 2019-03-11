@@ -3841,10 +3841,23 @@ let exitScope () =
     | UndoRemoveFromEnv n :: t ->
       H.remove env n; loop t
     | UndoRemoveFromAlphaTable (p,i) :: t ->
+      Kernel.(
+        debug ~dkey:dkey_alpha_undo
+          "Removing %s %s from alpha table\n" p i);
       (try
          let h = H.find alphaTable p in
          H.remove h i;
-         if H.length h = 0 then H.remove alphaTable p
+         let l = H.length h in
+         if l = 0 then begin
+           H.remove alphaTable p;
+           Kernel.(
+             debug ~dkey:dkey_alpha_undo "No suffix for %s anymore" p)
+         end else begin
+           Kernel.(
+             debug ~dkey:dkey_alpha_undo "%d suffixes remaining@\n%t" l
+               (fun fmt ->
+                  H.iter (fun i _ -> Format.fprintf fmt "%s@ " i) h))
+         end
        with Not_found ->
          Kernel.warning
            "prefix (%s,%s) not in alpha conversion table. \

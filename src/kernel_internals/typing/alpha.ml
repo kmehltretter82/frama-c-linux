@@ -202,11 +202,14 @@ let alphaWorker      ~(alphaTable: 'a alphaTable)
                   find_unused_suffix (Integer.succ min) infix infixes suffixes
                 in
                 let newsuffix = make_suffix newmin in
+                let newinfix = make_full_suffix infix newmin in
+                Kernel.(
+                  debug ~dkey:dkey_alpha "New suffix: %s" newsuffix);
                 let base =
                   if is_generated_name prefix then prefix else lookupname
                 in
                 H.add
-                  infixes newsuffix
+                  infixes newinfix
                   (ref (Integer.minus_one, [(Integer.minus_one, data)]));
                 (match undolist with
                   | Some l -> l:= AlphaAddedSuffix (prefix,newsuffix)::!l
