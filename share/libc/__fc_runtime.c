@@ -20,31 +20,19 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_DEFINE_PTHREAD_TYPES_T
-#define __FC_DEFINE_PTHREAD_TYPES_T
-#include "features.h"
-__PUSH_FC_STDLIB
-__BEGIN_DECLS
-// These types are defined as structs with a meaningless field just to provide
-// stronger typing constraints
-
-#ifndef __have_pthread_attr_t
-typedef struct __fc_pthread_attr_t { int _fc; } pthread_attr_t;
-#define __have_pthread_attr_t
-#endif
-
-typedef struct __fc_pthread_barrier_t { int _fc; } pthread_barrier_t;
-typedef struct __fc_pthread_barrierattr_t { int _fc; } pthread_barrierattr_t;
-typedef struct __fc_pthread_cond_t { int _fc; } pthread_cond_t;
-typedef struct __fc_pthread_condattr_t { int _fc; } pthread_condattr_t;
-typedef struct __fc_pthread_key_t { int _fc; } pthread_key_t;
-typedef struct __fc_pthread_mutex_t { int _fc; } pthread_mutex_t;
-typedef struct __fc_pthread_mutexattr_t { int _fc; } pthread_mutexattr_t;
-typedef struct __fc_pthread_once_t { int _fc; } pthread_once_t;
-typedef struct __fc_pthread_rwlock_t { int _fc; } pthread_rwlock_t;
-typedef struct __fc_pthread_rwlockattr_t { int _fc; } pthread_rwlockattr_t;
-typedef struct __fc_pthread_spinlock_t { int _fc; } pthread_spinlock_t;
-typedef struct __fc_pthread_t { int _fc; } pthread_t;
-__END_DECLS
-__POP_FC_STDLIB
-#endif
+#include "__fc_builtin.c"
+#include "assert.c"
+#include "ctype.c"
+#include "errno.c"
+#include "fenv.c"
+#include "getopt.c"
+#include "glob.c"
+#include "inttypes.c"
+#include "locale.c"
+#include "math.c"
+#include "netdb.c"
+#include "signal.c"
+#include "stdio.c"
+#include "stdlib.c"
+#include "string.c"
+#include "wchar.c"
