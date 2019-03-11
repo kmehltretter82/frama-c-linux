@@ -27,7 +27,7 @@
 module Json = Yojson.Basic
 module Jutil = Yojson.Basic.Util
 
-type json = Json.json
+type json = Json.t
 let pretty = Json.pretty_print ~std:false
 
 module type S =

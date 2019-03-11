@@ -24,7 +24,7 @@
 (** Server Main Process *)
 (* -------------------------------------------------------------------------- *)
 
-type json = Yojson.Basic.json
+type json = Json.t
 type kind = [ `GET | `SET | `EXEC ]
 val string_of_kind : kind -> string
 val pp_kind : Format.formatter -> kind -> unit

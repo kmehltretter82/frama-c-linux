@@ -55,7 +55,7 @@ let exec request data = (snd (Hashtbl.find registry request)) data
 (* --- Public API                                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
-type json = Json.json
+type json = Json.t
 
 type 'a request = [
   | `Poll

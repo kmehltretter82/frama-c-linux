@@ -125,7 +125,7 @@ let index () =
     (fun (title,entry) -> Markdown.href ~title entry)
     (List.sort (fun (a,_) (b,_) -> String.compare a b) !entries)
 
-type json = Yojson.Basic.json
+type json = Json.t
 
 let link ~toc ~title ~href : json =
   let link = [ "title" , `String title ; "href" , `String href ] in
@@ -141,7 +141,7 @@ let link_page page : json list =
        else links
     ) (pages_of_chapter page.chapter) []
 
-let maindata : Yojson.Basic.json =
+let maindata : json =
   `Assoc [
     "document", `String "Frama-C Server" ;
     "title",`String "Documentation" ;

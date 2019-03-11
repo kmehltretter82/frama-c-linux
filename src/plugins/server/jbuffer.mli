@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type json = Yojson.Basic.json
+type json = Json.t
 
 (** All-in-one formatter. Return the JSON encoding of formatted text. *)
 val format : ?indent:int -> ?margin:int ->
