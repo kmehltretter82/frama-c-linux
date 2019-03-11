@@ -23,6 +23,8 @@
 -  Wp         [2019/28/01] Now -wp-dynamic is set by default (annotation @calls)
 
  -  Wp         [2019/01/28] New floating-point model
+ - WP          [2019/02/05] Auto filter properties with name "no_wp:"
+ - Wp          [2019/01/28] New floating-point model
  - WP          [2018/02/16] Filter out some variables from separation
  - TIP         [2018/02/15] Extend bitwise-eq auto-strategy on hypotheses
  - TIP         [2018/02/15] Fix wrong reconciliation of sub-scripts during replay

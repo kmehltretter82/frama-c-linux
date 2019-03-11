@@ -329,10 +329,10 @@ let filter_configstatus config pid =
 
 let filter_asked config pid =
   match config.asked_prop with
-  | AllProps -> true
   | IdProp idp -> Property.equal (WpPropId.property_of_id pid) idp
   | CallPre (s_call, asked_pre) -> WpPropId.select_call_pre s_call asked_pre pid
   | NamedProp names -> WpPropId.select_by_name names pid
+  | AllProps -> WpPropId.select_default pid
 
 let rec filter config pid = function
   | [] -> None
