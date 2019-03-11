@@ -774,35 +774,6 @@ end
  *
 *)
 
-
-(* regular expression matching names of uninteresting locals *)
-let uninteresting =
-  let names = [
-    (* Cil.makeTempVar *)
-    "__cil_tmp";
-
-    (* sm: I don't know where it comes from but these show up all over. *)
-    (* this doesn't seem to do what I wanted.. *)
-    "iter";
-
-    (* various macros in glibc's <bits/string2.h> *)
-    "__result";
-    "__s"; "__s1"; "__s2";
-    "__s1_len"; "__s2_len";
-    "__retval"; "__len";
-
-    (* various macros in glibc's <ctype.h> *)
-    "__c"; "__res";
-
-    (* We remove the __malloc variables *)
-  ] in
-
-  (* optional alpha renaming *)
-  let alpha = "\\(___[0-9]+\\)?" in
-
-  let pattern = "\\(" ^ (String.concat "\\|" names) ^ "\\)" ^ alpha ^ "$" in
-  Str.regexp pattern
-
 let label_removable = function
     Label (_,_,user) -> not user
   | Case _ | Default _ -> false
@@ -853,9 +824,8 @@ let removeUnmarked isRoot ast reachable_tbl =
             (* along the way, record the interesting locals that were removed *)
             let name = local.vname in
             (Kernel.debug ~dkey "removing local: %s" name);
-            if not (Str.string_match uninteresting name 0) then
-              removedLocals :=
-                (func.svar.vname ^ "::" ^ name) :: !removedLocals;
+            removedLocals :=
+              (func.svar.vname ^ "::" ^ name) :: !removedLocals;
             false
           end else true
       in
