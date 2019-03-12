@@ -21,27 +21,38 @@
 (**************************************************************************)
 
 (** Traces domain *)
-open Cil_datatype
+open Cil_types
 
 module Node : Datatype.S
 
 module GraphShape : sig type 'value t end
 
-type edge =
-  | Assign of Node.t * Cil_types.lval * Cil_types.typ * Cil_types.exp
-  | Assume of Node.t * Cil_types.exp * bool
-  | EnterScope of Node.t * Cil_types.varinfo list
-  | LeaveScope of Node.t * Cil_types.varinfo list
+type node = Node.t
+
+type transition =
+  | Assign of lval * typ * exp
+  | Assume of exp * bool
+  | EnterScope of varinfo list
+  | LeaveScope of varinfo list
   (** For call of functions without definition *)
-  | CallDeclared of Node.t * Cil_types.kernel_function * Cil_types.exp list * Cil_types.lval option
-  | Loop of Node.t * Stmt.t * Node.t (** start *) * edge list GraphShape.t (** cfg of the loop **)
-  | Msg of Node.t * string
+  | CallDeclared of kernel_function * exp list * lval option
+  | Loop of stmt * node (** start *) * edge list GraphShape.t
+  | Msg of string
+
+and edge = {
+  edge_trans : transition;
+  edge_dst : node;
+}
 
 module Edge : Datatype.S with type t = edge
 
-module Graph : Hptmap_sig.S with type key = Node.t
-                             and type v = edge list
-                             and type 'a shape = 'a GraphShape.t
+module Graph : sig
+  include Hptmap_sig.S with type key = Node.t
+                        and type v = edge list
+                        and type 'a shape = 'a GraphShape.t
+
+  val join : t -> t -> t
+end
 
 (** stack of open loops *)
 type loops =
