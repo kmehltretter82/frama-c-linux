@@ -127,7 +127,7 @@ union sigval {
    int sival_int ;
    void *sival_ptr ;
 };
-struct __anonstruct_siginfo_t_1 {
+struct __fc_siginfo_t {
    int si_signo ;
    int si_code ;
    union sigval si_value ;
@@ -138,7 +138,7 @@ struct __anonstruct_siginfo_t_1 {
    int si_status ;
    int si_band ;
 };
-typedef struct __anonstruct_siginfo_t_1 siginfo_t;
+typedef struct __fc_siginfo_t siginfo_t;
 struct sigaction {
    void (*sa_handler)(int ) ;
    void (*sa_sigaction)(int , siginfo_t *, void *) ;
@@ -338,11 +338,11 @@ struct passwd {
    char *pw_shell ;
 };
 typedef int ( jmp_buf)[5];
-struct __anonstruct_sigjmp_buf_22 {
+struct __fc_sigjmp_buf {
    jmp_buf buf ;
    sigset_t sigs ;
 };
-typedef struct __anonstruct_sigjmp_buf_22 sigjmp_buf;
+typedef struct __fc_sigjmp_buf sigjmp_buf;
 struct _code {
    char const *c_name ;
    int c_val ;

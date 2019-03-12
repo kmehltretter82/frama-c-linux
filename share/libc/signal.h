@@ -132,7 +132,7 @@ struct sigevent {
 
 #ifndef __have_siginfo_t
 #define __have_siginfo_t
-typedef struct {
+typedef struct __fc_siginfo_t {
 	int si_signo;
 	int si_code;
 	union sigval si_value;
