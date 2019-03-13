@@ -3,15 +3,9 @@
 [wp] Running WP plugin...
 [wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
-[wp] tests/wp_acsl/logic.i:16: Warning: 
-  Cast with incompatible pointers types (source: __anonstruct_Point_1*)
-     (target: __anonstruct_Point_1[3]*)
 [wp] tests/wp_acsl/logic.i:65: Warning: 
   Cast with incompatible pointers types (source: __anonstruct_Buint_4*)
      (target: uint32*)
-[wp] tests/wp_acsl/logic.i:48: Warning: 
-  Cast with incompatible pointers types (source: __anonstruct_Point_1*)
-     (target: __anonstruct_Point_1[3]*)
 [wp] tests/wp_acsl/logic.i:49: Warning: 
   Logic cast from struct (Tint2) not implemented yet
 [wp] tests/wp_acsl/logic.i:50: Warning: 
@@ -45,28 +39,16 @@
 ------------------------------------------------------------
 
 Goal Post-condition (file tests/wp_acsl/logic.i, line 21) in 'h':
-tests/wp_acsl/logic.i:16: warning from Typed Model:
- - Warning: Keep pointer value
-   Reason: Cast with incompatible pointers types (source: __anonstruct_Point_1*)
-   (target: __anonstruct_Point_1[3]*)
 Prove: true.
 
 ------------------------------------------------------------
 
 Goal Assigns nothing in 'h':
-tests/wp_acsl/logic.i:16: warning from Typed Model:
- - Warning: Keep pointer value
-   Reason: Cast with incompatible pointers types (source: __anonstruct_Point_1*)
-   (target: __anonstruct_Point_1[3]*)
 Prove: true.
 
 ------------------------------------------------------------
 
 Goal Assigns nothing in 'h':
-tests/wp_acsl/logic.i:16: warning from Typed Model:
- - Warning: Keep pointer value
-   Reason: Cast with incompatible pointers types (source: __anonstruct_Point_1*)
-   (target: __anonstruct_Point_1[3]*)
 Prove: true.
 
 ------------------------------------------------------------
@@ -154,10 +136,6 @@ Prove: P_P(m).
 ------------------------------------------------------------
 
 Goal Pre-condition 'qed_ok' in 'main':
-tests/wp_acsl/logic.i:48: warning from Typed Model:
- - Warning: Keep pointer value
-   Reason: Cast with incompatible pointers types (source: __anonstruct_Point_1*)
-   (target: __anonstruct_Point_1[3]*)
 Let a = global(G_tr_31).
 Let a_1 = shift___anonstruct_Point_1(a, 2).
 Let a_2 = shift___anonstruct_Point_1(a, 1).

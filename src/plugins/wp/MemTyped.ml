@@ -1194,13 +1194,13 @@ struct
               match compare ~dst:u ~src:v with
               | Mismatch -> Mismatch
               | Drem u' ->
-                    let w1 = u' @ add_array u (n-1) w1 in
-                    let w2 = add_array v (m-1) w2 in
-                    compare w1 w2
+                  let w1 = u' @ add_array u (n-1) w1 in
+                  let w2 = add_array v (m-1) w2 in
+                  compare w1 w2
               | Srem v' ->
-                    let w1 = add_array u (n-1) w1 in
-                    let w2 = v' @ add_array v (m-1) w2 in
-                    compare w1 w2
+                  let w1 = add_array u (n-1) w1 in
+                  let w2 = v' @ add_array v (m-1) w2 in
+                  compare w1 w2
               | Equal ->
                   if n < m then
                     let w2 = add_array v (m-n) w2 in
@@ -1217,6 +1217,39 @@ struct
         | Str _ , Arr(v,n) ->
             compare ~dst ~src:(v @ add_array v (n-1) w2)
 
+  let rec repeated ~dst ~src =
+    match dst , src with
+    | [] , [] -> true (* src = dst *)
+    | _ , [] -> false  (* empty source layout *)
+    | [] , _ -> false  (* empty destination layout *)
+    | [p] , [q] -> begin
+        match p , q with
+        | Garbled , _ | _ , Garbled -> false
+        | Str(a,n) , Str(b,m) -> (* dst =?= repeated(src,n/m) *)
+            equal_atom a b && n >= m && (n mod m = 0)
+        | Arr(u,n) , Arr(v,m) ->
+            begin
+              match compare ~dst:u ~src:v with
+              | Mismatch -> false
+              | Drem u' ->
+                  let w1 = u' @ add_array u (n-1) [] in
+                  let w2 = add_array v (m-1) [] in
+                  let cmp = compare ~dst:w1 ~src:w2 in
+                  repeated_result ~src cmp
+              | Srem _ ->
+                  false
+              | Equal -> (* dst =?= repeated(src,n/m) *)
+                  n >= m && (n mod m = 0)
+            end
+        | _ , _ -> repeated_compare ~dst ~src
+      end
+    | _ , _ -> repeated_compare ~dst ~src
+  and repeated_compare ~dst ~src = repeated_result ~src (compare ~dst ~src)
+  and repeated_result ~src = function
+    | Equal -> true
+    | Mismatch | Srem _ -> false
+    | Drem dst -> repeated ~dst ~src
+
   let fits ~dst ~src =
     match dst , src with
     | C_int i1 , C_int i2 -> i1 = i2
@@ -1224,9 +1257,11 @@ struct
     | C_comp c , C_comp d when Compinfo.equal c d -> true
     | C_pointer _ , C_pointer _ -> true
     | _ ->
-        match compare ~dst:(layout dst) ~src:(layout src) with
+        let src = layout src in
+        match compare ~dst:(layout dst) ~src with
         | Equal | Srem _ -> true
-        | Drem _ | Mismatch -> false
+        | Mismatch -> false
+        | Drem dst -> repeated dst src
 
   let rec pretty fmt = function
     | C_pointer ty -> Format.fprintf fmt "%a*" pretty (Ctypes.object_of ty)
