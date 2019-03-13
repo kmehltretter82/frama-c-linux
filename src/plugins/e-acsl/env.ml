@@ -184,6 +184,7 @@ let do_new_var ~loc ?(scope=Local_block) ?(name="") env t ty mk_stmts =
       ~source:true
       false (* is a global? *)
       false (* is a formal? *)
+      ~referenced:true
       (Varname.get ~scope (Functions.RTL.mk_gen_name name))
       ty
   in

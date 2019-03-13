@@ -134,7 +134,7 @@ let dup_fundec loc spec bhv sound_verdict_vi kf vi new_vi =
   let res =
     let ty = Kernel_function.get_return_type kf in
     if Cil.isVoidType ty then None
-    else Some (Cil.makeVarinfo false false "__retres" ty)
+    else Some (Cil.makeVarinfo false false ~referenced:true "__retres" ty)
   in
   let return =
     Cil.mkStmt ~valid_sid:true
