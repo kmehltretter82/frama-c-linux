@@ -109,6 +109,8 @@ val dkey_prop_status_reg: category
 
 val dkey_rmtmps: category
 
+val dkey_referenced: category
+
 val dkey_task: category
 
 val dkey_typing_global: category

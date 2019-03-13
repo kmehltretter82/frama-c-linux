@@ -578,7 +578,7 @@ type attributeClass =
    | x -> x
 
  (* Make a varinfo. Used mostly as a helper function below  *)
- let makeVarinfo ?(source=true) ?(temp=false) global formal name typ =
+ let makeVarinfo ?(source=true) ?(temp=false) ?(referenced=false) global formal name typ =
    let vi =
      { vorig_name = name;
        vname = name;
@@ -593,7 +593,7 @@ type attributeClass =
        vattr = [];
        vstorage = NoStorage;
        vaddrof = false;
-       vreferenced = false;
+       vreferenced = referenced;
        vdescr = None;
        vdescrpure = true;
        vghost = false;
@@ -6280,16 +6280,16 @@ let need_cast ?(force=false) oldt newt =
  let refresh_local_name fdec vi =
    let new_name = findUniqueName fdec vi.vname in vi.vname <- new_name
 
- let makeLocal ?(temp=false) ?(formal=false) fdec name typ =
+ let makeLocal ?(temp=false) ?referenced ?(formal=false) fdec name typ =
    (* a helper function *)
    let name = findUniqueName fdec name in
    fdec.smaxid <- 1 + fdec.smaxid;
-   let vi = makeVarinfo ~temp false formal name typ in
+   let vi = makeVarinfo ~temp ?referenced false formal name typ in
    vi
 
  (* Make a local variable and add it to a function *)
- let makeLocalVar fdec ?scope ?(temp=false) ?(insert = true) name typ =
-   let vi = makeLocal ~temp fdec name typ in
+ let makeLocalVar fdec ?scope ?(temp=false) ?referenced ?(insert = true) name typ =
+   let vi = makeLocal ~temp ?referenced fdec name typ in
    refresh_local_name fdec vi;
    if insert then
      begin
@@ -6377,8 +6377,8 @@ let need_cast ?(force=false) oldt newt =
 
     (* Make a global variable. Your responsibility to make sure that the name
      * is unique *)
- let makeGlobalVar ?source ?temp name typ =
-   makeVarinfo ?source ?temp true false name typ
+ let makeGlobalVar ?source ?temp ?referenced name typ =
+   makeVarinfo ?source ?temp ?referenced true false name typ
 
  let mkPureExprInstr ~fundec ~scope ?loc e =
    let loc = match loc with None -> e.eloc | Some l -> l in

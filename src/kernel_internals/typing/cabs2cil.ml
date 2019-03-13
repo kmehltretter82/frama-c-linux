@@ -2882,8 +2882,8 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
          * local. This can happen when we declare an extern variable with
          * global scope but we are in a local scope. *)
       Kernel.debug ~dkey:Kernel.dkey_typing_global
-        "makeGlobalVarinfo isadef=%B vi.vname=%s(%d)"
-        isadef vi.vname vi.vid;
+        "makeGlobalVarinfo isadef=%B vi.vname=%s(%d), vreferenced=%B"
+        isadef vi.vname vi.vid vi.vreferenced;
       (* This may throw an exception Not_found *)
       let oldvi, oldloc = lookupGlobalVar vi.vname in
       Kernel.debug ~dkey:Kernel.dkey_typing_global
@@ -4644,6 +4644,7 @@ and makeVarInfoCabs
     ~(isformal: bool)
     ~(isglobal: bool)
     ?(isgenerated=false)
+    ?(referenced=false)
     (ldecl : location)
     (bt, sto, inline, attrs)
     (n,ndt,a)
@@ -4660,7 +4661,8 @@ and makeVarInfoCabs
     Kernel.error ~once:true ~current:true "inline for a non-function: %s" n;
   checkRestrictQualifierDeep vtype;
   (*  log "Looking at %s(%b): (%a)@." n isformal d_attrlist nattr;*)
-  let vi = makeVarinfo ~temp:isgenerated isglobal isformal n vtype in
+  let vi = makeVarinfo ~referenced ~temp:isgenerated isglobal isformal n vtype
+  in
   vi.vstorage <- sto;
   vi.vattr <- nattr;
   vi.vdecl <- ldecl;
@@ -8218,11 +8220,17 @@ and createGlobal ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool * A
   let is_fc_builtin {A.expr_node=enode} =
     match enode with A.VARIABLE "FC_BUILTIN" -> true | _ -> false
   in
+  let is_fc_stdlib {A.expr_node=enode} =
+    match enode with A.VARIABLE v when v = fc_stdlib -> true | _ -> false
+  in
   let isgenerated =
     List.exists (fun (_,el) -> List.exists is_fc_builtin el) a
   in
+  let islibc =
+    List.exists (fun (_,el) -> List.exists is_fc_stdlib el) a
+  in
   (* Make a first version of the varinfo *)
-  let vi = makeVarInfoCabs ~ghost ~isformal:false
+  let vi = makeVarInfoCabs ~ghost ~isformal:false ~referenced:islibc
       ~isglobal:true ~isgenerated (convLoc cloc) (t,s,b,attr_list) (n,ndt,a)
   in
   (* Add the variable to the environment before doing the initializer

@@ -82,6 +82,7 @@ let dkey_loops = register_category "natural-loops"
 
 let dkey_parser = register_category "parser"
 let dkey_rmtmps = register_category "parser:rmtmps"
+let dkey_referenced = register_category "parser:referenced"
 
 let dkey_pp = register_category "pp"
 let dkey_compilation_db = register_category "pp:compilation-db"

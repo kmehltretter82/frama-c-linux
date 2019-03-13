@@ -637,7 +637,7 @@ let () =
     keep_unused_specified_function). This function is meant to be passed to
     {!Rmtmps.removeUnusedTemps}. *)
 let keep_entry_point ?(specs=Kernel.Keep_unused_specified_functions.get ()) g =
-  Rmtmps.isDefaultRoot g ||
+  Rmtmps.isExportedRoot g ||
     match g with
     | GFun({svar = v; sspec = spec},_)
     | GFunDecl(spec,v,_) ->
