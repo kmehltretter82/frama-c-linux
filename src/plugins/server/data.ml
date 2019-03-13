@@ -38,6 +38,14 @@ sig
   val to_json : t -> json
 end
 
+module type Info =
+sig
+  val name : string
+  val descr : Markdown.text
+end
+
+type 'a data = (module S with type t = 'a)
+
 let d_tuple ts = Markdown.(tt "[" <+> glue ~sep:(raw " `,` ") ts <+> tt "]")
 let d_record txt = Markdown.(tt "{" <+> txt <+> tt "}")
 let d_array txt = Markdown.(tt "[" <+> txt <+> tt ",…]")
@@ -46,209 +54,74 @@ let d_option txt = Markdown.(txt <@> tt "?")
 let failure msg js = raise (Jutil.Type_error(msg,js))
 
 (* -------------------------------------------------------------------------- *)
-(* --- Field                                                              --- *)
-(* -------------------------------------------------------------------------- *)
-
-type 'a field = {
-  name: string ;
-  field: Markdown.text ;
-  default: Markdown.text option ;
-  descr: Markdown.text ;
-  optional: bool ;
-  get: ('a -> json option) option ;
-  set: ('a -> json -> 'a) option ;
-}
-
-module type S_field =
-sig
-  include S
-
-  val mk_field :
-    name:string ->
-    optional:bool ->
-    ?default:Markdown.text ->
-    descr:Markdown.text ->
-    ?get:('a -> t option) ->
-    ?set:('a -> t -> 'a) ->
-    unit -> 'a field
-
-  val field :
-    name:string ->
-    descr:string ->
-    ('a -> t) ->
-    ('a -> t -> 'a) ->
-    'a field
-
-  val option :
-    name:string ->
-    ?default:string ->
-    descr:string ->
-    ('a -> t option) ->
-    ('a -> t -> 'a) ->
-    'a field
-
-  val getter :
-    name:string ->
-    descr:string ->
-    ('a -> t) ->
-    'a field
-
-  val getopt :
-    name:string ->
-    ?default:string ->
-    descr:string ->
-    ('a -> t option) ->
-    'a field
-
-  val setter :
-    name:string ->
-    descr:string ->
-    ('a -> t -> 'a) ->
-    'a field
-
-  val setopt :
-    name:string ->
-    ?default:string ->
-    descr:string ->
-    ('a -> t -> 'a) ->
-    'a field
-
-end
-
-module Field(A : S) : S_field with type t = A.t =
-struct
-  include A
-
-  let opt f = function None -> None | Some x -> Some (f x)
-
-  let mk_field ~name ~optional ?default ~descr ?get ?set () =
-    begin match get , set with
-      | None , None ->
-        raise (Invalid_argument "Server.Data.field: no setter and no getter")
-      | _ -> ()
-    end ;
-    {
-      name ; optional ; default ; descr ;
-      field = A.descr ;
-      set = opt (fun f data js -> f data (A.of_json js)) set ;
-      get = opt (fun f data -> opt A.to_json (f data)) get ;
-    }
-
-  let field ~name ~descr get set =
-    mk_field ~name
-      ~descr:(Markdown.rm descr)
-      ~optional:false
-      ~get:(fun d -> Some (get d)) ~set ()
-
-  let option ~name ?default ~descr get set =
-    mk_field ~name
-      ~descr:(Markdown.rm descr)
-      ?default:(opt Markdown.rm default)
-      ~optional:true
-      ~get ~set ()
-
-  let getter ~name ~descr get =
-    mk_field ~name
-      ~optional:false
-      ~descr:(Markdown.rm descr)
-      ~get:(fun d -> Some (get d)) ()
-
-  let setter ~name ~descr set =
-    mk_field ~name
-      ~optional:false
-      ~descr:(Markdown.rm descr)
-      ~set ()
-
-  let getopt ~name ?default ~descr get =
-    mk_field ~name
-      ~optional:true
-      ?default:(opt Markdown.rm default)
-      ~descr:(Markdown.rm descr)
-      ~get ()
-
-  let setopt ~name ?default ~descr set =
-    mk_field ~name
-      ~optional:true
-      ?default:(opt Markdown.rm default)
-      ~descr:(Markdown.rm descr)
-      ~set ()
-
-end
-
-(* -------------------------------------------------------------------------- *)
 (* --- Option                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Joption(A : S) : S_field with type t = A.t option =
-  Field
-    (struct
-      type t = A.t option
+module Joption(A : S) : S with type t = A.t option =
+struct
+  type t = A.t option
 
-      let nullable = try ignore (A.of_json `Null) ; true with _ -> false
-      let descr = d_option (if nullable then A.descr else d_tuple [A.descr])
+  let nullable = try ignore (A.of_json `Null) ; true with _ -> false
+  let descr = d_option (if nullable then A.descr else d_tuple [A.descr])
 
-      let to_json = function
-        | None -> `Null
-        | Some v -> if nullable then `List [A.to_json v] else A.to_json v
+  let to_json = function
+    | None -> `Null
+    | Some v -> if nullable then `List [A.to_json v] else A.to_json v
 
-      let of_json = function
-        | `Null -> None
-        | `List [js] when nullable -> Some (A.of_json js)
-        | js -> Some (A.of_json js)
+  let of_json = function
+    | `Null -> None
+    | `List [js] when nullable -> Some (A.of_json js)
+    | js -> Some (A.of_json js)
 
-    end)
+end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Tuples                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Jpair(A : S)(B : S) : S_field with type t = A.t * B.t =
-  Field
-    (struct
-      type t = A.t * B.t
-      let descr = d_tuple [A.descr;B.descr]
-      let to_json (x,y) = `List [ A.to_json x ; B.to_json y ]
-      let of_json = function
-        | `List [ ja ; jb ] -> A.of_json ja , B.of_json jb
-        | js -> raise (Jutil.Type_error( "Expected list with 2 elements" , js ))
-    end)
+module Jpair(A : S)(B : S) : S with type t = A.t * B.t =
+struct
+  type t = A.t * B.t
+  let descr = d_tuple [A.descr;B.descr]
+  let to_json (x,y) = `List [ A.to_json x ; B.to_json y ]
+  let of_json = function
+    | `List [ ja ; jb ] -> A.of_json ja , B.of_json jb
+    | js -> raise (Jutil.Type_error( "Expected list with 2 elements" , js ))
+end
 
-module Jtriple(A : S)(B : S)(C : S) : S_field with type t = A.t * B.t * C.t =
-  Field
-    (struct
-      type t = A.t * B.t * C.t
-      let descr = d_tuple [A.descr;B.descr;C.descr]
-      let to_json (x,y,z) = `List [ A.to_json x ; B.to_json y ; C.to_json z ]
-      let of_json = function
-        | `List [ ja ; jb ; jc ] -> A.of_json ja , B.of_json jb , C.of_json jc
-        | js -> raise (Jutil.Type_error( "Expected list with 3 elements" , js ))
-    end)
+module Jtriple(A : S)(B : S)(C : S) : S with type t = A.t * B.t * C.t =
+struct
+  type t = A.t * B.t * C.t
+  let descr = d_tuple [A.descr;B.descr;C.descr]
+  let to_json (x,y,z) = `List [ A.to_json x ; B.to_json y ; C.to_json z ]
+  let of_json = function
+    | `List [ ja ; jb ; jc ] -> A.of_json ja , B.of_json jb , C.of_json jc
+    | js -> raise (Jutil.Type_error( "Expected list with 3 elements" , js ))
+end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Lists                                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Jlist(A : S) : S_field with type t = A.t list =
-  Field
-    (struct
-      type t = A.t list
-      let descr = d_array A.descr
-      let to_json xs = `List (List.map A.to_json xs)
-      let of_json js = List.map A.of_json (Jutil.to_list js)
-    end)
+module Jlist(A : S) : S with type t = A.t list =
+struct
+  type t = A.t list
+  let descr = d_array A.descr
+  let to_json xs = `List (List.map A.to_json xs)
+  let of_json js = List.map A.of_json (Jutil.to_list js)
+end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Arrays                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Jarray(A : S) : S_field with type t = A.t array =
-  Field
-    (struct
-      type t = A.t array
-      let descr = d_array A.descr
-      let to_json xs = `List (List.map A.to_json (Array.to_list xs))
-      let of_json js = Array.of_list @@ List.map A.of_json (Jutil.to_list js)
-    end)
+module Jarray(A : S) : S with type t = A.t array =
+struct
+  type t = A.t array
+  let descr = d_array A.descr
+  let to_json xs = `List (List.map A.to_json (Array.to_list xs))
+  let of_json js = Array.of_list @@ List.map A.of_json (Jutil.to_list js)
+end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Collections                                                        --- *)
@@ -256,15 +129,15 @@ module Jarray(A : S) : S_field with type t = A.t array =
 
 module type S_collection =
 sig
-  include S_field
-  module Joption : S_field with type t = t option
-  module Jlist : S_field with type t = t list
-  module Jarray : S_field with type t = t array
+  include S
+  module Joption : S with type t = t option
+  module Jlist : S with type t = t list
+  module Jarray : S with type t = t array
 end
 
 module Collection(A : S) : S_collection with type t = A.t =
 struct
-  include Field(A)
+  include A
   module Joption = Joption(A)
   module Jlist = Jlist(A)
   module Jarray = Jarray(A)
@@ -282,14 +155,13 @@ struct
   let to_json () = `Null
 end
 
-module Jany : S_field with type t = json =
-  Field
-    (struct
-      type t = json
-      let descr = Markdown.it "any"
-      let of_json js = js
-      let to_json js = js
-    end)
+module Jany : S with type t = json =
+struct
+  type t = json
+  let descr = Markdown.it "any"
+  let of_json js = js
+  let to_json js = js
+end
 
 module Jbool : S_collection with type t = bool =
   Collection
@@ -339,111 +211,87 @@ end
 (* --- Records                                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Record =
+module Fmap = Map.Make(String)
+
+module Record( R : Info ) =
 struct
 
-  type 'a record = 'a field list
+  type t = json Fmap.t
+  let descr = Markdown.it R.name
 
-  let descr_table
+  type 'a field = {
+    member : t -> bool ;
+    getter : t -> 'a ;
+    setter : t -> 'a -> t ;
+  }
+
+  (* Declared Fields in this Record *)
+  let fdocs = ref []
+  let defaults = ref Fmap.empty
+
+  let default () = !defaults
+  let has fd r = fd.member r
+  let get fd r = fd.getter r
+  let set fd v r = fd.setter r v
+
+  let field (type a) name ~descr ?default (d : a data) : a field =
+    let module D = (val d) in
+    let def = match default with
+      | None -> None
+      | Some v ->
+        let jd = D.to_json v in
+        defaults := Fmap.add name jd !defaults ; Some jd
+    in fdocs := (name , D.descr , def , descr) :: !fdocs ;
+    let member r = Fmap.mem name r in
+    let getter r = D.of_json (Fmap.find name r) in
+    let setter r v = Fmap.add name (D.to_json v) r in
+    { member ; getter ; setter }
+
+  let option (type a) name ~descr (d : a data) : a option field =
+    let module D = (val d) in
+    fdocs := (name , d_option D.descr , None , descr) :: !fdocs ;
+    let member r = Fmap.mem name r in
+    let getter r =
+      try Some (D.of_json (Fmap.find name r)) with Not_found -> None in
+    let setter r = function
+      | None -> Fmap.remove name r
+      | Some v -> Fmap.add name (D.to_json v) r in
+    { member ; getter ; setter }
+
+  let details
       ?(field=`Center "Field")
       ?(format=`Center "Format")
       ?(default=`Center "Default")
       ?(descr=`Left "Description")
-      ?(filter=(fun _ -> true))
-      record =
-    let defs = ref false in
-    let fields = List.filter
-        (fun fd ->
-           if filter fd then
-             ((if fd.default<>None then defs := true) ; true)
-           else false)
-        record in
-    if fields = [] then Markdown.empty else
-      let typ fd = if fd.optional then d_option fd.field else fd.field in
-      if !defs then
-        let def = function None -> Markdown.rm "" | Some text -> text in
-        Markdown.table
-          [ field ; format ; default ; descr ]
-          (List.map
-             (fun fd -> [
-                  Markdown.tt fd.name ;
-                  typ fd ;
-                  def fd.default ;
-                  fd.descr ;
-                ])
-             fields)
-      else
-        Markdown.table
-          [ field ; format ; descr ]
-          (List.map
-             (fun fd -> [ Markdown.tt fd.name ; typ fd ; fd.descr ])
-             fields)
+      ()
+    =
+    if Fmap.is_empty !defaults then
+      Markdown.table [ field ; format ; descr ]
+        (List.map
+           (fun (fd,fmt,_def,descr) -> [ Markdown.tt fd ; fmt ; descr ])
+           !fdocs)
+    else
+      let mk_format def fmt = if def <> None then d_option fmt else fmt in
+      let mk_default = function
+        | None -> Markdown.text []
+        | Some js -> Markdown.tt (Json.to_string js) in
+      Markdown.table [ field ; format ; default ; descr ]
+        (List.map
+           (fun (fd,fmt,def,descr) -> [
+                Markdown.tt fd ;
+                mk_format def fmt ;
+                mk_default def ;
+                descr ;
+              ])
+           !fdocs)
 
-  let rec getters = function
-    | { name ; optional ; get = Some f } :: fds ->
-      (name,optional,f) :: getters fds
-    | _ :: fds -> getters fds
-    | [] -> []
+  let of_json js =
+    List.fold_left
+      (fun r (fd,js) -> Fmap.add fd js r)
+      (default ()) (Jutil.to_assoc js)
 
-  let rec setters = function
-    | { name ; optional ; set = Some f } :: fds ->
-      (name,optional,f) :: setters fds
-    | _ :: fds -> setters fds
-    | [] -> []
-
-  let parser stage index default setters =
-    let values = Array.make (Array.length stage) None in
-    List.iter
-      (fun (fd,js) ->
-         try
-           let i = Hashtbl.find index fd in
-           if values.(i) = None then
-             failure (Printf.sprintf "Duplicate field %S" fd) js ;
-           values.(i) <- Some js ;
-         with Not_found ->
-           failure (Printf.sprintf "Unexpected field %S" fd) js
-      ) setters ;
-    let value = ref default in
-    Array.iteri
-      (fun i (name,required,set) ->
-         match values.(i) with
-         | None ->
-           if required then
-             failwith (Printf.sprintf "Missing field %S" name)
-         | Some js -> value := set !value js
-      ) stage ;
-    !value
-
-  let of_json record =
-    let stage = Array.of_list (setters record) in
-    let index = Hashtbl.create (Array.length stage) in
-    Array.iteri
-      (fun i (name,_,_) ->
-         if Hashtbl.mem index name then
-           raise (Invalid_argument
-                    "Server.Data.Record.compile: duplicate field") ;
-         Hashtbl.add index name i)
-      stage ;
-    fun default json ->
-      match json with
-      | `Null -> default
-      | `Assoc fields ->
-        begin
-          try parser stage index default fields
-          with Failure msg -> failure msg json
-        end
-      | js -> failure "Record expected" js
-
-  let formatter data (name,_optional,f) fds =
-    match f data with
-    | None -> fds
-    | Some js -> (name,js) :: fds
-
-  let to_json record =
-    let printer = getters record in
-    fun data ->
-      let fields = List.fold_right (formatter data) printer [] in
-      if fields = [] then `Null else `Assoc fields
+  let to_json r : json =
+    `Assoc (Fmap.fold (fun fd js fds -> (fd,js) :: fds) r [])
 
 end
 
@@ -461,12 +309,6 @@ sig
   val find : key -> 'a t -> 'a
 end
 
-module type IndexInfo =
-sig
-  val name : string
-  val descr : Markdown.text
-end
-
 module type Index =
 sig
   include S_collection
@@ -475,7 +317,7 @@ sig
   val clear : unit -> unit
 end
 
-module INDEXER(M : Map)(I : IndexInfo) :
+module INDEXER(M : Map)(I : Info) :
 sig
   type index
   val create : unit -> index
@@ -526,7 +368,7 @@ struct
 
 end
 
-module Static(M : Map)(I : IndexInfo) : Index with type t = M.key =
+module Static(M : Map)(I : Info) : Index with type t = M.key =
 struct
   module INDEX = INDEXER(M)(I)
   let index = INDEX.create ()
@@ -542,7 +384,7 @@ struct
       end)
 end
 
-module Index(M : Map)(I : IndexInfo) : Index with type t = M.key =
+module Index(M : Map)(I : Info) : Index with type t = M.key =
 struct
 
   module INDEX = INDEXER(M)(I)
@@ -582,8 +424,7 @@ module type IdentifiedType =
 sig
   type t
   val id : t -> int
-  val name : string
-  val descr : Markdown.text
+  include Info
 end
 
 module Identified(A : IdentifiedType) : Index with type t = A.t =
@@ -635,9 +476,8 @@ end
 module type Enum =
 sig
   type t
-  val name : string
-  val descr : Markdown.text
   val values : (t * string * Markdown.text) list
+  include Info
 end
 
 module Dictionary(E : Enum) :

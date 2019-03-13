@@ -40,27 +40,22 @@ struct
   type t = unit
   let descr = Markdown.tt "{ … }"
 
-  let version =
-    Jstring.getter ~name:"version" ~descr:"Frama-C version"
-      (fun () -> Config.version)
+  let to_json () = `Assoc [
+      "version" , Jstring.to_json Config.version ;
+      "datadir" , Jstring.to_json Config.datadir ;
+      "libdir" , Jstring.to_json Config.libdir ;
+      "pluginpath" , Jstring.Jlist.to_json Config.plugin_dir ;
+    ]
 
-  let datadir =
-    Jstring.getter ~name:"datadir" ~descr:"Shared directory (FRAMAC_SHARE)"
-      (fun () -> Config.datadir)
+  let details =
+    let open Markdown in
+    table [ `Left "field" ; `Left "format" ; `Left "Description" ] [
+      [ tt "'version'" ; Jstring.descr ; rm "Frama-C version" ] ;
+      [ tt "'datadir'" ; Jstring.descr ; rm "Shared directory (FRAMAC_SHARE)" ] ;
+      [ tt "'libdir'"  ; Jstring.descr ; rm "Lib directory (FRAMAC_LIB)" ] ;
+      [ tt "'pluginpath'" ; Jstring.Jlist.descr ; rm "Plugin directories (FRAMAC_PLUGIN)" ] ;
+    ]
 
-  let libdir =
-    Jstring.getter ~name:"libdir" ~descr:"Lib directory (FRAMAC_LIB)"
-      (fun () -> Config.datadir)
-
-  let pluginpath =
-    Jstring.Jlist.getter ~name:"pluginpath"
-      ~descr:"Plugin directories (FRAMAC_PLUGIN)"
-      (fun () -> Config.plugin_dir)
-
-  let record = [ version ; datadir ; libdir ; pluginpath ]
-
-  let to_json = Data.Record.to_json record
-  let details = Data.Record.descr_table record
 end
 
 module GetConfig =
@@ -143,44 +138,48 @@ end
 module RawEvent =
 struct
 
-  let kind = LogKind.field ~name:"kind" ~descr:"Message kind"
-      Log.(fun evt -> evt.evt_kind)
-      Log.(fun evt evt_kind -> { evt with evt_kind })
+  module R = Record
+      (struct
+        let name = "log"
+        let descr = Markdown.href (Doc.href fc_page "log")
+      end)
 
-  let plugin = Jstring.field ~name:"plugin" ~descr:"Emitter plugin"
-      Log.(fun evt -> evt.evt_plugin)
-      Log.(fun evt evt_plugin -> { evt with evt_plugin })
+  let descr = Markdown.rm
 
-  let category = Jstring.option ~name:"category"
-      ~descr:"Message category (DEBUG or WARNING)"
-      Log.(fun evt -> evt.evt_category)
-      Log.(fun evt a -> { evt with evt_category = Some a })
+  let kind = R.field "kind" ~descr:(descr "Message kind") (module LogKind)
+  let plugin = R.field "plugin" ~descr:(descr "Emitter plugin") (module Jstring)
+  let message = R.field "message" ~descr:(descr "Message text") (module Jstring)
 
-  let source = LogSource.option ~name:"source" ~descr:"Source file position"
-      Log.(fun evt -> evt.evt_source)
-      Log.(fun evt s -> { evt with evt_source = Some s })
+  let category = R.option "category"
+      ~descr:(descr "Message category (DEBUG or WARNING)")
+      (module Jstring)
 
-  let message = Jstring.field ~name:"message" ~descr:"Message text"
-      Log.(fun evt -> evt.evt_message)
-      Log.(fun evt evt_message -> { evt with evt_message })
-
-  let record = [ kind ; plugin ; category ; source ; message ]
+  let source = R.option "source" ~descr:(descr "Source file position")
+      (module LogSource)
 
   type t = Log.event
 
-  let default = Log.{
-      evt_plugin = "" ;
-      evt_kind = Feedback ;
-      evt_category = None ;
-      evt_source = None ;
-      evt_message = "" ;
+  let to_json evt =
+    R.default () |>
+    R.set plugin evt.Log.evt_plugin |>
+    R.set kind evt.Log.evt_kind |>
+    R.set category evt.Log.evt_category |>
+    R.set source evt.Log.evt_source |>
+    R.set message evt.Log.evt_message |>
+    R.to_json
+
+  let of_json js =
+    let r = R.of_json js in
+    {
+      Log.evt_plugin = R.get plugin r ;
+      Log.evt_kind = R.get kind r ;
+      Log.evt_category = R.get category r ;
+      Log.evt_source = R.get source r ;
+      Log.evt_message = R.get message r ;
     }
 
-  let to_json = Record.to_json record
-  let of_json = Record.of_json record default
-
   let descr = Markdown.href (Doc.href fc_page "log")
-  let details = Record.descr_table record
+  let details = R.details ()
 
 end
 

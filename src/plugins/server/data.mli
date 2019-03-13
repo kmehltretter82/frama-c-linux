@@ -36,166 +36,89 @@ sig
   val to_json : t -> json
 end
 
+module type Info =
+sig
+  val name : string
+  val descr : Markdown.text
+end
+
+type 'a data = (module S with type t = 'a)
+
 (* -------------------------------------------------------------------------- *)
 (** {2 Collections} *)
 (* -------------------------------------------------------------------------- *)
 
-(** Record field specification. *)
-type 'a field = {
-
-  name: string ; (** Name of JSON field *)
-  field: Markdown.text ; (** Format of JSON field *)
-  default: Markdown.text option ; (** Description of the field default *)
-  descr: Markdown.text ; (** Description of the JSON field *)
-
-  optional: bool ; (** Whether the field is optional or not *)
-
-  get: ('a -> json option) option ;
-  (** Accessor for building the « field » value from type ['a], if
-      to be including in the output. *)
-
-  set: ('a -> json -> 'a) option ;
-  (** Updater for some under-construction « record » value of type ['a]
-      with the field value. *)
-
-}
-
-module type S_field =
-sig
-  include S
-
-  (** Generic field build.
-      At least one of [~get] or [~set] shall be specified. *)
-  val mk_field :
-    name:string ->
-    optional:bool ->
-    ?default:Markdown.text ->
-    descr:Markdown.text ->
-    ?get:('a -> t option) ->
-    ?set:('a -> t -> 'a) ->
-    unit -> 'a field
-
-  (** Helper for simple (required) field *)
-  val field :
-    name:string ->
-    descr:string ->
-    ('a -> t) ->
-    ('a -> t -> 'a) ->
-    'a field
-
-  (** Helper for simple (optional) field *)
-  val option :
-    name:string ->
-    ?default:string ->
-    descr:string ->
-    ('a -> t option) ->
-    ('a -> t -> 'a) ->
-    'a field
-
-  (** Helper for simple fields with only a getter. *)
-  val getter :
-    name:string ->
-    descr:string ->
-    ('a -> t) ->
-    'a field
-
-  (** Helper for simple fields with only an optional getter. *)
-  val getopt :
-    name:string ->
-    ?default:string ->
-    descr:string ->
-    ('a -> t option) ->
-    'a field
-
-  (** Helper for simple fields with only a (required) setter. *)
-  val setter :
-    name:string ->
-    descr:string ->
-    ('a -> t -> 'a) ->
-    'a field
-
-  (** Helper for simple fields with only a (required) setter. *)
-  val setopt :
-    name:string ->
-    ?default:string ->
-    descr:string ->
-    ('a -> t -> 'a) ->
-    'a field
-
-end
-
 module type S_collection =
 sig
-  include S_field
-  module Joption : S_field with type t = t option
-  module Jlist : S_field with type t = t list
-  module Jarray : S_field with type t = t array
+  include S
+  module Joption : S with type t = t option
+  module Jlist : S with type t = t list
+  module Jarray : S with type t = t array
 end
 
-module Field(A : S) : S_field with type t = A.t
 module Collection(A : S) : S_collection with type t = A.t
 
 (* -------------------------------------------------------------------------- *)
 (** {2 Constructors} *)
 (* -------------------------------------------------------------------------- *)
 
-module Joption(A : S) : S_field with type t = A.t option
-module Jpair(A : S)(B : S) : S_field with type t = A.t * B.t
-module Jtriple(A : S)(B : S)(C : S) : S_field with type t = A.t * B.t * C.t
-module Jlist(A : S) : S_field with type t = A.t list
-module Jarray(A : S) : S_field with type t = A.t array
+module Joption(A : S) : S with type t = A.t option
+module Jpair(A : S)(B : S) : S with type t = A.t * B.t
+module Jtriple(A : S)(B : S)(C : S) : S with type t = A.t * B.t * C.t
+module Jlist(A : S) : S with type t = A.t list
+module Jarray(A : S) : S with type t = A.t array
 
 (* -------------------------------------------------------------------------- *)
 (** {2 Atomic Data} *)
 (* -------------------------------------------------------------------------- *)
 
 module Junit : S with type t = unit
-module Jany : S_field with type t = json
+module Jany : S with type t = json
 module Jbool : S_collection with type t = bool
 module Jint : S_collection with type t = int
 module Jfloat : S_collection with type t = float
 module Jstring : S_collection with type t = string
-module Jtext : S_field with type t = json
+module Jtext : S with type t = json
 (** Rich text encoding, see [Jbuffer] *)
 
 (* -------------------------------------------------------------------------- *)
-(** {2 Record Helper} *)
+(** {2 Records} *)
 (* -------------------------------------------------------------------------- *)
 
-module Record :
+module Record(R : Info) :
 sig
+  (** A new type [t] is created for each application of the functor. *)
+  include S
 
-  (** Ordered collection of fields to finally build values of type ['a] *)
-  type 'a record = 'a field list
+  (** Parametric field. Can only be used with type [t]. *)
+  type 'a field
 
-  (** Create a parser of JSON records from the specification.
-      Each field setter is applied in its order of declaration.
-      Extra fields or missing required ones leads to errors. *)
-  val of_json : 'a record -> ('a -> json -> 'a)
+  (** Field constructor *)
+  val field : string -> descr:Markdown.text -> ?default:'a -> 'a data -> 'a field
 
-  (** Create a formatter into JSON records from the specification.
-      Each field getter is applied when specified. *)
-  val to_json : 'a record -> ('a -> json)
+  (** Optional field constructor *)
+  val option : string -> descr:Markdown.text -> 'a data -> 'a option field
 
-  (** Output a description table for the field specification.
-      Options allow to configure the columns of the table, and the rows to
-      be printed.
-      - [~field] is the field name column title (defaults to [`Center "Field"])
-      - [~format] is the field format column title (defaults to [`Center "Format"])
-      - [~default] if an optional column title for defaults (defaults to [`Center "Default"])
-      - [~descr] is the field description title (defaults to [`Left "Description"])
-      - [~filter] is an optional filer over field specifications
+  (** Field presence. If the field has a default value, it will be always
+      present. *)
+  val has : 'a field -> t -> bool
 
-      The [default] column is discarded if none of the filtered field has
-      a default description. The output is [Markdown.empty] if all fields are
-      filtered out. *)
-  val descr_table :
+  (** Field accessor.
+      @raise Not_found if the field is optional and not present *)
+  val get : 'a field -> t -> 'a
+
+  (** Field updator. *)
+  val set : 'a field -> 'a -> t -> t
+
+  (** Contains only the default values. *)
+  val default : unit -> t
+
+  val details :
     ?field:Markdown.column ->
     ?format:Markdown.column ->
     ?default:Markdown.column ->
     ?descr:Markdown.column ->
-    ?filter:('a field -> bool) ->
-    'a record -> Markdown.block
+    unit -> Markdown.block
 
 end
 
@@ -213,12 +136,6 @@ sig
   val find : key -> 'a t -> 'a
 end
 
-module type IndexInfo =
-sig
-  val name : string
-  val descr : Markdown.text (** Actually an integer JSON *)
-end
-
 module type Index =
 sig
   include S_collection
@@ -229,10 +146,10 @@ sig
 end
 
 (** Builds an indexer that {i does not} depend on current project. *)
-module Static(M : Map)(I : IndexInfo) : Index with type t = M.key
+module Static(M : Map)(I : Info) : Index with type t = M.key
 
 (** Builds a {i projectified} index. *)
-module Index(M : Map)(I : IndexInfo) : Index with type t = M.key
+module Index(M : Map)(I : Info) : Index with type t = M.key
 
 (* -------------------------------------------------------------------------- *)
 (** {2 Identified Types} *)
@@ -256,9 +173,9 @@ module Identified(A : IdentifiedType) : Index with type t = A.t
 module type Enum =
 sig
   type t
+  val values : (t * string * Markdown.text) list
   val name : string
   val descr : Markdown.text
-  val values : (t * string * Markdown.text) list
 end
 
 module Dictionary(E : Enum) :
