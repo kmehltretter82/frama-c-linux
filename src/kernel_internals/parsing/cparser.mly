@@ -1035,9 +1035,22 @@ declaration:                                /* ISO 6.7.*/
 
 init_declarator_list:                       /* ISO 6.7 */
     init_declarator                              { [$1] }
-|   init_declarator COMMA init_declarator_list   { $1 :: $3 }
+|   init_declarator COMMA init_declarator_attr_list   { $1 :: $3 }
 
 ;
+
+init_declarator_attr_list:
+  init_declarator_attr { [ $1 ] }
+| init_declarator_attr COMMA init_declarator_attr_list { $1 :: $3 }
+;
+
+init_declarator_attr:
+  attribute_nocv_list init_declarator {
+    let ((name, decl, attrs, loc), init) = $2 in
+    ((name, PARENTYPE ($1,decl,[]), attrs, loc), init)
+  }
+;
+
 init_declarator:                             /* ISO 6.7 */
     declarator                          { ($1, NO_INIT) }
 |   declarator EQ init_expression
