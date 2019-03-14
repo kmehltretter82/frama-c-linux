@@ -72,12 +72,21 @@ let is_extended_integer_type t =
   | TNamed (ti, _) -> List.mem ti.tname extended_integer_typenames
   | _ -> false
 
+let integral_rep ikind =
+  Cil.bitsSizeOfInt ikind, Cil.isSigned ikind
+
+let expose t =
+  Cil.type_remove_attributes_for_c_cast (Cil.unrollType t)
+
+let is_equivalent_enum given expected =
+  match expose given, expose expected with
+  | TInt (i1,a1), TEnum({ekind=i2},a2)
+  | TEnum({ekind=i1},a1), TInt (i2,a2) ->
+    integral_rep i1 = integral_rep i2 &&
+    Cil_datatype.Attributes.equal a1 a2
+  | _, _ -> false
+
 let can_cast given expected =
-  let integral_rep ikind =
-    Cil.bitsSizeOfInt ikind, Cil.isSigned ikind
-  and expose t =
-    Cil.type_remove_attributes_for_c_cast (Cil.unrollType t)
-  in
   match expose given, expose expected with
   | (TInt (i1,a1) | TEnum({ekind=i1},a1)),
     (TInt (i2,a2) | TEnum({ekind=i2},a2))
@@ -106,11 +115,17 @@ let pretty_typ fmt t =
 let cast_arg i paramtyp exp =
   let argtyp = Cil.typeOf exp in
   if not (can_cast argtyp paramtyp) && not (does_fit exp paramtyp) then
-    Self.warning ~current:true
-      "Incorrect type for argument %d. \
-       The argument will be cast from %a to %a."
-      (i + 1)
-      pretty_typ argtyp pretty_typ paramtyp;
+    if Strict.get () && is_equivalent_enum argtyp paramtyp then
+      Self.warning ~current:true
+        "Possible portability issues with enum type for argument %d \
+         (use -variadic-no-strict to avoid this warning)."
+        (i + 1)
+    else
+      Self.warning ~current:true
+        "Incorrect type for argument %d. \
+         The argument will be cast from %a to %a."
+        (i + 1)
+        pretty_typ argtyp pretty_typ paramtyp;
   Cil.mkCast ~force:false ~e:exp ~newt:paramtyp
 
 
