@@ -2722,9 +2722,11 @@ let rec castTo ?(fromsource=false)
     | TPtr (TFun (_,args,va,_),_), TPtr(TFun (_,args',va',_),_) ->
       (* Checks on casting from a function type into another one.
          We enforce at least the same number of arguments, and emit a warning
-         if types do not match.
-      *)
-      if va <> va' || bigger_length_args args args' then
+         if types do not match. Note that empty argument lists are always
+         compatible. *)
+      if (va <> va' || bigger_length_args args args') &&
+         (args <> None && args' <> None)
+      then
         error
           "conversion between function types with \
            different number of arguments:@ %a@ and@ %a"
