@@ -130,7 +130,7 @@ let reduce_by_initialized_defined f loc state =
   | Ival.Not_Singleton_Int (* from Ival.project_int *) ->
     state
 
-let reduce_by_valid_loc ~positive ~for_writing loc typ state =
+let reduce_by_valid_loc ~positive access loc typ state =
   try
     let value = Cvalue.Model.find state loc in
     if Cvalue.V.is_imprecise value then
@@ -143,7 +143,7 @@ let reduce_by_valid_loc ~positive ~for_writing loc typ state =
     let reduced_value =
       Locations.loc_to_loc_without_size
         (if positive
-         then Locations.valid_part ~for_writing value_as_loc
+         then Locations.valid_part access value_as_loc
          else Locations.invalid_part value_as_loc )
     in
     if V.equal value reduced_value
@@ -176,7 +176,7 @@ let apply_on_all_locs f loc state =
   | Int_Base.Top -> state
   | Int_Base.Value _ as size ->
     try
-      let loc = Locations.valid_part ~for_writing:false loc in
+      let loc = Locations.valid_part Locations.Read loc in
       let loc = loc.Locations.loc in
       let plevel = Value_parameters.ArrayPrecisionLevel.get() in
       ignore (Locations.Location_Bits.cardinal_less_than loc plevel);

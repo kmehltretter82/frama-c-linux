@@ -344,10 +344,10 @@ let search_char kind ~length state str =
 let reduce_by_validity ~size cvalue =
   let loc_bits = Locations.loc_bytes_to_loc_bits cvalue in
   let loc = Locations.make_loc loc_bits (Int_Base.inject size) in
-  if Locations.is_valid ~for_writing:false loc
+  if Locations.(is_valid Read loc)
   then loc.Locations.loc, true
   else
-    let valid_loc = Locations.valid_part ~for_writing:false ~bitfield:true loc in
+    let valid_loc = Locations.(valid_part Read ~bitfield:true loc) in
     valid_loc.Locations.loc, false
 
 type char = Char | Wide

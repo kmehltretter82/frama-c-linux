@@ -59,7 +59,7 @@ let assigns_inputs_to_zone state assigns =
           (fun acc t ->
              let z =
                Eval_terms.eval_tlval_as_zone ~alarm_mode:Eval_terms.Ignore
-                 ~for_writing:false env t.it_content
+                 Read env t.it_content
              in
              Zone.join acc z)
           acc
@@ -96,7 +96,7 @@ let assigns_outputs_aux ~eval ~bot ~top ~join state ~result assigns =
 let assigns_outputs_to_zone =
   let eval env term =
     Eval_terms.eval_tlval_as_zone
-      ~alarm_mode:Eval_terms.Ignore ~for_writing:true env term
+      ~alarm_mode:Eval_terms.Ignore Write env term
   in
   assigns_outputs_aux ~eval
     ~bot:Locations.Zone.bottom ~top:Locations.Zone.top ~join:Locations.Zone.join
@@ -211,7 +211,7 @@ and eval_deps_lval state lv =
   match loc with
   | `Bottom -> deps
   | `Value loc ->
-    let deps_lv = Precise_locs.enumerate_valid_bits ~for_writing loc in
+    let deps_lv = Precise_locs.enumerate_valid_bits Read loc in
     Locations.Zone.join deps deps_lv
 and eval_deps_addr state (h, o:lval) =
   Locations.Zone.join (eval_deps_host state h) (eval_deps_offset state o)
@@ -399,7 +399,7 @@ module Export (Eval : Eval) = struct
       let _, r =
         lval_to_precise_loc_with_deps_state_alarm ?with_alarms state ~deps:None lv
       in
-      let zone = Precise_locs.enumerate_valid_bits ~for_writing:false r in
+      let zone = Precise_locs.enumerate_valid_bits Read r in
       Locations.Zone.join acc zone
     in
     Db.Value.fold_state_callstack
@@ -407,7 +407,7 @@ module Export (Eval : Eval) = struct
 
   let lval_to_zone_state state lv =
     let _, r = lval_to_precise_loc_with_deps_state state ~deps:None lv in
-    Precise_locs.enumerate_valid_bits ~for_writing:false r
+    Precise_locs.enumerate_valid_bits Read r
 
   let lval_to_zone_with_deps_state state ~for_writing ~deps lv =
     let deps, r = lval_to_precise_loc_with_deps_state state ~deps lv in
@@ -416,14 +416,15 @@ module Export (Eval : Eval) = struct
       then Precise_locs.loc_bottom
       else r
     in
-    let zone = Precise_locs.enumerate_valid_bits ~for_writing r in
+    let access = if for_writing then Write else Read in
+    let zone = Precise_locs.enumerate_valid_bits access r in
     let exact = Precise_locs.valid_cardinal_zero_or_one ~for_writing r in
     deps, zone, exact
 
 
   let lval_to_offsetmap_aux ?with_alarms state lv =
     let loc =
-      Locations.valid_part ~for_writing:false
+      Locations.valid_part Read
         (lval_to_loc ?with_alarms state lv)
     in
     match loc.Locations.size with

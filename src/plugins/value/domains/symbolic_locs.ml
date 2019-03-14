@@ -368,7 +368,7 @@ module Memory = struct
     List.fold_left aux_vi state l
 
   let kill loc state =
-    let z = Locations.enumerate_valid_bits ~for_writing:false loc in
+    let z = Locations.(enumerate_valid_bits Read loc) in
     fold_overwritten remove_key state z state
 
   (* Add the the mapping [lv --> v] to [state] when possible.
@@ -378,8 +378,7 @@ module Memory = struct
       state
     else
       let k = K.HCE.of_lval lv in
-      let for_writing = false in
-      let z_lv = Precise_locs.enumerate_valid_bits ~for_writing (get_z lv) in
+      let z_lv = Precise_locs.enumerate_valid_bits Locations.Read (get_z lv) in
       let z_lv_indirect = Value_util.indirect_zone_of_lval get_z lv in
       if Locations.Zone.intersects z_lv z_lv_indirect then
         (* The location of [lv] intersects with the zones needed to compute

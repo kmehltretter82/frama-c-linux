@@ -103,7 +103,7 @@ module V = struct
       then Ival.contains_zero offset
       else
         let bits_offset = Ival.scale (Bit_utils.sizeofchar()) offset in
-        not (Base.is_valid_offset ~for_writing:false Int.zero base bits_offset)
+        not Base.(is_valid_offset No_access base bits_offset)
     in
     Location_Bytes.exists offset_contains_zero loc
 

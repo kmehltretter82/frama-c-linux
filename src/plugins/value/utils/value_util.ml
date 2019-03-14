@@ -271,7 +271,7 @@ let rec zone_of_expr find_loc expr =
 and zone_of_lval find_loc lval =
   let ploc = find_loc lval in
   let loc = Precise_locs.imprecise_location ploc in
-  let zone = Locations.enumerate_valid_bits ~for_writing:false loc in
+  let zone = Locations.(enumerate_valid_bits Read loc) in
   Locations.Zone.join zone
     (indirect_zone_of_lval find_loc lval)
 

@@ -326,12 +326,18 @@ val make_loc : Location_Bits.t -> Int_Base.t -> location
 val loc_equal : location -> location -> bool
 val loc_size : location -> Int_Base.t
 
-val is_valid : for_writing:bool -> location -> bool
-(** Is the given location entirely valid, as the destination of a write
-    operation if [for_writing] is true, as the destination of a read
-    otherwise. *)
+(** Kind of memory access. *)
+type access = Read | Write | No_access
 
-val valid_part : for_writing:bool -> ?bitfield:bool -> location -> location
+(** Conversion into a base access, with the size information.
+    Accesses of unknown sizes are converted into empty accesses.  *)
+val base_access: size:Int_Base.t -> access -> Base.access
+
+val is_valid : access -> location -> bool
+(** Is the given location entirely valid, without any access or as a destination
+    for a read or write access. *)
+
+val valid_part : access -> ?bitfield:bool -> location -> location
 (** Overapproximation of the valid part of the given location. Beware that
     [is_valid (valid_part loc)] does not necessarily hold, as garbled mix
     may not be reduced by [valid_part].
@@ -375,10 +381,10 @@ val loc_bits_to_loc_bytes_under : Location_Bits.t -> Location_Bytes.t
 val enumerate_bits : location -> Zone.t
 val enumerate_bits_under : location -> Zone.t
 
-val enumerate_valid_bits : for_writing:bool -> location -> Zone.t
+val enumerate_valid_bits : access -> location -> Zone.t
 (** @plugin development guide *)
 
-val enumerate_valid_bits_under : for_writing:bool -> location -> Zone.t
+val enumerate_valid_bits_under : access -> location -> Zone.t
 
 val zone_of_varinfo : varinfo -> Zone.t
   (** @since Carbon-20101201 *)

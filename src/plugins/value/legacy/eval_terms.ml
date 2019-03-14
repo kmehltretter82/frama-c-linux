@@ -123,7 +123,7 @@ let alarm_reduce_mode () =
   if Value_parameters.ReduceOnLogicAlarms.get () then Ignore else Fail
 
 let find_or_alarm ~alarm_mode state loc =
-  let is_invalid = not (Locations.is_valid ~for_writing:false loc) in
+  let is_invalid = not Locations.(is_valid Read loc) in
   track_alarms is_invalid alarm_mode;
   let v = Model.find_indeterminate ~conflate_bottom:true state loc in
   let is_indeterminate = Cvalue.V_Or_Uninitialized.is_indeterminate v in
@@ -737,7 +737,7 @@ let rec eval_term ~alarm_mode env t =
     let deps =
       if Cvalue.Model.is_reachable state then
         add_deps env.e_cur empty_logic_deps
-          (enumerate_valid_bits ~for_writing:false eover_loc)
+          (enumerate_valid_bits Locations.Read eover_loc)
       else empty_logic_deps
     in
     let eunder_loc = make_loc (lval.eunder) size in
@@ -1303,16 +1303,16 @@ let eval_tlval_as_location_with_deps ~alarm_mode env t =
 
 
 (* Return a pair of (under-approximating, over-approximating) zones. *)
-let eval_tlval_as_zone_under_over ~alarm_mode ~for_writing env t =
+let eval_tlval_as_zone_under_over ~alarm_mode access env t =
   let r = eval_tlval ~alarm_mode env t in
   let s = Eval_typ.sizeof_lval_typ r.etype in
-  let under = enumerate_valid_bits_under ~for_writing (make_loc r.eunder s) in
-  let over = enumerate_valid_bits ~for_writing (make_loc r.eover s) in
+  let under = enumerate_valid_bits_under access (make_loc r.eunder s) in
+  let over = enumerate_valid_bits access (make_loc r.eover s) in
   (under, over)
 
-let eval_tlval_as_zone ~alarm_mode ~for_writing env t =
+let eval_tlval_as_zone ~alarm_mode access env t =
   let _under, over =
-    eval_tlval_as_zone_under_over ~alarm_mode ~for_writing env t
+    eval_tlval_as_zone_under_over ~alarm_mode access env t
   in
   over
 
@@ -1487,7 +1487,7 @@ let eval_forall_predicate state r test =
   let size_bits = Eval_typ.sizeof_lval_typ r.etype in
   let make_loc loc = make_loc loc size_bits in
   let over_loc = make_loc r.eover in
-  if not (Locations.is_valid ~for_writing:false over_loc) then c_alarm ();
+  if not Locations.(is_valid Read over_loc) then c_alarm ();
   match forall_in_over_location state over_loc test with
   | Unknown ->
     let under_loc = make_loc r.eunder in
@@ -1604,7 +1604,7 @@ let reduce_by_known_papp env positive li _labels args =
             can evaluate, but on which we are not able to reduce on (yet ?).*)
     env
 
-let reduce_by_valid env positive ~for_writing (tset: term) =
+let reduce_by_valid env positive access (tset: term) =
   (* Auxiliary function that reduces \valid(lv+offs), where lv is atomic
      (no more tsets), and offs is a bits-expressed constant offset.
      [offs_typ] is supposed to be the type of the pointed location after [offs]
@@ -1625,7 +1625,7 @@ let reduce_by_valid env positive ~for_writing (tset: term) =
       let lshifted_p = make_loc shifted_p (Eval_typ.sizeof_lval_typ offs_typ) in
       let valid = (* reduce the shifted pointer to the wanted part *)
         if positive
-        then Locations.valid_part ~for_writing lshifted_p
+        then Locations.valid_part access lshifted_p
         else Locations.invalid_part lshifted_p
       in
       let valid = valid.loc in
@@ -1661,7 +1661,7 @@ let reduce_by_valid env positive ~for_writing (tset: term) =
   let aux_one_lval typ loc env =
     try
       let state =
-        Eval_op.reduce_by_valid_loc ~positive ~for_writing
+        Eval_op.reduce_by_valid_loc ~positive access
           loc typ (env_current_state env)
       in
       overwrite_current_state env state
@@ -1876,9 +1876,9 @@ let rec reduce_by_predicate ~alarm_mode env positive p =
     | _,Pvalid (_label,tsets) ->
       (* TODO: label should not be ignored. Instead, we should clear
          variables that are not in scope at the label. *)
-      reduce_by_valid env positive ~for_writing:true  tsets
+      reduce_by_valid env positive Write tsets
     | _,Pvalid_read (_label,tsets) ->
-      reduce_by_valid env positive ~for_writing:false tsets
+      reduce_by_valid env positive Read tsets
 
     | _,Pvalid_function _tsets -> env (* TODO *)
 
@@ -2019,28 +2019,29 @@ and eval_predicate env pred =
     | Pvalid (_label, tsets) | Pvalid_read (_label, tsets) -> begin
         (* TODO: see same constructor in reduce_by_predicate *)
         try
-          let for_writing =
-            (match p.pred_content with Pvalid_read _ -> false | _ -> true) in
+          let access =
+            match p.pred_content with Pvalid_read _ -> Read | _ -> Write
+          in
           let state = env_current_state env in
           let typ_pointed = Logic_typing.ctype_of_pointed tsets.term_type in
           (* Check if we are trying to write in a const l-value *)
-          if for_writing && Value_util.is_const_write_invalid typ_pointed then
+          if access = Write && Value_util.is_const_write_invalid typ_pointed then
             raise Stop;
           let size = Eval_typ.sizeof_lval_typ typ_pointed in
           (* Check that the given location is valid *)
           let valid ~over:locbytes_over ~under:locbytes_under =
             let loc = loc_bytes_to_loc_bits locbytes_over in
             let loc = Locations.make_loc loc size in
-            if not (Locations.is_valid ~for_writing loc) then (
+            if not Locations.(is_valid access loc) then (
               (* \valid does not hold if the over-approximation is invalid
                  everywhere, or if a part of the under-approximation is invalid
               *)
-              let valid = valid_part ~for_writing loc in
+              let valid = valid_part access loc in
               if Locations.is_bottom_loc valid then raise Stop;
               let loc_under = loc_bytes_to_loc_bits locbytes_under in
               let loc_under = Locations.make_loc loc_under size in
               let valid_loc_under =
-                Locations.valid_part ~for_writing loc_under
+                Locations.valid_part access loc_under
               in
               if not (Location.equal loc_under valid_loc_under) then
                 raise Stop;
@@ -2051,7 +2052,7 @@ and eval_predicate env pred =
              (* Evaluate the left-value, and check that it is initialized
                 and not an escaping pointer *)
              let loc = eval_tlval_as_location ~alarm_mode env tsets in
-             if not (Locations.is_valid ~for_writing:false loc) then
+             if not Locations.(is_valid Read loc) then
                c_alarm ();
              let v = Model.find_indeterminate state loc in
              let v, ok = match v with
@@ -2329,7 +2330,7 @@ let predicate_deps env pred =
     | Pinitialized (lbl, tsets) | Pdangling (lbl, tsets) ->
       let loc, deploc =
         eval_tlval_as_location_with_deps ~alarm_mode env tsets in
-      let zone = enumerate_valid_bits ~for_writing:false loc in
+      let zone = enumerate_valid_bits Locations.Read loc in
       Logic_label.Map.add lbl zone deploc
 
     | Pnot p -> do_eval env p

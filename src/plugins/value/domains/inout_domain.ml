@@ -177,7 +177,7 @@ module Transfer = struct
     let inputs_lv = Value_util.indirect_zone_of_lval to_z lv.Eval.lval in
     let inputs = Zone.join inputs_e inputs_lv in
     let outputs =
-      Precise_locs.enumerate_valid_bits ~for_writing:true lv.Eval.lloc
+      Precise_locs.enumerate_valid_bits Locations.Write lv.Eval.lloc
     in
     let exact_outputs = Precise_locs.cardinal_zero_or_one lv.Eval.lloc in
     {
