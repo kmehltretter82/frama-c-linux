@@ -107,7 +107,10 @@ module PP = Printer_tag.Make(Tag)
 module Stmt = Data.Collection
     (struct
       type t = stmt
-      let descr = Markdown.tt "stmt"
+      let syntax = Syntax.publish ast_page
+          ~name:"stmt"
+          ~synopsis:Syntax.ident
+          ~descr:(Markdown.praw "Code statement identifier")
       let to_json st = `String (Tag.of_stmt st)
       let of_json js =
         try
@@ -122,7 +125,7 @@ module Stmt = Data.Collection
 module Ki = Data.Collection
     (struct
       type t = kinstr
-      let descr = Markdown.raw "(stmt|`\"global\")`"
+      let syntax = Syntax.union [ Syntax.tag "global" ; Stmt.syntax ]
       let to_json = function
         | Kglobal -> `String "global"
         | Kstmt st -> `String (Tag.of_stmt st)
@@ -134,7 +137,10 @@ module Ki = Data.Collection
 module Kf = Data.Collection
     (struct
       type t = kernel_function
-      let descr = Markdown.tt "function"
+      let syntax = Syntax.publish ast_page
+          ~name:"function"
+          ~synopsis:Syntax.ident
+          ~descr:(Markdown.praw "Function, identified by its global name.")
       let to_json kf = `String (Kernel_function.get_name kf)
       let of_json js =
         try Jutil.to_string js |> Globals.Functions.find_by_name

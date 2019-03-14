@@ -33,7 +33,9 @@ let project_page =
 module ProjectInfo =
 struct
   type t = Project.t
-  let descr = Markdown.href (`Name "project-info")
+  let syntax = Syntax.publish project_page ~name:"project"
+      ~synopsis:(Syntax.(record ["id",string;"name",string;"current",boolean]))
+      ~descr:(Markdown.praw "Project informations")
   let name_of_json = function
     | `Assoc info -> Jstring.of_json (List.assoc "id" info)
     | `String id -> id
@@ -51,10 +53,12 @@ end
 module ProjectRequest =
 struct
   type t = Project.t * string * json
-  let descr = Markdown.(tt "{" <+> href (`Name "project-request") <+> tt "}")
+  let syntax = Syntax.publish project_page ~name:"project"
+      ~synopsis:(Syntax.(record ["project",string;"request",string;"data",any]))
+      ~descr:(Markdown.praw "Request to be executed on the specified project.")
   let of_json js =
     begin
-      ProjectInfo.of_json (Jutil.member "project-request" js) ,
+      ProjectInfo.of_json (Jutil.member "project" js) ,
       Jutil.(member "request" js |> to_string) ,
       Jutil.(member "data" js)
     end

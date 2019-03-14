@@ -58,7 +58,9 @@ let page chapter ~title ~filename =
     | `Kernel -> ".." , Printf.sprintf "kernel/%s" filename
     | `Plugin name -> "../.." , Printf.sprintf "plugins/%s/%s" name filename
   in
-  try Pages.find path !pages
+  try
+    let other = Pages.find path !pages in
+    Senv.failure "Duplicate page '%s' path@." path ; other
   with Not_found ->
     let intro = match chapter with
       | `Protocol ->

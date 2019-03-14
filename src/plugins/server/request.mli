@@ -30,14 +30,14 @@ type kind = [ `GET | `SET | `EXEC ]
 module type Input =
 sig
   type t
-  val descr : Markdown.text
+  val syntax : Syntax.t
   val of_json : json -> t
 end
 
 module type Output =
 sig
   type t
-  val descr : Markdown.text
+  val syntax : Syntax.t
   val to_json : t -> json
 end
 

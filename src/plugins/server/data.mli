@@ -31,15 +31,16 @@ val pretty : Format.formatter -> json -> unit
 module type S =
 sig
   type t
-  val descr : Markdown.text
+  val syntax : Syntax.t
   val of_json : json -> t
   val to_json : t -> json
 end
 
 module type Info =
 sig
+  val page : Doc.page
   val name : string
-  val descr : Markdown.text
+  val descr : Markdown.block
 end
 
 type 'a data = (module S with type t = 'a)
@@ -113,13 +114,6 @@ sig
   (** Contains only the default values. *)
   val default : unit -> t
 
-  val details :
-    ?field:Markdown.column ->
-    ?format:Markdown.column ->
-    ?default:Markdown.column ->
-    ?descr:Markdown.column ->
-    unit -> Markdown.block
-
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -159,8 +153,7 @@ module type IdentifiedType =
 sig
   type t
   val id : t -> int
-  val name : string
-  val descr : Markdown.text
+  include Info
 end
 
 (** Builds a {i projectified} index on types with {i unique} identifiers *)
@@ -174,18 +167,10 @@ module type Enum =
 sig
   type t
   val values : (t * string * Markdown.text) list
-  val name : string
-  val descr : Markdown.text
+  include Info
 end
 
-module Dictionary(E : Enum) :
-sig
-  val descr_table :
-    ?tag:Markdown.column ->
-    ?descr:Markdown.column ->
-    unit -> Markdown.block
-  include S_collection with type t = E.t
-end
+module Dictionary(E : Enum) : S_collection with type t = E.t
 
 (* -------------------------------------------------------------------------- *)
 (** {2 Misc} *)
@@ -193,10 +178,5 @@ end
 
 val failure : string -> json -> 'a
 (** @raise Yojson.Basic.Util.Type_error with the given arguments *)
-
-val d_tuple : Markdown.text list -> Markdown.text
-val d_array : Markdown.text -> Markdown.text
-val d_option : Markdown.text -> Markdown.text
-val d_record : Markdown.text -> Markdown.text
 
 (* -------------------------------------------------------------------------- *)

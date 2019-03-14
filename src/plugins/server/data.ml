@@ -33,23 +33,19 @@ let pretty = Json.pretty_print ~std:false
 module type S =
 sig
   type t
-  val descr : Markdown.text
+  val syntax : Syntax.t
   val of_json : json -> t
   val to_json : t -> json
 end
 
 module type Info =
 sig
+  val page : Doc.page
   val name : string
-  val descr : Markdown.text
+  val descr : Markdown.block
 end
 
 type 'a data = (module S with type t = 'a)
-
-let d_tuple ts = Markdown.(tt "[" <+> glue ~sep:(raw " `,` ") ts <+> tt "]")
-let d_record txt = Markdown.(tt "{" <+> txt <+> tt "}")
-let d_array txt = Markdown.(tt "[" <+> txt <+> tt ",…]")
-let d_option txt = Markdown.(txt <@> tt "?")
 
 let failure msg js = raise (Jutil.Type_error(msg,js))
 
@@ -62,7 +58,8 @@ struct
   type t = A.t option
 
   let nullable = try ignore (A.of_json `Null) ; true with _ -> false
-  let descr = d_option (if nullable then A.descr else d_tuple [A.descr])
+  let syntax =
+    Syntax.option (if nullable then A.syntax else Syntax.tuple [A.syntax])
 
   let to_json = function
     | None -> `Null
@@ -82,7 +79,7 @@ end
 module Jpair(A : S)(B : S) : S with type t = A.t * B.t =
 struct
   type t = A.t * B.t
-  let descr = d_tuple [A.descr;B.descr]
+  let syntax = Syntax.tuple [A.syntax;B.syntax]
   let to_json (x,y) = `List [ A.to_json x ; B.to_json y ]
   let of_json = function
     | `List [ ja ; jb ] -> A.of_json ja , B.of_json jb
@@ -92,7 +89,7 @@ end
 module Jtriple(A : S)(B : S)(C : S) : S with type t = A.t * B.t * C.t =
 struct
   type t = A.t * B.t * C.t
-  let descr = d_tuple [A.descr;B.descr;C.descr]
+  let syntax = Syntax.tuple [A.syntax;B.syntax;C.syntax]
   let to_json (x,y,z) = `List [ A.to_json x ; B.to_json y ; C.to_json z ]
   let of_json = function
     | `List [ ja ; jb ; jc ] -> A.of_json ja , B.of_json jb , C.of_json jc
@@ -106,7 +103,7 @@ end
 module Jlist(A : S) : S with type t = A.t list =
 struct
   type t = A.t list
-  let descr = d_array A.descr
+  let syntax = Syntax.array A.syntax
   let to_json xs = `List (List.map A.to_json xs)
   let of_json js = List.map A.of_json (Jutil.to_list js)
 end
@@ -118,7 +115,7 @@ end
 module Jarray(A : S) : S with type t = A.t array =
 struct
   type t = A.t array
-  let descr = d_array A.descr
+  let syntax = Syntax.array A.syntax
   let to_json xs = `List (List.map A.to_json (Array.to_list xs))
   let of_json js = Array.of_list @@ List.map A.of_json (Jutil.to_list js)
 end
@@ -150,7 +147,7 @@ end
 module Junit : S with type t = unit =
 struct
   type t = unit
-  let descr = Markdown.tt "null"
+  let syntax = Syntax.null
   let of_json _js = ()
   let to_json () = `Null
 end
@@ -158,7 +155,7 @@ end
 module Jany : S with type t = json =
 struct
   type t = json
-  let descr = Markdown.it "any"
+  let syntax = Syntax.any
   let of_json js = js
   let to_json js = js
 end
@@ -167,7 +164,7 @@ module Jbool : S_collection with type t = bool =
   Collection
     (struct
       type t = bool
-      let descr = Markdown.it "bool"
+      let syntax = Syntax.boolean
       let of_json = Jutil.to_bool
       let to_json b = `Bool b
     end)
@@ -176,7 +173,7 @@ module Jint : S_collection with type t = int =
   Collection
     (struct
       type t = int
-      let descr = Markdown.it "int"
+      let syntax = Syntax.int
       let of_json = Jutil.to_int
       let to_json n = `Int n
     end)
@@ -185,7 +182,7 @@ module Jfloat : S_collection with type t = float =
   Collection
     (struct
       type t = float
-      let descr = Markdown.it "number"
+      let syntax = Syntax.number
       let of_json = Jutil.to_number
       let to_json v = `Float v
     end)
@@ -194,7 +191,7 @@ module Jstring : S_collection with type t = string =
   Collection
     (struct
       type t = string
-      let descr = Markdown.it "string"
+      let syntax = Syntax.string
       let of_json = Jutil.to_string
       let to_json s = `String s
     end)
@@ -204,7 +201,8 @@ let text_page = Doc.page `Kernel ~title:"Rich Text Format" ~filename:"text.md"
 module Jtext =
 struct
   include Jany
-  let descr = Markdown.href ~title:"text" (`Page (Doc.path text_page))
+  let syntax = Syntax.publish text_page ~name:"text"
+      ~synopsis:Syntax.any ~descr:(Markdown.praw "Formatted text.")
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -217,7 +215,6 @@ module Record( R : Info ) =
 struct
 
   type t = json Fmap.t
-  let descr = Markdown.it R.name
 
   type 'a field = {
     member : t -> bool ;
@@ -241,7 +238,7 @@ struct
       | Some v ->
         let jd = D.to_json v in
         defaults := Fmap.add name jd !defaults ; Some jd
-    in fdocs := (name , D.descr , def , descr) :: !fdocs ;
+    in fdocs := (name , D.syntax , def , descr) :: !fdocs ;
     let member r = Fmap.mem name r in
     let getter r = D.of_json (Fmap.find name r) in
     let setter r v = Fmap.add name (D.to_json v) r in
@@ -249,7 +246,7 @@ struct
 
   let option (type a) name ~descr (d : a data) : a option field =
     let module D = (val d) in
-    fdocs := (name , d_option D.descr , None , descr) :: !fdocs ;
+    fdocs := (name , Syntax.option D.syntax , None , descr) :: !fdocs ;
     let member r = Fmap.mem name r in
     let getter r =
       try Some (D.of_json (Fmap.find name r)) with Not_found -> None in
@@ -258,32 +255,34 @@ struct
       | Some v -> Fmap.add name (D.to_json v) r in
     { member ; getter ; setter }
 
-  let details
-      ?(field=`Center "Field")
-      ?(format=`Center "Format")
-      ?(default=`Center "Default")
-      ?(descr=`Left "Description")
-      ()
-    =
+  let fields () =
+    let field = `Center "Field" in
+    let format = `Center "Format" in
+    let default = `Center "Default" in
+    let descr = `Left "Description" in
     if Fmap.is_empty !defaults then
       Markdown.table [ field ; format ; descr ]
         (List.map
-           (fun (fd,fmt,_def,descr) -> [ Markdown.tt fd ; fmt ; descr ])
+           (fun (fd,sy,_def,descr) ->
+              [ Markdown.tt fd ; Syntax.format sy ; descr ])
            !fdocs)
     else
-      let mk_format def fmt = if def <> None then d_option fmt else fmt in
+      let mk_syntax def sy = if def <> None then Syntax.option sy else sy in
       let mk_default = function
         | None -> Markdown.text []
         | Some js -> Markdown.tt (Json.to_string js) in
       Markdown.table [ field ; format ; default ; descr ]
         (List.map
-           (fun (fd,fmt,def,descr) -> [
+           (fun (fd,sy,def,descr) -> [
                 Markdown.tt fd ;
-                mk_format def fmt ;
-                mk_default def ;
-                descr ;
+                Syntax.format @@ mk_syntax def sy ;
+                mk_default def ; descr ;
               ])
            !fdocs)
+
+  let syntax =
+    let descr = Markdown.( R.descr </> mk_block fields ) in
+    Syntax.publish R.page ~name:R.name ~synopsis:(Syntax.record []) ~descr
 
   let of_json js =
     List.fold_left
@@ -316,6 +315,9 @@ sig
   val find : int -> t
   val clear : unit -> unit
 end
+
+let publish_id (module A : Info) =
+  Syntax.publish A.page ~name:A.name ~synopsis:Syntax.int ~descr:A.descr
 
 module INDEXER(M : Map)(I : Info) :
 sig
@@ -378,7 +380,7 @@ struct
   include Collection
       (struct
         type t = M.key
-        let descr = I.descr
+        let syntax = publish_id (module I)
         let of_json = INDEX.of_json index
         let to_json = INDEX.to_json index
       end)
@@ -413,7 +415,7 @@ struct
   include Collection
       (struct
         type t = M.key
-        let descr = I.descr
+        let syntax = publish_id (module I)
         let of_json js = INDEX.of_json (index()) js
         let to_json v = INDEX.to_json (index()) v
       end)
@@ -457,7 +459,7 @@ struct
   include Collection
       (struct
         type t = A.t
-        let descr = A.descr
+        let syntax = publish_id (module A)
         let to_json a = `Int (get a)
         let of_json js =
           let k = Jutil.to_int js in
@@ -480,14 +482,7 @@ sig
   include Info
 end
 
-module Dictionary(E : Enum) :
-sig
-  val descr_table :
-    ?tag:Markdown.column ->
-    ?descr:Markdown.column ->
-    unit -> Markdown.block
-  include S_collection with type t = E.t
-end =
+module Dictionary(E : Enum) =
 struct
 
   let registered = ref false
@@ -512,9 +507,9 @@ struct
           ) E.values
       end
 
-  let descr_table ?(tag=`Center E.name) ?(descr=`Left "Description") () =
+  let values () =
     Markdown.table
-      [ tag ; descr ]
+      [ `Center E.name ; `Left "Description" ]
       (List.map
          (fun (_,tag,descr) ->
             [ Markdown.tt (Printf.sprintf "%S" tag) ; descr ]
@@ -524,7 +519,9 @@ struct
       (struct
         type t = E.t
 
-        let descr = E.descr
+        let syntax = Syntax.publish E.page ~name:E.name
+            ~synopsis:Syntax.ident
+            ~descr:Markdown.( E.descr </> mk_block values )
 
         let to_json value =
           register () ;

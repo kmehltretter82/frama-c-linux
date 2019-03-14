@@ -43,7 +43,7 @@ PLUGIN_REQUIRES:= yojson
 PLUGIN_CMO:= \
 	server_parameters \
 	jbuffer \
-	doc data main request \
+	doc syntax data main request \
 	server_batch \
 	kernel_fc \
 	kernel_project \
@@ -74,7 +74,7 @@ include $(FRAMAC_SHARE)/Makefile.dynamic
 # --------------------------------------------------------------------------
 
 SERVER_API= \
-	doc.mli data.mli request.mli
+	doc.mli syntax.mli data.mli request.mli
 
 define Capitalize
 $(shell printf "%s%s" \

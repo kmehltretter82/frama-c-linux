@@ -21,49 +21,31 @@
 (**************************************************************************)
 
 (* -------------------------------------------------------------------------- *)
-(* --- Server Plugin & Options                                            --- *)
+(** JSON Encoding Documentation *)
 (* -------------------------------------------------------------------------- *)
 
-module P = Plugin.Register
-    (struct
-      let name = "Server"
-      let shortname = "server"
-      let help = "Frama-C Request Server"
-    end)
+type t
 
-include P
+val format : t -> Markdown.text
 
-module Idle = P.Int
-    (struct
-      let option_name = "-server-idle"
-      let arg_name = "ms"
-      let default = 10
-      let help = "Waiting time (in milliseconds) when idle"
-    end)
+(** The provided synopsis must be very short, to fit in one line.
+    Extended definition, like record fields and such, must be detailed in
+    the description block. *)
+val publish : Doc.page -> name:string -> synopsis:t -> descr:Markdown.block -> t
 
-module Rate = P.Int
-    (struct
-      let option_name = "-server-rate"
-      let arg_name = "n"
-      let default = 100
-      let help = "Number of analysis steps between server communications"
-    end)
+val any : t
+val int : t (* small, non-decimal, number *)
+val ident : t (* integer of string *)
+val null : t
+val string : t
+val number : t
+val boolean : t
 
-module Doc = P.String
-    (struct
-      let option_name = "-server-doc"
-      let arg_name = "dir"
-      let default = ""
-      let help = "Output a markdown documentation of the server in <dir>"
-    end)
-
-module Log = P.False
-    (struct
-      let option_name = "-server-logs"
-      let help = "Start (or stop) monitoring logs"
-    end)
-
-let wpage = register_warn_category "inconsistent-page"
-let wkind = register_warn_category "inconsistent-kind"
+val tag : string -> t
+val array : t -> t
+val tuple : t list -> t
+val union : t list -> t
+val option : t -> t
+val record : (string * t) list -> t
 
 (* -------------------------------------------------------------------------- *)

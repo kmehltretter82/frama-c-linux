@@ -38,7 +38,7 @@ let fc_page =
 module ConfigInfo =
 struct
   type t = unit
-  let descr = Markdown.tt "{ … }"
+  let syntax = Syntax.record []
 
   let to_json () = `Assoc [
       "version" , Jstring.to_json Config.version ;
@@ -50,10 +50,11 @@ struct
   let details =
     let open Markdown in
     table [ `Left "field" ; `Left "format" ; `Left "Description" ] [
-      [ tt "'version'" ; Jstring.descr ; rm "Frama-C version" ] ;
-      [ tt "'datadir'" ; Jstring.descr ; rm "Shared directory (FRAMAC_SHARE)" ] ;
-      [ tt "'libdir'"  ; Jstring.descr ; rm "Lib directory (FRAMAC_LIB)" ] ;
-      [ tt "'pluginpath'" ; Jstring.Jlist.descr ; rm "Plugin directories (FRAMAC_PLUGIN)" ] ;
+      [ tt "'version'" ; it "string" ; rm "Frama-C version" ] ;
+      [ tt "'datadir'" ; it "string" ; rm "Shared directory (FRAMAC_SHARE)" ] ;
+      [ tt "'libdir'"  ; it "string" ; rm "Lib directory (FRAMAC_LIB)" ] ;
+      [ tt "'pluginpath'" ; tt "[" <+> it "string" <+> tt ",…]" ;
+        rm "Plugin directories (FRAMAC_PLUGIN)" ] ;
     ]
 
 end
@@ -80,10 +81,12 @@ module GetConfig =
 
 module RawSource =
 struct
-
   type t = Filepath.position
-
-  let descr = Markdown.href (Doc.href fc_page "source")
+  let syntax = Syntax.publish fc_page
+      ~name:"source"
+      ~synopsis:(Syntax.record [ "file" , Syntax.string ; "line" , Syntax.int ])
+      ~descr:(Markdown.praw "Source position. The file path is normalized, \
+                             and the line number starts at one.")
 
   let to_json p = `Assoc [
       "file" , `String (p.Filepath.pos_path :> string) ;
@@ -96,12 +99,6 @@ struct
       -> Log.source ~file:(Filepath.Normalized.of_string path) ~line
     | js -> failure "invalid source format" js
 
-  let details = Markdown.table
-      [`Center "Field" ; `Center "Type" ; `Left "Description" ]
-      [[ Markdown.tt "file" ; Jstring.descr ;
-         Markdown.rm "File path (normalized)" ];
-       [ Markdown.tt "line" ; Jint.descr ;
-         Markdown.rm "Line number (counting from 1)" ]]
 end
 
 module LogSource = Collection(RawSource)
@@ -113,8 +110,9 @@ module LogSource = Collection(RawSource)
 module RawKind =
 struct
   type t = Log.kind
+  let page = fc_page
   let name = "Kind"
-  let descr = Markdown.href (Doc.href fc_page "kind")
+  let descr = Markdown.praw "Frama-C message category."
   let values = [
     Log.Error,    "ERROR",    Markdown.rm "User Error" ;
     Log.Warning,  "WARNING",  Markdown.rm "User Warning" ;
@@ -125,11 +123,7 @@ struct
   ]
 end
 
-module LogKind =
-struct
-  include Dictionary(RawKind)
-  let details = descr_table ~tag:(`Center "Kind") ()
-end
+module LogKind = Dictionary(RawKind)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Log Events                                                         --- *)
@@ -140,12 +134,14 @@ struct
 
   module R = Record
       (struct
+        let page = fc_page
         let name = "log"
-        let descr = Markdown.href (Doc.href fc_page "log")
+        let descr = Markdown.praw "Message event record."
       end)
 
-  let descr = Markdown.rm
+  let syntax = R.syntax
 
+  let descr = Markdown.rm
   let kind = R.field "kind" ~descr:(descr "Message kind") (module LogKind)
   let plugin = R.field "plugin" ~descr:(descr "Emitter plugin") (module Jstring)
   let message = R.field "message" ~descr:(descr "Message text") (module Jstring)
@@ -177,9 +173,6 @@ struct
       Log.evt_source = R.get source r ;
       Log.evt_message = R.get message r ;
     }
-
-  let descr = Markdown.href (Doc.href fc_page "log")
-  let details = R.details ()
 
 end
 
@@ -233,13 +226,7 @@ module GetLogs =
     (struct
       let name = "Kernel.GetLogs"
       let descr = Markdown.rm "Flush emitted logs since last call (max 100)"
-
-      let details = [
-        Markdown.section ~name:"log" ~title:"Log Format" RawEvent.details [] ;
-        Markdown.section ~name:"kind" ~title:"Log Kind" LogKind.details [] ;
-        Markdown.section ~name:"source" ~title:"File position" RawSource.details [] ;
-      ]
-
+      let details = []
       let page = fc_page
       let kind = `GET
       type input = unit

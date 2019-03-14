@@ -32,14 +32,14 @@ type kind = [ `GET | `SET | `EXEC ]
 module type Input =
 sig
   type t
-  val descr : Markdown.text
+  val syntax : Syntax.t
   val of_json : json -> t
 end
 
 module type Output =
 sig
   type t
-  val descr : Markdown.text
+  val syntax : Syntax.t
   val to_json : t -> json
 end
 
@@ -128,7 +128,8 @@ struct
     let synopsis =
       Markdown.table
         [ `Center "Input" ; `Center "Output" ; `Left "Description" ]
-        [[ Input.descr ; Output.descr ; Rq.descr ]]
+        [[ Syntax.format Input.syntax ;
+           Syntax.format Output.syntax ; Rq.descr ]]
     in
     Doc.publish Rq.page ~index:[Rq.name] ~title synopsis Rq.details
 

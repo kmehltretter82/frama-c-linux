@@ -89,6 +89,7 @@ let fmt_block k fmt = Format.fprintf fmt "@[<v 0>%t@]" k
 (* --- Elementary Text                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
+let praw s fmt = Format.pp_print_string fmt s
 let raw s fmt = Format.pp_print_string fmt s
 let rm s fmt = Format.pp_print_string fmt s
 let it s fmt = Format.fprintf fmt "_%s_" s
@@ -197,7 +198,7 @@ let enum ws fmt =
   List.iter
     (fun w -> incr k ; Format.fprintf fmt "@[<hov 3>%d. %t@]@." !k w) ws
 
-let descr items fmt =
+let description items fmt =
   List.iter
     (fun (a,w) -> Format.fprintf fmt "@[<hov 2>- **%s** %t@]@." a w) items
 

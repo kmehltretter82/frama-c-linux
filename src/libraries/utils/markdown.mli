@@ -67,9 +67,10 @@ val in_h3 : block -> block (** Increment title levels by 3 *)
 val in_h4 : block -> block (** Increment title levels by 4 *)
 
 val par : text -> block (** Simple text paragraph *)
+val praw : string -> block (** Simple raw paragraph *)
 val list : text list -> block (** Itemized list *)
 val enum : text list -> block (** Enumerated list *)
-val descr : (string * text) list -> block (** Description list *)
+val description : (string * text) list -> block (** Description list *)
 
 (** Formatted code.
 
