@@ -71,9 +71,15 @@ module STR = Transitioning.String
 let re_get = Str.regexp_case_fold "\\(GET\\|PRINT\\)"
 let re_set = Str.regexp_string_case_fold "SET"
 let re_exec = Str.regexp_string_case_fold "EXEC"
+let re_name = Str.regexp_case_fold "[A-Z0-9.]+"
 
 let wpage = Senv.register_warn_category "inconsistent-page"
 let wkind = Senv.register_warn_category "inconsistent-kind"
+
+let check_name name =
+  if not (Str.string_match re_name name 0) then
+    Senv.warning ~wkey:Senv.wname
+    "Request %S is not a dot-separated list of identifiers" name
 
 let check_plugin plugin name =
   let p = STR.lowercase_ascii plugin in
@@ -134,6 +140,7 @@ struct
     Doc.publish Rq.page ~index:[Rq.name] ~title synopsis Rq.details
 
   let () =
+    check_name Rq.name ;
     check_page Rq.page Rq.name ;
     check_kind Rq.kind Rq.name ;
     Main.register Rq.kind Rq.name process_json

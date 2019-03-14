@@ -31,5 +31,6 @@ module Log : Parameter_sig.Bool (** Monitor logs *)
 
 val wpage : warn_category (** Inconsistent page warning *)
 val wkind : warn_category (** Inconsistent category warning *)
+val wname : warn_category (** Invalid name warning *)
 
 (**************************************************************************)

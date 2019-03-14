@@ -65,5 +65,6 @@ module Log = P.False
 
 let wpage = register_warn_category "inconsistent-page"
 let wkind = register_warn_category "inconsistent-kind"
+let wname = register_warn_category "invalid-name"
 
 (* -------------------------------------------------------------------------- *)

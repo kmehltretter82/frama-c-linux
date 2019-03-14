@@ -34,7 +34,7 @@ let check_plugin plugin name =
           String.get n k = '.')
   then
     Senv.warning ~wkey:Senv.wpage
-      "Data '%s' shall be named « %s.* »"
+      "Data %S shall be named « %s-* »"
       name plugin
 
 let check_page page name =
@@ -42,6 +42,13 @@ let check_page page name =
   | `Kernel -> ()
   | `Plugin plugin -> check_plugin plugin name
   | `Protocol -> check_plugin "server" name
+
+let re_name = Str.regexp "[a-zA-Z0-9-]+"
+
+let check_name name =
+  if not (Str.string_match re_name name 0) then
+    Senv.warning ~wkey:Senv.wname
+    "Data name %S is not a dash-separated list of identifiers" name
 
 (* -------------------------------------------------------------------------- *)
 
@@ -55,6 +62,7 @@ let protect a =
   if a.atomic then a.descr else Markdown.(rm "(" <+> a.descr <+> rm ")")
 
 let publish page ~name ~synopsis ~descr =
+  check_name name ;
   check_page page name ;
   let title = Printf.sprintf "`Data` %s" name in
   let syntax = Markdown.fmt_block (fun fmt ->
