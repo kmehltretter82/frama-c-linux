@@ -282,6 +282,8 @@ share/libc/setjmp.h: CEA_LGPL
 share/libc/signal.c: CEA_LGPL
 share/libc/signal.h: CEA_LGPL
 share/libc/stdarg.h: CEA_LGPL
+share/libc/stdatomic.c: CEA_LGPL
+share/libc/stdatomic.h: CEA_LGPL
 share/libc/stdbool.h: CEA_LGPL
 share/libc/stddef.h: CEA_LGPL
 share/libc/stdint.h: CEA_LGPL
