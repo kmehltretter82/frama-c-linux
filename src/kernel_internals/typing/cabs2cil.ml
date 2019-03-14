@@ -867,9 +867,7 @@ let remove_label_env lab =
  * hash table easily *)
 type undoScope =
     UndoRemoveFromEnv of string
-  | UndoResetAlphaCounter of location Alpha.alphaTableData ref *
-                             location Alpha.alphaTableData
-  | UndoRemoveFromAlphaTable of string * string
+  | UndoAlphaEnv of location Alpha.undoAlphaElement list
 
 let scopes :  undoScope list ref list ref = ref []
 
@@ -881,14 +879,10 @@ let declared_in_current_scope s =
   | cur_scope :: _ ->
     let names_declared_in_current_scope =
       Extlib.filter_map
-        (fun us ->
-           match us with
-           | UndoRemoveFromEnv _ | UndoRemoveFromAlphaTable _ -> true
-           | UndoResetAlphaCounter _ -> false)
-        (fun us ->
-           match us with
-           | UndoRemoveFromEnv s | UndoRemoveFromAlphaTable (s,_) -> s
-           | UndoResetAlphaCounter _ -> assert false (* already filtered *)
+        (function UndoRemoveFromEnv _  -> true | UndoAlphaEnv _ -> false)
+        (function
+          | UndoRemoveFromEnv s -> s
+          | UndoAlphaEnv _ -> assert false (* already filtered *)
         ) !cur_scope
     in
     List.mem s names_declared_in_current_scope
@@ -973,29 +967,24 @@ let newAlphaName (globalscope: bool) (* The name should have global scope *)
    * the top-most scope (that of the enclosing function) *)
   let rec findEnclosingFun = function
       [] -> (* At global scope *) None
-    | [s] -> begin
-        let prefix, infix = Alpha.getAlphaPrefix lookupname in
-        try
-          let infixes = H.find alphaTable prefix in
-          let countref = H.find infixes infix in
-          s := (UndoResetAlphaCounter (countref, !countref)) :: !s; Some s
-        with Not_found ->
-          s := (UndoRemoveFromAlphaTable (prefix, infix)) :: !s; Some s;
-      end
+    | [s] -> Some s
     | _ :: rest -> findEnclosingFun rest
   in
   let undo_scope =
     if not globalscope then findEnclosingFun !scopes else None
   in
-  let newname, oldloc =
-    Alpha.newAlphaName alphaTable lookupname (CurrentLoc.get ())
+  let undolist =
+    match undo_scope with None -> None | Some _ -> Some (ref [])
   in
+  let data = CurrentLoc.get () in
+  let newname, oldloc =
+    Alpha.newAlphaName ~alphaTable ?undolist ~lookupname ~data
+  in
+  (match undo_scope, undolist with
+   | None, None -> ()
+   | Some s, Some l -> s := (UndoAlphaEnv !l) :: !s
+   | _ -> assert false (* by construction, both options have the same status*));
   if newname <> lookupname then begin
-    (match undo_scope with
-     | None -> ()
-     | Some s ->
-       let newpre, newinf = Alpha.getAlphaPrefix newname in
-       s := (UndoRemoveFromAlphaTable (newpre, newinf)) :: !s);
     try
       let info =
         if !scopes = [] then begin
@@ -3840,31 +3829,8 @@ let exitScope () =
       [] -> ()
     | UndoRemoveFromEnv n :: t ->
       H.remove env n; loop t
-    | UndoRemoveFromAlphaTable (p,i) :: t ->
-      Kernel.(
-        debug ~dkey:dkey_alpha_undo
-          "Removing %s %s from alpha table\n" p i);
-      (try
-         let h = H.find alphaTable p in
-         H.remove h i;
-         let l = H.length h in
-         if l = 0 then begin
-           H.remove alphaTable p;
-           Kernel.(
-             debug ~dkey:dkey_alpha_undo "No suffix for %s anymore" p)
-         end else begin
-           Kernel.(
-             debug ~dkey:dkey_alpha_undo "%d suffixes remaining@\n%t" l
-               (fun fmt ->
-                  H.iter (fun i _ -> Format.fprintf fmt "%s@ " i) h))
-         end
-       with Not_found ->
-         Kernel.warning
-           "prefix (%s,%s) not in alpha conversion table. \
-            undo stack is inconsistent"
-           p i); loop t
-    | UndoResetAlphaCounter (vref, oldv) :: t ->
-      vref := oldv;
+    | UndoAlphaEnv undolist :: t ->
+      Alpha.undoAlphaChanges ~alphaTable ~undolist;
       loop t
   in
   loop !this;
