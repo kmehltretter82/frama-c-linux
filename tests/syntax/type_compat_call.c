@@ -7,7 +7,7 @@ void f(int32_t const *p);
 void g(int32_t *const p);
 void h(uint8_t const *p);
 void m(int8_t const *p);
-
+void n(int volatile *p);
 int main() {
   int const i = 42;
   f(&i); // compatible
@@ -19,5 +19,7 @@ int main() {
   h(&u); // compatible
   m(&c); // compatible
   m(&s); // incompatible
+  int j = 51;
+  n(&j); // 'volatile' discarded: no warning
   return 0;
 }
