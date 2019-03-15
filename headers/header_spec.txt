@@ -1024,10 +1024,10 @@ src/plugins/server/doc.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/doc.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/jbuffer.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/jbuffer.mli: CEA_LGPL_OR_PROPRIETARY
-src/plugins/server/kernel_fc.ml: CEA_LGPL_OR_PROPRIETARY
-src/plugins/server/kernel_fc.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/kernel_ast.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/kernel_ast.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/server/kernel_main.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/server/kernel_main.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/kernel_project.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/kernel_project.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/main.ml: CEA_LGPL_OR_PROPRIETARY

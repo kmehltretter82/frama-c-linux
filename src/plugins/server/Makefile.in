@@ -45,7 +45,7 @@ PLUGIN_CMO:= \
 	jbuffer \
 	doc syntax data main request \
 	server_batch \
-	kernel_fc \
+	kernel_main \
 	kernel_project \
 	kernel_ast
 
