@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type json = Json.t
+type json = Yojson.Basic.t
 
 type buffer = {
   text : FCBuffer.t ;

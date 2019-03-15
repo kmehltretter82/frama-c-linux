@@ -176,13 +176,11 @@ type ('a,'b) signature = {
   mutable output : 'b rq_output ;
 }
 
-let failure_missing name fmap =
-  Data.failure
-    (Printf.sprintf "Missing parameter '%s'" name)
-    (fmap_to_json fmap)
+let failure_missing fmap name =
+  Data.failure (fmap_to_json fmap) "Missing parameter '%s'" name
 
 let check_required fmap fd =
-  if not (Fmap.mem fd fmap) then failure_missing fd fmap
+  if not (Fmap.mem fd fmap) then failure_missing fmap fd
 
 (* -------------------------------------------------------------------------- *)
 (* --- Named Input Parameters Definitions                                 --- *)
@@ -207,7 +205,7 @@ let param (type a b) (s : (unit,b) signature) ~name ~descr
     try D.of_json (Fmap.find name rq.param)
     with Not_found ->
     match default with
-    | None -> failure_missing name rq.param
+    | None -> failure_missing rq.param name
     | Some v -> v
 
 let param_opt (type a b) (s : (unit,b) signature) ~name ~descr

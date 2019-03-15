@@ -113,7 +113,7 @@ module Stmt = Data.Collection
           | PStmt(_,st) -> st
           | _ -> raise Not_found
         with Not_found ->
-          Data.failure "Unknown stmt id" js
+          Data.failure js "Unknown stmt id"
     end)
 
 module Ki = Data.Collection
@@ -138,7 +138,7 @@ module Kf = Data.Collection
         `String (Kernel_function.get_name kf)
       let of_json js =
         try Js.to_string js |> Globals.Functions.find_by_name
-        with Not_found -> Data.failure "Undefined function" js
+        with Not_found -> Data.failure js "Undefined function"
     end)
 
 (* -------------------------------------------------------------------------- *)

@@ -78,7 +78,7 @@ struct
     | `Assoc [ "file" , `String path ; "line" , `Int line ]
     | `Assoc [ "line" , `Int line ; "file" , `String path ]
       -> Log.source ~file:(Filepath.Normalized.of_string path) ~line
-    | js -> failure "Invalid source format" js
+    | js -> failure js "Invalid source format"
 
 end
 

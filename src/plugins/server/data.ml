@@ -24,11 +24,11 @@
 (* --- Data Encoding                                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Json = Yojson.Basic
-module Jutil = Yojson.Basic.Util
+module Js = Yojson.Basic
+module Ju = Yojson.Basic.Util
 
-type json = Json.t
-let pretty = Json.pretty_print ~std:false
+type json = Js.t
+let pretty = Js.pretty_print ~std:false
 
 module type S =
 sig
@@ -47,7 +47,8 @@ end
 
 type 'a data = (module S with type t = 'a)
 
-let failure msg js = raise (Jutil.Type_error(msg,js))
+let failure js msg =
+  Pretty_utils.ksfprintf (fun msg -> raise(Ju.Type_error(msg,js))) msg
 
 (* -------------------------------------------------------------------------- *)
 (* --- Option                                                             --- *)
@@ -83,7 +84,7 @@ struct
   let to_json (x,y) = `List [ A.to_json x ; B.to_json y ]
   let of_json = function
     | `List [ ja ; jb ] -> A.of_json ja , B.of_json jb
-    | js -> raise (Jutil.Type_error( "Expected list with 2 elements" , js ))
+    | js -> failure js "Expected list with 2 elements"
 end
 
 module Jtriple(A : S)(B : S)(C : S) : S with type t = A.t * B.t * C.t =
@@ -93,7 +94,7 @@ struct
   let to_json (x,y,z) = `List [ A.to_json x ; B.to_json y ; C.to_json z ]
   let of_json = function
     | `List [ ja ; jb ; jc ] -> A.of_json ja , B.of_json jb , C.of_json jc
-    | js -> raise (Jutil.Type_error( "Expected list with 3 elements" , js ))
+    | js -> failure js "Expected list with 3 elements"
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -105,7 +106,7 @@ struct
   type t = A.t list
   let syntax = Syntax.array A.syntax
   let to_json xs = `List (List.map A.to_json xs)
-  let of_json js = List.map A.of_json (Jutil.to_list js)
+  let of_json js = List.map A.of_json (Ju.to_list js)
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -117,7 +118,7 @@ struct
   type t = A.t array
   let syntax = Syntax.array A.syntax
   let to_json xs = `List (List.map A.to_json (Array.to_list xs))
-  let of_json js = Array.of_list @@ List.map A.of_json (Jutil.to_list js)
+  let of_json js = Array.of_list @@ List.map A.of_json (Ju.to_list js)
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -165,7 +166,7 @@ module Jbool : S_collection with type t = bool =
     (struct
       type t = bool
       let syntax = Syntax.boolean
-      let of_json = Jutil.to_bool
+      let of_json = Ju.to_bool
       let to_json b = `Bool b
     end)
 
@@ -174,7 +175,7 @@ module Jint : S_collection with type t = int =
     (struct
       type t = int
       let syntax = Syntax.int
-      let of_json = Jutil.to_int
+      let of_json = Ju.to_int
       let to_json n = `Int n
     end)
 
@@ -183,7 +184,7 @@ module Jfloat : S_collection with type t = float =
     (struct
       type t = float
       let syntax = Syntax.number
-      let of_json = Jutil.to_number
+      let of_json = Ju.to_number
       let to_json v = `Float v
     end)
 
@@ -192,7 +193,7 @@ module Jstring : S_collection with type t = string =
     (struct
       type t = string
       let syntax = Syntax.string
-      let of_json = Jutil.to_string
+      let of_json = Ju.to_string
       let to_json s = `String s
     end)
 
@@ -201,7 +202,7 @@ module Jident : S_collection with type t = string =
     (struct
       type t = string
       let syntax = Syntax.ident
-      let of_json = Jutil.to_string
+      let of_json = Ju.to_string
       let to_json s = `String s
     end)
 
@@ -274,7 +275,7 @@ struct
   let of_json js =
     List.fold_left
       (fun r (fd,js) -> Fmap.add fd js r)
-      (default ()) (Jutil.to_assoc js)
+      (default ()) (Ju.to_assoc js)
 
   let to_json r : json =
     `Assoc (Fmap.fold (fun fd js fds -> (fd,js) :: fds) r [])
@@ -350,11 +351,10 @@ struct
 
   let to_json m a = `Int (get m a)
   let of_json m js =
-    let id = Jutil.to_int js in
+    let id = Ju.to_int js in
     try find m id
     with Not_found ->
-      let msg = Printf.sprintf "[%s] No registered id #%d" I.name id in
-      raise (Jutil.Type_error(msg,js))
+      failure js "[%s] No registered id #%d" I.name id
 
 end
 
@@ -451,11 +451,9 @@ struct
         let syntax = publish_id (module A)
         let to_json a = `Int (get a)
         let of_json js =
-          let k = Jutil.to_int js in
+          let k = Ju.to_int js in
           try find k
-          with Not_found ->
-            let msg = Printf.sprintf "[%s] No registered id #%d" A.name k in
-            raise (Jutil.Type_error(msg,js))
+          with Not_found -> failure js "[%s] No registered id #%d" A.name k
       end)
 
 end
@@ -522,11 +520,11 @@ struct
 
         let of_json js =
           register () ;
-          let tag = Jutil.to_string js in
+          let tag = Ju.to_string js in
           try Hashtbl.find lookup tag
           with Not_found ->
             let msg = Printf.sprintf "[%s] Unregistered tag %S" E.name tag in
-            raise (Jutil.Type_error(msg,js))
+            raise (Ju.Type_error(msg,js))
 
       end)
 

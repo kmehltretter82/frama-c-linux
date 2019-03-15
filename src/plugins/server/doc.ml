@@ -24,6 +24,7 @@
 (* --- Server Documentation                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
+type json = Yojson.Basic.t
 module Senv = Server_parameters
 module Pages = Map.Make(String)
 
@@ -126,8 +127,6 @@ let index () =
   List.map
     (fun (title,entry) -> Markdown.href ~title entry)
     (List.sort (fun (a,_) (b,_) -> String.compare a b) !entries)
-
-type json = Json.t
 
 let link ~toc ~title ~href : json =
   let link = [ "title" , `String title ; "href" , `String href ] in

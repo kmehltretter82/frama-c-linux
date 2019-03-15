@@ -47,15 +47,15 @@ let _ = Doc.page `Protocol ~title:"Batch Protocol" ~filename:"server_batch.md"
 (* --- Execute JSON                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Json = Yojson.Basic
-module Jutil = Yojson.Basic.Util
+module Js = Yojson.Basic
+module Ju = Yojson.Basic.Util
 
-let pretty = Json.pretty_print ~std:false
+let pretty = Js.pretty_print ~std:false
 
 let execute_command js =
-  let request = Jutil.member "request" js |> Jutil.to_string in
-  let id = Jutil.member "id" js in
-  let data = Jutil.member "data" js in
+  let request = Ju.member "request" js |> Ju.to_string in
+  let id = Ju.member "id" js in
+  let data = Ju.member "data" js in
   match Main.find request with
   | None ->
     Senv.error "[batch] %a: request %S not found" pretty id request ;
@@ -64,7 +64,7 @@ let execute_command js =
     try
       Senv.feedback "[%a] %s" Main.pp_kind kind request ;
       `Assoc [ "id" , id ; "data" , handler data ]
-    with Jutil.Type_error(msg,js) ->
+    with Ju.Type_error(msg,js) ->
       Senv.error "[%s] incorrect encoding:@\n%s@\n@[<hov 2>At: %a@]@."
         request msg pretty js ;
       `Assoc [ "id" , id ; "error" , `String msg ; "at" , js ]
@@ -75,7 +75,7 @@ let rec execute_batch js =
   | `List js -> `List (List.map execute_batch js)
   | js ->
     try execute_command js
-    with Jutil.Type_error(msg,js) ->
+    with Ju.Type_error(msg,js) ->
       Senv.error "[batch] incorrect encoding:@\n%s@\n@[<hov 2>At: %a@]@."
         msg pretty js ;
       `Null
@@ -89,10 +89,10 @@ let execute () =
     List.iter
       begin fun file ->
         Senv.feedback "Script %S" file ;
-        let response = execute_batch (Json.from_file file) in
+        let response = execute_batch (Js.from_file file) in
         let output = Filename.remove_extension file ^ ".out.js" in
         Senv.feedback "Output %S" output ;
-        Json.to_file output response ;
+        Js.to_file output response ;
       end
       (Batch.get()) ;
   end

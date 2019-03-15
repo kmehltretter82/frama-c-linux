@@ -184,7 +184,7 @@ module Dictionary(E : Enum) : S_collection with type t = E.t
 (** {2 Misc} *)
 (* -------------------------------------------------------------------------- *)
 
-val failure : string -> json -> 'a
-(** @raise Yojson.Basic.Util.Type_error with the given arguments *)
+val failure : json -> ('a, Format.formatter, unit, 'b) format4 -> 'a
+(** @raise Yojson.Basic.Util.Type_error with provided message *)
 
 (* -------------------------------------------------------------------------- *)

@@ -25,7 +25,6 @@
 (* -------------------------------------------------------------------------- *)
 
 module Senv = Server_parameters
-module Json = Yojson.Basic
 
 let option f = function None -> () | Some x -> f x
 
