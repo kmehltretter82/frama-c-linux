@@ -187,20 +187,6 @@ type _ rq_output =
   | Rdata : 'a output -> 'a rq_output
   | Rfields : Syntax.field list -> unit rq_output
 
-(* json input processing *)
-let mk_input (type a) name (input : a rq_input) : (rq -> json -> a) =
-  match input with
-  | Pnone -> Senv.fatal "No input defined for request '%s'" name
-  | Pdata d -> let module D = (val d) in (fun _rq js -> D.of_json js)
-  | Pfields _ -> (fun rq js -> rq.param <- fmap_of_json rq.param js)
-
-(* json output processing *)
-let mk_output (type b) name (output : b rq_output) : (rq -> b -> json) =
-  match output with
-  | Rnone -> Senv.fatal "No output defined for request '%s'" name
-  | Rdata d -> let module D = (val d) in (fun _rq v -> D.to_json v)
-  | Rfields _ -> (fun rq () -> fmap_to_json rq.result)
-
 (* json input syntax *)
 let sy_input (type a) (input : a rq_input) : Syntax.t =
   match input with
@@ -229,20 +215,6 @@ let doc_output (type b) (output : b rq_output) : Markdown.block =
   | Rdata _ -> Markdown.empty
   | Rfields fs -> Syntax.fields ~kind:"Output" (List.rev fs)
 
-(* current input fields *)
-let fds_input (type a) name (input : a rq_input) : Syntax.field list =
-  match input with
-  | Pdata _ -> Senv.fatal "Can not define named parameters for request '%s'" name
-  | Pnone -> []
-  | Pfields fds -> fds
-
-(* current output fields *)
-let fds_output (type a) name (output : a rq_output) : Syntax.field list =
-  match output with
-  | Rdata _ -> Senv.fatal "Can not define named results request '%s'" name
-  | Rnone -> []
-  | Rfields fds -> fds
-
 (* -------------------------------------------------------------------------- *)
 (* --- Multi-Parameters Requests                                          --- *)
 (* -------------------------------------------------------------------------- *)
@@ -255,6 +227,7 @@ type ('a,'b) signature = {
   details : Markdown.block ;
   mutable defined : bool ;
   mutable defaults : json Fmap.t ;
+  mutable required : string list ;
   mutable input : 'a rq_input ;
   mutable output : 'b rq_output ;
 }
@@ -264,9 +237,21 @@ let failure_missing name fmap =
     (Printf.sprintf "Missing parameter '%s'" name)
     (fmap_to_json fmap)
 
+let check_required fmap fd =
+  if not (Fmap.mem fd fmap) then failure_missing fd fmap
+
 (* -------------------------------------------------------------------------- *)
 (* --- Named Input Parameters Definitions                                 --- *)
 (* -------------------------------------------------------------------------- *)
+
+(* current input fields *)
+let fds_input s : Syntax.field list =
+  if s.defined then Senv.failure "Request '%s' has been finalized." s.name ;
+  match s.input with
+  | Pdata _ ->
+    Senv.fatal "Can not define named parameters for request '%s'" s.name
+  | Pnone -> []
+  | Pfields fds -> fds
 
 let param (type a b) (s : (unit,b) signature) ~name ~descr
     ?default (input : a input) : a param =
@@ -277,7 +262,7 @@ let param (type a b) (s : (unit,b) signature) ~name ~descr
       fd_default = None ;
       fd_descr = descr ;
     } in
-  s.input <- Pfields (fd :: fds_input s.name s.input) ;
+  s.input <- Pfields (fd :: fds_input s) ;
   fun rq ->
     try D.of_json (Fmap.find name rq.param)
     with Not_found ->
@@ -285,7 +270,7 @@ let param (type a b) (s : (unit,b) signature) ~name ~descr
     | None -> failure_missing name rq.param
     | Some v -> v
 
-let param_opt (type a b) (rq : (unit,b) signature) ~name ~descr
+let param_opt (type a b) (s : (unit,b) signature) ~name ~descr
     (input : a input) : a option param =
   let module D = (val input) in
   let fd = Syntax.{
@@ -294,7 +279,7 @@ let param_opt (type a b) (rq : (unit,b) signature) ~name ~descr
       fd_default = None ;
       fd_descr = descr ;
     } in
-  rq.input <- Pfields (fd :: fds_input rq.name rq.input) ;
+  s.input <- Pfields (fd :: fds_input s) ;
   fun rq ->
     try Some(D.of_json (Fmap.find name rq.param))
     with Not_found -> None
@@ -302,6 +287,14 @@ let param_opt (type a b) (rq : (unit,b) signature) ~name ~descr
 (* -------------------------------------------------------------------------- *)
 (* --- Named Output Parameters Definitions                                --- *)
 (* -------------------------------------------------------------------------- *)
+
+(* current output fields *)
+let fds_output s : Syntax.field list =
+  if s.defined then Senv.failure "Request '%s' has been finalized." s.name ;
+  match s.output with
+  | Rdata _ -> Senv.fatal "Can not define named results request '%s'" s.name
+  | Rnone -> []
+  | Rfields fds -> fds
 
 let result (type a b) (s : (a,unit) signature) ~name ~descr
     ?default (output : b output) : b result =
@@ -312,9 +305,12 @@ let result (type a b) (s : (a,unit) signature) ~name ~descr
       fd_default = None ;
       fd_descr = descr ;
     } in
-  s.output <- Rfields (fd :: fds_output s.name s.output) ;
-  ( match default with None -> () | Some v ->
-        s.defaults <- Fmap.add name (D.to_json v) s.defaults ) ;
+  s.output <- Rfields (fd :: fds_output s) ;
+  begin
+    match default with
+    | None -> s.required <- name :: s.required
+    | Some v -> s.defaults <- Fmap.add name (D.to_json v) s.defaults
+  end ;
   fun rq v -> rq.result <- Fmap.add name (D.to_json v) rq.result
 
 let result_opt (type a b) (s : (a,unit) signature) ~name ~descr
@@ -326,7 +322,7 @@ let result_opt (type a b) (s : (a,unit) signature) ~name ~descr
       fd_default = None ;
       fd_descr = descr ;
     } in
-  s.output <- Rfields (fd :: fds_output s.name s.output) ;
+  s.output <- Rfields (fd :: fds_output s) ;
   fun rq opt ->
     match opt with None -> () | Some v ->
       rq.result <- Fmap.add name (D.to_json v) rq.result
@@ -345,7 +341,7 @@ let signature
   let output = match output with None -> Rnone | Some d -> Rdata d in
   {
     page ; kind ; name ; descr ; details ;
-    defaults = Fmap.empty ;
+    defaults = Fmap.empty ; required = [] ;
     input ; output ; defined = false ;
   }
 
@@ -353,14 +349,34 @@ let signature
 (* --- Opened Signature Process                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
+(* json input processing *)
+let mk_input (type a) name defaults (input : a rq_input) : (rq -> json -> a) =
+  match input with
+  | Pnone -> Senv.fatal "No input defined for request '%s'" name
+  | Pdata d ->
+    let module D = (val d) in
+    (fun rq js -> rq.result <- defaults ; D.of_json js)
+  | Pfields _ ->
+    (fun rq js -> rq.param <- fmap_of_json rq.param js)
+
+(* json output processing *)
+let mk_output (type b) name required (output : b rq_output) : (rq -> b -> json) =
+  match output with
+  | Rnone -> Senv.fatal "No output defined for request '%s'" name
+  | Rdata d ->
+    let module D = (val d) in (fun _rq v -> D.to_json v)
+  | Rfields _ ->
+    (fun rq () ->
+       List.iter (check_required rq.result) required ;
+       fmap_to_json rq.result)
+
 let register_sig (type a b) (s : (a,b) signature) (process : rq -> a -> b) =
   if s.defined then
     Senv.fatal "Request '%s' is defined twice" s.name ;
-  let input = mk_input s.name s.input in
-  let output = mk_output s.name s.output in
-  let defaults = s.defaults in
+  let input = mk_input s.name s.defaults s.input in
+  let output = mk_output s.name s.required s.output in
   let processor js =
-    let rq = { param = Fmap.empty ; result = defaults } in
+    let rq = { param = Fmap.empty ; result = Fmap.empty } in
     js |> input rq |> process rq |> output rq
   in
   let skind = Main.string_of_kind s.kind in
