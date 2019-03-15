@@ -51,7 +51,8 @@ val page : chapter -> title:string -> filename:string -> page
     If index items are provided, they are added
     to the server documentation index.
 *)
-val publish : page ->
+val publish :
+  page:page ->
   ?name:string ->
   ?index:string list ->
   title:string ->

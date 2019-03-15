@@ -31,7 +31,8 @@ val format : t -> Markdown.text
 (** The provided synopsis must be very short, to fit in one line.
     Extended definition, like record fields and such, must be detailed in
     the description block. *)
-val publish : Doc.page -> name:string -> synopsis:t -> descr:Markdown.block -> t
+val publish :
+  page:Doc.page -> name:string -> synopsis:t -> descr:Markdown.block -> t
 
 val any : t
 val int : t (* small, non-decimal, number *)
@@ -47,5 +48,15 @@ val tuple : t list -> t
 val union : t list -> t
 val option : t -> t
 val record : (string * t) list -> t
+
+type field = {
+  fd_name : string ;
+  fd_syntax : t ;
+  fd_default : Markdown.text option ;
+  fd_descr : Markdown.text ;
+}
+
+(** Builds a table with fields column named « Kind » *)
+val fields : kind:string -> field list -> Markdown.block
 
 (* -------------------------------------------------------------------------- *)

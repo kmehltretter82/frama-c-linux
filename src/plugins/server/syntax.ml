@@ -61,7 +61,7 @@ let format { descr } = descr
 let protect a =
   if a.atomic then a.descr else Markdown.(rm "(" <+> a.descr <+> rm ")")
 
-let publish page ~name ~synopsis ~descr =
+let publish ~page ~name ~synopsis ~descr =
   check_name name ;
   check_page page name ;
   let title = Printf.sprintf "`Data` %s" name in
@@ -70,7 +70,7 @@ let publish page ~name ~synopsis ~descr =
         name Markdown.pp_text synopsis.descr
     ) in
   let content = Markdown.( syntax </> descr ) in
-  let href = Doc.publish page ~name ~title ~index:[name] content [] in
+  let href = Doc.publish ~page ~name ~title ~index:[name] content [] in
   atom @@ Markdown.href ~title:name href
 
 let any = atom @@ Markdown.it "any"
@@ -104,5 +104,37 @@ let record fds =
     if fds = [] then Markdown.rm "…" else
       Markdown.(glue ~sep:(raw " `;` ") (List.map field fds))
   in atom @@ Markdown.(tt "{" <+> fields <+> tt "}")
+
+type field = {
+  fd_name : string ;
+  fd_syntax : t ;
+  fd_default : Markdown.text option ;
+  fd_descr : Markdown.text ;
+}
+
+let fields ~kind (fds : field list) =
+  let c_field = `Center kind in
+  let c_format = `Center "Format" in
+  let c_default = `Center "Default" in
+  let c_descr = `Left "Description" in
+  if List.for_all (fun f -> f.fd_default = None) fds then
+    Markdown.table [ c_field ; c_format ; c_descr ]
+      (List.map
+         (fun f ->
+            [ Markdown.tt f.fd_name ; format f.fd_syntax ; f.fd_descr ])
+         fds)
+    else
+      let mk_syntax def sy = if def <> None then option sy else sy in
+      let mk_default = function
+        | None -> Markdown.text []
+        | Some default -> default in
+      Markdown.table [ c_field ; c_format ; c_default ; c_descr ]
+        (List.map
+           (fun f -> [
+                Markdown.tt f.fd_name ;
+                format @@ mk_syntax f.fd_default f.fd_syntax ;
+                mk_default f.fd_default ; f.fd_descr ;
+              ])
+           fds)
 
 (* -------------------------------------------------------------------------- *)

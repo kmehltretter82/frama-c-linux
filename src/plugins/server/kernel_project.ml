@@ -27,13 +27,12 @@
 open Data
 module Jutil = Yojson.Basic.Util
 
-let project_page =
-  Doc.page `Kernel ~title:"Project Management" ~filename:"project.md"
+let page = Doc.page `Kernel ~title:"Project Management" ~filename:"project.md"
 
 module ProjectInfo =
 struct
   type t = Project.t
-  let syntax = Syntax.publish project_page ~name:"project"
+  let syntax = Syntax.publish ~page ~name:"project"
       ~synopsis:(Syntax.(record ["id",string;"name",string;"current",boolean]))
       ~descr:(Markdown.praw "Project informations")
   let name_of_json = function
@@ -53,7 +52,7 @@ end
 module ProjectRequest =
 struct
   type t = Project.t * string * json
-  let syntax = Syntax.publish project_page ~name:"project"
+  let syntax = Syntax.publish ~page ~name:"project"
       ~synopsis:(Syntax.(record ["project",string;"request",string;"data",any]))
       ~descr:(Markdown.praw "Request to be executed on the specified project.")
   let of_json js =
@@ -76,7 +75,7 @@ module GetCurrent =
     (Junit)
     (ProjectInfo)
     (struct
-      let page = project_page
+      let page = page
       let kind = `GET
       let name = "Kernel.Project.GetCurrent"
       let descr = Markdown.rm "Returns the current project"
@@ -91,7 +90,7 @@ module SetCurrent =
     (ProjectInfo)
     (Junit)
     (struct
-      let page = project_page
+      let page = page
       let kind = `SET
       let name = "Kernel.Project.SetCurrent"
       let descr = Markdown.rm "Switches the current project"
@@ -106,7 +105,7 @@ module GetProjects =
     (Junit)
     (Jlist(ProjectInfo))
     (struct
-      let page = project_page
+      let page = page
       let kind = `GET
       let name = "Kernel.Project.GetList"
       let descr = Markdown.rm "List of projects"
@@ -121,7 +120,7 @@ module GetOn =
     (ProjectRequest)
     (Jany)
     (struct
-      let page = project_page
+      let page = page
       let kind = `GET
       let name = "Kernel.Project.GetOn"
       let descr = Markdown.rm "Execute a GET request within the given project"
@@ -136,7 +135,7 @@ module SetOn =
     (ProjectRequest)
     (Jany)
     (struct
-      let page = project_page
+      let page = page
       let kind = `SET
       let name = "Kernel.Project.SetOn"
       let descr = Markdown.rm "Execute a SET request within the given project"
@@ -151,7 +150,7 @@ module ExecOn =
     (ProjectRequest)
     (Jany)
     (struct
-      let page = project_page
+      let page = page
       let kind = `EXEC
       let name = "Kernel.Project.ExecOn"
       let descr = Markdown.rm "Execute an EXEC request within the given project"

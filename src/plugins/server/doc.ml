@@ -80,7 +80,7 @@ let page chapter ~title ~filename =
                  sections=[] } in
     pages := Pages.add path page !pages ; page
 
-let publish page ?name ?(index=[]) ~title content sections =
+let publish ~page ?name ?(index=[]) ~title content sections =
   let id = match name with Some id -> id | None -> title in
   let href = `Section( page.path , id ) in
   let section = Markdown.section ?name ~title content sections in

@@ -201,7 +201,7 @@ let text_page = Doc.page `Kernel ~title:"Rich Text Format" ~filename:"text.md"
 module Jtext =
 struct
   include Jany
-  let syntax = Syntax.publish text_page ~name:"text"
+  let syntax = Syntax.publish ~page:text_page ~name:"text"
       ~synopsis:Syntax.any ~descr:(Markdown.praw "Formatted text.")
 end
 
@@ -237,8 +237,14 @@ struct
       | None -> None
       | Some v ->
         let jd = D.to_json v in
-        defaults := Fmap.add name jd !defaults ; Some jd
-    in fdocs := (name , D.syntax , def , descr) :: !fdocs ;
+        defaults := Fmap.add name jd !defaults ;
+        Some (Markdown.tt @@ Json.to_string jd) in
+    fdocs := Syntax.{
+        fd_name = name ;
+        fd_syntax = D.syntax ;
+        fd_default = def ;
+        fd_descr = descr ;
+      } :: !fdocs ;
     let member r = Fmap.mem name r in
     let getter r = D.of_json (Fmap.find name r) in
     let setter r v = Fmap.add name (D.to_json v) r in
@@ -246,7 +252,12 @@ struct
 
   let option (type a) name ~descr (d : a data) : a option field =
     let module D = (val d) in
-    fdocs := (name , Syntax.option D.syntax , None , descr) :: !fdocs ;
+    fdocs := Syntax.{
+        fd_name = name ;
+        fd_syntax = D.syntax ;
+        fd_default = None ;
+        fd_descr = descr ;
+      } :: !fdocs ;
     let member r = Fmap.mem name r in
     let getter r =
       try Some (D.of_json (Fmap.find name r)) with Not_found -> None in
@@ -255,34 +266,11 @@ struct
       | Some v -> Fmap.add name (D.to_json v) r in
     { member ; getter ; setter }
 
-  let fields () =
-    let field = `Center "Field" in
-    let format = `Center "Format" in
-    let default = `Center "Default" in
-    let descr = `Left "Description" in
-    if Fmap.is_empty !defaults then
-      Markdown.table [ field ; format ; descr ]
-        (List.map
-           (fun (fd,sy,_def,descr) ->
-              [ Markdown.tt fd ; Syntax.format sy ; descr ])
-           !fdocs)
-    else
-      let mk_syntax def sy = if def <> None then Syntax.option sy else sy in
-      let mk_default = function
-        | None -> Markdown.text []
-        | Some js -> Markdown.tt (Json.to_string js) in
-      Markdown.table [ field ; format ; default ; descr ]
-        (List.map
-           (fun (fd,sy,def,descr) -> [
-                Markdown.tt fd ;
-                Syntax.format @@ mk_syntax def sy ;
-                mk_default def ; descr ;
-              ])
-           !fdocs)
+  let fields () = Syntax.fields ~kind:"Field" !fdocs
 
   let syntax =
     let descr = Markdown.( R.descr </> mk_block fields ) in
-    Syntax.publish R.page ~name:R.name ~synopsis:(Syntax.record []) ~descr
+    Syntax.publish ~page:R.page ~name:R.name ~synopsis:(Syntax.record []) ~descr
 
   let of_json js =
     List.fold_left
@@ -317,7 +305,7 @@ sig
 end
 
 let publish_id (module A : Info) =
-  Syntax.publish A.page ~name:A.name ~synopsis:Syntax.int ~descr:A.descr
+  Syntax.publish ~page:A.page ~name:A.name ~synopsis:Syntax.int ~descr:A.descr
 
 module INDEXER(M : Map)(I : Info) :
 sig
@@ -520,7 +508,8 @@ struct
       (struct
         type t = E.t
 
-        let syntax = Syntax.publish E.page ~name:E.name
+        let syntax = Syntax.publish
+            ~page:E.page ~name:E.name
             ~synopsis:Syntax.ident
             ~descr:Markdown.( E.descr </> mk_block values )
 

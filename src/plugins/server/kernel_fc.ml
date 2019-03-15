@@ -28,8 +28,7 @@ module Senv = Server_parameters
 
 open Data
 
-let fc_page =
-  Doc.page `Kernel ~title:"Kernel Services" ~filename:"kernel.md"
+let page = Doc.page `Kernel ~title:"Kernel Services" ~filename:"kernel.md"
 
 (* -------------------------------------------------------------------------- *)
 (* --- Config                                                             --- *)
@@ -64,7 +63,7 @@ module GetConfig =
     (Junit)
     (ConfigInfo)
     (struct
-      let page = fc_page
+      let page = page
       let kind = `GET
       let name = "Kernel.GetConfig"
       let descr = Markdown.rm "Kernel configuration"
@@ -82,8 +81,7 @@ module GetConfig =
 module RawSource =
 struct
   type t = Filepath.position
-  let syntax = Syntax.publish fc_page
-      ~name:"source"
+  let syntax = Syntax.publish ~page ~name:"source"
       ~synopsis:(Syntax.record [ "file" , Syntax.string ; "line" , Syntax.int ])
       ~descr:(Markdown.praw "Source position. The file path is normalized, \
                              and the line number starts at one.")
@@ -110,7 +108,7 @@ module LogSource = Collection(RawSource)
 module RawKind =
 struct
   type t = Log.kind
-  let page = fc_page
+  let page = page
   let name = "Kind"
   let descr = Markdown.praw "Frama-C message category."
   let values = [
@@ -134,7 +132,7 @@ struct
 
   module R = Record
       (struct
-        let page = fc_page
+        let page = page
         let name = "log"
         let descr = Markdown.praw "Message event record."
       end)
@@ -212,7 +210,7 @@ module SetLogs =
       let name = "Kernel.SetLogs"
       let descr = Markdown.rm "Turn logs monitoring on/off"
       let details = []
-      let page = fc_page
+      let page = page
       let kind = `SET
       type input = bool
       type output = unit
@@ -227,7 +225,7 @@ module GetLogs =
       let name = "Kernel.GetLogs"
       let descr = Markdown.rm "Flush emitted logs since last call (max 100)"
       let details = []
-      let page = fc_page
+      let page = page
       let kind = `GET
       type input = unit
       type output = Log.event list

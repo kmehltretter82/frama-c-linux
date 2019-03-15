@@ -28,15 +28,14 @@ module Jutil = Yojson.Basic.Util
 (* --- Frama-C Ast Services                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-let ast_page =
-  Doc.page `Kernel ~title:"Ast Services" ~filename:"ast.md"
+let page = Doc.page `Kernel ~title:"Ast Services" ~filename:"ast.md"
 
 module ExecCompute = Request.Register(Junit)(Junit)
     (struct
       let kind = `EXEC
       let name = "Kernel.Ast.ExecCompute"
       let descr = Markdown.rm "Ensures that AST is computed"
-      let page = ast_page
+      let page = page
       let details = []
       type input = unit
       type output = unit
@@ -107,8 +106,7 @@ module PP = Printer_tag.Make(Tag)
 module Stmt = Data.Collection
     (struct
       type t = stmt
-      let syntax = Syntax.publish ast_page
-          ~name:"stmt"
+      let syntax = Syntax.publish ~page ~name:"stmt"
           ~synopsis:Syntax.ident
           ~descr:(Markdown.praw "Code statement identifier")
       let to_json st = `String (Tag.of_stmt st)
@@ -137,8 +135,7 @@ module Ki = Data.Collection
 module Kf = Data.Collection
     (struct
       type t = kernel_function
-      let syntax = Syntax.publish ast_page
-          ~name:"function"
+      let syntax = Syntax.publish ~page ~name:"function"
           ~synopsis:Syntax.ident
           ~descr:(Markdown.praw "Function, identified by its global name.")
       let to_json kf = `String (Kernel_function.get_name kf)
@@ -156,7 +153,7 @@ module GetFunctions = Request.Register(Junit)(Kf.Jlist)
       let kind = `GET
       let name = "Kernel.Ast.GetFunctions"
       let descr = Markdown.rm "Collect all functions in the AST"
-      let page = ast_page
+      let page = page
       let details = []
       type input = unit
       type output = kernel_function list
@@ -171,7 +168,7 @@ module PrintFunction = Request.Register(Kf)(Jtext)
       let kind = `GET
       let name = "Kernel.Ast.PrintFunction"
       let descr = Markdown.rm "Print the AST of a function"
-      let page = ast_page
+      let page = page
       let details = []
       type input = kernel_function
       type output = json
