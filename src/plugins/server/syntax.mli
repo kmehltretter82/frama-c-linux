@@ -32,7 +32,8 @@ val format : t -> Markdown.text
     Extended definition, like record fields and such, must be detailed in
     the description block. *)
 val publish :
-  page:Doc.page -> name:string -> synopsis:t -> descr:Markdown.block -> t
+  page:Doc.page -> name:string -> descr:Markdown.text ->
+  synopsis:t -> ?details:Markdown.block -> unit -> t
 
 val any : t
 val int : t (* small, non-decimal, number *)
@@ -49,12 +50,7 @@ val union : t list -> t
 val option : t -> t
 val record : (string * t) list -> t
 
-type field = {
-  fd_name : string ;
-  fd_syntax : t ;
-  fd_default : Markdown.text option ;
-  fd_descr : Markdown.text ;
-}
+type field = { name : string ; syntax : t ; descr : Markdown.text }
 
 (** Builds a table with fields column named « Kind » *)
 val fields : kind:string -> field list -> Markdown.block

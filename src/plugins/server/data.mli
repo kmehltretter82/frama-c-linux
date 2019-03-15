@@ -40,7 +40,7 @@ module type Info =
 sig
   val page : Doc.page
   val name : string
-  val descr : Markdown.block
+  val descr : Markdown.text
 end
 
 type 'a data = (module S with type t = 'a)

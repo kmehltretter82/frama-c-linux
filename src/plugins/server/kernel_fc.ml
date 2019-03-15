@@ -20,13 +20,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Data
+module Sy = Syntax
+module Md = Markdown
 module Senv = Server_parameters
 
 (* -------------------------------------------------------------------------- *)
 (* --- Frama-C Kernel Services                                            --- *)
 (* -------------------------------------------------------------------------- *)
-
-open Data
 
 let page = Doc.page `Kernel ~title:"Kernel Services" ~filename:"kernel.md"
 
@@ -37,7 +38,7 @@ let page = Doc.page `Kernel ~title:"Kernel Services" ~filename:"kernel.md"
 module ConfigInfo =
 struct
   type t = unit
-  let syntax = Syntax.record []
+  let syntax = Sy.record []
 
   let to_json () = `Assoc [
       "version" , Jstring.to_json Config.version ;
@@ -47,7 +48,7 @@ struct
     ]
 
   let details =
-    let open Markdown in
+    let open Md in
     table [ `Left "field" ; `Left "format" ; `Left "Description" ] [
       [ tt "'version'" ; it "string" ; rm "Frama-C version" ] ;
       [ tt "'datadir'" ; it "string" ; rm "Shared directory (FRAMAC_SHARE)" ] ;
@@ -66,9 +67,9 @@ module GetConfig =
       let page = page
       let kind = `GET
       let name = "Kernel.GetConfig"
-      let descr = Markdown.rm "Kernel configuration"
+      let descr = Md.rm "Kernel configuration"
       let details =
-        [Markdown.section ~title:"Output Configuration" ConfigInfo.details []]
+        [Md.section ~title:"Output Configuration" ConfigInfo.details []]
       type input = unit
       type output = unit
       let process () = ()
@@ -81,10 +82,11 @@ module GetConfig =
 module RawSource =
 struct
   type t = Filepath.position
-  let syntax = Syntax.publish ~page ~name:"source"
-      ~synopsis:(Syntax.record [ "file" , Syntax.string ; "line" , Syntax.int ])
-      ~descr:(Markdown.praw "Source position. The file path is normalized, \
-                             and the line number starts at one.")
+  let syntax = Sy.publish ~page ~name:"source"
+      ~synopsis:(Sy.record [ "file" , Sy.string ; "line" , Sy.int ])
+      ~descr:(Md.rm "Source file positions.")
+      ~details:(Md.praw "The file path is normalized, \
+                         and the line number starts at one.") ()
 
   let to_json p = `Assoc [
       "file" , `String (p.Filepath.pos_path :> string) ;
@@ -95,7 +97,7 @@ struct
     | `Assoc [ "file" , `String path ; "line" , `Int line ]
     | `Assoc [ "line" , `Int line ; "file" , `String path ]
       -> Log.source ~file:(Filepath.Normalized.of_string path) ~line
-    | js -> failure "invalid source format" js
+    | js -> failure "Invalid source format" js
 
 end
 
@@ -109,15 +111,15 @@ module RawKind =
 struct
   type t = Log.kind
   let page = page
-  let name = "Kind"
-  let descr = Markdown.praw "Frama-C message category."
+  let name = "kind"
+  let descr = Md.rm "Frama-C message category."
   let values = [
-    Log.Error,    "ERROR",    Markdown.rm "User Error" ;
-    Log.Warning,  "WARNING",  Markdown.rm "User Warning" ;
-    Log.Feedback, "FEEDBACK", Markdown.rm "Analyzer Feedback" ;
-    Log.Result,   "RESULT",   Markdown.rm "Analyzer Result" ;
-    Log.Failure,  "FAILURE",  Markdown.rm "Analyzer Failure" ;
-    Log.Debug,    "DEBUG",    Markdown.rm "Analyser Debug" ;
+    Log.Error,    "ERROR",    Md.rm "User Error" ;
+    Log.Warning,  "WARNING",  Md.rm "User Warning" ;
+    Log.Feedback, "FEEDBACK", Md.rm "Analyzer Feedback" ;
+    Log.Result,   "RESULT",   Md.rm "Analyzer Result" ;
+    Log.Failure,  "FAILURE",  Md.rm "Analyzer Failure" ;
+    Log.Debug,    "DEBUG",    Md.rm "Analyser Debug" ;
   ]
 end
 
@@ -134,12 +136,12 @@ struct
       (struct
         let page = page
         let name = "log"
-        let descr = Markdown.praw "Message event record."
+        let descr = Md.rm "Message event record."
       end)
 
   let syntax = R.syntax
 
-  let descr = Markdown.rm
+  let descr = Md.rm
   let kind = R.field "kind" ~descr:(descr "Message kind") (module LogKind)
   let plugin = R.field "plugin" ~descr:(descr "Emitter plugin") (module Jstring)
   let message = R.field "message" ~descr:(descr "Message text") (module Jstring)
@@ -208,7 +210,7 @@ module SetLogs =
     (Junit)
     (struct
       let name = "Kernel.SetLogs"
-      let descr = Markdown.rm "Turn logs monitoring on/off"
+      let descr = Md.rm "Turn logs monitoring on/off"
       let details = []
       let page = page
       let kind = `SET
@@ -223,7 +225,7 @@ module GetLogs =
     (LogEvent.Jlist)
     (struct
       let name = "Kernel.GetLogs"
-      let descr = Markdown.rm "Flush emitted logs since last call (max 100)"
+      let descr = Md.rm "Flush emitted logs since last call (max 100)"
       let details = []
       let page = page
       let kind = `GET

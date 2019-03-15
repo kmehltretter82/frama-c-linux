@@ -20,46 +20,58 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Data
+module Sy = Syntax
+module Md = Markdown
+module Js = Yojson.Basic.Util
+
 (* -------------------------------------------------------------------------- *)
 (* --- Project Requests                                                   --- *)
 (* -------------------------------------------------------------------------- *)
-
-open Data
-module Jutil = Yojson.Basic.Util
 
 let page = Doc.page `Kernel ~title:"Project Management" ~filename:"project.md"
 
 module ProjectInfo =
 struct
+
   type t = Project.t
-  let syntax = Syntax.publish ~page ~name:"project"
-      ~synopsis:(Syntax.(record ["id",string;"name",string;"current",boolean]))
-      ~descr:(Markdown.praw "Project informations")
+  let syntax =
+    Sy.publish ~page ~name:"project-info"
+      ~synopsis:Sy.(record[ "id",ident; "name",string; "current",boolean ])
+      ~descr:(Md.rm "Project informations")
+      ()
+
   let name_of_json = function
     | `Assoc info -> Jstring.of_json (List.assoc "id" info)
     | `String id -> id
-    | js -> failure "Kernel.ProjectInfo" js
+    | js -> failure "Invalid project-info" js
+
   let of_json js =
     Project.from_unique_name (name_of_json js)
+
   let to_json p =
     `Assoc [
       "id", `String (Project.get_unique_name p) ;
       "name", `String (Project.get_name p) ;
       "current", `Bool (Project.is_current p) ;
     ]
+
 end
 
 module ProjectRequest =
 struct
+
   type t = Project.t * string * json
-  let syntax = Syntax.publish ~page ~name:"project"
-      ~synopsis:(Syntax.(record ["project",string;"request",string;"data",any]))
-      ~descr:(Markdown.praw "Request to be executed on the specified project.")
+
+  let syntax = Sy.publish ~page ~name:"project-request"
+      ~synopsis:(Sy.(record[ "project",ident; "request",string; "data",any; ]))
+      ~descr:(Md.rm "Request to be executed on the specified project.") ()
+
   let of_json js =
     begin
-      ProjectInfo.of_json (Jutil.member "project" js) ,
-      Jutil.(member "request" js |> to_string) ,
-      Jutil.(member "data" js)
+      Project.from_unique_name Js.(member "project" js |> to_string) ,
+      Js.(member "request" js |> to_string) ,
+      Js.(member "data" js)
     end
 
   let process kind (project,request,data) =
@@ -78,7 +90,7 @@ module GetCurrent =
       let page = page
       let kind = `GET
       let name = "Kernel.Project.GetCurrent"
-      let descr = Markdown.rm "Returns the current project"
+      let descr = Md.rm "Returns the current project"
       let details = []
       type input = unit
       type output = Project.t
@@ -93,7 +105,7 @@ module SetCurrent =
       let page = page
       let kind = `SET
       let name = "Kernel.Project.SetCurrent"
-      let descr = Markdown.rm "Switches the current project"
+      let descr = Md.rm "Switches the current project"
       let details = []
       type input = Project.t
       type output = unit
@@ -108,7 +120,7 @@ module GetProjects =
       let page = page
       let kind = `GET
       let name = "Kernel.Project.GetList"
-      let descr = Markdown.rm "List of projects"
+      let descr = Md.rm "List of projects"
       let details = []
       type input = unit
       type output = Project.t list
@@ -123,7 +135,7 @@ module GetOn =
       let page = page
       let kind = `GET
       let name = "Kernel.Project.GetOn"
-      let descr = Markdown.rm "Execute a GET request within the given project"
+      let descr = Md.rm "Execute a GET request within the given project"
       let details = []
       type input = Project.t * string * json
       type output = json
@@ -138,7 +150,7 @@ module SetOn =
       let page = page
       let kind = `SET
       let name = "Kernel.Project.SetOn"
-      let descr = Markdown.rm "Execute a SET request within the given project"
+      let descr = Md.rm "Execute a SET request within the given project"
       let details = []
       type input = Project.t * string * json
       type output = json
@@ -153,7 +165,7 @@ module ExecOn =
       let page = page
       let kind = `EXEC
       let name = "Kernel.Project.ExecOn"
-      let descr = Markdown.rm "Execute an EXEC request within the given project"
+      let descr = Md.rm "Execute an EXEC request within the given project"
       let details = []
       type input = Project.t * string * json
       type output = json

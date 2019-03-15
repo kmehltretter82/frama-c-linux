@@ -43,35 +43,40 @@ let check_page page name =
   | `Plugin plugin -> check_plugin plugin name
   | `Protocol -> check_plugin "server" name
 
-let re_name = Str.regexp "[a-zA-Z0-9-]+"
+let re_name = Str.regexp "[a-z0-9-]+$"
 
 let check_name name =
   if not (Str.string_match re_name name 0) then
     Senv.warning ~wkey:Senv.wname
-    "Data name %S is not a dash-separated list of identifiers" name
+      "Data name %S is not a dash-separated list of lowercase identifiers" name
 
 (* -------------------------------------------------------------------------- *)
 
-type t = { atomic:bool ; descr:Markdown.text }
+type t = { atomic:bool ; text:Markdown.text }
 
-let atom md = { atomic=true ; descr=md }
-let flow md = { atomic=false ; descr=md }
+let atom md = { atomic=true ; text=md }
+let flow md = { atomic=false ; text=md }
 
-let format { descr } = descr
+let format { text } = text
 let protect a =
-  if a.atomic then a.descr else Markdown.(rm "(" <+> a.descr <+> rm ")")
+  if a.atomic then a.text else Markdown.(rm "(" <+> a.text <+> rm ")")
 
-let publish ~page ~name ~synopsis ~descr =
+let publish ~page ~name ~descr ~synopsis ?(details = Markdown.empty) () =
   check_name name ;
   check_page page name ;
-  let title = Printf.sprintf "`Data` %s" name in
+  let id = Printf.sprintf "data-%s" name in
+  let title = Printf.sprintf "`DATA` %s" name in
+  let format = ref Markdown.nil in
   let syntax = Markdown.fmt_block (fun fmt ->
-      Format.fprintf fmt "> _%s_ ::= @[<h>%a@]"
-        name Markdown.pp_text synopsis.descr
+      Format.fprintf fmt "> %a ::= %a"
+        Markdown.pp_text !format
+        Markdown.pp_text synopsis.text
     ) in
-  let content = Markdown.( syntax </> descr ) in
-  let href = Doc.publish ~page ~name ~title ~index:[name] content [] in
-  atom @@ Markdown.href ~title:name href
+  let content = Markdown.( par descr </> syntax </> details ) in
+  let href = Doc.publish ~page ~name:id ~title ~index:[name] content [] in
+  let link_title = Printf.sprintf "_%s_" name in
+  let link = Markdown.href ~title:link_title href in
+  format := link ; atom @@ link
 
 let any = atom @@ Markdown.it "any"
 let int = atom @@ Markdown.it "int"
@@ -97,7 +102,7 @@ let union ts = flow @@ Markdown.(glue ~sep:(raw " | ") (List.map protect ts))
 
 let option t = atom @@ Markdown.(protect t <@> tt "?")
 
-let field (a,t) = Markdown.( escaped a <+> tt ":" <+> t.descr )
+let field (a,t) = Markdown.( escaped a <+> tt ":" <+> t.text )
 
 let record fds =
   let fields =
@@ -106,35 +111,21 @@ let record fds =
   in atom @@ Markdown.(tt "{" <+> fields <+> tt "}")
 
 type field = {
-  fd_name : string ;
-  fd_syntax : t ;
-  fd_default : Markdown.text option ;
-  fd_descr : Markdown.text ;
+  name : string ;
+  syntax : t ;
+  descr : Markdown.text ;
 }
 
 let fields ~kind (fds : field list) =
-  let c_field = `Center kind in
+  let c_field = `Left kind in
   let c_format = `Center "Format" in
-  let c_default = `Center "Default" in
   let c_descr = `Left "Description" in
-  if List.for_all (fun f -> f.fd_default = None) fds then
-    Markdown.table [ c_field ; c_format ; c_descr ]
-      (List.map
-         (fun f ->
-            [ Markdown.tt f.fd_name ; format f.fd_syntax ; f.fd_descr ])
-         fds)
-    else
-      let mk_syntax def sy = if def <> None then option sy else sy in
-      let mk_default = function
-        | None -> Markdown.text []
-        | Some default -> default in
-      Markdown.table [ c_field ; c_format ; c_default ; c_descr ]
-        (List.map
-           (fun f -> [
-                Markdown.tt f.fd_name ;
-                format @@ mk_syntax f.fd_default f.fd_syntax ;
-                mk_default f.fd_default ; f.fd_descr ;
-              ])
-           fds)
+  Markdown.table [ c_field ; c_format ; c_descr ]
+    begin
+      List.map
+        (fun f ->
+           [ Markdown.tt f.name ; format f.syntax ; f.descr ])
+        fds
+    end
 
 (* -------------------------------------------------------------------------- *)

@@ -20,11 +20,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Data
+
 (* -------------------------------------------------------------------------- *)
 (** Project Services *)
 (* -------------------------------------------------------------------------- *)
-
-open Data
 
 module ProjectInfo : Data.S with type t = Project.t
 module ProjectRequest : Request.Input with type t = Project.t * string * json

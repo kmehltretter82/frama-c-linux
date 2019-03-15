@@ -42,7 +42,7 @@ module type Info =
 sig
   val page : Doc.page
   val name : string
-  val descr : Markdown.block
+  val descr : Markdown.text
 end
 
 type 'a data = (module S with type t = 'a)
@@ -202,7 +202,7 @@ module Jtext =
 struct
   include Jany
   let syntax = Syntax.publish ~page:text_page ~name:"text"
-      ~synopsis:Syntax.any ~descr:(Markdown.praw "Formatted text.")
+      ~synopsis:Syntax.any ~descr:(Markdown.rm "Formatted text.") ()
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -233,18 +233,11 @@ struct
 
   let field (type a) name ~descr ?default (d : a data) : a field =
     let module D = (val d) in
-    let def = match default with
-      | None -> None
-      | Some v ->
-        let jd = D.to_json v in
-        defaults := Fmap.add name jd !defaults ;
-        Some (Markdown.tt @@ Json.to_string jd) in
-    fdocs := Syntax.{
-        fd_name = name ;
-        fd_syntax = D.syntax ;
-        fd_default = def ;
-        fd_descr = descr ;
-      } :: !fdocs ;
+    begin match default with
+      | None -> ()
+      | Some v -> defaults := Fmap.add name (D.to_json v) !defaults
+    end ;
+    fdocs := Syntax.{ name ; syntax = D.syntax ; descr } :: !fdocs ;
     let member r = Fmap.mem name r in
     let getter r = D.of_json (Fmap.find name r) in
     let setter r v = Fmap.add name (D.to_json v) r in
@@ -252,12 +245,7 @@ struct
 
   let option (type a) name ~descr (d : a data) : a option field =
     let module D = (val d) in
-    fdocs := Syntax.{
-        fd_name = name ;
-        fd_syntax = D.syntax ;
-        fd_default = None ;
-        fd_descr = descr ;
-      } :: !fdocs ;
+    fdocs := Syntax.{ name ; syntax = option D.syntax ; descr } :: !fdocs ;
     let member r = Fmap.mem name r in
     let getter r =
       try Some (D.of_json (Fmap.find name r)) with Not_found -> None in
@@ -269,8 +257,10 @@ struct
   let fields () = Syntax.fields ~kind:"Field" !fdocs
 
   let syntax =
-    let descr = Markdown.( R.descr </> mk_block fields ) in
-    Syntax.publish ~page:R.page ~name:R.name ~synopsis:(Syntax.record []) ~descr
+    Syntax.publish ~page:R.page ~name:R.name
+      ~descr:R.descr
+      ~synopsis:(Syntax.record [])
+      ~details:(Markdown.mk_block fields) ()
 
   let of_json js =
     List.fold_left
@@ -305,7 +295,8 @@ sig
 end
 
 let publish_id (module A : Info) =
-  Syntax.publish ~page:A.page ~name:A.name ~synopsis:Syntax.int ~descr:A.descr
+  Syntax.publish
+    ~page:A.page ~name:A.name ~synopsis:Syntax.int ~descr:A.descr ()
 
 module INDEXER(M : Map)(I : Info) :
 sig
@@ -498,7 +489,7 @@ struct
 
   let values () =
     Markdown.table
-      [ `Center E.name ; `Left "Description" ]
+      [ `Left E.name ; `Left "Description" ]
       (List.map
          (fun (_,tag,descr) ->
             [ Markdown.tt (Printf.sprintf "%S" tag) ; descr ]
@@ -511,7 +502,7 @@ struct
         let syntax = Syntax.publish
             ~page:E.page ~name:E.name
             ~synopsis:Syntax.ident
-            ~descr:Markdown.( E.descr </> mk_block values )
+            ~descr:E.descr ~details:(Markdown.mk_block values) ()
 
         let to_json value =
           register () ;

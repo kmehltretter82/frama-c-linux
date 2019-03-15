@@ -96,19 +96,19 @@ let (</>) a b =
     fun fmt -> a fmt ; newline fmt ; b fmt
 
 let fmt_text k fmt = Format.fprintf fmt "@[<h 0>%t@]" k
-let fmt_block k fmt = Format.fprintf fmt "@[<v 0>%t@]" k
+let fmt_block k fmt = Format.fprintf fmt "@[<v 0>%t@]@\n" k
 
 (* -------------------------------------------------------------------------- *)
 (* --- Elementary Text                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
-let praw s fmt = Format.pp_print_string fmt s
 let raw s fmt = Format.pp_print_string fmt s
 let rm s fmt = Format.pp_print_string fmt s
 let it s fmt = Format.fprintf fmt "_%s_" s
 let bf s fmt = Format.fprintf fmt "**%s**" s
 let tt s fmt = Format.fprintf fmt "`%s`" s
 let text = merge space
+let praw s = fmt_block (raw s)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Links                                                              --- *)
@@ -165,7 +165,7 @@ let href ?title (h : href) fmt =
 (* -------------------------------------------------------------------------- *)
 
 let aname anchor fmt =
-  Format.fprintf fmt "<a name=\"%s\"></a>@\n" anchor
+  Format.fprintf fmt "<a name=\"%s\"></a>@\n" (id anchor)
 
 let title h ?name title fmt =
   begin
@@ -174,8 +174,8 @@ let title h ?name title fmt =
     Format.fprintf fmt "%s %s" (String.make level '#') title ;
     if names || name <> None || toc <> None then
       begin
-        let anchor = match name with None -> id title | Some a -> a in
-        Format.fprintf fmt " {#%s}" anchor ;
+        let anchor = match name with None -> title | Some a -> a in
+        Format.fprintf fmt " {#%s}" (id anchor) ;
         (match toc with
          | None -> ()
          | Some callback ->

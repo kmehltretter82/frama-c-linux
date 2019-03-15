@@ -15,26 +15,3 @@ asynchronous behavior of the server.
 
 However, it is still possible to execute a request on a specific project with
 `Kernel.Project.{Get|Set|Exec}On` requests.
-
-## Project Informations {#project-info}
-
-The JSON encoding for `project-info` is a record with the following fields:
-
-| Field | Type | Description |
-|:-----:|:----:|:------------|
-| `"id"` | _string_ | Project unique name |
-| `"name"` | _string_ | Project descriptive name |
-| `"current"` | _boolean_ | Currently selected project |
-
-When used as _input_ parameter of a request, the project unique name can be used instead of the full project info.
-
-## Request Delegation {#request-info}
-
-To send a request on a specific project, the requests `Kernel.Project.{Get|Set|Exec}On` takes a input parameter
-a record `request-info` with the following fields:
-
-| Field | Type | Description |
-|:-----:|:----:|:------------|
-| `"project"` | [project-info](#project-info) | Project to execute the request on |
-| `"request"` | _string_ | The request name |
-| `"data"` | _any_ | The request data |

@@ -20,9 +20,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
+
 open Data
-module Jutil = Yojson.Basic.Util
+module Sy = Syntax
+module Md = Markdown
+module Js = Yojson.Basic.Util
+open Cil_types
 
 (* -------------------------------------------------------------------------- *)
 (* --- Frama-C Ast Services                                               --- *)
@@ -34,7 +37,7 @@ module ExecCompute = Request.Register(Junit)(Junit)
     (struct
       let kind = `EXEC
       let name = "Kernel.Ast.ExecCompute"
-      let descr = Markdown.rm "Ensures that AST is computed"
+      let descr = Md.rm "Ensures that AST is computed"
       let page = page
       let details = []
       type input = unit
@@ -106,14 +109,14 @@ module PP = Printer_tag.Make(Tag)
 module Stmt = Data.Collection
     (struct
       type t = stmt
-      let syntax = Syntax.publish ~page ~name:"stmt"
-          ~synopsis:Syntax.ident
-          ~descr:(Markdown.praw "Code statement identifier")
+      let syntax = Sy.publish ~page ~name:"stmt"
+          ~synopsis:Sy.ident
+          ~descr:(Md.rm "Code statement identifier") ()
       let to_json st = `String (Tag.of_stmt st)
       let of_json js =
         try
           let open Printer_tag in
-          match Tag.lookup (Jutil.to_string js) with
+          match Tag.lookup (Js.to_string js) with
           | PStmt(_,st) -> st
           | _ -> raise Not_found
         with Not_found ->
@@ -123,7 +126,7 @@ module Stmt = Data.Collection
 module Ki = Data.Collection
     (struct
       type t = kinstr
-      let syntax = Syntax.union [ Syntax.tag "global" ; Stmt.syntax ]
+      let syntax = Sy.union [ Sy.tag "global" ; Stmt.syntax ]
       let to_json = function
         | Kglobal -> `String "global"
         | Kstmt st -> `String (Tag.of_stmt st)
@@ -135,12 +138,12 @@ module Ki = Data.Collection
 module Kf = Data.Collection
     (struct
       type t = kernel_function
-      let syntax = Syntax.publish ~page ~name:"function"
-          ~synopsis:Syntax.ident
-          ~descr:(Markdown.praw "Function, identified by its global name.")
+      let syntax = Sy.publish ~page ~name:"function"
+          ~synopsis:Sy.ident
+          ~descr:(Md.rm "Function identified by its global name.") ()
       let to_json kf = `String (Kernel_function.get_name kf)
       let of_json js =
-        try Jutil.to_string js |> Globals.Functions.find_by_name
+        try Js.to_string js |> Globals.Functions.find_by_name
         with Not_found -> Data.failure "Undefined function" js
     end)
 
@@ -152,7 +155,7 @@ module GetFunctions = Request.Register(Junit)(Kf.Jlist)
     (struct
       let kind = `GET
       let name = "Kernel.Ast.GetFunctions"
-      let descr = Markdown.rm "Collect all functions in the AST"
+      let descr = Md.rm "Collect all functions in the AST"
       let page = page
       let details = []
       type input = unit
@@ -167,7 +170,7 @@ module PrintFunction = Request.Register(Kf)(Jtext)
     (struct
       let kind = `GET
       let name = "Kernel.Ast.PrintFunction"
-      let descr = Markdown.rm "Print the AST of a function"
+      let descr = Md.rm "Print the AST of a function"
       let page = page
       let details = []
       type input = kernel_function
