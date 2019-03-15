@@ -42,6 +42,7 @@ val (</>) : block -> block -> block (** Infix operator for [concat] *)
 
 (** {2 Text Constructors} *)
 
+val nil : text (** Empty *)
 val raw : string -> text (** inlined markdown format *)
 val rm : string -> text (** roman (normal) style *)
 val it : string -> text (** italic style *)

@@ -65,11 +65,13 @@ let local ctxt job data =
 (* --- Combinators                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
+let nil _fmt = ()
+let empty= nil
 let space fmt = Format.pp_print_space fmt ()
 let newline fmt = Format.pp_print_newline fmt ()
 
 let merge sep ds fmt =
-  match ds with
+  match List.filter (fun d -> d != nil) ds with
   | [] -> ()
   | d::ds -> d fmt ; List.iter (fun d -> sep fmt ; d fmt) ds
 
@@ -78,9 +80,20 @@ let glue ?sep ds fmt =
   | None -> List.iter (fun d -> d fmt) ds
   | Some s -> merge s ds fmt
 
-let (<@>) a b fmt = a fmt ; b fmt
-let (<+>) a b fmt = a fmt ; space fmt ; b fmt
-let (</>) a b fmt = a fmt ; newline fmt ; b fmt
+let (<@>) a b =
+  if a == empty then b else
+  if b == empty then a else
+    fun fmt -> a fmt ; b fmt
+
+let (<+>) a b =
+  if a == empty then b else
+  if b == empty then a else
+    fun fmt -> a fmt ; space fmt ; b fmt
+
+let (</>) a b =
+  if a == empty then b else
+  if b == empty then a else
+    fun fmt -> a fmt ; newline fmt ; b fmt
 
 let fmt_text k fmt = Format.fprintf fmt "@[<h 0>%t@]" k
 let fmt_block k fmt = Format.fprintf fmt "@[<v 0>%t@]" k
@@ -150,8 +163,6 @@ let href ?title (h : href) fmt =
 (* -------------------------------------------------------------------------- *)
 (* --- Blocks                                                             --- *)
 (* -------------------------------------------------------------------------- *)
-
-let empty _fmt = ()
 
 let aname anchor fmt =
   Format.fprintf fmt "<a name=\"%s\"></a>@\n" anchor
