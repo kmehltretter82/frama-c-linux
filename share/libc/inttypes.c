@@ -33,6 +33,6 @@ imaxdiv_t imaxdiv(intmax_t numer, intmax_t denom){
   r.quot=numer/denom;
   r.rem=numer%denom;
   return r;
-};
+}
 
 __POP_FC_STDLIB

@@ -736,10 +736,7 @@ string_constant:
    back to a string for easy viewing. */
     string_list                         { intlist_to_string (fst $1), snd $1 }
 ;
-one_string_constant:
-/* Don't concat multiple strings.  For asm templates. */
-    CST_STRING                          { intlist_to_string (fst $1) }
-;
+
 string_list:
     one_string                          { fst $1, snd $1 }
 |   string_list one_string              { merge_string $1 $2 }
@@ -1674,8 +1671,8 @@ asmattr:
 |    CONST asmattr                      { ("const", []) :: $2 }
 ;
 asmtemplate:
-    one_string_constant                          { [$1] }
-|   one_string_constant asmtemplate              { $1 :: $2 }
+    one_string                         { [intlist_to_string (fst $1)] }
+|   one_string asmtemplate             { intlist_to_string (fst $1) :: $2 }
 ;
 asmoutputs:
   /* empty */           { None }
@@ -1711,8 +1708,8 @@ asmclobber:
 | COLON asmcloberlst_ne asmlabels       { $2,$3 }
 ;
 asmcloberlst_ne:
-   one_string_constant                  { [$1] }
-|  one_string_constant COMMA asmcloberlst_ne     { $1 :: $3 }
+   string_constant                  { [fst $1] }
+|  string_constant COMMA asmcloberlst_ne     { fst $1 :: $3 }
 ;
 asmlabels:
 | /* empty */                          { [] }

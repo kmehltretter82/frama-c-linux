@@ -95,6 +95,9 @@
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
+  __fc_random48_init ∈ {0}
+  __fc_random48_counter[0..2] ∈ [--..--]
+  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
   __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
           [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
           [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
@@ -331,6 +334,9 @@ Values at end of function main:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
+  __fc_random48_init ∈ {0}
+  __fc_random48_counter[0..2] ∈ [--..--]
+  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
   __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
           [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
           [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
@@ -562,6 +568,9 @@ Values at end of function main:
   __fc_heap_status ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {32767}
+  __fc_random48_init ∈ {0}
+  __fc_random48_counter[0..2] ∈ [--..--]
+  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
   __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
           [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
           [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}

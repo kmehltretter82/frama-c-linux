@@ -191,4 +191,7 @@ asm("sidt %0\n" : :"m"(loc));
 
 asm ("movq $36, (%0)": : "r"(pulValue));
 
+int a = 2, b = 3;
+  __asm__("mov %1, %0" : "=r"(a) :"r"(b): "%""eax");
+
 }

@@ -1185,10 +1185,7 @@ let mkAddrOfAndMark loc ((b, off) as lval) : exp =
   begin match lastOffset off with
     | NoOffset ->
       (match b with
-       | Var vi ->
-         (* Do not mark arrays as having their address taken. *)
-         if not (isArrayType vi.vtype) then
-           vi.vaddrof <- true
+       | Var vi -> vi.vaddrof <- true
        | _ -> ())
     | Index _ -> ()
     | Field(fi,_) -> fi.faddrof <- true
@@ -1196,15 +1193,12 @@ let mkAddrOfAndMark loc ((b, off) as lval) : exp =
   mkAddrOf ~loc lval
 
 (* Call only on arrays *)
-let mkStartOfAndMark loc ((_b, _off) as lval) : exp =
+let mkStartOfAndMark loc ((b, _off) as lval) : exp =
   (* Mark the vaddrof flag if b is a variable *)
-  (* Do not mark arrays as having their address taken.
-     (match b with
-     | Var vi -> vi.vaddrof <- true
-     | _ -> ());
-  *)
-  let res = new_exp ~loc (StartOf lval) in
-  res
+  (match b with
+   | Var vi -> vi.vaddrof <- true
+   | _ -> ());
+  new_exp ~loc (StartOf lval)
 
 (* Keep a set of self compinfo for composite types *)
 let compInfoNameEnv : (string, compinfo) H.t = H.create 113
@@ -2728,9 +2722,11 @@ let rec castTo ?(fromsource=false)
     | TPtr (TFun (_,args,va,_),_), TPtr(TFun (_,args',va',_),_) ->
       (* Checks on casting from a function type into another one.
          We enforce at least the same number of arguments, and emit a warning
-         if types do not match.
-      *)
-      if va <> va' || bigger_length_args args args' then
+         if types do not match. Note that empty argument lists are always
+         compatible. *)
+      if (va <> va' || bigger_length_args args args') &&
+         (args <> None && args' <> None)
+      then
         error
           "conversion between function types with \
            different number of arguments:@ %a@ and@ %a"
@@ -2888,8 +2884,8 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
          * local. This can happen when we declare an extern variable with
          * global scope but we are in a local scope. *)
       Kernel.debug ~dkey:Kernel.dkey_typing_global
-        "makeGlobalVarinfo isadef=%B vi.vname=%s(%d)"
-        isadef vi.vname vi.vid;
+        "makeGlobalVarinfo isadef=%B vi.vname=%s(%d), vreferenced=%B"
+        isadef vi.vname vi.vid vi.vreferenced;
       (* This may throw an exception Not_found *)
       let oldvi, oldloc = lookupGlobalVar vi.vname in
       Kernel.debug ~dkey:Kernel.dkey_typing_global
@@ -4650,6 +4646,7 @@ and makeVarInfoCabs
     ~(isformal: bool)
     ~(isglobal: bool)
     ?(isgenerated=false)
+    ?(referenced=false)
     (ldecl : location)
     (bt, sto, inline, attrs)
     (n,ndt,a)
@@ -4666,7 +4663,8 @@ and makeVarInfoCabs
     Kernel.error ~once:true ~current:true "inline for a non-function: %s" n;
   checkRestrictQualifierDeep vtype;
   (*  log "Looking at %s(%b): (%a)@." n isformal d_attrlist nattr;*)
-  let vi = makeVarinfo ~temp:isgenerated isglobal isformal n vtype in
+  let vi = makeVarinfo ~referenced ~temp:isgenerated isglobal isformal n vtype
+  in
   vi.vstorage <- sto;
   vi.vattr <- nattr;
   vi.vdecl <- ldecl;
@@ -8224,11 +8222,17 @@ and createGlobal ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool * A
   let is_fc_builtin {A.expr_node=enode} =
     match enode with A.VARIABLE "FC_BUILTIN" -> true | _ -> false
   in
+  let is_fc_stdlib {A.expr_node=enode} =
+    match enode with A.VARIABLE v when v = fc_stdlib -> true | _ -> false
+  in
   let isgenerated =
     List.exists (fun (_,el) -> List.exists is_fc_builtin el) a
   in
+  let islibc =
+    List.exists (fun (_,el) -> List.exists is_fc_stdlib el) a
+  in
   (* Make a first version of the varinfo *)
-  let vi = makeVarInfoCabs ~ghost ~isformal:false
+  let vi = makeVarInfoCabs ~ghost ~isformal:false ~referenced:islibc
       ~isglobal:true ~isgenerated (convLoc cloc) (t,s,b,attr_list) (n,ndt,a)
   in
   (* Add the variable to the environment before doing the initializer
