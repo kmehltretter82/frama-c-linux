@@ -177,10 +177,6 @@ val max_valid_absolute_address: unit -> Int.t
 
 val bits_sizeof : t -> Int_Base.t
 
-val offset_is_in_validity : Int.t -> validity -> Ival.t -> bool
-(** [is_offset_in_validity size validity ival] checks that [ival] is a valid
-    offset for an access of size [size] according to [validity]. *)
-
 val is_valid_offset : for_writing:bool -> Int.t -> t -> Ival.t -> bool
 (** [is_valid_offset ~for_writing size b offset] checks that [offset]
     (expressed in bits) plus [size] bits is valid in [b]. *)

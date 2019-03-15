@@ -54,10 +54,7 @@ let v_uninit_of_offsetmap ~typ offsm =
   | Int_Base.Value size ->
     let validity = Base.validity_from_size size in
     let offsets = Ival.zero in
-    let _alarm, r =
-      V_Offsetmap.find ~validity ~conflate_bottom:false ~offsets ~size offsm
-    in
-    r
+    V_Offsetmap.find ~validity ~conflate_bottom:false ~offsets ~size offsm
 
 let backward_comp_int_left positive comp l r =
   if (Value_parameters.UndefinedPointerComparisonPropagateAll.get())
@@ -221,13 +218,13 @@ let add_if_singleton value acc =
   else acc
 
 let find_offsm_under validity ival size offsm acc =
-  let _alarm, offsets = Tr_offset.trim_by_validity ival size validity in
+  let offsets = Tr_offset.trim_by_validity ival size validity in
   match offsets with
   | Tr_offset.Invalid | Tr_offset.Overlap _ -> acc
   | Tr_offset.Set list ->
     let find acc offset =
       let offsets = Ival.inject_singleton offset in
-      let _, value = Cvalue.V_Offsetmap.find ~validity ~offsets ~size offsm in
+      let value = Cvalue.V_Offsetmap.find ~validity ~offsets ~size offsm in
       add_if_singleton value acc
     in
     List.fold_left find acc list

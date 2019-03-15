@@ -149,7 +149,7 @@ let read_char kind offset cvalue acc =
 let rec search_each_index kind ~validity ~index ~max offsetmap acc =
   let offsets = Ival.inject_singleton index in
   let size = kind.size in
-  let _, cvalue = Cvalue.V_Offsetmap.find ~validity ~offsets ~size offsetmap in
+  let cvalue = Cvalue.V_Offsetmap.find ~validity ~offsets ~size offsetmap in
   let acc = read_char kind offsets cvalue acc in
   let index = Integer.add index size in
   if acc.stop || Integer.gt index max

@@ -444,8 +444,8 @@ let memset_typ_offsm_int full_typ i =
         (* Read [full_offsm] between [offset] and [offset+size-1], and return
            the value stored there. *)
         let find size =
-          snd (V_Offsetmap.find ~validity
-                 ~offsets:(Ival.inject_singleton offset) ~size full_offsm)
+          V_Offsetmap.find ~validity
+            ~offsets:(Ival.inject_singleton offset) ~size full_offsm
         in
         (* Update [full_offsm] between [offset] and [offset+size-1], and store
            exactly [v] there *)
@@ -490,7 +490,7 @@ let memset_typ_offsm_int full_typ i =
               if Integer.(gt nb one) then begin
                 (* Copy the result *)
                 let src = Ival.inject_singleton offset in
-                let _alarm_access, copy =
+                let copy =
                   V_Offsetmap.copy_slice
                     ~validity ~offsets:src ~size:sizeelt offsm'
                 in
@@ -505,7 +505,7 @@ let memset_typ_offsm_int full_typ i =
                 match copy with
                 | `Bottom -> assert false (* the copy is within bounds *)
                 | `Value copy ->
-                  let _alarm_access, r =
+                  let r =
                     V_Offsetmap.paste_slice ~validity
                       ~exact:true ~from:copy ~size:sizeelt ~offsets:dst offsm'
                   in

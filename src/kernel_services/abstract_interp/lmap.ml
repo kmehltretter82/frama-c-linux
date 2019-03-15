@@ -183,10 +183,7 @@ struct
               Offsetmap.update_imprecise_everywhere ~validity orig v offm
             | Int_Base.Value size ->
               assert (Int.ge size Int.zero);
-              let _, r =
-                Offsetmap.update ?origin ~validity ~exact ~offsets ~size v offm
-              in
-              r
+              Offsetmap.update ?origin ~validity ~exact ~offsets ~size v offm
           in
           match offm' with
           | `Bottom -> ()
@@ -230,7 +227,7 @@ struct
               match find_or_default base mem with
               | `Bottom -> acc_v
               | `Value offsetmap ->
-                let _alarm_o, new_v =
+                let new_v =
                   Offsetmap.find
                     ~conflate_bottom ~validity ~offsets ~size offsetmap
                 in
@@ -475,7 +472,7 @@ struct
         match offsetmap_dst with
         | `Bottom -> acc
         | `Value offsetmap_dst ->
-          let _this_alarm, new_offsetmap =
+          let new_offsetmap =
             Offsetmap.paste_slice ~validity ~exact
               ~from ~size ~offsets:i_dst offsetmap_dst
           in
@@ -512,9 +509,8 @@ struct
         match find_or_default k_src m with
         | `Bottom -> acc
         | `Value offsetmap_src ->
-          let _alarm_copy, copy =
-            Offsetmap.copy_slice ~validity
-              ~offsets:i_src ~size offsetmap_src
+          let copy =
+            Offsetmap.copy_slice ~validity~offsets:i_src ~size offsetmap_src
           in
           Bottom.join Offsetmap.join acc copy
       in
