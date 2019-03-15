@@ -47,35 +47,16 @@ end
 type 'a input = (module Input with type t = 'a)
 type 'a output = (module Output with type t = 'a)
 
-module type RequestInfo =
-sig
-  type input
-  type output
-  val page : Doc.page
-  val name : string
-  val kind : kind
-  val descr : Markdown.text
-  val details : Markdown.section list
-  val process : input -> output
-end
-
-module type S =
-sig
-  include RequestInfo
-  val href : Markdown.href
-  val process_json : json -> json
-end
-
 (* -------------------------------------------------------------------------- *)
 (* --- Sanity Checks                                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
 module STR = Transitioning.String
 
-let re_get = Str.regexp_case_fold "\\(GET\\|PRINT\\)"
 let re_set = Str.regexp_string_case_fold "SET"
-let re_exec = Str.regexp_string_case_fold "EXEC"
-let re_name = Str.regexp_case_fold "[A-Z0-9.]+"
+let re_get = Str.regexp_case_fold "\\(GET\\|PRINT\\)"
+let re_exec = Str.regexp_case_fold "\\(EXEC\\|COMPUTE\\)"
+let re_name = Str.regexp_case_fold "[a-zA-Z0-9.]+$"
 
 let wpage = Senv.register_warn_category "inconsistent-page"
 let wkind = Senv.register_warn_category "inconsistent-kind"
@@ -83,7 +64,7 @@ let wkind = Senv.register_warn_category "inconsistent-kind"
 let check_name name =
   if not (Str.string_match re_name name 0) then
     Senv.warning ~wkey:Senv.wname
-      "Request %S is not a dot-separated list of identifiers" name
+      "Request %S is not a dot-separated list of (camlCased) identifiers" name
 
 let check_plugin plugin name =
   let p = STR.lowercase_ascii plugin in
@@ -106,50 +87,13 @@ let check_page page name =
       "Request '%s' shall not be published in protocol pages" name
 
 let check_kind kind name =
-  let re = match kind with
-    | `GET -> re_get
-    | `SET -> re_set
-    | `EXEC -> re_exec
+  let re,key = match kind with
+    | `GET -> re_get , "get|print"
+    | `SET -> re_set , "set"
+    | `EXEC -> re_exec , "exec|compute"
   in try ignore (Str.search_forward re name 0) with Not_found ->
-    Senv.warning "Request '%s' shall be named « *%s* »"
-      name (Main.string_of_kind kind
-            |> STR.lowercase_ascii
-            |> STR.capitalize_ascii)
-
-(* -------------------------------------------------------------------------- *)
-(* --- Registration                                                       --- *)
-(* -------------------------------------------------------------------------- *)
-
-module Register
-    (Input : Input)
-    (Output : Output)
-    (Rq : RequestInfo with type input = Input.t
-                       and type output = Output.t)
-=
-struct
-  include Rq
-
-  let process_json js =
-    js |> Input.of_json |> Rq.process |> Output.to_json
-
-  let href =
-    let kind = Main.string_of_kind Rq.kind in
-    let title =  Printf.sprintf "`%s` %s" kind Rq.name in
-    let synopsis =
-      Markdown.table
-        [ `Center "Input" ; `Center "Output" ; `Left "Description" ]
-        [[ Syntax.format Input.syntax ;
-           Syntax.format Output.syntax ; Rq.descr ]]
-    in
-    Doc.publish ~page:Rq.page ~index:[Rq.name] ~title synopsis Rq.details
-
-  let () =
-    check_name Rq.name ;
-    check_page Rq.page Rq.name ;
-    check_kind Rq.kind Rq.name ;
-    Main.register Rq.kind Rq.name process_json
-
-end
+    Senv.warning "Request '%s' shall be named with « %s »"
+      name key
 
 (* -------------------------------------------------------------------------- *)
 (* --- Multiple Fields Requests                                           --- *)
@@ -362,12 +306,11 @@ let register_sig (type a b) (s : (a,b) signature) (process : rq -> a -> b) =
   in
   let skind = Main.string_of_kind s.kind in
   let title =  Printf.sprintf "`%s` %s" skind s.name in
-  let pp_syntax fmt sy = Markdown.pp_text fmt (Syntax.format sy) in
-  let synopsis = Markdown.fmt_block (fun fmt ->
-      Format.fprintf fmt "> `'%s'` ( %a ) : %a" s.name
-        pp_syntax (sy_input s.input)
-        pp_syntax (sy_output s.output)
-    ) in
+  let synopsis =
+    Markdown.table
+      [`Center "Input" ; `Center "Output" ]
+      [[ Syntax.format @@ sy_input s.input ;
+         Syntax.format @@ sy_output s.output ]] in
   let content =
     Markdown.concat [
       Markdown.par s.descr ;
@@ -384,7 +327,7 @@ let register_sig (type a b) (s : (a,b) signature) (process : rq -> a -> b) =
 (* --- Request Registration                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-let register ~page ~kind ~name ~descr ?details ~input ~output ~process () =
+let register ~page ~kind ~name ~descr ?details ~input ~output process =
   register_sig
     (signature ~page ~kind ~name ~descr ?details ~input ~output ())
     (fun _rq v -> process v)

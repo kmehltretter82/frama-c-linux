@@ -21,31 +21,14 @@
 (**************************************************************************)
 
 open Cil_types
-open Data
 
 (* -------------------------------------------------------------------------- *)
 (** Ast Data *)
 (* -------------------------------------------------------------------------- *)
 
 module PP : Printer_tag.S_pp
-module Stmt : Data.S_collection with type t = stmt
-module Ki : Data.S_collection with type t = kinstr
 module Kf : Data.S_collection with type t = kernel_function
-
-(* -------------------------------------------------------------------------- *)
-(** Ast Services *)
-(* -------------------------------------------------------------------------- *)
-
-module ExecCompute : Request.S
-  with type input = unit
-   and type output = unit
-
-module GetFunctions : Request.S
-  with type input = unit
-   and type output = kernel_function list
-
-module PrintFunction : Request.S
-  with type input = kernel_function
-   and type output = Jtext.t
+module Ki : Data.S_collection with type t = kinstr
+module Stmt : Data.S_collection with type t = stmt
 
 (* -------------------------------------------------------------------------- *)

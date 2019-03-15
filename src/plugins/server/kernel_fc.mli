@@ -27,16 +27,4 @@
 module LogSource : Data.S_collection with type t = Filepath.position
 module LogEvent : Data.S_collection with type t = Log.event
 
-module GetConfig : Request.S
-  with type input = unit
-   and type output = unit
-
-module SetLogs : Request.S
-  with type input = bool
-   and type output = unit
-
-module GetLogs : Request.S
-  with type input = unit
-   and type output = Log.event list
-
 (* -------------------------------------------------------------------------- *)

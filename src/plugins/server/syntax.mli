@@ -35,10 +35,10 @@ val publish :
   page:Doc.page -> name:string -> descr:Markdown.text ->
   synopsis:t -> ?details:Markdown.block -> unit -> t
 
+val unit : t
 val any : t
 val int : t (* small, non-decimal, number *)
 val ident : t (* integer of string *)
-val null : t
 val string : t
 val number : t
 val boolean : t

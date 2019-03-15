@@ -25,38 +25,36 @@ module Sy = Syntax
 module Md = Markdown
 module Js = Yojson.Basic.Util
 
+let page = Doc.page `Kernel ~title:"Project Management" ~filename:"project.md"
+
+(* -------------------------------------------------------------------------- *)
+(* --- Project Info                                                       --- *)
+(* -------------------------------------------------------------------------- *)
+
+module ProjectInfo =
+  Collection
+    (struct
+      type t = Project.t
+
+      let syntax = Sy.publish ~page ~name:"project-info"
+          ~descr:(Md.rm "Project informations")
+          ~synopsis:Sy.(record[ "id",ident; "name",string; "current",boolean ])
+          ()
+
+      let of_json js =
+        Js.member "id" js |> Js.to_string |> Project.from_unique_name
+
+      let to_json p =
+        `Assoc [
+          "id", `String (Project.get_unique_name p) ;
+          "name", `String (Project.get_name p) ;
+          "current", `Bool (Project.is_current p) ;
+        ]
+    end)
+
 (* -------------------------------------------------------------------------- *)
 (* --- Project Requests                                                   --- *)
 (* -------------------------------------------------------------------------- *)
-
-let page = Doc.page `Kernel ~title:"Project Management" ~filename:"project.md"
-
-module ProjectInfo =
-struct
-
-  type t = Project.t
-  let syntax =
-    Sy.publish ~page ~name:"project-info"
-      ~synopsis:Sy.(record[ "id",ident; "name",string; "current",boolean ])
-      ~descr:(Md.rm "Project informations")
-      ()
-
-  let name_of_json = function
-    | `Assoc info -> Jstring.of_json (List.assoc "id" info)
-    | `String id -> id
-    | js -> failure "Invalid project-info" js
-
-  let of_json js =
-    Project.from_unique_name (name_of_json js)
-
-  let to_json p =
-    `Assoc [
-      "id", `String (Project.get_unique_name p) ;
-      "name", `String (Project.get_name p) ;
-      "current", `Bool (Project.is_current p) ;
-    ]
-
-end
 
 module ProjectRequest =
 struct
@@ -82,94 +80,44 @@ struct
 
 end
 
-module GetCurrent =
-  Request.Register
-    (Junit)
-    (ProjectInfo)
-    (struct
-      let page = page
-      let kind = `GET
-      let name = "Kernel.Project.GetCurrent"
-      let descr = Md.rm "Returns the current project"
-      let details = []
-      type input = unit
-      type output = Project.t
-      let process = Project.current
-    end)
+(* -------------------------------------------------------------------------- *)
+(* --- Project Requests                                                   --- *)
+(* -------------------------------------------------------------------------- *)
 
-module SetCurrent =
-  Request.Register
-    (ProjectInfo)
-    (Junit)
-    (struct
-      let page = page
-      let kind = `SET
-      let name = "Kernel.Project.SetCurrent"
-      let descr = Md.rm "Switches the current project"
-      let details = []
-      type input = Project.t
-      type output = unit
-      let process p = Project.set_current p
-    end)
+let () = Request.register ~page
+    ~kind:`GET ~name:"kernel.project.getCurrent"
+    ~descr:(Md.rm "Returns the current project")
+    ~input:(module Junit) ~output:(module ProjectInfo)
+    Project.current
 
-module GetProjects =
-  Request.Register
-    (Junit)
-    (Jlist(ProjectInfo))
-    (struct
-      let page = page
-      let kind = `GET
-      let name = "Kernel.Project.GetList"
-      let descr = Md.rm "List of projects"
-      let details = []
-      type input = unit
-      type output = Project.t list
-      let process () = Project.fold_on_projects (fun ids p -> p :: ids) []
-    end)
+let () = Request.register ~page
+    ~kind:`SET ~name:"kernel.project.setCurrent"
+    ~descr:(Md.rm "Switches the current project")
+    ~input:(module Jident) ~output:(module Junit)
+    (fun pid -> Project.(set_current (from_unique_name pid)))
 
-module GetOn =
-  Request.Register
-    (ProjectRequest)
-    (Jany)
-    (struct
-      let page = page
-      let kind = `GET
-      let name = "Kernel.Project.GetOn"
-      let descr = Md.rm "Execute a GET request within the given project"
-      let details = []
-      type input = Project.t * string * json
-      type output = json
-      let process = ProjectRequest.process `GET
-    end)
+let () = Request.register ~page
+    ~kind:`GET ~name:"kernel.project.getList"
+    ~descr:(Md.rm "Returns the list of all projects")
+    ~input:(module Junit) ~output:(module ProjectInfo.Jlist)
+    (fun () -> Project.fold_on_projects (fun ids p -> p :: ids) [])
 
-module SetOn =
-  Request.Register
-    (ProjectRequest)
-    (Jany)
-    (struct
-      let page = page
-      let kind = `SET
-      let name = "Kernel.Project.SetOn"
-      let descr = Md.rm "Execute a SET request within the given project"
-      let details = []
-      type input = Project.t * string * json
-      type output = json
-      let process = ProjectRequest.process `SET
-    end)
+let () = Request.register ~page
+    ~kind:`GET ~name:"kernel.project.getOn"
+    ~descr:(Md.rm "Execute a GET request within the given project")
+    ~input:(module ProjectRequest) ~output:(module Jany)
+    (ProjectRequest.process `GET)
 
-module ExecOn =
-  Request.Register
-    (ProjectRequest)
-    (Jany)
-    (struct
-      let page = page
-      let kind = `EXEC
-      let name = "Kernel.Project.ExecOn"
-      let descr = Md.rm "Execute an EXEC request within the given project"
-      let details = []
-      type input = Project.t * string * json
-      type output = json
-      let process = ProjectRequest.process `EXEC
-    end)
+let () = Request.register ~page
+    ~kind:`SET ~name:"kernel.project.setOn"
+    ~descr:(Md.rm "Execute a GET request within the given project")
+    ~input:(module ProjectRequest) ~output:(module Jany)
+    (ProjectRequest.process `SET)
+
+let () = Request.register ~page
+    ~kind:`EXEC ~name:"kernel.project.execOn"
+    ~descr:(Md.rm "Execute a GET request within the given project")
+    ~input:(module ProjectRequest) ~output:(module Jany)
+    (ProjectRequest.process `EXEC)
 
 (* -------------------------------------------------------------------------- *)

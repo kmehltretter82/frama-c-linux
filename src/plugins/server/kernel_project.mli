@@ -29,28 +29,4 @@ open Data
 module ProjectInfo : Data.S with type t = Project.t
 module ProjectRequest : Request.Input with type t = Project.t * string * json
 
-module GetCurrent : Request.S
-  with type input = unit
-   and type output = Project.t
-
-module SetCurrent : Request.S
-  with type input = Project.t
-   and type output = unit
-
-module GetProjects : Request.S
-  with type input = unit
-   and type output = Project.t list
-
-module GetOn : Request.S
-  with type input = ProjectRequest.t
-   and type output = json
-
-module SetOn : Request.S
-  with type input = ProjectRequest.t
-   and type output = json
-
-module ExecOn : Request.S
-  with type input = ProjectRequest.t
-   and type output = json
-
 (* -------------------------------------------------------------------------- *)

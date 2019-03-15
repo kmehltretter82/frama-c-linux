@@ -87,8 +87,8 @@ module Jbool : S_collection with type t = bool
 module Jint : S_collection with type t = int
 module Jfloat : S_collection with type t = float
 module Jstring : S_collection with type t = string
-module Jtext : S with type t = json
-(** Rich text encoding, see [Jbuffer] *)
+module Jident : S_collection with type t = string (** Syntax is {i ident}. *)
+module Jtext : S with type t = json (** Rich text encoding, see [Jbuffer] *)
 
 (* -------------------------------------------------------------------------- *)
 (** {2 Records} *)

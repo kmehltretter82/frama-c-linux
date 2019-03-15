@@ -35,45 +35,26 @@ let page = Doc.page `Kernel ~title:"Kernel Services" ~filename:"kernel.md"
 (* --- Config                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-module ConfigInfo =
-struct
-  type t = unit
-  let syntax = Sy.record []
-
-  let to_json () = `Assoc [
-      "version" , Jstring.to_json Config.version ;
-      "datadir" , Jstring.to_json Config.datadir ;
-      "libdir" , Jstring.to_json Config.libdir ;
-      "pluginpath" , Jstring.Jlist.to_json Config.plugin_dir ;
-    ]
-
-  let details =
-    let open Md in
-    table [ `Left "field" ; `Left "format" ; `Left "Description" ] [
-      [ tt "'version'" ; it "string" ; rm "Frama-C version" ] ;
-      [ tt "'datadir'" ; it "string" ; rm "Shared directory (FRAMAC_SHARE)" ] ;
-      [ tt "'libdir'"  ; it "string" ; rm "Lib directory (FRAMAC_LIB)" ] ;
-      [ tt "'pluginpath'" ; tt "[" <+> it "string" <+> tt ",…]" ;
-        rm "Plugin directories (FRAMAC_PLUGIN)" ] ;
-    ]
-
-end
-
-module GetConfig =
-  Request.Register
-    (Junit)
-    (ConfigInfo)
-    (struct
-      let page = page
-      let kind = `GET
-      let name = "Kernel.GetConfig"
-      let descr = Md.rm "Kernel configuration"
-      let details =
-        [Md.section ~title:"Output Configuration" ConfigInfo.details []]
-      type input = unit
-      type output = unit
-      let process () = ()
-    end)
+let () =
+  let get_config = Request.signature
+      ~page ~kind:`GET ~name:"kernel.getConfig"
+      ~descr:(Md.rm "Frama-C Kernel configuration")
+      ~input:(module Junit) () in
+  let result name descr =
+    Request.result get_config ~name ~descr:(Md.rm descr) (module Jstring) in
+  let set_version = result "version" "Frama-C version" in
+  let set_datadir = result "datadir" "Shared directory (FRAMAC_SHARE)" in
+  let set_libdir = result "libdir" "Lib directory (FRAMAC_LIB)" in
+  let set_pluginpath = Request.result get_config
+      ~name:"pluginpath" ~descr:(Md.rm "Plugin directories (FRAMAC_PLUGIN)")
+      (module Jstring.Jlist) in
+  Request.register_sig get_config
+    begin fun rq () ->
+      set_version rq Config.version ;
+      set_datadir rq Config.datadir ;
+      set_libdir rq Config.libdir ;
+      set_pluginpath rq Config.plugin_dir ;
+    end
 
 (* -------------------------------------------------------------------------- *)
 (* --- File Positions                                                     --- *)
@@ -178,6 +159,10 @@ end
 
 module LogEvent = Collection(RawEvent)
 
+(* -------------------------------------------------------------------------- *)
+(* --- Log Monitoring                                                     --- *)
+(* -------------------------------------------------------------------------- *)
+
 let monitoring = ref false
 let monitored = ref false
 let events : Log.event Queue.t = Queue.create ()
@@ -204,43 +189,27 @@ let () =
   Main.on monitor_server ;
   Cmdline.run_after_configuring_stage monitor_logs
 
-module SetLogs =
-  Request.Register
-    (Jbool)
-    (Junit)
-    (struct
-      let name = "Kernel.SetLogs"
-      let descr = Md.rm "Turn logs monitoring on/off"
-      let details = []
-      let page = page
-      let kind = `SET
-      type input = bool
-      type output = unit
-      let process = monitor
-    end)
+(* -------------------------------------------------------------------------- *)
+(* --- Log Requests                                                       --- *)
+(* -------------------------------------------------------------------------- *)
 
-module GetLogs =
-  Request.Register
-    (Junit)
-    (LogEvent.Jlist)
-    (struct
-      let name = "Kernel.GetLogs"
-      let descr = Md.rm "Flush emitted logs since last call (max 100)"
-      let details = []
-      let page = page
-      let kind = `GET
-      type input = unit
-      type output = Log.event list
+let () = Request.register
+    ~page ~kind:`SET ~name:"kernel.setLogs"
+    ~descr:(Md.rm "Turn logs monitoring on/off")
+    ~input:(module Jbool) ~output:(module Junit) monitor
 
-      let process () =
-        let pool = ref [] in
-        let count = ref 100 in
-        while not (Queue.is_empty events) && !count > 0 do
-          decr count ;
-          pool := Queue.pop events :: !pool
-        done ;
-        List.rev !pool
-
-    end)
+let () = Request.register
+    ~page ~kind:`GET ~name:"kernel.getLogs"
+    ~descr:(Md.rm "Flush the last emitted logs since last call (max 100)")
+    ~input:(module Junit) ~output:(module LogEvent.Jlist)
+    begin fun () ->
+      let pool = ref [] in
+      let count = ref 100 in
+      while not (Queue.is_empty events) && !count > 0 do
+        decr count ;
+        pool := Queue.pop events :: !pool
+      done ;
+      List.rev !pool
+    end
 
 (* -------------------------------------------------------------------------- *)

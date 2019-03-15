@@ -78,6 +78,7 @@ let publish ~page ~name ~descr ~synopsis ?(details = Markdown.empty) () =
   let link = Markdown.href ~title:link_title href in
   format := link ; atom @@ link
 
+let unit = atom @@ Markdown.rm "-"
 let any = atom @@ Markdown.it "any"
 let int = atom @@ Markdown.it "int"
 let ident = atom @@ Markdown.it "ident"
@@ -85,13 +86,11 @@ let string = atom @@ Markdown.it "string"
 let number = atom @@ Markdown.it "number"
 let boolean = atom @@ Markdown.it "boolean"
 
-let null = atom @@ Markdown.tt "null" (* really « tt » *)
-
 let escaped name = Markdown.tt @@ Printf.sprintf "'%s'" @@ String.escaped name
 
 let tag name = atom @@ escaped name
 
-let array a = atom @@ Markdown.(tt "[" <+> protect a <+> tt ",…]")
+let array a = atom @@ Markdown.(tt "[" <+> protect a <+> tt ", … ]")
 
 let tuple ts =
   atom @@ Markdown.(tt "["

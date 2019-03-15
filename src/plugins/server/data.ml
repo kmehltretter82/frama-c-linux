@@ -147,7 +147,7 @@ end
 module Junit : S with type t = unit =
 struct
   type t = unit
-  let syntax = Syntax.null
+  let syntax = Syntax.unit
   let of_json _js = ()
   let to_json () = `Null
 end
@@ -192,6 +192,15 @@ module Jstring : S_collection with type t = string =
     (struct
       type t = string
       let syntax = Syntax.string
+      let of_json = Jutil.to_string
+      let to_json s = `String s
+    end)
+
+module Jident : S_collection with type t = string =
+  Collection
+    (struct
+      type t = string
+      let syntax = Syntax.ident
       let of_json = Jutil.to_string
       let to_json s = `String s
     end)

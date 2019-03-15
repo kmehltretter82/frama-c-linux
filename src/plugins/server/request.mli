@@ -52,9 +52,9 @@ type 'b output = (module Output with type t = 'b)
      - No publication on [`Protocol] pages
      - Kernel requests shall starts with ["Kernel.*"]
      - Plugin requests shall starts with ["<Plugin>.*"]
-     - GET requests must contain ["get"] or ["print"] (case insensitive)
      - SET requests must contain ["set"] (case insensitive)
-     - EXEC requests must contain ["exec"] (case insensitive)
+     - GET requests must contain ["get"] or ["print"] (case insensitive)
+     - EXEC requests must contain ["exec"] or ["compute"] (case insensitive)
 
 *)
 val register :
@@ -65,8 +65,7 @@ val register :
   ?details:Markdown.block ->
   input:'a input ->
   output:'b output ->
-  process:('a -> 'b) ->
-  unit -> unit
+  ('a -> 'b) -> unit
 
 (** {2 Requests with Named Parameters}
 
@@ -192,44 +191,5 @@ val result_opt : ('a,unit) signature ->
   name:string ->
   descr:Markdown.text ->
   'b output -> 'b option result
-
-(** {2 Functorial Interface} *)
-
-module type RequestInfo =
-sig
-  type input
-  type output
-  val page : Doc.page (** Page to publish the request in *)
-  val name : string (** Shall starts with the plug-in name *)
-  val kind : kind (** Request kind *)
-  val descr : Markdown.text (** Short introduction (one paragraph) *)
-  val details : Markdown.section list (** Detailed documentation *)
-  val process : input -> output (** Request processing *)
-end
-
-module type S =
-sig
-  include RequestInfo
-  val href : Markdown.href
-  val process_json : json -> json
-end
-
-(** Register a server request.
-
-    The documentation is automatically published into the specified page.
-    Some (case-insensitive) sanity checks are performed on the request
-    informations:
-    - it shall not be published in [`Protocol] pages;
-    - its name shall starts the plug-in name, eg. ["MyPlugin.*"], or ["Kernel.*"] for
-    kernel plug-ins;
-    - its name shall contains ["get"], ["set"] or ["exec"] depending on its
-    specified kind.
-
-*)
-module Register
-    (Input : Input)
-    (Output : Output)
-    (Rq : RequestInfo with type input = Input.t and type output = Output.t) :
-  (S with type input = Input.t and type output = Output.t)
 
 (* -------------------------------------------------------------------------- *)

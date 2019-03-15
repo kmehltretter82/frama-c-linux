@@ -27,23 +27,16 @@ module Md = Markdown
 module Js = Yojson.Basic.Util
 open Cil_types
 
-(* -------------------------------------------------------------------------- *)
-(* --- Frama-C Ast Services                                               --- *)
-(* -------------------------------------------------------------------------- *)
-
 let page = Doc.page `Kernel ~title:"Ast Services" ~filename:"ast.md"
 
-module ExecCompute = Request.Register(Junit)(Junit)
-    (struct
-      let kind = `EXEC
-      let name = "Kernel.Ast.ExecCompute"
-      let descr = Md.rm "Ensures that AST is computed"
-      let page = page
-      let details = []
-      type input = unit
-      type output = unit
-      let process = Ast.compute
-    end)
+(* -------------------------------------------------------------------------- *)
+(* --- Compute Ast                                                        --- *)
+(* -------------------------------------------------------------------------- *)
+
+let () = Request.register ~page
+    ~kind:`EXEC ~name:"kernel.ast.compute"
+    ~descr:(Md.rm "Ensures that AST is computed")
+    ~input:(module Junit) ~output:(module Junit) Ast.compute
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Printers                                                          --- *)
@@ -138,10 +131,11 @@ module Ki = Data.Collection
 module Kf = Data.Collection
     (struct
       type t = kernel_function
-      let syntax = Sy.publish ~page ~name:"function"
+      let syntax = Sy.publish ~page ~name:"fct-id"
           ~synopsis:Sy.ident
           ~descr:(Md.rm "Function identified by its global name.") ()
-      let to_json kf = `String (Kernel_function.get_name kf)
+      let to_json kf =
+        `String (Kernel_function.get_name kf)
       let of_json js =
         try Js.to_string js |> Globals.Functions.find_by_name
         with Not_found -> Data.failure "Undefined function" js
@@ -151,32 +145,20 @@ module Kf = Data.Collection
 (* --- Functions                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-module GetFunctions = Request.Register(Junit)(Kf.Jlist)
-    (struct
-      let kind = `GET
-      let name = "Kernel.Ast.GetFunctions"
-      let descr = Md.rm "Collect all functions in the AST"
-      let page = page
-      let details = []
-      type input = unit
-      type output = kernel_function list
-      let process () =
-        let pool = ref [] in
-        Globals.Functions.iter (fun kf -> pool := kf :: !pool) ;
-        List.rev !pool
-    end)
+let () = Request.register ~page
+    ~kind:`GET ~name:"kernel.ast.getFunctions"
+    ~descr:(Md.rm "Collect all functions in the AST")
+    ~input:(module Junit) ~output:(module Kf.Jlist)
+    begin fun () ->
+      let pool = ref [] in
+      Globals.Functions.iter (fun kf -> pool := kf :: !pool) ;
+      List.rev !pool
+    end
 
-module PrintFunction = Request.Register(Kf)(Jtext)
-    (struct
-      let kind = `GET
-      let name = "Kernel.Ast.PrintFunction"
-      let descr = Md.rm "Print the AST of a function"
-      let page = page
-      let details = []
-      type input = kernel_function
-      type output = json
-      let process kf =
-        Jbuffer.to_json PP.pp_global (Kernel_function.get_global kf)
-    end)
+let () = Request.register ~page
+    ~kind:`GET ~name:"kernel.ast.printFunction"
+    ~descr:(Md.rm "Print the AST of a function")
+    ~input:(module Kf) ~output:(module Jtext)
+    (fun kf -> Jbuffer.to_json PP.pp_global (Kernel_function.get_global kf))
 
 (* -------------------------------------------------------------------------- *)
