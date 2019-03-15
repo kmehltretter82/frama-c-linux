@@ -339,7 +339,7 @@ val mkdir : ?parents:bool -> string -> Unix.file_perm -> unit
       and then fail to create the children, e.g. if [perm] does not allow
       user execution of the created directory. This will leave the filesystem
       in a modified state before raising an exception.
-      @raise [Unix.Unix_error] if cannot create [name] or its parents.
+      @raise Unix.Unix_error if cannot create [name] or its parents.
       @since Frama-C+dev  *)
 
 val safe_at_exit : (unit -> unit) -> unit
