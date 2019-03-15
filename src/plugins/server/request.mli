@@ -46,7 +46,17 @@ type 'b output = (module Output with type t = 'b)
 
 (** {2 Simple Requests Registration} *)
 
-(** Register a simple request of type [(a -> b)]. *)
+(** Register a simple request of type [(a -> b)].
+
+    Name, page and kind must be consistent with each others:
+     - No publication on [`Protocol] pages
+     - Kernel requests shall starts with ["Kernel.*"]
+     - Plugin requests shall starts with ["<Plugin>.*"]
+     - GET requests must contain ["get"] or ["print"] (case insensitive)
+     - SET requests must contain ["set"] (case insensitive)
+     - EXEC requests must contain ["exec"] (case insensitive)
+
+*)
 val register :
   page:Doc.page ->
   kind:kind ->
@@ -72,12 +82,13 @@ val register :
     function:
 
     {[
+      (* ---- Exemple of Request Registration --- *)
       let () =
         let s = Request.signature ~page ~kind ~name ~descr () in
-        let get_a = Request.param s ~name:"a" ~descr:"…" (module A) in
-        let get_b = Request.param s ~name:"b" ~descr:"…" (module B) in
-        let set_c = Request.result s ~name:"c" ~descr:"…" (module C) in
-        let set_d = Request.result s ~name:"d" ~descr:"…" (module D) in
+        let get_a = Request.param s ~name:"a" ~descr:"..." (module A) in
+        let get_b = Request.param s ~name:"b" ~descr:"..." (module B) in
+        let set_c = Request.result s ~name:"c" ~descr:"..." (module C) in
+        let set_d = Request.result s ~name:"d" ~descr:"..." (module D) in
         Request.register_sig s
           (fun rq () ->
              let (c,d) = some_job (get_a rq) (get_b rq) in
@@ -130,7 +141,7 @@ val register_sig : ('a,'b) signature -> (rq -> 'a -> 'b) -> unit
     [
 
         API:                    Input JSON   OCaml Getter
-        -----------------------------------------------------
+        -----------------------------------------------------------------------
         Request.param            { f: a  }    'a (* might raise an exception *)
         Request.param ~default   { f: a? }    'a (* defined by default *)
         Request.param_opt        { f: a? }    'a option
@@ -142,7 +153,7 @@ val register_sig : ('a,'b) signature -> (rq -> 'a -> 'b) -> unit
     [
 
         API:                    Input JSON   OCaml Setter
-        ----------------------------------------------------
+        ----------------------------------------------------------------------
         Request.result           { f: a  }    'a (* shall be set by process *)
         Request.result ~default  { f: a  }    'a (* defined by default *)
         Request.param_opt        { f: a? }    'a option

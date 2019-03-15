@@ -36,6 +36,14 @@ sig
   val to_json : t -> json
 end
 
+
+(** Datatype registration.
+
+    Name and page must be consistent with each other:
+     - The name must be lowercase, dash-separated list of identifiers
+     - Protocol data must start with ["<server>-*"]
+     - Plugin data must start with ["<plugin>-*"]
+*)
 module type Info =
 sig
   val page : Doc.page

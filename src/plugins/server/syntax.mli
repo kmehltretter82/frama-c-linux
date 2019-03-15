@@ -52,7 +52,8 @@ val record : (string * t) list -> t
 
 type field = { name : string ; syntax : t ; descr : Markdown.text }
 
-(** Builds a table with fields column named « Kind » *)
-val fields : kind:string -> field list -> Markdown.block
+(** Builds a table with fields column named with [~title]
+    (shall be capitalized) *)
+val fields : title:string -> field list -> Markdown.block
 
 (* -------------------------------------------------------------------------- *)

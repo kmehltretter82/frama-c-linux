@@ -116,8 +116,8 @@ type field = {
   descr : Markdown.text ;
 }
 
-let fields ~kind (fds : field list) =
-  let c_field = `Left kind in
+let fields ~title (fds : field list) =
+  let c_field = `Left title in
   let c_format = `Center "Format" in
   let c_descr = `Left "Description" in
   Markdown.table [ c_field ; c_format ; c_descr ]

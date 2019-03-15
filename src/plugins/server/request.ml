@@ -206,14 +206,14 @@ let doc_input (type a) (input : a rq_input) : Markdown.block =
   match input with
   | Pnone -> assert false
   | Pdata _ -> Markdown.empty
-  | Pfields fs -> Syntax.fields ~kind:"Input" (List.rev fs)
+  | Pfields fs -> Syntax.fields ~title:"Input" (List.rev fs)
 
 (* json output syntax *)
 let doc_output (type b) (output : b rq_output) : Markdown.block =
   match output with
   | Rnone -> assert false
   | Rdata _ -> Markdown.empty
-  | Rfields fs -> Syntax.fields ~kind:"Output" (List.rev fs)
+  | Rfields fs -> Syntax.fields ~title:"Output" (List.rev fs)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Multi-Parameters Requests                                          --- *)
