@@ -357,6 +357,7 @@ ML_LINT_KO+=src/plugins/pdg_types/pdgTypes.mli
 ML_LINT_KO+=src/plugins/postdominators/compute.ml
 ML_LINT_KO+=src/plugins/postdominators/postdominators_parameters.ml
 ML_LINT_KO+=src/plugins/postdominators/print.ml
+ML_LINT_KO+=src/plugins/print_api/dynamic_plugins.mli
 ML_LINT_KO+=src/plugins/print_api/print_interface.ml
 ML_LINT_KO+=src/plugins/scope/Scope.mli
 ML_LINT_KO+=src/plugins/scope/datascope.ml
