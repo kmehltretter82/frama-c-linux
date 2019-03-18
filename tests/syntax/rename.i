@@ -38,3 +38,9 @@ void f4(int *j_0_1) {
   { int j_0_1 = j_0;
     j_0_1+=j_0; }
 }
+
+struct not_anon {
+    int __anonCompField1;
+};
+
+struct not_anon s = {.__anonCompField1 = 0};
