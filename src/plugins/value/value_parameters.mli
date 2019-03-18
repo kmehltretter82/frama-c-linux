@@ -149,6 +149,9 @@ module MallocFunctions: Parameter_sig.String_set
 module AllocReturnsNull: Parameter_sig.Bool
 module MallocLevel: Parameter_sig.Int
 
+(** Meta-option *)
+module Precision: Parameter_sig.Int
+
 
 val parameters_correctness: Typed_parameter.t list
 val parameters_tuning: Typed_parameter.t list

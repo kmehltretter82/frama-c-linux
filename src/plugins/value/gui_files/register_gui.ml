@@ -113,16 +113,24 @@ let value_panel pack (main_ui:main_ui) =
     GPack.table ~packing:(box#pack ~expand:true ~fill:true) ~columns:2 ()
   in
   let box_1_1 = GPack.hbox ~packing:(w#attach ~left:1 ~top:1) () in
+  let precision_refresh =
+    let tooltip = Value_parameters.Precision.parameter.Typed_parameter.help in
+    Gtk_helper.on_int ~lower:(-1) ~upper:11 ~tooltip
+      box_1_1 "precision (meta-option)"
+      Value_parameters.Precision.get
+      Value_parameters.Precision.set
+  in
+  let box_1_2 = GPack.hbox ~packing:(w#attach ~left:1 ~top:2) () in
   let slevel_refresh =
     let tooltip =
       Value_parameters.SemanticUnrollingLevel.parameter.Typed_parameter.help
     in
     Gtk_helper.on_int ~lower:0 ~upper:1000000 ~tooltip
-      box_1_1 "slevel"
+      box_1_2 "slevel"
       Value_parameters.SemanticUnrollingLevel.get
       Value_parameters.SemanticUnrollingLevel.set
   in
-  let box_1_2 = GPack.hbox ~packing:(w#attach ~left:1 ~top:2) () in
+  let box_1_3 = GPack.hbox ~packing:(w#attach ~left:1 ~top:3) () in
   let validator s =
     not
       (Kernel_function.Set.is_empty
@@ -130,9 +138,9 @@ let value_panel pack (main_ui:main_ui) =
   in
   let main_refresh = Gtk_helper.on_string
       ~tooltip:Kernel.MainFunction.parameter.Typed_parameter.help
-      ~validator box_1_2 "main" Kernel.MainFunction.get Kernel.MainFunction.set
+      ~validator box_1_3 "main" Kernel.MainFunction.get Kernel.MainFunction.set
   in
-  let refresh () = slevel_refresh (); main_refresh() in
+  let refresh () = precision_refresh (); slevel_refresh (); main_refresh() in
   ignore (run_button#connect#pressed
             (fun () ->
                main_ui#protect ~cancelable:true
