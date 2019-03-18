@@ -1322,26 +1322,6 @@ let () = MallocLevel.add_aliases ["-val-mlevel"]
 (* --- Meta options                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-let () = Parameter_customize.set_negative_option_name ""
-module Fast =
-  False
-    (struct
-      let option_name = "-eva-fast"
-      let help = "Quick configuration for a fast (but rather imprecise) analysis. \
-                  Opposite of (and incompatible with) -eva-precise. \
-                  Equivalent to -eva-precision 0."
-    end)
-
-let () = Parameter_customize.set_negative_option_name ""
-module Precise =
-  False
-    (struct
-      let option_name = "-eva-precise"
-      let help = "Quick configuration for a precise (but rather slow) analysis. \
-                  Opposite of (and incompatible with) -eva-fast. \
-                  Equivalent to -eva-precision 5."
-    end)
-
 module Precision =
   Int
     (struct
@@ -1351,59 +1331,47 @@ module Precision =
       let help = "Meta-option that automatically sets up some Eva parameters \
                   for a quick configuration of an analysis, \
                   from 0 (fastest but rather imprecise analysis) \
-                  to 10 (accurate but potentially slow analysis)."
+                  to 11 (accurate but potentially slow analysis)."
     end)
-let () = Precision.set_range (-1) 10
+let () = Precision.set_range (-1) 11
 
-let incompatible_meta_options () =
-  abort "The meta options %s, %s and %s are mutually incompatible."
-    Fast.name Precise.name Precision.name
-
-(* Sets a parameter, unless is is already set. *)
-let set (type t) (module P: Parameter_sig.S with type t = t) t =
-  if P.is_set ()
-  then printf "  option %s has already been set, and is not modified." P.name
-  else
-    begin
-      P.set t;
-      let str = Typed_parameter.get_value P.parameter in
-      if P.is_default ()
-      then printf "  option %s kept at its default value: %s." P.name str
-      else printf "  option %s set to %s." P.name str;
-    end
+(* Sets a parameter to [t], or to its default value if [default] is true. *)
+let set (type t) (module P: Parameter_sig.S with type t = t) ~default t =
+  if default then P.clear () else P.set t;
+  let str = Typed_parameter.get_value P.parameter in
+  let str = match P.parameter.Typed_parameter.accessor with
+    | Typed_parameter.String _ -> "\'" ^ str ^ "\'"
+    | _ -> str
+  in
+  printf "  option %s set to %s%s." P.name str
+    (if P.is_default () then " (default value)" else "")
 
 (*  power             0   1   2   3   4    5    6    7     8     9     10     11 *)
 let slevel_power = [| 0;  10; 20; 50;  75; 100; 200; 500; 1000; 2000; 5000; 10000 |]
 let ilevel_power = [| 8;  12; 16; 24;  32;  64; 128; 256;  256;  256;  256;   256 |]
 let plevel_power = [| 10; 20; 40; 70; 100; 150; 200; 300;  500;  700; 1000;  2000 |]
 
+let get array n = if n < 0 then 0 else array.(n)
 
 let set_analysis option_name n =
-  if Fast.is_set () && option_name <> Fast.name
-  || Precise.is_set () && option_name <> Precise.name
-  || Precision.is_set () && option_name <> Precision.name
-  then incompatible_meta_options ();
-  feedback "Option %s detected, \
-            automatic configuration of the analysis:" option_name;
-  set (module (MinLoopUnroll)) (max 0 (n - 4));
-  set (module (SemanticUnrollingLevel)) (slevel_power.(n));
-  set (module (WideningDelay)) (1 + n / 2);
-  set (module (ILevel)) (ilevel_power.(n));
-  set (module (ArrayPrecisionLevel)) (plevel_power.(n));
-  set (module (LinearLevel)) (20 * n);
-  set (module (RmAssert)) (n > 0);
-  set (module (SymbolicLocsDomain)) (n > 0);
-  set (module (EqualityDomain)) (n > 1);
-  set (module (EqualityCall)) (if n > 2 then "formals" else "none");
-  set (module (GaugesDomain)) (n > 3);
-  set (module (SplitReturn)) (if n > 4 then "auto" else "");
+  feedback "Option %s %i detected, \
+            automatic configuration of the analysis:" option_name n;
+  let default = n < 0 in
+  set (module (MinLoopUnroll)) ~default (max 0 (n - 4));
+  set (module (SemanticUnrollingLevel)) ~default (get slevel_power n);
+  set (module (WideningDelay)) ~default (1 + n / 2);
+  set (module (ILevel)) ~default (get ilevel_power n);
+  set (module (ArrayPrecisionLevel)) ~default (get plevel_power n);
+  set (module (LinearLevel)) ~default (20 * n);
+  set (module (RmAssert)) ~default (n > 0);
+  set (module (SymbolicLocsDomain)) ~default (n > 0);
+  set (module (EqualityDomain)) ~default (n > 1);
+  set (module (EqualityCall)) ~default (if n > 2 then "formals" else "none");
+  set (module (GaugesDomain)) ~default (n > 3);
+  set (module (SplitReturn)) ~default (if n > 4 then "auto" else "");
   ()
 
-let () =
-  Fast.add_update_hook (fun _ n -> if n then set_analysis Fast.name 0);
-  Precise.add_update_hook (fun _ n -> if n then set_analysis Precise.name 5);
-  Precision.add_update_hook
-    (fun _ n -> if n >= 0 then set_analysis Precision.name n)
+let () = Precision.add_update_hook (fun _ n -> set_analysis Precision.name n)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Freeze parameters. MUST GO LAST                                    --- *)
