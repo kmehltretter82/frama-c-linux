@@ -36,8 +36,8 @@ __PUSH_FC_STDLIB
 #include "__fc_define_intptr_t.h"
 #include "__fc_select.h"
 
-#include <getopt.h>
-#include <limits.h>
+#include "getopt.h"
+#include "limits.h"
 
 extern volatile int Frama_C_entropy_source;
 

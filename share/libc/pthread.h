@@ -366,8 +366,8 @@ extern void pthread_testcancel(void);
 
 // From POSIX: "Inclusion of the <pthread.h> header shall make symbols defined
 //              in the headers <sched.h> and <time.h> visible."
-#include <sched.h>
-#include <time.h>
+//              (sched.h has already been included)
+#include "time.h"
 
 __POP_FC_STDLIB
 #endif

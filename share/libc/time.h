@@ -31,7 +31,7 @@ __PUSH_FC_STDLIB
 #include "__fc_string_axiomatic.h"
 
 #include "errno.h"
-
+#include "signal.h"
 /*
  * Names of the interval timers, and structure
  * defining a timer setting:

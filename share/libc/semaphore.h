@@ -26,7 +26,7 @@
 #define __FC_SEMAPHORE
 #include "features.h"
 __PUSH_FC_STDLIB
-#include <time.h>
+#include "time.h"
 
 __BEGIN_DECLS
 
