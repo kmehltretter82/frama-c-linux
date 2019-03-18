@@ -54,6 +54,11 @@ if [ $# -lt 1 ]; then
    echo "      Lists files in [dirs] declaring or defining <function-name>"
    echo "      (defaults to PWD + /usr/include)."
    echo "      Heuristics-based: neither correct nor complete."
+   echo ""
+   echo "  - summary [options]"
+   echo "      Monitors and summarizes multiple analyses dispatched by a Makefile"
+   echo "      in the current PWD."
+   echo "      Use $0 summary --help for more informations."
    exit
 fi
 
@@ -200,6 +205,10 @@ case "$command" in
     "flamegraph")
         shift;
         flamegraph "$@";
+        ;;
+    "summary")
+        shift;
+        ${FRAMAC_SHARE}/analysis-scripts/summary.py "$@";
         ;;
     *)
         echo "error: unrecognized command: $command"
