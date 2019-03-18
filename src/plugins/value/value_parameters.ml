@@ -1329,7 +1329,7 @@ module Fast =
       let option_name = "-eva-fast"
       let help = "Quick configuration for a fast (but rather imprecise) analysis. \
                   Opposite of (and incompatible with) -eva-precise. \
-                  Equivalent to -eva-power 0."
+                  Equivalent to -eva-precision 0."
     end)
 
 let () = Parameter_customize.set_negative_option_name ""
@@ -1339,13 +1339,13 @@ module Precise =
       let option_name = "-eva-precise"
       let help = "Quick configuration for a precise (but rather slow) analysis. \
                   Opposite of (and incompatible with) -eva-fast. \
-                  Equivalent to -eva-power 5."
+                  Equivalent to -eva-precision 5."
     end)
 
-module Power =
+module Precision =
   Int
     (struct
-      let option_name = "-eva-power"
+      let option_name = "-eva-precision"
       let arg_name = "n"
       let default = -1
       let help = "Meta-option that automatically sets up some Eva parameters \
@@ -1353,11 +1353,11 @@ module Power =
                   from 0 (fastest but rather imprecise analysis) \
                   to 10 (accurate but potentially slow analysis)."
     end)
-let () = Power.set_range (-1) 10
+let () = Precision.set_range (-1) 10
 
 let incompatible_meta_options () =
   abort "The meta options %s, %s and %s are mutually incompatible."
-    Fast.name Precise.name Power.name
+    Fast.name Precise.name Precision.name
 
 (* Sets a parameter, unless is is already set. *)
 let set (type t) (module P: Parameter_sig.S with type t = t) t =
@@ -1373,15 +1373,15 @@ let set (type t) (module P: Parameter_sig.S with type t = t) t =
     end
 
 (*  power             0   1   2   3   4    5    6    7     8     9     10     11 *)
-let slevel_power = [| 0;  10; 20; 50; 100; 200; 500; 1000; 2000; 5000; 10000; 20000 |]
-let ilevel_power = [| 8;  12; 16; 24; 32;  64;  128; 256;  256;  256;  256;   256 |]
-let plevel_power = [| 10; 20; 40; 70; 100; 150; 200; 300;  500;  700;  1000;  2000 |]
+let slevel_power = [| 0;  10; 20; 50;  75; 100; 200; 500; 1000; 2000; 5000; 10000 |]
+let ilevel_power = [| 8;  12; 16; 24;  32;  64; 128; 256;  256;  256;  256;   256 |]
+let plevel_power = [| 10; 20; 40; 70; 100; 150; 200; 300;  500;  700; 1000;  2000 |]
 
 
 let set_analysis option_name n =
   if Fast.is_set () && option_name <> Fast.name
   || Precise.is_set () && option_name <> Precise.name
-  || Power.is_set () && option_name <> Power.name
+  || Precision.is_set () && option_name <> Precision.name
   then incompatible_meta_options ();
   feedback "Option %s detected, \
             automatic configuration of the analysis:" option_name;
@@ -1402,7 +1402,8 @@ let set_analysis option_name n =
 let () =
   Fast.add_update_hook (fun _ n -> if n then set_analysis Fast.name 0);
   Precise.add_update_hook (fun _ n -> if n then set_analysis Precise.name 5);
-  Power.add_update_hook (fun _ n -> if n >= 0 then set_analysis Power.name n)
+  Precision.add_update_hook
+    (fun _ n -> if n >= 0 then set_analysis Precision.name n)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Freeze parameters. MUST GO LAST                                    --- *)
