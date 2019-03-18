@@ -41,3 +41,7 @@ iptr h(volatile iptr ip2) {
 }
 
 iptr volatile h(const iptr ip3);
+
+void test(void) {
+  int a, __attribute__((unused)) b;
+}

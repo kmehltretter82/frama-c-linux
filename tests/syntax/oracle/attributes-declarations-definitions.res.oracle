@@ -42,4 +42,11 @@ iptr h(iptr volatile ip3)
   return __retres;
 }
 
+void test(void)
+{
+  int a;
+  int b __attribute__((__unused__));
+  return;
+}
+
 
