@@ -3532,7 +3532,8 @@ let fieldsToInit
     else if found then
       found, offset :: loff
       (* if this field is an anonymous comp, search for the designator inside *)
-    else if prefix anonCompFieldName f.fname && not found then
+    else if prefix anonCompFieldName f.fname && not found
+            && f.forig_name <> f.fname then
       match unrollType f.ftype with
       | TComp (comp, _, _) ->
         add_comp offset comp acc (* go deeper inside *)
