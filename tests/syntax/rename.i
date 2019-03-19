@@ -44,3 +44,9 @@ struct not_anon {
 };
 
 struct not_anon s = {.__anonCompField1 = 0};
+
+struct anon {
+  struct { int inner_i; };
+};
+
+struct anon a = { .inner_i = 0 };
