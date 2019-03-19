@@ -157,6 +157,7 @@ let reset_analyzer () =
 (* Builds the analyzer if needed, and run the analysis. *)
 let force_compute () =
   Ast.compute ();
+  Value_parameters.configure_precision ();
   let kf, lib_entry = Globals.entry_point () in
   reset_analyzer ();
   let module Analyzer = (val snd !ref_analyzer) in

@@ -152,6 +152,10 @@ module MallocLevel: Parameter_sig.Int
 (** Meta-option *)
 module Precision: Parameter_sig.Int
 
+(* Automatically sets some parameters according to the meta-option
+   -eva-precision. *)
+val configure_precision: unit -> unit
+
 
 val parameters_correctness: Typed_parameter.t list
 val parameters_tuning: Typed_parameter.t list

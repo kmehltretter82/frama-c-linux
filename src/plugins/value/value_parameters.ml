@@ -1334,17 +1334,33 @@ module Precision =
                   to 11 (accurate but potentially slow analysis)."
     end)
 let () = Precision.set_range (-1) 11
+let () = add_precision_dep Precision.parameter
 
-(* Sets a parameter to [t], or to its default value if [default] is true. *)
-let set (type t) (module P: Parameter_sig.S with type t = t) ~default t =
-  if default then P.clear () else P.set t;
-  let str = Typed_parameter.get_value P.parameter in
-  let str = match P.parameter.Typed_parameter.accessor with
-    | Typed_parameter.String _ -> "\'" ^ str ^ "\'"
-    | _ -> str
-  in
-  printf "  option %s set to %s%s." P.name str
-    (if P.is_default () then " (default value)" else "")
+(* Sets a parameter [P] to [t], unless it has already been set by another mean
+   that this function. *)
+let set (type t) (module P: Parameter_sig.S with type t = t) =
+  let previous = ref (P.get ()) in
+  fun t ->
+    let already_set = P.is_set () && not (P.equal !previous (P.get ())) in
+    if not already_set then begin P.set t; previous := t end;
+    let str = Typed_parameter.get_value P.parameter in
+    let str = match P.parameter.Typed_parameter.accessor with
+      | Typed_parameter.String _ -> "\'" ^ str ^ "\'"
+      | _ -> str
+    in
+    printf "  option %s %sset to %s%s." P.name
+      (if already_set then "already " else "") str
+      (if already_set && not (P.equal t (P.get ())) then " (not modified)"
+       else if P.is_default () then " (default value)" else "")
+
+(* List of configure functions to be called for -eva-precision. *)
+let configures = ref []
+
+(* Binds the parameter [P] to the function [f] that gives the parameter value
+   for a precision n. *)
+let bind (type t) (module P: Parameter_sig.S with type t = t) f =
+  let set = set (module P) in
+  configures := (fun n -> set (f n)) :: !configures
 
 (*  power             0   1   2   3   4    5    6    7     8     9     10     11 *)
 let slevel_power = [| 0;  10; 20; 50;  75; 100; 200; 500; 1000; 2000; 5000; 10000 |]
@@ -1353,25 +1369,29 @@ let plevel_power = [| 10; 20; 40; 70; 100; 150; 200; 300;  500;  700; 1000;  200
 
 let get array n = if n < 0 then 0 else array.(n)
 
-let set_analysis option_name n =
-  feedback "Option %s %i detected, \
-            automatic configuration of the analysis:" option_name n;
-  let default = n < 0 in
-  set (module (MinLoopUnroll)) ~default (max 0 (n - 4));
-  set (module (SemanticUnrollingLevel)) ~default (get slevel_power n);
-  set (module (WideningDelay)) ~default (1 + n / 2);
-  set (module (ILevel)) ~default (get ilevel_power n);
-  set (module (ArrayPrecisionLevel)) ~default (get plevel_power n);
-  set (module (LinearLevel)) ~default (20 * n);
-  set (module (RmAssert)) ~default (n > 0);
-  set (module (SymbolicLocsDomain)) ~default (n > 0);
-  set (module (EqualityDomain)) ~default (n > 1);
-  set (module (EqualityCall)) ~default (if n > 2 then "formals" else "none");
-  set (module (GaugesDomain)) ~default (n > 3);
-  set (module (SplitReturn)) ~default (if n > 4 then "auto" else "");
+let () =
+  bind (module MinLoopUnroll) (fun n -> max 0 (n - 4));
+  bind (module SemanticUnrollingLevel) (get slevel_power);
+  bind (module WideningDelay) (fun n -> 1 + n / 2);
+  bind (module ILevel) (get ilevel_power);
+  bind (module ArrayPrecisionLevel) (get plevel_power);
+  bind (module LinearLevel) (fun n -> n * 20);
+  bind (module RmAssert) (fun n -> n > 0);
+  bind (module SymbolicLocsDomain) (fun n -> n > 0);
+  bind (module EqualityDomain) (fun n -> n > 1);
+  bind (module EqualityCall) (fun n -> if n > 2 then "formals" else "none");
+  bind (module GaugesDomain) (fun n -> n > 3);
+  bind (module SplitReturn) (fun n -> if n > 4 then "auto" else "");
   ()
 
-let () = Precision.add_set_hook (fun _ n -> set_analysis Precision.name n)
+let set_analysis n =
+  feedback "Option %s %i detected, \
+            automatic configuration of the analysis:" Precision.name n;
+  List.iter ((|>) n) (List.rev !configures)
+
+let configure_precision () =
+  let n = Precision.get () in
+  if n >= 0 then set_analysis n
 
 (* -------------------------------------------------------------------------- *)
 (* --- Freeze parameters. MUST GO LAST                                    --- *)
