@@ -1371,7 +1371,7 @@ let set_analysis option_name n =
   set (module (SplitReturn)) ~default (if n > 4 then "auto" else "");
   ()
 
-let () = Precision.add_update_hook (fun _ n -> set_analysis Precision.name n)
+let () = Precision.add_set_hook (fun _ n -> set_analysis Precision.name n)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Freeze parameters. MUST GO LAST                                    --- *)
