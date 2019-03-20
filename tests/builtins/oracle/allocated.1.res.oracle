@@ -325,7 +325,8 @@
   Semantic level unrolling superposing up to 100 states
 [eva] tests/builtins/allocated.c:84: 
   Semantic level unrolling superposing up to 200 states
-[eva] :0: Semantic level unrolling superposing up to 300 states
+[eva] tests/builtins/allocated.c:84: 
+  Semantic level unrolling superposing up to 300 states
 [eva] tests/builtins/allocated.c:84: 
   Semantic level unrolling superposing up to 400 states
 [eva] tests/builtins/allocated.c:87: Call to builtin free

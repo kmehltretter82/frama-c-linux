@@ -473,15 +473,15 @@ module Make_Dataflow
     let store = get_vertex_store v in
     (* Join incoming s tates *)
     let f = Partition.join sources store in
-    (* Output slevel related things *)
-    let store_size = Partition.store_size store in
-    output_slevel store_size;
     begin match v.vertex_start_of with
       | Some stmt ->
         (* Callbacks *)
         call_statement_callbacks stmt f;
         (* Transfer function associated to the statement *)
         Partition.transfer (transfer_statement stmt) f;
+        (* Output slevel related things *)
+        let store_size = Partition.store_size store in
+        output_slevel store_size;
         (* Debug informations *)
         Value_parameters.debug ~dkey ~current:true
           "reached statement %d with %d / %d eternal states, %d to propagate"
