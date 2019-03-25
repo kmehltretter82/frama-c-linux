@@ -251,16 +251,21 @@ DISTRIB_FILES:=\
       Changelog config.h.in						\
       VERSION VERSION_CODENAME $(wildcard licenses/*)                   \
       $(LIBC_FILES)							\
+      share/analysis-scripts/benchmark_database.py                      \
       share/analysis-scripts/cmd-dep.sh                                 \
       share/analysis-scripts/concat-csv.sh                              \
+      share/analysis-scripts/clone.sh                                   \
       $(wildcard share/analysis-scripts/examples/*)                     \
       share/analysis-scripts/find_fun.py                                \
       share/analysis-scripts/flamegraph.pl                              \
       share/analysis-scripts/frama-c.mk                                 \
+      share/analysis-scripts/frama_c_results.py                         \
+      share/analysis-scripts/git_utils.py                               \
       share/analysis-scripts/list_files.py                              \
       share/analysis-scripts/parse-coverage.sh                          \
-      share/analysis-scripts/summary.sh                                 \
       share/analysis-scripts/README.md                                  \
+      share/analysis-scripts/results_display.py                         \
+      share/analysis-scripts/summary.py                                 \
       share/analysis-scripts/template.mk                                \
       $(wildcard share/emacs/*.el) share/autocomplete_frama-c           \
       share/_frama-c                                                    \
@@ -1898,15 +1903,20 @@ install:: install-lib
 	  share/configure.ac share/autocomplete_frama-c share/_frama-c \
 	  $(FRAMAC_DATADIR)
 	$(MKDIR) $(FRAMAC_DATADIR)/analysis-scripts
-	$(CP) share/analysis-scripts/cmd-dep.sh \
+	$(CP) share/analysis-scripts/benchmark_database.py \
+	  share/analysis-scripts/cmd-dep.sh \
 	  share/analysis-scripts/concat-csv.sh \
+	  share/analysis-scripts/clone.sh \
 	  share/analysis-scripts/find_fun.py \
 	  share/analysis-scripts/flamegraph.pl \
 	  share/analysis-scripts/frama-c.mk \
+	  share/analysis-scripts/frama_c_results.py \
+	  share/analysis-scripts/git_utils.py \
+	  share/analysis-scripts/list_files.py \
 	  share/analysis-scripts/parse-coverage.sh \
 	  share/analysis-scripts/README.md \
-	  share/analysis-scripts/list_files.py \
-	  share/analysis-scripts/summary.sh \
+	  share/analysis-scripts/results_display.py \
+	  share/analysis-scripts/summary.py \
 	  share/analysis-scripts/template.mk \
 	  $(FRAMAC_DATADIR)/analysis-scripts
 	$(MKDIR) $(FRAMAC_DATADIR)/analysis-scripts/examples

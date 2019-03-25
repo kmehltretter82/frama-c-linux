@@ -113,8 +113,10 @@ ptests/.gitignore: .ignore
 ptests/.merlin: .ignore
 ptests/ptests.ml: CEA_LGPL
 share/_frama-c: CEA_LGPL
+share/analysis-scripts/benchmark_database.py: .ignore
+share/analysis-scripts/clone.sh: .ignore
 share/analysis-scripts/frama-c.mk: CEA_LGPL
-share/analysis-scripts/README.md: .ignore
+share/analysis-scripts/frama_c_results.py: .ignore
 share/analysis-scripts/cmd-dep.sh: .ignore
 share/analysis-scripts/concat-csv.sh: .ignore
 share/analysis-scripts/examples/example.c: .ignore
@@ -124,9 +126,12 @@ share/analysis-scripts/examples/example-slevel.mk: .ignore
 share/analysis-scripts/examples/Makefile: .ignore
 share/analysis-scripts/find_fun.py: .ignore
 share/analysis-scripts/flamegraph.pl: CDDL
+share/analysis-scripts/git_utils.py: .ignore
 share/analysis-scripts/list_files.py: .ignore
 share/analysis-scripts/parse-coverage.sh: .ignore
-share/analysis-scripts/summary.sh: .ignore
+share/analysis-scripts/README.md: .ignore
+share/analysis-scripts/results_display.py: .ignore
+share/analysis-scripts/summary.py: .ignore
 share/analysis-scripts/template.mk: .ignore
 share/autocomplete_frama-c: CEA_LGPL
 share/Makefile.clean: CEA_LGPL
