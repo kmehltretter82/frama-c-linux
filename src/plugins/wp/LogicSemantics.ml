@@ -543,6 +543,10 @@ struct
            to a deref of a cast to a pointer `*(T( * )[])(p)` *)
         let cast = cast_ptr dst_ctype t0 in
         L.load (C.current env) (Ctypes.object_of dst_ctype) cast
+    | C_array dst_arr_info, L_array src_arr_info
+      when Ctypes.AinfoComparable.equal dst_arr_info src_arr_info ->
+        (* cast from/to the same type *)
+        C.logic env t
     | C_array {arr_flat=Some _}, (L_integer|L_cint _|L_bool|L_real|L_cfloat _|L_array _) ->
         Warning.error "@[Logic cast to sized array (%a) from (%a) not implemented yet@]"
           Printer.pp_typ dst_ctype Printer.pp_logic_type t.term_type
