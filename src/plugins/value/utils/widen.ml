@@ -34,12 +34,18 @@ let dkey = Widen_hints_ext.dkey
    reuse loop indexes...
 *)
 
-let rec constFoldTermToNearestFloat = function
-  | TConst (LReal r) -> Some (r.r_nearest)
+let rec constFoldTermToLogicReal = function
+  | TConst (LReal r) -> Some r
   | TUnOp (Neg,e) -> begin
-      match (constFoldTermToNearestFloat e.term_node) with
+      match (constFoldTermToLogicReal e.term_node) with
       | None -> None
-      | Some e -> Some (-. e)
+      | Some e -> Some { r_literal =
+                           if String.get e.r_literal 0 = '-' then
+                             String.sub e.r_literal 1 (String.length e.r_literal - 1)
+                           else "-" ^ e.r_literal;
+                         r_nearest = -. e.r_nearest;
+                         r_lower = -. e.r_upper;
+                         r_upper = -. e.r_lower; }
     end
   | _ -> None
 
@@ -87,7 +93,7 @@ class pragma_widen_visitor init_widen_hints init_enclosing_loops = object(self)
           | { term_node= TConst (Integer(v,_))} ->
             (lv, Ival.Widen_Hints.add v lint, lfloat, lt)
           | _ ->
-            match constFoldTermToNearestFloat t.term_node with
+            match constFoldTermToLogicReal t.term_node with
             | Some f -> (lv, lint, Fc_float.Widen_Hints.add f lfloat, lt)
             | None -> (lv, lint, lfloat, t::lt)
         in
@@ -277,7 +283,7 @@ let base_of_static_hvars hvars =
     (* syntactic constraints prevent this from happening *)
     Value_parameters.fatal "unsupported lhost: %a" Printer.pp_lval (Mem e, offset)
 
-type threshold = Int_th of Integer.t | Float_th of float
+type threshold = Int_th of Integer.t | Real_th of logic_real
 
 (* try parsing as int, then as float *)
 let threshold_of_threshold_term ht =
@@ -290,8 +296,8 @@ let threshold_of_threshold_term ht =
   match Logic_utils.constFoldTermToInt ht with
   | Some i -> Int_th i
   | None ->
-    match constFoldTermToNearestFloat ht.term_node with
-    | Some f -> Float_th f
+    match constFoldTermToLogicReal ht.term_node with
+    | Some f -> Real_th f
     | None ->
       Value_parameters.abort ~source:(fst ht.term_loc)
         "could not parse widening hint: %a@ \
@@ -310,7 +316,7 @@ let thresholds_of_threshold_terms hts =
             Printer.pp_term ht;
         has_int := true;
         Ival.Widen_Hints.add i int_acc, float_acc
-      | Float_th f ->
+      | Real_th f ->
         if !has_int then
           Value_parameters.abort ~source:(fst ht.term_loc)
             "widening hint mixing integers and floats: %a"

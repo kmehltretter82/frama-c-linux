@@ -32,7 +32,7 @@ type prec = Single | Double | Long_Double | Real
 
 
 module type Widen_Hints = sig
-  include FCSet.S with type elt = Datatype.Float.t
+  include FCSet.S with type elt = Cil_datatype.Logic_real.t
   include Datatype.S with type t:=t
 
   val default_widen_hints: t

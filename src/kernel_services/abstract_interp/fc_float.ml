@@ -61,6 +61,7 @@ let cmp_ieee = (compare: float -> float -> int)
 (* replace "noalloc" with [@@noalloc] for OCaml version >= 4.03.0 *)
 [@@@ warning "-3"]
 external compare : float -> float -> int = "float_compare_total" "noalloc"
+let total_compare = compare
 [@@@ warning "+3"]
 
 let of_float round prec f = round >>% fun () -> round_to_precision prec f
@@ -118,7 +119,7 @@ let le f1 f2 = compare f1 f2 <= 0
 
 module Widen_Hints = struct
 
-  include Datatype.Float.Set
+  include Cil_datatype.Logic_real.Set
 
   let pretty fmt s =
     if not (is_empty s) then
@@ -126,29 +127,55 @@ module Widen_Hints = struct
         ~pre:"@[<hov 1>{"
         ~suf:"}@]"
         ~sep:";@ "
-        iter Floating_point.pretty fmt s
+        iter
+        (fun fmt r -> Format.pp_print_string fmt r.Cil_types.r_literal) fmt s
 
-  let of_list l =
+  let logic_real_of_float f =
+    { Cil_types.r_literal = Format.asprintf "%10.7g" f;
+      r_nearest = f;
+      r_lower = f;
+      r_upper = f; }
+
+  let of_float_list l =
     match l with
     | [] -> empty
-    | [e] -> singleton e
+    | [e] -> singleton (logic_real_of_float e)
     | e :: q ->
-      List.fold_left (fun acc x -> add x acc) (singleton e) q
-
-  let m_pi = 3.1415929794311523 (* single-precision *)
-  let m_pi_2 = 1.5707964897155761 (* single-precision *)
-  let max_single_float = Floating_point.max_single_precision_float
+      List.fold_left
+        (fun acc x -> add (logic_real_of_float x) acc)
+        (singleton (logic_real_of_float e)) q
 
   let default_widen_hints =
-    let l = [0.0;1.0;m_pi_2;m_pi;10.;1e10;max_single_float;1e80] in
-    union (of_list l) (of_list (List.map (fun x -> -. x) l))
+    let l = [0.0;1.0;10.0;1e10;Floating_point.max_single_precision_float;1e80] in
+    union (of_float_list l) (of_float_list (List.map (fun x -> -. x) l))
+
+  exception Found of float
+
+  let nearest_float_ge f s =
+    try
+      iter (fun e ->
+          if total_compare e.Cil_types.r_upper f >= 0
+          then raise (Found e.Cil_types.r_upper))
+        s;
+      raise Not_found
+    with Found r -> r
+
+  let nearest_float_le f s =
+    try
+      let els_desc = List.rev (elements s) in
+      List.iter (fun e ->
+          if total_compare e.Cil_types.r_lower f <= 0
+          then raise (Found e.Cil_types.r_lower))
+        els_desc;
+      raise Not_found
+    with Found r -> r
 
 end
 
 type widen_hints = Widen_Hints.t
 
 let widen_up wh prec f =
-  let r = try Widen_Hints.nearest_elt_ge f wh
+  let r = try Widen_Hints.nearest_float_ge f wh
     with Not_found ->
       if le f max_float then max_float
       else infinity
@@ -156,13 +183,12 @@ let widen_up wh prec f =
   round_to_precision Up prec r
 
 let widen_down wh prec f =
-  let r = try Widen_Hints.nearest_elt_le f wh
+  let r = try Widen_Hints.nearest_float_le f wh
     with Not_found ->
       if le (-. max_float) f then (-. max_float)
       else neg_infinity
   in
   round_to_precision Down prec r
-
 
 let neg = (~-.)
 let abs = abs_float
