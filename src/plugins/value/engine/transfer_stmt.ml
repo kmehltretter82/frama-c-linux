@@ -911,7 +911,7 @@ module Make (Abstract: Abstractions.Eva) = struct
       try
         Cvalue.V.project_ival cvalue
       with Cvalue.V.Not_based_on_null ->
-        fail ~exp "this partitioning parameter must evaluatassumee to an integer"
+        fail ~exp "this partitioning parameter must evaluate to an integer"
     in
     valuation, ival
 
