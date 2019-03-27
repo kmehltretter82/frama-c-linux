@@ -69,19 +69,14 @@ type branch = int
 
 module ExpMap = Cil_datatype.ExpStructEq.Map
 
-type key = private {
-  ration_stamp : (int * int) option; (* store stamp / transfer stamp *)
-  branches : branch list;
-  loops : (int * int) list; (* current iteration / max unrolling *)
-  static_split : (Integer.t * split_monitor) ExpMap.t; (* exp->value*monitor *)
-  dynamic_split : (Integer.t * split_monitor) ExpMap.t; (* exp->value*monitor *)
-}
+type key
 
 module Key : sig
   type t = key
   val zero : t
   val compare : t -> t -> int
   val pretty : Format.formatter -> t -> unit
+  val exceed_rationing: t -> bool
 end
 
 type 'a partition

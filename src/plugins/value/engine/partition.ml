@@ -45,11 +45,11 @@ module BranchList = Datatype.List (Datatype.Int)
 type branch = int
 
 type key = {
-  ration_stamp : (int * int) option;
+  ration_stamp : (int * int) option; (* store stamp / transfer stamp *)
   branches : branch list;
-  loops : (int * int) list;
-  static_split : (Integer.t*split_monitor) ExpMap.t;
-  dynamic_split : (Integer.t*split_monitor) ExpMap.t;
+  loops : (int * int) list; (* current iteration / max unrolling *)
+  static_split : (Integer.t*split_monitor) ExpMap.t; (* exp->value*monitor *)
+  dynamic_split : (Integer.t*split_monitor) ExpMap.t; (* exp->value*monitor *)
 }
 
 module Key =
@@ -97,6 +97,8 @@ struct
           (Integer.pretty ~hexa:false) i)
       fmt
       (ExpMap.bindings key.static_split @ ExpMap.bindings key.dynamic_split)
+
+  let exceed_rationing key = key.ration_stamp = None
 end
 
 

@@ -187,9 +187,7 @@ struct
   (* Reset state (for hierchical convergence) *)
 
   let reset_store (s : store) : unit =
-    let is_eternal key _state =
-      key.ration_stamp <> None
-    in
+    let is_eternal key _state = not (Key.exceed_rationing key) in
     s.store_partition <- Partition.filter is_eternal s.store_partition
 
   let reset_flow (f : flow) : unit =
@@ -351,7 +349,7 @@ struct
       with Not_found ->
         (* The key is not in the widening state; add the state if slevel is
            exceeded *)
-        if key.ration_stamp = None then
+        if Key.exceed_rationing key then
           update key {
             widened_state = None;
             previous_state = curr;
