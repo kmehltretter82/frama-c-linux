@@ -151,6 +151,30 @@ CFP:
   tags:
    - nix
 
+build-tarball:
+  stage: tests
+  variables:
+    CURRENT: $CI_COMMIT_REF_NAME
+    DEFAULT: "master"
+    OCAML: "4_05"
+    FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
+  script:
+   - nix/frama-ci.sh build -A frama-c.distrib
+  tags:
+   - nix
+
+tarball-compilation:
+  stage: distrib_and_compatibility
+  variables:
+    CURRENT: $CI_COMMIT_REF_NAME
+    DEFAULT: "master"
+    OCAML: "4_05"
+    FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
+  script:
+   - nix/frama-ci.sh build -A frama-c.tests-distrib
+  tags:
+   - nix
+
 internal:
   stage: distrib_and_compatibility
   variables:
