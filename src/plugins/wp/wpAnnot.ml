@@ -914,7 +914,7 @@ let get_stmt_annots config v s =
                 in (b_acc, (a_acc, e_acc))
           | TBRok | TBRpart ->
               let id = WpPropId.mk_assert_id config.kf s a in
-              let check = kind = Check || Wp_parameters.Assert_check_only.get ()
+              let check = kind = Check
               and goal = goal_to_select config id in
               if check && not goal then acc
               else

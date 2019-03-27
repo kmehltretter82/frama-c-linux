@@ -135,7 +135,6 @@ module ReportJson: Parameter_sig.String
 module ReportName: Parameter_sig.String
 module MemoryContext: Parameter_sig.Bool
 module Check: Parameter_sig.Bool
-module Assert_check_only: Parameter_sig.Bool
 
 (** {2 Environment Variables} *)
 
