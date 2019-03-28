@@ -575,29 +575,7 @@ let make config =
 (*                       Default and Legacy Abstractions                      *)
 (* -------------------------------------------------------------------------- *)
 
-
-module Legacy = struct
-
-  module Val = struct
-    include Main_values.CVal
-    include Structure.Open (Structure.Key_Value) (Main_values.CVal)
-    let reduce t = t
-  end
-
-  module Loc = struct
-    include Main_locations.PLoc
-    include Structure.Open
-        (Structure.Key_Location)
-        (struct include Main_locations.PLoc type t = location end)
-  end
-
-  module Dom = struct
-    include Cvalue_domain.State
-    include Structure.Open (Structure.Key_Domain) (Cvalue_domain.State)
-  end
-
-end
-
+module Legacy =  (val make legacy_config)
 module Default = (val make default_config)
 
 
