@@ -275,6 +275,7 @@ DISTRIB_FILES:=\
       share/Makefile.plugin.template share/Makefile.dynamic		\
       share/Makefile.dynamic_config.external				\
       share/Makefile.dynamic_config.internal				\
+      share/META.frama-c                                                \
       $(filter-out src/kernel_internals/runtime/config.ml,              \
 	  $(wildcard src/kernel_internals/runtime/*.ml*))               \
       $(wildcard src/kernel_services/abstract_interp/*.ml*)             \

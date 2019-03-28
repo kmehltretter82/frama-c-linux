@@ -142,6 +142,7 @@ share/Makefile.dynamic_config.external: CEA_LGPL
 share/Makefile.dynamic_config.internal: CEA_LGPL
 share/Makefile.generic: CEA_LGPL
 share/Makefile.plugin.template: CEA_LGPL
+share/META.frama-c: .ignore
 share/builtin.h: CEA_LGPL
 share/configure.ac: CEA_LGPL
 share/emacs/acsl.el: ACSL_EL
