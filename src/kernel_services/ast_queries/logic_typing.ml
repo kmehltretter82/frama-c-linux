@@ -2877,7 +2877,10 @@ struct
                Cil_printer.pp_logic_type ty
          in
          term_node, Linteger
-       | Linteger | Lreal | Ltype _ | Lvar _ | Larrow _ ->
+       | Ltype _  | Lvar _ | Larrow _
+         when Logic_utils.is_same_type t.term_type ct -> (* cast from T to T *)
+         t.term_node, t.term_type
+       | Linteger | Lreal | Ltype _  | Lvar _ | Larrow _ ->
          ctxt.error loc "cannot cast from %a to %a"
            Cil_printer.pp_logic_type t.term_type
            Cil_printer.pp_logic_type ct)
