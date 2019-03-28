@@ -165,14 +165,14 @@ let precise_loc_of_assign env assign_or_allocation =
 
 
 module Make
-    (Value: Abstract_value.External)
-    (Location: Abstract_location.External)
-    (Domain: Abstract_domain.External with type value = Value.t
-                                       and type location = Location.location)
-    (States: Powerset.S with type state = Domain.t)
-    (Logic : Transfer_logic.S with type state = Domain.t
+    (Abstract: Abstractions.S)
+    (States: Powerset.S with type state = Abstract.Dom.t)
+    (Logic : Transfer_logic.S with type state = Abstract.Dom.t
                                and type states = States.t)
 = struct
+
+  module Domain = Abstract.Dom
+  module Location = Abstract.Loc
 
   (* Most transfer functions about logic return a set of states instead of a
      single state, and States.empty instead of bottom. We thus use this monad

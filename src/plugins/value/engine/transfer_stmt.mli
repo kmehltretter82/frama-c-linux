@@ -61,18 +61,10 @@ module type S = sig
     (stmt -> (location, value) call -> state -> call_result) ref
 end
 
-module Make
-    (Value: Abstract_value.External)
-    (Location: Abstract_location.External)
-    (Domain: Abstract_domain.External with type value = Value.t
-                                       and type location = Location.location)
-    (Eva: Evaluation.S with type state = Domain.state
-                        and type value = Domain.value
-                        and type loc = Domain.location
-                        and type origin = Domain.origin)
-  : S with type state = Domain.state
-       and type value = Domain.value
-       and type location = Domain.location
+module Make (Abstract: Abstractions.Eva)
+  : S with type state = Abstract.Dom.t
+       and type value = Abstract.Val.t
+       and type location = Abstract.Loc.location
 
 (*
 Local Variables:

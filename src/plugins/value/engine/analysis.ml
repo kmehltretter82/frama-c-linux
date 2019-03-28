@@ -59,11 +59,13 @@ end
 
 module Make (Abstract: Abstractions.S) = struct
 
+  module Abstract = struct
+    include Abstract
+    module Eval = Evaluation.Make (Abstract.Val) (Abstract.Loc) (Abstract.Dom)
+  end
+
   include Abstract
-
-  module Eval = Evaluation.Make (Abstract.Val) (Abstract.Loc) (Abstract.Dom)
-
-  include Compute_functions.Make (Abstract) (Eval)
+  include Compute_functions.Make (Abstract)
 
   let get_stmt_state stmt =
     let fundec = Kernel_function.(get_definition (find_englobing_kf stmt)) in

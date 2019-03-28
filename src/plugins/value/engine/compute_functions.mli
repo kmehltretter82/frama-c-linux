@@ -25,12 +25,7 @@
 open Cil_types
 open Eval
 
-module Make
-    (Abstract: Abstractions.S)
-    (Eva: Evaluation.S with type value = Abstract.Val.t
-                        and type origin = Abstract.Dom.origin
-                        and type loc = Abstract.Loc.location
-                        and type state = Abstract.Dom.t)
+module Make (Abstract: Abstractions.Eva)
   : sig
 
     (** Compute a call to the main function. *)
