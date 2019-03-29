@@ -2,7 +2,7 @@
 { pkgs, stdenv, src ? ../., opam2nix, ocaml_version ? "ocaml-ng.ocamlPackages_4_05.ocaml", plugins ? { } }:
 
 let mk_buildInputs = { opamPackages ? [] } :
-    [ pkgs.gnugrep pkgs.gnused  pkgs.autoconf pkgs.gnumake pkgs.gcc pkgs.ncurses pkgs.time pkgs.python3 pkgs.perl] ++ opam2nix.build {
+    [ pkgs.gnugrep pkgs.gnused  pkgs.autoconf pkgs.gnumake pkgs.gcc pkgs.ncurses pkgs.time pkgs.python3 pkgs.perl pkgs.file] ++ opam2nix.build {
            specs = opam2nix.toSpecs ([ "ocamlfind" "zarith" "ocamlgraph"
                 { name = "coq"; constraint = "=8.7.2"; }
                 ] ++ opamPackages ++
@@ -108,7 +108,7 @@ rec {
   distrib = stdenv.mkDerivation {
         name = "frama-c-distrib";
         inherit src;
-        buildInputs = buildInputs ++ [ plugins.headache.installed ];
+        buildInputs = buildInputs ++ [ plugins.headache.installed pkgs.file ];
         postPatch = ''
                patchShebangs .
         '';
