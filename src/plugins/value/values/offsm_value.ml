@@ -44,8 +44,8 @@ let basic_copy ?(start=Int.zero) ~size o =
   let validity = enough_validity ~start ~size in
   let offsets = Ival.inject_singleton start in
   match V_Offsetmap.copy_slice ~validity ~offsets ~size o with
-  | _, `Bottom -> assert false
-  | _, `Value r -> r
+  | `Bottom -> assert false
+  | `Value r -> r
 
 (* paste [src] of size [size_src] starting at [start] in [r]. If [r] has size
    [size_r], [size+start <= size_r] must hold. *)
@@ -56,14 +56,14 @@ let basic_paste ?(start=Int.zero) ~src ~size_src dst =
   let offsets = Ival.inject_singleton start in
   let from = src in
   match V_Offsetmap.paste_slice ~validity ~exact ~from ~size ~offsets dst with
-  | _, `Bottom -> assert false
-  | _, `Value r -> r
+  | `Bottom -> assert false
+  | `Value r -> r
 
 (* Reads [size] bits starting at [start] in [o], as a single value *)
 let basic_find ?(start=Int.zero) ~size o =
   let validity = enough_validity ~start ~size in
   let offsets = Ival.inject_singleton start in
-  let _, v = V_Offsetmap.find ~validity ~offsets ~size o in
+  let v = V_Offsetmap.find ~validity ~offsets ~size o in
   V_Or_Uninitialized.map (fun v -> V.reinterpret_as_int ~signed:false ~size v) v
 
 (* Paste [v] of size [size] at position [start] in [o] *)
@@ -72,8 +72,8 @@ let basic_add ?(start=Int.zero) ~size v o =
   let offsets = Ival.inject_singleton start in
   let v = V_Or_Uninitialized.initialized v in
   match V_Offsetmap.update ~validity ~exact:true ~offsets ~size v o with
-  | _, `Value m -> m
-  | _ -> assert false
+  | `Value m -> m
+  | `Bottom -> assert false
 
 let inject ~size v =
   V_Offsetmap.create ~size ~size_v:size (V_Or_Uninitialized.initialized v)

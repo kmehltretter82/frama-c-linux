@@ -47,7 +47,7 @@ class virtual do_it_ = object(self)
           let loc = loc_bytes_to_loc_bits r in
           let size = Bit_utils.sizeof_lval lv in
           self#join
-            (enumerate_valid_bits ~for_writing:false (make_loc loc size))
+            (enumerate_valid_bits Read (make_loc loc size))
     end;
     DoChildren
 

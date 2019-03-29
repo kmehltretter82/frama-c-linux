@@ -36,7 +36,7 @@ let eval_assigns_from pre_state it =
     let eval_env = Eval_terms.env_assigns pre_state in
     let under, _ =
       Eval_terms.eval_tlval_as_zone_under_over
-        ~alarm_mode:Eval_terms.Ignore ~for_writing:false eval_env term
+        ~alarm_mode:Eval_terms.Ignore Locations.Read eval_env term
     in
     under
 

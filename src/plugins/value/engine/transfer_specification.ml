@@ -133,7 +133,7 @@ let reduce_to_valid_location out loc =
       None
     end
   else
-    let valid = Locations.valid_part ~for_writing:true loc in
+    let valid = Locations.(valid_part Write loc) in
     if Locations.is_bottom_loc valid then
       begin
         if is_assigns out && not (Locations.is_bottom_loc loc) then

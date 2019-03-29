@@ -100,7 +100,7 @@ let compute_using_prototype_for_state state kf assigns =
               let acc = Function_Froms.Memory.add_binding_loc ~exact:false
                 acc output_loc_over input_deps in
 	      let output_loc_under_zone = Locations.enumerate_valid_bits_under
-		~for_writing:true output_loc_under in
+		Write output_loc_under in
 	      (* Now, perform a strong update on the zones that are guaranteed
                  to be assigned (under-approximation) AND that do not depend
                  on themselves.
@@ -347,10 +347,10 @@ struct
       let deps_of_deps = Function_Froms.Memory.find state.deps_table deps in
       let all_indirect = Zone.join state.additional_deps deps_of_deps in
       let deps = Function_Froms.Deps.add_indirect_dep deps_right all_indirect in
+      let access = if init then Read else Write in
       { state with deps_table =
           Function_Froms.Memory.add_binding_precise_loc
-            ~for_writing:(not init)
-            ~exact state.deps_table loc deps }
+            ~exact access state.deps_table loc deps }
 
     let transfer_call stmt dest f args _loc state =
       !Db.progress ();

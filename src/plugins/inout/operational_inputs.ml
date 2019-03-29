@@ -123,8 +123,8 @@ let eval_assigns kf state assigns =
           let loc_out_under, loc_out_over, deps =
 	    !Db.Properties.Interp.loc_to_loc_under_over ~result:None state out.it_content
           in
-	  (enumerate_valid_bits_under ~for_writing:true loc_out_under,
-	   enumerate_valid_bits ~for_writing:true loc_out_over,
+	  (enumerate_valid_bits_under Write loc_out_under,
+	   enumerate_valid_bits Write loc_out_over,
 	   clean_deps deps)
       with Db.Properties.Interp.No_conversion ->
         Inout_parameters.warning ~current:true ~once:true
@@ -141,7 +141,7 @@ let eval_assigns kf state assigns =
                 let _, loc, deps =
 		  !Db.Properties.Interp.loc_to_loc_under_over None state from in
                 let acc = Zone.join (clean_deps deps) acc in
-                let z = enumerate_valid_bits ~for_writing:false loc in
+                let z = enumerate_valid_bits Read loc in
 		Zone.join z acc
               in
               List.fold_left aux deps l

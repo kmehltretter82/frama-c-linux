@@ -372,9 +372,9 @@ module Memory = struct
   let find z m =
     Deps.to_zone (find_precise z m)
 
-  let add_binding_precise_loc ~exact ~for_writing m loc v =
+  let add_binding_precise_loc ~exact access m loc v =
     let aux_one_loc loc m =
-      let loc = Locations.valid_part ~for_writing loc in
+      let loc = Locations.valid_part access loc in
       add_binding_loc ~exact m loc (DepsOrUnassigned.AssignedFrom v)
     in
     Precise_locs.fold aux_one_loc loc m
