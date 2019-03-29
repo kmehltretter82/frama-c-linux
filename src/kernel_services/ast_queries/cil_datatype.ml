@@ -1446,15 +1446,26 @@ let is_exact_float r =
   classify_float r.r_upper = FP_normal &&
   Datatype.Float.equal r.r_upper r.r_lower
 
+[@@@ warning "-3"]
+(* [float_compare_total] is used to ensure -0.0 and 0.0 are distinct *)
+external float_compare_total : float -> float -> int = "float_compare_total" "noalloc"
+[@@@ warning "+3"]
+
+let compare_logic_real r1 r2 =
+  let c = float_compare_total r1.r_lower r2.r_lower in
+  if c <> 0 then c else
+    let c = float_compare_total r1.r_nearest r2.r_nearest in
+    if c <> 0 then c else
+      let c = float_compare_total r1.r_upper r2.r_upper in
+      if c <> 0 then c else
+        String.compare r1.r_literal r2.r_literal
+
 let compare_logic_constant c1 c2 = match c1,c2 with
   | Integer (i1,_), Integer(i2,_) -> Integer.compare i1 i2
   | LStr s1, LStr s2 -> Datatype.String.compare s1 s2
   | LWStr s1, LWStr s2 -> compare_list Datatype.Int64.compare s1 s2
   | LChr c1, LChr c2 -> Datatype.Char.compare c1 c2
-  | LReal r1, LReal r2 ->
-    if is_exact_float r1 && is_exact_float r2
-    then Datatype.Float.compare r1.r_lower r2.r_lower
-    else Datatype.String.compare r1.r_literal r2.r_literal
+  | LReal r1, LReal r2 -> compare_logic_real r1 r2
   | LEnum e1, LEnum e2 -> Enumitem.compare e1 e2
   | Integer _,(LStr _|LWStr _ |LChr _|LReal _|LEnum _) -> 1
   | LStr _ ,(LWStr _ |LChr _|LReal _|LEnum _) -> 1
@@ -1880,6 +1891,27 @@ module Logic_label = struct
         let pretty fmt l = !pretty_ref fmt l
         let varname _ = "logic_label"
     end)
+end
+
+module Logic_real = struct
+  let pretty_ref = ref (fun _ _ -> assert false)
+  include Make_with_collections
+            (struct
+              type t = logic_real
+              let name = "Logic_real"
+              let reprs =
+                [{ r_literal = ""; r_nearest = 0.0; r_lower = 0.0; r_upper = 0.0; }]
+              let compare = compare_logic_real
+              let hash r =
+                let fhash = Datatype.Float.hash in
+                fhash r.r_lower + 3 * fhash r.r_nearest + 7 * fhash r.r_upper +
+                  11 * Datatype.String.hash r.r_literal
+              let equal r1 r2 = compare r1 r2 = 0
+              let copy = Datatype.undefined
+              let internal_pretty_code = Datatype.undefined
+              let pretty fmt t = !pretty_ref fmt t
+              let varname _ = "logic_real"
+            end)
 end
 
 module Global_annotation = struct

@@ -405,8 +405,8 @@ module Location_Bytes = struct
        m1 m2
 
   type size_widen_hint = Ival.size_widen_hint
-  type generic_widen_hint = Base.t -> Ival.generic_widen_hint
-  type widen_hint = size_widen_hint * generic_widen_hint
+  type numerical_widen_hint = Base.t -> Ival.numerical_widen_hint
+  type widen_hint = size_widen_hint * numerical_widen_hint
 
   let widen (size, wh) =
     let widen_map =

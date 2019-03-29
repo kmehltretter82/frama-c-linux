@@ -279,6 +279,8 @@ module Term_lhost: S_with_collections_pretty with type t = term_lhost
 module Term_offset: S_with_collections_pretty with type t = term_offset
 module Term_lval: S_with_collections_pretty with type t = term_lval
 
+module Logic_real: S_with_collections_pretty with type t = logic_real
+
 module Predicate: S_with_pretty with type t = predicate
 module Identified_predicate: 
   S_with_collections_pretty with type t = identified_predicate

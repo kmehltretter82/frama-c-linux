@@ -108,7 +108,7 @@ module Make (V : module type of Offsetmap_lattice_with_isotropy) = struct
   open Format
 
   type v = V.t
-  type widen_hint = V.generic_widen_hint
+  type widen_hint = V.numerical_widen_hint
 
   let empty = Empty
   (** All high-level functions of this module must handle a size of 0, in which
@@ -2194,9 +2194,9 @@ module FullyIsotropic = struct
   let cardinal_zero_or_one _ = false
 
   let widen _wh _ m = m
-  type generic_widen_hint =  unit
+  type numerical_widen_hint =  unit
   type size_widen_hint = Integer.t
-  type widen_hint = size_widen_hint * generic_widen_hint
+  type widen_hint = size_widen_hint * numerical_widen_hint
 end
 
 
