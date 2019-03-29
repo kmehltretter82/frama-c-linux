@@ -897,17 +897,6 @@ module Check =
   end)
 let () = on_reset Print.clear
 
-let () = Parameter_customize.set_group wp_po
-let () = Parameter_customize.do_not_save ()
-let () = Parameter_customize.is_invisible ()
-module Assert_check_only =
-  False (struct
-    let option_name = "-wp-assert-check-only"
-    let help =
-      "Turns assertions into labels."
-  end)
-let () = on_reset Print.clear
-
 (* -------------------------------------------------------------------------- *)
 (* --- OS environment variables                                           --- *)
 (* -------------------------------------------------------------------------- *)
