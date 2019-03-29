@@ -137,12 +137,6 @@ let merge = KMap.merge
 let to_list (p : 'a partition) : 'a list =
   KMap.fold (fun _k x l -> x :: l) p []
 
-let map_filter (f : key -> 'a -> 'b option) (p : 'a partition) : 'b partition =
-  let opt_flatten (type a) (o : a option option) : a option =
-    Extlib.opt_conv None o
-  in
-  KMap.merge (fun k o _ -> opt_flatten (Extlib.opt_map (f k) o)) p KMap.empty
-
 
 (* --- Partitioning actions --- *)
 
@@ -473,4 +467,27 @@ struct
 
   let iter (f : state -> unit) (p : t) : unit =
     List.iter (fun (_k,x) -> f x) p
+
+  let join_duplicate_keys (p : t) : t =
+    let cmp (k, _) (k', _) = Key.compare k k' in
+    let p = List.fast_sort cmp p in
+    let rec aux acc (key, state) = function
+      | [] -> (key, state) :: acc
+      | (key', state') :: tl ->
+        if Key.compare key key' = 0
+        then aux acc (key, Abstract.Dom.join state state') tl
+        else aux ((key, state) :: acc) (key', state') tl
+    in
+    match p with
+    | [] | [_] -> p
+    | e :: tl -> aux [] e tl
+
+  let filter_map (f: key -> state -> state option) (p : t) : t =
+    let rec aux = function
+      | [] -> []
+      | (key, x) :: tl -> match f key x with
+        | Some y -> (key, y) :: (aux tl)
+        | None -> aux tl
+    in
+    aux p
 end

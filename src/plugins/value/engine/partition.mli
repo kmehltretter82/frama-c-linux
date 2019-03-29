@@ -82,7 +82,6 @@ val merge : (key -> 'a option -> 'b option -> 'c option) -> 'a partition ->
 val iter : (key -> 'a -> unit) -> 'a partition -> unit
 val filter : (key -> 'a -> bool) -> 'a partition -> 'a partition
 val map : ('a  -> 'a) -> 'a partition -> 'a partition
-val map_filter : (key -> 'a -> 'b option) -> 'a partition -> 'b partition
 
 
 (* Partitioning actions *)
@@ -133,4 +132,7 @@ sig
   val transfer_states : (state -> state list) -> t -> t
 
   val iter : (state -> unit) -> t -> unit
+  val filter_map: (key -> state -> state option) -> t -> t
+
+  val join_duplicate_keys: t -> t
 end

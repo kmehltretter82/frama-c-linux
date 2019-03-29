@@ -170,9 +170,8 @@ struct
     if strategy <> Split_strategy.FullSplit
     then
       let apply action =
-        transfer_action flow action;
-        let p = Flow.to_partition flow.flow_states in
-        flow.flow_states <- Flow.of_partition p
+        let f = Flow.transfer_keys flow.flow_states action in
+        flow.flow_states <- Flow.join_duplicate_keys f
       in
       match Split_return.kf_strategy kf with
       (* SplitAuto already transformed into SplitEqList. *)
@@ -258,8 +257,6 @@ struct
     let flow_states =
       List.fold_left Flow.transfer_keys flow_states actions
     in
-    (* Join states with unique keys *)
-    let partition = Flow.to_partition flow_states in
     (* Add states to the store but filter out already propagated states *)
     let update key current_state =
       (* Inclusion test *)
@@ -288,8 +285,9 @@ struct
       (* Filter out already propagated states *)
       Extlib.opt_filter (fun s -> Index.add s dest.store_index) state
     in
-    let partition' = Partition.map_filter update partition in
-    { flow_states = Flow.of_partition partition' }
+    let flow = Flow.join_duplicate_keys flow_states in
+    let flow = Flow.filter_map update flow in
+    { flow_states = flow }
 
 
   let widen (w : widening) (f : flow) : bool =
@@ -347,8 +345,8 @@ struct
           };
         Some curr
     in
-    let p = Flow.to_partition f.flow_states in
-    let p' = Partition.map_filter widen_one p in
-    f.flow_states <- Flow.of_partition p';
+    let flow = Flow.join_duplicate_keys f.flow_states in
+    let flow = Flow.filter_map widen_one flow in
+    f.flow_states <- flow;
     Flow.is_empty f.flow_states
 end
