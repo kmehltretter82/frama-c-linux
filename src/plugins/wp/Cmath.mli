@@ -27,6 +27,9 @@
 open Lang
 open Lang.F
 
+val int_of_bool : unop
+val bool_of_int : unop
+
 val int_of_real : term -> term
 val real_of_int : term -> term
 
