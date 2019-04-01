@@ -450,14 +450,14 @@ and context_insensitive_term_to_exp kf env t =
     Cil.mkAddrOrStartOf ~loc lv, env, false, "startof"
   | Tapp(li, [], targs) ->
     let fname = li.l_var_info.lv_name in
-    let args, env = (* args computed in the reverse order *)
+    let args, env =
       try
-        List.fold_left
-          (fun (l, env) a ->
-            let e, env = term_to_exp kf env a in
+        List.fold_right
+          (fun targ (l, env) ->
+            let e, env = term_to_exp kf env targ in
             e :: l, env)
-          ([], env)
           targs
+          ([], env)
       with Invalid_argument _ ->
         Options.fatal "[Tapp] unexpected number of arguments when calling %s"
           fname
@@ -465,17 +465,15 @@ and context_insensitive_term_to_exp kf env t =
     (* build the varinfo (as an expression) which stores the result of the
        function call. *)
     let _, e, env =
-      if Builtins.mem li.l_var_info.lv_name then begin
-      (* E-ACSL built-in function call *)
-      Env.new_var
-        ~loc
-        ~name:(fname ^ "_app")
-        env
-        (Some t)
-        (Misc.cty (Extlib.the li.l_type))
-        (fun vi _ ->
-          [ Misc.mk_call ~loc ~result:(Cil.var vi) fname (List.rev args) ])
-      end
+      if Builtins.mem li.l_var_info.lv_name then
+        (* E-ACSL built-in function call *)
+        Env.new_var
+          ~loc
+          ~name:(fname ^ "_app")
+          env
+          (Some t)
+          (Misc.cty (Extlib.the li.l_type))
+          (fun vi _ -> [ Misc.mk_call ~loc ~result:(Cil.var vi) fname args ])
       else
         let args_lty =
           List.map
@@ -485,7 +483,7 @@ and context_insensitive_term_to_exp kf env t =
                | Typing.C_type _ | Typing.Other -> Ctype (Typing.get_typ targ))
             targs
         in
-        Logic_functions.generate ~loc env t li (List.rev args) args_lty
+        Logic_functions.generate ~loc env t li args args_lty
     in
     e, env, false, "app"
   | Tapp(_, _ :: _, _) ->
