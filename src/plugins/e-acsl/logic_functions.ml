@@ -327,7 +327,10 @@ module Memo = Hashtbl.Make(struct
       Cil_datatype.Logic_type.equal
       lfs1.lfs_args_lty
       lfs2.lfs_args_lty
-  let hash = Hashtbl.hash
+  let hash lfs =
+    Cil_datatype.Logic_info.hash lfs.lfs_li
+    + 257 * let module L = Datatype.List(Cil_datatype.Logic_type) in
+            L.hash (lfs.lfs_lty :: lfs.lfs_args_lty)
 end)
 
 let tbl = Memo.create 7
