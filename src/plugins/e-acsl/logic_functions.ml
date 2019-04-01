@@ -73,8 +73,9 @@ let arg_typ_from_lty lty = match lty with
   definitions. *)
 let empty_kf lfs typ =
   let li = lfs.lfs_li in
-  let fname = Functions.RTL.mk_gen_name
-    (Env.Varname.get ~scope:Env.Global li.l_var_info.lv_name)
+  let fname =
+    Functions.RTL.mk_gen_name
+      (Env.Varname.get ~scope:Env.Global li.l_var_info.lv_name)
   in
   let is_not_returnable = Cil.isArrayType typ in
   let ty_f = if is_not_returnable then Cil.voidType else typ in
@@ -362,6 +363,8 @@ let find_kfs li =
       else l)
     tbl
     []
+
+let reset () = Memo.reset tbl
 
 (*****************************************************************************)
 (****************** Generation of function calls *****************************)

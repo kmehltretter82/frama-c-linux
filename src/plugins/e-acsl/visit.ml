@@ -1023,6 +1023,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
 
   initializer
     Misc.reset ();
+    Logic_functions.reset ();
     Literal_strings.reset ();
     Global_observer.reset ();
     Keep_status.before_translation ();

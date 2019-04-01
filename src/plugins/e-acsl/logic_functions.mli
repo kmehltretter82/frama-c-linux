@@ -23,8 +23,8 @@
 open Cil_types
 
 (** Generate C implementations of user-defined logic functions.
-  A logic function can have multiple C implementations depending on
-  the types computed for its arguments.
+    A logic function can have multiple C implementations depending on
+    the types computed for its arguments.
     Eg: Consider the following definition: [integer g(integer x) = x]
       with the following calls: [g(5)] and [g(10*INT_MAX)]
       They will respectively generate the C prototypes [int g_1(int)]
@@ -37,10 +37,12 @@ open Cil_types
 val generate: loc:location -> Env.t -> term -> logic_info ->
   exp list -> logic_type list -> varinfo * exp * Env.t
 (** [generate ~loc env t_app li args_exp args_lty] generates the C function
-  corresponding to [t_app] and returns the associated call. *)
+    corresponding to [t_app] and returns the associated call. *)
 
 val do_visit: Cil_types.file -> unit
 (** Put declarations and definitions of the generated functions in the AST. *)
+
+val reset: unit -> unit
 
 (**************************************************************************)
 (********************** Forward references ********************************)
