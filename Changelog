@@ -17,6 +17,7 @@
 Open Source Release <next-release>
 ##################################
 
+-   Inout     [2019/04/01] Fix performance issue when initializing large arrays.
 -   ACSL      [2019/03/08] Add check annotation, similar to assert except that
               it does not introduce additional hypotheses on the program state
 -*  Makefile  [2019/03/07] Do not attempt to install .cmx on bytecode-only
