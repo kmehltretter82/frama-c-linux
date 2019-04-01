@@ -55,6 +55,14 @@ let rec interv_of_typ ty = match Cil.unrollType ty with
   | _ ->
     raise Not_an_integer
 
+let interv_of_logic_typ = function
+  | Ctype ty -> interv_of_typ ty
+  | Linteger -> Ival.inject_range None None
+  | Ltype _ -> Error.not_yet "user-defined logic type"
+  | Lvar _ -> Error.not_yet "type variable"
+  | Lreal -> Error.not_yet "real number"
+  | Larrow _ -> Error.not_yet "functional type"
+
 let ikind_of_interv i =
   if Ival.is_bottom i then IInt
   else match Ival.min_and_max i with
@@ -294,10 +302,11 @@ let rec infer t =
            fixpoint i
        in
        fixpoint Ival.bottom
-     | LBnone ->
-       Error.not_yet "logic functions with no definition nor reads clause"
+     | LBnone
      | LBreads _ ->
-       Error.not_yet "logic functions performing read accesses"
+       (match li.l_type with
+       | None -> assert false
+       | Some ret_type -> interv_of_logic_typ ret_type)
      | LBinductive _ ->
        Error.not_yet "logic functions inductively defined")
   | Tunion _ -> Error.not_yet "tset union"
