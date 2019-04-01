@@ -2882,7 +2882,9 @@ struct
          t.term_node, t.term_type
        | Ltype (_,[]) when Logic_const.is_boolean_type ct &&
                            Cil.isLogicIntegralType t.term_type ->
-         TLogic_coerce(ct, t), ct
+         TLogic_coerce(ct, t), ct (* cast from integral type to boolean *)
+       | Linteger when Logic_const.is_boolean_type t.term_type ->
+         TLogic_coerce(ct, t), ct (* cast from boolean to integer *)
        | Linteger | Lreal | Ltype _  | Lvar _ | Larrow _ ->
          ctxt.error loc "cannot cast from %a to %a"
            Cil_printer.pp_logic_type t.term_type
