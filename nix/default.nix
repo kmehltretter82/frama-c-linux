@@ -105,10 +105,11 @@ rec {
         '';
   };
 
-  distrib = stdenv.mkDerivation {
-        name = "frama-c-distrib";
+  build-distrib-tarball = stdenv.mkDerivation {
+        name = "frama-c-build-distrib-tarball";
         inherit src;
         buildInputs = buildInputs ++ [ plugins.headache.installed pkgs.file ];
+        outputs = [ "out" ];
         postPatch = ''
                patchShebangs .
         '';
@@ -119,16 +120,19 @@ rec {
         '';
         buildPhase = ''
                 make DISTRIB="frama-c-archive" src-distrib
+                tar -zcf frama-c-tests-archive.tar.gz tests src/plugins/*/tests
         '';
         installPhase = ''
-               tar -C $out --strip-components=1 -xf frama-c-archive.tar.gz
+               tar -C $out --strip-components=1 -xzf frama-c-archive.tar.gz
+               tar -C $out -xzf frama-c-tests-archive.tar.gz
         '';
   };
 
-  tests-distrib = stdenv.mkDerivation {
-        name = "frama-c-tests-distrib";
-        inherit distrib buildInputs;
-        outputs = [ "out" "build_dir" ];
+  build-from-distrib-tarball = stdenv.mkDerivation {
+        name = "frama-c-build-from-distrib-tarball";
+        inherit buildInputs;
+        src = build-distrib-tarball.out ;
+        outputs = [ "out" ];
         configurePhase = ''
                unset CC
                autoconf
@@ -136,10 +140,9 @@ rec {
         '';
         buildPhase = ''
                 make -j 4
-                make tests -j4 PTESTS_OPTS="-error-code -j 4"
         '';
         installPhase = ''
-               make install
+               true
         '';
   };
 
