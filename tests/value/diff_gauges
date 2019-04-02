@@ -96,86 +96,104 @@ diff tests/value/oracle/gauges.res.oracle tests/value/oracle_gauges/gauges.res.o
 < [eva:alarm] tests/value/gauges.c:158: Warning: 
 <   out of bounds write. assert \valid(tmp);
 <                        (tmp from p--)
-255,258d230
+227,231c203,205
+< [eva] tests/value/gauges.c:172: Frama_C_show_each: [2147483646..4294967294]
+< [eva] tests/value/gauges.c:172: Frama_C_show_each: [1..4294967294]
+< [eva] tests/value/gauges.c:172: Frama_C_show_each: [1..4294967294]
+< [eva] tests/value/gauges.c:172: Frama_C_show_each: [1..4294967294]
+< [eva] tests/value/gauges.c:172: Frama_C_show_each: [1..4294967294]
+---
+> [eva] tests/value/gauges.c:172: Frama_C_show_each: [2147483647..4294967294]
+> [eva] tests/value/gauges.c:172: Frama_C_show_each: [2147483647..4294967294]
+> [eva] tests/value/gauges.c:172: Frama_C_show_each: [2147483647..4294967294]
+235c209,210
+< [eva] tests/value/gauges.c:172: Frama_C_show_each: [1..4294967294]
+---
+> [eva] tests/value/gauges.c:172: Frama_C_show_each: [2147483647..4294967294]
+> [eva] tests/value/gauges.c:172: Frama_C_show_each: [2147483647..4294967294]
+255,258d229
 < [eva:alarm] tests/value/gauges.c:192: Warning: 
 <   out of bounds write. assert \valid(p);
 < [eva:alarm] tests/value/gauges.c:193: Warning: 
 <   out of bounds write. assert \valid(q);
-266,271d237
+266,271d236
 < [eva:alarm] tests/value/gauges.c:202: Warning: 
 <   out of bounds read. assert \valid_read(tmp);
 <                       (tmp from A++)
 < [eva:alarm] tests/value/gauges.c:202: Warning: 
 <   out of bounds read. assert \valid_read(tmp_0);
 <                       (tmp_0 from B++)
-315,318c281
+299,300d263
+< [eva:alarm] tests/value/gauges.c:220: Warning: 
+<   signed overflow. assert -2147483648 ≤ n - 1;
+315,318c278
 < [eva:alarm] tests/value/gauges.c:240: Warning: 
 <   signed overflow. assert j + 1 ≤ 2147483647;
 < [eva] tests/value/gauges.c:242: 
 <   Frama_C_show_each: {45; 46; 47; 48; 49; 50; 51}, [0..2147483647]
 ---
 > [eva] tests/value/gauges.c:242: Frama_C_show_each: {47; 48}, {6}
-324,325d286
+324,325d283
 < [eva:alarm] tests/value/gauges.c:251: Warning: 
 <   signed overflow. assert j + 1 ≤ 2147483647;
-327c288
+327c285
 <   Frama_C_show_each: {48; 49; 50; 51; 52; 53; 54}, [0..2147483647]
 ---
 >   Frama_C_show_each: {48; 49; 50; 51; 52; 53; 54}, {6; 7}
-333,336c294
+333,336c291
 < [eva:alarm] tests/value/gauges.c:263: Warning: 
 <   signed overflow. assert j + 1 ≤ 2147483647;
 < [eva] tests/value/gauges.c:265: 
 <   Frama_C_show_each: {-59; -58; -57; -56; -55; -54; -53}, [0..2147483647]
 ---
 > [eva] tests/value/gauges.c:265: Frama_C_show_each: {-58; -57}, {9}
-342,343d299
+342,343d296
 < [eva:alarm] tests/value/gauges.c:274: Warning: 
 <   signed overflow. assert j + 1 ≤ 2147483647;
-345c301
+345c298
 <   Frama_C_show_each: {-64; -63; -62; -61; -60; -59; -58}, [0..2147483647]
 ---
 >   Frama_C_show_each: {-64; -63; -62; -61; -60; -59; -58}, {9; 10}
-353,354d308
+353,354d305
 < [eva:alarm] tests/value/gauges.c:293: Warning: 
 <   signed overflow. assert j + 1 ≤ 2147483647;
-356c310
+356c307
 <   Frama_C_show_each: {-593; -592; -591; -590; -589; -588}, [0..2147483647]
 ---
 >   Frama_C_show_each: {-593; -592; -591; -590; -589; -588}, [99..119]
-418a373,376
+418a370,373
 >   # Gauges domain:
 >   V: [{[ p -> {{ &x }}
 >          i -> {1} ]}]
 >   s398: λ(0)
-478a437,440
+478a434,437
 >   # Gauges domain:
 >   V: [{[ i -> {1} ]}]
 >   s398: λ([0 .. 1])
 >         {[ i -> {1} ]}
-537a500,503
+537a497,500
 >   # Gauges domain:
 >   V: [{[ i -> {1} ]}]
 >   s398: λ([0 .. 2])
 >         {[ i -> {1} ]}
-596a563,566
+596a560,563
 >   # Gauges domain:
 >   V: [{[ i -> {1} ]}]
 >   s398: λ([0 .. 10])
 >         {[ i -> {1} ]}
-661a632,636
+661a629,633
 >   # Gauges domain:
 >   V: [{[ p -> {{ &a }}
 >          i -> {2} ]}]
 >   s412: λ(0)
 >   s411: λ(0)
-722a698,702
+722a695,699
 >   # Gauges domain:
 >   V: [{[ i -> {2} ]}]
 >   s412: λ(0)
 >   s411: λ([0 .. 1])
 >         {[ i -> {0} ]}
-724a705,832
+724a702,829
 > [eva] tests/value/gauges.c:325: 
 >   Frama_C_dump_each:
 >   # Cvalue domain:
@@ -304,53 +322,71 @@ diff tests/value/oracle/gauges.res.oracle tests/value/oracle_gauges/gauges.res.o
 >   s411: λ([0 .. +oo])
 >         {[ i -> {0} ]}
 >   ==END OF DUMP==
-732a841,842
+732a838,839
 > [eva] tests/value/gauges.c:343: Call to builtin malloc
 > [eva] tests/value/gauges.c:343: Call to builtin malloc
-785,786c895,896
+785,786c892,893
 <   A ∈ {{ &A + [0..--],0%4 }}
 <   B ∈ {{ &B + [0..--],0%4 }}
 ---
 >   A ∈ {{ &A + [0..36],0%4 }}
 >   B ∈ {{ &B + [0..36],0%4 }}
-804c914
+798c905
+<   n ∈ [-2147483648..99]
+---
+>   n ∈ [-2147483547..99]
+804c911
 <   i ∈ {45; 46; 47; 48; 49; 50; 51}
 ---
 >   i ∈ {45; 46; 47; 48}
-810c920
+810c917
 <   i ∈ {-59; -58; -57; -56; -55; -54; -53}
 ---
 >   i ∈ {-58; -57; -56; -55; -54; -53}
-830c940
+830c937
 <   p ∈ {{ &u + [0..--],0%4 }}
 ---
 >   p ∈ {{ &u + [0..400],0%4 }}
-832c942
+832c939
 <   k ∈ [0..2147483647]
 ---
 >   k ∈ [0..390]
-837c947
+837c944
 <   i ∈ [0..2147483647]
 ---
 >   i ∈ [0..21]
-848,849c958,960
+848,849c955,957
 <    [1..9] ∈ {4; 5; 6; 7; 8; 9} or UNINITIALIZED
 <   p ∈ {{ &y + [4..40],0%4 }}
 ---
 >    [1..6] ∈ {4; 5; 6; 7; 8; 9} or UNINITIALIZED
 >    [7..9] ∈ UNINITIALIZED
 >   p ∈ {{ &y[7] }}
-860c971
+860c968
 <   p ∈ {{ &T + [--..396],0%4 }}
 ---
 >   p ∈ {{ &T + [-4..396],0%4 }}
-995,996c1106,1107
+865,869c973
+<   n ∈ {0}
+<   arr[0] ∈ {0}
+<      [1] ∈ {-1}
+<      [2..65535] ∈ [--..--] or UNINITIALIZED
+<   p ∈ {{ &arr + [12..--],0%4 }}
+---
+>   NON TERMINATING FUNCTION
+972a1077
+> [from] Non-terminating function main8_aux (no dependencies)
+995,996c1100,1101
 <   p FROM p; A; B; n; p; A[0..9]; B[0..9] (and SELF)
 <   \result FROM p; A; B; n; p; A[0..9]; B[0..9]
 ---
 >   p FROM p; A; B; n; p; A[0..8]; B[0..8] (and SELF)
 >   \result FROM p; A; B; n; p; A[0..8]; B[0..8]
-1074c1185
+1040c1145
+<   NO EFFECTS
+---
+>   NON TERMINATING - NO EFFECTS
+1074c1179
 <     p; A[0..9]; B[0..9]
 ---
 >     p; A[0..8]; B[0..8]
@@ -864,6 +900,10 @@ diff tests/value/oracle/reevaluate_alarms.res.oracle tests/value/oracle_gauges/r
 < [eva:alarm] tests/value/reevaluate_alarms.i:14: Warning: 
 <   out of bounds write. assert \valid(tmp);
 <                        (tmp from p++)
+59c56
+<   p ∈ {{ &T + [0..--],0%4 }}
+---
+>   p ∈ {{ &T{[0], [1], [2], [3], [4], [5]} }}
 124,125d120
 < [    -    ] Assertion 'Eva,mem_access' (file tests/value/reevaluate_alarms.i, line 14)
 <             tried with Eva.
@@ -905,16 +945,22 @@ diff tests/value/oracle/undefined_sequence.0.res.oracle tests/value/oracle_gauge
 101a103
 > [eva] tests/value/undefined_sequence.i:49: starting to merge loop iterations
 diff tests/value/oracle/unroll.res.oracle tests/value/oracle_gauges/unroll.res.oracle
-16a17
+13,14d12
+< [eva:alarm] tests/value/unroll.i:34: Warning: 
+<   signed overflow. assert -2147483648 ≤ j - 1;
+16a15
 > [eva] tests/value/unroll.i:39: starting to merge loop iterations
-26c27
+26c25
 <   j ∈ [-2147483648..-123]
 ---
 >   j ∈ {-238}
 diff tests/value/oracle/unroll_simple.res.oracle tests/value/oracle_gauges/unroll_simple.res.oracle
-11a12
+8,9d7
+< [eva:alarm] tests/value/unroll_simple.i:11: Warning: 
+<   signed overflow. assert -2147483648 ≤ j - 1;
+11a10
 > [eva] tests/value/unroll_simple.i:16: starting to merge loop iterations
-21c22
+21c20
 <   j ∈ [-2147483648..-126]
 ---
 >   j ∈ {-250}
@@ -950,3 +996,8 @@ diff tests/value/oracle/widen_on_non_monotonic.res.oracle tests/value/oracle_gau
 25a26,27
 > [eva] tests/value/widen_on_non_monotonic.i:21: starting to merge loop iterations
 > [eva] tests/value/widen_on_non_monotonic.i:18: starting to merge loop iterations
+diff tests/value/oracle/widen_overflow.res.oracle tests/value/oracle_gauges/widen_overflow.res.oracle
+31a32,34
+> [eva] computing for function u <- main.
+>   Called from tests/value/widen_overflow.i:9.
+> [eva] Done for function u

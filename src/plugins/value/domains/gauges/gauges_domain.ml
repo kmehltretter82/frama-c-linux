@@ -1174,27 +1174,6 @@ module D_Impl : Abstract_domain.S_with_Structure
        and type valuation := Valuation.t
   = struct
 
-    let update _valuation st = st (* TODO? *)
-
-    exception Unassignable
-
-    let assign _kinstr lv e _assignment valuation (state:state) =
-      let to_loc lv =
-        match Valuation.find_loc valuation lv with
-        | `Value r -> Precise_locs.imprecise_location r.loc
-        | `Top -> raise Unassignable
-      in
-      let to_val e =
-        match Valuation.find valuation e with
-        | `Top -> raise Unassignable
-        | `Value v ->
-          match v.value.initialized, v.value.escaping, v.value.v with
-          | true, false, `Value v -> v
-          | _ -> raise Unassignable
-      in
-      try `Value (G.assign to_loc to_val lv.lval e state)
-      with Unassignable -> `Value (kill lv.lloc state)
-
     let assume_exp valuation e r state =
       if r.reductness = Created || r.reductness = Reduced then
         match e.enode with
@@ -1220,9 +1199,34 @@ module D_Impl : Abstract_domain.S_with_Structure
     let assume_exp_bot valuation e r state =
       state >>- assume_exp valuation e r
 
-    let assume _ _ _ valuation state =
+    let assume_valuation valuation state =
       let assume_one = assume_exp_bot valuation in
       Valuation.fold assume_one valuation (`Value state)
+
+    let update valuation state =
+      Bottom.non_bottom (assume_valuation valuation state)
+
+    let assume _ _ _ = assume_valuation
+
+    exception Unassignable
+
+    let assign _kinstr lv e _assignment valuation (state:state) =
+      let state = update valuation state in
+      let to_loc lv =
+        match Valuation.find_loc valuation lv with
+        | `Value r -> Precise_locs.imprecise_location r.loc
+        | `Top -> raise Unassignable
+      in
+      let to_val e =
+        match Valuation.find valuation e with
+        | `Top -> raise Unassignable
+        | `Value v ->
+          match v.value.initialized, v.value.escaping, v.value.v with
+          | true, false, `Value v -> v
+          | _ -> raise Unassignable
+      in
+      try `Value (G.assign to_loc to_val lv.lval e state)
+      with Unassignable -> `Value (kill lv.lloc state)
 
     let finalize_call _stmt _call ~pre ~post =
       let state =
