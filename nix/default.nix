@@ -63,7 +63,7 @@ rec {
   lint = stdenv.mkDerivation {
         name = "frama-c-lint";
         inherit src;
-        buildInputs = (mk_buildInputs {opamPackages = [ "ocp-indent" ];} ) ++ [ pkgs.bc plugins.headache.installed pkgs.file ];
+        buildInputs = (mk_buildInputs {opamPackages = [ "ocp-indent" ];} ) ++ [ pkgs.bc plugins.headache.installed ];
         outputs = [ "out" ];
         postPatch = ''
                patchShebangs .
@@ -108,7 +108,7 @@ rec {
   build-distrib-tarball = stdenv.mkDerivation {
         name = "frama-c-build-distrib-tarball";
         inherit src;
-        buildInputs = buildInputs ++ [ plugins.headache.installed pkgs.file ];
+        buildInputs = buildInputs ++ [ plugins.headache.installed ];
         outputs = [ "out" ];
         postPatch = ''
                patchShebangs .
@@ -179,7 +179,7 @@ rec {
         inherit src;
         buildInputs = (mk_buildInputs { opamPackages = [ "xml-light" ];} ) ++
                     [ pkgs.getopt pkgs.which
-                      pkgs.libxslt pkgs.libxml2 pkgs.file pkgs.autoPatchelfHook stdenv.cc.cc.lib
+                      pkgs.libxslt pkgs.libxml2 pkgs.autoPatchelfHook stdenv.cc.cc.lib
         ];
         counter_examples_src = plugins.counter-examples.src;
         genassigns_src = plugins.genassigns.src;
