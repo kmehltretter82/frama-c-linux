@@ -1340,9 +1340,12 @@ let () = add_precision_dep Precision.parameter
    means. *)
 let set (type t) (module P: Parameter_sig.S with type t = t) =
   let previous = ref (P.get ()) in
-  fun t ->
+  fun ~default t ->
     let already_set = P.is_set () && not (P.equal !previous (P.get ())) in
-    if not already_set then begin P.set t; previous := t end;
+    if not already_set then begin
+      if default then P.clear () else P.set t;
+      previous := P.get ();
+    end;
     let str = Typed_parameter.get_value P.parameter in
     let str = match P.parameter.Typed_parameter.accessor with
       | Typed_parameter.String _ -> "\'" ^ str ^ "\'"
@@ -1360,7 +1363,7 @@ let configures = ref []
    for a precision n. *)
 let bind (type t) (module P: Parameter_sig.S with type t = t) f =
   let set = set (module P) in
-  configures := (fun n -> set (f n)) :: !configures
+  configures := (fun n -> set ~default:(n < 0) (f n)) :: !configures
 
 (*  power             0   1   2   3   4    5    6    7     8     9     10     11 *)
 let slevel_power = [| 0;  10; 20; 50;  75; 100; 200; 500; 1000; 2000; 5000; 10000 |]
@@ -1390,8 +1393,7 @@ let set_analysis n =
   List.iter ((|>) n) (List.rev !configures)
 
 let configure_precision () =
-  let n = Precision.get () in
-  if n >= 0 then set_analysis n
+  if Precision.is_set () then set_analysis (Precision.get ())
 
 (* -------------------------------------------------------------------------- *)
 (* --- Freeze parameters. MUST GO LAST                                    --- *)
