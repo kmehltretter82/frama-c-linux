@@ -188,6 +188,9 @@ val wkey_missing_loop_unroll : warn_category
 (** Warning category used to identify for loops without unroll annotations *)
 val wkey_missing_loop_unroll_for : warn_category
 
+(** Warning category for signed overflows *)
+val wkey_signed_overflow : warn_category
+
 (** Debug category used to print information about invalid pointer comparisons*)
 val dkey_pointer_comparison: category
 
