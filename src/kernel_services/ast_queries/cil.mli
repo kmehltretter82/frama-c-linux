@@ -2049,12 +2049,15 @@ val visitCilBlock: cilVisitor -> block -> block
     might prevent it (e.g. if the preceding statement is a statement contract
     or a slicing/pragma annotation, or if there are labels involved). Use
     that whenever you're creating a block in order to hold multiple statements
-    as a result of visiting a single statement.
+    as a result of visiting a single statement. If the block contains local
+    variables, it will not be marked as transient, since removing it will
+    change the scope of those variables.
 
     @raise Fatal error if the given block attempts to declare local variables
-    (in which case it can't be marked as transient anyways).
+    and contain definitions of local variables that are not part of the block.
 
     @since Phosphorus-20170501-beta1
+    @modify Frama-C+dev: do not raise fatal as soon as the block has locals
 *)
 val transient_block: block -> block
 
