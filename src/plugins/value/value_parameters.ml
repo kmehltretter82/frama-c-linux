@@ -1336,8 +1336,8 @@ module Precision =
 let () = Precision.set_range (-1) 11
 let () = add_precision_dep Precision.parameter
 
-(* Sets a parameter [P] to [t], unless it has already been set by another mean
-   that this function. *)
+(* Sets a parameter [P] to [t], unless it has already been set by any other
+   means. *)
 let set (type t) (module P: Parameter_sig.S with type t = t) =
   let previous = ref (P.get ()) in
   fun t ->
