@@ -98,7 +98,7 @@ module Trivial =
   False
     (struct
       let option_name = "-rte-trivial-annotations"
-      let help = "generate all annotations even when they trivially hold \
+      let help = "generate all annotations even if they trivially hold \
                   (from evaluation of constant expressions, syntactical rules...)"
       (* if on, evaluates constants in order to check if assertions
          are trivially true / false *)

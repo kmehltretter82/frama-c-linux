@@ -2,7 +2,7 @@
 OPT: -warn-invalid-bool -rte -print -then -rte-trivial-annotations -rte -print
 */
 
-/* The test asks for two execution of RTE plug-in:
+/* The test asks for two executions of RTE plug-in:
    - a first one without trivial annotations (default behavior)
    - a second one with trivial annotations (-rte-trivial-annotations)
 */
