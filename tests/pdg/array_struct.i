@@ -1,5 +1,5 @@
 /* run.config
-  OPT: -eva-show-progress -pdg -pdg-print -journal-disable -pdg-verbose 2
+  STDOPT: +"-pdg"
 */
 
 typedef struct {

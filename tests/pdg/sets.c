@@ -1,6 +1,6 @@
 /* run.config
    EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
-   OPT: -eva-show-progress -load-module @PTEST_DIR@/@PTEST_NAME@ -lib-entry -main f -pdg -inout -journal-disable  -pdg-print -pdg-verbose 2
+   STDOPT: +"-load-module @PTEST_DIR@/@PTEST_NAME@ -lib-entry -main f -pdg -inout "
 */
 
 
