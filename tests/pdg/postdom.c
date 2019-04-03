@@ -1,5 +1,5 @@
 /* run.config
-  OPT: -eva-show-progress -pdg -journal-disable -pdg-print -pdg-verbose 2
+  STDOPT: +"-pdg"
 */
 
 

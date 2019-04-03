@@ -1,6 +1,6 @@
 /* run.config
-   OPT: -sparecode-debug 1 -sparecode -eva-show-progress -journal-disable
-   OPT: -slicing-level 2 -slice-return main -eva-show-progress -journal-disable -then-on 'Slicing export' -print
+   STDOPT: +"-sparecode"
+   STDOPT: +"-slicing-level 2 -slice-return main -then-on 'Slicing export' -print"
 */
 
 int main (void) {

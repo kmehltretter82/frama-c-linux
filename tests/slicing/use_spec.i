@@ -1,6 +1,6 @@
 /* run.config
- OPT: -eva-show-progress -eva-use-spec f -slice-return main -journal-disable -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  
- OPT: -eva-show-progress -main main2 -slicing-level 3 -slice-undef-functions -eva-use-spec h -slice-return main2 -journal-disable -slicing-keep-annotations -then-on 'Slicing export' -set-project-as-default -print  -eva -eva-show-progress -eva-use-spec='-@all'
+ STDOPT: +" -eva-use-spec f -slice-return main -journal-disable -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -eva-show-progress"
+ STDOPT: +"-main main2 -slicing-level 3 -slice-undef-functions -eva-use-spec h -slice-return main2 -journal-disable -slicing-keep-annotations -then-on 'Slicing export' -set-project-as-default -print  -eva -eva-use-spec='-@all' -eva-show-progress"
 
 
 

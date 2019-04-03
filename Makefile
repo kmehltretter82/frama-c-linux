@@ -1082,6 +1082,7 @@ PLUGIN_NAME:=Pdg
 PLUGIN_DIR:=src/plugins/pdg
 PLUGIN_TESTS_LIB:=tests/pdg/dyn_dpds.ml \
                   tests/pdg/sets.ml
+PLUGIN_TESTS_DIRS:=pdg
 PLUGIN_CMO:= pdg_parameters \
 	    ctrlDpds \
 	    pdg_state \
