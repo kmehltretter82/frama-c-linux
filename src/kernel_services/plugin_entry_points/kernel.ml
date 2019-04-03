@@ -1113,13 +1113,15 @@ module LogicalOperators =
 let () = Parameter_customize.set_group normalisation
 let () = Parameter_customize.do_not_reset_on_copy ()
 module Enums =
-  P.Empty_string
+  P.String
     (struct
       let option_name = "-enums"
       let arg_name = "repr"
+      let default = "gcc-enums"
       let help = 
         "use <repr> to decide how enumerated types should be represented. \
-         -enums help gives the list of available representations"
+         -enums help gives the list of available representations (default: "
+        ^ default ^ ")"
      end)
 let enum_reprs = ["gcc-enums"; "gcc-short-enums"; "int";]
 let () = Enums.set_possible_values ("help"::enum_reprs)
