@@ -2,7 +2,7 @@
 { pkgs, stdenv, src ? ../., opam2nix, ocaml_version ? "ocaml-ng.ocamlPackages_4_05.ocaml", plugins ? { } }:
 
 let mk_buildInputs = { opamPackages ? [] } :
-    [ pkgs.gnugrep pkgs.gnused  pkgs.autoconf pkgs.gnumake pkgs.gcc pkgs.ncurses pkgs.time pkgs.python3 pkgs.perl] ++ opam2nix.build {
+    [ pkgs.gnugrep pkgs.gnused  pkgs.autoconf pkgs.gnumake pkgs.gcc pkgs.ncurses pkgs.time pkgs.python3 pkgs.perl pkgs.file] ++ opam2nix.build {
            specs = opam2nix.toSpecs ([ "ocamlfind" "zarith" "ocamlgraph"
                 { name = "coq"; constraint = "=8.7.2"; }
                 ] ++ opamPackages ++
@@ -63,7 +63,7 @@ rec {
   lint = stdenv.mkDerivation {
         name = "frama-c-lint";
         inherit src;
-        buildInputs = (mk_buildInputs {opamPackages = [ "ocp-indent" ];} ) ++ [ pkgs.bc plugins.headache.installed pkgs.file ];
+        buildInputs = (mk_buildInputs {opamPackages = [ "ocp-indent" ];} ) ++ [ pkgs.bc plugins.headache.installed ];
         outputs = [ "out" ];
         postPatch = ''
                patchShebangs .
@@ -105,10 +105,11 @@ rec {
         '';
   };
 
-  distrib = stdenv.mkDerivation {
-        name = "frama-c-distrib";
+  build-distrib-tarball = stdenv.mkDerivation {
+        name = "frama-c-build-distrib-tarball";
         inherit src;
         buildInputs = buildInputs ++ [ plugins.headache.installed ];
+        outputs = [ "out" ];
         postPatch = ''
                patchShebangs .
         '';
@@ -119,16 +120,19 @@ rec {
         '';
         buildPhase = ''
                 make DISTRIB="frama-c-archive" src-distrib
+                tar -zcf frama-c-tests-archive.tar.gz tests src/plugins/*/tests
         '';
         installPhase = ''
-               tar -C $out --strip-components=1 -xf frama-c-archive.tar.gz
+               tar -C $out --strip-components=1 -xzf frama-c-archive.tar.gz
+               tar -C $out -xzf frama-c-tests-archive.tar.gz
         '';
   };
 
-  tests-distrib = stdenv.mkDerivation {
-        name = "frama-c-tests-distrib";
-        inherit distrib buildInputs;
-        outputs = [ "out" "build_dir" ];
+  build-from-distrib-tarball = stdenv.mkDerivation {
+        name = "frama-c-build-from-distrib-tarball";
+        inherit buildInputs;
+        src = build-distrib-tarball.out ;
+        outputs = [ "out" ];
         configurePhase = ''
                unset CC
                autoconf
@@ -136,10 +140,9 @@ rec {
         '';
         buildPhase = ''
                 make -j 4
-                make tests -j4 PTESTS_OPTS="-error-code -j 4"
         '';
         installPhase = ''
-               make install
+               true
         '';
   };
 
@@ -176,7 +179,7 @@ rec {
         inherit src;
         buildInputs = (mk_buildInputs { opamPackages = [ "xml-light" ];} ) ++
                     [ pkgs.getopt pkgs.which
-                      pkgs.libxslt pkgs.libxml2 pkgs.file pkgs.autoPatchelfHook stdenv.cc.cc.lib
+                      pkgs.libxslt pkgs.libxml2 pkgs.autoPatchelfHook stdenv.cc.cc.lib
         ];
         counter_examples_src = plugins.counter-examples.src;
         genassigns_src = plugins.genassigns.src;
