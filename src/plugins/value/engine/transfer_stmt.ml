@@ -412,7 +412,7 @@ module Make
       valuation >>- fun valuation ->
       Eva.assume ~valuation state argument.concrete post_value
     in
-    List.fold_left reduce_one_argument valuation reductions >>-: fun valuation ->
+    List.fold_left reduce_one_argument valuation reductions >>- fun valuation ->
     TF.update valuation state
 
   (* -------------------- Treat the results of a call ----------------------- *)

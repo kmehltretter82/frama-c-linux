@@ -227,7 +227,7 @@ module State = struct
 
     module T = Cvalue_transfer.Transfer (Valuation)
 
-    let update valuation (s, clob) = T.update valuation s, clob
+    let update valuation (s, clob) = T.update valuation s >>-: fun s -> s, clob
 
     let assign stmt lv expr assigned valuation (s, clob) =
       T.assign stmt lv expr assigned valuation s >>-: fun s ->

@@ -1199,19 +1199,16 @@ module D_Impl : Abstract_domain.S_with_Structure
     let assume_exp_bot valuation e r state =
       state >>- assume_exp valuation e r
 
-    let assume_valuation valuation state =
+    let update valuation state =
       let assume_one = assume_exp_bot valuation in
       Valuation.fold assume_one valuation (`Value state)
 
-    let update valuation state =
-      Bottom.non_bottom (assume_valuation valuation state)
-
-    let assume _ _ _ = assume_valuation
+    let assume _ _ _ = update
 
     exception Unassignable
 
     let assign _kinstr lv e _assignment valuation (state:state) =
-      let state = update valuation state in
+      update valuation state >>- fun state ->
       let to_loc lv =
         match Valuation.find_loc valuation lv with
         | `Value r -> Precise_locs.imprecise_location r.loc
@@ -1242,8 +1239,9 @@ module D_Impl : Abstract_domain.S_with_Structure
         match function_calls_handling with
         | FullInterprocedural -> update valuation state
         | IntraproceduralAll
-        | IntraproceduralNonReferenced -> G.empty
+        | IntraproceduralNonReferenced -> `Value G.empty
       in
+      state >>- fun state ->
       (* track [arg.formal] into [state]. Important for functions that
          receive a size as argument. *)
       let aux_arg state arg =

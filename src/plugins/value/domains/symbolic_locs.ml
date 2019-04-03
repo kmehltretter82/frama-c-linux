@@ -540,7 +540,7 @@ module Internal : Domain_builder.InputDomain
             state
         | _ -> state
       in
-      Valuation.fold aux valuation state
+      `Value (Valuation.fold aux valuation state)
 
     let store_value valuation lv loc state v =
       let loc = Precise_locs.imprecise_location loc in
@@ -568,14 +568,14 @@ module Internal : Domain_builder.InputDomain
 
     (* perform [lv = e] in [state] *)
     let assign _kinstr lv _e v valuation state =
-      let state = update valuation state in
+      update valuation state >>- fun state ->
       match v with
       | Copy (_, vc) -> store_copy valuation lv lv.lloc state vc
       | Assign v -> store_value valuation lv.lval lv.lloc state v
 
-    let assume _stmt _exp _pos valuation state = `Value (update valuation state)
+    let assume _stmt _exp _pos valuation state = update valuation state
 
-    let start_call _stmt _call valuation state = `Value (update valuation state)
+    let start_call _stmt _call valuation state = update valuation state
 
     let finalize_call _stmt _call ~pre:_ ~post = `Value post
 

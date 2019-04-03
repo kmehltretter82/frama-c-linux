@@ -338,7 +338,7 @@ module Make
       let deps = HCESet.fold (add_one_dep valuation) lvalues.read deps in
       HCESet.fold (add_one_dep valuation) lvalues.addr deps
 
-    let update _valuation state = state
+    let update _valuation state = `Value state
 
     let is_singleton = match get_cvalue with
       | None -> fun _ -> false
