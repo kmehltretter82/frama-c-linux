@@ -4954,6 +4954,10 @@ extern int pclose(FILE *stream);
 
 ssize_t getline(char **lineptr, size_t *n, FILE *stream);
 
+/*@ assigns \result;
+    assigns \result \from maj, min; */
+extern dev_t makedev(int maj, int min);
+
 FILE __fc_initial_stdout =
   {.__fc_FILE_id = (unsigned int)1, .__fc_FILE_data = 0U};
 FILE *__fc_stdout = & __fc_initial_stdout;
@@ -7531,13 +7535,43 @@ extern int setitimer(int which,
 extern int select(int nfds, fd_set *readfds, fd_set *writefds,
                   fd_set *errorfds, struct timeval *timeout);
 
-/*@ requires valid_string_path: valid_read_string(path);
+/*@ requires valid_path: valid_read_string(path);
+    requires valid_buf: \valid(buf);
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result, *buf;
+    assigns \result
+      \from (indirect: path), (indirect: *(path + (0 .. strlen{Old}(path))));
+    assigns *buf
+      \from (indirect: path), (indirect: *(path + (0 .. strlen{Old}(path))));
+ */
+extern int lstat(char const *path, struct stat *buf);
+
+/*@ requires valid_path: valid_read_string(path);
     ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
     assigns \result;
     assigns \result
-      \from (indirect: path), (indirect: *(path + (0 ..))), (indirect: mode);
+      \from (indirect: path), (indirect: *(path + (0 .. strlen{Old}(path)))),
+            (indirect: mode);
  */
 extern int mkdir(char const *path, mode_t mode);
+
+/*@ requires valid_path: valid_read_string(path);
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result
+      \from (indirect: path), (indirect: *(path + (0 .. strlen{Old}(path)))),
+            (indirect: mode);
+ */
+extern int mkfifo(char const *path, mode_t mode);
+
+/*@ requires valid_path: valid_read_string(path);
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result
+      \from (indirect: path), (indirect: *(path + (0 .. strlen{Old}(path)))),
+            (indirect: mode), (indirect: dev);
+ */
+extern int mknod(char const *path, mode_t mode, dev_t dev);
 
 /*@ requires valid_pathname: valid_read_string(pathname);
     requires valid_buf: \valid(buf);
@@ -7546,8 +7580,8 @@ extern int mkdir(char const *path, mode_t mode);
       init_on_success: initialization: buf:
         \result ≡ 0 ⇒ \initialized(\old(buf));
     assigns \result, *buf;
-    assigns \result \from *(pathname + (0 ..));
-    assigns *buf \from *(pathname + (0 ..));
+    assigns \result \from *(pathname + (0 .. strlen{Old}(pathname)));
+    assigns *buf \from *(pathname + (0 .. strlen{Old}(pathname)));
  */
 extern int stat(char const *pathname, struct stat *buf);
 

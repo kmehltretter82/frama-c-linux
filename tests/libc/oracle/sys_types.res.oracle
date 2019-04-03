@@ -1,0 +1,16 @@
+[kernel] Parsing tests/libc/sys_types.c (with preprocessing)
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:initial-state] Values of globals at initialization
+  
+[eva] computing for function makedev <- main.
+  Called from tests/libc/sys_types.c:4.
+[eva] using specification for function makedev
+[eva] Done for function makedev
+[eva] Recording results for main
+[eva] done for function main
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function main:
+  dev ∈ [--..--]
+  __retres ∈ {0}
