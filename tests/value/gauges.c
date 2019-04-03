@@ -170,12 +170,12 @@ void main8_aux (unsigned int n) {
   int *p = arr;
   do {
     Frama_C_show_each(n);
-    *p++ = n;
+    *p++ = n; // Invalid access memory if more than 65536 iterations.
   } while (--n);
 }
 
 void main8() {
-  main8_aux(0);
+  if (v) main8_aux(0); // This call can legitimately lead to bottom.
 }
 
 void main9() {

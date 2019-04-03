@@ -1163,7 +1163,7 @@
 [inout] Out (internal) for function main8:
     \nothing
 [inout] Inputs for function main8:
-    \nothing
+    v
 [inout] Out (internal) for function main9:
     x[0..9]; y[0..9]; p; q; z; i; r
 [inout] Inputs for function main9:

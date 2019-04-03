@@ -147,33 +147,33 @@ diff tests/value/oracle/gauges.res.oracle tests/value/oracle_gauges/gauges.res.o
 >   # Gauges domain:
 >   V: [{[ p -> {{ &x }}
 >          i -> {1} ]}]
->   s395: λ(0)
+>   s398: λ(0)
 478a437,440
 >   # Gauges domain:
 >   V: [{[ i -> {1} ]}]
->   s395: λ([0 .. 1])
+>   s398: λ([0 .. 1])
 >         {[ i -> {1} ]}
 537a500,503
 >   # Gauges domain:
 >   V: [{[ i -> {1} ]}]
->   s395: λ([0 .. 2])
+>   s398: λ([0 .. 2])
 >         {[ i -> {1} ]}
 596a563,566
 >   # Gauges domain:
 >   V: [{[ i -> {1} ]}]
->   s395: λ([0 .. 10])
+>   s398: λ([0 .. 10])
 >         {[ i -> {1} ]}
 661a632,636
 >   # Gauges domain:
 >   V: [{[ p -> {{ &a }}
 >          i -> {2} ]}]
->   s409: λ(0)
->   s408: λ(0)
+>   s412: λ(0)
+>   s411: λ(0)
 722a698,702
 >   # Gauges domain:
 >   V: [{[ i -> {2} ]}]
->   s409: λ(0)
->   s408: λ([0 .. 1])
+>   s412: λ(0)
+>   s411: λ([0 .. 1])
 >         {[ i -> {0} ]}
 724a705,832
 > [eva] tests/value/gauges.c:325: 
@@ -236,8 +236,8 @@ diff tests/value/oracle/gauges.res.oracle tests/value/oracle_gauges/gauges.res.o
 >   S_1___fc_env[0..1] ∈ [--..--]
 >   # Gauges domain:
 >   V: [{[ i -> {2} ]}]
->   s409: λ(0)
->   s408: λ([0 .. 2])
+>   s412: λ(0)
+>   s411: λ([0 .. 2])
 >         {[ i -> {0} ]}
 >   ==END OF DUMP==
 > [eva] tests/value/gauges.c:325: 
@@ -300,8 +300,8 @@ diff tests/value/oracle/gauges.res.oracle tests/value/oracle_gauges/gauges.res.o
 >   S_1___fc_env[0..1] ∈ [--..--]
 >   # Gauges domain:
 >   V: [{[ i -> {2} ]}]
->   s409: λ(0)
->   s408: λ([0 .. +oo])
+>   s412: λ(0)
+>   s411: λ([0 .. +oo])
 >         {[ i -> {0} ]}
 >   ==END OF DUMP==
 732a841,842
