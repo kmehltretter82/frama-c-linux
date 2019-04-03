@@ -1,9 +1,9 @@
 diff tests/builtins/oracle/Longinit_sequencer.res.oracle tests/builtins/oracle_apron/Longinit_sequencer.res.oracle
-320c320
+323c323
 <   tests/builtins/result/Longinit_sequencer.sav
 ---
 >   tests/builtins/result_apron/Longinit_sequencer.sav
-556c556
+562c562
 <   tests/builtins/result/Longinit_sequencer.sav
 ---
 >   tests/builtins/result_apron/Longinit_sequencer.sav

@@ -1,17 +1,17 @@
 diff tests/builtins/oracle/Longinit_sequencer.res.oracle tests/builtins/oracle_equalities/Longinit_sequencer.res.oracle
-320c320
+323c323
 <   tests/builtins/result/Longinit_sequencer.sav
 ---
 >   tests/builtins/result_equalities/Longinit_sequencer.sav
-556c556
+562c562
 <   tests/builtins/result/Longinit_sequencer.sav
 ---
 >   tests/builtins/result_equalities/Longinit_sequencer.sav
 diff tests/builtins/oracle/alloc_weak.res.oracle tests/builtins/oracle_equalities/alloc_weak.res.oracle
-34,35d33
+36,37d35
 < [eva:alarm] tests/builtins/alloc_weak.c:30: Warning: 
 <   accessing uninitialized left-value. assert \initialized(p);
-898c896
+900c898
 <   r ∈ [--..--]
 ---
 >   r ∈ {42}
@@ -301,31 +301,31 @@ diff tests/builtins/oracle/allocated.1.res.oracle tests/builtins/oracle_equaliti
 >     __malloc_main_l97[0]; __malloc_main_l114[0..3]; __malloc_main_l127;
 >     __malloc_main_l127_0[0..1]; __malloc_main_l127_1[0..2];
 diff tests/builtins/oracle/imprecise.res.oracle tests/builtins/oracle_equalities/imprecise.res.oracle
-96a97,98
+100a101,102
 > [kernel] tests/builtins/imprecise.c:51: 
 >   imprecise size for variable v3 (abstract type 'struct u')
-216a219,220
+224a227,228
 > [kernel] tests/builtins/imprecise.c:111: 
 >   more than 200(300) elements to enumerate. Approximating.
-225a230,231
+233a238,239
 > [kernel] tests/builtins/imprecise.c:114: 
 >   more than 200(300) elements to enumerate. Approximating.
-229,232d234
+237,240d242
 < [kernel] tests/builtins/imprecise.c:111: 
 <   more than 200(300) elements to enumerate. Approximating.
 < [kernel] tests/builtins/imprecise.c:114: 
 <   more than 200(300) elements to enumerate. Approximating.
 diff tests/builtins/oracle/linked_list.1.res.oracle tests/builtins/oracle_equalities/linked_list.1.res.oracle
-422a423,424
+455a456,457
 > [kernel] tests/builtins/linked_list.c:19: 
 >   more than 100(128) elements to enumerate. Approximating.
-470a473,474
+506a509,510
 > [kernel] tests/builtins/linked_list.c:43: 
 >   more than 100(128) elements to enumerate. Approximating.
-472a477,478
+508a513,514
 > [kernel] tests/builtins/linked_list.c:44: 
 >   more than 100(128) elements to enumerate. Approximating.
-558,561d563
+600,603d605
 < [kernel] tests/builtins/linked_list.c:43: 
 <   more than 100(128) elements to enumerate. Approximating.
 < [kernel] tests/builtins/linked_list.c:44: 
@@ -585,11 +585,11 @@ diff tests/builtins/oracle/malloc-optimistic.res.oracle tests/builtins/oracle_eq
 ---
 > [eva] tests/builtins/malloc-optimistic.c:122: Frama_C_show_each: [30..99]
 diff tests/builtins/oracle/write-const.res.oracle tests/builtins/oracle_equalities/write-const.res.oracle
-78c78
+84c84
 <   tmp ∈ {{ &a ; &b }}
 ---
 >   tmp ∈ {{ &b }}
-99c99
+107c107
 <   tmp ∈ {{ &a ; &b }}
 ---
 >   tmp ∈ {{ &b }}
