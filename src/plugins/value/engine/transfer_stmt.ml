@@ -923,18 +923,21 @@ module Make (Abstract: Abstractions.Eva) = struct
     (* Build a state with the lvalue set to a singleton *)
     let build i acc =
       let value = Value.inject_int (Cil.typeOf exp) i in
-      match Eval.assume ~valuation state exp value with
-      | `Value valuation ->
+      let state =
+        Eval.assume ~valuation state exp value >>- fun valuation ->
         (* Check the reduction *)
-        let state = TF.update valuation state in
-        let _,new_ival = evaluate_exp_to_ival ~valuation state exp in
+        TF.update valuation state
+      in
+      match state with
+      | `Value state ->
+        let _,new_ival = evaluate_exp_to_ival state exp in
         if not (Ival.is_singleton_int new_ival) then
           fail ~exp "failing to learn perfectly from split" ;
         monitor.Partition.split_values <-
           SplitValues.add i monitor.Partition.split_values;
         (i, state) :: acc
-      | _ -> (* This value cannot be set in the state ; the evaluation of
-                expr was unprecise *)
+      | `Bottom -> (* This value cannot be set in the state ; the evaluation of
+                      expr was unprecise *)
         acc
     in
     try
