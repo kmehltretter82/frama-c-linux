@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: +"-deps -eva-show-progress"
+   STDOPT: +"-deps @EVA_OPTIONS@"
 */
 int X,Y;
 

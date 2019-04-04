@@ -1,1 +1,1 @@
-OPT: -journal-disable -scf -eva-show-progress
+OPT: -journal-disable -scf @EVA_OPTIONS@

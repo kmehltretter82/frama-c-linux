@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -eva -eva-show-progress -then -scf -eva-show-progress -then-on propagated -scf -eva-show-progress
+   OPT: -eva @EVA_OPTIONS@ -then -scf -then-on propagated -scf @EVA_OPTIONS@
 */
 
 void f(int *x, int *y, void (*p)(int *x, int *y)) {
