@@ -191,6 +191,9 @@ let bot_state = function
   | `Bottom -> Cvalue.Model.bottom
   | `Value s -> s
 
+let update valuation state =
+  bot_state (Transfer.update valuation state >>-: Cvalue_domain.project)
+
 let rec eval_deps state e =
   match e.enode with
   | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ | Const _ ->
@@ -240,7 +243,7 @@ let eval_expr_with_valuation ?with_alarms deps state expr=
   match eval with
   | `Bottom -> (Cvalue.Model.bottom, deps, Cvalue.V.bottom), None
   | `Value (valuation, result) ->
-    let state = Cvalue_domain.project (Transfer.update valuation state) in
+    let state = update valuation state in
     (state, deps, result), Some valuation
 
 (* Compatibility layer between the old API of eval_exprs and the new evaluation
@@ -274,8 +277,7 @@ module Eval = struct
     let eval, _alarms =
       Eva.reduce state expr positive
     in
-    bot_state (eval >>-: fun valuation ->
-               Cvalue_domain.project (Transfer.update valuation state))
+    bot_state (eval >>-: fun valuation -> update valuation state)
 
 
   let lval_to_precise_loc_deps_state ?with_alarms ~deps state ~reduce_valid_index:(_:bool) lval =
@@ -295,8 +297,7 @@ module Eval = struct
       notify_opt with_alarms alarms;
       match eval with
       | `Bottom -> Cvalue.Model.bottom, deps, Precise_locs.loc_bottom, (Cil.typeOfLval lval)
-      | `Value (valuation, loc, typ) ->
-        Cvalue_domain.project (Transfer.update valuation state), deps, loc, typ
+      | `Value (valuation, loc, typ) -> update valuation state, deps, loc, typ
 
   let lval_to_loc_deps_state ?with_alarms ~deps state ~reduce_valid_index lv =
     let state, deps, pl, typ =

@@ -264,7 +264,7 @@ module Internal
     let finalize_call _stmt _call ~pre ~post =
       `Value (Transfer.catenate pre post)
 
-    let update _valuation state = state
+    let update _valuation state = `Value state
 
     let show_expr _valuation _state _fmt _expr = ()
   end

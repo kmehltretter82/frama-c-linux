@@ -129,7 +129,7 @@ module Internal  : Domain_builder.InputDomain
        and type valuation := Valuation.t
   = struct
 
-    let update _valuation st = st (* TODO? *)
+    let update _valuation st = `Value st (* TODO? *)
 
     let kill loc state =
       Memory.add_binding ~exact:true state loc V_Or_Uninitialized.top
@@ -171,7 +171,7 @@ module Internal  : Domain_builder.InputDomain
 
     let finalize_call _stmt _call ~pre:_ ~post = `Value post
 
-    let start_call _stmt _call valuation state = `Value (update valuation state)
+    let start_call _stmt _call valuation state = update valuation state
 
     let show_expr _valuation _state _fmt _expr = ()
   end
