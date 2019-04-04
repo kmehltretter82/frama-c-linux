@@ -913,12 +913,12 @@ PLUGIN_CMO:= slevel/split_strategy value_parameters \
 	domains/cvalue/cvalue_transfer domains/cvalue/cvalue_init \
 	domains/cvalue/cvalue_specification \
 	domains/cvalue/cvalue_domain \
-	engine/subdivided_evaluation engine/evaluation \
+	engine/subdivided_evaluation engine/evaluation engine/abstractions \
 	engine/recursion engine/transfer_stmt engine/transfer_specification \
 	engine/partitioning engine/mem_exec \
 	engine/legacy_partitioning engine/basic_partitioning \
 	engine/loop_partitioning engine/partitioned_dataflow \
-	engine/initialization engine/abstractions \
+	engine/initialization \
 	engine/compute_functions engine/analysis register
 PLUGIN_CMI:= values/abstract_value values/abstract_location \
 	engine/state_partitioning \

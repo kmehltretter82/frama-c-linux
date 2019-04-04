@@ -334,10 +334,12 @@ module Make_Dataflow
     lift' (fun s -> Transfer.assume s stmt exp positive) states
 
   let transfer_enter (block : block) (states : state list) : state list =
-    List.map (Transfer.enter_scope kf (block_toplevel_locals block)) states
+    let vars = block_toplevel_locals block in
+    if vars = [] then states else List.map (Transfer.enter_scope kf vars) states
 
   let transfer_leave (block : block) (states : state list) : state list =
-    List.map (Domain.leave_scope kf block.blocals) states
+    let vars = block.blocals in
+    if vars = [] then states else List.map (Domain.leave_scope kf vars) states
 
   let transfer_call (stmt : stmt) (dest : lval option) (callee : exp)
       (args : exp list) (state : state) : state list =
