@@ -79,6 +79,8 @@
 [eva] tests/builtins/long_init.c:77: Call to builtin free
 [eva] tests/builtins/long_init.c:77: 
   function free: precondition 'freeable' got status valid.
+[eva:malloc] tests/builtins/long_init.c:77: 
+  strong free on bases: {__malloc_init_inner_l75}
 [eva] Recording results for init_inner
 [eva] Done for function init_inner
 [eva:locals-escaping] tests/builtins/long_init.c:85: Warning: 
@@ -161,6 +163,8 @@
 [eva] tests/builtins/long_init.c:103: Call to builtin free
 [eva] tests/builtins/long_init.c:103: 
   function free: precondition 'freeable' got status valid.
+[eva:malloc] tests/builtins/long_init.c:103: 
+  strong free on bases: {__malloc_init_inner_l73}
 [eva] tests/builtins/long_init.c:104: 
   Call to builtin Frama_C_malloc_fresh for function malloc
 [eva] tests/builtins/long_init.c:104: allocating variable __malloc_main_l104
@@ -435,6 +439,8 @@ Values at end of function main:
 [eva] tests/builtins/long_init2.c:103: Call to builtin free
 [eva] tests/builtins/long_init2.c:103: 
   function free: precondition 'freeable' got status valid.
+[eva:malloc] tests/builtins/long_init2.c:103: 
+  strong free on bases: {__malloc_init_inner_l73}
 [eva] tests/builtins/long_init2.c:104: 
   Call to builtin Frama_C_malloc_fresh for function malloc
 [eva] tests/builtins/long_init2.c:104: allocating variable __malloc_main_l104
@@ -670,6 +676,8 @@ Values at end of function main:
 [eva] tests/builtins/long_init3.c:103: Call to builtin free
 [eva] tests/builtins/long_init3.c:103: 
   function free: precondition 'freeable' got status valid.
+[eva:malloc] tests/builtins/long_init3.c:103: 
+  strong free on bases: {__malloc_init_inner_l73}
 [eva] tests/builtins/long_init3.c:104: 
   Call to builtin Frama_C_malloc_fresh for function malloc
 [eva] tests/builtins/long_init3.c:104: allocating variable __malloc_main_l104
