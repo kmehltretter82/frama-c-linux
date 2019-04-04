@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -no-autoload-plugins -load-module eva,inout -eva @VALUECONFIG@
+   OPT: -no-autoload-plugins -load-module eva,inout -eva @EVA_CONFIG@
 */
 
 int main() {

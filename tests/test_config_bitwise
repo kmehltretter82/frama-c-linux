@@ -1,2 +1,2 @@
-MACRO: VALUECONFIG -eva-show-progress -no-autoload-plugins -load-module from,inout,eva,scope,variadic -eva-bitwise-domain
-OPT: -eva @VALUECONFIG@ -journal-disable -out -input -deps
+MACRO: EVA_CONFIG -eva-show-progress -no-autoload-plugins -load-module from,inout,eva,scope,variadic -eva-bitwise-domain
+OPT: -eva @EVA_CONFIG@ -journal-disable -out -input -deps

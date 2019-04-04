@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -eva @VALUECONFIG@ -slevel 10 -eva-mlevel 0
+   OPT: -eva @EVA_CONFIG@ -slevel 10 -eva-mlevel 0
 */
 
 void *Frama_C_malloc_by_stack(unsigned long i);
