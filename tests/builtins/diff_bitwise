@@ -1,9 +1,49 @@
 diff tests/builtins/oracle/Longinit_sequencer.res.oracle tests/builtins/oracle_bitwise/Longinit_sequencer.res.oracle
-323c323
+153,154c153,188
+< [eva] tests/builtins/long_init.c:93: Reusing old results for call to analyze
+< [eva] tests/builtins/long_init.c:94: Reusing old results for call to analyze
+---
+> [eva] computing for function analyze <- main.
+>   Called from tests/builtins/long_init.c:93.
+> [eva] computing for function subanalyze <- analyze <- main.
+>   Called from tests/builtins/long_init.c:29.
+> [eva] Recording results for subanalyze
+> [eva] Done for function subanalyze
+> [eva] computing for function subanalyze <- analyze <- main.
+>   Called from tests/builtins/long_init.c:29.
+> [eva] Recording results for subanalyze
+> [eva] Done for function subanalyze
+> [eva] computing for function subanalyze <- analyze <- main.
+>   Called from tests/builtins/long_init.c:29.
+> [eva] Recording results for subanalyze
+> [eva] Done for function subanalyze
+> [eva] computing for function subanalyze <- analyze <- main.
+>   Called from tests/builtins/long_init.c:29.
+> [eva] Recording results for subanalyze
+> [eva] Done for function subanalyze
+> [eva] computing for function subanalyze <- analyze <- main.
+>   Called from tests/builtins/long_init.c:29.
+> [eva] Recording results for subanalyze
+> [eva] Done for function subanalyze
+> [eva] Recording results for analyze
+> [eva] Done for function analyze
+> [eva] computing for function analyze <- main.
+>   Called from tests/builtins/long_init.c:94.
+> [eva] tests/builtins/long_init.c:29: Reusing old results for call to subanalyze
+> [eva] tests/builtins/long_init.c:29: Reusing old results for call to subanalyze
+> [eva] tests/builtins/long_init.c:29: Reusing old results for call to subanalyze
+> [eva] tests/builtins/long_init.c:29: Reusing old results for call to subanalyze
+> [eva] computing for function subanalyze <- analyze <- main.
+>   Called from tests/builtins/long_init.c:29.
+> [eva] Recording results for subanalyze
+> [eva] Done for function subanalyze
+> [eva] Recording results for analyze
+> [eva] Done for function analyze
+327c361
 <   tests/builtins/result/Longinit_sequencer.sav
 ---
 >   tests/builtins/result_bitwise/Longinit_sequencer.sav
-562c562
+568c602
 <   tests/builtins/result/Longinit_sequencer.sav
 ---
 >   tests/builtins/result_bitwise/Longinit_sequencer.sav

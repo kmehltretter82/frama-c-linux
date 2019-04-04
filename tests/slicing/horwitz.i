@@ -1,7 +1,7 @@
 /* run.config
    EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
    CMD: @frama-c@ -load-module tests/slicing/libSelect.cmxs -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs
-   OPT: -eva-show-progress -deps -slicing-level 0 -journal-disable
+   OPT: @EVA_OPTIONS@ -deps -slicing-level 0 -journal-disable
 */
 
 /* bin/toplevel.opt -deps -eva @PTEST_DIR@/@PTEST_NAME@.c */

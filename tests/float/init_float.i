@@ -1,5 +1,5 @@
 /* run.config*
-   OPT:  -eva @VALUECONFIG@ -journal-disable -float-normal -lib-entry
+   OPT:  -eva @EVA_CONFIG@ -journal-disable -float-normal -lib-entry
 */
 
 typedef struct S { float y; } S;

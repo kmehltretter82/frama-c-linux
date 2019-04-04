@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -pp-annot -eva -eva-show-progress -journal-disable
+   OPT: -pp-annot -eva @EVA_CONFIG@ -journal-disable
 */
 
 // see bts 1357

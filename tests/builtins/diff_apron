@@ -1,12 +1,134 @@
 diff tests/builtins/oracle/Longinit_sequencer.res.oracle tests/builtins/oracle_apron/Longinit_sequencer.res.oracle
-323c323
+62,65c62,81
+< [eva] tests/builtins/long_init.c:29: Reusing old results for call to subanalyze
+< [eva] tests/builtins/long_init.c:29: Reusing old results for call to subanalyze
+< [eva] tests/builtins/long_init.c:29: Reusing old results for call to subanalyze
+< [eva] tests/builtins/long_init.c:29: Reusing old results for call to subanalyze
+---
+> [eva] computing for function subanalyze <- analyze <- init_inner <- init_outer <- 
+>                           main.
+>   Called from tests/builtins/long_init.c:29.
+> [eva] Recording results for subanalyze
+> [eva] Done for function subanalyze
+> [eva] computing for function subanalyze <- analyze <- init_inner <- init_outer <- 
+>                           main.
+>   Called from tests/builtins/long_init.c:29.
+> [eva] Recording results for subanalyze
+> [eva] Done for function subanalyze
+> [eva] computing for function subanalyze <- analyze <- init_inner <- init_outer <- 
+>                           main.
+>   Called from tests/builtins/long_init.c:29.
+> [eva] Recording results for subanalyze
+> [eva] Done for function subanalyze
+> [eva] computing for function subanalyze <- analyze <- init_inner <- init_outer <- 
+>                           main.
+>   Called from tests/builtins/long_init.c:29.
+> [eva] Recording results for subanalyze
+> [eva] Done for function subanalyze
+153,154c169,216
+< [eva] tests/builtins/long_init.c:93: Reusing old results for call to analyze
+< [eva] tests/builtins/long_init.c:94: Reusing old results for call to analyze
+---
+> [eva] computing for function analyze <- main.
+>   Called from tests/builtins/long_init.c:93.
+> [eva] computing for function subanalyze <- analyze <- main.
+>   Called from tests/builtins/long_init.c:29.
+> [eva] Recording results for subanalyze
+> [eva] Done for function subanalyze
+> [eva] computing for function subanalyze <- analyze <- main.
+>   Called from tests/builtins/long_init.c:29.
+> [eva] Recording results for subanalyze
+> [eva] Done for function subanalyze
+> [eva] computing for function subanalyze <- analyze <- main.
+>   Called from tests/builtins/long_init.c:29.
+> [eva] Recording results for subanalyze
+> [eva] Done for function subanalyze
+> [eva] computing for function subanalyze <- analyze <- main.
+>   Called from tests/builtins/long_init.c:29.
+> [eva] Recording results for subanalyze
+> [eva] Done for function subanalyze
+> [eva] computing for function subanalyze <- analyze <- main.
+>   Called from tests/builtins/long_init.c:29.
+> [eva] Recording results for subanalyze
+> [eva] Done for function subanalyze
+> [eva] Recording results for analyze
+> [eva] Done for function analyze
+> [eva] computing for function analyze <- main.
+>   Called from tests/builtins/long_init.c:94.
+> [eva] computing for function subanalyze <- analyze <- main.
+>   Called from tests/builtins/long_init.c:29.
+> [eva] Recording results for subanalyze
+> [eva] Done for function subanalyze
+> [eva] computing for function subanalyze <- analyze <- main.
+>   Called from tests/builtins/long_init.c:29.
+> [eva] Recording results for subanalyze
+> [eva] Done for function subanalyze
+> [eva] computing for function subanalyze <- analyze <- main.
+>   Called from tests/builtins/long_init.c:29.
+> [eva] Recording results for subanalyze
+> [eva] Done for function subanalyze
+> [eva] computing for function subanalyze <- analyze <- main.
+>   Called from tests/builtins/long_init.c:29.
+> [eva] Recording results for subanalyze
+> [eva] Done for function subanalyze
+> [eva] computing for function subanalyze <- analyze <- main.
+>   Called from tests/builtins/long_init.c:29.
+> [eva] Recording results for subanalyze
+> [eva] Done for function subanalyze
+> [eva] Recording results for analyze
+> [eva] Done for function analyze
+327c389
 <   tests/builtins/result/Longinit_sequencer.sav
 ---
 >   tests/builtins/result_apron/Longinit_sequencer.sav
-562c562
+421,424c483,498
+< [eva] tests/builtins/long_init2.c:29: Reusing old results for call to subanalyze
+< [eva] tests/builtins/long_init2.c:29: Reusing old results for call to subanalyze
+< [eva] tests/builtins/long_init2.c:29: Reusing old results for call to subanalyze
+< [eva] tests/builtins/long_init2.c:29: Reusing old results for call to subanalyze
+---
+> [eva] computing for function subanalyze <- analyze <- main.
+>   Called from tests/builtins/long_init2.c:29.
+> [eva] Recording results for subanalyze
+> [eva] Done for function subanalyze
+> [eva] computing for function subanalyze <- analyze <- main.
+>   Called from tests/builtins/long_init2.c:29.
+> [eva] Recording results for subanalyze
+> [eva] Done for function subanalyze
+> [eva] computing for function subanalyze <- analyze <- main.
+>   Called from tests/builtins/long_init2.c:29.
+> [eva] Recording results for subanalyze
+> [eva] Done for function subanalyze
+> [eva] computing for function subanalyze <- analyze <- main.
+>   Called from tests/builtins/long_init2.c:29.
+> [eva] Recording results for subanalyze
+> [eva] Done for function subanalyze
+568c642
 <   tests/builtins/result/Longinit_sequencer.sav
 ---
 >   tests/builtins/result_apron/Longinit_sequencer.sav
+658,661c732,747
+< [eva] tests/builtins/long_init3.c:29: Reusing old results for call to subanalyze
+< [eva] tests/builtins/long_init3.c:29: Reusing old results for call to subanalyze
+< [eva] tests/builtins/long_init3.c:29: Reusing old results for call to subanalyze
+< [eva] tests/builtins/long_init3.c:29: Reusing old results for call to subanalyze
+---
+> [eva] computing for function subanalyze <- analyze <- main.
+>   Called from tests/builtins/long_init3.c:29.
+> [eva] Recording results for subanalyze
+> [eva] Done for function subanalyze
+> [eva] computing for function subanalyze <- analyze <- main.
+>   Called from tests/builtins/long_init3.c:29.
+> [eva] Recording results for subanalyze
+> [eva] Done for function subanalyze
+> [eva] computing for function subanalyze <- analyze <- main.
+>   Called from tests/builtins/long_init3.c:29.
+> [eva] Recording results for subanalyze
+> [eva] Done for function subanalyze
+> [eva] computing for function subanalyze <- analyze <- main.
+>   Called from tests/builtins/long_init3.c:29.
+> [eva] Recording results for subanalyze
+> [eva] Done for function subanalyze
 diff tests/builtins/oracle/allocated.0.res.oracle tests/builtins/oracle_apron/allocated.0.res.oracle
 260a261,263
 > [eva] tests/builtins/allocated.c:127: Call to builtin __fc_vla_alloc
