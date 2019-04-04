@@ -1073,7 +1073,8 @@ src/plugins/sparecode/spare_marks.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/sparecode/sparecode_params.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/sparecode/sparecode_params.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/sparecode/transform.ml: CEA_LGPL_OR_PROPRIETARY
-src/plugins/studia/Makefile: CEA_LGPL_OR_PROPRIETARY
+src/plugins/studia/Makefile.in: CEA_LGPL_OR_PROPRIETARY
+src/plugins/studia/configure.ac: CEA_LGPL_OR_PROPRIETARY
 src/plugins/studia/options.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/studia/options.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/studia/reads.ml: CEA_LGPL_OR_PROPRIETARY

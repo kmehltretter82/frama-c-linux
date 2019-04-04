@@ -20,31 +20,28 @@
 #                                                                        #
 ##########################################################################
 
+########################################
+# Studia as a standard Frama-C plug-in #
+########################################
+
+m4_define([plugin_file],Makefile.in)
+
+m4_define([FRAMAC_SHARE_ENV],
+          [m4_normalize(m4_esyscmd([echo $FRAMAC_SHARE]))])
+
+m4_define([FRAMAC_SHARE],
+          [m4_ifval(FRAMAC_SHARE_ENV,[FRAMAC_SHARE_ENV],
+                                     [m4_esyscmd(frama-c -print-path)])])
+
+m4_ifndef([FRAMAC_M4_MACROS], [m4_include(FRAMAC_SHARE/configure.ac)])
+
+check_plugin(studia,PLUGIN_RELATIVE_PATH(plugin_file),
+             [support for studia plug-in],yes)
+
+plugin_require(studia,eva)
+
 #######################
-# Frama-C Environment #
+# Generating Makefile #
 #######################
 
-ifndef FRAMAC_SHARE
-FRAMAC_SHARE	:= $(shell frama-c-config -print-share-path)
-endif
-
-ifndef FRAMAC_LIBDIR
-FRAMAC_LIBDIR	:= $(shell frama-c-config -print-libpath)
-endif
-
-#########################
-# Plug-in configuration #
-#########################
-
-PLUGIN_DIR ?=.
-PLUGIN_NAME:=Studia
-PLUGIN_CMO:=options writes reads
-PLUGIN_GUI_CMO:=studia_gui
-PLUGIN_DEPENDENCIES:=Eva
-PLUGIN_DISTRIB_EXTERNAL:= Makefile
-
-################
-# Generic part #
-################
-
-include $(FRAMAC_SHARE)/Makefile.dynamic
+write_plugin_config(Makefile)
