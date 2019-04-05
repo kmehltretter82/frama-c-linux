@@ -138,7 +138,7 @@ end
 module type Domain = Partitioning.Domain
 
 module type Partitioning = functor
-  (Domain : Abstract_domain.External)
-  (Transfer : Transfer_stmt.S with type state = Domain.t)
+  (Abstract : Abstractions.Eva)
+  (Transfer : Transfer_stmt.S with type state = Abstract.Dom.t)
   (Kf : Kf) ->
-  Partition with type state = Domain.t
+  Partition with type state = Abstract.Dom.t

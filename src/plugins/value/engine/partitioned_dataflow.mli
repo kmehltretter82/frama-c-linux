@@ -27,24 +27,26 @@ open Eval
 val signal_abort: unit -> unit
 
 module Computer
-    (* Abstract domain with partitioning. *)
-    (Domain: Abstract_domain.External)
+    (* Abstractions with the evaluator. *)
+    (Abstract: Abstractions.Eva)
     (* Set of states of abstract domain. *)
-    (States : Powerset.S with type state = Domain.t)
+    (States : Powerset.S with type state = Abstract.Dom.t)
     (* Transfer functions for statement on the abstract domain. *)
-    (Transfer : Transfer_stmt.S with type state = Domain.t
-                                 and type value = Domain.value)
+    (Transfer : Transfer_stmt.S with type state = Abstract.Dom.t
+                                 and type value = Abstract.Val.t)
     (* Initialization of local variables. *)
-    (Init: Initialization.S with type state := Domain.state)
+    (Init: Initialization.S with type state := Abstract.Dom.t)
     (* Transfer functions for the logic on the abstract domain. *)
-    (Logic : Transfer_logic.S with type state = Domain.t
+    (Logic : Transfer_logic.S with type state = Abstract.Dom.t
                                and type states = States.t)
-    (Spec: sig val treat_statement_assigns: assigns -> Domain.t -> Domain.t end)
+    (Spec: sig
+       val treat_statement_assigns: assigns -> Abstract.Dom.t -> Abstract.Dom.t
+     end)
   : sig
 
     val compute:
-      kernel_function -> kinstr -> Domain.t ->
-      Domain.t list or_bottom * Value_types.cacheable
+      kernel_function -> kinstr -> Abstract.Dom.t ->
+      Abstract.Dom.t list or_bottom * Value_types.cacheable
 
   end
 

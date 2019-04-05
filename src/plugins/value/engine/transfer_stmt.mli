@@ -51,12 +51,6 @@ module type S = sig
 
   val enter_scope: kernel_function -> varinfo list -> state -> state
 
-  exception Operation_failed
-
-  val split_by_value: monitor:Partition.split_monitor ->
-    state -> exp -> (Integer.t * state) list
-  val eval_exp_to_int: state -> exp -> int
-
   type call_result = {
     states: state list or_bottom;
     cacheable: Value_types.cacheable;

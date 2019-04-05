@@ -27,8 +27,8 @@ open Partition
 
 
 module Make
-    (Domain : Abstract_domain.External)
-    (Transfer : Transfer_stmt.S with type state = Domain.t)
+    (Abstract: Abstractions.Eva)
+    (Transfer : Transfer_stmt.S with type state = Abstract.Dom.t)
     (Kf : Kf) =
 struct
   module Parameters = Partitioning_parameters.Make (Kf)
@@ -36,22 +36,14 @@ struct
   open Kf
   open Parameters
 
-  (* Add the split function to the domain *)
-  module Domain =
-  struct
-    exception Operation_failed = Transfer.Operation_failed
-    let split = Transfer.split_by_value
-    let eval_exp_to_int = Transfer.eval_exp_to_int
+  module Domain = Abstract.Dom
 
-    include Domain
-
-    let smash = function
-      | [] -> []
-      | v1 :: l -> [ List.fold_left join v1 l ]
-  end
+  let smash_states = function
+    | [] -> []
+    | v1 :: l -> [ List.fold_left Domain.join v1 l ]
 
   module Index = Partitioning.Make (Domain)
-  module Flow = Partition.MakeFlow (Domain)
+  module Flow = Partition.MakeFlow (Abstract)
 
   type state = Domain.t
 
@@ -133,7 +125,7 @@ struct
     Partition.to_list s.store_partition
 
   let smashed (s : store) : state or_bottom =
-    Bottom.of_list (Domain.smash (expanded s))
+    Bottom.of_list (smash_states (expanded s))
 
   let contents (f : flow) : state list =
     Flow.to_list f.flow_states
@@ -179,11 +171,11 @@ struct
         begin match return_exp with
           | Some return_exp ->
             let states = Transfer.split_final_states kf return_exp i states in
-            List.flatten (List.map Domain.smash states)
+            List.flatten (List.map smash_states states)
           | None ->
-            Domain.smash states
+            smash_states states
         end
-      | Split_strategy.NoSplit   -> Domain.smash states
+      | Split_strategy.NoSplit   -> smash_states states
       | Split_strategy.FullSplit -> states
       (* Last case not possible : already transformed into SplitEqList *)
       | Split_strategy.SplitAuto -> assert false

@@ -20,6 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Bottom.Type
+
 (* --- Split monitors --- *)
 
 type split_monitor = {
@@ -147,24 +149,11 @@ type action =
 
 exception InvalidAction
 
-
 (* --- Flows --- *)
 
-module type InputDomain =
-sig
-  type t
-
-  exception Operation_failed
-
-  val join : t -> t -> t
-  val split : monitor:split_monitor ->
-    t -> Cil_types.exp -> (Integer.t * t) list
-  val eval_exp_to_int : t -> Cil_types.exp -> int
-end
-
-module MakeFlow (Domain : InputDomain) =
+module MakeFlow (Abstract: Abstractions.Eva) =
 struct
-  type state = Domain.t
+  type state = Abstract.Dom.t
   type t =  (key * state) list
 
   let empty = []
@@ -183,7 +172,7 @@ struct
       (* Join states with the same key *)
       let x' =
         try
-          Domain.join (KMap.find k p) x
+          Abstract.Dom.join (KMap.find k p) x
         with Not_found -> x
       in
       KMap.add k x' p
@@ -199,6 +188,113 @@ struct
   let union (p1 : t) (p2 : t) : t =
     p1 @ p2
 
+  (* --- Evalution and split functions -------------------------------------- *)
+
+  (* Domains transfer functions. *)
+  module TF = Abstract.Dom.Transfer (Abstract.Eval.Valuation)
+
+  exception Operation_failed
+
+  let fail ~exp message =
+    let source = fst exp.Cil_types.eloc in
+    let warn_and_raise message =
+      Value_parameters.warning ~source ~once:true "%s" message;
+      raise Operation_failed
+    in
+    Pretty_utils.ksfprintf warn_and_raise message
+
+  let evaluate_exp_to_ival ?valuation state exp =
+    (* Evaluate the expression *)
+    let valuation, value =
+      match Abstract.Eval.evaluate ?valuation ~reduction:false state exp with
+      | `Value (valuation, value), alarms when Alarmset.is_empty alarms ->
+        valuation, value
+      | _ ->
+        fail ~exp "this partitioning parameter cannot be evaluated safely on \
+                   all states"
+    in
+    (* Get the cvalue *)
+    let cvalue = match Abstract.Val.get Main_values.cvalue_key with
+      | Some get_cvalue -> get_cvalue value
+      | None -> fail ~exp "partitioning is disabled when the CValue domain is \
+                           not active"
+    in
+    (* Extract the ival *)
+    let ival =
+      try
+        Cvalue.V.project_ival cvalue
+      with Cvalue.V.Not_based_on_null ->
+        fail ~exp "this partitioning parameter must evaluate to an integer"
+    in
+    valuation, ival
+
+  exception Split_limit of Integer.t option
+
+  let split_by_value ~monitor state exp =
+    let module SplitValues = Datatype.Integer.Set in
+    let valuation, ival = evaluate_exp_to_ival state exp in
+    (* Build a state with the lvalue set to a singleton *)
+    let build i acc =
+      let value = Abstract.Val.inject_int (Cil.typeOf exp) i in
+      let state =
+        Abstract.Eval.assume ~valuation state exp value >>- fun valuation ->
+        (* Check the reduction *)
+        TF.update valuation state
+      in
+      match state with
+      | `Value state ->
+        let _,new_ival = evaluate_exp_to_ival state exp in
+        if not (Ival.is_singleton_int new_ival) then
+          fail ~exp "failing to learn perfectly from split" ;
+        monitor.split_values <-
+          SplitValues.add i monitor.split_values;
+        (i, state) :: acc
+      | `Bottom -> (* This value cannot be set in the state ; the evaluation of
+                      expr was unprecise *)
+        acc
+    in
+    try
+      (* Check the size of the ival *)
+      begin match Ival.cardinal ival with
+        | None -> raise (Split_limit None)
+        | Some c as count ->
+          if Integer.(gt c (of_int monitor.split_limit)) then
+            raise (Split_limit count)
+      end;
+      (* For each integer of the ival, build a new state *)
+      try
+        let result = Ival.fold_int build ival [] in
+        let c = SplitValues.cardinal monitor.split_values in
+        if c > monitor.split_limit then
+          raise (Split_limit (Some (Integer.of_int c)));
+        result
+      with Abstract_interp.Error_Top -> (* The ival is float *)
+        raise (Split_limit None)
+    with
+    | Split_limit count ->
+      let pp_count fmt =
+        match count with
+        | None -> ()
+        | Some c -> Format.fprintf fmt " (%a)" (Integer.pretty ~hexa:false) c
+      in
+      fail ~exp "split on more than %d values%t prevented ; try to improve \
+                 the analysis precision or look at the option -eva-split-limit \
+                 to increase this limit."
+        monitor.split_limit pp_count
+
+
+  let eval_exp_to_int state exp =
+    let _valuation, ival = evaluate_exp_to_ival state exp in
+    try
+      Integer.to_int (Ival.project_int ival)
+    with
+    | Ival.Not_Singleton_Int ->
+      fail ~exp "this partitioning parameter must evaluate to a singleton"
+    | Failure _ ->
+      fail ~exp "this partitioning parameter is too big"
+
+  (* --- Applying partitioning actions onto flows --------------------------- *)
+
   let split_state ~monitor ~(static : bool) (exp : Cil_types.exp)
       (key : key) (state : state) : (key * state) list =
     try
@@ -212,8 +308,8 @@ struct
         in
         (k,x)
       in
-      List.map update_key (Domain.split ~monitor state exp)
-    with Domain.Operation_failed ->
+      List.map update_key (split_by_value ~monitor state exp)
+    with Operation_failed ->
       [(key,state)]
 
   let split ~monitor ~(static : bool) (p : t) (exp : Cil_types.exp) =
@@ -260,10 +356,10 @@ struct
 
         | Enter_loop limit_kind -> fun k x ->
           let limit = try match limit_kind with
-            | ExpLimit exp -> Domain.eval_exp_to_int x exp
+            | ExpLimit exp -> eval_exp_to_int x exp
             | IntLimit i -> i
             with
-            | Domain.Operation_failed -> 0
+            | Operation_failed -> 0
           in
           { k with loops = (0,limit) :: k.loops }
 

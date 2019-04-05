@@ -46,20 +46,24 @@ let blocks_share_locals b1 b2 =
   | _, _ -> false
 
 module Make_Dataflow
-    (Domain : Abstract_domain.External)
-    (States : Powerset.S with type state = Domain.t)
-    (Transfer : Transfer_stmt.S with type state = Domain.t)
-    (Init: Initialization.S with type state := Domain.t)
-    (Logic : Transfer_logic.S with type state = Domain.t
+    (Abstract : Abstractions.Eva)
+    (States : Powerset.S with type state = Abstract.Dom.t)
+    (Transfer : Transfer_stmt.S with type state = Abstract.Dom.t)
+    (Init: Initialization.S with type state := Abstract.Dom.t)
+    (Logic : Transfer_logic.S with type state = Abstract.Dom.t
                                and type states = States.t)
-    (Spec: sig val treat_statement_assigns: assigns -> Domain.t -> Domain.t end)
+    (Spec: sig
+       val treat_statement_assigns: assigns -> Abstract.Dom.t -> Abstract.Dom.t
+     end)
     (AnalysisParam : sig
        val kf: kernel_function
        val call_kinstr: kinstr
-       val initial_state : Domain.t
+       val initial_state : Abstract.Dom.t
      end)
     ()
 = struct
+
+  module Domain = Abstract.Dom
 
   (* --- Analysis parameters --- *)
 
@@ -97,7 +101,7 @@ module Make_Dataflow
 
   (* --- Abstract values storage --- *)
 
-  module Partition = Trace_partitioning.Make (Domain) (Transfer) (AnalysisParam)
+  module Partition = Trace_partitioning.Make (Abstract) (Transfer) (AnalysisParam)
 
   type store = Partition.store
   type flow = Partition.flow
@@ -770,20 +774,21 @@ end
 
 
 module Computer
-    (Domain : Abstract_domain.External)
-    (States : Powerset.S with type state = Domain.t)
-    (Transfer : Transfer_stmt.S with type state = Domain.t
-                                 and type value = Domain.value)
-    (Init: Initialization.S with type state := Domain.state)
-    (Logic : Transfer_logic.S with type state = Domain.t
+    (Abstract : Abstractions.Eva)
+    (States : Powerset.S with type state = Abstract.Dom.t)
+    (Transfer : Transfer_stmt.S with type state = Abstract.Dom.t)
+    (Init: Initialization.S with type state := Abstract.Dom.t)
+    (Logic : Transfer_logic.S with type state = Abstract.Dom.t
                                and type states = States.t)
-    (Spec: sig val treat_statement_assigns: assigns -> Domain.t -> Domain.t end)
+    (Spec: sig
+       val treat_statement_assigns: assigns -> Abstract.Dom.t -> Abstract.Dom.t
+     end)
 = struct
 
   let compute kf call_kinstr state =
     let module Dataflow =
       Make_Dataflow
-        (Domain) (States) (Transfer) (Init) (Logic) (Spec)
+        (Abstract) (States) (Transfer) (Init) (Logic) (Spec)
         (struct
           let kf = kf
           let call_kinstr = call_kinstr

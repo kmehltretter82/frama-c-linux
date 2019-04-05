@@ -126,21 +126,9 @@ exception InvalidAction
 
 (* Flows *)
 
-module type InputDomain =
+module MakeFlow (Abstract: Abstractions.Eva) :
 sig
-  type t
-
-  exception Operation_failed
-
-  val join : t -> t -> t
-  val split : monitor:split_monitor ->
-    t -> Cil_types.exp -> (Integer.t * t) list
-  val eval_exp_to_int : t -> Cil_types.exp -> int
-end
-
-module MakeFlow (Domain : InputDomain) :
-sig
-  type state = Domain.t
+  type state = Abstract.Dom.t
   type t
 
   val empty : t

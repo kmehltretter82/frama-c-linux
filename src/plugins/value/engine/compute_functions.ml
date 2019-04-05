@@ -144,7 +144,7 @@ module Make (Abstract: Abstractions.Eva) = struct
 
   module Computer =
     Partitioned_dataflow.Computer
-      (Abstract.Dom) (PowersetDomain) (Transfer) (Init) (Logic) (Spec)
+      (Abstract) (PowersetDomain) (Transfer) (Init) (Logic) (Spec)
 
   let initial_state = Init.initial_state
 
