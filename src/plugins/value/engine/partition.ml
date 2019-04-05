@@ -34,6 +34,22 @@ let new_monitor ~split_limit = {
   split_values = Datatype.Integer.Set.empty;
 }
 
+(* --- Stamp rationing --- *)
+
+(* Stamps used to label states according to slevel.
+   The second integer is used to keep separate the different states resulting
+   from a transfer function producing a state list before a new stamping.  *)
+type stamp = (int * int) option (* store stamp / transfer stamp *)
+
+(* Stamp rationing according to the slevel. *)
+type rationing =
+  { current: int ref; (* last used stamp. *)
+    limit: int;       (* limit of available stamps; after, stamps are [None]. *)
+    merge: bool       (* on merge slevel annotations or -eva-merge-after-loop,
+                         merge the incoming states with one unique stamp. *)
+  }
+
+let new_rationing ~limit ~merge = { current = ref 0; limit; merge }
 
 (* --- Keys --- *)
 
@@ -45,7 +61,7 @@ module BranchList = Datatype.List (Datatype.Int)
 type branch = int
 
 type key = {
-  ration_stamp : (int * int) option; (* store stamp / transfer stamp *)
+  ration_stamp : stamp;
   branches : branch list;
   loops : (int * int) list; (* current iteration / max unrolling *)
   static_split : (Integer.t*split_monitor) ExpMap.t; (* exp->value*monitor *)
@@ -141,8 +157,7 @@ type action =
   | Leave_loop
   | Incr_loop
   | Branch of branch * int
-  | Ration of int
-  | Ration_merge of (int*int) option
+  | Ration of rationing
   | Split of Cil_types.exp * split_kind * int
   | Merge of Cil_types.exp * split_kind
   | Update_dynamic_splits
@@ -389,15 +404,22 @@ struct
           else
             k
 
-        | Ration (min) ->
-          let r = ref min in
-          fun k _x ->
-            let ration_stamp = Some (!r, 0) in
-            incr r;
-            { k with ration_stamp }
-
-        | Ration_merge ration_stamp  -> fun k _x ->
-          { k with ration_stamp }
+        | Ration { current; limit; merge } ->
+          let length = List.length p in
+          (* The incoming states exceed the rationing limit: no more stamps. *)
+          if !current + length > limit then begin
+            current := limit;
+            fun k _ -> { k with ration_stamp = None }
+          end
+          (* If merge, a unique ration stamp for all incoming states. *)
+          else if merge then begin
+            current := !current + length;
+            fun k _ -> { k with ration_stamp = Some (!current, 0) }
+          end
+          (* Default case: a different stamp for each incoming state. *)
+          else
+            let stamp () = incr current; Some (!current, 0) in
+            fun k _ -> { k with ration_stamp = stamp () }
 
         | Merge (exp, Static) -> fun k _x ->
           { k with static_split = ExpMap.remove exp k.static_split }

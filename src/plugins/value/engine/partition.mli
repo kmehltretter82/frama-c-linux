@@ -87,6 +87,9 @@ val map_filter : (key -> 'a -> 'b option) -> 'a partition -> 'b partition
 
 (* Partitioning actions *)
 
+type rationing
+val new_rationing: limit:int -> merge:bool -> rationing
+
 type unroll_limit =
   | ExpLimit of Cil_types.exp
   | IntLimit of int
@@ -98,8 +101,7 @@ type action =
   | Leave_loop
   | Incr_loop
   | Branch of branch * int (* branch taken, max branches in history *)
-  | Ration of int (* starting ration stamp *)
-  | Ration_merge of (int * int) option (* new ration stamp for the merge state *)
+  | Ration of rationing
   | Split of Cil_types.exp * split_kind * int
   | Merge of Cil_types.exp * split_kind
   | Update_dynamic_splits

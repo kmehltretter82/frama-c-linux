@@ -48,8 +48,7 @@ struct
   type state = Domain.t
 
   type store = {
-    size_limit : int;
-    merge : bool;
+    rationing: Partition.rationing;
     flow_actions : action list;
     store_stmt : stmt option;
     store_index : Index.t;
@@ -79,12 +78,13 @@ struct
   (* Constructors *)
 
   let empty_store ~(stmt : stmt option) : store =
-    let size_limit, merge, flow_actions = match stmt with
+    let limit, merge, flow_actions = match stmt with
       | None -> max_int, false, []
       | Some stmt -> slevel stmt, merge stmt, flow_actions stmt
     in
+    let rationing = Partition.new_rationing ~limit ~merge in
     {
-      size_limit; merge; flow_actions;
+      rationing; flow_actions;
       store_stmt = stmt;
       store_index = Index.empty ();
       store_partition = Partition.empty;
@@ -247,20 +247,8 @@ struct
       List.fold_left Flow.union Flow.empty sources_states
     in
     (* Handle ration stamps *)
-    let previous_store_size = dest.store_size in
     dest.store_size <- dest.store_size + Flow.size flow_states;
-    let slevel_exceeded = dest.store_size > dest.size_limit in
-    let rationing_action =
-      if slevel_exceeded then
-        (* No more slevel, no more ration tickets *)
-        Ration_merge None
-      else if dest.merge then
-        (* Merge / Merge after loop : a unique ration stamp for all *)
-        Ration_merge (Some (previous_store_size, 0))
-      else
-        (* Attribute a ration stamp to each individual state *)
-        Ration previous_store_size
-    in
+    let rationing_action = Ration dest.rationing in
     (* Handle Split / Merge operations *)
     let flow_actions = Update_dynamic_splits :: dest.flow_actions in
     (* Execute actions *)
