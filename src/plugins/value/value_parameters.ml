@@ -70,6 +70,7 @@ let () = add_plugin_output_aliases [ "value" ]
 (* Debug categories. *)
 let dkey_initial_state = register_category "initial-state"
 let dkey_final_states = register_category "final-states"
+let dkey_summary = register_category "summary"
 let dkey_pointer_comparison = register_category "pointer-comparison"
 let dkey_cvalue_domain = register_category "d-cvalue"
 let dkey_incompatible_states = register_category "incompatible-states"
@@ -80,7 +81,7 @@ let dkey_widening = register_category "widening"
 let () =
   let activate dkey = add_debug_keys dkey in
   List.iter activate
-    [dkey_initial_state; dkey_final_states; dkey_cvalue_domain]
+    [dkey_initial_state; dkey_final_states; dkey_summary; dkey_cvalue_domain]
 
 (* Warning categories. *)
 let wkey_alarm = register_warn_category "alarm"
