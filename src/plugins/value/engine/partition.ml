@@ -134,6 +134,8 @@ type unroll_limit =
   | ExpLimit of Cil_types.exp
   | IntLimit of int
 
+type split_kind = Static | Dynamic
+
 type action =
   | Enter_loop of unroll_limit
   | Leave_loop
@@ -141,10 +143,8 @@ type action =
   | Branch of branch * int
   | Ration of int
   | Ration_merge of (int*int) option
-  | Static_split of (Cil_types.exp * split_monitor)
-  | Dynamic_split of (Cil_types.exp * split_monitor)
-  | Static_merge of Cil_types.exp
-  | Dynamic_merge of Cil_types.exp
+  | Split of Cil_types.exp * split_kind * int
+  | Merge of Cil_types.exp * split_kind
   | Update_dynamic_splits
 
 exception InvalidAction
@@ -295,16 +295,15 @@ struct
 
   (* --- Applying partitioning actions onto flows --------------------------- *)
 
-  let split_state ~monitor ~(static : bool) (exp : Cil_types.exp)
+  let split_state ~monitor (kind : split_kind) (exp : Cil_types.exp)
       (key : key) (state : state) : (key * state) list =
     try
+      let add value map = ExpMap.add exp (value, monitor) map in
       let update_key (v,x) =
         let k =
-          let m = monitor in
-          if static then
-            { key with static_split = ExpMap.add exp (v,m) key.static_split }
-          else
-            { key with dynamic_split = ExpMap.add exp (v,m) key.dynamic_split }
+          match kind with
+          | Static -> { key with static_split = add v key.static_split }
+          | Dynamic -> { key with dynamic_split = add v key.dynamic_split }
         in
         (k,x)
       in
@@ -312,9 +311,10 @@ struct
     with Operation_failed ->
       [(key,state)]
 
-  let split ~monitor ~(static : bool) (p : t) (exp : Cil_types.exp) =
+  let split ~limit (kind : split_kind) (exp : Cil_types.exp) (p : t) =
+    let monitor = new_monitor limit in
     let add_split acc (key,state) =
-      split_state ~monitor ~static exp key state @ acc
+      split_state ~monitor kind exp key state @ acc
     in
     List.fold_left add_split [] p
 
@@ -324,7 +324,7 @@ struct
       (* Split the states in the list l for the given exp *)
       let update_exp exp (_i,monitor) l =
         let resplit acc (k,x) =
-          split_state ~monitor ~static:false exp k x @ acc
+          split_state ~monitor Dynamic exp k x @ acc
         in
         List.fold_left resplit [] l
       in
@@ -337,18 +337,15 @@ struct
     List.map (fun (k,x) -> f k x, x) p
 
   let transfer_keys p = function
-    | Static_split (exp,monitor) ->
-      split ~monitor ~static:true p exp
-
-    | Dynamic_split (exp,monitor) ->
-      split ~monitor ~static:false p exp
+    | Split (expr, kind, limit) ->
+      split ~limit kind expr p
 
     | Update_dynamic_splits ->
       update_dynamic_splits p
 
     | action -> (* Simple map transfer functions *)
       let transfer = match action with
-        | Static_split _ | Dynamic_split _ | Update_dynamic_splits ->
+        | Split _ | Update_dynamic_splits ->
           assert false (* Handled above *)
 
         | Enter_loop limit_kind -> fun k x ->
@@ -402,10 +399,10 @@ struct
         | Ration_merge ration_stamp  -> fun k _x ->
           { k with ration_stamp }
 
-        | Static_merge exp -> fun k _x ->
+        | Merge (exp, Static) -> fun k _x ->
           { k with static_split = ExpMap.remove exp k.static_split }
 
-        | Dynamic_merge exp -> fun k _x ->
+        | Merge (exp, Dynamic) -> fun k _x ->
           { k with dynamic_split = ExpMap.remove exp k.dynamic_split }
       in
       map_keys transfer p

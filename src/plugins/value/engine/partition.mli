@@ -20,16 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Split monitor : prevents splits from generating too many states *)
-
-type split_monitor = {
-  split_limit : int;
-  mutable split_values : Datatype.Integer.Set.t;
-}
-
-val new_monitor : split_limit:int -> split_monitor
-
-
 (*  A state partition is a collection of states, each of which is identified
     by a unique key. The key identifies the reason for which we want to keep
     the state separate from the others. The partitioning method will involve
@@ -101,6 +91,8 @@ type unroll_limit =
   | ExpLimit of Cil_types.exp
   | IntLimit of int
 
+type split_kind = Static | Dynamic
+
 type action =
   | Enter_loop of unroll_limit
   | Leave_loop
@@ -108,10 +100,8 @@ type action =
   | Branch of branch * int (* branch taken, max branches in history *)
   | Ration of int (* starting ration stamp *)
   | Ration_merge of (int * int) option (* new ration stamp for the merge state *)
-  | Static_split of (Cil_types.exp * split_monitor)
-  | Dynamic_split of (Cil_types.exp * split_monitor)
-  | Static_merge of Cil_types.exp
-  | Dynamic_merge of Cil_types.exp
+  | Split of Cil_types.exp * split_kind * int
+  | Merge of Cil_types.exp * split_kind
   | Update_dynamic_splits
 
 exception InvalidAction
