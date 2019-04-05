@@ -102,8 +102,6 @@ val map_filter : (key -> 'a -> 'b option) -> 'a partition -> 'b partition
 
 (* Partitioning actions *)
 
-type 'a transfer_function = (key * 'a) list -> (key * 'a) list
-
 type unroll_limit =
   | ExpLimit of Cil_types.exp
   | IntLimit of int
@@ -143,7 +141,6 @@ sig
 
   val union : t -> t -> t
 
-  val transfer : state transfer_function -> t -> t
   val transfer_keys : t -> action -> t
   val transfer_states : (state -> state list) -> t -> t
   val legacy_transfer_states : (state list -> state list) -> t -> t

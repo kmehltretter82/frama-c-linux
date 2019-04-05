@@ -128,8 +128,6 @@ let map_filter (f : key -> 'a -> 'b option) (p : 'a partition) : 'b partition =
 
 (* --- Partitioning actions --- *)
 
-type 'a transfer_function = (key * 'a) list -> (key * 'a) list
-
 type unroll_limit =
   | ExpLimit of Cil_types.exp
   | IntLimit of int
@@ -335,9 +333,6 @@ struct
 
   let map_keys (f : key -> state -> key) (p : t) : t =
     List.map (fun (k,x) -> f k x, x) p
-
-  let transfer (f : state transfer_function)  (p : t) : t =
-    f p
 
   let transfer_keys p = function
     | Static_split (exp,monitor) ->
