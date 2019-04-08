@@ -25,6 +25,7 @@ type k =
   | Enum
   | Field
   | Formal_var
+  | Formal_in_type
   | Function
   | Global_var
   | Label
@@ -41,6 +42,7 @@ let name_of_kind = function
   | Enum -> "enum"
   | Field -> "field"
   | Formal_var -> "formal variable"
+  | Formal_in_type -> "formal variable in fun type"
   | Function -> "function"
   | Global_var -> "global variable"
   | Label -> "label"
@@ -57,6 +59,7 @@ let prefix = function
   | Enum -> "E"
   | Field -> "M"
   | Formal_var -> "f"
+  | Formal_in_type -> "ft"
   | Function -> "F"
   | Global_var -> "G"
   | Label -> "L"

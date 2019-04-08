@@ -36,12 +36,27 @@ class visitor = object
   val logic_vars_visited = Logic_var.Hashtbl.create 7
   val id_pred_visited = Identified_predicate.Hashtbl.create 7
 
+  method! vtype = function
+    | TFun(t, args, variadic, attrs) ->
+      let args' =
+        match args with
+        | None -> None
+        | Some l ->
+          Some
+            (List.map
+               (fun (s,t,a) ->
+                  (Dictionary.fresh Obfuscator_kind.Formal_in_type s, t, a)) l)
+      in
+      Cil.ChangeDoChildrenPost(TFun(t,args',variadic,attrs), Extlib.id)
+    | _ -> Cil.DoChildren
+
   method! vglob_aux = function
     | GType (ty,_) ->
       if not (Cil.typeHasAttribute "fc_stdlib" ty.ttype) then
         ty.tname <- Dictionary.fresh Obfuscator_kind.Type ty.tname;
       Cil.DoChildren
-    | GVarDecl (v, _) | GVar (v, _, _) | GFun ({svar = v}, _) | GFunDecl (_, v, _)
+    | GVarDecl (v, _) | GVar (v, _, _)
+    | GFun ({svar = v}, _) | GFunDecl (_, v, _)
       when Cil.is_unused_builtin v ->
       Cil.SkipChildren
     | _ ->

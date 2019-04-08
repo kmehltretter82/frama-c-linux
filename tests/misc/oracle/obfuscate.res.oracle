@@ -53,6 +53,15 @@
 #define f4 c
 #define f5 d
 #define f6 s
+// formal variable in fun types
+#define ft1 x
+#define ft2 y
+#define ft3 p
+#define ft4 f1
+#define ft5 p
+#define ft6 c
+#define ft7 d
+#define ft8 s
 /*********************************** */
 /* end of dictionary for obfuscation */
 /*********************************** */
@@ -74,7 +83,7 @@ enum T1 {
     E3 = 4
 };
 struct T2 {
-   void (*M1)(int x, int y) ;
+   void (*M1)(int ft1, int ft2) ;
 };
 int G1 = 0;
 /*@ global invariant LV1: G1 ≥ 0;
