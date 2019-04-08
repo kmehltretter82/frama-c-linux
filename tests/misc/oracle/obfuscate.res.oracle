@@ -16,8 +16,11 @@
 #define F2 f
 #define F3 logic
 #define F4 builtin_and_stdlib
+#define F5 implem
+#define F6 test_func
 // global variables
 #define G1 my_var
+#define G2 example_struct
 // labels
 #define L1 end
 #define L2 end
@@ -29,10 +32,13 @@
 // logic variables
 #define LV1 I
 #define LV2 x
+// fields
+#define M1 my_func
 // predicates
 #define P1 never
 // types
 #define T1 my_enum
+#define T2 S
 // local variables
 #define V1 x
 #define V2 __retres
@@ -44,6 +50,9 @@
 #define f1 p
 #define f2 f1
 #define f3 p
+#define f4 c
+#define f5 d
+#define f6 s
 /*********************************** */
 /* end of dictionary for obfuscation */
 /*********************************** */
@@ -63,6 +72,9 @@ enum T1 {
     E1 = 0,
     E2 = 1,
     E3 = 4
+};
+struct T2 {
+   void (*M1)(int x, int y) ;
 };
 int G1 = 0;
 /*@ global invariant LV1: G1 ≥ 0;
@@ -128,6 +140,19 @@ int F4(void)
   /*@ assert \true; */ ;
   V6 = 1;
   return V6;
+}
+
+void F5(int f4, int f5)
+{
+  return;
+}
+
+struct T2 G2 = {.M1 = & F5};
+void F6(struct T2 *f6)
+{
+  (*(f6->M1))(3,4);
+  (*(G2.M1))(5,6);
+  return;
 }
 
 
