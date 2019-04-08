@@ -20,7 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open State_partitioning
 open Value_parameters
 open Partitioning_annots
 open Cil_types
@@ -30,7 +29,7 @@ let is_loop s =   match s.skind with Loop _ -> true | _ -> false
 
 let warn ?(current = true) = Kernel.warning ~once:true ~current
 
-module Make (Kf : Kf) : Parameters =
+module Make (Kf : sig val kf: kernel_function end) =
 struct
   let kf = Kf.kf
 

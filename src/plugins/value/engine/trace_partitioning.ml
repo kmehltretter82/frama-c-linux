@@ -22,14 +22,12 @@
 
 open Cil_types
 open Bottom.Type
-open State_partitioning
 open Partition
-
 
 module Make
     (Abstract: Abstractions.Eva)
     (Transfer : Transfer_stmt.S with type state = Abstract.Dom.t)
-    (Kf : Kf) =
+    (Kf : sig val kf: kernel_function end) =
 struct
   module Parameters = Partitioning_parameters.Make (Kf)
 
@@ -152,13 +150,13 @@ struct
   let transfer_action p action =
     p.flow_states <- Flow.transfer_keys p.flow_states action
 
-  let enter_loop (p : flow) (i : loop) : unit =
+  let enter_loop (p : flow) (i : stmt) : unit =
     transfer_action p (Enter_loop (unroll i))
 
-  let leave_loop (p : flow) (_i : loop) : unit =
+  let leave_loop (p : flow) (_i : stmt) : unit =
     transfer_action p Leave_loop
 
-  let next_loop_iteration (p : flow) (_i : loop) : unit =
+  let next_loop_iteration (p : flow) (_i : stmt) : unit =
     transfer_action p Incr_loop
 
   let empty_rationing = new_rationing ~limit:0 ~merge:false

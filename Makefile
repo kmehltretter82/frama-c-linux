@@ -923,7 +923,6 @@ PLUGIN_CMO:= slevel/split_strategy value_parameters \
 	engine/initialization \
 	engine/compute_functions engine/analysis register
 PLUGIN_CMI:= values/abstract_value values/abstract_location \
-	engine/state_partitioning \
 	domains/abstract_domain domains/simpler_domains
 PLUGIN_DEPENDENCIES:=Callgraph LoopAnalysis RteGen
 

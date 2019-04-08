@@ -20,4 +20,100 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Make : State_partitioning.Partitioning
+open Bottom.Type
+
+module Make
+    (Abstract : Abstractions.Eva)
+    (Transfer : Transfer_stmt.S with type state = Abstract.Dom.t)
+    (Kf : sig val kf: Cil_types.kernel_function end) :
+sig
+  type state = Abstract.Dom.t     (** The states being partitioned *)
+  type store       (** The storage of all states ever met at a control point *)
+  type flow        (** A set of states which are currently propagated *)
+  type tank        (** An organized temporary accumulation of flows *)
+  type widening    (** Widening informations *)
+
+  (* --- Constructors --- *)
+
+  val empty_store : stmt:Cil_types.stmt option -> store
+  val empty_flow : unit -> flow
+  val empty_tank : unit -> tank
+  val empty_widening : stmt:Cil_types.stmt option -> widening
+
+  (** Build the initial tank for the entry point of a function. *)
+  val initial_tank : state list -> tank
+
+  (* --- Pretty printing --- *)
+
+  val pretty_store : Format.formatter -> store -> unit
+  val pretty_flow : Format.formatter -> flow -> unit
+
+  (* --- Accessors --- *)
+
+  val expanded : store -> state list
+  val smashed : store -> state or_bottom
+  val contents : flow -> state list
+  val is_empty_store : store -> bool
+  val is_empty_flow : flow -> bool
+  val is_empty_tank : tank -> bool
+  val store_size : store -> int
+  val flow_size : flow -> int
+  val tank_size : tank -> int
+
+  (* --- Reset state (for hierchical convergence) --- *)
+
+  (* These functions reset the part of the state of the analysis which has
+     been obtained after a widening. *)
+  val reset_store : store -> unit
+  val reset_flow : flow -> unit
+  val reset_tank : tank -> unit
+  val reset_widening : widening -> unit
+
+  (** Resets (or just delays) the widening counter. Used on nested loops, to
+      postpone the widening of the inner loop when iterating on the outer
+      loops. This is especially useful when the inner loop fixpoint does not
+      depend on the outer loop. *)
+  val reset_widening_counter : widening -> unit
+
+  (* --- Partition transfer functions --- *)
+
+  val enter_loop : flow -> Cil_types.stmt -> unit
+  val leave_loop : flow -> Cil_types.stmt -> unit
+  val next_loop_iteration : flow -> Cil_types.stmt -> unit
+  val split_return : flow -> Cil_types.exp option -> unit
+
+  (* --- Operators --- *)
+
+  (** Remove all states from the tank, leaving it empty as if it was just
+      created by [empty_tank] *)
+  val drain : tank -> flow
+
+  (** Fill the states of the flow into the tank, modifying [into] inplace but
+      letting the flow unchanged *)
+  val fill : into:tank -> flow -> unit
+
+  (** Apply a transfer function to all the states of a propagation. *)
+  val transfer : (state -> state list) -> flow -> unit
+
+  (** Join all incoming propagations into the given store. This function returns
+      a set of states which still need to be propagated past the store.
+
+      If a state from the propagations is included in another state which has
+      already been propagated, it may be removed from the output propagation.
+      Likewise, if a state from a propagation is included in a state from
+      another propagation of the list (coming from another edge or iteration),
+      it may also be removed.
+
+      This function also interprets partitioning annotations at the store
+      vertex (slevel, splits, merges, ...) which will generally change the
+      current partitioning. *)
+  val join : (Partition.branch * flow) list -> store -> flow
+
+  (** Widen a flow. The widening object keeps track of the previous widenings
+      and previous propagated states to ensure termination. The result is true
+      when it is correct to end the propagation here, i.e. when the flow
+      object is only containng states which are included into already propagated
+      states. *)
+  val widen : widening -> flow -> bool
+
+end

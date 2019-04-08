@@ -55,7 +55,7 @@
     of keys.
 *)
 
-type branch = int
+type branch = int (* Junction branch id in the control flow *)
 
 module ExpMap = Cil_datatype.ExpStructEq.Map
 
