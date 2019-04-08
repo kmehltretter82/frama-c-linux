@@ -72,21 +72,21 @@ let prefix = function
   | Logic_constructor -> "LC"
 
 include Datatype.Make_with_collections
-(struct
-  type t = k
-  let name = "Obfuscator.kind"
-  let reprs = [ Global_var ]
-  let hash (k:k) = Hashtbl.hash k
-  let equal (k1:k) k2 = k1 = k2
-  let compare (k1:k) k2 = Transitioning.Stdlib.compare k1 k2
-  let varname _ = "k"
-  let internal_pretty_code = Datatype.undefined
-  let copy = Datatype.identity
-  let structural_descr = Structural_descr.t_abstract
-  let rehash = Datatype.identity
-  let mem_project = Datatype.never_any_project
-  let pretty fmt k = Format.fprintf fmt "%s" (name_of_kind k)
- end)
+    (struct
+      type t = k
+      let name = "Obfuscator.kind"
+      let reprs = [ Global_var ]
+      let hash (k:k) = Hashtbl.hash k
+      let equal (k1:k) k2 = k1 = k2
+      let compare (k1:k) k2 = Transitioning.Stdlib.compare k1 k2
+      let varname _ = "k"
+      let internal_pretty_code = Datatype.undefined
+      let copy = Datatype.identity
+      let structural_descr = Structural_descr.t_abstract
+      let rehash = Datatype.identity
+      let mem_project = Datatype.never_any_project
+      let pretty fmt k = Format.fprintf fmt "%s" (name_of_kind k)
+    end)
 
 (*
 Local Variables:
