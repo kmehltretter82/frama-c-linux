@@ -308,19 +308,16 @@ struct
     | Failure _ ->
       fail ~exp "this partitioning parameter is too big"
 
-  (* Sorts a list of states by the evaluation of an expression, according to
-     a list of expected integer values.
-     [split_by_evaluation expr expected_values states] returns two list
-     (matched, tail) such as:
-     - for each element (i, states, mess) of the first list [matched],
-       i was in the list of integer [expected_values], [states] is the list of
-       input states where [expr] evaluates to exactly [i], and [mess] is true
-       if there was some other input state on which [expr] evaluates to a value
-       including [i] (but not equal to [i]).
-     - tail are the states on which [expr] does not evaluate to none of the
-       [expected_values]. *)
-  let split_by_evaluation = match Abstract.Val.get Main_values.cvalue_key with
-    | None -> fun _ _ states -> [], states
+  let smash_states acc = function
+    | [] -> acc
+    | v1 :: l -> List.fold_left Abstract.Dom.join v1 l :: acc
+
+  (* In a list of states, join the states in which the given expression
+     evaluates to:
+     - exactly the integer i from the list expected_values;
+     - anything else. *)
+  let merge_by_value = match Abstract.Val.get Main_values.cvalue_key with
+    | None -> fun _ _ states -> states
     | Some get -> fun expr expected_values states ->
       let typ = Cil.typeOf expr in
       let eval acc state =
@@ -331,53 +328,30 @@ struct
           (state, `Value value, zero_or_one) :: acc
       in
       let eval_states = List.fold_left eval [] states in
-      let match_expected_value expected_value states =
-        let process_one_state (eq, mess, neq) (s, v, zero_or_one as current) =
-          if Bottom.is_included Abstract.Val.is_included expected_value v then
-            (* The integer on which we split is part of the result *)
-            if zero_or_one then
-              (s :: eq, mess, neq) (* Clean split *)
-            else
-              (eq, true, current :: neq) (* v is not exact: mess, i.e. no split *)
-          else
-            (eq, mess, current :: neq) (* Integer not in the result at all *)
+      let is_included = Bottom.is_included Abstract.Val.is_included in
+      let match_expected_value i states =
+        let expected_value = `Value Abstract.Val.(reduce (inject_int typ i)) in
+        let process_one_state (eq, neq) (s, v, zero_or_one as current) =
+          let included = is_included expected_value v in
+          if included && not zero_or_one
+          then
+            Value_parameters.result ~once:true ~current:true
+              "cannot properly split on \\result == %a"
+              Abstract_interp.Int.pretty i;
+          if included && zero_or_one
+          then s :: eq, neq
+          else eq, current :: neq
         in
-        List.fold_left process_one_state ([], false, []) states
+        List.fold_left process_one_state ([], []) states
       in
       let process_one_value (acc, states) i =
-        let value = `Value Abstract.Val.(reduce (inject_int typ i)) in
-        let eq, mess, neq = match_expected_value value states in
-        (i, eq, mess) :: acc, neq
+        let eq, neq = match_expected_value i states in
+        smash_states acc eq, neq
       in
       let matched, tail =
         List.fold_left process_one_value ([], eval_states) expected_values
       in
-      matched, List.map (fun (s, _, _) -> s) tail
-
-  let smash_states = function
-    | [] -> []
-    | v1 :: l -> [ List.fold_left Abstract.Dom.join v1 l ]
-
-  (* In the list of [states], join states in which [expr] evaluates to the
-     same exact value in [expected_values] or to any other value. *)
-  let merge_by_value expr expected_values states =
-    let states =
-      if Cil.isIntegralOrPointerType (Cil.typeOf expr)
-      then
-        let matched, tail =
-          split_by_evaluation expr expected_values states
-        in
-        let process (i, states, mess) =
-          if mess then
-            Value_parameters.result ~once:true ~current:true
-              "cannot properly split on \\result == %a"
-              Abstract_interp.Int.pretty i;
-          states
-        in
-        tail :: List.map process matched
-      else [states]
-    in
-    List.flatten (List.map smash_states states)
+      smash_states matched (List.map (fun (s, _, _) -> s) tail)
 
   (* --- Applying partitioning actions onto flows --------------------------- *)
 

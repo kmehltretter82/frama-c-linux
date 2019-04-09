@@ -181,7 +181,10 @@ struct
       | Split_strategy.SplitEqList i ->
         match return_exp with
         | None -> smash ()
-        | Some return_exp -> transfer_action flow (Restrict (return_exp, i))
+        | Some return_exp ->
+          if Cil.isIntegralOrPointerType (Cil.typeOf return_exp)
+          then transfer_action flow (Restrict (return_exp, i))
+          else smash ()
 
   (* Reset state (for hierchical convergence) *)
 
