@@ -17,6 +17,7 @@
 Open Source Release <next-release>
 ##################################
 
+-*  Kernel    [2019/04/09] Avoid crashing on one-letter attributes. Fixes #2432
 -*  Obfuscator [2019/04/09] Also obfuscate formals in function pointer types.
               Fixes #2433.
 -   Inout     [2019/04/01] Fix performance issue when initializing large arrays.
