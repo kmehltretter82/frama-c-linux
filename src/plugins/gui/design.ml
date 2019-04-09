@@ -1338,12 +1338,15 @@ class main_window () : main_window_extension_points =
     method private statusbar = statusbar
 
     method lower_notebook = lower_notebook
-    method reset () =
+    method private reset_no_extensions () =
       Gui_parameters.debug ~dkey "Redisplaying gui";
       Globals_GUI.clear ();
       current_buffer_state <- original_reactive_buffer;
       self#file_tree#reset ();
-      (self#menu_manager ())#refresh ();
+      (self#menu_manager ())#refresh ()
+
+    method reset () =
+      self#reset_no_extensions ();
       reset_extensions self#toplevel;
       if History.is_empty () then (
         self#default_screen ())
@@ -1527,7 +1530,7 @@ class main_window () : main_window_extension_points =
                   try
                     let stmt = Hashtbl.find Feedback.call_sites line in
                     Pretty_source.fold_preconds_at_callsite stmt;
-                    self#reset ();
+                    self#reset_no_extensions ();
                     (* give some time for the sourceview to recompute
                        its height, otherwise scrolling is broken. *)
                     let has_stabilized = ref false in
