@@ -25,11 +25,11 @@ type node_kind =
   | Composite of Cil_types.varinfo
   | Scattered of Cil_types.lval
   | Alarm of Cil_types.stmt * Alarms.alarm
-  | File (* Dummy node, hack for Ocamlgraph Graphviz Dot module *)
+  | Cluster (* Dummy node, hack for Ocamlgraph Graphviz Dot module *)
 
 type node_locality = {
   loc_file : string;
-  loc_function : Cil_types.kernel_function option;
+  loc_callstack : Callstack.t;
 }
 
 type node_precision = Unevaluated | Singleton | Normal | Wide | Critical

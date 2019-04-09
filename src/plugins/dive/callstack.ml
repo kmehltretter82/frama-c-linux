@@ -20,29 +20,31 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Graph_types
+open Cil_types
 
-let get_base = function
-  | Scalar (vi,_,_) | Composite (vi) -> Some vi
-  | Scattered _ | Alarm _ | Cluster -> None
+include Value_types.Callstack
 
-let to_location = function
-  | Scalar (vi,typ,offset) ->
-    let base = Base.of_varinfo vi in
-    Some (Locations.loc_of_typoffset base typ offset)
-  | Composite (vi) ->
-    Some (Locations.loc_of_varinfo vi)
-  | Scattered _ | Alarm _ | Cluster -> None
+type call_site = (Cil_types.kernel_function * Cil_types.kinstr)
 
-let to_lval = function
-  | Scalar (vi,_typ,offset) -> Some (Cil_types.Var vi, offset)
-  | Composite (vi) -> Some (Cil_types.Var vi, Cil_types.NoOffset)
-  | Scattered (lval) -> Some lval
-  | Alarm (_,_) | Cluster -> None
+let init kf = [(kf,Kglobal)]
 
-let pretty fmt = function
-  | (Scalar _ | Composite _ | Scattered _) as kind ->
-    Cil_printer.pp_lval fmt (Extlib.the (to_lval kind))
-  | Alarm (_stmt,alarm) ->
-    Cil_printer.pp_predicate fmt (Alarms.create_predicate alarm)
-  | Cluster -> ()
+let pop cs =
+  match cs with
+  | [] | (_,Kglobal) :: _ :: _ | [(_,Kstmt _)] -> assert false (* Invariant *)
+  | [(_,Kglobal)] -> None
+  | (kf,Kstmt stmt) :: t -> Some (kf,stmt,t)
+
+let rec pop_downto top_kf = function
+  | [] -> failwith "the callstack doesn't contain this function"
+  | ((kf,_kinstr) :: tail) as cs ->
+    if Kernel_function.equal kf top_kf
+    then cs
+    else pop_downto top_kf tail
+
+let push (kf,stmt) cs =
+  match cs with
+  (* When the callstack is truncated, we ignore the first callsite *)
+  | [] -> [(kf,Kglobal)]
+  | cs -> (kf,Kstmt stmt) :: cs
+
+

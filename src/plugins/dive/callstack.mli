@@ -20,29 +20,17 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Graph_types
+type call_site = (Cil_types.kernel_function * Cil_types.kinstr)
+type t = call_site list
 
-let get_base = function
-  | Scalar (vi,_,_) | Composite (vi) -> Some vi
-  | Scattered _ | Alarm _ | Cluster -> None
+include Datatype.S_with_collections with type t := t
 
-let to_location = function
-  | Scalar (vi,typ,offset) ->
-    let base = Base.of_varinfo vi in
-    Some (Locations.loc_of_typoffset base typ offset)
-  | Composite (vi) ->
-    Some (Locations.loc_of_varinfo vi)
-  | Scattered _ | Alarm _ | Cluster -> None
+(* The callstacks manipulated here have the following invariant:
+   - the callstack is never an empty list
+   - the last item of the list has alwas a Kglobal
+   - all elements of the list except the last have a Kstmt *)
 
-let to_lval = function
-  | Scalar (vi,_typ,offset) -> Some (Cil_types.Var vi, offset)
-  | Composite (vi) -> Some (Cil_types.Var vi, Cil_types.NoOffset)
-  | Scattered (lval) -> Some lval
-  | Alarm (_,_) | Cluster -> None
-
-let pretty fmt = function
-  | (Scalar _ | Composite _ | Scattered _) as kind ->
-    Cil_printer.pp_lval fmt (Extlib.the (to_lval kind))
-  | Alarm (_stmt,alarm) ->
-    Cil_printer.pp_predicate fmt (Alarms.create_predicate alarm)
-  | Cluster -> ()
+val init : Cil_types.kernel_function -> t
+val pop : t -> (Cil_types.kernel_function * Cil_types.stmt * t) option
+val pop_downto : Cil_types.kernel_function -> t -> t
+val push : Cil_types.kernel_function * Cil_types.stmt -> t -> t

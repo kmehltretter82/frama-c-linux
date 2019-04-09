@@ -103,10 +103,11 @@ let ouptput_to_dot out_channel g =
   let build_label s = `HtmlLabel (Extlib.html_escape s) in
 
   let module FileTable = Datatype.String.Hashtbl in
-  let module FunctionTable = Kernel_function.Hashtbl in
+  let module CallstackTable = Value_types.Callstack.Hashtbl in
   let file_table = FileTable.create 13
-  and function_table = FunctionTable.create 13 in
+  and callstack_table = CallstackTable.create 13 in
   let file_counter = ref 0 in
+  let callstack_counter = ref 0 in
   let rec build_file_subgraph filename =
     incr file_counter;
     {
@@ -114,16 +115,20 @@ let ouptput_to_dot out_channel g =
       sg_attributes = [build_label filename];
       sg_parent = None;
     }
-  and build_function_subgraph filename kf =
-    {
-      sg_name = "function_" ^ (string_of_int (Kernel_function.get_id kf));
-      sg_attributes = [build_label (Kernel_function.get_name kf)];
-      sg_parent = Some (get_file_subgraph filename).sg_name;
-    }
+  and build_callstack_subgraph = function
+    | [] -> None
+    | (kf,_kinstr) :: stack ->
+      let parent = get_callstack_subgraph stack in
+      incr callstack_counter;
+      Some {
+        sg_name = "cs_" ^ (string_of_int !callstack_counter);
+        sg_attributes = [build_label (Kernel_function.get_name kf)];
+        sg_parent = Extlib.opt_map (fun sg -> sg.sg_name) parent;
+      }
   and get_file_subgraph filename =
     FileTable.memo file_table filename build_file_subgraph
-  and get_function_subgraph filename kf =
-    FunctionTable.memo function_table kf (build_function_subgraph filename)
+  and get_callstack_subgraph cs =
+    CallstackTable.memo callstack_table cs build_callstack_subgraph
   in
 
   let module Dot = Graph.Graphviz.Dot (
@@ -142,7 +147,7 @@ let ouptput_to_dot out_channel g =
           | Composite _ -> [ `Shape `Box3d ]
           | Scattered _ -> [ `Shape `Parallelogram ]
           | Alarm _ ->  [ `Shape `Doubleoctagon ; `Style `Bold ]
-          | File -> [ `Style `Invis ]
+          | Cluster -> [ `Style `Invis ]
         and precision = match v.node_precision with
           | Unevaluated -> []
           | Singleton -> [`Color 0x88aaff ;
@@ -159,10 +164,10 @@ let ouptput_to_dot out_channel g =
           l := [ `Style `Dotted ] @ !l;
         !l
       let get_subgraph v =
-        let {loc_file ; loc_function} = v.node_locality in
-          match loc_function with
-            | None -> Some (get_file_subgraph loc_file)
-            | Some kf -> Some (get_function_subgraph loc_file kf)
+        let {loc_file ; loc_callstack} = v.node_locality in
+          match loc_callstack with
+          | [] -> Some (get_file_subgraph loc_file)
+          | cs -> get_callstack_subgraph cs
       let default_edge_attributes _g = []
       let edge_attributes (_v1,e,_v2) =
         let kind_attribute = match e.dependency_kind with
@@ -177,20 +182,31 @@ let ouptput_to_dot out_channel g =
   Dot.output_graph out_channel g
 
 let ouptput_to_json out_channel g =
+  let rec output_kinstr = function
+    | Cil_types.Kglobal -> Json.of_string "global"
+    | Cil_types.Kstmt stmt -> Json.of_int stmt.Cil_types.sid
+  and output_callsite (kf,kinstr) =
+    Json.of_fields [
+      ("fun", Json.of_string (Kernel_function.get_name kf)) ;
+      ("instr", output_kinstr kinstr) ;
+    ]
+  and output_callstack cs =
+    Json.of_list (List.map output_callsite cs)
+  in
   let output_node_kind kind =
     let s = match kind with
       | Scalar _ -> "scalar"
       | Composite _ -> "composite"
       | Scattered _ -> "scattered"
       | Alarm _ -> "alarm"
-      | File -> "dummy"
+      | Cluster -> "dummy"
     in
     Json.of_string s
-  and output_node_locality { loc_file ; loc_function } =
+  and output_node_locality { loc_file ; loc_callstack } =
     let f1 = ("file", Json.of_string loc_file) in
-    let fields = match loc_function with
-      | None -> [f1]
-      | Some kf -> [f1 ; ("fun", Json.of_string (Kernel_function.get_name kf))]
+    let fields = match loc_callstack with
+      | [] -> [f1]
+      | cs -> [f1 ; ("fun", output_callstack cs)]
     in
     Json.of_fields fields
   and output_node_precision precision =
@@ -212,7 +228,7 @@ let ouptput_to_json out_channel g =
     Json.of_string s
   in
   let output_node node acc =
-    if node.node_kind = File then acc
+    if node.node_kind = Cluster then acc
     else
       let label = Pretty_utils.to_string Node_kind.pretty node.node_kind in
       Json.of_fields [
