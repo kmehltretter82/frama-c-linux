@@ -1,3 +1,4 @@
+/configure
 /Makefile
 /tests/ptests_config
-/tests/nonterm/result
+/tests/*/result
