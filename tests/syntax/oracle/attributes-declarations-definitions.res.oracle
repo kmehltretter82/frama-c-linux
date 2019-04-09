@@ -49,4 +49,7 @@ void test(void)
   return;
 }
 
+int __attribute__((__o__)) one_letter_attribute;
+int __attribute__((__n__)) one_letter_attribute_with_underscore;
+int __attribute__((__e__)) one_letter_attribute_with_underscore_after;
 
