@@ -169,22 +169,22 @@ struct
     let strategy = Split_return.kf_strategy kf in
     if strategy <> Split_strategy.FullSplit
     then
-      let smash () =
-        transfer_action flow (Ration empty_rationing);
+      let apply action =
+        transfer_action flow action;
         let p = Flow.to_partition flow.flow_states in
         flow.flow_states <- Flow.of_partition p
       in
       match Split_return.kf_strategy kf with
       (* SplitAuto already transformed into SplitEqList. *)
       | Split_strategy.FullSplit | Split_strategy.SplitAuto -> assert false
-      | Split_strategy.NoSplit -> smash ()
+      | Split_strategy.NoSplit -> apply (Ration empty_rationing)
       | Split_strategy.SplitEqList i ->
         match return_exp with
-        | None -> smash ()
+        | None -> apply (Ration empty_rationing)
         | Some return_exp ->
           if Cil.isIntegralOrPointerType (Cil.typeOf return_exp)
-          then transfer_action flow (Restrict (return_exp, i))
-          else smash ()
+          then apply (Restrict (return_exp, i))
+          else apply (Ration empty_rationing)
 
   (* Reset state (for hierchical convergence) *)
 

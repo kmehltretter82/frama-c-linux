@@ -308,78 +308,29 @@ struct
     | Failure _ ->
       fail ~exp "this partitioning parameter is too big"
 
-  let smash_states acc = function
-    | [] -> acc
-    | v1 :: l -> List.fold_left Abstract.Dom.join v1 l :: acc
+  (* --- Applying partitioning actions onto flows --------------------------- *)
 
-  (* In a list of states, join the states in which the given expression
-     evaluates to:
-     - exactly the integer i from the list expected_values;
-     - anything else. *)
-  let merge_by_value = match Abstract.Val.get Main_values.cvalue_key with
-    | None -> fun _ _ states -> states
-    | Some get -> fun expr expected_values states ->
+  let stamp_by_value = match Abstract.Val.get Main_values.cvalue_key with
+    | None -> fun _ _ _ -> None
+    | Some get -> fun expr expected_values state ->
       let typ = Cil.typeOf expr in
-      let eval acc state =
-        match fst (Abstract.Eval.evaluate state expr) with
-        | `Bottom -> (state, `Bottom, false) :: acc
-        | `Value (_cache, value) ->
-          let zero_or_one = Cvalue.V.cardinal_zero_or_one (get value) in
-          (state, `Value value, zero_or_one) :: acc
-      in
-      let eval_states = List.fold_left eval [] states in
-      let is_included = Bottom.is_included Abstract.Val.is_included in
-      let match_expected_value i states =
-        let expected_value = `Value Abstract.Val.(reduce (inject_int typ i)) in
-        let process_one_state (eq, neq) (s, v, zero_or_one as current) =
-          let included = is_included expected_value v in
-          if included && not zero_or_one
-          then
+      let make stamp i = stamp, i, Abstract.Val.inject_int typ i in
+      let expected_values = List.mapi make expected_values in
+      match fst (Abstract.Eval.evaluate state expr) with
+      | `Bottom -> None
+      | `Value (_cache, value) ->
+        let is_included (_, _, v) = Abstract.Val.is_included v value in
+        match Transitioning.List.find_opt is_included expected_values with
+        | None -> None
+        | Some (stamp, i, _) ->
+          if Cvalue.V.cardinal_zero_or_one (get value)
+          then Some (stamp, 0)
+          else begin
             Value_parameters.result ~once:true ~current:true
               "cannot properly split on \\result == %a"
               Abstract_interp.Int.pretty i;
-          if included && zero_or_one
-          then s :: eq, neq
-          else eq, current :: neq
-        in
-        List.fold_left process_one_state ([], []) states
-      in
-      let process_one_value (acc, states) i =
-        let eq, neq = match_expected_value i states in
-        smash_states acc eq, neq
-      in
-      let matched, tail =
-        List.fold_left process_one_value ([], eval_states) expected_values
-      in
-      smash_states matched (List.map (fun (s, _, _) -> s) tail)
-
-  (* --- Applying partitioning actions onto flows --------------------------- *)
-
-  (* Applies the transfer function [f] to the states whose partitioning keys
-     only differ by the ration stamp. [f] may smash those states, thus
-     restricting the rationing without affecting the other partitioning. *)
-  let restrict_rationing (f : state list -> state list) (p : t) : t =
-    (* Group the states in buckets, where each bucket is a list of states
-       with the same key except for the ration stamp *)
-    let fill_buckets buckets (k,x)  =
-      (* Ignore the ration stamp *)
-      let k = { k with ration_stamp = None } in
-      (* Find the bucket *)
-      let contents =
-        try KMap.find k buckets
-        with Not_found -> []
-      in
-      (* Add the state to the bucket *)
-      KMap.add k (x :: contents) buckets
-    in
-    let buckets = List.fold_left fill_buckets KMap.empty p in
-    (* Apply the transfer function to each bucket *)
-    let result = KMap.map f buckets in
-    (* Rebuild the flow *)
-    let add_bucket k bucket acc =
-      List.map (fun x -> k,x) bucket @ acc
-    in
-    KMap.fold add_bucket result []
+            None
+          end
 
   let split_state ~monitor (kind : split_kind) (exp : Cil_types.exp)
       (key : key) (state : state) : (key * state) list =
@@ -429,12 +380,9 @@ struct
     | Update_dynamic_splits ->
       update_dynamic_splits p
 
-    | Restrict (expr, expected_values) ->
-      restrict_rationing (merge_by_value expr expected_values) p
-
     | action -> (* Simple map transfer functions *)
       let transfer = match action with
-        | Restrict _ | Split _ | Update_dynamic_splits ->
+        | Split _ | Update_dynamic_splits ->
           assert false (* Handled above *)
 
         | Enter_loop limit_kind -> fun k x ->
@@ -494,6 +442,9 @@ struct
           else
             let stamp () = incr current; Some (!current, 0) in
             fun k _ -> { k with ration_stamp = stamp () }
+
+        | Restrict (expr, expected_values) -> fun k s ->
+          { k with ration_stamp = stamp_by_value expr expected_values s}
 
         | Merge (exp, Static) -> fun k _x ->
           { k with static_split = ExpMap.remove exp k.static_split }
