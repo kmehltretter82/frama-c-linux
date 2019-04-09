@@ -63,10 +63,16 @@ open Cil_types
 open Cil_datatype
 
 let stripUnderscore s =
-  let res = Extlib.strip_underscore s in
-  if res = "" then
-    Kernel.error ~once:true ~current:true "Invalid attribute name %s" s;
-  res
+  if String.length s = 1 then begin
+    if s = "_" then
+      Kernel.error ~once:true ~current:true "Invalid attribute name %s" s;
+    s
+  end else begin
+    let res = Extlib.strip_underscore s in
+    if res = "" then
+      Kernel.error ~once:true ~current:true "Invalid attribute name %s" s;
+    res
+  end
 
 let frama_c_keep_block = "FRAMA_C_KEEP_BLOCK"
 let () = Cil_printer.register_shallow_attribute frama_c_keep_block

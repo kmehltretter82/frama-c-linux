@@ -477,11 +477,11 @@ let make_unique_name mem ?(sep=" ") ?(start=2) from =
 let strip_underscore s =
   let l = String.length s in
   let rec start i =
-    if i >= l then l-1
+    if i >= l then l
     else if s.[i] = '_' then start (i + 1) else i
   in
   let st = start 0 in
-  if st = l - 1 then ""
+  if st = l then ""
   else begin
     let rec finish i =
       (* We know that we will stop at >= st >= 0 *)
