@@ -39,9 +39,6 @@ module type S = sig
     stmt -> lval option -> exp -> exp list -> state ->
     state list or_bottom * Value_types.cacheable
 
-  val split_final_states:
-    kernel_function -> exp -> Integer.t list -> state list -> state list list
-
   val check_unspecified_sequence:
     Cil_types.stmt ->
     state ->

@@ -151,38 +151,37 @@ struct
 
   (* Partition transfer functions *)
 
-  let loop_transfer p action =
+  let transfer_action p action =
     p.flow_states <- Flow.transfer_keys p.flow_states action
 
   let enter_loop (p : flow) (i : loop) : unit =
-    loop_transfer p (Enter_loop (unroll i))
+    transfer_action p (Enter_loop (unroll i))
 
   let leave_loop (p : flow) (_i : loop) : unit =
-    loop_transfer p Leave_loop
+    transfer_action p Leave_loop
 
   let next_loop_iteration (p : flow) (_i : loop) : unit =
-    loop_transfer p Incr_loop
+    transfer_action p Incr_loop
+
+  let empty_rationing = new_rationing ~limit:0 ~merge:false
 
   let split_return (flow : flow) (return_exp : exp option) : unit =
-    (** Join every state in the list *)
-    let transfer_split states =
+    let strategy = Split_return.kf_strategy kf in
+    if strategy <> Split_strategy.FullSplit
+    then
+      let smash () =
+        transfer_action flow (Ration empty_rationing);
+        let p = Flow.to_partition flow.flow_states in
+        flow.flow_states <- Flow.of_partition p
+      in
       match Split_return.kf_strategy kf with
+      (* SplitAuto already transformed into SplitEqList. *)
+      | Split_strategy.FullSplit | Split_strategy.SplitAuto -> assert false
+      | Split_strategy.NoSplit -> smash ()
       | Split_strategy.SplitEqList i ->
-        begin match return_exp with
-          | Some return_exp ->
-            let states = Transfer.split_final_states kf return_exp i states in
-            List.flatten (List.map smash_states states)
-          | None ->
-            smash_states states
-        end
-      | Split_strategy.NoSplit   -> smash_states states
-      | Split_strategy.FullSplit -> states
-      (* Last case not possible : already transformed into SplitEqList *)
-      | Split_strategy.SplitAuto -> assert false
-    in
-    flow.flow_states <-
-      Flow.legacy_transfer_states transfer_split flow.flow_states
-
+        match return_exp with
+        | None -> smash ()
+        | Some return_exp -> transfer_action flow (Restrict (return_exp, i))
 
   (* Reset state (for hierchical convergence) *)
 

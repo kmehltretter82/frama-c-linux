@@ -102,6 +102,7 @@ type action =
   | Incr_loop
   | Branch of branch * int (* branch taken, max branches in history *)
   | Ration of rationing
+  | Restrict of Cil_types.exp * Integer.t list
   | Split of Cil_types.exp * split_kind * int
   | Merge of Cil_types.exp * split_kind
   | Update_dynamic_splits
@@ -130,7 +131,6 @@ sig
 
   val transfer_keys : t -> action -> t
   val transfer_states : (state -> state list) -> t -> t
-  val legacy_transfer_states : (state list -> state list) -> t -> t
 
   val iter : (state -> unit) -> t -> unit
 end

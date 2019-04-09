@@ -43,7 +43,7 @@
   Called from tests/value/split_return.i:206.
 [eva] computing for function f3 <- main3 <- main.
   Called from tests/value/split_return.i:73.
-[eva] tests/value/split_return.i:69: f3: cannot properly split on \result == -2
+[eva] tests/value/split_return.i:69: cannot properly split on \result == -2
 [eva] Recording results for f3
 [eva] Done for function f3
 [eva] tests/value/split_return.i:74: Frama_C_show_each_f3: {-2; 7}, {0; 5}

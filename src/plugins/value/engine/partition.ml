@@ -158,6 +158,7 @@ type action =
   | Incr_loop
   | Branch of branch * int
   | Ration of rationing
+  | Restrict of Cil_types.exp * Integer.t list
   | Split of Cil_types.exp * split_kind * int
   | Merge of Cil_types.exp * split_kind
   | Update_dynamic_splits
@@ -297,7 +298,6 @@ struct
                  to increase this limit."
         monitor.split_limit pp_count
 
-
   let eval_exp_to_int state exp =
     let _valuation, ival = evaluate_exp_to_ival state exp in
     try
@@ -308,7 +308,104 @@ struct
     | Failure _ ->
       fail ~exp "this partitioning parameter is too big"
 
+  (* Sorts a list of states by the evaluation of an expression, according to
+     a list of expected integer values.
+     [split_by_evaluation expr expected_values states] returns two list
+     (matched, tail) such as:
+     - for each element (i, states, mess) of the first list [matched],
+       i was in the list of integer [expected_values], [states] is the list of
+       input states where [expr] evaluates to exactly [i], and [mess] is true
+       if there was some other input state on which [expr] evaluates to a value
+       including [i] (but not equal to [i]).
+     - tail are the states on which [expr] does not evaluate to none of the
+       [expected_values]. *)
+  let split_by_evaluation = match Abstract.Val.get Main_values.cvalue_key with
+    | None -> fun _ _ states -> [], states
+    | Some get -> fun expr expected_values states ->
+      let typ = Cil.typeOf expr in
+      let eval acc state =
+        match fst (Abstract.Eval.evaluate state expr) with
+        | `Bottom -> (state, `Bottom, false) :: acc
+        | `Value (_cache, value) ->
+          let zero_or_one = Cvalue.V.cardinal_zero_or_one (get value) in
+          (state, `Value value, zero_or_one) :: acc
+      in
+      let eval_states = List.fold_left eval [] states in
+      let match_expected_value expected_value states =
+        let process_one_state (eq, mess, neq) (s, v, zero_or_one as current) =
+          if Bottom.is_included Abstract.Val.is_included expected_value v then
+            (* The integer on which we split is part of the result *)
+            if zero_or_one then
+              (s :: eq, mess, neq) (* Clean split *)
+            else
+              (eq, true, current :: neq) (* v is not exact: mess, i.e. no split *)
+          else
+            (eq, mess, current :: neq) (* Integer not in the result at all *)
+        in
+        List.fold_left process_one_state ([], false, []) states
+      in
+      let process_one_value (acc, states) i =
+        let value = `Value Abstract.Val.(reduce (inject_int typ i)) in
+        let eq, mess, neq = match_expected_value value states in
+        (i, eq, mess) :: acc, neq
+      in
+      let matched, tail =
+        List.fold_left process_one_value ([], eval_states) expected_values
+      in
+      matched, List.map (fun (s, _, _) -> s) tail
+
+  let smash_states = function
+    | [] -> []
+    | v1 :: l -> [ List.fold_left Abstract.Dom.join v1 l ]
+
+  (* In the list of [states], join states in which [expr] evaluates to the
+     same exact value in [expected_values] or to any other value. *)
+  let merge_by_value expr expected_values states =
+    let states =
+      if Cil.isIntegralOrPointerType (Cil.typeOf expr)
+      then
+        let matched, tail =
+          split_by_evaluation expr expected_values states
+        in
+        let process (i, states, mess) =
+          if mess then
+            Value_parameters.result ~once:true ~current:true
+              "cannot properly split on \\result == %a"
+              Abstract_interp.Int.pretty i;
+          states
+        in
+        tail :: List.map process matched
+      else [states]
+    in
+    List.flatten (List.map smash_states states)
+
   (* --- Applying partitioning actions onto flows --------------------------- *)
+
+  (* Applies the transfer function [f] to the states whose partitioning keys
+     only differ by the ration stamp. [f] may smash those states, thus
+     restricting the rationing without affecting the other partitioning. *)
+  let restrict_rationing (f : state list -> state list) (p : t) : t =
+    (* Group the states in buckets, where each bucket is a list of states
+       with the same key except for the ration stamp *)
+    let fill_buckets buckets (k,x)  =
+      (* Ignore the ration stamp *)
+      let k = { k with ration_stamp = None } in
+      (* Find the bucket *)
+      let contents =
+        try KMap.find k buckets
+        with Not_found -> []
+      in
+      (* Add the state to the bucket *)
+      KMap.add k (x :: contents) buckets
+    in
+    let buckets = List.fold_left fill_buckets KMap.empty p in
+    (* Apply the transfer function to each bucket *)
+    let result = KMap.map f buckets in
+    (* Rebuild the flow *)
+    let add_bucket k bucket acc =
+      List.map (fun x -> k,x) bucket @ acc
+    in
+    KMap.fold add_bucket result []
 
   let split_state ~monitor (kind : split_kind) (exp : Cil_types.exp)
       (key : key) (state : state) : (key * state) list =
@@ -358,9 +455,12 @@ struct
     | Update_dynamic_splits ->
       update_dynamic_splits p
 
+    | Restrict (expr, expected_values) ->
+      restrict_rationing (merge_by_value expr expected_values) p
+
     | action -> (* Simple map transfer functions *)
       let transfer = match action with
-        | Split _ | Update_dynamic_splits ->
+        | Restrict _ | Split _ | Update_dynamic_splits ->
           assert false (* Handled above *)
 
         | Enter_loop limit_kind -> fun k x ->
@@ -445,29 +545,6 @@ struct
       List.fold_left add acc (f x)
     in
     List.fold_left transfer [] p
-
-  let legacy_transfer_states (f : state list -> state list) (p : t) : t =
-    (* Group the states in buckets, where each bucket is a list of states
-       with the same key except for the ration stamp *)
-    let fill_buckets buckets (k,x)  =
-      (* Ignore the ration stamp *)
-      let k = { k with ration_stamp = None } in
-      (* Find the bucket *)
-      let contents =
-        try KMap.find k buckets
-        with Not_found -> []
-      in
-      (* Add the state to the bucket *)
-      KMap.add k (x :: contents) buckets
-    in
-    let buckets = List.fold_left fill_buckets KMap.empty p in
-    (* Apply the transfer function to each bucket *)
-    let result = KMap.map f buckets in
-    (* Rebuild the flow *)
-    let add_bucket k bucket acc =
-      List.map (fun x -> k,x) bucket @ acc
-    in
-    KMap.fold add_bucket result []
 
   let iter (f : state -> unit) (p : t) : unit =
     List.iter (fun (_k,x) -> f x) p
