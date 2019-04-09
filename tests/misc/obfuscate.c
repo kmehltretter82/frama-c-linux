@@ -59,3 +59,15 @@ int builtin_and_stdlib () {
   /*@ assert \true; */
   return 1;
 }
+
+/* obfuscate names of arguments of function pointers. */
+
+typedef void (*fct_ptr)(int x, int y);
+
+struct S { fct_ptr my_func; };
+
+void implem(int c, int d) { };
+
+struct S example_struct = { .my_func = implem };
+
+void test_func(struct S* s) { s->my_func(3,4); example_struct.my_func(5,6); }
