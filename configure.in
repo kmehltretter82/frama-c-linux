@@ -774,7 +774,7 @@ plugin_require(inout,callgraph)
 #########
 
 check_plugin(metrics,src/plugins/metrics,[support for metrics analysis],yes)
-plugin_use(metrics,eva)
+plugin_require(metrics,eva)
 plugin_use(metrics,gui)
 
 # occurrence
