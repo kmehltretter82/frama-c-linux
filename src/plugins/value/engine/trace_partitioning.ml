@@ -38,10 +38,6 @@ struct
 
   module Domain = Abstract.Dom
 
-  let smash_states = function
-    | [] -> []
-    | v1 :: l -> [ List.fold_left Domain.join v1 l ]
-
   module Index = Partitioning.Make (Domain)
   module Flow = Partition.MakeFlow (Abstract)
 
@@ -125,7 +121,9 @@ struct
     Partition.to_list s.store_partition
 
   let smashed (s : store) : state or_bottom =
-    Bottom.of_list (smash_states (expanded s))
+    match expanded s with
+    | [] -> `Bottom
+    | v1 :: l -> `Value (List.fold_left Domain.join v1 l)
 
   let contents (f : flow) : state list =
     Flow.to_list f.flow_states
