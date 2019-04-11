@@ -20,56 +20,36 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(*  A state partition is a collection of states, each of which is identified
-    by a unique key. The key identifies the reason for which we want to keep
-    the state separate from the others. The partitioning method will involve
-    updating the key. If at some point two states share the same key, it means
-    that the partitioning method decided to not consider those states separately
-    anymore and that they should be joined together.
+(** A partition is a collection of states, each identified by a unique key.
+    The keys define the states partition: states with identical keys are joined
+    together, while states with different keys are maintained separate.
+    A key contains the reason for which a state must be kept separate from
+    others, or joined with similar states.
 
-    The key have several fields, one for each kind of partitioning.
+    Partitioning actions allow updating the keys or spliting some states to
+    define or change the partition. Actions are applied to flows, in which
+    states with the same key are *not* automatically joined. This allows
+    applying mutliple actions before recomputing the partitions. Flows can then
+    be converted into partitions, thus merging states with identical keys.
 
-    - Ration stamps: These modelize the legacy slevel. Each state is given
-      a ration stamp (represented by two integers) until there is no slevel
-      left. The first number is attributed by the store it comes from, the
-      second one is attributed by the last transfer.
-      It is an option type, when there is no more ration stamp, this field is
-      set to None; each new state will not be distinguished by this field.
-    - Branches: This field enumerate the last junctions points passed through.
-      The partitioning may chose how the branches are identified, but it
-      is a First-In-First-Out set.
-    - Loops: This field stores the loop iterations needed to reach this state
-      for each loop we are currently in. It is stored in reverse order
-      (innermost loop first) It also stores the maximum number of unrolling ;
-      this number varies from a state to another, as it is computed from
-      an expression evaluated when we enter the loop.
-    - Static/Dynamic splits: track the splits applied to the state as a map
-      from the expression of the split to the value of this expression. Since
-      the split creates states in which the expression evalutates to a
-      singleton, the values of the map are integers.
-      Static splits are only evaluated when the annotation is encountered
-      whereas dynamic splits are reevaluated regularly.
+    Flows are used to transfer states from one partition to another. Transfer
+    functions can be applied to flows; keys are maintained through transfer
+    functions, until partitioning actions update them.  *)
 
-    A flow is a list of states accompanied by their key. It is used to
-    transfer states from one partition to another. It doesn't enforce unicity
-    of keys.
-*)
+(** {2 Keys and partitions.} *)
 
-type branch = int (* Junction branch id in the control flow *)
-
-module ExpMap = Cil_datatype.ExpStructEq.Map
-
+(** Partitioning keys attached to states. *)
 type key
 
 module Key : sig
-  type t = key
-  val zero : t
-  val compare : t -> t -> int
-  val pretty : Format.formatter -> t -> unit
-  val exceed_rationing: t -> bool
+  val zero : key (** Initial key: no partitioning. *)
+  val compare : key -> key -> int
+  val pretty : Format.formatter -> key -> unit
+  val exceed_rationing: key -> bool
 end
 
-type 'a partition
+(** Collection of states, each identified by a unique key. *)
+type 'state partition
 
 val empty : 'a partition
 val is_empty : 'a partition -> bool
@@ -84,33 +64,90 @@ val filter : (key -> 'a -> bool) -> 'a partition -> 'a partition
 val map : ('a  -> 'a) -> 'a partition -> 'a partition
 
 
-(* Partitioning actions *)
+(** {2 Partitioning actions.} *)
 
+type branch = int (** Junction branch id in the control flow *)
+
+(** Rationing are used to keep separate the [n] first states propagated at
+    a point, by creating unique stamp until the limit is reached.
+    Implementation of the option -eva-slevel. *)
 type rationing
+
+(** Creates a new rationing, that can be used successively on several flows. *)
 val new_rationing: limit:int -> merge:bool -> rationing
 
+(** The unroll limit of a loop can be specified as an integer, or as a C
+    expression, which is evaluated when entering the loop in each incoming
+    state. The expression must always evaluate to a singleton integer. *)
 type unroll_limit =
   | ExpLimit of Cil_types.exp
   | IntLimit of int
 
+(** Splits on an expression can be static or dynamic:
+    - static splits are processed once: the expression is only evaluated at the
+      split point, and the key is then kept unchanged until a merge.
+    - dynamic splits are regularly redone: the expression is re-evaluated, and
+      states are then split or merged accordingly. *)
 type split_kind = Static | Dynamic
 
+(** These actions redefine the partitioning by updating keys or spliting states.
+    They are applied to all the pair (key, state) in a flow. *)
 type action =
   | Enter_loop of unroll_limit
+  (** Enters a loop in which the n first iterations will be kept separate:
+      creates an iteration counter at 0 for each states in the flow; states at
+      different iterations will be kept separate, untill reaching the
+      [unroll_limit]. Counters are incremented by the [Incr_loop] action. *)
   | Leave_loop
+  (** Leaves the current loop: removes its iteration counter. States that were
+      kept separate only by this iteration counter will be joined together. *)
   | Incr_loop
-  | Branch of branch * int (* branch taken, max branches in history *)
+  (** Increments the iteration counter of the current loop for all states in
+      the flow. States with different iteration counter are kept separate. *)
+  | Branch of branch * int
+  (** Identifies all the states in the flow as coming from [branch].
+      They will be kept separated from states coming from other branches.
+      The integer is the maximum number of successive branches kept in the keys:
+      this action also removes the oldest branches from the keys to meet this
+      constraint. *)
   | Ration of rationing
+  (** Ensures that the first states encountered are kept separate, by creating a
+      unique ration stamp for each new state until the [limit] is reached. The
+      same rationing can be used on multiple flows. Applying a new rationing
+      replaces the previous one.
+      If the rationing has been created with [merge:true], all the states from
+      each flow receive the same stamp, but states from different flows receive
+      different stamps, until [limit] states have been tagged. *)
   | Restrict of Cil_types.exp * Integer.t list
+  (** [Restrict (exp, list)] restricts the rationing according to the evaluation
+      of the expression [exp]:
+      - for each integer [i] in [list], states in which [exp] evaluates exactly
+        to the singleton [i] receive the same unique stamp, and will thus be
+        joined together but kept separate from other states;
+      - all other states are joined together.
+      Previous rationing is erased and replaced by this new stamping.
+      Implementation of the option -eva-split-return. *)
   | Split of Cil_types.exp * split_kind * int
+  (** [Split (exp, kind, max)] tries to separate states such as the [exp]
+      evaluates to a singleton value in each state in the flow. If necessary and
+      possible, splits states into multiple states. States in which the [exp]
+      evaluates to different values will be kept separate. Gives up the split
+      if [exp] evaluates to more than [max] values. *)
   | Merge of Cil_types.exp * split_kind
+  (** Forgets the split of an expression: states that were kept separate only
+      by the split of this expression will be joined together. *)
   | Update_dynamic_splits
+  (** Updates dynamic splits by evaluating the expression and spliting the
+      states accordingly. *)
 
 exception InvalidAction
 
 
-(* Flows *)
+(** {2 Flows.} *)
 
+(** Flows are used to transfer states from one partition to another, by
+    applying transfer functions and partitioning actions. They do not enforce
+    the unicity of keys. *)
 module MakeFlow (Abstract: Abstractions.Eva) :
 sig
   type state = Abstract.Dom.t

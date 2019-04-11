@@ -60,6 +60,27 @@ module BranchList = Datatype.List (Datatype.Int)
 
 type branch = int
 
+(* The key have several fields, one for each kind of partitioning:
+   - Ration stamps: These modelize the legacy slevel. Each state is given
+     a ration stamp (represented by two integers) until there is no slevel
+     left. The first number is attributed by the store it comes from, the
+     second one is attributed by the last transfer.
+     It is an option type, when there is no more ration stamp, this field is
+     set to None; each new state will not be distinguished by this field.
+   - Branches: This field enumerate the last junctions points passed through.
+     The partitioning may chose how the branches are identified, but it
+     is a First-In-First-Out set.
+   - Loops: This field stores the loop iterations needed to reach this state
+     for each loop we are currently in. It is stored in reverse order
+     (innermost loop first) It also stores the maximum number of unrolling ;
+     this number varies from a state to another, as it is computed from
+     an expression evaluated when we enter the loop.
+   - Static/Dynamic splits: track the splits applied to the state as a map
+     from the expression of the split to the value of this expression. Since
+     the split creates states in which the expression evalutates to a
+     singleton, the values of the map are integers.
+     Static splits are only evaluated when the annotation is encountered
+     whereas dynamic splits are reevaluated regularly. *)
 type key = {
   ration_stamp : stamp;
   branches : branch list;
