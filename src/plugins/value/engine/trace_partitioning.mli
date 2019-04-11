@@ -29,14 +29,15 @@ module Make
 sig
   type state = Abstract.Dom.t     (** The states being partitioned *)
   type store       (** The storage of all states ever met at a control point *)
+  type tank        (** The set of states that remains to propagate from a
+                       control point. *)
   type flow        (** A set of states which are currently propagated *)
-  type tank        (** An organized temporary accumulation of flows *)
-  type widening    (** Widening informations *)
+  type widening    (** Widening information *)
 
   (* --- Constructors --- *)
 
   val empty_store : stmt:Cil_types.stmt option -> store
-  val empty_flow : unit -> flow
+  val empty_flow : flow
   val empty_tank : unit -> tank
   val empty_widening : stmt:Cil_types.stmt option -> widening
 
@@ -65,7 +66,6 @@ sig
   (* These functions reset the part of the state of the analysis which has
      been obtained after a widening. *)
   val reset_store : store -> unit
-  val reset_flow : flow -> unit
   val reset_tank : tank -> unit
   val reset_widening : widening -> unit
 
@@ -77,10 +77,10 @@ sig
 
   (* --- Partition transfer functions --- *)
 
-  val enter_loop : flow -> Cil_types.stmt -> unit
-  val leave_loop : flow -> Cil_types.stmt -> unit
-  val next_loop_iteration : flow -> Cil_types.stmt -> unit
-  val split_return : flow -> Cil_types.exp option -> unit
+  val enter_loop : flow -> Cil_types.stmt -> flow
+  val leave_loop : flow -> Cil_types.stmt -> flow
+  val next_loop_iteration : flow -> Cil_types.stmt -> flow
+  val split_return : flow -> Cil_types.exp option -> flow
 
   (* --- Operators --- *)
 
@@ -88,12 +88,11 @@ sig
       created by [empty_tank] *)
   val drain : tank -> flow
 
-  (** Fill the states of the flow into the tank, modifying [into] inplace but
-      letting the flow unchanged *)
+  (** Fill the states of the flow into the tank, modifying [into] inplace. *)
   val fill : into:tank -> flow -> unit
 
   (** Apply a transfer function to all the states of a propagation. *)
-  val transfer : (state -> state list) -> flow -> unit
+  val transfer : (state -> state list) -> flow -> flow
 
   (** Join all incoming propagations into the given store. This function returns
       a set of states which still need to be propagated past the store.
@@ -110,10 +109,7 @@ sig
   val join : (Partition.branch * flow) list -> store -> flow
 
   (** Widen a flow. The widening object keeps track of the previous widenings
-      and previous propagated states to ensure termination. The result is true
-      when it is correct to end the propagation here, i.e. when the flow
-      object is only containng states which are included into already propagated
-      states. *)
-  val widen : widening -> flow -> bool
+      and previous propagated states to ensure termination. *)
+  val widen : widening -> flow -> flow
 
 end

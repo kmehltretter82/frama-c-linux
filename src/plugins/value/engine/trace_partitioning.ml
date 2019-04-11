@@ -50,9 +50,7 @@ struct
     mutable store_size : int;
   }
 
-  type flow = {
-    mutable flow_states : Flow.t;
-  }
+  type flow = Flow.t
 
   type tank = {
     mutable tank_states : state partition;
@@ -85,8 +83,7 @@ struct
       store_size = 0;
     }
 
-  let empty_flow () : flow =
-    { flow_states = Flow.empty }
+  let empty_flow : flow = Flow.empty
 
   let empty_tank () : tank =
     { tank_states = Partition.empty }
@@ -109,8 +106,8 @@ struct
   let pretty_store (fmt : Format.formatter) (s : store) : unit =
     Partition.iter (fun _key state -> Domain.pretty fmt state) s.store_partition
 
-  let pretty_flow (fmt : Format.formatter) (p : flow) =
-    Flow.iter (Domain.pretty fmt) p.flow_states
+  let pretty_flow (fmt : Format.formatter) (flow : flow) =
+    Flow.iter (Domain.pretty fmt) flow
 
 
   (* Accessors *)
@@ -123,14 +120,14 @@ struct
     | [] -> `Bottom
     | v1 :: l -> `Value (List.fold_left Domain.join v1 l)
 
-  let contents (f : flow) : state list =
-    Flow.to_list f.flow_states
+  let contents (flow : flow) : state list =
+    Flow.to_list flow
 
   let is_empty_store (s : store) : bool =
     Partition.is_empty s.store_partition
 
-  let is_empty_flow (f : flow) : bool =
-    Flow.is_empty f.flow_states
+  let is_empty_flow (flow : flow) : bool =
+    Flow.is_empty flow
 
   let is_empty_tank (t : tank) : bool =
     Partition.is_empty t.tank_states
@@ -138,8 +135,8 @@ struct
   let store_size (s : store) : int =
     s.store_size
 
-  let flow_size (f : flow) : int =
-    Flow.size f.flow_states
+  let flow_size (flow : flow) : int =
+    Flow.size flow
 
   let tank_size (t : tank) : int =
     Partition.size t.tank_states
@@ -147,27 +144,24 @@ struct
 
   (* Partition transfer functions *)
 
-  let transfer_action p action =
-    p.flow_states <- Flow.transfer_keys p.flow_states action
+  let enter_loop (flow : flow) (i : stmt) : flow =
+    Flow.transfer_keys flow (Enter_loop (unroll i))
 
-  let enter_loop (p : flow) (i : stmt) : unit =
-    transfer_action p (Enter_loop (unroll i))
+  let leave_loop (flow : flow) (_i : stmt) : flow =
+    Flow.transfer_keys flow Leave_loop
 
-  let leave_loop (p : flow) (_i : stmt) : unit =
-    transfer_action p Leave_loop
-
-  let next_loop_iteration (p : flow) (_i : stmt) : unit =
-    transfer_action p Incr_loop
+  let next_loop_iteration (flow : flow) (_i : stmt) : flow =
+    Flow.transfer_keys flow Incr_loop
 
   let empty_rationing = new_rationing ~limit:0 ~merge:false
 
-  let split_return (flow : flow) (return_exp : exp option) : unit =
+  let split_return (flow : flow) (return_exp : exp option) : flow =
     let strategy = Split_return.kf_strategy kf in
-    if strategy <> Split_strategy.FullSplit
-    then
+    if strategy = Split_strategy.FullSplit
+    then flow
+    else
       let apply action =
-        let f = Flow.transfer_keys flow.flow_states action in
-        flow.flow_states <- Flow.join_duplicate_keys f
+        Flow.join_duplicate_keys (Flow.transfer_keys flow action)
       in
       match Split_return.kf_strategy kf with
       (* SplitAuto already transformed into SplitEqList. *)
@@ -187,9 +181,6 @@ struct
     let is_eternal key _state = not (Key.exceed_rationing key) in
     s.store_partition <- Partition.filter is_eternal s.store_partition
 
-  let reset_flow (f : flow) : unit =
-    f.flow_states <- Flow.empty
-
   let reset_tank (t : tank) : unit =
     t.tank_states <- Partition.empty
 
@@ -206,21 +197,20 @@ struct
   (* Operators *)
 
   let drain (t : tank) : flow =
-    let flow_states = Flow.of_partition t.tank_states in
+    let flow = Flow.of_partition t.tank_states in
     t.tank_states <- Partition.empty;
-    { flow_states }
+    flow
 
-  let fill ~(into : tank) (f : flow) : unit =
+  let fill ~(into : tank) (flow : flow) : unit =
     let erase _key dest src =
       if Extlib.has_some src
       then src
       else dest
     in
-    let new_states = Flow.to_partition f.flow_states in
+    let new_states = Flow.to_partition flow in
     into.tank_states <- Partition.merge erase into.tank_states new_states
 
-  let transfer (f : state -> state list) (p : flow) : unit =
-    p.flow_states <- Flow.transfer_states f p.flow_states
+  let transfer = Flow.transfer_states
 
   let join (sources : (branch*flow) list) (dest : store) : flow =
     let is_loop_head =
@@ -231,11 +221,11 @@ struct
     (* Get every source flow *)
     let sources_states =
       match sources with
-      | [(_,p)] -> [p.flow_states]
+      | [(_,flow)] -> [flow]
       | sources ->
         (* Several branches -> partition according to the incoming branch *)
-        let get (b,p) =
-          Flow.transfer_keys p.flow_states (Branch (b,history_size))
+        let get (b,flow) =
+          Flow.transfer_keys flow (Branch (b,history_size))
         in
         List.map get sources
     in
@@ -282,11 +272,10 @@ struct
       Extlib.opt_filter (fun s -> Index.add s dest.store_index) state
     in
     let flow = Flow.join_duplicate_keys flow_states in
-    let flow = Flow.filter_map update flow in
-    { flow_states = flow }
+    Flow.filter_map update flow
 
 
-  let widen (w : widening) (f : flow) : bool =
+  let widen (w : widening) (flow : flow) : flow =
     let stmt = w.widening_stmt in
     (* Auxiliary function to update the result *)
     let update key widening_state =
@@ -341,8 +330,6 @@ struct
           };
         Some curr
     in
-    let flow = Flow.join_duplicate_keys f.flow_states in
-    let flow = Flow.filter_map widen_one flow in
-    f.flow_states <- flow;
-    Flow.is_empty f.flow_states
+    let flow = Flow.join_duplicate_keys flow in
+    Flow.filter_map widen_one flow
 end

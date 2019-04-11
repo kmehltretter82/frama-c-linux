@@ -407,34 +407,32 @@ module Make_Dataflow
       end
 
   let process_partitioning_transitions (v1 : vertex) (v2 : vertex)
-      (transition : vertex transition) (f : flow) : unit =
+      (transition : vertex transition) (flow : flow) : flow =
     (* Split return *)
-    begin match transition with
-      | Return (return_exp, _) ->
-        Partition.split_return f return_exp
-      | _ -> ()
-    end;
+    let flow = match transition with
+      | Return (return_exp, _) -> Partition.split_return flow return_exp
+      | _ -> flow
+    in
     (* Loop transitions *)
     let the_stmt v = Extlib.the v.vertex_start_of in
-    let enter_loop v =
-      Partition.transfer (lift (Domain.enter_loop (the_stmt v))) f;
-      Partition.enter_loop f (the_stmt v)
-    and leave_loop v =
-      Partition.transfer (lift (Domain.leave_loop (the_stmt v))) f;
-      Partition.leave_loop f (the_stmt v)
-    and incr_loop_counter v =
-      Partition.transfer (lift (Domain.incr_loop_counter (the_stmt v))) f;
-      Partition.next_loop_iteration f (the_stmt v)
+    let enter_loop f v =
+      let f = Partition.enter_loop f (the_stmt v) in
+      Partition.transfer (lift (Domain.enter_loop (the_stmt v))) f
+    and leave_loop f v =
+      let f = Partition.leave_loop f (the_stmt v) in
+      Partition.transfer (lift (Domain.leave_loop (the_stmt v))) f
+    and incr_loop_counter f v =
+      let f = Partition.next_loop_iteration f (the_stmt v) in
+      Partition.transfer (lift (Domain.incr_loop_counter (the_stmt v))) f
     in
     let loops_left, loops_entered =
       Interpreted_automata.get_wto_index_diff kf v1 v2
     and loop_incr =
       Interpreted_automata.is_back_edge kf (v1,v2)
     in
-    List.iter leave_loop loops_left;
-    List.iter enter_loop loops_entered;
-    if loop_incr then
-      incr_loop_counter v2
+    let flow = List.fold_left leave_loop flow loops_left in
+    let flow = List.fold_left enter_loop flow loops_entered in
+    if loop_incr then incr_loop_counter flow v2 else flow
 
   let process_edge (v1,e,v2 : G.edge) : flow =
     let {edge_transition=transition; edge_kinstr=kinstr} = e in
@@ -444,8 +442,8 @@ module Make_Dataflow
     check_signals ();
     current_ki := kinstr;
     Cil.CurrentLoc.set e.edge_loc;
-    Partition.transfer (transfer_transition transition) flow;
-    process_partitioning_transitions v1 v2 transition flow;
+    let flow = Partition.transfer (transfer_transition transition) flow in
+    let flow = process_partitioning_transitions v1 v2 transition flow in
     if not (Partition.is_empty_flow flow) then
       edge_info.fireable <- true;
     flow
@@ -476,45 +474,44 @@ module Make_Dataflow
     (* Get vertex store *)
     let store = get_vertex_store v in
     (* Join incoming s tates *)
-    let f = Partition.join sources store in
-    begin match v.vertex_start_of with
+    let flow = Partition.join sources store in
+    let flow =
+      match v.vertex_start_of with
       | Some stmt ->
         (* Callbacks *)
-        call_statement_callbacks stmt f;
+        call_statement_callbacks stmt flow;
         (* Transfer function associated to the statement *)
-        Partition.transfer (transfer_statement stmt) f;
+        let flow = Partition.transfer (transfer_statement stmt) flow in
         (* Output slevel related things *)
         let store_size = Partition.store_size store in
         output_slevel store_size;
         (* Debug informations *)
         Value_parameters.debug ~dkey ~current:true
           "reached statement %d with %d / %d eternal states, %d to propagate"
-          stmt.sid store_size (slevel stmt) (Partition.flow_size f);
-      | _ -> ()
-    end;
+          stmt.sid store_size (slevel stmt) (Partition.flow_size flow);
+        flow
+      | _ -> flow
+    in
     (* Widen if necessary *)
-    let stable =
-      if Partition.is_empty_flow f then
-        true
-      else if widening then begin
-        let stable = Partition.widen (get_vertex_widening v) f in
+    let flow =
+      if widening && not (Partition.is_empty_flow flow) then begin
+        let flow = Partition.widen (get_vertex_widening v) flow in
         (* Try to correct over-widenings *)
         let correct_over_widening stmt =
           (* Do *not* record the status after interpreting the annotation
              here. Possible unproven assertions have already been recorded
              when the assertion has been interpreted the first time higher
              in this function. *)
-          Partition.transfer (transfer_annotations stmt ~record:false) f
+          Partition.transfer (transfer_annotations stmt ~record:false) flow
         in
-        Extlib.may correct_over_widening v.vertex_start_of;
-        stable
+        Extlib.may_map correct_over_widening ~dft:flow v.vertex_start_of
       end else
-        false
+        flow
     in
     (* Dispatch to successors *)
-    List.iter (fun into -> Partition.fill f ~into) (get_succ_tanks v);
-    (* Return wether the iterator should stop or not *)
-    stable
+    List.iter (fun into -> Partition.fill flow ~into) (get_succ_tanks v);
+    (* Return whether the iterator should stop or not *)
+    Partition.is_empty_flow flow
 
   let process_vertex ?(widening : bool = false) (v : vertex) : bool =
     (* Process predecessors *)
