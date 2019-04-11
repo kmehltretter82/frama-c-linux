@@ -57,9 +57,9 @@ struct
   }
 
   type widening_state = {
-    widened_state : state option;
-    previous_state : state;
-    widening_counter : int;
+    mutable widened_state : state option;
+    mutable previous_state : state;
+    mutable widening_counter : int;
   }
 
   type widening = {
@@ -274,60 +274,52 @@ struct
     let flow = Flow.join_duplicate_keys flow_states in
     Flow.filter_map update flow
 
-
   let widen (w : widening) (flow : flow) : flow =
     let stmt = w.widening_stmt in
-    (* Auxiliary function to update the result *)
-    let update key widening_state =
-      w.widening_partition <-
-        Partition.replace key widening_state w.widening_partition
-    in
     (* Apply widening to each leaf *)
     let widen_one key curr =
       try
         (* Search for an already existing widening state *)
-        let wstate = Partition.find key w.widening_partition in
+        let w = Partition.find key w.widening_partition in
+        let previous_state = w.previous_state in
         (* Update the widening state *)
-        update key {
-          wstate with
-          previous_state = curr;
-          widening_counter = wstate.widening_counter - 1
-        };
+        w.previous_state <- curr;
+        w.widening_counter <- w.widening_counter - 1;
         (* Propagated state decreases, stop propagating *)
-        if Domain.is_included curr wstate.previous_state then
+        if Domain.is_included curr previous_state then
           None
           (* Widening is delayed *)
-        else if wstate.widening_counter > 0 then begin
+        else if w.widening_counter >= 0 then
           Some curr
           (* Apply widening *)
-        end else begin
+        else begin
           Value_parameters.feedback ~level:1 ~once:true ~current:true
             ~dkey:Value_parameters.dkey_widening
             "applying a widening at this point";
           (* We join the previous widening state with the previous iteration
              state so as to allow the intermediate(s) iteration(s) (between
              two widenings) to stabilize at least a part of the state. *)
-          let prev = match wstate.widened_state with
-            | Some v -> Domain.join wstate.previous_state v
-            | None -> wstate.previous_state
+          let prev = match w.widened_state with
+            | Some v -> Domain.join previous_state v
+            | None -> previous_state
           in
           let next = Domain.widen kf stmt prev (Domain.join prev curr) in
-          update key {
-            previous_state = next;
-            widened_state = Some next;
-            widening_counter = widening_period - 1;
-          };
+          w.previous_state <- next;
+          w.widened_state <- Some next;
+          w.widening_counter <- widening_period - 1;
           Some next
         end
       with Not_found ->
         (* The key is not in the widening state; add the state if slevel is
-           exceeded *)
-        if Key.exceed_rationing key then
-          update key {
-            widened_state = None;
-            previous_state = curr;
-            widening_counter = widening_delay - 1;
-          };
+           exceeded. *)
+        if Key.exceed_rationing key then begin
+          let ws =
+            { widened_state = None;
+              previous_state = curr;
+              widening_counter = widening_delay - 1; }
+          in
+          w.widening_partition <- Partition.replace key ws w.widening_partition
+        end;
         Some curr
     in
     let flow = Flow.join_duplicate_keys flow in
