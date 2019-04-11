@@ -81,6 +81,10 @@ let split_command_args s =
       let c = String.get s i in
       let new_state, new_acc =
         match state, prev_c, c with
+        | Outside_quote, '\\', c when c = '\"' || c = '\'' ->
+          (* escaped quote, continue with previous arg *)
+          Buffer.add_char buf c;
+          state, acc
         | Outside_quote, _, q when q = '\'' || q = '\"' ->
           (* continue previous arg with q *)
           Buffer.add_char buf q;
