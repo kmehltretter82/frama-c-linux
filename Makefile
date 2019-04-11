@@ -917,9 +917,9 @@ PLUGIN_CMO:= slevel/split_strategy value_parameters \
 	domains/cvalue/cvalue_domain \
 	engine/subdivided_evaluation engine/evaluation engine/abstractions \
 	engine/recursion engine/transfer_stmt engine/transfer_specification \
-	engine/partitioning engine/mem_exec \
+	engine/partitioning_index engine/mem_exec \
 	engine/partition engine/partitioning_parameters engine/trace_partitioning \
-	engine/partitioned_dataflow \
+	engine/iterator \
 	engine/initialization \
 	engine/compute_functions engine/analysis register
 PLUGIN_CMI:= values/abstract_value values/abstract_location \

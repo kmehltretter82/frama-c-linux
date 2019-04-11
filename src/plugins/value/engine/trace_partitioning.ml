@@ -36,7 +36,7 @@ struct
 
   module Domain = Abstract.Dom
 
-  module Index = Partitioning.Make (Domain)
+  module Index = Partitioning_index.Make (Domain)
   module Flow = Partition.MakeFlow (Abstract)
 
   type state = Domain.t
