@@ -256,6 +256,7 @@ DISTRIB_FILES:=\
       share/analysis-scripts/concat-csv.sh                              \
       share/analysis-scripts/clone.sh                                   \
       $(wildcard share/analysis-scripts/examples/*)                     \
+      share/analysis-scripts/fc_stubs.c                                 \
       share/analysis-scripts/find_fun.py                                \
       share/analysis-scripts/flamegraph.pl                              \
       share/analysis-scripts/frama-c.mk                                 \
@@ -1910,6 +1911,7 @@ install:: install-lib
 	  share/analysis-scripts/cmd-dep.sh \
 	  share/analysis-scripts/concat-csv.sh \
 	  share/analysis-scripts/clone.sh \
+	  share/analysis-scripts/fc_stubs.c \
 	  share/analysis-scripts/find_fun.py \
 	  share/analysis-scripts/flamegraph.pl \
 	  share/analysis-scripts/frama-c.mk \
