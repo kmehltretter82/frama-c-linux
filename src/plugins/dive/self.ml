@@ -75,7 +75,7 @@ struct
       with Not_found ->
       try Globals.Vars.find_from_astinfo variable_name (VFormal kf)
       with Not_found ->
-        raise (Cannot_build ("no variable '" ^ name ^ "' in function"
+        raise (Cannot_build ("no variable '" ^ variable_name ^ "' in function "
                              ^ function_name))
     else
       let regexp = Str.regexp "^[_a-zA-Z0-9]+$" in
