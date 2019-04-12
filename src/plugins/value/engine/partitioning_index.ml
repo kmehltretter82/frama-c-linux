@@ -20,26 +20,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Eval
-
 module type Domain = sig
   include Abstract_domain.Lattice
   include Datatype.S_with_collections with type t = state
   include Abstract_domain.Interface with type t := state
 end
-
-module type S = sig
-  type state
-  type t
-
-  val empty: unit -> t
-  val add : state -> t -> bool
-  val merge_set_return_new: state list -> t -> state list
-  val join: t -> state or_bottom
-  val to_list: t -> state list
-  val pretty : Format.formatter -> t -> unit
-end
-
 
 (** Partition of the abstract states, computed for each node by the
     dataflow analysis. *)
@@ -47,7 +32,6 @@ module Make
     (Domain : Domain)
 = struct
 
-  type state = Domain.t
   module Index = Hashtbl.Make (Cvalue_domain.Subpart)
 
   type t = {
@@ -58,10 +42,6 @@ module Make
 
   let sentinel = Index.create 1
   let empty () = { states = sentinel ; prefix = None ; others = [] }
-
-  let fold f {states; others} acc =
-    let acc = Index.fold (fun _k s acc -> f s acc) states acc in
-    List.fold_left (fun acc s -> f s acc) acc others
 
   (* Optimizations relying on specific features of the cvalue domain. *)
 
@@ -112,18 +92,6 @@ module Make
         if List.exists (fun s -> Domain.is_included state s) candidates
         then false
         else (Index.add states prefix state; true)
-
-  let merge_set_return_new states partition =
-    let f acc state =
-      let added = add state partition in
-      if added then state :: acc else acc
-    in
-    List.fold_left f [] states
-
-  let join partition =
-    fold (fun v acc -> Bottom.join Domain.join (`Value v) acc) partition `Bottom
-
-  let to_list p = Index.fold (fun _k v a -> v :: a) p.states p.others
 
   let iter f { states; others } =
     Index.iter (fun _k v -> f v) states;
