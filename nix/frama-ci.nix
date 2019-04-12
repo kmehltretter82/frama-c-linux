@@ -5,8 +5,8 @@ let
     src = builtins.fetchGit {
             "url" = "https://bobot:${password}@git.frama-c.com/frama-c/Frama-CI.git";
             "name" = "Frama-CI";
-            "rev" = "70045f4252e668e0facad12d7db2c6ab83fc813b";
-            "ref" = "master";
+            "rev" = "ed541f6e3818da2bf31125740b8555acb086ca29";
+            "ref" = "feature/andre/yojson-mandatory-dependence";
     };
  in
  {
