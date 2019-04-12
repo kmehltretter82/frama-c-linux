@@ -426,16 +426,8 @@ struct
           end
 
         | Branch (b,max) -> fun k _x ->
-          let list_start l i =
-            let rec aux acc i = function
-              | [] -> acc
-              | _ when i <= 0 -> List.rev acc
-              | x :: l -> aux (x :: acc) (i - 1) l
-            in
-            aux [] i l
-          in
           if max > 0 then
-            { k with branches = b :: list_start k.branches (max - 1) }
+            { k with branches = b :: Extlib.list_first_n (max - 1) k.branches  }
           else if k.branches <> [] then
             { k with branches = [] }
           else
