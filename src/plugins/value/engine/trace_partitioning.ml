@@ -42,12 +42,13 @@ struct
   type state = Domain.t
 
   type store = {
-    rationing: Partition.rationing;
-    flow_actions : action list;
+    rationing: Partition.rationing; (* slevel rationing at this point *)
+    flow_actions : action list; (* partitioning actions to be applied *)
     store_stmt : stmt option;
-    store_index : Index.t;
-    mutable store_partition : state partition;
-    mutable store_size : int;
+    store_index : Index.t; (* Index of all states stored: used to quickly remove
+                              new states that have already been propagated. *)
+    mutable store_partition : state partition; (* partition of states *)
+    mutable incoming_states : int; (* number of incoming states. *)
   }
 
   type flow = Flow.t
@@ -80,7 +81,7 @@ struct
       store_stmt = stmt;
       store_index = Index.empty ();
       store_partition = Partition.empty;
-      store_size = 0;
+      incoming_states = 0;
     }
 
   let empty_flow : flow = Flow.empty
@@ -133,7 +134,7 @@ struct
     Partition.is_empty t.tank_states
 
   let store_size (s : store) : int =
-    s.store_size
+    Partition.size s.store_partition
 
   let flow_size (flow : flow) : int =
     Flow.size flow
@@ -212,6 +213,25 @@ struct
 
   let transfer = Flow.transfer_states
 
+  let output_slevel : int -> unit =
+    let slevel_display_step = Value_parameters.ShowSlevel.get () in
+    let max_displayed = ref 0 in
+    fun x ->
+      if x >= !max_displayed + slevel_display_step
+      then
+        let rounded = x / slevel_display_step * slevel_display_step in
+        Value_parameters.feedback ~once:true ~current:true
+          "Semantic level unrolling superposing up to %d states"
+          rounded;
+        max_displayed := rounded
+
+  let partitioning_feedback dest flow stmt =
+    output_slevel dest.incoming_states;
+    (* Debug information. *)
+    Value_parameters.debug ~dkey:Value_parameters.dkey_iterator ~current:true
+      "reached statement %d with %d incoming states, %d to propagate"
+      stmt.sid dest.incoming_states (flow_size flow)
+
   let join (sources : (branch*flow) list) (dest : store) : flow =
     let is_loop_head =
       match dest.store_stmt with
@@ -234,7 +254,7 @@ struct
       List.fold_left Flow.union Flow.empty sources_states
     in
     (* Handle ration stamps *)
-    dest.store_size <- dest.store_size + Flow.size flow_states;
+    dest.incoming_states <- dest.incoming_states + Flow.size flow_states;
     let rationing_action = Ration dest.rationing in
     (* Handle Split / Merge operations *)
     let flow_actions = Update_dynamic_splits :: dest.flow_actions in
@@ -272,7 +292,9 @@ struct
       Extlib.opt_filter (fun s -> Index.add s dest.store_index) state
     in
     let flow = Flow.join_duplicate_keys flow_states in
-    Flow.filter_map update flow
+    let flow = Flow.filter_map update flow in
+    Extlib.may (partitioning_feedback dest flow) dest.store_stmt;
+    flow
 
   let widen (w : widening) (flow : flow) : flow =
     let stmt = w.widening_stmt in

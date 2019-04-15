@@ -89,9 +89,6 @@ module Make_Dataflow
   let interpreter_mode =
     Value_parameters.InterpreterMode.get ()
 
-  let slevel_display_step : int =
-    Value_parameters.ShowSlevel.get ()
-
   (* Ideally, the slevel parameter should not be used anymore in this file
      but it is still required for logic interpretation *)
   let slevel =
@@ -394,18 +391,6 @@ module Make_Dataflow
 
   (* --- Iteration strategy ---*)
 
-  let output_slevel : int -> unit =
-    let max_displayed = ref 0 in
-    fun x ->
-      if x >= !max_displayed + slevel_display_step
-      then begin
-        let rounded = x / slevel_display_step * slevel_display_step in
-        Value_parameters.feedback ~once:true ~current:true
-          "Semantic level unrolling superposing up to %d states"
-          rounded;
-        max_displayed := rounded;
-      end
-
   let process_partitioning_transitions (v1 : vertex) (v2 : vertex)
       (transition : vertex transition) (flow : flow) : flow =
     (* Split return *)
@@ -481,15 +466,7 @@ module Make_Dataflow
         (* Callbacks *)
         call_statement_callbacks stmt flow;
         (* Transfer function associated to the statement *)
-        let flow = Partition.transfer (transfer_statement stmt) flow in
-        (* Output slevel related things *)
-        let store_size = Partition.store_size store in
-        output_slevel store_size;
-        (* Debug informations *)
-        Value_parameters.debug ~dkey ~current:true
-          "reached statement %d with %d / %d eternal states, %d to propagate"
-          stmt.sid store_size (slevel stmt) (Partition.flow_size flow);
-        flow
+        Partition.transfer (transfer_statement stmt) flow
       | _ -> flow
     in
     (* Widen if necessary *)
