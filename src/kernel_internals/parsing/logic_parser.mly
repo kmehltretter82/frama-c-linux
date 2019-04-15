@@ -921,12 +921,12 @@ ext_global_clause:
 | INCLUDE string SEMICOLON { let b,s = $2 in Ext_include(b,s, loc()) }
 ;
 
-ext_global_specs_opt: 
+ext_global_specs_opt:
  | /* empty */       { [] }
  | ext_global_specs  { $1 }
 ;
 
-ext_global_specs: 
+ext_global_specs:
 | ext_global_spec                  { [$1] }
 | ext_global_spec ext_global_specs { $1::$2 }
 ;
@@ -934,8 +934,8 @@ ext_global_specs:
 ext_global_spec:
 | ext_module_markup ext_global_clauses_opt ext_module_specs
     { (Some $1),$2,$3 }
-| ext_module_markup
-    { (Some $1),[],[] }
+| ext_module_markup ext_global_clauses_opt
+    { (Some $1),$2,[] }
 ;
 
 ext_module_specs_opt:
