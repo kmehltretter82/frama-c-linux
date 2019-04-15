@@ -22,6 +22,7 @@ void main()
 
   float x = 3.0 + g;
   float y = f(x);
+  x = x + 0.5f;
   float w = (*pf)(x);
   float z = y + w + 1.0;
 }

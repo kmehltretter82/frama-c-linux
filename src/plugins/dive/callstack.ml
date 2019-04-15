@@ -24,7 +24,8 @@ open Cil_types
 
 include Value_types.Callstack
 
-type call_site = (Cil_types.kernel_function * Cil_types.kinstr)
+type call_site = Value_types.call_site
+module Callsite = Value_types.Callsite
 
 let init kf = [(kf,Kglobal)]
 
@@ -47,4 +48,34 @@ let push (kf,stmt) cs =
   | [] -> [(kf,Kglobal)]
   | cs -> (kf,Kstmt stmt) :: cs
 
+let rec is_prefix cs1 cs2 =
+  match cs1, cs2 with
+  | [], _ -> true
+  | _, [] -> false
+  | [(kf,Kglobal)], (kf',_)::_ -> Kernel_function.equal kf kf'
+  | _, [(_,Kglobal)] -> false
+  | s1 :: t1, s2 :: t2 ->
+    if Callsite.equal s1 s2
+    then is_prefix t1 t2
+    else false
 
+let truncate_to_sub full_cs sub_cs =
+  let rec aux acc = function
+    | [] -> None
+  | (s :: t) as cs ->
+    if is_prefix sub_cs cs
+    then Some (List.rev acc @ sub_cs)
+    else aux (s :: acc) t
+  in
+  aux [] full_cs
+
+let list_filter_map f l =
+  let aux acc x =
+    match f x with
+    | None -> acc
+    | Some y -> y :: acc
+  in
+  List.rev (List.fold_left aux [] l)
+
+let filter_truncate l sub_cs =
+  list_filter_map (fun cs -> truncate_to_sub cs sub_cs) l

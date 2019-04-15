@@ -6,7 +6,7 @@
 [eva:alarm] tests/dive/various.i:13: Warning: 
   non-finite float value.
   assert \is_finite((float)((double)((double)y * 2.0)));
-[eva:alarm] tests/dive/various.i:26: Warning: 
+[eva:alarm] tests/dive/various.i:27: Warning: 
   non-finite float value. assert \is_finite((float)(y + w));
 [eva] done for function main
 [dive] output to tests/dive/result/various.dot

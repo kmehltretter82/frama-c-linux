@@ -38,7 +38,7 @@ endif
 
 PLUGIN_DIR ?=.
 PLUGIN_NAME := Dive
-PLUGIN_CMO := callstack self node_kind imprecision_graph build main
+PLUGIN_CMO := self callstack node_kind imprecision_graph build main
 PLUGIN_CMI:= graph_types
 PLUGIN_DEPENDENCIES:= Eva Studia
 PLUGIN_HAS_MLI:= yes

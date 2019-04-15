@@ -34,3 +34,6 @@ val init : Cil_types.kernel_function -> t
 val pop : t -> (Cil_types.kernel_function * Cil_types.stmt * t) option
 val pop_downto : Cil_types.kernel_function -> t -> t
 val push : Cil_types.kernel_function * Cil_types.stmt -> t -> t
+val is_prefix : t -> t -> bool
+val truncate_to_sub : t -> t -> t option
+val filter_truncate : t list -> t -> t list

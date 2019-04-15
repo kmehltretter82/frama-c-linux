@@ -173,17 +173,23 @@ type t = {
 
 let reference_node_locality context node_locality =
   let { loc_file ; loc_callstack } = node_locality in
-  let add_file _ =
+  let rec add_file _ =
     let node_locality = { node_locality with loc_callstack = [] } in
     Graph.create_node context.graph ~node_kind:Cluster ~node_locality
-  and add_callstack _ =
-    Graph.create_node context.graph ~node_kind:Cluster ~node_locality
+  and add_callstack = function
+    | [] -> assert false
+    | _ :: t as loc_callstack ->
+      let node_locality = { node_locality with loc_callstack } in
+      if t <> [] then
+        ignore (CallstackTable.memo context.callstack_table t add_callstack);
+      Graph.create_node context.graph ~node_kind:Cluster ~node_locality
   in
-  ignore (FileTable.memo context.file_table loc_file add_file);
   match loc_callstack with
-  | [] -> ()
+  | [] ->
+    ignore (FileTable.memo context.file_table loc_file add_file)
   | cs ->
     ignore (CallstackTable.memo context.callstack_table cs add_callstack)
+
 
 let is_folded context vi =
   not (BaseSet.mem vi context.unfolded_bases)
@@ -214,7 +220,7 @@ let build_node context callstack location lval  =
       | None -> location
       | Some location' -> location'
     in
-    let ref = (location', callstack) in
+    let ref = (location', node_locality.loc_callstack) in
     let node = NodeTable.memo context.node_table ref build_new_node in
     Some node
   end
@@ -251,9 +257,21 @@ let build_node_deps context node =
     let writes = Studia.Writes.compute zone
     and add_deps (stmt,effects) =
       match stmt.skind with
-      | Instr instr when effects.Studia.Writes.direct ->
-        build_instr_deps callstack stmt instr
-      | _ -> ()
+      | Instr _ when not effects.Studia.Writes.direct -> ()
+      | Instr instr ->
+        (* Keep only callstacks which are a compatible with the current one *)
+        let states = Db.Value.get_stmt_state_callstack ~after:false stmt in
+        let callstacks = match states with
+          | None -> assert false
+          | Some table ->
+            let module Table = Value_types.Callstack.Hashtbl in
+            Table.fold (fun cs _ acc -> cs :: acc) table []
+        in
+        (* TODO: missing callstacks filtered by memexec *)
+        let callstacks = Callstack.filter_truncate callstacks callstack in
+        (* Create a dependency for each of them *)
+        List.iter (fun cs -> build_instr_deps cs stmt instr) callstacks
+      | _ -> assert false
     in
     let count = List.length writes in
     Self.debug ~dkey "%d found" count;
