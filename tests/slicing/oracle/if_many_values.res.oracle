@@ -6,7 +6,7 @@
 [eva:initial-state] Values of globals at initialization
   r ∈ {1}
 [eva] tests/slicing/if_many_values.i:8: 
-  Semantic level unrolling superposing up to 100 states
+  Trace partitioning superposing up to 100 states
 [eva] tests/slicing/if_many_values.i:8: starting to merge loop iterations
 [eva:alarm] tests/slicing/if_many_values.i:11: Warning: 
   signed overflow. assert r + 1 ≤ 2147483647;

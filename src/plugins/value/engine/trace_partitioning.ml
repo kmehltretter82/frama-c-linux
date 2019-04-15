@@ -221,7 +221,7 @@ struct
       then
         let rounded = x / slevel_display_step * slevel_display_step in
         Value_parameters.feedback ~once:true ~current:true
-          "Semantic level unrolling superposing up to %d states"
+          "Trace partitioning superposing up to %d states"
           rounded;
         max_displayed := rounded
 

@@ -89,7 +89,7 @@
 [eva] tests/value/local_slevel.i:37: Frama_C_show_each: {48}
 [eva] tests/value/local_slevel.i:37: Frama_C_show_each: {49}
 [eva] tests/value/local_slevel.i:43: 
-  Semantic level unrolling superposing up to 100 states
+  Trace partitioning superposing up to 100 states
 [eva] tests/value/local_slevel.i:37: Frama_C_show_each: {50}
 [eva] tests/value/local_slevel.i:37: Frama_C_show_each: {51}
 [eva] tests/value/local_slevel.i:37: Frama_C_show_each: {52}
@@ -141,7 +141,7 @@
 [eva] tests/value/local_slevel.i:37: Frama_C_show_each: {98}
 [eva] tests/value/local_slevel.i:37: Frama_C_show_each: {99}
 [eva] tests/value/local_slevel.i:43: 
-  Semantic level unrolling superposing up to 200 states
+  Trace partitioning superposing up to 200 states
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] Recording results for main
@@ -469,7 +469,7 @@ void main(void)
 [eva] tests/value/local_slevel.i:37: Frama_C_show_each: {48}
 [eva] tests/value/local_slevel.i:37: Frama_C_show_each: {49}
 [eva] tests/value/local_slevel.i:43: 
-  Semantic level unrolling superposing up to 100 states
+  Trace partitioning superposing up to 100 states
 [eva] tests/value/local_slevel.i:37: Frama_C_show_each: {50}
 [eva] tests/value/local_slevel.i:37: Frama_C_show_each: {51}
 [eva] tests/value/local_slevel.i:37: Frama_C_show_each: {52}
@@ -521,7 +521,7 @@ void main(void)
 [eva] tests/value/local_slevel.i:37: Frama_C_show_each: {98}
 [eva] tests/value/local_slevel.i:37: Frama_C_show_each: {99}
 [eva] tests/value/local_slevel.i:43: 
-  Semantic level unrolling superposing up to 200 states
+  Trace partitioning superposing up to 200 states
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] Recording results for main

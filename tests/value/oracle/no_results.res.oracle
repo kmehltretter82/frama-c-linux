@@ -7,65 +7,65 @@
 [eva] computing for function init <- main.
   Called from tests/value/no_results.c:19.
 [eva] tests/value/no_results.c:10: 
-  Semantic level unrolling superposing up to 100 states
+  Trace partitioning superposing up to 100 states
 [eva] tests/value/no_results.c:10: 
-  Semantic level unrolling superposing up to 200 states
+  Trace partitioning superposing up to 200 states
 [eva] tests/value/no_results.c:10: 
-  Semantic level unrolling superposing up to 300 states
+  Trace partitioning superposing up to 300 states
 [eva] tests/value/no_results.c:10: 
-  Semantic level unrolling superposing up to 400 states
+  Trace partitioning superposing up to 400 states
 [eva] tests/value/no_results.c:10: 
-  Semantic level unrolling superposing up to 500 states
+  Trace partitioning superposing up to 500 states
 [eva] tests/value/no_results.c:10: 
-  Semantic level unrolling superposing up to 600 states
+  Trace partitioning superposing up to 600 states
 [eva] tests/value/no_results.c:10: 
-  Semantic level unrolling superposing up to 700 states
+  Trace partitioning superposing up to 700 states
 [eva] tests/value/no_results.c:10: 
-  Semantic level unrolling superposing up to 800 states
+  Trace partitioning superposing up to 800 states
 [eva] tests/value/no_results.c:10: 
-  Semantic level unrolling superposing up to 900 states
+  Trace partitioning superposing up to 900 states
 [eva] tests/value/no_results.c:10: 
-  Semantic level unrolling superposing up to 1000 states
+  Trace partitioning superposing up to 1000 states
 [eva] tests/value/no_results.c:10: 
-  Semantic level unrolling superposing up to 1100 states
+  Trace partitioning superposing up to 1100 states
 [eva] tests/value/no_results.c:10: 
-  Semantic level unrolling superposing up to 1200 states
+  Trace partitioning superposing up to 1200 states
 [eva] tests/value/no_results.c:10: 
-  Semantic level unrolling superposing up to 1300 states
+  Trace partitioning superposing up to 1300 states
 [eva] tests/value/no_results.c:10: 
-  Semantic level unrolling superposing up to 1400 states
+  Trace partitioning superposing up to 1400 states
 [eva] tests/value/no_results.c:10: 
-  Semantic level unrolling superposing up to 1500 states
+  Trace partitioning superposing up to 1500 states
 [eva] tests/value/no_results.c:10: 
-  Semantic level unrolling superposing up to 1600 states
+  Trace partitioning superposing up to 1600 states
 [eva] tests/value/no_results.c:10: 
-  Semantic level unrolling superposing up to 1700 states
+  Trace partitioning superposing up to 1700 states
 [eva] tests/value/no_results.c:10: 
-  Semantic level unrolling superposing up to 1800 states
+  Trace partitioning superposing up to 1800 states
 [eva] tests/value/no_results.c:10: 
-  Semantic level unrolling superposing up to 1900 states
+  Trace partitioning superposing up to 1900 states
 [eva] tests/value/no_results.c:10: 
-  Semantic level unrolling superposing up to 2000 states
+  Trace partitioning superposing up to 2000 states
 [eva] tests/value/no_results.c:10: 
-  Semantic level unrolling superposing up to 2100 states
+  Trace partitioning superposing up to 2100 states
 [eva] tests/value/no_results.c:10: 
-  Semantic level unrolling superposing up to 2200 states
+  Trace partitioning superposing up to 2200 states
 [eva] tests/value/no_results.c:10: 
-  Semantic level unrolling superposing up to 2300 states
+  Trace partitioning superposing up to 2300 states
 [eva] tests/value/no_results.c:10: 
-  Semantic level unrolling superposing up to 2400 states
+  Trace partitioning superposing up to 2400 states
 [eva] tests/value/no_results.c:10: 
-  Semantic level unrolling superposing up to 2500 states
+  Trace partitioning superposing up to 2500 states
 [eva] tests/value/no_results.c:10: 
-  Semantic level unrolling superposing up to 2600 states
+  Trace partitioning superposing up to 2600 states
 [eva] tests/value/no_results.c:10: 
-  Semantic level unrolling superposing up to 2700 states
+  Trace partitioning superposing up to 2700 states
 [eva] tests/value/no_results.c:10: 
-  Semantic level unrolling superposing up to 2800 states
+  Trace partitioning superposing up to 2800 states
 [eva] tests/value/no_results.c:10: 
-  Semantic level unrolling superposing up to 2900 states
+  Trace partitioning superposing up to 2900 states
 [eva] tests/value/no_results.c:10: 
-  Semantic level unrolling superposing up to 3000 states
+  Trace partitioning superposing up to 3000 states
 [eva] Recording results for init
 [eva] Done for function init
 [eva] computing for function f <- main.
