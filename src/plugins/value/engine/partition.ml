@@ -418,8 +418,13 @@ struct
           begin match k.loops with
             | [] -> raise InvalidAction
             | (h, limit) :: tl ->
-              if h >= limit then
+              if h >= limit then begin
+                if limit > 0 then
+                  Value_parameters.warning ~once:true ~current:true
+                    ~wkey:Value_parameters.wkey_loop_unroll
+                    "loop not completely unrolled";
                 k
+              end
               else
                 { k with loops = (h + 1, limit) :: tl }
           end
