@@ -90,6 +90,12 @@ type unroll_limit =
       states are then split or merged accordingly. *)
 type split_kind = Static | Dynamic
 
+(** Split monitor: prevents splits from generating too many states. *)
+type split_monitor
+
+(** Creates a new monitor that allows to split up to [split_limit] states. *)
+val new_monitor: split_limit:int -> split_monitor
+
 (** These actions redefine the partitioning by updating keys or spliting states.
     They are applied to all the pair (key, state) in a flow. *)
 type action =
@@ -127,12 +133,14 @@ type action =
       - all other states are joined together.
       Previous rationing is erased and replaced by this new stamping.
       Implementation of the option -eva-split-return. *)
-  | Split of Cil_types.exp * split_kind * int
-  (** [Split (exp, kind, max)] tries to separate states such as the [exp]
+  | Split of Cil_types.exp * split_kind * split_monitor
+  (** [Split (exp, kind, monitor)] tries to separate states such as the [exp]
       evaluates to a singleton value in each state in the flow. If necessary and
       possible, splits states into multiple states. States in which the [exp]
       evaluates to different values will be kept separate. Gives up the split
-      if [exp] evaluates to more than [max] values. *)
+      if [exp] evaluates to more than [limit] values, [limit] being the split
+      limit of the [monitor]. A same monitor can be used for successive splits
+      on different flows. *)
   | Merge of Cil_types.exp * split_kind
   (** Forgets the split of an expression: states that were kept separate only
       by the split of this expression will be joined together. *)

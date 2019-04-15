@@ -174,7 +174,7 @@ type action =
   | Branch of branch * int
   | Ration of rationing
   | Restrict of Cil_types.exp * Integer.t list
-  | Split of Cil_types.exp * split_kind * int
+  | Split of Cil_types.exp * split_kind * split_monitor
   | Merge of Cil_types.exp * split_kind
   | Update_dynamic_splits
 
@@ -363,8 +363,7 @@ struct
     with Operation_failed ->
       [(key,state)]
 
-  let split ~limit (kind : split_kind) (exp : Cil_types.exp) (p : t) =
-    let monitor = new_monitor limit in
+  let split ~monitor (kind : split_kind) (exp : Cil_types.exp) (p : t) =
     let add_split acc (key,state) =
       split_state ~monitor kind exp key state @ acc
     in
@@ -389,8 +388,8 @@ struct
     List.map (fun (k,x) -> f k x, x) p
 
   let transfer_keys p = function
-    | Split (expr, kind, limit) ->
-      split ~limit kind expr p
+    | Split (expr, kind, monitor) ->
+      split ~monitor kind expr p
 
     | Update_dynamic_splits ->
       update_dynamic_splits p
