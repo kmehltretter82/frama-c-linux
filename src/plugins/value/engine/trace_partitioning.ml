@@ -288,8 +288,10 @@ struct
         dest.store_partition <- Partition.replace key s dest.store_partition;
       in
       Extlib.may add state;
-      (* Filter out already propagated states *)
-      Extlib.opt_filter (fun s -> Index.add s dest.store_index) state
+      (* Filter out already propagated states (only at statements). *)
+      if dest.store_stmt = None
+      then state
+      else Extlib.opt_filter (fun s -> Index.add s dest.store_index) state
     in
     let flow = Flow.join_duplicate_keys flow_states in
     let flow = Flow.filter_map update flow in
