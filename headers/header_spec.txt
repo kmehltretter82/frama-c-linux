@@ -114,6 +114,7 @@ ptests/ptests.ml: CEA_LGPL
 share/_frama-c: CEA_LGPL
 share/analysis-scripts/benchmark_database.py: .ignore
 share/analysis-scripts/clone.sh: .ignore
+share/analysis-scripts/creduce.sh: CEA_LGPL
 share/analysis-scripts/fc_stubs.c: .ignore
 share/analysis-scripts/frama-c.mk: CEA_LGPL
 share/analysis-scripts/frama_c_results.py: .ignore
