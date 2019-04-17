@@ -499,22 +499,23 @@ module CvalueOffsm : Abstract_value.Internal with type t = V.t * offsm_or_top
     else p
 
   (* Refine the value component according to the contents of the offsetmap *)
-  let strengthen_v typ (v, o as p : t) : t =
+  let strengthen_v typ (v, o as p : t) : t or_bottom =
     match o with
-    | Top -> p
+    | Top -> `Value p
     | O o' ->
       let size = size typ in
       (* TODO: this should be done by the transfer function itself... *)
       let v = Cvalue_forward.reinterpret typ v in
       let v_o = V_Or_Uninitialized.get_v (basic_find ~size o') in
       let v_o = Cvalue_forward.reinterpret typ v_o in
-      (V.narrow v v_o, o)
+      let v = V.narrow v v_o in
+      if V.is_bottom v then `Bottom else `Value (v, o)
 
   let forward_unop typ op p =
     match op with
     | BNot ->
       let p' = strengthen_offsm typ p in
-      forward_unop typ op p' >>-: fun p'' ->
+      forward_unop typ op p' >>- fun p'' ->
       strengthen_v typ p''
     | _ -> forward_unop typ op p
 
@@ -523,7 +524,7 @@ module CvalueOffsm : Abstract_value.Internal with type t = V.t * offsm_or_top
     | BAnd | BOr | BXor ->
       let l = strengthen_offsm typ l in
       let r = strengthen_offsm typ r in
-      forward_binop typ op l r >>-: fun p ->
+      forward_binop typ op l r >>- fun p ->
       strengthen_v typ p
     | Shiftlt | Shiftrt ->
       let (v_r, _) = r in
