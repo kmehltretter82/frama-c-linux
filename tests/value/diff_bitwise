@@ -23,6 +23,14 @@ diff tests/value/oracle/addition.res.oracle tests/value/oracle_bitwise/addition.
 <       (origin: Arithmetic {tests/value/addition.i:52}) }}
 ---
 >   p10 ∈ {{ garbled mix of &{p1} }}
+diff tests/value/oracle/bitwise.res.oracle tests/value/oracle_bitwise/bitwise.res.oracle
+79c79,82
+< [eva] tests/value/bitwise.i:144: Frama_C_show_each_dead: {0}
+---
+> [eva] tests/value/bitwise.i:142: 
+>   The evaluation of the expression x & 2
+>   led to bottom without alarms:
+>   at this point the product of states has no possible concretization.
 diff tests/value/oracle/bitwise_pointer.res.oracle tests/value/oracle_bitwise/bitwise_pointer.res.oracle
 32,34c32
 < [eva] tests/value/bitwise_pointer.i:18: 
