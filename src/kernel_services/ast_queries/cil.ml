@@ -3776,7 +3776,8 @@ and childrenExp (vis: cilVisitor) (e: exp) : exp =
        (List.map (fun i -> mkStmt (Instr i)) toPrepend) @ f.sbody.bstmts;
    if vis#behavior.is_copy_behavior then begin
      fix_succs_preds_block vis#behavior f.sbody;
-     f.sallstmts <- List.map vis#behavior.get_stmt f.sallstmts
+     f.sallstmts <-
+       List.rev (List.rev_map vis#behavior.get_stmt f.sallstmts)
    end;
    vis#reset_current_func ();
    f
