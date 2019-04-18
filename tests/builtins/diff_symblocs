@@ -11,7 +11,7 @@ diff tests/builtins/oracle/alloc_weak.res.oracle tests/builtins/oracle_symblocs/
 36,37d35
 < [eva:alarm] tests/builtins/alloc_weak.c:30: Warning: 
 <   accessing uninitialized left-value. assert \initialized(p);
-900c898
+908c906
 <   r ∈ [--..--]
 ---
 >   r ∈ {42}
