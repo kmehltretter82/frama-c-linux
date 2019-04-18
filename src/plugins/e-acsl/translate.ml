@@ -517,8 +517,6 @@ and context_insensitive_term_to_exp kf env t =
     e, env, false, name
   | Tblock_length _ -> not_yet env "labeled \\block_length"
   | Tnull -> Cil.mkCast (Cil.zero ~loc) (TPtr(TVoid [], [])), env, false, "null"
-  | TCoerce _ -> Error.untypable "coercion" (* Jessie specific *)
-  | TCoerceE _ -> Error.untypable "expression coercion" (* Jessie specific *)
   | TUpdate _ -> not_yet env "functional update"
   | Ttypeof _ -> not_yet env "typeof"
   | Ttype _ -> not_yet env "C type"
@@ -771,7 +769,6 @@ and named_predicate_content_to_exp ?name kf env p =
     Mmodel_translate.call ~loc kf "freeable" Cil.intType env t
   | Pfreeable _ -> not_yet env "labeled \\freeable"
   | Pfresh _ -> not_yet env "\\fresh"
-  | Psubtype _ -> Error.untypable "subtyping relation" (* Jessie specific *)
 
 and named_predicate_to_exp ?name kf ?rte env p =
   let rte = match rte with None -> Env.generate_rte env | Some b -> b in

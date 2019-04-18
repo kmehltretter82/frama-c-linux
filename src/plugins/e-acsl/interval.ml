@@ -136,23 +136,6 @@ let rec infer t =
     let i2 = infer t2 in
     Ival.bitwise_or i1 i2
   | TCastE (ty, t)
-  | TCoerce (t, ty) ->
-    (try
-       let it = infer t in
-       let ity = interv_of_typ ty in
-       Ival.meet it ity
-     with Not_an_integer ->
-       if Cil.isIntegralType ty then begin
-         (* heterogeneous cast from a non-integral term to an integral type:
-            consider that one eventually gets an integral type even if it is
-            not sure. *)
-         Options.warning
-           ~once:true "possibly unsafe cast from term '%a' to type '%a'."
-           Printer.pp_term t
-           Printer.pp_typ ty;
-         interv_of_typ ty
-       end else
-         raise Not_an_integer)
   | Tif (_, t2, t3) ->
     let i2 = infer t2 in
     let i3 = infer t3 in
@@ -177,10 +160,6 @@ let rec infer t =
      | _ -> assert false)
   | Tnull  -> singleton_of_int 0
   | TLogic_coerce (_, t) -> infer t
-  | TCoerceE (t1, t2) ->
-    let i1 = infer t1 in
-    let i2 = infer t2 in
-    Ival.meet i1 i2
 
   | Tapp (li, _, _args) ->
     (match li.l_type with
