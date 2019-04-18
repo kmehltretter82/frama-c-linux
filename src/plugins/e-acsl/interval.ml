@@ -135,7 +135,6 @@ let rec infer t =
     let i1 = infer t1 in
     let i2 = infer t2 in
     Ival.bitwise_or i1 i2
-  | TCastE (ty, t)
   | Tif (_, t2, t3) ->
     let i2 = infer t2 in
     let i3 = infer t3 in
@@ -197,7 +196,8 @@ let rec infer t =
   | TUpdate (_,_,_)
   | Ttypeof _
   | Ttype _
-  | Tempty_set  -> raise Not_an_integer
+  | Tempty_set
+  | TCastE (_,_) -> raise Not_an_integer
 
 and infer_term_lval (host, offset as tlv) =
   match offset with

@@ -414,20 +414,6 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
     | TLogic_coerce (_, t) ->
       dup (type_term ~use_gmp_opt ~arith_operand ?ctx t).ty
 
-    | TCoerceE (t1, t2) ->
-      let ctx =
-        try
-          let i = Interval.infer t in
-          let i1 = Interval.infer t1 in
-          let i2 = Interval.infer t2 in
-          ty_of_interv ?ctx (Ival.join i (Ival.join i1 i2))
-        with Interval.Not_an_integer ->
-          Other
-      in
-      ignore (type_term ~use_gmp_opt:true ~ctx t1);
-      ignore (type_term ~use_gmp_opt:true ~ctx t2);
-      dup ctx
-
     | TAddrOf tlv
     | TStartOf tlv ->
       (* it is a pointer, but subterms must be typed. *)
@@ -480,7 +466,8 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
     | TConst (LStr _ | LWStr _ | LReal _)
     | Ttypeof _
     | Ttype _
-    | Tempty_set  -> dup Other
+    | Tempty_set
+    | TCastE (_,_) -> dup Other
   in
   Memo.memo
     (fun t ->
