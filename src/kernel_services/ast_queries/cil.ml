@@ -5615,11 +5615,11 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
       | Mult, Const(CInt64(i1,ik1,_)), Const(CInt64(i2,ik2,_)) when ik1 = ik2 ->
           kinteger64 ~loc ~kind:tk (Integer.mul i1 i2)
       | Mult, Const(CInt64(z,_,_)), _
-        when Integer.equal z Integer.zero -> zero ~loc
+        when Integer.equal z Integer.zero -> e1''
       | Mult, Const(CInt64(one,_,_)), _ 
         when Integer.equal one Integer.one -> e2''
       | Mult, _,    Const(CInt64(z,_,_)) 
-        when Integer.equal z Integer.zero -> zero ~loc
+        when Integer.equal z Integer.zero -> e2''
       | Mult, _, Const(CInt64(one,_,_)) 
         when Integer.equal one Integer.one -> e1''
       | Div, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_)) when ik1 = ik2 ->
@@ -5642,9 +5642,9 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
       | BAnd, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_)) when ik1 = ik2 ->
           kinteger64 ~loc ~kind:tk (Integer.logand i1 i2)
       | BAnd, Const(CInt64(z,_,_)), _ 
-        when Integer.equal z Integer.zero -> zero ~loc
+        when Integer.equal z Integer.zero -> e1''
       | BAnd, _, Const(CInt64(z,_,_)) 
-        when Integer.equal z Integer.zero -> zero ~loc
+        when Integer.equal z Integer.zero -> e2''
       | BOr, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_)) when ik1 = ik2 ->
           kinteger64 ~loc ~kind:tk (Integer.logor i1 i2)
       | BOr, _, _ when isZero e1' -> e2'
@@ -5655,7 +5655,7 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
           when shiftInBounds i2 ->
           kinteger64 ~loc ~kind:tk (Integer.shift_left i1 i2)
       | Shiftlt, Const(CInt64(z,_,_)), _ 
-        when Integer.equal z Integer.zero -> zero ~loc
+        when Integer.equal z Integer.zero -> e1''
       | Shiftlt, _, Const(CInt64(z,_,_)) 
         when Integer.equal z Integer.zero -> e1''
       | Shiftrt, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,_,_))
@@ -5666,7 +5666,7 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
           else
             kinteger64 ~loc ~kind:tk (Integer.shift_right i1 i2)
       | Shiftrt, Const(CInt64(z,_,_)), _ 
-        when Integer.equal z Integer.zero -> zero ~loc
+        when Integer.equal z Integer.zero -> e1''
       | Shiftrt, _, Const(CInt64(z,_,_)) 
         when Integer.equal z Integer.zero -> e1''
       | Eq, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_)) ->
