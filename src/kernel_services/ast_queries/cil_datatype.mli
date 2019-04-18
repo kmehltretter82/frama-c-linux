@@ -256,6 +256,7 @@ module Identified_term: S_with_collections_pretty with type t = identified_term
 
 module Logic_ctor_info: S_with_collections_pretty with type t = logic_ctor_info
 module Logic_info: S_with_collections_pretty with type t = logic_info
+module Logic_info_structural: S_with_collections_pretty with type t = logic_info
 module Logic_constant: S_with_collections_pretty with type t = logic_constant
 
 module Logic_label: S_with_collections_pretty with type t = logic_label
