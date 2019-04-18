@@ -2213,16 +2213,16 @@ let flatten_transient_sub_blocks b =
       -> true
     | Some _ -> false
   in
-  let treat_one_stmt s =
+  let treat_one_stmt acc s =
     match s.skind with
     | Block b when is_transient_block b ->
       if previous_is_annot () then begin
         s.skind <- Block (block_of_transient b);
         prev := Some s;
-        [ s ]
+        s :: acc
       end else begin
         match s.labels, b.bstmts with
-        | [], _ -> prev:= None; b.bstmts
+        | [], _ -> prev:= None; List.rev_append b.bstmts acc
         | _, [] ->
           (* Empty block, but we have a label attached to the statement, so
              that it is difficult to get rid of it (see below). Replace with
@@ -2230,7 +2230,7 @@ let flatten_transient_sub_blocks b =
           *)
           s.skind <- Instr (Skip (Cil_datatype.Stmt.loc s));
           prev:=Some s;
-          [s]
+          s :: acc
         | _, s'::tl when s'.labels = [] ->
           (* res is the target of a label (either goto or case). Removing the
              block would imply updating the origin of the jump, which is
@@ -2239,17 +2239,17 @@ let flatten_transient_sub_blocks b =
              the block, and return the list. *)
           s.skind <- s'.skind;
           prev:=None;
-          s :: tl
+          List.rev_append tl (s :: acc)
         | _ ->
           (* both the block and the first statement have labels. Just keep
              the block. *)
           s.skind <- Block (block_of_transient b);
           prev:=Some s;
-          [s]
+          s :: acc
        end
-     | _ -> prev:= Some s; [ s ]
+     | _ -> prev:= Some s; s :: acc
   in
-  b.bstmts <- List.concat (List.map treat_one_stmt b.bstmts);
+  b.bstmts <- List.rev (List.fold_left treat_one_stmt [] b.bstmts);
   b
 
 let stmt_of_instr_list_visitor ?loc l =
