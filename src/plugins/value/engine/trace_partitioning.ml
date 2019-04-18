@@ -203,13 +203,13 @@ struct
     flow
 
   let fill ~(into : tank) (flow : flow) : unit =
-    let erase _key dest src =
-      if Extlib.has_some src
-      then src
-      else dest
-    in
     let new_states = Flow.to_partition flow in
-    into.tank_states <- Partition.merge erase into.tank_states new_states
+    let join _key dest src = match dest, src with
+      | Some dest, Some src -> Some (Domain.join dest src)
+      | Some v, None | None, Some v -> Some v
+      | None, None -> None
+    in
+    into.tank_states <- Partition.merge join into.tank_states new_states
 
   let transfer = Flow.transfer_states
 
