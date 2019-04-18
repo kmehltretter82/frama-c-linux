@@ -361,6 +361,9 @@ let journalized_set_current =
 let set_current ?(on=false) ?(selection=State_selection.full) p =
   if not (equal p (current ())) then journalized_set_current on selection p
 
+let set_current_as_last_created () =
+  Extlib.may (fun p -> set_current p) !last_created_by_copy_ref
+
 (** Indicates if we should keep [p] as the current project when calling {!on p}. *)
 let keep_current: bool ref = ref false
 

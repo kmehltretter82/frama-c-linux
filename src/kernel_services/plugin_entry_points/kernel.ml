@@ -1523,8 +1523,11 @@ let _ =
 let () =
   Cmdline.run_after_configuring_stage
     (fun () ->
+        feedback "BEFORE Project.remove";
         Remove_projects.iter (fun project -> Project.remove ~project ());
-        Remove_projects.clear ())
+        feedback "AFTER Project.remove";
+        Remove_projects.unsafe_set Project.Datatype.Set.empty;
+        feedback "AFTER Clearing option")
 
 (* ************************************************************************* *)
 (** {2 Others options} *)
