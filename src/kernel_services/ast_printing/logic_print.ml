@@ -124,7 +124,6 @@ let getParenthLevel e =
   | PLbinop (_,(Badd|Bsub|Blshift|Brshift),_) -> 60
   | PLbinop (_,(Bmul|Bdiv|Bmod),_) -> 40
   | PLunop ((Uamp|Uminus|Ubw_not),_) | PLcast _ | PLnot _ -> 30
-  | PLcoercion _ | PLcoercionE _ -> 25
   | PLunop (Ustar,_) | PLdot _ | PLarrow _ | PLarrget _
   | PLsizeof _ | PLsizeofE _ -> 20
   | PLapp _ | PLold _ | PLat _
@@ -217,10 +216,6 @@ and print_lexpr_level n fmt e =
         (pp_opt print_lexpr) e1 (pp_opt print_lexpr) e2
     | PLsizeof t -> fprintf fmt "sizeof(@;@[%a@]@;)" (print_logic_type None) t
     | PLsizeofE e -> fprintf fmt "sizeof(@;@[%a@]@;)" print_lexpr_plain e
-    | PLcoercion(e,t) ->
-      fprintf fmt "%a@ :>@ %a" print_lexpr e (print_logic_type None) t
-    | PLcoercionE(e1,e2) ->
-      fprintf fmt "%a@ :>@ %a" print_lexpr e1 print_lexpr e2
     | PLupdate(e1,path,e2) ->
       fprintf fmt "{@ @[%a@ \\with@ %a@]}"
         print_lexpr_plain e1 print_path_val (path, e2)

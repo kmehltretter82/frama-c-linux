@@ -778,10 +778,6 @@ let rec is_same_term t1 t2 =
   | Toffset (l1,t1), Toffset (l2,t2)
   | Tat(t1,l1), Tat(t2,l2) -> is_same_logic_label l1 l2 && is_same_term t1 t2
   | Tnull, Tnull -> true
-  | TCoerce(t1,typ1), TCoerce(t2,typ2) ->
-    is_same_term t1 t2 && Cil_datatype.TypByName.equal typ1 typ2
-  | TCoerceE(t1,tt1), TCoerceE(t2,tt2) ->
-    is_same_term t1 t2 && is_same_term tt1 tt2
   | Tlambda (v1,t1), Tlambda(v2,t2) ->
     is_same_list is_same_var v1 v2 && is_same_term t1 t2
   | TUpdate(t1,i1,nt1), TUpdate(t2,i2,nt2) ->
@@ -810,7 +806,7 @@ let rec is_same_term t1 t2 =
     | TAlignOf _ | TAlignOfE _ | TUnOp _ | TBinOp _ | TCastE _
     | TAddrOf _ | TStartOf _ | Tapp _ | Tlambda _ | TDataCons _
     | Tif _ | Tat _ | Tbase_addr _ | Tblock_length _ | Toffset _ | Tnull
-    | TCoerce _ | TCoerceE _ | TUpdate _ | Ttypeof _ | Ttype _
+    | TUpdate _ | Ttypeof _ | Ttype _
     | Tcomprehension _ | Tempty_set | Tunion _ | Tinter _ | Trange _
     | Tlet _ | TLogic_coerce _
     ),_ -> false
@@ -1212,14 +1208,12 @@ and is_same_lexpr l1 l2 =
   | PLresult, PLresult | PLnull, PLnull
   | PLfalse, PLfalse | PLtrue, PLtrue | PLempty, PLempty ->
     true
-  | PLcast(t1,e1), PLcast(t2,e2) | PLcoercion(e1,t1), PLcoercion (e2,t2)->
+  | PLcast(t1,e1), PLcast(t2,e2) ->
     is_same_pl_type t1 t2 && is_same_lexpr e1 e2
   | PLrange(l1,h1), PLrange(l2,h2) ->
     is_same_opt is_same_lexpr l1 l2 && is_same_opt is_same_lexpr h1 h2
   | PLsizeof t1, PLsizeof t2 -> is_same_pl_type t1 t2
   | PLsizeofE e1,PLsizeofE e2 | PLtypeof e1,PLtypeof e2-> is_same_lexpr e1 e2
-  | PLcoercionE (b1,t1), PLcoercionE(b2,t2) ->
-    is_same_lexpr b1 b2 && is_same_lexpr t1 t2
   | PLupdate(b1,p1,r1), PLupdate(b2,p2,r2) ->
     is_same_lexpr b1 b2
     && is_same_list is_same_path_elt p1 p2 && is_same_update_term r1 r2
@@ -1270,8 +1264,8 @@ and is_same_lexpr l1 l2 =
     | PLold _ | PLat _
     | PLbase_addr _ | PLblock_length _ | PLoffset _
     | PLresult | PLnull | PLcast _
-    | PLrange _ | PLsizeof _ | PLsizeofE _ | PLtypeof _ | PLcoercion _
-    | PLcoercionE _ | PLupdate _ | PLinitIndex _ | PLtype _ | PLfalse
+    | PLrange _ | PLsizeof _ | PLsizeofE _ | PLtypeof _
+    | PLupdate _ | PLinitIndex _ | PLtype _ | PLfalse
     | PLtrue | PLinitField _ | PLrel _ | PLand _ | PLor _ | PLxor _
     | PLimplies _ | PLiff _ | PLnot _ | PLif _ | PLforall _
     | PLexists _ | PLvalid _ | PLvalid_read _ | PLvalid_function _
@@ -1348,12 +1342,6 @@ let rec hash_term (acc,depth,tot) t =
       let hash = acc + 351 + hash_label l in
       hash_term (hash,depth-1,tot-2) t
     | Tnull -> acc+361, tot - 1
-    | TCoerce(t,ty) ->
-      let hash = Cil_datatype.TypByName.hash ty in
-      hash_term (acc+380+hash,depth-1,tot-2) t
-    | TCoerceE(t1,t2) ->
-      let hash1,tot1 = hash_term (acc+399,depth-1,tot-1) t1 in
-      hash_term (hash1,depth-1,tot1) t2
     | TUpdate(t1,off,t2) ->
       let hash1,tot1 = hash_term (acc+418,depth-1,tot-1) t1 in
       let hash2,tot2 = hash_term_offset (hash1,depth-1,tot1) off in
@@ -1594,16 +1582,6 @@ let rec compare_term t1 t2 =
   | Tnull, Tnull -> 0
   | Tnull, _ -> 1
   | _, Tnull -> -1
-  | TCoerce(t1,typ1), TCoerce(t2,typ2) ->
-    let res = compare_term t1 t2 in
-    if res = 0 then Cil_datatype.TypByName.compare typ1 typ2 else res
-  | TCoerce _, _ -> 1
-  | _, TCoerce _ -> -1
-  | TCoerceE(t1,tt1), TCoerceE(t2,tt2) ->
-    let res = compare_term t1 t2 in
-    if res = 0 then compare_term tt1 tt2 else res
-  | TCoerceE _, _ -> 1
-  | _, TCoerceE _ -> -1
   | Tlambda (v1,t1), Tlambda(v2,t2) ->
     let res = Extlib.list_compare compare_var v1 v2 in
     if res = 0 then compare_term t1 t2 else res
@@ -2290,7 +2268,7 @@ let rec constFoldTermToInt ?(machdep=true) (e: term) : Integer.t option =
     constFoldMinMax ~machdep Integer.min args
 
   | TLval _ | TAddrOf _ | TStartOf _ | Tapp _ | Tlambda _ | TDataCons _
-  | Tat _ | Tbase_addr _ | Tblock_length _ | TCoerce _ | TCoerceE _
+  | Tat _ | Tbase_addr _ | Tblock_length _
   | TUpdate _ | Ttypeof _ | Ttype _ | Tempty_set | Tunion _ | Tinter _
   | Tcomprehension _ | Trange _ | Tlet _ ->
     None

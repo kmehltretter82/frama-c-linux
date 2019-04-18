@@ -1403,8 +1403,6 @@ and term_node =
       The logic type must not be a Ctype. In particular, used to denote
       lifting to Linteger and Lreal.
   *)
-  | TCoerce of term * typ (** coercion to a given C type. *)
-  | TCoerceE of term * term (** coercion to the type of a given term. *)
   | TUpdate of term * term_offset * term
       (** functional update of a field. *)
   | Ttypeof of term (** type tag for a term. *)

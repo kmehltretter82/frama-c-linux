@@ -276,8 +276,6 @@ module Precedence = struct
     | TAddrOf(_) -> addrOfLevel
     | TStartOf(_) -> 30
     | TUnOp((Neg|BNot|LNot),_) -> 30
-    (* Unary post *)
-    | TCoerce _ | TCoerceE _ -> 25
     (* Lvals *)
     | TLval(TMem _ , _) -> derefStarLevel
     | TLval(TVar _, (TField _|TIndex _|TModel _)) -> indexLevel
@@ -2323,12 +2321,6 @@ class cil_printer () = object (self)
       fprintf fmt "%a%a(%a)" self#pp_acsl_keyword "\\block_length"
         self#labels [l] self#term t
     | Tnull -> self#pp_acsl_keyword fmt "\\null"
-    | TCoerce (e,ty) ->
-      fprintf fmt "%a@ :>@ %a"
-        (self#term_prec current_level) e (self#typ None) ty
-    | TCoerceE (e,ce) ->
-      fprintf fmt "%a :> %a"
-        (self#term_prec current_level) e (self#term_prec current_level) ce
     | TUpdate (t,toff,v) ->
       fprintf fmt "{%a %a %a = %a}"
         self#term t

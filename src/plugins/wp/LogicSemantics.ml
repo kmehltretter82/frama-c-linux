@@ -681,8 +681,6 @@ struct
     | TUnOp(unop,t) -> term_unop unop (C.logic env t)
     | TBinOp(binop,a,b) -> term_binop env binop a b
 
-    | TCoerceE (t,e) -> term_cast_to_ltype env e.term_type t (** Jessie only, to be deprecated *)
-    | TCoerce (t,ty) -> term_cast_to_ctype env ty t (** Jessie only, to be deprecated *)
     | TCastE(ty,t) -> term_cast_to_ctype env ty t
     | TLogic_coerce(typ,t) -> term_cast_to_ltype env typ t
 
@@ -961,8 +959,6 @@ struct
         Warning.error "Complex let-binding not implemented yet (%a)"
           Printer.pp_term t
 
-    | TCoerce (t,_)  (** Jessie only, to be deprecated *)
-    | TCoerceE (t,_) (** Jessie only, to be deprecated *)
     | TCastE (_,t)
     | TLogic_coerce(_,t) -> C.region env ~unfold t
 

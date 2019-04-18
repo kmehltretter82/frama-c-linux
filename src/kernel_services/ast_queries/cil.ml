@@ -2485,14 +2485,6 @@ and childrenTermNode vis tn =
         let t' = vTerm t in 
 	if t' != t || s' != s then Tblock_length (s',t') else tn
     | Tnull -> tn
-    | TCoerce(te,ty) ->
-        let ty' = vTyp ty in
-        let te' = vTerm te in
-        if ty' != ty || te' != te then TCoerce(te',ty') else tn
-    | TCoerceE(te,tc) ->
-        let tc' = vTerm tc in
-        let te' = vTerm te in
-        if tc' != tc || te' != te then TCoerceE(te',tc') else tn
     | TUpdate (tc,toff,te) ->
 	let tc' = vTerm tc in
         let te' = vTerm te in
@@ -7765,10 +7757,8 @@ let rec free_vars_term bound_vars t = match t.term_node with
   | Toffset (_,t)
   | Tbase_addr (_,t)
   | Tblock_length (_,t)
-  | TCoerce (t,_)
   | Ttypeof t -> free_vars_term bound_vars t
-  | TBinOp (_,t1,t2)
-  | TCoerceE (t1,t2) ->
+  | TBinOp (_,t1,t2) ->
     Logic_var.Set.union
       (free_vars_term bound_vars t1)
       (free_vars_term bound_vars t2)

@@ -1002,7 +1002,6 @@ let rec eval_term ~alarm_mode env t =
 
   | Tlambda _ -> unsupported "logic functions or predicates"
   | TUpdate _ -> unsupported "functional updates"
-  | TCoerce _ | TCoerceE _ -> unsupported "logic coercions" (* jessie *)
   | Ttype _ -> unsupported "\\type operator"
   | Ttypeof _ -> unsupported "\\typeof operator"
   | Tcomprehension _ -> unsupported "sets defined by comprehension"

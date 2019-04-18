@@ -406,10 +406,6 @@ and term (env:ctx) (t:term) : model = match t.term_node with
   | TCastE(ty_tgt,t) -> cast (cast_ltyp ty_tgt t.term_type) (term env t)
   | TLogic_coerce (_lt,t) -> term env t
 
-  (* Jessie *)
-  | TCoerce _ -> Wp_parameters.fatal "Coercions: TCoerc _"
-  | TCoerceE _ -> Wp_parameters.fatal "Coercions: TCoerceE _"
-
 
   (* Term L-Values *)
   | TLval tlv -> term_lval env tlv
