@@ -1968,7 +1968,6 @@ let rec reduce_by_predicate ~alarm_mode env positive p =
     | true, Pexists (_, _) | false, Pforall (_, _)
     | _,Plet (_, _)
     | _,Pallocable (_,_) | _,Pfreeable (_,_) | _,Pfresh (_,_,_,_)
-    | _,Psubtype _
     | _, Pseparated _
       -> env
   in
@@ -2223,7 +2222,6 @@ and eval_predicate env pred =
     | Pfresh (_,_,_,_)
     | Pallocable _ | Pfreeable _
     | Plet (_,_)
-    | Psubtype _
       -> Unknown
 
   (* Logic predicates. Update the list known_predicates above if you
@@ -2372,7 +2370,7 @@ let predicate_deps env pred =
           | Some p' -> do_eval env p'
       end
 
-    | Pfresh _ | Pallocable _ | Pfreeable _ | Psubtype _
+    | Pfresh _ | Pallocable _ | Pfreeable _
       -> assert false
   in
   do_eval env pred

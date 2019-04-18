@@ -147,8 +147,6 @@ and lexpr_node =
   | PLseparated of lexpr list
       (** separation predicate. *)
   | PLnamed of string * lexpr (** named expression. *)
-  | PLsubtype of lexpr * lexpr
-      (** first type tag is a subtype of second one. *)
       (* tsets *)
   | PLcomprehension of lexpr * quantifiers * lexpr option
       (** set of expression defined in comprehension

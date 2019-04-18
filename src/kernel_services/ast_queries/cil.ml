@@ -2894,10 +2894,6 @@ and childrenLogicLabel vis l =
 	 let t' = vTerm t in
 	 let n' = vTerm n in 
 	 if t' != t || n' != n || s1 != s1' || s2 != s2' then Pfresh (s1',s2',t',n') else p
-     | Psubtype(te,tc) ->
-	 let tc' = vTerm tc in
-	 let te' = vTerm te in
-	 if tc' != tc || te' != te then Psubtype(te',tc') else p
 
 and visitCilIdTerm vis loc =
    doVisitCil vis vis#behavior.cidentified_term vis#videntified_term
@@ -7882,7 +7878,6 @@ and free_vars_predicate bound_vars p = match p.pred_content with
       seps
   | Pfresh (_,_,t1,t2) 
   | Prel (_,t1,t2)
-  | Psubtype (t1,t2)
     ->
     Logic_var.Set.union
       (free_vars_term bound_vars t1)

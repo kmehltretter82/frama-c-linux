@@ -803,7 +803,7 @@ to function contracts."
       | Pvalid_function _ ->
           DoChildren
 
-      | Papp _ | Pallocable _ | Pfreeable _ | Pfresh _ | Psubtype _
+      | Papp _ | Pallocable _ | Pfreeable _ | Pfresh _
         -> fail ()
 
       method private do_term_lval t =

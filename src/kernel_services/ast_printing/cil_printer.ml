@@ -199,7 +199,6 @@ module Precedence = struct
     | Pfresh _ -> 0
     | Papp _ as p -> if subset_is_backslash_in p = None then 0 else 36
     | Pnot _ -> 30
-    | Psubtype _ -> 75
     | Pand _ -> and_level
     | Pxor _ -> xor_level
     | Por _ -> or_level
@@ -2654,8 +2653,6 @@ class cil_printer () = object (self)
           self#pred_prec_named (Precedence.upperLevel,p)
           self#logic_label lab;
       current_label <- old_label
-    | Psubtype (e,ce) ->
-      fprintf fmt "@[%a@ <:@ %a@]" term e term ce
 
   method private decrement kw fmt (t, rel) = match rel with
     | None -> fprintf fmt "@[<2>%a@ %a;@]" self#pp_acsl_keyword kw self#term t

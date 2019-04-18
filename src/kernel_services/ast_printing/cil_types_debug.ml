@@ -879,8 +879,6 @@ and pp_predicate_node fmt = function
   | Pfresh(logic_label1,logic_label2,term1,term2) ->
     Format.fprintf fmt "Pfresh(%a,%a,%a,%a)"  pp_logic_label logic_label1  pp_logic_label logic_label2
       pp_term term1  pp_term term2
-  | Psubtype(term1,term2) ->
-    Format.fprintf fmt "Psubtype(%a,%a)"  pp_term term1  pp_term term2
 
 and pp_identified_predicate fmt identified_predicate =
   Format.fprintf fmt "{ip_id=%d;ip_content=%a}"

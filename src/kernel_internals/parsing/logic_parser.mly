@@ -525,8 +525,6 @@ lexpr_inner:
 | LPAR range RPAR { info $2.lexpr_node }
 | LPAR cast_logic_type RPAR lexpr_inner %prec prec_cast
       { info (PLcast ($2, $4)) }
-| lexpr_inner LTCOLON lexpr_inner %prec prec_cast
-      { info (PLsubtype ($1, $3)) }
 | lexpr_inner COLONGT logic_type 
       { info (PLcoercion ($1, $3)) }
 | lexpr_inner COLONGT lexpr_inner %prec prec_cast

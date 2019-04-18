@@ -896,8 +896,6 @@ struct
           "Allocation, initialization and danglingness not yet implemented@\n\
            @[<hov 0>(%a)@]" Printer.pp_predicate p
 
-    | Psubtype _ ->
-        Warning.error "Type tags not implemented yet"
 
   (* -------------------------------------------------------------------------- *)
   (* --- Set of locations for a term representing a set of l-values         --- *)

@@ -1044,7 +1044,6 @@ struct
       | Pinitialized (_,t) | Pdangling (_, t)
       | Pallocable(_,t) | Pfreeable(_,t)-> needs_at t
       | Pfresh (_,_,t,n) -> (needs_at t) && (needs_at n)
-      | Psubtype _ -> false
     in
     if needs_at idx then tat ~loc:idx.term_loc (idx,here_label) else idx
 
@@ -3000,7 +2999,7 @@ struct
     | PLfresh _ | PLallocable _ | PLfreeable _
     | PLinitialized _ | PLdangling _ | PLexists _ | PLforall _
     | PLimplies _ | PLiff _
-    | PLxor _ | PLsubtype _ | PLseparated _ ->
+    | PLxor _ | PLseparated _ ->
       if ctxt.silent then raise Backtrack;
       ctxt.error loc "syntax error (expression expected but predicate found)"
   and type_relation:
@@ -3431,7 +3430,6 @@ struct
     | PLrange _ -> ctxt.error loc "cannot use operator .. within a predicate"
     | PLnamed (n, p) ->
       let p = predicate env p in { p with pred_name = n::p.pred_name }
-    | PLsubtype (t,tc) -> psubtype ~loc (term env t, term env tc)
     | PLseparated seps ->
       let seps = List.map (term_ptr ~check_non_void:true) seps in
       pseparated ~loc seps

@@ -482,7 +482,7 @@ and addr_lval env (h,ofs) = match h with
 
 (* --- Predicates --- *)
 and pred (env:ctx) p : value = match p.pred_content with
-  | Psubtype (_, _) | Pfalse | Ptrue ->  E.bot
+  | Pfalse | Ptrue ->  E.bot
 
   (* Unary *)
   | Pat(p,_)

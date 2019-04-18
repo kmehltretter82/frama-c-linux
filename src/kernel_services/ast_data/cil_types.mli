@@ -1583,8 +1583,6 @@ and predicate_node =
   | Pfresh of logic_label * logic_label * term * term
       (** \fresh(pointer, n)
 	  A memory block of n bytes is newly allocated to the pointer.*)
-  | Psubtype of term * term
-      (** First term is a type tag that is a subtype of the second. *)
 
 (** predicate with an unique identifier.  Use {!Logic_const.new_predicate} to
     create fresh predicates *)

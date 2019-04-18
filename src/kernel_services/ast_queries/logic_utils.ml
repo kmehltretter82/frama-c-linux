@@ -900,8 +900,6 @@ and is_same_predicate_node p1 p2 =
   | Pfresh (l1,m1,t1,n1), Pfresh (l2,m2,t2,n2) ->
     is_same_logic_label l1 l2 && is_same_logic_label m1 m2 &&
     is_same_term t1 t2 && is_same_term n1 n2
-  | Psubtype(lt1,rt1), Psubtype(lt2,rt2) ->
-    is_same_term lt1 lt2 && is_same_term rt1 rt2
   | Pseparated(seps1), Pseparated(seps2) ->
     (try List.for_all2 is_same_term seps1 seps2
      with Invalid_argument _ -> false)
@@ -909,7 +907,7 @@ and is_same_predicate_node p1 p2 =
     | Piff _ | Pnot _ | Pif _ | Plet _ | Pforall _ | Pexists _
     | Pat _ | Pvalid _ | Pvalid_read _ | Pvalid_function _
     | Pinitialized _ | Pdangling _
-    | Pfresh _ | Pallocable _ | Pfreeable _ | Psubtype _ | Pxor _ | Pseparated _
+    | Pfresh _ | Pallocable _ | Pfreeable _ | Pxor _ | Pseparated _
     ), _ -> false
 
 and is_same_predicate pred1 pred2 =
@@ -1220,8 +1218,7 @@ and is_same_lexpr l1 l2 =
     is_same_opt is_same_lexpr l1 l2 && is_same_opt is_same_lexpr h1 h2
   | PLsizeof t1, PLsizeof t2 -> is_same_pl_type t1 t2
   | PLsizeofE e1,PLsizeofE e2 | PLtypeof e1,PLtypeof e2-> is_same_lexpr e1 e2
-  | PLcoercionE (b1,t1), PLcoercionE(b2,t2)
-  | PLsubtype(b1,t1), PLsubtype(b2,t2) ->
+  | PLcoercionE (b1,t1), PLcoercionE(b2,t2) ->
     is_same_lexpr b1 b2 && is_same_lexpr t1 t2
   | PLupdate(b1,p1,r1), PLupdate(b2,p2,r2) ->
     is_same_lexpr b1 b2
@@ -1280,7 +1277,7 @@ and is_same_lexpr l1 l2 =
     | PLexists _ | PLvalid _ | PLvalid_read _ | PLvalid_function _
     | PLfreeable _ | PLallocable _
     | PLinitialized _ | PLdangling _ | PLseparated _ | PLfresh _ | PLnamed _
-    | PLsubtype _ | PLcomprehension _ | PLunion _ | PLinter _
+    | PLcomprehension _ | PLunion _ | PLinter _
     | PLset _ | PLempty
     ),_ -> false
 
@@ -1507,9 +1504,6 @@ and hash_predicate (acc,depth,tot) p =
           (acc + 259 + hash_label l1 + hash_label l2, depth - 1, tot - 2) t1
       in
       hash_term (acc, depth-1, tot) t2
-    | Psubtype(t1, t2) ->
-      let (acc, tot) = hash_term (acc + 263, depth - 1, tot - 1) t1 in
-      hash_term (acc, depth - 1, tot) t2
   end
 
 let hash_term t =
@@ -1834,11 +1828,6 @@ and compare_predicate_node p1 p2 =
     else res
   | Pfresh _, _ -> 1
   | _, Pfresh _ -> -1
-  | Psubtype(lt1,rt1), Psubtype(lt2,rt2) ->
-    let res = compare_term lt1 lt2 in
-    if res = 0 then compare_term rt1 rt2 else res
-  | Psubtype _, _ -> 1
-  | _, Psubtype _ -> -1
   | Pseparated(seps1), Pseparated(seps2) ->
     Extlib.list_compare compare_term seps1 seps2
 
