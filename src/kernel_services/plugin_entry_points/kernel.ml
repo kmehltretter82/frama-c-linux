@@ -1522,7 +1522,9 @@ let _ =
 
 let () =
   Cmdline.run_after_configuring_stage
-    (fun () -> Remove_projects.iter (fun project -> Project.remove ~project ()))
+    (fun () ->
+        Remove_projects.iter (fun project -> Project.remove ~project ());
+        Remove_projects.clear ())
 
 (* ************************************************************************* *)
 (** {2 Others options} *)
