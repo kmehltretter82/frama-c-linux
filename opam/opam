@@ -94,10 +94,10 @@ depends: [
   "conf-gtksourceview"
   ( "alt-ergo-free" | "alt-ergo" )
   "conf-graphviz" { post }
+  "yojson"
 ]
 
 depopts: [
-  "yojson" { build & >= "1.6.0" }
   "coq" { build }
   "why3" { build }
   "mlgmpidl" { build }
@@ -116,8 +116,6 @@ conflicts: [
 ]
 
 messages: [
-  "Yojson enables kernel option -json-compilation-database"
-    {!yojson:installed}
   "Why3 can be used by the WP plug-in for running additional automatic solvers"
     {!why3:installed}
   "Coq can be used with the WP plug-in for proving interactively proof obligations"

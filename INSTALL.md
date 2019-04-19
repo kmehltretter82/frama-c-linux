@@ -88,7 +88,7 @@ Frama-C 18 (Argon):
 - mlgmpidl.1.2.7 (optional)
 - ocamlgraph.1.8.8
 - why3.0.88.3
-- yojson.1.4.1 (optional)
+- yojson.1.4.1
 - zarith.1.7
 
 Note: *pin recommended* indicates packages likely to become incompatible in

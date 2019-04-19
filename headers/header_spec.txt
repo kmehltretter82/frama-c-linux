@@ -528,9 +528,8 @@ src/kernel_services/ast_queries/file.ml: CEA_LGPL
 src/kernel_services/ast_queries/file.mli: CEA_LGPL
 src/kernel_services/ast_queries/filecheck.ml: CEA_LGPL
 src/kernel_services/ast_queries/filecheck.mli: CEA_LGPL
-src/kernel_services/ast_queries/json_compilation_database.ko.ml: CEA_LGPL
+src/kernel_services/ast_queries/json_compilation_database.ml: CEA_LGPL
 src/kernel_services/ast_queries/json_compilation_database.mli: CEA_LGPL
-src/kernel_services/ast_queries/json_compilation_database.ok.ml: CEA_LGPL
 src/kernel_services/ast_queries/logic_const.ml: CEA_INRIA_LGPL
 src/kernel_services/ast_queries/logic_const.mli: CEA_INRIA_LGPL
 src/kernel_services/ast_queries/logic_env.ml: CEA_INRIA_LGPL

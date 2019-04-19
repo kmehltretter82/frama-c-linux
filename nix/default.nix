@@ -1,9 +1,9 @@
 # paramaterised derivation with dependencies injected (callPackage style)
 { pkgs, stdenv, src ? ../., opam2nix, ocaml_version ? "ocaml-ng.ocamlPackages_4_05.ocaml", plugins ? { } }:
 
-let mk_buildInputs = { opamPackages ? [] } :
-    [ pkgs.gnugrep pkgs.gnused  pkgs.autoconf pkgs.gnumake pkgs.gcc pkgs.ncurses pkgs.time pkgs.python3 pkgs.perl pkgs.file] ++ opam2nix.build {
-           specs = opam2nix.toSpecs ([ "ocamlfind" "zarith" "ocamlgraph"
+let mk_buildInputs = { opamPackages ? [], nixPackages ? [] } :
+    [ pkgs.gnugrep pkgs.gnused  pkgs.autoconf pkgs.gnumake pkgs.gcc pkgs.ncurses pkgs.time pkgs.python3 pkgs.perl] ++ nixPackages ++ opam2nix.build {
+           specs = opam2nix.toSpecs ([ "ocamlfind" "zarith" "ocamlgraph" "yojson"
                 { name = "coq"; constraint = "=8.7.2"; }
                 ] ++ opamPackages ++
                 (if ocaml_version == "pkgs.ocaml-ng.ocamlPackages_4_02.ocaml"
@@ -15,7 +15,7 @@ let mk_buildInputs = { opamPackages ? [] } :
 in
 
 rec {
-  inherit src;
+  inherit src mk_buildInputs;
   buildInputs = mk_buildInputs {};
   installed = main.out;
   main = stdenv.mkDerivation {

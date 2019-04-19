@@ -130,11 +130,6 @@ val dot: string option
     @return [None] if `dot' is not installed.
     @since Carbon-20101201 *)
 
-val has_yojson: bool
-(** [true] if Frama-C has been compiled with yojson support.
-    @since Chlorine-20180501
-*)
-
 (*
   Local Variables:
   compile-command: "make -C ../../.."

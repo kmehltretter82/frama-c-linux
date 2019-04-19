@@ -444,7 +444,7 @@ module ImplicitFunctionDeclaration: Parameter_sig.String
 module C11: Parameter_sig.Bool
   (** Behavior of option "-c11" *)
 
-module JsonCompilationDatabase: State_builder.Ref with type data = string
+module JsonCompilationDatabase: Parameter_sig.String
   (** Behavior of option "-json-compilation-database" *)
 
 (* ************************************************************************* *)
