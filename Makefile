@@ -863,7 +863,7 @@ PLUGIN_DISTRIB_EXTERNAL+= \
 PLUGIN_CMO:= slevel/split_strategy value_parameters \
 	utils/value_perf utils/value_util utils/red_statuses \
 	utils/mark_noresults \
-	utils/widen_hints_ext utils/widen utils/unroll_annots \
+	utils/widen_hints_ext utils/widen utils/partitioning_annots \
 	engine/split_return \
 	slevel/per_stmt_slevel \
 	utils/library_functions \
@@ -903,13 +903,12 @@ PLUGIN_CMO:= slevel/split_strategy value_parameters \
 	domains/cvalue/cvalue_domain \
 	engine/subdivided_evaluation engine/evaluation engine/abstractions \
 	engine/recursion engine/transfer_stmt engine/transfer_specification \
-	engine/partitioning engine/mem_exec \
-	engine/legacy_partitioning engine/basic_partitioning \
-	engine/loop_partitioning engine/partitioned_dataflow \
+	engine/partitioning_index engine/mem_exec \
+	engine/partition engine/partitioning_parameters engine/trace_partitioning \
+	engine/iterator \
 	engine/initialization \
 	engine/compute_functions engine/analysis register
 PLUGIN_CMI:= values/abstract_value values/abstract_location \
-	engine/state_partitioning \
 	domains/abstract_domain domains/simpler_domains
 PLUGIN_DEPENDENCIES:=Callgraph LoopAnalysis RteGen
 

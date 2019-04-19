@@ -33,8 +33,6 @@ module type S = sig
   val call:
     stmt -> lval option -> exp -> exp list -> state ->
     state list or_bottom * Value_types.cacheable
-  val split_final_states:
-    kernel_function -> exp -> Integer.t list -> state list -> state list list
   val check_unspecified_sequence:
     stmt ->
     state -> (stmt * lval list * lval list * lval list * stmt ref list) list ->
@@ -764,31 +762,6 @@ module Make (Abstract: Abstractions.Eva) = struct
     in
     eval, !cacheable
 
-
-  (* ------------------------------------------------------------------------ *)
-  (*                            Function Return                               *)
-  (* ------------------------------------------------------------------------ *)
-
-  let split_final_states kf return_expr expected_values states =
-    let varinfo = match return_expr.enode with
-      | Lval (Var varinfo, NoOffset) -> varinfo
-      | _                            -> assert false (* Cil invariant *)
-    in
-    if Cil.isIntegralOrPointerType varinfo.vtype
-    then
-      let matched, tail =
-        Eval.split_by_evaluation return_expr expected_values states
-      in
-      let process (i, states, mess) =
-        if mess then
-          Value_parameters.result ~once:true ~current:true
-            "%a: cannot properly split on \\result == %a"
-            Kernel_function.pretty kf Abstract_interp.Int.pretty i;
-        states
-      in
-      tail :: List.map process matched
-    else [states]
-
   (* ------------------------------------------------------------------------ *)
   (*                            Unspecified Sequence                          *)
   (* ------------------------------------------------------------------------ *)
@@ -871,7 +844,6 @@ module Make (Abstract: Abstractions.Eva) = struct
       Domain.initialize_variable lval location ~initialized init_value state
     in
     List.fold_left initialize_volatile state vars
-
 end
 
 

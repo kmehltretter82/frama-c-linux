@@ -124,7 +124,7 @@ let () =
   let handler (_signal: int) =
     !prev Sys.sigusr1; (* Call previous signal handler *)
     Value_parameters.warning "Stopping analysis at user request@.";
-    Partitioned_dataflow.signal_abort ()
+    Iterator.signal_abort ()
   in
   try
     match Sys.signal Sys.sigusr1 (Sys.Signal_handle handler) with
@@ -143,8 +143,8 @@ module Make (Abstract: Abstractions.Eva) = struct
   module Init = Initialization.Make (Abstract.Dom) (Abstract.Eval) (Transfer)
 
   module Computer =
-    Partitioned_dataflow.Computer
-      (Abstract.Dom) (PowersetDomain) (Transfer) (Init) (Logic) (Spec)
+    Iterator.Computer
+      (Abstract) (PowersetDomain) (Transfer) (Init) (Logic) (Spec)
 
   let initial_state = Init.initial_state
 

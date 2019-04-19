@@ -20,4 +20,15 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Make : State_partitioning.Partitioning
+open Cil_types
+
+module Make (Kf : sig val kf: kernel_function end) : sig
+  val widening_delay : int
+  val widening_period : int
+  val slevel : stmt -> int
+  val merge : stmt -> bool
+  val unroll : stmt -> Partition.unroll_limit
+  val history_size : int
+  val universal_splits : Partition.action list
+  val flow_actions : stmt -> Partition.action list
+end

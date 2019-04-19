@@ -39,9 +39,6 @@ let check_signals, signal_abort =
 let dkey = Value_parameters.dkey_iterator
 let dkey_callbacks = Value_parameters.dkey_callbacks
 
-let is_return s = match s.skind with Return _ -> true | _ -> false
-let is_loop s =   match s.skind with Loop _ -> true | _ -> false
-
 let blocks_share_locals b1 b2 =
   match b1.blocals, b2.blocals with
   | [], [] -> true
@@ -49,20 +46,24 @@ let blocks_share_locals b1 b2 =
   | _, _ -> false
 
 module Make_Dataflow
-    (Domain : Abstract_domain.External)
-    (States : Powerset.S with type state = Domain.t)
-    (Transfer : Transfer_stmt.S with type state = Domain.t)
-    (Init: Initialization.S with type state := Domain.t)
-    (Logic : Transfer_logic.S with type state = Domain.t
+    (Abstract : Abstractions.Eva)
+    (States : Powerset.S with type state = Abstract.Dom.t)
+    (Transfer : Transfer_stmt.S with type state = Abstract.Dom.t)
+    (Init: Initialization.S with type state := Abstract.Dom.t)
+    (Logic : Transfer_logic.S with type state = Abstract.Dom.t
                                and type states = States.t)
-    (Spec: sig val treat_statement_assigns: assigns -> Domain.t -> Domain.t end)
+    (Spec: sig
+       val treat_statement_assigns: assigns -> Abstract.Dom.t -> Abstract.Dom.t
+     end)
     (AnalysisParam : sig
        val kf: kernel_function
        val call_kinstr: kinstr
-       val initial_state : Domain.t
+       val initial_state : Abstract.Dom.t
      end)
     ()
 = struct
+
+  module Domain = Abstract.Dom
 
   (* --- Analysis parameters --- *)
 
@@ -88,108 +89,25 @@ module Make_Dataflow
   let interpreter_mode =
     Value_parameters.InterpreterMode.get ()
 
-  let slevel (stmt : stmt) : int =
-    if is_return stmt || interpreter_mode then
-      max_int
-    else match Per_stmt_slevel.local kf with
-      | Per_stmt_slevel.Global i -> i
-      | Per_stmt_slevel.PerStmt f -> f stmt
-
-  let merge_after_loop : bool =
-    Kernel_function.Set.mem kf
-      (Value_parameters.SlevelMergeAfterLoop.get ())
-
-  let merge (stmt : stmt) : bool  =
-    is_loop stmt && merge_after_loop
-    ||
-    match Per_stmt_slevel.merge kf with
-    | Per_stmt_slevel.NoMerge -> false
-    | Per_stmt_slevel.Merge f -> f stmt
-
-  let default_loop_unroll : int = Value_parameters.MinLoopUnroll.get ()
-
-  let unroll (stmt : stmt) : int =
-    let local_unroll = match Unroll_annots.get_unroll_terms stmt with
-      | [] ->
-        let is_attribute a = Cil.hasAttribute a stmt.sattr in
-        begin
-          match List.filter is_attribute ["for" ; "while" ; "dowhile"] with
-          | [] -> ()
-          | loop_kind :: _ ->
-            let wkey =
-              if loop_kind = "for"
-              then Value_parameters.wkey_missing_loop_unroll_for
-              else Value_parameters.wkey_missing_loop_unroll
-            in
-            Value_parameters.warning
-              ~wkey ~source:(fst (Cil_datatype.Stmt.loc stmt)) ~once:true
-              "%s loop without unroll annotation" loop_kind
-        end;
-        None
-      | [t] ->
-        (* Inlines the value of const variables in [t]. *)
-        let global_init vi =
-          try (Globals.Vars.find vi).init with Not_found -> None
-        in
-        let t =
-          Cil.visitCilTerm (new Logic_utils.simplify_const_lval global_init) t
-        in
-        begin match Logic_utils.constFoldTermToInt t with
-          | Some n -> Some (Integer.to_int n)
-          | None ->
-            Kernel.warning ~once:true ~current:true
-              "invalid term, not integer: %a"
-              Printer.pp_term t;
-            None
-        end
-      | _ ->
-        Kernel.warning ~once:true ~current:true
-          "ignoring invalid unroll annotation";
-        None
-    in match local_unroll with
-    | Some n -> n
-    | None -> default_loop_unroll
-
-  let slevel_display_step : int =
-    Value_parameters.ShowSlevel.get ()
+  (* Ideally, the slevel parameter should not be used anymore in this file
+     but it is still required for logic interpretation *)
+  let slevel =
+    let module P = Partitioning_parameters.Make (AnalysisParam) in
+    P.slevel
 
 
   (* --- Abstract values storage --- *)
 
-  module Domain = struct
-    include Domain
-
-    let join_list ?(into : t or_bottom = `Bottom) (l : t list) : t or_bottom =
-      List.fold_left
-        (fun acc v -> Bottom.join join acc (`Value v))
-        into l
-  end
-
-  module PartitioningParam = struct
-    type loop = stmt
-    let kf = kf
-    let widening_delay = Value_parameters.WideningDelay.get ()
-    let widening_period = Value_parameters.WideningPeriod.get ()
-    let slevel = slevel
-    let merge = merge
-    let unroll = unroll
-  end
-
-  module type P =
-    State_partitioning.Partition with type state = Domain.t
-                                  and type loop = PartitioningParam.loop
-
-  let partition_module =
-    if descending_iteration = NoIteration
-    then (module Loop_partitioning.Make (Domain) (PartitioningParam) : P)
-    else (module Basic_partitioning.Make (Domain) (PartitioningParam) : P)
-
-  module Partition = (val partition_module: P)
+  module Partition = Trace_partitioning.Make (Abstract) (Transfer) (AnalysisParam)
 
   type store = Partition.store
+  type flow = Partition.flow
+  type tank = Partition.tank
   type widening = Partition.widening
-  type propagation = Partition.propagation
-  type shadow = Partition.shadow
+
+  type edge_info = {
+    mutable fireable : bool (* Does any states survive the transition ? *)
+  }
 
 
   (* --- Interpreted automata --- *)
@@ -225,9 +143,10 @@ module Make_Dataflow
     | `Bottom -> Domain.top (* No analysis in this case. *)
     | `Value state -> state
 
-  let initial_propagation =
-    Partition.initial_propagation (States.to_list initial_states),
-    Partition.empty_shadow ()
+  let initial_tank =
+    Partition.initial_tank (States.to_list initial_states)
+  let get_initial_flow () =
+    -1 (* Dummy edge id *), Partition.drain initial_tank
 
   let post_conditions = ref false
 
@@ -259,7 +178,7 @@ module Make_Dataflow
     VertexTable.create control_point_count
   let w_table : widening VertexTable.t =
     VertexTable.create 7
-  let e_table : (propagation * shadow) EdgeTable.t =
+  let e_table : (tank * edge_info) EdgeTable.t =
     EdgeTable.create transition_count
 
   (* Default (Initial) stores on vertex and edges *)
@@ -267,20 +186,18 @@ module Make_Dataflow
     Partition.empty_store ~stmt:v.vertex_start_of
   let default_vertex_widening (v : vertex) () : widening =
     Partition.empty_widening ~stmt:v.vertex_start_of
-  let default_edge_store () : propagation * shadow =
-    Partition.empty_propagation (), Partition.empty_shadow ()
+  let default_edge_tank () : tank * edge_info =
+    Partition.empty_tank (), { fireable = false }
 
   (* Get the stores associated to a control point or edge *)
   let get_vertex_store (v : vertex) : store =
     VertexTable.find_or_add v_table v ~default:(default_vertex_store v)
   let get_vertex_widening (v : vertex) : widening =
     VertexTable.find_or_add w_table v ~default:(default_vertex_widening v)
-  let get_edge_propagation (e : vertex edge) : propagation * shadow =
-    EdgeTable.find_or_add e_table e ~default:default_edge_store
-  let get_pred_propagations (v : vertex) : (propagation * shadow) list =
-    List.map (fun (_,e,_) -> get_edge_propagation e) (G.pred_e graph v)
-  let get_succ_propagations (v : vertex) : propagation list =
-    List.map (fun (_,e,_) -> fst (get_edge_propagation e)) (G.succ_e graph v)
+  let get_edge_data (e : vertex edge) : tank * edge_info =
+    EdgeTable.find_or_add e_table e ~default:default_edge_tank
+  let get_succ_tanks (v : vertex) : tank list =
+    List.map (fun (_,e,_) -> fst (get_edge_data e)) (G.succ_e graph v)
 
   module StmtTable = struct
     include Cil_datatype.Stmt.Hashtbl
@@ -305,41 +222,54 @@ module Make_Dataflow
 
   type state = Domain.t
 
+  type transfer_function = state -> state list
+
+  let id : transfer_function = fun x -> [x]
+
   (* Thse lifting function helps to uniformize the transfer functions to a
      common signature *)
 
-  let lift (f : state -> state list) : state list -> state list =
-    fun l -> List.fold_left (fun acc x -> (f x) @ acc) [] l
+  let lift (f : state -> state) : transfer_function =
+    fun x -> [f x]
 
-  let lift' (f : state -> state or_bottom) : state list -> state list =
-    fun l -> List.fold_left (fun acc x -> Bottom.add_to_list (f x) acc) [] l
+  let lift' (f : state -> state or_bottom) : transfer_function =
+    fun x -> Bottom.to_list (f x)
+
+  let sequence (f1 : transfer_function) (f2 : transfer_function)
+    : transfer_function =
+    fun x -> List.fold_left (fun acc y -> f2 y @ acc) [] (f1 x)
+
 
   (* Tries to evaluate \assigns … \from … clauses for assembly code. *)
-  let transfer_asm (stmt : stmt) (states : state list) : state list =
+  let transfer_asm (stmt : stmt) : transfer_function =
     let asm_contracts = Annotations.code_annot stmt in
     match Logic_utils.extract_contract asm_contracts with
     | [] ->
       Value_util.warning_once_current
         "assuming assembly code has no effects in function %t"
         Value_util.pretty_current_cfunction_name;
-      states
+      id
     (* There should be only one statement contract, if any. *)
     | (_, spec) :: _ ->
       let assigns = Ast_info.merge_assigns_from_spec ~warn:false spec in
-      List.map (Spec.treat_statement_assigns assigns) states
+      lift (Spec.treat_statement_assigns assigns)
 
   let transfer_assume (stmt : stmt) (exp : exp) (kind : guard_kind)
-      (states : state list) : state list =
+    : transfer_function =
     let positive = (kind = Then) in
-    lift' (fun s -> Transfer.assume s stmt exp positive) states
+    lift' (fun s -> Transfer.assume s stmt exp positive)
 
-  let transfer_enter (block : block) (states : state list) : state list =
+  let transfer_assign (stmt : stmt) (dest : Cil_types.lval) (exp : exp)
+    : transfer_function =
+    lift' (fun s -> Transfer.assign s (Kstmt stmt) dest exp)
+
+  let transfer_enter (block : block) : transfer_function =
     let vars = block_toplevel_locals block in
-    if vars = [] then states else List.map (Transfer.enter_scope kf vars) states
+    if vars = [] then id else lift (Transfer.enter_scope kf vars)
 
-  let transfer_leave (block : block) (states : state list) : state list =
+  let transfer_leave (block : block) : transfer_function =
     let vars = block.blocals in
-    if vars = [] then states else List.map (Domain.leave_scope kf vars) states
+    if vars = [] then id else lift (Domain.leave_scope kf vars)
 
   let transfer_call (stmt : stmt) (dest : lval option) (callee : exp)
       (args : exp list) (state : state) : state list =
@@ -351,8 +281,7 @@ module Make_Dataflow
       cacheable := Value_types.NoCacheCallers;
     Bottom.list_of_bot result
 
-  let transfer_instr (stmt : stmt) (instr : instr) : state list -> state list =
-    let id states = states in
+  let transfer_instr (stmt : stmt) (instr : instr) : transfer_function =
     match instr with
     | Local_init (vi, AssignInit exp, _loc) ->
       let transfer state =
@@ -369,11 +298,11 @@ module Make_Dataflow
         let state = Domain.enter_scope kf [vi] state in
         transfer_call stmt dest callee args state
       in
-      lift (Cil.treat_constructor_as_func as_func vi f args k loc)
+      Cil.treat_constructor_as_func as_func vi f args k loc
     | Set (dest, exp, _loc) ->
-      lift' (fun s -> Transfer.assign s (Kstmt stmt) dest exp)
+      transfer_assign stmt dest exp
     | Call (dest, callee, args, _loc) ->
-      lift (transfer_call stmt dest callee args)
+      transfer_call stmt dest callee args
     | Asm _ ->
       transfer_asm stmt
     | Skip _loc -> id
@@ -381,11 +310,7 @@ module Make_Dataflow
                                    from the annotation table *)
 
   let transfer_return (stmt : stmt) (return_exp : exp option)
-      (states : state list) : state list =
-    (** Join every state in the list and put the result in a singleton. *)
-    let smash (l : state list) : state list =
-      Bottom.to_list (Domain.join_list l)
-    in
+    : transfer_function =
     (* Deconstruct return statement *)
     let return_var = match return_exp with
       | Some {enode = Lval (Var v, NoOffset)} -> Some v
@@ -393,62 +318,46 @@ module Make_Dataflow
       | _ -> assert false (* Cil invariant *)
     in
     (* Check postconditions *)
-    post_conditions := true;
-    let states =
+    let check_postconditions = fun state ->
+      post_conditions := true;
       if Value_util.skip_specifications kf then
-        states
+        [state]
       else match
           Logic.check_fct_postconditions kf active_behaviors Normal
-            ~pre_state:initial_state ~post_states:(States.of_list states)
+            ~pre_state:initial_state ~post_states:(States.singleton state)
             ~result:return_var
         with
         | `Bottom -> []
         | `Value v -> States.to_list v
-    in
-    (* Split strategies *)
-    let states = match Split_return.kf_strategy kf with
-      | Split_strategy.SplitEqList i ->
-        begin match return_exp with
-          | Some return_exp ->
-            let split_states = Transfer.split_final_states kf return_exp i states in
-            let states' = List.map Domain.join_list split_states in
-            Bottom.all states'
-          | None ->
-            smash states
-        end
-      | Split_strategy.NoSplit   -> smash states
-      | Split_strategy.FullSplit -> states
-      (* Last case not possible : already transformed into SplitEqList *)
-      | Split_strategy.SplitAuto -> assert false
-    in
     (* Assign the return value *)
-    match return_exp with
-    | None ->
-      states
-    | Some return_exp ->
-      let vi_ret = Extlib.the (Library_functions.get_retres_vi kf) in
-      let return_lval = Var vi_ret, NoOffset in
-      let transfer state =
-        let state = Domain.enter_scope kf [vi_ret] state in
-        Transfer.assign state (Kstmt stmt) return_lval return_exp
-      in
-      lift' transfer states
+    and assign_retval =
+      match return_exp with
+      | None -> id
+      | Some return_exp ->
+        let vi_ret = Extlib.the (Library_functions.get_retres_vi kf) in
+        let return_lval = Var vi_ret, NoOffset in
+        let kstmt = Kstmt stmt in
+        fun state ->
+          let state = Domain.enter_scope kf [vi_ret] state in
+          let state' = Transfer.assign state kstmt return_lval return_exp in
+          Bottom.to_list state'
+    in
+    sequence check_postconditions assign_retval
 
-  let transfer_transition (t : vertex transition) (states : state list) : state list =
+  let transfer_transition (t : vertex transition) : transfer_function =
     match t with
-    | Skip ->                     states
-    | Return (return_exp,stmt) -> transfer_return stmt return_exp states
-    | Guard (exp,kind,stmt) ->    transfer_assume stmt exp kind states
-    | Instr (instr,stmt) ->       transfer_instr stmt instr states
-    | Enter (block) ->            transfer_enter block states
+    | Skip ->                     id
+    | Return (return_exp,stmt) -> transfer_return stmt return_exp
+    | Guard (exp,kind,stmt) ->    transfer_assume stmt exp kind
+    | Instr (instr,stmt) ->       transfer_instr stmt instr
+    | Enter (block) ->            transfer_enter block
     | Leave (block) when blocks_share_locals fundec.sbody block ->
       (* The variables from the toplevel block will be removed by the caller *)
-      states
-    | Leave (block) ->            transfer_leave block states
-    | Prop _ -> states (* Annotations are interpreted in [transfer_statement]. *)
+      id
+    | Leave (block) ->            transfer_leave block
+    | Prop _ -> id (* Annotations are interpreted in [transfer_statement]. *)
 
-  let transfer_statement_annot (stmt : stmt) ~(record : bool)
-      (states : state list) : state list =
+  let transfer_annotations (stmt : stmt) ~(record : bool) : transfer_function =
     let annots =
       (* We do not interpret annotations that come from statement contracts
          and everything previously emitted by Value (currently, alarms) *)
@@ -457,29 +366,19 @@ module Make_Dataflow
       in
       List.map fst (Annotations.code_annot_emitter ~filter stmt)
     in
-    let interp_annot states ca =
-      Logic.interp_annot
-        ~limit:(slevel stmt) ~record
-        kf active_behaviors stmt ca
-        ~initial_state states
-    in
-    States.to_list (List.fold_left interp_annot (States.of_list states) annots)
+    fun state ->
+      let interp_annot states ca =
+        Logic.interp_annot
+          ~limit:(slevel stmt) ~record
+          kf active_behaviors stmt ca
+          ~initial_state states
+      in
+      States.to_list
+        (List.fold_left interp_annot (States.singleton state) annots)
 
-  let get_cvalue = Domain.get Cvalue_domain.key
-  let gather_cvalues states =
-    match get_cvalue with
-    | Some get -> List.map get states
-    | None -> []
-
-  let transfer_statement (stmt : stmt) (states : state list) : state list =
-    current_ki := Kstmt stmt;
-    (* Apply callback *)
-    (* TODO: apply on all domains. *)
-    let cvalue_states = gather_cvalues states in
-    Db.Value.Compute_Statement_Callbacks.apply
-      (stmt, Value_util.call_stack (), cvalue_states);
+  let transfer_statement (stmt : stmt) (state : state) : state list =
     (* Interpret annotations *)
-    let states = transfer_statement_annot stmt ~record:true states in
+    let states = transfer_annotations stmt ~record:true state in
     (* Check unspecified sequences *)
     match stmt.skind with
     | UnspecifiedSequence seq when Kernel.UnspecifiedAccess.get () ->
@@ -492,138 +391,143 @@ module Make_Dataflow
 
   (* --- Iteration strategy ---*)
 
-  let output_slevel : int -> unit =
-    let max_displayed = ref 0 in
-    fun x ->
-      if x >= !max_displayed + slevel_display_step
-      then begin
-        let rounded = x / slevel_display_step * slevel_display_step in
-        Value_parameters.feedback ~once:true
-          "Semantic level unrolling superposing up to %d states"
-          rounded;
-        max_displayed := rounded;
-      end
-
-  let process_loop_transitions (v1 : vertex) (v2 : vertex) (p : propagation)
-    : unit =
+  let process_partitioning_transitions (v1 : vertex) (v2 : vertex)
+      (transition : vertex transition) (flow : flow) : flow =
+    (* Split return *)
+    let flow = match transition with
+      | Return (return_exp, _) -> Partition.split_return flow return_exp
+      | _ -> flow
+    in
+    (* Loop transitions *)
     let the_stmt v = Extlib.the v.vertex_start_of in
-    let enter_loop v =
-      Partition.transfer (List.map (Domain.enter_loop (the_stmt v))) p;
-      Partition.enter_loop p (the_stmt v)
-    and leave_loop v =
-      Partition.transfer (List.map (Domain.leave_loop (the_stmt v))) p;
-      Partition.leave_loop p (the_stmt v)
-    and incr_loop_counter v =
-      Partition.transfer (List.map (Domain.incr_loop_counter (the_stmt v))) p;
-      Partition.next_loop_iteration p (the_stmt v)
+    let enter_loop f v =
+      let f = Partition.enter_loop f (the_stmt v) in
+      Partition.transfer (lift (Domain.enter_loop (the_stmt v))) f
+    and leave_loop f v =
+      let f = Partition.leave_loop f (the_stmt v) in
+      Partition.transfer (lift (Domain.leave_loop (the_stmt v))) f
+    and incr_loop_counter f v =
+      let f = Partition.next_loop_iteration f (the_stmt v) in
+      Partition.transfer (lift (Domain.incr_loop_counter (the_stmt v))) f
     in
     let loops_left, loops_entered =
       Interpreted_automata.get_wto_index_diff kf v1 v2
     and loop_incr =
       Interpreted_automata.is_back_edge kf (v1,v2)
     in
-    List.iter leave_loop loops_left;
-    List.iter enter_loop loops_entered;
-    if loop_incr then
-      incr_loop_counter v2
+    let flow = List.fold_left leave_loop flow loops_left in
+    let flow = List.fold_left enter_loop flow loops_entered in
+    if loop_incr then incr_loop_counter flow v2 else flow
 
-  let process_edge (v1,e,v2 : G.edge) : unit =
+  let process_edge (v1,e,v2 : G.edge) : flow =
     let {edge_transition=transition; edge_kinstr=kinstr} = e in
-    let propagation,_shadow = get_edge_propagation e in
+    let tank,edge_info = get_edge_data e in
+    let flow = Partition.drain tank in
     !Db.progress ();
     check_signals ();
     current_ki := kinstr;
     Cil.CurrentLoc.set e.edge_loc;
-    Partition.transfer (transfer_transition transition) propagation;
-    process_loop_transitions v1 v2 propagation
+    let flow = Partition.transfer (transfer_transition transition) flow in
+    let flow = process_partitioning_transitions v1 v2 transition flow in
+    if not (Partition.is_empty_flow flow) then
+      edge_info.fireable <- true;
+    flow
 
-  let update_vertex ?(widening : bool = false) (v : vertex) : bool =
-    (* Set location if possible *)
-    Extlib.may
-      (fun stmt -> Cil.CurrentLoc.set (Cil_datatype.Stmt.loc stmt))
-      v.vertex_start_of;
+  let get_cvalue = Domain.get Cvalue_domain.key
+  let gather_cvalues states =
+    match get_cvalue with
+    | Some get -> List.map get states
+    | None -> []
+
+  let call_statement_callbacks (stmt : stmt) (f : flow) : unit =
+    (* TODO: apply on all domains. *)
+    let states = Partition.contents f in
+    let cvalue_states = gather_cvalues states in
+    Db.Value.Compute_Statement_Callbacks.apply
+      (stmt, Value_util.call_stack (), cvalue_states)
+
+  let update_vertex ?(widening : bool = false) (v : vertex)
+      (sources : ('branch * flow) list) : bool =
+    begin match v.vertex_start_of with
+      | Some stmt ->
+        (* Set location *)
+        current_ki := Kstmt stmt;
+        let current_loc = Cil_datatype.Stmt.loc stmt in
+        Cil.CurrentLoc.set current_loc
+      | None -> ()
+    end;
     (* Get vertex store *)
     let store = get_vertex_store v in
     (* Join incoming s tates *)
-    let sources = get_pred_propagations v in
-    let sources =
-      if v == automaton.entry_point
-      then initial_propagation :: sources
-      else sources
-    in
-    let p = Partition.join sources store in
-    (* Output slevel related things *)
-    let store_size = Partition.store_size store in
-    begin match v.vertex_start_of with
+    let flow = Partition.join sources store in
+    let flow =
+      match v.vertex_start_of with
       | Some stmt ->
-        Value_parameters.debug ~dkey ~current:true
-          "reached statement %d with %d / %d eternal states, %d to propagate"
-          stmt.sid store_size (slevel stmt) (Partition.propagation_size p)
-      | _ -> ()
-    end;
-    output_slevel store_size;
-    (* Transfer function associated to the statement *)
-    Extlib.may
-      (fun stmt -> Partition.transfer (transfer_statement stmt) p)
-      v.vertex_start_of;
+        (* Callbacks *)
+        call_statement_callbacks stmt flow;
+        (* Transfer function associated to the statement *)
+        Partition.transfer (transfer_statement stmt) flow
+      | _ -> flow
+    in
     (* Widen if necessary *)
-    let stable =
-      if Partition.is_empty_propagation p then
-        true
-      else if widening then begin
-        let stable = Partition.widen store (get_vertex_widening v) p in
+    let flow =
+      if widening && not (Partition.is_empty_flow flow) then begin
+        let flow = Partition.widen (get_vertex_widening v) flow in
         (* Try to correct over-widenings *)
         let correct_over_widening stmt =
           (* Do *not* record the status after interpreting the annotation
              here. Possible unproven assertions have already been recorded
              when the assertion has been interpreted the first time higher
              in this function. *)
-          Partition.transfer (transfer_statement_annot stmt ~record:false) p
+          Partition.transfer (transfer_annotations stmt ~record:false) flow
         in
-        Extlib.may correct_over_widening v.vertex_start_of;
-        stable
+        Extlib.may_map correct_over_widening ~dft:flow v.vertex_start_of
       end else
-        false
+        flow
     in
-    (* Reset sources *)
-    List.iter (fun (p,_) -> Partition.clear_propagation p) sources;
     (* Dispatch to successors *)
-    List.iter (fun p2 -> Partition.merge p ~into:p2) (get_succ_propagations v);
-    (* Return wether the iterator should stop or not *)
-    stable
+    List.iter (fun into -> Partition.fill flow ~into) (get_succ_tanks v);
+    (* Return whether the iterator should stop or not *)
+    Partition.is_empty_flow flow
 
   let process_vertex ?(widening : bool = false) (v : vertex) : bool =
     (* Process predecessors *)
-    G.iter_pred_e process_edge graph v;
+    let process_source (_,e,_ as edge) =
+      e.edge_key, process_edge edge
+    in
+    let sources = List.map process_source (G.pred_e graph v) in
+    (* Add initial source *)
+    let sources =
+      if v <> automaton.entry_point
+      then sources
+      else get_initial_flow () :: sources
+    in
     (* Update the vertex *)
-    update_vertex ~widening v
+    update_vertex ~widening v sources
 
-  let rec simulate (v : vertex) : unit =
+  let rec simulate (v : vertex) (source : 'branch * flow) : unit =
     (* Update the current vertex *)
-    ignore (update_vertex v);
+    ignore (update_vertex v [source]);
     (* Try every possible successor *)
-    G.iter_succ_e process_edge graph v;
-    (* Find which edges were fireable *)
-    let add_if_fireable (_,e,succ) acc =
-      let p = fst (get_edge_propagation e) in
-      if Partition.is_empty_propagation p
-      then (Partition.clear_propagation p; acc)
-      else succ :: acc
+    let add_if_fireable (_,e,succ as edge) acc =
+      let f = process_edge edge in
+      if Partition.is_empty_flow f
+      then acc
+      else (e.edge_key,f,succ) :: acc
     in
     let successors = G.fold_succ_e add_if_fireable graph v [] in
     (* How many possible successors ? *)
     match successors with
     | [] -> () (* No successor - end of simulation *)
-    | [succ] -> (* One successor - continue simulation *)
-      simulate succ
+    | [b,f,succ] -> (* One successor - continue simulation *)
+      simulate succ (b,f)
     | _ -> (* Several successors - failure *)
       Value_parameters.abort "Do not know which branch to take. Stopping."
 
   let reset_component (vertex_list : vertex list) : unit =
     let reset_edge (_,e,_) =
-      let p,s = get_edge_propagation e in
-      Partition.reset_propagation p;
-      Partition.reset_shadow s;
+      let t,_ = get_edge_data e in
+      Partition.reset_tank t
     in
     let reset_vertex v =
       let s = get_vertex_store v
@@ -675,8 +579,8 @@ module Make_Dataflow
      relevant.*)
   let mark_degeneration () =
     let f stmt (v,_) =
-      let l = get_succ_propagations v in
-      if not (List.for_all Partition.is_empty_propagation l) then
+      let l = get_succ_tanks v in
+      if not (List.for_all Partition.is_empty_tank l) then
         Value_util.DegenerationPoints.replace stmt false
     in
     StmtTable.iter f automaton.stmt_table;
@@ -694,7 +598,7 @@ module Make_Dataflow
 
   let compute () : state list or_bottom =
     if interpreter_mode then
-      simulate automaton.entry_point
+      simulate automaton.entry_point (get_initial_flow ())
     else begin
       let wto = Interpreted_automata.get_wto kf in
       iterate_list wto
@@ -715,12 +619,12 @@ module Make_Dataflow
           | Then -> Db.Value.mask_then
           | Else -> Db.Value.mask_else
         in
-        let shadow = snd (get_edge_propagation e) in
+        let edge_info = snd (get_edge_data e) in
         let old_status =
           try StmtTable.find table stmt
           with Not_found -> 0
         and status =
-          if Partition.is_empty_shadow shadow then 0 else mask
+          if edge_info.fireable then mask else 0
         in
         let new_status = old_status lor status in
         StmtTable.replace table stmt new_status;
@@ -844,20 +748,21 @@ end
 
 
 module Computer
-    (Domain : Abstract_domain.External)
-    (States : Powerset.S with type state = Domain.t)
-    (Transfer : Transfer_stmt.S with type state = Domain.t
-                                 and type value = Domain.value)
-    (Init: Initialization.S with type state := Domain.state)
-    (Logic : Transfer_logic.S with type state = Domain.t
+    (Abstract : Abstractions.Eva)
+    (States : Powerset.S with type state = Abstract.Dom.t)
+    (Transfer : Transfer_stmt.S with type state = Abstract.Dom.t)
+    (Init: Initialization.S with type state := Abstract.Dom.t)
+    (Logic : Transfer_logic.S with type state = Abstract.Dom.t
                                and type states = States.t)
-    (Spec: sig val treat_statement_assigns: assigns -> Domain.t -> Domain.t end)
+    (Spec: sig
+       val treat_statement_assigns: assigns -> Abstract.Dom.t -> Abstract.Dom.t
+     end)
 = struct
 
   let compute kf call_kinstr state =
     let module Dataflow =
       Make_Dataflow
-        (Domain) (States) (Transfer) (Init) (Logic) (Spec)
+        (Abstract) (States) (Transfer) (Init) (Logic) (Spec)
         (struct
           let kf = kf
           let call_kinstr = call_kinstr
