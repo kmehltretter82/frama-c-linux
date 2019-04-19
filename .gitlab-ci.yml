@@ -9,7 +9,7 @@ git-update:
   stage: git-update
   variables:
     CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
+    DEFAULT: "stable/potassium"
     OCAML: "4_05"
     FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
@@ -21,7 +21,7 @@ frama-c:
   stage: build
   variables:
     CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
+    DEFAULT: "stable/potassium"
     OCAML: "4_05"
     FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
@@ -33,7 +33,7 @@ lint:
   stage: build
   variables:
     CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
+    DEFAULT: "stable/potassium"
     OCAML: "4_05"
     FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
@@ -46,7 +46,7 @@ tests:
   stage: tests
   variables:
     CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
+    DEFAULT: "stable/potassium"
     OCAML: "4_05"
     FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
@@ -58,7 +58,7 @@ wp-qualif:
   stage: tests
   variables:
     CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
+    DEFAULT: "stable/potassium"
     OCAML: "4_05"
     FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
@@ -71,7 +71,7 @@ genassigns:
   stage: tests
   variables:
     CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
+    DEFAULT: "stable/potassium"
     OCAML: "4_05"
     FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
@@ -83,7 +83,7 @@ counter-examples:
   stage: tests
   variables:
     CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
+    DEFAULT: "stable/potassium"
     OCAML: "4_05"
     FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
@@ -95,7 +95,7 @@ acsl-importer:
   stage: tests
   variables:
     CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
+    DEFAULT: "stable/potassium"
     OCAML: "4_05"
     FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
@@ -107,7 +107,7 @@ volatile:
   stage: tests
   variables:
     CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
+    DEFAULT: "stable/potassium"
     OCAML: "4_05"
     FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
@@ -119,7 +119,7 @@ E-ACSL:
   stage: tests
   variables:
     CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
+    DEFAULT: "stable/potassium"
     OCAML: "4_05"
     FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
@@ -131,7 +131,7 @@ Security:
   stage: tests
   variables:
     CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
+    DEFAULT: "stable/potassium"
     OCAML: "4_05"
     FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
@@ -143,7 +143,7 @@ CFP:
   stage: tests
   variables:
     CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
+    DEFAULT: "stable/potassium"
     OCAML: "4_05"
     FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
@@ -155,7 +155,7 @@ build-distrib-tarball:
   stage: build
   variables:
     CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
+    DEFAULT: "stable/potassium"
     OCAML: "4_05"
     FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
@@ -167,7 +167,7 @@ build-from-distrib-tarball:
   stage: tests
   variables:
     CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
+    DEFAULT: "stable/potassium"
     OCAML: "4_05"
     FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
@@ -179,7 +179,7 @@ internal:
   stage: distrib_and_compatibility
   variables:
     CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
+    DEFAULT: "stable/potassium"
     OCAML: "4_05"
     FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
@@ -198,7 +198,7 @@ internal:
 frama-c-ocaml-4.02:
   variables:
     CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
+    DEFAULT: "stable/potassium"
     OCAML: "4_02"
     FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   <<: *frama-c-ocaml
@@ -206,7 +206,7 @@ frama-c-ocaml-4.02:
 frama-c-ocaml-4.03:
   variables:
     CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
+    DEFAULT: "stable/potassium"
     OCAML: "4_03"
     FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   <<: *frama-c-ocaml
@@ -214,7 +214,7 @@ frama-c-ocaml-4.03:
 frama-c-ocaml-4.04:
   variables:
     CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
+    DEFAULT: "stable/potassium"
     OCAML: "4_04"
     FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   <<: *frama-c-ocaml
@@ -222,7 +222,7 @@ frama-c-ocaml-4.04:
 frama-c-ocaml-4.06:
   variables:
     CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
+    DEFAULT: "stable/potassium"
     OCAML: "4_06"
     FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   <<: *frama-c-ocaml
@@ -230,7 +230,7 @@ frama-c-ocaml-4.06:
 frama-c-ocaml-4.07:
   variables:
     CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
+    DEFAULT: "stable/potassium"
     OCAML: "4_07"
     FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   <<: *frama-c-ocaml
@@ -239,7 +239,7 @@ caveat-importer:
   stage: tests
   variables:
     CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
+    DEFAULT: "stable/potassium"
     OCAML: "4_05"
     FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
@@ -251,7 +251,7 @@ mthread:
   stage: tests
   variables:
     CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
+    DEFAULT: "stable/potassium"
     OCAML: "4_05"
     FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
@@ -263,7 +263,7 @@ pathcrawler:
   stage: tests
   variables:
     CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
+    DEFAULT: "stable/potassium"
     OCAML: "4_05"
     FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
