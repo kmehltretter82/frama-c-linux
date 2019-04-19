@@ -1799,6 +1799,7 @@ src/plugins/wp/share/coqwp/Cfloat.v: CEA_WP
 src/plugins/wp/share/coqwp/Cint.v: CEA_WP
 src/plugins/wp/share/coqwp/Cmath.v: CEA_WP
 src/plugins/wp/share/coqwp/ExpLog.v: CEA_WP
+src/plugins/wp/share/coqwp/HighOrd.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/Memory.v: CEA_WP
 src/plugins/wp/share/coqwp/Qed.v: CEA_WP
 src/plugins/wp/share/coqwp/Qedlib.v: CEA_WP
@@ -1809,8 +1810,10 @@ src/plugins/wp/share/coqwp/Zbits.v: CEA_WP
 src/plugins/wp/share/coqwp/bool/Bool.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/int/Abs.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/int/ComputerDivision.v: UNMODIFIED_WHY3
+src/plugins/wp/share/coqwp/int/Exponentiation.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/int/Int.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/int/MinMax.v: UNMODIFIED_WHY3
+src/plugins/wp/share/coqwp/int/Power.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/map/Map.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/map/Const.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/real/Abs.v: UNMODIFIED_WHY3
