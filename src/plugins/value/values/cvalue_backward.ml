@@ -313,7 +313,8 @@ let backward_unop ~typ_arg op ~arg:_ ~res =
     try
       let v = V.project_ival res in
       if Cil.isIntegralType typ_arg then
-        Some (V.inject_ival (Ival.neg_int v))
+        let v = V.inject_ival (Ival.neg_int v) in
+        Some (Cvalue_forward.reinterpret typ_arg v)
       else begin
         assert (Cil.isFloatingType typ_arg);
         let f = Ival.project_float v in
