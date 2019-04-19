@@ -64,7 +64,7 @@ if test "$ENABLE_WP" != "no"; then
     if test "$COQC" = "yes" ; then
       COQVERSION=`coqc -v | sed -n -e 's|.*version* *\([[^ ]]*\) .*$|\1|p' `
       case $COQVERSION in
-        8.5*|8.6*|8.7*|trunk)
+        8.8*|8.9*|trunk)
           AC_MSG_RESULT(coqc version $COQVERSION found)
           ;;
         *) 
@@ -73,7 +73,7 @@ if test "$ENABLE_WP" != "no"; then
           ;;
       esac
     else
-      AC_MSG_NOTICE(rerun configure to make wp using coq 8.5+)
+      AC_MSG_NOTICE(rerun configure to make wp using coq 8.8+)
     fi
   else
     COQC="no"
@@ -86,7 +86,7 @@ if test "$ENABLE_WP" != "no"; then
     if test "$WHY3COQC" = "yes" ; then
       WHY3VERSION=`why3 --version | sed -n -e 's|.*version *\([[^ ]]*\)$|\1|p' `
       case $WHY3VERSION in
-        0.88*)
+        1.*)
           AC_MSG_RESULT(why3 version $WHY3VERSION found)
 	  WHY3LIB=`why3 --print-libdir`
 	  if test -f $WHY3LIB/coq/BuiltIn.vo ; then
@@ -102,7 +102,7 @@ if test "$ENABLE_WP" != "no"; then
           ;;
       esac
     else
-      AC_MSG_NOTICE(rerun configure to make wp using why3 0.88)
+      AC_MSG_NOTICE(rerun configure to make wp using why3 (1.0.0+))
     fi
   else
     WHY3COQC="no"
