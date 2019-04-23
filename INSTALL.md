@@ -168,13 +168,12 @@ We recommend to rely on it for the installation of Frama-C.
 
     ```shell
     brew install graphviz
-    opam install why3
     ```
 
 4. Install *optional* dependencies for Frama-C/WP:
 
     ```shell
-    opam install coq coqide
+    opam install coq coqide why3 why3-coq
     ```
 
 5. Install Frama-C:
