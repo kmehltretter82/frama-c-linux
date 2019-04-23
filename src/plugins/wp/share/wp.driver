@@ -22,6 +22,7 @@
 
 library qed:
 coq.file += "coqwp/BuiltIn.v";
+coq.file += "coqwp/HighOrd.v";
 coq.file += "coqwp:int/Int.v";
 coq.file += "coqwp:int/Abs.v";
 coq.file += "coqwp:int/ComputerDivision.v";
