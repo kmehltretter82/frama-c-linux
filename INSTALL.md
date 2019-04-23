@@ -81,18 +81,16 @@ The following set of packages is known to be a working configuration for
 Frama-C 18 (Argon):
 
 - OCaml 4.05.0
-- alt-ergo.2.0.0 (pin recommanded)
+- alt-ergo-free.2.0.0 (optional)
 - apron.20160125 (optional)
-- coq.8.9.0 (optional; pin recommended)
+- coq.8.9.0 (optional)
 - lablgtk.2.18.5
 - mlgmpidl.1.2.7 (optional)
 - ocamlgraph.1.8.8
-- why3.1.2.0
+- why3.1.2.0 (optional)
+- why3-coq.1.2.0 (optional)
 - yojson.1.4.1
 - zarith.1.7
-
-Note: *pin recommended* indicates packages likely to become incompatible in
-      future releases; `opam pin` is recommended to prevent them from breaking.
 
 ### Installing Custom Versions of Frama-C via opam
 
