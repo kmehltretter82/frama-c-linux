@@ -244,3 +244,21 @@ module UnrollUnnatural : sig
     automaton -> wto -> Compute.wto_index_table -> G.t
 
 end
+
+
+(* Dataflow computation *)
+
+module type Domain =
+sig
+  type t
+
+  val join : t -> t -> t
+  val widen : t -> t -> t option (* returns None when inclusion *)
+  val transfer : vertex transition ->  t -> t option
+end
+
+module Dataflow (D : Domain) :
+sig
+  val fixpoint : Cil_types.kernel_function -> D.t -> D.t Vertex.Hashtbl.t
+end
+
