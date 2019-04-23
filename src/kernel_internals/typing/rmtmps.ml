@@ -819,7 +819,8 @@ let removeUnmarked isRoot ast reachable_tbl =
          Keep variables that were already present in the code.
       *)
       let filterLocal local =
-        if local.vtemp && not (is_reachable reachable_tbl (Var local)) then
+        if (local.vtemp || local.vstorage = Static) &&
+           not (is_reachable reachable_tbl (Var local)) then
           begin
             (* along the way, record the interesting locals that were removed *)
             let name = local.vname in
@@ -834,6 +835,7 @@ let removeUnmarked isRoot ast reachable_tbl =
         inherit Cil.nopCilVisitor
         method! vblock b =
           b.blocals <- List.filter filterLocal b.blocals;
+          b.bstatics <- List.filter filterLocal b.bstatics;
           DoChildren
       end
       in
