@@ -29,21 +29,27 @@ plug-in with the load and save commands of \textsf{Frama-C} and/or the
 %-----------------------------------------------------------------------------
 
 The \textsf{WP} plug-in requires external provers to work.
-The natively supported provers are:
+The recommended versions for external provers are:
 \begin{center}
   \begin{tabular}{crlc}
-    Prover & Version & Download &\\
+    Prover & Versions & Download &\\
     \hline
-    \textsf{Alt-Ergo} & \verb|1.0.0+| and \verb|2.0.0+| &
+    \textsf{Alt-Ergo} & \verb|2.0.0|  &
     \url{http://alt-ergo.ocamlpro.com} & \cite{AltErgo2006}\\
-    \textsf{Coq} & \verb|8.9|, \verb|8.8| &
+    \textsf{Coq} & \verb|8.9.0| &
     \url{http://coq.inria.fr} & \cite{Coq84}\\
-    \textsf{Why3} & \verb|1.1.0+| &
+    \textsf{Why3} & \verb|1.2.0| &
     \url{http://why3.lri.fr} & \cite{Why3}\\
   \end{tabular}
 \end{center}
 
 Recent \textsf{OPAM}-provided versions should work smoothly.
+Other versions might be supported as well, typically, as far as we know:
+\begin{itemize}
+\item \textsf{Alt-Ergo} \verb+2.2.0+ and \verb+2.3.0+, although distributed under a non-commercial licence.
+\item \textsf{Coq} \verb+8.7.2+ and \verb+8.8.2+, although proof scripts compatibility can be an issue.
+\item \textsf{Why3} \verb+1.0.0+ and \verb+1.1.1+, although only \verb+1.2.0+ is provided with Coq support.
+\end{itemize}
 
 Other provers, like \textsf{Gappa}, \textsf{Z3}, \textsf{CVC3},
 \textsf{CVC4}, \textsf{PVS}, and many others, are accessible from
@@ -64,7 +70,7 @@ turned on/off at configure time, typically:
 \end{logs}
 
 \paragraph{Compilation.} If you want to compile the \textsf{Coq} and \textsf{Why-3}
-libraries manually, you can still run:
+libraries manually, you can still run the following commands:
 \begin{logs}
 # make wp-coq wp-why3
 # [sudo] make wp-coq-install
