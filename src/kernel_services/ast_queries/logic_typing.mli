@@ -291,8 +291,14 @@ sig
   val type_of_field:
     location -> string -> logic_type -> (term_offset * logic_type)
 
-  (** @since Nitrogen-20111001 *)
-  val mk_cast: Cil_types.term -> Cil_types.logic_type -> Cil_types.term
+  (**
+     @param explicit true if the cast is present in original source.
+            defaults to false
+     @since Nitrogen-20111001
+     @modify Frama-C+dev introduces explicit param
+  *)
+  val mk_cast:
+    ?explicit:bool -> Cil_types.term -> Cil_types.logic_type -> Cil_types.term
 
   (** type-checks a term. *)
   val term : Lenv.t -> Logic_ptree.lexpr -> term
