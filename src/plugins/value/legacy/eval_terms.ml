@@ -604,6 +604,19 @@ let cast ~src_typ ~dst_typ v =
     | TSFloat fkind, TSFloat _ ->
       Cvalue.V.cast_float_to_float (Fval.kind fkind) v
 
+(* V.cast_int_to_int is unsound when the destination type is _Bool.
+   Use this function instead. *)
+let cast_to_bool r =
+  let contains_zero = V.contains_zero r.eover
+  and contains_non_zero = V.contains_non_zero r.eover in
+  let eover = V.interp_boolean ~contains_zero ~contains_non_zero in
+  { eover; eunder = under_from_over eover;
+    ldeps = r.ldeps; etype = TInt (IBool, []) }
+
+let is_bool typ = match Cil.unrollType typ with
+  | TInt (IBool, _) -> true
+  | _ -> false
+
 (* -------------------------------------------------------------------------- *)
 (* --- Inlining of defined logic functions and predicates                 --- *)
 (* -------------------------------------------------------------------------- *)
@@ -835,15 +848,14 @@ let rec eval_term ~alarm_mode env t =
 
   | TCastE (typ, t) ->
     let r = eval_term ~alarm_mode env t in
-    let eover, eunder =
-      (* See if the cast does something. If not, we can keep eunder as is.*)
-      if is_noop_cast ~src_typ:t.term_type ~dst_typ:typ
-      then r.eover, r.eunder
-      else
-        let eover = cast ~src_typ:r.etype ~dst_typ:typ r.eover in
-        eover, under_from_over eover
-    in
-    { etype = typ; ldeps = r.ldeps; eunder; eover }
+    (* See if the cast does something. If not, we can keep eunder as is.*)
+    if is_noop_cast ~src_typ:t.term_type ~dst_typ:typ
+    then { r with etype = typ }
+    else if is_bool typ
+    then cast_to_bool r
+    else
+      let eover = cast ~src_typ:r.etype ~dst_typ:typ r.eover in
+      { etype = typ; ldeps = r.ldeps; eunder = under_from_over eover; eover }
 
   | Tif (tcond, ttrue, tfalse) ->
     eval_tif eval_term Cvalue.V.join Cvalue.V.meet ~alarm_mode env
