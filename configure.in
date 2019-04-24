@@ -436,7 +436,7 @@ else
     PLATFORM=Cygwin
     EXE=.exe
   else
-    if test -x "/Applications/Mail.app"; then
+    if test $(uname -s) = "Darwin"; then
       AC_MSG_RESULT(MacOS)
       PLATFORM=MacOS
     else
