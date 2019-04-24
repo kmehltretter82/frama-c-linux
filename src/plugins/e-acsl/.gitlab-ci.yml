@@ -3,15 +3,16 @@ stages:
  - build
  - tests
 
+variables:
+    CURRENT: $CI_COMMIT_REF_NAME
+    DEFAULT: "stable/potassium"
+    OCAML: "4_05"
+    FRAMA_CI_OPT: "--override e-acsl:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
+
 
 #avoid a nix error https://github.com/NixOS/nix/issues/2087
 git-update:
   stage: git-update
-  variables:
-    CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
-    OCAML: "4_05"
-    FRAMA_CI_OPT: "--override e-acsl:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
    - nix/frama-ci.sh instantiate --eval -A e-acsl.src.outPath
   tags:
@@ -19,11 +20,6 @@ git-update:
 
 E-ACSL:
   stage: build
-  variables:
-    CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
-    OCAML: "4_05"
-    FRAMA_CI_OPT: "--override e-acsl:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
    - nix/frama-ci.sh build -A e-acsl.installed
   tags:
@@ -31,11 +27,6 @@ E-ACSL:
 
 CheckHeaders:
   stage: build
-  variables:
-    CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
-    OCAML: "4_05"
-    FRAMA_CI_OPT: "--override genassigns:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
    - nix/frama-ci.sh build -A genassigns.checkHeaders
   tags:
@@ -43,11 +34,6 @@ CheckHeaders:
 
 Tests:
   stage: tests
-  variables:
-    CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
-    OCAML: "4_05"
-    FRAMA_CI_OPT: "--override e-acsl:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
    - nix/frama-ci.sh build -A e-acsl.tests
   tags:
@@ -55,11 +41,6 @@ Tests:
 
 Cfp:
   stage: tests
-  variables:
-    CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
-    OCAML: "4_05"
-    FRAMA_CI_OPT: "--override e-acsl:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
    - nix/frama-ci.sh build -A context-from-precondition.tests
   tags:
@@ -67,11 +48,6 @@ Cfp:
 
 Security:
   stage: tests
-  variables:
-    CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
-    OCAML: "4_05"
-    FRAMA_CI_OPT: "--override e-acsl:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
    - nix/frama-ci.sh build -A security.tests
   tags:
