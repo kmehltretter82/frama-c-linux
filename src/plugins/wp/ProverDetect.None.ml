@@ -1,4 +1,3 @@
-# 1 "src/plugins/wp/ProverDetect.None.ml"
 (**************************************************************************)
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
@@ -20,6 +19,8 @@
 (*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
 (*                                                                        *)
 (**************************************************************************)
+
+# 23 "src/plugins/wp/ProverDetect.None.ml"
 
 (* -------------------------------------------------------------------------- *)
 (* --- Prover Detection (no why3)                                         --- *)

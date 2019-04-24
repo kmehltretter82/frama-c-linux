@@ -1,4 +1,3 @@
-# 1 "src/plugins/wp/ProverDetect.Why3.ml"
 (**************************************************************************)
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
@@ -20,6 +19,8 @@
 (*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
 (*                                                                        *)
 (**************************************************************************)
+
+# 23 "src/plugins/wp/ProverDetect.Why3.ml"
 
 (* -------------------------------------------------------------------------- *)
 (* --- Why3 Prover Detection                                              --- *)
@@ -53,7 +54,7 @@ let detect () =
            dp_version = dp.prover_version ;
            dp_altern = dp.prover_altern ;
            dp_shortcuts = List.rev keys ;
-       } :: dps
+         } :: dps
       ) !index []
   in List.rev dps
 
