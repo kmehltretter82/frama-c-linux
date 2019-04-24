@@ -843,17 +843,29 @@ let () = Cmdline.run_after_setting_files
 
 let do_prover_detect () =
   if not !Config.is_gui && Wp_parameters.Detect.get () then
-    ProverWhy3.detect_why3
-      begin function
-        | None -> Wp_parameters.error ~current:false "Why3 not found"
-        | Some dps ->
-            List.iter
-              (fun dp ->
-                 let open ProverWhy3 in
-                 Wp_parameters.result "Prover %10s %-10s [%s]"
-                   dp.dp_name dp.dp_version dp.dp_prover
-              ) dps
-      end
+    begin
+      let open ProverDetect in
+      let dps = detect () in
+      let pp_altern fmt a = if a<>"" then Format.fprintf fmt " (%s)" a in
+      let pp_shortcut fmt = function
+        | ("alt-ergo" | "coq" | "tip" | "script") as p ->
+            Format.fprintf fmt "why3:%s" p
+        | p -> Format.pp_print_string fmt p in
+      let pp_shortcuts =
+        Pretty_utils.pp_list ~pre:"[" ~sep:"," ~suf:"]" ~empty:"(disabled)"
+          pp_shortcut in
+      let pp_prover fmt dp =
+        Format.fprintf fmt "%s %s%a %a"
+          dp.dp_name dp.dp_version
+          pp_altern dp.dp_altern
+          pp_shortcuts dp.dp_shortcuts in
+      let pp_provers fmt dps =
+        List.iter (Format.fprintf fmt "@\n - %a" pp_prover) dps in
+      if dps = [] then
+        Wp_parameters.result "No Why3 provers detected."
+      else
+        Wp_parameters.result "Why3 provers detected:%a" pp_provers dps
+    end
 
 (* ------------------------------------------------------------------------ *)
 (* ---  Main Entry Point                                                --- *)

@@ -72,6 +72,7 @@ let name_of_prover = function
 
 let title_of_prover = function
   | Why3ide -> "Why3"
+  | Why3 "alt-ergo" -> "altergo"
   | Why3 s -> s
   | AltErgo -> "Alt-Ergo"
   | Coq -> "Coq"
@@ -104,13 +105,6 @@ let filename_for_prover = function
   | Coq -> "Coq"
   | Qed -> "Qed"
   | Tactical -> "Tactical"
-
-let language_of_name = function
-  | "" | "none" -> None
-  | "alt-ergo" | "altgr-ergo" -> Some L_altergo
-  | "coq" | "coqide"-> Some L_coq
-  | "why" -> Some L_why3
-  | s -> Wp_parameters.abort "Language '%s' unknown" s
 
 let language_of_prover = function
   | Why3 _ -> L_why3

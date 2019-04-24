@@ -52,7 +52,6 @@ module Pset : Set.S with type elt = prover
 module Pmap : Map.S with type key = prover
 
 val language_of_prover : prover -> language
-val language_of_name : string -> language option
 val name_of_prover : prover -> string
 val title_of_prover : prover -> string
 val filename_for_prover : prover -> string

@@ -1430,6 +1430,10 @@ src/plugins/wp/ProofScript.ml: CEA_WP
 src/plugins/wp/ProofScript.mli: CEA_WP
 src/plugins/wp/ProverCoq.ml: CEA_WP
 src/plugins/wp/ProverCoq.mli: CEA_WP
+src/plugins/wp/ProverDetect.ml: CEA_WP
+src/plugins/wp/ProverDetect.mli: CEA_WP
+src/plugins/wp/ProverDetect.Why3.ml: CEA_WP
+src/plugins/wp/ProverDetect.None.ml: CEA_WP
 src/plugins/wp/ProverErgo.ml: CEA_WP
 src/plugins/wp/ProverErgo.mli: CEA_WP
 src/plugins/wp/ProverScript.ml: CEA_WP

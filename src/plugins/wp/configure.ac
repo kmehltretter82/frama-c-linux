@@ -109,6 +109,20 @@ if test "$ENABLE_WP" != "no"; then
   fi
   AC_SUBST(WHY3COQC)
 
+  ## Configuring for WHY3-API
+  WHY3API_VERSION=$($OCAMLFIND query why3 -format %v)
+  case $WHY3API_VERSION in
+    1.*)
+        AC_MSG_RESULT(why3 api $WHY3API_VERSION found)
+        WHY3API="yes"
+        ;;
+    *)
+        AC_MSG_RESULT(why3 api not found (no why3-provers))
+        WHY3API="no"
+        ;;
+  esac
+  AC_SUBST(WHY3API)
+
 fi
 
 write_plugin_config(Makefile)
