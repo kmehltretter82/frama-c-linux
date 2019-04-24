@@ -9,7 +9,7 @@
 [wp] 1 goal scheduled
 [wp] [alt-ergo] Goal typed_output_ensures_KO : Unsuccess
 [wp] Proved goals:    0 / 1
-  alt-ergo:        0  (unsuccess: 1)
+  Alt-Ergo (why3):    0  (unsuccess: 1)
 [wp] Report in:  'tests/wp_plugin/oracle_qualif/float_format.2.report.json'
 [wp] Report out: 'tests/wp_plugin/result_qualif/float_format.2.report.json'
 -------------------------------------------------------------

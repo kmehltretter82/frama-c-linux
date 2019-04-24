@@ -22,8 +22,8 @@
 [wp] [alt-ergo] Goal typed_BinaryMultiplication_loop_variant_decrease : Valid
 [wp] [Qed] Goal typed_BinaryMultiplication_loop_variant_positive : Valid
 [wp] Proved goals:   17 / 17
-  Qed:             4 
-  alt-ergo:       13
+  Qed:                4 
+  Alt-Ergo (why3):   13
 [wp] Report in:  'tests/wp_gallery/oracle_qualif/binary-multiplication.0.report.json'
 [wp] Report out: 'tests/wp_gallery/result_qualif/binary-multiplication.0.report.json'
 -------------------------------------------------------------
@@ -54,8 +54,8 @@ BinaryMultiplication   3   -                13       100%
 [wp] [alt-ergo] Goal typed_BinaryMultiplication_loop_variant_decrease : Valid
 [wp] [Qed] Goal typed_BinaryMultiplication_loop_variant_positive : Valid
 [wp] Proved goals:   13 / 17
-  Qed:             0 
-  alt-ergo:       13
+  Qed:                0 
+  Alt-Ergo (why3):   13
 [wp] Report in:  'tests/wp_gallery/oracle_qualif/binary-multiplication.0.report.json'
 [wp] Report out: 'tests/wp_gallery/result_qualif/binary-multiplication.0.report.json'
 -------------------------------------------------------------
