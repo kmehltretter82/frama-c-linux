@@ -42,9 +42,7 @@ class dp_chooser :
     method run : unit -> unit (** Edit enabled provers *)
   end
 
-class dp_button :
-  available:available ->
-  enabled:enabled ->
+class dp_button : available:available ->
   object
     inherit Widget.widget
     method update : unit -> unit

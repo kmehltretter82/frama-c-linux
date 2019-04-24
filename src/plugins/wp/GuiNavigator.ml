@@ -408,6 +408,7 @@ let make (main : main_window_extension_points) =
 
     let available = new GuiConfig.available () in
     let enabled = new GuiConfig.enabled "wp.enabled" in
+
     let dp_chooser = new GuiConfig.dp_chooser ~main ~available ~enabled in
 
     (* -------------------------------------------------------------------------- *)
@@ -502,7 +503,6 @@ let make (main : main_window_extension_points) =
     main#register_source_selector popup#register ;
     GuiPanel.register ~main
       ~available_provers:available
-      ~enabled_provers:enabled
       ~configure_provers:dp_chooser#run ;
   end
 

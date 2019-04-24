@@ -50,8 +50,8 @@ class enabled key =
         | _ -> w in
       try
         let data = Gtk_helper.Configuration.find key in
-        self#set (List.rev (collect [] data))
-      with Not_found -> ()
+        List.rev (collect [] data)
+      with Not_found -> []
 
     method private save () =
       let open Gtk_helper.Configuration in
@@ -60,7 +60,10 @@ class enabled key =
 
     initializer
       begin
-        self#load () ;
+        let settings = self#load () in
+        let cmdline = Wp_parameters.Provers.get () in
+        let selection = List.sort_uniq String.compare (settings @ cmdline) in
+        self#set selection ;
         self#on_event self#save ;
       end
 
@@ -97,7 +100,7 @@ class dp_chooser
       with Not_found -> false
 
     method private entry dp =
-      let text = Printf.sprintf "%s (%s)" dp.dp_name dp.dp_version in
+      let text = Pretty_utils.to_string VCS.pretty dp in
       let sw = new Widget.switch () in
       let lb = new Widget.label ~align:`Left ~text () in
       sw#set (self#lookup dp) ;
@@ -155,39 +158,64 @@ class dp_chooser
 (* ---  WP Prover Switch Panel                                          --- *)
 (* ------------------------------------------------------------------------ *)
 
-[@@@ warning "-37-27"]
-
 type mprover =
-  | NoProver
-  | AltErgo
-  | Coq
-  | Why3ide
-  | Why3 of dp
+  | NONE
+  | ERGO
+  | COQ
+  | WHY of VCS.dp
 
-class dp_button ~(available:available) ~(enabled:enabled) =
+class dp_button ~(available:available) =
   let render = function
-    | NoProver -> "None"
-    | AltErgo -> "Alt-Ergo (native)"
-    | Coq -> "Coq (native,ide)"
-    | Why3ide -> "Why3 (ide)"
-    | Why3 dp -> Printf.sprintf "Why3: %s (%s)" dp.dp_name dp.dp_version
+    | NONE -> "(none)"
+    | ERGO -> "Alt-Ergo (native)"
+    | COQ -> "Coq (native)"
+    | WHY { dp_shortcuts = keys } when List.mem "alt-ergo" keys ->
+        "Alt-Ergo (why3)"
+    | WHY dp -> Pretty_utils.to_string VCS.pretty dp in
+  let select = function
+    | ERGO -> "alt-ergo"
+    | COQ -> "coq"
+    | WHY { dp_shortcuts=[] } | NONE -> "none"
+    | WHY { dp_shortcuts=key::_ } -> "why3:"^key in
+  let rec import = function
+    | [] -> ERGO
+    | spec::others ->
+        match VCS.prover_of_name spec with
+        | None | Some (Why3ide|Qed) -> NONE
+        | Some (AltErgo|Tactical) -> ERGO
+        | Some Coq -> COQ
+        | Some (Why3 s) ->
+            try
+              let dps = available#get in
+              WHY (List.find (fun dp -> List.mem s dp.dp_shortcuts) dps)
+            with Not_found -> import others
   in
-  let items = [ NoProver ; AltErgo ; Coq ; Why3ide ] in
-  let button = new Widget.menu ~default:AltErgo ~render ~items () in
+  let items = [ NONE ; ERGO ; COQ ] in
+  let button = new Widget.menu ~default:ERGO ~render ~items () in
   object(self)
     method coerce = button#coerce
     method widget = (self :> Widget.t)
     method set_enabled = button#set_enabled
     method set_visible = button#set_visible
+
+    val mutable dps = []
+
     method update () =
+      (* called in polling mode *)
       begin
-        Format.eprintf "BUTTON UPDATE@." ;
+        let avl = available#get in
+        if avl != dps then
+          begin
+            dps <- avl ;
+            let items = [NONE;ERGO] @ List.map (fun p -> WHY p) dps @ [COQ] in
+            button#set_items items
+          end ;
+        let cur = Wp_parameters.Provers.get () |> import in
+        if cur <> button#get then button#set cur ;
       end
 
-    initializer
-      begin
-        button#connect
-          (fun _mp -> Format.eprintf "BUTTON SIGNAL@.") ;
-      end
-
+    initializer button#connect
+        (fun s -> Wp_parameters.Provers.set [select s])
   end
+
+(* ------------------------------------------------------------------------ *)

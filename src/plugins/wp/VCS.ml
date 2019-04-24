@@ -71,9 +71,11 @@ let name_of_prover = function
   | Tactical -> "script"
 
 let title_of_prover = function
-  | Why3ide -> "Why3"
-  | Why3 "alt-ergo" -> "altergo"
-  | Why3 s -> s
+  | Why3 "cvc4" -> "CVC4"
+  | Why3 "z3" -> "Z3"
+  | Why3 ("alt-ergo" | "altergo") -> "Alt-Ergo (why3)"
+  | Why3 s -> Printf.sprintf "Why3 (%s)" s
+  | Why3ide -> "Why3 (ide)"
   | AltErgo -> "Alt-Ergo"
   | Coq -> "Coq"
   | Qed -> "Qed"
