@@ -31,6 +31,6 @@ val run_and_prove :
 
 val register :
   main:Design.main_window_extension_points ->
-  available_provers:GuiConfig.provers ->
-  enabled_provers:GuiConfig.provers ->
+  available_provers:GuiConfig.available ->
+  enabled_provers:GuiConfig.enabled ->
   configure_provers:(unit -> unit) -> unit

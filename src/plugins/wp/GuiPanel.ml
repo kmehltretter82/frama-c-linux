@@ -192,8 +192,8 @@ let wp_update_script label () =
 
 let wp_panel
     ~(main:Design.main_window_extension_points)
-    ~(available_provers:GuiConfig.provers)
-    ~(enabled_provers:GuiConfig.provers)
+    ~(available_provers:GuiConfig.available)
+    ~(enabled_provers:GuiConfig.enabled)
     ~(configure_provers:unit -> unit)
   =
   let vbox = GPack.vbox () in

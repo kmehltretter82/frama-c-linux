@@ -406,10 +406,8 @@ let make (main : main_window_extension_points) =
     (* --- Provers                                                            --- *)
     (* -------------------------------------------------------------------------- *)
 
-    let available = new GuiConfig.provers "wp.available" in
-    let enabled = new GuiConfig.provers "wp.enabled" in
-    if Wp_parameters.Detect.get () then ProverWhy3.detect_provers available#set ;
-
+    let available = new GuiConfig.available () in
+    let enabled = new GuiConfig.enabled "wp.enabled" in
     let dp_chooser = new GuiConfig.dp_chooser ~main ~available ~enabled in
 
     (* -------------------------------------------------------------------------- *)
