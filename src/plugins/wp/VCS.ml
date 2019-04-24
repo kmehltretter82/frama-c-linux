@@ -171,6 +171,37 @@ module Pset = Set.Make(P)
 module Pmap = Map.Make(P)
 
 (* -------------------------------------------------------------------------- *)
+(* --- Why3 Provers                                                       --- *)
+(* -------------------------------------------------------------------------- *)
+
+type dp = {
+  dp_name : string ;
+  dp_version : string ;
+  dp_altern : string ;
+  dp_shortcuts : string list ;
+}
+
+let pp_altern fmt a = if a<>"" then Format.fprintf fmt " (%s)" a
+
+let pp_shortcut fmt = function
+  | ("alt-ergo" | "coq" | "tip" | "script") as p ->
+      Format.fprintf fmt "why3:%s" p
+  | p -> Format.pp_print_string fmt p
+
+let pp_shortcuts =
+  Pretty_utils.pp_list ~pre:"[" ~sep:"," ~suf:"]" ~empty:"(disabled)"
+    pp_shortcut
+
+let pretty fmt dp =
+  Format.fprintf fmt "%s %s%a"
+    dp.dp_name dp.dp_version
+    pp_altern dp.dp_altern
+
+let prover_of_dp = function
+  | { dp_shortcuts = key::_ } -> Why3 key
+  | _ -> Why3 "none"
+
+(* -------------------------------------------------------------------------- *)
 (* --- Config                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 

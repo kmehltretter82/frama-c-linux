@@ -846,21 +846,11 @@ let do_prover_detect () =
     begin
       let open ProverDetect in
       let dps = detect () in
-      let pp_altern fmt a = if a<>"" then Format.fprintf fmt " (%s)" a in
-      let pp_shortcut fmt = function
-        | ("alt-ergo" | "coq" | "tip" | "script") as p ->
-            Format.fprintf fmt "why3:%s" p
-        | p -> Format.pp_print_string fmt p in
-      let pp_shortcuts =
-        Pretty_utils.pp_list ~pre:"[" ~sep:"," ~suf:"]" ~empty:"(disabled)"
-          pp_shortcut in
-      let pp_prover fmt dp =
-        Format.fprintf fmt "%s %s%a %a"
-          dp.dp_name dp.dp_version
-          pp_altern dp.dp_altern
-          pp_shortcuts dp.dp_shortcuts in
       let pp_provers fmt dps =
-        List.iter (Format.fprintf fmt "@\n - %a" pp_prover) dps in
+        List.iter (fun dp ->
+            Format.fprintf fmt "@\n - %a %a"
+              VCS.pretty dp VCS.pp_shortcuts dp.VCS.dp_shortcuts
+          ) dps in
       if dps = [] then
         Wp_parameters.result "No Why3 provers detected."
       else

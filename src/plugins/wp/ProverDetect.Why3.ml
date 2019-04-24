@@ -26,13 +26,6 @@
 (* --- Why3 Prover Detection                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
-type dp = {
-  dp_name : string ;
-  dp_version : string ;
-  dp_altern : string ;
-  dp_shortcuts : string list ;
-}
-
 open Why3
 open Wstdlib
 open Whyconf
@@ -49,7 +42,7 @@ let detect () =
   let dps =
     Mprover.fold
       (fun dp keys dps ->
-         {
+         VCS.{
            dp_name = dp.prover_name ;
            dp_version = dp.prover_version ;
            dp_altern = dp.prover_altern ;

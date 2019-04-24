@@ -26,13 +26,6 @@
 (* --- Prover Detection (no why3)                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
-type dp = {
-  dp_name : string ;
-  dp_version : string ;
-  dp_altern : string ;
-  dp_shortcuts : string list ;
-}
-
-let detect () = []
+let detect () : VCS.dp list = []
 
 (**************************************************************************)

@@ -24,13 +24,6 @@
 (** Why3 Prover Detection *)
 (* -------------------------------------------------------------------------- *)
 
-type dp = {
-  dp_name : string ;
-  dp_version : string ;
-  dp_altern : string ;
-  dp_shortcuts : string list ;
-}
-
-val detect : unit -> dp list
+val detect : unit -> VCS.dp list
 
 (**************************************************************************)
