@@ -117,6 +117,8 @@ PLUGIN_DISTRIBUTED:=$(PLUGIN_ENABLE)
 PLUGIN_DISTRIB_EXTERNAL:= \
 	Changelog \
 	Makefile.in \
+	ProverDetect.Why3.ml \
+	ProverDetect.None.ml \
         MakeAPI \
 	configure.ac \
 	configure \

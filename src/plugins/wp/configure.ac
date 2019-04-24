@@ -117,7 +117,7 @@ if test "$ENABLE_WP" != "no"; then
         WHY3API="yes"
         ;;
     *)
-        AC_MSG_RESULT(why3 api not found (no why3-provers))
+        AC_MSG_RESULT(why3 api not found (no why3 prover detection))
         WHY3API="no"
         ;;
   esac
