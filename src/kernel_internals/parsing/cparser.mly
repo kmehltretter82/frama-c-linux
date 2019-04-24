@@ -969,11 +969,11 @@ statement:
     }
 |   ASM GOTO asmattr LPAREN asmtemplate asmoutputs RPAREN SEMICOLON {
       let loc = Cil_datatype.Location.of_lexing_loc (Parsing.symbol_start_pos (), Parsing.symbol_end_pos ()) in
-      no_ghost [ASM ($3, $5, $6, loc)]
+      no_ghost [ASM ($3, mk_asm_templates $5, $6, loc)]
     }
 |   ASM asmattr LPAREN asmtemplate asmoutputs RPAREN SEMICOLON {
       let loc = Cil_datatype.Location.of_lexing_loc (Parsing.symbol_start_pos (), Parsing.symbol_end_pos ()) in
-      no_ghost [ASM ($2, $4, $5, loc)]
+      no_ghost [ASM ($2, mk_asm_templates $4, $5, loc)]
     }
 |   MSASM   { no_ghost [ASM ([], [fst $1], None, snd $1)]}
 |   TRY block EXCEPT paren_comma_expression block {
