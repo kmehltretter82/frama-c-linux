@@ -1288,12 +1288,22 @@ gui: gui-$(OCAMLBEST)
 ALL_GUI_CMO= $(ALL_CMO) $(GRAPH_GUICMO) $(GUICMO)
 ALL_GUI_CMX= $(patsubst %.cma,%.cmxa,$(ALL_GUI_CMO:.cmo=.cmx))
 
+ifeq ($(NATIVE_THREADS),yes)
+ifneq ($(PLATFORM),MacOS)
+GUI_THREAD=-thread
+else
+GUI_THREAD=
+endif
+else
+GUI_THREAD=
+endif
+
 bin/viewer.byte$(EXE): BYTE_LIBS+= $(GRAPH_GUICMO)
 bin/viewer.byte$(EXE): $(filter-out $(GRAPH_GUICMO),$(ALL_GUI_CMO)) \
 			$(GEN_BYTE_LIBS) \
 			$(PLUGIN_DYN_CMO_LIST) $(PLUGIN_DYN_GUI_CMO_LIST)
 	$(PRINT_LINKING) $@
-	$(OCAMLC) $(BLINKFLAGS) $(THREAD) -o $@ $(BYTE_LIBS) \
+	$(OCAMLC) $(BLINKFLAGS) $(GUI_THREAD) -o $@ $(BYTE_LIBS) \
 	  $(CMO) \
 	  $(filter-out \
 	    $(patsubst $(PLUGIN_GUI_LIB_DIR)/%,$(PLUGIN_LIB_DIR)/%,\
@@ -1307,7 +1317,7 @@ bin/viewer.opt$(EXE): $(filter-out $(GRAPH_GUICMX),$(ALL_GUI_CMX)) \
 			$(PLUGIN_DYN_CMX_LIST) $(PLUGIN_DYN_GUI_CMX_LIST) \
 			$(PLUGIN_CMX_LIST) $(PLUGIN_GUI_CMX_LIST)
 	$(PRINT_LINKING) $@
-	$(OCAMLOPT) $(OLINKFLAGS) $(THREAD) -o $@ $(OPT_LIBS) \
+	$(OCAMLOPT) $(OLINKFLAGS) $(GUI_THREAD) -o $@ $(OPT_LIBS) \
 	  $(CMX) \
 	  $(filter-out \
 	    $(patsubst $(PLUGIN_GUI_LIB_DIR)/%,$(PLUGIN_LIB_DIR)/%,\
@@ -2297,21 +2307,21 @@ PTESTS_SRC=ptests/ptests_config.ml ptests/ptests.ml
 PTESTS_CONFIG:= $(shell if test -d tests; then echo tests/ptests_config; fi)
 
 ifeq ($(NATIVE_THREADS),yes)
-THREAD=-thread
+PTEST_THREAD=-thread
 ptests: bin/ptests.$(PTESTSBEST)$(EXE) $(PTESTS_CONFIG)
 else
-THREAD=-vmthread
+PTEST_THREAD=-vmthread
 ptests: bin/ptests.byte$(EXE) $(PTESTS_CONFIG)
 endif
 
 bin/ptests.byte$(EXE): $(PTESTS_SRC)
 	$(PRINT_LINKING) $@
-	$(OCAMLC) -I ptests -dtypes $(THREAD) -g -o $@ \
+	$(OCAMLC) -I ptests -dtypes $(PTEST_THREAD) -g -o $@ \
 	    unix.cma threads.cma str.cma dynlink.cma $^
 
 bin/ptests.opt$(EXE): $(PTESTS_SRC)
 	$(PRINT_LINKING) $@
-	$(OCAMLOPT) -I ptests -dtypes $(THREAD) -o $@ \
+	$(OCAMLOPT) -I ptests -dtypes $(PTEST_THREAD) -o $@ \
 	    unix.cmxa threads.cmxa str.cmxa dynlink.cmxa $^
 
 GENERATED+=ptests/ptests_config.ml tests/ptests_config

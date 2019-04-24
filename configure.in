@@ -424,6 +424,7 @@ rm -f test_os_type.cmi  test_os_type.cmo  test_os_type.ml test_os_type
 if test "$OCAML_OS_TYPE" = "Win32"; then
   AC_MSG_RESULT(Win32)
   AC_CHECK_PROG(CYGPATH,cygpath,cygpath,no)
+  PLATFORM=Win32
   OCAMLWIN32=yes
   EXE=.exe
   # OCaml on Win32 does not support vmthreads, use native ones.
@@ -432,9 +433,16 @@ else
   OCAMLWIN32=no
   if test "$OCAML_OS_TYPE" = "Cygwin"; then
     AC_MSG_RESULT(Cygwin)
+    PLATFORM=Cygwin
     EXE=.exe
   else
-    AC_MSG_RESULT(Unix)
+    if test -x "/Applications/Mail.app"; then
+      AC_MSG_RESULT(MacOS)
+      PLATFORM=MacOS
+    else
+      AC_MSG_RESULT(Unix)
+      PLATFORM=Unix
+    fi
     EXE=
   fi
 
@@ -1016,6 +1024,7 @@ check_frama_c_dependencies
 
 EXTERNAL_PLUGINS="${EXTERNAL_PLUGINS} ${EXTRA_EXTERNAL_PLUGINS}"
 
+AC_SUBST(PLATFORM)
 AC_SUBST(VERBOSEMAKE)
 AC_SUBST(DEVELOPMENT)
 AC_SUBST(DOT)
