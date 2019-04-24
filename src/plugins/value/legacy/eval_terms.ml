@@ -899,7 +899,8 @@ let rec eval_term ~alarm_mode env t =
        nothing to do, AND coercion from an integer type to a floating-point
        type, that require a conversion. *)
     (match Logic_const.plain_or_set Extlib.id ltyp with
-     | Linteger when Logic_typing.is_integral_type t.term_type -> r
+     | Linteger when Logic_typing.is_integral_type t.term_type
+                  || Logic_const.is_boolean_type t.term_type -> r
      | Ctype typ when Cil.isIntegralOrPointerType typ -> r
      | Lreal ->
        if Logic_typing.is_integral_type t.term_type
@@ -915,9 +916,14 @@ let rec eval_term ~alarm_mode env t =
            ldeps = r.ldeps;
            eunder = under_from_over eover;
            eover;  }
-     | _ -> unsupported
-              (Format.asprintf "logic coercion %a -> %a@."
-                 Printer.pp_logic_type t.term_type Printer.pp_logic_type ltyp)
+     | _ ->
+       if Logic_const.is_boolean_type ltyp
+       && Logic_typing.is_integral_type t.term_type
+       then cast_to_bool r
+       else
+         unsupported
+           (Format.asprintf "logic coercion %a -> %a@."
+              Printer.pp_logic_type t.term_type Printer.pp_logic_type ltyp)
     )
 
   (* TODO: the meaning of the label in \offset and \base_addr is not obvious
