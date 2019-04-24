@@ -3,7 +3,7 @@
 void foo(int c)
 {
   float f = (float)1.0;
-  /*@ assert 0.0 ≤ (c ≢ 0? f: 2.0); */ ;
+  /*@ assert 0.0 ≤ (c? f: 2.0); */ ;
   return;
 }
 
