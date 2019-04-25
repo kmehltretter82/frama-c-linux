@@ -381,18 +381,9 @@ let is_same_direction_binop dir op =
 let is_same_direction_rel dir op =
   update_direction_rel dir op <> Nothing
 
-let no_op_coerce typ t =
-  match typ with
-  | Lreal -> true
-  | Linteger -> Cil.isLogicIntegralType t.term_type
-  | Ltype _ when Logic_const.is_boolean_type typ ->
-    Cil.isLogicBooleanType t.term_type
-  | Ltype ({lt_name="set"},_) -> true
-  | _ -> false
-
 let remove_no_op_coerce t =
   match t.term_node with
-  | TLogic_coerce (ty,t) when no_op_coerce ty t -> t
+  | TLogic_coerce (ty,t) when Cil.no_op_coerce ty t -> t
   | _ -> t
 
 (* when pretty-printing relation chains, a < b && b' < c, it can happen that
@@ -2400,7 +2391,7 @@ class cil_printer () = object (self)
         pp_defn
         (self#term_prec current_level) body
     | TLogic_coerce(ty,t) ->
-      if (not (no_op_coerce ty t)) ||
+      if (not (Cil.no_op_coerce ty t)) ||
          Kernel.is_debug_key_enabled Kernel.dkey_print_logic_coercions
       then
         fprintf fmt "(%a)" (self#logic_type None) ty;

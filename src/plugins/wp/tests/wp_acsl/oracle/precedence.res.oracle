@@ -778,17 +778,19 @@ void predicate(int x, int a, int b)
     ensures
       ko: r_precedence_and_eq:
         \old(p) ≡ \old(q) ∧ \old(r) ≢ 0 ⇔
-        \old(p) ≡ (\old(q) ∧ \old(r));
+        (𝔹)\old(p) ≡ ((𝔹)\old(q) ∧ (𝔹)\old(r));
     ensures
       ko: l_precedence_and_eq:
         \old(p) ≢ 0 ∧ \old(q) ≡ \old(r) ⇔
-        (\old(p) ∧ \old(q)) ≡ \old(r);
+        ((𝔹)\old(p) ∧ (𝔹)\old(q)) ≡ (𝔹)\old(r);
     ensures
       ko: l_nonassoc_eq:
-        \old(p) ≡ \old(q) ≡ \old(r) ⇔ (\old(p) ≡ \old(q)) ≡ \old(r);
+        \old(p) ≡ \old(q) ≡ \old(r) ⇔
+        (\old(p) ≡ \old(q)) ≡ (𝔹)\old(r);
     ensures
       ko: r_nonassoc_eq:
-        \old(p) ≡ \old(q) ≡ \old(r) ⇔ \old(p) ≡ (\old(q) ≡ \old(r));
+        \old(p) ≡ \old(q) ≡ \old(r) ⇔
+        (𝔹)\old(p) ≡ (\old(q) ≡ \old(r));
     ensures
       r_precedence_neq_and:
         \old(p) ≢ \old(q) ∧ R ⇔ \old(p) ≢ \old(q) ∧ R;
@@ -798,11 +800,11 @@ void predicate(int x, int a, int b)
     ensures
       ko: r_precedence_and_neq:
         \old(p) ≢ \old(q) ∧ \old(r) ≢ 0 ⇔
-        \old(p) ≢ (\old(q) ∧ \old(r));
+        (𝔹)\old(p) ≢ ((𝔹)\old(q) ∧ (𝔹)\old(r));
     ensures
       ko: l_precedence_and_neq:
         \old(p) ≢ 0 ∧ \old(q) ≢ \old(r) ⇔
-        (\old(p) ∧ \old(q)) ≢ \old(r);
+        ((𝔹)\old(p) ∧ (𝔹)\old(q)) ≢ (𝔹)\old(r);
  */
 void comparison(int p, int q, int r)
 {

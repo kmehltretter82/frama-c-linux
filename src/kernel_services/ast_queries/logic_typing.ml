@@ -1176,7 +1176,7 @@ struct
       | Tinter l ->
         { e with term_type = real_type; term_node = Tinter (List.map aux l) }
       | Tempty_set -> { e with term_type = real_type }
-      | TLogic_coerce(_,e) ->
+      | TLogic_coerce(t2,e) when Cil.no_op_coerce t2 e ->
         let e = aux e in
         { e with term_type = real_type; term_node = TLogic_coerce(real_type,e) }
       | _ when Cil.isLogicArithmeticType real_type ->
@@ -1230,10 +1230,10 @@ struct
         when name = Utf8_logic.boolean && is_integral_type t1 ->
         let t2 = Ltype (C.find_logic_type Utf8_logic.boolean,[]) in
         { e with term_node = TLogic_coerce(t2,e); term_type = t2 }
-      | t1, Linteger when Logic_const.is_boolean_type t1 ->
+      | t1, Linteger when Logic_const.is_boolean_type t1 && explicit ->
         logic_coerce Linteger e
       | t1, Ctype t2 when Logic_const.is_boolean_type t1
-                       && is_integral_type newt ->
+                       && is_integral_type newt && explicit ->
         Logic_const.term ~loc (TCastE (t2,e)) newt
       | ty1, Ltype({lt_name="set"},[ty2])
         when is_pointer_type ty1 &&
@@ -1807,6 +1807,8 @@ struct
         when Cil.isIntegralType t -> Linteger
       | (Linteger, Ctype t | Ctype t, Linteger)
         when Cil.isArithmeticType t -> Lreal
+      (* In ACSL, you can convert implicitely from integral to boolean =>
+         prefer boolean as common type when doing comparison. *)
       | Ltype({lt_name = name},[]), t
         when is_integral_type t && name = Utf8_logic.boolean ->
         Ltype(C.find_logic_type Utf8_logic.boolean,[])
