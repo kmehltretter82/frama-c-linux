@@ -44,15 +44,10 @@ type language =
   | L_coq
   | L_altergo
 
-(* -------------------------------------------------------------------------- *)
-(* --- Prover Names                                                       --- *)
-(* -------------------------------------------------------------------------- *)
-
 module Pset : Set.S with type elt = prover
 module Pmap : Map.S with type key = prover
 
 val language_of_prover : prover -> language
-val language_of_name : string -> language option
 val name_of_prover : prover -> string
 val title_of_prover : prover -> string
 val filename_for_prover : prover -> string
@@ -67,9 +62,29 @@ val pp_mode : Format.formatter -> mode -> unit
 
 val cmp_prover : prover -> prover -> int
 
+(* -------------------------------------------------------------------------- *)
+(** {2 Why3 Provers} *)
+(* -------------------------------------------------------------------------- *)
+
+type dp = {
+  dp_name : string ;
+  dp_version : string ;
+  dp_altern : string ;
+  dp_shortcuts : string list ;
+}
+
+val prover_of_dp : dp -> prover
+
+(** Without shortcuts *)
+val pretty : Format.formatter -> dp -> unit
+val pp_shortcut : Format.formatter -> string -> unit
+val pp_shortcuts : Format.formatter -> string list -> unit
+
+(* -------------------------------------------------------------------------- *)
 (** {2 Config}
     [None] means current WP option default.
     [Some 0] means prover default. *)
+(* -------------------------------------------------------------------------- *)
 
 type config = {
   valid : bool ;

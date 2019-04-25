@@ -7,12 +7,19 @@
 (*  General Public License version 2.1, with the special exception        *)
 (*  on linking described in file LICENSE.                                 *)
 (*                                                                        *)
-(*  File modified by CEA (Commissariat à l'énergie atomique et aux        *)
-(*                        énergies alternatives).                         *)
-(*                                                                        *)
 (**************************************************************************)
 
-(* this is the prelude for Alt-Ergo, version >= 0.95.2 *)
-(** The theory BuiltIn_ must be appended to this file*)
-(** The theory Bool_ must be appended to this file*)
-(** The theory real_Real_ must be appended to this file*)
+Require Import BuiltIn.
+
+Definition func : forall (a:Type) (b:Type), Type.
+intros a b.
+exact (a -> b).
+Defined.
+
+Definition infix_at: forall {a:Type} {a_WT:WhyType a}
+  {b:Type} {b_WT:WhyType b}, (a -> b) -> a -> b.
+intros a aWT b bWT f x.
+exact (f x).
+Defined.
+
+Definition pred (a: Type) := func a bool.

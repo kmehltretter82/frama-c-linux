@@ -20,54 +20,35 @@
 (*                                                                        *)
 (**************************************************************************)
 
+# 23 "src/plugins/wp/ProverDetect.Why3.ml"
+
 (* -------------------------------------------------------------------------- *)
-(* --- Mathematics for Why-3                                              --- *)
+(* --- Why3 Prover Detection                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
-theory Cmath
-  use import int.Int
-  use import int.Abs
-  use import real.RealInfix
+open Why3
+open Wstdlib
+open Whyconf
 
-  axiom abs_def :
-    forall x:int [abs(x)].
-    if x >= 0 then abs(x)=x else abs(x)=(-x)
+let detect () =
+  let config = Whyconf.read_config None in
+  let provers = Whyconf.get_prover_shortcuts config in
+  let index = ref Mprover.empty in
+  Mstr.iter
+    (fun key dp ->
+       let keys = Mprover.find_def [] dp !index in
+       index := Mprover.add dp (key::keys) !index)
+    provers ;
+  let dps =
+    Mprover.fold
+      (fun dp keys dps ->
+         VCS.{
+           dp_name = dp.prover_name ;
+           dp_version = dp.prover_version ;
+           dp_altern = dp.prover_altern ;
+           dp_shortcuts = List.rev keys ;
+         } :: dps
+      ) !index []
+  in List.rev dps
 
-end
-
-theory Square
-
-  use import real.RealInfix
-  use import real.Square
-
-  axiom sqrt_lin1 : forall x:real [sqrt(x)]. 1. <. x -> sqrt(x) <. x
-  axiom sqrt_lin0 : forall x:real [sqrt(x)]. 0. <. x <. 1. -> x <. sqrt(x)
-  axiom sqrt_0 : sqrt(0.) = 0.
-  axiom sqrt_1 : sqrt(1.) = 1.
-
-end
-
-theory ExpLog
-
-  use import real.RealInfix
-  use import real.ExpLog
-
-  axiom exp_pos : forall x:real. exp x >. 0.
-
-end
-
-
-theory ArcTrigo
-
-  use import real.RealInfix
-  use import real.Trigonometry as Trigo
-
-  function atan (x : real) : real = Trigo.atan x
-  function asin real : real
-  function acos real : real
-
-  axiom Sin_asin: forall x:real. -. 1.0 <=. x <=. 1.0 -> sin (asin x) = x
-  axiom Cos_acos: forall x:real. -. 1.0 <=. x <=. 1.0 -> cos (acos x) = x
-
-end
-
+(**************************************************************************)
