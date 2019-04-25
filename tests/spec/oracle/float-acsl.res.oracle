@@ -28,12 +28,8 @@ double minus_one(void);
  */
 float minus_onef(void);
 
-/*@ requires
-      /* (coercion to:ℝ */x/* ) */ ≤ /* (coercion to:ℝ */y/* ) */;
-    ensures
-      /* (coercion to:ℝ */\old(x)/* ) */ ≤
-      /* (coercion to:ℝ */\result/* ) */ ≤
-      /* (coercion to:ℝ */\old(y)/* ) */;
+/*@ requires (ℝ)x ≤ (ℝ)y;
+    ensures (ℝ)\old(x) ≤ (ℝ)\result ≤ (ℝ)\old(y);
     assigns \result;
     assigns \result \from x, y;
  */

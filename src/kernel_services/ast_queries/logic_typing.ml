@@ -1165,20 +1165,24 @@ struct
     | _ -> false
 
   let logic_coerce t e =
-    let set = make_set_type t in
+    let real_type = set_conversion t e.term_type in
     let rec aux e =
       match e.term_node with
       | Tcomprehension(e,q,p) ->
-        { e with term_type = set; term_node = Tcomprehension (aux e,q,p) }
+        { e with term_type = real_type;
+                 term_node = Tcomprehension (aux e,q,p) }
       | Tunion l ->
-        { e with term_type = set; term_node = Tunion (List.map aux l) }
+        { e with term_type = real_type; term_node = Tunion (List.map aux l) }
       | Tinter l ->
-        { e with term_type = set; term_node = Tinter (List.map aux l) }
-      | Tempty_set -> { e with term_type = set }
+        { e with term_type = real_type; term_node = Tinter (List.map aux l) }
+      | Tempty_set -> { e with term_type = real_type }
       | TLogic_coerce(_,e) ->
-        { e with term_type = t; term_node = TLogic_coerce(t,e) }
-      | _ when Cil.isLogicArithmeticType t -> Logic_utils.numeric_coerce t e
-      | _ -> { e with term_type = t; term_node = TLogic_coerce(t,e) }
+        let e = aux e in
+        { e with term_type = real_type; term_node = TLogic_coerce(real_type,e) }
+      | _ when Cil.isLogicArithmeticType real_type ->
+        Logic_utils.numeric_coerce real_type e
+      | _ ->
+        { e with term_type = real_type; term_node = TLogic_coerce(real_type,e) }
     in
     if is_same_type e.term_type t then e else aux e
 
@@ -2420,7 +2424,6 @@ struct
       in
       normalize_updated_offset_term idx_typing env loc t normalizing_cont toff
   and locations_set ctxt ~lift_set env loc l init_type =
-    let module C = struct end in
     let convert_ptr, locs, typ =
       List.fold_left
         (fun (convert_ptr,locs,typ) t ->
@@ -2440,7 +2443,6 @@ struct
     let locs = List.rev_map (make_set_conversion convert_ptr) locs in
     locs,typ
   and lfun_app ctxt env loc f labels ttl =
-    let module C = struct end in
     try
       let info = ctxt.find_logic_ctor f in
       if labels <> [] then begin
@@ -2469,7 +2471,6 @@ struct
         ctxt.error loc "symbol %s is a predicate, not a function" f
       | Some t -> Tapp(info, label_assoc, tl), t
   and term_node ctxt env loc pl =
-    let module C = struct end in
     let term = ctxt.type_term ctxt in
     let term_ptr pl =
       let t = term env pl in
