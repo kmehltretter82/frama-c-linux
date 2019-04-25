@@ -4500,12 +4500,13 @@ let isCharConstPtrType t =
           ( is_unrollable_ltdef tdef && isLogicBooleanType (unroll_ltdef t))
       | Lreal | Lvar _ | Larrow _ -> false
 
+let isBoolType typ = match unrollType typ with
+  | TInt (IBool, _) -> true
+  | _ -> false
+
 let rec isLogicPureBooleanType t =
   match t with
-  | Ctype t ->
-    (match unrollType t with
-     | TInt(IBool,_) -> true
-     | _ -> false)
+  | Ctype t -> isBoolType t
   | Ltype ({lt_name = name} as def,_) ->
     name = Utf8_logic.boolean ||
     (is_unrollable_ltdef def && isLogicPureBooleanType (unroll_ltdef t))

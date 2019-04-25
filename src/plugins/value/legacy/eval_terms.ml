@@ -613,10 +613,6 @@ let cast_to_bool r =
   { eover; eunder = under_from_over eover;
     ldeps = r.ldeps; etype = TInt (IBool, []) }
 
-let is_bool typ = match Cil.unrollType typ with
-  | TInt (IBool, _) -> true
-  | _ -> false
-
 (* -------------------------------------------------------------------------- *)
 (* --- Inlining of defined logic functions and predicates                 --- *)
 (* -------------------------------------------------------------------------- *)
@@ -851,7 +847,7 @@ let rec eval_term ~alarm_mode env t =
     (* See if the cast does something. If not, we can keep eunder as is.*)
     if is_noop_cast ~src_typ:t.term_type ~dst_typ:typ
     then { r with etype = typ }
-    else if is_bool typ
+    else if Cil.isBoolType typ
     then cast_to_bool r
     else
       let eover = cast ~src_typ:r.etype ~dst_typ:typ r.eover in

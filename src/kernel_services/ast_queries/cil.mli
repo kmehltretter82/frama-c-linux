@@ -537,6 +537,16 @@ val isCharArrayType: typ -> bool
 (** True if the argument is an integral type (i.e. integer or enum) *)
 val isIntegralType: typ -> bool
 
+(** True if the argument is [_Bool]
+    @since Frama-C+dev
+*)
+val isBoolType: typ -> bool
+
+(** True if the argument is [_Bool] or [boolean].
+    @since Frama-C+dev
+ *)
+val isLogicPureBooleanType: logic_type -> bool
+
 (** True if the argument is an integral or pointer type. *)
 val isIntegralOrPointerType: typ -> bool
 
