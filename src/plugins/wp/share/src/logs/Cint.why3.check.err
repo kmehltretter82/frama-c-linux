@@ -1,4 +1,0 @@
-File "../why3/Cint.why", line 61, characters 6-14:
-warning: axiom is_bool0 does not contain any local abstract symbol
-File "../why3/Cint.why", line 63, characters 6-14:
-warning: axiom is_bool1 does not contain any local abstract symbol
