@@ -386,6 +386,11 @@ let remove_no_op_coerce t =
   | TLogic_coerce (ty,t) when Cil.no_op_coerce ty t -> t
   | _ -> t
 
+let rec is_singleton t =
+  match t.term_node with
+  | TLogic_coerce(Ltype ({ lt_name = "set"},_), t') -> is_singleton t'
+  | _ -> not (Logic_const.is_set_type t.term_type)
+
 (* when pretty-printing relation chains, a < b && b' < c, it can happen that
    b has a coercion and b' hasn't or vice-versa (bc c is an integer and a and
    b are ints for instance). We nevertheless want to
@@ -2340,8 +2345,7 @@ class cil_printer () = object (self)
     | Ttype ty ->
       fprintf fmt "%a(%a)" self#pp_acsl_keyword "\\type" (self#typ None) ty
     | Tunion l
-      when ((List.for_all (fun t -> not(Logic_const.is_set_type t.term_type)) l)
-            && (not state.print_cil_as_is)) ->
+      when (List.for_all is_singleton l) && (not state.print_cil_as_is) ->
       fprintf fmt "{%a}" (Pretty_utils.pp_list ~sep:",@ " self#term) l
     | Tunion locs ->
       fprintf fmt "@[<hov 2>%a(@,%a)@]"
