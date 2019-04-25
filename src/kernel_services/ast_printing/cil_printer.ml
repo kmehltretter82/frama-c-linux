@@ -381,6 +381,20 @@ let is_same_direction_binop dir op =
 let is_same_direction_rel dir op =
   update_direction_rel dir op <> Nothing
 
+let no_op_coerce typ t =
+  match typ with
+  | Lreal -> true
+  | Linteger -> Cil.isLogicIntegralType t.term_type
+  | Ltype _ when Logic_const.is_boolean_type typ ->
+    Cil.isLogicBooleanType t.term_type
+  | Ltype ({lt_name="set"},_) -> true
+  | _ -> false
+
+let remove_no_op_coerce t =
+  match t.term_node with
+  | TLogic_coerce (ty,t) when no_op_coerce ty t -> t
+  | _ -> t
+
 (* when pretty-printing relation chains, a < b && b' < c, it can happen that
    b has a coercion and b' hasn't or vice-versa (bc c is an integer and a and
    b are ints for instance). We nevertheless want to
@@ -388,13 +402,7 @@ let is_same_direction_rel dir op =
    removed any existing head coercion.
 *)
 let equal_mod_coercion t1 t2 =
-  let t1 =
-    match t1.term_node with TLogic_coerce(_,t1) -> t1 | _ -> t1
-  in
-  let t2 =
-    match t2.term_node with TLogic_coerce(_,t2) -> t2 | _ -> t2
-  in
-  Cil_datatype.Term.equal t1 t2
+  Cil_datatype.Term.equal (remove_no_op_coerce t1) (remove_no_op_coerce t2)
 
 (* Grab one of the labels of a statement *)
 let rec pickLabel = function
@@ -2392,13 +2400,11 @@ class cil_printer () = object (self)
         pp_defn
         (self#term_prec current_level) body
     | TLogic_coerce(ty,t) ->
-      let debug =
-        Kernel.is_debug_key_enabled Kernel.dkey_print_logic_coercions
-      in
-      if debug then
-        fprintf fmt "/* (coercion to:%a */" (self#logic_type None) ty;
+      if (not (no_op_coerce ty t)) ||
+         Kernel.is_debug_key_enabled Kernel.dkey_print_logic_coercions
+      then
+        fprintf fmt "(%a)" (self#logic_type None) ty;
       self#term_prec current_level fmt t;
-      if debug then fprintf fmt "/* ) */"
 
   method private term_lval_prec contextprec fmt lv =
     if Precedence.getParenthLevelLogic (TLval lv) > contextprec then
