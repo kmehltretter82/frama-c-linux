@@ -946,12 +946,13 @@ USE_LABLGTK="$USE_LABLGTK$USE_GNOMECANVAS"
 LABLGTK_PATH=""
 SOURCEVIEW_PATH=""
 
+if test "$PLATFORM" != "MacOS"; then
 if test "$ENABLE_LABLGTK3" = "yes"; then
   LABLGTK_PATH=`ocamlfind query lablgtk3 | tr -d '\\r\\n'`;
 fi
-
 if test "$LABLGTK_PATH" != ""; then
   SOURCEVIEW_PATH=`ocamlfind query lablgtk3-sourceview3 | tr -d '\\r\\n'`;
+fi
 fi
 
 if test "$SOURCEVIEW_PATH" = ""; then
