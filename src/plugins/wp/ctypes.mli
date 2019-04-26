@@ -28,7 +28,7 @@ open Cil_types
 
 (** Runtime integers. *)
 type c_int =
-  | Bool
+  | CBool
   | UInt8
   | SInt8
   | UInt16

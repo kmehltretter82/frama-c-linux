@@ -30,7 +30,7 @@ open Cil_datatype
 module WpLog = Wp_parameters
 
 type c_int =
-  | Bool
+  | CBool
   | UInt8
   | SInt8
   | UInt16
@@ -43,19 +43,19 @@ type c_int =
 let compare_c_int : c_int -> c_int -> _ = Extlib.compare_basic
 
 let signed  = function
-  | Bool -> false
+  | CBool -> false
   | UInt8 | UInt16 | UInt32 | UInt64 -> false
   | SInt8 | SInt16 | SInt32 | SInt64 -> true
 
 let i_bits = function
-  | Bool -> 1
+  | CBool -> 8
   | UInt8  | SInt8  -> 8
   | UInt16 | SInt16 -> 16
   | UInt32 | SInt32 -> 32
   | UInt64 | SInt64 -> 64
 
 let i_bytes = function
-  | Bool -> 1
+  | CBool -> 1
   | UInt8  | SInt8  -> 1
   | UInt16 | SInt16 -> 2
   | UInt32 | SInt32 -> 4
@@ -73,12 +73,12 @@ let is_char = function
   | SInt8 -> not Cil.theMachine.Cil.theMachine.char_is_unsigned
   | UInt16 | SInt16
   | UInt32 | SInt32
-  | UInt64 | SInt64 | Bool -> false
+  | UInt64 | SInt64 | CBool -> false
 
 let c_int ikind =
   let mach = Cil.theMachine.Cil.theMachine in
   match ikind with
-  | IBool -> if Wp_parameters.get_bool_range () then Bool else UInt8
+  | IBool -> CBool
   | IChar -> if mach.char_is_unsigned then UInt8 else SInt8
   | ISChar -> SInt8
   | IUChar -> UInt8
@@ -163,7 +163,7 @@ let idx = function
   | SInt32 -> 5
   | UInt64 -> 6
   | SInt64 -> 7
-  | Bool -> 8
+  | CBool -> 8
 
 let i_memo f =
   let m = Array.make 9 None in
@@ -186,7 +186,7 @@ let f_memo f =
     | None -> let r = f z in m.(k) <- Some r ; r
 
 let i_iter f =
-  List.iter f [Bool;UInt8;SInt8;UInt16;SInt16;UInt32;SInt32;UInt64;SInt64]
+  List.iter f [CBool;UInt8;SInt8;UInt16;SInt16;UInt32;SInt32;UInt64;SInt64]
 
 let f_iter f =
   List.iter f [Float32;Float64]
@@ -210,7 +210,7 @@ let bounds i = i_memo i_bounds i
 (* -------------------------------------------------------------------------- *)
 
 let pp_int fmt i =
-  if i = Bool then Format.pp_print_string fmt "bool"
+  if i = CBool then Format.pp_print_string fmt "bool"
   else Format.fprintf fmt "%cint%d" (if signed i then 's' else 'u') (i_bits i)
 
 let pp_float fmt f = Format.fprintf fmt "float%d" (f_bits f)
