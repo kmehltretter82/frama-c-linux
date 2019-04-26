@@ -9,8 +9,8 @@
 
 Goal Post-condition for 'false' (file tests/wp_plugin/bool.i, line 30) in 'band_bool':
 Assume {
-  Type: is_uint8(a) /\ is_uint8(a_1) /\ is_uint8(b) /\ is_uint8(b_1) /\
-      is_uint8(band_bool_0) /\ is_uint8(retres_0).
+  Type: is_bool(a) /\ is_bool(a_1) /\ is_bool(b) /\ is_bool(b_1) /\
+      is_bool(band_bool_0) /\ is_bool(retres_0).
   Have: (a_1 = a) /\ (b_1 = b).
   (* Pre-condition for 'false' *)
   Have: (a_1 != 1) \/ (b_1 != 1).
@@ -27,8 +27,8 @@ Prove: band_bool_0 = 0.
 
 Goal Post-condition for 'true' (file tests/wp_plugin/bool.i, line 27) in 'band_bool':
 Assume {
-  Type: is_uint8(a) /\ is_uint8(a_1) /\ is_uint8(b) /\ is_uint8(b_1) /\
-      is_uint8(band_bool_0) /\ is_uint8(retres_0).
+  Type: is_bool(a) /\ is_bool(a_1) /\ is_bool(b) /\ is_bool(b_1) /\
+      is_bool(band_bool_0) /\ is_bool(retres_0).
   Have: (a_1 = a) /\ (b_1 = b).
   (* Pre-condition for 'true' *)
   Have: (a_1 = 1) /\ (b_1 = 1).
@@ -45,8 +45,8 @@ Prove: band_bool_0 = 1.
 
 Goal Post-condition for 'false' (file tests/wp_plugin/bool.i, line 20) in 'bor_bool':
 Assume {
-  Type: is_uint8(a) /\ is_uint8(a_1) /\ is_uint8(b) /\ is_uint8(b_1) /\
-      is_uint8(bor_bool_0) /\ is_uint8(retres_0).
+  Type: is_bool(a) /\ is_bool(a_1) /\ is_bool(b) /\ is_bool(b_1) /\
+      is_bool(bor_bool_0) /\ is_bool(retres_0).
   Have: (a_1 = a) /\ (b_1 = b).
   (* Pre-condition for 'false' *)
   Have: (a_1 != 1) /\ (b_1 != 1).
@@ -63,8 +63,8 @@ Prove: bor_bool_0 = 0.
 
 Goal Post-condition for 'true' (file tests/wp_plugin/bool.i, line 17) in 'bor_bool':
 Assume {
-  Type: is_uint8(a) /\ is_uint8(a_1) /\ is_uint8(b) /\ is_uint8(b_1) /\
-      is_uint8(bor_bool_0) /\ is_uint8(retres_0).
+  Type: is_bool(a) /\ is_bool(a_1) /\ is_bool(b) /\ is_bool(b_1) /\
+      is_bool(bor_bool_0) /\ is_bool(retres_0).
   Have: (a_1 = a) /\ (b_1 = b).
   (* Pre-condition for 'true' *)
   Have: (a_1 = 1) \/ (b_1 = 1).
@@ -81,8 +81,8 @@ Prove: bor_bool_0 = 1.
 
 Goal Post-condition for 'false' (file tests/wp_plugin/bool.i, line 39) in 'bxor_bool':
 Assume {
-  Type: is_uint8(a) /\ is_uint8(a_1) /\ is_uint8(b) /\ is_uint8(b_1) /\
-      is_uint8(bxor_bool_0) /\ is_uint8(retres_0).
+  Type: is_bool(a) /\ is_bool(a_1) /\ is_bool(b) /\ is_bool(b_1) /\
+      is_bool(bxor_bool_0) /\ is_bool(retres_0).
   Have: (a_1 = a) /\ (b_1 = b).
   (* Pre-condition for 'false' *)
   Have: ((a_1 != 0) \/ (b_1 != 1)) /\ ((a_1 != 1) \/ (b_1 != 0)).
@@ -99,8 +99,8 @@ Prove: bxor_bool_0 = 0.
 
 Goal Post-condition for 'true' (file tests/wp_plugin/bool.i, line 36) in 'bxor_bool':
 Assume {
-  Type: is_uint8(a) /\ is_uint8(a_1) /\ is_uint8(b) /\ is_uint8(b_1) /\
-      is_uint8(bxor_bool_0) /\ is_uint8(retres_0).
+  Type: is_bool(a) /\ is_bool(a_1) /\ is_bool(b) /\ is_bool(b_1) /\
+      is_bool(bxor_bool_0) /\ is_bool(retres_0).
   Have: (a_1 = a) /\ (b_1 = b).
   (* Pre-condition for 'true' *)
   Have: ((a_1 = 0) /\ (b_1 = 1)) \/ ((a_1 = 1) /\ (b_1 = 0)).
@@ -117,8 +117,7 @@ Prove: bxor_bool_0 = 1.
 
 Goal Post-condition (file tests/wp_plugin/bool.i, line 12) in 'job':
 Assume {
-  Type: is_uint8(a) /\ is_uint8(b) /\ is_sint32(job_0) /\
-      is_sint32(retres_0).
+  Type: is_bool(a) /\ is_bool(b) /\ is_sint32(job_0) /\ is_sint32(retres_0).
   Have: (a + b) = retres_0.
   (* Return *)
   Have: retres_0 = job_0.

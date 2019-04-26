@@ -238,13 +238,14 @@ let match_power2_extraction = match_list_extraction match_power2
 (* -------------------------------------------------------------------------- *)
 
 (* rule A: to_a(to_b x) = to_b x when domain(b) is all included in domain(a) *)
-(* rule B: to_a(to_b x) = to_a x when size(b) is a multiple of size(a) *)
+(* rule B: to_a(to_b x) = to_a x when range(b) is a multiple of range(a)
+                          AND a is not bool *)
 
-(* to_iota(e) where e = to_iota'(e') *)
-let simplify_f_to_conv f iota e conv e' =
+(* to_iota(e) where e = to_iota'(e'), only ranges for iota *)
+let simplify_range_comp f iota e conv e' =
   let iota' = to_cint conv in
-  let size' = Ctypes.i_bits iota' in
-  let size = Ctypes.i_bits iota in
+  let size' = Ctypes.range iota' in
+  let size = Ctypes.range iota in
   if size <= size'
   then e_fun f [e']
   (* rule B:
@@ -269,12 +270,12 @@ let simplify_f_to_bounds iota e =
 let f_to_int = Ctypes.i_memo (fun iota -> make_fun_int "to" iota)
 
 let configure_to_int iota =
-  let f = f_to_int iota in
-  let simplify e =
+
+  let simplify_range f iota e =
     begin
       try match F.repr e with
         | Logic.Kint value ->
-            let size = Integer.of_int (Ctypes.i_bits iota) in
+            let size = Integer.of_int (Ctypes.range iota) in
             let signed = Ctypes.signed iota in
             F.e_zint (Integer.cast ~size ~signed ~value)
         | Logic.Fun( fland , es )
@@ -297,15 +298,22 @@ let configure_to_int iota =
               | _ -> raise Not_found
             end
         | Logic.Fun( conv , [e'] ) -> (* unary op *)
-            simplify_f_to_conv f iota e conv e'
+            simplify_range_comp f iota e conv e'
         | _ -> raise Not_found
       with Not_found ->
         simplify_f_to_bounds iota e
     end
   in
-  F.set_builtin_1 f simplify ;
-
-  let simplify_leq x y =
+  let simplify_conv f iota e =
+    if iota = Ctypes.CBool then
+      match F.is_equal e F.e_zero with
+      | Yes -> F.e_zero
+      | No -> F.e_one
+      | Maybe -> raise Not_found
+    else
+      simplify_range f iota e
+  in
+  let simplify_leq f iota x y =
     let lower,upper = Ctypes.bounds iota in
     match F.repr y with
     | Logic.Fun( conv , [_] )
@@ -324,7 +332,9 @@ let configure_to_int iota =
           | _ -> raise Not_found
         end
   in
-  F.set_builtin_leq f simplify_leq ;
+  let f = f_to_int iota in
+  F.set_builtin_1 f (simplify_conv f iota) ;
+  F.set_builtin_leq f (simplify_leq f iota) ;
   to_cint_map := FunMap.add f iota !to_cint_map
 
 
@@ -485,14 +495,14 @@ let smp_bitk_positive = function
             F.e_not (bitk_positive k a)
         | Logic.Fun( conv , [a] ) (* when is_to_c_int conv *) ->
             let iota = to_cint conv in
-            let size = Ctypes.i_bits iota in
+            let range = Ctypes.range iota in
             let signed = Ctypes.signed iota in
             if signed then (* beware of sign-bit *)
-              begin match is_leq k (e_int (size-2)) with
+              begin match is_leq k (e_int (range-2)) with
                 | Logic.Yes -> bitk_positive k a
                 | Logic.No | Logic.Maybe -> raise Not_found
               end
-            else begin match is_leq (e_int size) k with
+            else begin match is_leq (e_int range) k with
               | Logic.Yes -> e_false
               | Logic.No -> bitk_positive k a
               | Logic.Maybe -> raise Not_found

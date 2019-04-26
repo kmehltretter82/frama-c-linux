@@ -97,9 +97,8 @@ val char : char -> int64
 val constant : exp -> int64
 val get_int : exp -> int64 option
 
-val i_bits : c_int -> int (** size in bits *)
-val i_bytes : c_int -> int (** size in bytes *)
 val signed : c_int -> bool  (** [true] if signed *)
+val range : c_int -> int (** range in 2^n *)
 val bounds: c_int -> Integer.t * Integer.t (** domain, bounds included *)
 
 (** All sizes are in bits *)

@@ -1,11 +1,11 @@
 /* run.config
-   OPT: -wp-no-let -wp-no-bool-range
-   OPT: -wp-no-let -wp-bool-range 
+   OPT: -wp-no-let
+   OPT: -wp-no-let
 */
 
 /* run.config_qualif
-   OPT: -wp-no-let -wp-no-bool-range
-   OPT: -wp-no-let -wp-bool-range
+   OPT: -wp-no-let
+   OPT: -wp-no-let
 */
 
 

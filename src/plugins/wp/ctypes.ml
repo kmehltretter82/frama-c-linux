@@ -47,14 +47,14 @@ let signed  = function
   | UInt8 | UInt16 | UInt32 | UInt64 -> false
   | SInt8 | SInt16 | SInt32 | SInt64 -> true
 
-let i_bits = function
-  | CBool -> 8
+let range = function
+  | CBool -> 1
   | UInt8  | SInt8  -> 8
   | UInt16 | SInt16 -> 16
   | UInt32 | SInt32 -> 32
   | UInt64 | SInt64 -> 64
 
-let i_bytes = function
+let sizeof_i = function
   | CBool -> 1
   | UInt8  | SInt8  -> 1
   | UInt16 | SInt16 -> 2
@@ -97,8 +97,8 @@ let c_ptr () =
   make_c_int false Cil.theMachine.Cil.theMachine.sizeof_ptr
 
 let sub_c_int t1 t2 =
-  if (signed t1 = signed t2) then i_bits t1 <= i_bits t2
-  else (not(signed t1) && (i_bits t1 < i_bits t2))
+  if (signed t1 = signed t2) then range t1 <= range t2
+  else (not(signed t1) && (range t1 < range t2))
 
 type c_float =
   | Float32
@@ -106,7 +106,7 @@ type c_float =
 
 let compare_c_float : c_float -> c_float -> _ = Extlib.compare_basic
 
-let f_bytes = function
+let sizeof_f = function
   | Float32 -> 4
   | Float64 -> 8
 
@@ -126,7 +126,7 @@ let c_float fkind =
   | FDouble -> make_c_float mach.sizeof_double
   | FLongDouble -> make_c_float mach.sizeof_longdouble
 
-let equal_float f1 f2 = f_bits f1 = f_bits f2
+let equal_float f1 f2 = (f1 = f2)
 
 (* Array objects, with both the head view and the flatten view. *)
 
@@ -195,15 +195,15 @@ let f_iter f =
 (* --- Bounds                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-let i_bounds i =
-  if signed i then
-    let m = Integer.two_power_of_int (i_bits i - 1) in
-    Integer.neg m , Integer.pred m
-  else
-    let m = Integer.two_power_of_int (i_bits i) in
-    Integer.zero , Integer.pred m
-
-let bounds i = i_memo i_bounds i
+let bounds =
+  let i_bounds i =
+    if signed i then
+      let m = Integer.two_power_of_int (range i - 1) in
+      Integer.neg m , Integer.pred m
+    else
+      let m = Integer.two_power_of_int (range i) in
+      Integer.zero , Integer.pred m
+  in i_memo i_bounds
 
 (* -------------------------------------------------------------------------- *)
 (* --- Pretty Printers                                                    --- *)
@@ -211,7 +211,7 @@ let bounds i = i_memo i_bounds i
 
 let pp_int fmt i =
   if i = CBool then Format.pp_print_string fmt "bool"
-  else Format.fprintf fmt "%cint%d" (if signed i then 's' else 'u') (i_bits i)
+  else Format.fprintf fmt "%cint%d" (if signed i then 's' else 'u') (range i)
 
 let pp_float fmt f = Format.fprintf fmt "float%d" (f_bits f)
 
@@ -445,9 +445,9 @@ let sizeof_defined = function
   | _ -> true
 
 let sizeof_object = function
-  | C_int i -> i_bytes i
-  | C_float f -> f_bytes f
-  | C_pointer _ty -> i_bytes (c_ptr())
+  | C_int i -> sizeof_i i
+  | C_float f -> sizeof_f f
+  | C_pointer _ty -> sizeof_i (c_ptr())
   | C_comp cinfo ->
       let ctype = TComp(cinfo,Cil.empty_size_cache(),[]) in
       (Cil.bitsSizeOf ctype / 8)
@@ -490,7 +490,7 @@ let field_offset fd =
 (* with greater rank, whatever      *)
 (* their sign.                      *)
 
-let i_convert t1 t2 = if i_bits t1 < i_bits t2 then t2 else t1
+let i_convert t1 t2 = if range t1 < range t2 then t2 else t1
 let f_convert t1 t2 = if f_bits t1 < f_bits t2 then t2 else t1
 
 let promote a1 a2 =

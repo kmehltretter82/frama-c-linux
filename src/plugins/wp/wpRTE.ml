@@ -102,4 +102,8 @@ let missing_guards kf model =
   let update = ref false in
   let cint = Model.with_model model Cint.current () in
   List.iter (configure ~update ~generate:false kf cint) generator ;
+  let has_bool_traps = not (Kernel.InvalidBool.get ()) in
+  if has_bool_traps then
+    Wp_parameters.warning ~once:true ~current:false
+      "memory model incompatible with -no-warn-invalid-bool" ;
   !update
