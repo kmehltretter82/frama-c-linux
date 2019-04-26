@@ -25,7 +25,7 @@ use int.Int as Int
 use int.Abs as Abs
 use real.Real as Real
 
-axiom abs_def : forall x:int [Abs.abs x].
+lemma abs_def : forall x:int [Abs.abs x].
   if (Int.(>=) (x) (0)) then ((Abs.abs x) = (x)) else ((Abs.abs
   x) = ((Int.(-_) (x))))
 

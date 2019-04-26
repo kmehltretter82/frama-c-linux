@@ -27,8 +27,8 @@
 [wp] [alt-ergo] Goal typed_f_ensures_sm2_mod_pos_neg : Valid
 [wp] [alt-ergo] Goal typed_f_ensures_sm3_mod_neg_neg : Valid
 [wp] Proved goals:   22 / 22
-  Qed:             0 
-  alt-ergo:       22
+  Qed:                0 
+  Alt-Ergo (why3):   22
 [wp] Report in:  'tests/wp_acsl/oracle_qualif/div_mod.1.report.json'
 [wp] Report out: 'tests/wp_acsl/result_qualif/div_mod.1.report.json'
 -------------------------------------------------------------

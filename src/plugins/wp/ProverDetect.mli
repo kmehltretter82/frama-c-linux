@@ -20,48 +20,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-theory int.Int
-  remove prop CompatOrderMult
-end
+(* -------------------------------------------------------------------------- *)
+(** Why3 Prover Detection *)
+(* -------------------------------------------------------------------------- *)
 
-theory int.Abs
-  meta "rename_logic" function abs, "abs_int"
-end
+val detect : unit -> VCS.dp list
 
-theory int.MinMax
-  meta "rename_logic" function min, "min_int"
-  meta "rename_logic" function max, "max_int"
-end
-
-theory int.ComputerDivision
-  remove prop Div_mod
-  remove prop Mod_bound
-  remove prop Div_sign_pos
-  remove prop Div_sign_neg
-  remove prop Mod_sign_pos
-  remove prop Mod_sign_neg
-  remove prop Rounds_toward_zero
-end
-
-theory real.Real
-  remove prop CompatOrderMult
-end
-
-theory real.Abs
-  meta "rename_logic" function abs, "abs_real"
-end
-
-theory real.MinMax
-  meta "rename_logic" function min, "min_real"
-  meta "rename_logic" function max, "max_real"
-end
-
-theory map.Const
-
-end
-
-
-theory qed.Qed
-   syntax function pdiv "(%1 / %2)"
-   syntax function pmod "(%1 % %2)"
-end
+(**************************************************************************)
