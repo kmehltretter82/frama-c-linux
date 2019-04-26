@@ -95,6 +95,7 @@ let () =
   nojournal_register get_unsignedDownCast_status Unsigned_downcast.accessor;
   nojournal_register get_float_to_int_status Float_to_int.accessor;
   nojournal_register get_finite_float_status Finite_float.accessor;
+  nojournal_register get_bool_value_status Bool_value.accessor ;
   nojournal_register get_all_status all_statuses;
 ;;
 
