@@ -73,7 +73,7 @@ class iformat =
 (* --- Goal Panel                                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
-class pane (proverpane : GuiConfig.provers) =
+class pane (enabled : GuiConfig.enabled) =
   let icon = new Widget.image GuiProver.no_status in
   let status = new Widget.label () in
   let text = new Wtext.text () in
@@ -126,8 +126,8 @@ class pane (proverpane : GuiConfig.provers) =
         provers <-
           VCS.([ new GuiProver.prover ~console:text ~prover:AltErgo ] @
                List.map
-                 (fun dp -> new GuiProver.prover text (ProverWhy3.prover dp))
-                 proverpane#get) ;
+                 (fun dp -> new GuiProver.prover text (Why3 dp))
+                 enabled#get) ;
         List.iter (fun p -> palette#add_tool p#tool) provers ;
         palette#add_tool strategies#tool ;
         Strategy.iter strategies#register ;
@@ -137,11 +137,11 @@ class pane (proverpane : GuiConfig.provers) =
              tactics <- gtac :: tactics ;
              palette#add_tool gtac#tool) ;
         tactics <- List.rev tactics ;
-        self#register_provers proverpane#get ;
+        self#register_provers enabled#get ;
         printer#on_selection (fun () -> self#update) ;
         scripter#on_click self#goto ;
         scripter#on_backtrack self#backtrack ;
-        proverpane#connect self#register_provers ;
+        enabled#connect self#register_provers ;
         delete#connect (fun () -> self#interrupt ProofEngine.reset) ;
         cancel#connect (fun () -> self#interrupt ProofEngine.cancel) ;
         forward#connect (fun () -> self#forward) ;
@@ -292,7 +292,7 @@ class pane (proverpane : GuiConfig.provers) =
     method private register_provers dps =
       begin
         (* register missing provers *)
-        let prvs = List.map ProverWhy3.prover dps in
+        let prvs = List.map (fun p -> VCS.Why3 p) dps in
         (* set visible provers *)
         List.iter
           (fun prover ->

@@ -35,8 +35,8 @@
 [wp] [alt-ergo] Goal typed_ok_ensures_sqrt_pos : Valid
 [wp] [alt-ergo] Goal typed_ok_ensures_sqrt_pos0 : Valid
 [wp] Proved goals:   30 / 30
-  Qed:             5 
-  alt-ergo:       25
+  Qed:                5 
+  Alt-Ergo (why3):   25
 ----------------------------------------------------------
 Axiomatics          WP Alt-Ergo(Why3) Total  Success
 Lemma                3     16         19       100%

@@ -1,6 +1,0 @@
-theory T
-       use import qed.Qed
-
-       goal G : forall x : int, y : int. zleq x y = zleq y x -> x = y
-
-end

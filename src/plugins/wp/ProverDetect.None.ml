@@ -20,11 +20,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-logic match_bool : bool, 'a, 'a -> 'a
+# 23 "src/plugins/wp/ProverDetect.None.ml"
 
-axiom match_bool_True :
-  (forall z:'a. forall z1:'a. (match_bool(true, z, z1) = z))
+(* -------------------------------------------------------------------------- *)
+(* --- Prover Detection (no why3)                                         --- *)
+(* -------------------------------------------------------------------------- *)
 
-axiom match_bool_False :
-  (forall z:'a. forall z1:'a. (match_bool(false, z, z1) = z1))
+let detect () : VCS.dp list = []
 
+(**************************************************************************)
