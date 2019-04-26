@@ -5,6 +5,7 @@
 [wp:rte] function job: generate rte for memory access
 [wp:rte] function job: generate rte for division by zero
 [wp:rte] function job: generate rte for signed overflow
+[wp] Warning: -wp-rte can annotate invalid bool value because -warn-invalid-bool is not set
 [rte] annotating function job
 [wp:rte] function job2: generate rte for memory access
 [wp:rte] function job2: generate rte for division by zero
@@ -14,7 +15,7 @@
 [wp:rte] function job3: generate rte for division by zero
 [wp:rte] function job3: generate rte for signed overflow
 [rte] annotating function job3
-[wp] Warning: memory model incompatible with -no-warn-invalid-bool
+[wp] Warning: Missing RTE guards
 [wp] Goal typed_job_ensures : not tried
 [wp] Goal typed_job_assert_rte_mem_access : not tried
 [wp] Goal typed_job_assert_rte_mem_access_2 : not tried
