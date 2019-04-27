@@ -1229,7 +1229,8 @@ struct
       | t1, Ltype ({lt_name = name},[])
         when name = Utf8_logic.boolean && is_integral_type t1 ->
         let t2 = Ltype (C.find_logic_type Utf8_logic.boolean,[]) in
-        { e with term_node = TLogic_coerce(t2,e); term_type = t2 }
+        let e = mk_cast e Linteger in
+        Logic_const.term ~loc (TBinOp(Ne,e,lzero ~loc())) t2
       | t1, Linteger when Logic_const.is_boolean_type t1 && explicit ->
         logic_coerce Linteger e
       | t1, Ctype t2 when Logic_const.is_boolean_type t1

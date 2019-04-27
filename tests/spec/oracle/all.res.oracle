@@ -29,7 +29,7 @@ axiomatic Test {
   
   axiom e: P ⊻ Q;
   
-  axiom f: (𝔹)0? P: Q;
+  axiom f: 0 ≢ 0? P: Q;
   
   axiom g: (P ⇒ P) ∧ (¬P ⇒ Q);
   
@@ -39,13 +39,13 @@ axiomatic Test {
   
   }
  */
-/*@ predicate R(ℤ i, ℤ j) = ((𝔹)1? i + j: (j: j)) ≡ i + j;
+/*@ predicate R(ℤ i, ℤ j) = (1 ≢ 0? i + j: (j: j)) ≡ i + j;
  */
-/*@ predicate S(ℤ i, ℤ j) = ((𝔹)1? (i: j): j) ≡ j;
+/*@ predicate S(ℤ i, ℤ j) = (1 ≢ 0? (i: j): j) ≡ j;
  */
-/*@ predicate T(ℤ i, ℤ j) = ((𝔹)1? i: j) ≡ i;
+/*@ predicate T(ℤ i, ℤ j) = (1 ≢ 0? i: j) ≡ i;
  */
-/*@ lemma tauto: (𝔹)0? T(0, 0): R(1, 2);
+/*@ lemma tauto: 0 ≢ 0? T(0, 0): R(1, 2);
  */
 /*@ lemma tauto2: (R(0, 1) ⇒ S(3, 4)) ∧ (¬R(0, 1) ⇒ T(5, 6));
  */

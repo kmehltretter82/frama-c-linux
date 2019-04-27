@@ -22,7 +22,7 @@ void f(char *x)
   return;
 }
 
-/*@ ensures (𝔹)\result ≡ \true; */
+/*@ ensures (\result ≢ 0) ≡ \true; */
 int g(void)
 {
   int __retres;

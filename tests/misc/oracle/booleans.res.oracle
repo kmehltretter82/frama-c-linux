@@ -29,8 +29,8 @@ int main(void)
 {
   int __retres;
   int x = 42;
-  /*@ check (𝔹)x ≡ (𝔹)17; */ ;
-  /*@ check (ℤ)(𝔹)x ≡ 17; */ ;
+  /*@ check (x ≢ 0) ≡ (17 ≢ 0); */ ;
+  /*@ check ((ℤ)x ≢ 0) ≡ 17; */ ;
   __retres = 0;
   return __retres;
 }
