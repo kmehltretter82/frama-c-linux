@@ -146,7 +146,6 @@ val get_output : unit -> string
 val get_output_dir : string -> string
 val get_includes : unit -> string list
 val make_output_dir : string -> unit
-val get_bool_range : unit -> bool
 val get_overflows : unit -> bool
 
 (** {2 Debugging Categories} *)

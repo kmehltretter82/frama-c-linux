@@ -445,7 +445,8 @@ let annotate ?flags kf =
        comp Unsigned_overflow.accessor flags.unsigned_overflow |||
        comp Unsigned_downcast.accessor flags.unsigned_downcast |||
        comp Float_to_int.accessor flags.float_to_int |||
-       comp Finite_float.accessor flags.finite_float
+       comp Finite_float.accessor flags.finite_float |||
+       comp Bool_value.accessor flags.bool_value
     then begin
       Options.feedback "annotating function %a" Kernel_function.pretty kf;
       let warn = Options.Warn.get () in

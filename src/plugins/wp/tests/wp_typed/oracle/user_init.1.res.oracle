@@ -232,7 +232,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Post-condition (file tests/wp_typed/user_init.i, line 127) in 'init_t2_bis_v1':
-Let a = global(G_t2_48).
+Let a = global(G_t2_50).
 Assume {
   Type: is_uint32(i_2) /\ is_sint32(v).
   (* Goal *)
@@ -262,7 +262,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Preservation of Invariant 'Partial' (file tests/wp_typed/user_init.i, line 136):
-Let a = global(G_t2_48).
+Let a = global(G_t2_50).
 Let a_1 = shift_A20_sint32(a, i).
 Let a_2 = shift_sint32(a_1, 0).
 Let a_3 = havoc(Mint_undef_0, Mint_0, a_2, 20).
@@ -298,7 +298,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Preservation of Invariant 'Range' (file tests/wp_typed/user_init.i, line 135):
-Let a = global(G_t2_48).
+Let a = global(G_t2_50).
 Let a_1 = shift_A20_sint32(a, i).
 Assume {
   Type: is_uint32(i) /\ is_sint32(v).
@@ -342,7 +342,7 @@ Prove: true.
 
 Goal Loop assigns 'lack,Zone' (2/3):
 Effect at line 139
-Let a = global(G_t2_48).
+Let a = global(G_t2_50).
 Let a_1 = shift_A20_sint32(a, i).
 Assume {
   Type: is_uint32(i) /\ is_sint32(v).
@@ -379,7 +379,7 @@ Prove: (forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 <= 9) ->
 
 Goal Loop assigns 'lack,Zone' (3/3):
 Call Effect at line 140
-Let a = global(G_t2_48).
+Let a = global(G_t2_50).
 Let a_1 = shift_A20_sint32(a, i).
 Assume {
   Type: is_uint32(i) /\ is_sint32(v).
@@ -428,7 +428,7 @@ Assume {
   Have: forall a : addr.
       ((forall i_5,i_4 : Z. ((0 <= i_4) -> ((0 <= i_5) -> ((i_5 <= 9) ->
         ((i_4 <= 19) ->
-        (shift_sint32(shift_A20_sint32(global(G_t2_48), i_5), i_4) != a)))))) ->
+        (shift_sint32(shift_A20_sint32(global(G_t2_50), i_5), i_4) != a)))))) ->
       (Mint_0[a] = Mint_1[a])).
 }
 Prove: exists i_5,i_4 : Z. (i_5 <= i) /\ (i_4 <= i_1) /\ (0 <= i_4) /\
@@ -463,7 +463,7 @@ Assume {
   Have: forall a : addr.
       ((forall i_5,i_4 : Z. ((0 <= i_4) -> ((0 <= i_5) -> ((i_5 <= 9) ->
         ((i_4 <= 19) ->
-        (shift_sint32(shift_A20_sint32(global(G_t2_48), i_5), i_4) != a)))))) ->
+        (shift_sint32(shift_A20_sint32(global(G_t2_50), i_5), i_4) != a)))))) ->
       (Mint_0[a] = Mint_1[a])).
 }
 Prove: exists i_5,i_4 : Z. (i_5 <= i) /\ (i_4 <= i_1) /\ (0 <= i_4) /\
@@ -472,7 +472,7 @@ Prove: exists i_5,i_4 : Z. (i_5 <= i) /\ (i_4 <= i_1) /\ (0 <= i_4) /\
 ------------------------------------------------------------
 
 Goal Decreasing of Loop variant at loop (file tests/wp_typed/user_init.i, line 139):
-Let a = global(G_t2_48).
+Let a = global(G_t2_50).
 Let a_1 = shift_A20_sint32(a, i).
 Assume {
   Type: is_uint32(i) /\ is_sint32(v).
@@ -520,7 +520,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Post-condition (file tests/wp_typed/user_init.i, line 145) in 'init_t2_bis_v2':
-Let a = global(G_t2_48).
+Let a = global(G_t2_50).
 Assume {
   Type: is_uint32(i_2) /\ is_sint32(v).
   (* Goal *)
@@ -549,7 +549,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Preservation of Invariant 'Partial' (file tests/wp_typed/user_init.i, line 154):
-Let a = global(G_t2_48).
+Let a = global(G_t2_50).
 Let a_1 = shift_A20_sint32(a, i).
 Let a_2 = shift_sint32(a_1, 0).
 Let a_3 = havoc(Mint_undef_0, Mint_0, a_2, 20).
@@ -584,7 +584,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Preservation of Invariant 'Range' (file tests/wp_typed/user_init.i, line 153):
-Let a = global(G_t2_48).
+Let a = global(G_t2_50).
 Let a_1 = shift_A20_sint32(a, i).
 Assume {
   Type: is_uint32(i) /\ is_sint32(v).
@@ -627,7 +627,7 @@ Prove: true.
 
 Goal Loop assigns 'tactic,Zone' (2/3):
 Effect at line 157
-Let a = global(G_t2_48).
+Let a = global(G_t2_50).
 Let a_1 = shift_A20_sint32(a, i_2).
 Assume {
   Have: 0 <= i.
@@ -660,7 +660,7 @@ Prove: exists i_6,i_5 : Z. (i_6 <= i) /\ (i_5 <= i_1) /\ (i_1 <= i_5) /\
 
 Goal Loop assigns 'tactic,Zone' (3/3):
 Call Effect at line 158
-Let a = global(G_t2_48).
+Let a = global(G_t2_50).
 Let a_1 = shift_A20_sint32(a, i).
 Assume {
   Type: is_uint32(i) /\ is_sint32(v).
@@ -705,7 +705,7 @@ Assume {
   (* Loop assigns 'tactic,Zone' *)
   Have: forall a : addr.
       ((forall i_5,i_4 : Z. ((0 <= i_5) -> ((i_5 <= 9) ->
-        (shift_sint32(shift_A20_sint32(global(G_t2_48), i_5), i_4) != a)))) ->
+        (shift_sint32(shift_A20_sint32(global(G_t2_50), i_5), i_4) != a)))) ->
       (Mint_0[a] = Mint_1[a])).
 }
 Prove: exists i_5,i_4 : Z. (i_5 <= i) /\ (i_4 <= i_1) /\ (i_1 <= i_4) /\
@@ -737,7 +737,7 @@ Assume {
   (* Loop assigns 'tactic,Zone' *)
   Have: forall a : addr.
       ((forall i_5,i_4 : Z. ((0 <= i_5) -> ((i_5 <= 9) ->
-        (shift_sint32(shift_A20_sint32(global(G_t2_48), i_5), i_4) != a)))) ->
+        (shift_sint32(shift_A20_sint32(global(G_t2_50), i_5), i_4) != a)))) ->
       (Mint_0[a] = Mint_1[a])).
 }
 Prove: exists i_5,i_4 : Z. (i_5 <= i) /\ (i_4 <= i_1) /\ (i_1 <= i_4) /\
@@ -746,7 +746,7 @@ Prove: exists i_5,i_4 : Z. (i_5 <= i) /\ (i_4 <= i_1) /\ (i_1 <= i_4) /\
 ------------------------------------------------------------
 
 Goal Decreasing of Loop variant at loop (file tests/wp_typed/user_init.i, line 157):
-Let a = global(G_t2_48).
+Let a = global(G_t2_50).
 Let a_1 = shift_A20_sint32(a, i).
 Assume {
   Type: is_uint32(i) /\ is_sint32(v).

@@ -537,6 +537,16 @@ val isCharArrayType: typ -> bool
 (** True if the argument is an integral type (i.e. integer or enum) *)
 val isIntegralType: typ -> bool
 
+(** True if the argument is [_Bool]
+    @since Frama-C+dev
+*)
+val isBoolType: typ -> bool
+
+(** True if the argument is [_Bool] or [boolean].
+    @since Frama-C+dev
+ *)
+val isLogicPureBooleanType: logic_type -> bool
+
 (** True if the argument is an integral or pointer type. *)
 val isIntegralOrPointerType: typ -> bool
 
@@ -841,6 +851,13 @@ val isLogicZero: term -> bool
 
 (** True if the given term is [\null] or a constant null pointer*)
 val isLogicNull: term -> bool
+
+(** [no_op_coerce typ term] is [true] iff converting [term] to [typ] does
+    not modify its value.
+
+    @since Frama-C+dev
+*)
+val no_op_coerce: logic_type -> term -> bool
 
 (** gives the value of a wide char literal. *)
 val reduce_multichar: Cil_types.typ -> int64 list -> int64

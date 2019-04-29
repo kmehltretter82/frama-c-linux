@@ -604,6 +604,15 @@ let cast ~src_typ ~dst_typ v =
     | TSFloat fkind, TSFloat _ ->
       Cvalue.V.cast_float_to_float (Fval.kind fkind) v
 
+(* V.cast_int_to_int is unsound when the destination type is _Bool.
+   Use this function instead. *)
+let cast_to_bool r =
+  let contains_zero = V.contains_zero r.eover
+  and contains_non_zero = V.contains_non_zero r.eover in
+  let eover = V.interp_boolean ~contains_zero ~contains_non_zero in
+  { eover; eunder = under_from_over eover;
+    ldeps = r.ldeps; etype = TInt (IBool, []) }
+
 (* -------------------------------------------------------------------------- *)
 (* --- Inlining of defined logic functions and predicates                 --- *)
 (* -------------------------------------------------------------------------- *)
@@ -835,15 +844,14 @@ let rec eval_term ~alarm_mode env t =
 
   | TCastE (typ, t) ->
     let r = eval_term ~alarm_mode env t in
-    let eover, eunder =
-      (* See if the cast does something. If not, we can keep eunder as is.*)
-      if is_noop_cast ~src_typ:t.term_type ~dst_typ:typ
-      then r.eover, r.eunder
-      else
-        let eover = cast ~src_typ:r.etype ~dst_typ:typ r.eover in
-        eover, under_from_over eover
-    in
-    { etype = typ; ldeps = r.ldeps; eunder; eover }
+    (* See if the cast does something. If not, we can keep eunder as is.*)
+    if is_noop_cast ~src_typ:t.term_type ~dst_typ:typ
+    then { r with etype = typ }
+    else if Cil.isBoolType typ
+    then cast_to_bool r
+    else
+      let eover = cast ~src_typ:r.etype ~dst_typ:typ r.eover in
+      { etype = typ; ldeps = r.ldeps; eunder = under_from_over eover; eover }
 
   | Tif (tcond, ttrue, tfalse) ->
     eval_tif eval_term Cvalue.V.join Cvalue.V.meet ~alarm_mode env
@@ -887,9 +895,8 @@ let rec eval_term ~alarm_mode env t =
        nothing to do, AND coercion from an integer type to a floating-point
        type, that require a conversion. *)
     (match Logic_const.plain_or_set Extlib.id ltyp with
-     | Linteger ->
-       assert (Logic_typing.is_integral_type t.term_type);
-       r
+     | Linteger when Logic_typing.is_integral_type t.term_type
+                  || Logic_const.is_boolean_type t.term_type -> r
      | Ctype typ when Cil.isIntegralOrPointerType typ -> r
      | Lreal ->
        if Logic_typing.is_integral_type t.term_type
@@ -905,9 +912,14 @@ let rec eval_term ~alarm_mode env t =
            ldeps = r.ldeps;
            eunder = under_from_over eover;
            eover;  }
-     | _ -> unsupported
-              (Format.asprintf "logic coercion %a -> %a@."
-                 Printer.pp_logic_type t.term_type Printer.pp_logic_type ltyp)
+     | _ ->
+       if Logic_const.is_boolean_type ltyp
+       && Logic_typing.is_integral_type t.term_type
+       then cast_to_bool r
+       else
+         unsupported
+           (Format.asprintf "logic coercion %a -> %a@."
+              Printer.pp_logic_type t.term_type Printer.pp_logic_type ltyp)
     )
 
   (* TODO: the meaning of the label in \offset and \base_addr is not obvious
