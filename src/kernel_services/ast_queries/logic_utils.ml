@@ -304,7 +304,7 @@ let numeric_coerce ltyp t =
   let oldt = unroll_type t.term_type in
   if Cil_datatype.Logic_type.equal oldt ltyp then t
   else match t.term_node with
-    | TLogic_coerce(_,e) -> coerce e
+    | TLogic_coerce(t,e) when Cil.no_op_coerce t e -> coerce e
     | TConst(Integer(i,_)) ->
       (match oldt, ltyp with
        | Ctype (TInt(ikind,_)), Linteger when Cil.fitsInInt ikind i ->
