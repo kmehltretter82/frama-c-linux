@@ -39,24 +39,58 @@ int main(void)
     int __gen_e_acsl_f2_14;
     __gen_e_acsl_f2_14 = __gen_e_acsl_f2(7);
     __e_acsl_assert(__gen_e_acsl_f2_14 == 1,(char *)"Assertion",
-                    (char *)"main",(char *)"f2(7) == 1",25);
+                    (char *)"main",(char *)"f2(7) == 1",26);
   }
   /*@ assert f3(6) ≡ -5; */
   {
     int __gen_e_acsl_f3_6;
     __gen_e_acsl_f3_6 = __gen_e_acsl_f3(6);
     __e_acsl_assert(__gen_e_acsl_f3_6 == -5,(char *)"Assertion",
-                    (char *)"main",(char *)"f3(6) == -5",27);
+                    (char *)"main",(char *)"f3(6) == -5",28);
   }
   /*@ assert f4(9) > 0; */
   {
     unsigned long __gen_e_acsl_f4_6;
     __gen_e_acsl_f4_6 = __gen_e_acsl_f4(9);
     __e_acsl_assert(__gen_e_acsl_f4_6 > 0UL,(char *)"Assertion",
-                    (char *)"main",(char *)"f4(9) > 0",29);
+                    (char *)"main",(char *)"f4(9) > 0",30);
   }
   __retres = 0;
   return __retres;
+}
+
+unsigned long __gen_e_acsl_f4_2(long n)
+{
+  unsigned long __gen_e_acsl_if_6;
+  if (n < 100L) {
+    unsigned long __gen_e_acsl_f4_4;
+    __gen_e_acsl_f4_4 = __gen_e_acsl_f4_2(n + 1L);
+    __gen_e_acsl_if_6 = __gen_e_acsl_f4_4;
+  }
+  else {
+    unsigned long __gen_e_acsl_if_5;
+    if (n < 9223372036854775807L) __gen_e_acsl_if_5 = 9223372036854775807UL;
+    else __gen_e_acsl_if_5 = 6UL;
+    __gen_e_acsl_if_6 = __gen_e_acsl_if_5;
+  }
+  return __gen_e_acsl_if_6;
+}
+
+unsigned long __gen_e_acsl_f4(int n)
+{
+  unsigned long __gen_e_acsl_if_8;
+  if (n < 100) {
+    unsigned long __gen_e_acsl_f4_5;
+    __gen_e_acsl_f4_5 = __gen_e_acsl_f4_2(n + 1L);
+    __gen_e_acsl_if_8 = __gen_e_acsl_f4_5;
+  }
+  else {
+    unsigned long __gen_e_acsl_if_7;
+    if ((long)n < 9223372036854775807L) __gen_e_acsl_if_7 = 9223372036854775807UL;
+    else __gen_e_acsl_if_7 = 6UL;
+    __gen_e_acsl_if_8 = __gen_e_acsl_if_7;
+  }
+  return __gen_e_acsl_if_8;
 }
 
 int __gen_e_acsl_f2_2(long n)
@@ -71,7 +105,7 @@ int __gen_e_acsl_f2_2(long n)
     __gen_e_acsl_f2_6 = __gen_e_acsl_f2_2(n - 2L);
     __gen_e_acsl_f2_8 = __gen_e_acsl_f2_2(n - 3L);
     __e_acsl_assert(__gen_e_acsl_f2_8 != 0,(char *)"RTE",(char *)"f2_2",
-                    (char *)"division_by_zero: __gen_e_acsl_f2_8 != 0",9);
+                    (char *)"division_by_zero: __gen_e_acsl_f2_8 != 0",10);
     /*@ assert Eva: division_by_zero: __gen_e_acsl_f2_8 ≢ 0; */
     /*@ assert
         Eva: signed_overflow:
@@ -103,7 +137,7 @@ int __gen_e_acsl_f2(int n)
     __gen_e_acsl_f2_11 = __gen_e_acsl_f2_2(n - 2L);
     __gen_e_acsl_f2_13 = __gen_e_acsl_f2_2(n - 3L);
     __e_acsl_assert(__gen_e_acsl_f2_13 != 0,(char *)"RTE",(char *)"f2",
-                    (char *)"division_by_zero: __gen_e_acsl_f2_13 != 0",9);
+                    (char *)"division_by_zero: __gen_e_acsl_f2_13 != 0",10);
     /*@ assert Eva: division_by_zero: __gen_e_acsl_f2_13 ≢ 0; */
     /*@ assert
         Eva: signed_overflow:
@@ -169,40 +203,6 @@ int __gen_e_acsl_f3(int n)
     __gen_e_acsl_if_4 = __gen_e_acsl_g_8;
   }
   return __gen_e_acsl_if_4;
-}
-
-unsigned long __gen_e_acsl_f4_2(long n)
-{
-  unsigned long __gen_e_acsl_if_6;
-  if (n < 100L) {
-    unsigned long __gen_e_acsl_f4_4;
-    __gen_e_acsl_f4_4 = __gen_e_acsl_f4_2(n + 1L);
-    __gen_e_acsl_if_6 = __gen_e_acsl_f4_4;
-  }
-  else {
-    unsigned long __gen_e_acsl_if_5;
-    if (n < 9223372036854775807L) __gen_e_acsl_if_5 = 9223372036854775807UL;
-    else __gen_e_acsl_if_5 = 6UL;
-    __gen_e_acsl_if_6 = __gen_e_acsl_if_5;
-  }
-  return __gen_e_acsl_if_6;
-}
-
-unsigned long __gen_e_acsl_f4(int n)
-{
-  unsigned long __gen_e_acsl_if_8;
-  if (n < 100) {
-    unsigned long __gen_e_acsl_f4_5;
-    __gen_e_acsl_f4_5 = __gen_e_acsl_f4_2(n + 1L);
-    __gen_e_acsl_if_8 = __gen_e_acsl_f4_5;
-  }
-  else {
-    unsigned long __gen_e_acsl_if_7;
-    if ((long)n < 9223372036854775807L) __gen_e_acsl_if_7 = 9223372036854775807UL;
-    else __gen_e_acsl_if_7 = 6UL;
-    __gen_e_acsl_if_8 = __gen_e_acsl_if_7;
-  }
-  return __gen_e_acsl_if_8;
 }
 
 

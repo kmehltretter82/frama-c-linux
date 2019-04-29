@@ -1,5 +1,6 @@
 /* run.config
    COMMENT: recursive logic functions
+   STDOPT: +"-eva-ignore-recursive-calls"
 */
 
 /*@ logic integer f1(integer n) =
