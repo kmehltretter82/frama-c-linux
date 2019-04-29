@@ -266,6 +266,12 @@ void __gen_e_acsl_k(int x)
   return;
 }
 
+char __gen_e_acsl_h_char(int c)
+{
+  char __retres = (char)c;
+  return __retres;
+}
+
 short __gen_e_acsl_h_short(int s)
 {
   short __retres = (short)s;
@@ -438,12 +444,6 @@ void __gen_e_acsl_f1(__e_acsl_mpz_t *__retres_arg, int x, int y)
   __gmpz_clear(__gen_e_acsl_y_3);
   __gmpz_clear(__gen_e_acsl_add_4);
   return;
-}
-
-char __gen_e_acsl_h_char(int c)
-{
-  char __retres = (char)c;
-  return __retres;
 }
 
 
