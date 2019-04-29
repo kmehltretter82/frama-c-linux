@@ -133,9 +133,9 @@ let must_translate kf kind =
     let name = Functions.RTL.get_original_name kf in
     try
     let info =
-(*      try*) Datatype.String.Hashtbl.find keep_status name
-(*      with Not_found ->
-        Options.fatal "[keep_status] unbound function" Datatype.String.pretty kf*)
+      try Datatype.String.Hashtbl.find keep_status name
+      with Not_found ->
+        Options.fatal "[keep_status] unbound function" Datatype.String.pretty kf
     in
     info.cpt <- info.cpt + 1;
     let kind', keep =
