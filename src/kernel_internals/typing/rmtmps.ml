@@ -609,9 +609,11 @@ class markReferencedVisitor = object
     | GVarDecl (varinfo, loc)
     | GFunDecl (_,varinfo, loc)
     | GFun ({svar = varinfo}, loc) ->
-      Kernel.debug ~dkey "referenced: var/fun %s@." varinfo.vname;
-      Kernel.debug ~source:(fst loc) ~dkey "referenced: fun %s" varinfo.vname;
-      varinfo.vreferenced <- true;
+      if not (hasAttribute "FC_BUILTIN" varinfo.vattr) then begin
+        Kernel.debug ~dkey "referenced: var/fun %s@." varinfo.vname;
+        Kernel.debug ~source:(fst loc) ~dkey "referenced: fun %s" varinfo.vname;
+        varinfo.vreferenced <- true;
+      end;
       DoChildren
     | GAnnot _ -> DoChildren
     | _ ->
