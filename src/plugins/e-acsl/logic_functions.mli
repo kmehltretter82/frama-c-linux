@@ -20,42 +20,37 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** GMP Values. *)
-
 open Cil_types
 
-val init_t: unit -> unit
-(** Must be called before any use of GMP *)
+(** Generate C implementations of user-defined logic functions.
+    A logic function can have multiple C implementations depending on
+    the types computed for its arguments.
+    Eg: Consider the following definition: [integer g(integer x) = x]
+      with the following calls: [g(5)] and [g(10*INT_MAX)]
+      They will respectively generate the C prototypes [int g_1(int)]
+      and [long g_2(long)] *)
 
-val set_t: typeinfo -> unit
+(**************************************************************************)
+(************** Logic functions without labels ****************************)
+(**************************************************************************)
 
-val t: unit -> typ 
-  (** type "mpz_t" *)
-val t_ptr: unit -> typ
-  (** type "_mpz_struct *" *)
-  
-val is_now_referenced: unit -> unit 
-  (** Should be called once one variable of type "mpz_t" exists *)
+val reset: unit -> unit
 
-val is_t: typ -> bool 
-  (** is the type equal to "mpz_t"? *)
+val tapp_to_exp:
+  loc:location ->
+  string -> Env.t -> term -> logic_info -> Typing.integer_ty list -> exp list ->
+  varinfo * exp * Env.t
 
-val init: loc:location -> exp -> stmt
-  (** build stmt "mpz_init(v)" *)
+val add_generated_functions: global list -> global list
+(* @return the input list of globals in which the generated functions have been
+   inserted at the right places (both their declaration and their definition) *)
 
-val init_set: loc:location -> lval -> exp -> exp -> stmt
-(** [init_set x_as_lv x_as_exp e] builds stmt [x = e] or [mpz_init_set*(v, e)]
-    with the good function 'set' according to the type of e *)
+(**************************************************************************)
+(********************** Forward references ********************************)
+(**************************************************************************)
 
-val clear: loc:location -> exp -> stmt
-(** build stmt "mpz_clear(v)" *)
+val named_predicate_to_exp_ref:
+  (kernel_function -> Env.t -> predicate -> exp * Env.t) ref
 
-val affect: loc:location -> lval -> exp -> exp -> stmt
-(** [affect x_as_lv x_as_exp e] builds stmt [x = e] or [mpz_set*(e)] with the
-    good function 'set' according to the type of e *)
-
-(*
-Local Variables:
-compile-command: "make"
-End:
-*)
+val term_to_exp_ref:
+  (kernel_function -> Env.t -> term -> exp * Env.t) ref
