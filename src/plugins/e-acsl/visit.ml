@@ -369,8 +369,6 @@ class e_acsl_visitor prj generate = object (self)
     if generate then Project.copy ~selection ~src:cur prj;
     Cil.DoChildrenPost
       (fun f ->
-        (* generate the C functions that correspond to the logic ones *)
-        Logic_functions.do_visit f;
         (* extend [main] with forward initialization and put it at end *)
         if generate then begin
           if not (Global_observer.is_empty () && Literal_strings.is_empty ())
@@ -455,7 +453,12 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
             in
             Extlib.may handle_main main_fct
           in
-          Project.on prj build_mmodel_initializer ();
+          Project.on
+            prj
+            (fun () ->
+               f.globals <- Logic_functions.add_generated_functions f.globals;
+               build_mmodel_initializer ())
+            ();
           (* reset copied states at the end to be observationally
               equivalent to a standard visitor. *)
           Project.clear ~selection ~project:prj ();
@@ -564,9 +567,10 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
     let locals, blocks =
       List.fold_left
         (fun (local_vars, block_vars as acc) (v, scope) -> match scope with
-        | Env.Global -> acc
-        | Env.Function -> v :: local_vars, v :: block_vars
-        | Env.Local_block -> v :: local_vars, block_vars)
+        (* TODO: [kf] assumed to be consistent. Should be asserted. *)
+        | Env.LFunction _kf -> v :: local_vars, v :: block_vars
+        | Env.LLocal_block _kf -> v :: local_vars, block_vars
+        | _ -> acc)
         (f.slocals, f.sbody.blocals)
         vars
     in

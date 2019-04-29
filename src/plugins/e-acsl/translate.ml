@@ -450,40 +450,54 @@ and context_insensitive_term_to_exp kf env t =
     Cil.mkAddrOrStartOf ~loc lv, env, false, "startof"
   | Tapp(li, [], targs) ->
     let fname = li.l_var_info.lv_name in
-    let args, env =
-      try
-        List.fold_right
-          (fun targ (l, env) ->
-            let e, env = term_to_exp kf env targ in
-            e :: l, env)
-          targs
-          ([], env)
-      with Invalid_argument _ ->
-        Options.fatal "[Tapp] unexpected number of arguments when calling %s"
-          fname
-    in
     (* build the varinfo (as an expression) which stores the result of the
        function call. *)
     let _, e, env =
       if Builtins.mem li.l_var_info.lv_name then
         (* E-ACSL built-in function call *)
+        let args, env =
+          try
+            List.fold_right
+              (fun targ (l, env) ->
+                 let e, env = term_to_exp kf env targ in
+                 e :: l, env)
+              targs
+              ([], env)
+          with Invalid_argument _ ->
+            Options.fatal
+              "[Tapp] unexpected number of arguments when calling %s"
+              fname
+        in
         Env.new_var
           ~loc
           ~name:(fname ^ "_app")
           env
           (Some t)
           (Misc.cty (Extlib.the li.l_type))
-          (fun vi _ -> [ Misc.mk_call ~loc ~result:(Cil.var vi) fname args ])
+          (fun vi _ ->
+             [ Misc.mk_call ~loc ~result:(Cil.var vi) fname args ])
       else
-        let args_lty =
-          List.map
-            (fun targ ->
-               match Typing.get_integer_ty targ with
-               | Typing.Gmp -> Linteger
-               | Typing.C_type _ | Typing.Other -> Ctype (Typing.get_typ targ))
+        (* build the arguments and compute the integer_ty of the parameters *)
+        let params_ty, args, env =
+          List.fold_right
+            (fun targ (params_ty, args, env) ->
+               let e, env = term_to_exp kf env targ in
+               let param_ty = Typing.get_integer_ty targ in
+               let e, env =
+                 try
+                   let ty = Typing.typ_of_integer_ty param_ty in
+                   add_cast loc env (Some ty) false (Some targ) e
+                 with Typing.Not_an_integer ->
+                   e, env
+               in
+               param_ty :: params_ty, e :: args, env)
             targs
+            ([], [], env)
         in
-        Logic_functions.generate ~loc env t li args args_lty
+        let gen_fname =
+          Env.Varname.get ~scope:Env.Global (Functions.RTL.mk_gen_name fname)
+        in
+        Logic_functions.tapp_to_exp ~loc gen_fname env t li params_ty args
     in
     e, env, false, "app"
   | Tapp(_, _ :: _, _) ->
@@ -662,9 +676,7 @@ and named_predicate_content_to_exp ?name kf env p =
     (* Simply use the implementation of Tapp(li, labels, args).
       To achieve this, we create a clone of [li] for which the type is
       transformed from [None] (type of predicates) to
-      [Some int] (type as a term).
-      TODO: the approach seems dangerous. A better way would probably use a
-            version of [Lfunctions.generate] generalized to predicates. *)
+      [Some int] (type as a term). *)
     let prj = Project.current () in
     let o = object inherit Visitor.frama_c_copy prj end in
     let li = Visitor.visitFramacLogicInfo o li in
@@ -862,9 +874,6 @@ and translate_named_predicate kf env p =
 let named_predicate_to_exp ?name kf env p =
   named_predicate_to_exp ?name kf env p (* forget optional argument ?rte *)
 
-let add_cast_lfunctions loc env cty is_mpz e =
-  add_cast ~loc env cty is_mpz None e
-
 let () =
   Loops.term_to_exp_ref := term_to_exp;
   Loops.translate_named_predicate_ref := translate_named_predicate;
@@ -875,8 +884,7 @@ let () =
   Mmodel_translate.term_to_exp_ref := term_to_exp;
   Mmodel_translate.predicate_to_exp_ref := named_predicate_to_exp;
   Logic_functions.term_to_exp_ref := term_to_exp;
-  Logic_functions.predicate_to_exp_ref := named_predicate_to_exp;
-  Logic_functions.add_cast_ref := add_cast_lfunctions
+  Logic_functions.named_predicate_to_exp_ref := named_predicate_to_exp
 
 (* This function is used by Guillaume.
    However, it is correct to use it only in specific contexts. *)

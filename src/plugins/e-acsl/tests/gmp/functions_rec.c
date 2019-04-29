@@ -18,13 +18,13 @@
     6; */
 
 int main (void) {
-  /*@ assert f1(0) == 0; */ ;
-  /*@ assert f1(1) == 1; */ ;
-  /*@ assert f1(100) == 5050; */ ;
+  //  /*@ assert f1(0) == 0; */ ;
+  //  /*@ assert f1(1) == 1; */ ;
+  //  /*@ assert f1(100) == 5050; */ ;
 
-  /*@ assert f2(7) == 1; */ ;
+   /*@ assert f2(7) == 1; */ ;
 
   /*@ assert f3(6) == -5; */ ;
 
-  /*@assert f4(9) > 0; */ ;
+  /*@ assert f4(9) > 0; */ ;
 }

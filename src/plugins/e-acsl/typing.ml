@@ -46,28 +46,34 @@ let c_int = C_type IInt
 let ikind ik = C_type ik
 let other = Other
 
-include Datatype.Make
-(struct
-  type t = integer_ty
-  let name = "E_ACSL.New_typing.t"
-  let reprs = [ Gmp; c_int ]
-  include Datatype.Undefined
+module D =
+  Datatype.Make_with_collections
+    (struct
+      type t = integer_ty
+      let name = "E_ACSL.New_typing.t"
+      let reprs = [ Gmp; c_int ]
+      include Datatype.Undefined
 
-  let compare ty1 ty2 = match ty1, ty2 with
-    | C_type i1, C_type i2 ->
-      if i1 = i2 then 0
-      else if Cil.intTypeIncluded i1 i2 then -1 else 1
-    | (Other | C_type _), Gmp | Other, C_type _ -> -1
-    | Gmp, (C_type _ | Other) | C_type _, Other -> 1
-    | Gmp, Gmp | Other, Other -> 0
+      let compare ty1 ty2 = match ty1, ty2 with
+        | C_type i1, C_type i2 ->
+          if i1 = i2 then 0
+          else if Cil.intTypeIncluded i1 i2 then -1 else 1
+        | (Other | C_type _), Gmp | Other, C_type _ -> -1
+        | Gmp, (C_type _ | Other) | C_type _, Other -> 1
+        | Gmp, Gmp | Other, Other -> 0
 
-  let equal = Datatype.from_compare
+      let equal = Datatype.from_compare
 
-  let pretty fmt = function
-    | Gmp -> Format.pp_print_string fmt "GMP"
-    | C_type k -> Printer.pp_ikind fmt k
-    | Other -> Format.pp_print_string fmt "OTHER"
- end)
+      let hash = function
+        | Gmp -> 787
+        | Other -> 1011
+        | C_type ik -> Hashtbl.hash ik
+
+      let pretty fmt = function
+        | Gmp -> Format.pp_print_string fmt "GMP"
+        | C_type k -> Printer.pp_ikind fmt k
+        | Other -> Format.pp_print_string fmt "OTHER"
+    end)
 
 (******************************************************************************)
 (** Basic operations *)
@@ -105,9 +111,9 @@ let typ_of_lty = function
 (******************************************************************************)
 
 type computed_info =
-    { ty: t;  (* type required for the term *)
-      op: t; (* type required for the operation *)
-      cast: t option; (* if not [None], type of the context which the term
+    { ty: D.t;  (* type required for the term *)
+      op: D.t; (* type required for the operation *)
+      cast: D.t option; (* if not [None], type of the context which the term
                          must be casted to. If [None], no cast needed. *)
     }
 
@@ -116,7 +122,6 @@ type computed_info =
 module Memo: sig
   val memo: (term -> computed_info) -> term -> computed_info
   val get: term -> computed_info
-  val remove_all: term -> unit
   val clear: unit -> unit
 end = struct
 
@@ -155,29 +160,9 @@ end = struct
       H.add tbl t x;
       x
 
-  let rec remove_all t =
-    try
-      ignore (H.find tbl t);
-      H.remove tbl t;
-      remove_all t
-    with Not_found ->
-      ()
-
   let clear () = H.clear tbl
 
 end
-
-let clear_all_pred_or_term pot =
-  let o = object inherit Visitor.frama_c_inplace
-    method !vterm t =
-      Memo.remove_all t;
-      Cil.DoChildren
-  end
-  in
-  begin match pot with
-    | Misc.PoT_term t -> ignore(Visitor.visitFramacTerm o t)
-    | Misc.PoT_pred p -> ignore(Visitor.visitFramacPredicate o p)
-  end
 
 (******************************************************************************)
 (** {2 Coercion rules} *)
@@ -211,11 +196,11 @@ let ty_of_interv ?ctx i =
 (* compute a new {!computed_info} by coercing the given type [ty] to the given
    context [ctx]. [op] is the type for the operator. *)
 let coerce ~arith_operand ~ctx ~op ty =
-  if compare ty ctx = 1 then begin
+  if D.compare ty ctx = 1 then
     (* type larger than the expected context,
        so we must introduce an explicit cast *)
     { ty; op; cast = Some ctx }
-  end else
+  else
     (* only add an explicit cast if the context is [Gmp] and [ty] is not;
        or if the term corresponding to [ty] is an operand of an arithmetic
        operation which must be explicitly coerced in order to force the
@@ -369,7 +354,7 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
       dup ctx_res
 
     | TBinOp ((Lt | Gt | Le | Ge | Eq | Ne), t1, t2) ->
-      assert (match ctx with None -> true | Some c -> compare c c_int >= 0);
+      assert (match ctx with None -> true | Some c -> D.compare c c_int >= 0);
       let ctx =
         try
           let i1 = Interval.infer t1 in
@@ -491,9 +476,10 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
            type of the argument? For now, it is silently ignored (both
            statically and at runtime)... *)
         List.iter (fun arg -> ignore (type_term ~use_gmp_opt:true arg)) args;
+        (* TODO: recursive call in arguments of function call *)
         match li.l_body with
         | LBpred _ ->
-          (* We can have an [LBpred] here because we transformed
+          (* possible to have an [LBpred] here because we transformed
              [Papp] into [Tapp] *)
           dup c_int
         | LBterm _ ->
@@ -701,7 +687,7 @@ let rec type_predicate p =
 
 let type_term ~use_gmp_opt ?ctx t =
   Options.feedback ~dkey ~level:4 "typing term '%a' in ctx '%a'."
-    Printer.pp_term t (Pretty_utils.pp_opt pretty) ctx;
+    Printer.pp_term t (Pretty_utils.pp_opt D.pretty) ctx;
   ignore (type_term ~use_gmp_opt ?ctx t)
 
 let type_named_predicate ?(must_clear=true) p =
@@ -757,6 +743,8 @@ let get_cast_of_predicate p =
   with Not_an_integer -> assert false
 
 let clear = Memo.clear
+
+module Datatype = D
 
 (*
 Local Variables:

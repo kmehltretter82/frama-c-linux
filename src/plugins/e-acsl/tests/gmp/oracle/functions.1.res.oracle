@@ -23,12 +23,28 @@
 [eva:alarm] tests/gmp/functions.c:43: Warning: 
   function __e_acsl_assert: precondition got status unknown.
 [eva] using specification for function __gmpz_init_set_str
-[eva] using specification for function __gmpz_init_set
 [eva:alarm] tests/gmp/functions.c:44: Warning: 
   function __e_acsl_assert: precondition got status unknown.
+[eva] using specification for function __gmpz_init_set
 [eva:alarm] tests/gmp/functions.c:46: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[eva:alarm] tests/gmp/functions.c:47: Warning: 
   accessing uninitialized left-value.
-  assert \initialized((__e_acsl_mpz_struct *)__gen_e_acsl_f1_tapp);
-[eva:alarm] :0: Warning: 
-  function __gmpz_init_set: precondition ¬\initialized(z) got status invalid.
+  assert \initialized((__e_acsl_mpz_struct *)__gen_e_acsl_f1_4);
+[eva:alarm] tests/gmp/functions.c:47: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[eva:alarm] tests/gmp/functions.c:48: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[eva:alarm] tests/gmp/functions.c:49: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[eva:alarm] tests/gmp/functions.c:53: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[eva:alarm] tests/gmp/functions.c:56: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[eva:alarm] tests/gmp/functions.c:58: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[eva:alarm] tests/gmp/functions.c:63: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[eva:alarm] tests/gmp/functions.c:25: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
 [eva] done for function main

@@ -54,7 +54,8 @@ let t_ptr () = TNamed(
   },
 [])
 
-let is_t ty = Cil_datatype.Typ.equal ty (t ())
+let is_t ty =
+  Cil_datatype.Typ.equal ty (t ()) || Cil_datatype.Typ.equal ty (t_ptr ())
 
 let apply_on_var ~loc funname e = Misc.mk_call ~loc ("__gmpz_" ^ funname) [ e ]
 let init ~loc e = apply_on_var "init" ~loc e

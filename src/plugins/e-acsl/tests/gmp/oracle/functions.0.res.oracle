@@ -14,7 +14,6 @@
 [eva] using specification for function __e_acsl_memory_init
 [eva] using specification for function __e_acsl_assert
 [eva] using specification for function __gmpz_init_set_str
-[eva] using specification for function __gmpz_init_set
 [eva] using specification for function __gmpz_init_set_si
 [eva] using specification for function __gmpz_init
 [eva] using specification for function __gmpz_add
@@ -24,9 +23,9 @@
   function __e_acsl_assert: precondition got status unknown.
 [eva:alarm] tests/gmp/functions.c:47: Warning: 
   function __e_acsl_assert: precondition got status unknown.
+[eva] using specification for function __gmpz_init_set
 [eva:alarm] tests/gmp/functions.c:48: Warning: 
-  accessing uninitialized left-value.
-  assert \initialized((__e_acsl_mpz_struct *)__gen_e_acsl_f1_tapp_3);
-[eva:alarm] :0: Warning: 
-  function __gmpz_init_set: precondition ¬\initialized(z) got status invalid.
+  function __e_acsl_assert: precondition got status unknown.
+[eva:alarm] tests/gmp/functions.c:49: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
 [eva] done for function main

@@ -34,25 +34,23 @@ open Cil_types
 (************** Logic functions without labels ****************************)
 (**************************************************************************)
 
-val generate: loc:location -> Env.t -> term -> logic_info ->
-  exp list -> logic_type list -> varinfo * exp * Env.t
-(** [generate ~loc env t_app li args_exp args_lty] generates the C function
-    corresponding to [t_app] and returns the associated call. *)
-
-val do_visit: Cil_types.file -> unit
-(** Put declarations and definitions of the generated functions in the AST. *)
-
 val reset: unit -> unit
+
+val tapp_to_exp:
+  loc:location ->
+  string -> Env.t -> term -> logic_info -> Typing.integer_ty list -> exp list ->
+  varinfo * exp * Env.t
+
+val add_generated_functions: global list -> global list
+(* @return the input list of globals in which the generated functions have been
+   inserted at the right places (both their declaration and their definition) *)
 
 (**************************************************************************)
 (********************** Forward references ********************************)
 (**************************************************************************)
 
-val predicate_to_exp_ref:
+val named_predicate_to_exp_ref:
   (kernel_function -> Env.t -> predicate -> exp * Env.t) ref
 
 val term_to_exp_ref:
   (kernel_function -> Env.t -> term -> exp * Env.t) ref
-
-val add_cast_ref:
-  (location -> Env.t -> typ option -> bool -> exp -> exp * Env.t) ref

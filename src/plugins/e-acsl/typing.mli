@@ -56,7 +56,7 @@ type integer_ty = private
   | C_type of ikind
   | Other (** Any non-integral type *)
 
-val pretty: Format.formatter -> integer_ty -> unit
+module Datatype: Datatype.S_with_collections with type t = integer_ty
 
 (** {3 Smart constructors} *)
 
@@ -91,8 +91,8 @@ val join: integer_ty -> integer_ty -> integer_ty
 
 val type_term: use_gmp_opt:bool -> ?ctx:integer_ty -> term -> unit
 (** Compute the type of each subterm of the given term in the given context. If
-    [use_gmp_opt] is false, then the conversion to the given context is done even if
-    -e-acsl-gmp-only is set. *)
+    [use_gmp_opt] is false, then the conversion to the given context is done
+    even if -e-acsl-gmp-only is set. *)
 
 val type_named_predicate: ?must_clear:bool -> predicate -> unit
 (** Compute the type of each term of the given predicate.
@@ -100,10 +100,6 @@ val type_named_predicate: ?must_clear:bool -> predicate -> unit
 
 val clear: unit -> unit
 (** Remove all the previously computed types. *)
-
-val clear_all_pred_or_term: Misc.pred_or_term -> unit
-(** Remove all the previously computed types for the given term or predicate
-    AND its subterms. *)
 
 (** {3 Getters}
 

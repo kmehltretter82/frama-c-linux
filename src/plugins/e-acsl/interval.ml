@@ -348,7 +348,7 @@ and infer_term_lval (host, offset as tlv) =
     let ty = Logic_utils.logicCType (Cil.typeOfTermLval tlv) in
     interv_of_typ ty
 
-and infer_term_host h = match h with
+and infer_term_host = function
   | TVar v ->
     (try Env.find v
      with Not_found ->

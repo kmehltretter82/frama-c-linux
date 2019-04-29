@@ -36,6 +36,11 @@ val has_no_new_stmt: t -> bool
 (** Assume that a local context has been previously pushed.
     @return true iff the given env does not contain any new statement. *)
 
+type localized_scope =
+  | LGlobal
+  | LFunction of kernel_function
+  | LLocal_block of kernel_function
+
 type scope =
   | Global
   | Function
@@ -75,8 +80,9 @@ module Logic_binding: sig
   val get: t -> logic_var -> varinfo
   (* Return the latest C binding. *)
 
-  val remove: t -> logic_var -> t
+  val remove: t -> logic_var -> unit
   (* Remove the latest C binding. *)
+
 end
 
 val add_assert: t -> stmt -> predicate -> unit
@@ -115,10 +121,8 @@ val pop: t -> t
 val transfer: from:t -> t -> t
 (** Pop the last local context of [from] and push it into the other env. *)
 
-val get_generated_variables: t -> (varinfo * scope) list
-(** All the new variables local to the visited function. 
-    The boolean indicates whether the varinfo must be added to the outermost
-    function block. *)
+val get_generated_variables: t -> (varinfo * localized_scope) list
+(** All the new variables local to the visited function. *)
 
 val get_visitor: t -> Visitor.generic_frama_c_visitor
 val get_behavior: t -> Cil.visitor_behavior
