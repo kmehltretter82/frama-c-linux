@@ -4495,11 +4495,22 @@ let isCharConstPtrType t =
     match t with
       | Ctype ty -> isIntegralType ty
       | Linteger -> true
-      | Ltype ({lt_name = name},[]) ->
-          name = Utf8_logic.boolean
-      | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
-        isLogicBooleanType (unroll_ltdef ty)
-      | Lreal | Ltype _ | Lvar _ | Larrow _ -> false
+      | Ltype ({lt_name = name} as tdef,_) ->
+          name = Utf8_logic.boolean ||
+          ( is_unrollable_ltdef tdef && isLogicBooleanType (unroll_ltdef t))
+      | Lreal | Lvar _ | Larrow _ -> false
+
+let isBoolType typ = match unrollType typ with
+  | TInt (IBool, _) -> true
+  | _ -> false
+
+let rec isLogicPureBooleanType t =
+  match t with
+  | Ctype t -> isBoolType t
+  | Ltype ({lt_name = name} as def,_) ->
+    name = Utf8_logic.boolean ||
+    (is_unrollable_ltdef def && isLogicPureBooleanType (unroll_ltdef t))
+  | _ -> false
 
  let rec isLogicIntegralType t =
    match t with
@@ -4622,6 +4633,14 @@ let isCharConstPtrType t =
  let () =
    registerAttribute (Extlib.strip_underscore frama_c_init_obj) (AttrName false)
 
+ let no_op_coerce typ t =
+   match typ with
+   | Lreal -> true
+   | Linteger -> isLogicIntegralType t.term_type
+   | Ltype _ when Logic_const.is_boolean_type typ ->
+     isLogicPureBooleanType t.term_type
+   | Ltype ({lt_name="set"},_) -> true
+   | _ -> false
 
  (**** Compute the type of an expression ****)
  let rec typeOf (e: exp) : typ =

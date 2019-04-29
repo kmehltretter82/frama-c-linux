@@ -587,7 +587,9 @@ struct
         L.map
           (fun x -> Cmath.int_of_real (Cfloat.real_of_float f x))
           (C.logic env t)
-    | L_bool|L_pointer _|L_array _ ->
+    | L_bool ->
+        L.map Cmath.bool_of_int (C.logic env t)
+    | L_pointer _|L_array _ ->
         Warning.error "@[Logic cast from (%a) to (%a) not implemented yet@]"
           Printer.pp_logic_type src_ltype Printer.pp_logic_type Linteger
 
@@ -595,7 +597,9 @@ struct
     let src_ltype = Logic_utils.unroll_type ~unroll_typedef:false t.term_type in
     match cvsort_of_ltype src_ltype with
     | L_bool -> C.logic env t
-    | L_integer | L_cint _ | L_real | L_cfloat _ | L_pointer _ | L_array _ ->
+    | L_integer | L_cint _ ->
+        L.map Cmath.int_of_bool (C.logic env t)
+    | L_real | L_cfloat _ | L_pointer _ | L_array _ ->
         Warning.error "@[Logic cast from (%a) to (%a) not implemented yet@]"
           Printer.pp_logic_type src_ltype Printer.pp_logic_type Logic_const.boolean_type
 

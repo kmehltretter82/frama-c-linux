@@ -1071,16 +1071,20 @@ struct
     Cil_datatype.Logic_type.equal (Ctype ctyp1) (Ctype ctyp2)
 
   let rec c_mk_cast ?(force=false) e oldt newt =
+    let loc = e.term_loc in
     if is_same_c_type oldt newt then begin
-      if force then
-        Logic_utils.mk_cast ~loc:e.term_loc ~force newt e
-      else e
+      if force then Logic_utils.mk_cast ~loc ~force newt e else e
     end else begin
       (* Watch out for constants *)
       if isPointerType newt && isLogicNull e && not (isLogicZero e) then
         (* \null can have any pointer type, see ACSL manual. *)
-        { e with term_type = Ctype newt }
-      else if isPointerType newt && isArrayType oldt && is_C_array e then begin
+        (if force then
+           Logic_const.term ~loc (TCastE (newt, e)) (Ctype newt)
+         else
+           { e with term_type = Ctype newt })
+      else if isPointerType newt && isArrayType oldt then begin
+        if not (is_C_array e) then
+          C.error loc "cannot cast logic array to pointer type";
         let e = mk_logic_StartOf e in
         let oldt = Logic_utils.logicCType e.term_type in
         (* we have converted from array to ptr, but the pointed type might
@@ -1089,7 +1093,7 @@ struct
       end else begin
         match Cil.unrollType newt, e.term_node with
         | TEnum (ei,[]), TConst (LEnum { eihost = ei'})
-          when ei.ename = ei'.ename -> e
+          when ei.ename = ei'.ename && not force -> e
         | _ ->
           { e with term_node =
                      (Logic_utils.mk_cast ~force newt e).term_node;
@@ -1161,20 +1165,24 @@ struct
     | _ -> false
 
   let logic_coerce t e =
-    let set = make_set_type t in
+    let real_type = set_conversion t e.term_type in
     let rec aux e =
       match e.term_node with
       | Tcomprehension(e,q,p) ->
-        { e with term_type = set; term_node = Tcomprehension (aux e,q,p) }
+        { e with term_type = real_type;
+                 term_node = Tcomprehension (aux e,q,p) }
       | Tunion l ->
-        { e with term_type = set; term_node = Tunion (List.map aux l) }
+        { e with term_type = real_type; term_node = Tunion (List.map aux l) }
       | Tinter l ->
-        { e with term_type = set; term_node = Tinter (List.map aux l) }
-      | Tempty_set -> { e with term_type = set }
-      | TLogic_coerce(_,e) ->
-        { e with term_type = t; term_node = TLogic_coerce(t,e) }
-      | _ when Cil.isLogicArithmeticType t -> Logic_utils.numeric_coerce t e
-      | _ -> { e with term_type = t; term_node = TLogic_coerce(t,e) }
+        { e with term_type = real_type; term_node = Tinter (List.map aux l) }
+      | Tempty_set -> { e with term_type = real_type }
+      | TLogic_coerce(t2,e) when Cil.no_op_coerce t2 e ->
+        let e = aux e in
+        { e with term_type = real_type; term_node = TLogic_coerce(real_type,e) }
+      | _ when Cil.isLogicArithmeticType real_type ->
+        Logic_utils.numeric_coerce real_type e
+      | _ ->
+        { e with term_type = real_type; term_node = TLogic_coerce(real_type,e) }
     in
     if is_same_type e.term_type t then e else aux e
 
@@ -1196,10 +1204,20 @@ struct
     in
     lift_set convert_one_location t
 
-  let rec mk_cast e newt =
+  let rec mk_cast ?(explicit=false) e newt =
+    let force = explicit in
     let loc = e.term_loc in
-    if is_same_type e.term_type newt then e
-    else if is_enum_cst e newt then e
+    let truncate_info =
+      List.hd @@ Logic_env.find_all_logic_functions "\\truncate"
+    in
+    if is_same_type e.term_type newt then begin
+      if explicit then begin
+        match Logic_const.unroll_ltdef newt with
+        | Ctype cnewt ->
+          { e with term_node = TCastE(cnewt,e); term_type = newt }
+        | _ -> e
+      end else e
+    end else if is_enum_cst e newt then { e with term_type = newt }
     else begin
       match
         (unroll_type e.term_type),
@@ -1207,15 +1225,17 @@ struct
         (Logic_const.unroll_ltdef newt)
       with
       | Ctype oldt, Ctype newt ->
-        c_mk_cast e oldt newt
+        c_mk_cast ~force e oldt newt
       | t1, Ltype ({lt_name = name},[])
         when name = Utf8_logic.boolean && is_integral_type t1 ->
-        { e with
-          term_node =
-            TBinOp(Cil_types.Ne,
-                   mk_cast e Linteger,
-                   lzero ~loc ());
-          term_type = Ltype(C.find_logic_type Utf8_logic.boolean,[]) }
+        let t2 = Ltype (C.find_logic_type Utf8_logic.boolean,[]) in
+        let e = mk_cast e Linteger in
+        Logic_const.term ~loc (TBinOp(Ne,e,lzero ~loc())) t2
+      | t1, Linteger when Logic_const.is_boolean_type t1 && explicit ->
+        logic_coerce Linteger e
+      | t1, Ctype t2 when Logic_const.is_boolean_type t1
+                       && is_integral_type newt && explicit ->
+        Logic_const.term ~loc (TCastE (t2,e)) newt
       | ty1, Ltype({lt_name="set"},[ty2])
         when is_pointer_type ty1 &&
              is_plain_pointer_type ty2 &&
@@ -1224,27 +1244,37 @@ struct
       | Ltype({lt_name = "set"},[_]), Ltype({lt_name="set"},[ty2]) ->
         let e = lift_set (fun e -> mk_cast e ty2) e in
         { e with term_type = make_set_type e.term_type}
+      (* extremely dirty cast to allow Eva to understand some libc
+         specifications *)
+      | Ltype({lt_name = "set"},[_]), Ctype ty2 when explicit ->
+        Logic_utils.mk_cast ~loc ty2 e
       | _ , Ltype({lt_name =  "set"},[ ty2 ]) ->
         let e = mk_cast e ty2 in
         logic_coerce (make_set_type e.term_type) e
       | Linteger, Linteger | Lreal, Lreal -> e
       | Linteger, Ctype t when isLogicPointerType newt && isLogicNull e ->
-        c_mk_cast e intType t
+        c_mk_cast ~force e intType t
+      | Linteger, (Ctype newt) | Lreal, (Ctype newt) when explicit ->
+        Logic_utils.mk_cast ~loc newt e
       | Linteger, Ctype t when isIntegralType t ->
-        (try
-           C.integral_cast t e
-         with Failure s -> C.error loc "%s" s)
+        (try C.integral_cast t e with Failure s -> C.error loc "%s" s)
       | Linteger, Ctype _ | Lreal, Ctype _ ->
         C.error loc "invalid implicit cast from %a to C type %a"
           Cil_printer.pp_logic_type e.term_type
           Cil_printer.pp_logic_type newt
       | Ctype t, Linteger when Cil.isIntegralType t -> logic_coerce Linteger e
+      | Ctype t, Linteger when Cil.isArithmeticType t && explicit ->
+        Logic_const.term
+          ~loc (Tapp(truncate_info,[], [logic_coerce Lreal e])) Linteger
       | Ctype t, Lreal when isArithmeticType t -> logic_coerce Lreal e
       | Ctype _, (Lreal | Linteger) ->
         C.error loc "invalid implicit cast from %a to logic type %a"
           Cil_printer.pp_logic_type e.term_type
           Cil_printer.pp_logic_type newt
       | Linteger, Lreal -> logic_coerce Lreal e
+      | Lreal, Linteger when explicit ->
+        let term_node = Tapp(truncate_info,[],[e]) in
+        Logic_const.term ~loc term_node Linteger
       | Lreal, Linteger ->
         C.error loc
           "invalid cast from real to integer. \
@@ -1778,6 +1808,8 @@ struct
         when Cil.isIntegralType t -> Linteger
       | (Linteger, Ctype t | Ctype t, Linteger)
         when Cil.isArithmeticType t -> Lreal
+      (* In ACSL, you can convert implicitely from integral to boolean =>
+         prefer boolean as common type when doing comparison. *)
       | Ltype({lt_name = name},[]), t
         when is_integral_type t && name = Utf8_logic.boolean ->
         Ltype(C.find_logic_type Utf8_logic.boolean,[])
@@ -2395,7 +2427,6 @@ struct
       in
       normalize_updated_offset_term idx_typing env loc t normalizing_cont toff
   and locations_set ctxt ~lift_set env loc l init_type =
-    let module C = struct end in
     let convert_ptr, locs, typ =
       List.fold_left
         (fun (convert_ptr,locs,typ) t ->
@@ -2415,7 +2446,6 @@ struct
     let locs = List.rev_map (make_set_conversion convert_ptr) locs in
     locs,typ
   and lfun_app ctxt env loc f labels ttl =
-    let module C = struct end in
     try
       let info = ctxt.find_logic_ctor f in
       if labels <> [] then begin
@@ -2444,7 +2474,6 @@ struct
         ctxt.error loc "symbol %s is a predicate, not a function" f
       | Some t -> Tapp(info, label_assoc, tl), t
   and term_node ctxt env loc pl =
-    let module C = struct end in
     let term = ctxt.type_term ctxt in
     let term_ptr pl =
       let t = term env pl in
@@ -2838,49 +2867,9 @@ struct
     | PLcast (ty, t) ->
       let t = term env t in
       (* no casts of tsets in grammar *)
-      let ct =
-        Logic_const.unroll_ltdef (logic_type ctxt loc env ty)
-      in
-      (match ct with
-       | (Ctype tnew) ->
-         (match t.term_type with
-          | Ctype told ->
-            if isPointerType tnew && isArrayType told
-               && not (is_C_array t) then
-              ctxt.error loc "cannot cast logic array to pointer type";
-            if Cil.isVoidPtrType told then
-              (Logic_utils.mk_cast tnew t).term_node, ct
-            else
-              (c_mk_cast ~force:true t told tnew).term_node , ct
-          | _ -> (Logic_utils.mk_cast tnew t).term_node, ct)
-       | Linteger when is_arithmetic_type t.term_type ->
-         let truncate_info =
-           List.hd @@ Logic_env.find_all_logic_functions "\\truncate"
-         in
-         let term_node =
-           match unroll_type t.term_type with
-           | Lreal -> Tapp (truncate_info, [], [t])
-           | Ctype ty when not (Cil.isIntegralType ty) ->
-             (* arithmetic but not integral type: floating point.
-                Coerce to real before applying truncate. *)
-             Tapp (
-               truncate_info, [],
-               [ Logic_const.term ~loc:t.term_loc
-                   (TLogic_coerce(Lreal,t)) Lreal ])
-           | Ctype _ ->
-             (* an integral type by construction *)
-             TLogic_coerce(Linteger, t)
-           | Linteger -> (* coercion is a no-op. *) t.term_node
-           | Ltype _ | Lvar _ | Larrow _ as ty ->
-             Kernel.fatal
-               "%a should not be considered an arithmetic type"
-               Cil_printer.pp_logic_type ty
-         in
-         term_node, Linteger
-       | Linteger | Lreal | Ltype _ | Lvar _ | Larrow _ ->
-         ctxt.error loc "cannot cast from %a to %a"
-           Cil_printer.pp_logic_type t.term_type
-           Cil_printer.pp_logic_type ct)
+      let ct = Logic_const.unroll_ltdef (logic_type ctxt loc env ty) in
+      let { term_node; term_type } = mk_cast ~explicit:true t ct in
+      (term_node, term_type)
     | PLcoercion (t,ty) ->
       let t = term env t in
       (match Logic_const.unroll_ltdef (logic_type ctxt loc env ty) with
