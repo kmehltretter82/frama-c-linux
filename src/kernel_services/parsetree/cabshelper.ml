@@ -235,6 +235,7 @@ let mk_behavior ?(name=Cil.default_behavior_name) ?(assumes=[]) ?(requires=[])
 let mk_asm_templates =
   let buf = Buffer.create 100 in
   let rec outer res = function
+    | [] when res = [] && Buffer.length buf = 0 -> [""]
     | [] when Buffer.length buf = 0 -> List.rev res
     | [] ->
        let res = List.rev @@ Buffer.contents buf :: res in
