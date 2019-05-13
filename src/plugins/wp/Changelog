@@ -21,6 +21,7 @@
 ###############################################################################
 
  - Qed         [2019/05/09] Transforms some boolean quantifications into let constructs
+ - Wp          [2019/05/09] Fixes -wp-simplify-is-cint simplifier
  - Wp          [2019/04/26] Now requires -warn-invalid-bool
  - Wp          [2019/04/26] Removed option -wp-bool-range
  - Wp          [2019/04/24] Support for Why3 1.* and Coq 8.{7-9}
