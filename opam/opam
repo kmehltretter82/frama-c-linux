@@ -1,7 +1,7 @@
 opam-version: "2.0"
 name: "frama-c"
 synopsis: "Platform dedicated to the analysis of source code written in C"
-version: "18.0"
+version: "19.0.beta1"
 maintainer: "francois.bobot@cea.fr"
 authors: [
   "Michele Alberti"
@@ -28,6 +28,7 @@ authors: [
   "David Maison"
   "Claude Marché"
   "André Maroneze"
+  "Thibault Martin"
   "Melody Méaulle"
   "Benjamin Monate"
   "Yannick Moy"
@@ -36,6 +37,7 @@ authors: [
   "Guillaume Petiot"
   "Virgile Prevosto"
   "Armand Puccetti"
+  "Virgile Robles"
   "Muriel Roger"
   "Julien Signoles"
   "Kostyantyn Vorobyov"
@@ -44,7 +46,7 @@ authors: [
 homepage: "http://frama-c.com/"
 license: "GNU Lesser General Public License version 2.1"
 dev-repo: "git+https://github.com/Frama-C/Frama-C-snapshot.git#latest"
-doc: "http://frama-c.com/download/user-manual-18.0-Argon.pdf"
+doc: "http://frama-c.com/download/user-manual-19.0-Potassium.pdf"
 bug-reports: "https://bts.frama-c.com/"
 tags: [
   "deductive"
