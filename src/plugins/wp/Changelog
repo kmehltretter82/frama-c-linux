@@ -20,6 +20,10 @@
 #   <Prover>: prover
 ###############################################################################
 
+##########################
+Plugin WP 19.0 (Potassium)
+##########################
+
  - Wp          [2019/05/09] Fixes -wp-simplify-is-cint simplifier
  - Wp          [2019/04/26] Now requires -warn-invalid-bool
  - Wp          [2019/04/26] Removed option -wp-bool-range

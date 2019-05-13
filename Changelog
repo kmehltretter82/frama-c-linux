@@ -17,6 +17,10 @@
 Open Source Release <next-release>
 ##################################
 
+####################################
+Open Source Release 19.0 (Potassium)
+####################################
+
 -*  Kernel    [2019/04/09] Avoid crashing on one-letter attributes. Fixes #2432
 -*  Obfuscator [2019/04/09] Also obfuscate formals in function pointer types.
               Fixes #2433.
