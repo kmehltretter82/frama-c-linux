@@ -815,6 +815,7 @@ let c_int_bounds_ival f  =
 
 let max_reduce_quantifiers = 1000
 
+(** We know that t is a predicate which is the opened body of a forall *)
 let reduce_bound v dom t : term =
   let module Exc = struct
     exception True
@@ -831,8 +832,9 @@ let reduce_bound v dom t : term =
         Ival.fold_int red dom (); raise Exc.True
       with Exc.Unknown i -> i in
     let max_bound = try
-        Ival.fold_int(*_decrease*) red dom (); raise Exc.True
+        Ival.fold_int_decrease red dom (); raise Exc.True
       with Exc.Unknown i -> i in
+    (** we try to reduce the bounds of the domains, when trivially false *)
     let dom_red = Ival.inject_range (Some min_bound) (Some max_bound) in
     if not (Ival.equal dom_red dom) && Ival.is_included dom_red dom
     then t
@@ -929,6 +931,8 @@ let is_cint_simplifier = object (self)
           domain <- Tmap.add tvar !var_domain domain;
           let t = walk ~is_goal t in
           domain <- Tmap.remove tvar domain;
+          (** Bonus: Add additionnal hypothesis in forall when we could deduce
+              better constraint on the variable *)
           let t = if quant = Forall &&
                      is_goal &&
                      Ival.cardinal_is_less_than !var_domain max_reduce_quantifiers
@@ -936,6 +940,7 @@ let is_cint_simplifier = object (self)
             else t in
           e_bind quant var t
       | Fun(g,[a]) ->
+          (** Here we simplifies the cints which are redoundant *)
           begin try
               let ubound = c_int_bounds_ival (is_cint g) in
               let dom = (Tmap.find a domain) in
