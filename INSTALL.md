@@ -85,7 +85,7 @@ Frama-C 19 (Potassium):
 - apron.20160125 (optional)
 - coq.8.9.0 (optional)
 - lablgtk.2.18.5 | lablgtk3.3.0.beta5 + lablgtk3-sourceview3.3.0.beta5
-- mlgmpidl.1.2.7 (optional)
+- mlgmpidl.1.2.9 (optional)
 - ocamlgraph.1.8.8
 - why3.1.2.0 (optional)
 - why3-coq.1.2.0 (optional)
