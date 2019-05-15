@@ -317,7 +317,7 @@ endif
 byte:: $(Wp_DIR)/share/why3/why3.conf
 opt:: $(Wp_DIR)/share/why3/why3.conf
 
-$(Wp_DIR)/share/why3/why3.conf:
+$(Wp_DIR)/share/why3/why3.conf: config.status $(Wp_DIR)/Makefile.in
 	@echo Generation of the extra-config for why3
 	@printf "[prover_modifiers]\n" >> $@
 	@printf "name=\"Coq\"\n" >> $@
