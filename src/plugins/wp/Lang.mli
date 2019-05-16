@@ -555,6 +555,14 @@ val p_subst : (term -> term) -> pred -> pred (** uses current pool *)
 
 exception Contradiction
 
+val is_literal: F.term -> bool
+val iter_confident_literals: (F.term -> unit) -> F.term -> unit
+(** [iter_confident_literals assume_from_litteral hyp] applies
+    the function [assume_from_litteral] on confident literals of an hypothesis.
+    Note: confident literals of an hypothesis are implied by this hypothesis.
+    (i.e. in the hypothesis [not (A && (B || C) ==> D)], only [A] and [not D] are
+    considered as confident literals). *)
+
 class type simplifier =
   object
     method name : string
