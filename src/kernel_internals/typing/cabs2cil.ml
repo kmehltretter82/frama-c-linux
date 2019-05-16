@@ -4993,11 +4993,20 @@ and doType (ghost:bool) isFuncArg
           (args', !newisva)
         end else (args, isva)
       in
+      let argl_length = List.length args' in
       (* Make the argument as for a formal *)
       let doOneArg (s, (n, ndt, a, cloc)) : varinfo =
         let s' = doSpecList ghost n s in
         let vi = makeVarInfoCabs ~ghost ~isformal:true ~isglobal:false
             (convLoc cloc) s' (n,ndt,a) in
+        if isVoidType vi.vtype then begin
+          if argl_length > 1 then
+            Kernel.error ~once:true ~current:true
+              "'void' must be the only parameter if specified";
+          if vi.vname <> "" then
+            Kernel.error ~once:true ~current:true
+              "named parameter '%s' has void type" vi.vname
+        end;
         (* Add the formal to the environment, so it can be referenced by
            other formals  (e.g. in an array type, although that will be
            changed to a pointer later, or though typeof).  *)
