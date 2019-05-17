@@ -112,6 +112,11 @@ class annot_visitor kf flags on_alarm = object (self)
       let on_alarm ~invalid a = on_alarm stmt ~invalid a in
       fgen ~remove_trivial:flags.Flags.remove_trivial ~on_alarm
 
+  (* Do not visit variable declarations, as no alarm should be emitted here,
+     and there is no statement to emit an alarm anyway ([generate_assertion]
+     or [Alarms.register] would then crash). *)
+  method !vvdec _ = Cil.SkipChildren
+
   method! vstmt s = match s.skind with
     | UnspecifiedSequence l ->
       (* UnspecifiedSequences may contain lvals for side-effects, that
