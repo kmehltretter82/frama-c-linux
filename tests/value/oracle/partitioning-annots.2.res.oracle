@@ -11,9 +11,6 @@
 [eva] tests/value/partitioning-annots.c:127: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_interval <- test_loop_split.
-  Called from tests/value/partitioning-annots.c:127.
-[eva] Done for function Frama_C_interval
 [eva] tests/value/partitioning-annots.c:125: starting to merge loop iterations
 [eva] computing for function Frama_C_interval <- test_loop_split.
   Called from tests/value/partitioning-annots.c:127.

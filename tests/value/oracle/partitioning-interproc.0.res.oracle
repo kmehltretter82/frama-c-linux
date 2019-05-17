@@ -12,9 +12,9 @@
 [eva] Done for function Frama_C_nondet
 [eva] Recording results for cassign
 [eva] Done for function cassign
-[eva:alarm] tests/value/partitioning-interproc.c:25: Warning: 
-  accessing uninitialized left-value. assert \initialized(&x);
 [eva] tests/value/partitioning-interproc.c:26: Frama_C_show_each: {1}
+[eva] tests/value/partitioning-interproc.c:30: 
+  Reusing old results for call to cassign
 [eva] computing for function cassign <- cassign_test.
   Called from tests/value/partitioning-interproc.c:30.
 [eva] computing for function Frama_C_nondet <- cassign <- cassign_test.
@@ -22,15 +22,6 @@
 [eva] Done for function Frama_C_nondet
 [eva] Recording results for cassign
 [eva] Done for function cassign
-[eva] computing for function cassign <- cassign_test.
-  Called from tests/value/partitioning-interproc.c:30.
-[eva] computing for function Frama_C_nondet <- cassign <- cassign_test.
-  Called from tests/value/partitioning-interproc.c:11.
-[eva] Done for function Frama_C_nondet
-[eva] Recording results for cassign
-[eva] Done for function cassign
-[eva:alarm] tests/value/partitioning-interproc.c:31: Warning: 
-  accessing uninitialized left-value. assert \initialized(&x);
 [eva] tests/value/partitioning-interproc.c:32: Frama_C_show_each: {1}
 [eva] tests/value/partitioning-interproc.c:32: Frama_C_show_each: {1}
 [eva] Recording results for cassign_test

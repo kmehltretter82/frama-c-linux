@@ -564,10 +564,10 @@ module Make
      evaluates the assigns, and finally reduces by the post-conditions.
      [warn] is false for the specification of cvalue builtins — in this case,
      some warnings are disabled, such as warnings about new garbled mixes. *)
-  let compute_using_specification ~warn kinstr call spec state =
+  let compute_using_specification ~warn kinstr call spec (key,state) =
     let vi = Kernel_function.get_vi call.kf in
     if Cil.hasAttribute "noreturn" vi.vattr
-    then `Bottom
+    then []
     else
       (* Initializes the variable returned by the function. *)
       let state = match call.return with
@@ -582,8 +582,6 @@ module Make
       let states =
         compute_specification ~warn kinstr call.kf call.return spec state
       in
-      if States.is_empty states
-      then `Bottom
-      else `Value (States.to_list states)
+      List.map (fun x -> key,x) (States.to_list states)
 
 end

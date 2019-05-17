@@ -112,13 +112,13 @@ struct
 
   (* Accessors *)
 
-  let expanded (s : store) : state list =
+  let expanded (s : store) : (key*state) list =
     Partition.to_list s.store_partition
 
   let smashed (s : store) : state or_bottom =
     match expanded s with
     | [] -> `Bottom
-    | v1 :: l -> `Value (List.fold_left Domain.join v1 l)
+    | (_k,v1) :: l -> `Value (List.fold_left Domain.join v1 (List.map snd l))
 
   let contents (flow : flow) : state list =
     Flow.to_list flow
@@ -210,7 +210,7 @@ struct
     in
     into.tank_states <- Partition.merge join into.tank_states new_states
 
-  let transfer = Flow.transfer_states
+  let transfer = Flow.transfer
 
   let output_slevel : int -> unit =
     let slevel_display_step = Value_parameters.ShowSlevel.get () in
@@ -239,7 +239,8 @@ struct
     in
     (* Get every source flow *)
     let sources_states =
-      match sources with
+      (* Is there more than one non-empty incomming flow ? *)
+      match List.filter (fun (_b,f) -> not (Flow.is_empty f)) sources with
       | [(_,flow)] -> [flow]
       | sources ->
         (* Several branches -> partition according to the incoming branch *)

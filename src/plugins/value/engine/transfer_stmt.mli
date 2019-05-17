@@ -27,6 +27,7 @@ val current_kf_inout: unit -> Inout_type.t option
 
 module type S = sig
 
+  type pkey = Partition.key
   type state
   type value
   type loc
@@ -36,8 +37,8 @@ module type S = sig
   val assume: state -> stmt -> exp -> bool -> state or_bottom
 
   val call:
-    stmt -> lval option -> exp -> exp list -> state ->
-    state list or_bottom * Eval.cacheable
+    stmt -> lval option -> exp -> exp list -> pkey -> state ->
+    (pkey*state) list * Eval.cacheable
 
   val check_unspecified_sequence:
     Cil_types.stmt ->
@@ -49,13 +50,13 @@ module type S = sig
   val enter_scope: kernel_function -> varinfo list -> state -> state
 
   type call_result = {
-    states: state list or_bottom;
+    states: (pkey * state) list;
     cacheable: Eval.cacheable;
     builtin: bool;
   }
 
   val compute_call_ref:
-    (stmt -> (loc, value) call -> recursion option -> state -> call_result) ref
+    (stmt -> (loc, value) call -> recursion option -> pkey -> state -> call_result) ref
 end
 
 module Make (Abstract: Abstractions.Eva)

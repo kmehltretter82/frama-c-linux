@@ -35,6 +35,6 @@ module Make
     val compute_using_specification:
       warn:bool ->
       kinstr -> (Abstract.Loc.location, Abstract.Val.t) call -> spec ->
-      Abstract.Dom.t -> Abstract.Dom.t list or_bottom
+      (Partition.key * Abstract.Dom.t) -> (Partition.key * Abstract.Dom.t) list
 
   end

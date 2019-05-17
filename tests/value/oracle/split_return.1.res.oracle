@@ -34,8 +34,8 @@
   Called from tests/value/split_return.i:51.
 [eva] Recording results for f2
 [eva] Done for function f2
-[eva] tests/value/split_return.i:52: Frama_C_show_each_f2: {0}, {0}
 [eva] tests/value/split_return.i:52: Frama_C_show_each_f2: {5; 7}, {5}
+[eva] tests/value/split_return.i:52: Frama_C_show_each_f2: {0}, {0}
 [eva] tests/value/split_return.i:54: assertion got status valid.
 [eva] tests/value/split_return.i:56: Frama_C_show_each_f2_2: {5; 7}, {5}
 [eva] tests/value/split_return.i:57: assertion got status valid.
@@ -47,8 +47,8 @@
   Called from tests/value/split_return.i:76.
 [eva] Recording results for f3
 [eva] Done for function f3
-[eva] tests/value/split_return.i:77: Frama_C_show_each_f3: {-2}, {0}
 [eva] tests/value/split_return.i:77: Frama_C_show_each_f3: {7}, {5}
+[eva] tests/value/split_return.i:77: Frama_C_show_each_f3: {-2}, {0}
 [eva] tests/value/split_return.i:79: assertion got status valid.
 [eva] tests/value/split_return.i:81: assertion got status valid.
 [eva] Recording results for main3
@@ -59,8 +59,8 @@
   Called from tests/value/split_return.i:97.
 [eva] Recording results for f4
 [eva] Done for function f4
-[eva] tests/value/split_return.i:98: Frama_C_show_each_f4: {4}, {0}
 [eva] tests/value/split_return.i:98: Frama_C_show_each_f4: {7}, {5}
+[eva] tests/value/split_return.i:98: Frama_C_show_each_f4: {4}, {0}
 [eva] tests/value/split_return.i:100: assertion got status valid.
 [eva] tests/value/split_return.i:102: assertion got status valid.
 [eva] Recording results for main4
@@ -71,8 +71,8 @@
   Called from tests/value/split_return.i:120.
 [eva] Recording results for f5
 [eva] Done for function f5
-[eva] tests/value/split_return.i:121: Frama_C_show_each_f5: {-2}, {0}
 [eva] tests/value/split_return.i:121: Frama_C_show_each_f5: {7}, {5}
+[eva] tests/value/split_return.i:121: Frama_C_show_each_f5: {-2}, {0}
 [eva] tests/value/split_return.i:123: assertion got status valid.
 [eva] tests/value/split_return.i:125: assertion got status valid.
 [eva] Recording results for main5
@@ -104,8 +104,8 @@
   Called from tests/value/split_return.i:174.
 [eva] Recording results for f8
 [eva] Done for function f8
-[eva] tests/value/split_return.i:175: Frama_C_show_each_then8: {-1}, {0}
 [eva] tests/value/split_return.i:175: Frama_C_show_each_then8: {4}, {{ &x }}
+[eva] tests/value/split_return.i:175: Frama_C_show_each_then8: {-1}, {0}
 [eva] Recording results for main8
 [eva] Done for function main8
 [eva] computing for function main9 <- main.

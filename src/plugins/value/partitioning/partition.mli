@@ -42,10 +42,10 @@
 type key
 
 module Key : sig
-  val zero : key (** Initial key: no partitioning. *)
-  val compare : key -> key -> int
-  val pretty : Format.formatter -> key -> unit
-  val exceed_rationing: key -> bool
+  include Datatype.S_with_collections with type t = key
+  val zero : t (** Initial key: no partitioning. *)
+  val exceed_rationing: t -> bool
+  val recombine : t -> t -> t (** Recombinaison of keys after a call *)
 end
 
 (** Collection of states, each identified by a unique key. *)
@@ -54,7 +54,7 @@ type 'state partition
 val empty : 'a partition
 val is_empty : 'a partition -> bool
 val size : 'a partition -> int
-val to_list : 'a partition -> 'a list
+val to_list : 'a partition -> (key*'a) list
 val find : key -> 'a partition -> 'a
 val replace : key -> 'a -> 'a partition -> 'a partition
 val merge : (key -> 'a option -> 'b option -> 'c option) -> 'a partition ->
@@ -182,8 +182,8 @@ sig
 
   val union : t -> t -> t
 
+  val transfer : ((key * state) -> (key * state) list) -> t -> t
   val transfer_keys : t -> action -> t
-  val transfer_states : (state -> state list) -> t -> t
 
   val iter : (state -> unit) -> t -> unit
   val filter_map: (key -> state -> state option) -> t -> t

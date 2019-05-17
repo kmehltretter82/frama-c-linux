@@ -1,7 +1,7 @@
 /* run.config*
    GCC:
    STDOPT: #"-main cassign_test -eva-partition-history 1"
-   STDOPT: #"-main fabs_test -eva-partition-history 1 -eva-equality-domain"
+   STDOPT: #"-main fabs_test -eva-partition-history 1 -eva-domains equality"
    */
 
 #include "__fc_builtin.h"

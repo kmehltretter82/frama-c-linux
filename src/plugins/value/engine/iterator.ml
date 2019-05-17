@@ -95,12 +95,12 @@ module Make_Dataflow
 
   (* --- Abstract values storage --- *)
 
-  module Partition = Trace_partitioning.Make (Abstract) (AnalysisParam)
+  module Partitioning = Trace_partitioning.Make (Abstract) (AnalysisParam)
 
-  type store = Partition.store
-  type flow = Partition.flow
-  type tank = Partition.tank
-  type widening = Partition.widening
+  type store = Partitioning.store
+  type flow = Partitioning.flow
+  type tank = Partitioning.tank
+  type widening = Partitioning.widening
 
   type edge_info = {
     mutable fireable : bool (* Does any states survive the transition ? *)
@@ -141,9 +141,9 @@ module Make_Dataflow
     | `Value state -> state
 
   let initial_tank =
-    Partition.initial_tank (States.to_list initial_states)
+    Partitioning.initial_tank (States.to_list initial_states)
   let get_initial_flow () =
-    -1 (* Dummy edge id *), Partition.drain initial_tank
+    -1 (* Dummy edge id *), Partitioning.drain initial_tank
 
   let post_conditions = ref false
 
@@ -180,11 +180,11 @@ module Make_Dataflow
 
   (* Default (Initial) stores on vertex and edges *)
   let default_vertex_store (v : vertex) () : store =
-    Partition.empty_store ~stmt:v.vertex_start_of
+    Partitioning.empty_store ~stmt:v.vertex_start_of
   let default_vertex_widening (v : vertex) () : widening =
-    Partition.empty_widening ~stmt:v.vertex_start_of
+    Partitioning.empty_widening ~stmt:v.vertex_start_of
   let default_edge_tank () : tank * edge_info =
-    Partition.empty_tank (), { fireable = false }
+    Partitioning.empty_tank (), { fireable = false }
 
   (* Get the stores associated to a control point or edge *)
   let get_vertex_store (v : vertex) : store =
@@ -217,24 +217,28 @@ module Make_Dataflow
 
   (* --- Transfer functions application --- *)
 
+  type key = Partition.key
   type state = Domain.t
 
-  type transfer_function = state -> state list
+  type transfer_function = (key * state) -> (key * state) list
 
-  let id : transfer_function = fun x -> [x]
+  let id : transfer_function = fun (k,x) -> [(k,x)]
 
   (* Thse lifting function helps to uniformize the transfer functions to a
      common signature *)
 
   let lift (f : state -> state) : transfer_function =
-    fun x -> [f x]
+    fun (k,x) -> [(k,f x)]
 
   let lift' (f : state -> state or_bottom) : transfer_function =
-    fun x -> Bottom.to_list (f x)
+    fun (k,x) -> Bottom.to_list (f x >>-: fun y -> k,y)
+
+  let lift'' (f : state -> state list) : transfer_function =
+    fun (k,x) -> List.map (fun y -> k,y) (f x)
 
   let sequence (f1 : transfer_function) (f2 : transfer_function)
     : transfer_function =
-    fun x -> List.fold_left (fun acc y -> f2 y @ acc) [] (f1 x)
+    fun (k,x) -> List.fold_left (fun acc (k',y) -> f2 (k',y) @ acc) [] (f1 (k,x))
 
 
   (* Tries to evaluate \assigns … \from … clauses for assembly code. *)
@@ -269,14 +273,14 @@ module Make_Dataflow
     if vars = [] then id else lift (Domain.leave_scope kf vars)
 
   let transfer_call (stmt : stmt) (dest : lval option) (callee : exp)
-      (args : exp list) (state : state) : state list =
+      (args : exp list) (key,state : key * state) : (key*state) list =
     let result, call_cacheable =
-      Transfer.call stmt dest callee args state
+      Transfer.call stmt dest callee args key state
     in
     if call_cacheable = Eval.NoCacheCallers then
       (* Propagate info that the current call cannot be cached either *)
       cacheable := Eval.NoCacheCallers;
-    Bottom.list_of_bot result
+    result
 
   let transfer_instr (stmt : stmt) (instr : instr) : transfer_function =
     match instr with
@@ -289,13 +293,13 @@ module Make_Dataflow
       lift' transfer
     | Local_init (vi, ConsInit (f, args, k), loc) ->
       let kind = Abstract_domain.Local kf in
-      let as_func dest callee args _loc state =
+      let as_func dest callee args _loc (key,state) =
         (* This variable enters the scope too early, as it should
            be introduced after the call to [f] but before the assignment
            to [v]. This is currently not possible, at least without
            splitting Transfer.call in two. *)
         let state = Domain.enter_scope kind [vi] state in
-        transfer_call stmt dest callee args state
+        transfer_call stmt dest callee args (key,state)
       in
       Cil.treat_constructor_as_func as_func vi f args k loc
     | Set (dest, exp, _loc) ->
@@ -331,7 +335,7 @@ module Make_Dataflow
     (* Assign the return value *)
     and assign_retval =
       match return_exp with
-      | None -> id
+      | None -> fun state -> [state]
       | Some return_exp ->
         let vi_ret = Option.get (Library_functions.get_retres_vi kf) in
         let return_lval = Var vi_ret, NoOffset in
@@ -342,7 +346,7 @@ module Make_Dataflow
           let state' = Transfer.assign state kstmt return_lval return_exp in
           Bottom.to_list state'
     in
-    sequence check_postconditions assign_retval
+    sequence (lift'' check_postconditions) (lift'' assign_retval)
 
   let transfer_transition (t : vertex transition) : transfer_function =
     match t with
@@ -357,7 +361,8 @@ module Make_Dataflow
     | Leave (block) ->            transfer_leave block
     | Prop _ -> id (* Annotations are interpreted in [transfer_statement]. *)
 
-  let transfer_annotations (stmt : stmt) ~(record : bool) : transfer_function =
+  let transfer_annotations (stmt : stmt) ~(record : bool)
+    : state -> state list =
     let annots =
       (* We do not interpret annotations that come from statement contracts
          and everything previously emitted by Value (currently, alarms) *)
@@ -395,20 +400,20 @@ module Make_Dataflow
       (transition : vertex transition) (flow : flow) : flow =
     (* Split return *)
     let flow = match transition with
-      | Return (return_exp, _) -> Partition.split_return flow return_exp
+      | Return (return_exp, _) -> Partitioning.split_return flow return_exp
       | _ -> flow
     in
     (* Loop transitions *)
     let the_stmt v = Option.get v.vertex_start_of in
     let enter_loop f v =
-      let f = Partition.enter_loop f (the_stmt v) in
-      Partition.transfer (lift (Domain.enter_loop (the_stmt v))) f
+      let f = Partitioning.enter_loop f (the_stmt v) in
+      Partitioning.transfer (lift (Domain.enter_loop (the_stmt v))) f
     and leave_loop f v =
-      let f = Partition.leave_loop f (the_stmt v) in
-      Partition.transfer (lift (Domain.leave_loop (the_stmt v))) f
+      let f = Partitioning.leave_loop f (the_stmt v) in
+      Partitioning.transfer (lift (Domain.leave_loop (the_stmt v))) f
     and incr_loop_counter f v =
-      let f = Partition.next_loop_iteration f (the_stmt v) in
-      Partition.transfer (lift (Domain.incr_loop_counter (the_stmt v))) f
+      let f = Partitioning.next_loop_iteration f (the_stmt v) in
+      Partitioning.transfer (lift (Domain.incr_loop_counter (the_stmt v))) f
     in
     let loops_left, loops_entered =
       Interpreted_automata.get_wto_index_diff kf v1 v2
@@ -422,14 +427,14 @@ module Make_Dataflow
   let process_edge (v1,e,v2 : G.edge) : flow =
     let {edge_transition=transition; edge_kinstr=kinstr} = e in
     let tank,edge_info = get_edge_data e in
-    let flow = Partition.drain tank in
+    let flow = Partitioning.drain tank in
     Db.yield ();
     check_signals ();
     current_ki := kinstr;
     Cil.CurrentLoc.set e.edge_loc;
-    let flow = Partition.transfer (transfer_transition transition) flow in
+    let flow = Partitioning.transfer (transfer_transition transition) flow in
     let flow = process_partitioning_transitions v1 v2 transition flow in
-    if not (Partition.is_empty_flow flow) then
+    if not (Partitioning.is_empty_flow flow) then
       edge_info.fireable <- true;
     flow
 
@@ -439,7 +444,7 @@ module Make_Dataflow
 
   let call_statement_callbacks (stmt : stmt) (f : flow) : unit =
     (* TODO: apply on all domains. *)
-    let states = Partition.contents f in
+    let states = Partitioning.contents f in
     let cvalue_states = gather_cvalues states in
     Db.Value.Compute_Statement_Callbacks.apply
       (stmt, Value_util.call_stack (), cvalue_states)
@@ -457,36 +462,37 @@ module Make_Dataflow
     (* Get vertex store *)
     let store = get_vertex_store v in
     (* Join incoming s tates *)
-    let flow = Partition.join sources store in
+    let flow = Partitioning.join sources store in
     let flow =
       match v.vertex_start_of with
       | Some stmt ->
         (* Callbacks *)
         call_statement_callbacks stmt flow;
         (* Transfer function associated to the statement *)
-        Partition.transfer (transfer_statement stmt) flow
+        Partitioning.transfer (lift'' (transfer_statement stmt)) flow
       | _ -> flow
     in
     (* Widen if necessary *)
     let flow =
-      if widening && not (Partition.is_empty_flow flow) then begin
-        let flow = Partition.widen (get_vertex_widening v) flow in
+      if widening && not (Partitioning.is_empty_flow flow) then begin
+        let flow = Partitioning.widen (get_vertex_widening v) flow in
         (* Try to correct over-widenings *)
         let correct_over_widening stmt =
           (* Do *not* record the status after interpreting the annotation
              here. Possible unproven assertions have already been recorded
              when the assertion has been interpreted the first time higher
              in this function. *)
-          Partition.transfer (transfer_annotations stmt ~record:false) flow
+          Partitioning.transfer
+            (lift'' (transfer_annotations stmt ~record:false)) flow
         in
         Option.fold ~some:correct_over_widening ~none:flow v.vertex_start_of
       end else
         flow
     in
     (* Dispatch to successors *)
-    List.iter (fun into -> Partition.fill flow ~into) (get_succ_tanks v);
+    List.iter (fun into -> Partitioning.fill flow ~into) (get_succ_tanks v);
     (* Return whether the iterator should stop or not *)
-    Partition.is_empty_flow flow
+    Partitioning.is_empty_flow flow
 
   let process_vertex ?(widening : bool = false) (v : vertex) : bool =
     (* Process predecessors *)
@@ -509,7 +515,7 @@ module Make_Dataflow
     (* Try every possible successor *)
     let add_if_fireable (_,e,succ as edge) acc =
       let f = process_edge edge in
-      if Partition.is_empty_flow f
+      if Partitioning.is_empty_flow f
       then acc
       else (e.edge_key,f,succ) :: acc
     in
@@ -525,13 +531,13 @@ module Make_Dataflow
   let reset_component (vertex_list : vertex list) : unit =
     let reset_edge (_,e,_) =
       let t,_ = get_edge_data e in
-      Partition.reset_tank t
+      Partitioning.reset_tank t
     in
     let reset_vertex v =
       let s = get_vertex_store v
       and w = get_vertex_widening v in
-      Partition.reset_store s;
-      Partition.reset_widening w;
+      Partitioning.reset_store s;
+      Partitioning.reset_widening w;
       List.iter reset_edge (G.succ_e graph v)
     in
     List.iter reset_vertex vertex_list
@@ -547,7 +553,7 @@ module Make_Dataflow
          is especially useful for nested loops. *)
       if hierachical_convergence
       then reset_component (v :: Wto.flatten w)
-      else Partition.reset_widening_counter (get_vertex_widening v);
+      else Partitioning.reset_widening_counter (get_vertex_widening v);
       (* Iterate until convergence *)
       let iteration_count = ref 0 in
       while
@@ -578,7 +584,7 @@ module Make_Dataflow
   let mark_degeneration () =
     let f stmt (v,_) =
       let l = get_succ_tanks v in
-      if not (List.for_all Partition.is_empty_tank l) then
+      if not (List.for_all Partitioning.is_empty_tank l) then
         Value_util.DegenerationPoints.replace stmt false
     in
     StmtTable.iter f automaton.stmt_table;
@@ -594,7 +600,7 @@ module Make_Dataflow
     ignore (Logic.check_fct_postconditions kf active_behaviors Normal
               ~pre_state:initial_state ~post_states:States.empty ~result:None)
 
-  let compute () : state list or_bottom =
+  let compute () : (key*state) list =
     if interpreter_mode then
       simulate automaton.entry_point (get_initial_flow ())
     else begin
@@ -603,7 +609,7 @@ module Make_Dataflow
     end;
     if not !post_conditions then mark_postconds_as_true ();
     let final_store = get_vertex_store automaton.return_point in
-    Bottom.bot_of_list (Partition.expanded final_store)
+    Partitioning.expanded final_store
 
 
   (* --- Results conversion --- *)
@@ -664,7 +670,7 @@ module Make_Dataflow
       let merged_states = VertexTable.create control_point_count
       and get_smashed_store v =
         let store = get_vertex_store v in
-        Partition.smashed store
+        Partitioning.smashed store
       in
       fun ~all stmt (v : vertex) ->
         if all || is_instr stmt
@@ -685,8 +691,8 @@ module Make_Dataflow
     let unmerged_pre_cvalues = lazy
       (StmtTable.map (fun _stmt (v,_) ->
            let store = get_vertex_store v in
-           let states = Partition.expanded store in
-           List.map (fun x -> Domain.get_cvalue_or_top x) states)
+           let states = Partitioning.expanded store in
+           List.map (fun (_k,x) -> Domain.get_cvalue_or_top x) states)
           automaton.stmt_table)
     in
     let merged_pre_cvalues = lazy (lift_to_cvalues merged_pre_states)
@@ -772,12 +778,10 @@ module Computer
           Kernel_function.pretty kf;
       Dataflow.merge_results ();
       let f = Kernel_function.get_definition kf in
-      (match results with
-       | `Value (_::_) when Cil.hasAttribute "noreturn" f.svar.vattr ->
-         Value_util.warning_once_current
-           "function %a may terminate but has the noreturn attribute"
-           Kernel_function.pretty kf;
-       | _ -> ());
+      if Cil.hasAttribute "noreturn" f.svar.vattr && results <> [] then
+        Value_util.warning_once_current
+          "function %a may terminate but has the noreturn attribute"
+          Kernel_function.pretty kf;
       results, !Dataflow.cacheable
     in
     let cleanup () =
