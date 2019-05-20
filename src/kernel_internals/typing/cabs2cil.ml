@@ -1628,12 +1628,25 @@ struct
       (fun (stmt, _, _, _, _) -> ignore (Cil.visitCilStmt vis stmt))
       c.stmts
 
-  (* if we're about to drop a chunk, clean up locals of current func. *)
-  let clean_up_chunk_locals c =
+  let remove_locals l =
     !currentFunctionFDEC.slocals <-
       List.filter
-        (fun x -> not (List.exists (Cil_datatype.Varinfo.equal x) c.locals))
+        (fun x -> not (List.exists (Cil_datatype.Varinfo.equal x) l))
         !currentFunctionFDEC.slocals
+
+  let clean_up_block_locals (s, _, _, _, _) =
+    let vis =
+      object
+        inherit Cil.nopCilVisitor
+        method! vblock b = remove_locals b.blocals; DoChildren
+      end
+    in
+    ignore (Cil.visitCilStmt vis s)
+
+  (* if we're about to drop a chunk, clean up locals of current func. *)
+  let clean_up_chunk_locals c =
+    remove_locals c.locals;
+    List.iter clean_up_block_locals c.stmts
 
   (* Gathers locals of blocks. *)
   class locals_visitor () = object
