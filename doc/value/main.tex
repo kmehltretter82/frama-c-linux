@@ -3,6 +3,7 @@
 \usepackage{microtype}
 \usepackage{lmodern}
 \usepackage{booktabs}
+\usepackage{calc}
 
 % Commandes pour mettre des ref dans l'index :
 \newcommand{\idb}[1]{\textbf{#1}}
@@ -16,6 +17,17 @@
 \newcommand{\brclose}{\mbox{\tt ]}}
 \newcommand{\cbopen}{\mbox{\tt \{}}
 \newcommand{\cbclose}{\mbox{\tt \}}}
+
+% Special environment
+\definecolor{gris}{gray}{0.85}
+
+\makeatletter
+\newenvironment{important}%
+{\hspace{5pt plus \linewidth minus \marginparsep}%
+ \begin{lrbox}{\@tempboxa}%
+   \begin{minipage}{\linewidth - 2\fboxsep}\itshape}
+{\end{minipage}\end{lrbox}\colorbox{gris}{\usebox{\@tempboxa}}}
+\makeatother
 
 \newcommand{\framacversion}%
            {\input{../../VERSION} (\input{../../VERSION_CODENAME}\unskip)}
@@ -144,7 +156,7 @@ invalid pointer accesses,\ldots
 When launched with \lstinline|frama-c -eva rte.c|,
 \Eva{} emits a warning about an out-of-bound access at line 5:
 \begin{logs}
-rte.c:5:[kernel] warning: accessing out of bounds index. assert i < 10;
+rte.c:5:[eva] Warning: accessing out of bounds index. assert i < 10;
 \end{logs}
 There is in fact an out-of-bounds access at this line in the program.
 It can also happen that, because of approximations during its computations,
@@ -289,16 +301,16 @@ After extracting the archive \lstinline|skein_NIST_CD_010509.zip|,
 listing the files in\\
 \lstinline|NIST/CD/Reference_Implementation| shows:
 \begin{listing}{1}
--rw-r--r--  1 pascal  501   4984 Oct 14 00:52 SHA3api_ref.c
--rw-r--r--  1 pascal  501   2001 Oct 14 00:54 SHA3api_ref.h
--rw-r--r--  1 pascal  501   6141 Sep 30 00:28 brg_endian.h
--rw-r--r--  1 pascal  501   6921 May 17  2008 brg_types.h
--rw-r--r--  1 pascal  501  34990 Jan  6 01:39 skein.c
--rw-r--r--  1 pascal  501  16290 Nov  9 05:48 skein.h
--rw-r--r--  1 pascal  501  18548 Oct  7 20:02 skein_block.c
--rw-r--r--  1 pascal  501   7807 Oct 10 02:47 skein_debug.c
--rw-r--r--  1 pascal  501   2646 Oct  9 23:44 skein_debug.h
--rw-r--r--  1 pascal  501   1688 Jul  3  2008 skein_port.h
+SHA3api_ref.c
+SHA3api_ref.h
+brg_endian.h
+brg_types.h
+skein.c
+skein.h
+skein_block.c
+skein_debug.c
+skein_debug.h
+skein_port.h
 \end{listing}
 
 The most natural place to go next is the file \lstinline|skein.h|,
@@ -339,7 +351,7 @@ use string-printing functions, hence the \lstinline|for| loop at lines 17-18.
 \goodbreak
 
 With luck, the compilation goes smoothly and we obtain
-the hash value:
+a hash value:
 \begin{shell}
 gcc *.c
 ./a.out
@@ -356,13 +368,18 @@ gcc *.c
 13
 \end{logs}
 
+\begin{important}
+  Your actual result may differ from the one above;
+  this will be explained later.
+\end{important}
+
 \subsection{First try at an analysis using \Eva{}}
 
 Let us now see how \Eva{} works on the same example.
 \Eva{} can be launched with the following command. 
 The analysis should not take more than a few seconds:
 \begin{listing-nonumber}
-frama-c -eva *.c >log
+frama-c -eva main_1.c >log
 \end{listing-nonumber}
 
 Frama-C has its own model of the target platform (the default target is
@@ -393,16 +410,22 @@ to send it to a log file.
 There is also a Graphical User Interface 
 for creating analysis projects and
 visualizing the results. 
-The GUI is still evolving quickly at this stage 
-and it would not make much sense to
-describe its manipulation in detail in this document.
-You are however encouraged to try it if it is available on your
-platform.
+Note that you cannot {\em edit} the source code in the GUI, only visualize it.
+Most of the information present in the console is also available in the GUI,
+but presented differently. Each interface (terminal or GUI) is better suited
+for a specific set of tasks.
+
 One way to create an analysis project in the GUI
 is to pass the command \lstinline|frama-c-gui| the same options
 that would be passed to \lstinline|frama-c|. In this first example,
-the command \lstinline|frama-c-gui -eva *.c| launches
+the command \lstinline|frama-c-gui -eva main_1.c| launches
 the same analysis and then opens the GUI for inspection of the results.
+
+\begin{important}
+  For simple projects like this tutorial, running everything at once
+  is perfectly suitable; however, for larger analyses, we recommend the
+  three-step approach presented in section~\ref{three-step}.
+\end{important}
 
 The initial syntactic analysis and symbolic link phases
 of Frama-C may find issues such as
@@ -417,7 +440,7 @@ lines of the log.
 Since we are trying out the library for the first time, 
 something else to look for in the log file is the list of functions for
 which the source code is missing. \Eva{} requires
-either a body or a specification for each function it analyses.
+either a body or a specification for each function it analyzes.
 
 \begin{listing-nonumber}
 grep "Neither code nor specification" log
@@ -425,48 +448,74 @@ grep "Neither code nor specification" log
 
 This should match lines indicating functions that are both undefined
 (without source) and that have no specification in Frama-C's standard library.
-In this example, no functions will be output, since Frama-C's standard library
-already has prototypes for the most important library functions.
-
-But suppose you would have a custom printing
-function, say \verb|print| instead of \verb|printf|, or some other function
-with missing source code. For instance, change the code in \verb|main_1.c|,
-replacing \verb|printf| with \verb|print|, re-run \Eva{},
-and then grep the log again. You will obtain this output:
+In our example, we obtain the following lines in the log:
 
 \begin{logs}
-main_1.c:14:[kernel] warning: Neither code nor specification for function print,
+[kernel:annot:missing-spec] main_1.c:13: Warning: 
+  Neither code nor specification for function Skein_256_Init,
   generating default assigns from the prototype
+[eva] using specification for function Skein_256_Init
 \end{logs}
 
-The warning indicates that \Eva{} is trying to infer an
-{\em assigns} clause for the function. This will be explained in detail later
-(\ref{annot_assigns}), but for now the important part is that \Eva{}
-needs either source code or an ACSL specification in order to work.
-Without those, it can only guess what each function does from the function's
-prototype, which is both inaccurate and likely incorrect.
+The same messages are produced for functions \verb|Skein_256_Update| and
+\verb|Skein_256_Final|.
+For each function, there are two messages: first, a warning about the absence
+of either code or ACSL specification for the function, stating
+that an {\em assigns} clause will be generated for the function
+(the {\em assigns} clause will be explained in detail later, in
+section~\ref{annot_assigns}). Second, a message stating that \Eva{} will use a
+specification for the missing function.
 
-Once we are convinced that all functions have either a body or a specification,
-we can focus on functions without bodies:
+What happens is that, without code or specification, Frama-C can only
+{\em guess} what each function does from the function's prototype,
+which is both inaccurate and likely incorrect. \Eva{} needs a specification
+for each function called during the analysis, so one is created on the fly and
+then used, but results are likely to be unsatisfactory.
+
+\begin{important}
+  Absence of code and ACSL specification is a major issue which often renders
+  the analysis incorrect. For this reason, the recommended approach of using
+  \Eva{} includes converting this warning into an error, to help spotting it
+  immediately. The {\em analysis script templates}, to be presented in
+  section~\ref{analysis-scripts}, already include this change.
+\end{important}
+
+To fix the issue, we only need to give Frama-C all of the C sources in
+the directory:
+\begin{listing-nonumber}
+frama-c -eva *.c >log
+\end{listing-nonumber}
+
+No further warnings about missing functions are emitted. We can now focus on
+functions without bodies:
 \begin{listing-nonumber}
 grep "using specification for function" log
-[eva] using specification for function memset
-[eva] using specification for function memcpy
-[eva] using specification for function printf
+[eva] using specification for function printf_va_1
 \end{listing-nonumber}
-We find three functions. Not having a body for \verb|printf| is fine,
-since calls to this function have no observable effects for the analysis.
-Things are not so clear-cut for
-\verb|memcpy| and \verb|memset|, for which we will provide bodies later.
+This \verb|printf_va_1| function is not present directly in the source code;
+it is a specialization of a call to the variadic function \verb|printf|. This
+specialization is performed by the \textsf{Variadic} plugin\footnote{The
+  \textsf{Variadic} plugin is described in more detail in the Frama-C User
+  Manual~\cite{FCUserMan}.}.
+All we need to know for now is that the plugin handles calls to such functions
+and produces sound specifications for them, which are then used by \Eva{}.
+This call to \verb|printf| has no observable effects for the analysis anyway,
+so we do not have anything to be concerned with. It is still a good idea to
+check the specification of each function without body used during the analysis,
+since the overall correctness depends on them. This can be done using the
+GUI or, in the command line, with option \verb|-print|, which outputs the
+Frama-C normalized source code, including ACSL specifications and
+transformations performed by the \textsf{Variadic} plugin.
 
 It is also possible to obtain a list of
 missing function definitions by using the command:
 \begin{listing-nonumber}
-frama-c -metrics -metrics-libc *.c
+frama-c -metrics *.c
 \end{listing-nonumber}
 This command computes, among other pieces of information,
-a list of missing functions using
-a syntactic analysis. It is not exactly equivalent to
+a list of missing functions (under the listing ``Undefined functions'')
+using a syntactic analysis produced by the \textsf{Metrics} plugin.
+It is not exactly equivalent to
 grepping the log of \Eva{} because it lists
 all the functions that are missing, while the log of
 \Eva{} only cites the functions that would have
@@ -477,93 +526,63 @@ In this case, relying on the information displayed by \lstinline|-metrics|
 means spending time hunting for functions that are not actually
 necessary.
 
-
-The output of \verb|frama-c -metrics -metrics-libc *.c|
-will then include the following lines:
+By default, \textsf{Metrics} does not list functions from the standard C
+library. This can be done by adding option \verb|-metrics-libc|, which would
+produce something similar to:
 
 \begin{logs}
-Undefined functions (83)
+Undefined functions (90)
 =======================
 [...]
- gets (0 call); memchr (0 call); memcmp (0 call); memcpy (21 calls);
- memmove (0 call); memset (27 calls); perror (0 call); printf (1 call)
+memcpy (21 calls); memmove (0 call); memset (27 calls); pclose (0 call);
+perror (0 call); popen (0 call); printf_va_1 (1 call); putc (0 call);
 \end{logs}
-All functions included from \verb+string.h+ are undefined, but only
-\verb+memcpy+, \verb+memset+ and \verb+printf+ are called.
+Besides \verb|printf_va_1|, only functions \verb|memcpy| and \verb|memset|
+are called. These functions are already specified in the Frama-C libc. However,
+when running \Eva{}, they result in an output similar to the following:
 
+\begin{logs}
+[eva] FRAMAC_SHARE/libc/string.h:118:
+  cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
+\end{logs}
 
-To handle the absence of functions \lstinline|memset| and \lstinline|memcpy|%
-\footnote{Since \FramaC 18 (Argon), \Eva{} includes builtin functions for
-  \lstinline|memset| and \lstinline|memcpy|,
-  thus providing source code for them is no longer necessary.},
-we will provide source code for them.
-Sometimes it is a good idea to provide the
-exact source code that will actually be used in an actual
-running environment, so as to detect subtle bugs in the interactions
-between the program and the system libraries. 
-On the other hand, string manipulation functions often 
-feature difficult-to-analyze 
-architecture-dependent optimizations.
-For these, it is better to provide a simpler but equivalent implementation.
-In this particular case, let us provide these two
-functions in a file that we will place with the others and 
-name ``\lstinline|lib.c|''.
-\listinginput{1}{tutorial/lib.c}
+Note that this message is {\em not} a warning (it does not begin with the word
+``Warning'') neither an alarm (it is not prefixed with \verb|[eva:alarm]|). It
+is an informative message related to Frama-C's libc specifications that can be
+safely ignored\footnote{For the interested reader: these messages appear due to
+  the fact that the ACSL specifications for functions in Frama-C's
+  \texttt{<string.h>} are very thorough, useful for plugins such as \textsf{WP},
+  and not yet fully interpreted by \Eva{}, which has builtins for them.} and
+will likely disappear in future Frama-C releases.
 
-%% Some compilation platforms' headers define the names \lstinline|memset|
-%% and \lstinline|memcpy| in ways that make it impossible to provide
-%% your own implementation for these functions. If this happens for
-%% yours, you can try placing your own header in the analysis directory,
-%% under the name ``\lstinline|string.h|''
-%% \listinginput{1}{tutorial/string.h}
+\subsection{Interpreting the output of the analysis}
 
-%% In some circumstances, the results of \Eva{} may
-%% remain useful even when letting Frama-C guess the effects
-%% of missing functions. In the case of functions that take
-%% pointers as arguments, however, the possibilities are too numerous
-%% for the analyzer to be able to guess right.
-%% In this example, the function \lstinline|printf| is safe to
-%% leave without an implementation, because 
-%% unlike the other two,
-%% it does not have effects on the variables of the program.
+By default, \Eva{}'s log emits several messages during the analysis, which are
+essential for a deep understanding of the issues which may happen, but on
+overview, these are the main components of the log:
 
-%. It is generally far simpler to provide
-%either the actual code or a model written in C
-%for the missing functions.
+\begin{itemize}
+\item parsing and related messages (in our case, simply the list of files being
+  parsed);
+\item start of the analysis by \Eva{}, with the initial values of global
+  variables;
+\item messages emitted during the analysis, such as warnings, alarms and
+  informative feedback;
+\item values for all variables at the end of each function;
+\item an analysis summary, with coverage and the number of
+  errors, warnings, alarms and logical properties.
+\end{itemize}
 
-For some functions -- including those two -- an implementation is
-already provided in \FramaC. It can be found in the \lstinline|.c|
-files of the directory \lstinline|share/frama-c/libc|, usually within
-a file identically named to the header declaring the functions.  For
-\lstinline|memcpy| and \lstinline|memset|, the implementation can thus
-be found in \lstinline|string.c|, and adding it to the list of files
-to be analyzed would make the warning disappear.
-%
-However, we are going to assume that such implementations are not available
-in the remainder of this tutorial.  Since quite a few functions do not have
-any implementation in \FramaC's \lstinline|libc|, this allows us to show how
-to deal with the general case.
-
-\subsection{First meaningful analysis}
-
-If we run the analysis again with definitions for \lstinline|memset|
-and \lstinline|memcpy|, the newly obtained log no longer mentions
-any missing function other than \lstinline|printf|\footnote{It is
-a good idea to
-check again for missing functions because new execution paths
-could have been activated by the implementations of functions 
-that were previously missing.}.
-
-The log next contains a description of the initial values of
-variables.  Apart from the variables that we defined ourselves, there
-is a rather strange one, named \lstinline|ONE| and indeed containing
+If we focus on the initial values of variables, we notice that,
+apart from the variables that we defined ourselves, there
+is a rather strange one, named \lstinline|Skein_Swap64_ONE| and containing
 \lstinline|1|. Searching the source code reveals that this variable is
-in fact declared \lstinline|static| as it should be.  Frama-C can
-display the value of static variables (something that is annoying to
-do when using a C compiler for testing).  Frama-C may rename
-static variables in order to distinguish them from another variable
-with the same name.  The GUI displays the original source code
-alongside the transformed one.
+in fact variable \verb|ONE|, declared \lstinline|static| inside function
+\lstinline|Skein_Swap64|. Frama-C can
+display the value of static variables, something that is annoying to
+do when using a C compiler for testing.
+The GUI displays the original source code alongside the transformed one,
+and allows navigating between uses of a variable and its declaration.
 
 A quick inspection shows that the Skein functions
 use variable \lstinline|ONE| to detect endianness.
@@ -576,259 +595,225 @@ The big-endian version of the library could be analyzed
 by reproducing the same steps we are taking here for
 a big-endian configuration of Frama-C.
 
-You will also see lots of variable names
+You may also see variable names
 prefixed by \verb|__fc_|, \verb|__FC_| and \verb|S___fc_|.
-These are all variables coming from ACSL specifications in the Frama-C
+These are variables coming from ACSL specifications in the Frama-C
 standard library.
 
-The next line in the log is a progression message, that indicates
-that \Eva{} has encountered a loop and is performing an approximations.
-Those messages can be ignored for now.
+The log contains some lines such as this:
+
 \begin{logs}
-lib.c:17:[eva] entering loop for the first time
+[eva] skein_block.c:56: starting to merge loop iterations
 \end{logs}
 
-The next log entry which is not a progression message is a
-warning concerning variable \lstinline|tmp|
+This means that \Eva{} has encountered a loop and is performing an
+approximation. These messages can be ignored for now.
+
+Arguably some of the most important messages in the analysis are {\em alarms},
+such as the one below:
+
 \begin{logs}
-lib.c:18:[kernel] warning: out of bounds write. assert \valid(tmp);
-                                       (tmp from ptr++)
+[eva:alarm] skein_block.c:69: Warning:
+  accessing uninitialized left-value. assert \initialized(&ks[i]);
 \end{logs}
-
-There is no variable \lstinline|tmp| in our file \lstinline|lib.c|,
-but as indicated in the message, this variable is introduced by the source
-code normalization of the \verb|ptr++| expression.
-You can also see the relation between this variable
-and the original source code in the GUI.
-Alternately, the command \lstinline|frama-c *.c -print|
-shows how the original source code has been
-transformed by Frama-C (note, however, that the location
-\lstinline|lib.c:18| refers to the original source file).
-Here, it is the statement \lstinline|*ptr++ = val;| in the
-function \lstinline|memset| that has been transformed by
-Frama-C into the sequence below, so that it would not
-be ambiguous which value of \lstinline|ptr| 
-has to be a valid pointer.
-\begin{listing-nonumber}
-  tmp = ptr;
-  ptr ++;
-  *tmp = (unsigned char)val;
-\end{listing-nonumber}
-
-The command \lstinline|frama-c *.c -eva -print| launches
-\Eva{} and then prints the transformed source code,
-annotated with the
-alarms raised by \Eva{}. In our case, the
-function \lstinline|memset| is transformed in
-\begin{listing-nonumber}
-void *memset(void *dest, int val, size_t len)
-{
-  unsigned char *ptr;
-  ptr = (unsigned char *)dest;
-  while (1) {
-    size_t tmp_0;
-    unsigned char *tmp;
-    { /* sequence */
-      tmp_0 = len;
-      len --;
-      ;
-    }
-    if (! (tmp_0 > (size_t)0)) break;
-    { /* sequence */
-      tmp = ptr;
-      ptr ++;
-      /*@ assert Value: mem_access: \valid(tmp); */
-      *tmp = (unsigned char)val;
-    }
-  }
-  return dest;
-}
-\end{listing-nonumber}
 
 As we will find out later in this tutorial, this alarm is a false
 alarm, an indication of a potential problem in a place where there is
-in fact none. On the other hand, \Eva{} never remains
+in fact none. However, \Eva{} never remains
 silent when a risk of run-time error is present, unlike many other
 static analysis tools. The important consequence is that if you get
 the tool to remain silent, you have {\em formally verified} that
 no run-time error could happen when running the program.
- 
-It may seem that the access to \lstinline|*tmp| is the
-only dangerous operation in the function \lstinline|memset|,
-and therefore that the analyzer is not doing a very good job
-of pointing only the operations that are problematic.
-While it is true that the results obtained on this example
-are not very precise, the comparison
-\lstinline|>| is also considered dangerous 
-by the analyzer. This operation may be unspecified when applied
-to an invalid pointer. Consider a program that does the
-following:
-\begin{listing}{1}
-int main()
-{
-  int a;
-  return ((unsigned int)(&a - 1432)) > 0;
-}
-\end{listing}
-The programmer might misguidedly have written the \lstinline|>0|
-test in this example as a way to test for \lstinline|NULL|.
-Ey\footnote{This manual uses Spivak pronouns:
-\url{http://en.wikipedia.org/wiki/Spivak_pronoun}} might 
-expect this program always to return 1, since
-\lstinline|(&a - 1432)| is not \lstinline|NULL|. But this
-program may in fact return 0 if, out of bad luck,
-the compiler places variable \lstinline|a| precisely at address
-1432. This kind of bug would be very
-difficult to find and/or reproduce by testing.
 
-The analyzer does not emit any alarm for the comparison
-\lstinline|tmp_0 > (size_t )0| in the normalized source code
-for \lstinline|memset|, and
-this means that it guarantees\footnote{The fine print is
-the reference part of this manual} that 
-this particular comparison is never non-deterministic
-because of an issue such as the one just described.
-This conclusion can only be reached by looking at 
-the arguments actually passed to the function \lstinline|memset|.
-Therefore, this conclusion is only valid for all the
-possible executions coming from the \lstinline|main|
-function that we provided, and not for all the possible
-calls to function \lstinline|memset| that a programmer
-could write.
+The alarm means that \Eva{} could not prove that the value \verb|ks[i]|
+accessed in \verb|skein_block.c:69| was definitely initialized before being
+read. Reading an initialized value is an undefined behavior according to the
+ISO C99 standard (and can even lead to security vulnerabilities).
 
-One should not spend too much time at this stage trying to
-determine if the dozens or so alarms emitted by the analyzer
-are true alarms that indicate an actual problem or false alarms
-that don't.
-The most important information is that the analysis did not
-take an unreasonable time.
-% The second most important information is that the analysis
-% seems to have explored all the paths we intended for it to
-% explore, as seen in the list of functions for which values are
-% printed or in the log entries such as:
-% \begin{logs}
-% [value] computing for function RotL_64 <- Skein_256_Process_Block
-%                       <- Skein_256_Final <- main.
-%         Called from skein_block.c:100.
-% \end{logs}
+As is often the case, this alarm is related to the approximation introduced
+in \verb|skein_block.c:56|, which is the loop responsible for initialising
+the values of array \verb|ks[i]|. The order of the messages during the
+analysis thus provides some hints about what is happening, and also some
+ideas about how to solve them.
 
-The GUI allows to inspect the sets of values 
-obtained during the analysis and to get
-a feeling of how it works. Right-clicking on the function name
-in a function call brings a contextual menu that allows to go
-to the function's definition and to inspect it in turn. 
-In order to return to the caller,
-right-clicking on the name of the current function at the top
-of the normalized code buffer brings a contextual menu
-with a list of callers.
-You can also use the Back button (left arrow) in the toolbar.
+\subsection{Increasing analysis precision in loops}
 
-\section{Searching for bugs}
-
-\subsection{Increasing the precision with option {\tt -eva-slevel}}
-
-Because we compiled and executed the same program that we are
-now analyzing, we are confident that most of the alarms
-displayed by \Eva{} are false alarms that do not
-correspond to actual problems. In fact, because the program
-is deterministic and takes no inputs,
-only one of the alarms can be a true alarm in
-the strictest sense. The analysis stops when an error is
-encountered (what would it even mean to continue the analysis
-after, for instance, \lstinline|NULL| has been dereferenced?).
-It is only because \Eva{} is uncertain about the errors
-encountered here that it continues and finds more possible
-errors.
-
+The previous alarm is just one of several related to variable initialization.
 Before we spend any of our time looking at each of these alarms,
-trying to determine whether it is true or false,
-it is a good idea to make the analyzer spend more of its time
-trying to determine whether each alarm is true or false.
+trying to determine whether they are true or false,
+it is a good idea to make the analyzer spend more of {\em its} time
+trying to determine the same thing.
 There are different settings that influence the compromise
-between precision and resource consumption.
-If you chose to remember only one of these settings, it would
-have to be the option \lstinline|-eva-slevel|. This option has
-two visible effects:
-it makes the analyzer unroll loops, and it makes it propagate
-separately the states that come from the \lstinline|then|
-and \lstinline|else| branches of a conditional statement.
-This makes the analysis more precise (at the cost of being
-slower) for almost every program that can be analyzed.
+between precision and resource consumption. When dealing with bounded loops,
+the best approach consists in using an ACSL annotation, \verb+//@ loop unroll+,
+to direct \Eva{} to spend more time trying to analyze the contents of a loop,
+before approximating the results.
 
-\Eva{} has different ways to provide information on 
-the loss of precision that causes the false alarms. 
-This is another reason why it is so verbose during an analysis:
-it tries to provide enough information for a motivated user
-to be able to understand what is happening during the analysis,
-where the imprecise values that cause the false alarms came from,
-and what instructions in the program made them imprecise.
+Currently, annotating loops is done manually; in future releases of Frama-C,
+this will be partly automated. In simple loops, you can obtain its
+bounds via the GUI, by inspecting the values taken by the loop counter,
+as in the example below:
 
-But instead of spending precious human time  making use
-of the provided information, the brute-force approach of blindly
-applying the \lstinline|-eva-slevel| option must be tried first.
-Indeed, \lstinline|-eva-slevel| is one of the options of \Eva{}
-that can never cause it to become incorrect. Such options,
-when used wrongly, may make the analysis slower, 
-provide hints that are not
-useful, or even possibly counter-productive (making the analysis
-less precise), but they cannot
-prevent the analyzer from reporting a problem where there is one.
+\begin{figure}[hbt]
+\centering
+\includegraphics[width=0.75\textwidth]{gui-loop-to-unroll.png}
+\caption{Estimating loop unroll bounds in the GUI}
+\label{fig:gui-loop-to-unroll}
+\end{figure}
 
-The \lstinline|-eva-slevel| option is useful for unrolling loops.  We do
-not know without further inspection how many iterations the loops
-inside the program need, but the input message is 80 characters long,
-and we can assume that it is read inside a loop, so using the option
-\lstinline|-eva-slevel 100| should have a good chance of unrolling at
-least that loop. Furthermore, it does not make the analysis slower to
-use a number greater than the value actually necessary to unroll
-every loop and conditional in the program. We are limiting ourselves
-to 100 in this first try because we do not know how much time the
-analysis will take with this number of unrolled branches.  If, with
-the parameter \lstinline|-eva-slevel 100|, the precision of the analysis still isn't
-satisfactory and the time spent by the analyzer remains reasonable, we
-can always try a higher value. This should be progressive, because a value
-higher than a few hundreds, when there really are that many branches to
-unroll in the program, can make the analysis very slow.
+In this case, \verb|WCNT| has a constant value (4), so it could also be used
+to estimate the loop bounds.
+
+We can then Ctrl+click on the loop condition in the original source view
+(right panel) to open an editor\footnote{The code editor to be used by the GUI
+  is defined via menu {\em File - Preferences}.} centered on the loop, and
+then add the loop unroll annotation, as follows:
+
+\begin{lstlisting}
+  //@ loop unroll 4;
+  for (i=0;i < WCNT; i++)
+      {
+      ks[i]     = ctx->X[i];
+      ks[WCNT] ^= ctx->X[i];            /* compute overall parity */
+      }
+\end{lstlisting}
+
+The value 4 is sufficient to completely unroll the loop, even though \verb|i|
+ranges from 0 to 4 (5 values in total). One way to confirm the unrolling is
+complete is to check that the ``starting to merge loop iterations'' is no
+longer emitted when entering the loop. Also, when a loop unroll annotation
+is present but insufficient to unroll the loop, a message is emitted:
+
+\begin{logs}
+[eva:loop-unroll] skein_block.c:57: loop not completely unrolled
+\end{logs}
+
+Once a loop is completely unrolled, any ``leftovers'' are ignored, so it incurs
+no extra cost. Using a value larger than necessary is therefore not an issue.
+
+The practical effect of adding this annotation and then re-running \Eva{} is
+the elimination of 3 alarms in the analysis. Thanks to the extra precision
+allowed by the annotation (with a minimal increase in analysis time), \Eva{}
+is now able to prove there are no initialization errors in more places than
+before.
+
+\subsection{Increasing precision with option {\tt -eva-slevel}}
+
+Another way to improve precision in the analysis is to use option
+\verb|-eva-slevel| (formerly known as {\em slevel}.
+This option controls the trade-off between precision
+and analysis effort: the higher the value, the longer the analysis, and
+(hopefully) more precise. You can think of it as some kind of ``fuel''
+to be consumed during the analysis: as long as there is some slevel,
+the analysis will keep states separate and maintain precision; when all of
+it is consumed, further states are merged, avoiding increase in analysis time
+but approximating the results.
+
+The main advantage of \verb|-eva-slevel| is the simplicity of usage: just
+choose a number and run the analysis; increase it if the analysis is quick
+but imprecise, decrease it if the analysis is too slow. It can also be
+specified separately for each function (\verb|-eva-slevel-function f:n|).
+
+The main inconvenients of \verb|-eva-slevel| are its lack of stability and
+predictability in large code bases. Indeed, since it is a very general option,
+it is very hard to determine exactly {\em how} it is used: it can be consumed
+by loops, branches, disjunctions; in nested loops, it is consumed by both inner
+and outer loops. In loops with branches, its consumption may become exponential.
+And once a satisfactory value is found, later changes to ACSL specifications,
+\Eva{}'s algorithms and other parameters can affect it, requiring a new
+parametrization.
+
+Still, its ease of use, especially for smaller code bases, makes it very
+convenient for quickly eliminating false alarms. Let us use it in our
+analysis:
 
 \begin{shell}
 frama-c -eva-slevel 100 -eva *.c >log 
 \end{shell}
 
-The analysis goes rather far without finding any alarm,
+Now, the analysis goes rather far without finding any alarm,
 but when it is almost done (after the analysis of function
 \lstinline|Skein_256_Final|), it produces:
 \begin{logs}
 ...
-main_1.c:14:[kernel] warning: Neither code nor specification for function printf, 
-            generating default assigns from the prototype
-[eva] using specification for function printf
-[eva] Done for function printf
-main_1.c:14:[eva] completely invalid value in evaluation of
-                  argument (int)hash[i]
-main_1.c:14:[kernel] warning: accessing uninitialized left-value.
-                     assert \initialized(&hash[i]);
-[eva] Recording results for main
+[eva] using specification for function printf_va_1
+[eva:alarm] main_1.c:17: Warning: 
+  accessing uninitialized left-value. assert \initialized(&hash[i]);
 [eva] done for function main
 ...
 \end{logs}
 
-These messages mean that lvalue \lstinline|hash[i]|, as found
-in line 14 of our file \lstinline|main_1.c|, may be
-uninitialized\footnote{An lvalue is a C expression that exists in memory.
-Examples of lvalues are a simple variable {\tt x}, the cell of an
-array {\tt t[i]}, or a pointed location {\tt *p}. Because an lvalue
-lies in memory, it may have uninitialized contents.
-Using an
-lvalue when it has not yet been initialized is a forbidden
-behavior that compilers do not detect in all cases, and this
-is only one of the numerous pitfalls of C.}. 
-Actually, the analyzer finds that for one execution
-branch, it is certain to be uninitialized. This is when reading
-the memory location ``\lstinline|hash[i]|'', one of the arguments given
-to the \lstinline|printf| function.
-Extra information can be observed using the GUI, by clicking on the 
-\lstinline|hash| expression in line 14 and reading the \textsf{Values} tab,
-which displays the following values for \lstinline|hash|:
+There remains an alarm about initialization, but all the others have been
+removed. Trying larger values of slevel does not change this. In this case,
+we can afford to spend some time looking at it in more detail.
+
+\subsection{Inspecting alarms in the GUI}
+
+Instead of running \verb|frama-c|, let us use \verb|frama-c-gui|:
+
+\begin{shell}
+frama-c-gui -eva-slevel 100 -eva *.c >log
+\end{shell}
+
+The GUI allows to inspect the sets of values
+obtained during the analysis and to get
+a feeling of how it works. Right-clicking on the function name
+in a function call brings a contextual menu that allows to go
+to the function's definition and to inspect it in turn.
+In order to return to the caller,
+right-clicking on the name of the current function at the top
+of the normalized code buffer brings a contextual menu
+with a list of callers.
+You can also use the Back button (left arrow) in the toolbar.
+The Information panel also offers navigation possibilities between
+variables and their definitions.
+
+In the graphical interface, there are three panels (displayed below the
+source code) which are very useful for \Eva{}: Properties, Values, and
+Red Alarms. Further details about the GUI are presented in chapter~\ref{gui}.
+For now, it suffices to say that:
+
+\begin{itemize}
+\item Properties displays (among others) the list of alarms in the program;
+\item Values displays the inferred values for the expression selected in the
+  Frama-C normalized source code (highlighted in green);
+\item Red Alarms displays some special cases of alarms which {\em definitely}
+  arrive in the program, even if they are marked as yellow in the Properties
+  panel.
+\end{itemize}
+
+Each alarm is represented in the GUI with a ``bullet'' to the left of the line
+which generates it. Red bullets mean ``this {\em always} happens''; yellow
+bullets mean ``this {\em may} happen (but I am not sure, due to
+approximations)''. When there are several alarms, some strategies allow
+prioritizing which alarms are more likely to correspond to actual issues.
+
+The overall rule of thumb when inspecting alarms in the GUI\footnote{The first
+  time the Frama-C GUI is run, the Properties panel displays several kinds of
+  properties. For \Eva{}, the most useful view consists in selecting the
+  ``Reset 'Status' filters to show only unproved/invalid'' option, using the
+  button next to ``Refresh'' in the Properties panel.} is the following:
+
+\begin{itemize}
+\item inspect red alarms in the Properties panel; these correspond to
+  situations where the analysis is {\em certain} that a problem has arrived;
+  either an actual bug in the code, or some issue in the analysis that needs to
+  be addressed (e.g. due to missing or incorrect specifications);
+\item inspect the cases present in the Red Alarms panel; these are situations
+  which are likely to correspond to definitive problems, and thus should be
+  treated before others\footnote{The {\em exact} meaning of such red alarms is
+    too complex to be presented here; as a first approximation, these can be
+    seen as intermediate between red and yellow alarms.};
+\item inspect remaining cases (yellow alarms) in the Properties panel.
+\end{itemize}
+
+In the case of our remaining alarm, it is yellow, but it appears in the
+Red Alarms panel. This indicates it is more likely to correspond to a real
+issue.
+
+Extra information can be observed by clicking the alarm in the Red Alarms tab,
+which highlights it in the source code, then selecting expression
+\lstinline|hash| in line 17 and reading the \textsf{Values} tab:
 \begin{logs}
   [0] $\in$ {200}
   [1..7] $\in$ UNINITIALIZED
@@ -837,54 +822,16 @@ This means that element \lstinline|hash[0]| has value 200, but elements 1 to 7
 are definitely uninitialized. Therefore the first iteration of the loop
 proceeds as expected, but on the second iteration, the analysis of the branch
 is stopped, because
-from the point of view of the analyzer reading an uninitialized
+from the point of view of the analyzer, reading an uninitialized
 value should be a fatal error. And there are no other execution
 branches that reach the end of this loop, which is why the analyzer
-finds that function \lstinline|main| does not terminate.
+finds that function \lstinline|main| does not terminate (the log contains
+the message ``NON TERMINATING FUNCTION'').
 
-The next warning, \lstinline|accessing uninitialized left-value...|
-is emitted whenever an accessed value may be uninitialized, and the emitted
-assertion, \lstinline|\initialized(&hash[i])|, could not be verified by
-\Eva{}, and must therefore be verified by other means
-(eventually, other Frama-C analyses) to ensure the behavior of the code is
-defined.
+\subsection{Finding and fixing bugs}
 
-\subsection{Making sense of alarms}
-
-There were three alarms in the analysis. The other two are related to
-interactions between
-the Frama-C standard library and our own implementations of \verb|memset|/
-\verb|memcpy|\footnote{Namely, the fact that their specifications involve
-{\em logic predicates} that are not yet understood by \Eva{} leads
-to an ``Unknown'' status, even though they are valid in this case.},
-but we can safely ignore them here.
-
-
-%% There are three alarms in the analysis we now have, and two of them are related
-%% to the (lack of) \lstinline|printf| specification, because we did not include
-%% that of the Frama-C standard library. Because \lstinline|printf| does not
-%% modify the values of any variables we are interested in, and we do not want to
-%% provide it with some code, we can simply add a minimalistic ACSL specification
-%% to the \lstinline|printf| prototype in line 3:
-
-%% \begin{listing}{3}
-%% /*@ assigns \result \from \nothing; */
-%% int printf(const char*,...);
-%% \end{listing}
-
-%% This is incorrect in the general case (since it claims that the result of
-%% \lstinline|printf| is a constant value, independent of its arguments),
-%% but since we ignore its result in our code anyway, this is fine here.
-%% This is by the way equivalent to the default behavior that was previously
-%% inferred by \Eva{}, and the reason why it emitted warnings:
-%% it is not a correct specification in the general case.
-
-Furthermore, the program
-is also found not to terminate. This means that every execution
-either encounters the problem from line 14 in \lstinline|main_1.c|,
-or an infinite loop somewhere else in the program.
-We should, therefore, pay particular attention to this alarm.
-
+We found a real issue in the code, but to find the exact cause it is necessary
+to investigate the code.
 Looking again at the header file \lstinline|skein.h|, we may now
 notice that in function \lstinline|Skein_256_Init|,
 the formal parameter for the desired hash length is named
@@ -892,19 +839,13 @@ the formal parameter for the desired hash length is named
 We were inadvertently asking for a 1-char hash of the message
 since the beginning, and the test that we ran as our first
 step failed to notice it.
-Our first imprecise analysis  did find it -- the same alarm that
-pointed out the problem is present among the other alarms produced
-by the first analysis. Note that because of the imprecisions,
-the first analysis was not able to conclude that the uninitialized access
-at \lstinline|hash[2]| was certain, making it much less noticeable
-among the others.
 
 The bug can be fixed by passing
 8*HASHLEN instead of HASHLEN as the second argument of 
 \lstinline|Skein_256_Init|.
 With this fix in place, the analysis
-with \lstinline|-eva-slevel 100| produces no alarms (apart from the postconditions
-of \verb+memcpy+ and \verb+memset+) and gives the following result:
+with \lstinline|-eva-slevel 100| produces no alarms and gives the following
+result:
 \begin{logs}
 Values for function main:
   hash[0] $\in$ {40}
@@ -1063,7 +1004,7 @@ Function Skein_256_Init:
                .h{.bCnt; .T[0..1]; } FROM ctx
                .X[0..3] FROM msg[0..63];
                              skein_context{.X[0..3]; .b[0..31]; }; ctx;
-                             hashBitLen; ONE[bits 0 to 7] (and SELF)
+                             hashBitLen; Skein_Swap64_ONE[bits 0 to 7] (and SELF)
                .b[0..31] FROM ctx (and SELF)
   \result FROM \nothing
 
@@ -1080,12 +1021,12 @@ Function Skein_256_Update:
 
 Function Skein_256_Final:
   hash[0..7] FROM msg[0..79]; skein_context; ctx; 
-                  hashVal; ONE[bits 0 to 7] (and SELF)
+                  hashVal; Skein_Swap64_ONE[bits 0 to 7] (and SELF)
   skein_context.h.bCnt FROM skein_context.h.hashBitLen; ctx (and SELF)
                .h.T[0] FROM skein_context.h{.hashBitLen; .bCnt; .T[0]; }; ctx
                .h.T[1] FROM skein_context{.h.hashBitLen; .h.T[1]; }; ctx
                {.X[0..3]; .b[0..15]; } FROM msg[0..79]; skein_context; 
-                                            ctx; ONE[bits 0 to 7] (and SELF)
+                                            ctx; Skein_Swap64_ONE[bits 0 to 7] (and SELF)
                .b[16..31] FROM skein_context.h.bCnt; ctx (and SELF)
   \result FROM \nothing
 \end{logs}
@@ -1112,20 +1053,20 @@ dependencies are normal or reveal a problem. Let us move on to the
 functional dependencies of \lstinline|do_Skein_256|:
 \begin{logs}
 Function do_Skein_256:
-  hash[0..7] FROM msg[0..79]; ONE[bits 0 to 7] (and SELF)
+  hash[0..7] FROM msg[0..79]; Skein_Swap64_ONE[bits 0 to 7] (and SELF)
 \end{logs}
 
 These dependencies make the effect of the functions clearer.  The
 \verb|FROM msg[0..79]| part is what we expect.  The
 \verb|and SELF| mention is an unfortunate approximation.  The
-dependency on global variable \verb|ONE| reveals an implementation
+dependency on global variable \verb|Skein_Swap64_ONE| reveals an implementation
 detail of the library (the variable is used to detect endianness
 dynamically). Finding out about this variable is a good thing: it
 shows that a possibility for a malicious programmer to corrupt the
 implementation into hashing the same message to different digests
-would be to try to change the value of \verb|ONE| between
+would be to try to change the value of \verb|Skein_Swap64_ONE| between
 computations.  Checking the source code for mentions of variable 
-\lstinline|ONE|, we can see it is used to
+\lstinline|Skein_Swap64_ONE|, we can see it is used to
 detect endianness and is declared \lstinline|const|. On an
 MMU-equipped platform, there is little risk that this variable
 could be modified maliciously from the outside. 
@@ -1133,7 +1074,7 @@ However, this is a vivid example of how static
 analysis, and especially correct analyses as provided in Frama-C, can
 complement code reviews in improving trust in existing C code.
 
-Assuming that variable \lstinline|ONE| keeps its value, a same
+Assuming that variable \lstinline|Skein_Swap64_ONE| keeps its value, a same
 input message is guaranteed always to be hashed by this 
 sequence of calls to the same digest,
 because option \verb|-deps| says that there is no other
@@ -1164,8 +1105,10 @@ The latter condition is harder than the former.
 Observing results (with the GUI or observation functions
 described in section \ref{buitins_observation}) can help to iterate towards
 a solution. Be creative. The continuation of this tutorial can be found online
-at \url{http://blog.frama-c.com/index.php?tag/skein}; read 
-available posts in chronological order.
+at \url{http://blog.frama-c.com/index.php?tag/skein}\footnote{Note that some
+  messages and options have changed since the tutorial was posted. Using an
+  older Frama-C version may be necessary to obtain similar results.}
+; read available posts in chronological order.
 
 % This tutorial is TO BE CONTINUED.\\
 % ~\\
@@ -1882,7 +1825,8 @@ and \lstinline|int *| are \emph{not} compatible).
 [eva:alarm] valid_function.c:9: Warning:
   pointer to function with incompatible type. assert \valid_function(p);
 [kernel:annot:missing-spec] valid_function.c:9: Warning:
-  Neither code nor specification for function f1, generating default assigns from the prototype
+  Neither code nor specification for function f1, generating default assigns
+  from the prototype
 [eva] using specification for function f1
 [eva:alarm] valid_function.c:12: Warning:
   pointer to function with incompatible type. assert \valid_function(p);
@@ -1936,21 +1880,26 @@ is imprecise.
 Examples of messages that result from the apparition of imprecision in the
 analysis are:
 \begin{logs}
-origin.c:14:[eva] assigning imprecise value to pa1.
-        The imprecision originates from Arithmetic {origin.c:14}
+[eva] origin.c:14:
+  Assigning imprecise value to pa1.
+  The imprecision originates from Arithmetic {origin.c:14}
 
-origin.c:15:[eva] writing somewhere in {ta1} 
-        because of Arithmetic {origin.c:14}.
+[eva] origin.c:15:
+  writing somewhere in {ta1} because of Arithmetic {origin.c:14}.
 \end{logs}
 
 Examples of messages that correspond to unusual circumstances are:
 \begin{logs}
-alloc.c:20: ... all target addresses were invalid.
-        This path is assumed to be dead.
+[kernel] alloc.c:20: Warning:
+  all target addresses were invalid. This path is assumed to be dead.
 
-origin.i:86: ... local escaping the scope of local_escape_1 through esc2
+[eva:locals-escaping] origin.i:86: Warning:
+  locals {x} escaping the scope of local_escape_1 through esc2
 \end{logs}
 
+Note that a few messages are prefixed with \verb|[kernel]| instead of
+\verb|[eva]|, for technical reasons, but it is the analysis by \Eva{}
+which causes them to be emitted.
 
 \section{About these alarms the user is supposed to check\ldots}
 
@@ -2182,7 +2131,7 @@ is as precise as the result obtained for the example in section \ref{boucles}.
 
 \listinginput{1}{fonctions.c}
 
-Calls to variadic functions are handled by the {\em Variadic} plug-in, which
+Calls to variadic functions are handled by the \textsf{Variadic} plug-in, which
 translates calls to variadic functions into semantically-equivalent calls,
 either using arrays as arguments or via calls to specialized variants of the
 function. Such translations are enabled by default whenever the corresponding
@@ -2644,14 +2593,43 @@ These options cannot be used wrongly, in the sense that they do not affect the
 correctness of the results. However, using them efficiently is essential for
 scalability of the analysis.
 
+Section \ref{three-step} presents the overall methodology recommended when
+using \Eva{}, especially for realistic code bases.
 Section \ref{command-line} presents the general usage options of \Eva{} in the
 command-line.
 The options described in section \ref{context} are correctness options,
 while the remaining sections (\ref{boucles-traitement},
 \ref{controlling-approximations} and \ref{sec:eva}) deal with performance
-tuning options. Finally, \ref{nonterm} presents a derived analysis to
+tuning options. Section \ref{nonterm} presents a derived analysis to
 obtain information about non-termination.
+Finally, section \ref{analysis-scripts} presents some scripts and templates
+to help bootstrap an analysis and automate some of its steps.
 
+
+\section{Three-step approach}
+\label{three-step}
+
+For realistic code bases, an analysis with \Eva{} requires several steps which
+are better performed separately, for several reasons:
+
+\begin{itemize}
+\item errors are confined to each of the separate steps, instead of being
+  mingled together;
+\item partial results can be saved and reused, avoiding unnecessary
+  recomputations;
+\item it is clearer which options and changes affect which stages, leading to
+  better understanding of the process.
+\end{itemize}
+
+The recommended approach can be summarized as follows:
+
+\begin{itemize}
+\item parsing sources: \verb|frama-c <sources> -save parsed.sav|;
+\item running \Eva{}:  \verb|frama-c -load parsed.sav -eva -save eva.sav|;
+\item viewing its results on the GUI: \verb|frama-c-gui -load eva.sav|.
+\end{itemize}
+
+The commands and options are detailed in the next section.
 
 \section{Command line}
 \label{command-line}
@@ -2697,10 +2675,12 @@ $\dots$
 $\dots$
 \end{logs}
 
-\textbf{Note:} historically, \Eva{} was called Value, and most of its options
-were prefixed with \lstinline|-val|. All \lstinline|-val-*| options
-are aliased to equivalent \lstinline|-eva-*| functions; negative options of
-the form \lstinline|-no-val-*| are aliased to \lstinline|-eva-no-*|.
+\begin{important}
+  Historically, \Eva{} was called Value, and most of its options
+  were prefixed with \lstinline|-val|. All \lstinline|-val-*| options
+  are aliased to equivalent \lstinline|-eva-*| functions; negative options of
+  the form \lstinline|-no-val-*| are aliased to \lstinline|-eva-no-*|.
+\end{important}
 
 \subsection{Analyzed files and preprocessing}\label{sec:analyz-files-prepr}
 
@@ -2715,14 +2695,18 @@ to which the option \lstinline|-x c| should be passed in order to pre-process
 C files that do not have a \lstinline|.c| extension.
 \goodbreak
 
-The option \lstinline|-cpp-command <cmd>| sets the preprocessing command to use.
+Option \lstinline|-cpp-extra-args <options>| allows giving additional options
+to the preprocessor, usually \verb|-D| for defining macros and \verb|-I| for
+including header directories.
+
+In rare cases, you may need to use a different preprocessing command, via
+option \lstinline|-cpp-command <cmd>|.
 If the patterns \lstinline|%1| and \lstinline|%2| do not appear 
 in the text of the
 command, Frama-C invokes the preprocessor in the following way:
 \begin{shell}
 <cmd> -o <outputfile> <inputfile>
 \end{shell}
-
 
 In the cases where it is not possible to invoke the preprocessor with
 this syntax, it is possible to use the 
@@ -2763,9 +2747,21 @@ back into memory for visualization or further computations.
 
 Example :
 \begin{shell}
-frama-c -eva -deps -out -save result file1.c file2.c
-frama-c-gui -load result
+frama-c -eva -deps -out -save result.sav file1.c file2.c
+frama-c-gui -load result.sav
 \end{shell}
+
+\begin{important}
+  There is no specific extension for Frama-C saved files; the usual
+  convention is to use \verb|.sav|.
+\end{important}
+
+\begin{important}
+  Most options are saved when \verb|-save| is used and do not need to
+  be passed again when loading it. It is therefore useful to separate
+  parsing options from analysis options, the former to be saved after
+  parsing, the latter to be given after loading it.
+\end{important}
 
 \subsection{Controlling  the output}
 
@@ -3090,6 +3086,8 @@ compiled with the same compiler as the one intended to compile the
 analyzed application. If this is not possible, the analysis can also be
 parameterized manually with the characteristics of the target
 architecture. 
+The Frama-C Plugin Development Guide~\cite{plugin-dev-guide} contains a
+section about customizing the machine model.
 
 \subsection{Parameterizing the modeling of the C language}
 
@@ -3479,8 +3477,10 @@ be applied to them.
 
 \subsubsection*{Deprecated: \texttt{WIDEN\_HINTS} loop pragma}
 
-\textbf{Note:} this syntax has been deprecated in favor of the previous one
-and it is kept here only for reference.
+\begin{important}
+  This syntax has been deprecated in favor of the previous one
+  and it is kept here only for reference.
+\end{important}
 
 The \lstinline|loop widen_hints| annotation above has an obsoleted syntax: \\
 \lstinline|//@ loop pragma WIDEN_HINTS $v_1,\ldots,v_n$, $e_1,\ldots,e_m$ ;|\\
@@ -4013,6 +4013,34 @@ to syntactically unreachable code, e.g. instructions that are unreachable due to
 amount of warnings and is rarely needed in practice.
 
 % TODO: plevel, wlevel?
+
+\section{Analysis scripts and templates}\label{analysis-scripts}
+
+Setting up an analysis is a process that takes some time. Iterating an
+analysis (changing the parametrization, adding annotations, etc.) is a process
+which can greatly benefit from a structured approach, for instance to avoid
+reparsing the sources when only \Eva{}-related options are modified.
+For both tasks, Frama-C offers some templates and scripts to help the user.
+
+The files themselves are located mostly in Frama-C's \verb|share| directory
+(\verb|FRAMAC_SHARE|, when running \verb|frama-c-config|), but they can be
+accessed via the \verb|frama-c-script| command, among which we cite:
+
+\begin{description}
+\item[make-template]: creates a Makefile template in the current directory.
+  This template follows the recommended three-step setup
+  (section~\ref{three-step}), tracks dependencies (e.g. re-running parsing
+  when source files are modified) and offers useful targets for the user.
+\item[find-fun]: useful to find which source files declare/define a given
+  function; for instance, when there are multiple \verb|main| functions.
+\item[flamegraph]: opens a {\em flamegraph}\footnote{See
+  https://github.com/brendangregg/FlameGraph for details about flamegraphs.}
+  (a graphical profiling tool) of the analysis performed by \Eva{}.
+\end{description}
+
+Running \verb|frama-c-script| without arguments outputs the list of
+currently-available commands\footnote{The list of commands is liable to change
+  for each Frama-C release.}.
 
 \chapter{Inputs, outputs and dependencies}\label{inoutdeps}
 \vspace{2cm}
@@ -5019,7 +5047,10 @@ Builtins for functions of the \lstinline|string.h| standard header.
     \lstinline|Frama_C_strnlen|
   \end{tabular}
 \end{table}
-Note: \lstinline|rawmemchr| is a GNU extension to standard C.
+
+\begin{important}
+  \lstinline|rawmemchr| is a GNU extension to standard C.
+\end{important}
 
 \ifdefstring{\OPENSOURCE}{no}{
   % These builtins are not available in the open-source release
