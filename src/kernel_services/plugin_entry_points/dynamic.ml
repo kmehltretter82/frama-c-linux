@@ -445,6 +445,14 @@ module Parameter = struct
         let modname = "String"
       end)
 
+  module Filepath =
+    Common
+      (struct
+        type t = Datatype.Filepath.t
+        let ty = Datatype.Filepath.ty
+        let modname = "Filepath"
+      end)
+
   module StringSet = struct
     include Common
         (struct include Datatype.String.Set let modname = "StringSet" end)

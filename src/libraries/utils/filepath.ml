@@ -237,6 +237,8 @@ type position =
 let pp_pos fmt pos =
   Format.fprintf fmt "%a:%d" Normalized.pretty pos.pos_path pos.pos_lnum
 
+type existence = Must_exist | Must_not_exist | Indifferent
+
 (*
 Local Variables:
 compile-command: "make -C ../../.."

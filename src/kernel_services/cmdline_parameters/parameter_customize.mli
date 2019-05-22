@@ -148,6 +148,19 @@ val is_permissive_ref: bool ref
     Set by {!Kernel.Permissive} option
  *)
 
+val set_filepath_existence: Filepath.existence -> unit
+(** For arguments which correspond to filepaths, [Indifferent] (default)
+    does not impose any constraints; [Must_exist] and [Must_not_exist] raise
+    exceptions when not satisfied.
+    @since Frama-C+dev
+ *)
+
+val filepath_existence: unit -> Filepath.existence
+(** Retrieves filepath existence constraints (see {!set_filepath_existence}
+    for details).
+    @since Frama-C+dev
+ *)
+
 (* ************************************************************************* *)
 (** {2 Function names} *)
 (* ************************************************************************* *)
@@ -215,6 +228,7 @@ val do_iterate_ref: bool option ref
 val is_visible_ref: bool ref
 val module_name_ref: string ref
 val use_category_ref: bool ref
+val filepath_existence_ref: Filepath.existence ref
 
 (**/**)
 

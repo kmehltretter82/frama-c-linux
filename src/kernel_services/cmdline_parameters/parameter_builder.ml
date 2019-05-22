@@ -443,6 +443,69 @@ struct
     String(struct include X let default = empty_string end)
 
   (* ************************************************************************ *)
+  (** {3 Filepath} *)
+  (* ************************************************************************ *)
+
+  module Fc_Filepath = Filepath
+
+  module Filepath
+      (X: sig
+         include Parameter_sig.Input_with_arg
+         val existence : Filepath.existence
+       end) =
+  struct
+
+    exception No_file
+    exception File_exists
+
+    include Build
+        (struct
+          include Datatype.Filepath
+          include X
+          let functor_name = "Filepath"
+          let default () = Filepath.Normalized.unknown
+        end)
+
+    let check_existence existence s =
+      match existence with
+      | Filepath.Indifferent -> ()
+      | Filepath.Must_exist ->
+        let fp = Filepath.Normalized.of_string s in
+        if not (Sys.file_exists (Filepath.Normalized.to_pretty_string fp)) then
+          raise No_file
+      | Filepath.Must_not_exist ->
+        let fp = Filepath.Normalized.of_string s in
+        if Sys.file_exists (Filepath.Normalized.to_pretty_string fp) then
+          raise File_exists
+
+    let existence = X.existence
+
+    let convert_and_check_existence f = fun oldstr newstr ->
+      let oldfp = Filepath.Normalized.to_pretty_string oldstr in
+      let newfp = Filepath.Normalized.to_pretty_string newstr in
+      check_existence existence newfp;
+      f oldfp newfp
+
+    let parameter =
+      let accessor =
+        Typed_parameter.String
+          ({ Typed_parameter.get =
+               (fun fp -> Filepath.Normalized.to_pretty_string (get fp));
+             set =
+               (fun fp ->
+                  check_existence existence fp;
+                  set (Filepath.Normalized.of_string fp));
+             add_set_hook =
+               (fun f -> add_set_hook (convert_and_check_existence f));
+             add_update_hook =
+               (fun f -> add_update_hook (convert_and_check_existence f));
+           },
+           (fun () -> []))
+      in
+      Typed_parameter.create ~name ~help:X.help ~accessor ~is_set
+  end
+
+  (* ************************************************************************ *)
   (** {3 Collections} *)
   (* ************************************************************************ *)
 
