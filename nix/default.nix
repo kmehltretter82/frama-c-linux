@@ -63,7 +63,8 @@ rec {
   lint = stdenv.mkDerivation {
         name = "frama-c-lint";
         inherit src;
-        buildInputs = (mk_buildInputs {opamPackages = [ "ocp-indent" ];} ) ++ [ pkgs.bc plugins.headache.installed ];
+        buildInputs = (mk_buildInputs { opamPackages = [ { name = "ocp-indent"; constraint = "=1.6.1"; } ];} )
+                      ++ [ pkgs.bc plugins.headache.installed ];
         outputs = [ "out" ];
         postPatch = ''
                patchShebangs .
