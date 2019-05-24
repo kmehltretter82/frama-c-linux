@@ -135,27 +135,6 @@ class printer_with_annot () = object (self)
               | _ -> true)
         | _ :: _ -> false)
 
-  method! varinfo fmt v =
-    if Kernel.is_debug_key_enabled Kernel.dkey_print_vid then begin
-      Format.fprintf fmt "/* vid:%d" v.vid;
-      (match v.vlogic_var_assoc with
-         None -> ()
-       | Some v -> Format.fprintf fmt ", lvid:%d" v.lv_id
-      );
-      Format.fprintf fmt " */"
-    end;
-    super#varinfo fmt v;
-
-  method! logic_var fmt v =
-    if Kernel.is_debug_key_enabled Kernel.dkey_print_vid then begin
-      Format.fprintf fmt "/* ";
-      (match v.lv_origin with
-         None -> ()
-       | Some v -> Format.fprintf fmt "vid:%d, " v.vid);
-      Format.fprintf fmt "lvid:%d */" v.lv_id
-    end;
-    super#logic_var fmt v;
-
   method! vdecl fmt vi =
     Format.open_vbox 0;
     (try
