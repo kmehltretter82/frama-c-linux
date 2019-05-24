@@ -78,14 +78,14 @@ so that we can add it to the Frama-C `depext` package.
 ### Known working configuration
 
 The following set of packages is known to be a working configuration for
-Frama-C 18 (Argon):
+Frama-C 19 (Potassium):
 
 - OCaml 4.05.0
 - alt-ergo-free.2.0.0 (optional)
 - apron.20160125 (optional)
 - coq.8.9.0 (optional)
-- lablgtk.2.18.5
-- mlgmpidl.1.2.7 (optional)
+- lablgtk.2.18.5 | lablgtk3.3.0.beta5 + lablgtk3-sourceview3.3.0.beta5
+- mlgmpidl.1.2.9 (optional)
 - ocamlgraph.1.8.8
 - why3.1.2.0 (optional)
 - why3-coq.1.2.0 (optional)
@@ -206,7 +206,7 @@ Debian/Ubuntu: `apt-get install frama-c`
 
 Fedora: `dnf install frama-c`
 
-Arch Linux: `yaourt -S frama-c`
+Arch Linux: `pikaur -S frama-c`
 
 ## Compiling from source
 
@@ -219,7 +219,7 @@ Arch Linux: `yaourt -S frama-c`
    Note that OCaml >= 4.02.3 is needed in order to compile Frama-C.
 
 2. (Optional) For the GUI, also install Gtk, GtkSourceView, GnomeCanvas and
-   Lablgtk2 if not already installed.
+   Lablgtk2 or Lablgtk3 + Lablgtksourceview3 if not already installed.
    See section 'REQUIREMENTS' below for indications on the names of the
    packages to install, or use 'opam depext' as explained in section 'Opam'
    above.
@@ -254,9 +254,9 @@ Arch Linux: `yaourt -S frama-c`
 
 The Frama-C GUI also requires:
 - Gtk (>= 2.4)
-- GtkSourceView 2.x
-- GnomeCanvas 2.x
-- LablGtk >= 2.18.5
+- GtkSourceView 2.x or 3.x (compatible with your Gtk version)
+- GnomeCanvas 2.x (only for Gtk 2.x)
+- LablGtk >= 2.18.5 or Lablgtk3 >= beta5 + corresponding Lablgtksourceview3
 
 Plugins may have their own requirements.
 Consult their specific documentations for details.
