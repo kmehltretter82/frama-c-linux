@@ -3782,10 +3782,10 @@ and childrenExp (vis: cilVisitor) (e: exp) : exp =
        Cil_datatype.Varinfo.pretty nv
    end;
    f.svar <- nv; (* hit the function name *)
-   (* visit local declarations *)
-   f.slocals <- mapNoCopy (visitCilVarDecl vis) f.slocals;
    (* visit the formals *)
    let newformals = mapNoCopy (visitCilVarDecl vis) f.sformals in
+   (* visit local declarations *)
+   f.slocals <- mapNoCopy (visitCilVarDecl vis) f.slocals;
    (* Make sure the type reflects the formals *)
    let selection = State_selection.singleton FormalsDecl.self in
    if vis#behavior.is_copy_behavior || newformals != f.sformals then begin
