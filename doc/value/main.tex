@@ -1773,7 +1773,7 @@ Vaguely related to, but different from, undefined side-effects in expressions,
 
 \listinginput{1}{overlap.c}
 
-The programmer thought ey was invoking implementation-defined behavior
+The programmer thought implementation-defined behavior was invoked
 in the above program, using an union to type-pun between structs S and T.
 Unfortunately, this program returns 1 when compiled
 with \lstinline|clang -m32|; it returns 2 when compiled 
@@ -1908,9 +1908,9 @@ reverse-engineering source code, it does not really make sense to expect
 the user to check the alarms that are emitted by \Eva{}.
 Consider for instance Frama-C's slicing plug-in. This plug-in produces
 a simplified version of a program. It is often applied to large unfamiliar
-codebases; if the user is at the point where ey needs a slicer to make 
+codebases; if the user is at the point where they need a slicer to make
 sense of the codebase, it's probably a bad time to require
-em to check alarms on the original unsliced version.
+them to check alarms on the original unsliced version.
 
 The slicer and other code comprehension plug-ins work around this problem
 by defining the results they provide as ``valid for well-defined executions''.
@@ -2338,7 +2338,7 @@ For each C language construct that is not completely specified by the
 standard, there may exist an alternative, ``portable''
 version. The portable version could be considered safer if the
 programmer did not know exactly how the non-portable version will be
-translated by eir compiler. But the portable version may
+translated by their compiler. But the portable version may
 produce a code which is significantly slower and/or bigger. In practice,
 the constraints imposed on embedded software often lead to choosing
 the non-portable version. This is why, as often as possible, \Eva{}
@@ -3985,19 +3985,19 @@ during the initial part of an analysis, they may blend in with the sets
 of possibly false alarms. However, priority should be given to these
 alarms, since they are likely to indicate an incorrect parameterization.
 
-To help identify these situations, the {\em Nonterm} plug-in has been
+To help identify these situations, the \textsf{Nonterm} plug-in has been
 developed. It runs after \Eva{}, by adding \verb|-then -nonterm|
 at the end of the command-line.
 
-{\em Nonterm} emits warnings about non-terminating instructions in functions
+\textsf{Nonterm} emits warnings about non-terminating instructions in functions
 analyzed by \Eva{}. It operates on a per-callstack basis, and therefore
 displays more precise results than a visual inspection on the GUI;
 in particular, if there are both terminating and non-terminating callstacks for
 a given statement, the GUI will not color their successors red
-(because of the terminating callstacks), but {\em Nonterm} will emit warnings
+(because of the terminating callstacks), but \textsf{Nonterm} will emit warnings
 for the non-terminating ones.
 
-{\em Nonterm} only reports situations where \Eva{} is able to
+\textsf{Nonterm} only reports situations where \Eva{} is able to
 guarantee non-termination. Because its purpose is to prioritize warnings
 that are likely to indicate parameterization errors,
 it does not consider callstacks where termination seems possible.
@@ -5330,7 +5330,7 @@ that there is an alarm on line 9. These results must be interpreted
 thus: assuming that the array access on line 7 was legitimate, then
 line 8 is safe, and there is a threat on line 9. As a consequence, if
 the user can convince emself that the threat on line 7 is false,
-ey can trust these results ({\it i.e.} there is nothing to worry
+they can trust these results ({\it i.e.} there is nothing to worry
 about on line 8, but line 9 needs further investigation).
 %\bigskip
 %\bigskip
