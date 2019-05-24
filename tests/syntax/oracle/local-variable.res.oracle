@@ -18,7 +18,8 @@ void f(void)
 
 void h(int i)
 {
-  int t[(unsigned int)100 / sizeof(x)];
+  int tmp_0;
+  int t[(unsigned int)100 / sizeof(tmp_0)];
   int u[(unsigned int)100 / sizeof(i)];
   int x = 1;
   return;

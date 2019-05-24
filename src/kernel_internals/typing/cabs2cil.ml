@@ -1540,18 +1540,50 @@ struct
   *)
   let c2block ~ghost ?(collapse_block=true) ?(force_non_scoping=false) c =
     let declares_var = c.locals <> [] || c.statics <> [] in
+    let vars = ref [] in
+    let cleanup_types =
+      object
+        val replacements = Cil_datatype.Varinfo.Hashtbl.create 3
+        inherit Cil.nopCilVisitor
+        method! vvrbl vi =
+          if List.memq vi c.locals && vi.vdefined then begin
+            (* This can happen in particular in a SizeOfE used in the size
+               of a declared array. As the actual definition of the referenced
+               variable is deported to the Local_init node, we use an undefined
+               temp variable instead as placeholder.
+            *)
+            let vi' =
+              match Cil_datatype.Varinfo.Hashtbl.find_opt replacements vi with
+              | None ->
+                let vi' =
+                  newTempVar (vi.vname ^ " initialization") true vi.vtype
+                in
+                Cil_datatype.Varinfo.Hashtbl.add replacements vi vi';
+                vars := vi' :: !vars;
+                vi'
+              | Some vi' -> vi'
+            in
+            ChangeTo vi'
+          end else SkipChildren
+      end
+    in
+    let cleanup_var vi = vi.vtype <- Cil.visitCilType cleanup_types vi.vtype in
+    List.iter cleanup_var c.locals;
+    !currentFunctionFDEC.slocals <- !currentFunctionFDEC.slocals @ !vars;
+    let vars = !vars @ c.locals in
     if c.unspecified_order then begin
       if List.length c.stmts >= 2 then begin
         let first_stmt =
           (fun (s,_,_,_,_) -> s) (Extlib.last c.stmts) in
         Kernel.warning ~wkey:Kernel.wkey_cert_exp_10
           ~source:(fst (Stmt.loc first_stmt))
-          "Potential unsequenced side-effects" end;
+          "Potential unsequenced side-effects"
+      end;
       let b =
         Cil.mkBlock
           [mkStmt ~ghost ~valid_sid (UnspecifiedSequence (List.rev c.stmts))]
       in
-      b.blocals <- c.locals;
+      b.blocals <- vars;
       b.bstatics <- c.statics;
       b.bscoping <- declares_var || not force_non_scoping;
       b
@@ -1559,14 +1591,14 @@ struct
       match c.stmts with
       | [{ skind = Block b } as s,_,_,_,_] when
           collapse_block && s.labels = [] ->
-        b.blocals <- c.locals @ b.blocals;
+        b.blocals <- vars @ b.blocals;
         b.bstatics <- c.statics @ b.bstatics;
         b.bscoping <- b.bscoping || declares_var || not force_non_scoping;
         b
       | stmts ->
         let stmts = List.rev_map (fun (s,_,_,_,_) -> s) stmts in
         let b = Cil.mkBlock stmts in
-        b.blocals <- c.locals;
+        b.blocals <- vars;
         b.bstatics <- c.statics;
         b.bscoping <- declares_var || not force_non_scoping;
         b
@@ -3716,7 +3748,9 @@ let afterConversion ~ghost (c: chunk) : chunk =
   (* the call to c2block has taken care of a possible unspecified sequence.
      We do not need to keep track of effects at this level. *)
   let res =
-    { c with stmts = (List.rev_map (fun x -> x,[],[],[],[]) sl); }
+    { c with stmts = (List.rev_map (fun x -> x,[],[],[],[]) sl);
+             locals = block.blocals
+    }
   in
   (*  Format.eprintf "Before conversion@\n%a@\nAfter conversion@\n%a@\n@."
       d_chunk c d_chunk res;
@@ -3728,7 +3762,6 @@ let suggestAnonName (nl: A.name list) =
   match nl with
   | [] -> ""
   | (n, _, _, _) :: _ -> n
-
 
 (** Optional constant folding of binary operations *)
 let optConstFoldBinOp loc machdep bop e1 e2 t =
