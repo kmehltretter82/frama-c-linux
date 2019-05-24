@@ -378,7 +378,7 @@ class check ?(is_normalized=true) what : Visitor.frama_c_visitor =
         self#pop_behavior_stack ();
         f
       in
-      Cil.ChangeDoChildrenPost(f,check)
+      Cil.DoChildrenPost check
 
     method private check_label s =
       let ok = List.exists (function Label _ -> true | _ -> false) !s.labels in
