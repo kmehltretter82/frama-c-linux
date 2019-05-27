@@ -175,8 +175,8 @@ sig
   module Var : Variable
 
   type term
-  type bind
-
+  type lc_term
+  (** Loosely closed terms. *)
 
   module Term : Symbol with type t = term
 
@@ -219,10 +219,11 @@ sig
 
   (** {3 Terms} *)
 
-  type 'a expression = (Field.t,ADT.t,Fun.t,var,bind,'a) term_repr
+  type 'a expression = (Field.t,ADT.t,Fun.t,var,lc_term,'a) term_repr
 
   type repr = term expression
-  type path = int list (** position of a subterm in a term. *)
+  type lc_repr = lc_term expression
+
   type record = (Field.t * term) list
 
   val decide   : term -> bool (** Return [true] if and only the term is [e_true]. Constant time. *)
@@ -243,8 +244,18 @@ sig
   val sort : term -> sort   (** Constant time *)
   val vars : term -> Vars.t (** Constant time *)
 
+  (** Path-positioning access
+
+      This part of the API is DEPRECATED
+  *)
+
+  type path = int list (** position of a subterm in a term. *)
+
   val subterm: term -> path -> term
+  [@@deprecated "Path-access might be unsafe in presence of binders"]
+
   val change_subterm: term -> path -> term -> term
+  [@@deprecated "Path-access might be unsafe in presence of binders"]
 
   (** {3 Basic constructors} *)
 
@@ -300,21 +311,35 @@ sig
   val sigma_add : sigma -> term Tmap.t -> unit
 
   val e_subst : ?sigma:sigma -> (term -> term) -> term -> term
+  [@@deprecated "Might be unsafe in presence of binders"]
+
   val e_subst_var : var -> term -> term -> term
+  [@@deprecated "Might be unsafe in presence of binders"]
 
   (** {3 Locally Nameless Representation} *)
 
-  val lc_bind : var -> term -> bind (** Close [x] as a new bound variable *)
-  val lc_open : var -> bind -> term (** Instantiate top bound variable *)
-  val lc_open_term : term -> bind -> term
+  val lc_bind : var -> term -> lc_term (** Close [x] as a new bound variable *)
+  [@@deprecated "Might be unsafe in presence of binders"]
+
+  val lc_open : var -> lc_term -> term (** Instantiate top bound variable *)
+  [@@deprecated "Might be unsafe in presence of binders"]
+
+  val lc_open_term : term -> lc_term -> term
+  [@@deprecated "Might be unsafe in presence of binders"]
+
+
   (** Instantiate top bound variable with the given term *)
   val lc_closed : term -> bool
   val lc_closed_at : int -> term -> bool
   val lc_vars : term -> Bvars.t
-  val lc_repr : bind -> term
 
-  val binders : term -> binder list
+  val lc_term : term -> lc_term
+  val lc_repr : lc_term -> term
+  [@@deprecated "Might be unsafe in presence of binders"]
+
   (** Returns the list of head binders *)
+  val binders : term -> binder list
+  [@@deprecated "Useless function"]
 
   (** {3 Recursion Scheme} *)
 
@@ -325,7 +350,10 @@ sig
   val f_iter : (int -> term -> unit) -> int -> term -> unit
 
   val lc_map : (term -> term) -> term -> term
+  [@@deprecated "Might be unsafe in presence of binders"]
+
   val lc_iter : (term -> unit) -> term -> unit
+  [@@deprecated "Might be unsafe in presence of binders"]
 
   (** {3 Partial Typing} *)
 

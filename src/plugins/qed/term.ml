@@ -65,9 +65,10 @@ struct
   }
   and repr = (Field.t,ADT.t,Fun.t,var,term,term) term_repr
 
-  type bind = term
+  type lc_term = term
+  type lc_repr = repr
 
-  type 'a expression = (Field.t,ADT.t,Fun.t,var,bind,'a) term_repr
+  type 'a expression = (Field.t,ADT.t,Fun.t,var,lc_term,'a) term_repr
 
   (* ------------------------------------------------------------------------ *)
   (* ---  Term Set,Map and Vars                                           --- *)
@@ -759,7 +760,7 @@ struct
   let e_zint z = insert (Kint z)
   let e_real x = insert (Kreal x)
   let e_var x  = insert(Fvar x)
-  let e_bvar k t = insert(Bvar(k,t))
+  let c_bvar k t = insert(Bvar(k,t))
 
   let c_div x y = insert (Div(x,y))
   let c_mod x y = insert (Mod(x,y))
@@ -1942,7 +1943,7 @@ struct
   let lc_bind x e =
     let k = Bvars.order e.bind in
     let t = tau_of_var x in
-    lc_subst_var (sigma ()) x (e_bvar k t) e
+    lc_subst_var (sigma ()) x (c_bvar k t) e
 
   let e_subst_var x v e =
     lc_subst_var (sigma ()) x v e
@@ -1968,6 +1969,7 @@ struct
   let lc_closed_at n e = Bvars.closed_at n e.bind
   let lc_vars e = e.bind
   let lc_repr e = e
+  let lc_term e = e
 
   (* -------------------------------------------------------------------------- *)
   (* --- Binders                                                            --- *)
@@ -2130,7 +2132,7 @@ struct
     | Kint z -> e_zint z
     | Kreal r -> e_real r
     | Fvar x -> e_var x
-    | Bvar(k,t) -> e_bvar k t
+    | Bvar(k,t) -> c_bvar k t
     | Bind(q,t,e) -> c_bind q t e
     | Apply(a,xs) -> e_apply a xs
     | Times(k,e) -> e_times k e

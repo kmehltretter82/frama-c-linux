@@ -25,7 +25,7 @@ open Lang
 module PartitionsQQ : sig
   val destructs_qq :
     Lang.F.pool ->
-    Qed.Logic.binder -> tau:Lang.F.QED.tau -> phi:Lang.F.QED.bind ->
+    Qed.Logic.binder -> tau:Lang.F.QED.tau -> phi:Lang.F.QED.lc_term ->
     Lang.F.Vars.t * Lang.F.QED.term
 
   val get : vars:Lang.F.Vars.t -> Lang.F.term list ->
