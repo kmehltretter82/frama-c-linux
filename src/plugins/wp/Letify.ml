@@ -438,7 +438,7 @@ struct
               let rec aux sigma i =
                 if Integer.lt cstb i then sigma
                 else begin
-                  let eq = F.QED.lc_open_term (e_zint i) fb in
+                  let eq = F.QED.e_apply p [e_zint i] in
                   (** qed should be able to simplify it directly *)
                   let sigma = add_pred sigma eq in
                   aux sigma (Integer.succ i)

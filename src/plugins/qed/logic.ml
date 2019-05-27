@@ -328,14 +328,7 @@ sig
   (** {3 Locally Nameless Representation} *)
 
   val lc_bind : var -> term -> lc_term (** Close [x] as a new bound variable *)
-  [@@deprecated "Might be unsafe in presence of binders"]
-
   val lc_open : var -> lc_term -> term (** Instantiate top bound variable *)
-  [@@deprecated "Might be unsafe in presence of binders"]
-
-  val lc_open_term : term -> lc_term -> term
-  [@@deprecated "Might be unsafe in presence of binders"]
-
 
   val lc_empty : term -> bool (** No bound variables *)
   val lc_closed : term -> bool (** All bound variables are under their binder *)

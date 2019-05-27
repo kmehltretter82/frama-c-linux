@@ -1904,6 +1904,61 @@ struct
   let lc_repr e = e
   let lc_term e = e
 
+  (*
+     Warning: must only be used for alpha-conversion
+     Never re-compute simplifications, only renormalize with
+     respect to hash-consing.
+  *)
+  let lc_alpha f e =
+    match e.repr with
+    | Kint _ | Kreal _ | Fvar _ | Bvar _ | True | False -> e
+    | Not e -> c_not (f e)
+    | Add xs -> c_add (List.map f xs)
+    | Mul xs -> c_mul (List.map f xs)
+    | And xs -> c_and (List.map f xs)
+    | Or  xs -> c_or (List.map f xs)
+    | Mod(x,y) -> c_mod (f x) (f y)
+    | Div(x,y) -> c_div (f x) (f y)
+    | Eq(x,y)  -> c_eq  (f x) (f y)
+    | Neq(x,y) -> c_neq (f x) (f y)
+    | Lt(x,y)  -> c_lt  (f x) (f y)
+    | Leq(x,y) -> c_leq (f x) (f y)
+    | Times(z,t) -> c_times z (f t)
+    | If(e,a,b) -> c_if (f e) (f a) (f b)
+    | Imply(hs,p) -> c_imply (List.map f hs) (f p)
+    | Fun(g,xs) -> c_fun g (List.map f xs)
+    | Acst(t,v) -> c_const t v
+    | Aget(x,y) -> c_get (f x) (f y)
+    | Aset(x,y,z) -> c_set (f x) (f y) (f z)
+    | Rget(x,g) -> c_getfield (f x) g
+    | Rdef gxs -> c_record (List.map (fun (g,x) -> g, f x) gxs)
+    | Apply(e,es) -> c_apply (f e) (List.map f es)
+    | Bind(q,t,e) -> c_bind q t e
+
+  (* Alpha-convert free-variable x with the top-most bound variable *)
+  let lc_bind x (lc : lc_term) : lc_term =
+    let rec walk mu x lc =
+      if Vars.mem x lc.vars then
+        get mu (lc_alpha (walk mu x)) lc
+      else lc in
+    let k = Bvars.order lc.bind in
+    let t = tau_of_var x in
+    let mu = cache () in
+    set mu (e_var x) (c_bvar k t) ;
+    walk mu x lc
+
+  (* Alpha-convert top-most bound variable with free-variable x *)
+  let lc_open x (lc : lc_term) : lc_term =
+    let rec walk mu k lc =
+      if Bvars.contains k lc.bind then
+        get mu (lc_alpha (walk mu k)) lc
+      else lc in
+    let k = Bvars.order lc.bind in
+    let t = tau_of_var x in
+    let mu = cache () in
+    set mu (c_bvar k t) (e_var x) ;
+    walk mu k lc
+
   (* -------------------------------------------------------------------------- *)
   (* --- Non-Binding Morphism                                               --- *)
   (* -------------------------------------------------------------------------- *)
@@ -1933,37 +1988,6 @@ struct
     | Rdef gxs -> e_record (List.map (fun (g,x) -> g, f x) gxs)
     | Bvar _ | Bind _ | Apply _ -> assert false
 
-
-  let rec lc_subst_var m x v e =
-    if not (Vars.mem x e.vars) then e else
-      match e.repr with
-      | Fvar y when Var.equal x y -> v
-      | _ -> get m (rebuild (lc_subst_var m x v)) e
-
-  let lc_bind x e =
-    let k = Bvars.order e.bind in
-    let t = tau_of_var x in
-    lc_subst_var (cache ()) x (c_bvar k t) e
-
-  let e_subst_var x v e =
-    lc_subst_var (cache ()) x v e
-
-  let rec lc_open m k v e =
-    if not (Bvars.contains k e.bind) then e else
-      match e.repr with
-      | Bvar _ -> v (* e.bind is a singleton that can only contains k *)
-      | _ ->
-          if is_simple e then e else
-            get m (rebuild (lc_open m k v)) e
-
-  let lc_open_term t e =
-    let k = Bvars.order e.bind in
-    lc_open (cache ()) k t e
-
-  let lc_open x e =
-    let k = Bvars.order e.bind in
-    lc_open (cache ()) k (e_var x) e
-
   (* -------------------------------------------------------------------------- *)
   (* --- General Substitutions                                              --- *)
   (* -------------------------------------------------------------------------- *)
@@ -1985,6 +2009,16 @@ struct
   let e_subst ?sigma f e =
     let cache = match sigma with None -> ref Tmap.empty | Some c -> c in
     gsubst cache f e
+
+  let e_subst_var x v e =
+    let rec walk mu x e =
+      if Vars.mem x e.vars then
+        get mu (rebuild (walk mu x)) e
+      else e
+    in
+    let cache = cache () in
+    set cache (e_var x) v ;
+    walk cache x e
 
   (* -------------------------------------------------------------------------- *)
   (* --- Binders                                                            --- *)
@@ -2060,7 +2094,7 @@ struct
     if do_bind then
       match let_intro_case q x a with
       | None -> c_bind q (tau_of_var x) (lc_bind x a)
-      | Some e -> lc_subst_var (cache ()) x e a (* case [let x = e ; a] *)
+      | Some e -> e_subst_var x e a (* case [let x = e ; a] *)
     else a
 
   let rec bind_xs q xs e =
