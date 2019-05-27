@@ -1120,14 +1120,6 @@ struct
     if Z.lt z Z.zero then Negative else
     if Z.lt Z.zero z then Positive else
       Null
-(*
-  let pp fmt a =
-    match a.repr with
-    | Kint z -> Format.pp_print_string fmt (Z.to_string z)
-    | Kreal q -> Format.pp_print_string fmt (Q.to_string q)
-    | Fvar x -> Var.pretty fmt x
-    | _ -> Format.fprintf fmt "#%d" a.id
-*)
 
   let r_affine_rel fz fe c xs ys =
     let a , xs = r_ground Q.add (Q.of_bigint c) [] xs in
@@ -1874,36 +1866,6 @@ struct
   type record = (Field.t * term) list
 
   (* -------------------------------------------------------------------------- *)
-  (* --- Non-Binding Morphism                                               --- *)
-  (* -------------------------------------------------------------------------- *)
-
-  let rebuild f e =
-    match e.repr with
-    | Kint _ | Kreal _ | Fvar _ | Bvar _ | True | False -> e
-    | Not e -> e_not (f e)
-    | Add xs -> addition (List.map f xs)
-    | Mul xs -> multiplication (List.map f xs)
-    | And xs -> e_and (List.map f xs)
-    | Or  xs -> e_or  (List.map f xs)
-    | Mod(x,y) -> e_mod (f x) (f y)
-    | Div(x,y) -> e_div (f x) (f y)
-    | Eq(x,y)  -> e_eq  (f x) (f y)
-    | Neq(x,y) -> e_neq (f x) (f y)
-    | Lt(x,y)  -> e_lt  (f x) (f y)
-    | Leq(x,y) -> e_leq (f x) (f y)
-    | Times(z,t) -> times z (f t)
-    | If(e,a,b) -> e_if (f e) (f a) (f b)
-    | Imply(hs,p) -> e_imply (List.map f hs) (f p)
-    | Fun(g,xs) -> e_fun g (List.map f xs)
-    | Acst(t,v) -> e_const t v
-    | Aget(x,y) -> e_get (f x) (f y)
-    | Aset(x,y,z) -> e_set (f x) (f y) (f z)
-    | Rget(x,g) -> e_getfield (f x) g
-    | Rdef gxs -> e_record (List.map (fun (g,x) -> g, f x) gxs)
-    | Apply(e,es) -> c_apply (f e) (List.map f es)
-    | Bind(q,t,e) -> c_bind q t (f e)
-
-  (* -------------------------------------------------------------------------- *)
   (* --- Smart Constructors                                                 --- *)
   (* -------------------------------------------------------------------------- *)
 
@@ -1916,37 +1878,75 @@ struct
   let e_mul x y = multiplication [x;y]
 
   (* -------------------------------------------------------------------------- *)
-  (* --- Locally Memoized                                                   --- *)
+  (* --- Caches                                                             --- *)
   (* -------------------------------------------------------------------------- *)
 
-  type sigma = term Tmap.t ref
+  type 'a cache = 'a Tmap.t ref
 
-  let sigma () = ref Tmap.empty
+  let cache () = ref Tmap.empty
+  let get mu f e =
+    try Tmap.find e !mu with Not_found ->
+      let v = f e in mu := Tmap.add e v !mu ; v
+  let set mu e v = mu := Tmap.add e v !mu
+  let clear mu = mu := Tmap.empty
 
-  let cache_find m e = Tmap.find e !m
-  let cache_bind m e v = m := Tmap.add e v !m ; v
-
-  let sigma_add m t = m := Tmap.union (fun _ _ v2 -> v2) !m t
+  let lc_set = set
+  let lc_get = get
 
   (* -------------------------------------------------------------------------- *)
   (* --- Locally Nameless                                                   --- *)
   (* -------------------------------------------------------------------------- *)
 
+  let lc_empty e = Bvars.is_empty e.bind
+  let lc_closed e = Bvars.closed e.bind
+  let lc_closed_at n e = Bvars.closed_at n e.bind
+  let lc_vars e = e.bind
+  let lc_repr e = e
+  let lc_term e = e
+
+  (* -------------------------------------------------------------------------- *)
+  (* --- Non-Binding Morphism                                               --- *)
+  (* -------------------------------------------------------------------------- *)
+
+  let rebuild f e =
+    match e.repr with
+    | Kint _ | Kreal _ | Fvar _ | True | False -> e
+    | Not e -> e_not (f e)
+    | Add xs -> e_sum (List.map f xs)
+    | Mul xs -> e_prod (List.map f xs)
+    | And xs -> e_and (List.map f xs)
+    | Or  xs -> e_or (List.map f xs)
+    | Mod(x,y) -> e_mod (f x) (f y)
+    | Div(x,y) -> e_div (f x) (f y)
+    | Eq(x,y)  -> e_eq  (f x) (f y)
+    | Neq(x,y) -> e_neq (f x) (f y)
+    | Lt(x,y)  -> e_lt  (f x) (f y)
+    | Leq(x,y) -> e_leq (f x) (f y)
+    | Times(z,t) -> e_times z (f t)
+    | If(e,a,b) -> e_if (f e) (f a) (f b)
+    | Imply(hs,p) -> e_imply (List.map f hs) (f p)
+    | Fun(g,xs) -> e_fun g (List.map f xs)
+    | Acst(t,v) -> e_const t v
+    | Aget(x,y) -> e_get (f x) (f y)
+    | Aset(x,y,z) -> e_set (f x) (f y) (f z)
+    | Rget(x,g) -> e_getfield (f x) g
+    | Rdef gxs -> e_record (List.map (fun (g,x) -> g, f x) gxs)
+    | Bvar _ | Bind _ | Apply _ -> assert false
+
+
   let rec lc_subst_var m x v e =
     if not (Vars.mem x e.vars) then e else
       match e.repr with
       | Fvar y when Var.equal x y -> v
-      | _ ->
-          try cache_find m e
-          with Not_found -> cache_bind m e (rebuild (lc_subst_var m x v) e)
+      | _ -> get m (rebuild (lc_subst_var m x v)) e
 
   let lc_bind x e =
     let k = Bvars.order e.bind in
     let t = tau_of_var x in
-    lc_subst_var (sigma ()) x (c_bvar k t) e
+    lc_subst_var (cache ()) x (c_bvar k t) e
 
   let e_subst_var x v e =
-    lc_subst_var (sigma ()) x v e
+    lc_subst_var (cache ()) x v e
 
   let rec lc_open m k v e =
     if not (Bvars.contains k e.bind) then e else
@@ -1954,22 +1954,37 @@ struct
       | Bvar _ -> v (* e.bind is a singleton that can only contains k *)
       | _ ->
           if is_simple e then e else
-            try cache_find m e
-            with Not_found -> cache_bind m e (rebuild (lc_open m k v) e)
+            get m (rebuild (lc_open m k v)) e
 
   let lc_open_term t e =
     let k = Bvars.order e.bind in
-    lc_open (sigma ()) k t e
+    lc_open (cache ()) k t e
 
   let lc_open x e =
     let k = Bvars.order e.bind in
-    lc_open (sigma ()) k (e_var x) e
+    lc_open (cache ()) k (e_var x) e
 
-  let lc_closed e = Bvars.closed e.bind
-  let lc_closed_at n e = Bvars.closed_at n e.bind
-  let lc_vars e = e.bind
-  let lc_repr e = e
-  let lc_term e = e
+  (* -------------------------------------------------------------------------- *)
+  (* --- General Substitutions                                              --- *)
+  (* -------------------------------------------------------------------------- *)
+
+  type sigma = term cache
+
+  let sigma () = cache ()
+
+  let rec gsubst mu f e =
+    match e.repr with
+    | True | False | Kint _ | Kreal _ | Bvar _ -> e
+    | _ -> get mu (fun e ->
+        let e0 = rebuild (gsubst mu f) e in
+        if lc_closed e0 then
+          try f e0 with Not_found -> e0
+        else e0
+      ) e
+
+  let e_subst ?sigma f e =
+    let cache = match sigma with None -> ref Tmap.empty | Some c -> c in
+    gsubst cache f e
 
   (* -------------------------------------------------------------------------- *)
   (* --- Binders                                                            --- *)
@@ -2045,7 +2060,7 @@ struct
     if do_bind then
       match let_intro_case q x a with
       | None -> c_bind q (tau_of_var x) (lc_bind x a)
-      | Some e -> lc_subst_var (sigma ()) x e a (* case [let x = e ; a] *)
+      | Some e -> lc_subst_var (cache ()) x e a (* case [let x = e ; a] *)
     else a
 
   let rec bind_xs q xs e =
@@ -2066,24 +2081,23 @@ struct
 
   let r_apply = ref (fun _ _ _ -> assert false)
 
-  let rec subst sigma xs d e =
+  let rec subst mu xs d e =
     (* substitute bound variable d+i with xs.(i) for 0 <= i < xs.length *)
     if not (Bvars.overlap d (Array.length xs) e.bind)
     then e else
       match e.repr with
       | Bvar(k,_) -> xs.(k-d)
       | _ ->
-          try cache_find sigma e
-          with Not_found ->
-            cache_bind sigma e
-              begin match e.repr with
-                | Apply(e,es) ->
-                    let e = subst sigma xs d e in
-                    let es = List.map (subst sigma xs d) es in
-                    !r_apply [] e es
-                | _ ->
-                    rebuild (subst sigma xs d) e
-              end
+          get mu
+            begin fun e ->
+              match e.repr with
+              | Apply(e,es) ->
+                  let e = subst mu xs d e in
+                  let es = List.map (subst mu xs d) es in
+                  !r_apply [] e es
+              | _ ->
+                  rebuild (subst mu xs d) e
+            end e
 
   let rec apply xs a es =
     match a.repr , es with
@@ -2091,36 +2105,15 @@ struct
     | _ ->
         let core =
           if xs=[] then a else
-            let sigma = sigma () in
+            let mu = cache () in
             let xs = Array.of_list xs in
             let d = Bvars.order a.bind + 1 - Array.length xs in
-            subst sigma xs d a
+            subst mu xs d a
         in c_apply core es
 
   let () = r_apply := apply
 
   let e_apply e es = apply [] e es
-
-  (* -------------------------------------------------------------------------- *)
-  (* --- General Substitutions                                              --- *)
-  (* -------------------------------------------------------------------------- *)
-
-  let rec gsubst mu sigma e =
-    match e.repr with
-    | True | False | Kint _ | Kreal _ | Bvar _ -> e
-    | _ ->
-        try cache_find mu e
-        with Not_found ->
-          let e0 = rebuild (gsubst mu sigma) e in
-          let e1 =
-            if lc_closed e0 then
-              try sigma e0 with Not_found -> e0
-            else e0 in
-          cache_bind mu e e1
-
-  let e_subst ?sigma f e =
-    let cache = match sigma with None -> ref Tmap.empty | Some c -> c in
-    gsubst cache f e
 
   (* -------------------------------------------------------------------------- *)
   (* --- Iterators                                                          --- *)

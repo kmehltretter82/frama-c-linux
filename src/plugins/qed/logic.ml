@@ -304,11 +304,20 @@ sig
   val e_bind : binder -> var -> term -> term
   val e_apply : term -> term list -> term
 
+  (** {3 Local Caches} *)
+
+  type 'a cache
+  val cache : unit -> 'a cache
+  val get : 'a cache -> (term -> 'a) -> term -> 'a
+  val set : 'a cache -> term -> 'a -> unit
+  val lc_get : 'a cache -> (lc_term -> 'a) -> lc_term -> 'a
+  val lc_set : 'a cache -> lc_term -> 'a -> unit
+  val clear : 'a cache -> unit
+
   (** {3 Generalized Substitutions} *)
 
   type sigma
   val sigma : unit -> sigma
-  val sigma_add : sigma -> term Tmap.t -> unit
 
   val e_subst : ?sigma:sigma -> (term -> term) -> term -> term
   [@@deprecated "Might be unsafe in presence of binders"]
@@ -328,9 +337,13 @@ sig
   [@@deprecated "Might be unsafe in presence of binders"]
 
 
-  (** Instantiate top bound variable with the given term *)
-  val lc_closed : term -> bool
+  val lc_empty : term -> bool (** No bound variables *)
+  val lc_closed : term -> bool (** All bound variables are under their binder *)
   val lc_closed_at : int -> term -> bool
+  (** [lc_closed_at n] do not contains bvar with [k < n].
+      Means that the term has no bound-variable that can escape [n] binders
+      uppon the term. *)
+
   val lc_vars : term -> Bvars.t
 
   val lc_term : term -> lc_term
