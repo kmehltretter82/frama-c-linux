@@ -318,6 +318,81 @@ struct
     | If(a,b,c) -> 2 + max a.size (max b.size c.size)
     | Bind(_,_,p) -> 3 + p.size
 
+  let repr_iter f = function
+    | True | False | Kint _ | Kreal _ | Fvar _ | Bvar _ -> ()
+    | Times(_,e) | Not e | Rget(e,_) | Acst(_,e) -> f e
+    | Add xs | Mul xs | And xs | Or xs -> List.iter f xs
+    | Mod(x,y) | Div(x,y) | Eq(x,y) | Neq(x,y) | Leq(x,y) | Lt(x,y)
+    | Aget(x,y) -> f x ; f y
+    | Rdef fvs -> List.iter (fun (_,v) -> f v) fvs
+    | If(e,a,b) | Aset(e,a,b) -> f e ; f a ; f b
+    | Imply(xs,x) -> List.iter f xs ; f x
+    | Fun(_,xs) -> List.iter f xs
+    | Apply(x,xs) -> f x ; List.iter f xs
+    | Bind(_,_,e) -> f e
+
+  (* -------------------------------------------------------------------------- *)
+  (* --- DEBUG                                                              --- *)
+  (* -------------------------------------------------------------------------- *)
+
+  let pp_bind fmt = function
+    | Forall -> Format.pp_print_string fmt "Forall"
+    | Exists -> Format.pp_print_string fmt "Exists"
+    | Lambda -> Format.pp_print_string fmt "Lambda"
+
+  let pp_var fmt x = Format.fprintf fmt "X%03d(%s:%d)" x.vid x.vbase x.vrank
+  let pp_id fmt x = Format.fprintf fmt " #%03d" x.id
+  let pp_ids fmt xs = List.iter (pp_id fmt) xs
+  let pp_field fmt (f,x) = Format.fprintf fmt "@ %a:%a;" Field.pretty f pp_id x
+  let pp_record fmt fxs = List.iter (pp_field fmt) fxs
+  let pp_repr fmt = function
+    | Kint z -> Format.fprintf fmt "constant %s" (Z.to_string z)
+    | Kreal z -> Format.fprintf fmt "real constant %s" (Q.to_string z)
+    | True  -> Format.pp_print_string fmt "true"
+    | False -> Format.pp_print_string fmt "false"
+    | Times(z,x) -> Format.fprintf fmt "times %s%a" (Z.to_string z) pp_id x
+    | Add xs -> Format.fprintf fmt "add%a" pp_ids xs
+    | Mul xs -> Format.fprintf fmt "mul%a" pp_ids xs
+    | And xs -> Format.fprintf fmt "and%a" pp_ids xs
+    | Div(a,b) -> Format.fprintf fmt "div%a%a" pp_id a pp_id b
+    | Mod(a,b) -> Format.fprintf fmt "mod%a%a" pp_id a pp_id b
+    | Or xs -> Format.fprintf fmt "or%a" pp_ids xs
+    | If(e,a,b) -> Format.fprintf fmt "if%a%a%a" pp_id e pp_id a pp_id b
+    | Imply(hs,p) -> Format.fprintf fmt "imply%a =>%a" pp_ids hs pp_id p
+    | Neq(a,b) -> Format.fprintf fmt "neq%a%a" pp_id a pp_id b
+    | Eq(a,b) -> Format.fprintf fmt "eq%a%a" pp_id a pp_id b
+    | Leq(a,b) -> Format.fprintf fmt "leq%a%a" pp_id a pp_id b
+    | Lt(a,b) -> Format.fprintf fmt "lt%a%a" pp_id a pp_id b
+    | Not e -> Format.fprintf fmt "not%a" pp_id e
+    | Fun(f,es) -> Format.fprintf fmt "fun %a%a" Fun.pretty f pp_ids es
+    | Apply(phi,es) -> Format.fprintf fmt "apply%a%a" pp_id phi pp_ids es
+    | Fvar x -> Format.fprintf fmt "var %a" pp_var x
+    | Bvar(k,_) -> Format.fprintf fmt "bvar #%d" k
+    | Bind(q,t,e) -> Format.fprintf fmt "bind %a %a. %a" pp_bind q Tau.pretty t pp_id e
+    | Rdef fxs -> Format.fprintf fmt "@[<hov 2>record {%a }@]" pp_record fxs
+    | Rget(e,f) -> Format.fprintf fmt "field %a.%a" pp_id e Field.pretty f
+    | Aset(m,k,v) -> Format.fprintf fmt "array%a[%a :=%a ]" pp_id m pp_id k pp_id v
+    | Aget(m,k) -> Format.fprintf fmt "array%a[%a ]" pp_id m pp_id k
+    | Acst(t,v) -> Format.fprintf fmt "const[%a ->%a]" Tau.pretty t pp_id v
+  let pp_rid fmt e = pp_repr fmt e.repr
+
+  let rec pp_debug disp fmt e =
+    if not (Intset.mem e.id !disp) then
+      begin
+        Format.fprintf fmt "%a{%a} = %a@."
+          pp_id e Bvars.pretty e.bind pp_repr e.repr ;
+        disp := Intset.add e.id !disp ;
+        pp_children disp fmt e ;
+      end
+
+  and pp_children disp fmt e = repr_iter (pp_debug disp fmt) e.repr
+
+  let debug fmt e =
+    Format.fprintf fmt "%a with:@." pp_id e ;
+    pp_debug (ref Intset.empty) fmt e
+
+  let pretty = debug
+
   (* -------------------------------------------------------------------------- *)
   (* --- Symbols                                                            --- *)
   (* -------------------------------------------------------------------------- *)
@@ -1933,7 +2008,7 @@ struct
     | Rget(x,g) -> c_getfield (f x) g
     | Rdef gxs -> c_record (List.map (fun (g,x) -> g, f x) gxs)
     | Apply(e,es) -> c_apply (f e) (List.map f es)
-    | Bind(q,t,e) -> c_bind q t e
+    | Bind(q,t,e) -> c_bind q t (f e)
 
   (* Alpha-convert free-variable x with the top-most bound variable *)
   let lc_bind x (lc : lc_term) : lc_term =
@@ -2113,7 +2188,15 @@ struct
     else
       let sigma = Subst.create () in
       Subst.add sigma (e_var x) v ;
+      Subst.add_term sigma v ;
+      Subst.add_term sigma e ;
       subst sigma Intmap.empty e
+
+  let e_apply e es =
+    let sigma = Subst.create () in
+    Subst.add_term sigma e ;
+    List.iter (Subst.add_term sigma) es ;
+    apply sigma Intmap.empty e es
 
   (* -------------------------------------------------------------------------- *)
   (* --- Binders                                                            --- *)
@@ -2205,46 +2288,6 @@ struct
     | _ -> []
 
   (* -------------------------------------------------------------------------- *)
-  (* --- Substitutions                                                      --- *)
-  (* -------------------------------------------------------------------------- *)
-
-  let r_apply = ref (fun _ _ _ -> assert false)
-
-  let rec subst mu xs d e =
-    (* substitute bound variable d+i with xs.(i) for 0 <= i < xs.length *)
-    if not (Bvars.overlap d (Array.length xs) e.bind)
-    then e else
-      match e.repr with
-      | Bvar(k,_) -> xs.(k-d)
-      | _ ->
-          get mu
-            begin fun e ->
-              match e.repr with
-              | Apply(e,es) ->
-                  let e = subst mu xs d e in
-                  let es = List.map (subst mu xs d) es in
-                  !r_apply [] e es
-              | _ ->
-                  rebuild (subst mu xs d) e
-            end e
-
-  let rec apply xs a es =
-    match a.repr , es with
-    | Bind(_,_,a) , e::es -> apply (e::xs) a es
-    | _ ->
-        let core =
-          if xs=[] then a else
-            let mu = cache () in
-            let xs = Array.of_list xs in
-            let d = Bvars.order a.bind + 1 - Array.length xs in
-            subst mu xs d a
-        in c_apply core es
-
-  let () = r_apply := apply
-
-  let e_apply e es = apply [] e es
-
-  (* -------------------------------------------------------------------------- *)
   (* --- Iterators                                                          --- *)
   (* -------------------------------------------------------------------------- *)
 
@@ -2298,19 +2341,7 @@ struct
     | Apply(a,xs) -> e_apply (f a) (List.map f xs)
     | _ -> rebuild f e
 
-  let lc_iter f e =
-    match e.repr with
-    | True | False | Kint _ | Kreal _ | Fvar _ | Bvar _ -> ()
-    | Times(_,e) | Not e | Rget(e,_) | Acst(_,e) -> f e
-    | Add xs | Mul xs | And xs | Or xs -> List.iter f xs
-    | Mod(x,y) | Div(x,y) | Eq(x,y) | Neq(x,y) | Leq(x,y) | Lt(x,y)
-    | Aget(x,y) -> f x ; f y
-    | Rdef fvs -> List.iter (fun (_,v) -> f v) fvs
-    | If(e,a,b) | Aset(e,a,b) -> f e ; f a ; f b
-    | Imply(xs,x) -> List.iter f xs ; f x
-    | Fun(_,xs) -> List.iter f xs
-    | Apply(x,xs) -> f x ; List.iter f xs
-    | Bind(_,_,e) -> f e
+  let lc_iter f e = repr_iter f e.repr
 
   let e_iter pool f e =
     match e.repr with
@@ -2407,68 +2438,6 @@ struct
               e_apply f (change_in_list args i l)
         end
     in aux e pos
-
-  (* -------------------------------------------------------------------------- *)
-  (* --- DEBUG                                                              --- *)
-  (* -------------------------------------------------------------------------- *)
-
-  let pp_bind fmt = function
-    | Forall -> Format.pp_print_string fmt "Forall"
-    | Exists -> Format.pp_print_string fmt "Exists"
-    | Lambda -> Format.pp_print_string fmt "Lambda"
-
-  let pp_var fmt x = Format.fprintf fmt "X%03d(%s:%d)" x.vid x.vbase x.vrank
-  let pp_id fmt x = Format.fprintf fmt " #%03d" x.id
-  let pp_ids fmt xs = List.iter (pp_id fmt) xs
-  let pp_field fmt (f,x) = Format.fprintf fmt "@ %a:%a;" Field.pretty f pp_id x
-  let pp_record fmt fxs = List.iter (pp_field fmt) fxs
-  let pp_repr fmt = function
-    | Kint z -> Format.fprintf fmt "constant %s" (Z.to_string z)
-    | Kreal z -> Format.fprintf fmt "real constant %s" (Q.to_string z)
-    | True  -> Format.pp_print_string fmt "true"
-    | False -> Format.pp_print_string fmt "false"
-    | Times(z,x) -> Format.fprintf fmt "times %s%a" (Z.to_string z) pp_id x
-    | Add xs -> Format.fprintf fmt "add%a" pp_ids xs
-    | Mul xs -> Format.fprintf fmt "mul%a" pp_ids xs
-    | And xs -> Format.fprintf fmt "and%a" pp_ids xs
-    | Div(a,b) -> Format.fprintf fmt "div%a%a" pp_id a pp_id b
-    | Mod(a,b) -> Format.fprintf fmt "mod%a%a" pp_id a pp_id b
-    | Or xs -> Format.fprintf fmt "or%a" pp_ids xs
-    | If(e,a,b) -> Format.fprintf fmt "if%a%a%a" pp_id e pp_id a pp_id b
-    | Imply(hs,p) -> Format.fprintf fmt "imply%a =>%a" pp_ids hs pp_id p
-    | Neq(a,b) -> Format.fprintf fmt "neq%a%a" pp_id a pp_id b
-    | Eq(a,b) -> Format.fprintf fmt "eq%a%a" pp_id a pp_id b
-    | Leq(a,b) -> Format.fprintf fmt "leq%a%a" pp_id a pp_id b
-    | Lt(a,b) -> Format.fprintf fmt "lt%a%a" pp_id a pp_id b
-    | Not e -> Format.fprintf fmt "not%a" pp_id e
-    | Fun(f,es) -> Format.fprintf fmt "fun %a%a" Fun.pretty f pp_ids es
-    | Apply(phi,es) -> Format.fprintf fmt "apply%a%a" pp_id phi pp_ids es
-    | Fvar x -> Format.fprintf fmt "var %a" pp_var x
-    | Bvar(k,_) -> Format.fprintf fmt "bvar #%d" k
-    | Bind(q,t,e) -> Format.fprintf fmt "bind %a %a. %a" pp_bind q Tau.pretty t pp_id e
-    | Rdef fxs -> Format.fprintf fmt "@[<hov 2>record {%a }@]" pp_record fxs
-    | Rget(e,f) -> Format.fprintf fmt "field %a.%a" pp_id e Field.pretty f
-    | Aset(m,k,v) -> Format.fprintf fmt "array%a[%a :=%a ]" pp_id m pp_id k pp_id v
-    | Aget(m,k) -> Format.fprintf fmt "array%a[%a ]" pp_id m pp_id k
-    | Acst(t,v) -> Format.fprintf fmt "const[%a ->%a]" Tau.pretty t pp_id v
-  let pp_rid fmt e = pp_repr fmt e.repr
-
-  let rec pp_debug disp fmt e =
-    if not (Intset.mem e.id !disp) then
-      begin
-        Format.fprintf fmt "%a{%a} = %a@."
-          pp_id e Bvars.pretty e.bind pp_repr e.repr ;
-        disp := Intset.add e.id !disp ;
-        pp_children disp fmt e ;
-      end
-
-  and pp_children disp fmt e = lc_iter (pp_debug disp fmt) e
-
-  let debug fmt e =
-    Format.fprintf fmt "%a with:@." pp_id e ;
-    pp_debug (ref Intset.empty) fmt e
-
-  let pretty = debug
 
   (* ------------------------------------------------------------------------ *)
   (* ---  Record Decomposition                                            --- *)
