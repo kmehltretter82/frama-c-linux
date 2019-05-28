@@ -1984,9 +1984,9 @@ struct
      Never re-compute simplifications, only renormalize with
      respect to hash-consing.
   *)
-  let lc_alpha f e =
-    match e.repr with
-    | Kint _ | Kreal _ | Fvar _ | Bvar _ | True | False -> e
+  let lc_alpha f e0 =
+    match e0.repr with
+    | Kint _ | Kreal _ | Fvar _ | Bvar _ | True | False -> e0
     | Not e -> c_not (f e)
     | Add xs -> c_add (List.map f xs)
     | Mul xs -> c_mul (List.map f xs)
@@ -2038,9 +2038,9 @@ struct
   (* --- Non-Binding Morphism                                               --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let rebuild f e =
-    match e.repr with
-    | Kint _ | Kreal _ | Fvar _ | True | False -> e
+  let rebuild f e0 =
+    match e0.repr with
+    | Kint _ | Kreal _ | Fvar _ | Bvar _ | True | False -> e0
     | Not e -> e_not (f e)
     | Add xs -> e_sum (List.map f xs)
     | Mul xs -> e_prod (List.map f xs)
@@ -2061,7 +2061,8 @@ struct
     | Aset(x,y,z) -> e_set (f x) (f y) (f z)
     | Rget(x,g) -> e_getfield (f x) g
     | Rdef gxs -> e_record (List.map (fun (g,x) -> g, f x) gxs)
-    | Bvar _ | Bind _ | Apply _ -> assert false
+    | Bind(q,t,a) -> c_bind q t (f a)
+    | Apply(e,es) -> c_apply (f e) (List.map f es)
 
   (* -------------------------------------------------------------------------- *)
   (* --- General Substitution                                               --- *)
@@ -2086,32 +2087,23 @@ struct
 
     let fresh sigma t = fresh sigma.pool t
 
-    let check v =
-      if not (lc_closed v) then raise (Invalid_argument "Qed.Sigma")
-
-    let checked v = check v ; v
-
     let rec compute e = function
       | EMPTY -> raise Not_found
-      | FUN(f,EMPTY) -> checked (f e)
+      | FUN(f,EMPTY) -> f e
       | MAP(m,EMPTY) -> Tmap.find e m
-      | FUN(f,s) -> (try checked (f e) with Not_found -> compute e s)
+      | FUN(f,s) -> (try f e with Not_found -> compute e s)
       | MAP(m,s) -> (try Tmap.find e m with Not_found -> compute e s)
 
     let get sigma a = compute a sigma.shared
 
     let add sigma a b =
-      check a ; check b ;
       sigma.shared <- match sigma.shared with
         | MAP(m,s) -> MAP (Tmap.add a b m,s)
         | (FUN _ | EMPTY) as s -> MAP (Tmap.add a b Tmap.empty,s)
 
     let add_map sigma m =
       if not (Tmap.is_empty m) then
-        begin
-          Tmap.iter (fun a b -> check a ; check b) m ;
-          sigma.shared <- MAP(m,sigma.shared)
-        end
+        sigma.shared <- MAP(m,sigma.shared)
 
     let add_fun sigma f =
       sigma.shared <- FUN(f,sigma.shared)
@@ -2126,25 +2118,25 @@ struct
 
   let rec subst sigma alpha e =
     let mu = cache () in
-    compute mu sigma alpha e
+    incache mu sigma alpha e
 
   and incache mu sigma alpha e =
     get mu (compute mu sigma alpha) e
 
   and compute mu sigma alpha e =
     try Subst.get sigma e with Not_found ->
-    let r =
-      match e.repr with
-      | Bvar(k,_) -> Intmap.find k alpha
-      | Bind _ ->
-          (* Not in cache *)
-          bind sigma alpha [] e
-      | Apply(e,es) ->
-          let phi = incache mu sigma alpha in
-          apply sigma Intmap.empty (phi e) (List.map phi es)
-      | _ -> rebuild (incache mu sigma alpha) e
-    in
-    (if lc_closed e && lc_closed r then Subst.add sigma e r) ; r
+      let r =
+        match e.repr with
+        | Bvar(k,_) -> Intmap.find k alpha
+        | Bind _ ->
+            (* Not in cache *)
+            bind sigma alpha [] e
+        | Apply(e,es) ->
+            let phi = incache mu sigma alpha in
+            apply sigma Intmap.empty (phi e) (List.map phi es)
+        | _ -> rebuild (incache mu sigma alpha) e
+      in
+      (if lc_closed e && lc_closed r then Subst.add sigma e r) ; r
 
   and bind sigma alpha qs e =
     match e.repr with
@@ -2169,7 +2161,8 @@ struct
         let k = Bvars.order g.bind in
         apply sigma (Intmap.add k v beta) g vs
     | _ ->
-        subst sigma beta f
+        let f' = if Intmap.is_empty beta then f else subst sigma beta f in
+        c_apply f' vs
 
   let e_subst sigma e =
     subst sigma Intmap.empty e
@@ -2281,11 +2274,6 @@ struct
   let e_forall = bind_xs Forall
   let e_exists = bind_xs Exists
   let e_lambda = bind_xs Lambda
-
-  let rec binders e =
-    match e.repr with
-    | Bind(q,_,e) -> q :: binders e
-    | _ -> []
 
   (* -------------------------------------------------------------------------- *)
   (* --- Iterators                                                          --- *)

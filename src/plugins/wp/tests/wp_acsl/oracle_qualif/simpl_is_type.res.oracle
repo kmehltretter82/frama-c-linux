@@ -26,6 +26,6 @@
 [wp] Report out: 'tests/wp_acsl/result_qualif/simpl_is_type.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
-f                    3      6 (88..112)      9       100%
+f                    3      6 (96..120)      9       100%
 g                    3      3 (36..48)       6       100%
 -------------------------------------------------------------

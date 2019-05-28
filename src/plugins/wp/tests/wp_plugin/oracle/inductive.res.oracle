@@ -147,8 +147,8 @@
           ((P_same_elements t_1 t a_1 a i_3%Z i%Z))
       | Q_trans: forall (i_1 i : Z), forall (t_2 t_1 t : farray addr Z),
           forall (a_2 a_1 a : addr),
-          ((P_same_elements t_1 t a_2 a_1 i_1%Z i%Z)) ->
           ((P_same_elements t_2 t_1 a_1 a i_1%Z i%Z)) ->
+          ((P_same_elements t_1 t a_2 a_1 i_1%Z i%Z)) ->
           ((P_same_elements t_2 t a_2 a i_1%Z i%Z)).
   
   Goal

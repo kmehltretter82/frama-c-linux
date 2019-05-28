@@ -212,7 +212,7 @@ struct
         if Wp_parameters.Filter.get ()
         then apply Conditions.filter g ;
         if Wp_parameters.Parasite.get ()
-        then apply Conditions.parasite g
+        then apply Conditions.parasite g ;
       end
     else
       begin
@@ -227,13 +227,18 @@ struct
 
   let safecompute g =
     begin
-      g.simplified <- true ;
-      let timer = ref 0.0 in
-      Wp_parameters.debug ~dkey "Simplify goal" ;
-      Command.time ~rmax:timer preprocess g ;
-      Wp_parameters.debug ~dkey "Simplification time: %a"
-        Rformat.pp_time !timer ;
-      g.time <- !timer ;
+      try
+        g.simplified <- true ;
+        let timer = ref 0.0 in
+        Wp_parameters.debug ~dkey "Simplify goal" ;
+        Command.time ~rmax:timer preprocess g ;
+        Wp_parameters.debug ~dkey "Simplification time: %a"
+          Rformat.pp_time !timer ;
+        g.time <- !timer ;
+      with e ->
+        Format.eprintf "PREPROCESS ERROR(%s)@."
+          (Printexc.to_string e) ;
+        assert false
     end
 
   let compute g =

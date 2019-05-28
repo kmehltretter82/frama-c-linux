@@ -457,7 +457,7 @@ class tactic
 
     method private status target =
       List.iter (fun fd -> fd#select target) wfields ;
-      try tac#select (self :> feedback) target
+      try Lang.local ~pool:self#pool (tac#select (self :> feedback)) target
       with Not_found | Exit -> Not_applicable
 
     method select ~process ~browser ~composer ~tree

@@ -958,17 +958,15 @@ let lemma g =
   let cc g = let hs,p = forall_intro g in sequence hs , p
   in Lang.local ~vars:(F.varsp g) cc g
 
-let introduction sequent =
-  let cc (hs,g) =
-    let flag = ref false in
-    let intro p = let q = exist_intro p in if q != p then flag := true ; q in
-    let hj = List.map (map_step intro) hs.seq_list in
-    let hi,p = forall_intro g in
-    if not !flag && hi == [] then
-      if p == g then None else Some (hs , p)
-    else
-      Some (sequence (hi @ hj) , p)
-  in Lang.local ~vars:(vars_seq sequent) cc sequent
+let introduction (hs,g) =
+  let flag = ref false in
+  let intro p = let q = exist_intro p in if q != p then flag := true ; q in
+  let hj = List.map (map_step intro) hs.seq_list in
+  let hi,p = forall_intro g in
+  if not !flag && hi == [] then
+    if p == g then None else Some (hs , p)
+  else
+    Some (sequence (hi @ hj) , p)
 
 let introduction_eq s = match introduction s with
   | Some s' -> s'
@@ -1074,6 +1072,8 @@ end
 (* -------------------------------------------------------------------------- *)
 
 let rec fixpoint limit solvers sigma s0 =
+  if limit > 0 then compute limit solvers sigma s0 else s0
+and compute limit solvers sigma s0 =
   !Db.progress ();
   let s1 =
     if Wp_parameters.Ground.get () then ground s0

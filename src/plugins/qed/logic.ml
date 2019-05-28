@@ -370,11 +370,6 @@ sig
 
   val lc_term : term -> lc_term
   val lc_repr : lc_term -> term
-  [@@deprecated "Might be unsafe in presence of binders"]
-
-  (** Returns the list of head binders *)
-  val binders : term -> binder list
-  [@@deprecated "Useless function"]
 
   (** {3 Recursion Scheme} *)
 
@@ -385,10 +380,7 @@ sig
   val f_iter : (int -> term -> unit) -> int -> term -> unit
 
   val lc_map : (term -> term) -> term -> term
-  [@@deprecated "Might be unsafe in presence of binders"]
-
   val lc_iter : (term -> unit) -> term -> unit
-  [@@deprecated "Might be unsafe in presence of binders"]
 
   (** {3 Partial Typing} *)
 

@@ -21,11 +21,11 @@
     let m_1 = m[shift_sint32(a, 1) <- m[a_2]] : (addr,int) farray in
     let m_2 = m_1[shift_sint32(a, 2) <- m_1[a_2]] : (addr,int) farray in
     let m_3 = m_2[shift_sint32(a, 3) <- m_2[a_2]] : (addr,int) farray in
-    (0 <= i) ->
     (0 <= i_1) ->
+    (0 <= i) ->
     (region(a.base) <= 0) ->
-    (i <= 9) ->
     (i_1 <= 9) ->
+    (i <= 9) ->
     linked(t) ->
     is_sint32(i) ->
     valid_rw(t, a_1, 10) ->
