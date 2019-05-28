@@ -1023,19 +1023,19 @@ let mask_simplifier =
 
     method simplify_exp e =
       if Tmap.is_empty magnitude then e else
-        F.e_subst self#rewrite e
+        Lang.e_subst self#rewrite e
 
     method simplify_hyp p =
       if Tmap.is_empty magnitude then p else
-        F.p_subst self#rewrite p
+        Lang.p_subst self#rewrite p
 
     method simplify_branch p =
       if Tmap.is_empty magnitude then p else
-        F.p_subst self#rewrite p
+        Lang.p_subst self#rewrite p
 
     method simplify_goal p =
       if Tmap.is_empty magnitude then p else
-        F.p_subst self#rewrite p
+        Lang.p_subst self#rewrite p
 
   end
 

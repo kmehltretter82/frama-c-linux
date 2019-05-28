@@ -1989,36 +1989,131 @@ struct
     | Bvar _ | Bind _ | Apply _ -> assert false
 
   (* -------------------------------------------------------------------------- *)
-  (* --- General Substitutions                                              --- *)
+  (* --- General Substitution                                               --- *)
   (* -------------------------------------------------------------------------- *)
 
-  type sigma = term cache
+  type sigma = {
+    pool : pool ;
+    mutable shared : sfun ;
+  } and sfun =
+      | EMPTY
+      | FUN of (term -> term) * sfun
+      | MAP of term Tmap.t * sfun
 
-  let sigma () = cache ()
+  module Subst =
+  struct
+    type t = sigma
 
-  let rec gsubst mu f e =
+    let create ?pool () = {
+      pool = POOL.create ?copy:pool () ;
+      shared = EMPTY ;
+    }
+
+    let fresh sigma t = fresh sigma.pool t
+
+    let check v =
+      if not (lc_closed v) then raise (Invalid_argument "Qed.Sigma")
+
+    let checked v = check v ; v
+
+    let rec compute e = function
+      | EMPTY -> raise Not_found
+      | FUN(f,EMPTY) -> checked (f e)
+      | MAP(m,EMPTY) -> Tmap.find e m
+      | FUN(f,s) -> (try checked (f e) with Not_found -> compute e s)
+      | MAP(m,s) -> (try Tmap.find e m with Not_found -> compute e s)
+
+    let get sigma a = compute a sigma.shared
+
+    let add sigma a b =
+      check a ; check b ;
+      sigma.shared <- match sigma.shared with
+        | MAP(m,s) -> MAP (Tmap.add a b m,s)
+        | (FUN _ | EMPTY) as s -> MAP (Tmap.add a b Tmap.empty,s)
+
+    let add_map sigma m =
+      if not (Tmap.is_empty m) then
+        begin
+          Tmap.iter (fun a b -> check a ; check b) m ;
+          sigma.shared <- MAP(m,sigma.shared)
+        end
+
+    let add_fun sigma f =
+      sigma.shared <- FUN(f,sigma.shared)
+
+    let add_var sigma x = add_var sigma.pool x
+    let add_term sigma e = add_vars sigma.pool e.vars
+    let add_vars sigma xs = add_vars sigma.pool xs
+
+  end
+
+  let sigma = Subst.create
+
+  let rec subst sigma alpha e =
+    let mu = cache () in
+    compute mu sigma alpha e
+
+  and incache mu sigma alpha e =
+    get mu (compute mu sigma alpha) e
+
+  and compute mu sigma alpha e =
+    try Subst.get sigma e with Not_found ->
+    let r =
+      match e.repr with
+      | Bvar(k,_) -> Intmap.find k alpha
+      | Bind _ ->
+          (* Not in cache *)
+          bind sigma alpha [] e
+      | Apply(e,es) ->
+          let phi = incache mu sigma alpha in
+          apply sigma Intmap.empty (phi e) (List.map phi es)
+      | _ -> rebuild (incache mu sigma alpha) e
+    in
+    (if lc_closed e && lc_closed r then Subst.add sigma e r) ; r
+
+  and bind sigma alpha qs e =
     match e.repr with
-    | True | False | Kint _ | Kreal _ | Bvar _ -> e
-    | _ -> get mu (fun e ->
-        let e0 = rebuild (gsubst mu f) e in
-        if lc_closed e0 then
-          try f e0 with Not_found -> e0
-        else e0
-      ) e
+    | Bind(q,t,a) ->
+        let k = Bvars.order a.bind in
+        let x = Subst.fresh sigma t in
+        let alpha = Intmap.add k (e_var x) alpha in
+        let qs = (q,x) :: qs in
+        bind sigma alpha qs a
+    | _ ->
+        List.fold_left
+          (fun e (q,x) ->
+             if Vars.mem x e.vars then
+               let t = tau_of_var x in
+               c_bind q t (lc_bind x e)
+             else e
+          ) (subst sigma alpha e) qs
 
-  let e_subst ?sigma f e =
-    let cache = match sigma with None -> ref Tmap.empty | Some c -> c in
-    gsubst cache f e
+  and apply sigma beta f vs =
+    match f.repr, vs with
+    | Bind(_,_,g) , v::vs ->
+        let k = Bvars.order g.bind in
+        apply sigma (Intmap.add k v beta) g vs
+    | _ ->
+        subst sigma beta f
+
+  let e_subst sigma e =
+    subst sigma Intmap.empty e
 
   let e_subst_var x v e =
-    let rec walk mu x e =
-      if Vars.mem x e.vars then
-        get mu (rebuild (walk mu x)) e
-      else e
-    in
-    let cache = cache () in
-    set cache (e_var x) v ;
-    walk cache x e
+    if not (Vars.mem x e.vars) then e else
+    if Bvars.is_empty v.bind && Bvars.is_empty e.bind then
+      let rec walk mu x e =
+        if Vars.mem x e.vars then
+          get mu (rebuild (walk mu x)) e
+        else e
+      in
+      let cache = cache () in
+      set cache (e_var x) v ;
+      walk cache x e
+    else
+      let sigma = Subst.create () in
+      Subst.add sigma (e_var x) v ;
+      subst sigma Intmap.empty e
 
   (* -------------------------------------------------------------------------- *)
   (* --- Binders                                                            --- *)

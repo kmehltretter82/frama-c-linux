@@ -343,10 +343,18 @@ sig
   val p_exists : var list -> pred -> pred
   val p_bind : binder -> var -> pred -> pred
 
-  type sigma = QED.sigma
-  val sigma : unit -> sigma
-  val e_subst : ?sigma:sigma -> (term -> term) -> term -> term
-  val p_subst : ?sigma:sigma -> (term -> term) -> pred -> pred
+  type sigma
+
+  module Subst :
+  sig
+    val get : sigma -> term -> term
+    val add : sigma -> term -> term -> unit
+    val add_map : sigma -> term Tmap.t -> unit
+    val add_fun : sigma -> (term -> term) -> unit
+  end
+
+  val e_subst : sigma -> term -> term
+  val p_subst : sigma -> pred -> pred
   val p_apply : var -> term -> pred -> pred
 
   val e_vars : term -> var list (** Sorted *)
@@ -524,33 +532,14 @@ val has_gamma : unit -> bool
 val get_hypotheses : unit -> pred list
 val get_variables : unit -> var list
 
-(** {2 Alpha Conversion} *)
+(** {2 Substitutions} *)
 
-module Alpha :
-sig
+val sigma : unit -> F.sigma (** uses current pool *)
+val alpha : unit -> F.sigma (** freshen all variables *)
+val subst : F.var list -> F.term list -> F.sigma (** replace variables *)
 
-  type t
-  val create : unit -> t
-  val get : t -> var -> var
-  val iter : (var -> var -> unit) -> t -> unit
-
-  val convert : t -> term -> term
-  val convertp : t -> pred -> pred
-
-end
-
-(** {2 Substitution} *)
-
-module Subst :
-sig
-
-  type sigma
-
-  val sigma : F.var list -> F.term list -> sigma
-  val e_apply : sigma -> F.term -> F.term
-  val p_apply : sigma -> F.pred -> F.pred
-
-end
+val e_subst : (term -> term) -> term -> term (** uses current pool *)
+val p_subst : (term -> term) -> pred -> pred (** uses current pool *)
 
 (** {2 Simplifiers} *)
 

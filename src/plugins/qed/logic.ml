@@ -317,13 +317,42 @@ sig
   (** {3 Generalized Substitutions} *)
 
   type sigma
-  val sigma : unit -> sigma
+  val sigma : ?pool:pool -> unit -> sigma
 
-  val e_subst : ?sigma:sigma -> (term -> term) -> term -> term
-  [@@deprecated "Might be unsafe in presence of binders"]
+  module Subst :
+  sig
+    type t = sigma
+    val create : ?pool:pool -> unit -> t
+    val fresh : t -> tau -> var
+    val get : t -> term -> term
+
+    val add : t -> term -> term -> unit
+    (** Must bind lc-closed terms, or raise Invalid_argument *)
+
+    val add_map : t -> term Tmap.t -> unit
+    (** Must bind lc-closed terms, or raise Invalid_argument *)
+
+    val add_fun : t -> (term -> term) -> unit
+    (** Must bind lc-closed terms, or raise Invalid_argument *)
+
+    val add_var : t -> var -> unit
+    (** To the pool *)
+
+    val add_vars : t -> Vars.t -> unit
+    (** To the pool *)
+
+    val add_term : t -> term -> unit
+    (** To the pool *)
+  end
+
+  val e_subst : sigma -> term -> term
+  (**
+     The environment sigma must be prepared with the desired substitution.
+     Its pool of fresh variables must covers the entire domain and co-domain
+     of the substitution, and the transformed values.
+  *)
 
   val e_subst_var : var -> term -> term -> term
-  [@@deprecated "Might be unsafe in presence of binders"]
 
   (** {3 Locally Nameless Representation} *)
 

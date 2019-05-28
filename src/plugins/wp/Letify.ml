@@ -120,18 +120,17 @@ struct
     | _ ->
         clause env h
 
-  let lookup mu e = Tmap.find e mu
   let subst mu =
-    let sigma = F.sigma () in
-    F.p_subst ~sigma (lookup mu)
+    let sigma = Lang.sigma () in
+    F.Subst.add_map sigma mu ; F.p_subst sigma
 
   let e_apply env =
-    let sigma = F.sigma () in
-    F.e_subst ~sigma (lookup env.domain)
+    let sigma = Lang.sigma () in
+    F.Subst.add_map sigma env.domain ; F.e_subst sigma
 
   let p_apply env =
-    let sigma = F.sigma () in
-    F.p_subst ~sigma (lookup env.domain)
+    let sigma = Lang.sigma () in
+    F.Subst.add_map sigma env.domain ; F.p_subst sigma
 
   [@@@ warning "-32"]
   let pp_sigma fmt s =
@@ -147,7 +146,7 @@ struct
   let pretty fmt env = pp_sigma fmt env.domain
 
   let assume env p =
-    let p = F.p_subst (lookup env.domain) p in
+    let p = p_apply env p in
     walk env (F.e_prop p) ; p
 
   let top () = { ground = Tmap.empty ; domain = Tmap.empty }

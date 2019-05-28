@@ -1208,9 +1208,9 @@ struct
     let guards = Lang.get_hypotheses () in
     let hyps = Conditions.assume ~descr:"Bisimulation" (p_conj guards) vc.hyps in
     let p = F.p_hyps (Conditions.extract hyps) vc.goal in
-    let alpha = Alpha.create () in
-    let a_hs = List.map (Alpha.convertp alpha) hs in
-    let a_p = Alpha.convertp alpha p in
+    let alpha = Lang.alpha () in
+    let a_hs = List.map (F.p_subst alpha) hs in
+    let a_p = F.p_subst alpha p in
     let p = p_hyps a_hs a_p in
     { vc with
       goal = p ; vars = F.varsp p ;

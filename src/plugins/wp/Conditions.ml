@@ -1706,8 +1706,6 @@ let replace ~at step sequent =
 (* --- Replace                                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
-let subst f s =
-  let sigma = F.sigma () in
-  map_sequent (F.p_subst ~sigma f) s
+let subst f s = map_sequent (Lang.p_subst f) s
 
 (* -------------------------------------------------------------------------- *)
