@@ -868,7 +868,7 @@ let is_cint_simplifier = object (self)
         t v domain
 
   method assume p =
-    let rec aux i t =
+    let rec aux t =
       match Lang.F.repr t with
       | _ when not (is_prop t) -> ()
       | Fun(g,[a]) ->
@@ -877,10 +877,10 @@ let is_cint_simplifier = object (self)
               self#narrow_dom a ubound
             with Not_found -> ()
           end
-      | And _ -> Lang.F.QED.f_iter aux i t
+      | And _ -> Lang.F.QED.lc_iter aux t
       | _ -> ()
     in
-    aux 0 (Lang.F.e_prop p)
+    aux (Lang.F.e_prop p)
 
   method target _ = ()
   method fixpoint = ()

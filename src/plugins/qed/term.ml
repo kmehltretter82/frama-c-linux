@@ -2338,12 +2338,6 @@ struct
         e_bind q x (f (lc_open x e))
     | _ -> rebuild f e
 
-  let f_map f n e =
-    match e.repr with
-    | Bind(q,t,e) -> c_bind q t (f (succ n) e)
-    | Apply(a,xs) -> e_apply (f n a) (List.map (f n) xs)
-    | _ -> rebuild (f n) e
-
   let lc_map f e =
     match e.repr with
     | Apply(a,xs) -> e_apply (f a) (List.map f xs)
@@ -2358,11 +2352,6 @@ struct
         let x = fresh pool t in
         lc_iter f (lc_open x e)
     | _ -> lc_iter f e
-
-  let f_iter f n e =
-    match e.repr with
-    | Bind(_,_,e) -> f (succ n) e
-    | _ -> lc_iter (f n) e
 
   (* -------------------------------------------------------------------------- *)
   (* --- Sub-terms                                                          --- *)

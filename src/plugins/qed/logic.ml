@@ -382,9 +382,6 @@ sig
   val e_map  : pool -> (term -> term) -> term -> term
   val e_iter : pool -> (term -> unit) -> term -> unit
 
-  val f_map  : (int -> term -> term) -> int -> term -> term
-  val f_iter : (int -> term -> unit) -> int -> term -> unit
-
   val lc_map : (term -> term) -> term -> term
   val lc_iter : (term -> unit) -> term -> unit
 
