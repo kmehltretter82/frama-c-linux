@@ -293,8 +293,8 @@ sig
   val e_getfield : term -> Field.t -> term
   val e_record : record -> term
   val e_fun : Fun.t -> term list -> term
-
   val e_repr : repr -> term
+  (** @raise Invalid_argument on [Bvar] and [Bind] *)
 
   (** {3 Quantification and Binding} *)
 
@@ -325,6 +325,7 @@ sig
     val create : ?pool:pool -> unit -> t
     val fresh : t -> tau -> var
     val get : t -> term -> term
+    val filter : t -> term -> bool
 
     val add : t -> term -> term -> unit
     (** Must bind lc-closed terms, or raise Invalid_argument *)
@@ -334,6 +335,9 @@ sig
 
     val add_fun : t -> (term -> term) -> unit
     (** Must bind lc-closed terms, or raise Invalid_argument *)
+
+    val add_filter : t -> (term -> bool) -> unit
+    (** Only modifies terms that {i not} pass the filter. *)
 
     val add_var : t -> var -> unit
     (** To the pool *)

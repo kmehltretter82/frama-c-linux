@@ -2070,6 +2070,7 @@ struct
 
   type sigma = {
     pool : pool ;
+    mutable filter : (term -> bool) list ;
     mutable shared : sfun ;
   } and sfun =
       | EMPTY
@@ -2083,6 +2084,7 @@ struct
     let create ?pool () = {
       pool = POOL.create ?copy:pool () ;
       shared = EMPTY ;
+      filter = [] ;
     }
 
     let fresh sigma t = fresh sigma.pool t
@@ -2096,6 +2098,9 @@ struct
 
     let get sigma a = compute a sigma.shared
 
+    let filter sigma a =
+      List.for_all (fun f -> f a) sigma.filter
+
     let add sigma a b =
       sigma.shared <- match sigma.shared with
         | MAP(m,s) -> MAP (Tmap.add a b m,s)
@@ -2108,6 +2113,9 @@ struct
     let add_fun sigma f =
       sigma.shared <- FUN(f,sigma.shared)
 
+    let add_filter sigma f =
+      sigma.filter <- f :: sigma.filter
+
     let add_var sigma x = add_var sigma.pool x
     let add_term sigma e = add_vars sigma.pool e.vars
     let add_vars sigma xs = add_vars sigma.pool xs
@@ -2117,11 +2125,16 @@ struct
   let sigma = Subst.create
 
   let rec subst sigma alpha e =
-    let mu = cache () in
-    incache mu sigma alpha e
+    if Subst.filter sigma e then
+      let mu = cache () in
+      let v = compute mu sigma alpha e in
+      set mu e v ; v
+    else e
 
   and incache mu sigma alpha e =
-    get mu (compute mu sigma alpha) e
+    if Subst.filter sigma e then
+      get mu (compute mu sigma alpha) e
+    else e
 
   and compute mu sigma alpha e =
     try Subst.get sigma e with Not_found ->
@@ -2168,21 +2181,23 @@ struct
     subst sigma Intmap.empty e
 
   let e_subst_var x v e =
-    if not (Vars.mem x e.vars) then e else
+    let filter e = Vars.mem x e.vars in
+    if not (filter e) then e else
     if Bvars.is_empty v.bind && Bvars.is_empty e.bind then
-      let rec walk mu x e =
-        if Vars.mem x e.vars then
-          get mu (rebuild (walk mu x)) e
+      let rec walk mu e =
+        if filter e then
+          get mu (rebuild (walk mu)) e
         else e
       in
       let cache = cache () in
       set cache (e_var x) v ;
-      walk cache x e
+      walk cache e
     else
       let sigma = Subst.create () in
       Subst.add sigma (e_var x) v ;
       Subst.add_term sigma v ;
       Subst.add_term sigma e ;
+      Subst.add_filter sigma filter ;
       subst sigma Intmap.empty e
 
   let e_apply e es =
@@ -2280,18 +2295,17 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   let e_repr = function
+    | Bvar _ | Bind _ -> raise (Invalid_argument "Qed.e_repr")
     | True -> e_true
     | False -> e_false
     | Kint z -> e_zint z
     | Kreal r -> e_real r
     | Fvar x -> e_var x
-    | Bvar(k,t) -> c_bvar k t
-    | Bind(q,t,e) -> c_bind q t e
     | Apply(a,xs) -> e_apply a xs
     | Times(k,e) -> e_times k e
     | Not e -> e_not e
-    | Add xs -> addition xs
-    | Mul xs -> multiplication xs
+    | Add xs -> e_sum xs
+    | Mul xs -> e_prod xs
     | And xs -> e_and xs
     | Or  xs -> e_or xs
     | Mod(x,y) -> e_mod x y
