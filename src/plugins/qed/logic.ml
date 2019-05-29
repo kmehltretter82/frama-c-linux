@@ -301,8 +301,17 @@ sig
   val e_forall : var list -> term -> term
   val e_exists : var list -> term -> term
   val e_lambda : var list -> term -> term
-  val e_bind : binder -> var -> term -> term
   val e_apply : term -> term list -> term
+
+  val e_bind : binder -> var -> term -> term
+  (** Bind the given variable if it appears free in the term,
+      or return the term unchanged. *)
+
+  val e_open : var -> term -> term
+  (** Open the top-most binder with the given variable, or
+      return the term unchanged.
+      @raise Invalid_argument if the variable is not free and
+      has not the right type. *)
 
   (** {3 Local Caches} *)
 
@@ -362,8 +371,8 @@ sig
 
   (** {3 Locally Nameless Representation} *)
 
-  val lc_bind : var -> term -> lc_term (** Close [x] as a new bound variable *)
-  val lc_open : var -> lc_term -> term (** Instantiate top bound variable *)
+  val lc_bind : var -> term -> lc_term (** Bind x with top bound variable *)
+  val lc_open : var -> lc_term -> term (** Open top bound variable with x *)
 
   val lc_empty : term -> bool (** No bound variables *)
   val lc_closed : term -> bool (** All bound variables are under their binder *)

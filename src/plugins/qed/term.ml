@@ -2279,15 +2279,24 @@ struct
           | _ -> is_eq e
         in ignore(exists_case a); !res
 
-  let e_bind q x a =
-    assert (lc_closed a) ;
+  let e_open x (e : term) =
+    assert (lc_closed e) ;
+    match e.repr with
+    | Bind(_,t,a) ->
+        if not (Tau.equal t (tau_of_var x) || Vars.mem x e.vars)
+        then lc_open x a
+        else raise (Invalid_argument "Qed.e_open")
+    | _ -> e
+
+  let e_bind q x (e : term) =
+    assert (lc_closed e) ;
     let do_bind =
-      match q with Forall | Exists -> Vars.mem x a.vars | Lambda -> true in
+      match q with Forall | Exists -> Vars.mem x e.vars | Lambda -> true in
     if do_bind then
-      match let_intro_case q x a with
-      | None -> c_bind q (tau_of_var x) (lc_bind x a)
-      | Some e -> e_subst_var x e a (* case [let x = e ; a] *)
-    else a
+      match let_intro_case q x e with
+      | None -> c_bind q (tau_of_var x) (lc_bind x e)
+      | Some v -> e_subst_var x v e (* case [let x = v ; e] *)
+    else e
 
   let rec bind_xs q xs e =
     match xs with [] -> e | x::xs -> e_bind q x (bind_xs q xs e)
