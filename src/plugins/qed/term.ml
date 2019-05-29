@@ -2087,6 +2087,11 @@ struct
       filter = [] ;
     }
 
+    let cache sigma =
+      ref begin
+        match sigma.shared with MAP( m , _ ) -> m | _ -> Tmap.empty
+      end
+
     let fresh sigma t = fresh sigma.pool t
 
     let rec compute e = function
@@ -2124,15 +2129,16 @@ struct
 
   let sigma = Subst.create
 
+  let filter sigma e =
+    Subst.filter sigma e || not (Bvars.is_empty e.bind)
+
   let rec subst sigma alpha e =
-    if Subst.filter sigma e then
-      let mu = cache () in
-      let v = compute mu sigma alpha e in
-      set mu e v ; v
+    if filter sigma e then
+      incache (Subst.cache sigma) sigma alpha e
     else e
 
   and incache mu sigma alpha e =
-    if Subst.filter sigma e then
+    if filter sigma e then
       get mu (compute mu sigma alpha) e
     else e
 

@@ -323,6 +323,8 @@ sig
   sig
     type t = sigma
     val create : ?pool:pool -> unit -> t
+
+    val cache : sigma -> term cache
     val fresh : t -> tau -> var
     val get : t -> term -> term
     val filter : t -> term -> bool

@@ -922,8 +922,7 @@ let alpha () =
     match F.repr e with
     | Fvar x -> lookup e x
     | _ -> raise Not_found in
-  F.Subst.add_fun sigma compute ;
-  sigma
+  F.Subst.add_fun sigma compute ; sigma
 
 let subst xs vs =
   let bind w x v = Tmap.add (e_var x) v w in
