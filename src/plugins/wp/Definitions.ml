@@ -371,7 +371,11 @@ class virtual visitor main =
       if not (Tset.mem t terms) then
         begin
           self#repr ~bool:false (F.repr t) ;
-          F.p_iter self#vpred self#vterm p
+          F.lc_iter
+            (fun e ->
+               if F.is_prop e
+               then self#vpred (F.p_bool e)
+               else self#vterm e) t
         end
 
     method private vdefinition = function

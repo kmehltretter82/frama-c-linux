@@ -2329,6 +2329,8 @@ struct
     | Rget(r,f) -> e_getfield r f
     | Rdef fvs -> e_record fvs
 
+  let lc_iter f e = repr_iter f e.repr
+
   let e_map pool f e =
     match e.repr with
     | Apply(a,xs) -> e_apply (f a) (List.map f xs)
@@ -2337,13 +2339,6 @@ struct
         let x = fresh pool t in
         e_bind q x (f (lc_open x e))
     | _ -> rebuild f e
-
-  let lc_map f e =
-    match e.repr with
-    | Apply(a,xs) -> e_apply (f a) (List.map f xs)
-    | _ -> rebuild f e
-
-  let lc_iter f e = repr_iter f e.repr
 
   let e_iter pool f e =
     match e.repr with

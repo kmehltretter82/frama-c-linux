@@ -785,13 +785,6 @@ struct
   let varsp = vars
   let p_expr = repr
   let e_expr = repr
-  let p_iter fp fe p =
-    match QED.repr p with
-    | True | False | Kint _ | Kreal _ | Fvar _ | Bvar _ -> ()
-    | Eq(a,b) | Neq(a,b) when is_prop a && is_prop b -> fp a ; fp b
-    | Eq _ | Neq _ | Leq _ | Lt _ | Times _ | Add _ | Mul _ | Div _ | Mod _
-    | Acst _ | Aget _ | Aset _ | Rget _ | Rdef _ | Fun _ | Apply _ -> lc_iter fe p
-    | And _ | Or _ | Imply _ | If _ | Not _ | Bind _ -> lc_iter fp p
 
   let pp_tau = Pretty.pp_tau
   let context_pp = Context.create "Lang.F.pp"

@@ -380,9 +380,11 @@ sig
   (** {3 Recursion Scheme} *)
 
   val e_map  : pool -> (term -> term) -> term -> term
-  val e_iter : pool -> (term -> unit) -> term -> unit
+  (** Open and close binders *)
 
-  val lc_map : (term -> term) -> term -> term
+  val e_iter : pool -> (term -> unit) -> term -> unit
+  (** Open binders *)
+
   val lc_iter : (term -> unit) -> term -> unit
 
   (** {3 Partial Typing} *)

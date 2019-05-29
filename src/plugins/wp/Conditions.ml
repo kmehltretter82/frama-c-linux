@@ -985,7 +985,7 @@ struct
     mutable cst : bool Tmap.t ;
     mutable dom : Vars.t ; (* support of defs *)
     mutable def : term Tmap.t ; (* defs *)
-    mutable mem : term Tmap.t ; (* defs+memo *)
+    mutable cache : F.sigma option ; (* memo *)
   }
 
   let rec is_cst s e = match F.repr e with
@@ -1012,6 +1012,7 @@ struct
         s.dom <- Vars.union (F.vars a) s.dom ;
         s.def <- Tmap.add a e s.def ;
         s.def <- Tmap.add p p s.def ;
+        s.cache <- None ;
       end
 
   let rec assume s p = match F.repr p with
@@ -1025,13 +1026,16 @@ struct
     | Have p | When p | Core p | Init p -> assume s (F.e_prop p)
     | Type _ | Branch _ | Either _ | State _ -> ()
 
-  let rec e_apply s e =
-    try Tmap.find e s.mem
-    with Not_found ->
-      let e' = F.QED.lc_map (e_apply s) e in
-      s.mem <- Tmap.add e e' s.mem ; e'
+  let subst s =
+    match s.cache with
+    | Some m -> m
+    | None ->
+        let m = Lang.sigma () in
+        F.Subst.add_map m s.def ;
+        s.cache <- Some m ; m
 
-  let p_apply s p = F.p_bool (e_apply s (F.e_prop p))
+  let e_apply s e = F.e_subst (subst s) e
+  let p_apply s p = F.p_subst (subst s) p
 
   let rec c_apply s = function
     | State m -> State (Mstate.apply (e_apply s) m)
@@ -1052,13 +1056,12 @@ struct
   let simplify (hs,p) =
     let s = {
       cst = Tmap.empty ;
-      mem = Tmap.empty ;
       def = Tmap.empty ;
       dom = Vars.empty ;
+      cache = None ;
     } in
     try
       List.iter (fun h -> collect s h.condition) hs ;
-      s.mem <- s.def ;
       let hs = List.map (s_apply s) hs in
       let p = p_apply s p in
       hs , p

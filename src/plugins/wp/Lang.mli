@@ -392,13 +392,13 @@ sig
 
   val p_expr : pred -> pred QED.expression
   val e_expr : pred -> term QED.expression
-  val p_iter : (pred -> unit) -> (term -> unit) -> pred -> unit
+
+  (* val p_iter : (pred -> unit) -> (term -> unit) -> pred -> unit *)
 
   (** {3 Binders} *)
 
   val lc_closed : term -> bool
   val lc_iter : (term -> unit) -> term -> unit
-  val lc_map : (term -> term) -> term -> term
 
   (** {3 Utilities} *)
 
