@@ -351,6 +351,7 @@ sig
     val add : sigma -> term -> term -> unit
     val add_map : sigma -> term Tmap.t -> unit
     val add_fun : sigma -> (term -> term) -> unit
+    val add_filter : sigma -> (term -> bool) -> unit
   end
 
   val e_subst : sigma -> term -> term
