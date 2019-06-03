@@ -251,7 +251,7 @@ let () =
   Design.register_extension
     (fun window ->
        let menu_manager = window#menu_manager () in
-       let item, menu = menu_manager#add_menu "_Project" in
+       let _item, menu = menu_manager#add_menu "_Project" in
        let constant_items =
          menu_manager#add_entries
            menu
@@ -278,7 +278,11 @@ let () =
          let is_reset = reset menu in
          if is_reset then make_project_entries window menu
        in
-       ignore (item#connect#activate ~callback))
+       let callback_prj _p = callback () in
+       Project.register_create_hook callback_prj;
+       Project.register_after_set_current_hook ~user_only:false callback_prj;
+       Project.register_before_remove_hook callback_prj;
+       callback ())
 
 (*
 Local Variables:
