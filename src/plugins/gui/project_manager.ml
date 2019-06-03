@@ -23,10 +23,11 @@
 let compare_prj (_p1, n1) (_p2, n2) =
   String.compare n1 n2
 
-let projects_list () =
+let projects_list ?(filter=fun _ -> true) () =
   let projects =
     Project.fold_on_projects
-      (fun acc p -> (p, Project.get_unique_name p) :: acc)
+      (fun acc p ->
+         if filter p then ((p, Project.get_unique_name p) :: acc) else acc)
       []
   in
   List.sort compare_prj projects
@@ -155,9 +156,9 @@ let rename_project (main_ui: Design.main_window_extension_points) project =
       with Project.Unknown_project ->
         Project.set_name project s
 
-let reset (menu: GMenu.menu) =
+let reset ?filter (menu: GMenu.menu) =
   (* Do not reset all if there is no change. *)
-  let pl = projects_list () in
+  let pl = projects_list ?filter () in
   let same_projects =
     (* use that project_radios and pl are sorted in the same way *)
     try
@@ -235,8 +236,8 @@ and mk_project_entry window menu ?group p =
   add_action `SELECT_FONT "Rename project" (fun () -> rename_project window p);
   p_item
 
-let make_project_entries window menu =
-  match projects_list () with
+let make_project_entries ?filter window menu =
+  match projects_list ?filter () with
   | [] -> assert false
   | (pa, _name) :: tl ->
       let mk = mk_project_entry window menu in
@@ -274,14 +275,18 @@ let () =
        new_item#add_accelerator `CONTROL 'n';
        constant_items.(3)#add_accelerator `CONTROL 'd';
        ignore (GMenu.separator_item ~packing:menu#append ());
-       let callback () =
-         let is_reset = reset menu in
-         if is_reset then make_project_entries window menu
+       let callback ?filter () =
+         let is_reset = reset ?filter menu in
+         if is_reset then make_project_entries ?filter window menu
        in
        let callback_prj _p = callback () in
+       let callback_rm_prj p =
+         let filter p' = not (Project.equal p p') in
+         callback ~filter ()
+       in
        Project.register_create_hook callback_prj;
        Project.register_after_set_current_hook ~user_only:false callback_prj;
-       Project.register_before_remove_hook callback_prj;
+       Project.register_before_remove_hook callback_rm_prj;
        callback ())
 
 (*
