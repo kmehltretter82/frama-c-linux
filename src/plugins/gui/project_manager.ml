@@ -38,8 +38,8 @@ let projects_list ?(filter=fun _ -> true) () =
 module PrjRadiosSet =
   FCSet.Make
     (struct
-      type t = (Project.t * string) * GMenu.radio_menu_item
-      let compare (p1, _) (p2, _) = compare_prj p1 p2
+      type t = (Project.t * string) * GMenu.radio_menu_item * GMenu.menu_item
+      let compare (p1, _, _) (p2, _, _) = compare_prj p1 p2
     end)
 
 let project_radios : PrjRadiosSet.t ref = ref PrjRadiosSet.empty
@@ -147,7 +147,7 @@ let reset ?filter (menu: GMenu.menu) =
     try
       let rest =
         PrjRadiosSet.fold
-          (fun (p1, _) acc ->
+          (fun (p1, _, _) acc ->
              match acc with
              | [] -> raise Exit
              | p2 :: acc ->
@@ -162,13 +162,11 @@ let reset ?filter (menu: GMenu.menu) =
   if same_projects then begin
     (* update the item status according to the current project anyway *)
     PrjRadiosSet.iter
-      (fun ((p, _), r) -> r#set_active (Project.is_current p))
+      (fun ((p, _), r, _) -> r#set_active (Project.is_current p))
       !project_radios;
     false
   end else begin
-    PrjRadiosSet.iter
-      (fun (_, r) -> menu#remove (r :> GMenu.menu_item))
-      !project_radios;
+    PrjRadiosSet.iter (fun (_, _, i) -> menu#remove i) !project_radios;
     project_radios := PrjRadiosSet.empty;
     true
   end
@@ -199,17 +197,18 @@ let rec rename_project
 
 and mk_project_entry window menu ?group p =
   let pname = Project.get_unique_name p in
+  let item = GMenu.menu_item ~label:pname ~packing:menu#append () in
+  let submenu = GMenu.menu ~packing:item#set_submenu () in
   let p_item = GMenu.radio_menu_item
       ?group
       ~active:(Project.is_current p)
-      ~packing:menu#append
-      ~label:pname
+      ~packing:submenu#append
+      ~label:"current"
       ()
   in
   let callback () = if p_item#active then Project.set_current p in
   ignore (p_item#connect#toggled ~callback);
-  project_radios := PrjRadiosSet.add ((p, pname), p_item) !project_radios;
-  let submenu = GMenu.menu ~packing:p_item#set_submenu () in
+  project_radios := PrjRadiosSet.add ((p, pname), p_item, item) !project_radios;
   let add_action stock text callback =
     let image = GMisc.image ~stock () in
     let image = image#coerce in
