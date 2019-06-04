@@ -173,6 +173,10 @@ let reset ?filter (menu: GMenu.menu) =
     true
   end
 
+let duplicate_project project =
+  ignore
+    (Project.create_by_copy ~last:false ~src:project (Project.get_name project))
+
 let rec rename_project
     (main_ui: Design.main_window_extension_points) menu project
   =
@@ -192,21 +196,6 @@ let rec rename_project
      with Project.Unknown_project ->
        Project.set_name project s);
   recompute main_ui menu
-
-and duplicate_project window menu project =
-  let new_p =
-    Project.create_by_copy ~last:false ~src:project (Project.get_name project)
-  in
-  try
-    (* update the menu *)
-    let group =
-      let _, i = PrjRadiosSet.choose !project_radios in
-      i#group
-    in
-    ignore (mk_project_entry window menu ~group new_p)
-  with Not_found ->
-    (* menu not built (action called from the toolbar) *)
-    ()
 
 and mk_project_entry window menu ?group p =
   let pname = Project.get_unique_name p in
@@ -230,7 +219,7 @@ and mk_project_entry window menu ?group p =
     ignore (item#connect#activate ~callback)
   in
   add_action `COPY "Duplicate project"
-    (fun () -> duplicate_project window menu p);
+    (fun () -> duplicate_project p);
   add_action `DELETE "Delete project" (fun () -> delete_project p);
   add_action `SAVE "Save project" (fun () -> save_project window p);
   add_action `SAVE_AS "Save project as" (fun () -> save_project_as window p);
@@ -269,7 +258,7 @@ let () =
                (Unit_callback (fun () -> load_project window));
              menubar ~icon:`COPY "Duplicate current project"
                (Unit_callback
-                  (fun () -> duplicate_project window menu(Project.current())));
+                  (fun () -> duplicate_project (Project.current())));
              menubar ~icon:`DELETE "Delete current project"
                (Unit_callback (fun () -> delete_project (Project.current ())));
              menubar ~icon:`SELECT_FONT "Rename current project"
@@ -287,7 +276,7 @@ let () =
          recompute ~filter window menu
        in
        Project.register_create_hook callback_prj;
-       Project.register_after_set_current_hook ~user_only:false callback_prj;
+       Project.register_after_set_current_hook ~user_only:true callback_prj;
        Project.register_before_remove_hook callback_rm_prj;
        recompute window menu)
 
