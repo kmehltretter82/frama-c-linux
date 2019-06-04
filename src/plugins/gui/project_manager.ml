@@ -206,27 +206,25 @@ let rec duplicate_project window menu project =
     ()
 
 and mk_project_entry window menu ?group p =
+  let pname = Project.get_unique_name p in
   let p_item = GMenu.radio_menu_item
       ?group
       ~active:(Project.is_current p)
       ~packing:menu#append
+      ~label:pname
       ()
   in
   let callback () = if p_item#active then Project.set_current p in
-  let pname = Project.get_unique_name p in
   ignore (p_item#connect#toggled ~callback);
   project_radios := PrjRadiosSet.add ((p, pname), p_item) !project_radios;
-  let box = GPack.hbox ~packing:p_item#add () in
-  ignore (GMisc.label ~text:pname ~packing:box#pack ());
-  let buttons_box = GPack.hbox ~packing:(box#pack ~from:`END) () in
+  let submenu = GMenu.menu ~packing:p_item#set_submenu () in
   let add_action stock text callback =
-    let item = GButton.button ~packing:buttons_box#pack () in
-    Gtk_helper.do_tooltip ~tooltip:text item;
-    item#set_relief `NONE;
     let image = GMisc.image ~stock () in
-    item#set_image image#coerce;
-    image#set_icon_size `MENU;
-    ignore (item#connect#clicked ~callback)
+    let image = image#coerce in
+    let item =
+      Gtk_helper.image_menu_item ~image ~text ~packing:submenu#append
+    in
+    ignore (item#connect#activate ~callback)
   in
   add_action `COPY "Duplicate project"
     (fun () -> duplicate_project window menu p);
