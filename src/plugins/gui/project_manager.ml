@@ -139,23 +139,6 @@ let load_project (host_window: Design.main_window_extension_points) =
        | `DELETE_EVENT | `CANCEL -> ());
   dialog#destroy ()
 
-let rename_project (main_ui: Design.main_window_extension_points) project =
-  let old = Project.get_unique_name project in
-  let s =
-    Gtk_helper.input_string
-      ~parent:main_ui#main_window
-      ~title:"Renaming project"
-      (Format.sprintf "New name for project %S:" old)
-  in
-  match s with
-  | None -> ()
-  | Some s ->
-      try
-        ignore (Project.from_unique_name s);
-        main_ui#error "Project of name %S already exists" s
-      with Project.Unknown_project ->
-        Project.set_name project s
-
 let reset ?filter (menu: GMenu.menu) =
   (* Do not reset all if there is no change. *)
   let pl = projects_list ?filter () in
@@ -190,7 +173,27 @@ let reset ?filter (menu: GMenu.menu) =
     true
   end
 
-let rec duplicate_project window menu project =
+let rec rename_project
+    (main_ui: Design.main_window_extension_points) menu project
+  =
+  let old = Project.get_unique_name project in
+  let s =
+    Gtk_helper.input_string
+      ~parent:main_ui#main_window
+      ~title:"Renaming project"
+      (Format.sprintf "New name for project %S:" old)
+  in
+  (match s with
+   | None -> ()
+   | Some s ->
+     try
+       ignore (Project.from_unique_name s);
+       main_ui#error "Project of name %S already exists" s
+     with Project.Unknown_project ->
+       Project.set_name project s);
+  recompute main_ui menu
+
+and duplicate_project window menu project =
   let new_p =
     Project.create_by_copy ~last:false ~src:project (Project.get_name project)
   in
@@ -231,10 +234,11 @@ and mk_project_entry window menu ?group p =
   add_action `DELETE "Delete project" (fun () -> delete_project p);
   add_action `SAVE "Save project" (fun () -> save_project window p);
   add_action `SAVE_AS "Save project as" (fun () -> save_project_as window p);
-  add_action `SELECT_FONT "Rename project" (fun () -> rename_project window p);
+  add_action
+    `SELECT_FONT "Rename project" (fun () -> rename_project window menu p);
   p_item
 
-let make_project_entries ?filter window menu =
+and make_project_entries ?filter window menu =
   match projects_list ?filter () with
   | [] -> assert false
   | (pa, _name) :: tl ->
@@ -242,6 +246,10 @@ let make_project_entries ?filter window menu =
       let pa_item = mk pa in
       let group = pa_item#group in
       List.iter (fun (pa, _) -> ignore (mk ~group pa)) tl
+
+and recompute ?filter window menu =
+  let is_reset = reset ?filter menu in
+  if is_reset then make_project_entries ?filter window menu
 
 open Menu_manager
 
@@ -266,26 +274,22 @@ let () =
                (Unit_callback (fun () -> delete_project (Project.current ())));
              menubar ~icon:`SELECT_FONT "Rename current project"
                (Unit_callback
-                  (fun () -> rename_project window (Project.current ())));
+                  (fun () -> rename_project window menu (Project.current ())));
            ]
        in
        let new_item = constant_items.(0) in
        new_item#add_accelerator `CONTROL 'n';
        constant_items.(3)#add_accelerator `CONTROL 'd';
        ignore (GMenu.separator_item ~packing:menu#append ());
-       let callback ?filter () =
-         let is_reset = reset ?filter menu in
-         if is_reset then make_project_entries ?filter window menu
-       in
-       let callback_prj _p = callback () in
+       let callback_prj _p = recompute window menu in
        let callback_rm_prj p =
          let filter p' = not (Project.equal p p') in
-         callback ~filter ()
+         recompute ~filter window menu
        in
        Project.register_create_hook callback_prj;
        Project.register_after_set_current_hook ~user_only:false callback_prj;
        Project.register_before_remove_hook callback_rm_prj;
-       callback ())
+       recompute window menu)
 
 (*
 Local Variables:
