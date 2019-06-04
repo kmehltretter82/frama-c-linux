@@ -203,7 +203,7 @@ and mk_project_entry window menu ?group p =
       ?group
       ~active:(Project.is_current p)
       ~packing:submenu#append
-      ~label:"current"
+      ~label:"Set current"
       ()
   in
   let callback () = if p_item#active then Project.set_current p in
