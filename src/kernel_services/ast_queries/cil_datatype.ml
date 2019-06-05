@@ -1377,24 +1377,18 @@ module Logic_info_structural = struct
 	      l_body = LBnone })
 	  Logic_var.reprs
       let compare i1 i2 =
-        match String.compare i1.l_var_info.lv_name i2.l_var_info.lv_name with
-        | (-1 | 1) as res -> res
-        | _ ->
-           let rec profile_cmp p1 p2 = match p1, p2 with
-             | [], [] -> 0
-             | [], _ -> -1
-             | _, [] -> 1
-             | h1::t1, h2::t2 ->
-                let ty1 = h1.lv_type in
-                let ty2 = h2.lv_type in
-                let config = { by_name = true ;
-                               logic_type = true ;
-                               unroll = true } in
-                match compare_logic_type config ty1 ty2 with
-                | (-1 | 1) as res -> res
-                | _ -> profile_cmp t1 t2
-           in
-           profile_cmp i1.l_profile i2.l_profile
+        let name_cmp =
+          String.compare i1.l_var_info.lv_name i2.l_var_info.lv_name
+        in
+        if name_cmp <> 0 then name_cmp else begin
+          let config =
+            { by_name = true ; logic_type = true ; unroll = true }
+          in
+          let prm_cmp p1 p2 =
+            compare_logic_type config p1.lv_type p2.lv_type
+          in
+          compare_list prm_cmp i1.l_profile i2.l_profile
+        end
 
       let equal i1 i2 = Logic_var.equal i1.l_var_info i2.l_var_info
       let hash i = Logic_var.hash i.l_var_info
