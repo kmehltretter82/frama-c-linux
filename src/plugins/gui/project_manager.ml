@@ -197,7 +197,9 @@ let rec rename_project
 
 and mk_project_entry window menu ?group p =
   let pname = Project.get_unique_name p in
-  let item = GMenu.menu_item ~label:pname ~packing:menu#append () in
+  let markup = if Project.is_current p then "<b>" ^ pname ^ "</b>" else pname in
+  let item = GMenu.menu_item ~packing:menu#append () in
+  let _label = GMisc.label ~markup ~packing:item#add () in
   let submenu = GMenu.menu ~packing:item#set_submenu () in
   let p_item = GMenu.radio_menu_item
       ?group
