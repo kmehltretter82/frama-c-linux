@@ -138,8 +138,8 @@ object(self)
             let once = true in
             Kernel.warning
               ~once ~source
-              "Clobber list contain \"memory\" argument. Assuming no \
-               side-effect beyond those mentioned in operands."
+              "Clobber list contains \"memory\" argument. Assuming no \
+               side effects beyond those mentioned in operands."
           end;
           let to_id_term lv =
             Logic_const.new_identified_term
