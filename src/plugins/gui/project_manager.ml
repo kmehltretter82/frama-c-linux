@@ -38,7 +38,7 @@ let projects_list ?(filter=fun _ -> true) () =
 module PrjRadiosSet =
   FCSet.Make
     (struct
-      type t = (Project.t * string) * GMenu.radio_menu_item * GMenu.menu_item
+      type t = (Project.t * string) * GButton.radio_button * GMenu.menu_item
       let compare (p1, _, _) (p2, _, _) = compare_prj p1 p2
     end)
 
@@ -221,18 +221,19 @@ and mk_project_entry window menu ?group p =
   let item = GMenu.menu_item ~packing:menu#append () in
   let _label = GMisc.label ~markup ~xalign:0. ~packing:item#add () in
   let submenu = GMenu.menu ~packing:item#set_submenu () in
-  let p_item = GMenu.radio_menu_item
+  let current = GMenu.menu_item ~packing:submenu#append () in
+  let p_item = GButton.radio_button
       ?group
       ~active:(Project.is_current p)
-      ~packing:submenu#append
+      ~packing:current#add
       ~label:"Set current"
       ()
   in
-  let callback () = if p_item#active then Project.set_current p in
-  ignore (p_item#connect#toggled ~callback);
+  let callback () = Project.set_current p in
+  ignore (current#connect#activate ~callback);
   project_radios := PrjRadiosSet.add ((p, pname), p_item, item) !project_radios;
   let add_action stock text callback =
-    let image = GMisc.image ~stock () in
+    let image = GMisc.image ~xalign:0. ~stock () in
     let image = image#coerce in
     let item =
       Gtk_helper.image_menu_item ~image ~text ~packing:submenu#append
