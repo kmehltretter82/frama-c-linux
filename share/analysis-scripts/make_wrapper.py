@@ -32,6 +32,7 @@ import re
 import subprocess
 import sys
 from functools import partial
+import tempfile
 
 MIN_PYTHON = (3, 6) # for automatic Path conversions
 if sys.version_info < MIN_PYTHON:
@@ -40,7 +41,7 @@ if sys.version_info < MIN_PYTHON:
 parser = argparse.ArgumentParser(description="""
 Builds the specified target, parsing the output to identify and recommend
 actions in case of failure.""")
-parser.add_argument('--make-dir', metavar='DIR', default=".frama-c", nargs=1,
+parser.add_argument('--make-dir', metavar='DIR', default=".frama-c",
                     help='directory containing the makefile (default: .frama-c)')
 
 (make_dir_arg, args) = parser.parse_known_args()
@@ -52,10 +53,22 @@ if not framac_bin:
    sys.exit("error: FRAMAC_BIN not in environment (set by frama-c-script)")
 framac_script = f"{framac_bin}/frama-c-script"
 
-out = subprocess.Popen(['make', "-C", make_dir] + args,
-                       stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+_logfd, logname = tempfile.mkstemp(prefix="make_wrapper_tmp_")
+with subprocess.Popen(['make', "-C", make_dir] + args,
+                      stdout=subprocess.PIPE,
+                      stderr=subprocess.STDOUT) as proc, \
+     open (logname, "bw") as logfile:
+  while True:
+    line = proc.stdout.readline()
+    if line:
+       sys.stdout.buffer.write(line)
+       sys.stdout.flush()
+       logfile.write(line)
+    else:
+       break
 
-output = out.communicate()[0].decode('utf-8')
+output = open(logname, "r").read()
+os.remove(logname)
 
 re_missing_spec = re.compile("Neither code nor specification for function ([^,]+),")
 re_recursive_call_start = re.compile("detected recursive call")
@@ -65,7 +78,6 @@ tips = []
 
 lines = iter(output.splitlines())
 for line in lines:
-    print(line)
     match = re_missing_spec.search(line)
     if match:
        fname = match.group(1)
