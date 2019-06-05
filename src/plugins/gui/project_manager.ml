@@ -139,6 +139,10 @@ let load_project (host_window: Design.main_window_extension_points) =
        | `DELETE_EVENT | `CANCEL -> ());
   dialog#destroy ()
 
+let mk_project_markup p =
+  let name = Project.get_unique_name p in
+  if Project.is_current p then "<b>" ^ name ^ "</b>" else name
+
 let reset ?filter (menu: GMenu.menu) =
   (* Do not reset all if there is no change. *)
   let pl = projects_list ?filter () in
@@ -162,7 +166,23 @@ let reset ?filter (menu: GMenu.menu) =
   if same_projects then begin
     (* update the item status according to the current project anyway *)
     PrjRadiosSet.iter
-      (fun ((p, _), r, _) -> r#set_active (Project.is_current p))
+      (fun ((p, _), r, i) ->
+         r#set_active (Project.is_current p);
+         let widgets = i#children in
+         match widgets with
+         | [ w ] ->
+           (try
+              let label = GMisc.label_cast w in
+              label#set_label (mk_project_markup p);
+              label#set_use_markup true
+            with Gobject.Cannot_cast (t1,t2) ->
+              Gui_parameters.warning
+                "Child of project menu item of kind %s while %s was expected"
+                t1 t2)
+         | [] -> Gui_parameters.warning "Project menu item without child"
+         | _ -> Gui_parameters.warning "Project menu item with %d child"
+                  (List.length widgets)
+      )
       !project_radios;
     false
   end else begin
@@ -197,9 +217,9 @@ let rec rename_project
 
 and mk_project_entry window menu ?group p =
   let pname = Project.get_unique_name p in
-  let markup = if Project.is_current p then "<b>" ^ pname ^ "</b>" else pname in
+  let markup = mk_project_markup p in
   let item = GMenu.menu_item ~packing:menu#append () in
-  let _label = GMisc.label ~markup ~packing:item#add () in
+  let _label = GMisc.label ~markup ~xalign:0. ~packing:item#add () in
   let submenu = GMenu.menu ~packing:item#set_submenu () in
   let p_item = GMenu.radio_menu_item
       ?group
