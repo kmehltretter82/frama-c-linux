@@ -1357,6 +1357,48 @@ let rec hash_logic_type config = function
   | Larrow (_,t) -> 41 * hash_logic_type config t
 
 
+(* Logic_info with structural comparison
+   if functions / predicates have the same name (overloading), compare
+   their arguments types ; ignore polymorphism *)
+module Logic_info_structural = struct
+  let pretty_ref = ref (fun fmt f -> Logic_var.pretty fmt f.l_var_info)
+  include  Make_with_collections
+    (struct
+      type t = logic_info
+      let name = "Logic_info_structural"
+      let reprs =
+	List.map
+	  (fun v ->
+	    { l_var_info = v;
+	      l_labels = [];
+	      l_tparams = [];
+	      l_type = None;
+	      l_profile = [];
+	      l_body = LBnone })
+	  Logic_var.reprs
+      let compare i1 i2 =
+        let name_cmp =
+          String.compare i1.l_var_info.lv_name i2.l_var_info.lv_name
+        in
+        if name_cmp <> 0 then name_cmp else begin
+          let config =
+            { by_name = true ; logic_type = true ; unroll = true }
+          in
+          let prm_cmp p1 p2 =
+            compare_logic_type config p1.lv_type p2.lv_type
+          in
+          compare_list prm_cmp i1.l_profile i2.l_profile
+        end
+
+      let equal = Datatype.from_compare
+      let hash i = Logic_var.hash i.l_var_info
+      let copy = Datatype.undefined
+      let internal_pretty_code = Datatype.undefined
+      let pretty = !pretty_ref
+      let varname _ = "logic_varinfo"
+     end)
+end
+
 (* Shared between the different modules for logic types *)
 let pretty_logic_type_ref = ref (fun _ _ -> assert false)
 

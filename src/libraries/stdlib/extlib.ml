@@ -127,8 +127,8 @@ let rec list_compare cmp_elt l1 l2 =
   else
     match l1, l2 with
       | [], [] -> assert false (* included in l1 == l2 above *)
-      | [], _ :: _ -> 1
-      | _ :: _, [] -> -1
+      | [], _ :: _ -> -1
+      | _ :: _, [] -> 1
       | v1::r1, v2::r2 ->
           let c = cmp_elt v1 v2 in
           if c = 0 then list_compare cmp_elt r1 r2 else c
