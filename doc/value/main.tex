@@ -3286,9 +3286,8 @@ number of times. If the loop has not been entirely unrolled, however,
 remaining \lstinline|-eva-slevel| may be used to unroll more iterations.
 
 While it is sometimes useful to unroll only the first iterations, the usual
-objective is full unrolling; the user can enable option
-\lstinline|-value-msg-key=loop-unroll| to be informed whenever the specified
-unrolling value is insufficient to unroll the loop entirely:
+objective is full unrolling; for this reason, the user is informed whenever
+the specified unrolling value is insufficient to unroll the loop entirely:
 
 \begin{lstlisting}
 void main() {
@@ -3301,6 +3300,8 @@ void main() {
 \begin{lstlisting}
 [eva:loop-unroll] insuf-loop.c:3: loop not completely unrolled
 \end{lstlisting}
+
+The message can be deactived via \lstinline|-eva-warn-key loop-unroll=inactive|.
 
 Note that using an unrolling parameter which is higher than the actual number
 of iterations of a loop doesn't generally have an effect on the analysis.
