@@ -63,7 +63,8 @@ rec {
   lint = stdenv.mkDerivation {
         name = "frama-c-lint";
         inherit src;
-        buildInputs = (mk_buildInputs {opamPackages = [ "ocp-indent" ];} ) ++ [ pkgs.bc plugins.headache.installed ];
+        buildInputs = (mk_buildInputs { opamPackages = [ { name = "ocp-indent"; constraint = "=1.6.1"; } ];} )
+                      ++ [ pkgs.bc plugins.headache.installed ];
         outputs = [ "out" ];
         postPatch = ''
                patchShebangs .
@@ -228,7 +229,7 @@ rec {
                 sed -i src/plugins/pathcrawler/extern/eclipseCLP/RUNME -e "s/chmod 2755/chmod 755/g"
                 rm src/plugins/pathcrawler/extern/eclipseCLP/lib/x86_64_linux/dbi_mysql.so
                 rm src/plugins/pathcrawler/extern/eclipseCLP/lib/x86_64_linux/ic.so
-                prefix="src/plugins/pathcrawler" autoPatchelf
+                autoPatchelf src/plugins/pathcrawler
                 make -j 4
                 ln -sr src/plugins/pathcrawler/share share/pc
                 make tests -j4 PTESTS_OPTS="-error-code -j 4"
