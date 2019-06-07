@@ -1,0 +1,8 @@
+[kernel] Parsing tests/dive/global.i (no preprocessing)
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:alarm] tests/dive/global.i:11: Warning: 
+  non-finite float value. assert \is_finite((float)(g + x));
+[eva] done for function main
+[dive] output to tests/dive/result/global.dot

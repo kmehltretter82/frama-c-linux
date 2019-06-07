@@ -259,16 +259,29 @@ let build_node_deps context node =
       match stmt.skind with
       | Instr _ when not effects.Studia.Writes.direct -> ()
       | Instr instr ->
-        (* Keep only callstacks which are a compatible with the current one *)
-        let states = Db.Value.get_stmt_state_callstack ~after:false stmt in
-        let callstacks = match states with
-          | None -> assert false
-          | Some table ->
-            let module Table = Value_types.Callstack.Hashtbl in
-            Table.fold (fun cs _ acc -> cs :: acc) table []
+        let callstacks =
+          if callstack <> [] &&
+             Kernel_function.(equal
+                                (find_englobing_kf stmt)
+                                (Callstack.top_kf callstack))
+          then
+            (* slight improvement which only work when there is no recursion
+               and which is only usefull because you currently can't have
+               all callstacks due to memexec -> in this particular case
+               we are sure not to miss the only admissible callstack *)
+            [callstack]
+          else
+            (* Keep only callstacks which are a compatible with the current one *)
+            let states = Db.Value.get_stmt_state_callstack ~after:false stmt in
+            let callstacks = match states with
+              | None -> assert false
+              | Some table ->
+                let module Table = Value_types.Callstack.Hashtbl in
+                Table.fold (fun cs _ acc -> cs :: acc) table []
+            in
+            (* TODO: missing callstacks filtered by memexec *)
+            Callstack.filter_truncate callstacks callstack
         in
-        (* TODO: missing callstacks filtered by memexec *)
-        let callstacks = Callstack.filter_truncate callstacks callstack in
         (* Create a dependency for each of them *)
         List.iter (fun cs -> build_instr_deps cs stmt instr) callstacks
       | _ -> assert false

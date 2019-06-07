@@ -47,8 +47,8 @@ digraph G {
   subgraph cluster_file_1 { label=<tests/dive/various.i>; cp6;cp5;
      };
   
-  cp1 -> cp2 [style="bold", ];
-  cp2 -> cp1 [style="bold", ];
+  cp1 -> cp2;
+  cp2 -> cp1;
   cp2 -> cp18;
   cp4 -> cp1;
   cp4 -> cp4;

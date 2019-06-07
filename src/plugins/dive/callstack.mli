@@ -27,12 +27,13 @@ include Datatype.S_with_collections with type t := t
 
 (* The callstacks manipulated here have the following invariant:
    - the callstack is never an empty list
-   - the last item of the list has alwas a Kglobal
+   - the last item of the list has always a Kglobal
    - all elements of the list except the last have a Kstmt *)
 
 val init : Cil_types.kernel_function -> t
 val pop : t -> (Cil_types.kernel_function * Cil_types.stmt * t) option
 val pop_downto : Cil_types.kernel_function -> t -> t
+val top_kf : t -> Cil_types.kernel_function
 val push : Cil_types.kernel_function * Cil_types.stmt -> t -> t
 val is_prefix : t -> t -> bool
 val truncate_to_sub : t -> t -> t option

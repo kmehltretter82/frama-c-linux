@@ -35,6 +35,11 @@ let pop cs =
   | [(_,Kglobal)] -> None
   | (kf,Kstmt stmt) :: t -> Some (kf,stmt,t)
 
+let top_kf cs =
+  match cs with
+  | [] | (_,Kglobal) :: _ :: _ | [(_,Kstmt _)] -> assert false (* Invariant *)
+  | (kf,_) :: _ -> kf
+
 let rec pop_downto top_kf = function
   | [] -> failwith "the callstack doesn't contain this function"
   | ((kf,_kinstr) :: tail) as cs ->
@@ -62,10 +67,10 @@ let rec is_prefix cs1 cs2 =
 let truncate_to_sub full_cs sub_cs =
   let rec aux acc = function
     | [] -> None
-  | (s :: t) as cs ->
-    if is_prefix sub_cs cs
-    then Some (List.rev acc @ sub_cs)
-    else aux (s :: acc) t
+    | (s :: t) as cs ->
+      if is_prefix sub_cs cs
+      then Some (List.rev acc @ sub_cs)
+      else aux (s :: acc) t
   in
   aux [] full_cs
 
