@@ -156,7 +156,7 @@ invalid pointer accesses,\ldots
 When launched with \lstinline|frama-c -eva rte.c|,
 \Eva{} emits a warning about an out-of-bound access at line 5:
 \begin{logs}
-rte.c:5:[eva] Warning: accessing out of bounds index. assert i < 10;
+[eva:alarm] rte.c:5: Warning: accessing out of bounds index. assert i < 10;
 \end{logs}
 There is in fact an out-of-bounds access at this line in the program.
 It can also happen that, because of approximations during its computations,
@@ -1491,7 +1491,7 @@ enable such alarms.
 
 \listinginput{1}{lshift.c}
 \begin{logs}
-lshift.c:4:[kernel] warning: invalid LHS operand for left shift. assert 0 <= x;
+[eva:alarm] lshift.c:4: Warning: invalid LHS operand for left shift. assert 0 <= x;
 \end{logs}
 
 \subsubsection{Overflow in integer arithmetic}
@@ -1536,8 +1536,8 @@ range of the integer type it is converted to.
 \listinginput{1}{ov_float_int.c}
 \begin{logs}
 ...
-ov_float_int.c:6:[kernel] warning: overflow in conversion from floating-point 
- to integer. assert -2147483649 < f < 2147483648;
+[eva:alarm] ov_float_int.c:6: Warning: overflow in conversion from floating-point 
+ to integer. assert f < 2147483648;
 
 [eva] Values at end of function main:
 f $\in$ [2000000000. .. 3000000000.]
@@ -1557,7 +1557,7 @@ first kind of alarm can be seen in the following example.
 frama-c -eva -main sum double_op_res.c
 \end{shell}
 \begin{logs}
-double_op_res.c:3:[kernel] warning: non-finite double value
+[eva:alarm] double_op_res.c:3: Warning: non-finite double value.
     assert \is_finite((double)(a+b));
 \end{logs}
 
@@ -1575,7 +1575,7 @@ See the example below.
 frama-c -eva double_op_arg.c
 \end{shell}
 \begin{logs}
-double_op_arg.c:7:[kernel] warning: non-finite float value:
+[eva:alarm] double_op_arg.c:7: Warning: non-finite float value.
     assert \is_finite(bits.f);
 \end{logs}
 
@@ -1728,7 +1728,7 @@ parsing. Each of these only mean that an expression with side-effects
 will require checking after the Abstract Syntax Tree has been elaborated. 
 For instance, the first of these warnings is:
 \begin{logs}
-se.c:5:[kernel] warning: Unspecified sequence with side effect:
+[kernel] se.c:5: Warning: Unspecified sequence with side effect:
                   /*  <-  */
                   tmp = x;
                   /* x <-  */
@@ -1740,8 +1740,8 @@ se.c:5:[kernel] warning: Unspecified sequence with side effect:
 Then \Eva{} is run on the program.
 In the example at hand, the analysis finds problems at lines 5 and 7.
 \begin{logs}
-se.c:5: ... undefined multiple accesses in expression. assert \separated(&x, &x);
-se.c:7: ... undefined multiple accesses in expression. assert \separated(&x, p);
+[eva:alarm] se.c:5: Warning: undefined multiple accesses in expression. assert \separated(&x, &x);
+[eva:alarm] se.c:7: Warning: undefined multiple accesses in expression. assert \separated(&x, p);
 \end{logs}
 At line 5, it can guarantee that an undefined behavior exists, and the analysis
 is halted.
@@ -5317,9 +5317,8 @@ happens in the following example:
 
 Analyzing this example with the default options produces:
 \begin{logs}
-false_al.c:7:[kernel] warning: accessing out of bounds index [-100..100].
-                      assert 0 <= i < 101;
-false_al.c:9:[kernel] warning: division by zero: assert y != 0;
+[eva:alarm] false_al.c:7: Warning: accessing out of bounds index. assert 0 <= i;
+[eva:alarm] false_al.c:9: Warning: division by zero. assert y != 0;
 \end{logs}
 
 On line 7, the tool is only capable of detecting that \lstinline|i| lies in
