@@ -1,6 +1,6 @@
 /* run.config
-   OPT: -sparecode-debug 1 -sparecode-analysis -eva-show-progress -journal-disable
-   OPT: -eva-show-progress -slicing-level 2 -slice-return main -journal-disable -then-last -print -eva-show-progress
+   STDOPT: +"-sparecode-analysis"
+   STDOPT: +"-slicing-level 2 -slice-return main -then-last -print"
 */
 
 /* This is an example from #529. 'y' in [main1] should be visible to get a

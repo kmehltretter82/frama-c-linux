@@ -25,6 +25,7 @@ type k =
   | Enum
   | Field
   | Formal_var
+  | Formal_in_type
   | Function
   | Global_var
   | Label
@@ -33,6 +34,8 @@ type k =
   | Logic_var
   | Predicate
   | Type
+  | Logic_type
+  | Logic_constructor
 
 include Datatype.S_with_collections with type t = k
 val prefix: t -> string

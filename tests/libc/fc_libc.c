@@ -2,7 +2,7 @@
    EXECNOW: make -s @PTEST_DIR@/check_libc_naming_conventions.cmxs
    EXECNOW: make -s @PTEST_DIR@/check_const.cmxs
    EXECNOW: make -s @PTEST_DIR@/check_parsing_individual_headers.cmxs
-   OPT: -load-module @PTEST_DIR@/check_libc_naming_conventions -print -cpp-extra-args='-nostdinc -Ishare/libc' -metrics -metrics-libc -load-module @PTEST_DIR@/check_const -load-module metrics -eva @VALUECONFIG@ -then -lib-entry -no-print -metrics-no-libc
+   OPT: -load-module @PTEST_DIR@/check_libc_naming_conventions -print -cpp-extra-args='-nostdinc -Ishare/libc' -metrics -metrics-libc -load-module @PTEST_DIR@/check_const -load-module metrics -eva @EVA_CONFIG@ -then -lib-entry -no-print -metrics-no-libc
    OPT: -print -print-libc
    OPT: -load-module @PTEST_DIR@/check_parsing_individual_headers
    CMD: ./tests/libc/check_full_libc.sh
@@ -18,7 +18,7 @@
 #define _POSIX_C_SOURCE 200112L
 #define _GNU_SOURCE 1
 
-#include "share/libc/fc_runtime.c"
+#include "share/libc/__fc_runtime.c"
 
 #include "alloca.h"
 #include "arpa/inet.h"

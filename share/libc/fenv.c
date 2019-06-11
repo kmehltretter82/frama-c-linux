@@ -50,7 +50,7 @@ volatile fenv_t __fc_fenv_state __attribute__((FRAMA_C_MODEL));
  */
 int feholdexcept( fenv_t *envp )
 {
-  *envp = (fenv_t)__fc_fenv_state; /* store the current FPU environment */
+  *envp = __fc_fenv_state; /* store the current FPU environment */
 
   return 0;
 }
@@ -63,9 +63,10 @@ int feholdexcept( fenv_t *envp )
  *  exceptions: If envp contains a raised exception flag and at the same time
  *  unmasks that exception type, then this will cause an interrupt.
  */
-void fesetenv( const fenv_t *envp )
+int fesetenv( const fenv_t *envp )
 {
   __fc_fenv_state = *envp;
+  return 0;
 }
 
 __POP_FC_STDLIB

@@ -304,7 +304,7 @@ let numeric_coerce ltyp t =
   let oldt = unroll_type t.term_type in
   if Cil_datatype.Logic_type.equal oldt ltyp then t
   else match t.term_node with
-    | TLogic_coerce(_,e) -> coerce e
+    | TLogic_coerce(t,e) when Cil.no_op_coerce t e -> coerce e
     | TConst(Integer(i,_)) ->
       (match oldt, ltyp with
        | Ctype (TInt(ikind,_)), Linteger when Cil.fitsInInt ikind i ->
@@ -1021,8 +1021,8 @@ let is_same_extension (_,e1,_,s1,c1) (_,e2,_,s2,c2) =
 
 let is_same_code_annotation (ca1:code_annotation) (ca2:code_annotation) =
   match ca1.annot_content, ca2.annot_content with
-  | AAssert(l1,p1), AAssert(l2,p2) ->
-    is_same_list (=) l1 l2 && is_same_predicate p1 p2
+  | AAssert(l1,k1,p1), AAssert(l2,k2,p2) ->
+    is_same_list (=) l1 l2 && k1 = k2 && is_same_predicate p1 p2
   | AStmtSpec (l1,s1), AStmtSpec (l2,s2) ->
     is_same_list (=) l1 l2 && is_same_spec s1 s2
   | AInvariant(l1,b1,p1), AInvariant(l2,b2,p2) ->
@@ -1544,12 +1544,12 @@ let rec compare_term t1 t2 =
   | TAlignOfE _, _ -> 1
   | _, TAlignOfE _ -> -1
   | TUnOp (o1,t1), TUnOp(o2,t2) ->
-    let res = Pervasives.compare o1 o2 in
+    let res = Transitioning.Stdlib.compare o1 o2 in
     if res = 0 then compare_term t1 t2 else res
   | TUnOp _, _ -> 1
   | _, TUnOp _ -> -1
   | TBinOp(o1,l1,r1), TBinOp(o2,l2,r2) ->
-    let res = Pervasives.compare o1 o2 in
+    let res = Transitioning.Stdlib.compare o1 o2 in
     if res = 0 then
       let res = compare_term l1 l2 in
       if res = 0 then compare_term r1 r2 else res
@@ -1749,7 +1749,7 @@ and compare_predicate_node p1 p2 =
   | Papp _, _ -> 1
   | _, Papp _ -> -1
   | Prel(r1,lt1,rt1), Prel(r2,lt2,rt2) ->
-    let res = Pervasives.compare r1 r2 in
+    let res = Transitioning.Stdlib.compare r1 r2 in
     if res = 0 then
       let res = compare_term lt1 lt2 in
       if res = 0 then compare_term rt1 rt2 else res
@@ -2057,7 +2057,11 @@ let lhost_c_type thost =
      | _ -> assert false)
   | TResult ty -> ty
 
-let is_assert ca = match ca.annot_content with AAssert _ -> true | _ -> false
+let is_assert ca =
+  match ca.annot_content with AAssert (_, Assert, _) -> true | _ -> false
+
+let is_check ca =
+  match ca.annot_content with AAssert (_, Check, _) -> true | _ -> false
 
 let is_contract ca =
   match ca.annot_content with AStmtSpec _ -> true | _ -> false
@@ -2101,7 +2105,7 @@ let is_loop_annot s =
 
 let is_trivial_annotation a =
   match a.annot_content with
-  | AAssert (_,a) -> is_trivially_true a
+  | AAssert (_,_,a) -> is_trivially_true a
   | APragma _ | AStmtSpec _ | AInvariant _ | AVariant _
   | AAssigns _| AAllocation _ | AExtended _
     -> false

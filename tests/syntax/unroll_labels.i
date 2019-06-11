@@ -1,6 +1,6 @@
 /* run.config
-  STDOPT: +"-eva -eva-show-progress"
-  STDOPT: +"-eva -eva-show-progress -main main2 -slevel 3"
+  STDOPT: +"-eva @EVA_CONFIG@"
+  STDOPT: +"-eva @EVA_CONFIG@ -main main2 -slevel 3"
 */
 enum { SIX = 6 } ;
 volatile foo;

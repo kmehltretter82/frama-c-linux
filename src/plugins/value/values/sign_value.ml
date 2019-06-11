@@ -54,7 +54,7 @@ let empty = { pos = false; zero = false; neg = false }
 include Datatype.Make(struct
     type t = signs
     include Datatype.Serializable_undefined
-    let compare = Pervasives.compare
+    let compare = Transitioning.Stdlib.compare
     let equal = Datatype.from_compare
     let hash = Hashtbl.hash
     let reprs = [top]

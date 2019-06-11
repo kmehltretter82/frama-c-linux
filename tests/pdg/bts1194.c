@@ -1,5 +1,5 @@
 /* run.config
-  OPT: -eva -inout -eva-show-progress -pdg -pdg-print -calldeps -deps -then -slice-return main -then-last -print -eva-show-progress
+  STDOPT: +"-eva -inout -pdg -calldeps -deps -then -slice-return main -then-last -print @EVA_OPTIONS@"
 */
 
 int Y, X;

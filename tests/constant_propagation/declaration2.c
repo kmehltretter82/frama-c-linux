@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -eva -eva-show-progress -scf -eva-show-progress -journal-disable
+   OPT: -eva @EVA_OPTIONS@ -scf -journal-disable
 */
 
 void f(int *x) { (*x)++; }

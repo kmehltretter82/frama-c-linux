@@ -379,7 +379,7 @@ struct
       | Constructor -> 1
       | Operator _ -> 0
 
-    let cmp_size a b = Pervasives.compare a.size b.size
+    let cmp_size a b = Transitioning.Stdlib.compare a.size b.size
     let rank_bind = function Forall -> 0 | Exists -> 1 | Lambda -> 2
     let cmp_bind p q = rank_bind p - rank_bind q
     let cmp_field phi (f,x) (g,y) =
@@ -1221,7 +1221,7 @@ struct
     | _ -> (k,t) :: acc
 
   (* sorts monoms by terms *)
-  let compare_monoms (_,t1) (_,t2) = Pervasives.compare t1.id t2.id
+  let compare_monoms (_,t1) (_,t2) = Transitioning.Stdlib.compare t1.id t2.id
 
   (* factorized monoms *)
   let fold_monom ts k t =
@@ -1975,11 +1975,11 @@ struct
 
   let let_intro_case q x a =
     let res = ref None in
+    let found_term t = assert (!res = None);
+      assert (not (Vars.mem x t.vars));
+      res := Some t; true
+    in
     let is_term_ok a b =
-      let found_term t = assert (!res = None);
-        assert (not (Vars.mem x t.vars));
-        res := Some t; true
-      in
       match a.repr with
       | Fvar w -> assert (Var.equal x w); found_term b
       | Add e ->
@@ -2010,8 +2010,16 @@ struct
       | false,true -> is_term_ok v u
       | _,_ -> false
     in
-    let is_eq e  = match e.repr with|Eq(u,v) -> is_var_ok u v |_ -> false in
-    let is_neq e = match e.repr with|Neq(u,v)-> is_var_ok u v |_ -> false in
+    let is_boolean_var polarity_term = function
+      | Fvar w when Var.equal x w -> found_term polarity_term
+      | _ -> false
+    in
+    let is_eq e = match e.repr with | Eq(u,v) -> is_var_ok u v
+                                    | Not q -> is_boolean_var e_false q.repr
+                                    | rep -> is_boolean_var e_true rep in
+    let is_neq e = match e.repr with | Neq(u,v)-> is_var_ok u v
+                                     | Not q -> is_boolean_var e_true q.repr
+                                     | rep -> is_boolean_var e_false rep in
     match q with
     | Lambda -> None
     | Forall ->

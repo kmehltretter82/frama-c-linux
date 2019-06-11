@@ -127,8 +127,8 @@ let rec list_compare cmp_elt l1 l2 =
   else
     match l1, l2 with
       | [], [] -> assert false (* included in l1 == l2 above *)
-      | [], _ :: _ -> 1
-      | _ :: _, [] -> -1
+      | [], _ :: _ -> -1
+      | _ :: _, [] -> 1
       | v1::r1, v2::r2 ->
           let c = cmp_elt v1 v2 in
           if c = 0 then list_compare cmp_elt r1 r2 else c
@@ -341,11 +341,23 @@ let try_finally ~finally f x =
 
   The alternative, such as registering an daemon that raises an exception,
   hence interrupting the process, might not work: child processes still need to
-  run some daemons, such as [Pervasives.flush_all] which is registered by default. *)
+  run some daemons, such as [flush_all] which is registered by default. *)
+
+let rec mkdir ?(parents=false) name perm =
+  try Unix.mkdir name perm
+  with
+  | Unix.Unix_error (Unix.ENOENT,_,_) when parents ->
+    let parent_name = Filename.dirname name in
+    if name <> parent_name then
+      begin
+        mkdir ~parents parent_name perm;
+        Unix.mkdir name perm
+      end
+  | e -> raise e
 
 let pid = Unix.getpid ()
 let safe_at_exit f =
-  Pervasives.at_exit
+  at_exit
     begin fun () ->
       let child = Unix.getpid () in
       if child = pid then f ()
@@ -465,11 +477,11 @@ let make_unique_name mem ?(sep=" ") ?(start=2) from =
 let strip_underscore s =
   let l = String.length s in
   let rec start i =
-    if i >= l then l-1
+    if i >= l then l
     else if s.[i] = '_' then start (i + 1) else i
   in
   let st = start 0 in
-  if st = l - 1 then ""
+  if st = l then ""
   else begin
     let rec finish i =
       (* We know that we will stop at >= st >= 0 *)

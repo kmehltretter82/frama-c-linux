@@ -1,7 +1,7 @@
 \chapter{Using the WP Plug-in}
 \label{wp-plugin}
 
-The \textsf{WP} plug-in can be used from the \textsf{Frama-C} command line 
+The \textsf{WP} plug-in can be used from the \textsf{Frama-C} command line
 or within its graphical user interface. It is a
 dynamically loaded plug-in, distributed with the kernel since the
 \textsf{Carbon} release of \textsf{Frama-C}.
@@ -29,21 +29,27 @@ plug-in with the load and save commands of \textsf{Frama-C} and/or the
 %-----------------------------------------------------------------------------
 
 The \textsf{WP} plug-in requires external provers to work.
-The natively supported provers are:
+The recommended versions for external provers are:
 \begin{center}
   \begin{tabular}{crlc}
-    Prover & Version & Download &\\
+    Prover & Versions & Download &\\
     \hline
-    \textsf{Alt-Ergo} & \verb|0.99.1| to \verb|2.0.0| & 
+    \textsf{Alt-Ergo} & \verb|2.0.0|  &
     \url{http://alt-ergo.ocamlpro.com} & \cite{AltErgo2006}\\
-    \textsf{Coq} & \verb|8.5|, \verb|8.6| or \verb|8.7| & 
+    \textsf{Coq} & \verb|8.9.0| &
     \url{http://coq.inria.fr} & \cite{Coq84}\\
-    \textsf{Why3} & \verb|0.88+| & 
+    \textsf{Why3} & \verb|1.2.0| &
     \url{http://why3.lri.fr} & \cite{Why3}\\
   \end{tabular}
 \end{center}
 
 Recent \textsf{OPAM}-provided versions should work smoothly.
+Other versions might be supported as well, typically, as far as we know:
+\begin{itemize}
+\item \textsf{Alt-Ergo} \verb+2.2.0+ and \verb+2.3.0+, although distributed under a non-commercial licence.
+\item \textsf{Coq} \verb+8.7.2+ and \verb+8.8.2+, although proof scripts compatibility can be an issue.
+\item \textsf{Why3} \verb+1.0.0+ and \verb+1.1.1+, although only \verb+1.2.0+ is provided with Coq support.
+\end{itemize}
 
 Other provers, like \textsf{Gappa}, \textsf{Z3}, \textsf{CVC3},
 \textsf{CVC4}, \textsf{PVS}, and many others, are accessible from
@@ -55,7 +61,7 @@ of \textsf{Frama-C/WP}. However, when using \textsf{Coq} and
 \textsf{Why-3}, it is better to install them before, or to
 re-configure and re-install \textsf{WP}, as explained below.
 
-\paragraph{Configuration.} When using \textsf{Coq} and \textsf{Why-3}, pre-compiled 
+\paragraph{Configuration.} When using \textsf{Coq} and \textsf{Why-3}, pre-compiled
 libraries are built during the compilation of \textsf{Frama-C}, which
 speed up the proof process in a significant way. This behavior can be
 turned on/off at configure time, typically:
@@ -63,14 +69,14 @@ turned on/off at configure time, typically:
 # configure --disable-wp-coq --disable-wp-why3
 \end{logs}
 
-\paragraph{Compilation.} If you want to compile the \textsf{Coq} and \textsf{Why-3} 
-libraries manually, you can still run:
+\paragraph{Compilation.} If you want to compile the \textsf{Coq} and \textsf{Why-3}
+libraries manually, you can still run the following commands:
 \begin{logs}
 # make wp-coq wp-why3
 # [sudo] make wp-coq-install
 \end{logs}
 
-\paragraph{Remark.} The \textsf{Why}~\cite{Filliatre2003} prover is no longer supported 
+\paragraph{Remark.} The \textsf{Why}~\cite{Filliatre2003} prover is no longer supported
 since \textsf{WP} version \verb+0.7+ (Fluorine).
 
 \clearpage
@@ -128,7 +134,7 @@ for more details. In the graphical user interface, there are also
 specific panels that display more details related to the \textsf{WP} plug-in,
 that we shortly describe below.
 
-\paragraph{Source Panel.} On the center of the \textsf{Frama-C} window, the status 
+\paragraph{Source Panel.} On the center of the \textsf{Frama-C} window, the status
 of each code annotation is reported in the left margin. The meaning of
 icons is the same for all plug-ins in \textsf{Frama-C} and more precisely described
 in the general user's manual of the platform. The status emitted by the \textsf{WP} plug-in are:
@@ -155,7 +161,7 @@ as proof-script editing for \textsf{Coq}.
 \paragraph{Interactive Proof Editor.}
 From the Goals Panel view, you can double-click on a row and open the \emph{interactive proof editor} panel as described in section~\ref{wp-proof-editor}.
 
-\paragraph{Properties Panel.} This panel summarizes the consolidated 
+\paragraph{Properties Panel.} This panel summarizes the consolidated
 status of properties, from various plug-ins. This panel is not
 automatically refreshed. You should press the \texttt{Refresh} button
 to update it. This panel is described in more details in the general
@@ -220,7 +226,7 @@ With memory model unmangled, the encoding in logic formulae is revealed and no l
 
 \subsection{Tactics}
 
-The right panel display a palette of tactics to be applied on the current goal. Tooltips are provided to help the user understanding how to configure and run tactics. 
+The right panel display a palette of tactics to be applied on the current goal. Tooltips are provided to help the user understanding how to configure and run tactics.
 
 Only applicable tactics are displayed, with respect to current term or clause selected. Many tactics can be configured by the user to tune their effect. Click on the tactic button to toggle its control panel. Once a tactic is correctly configured, it can be applied by clicking its « Play » button.
 
@@ -300,7 +306,7 @@ Any number of phase a. and b. can be executed and interleaved. This incrementall
 
 c. Consolidating the Bench.
 \begin{logs}
-  frama-c [...] -wp-prover script,alt-ergo    
+  frama-c [...] -wp-prover script,alt-ergo
 \end{logs}
 
 This mode replays the automated proofs and the interactive ones, re-running Alt-Ergo on every WP goals and every proof tactic sub-goals. The user scripts are never modified — this is a replay mode only.
@@ -448,12 +454,12 @@ the equality is decomposed into $N$ bit-tests equalities:
 \[\TACTIC{\Delta\models G}{%
 \begin{array}[t]{rcl}
 \Delta\phantom{)} &\models & 0 \leq a,b < 2^N \\
-\sigma(\Delta) & \models & \sigma(G) 
+\sigma(\Delta) & \models & \sigma(G)
 \end{array}
 }\]
 where $\sigma$ is the following subsitution:
-\[ \sigma \equiv 
-\left[ a=b \quad \leftarrow 
+\[ \sigma \equiv
+\left[ a=b \quad \leftarrow
 \bigwedge_{k\in 0..N-1} \mathtt{bit\_test}(a,k) = \mathtt{bit\_test}(b,k)
 \right]
 \]
@@ -464,14 +470,14 @@ to the \textsf{ACSL} expression \lstinline{(a & (1 << k)) != 0}. The
 such patterns, and the a tactic is good way to reason over bits.
 
 \paragraph{Shift} Transform logical shifts into arithmetics\\
-For positive integers, logical shifts such as \lstinline{a << k} 
+For positive integers, logical shifts such as \lstinline{a << k}
 and \lstinline{a >> k} where \lstinline$k$ is a constant can be interpreted into a multiplication or a division by $2^k$.
 
 When selecting a logical-shift, the tactic performs:
 \[\TACTIC{\Delta\models G}{%
 \begin{array}[t]{rcl}
 \Delta\phantom{)} &\models& 0 \leq a \\
-\sigma(\Delta) &\models& \sigma(G) 
+\sigma(\Delta) &\models& \sigma(G)
 \end{array}
 }\]
 where:
@@ -520,7 +526,7 @@ k|n, & a = n/k &\Longleftrightarrow& k.a = n \\
 \neg(k|n), & k.a = n & \Longrightarrow & \mathtt{false} \\
 0<k, & a < k.(b+1) &\Longrightarrow& a/k < b \\
 0<k, 0<k', & k'.a < k.b &\Longrightarrow& a/k < b/k' \\
-n|k, n|k', & (k/n).a = (k'/n).b &\Longleftrightarrow& k.a = k'.b 
+n|k, n|k', & (k/n).a = (k'/n).b &\Longleftrightarrow& k.a = k'.b
 \end{array}
 \]
 
@@ -533,7 +539,7 @@ with pattern $\mathtt{to\_iota(e)}$ where \texttt{iota} is a a machine-integer n
 \[\TACTIC{\Delta\models G}{%
 \begin{array}[t]{rcl}
 \Delta\phantom{)} &\models & a \leq e \leq b \\
-\sigma(\Delta) & \models & \sigma(G) 
+\sigma(\Delta) & \models & \sigma(G)
 \end{array}
 }\]
 where $\sigma = [ \mathtt{to\_iota}(e) \mapsto e ]$ and $[a..b]$ is the range
@@ -616,13 +622,13 @@ let () = Strategy.register (new dummy)
 
 Then, simply extend your command line with the following options to make your strategy available from the interactive proof editor:
 \begin{logs}
-> frama-c-gui -load-module dummy.ml [...]   
+> frama-c-gui -load-module dummy.ml [...]
 \end{logs}
 
 \paragraph{Note:} Loading custom strategies is only required when running the graphical user interface (\texttt{frama-c-gui}). When replaying scripts from the command line (\texttt{frama-c}), only custom tactics and custom composers actually involved in proofs are required to be loaded.
 
 The example custom strategy above is structured as follows. First we open the module \lstinline$Wp$ to simplify
-access to the API. A custom strategy must be an instance of class-type \lstinline$Strategy.heuristic$, and we use a coercion here to explicit types. Methods \lstinline$#id$, \lstinline$#title$ and \lstinline$#descr$ are required and describes the strategy, making it available from the tactic panel in the graphical user interface. 
+access to the API. A custom strategy must be an instance of class-type \lstinline$Strategy.heuristic$, and we use a coercion here to explicit types. Methods \lstinline$#id$, \lstinline$#title$ and \lstinline$#descr$ are required and describes the strategy, making it available from the tactic panel in the graphical user interface.
 
 The actual heuristic code takes place in method \lstinline$#search$ which has the following type (consult the html API for details):
 \begin{lstlisting}[language=ocaml]
@@ -630,12 +636,12 @@ The actual heuristic code takes place in method \lstinline$#search$ which has th
 \end{lstlisting}
 
 This method takes two parameters: a strategy registration callback and the sequent to prove. Each heuristic
-is supposed to register any number of strategies to be tried on the provided sequent. In turn, each strategy 
+is supposed to register any number of strategies to be tried on the provided sequent. In turn, each strategy
 is a record consisting of a priority, a tactic, a target selection for the tactic and its arguments.
 It is possible to build such a record by hand, using custom or predefined tactics. However, it is much more convenient
 to use the helper functions from module \lstinline$Auto$ that directly build strategies.
 
-In the example above, we inspect the structure of the goal, and when a conjunction is detected (\lstinline$And _$), 
+In the example above, we inspect the structure of the goal, and when a conjunction is detected (\lstinline$And _$),
 we decide to register a split tactic, thanks to the helper function \lstinline$Auto.split$. Default priority is \lstinline$1.0$ by convention. Pre-installed strategies would only use range $[0.5\ldots2.0]$ of priorities. You can use any value you want inside or outside this range. In the example below, we assign a high priority to the split of goal conjunctions, meaning that such a split should be tried first.
 
 \paragraph{Using Selections.} Tactics always need a \lstinline$selection$ target. Moreover, some tactics require additional parameters, also to be provided as \lstinline$selection$ values. Typically, consider the \lstinline$Auto.range$ tactic:
@@ -754,14 +760,17 @@ interface of the programmatic API.
     \texttt{@<category>} of properties.
     \\
     Recognized categories are: \texttt{@lemma}, \texttt{@requires}, \texttt{@assigns},
-    \texttt{@ensures}, \texttt{@exits},  \texttt{@assert},
+    \texttt{@ensures}, \texttt{@exits}, \texttt{@assert}, \texttt{@check},
     \texttt{@invariant}, \texttt{@variant}, \texttt{@breaks},
     \texttt{@continues}, \texttt{@returns}, \\
     \texttt{\mbox{@complete\_behaviors}}, \texttt{\mbox{@disjoint\_behaviors}}.
-    \\ 
+    \\
     Properties can be prefixed with a minus sign to \emph{skip} the associated annotations.
-    For example \texttt{-wp-prop="-@assigns"} removes all \texttt{assigns} 
+    For example \texttt{-wp-prop="-@assigns"} removes all \texttt{assigns}
     and \texttt{loop assigns} properties from the selection.
+    \\
+    \textbf{Remark:} properties with name \verb+no_wp:+ are always and automatically
+    filtered and never proved by WP.
 \item [\tt -wp-(no)-status-all] includes in the goal selection all properties
   regardless of their current status (default is: \texttt{no}).
 \item [\tt -wp-(no)-status-valid] includes in the goal selection those properties
@@ -789,7 +798,7 @@ are taken into account by \textsf{WP} plug-in as follows:
 These options impact the generation of proof-obligations for the
 ``\texttt{requires}'' contract of the main entry point. More precisely, if there
 is a main entry point, \emph{and} \texttt{-lib-entry} is not set:
-\begin{itemize} 
+\begin{itemize}
 \item the global variables are set to their initial values at the
   beginning of the main entry point for all its properties to be established;
 \item special proof obligations are generated for the preconditions of the
@@ -946,7 +955,7 @@ controlled by the following options:
 \begin{description}
 \item[\tt -wp-(no)-simpl] simplifies constant
   expressions and tautologies (default is: \texttt{yes}).
-\item[\tt -wp-(no)-let] propagates equalities by substitutions 
+\item[\tt -wp-(no)-let] propagates equalities by substitutions
   and let-bindings (default is: \texttt{yes}).
 \item[\tt -wp-(no)-core] factorize common properties between branches
   (default is: \texttt{yes}).
@@ -964,7 +973,7 @@ controlled by the following options:
   (default is: \texttt{yes}).
 \item[\tt -wp-(no)-init-summarize-array] summarize contiguous initializers
   with quantified formulae (default: \texttt{yes}).
-\item[\tt -wp-(no)-simplify-is-cint] eliminates redundant constraints on integers 
+\item[\tt -wp-(no)-simplify-is-cint] eliminates redundant constraints on integers
   (default: \texttt{yes}).
 \item[\tt -wp-(no)-simplify-land-mask] tight constants in logical-and with
   unsigned integers (default: \texttt{yes}).
@@ -1037,15 +1046,15 @@ version \verb+0.99+ of the prover, but more recent versions \verb+1.01+ or
 \item[\tt -wp-prover alt-ergo] selects \textsf{Alt-Ergo}.
 \item[\tt -wp-prover altgr-ergo] opens the graphical interface of
   \textsf{Alt-Ergo} when the goal is not proved.
-\item[\tt -wp-steps <$n$>] sets the maximal number of \textsf{Alt-Ergo} 
+\item[\tt -wp-steps <$n$>] sets the maximal number of \textsf{Alt-Ergo}
   steps. This can be used as a machine-independent alternative to timeout.
 \item[\tt -wp-depth <$n$>] sets '\textit{stop}' and
   '\textit{age-limit}' parameters of \textsf{Alt-Ergo} such that $n$ cycles of
   quantifier instantiations are enabled.
 \item[\tt -wp-alt-ergo-opt <opt,...>] passes additional options to \textsf{Alt-Ergo}
   (default: none).
-\item[\tt -wp-alt-ergo='<cmd>'] override the \verb+alt-ergo+ command.  
-\item[\tt -wp-altgr-ergo='<cmd>'] override the \verb+altgr-ergo+ command.  
+\item[\tt -wp-alt-ergo='<cmd>'] override the \verb+alt-ergo+ command.
+\item[\tt -wp-altgr-ergo='<cmd>'] override the \verb+altgr-ergo+ command.
 \end{description}
 
 \hrule
@@ -1092,7 +1101,7 @@ then save the proof scripts in order to replay them in batch mode.
   This conforms to Proof General 4.3 settings.
   The project file can be changed (see below).
 \item[\tt -wp-coq-project='<name>'] override the \verb+_CoqProject+ file name
-  for Emacs and Proof General. 
+  for Emacs and Proof General.
 \end{description}
 
 \hrule
@@ -1165,9 +1174,9 @@ procedures.  This support is provided for \textsf{Alt-Ergo},
   libraries and driver files are looked for.
   The current directory (implicitly added to that list) is always looked up
   first.
-  Relative directory names are relative to the current directory except 
-  for names prefixed by the characters \texttt{++}. 
-  In such a name, the directory is relative to the main \texttt{FRAMAC\_SHARE} 
+  Relative directory names are relative to the current directory except
+  for names prefixed by the characters \texttt{++}.
+  In such a name, the directory is relative to the main \texttt{FRAMAC\_SHARE}
   directory.
 \item[\tt -wp-alt-ergo-lib <f,\ldots>] (\textbf{deprecated} use altergo.file
   in driver instead) looks for \textsf{Alt-Ergo}
@@ -1211,13 +1220,13 @@ Each driver file contains a list of bindings with the following syntax:
   \textit{group}.\textit{field} &\texttt{:=} \textit{string} \\
   \textit{group}.\textit{field} &\texttt{+=} \textit{string} \\
   \texttt{type} & \textit{symbol} & \verb'=' \user{link} \verb';' \\
-  \texttt{ctor} & \textit{type} \textit{symbol} 
+  \texttt{ctor} & \textit{type} \textit{symbol}
                    \verb'(' \textit{type}\ccc\textit{type} \verb')'
                  & \verb'=' \user{link} \verb';' \\
-  \texttt{logic} & \textit{type} \textit{symbol} 
+  \texttt{logic} & \textit{type} \textit{symbol}
                    \verb'(' \textit{type}\ccc\textit{type} \verb')'
                  & \verb'=' \textit{property-tags} \user{link} \verb';' \\
-  \texttt{predicate} & \textit{symbol} 
+  \texttt{predicate} & \textit{symbol}
                    \verb'(' \textit{type}\ccc\textit{type} \verb')'
                  & \verb'=' \user{link} \verb';'
   \end{tabular}
@@ -1250,10 +1259,10 @@ each existing signature. The same \user{link} symbol is used for all provers,
 and must be defined in the specified libraries, or in the external
 ones (see~\ref{prooflibs}).
 
-It is also possible to specify different names 
+It is also possible to specify different names
 for each prover, with the following syntax:
 \texttt{\{coq=\user{a};altergo=\user{b};why3=\user{c}\}}.
-Alternatively, a link-name can be an arbitrary string 
+Alternatively, a link-name can be an arbitrary string
 with patterns substituted by arguments, \verb="(%1+%2)"= for instance.
 
 When a library \user{lib} is specified, the loaded module depends on the
@@ -1354,9 +1363,9 @@ We only discuss \textit{WP reports} in this section.
 
 Reports are generated with the following command-line options:
 \begin{description}
-\item[\tt -wp-report <Rspec$_1$,...,Rspec$_n$>] specifies the list of 
+\item[\tt -wp-report <Rspec$_1$,...,Rspec$_n$>] specifies the list of
   reports to export.
-  Each value \texttt{Rspec$_i$} is a \textit{WP report} specification file 
+  Each value \texttt{Rspec$_i$} is a \textit{WP report} specification file
   (described below).
 \item[\tt -wp-report-basename <name>] set the basename for exported
   reports (described below).
@@ -1391,28 +1400,28 @@ among:
   where \textit{base} can be set with \texttt{-wp-report-basename} option.
 \item[\tt @ZERO "<\textit{text}>"] text to be printed for $0$-numbers. Default is \verb+"-"+.
 
-\item[\tt @GLOBAL\_SECTION "<\textit{text}>"] text to be printed for the chapter name about globals 
-\item[\tt @AXIOMATIC\_SECTION "<\textit{text}>"] text to be printed for the chapter name about axiomatics 
+\item[\tt @GLOBAL\_SECTION "<\textit{text}>"] text to be printed for the chapter name about globals
+\item[\tt @AXIOMATIC\_SECTION "<\textit{text}>"] text to be printed for the chapter name about axiomatics
 \item[\tt @FUNCTION\_SECTION "<\textit{text}>"] text to be printed for the chapter name about functions
 
-\item[\tt @AXIOMATIC\_PREFIX "<\textit{text}>"] text to be printed before axiomatic names. 
+\item[\tt @AXIOMATIC\_PREFIX "<\textit{text}>"] text to be printed before axiomatic names.
   Default is \verb+"Axiomatic"+ (with a trailing space).
 \item[\tt @FUNCTION\_PREFIX "<\textit{text}>"] text to be printed before function names. Default is empty.
 \item[\tt @GLOBAL\_PREFIX "<\textit{text}>"] text to be printed before global property names.
   Default is \verb+"(Global)"+ (with a trailing space).
-\item[\tt @LEMMA\_PREFIX "<\textit{text}>"] text to be printed before lemma names. 
+\item[\tt @LEMMA\_PREFIX "<\textit{text}>"] text to be printed before lemma names.
   Default is \verb+"Lemma"+ (with a trailing space).
-\item[\tt @PROPERTY\_PREFIX "<\textit{text}>"] text to be printed before other property names. 
+\item[\tt @PROPERTY\_PREFIX "<\textit{text}>"] text to be printed before other property names.
 \end{description}
 
 The generated report consists of several optional parts, corresponding
-to Head, Chapter and Tail sections of the wp-report specification file.  
-First, the head contents lines are produced. 
-Then the chapters and their sections are produced. 
+to Head, Chapter and Tail sections of the wp-report specification file.
+First, the head contents lines are produced.
+Then the chapters and their sections are produced.
 Finally, the Tail content lines are printed.
 
 The different chapters are about globals, axiomatics and functions.
-Outputs for these chapters can be specified using these directives: 
+Outputs for these chapters can be specified using these directives:
 \begin{description}
 \item[\tt @CHAPTER] <\textit{chapter header...>}
 \item[\tt @GLOBAL] <\textit{global section contents...>}
@@ -1432,7 +1441,7 @@ several categories of formatters (PO stands for \emph{Proof Obligations}):
 \begin{center}
   \begin{tabular}{ll}
     \textbf{Formatters} & \textbf{Description} \\
-    \hline\hline    
+    \hline\hline
     \verb+&<+{\it col}\verb+>:+ & insert spaces up to column \textit{col} \\
     \verb+&&+ & prints a \verb+"&"+ \\
     \verb+%%+ & prints a \verb+"%"+ \\
@@ -1451,7 +1460,7 @@ several categories of formatters (PO stands for \emph{Proof Obligations}):
 \begin{center}
   \begin{tabular}{ll}
     \hline
-    \textbf{Provers} \\ 
+    \textbf{Provers} \\
     (\verb+<+{\it prover}\verb+>+) & A prover name (see \texttt{-wp-prover}) \\
     \hline
     \hline
@@ -1481,7 +1490,7 @@ current names:
 \begin{center}
   \begin{tabular}{ll}
    \textbf{Names} & \textbf{Description} \\
-    \hline\hline    
+    \hline\hline
     \verb+%chapter+ & current chapter name \\
     \verb+%section+ & current section name \\
     \verb+%global+ & current global name (under the chapter about globals)\\
@@ -1521,18 +1530,17 @@ options, the user should be aware of the following precisions:
   \textsf{WP} plug-in generate proof-obligations for the selected
   properties. The values of theses options are never saved and they are
   cleared by \texttt{-then}. Hence, running \texttt{-wp-prop A}
-  \texttt{-then} \texttt{-wp-fct F} does what you expect: 
+  \texttt{-then} \texttt{-wp-fct F} does what you expect:
   properties tagged by \texttt{A} are proved only once.
 \item[\tt -wp-print, -wp-prover, -wp-gen, -wp-detect.] These options do not
   generate new proof-obligations, but run other actions on all
   previously generated ones. For the same reasons, they are not saved
   and cleared by \texttt{-then}.
 \item[\tt -wp-xxx.] All other options are tunings that can be easily
-  turned on and off or set to the desired value. 
+  turned on and off or set to the desired value.
   They are saved and kept across \texttt{-then} commands.
 \end{description}
 
 %-----------------------------------------------------------------------------
 
 % vim: spell spelllang=en
-

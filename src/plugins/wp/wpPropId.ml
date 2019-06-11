@@ -192,7 +192,7 @@ let compare_kind k1 k2 = match k1, k2 with
         if cmp <> 0 then cmp
         else
           Property.compare p1 p2
-  | _,_ -> Pervasives.compare (kind_order k1) (kind_order k2)
+  | _,_ -> Transitioning.Stdlib.compare (kind_order k1) (kind_order k2)
 
 let compare_prop_id pid1 pid2 =
   (* This order of comparison groups together prop_pids with same properties *)
@@ -204,7 +204,7 @@ let compare_prop_id pid1 pid2 =
     let cmp = compare_kind pid2.p_kind pid1.p_kind in
     if cmp <> 0 then cmp
     else
-      Pervasives.compare pid1.p_part pid2.p_part
+      Transitioning.Stdlib.compare pid1.p_part pid2.p_part
 
 module PropId =
   Datatype.Make_with_collections(
@@ -420,7 +420,8 @@ let ident_names names =
                       | _ as n -> '\"' <> (String.get n 0) ) names
 
 let code_annot_names ca = match ca.annot_content with
-  | AAssert (_, named_pred)  -> "@assert"::(ident_names named_pred.pred_name)
+  | AAssert (_, Check, named_pred)  -> "@check"::(ident_names named_pred.pred_name)
+  | AAssert (_, Assert, named_pred)  -> "@assert"::(ident_names named_pred.pred_name)
   | AInvariant (_,_,named_pred) -> "@invariant"::(ident_names named_pred.pred_name)
   | AVariant (term, _) -> "@variant"::(ident_names term.term_name)
   | AExtended(_,_,(_,name,_,_,_)) -> [Printf.sprintf "@%s" name]
@@ -588,7 +589,7 @@ let assigns_hints hs froms =
   List.iter (fun ({it_content=t},_) -> term_hints hs t) froms
 
 let annot_hints hs = function
-  | AAssert(bs,ipred) | AInvariant(bs,_,ipred) ->
+  | AAssert(bs,_,ipred) | AInvariant(bs,_,ipred) ->
       List.iter (add_hint hs) (ident_names ipred.pred_name) ;
       List.iter (add_hint hs) bs
   | AAssigns(bs,Writes froms) ->
@@ -693,29 +694,38 @@ let is_loop_preservation p =
       end
   | _ -> None
 
-let select_by_name asked_names pid =
+let user_prop_pid pid =
   let p_prop = match pid.p_kind with
     | PKPre (_,_,p_prop) -> p_prop
-    | _ -> property_of_id pid
-  in
-  let names = user_prop_names p_prop in
-  let is_minus s = try s.[0] = '-' with _ -> false in
-  let is_plus s = try s.[0] = '+' with _ -> false in
-  let remove_first s = String.sub s 1 ((String.length s) -1) in
-  let eval acc asked =
-    let is_minus,a = match acc with
-      | None -> if is_minus asked then true,true else false,false
-      | Some a -> (is_minus asked),a
-    in let eval () =
-         let asked = if is_minus || (is_plus asked) then remove_first asked else asked
-         in List.mem asked names
-    in Some (if is_minus
-             then a && (not (eval ()))
-             else a || (eval ()))
-  in
-  match List.fold_left eval None asked_names with
-  | Some false -> false
-  | _ -> true
+    | _ -> property_of_id pid in
+  user_prop_names p_prop
+
+let select_default pid =
+  let names = user_prop_pid pid in
+  not (List.mem "no_wp" names)
+
+let select_by_name asked_names pid =
+  let names = user_prop_pid pid in
+  if List.mem "no_wp" names then false
+  else
+    let is_minus s = try s.[0] = '-' with _ -> false in
+    let is_plus s = try s.[0] = '+' with _ -> false in
+    let remove_first s = String.sub s 1 ((String.length s) -1) in
+    let eval acc asked =
+      let is_minus,a = match acc with
+        | None -> if is_minus asked then true,true else false,false
+        | Some a -> (is_minus asked),a
+      in let eval () =
+           let asked = if is_minus || (is_plus asked)
+             then remove_first asked else asked
+           in List.mem asked names
+      in Some (if is_minus
+               then a && (not (eval ()))
+               else a || (eval ()))
+    in
+    match List.fold_left eval None asked_names with
+    | Some false -> false
+    | _ -> true
 
 let select_call_pre s_call asked_pre pid =
   match pid.p_kind with

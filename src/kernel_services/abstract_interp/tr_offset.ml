@@ -65,9 +65,7 @@ let reduce_offset_by_validity origin ival size validity =
   | Base.Variable v -> reduce_for_bounds Int.zero v.Base.max_alloc
 
 let trim_by_validity ?(origin=Origin.Unknown) ival size validity =
-  let alarm = not (Base.offset_is_in_validity size validity ival) in
-  let offset = reduce_offset_by_validity origin ival size validity in
-  alarm, offset
+  reduce_offset_by_validity origin ival size validity
 
 (*
 Local Variables:

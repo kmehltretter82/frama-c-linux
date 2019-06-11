@@ -14,4 +14,4 @@ let type_foo ~typing_context ~loc:_loc l =
   in
   Ext_terms res
 
-let () = Logic_typing.register_behavior_extension "foo" type_foo
+let () = Logic_typing.register_behavior_extension "foo" false type_foo

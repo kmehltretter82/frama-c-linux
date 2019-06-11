@@ -35,7 +35,7 @@ type cst =
 module STR =
 struct
   type t = cst
-  let compare = Pervasives.compare (* only comparable types *)
+  let compare = Transitioning.Stdlib.compare (* only comparable types *)
   let pretty fmt = function
     | C_str s -> Format.fprintf fmt "%S" s
     | W_str _ -> Format.fprintf fmt "\"L<...>\""

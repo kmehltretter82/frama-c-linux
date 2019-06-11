@@ -868,6 +868,44 @@ one for regular tests (if more than one \verb|OPT|).\\
 \caption{Predefined macros for ptests}\label{fig:ptests-macros}
 \end{figure}
 
+\section{Profiling with Landmarks} \label{refman:landmarks}\codeidxdef{Landmarks}
+
+{\em Landmarks}\footnote{\url{https://github.com/LexiFi/landmarks}} is a
+library for ``quick and dirty'' profiling of OCaml programs. It allows the
+insertion of annotations in the code to enable profiling of specific parts of
+it, but also an automatic mode, in which every function call is instrumented.
+The Frama-C \texttt{configure} file is setup to enable usage of this library
+when it is available (the usual way to install it is via the \texttt{landmarks}
+opam package).
+
+For quick usage of the library:
+\begin{itemize}
+\item ensure that the \texttt{configure} script detected it
+  (there should be a line \texttt{checking for Landmarks... found});
+\item enable instrumentation {\em when compiling Frama-C's files}, that is,
+  when running \texttt{make}, by setting the environment variable
+  \verb+OCAML_LANDMARKS+. For instance, to enable automatic instrumentation
+  of every Frama-C function (note: this increases compilation time of Frama-C),
+  run:
+
+\begin{lstlisting}
+    OCAML_LANDMARKS=auto make
+\end{lstlisting}
+
+\item enable instrumentation {\em during execution} of Frama-C, again using
+  \verb+OCAML_LANDMARKS+. Note that the \texttt{auto} parameter here is
+  implicit if you enabled it on the previous step.
+  For instance, run:
+
+  \begin{lstlisting}
+    OCAML_LANDMARKS= bin/frama-c [files] [options]
+  \end{lstlisting}
+\end{itemize}
+
+Commonly used options include \verb+output=landmarks.log+ to output the result
+to a file instead of \texttt{stderr}.
+Check \url{https://github.com/LexiFi/landmarks} for its documentation.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Local Variables:
 %%% TeX-master: "developer.tex"

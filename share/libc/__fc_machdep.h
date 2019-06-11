@@ -447,6 +447,7 @@
 /* Note: MSVC does not define this constant, but because it is used in an ACSL
    specification, it is safer to define it anyway. */
 #define __FC_HOST_NAME_MAX 255
+#define __FC_TTY_NAME_MAX 32
 
 /* Optional */
 #define __INT8_T signed char

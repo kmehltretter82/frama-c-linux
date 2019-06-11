@@ -61,6 +61,7 @@ module F : sig
 end
 
 include Float_interval_sig.S with type float := F.t
+                              and type widen_hints := Fc_float.widen_hints
 
 val round_to_single_precision_float : t -> t
 

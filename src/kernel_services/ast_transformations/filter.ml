@@ -447,7 +447,7 @@ end = struct
           Printer.pp_code_annotation v;
         ChangeTo
           (Logic_const.new_code_annotation
-             (AAssert ([],
+             (AAssert ([], Assert,
                        { pred_name = []; pred_loc = Cil_datatype.Location.unknown;
                          pred_content = Ptrue})))
       end

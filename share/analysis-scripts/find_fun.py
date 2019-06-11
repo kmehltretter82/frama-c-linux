@@ -4,7 +4,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2018                                               #
+#  Copyright (C) 2007-2019                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -101,8 +101,8 @@ else:
    if possible_declarators != []:
       print("Possible declarations for function '%s' in the following file(s):"
             % fname)
-      print("  " + "\n  ".join(possible_declarators))
+      print("  " + "\n  ".join(map(os.path.relpath, possible_declarators)))
    if possible_definers != []:
       print("Possible definitions for function '%s' in the following file(s):"
             % fname)
-      print("  " + "\n  ".join(possible_definers))
+      print("  " + "\n  ".join(map(os.path.relpath, possible_definers)))

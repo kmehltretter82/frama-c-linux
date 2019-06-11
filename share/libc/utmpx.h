@@ -26,7 +26,7 @@
 __PUSH_FC_STDLIB
 
 #include "__fc_define_pid_t.h"
-#include <sys/time.h>
+#include "sys/time.h"
 
 __BEGIN_DECLS
 

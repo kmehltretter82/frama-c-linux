@@ -1,6 +1,6 @@
 /* run.config
    EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
-   OPT: -load-module @PTEST_DIR@/@PTEST_NAME@ -eva-show-progress
+   OPT: @EVA_CONFIG@ -load-module @PTEST_DIR@/@PTEST_NAME@
 */
 
 int* f() {

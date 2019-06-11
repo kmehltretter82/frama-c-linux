@@ -96,7 +96,9 @@ class virtual do_it_ = object(self)
             self#do_assign lv;
             ignore (visitFramacExpr (self:>frama_c_visitor) e)
           | CompoundInit (ct,initl) ->
-            let implicit = true in
+            (* No need to consider implicit zero-initializers, for which
+               nothing is read. *)
+            let implicit = false in
             let doinit o i _ () =
               ignore (visitFramacOffset (self:>frama_c_visitor) o);
               aux (Cil.addOffsetLval o lv) i

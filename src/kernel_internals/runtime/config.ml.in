@@ -97,6 +97,4 @@ let preprocessor_keep_comments =
 let compilation_unit_names = [@COMPILATION_UNITS@]
 let library_names = [@LIBRARY_NAMES@]
 
-let has_yojson = @HAS_YOJSON@
-
 let dot = @OPTDOT@

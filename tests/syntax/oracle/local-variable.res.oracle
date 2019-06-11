@@ -11,4 +11,17 @@ int main(void)
   return __retres;
 }
 
+void f(void)
+{
+  return;
+}
+
+int c;
+int g(void)
+{
+  int __retres;
+  __retres = 1;
+  return __retres;
+}
+
 

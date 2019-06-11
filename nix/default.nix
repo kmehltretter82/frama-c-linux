@@ -1,9 +1,9 @@
 # paramaterised derivation with dependencies injected (callPackage style)
 { pkgs, stdenv, src ? ../., opam2nix, ocaml_version ? "ocaml-ng.ocamlPackages_4_05.ocaml", plugins ? { } }:
 
-let mk_buildInputs = { opamPackages ? [] } :
-    [ pkgs.gnugrep pkgs.gnused  pkgs.autoconf pkgs.gnumake pkgs.gcc pkgs.ncurses pkgs.time pkgs.python3 pkgs.perl] ++ opam2nix.build {
-           specs = opam2nix.toSpecs ([ "ocamlfind" "zarith" "ocamlgraph"
+let mk_buildInputs = { opamPackages ? [], nixPackages ? [] } :
+    [ pkgs.gnugrep pkgs.gnused  pkgs.autoconf pkgs.gnumake pkgs.gcc pkgs.ncurses pkgs.time pkgs.python3 pkgs.perl pkgs.file ] ++ nixPackages ++ opam2nix.build {
+           specs = opam2nix.toSpecs ([ "ocamlfind" "zarith" "ocamlgraph" "yojson"
                 { name = "coq"; constraint = "=8.7.2"; }
                 ] ++ opamPackages ++
                 (if ocaml_version == "pkgs.ocaml-ng.ocamlPackages_4_02.ocaml"
@@ -15,7 +15,7 @@ let mk_buildInputs = { opamPackages ? [] } :
 in
 
 rec {
-  inherit src;
+  inherit src mk_buildInputs;
   buildInputs = mk_buildInputs {};
   installed = main.out;
   main = stdenv.mkDerivation {
@@ -63,7 +63,7 @@ rec {
   lint = stdenv.mkDerivation {
         name = "frama-c-lint";
         inherit src;
-        buildInputs = (mk_buildInputs {opamPackages = [ "ocp-indent" ];} ) ++ [ pkgs.bc plugins.headache.installed pkgs.file ];
+        buildInputs = (mk_buildInputs {opamPackages = [ "ocp-indent" ];} ) ++ [ pkgs.bc plugins.headache.installed ];
         outputs = [ "out" ];
         postPatch = ''
                patchShebangs .
@@ -105,10 +105,11 @@ rec {
         '';
   };
 
-  distrib = stdenv.mkDerivation {
-        name = "frama-c-distrib";
+  build-distrib-tarball = stdenv.mkDerivation {
+        name = "frama-c-build-distrib-tarball";
         inherit src;
         buildInputs = buildInputs ++ [ plugins.headache.installed ];
+        outputs = [ "out" ];
         postPatch = ''
                patchShebangs .
         '';
@@ -119,16 +120,19 @@ rec {
         '';
         buildPhase = ''
                 make DISTRIB="frama-c-archive" src-distrib
+                tar -zcf frama-c-tests-archive.tar.gz tests src/plugins/*/tests
         '';
         installPhase = ''
-               tar -C $out --strip-components=1 -xf frama-c-archive.tar.gz
+               tar -C $out --strip-components=1 -xzf frama-c-archive.tar.gz
+               tar -C $out -xzf frama-c-tests-archive.tar.gz
         '';
   };
 
-  tests-distrib = stdenv.mkDerivation {
-        name = "frama-c-tests-distrib";
-        inherit distrib buildInputs;
-        outputs = [ "out" "build_dir" ];
+  build-from-distrib-tarball = stdenv.mkDerivation {
+        name = "frama-c-build-from-distrib-tarball";
+        inherit buildInputs;
+        src = build-distrib-tarball.out ;
+        outputs = [ "out" ];
         configurePhase = ''
                unset CC
                autoconf
@@ -136,10 +140,9 @@ rec {
         '';
         buildPhase = ''
                 make -j 4
-                make tests -j4 PTESTS_OPTS="-error-code -j 4"
         '';
         installPhase = ''
-               make install
+               true
         '';
   };
 
@@ -147,7 +150,7 @@ rec {
         name = "frama-c-wp-qualif";
         buildInputs = mk_buildInputs { opamPackages = [
                     { name = "alt-ergo"; constraint = "=2.0.0"; }
-                    { name = "why3" ; constraint = "=0.88.3"; }
+                    { name = "why3" ; constraint = "=1.1.1"; }
                ]; };
         build_dir = main.build_dir;
         src = main.build_dir + "/dir.tar";
@@ -176,7 +179,7 @@ rec {
         inherit src;
         buildInputs = (mk_buildInputs { opamPackages = [ "xml-light" ];} ) ++
                     [ pkgs.getopt pkgs.which
-                      pkgs.libxslt pkgs.libxml2 pkgs.file pkgs.autoPatchelfHook stdenv.cc.cc.lib
+                      pkgs.libxslt pkgs.libxml2 pkgs.autoPatchelfHook stdenv.cc.cc.lib
         ];
         counter_examples_src = plugins.counter-examples.src;
         genassigns_src = plugins.genassigns.src;

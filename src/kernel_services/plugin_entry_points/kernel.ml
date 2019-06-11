@@ -82,6 +82,7 @@ let dkey_loops = register_category "natural-loops"
 
 let dkey_parser = register_category "parser"
 let dkey_rmtmps = register_category "parser:rmtmps"
+let dkey_referenced = register_category "parser:referenced"
 
 let dkey_pp = register_category "pp"
 let dkey_compilation_db = register_category "pp:compilation-db"
@@ -144,6 +145,9 @@ let wkey_incompatible_types_call =
 
 let wkey_incompatible_pointer_types =
   register_warn_category "typing:incompatible-pointer-types"
+
+let wkey_int_conversion =
+  register_warn_category "typing:int-conversion"
 
 let wkey_cert_exp_46 = register_warn_category "CERT:EXP:46"
 
@@ -1020,47 +1024,19 @@ module C11 =
 
 let () = Parameter_customize.set_group parsing
 let () = Parameter_customize.do_not_reset_on_copy ()
-module JsonCompilationDatabaseOption =
+module JsonCompilationDatabase =
   String
     (struct
-      let module_name = "JsonCompilationDatabaseOption"
+      let module_name = "JsonCompilationDatabase"
       let option_name = "-json-compilation-database"
       let default = ""
       let arg_name = "path"
       let help =
-        if Fc_config.has_yojson then
-          "when set, preprocessing of each file will include corresponding \
-           flags (e.g. -I, -D) from the JSON compilation database \
-           specified by <path>. If <path> is a directory, use \
-           '<path>/compile_commands.json'. Disabled by default. \
-           NOTE: this requires Frama-C to be compiled with yojson support."
-        else
-          "Unsupported: recompile Frama-C with Yojson library to enable it"
+        "when set, preprocessing of each file will include corresponding \
+         flags (e.g. -I, -D) from the JSON compilation database \
+         specified by <path>. If <path> is a directory, use \
+         '<path>/compile_commands.json'. Disabled by default."
     end)
-
-(* This module holds the real value of the option. It is only updated
-   if Yojson support has been compiled. Otherwise, attempt to use
-   -json-compilation-database results in a warning.
-*)
-module JsonCompilationDatabase =
-  State_builder.Ref(Datatype.String)
-    (struct
-      let name = "JsonCompilationDatabase"
-      let dependencies = [ JsonCompilationDatabaseOption.self ]
-      let default () = ""
-    end)
-
-let () =
-  if Fc_config.has_yojson then
-    JsonCompilationDatabaseOption.add_set_hook
-      (fun _ new_opt -> JsonCompilationDatabase.set new_opt)
-  else begin
-      JsonCompilationDatabaseOption.add_set_hook
-        (fun _ _ ->
-           warning ~once:true
-             "trying to set -json-compilation-database even though Yojson \
-              is not available. Ignoring argument.")
-    end
 
 (* ************************************************************************* *)
 (** {2 Customizing Normalization} *)
@@ -1109,13 +1085,15 @@ module LogicalOperators =
 let () = Parameter_customize.set_group normalisation
 let () = Parameter_customize.do_not_reset_on_copy ()
 module Enums =
-  P.Empty_string
+  P.String
     (struct
       let option_name = "-enums"
       let arg_name = "repr"
+      let default = "gcc-enums"
       let help = 
         "use <repr> to decide how enumerated types should be represented. \
-         -enums help gives the list of available representations"
+         -enums help gives the list of available representations (default: "
+        ^ default ^ ")"
      end)
 let enum_reprs = ["gcc-enums"; "gcc-short-enums"; "int";]
 let () = Enums.set_possible_values ("help"::enum_reprs)

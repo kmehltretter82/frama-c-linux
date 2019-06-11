@@ -69,7 +69,11 @@
 [variadic] tests/known/printf_wrong_types.c:35: 
   Translating call to printf to a call to the specialized version printf_va_15.
 [variadic] tests/known/printf_wrong_types.c:35: Warning: 
-  Incorrect type for argument 2. The argument will be cast from RC (unsigned int) to unsigned int.
+  Possible portability issues with enum type for argument 2 (use -variadic-no-strict to avoid this warning).
+[variadic] tests/known/printf_wrong_types.c:36: 
+  Translating call to printf to a call to the specialized version printf_va_16.
+[variadic] tests/known/printf_wrong_types.c:36: Warning: 
+  Incorrect type for argument 2. The argument will be cast from RC (unsigned int) to int.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -298,6 +302,19 @@ int printf_va_14(char const * __restrict format, int param0);
  */
 int printf_va_15(char const * __restrict format, unsigned int param0);
 
+/*@ requires valid_read_string(format);
+    assigns \result, __fc_stdout->__fc_FILE_data;
+    assigns \result
+      \from (indirect: __fc_stdout->__fc_FILE_id),
+            __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..))),
+            param0;
+    assigns __fc_stdout->__fc_FILE_data
+      \from (indirect: __fc_stdout->__fc_FILE_id),
+            __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..))),
+            param0;
+ */
+int printf_va_16(char const * __restrict format, int param0);
+
 int main(void)
 {
   int __retres;
@@ -325,6 +342,7 @@ int main(void)
   printf_va_14("%d",(int)string);
   RC rc = OK;
   printf_va_15("%u",rc);
+  printf_va_16("%d",(int)rc);
   __retres = 0;
   return __retres;
 }
@@ -386,6 +404,7 @@ int main(void)
   printf("%d",string);
   RC rc = OK;
   printf("%u",rc);
+  printf("%d",rc);
   __retres = 0;
   return __retres;
 }
@@ -453,6 +472,10 @@ int main(void)
   Incorrect type for argument 2. The argument will be cast from char * to int.
 [variadic] tests/known/printf_wrong_types.c:35: 
   Translating call to printf to a call to the specialized version printf_va_15.
+[variadic] tests/known/printf_wrong_types.c:36: 
+  Translating call to printf to a call to the specialized version printf_va_16.
+[variadic] tests/known/printf_wrong_types.c:36: Warning: 
+  Incorrect type for argument 2. The argument will be cast from RC (unsigned int) to int.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -681,6 +704,19 @@ int printf_va_14(char const * __restrict format, int param0);
  */
 int printf_va_15(char const * __restrict format, unsigned int param0);
 
+/*@ requires valid_read_string(format);
+    assigns \result, __fc_stdout->__fc_FILE_data;
+    assigns \result
+      \from (indirect: __fc_stdout->__fc_FILE_id),
+            __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..))),
+            param0;
+    assigns __fc_stdout->__fc_FILE_data
+      \from (indirect: __fc_stdout->__fc_FILE_id),
+            __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..))),
+            param0;
+ */
+int printf_va_16(char const * __restrict format, int param0);
+
 int main(void)
 {
   int __retres;
@@ -708,6 +744,7 @@ int main(void)
   printf_va_14("%d",(int)string);
   RC rc = OK;
   printf_va_15("%u",rc);
+  printf_va_16("%d",(int)rc);
   __retres = 0;
   return __retres;
 }

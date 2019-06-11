@@ -11,7 +11,8 @@
 [wp] Proved goals:    1 / 1
   Qed:             0 
   Alt-Ergo:        1
-[wp] Report 'tests/wp_plugin/float_real.i.0.report.json'
+[wp] Report in:  'tests/wp_plugin/oracle_qualif/float_real.0.report.json'
+[wp] Report out: 'tests/wp_plugin/result_qualif/float_real.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
 dequal              -       1 (12..24)       1       100%

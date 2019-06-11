@@ -73,7 +73,7 @@ class iformat =
 (* --- Goal Panel                                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
-class pane (proverpane : GuiConfig.provers) =
+class pane (enabled : GuiConfig.enabled) =
   let icon = new Widget.image GuiProver.no_status in
   let status = new Widget.label () in
   let text = new Wtext.text () in
@@ -82,12 +82,7 @@ class pane (proverpane : GuiConfig.provers) =
   let composer = new GuiComposer.composer printer in
   let browser = new GuiComposer.browser printer in
   let layout = new Wutil.layout in
-  let scroll_palette =
-    GBin.scrolled_window ~vpolicy:`AUTOMATIC ~hpolicy:`NEVER ()
-  in
-  let scroll_palette_widget = new Wutil.gobj_widget scroll_palette in
   let palette = new Wpalette.panel () in
-  let () = scroll_palette#add_with_viewport palette#coerce in
   let help = new Widget.button
     ~label:"Tactics" ~border:false ~tooltip:"List Available Tactics" () in
   let delete = new Widget.button
@@ -122,12 +117,17 @@ class pane (proverpane : GuiConfig.provers) =
                     w play_script ; w save_script ;
                     w ~padding:6 icon ; h ~padding:6 status ]
                   [ w help ; w delete ]) in
-        layout#populate (Wbox.panel ~top:toolbar ~right:scroll_palette_widget text) ;
+        let content = Wbox.split ~dir:`HORIZONTAL
+            text#widget (Wbox.scroll palette#widget) in
+        Wutil.later (fun () ->
+            Config.config_float ~key:"GuiGoal.palette" ~default:0.8 content
+          );
+        layout#populate (Wbox.panel ~top:toolbar content#widget) ;
         provers <-
           VCS.([ new GuiProver.prover ~console:text ~prover:AltErgo ] @
                List.map
-                 (fun dp -> new GuiProver.prover text (ProverWhy3.prover dp))
-                 proverpane#get) ;
+                 (fun dp -> new GuiProver.prover text (Why3 dp))
+                 enabled#get) ;
         List.iter (fun p -> palette#add_tool p#tool) provers ;
         palette#add_tool strategies#tool ;
         Strategy.iter strategies#register ;
@@ -137,11 +137,11 @@ class pane (proverpane : GuiConfig.provers) =
              tactics <- gtac :: tactics ;
              palette#add_tool gtac#tool) ;
         tactics <- List.rev tactics ;
-        self#register_provers proverpane#get ;
+        self#register_provers enabled#get ;
         printer#on_selection (fun () -> self#update) ;
         scripter#on_click self#goto ;
         scripter#on_backtrack self#backtrack ;
-        proverpane#connect self#register_provers ;
+        enabled#connect self#register_provers ;
         delete#connect (fun () -> self#interrupt ProofEngine.reset) ;
         cancel#connect (fun () -> self#interrupt ProofEngine.cancel) ;
         forward#connect (fun () -> self#forward) ;
@@ -292,7 +292,7 @@ class pane (proverpane : GuiConfig.provers) =
     method private register_provers dps =
       begin
         (* register missing provers *)
-        let prvs = List.map ProverWhy3.prover dps in
+        let prvs = List.map (fun p -> VCS.Why3 p) dps in
         (* set visible provers *)
         List.iter
           (fun prover ->

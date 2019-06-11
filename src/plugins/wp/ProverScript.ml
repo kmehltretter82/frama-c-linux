@@ -47,7 +47,7 @@ struct
     let sa = stage a in
     let sb = stage b in
     if sa = sb
-    then Pervasives.compare (time a) (time b)
+    then Transitioning.Stdlib.compare (time a) (time b)
     else sa - sb
 
   let sort script = List.stable_sort compare script

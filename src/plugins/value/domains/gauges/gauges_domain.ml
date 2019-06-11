@@ -291,7 +291,7 @@ module G = struct
       let decide _ _ _ = assert false in
       join ~cache ~symmetric:true ~idempotent:false ~decide
 
-    let empty_wh = Integer.zero, (fun _ -> Ival.Widen_Hints.empty)
+    let empty_wh = Integer.zero, (fun _ -> Ival.Widen_Hints.empty, Fc_float.Widen_Hints.empty)
 
     let widen =
       let cache = cache_name "MV.widen" in
@@ -502,7 +502,7 @@ module G = struct
 
         let compare ii1 ii2 = match ii1, ii2 with
           | PreciseIteration i1, PreciseIteration i2 ->
-            Pervasives.compare i1 i2
+            Transitioning.Stdlib.compare i1 i2
           | MultipleIterations i1, MultipleIterations i2 ->
             MultipleIterations.compare i1 i2
           | PreciseIteration _, MultipleIterations _ -> -1
@@ -1174,27 +1174,6 @@ module D_Impl : Abstract_domain.S_with_Structure
        and type valuation := Valuation.t
   = struct
 
-    let update _valuation st = st (* TODO? *)
-
-    exception Unassignable
-
-    let assign _kinstr lv e _assignment valuation (state:state) =
-      let to_loc lv =
-        match Valuation.find_loc valuation lv with
-        | `Value r -> Precise_locs.imprecise_location r.loc
-        | `Top -> raise Unassignable
-      in
-      let to_val e =
-        match Valuation.find valuation e with
-        | `Top -> raise Unassignable
-        | `Value v ->
-          match v.value.initialized, v.value.escaping, v.value.v with
-          | true, false, `Value v -> v
-          | _ -> raise Unassignable
-      in
-      try `Value (G.assign to_loc to_val lv.lval e state)
-      with Unassignable -> `Value (kill lv.lloc state)
-
     let assume_exp valuation e r state =
       if r.reductness = Created || r.reductness = Reduced then
         match e.enode with
@@ -1220,9 +1199,31 @@ module D_Impl : Abstract_domain.S_with_Structure
     let assume_exp_bot valuation e r state =
       state >>- assume_exp valuation e r
 
-    let assume _ _ _ valuation state =
+    let update valuation state =
       let assume_one = assume_exp_bot valuation in
       Valuation.fold assume_one valuation (`Value state)
+
+    let assume _ _ _ = update
+
+    exception Unassignable
+
+    let assign _kinstr lv e _assignment valuation (state:state) =
+      update valuation state >>- fun state ->
+      let to_loc lv =
+        match Valuation.find_loc valuation lv with
+        | `Value r -> Precise_locs.imprecise_location r.loc
+        | `Top -> raise Unassignable
+      in
+      let to_val e =
+        match Valuation.find valuation e with
+        | `Top -> raise Unassignable
+        | `Value v ->
+          match v.value.initialized, v.value.escaping, v.value.v with
+          | true, false, `Value v -> v
+          | _ -> raise Unassignable
+      in
+      try `Value (G.assign to_loc to_val lv.lval e state)
+      with Unassignable -> `Value (kill lv.lloc state)
 
     let finalize_call _stmt _call ~pre ~post =
       let state =
@@ -1238,8 +1239,9 @@ module D_Impl : Abstract_domain.S_with_Structure
         match function_calls_handling with
         | FullInterprocedural -> update valuation state
         | IntraproceduralAll
-        | IntraproceduralNonReferenced -> G.empty
+        | IntraproceduralNonReferenced -> `Value G.empty
       in
+      state >>- fun state ->
       (* track [arg.formal] into [state]. Important for functions that
          receive a size as argument. *)
       let aux_arg state arg =

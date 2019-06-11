@@ -100,7 +100,7 @@ module Properties =
       let arg_name = "p,..."
       let help = "Select properties having the one of the given tagnames (defaults to all properties).\n\
                   You may also replace the tagname by '@category' for the selection of all properties of the given category.\n\
-                  Accepted categories are: lemmas, requires, assigns, ensures, exits, complete_behaviors, disjoint_behaviors assert, invariant, variant, breaks, continues, returns.\n\
+                  Accepted categories are: lemmas, requires, assigns, ensures, exits, complete_behaviors, disjoint_behaviors, assert, check, invariant, variant, breaks, continues, returns.\n\
                   Starts by a minus character to remove properties from the selection."
     end)
 let () = on_reset Properties.clear
@@ -221,14 +221,6 @@ module ExtEqual =
   False(struct
     let option_name = "-wp-extensional"
     let help = "Use extensional equality on compounds (hypotheses only)."
-  end)
-
-let () = Parameter_customize.set_group wp_model
-let () = Parameter_customize.is_invisible () (* experimental option *)
-module BoolRange =
-  False(struct
-    let option_name = "-wp-bool-range"
-    let help = "Assumes _Bool values have no trap representations."
   end)
 
 let () = Parameter_customize.set_group wp_model
@@ -897,17 +889,6 @@ module Check =
   end)
 let () = on_reset Print.clear
 
-let () = Parameter_customize.set_group wp_po
-let () = Parameter_customize.do_not_save ()
-let () = Parameter_customize.is_invisible ()
-module Assert_check_only =
-  False (struct
-    let option_name = "-wp-assert-check-only"
-    let help =
-      "Turns assertions into labels."
-  end)
-let () = on_reset Print.clear
-
 (* -------------------------------------------------------------------------- *)
 (* --- OS environment variables                                           --- *)
 (* -------------------------------------------------------------------------- *)
@@ -920,7 +901,6 @@ let active_unless_rte option =
   else true
 
 let get_overflows () = Overflows.get () && active_unless_rte "-wp-overflows"
-let get_bool_range () = BoolRange.get () && active_unless_rte "-wp-bool-range"
 
 let dkey = register_category "env"
 

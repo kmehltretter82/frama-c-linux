@@ -63,10 +63,16 @@ open Cil_types
 open Cil_datatype
 
 let stripUnderscore s =
-  let res = Extlib.strip_underscore s in
-  if res = "" then
-    Kernel.error ~once:true ~current:true "Invalid attribute name %s" s;
-  res
+  if String.length s = 1 then begin
+    if s = "_" then
+      Kernel.error ~once:true ~current:true "Invalid attribute name %s" s;
+    s
+  end else begin
+    let res = Extlib.strip_underscore s in
+    if res = "" then
+      Kernel.error ~once:true ~current:true "Invalid attribute name %s" s;
+    res
+  end
 
 let frama_c_keep_block = "FRAMA_C_KEEP_BLOCK"
 let () = Cil_printer.register_shallow_attribute frama_c_keep_block
@@ -325,8 +331,15 @@ let process_stdlib_pragma name args =
 let fc_stdlib_attribute attrs =
   let s = get_current_stdheader () in
   if s = "" then attrs
-  else Cil.addAttribute (Attr (fc_stdlib, [AStr s])) attrs
-
+  else begin
+    let payload, attrs =
+      if Cil.hasAttribute fc_stdlib attrs then begin
+        AStr s :: Cil.findAttribute fc_stdlib attrs,
+        Cil.dropAttribute fc_stdlib attrs
+      end else [AStr s], attrs
+    in
+    Cil.addAttribute (Attr (fc_stdlib, payload)) attrs
+  end
 (* ICC align/noalign pragmas (not supported by GCC/MSVC with this syntax).
    Implemented by translating them to 'aligned' attributes. Currently,
    only default and noalign are supported, not explicit alignment values.
@@ -841,13 +854,26 @@ let env : (string, envdata * location) H.t = H.create 307
 (* We also keep a global environment. This is always a subset of the env *)
 let genv : (string, envdata * location) H.t = H.create 307
 
+let label_env = Datatype.String.Hashtbl.create 307
+
+let add_label_env lab =
+  let add_if_absent v (d,_) map =
+    match d with
+    | EnvVar vi when not (Datatype.String.Map.mem v map) ->
+      Datatype.String.Map.add v vi map
+    | _ -> map
+  in
+  let lab_env = H.fold add_if_absent env Datatype.String.Map.empty in
+  Datatype.String.Hashtbl.add label_env lab lab_env
+
+let remove_label_env lab =
+  Datatype.String.Hashtbl.remove label_env lab
+
 (* In the scope we keep the original name, so we can remove them from the
  * hash table easily *)
 type undoScope =
     UndoRemoveFromEnv of string
-  | UndoResetAlphaCounter of location Alpha.alphaTableData ref *
-                             location Alpha.alphaTableData
-  | UndoRemoveFromAlphaTable of string * string
+  | UndoAlphaEnv of location Alpha.undoAlphaElement list
 
 let scopes :  undoScope list ref list ref = ref []
 
@@ -859,14 +885,10 @@ let declared_in_current_scope s =
   | cur_scope :: _ ->
     let names_declared_in_current_scope =
       Extlib.filter_map
-        (fun us ->
-           match us with
-           | UndoRemoveFromEnv _ | UndoRemoveFromAlphaTable _ -> true
-           | UndoResetAlphaCounter _ -> false)
-        (fun us ->
-           match us with
-           | UndoRemoveFromEnv s | UndoRemoveFromAlphaTable (s,_) -> s
-           | UndoResetAlphaCounter _ -> assert false (* already filtered *)
+        (function UndoRemoveFromEnv _  -> true | UndoAlphaEnv _ -> false)
+        (function
+          | UndoRemoveFromEnv s -> s
+          | UndoAlphaEnv _ -> assert false (* already filtered *)
         ) !cur_scope
     in
     List.mem s names_declared_in_current_scope
@@ -951,29 +973,24 @@ let newAlphaName (globalscope: bool) (* The name should have global scope *)
    * the top-most scope (that of the enclosing function) *)
   let rec findEnclosingFun = function
       [] -> (* At global scope *) None
-    | [s] -> begin
-        let prefix, infix = Alpha.getAlphaPrefix lookupname in
-        try
-          let infixes = H.find alphaTable prefix in
-          let countref = H.find infixes infix in
-          s := (UndoResetAlphaCounter (countref, !countref)) :: !s; Some s
-        with Not_found ->
-          s := (UndoRemoveFromAlphaTable (prefix, infix)) :: !s; Some s;
-      end
+    | [s] -> Some s
     | _ :: rest -> findEnclosingFun rest
   in
   let undo_scope =
     if not globalscope then findEnclosingFun !scopes else None
   in
-  let newname, oldloc =
-    Alpha.newAlphaName alphaTable lookupname (CurrentLoc.get ())
+  let undolist =
+    match undo_scope with None -> None | Some _ -> Some (ref [])
   in
+  let data = CurrentLoc.get () in
+  let newname, oldloc =
+    Alpha.newAlphaName ~alphaTable ?undolist ~lookupname ~data
+  in
+  (match undo_scope, undolist with
+   | None, None -> ()
+   | Some s, Some l -> s := (UndoAlphaEnv !l) :: !s
+   | _ -> assert false (* by construction, both options have the same status*));
   if newname <> lookupname then begin
-    (match undo_scope with
-     | None -> ()
-     | Some s ->
-       let newpre, newinf = Alpha.getAlphaPrefix newname in
-       s := (UndoRemoveFromAlphaTable (newpre, newinf)) :: !s);
     try
       let info =
         if !scopes = [] then begin
@@ -1021,6 +1038,7 @@ let constrExprId = ref 0
 
 
 let startFile () =
+  Datatype.String.Hashtbl.clear label_env;
   H.clear env;
   H.clear genv;
   H.clear alphaTable;
@@ -1162,10 +1180,7 @@ let mkAddrOfAndMark loc ((b, off) as lval) : exp =
   begin match lastOffset off with
     | NoOffset ->
       (match b with
-       | Var vi ->
-         (* Do not mark arrays as having their address taken. *)
-         if not (isArrayType vi.vtype) then
-           vi.vaddrof <- true
+       | Var vi -> vi.vaddrof <- true
        | _ -> ())
     | Index _ -> ()
     | Field(fi,_) -> fi.faddrof <- true
@@ -1173,15 +1188,12 @@ let mkAddrOfAndMark loc ((b, off) as lval) : exp =
   mkAddrOf ~loc lval
 
 (* Call only on arrays *)
-let mkStartOfAndMark loc ((_b, _off) as lval) : exp =
+let mkStartOfAndMark loc ((b, _off) as lval) : exp =
   (* Mark the vaddrof flag if b is a variable *)
-  (* Do not mark arrays as having their address taken.
-     (match b with
-     | Var vi -> vi.vaddrof <- true
-     | _ -> ());
-  *)
-  let res = new_exp ~loc (StartOf lval) in
-  res
+  (match b with
+   | Var vi -> vi.vaddrof <- true
+   | _ -> ());
+  new_exp ~loc (StartOf lval)
 
 (* Keep a set of self compinfo for composite types *)
 let compInfoNameEnv : (string, compinfo) H.t = H.create 113
@@ -1503,13 +1515,13 @@ struct
       try
         ref (H.find labels s)
       with Not_found when List.mem s !label_current ->
-        let my_ref =
-          ref
-            (mkEmptyStmt
-               (* just a placeholder that will never be used. no need to
-                  check for ghost status here. *)
-               ~ghost:false ~valid_sid ~loc:(cabslu "_find_label") ())
+        (* just a placeholder that will never be used. no need to
+           check for ghost status here. *)
+        let my_stmt =
+          mkEmptyStmt ~ghost:false ~valid_sid ~loc:(cabslu "_find_label") ()
         in
+        my_stmt.labels <- [Label(s,cabslu "_find_label",true)];
+        let my_ref = ref my_stmt in
         addGoto s my_ref; my_ref
   end
 
@@ -1616,12 +1628,25 @@ struct
       (fun (stmt, _, _, _, _) -> ignore (Cil.visitCilStmt vis stmt))
       c.stmts
 
-  (* if we're about to drop a chunk, clean up locals of current func. *)
-  let clean_up_chunk_locals c =
+  let remove_locals l =
     !currentFunctionFDEC.slocals <-
       List.filter
-        (fun x -> not (List.exists (Cil_datatype.Varinfo.equal x) c.locals))
+        (fun x -> not (List.exists (Cil_datatype.Varinfo.equal x) l))
         !currentFunctionFDEC.slocals
+
+  let clean_up_block_locals (s, _, _, _, _) =
+    let vis =
+      object
+        inherit Cil.nopCilVisitor
+        method! vblock b = remove_locals b.blocals; DoChildren
+      end
+    in
+    ignore (Cil.visitCilStmt vis s)
+
+  (* if we're about to drop a chunk, clean up locals of current func. *)
+  let clean_up_chunk_locals c =
+    remove_locals c.locals;
+    List.iter clean_up_block_locals c.stmts
 
   (* Gathers locals of blocks. *)
   class locals_visitor () = object
@@ -2705,9 +2730,11 @@ let rec castTo ?(fromsource=false)
     | TPtr (TFun (_,args,va,_),_), TPtr(TFun (_,args',va',_),_) ->
       (* Checks on casting from a function type into another one.
          We enforce at least the same number of arguments, and emit a warning
-         if types do not match.
-      *)
-      if va <> va' || bigger_length_args args args' then
+         if types do not match. Note that empty argument lists are always
+         compatible. *)
+      if (va <> va' || bigger_length_args args args') &&
+         (args <> None && args' <> None)
+      then
         error
           "conversion between function types with \
            different number of arguments:@ %a@ and@ %a"
@@ -2737,7 +2764,6 @@ let rec castTo ?(fromsource=false)
     (* Taking numerical address or calling an absolute location. Also
        accepted by gcc albeit with a warning. *)
     | TInt _, TPtr (TFun _, _) -> result
-    | TPtr (TFun _, _), TInt _ -> result
 
     (* pointer to potential function type. Note that we do not
        use unrollTypeDeep above in order to avoid needless divergence with
@@ -2770,7 +2796,14 @@ let rec castTo ?(fromsource=false)
 
     | TInt _, TPtr _ -> result
 
-    | TPtr _, TInt _ -> result
+    | TPtr _, TInt _ ->
+      if not fromsource
+      then
+        Kernel.warning
+          ~wkey:Kernel.wkey_int_conversion
+          ~current:true
+          "Conversion from a pointer to an integer without an explicit cast";
+      result
 
     | TArray _, TPtr _ -> result
 
@@ -2859,8 +2892,8 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
          * local. This can happen when we declare an extern variable with
          * global scope but we are in a local scope. *)
       Kernel.debug ~dkey:Kernel.dkey_typing_global
-        "makeGlobalVarinfo isadef=%B vi.vname=%s(%d)"
-        isadef vi.vname vi.vid;
+        "makeGlobalVarinfo isadef=%B vi.vname=%s(%d), vreferenced=%B"
+        isadef vi.vname vi.vid vi.vreferenced;
       (* This may throw an exception Not_found *)
       let oldvi, oldloc = lookupGlobalVar vi.vname in
       Kernel.debug ~dkey:Kernel.dkey_typing_global
@@ -2982,6 +3015,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
         (* always favor the location of the definition.*)
         oldvi.vdecl <- vi.vdecl;
         oldvi.vdefined <- true;
+        oldvi.vattr <- fc_stdlib_attribute oldvi.vattr
       end;
       (* notice that [vtemp] is immutable, and cannot be updated. Hopefully,
          temporaries have sufficiently fresh names that this is not a problem *)
@@ -3506,7 +3540,8 @@ let fieldsToInit
     else if found then
       found, offset :: loff
       (* if this field is an anonymous comp, search for the designator inside *)
-    else if prefix anonCompFieldName f.fname && not found then
+    else if prefix anonCompFieldName f.fname && not found
+            && f.forig_name <> f.fname then
       match unrollType f.ftype with
       | TComp (comp, _, _) ->
         add_comp offset comp acc (* go deeper inside *)
@@ -3719,9 +3754,27 @@ struct
   let anonCompFieldName = anonCompFieldName
   let conditionalConversion = logicConditionalConversion
   let find_macro _ = raise Not_found
-  let find_var x = match H.find env x with
-    | EnvVar vi, _ -> cvar_to_lvar vi
-    | _ -> raise Not_found
+  let find_var ?label ~var =
+    let find_from_curr_env test =
+      match H.find env var with
+      | EnvVar vi, _ when test vi -> cvar_to_lvar vi
+      | _ -> raise Not_found
+    in
+    match label with
+    | None -> find_from_curr_env (fun _ -> true)
+    | Some "Here" | Some "Old" | Some "Post" ->
+      (* the last two labels can only be found in contracts and refer
+         to the pre/post state of the contracts: all local variables
+         in scope at current point are also in scope in the labels. *)
+      find_from_curr_env (fun _ -> true)
+    | Some "Pre" ->
+      find_from_curr_env (fun vi -> vi.vformal || vi.vglob)
+    | Some "Init" -> find_from_curr_env (fun vi -> vi.vglob)
+    | Some lab ->
+      cvar_to_lvar
+        (Datatype.String.Map.find var
+           (Datatype.String.Hashtbl.find label_env lab))
+
   let find_enum_tag x = match H.find env x with
     | EnvEnum item,_ ->
       dummy_exp (Const (CEnum item)), typeOf item.eival
@@ -3764,6 +3817,8 @@ module Ltyping = Logic_typing.Make (C_logic_env)
 
 let startLoop iswhile =
   incr C_logic_env.nb_loop;
+  add_label_env "LoopEntry";
+  add_label_env "LoopCurrent";
   continues :=
     (if iswhile then While (ref "") else NotWhile (ref "")) :: !continues;
   enter_break_env ()
@@ -3771,6 +3826,8 @@ let startLoop iswhile =
 let exitLoop () =
   decr C_logic_env.nb_loop;
   exit_break_env ();
+  remove_label_env "LoopEntry";
+  remove_label_env "LoopCurrent";
   match !continues with
   | [] -> Kernel.error ~once:true ~current:true "exit Loop not in a loop"
   | _ :: rest -> continues := rest
@@ -3791,18 +3848,8 @@ let exitScope () =
       [] -> ()
     | UndoRemoveFromEnv n :: t ->
       H.remove env n; loop t
-    | UndoRemoveFromAlphaTable (p,i) :: t ->
-      (try
-         let h = H.find alphaTable p in
-         H.remove h i;
-         if H.length h = 0 then H.remove alphaTable p
-       with Not_found ->
-         Kernel.warning
-           "prefix (%s,%s) not in alpha conversion table. \
-            undo stack is inconsistent"
-           p i); loop t
-    | UndoResetAlphaCounter (vref, oldv) :: t ->
-      vref := oldv;
+    | UndoAlphaEnv undolist :: t ->
+      Alpha.undoAlphaChanges ~alphaTable ~undolist;
       loop t
   in
   loop !this;
@@ -4598,6 +4645,7 @@ and makeVarInfoCabs
     ~(isformal: bool)
     ~(isglobal: bool)
     ?(isgenerated=false)
+    ?(referenced=false)
     (ldecl : location)
     (bt, sto, inline, attrs)
     (n,ndt,a)
@@ -4614,7 +4662,8 @@ and makeVarInfoCabs
     Kernel.error ~once:true ~current:true "inline for a non-function: %s" n;
   checkRestrictQualifierDeep vtype;
   (*  log "Looking at %s(%b): (%a)@." n isformal d_attrlist nattr;*)
-  let vi = makeVarinfo ~temp:isgenerated isglobal isformal n vtype in
+  let vi = makeVarinfo ~referenced ~temp:isgenerated isglobal isformal n vtype
+  in
   vi.vstorage <- sto;
   vi.vattr <- nattr;
   vi.vdecl <- ldecl;
@@ -4957,11 +5006,20 @@ and doType (ghost:bool) isFuncArg
           (args', !newisva)
         end else (args, isva)
       in
+      let argl_length = List.length args' in
       (* Make the argument as for a formal *)
       let doOneArg (s, (n, ndt, a, cloc)) : varinfo =
         let s' = doSpecList ghost n s in
         let vi = makeVarInfoCabs ~ghost ~isformal:true ~isglobal:false
             (convLoc cloc) s' (n,ndt,a) in
+        if isVoidType vi.vtype then begin
+          if argl_length > 1 then
+            Kernel.error ~once:true ~current:true
+              "'void' must be the only parameter if specified";
+          if vi.vname <> "" then
+            Kernel.error ~once:true ~current:true
+              "named parameter '%s' has void type" vi.vname
+        end;
         (* Add the formal to the environment, so it can be referenced by
            other formals  (e.g. in an array type, although that will be
            changed to a pointer later, or though typeof).  *)
@@ -7597,11 +7655,11 @@ and compileCondExp ~ghost ce st sf =
       match e.enode with
       | Const(CInt64(i,_,_))
         when (not (Integer.equal i Integer.zero)) && canDrop sf ->
-        clean_up_chunk_locals sf;
+        full_clean_up_chunk_locals sf;
         se @@ (st, ghost)
       | Const(CInt64(z,_,_))
         when (Integer.equal z Integer.zero) && canDrop st ->
-        clean_up_chunk_locals st;
+        full_clean_up_chunk_locals st;
         se @@ (sf, ghost)
       | _ -> (empty @@ (se, ghost)) @@ (ifChunk ~ghost e e.eloc st sf, ghost)
     end
@@ -8172,11 +8230,17 @@ and createGlobal ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool * A
   let is_fc_builtin {A.expr_node=enode} =
     match enode with A.VARIABLE "FC_BUILTIN" -> true | _ -> false
   in
+  let is_fc_stdlib {A.expr_node=enode} =
+    match enode with A.VARIABLE v when v = fc_stdlib -> true | _ -> false
+  in
   let isgenerated =
     List.exists (fun (_,el) -> List.exists is_fc_builtin el) a
   in
+  let islibc =
+    List.exists (fun (_,el) -> List.exists is_fc_stdlib el) a
+  in
   (* Make a first version of the varinfo *)
-  let vi = makeVarInfoCabs ~ghost ~isformal:false
+  let vi = makeVarInfoCabs ~ghost ~isformal:false ~referenced:islibc
       ~isglobal:true ~isgenerated (convLoc cloc) (t,s,b,attr_list) (n,ndt,a)
   in
   (* Add the variable to the environment before doing the initializer
@@ -8561,7 +8625,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
               let alloca_bounds = Logic_const.pand ~loc:castloc (pos_size, max_size) in
               let alloca_bounds = { alloca_bounds with pred_name = ["alloca_bounds"] } in
               let annot =
-                Logic_const.new_code_annotation (AAssert ([], alloca_bounds))
+                Logic_const.new_code_annotation (AAssert ([], Assert, alloca_bounds))
               in
               (mkStmtOneInstr ~ghost ~valid_sid
                  (Code_annot (annot, castloc)),
@@ -9081,7 +9145,7 @@ and doDecl local_env (isglobal: bool) : A.definition -> chunk = function
           let pfalse = { pfalse with pred_name = ["missing_return"] } in
           let assert_false () =
             let annot =
-              Logic_const.new_code_annotation (AAssert ([], pfalse))
+              Logic_const.new_code_annotation (AAssert ([], Assert, pfalse))
             in
             Cil.mkStmt ~ghost ~valid_sid (Instr(Code_annot(annot,loc)))
           in
@@ -9663,6 +9727,7 @@ and doStatement local_env (s : A.statement) : chunk =
   | A.LABEL (l, s, loc) ->
     let loc' = convLoc loc in
     CurrentLoc.set loc';
+    add_label_env l;
     C_logic_env.add_current_label l;
     (* Lookup the label because it might have been locally defined *)
     let chunk =

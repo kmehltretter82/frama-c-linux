@@ -106,7 +106,7 @@ type strategy = {
   arguments : argument list ;
 } and t = strategy
 
-let highest a b = Pervasives.compare b.priority a.priority
+let highest a b = Transitioning.Stdlib.compare b.priority a.priority
 
 class pool =
   object

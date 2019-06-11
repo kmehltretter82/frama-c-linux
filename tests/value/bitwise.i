@@ -134,6 +134,17 @@ void bug4() {
   }
 }
 
+/* See issue #639 and merge request #2230 on the bitwise domain. */
+void bug5() {
+  int x = v;
+  x = x | 2;
+  if (x == 8) {
+    x = x & 2; /* This branch is dead, but the bitwise domain leads to bottom
+                  only after the operation x&2 and not before. */
+    Frama_C_show_each_dead(x);
+  }
+}
+
 void main(void) {
   test1();
   test2();
@@ -145,4 +156,5 @@ void main(void) {
   bug2();
   bug3();
   bug4();
+  bug5();
 }

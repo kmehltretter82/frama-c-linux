@@ -27,7 +27,7 @@ __PUSH_FC_STDLIB
 #define FD_SETSIZE 1024
 #define NFDBITS (8 * sizeof(long))
 __BEGIN_DECLS
-typedef struct { long __fc_fd_set[FD_SETSIZE / NFDBITS]; } fd_set;
+typedef struct __fc_fd_set { long __fc_fd_set[FD_SETSIZE / NFDBITS]; } fd_set;
 
 /*@
   requires valid_fdset: \valid(fdset);

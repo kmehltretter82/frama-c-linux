@@ -43,8 +43,8 @@ let hardcopy inc out =
   begin
     let buffer = Bytes.create 1024 in
     let n = ref 0 in
-    while (n := Pervasives.input inc buffer 0 1024 ; !n > 0) do
-      Pervasives.output out buffer 0 !n
+    while (n := input inc buffer 0 1024 ; !n > 0) do
+      output out buffer 0 !n
     done ;
     flush out ;
   end

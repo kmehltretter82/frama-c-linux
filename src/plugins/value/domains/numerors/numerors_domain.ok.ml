@@ -153,7 +153,7 @@ module Domain = struct
       let log = Pervasives.open_out s in
       let fmt = Format.formatter_of_out_channel log in
       List.iter (fun f -> f fmt ()) !Numerors_Value.dprint_callstack ;
-      Pervasives.close_out log
+      close_out log
     | _, _ -> ()
 end
 

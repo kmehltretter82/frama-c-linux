@@ -58,12 +58,12 @@ module Widen_Hints : sig
 end
 
 type size_widen_hint = Integer.t
-type generic_widen_hint = Widen_Hints.t
+type numerical_widen_hint = Widen_Hints.t * Fc_float.Widen_Hints.t
 
 include Datatype.S_with_collections with type t := t
 include Lattice_type.Full_AI_Lattice_with_cardinality
   with type t := t
-  and type widen_hint = size_widen_hint * generic_widen_hint
+  and type widen_hint = size_widen_hint * numerical_widen_hint
 
 val is_bottom : t -> bool
 val overlaps: partial:bool -> size:Integer.t -> t -> t -> bool

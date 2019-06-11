@@ -59,7 +59,7 @@ module Precisions = struct
     | Simple      -> -149    | Double  -> -1074
     | Long_Double -> -16494  | Real    -> Pervasives.min_int
 
-  let compare a b = Pervasives.compare (get a) (get b)
+  let compare a b = Transitioning.Stdlib.compare (get a) (get b)
   let eq a b = compare a b =  0
 
   let max a b = if compare a b <= 0 then b else a

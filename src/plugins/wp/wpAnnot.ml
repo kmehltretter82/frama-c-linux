@@ -329,10 +329,10 @@ let filter_configstatus config pid =
 
 let filter_asked config pid =
   match config.asked_prop with
-  | AllProps -> true
   | IdProp idp -> Property.equal (WpPropId.property_of_id pid) idp
   | CallPre (s_call, asked_pre) -> WpPropId.select_call_pre s_call asked_pre pid
   | NamedProp names -> WpPropId.select_by_name names pid
+  | AllProps -> WpPropId.select_default pid
 
 let rec filter config pid = function
   | [] -> None
@@ -902,24 +902,25 @@ let get_stmt_annots config v s =
               Printer.pp_code_annotation a;
             acc
           end
-    | AAssert (b_list,p) ->
+    | AAssert (b_list, kind, p) ->
         let kf = config.kf in
         let acc = match is_annot_for_config config v s b_list with
           | TBRno -> acc
           | TBRhyp ->
-              let b_acc =
-                WpStrategy.add_prop_assert b_acc WpStrategy.Ahyp kf s a p
-              in (b_acc, (a_acc, e_acc))
+              if kind = Check then acc
+              else
+                let b_acc =
+                  WpStrategy.add_prop_assert b_acc WpStrategy.Ahyp kf s a p
+                in (b_acc, (a_acc, e_acc))
           | TBRok | TBRpart ->
               let id = WpPropId.mk_assert_id config.kf s a in
-              let kind =
-                if Wp_parameters.Assert_check_only.get () then
-                  WpStrategy.Agoal
-                else
-                  WpStrategy.Aboth (goal_to_select config id)
-              in
-              let b_acc = WpStrategy.add_prop_assert b_acc kind kf s a p in
-              (b_acc, (a_acc, e_acc))
+              let check = kind = Check
+              and goal = goal_to_select config id in
+              if check && not goal then acc
+              else
+                let kind = WpStrategy.(if check then Agoal else Aboth goal) in
+                let b_acc = WpStrategy.add_prop_assert b_acc kind kf s a p in
+                (b_acc, (a_acc, e_acc))
         in acc
     | AAllocation (_b_list, _frees_allocates) ->
         (* [PB] TODO *) acc
@@ -1385,7 +1386,7 @@ let get_id_prop_strategies ~model ?(assigns=WithAssigns) p =
   match p with
   | Property.IPCodeAnnot (kf,_,ca) ->
       let bhvs = match ca.annot_content with
-        | AAssert (l, _) | AInvariant (l, _, _) | AAssigns (l, _) -> l
+        | AAssert (l, _, _) | AInvariant (l, _, _) | AAssigns (l, _) -> l
         | _ -> []
       in get_strategies assigns kf model bhvs None (IdProp p)
   | Property.IPAssigns (kf, _, Property.Id_loop _, _)

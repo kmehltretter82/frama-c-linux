@@ -8,12 +8,14 @@
   \return(fgets) == 0 (auto)
   \return(gets) == 0 (auto)
   \return(popen) == 0 (auto)
+  \return(seed48) == 0 (auto)
   \return(calloc) == 0 (auto)
   \return(malloc) == 0 (auto)
   \return(realloc) == 0 (auto)
   \return(getenv) == 0 (auto)
   \return(bsearch) == 0 (auto)
   \return(getcwd) == 0 (auto)
+  \return(ttyname) == 0 (auto)
   \return(memchr) == 0 (auto)
   \return(memcpy) == 0 (auto)
   \return(memmove) == 0 (auto)
@@ -22,16 +24,19 @@
   \return(strrchr) == 0 (auto)
   \return(strpbrk) == 0 (auto)
   \return(strstr) == 0 (auto)
+  \return(strcasestr) == 0 (auto)
   \return(strtok) == 0 (auto)
   \return(strtok_r) == 0 (auto)
   \return(strsep) == 0 (auto)
   \return(strerror) == 0 (auto)
   \return(strcpy) == 0 (auto)
   \return(strncpy) == 0 (auto)
+  \return(stpcpy) == 0 (auto)
   \return(strcat) == 0 (auto)
   \return(strncat) == 0 (auto)
   \return(strdup) == 0 (auto)
   \return(strndup) == 0 (auto)
+  \return(strsignal) == 0 (auto)
   \return(bind) == 0 (auto)
   \return(socket) == -1 (auto)
   \return(signal) == 0 (auto)
@@ -243,7 +248,7 @@
   function strncpy: precondition 'room_nstring' got status valid.
 [eva] share/libc/netdb.c:147: 
   function strncpy: precondition 'separation' got status valid.
-[eva] share/libc/string.h:369: 
+[eva] share/libc/string.h:367: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strcmp
 [eva] Done for function strncpy
 [eva] Recording results for gethostbyname

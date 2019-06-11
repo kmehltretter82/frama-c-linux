@@ -82,6 +82,23 @@ let later f =
   ignore (Glib.Idle.add ~prio for_idle)
 
 (* -------------------------------------------------------------------------- *)
+(* ---  Ratio                                                             --- *)
+(* -------------------------------------------------------------------------- *)
+
+let get_pane_ratio (paned:GPack.paned) =
+  let paned_min_pos = paned#min_position in
+  let paned_max_pos = paned#max_position in
+  let length = paned_max_pos - paned_min_pos in
+  if length = 0 then 0.5
+  else (float_of_int paned#position)/.(float_of_int length)
+
+let set_pane_ratio (paned:GPack.paned) ratio =
+  let paned_min_pos = paned#min_position in
+  let offset =
+    int_of_float (float (paned#max_position - paned_min_pos) *. ratio)
+  in paned#set_position (paned_min_pos + offset)
+
+(* -------------------------------------------------------------------------- *)
 (* ---  Widget & Signals                                                  --- *)
 (* -------------------------------------------------------------------------- *)
 

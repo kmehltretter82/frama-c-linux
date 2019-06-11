@@ -251,16 +251,23 @@ DISTRIB_FILES:=\
       Changelog config.h.in						\
       VERSION VERSION_CODENAME $(wildcard licenses/*)                   \
       $(LIBC_FILES)							\
+      share/analysis-scripts/benchmark_database.py                      \
       share/analysis-scripts/cmd-dep.sh                                 \
       share/analysis-scripts/concat-csv.sh                              \
+      share/analysis-scripts/clone.sh                                   \
       $(wildcard share/analysis-scripts/examples/*)                     \
+      share/analysis-scripts/fc_stubs.c                                 \
       share/analysis-scripts/find_fun.py                                \
       share/analysis-scripts/flamegraph.pl                              \
       share/analysis-scripts/frama-c.mk                                 \
+      share/analysis-scripts/frama_c_results.py                         \
+      share/analysis-scripts/git_utils.py                               \
       share/analysis-scripts/list_files.py                              \
+      share/analysis-scripts/make_wrapper.py                            \
       share/analysis-scripts/parse-coverage.sh                          \
-      share/analysis-scripts/summary.sh                                 \
       share/analysis-scripts/README.md                                  \
+      share/analysis-scripts/results_display.py                         \
+      share/analysis-scripts/summary.py                                 \
       share/analysis-scripts/template.mk                                \
       $(wildcard share/emacs/*.el) share/autocomplete_frama-c           \
       share/_frama-c                                                    \
@@ -270,6 +277,7 @@ DISTRIB_FILES:=\
       share/Makefile.plugin.template share/Makefile.dynamic		\
       share/Makefile.dynamic_config.external				\
       share/Makefile.dynamic_config.internal				\
+      share/META.frama-c                                                \
       $(filter-out src/kernel_internals/runtime/config.ml,              \
 	  $(wildcard src/kernel_internals/runtime/*.ml*))               \
       $(wildcard src/kernel_services/abstract_interp/*.ml*)             \
@@ -638,20 +646,6 @@ GENERATED += $(addprefix src/kernel_internals/parsing/,\
 		logic_parser.mli logic_preprocess.ml)
 
 
-ifeq ($(HAS_YOJSON),yes)
-src/kernel_services/ast_queries/json_compilation_database.ml: \
-	src/kernel_services/ast_queries/json_compilation_database.ok.ml share/Makefile.config
-	$(CP_IF_DIFF) $< $@
-	$(CHMOD_RO) $@
-else
-src/kernel_services/ast_queries/json_compilation_database.ml: \
-	src/kernel_services/ast_queries/json_compilation_database.ko.ml share/Makefile.config
-	$(CP_IF_DIFF) $< $@
-	$(CHMOD_RO) $@
-endif
-GENERATED += src/kernel_services/ast_queries/json_compilation_database.ml
-
-
 .PHONY: check-logic-parser-wildcard
 check-logic-parser-wildcard:
 	cd src/kernel_internals/parsing && ocaml check_logic_parser.ml
@@ -684,7 +678,7 @@ STARTUP_CMX=$(STARTUP_CMO:.cmo=.cmx)
 WTOOLKIT= \
 	wutil widget wbox wfile wpane wpalette wtext wtable
 
-ifeq ($(strip $(GTKSOURCEVIEW)),lablgtk3.sourceview3)
+ifeq ("$(LABLGTK_VERSION)","3")
 
 src/plugins/gui/GSourceView.ml: src/plugins/gui/GSourceView3.ml.in
 	$(CP) $< $@
@@ -869,7 +863,7 @@ PLUGIN_DISTRIB_EXTERNAL+= \
 PLUGIN_CMO:= slevel/split_strategy value_parameters \
 	utils/value_perf utils/value_util utils/red_statuses \
 	utils/mark_noresults \
-	utils/widen_hints_ext utils/widen utils/unroll_annots \
+	utils/widen_hints_ext utils/widen utils/partitioning_annots \
 	engine/split_return \
 	slevel/per_stmt_slevel \
 	utils/library_functions \
@@ -907,15 +901,14 @@ PLUGIN_CMO:= slevel/split_strategy value_parameters \
 	domains/cvalue/cvalue_transfer domains/cvalue/cvalue_init \
 	domains/cvalue/cvalue_specification \
 	domains/cvalue/cvalue_domain \
-	engine/subdivided_evaluation engine/evaluation \
+	engine/subdivided_evaluation engine/evaluation engine/abstractions \
 	engine/recursion engine/transfer_stmt engine/transfer_specification \
-	engine/partitioning engine/mem_exec \
-	engine/legacy_partitioning engine/basic_partitioning \
-	engine/loop_partitioning engine/partitioned_dataflow \
-	engine/initialization engine/abstractions \
+	engine/partitioning_index engine/mem_exec \
+	engine/partition engine/partitioning_parameters engine/trace_partitioning \
+	engine/iterator \
+	engine/initialization \
 	engine/compute_functions engine/analysis register
 PLUGIN_CMI:= values/abstract_value values/abstract_location \
-	engine/state_partitioning \
 	domains/abstract_domain domains/simpler_domains
 PLUGIN_DEPENDENCIES:=Callgraph LoopAnalysis RteGen
 
@@ -957,7 +950,7 @@ $(eval $(call include_generic_plugin_Makefile,$(PLUGIN_NAME)))
 PLUGIN_ENABLE:=$(ENABLE_RTEGEN)
 PLUGIN_NAME:=RteGen
 PLUGIN_DIR:=src/plugins/rte
-PLUGIN_CMO:= options generator rte visit register
+PLUGIN_CMO:= options generator rte flags visit register
 PLUGIN_DISTRIBUTED:=yes
 PLUGIN_INTERNAL_TEST:=yes
 PLUGIN_TESTS_DIRS:=rte rte_manual
@@ -1076,6 +1069,7 @@ PLUGIN_NAME:=Pdg
 PLUGIN_DIR:=src/plugins/pdg
 PLUGIN_TESTS_LIB:=tests/pdg/dyn_dpds.ml \
                   tests/pdg/sets.ml
+PLUGIN_TESTS_DIRS:=pdg
 PLUGIN_CMO:= pdg_parameters \
 	    ctrlDpds \
 	    pdg_state \
@@ -1294,12 +1288,20 @@ gui: gui-$(OCAMLBEST)
 ALL_GUI_CMO= $(ALL_CMO) $(GRAPH_GUICMO) $(GUICMO)
 ALL_GUI_CMX= $(patsubst %.cma,%.cmxa,$(ALL_GUI_CMO:.cmo=.cmx))
 
+ifeq ($(LABLGTK_VERSION),3)
+ifeq ($(NATIVE_THREADS),yes)
+THREAD=-thread
+else
+THREAD=-vmthread
+endif
+endif
+
 bin/viewer.byte$(EXE): BYTE_LIBS+= $(GRAPH_GUICMO)
 bin/viewer.byte$(EXE): $(filter-out $(GRAPH_GUICMO),$(ALL_GUI_CMO)) \
 			$(GEN_BYTE_LIBS) \
 			$(PLUGIN_DYN_CMO_LIST) $(PLUGIN_DYN_GUI_CMO_LIST)
 	$(PRINT_LINKING) $@
-	$(OCAMLC) $(BLINKFLAGS) -o $@ $(BYTE_LIBS) \
+	$(OCAMLC) $(BLINKFLAGS) $(THREAD) -o $@ $(BYTE_LIBS) \
 	  $(CMO) \
 	  $(filter-out \
 	    $(patsubst $(PLUGIN_GUI_LIB_DIR)/%,$(PLUGIN_LIB_DIR)/%,\
@@ -1313,7 +1315,7 @@ bin/viewer.opt$(EXE): $(filter-out $(GRAPH_GUICMX),$(ALL_GUI_CMX)) \
 			$(PLUGIN_DYN_CMX_LIST) $(PLUGIN_DYN_GUI_CMX_LIST) \
 			$(PLUGIN_CMX_LIST) $(PLUGIN_GUI_CMX_LIST)
 	$(PRINT_LINKING) $@
-	$(OCAMLOPT) $(OLINKFLAGS) -o $@ $(OPT_LIBS) \
+	$(OCAMLOPT) $(OLINKFLAGS) $(THREAD) -o $@ $(OPT_LIBS) \
 	  $(CMX) \
 	  $(filter-out \
 	    $(patsubst $(PLUGIN_GUI_LIB_DIR)/%,$(PLUGIN_LIB_DIR)/%,\
@@ -1754,12 +1756,24 @@ indent: $(INDENT_TARGET)
 
 lint: $(LINT_TARGET)
 
+check-ocp-indent-version:
+	if command -v ocp-indent >/dev/null; then \
+		$(eval ocp_version_major := $(shell ocp-indent --version | $(SED) -E "s/^([0-9]+)\.[0-9]+\..*/\1/")) \
+		$(eval ocp_version_minor := $(shell ocp-indent --version | $(SED) -E "s/^[0-9]+\.([0-9]+)\..*/\1/")) \
+		if [ "$(ocp_version_major)" -gt 1 -o "$(ocp_version_minor)" -gt 7 ]; then \
+			echo "error: ocp-indent <1.7.0 required for linting (got $(ocp_version_major).$(ocp_version_minor))"; \
+			exit 1; \
+		fi; \
+	else \
+		exit 1; \
+	fi;
+
 fix-syntax: $(FIX_SYNTAX_TARGET)
 
-$(INDENT_TARGET): %.indent: %
+$(INDENT_TARGET): %.indent: % check-ocp-indent-version
 	ocp-indent -i $<
 
-$(LINT_TARGET): %.lint: %
+$(LINT_TARGET): %.lint: % check-ocp-indent-version
 	# See SO 1825552 on mixing grep and \t (and cry)
 	# For OK_NL, we have three cases:
 	# - for empty files, the computation boils down to 0 - 0 == 0
@@ -1886,15 +1900,22 @@ install:: install-lib
 	  share/configure.ac share/autocomplete_frama-c share/_frama-c \
 	  $(FRAMAC_DATADIR)
 	$(MKDIR) $(FRAMAC_DATADIR)/analysis-scripts
-	$(CP) share/analysis-scripts/cmd-dep.sh \
+	$(CP) share/analysis-scripts/benchmark_database.py \
+	  share/analysis-scripts/cmd-dep.sh \
 	  share/analysis-scripts/concat-csv.sh \
+	  share/analysis-scripts/clone.sh \
+	  share/analysis-scripts/fc_stubs.c \
 	  share/analysis-scripts/find_fun.py \
 	  share/analysis-scripts/flamegraph.pl \
 	  share/analysis-scripts/frama-c.mk \
+	  share/analysis-scripts/frama_c_results.py \
+	  share/analysis-scripts/git_utils.py \
+	  share/analysis-scripts/list_files.py \
+	  share/analysis-scripts/make_wrapper.py \
 	  share/analysis-scripts/parse-coverage.sh \
 	  share/analysis-scripts/README.md \
-	  share/analysis-scripts/list_files.py \
-	  share/analysis-scripts/summary.sh \
+	  share/analysis-scripts/results_display.py \
+	  share/analysis-scripts/summary.py \
 	  share/analysis-scripts/template.mk \
 	  $(FRAMAC_DATADIR)/analysis-scripts
 	$(MKDIR) $(FRAMAC_DATADIR)/analysis-scripts/examples
@@ -1947,15 +1968,19 @@ install:: install-lib
 	if [ -d "$(FRAMAC_PLUGIN)" ]; then \
 	  $(CP)  $(PLUGIN_DYN_CMI_LIST) $(PLUGIN_META_LIST) \
 		 $(FRAMAC_PLUGINDIR); \
-	  $(CP)  $(PLUGIN_DYN_CMO_LIST) $(PLUGIN_DYN_CMX_LIST) \
-		 $(FRAMAC_PLUGINDIR)/top; \
+	  $(CP)  $(PLUGIN_DYN_CMO_LIST) $(FRAMAC_PLUGINDIR)/top; \
+	  if [ "$(OCAMLBEST)" = "opt" ]; then \
+	    $(CP) $(PLUGIN_DYN_CMX_LIST) $(FRAMAC_PLUGINDIR)/top; \
+	  fi; \
 	fi
 	$(PRINT_INSTALL) gui plug-ins
 	if [ -d "$(FRAMAC_PLUGIN_GUI)" -a "$(PLUGIN_DYN_GUI_EXISTS)" = "yes" ]; \
 	then \
 	  $(CP) $(patsubst %.cma,%.cmi,$(PLUGIN_DYN_GUI_CMO_LIST:.cmo=.cmi)) \
-		$(PLUGIN_DYN_GUI_CMO_LIST) $(PLUGIN_DYN_GUI_CMX_LIST) \
-		$(FRAMAC_PLUGINDIR)/gui; \
+		$(PLUGIN_DYN_GUI_CMO_LIST) $(FRAMAC_PLUGINDIR)/gui; \
+	  if [ "$(OCAMLBEST)" = "opt" ]; then \
+	    $(CP) $(PLUGIN_DYN_GUI_CMX_LIST) $(FRAMAC_PLUGINDIR)/gui; \
+	  fi; \
 	fi
 	$(PRINT_INSTALL) man pages
 	$(CP) man/frama-c.1 $(MANDIR)/man1/frama-c.1
@@ -2280,21 +2305,21 @@ PTESTS_SRC=ptests/ptests_config.ml ptests/ptests.ml
 PTESTS_CONFIG:= $(shell if test -d tests; then echo tests/ptests_config; fi)
 
 ifeq ($(NATIVE_THREADS),yes)
-THREAD=-thread
+PTEST_THREAD=-thread
 ptests: bin/ptests.$(PTESTSBEST)$(EXE) $(PTESTS_CONFIG)
 else
-THREAD=-vmthread
+PTEST_THREAD=-vmthread
 ptests: bin/ptests.byte$(EXE) $(PTESTS_CONFIG)
 endif
 
 bin/ptests.byte$(EXE): $(PTESTS_SRC)
 	$(PRINT_LINKING) $@
-	$(OCAMLC) -I ptests -dtypes $(THREAD) -g -o $@ \
+	$(OCAMLC) -I ptests -dtypes $(PTEST_THREAD) -g -o $@ \
 	    unix.cma threads.cma str.cma dynlink.cma $^
 
 bin/ptests.opt$(EXE): $(PTESTS_SRC)
 	$(PRINT_LINKING) $@
-	$(OCAMLOPT) -I ptests -dtypes $(THREAD) -o $@ \
+	$(OCAMLOPT) -I ptests -dtypes $(PTEST_THREAD) -o $@ \
 	    unix.cmxa threads.cmxa str.cmxa dynlink.cmxa $^
 
 GENERATED+=ptests/ptests_config.ml tests/ptests_config

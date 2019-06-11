@@ -4,14 +4,16 @@ stages:
  - tests
  - distrib_and_compatibility
 
+variables:
+    CURRENT: $CI_COMMIT_REF_NAME
+    DEFAULT: "stable/potassium"
+    FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
+
 #avoid a nix error https://github.com/NixOS/nix/issues/2087
 git-update:
   stage: git-update
   variables:
-    CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
     OCAML: "4_05"
-    FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
    - nix/frama-ci.sh instantiate --eval -A frama-c.src.outPath
   tags:
@@ -20,10 +22,7 @@ git-update:
 frama-c:
   stage: build
   variables:
-    CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
     OCAML: "4_05"
-    FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
    - nix/frama-ci.sh build -A frama-c.installed
   tags:
@@ -32,10 +31,7 @@ frama-c:
 lint:
   stage: build
   variables:
-    CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
     OCAML: "4_05"
-    FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
    - nix/frama-ci.sh build -A frama-c.lint
   coverage: '/lint coverage: \d+\.\d+/'
@@ -45,10 +41,7 @@ lint:
 tests:
   stage: tests
   variables:
-    CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
     OCAML: "4_05"
-    FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
    - nix/frama-ci.sh build -A frama-c.tests
   tags:
@@ -57,10 +50,7 @@ tests:
 wp-qualif:
   stage: tests
   variables:
-    CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
     OCAML: "4_05"
-    FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
    - nix/frama-ci.sh build -A frama-c.wp-qualif
   tags:
@@ -70,10 +60,7 @@ wp-qualif:
 genassigns:
   stage: tests
   variables:
-    CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
     OCAML: "4_05"
-    FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
    - nix/frama-ci.sh build -A genassigns.tests
   tags:
@@ -82,10 +69,7 @@ genassigns:
 counter-examples:
   stage: tests
   variables:
-    CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
     OCAML: "4_05"
-    FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
    - nix/frama-ci.sh build -A counter-examples.tests
   tags:
@@ -94,10 +78,7 @@ counter-examples:
 acsl-importer:
   stage: tests
   variables:
-    CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
     OCAML: "4_05"
-    FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
    - nix/frama-ci.sh build -A acsl-importer.tests
   tags:
@@ -106,10 +87,7 @@ acsl-importer:
 volatile:
   stage: tests
   variables:
-    CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
     OCAML: "4_05"
-    FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
    - nix/frama-ci.sh build -A volatile.tests
   tags:
@@ -118,10 +96,7 @@ volatile:
 E-ACSL:
   stage: tests
   variables:
-    CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
     OCAML: "4_05"
-    FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
    - nix/frama-ci.sh build -A e-acsl.tests
   tags:
@@ -130,10 +105,7 @@ E-ACSL:
 Security:
   stage: tests
   variables:
-    CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
     OCAML: "4_05"
-    FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
    - nix/frama-ci.sh build -A security.tests
   tags:
@@ -142,22 +114,34 @@ Security:
 CFP:
   stage: tests
   variables:
-    CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
     OCAML: "4_05"
-    FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
    - nix/frama-ci.sh build -A context-from-precondition.tests
+  tags:
+   - nix
+
+build-distrib-tarball:
+  stage: build
+  variables:
+    OCAML: "4_05"
+  script:
+   - nix/frama-ci.sh build -A frama-c.build-distrib-tarball
+  tags:
+   - nix
+
+build-from-distrib-tarball:
+  stage: tests
+  variables:
+    OCAML: "4_05"
+  script:
+   - nix/frama-ci.sh build -A frama-c.build-from-distrib-tarball
   tags:
    - nix
 
 internal:
   stage: distrib_and_compatibility
   variables:
-    CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
     OCAML: "4_05"
-    FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
    - nix/frama-ci.sh build -A frama-c.internal
   tags:
@@ -173,51 +157,33 @@ internal:
 
 frama-c-ocaml-4.02:
   variables:
-    CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
     OCAML: "4_02"
-    FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   <<: *frama-c-ocaml
 
 frama-c-ocaml-4.03:
   variables:
-    CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
     OCAML: "4_03"
-    FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   <<: *frama-c-ocaml
 
 frama-c-ocaml-4.04:
   variables:
-    CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
     OCAML: "4_04"
-    FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   <<: *frama-c-ocaml
 
 frama-c-ocaml-4.06:
   variables:
-    CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
     OCAML: "4_06"
-    FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   <<: *frama-c-ocaml
 
 frama-c-ocaml-4.07:
   variables:
-    CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
     OCAML: "4_07"
-    FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   <<: *frama-c-ocaml
 
 caveat-importer:
   stage: tests
   variables:
-    CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
     OCAML: "4_05"
-    FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
    - nix/frama-ci.sh build -A caveat-importer.tests
   tags:
@@ -226,10 +192,7 @@ caveat-importer:
 mthread:
   stage: tests
   variables:
-    CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
     OCAML: "4_05"
-    FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
    - nix/frama-ci.sh build -A mthread.tests
   tags:
@@ -238,10 +201,7 @@ mthread:
 pathcrawler:
   stage: tests
   variables:
-    CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "master"
     OCAML: "4_05"
-    FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
    - nix/frama-ci.sh build -A pathcrawler.tests
   tags:

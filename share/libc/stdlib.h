@@ -271,23 +271,9 @@ const unsigned long __fc_rand_max = __FC_RAND_MAX;
 */
 extern int rand(void);
 
-#ifdef _POSIX_C_SOURCE
-# if _POSIX_C_SOURCE >= 200112L
-/*@ assigns \result \from __fc_random_counter ;
-  @ assigns __fc_random_counter \from __fc_random_counter ;
-  @ ensures result_range: 0 <= \result < 2147483648 ;
-*/
-extern long int lrand48 (void);
-
-/*@ assigns __fc_random_counter \from seed ; */
-extern void srand48 (long int seed);
-# endif
-#endif
-
 /*@ assigns __fc_random_counter \from seed ; */
 extern void srand(unsigned int seed);
 
-#if _XOPEN_SOURCE >= 500
 /*@
   assigns \result \from __fc_random_counter;
   ensures result_range: 0 <= \result <= __fc_rand_max;
@@ -296,7 +282,84 @@ extern long int random(void);
 
 /*@ assigns __fc_random_counter \from seed; */
 extern void srandom(unsigned int seed);
-#endif
+
+// used to check if some *48() functions have called the seed initializer
+int __fc_random48_init __attribute__((FRAMA_C_MODEL));
+
+extern unsigned short __fc_random48_counter[3] __attribute__((FRAMA_C_MODEL));
+unsigned short *__fc_p_random48_counter = __fc_random48_counter;
+
+/*@
+  assigns __fc_random48_counter[0..2] \from seed;
+  assigns __fc_random48_init \from \nothing;
+  ensures random48_initialized: __fc_random48_init == 1;
+*/
+extern void srand48 (long int seed);
+
+/*@
+  requires initialization:initialized_seed16v: \initialized(seed16v+(0..2));
+  assigns __fc_random48_counter[0..2] \from indirect:seed16v[0..2];
+  assigns __fc_random48_init \from \nothing;
+  assigns \result \from __fc_p_random48_counter;
+  ensures random48_initialized: __fc_random48_init == 1;
+  ensures result_counter: \result == __fc_p_random48_counter;
+*/
+extern unsigned short *seed48(unsigned short seed16v[3]);
+
+/*@
+  assigns __fc_random48_counter[0..2] \from param[0..5];
+  assigns __fc_random48_init \from \nothing;
+  ensures random48_initialized: __fc_random48_init == 1;
+*/
+extern void lcong48(unsigned short param[7]);
+
+/*@
+  requires random48_initialized: __fc_random48_init == 1;
+  assigns __fc_random48_counter[0..2] \from __fc_random48_counter[0..2];
+  assigns \result \from __fc_random48_counter[0..2];
+  ensures result_range: \is_finite(\result) && 0.0 <= \result < 1.0;
+*/
+extern double drand48(void);
+
+/*@
+  requires initialization:initialized_xsubi: \initialized(xsubi+(0..2));
+  assigns __fc_random48_counter[0..2] \from __fc_random48_counter[0..2];
+  assigns \result \from __fc_random48_counter[0..2];
+  ensures result_range: \is_finite(\result) && 0.0 <= \result < 1.0;
+*/
+extern double erand48(unsigned short xsubi[3]);
+
+/*@
+  requires random48_initialized: __fc_random48_init == 1;
+  assigns __fc_random48_counter[0..2] \from __fc_random48_counter[0..2];
+  assigns \result \from __fc_random48_counter[0..2];
+  ensures result_range: 0 <= \result < 2147483648;
+*/
+extern long int lrand48 (void);
+
+/*@
+  requires initialization:initialized_xsubi: \initialized(xsubi+(0..2));
+  assigns __fc_random48_counter[0..2] \from __fc_random48_counter[0..2];
+  assigns \result \from __fc_random48_counter[0..2];
+  ensures result_range: 0 <= \result < 2147483648;
+*/
+extern long int nrand48 (unsigned short xsubi[3]);
+
+/*@
+  requires random48_initialized: __fc_random48_init == 1;
+  assigns __fc_random48_counter[0..2] \from __fc_random48_counter[0..2];
+  assigns \result \from __fc_random48_counter[0..2];
+  ensures result_range: -2147483648 <= \result < 2147483648;
+*/
+extern long int mrand48 (void);
+
+/*@
+  requires initialization:initialized_xsubi: \initialized(xsubi+(0..2));
+  assigns __fc_random48_counter[0..2] \from __fc_random48_counter[0..2];
+  assigns \result \from __fc_random48_counter[0..2];
+  ensures result_range: -2147483648 <= \result < 2147483648;
+*/
+extern long int jrand48 (unsigned short xsubi[3]);
 
 /* ISO C: 7.20.3.1 */
 /*@
@@ -593,7 +656,6 @@ extern size_t wcstombs(char * restrict s,
      const wchar_t * restrict pwcs,
      size_t n);
 
-
 // Note: this specification should ideally use a more specific predicate,
 //       such as 'is_allocable_aligned(alignment, size)'.
 /*@
@@ -621,6 +683,17 @@ extern size_t wcstombs(char * restrict s,
   disjoint behaviors;
  */
 extern int posix_memalign(void **memptr, size_t alignment, size_t size);
+
+/*@
+  // missing: requires 'last 6 characters of template must be XXXXXX'
+  // missing: assigns \result, templat[0..] \from 'filesystem', 'RNG';
+  requires valid_template: valid_string(templat);
+  assigns templat[0..] \from \nothing;
+  assigns \result \from \nothing;
+  ensures result_error_or_valid_fd: \result == -1 ||
+                                    0 <= \result < __FC_FOPEN_MAX;
+ */
+extern int mkstemp(char *templat);
 
 __END_DECLS
 

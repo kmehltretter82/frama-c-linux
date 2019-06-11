@@ -537,6 +537,16 @@ val isCharArrayType: typ -> bool
 (** True if the argument is an integral type (i.e. integer or enum) *)
 val isIntegralType: typ -> bool
 
+(** True if the argument is [_Bool]
+    @since Frama-C+dev
+*)
+val isBoolType: typ -> bool
+
+(** True if the argument is [_Bool] or [boolean].
+    @since Frama-C+dev
+ *)
+val isLogicPureBooleanType: logic_type -> bool
+
 (** True if the argument is an integral or pointer type. *)
 val isIntegralOrPointerType: typ -> bool
 
@@ -672,10 +682,13 @@ val splitFunctionTypeVI:
   [vtemp] field in type {!Cil_types.varinfo}.
   The [source] argument defaults to [true], and corresponds to the field
   [vsource] .
+  The [referenced] argument defaults to [false], and corresponds to the field
+  [vreferenced] .
   The first unnamed argument specifies whether the varinfo is for a global and
   the second is for formals. *)
 val makeVarinfo:
-  ?source:bool -> ?temp:bool -> bool -> bool -> string -> typ -> varinfo
+  ?source:bool -> ?temp:bool -> ?referenced:bool -> bool -> bool -> string ->
+  typ -> varinfo
 
 (** Make a formal variable for a function declaration. Insert it in both the
     sformals and the type of the function. You can optionally specify where to
@@ -696,7 +709,7 @@ val makeFormalVar: fundec -> ?where:string -> string -> typ -> varinfo
     @modify Chlorine-20180501 the name of the variable is guaranteed to be fresh.
 *)
 val makeLocalVar:
-  fundec -> ?scope:block -> ?temp:bool -> ?insert:bool
+  fundec -> ?scope:block -> ?temp:bool -> ?referenced:bool -> ?insert:bool
   -> string -> typ -> varinfo
 
 (** if needed, rename the given varinfo so that its [vname] does not
@@ -720,7 +733,8 @@ val makeTempVar: fundec -> ?insert:bool -> ?name:string -> ?descr:string ->
 
 (** Make a global variable. Your responsibility to make sure that the name
     is unique. [source] defaults to [true]. [temp] defaults to [false].*)
-val makeGlobalVar: ?source:bool -> ?temp:bool -> string -> typ -> varinfo
+val makeGlobalVar: ?source:bool -> ?temp:bool -> ?referenced:bool -> string ->
+  typ -> varinfo
 
 (** Make a shallow copy of a [varinfo] and assign a new identifier.
     If the original varinfo has an associated logic var, it is copied too and
@@ -837,6 +851,13 @@ val isLogicZero: term -> bool
 
 (** True if the given term is [\null] or a constant null pointer*)
 val isLogicNull: term -> bool
+
+(** [no_op_coerce typ term] is [true] iff converting [term] to [typ] does
+    not modify its value.
+
+    @since Frama-C+dev
+*)
+val no_op_coerce: logic_type -> term -> bool
 
 (** gives the value of a wide char literal. *)
 val reduce_multichar: Cil_types.typ -> int64 list -> int64
@@ -2045,12 +2066,15 @@ val visitCilBlock: cilVisitor -> block -> block
     might prevent it (e.g. if the preceding statement is a statement contract
     or a slicing/pragma annotation, or if there are labels involved). Use
     that whenever you're creating a block in order to hold multiple statements
-    as a result of visiting a single statement.
+    as a result of visiting a single statement. If the block contains local
+    variables, it will not be marked as transient, since removing it will
+    change the scope of those variables.
 
     @raise Fatal error if the given block attempts to declare local variables
-    (in which case it can't be marked as transient anyways).
+    and contain definitions of local variables that are not part of the block.
 
     @since Phosphorus-20170501-beta1
+    @modify Frama-C+dev: do not raise fatal as soon as the block has locals
 *)
 val transient_block: block -> block
 

@@ -109,9 +109,7 @@ let print_std_includes fmt globs =
     in
     let add_file acc g =
       let attrs = Cil_datatype.Global.attr g in
-      match Cil.findAttribute "fc_stdlib" attrs with
-      | [ arg ] -> extract_file acc arg
-      | _ -> acc
+      List.fold_left extract_file acc (Cil.findAttribute "fc_stdlib" attrs)
     in
     let includes = List.fold_left add_file Datatype.String.Set.empty globs in
     let print_one_include s = Format.fprintf fmt "#include \"%s\"@." s in
@@ -383,6 +381,16 @@ let is_same_direction_binop dir op =
 let is_same_direction_rel dir op =
   update_direction_rel dir op <> Nothing
 
+let remove_no_op_coerce t =
+  match t.term_node with
+  | TLogic_coerce (ty,t) when Cil.no_op_coerce ty t -> t
+  | _ -> t
+
+let rec is_singleton t =
+  match t.term_node with
+  | TLogic_coerce(Ltype ({ lt_name = "set"},_), t') -> is_singleton t'
+  | _ -> not (Logic_const.is_set_type t.term_type)
+
 (* when pretty-printing relation chains, a < b && b' < c, it can happen that
    b has a coercion and b' hasn't or vice-versa (bc c is an integer and a and
    b are ints for instance). We nevertheless want to
@@ -390,13 +398,7 @@ let is_same_direction_rel dir op =
    removed any existing head coercion.
 *)
 let equal_mod_coercion t1 t2 =
-  let t1 =
-    match t1.term_node with TLogic_coerce(_,t1) -> t1 | _ -> t1
-  in
-  let t2 =
-    match t2.term_node with TLogic_coerce(_,t2) -> t2 | _ -> t2
-  in
-  Cil_datatype.Term.equal t1 t2
+  Cil_datatype.Term.equal (remove_no_op_coerce t1) (remove_no_op_coerce t2)
 
 (* Grab one of the labels of a statement *)
 let rec pickLabel = function
@@ -417,6 +419,13 @@ let extract_acsl_list t =
 
 let is_cfg_block =
   function Stmt_block _ -> false | Then_with_else | Other | Body -> true
+
+let rec has_unprotected_local_init s =
+  match s.skind with
+  | Instr (Local_init _) -> true
+  | UnspecifiedSequence((s,_,_,_,_) :: _) -> has_unprotected_local_init s
+  | Block { bscoping = false; bstmts = s :: _ } -> has_unprotected_local_init s
+  | _ -> false
 
 class cil_printer () = object (self)
 
@@ -1020,9 +1029,8 @@ class cil_printer () = object (self)
 
   method stmt_labels fmt (s:stmt) =
     let suf =
-      match s.skind with
-      | Instr (Local_init _) -> format_of_string ";@]@ "
-      | _ -> format_of_string "@]@ "
+      if has_unprotected_local_init s then format_of_string ";@]@ "
+      else format_of_string "@]@ "
     in
     if s.labels <> [] then
       Pretty_utils.pp_list
@@ -2337,8 +2345,7 @@ class cil_printer () = object (self)
     | Ttype ty ->
       fprintf fmt "%a(%a)" self#pp_acsl_keyword "\\type" (self#typ None) ty
     | Tunion l
-      when ((List.for_all (fun t -> not(Logic_const.is_set_type t.term_type)) l)
-            && (not state.print_cil_as_is)) ->
+      when (List.for_all is_singleton l) && (not state.print_cil_as_is) ->
       fprintf fmt "{%a}" (Pretty_utils.pp_list ~sep:",@ " self#term) l
     | Tunion locs ->
       fprintf fmt "@[<hov 2>%a(@,%a)@]"
@@ -2388,13 +2395,11 @@ class cil_printer () = object (self)
         pp_defn
         (self#term_prec current_level) body
     | TLogic_coerce(ty,t) ->
-      let debug =
-        Kernel.is_debug_key_enabled Kernel.dkey_print_logic_coercions
-      in
-      if debug then
-        fprintf fmt "/* (coercion to:%a */" (self#logic_type None) ty;
+      if (not (Cil.no_op_coerce ty t)) ||
+         Kernel.is_debug_key_enabled Kernel.dkey_print_logic_coercions
+      then
+        fprintf fmt "(%a)" (self#logic_type None) ty;
       self#term_prec current_level fmt t;
-      if debug then fprintf fmt "/* ) */"
 
   method private term_lval_prec contextprec fmt lv =
     if Precedence.getParenthLevelLogic (TLval lv) > contextprec then
@@ -2887,10 +2892,15 @@ class cil_printer () = object (self)
           (Pretty_utils.pp_list ~sep:",@ " pp_print_string) l
     in
     match ca.annot_content with
-    | AAssert (behav,p) ->
+    | AAssert (behav,Assert,p) ->
       fprintf fmt "@[%a%a@ %a;@]"
         pp_for_behavs behav
         self#pp_acsl_keyword "assert"
+        self#predicate p
+    | AAssert (behav,Check,p) ->
+      fprintf fmt "@[%a%a@ %a;@]"
+        pp_for_behavs behav
+        self#pp_acsl_keyword "check"
         self#predicate p
     | APragma (Slice_pragma sp) ->
       fprintf fmt "@[%a@ %a;@]"

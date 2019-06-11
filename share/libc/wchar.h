@@ -206,7 +206,7 @@ extern int fwscanf(FILE * stream, const wchar_t * format, ...);
 extern int swscanf(const wchar_t * str, const wchar_t * format, ...);
 
 #ifndef __mbstate_t_defined
-typedef struct { int __count; char __value[4]; } mbstate_t;
+typedef struct __fc_mbstate_t { int __count; char __value[4]; } mbstate_t;
 #define __mbstate_t_defined
 #endif
 

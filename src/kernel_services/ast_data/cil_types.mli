@@ -1487,7 +1487,7 @@ and logic_body =
 (** Description of a logic type.
     @plugin development guide *)
 and logic_type_info = {
-  lt_name: string;
+  mutable lt_name: string;
   lt_params : string list; (** type parameters*)
   mutable lt_def: logic_type_def option;
     (** definition of the type. None for abstract types. *)
@@ -1528,7 +1528,7 @@ and logic_var = {
 (** Description of a constructor of a logic sum-type.
     @plugin development guide *)
 and logic_ctor_info =
- { ctor_name: string; (** name of the constructor. *)
+ { mutable ctor_name: string; (** name of the constructor. *)
    ctor_type: logic_type_info; (** type to which the constructor belongs. *)
    ctor_params: logic_type list 
  (** types of the parameters of the constructor. *)
@@ -1739,11 +1739,17 @@ and pragma =
   | Slice_pragma of slice_pragma
   | Impact_pragma of impact_pragma
 
+(** Kind of an assertion:
+    - an assert is both evaluated and used as hypothesis afterwards;
+    - a check is only evaluated, but is not used as an hypothesis: it does not
+      affect the analyses. *)
+and assertion_kind = Assert | Check
+
 (** all annotations that can be found in the code.
     This type shares the name of its constructors with
     {!Logic_ptree.code_annot}. *)
 and code_annotation_node =
-  | AAssert of string list * predicate
+  | AAssert of string list * assertion_kind * predicate
   (** assertion to be checked. The list of strings is the list of
       behaviors to which this assertion applies. *)
 

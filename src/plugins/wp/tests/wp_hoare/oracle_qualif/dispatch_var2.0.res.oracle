@@ -40,7 +40,8 @@
 [wp] [Qed] Goal typed_ref_reset_assigns : Valid
 [wp] Proved goals:   34 / 34
   Qed:            34
-[wp] Report 'tests/wp_hoare/dispatch_var2.i.0.report.json'
+[wp] Report in:  'tests/wp_hoare/oracle_qualif/dispatch_var2.0.report.json'
+[wp] Report out: 'tests/wp_hoare/result_qualif/dispatch_var2.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
 reset                2     -                 2       100%

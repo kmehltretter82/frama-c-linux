@@ -3,12 +3,13 @@
 /.make-wp-why3
 
 /Wp.mli
+/gui/Wp.mli
 /.WP_API_GENERATED
 /driver.ml
 /rformat.ml
 /script.ml
 /why3_xml.ml
-/gui/Wp.mli
+/ProverDetect.ml
 
 /tests/ptests_config
 /tests/*/result

@@ -112,7 +112,10 @@ let pp_named fmt nx =
 
 let pp_code_annot fmt ca =
   match ca.annot_content with
-  | AAssert(bs,np) -> Format.fprintf fmt "assertion%a%a" pp_for bs pp_named np
+  | AAssert(bs,Assert,np) ->
+    Format.fprintf fmt "assertion%a%a" pp_for bs pp_named np
+  | AAssert(bs,Check,np) ->
+    Format.fprintf fmt "check%a%a" pp_for bs pp_named np
   | AInvariant(bs,_,np) ->
     Format.fprintf fmt "invariant%a%a" pp_for bs pp_named np
   | AAssigns(bs,_) -> Format.fprintf fmt "assigns%a" pp_for bs
@@ -250,8 +253,13 @@ let rec pp_prop kfopt kiopt kloc fmt = function
       pp_bhvs bs
       (pp_opt kiopt (pp_kinstr kloc)) ki
       (pp_opt kiopt pp_active) active
-  | IPCodeAnnot(_,_,{annot_content=AAssert(bs,np)}) ->
+  | IPCodeAnnot(_,_,{annot_content=AAssert(bs,Assert,np)}) ->
     Format.fprintf fmt "Assertion%a%a%a"
+      pp_for bs
+      pp_named np
+      (pp_kloc kloc) np.pred_loc
+  | IPCodeAnnot(_,_,{annot_content=AAssert(bs,Check,np)}) ->
+    Format.fprintf fmt "Check%a%a%a"
       pp_for bs
       pp_named np
       (pp_kloc kloc) np.pred_loc
@@ -348,13 +356,15 @@ let to_string pp elt =
   Buffer.contents b
 
 let code_annot_kind_and_node code_annot = match code_annot.annot_content with
-  | AAssert (_, {pred_content; pred_name}) ->
+  | AAssert (_, kind, {pred_content; pred_name}) ->
     let kind = match Alarms.find code_annot with
       | Some alarm -> Alarms.get_name alarm
       | None ->
         if List.exists ((=) "missing_return") pred_name
         then "missing_return"
-        else "user assertion"
+        else match kind with
+          | Assert -> "user assertion"
+          | Check -> "user check"
     in
     Some (kind, to_string Printer.pp_predicate_node pred_content)
   | AInvariant (_, _, {pred_content}) ->
@@ -409,7 +419,7 @@ type order =
   | A of Datatype.String.Set.t
 
 let cmp_order a b = match a , b with
-  | I a , I b -> Pervasives.compare a b
+  | I a , I b -> Transitioning.Stdlib.compare a b
   | I _ , _ -> (-1)
   | _ , I _ -> 1
   | S a , S b -> String.compare a b
@@ -456,11 +466,13 @@ let for_order k = function
   | [] -> [I k]
   | bs -> I (succ k) :: named_order bs
 let annot_order = function
-  | {annot_content=AAssert(bs,np)} ->
+  | {annot_content=AAssert(bs,Check,np)} ->
     for_order 0 bs @ named_order np.pred_name
-  | {annot_content=AInvariant(bs,_,np)} ->
+  | {annot_content=AAssert(bs,Assert,np)} ->
     for_order 2 bs @ named_order np.pred_name
-  | _ -> [I 4]
+  | {annot_content=AInvariant(bs,_,np)} ->
+    for_order 4 bs @ named_order np.pred_name
+  | _ -> [I 6]
 let loop_order = function
   | Id_contract (active,b) -> [B b; A active]
   | Id_loop _ -> []

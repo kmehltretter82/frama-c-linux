@@ -51,7 +51,7 @@ void main_abs(int c)
   r = - (int) q;
 
   *(int*)0x104=0;
-  *r = r;
+  *r = (int) r;
 
   (*q)++;
   a = *q; /* it is incorrect to find 1 here */

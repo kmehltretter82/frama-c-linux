@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -eva @VALUECONFIG@ -deps -calldeps -inout -slevel 5 -eva-msg-key malloc
+   OPT: -eva @EVA_CONFIG@ -deps -calldeps -inout -slevel 5 -eva-msg-key malloc
 */
 //@ assigns \result \from \nothing;
 void *Frama_C_malloc_fresh(unsigned long n);

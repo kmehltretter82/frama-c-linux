@@ -15,7 +15,8 @@
 [wp] Proved goals:    8 / 8
   Qed:             3 
   Alt-Ergo:        5
-[wp] Report 'tests/wp_acsl/looplabels.i.0.report.json'
+[wp] Report in:  'tests/wp_acsl/oracle_qualif/looplabels.0.report.json'
+[wp] Report out: 'tests/wp_acsl/result_qualif/looplabels.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
 copy                 3      5 (256..304)     8       100%

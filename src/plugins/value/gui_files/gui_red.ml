@@ -69,7 +69,7 @@ type red_alarm = {
 
 let get_predicate ca =
   match ca.annot_content with
-  | AAssert (_, p) -> { p with pred_name = [] }
+  | AAssert (_, _, p) -> { p with pred_name = [] }
   | _ -> assert false
 
 let make_red_alarm function_name ki alarm callstacks =
@@ -108,7 +108,7 @@ type t =
 module Data = Indexer.Make(
   struct
     type t = int*row
-    let compare (x,_) (y,_) = Pervasives.compare x y
+    let compare (x,_) (y,_) = Transitioning.Stdlib.compare x y
   end)
 
 let append t message = t.append message

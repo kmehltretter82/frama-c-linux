@@ -1,7 +1,4 @@
 [kernel] Parsing tests/idct/ieee_1180_1990.c (with preprocessing)
-[kernel:parser:decimal-float] tests/idct/ieee_1180_1990.c:101: Warning: 
-  Floating-point constant 3.14159265358979323846 is not represented exactly. Will use 0x1.921fb54442d18p1.
-  (warn-once: no further messages from category 'parser:decimal-float' will be emitted)
 [kernel] Parsing tests/idct/idct.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
@@ -69,9 +66,11 @@
   accessing uninitialized left-value. assert \initialized(&tmp1[i][j]);
 [eva:alarm] tests/idct/idct.c:150: Warning: 
   accessing uninitialized left-value. assert \initialized(&tmp1[i][j]);
-[eva] tests/idct/idct.c:141: Warning: 2's complement assumed for overflow
+[eva:signed-overflow] tests/idct/idct.c:141: Warning: 
+  2's complement assumed for overflow
 [eva] tests/idct/idct.c:125: starting to merge loop iterations
-[eva] tests/idct/idct.c:163: Warning: 2's complement assumed for overflow
+[eva:signed-overflow] tests/idct/idct.c:163: Warning: 
+  2's complement assumed for overflow
 [eva:alarm] tests/idct/idct.c:163: Warning: 
   accessing uninitialized left-value. assert \initialized(&tmp2[k][j]);
 [eva] tests/idct/idct.c:162: starting to merge loop iterations
@@ -80,7 +79,8 @@
   accessing uninitialized left-value. assert \initialized(&tmp1[i][j]);
 [eva:alarm] tests/idct/idct.c:166: Warning: 
   accessing uninitialized left-value. assert \initialized(&tmp1[i][j]);
-[eva] tests/idct/idct.c:176: Warning: 2's complement assumed for overflow
+[eva:signed-overflow] tests/idct/idct.c:176: Warning: 
+  2's complement assumed for overflow
 [eva:alarm] tests/idct/idct.c:176: Warning: 
   accessing uninitialized left-value. assert \initialized(&tmp1[i][j]);
 [eva:alarm] tests/idct/idct.c:178: Warning: 
@@ -119,7 +119,7 @@
 [eva] tests/idct/ieee_1180_1990.c:84: starting to merge loop iterations
 [eva] computing for function IEEE_1180_1990_rand <- IEEE_1180_1990_mkbk <- main.
   Called from tests/idct/ieee_1180_1990.c:85.
-[eva] tests/idct/ieee_1180_1990.c:69: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:69: Warning: 
   2's complement assumed for overflow
 [eva] Recording results for IEEE_1180_1990_rand
 [eva] Done for function IEEE_1180_1990_rand
@@ -342,12 +342,13 @@
 [eva] Done for function IEEE_1180_1990_idctf
 [eva] computing for function idct <- main.
   Called from tests/idct/ieee_1180_1990.c:214.
-[eva] tests/idct/idct.c:129: Warning: 2's complement assumed for overflow
+[eva:signed-overflow] tests/idct/idct.c:129: Warning: 
+  2's complement assumed for overflow
 [eva:alarm] tests/idct/idct.c:129: Warning: 
   accessing uninitialized left-value. assert \initialized(&(*(m1 + k))[j]);
 [eva] Recording results for idct
 [eva] Done for function idct
-[eva] tests/idct/ieee_1180_1990.c:218: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:218: Warning: 
   2's complement assumed for overflow
 [eva:alarm] tests/idct/ieee_1180_1990.c:218: Warning: 
   accessing uninitialized left-value. assert \initialized(&m3[j][k]);
@@ -355,21 +356,21 @@
   accessing uninitialized left-value. assert \initialized(&m4[j][k]);
 [eva:alarm] tests/idct/ieee_1180_1990.c:219: Warning: 
   accessing uninitialized left-value. assert \initialized(&res[0].pme[j][k]);
-[eva] tests/idct/ieee_1180_1990.c:220: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:220: Warning: 
   2's complement assumed for overflow
-[eva] tests/idct/ieee_1180_1990.c:230: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:230: Warning: 
   2's complement assumed for overflow
 [eva:alarm] tests/idct/ieee_1180_1990.c:231: Warning: 
   accessing uninitialized left-value. assert \initialized(&res[0].pmse[j][k]);
 [eva] tests/idct/ieee_1180_1990.c:216: starting to merge loop iterations
-[eva] tests/idct/ieee_1180_1990.c:219: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:219: Warning: 
   2's complement assumed for overflow
-[eva] tests/idct/ieee_1180_1990.c:231: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:231: Warning: 
   2's complement assumed for overflow
 [eva] tests/idct/ieee_1180_1990.c:215: starting to merge loop iterations
 [eva] tests/idct/ieee_1180_1990.c:234: starting to merge loop iterations
 [eva] tests/idct/ieee_1180_1990.c:233: starting to merge loop iterations
-[eva] tests/idct/ieee_1180_1990.c:235: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:235: Warning: 
   2's complement assumed for overflow
 [eva] computing for function IEEE_1180_1990_dctf <- main.
   Called from tests/idct/ieee_1180_1990.c:236.
@@ -383,7 +384,7 @@
   Called from tests/idct/ieee_1180_1990.c:238.
 [eva] Recording results for idct
 [eva] Done for function idct
-[eva] tests/idct/ieee_1180_1990.c:242: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:242: Warning: 
   2's complement assumed for overflow
 [eva:alarm] tests/idct/ieee_1180_1990.c:242: Warning: 
   accessing uninitialized left-value. assert \initialized(&m3[j][k]);
@@ -391,16 +392,16 @@
   accessing uninitialized left-value. assert \initialized(&m4[j][k]);
 [eva:alarm] tests/idct/ieee_1180_1990.c:243: Warning: 
   accessing uninitialized left-value. assert \initialized(&res[3].pme[j][k]);
-[eva] tests/idct/ieee_1180_1990.c:244: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:244: Warning: 
   2's complement assumed for overflow
-[eva] tests/idct/ieee_1180_1990.c:254: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:254: Warning: 
   2's complement assumed for overflow
 [eva:alarm] tests/idct/ieee_1180_1990.c:255: Warning: 
   accessing uninitialized left-value. assert \initialized(&res[3].pmse[j][k]);
 [eva] tests/idct/ieee_1180_1990.c:240: starting to merge loop iterations
-[eva] tests/idct/ieee_1180_1990.c:243: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:243: Warning: 
   2's complement assumed for overflow
-[eva] tests/idct/ieee_1180_1990.c:255: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:255: Warning: 
   2's complement assumed for overflow
 [eva] tests/idct/ieee_1180_1990.c:239: starting to merge loop iterations
 [eva] computing for function IEEE_1180_1990_mkbk <- main.
@@ -428,7 +429,7 @@
 [eva] tests/idct/ieee_1180_1990.c:259: 
   Reusing old results for call to IEEE_1180_1990_idctf
 [eva] tests/idct/ieee_1180_1990.c:260: Reusing old results for call to idct
-[eva] tests/idct/ieee_1180_1990.c:264: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:264: Warning: 
   2's complement assumed for overflow
 [eva:alarm] tests/idct/ieee_1180_1990.c:264: Warning: 
   accessing uninitialized left-value. assert \initialized(&m3[j][k]);
@@ -436,19 +437,19 @@
   accessing uninitialized left-value. assert \initialized(&m4[j][k]);
 [eva:alarm] tests/idct/ieee_1180_1990.c:265: Warning: 
   accessing uninitialized left-value. assert \initialized(&res[1].pme[j][k]);
-[eva] tests/idct/ieee_1180_1990.c:266: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:266: Warning: 
   2's complement assumed for overflow
-[eva] tests/idct/ieee_1180_1990.c:276: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:276: Warning: 
   2's complement assumed for overflow
 [eva:alarm] tests/idct/ieee_1180_1990.c:277: Warning: 
   accessing uninitialized left-value. assert \initialized(&res[1].pmse[j][k]);
 [eva] tests/idct/ieee_1180_1990.c:262: starting to merge loop iterations
-[eva] tests/idct/ieee_1180_1990.c:265: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:265: Warning: 
   2's complement assumed for overflow
-[eva] tests/idct/ieee_1180_1990.c:277: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:277: Warning: 
   2's complement assumed for overflow
 [eva] tests/idct/ieee_1180_1990.c:261: starting to merge loop iterations
-[eva] tests/idct/ieee_1180_1990.c:281: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:281: Warning: 
   2's complement assumed for overflow
 [eva] tests/idct/ieee_1180_1990.c:280: starting to merge loop iterations
 [eva] tests/idct/ieee_1180_1990.c:279: starting to merge loop iterations
@@ -457,7 +458,7 @@
 [eva] tests/idct/ieee_1180_1990.c:283: 
   Reusing old results for call to IEEE_1180_1990_idctf
 [eva] tests/idct/ieee_1180_1990.c:284: Reusing old results for call to idct
-[eva] tests/idct/ieee_1180_1990.c:288: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:288: Warning: 
   2's complement assumed for overflow
 [eva:alarm] tests/idct/ieee_1180_1990.c:288: Warning: 
   accessing uninitialized left-value. assert \initialized(&m3[j][k]);
@@ -465,16 +466,16 @@
   accessing uninitialized left-value. assert \initialized(&m4[j][k]);
 [eva:alarm] tests/idct/ieee_1180_1990.c:289: Warning: 
   accessing uninitialized left-value. assert \initialized(&res[4].pme[j][k]);
-[eva] tests/idct/ieee_1180_1990.c:290: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:290: Warning: 
   2's complement assumed for overflow
-[eva] tests/idct/ieee_1180_1990.c:300: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:300: Warning: 
   2's complement assumed for overflow
 [eva:alarm] tests/idct/ieee_1180_1990.c:301: Warning: 
   accessing uninitialized left-value. assert \initialized(&res[4].pmse[j][k]);
 [eva] tests/idct/ieee_1180_1990.c:286: starting to merge loop iterations
-[eva] tests/idct/ieee_1180_1990.c:289: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:289: Warning: 
   2's complement assumed for overflow
-[eva] tests/idct/ieee_1180_1990.c:301: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:301: Warning: 
   2's complement assumed for overflow
 [eva] tests/idct/ieee_1180_1990.c:285: starting to merge loop iterations
 [eva] computing for function IEEE_1180_1990_mkbk <- main.
@@ -502,7 +503,7 @@
 [eva] tests/idct/ieee_1180_1990.c:305: 
   Reusing old results for call to IEEE_1180_1990_idctf
 [eva] tests/idct/ieee_1180_1990.c:306: Reusing old results for call to idct
-[eva] tests/idct/ieee_1180_1990.c:310: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:310: Warning: 
   2's complement assumed for overflow
 [eva:alarm] tests/idct/ieee_1180_1990.c:310: Warning: 
   accessing uninitialized left-value. assert \initialized(&m3[j][k]);
@@ -510,19 +511,19 @@
   accessing uninitialized left-value. assert \initialized(&m4[j][k]);
 [eva:alarm] tests/idct/ieee_1180_1990.c:311: Warning: 
   accessing uninitialized left-value. assert \initialized(&res[2].pme[j][k]);
-[eva] tests/idct/ieee_1180_1990.c:312: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:312: Warning: 
   2's complement assumed for overflow
-[eva] tests/idct/ieee_1180_1990.c:322: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:322: Warning: 
   2's complement assumed for overflow
 [eva:alarm] tests/idct/ieee_1180_1990.c:323: Warning: 
   accessing uninitialized left-value. assert \initialized(&res[2].pmse[j][k]);
 [eva] tests/idct/ieee_1180_1990.c:308: starting to merge loop iterations
-[eva] tests/idct/ieee_1180_1990.c:311: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:311: Warning: 
   2's complement assumed for overflow
-[eva] tests/idct/ieee_1180_1990.c:323: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:323: Warning: 
   2's complement assumed for overflow
 [eva] tests/idct/ieee_1180_1990.c:307: starting to merge loop iterations
-[eva] tests/idct/ieee_1180_1990.c:327: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:327: Warning: 
   2's complement assumed for overflow
 [eva] tests/idct/ieee_1180_1990.c:326: starting to merge loop iterations
 [eva] tests/idct/ieee_1180_1990.c:325: starting to merge loop iterations
@@ -531,7 +532,7 @@
 [eva] tests/idct/ieee_1180_1990.c:329: 
   Reusing old results for call to IEEE_1180_1990_idctf
 [eva] tests/idct/ieee_1180_1990.c:330: Reusing old results for call to idct
-[eva] tests/idct/ieee_1180_1990.c:334: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:334: Warning: 
   2's complement assumed for overflow
 [eva:alarm] tests/idct/ieee_1180_1990.c:334: Warning: 
   accessing uninitialized left-value. assert \initialized(&m3[j][k]);
@@ -539,16 +540,16 @@
   accessing uninitialized left-value. assert \initialized(&m4[j][k]);
 [eva:alarm] tests/idct/ieee_1180_1990.c:335: Warning: 
   accessing uninitialized left-value. assert \initialized(&res[5].pme[j][k]);
-[eva] tests/idct/ieee_1180_1990.c:336: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:336: Warning: 
   2's complement assumed for overflow
-[eva] tests/idct/ieee_1180_1990.c:346: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:346: Warning: 
   2's complement assumed for overflow
 [eva:alarm] tests/idct/ieee_1180_1990.c:347: Warning: 
   accessing uninitialized left-value. assert \initialized(&res[5].pmse[j][k]);
 [eva] tests/idct/ieee_1180_1990.c:332: starting to merge loop iterations
-[eva] tests/idct/ieee_1180_1990.c:335: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:335: Warning: 
   2's complement assumed for overflow
-[eva] tests/idct/ieee_1180_1990.c:347: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:347: Warning: 
   2's complement assumed for overflow
 [eva] tests/idct/ieee_1180_1990.c:331: starting to merge loop iterations
 [eva] tests/idct/ieee_1180_1990.c:202: starting to merge loop iterations
@@ -872,14 +873,14 @@
   accessing uninitialized left-value. assert \initialized(&res[i].pmse[j][k]);
 [eva:alarm] tests/idct/ieee_1180_1990.c:368: Warning: 
   accessing uninitialized left-value. assert \initialized(&res[i].pme[j][k]);
-[eva] tests/idct/ieee_1180_1990.c:369: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:369: Warning: 
   2's complement assumed for overflow
 [eva] tests/idct/ieee_1180_1990.c:355: starting to merge loop iterations
-[eva] tests/idct/ieee_1180_1990.c:357: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:357: Warning: 
   2's complement assumed for overflow
 [eva:alarm] tests/idct/ieee_1180_1990.c:358: Warning: 
   accessing uninitialized left-value. assert \initialized(&res[i].pmse[j][k]);
-[eva] tests/idct/ieee_1180_1990.c:368: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:368: Warning: 
   2's complement assumed for overflow
 [eva:alarm] tests/idct/ieee_1180_1990.c:369: Warning: 
   accessing uninitialized left-value. assert \initialized(&res[i].pme[j][k]);
@@ -888,7 +889,7 @@
 [eva:alarm] tests/idct/ieee_1180_1990.c:369: Warning: 
   accessing uninitialized left-value. assert \initialized(&res[i].pme[j][k]);
 [eva] tests/idct/ieee_1180_1990.c:354: starting to merge loop iterations
-[eva] tests/idct/ieee_1180_1990.c:389: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:389: Warning: 
   2's complement assumed for overflow
 [eva] tests/idct/ieee_1180_1990.c:350: starting to merge loop iterations
 [eva] Recording results for main
@@ -970,6 +971,24 @@
   idct_mc2[0..7][0..7] ∈ [-8192..8192]
   __retres ∈ {0; 1}
   S___fc_stdout[0..1] ∈ [--..--]
+[eva:summary] ====== ANALYSIS SUMMARY ======
+  ----------------------------------------------------------------------------
+  6 functions analyzed (out of 44): 13% coverage.
+  In these functions, 588 statements reached (out of 626): 93% coverage.
+  ----------------------------------------------------------------------------
+  Some errors and warnings have been raised during the analysis:
+    by the Eva analyzer:      0 errors   42 warnings
+    by the Frama-C kernel:    0 errors    0 warnings
+  ----------------------------------------------------------------------------
+  72 alarms generated by the analysis:
+      64 accesses to uninitialized left-values
+       8 illegal conversions from floating-point to integer
+  ----------------------------------------------------------------------------
+  Evaluation of the logical properties reached by the analysis:
+    Assertions        0 valid     0 unknown     0 invalid      0 total
+    Preconditions    11 valid     0 unknown     0 invalid     11 total
+  100% of the logical properties reached have been proven.
+  ----------------------------------------------------------------------------
 [from] Computing for function IEEE_1180_1990_rand
 [from] Done for function IEEE_1180_1990_rand
 [from] Computing for function IEEE_1180_1990_mkbk
@@ -2142,7 +2161,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 73)
+[ Extern  ] Froms (file share/libc/math.h, line 71)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2186,7 +2205,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 97)
+[ Extern  ] Froms (file share/libc/math.h, line 95)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2218,28 +2237,28 @@
 [ Extern  ] Post-condition for 'domain_error' 'errno_set'
             ensures errno_set: __fc_errno ≡ 1
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/math.h, line 134)
+[ Extern  ] Assigns (file share/libc/math.h, line 132)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 141)
+[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 139)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
 [ Extern  ] Assigns for 'normal' nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 134)
+[ Extern  ] Froms (file share/libc/math.h, line 132)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 134)
+[ Extern  ] Froms (file share/libc/math.h, line 132)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 141)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 139)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 141)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 139)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 137)
+[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 135)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2262,28 +2281,28 @@
 [ Extern  ] Post-condition for 'domain_error' 'errno_set'
             ensures errno_set: __fc_errno ≡ 1
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/math.h, line 148)
+[ Extern  ] Assigns (file share/libc/math.h, line 146)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 155)
+[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 153)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
 [ Extern  ] Assigns for 'normal' nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 148)
+[ Extern  ] Froms (file share/libc/math.h, line 146)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 148)
+[ Extern  ] Froms (file share/libc/math.h, line 146)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 155)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 153)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 155)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 153)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 151)
+[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 149)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2306,28 +2325,28 @@
 [ Extern  ] Post-condition for 'domain_error' 'errno_set'
             ensures errno_set: __fc_errno ≡ 1
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/math.h, line 162)
+[ Extern  ] Assigns (file share/libc/math.h, line 160)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 169)
+[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 167)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
 [ Extern  ] Assigns for 'normal' nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 162)
+[ Extern  ] Froms (file share/libc/math.h, line 160)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 162)
+[ Extern  ] Froms (file share/libc/math.h, line 160)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 169)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 167)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 169)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 167)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 165)
+[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 163)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2350,28 +2369,28 @@
 [ Extern  ] Post-condition for 'domain_error' 'errno_set'
             ensures errno_set: __fc_errno ≡ 1
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/math.h, line 176)
+[ Extern  ] Assigns (file share/libc/math.h, line 174)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 183)
+[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 181)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
 [ Extern  ] Assigns for 'normal' nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 176)
+[ Extern  ] Froms (file share/libc/math.h, line 174)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 176)
+[ Extern  ] Froms (file share/libc/math.h, line 174)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 183)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 181)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 183)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 181)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 179)
+[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 177)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2394,28 +2413,28 @@
 [ Extern  ] Post-condition for 'domain_error' 'errno_set'
             ensures errno_set: __fc_errno ≡ 1
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/math.h, line 190)
+[ Extern  ] Assigns (file share/libc/math.h, line 188)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 197)
+[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 195)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
 [ Extern  ] Assigns for 'normal' nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 190)
+[ Extern  ] Froms (file share/libc/math.h, line 188)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 190)
+[ Extern  ] Froms (file share/libc/math.h, line 188)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 197)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 195)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 197)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 195)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 193)
+[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 191)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2438,28 +2457,28 @@
 [ Extern  ] Post-condition for 'domain_error' 'errno_set'
             ensures errno_set: __fc_errno ≡ 1
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/math.h, line 204)
+[ Extern  ] Assigns (file share/libc/math.h, line 202)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 211)
+[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 209)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
 [ Extern  ] Assigns for 'normal' nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 204)
+[ Extern  ] Froms (file share/libc/math.h, line 202)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 204)
+[ Extern  ] Froms (file share/libc/math.h, line 202)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 211)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 209)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 211)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 209)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 207)
+[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 205)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2485,7 +2504,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 218)
+[ Extern  ] Froms (file share/libc/math.h, line 216)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2505,7 +2524,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 225)
+[ Extern  ] Froms (file share/libc/math.h, line 223)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2525,7 +2544,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 232)
+[ Extern  ] Froms (file share/libc/math.h, line 230)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2542,7 +2561,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 240)
+[ Extern  ] Froms (file share/libc/math.h, line 238)
             assigns \result \from x, y;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2559,7 +2578,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 247)
+[ Extern  ] Froms (file share/libc/math.h, line 245)
             assigns \result \from x, y;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2582,7 +2601,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 255)
+[ Extern  ] Froms (file share/libc/math.h, line 253)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2602,7 +2621,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 262)
+[ Extern  ] Froms (file share/libc/math.h, line 260)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2622,7 +2641,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 269)
+[ Extern  ] Froms (file share/libc/math.h, line 267)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2642,7 +2661,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 276)
+[ Extern  ] Froms (file share/libc/math.h, line 274)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2662,7 +2681,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 283)
+[ Extern  ] Froms (file share/libc/math.h, line 281)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2682,7 +2701,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 290)
+[ Extern  ] Froms (file share/libc/math.h, line 288)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2702,10 +2721,10 @@
 [ Extern  ] Post-condition for 'domain_error' 'errno_set'
             ensures errno_set: __fc_errno ≡ 1
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/math.h, line 301)
+[ Extern  ] Assigns (file share/libc/math.h, line 299)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 312)
+[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 310)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
 [ Extern  ] Assigns for 'infinite' nothing
@@ -2714,22 +2733,22 @@
 [ Extern  ] Assigns for 'normal' nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 301)
+[ Extern  ] Froms (file share/libc/math.h, line 299)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 301)
+[ Extern  ] Froms (file share/libc/math.h, line 299)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 312)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 310)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 312)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 310)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'infinite' (file share/libc/math.h, line 308)
+[ Extern  ] Froms for 'infinite' (file share/libc/math.h, line 306)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 304)
+[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 302)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2758,10 +2777,10 @@
 [ Extern  ] Post-condition for 'domain_error' 'errno_set'
             ensures errno_set: __fc_errno ≡ 1
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/math.h, line 319)
+[ Extern  ] Assigns (file share/libc/math.h, line 317)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 330)
+[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 328)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
 [ Extern  ] Assigns for 'infinite' nothing
@@ -2770,22 +2789,22 @@
 [ Extern  ] Assigns for 'normal' nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 319)
+[ Extern  ] Froms (file share/libc/math.h, line 317)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 319)
+[ Extern  ] Froms (file share/libc/math.h, line 317)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 330)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 328)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 330)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 328)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'infinite' (file share/libc/math.h, line 326)
+[ Extern  ] Froms for 'infinite' (file share/libc/math.h, line 324)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 322)
+[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 320)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2814,10 +2833,10 @@
 [ Extern  ] Post-condition for 'domain_error' 'errno_set'
             ensures errno_set: __fc_errno ≡ 1
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/math.h, line 337)
+[ Extern  ] Assigns (file share/libc/math.h, line 335)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 348)
+[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 346)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
 [ Extern  ] Assigns for 'infinite' nothing
@@ -2826,22 +2845,22 @@
 [ Extern  ] Assigns for 'normal' nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 337)
+[ Extern  ] Froms (file share/libc/math.h, line 335)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 337)
+[ Extern  ] Froms (file share/libc/math.h, line 335)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 348)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 346)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 348)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 346)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'infinite' (file share/libc/math.h, line 344)
+[ Extern  ] Froms for 'infinite' (file share/libc/math.h, line 342)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 340)
+[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 338)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2870,7 +2889,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 376)
+[ Extern  ] Froms (file share/libc/math.h, line 374)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2890,7 +2909,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 384)
+[ Extern  ] Froms (file share/libc/math.h, line 382)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2907,7 +2926,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 414)
+[ Extern  ] Froms (file share/libc/math.h, line 412)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2924,7 +2943,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 421)
+[ Extern  ] Froms (file share/libc/math.h, line 419)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2941,7 +2960,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 428)
+[ Extern  ] Froms (file share/libc/math.h, line 426)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2958,7 +2977,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 435)
+[ Extern  ] Froms (file share/libc/math.h, line 433)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2975,7 +2994,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 442)
+[ Extern  ] Froms (file share/libc/math.h, line 440)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2992,7 +3011,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 449)
+[ Extern  ] Froms (file share/libc/math.h, line 447)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3009,7 +3028,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 460)
+[ Extern  ] Froms (file share/libc/math.h, line 458)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3026,7 +3045,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 467)
+[ Extern  ] Froms (file share/libc/math.h, line 465)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3043,7 +3062,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 474)
+[ Extern  ] Froms (file share/libc/math.h, line 472)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3068,7 +3087,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 500)
+[ Extern  ] Froms (file share/libc/math.h, line 498)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3093,7 +3112,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 508)
+[ Extern  ] Froms (file share/libc/math.h, line 506)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3118,7 +3137,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 516)
+[ Extern  ] Froms (file share/libc/math.h, line 514)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3135,7 +3154,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 529)
+[ Extern  ] Froms (file share/libc/math.h, line 527)
             assigns \result \from x, y;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3152,7 +3171,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 536)
+[ Extern  ] Froms (file share/libc/math.h, line 534)
             assigns \result \from x, y;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3178,7 +3197,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 545)
+[ Extern  ] Froms (file share/libc/math.h, line 543)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3198,7 +3217,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 553)
+[ Extern  ] Froms (file share/libc/math.h, line 551)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3218,7 +3237,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 561)
+[ Extern  ] Froms (file share/libc/math.h, line 559)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3235,7 +3254,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 584)
+[ Extern  ] Froms (file share/libc/math.h, line 582)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3252,7 +3271,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 590)
+[ Extern  ] Froms (file share/libc/math.h, line 588)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3269,7 +3288,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 597)
+[ Extern  ] Froms (file share/libc/math.h, line 595)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3286,7 +3305,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 603)
+[ Extern  ] Froms (file share/libc/math.h, line 601)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3303,7 +3322,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 609)
+[ Extern  ] Froms (file share/libc/math.h, line 607)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3320,7 +3339,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 615)
+[ Extern  ] Froms (file share/libc/math.h, line 613)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3337,7 +3356,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 637)
+[ Extern  ] Froms (file share/libc/math.h, line 635)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3354,7 +3373,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 643)
+[ Extern  ] Froms (file share/libc/math.h, line 641)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3371,7 +3390,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 649)
+[ Extern  ] Froms (file share/libc/math.h, line 647)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3388,7 +3407,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 663)
+[ Extern  ] Froms (file share/libc/math.h, line 661)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3405,7 +3424,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 669)
+[ Extern  ] Froms (file share/libc/math.h, line 667)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3422,7 +3441,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 675)
+[ Extern  ] Froms (file share/libc/math.h, line 673)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3439,7 +3458,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 682)
+[ Extern  ] Froms (file share/libc/math.h, line 680)
             assigns \result \from x, y;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3456,7 +3475,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 689)
+[ Extern  ] Froms (file share/libc/math.h, line 687)
             assigns \result \from x, y;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3473,7 +3492,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 710)
+[ Extern  ] Froms (file share/libc/math.h, line 708)
             assigns \result \from (indirect: *(tagp + (0 ..)));
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3490,7 +3509,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 717)
+[ Extern  ] Froms (file share/libc/math.h, line 715)
             assigns \result \from (indirect: *(tagp + (0 ..)));
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3507,7 +3526,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 724)
+[ Extern  ] Froms (file share/libc/math.h, line 722)
             assigns \result \from (indirect: *(tagp + (0 ..)));
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior

@@ -46,6 +46,8 @@ val change_callstacks:
     For technical reasons, the top of the callstack must currently
     be preserved. *)
 
+(** Prints a summary of the analysis. *)
+val print_summary: unit -> unit
 
 (*
 Local Variables:

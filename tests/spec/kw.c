@@ -11,6 +11,12 @@ assert behavior = 0;
 int main () {
   //@ slevel 4;
   behavior++;
+  struct custom { int reads, behaviors, label ; } writes;
+  //@ assert custom: writes.reads + writes.behaviors <= \let global = writes.label; global;
+  struct at { int module, function, global ; } include;
+  //@ assert at: include.function + include.module  <= \let behaviors = include.global ; behaviors;
+  struct loop { int requires, ensures, checks ; } assert;
+  //@ assert loop: assert.ensures + assert.ensures <= \let reads = assert.checks; reads ;
   return 0;
 }
 

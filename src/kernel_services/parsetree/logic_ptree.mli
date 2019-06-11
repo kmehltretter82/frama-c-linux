@@ -334,11 +334,13 @@ and pragma =
   | Slice_pragma of slice_pragma
   | Impact_pragma of impact_pragma
 
+and assertion_kind = Assert | Check
+
 
 (** all annotations that can be found in the code. This type shares the name of
     its constructors with {!Cil_types.code_annotation_node}. *)
 type code_annot =
-  | AAssert of string list * lexpr
+  | AAssert of string list * assertion_kind * lexpr
   (** assertion to be checked. The list of strings is the list of
       behaviors to which this assertion applies. *)
 

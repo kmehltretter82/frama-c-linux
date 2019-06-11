@@ -7,7 +7,8 @@
 [wp] [Alt-Ergo] Goal typed_f_assert_qed_ko_oracle_ko : Unsuccess
 [wp] Proved goals:    0 / 1
   Alt-Ergo:        0  (unsuccess: 1)
-[wp] Report 'tests/wp_acsl/label_escape.i.1.report.json'
+[wp] Report in:  'tests/wp_acsl/oracle_qualif/label_escape.1.report.json'
+[wp] Report out: 'tests/wp_acsl/result_qualif/label_escape.1.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
 f                   -      -                 1       0.0%

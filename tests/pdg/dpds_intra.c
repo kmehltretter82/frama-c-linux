@@ -1,18 +1,18 @@
 /* run.config
    GCC:
-   OPT: -eva-show-progress -fct-pdg test_struct -journal-disable -pdg-print -pdg-verbose 2
-   OPT: -eva-show-progress -fct-pdg test_if_simple -journal-disable -pdg-print -pdg-verbose 2
-   OPT: -eva-show-progress -fct-pdg test_goto_simple -journal-disable -pdg-print -pdg-verbose 2
-   OPT: -eva-show-progress -fct-pdg test_goto_arriere -journal-disable -pdg-print -pdg-verbose 2
-   OPT: -eva-show-progress -fct-pdg test_goto_else -journal-disable -pdg-print -pdg-verbose 2
-   OPT: -main test_ctrl_dpd_multiple  -journal-disable -pdg-print -pdg-verbose 2
+   STDOPT: +"-fct-pdg test_struct"
+   STDOPT: +"-fct-pdg test_if_simple"
+   STDOPT: +"-fct-pdg test_goto_simple"
+   STDOPT: +"-fct-pdg test_goto_arriere"
+   STDOPT: +"-fct-pdg test_goto_else"
+   STDOPT: +"-main test_ctrl_dpd_multiple "
         => ne passe pas
-   OPT: -eva-show-progress -fct-pdg test_simple_loop -journal-disable -pdg-print -pdg-verbose 2
-   OPT: -eva-show-progress -fct-pdg main -journal-disable -pdg-print -pdg-verbose 2
-   OPT: -eva-show-progress -fct-pdg multiple_global_inputs -journal-disable -pdg-print -pdg-verbose 2
+   STDOPT: +"-fct-pdg test_simple_loop"
+   STDOPT: +"-fct-pdg main"
+   STDOPT: +"-fct-pdg multiple_global_inputs"
 */
 /* bin/toplevel.opt -deps -main g tests/slicing/dpds_intra.c */
-/* bin/toplevel.opt -eva-show-progress -fct-pdg test_goto_simple tests/slicing/dpds_intra.c -pdg-dot */
+/* bin/toplevel.opt -fct-pdg test_goto_simple tests/slicing/dpds_intra.c -pdg-dot */
 
 extern int G;
 

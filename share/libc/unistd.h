@@ -36,8 +36,8 @@ __PUSH_FC_STDLIB
 #include "__fc_define_intptr_t.h"
 #include "__fc_select.h"
 
-#include <getopt.h>
-#include <limits.h>
+
+#include "limits.h"
 
 extern volatile int Frama_C_entropy_source;
 
@@ -747,7 +747,18 @@ extern unsigned int alarm(unsigned int);
 extern int          brk(void *);
 extern int          chdir(const char *path);
 extern int          chroot(const char *path);
-extern int          chown(const char *, uid_t, gid_t);
+
+
+/*@ // missing: may assign to errno: EACCES, ELOOP, ENAMETOOLONG, ENOENT,
+    //                               ENOTDIR, EROFS, EIO, EINTR, EINVAL
+    // missing: assigns \result \from 'filesystem, permissions'
+    // missing: assigns 'file permissions' \from owner, group;
+  requires valid_string_path: valid_read_string(path);
+  assigns \result \from indirect:path, indirect:path[0..], indirect:owner,
+                        indirect:group;
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+*/
+extern int          chown(const char *path, uid_t owner, gid_t group);
 
 /*@
   requires valid_fd: 0 <= fd < __FC_MAX_OPEN_FILES;
@@ -812,7 +823,12 @@ extern int          execve(const char *path, char *const argv[], char *const env
 */
 extern int          execvp(const char *path, char *const argv[]);
 
+/*@
+  assigns \nothing;
+  ensures never_terminates: \false;
+*/
 extern void         _exit(int) __attribute__ ((__noreturn__));
+
 extern int          fchown(int, uid_t, gid_t);
 extern int          fchdir(int);
 extern int          fdatasync(int);
@@ -884,7 +900,15 @@ extern char        *getlogin(void);
 extern int          getlogin_r(char *, size_t);
 extern int          getpagesize(void);
 extern char        *getpass(const char *);
-extern pid_t        getpgid(pid_t);
+
+/*@ //missing: assigns \result \from 'process PGID'
+  assigns \result \from indirect:pid;
+*/
+extern pid_t        getpgid(pid_t pid);
+
+/*@ //missing: assigns \result \from 'calling process PGID'
+  assigns \result \from \nothing;
+*/
 extern pid_t        getpgrp(void);
 
 /*@ //missing: assigns \result \from 'process id'
@@ -908,7 +932,13 @@ extern pid_t        getsid(pid_t);
 extern uid_t        getuid(void);
 
 extern char        *getwd(char *);
-extern int          isatty(int);
+
+/*@ //missing: may assign to errno: EBADF, ENOTTY (POSIX) / EINVAL (Linux)
+  assigns \result \from indirect:fd, indirect:__fc_fds[fd];
+  ensures result_true_or_false: \result == 0 || \result == 1;
+ */
+extern int          isatty(int fd);
+
 extern int          lchown(const char *, uid_t, gid_t);
 extern int          link(const char *, const char *);
 extern int          lockf(int, int, off_t);
@@ -976,7 +1006,13 @@ extern int seteuid(uid_t uid);
 */
 extern int          setgid(gid_t gid);
 
-extern int          setpgid(pid_t, pid_t);
+/*@ // missing: may assign to errno
+  // missing: assigns \result \from 'processes'
+  assigns \result \from indirect:pid, indirect:pgid;
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+*/
+extern int          setpgid(pid_t pid, pid_t pgid);
+
 extern pid_t        setpgrp(void);
 
 /*@ // missing: may assign errno to EINVAL, EPERM or EAGAIN
@@ -1028,23 +1064,35 @@ extern long int     sysconf(int name);
 extern pid_t        tcgetpgrp(int);
 extern int          tcsetpgrp(int, pid_t);
 extern int          truncate(const char *, off_t);
-extern char        *ttyname(int);
+
+extern volatile char __fc_ttyname[TTY_NAME_MAX];
+extern char *__fc_p_ttyname = __fc_ttyname;
+
+/*@
+  // missing: may assign to errno: EBADF, ENOTTY
+  assigns \result \from __fc_p_ttyname, indirect:fildes;
+  ensures result_name_or_null: \result == __fc_p_ttyname || \result == \null;
+ */
+extern char        *ttyname(int fildes);
+
 extern int          ttyname_r(int, char *, size_t);
 extern useconds_t   ualarm(useconds_t, useconds_t);
-extern int          unlink(const char *);
 
-// usleep is not POSIX anymore since 200809
-#if (_XOPEN_SOURCE >= 500) && ! (_POSIX_C_SOURCE >= 200809L) \
-  || /* Glibc since 2.19: */ defined _DEFAULT_SOURCE \
-  || /* Glibc versions <= 2.19: */ defined _BSD_SOURCE
+/*@ // missing: may assign errno
+  // missing: assigns 'filesystem' \from path[0..];
+  // missing: assigns \result \from 'filesystem';
+  requires valid_string_path: valid_read_string(path);
+  assigns \result \from path[0..];
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+ */
+extern int          unlink(const char *path);
+
 /*@
   assigns \result \from indirect:usec, indirect:Frama_C_entropy_source;
   assigns Frama_C_entropy_source \from Frama_C_entropy_source;
   ensures result_ok_or_error: \result == 0 || \result == -1;
  */
 extern int          usleep(useconds_t usec);
-
-#endif
 
 extern pid_t        vfork(void);
 
@@ -1061,7 +1109,6 @@ extern ssize_t      write(int fd, const void *buf, size_t count);
 extern int setgroups(size_t size, const gid_t *list);
 
 // The following functions are GNU extensions
-#ifdef _GNU_SOURCE
 
 /*@
   // missing: assigns \result, *ruid, *euid, *suid \from 'process'
@@ -1111,7 +1158,6 @@ int getresgid(gid_t *rgid, gid_t *egid, gid_t *sgid);
  */
 int setresgid(gid_t rgid, gid_t egid, gid_t sgid);
 
-#endif
 
 __END_DECLS
 

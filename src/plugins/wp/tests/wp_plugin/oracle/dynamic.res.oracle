@@ -77,7 +77,7 @@ Prove: true.
 
 Goal Call point f1 f2 in 'call' at instruction (file tests/wp_plugin/dynamic.i, line 30):
 Let a = Mptr_0[shiftfield_F1_S_f(closure_0)].
-Let a_1 = global(G_f2_26).
+Let a_1 = global(G_f2_28).
 Let a_2 = global(G_f1_20).
 Let x = Mint_0[shiftfield_F1_S_param(closure_0)].
 Assume {
@@ -137,7 +137,7 @@ Assume {
   (* Heap *)
   Have: (region(p.base) <= 0) /\ framed(Mptr_0).
   (* Else *)
-  Have: G_g_44 = 0.
+  Have: G_g_46 = 0.
 }
 Prove: X = 1.
 
@@ -165,7 +165,7 @@ Prove: true.
 
 Goal Call point h1 in 'missing_context' at instruction (file tests/wp_plugin/dynamic.i, line 87):
 Assume { (* Heap *) Have: region(p.base) <= 0. }
-Prove: global(G_h1_57) = p.
+Prove: global(G_h1_59) = p.
 
 ------------------------------------------------------------
 

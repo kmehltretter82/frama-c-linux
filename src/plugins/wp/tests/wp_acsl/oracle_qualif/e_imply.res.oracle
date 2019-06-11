@@ -50,7 +50,8 @@
 [wp] Proved goals:  119 / 119
   Qed:             8 
   Alt-Ergo:      111
-[wp] Report 'tests/wp_acsl/e_imply.i.0.report.json'
+[wp] Report in:  'tests/wp_acsl/oracle_qualif/e_imply.0.report.json'
+[wp] Report out: 'tests/wp_acsl/result_qualif/e_imply.0.report.json'
 -------------------------------------------------------------
 Axiomatics          WP     Alt-Ergo        Total   Success
 Lemma               -      77 (8..20)       77       100%

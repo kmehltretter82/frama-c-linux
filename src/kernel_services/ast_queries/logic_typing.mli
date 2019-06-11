@@ -97,7 +97,11 @@ type typing_context = {
   anonCompFieldName : string;
   conditionalConversion : typ -> typ -> typ;
   find_macro : string -> Logic_ptree.lexpr;
-  find_var : string -> logic_var;
+  find_var : ?label:string -> var:string -> logic_var;
+  (** the label argument is a C label (obeying the restrictions
+      of which label can be present in a \at). If present, the scope for
+      searching local C variables is the one of the statement with
+      the corresponding label. *)
   find_enum_tag : string -> exp * typ;
   find_comp_field: compinfo -> string -> offset;
   find_type : type_namespace -> string -> typ;
@@ -172,6 +176,7 @@ type typing_context = {
 
     @since Carbon-20101201
     @modify Silicon-20161101 change type of the function
+    @modify Frama-C+dev add [status] argument
 *)
 val register_behavior_extension:
   string -> bool ->
@@ -245,7 +250,8 @@ module Make
        val anonCompFieldName : string
        val conditionalConversion : typ -> typ -> typ
        val find_macro : string -> Logic_ptree.lexpr
-       val find_var : string -> logic_var
+       val find_var : ?label:string -> var:string -> logic_var
+       (** see corresponding field in {!Logic_typing.typing_context}. *)
        val find_enum_tag : string -> exp * typ
        val find_type : type_namespace -> string -> typ
        val find_comp_field: compinfo -> string -> offset
@@ -285,8 +291,14 @@ sig
   val type_of_field:
     location -> string -> logic_type -> (term_offset * logic_type)
 
-  (** @since Nitrogen-20111001 *)
-  val mk_cast: Cil_types.term -> Cil_types.logic_type -> Cil_types.term
+  (**
+     @param explicit true if the cast is present in original source.
+            defaults to false
+     @since Nitrogen-20111001
+     @modify Frama-C+dev introduces explicit param
+  *)
+  val mk_cast:
+    ?explicit:bool -> Cil_types.term -> Cil_types.logic_type -> Cil_types.term
 
   (** type-checks a term. *)
   val term : Lenv.t -> Logic_ptree.lexpr -> term

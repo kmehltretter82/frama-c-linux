@@ -32,7 +32,7 @@ module CardinalEstimate = struct
 
   let zero = None
   let one = Some 0.0
-  let of_integer x = Some(Pervasives.log10 (Integer.to_float x))
+  let of_integer x = Some(log10 (Integer.to_float x))
   let infinite = Some(infinity)
   let mul a b = match (a,b) with
     | None, _ | _, None -> None
@@ -103,7 +103,7 @@ module V = struct
       then Ival.contains_zero offset
       else
         let bits_offset = Ival.scale (Bit_utils.sizeofchar()) offset in
-        not (Base.is_valid_offset ~for_writing:false Int.zero base bits_offset)
+        not Base.(is_valid_offset No_access base bits_offset)
     in
     Location_Bytes.exists offset_contains_zero loc
 
@@ -744,7 +744,7 @@ module V_Or_Uninitialized = struct
 (* let (==>) = (fun x y -> (not x) || y) *)
 
   type size_widen_hint = V.size_widen_hint
-  type generic_widen_hint = V.generic_widen_hint
+  type numerical_widen_hint = V.numerical_widen_hint
   type widen_hint = V.widen_hint
   let widen wh t1 t2 =
     create (get_flags t2) (V.widen wh (get_v t1) (get_v t2))

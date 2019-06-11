@@ -1,7 +1,7 @@
 /* run.config
    EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
    CMD: @frama-c@ -load-module tests/slicing/libSelect.cmxs -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs
-   OPT: -eva-show-progress -deps -lib-entry -main h -journal-disable
+   OPT: @EVA_OPTIONS@ -deps -lib-entry -main h -journal-disable
 */
 
 int G;
@@ -24,5 +24,5 @@ int h (void) {
   G = f (4);
   if (G > 0)
     G = g (c);
-  return g;
+  return (int)g;
 }
