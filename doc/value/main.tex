@@ -469,14 +469,14 @@ specification for the missing function.
 What happens is that, without code or specification, Frama-C can only
 {\em guess} what each function does from the function's prototype,
 which is both inaccurate and likely incorrect. \Eva{} needs a specification
-for each function called during the analysis, so one is created on the fly and
-then used, but results are likely to be unsatisfactory.
+for each function without body reached during the analysis, so one is created
+on the fly and then used, but results are likely to be unsatisfactory.
 
 \begin{important}
-  Absence of code and ACSL specification is a major issue which often renders
-  the analysis incorrect. For this reason, the recommended approach of using
-  \Eva{} includes converting this warning into an error, to help spotting it
-  immediately. The {\em analysis script templates}, to be presented in
+  Absence of code or ACSL specification is a major issue which often renders
+  the analysis incorrect. For this reason, we recommend converting this warning
+  into an error, in order to spot it immediately.
+  The {\em analysis script templates}, to be presented in
   section~\ref{analysis-scripts}, already include this change.
 \end{important}
 
@@ -497,7 +497,7 @@ it is a specialization of a call to the variadic function \verb|printf|. This
 specialization is performed by the \textsf{Variadic} plugin\footnote{The
   \textsf{Variadic} plugin is described in more detail in the Frama-C User
   Manual~\cite{FCUserMan}.}.
-All we need to know for now is that the plugin handles calls to such functions
+All we need to know for now is that the plugin handles calls to variadic functions
 and produces sound specifications for them, which are then used by \Eva{}.
 This call to \verb|printf| has no observable effects for the analysis anyway,
 so we do not have anything to be concerned with. It is still a good idea to
@@ -549,11 +549,13 @@ when running \Eva{}, they result in an output similar to the following:
 Note that this message is {\em not} a warning (it does not begin with the word
 ``Warning'') neither an alarm (it is not prefixed with \verb|[eva:alarm]|). It
 is an informative message related to Frama-C's libc specifications that can be
-safely ignored\footnote{For the interested reader: these messages appear due to
-  the fact that the ACSL specifications for functions in Frama-C's
-  \texttt{<string.h>} are very thorough, useful for plugins such as \textsf{WP},
-  and not yet fully interpreted by \Eva{}, which has builtins for them.} and
-will likely disappear in future Frama-C releases.
+safely ignored\footnote{For the interested reader:
+  some of the more thorough ACSL specifications in Frama-C's
+  \texttt{<string.h>} are useful for plugins such as \textsf{WP},
+  but are not yet fully interpreted by \Eva{}. Instead, \Eva{} has builtins to
+  correctly interpret these libc functions without only relying on their
+  specification.}
+and will likely disappear in future Frama-C releases.
 
 \subsection{Interpreting the output of the analysis}
 
@@ -574,8 +576,8 @@ overview, these are the main components of the log:
 \end{itemize}
 
 If we focus on the initial values of variables, we notice that,
-apart from the variables that we defined ourselves, there
-is a rather strange one, named \lstinline|Skein_Swap64_ONE| and containing
+apart from the variables defined in the source code, there
+is a rather strange variable named \lstinline|Skein_Swap64_ONE| and containing
 \lstinline|1|. Searching the source code reveals that this variable is
 in fact variable \verb|ONE|, declared \lstinline|static| inside function
 \lstinline|Skein_Swap64|. Frama-C can
@@ -600,7 +602,7 @@ prefixed by \verb|__fc_|, \verb|__FC_| and \verb|S___fc_|.
 These are variables coming from ACSL specifications in the Frama-C
 standard library.
 
-The log contains some lines such as this:
+After the initial values, the analysis log contains some lines such as:
 
 \begin{logs}
 [eva] skein_block.c:56: starting to merge loop iterations
@@ -631,7 +633,7 @@ read. Reading an initialized value is an undefined behavior according to the
 ISO C99 standard (and can even lead to security vulnerabilities).
 
 As is often the case, this alarm is related to the approximation introduced
-in \verb|skein_block.c:56|, which is the loop responsible for initialising
+in \verb|skein_block.c:56|, which is the loop responsible for initializing
 the values of array \verb|ks[i]|. The order of the messages during the
 analysis thus provides some hints about what is happening, and also some
 ideas about how to solve them.
@@ -645,8 +647,8 @@ it is a good idea to make the analyzer spend more of {\em its} time
 trying to determine the same thing.
 There are different settings that influence the compromise
 between precision and resource consumption. When dealing with bounded loops,
-the best approach consists in using an ACSL annotation, \verb+//@ loop unroll+,
-to direct \Eva{} to spend more time trying to analyze the contents of a loop,
+the best approach consists in using an ACSL annotation, \verb+//@ loop unroll N+,
+to direct \Eva{} to analyze precisely the N first iterations of the loop
 before approximating the results.
 
 Currently, annotating loops is done manually; in future releases of Frama-C,
@@ -665,8 +667,8 @@ In this case, \verb|WCNT| has a constant value (4), so it could also be used
 to estimate the loop bounds.
 
 We can then Ctrl+click on the loop condition in the original source view
-(right panel) to open an editor\footnote{The code editor to be used by the GUI
-  is defined via menu {\em File - Preferences}.} centered on the loop, and
+(right panel) to open an editor\footnote{The external code editor used by the GUI
+  can be defined via the menu {\em File - Preferences}.} centered on the loop, and
 then add the loop unroll annotation, as follows:
 
 \begin{lstlisting}
@@ -700,8 +702,8 @@ before.
 \subsection{Increasing precision with option {\tt -eva-slevel}}
 
 Another way to improve precision in the analysis is to use option
-\verb|-eva-slevel| (formerly known as {\em slevel}.
-This option controls the trade-off between precision
+\verb|-eva-slevel|.
+This option controls the global trade-off between precision
 and analysis effort: the higher the value, the longer the analysis, and
 (hopefully) more precise. You can think of it as some kind of ``fuel''
 to be consumed during the analysis: as long as there is some slevel,
@@ -719,9 +721,9 @@ predictability in large code bases. Indeed, since it is a very general option,
 it is very hard to determine exactly {\em how} it is used: it can be consumed
 by loops, branches, disjunctions; in nested loops, it is consumed by both inner
 and outer loops. In loops with branches, its consumption may become exponential.
-And once a satisfactory value is found, later changes to ACSL specifications,
-\Eva{}'s algorithms and other parameters can affect it, requiring a new
-parametrization.
+And once a satisfactory value is found, later changes to the source code,
+ACSL specifications, \Eva{}'s algorithms or other parameters can affect it,
+requiring a new parametrization.
 
 Still, its ease of use, especially for smaller code bases, makes it very
 convenient for quickly eliminating false alarms. Let us use it in our
@@ -755,21 +757,20 @@ Instead of running \verb|frama-c|, let us use \verb|frama-c-gui|:
 frama-c-gui -eva-slevel 100 -eva *.c >log
 \end{shell}
 
-The GUI allows to inspect the sets of values
-obtained during the analysis and to get
+The GUI allows the user to navigate the source code, to inspect the sets of
+values inferred by the analysis and to get
 a feeling of how it works. Right-clicking on the function name
-in a function call brings a contextual menu that allows to go
-to the function's definition and to inspect it in turn.
+at a call site brings a contextual menu to jump
+to the function's definition.
 In order to return to the caller,
 right-clicking on the name of the current function at the top
-of the normalized code buffer brings a contextual menu
-with a list of callers.
+brings a contextual menu with a list of callers.
 You can also use the Back button (left arrow) in the toolbar.
 The Information panel also offers navigation possibilities between
 variables and their definitions.
 
-In the graphical interface, there are three panels (displayed below the
-source code) which are very useful for \Eva{}: Properties, Values, and
+In the graphical interface, three panels (displayed below the
+source code) are very useful for \Eva{}: Properties, Values, and
 Red Alarms. Further details about the GUI are presented in chapter~\ref{gui}.
 For now, it suffices to say that:
 
@@ -777,13 +778,12 @@ For now, it suffices to say that:
 \item Properties displays (among others) the list of alarms in the program;
 \item Values displays the inferred values for the expression selected in the
   Frama-C normalized source code (highlighted in green);
-\item Red Alarms displays some special cases of alarms which {\em definitely}
-  arrive in the program, even if they are marked as yellow in the Properties
-  panel.
+\item Red Alarms displays some special cases of alarms that should be considered
+  first.
 \end{itemize}
 
-Each alarm is represented in the GUI with a ``bullet'' to the left of the line
-which generates it. Red bullets mean ``this {\em always} happens''; yellow
+In the GUI, each alarm is represented with a ``bullet'' to its left.
+Red bullets mean ``this {\em always} happens''; yellow
 bullets mean ``this {\em may} happen (but I am not sure, due to
 approximations)''. When there are several alarms, some strategies allow
 prioritizing which alarms are more likely to correspond to actual issues.
