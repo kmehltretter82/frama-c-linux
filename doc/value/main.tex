@@ -1505,28 +1505,23 @@ paragraph 6.5.5 of the ISO/IEC 9899:1999 standard.
 If useful, it is also possible to assume that signed integers overflow
 according to a 2's complement representation. The option
 \lstinline|-no-warn-signed-overflow| can be used to this end. A
-reminder message is nevertheless emitted  operations that are detected
-as potentially overflowing.
-%
-Regardless of the value of option \lstinline|-warn-signed-overflow|,
-a warning is emitted on signed arithmetic
-operations applied to the cast to signed int of an address, since the
-compiler may place variables in memory at will.
+reminder warning is nevertheless emitted on operations that are detected
+as potentially overflowing. This warning can also be disabled by option
+\lstinline|-eva-warn-key signed-overflow=inactive|.
 
 By default, no alarm is emitted for arithmetic operations on unsigned integers
 for which an overflow may happen, since such operations have
 defined semantics according to the ISO/IEC 9899:1999 standard.
-If one wishes to signal and prevent such unsigned overflows, 
+If one wishes to signal and prevent such unsigned overflows,
 option \verb+-warn-unsigned-overflow+ can be used.
 
-Finally, no alarm is emitted for downcasts to signed or unsigned
-integers. In the signed case, the least significant bits 
+Finally, by default, no alarm is emitted for downcasts to signed or unsigned
+integers. In the signed case, the least significant bits
 of the original value are used, and are interpreted according
 to 2's complement representation.
 Frama-C's options \lstinline|-warn-signed-downcast| and
-\lstinline|-warn-unsigned-downcast| are not honored by \Eva{}.
-The RTE plug-in can be used to generate the relevant assertions
-before starting an analysis.
+\lstinline|-warn-unsigned-downcast| can be used to emit alarms on signed
+or unsigned downcasts that may exceed the destination range.
 
 
 \subsubsection{Overflow in conversion from floating-point to integer}
