@@ -5247,33 +5247,35 @@ return \lstinline|6| and \lstinline|36| respectively.
 \newcommand{\question}[1]{\stepcounter{question}{\vspace{5mm}\noindent \bf {\large Q.\arabic{question}}~~~{#1}\medskip}}
 
 \question{Which option should I use to improve the handling of loops
-  in my program, {\tt -ulevel} or {\tt -eva-slevel}?}
+  in my program?}
 
-The options \lstinline|-ulevel| and \lstinline|-eva-slevel| have different sets of
-advantages and drawbacks. The main drawback of \lstinline|-ulevel| is that
-it performs a syntactic modification of the analyzed source code,
-which may hamper its manipulation. On the other hand, syntactic
-unrolling, by explicitly separating iteration steps, allows to use
-the graphical user interface
-\lstinline|frama-c-gui| to observe values or express properties for a
-specific iteration step of the loop.
+The recommended way is to use \lstinline|loop unroll| annotations, which are
+the most precise and stable mechanism currently in \Eva{}.
+Alternatively, using \lstinline|-eva-slevel| is the next best approach.
 
-The \lstinline|-eva-slevel| option does not allow to observe a specific
-iteration step of the loop. In fact, this option may even be a little
+Both approaches do have a minor drawback, in that they do not allow to observe
+a specific iteration step of the loop.
+In fact, they may even be a little
 confusing for the user when the program contains loops for which the
 analysis cannot decide easily the truth value of the condition,
 nested loops, or if-then-else
 statements\footnote{if-then-else statements are ``unrolled''
-  in a manner similar to loops}. The main advantages of this option are
-that it leaves the source code unchanged and that it works with
-loops that are built using \lstinline|goto|s instead of \lstinline|for| or \lstinline|while|.
-% The \lstinline|-eva-slevel| option requires less memory than 
-% \lstinline|-ulevel|, and as a consequence it can sometimes be faster.
-It also improves precision when evaluating \lstinline|if| or
-\lstinline|switch| conditionals.
-A current drawback of semantic unrolling is that it can only be specified
-crudely at the function level, whereas syntactic unrolling can be
-specified loop by loop.
+  in a manner similar to loops}. The main advantage of these options are
+that they leave the source code unchanged. Also, \lstinline|-eva-slevel| works
+with loops that are built using \lstinline|goto|s instead of \lstinline|for|
+or \lstinline|while|.
+\lstinline|-eva-slevel| also improves precision when evaluating \lstinline|if|
+or \lstinline|switch| conditionals (but it is consumed by them).
+
+The Frama-C kernel has an option \lstinline|-ulevel|, which performs a
+syntactic modification of the analyzed source code. Its advantage is that,
+by explicitly separating iteration steps, it allows to use
+the graphical user interface to observe values or express properties for a
+specific iteration step of the loop. However, the duplication of loop
+statements and variables can lead to cluttered code. Also, the transformation
+increases the size of the code in the Frama-C AST and, for large functions,
+this has a significant impact in the analysis
+time. For these reasons, \lstinline|-ulevel| is seldom used nowadays.
 
 
 \question{Alarms that occur after a true alarm in the analyzed code
