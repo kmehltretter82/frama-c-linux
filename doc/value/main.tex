@@ -5249,23 +5249,19 @@ return \lstinline|6| and \lstinline|36| respectively.
 \question{Which option should I use to improve the handling of loops
   in my program?}
 
-The recommended way is to use \lstinline|loop unroll| annotations, which are
-the most precise and stable mechanism currently in \Eva{}.
+The recommended way is to use \lstinline|loop unroll| annotations on a case by
+case basis, which is the most precise and stable mechanism currently in \Eva{}.
 Alternatively, using \lstinline|-eva-slevel| is the next best approach.
+This option is more costly, often hard to predict, and can only be specified
+globally or at the function level (via \lstinline|-eva-slevel-function|).
+However, it works for loops that are built using \lstinline|goto|s instead of
+\lstinline|for| or \lstinline|while|, and it also improves precision when
+evaluating \lstinline|if| or \lstinline|switch| conditionals (but it is consumed
+by them, which can be confusing for the user).
 
 Both approaches do have a minor drawback, in that they do not allow to observe
-a specific iteration step of the loop.
-In fact, they may even be a little
-confusing for the user when the program contains loops for which the
-analysis cannot decide easily the truth value of the condition,
-nested loops, or if-then-else
-statements\footnote{if-then-else statements are ``unrolled''
-  in a manner similar to loops}. The main advantage of these options are
-that they leave the source code unchanged. Also, \lstinline|-eva-slevel| works
-with loops that are built using \lstinline|goto|s instead of \lstinline|for|
-or \lstinline|while|.
-\lstinline|-eva-slevel| also improves precision when evaluating \lstinline|if|
-or \lstinline|switch| conditionals (but it is consumed by them).
+a specific iteration step of the loop. The main advantage of these options are
+that they leave the source code unchanged.
 
 The Frama-C kernel has an option \lstinline|-ulevel|, which performs a
 syntactic modification of the analyzed source code. Its advantage is that,
