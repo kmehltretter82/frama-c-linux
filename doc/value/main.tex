@@ -5339,50 +5339,50 @@ about on line 8, but line 9 needs further investigation).
 %\bigskip
 %\bigskip
 
-\question{In my annotations, macros are not pre-processed. What should
-  I do?}
+%% \question{In my annotations, macros are not pre-processed. What should
+%%   I do?}
 
-The annotations being contained inside C comments, they
-{\it a priori} aren't affected by the preprocessing. It is possible
-to instruct Frama-C to launch the preprocessing on annotations
-with the option \lstinline|-pp-annot| (activated by default). Note that this option requires the
-preprocessor to be GNU \lstinline|cpp|, the GCC preprocessor\footnote{More
-  precisely, the preprocessor must understand the {\tt -dD} and the
-  {\tt -P} options that outputs macros definitions along with the
-  pre-processed code and inhibits the generation of {\tt \#line}
-  directives respectively.}.
+%% The annotations being contained inside C comments, they
+%% {\it a priori} aren't affected by the preprocessing. It is possible
+%% to instruct Frama-C to launch the preprocessing on annotations
+%% with the option \lstinline|-pp-annot| (activated by default). Note that this option requires the
+%% preprocessor to be GNU \lstinline|cpp|, the GCC preprocessor\footnote{More
+%%   precisely, the preprocessor must understand the {\tt -dD} and the
+%%   {\tt -P} options that outputs macros definitions along with the
+%%   pre-processed code and inhibits the generation of {\tt \#line}
+%%   directives respectively.}.
 
-A typical example is as follows.
-\listinginputcaption{1}{\texttt{array.c}}{array.c}
-It is useful to use the pre-processor constant \lstinline|N|
-in the post-condition of function \lstinline|get_index()|.
-Use the command-line:
-\begin{shell}
-frama-c -eva array.c -pp-annot
-\end{shell}
-\medskip
+%% A typical example is as follows.
+%% \listinginputcaption{1}{\texttt{array.c}}{array.c}
+%% It is useful to use the pre-processor constant \lstinline|N|
+%% in the post-condition of function \lstinline|get_index()|.
+%% Use the command-line:
+%% \begin{shell}
+%% frama-c -eva array.c -pp-annot
+%% \end{shell}
+%% \medskip
 
-Note that when using this option, the preprocessing is 
-made in two passes (the first
-pass operating on the code only, and the second operating on the
-annotations only). For this reason, the options passed to
-\lstinline|-cpp-command| in this case should only be commands that can
-be applied several times without ill side-effects. For instance,
-the \lstinline+-include+ option to \lstinline|cpp| is a command-line equivalent
-of the \lstinline+#include+ directive. If it was passed to \lstinline+cpp-command+
-while the preprocessing of annotations is being used, the
-corresponding header file would be included twice. The Frama-C
-option \lstinline+-cpp-extra-args <args>+ allows to pass \lstinline+<args>+
-at the end of the command for the first pass of the preprocessing.
+%% Note that when using this option, the preprocessing is 
+%% made in two passes (the first
+%% pass operating on the code only, and the second operating on the
+%% annotations only). For this reason, the options passed to
+%% \lstinline|-cpp-command| in this case should only be commands that can
+%% be applied several times without ill side-effects. For instance,
+%% the \lstinline+-include+ option to \lstinline|cpp| is a command-line equivalent
+%% of the \lstinline+#include+ directive. If it was passed to \lstinline+cpp-command+
+%% while the preprocessing of annotations is being used, the
+%% corresponding header file would be included twice. The Frama-C
+%% option \lstinline+-cpp-extra-args <args>+ allows to pass \lstinline+<args>+
+%% at the end of the command for the first pass of the preprocessing.
 
-Example: In order to force \lstinline+gcc+ to include the header \lstinline+mylib.h+
-and to pre-process the annotations, the following command-line should be
-used:
-\begin{shell}
-frama-c-gui -eva -cpp-command 'gcc -C -E -I.'   \
-       -cpp-extra-args '-include mylib.h'       \
-       -pp-annot file1.c
-\end{shell}
+%% Example: In order to force \lstinline+gcc+ to include the header \lstinline+mylib.h+
+%% and to pre-process the annotations, the following command-line should be
+%% used:
+%% \begin{shell}
+%% frama-c-gui -eva -cpp-command 'gcc -C -E -I.'   \
+%%        -cpp-extra-args '-include mylib.h'       \
+%%        -pp-annot file1.c
+%% \end{shell}
 
 \section*{Acknowledgments}
 
