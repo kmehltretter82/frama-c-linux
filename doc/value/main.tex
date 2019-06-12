@@ -699,38 +699,51 @@ allowed by the annotation (with a minimal increase in analysis time), \Eva{}
 is now able to prove there are no initialization errors in more places than
 before.
 
-\subsection{Increasing precision with option {\tt -eva-slevel}}
+\subsection{Increasing precision}
 
-Another way to improve precision in the analysis is to use option
-\verb|-eva-slevel|.
-This option controls the global trade-off between precision
-and analysis effort: the higher the value, the longer the analysis, and
-(hopefully) more precise. You can think of it as some kind of ``fuel''
+Option \verb|-eva-precision| allows setting a global trade-off between
+precision and analysis time. By default, \Eva{} is tuned to a low precision
+to ensure a fast initial analysis. Especially for smaller code bases, it is
+often useful to increase this precision, to dismiss ``easy'' alarms.
+Precision can be set between 0 and 11, the higher the value, the more precise
+the analysis. The default value of \Eva{} is somewhere between 0 and 1, so that
+setting \verb|-eva-precision 0| potentially allows it to go even faster
+(only useful for large or very complex code bases).
+
+\verb|-eva-precision| is in fact a meta-option, whose only purpose is to set
+the values of other options to a set of predefined values. This avoids the user
+having to know all of them, and which values are reasonable. Think of it as a
+``knob'' to perform a coarse adjustment of the analysis, before fine-tuning
+it more precisely with other options.
+
+\verb|-eva-precision| displays a message when it is used, stating which options
+are affected and the value given to them. If one of those options is already
+specified by the user, that value takes priority over the one chosen by
+\verb|-eva-precision|.
+
+Among the options set by \verb|-eva-precision|, there is \verb|-eva-slevel|,
+which can be thought of as some kind of ``fuel''
 to be consumed during the analysis: as long as there is some slevel,
-the analysis will keep states separate and maintain precision; when all of
+the analysis will keep states separated and maintain precision at the cost of
+extra analysis time; when all of
 it is consumed, further states are merged, avoiding increase in analysis time
-but approximating the results.
-
-The main advantage of \verb|-eva-slevel| is the simplicity of usage: just
-choose a number and run the analysis; increase it if the analysis is quick
-but imprecise, decrease it if the analysis is too slow. It can also be
+but approximating the results. It can also be
 specified separately for each function (\verb|-eva-slevel-function f:n|).
 
-The main inconvenients of \verb|-eva-slevel| are its lack of stability and
-predictability in large code bases. Indeed, since it is a very general option,
-it is very hard to determine exactly {\em how} it is used: it can be consumed
-by loops, branches, disjunctions; in nested loops, it is consumed by both inner
-and outer loops. In loops with branches, its consumption may become exponential.
+For complex code bases, however, \verb|-eva-slevel| lacks in stability and
+predictability: it is very hard to determine exactly {\em how} it is used.
+It can be consumed in the presence of loops, branches, disjunctions;
+in nested loops, it is consumed by both inner and outer loops.
+In loops with branches, its consumption may become exponential.
 And once a satisfactory value is found, later changes to the source code,
 ACSL specifications, \Eva{}'s algorithms or other parameters can affect it,
 requiring a new parametrization.
 
-Still, its ease of use, especially for smaller code bases, makes it very
-convenient for quickly eliminating false alarms. Let us use it in our
-analysis:
+In our example, we can quickly try a few values of \verb|-eva-precision|,
+such as 1, 2 and 3:
 
 \begin{shell}
-frama-c -eva-slevel 100 -eva *.c >log 
+frama-c -eva-precision 3 -eva *.c >log
 \end{shell}
 
 Now, the analysis goes rather far without finding any alarm,
@@ -746,15 +759,15 @@ but when it is almost done (after the analysis of function
 \end{logs}
 
 There remains an alarm about initialization, but all the others have been
-removed. Trying larger values of slevel does not change this. In this case,
-we can afford to spend some time looking at it in more detail.
+removed. Trying larger values for precision or slevel does not change this.
+In this case, we can afford to spend some time looking at it in more detail.
 
 \subsection{Inspecting alarms in the GUI}
 
 Instead of running \verb|frama-c|, let us use \verb|frama-c-gui|:
 
 \begin{shell}
-frama-c-gui -eva-slevel 100 -eva *.c >log
+frama-c-gui -eva-precision 3 -eva *.c >log
 \end{shell}
 
 The GUI allows the user to navigate the source code, to inspect the sets of
@@ -844,7 +857,7 @@ The bug can be fixed by passing
 8*HASHLEN instead of HASHLEN as the second argument of 
 \lstinline|Skein_256_Init|.
 With this fix in place, the analysis
-with \lstinline|-eva-slevel 100| produces no alarms and gives the following
+with \lstinline|-eva-precision 3| produces no alarms and gives the following
 result:
 \begin{logs}
 Values for function main:
@@ -909,7 +922,7 @@ defines \lstinline|Frama_C_interval|. Running Frama-C on this
 file (without \verb|main_1.c| in the same directory, to avoid having two
 definitions for \verb|main|):
 \begin{shell}
-frama-c -eva-slevel 100 -eva *.c >log 2>&1
+frama-c -eva-precision 3 -eva *.c >log 2>&1
 \end{shell}
 
 This time, the absence of actual alarms is starting to be really interesting:
@@ -996,7 +1009,7 @@ sequence, let us now compute the functional dependencies of each function.
 Functional dependencies list, for each output location, 
 the input locations that influence the final contents of this output location:
 \begin{shell}
-frama-c -eva *.c -eva-slevel 100 -deps
+frama-c -eva *.c -eva-precision 3 -deps
 \end{shell}
 \begin{logs}
 Function Skein_256_Init:
@@ -2630,27 +2643,18 @@ The commands and options are detailed in the next section.
 \label{command-line}
 
 The parameters that determine Frama-C's behavior can be
-set through the command line.
-The command to use to launch the tool is:
-\begin{shell}
-frama-c-gui <options> <files>
-\end{shell}
-Most parameters can also be set after the tool is launched,
-in the graphical interface.
-
+set through the command line. There are two main variants of Frama-C,
+one based on the command line (\lstinline|frama-c|), and one which launches
+a graphical interface (\lstinline|frama-c-gui|).
 The options understood by the \Eva{} plug-in are described in
-this chapter. The files are the C files containing source code
-to analyze.
-
-For advanced users and plug-in developers, there exists 
-a ``batch'' version of Frama-C. The executable for the batch version is named
-\lstinline|frama-c| (or \lstinline|frama-c.exe|). All options of \Eva{} 
-work identically for the GUI and batch version of Frama-C.
+this chapter.
+All options of \Eva{} work identically for both the graphical interface
+and for the command line.
 
 \bigskip
 
 The options documented in this manual can be listed,
-with short descriptions, from the command-line. 
+with short descriptions, from the command line.
 Option \lstinline|-kernel-help|
 lists options that affect all plug-ins. Option
 \lstinline|-eva-help| lists options specific to the
@@ -3372,7 +3376,10 @@ the analyzed application. The \lstinline|-eva-slevel-function| option can be use
 several times to set the semantic unrolling level of several functions.
 
 Overall, \lstinline|-eva-slevel| has the advantage of being quick to setup.
-However, it does not allow fine grained control as loop unrolling annotations,
+However, it is in many cases superseded by \lstinline|-eva-precision|, which
+controls other parameters related to analysis precision and speed.
+Also, \lstinline|-eva-slevel| does not allow fine grained control as
+loop unrolling annotations,
 it is context-dependent (e.g. for nested loops), unstable (minor changes in
 control flow may affect the usage of slevel) and hard to estimate in presence
 of complex control flows.
