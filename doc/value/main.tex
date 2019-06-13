@@ -2455,18 +2455,18 @@ respect to the same base address.
 
 The strongest hypothesis that the plug-in relies on is about the representation
 of memory and can be expressed in this way:
-{\bf It is possible to pass from one address to another through the addition
+{\bf it is possible to pass from one address to another through the addition
 of an offset, if and only if the two addresses share the same base address}.
 \medskip
 
-This hypothesis is not true in the C language itself : addresses
+This hypothesis is not true in the C language itself: addresses
 are represented with a finite number of bits, 32 for instance,
-and it is always possible to compute an offset to go from on address
+and it is always possible to compute an offset to go from an address
 to a second one by considering them as integers and subtracting the
 first one from the second one.
 The plug-in generates all the alarms that ensure, if they are checked,
 that the analyzed code fits in this hypothesis. On the following example,
-it generates a proof obligation that means that ``the comparison
+it generates a proof obligation meaning that ``the comparison
 on line 8 is safe only if \lstinline|p| is a valid address or if the base address
 of \lstinline|p| is the same as that of \lstinline|&x|''.
 \listinginput{1}{bases.c}
@@ -2518,7 +2518,7 @@ Dynamic allocation is modeled by creating new bases.
 Each call to \lstinline|malloc| and \lstinline|realloc| potentially creates a
 new base, depending on the \emph{builtins} (described in section~\ref{libc})
 used -- possibly resulting in an unbounded number of such bases.
-Dynamically allocated bases behave mostly like statically allocated one,
+Dynamically allocated bases behave mostly like statically allocated ones,
 except that they come in two flavors:
 %
 \begin{itemize}
@@ -2882,7 +2882,7 @@ you should make use of the non-deterministic primitives described in
 section \ref{nondeterminism} to write an alternative entry point
 for the analysis like this:
 \begin{listing-nonumber}
-int analysis_main(void)
+int eva_main(void)
 {
   char *argv[3];
   char arg[2];
@@ -2898,7 +2898,7 @@ int analysis_main(void)
 For this particular example, the initial state that was
 automatically generated includes the desired one. This may however
 not always be the case. Even when it is the case, it is desirable
-write an analysis entry point that positions the
+to write an analysis entry point that positions the
 values of \lstinline|argc| and \lstinline|argv| to
 improve the relevance of the alarms emitted by \Eva{}.
 
@@ -3279,6 +3279,7 @@ that enable the analyzer to maintain precision while ensuring the analysis
 time remains bounded.
 
 \subsection{Loop unrolling}
+\label{loop-unroll}
 
 Loop unrolling is often easier to apply, since it does not require much
 knowledge about the loop, other than an estimate of the number of iterations.
@@ -4854,9 +4855,8 @@ form:
 \end{listing-nonumber}
 
 This indicates that new bases are being created.
-The analysis will then have to be manually interrupted.
-You will then need to either entirely unroll the loop ({\it e.g.} giving
-the analysis enough \lstinline|slevel|), or use a weak variant.
+You must then manually interrupt the analysis and either unroll the loop
+entirely (see Section~\ref{loop-unroll}) or use a weak variant.
 
 By default, \emph{weak} builtins are used, but usage of
 \lstinline|-eva-builtin| takes precedence over preexisting associations.
