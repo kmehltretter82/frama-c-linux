@@ -100,7 +100,7 @@ depends: [
 ]
 
 depopts: [
-  "coq" { build }
+  "coq" # cannot use {build}: Frama-C must be recompiled when Coq changes
   "why3" { build }
   "why3-coq" { build }
   "mlgmpidl" { build }
