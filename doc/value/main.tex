@@ -1913,7 +1913,7 @@ which causes them to be emitted.
 
 \subsection{Analysis summary}
 
-By default, at the end of the analysis \Eva{} produces a summary such as the
+At the end of the analysis, \Eva{} produces a summary such as the
 following:
 
 \begin{logs}
@@ -1939,15 +1939,25 @@ following:
 It contains:
 
 \begin{itemize}
-\item semantic coverage metrics;
-\item total number of errors and warnings;
-\item total number of alarms, grouped by kind;
-\item total number of property statuses evaluated by \Eva{}.
+\item semantic coverage metrics, with the number of functions and
+  statements analyzed;
+\item total number of errors and warnings, pointing out potential issues that
+  could jeopardize the correction of the analysis;
+\item total number of alarms emitted by the analysis, grouped by kind;
+\item total number of logical properties (assertions and preconditions at each call-site)
+  proven by the analysis.
+  Note that this only indicates the logical statuses evaluated by \Eva{};
+  some logical properties may have been proven by other plugins.
 \end{itemize}
 
 The summary provides a quick glance at the analysis, being especially useful
 for side-by-side comparisons of different parametrizations. It also allows
 one to quickly determine whether there remain issues to be resolved.
+More detailed information is provided through the graphical interface and
+by the Report plugin.
+
+The summary display can be disabled by using option
+\lstinline|-eva-msg-key=-summary|.
 
 
 \section{About these alarms the user is supposed to check\ldots}
