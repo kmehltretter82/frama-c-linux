@@ -368,6 +368,17 @@ struct
   let get_ip ip =
     Uniquify1.unique_basename ip
 
+  (** Uniquify call-site for precondition check. So
+      that precondition of the same call-site are grouped *)
+  module CallSite = Datatype.Triple_with_collections
+      (Kernel_function)(Kernel_function)(Stmt)
+      (struct let module_name = "Wp.WpPropId.CallSite" end)
+  module Uniquify_Stmt = NameUniquify(CallSite)(struct
+      let name = "Wp.WpPropId.Names3."
+      let basename (caller_kf,callee_kf,_stmt) =
+        (Kernel_function.get_name caller_kf)^"_call_"^(Kernel_function.get_name callee_kf)
+    end)
+
   let get_prop_id_base p =
     match p.p_kind , p.p_prop with
     | (PKTactic | PKCheck | PKProp | PKPropLoop) , p -> get_ip p
@@ -377,11 +388,20 @@ struct
     | PKVarPos , p -> get_ip p ^ "_positive"
     | PKAFctOut , p -> get_ip p ^ "_normal"
     | PKAFctExit , p -> get_ip p ^ "_exit"
-    | PKPre(_kf,stmt,pre) , _ ->
-        let kf_name_of_stmt =
-          Kernel_function.get_name
-            (Kernel_function.find_englobing_kf stmt)
-        in Printf.sprintf "%s_call_%s" kf_name_of_stmt (get_ip pre)
+    | PKPre(callee_kf,stmt,pre) , _ ->
+        let caller_kf = Kernel_function.find_englobing_kf stmt in
+        let call_string =
+          Uniquify_Stmt.unique_basename (caller_kf,callee_kf,stmt)
+        in
+        (** remove name of callee kernel function given by get_ip *)
+        let ip_string = get_ip pre in
+        let ip_string =
+          Extlib.opt_conv ip_string
+            (Extlib.string_del_prefix
+               ((Kernel_function.get_name callee_kf)^"_")
+               ip_string)
+        in
+        call_string^"_"^ip_string
 
   let get_prop_id_basename p =
     let basename = get_prop_id_base p in
