@@ -383,7 +383,7 @@ struct
             (Kernel_function.find_englobing_kf stmt)
         in Printf.sprintf "%s_call_%s" kf_name_of_stmt (get_ip pre)
 
-  let get_prop_id_name p =
+  let get_prop_id_basename p =
     let basename = get_prop_id_base p in
     match p.p_part with
     | None -> basename
@@ -392,6 +392,14 @@ struct
         if n < 100 then Printf.sprintf "%s_part%02d" basename (succ k) else
         if n < 1000 then Printf.sprintf "%s_part%03d" basename (succ k) else
           Printf.sprintf "%s_part%06d" basename (succ k)
+
+  module Uniquify2 = NameUniquify(PropId)(struct
+      let name = "Wp.WpPropId.Names2."
+      let basename = get_prop_id_basename
+    end)
+
+  let get_prop_id_name p =
+    Uniquify2.unique_basename p
 
 end
 
