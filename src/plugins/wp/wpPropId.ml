@@ -232,22 +232,27 @@ module PropId =
 (* --- Lagacy Naming                                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
-module LegacyNames :
+module NameUniquify(D:Datatype.S_with_collections)(S:sig
+    val name: string
+    val basename: D.t -> string
+  end) :
 sig
-  val get_prop_id_name: prop_id -> string
-end = struct
+  val unique_basename: D.t -> string
+end
+=
+struct
 
   module NamesTbl = State_builder.Hashtbl(Datatype.String.Hashtbl)(Datatype.Int)
       (struct
-        let name = "WpPropertyNames"
+        let name = S.name^"Names"
         let dependencies = [ ]
         let size = 97
       end)
 
   module IndexTbl =
-    State_builder.Hashtbl(PropId.Hashtbl)(Datatype.String)
+    State_builder.Hashtbl(D.Hashtbl)(Datatype.String)
       (struct
-        let name = "WpPropertyIndex"
+        let name = S.name^"Index"
         let dependencies =
           [ Ast.self;
             NamesTbl.self;
@@ -257,6 +262,38 @@ end = struct
             Annotations.global_state ]
         let size = 97
       end)
+
+
+  (** returns the name that should be returned by the function [get_prop_name_id]
+      if the given property has [name] as basename. That name is reserved so that
+      [get_prop_name_id prop] can never return an identical name. *)
+  let reserve_name_id pid =
+    let basename = S.basename pid in
+    try
+      let speed_up_start = NamesTbl.find basename in
+      (* this basename is already reserved *)
+      let n,unique_name = Extlib.make_unique_name NamesTbl.mem ~sep:"_" ~start:speed_up_start basename
+      in NamesTbl.replace basename (succ n) ; (* to speed up Extlib.make_unique_name for next time *)
+      unique_name
+    with Not_found -> (* first time that basename is reserved *)
+      NamesTbl.add basename 2 ;
+      basename
+
+  (** returns a unique name identifying the property.
+      This name is built from the basename of the property. *)
+  let unique_basename pid =
+    try IndexTbl.find pid
+    with Not_found -> (* first time we are asking for a name for that [ip] *)
+      let unique_name = reserve_name_id pid in
+      IndexTbl.add pid unique_name ;
+      unique_name
+
+end
+
+module LegacyNames :
+sig
+  val get_prop_id_name: prop_id -> string
+end = struct
 
   let base_id_prop_txt = Property.LegacyNames.get_prop_name_id
 
@@ -296,29 +333,17 @@ end = struct
             Printf.sprintf "%s_part%06d" basename (succ k)
     in normalize_basename basename
 
-  (** returns the name that should be returned by the function [get_prop_name_id]
-      if the given property has [name] as basename. That name is reserved so that
-      [get_prop_name_id prop] can never return an identical name. *)
-  let reserve_name_id pid =
-    let basename = get_prop_id_basename pid in
-    try
-      let speed_up_start = NamesTbl.find basename in
-      (* this basename is already reserved *)
-      let n,unique_name = Extlib.make_unique_name NamesTbl.mem ~sep:"_" ~start:speed_up_start basename
-      in NamesTbl.replace basename (succ n) ; (* to speed up Extlib.make_unique_name for next time *)
-      unique_name
-    with Not_found -> (* first time that basename is reserved *)
-      NamesTbl.add basename 2 ;
-      basename
+
+  module UniquifyPropId = NameUniquify(PropId)(struct
+      let name = "WpProperty"
+      let basename = get_prop_id_basename
+    end)
+
 
   (** returns a unique name identifying the property.
       This name is built from the basename of the property. *)
   let get_prop_id_name pid =
-    try IndexTbl.find pid
-    with Not_found -> (* first time we are asking for a name for that [ip] *)
-      let unique_name = reserve_name_id pid in
-      IndexTbl.add pid unique_name ;
-      unique_name
+    UniquifyPropId.unique_basename pid
 
 end
 
@@ -332,45 +357,16 @@ sig
 end =
 struct
 
-  module NamesTbl = State_builder.Hashtbl(Datatype.String.Hashtbl)(Datatype.Int)
-      (struct
-        let name = "Wp.WpPropId.Names.NamesTbl"
-        let dependencies = [ ]
-        let size = 97
-      end)
-
-  module IndexTbl =
-    State_builder.Hashtbl(Property.Hashtbl)(Datatype.String)
-      (struct
-        let name = "Wp.WpPropId.Names.IndexTbl"
-        let dependencies =
-          [ Ast.self;
-            NamesTbl.self;
-            Globals.Functions.self;
-            Annotations.code_annot_state;
-            Annotations.funspec_state;
-            Annotations.global_state ]
-        let size = 97
-      end)
-
-  let compute_ip ip =
-    let truncate = max 20 (Wp_parameters.TruncPropIdFileName.get ()) in
-    let basename = Property.Names.get_prop_basename ~truncate ip in
-    try
-      let speed_up_start = NamesTbl.find basename in
-      let n,unique_name = Extlib.make_unique_name
-          NamesTbl.mem ~sep:"_" ~start:speed_up_start basename
-      in NamesTbl.replace basename (succ n) ;
-      unique_name
-    with Not_found -> (* first time that basename is reserved *)
-      NamesTbl.add basename 2 ; basename
+  (** Uniquify the first part of the prop_id *)
+  module Uniquify1 = NameUniquify(Property)(struct
+      let name = "Wp.WpPropId.Names."
+      let basename ip =
+        let truncate = max 20 (Wp_parameters.TruncPropIdFileName.get ()) in
+        Property.Names.get_prop_basename ~truncate ip
+    end)
 
   let get_ip ip =
-    try IndexTbl.find ip
-    with Not_found -> (* first time we are asking for a name for that [ip] *)
-      let unique_name = compute_ip ip in
-      IndexTbl.add ip unique_name ;
-      unique_name
+    Uniquify1.unique_basename ip
 
   let get_prop_id_base p =
     match p.p_kind , p.p_prop with
