@@ -152,29 +152,39 @@ let state =
    parenthesized if its parentheses level is >= that that of its context.
    Identifiers have the lowest level and weakly binding operators (e.g. |)
    have the largest level. The correctness criterion is that a smaller level
-   MUST correspond to a stronger precedence! *)
+   MUST correspond to a stronger precedence! 
+   These levels must be coherent with the precedence used in file
+   [src/kernel_internals/parsing/logic_parser.mly].
+*)
 module Precedence = struct
 
-  let derefStarLevel = 20
-  let indexLevel = 20
-  let arrowLevel = 20
-  let addrOfLevel = 30
-  let multiplicativeLevel = 40
-  let additiveLevel = 60
-  let comparativeLevel = 70
-  let bitwiseLevel = 75
-  let logic_level = 77
+  let derefStarLevel = 20 (* [%left DOT ARROW LSQUARE] *)
+  let indexLevel = 20     (* [%left DOT ARROW LSQUARE] *)
+  let arrowLevel = 20     (* [%left DOT ARROW LSQUARE] *)
+  let addrOfLevel = 30         (* [%left STAR SLASH PERCENT] *)
+  let multiplicativeLevel = 40 (* [%left STAR SLASH PERCENT] *)
+  let additiveLevel = 60       (* [%left PLUS MINUS] *)
+  let comparativeLevel = 70    (* [%left LT] *)
+  let bitwiseLevel = 75 (* [%left BIFF]
+                           [%right BIMPLIES]
+                           [%left PIPE]
+                           [%left HAT]
+                           [%left STARHAT] (releted to \repeat)
+                           [%nonassoc IN] ???
+                           [%left AMP] *)
+  let logic_level = 77 (* Tif _ -> [%right QUESTION prec_question] *)
 
   (* Be careful if you change the relative order of these 3 levels *)
-  let and_level = 83
-  let xor_level = 84
-  let or_level = 85
+  let and_level = 83  (* [%left AND] *)
+  let xor_level = 84  (* [%left HATHAT] *)
+  let or_level = 85   (* [%left OR] *)
   let assoc_connector_level x =
     and_level <= x && x <= or_level
 
-  let binderLevel = 90
-  let questionLevel = 100
-  let upperLevel = 110
+  let binderLevel = 90    (* [%nonassoc prec_forall prec_exists prec_lambda LET] *)
+  let questionLevel = 100 (* [%right QUESTION prec_question] *)
+  let upperLevel = 110    (* [%nonassoc TYPENAME]
+                             [%right prec_named] *)
 
   (* is this predicate the encoding of [\in]? If so, return its arguments. *)
   let subset_is_backslash_in p = match p with
@@ -198,18 +208,18 @@ module Precedence = struct
     | Pat _
     | Pfresh _ -> 0
     | Papp _ as p -> if subset_is_backslash_in p = None then 0 else 36
-    | Pnot _ -> 30
+    | Pnot _ -> 30 (* [%right prec_cast TILDE NOT prec_unary_op *)
     | Psubtype _ -> 75
-    | Pand _ -> and_level
-    | Pxor _ -> xor_level
-    | Por _ -> or_level
-    | Pimplies _ -> 87 (* and 88 for positive side *)
-    | Piff _ -> 89
-    | Pif _ -> questionLevel
-    | Prel _ -> comparativeLevel
+    | Pand _ -> and_level (* [%left AND] *)
+    | Pxor _ -> xor_level (* [%left HATHAT] *)
+    | Por _ -> or_level (* [%left OR] *)
+    | Pimplies _ -> 87 (* and 88 for positive side *) (* [%right IMPLIES] *)
+    | Piff _ -> 89 (* [%left IFF] *)
+    | Pif _ -> questionLevel (* [%right QUESTION prec_question] *)
+    | Prel _ -> comparativeLevel (* [%left LT] *)
     | Plet _
     | Pforall _
-    | Pexists _ -> binderLevel
+    | Pexists _ -> binderLevel (* [%nonassoc prec_forall prec_exists prec_lambda LET] *)
 
   let compareLevel x y =
     if assoc_connector_level x && assoc_connector_level y then 0
