@@ -68,3 +68,6 @@ int *AA(void);
 //@ logic set<integer> Sadd_elem_1(set<integer> s, integer e) = \union(s,e) ;
 //@ logic set<integer> Sadd_elem_2(set<integer> s, integer e) = \union(s,{e}) ;
 
+//@ predicate Smember_and(set<integer> s, integer v1, integer v2) = v1 & v2 \in s ;
+//@ predicate Smember_or (set<integer> s, integer v1, integer v2) = v1 | v2 \in s ;
+
