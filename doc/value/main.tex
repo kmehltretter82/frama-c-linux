@@ -2658,6 +2658,7 @@ Section \ref{command-line} presents the general usage options of \Eva{} in the
 command-line.
 The options described in section \ref{context} are correctness options,
 while the remaining sections (\ref{boucles-traitement},
+\ref{trace-partitioning},
 \ref{controlling-approximations} and \ref{sec:eva}) deal with performance
 tuning options. Section \ref{nonterm} presents a derived analysis to
 obtain information about non-termination.
@@ -3709,6 +3710,118 @@ line~7, by an invariant, that remains to be proven.
 %% are available, but the values predicted by the analysis are
 %% less precise, because \verb|irrelevant_function| has been analyzed
 %% less precisely.
+
+
+\section{Improving precision with reasoning by case}
+\label{trace-partitioning}
+
+Some formal proofs about programs require to use \emph{reasoning by cases}. \Eva can
+perform such reasonings through the use of the \emph{Trace Partitioning}
+\cite{trace-partitioning} techniques. These can be enabled manually or
+automatically. It is important to note that, whatever the method used, the
+partitioning and thus the reasoning by case stops at the end of a function
+and can only be extended past the function return if there is enough
+\lstinline|slevel| in the calling function.
+
+
+\subsection{Automatic partitioning on conditional structures}
+
+It sometimes happens that the cases we want to reason on are exactly the
+cases distinguished in the program in an \lstinline|if-then-else| or a
+\lstinline|switch| not far above.  even if these blocks are already closed
+at the point we need the reasoning by cases. Unless enough
+\lstinline|slevel| is available, the cases of a conditional structures are
+approximated together as soon as the analyzer leaves the block. \Eva can delay
+this approximation until after the statement where the reasoning
+by cases is needed.
+
+The global command-line parameter \lstinline|-eva-partition-history <n>|
+will delay the approximation for all conditional structures of the whole
+program. It takes a parameter \lstinline|<n>| which allow to control the delay.
+It represents the number of junction points for which we keep the incoming
+path (the cases) separated. A value of $1$ means that \Eva will reason by
+case on the previous \lstinline|if-then-else| until another
+\lstinline|if-then-else| is closed.
+
+This option has a very high cost on the analysis, theoretically increasing the
+analysis time by 2 for $n = 1$, and doubling each time $n$ is increased by $1$.
+The cost can even be higher if there are \lstinline|switch| instructions in the
+program. However, it can remove false alarms in a fully automatic way. Thus,
+the trade off might often be worth trying.
+
+Choosing a value for \lstinline|<n>| strictly greater than 1 is often not
+needed.
+
+
+\subsection{Manual partitioning on values}
+
+The reasoning by case can be forced inside a function by using \lstinline|split|
+annotations. These annotations must be given an expression which values
+correspond to the cases being enumerated. The example below show a usage
+of this annotation.
+
+\lstinputlisting{examples/parametrizing/split-array.c}
+
+The \lstinline|split| requires that the analyzer enumerate all the 3 possible
+values for \lstinline|i| and conduct a specialized analysis of the function for
+each of these values. Thereafter, the value of \lstinline|i| is always
+evalutated by \Eva{} as a singleton and it enables the use of a
+\lstinline|loop unroll| annotation on \lstinline|i|. This way, the result of
+the function can be exactly computed as the set of three possible value instead
+of an imprecise interval.
+
+\lstinputlisting[linerange={25-26}]
+  {examples/parametrizing/split-array.log}
+
+The \lstinline|split| can be any expression that evaluate to a {\it small}
+number of integer values. In particular, it can be C comparisons like in
+the following example.
+
+\lstinputlisting{examples/parametrizing/split-fabs.c}
+
+To be analyzed properly, the equality domain must be activated with the option
+\lstinline|-eva-equality-domain| (see section \ref{sec:symbolic-equalities})
+as we need the equality relations between the input and the output of the
+function \lstinline|fabs|, i.e. the relations \lstinline|x == \result| or
+\lstinline|x == -\result|. Then, the \lstinline|split| annotation placed before
+the call to \lstinline|fabs| allows us to reason by case and infer the relevant
+equality in each case.
+
+Note in the previous example the use of \lstinline|merge| annotation. These
+annotations ends the reasoning by cases and must use the exact same expression
+as a previous \lstinline|split|. In this example, the \lstinline|merge|
+annotation is not needed as the partitioning will be ended at the end of the
+function anyway. The use of \lstinline|merge| annotations is not mandatory,
+and are these annotations exists only to allow the user to mitigate the cost of
+the reasoning by cases.
+
+Alternatively to annotations, it is possible to use the command-line to
+reason by case during the whole analysis. The command line parameter
+\lstinline|-eva-partition-value <V>| forces the analyzer to reason at all times
+on single values of the global variable \lstinline|<V>|.
+
+There are three limitations to partitioning on values.
+
+\begin{enumerate}
+\item While the number of simultaneous splits (whether local with annotations
+  or global through command line) is not bounded, there can be only one split
+  per expression. If two \lstinline|split| annotation uses the same expression,
+  only the latest one encountered on the path will be kept. Although it is a
+  limitation, it can be used to define strategies where a reasoning by case is
+  controlled accross the whole program.
+\item The expression on which the split is done must evaluate to a bounded set
+  of values. Otherwise, the analysis would not be guaranteed to terminate. The
+  analysis must be precise enough in order to prove the boundedness. When \Eva{}
+  fails to prove that the number of possible values is lower than a defined limit,
+  either because the set is unbounded or because it failed to prove it,
+  it will raise a warning and cancel the split. The limit is arbitrary and
+  can be set with the option \lstinline|-eva-split-limit <n>|.
+\item When the expression is complex, the ability of \Eva{} to reason
+  precisely by cases depends on the activated abstract domains (see section
+  \ref{sec:eva}) and their capability to learn from the expression. \Eva{} will
+  try to detect this and will cancel the split and warn the user when it is
+  not useful.
+\end{enumerate}
 
 
 \section{Controlling approximations}

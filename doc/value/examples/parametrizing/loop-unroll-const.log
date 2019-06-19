@@ -4,8 +4,8 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] loop-unroll-const.c:7: Trace partitioning superposing up to 100 states
-[eva] loop-unroll-const.c:7: Trace partitioning superposing up to 200 states
+[eva] loop-unroll-const.c:8: Trace partitioning superposing up to 100 states
+[eva] loop-unroll-const.c:8: Trace partitioning superposing up to 200 states
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:

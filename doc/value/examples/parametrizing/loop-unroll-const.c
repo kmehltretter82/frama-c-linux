@@ -1,5 +1,6 @@
 #define NROWS 10
-void main(void) {
+void main(void)
+{
   int a[NROWS][20] = {0};
   //@ loop unroll NROWS;
   for (int i = 0; i < 10; i++) {
