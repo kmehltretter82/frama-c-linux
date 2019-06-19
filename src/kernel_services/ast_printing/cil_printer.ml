@@ -158,17 +158,23 @@ let state =
 *)
 module Precedence = struct
 
-  let upperLevel = 110          (* Occurence order in [logic_parser.mly]: 
+  let upperLevel = 110          (* Occurence order in [logic_parser.mly]:
                                    1 [%right prec_named]
                                    2 [%nonassoc TYPENAME] *)
   let questionLevel = 100 (* Pif, Aquestion:
                                    4 [%right QUESTION prec_question] *)
   let binderLevel = 90          (* 3 [%nonassoc prec_forall prec_exists prec_lambda LET] *)
 
+  let iff_level = 89            (* 5 [%left IFF] *)
+  let implies_level = 87 (* and +1 for positive side
+                                   6 [%right IMPLIES] *)
+
   (* Be careful if you change the relative order of these 3 levels *)
   let or_level = 85             (* 7 [%left OR] *)
   let xor_level = 84            (* 8 [%left HATHAT] *)
   let and_level = 83            (* 9 [%left AND] *)
+  let and_or_level = 80         (* 7 [%left OR]
+                                   9 [%left AND]  *)
   let assoc_connector_level x =
     and_level <= x && x <= or_level
 
@@ -181,14 +187,22 @@ module Precedence = struct
                                   14 [%left STARHAT] (releted to \repeat)
                                   15 [%nonassoc IN] ???
                                   16 [%left AMP] *)
+  let subtypeLevel = 75        (* 22 [%nonassoc LTCOLON COLONGT] *)
   let comparativeLevel = 70    (* 17 [%left LT] *)
-  let additiveLevel = 60       (* 19 [%left PLUS MINUS] *)
+  let additiveLevel = 60       (* 18 [%left LTLT GTGT]
+                                  19 [%left PLUS MINUS] *)
   let multiplicativeLevel = 40 (* 20 [%left STAR SLASH PERCENT] *)
+  let belongLevel = 36         (* 15 [%nonassoc IN] ??? *)
+  let unaryLevel = 30          (* 21 [%right prec_cast TILDE NOT prec_unary_op] *)
   let addrOfLevel = 30         (* 21 [%right prec_cast TILDE NOT prec_unary_op] *)
+  let coerseLevel = 25         (* -  [%token] *)
+  let memOffset_level = 20     (* 23 [%left DOT ARROW LSQUARE] *)
   let derefStarLevel = 20      (* 23 [%left DOT ARROW LSQUARE] *)
   let indexLevel = 20          (* 23 [%left DOT ARROW LSQUARE] *)
   let arrowLevel = 20          (* 23 [%left DOT ARROW LSQUARE] *)
-
+  let sizeOfLevel = 20         (* -  [%token] *)
+  let alignOfLevel = 20        (* -  [%token] *)
+  let applicationLevel = 10    (* -  [%token] *)
 
   (* is this predicate the encoding of [\in]? If so, return its arguments. *)
   let subset_is_backslash_in p = match p with
@@ -214,21 +228,18 @@ module Precedence = struct
 
     | Plet _
     | Pforall _
-    | Pexists _ -> binderLevel    (* Occurence order in [logic_parser.mly]: 
-                                     3 [%nonassoc prec_forall prec_exists prec_lambda LET] *)
-    | Pif _ -> questionLevel      (* 4 [%right QUESTION prec_question] *)
-    | Piff _ -> 89                (* 5 [%left IFF] *)
-    | Pimplies _ -> 87 (* and 88 for positive side *)
-                                  (* 6 [%right IMPLIES] *)
-    | Por _ -> or_level           (* 7 [%left OR] *)
-    | Pxor _ -> xor_level         (* 8 [%left HATHAT] *)
-    | Pand _ -> and_level         (* 9 [%left AND] *)
+    | Pexists _ -> binderLevel
+    | Pif _ -> questionLevel
+    | Piff _ -> iff_level
+    | Pimplies _ -> implies_level (* and +1 for positive side *)
+    | Por _ -> or_level
+    | Pxor _ -> xor_level
+    | Pand _ -> and_level
 
-    | Papp _ as p -> if subset_is_backslash_in p = None
-      then 0 else 36             (* 15 [%nonassoc IN] ??? *)
-    | Prel _ -> comparativeLevel (* 18 [%left LT] *)
-    | Pnot _ -> 30               (* 21 [%right prec_cast TILDE NOT prec_unary_op] *)
-    | Psubtype _ -> 75           (* 22 [%nonassoc LTCOLON COLONGT] *)
+    | Papp _ as p -> if subset_is_backslash_in p = None then 0 else belongLevel
+    | Prel _ -> comparativeLevel
+    | Pnot _ -> unaryLevel
+    | Psubtype _ -> subtypeLevel
 
   let compareLevel x y =
     if assoc_connector_level x && assoc_connector_level y then 0
@@ -240,77 +251,73 @@ module Precedence = struct
     then c > 0
     else
       not (thisLevel == binderLevel ||
-           thisLevel == 89 (* Piff *) ||
+           thisLevel == iff_level (* Piff *) ||
            (assoc_connector_level thisLevel && thisLevel == contextprec
             && not state.print_cil_as_is))
 
   let getParenthLevel e = match (Cil.stripInfo e).enode with
     | Info _ -> assert false
-    | BinOp((LAnd | LOr), _,_,_) -> 80
+    | BinOp((LAnd | LOr), _,_,_) -> and_or_level
     (* Bit operations. *)
-    | BinOp((BOr|BXor|BAnd),_,_,_) -> bitwiseLevel (* 75 *)
+    | BinOp((BOr|BXor|BAnd),_,_,_) -> bitwiseLevel
     (* Comparisons *)
-    | BinOp((Eq|Ne|Gt|Lt|Ge|Le),_,_,_) ->
-      comparativeLevel (* 70 *)
+    | BinOp((Eq|Ne|Gt|Lt|Ge|Le),_,_,_) -> comparativeLevel
     (* Additive. Shifts can have higher level than + or - but I want parentheses
        around them *)
     | BinOp((MinusA|MinusPP|MinusPI|PlusA|
-             PlusPI|IndexPI|Shiftlt|Shiftrt),_,_,_)
-      -> additiveLevel (* 60 *)
+             PlusPI|IndexPI|Shiftlt|Shiftrt),_,_,_) -> additiveLevel
     (* Multiplicative *)
     | BinOp((Div|Mod|Mult),_,_,_) -> multiplicativeLevel
     (* Unary *)
-    | CastE(_,_) -> 30 
-    | AddrOf(_) -> 30
-    | StartOf(_) -> 30
-    | UnOp((Neg|BNot|LNot),_,_) -> 30
+    | CastE(_,_)
+    | AddrOf(_)
+    | StartOf(_)
+    | UnOp((Neg|BNot|LNot),_,_) -> unaryLevel
     (* Lvals *)
-    | Lval(Mem _ , _) -> derefStarLevel (* 20 *)
-    | Lval(Var _, (Field _|Index _)) -> indexLevel (* 20 *)
-    | SizeOf _ | SizeOfE _ | SizeOfStr _ -> 20
-    | AlignOf _ | AlignOfE _ -> 20
+    | Lval(Mem _ , _) -> derefStarLevel
+    | Lval(Var _, (Field _|Index _)) -> indexLevel
+    | SizeOf _ | SizeOfE _ | SizeOfStr _ -> sizeOfLevel
+    | AlignOf _ | AlignOfE _ -> alignOfLevel
     | Lval(Var _, NoOffset) -> 0        (* Plain variables *)
     | Const _ -> 0                        (* Constants *)
 
   let rec getParenthLevelLogic = function
     | Tlambda _ | Trange _ | Tlet _ -> binderLevel
-    | TBinOp((LAnd | LOr), _,_) -> 80
+    | TBinOp((LAnd | LOr), _,_) -> and_or_level
     (* Bit operations. *)
-    | TBinOp((BOr|BXor|BAnd),_,_) -> bitwiseLevel (* 75 *)
+    | TBinOp((BOr|BXor|BAnd),_,_) -> bitwiseLevel
     | Tapp({ l_var_info },[],[_;_])
       when l_var_info.lv_name = "\\concat" -> bitwiseLevel
     (* Comparisons *)
-    | TBinOp((Eq|Ne|Gt|Lt|Ge|Le),_,_) ->
-      comparativeLevel (* 70 *)
+    | TBinOp((Eq|Ne|Gt|Lt|Ge|Le),_,_) -> comparativeLevel
     (* Additive. Shifts can have higher level than + or - but I want parentheses
        around them *)
     | TBinOp((MinusA|MinusPP|MinusPI|PlusA|
-              PlusPI|IndexPI|Shiftlt|Shiftrt),_,_)
-      -> additiveLevel (* 60 *)
+              PlusPI|IndexPI|Shiftlt|Shiftrt),_,_) -> additiveLevel
     (* Multiplicative *)
     | TBinOp((Div|Mod|Mult),_,_) -> multiplicativeLevel
     | Tapp({ l_var_info },[],[_;_])
       when l_var_info.lv_name = "\\repeat" -> bitwiseLevel
     (* Unary *)
-    | TCastE(_,_) -> 30
-    | TAddrOf(_) -> addrOfLevel
-    | TStartOf(_) -> 30
-    | TUnOp((Neg|BNot|LNot),_) -> 30
+    | TCastE(_,_)
+    | TAddrOf(_)
+    | TStartOf(_)
+    | TUnOp((Neg|BNot|LNot),_) -> unaryLevel
     (* Unary post *)
-    | TCoerce _ | TCoerceE _ -> 25
+    | TCoerce _ | TCoerceE _ -> coerseLevel
     (* Lvals *)
     | TLval(TMem _ , _) -> derefStarLevel
     | TLval(TVar _, (TField _|TIndex _|TModel _)) -> indexLevel
     | TLval(TResult _,(TField _|TIndex _|TModel _)) -> indexLevel
-    | TSizeOf _ | TSizeOfE _ | TSizeOfStr _ -> 20
-    | TAlignOf _ | TAlignOfE _ -> 20
+    | TSizeOf _ | TSizeOfE _ | TSizeOfStr _ -> sizeOfLevel
+    | TAlignOf _ | TAlignOfE _ -> alignOfLevel
     (* VP: I'm not sure I understand why sizeof(x) and f(x) should
        have a separated treatment wrt parentheses. *)
     (* application and applications-like constructions *)
     | Tapp (_, _,_)|TDataCons _
     | Tblock_length _ | Tbase_addr _ | Toffset _ | Tat (_, _)
     | Tunion _ | Tinter _
-    | TUpdate _ | Ttypeof _ | Ttype _ -> 10
+    | TUpdate _ | Ttypeof _ | Ttype _ -> applicationLevel
     | TLval(TVar _, TNoOffset) -> 0        (* Plain variables *)
     (* Constructions that do not require parentheses *)
     | TConst _
@@ -323,8 +330,8 @@ module Precedence = struct
     | ACons ("__fc_assign", [_;_]) -> upperLevel
     | ACons ("__fc_float", [_]) -> 0
     | AInt _ | AStr _ | ACons _ -> 0
-    | ASizeOf _ | ASizeOfE _ -> 20
-    | AAlignOf _ | AAlignOfE _ -> 20
+    | ASizeOf _ | ASizeOfE _ -> sizeOfLevel
+    | AAlignOf _ | AAlignOfE _ -> alignOfLevel
     | AUnOp (uo, _) ->
       getParenthLevel
         (Cil.dummy_exp
@@ -335,8 +342,8 @@ module Precedence = struct
                              Cil.zero ~loc:Cil_datatype.Location.unknown,
                              Cil.zero ~loc:Cil_datatype.Location.unknown,
                              Cil.intType)))
-    | AAddrOf _ -> 30
-    | ADot _ | AIndex _ | AStar _ -> 20
+    | AAddrOf _ -> addrOfLevel
+    | ADot _ | AIndex _ | AStar _ -> memOffset_level
     | AQuestion _ -> questionLevel
 
   let needIndent current pred fmt =
