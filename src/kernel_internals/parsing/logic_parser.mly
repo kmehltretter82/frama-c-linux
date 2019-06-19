@@ -282,8 +282,8 @@
 %left PIPE
 %left HAT
 %left STARHAT
-%nonassoc IN
 %left AMP
+%nonassoc IN
 %left LT
 %left LTLT GTGT
 %left PLUS MINUS

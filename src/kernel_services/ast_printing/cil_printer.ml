@@ -162,8 +162,8 @@ module Precedence = struct
                                    1 [%right prec_named]
                                    2 [%nonassoc TYPENAME] *)
   let questionLevel = 100 (* Pif, Aquestion:
-                                   4 [%right QUESTION prec_question] *)
-  let binderLevel = 90          (* 3 [%nonassoc prec_forall prec_exists prec_lambda LET] *)
+                                   4 [%right QUESTION prec_question]  ??? *)
+  let binderLevel = 90          (* 3 [%nonassoc prec_forall prec_exists prec_lambda LET]  ??? *)
 
   let iff_level = 89            (* 5 [%left IFF] *)
   let implies_level = 87 (* and +1 for positive side
@@ -174,34 +174,40 @@ module Precedence = struct
   let xor_level = 84            (* 8 [%left HATHAT] *)
   let and_level = 83            (* 9 [%left AND] *)
   let and_or_level = 80         (* 7 [%left OR]
-                                   9 [%left AND]  *)
+                                   9 [%left AND] ???  *)
   let assoc_connector_level x =
     and_level <= x && x <= or_level
 
-  let logic_level = 77 (* Tif:     4 [%right QUESTION prec_question] *)
+  let logic_level = 77 (* Tif:     4 [%right QUESTION prec_question]  ??? *)
 
   let bitwiseLevel = 75        (* 10 [%left BIFF]
                                   11 [%right BIMPLIES]
                                   12 [%left PIPE]
                                   13 [%left HAT]
                                   14 [%left STARHAT] (releted to \repeat)
-                                  15 [%nonassoc IN] ???
-                                  16 [%left AMP] *)
-  let subtypeLevel = 75        (* 22 [%nonassoc LTCOLON COLONGT] *)
+                                  15 [%left AMP] *)
+    
+  let belongLevel = 72         (* 16 [%nonassoc IN] *)
+
+  let subtypeLevel = 75        (* 22 [%nonassoc LTCOLON COLONGT] ??? *)
+
   let comparativeLevel = 70    (* 17 [%left LT] *)
   let additiveLevel = 60       (* 18 [%left LTLT GTGT]
                                   19 [%left PLUS MINUS] *)
   let multiplicativeLevel = 40 (* 20 [%left STAR SLASH PERCENT] *)
-  let belongLevel = 36         (* 15 [%nonassoc IN] ??? *)
+
   let unaryLevel = 30          (* 21 [%right prec_cast TILDE NOT prec_unary_op] *)
   let addrOfLevel = 30         (* 21 [%right prec_cast TILDE NOT prec_unary_op] *)
+
   let coerseLevel = 25         (* -  [%token] *)
+
   let memOffset_level = 20     (* 23 [%left DOT ARROW LSQUARE] *)
   let derefStarLevel = 20      (* 23 [%left DOT ARROW LSQUARE] *)
   let indexLevel = 20          (* 23 [%left DOT ARROW LSQUARE] *)
   let arrowLevel = 20          (* 23 [%left DOT ARROW LSQUARE] *)
   let sizeOfLevel = 20         (* -  [%token] *)
   let alignOfLevel = 20        (* -  [%token] *)
+
   let applicationLevel = 10    (* -  [%token] *)
 
   (* is this predicate the encoding of [\in]? If so, return its arguments. *)
