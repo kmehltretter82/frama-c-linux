@@ -14,7 +14,10 @@ TARGETS = \
   nor.1.log \
   nor.2.log \
   ilevel.1.log \
-  ilevel.2.log
+  ilevel.2.log \
+	loop-unroll-const.log \
+	loop-unroll-nested.log \
+	loop-unroll-insuf.log
 
 .SECONDEXPANSION:
 .PHONY: all clean

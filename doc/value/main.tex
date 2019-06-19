@@ -3308,28 +3308,34 @@ iteration, avoiding merging states from different iterations.
 This leads to increased cost in terms of analysis, but usually the cost
 increase is worth the improvement in precision.
 
-Such annotations must be placed before just before the loop (i.e. before the
+Such annotations must be placed just before the loop (i.e. before the
 \lstinline|while|, \lstinline|for| or \lstinline|do| introducing the loop),
 and one annotation is required per loop, including nested ones. For instance:
 
-\begin{lstlisting}
-#define NROWS 10
-void main() {
-  int a[NROWS][20] = {0};
-  //@ loop unroll NROWS;
-  for (int i = 0; i < 10; i++) {
-    //@ loop unroll (10+10);
-    for (int j = 0; j < 20; j++) {
-      a[i][j] += i + j;
-    }
-  }
-}
-\end{lstlisting}
+\lstinputlisting{examples/parametrizing/loop-unroll-const.c}
 
-Note that constants obtained via \lstinline|#define| macros can be used in
-annotations, as well as constant expressions. The annotations above will ensure
+The annotations above will ensure
 that \Eva{} will unroll the loops and keep the analysis precise; otherwise,
 the array access \lstinline|a[i][j]| might generate alarms due to imprecisions.
+
+The \lstinline|loop unroll| parameter can be any C expression such that there
+is only one possible integer value found by \Eva{} for this expression.
+Constants obtained via \lstinline|#define| macros, variables which always have
+a unique value or a combination of these with arithmetic operator are
+suitable. For expressions which do not obviously represent only one integer,
+the acceptability of the annotation depends on the precision of the analyzer.
+Note that there are interesting cases of non-constant expression for
+unrolling annotations. The example below shows a function with two nested loops.
+
+\lstinputlisting{examples/parametrizing/loop-unroll-nested.c}
+
+The number of iterations of the outer one is constant while the number of
+iterations of the inner one is variable but depends on the current iteration of
+the outer loop. However, if we instructs \Eva{} to unroll the outer loop then
+the parameter \lstinline|sizes[i]| of the \lstinline|loop unroll| annotation
+always evaluate to a single possible integer and thus the inner loop annotation
+is accepted. Note that, in this example, it is also possible to use an upper
+bound like $4$.
 
 The unrolling mechanism is independent of \lstinline|-eva-slevel|
 (see next subsection): annotated loops are always unrolled at least the specified
@@ -3340,17 +3346,12 @@ While it is sometimes useful to unroll only the first iterations, the usual
 objective is full unrolling; for this reason, the user is informed whenever
 the specified unrolling value is insufficient to unroll the loop entirely:
 
-\begin{lstlisting}
-void main() {
-  //@ loop unroll 20; // should be 21
-  for (int i = 0 ; i <= 20 ; i ++) {
-  }
-}
-\end{lstlisting}
+\begin{minipage}{\linewidth}% prevents page break in listing
+\lstinputlisting{examples/parametrizing/loop-unroll-insuf.c}
+\end{minipage}
 
-\begin{lstlisting}
-[eva:loop-unroll] insuf-loop.c:3: loop not completely unrolled
-\end{lstlisting}
+\lstinputlisting[linerange={7-7}]
+  {examples/parametrizing/loop-unroll-insuf.log}
 
 The message can be deactived via \lstinline|-eva-warn-key loop-unroll=inactive|.
 
