@@ -100,11 +100,14 @@ depends: [
 ]
 
 depopts: [
-  "coq" # cannot use {build}: Frama-C must be recompiled when Coq changes
-  "why3" { build }
-  "why3-coq" { build }
-  "mlgmpidl" { build }
-  "apron" { build }
+  # cannot use {build}: Frama-C must be recompiled when Coq and libraries changes.
+  # Coq: because .vo would would not be loadable by another version of Coq
+  # libraries: because we use dynamic linking
+  "coq"
+  "why3"
+  "why3-coq"
+  "mlgmpidl"
+  "apron"
 ]
 
 conflicts: [
