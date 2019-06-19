@@ -158,33 +158,35 @@ let state =
 *)
 module Precedence = struct
 
-  let derefStarLevel = 20 (* [%left DOT ARROW LSQUARE] *)
-  let indexLevel = 20     (* [%left DOT ARROW LSQUARE] *)
-  let arrowLevel = 20     (* [%left DOT ARROW LSQUARE] *)
-  let addrOfLevel = 30         (* [%left STAR SLASH PERCENT] *)
-  let multiplicativeLevel = 40 (* [%left STAR SLASH PERCENT] *)
-  let additiveLevel = 60       (* [%left PLUS MINUS] *)
-  let comparativeLevel = 70    (* [%left LT] *)
-  let bitwiseLevel = 75 (* [%left BIFF]
-                           [%right BIMPLIES]
-                           [%left PIPE]
-                           [%left HAT]
-                           [%left STARHAT] (releted to \repeat)
-                           [%nonassoc IN] ???
-                           [%left AMP] *)
-  let logic_level = 77 (* Tif _ -> [%right QUESTION prec_question] *)
+  let derefStarLevel = 20      (* 23 [%left DOT ARROW LSQUARE] *)
+  let indexLevel = 20          (* 23 [%left DOT ARROW LSQUARE] *)
+  let arrowLevel = 20          (* 23 [%left DOT ARROW LSQUARE] *)
+  let addrOfLevel = 30         (* 21 [%right prec_cast TILDE NOT prec_unary_op] *)
+  let multiplicativeLevel = 40 (* 20 [%left STAR SLASH PERCENT] *)
+  let additiveLevel = 60       (* 19 [%left PLUS MINUS] *)
+  let comparativeLevel = 70    (* 17 [%left LT] *)
+  let bitwiseLevel = 75        (* 10 [%left BIFF]
+                                  11 [%right BIMPLIES]
+                                  12 [%left PIPE]
+                                  13 [%left HAT]
+                                  14 [%left STARHAT] (releted to \repeat)
+                                  15 [%nonassoc IN] ???
+                                  16 [%left AMP] *)
+  let logic_level = 77 (* Tif:
+                                   4 [%right QUESTION prec_question] *)
 
   (* Be careful if you change the relative order of these 3 levels *)
-  let and_level = 83  (* [%left AND] *)
-  let xor_level = 84  (* [%left HATHAT] *)
-  let or_level = 85   (* [%left OR] *)
+  let and_level = 83            (* 9 [%left AND] *)
+  let xor_level = 84            (* 8 [%left HATHAT] *)
+  let or_level = 85             (* 7 [%left OR] *)
   let assoc_connector_level x =
     and_level <= x && x <= or_level
 
-  let binderLevel = 90    (* [%nonassoc prec_forall prec_exists prec_lambda LET] *)
-  let questionLevel = 100 (* [%right QUESTION prec_question] *)
-  let upperLevel = 110    (* [%nonassoc TYPENAME]
-                             [%right prec_named] *)
+  let binderLevel = 90          (* 3 [%nonassoc prec_forall prec_exists prec_lambda LET] *)
+  let questionLevel = 100 (* Pif, Aquestion:
+                                   4 [%right QUESTION prec_question] *)
+  let upperLevel = 110          (* 2 [%nonassoc TYPENAME]
+                                   1 [%right prec_named] *)
 
   (* is this predicate the encoding of [\in]? If so, return its arguments. *)
   let subset_is_backslash_in p = match p with
@@ -208,18 +210,20 @@ module Precedence = struct
     | Pat _
     | Pfresh _ -> 0
     | Papp _ as p -> if subset_is_backslash_in p = None then 0 else 36
-    | Pnot _ -> 30 (* [%right prec_cast TILDE NOT prec_unary_op *)
-    | Psubtype _ -> 75
-    | Pand _ -> and_level (* [%left AND] *)
-    | Pxor _ -> xor_level (* [%left HATHAT] *)
-    | Por _ -> or_level (* [%left OR] *)
-    | Pimplies _ -> 87 (* and 88 for positive side *) (* [%right IMPLIES] *)
-    | Piff _ -> 89 (* [%left IFF] *)
-    | Pif _ -> questionLevel (* [%right QUESTION prec_question] *)
-    | Prel _ -> comparativeLevel (* [%left LT] *)
+    | Pnot _ -> 30               (* 21 [%right prec_cast TILDE NOT prec_unary_op] *)
+    | Psubtype _ -> 75           (* 22 [%nonassoc LTCOLON COLONGT] *)
+
+    | Pand _ -> and_level         (* 9 [%left AND] *)
+    | Pxor _ -> xor_level         (* 8 [%left HATHAT] *)
+    | Por _ -> or_level           (* 7 [%left OR] *)
+    | Pimplies _ -> 87 (* and 88 for positive side *)
+                                  (* 4 [%right IMPLIES] *)
+    | Piff _ -> 89                (* 5 [%left IFF] *)
+    | Pif _ -> questionLevel      (* 4 [%right QUESTION prec_question] *)
+    | Prel _ -> comparativeLevel  (* 18 [%left LT] *)
     | Plet _
     | Pforall _
-    | Pexists _ -> binderLevel (* [%nonassoc prec_forall prec_exists prec_lambda LET] *)
+    | Pexists _ -> binderLevel    (* 3 [%nonassoc prec_forall prec_exists prec_lambda LET] *)
 
   let compareLevel x y =
     if assoc_connector_level x && assoc_connector_level y then 0
@@ -251,7 +255,7 @@ module Precedence = struct
     (* Multiplicative *)
     | BinOp((Div|Mod|Mult),_,_,_) -> multiplicativeLevel
     (* Unary *)
-    | CastE(_,_) -> 30
+    | CastE(_,_) -> 30 
     | AddrOf(_) -> 30
     | StartOf(_) -> 30
     | UnOp((Neg|BNot|LNot),_,_) -> 30
