@@ -108,9 +108,20 @@ class annot_visitor kf flags on_alarm = object (self)
 
   method private generate_assertion: 'a. 'a Rte.alarm_gen -> 'a -> unit =
     fun fgen ->
-      let stmt = Extlib.the (self#current_stmt) in
-      let on_alarm ~invalid a = on_alarm stmt ~invalid a in
+      let curr_stmt = self#current_stmt in
+      let on_alarm ~invalid a =
+        match curr_stmt with
+        | None -> Options.warning ~current:true
+                    "Alarm generated outside any statement:@ %a"
+                    Alarms.pretty a
+        | Some stmt -> on_alarm stmt ~invalid a
+      in
       fgen ~remove_trivial:flags.Flags.remove_trivial ~on_alarm
+
+  (* Do not visit variable declarations, as no alarm should be emitted here,
+     and there is no statement to emit an alarm anyway ([generate_assertion]
+     or [Alarms.register] would then crash). *)
+  method !vvdec _ = Cil.SkipChildren
 
   method! vstmt s = match s.skind with
     | UnspecifiedSequence l ->
@@ -445,7 +456,8 @@ let annotate ?flags kf =
        comp Unsigned_overflow.accessor flags.unsigned_overflow |||
        comp Unsigned_downcast.accessor flags.unsigned_downcast |||
        comp Float_to_int.accessor flags.float_to_int |||
-       comp Finite_float.accessor flags.finite_float
+       comp Finite_float.accessor flags.finite_float |||
+       comp Bool_value.accessor flags.bool_value
     then begin
       Options.feedback "annotating function %a" Kernel_function.pretty kf;
       let warn = Options.Warn.get () in

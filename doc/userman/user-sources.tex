@@ -1,4 +1,4 @@
-\chapter{Preparing the Sources}
+ojson\chapter{Preparing the Sources}
 \label{user-sources}
 
 This chapter explains how to specify the source files that form the
@@ -49,8 +49,7 @@ directories (\texttt{-I} switches), as in
 \texttt{-cpp-extra-args="-DDEBUG -DARCH=ia32 -I./headers"}.
 
 If you have a JSON compilation database file\footnote{%
-  \url{http://clang.llvm.org/docs/JSONCompilationDatabase.html}} (and if your
-\FramaC was compiled with \texttt{yojson} support), you can use
+  \url{http://clang.llvm.org/docs/JSONCompilationDatabase.html}}, you can use
 it to retrieve preprocessing macros such as \texttt{-D} and \texttt{-I}
 for each file in the database, via option
 \optiondef{-}{json-compilation-database} \texttt{<path>}, where \texttt{<path>}

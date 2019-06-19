@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -eva-show-progress -eva -print -journal-disable -scope-verbose 1 -remove-redundant-alarms
+   OPT: @EVA_CONFIG@ -eva -print -journal-disable -scope-verbose 1 -remove-redundant-alarms
 */
 
 typedef struct {

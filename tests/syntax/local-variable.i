@@ -10,3 +10,6 @@ void f() {
     int b;
   }
 }
+
+int c;
+int g() { return 1 || (-1L || g(), c); }

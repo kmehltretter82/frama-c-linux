@@ -537,6 +537,16 @@ val isCharArrayType: typ -> bool
 (** True if the argument is an integral type (i.e. integer or enum) *)
 val isIntegralType: typ -> bool
 
+(** True if the argument is [_Bool]
+    @since Frama-C+dev
+*)
+val isBoolType: typ -> bool
+
+(** True if the argument is [_Bool] or [boolean].
+    @since Frama-C+dev
+ *)
+val isLogicPureBooleanType: logic_type -> bool
+
 (** True if the argument is an integral or pointer type. *)
 val isIntegralOrPointerType: typ -> bool
 
@@ -841,6 +851,13 @@ val isLogicZero: term -> bool
 
 (** True if the given term is [\null] or a constant null pointer*)
 val isLogicNull: term -> bool
+
+(** [no_op_coerce typ term] is [true] iff converting [term] to [typ] does
+    not modify its value.
+
+    @since Frama-C+dev
+*)
+val no_op_coerce: logic_type -> term -> bool
 
 (** gives the value of a wide char literal. *)
 val reduce_multichar: Cil_types.typ -> int64 list -> int64
@@ -2049,12 +2066,15 @@ val visitCilBlock: cilVisitor -> block -> block
     might prevent it (e.g. if the preceding statement is a statement contract
     or a slicing/pragma annotation, or if there are labels involved). Use
     that whenever you're creating a block in order to hold multiple statements
-    as a result of visiting a single statement.
+    as a result of visiting a single statement. If the block contains local
+    variables, it will not be marked as transient, since removing it will
+    change the scope of those variables.
 
     @raise Fatal error if the given block attempts to declare local variables
-    (in which case it can't be marked as transient anyways).
+    and contain definitions of local variables that are not part of the block.
 
     @since Phosphorus-20170501-beta1
+    @modify Frama-C+dev: do not raise fatal as soon as the block has locals
 *)
 val transient_block: block -> block
 

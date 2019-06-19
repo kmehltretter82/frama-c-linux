@@ -164,7 +164,7 @@ module Interval = struct
   let zero = None
   let one = None
   let top_int = None
-  let inject_int _typ _i = None
+  let inject_int _typ i = Some (Ival.inject_singleton i)
 
   let assume_non_zero v = `Unknown v
   let assume_bounded _ _ v = `Unknown v

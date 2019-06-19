@@ -1,6 +1,6 @@
 /* run.config
-OPT: -journal-disable -scf -eva-show-progress -scf-allow-cast
-OPT: -journal-disable -scf -eva-show-progress
+   STDOPT: +"-scf-allow-cast"
+   STDOPT:
 */
 
 typedef struct {

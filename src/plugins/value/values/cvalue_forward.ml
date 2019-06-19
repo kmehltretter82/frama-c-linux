@@ -61,14 +61,12 @@ let are_comparable_string pointer1 pointer2 =
    In practice, function pointers are considered possible or one past
    when their offset is 0. For object pointers, the offset is checked
    against the validity of each base, taking past-one into account. *)
-let possible_pointer ~one_past location =
+let possible_pointer access location =
   let location = Locations.loc_bytes_to_loc_bits location in
   let is_possible_offset base offs =
-    if Base.is_function base then
-      Ival.is_zero offs
-    else
-      let size = if one_past then Integer.zero else Integer.one in
-      Base.is_valid_offset ~for_writing:false size base offs
+    if Base.is_function base
+    then Ival.is_zero offs
+    else Base.is_valid_offset access base offs
   in
   Locations.Location_Bits.for_all is_possible_offset location
 
@@ -107,8 +105,8 @@ let are_comparable_reason kind ev1 ev2 =
     else
       (* Both pointers have to be almost valid (they can be pointers to one past
          an array object. *)
-    if (not (possible_pointer ~one_past:true rest_1)) ||
-       (not (possible_pointer ~one_past:true rest_2))
+    if (not (possible_pointer Base.No_access rest_1)) ||
+       (not (possible_pointer Base.No_access rest_2))
     then false, `Invalid_pointer
     else
       (* Equality operators allow the comparison between an almost valid pointer
@@ -133,8 +131,8 @@ let are_comparable_reason kind ev1 ev2 =
       then false, `Rel_different_bases
       else
         (* If both addresses are valid, they can be compared for equality. *)
-      if (possible_pointer ~one_past:false rest_1) &&
-         (possible_pointer ~one_past:false rest_2)
+      if (possible_pointer (Base.Read Integer.one) rest_1) &&
+         (possible_pointer (Base.Read Integer.one) rest_2)
       then
         (* But beware of the comparisons of literal strings. *)
         if are_comparable_string rest_1 rest_2

@@ -6,8 +6,8 @@
 # accordingly. The syntax for the root test_config files is as follows
 # (2 lines):
 #
-# MACRO: VALUECONFIG  <options inherited in all tests>
-# OPT: @VALUECONFIG@  <default options, inherited in tests that use STDOPT>
+# MACRO: EVA_CONFIG  <options inherited in all tests>
+# OPT: @EVA_CONFIG@  <default options, inherited in tests that use STDOPT>
 
 # All tested domains
 declare -a domains=(

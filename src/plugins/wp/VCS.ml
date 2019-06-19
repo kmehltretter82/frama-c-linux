@@ -71,8 +71,11 @@ let name_of_prover = function
   | Tactical -> "script"
 
 let title_of_prover = function
-  | Why3ide -> "Why3"
-  | Why3 s -> s
+  | Why3 "cvc4" -> "CVC4"
+  | Why3 "z3" -> "Z3"
+  | Why3 ("alt-ergo" | "altergo") -> "Alt-Ergo (why3)"
+  | Why3 s -> Printf.sprintf "Why3 (%s)" s
+  | Why3ide -> "Why3 (ide)"
   | AltErgo -> "Alt-Ergo"
   | Coq -> "Coq"
   | Qed -> "Qed"
@@ -104,13 +107,6 @@ let filename_for_prover = function
   | Coq -> "Coq"
   | Qed -> "Qed"
   | Tactical -> "Tactical"
-
-let language_of_name = function
-  | "" | "none" -> None
-  | "alt-ergo" | "altgr-ergo" -> Some L_altergo
-  | "coq" | "coqide"-> Some L_coq
-  | "why" -> Some L_why3
-  | s -> Wp_parameters.abort "Language '%s' unknown" s
 
 let language_of_prover = function
   | Why3 _ -> L_why3
@@ -175,6 +171,37 @@ let pp_mode fmt m = Format.pp_print_string fmt (title_of_mode m)
 module P = struct type t = prover let compare = cmp_prover end
 module Pset = Set.Make(P)
 module Pmap = Map.Make(P)
+
+(* -------------------------------------------------------------------------- *)
+(* --- Why3 Provers                                                       --- *)
+(* -------------------------------------------------------------------------- *)
+
+type dp = {
+  dp_name : string ;
+  dp_version : string ;
+  dp_altern : string ;
+  dp_shortcuts : string list ;
+}
+
+let pp_altern fmt a = if a<>"" then Format.fprintf fmt " (%s)" a
+
+let pp_shortcut fmt = function
+  | ("alt-ergo" | "coq" | "tip" | "script") as p ->
+      Format.fprintf fmt "why3:%s" p
+  | p -> Format.pp_print_string fmt p
+
+let pp_shortcuts =
+  Pretty_utils.pp_list ~pre:"[" ~sep:"," ~suf:"]" ~empty:"(disabled)"
+    pp_shortcut
+
+let pretty fmt dp =
+  Format.fprintf fmt "%s %s%a"
+    dp.dp_name dp.dp_version
+    pp_altern dp.dp_altern
+
+let prover_of_dp = function
+  | { dp_shortcuts = key::_ } -> Why3 key
+  | _ -> Why3 "none"
 
 (* -------------------------------------------------------------------------- *)
 (* --- Config                                                             --- *)

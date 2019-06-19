@@ -1,6 +1,6 @@
 /* run.config
 #   EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
-   OPT: -load-module @PTEST_DIR@/@PTEST_NAME@ -eva -eva-show-progress -journal-disable
+   OPT: -load-module @PTEST_DIR@/@PTEST_NAME@ -eva @EVA_OPTIONS@ -journal-disable
 */
 
 

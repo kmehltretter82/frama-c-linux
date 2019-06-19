@@ -451,11 +451,7 @@ module Make
     let array = Tcons1.array_make env (List.length constraints) in
     List.iteri (fun i c -> Tcons1.array_set array i c) constraints;
     let st = Abstract1.meet_tcons_array man state array in
-    if debug && Abstract1.is_bottom man st then
-      Value_parameters.result ~current:true ~once:true
-        "Bottom with state %a and constraints %a@."
-        Abstract1.print state (fun fmt a -> Tcons1.array_print fmt a) array;
-    st
+    if Abstract1.is_bottom man st then `Bottom else `Value st
 
   let _constraint_to_typ env state vars =
     let aux (var_apron, vi) =
@@ -615,11 +611,11 @@ module Make
       in
       let constraints = Valuation.fold gather_constraints valuation [] in
       if constraints = []
-      then state
+      then `Value state
       else meet_with_constraints env state constraints
 
     let assign _stmt lvalue expr _value valuation state =
-      let state = update valuation state in
+      update valuation state >>- fun state ->
       try
         let state =
           try
@@ -642,7 +638,7 @@ module Make
 
 
     let assume _stmt exp bool valuation state =
-      let state = update valuation state in
+      update valuation state >>- fun state ->
       try
         let env = Abstract1.env state in
         let eval = make_eval state in
@@ -656,7 +652,7 @@ module Make
       | Out_of_Scope _ -> `Value state
 
     let start_call _stmt call valuation state =
-      let state = update valuation state in
+      update valuation state >>- fun state ->
       let eval = make_eval state in
       let oracle = make_oracle valuation in
       let process_argument (vars, acc) arg =

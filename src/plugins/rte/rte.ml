@@ -497,8 +497,14 @@ let finite_float_assertion ~remove_trivial:_ ~on_alarm (fkind, exp) =
 let pointer_call ~remove_trivial:_ ~on_alarm (e, args) =
   on_alarm ~invalid:false (Alarms.Function_pointer (e, Some args))
 
-let bool_value ~remove_trivial:_ ~on_alarm lv =
-  on_alarm ~invalid:false (Alarms.Invalid_bool lv)
+let bool_value ~remove_trivial ~on_alarm lv =
+  match remove_trivial, lv with
+  | true, (Var vi, NoOffset)
+    when (* consider as trivial accesses to ...  *)
+      (not vi.vglob) && (* local variable or formal parameter when ... *)
+      (not vi.vaddrof)  (* their address is not taken *)
+    -> ()
+  | _ -> on_alarm ~invalid:false (Alarms.Invalid_bool lv)
 
 (*
 Local Variables:

@@ -503,6 +503,7 @@ let rec size_of_object = function
 and size_of_typ t = size_of_object (object_of t)
 and size_of_field f = size_of_typ f.ftype
 and size_of_comp c =
+  (* union field are considered as struct field *)
   List.fold_left
     (fun s f -> s + size_of_field f)
     0 c.cfields
@@ -1057,7 +1058,14 @@ let block_length sigma obj l =
 (* --- Cast                                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Layout =
+module Layout : sig
+  val pretty : Format.formatter -> c_object -> unit
+
+  val fits: dst:c_object -> src:c_object -> bool
+  (* returns [true] in these cases:
+     - [dst] fits into [src] (exists cobj; [src] = [dst] concat cobj)
+     - [dst] equals    [src] ([dst] = [src]) *)
+end =
 struct
 
   type atom = P of typ | I of c_int | F of c_float
@@ -1067,25 +1075,67 @@ struct
     | I i -> Ctypes.pp_int fmt i
     | F f -> Ctypes.pp_float fmt f
 
-  let eqatom a1 a2 =
+  let eq_atom a1 a2 =
     match a1 , a2 with
     | P _ , P _ -> true
-    | _ -> (a1 = a2)
+    | I i1 , I i2 -> i1 = i2
+    | F f1 , F f2 -> f1 = f2
+    | _ -> false
+
+  type slot = A of atom
+            | S of Cil_types.compinfo (* delayed layout of a C struct *)
+            | U of Cil_types.compinfo (* delayed layout of a C union *)
+
+  let pp_slot fmt = function
+    | A a -> pp_atom fmt a
+    | S s -> Format.fprintf fmt "{struct %a}" Printer.pp_compinfo s
+    | U u -> Format.fprintf fmt "{union %a}" Printer.pp_compinfo u
+
+  let eq_slot a1 a2 = (* syntactic equality *)
+    match a1 , a2 with
+    | A a1 , A a2 -> eq_atom a1 a2
+    | S c1 , S c2 | U c1, U c2 -> Compinfo.equal c1 c2
+    | _ -> false
+
+  let rec get_slot = function
+    | C_int i -> A (I i)
+    | C_float f -> A (F f)
+    | C_pointer t -> A (P t)
+    | C_comp ( { cfields = [f] } as c ) ->
+        begin (* union having only one field is equivalent to a struct *)
+          match Ctypes.object_of f.ftype with
+          | C_array _ -> (if c.cstruct then S c else U c)
+          | cobj -> get_slot cobj
+        end
+    | C_comp c -> if c.cstruct then S c else U c
+    | C_array _ -> assert false
 
   type block =
-    | Str of atom * int
-    | Arr of layout * int (* non-homogeneous, more than one *)
+    | Str of slot * int
+    | Arr of c_object * int (* delayed layout of a C type *)
     | Garbled
 
-  and layout = block list
-
-  let rec pp_block fmt = function
-    | Str(a,n) when n=1 -> pp_atom fmt a
-    | Str(a,n) -> Format.fprintf fmt "%a[%d]" pp_atom a n
-    | Arr(ly,n) -> Format.fprintf fmt "%a[%d]" pp_layout ly n
+  let pp_block fmt = function
+    | Str(a,n) when n=1 -> pp_slot fmt a
+    | Str(a,n) -> Format.fprintf fmt "%a[%d]" pp_slot a n
+    | Arr(o,n) -> Format.fprintf fmt "{ctype %a}[%d]" Ctypes.pretty o n
     | Garbled -> Format.fprintf fmt "..."
 
-  and pp_layout fmt = function
+  let add_slot a n w =
+    assert (n >= 1) ;
+    match w with
+    | Str(b,m) :: w when eq_slot a b -> Str(b,m+n)::w
+    | _ -> Str(a,n) :: w
+
+  let add_block p w =
+    match p , w with
+    | Str(a,n) , Str(b,m)::w when eq_slot a b -> Str(b,n+m)::w
+    | Garbled , Garbled::_ -> w
+    | _ -> p :: w
+
+  type layout = block list
+
+  let pp_layout fmt = function
     | [b] -> pp_block fmt b
     | bs ->
         begin
@@ -1094,81 +1144,102 @@ struct
           Format.fprintf fmt " }@]" ;
         end
 
-  let add_atom a ly =
-    match ly with
-    | Str(b,m) :: w when eqatom a b -> Str(b,m+1)::w
-    | _ -> Str(a,1) :: ly
-
-  let add_block p ly =
-    match p , ly with
-    | Str(a,n) , Str(b,m)::w when eqatom a b -> Str(b,n+m)::w
-    | Garbled , Garbled::_ -> ly
-    | _ -> p :: ly
-
   (* requires n > 1 *)
-  let add_many ly n w =
-    match ly with
-    | [] -> w
-    | [Str(a,m)] -> add_block (Str(a,n*m)) w
-    | Garbled::_ -> add_block Garbled w
-    | ly -> Arr(ly,n) :: w
+  let rec add_many cobj n w = (* returns [layout obj]*n @ [w] *)
+    assert (n > 1) ;
+    match cobj, w with
+    | C_array { arr_flat = Some a }, _ when a.arr_cell_nbr = 1 ->
+        add_many (Ctypes.object_of a.arr_cell) n w
+    | C_array _, Arr(o, m)::w when 0 = compare_ptr_conflated o cobj -> Arr(o, m+n)::w
+    | C_array _, _ -> Arr(cobj, n)::w
+    | _  -> add_slot (get_slot cobj) n w
 
-  let rec rlayout w = function
-    | C_int i -> add_atom (I i) w
-    | C_float f -> add_atom (F f) w
-    | C_pointer t -> add_atom (P t) w
-    | C_comp c ->
-        if c.cstruct
-        then List.fold_left flayout w c.cfields
-        else
-          (* TODO: can be the longest common prefix *)
-          add_block Garbled w
+  let rec rlayout w = function (* returns [layout obj] @ [w] *)
     | C_array { arr_flat = Some a } ->
-        let ly = rlayout [] (Ctypes.object_of a.arr_cell) in
+        let cobj = Ctypes.object_of a.arr_cell in
         if a.arr_cell_nbr = 1
-        then ly @ w (* ly is in reversed order *)
-        else add_many (List.rev ly) a.arr_cell_nbr w
+        then rlayout w cobj
+        else add_many cobj a.arr_cell_nbr w
     | C_array { arr_element = e } ->
         if Wp_parameters.ExternArrays.get () then
-          let ly = rlayout [] (Ctypes.object_of e) in
-          add_many (List.rev ly) max_int w
+          add_many (Ctypes.object_of e) max_int w
         else
           add_block Garbled w
+    | cobj -> add_slot (get_slot cobj) 1 w
 
-  and flayout w f = rlayout w (Ctypes.object_of f.ftype)
+  let layout (obj : c_object) : layout = rlayout [] obj
 
-  let layout (obj : c_object) : layout = List.rev (rlayout [] obj)
+  let clayout (c: Cil_types.compinfo) : layout =
+    let flayout w f = rlayout w (Ctypes.object_of f.ftype) in
+    List.fold_left flayout [] (List.rev c.cfields)
 
-  type comparison = Fit | Equal | Mismatch
+  type comparison = Srem of layout | Drem of layout | Equal | Mismatch
 
-  let add_array ly n w =
-    if n=1 then ly @ w else add_many ly n w
+  let add_array o n w =
+    assert (n > 0) ;
+    if n=1 then rlayout w o else Arr(o, n)::w
 
-  let rec compare l1 l2 =
-    match l1 , l2 with
-    | [] , [] -> Equal
-    | [] , _ -> Fit
-    | _ , [] -> Mismatch
+  let decr_slot a n w =
+    assert (n >= 1);
+    if n=1 then w else Str(a, n-1)::w
+
+  let rec equal u v =
+    match compare ~dst:u ~src:v with
+    | Equal -> true
+    | _ -> false
+  and compare_slot ~dst ~src =
+    match dst, src with
+    | A a1, A a2 -> if eq_atom a1 a2 then Equal else Mismatch
+    | S c1, S c2 | U c1, U c2 when Compinfo.equal c1 c2 -> Equal
+    | S c1, _    -> compare ~dst:(clayout c1) ~src:[Str(src,1)]
+    |    _, S c2 -> compare ~dst:[Str(dst,1)] ~src:(clayout c2)
+    | U c1, U c2 ->  (* for union, the layouts must be equal *)
+        if equal (clayout c1) (clayout c2) then Equal else Mismatch
+    | U _, A _ -> Mismatch
+    | A _, U _ -> Mismatch
+  and compare ~dst ~src =
+    match dst , src with
+    | [] , [] -> Equal     (* src = dst *)
+    | [] , obj -> Srem obj (* src = dst @ obj *)
+    | obj , [] -> Drem obj (* dst = src @ obj *)
     | p::w1 , q::w2 ->
         match p , q with
         | Garbled , _ | _ , Garbled -> Mismatch
         | Str(a,n) , Str(b,m) ->
-            if eqatom a b then
-              if n < m then
-                let w2 = Str(a,m-n)::w2 in
-                compare w1 w2
-              else if n > m then
-                let w1 = Str(a,n-m)::w1 in
-                compare w1 w2
-              else
-                (* n = m *)
-                compare w1 w2
-            else Mismatch
+            begin
+              match compare_slot a b with
+              | Mismatch -> Mismatch
+              | Drem a'->
+                  let w1 = a' @ decr_slot a n w1 in
+                  let w2 =      decr_slot b m w2 in
+                  compare w1 w2
+              | Srem b' ->
+                  let w1 =      decr_slot a n w1 in
+                  let w2 = b' @ decr_slot b m w2 in
+                  compare w1 w2
+              | Equal ->
+                  if n < m then
+                    let w2 = Str(a,m-n)::w2 in
+                    compare w1 w2
+                  else if n > m then
+                    let w1 = Str(a,n-m)::w1 in
+                    compare w1 w2
+                  else
+                    (* n = m *)
+                    compare w1 w2
+            end
         | Arr(u,n) , Arr(v,m) ->
             begin
-              match compare u v with
+              match compare ~dst:(layout u) ~src:(layout v) with
               | Mismatch -> Mismatch
-              | Fit -> Mismatch
+              | Drem u' ->
+                  let w1 = u' @ add_array u (n-1) w1 in
+                  let w2 =      add_array v (m-1) w2 in
+                  compare w1 w2
+              | Srem v' ->
+                  let w1 =      add_array u (n-1) w1 in
+                  let w2 = v' @ add_array v (m-1) w2 in
+                  compare w1 w2
               | Equal ->
                   if n < m then
                     let w2 = add_array v (m-n) w2 in
@@ -1180,21 +1251,68 @@ struct
                     (* n = m *)
                     compare w1 w2
             end
-        | Arr(v,n) , Str _ ->
-            compare (v @ add_array v (n-1) w1) l2
+        | Arr(u,n) , Str _ ->
+            compare ~dst:((layout u) @ add_array u (n-1) w1) ~src
         | Str _ , Arr(v,n) ->
-            compare l1 (v @ add_array v (n-1) w2)
+            compare ~dst ~src:((layout v) @ add_array v (n-1) w2)
 
-  let fits obj1 obj2 =
-    match obj1 , obj2 with
+  let rec repeated ~dst ~src =
+    match dst , src with
+    | [] , [] -> true (* src = dst *)
+    | _ , [] -> false  (* empty source layout *)
+    | [] , _ -> false  (* empty destination layout *)
+    | [p] , [q] -> begin
+        match p , q with
+        | Garbled , _ | _ , Garbled -> false
+        | Str(a,n) , Str(b,m) -> (* dst =?= repeated(src,n/m) *)
+            begin
+              match compare_slot ~dst:a ~src:b with
+              | Mismatch -> false
+              | Drem a' ->
+                  let w1 = a' @ decr_slot a n [] in
+                  let w2 =      decr_slot b m [] in
+                  let cmp = compare ~dst:w1 ~src:w2 in
+                  repeated_result ~src cmp
+              | Srem _ ->
+                  false
+              | Equal -> (* dst =?= repeated(src,n/m) *)
+                  n >= m && (n mod m = 0)
+            end
+        | Arr(u,n) , Arr(v,m) ->
+            begin
+              match compare ~dst:(layout u) ~src:(layout v) with
+              | Mismatch -> false
+              | Drem u' ->
+                  let w1 = u' @ add_array u (n-1) [] in
+                  let w2 = add_array v (m-1) [] in
+                  let cmp = compare ~dst:w1 ~src:w2 in
+                  repeated_result ~src cmp
+              | Srem _ ->
+                  false
+              | Equal -> (* dst =?= repeated(src,n/m) *)
+                  n >= m && (n mod m = 0)
+            end
+        | _ , _ -> repeated_compare ~dst ~src
+      end
+    | _ , _ -> repeated_compare ~dst ~src
+  and repeated_compare ~dst ~src = repeated_result ~src (compare ~dst ~src)
+  and repeated_result ~src = function
+    | Equal -> true
+    | Mismatch | Srem _ -> false
+    | Drem dst -> repeated ~dst ~src
+
+  let fits ~dst ~src =
+    match dst , src with
     | C_int i1 , C_int i2 -> i1 = i2
     | C_float f1 , C_float f2 -> f1 = f2
     | C_comp c , C_comp d when Compinfo.equal c d -> true
     | C_pointer _ , C_pointer _ -> true
     | _ ->
-        match compare (layout obj1) (layout obj2) with
-        | Equal | Fit -> true
+        let src = layout src in
+        match compare ~dst:(layout dst) ~src with
+        | Equal | Srem _ -> true
         | Mismatch -> false
+        | Drem dst -> repeated dst src
 
   let rec pretty fmt = function
     | C_pointer ty -> Format.fprintf fmt "%a*" pretty (Ctypes.object_of ty)
@@ -1223,10 +1341,10 @@ let cast s l =
       match Context.get pointer with
       | NoCast -> Warning.error ~source:"Typed Model" "%a" pp_mismatch s
       | Fits ->
-          if Layout.fits s.post s.pre then l else
+          if Layout.fits ~dst:s.post ~src:s.pre then l else
             Warning.error ~source:"Typed Model" "%a" pp_mismatch s
       | Unsafe ->
-          if not (Layout.fits s.post s.pre) then
+          if not (Layout.fits ~dst:s.post ~src:s.pre) then
             Warning.emit ~severe:false ~source:"Typed Model"
               ~effect:"Keep pointer value"
               "%a" pp_mismatch s ; l

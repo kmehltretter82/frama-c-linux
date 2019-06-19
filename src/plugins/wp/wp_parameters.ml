@@ -224,14 +224,6 @@ module ExtEqual =
   end)
 
 let () = Parameter_customize.set_group wp_model
-let () = Parameter_customize.is_invisible () (* experimental option *)
-module BoolRange =
-  False(struct
-    let option_name = "-wp-bool-range"
-    let help = "Assumes _Bool values have no trap representations."
-  end)
-
-let () = Parameter_customize.set_group wp_model
 module Overflows =
   False(struct
     let option_name = "-wp-overflows"
@@ -897,17 +889,6 @@ module Check =
   end)
 let () = on_reset Print.clear
 
-let () = Parameter_customize.set_group wp_po
-let () = Parameter_customize.do_not_save ()
-let () = Parameter_customize.is_invisible ()
-module Assert_check_only =
-  False (struct
-    let option_name = "-wp-assert-check-only"
-    let help =
-      "Turns assertions into labels."
-  end)
-let () = on_reset Print.clear
-
 (* -------------------------------------------------------------------------- *)
 (* --- OS environment variables                                           --- *)
 (* -------------------------------------------------------------------------- *)
@@ -920,7 +901,6 @@ let active_unless_rte option =
   else true
 
 let get_overflows () = Overflows.get () && active_unless_rte "-wp-overflows"
-let get_bool_range () = BoolRange.get () && active_unless_rte "-wp-bool-range"
 
 let dkey = register_category "env"
 

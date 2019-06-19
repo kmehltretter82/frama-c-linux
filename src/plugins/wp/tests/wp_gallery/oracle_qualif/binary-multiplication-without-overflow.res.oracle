@@ -15,8 +15,8 @@
 [wp] [alt-ergo] Goal typed_BinaryMultiplication_loop_variant_decrease : Valid
 [wp] [alt-ergo] Goal typed_BinaryMultiplication_loop_variant_positive : Valid
 [wp] Proved goals:   10 / 10
-  Qed:             3 
-  alt-ergo:        7
+  Qed:                3 
+  Alt-Ergo (why3):    7
 [wp] Report in:  'tests/wp_gallery/oracle_qualif/binary-multiplication-without-overflow.0.report.json'
 [wp] Report out: 'tests/wp_gallery/result_qualif/binary-multiplication-without-overflow.0.report.json'
 -------------------------------------------------------------
@@ -44,8 +44,8 @@ BinaryMultiplication   2   -                 9       100%
 [wp] [alt-ergo] Goal typed_BinaryMultiplication_loop_variant_decrease : Valid
 [wp] [alt-ergo] Goal typed_BinaryMultiplication_loop_variant_positive : Valid
 [wp] Proved goals:   11 / 14
-  Qed:             0 
-  alt-ergo:       11
+  Qed:                0 
+  Alt-Ergo (why3):   11
 [wp] Report in:  'tests/wp_gallery/oracle_qualif/binary-multiplication-without-overflow.0.report.json'
 [wp] Report out: 'tests/wp_gallery/result_qualif/binary-multiplication-without-overflow.0.report.json'
 -------------------------------------------------------------

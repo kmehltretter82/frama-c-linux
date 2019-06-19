@@ -123,8 +123,8 @@ let eval_assigns kf state assigns =
           let loc_out_under, loc_out_over, deps =
 	    !Db.Properties.Interp.loc_to_loc_under_over ~result:None state out.it_content
           in
-	  (enumerate_valid_bits_under ~for_writing:true loc_out_under,
-	   enumerate_valid_bits ~for_writing:true loc_out_over,
+	  (enumerate_valid_bits_under Write loc_out_under,
+	   enumerate_valid_bits Write loc_out_over,
 	   clean_deps deps)
       with Db.Properties.Interp.No_conversion ->
         Inout_parameters.warning ~current:true ~once:true
@@ -141,7 +141,7 @@ let eval_assigns kf state assigns =
                 let _, loc, deps =
 		  !Db.Properties.Interp.loc_to_loc_under_over None state from in
                 let acc = Zone.join (clean_deps deps) acc in
-                let z = enumerate_valid_bits ~for_writing:false loc in
+                let z = enumerate_valid_bits Read loc in
 		Zone.join z acc
               in
               List.fold_left aux deps l
@@ -283,7 +283,6 @@ end) = struct
     let new_inputs = Zone.diff inputs data.under_outputs_d in
     store_non_terminating_inputs new_inputs;
     {data with over_inputs_d = Zone.join data.over_inputs_d new_inputs}
-  ;;
 
   (* Initialized const variables should be included as outputs of the function,
      so [for_writing] must be false for local initializations. It should be
@@ -302,8 +301,8 @@ end) = struct
            Add it into the under-approximated outputs. *)
         Zone.link data.under_outputs_d new_outs
       else data.under_outputs_d
-    in {
-      under_outputs_d = new_sure_outs;
+    in
+    { under_outputs_d = new_sure_outs;
       over_inputs_d = Zone.join data.over_inputs_d new_inputs;
       over_outputs_d = Zone.join data.over_outputs_d new_outs }
 
@@ -372,9 +371,16 @@ end) = struct
           let e_inputs = !Db.From.find_deps_no_transitivity_state state e in
           add_out ~for_writing:false state lv e_inputs acc
         | CompoundInit(ct, initl) ->
-          let implicit = true in
+          (* Avoid folding implicit zero-initializer of large arrays. *)
+          let implicit = Cumulative_analysis.fold_implicit_initializer ct in
           let doinit o i _ data = aux (Cil.addOffsetLval o lv) i data in
-          Cil.foldLeftCompound ~implicit ~doinit ~ct ~initl ~acc
+          let data = Cil.foldLeftCompound ~implicit ~doinit ~ct ~initl ~acc in
+          if implicit then data else
+            (* If the implicit zero-initializers hade been skipped, add the
+               zone of the array as outputs. It is exactly the written zone for
+               arrays of scalar elements. Nothing is read by zero-initializers,
+               so the inputs are empty. *)
+            add_out ~for_writing:false state lv Zone.bottom acc
       in
       aux (Cil.var v) i data
     | Call (lvaloption,funcexp,argl,loc) ->

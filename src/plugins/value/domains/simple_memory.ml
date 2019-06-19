@@ -247,25 +247,26 @@ module Make_Internal (Info: sig val name: string end) (Value: Value) = struct
     (* This function fills [state] according to the information available
        in [valuation]. This information is computed by Eva's engine for
        all the expressions involved in the current statement. *)
-    let update valuation state =
+    let assume_valuation valuation state =
       Valuation.fold (assume_exp valuation) valuation state
 
     (* Abstraction of an assignment. *)
     let assign _kinstr lv _expr value valuation state =
       (* Update the state with the information obtained from evaluating
          [lv] and [e] *)
-      let state = update valuation state in
+      let state = assume_valuation valuation state in
       (* Extract the abstract value *)
       let value = Eval.value_assigned value in
       (* Store the information [lv = e;] in the state *)
       let state = bind_loc lv.lloc lv.ltyp value state in
       `Value state
 
+    let update valuation state = `Value (assume_valuation valuation state)
+
     (* Abstraction of a conditional. All information inferred by the engine
        is present in the valuation, and must be stored in the memory
        abstraction of the domain itself. *)
-    let assume _stmt _expr _pos valuation state =
-      `Value (update valuation state)
+    let assume _stmt _expr _pos = update
 
     let start_call _stmt call _valuation state =
       let bind_argument state argument =

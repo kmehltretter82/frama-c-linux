@@ -1,6 +1,6 @@
 /* run.config*
-   OPT: -eva @VALUECONFIG@ -eva-mlevel 3
-   OPT: -eva @VALUECONFIG@ -eva-malloc-functions my_calloc
+   OPT: -eva @EVA_CONFIG@ -eva-mlevel 3
+   OPT: -eva @EVA_CONFIG@ -eva-malloc-functions my_calloc
 */
 
 #include <stdlib.h>

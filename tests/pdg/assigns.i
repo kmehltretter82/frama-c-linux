@@ -1,5 +1,5 @@
 /* run.config
-  OPT: -journal-disable -eva-show-progress -pdg -pdg-print -calldeps -pdg-verbose 2
+  STDOPT: +"-pdg -calldeps"
 */
 
 unsigned int x, y;

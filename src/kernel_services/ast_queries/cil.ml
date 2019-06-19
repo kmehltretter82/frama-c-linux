@@ -2169,10 +2169,25 @@ let assertEmptyQueue vis =
 
 let vis_tmp_attr = "FRAMAC_VIS_TMP_ATTR"
 
+let wkey_transient = Kernel.register_warn_category "transient-block"
+let () = Kernel.set_warn_status wkey_transient Log.Winactive
+
 let transient_block b =
-  if b.blocals <> [] then
+  if b.blocals <> [] then begin
+    if List.exists
+        (function
+          | { skind = Instr (Local_init (v,_,_)) } ->
+            not (List.exists (Cil_datatype.Varinfo.equal v) b.blocals)
+          | _ -> false)
+        b.bstmts
+    then
     Kernel.fatal
       "Attempting to mark as transient a block that declares local variables";
+    Kernel.warning
+      ~wkey:wkey_transient
+      "ignoring request to mark transient a block with local variables:@\n%a"
+      Cil_datatype.Block.pretty b
+  end else
   b.battrs <- addAttribute (Attr (vis_tmp_attr,[])) b.battrs; b
 
 let block_of_transient b =
@@ -2198,16 +2213,16 @@ let flatten_transient_sub_blocks b =
       -> true
     | Some _ -> false
   in
-  let treat_one_stmt s =
+  let treat_one_stmt acc s =
     match s.skind with
     | Block b when is_transient_block b ->
       if previous_is_annot () then begin
         s.skind <- Block (block_of_transient b);
         prev := Some s;
-        [ s ]
+        s :: acc
       end else begin
         match s.labels, b.bstmts with
-        | [], _ -> prev:= None; b.bstmts
+        | [], _ -> prev:= None; List.rev_append b.bstmts acc
         | _, [] ->
           (* Empty block, but we have a label attached to the statement, so
              that it is difficult to get rid of it (see below). Replace with
@@ -2215,7 +2230,7 @@ let flatten_transient_sub_blocks b =
           *)
           s.skind <- Instr (Skip (Cil_datatype.Stmt.loc s));
           prev:=Some s;
-          [s]
+          s :: acc
         | _, s'::tl when s'.labels = [] ->
           (* res is the target of a label (either goto or case). Removing the
              block would imply updating the origin of the jump, which is
@@ -2224,17 +2239,17 @@ let flatten_transient_sub_blocks b =
              the block, and return the list. *)
           s.skind <- s'.skind;
           prev:=None;
-          s :: tl
+          List.rev_append tl (s :: acc)
         | _ ->
           (* both the block and the first statement have labels. Just keep
              the block. *)
           s.skind <- Block (block_of_transient b);
           prev:=Some s;
-          [s]
+          s :: acc
        end
-     | _ -> prev:= Some s; [ s ]
+     | _ -> prev:= Some s; s :: acc
   in
-  b.bstmts <- List.concat (List.map treat_one_stmt b.bstmts);
+  b.bstmts <- List.rev (List.fold_left treat_one_stmt [] b.bstmts);
   b
 
 let stmt_of_instr_list_visitor ?loc l =
@@ -3761,7 +3776,8 @@ and childrenExp (vis: cilVisitor) (e: exp) : exp =
        (List.map (fun i -> mkStmt (Instr i)) toPrepend) @ f.sbody.bstmts;
    if vis#behavior.is_copy_behavior then begin
      fix_succs_preds_block vis#behavior f.sbody;
-     f.sallstmts <- List.map vis#behavior.get_stmt f.sallstmts
+     f.sallstmts <-
+       List.rev (List.rev_map vis#behavior.get_stmt f.sallstmts)
    end;
    vis#reset_current_func ();
    f
@@ -4480,11 +4496,22 @@ let isCharConstPtrType t =
     match t with
       | Ctype ty -> isIntegralType ty
       | Linteger -> true
-      | Ltype ({lt_name = name},[]) ->
-          name = Utf8_logic.boolean
-      | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
-        isLogicBooleanType (unroll_ltdef ty)
-      | Lreal | Ltype _ | Lvar _ | Larrow _ -> false
+      | Ltype ({lt_name = name} as tdef,_) ->
+          name = Utf8_logic.boolean ||
+          ( is_unrollable_ltdef tdef && isLogicBooleanType (unroll_ltdef t))
+      | Lreal | Lvar _ | Larrow _ -> false
+
+let isBoolType typ = match unrollType typ with
+  | TInt (IBool, _) -> true
+  | _ -> false
+
+let rec isLogicPureBooleanType t =
+  match t with
+  | Ctype t -> isBoolType t
+  | Ltype ({lt_name = name} as def,_) ->
+    name = Utf8_logic.boolean ||
+    (is_unrollable_ltdef def && isLogicPureBooleanType (unroll_ltdef t))
+  | _ -> false
 
  let rec isLogicIntegralType t =
    match t with
@@ -4567,7 +4594,7 @@ let isCharConstPtrType t =
    | Ltype ({lt_name = "typetag"},[]) -> true
    | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
      isTypeTagType (unroll_ltdef ty)
-   | _ -> false
+     | _ -> false
 
  let getReturnType t =
    match unrollType t with
@@ -4607,6 +4634,14 @@ let isCharConstPtrType t =
  let () =
    registerAttribute (Extlib.strip_underscore frama_c_init_obj) (AttrName false)
 
+ let no_op_coerce typ t =
+   match typ with
+   | Lreal -> true
+   | Linteger -> isLogicIntegralType t.term_type
+   | Ltype _ when Logic_const.is_boolean_type typ ->
+     isLogicPureBooleanType t.term_type
+   | Ltype ({lt_name="set"},_) -> true
+   | _ -> false
 
  (**** Compute the type of an expression ****)
  let rec typeOf (e: exp) : typ =
@@ -4703,7 +4738,7 @@ let isCharConstPtrType t =
 	 | Ctype typ ->
 	     begin match unrollType typ with
                | TPtr (t, _) -> typeTermOffset (Ctype t) off
-               | _ ->
+	       | _ -> 
 		 Kernel.fatal ~current:true
 		   "typeOfTermLval: Mem on a non-pointer"
 	     end
@@ -4711,7 +4746,7 @@ let isCharConstPtrType t =
 	   Kernel.fatal ~current:true "typeOfTermLval: Mem on a logic type"
          | Ltype (s,_) as ty when is_unrollable_ltdef s ->
            type_of_pointed (unroll_ltdef ty)
-         | Ltype (s,_) ->
+	 | Ltype (s,_) -> 
            Kernel.fatal ~current:true
 	     "typeOfTermLval: Mem on a non-C type (%s)" s.lt_name
 	 | Lvar s -> 
@@ -4736,7 +4771,7 @@ let isCharConstPtrType t =
 	     "typeTermOffset: Attribute on a logic type"
          | Ltype (s,_) as ty when is_unrollable_ltdef s ->
            putAttributes (unroll_ltdef ty)
-         | Ltype (s,_) ->
+         | Ltype (s,_) -> 
            Kernel.fatal ~current:true
 	     "typeTermOffset: Attribute on a non-C type (%s)" s.lt_name
          | Lvar s -> 
@@ -4765,8 +4800,8 @@ let isCharConstPtrType t =
 	   | Linteger | Lreal -> Kernel.fatal ~current:true "typeTermOffset: Index on a logic type"
            | Ltype (s,_) as ty when is_unrollable_ltdef s ->
              elt_type (unroll_ltdef ty)
-           | Ltype (s,_) ->
-              Kernel.fatal ~current:true "typeTermOffset: Index on a non-C type (%s)" s.lt_name
+	   | Ltype (s,_) -> 
+             Kernel.fatal ~current:true "typeTermOffset: Index on a non-C type (%s)" s.lt_name
 	   | Lvar s -> Kernel.fatal ~current:true "typeTermOffset: Index on a non-C type ('%s)" s
 	   | Larrow _ -> Kernel.fatal ~current:true "typeTermOffset: Index on a function type"
        in
@@ -4786,7 +4821,7 @@ let isCharConstPtrType t =
 	   | Linteger | Lreal -> Kernel.fatal ~current:true "typeTermOffset: Field on a logic type"
            | Ltype (s,_) as ty when is_unrollable_ltdef s ->
              elt_type (unroll_ltdef ty)
-           | Ltype (s,_) ->
+	   | Ltype (s,_) ->
              Kernel.fatal ~current:true "typeTermOffset: Field on a non-C type (%s)" s.lt_name
 	   | Lvar s ->  Kernel.fatal ~current:true "typeTermOffset: Field on a non-C type ('%s)" s
 	   | Larrow _ -> Kernel.fatal ~current:true "typeTermOffset: Field on a function type"
@@ -5600,11 +5635,11 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
       | Mult, Const(CInt64(i1,ik1,_)), Const(CInt64(i2,ik2,_)) when ik1 = ik2 ->
           kinteger64 ~loc ~kind:tk (Integer.mul i1 i2)
       | Mult, Const(CInt64(z,_,_)), _
-        when Integer.equal z Integer.zero -> zero ~loc
+        when Integer.equal z Integer.zero -> e1''
       | Mult, Const(CInt64(one,_,_)), _ 
         when Integer.equal one Integer.one -> e2''
       | Mult, _,    Const(CInt64(z,_,_)) 
-        when Integer.equal z Integer.zero -> zero ~loc
+        when Integer.equal z Integer.zero -> e2''
       | Mult, _, Const(CInt64(one,_,_)) 
         when Integer.equal one Integer.one -> e1''
       | Div, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_)) when ik1 = ik2 ->
@@ -5627,9 +5662,9 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
       | BAnd, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_)) when ik1 = ik2 ->
           kinteger64 ~loc ~kind:tk (Integer.logand i1 i2)
       | BAnd, Const(CInt64(z,_,_)), _ 
-        when Integer.equal z Integer.zero -> zero ~loc
+        when Integer.equal z Integer.zero -> e1''
       | BAnd, _, Const(CInt64(z,_,_)) 
-        when Integer.equal z Integer.zero -> zero ~loc
+        when Integer.equal z Integer.zero -> e2''
       | BOr, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_)) when ik1 = ik2 ->
           kinteger64 ~loc ~kind:tk (Integer.logor i1 i2)
       | BOr, _, _ when isZero e1' -> e2'
@@ -5640,7 +5675,7 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
           when shiftInBounds i2 ->
           kinteger64 ~loc ~kind:tk (Integer.shift_left i1 i2)
       | Shiftlt, Const(CInt64(z,_,_)), _ 
-        when Integer.equal z Integer.zero -> zero ~loc
+        when Integer.equal z Integer.zero -> e1''
       | Shiftlt, _, Const(CInt64(z,_,_)) 
         when Integer.equal z Integer.zero -> e1''
       | Shiftrt, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,_,_))
@@ -5651,7 +5686,7 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
           else
             kinteger64 ~loc ~kind:tk (Integer.shift_right i1 i2)
       | Shiftrt, Const(CInt64(z,_,_)), _ 
-        when Integer.equal z Integer.zero -> zero ~loc
+        when Integer.equal z Integer.zero -> e1''
       | Shiftrt, _, Const(CInt64(z,_,_)) 
         when Integer.equal z Integer.zero -> e1''
       | Eq, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_)) ->
@@ -7444,7 +7479,9 @@ let isCompleteType ?allowZeroSizeArrays t =
 	   let undolist = ref [] in
 	   (* Process one local variable *)
 	   let processLocal (v: varinfo) =
-             let lookupname = v.vname in
+             (* start from original name to avoid putting another _0 in case
+                of conflicts. *)
+             let lookupname = v.vorig_name in
              let data = CurrentLoc.get () in
 	     let newname, oldloc =
                Alpha.newAlphaName

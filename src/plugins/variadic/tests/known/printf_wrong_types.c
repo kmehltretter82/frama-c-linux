@@ -32,5 +32,6 @@ int main(){
 
   typedef enum { OK, ERROR } RC;
   RC rc = OK;
-  printf("%u", rc); // Wrong type (in strict mode)
+  printf("%u", rc); // Correct type with '-enums gcc-enums'
+  printf("%d", rc); // Wrong type (in strict mode)
 }

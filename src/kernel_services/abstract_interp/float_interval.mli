@@ -26,3 +26,4 @@
     Supports NaN and infinite values. *)
 module Make (Float: Float_sig.S) :
   Float_interval_sig.S with type float := Float.t
+                        and type widen_hints := Float.widen_hints

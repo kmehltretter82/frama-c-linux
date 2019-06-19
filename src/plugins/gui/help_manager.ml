@@ -46,6 +46,7 @@ let show main_ui =
     "David Maison";
     "Claude Marché";
     "André Maroneze";
+    "Thibault Martin";
     "Melody Méaulle";
     "Benjamin Monate";
     "Yannick Moy";
@@ -54,6 +55,7 @@ let show main_ui =
     "Guillaume Petiot";
     "Virgile Prevosto";
     "Armand Puccetti";
+    "Virgile Robles";
     "Muriel Roger";
     "Julien Signoles";
     "Kostyantyn Vorobyov";

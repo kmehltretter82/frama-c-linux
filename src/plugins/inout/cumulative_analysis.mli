@@ -32,6 +32,10 @@ open Cil_types
     can be gathered using a Cil visitor).
 *)
 
+(** Should implicit zero-initializers for [typ] be folded? False for big arrays
+    to avoid a performance issue. *)
+val fold_implicit_initializer: typ -> bool
+
 
 val specialize_state_on_call: ?stmt:stmt -> kernel_function -> Db.Value.state
   (** If the given statement is a call to the given function,

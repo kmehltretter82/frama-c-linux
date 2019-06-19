@@ -1357,6 +1357,48 @@ let rec hash_logic_type config = function
   | Larrow (_,t) -> 41 * hash_logic_type config t
 
 
+(* Logic_info with structural comparison
+   if functions / predicates have the same name (overloading), compare
+   their arguments types ; ignore polymorphism *)
+module Logic_info_structural = struct
+  let pretty_ref = ref (fun fmt f -> Logic_var.pretty fmt f.l_var_info)
+  include  Make_with_collections
+    (struct
+      type t = logic_info
+      let name = "Logic_info_structural"
+      let reprs =
+	List.map
+	  (fun v ->
+	    { l_var_info = v;
+	      l_labels = [];
+	      l_tparams = [];
+	      l_type = None;
+	      l_profile = [];
+	      l_body = LBnone })
+	  Logic_var.reprs
+      let compare i1 i2 =
+        let name_cmp =
+          String.compare i1.l_var_info.lv_name i2.l_var_info.lv_name
+        in
+        if name_cmp <> 0 then name_cmp else begin
+          let config =
+            { by_name = true ; logic_type = true ; unroll = true }
+          in
+          let prm_cmp p1 p2 =
+            compare_logic_type config p1.lv_type p2.lv_type
+          in
+          compare_list prm_cmp i1.l_profile i2.l_profile
+        end
+
+      let equal = Datatype.from_compare
+      let hash i = Logic_var.hash i.l_var_info
+      let copy = Datatype.undefined
+      let internal_pretty_code = Datatype.undefined
+      let pretty = !pretty_ref
+      let varname _ = "logic_varinfo"
+     end)
+end
+
 (* Shared between the different modules for logic types *)
 let pretty_logic_type_ref = ref (fun _ _ -> assert false)
 
@@ -1446,15 +1488,26 @@ let is_exact_float r =
   classify_float r.r_upper = FP_normal &&
   Datatype.Float.equal r.r_upper r.r_lower
 
+[@@@ warning "-3"]
+(* [float_compare_total] is used to ensure -0.0 and 0.0 are distinct *)
+external float_compare_total : float -> float -> int = "float_compare_total" "noalloc"
+[@@@ warning "+3"]
+
+let compare_logic_real r1 r2 =
+  let c = float_compare_total r1.r_lower r2.r_lower in
+  if c <> 0 then c else
+    let c = float_compare_total r1.r_nearest r2.r_nearest in
+    if c <> 0 then c else
+      let c = float_compare_total r1.r_upper r2.r_upper in
+      if c <> 0 then c else
+        String.compare r1.r_literal r2.r_literal
+
 let compare_logic_constant c1 c2 = match c1,c2 with
   | Integer (i1,_), Integer(i2,_) -> Integer.compare i1 i2
   | LStr s1, LStr s2 -> Datatype.String.compare s1 s2
   | LWStr s1, LWStr s2 -> compare_list Datatype.Int64.compare s1 s2
   | LChr c1, LChr c2 -> Datatype.Char.compare c1 c2
-  | LReal r1, LReal r2 ->
-    if is_exact_float r1 && is_exact_float r2
-    then Datatype.Float.compare r1.r_lower r2.r_lower
-    else Datatype.String.compare r1.r_literal r2.r_literal
+  | LReal r1, LReal r2 -> compare_logic_real r1 r2
   | LEnum e1, LEnum e2 -> Enumitem.compare e1 e2
   | Integer _,(LStr _|LWStr _ |LChr _|LReal _|LEnum _) -> 1
   | LStr _ ,(LWStr _ |LChr _|LReal _|LEnum _) -> 1
@@ -1880,6 +1933,27 @@ module Logic_label = struct
         let pretty fmt l = !pretty_ref fmt l
         let varname _ = "logic_label"
     end)
+end
+
+module Logic_real = struct
+  let pretty_ref = ref (fun _ _ -> assert false)
+  include Make_with_collections
+            (struct
+              type t = logic_real
+              let name = "Logic_real"
+              let reprs =
+                [{ r_literal = ""; r_nearest = 0.0; r_lower = 0.0; r_upper = 0.0; }]
+              let compare = compare_logic_real
+              let hash r =
+                let fhash = Datatype.Float.hash in
+                fhash r.r_lower + 3 * fhash r.r_nearest + 7 * fhash r.r_upper +
+                  11 * Datatype.String.hash r.r_literal
+              let equal r1 r2 = compare r1 r2 = 0
+              let copy = Datatype.undefined
+              let internal_pretty_code = Datatype.undefined
+              let pretty fmt t = !pretty_ref fmt t
+              let varname _ = "logic_real"
+            end)
 end
 
 module Global_annotation = struct

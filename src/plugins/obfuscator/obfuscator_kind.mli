@@ -25,6 +25,7 @@ type k =
   | Enum
   | Field
   | Formal_var
+  | Formal_in_type
   | Function
   | Global_var
   | Label

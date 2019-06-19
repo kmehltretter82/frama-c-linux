@@ -1,6 +1,6 @@
 /* run.config
    GCC:
-   OPT: -eva -out -input -calldeps -eva-show-progress -pdg -journal-disable  -pdg-print -pdg-verbose 2
+   STDOPT: +"-eva -out -input -calldeps -pdg"
 */
 
 int G;

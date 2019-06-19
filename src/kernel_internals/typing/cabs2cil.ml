@@ -63,10 +63,16 @@ open Cil_types
 open Cil_datatype
 
 let stripUnderscore s =
-  let res = Extlib.strip_underscore s in
-  if res = "" then
-    Kernel.error ~once:true ~current:true "Invalid attribute name %s" s;
-  res
+  if String.length s = 1 then begin
+    if s = "_" then
+      Kernel.error ~once:true ~current:true "Invalid attribute name %s" s;
+    s
+  end else begin
+    let res = Extlib.strip_underscore s in
+    if res = "" then
+      Kernel.error ~once:true ~current:true "Invalid attribute name %s" s;
+    res
+  end
 
 let frama_c_keep_block = "FRAMA_C_KEEP_BLOCK"
 let () = Cil_printer.register_shallow_attribute frama_c_keep_block
@@ -867,9 +873,7 @@ let remove_label_env lab =
  * hash table easily *)
 type undoScope =
     UndoRemoveFromEnv of string
-  | UndoResetAlphaCounter of location Alpha.alphaTableData ref *
-                             location Alpha.alphaTableData
-  | UndoRemoveFromAlphaTable of string * string
+  | UndoAlphaEnv of location Alpha.undoAlphaElement list
 
 let scopes :  undoScope list ref list ref = ref []
 
@@ -881,14 +885,10 @@ let declared_in_current_scope s =
   | cur_scope :: _ ->
     let names_declared_in_current_scope =
       Extlib.filter_map
-        (fun us ->
-           match us with
-           | UndoRemoveFromEnv _ | UndoRemoveFromAlphaTable _ -> true
-           | UndoResetAlphaCounter _ -> false)
-        (fun us ->
-           match us with
-           | UndoRemoveFromEnv s | UndoRemoveFromAlphaTable (s,_) -> s
-           | UndoResetAlphaCounter _ -> assert false (* already filtered *)
+        (function UndoRemoveFromEnv _  -> true | UndoAlphaEnv _ -> false)
+        (function
+          | UndoRemoveFromEnv s -> s
+          | UndoAlphaEnv _ -> assert false (* already filtered *)
         ) !cur_scope
     in
     List.mem s names_declared_in_current_scope
@@ -973,29 +973,24 @@ let newAlphaName (globalscope: bool) (* The name should have global scope *)
    * the top-most scope (that of the enclosing function) *)
   let rec findEnclosingFun = function
       [] -> (* At global scope *) None
-    | [s] -> begin
-        let prefix, infix = Alpha.getAlphaPrefix lookupname in
-        try
-          let infixes = H.find alphaTable prefix in
-          let countref = H.find infixes infix in
-          s := (UndoResetAlphaCounter (countref, !countref)) :: !s; Some s
-        with Not_found ->
-          s := (UndoRemoveFromAlphaTable (prefix, infix)) :: !s; Some s;
-      end
+    | [s] -> Some s
     | _ :: rest -> findEnclosingFun rest
   in
   let undo_scope =
     if not globalscope then findEnclosingFun !scopes else None
   in
-  let newname, oldloc =
-    Alpha.newAlphaName alphaTable lookupname (CurrentLoc.get ())
+  let undolist =
+    match undo_scope with None -> None | Some _ -> Some (ref [])
   in
+  let data = CurrentLoc.get () in
+  let newname, oldloc =
+    Alpha.newAlphaName ~alphaTable ?undolist ~lookupname ~data
+  in
+  (match undo_scope, undolist with
+   | None, None -> ()
+   | Some s, Some l -> s := (UndoAlphaEnv !l) :: !s
+   | _ -> assert false (* by construction, both options have the same status*));
   if newname <> lookupname then begin
-    (match undo_scope with
-     | None -> ()
-     | Some s ->
-       let newpre, newinf = Alpha.getAlphaPrefix newname in
-       s := (UndoRemoveFromAlphaTable (newpre, newinf)) :: !s);
     try
       let info =
         if !scopes = [] then begin
@@ -1633,12 +1628,25 @@ struct
       (fun (stmt, _, _, _, _) -> ignore (Cil.visitCilStmt vis stmt))
       c.stmts
 
-  (* if we're about to drop a chunk, clean up locals of current func. *)
-  let clean_up_chunk_locals c =
+  let remove_locals l =
     !currentFunctionFDEC.slocals <-
       List.filter
-        (fun x -> not (List.exists (Cil_datatype.Varinfo.equal x) c.locals))
+        (fun x -> not (List.exists (Cil_datatype.Varinfo.equal x) l))
         !currentFunctionFDEC.slocals
+
+  let clean_up_block_locals (s, _, _, _, _) =
+    let vis =
+      object
+        inherit Cil.nopCilVisitor
+        method! vblock b = remove_locals b.blocals; DoChildren
+      end
+    in
+    ignore (Cil.visitCilStmt vis s)
+
+  (* if we're about to drop a chunk, clean up locals of current func. *)
+  let clean_up_chunk_locals c =
+    remove_locals c.locals;
+    List.iter clean_up_block_locals c.stmts
 
   (* Gathers locals of blocks. *)
   class locals_visitor () = object
@@ -3532,7 +3540,8 @@ let fieldsToInit
     else if found then
       found, offset :: loff
       (* if this field is an anonymous comp, search for the designator inside *)
-    else if prefix anonCompFieldName f.fname && not found then
+    else if prefix anonCompFieldName f.fname && not found
+            && f.forig_name <> f.fname then
       match unrollType f.ftype with
       | TComp (comp, _, _) ->
         add_comp offset comp acc (* go deeper inside *)
@@ -3839,18 +3848,8 @@ let exitScope () =
       [] -> ()
     | UndoRemoveFromEnv n :: t ->
       H.remove env n; loop t
-    | UndoRemoveFromAlphaTable (p,i) :: t ->
-      (try
-         let h = H.find alphaTable p in
-         H.remove h i;
-         if H.length h = 0 then H.remove alphaTable p
-       with Not_found ->
-         Kernel.warning
-           "prefix (%s,%s) not in alpha conversion table. \
-            undo stack is inconsistent"
-           p i); loop t
-    | UndoResetAlphaCounter (vref, oldv) :: t ->
-      vref := oldv;
+    | UndoAlphaEnv undolist :: t ->
+      Alpha.undoAlphaChanges ~alphaTable ~undolist;
       loop t
   in
   loop !this;
@@ -5007,11 +5006,20 @@ and doType (ghost:bool) isFuncArg
           (args', !newisva)
         end else (args, isva)
       in
+      let argl_length = List.length args' in
       (* Make the argument as for a formal *)
       let doOneArg (s, (n, ndt, a, cloc)) : varinfo =
         let s' = doSpecList ghost n s in
         let vi = makeVarInfoCabs ~ghost ~isformal:true ~isglobal:false
             (convLoc cloc) s' (n,ndt,a) in
+        if isVoidType vi.vtype then begin
+          if argl_length > 1 then
+            Kernel.error ~once:true ~current:true
+              "'void' must be the only parameter if specified";
+          if vi.vname <> "" then
+            Kernel.error ~once:true ~current:true
+              "named parameter '%s' has void type" vi.vname
+        end;
         (* Add the formal to the environment, so it can be referenced by
            other formals  (e.g. in an array type, although that will be
            changed to a pointer later, or though typeof).  *)

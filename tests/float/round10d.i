@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -eva @VALUECONFIG@ -float-normal -journal-disable -no-results
+   OPT: -eva @EVA_CONFIG@ -float-normal -journal-disable -no-results
 
 */
 int main()

@@ -6,8 +6,8 @@
 [wp] 1 goal scheduled
 [wp] [alt-ergo] Goal typed_abs_abs_ensures : Valid
 [wp] Proved goals:    1 / 1
-  Qed:             0 
-  alt-ergo:        1
+  Qed:                0 
+  Alt-Ergo (why3):    1
 [wp] Report in:  'tests/wp_plugin/oracle_qualif/abs.2.report.json'
 [wp] Report out: 'tests/wp_plugin/result_qualif/abs.2.report.json'
 -------------------------------------------------------------

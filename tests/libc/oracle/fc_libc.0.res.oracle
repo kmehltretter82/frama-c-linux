@@ -156,12 +156,12 @@
    wcstombs (0 call); wctomb (0 call); wmemchr (0 call); wmemcmp (0 call);
    wmemmove (0 call); write (0 call); 
   
-  'Extern' global variables (17)
+  'Extern' global variables (15)
   ==============================
-   __fc_basename; __fc_dirname; __fc_getpwuid_pw_dir; __fc_getpwuid_pw_gid;
-   __fc_getpwuid_pw_name; __fc_getpwuid_pw_passwd; __fc_getpwuid_pw_shell;
-   __fc_getpwuid_pw_uid; __fc_hostname; __fc_mblen_state; __fc_mbtowc_state;
-   __fc_ttyname; __fc_wctomb_state; optarg; opterr; optopt; tzname
+   __fc_basename; __fc_dirname; __fc_getpwuid_pw_dir; __fc_getpwuid_pw_name;
+   __fc_getpwuid_pw_passwd; __fc_getpwuid_pw_shell; __fc_hostname;
+   __fc_mblen_state; __fc_mbtowc_state; __fc_ttyname; __fc_wctomb_state;
+   optarg; opterr; optopt; tzname
   
   Potential entry points (1)
   ==========================
@@ -171,7 +171,7 @@
   ============== 
   Sloc = 1083
   Decision point = 204
-  Global variables = 68
+  Global variables = 66
   If = 195
   Loop = 43
   Goto = 89

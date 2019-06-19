@@ -921,12 +921,12 @@ ext_global_clause:
 | INCLUDE string SEMICOLON { let b,s = $2 in Ext_include(b,s, loc()) }
 ;
 
-ext_global_specs_opt: 
+ext_global_specs_opt:
  | /* empty */       { [] }
  | ext_global_specs  { $1 }
 ;
 
-ext_global_specs: 
+ext_global_specs:
 | ext_global_spec                  { [$1] }
 | ext_global_spec ext_global_specs { $1::$2 }
 ;
@@ -934,8 +934,8 @@ ext_global_specs:
 ext_global_spec:
 | ext_module_markup ext_global_clauses_opt ext_module_specs
     { (Some $1),$2,$3 }
-| ext_module_markup
-    { (Some $1),[],[] }
+| ext_module_markup ext_global_clauses_opt
+    { (Some $1),$2,[] }
 ;
 
 ext_module_specs_opt:
@@ -1765,15 +1765,23 @@ any_identifier_non_logic:
 | identifier_or_typename { $1 }
 | non_logic_keyword { $1 }
 
-identifier_or_typename:
+identifier_or_typename: /* allowed as C field names */
+| TYPENAME { $1 } /* followed by the same list than 'identifier' */
 | IDENTIFIER { $1 }
-| TYPENAME { $1 }
+/* token list used inside ascl clauses: */
+| BEHAVIORS  { "behaviors" }
+| LABEL      { "label" }
+| READS      { "reads" }
+| WRITES     { "writes" }
 ;
 
-identifier:
+identifier: /* part included into 'identifier_or_typename', but duplicated to avoid parsing conflicts */
 | IDENTIFIER { $1 }
-| READS { "reads" }
-| WRITES { "writes" }
+/* token list used inside ascl clauses: */
+| BEHAVIORS  { "behaviors" }
+| LABEL      { "label" }
+| READS      { "reads" }
+| WRITES     { "writes" }
 ;
 
 bounded_var:
@@ -1786,30 +1794,30 @@ bounded_var:
 ;
 
 c_keyword:
-| CASE { "case" }
-| CHAR { "char" }
-| BOOLEAN { "boolean" }
-| BOOL { "_Bool" }
-| CONST { "const" }
-| DOUBLE { "double" }
-| ELSE { "else" }
-| ENUM { "enum" }
-| FLOAT { "float" }
-| IF { "if" }
-| INT { "int" }
-| LONG { "long" }
-| SHORT { "short" }
-| SIGNED { "signed" }
-| SIZEOF { "sizeof" }
-| STATIC { "static" }
-| STRUCT { "struct" }
-| UNION { "union" }
+| CHAR     { "char" }
+| BOOLEAN  { "boolean" }
+| BOOL     { "_Bool" }
+| CONST    { "const" }
+| DOUBLE   { "double" }
+| ENUM     { "enum" }
+| ELSE     { "else" }
+| FLOAT    { "float" }
+| IF       { "if" }
+| INT      { "int" }
+| LONG     { "long" }
+| SHORT    { "short" }
+| SIGNED   { "signed" }
+| SIZEOF   { "sizeof" }
+| STATIC   { "static" }
+| STRUCT   { "struct" }
+| UNION    { "union" }
 | UNSIGNED { "unsigned" }
-| VOID { "void" }
+| VOID     { "void" }
 ;
 
 acsl_c_keyword:
-| FOR { "for" }
+| CASE     { "case" }
+| FOR      { "for" }
 | VOLATILE { "volatile" }
 ;
 
@@ -1848,7 +1856,7 @@ is_acsl_decl_or_code_annot:
 | LEMMA     { "lemma" }
 | LOOP      { "loop" }
 | PRAGMA    { "pragma" }
-| PREDICATE { "predicate" } 
+| PREDICATE { "predicate" }
 | SLICE     { "slice" }
 | TYPE      { "type" }
 | MODEL     { "model" }
@@ -1858,12 +1866,8 @@ is_acsl_decl_or_code_annot:
 ;
 
 is_acsl_other:
-| BEHAVIORS { "behaviors" }
-| INTEGER { "integer" }
-| LABEL { "label" }
-| READS { "reads" }
-| REAL { "real" }
-| WRITES { "writes" }
+| INTEGER  { "integer" (* token that cannot be used in C fields *) }
+| REAL     { "real" (* token that cannot be used in C fields *) }
 ;
 
 is_ext_spec:
@@ -1876,7 +1880,7 @@ is_ext_spec:
 ;
 
 keyword:
-| LOGIC     { "logic" }
+| LOGIC   { "logic" }
 | non_logic_keyword { $1 }
 ;
 
@@ -1887,7 +1891,7 @@ non_logic_keyword:
 | is_acsl_spec   { $1 }
 | is_acsl_decl_or_code_annot { $1 }
 | is_acsl_other  { $1 }
-| CUSTOM { "custom" }
+| CUSTOM { "custom" (* token that cannot be used in C fields *) } 
 ;
 
 bs_keyword:

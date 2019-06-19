@@ -2146,14 +2146,14 @@ extern size_t wcstombs(char * __restrict s, wchar_t const * __restrict pwcs,
 
 int posix_memalign(void **memptr, size_t alignment, size_t size);
 
-/*@ requires valid_template: valid_string(template);
+/*@ requires valid_template: valid_string(templat);
     ensures
       result_error_or_valid_fd: \result ≡ -1 ∨ (0 ≤ \result < 16);
-    assigns *(template + (0 ..)), \result;
-    assigns *(template + (0 ..)) \from \nothing;
+    assigns *(templat + (0 ..)), \result;
+    assigns *(templat + (0 ..)) \from \nothing;
     assigns \result \from \nothing;
  */
-extern int mkstemp(char *template);
+extern int mkstemp(char *templat);
 
 int glob(char const *pattern, int flags,
          int (*errfunc)(char const *epath, int eerrno), glob_t *pglob)
@@ -4783,7 +4783,7 @@ int unsetenv(char const *name)
     requires
       alignment_is_a_suitable_power_of_two:
         alignment ≥ sizeof(void *) ∧
-        ((unsigned int)alignment & ((unsigned int)alignment - 1)) ≡ 0;
+        ((size_t)alignment & ((size_t)alignment - 1)) ≡ 0;
     assigns __fc_heap_status, \result;
     assigns __fc_heap_status
       \from (indirect: alignment), size, __fc_heap_status;
@@ -4820,7 +4820,7 @@ int posix_memalign(void **memptr, size_t alignment, size_t size)
   assert
   alignment_is_a_suitable_power_of_two:
     alignment ≥ sizeof(void *) ∧
-    ((unsigned int)alignment & ((unsigned int)alignment - 1)) ≡ 0;
+    ((size_t)alignment & ((size_t)alignment - 1)) ≡ 0;
    */
   ;
   *memptr = malloc(size);
@@ -6893,7 +6893,7 @@ char *__fc_p_basename = __fc_basename;
       null_or_valid_string_path: path ≡ \null ∨ valid_read_string(path);
     ensures
       result_points_to_internal_storage_or_path:
-        \subset(\result, \union(__fc_p_basename, \old(path)));
+        \subset(\result, {__fc_p_basename, \old(path)});
     assigns *(path + (0 ..)), __fc_basename[0 ..], \result;
     assigns *(path + (0 ..)) \from *(path + (0 ..)), __fc_basename[0 ..];
     assigns __fc_basename[0 ..] \from *(path + (0 ..)), __fc_basename[0 ..];
@@ -6908,7 +6908,7 @@ char *__fc_p_dirname = __fc_dirname;
       null_or_valid_string_path: path ≡ \null ∨ valid_read_string(path);
     ensures
       result_points_to_internal_storage_or_path:
-        \subset(\result, \union(__fc_p_dirname, \old(path)));
+        \subset(\result, {__fc_p_dirname, \old(path)});
     assigns *(path + (0 ..)), __fc_dirname[0 ..], \result;
     assigns *(path + (0 ..)) \from *(path + (0 ..)), __fc_dirname[0 ..];
     assigns __fc_dirname[0 ..] \from *(path + (0 ..)), __fc_dirname[0 ..];
@@ -7050,10 +7050,6 @@ extern char __fc_getpwuid_pw_name[64];
 
 extern char __fc_getpwuid_pw_passwd[64];
 
-extern uid_t __fc_getpwuid_pw_uid;
-
-extern gid_t __fc_getpwuid_pw_gid;
-
 extern char __fc_getpwuid_pw_dir[64];
 
 extern char __fc_getpwuid_pw_shell[64];
@@ -7061,8 +7057,8 @@ extern char __fc_getpwuid_pw_shell[64];
 struct passwd __fc_pwd =
   {.pw_name = __fc_getpwuid_pw_name,
    .pw_passwd = __fc_getpwuid_pw_passwd,
-   .pw_uid = __fc_getpwuid_pw_uid,
-   .pw_gid = __fc_getpwuid_pw_gid,
+   .pw_uid = 0U,
+   .pw_gid = 0U,
    .pw_gecos = (char *)0,
    .pw_dir = __fc_getpwuid_pw_dir,
    .pw_shell = __fc_getpwuid_pw_shell};
