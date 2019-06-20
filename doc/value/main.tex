@@ -3712,53 +3712,55 @@ line~7, by an invariant, that remains to be proven.
 %% less precisely.
 
 
-\section{Improving precision with reasoning by case}
+\section{Improving precision with case-based reasoning}
 \label{trace-partitioning}
 
-Some formal proofs about programs require to use \emph{reasoning by cases}. \Eva can
-perform such reasonings through the use of the \emph{Trace Partitioning}
-\cite{trace-partitioning} techniques. These can be enabled manually or
-automatically. It is important to note that, whatever the method used, the
-partitioning and thus the reasoning by case stops at the end of a function
-and can only be extended past the function return if there is enough
+Some formal proofs about programs require to use \emph{case-based reasoning}.
+\Eva{} can perform such reasonings through \emph{trace partitioning}
+\cite{trace-partitioning} techniques, which can be enabled globally or
+by specific annotations. It is important to note that, whatever the method used,
+a partitioning (and thus the case-based reasoning) currently stops at the end of
+a function, and can only be extended past the function return if there is enough
 \lstinline|slevel| in the calling function.
 
 
 \subsection{Automatic partitioning on conditional structures}
 
 It sometimes happens that the cases we want to reason on are exactly the
-cases distinguished in the program in an \lstinline|if-then-else| or a
-\lstinline|switch| not far above.  even if these blocks are already closed
-at the point we need the reasoning by cases. Unless enough
-\lstinline|slevel| is available, the cases of a conditional structures are
-approximated together as soon as the analyzer leaves the block. \Eva can delay
-this approximation until after the statement where the reasoning
-by cases is needed.
+cases distinguished in the program by an \lstinline|if-then-else| statement or a
+\lstinline|switch| not far above, even if these blocks are already closed
+at the point we need the case-based reasoning. Unless enough
+\lstinline|slevel| is available, the cases of a conditional structure are
+approximated together as soon as the analyzer leaves the block. However, \Eva{}
+can delay this approximation until after the statement where the case-based
+reasoning is needed.
 
 The global command-line parameter \lstinline|-eva-partition-history <n>|
-will delay the approximation for all conditional structures of the whole
-program. It takes a parameter \lstinline|<n>| which allow to control the delay.
-It represents the number of junction points for which we keep the incoming
-path (the cases) separated. A value of $1$ means that \Eva will reason by
-case on the previous \lstinline|if-then-else| until another
-\lstinline|if-then-else| is closed.
+delays the approximation for all conditional structures of the whole
+program. The parameter \lstinline|<n>| controls the delay:
+it represents the number of junction points for which the incoming
+paths (the cases) are kept separated. At a given point, \Eva{} is then able to
+reason by cases on the \lstinline|<n>| last \lstinline|if-then-else| statements
+closed before.
+A value of $1$ means that \Eva{} will reason by
+case on the previous \lstinline|if-then-else|, until another one is closed.
 
-This option has a very high cost on the analysis, theoretically increasing the
-analysis time by 2 for $n = 1$, and doubling each time $n$ is increased by $1$.
-The cost can even be higher if there are \lstinline|switch| instructions in the
-program. However, it can remove false alarms in a fully automatic way. Thus,
+This option has a very high cost on the analysis, theoretically doubling the
+analysis time for each increment of its parameter $n$.
+The cost can even be higher on \lstinline|switch| statements.
+However, it can remove false alarms in a fully automatic way. Thus,
 the trade off might often be worth trying.
 
-Choosing a value for \lstinline|<n>| strictly greater than 1 is often not
-needed.
+In practice, \lstinline|-eva-partition-history 1| seems to be sufficient in
+most cases, and a greater value is rarely needed.
 
 
 \subsection{Manual partitioning on values}
 
-The reasoning by case can be forced inside a function by using \lstinline|split|
-annotations. These annotations must be given an expression which values
-correspond to the cases being enumerated. The example below show a usage
-of this annotation.
+A case-based reasoning on the possible values of an expression can be forced
+inside a function by using \lstinline|split| annotations.  These annotations
+must be given an expression which values correspond to the cases that need to be
+enumerated. The example below shows an usage of this annotation.
 
 \lstinputlisting{examples/parametrizing/split-array.c}
 
