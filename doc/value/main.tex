@@ -3800,21 +3800,23 @@ reason by case during the whole analysis. The command line parameter
 \lstinline|-eva-partition-value <V>| forces the analyzer to reason at all times
 on single values of the global variable \lstinline|<V>|.
 
-There are three limitations to partitioning on values:
+There are four limitations to the value partitioning:
 
 \begin{enumerate}
-\item While the number of simultaneous splits (whether local with annotations
-  or global through command line) is not bounded, there can be only one split
-  per expression. If two \lstinline|split| annotations use the same expression,
-  only the latest one encountered on the path will be kept. Although it is a
-  limitation, it can be used to define strategies where a case-based reasoning
-  is controlled accross the whole program.
+\item Splits can only be performed on integer expressions. Pointers and
+  floating-point values are not supported yet.
 \item The expression on which the split is done must evaluate to a small set of
   integer values, in order to limit the cost of the partitioning and ensure the
   termination of the analysis. If the number of possible values infered for the
   expression exceeds a defined limit, \Eva{} cancels the split and emits a
   warning. The limit is 100 by default and can be changed with option
   \lstinline|-eva-split-limit <n>|.
+\item While the number of simultaneous splits (whether local with annotations
+  or global through command line) is not bounded, there can be only one split
+  per expression. If two \lstinline|split| annotations use the same expression,
+  only the latest one encountered on the path will be kept. Although it is a
+  limitation, it can be used to define strategies where a case-based reasoning
+  is controlled accross the whole program.
 \item When the expression is complex, the ability of \Eva{} to reason
   precisely by cases depends on the enabled abstract domains (see section
   \ref{sec:eva}) and their capability to learn from the value of the expression.
