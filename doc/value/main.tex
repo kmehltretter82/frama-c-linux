@@ -3755,7 +3755,7 @@ In practice, \lstinline|-eva-partition-history 1| seems to be sufficient in
 most cases, and a greater value is rarely needed.
 
 
-\subsection{Manual partitioning on values}
+\subsection{Value partitioning}
 
 A case-based reasoning on the possible values of an expression can be forced
 inside a function by using \lstinline|split| annotations.  These annotations
@@ -3764,65 +3764,62 @@ enumerated. The example below shows an usage of this annotation.
 
 \lstinputlisting{examples/parametrizing/split-array.c}
 
-The \lstinline|split| requires that the analyzer enumerate all the 3 possible
-values for \lstinline|i| and conduct a specialized analysis of the function for
+The \lstinline|split| instructs \Eva{} to enumerate all the possible
+values of \lstinline|i| and to continue the analysis separately for
 each of these values. Thereafter, the value of \lstinline|i| is always
-evalutated by \Eva{} as a singleton and it enables the use of a
+evaluated by \Eva{} as a singleton in each case, which enables the use of a
 \lstinline|loop unroll| annotation on \lstinline|i|. This way, the result of
-the function can be exactly computed as the set of three possible value instead
+the function can be exactly computed as the set of three possible values instead
 of an imprecise interval.
 
 \lstinputlisting[linerange={25-26}]
   {examples/parametrizing/split-array.log}
 
-The \lstinline|split| can be any expression that evaluate to a {\it small}
-number of integer values. In particular, it can be C comparisons like in
-the following example.
+A \lstinline|split| annotation can be used on any expression that evaluates to a
+{\it small} number of integer values. In particular, the expression can be a C
+comparison like in the following example.
 
 \lstinputlisting{examples/parametrizing/split-fabs.c}
 
-To be analyzed properly, the equality domain must be activated with the option
-\lstinline|-eva-equality-domain| (see section \ref{sec:symbolic-equalities})
-as we need the equality relations between the input and the output of the
-function \lstinline|fabs|, i.e. the relations \lstinline|x == \result| or
-\lstinline|x == -\result|. Then, the \lstinline|split| annotation placed before
-the call to \lstinline|fabs| allows us to reason by case and infer the relevant
-equality in each case.
+This example requires the equality domain (enabled with option
+\lstinline|-eva-equality-domain|, see section \ref{sec:symbolic-equalities}) to
+be analyzed precisely, as we need the equality relations between the input and
+the output of the function \lstinline|fabs|, i.e. the relations
+\lstinline|x == \result| or \lstinline|x == -\result|.
+Then, the \lstinline|split| annotation before the call to \lstinline|fabs|
+allows \Eva{} to reason by case and to infer the relevant equality in each case.
 
-Note in the previous example the use of \lstinline|merge| annotation. These
-annotations ends the reasoning by cases and must use the exact same expression
-as a previous \lstinline|split|. In this example, the \lstinline|merge|
-annotation is not needed as the partitioning will be ended at the end of the
-function anyway. The use of \lstinline|merge| annotations is not mandatory,
-and are these annotations exists only to allow the user to mitigate the cost of
-the reasoning by cases.
+This example also illustrates the use of a \lstinline|merge| annotation, which
+ends the case-based reasoning started by a previous \lstinline|split| annotation
+with the exact same expression.
+The use of \lstinline|merge| annotations is not mandatory, but they allow the
+user to mitigate the cost of \lstinline|split| annotations.
 
 Alternatively to annotations, it is possible to use the command-line to
 reason by case during the whole analysis. The command line parameter
 \lstinline|-eva-partition-value <V>| forces the analyzer to reason at all times
 on single values of the global variable \lstinline|<V>|.
 
-There are three limitations to partitioning on values.
+There are three limitations to partitioning on values:
 
 \begin{enumerate}
 \item While the number of simultaneous splits (whether local with annotations
   or global through command line) is not bounded, there can be only one split
-  per expression. If two \lstinline|split| annotation uses the same expression,
+  per expression. If two \lstinline|split| annotations use the same expression,
   only the latest one encountered on the path will be kept. Although it is a
-  limitation, it can be used to define strategies where a reasoning by case is
-  controlled accross the whole program.
-\item The expression on which the split is done must evaluate to a bounded set
-  of values. Otherwise, the analysis would not be guaranteed to terminate. The
-  analysis must be precise enough in order to prove the boundedness. When \Eva{}
-  fails to prove that the number of possible values is lower than a defined limit,
-  either because the set is unbounded or because it failed to prove it,
-  it will raise a warning and cancel the split. The limit is arbitrary and
-  can be set with the option \lstinline|-eva-split-limit <n>|.
+  limitation, it can be used to define strategies where a case-based reasoning
+  is controlled accross the whole program.
+\item The expression on which the split is done must evaluate to a small set of
+  integer values, in order to limit the cost of the partitioning and ensure the
+  termination of the analysis. If the number of possible values infered for the
+  expression exceeds a defined limit, \Eva{} cancels the split and emits a
+  warning. The limit is 100 by default and can be changed with option
+  \lstinline|-eva-split-limit <n>|.
 \item When the expression is complex, the ability of \Eva{} to reason
-  precisely by cases depends on the activated abstract domains (see section
-  \ref{sec:eva}) and their capability to learn from the expression. \Eva{} will
-  try to detect this and will cancel the split and warn the user when it is
-  not useful.
+  precisely by cases depends on the enabled abstract domains (see section
+  \ref{sec:eva}) and their capability to learn from the value of the expression.
+  If \Eva{} detects that the expression is too complex for the split to be useful,
+  it will cancel the split and warn the user.
 \end{enumerate}
 
 
