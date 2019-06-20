@@ -17,6 +17,8 @@
 Open Source Release <next-release>
 ##################################
 
+-*  Kernel    [2019/06/20] fixes dangling ref when removing unused static local
+
 ####################################
 Open Source Release 19.0 (Potassium)
 ####################################
