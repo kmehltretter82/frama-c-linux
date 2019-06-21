@@ -1,20 +1,31 @@
-[kernel] Parsing global-initial-values.c (with preprocessing)
-[eva] Analyzing an incomplete application starting at main
+[kernel] Parsing loop-unroll-nested.c (with preprocessing)
+[eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
-  s.i ∈ [--..--]
-   .f ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
-   .p ∈ {{ NULL ; &S_p_s[0] }}
-  S_p_s[0..1] ∈ [--..--]
+  t1[0] ∈ {1}
+    [1] ∈ {2}
+    [2] ∈ {3}
+  t2[0] ∈ {4}
+    [1] ∈ {5}
+  t3[0] ∈ {6}
+    [1] ∈ {7}
+    [2] ∈ {8}
+    [3] ∈ {9}
+  t[0] ∈ {{ &t1[0] }}
+   [1] ∈ {{ &t2[0] }}
+   [2] ∈ {{ &t3[0] }}
+  sizes[0] ∈ {3}
+       [1] ∈ {2}
+       [2] ∈ {4}
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
-  
+  S ∈ {45}
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
   1 function analyzed (out of 1): 100% coverage.
-  In this function, 1 statements reached (out of 1): 100% coverage.
+  In this function, 16 statements reached (out of 16): 100% coverage.
   ----------------------------------------------------------------------------
   No errors or warnings raised during the analysis.
   ----------------------------------------------------------------------------

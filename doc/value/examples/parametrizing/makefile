@@ -14,7 +14,12 @@ TARGETS = \
   nor.1.log \
   nor.2.log \
   ilevel.1.log \
-  ilevel.2.log
+  ilevel.2.log \
+	loop-unroll-const.log \
+	loop-unroll-nested.log \
+	loop-unroll-insuf.log \
+	split-array.log \
+	split-fabs.log
 
 .SECONDEXPANSION:
 .PHONY: all clean
@@ -35,6 +40,7 @@ context-depth.3.log: FCFLAGS += -context-width 1 -context-depth 1 -context-valid
 slevel.1.log: FCFLAGS += -slevel 55
 slevel.2.log: FCFLAGS += -slevel 28
 ilevel.2.log: FCFLAGS += -val-ilevel 16
+split-fabs.log: FCFLAGS += -eva-equality-domain
 
 nor.1.log nor.2.log: nor.c
 	time --format "\nuser time: %Us" $(FRAMAC) $(FCFLAGS) -val $< > $@ 2>&1
