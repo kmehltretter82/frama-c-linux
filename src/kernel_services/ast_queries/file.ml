@@ -398,12 +398,13 @@ let build_cpp_cmd cmdl supp_args in_file out_file =
   and out_file = Filename.quote out_file in
   let substitute s =
     match Str.matched_string s with
+    | "%%" -> "%"
     | "%args" -> supp_args
     | "%1" | "%i" | "%input" -> in_file
     | "%2" | "%o" | "%output" -> out_file
     | s -> s (* Unrocognized parameters are left intact *)
   in
-  let regexp = Str.regexp "%[a-z0-9]+" in
+  let regexp = Str.regexp "%%\\|%[a-z0-9]+" in
   try
     ignore (Str.search_forward regexp cmdl 0); (* Try to find one match *)
     Str.global_substitute regexp substitute cmdl
