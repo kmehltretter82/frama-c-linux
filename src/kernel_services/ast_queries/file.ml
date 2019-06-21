@@ -402,7 +402,7 @@ let build_cpp_cmd cmdl supp_args in_file out_file =
     | "%args" -> supp_args
     | "%1" | "%i" | "%input" -> in_file
     | "%2" | "%o" | "%output" -> out_file
-    | s -> s (* Unrocognized parameters are left intact *)
+    | s -> s (* Unrecognized parameters are left intact *)
   in
   let regexp = Str.regexp "%%\\|%[a-z0-9]+" in
   try
