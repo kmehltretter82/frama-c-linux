@@ -293,6 +293,14 @@ sig
   val e_fun : Fun.t -> term list -> term
   val e_bind : binder -> var -> term -> term
 
+  val e_open : pool:pool -> ?forall:bool -> ?exists:bool -> ?lambda:bool ->
+    term -> (binder * var) list * term
+  (** Open all the specified binders
+      The pool must contain all free variables of the term. *)
+
+  val e_close : (binder * var) list -> term -> term
+  (** Closes all specified binders *)
+
   (** {3 Predicates} *)
 
   type pred
@@ -398,7 +406,7 @@ sig
   (** {3 Binders} *)
 
   val lc_closed : term -> bool
-  val lc_iter : (term -> unit) -> term -> unit
+  val lc_iter : (term -> unit) -> term -> unit (* TODO: to remove *)
 
   (** {3 Utilities} *)
 

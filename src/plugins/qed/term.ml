@@ -2285,15 +2285,6 @@ struct
           | _ -> is_eq e
         in ignore(exists_case a); !res
 
-  let e_open x (e : term) =
-    assert (lc_closed e) ;
-    match e.repr with
-    | Bind(_,t,a) ->
-        if not (Tau.equal t (tau_of_var x) || Vars.mem x e.vars)
-        then lc_open x a
-        else raise (Invalid_argument "Qed.e_open")
-    | _ -> e
-
   let e_bind q x (e : term) =
     assert (lc_closed e) ;
     let do_bind =
@@ -2310,6 +2301,26 @@ struct
   let e_forall = bind_xs Forall
   let e_exists = bind_xs Exists
   let e_lambda = bind_xs Lambda
+
+  let e_open ?pool ?(forall=true) ?(exists=true) ?(lambda=true) a =
+    match a.repr with
+    | Bind _ ->
+        let pool = match pool with Some p -> p | None ->
+          let p = POOL.create () in
+          Vars.iter (POOL.add p) a.vars ; p in
+        let filter = function
+          | Forall -> forall
+          | Exists -> exists
+          | Lambda -> lambda in
+        let rec walk qs a = match a.repr with
+          | Bind(q,t,b) when filter q ->
+              let x = fresh pool t in
+              walk ((q,x)::qs) (lc_open x b)
+          | _ -> qs , a
+        in walk [] a
+    | _ -> [],a
+
+  let e_close qs a = List.fold_left (fun b (q,x) -> e_bind q x b) a qs
 
   (* -------------------------------------------------------------------------- *)
   (* --- Iterators                                                          --- *)

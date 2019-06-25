@@ -306,11 +306,12 @@ sig
   (** Bind the given variable if it appears free in the term,
       or return the term unchanged. *)
 
-  val e_open : var -> term -> term
-  (** Open the top-most binder with the given variable, or
-      return the term unchanged.
-      @raise Invalid_argument if the variable is not free and
-      has not the right type. *)
+  val e_open : ?pool:pool -> ?forall:bool -> ?exists:bool -> ?lambda:bool ->
+    term -> (binder * var) list * term
+  (** Open all the specified binders *)
+
+  val e_close : (binder * var) list -> term -> term
+  (** Closes all specified binders *)
 
   (** {3 Local Caches} *)
 
