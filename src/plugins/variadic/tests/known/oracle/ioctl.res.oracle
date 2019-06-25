@@ -13,6 +13,9 @@
 [eva] Initial state computed
 [eva] using specification for function __va_ioctl_void
 [eva] using specification for function __va_ioctl_ptr
+[eva:invalid-assigns] tests/known/ioctl.c:17: 
+  Completely invalid destination for assigns clause *((char *)argp + (0 ..)).
+  Ignoring.
 [eva] using specification for function __va_ioctl_int
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
