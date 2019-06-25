@@ -387,13 +387,18 @@ sig
   val lc_term : term -> lc_term
   val lc_repr : lc_term -> term
 
-  (** {3 Recursion Scheme} *)
+  (** {3 Iteration Scheme} *)
 
-  val e_map  : pool -> (term -> term) -> term -> term
-  (** Open and close binders *)
+  val f_map  : ?pool:pool -> (term -> term) -> term -> term
+  (** Pass and open binders, maps its direct sub-terms
+      and then close then opened binders
+      Raises Invalid_argument in case of a bind-term without pool.
+      The optional pool must contain all free variables of the term. *)
 
-  val e_iter : pool -> (term -> unit) -> term -> unit
-  (** Open binders *)
+  val f_iter : ?pool:pool -> (term -> unit) -> term -> unit
+  (** Iterates over its direct sub-terms (pass and open binders)
+      Raises Invalid_argument in case of a bind-term without pool.
+      The optional pool must contain all free variables of the term. *)
 
   val lc_iter : (term -> unit) -> term -> unit
 

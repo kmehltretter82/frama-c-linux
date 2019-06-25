@@ -2354,22 +2354,26 @@ struct
 
   let lc_iter f e = repr_iter f e.repr
 
-  let e_map pool f e =
+  let f_map ?pool f e =
     match e.repr with
     | Apply(a,xs) -> e_apply (f a) (List.map f xs)
-    | Bind(q,t,e) ->
-        add_term pool e ;
-        let x = fresh pool t in
-        e_bind q x (f (lc_open x e))
+    | Bind _ ->
+        let pool = match pool with
+          | None -> raise (Invalid_argument "Qed.ogic.Term.f_map")
+          | Some pool -> pool in
+        let ctx,a = e_open pool e in
+        e_close ctx (rebuild f a)
     | _ -> rebuild f e
 
-  let e_iter pool f e =
+  let f_iter ?pool f e =
     match e.repr with
-    | Bind(_,t,e) ->
-        add_term pool e ;
-        let x = fresh pool t in
-        lc_iter f (lc_open x e)
-    | _ -> lc_iter f e
+    | Bind _ ->
+        let pool = match pool with
+          | None -> raise (Invalid_argument "Qed.ogic.Term.f_iter")
+          | Some pool -> pool in
+        let _,a = e_open pool e in
+        f a
+    | _ -> repr_iter f e.repr
 
   (* -------------------------------------------------------------------------- *)
   (* --- Sub-terms                                                          --- *)

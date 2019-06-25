@@ -950,7 +950,7 @@ let is_cint_simplifier = object (self)
             with Not_found -> t
           end
       | Imply (l1,l2) -> e_imply (List.map (walk ~is_goal:false) l1) (walk ~is_goal l2)
-      | _ -> Lang.F.QED.e_map pool (walk ~is_goal) t in
+      | _ -> Lang.F.QED.f_map ~pool (walk ~is_goal) t in
     Lang.F.p_bool (walk ~is_goal (Lang.F.e_prop p))
 
   method simplify_exp (e : term) = e
