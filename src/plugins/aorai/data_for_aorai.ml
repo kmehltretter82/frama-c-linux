@@ -1536,9 +1536,28 @@ let type_cond_auto auto =
     { original_auto with states = List.rev states; trans = List.rev trans }
 
 
+(* Check Metavariable compatibility *)
+let checkMetavariableCompatibility auto =
+  let is_extended_trans trans =
+    match trans.cross with
+    | Otherwise -> false
+    | Seq [ elt ] ->
+      elt.nested <> [] || not (is_single elt)
+    | Seq _ -> true
+  in
+  let has_metavariables = not (Datatype.String.Map.is_empty auto.metavariables)
+  and deterministic = Aorai_option.Deterministic.get ()
+  and uses_extended_guards = List.exists is_extended_trans auto.trans in
+  if has_metavariables && (not deterministic || uses_extended_guards) then
+    Aorai_option.abort
+      "The use of metavariables is incompatible with non-deterministic \
+       automata, such as automa using extended transitions."
+
+
 (** Stores the buchi automaton and its variables and
     functions as it is returned by the parsing *)
 let setAutomata auto =
+  checkMetavariableCompatibility auto;
   let auto = type_cond_auto auto in
   automata:=Some auto;
   check_states "typed automata";
