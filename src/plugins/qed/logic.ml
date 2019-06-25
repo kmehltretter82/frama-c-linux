@@ -306,9 +306,10 @@ sig
   (** Bind the given variable if it appears free in the term,
       or return the term unchanged. *)
 
-  val e_open : ?pool:pool -> ?forall:bool -> ?exists:bool -> ?lambda:bool ->
+  val e_open : pool:pool -> ?forall:bool -> ?exists:bool -> ?lambda:bool ->
     term -> (binder * var) list * term
-  (** Open all the specified binders *)
+  (** Open all the specified binders
+      The pool must contain all free variables of the term. *)
 
   val e_close : (binder * var) list -> term -> term
   (** Closes all specified binders *)
@@ -348,7 +349,7 @@ sig
     (** Must bind lc-closed terms, or raise Invalid_argument *)
 
     val add_filter : t -> (term -> bool) -> unit
-    (** Only modifies terms that {i not} pass the filter. *)
+    (** Only modifies terms that {i pass} the filter. *)
 
     val add_var : t -> var -> unit
     (** To the pool *)

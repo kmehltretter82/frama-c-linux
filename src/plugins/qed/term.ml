@@ -2302,12 +2302,9 @@ struct
   let e_exists = bind_xs Exists
   let e_lambda = bind_xs Lambda
 
-  let e_open ?pool ?(forall=true) ?(exists=true) ?(lambda=true) a =
+  let e_open ~pool ?(forall=true) ?(exists=true) ?(lambda=true) a =
     match a.repr with
     | Bind _ ->
-        let pool = match pool with Some p -> p | None ->
-          let p = POOL.create () in
-          Vars.iter (POOL.add p) a.vars ; p in
         let filter = function
           | Forall -> forall
           | Exists -> exists
