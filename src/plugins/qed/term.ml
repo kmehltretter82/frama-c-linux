@@ -66,7 +66,6 @@ struct
   and repr = (Field.t,ADT.t,Fun.t,var,term,term) term_repr
 
   type lc_term = term
-  type lc_repr = repr
 
   type 'a expression = (Field.t,ADT.t,Fun.t,var,lc_term,'a) term_repr
 

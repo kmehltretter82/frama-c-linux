@@ -222,7 +222,6 @@ sig
   type 'a expression = (Field.t,ADT.t,Fun.t,var,lc_term,'a) term_repr
 
   type repr = term expression
-  type lc_repr = lc_term expression
 
   type record = (Field.t * term) list
 
