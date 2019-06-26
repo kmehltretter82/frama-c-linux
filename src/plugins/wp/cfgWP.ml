@@ -399,16 +399,8 @@ struct
   (* --- Compilation of Goals                                               --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let rec intros hs p =
-    match F.p_expr p with
-    | Logic.Bind(Logic.Forall,t,p) ->
-        let x = Lang.freshvar t in
-        intros hs (F.p_bool (F.QED.lc_open x p))
-    | Logic.Imply(hs2,p) -> intros (hs @ hs2) p
-    | _ -> hs , p
-
   let introduction pred =
-    let hs , goal = intros [] pred in
+    let hs , goal = Conditions.forall_intro pred in
     let xs = List.fold_left
         (fun xs h -> Vars.union xs (F.varsp h))
         (F.varsp goal) hs

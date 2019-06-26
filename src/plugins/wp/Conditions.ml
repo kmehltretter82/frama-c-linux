@@ -476,7 +476,6 @@ let rec forall_intro p =
       forall_intro (F.p_bool t)
   | Imply(hs,p) ->
       let hs = exist_intros hs in
-      let hs = List.map (fun p -> step (Have p)) hs in
       let hp,p = forall_intro p in
       hs @ hp , p
   | _ -> [] , p
@@ -963,7 +962,10 @@ let seq_branch ?stmt p sa sb =
 (* -------------------------------------------------------------------------- *)
 
 let lemma g =
-  let cc g = let hs,p = forall_intro g in sequence hs , p
+  let cc g =
+    let hs,p = forall_intro g in
+    let hs = List.map (fun p -> step (Have p)) hs in
+    sequence hs , p
   in Lang.local ~vars:(F.varsp g) cc g
 
 let introduction (hs,g) =
@@ -971,6 +973,7 @@ let introduction (hs,g) =
   let intro p = let q = exist_intro p in if q != p then flag := true ; q in
   let hj = List.map (map_step intro) hs.seq_list in
   let hi,p = forall_intro g in
+  let hi = List.map (fun p -> step (Have p)) hi in
   if not !flag && hi == [] then
     if p == g then None else Some (hs , p)
   else
