@@ -840,12 +840,18 @@ let reduce_bound v tv dom t : term =
     if Ival.equal dom_red dom
     then t
     else
-        (e_imply [e_leq (e_zint min_bound) tv;
-                  e_leq tv (e_zint max_bound)]
-           t)
+      (e_imply [e_leq (e_zint min_bound) tv;
+                e_leq tv (e_zint max_bound)]
+         t)
   with
   | Exc.True -> e_true
   | Exc.False -> e_false
+
+module Polarity = struct
+  type t = Pos | Neg | Both
+  let flip = function | Pos -> Neg | Neg -> Pos | Both -> Both
+  let from_bool = function | false -> Neg | true -> Pos
+end
 
 let is_cint_simplifier = object (self)
 
@@ -917,7 +923,11 @@ let is_cint_simplifier = object (self)
       | Imply (l,_) -> List.iter (reduce_on_neg var var_domain) l
       | _ -> ()
     in
-    let rec walk ~is_goal t =
+    let rec walk ~term_pol t =
+      let walk_flip_pol t = walk ~term_pol:(Polarity.flip term_pol) t
+      and walk_same_pol t = walk ~term_pol t
+      and walk_both_pol t = walk ~term_pol:Polarity.Both t
+      in
       match repr t with
       | _ when not (is_prop t) -> t
       | Bind((Forall|Exists),_,_) ->
@@ -934,7 +944,7 @@ let is_cint_simplifier = object (self)
                     qv, Some (tvar, var_domain)
                 | _ -> qv, None) ctx
           in
-          let t = walk ~is_goal t in
+          let t = walk_same_pol t in
           let f_close t = function
             | (quant,var), None -> e_bind quant var t
             | (quant,var), Some (tvar,var_domain) ->
@@ -942,7 +952,7 @@ let is_cint_simplifier = object (self)
                 (** Bonus: Add additionnal hypothesis in forall when we could deduce
                     better constraint on the variable *)
                 let t = if quant = Forall &&
-                           is_goal &&
+                           term_pol = Polarity.Pos &&
                            Ival.cardinal_is_less_than !var_domain max_reduce_quantifiers
                   then reduce_bound var tvar !var_domain t
                   else t in
@@ -959,10 +969,12 @@ let is_cint_simplifier = object (self)
               else t
             with Not_found -> t
           end
-      | Imply (l1,l2) -> e_imply (List.map (walk ~is_goal:false) l1) (walk ~is_goal l2)
+      | Imply (l1,l2) -> e_imply (List.map walk_flip_pol l1) (walk_same_pol l2)
+      | Not p -> e_not (walk_flip_pol p)
+      | And _ | Or _ -> Lang.F.QED.f_map walk_same_pol t
       | _ ->
-          Lang.F.QED.f_map ~pool ~forall:false ~exists:false (walk ~is_goal) t in
-    Lang.F.p_bool (walk ~is_goal (Lang.F.e_prop p))
+          Lang.F.QED.f_map ~pool ~forall:false ~exists:false walk_both_pol t in
+    Lang.F.p_bool (walk ~term_pol:(Polarity.from_bool is_goal) (Lang.F.e_prop p))
 
   method simplify_exp (e : term) = e
 
