@@ -816,7 +816,7 @@ let c_int_bounds_ival f  =
 let max_reduce_quantifiers = 1000
 
 (** We know that t is a predicate which is the opened body of a forall *)
-let reduce_bound v dom t : term =
+let reduce_bound v tv dom t : term =
   let module Exc = struct
     exception True
     exception False
@@ -839,9 +839,8 @@ let reduce_bound v dom t : term =
     if not (Ival.equal dom_red dom) && Ival.is_included dom_red dom
     then t
     else
-      e_bind Forall v
-        (e_imply [e_leq (e_zint min_bound) (e_var v);
-                  e_leq (e_var v) (e_zint max_bound)]
+        (e_imply [e_leq (e_zint min_bound) tv;
+                  e_leq tv (e_zint max_bound)]
            t)
   with
   | Exc.True -> e_true
@@ -877,7 +876,7 @@ let is_cint_simplifier = object (self)
               self#narrow_dom a ubound
             with Not_found -> ()
           end
-      | And _ -> Lang.F.QED.lc_iter aux t
+      | And _ -> Lang.F.QED.f_iter aux t
       | _ -> ()
     in
     aux (Lang.F.e_prop p)
@@ -886,7 +885,7 @@ let is_cint_simplifier = object (self)
   method fixpoint = ()
 
   method private simplify ~is_goal p =
-    let pool = Lang.F.pool () in
+    let pool = Lang.get_pool () in
 
     let reduce op var_domain base =
       let dom =
@@ -920,25 +919,35 @@ let is_cint_simplifier = object (self)
     let rec walk ~is_goal t =
       match repr t with
       | _ when not (is_prop t) -> t
-      | Bind(Forall|Exists as quant,(Int as ty),bind) ->
-          let var = fresh pool ~basename:"simpl" ty in
-          let t = QED.lc_open var bind in
-          let tvar = (e_var var) in
-          let var_domain = ref Ival.top in
-          if quant = Forall
-          then reduce_on_pos tvar var_domain t
-          else reduce_on_neg tvar var_domain t;
-          domain <- Tmap.add tvar !var_domain domain;
+      | Bind((Forall|Exists),_,_) ->
+          let ctx,t = e_open ~pool ~lambda:false t in
+          let ctx_with_dom =
+            List.map (fun ((quant,var) as qv)  -> match tau_of_var var with
+                | Int ->
+                    let tvar = (e_var var) in
+                    let var_domain = ref Ival.top in
+                    if quant = Forall
+                    then reduce_on_pos tvar var_domain t
+                    else reduce_on_neg tvar var_domain t;
+                    domain <- Tmap.add tvar !var_domain domain;
+                    qv, Some (tvar, var_domain)
+                | _ -> qv, None) ctx
+          in
           let t = walk ~is_goal t in
-          domain <- Tmap.remove tvar domain;
-          (** Bonus: Add additionnal hypothesis in forall when we could deduce
-              better constraint on the variable *)
-          let t = if quant = Forall &&
-                     is_goal &&
-                     Ival.cardinal_is_less_than !var_domain max_reduce_quantifiers
-            then reduce_bound var !var_domain t
-            else t in
-          e_bind quant var t
+          let f_close t = function
+            | (quant,var), None -> e_bind quant var t
+            | (quant,var), Some (tvar,var_domain) ->
+                domain <- Tmap.remove tvar domain;
+                (** Bonus: Add additionnal hypothesis in forall when we could deduce
+                    better constraint on the variable *)
+                let t = if quant = Forall &&
+                           is_goal &&
+                           Ival.cardinal_is_less_than !var_domain max_reduce_quantifiers
+                  then reduce_bound var tvar !var_domain t
+                  else t in
+                e_bind quant var t
+          in
+          List.fold_left f_close t ctx_with_dom
       | Fun(g,[a]) ->
           (** Here we simplifies the cints which are redoundant *)
           begin try
@@ -950,7 +959,8 @@ let is_cint_simplifier = object (self)
             with Not_found -> t
           end
       | Imply (l1,l2) -> e_imply (List.map (walk ~is_goal:false) l1) (walk ~is_goal l2)
-      | _ -> Lang.F.QED.f_map ~pool (walk ~is_goal) t in
+      | _ ->
+          Lang.F.QED.f_map ~pool ~forall:false ~exists:false (walk ~is_goal) t in
     Lang.F.p_bool (walk ~is_goal (Lang.F.e_prop p))
 
   method simplify_exp (e : term) = e

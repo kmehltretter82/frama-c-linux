@@ -2354,24 +2354,24 @@ struct
 
   let lc_iter f e = repr_iter f e.repr
 
-  let f_map ?pool f e =
+  let f_map ?pool ?forall ?exists ?lambda f e =
     match e.repr with
     | Apply(a,xs) -> e_apply (f a) (List.map f xs)
     | Bind _ ->
         let pool = match pool with
           | None -> raise (Invalid_argument "Qed.ogic.Term.f_map")
           | Some pool -> pool in
-        let ctx,a = e_open pool e in
+        let ctx,a = e_open ~pool ?forall ?exists ?lambda e in
         e_close ctx (rebuild f a)
     | _ -> rebuild f e
 
-  let f_iter ?pool f e =
+  let f_iter ?pool ?forall ?exists ?lambda f e =
     match e.repr with
     | Bind _ ->
         let pool = match pool with
           | None -> raise (Invalid_argument "Qed.ogic.Term.f_iter")
           | Some pool -> pool in
-        let _,a = e_open pool e in
+        let _,a = e_open ~pool ?forall ?exists ?lambda e in
         f a
     | _ -> repr_iter f e.repr
 

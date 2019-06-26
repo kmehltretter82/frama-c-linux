@@ -389,13 +389,15 @@ sig
 
   (** {3 Iteration Scheme} *)
 
-  val f_map  : ?pool:pool -> (term -> term) -> term -> term
+  val f_map  : ?pool:pool -> ?forall:bool -> ?exists:bool -> ?lambda:bool
+    -> (term -> term) -> term -> term
   (** Pass and open binders, maps its direct sub-terms
       and then close then opened binders
       Raises Invalid_argument in case of a bind-term without pool.
       The optional pool must contain all free variables of the term. *)
 
-  val f_iter : ?pool:pool -> (term -> unit) -> term -> unit
+  val f_iter : ?pool:pool -> ?forall:bool -> ?exists:bool -> ?lambda:bool
+    -> (term -> unit) -> term -> unit
   (** Iterates over its direct sub-terms (pass and open binders)
       Raises Invalid_argument in case of a bind-term without pool.
       The optional pool must contain all free variables of the term. *)
