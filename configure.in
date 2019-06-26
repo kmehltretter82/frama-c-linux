@@ -319,7 +319,7 @@ ZARITH=$($OCAMLFIND query zarith -format %v)
 if test -z "$ZARITH" ; then
   AC_MSG_ERROR(Cannot find zarith via ocamlfind.)
 else
-  AC_MSG_RESULT(found)
+  AC_MSG_RESULT(found $ZARITH)
 fi
 
 # yojson
@@ -331,6 +331,8 @@ YOJSON=$($OCAMLFIND query yojson -format %v)
 if test -z "$YOJSON" ; then
   AC_MSG_ERROR(Cannot find yojson via ocamlfind \
 (requires yojson 1.4.1 or higher).)
+else
+  AC_MSG_RESULT(found $YOJSON)
 fi
 
 #################################################
