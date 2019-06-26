@@ -478,6 +478,13 @@ let rec forall_intro p =
       let hs = exist_intros hs in
       let hp,p = forall_intro p in
       hs @ hp , p
+  | Or qs -> (* analogy with Imply *)
+      let hps,ps = List.fold_left (fun (hs,ps) q ->
+          let hp,p = forall_intro q in (* q <==> (hp ==> p) *)
+          (hp @ hs), (p::ps)) ([],[]) qs
+      in (* ORs qs  <==> ORs (hps ==> ps)
+                    <==> ((ANDs hps) ==> ORs ps) *)
+      hps, (p_disj ps)
   | _ -> [] , p
 
 (* -------------------------------------------------------------------------- *)
