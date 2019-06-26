@@ -19,6 +19,12 @@
 #   configure	configure
 ###############################################################################
 
+##############################
+Plugin E-ACSL 19.0 (Potassium)
+##############################
+
+-  E-ACSL       [2019/04/29] Support for logic functions and predicates
+	        without labels.
 -  runtime      [2019/02/26] The behavior of __e_acsl_assert now depends on the
 	        runtime value of the global variable __e_acsl_sound_verdict:
 	        if 0, it means that its verdict is possibly incorrect.

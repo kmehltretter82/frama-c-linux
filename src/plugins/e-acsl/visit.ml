@@ -453,7 +453,12 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
             in
             Extlib.may handle_main main_fct
           in
-          Project.on prj build_mmodel_initializer ();
+          Project.on
+            prj
+            (fun () ->
+               f.globals <- Logic_functions.add_generated_functions f.globals;
+               build_mmodel_initializer ())
+            ();
           (* reset copied states at the end to be observationally
               equivalent to a standard visitor. *)
           Project.clear ~selection ~project:prj ();
@@ -468,8 +473,9 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       Cil.JustCopyPost
         (fun l ->
           let new_vi = Cil.get_varinfo self#behavior vi in
-          Misc.register_library_function new_vi;
-          Builtins.update vi.vname new_vi;
+          if Misc.is_library_loc vi.vdecl then
+            Misc.register_library_function new_vi;
+          if Builtins.mem vi.vname then Builtins.update vi.vname new_vi;
           l)
     else begin
       Misc.register_library_function vi;
@@ -561,9 +567,10 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
     let locals, blocks =
       List.fold_left
         (fun (local_vars, block_vars as acc) (v, scope) -> match scope with
-        | Env.Global -> acc
-        | Env.Function -> v :: local_vars, v :: block_vars
-        | Env.Local_block -> v :: local_vars, block_vars)
+        (* TODO: [kf] assumed to be consistent. Should be asserted. *)
+        | Env.LFunction _kf -> v :: local_vars, v :: block_vars
+        | Env.LLocal_block _kf -> v :: local_vars, block_vars
+        | _ -> acc)
         (f.slocals, f.sbody.blocals)
         vars
     in
@@ -1020,6 +1027,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
 
   initializer
     Misc.reset ();
+    Logic_functions.reset ();
     Literal_strings.reset ();
     Global_observer.reset ();
     Keep_status.before_translation ();
