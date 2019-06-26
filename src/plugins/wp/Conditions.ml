@@ -410,20 +410,22 @@ let prenex_intro p =
     let rec walk hs xs p =
       match F.p_expr p with
       | Imply(h,p) -> walk (h::hs) xs p
-      | Bind(Forall,tau,p) -> bind hs xs tau p
+      | Bind(Forall,_,_) -> bind hs xs p
       | _ ->
           if hs = [] then raise Exit ;
           F.p_forall (List.rev xs) (F.p_hyps (List.concat hs) p)
     (* invariant: result <-> forall hs xs (\tau.bind) *)
-    and bind hs xs tau bind =
-      let x = Lang.freshvar tau in
-      let p = F.p_bool (F.QED.lc_open x bind) in
-      walk hs (x::xs) p
+    and bind hs xs p =
+      let pool = Lang.get_pool () in
+      let ctx,t = e_open ~pool ~forall:true
+          ~exists:false ~lambda:false (e_prop p) in
+      let xs = List.fold_left (fun xs (_,x) -> x::xs) xs (List.rev ctx) in
+      walk hs xs (F.p_bool t)
     (* invariant: result <-> p *)
     and crawl p =
       match F.p_expr p with
       | Imply(h,p) -> F.p_hyps h (crawl p)
-      | Bind(Forall,tau,p) -> bind [] [] tau p
+      | Bind(Forall,_,_) -> bind [] [] p
       | _ -> raise Exit
     in crawl p
   with Exit -> p
@@ -436,9 +438,11 @@ let rec exist_intro p =
   let open Qed.Logic in
   match F.p_expr p with
   | And ps -> F.p_all exist_intro ps
-  | Bind(Exists,tau,p) ->
-      let x = Lang.freshvar tau in
-      exist_intro (F.p_bool (F.QED.lc_open x p))
+  | Bind(Exists,_,_) ->
+      let pool = Lang.get_pool () in
+      let _,t = e_open ~pool ~exists:true
+          ~forall:false ~lambda:false (e_prop p) in
+      exist_intro (F.p_bool t)
   | _ ->
       if Wp_parameters.Prenex.get ()
       then prenex_intro p
@@ -450,9 +454,11 @@ let rec exist_intros = function
       let open Qed.Logic in
       match F.p_expr p with
       | And ps -> exist_intros (ps@hs)
-      | Bind(Exists,tau,p) ->
-          let x = Lang.freshvar tau in
-          exist_intros ((F.p_bool (F.QED.lc_open x p))::hs)
+      | Bind(Exists,_,_) ->
+          let pool = Lang.get_pool () in
+          let _,t = F.QED.e_open ~pool ~exists:true
+              ~forall:false ~lambda:false (e_prop p) in
+          exist_intros ((F.p_bool t)::hs)
       | _ -> p::(exist_intros hs)
     end
 
@@ -463,9 +469,11 @@ let rec exist_intros = function
 let rec forall_intro p =
   let open Qed.Logic in
   match F.p_expr p with
-  | Bind(Forall,tau,p) ->
-      let x = Lang.freshvar tau in
-      forall_intro (F.p_bool (F.QED.lc_open x p))
+  | Bind(Forall,_,_) ->
+      let pool = Lang.get_pool () in
+      let _,t = F.QED.e_open ~pool ~forall:true
+          ~exists:false ~lambda:false (e_prop p) in
+      forall_intro (F.p_bool t)
   | Imply(hs,p) ->
       let hs = exist_intros hs in
       let hs = List.map (fun p -> step (Have p)) hs in
