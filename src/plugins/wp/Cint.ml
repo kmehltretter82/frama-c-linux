@@ -836,7 +836,8 @@ let reduce_bound v tv dom t : term =
       with Exc.Unknown i -> i in
     (** we try to reduce the bounds of the domains, when trivially false *)
     let dom_red = Ival.inject_range (Some min_bound) (Some max_bound) in
-    if not (Ival.equal dom_red dom) && Ival.is_included dom_red dom
+    assert ( Ival.is_included dom_red dom);
+    if Ival.equal dom_red dom
     then t
     else
         (e_imply [e_leq (e_zint min_bound) tv;
