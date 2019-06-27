@@ -989,7 +989,30 @@ end
 
 
 let mask_simplifier =
-  object(self)
+  let update x m ctx =
+    Tmap.insert (fun _ m old -> if Integer.lt m old then (*better*) m else old)
+      x m ctx
+  and rewrite ctx e =
+    let reduce m x = match F.repr x with
+      | Kint v -> F.e_zint (Integer.logand m v)
+      | _ -> x
+    and collect ctx d x = try
+        let m = Tmap.find x ctx in
+        match d with
+        | None -> Some m
+        | Some m0 -> if Integer.lt m m0 then Some m else d
+      with Not_found -> d
+    in
+    match F.repr e with
+    | Fun(f,es) when f == f_land ->
+        begin
+          match List.fold_left (collect ctx) None es with
+          | None -> raise Not_found
+          | Some m -> F.e_fun f_land (List.map (reduce m) es)
+        end
+    | _ -> raise Not_found
+  in
+  object
 
     (** Must be 2^n-1 *)
     val mutable magnitude : Integer.t Tmap.t = Tmap.empty
@@ -997,68 +1020,37 @@ let mask_simplifier =
     method name = "Rewrite unsigned masks"
     method copy = {< magnitude = magnitude >}
 
-    method private update x m =
-      let better =
-        try Integer.lt m (Tmap.find x magnitude)
-        with Not_found -> true in
-      if better then magnitude <- Tmap.add x m magnitude
-
-    method private collect d x =
-      try
-        let m = Tmap.find x magnitude in
-        match d with
-        | None -> Some m
-        | Some m0 -> if Integer.lt m m0 then Some m else d
-      with Not_found -> d
-
-    method private reduce m x =
-      match F.repr x with
-      | Kint v -> F.e_zint (Integer.logand m v)
-      | _ -> x
-
-    method private rewrite e =
-      match F.repr e with
-      | Fun(f,es) when f == f_land ->
-          begin
-            match List.fold_left self#collect None es with
-            | None -> raise Not_found
-            | Some m -> F.e_fun f_land (List.map (self#reduce m) es)
-          end
-      | _ -> raise Not_found
-
     method target _ = ()
     method infer = []
     method fixpoint = ()
 
     method assume p =
-      let rec walk e = match F.repr e with
-        | And es -> List.iter walk es
-        | Fun(f,[x]) ->
-            begin
-              try
-                let iota = is_cint f in
-                if not (Ctypes.signed iota) then
-                  self#update x (snd (Ctypes.bounds iota))
-              with Not_found -> ()
-            end
-        | _ -> ()
-      in walk (F.e_prop p)
+      Lang.iter_confident_literals
+        (fun p -> match F.repr p with
+           | Fun(f,[x]) -> begin
+               try
+                 let iota = is_cint f in
+                 if not (Ctypes.signed iota) then
+                   magnitude <- update x (snd (Ctypes.bounds iota)) magnitude
+               with Not_found -> ()
+             end
+           | _ -> ()) (F.e_prop p)
 
     method simplify_exp e =
       if Tmap.is_empty magnitude then e else
-        Lang.e_subst self#rewrite e
+        Lang.e_subst (rewrite magnitude) e
 
     method simplify_hyp p =
       if Tmap.is_empty magnitude then p else
-        Lang.p_subst self#rewrite p
+        Lang.p_subst (rewrite magnitude) p
 
     method simplify_branch p =
       if Tmap.is_empty magnitude then p else
-        Lang.p_subst self#rewrite p
+        Lang.p_subst (rewrite magnitude) p
 
     method simplify_goal p =
       if Tmap.is_empty magnitude then p else
-        Lang.p_subst self#rewrite p
+        Lang.p_subst (rewrite magnitude) p
 
   end
 
