@@ -306,6 +306,9 @@ sig
   (** Bind the given variable if it appears free in the term,
       or return the term unchanged. *)
 
+  val lc_open : var -> lc_term -> term
+  [@@deprecated "Use e_unbind instead"]
+
   val e_unbind : var -> lc_term -> term
   (** Opens the top-most bound variable with a (fresh) variable.
       Can be only applied on top-most lc-term from `Bind(_,_,_)`,

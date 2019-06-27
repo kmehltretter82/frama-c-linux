@@ -2004,7 +2004,7 @@ struct
     | Bind(q,t,e) -> c_bind q t (f e)
 
   (* Alpha-convert free-variable x with the top-most bound variable *)
-  let lc_bind x (lc : lc_term) : lc_term =
+  let lc_close x (lc : lc_term) : lc_term =
     let rec walk mu x lc =
       if Vars.mem x lc.vars then
         get mu (lc_alpha (walk mu x)) lc
@@ -2170,7 +2170,7 @@ struct
                   possible to insert a recursive call to let-intro
                   it will use a new instance of e_subst_var that
                   will work on a different sigma *)
-               c_bind q t (lc_bind x e)
+               c_bind q t (lc_close x e)
              else e
           ) (subst sigma alpha e) qs
 
@@ -2302,7 +2302,7 @@ struct
       match q with Forall | Exists -> Vars.mem x e.vars | Lambda -> true in
     if do_bind then
       match let_intro_case q x e with
-      | None -> c_bind q (tau_of_var x) (lc_bind x e)
+      | None -> c_bind q (tau_of_var x) (lc_close x e)
       | Some v -> e_subst_var x v e (* case [let x = v ; e] *)
     else e
 
