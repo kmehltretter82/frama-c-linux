@@ -295,7 +295,7 @@ sig
   val e_repr : repr -> term
   (** @raise Invalid_argument on [Bvar] and [Bind] *)
 
-  (** {3 Quantification and Binding} *)
+  (** {3 Quantifiers and Binding} *)
 
   val e_forall : var list -> term -> term
   val e_exists : var list -> term -> term
