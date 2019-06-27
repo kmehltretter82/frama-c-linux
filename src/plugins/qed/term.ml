@@ -2280,23 +2280,6 @@ struct
           | _ -> is_eq e
         in ignore(exists_case a); !res
 
-  let e_bind q x (e : term) =
-    assert (lc_closed e) ;
-    let do_bind =
-      match q with Forall | Exists -> Vars.mem x e.vars | Lambda -> true in
-    if do_bind then
-      match let_intro_case q x e with
-      | None -> c_bind q (tau_of_var x) (lc_bind x e)
-      | Some v -> e_subst_var x v e (* case [let x = v ; e] *)
-    else e
-
-  let rec bind_xs q xs e =
-    match xs with [] -> e | x::xs -> e_bind q x (bind_xs q xs e)
-
-  let e_forall = bind_xs Forall
-  let e_exists = bind_xs Exists
-  let e_lambda = bind_xs Lambda
-
   let e_open ~pool ?(forall=true) ?(exists=true) ?(lambda=true) a =
     match a.repr with
     | Bind _ ->
@@ -2312,7 +2295,26 @@ struct
         in walk [] a
     | _ -> [],a
 
+  let e_unbind x (lc : lc_term) : term =
+    assert (not (Vars.mem x lc.vars)); lc_open x lc
+
+  let e_bind q x (e : term) =
+    let do_bind =
+      match q with Forall | Exists -> Vars.mem x e.vars | Lambda -> true in
+    if do_bind then
+      match let_intro_case q x e with
+      | None -> c_bind q (tau_of_var x) (lc_bind x e)
+      | Some v -> e_subst_var x v e (* case [let x = v ; e] *)
+    else e
+
   let e_close qs a = List.fold_left (fun b (q,x) -> e_bind q x b) a qs
+
+  let rec bind_xs q xs e =
+    match xs with [] -> e | x::xs -> e_bind q x (bind_xs q xs e)
+
+  let e_forall = bind_xs Forall
+  let e_exists = bind_xs Exists
+  let e_lambda = bind_xs Lambda
 
   (* -------------------------------------------------------------------------- *)
   (* --- Iterators                                                          --- *)

@@ -159,7 +159,7 @@ class instance =
           let tooltip = fieldname ~range env.index x in
           env.feedback#update_field
             ~tooltip ~range ~enabled:true ~filter:(filter x) fd ;
-          let lemma = F.QED.lc_open x phi in
+          let lemma = F.QED.e_unbind x phi in
           let bindings,property = self#wrap env lemma fields in
           (x,v) :: bindings , property
       | _ ->

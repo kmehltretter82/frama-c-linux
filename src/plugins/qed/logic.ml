@@ -306,6 +306,11 @@ sig
   (** Bind the given variable if it appears free in the term,
       or return the term unchanged. *)
 
+  val e_unbind : var -> lc_term -> term
+  (** Opens the top-most bound variable with a (fresh) variable.
+      Can be only applied on top-most lc-term from `Bind(_,_,_)`,
+      thanks to typing. *)
+
   val e_open : pool:pool -> ?forall:bool -> ?exists:bool -> ?lambda:bool ->
     term -> (binder * var) list * term
   (** Open all the specified binders (flags default to `true`, so all
@@ -361,9 +366,6 @@ sig
   val e_subst_var : var -> term -> term -> term
 
   (** {3 Locally Nameless Representation} *)
-
-  val lc_bind : var -> term -> lc_term (** Bind x with top bound variable *)
-  val lc_open : var -> lc_term -> term (** Open top bound variable with x *)
 
   val lc_empty : term -> bool (** No bound variables *)
   val lc_closed : term -> bool (** All bound variables are under their binder *)
