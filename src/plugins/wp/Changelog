@@ -20,7 +20,10 @@
 #   <Prover>: prover
 ###############################################################################
 
- - Qed         [2019/05/09] Transforms some boolean quantifications into let constructs
+- WP          [2019/06/27] Improving Cint simplifier and quantifier introduction
+o WP          [2019/06/27] Using the new API of Qed
+o Qed         [2019/06/27] Changes into the API in order to get a more secure way to manipulate quantifiers and binding
+- Qed         [2019/05/09] Transforms some boolean quantifications into let constructs
 ##########################
 Plugin WP 19.0 (Potassium)
 ##########################
