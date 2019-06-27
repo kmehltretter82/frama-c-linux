@@ -1970,7 +1970,6 @@ struct
   let lc_closed_at n e = Bvars.closed_at n e.bind
   let lc_vars e = e.bind
   let lc_repr e = e
-  let lc_term e = e
 
   (*
      Warning: must only be used for alpha-conversion
@@ -2080,6 +2079,13 @@ struct
       filter = [] ;
     }
 
+    let validate fn e =
+      if false && not (lc_closed e) then
+        begin
+          Format.eprintf "Invalid %s: %a@." fn pretty e ;
+          raise (Invalid_argument (fn ^ ": non lc-closed binding"))
+        end
+
     let cache sigma =
       ref begin
         match sigma.shared with MAP( m , _ ) -> m | _ -> Tmap.empty
@@ -2087,11 +2093,15 @@ struct
 
     let fresh sigma t = fresh sigma.pool t
 
+    let call f e =
+      let v = f e in
+      validate "Qed.Subst.add_fun" v ; v
+
     let rec compute e = function
       | EMPTY -> raise Not_found
-      | FUN(f,EMPTY) -> f e
+      | FUN(f,EMPTY) -> call f e
       | MAP(m,EMPTY) -> Tmap.find e m
-      | FUN(f,s) -> (try f e with Not_found -> compute e s)
+      | FUN(f,s) -> (try call f e with Not_found -> compute e s)
       | MAP(m,s) -> (try Tmap.find e m with Not_found -> compute e s)
 
     let get sigma a = compute a sigma.shared
@@ -2100,13 +2110,22 @@ struct
       List.for_all (fun f -> f a) sigma.filter
 
     let add sigma a b =
+      validate "Qed.Subst.add (domain)" a ;
+      validate "Qed.Subst.add (codomain)" b ;
       sigma.shared <- match sigma.shared with
         | MAP(m,s) -> MAP (Tmap.add a b m,s)
         | (FUN _ | EMPTY) as s -> MAP (Tmap.add a b Tmap.empty,s)
 
     let add_map sigma m =
       if not (Tmap.is_empty m) then
-        sigma.shared <- MAP(m,sigma.shared)
+        begin
+          Tmap.iter
+            (fun a b ->
+               validate "Qed.Subst.add_map (domain)" a ;
+               validate "Qed.Subst.add_map (codomain)" b ;
+            ) m ;
+          sigma.shared <- MAP(m,sigma.shared)
+        end
 
     let add_fun sigma f =
       sigma.shared <- FUN(f,sigma.shared)
@@ -2184,9 +2203,12 @@ struct
         c_apply f' vs
 
   let e_subst sigma e =
+    Subst.validate "Qed.e_subst (target)" e ;
     subst sigma Intmap.empty e
 
   let e_subst_var x v e =
+    Subst.validate "Qed.e_subst_var (value)" v ;
+    Subst.validate "Qed.e_subst_var (target)" e ;
     let filter e = Vars.mem x e.vars in
     if not (filter e) then e else
     if Bvars.is_empty v.bind && Bvars.is_empty e.bind then
@@ -2302,8 +2324,8 @@ struct
       match q with Forall | Exists -> Vars.mem x e.vars | Lambda -> true in
     if do_bind then
       match let_intro_case q x e with
-      | None -> c_bind q (tau_of_var x) (lc_close x e)
       | Some v -> e_subst_var x v e (* case [let x = v ; e] *)
+      | _ -> c_bind q (tau_of_var x) (lc_close x e)
     else e
 
   let e_close qs a = List.fold_left (fun b (q,x) -> e_bind q x b) a qs

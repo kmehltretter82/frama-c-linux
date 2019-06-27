@@ -757,7 +757,7 @@ struct
   let p_forall = e_forall
   let p_exists = e_exists
   let p_subst = e_subst
-  let p_apply = e_subst_var
+  let p_subst_var = e_subst_var
 
   let p_and p q = e_and [p;q]
   let p_or p q = e_or [p;q]

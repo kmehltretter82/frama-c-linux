@@ -368,14 +368,23 @@ sig
 
   val e_subst_var : var -> term -> term -> term
 
-  (** {3 Locally Nameless Representation} *)
+  (** {3 Locally Nameless Representation}
 
-  val lc_closed : term -> bool (** All bound variables are under their binder *)
+      These functions can be {i unsafe} because they might expose terms
+      that contains non-bound b-vars. Never use such terms to build
+      substitutions (sigma).
+  *)
 
   val lc_vars : term -> Bvars.t
+  val lc_closed : term -> bool
+  (** All bound variables are under their binder *)
 
-  val lc_term : term -> lc_term
   val lc_repr : lc_term -> term
+  (** Calling this function is {i unsafe} unless the term is lc_closed *)
+
+  val lc_iter : (term -> unit) -> term -> unit
+  (** Similar to [f_iter] but exposes non-closed sub-terms of `Bind`
+      as regular [term] values instead of [lc_term] ones. *)
 
   (** {3 Iteration Scheme} *)
 
@@ -391,8 +400,6 @@ sig
   (** Iterates over its direct sub-terms (pass and open binders)
       Raises Invalid_argument in case of a bind-term without pool.
       The optional pool must contain all free variables of the term. *)
-
-  val lc_iter : (term -> unit) -> term -> unit
 
   (** {3 Partial Typing} *)
 

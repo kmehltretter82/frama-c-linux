@@ -365,7 +365,7 @@ sig
 
   val e_subst : sigma -> term -> term
   val p_subst : sigma -> pred -> pred
-  val p_apply : var -> term -> pred -> pred
+  val p_subst_var : var -> term -> pred -> pred
 
   val e_vars : term -> var list (** Sorted *)
   val p_vars : pred -> var list (** Sorted *)
