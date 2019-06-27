@@ -110,7 +110,7 @@ Functions           WP     Alt-Ergo        Total   Success
 init                 6      4 (80..104)     10       100%
 init_t1              6      4 (12..24)      10       100%
 init_t2_v1           9      8 (40..52)      17       100%
-init_t2_v2           9      8 (32..44)      17       100%
+init_t2_v2           9      8 (24..36)      17       100%
 init_t2_v3           7      8 (28..40)      15       100%
 init_t2_bis_v1       7      4 (208..256)    11       100%
 init_t2_bis_v2       7      4 (192..240)    11       100%

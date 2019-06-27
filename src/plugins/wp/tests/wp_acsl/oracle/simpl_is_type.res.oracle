@@ -165,20 +165,17 @@ Prove: exists i : Z. forall i_1 : Z. (is_uint8(i_1) ->
 ------------------------------------------------------------
 
 Goal Check 'ko,Let1,intro_let' (file tests/wp_acsl/simpl_is_type.i, line 92):
-Prove: exists i : Z. forall i_1 : Z. ((10 <= i_1) -> ((i_1 <= 10) ->
-    P_P(i_1, i, 1.0))).
+Prove: exists i : Z. P_P(10, i, 1.0).
 
 ------------------------------------------------------------
 
 Goal Check 'ko,Let2,intro_let' (file tests/wp_acsl/simpl_is_type.i, line 93):
-Prove: exists i : Z. forall i_1 : Z. ((i_1 <= 0) -> ((0 <= i_1) ->
-    (((-5) <= i_1) -> P_P(i_1, i, 1.0)))).
+Prove: exists i : Z. P_P(0, i, 1.0).
 
 ------------------------------------------------------------
 
 Goal Check 'ko,Let3,intro_let' (file tests/wp_acsl/simpl_is_type.i, line 94):
-Prove: exists i : Z. forall i_1 : Z. ((255 <= i_1) -> ((i_1 <= 255) ->
-    ((i_1 <= 599) -> P_P(i_1, i, 1.0)))).
+Prove: exists i : Z. P_P(255, i, 1.0).
 
 ------------------------------------------------------------
 
