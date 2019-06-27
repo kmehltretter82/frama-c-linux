@@ -1955,17 +1955,12 @@ struct
   (* --- Caches                                                             --- *)
   (* -------------------------------------------------------------------------- *)
 
-  type 'a cache = 'a Tmap.t ref
-
   let cache () = ref Tmap.empty
   let get mu f e =
     try Tmap.find e !mu with Not_found ->
       let v = f e in mu := Tmap.add e v !mu ; v
   let set mu e v = mu := Tmap.add e v !mu
-  let clear mu = mu := Tmap.empty
 
-  let lc_set = set
-  let lc_get = get
 
   (* -------------------------------------------------------------------------- *)
   (* --- Locally Nameless                                                   --- *)

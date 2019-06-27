@@ -308,21 +308,12 @@ sig
 
   val e_open : pool:pool -> ?forall:bool -> ?exists:bool -> ?lambda:bool ->
     term -> (binder * var) list * term
-  (** Open all the specified binders
+  (** Open all the specified binders (flags default to `true`, so all 
+      consecutive top most binders are opened by default).
       The pool must contain all free variables of the term. *)
 
   val e_close : (binder * var) list -> term -> term
   (** Closes all specified binders *)
-
-  (** {3 Local Caches} *)
-
-  type 'a cache
-  val cache : unit -> 'a cache
-  val get : 'a cache -> (term -> 'a) -> term -> 'a
-  val set : 'a cache -> term -> 'a -> unit
-  val lc_get : 'a cache -> (lc_term -> 'a) -> lc_term -> 'a
-  val lc_set : 'a cache -> lc_term -> 'a -> unit
-  val clear : 'a cache -> unit
 
   (** {3 Generalized Substitutions} *)
 
@@ -334,7 +325,6 @@ sig
     type t = sigma
     val create : ?pool:pool -> unit -> t
 
-    val cache : sigma -> term cache
     val fresh : t -> tau -> var
     val get : t -> term -> term
     val filter : t -> term -> bool
