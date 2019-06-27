@@ -295,7 +295,7 @@ sig
 
   val e_open : pool:pool -> ?forall:bool -> ?exists:bool -> ?lambda:bool ->
     term -> (binder * var) list * term
-  (** Open all the specified binders (flags default to `true`, so all 
+  (** Open all the specified binders (flags default to `true`, so all
       consecutive top most binders are opened by default).
       The pool must contain all free variables of the term. *)
 
