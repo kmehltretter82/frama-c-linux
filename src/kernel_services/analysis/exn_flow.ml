@@ -418,6 +418,8 @@ object(self)
 
   val mutable can_throw = false
 
+  val mutable fct_can_throw = false
+
   val mutable catched_var = None
 
   val mutable label_counter = 0
@@ -511,6 +513,7 @@ object(self)
   method private jumps_to_default_handler loc =
     if Stack.is_empty catch_all_label then begin
       (* no catch-all clause in the function: just go up in the stack. *)
+      fct_can_throw <- true;
       let kf = Extlib.the self#current_kf in
       let ret = Kernel_function.find_return kf in
       let rtyp = Kernel_function.get_return_type kf in
@@ -617,7 +620,56 @@ object(self)
     ignore (Visitor.visitFramacBlock (self :> Visitor.frama_c_visitor) b);
     add_unreachable_block b
 
-  method! vfunc _ = label_counter <- 0; DoChildren
+  method! vfunc _ =
+    label_counter <- 0;
+    fct_can_throw <- false;
+    let update_body f =
+      if fct_can_throw then begin
+        (* we must ensure that our gotos to the end of the function do not
+           bypass declaration of objects with destructors, or there will be
+           issues when inserting the destructor calls. If needed, enclose
+           the main body (except return and the declaration of the retvar)
+           inside its own block.
+        *)
+        if
+          List.exists
+            (fun v -> Cil.hasAttribute Cabs2cil.frama_c_destructor v.vattr)
+            f.sbody.blocals
+        then begin
+          let ret = Kernel_function.find_return (Extlib.the self#current_kf) in
+          let ret_block = Kernel_function.find_enclosing_block ret in
+          let ret_block_body =
+            List.filter
+              (fun s -> not (Cil_datatype.Stmt.equal ret s))
+              ret_block.bstmts
+          in
+          let retvar =
+            match ret.skind with
+            | Return(None, _) -> []
+            | Return(Some {enode = Lval (Var v,NoOffset)}, _) -> [v]
+            | Return _ ->
+              Kernel.fatal "Return node in unexpected format after oneret call"
+            | _ ->
+              Kernel.fatal "find_return did not return Return node"
+          in
+          let ret_block_locals =
+            List.filter
+              (fun v ->
+                 not (List.exists
+                        (fun v' -> Cil_datatype.Varinfo.equal v v') retvar))
+              ret_block.blocals
+          in
+          ret_block.bstmts <- ret_block_body;
+          ret_block.blocals <- ret_block_locals;
+          let s1 = Cil.mkStmt (Block f.sbody) in
+          let b = Cil.mkBlock [ s1; ret] in
+          b.blocals <- retvar;
+          f.sbody <- b
+        end
+      end;
+      f
+    in
+    DoChildrenPost update_body
 
   method private modify_current () =
     modified_funcs <-
