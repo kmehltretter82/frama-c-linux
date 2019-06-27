@@ -1966,7 +1966,6 @@ struct
   (* --- Locally Nameless                                                   --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let lc_empty e = Bvars.is_empty e.bind
   let lc_closed e = Bvars.closed e.bind
   let lc_closed_at n e = Bvars.closed_at n e.bind
   let lc_vars e = e.bind

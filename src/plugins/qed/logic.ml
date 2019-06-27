@@ -367,12 +367,7 @@ sig
 
   (** {3 Locally Nameless Representation} *)
 
-  val lc_empty : term -> bool (** No bound variables *)
   val lc_closed : term -> bool (** All bound variables are under their binder *)
-  val lc_closed_at : int -> term -> bool
-  (** [lc_closed_at n] do not contains bvar with [k < n].
-      Means that the term has no bound-variable that can escape [n] binders
-      uppon the term. *)
 
   val lc_vars : term -> Bvars.t
 
