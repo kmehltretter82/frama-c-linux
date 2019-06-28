@@ -2242,7 +2242,8 @@ struct
     let res = ref None in
     let found_term t = assert (!res = None);
       assert (not (Vars.mem x t.vars));
-      res := Some t; true
+      if not (lc_closed t) then false else
+        (res := Some t; true)
     in
     let is_term_ok a b =
       match a.repr with
