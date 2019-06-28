@@ -108,8 +108,6 @@ let rank_term = function
   | Tbase_addr _ -> 17
   | Tblock_length _ -> 18
   | Tnull -> 19
-  | TCoerce _ -> 20
-  | TCoerceE _ -> 21
   | TUpdate _ -> 22
   | Ttypeof _ -> 23
   | Ttype _ -> 24
@@ -1562,12 +1560,6 @@ let rec compare_term t1 t2 =
       let cl = compare_logic_label l1 l2 in
       if cl <> 0 then cl else compare_term t1 t2
     | Tnull , Tnull -> 0
-    | TCoerce(t1,ty1) , TCoerce(t2,ty2) ->
-      let ct = Typ.compare ty1 ty2 in
-      if ct <> 0 then ct else compare_term t1 t2
-    | TCoerceE(t1,ty1) , TCoerceE(t2,ty2) ->
-      let ct = compare_term ty1 ty2 in
-      if ct <> 0 then ct else compare_term t1 t2
     | TUpdate(x1,off1,y1) , TUpdate(x2,off2,y2) ->
       let cx = compare_term x1 x2 in
       if cx <> 0 then cx else
@@ -1598,7 +1590,7 @@ let rec compare_term t1 t2 =
       | TAlignOfE _ | TUnOp _ | TBinOp _ | TCastE _ | TAddrOf _ | TStartOf _
       | Tapp _ | Tlambda _ | TDataCons _ | Tif _ | Tat _
       | Tbase_addr _ | Tblock_length _ | Toffset _
-      | Tnull | TCoerce _ | TCoerceE _ | TUpdate _ | Ttypeof _
+      | Tnull | TUpdate _ | Ttypeof _
       | Ttype _ | Tempty_set | Tunion _ | Tinter _  | Tcomprehension _
       | Trange _ | Tlet _ 
       | TLogic_coerce _), _ -> assert false
@@ -1727,12 +1719,6 @@ let rec hash_term (acc,depth,tot) t =
         let hash = acc + 351 + hash_label l in
         hash_term (hash,depth-1,tot-2) t
       | Tnull -> acc+361, tot - 1
-      | TCoerce(t,ty) ->
-        let hash = Typ.hash ty in
-        hash_term (acc+380+hash,depth-1,tot-2) t
-      | TCoerceE(t1,t2) ->
-        let hash1,tot1 = hash_term (acc+399,depth-1,tot-1) t1 in
-        hash_term (hash1,depth-1,tot1) t2
       | TUpdate(t1,off,t2) ->
         let hash1,tot1 = hash_term (acc+418,depth-1,tot-1) t1 in
         let hash2,tot2 = hash_toffset (hash1,depth-1,tot1) off in

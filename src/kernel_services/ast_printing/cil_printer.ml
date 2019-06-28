@@ -199,7 +199,6 @@ module Precedence = struct
     | Pfresh _ -> 0
     | Papp _ as p -> if subset_is_backslash_in p = None then 0 else 36
     | Pnot _ -> 30
-    | Psubtype _ -> 75
     | Pand _ -> and_level
     | Pxor _ -> xor_level
     | Por _ -> or_level
@@ -277,8 +276,6 @@ module Precedence = struct
     | TAddrOf(_) -> addrOfLevel
     | TStartOf(_) -> 30
     | TUnOp((Neg|BNot|LNot),_) -> 30
-    (* Unary post *)
-    | TCoerce _ | TCoerceE _ -> 25
     (* Lvals *)
     | TLval(TMem _ , _) -> derefStarLevel
     | TLval(TVar _, (TField _|TIndex _|TModel _)) -> indexLevel
@@ -2324,12 +2321,6 @@ class cil_printer () = object (self)
       fprintf fmt "%a%a(%a)" self#pp_acsl_keyword "\\block_length"
         self#labels [l] self#term t
     | Tnull -> self#pp_acsl_keyword fmt "\\null"
-    | TCoerce (e,ty) ->
-      fprintf fmt "%a@ :>@ %a"
-        (self#term_prec current_level) e (self#typ None) ty
-    | TCoerceE (e,ce) ->
-      fprintf fmt "%a :> %a"
-        (self#term_prec current_level) e (self#term_prec current_level) ce
     | TUpdate (t,toff,v) ->
       fprintf fmt "{%a %a %a = %a}"
         self#term t
@@ -2654,8 +2645,6 @@ class cil_printer () = object (self)
           self#pred_prec_named (Precedence.upperLevel,p)
           self#logic_label lab;
       current_label <- old_label
-    | Psubtype (e,ce) ->
-      fprintf fmt "@[%a@ <:@ %a@]" term e term ce
 
   method private decrement kw fmt (t, rel) = match rel with
     | None -> fprintf fmt "@[<2>%a@ %a;@]" self#pp_acsl_keyword kw self#term t

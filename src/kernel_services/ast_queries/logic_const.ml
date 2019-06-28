@@ -444,8 +444,6 @@ let pinitialized ?(loc=Cil_datatype.Location.unknown) (l,p) =
   unamed ~loc (Pinitialized (l,p))
 let pdangling ?(loc=Cil_datatype.Location.unknown) (l,p) =
   unamed ~loc (Pdangling (l,p))
-let psubtype ?(loc=Cil_datatype.Location.unknown) (p,q) =
-  unamed ~loc (Psubtype (p,q))
 
 let pseparated  ?(loc=Cil_datatype.Location.unknown) seps =
   unamed ~loc (Pseparated seps)
