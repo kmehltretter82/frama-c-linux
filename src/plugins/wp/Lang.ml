@@ -757,7 +757,7 @@ struct
   let p_forall = e_forall
   let p_exists = e_exists
   let p_subst = e_subst
-  let p_apply = e_subst_var
+  let p_subst_var = e_subst_var
 
   let p_and p q = e_and [p;q]
   let p_or p q = e_or [p;q]
@@ -785,13 +785,6 @@ struct
   let varsp = vars
   let p_expr = repr
   let e_expr = repr
-  let p_iter fp fe p =
-    match QED.repr p with
-    | True | False | Kint _ | Kreal _ | Fvar _ | Bvar _ -> ()
-    | Eq(a,b) | Neq(a,b) when is_prop a && is_prop b -> fp a ; fp b
-    | Eq _ | Neq _ | Leq _ | Lt _ | Times _ | Add _ | Mul _ | Div _ | Mod _
-    | Acst _ | Aget _ | Aset _ | Rget _ | Rdef _ | Fun _ | Apply _ -> lc_iter fe p
-    | And _ | Or _ | Imply _ | If _ | Not _ | Bind _ -> lc_iter fp p
 
   let pp_tau = Pretty.pp_tau
   let context_pp = Context.create "Lang.F.pp"
@@ -909,6 +902,38 @@ let local ?pool ?vars ?gamma f =
   let gamma = match gamma with None -> { hyps=[] ; vars=[] } | Some g -> g in
   Context.bind cpool pool (Context.bind cgamma gamma f)
 
+let sigma () = F.sigma ~pool:(Context.get cpool) ()
+
+let alpha () =
+  let sigma = sigma () in
+  let alpha = ref Tmap.empty in
+  let lookup e x =
+    try Tmap.find e !alpha with Not_found ->
+      let y = F.Subst.fresh sigma (F.tau_of_var x) in
+      let ey = e_var y in alpha := Tmap.add e ey !alpha; ey in
+  let compute e =
+    match F.repr e with
+    | Fvar x -> lookup e x
+    | _ -> raise Not_found in
+  F.Subst.add_fun sigma compute ; sigma
+
+let subst xs vs =
+  let bind w x v = Tmap.add (e_var x) v w in
+  let vmap =
+    try List.fold_left2 bind Tmap.empty xs vs
+    with _ -> raise (Invalid_argument "Wp.Lang.Subst.sigma")
+  in
+  let sigma = sigma () in
+  F.Subst.add_map sigma vmap ; sigma
+
+let e_subst f =
+  let sigma = sigma () in
+  F.Subst.add_fun sigma f ; F.e_subst sigma
+
+let p_subst f =
+  let sigma = sigma () in
+  F.Subst.add_fun sigma f ; F.p_subst sigma
+
 (* -------------------------------------------------------------------------- *)
 (* --- Hypotheses                                                         --- *)
 (* -------------------------------------------------------------------------- *)
@@ -940,64 +965,6 @@ let variables g = List.rev g.vars
 
 let get_hypotheses () = (Context.get cgamma).hyps
 let get_variables () = (Context.get cgamma).vars
-
-(* -------------------------------------------------------------------------- *)
-(* --- Alpha Conversion                                                   --- *)
-(* -------------------------------------------------------------------------- *)
-
-module Alpha =
-struct
-
-  module Vmap = FCMap.Make(Var)
-
-  type t = var Vmap.t ref
-
-  let create () = ref Vmap.empty
-
-  let get w x =
-    try Vmap.find x !w
-    with Not_found ->
-      let y = freshen x in
-      w := Vmap.add x y !w ; y
-
-  let iter f w = Vmap.iter f !w
-
-  let convert w = e_subst
-      (fun e -> match QED.repr e with
-         | Logic.Fvar x -> e_var (get w x)
-         | _ -> raise Not_found)
-
-  let convertp = convert
-
-end
-
-(* -------------------------------------------------------------------------- *)
-(* --- Substitution                                                       --- *)
-(* -------------------------------------------------------------------------- *)
-
-module Subst =
-struct
-  type sigma = {
-    e_apply : F.term -> F.term ;
-    p_apply : F.pred -> F.pred ;
-  }
-
-  let sigma xs vs =
-    let bind w x v = Tmap.add (e_var x) v w in
-    let vmap =
-      try List.fold_left2 bind Tmap.empty xs vs
-      with _ -> raise (Invalid_argument "Wp.Lang.Subst.sigma")
-    in
-    let lookup e = Tmap.find e vmap in
-    let sigma = F.sigma () in
-    let e_apply = F.e_subst ~sigma lookup in
-    let p_apply = F.p_subst ~sigma lookup in
-    { e_apply ; p_apply }
-
-  let e_apply s e = s.e_apply e
-  let p_apply s p = s.p_apply p
-
-end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Simplifier                                                         --- *)

@@ -35,7 +35,7 @@
 [wp] Report out: 'tests/wp_acsl/result_qualif/arith.0.report.json'
 -------------------------------------------------------------
 Axiomatics          WP     Alt-Ergo        Total   Success
-Lemma               20      1 (1..8)        21       100%
+Lemma               20      1 (8..20)       21       100%
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
 cast_sgn_usgn        1     -                 1       100%

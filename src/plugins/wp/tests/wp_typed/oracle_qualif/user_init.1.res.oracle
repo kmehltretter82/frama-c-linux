@@ -43,7 +43,7 @@
 [wp] Report out: 'tests/wp_typed/result_qualif/user_init.1.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
-init_t2_v2           3     -  (16..28)       8       100%
+init_t2_v2           3     -  (20..32)       8       100%
 init_t2_v3           4     -  (20..32)       7       100%
 init_t2_bis_v2       4     -  (28..40)       8       100%
 -------------------------------------------------------------

@@ -65,7 +65,7 @@ let jconfigure (console : #Tactical.feedback) jtactic goal =
   | Some(tactical,selection) ->
       console#set_title "%s" tactical#title ;
       let verdict =
-        try tactical#select console selection
+        try Lang.local ~pool:console#pool (tactical#select console) selection
         with Not_found | Exit -> Not_applicable
       in
       begin

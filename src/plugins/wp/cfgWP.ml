@@ -399,16 +399,8 @@ struct
   (* --- Compilation of Goals                                               --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let rec intros hs p =
-    match F.p_expr p with
-    | Logic.Bind(Logic.Forall,t,p) ->
-        let x = Lang.freshvar t in
-        intros hs (F.p_bool (F.QED.lc_open x p))
-    | Logic.Imply(hs2,p) -> intros (hs @ hs2) p
-    | _ -> hs , p
-
   let introduction pred =
-    let hs , goal = intros [] pred in
+    let hs , goal = Conditions.forall_intro pred in
     let xs = List.fold_left
         (fun xs h -> Vars.union xs (F.varsp h))
         (F.varsp goal) hs
@@ -1208,9 +1200,9 @@ struct
     let guards = Lang.get_hypotheses () in
     let hyps = Conditions.assume ~descr:"Bisimulation" (p_conj guards) vc.hyps in
     let p = F.p_hyps (Conditions.extract hyps) vc.goal in
-    let alpha = Alpha.create () in
-    let a_hs = List.map (Alpha.convertp alpha) hs in
-    let a_p = Alpha.convertp alpha p in
+    let alpha = Lang.alpha () in
+    let a_hs = List.map (F.p_subst alpha) hs in
+    let a_p = F.p_subst alpha p in
     let p = p_hyps a_hs a_p in
     { vc with
       goal = p ; vars = F.varsp p ;

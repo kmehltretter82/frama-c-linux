@@ -293,6 +293,15 @@ sig
   val e_fun : Fun.t -> term list -> term
   val e_bind : binder -> var -> term -> term
 
+  val e_open : pool:pool -> ?forall:bool -> ?exists:bool -> ?lambda:bool ->
+    term -> (binder * var) list * term
+  (** Open all the specified binders (flags default to `true`, so all
+      consecutive top most binders are opened by default).
+      The pool must contain all free variables of the term. *)
+
+  val e_close : (binder * var) list -> term -> term
+  (** Closes all specified binders *)
+
   (** {3 Predicates} *)
 
   type pred
@@ -343,11 +352,20 @@ sig
   val p_exists : var list -> pred -> pred
   val p_bind : binder -> var -> pred -> pred
 
-  type sigma = QED.sigma
-  val sigma : unit -> sigma
-  val e_subst : ?sigma:sigma -> (term -> term) -> term -> term
-  val p_subst : ?sigma:sigma -> (term -> term) -> pred -> pred
-  val p_apply : var -> term -> pred -> pred
+  type sigma
+
+  module Subst :
+  sig
+    val get : sigma -> term -> term
+    val add : sigma -> term -> term -> unit
+    val add_map : sigma -> term Tmap.t -> unit
+    val add_fun : sigma -> (term -> term) -> unit
+    val add_filter : sigma -> (term -> bool) -> unit
+  end
+
+  val e_subst : sigma -> term -> term
+  val p_subst : sigma -> pred -> pred
+  val p_subst_var : var -> term -> pred -> pred
 
   val e_vars : term -> var list (** Sorted *)
   val p_vars : pred -> var list (** Sorted *)
@@ -383,13 +401,13 @@ sig
 
   val p_expr : pred -> pred QED.expression
   val e_expr : pred -> term QED.expression
-  val p_iter : (pred -> unit) -> (term -> unit) -> pred -> unit
+
+  (* val p_iter : (pred -> unit) -> (term -> unit) -> pred -> unit *)
 
   (** {3 Binders} *)
 
   val lc_closed : term -> bool
-  val lc_iter : (term -> unit) -> term -> unit
-  val lc_map : (term -> term) -> term -> term
+  val lc_iter : (term -> unit) -> term -> unit (* TODO: to remove *)
 
   (** {3 Utilities} *)
 
@@ -524,33 +542,14 @@ val has_gamma : unit -> bool
 val get_hypotheses : unit -> pred list
 val get_variables : unit -> var list
 
-(** {2 Alpha Conversion} *)
+(** {2 Substitutions} *)
 
-module Alpha :
-sig
+val sigma : unit -> F.sigma (** uses current pool *)
+val alpha : unit -> F.sigma (** freshen all variables *)
+val subst : F.var list -> F.term list -> F.sigma (** replace variables *)
 
-  type t
-  val create : unit -> t
-  val get : t -> var -> var
-  val iter : (var -> var -> unit) -> t -> unit
-
-  val convert : t -> term -> term
-  val convertp : t -> pred -> pred
-
-end
-
-(** {2 Substitution} *)
-
-module Subst :
-sig
-
-  type sigma
-
-  val sigma : F.var list -> F.term list -> sigma
-  val e_apply : sigma -> F.term -> F.term
-  val p_apply : sigma -> F.pred -> F.pred
-
-end
+val e_subst : (term -> term) -> term -> term (** uses current pool *)
+val p_subst : (term -> term) -> pred -> pred (** uses current pool *)
 
 (** {2 Simplifiers} *)
 

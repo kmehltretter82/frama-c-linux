@@ -816,7 +816,7 @@ let c_int_bounds_ival f  =
 let max_reduce_quantifiers = 1000
 
 (** We know that t is a predicate which is the opened body of a forall *)
-let reduce_bound v dom t : term =
+let reduce_bound v tv dom t : term =
   let module Exc = struct
     exception True
     exception False
@@ -836,16 +836,22 @@ let reduce_bound v dom t : term =
       with Exc.Unknown i -> i in
     (** we try to reduce the bounds of the domains, when trivially false *)
     let dom_red = Ival.inject_range (Some min_bound) (Some max_bound) in
-    if not (Ival.equal dom_red dom) && Ival.is_included dom_red dom
+    assert ( Ival.is_included dom_red dom);
+    if Ival.equal dom_red dom
     then t
     else
-      e_bind Forall v
-        (e_imply [e_leq (e_zint min_bound) (e_var v);
-                  e_leq (e_var v) (e_zint max_bound)]
-           t)
+      (e_imply [e_leq (e_zint min_bound) tv;
+                e_leq tv (e_zint max_bound)]
+         t)
   with
   | Exc.True -> e_true
   | Exc.False -> e_false
+
+module Polarity = struct
+  type t = Pos | Neg | Both
+  let flip = function | Pos -> Neg | Neg -> Pos | Both -> Both
+  let from_bool = function | false -> Neg | true -> Pos
+end
 
 let is_cint_simplifier = object (self)
 
@@ -868,7 +874,7 @@ let is_cint_simplifier = object (self)
         t v domain
 
   method assume p =
-    let rec aux i t =
+    let rec aux t =
       match Lang.F.repr t with
       | _ when not (is_prop t) -> ()
       | Fun(g,[a]) ->
@@ -877,16 +883,16 @@ let is_cint_simplifier = object (self)
               self#narrow_dom a ubound
             with Not_found -> ()
           end
-      | And _ -> Lang.F.QED.f_iter aux i t
+      | And _ -> Lang.F.QED.f_iter aux t
       | _ -> ()
     in
-    aux 0 (Lang.F.e_prop p)
+    aux (Lang.F.e_prop p)
 
   method target _ = ()
   method fixpoint = ()
 
   method private simplify ~is_goal p =
-    let pool = Lang.F.pool () in
+    let pool = Lang.get_pool () in
 
     let reduce op var_domain base =
       let dom =
@@ -917,28 +923,42 @@ let is_cint_simplifier = object (self)
       | Imply (l,_) -> List.iter (reduce_on_neg var var_domain) l
       | _ -> ()
     in
-    let rec walk ~is_goal t =
+    let rec walk ~term_pol t =
+      let walk_flip_pol t = walk ~term_pol:(Polarity.flip term_pol) t
+      and walk_same_pol t = walk ~term_pol t
+      and walk_both_pol t = walk ~term_pol:Polarity.Both t
+      in
       match repr t with
       | _ when not (is_prop t) -> t
-      | Bind(Forall|Exists as quant,(Int as ty),bind) ->
-          let var = fresh pool ~basename:"simpl" ty in
-          let t = QED.lc_open var bind in
-          let tvar = (e_var var) in
-          let var_domain = ref Ival.top in
-          if quant = Forall
-          then reduce_on_pos tvar var_domain t
-          else reduce_on_neg tvar var_domain t;
-          domain <- Tmap.add tvar !var_domain domain;
-          let t = walk ~is_goal t in
-          domain <- Tmap.remove tvar domain;
-          (** Bonus: Add additionnal hypothesis in forall when we could deduce
-              better constraint on the variable *)
-          let t = if quant = Forall &&
-                     is_goal &&
-                     Ival.cardinal_is_less_than !var_domain max_reduce_quantifiers
-            then reduce_bound var !var_domain t
-            else t in
-          e_bind quant var t
+      | Bind((Forall|Exists),_,_) ->
+          let ctx,t = e_open ~pool ~lambda:false t in
+          let ctx_with_dom =
+            List.map (fun ((quant,var) as qv)  -> match tau_of_var var with
+                | Int ->
+                    let tvar = (e_var var) in
+                    let var_domain = ref Ival.top in
+                    if quant = Forall
+                    then reduce_on_pos tvar var_domain t
+                    else reduce_on_neg tvar var_domain t;
+                    domain <- Tmap.add tvar !var_domain domain;
+                    qv, Some (tvar, var_domain)
+                | _ -> qv, None) ctx
+          in
+          let t = walk_same_pol t in
+          let f_close t = function
+            | (quant,var), None -> e_bind quant var t
+            | (quant,var), Some (tvar,var_domain) ->
+                domain <- Tmap.remove tvar domain;
+                (** Bonus: Add additionnal hypothesis in forall when we could deduce
+                    better constraint on the variable *)
+                let t = if quant = Forall &&
+                           term_pol = Polarity.Pos &&
+                           Ival.cardinal_is_less_than !var_domain max_reduce_quantifiers
+                  then reduce_bound var tvar !var_domain t
+                  else t in
+                e_bind quant var t
+          in
+          List.fold_left f_close t ctx_with_dom
       | Fun(g,[a]) ->
           (** Here we simplifies the cints which are redoundant *)
           begin try
@@ -949,9 +969,12 @@ let is_cint_simplifier = object (self)
               else t
             with Not_found -> t
           end
-      | Imply (l1,l2) -> e_imply (List.map (walk ~is_goal:false) l1) (walk ~is_goal l2)
-      | _ -> Lang.F.QED.e_map pool (walk ~is_goal) t in
-    Lang.F.p_bool (walk ~is_goal (Lang.F.e_prop p))
+      | Imply (l1,l2) -> e_imply (List.map walk_flip_pol l1) (walk_same_pol l2)
+      | Not p -> e_not (walk_flip_pol p)
+      | And _ | Or _ -> Lang.F.QED.f_map walk_same_pol t
+      | _ ->
+          Lang.F.QED.f_map ~pool ~forall:false ~exists:false walk_both_pol t in
+    Lang.F.p_bool (walk ~term_pol:(Polarity.from_bool is_goal) (Lang.F.e_prop p))
 
   method simplify_exp (e : term) = e
 
@@ -1023,19 +1046,19 @@ let mask_simplifier =
 
     method simplify_exp e =
       if Tmap.is_empty magnitude then e else
-        F.e_subst self#rewrite e
+        Lang.e_subst self#rewrite e
 
     method simplify_hyp p =
       if Tmap.is_empty magnitude then p else
-        F.p_subst self#rewrite p
+        Lang.p_subst self#rewrite p
 
     method simplify_branch p =
       if Tmap.is_empty magnitude then p else
-        F.p_subst self#rewrite p
+        Lang.p_subst self#rewrite p
 
     method simplify_goal p =
       if Tmap.is_empty magnitude then p else
-        F.p_subst self#rewrite p
+        Lang.p_subst self#rewrite p
 
   end
 

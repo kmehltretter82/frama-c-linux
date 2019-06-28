@@ -210,7 +210,7 @@ struct
         if Wp_parameters.Filter.get ()
         then apply Conditions.filter g ;
         if Wp_parameters.Parasite.get ()
-        then apply Conditions.parasite g
+        then apply Conditions.parasite g ;
       end
     else
       begin
@@ -222,17 +222,22 @@ struct
     g.obligation <- Conditions.close g.sequent
 
   let dkey = Wp_parameters.register_category "prover"
+
+  let safecompute g =
+    begin
+      g.simplified <- true ;
+      let timer = ref 0.0 in
+      Wp_parameters.debug ~dkey "Simplify goal" ;
+      Command.time ~rmax:timer preprocess g ;
+      Wp_parameters.debug ~dkey "Simplification time: %a"
+        Rformat.pp_time !timer ;
+      g.time <- !timer ;
+    end
+
   let compute g =
     if not g.simplified then
-      begin
-        g.simplified <- true ;
-        let timer = ref 0.0 in
-        Wp_parameters.debug ~dkey "Simplify goal" ;
-        Command.time ~rmax:timer preprocess g ;
-        Wp_parameters.debug ~dkey "Simplification time: %a"
-          Rformat.pp_time !timer ;
-        g.time <- !timer ;
-      end
+      Lang.local ~vars:(Conditions.vars_seq g.sequent)
+        safecompute g
 
   let compute_proof g = compute g ; g.obligation
   let compute_descr g = compute g ; g.sequent

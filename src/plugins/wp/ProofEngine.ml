@@ -361,7 +361,8 @@ struct
 
   let create tree ~anchor tactic process =
     let axioms , sequent = Wpo.compute anchor.goal in
-    let dseqs = process sequent in
+    let vars = Conditions.vars_seq sequent in
+    let dseqs = Lang.local ~vars process sequent in
     let title = tactic.ProofScript.header in
     let goals = List.map
         (fun (part,s) -> part , mk_goal tree ~title ~part ~axioms s) dseqs

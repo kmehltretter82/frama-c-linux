@@ -37,7 +37,7 @@
 [wp] Report out: 'tests/wp_gallery/result_qualif/frama_c_exo3_solved.simplified.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
-pair                16     10 (104..128)    26       100%
+pair                16     10 (88..112)     26       100%
 -------------------------------------------------------------
 [wp] Running WP plugin...
 [rte] annotating function pair
