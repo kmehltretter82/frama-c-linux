@@ -2080,7 +2080,7 @@ struct
     }
 
     let validate fn e =
-      if false && not (lc_closed e) then
+      if not (lc_closed e) then
         begin
           Format.eprintf "Invalid %s: %a@." fn pretty e ;
           raise (Invalid_argument (fn ^ ": non lc-closed binding"))
@@ -2167,7 +2167,9 @@ struct
             apply sigma Intmap.empty (phi e) (List.map phi es)
         | _ -> rebuild (incache mu sigma alpha) e
       in
-      (if lc_closed e && lc_closed r then Subst.add sigma e r) ; r
+      (* Only put closed terms in cache *)
+      (if lc_closed e && lc_closed r then Subst.add sigma e r) ;
+      (* Finally returns result *) r
 
   and bind sigma alpha qs e =
     match e.repr with
