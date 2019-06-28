@@ -389,8 +389,7 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
     | TBinOp (BXor, _, _) -> Error.not_yet "bitwise xor"
     | TBinOp (BOr, _, _) -> Error.not_yet "bitwise or"
 
-    | TCastE(_, t')
-    | TCoerce(t', _) ->
+    | TCastE(_, t') ->
       let ctx =
         try
           (* compute the smallest interval from the whole term [t] *)
@@ -426,20 +425,6 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
     | Tat (t, _)
     | TLogic_coerce (_, t) ->
       dup (type_term ~use_gmp_opt ~arith_operand ?ctx t).ty
-
-    | TCoerceE (t1, t2) ->
-      let ctx =
-        try
-          let i = Interval.infer t in
-          let i1 = Interval.infer t1 in
-          let i2 = Interval.infer t2 in
-          ty_of_interv ?ctx (Ival.join i (Ival.join i1 i2))
-        with Interval.Not_an_integer ->
-          Other
-      in
-      ignore (type_term ~use_gmp_opt:true ~ctx t1);
-      ignore (type_term ~use_gmp_opt:true ~ctx t2);
-      dup ctx
 
     | TAddrOf tlv
     | TStartOf tlv ->
@@ -681,7 +666,6 @@ let rec type_predicate p =
     | Pexists _ -> Error.not_yet "unguarded \\exists quantification"
     | Pat(p, _) -> (type_predicate p).ty
     | Pfresh _ -> Error.not_yet "\\fresh"
-    | Psubtype _ -> Error.not_yet "subtyping relation" (* Jessie specific *)
   in
   coerce ~arith_operand:false ~ctx:c_int ~op c_int
 

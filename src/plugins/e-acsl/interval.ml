@@ -239,8 +239,7 @@ let rec infer t =
     let i1 = infer t1 in
     let i2 = infer t2 in
     Ival.bitwise_or i1 i2
-  | TCastE (ty, t)
-  | TCoerce (t, ty) ->
+  | TCastE (ty, t) ->
     (try
        let it = infer t in
        let ity = interv_of_typ ty in
@@ -281,10 +280,6 @@ let rec infer t =
      | _ -> assert false)
   | Tnull  -> singleton_of_int 0
   | TLogic_coerce (_, t) -> infer t
-  | TCoerceE (t1, t2) ->
-    let i1 = infer t1 in
-    let i2 = infer t2 in
-    Ival.meet i1 i2
 
   | Tapp (li, _, _args) ->
     (match li.l_body with

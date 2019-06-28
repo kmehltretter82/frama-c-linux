@@ -338,8 +338,6 @@ module rec Transfer
     | Toffset _ -> Error.not_yet "\\offset"
     | Tblock_length _ -> Error.not_yet "\\block_length"
     | TLogic_coerce(_, t) -> register_term kf varinfos t
-    | TCoerce _ -> Error.not_yet "coerce"
-    | TCoerceE _ -> Error.not_yet "coerce expression"
     | TUpdate _ -> Error.not_yet "functional update"
     | Ttypeof _ -> Error.not_yet "typeof"
     | Tempty_set -> Error.not_yet "empty set"
@@ -372,7 +370,7 @@ module rec Transfer
     | Pdangling _ -> Error.not_yet "\\dangling"
     | Ptrue | Pfalse | Papp _ | Prel _
     | Pand _ | Por _ | Pxor _ | Pimplies _ | Piff _ | Pnot _ | Pif _
-    | Pforall _ | Pexists _ | Pat _ | Psubtype _ ->
+    | Pforall _ | Pexists _ | Pat _ ->
       Cil.DoChildren
     | Plet(li, _) ->
       if may_alias li then Error.not_yet "let-binding on array or pointer"
@@ -391,7 +389,7 @@ module rec Transfer
     | TUnOp _ | TBinOp _ | Ttypeof _ | TSizeOfE _
     | TLval _ | TAlignOfE _ | TCastE _ | TAddrOf _
     | TStartOf _ | Tapp _ | Tlambda _ | TDataCons _ | Tif _ | Tat _
-    | TCoerce _ | TCoerceE _ | TUpdate _ | Tunion _ | Tinter _
+    | TUpdate _ | Tunion _ | Tinter _
     | Tcomprehension _ | Trange _ | TLogic_coerce _ ->
       (* potential sub-term inside *)
       Cil.DoChildren
