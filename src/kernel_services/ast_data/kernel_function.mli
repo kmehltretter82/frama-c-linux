@@ -135,6 +135,13 @@ val find_syntactic_callsites : t -> (t * stmt) list
       [stmt].
       @since Carbon-20110201 *)
 
+val local_definition: t -> varinfo -> stmt
+(** [local_definition f v] returns the statement initializing the (defined)
+    local variable [v] of [f].
+    @raise AbortFatal if [v] is not defined or is not a local of [f]
+    @since Frama-C+dev
+*)
+
 val var_is_in_scope: stmt -> varinfo -> bool
   (** [var_is_in_scope kf stmt vi] returns [true] iff the local variable [vi]
       is syntactically visible from statement [stmt] in function [kf]. Note

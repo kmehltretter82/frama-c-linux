@@ -513,10 +513,36 @@ let find_syntactic_callsites kf =
   try CallSites.find table kf
   with Not_found -> []
 
+let local_definition kf vi =
+  let locals = get_locals kf in
+  if not vi.vdefined ||
+     not (List.exists (fun vi' -> Cil_datatype.Varinfo.equal vi vi') locals)
+  then
+    Kernel.fatal
+      "%a is not a defined local variable of %a"
+      Cil_datatype.Varinfo.pretty vi pretty kf;
+  try
+    List.find
+      (fun s ->
+         match s.skind with
+         | Instr (Local_init (vi', _, _)) -> Cil_datatype.Varinfo.equal vi vi'
+         | _ -> false)
+      (get_definition kf).sallstmts
+  with Not_found -> assert false (* cannot occur on well-formed AST. *)
+
 let var_is_in_scope stmt vi =
   let blocks = find_all_enclosing_blocks stmt in
+  let is_def_above b =
+    let sdef = local_definition (find_englobing_kf stmt) vi in
+    match b.bstmts with
+    | [] -> assert false (* at least contains stmt *)
+    | sfst :: _ -> is_between b sfst sdef stmt
+  in
   List.exists
-    (fun b -> List.exists (Cil_datatype.Varinfo.equal vi) b.blocals)
+    (fun b ->
+       List.exists (Cil_datatype.Varinfo.equal vi) b.blocals &&
+       (not vi.vdefined || is_def_above b)
+    )
     blocks
 
 (* ************************************************************************* *)
