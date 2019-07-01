@@ -69,8 +69,8 @@ module Make_Minimal
   let narrow x _y = `Value x
 
   let top_answer = `Value (Value.top, None), Alarmset.all
-  let extract_expr _oracle _state _expr = top_answer
-  let extract_lval _oracle _state _lval _typ _location = top_answer
+  let extract_expr ~oracle:_ ~root:_ _state _expr = top_answer
+  let extract_lval ~oracle:_ ~root:_ _state _lval _typ _location = top_answer
   let backward_location _state _lval _typ location value = `Value (location, value)
   let reduce_further _state _expr _value = []
 
@@ -187,15 +187,12 @@ module Complete_Simple_Cvalue (Domain: Simpler_domains.Simple_Cvalue)
 
     let narrow x _y = `Value x
 
-    let extract_expr _oracle state expr =
+    let extract_expr ~oracle:_ ~root:_ state expr =
       let v = Domain.extract_expr state expr >>-: fun v -> v, None in
       v, Alarmset.all
 
-    let extract_lval _oracle state lval typ location =
-      let v =
-        Domain.extract_lval state lval typ location >>-: fun v ->
-        v, None
-      in
+    let extract_lval ~oracle:_ ~root:_ state lval typ location =
+      let v = Domain.extract_lval state lval typ location >>-: fun v -> v, None in
       v, Alarmset.all
 
     let backward_location _state _lval _typ location value =
@@ -372,13 +369,14 @@ module Restrict
 
   let default_query = `Value (Value.top, None), Alarmset.all
 
-  let extract_expr oracle state expr =
-    make_query default_query (fun s -> Domain.extract_expr oracle s expr) state
+  let extract_expr ~oracle ~root state expr =
+    make_query default_query
+      (fun s -> Domain.extract_expr ~oracle ~root s expr) state
 
-  let extract_lval oracle state lval typ location =
+  let extract_lval ~oracle ~root state lval typ location =
     make_query
       default_query
-      (fun s -> Domain.extract_lval oracle s lval typ location)
+      (fun s -> Domain.extract_lval ~oracle ~root s lval typ location)
       state
 
   let backward_location state lval typ location value =

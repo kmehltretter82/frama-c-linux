@@ -1041,7 +1041,7 @@ module Domain = struct
 
   let top_value = `Value (Cvalue.V.top, None), Alarmset.all
 
-  let extract_expr oracle state expr =
+  let extract_expr ~oracle ~root:_ state expr =
     let evaluate_expr expr =
       match fst (oracle expr) with
       | `Bottom -> `Top (* should not happen *)
@@ -1059,7 +1059,7 @@ module Domain = struct
     then `Bottom, Alarmset.all
     else `Value (Cvalue.V.inject_ival ival, None), alarms
 
-  let extract_lval _oracle _t _lval _typ _loc = top_value
+  let extract_lval ~oracle:_ ~root:_ _t _lval _typ _loc = top_value
 
   let backward_location _t _lval _typ loc value = `Value (loc, value)
 

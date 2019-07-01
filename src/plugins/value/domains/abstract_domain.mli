@@ -137,20 +137,26 @@ module type Queries = sig
            value of the expression [exp], and [o] is the origin of the value,
            which can be None. *)
 
+  (** When evaluating an expression, the evaluation engine asks the domains
+      for abstract values and alarms at each lvalue (via [extract_lval]) and
+      each sub-expressions (via [extract_expr]).
+      In these queries, the [root] boolean is true for the root expression
+      being evaluated, and false for all its sub-terms. *)
+
   (** Query function for compound expressions:
       [eval oracle t exp] returns the known value of [exp] by the state [t].
       [oracle] is an evaluation function and can be used to find the answer
       by evaluating some others expressions, especially by relational domain.
       No recursive evaluation should be done by this function. *)
   val extract_expr :
-    (exp -> value evaluated) ->
+    oracle:(exp -> value evaluated) -> root:bool ->
     state -> exp -> (value * origin option) evaluated
 
   (** Query function for lvalues:
       [find oracle t lval typ loc] returns the known value stored at
       the location [loc] of the left value [lval] of type [typ]. *)
   val extract_lval :
-    (exp -> value evaluated) ->
+    oracle:(exp -> value evaluated) -> root:bool ->
     state -> lval -> typ -> location -> (value * origin option) evaluated
 
   (** [backward_location state lval typ loc v] reduces the location [loc] of the

@@ -764,6 +764,9 @@ module Make
   type context =
     { (* The abstract domain state in which the evaluation takes place. *)
       state: Domain.t;
+      (* Is the expression currently processed the "root" expression being
+         evaluated, or is it a sub-expression? Useful for domain queries. *)
+      root: bool;
       (* Maximum number of subdivisions. See {!Subdivided_evaluation} for
          more details. *)
       subdivision: int;
@@ -831,10 +834,13 @@ module Make
     match expr.enode with
     | Lval lval -> eval_lval context lval
     | BinOp _ | UnOp _ | CastE _ -> begin
-        let intern_value, alarms = internal_forward_eval context expr in
-        let state = context.state in
+        let { state; root } = context in
+        let context = { context with root = false } in
         let oracle = make_oracle context in
-        let domain_value, alarms' = Domain.extract_expr oracle state expr in
+        let intern_value, alarms = internal_forward_eval context expr in
+        let domain_value, alarms' =
+          Domain.extract_expr ~oracle ~root state expr
+        in
         (* Intersection of alarms, as each sets of alarms are correct
            and "complete" for the evaluation of [expr]. *)
         match Alarmset.inter alarms alarms' with
@@ -1061,6 +1067,9 @@ module Make
       off, typ_res, volatile
 
   and eval_lval ?(indeterminate=false) context lval =
+    let { state; root } = context in
+    let context = { context with root = false } in
+    let oracle = make_oracle context in
     (* Computes the location of [lval]. *)
     lval_to_loc context ~for_writing:false ~reduction:true lval
     >>= fun (loc, typ_lv, volatile_expr) ->
@@ -1072,8 +1081,7 @@ module Make
     *)
     let volatile = volatile_expr || Cil.typeHasQualifier "volatile" typ_lv in
     (* Find the value of the location, if not bottom. *)
-    let oracle = make_oracle context in
-    let v, alarms = Domain.extract_lval oracle context.state lval typ_lv loc in
+    let v, alarms = Domain.extract_lval ~oracle ~root state lval typ_lv loc in
     let alarms = close_dereference_alarms lval alarms in
     if indeterminate
     then
@@ -1133,14 +1141,15 @@ module Make
       | None -> Value_parameters.LinearLevel.get ()
       | Some n -> n
     in
-    { state; subdivision; remaining_fuel; oracle }
+    { state; root = true; subdivision; remaining_fuel; oracle }
 
   (* Context for a fast forward evaluation with minimal precision:
-     no subdivisions and no calls to the oracle. *)
+     no subdivisions, no calls to the oracle, and the expression is not
+     considered as a "root" expression. *)
   let fast_eval_context state =
     let remaining_fuel = no_fuel in
     let subdivision = 0 in
-    { state; subdivision; remaining_fuel; oracle }
+    { state; root = false; subdivision; remaining_fuel; oracle }
 
   let subdivided_forward_eval valuation ?subdivnb state expr =
     let context = root_context ?subdivnb state in

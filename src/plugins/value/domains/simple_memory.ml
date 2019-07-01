@@ -196,11 +196,12 @@ module Make_Internal (Info: sig val name: string end) (Value: Value) = struct
   (* This function returns the information known about the location
      corresponding to [_lv], so that it may be used by the engine during
      evaluation. *)
-  let extract_lval _oracle state _lv typ loc =
+  let extract_lval ~oracle:_ ~root:_ state _lv typ loc =
     let v = find loc typ state in
     `Value (v, None), Alarmset.all
 
-  let extract_expr _oracle _state _expr = `Value (Value.top, None), Alarmset.all
+  let extract_expr ~oracle:_ ~root:_ _state _expr =
+    `Value (Value.top, None), Alarmset.all
 
   let backward_location state _lval typ loc _value =
     let new_value = find loc typ state in

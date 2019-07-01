@@ -40,7 +40,7 @@ module Model = struct
      function in cvalue_transfer. *)
   type origin = value
 
-  let extract_expr _ _ _ = `Value (Cvalue.V.top, None), Alarmset.all
+  let extract_expr _state _expr = `Value (Cvalue.V.top, None), Alarmset.all
 
   let indeterminate_alarms lval v =
     let open Cvalue.V_Or_Uninitialized in
@@ -112,7 +112,7 @@ module Model = struct
         let v = if Cvalue.V.is_bottom v then `Bottom else `Value (v, None) in
         v, alarms
 
-  let extract_lval _oracle state lval typ loc =
+  let extract_lval state lval typ loc =
     if Cil.isArithmeticOrPointerType typ
     then extract_scalar_lval state lval typ loc
     else extract_aggregate_lval state lval typ loc
@@ -201,9 +201,10 @@ module State = struct
 
   type origin = Model.origin
 
-  let extract_expr evaluate (s, _) expr = Model.extract_expr evaluate s expr
-  let extract_lval oracle (s, _) lval typ loc =
-    Model.extract_lval oracle s lval typ loc
+  let extract_expr ~oracle:_ ~root:_ (s, _) expr =
+    Model.extract_expr s expr
+  let extract_lval ~oracle:_ ~root:_ (s, _) lval typ loc =
+    Model.extract_lval s lval typ loc
   let backward_location (state, _) lval typ precise_loc value =
     Model.backward_location state lval typ precise_loc value
   let reduce_further _ _ _ = []
