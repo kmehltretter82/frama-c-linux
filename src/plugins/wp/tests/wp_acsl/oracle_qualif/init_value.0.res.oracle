@@ -11,7 +11,7 @@
 [wp] [Qed] Goal typed_main_requires_qed_ok_Struct_Simple_a : Valid
 [wp] [Qed] Goal typed_main_requires_qed_ok_Struct_Simple_b : Valid
 [wp] [Qed] Goal typed_main_requires_qed_ok_Simple_Array_0 : Valid
-[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_Simple_Array_1 : Valid
+[wp] [Qed] Goal typed_main_requires_qed_ok_Simple_Array_1 : Valid
 [wp] [Qed] Goal typed_main_requires_qed_ok_With_Array_Struct_5 : Valid
 [wp] [Qed] Goal typed_main_requires_qed_ok_With_Array_Struct_3 : Valid
 [wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_Sc_eq : Valid
@@ -25,19 +25,19 @@
 [wp] [Qed] Goal typed_main_requires_qed_ok_2 : Valid
 [wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_3 : Valid
 [wp] [Qed] Goal typed_main_requires_qed_ok_todo : Valid
-[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_4 : Valid
+[wp] [Qed] Goal typed_main_requires_qed_ok_4 : Valid
 [wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_5 : Valid
 [wp] [Qed] Goal typed_main_requires_qed_ok_direct_init_union : Valid
 [wp] Proved goals:   24 / 24
-  Qed:            17 
-  Alt-Ergo:        7
+  Qed:            19 
+  Alt-Ergo:        5
 [wp] Report in:  'tests/wp_acsl/oracle_qualif/init_value.0.report.json'
 [wp] Report out: 'tests/wp_acsl/result_qualif/init_value.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
-main                14      6 (28..40)      20       100%
+main                16      4 (28..40)      20       100%
 fa1                  1     -                 1       100%
 fa2                  1     -                 1       100%
 fa3                  1     -                 1       100%
-fs1                 -       1 (160..184)     1       100%
+fs1                 -       1 (112..136)     1       100%
 -------------------------------------------------------------

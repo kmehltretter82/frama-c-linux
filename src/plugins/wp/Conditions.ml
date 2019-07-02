@@ -1033,15 +1033,15 @@ struct
         s.cache <- None ;
       end
 
-  let rec assume s p = match F.repr p with
-    | Logic.And ps -> List.iter (assume s) ps
-    | Logic.Eq(a,b) ->
-        if is_cst s a then set_def s p b a ;
-        if is_cst s b then set_def s p a b ;
-    | _ -> ()
+  let collect_set_def s p = Lang.iter_consequence_literals
+      (fun literal -> match Lang.F.repr literal with
+         | Logic.Eq(a,b) ->
+             if is_cst s a then set_def s literal b a ;
+             if is_cst s b then set_def s literal a b ;
+         | _ -> ()) p
 
   let collect s = function
-    | Have p | When p | Core p | Init p -> assume s (F.e_prop p)
+    | Have p | When p | Core p | Init p -> collect_set_def s (F.e_prop p)
     | Type _ | Branch _ | Either _ | State _ -> ()
 
   let subst s =
@@ -1544,8 +1544,7 @@ struct
   let rec collect_step w s =
     match s.condition with
     | Type _ | State _ -> w
-    | Have p | Core p | Init p | When p ->
-        usage w (F.e_prop p)
+    | Have p | Core p | Init p | When p -> usage w (F.e_prop p)
     | Branch(p,a,b) ->
         let wa = collect_seq w a in
         let wb = collect_seq w b in

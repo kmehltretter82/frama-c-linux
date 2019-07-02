@@ -987,4 +987,28 @@ class type simplifier =
     method simplify_goal : F.pred -> F.pred
   end
 
+let is_atomic_pred = function
+  | Neq _ | Eq _ | Leq _ | Lt _ | Fun _ -> true
+  | _ -> false
+let is_literal p = match repr p with
+  | Not p -> is_atomic_pred (repr p)
+  | _ ->  is_atomic_pred (repr p)
+
+let iter_consequence_literals f_literal p =
+  let f_literal = (fun p -> if QED.lc_closed p then f_literal p else ()) in
+  let rec aux_pos p = match repr p with
+    | And ps -> List.iter aux_pos ps
+    | Not p ->  aux_neg p
+    | Bind((Forall|Exists),_,a) -> aux_pos (QED.lc_repr a)
+    | rep when is_atomic_pred rep -> f_literal p
+    | _ -> ()
+  and aux_neg p = match repr p with
+    | Imply (hs,p) -> List.iter aux_pos hs ; aux_neg p
+    | Or ps -> List.iter aux_neg ps
+    | Not p -> aux_pos p
+    | Bind((Forall|Exists),_,a) -> aux_neg (QED.lc_repr a)
+    | rep when is_atomic_pred rep -> f_literal (e_not p)
+    | _ -> ()
+  in aux_pos p
+
 (* -------------------------------------------------------------------------- *)

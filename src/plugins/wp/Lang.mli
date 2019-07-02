@@ -555,6 +555,13 @@ val p_subst : (term -> term) -> pred -> pred (** uses current pool *)
 
 exception Contradiction
 
+val is_literal: F.term -> bool
+val iter_consequence_literals: (F.term -> unit) -> F.term -> unit
+(** [iter_consequence_literals assume_from_litteral hypothesis] applies
+    the function [assume_from_litteral] on literals that are a consequence of the [hypothesis]
+    (i.e. in the hypothesis [not (A && (B || C) ==> D)], only [A] and [not D] are
+    considered as consequence literals). *)
+
 class type simplifier =
   object
     method name : string
