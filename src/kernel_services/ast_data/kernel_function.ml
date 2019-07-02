@@ -536,7 +536,12 @@ let var_is_in_scope stmt vi =
     let sdef = local_definition (find_englobing_kf stmt) vi in
     match b.bstmts with
     | [] -> assert false (* at least contains stmt *)
-    | sfst :: _ -> is_between b sfst sdef stmt
+    | sfst :: _ ->
+      (* if sfst is sdef (or an unspecified sequence containing sdef), it
+         is necessarily above stmt. Otherwise, we can rely on is_between to
+         check that. *)
+      Cil_datatype.Stmt.equal sfst (find_enclosing_stmt_in_block b sdef) ||
+      is_between b sfst sdef stmt
   in
   List.exists
     (fun b ->
