@@ -161,7 +161,8 @@ val find_enclosing_stmt_in_block: block -> stmt -> stmt
 
 val is_between: block -> stmt -> stmt -> stmt -> bool
 (** [is_between b s1 s2 s3] returns [true] if the statement [s2] appears
-    between [s1] and [s3] inside the [b.bstmts] list. All three statements
+    strictly between [s1] and [s3] inside the [b.bstmts] list.
+    All three statements
     must actually occur in [b.bstmts], either directly or indirectly
     (see {!Kernel_function.find_enclosing_stmt_in_block}).
 
