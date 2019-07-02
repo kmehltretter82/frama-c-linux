@@ -32,7 +32,7 @@ First you need to install opam, then you may install Frama-C using opam:
 
     opam install frama-c
 
-**Note:** make sure your opam version is >= 1.2.2.
+**Note:** make sure your opam version is >= 2.0.0.
           Also, it is highly recommended that you install an external solver
           for opam, such as `aspcud`, otherwise unexpected dependency errors
           may occur during installation.
@@ -46,7 +46,7 @@ OSX has opam through Homebrew.
 A [Cygwin-based opam](https://fdopen.github.io/opam-repository-mingw/installation)
 is available on Windows. It is less stable than it is for the other OSes, but should work.
 
-If your system does not have an opam package >= 1.2.2 you can compile it from source,
+If your system does not have an opam package >= 2.0.0 you can compile it from source,
 or use the provided opam binaries available at:
 
 http://opam.ocaml.org/doc/Install.html
