@@ -994,7 +994,7 @@ let is_literal p = match repr p with
   | Not p -> is_atomic_pred (repr p)
   | _ ->  is_atomic_pred (repr p)
 
-let iter_confident_literals f_literal p =
+let iter_consequence_literals f_literal p =
   let f_literal = (fun p -> if QED.lc_closed p then f_literal p else ()) in
   let rec aux_pos p = match repr p with
     | And ps -> List.iter aux_pos ps

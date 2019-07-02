@@ -1033,7 +1033,7 @@ struct
         s.cache <- None ;
       end
 
-  let collect_set_def s p = Lang.iter_confident_literals
+  let collect_set_def s p = Lang.iter_consequence_literals
       (fun literal -> match Lang.F.repr literal with
          | Logic.Eq(a,b) ->
              if is_cst s a then set_def s literal b a ;

@@ -998,7 +998,7 @@ let is_cint_simplifier =
     method fixpoint = ()
 
     method assume p =
-      Lang.iter_confident_literals
+      Lang.iter_consequence_literals
         (fun p -> domain <- Dom.assume_literal p domain) (Lang.F.e_prop p)
 
     method private simplify ~is_goal p =
@@ -1143,7 +1143,7 @@ let mask_simplifier =
     method fixpoint = ()
 
     method assume p =
-      Lang.iter_confident_literals
+      Lang.iter_consequence_literals
         (fun p -> match F.repr p with
            | Fun(f,[x]) -> begin
                try
