@@ -637,10 +637,11 @@ object(self)
             f.sbody.blocals
         then begin
           let ret = Kernel_function.find_return (Extlib.the self#current_kf) in
-          let main_body =
+          let ret_block = Kernel_function.find_enclosing_block ret in
+          let ret_block_body =
             List.filter
               (fun s -> not (Cil_datatype.Stmt.equal ret s))
-              f.sbody.bstmts
+              ret_block.bstmts
           in
           let retvar =
             match ret.skind with
@@ -651,15 +652,15 @@ object(self)
             | _ ->
               Kernel.fatal "find_return did not return Return node"
           in
-          let main_locals =
+          let ret_block_locals =
             List.filter
               (fun v ->
                  not (List.exists
                         (fun v' -> Cil_datatype.Varinfo.equal v v') retvar))
-              f.sbody.blocals
+              ret_block.blocals
           in
-          f.sbody.bstmts <- main_body;
-          f.sbody.blocals <- main_locals;
+          ret_block.bstmts <- ret_block_body;
+          ret_block.blocals <- ret_block_locals;
           let s1 = Cil.mkStmt (Block f.sbody) in
           let b = Cil.mkBlock [ s1; ret] in
           b.blocals <- retvar;
