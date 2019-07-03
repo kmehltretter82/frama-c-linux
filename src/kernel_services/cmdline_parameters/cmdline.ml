@@ -1084,13 +1084,15 @@ let list_all_plugin_options ~print_invisible =
     Special processing for option "-explain" *)
 (* ************************************************************************* *)
 
-let pp_option_help option_name =
-  let option = Hashtbl.find Plugin.all_options option_name in
-  let argname = if option.argname <> "" then "  " ^ option.argname else "" in
-  let print fmt =
-    Format.fprintf fmt "@[<v>%s%s@\n        %s@]@."
-      option_name argname option.ohelp;
+let pp_option_help name =
+  let option = Hashtbl.find Plugin.all_options name in
+  let help =
+    if option.oname = name then option.ohelp else
+      "alias for " ^ option.oname ^ "\n" ^ option.ohelp
   in
+  let argname = option.argname in
+  let name = if argname = "" then name else name ^ " <" ^ argname ^ ">" in
+  let print fmt = print_helpline fmt name help option.ext_help in
   Log.print_on_output print
 
 (* [option_re] allows matching an option and extracting its name,
