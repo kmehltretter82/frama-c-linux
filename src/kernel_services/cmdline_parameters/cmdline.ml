@@ -436,6 +436,7 @@ module Plugin: sig
       short: string;
       groups: (string, cmdline_option list ref) Hashtbl.t }
   val all_plugins: unit -> t list
+  val all_options: (string, cmdline_option) Hashtbl.t
   val add: ?short:string -> string -> help:string -> unit
   val add_group: ?memo:bool -> plugin:string -> string -> string * bool
   val add_option: string -> group:string -> cmdline_option -> unit
@@ -458,6 +459,9 @@ end = struct
 
   (* all the registered plug-ins indexed by their shortnames *)
   let plugins : (string, t) Hashtbl.t = Hashtbl.create 17
+
+  (* all the registered options indexed by their name. *)
+  let all_options : (string, cmdline_option) Hashtbl.t = Hashtbl.create 97
 
   let all_plugins () =
     let cmp p1 p2 = Extlib.compare_ignore_case p1.name p2.name in
@@ -518,6 +522,7 @@ end = struct
 
   let add_option shortname ~group option =
     assert (option.oname <> "");
+    Hashtbl.replace all_options option.oname option;
     Option_names.add option.oname false;
     let g = find_group shortname group in
     g := option :: !g
@@ -531,6 +536,7 @@ end = struct
     let option = List.find (fun o -> o.oname = orig) !options_group in
     let get_one name =
       if name = "" then invalid_arg "empty alias name";
+      Hashtbl.replace all_options name option;
       Option_names.add name true;
       let alias = { option with oname = name } in
       options_group := alias :: !options_group;
@@ -1078,31 +1084,14 @@ let list_all_plugin_options ~print_invisible =
     Special processing for option "-explain" *)
 (* ************************************************************************* *)
 
-let print_help_for_options option_names =
-  let messages_to_print = Hashtbl.create 5 in
-  let option_names =
-    List.filter (fun o -> o <> "-explain") option_names
+let pp_option_help option_name =
+  let option = Hashtbl.find Plugin.all_options option_name in
+  let argname = if option.argname <> "" then "  " ^ option.argname else "" in
+  let print fmt =
+    Format.fprintf fmt "@[<v>%s%s@\n        %s@]@."
+      option_name argname option.ohelp;
   in
-  Log.print_on_output
-    begin fun fmt ->
-      List.iter (fun plugin ->
-          Hashtbl.iter
-            (fun _gname opts ->
-               List.iter (fun o ->
-                   if List.mem o.oname option_names then
-                     Hashtbl.replace messages_to_print o.oname (o.argname, o.ohelp)
-                 ) !opts
-            ) plugin.Plugin.groups
-        ) (Plugin.all_plugins ());
-      Format.fprintf fmt
-        "[kernel] Explaining command-line options:@.";
-      List.iter (fun opt_name ->
-          let (helparg, help) = Hashtbl.find messages_to_print opt_name in
-          Format.fprintf fmt "@[<v>%s%s@\n        %s@]@." opt_name
-            (if helparg <> "" then " " ^ helparg else helparg) help
-        ) option_names;
-    end;
-  raise Exit
+  Log.print_on_output print
 
 (* [option_re] allows matching an option and extracting its name,
    even when there is a '=', e.g. "-kernel-msg-key=-typing".
@@ -1110,14 +1099,18 @@ let print_help_for_options option_names =
 let option_re = Str.regexp "-\\([a-zA-Z-][a-zA-Z0-9-]*\\)"
 let explain_cmdline () =
   let option_names =
-    List.fold_left (fun acc opt ->
-        if Str.string_match option_re opt 0 then
-          let opt_name = Str.matched_string opt in
-          opt_name :: acc
-        else acc
-      ) [] all_options
+    List.fold_left
+      (fun acc option ->
+         if Str.string_match option_re option 0 && option <> "-explain"
+         then Str.matched_string option :: acc
+         else acc)
+      [] all_options
   in
-  print_help_for_options (List.rev option_names)
+  Log.print_on_output
+    (fun fmt ->
+       Format.fprintf fmt "[kernel] Explaining command-line options:@.");
+  List.iter pp_option_help (List.rev option_names);
+  raise Exit
 
 (*
   Local Variables:
