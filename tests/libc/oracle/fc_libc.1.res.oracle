@@ -7321,6 +7321,20 @@ extern int access(char const *path, int amode);
 /*@ requires valid_string_path: valid_read_string(path);
     ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
     assigns \result;
+    assigns \result \from (indirect: path), (indirect: *(path + (0 ..)));
+ */
+extern int chdir(char const *path);
+
+/*@ requires valid_string_path: valid_read_string(path);
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result \from (indirect: path), (indirect: *(path + (0 ..)));
+ */
+extern int chroot(char const *path);
+
+/*@ requires valid_string_path: valid_read_string(path);
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
     assigns \result
       \from (indirect: path), (indirect: *(path + (0 ..))),
             (indirect: owner), (indirect: group);
