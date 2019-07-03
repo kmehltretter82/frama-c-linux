@@ -430,7 +430,7 @@ let run_list_all_plugin_options () =
 let () = Cmdline.run_after_exiting_stage run_list_all_plugin_options
 
 let () = Parameter_customize.set_group help
-let () = Parameter_customize.set_cmdline_stage Cmdline.Exiting
+let () = Parameter_customize.set_cmdline_stage Cmdline.Extending
 let () = Parameter_customize.do_not_journalize ()
 let () = Parameter_customize.set_negative_option_name ""
 module Explain =
