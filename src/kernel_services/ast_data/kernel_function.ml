@@ -269,9 +269,9 @@ let is_between b s1 s2 s3 =
       Kernel.fatal
         "Unexpected end of block while looking for %a"
         Cil_printer.pp_stmt s3
+    | s :: _ when Cil_datatype.Stmt.equal s s3 -> false
     | s :: l when Cil_datatype.Stmt.equal s s1 -> aux true l
     | s :: _ when Cil_datatype.Stmt.equal s s2 -> has_s1
-    | s :: _ when Cil_datatype.Stmt.equal s s3 -> false
     | _ :: l -> aux has_s1 l
   in
   aux false b.bstmts
