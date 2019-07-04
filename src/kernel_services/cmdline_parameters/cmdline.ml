@@ -1085,15 +1085,19 @@ let list_all_plugin_options ~print_invisible =
 (* ************************************************************************* *)
 
 let pp_option_help name =
-  let option = Hashtbl.find Plugin.all_options name in
-  let help =
-    if option.oname = name then option.ohelp else
-      "alias for " ^ option.oname ^ "\n" ^ option.ohelp
-  in
-  let argname = option.argname in
-  let name = if argname = "" then name else name ^ " <" ^ argname ^ ">" in
-  let print fmt = print_helpline fmt name help option.ext_help in
-  Log.print_on_output print
+  try
+    let option = Hashtbl.find Plugin.all_options name in
+    let help =
+      if option.oname = name then option.ohelp else
+        "alias for " ^ option.oname ^ "\n" ^ option.ohelp
+    in
+    let argname = option.argname in
+    let name = if argname = "" then name else name ^ " <" ^ argname ^ ">" in
+    let print fmt = print_helpline fmt name help option.ext_help in
+    Log.print_on_output print
+  with Not_found ->
+    let print fmt = Format.fprintf fmt "Invalid option %s@." name in
+    Log.print_on_output print
 
 (* [option_re] allows matching an option and extracting its name,
    even when there is a '=', e.g. "-kernel-msg-key=-typing".
