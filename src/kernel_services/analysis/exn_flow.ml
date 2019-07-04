@@ -625,47 +625,7 @@ object(self)
     fct_can_throw <- false;
     let update_body f =
       if fct_can_throw then begin
-        (* we must ensure that our gotos to the end of the function do not
-           bypass declaration of objects with destructors, or there will be
-           issues when inserting the destructor calls. If needed, enclose
-           the main body (except return and the declaration of the retvar)
-           inside its own block.
-        *)
-        if
-          List.exists
-            (fun v -> Cil.hasAttribute Cabs2cil.frama_c_destructor v.vattr)
-            f.sbody.blocals
-        then begin
-          let ret = Kernel_function.find_return (Extlib.the self#current_kf) in
-          let ret_block = Kernel_function.find_enclosing_block ret in
-          let ret_block_body =
-            List.filter
-              (fun s -> not (Cil_datatype.Stmt.equal ret s))
-              ret_block.bstmts
-          in
-          let retvar =
-            match ret.skind with
-            | Return(None, _) -> []
-            | Return(Some {enode = Lval (Var v,NoOffset)}, _) -> [v]
-            | Return _ ->
-              Kernel.fatal "Return node in unexpected format after oneret call"
-            | _ ->
-              Kernel.fatal "find_return did not return Return node"
-          in
-          let ret_block_locals =
-            List.filter
-              (fun v ->
-                 not (List.exists
-                        (fun v' -> Cil_datatype.Varinfo.equal v v') retvar))
-              ret_block.blocals
-          in
-          ret_block.bstmts <- ret_block_body;
-          ret_block.blocals <- ret_block_locals;
-          let s1 = Cil.mkStmt (Block f.sbody) in
-          let b = Cil.mkBlock [ s1; ret] in
-          b.blocals <- retvar;
-          f.sbody <- b
-        end
+        Oneret.encapsulate_local_vars f
       end;
       f
     in

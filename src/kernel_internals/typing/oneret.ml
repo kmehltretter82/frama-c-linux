@@ -119,6 +119,68 @@ let collect_returns (ca : Cil_types.code_annotation) =
       ) [] spec.spec_behavior
   | _ -> []
 
+let encapsulate_local_vars f =
+  (* we must ensure that our gotos to the end of the function do not
+     bypass declaration of objects with destructors, or there will be
+     issues when inserting the destructor calls. If needed, enclose
+     the main body (except return and the declaration of the retvar)
+     inside its own block.
+  *)
+  if
+    List.exists
+      (fun v -> Cil.hasAttribute Cabs2cil.frama_c_destructor v.vattr)
+      f.sbody.blocals
+  then begin
+    let module M = struct exception Found of (block * stmt) end in
+    let vis = object
+      val sb = Stack.create ()
+      inherit Cil.nopCilVisitor
+      method! vblock b =
+        Stack.push b sb;
+        DoChildrenPost (fun b -> ignore (Stack.pop sb); b)
+
+      method! vstmt s =
+        match s.skind with
+        | Return _ -> raise (M.Found (Stack.top sb,s));
+        | _ -> DoChildren
+    end
+    in
+    let ret_block, ret =
+      try
+        ignore (visitCilBlock vis f.sbody);
+        Kernel.fatal "no return statement found inside %a"
+          Cil_printer.pp_varinfo f.svar
+      with M.Found res -> res
+    in
+    let ret_block_body =
+      List.filter
+        (fun s -> not (Cil_datatype.Stmt.equal ret s))
+        ret_block.bstmts
+    in
+    let retvar =
+      match ret.skind with
+      | Return(None, _) -> []
+      | Return(Some {enode = Lval (Var v,NoOffset)}, _) -> [v]
+      | Return _ ->
+        Kernel.fatal "Return node in unexpected format after oneret call"
+      | _ ->
+        Kernel.fatal "find_return did not return Return node"
+    in
+    let ret_block_locals =
+      List.filter
+        (fun v ->
+           not (List.exists
+                  (fun v' -> Cil_datatype.Varinfo.equal v v') retvar))
+        ret_block.blocals
+    in
+    ret_block.bstmts <- ret_block_body;
+    ret_block.blocals <- ret_block_locals;
+    let s1 = Cil.mkStmt (Block f.sbody) in
+    let b = Cil.mkBlock [ s1; ret] in
+    b.blocals <- retvar;
+    f.sbody <- b
+  end
+
 let oneret ?(callback: callback option) (f: fundec) : unit =
   let fname = f.svar.vname in
   (* Get the return type *)
@@ -415,6 +477,7 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
   (*CEA so, [scanBlock] will set [lastloc] when necessary
     lastloc := !currentLoc ;  *) (* last location in the function *)
   f.sbody <- scanBlock true f.sbody ;
+  if !haveGoto && !retStmt != dummyStmt then encapsulate_local_vars f;
   Extlib.may do_callback callback
 
 (*
