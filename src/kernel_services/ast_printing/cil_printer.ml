@@ -563,7 +563,16 @@ class cil_printer () = object (self)
   method varname fmt v = pp_print_string fmt v
 
   (* variable use *)
-  method varinfo fmt v = self#varname fmt v.vname
+  method varinfo fmt v =
+    if Kernel.is_debug_key_enabled Kernel.dkey_print_vid then begin
+      Format.fprintf fmt "/* vid:%d" v.vid;
+      (match v.vlogic_var_assoc with
+         None -> ()
+       | Some v -> Format.fprintf fmt ", lvid:%d" v.lv_id
+      );
+      Format.fprintf fmt " */"
+    end;
+    self#varname fmt v.vname
 
   (* variable declaration *)
   method vdecl fmt (v:varinfo) =
@@ -2429,7 +2438,16 @@ class cil_printer () = object (self)
     self#term_lval fmt (lh, TNoOffset)
 
   method logic_info fmt li = self#logic_var fmt li.l_var_info
-  method logic_var fmt v = self#varname fmt v.lv_name
+
+  method logic_var fmt v =
+    if Kernel.is_debug_key_enabled Kernel.dkey_print_vid then begin
+      Format.fprintf fmt "/* ";
+      (match v.lv_origin with
+         None -> ()
+       | Some v -> Format.fprintf fmt "vid:%d, " v.vid);
+      Format.fprintf fmt "lvid:%d */" v.lv_id
+    end;
+    self#varname fmt v.lv_name
 
   method quantifiers fmt l =
     Pretty_utils.pp_list ~sep:",@ "
