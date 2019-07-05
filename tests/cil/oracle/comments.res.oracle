@@ -3,21 +3,21 @@
 /*  run.config
    OPT: -print -keep-comments
  */
-/*  ABC  */
+//  ABC 
 void f(void)
 {
   return;
 }
 
-/* ABD/*FOO*/ */
-/* ABC */
+// ABD/*FOO*/
+// ABC
 /* ABC
       */
 /*@ requires \true; */
 void g(void)
 {
   /*@ ghost int x = 0; */
-  /*  ghost_comment  */
+  //  ghost_comment 
   return;
 }
 
@@ -25,8 +25,8 @@ int bts_2176(void)
 {
   int r = 0;
   int i = 0;
-  /*  comment 1  */
-  /*  comment 2  */
+  //  comment 1 
+  //  comment 2 
   r = 1;
   i = 0;
   if (! (i < 10)) goto unrolling_2_loop;
