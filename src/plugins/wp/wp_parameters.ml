@@ -472,6 +472,10 @@ module Provers = String_list
          - 'altgr-ergo' (gui)\n\
          - 'coq', 'coqide' (see also -wp-script)\n\
          - 'why3:<dp>' or '<dp>' (why3 prover, see -wp-detect)\n\
+         - 'native:alt-ergo'\n\
+         - 'native:altgr-ergo'\n\
+         - 'native:coq'\n\
+         - 'native:coqide'\n\
          - 'why3ide' (why3 gui)"
     end)
 

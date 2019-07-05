@@ -20,12 +20,60 @@
 (*                                                                        *)
 (**************************************************************************)
 
-# 23 "src/plugins/wp/ProverDetect.None.ml"
+theory int.Int
+  remove prop CompatOrderMult
+end
 
-(* -------------------------------------------------------------------------- *)
-(* --- Prover Detection (no why3)                                         --- *)
-(* -------------------------------------------------------------------------- *)
+theory int.Abs
+  meta "rename_logic" function abs, "abs_int"
+end
 
-let detect () : VCS.dp list = []
+theory int.MinMax
+  meta "rename_logic" function min, "min_int"
+  meta "rename_logic" function max, "max_int"
+end
 
-(**************************************************************************)
+theory int.ComputerDivision
+  remove prop Div_mod
+  remove prop Mod_bound
+  remove prop Div_sign_pos
+  remove prop Div_sign_neg
+  remove prop Mod_sign_pos
+  remove prop Mod_sign_neg
+  remove prop Rounds_toward_zero
+end
+
+theory int.EuclideanDivision
+  remove prop Div_mod
+  remove prop Mod_bound
+  remove prop Div_unique
+  remove prop Div_bound
+  remove prop Mod_1
+  remove prop Div_1
+  remove prop Div_inf
+  remove prop Div_inf_neg
+  remove prop Mod_0
+  remove prop Div_1_left
+  remove prop Div_minus1_left
+  remove prop Mod_1_left
+  remove prop Mod_minus1_left
+  remove prop Div_mult
+  remove prop Mod_mult
+end
+
+theory real.Real
+  remove prop CompatOrderMult
+end
+
+theory real.Abs
+  meta "rename_logic" function abs, "abs_real"
+end
+
+theory real.MinMax
+  meta "rename_logic" function min, "min_real"
+  meta "rename_logic" function max, "max_real"
+end
+
+theory map.Const
+
+end

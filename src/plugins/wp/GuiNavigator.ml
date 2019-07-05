@@ -257,8 +257,8 @@ class behavior
         | _ ->
             let mode = match mode , prover with
               | Some m , _ -> m
-              | None , VCS.Coq -> VCS.EditMode
-              | None , VCS.AltErgo -> VCS.FixMode
+              | None , VCS.NativeCoq -> VCS.EditMode
+              | None , VCS.NativeAltErgo -> VCS.FixMode
               | _ -> VCS.BatchMode in
             schedule (Prover.prove w ~mode ~result prover)
       end
@@ -349,8 +349,8 @@ class behavior
         match p with
         | None | Some Tactical -> popup_tip#run ()
         | Some Qed -> popup_qed#run ()
-        | Some Coq -> popup_coq#run ()
-        | Some AltErgo -> popup_ergo#run ()
+        | Some NativeCoq -> popup_coq#run ()
+        | Some NativeAltErgo -> popup_ergo#run ()
         | Some (Why3 _) -> popup_why3#run ()
       end
 
@@ -410,10 +410,9 @@ let make (main : main_window_extension_points) =
     (* --- Provers                                                            --- *)
     (* -------------------------------------------------------------------------- *)
 
-    let available = new GuiConfig.available () in
     let enabled = new GuiConfig.enabled "wp.enabled" in
 
-    let dp_chooser = new GuiConfig.dp_chooser ~main ~available ~enabled in
+    let dp_chooser = new GuiConfig.dp_chooser ~main ~enabled in
 
     (* -------------------------------------------------------------------------- *)
     (* --- Focus Bar                                                          --- *)
@@ -505,8 +504,8 @@ let make (main : main_window_extension_points) =
     ignore (main#lower_notebook#append_page ~tab_label panel#coerce) ;
     main#register_source_highlighter source#highlight ;
     main#register_source_selector popup#register ;
+
     GuiPanel.register ~main
-      ~available_provers:available
       ~configure_provers:dp_chooser#run ;
   end
 

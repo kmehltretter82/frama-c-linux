@@ -62,8 +62,11 @@ struct
     bind : Bvars.t ;
     sort : sort ;
     repr : repr ;
+    tau  : tau option;
   }
   and repr = (Field.t,ADT.t,Fun.t,var,term,term) term_repr
+
+  let pretty_debug :  (_ -> term -> unit) ref = ref (fun _ _ -> ())
 
   type lc_term = term
 
@@ -629,7 +632,10 @@ struct
 
     let rec compare a b =
       if a == b then 0 else
-        cmp_struct compare a b
+        let cmp = cmp_struct compare a b in
+        if cmp <> 0 then cmp else
+          Extlib.opt_compare Tau.compare a.tau b.tau
+
 
   end
 
@@ -685,7 +691,7 @@ struct
   type operation =
     | NOT of term (* Only AND, OR and IMPLY *)
     | CMP of cmp * term * term
-    | FUN of Fun.t * term list
+    | FUN of Fun.t * term list * tau option
 
   module C = Cache.Unary
       (struct
@@ -695,11 +701,12 @@ struct
         let hash = function
           | NOT p -> 5 * p.hash
           | CMP(c,a,b) -> hash_op c * Hcons.hash_pair a.hash b.hash
-          | FUN(f,es) -> Hcons.hash_list hash (Fun.hash f) es
+          | FUN(f,es,_) -> Hcons.hash_list hash (Fun.hash f) es
         let equal a b = match a,b with
           | NOT p,NOT q -> p==q
           | CMP(c,a,b),CMP(c',a',b') -> c=c' && a==a' && b==b'
-          | FUN(f,xs) , FUN(g,ys) -> Fun.equal f g && Hcons.equal_list (==) xs ys
+          | FUN(f,xs,t) , FUN(g,ys,t') -> Fun.equal f g && Hcons.equal_list (==) xs ys
+                                          && Extlib.opt_equal Tau.equal t t'
           | _ -> false
       end)
 
@@ -716,8 +723,8 @@ struct
     weak : W.t ;
     cache : term C.cache ;
     mutable checks : STset.t STmap.t ;
-    mutable builtins_fun : (term list -> term) BUILTIN.t ;
-    mutable builtins_get : (term list -> term -> term) BUILTIN.t ;
+    mutable builtins_fun : (term list -> tau option -> term) BUILTIN.t ;
+    mutable builtins_get : (term list -> tau option -> term -> term) BUILTIN.t ;
     mutable builtins_eq  : (term -> term -> term) BUILTIN.t ;
     mutable builtins_leq : (term -> term -> term) BUILTIN.t ;
   }
@@ -739,6 +746,12 @@ struct
   let release () =
     C.clear !state.cache ;
     !state.checks <- STmap.empty
+
+  let in_state st f x =
+    let old = !state in
+    Extlib.try_finally
+      ~finally:(fun () -> state := old)
+      (fun x -> state := st; f x) x
 
   let clock = ref true
   let constants = ref Tset.empty
@@ -769,9 +782,9 @@ struct
   (* --- Hconsed insertion                                                  --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let insert r =
+  let insert ?tau r =
     let h = hash_repr r in
-    (* Only [hash] and [repr] are significant for lookup in weak hmap *)
+    (* Only [hash] and [repr] an [tau] are significant for lookup in weak hmap *)
     let e0 = {
       id = 0 ;
       hash = h ;
@@ -780,6 +793,7 @@ struct
       vars = Vars.empty ;
       bind = Bvars.empty ;
       sort = Sdata ;
+      tau;
     } in
     try W.find !state.weak e0
     with Not_found ->
@@ -794,6 +808,7 @@ struct
         bind = bind_repr r ;
         sort = sort_repr r ;
         size = size_repr r ;
+        tau;
       }
       in W.add !state.weak e ; e
 
@@ -850,7 +865,7 @@ struct
   let c_eq = sym insert_eq
   let c_neq = sym insert_neq
 
-  let c_fun f xs = insert(Fun(f,xs))
+  let c_fun f xs tau = insert ?tau (Fun(f,xs))
 
   let c_add = function
     | [] -> e_zero
@@ -941,9 +956,9 @@ struct
   (* --- Cache & Builtin Simplifiers                                        --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let builtin_fun f es =
-    try (BUILTIN.find f !state.builtins_fun) es
-    with Not_found -> c_fun f es
+  let builtin_fun ?tau f es =
+    try (BUILTIN.find f !state.builtins_fun) es tau
+    with Not_found -> c_fun f es tau
 
   let simplify_eq e a b =
     match e.repr with
@@ -978,7 +993,7 @@ struct
   let dispatch = function
     | NOT p -> !cached_not p.repr
     | CMP(cmp,a,b) -> builtin_cmp cmp a b
-    | FUN(f,es) -> builtin_fun f es
+    | FUN(f,es,tau) -> builtin_fun ?tau f es
   let operation op = C.compute !state.cache dispatch op
 
   let distribute_if_over_operation force op x y f a b =
@@ -995,18 +1010,20 @@ struct
       -> !extern_ite bc (f a b1) (f a b2)
     | _ -> op x y
 
-  let distribute f = function
+  let distribute f tau = function
     | x::[] as xs ->
         begin
           match x.repr with
           | If(c,a,b) ->  !extern_ite c (!extern_fun f [a]) (!extern_fun f [b])
-          | _ -> operation (FUN(f,xs))
+          | _ -> operation (FUN(f,xs,tau))
         end
     | a::b::[] as xs ->
-        distribute_if_over_operation false (fun f xs -> operation (FUN(f,xs))) f xs (fun a b -> !extern_fun f [a;b]) a b
-    | xs -> operation (FUN(f,xs))
+        distribute_if_over_operation false
+          (fun f xs -> operation (FUN(f,xs,tau))) f xs
+          (fun a b -> !extern_fun f [a;b]) a b
+    | xs -> operation (FUN(f,xs,tau))
 
-  let c_builtin_fun f xs = distribute f xs
+  let c_builtin_fun f xs tau = distribute f tau xs
   let c_builtin_eq  a b = distribute_if_over_operation true (fun a b -> operation (CMP(EQ ,a,b))) a b !extern_eq  a b
   let c_builtin_neq a b = distribute_if_over_operation true (fun a b -> operation (CMP(NEQ,a,b))) a b !extern_neq a b
   let c_builtin_lt  a b = distribute_if_over_operation true (fun a b -> operation (CMP(LT ,a,b))) a b !extern_lt  a b
@@ -1019,11 +1036,13 @@ struct
           "Builtin already registered for '%s'" (Fun.debug f) in
       raise (Failure msg)
 
-  let set_builtin f p =
+  let set_builtin' f p =
     begin
       prepare_builtin f !state.builtins_fun ;
       !state.builtins_fun <- BUILTIN.add f p !state.builtins_fun ;
     end
+
+  let set_builtin f p = set_builtin' f (fun es _ -> p es)
 
   let set_builtin_get f p =
     begin
@@ -1043,7 +1062,7 @@ struct
       !state.builtins_leq <- BUILTIN.add f p !state.builtins_leq ;
     end
 
-  let set_builtin_map f phi = set_builtin f (fun es -> c_fun f (phi es))
+  let set_builtin_map f phi = set_builtin' f (fun es tau -> c_fun f (phi es) tau)
 
   (* -------------------------------------------------------------------------- *)
   (* --- Negation                                                           --- *)
@@ -1116,7 +1135,7 @@ struct
     | E_int k -> e_int k
     | E_true -> e_true
     | E_false -> e_false
-    | E_fun (f,l) -> c_fun f (List.map element l)
+    | E_fun (f,l) -> c_fun f (List.map element l) None
 
   let rec is_element e x = match e , x.repr with
     | E_int k , Kint z -> Z.equal (Z.of_int k) z
@@ -1140,7 +1159,7 @@ struct
     | Operator op -> is_element op.absorbant e
     | _ -> false
 
-  let op_fun f op xs =
+  let op_fun f op xs tau =
     let xs =
       if op.associative then
         let xs = op_revassoc f [] xs in
@@ -1164,14 +1183,14 @@ struct
       match xs with
       | [] when op.neutral <> E_none -> element op.neutral
       | [x] when op.associative -> x
-      | _ -> c_builtin_fun f xs
+      | _ -> c_builtin_fun f xs tau
 
-  let e_fungen f xs =
+  let e_fungen f xs tau =
     match Fun.category f with
-    | Logic.Operator op -> op_fun f op xs
-    | _ -> c_builtin_fun f xs
+    | Logic.Operator op -> op_fun f op xs tau
+    | _ -> c_builtin_fun f xs tau
 
-  let e_fun = e_fungen
+  let e_fun ?result f xs = e_fungen f xs result
   let () = extern_fun := e_fun
 
   (* -------------------------------------------------------------------------- *)
@@ -1724,13 +1743,13 @@ struct
   and eq_invertible x y f xs ys =
     let modified,xs,ys = op_invertible ~ac:(is_ac f) xs ys in
     if modified
-    then eq_symb (e_fun f xs) (e_fun f ys)
+    then eq_symb (e_fun f xs ?result:x.tau) (e_fun f ys ?result:y.tau)
     else c_builtin_eq x y
 
   and eq_invertible_both x y f g xs ys =
     let modified,xs',ys' = op_invertible ~ac:(is_ac f) xs [y] in
     if modified
-    then eq_symb (e_fun f xs') (e_fun f ys')
+    then eq_symb (e_fun f xs' ?result:x.tau) (e_fun f ys' ?result:y.tau)
     else eq_invertible x y g [x] ys
 
   and eq_field (f,x) (g,y) =
@@ -1900,7 +1919,7 @@ struct
         end
     | Fun (g,xs) ->
         begin
-          try (BUILTIN.find g !state.builtins_get) xs k
+          try (BUILTIN.find g !state.builtins_get) xs m.tau k
           with Not_found -> c_get m k
         end
     | _ -> c_get m k
@@ -1993,7 +2012,7 @@ struct
     | Times(z,t) -> c_times z (f t)
     | If(e,a,b) -> c_if (f e) (f a) (f b)
     | Imply(hs,p) -> c_imply (List.map f hs) (f p)
-    | Fun(g,xs) -> c_fun g (List.map f xs)
+    | Fun(g,xs) -> c_fun g (List.map f xs) e0.tau
     | Acst(t,v) -> c_const t v
     | Aget(x,y) -> c_get (f x) (f y)
     | Aset(x,y,z) -> c_set (f x) (f y) (f z)
@@ -2047,7 +2066,7 @@ struct
     | Times(z,t) -> e_times z (f t)
     | If(e,a,b) -> e_if (f e) (f a) (f b)
     | Imply(hs,p) -> e_imply (List.map f hs) (f p)
-    | Fun(g,xs) -> e_fun g (List.map f xs)
+    | Fun(g,xs) -> e_fun ?result:e0.tau g (List.map f xs)
     | Acst(t,v) -> e_const t v
     | Aget(x,y) -> e_get (f x) (f y)
     | Aset(x,y,z) -> e_set (f x) (f y) (f z)
@@ -2236,6 +2255,53 @@ struct
     List.iter (Subst.add_term sigma) es ;
     apply sigma Intmap.empty e es
 
+
+  (* -------------------------------------------------------------------------- *)
+  (* --- convert between states                                             --- *)
+  (* -------------------------------------------------------------------------- *)
+
+  let rebuild_in_state to_state ?(cache=Tmap.empty) e =
+    let cache_find m e = Tmap.find e !m in
+    let cache_bind m e v = m := Tmap.add e v !m ; v in
+    let m = ref cache in
+    let rec aux e =
+      try cache_find m e
+      with Not_found ->
+        let r = match e.repr with
+          | Kint i -> e_zint i
+          | Kreal r -> e_real r
+          | Fvar v -> e_var v
+          | Bvar (v,t) -> c_bvar v t
+          | True -> e_true
+          | False -> e_false
+          | Not e -> e_not (aux e)
+          | Add xs -> addition (List.map aux xs)
+          | Mul xs -> multiplication (List.map aux xs)
+          | And xs -> e_and (List.map aux xs)
+          | Or  xs -> e_or  (List.map aux xs)
+          | Mod(x,y) -> e_mod (aux x) (aux y)
+          | Div(x,y) -> e_div (aux x) (aux y)
+          | Eq(x,y)  -> e_eq  (aux x) (aux y)
+          | Neq(x,y) -> e_neq (aux x) (aux y)
+          | Lt(x,y)  -> e_lt  (aux x) (aux y)
+          | Leq(x,y) -> e_leq (aux x) (aux y)
+          | Times(z,t) -> times z (aux t)
+          | If(e,a,b) -> e_if (aux e) (aux a) (aux b)
+          | Imply(hs,p) -> e_imply (List.map aux hs) (aux p)
+          | Fun(g,xs) -> e_fun ?result:e.tau g (List.map aux xs)
+          | Acst(t,v) -> e_const t (aux v)
+          | Aget(x,y) -> e_get (aux x) (aux y)
+          | Aset(x,y,z) -> e_set (aux x) (aux y) (aux z)
+          | Rget(x,g) -> e_getfield (aux x) g
+          | Rdef gxs -> e_record (List.map (fun (g,x) -> g, aux x) gxs)
+          | Apply(e,es) -> c_apply (aux e) (List.map aux es)
+          | Bind(q,t,e) -> c_bind q t (aux e)
+        in
+        cache_bind m e r
+    in
+    let r = in_state to_state aux e in
+    r, !m
+
   (* -------------------------------------------------------------------------- *)
   (* --- Binders                                                            --- *)
   (* -------------------------------------------------------------------------- *)
@@ -2344,7 +2410,7 @@ struct
   (* --- Iterators                                                          --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let e_repr = function
+  let e_repr ?result = function
     | Bvar _ | Bind _ -> raise (Invalid_argument "Qed.e_repr")
     | True -> e_true
     | False -> e_false
@@ -2366,7 +2432,7 @@ struct
     | Leq(x,y) -> e_leq x y
     | If(e,a,b) -> e_if e a b
     | Imply(hs,p) -> e_imply hs p
-    | Fun(g,xs) -> e_fun g xs
+    | Fun(g,xs) -> e_fun ?result g xs
     | Acst(t,v) -> e_const t v
     | Aget(m,k) -> e_get m k
     | Aset(m,k,v) -> e_set m k v
@@ -2469,7 +2535,7 @@ struct
           | Aset _ -> bad_position ()
           | Rdef _ | Rget _ ->
               failwith "change in place for records not yet implemented"
-          | Fun (f,ops) -> e_fun f (change_in_list ops i l)
+          | Fun (f,ops) -> e_fun ?result:e.tau f (change_in_list ops i l)
           | Bind(q,x,t) when i = 0 -> c_bind q x (aux t l)
           | Bind _ -> bad_position ()
           | Apply(f,args) when i = 0 ->
@@ -2478,6 +2544,8 @@ struct
               e_apply f (change_in_list args i l)
         end
     in aux e pos
+
+  let () = pretty_debug := debug
 
   (* ------------------------------------------------------------------------ *)
   (* ---  Record Decomposition                                            --- *)
@@ -2696,43 +2764,46 @@ struct
   }
 
   let rec typecheck env e =
-    match e.sort with
-    | Sint -> Int
-    | Sreal -> Real
-    | Sbool -> Bool
-    | Sprop -> Prop
-    | Sdata | Sarray _ ->
-        match e.repr with
-        | Bvar (_,ty) -> ty
-        | Fvar x -> tau_of_var x
-        | Acst(t,v) -> Array(t,typecheck env v)
-        | Aset(m,k,v) ->
-            (try typecheck env m
-             with Not_found ->
-               Array(typecheck env k,typecheck env v))
-        | Fun(f,es) ->
-            (try tau_of_sort (Fun.sort f)
-             with Not_found -> env.call f (List.map (typeof env) es))
-        | Aget(m,_) ->
-            (try match typecheck env m with
-               | Array(_,v) -> v
-               | _ -> raise Not_found
-             with Not_found -> tau_of_arraysort m.sort)
-        | Rdef [] -> raise Not_found
-        | Rdef ((f,_)::_) -> env.record f
-        | Rget (_,f) ->
-            (try tau_of_sort (Field.sort f)
-             with Not_found -> env.field f)
-        | True | False -> Bool
-        | Kint _ -> Int
-        | Kreal _ -> Real
-        | Times(_,e) -> typecheck env e
-        | Add es | Mul es -> merge_list Int (typecheck env) es
-        | Div (a,b) | Mod (a,b) | If(_,a,b) ->
-            tau_merge (typecheck env a) (typecheck env b)
-        | Eq _ | Neq _ | Leq _ | Lt _ | And _ | Or _ | Not _ | Imply _ -> Bool
-        | Bind((Forall|Exists),_,_) -> Prop
-        | Apply _ | Bind(Lambda,_,_) -> raise Not_found
+    match e.tau with
+    | Some tau -> tau
+    | None ->
+        match e.sort with
+        | Sint -> Int
+        | Sreal -> Real
+        | Sbool -> Bool
+        | Sprop -> Prop
+        | Sdata | Sarray _ ->
+            match e.repr with
+            | Bvar (_,ty) -> ty
+            | Fvar x -> tau_of_var x
+            | Acst(t,v) -> Array(t,typecheck env v)
+            | Aset(m,k,v) ->
+                (try typecheck env m
+                 with Not_found ->
+                   Array(typecheck env k,typecheck env v))
+            | Fun(f,es) ->
+                (try tau_of_sort (Fun.sort f)
+                 with Not_found -> env.call f (List.map (typeof env) es))
+            | Aget(m,_) ->
+                (try match typecheck env m with
+                   | Array(_,v) -> v
+                   | _ -> raise Not_found
+                 with Not_found -> tau_of_arraysort m.sort)
+            | Rdef [] -> raise Not_found
+            | Rdef ((f,_)::_) -> env.record f
+            | Rget (_,f) ->
+                (try tau_of_sort (Field.sort f)
+                 with Not_found -> env.field f)
+            | True | False -> Bool
+            | Kint _ -> Int
+            | Kreal _ -> Real
+            | Times(_,e) -> typecheck env e
+            | Add es | Mul es -> merge_list Int (typecheck env) es
+            | Div (a,b) | Mod (a,b) | If(_,a,b) ->
+                tau_merge (typecheck env a) (typecheck env b)
+            | Eq _ | Neq _ | Leq _ | Lt _ | And _ | Or _ | Not _ | Imply _ -> Bool
+            | Bind((Forall|Exists),_,_) -> Prop
+            | Apply _ | Bind(Lambda,_,_) -> raise Not_found
 
   and typeof env e = try Some (typecheck env e) with Not_found -> None
 

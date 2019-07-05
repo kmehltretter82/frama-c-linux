@@ -689,7 +689,7 @@ struct
         let r = match LogicBuiltins.logic f with
           | ACSLDEF -> C.call_fun env f ls vs
           | HACK phi -> phi vs
-          | LFUN f -> e_fun f vs
+          | LFUN f -> e_fun f vs ~result:(Lang.tau_of_ltype t.term_type)
         in Vexp r
 
     | Tlambda _ ->
@@ -703,7 +703,7 @@ struct
         let r = match LogicBuiltins.ctor c with
           | ACSLDEF -> e_fun (CTOR c) es
           | HACK phi -> phi es
-          | LFUN f -> e_fun f es
+          | LFUN f -> e_fun f es ~result:(Lang.tau_of_ltype t.term_type)
         in Vexp r
 
     | Tif( cond , a , b ) ->

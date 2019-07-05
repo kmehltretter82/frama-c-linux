@@ -1,0 +1,439 @@
+[Config] reading extra configuration file realization.conf
+<<<<<<< HEAD
+||||||| merged common ancestors
+File "WP-SHARE/src/./qed.why", line 76, characters 8-19:
+warning: axiom c_euclidian does not contain any local abstract symbol
+File "WP-SHARE/src/./qed.why", line 91, characters 8-22:
+warning: axiom cmod_remainder does not contain any local abstract symbol
+File "WP-SHARE/src/./qed.why", line 97, characters 8-20:
+warning: axiom cdiv_neutral does not contain any local abstract symbol
+File "WP-SHARE/src/./qed.why", line 98, characters 8-16:
+warning: axiom cdiv_inv does not contain any local abstract symbol
+File "WP-SHARE/src/./cmath.why", line 32, characters 8-15:
+warning: axiom abs_def does not contain any local abstract symbol
+File "WP-SHARE/src/./cmath.why", line 43, characters 8-17:
+warning: axiom sqrt_lin1 does not contain any local abstract symbol
+File "WP-SHARE/src/./cmath.why", line 44, characters 8-17:
+warning: axiom sqrt_lin0 does not contain any local abstract symbol
+File "WP-SHARE/src/./cmath.why", line 45, characters 8-14:
+warning: axiom sqrt_0 does not contain any local abstract symbol
+File "WP-SHARE/src/./cmath.why", line 46, characters 8-14:
+warning: axiom sqrt_1 does not contain any local abstract symbol
+File "WP-SHARE/src/./cmath.why", line 55, characters 8-15:
+warning: axiom exp_pos does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 37, characters 8-20:
+warning: axiom bit_test_def does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 44, characters 8-27:
+warning: axiom bit_test_extraction does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 50, characters 8-15:
+warning: axiom lsl_1_0 does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 52, characters 8-31:
+warning: axiom bit_test_extraction_bis does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 54, characters 8-34:
+warning: axiom bit_test_extraction_bis_eq does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 59, characters 8-23:
+warning: axiom lnot_extraction does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 65, characters 8-23:
+warning: axiom land_extraction does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 71, characters 8-22:
+warning: axiom lor_extraction does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 77, characters 8-23:
+warning: axiom lxor_extraction does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 85, characters 8-20:
+warning: axiom land_1_lsl_1 does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 90, characters 8-26:
+warning: axiom lsl_extraction_sup does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 96, characters 8-26:
+warning: axiom lsl_extraction_inf does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 102, characters 8-23:
+warning: axiom lsr_extractionl does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 108, characters 8-23:
+warning: axiom lsl1_extraction does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 139, characters 8-31:
+warning: axiom to_uint8_extraction_sup does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 144, characters 8-31:
+warning: axiom to_uint8_extraction_inf does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 155, characters 8-32:
+warning: axiom to_uint16_extraction_sup does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 160, characters 8-32:
+warning: axiom to_uint16_extraction_inf does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 171, characters 8-32:
+warning: axiom to_uint32_extraction_sup does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 176, characters 8-32:
+warning: axiom to_uint32_extraction_inf does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 187, characters 8-32:
+warning: axiom to_uint64_extraction_sup does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 192, characters 8-32:
+warning: axiom to_uint64_extraction_inf does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 219, characters 8-31:
+warning: axiom to_sint8_extraction_sup does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 224, characters 8-31:
+warning: axiom to_sint8_extraction_inf does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 235, characters 8-32:
+warning: axiom to_sint16_extraction_sup does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 240, characters 8-32:
+warning: axiom to_sint16_extraction_inf does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 251, characters 8-32:
+warning: axiom to_sint32_extraction_sup does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 256, characters 8-32:
+warning: axiom to_sint32_extraction_inf does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 267, characters 8-32:
+warning: axiom to_sint64_extraction_sup does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 272, characters 8-32:
+warning: axiom to_sint64_extraction_inf does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 299, characters 8-21:
+warning: axiom to_uint32_lor does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 329, characters 8-21:
+warning: axiom is_uint8_lxor does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 332, characters 8-20:
+warning: axiom is_uint8_lor does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 335, characters 8-21:
+warning: axiom is_uint8_land does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 338, characters 8-20:
+warning: axiom is_uint8_lsr does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 341, characters 8-25:
+warning: axiom is_uint8_lsl1_inf does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 344, characters 8-25:
+warning: axiom is_uint8_lsl1_sup does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 348, characters 8-22:
+warning: axiom is_uint16_lxor does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 351, characters 8-21:
+warning: axiom is_uint16_lor does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 354, characters 8-22:
+warning: axiom is_uint16_land does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 357, characters 8-21:
+warning: axiom is_uint16_lsr does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 360, characters 8-26:
+warning: axiom is_uint16_lsl1_inf does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 363, characters 8-26:
+warning: axiom is_uint16_lsl1_sup does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 367, characters 8-22:
+warning: axiom is_uint32_lxor does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 370, characters 8-21:
+warning: axiom is_uint32_lor does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 373, characters 8-22:
+warning: axiom is_uint32_land does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 376, characters 8-21:
+warning: axiom is_uint32_lsr does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 379, characters 8-26:
+warning: axiom is_uint32_lsl1_inf does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 382, characters 8-26:
+warning: axiom is_uint32_lsl1_sup does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 386, characters 8-22:
+warning: axiom is_uint64_lxor does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 389, characters 8-21:
+warning: axiom is_uint64_lor does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 392, characters 8-22:
+warning: axiom is_uint64_land does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 395, characters 8-21:
+warning: axiom is_uint64_lsr does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 398, characters 8-26:
+warning: axiom is_uint64_lsl1_inf does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 401, characters 8-26:
+warning: axiom is_uint64_lsl1_sup does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 428, characters 8-21:
+warning: axiom is_sint8_lnot does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 431, characters 8-21:
+warning: axiom is_sint8_lxor does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 434, characters 8-20:
+warning: axiom is_sint8_lor does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 437, characters 8-21:
+warning: axiom is_sint8_land does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 440, characters 8-20:
+warning: axiom is_sint8_lsr does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 443, characters 8-21:
+warning: axiom is_sint8_lsl1 does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 446, characters 8-25:
+warning: axiom is_sint8_lsl1_inf does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 449, characters 8-25:
+warning: axiom is_sint8_lsl1_sup does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 453, characters 8-22:
+warning: axiom is_sint16_lnot does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 456, characters 8-22:
+warning: axiom is_sint16_lxor does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 459, characters 8-21:
+warning: axiom is_sint16_lor does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 462, characters 8-22:
+warning: axiom is_sint16_land does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 465, characters 8-21:
+warning: axiom is_sint16_lsr does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 468, characters 8-22:
+warning: axiom is_sint16_lsl1 does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 471, characters 8-26:
+warning: axiom is_sint16_lsl1_inf does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 474, characters 8-26:
+warning: axiom is_sint16_lsl1_sup does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 478, characters 8-22:
+warning: axiom is_sint32_lnot does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 481, characters 8-22:
+warning: axiom is_sint32_lxor does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 484, characters 8-21:
+warning: axiom is_sint32_lor does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 487, characters 8-22:
+warning: axiom is_sint32_land does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 490, characters 8-21:
+warning: axiom is_sint32_lsr does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 493, characters 8-22:
+warning: axiom is_sint32_lsl1 does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 496, characters 8-26:
+warning: axiom is_sint32_lsl1_inf does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 499, characters 8-26:
+warning: axiom is_sint32_lsl1_sup does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 503, characters 8-22:
+warning: axiom is_sint64_lnot does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 506, characters 8-22:
+warning: axiom is_sint64_lxor does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 509, characters 8-21:
+warning: axiom is_sint64_lor does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 512, characters 8-22:
+warning: axiom is_sint64_land does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 515, characters 8-21:
+warning: axiom is_sint64_lsr does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 518, characters 8-22:
+warning: axiom is_sint64_lsl1 does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 521, characters 8-26:
+warning: axiom is_sint64_lsl1_inf does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 524, characters 8-26:
+warning: axiom is_sint64_lsl1_sup does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 549, characters 8-20:
+warning: axiom lor_addition does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 552, characters 8-21:
+warning: axiom lxor_addition does not contain any local abstract symbol
+=======
+File "WP-SHARE/src/./qed.why", line 76, characters 8-19:
+warning: axiom c_euclidian does not contain any local abstract symbol
+File "WP-SHARE/src/./qed.why", line 91, characters 8-22:
+warning: axiom cmod_remainder does not contain any local abstract symbol
+File "WP-SHARE/src/./qed.why", line 97, characters 8-20:
+warning: axiom cdiv_neutral does not contain any local abstract symbol
+File "WP-SHARE/src/./qed.why", line 98, characters 8-16:
+warning: axiom cdiv_inv does not contain any local abstract symbol
+File "WP-SHARE/src/./cmath.why", line 32, characters 8-15:
+warning: axiom abs_def does not contain any local abstract symbol
+File "WP-SHARE/src/./cmath.why", line 43, characters 8-17:
+warning: axiom sqrt_lin1 does not contain any local abstract symbol
+File "WP-SHARE/src/./cmath.why", line 44, characters 8-17:
+warning: axiom sqrt_lin0 does not contain any local abstract symbol
+File "WP-SHARE/src/./cmath.why", line 45, characters 8-14:
+warning: axiom sqrt_0 does not contain any local abstract symbol
+File "WP-SHARE/src/./cmath.why", line 46, characters 8-14:
+warning: axiom sqrt_1 does not contain any local abstract symbol
+File "WP-SHARE/src/./cmath.why", line 55, characters 8-15:
+warning: axiom exp_pos does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 36, characters 8-17:
+warning: axiom lnot_bool does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 39, characters 8-18:
+warning: axiom land_idemp does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 40, characters 8-14:
+warning: axiom land_0 does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 41, characters 8-17:
+warning: axiom land_0bis does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 42, characters 8-14:
+warning: axiom land_1 does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 43, characters 8-17:
+warning: axiom land_1bis does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 44, characters 8-17:
+warning: axiom land_bool does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 49, characters 8-17:
+warning: axiom lor_idemp does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 50, characters 8-13:
+warning: axiom lor_1 does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 51, characters 8-16:
+warning: axiom lor_1bis does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 52, characters 8-13:
+warning: axiom lor_0 does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 53, characters 8-16:
+warning: axiom lor_0bis does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 54, characters 8-16:
+warning: axiom lor_bool does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 59, characters 8-22:
+warning: axiom lxor_nilpotent does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 60, characters 8-14:
+warning: axiom lxor_1 does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 61, characters 8-17:
+warning: axiom lxor_1bis does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 62, characters 8-14:
+warning: axiom lxor_0 does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 63, characters 8-17:
+warning: axiom lxor_0bis does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 64, characters 8-17:
+warning: axiom lxor_bool does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 71, characters 8-20:
+warning: axiom bit_test_def does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 78, characters 8-27:
+warning: axiom bit_test_extraction does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 84, characters 8-15:
+warning: axiom lsl_1_0 does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 86, characters 8-31:
+warning: axiom bit_test_extraction_bis does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 88, characters 8-34:
+warning: axiom bit_test_extraction_bis_eq does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 93, characters 8-23:
+warning: axiom lnot_extraction does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 99, characters 8-23:
+warning: axiom land_extraction does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 105, characters 8-22:
+warning: axiom lor_extraction does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 111, characters 8-23:
+warning: axiom lxor_extraction does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 119, characters 8-20:
+warning: axiom land_1_lsl_1 does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 124, characters 8-26:
+warning: axiom lsl_extraction_sup does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 130, characters 8-26:
+warning: axiom lsl_extraction_inf does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 136, characters 8-23:
+warning: axiom lsr_extractionl does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 142, characters 8-23:
+warning: axiom lsl1_extraction does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 173, characters 8-31:
+warning: axiom to_uint8_extraction_sup does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 178, characters 8-31:
+warning: axiom to_uint8_extraction_inf does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 189, characters 8-32:
+warning: axiom to_uint16_extraction_sup does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 194, characters 8-32:
+warning: axiom to_uint16_extraction_inf does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 205, characters 8-32:
+warning: axiom to_uint32_extraction_sup does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 210, characters 8-32:
+warning: axiom to_uint32_extraction_inf does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 221, characters 8-32:
+warning: axiom to_uint64_extraction_sup does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 226, characters 8-32:
+warning: axiom to_uint64_extraction_inf does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 253, characters 8-31:
+warning: axiom to_sint8_extraction_sup does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 258, characters 8-31:
+warning: axiom to_sint8_extraction_inf does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 269, characters 8-32:
+warning: axiom to_sint16_extraction_sup does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 274, characters 8-32:
+warning: axiom to_sint16_extraction_inf does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 285, characters 8-32:
+warning: axiom to_sint32_extraction_sup does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 290, characters 8-32:
+warning: axiom to_sint32_extraction_inf does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 301, characters 8-32:
+warning: axiom to_sint64_extraction_sup does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 306, characters 8-32:
+warning: axiom to_sint64_extraction_inf does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 333, characters 8-21:
+warning: axiom to_uint32_lor does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 363, characters 8-21:
+warning: axiom is_uint8_lxor does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 366, characters 8-20:
+warning: axiom is_uint8_lor does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 369, characters 8-21:
+warning: axiom is_uint8_land does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 372, characters 8-20:
+warning: axiom is_uint8_lsr does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 375, characters 8-25:
+warning: axiom is_uint8_lsl1_inf does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 378, characters 8-25:
+warning: axiom is_uint8_lsl1_sup does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 382, characters 8-22:
+warning: axiom is_uint16_lxor does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 385, characters 8-21:
+warning: axiom is_uint16_lor does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 388, characters 8-22:
+warning: axiom is_uint16_land does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 391, characters 8-21:
+warning: axiom is_uint16_lsr does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 394, characters 8-26:
+warning: axiom is_uint16_lsl1_inf does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 397, characters 8-26:
+warning: axiom is_uint16_lsl1_sup does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 401, characters 8-22:
+warning: axiom is_uint32_lxor does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 404, characters 8-21:
+warning: axiom is_uint32_lor does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 407, characters 8-22:
+warning: axiom is_uint32_land does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 410, characters 8-21:
+warning: axiom is_uint32_lsr does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 413, characters 8-26:
+warning: axiom is_uint32_lsl1_inf does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 416, characters 8-26:
+warning: axiom is_uint32_lsl1_sup does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 420, characters 8-22:
+warning: axiom is_uint64_lxor does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 423, characters 8-21:
+warning: axiom is_uint64_lor does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 426, characters 8-22:
+warning: axiom is_uint64_land does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 429, characters 8-21:
+warning: axiom is_uint64_lsr does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 432, characters 8-26:
+warning: axiom is_uint64_lsl1_inf does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 435, characters 8-26:
+warning: axiom is_uint64_lsl1_sup does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 462, characters 8-21:
+warning: axiom is_sint8_lnot does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 465, characters 8-21:
+warning: axiom is_sint8_lxor does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 468, characters 8-20:
+warning: axiom is_sint8_lor does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 471, characters 8-21:
+warning: axiom is_sint8_land does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 474, characters 8-20:
+warning: axiom is_sint8_lsr does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 477, characters 8-21:
+warning: axiom is_sint8_lsl1 does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 480, characters 8-25:
+warning: axiom is_sint8_lsl1_inf does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 483, characters 8-25:
+warning: axiom is_sint8_lsl1_sup does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 487, characters 8-22:
+warning: axiom is_sint16_lnot does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 490, characters 8-22:
+warning: axiom is_sint16_lxor does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 493, characters 8-21:
+warning: axiom is_sint16_lor does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 496, characters 8-22:
+warning: axiom is_sint16_land does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 499, characters 8-21:
+warning: axiom is_sint16_lsr does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 502, characters 8-22:
+warning: axiom is_sint16_lsl1 does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 505, characters 8-26:
+warning: axiom is_sint16_lsl1_inf does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 508, characters 8-26:
+warning: axiom is_sint16_lsl1_sup does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 512, characters 8-22:
+warning: axiom is_sint32_lnot does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 515, characters 8-22:
+warning: axiom is_sint32_lxor does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 518, characters 8-21:
+warning: axiom is_sint32_lor does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 521, characters 8-22:
+warning: axiom is_sint32_land does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 524, characters 8-21:
+warning: axiom is_sint32_lsr does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 527, characters 8-22:
+warning: axiom is_sint32_lsl1 does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 530, characters 8-26:
+warning: axiom is_sint32_lsl1_inf does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 533, characters 8-26:
+warning: axiom is_sint32_lsl1_sup does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 537, characters 8-22:
+warning: axiom is_sint64_lnot does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 540, characters 8-22:
+warning: axiom is_sint64_lxor does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 543, characters 8-21:
+warning: axiom is_sint64_lor does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 546, characters 8-22:
+warning: axiom is_sint64_land does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 549, characters 8-21:
+warning: axiom is_sint64_lsr does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 552, characters 8-22:
+warning: axiom is_sint64_lsl1 does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 555, characters 8-26:
+warning: axiom is_sint64_lsl1_inf does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 558, characters 8-26:
+warning: axiom is_sint64_lsl1_sup does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 583, characters 8-20:
+warning: axiom lor_addition does not contain any local abstract symbol
+File "WP-SHARE/src/./cbits.why", line 586, characters 8-21:
+warning: axiom lxor_addition does not contain any local abstract symbol
+>>>>>>> origin/master

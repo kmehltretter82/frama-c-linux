@@ -490,22 +490,6 @@ type error =
   | Error_No
   | Error_Generated of Lexing.position * string
 
-let rec split spec i =
-  try
-    let j = String.index_from spec i ':' in
-    if j > i then
-      String.sub spec i (j-i) :: split spec (succ j)
-    else
-      split spec (succ j)
-  with Not_found ->
-    let n = String.length spec - i in
-    if n > 0 then [ String.sub spec i n ] else []
-
-let chop_version spec = match split spec 0 with
-  | [] | [_] -> spec
-  | [a;b] -> Printf.sprintf "%s,%s," a b
-  | a::b::c::_ -> Printf.sprintf "%s,%s,%s" a b c
-
 class why3 ~timeout ~prover ~pid ~file ~includes ~logout ~logerr =
   object(why)
 
@@ -570,7 +554,7 @@ class why3 ~timeout ~prover ~pid ~file ~includes ~logout ~logerr =
       why#add ["--extra-config"; Wp_parameters.Share.file "why3/why3.conf"];
       why#add (Wp_parameters.WhyFlags.get ()) ;
       why#add [ file.file ] ;
-      why#add ["-P";chop_version prover];
+      why#add ["-P";Why3.Whyconf.prover_parseable_format prover];
       why#add ["-T";file.theory];
       why#add ["-G";file.goal];
       why#add_positive ~name:"-t" ~value:time ;

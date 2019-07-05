@@ -473,7 +473,7 @@ let prove_file ~config ~pid ~mode ~file ~lines ~logout ~logerr =
   | r -> Task.return r
 
 let prove_prop ~config ~pid ~mode ~model ~axioms ~prop =
-  let prover = AltErgo in
+  let prover = NativeAltErgo in
   let file = DISK.file_goal ~pid ~model ~prover in
   let logout = DISK.file_logout ~pid ~model ~prover in
   let logerr = DISK.file_logerr ~pid ~model ~prover in

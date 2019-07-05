@@ -124,10 +124,10 @@ class pane (enabled : GuiConfig.enabled) =
           );
         layout#populate (Wbox.panel ~top:toolbar content#widget) ;
         provers <-
-          VCS.([ new GuiProver.prover ~console:text ~prover:AltErgo ] @
+          VCS.([ new GuiProver.prover ~console:text ~prover:NativeAltErgo ] @
                List.map
-                 (fun dp -> new GuiProver.prover text (Why3 dp))
-                 enabled#get) ;
+                 (fun dp -> new GuiProver.prover text (VCS.Why3 dp))
+                 (Why3.Whyconf.Sprover.elements enabled#get)) ;
         List.iter (fun p -> palette#add_tool p#tool) provers ;
         palette#add_tool strategies#tool ;
         Strategy.iter strategies#register ;
@@ -137,7 +137,7 @@ class pane (enabled : GuiConfig.enabled) =
              tactics <- gtac :: tactics ;
              palette#add_tool gtac#tool) ;
         tactics <- List.rev tactics ;
-        self#register_provers enabled#get ;
+        self#register_provers enabled#get;
         printer#on_selection (fun () -> self#update) ;
         scripter#on_click self#goto ;
         scripter#on_backtrack self#backtrack ;
@@ -255,7 +255,7 @@ class pane (enabled : GuiConfig.enabled) =
       | Proof p ->
           ProofEngine.reset p ;
           ProverScript.spawn
-            ~provers:[ VCS.AltErgo ]
+            ~provers:[ VCS.NativeAltErgo ]
             ~result:
               (fun wpo prv res ->
                  text#printf "[%a] %a : %a@."
@@ -292,6 +292,7 @@ class pane (enabled : GuiConfig.enabled) =
     method private register_provers dps =
       begin
         (* register missing provers *)
+        let dps = Why3.Whyconf.Sprover.elements dps in
         let prvs = List.map (fun p -> VCS.Why3 p) dps in
         (* set visible provers *)
         List.iter
@@ -573,7 +574,7 @@ class pane (enabled : GuiConfig.enabled) =
     method private fork proof fork =
       Wutil.later
         begin fun () ->
-          let provers = VCS.[ BatchMode, AltErgo ] in
+          let provers = VCS.[ BatchMode, NativeAltErgo ] in
           let pool = Task.pool () in
           ProofEngine.iter (self#schedule pool provers) fork ;
           let server = ProverTask.server () in
@@ -616,7 +617,7 @@ class pane (enabled : GuiConfig.enabled) =
                 begin
                   ProverScript.search
                     ~depth ~width ~auto
-                    ~provers:[ VCS.AltErgo ]
+                    ~provers:[ VCS.NativeAltErgo ]
                     ~result:
                       (fun wpo prv res ->
                          text#printf "[%a] %a : %a@."

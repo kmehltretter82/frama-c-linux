@@ -45,12 +45,12 @@ let a_addr = Lang.datatype ~library "addr"
 let t_addr = L.Data(a_addr,[])
 let f_base   = Lang.extern_f ~library ~result:L.Int
     ~link:{altergo = Qed.Engine.F_subst("%1.base");
-           why3    = Qed.Engine.F_subst("%1.base");
+           why3    = Qed.Engine.F_call("base");
            coq     = Qed.Engine.F_subst("(base %1)");
           } "base"
 let f_offset = Lang.extern_f ~library ~result:L.Int
     ~link:{altergo = Qed.Engine.F_subst("%1.offset");
-           why3    = Qed.Engine.F_subst("%1.offset");
+           why3    = Qed.Engine.F_call("offset");
            coq     = Qed.Engine.F_subst("(offset %1)");
           } "offset"
 let f_shift  = Lang.extern_f ~library ~result:t_addr "shift"
@@ -340,7 +340,7 @@ let r_havoc = function
 *)
 let r_get_havoc = function
   | [undef;m;p;a] ->
-      (fun k ->
+      (fun _ k ->
          match is_separated [p;a;k;e_one] with
          | L.Yes -> F.e_get m k
          | L.No  -> F.e_get undef k

@@ -20,15 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* generated automatically at developer compilation time *)
-theory qed.Qed meta "realized_theory" "qed.Qed", "Qed" end
-theory cmath.Cmath meta "realized_theory" "cmath.Cmath", "Cmath" end
-theory square.Square meta "realized_theory" "square.Square", "Square" end
-theory explog.ExpLog meta "realized_theory" "explog.ExpLog", "ExpLog" end
-theory arctrigo.ArcTrigo meta "realized_theory" "arctrigo.ArcTrigo", "ArcTrigo" end
-theory cint.Cint meta "realized_theory" "cint.Cint", "Cint" end
-theory cbits.Cbits meta "realized_theory" "cbits.Cbits", "Cbits" end
-theory memory.Memory meta "realized_theory" "memory.Memory", "Memory" end
-theory vset.Vset meta "realized_theory" "vset.Vset", "Vset" end
-theory cfloat.Cfloat meta "realized_theory" "cfloat.Cfloat", "Cfloat" end
-theory vlist.Vlist meta "realized_theory" "vlist.Vlist", "Vlist" end
+val remove_for_altergo : Why3.Task.task Why3.Trans.trans
+val remove_for_why3    : Why3.Task.task Why3.Trans.trans
+val trans              : Why3.Task.task Why3.Trans.trans
+val def_into_axiom     : Why3.Task.task Why3.Trans.trans

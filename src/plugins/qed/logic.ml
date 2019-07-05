@@ -291,8 +291,8 @@ sig
   val e_set   : term -> term -> term -> term
   val e_getfield : term -> Field.t -> term
   val e_record : record -> term
-  val e_fun : Fun.t -> term list -> term
-  val e_repr : repr -> term
+  val e_fun : ?result:tau -> Fun.t -> term list -> term
+  val e_repr : ?result:tau -> repr -> term
   (** @raise Invalid_argument on [Bvar] and [Bind] *)
 
   (** {3 Quantifiers and Binding} *)
@@ -430,6 +430,8 @@ sig
         Recursive calls must be performed on strictly smaller terms.
   *)
 
+  val set_builtin' : Fun.t -> (term list -> tau option -> term) -> unit
+
   val set_builtin_map : Fun.t -> (term list -> term list) -> unit
   (** Register a builtin for rewriting [f a1..an] into [f b1..bm].
 
@@ -437,9 +439,10 @@ sig
       to run into an infinite loop.
   *)
 
-  val set_builtin_get : Fun.t -> (term list -> term -> term) -> unit
+  val set_builtin_get : Fun.t -> (term list -> tau option -> term -> term) -> unit
   (** [set_builtin_get f rewrite] register a builtin
       for rewriting [(f a1..an)[k]] into [rewrite (a1..an) k].
+      The type given is the type of (f a1..an).
   *)
 
   val set_builtin_eq : Fun.t -> (term -> term -> term) -> unit

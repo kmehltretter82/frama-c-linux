@@ -139,6 +139,7 @@ let failed text =
     (Format.formatter_of_buffer buffer) text
 
 let bind = Monad.bind
+let async = Monad.async
 
 let sequence a k = 
   Monad.bind a (function

@@ -1527,6 +1527,10 @@ src/plugins/wp/clabels.mli: CEA_WP
 src/plugins/wp/configure.ac: CEA_WP
 src/plugins/wp/ctypes.ml: CEA_WP
 src/plugins/wp/ctypes.mli: CEA_WP
+src/plugins/wp/filter_axioms.ml: CEA_WP
+src/plugins/wp/filter_axioms.mli: CEA_WP
+src/plugins/wp/why3_api.mli: CEA_WP
+src/plugins/wp/why3_api.ml: CEA_WP
 src/plugins/wp/doc/MakeDoc: .ignore
 src/plugins/wp/doc/coqdoc/Makefile: .ignore
 src/plugins/wp/doc/coqdoc/coqdoc.sty: .ignore
@@ -1814,10 +1818,12 @@ src/plugins/wp/share/coqwp/Zbits.v: CEA_WP
 src/plugins/wp/share/coqwp/bool/Bool.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/int/Abs.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/int/ComputerDivision.v: UNMODIFIED_WHY3
+src/plugins/wp/share/coqwp/int/EuclideanDivision.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/int/Exponentiation.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/int/Int.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/int/MinMax.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/int/Power.v: UNMODIFIED_WHY3
+src/plugins/wp/share/coqwp/for_drivers/ComputerOfEuclideanDivision.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/map/Map.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/map/Const.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/real/Abs.v: UNMODIFIED_WHY3
@@ -1904,7 +1910,6 @@ src/plugins/wp/share/src/upper.ml: .ignore
 src/plugins/wp/share/src/vlist.why: CEA_WP
 src/plugins/wp/share/src/vset.why: CEA_WP
 src/plugins/wp/share/src/why3-realize.drv: .ignore
-src/plugins/wp/share/src/why3printer_realize.ml: MODIFIED_WHY3
 src/plugins/wp/share/why3/ArcTrigo.v: CEA_WP
 src/plugins/wp/share/why3/ArcTrigo.why: CEA_WP
 src/plugins/wp/share/why3/Bits.v: CEA_WP
@@ -1931,6 +1936,14 @@ src/plugins/wp/share/why3/Vset.v: CEA_WP
 src/plugins/wp/share/why3/Vset.why: CEA_WP
 src/plugins/wp/share/why3/Zbits.v: CEA_WP
 src/plugins/wp/share/why3/coq.drv: CEA_WP
+src/plugins/wp/share/why3/frama_c_wp/cbits.mlw: CEA_WP
+src/plugins/wp/share/why3/frama_c_wp/cfloat.mlw: CEA_WP
+src/plugins/wp/share/why3/frama_c_wp/cint.mlw: CEA_WP
+src/plugins/wp/share/why3/frama_c_wp/cmath.mlw: CEA_WP
+src/plugins/wp/share/why3/frama_c_wp/memory.mlw: CEA_WP
+src/plugins/wp/share/why3/frama_c_wp/qed.mlw: CEA_WP
+src/plugins/wp/share/why3/frama_c_wp/vlist.mlw: CEA_WP
+src/plugins/wp/share/why3/frama_c_wp/vset.mlw: CEA_WP
 src/plugins/wp/share/wp.driver: CEA_WP
 src/plugins/wp/share/wpcoqdoc.zip: .ignore
 src/plugins/wp/why3_xml.mli: MODIFIED_WHY3

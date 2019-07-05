@@ -12,10 +12,13 @@
   Require Import ZArith.
   Require Import Reals.
   Require Import BuiltIn.
+  Require Import bool.Bool.
   Require Import HighOrd.
   Require Import int.Int.
   Require Import int.Abs.
   Require Import int.ComputerDivision.
+  Require Import int.EuclideanDivision.
+  Require Import for_drivers.ComputerOfEuclideanDivision.
   Require Import real.Real.
   Require Import real.RealInfix.
   Require Import real.FromInt.
@@ -36,10 +39,13 @@
   Require Import ZArith.
   Require Import Reals.
   Require Import BuiltIn.
+  Require Import bool.Bool.
   Require Import HighOrd.
   Require Import int.Int.
   Require Import int.Abs.
   Require Import int.ComputerDivision.
+  Require Import int.EuclideanDivision.
+  Require Import for_drivers.ComputerOfEuclideanDivision.
   Require Import real.Real.
   Require Import real.RealInfix.
   Require Import real.FromInt.
@@ -84,10 +90,13 @@
   Require Import ZArith.
   Require Import Reals.
   Require Import BuiltIn.
+  Require Import bool.Bool.
   Require Import HighOrd.
   Require Import int.Int.
   Require Import int.Abs.
   Require Import int.ComputerDivision.
+  Require Import int.EuclideanDivision.
+  Require Import for_drivers.ComputerOfEuclideanDivision.
   Require Import real.Real.
   Require Import real.RealInfix.
   Require Import real.FromInt.
