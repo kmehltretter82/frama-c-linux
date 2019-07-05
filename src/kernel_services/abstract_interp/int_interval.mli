@@ -87,4 +87,4 @@ val subdivide: t -> t * t
 val reduce_sign: t -> bool -> t or_bottom
 val reduce_bit: int -> t -> bool -> t or_bottom
 
-val fold_int: (Integer.t -> 'a -> 'a) -> t -> 'a -> 'a
+val fold_int: ?increasing:bool -> (Integer.t -> 'a -> 'a) -> t -> 'a -> 'a

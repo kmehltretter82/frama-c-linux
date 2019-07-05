@@ -75,7 +75,7 @@ val cardinal: t -> int
 val for_all: (Integer.t -> bool) -> t -> bool
 val exists: (Integer.t -> bool) -> t -> bool
 val iter: (Integer.t -> unit) -> t -> unit
-val fold: ('a -> Integer.t -> 'a) -> 'a -> t -> 'a
+val fold: ?increasing:bool -> (Integer.t -> 'a -> 'a) -> t -> 'a -> 'a
 val map: (Integer.t -> Integer.t) -> t -> t
 val filter: (Integer.t -> bool) -> t -> t or_bottom
 val map_reduce: (Integer.t -> 'a) -> ('a -> 'a -> 'a) -> t -> 'a

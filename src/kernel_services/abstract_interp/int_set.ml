@@ -148,7 +148,10 @@ let for_all f (a : Integer.t array) =
 let exists = Extlib.array_exists
 
 let iter = Array.iter
-let fold = Array.fold_left
+let fold ?(increasing=true) =
+  if increasing
+  then fun f array acc -> Array.fold_left (fun acc x -> f x acc) acc array
+  else Array.fold_right
 
 let truncate_no_bottom r i =
   assert (i > 0);

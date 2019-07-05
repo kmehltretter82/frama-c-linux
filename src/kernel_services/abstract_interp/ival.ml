@@ -398,6 +398,12 @@ let fold_int f v acc =
   | Float _ -> raise Error_Top
   | Int i -> Int_val.fold_int f i acc
 
+let fold_int_decrease f v acc =
+  match v with
+  | Bottom -> acc
+  | Float _ -> raise Error_Top
+  | Int i -> Int_val.fold_int ~increasing:false f i acc
+
 let fold_enum f v acc =
   match v with
   | Bottom -> acc

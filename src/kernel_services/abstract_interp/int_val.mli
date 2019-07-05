@@ -173,9 +173,10 @@ val all_values: size:Integer.t -> t -> bool
 
 val overlaps: partial:bool -> size:Integer.t -> t -> t -> bool
 
-(** Iterates on all integers represented by an abstraction.
+(** Iterates on all integers represented by an abstraction, in increasing order
+    by default. If [increasing] is set to false, iterate by decreasing order.
     @raise Abstract_interp.Error_Top if the abstraction is unbounded. *)
-val fold_int: (Integer.t -> 'a -> 'a) -> t -> 'a -> 'a
+val fold_int: ?increasing:bool -> (Integer.t -> 'a -> 'a) -> t -> 'a -> 'a
 
 (** Low-level operation for demarshalling *)
 val rehash: t -> t

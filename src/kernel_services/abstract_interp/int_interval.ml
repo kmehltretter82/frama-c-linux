@@ -415,10 +415,12 @@ let cardinal_zero_or_one t =
 let diff v _ = `Value v
 let diff_if_one v _ = `Value v
 
-let fold_int f t acc =
+let fold_int ?(increasing=true) f t acc =
   match t.min, t.max with
   | None, _ | _, None -> raise Error_Top
-  | Some inf, Some sup -> Int.fold f ~inf ~sup ~step:t.modu acc
+  | Some inf, Some sup ->
+    let step = if increasing then t.modu else Int.neg t.modu in
+    Int.fold f ~inf ~sup ~step acc
 
 let fold_enum f v acc =
   fold_int (fun x acc -> f (inject_singleton x) acc) v acc

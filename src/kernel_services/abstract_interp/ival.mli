@@ -187,6 +187,11 @@ val fold_int : (Integer.t -> 'a -> 'a) -> t -> 'a -> 'a
     Raise {!Abstract_interp.Error_Top} if the argument is a float or a
     potentially infinite integer. *)
 
+val fold_int_decrease : (Integer.t -> 'a -> 'a) -> t -> 'a -> 'a
+(** Iterate on the integer values of the ival in decreasing order.
+    Raise {!Abstract_Interp.Error_Top} if the argument is a float or a
+    potentially infinite integer. *)
+
 val fold_enum : (t -> 'a -> 'a) -> t -> 'a -> 'a
 (** Iterate on every value of the ival. Raise {!Abstract_intrep.Error_Top} if
     the argument is a non-singleton float or a potentially infinite integer. *)

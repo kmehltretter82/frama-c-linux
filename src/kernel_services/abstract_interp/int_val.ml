@@ -192,12 +192,12 @@ let make_top_from_set s =
   let min = Int_set.min s in
   let modu =
     Int_set.fold
-      (fun acc x ->
+      (fun x acc ->
          if Int.equal x min
          then acc
          else Int.pgcd (Int.sub x min) acc)
-      Int.zero
       s
+      Int.zero
   in
   let rem = Int.e_rem min modu in
   let max = Some (Int_set.max s) in
@@ -243,10 +243,10 @@ let contains_non_zero = function
   | Itv _ -> true (* at least two values *)
   | Set _ as s -> not (is_zero s)
 
-let fold_int f v acc =
+let fold_int ?(increasing=true) f v acc =
   match v with
-  | Itv i -> Int_interval.fold_int f i acc
-  | Set s -> Int_set.fold (fun acc x -> f x acc) acc s
+  | Itv i -> Int_interval.fold_int ~increasing f i acc
+  | Set s -> Int_set.fold ~increasing f s acc
 
 let fold_enum f v acc = fold_int (fun x acc -> f (inject_singleton x) acc) v acc
 
@@ -385,8 +385,8 @@ let join v1 v2 =
       let l = Int_set.cardinal s in
       if l = 0 then t
       else
-        let f modu elt = Int.pgcd modu (Int.abs (Int.sub r elt)) in
-        let modu = Int_set.fold f modu s in
+        let f elt modu = Int.pgcd modu (Int.abs (Int.sub r elt)) in
+        let modu = Int_set.fold f s modu in
         let rem = Int.e_rem r modu in
         let min = match min with
             None -> None
@@ -527,9 +527,9 @@ let div x y =
   match y with
   | Set sy ->
     Int_set.fold
-      (fun acc elt ->
+      (fun elt acc ->
          Bottom.join join acc (scale_div_or_bottom ~pos:false elt x))
-      `Bottom sy
+      sy `Bottom
   | Itv iy -> Int_interval.div (make_range x) iy >>-: inject_itv
 
 (* [scale_rem ~pos:false f v] is an over-approximation of the set of
@@ -550,10 +550,10 @@ let c_rem x y =
     match x with
     | Set xx -> inject_set_or_top_or_bottom (Int_set.c_rem xx yy)
     | Itv _ ->
-      let f acc y =
+      let f y acc =
         Bottom.join join (scale_rem_or_bottom ~pos:false y x) acc
       in
-      Int_set.fold f `Bottom yy
+      Int_set.fold f yy `Bottom
 
 (** Computes [x (op) ({y >= 0} * 2^n)], as an auxiliary function for
     [shift_left] and [shift_right]. [op] and [scale] must verify
