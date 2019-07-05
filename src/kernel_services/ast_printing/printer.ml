@@ -157,7 +157,11 @@ class printer_with_annot () = object (self)
       let comments = Globals.get_comments_global glob in
       Pretty_utils.pp_list
         ~sep:"@\n" ~suf:"@\n"
-        (fun fmt s -> Format.fprintf fmt "/* %s */" s) fmt comments
+        (fun fmt s ->
+           if not (String.contains s '\n') then
+             Format.fprintf fmt "// %s" s
+           else Format.fprintf fmt "/* %s */" s
+        ) fmt comments
     end;
     (* Out of tree global annotations are pretty printed before the first
        variable declaration of the first function definition. *)
@@ -200,8 +204,12 @@ class printer_with_annot () = object (self)
       let comments = Globals.get_comments_stmt s in
       if comments <> [] then
         Pretty_utils.pp_list ~sep:"@\n" ~suf:"@]@\n"
-          (fun fmt s -> Format.fprintf fmt "@[/* %s */@]" s)
-          fmt comments
+          (fun fmt s ->
+             if not (String.contains s '\n') then
+               Format.fprintf fmt "@[// %s@]" s
+             else
+               Format.fprintf fmt "@[/* %s */@]" s
+          ) fmt comments
     end;
     if verbose || Kernel.is_debug_key_enabled Kernel.dkey_print_sid then
       Format.fprintf fmt "@[/* sid:%d */@]@\n" s.sid ;
