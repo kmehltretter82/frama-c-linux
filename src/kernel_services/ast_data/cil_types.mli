@@ -1665,7 +1665,13 @@ and spec = {
     grammar ambiguous.
 
     @plugin development guide *)
-and acsl_extension = int * string * location * bool * acsl_extension_kind
+and acsl_extension = {
+    ext_id : int;
+    ext_name : string;
+    ext_loc : location;
+    ext_has_status : bool;
+    ext_kind : acsl_extension_kind
+}
 
 (** @plugin development guide *)
 and acsl_extension_kind =

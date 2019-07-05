@@ -212,7 +212,7 @@ let pp_active fmt active =
 let pp_capitalize fmt s =
   Format.pp_print_string fmt (Transitioning.String.capitalize_ascii s)
 
-let pp_acsl_extension fmt (_,s,_,_,_) = pp_capitalize fmt s
+let pp_acsl_extension fmt {ext_name} = pp_capitalize fmt ext_name
 
 let rec pp_prop kfopt kiopt kloc fmt = function
   | IPAxiom (s,_,_,_,_) -> Format.fprintf fmt "Axiom '%s'" s
@@ -232,10 +232,10 @@ let rec pp_prop kfopt kiopt kloc fmt = function
       pp_predicate kind
       (pp_idpred kloc) idpred
       (pp_kinstr kloc) ki
-  | IPExtended(le,(_,_,loc,_,_ as ext)) ->
+  | IPExtended(le,ext) ->
     Format.fprintf fmt "%a%a"
       pp_acsl_extension ext
-      (pp_extended_loc kfopt kiopt kloc) (loc,le)
+      (pp_extended_loc kfopt kiopt kloc) (ext.ext_loc,le)
   | IPBehavior(_,ki, active, bhv) ->
     if Cil.is_default_behavior bhv then
       Format.fprintf fmt "Default behavior%a%a"
@@ -268,9 +268,9 @@ let rec pp_prop kfopt kiopt kloc fmt = function
       pp_for bs
       pp_named np
       (pp_kloc kloc) np.pred_loc
-  | IPCodeAnnot(_,stmt,{annot_content=AExtended(bs,_,(_,clause,_,_,_))}) ->
+  | IPCodeAnnot(_,stmt,{annot_content=AExtended(bs,_,{ext_name})}) ->
     Format.fprintf fmt "%a%a %a"
-      pp_capitalize clause pp_for bs (pp_stmt kloc) stmt
+      pp_capitalize ext_name pp_for bs (pp_stmt kloc) stmt
   | IPCodeAnnot(_,stmt,_) ->
     Format.fprintf fmt "Annotation %a" (pp_stmt kloc) stmt
   | IPAllocation(kf,Kglobal,Id_contract (_,bhv),(frees,allocates)) ->
@@ -498,10 +498,10 @@ let rec ip_order = function
   | IPPropertyInstance (kf, s, _, ip) -> [I 18; F kf; K (Kstmt s)] @ ip_order ip
   | IPTypeInvariant(a,_,_,_) -> [I 19; S a]
   | IPGlobalInvariant(a,_,_) -> [I 20; S a]
-  | IPExtended(ELContract kf,(_,n,_,_,_)) -> [I 21;F kf; S n]
-  | IPExtended(ELStmt (kf, stmt), (_,n,_,_,_)) ->
-    [ I 22; F kf; K (Kstmt stmt); S n]
-  | IPExtended(ELGlob, (_,n,_,_,_)) -> [ I 23; S n]
+  | IPExtended(ELContract kf, {ext_name}) -> [I 21;F kf; S ext_name]
+  | IPExtended(ELStmt (kf, stmt), {ext_name}) ->
+    [ I 22; F kf; K (Kstmt stmt); S ext_name]
+  | IPExtended(ELGlob, {ext_name}) -> [ I 23; S ext_name]
 
 let pp_compare p q = cmp (ip_order p) (ip_order q)
 

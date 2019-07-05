@@ -733,8 +733,8 @@ let synchronize_source_annot has_new_stmt kf =
           match annot.annot_content with
           | AStmtSpec _ | APragma (Slice_pragma SPstmt | Impact_pragma IPstmt)
             -> true
-          | AExtended(_,is_loop,(_,name,_,_,_)) ->
-            (match Logic_env.extension_category name with
+          | AExtended(_,is_loop,{ext_name}) ->
+            (match Logic_env.extension_category ext_name with
              | Some (Ext_code_annot (Ext_here | Ext_next_loop)) -> false
              | Some (Ext_code_annot Ext_next_stmt) -> true
              | Some (Ext_code_annot Ext_next_both) -> not is_loop

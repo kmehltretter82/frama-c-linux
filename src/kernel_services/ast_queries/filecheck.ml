@@ -612,8 +612,8 @@ class check ?(is_normalized=true) what : Visitor.frama_c_visitor =
       in
       let my_labels =
         match ca.annot_content with
-        | AExtended (_, is_loop, (_, name, _, _, _)) ->
-          (match Logic_env.extension_category name, is_loop with
+        | AExtended (_, is_loop, {ext_name}) ->
+          (match Logic_env.extension_category ext_name, is_loop with
            | Some (Ext_code_annot (Ext_next_stmt | Ext_next_both)), false ->
              Logic_const.post_label :: my_labels
            | Some (Ext_code_annot Ext_here), false -> my_labels
@@ -624,18 +624,18 @@ class check ?(is_normalized=true) what : Visitor.frama_c_visitor =
              Kernel.(
                warning ~wkey:wkey_acsl_extension
                  "%s is a code annotation extension, \
-                  but used as a loop annotation" name);
+                  but used as a loop annotation" ext_name);
              my_labels
            | Some (Ext_code_annot (Ext_next_loop)), false ->
              Kernel.(
                warning ~wkey:wkey_acsl_extension
                  "%s is a loop annotation extension, \
-                  but used as a code annotation" name;
+                  but used as a code annotation" ext_name;
                my_labels)
            | (Some (Ext_contract | Ext_global) | None), _ ->
              Kernel.(
                warning ~wkey:wkey_acsl_extension
-                 "%s is not a known code annotation extension" name);
+                 "%s is not a known code annotation extension" ext_name);
              my_labels)
         | AAssert _ | AStmtSpec _ | AInvariant _ | AVariant _
         | AAssigns _ | AAllocation _ | APragma _ -> my_labels

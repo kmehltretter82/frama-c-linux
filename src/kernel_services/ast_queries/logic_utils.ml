@@ -1002,10 +1002,10 @@ let is_same_pragma p1 p2 =
   | Impact_pragma p1, Impact_pragma p2 -> is_same_impact_pragma p1 p2
   | (Loop_pragma _ | Slice_pragma _ | Impact_pragma _), _ -> false
 
-let is_same_extension (_,e1,_,s1,c1) (_,e2,_,s2,c2) =
-  Datatype.String.equal e1 e2 &&
-  (s1 = s2) &&
-  match c1, c2 with
+let is_same_extension x1 x2 =
+  Datatype.String.equal x1.ext_name x2.ext_name &&
+  (x1.ext_has_status = x2.ext_has_status) &&
+  match x1.ext_kind, x2.ext_kind with
   | Ext_id i1, Ext_id i2 -> i1 = i2
   | Ext_terms t1, Ext_terms t2 ->
     is_same_list is_same_term t1 t2

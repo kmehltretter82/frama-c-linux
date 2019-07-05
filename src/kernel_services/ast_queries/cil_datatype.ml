@@ -1992,8 +1992,8 @@ module Global_annotation = struct
             if res = 0 then Attributes.compare attr1 attr2 else res
           | Dcustom_annot _, _ -> -1
           | _, Dcustom_annot _ -> 1
-          | Dextended ((id1,_,_,_,_),_,_), Dextended((id2,_,_,_,_),_,_) ->
-            Datatype.Int.compare id1 id2
+          | Dextended (ext1, _, _), Dextended (ext2, _, _) ->
+            Datatype.Int.compare ext1.ext_id ext2.ext_id
 
       let equal = Datatype.from_compare
 
@@ -2012,7 +2012,7 @@ module Global_annotation = struct
         | Dtype_annot(l,_) -> 17 * Logic_info.hash l
         | Dmodel_annot(l,_) -> 19 * Model_info.hash l
         | Dcustom_annot(_,n,_,_) -> 23 * Datatype.String.hash n
-        | Dextended ((id,_,_,_,_),_,_) -> 29 * Datatype.Int.hash id
+        | Dextended ({ext_id},_,_) -> 29 * Datatype.Int.hash ext_id
 
       let copy = Datatype.undefined
      end)

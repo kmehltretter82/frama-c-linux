@@ -461,22 +461,20 @@ module ExtMerging =
   Merging
     (struct
       type t = acsl_extension
-      let hash ((_,name,_,_,kind) : acsl_extension) =
-        Datatype.String.hash name + 5 * hash_ext_kind kind
-      let compare
-          ((_,name1,_,s1,kind1) : acsl_extension)
-          ((_,name2,_,s2,kind2) : acsl_extension) =
-        let res = Datatype.String.compare name1 name2 in
+      let hash (e : acsl_extension) =
+        Datatype.String.hash e.ext_name + 5 * hash_ext_kind e.ext_kind
+      let compare (e1 : acsl_extension) (e2 : acsl_extension) =
+        let res = Datatype.String.compare e1.ext_name e2.ext_name in
         if res <> 0 then res
         else
-          let res = Datatype.Bool.compare s1 s2 in
+          let res = Datatype.Bool.compare e1.ext_has_status e2.ext_has_status in
           if res <> 0 then res
           else
-            compare_ext_kind kind1 kind2
+            compare_ext_kind e1.ext_kind e2.ext_kind
       let equal x y = compare x y = 0
       let merge_synonym _ = true
-      let output fmt (_,name,_,_,_) =
-        Format.fprintf fmt "global ACSL extension %s" name
+      let output fmt {ext_name} =
+        Format.fprintf fmt "global ACSL extension %s" ext_name
     end)
 
 type volatile_kind = R | W

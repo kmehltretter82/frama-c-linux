@@ -42,13 +42,13 @@ module Behavior_extensions = struct
     | Ext_preds preds ->
       Pretty_utils.pp_list ~sep:",@ " printer#predicate fmt preds
 
-  let pp (printer) fmt (_,name,_,_,ext) =
+  let pp (printer) fmt {ext_name; ext_kind} =
     let pp =
       try
-        Hashtbl.find printer_tbl name
+        Hashtbl.find printer_tbl ext_name
       with Not_found -> default_pp
     in
-    Format.fprintf fmt "@[<hov 2>%s %a;@]" name (pp printer) ext
+    Format.fprintf fmt "@[<hov 2>%s %a;@]" ext_name (pp printer) ext_kind
 
 end
 let register_behavior_extension = Behavior_extensions.register
