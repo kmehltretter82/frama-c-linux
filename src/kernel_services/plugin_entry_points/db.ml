@@ -825,18 +825,6 @@ module Pdg = struct
 end
 
 (* ************************************************************************* *)
-(** {2 Spare Code} *)
-(* ************************************************************************* *)
-
-(** Detection of the unused code of an application. *)
-module Sparecode = struct
-  let get =
-    ref (fun ~select_annot:_  -> mk_labeled_fun "Sparecode.run")
-  let rm_unused_globals =
-    ref (fun ?new_proj_name:_ -> mk_labeled_fun "Sparecode.rm_unused_globals")
-end
-
-(* ************************************************************************* *)
 (** {2 Properties} *)
 (* ************************************************************************* *)
 
