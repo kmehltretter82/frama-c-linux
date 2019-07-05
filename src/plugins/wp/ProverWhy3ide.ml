@@ -85,7 +85,12 @@ let parse_prover env e =
     let id = List.assoc "id" e.attributes in
     let name = List.assoc "name" e.attributes in
     let version = List.assoc "version" e.attributes in
-    let prover = VCS.Why3 (Printf.sprintf "%s:%s" name version) in
+    let prover = VCS.Why3 {
+        Why3.Whyconf.prover_name = name;
+        Why3.Whyconf.prover_version = version;
+        Why3.Whyconf.prover_altern = "";
+      }
+    in
     env.provers <- (id , prover) :: env.provers
   with Not_found ->
     Wp_parameters.warning "[why3] Skipped %a" Xml.pretty e

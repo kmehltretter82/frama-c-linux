@@ -20,10 +20,15 @@
 (*                                                                        *)
 (**************************************************************************)
 
-theory ExpLog
-use real.Real as Real
-use real.ExpLog as ExpLog
+val add_specific_equality:
+  for_tau:(Lang.tau -> bool) ->
+  mk_new_eq:Lang.F.binop ->
+  unit
+(** equality used in the goal, simpler to prove than polymorphic equality *)
 
-lemma exp_pos : forall x:real. (Real.(>) (ExpLog.exp x) (0.))
+val version : string
 
-end
+val prove : ?timeout:int -> ?steplimit:int -> prover:VCS.Why3_prover.t -> Wpo.t -> VCS.result Task.task
+(** Return NoResult if it is already proved by Qed *)
+
+val parse_why3_options : unit -> unit

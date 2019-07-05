@@ -774,8 +774,7 @@ struct
 
   let e_vars e = List.sort Var.compare (Vars.elements (vars e))
   let p_vars = e_vars
-
-  let p_call = e_fun
+  let p_call = e_fun ~result:Prop
   let p_close p = p_forall (p_vars p) p
 
   let occurs x t = Vars.mem x (vars t)
@@ -831,6 +830,9 @@ struct
 
   let set_builtin_2 f r =
     set_builtin f (function [a;b] -> r a b | _ -> raise Not_found)
+
+  let set_builtin_2' f r =
+    set_builtin' f (function [a;b] -> r a b | _ -> raise Not_found)
 
   let set_builtin_eqp = set_builtin_eq
 
@@ -965,6 +967,44 @@ let variables g = List.rev g.vars
 
 let get_hypotheses () = (Context.get cgamma).hyps
 let get_variables () = (Context.get cgamma).vars
+
+(** For why3_api but circular dependency *)
+
+module For_export = struct
+
+  type specific_equality = {
+    for_tau:(tau -> bool);
+    mk_new_eq:F.binop;
+  }
+
+  (** delay the create at most as possible (due to constants handling in qed) *)
+  let state = ref None
+
+  let init = ref (fun () -> ())
+
+  let add_init f =
+    let old = !init in
+    init := (fun () -> old (); f ())
+
+  let get_state () =
+    match !state with
+    | None ->
+        let st = QZERO.create () in
+        QZERO.in_state st !init ();
+        state := Some st;
+        st
+    | Some st -> st
+
+  let rebuild ?cache t = QZERO.rebuild_in_state (get_state ()) ?cache t
+
+  let set_builtin f c =
+    add_init (fun () -> QZERO.set_builtin f c)
+  let set_builtin' f c =
+    add_init (fun () -> QZERO.set_builtin' f c)
+
+  let in_state f v = QZERO.in_state (get_state ()) f v
+
+end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Simplifier                                                         --- *)

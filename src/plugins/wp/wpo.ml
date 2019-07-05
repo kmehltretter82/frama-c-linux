@@ -85,11 +85,10 @@ module DISK =
 struct
 
   let file ~id ~model ?prover ?suffix ~ext () =
-    let dir = Wp_parameters.get_output () in
-    let mid = Model.get_id model in
+    let mid = Wp_parameters.get_output_dir (Model.get_id model) in
     let buffer = Buffer.create 80 in
     let fmt = Format.formatter_of_buffer buffer in
-    Format.fprintf fmt "%s/%s/%s" dir mid id ;
+    Format.fprintf fmt "%s/%s" mid id ;
     (match prover with None -> () | Some p ->
         Format.fprintf fmt "_%s" (filename_for_prover p)) ;
     (match suffix with None -> () | Some s ->
@@ -107,9 +106,9 @@ struct
   let file_goal ~pid ~model ~prover =
     let ext = match prover with
       | Qed -> "qed"
-      | AltErgo -> "mlw"
+      | NativeAltErgo -> "mlw"
       | Why3 _ -> "why"
-      | Coq -> "v"
+      | NativeCoq -> "v"
       | Tactical -> "tac"
     in
     let id = WpPropId.get_propid pid in
@@ -118,9 +117,9 @@ struct
   let file_kf ~kf ~model ~prover =
     let ext = match prover with
       | Qed -> "qed"
-      | AltErgo -> "mlw"
+      | NativeAltErgo -> "mlw"
       | Why3 _ -> "why"
-      | Coq -> "v"
+      | NativeCoq -> "v"
       | Tactical -> "tac"
     in
     let id = (Kf.vi kf).vname in
@@ -475,7 +474,7 @@ module ProverType =
       type t = prover
       include Datatype.Undefined
       let name = "Wpo.prover"
-      let reprs = [ AltErgo; Coq; Qed; Why3 "z3" ]
+      let reprs = [ NativeAltErgo; NativeCoq; Qed ]
     end)
 (* to get a "reasonable" API doc: *)
 let () = Type.set_ml_name ProverType.ty (Some "Wpo.prover")
@@ -530,49 +529,27 @@ module Hproof = Hashtbl.Make(Datatype.Pair(Datatype.String)(Property))
 module Results =
 struct
 
-  module Cmap = Map.Make(String)
-
   type t = {
     mutable dps : result Pmap.t ;
-    mutable cps : result Cmap.t ;
-    (* result per class of Why3 provers *)
   }
 
   let not_computing _ r =
     match r.verdict with VCS.Computing _ -> false | _ -> true
 
-  let class_of_prover = function
-    | Qed | Tactical | AltErgo | Coq -> None
-    | Why3 dp ->
-        let cp =
-          try String.sub dp 0 (String.index dp ':')
-          with Not_found -> dp
-        in Some (Transitioning.String.uppercase_ascii cp)
-
-  let create () = { dps = Pmap.empty ; cps = Cmap.empty }
+  let create () = { dps = Pmap.empty }
 
   let get w p =
-    try Pmap.find p w.dps
-    with Not_found ->
-    match class_of_prover p with
-    | None -> VCS.no_result
-    | Some cp ->
-        try Cmap.find cp w.cps
-        with Not_found -> VCS.no_result
+    Pmap.find p w.dps
 
-  let clear w = w.dps <- Pmap.empty ; w.cps <- Cmap.empty
+  let clear w = w.dps <- Pmap.empty
 
   let replace w p r =
     begin
       if p = Qed then
         begin
           w.dps <- Pmap.filter not_computing w.dps ;
-          w.cps <- Cmap.filter not_computing w.cps ;
         end ;
-      w.dps <- Pmap.add p r w.dps ;
-      match class_of_prover p with
-      | None -> ()
-      | Some c -> w.cps <- Cmap.add c r w.cps
+      w.dps <- Pmap.add p r w.dps
     end
 
   let list w =

@@ -115,18 +115,18 @@ class pane (enabled:GuiConfig.enabled) =
         in if p <> VCS.Qed then provers <- (p,column) :: provers
       end
 
-    method private configure dps =
+    method private configure (dps:Why3.Whyconf.Sprover.t) =
       begin
         (* Removing Useless Columns *)
         List.iter
           (fun (vcs,column) ->
              match vcs with
-             | VCS.Why3 p when not (List.mem p dps) ->
+             | VCS.Why3 p when not (Why3.Whyconf.Sprover.mem p dps) ->
                  ignore (list#view#remove_column column)
              | _ -> ()
           ) provers ;
         (* Installing Missing Columns *)
-        List.iter
+        Why3.Whyconf.Sprover.iter
           (fun dp ->
              let prv = VCS.Why3 dp in
              match self#column_of_prover prv with
@@ -147,7 +147,7 @@ class pane (enabled:GuiConfig.enabled) =
         ignore (list#add_column_text ~title:"Model" [] render) ;
         List.iter
           self#create_prover
-          [ VCS.Qed ; VCS.Tactical ; VCS.AltErgo ; VCS.Coq ] ;
+          [ VCS.Qed ; VCS.Tactical ; VCS.NativeAltErgo ; VCS.NativeCoq ] ;
         ignore (list#add_column_empty) ;
         list#set_selection_mode `MULTIPLE ;
         enabled#connect self#configure ;

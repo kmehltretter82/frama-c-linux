@@ -47,6 +47,7 @@ val comp_id  : compinfo -> string
 val field_id : fieldinfo -> string
 val type_id  : logic_type_info -> string
 val logic_id : logic_info -> string
+val ctor_id  : logic_ctor_info -> string
 val lemma_id : string -> string
 
 (** {2 Symbols} *)
@@ -290,7 +291,7 @@ sig
   val e_set   : term -> term -> term -> term
   val e_getfield : term -> Field.t -> term
   val e_record : record -> term
-  val e_fun : Fun.t -> term list -> term
+  val e_fun : ?result:tau -> Fun.t -> term list -> term
   val e_bind : binder -> var -> term -> term
 
   val e_open : pool:pool -> ?forall:bool -> ?exists:bool -> ?lambda:bool ->
@@ -470,9 +471,10 @@ sig
       smaller terms. *)
 
   val set_builtin : lfun -> (term list -> term) -> unit
-  val set_builtin_get : lfun -> (term list -> term-> term) -> unit
+  val set_builtin_get : lfun -> (term list -> tau option -> term-> term) -> unit
   val set_builtin_1 : lfun -> unop -> unit
   val set_builtin_2 : lfun -> binop -> unit
+  val set_builtin_2' : lfun -> (term -> term -> tau option -> term) -> unit
   val set_builtin_eq : lfun -> binop -> unit
   val set_builtin_leq : lfun -> binop -> unit
   val set_builtin_eqp : lfun -> cmp -> unit
@@ -513,7 +515,7 @@ module N: sig
   val ( || ): F.operator (** {! F.p_or } *)
   val not: F.pred -> F.pred (** {! F.p_not } *)
 
-  val ( $ ): lfun -> F.term list -> F.term (** {! F.e_fun } *)
+  val ( $ ): ?result:tau -> lfun -> F.term list -> F.term (** {! F.e_fun } *)
   val ( $$ ): lfun -> F.term list -> F.pred (** {! F.p_call } *)
 end
 
@@ -588,3 +590,20 @@ class type simplifier =
   end
 
 (* -------------------------------------------------------------------------- *)
+
+(** For why3_api but circular dependency *)
+module For_export : sig
+
+  type specific_equality = {
+    for_tau:(tau -> bool);
+    mk_new_eq:F.binop;
+  }
+
+  val rebuild : ?cache:term Tmap.t -> term -> term * term Tmap.t
+
+  val set_builtin : Fun.t -> (term list -> term) -> unit
+  val set_builtin' : Fun.t -> (term list -> tau option -> term) -> unit
+
+  val in_state: ('a -> 'b) -> 'a -> 'b
+
+end

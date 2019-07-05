@@ -37,10 +37,10 @@ type goal =
 val assemble_goal: Wpo.t -> (string list (* includes *) * goal) option
 (** None if the po is trivial *)
 
-val prove : ?timeout:int -> prover:string -> Wpo.t -> result task
+val prove : ?timeout:int -> prover:Why3.Whyconf.prover -> Wpo.t -> result task
 (** The string must be a valid why3 prover identifier
-    Return NoResult if it is already proved by Qed *)
-
+    Return NoResult if it is already proved by Qed
+*)
 (* -------------------------------------------------------------------------- *)
 (* --- Why3 Multi-Theorem Prover                                          --- *)
 (* -------------------------------------------------------------------------- *)
@@ -51,5 +51,9 @@ sig
   val compare : t -> t -> int
   val pretty : Format.formatter -> t -> unit
 end
+
+
+val option_file: LogicBuiltins.doption
+val option_import: LogicBuiltins.doption
 
 (* -------------------------------------------------------------------------- *)

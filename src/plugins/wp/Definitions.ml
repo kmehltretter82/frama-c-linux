@@ -107,6 +107,14 @@ struct
 
   let vars = collect Vars.empty
 
+  (* let rec pretty fmt = function
+   *   | TgAny -> assert false
+   *   | TgVar x -> Lang.F.QED.Var.pretty fmt x
+   *   | TgGet(t,k) -> Format.fprintf fmt "@[<hov 2>%a[%a]@]" pretty t pretty k
+   *   | TgSet(t,k,v) -> Format.fprintf fmt "@[<hov 2>%a[%a@ <- %a]@]" pretty t pretty k pretty v
+   *   | TgFun(f,ts) ->
+   *   | TgProp(f,ts) -> call Cprop f fmt ts *)
+
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -239,9 +247,9 @@ let matrix = function
       Cluster.memoize
         (fun id -> newcluster ~id ~title:"Basic Arrays" ()) "Matrix"
 
-let call_fun lfun cc es =
+let call_fun ~result lfun cc es =
   Symbol.compile (Lang.local cc) lfun ;
-  e_fun lfun es
+  e_fun ~result lfun es
 
 let call_pred lfun cc es =
   Symbol.compile (Lang.local cc) lfun ;
@@ -344,7 +352,9 @@ class virtual visitor main =
 
     method vparam x = self#vtau (tau_of_var x)
 
-    method private repr ~bool = function
+    method private repr ~bool x =
+      self#vtau (Lang.F.typeof x);
+      match F.repr x with
       | Fun(f,_) -> self#vsymbol f
       | Rget(_,f) -> self#vfield f
       | Rdef fts -> List.iter (fun (f,_) -> self#vfield f) fts
@@ -362,7 +372,7 @@ class virtual visitor main =
       if not (Tset.mem t terms) then
         begin
           terms <- Tset.add t terms ;
-          self#repr ~bool:true (F.repr t) ;
+          self#repr ~bool:true t ;
           F.lc_iter self#vterm t ;
         end
 
@@ -370,7 +380,7 @@ class virtual visitor main =
       let t = F.e_prop p in
       if not (Tset.mem t terms) then
         begin
-          self#repr ~bool:false (F.repr t) ;
+          self#repr ~bool:false t ;
           F.lc_iter
             (fun e ->
                if F.is_prop e
@@ -397,12 +407,12 @@ class virtual visitor main =
       end
 
     method private vlfun f =
-      try
-        let d = Symbol.find f in
-        let c = d.d_cluster in
-        if self#do_local c then self#vdfun d
-      with Not_found ->
-        Wp_parameters.fatal "Undefined symbol '%a'" Fun.pretty f
+      match Symbol.find f with
+      | exception Not_found ->
+          Wp_parameters.fatal "Undefined symbol '%a'" Fun.pretty f
+      | d ->
+          let c = d.d_cluster in
+          if self#do_local c then self#vdfun d
 
     method vsymbol f =
       if not (DF.mem f symbols) then

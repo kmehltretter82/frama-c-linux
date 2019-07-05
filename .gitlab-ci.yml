@@ -138,19 +138,32 @@ build-from-distrib-tarball:
   tags:
    - nix
 
-internal:
+.build_template: &internal_template
   stage: distrib_and_compatibility
   variables:
     OCAML: "4_05"
-  script:
-   - nix/frama-ci.sh build -A frama-c.internal
   tags:
    - nix
+
+internal:
+  <<: *internal_template
+  script:
+   - nix/frama-ci.sh build -A frama-c.internal
+  when: manual
+
+
+internal_nightly:
+  <<: *internal_template
+  script:
+   - nix/frama-ci.sh build -A frama-c.internal
+  only:
+  - schedules
+
 
 .build_template: &frama-c-ocaml
   stage: distrib_and_compatibility
   script:
-   - nix/frama-ci.sh build -A frama-c.installed
+   - nix/frama-ci.sh build -A frama-c.tests
   tags:
    - nix
 

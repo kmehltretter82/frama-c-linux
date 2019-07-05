@@ -1,4 +1,4 @@
-# frama-c -wp -wp-timeout 90 -wp-steps 50 [...]
+# frama-c -wp -wp-timeout 45 -wp-steps 50 [...]
 [kernel] Parsing tests/wp_acsl/logic.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Loading driver 'share/wp.driver'
@@ -39,26 +39,26 @@
 [wp] [Qed] Goal typed_h_assigns_exit : Valid
 [wp] [Qed] Goal typed_h_assigns_normal : Valid
 [wp] [Qed] Goal typed_main_requires_qed_ok : Valid
-[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_2 : Unsuccess
-[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_3 : Unsuccess
-[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_4 : Unsuccess
-[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_5 : Unsuccess (Stronger)
-[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_6 : Unsuccess (Stronger)
-[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_7 : Unsuccess (Stronger)
-[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_8 : Unsuccess (Stronger)
-[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_9 : Unsuccess (Stronger)
-[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_10 : Unsuccess (Stronger)
-[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_11 : Unsuccess (Stronger)
-[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_12 : Unsuccess (Stronger)
-[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_13 : Unsuccess (Stronger)
-[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_14 : Unsuccess (Stronger)
-[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_15 : Unsuccess (Stronger)
-[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_16 : Unsuccess (Stronger)
-[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_17 : Unsuccess (Stronger)
-[wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_18 : Unsuccess (Stronger)
+[wp] [Alt-Ergo 2.0.0] Goal typed_main_requires_qed_ok_2 : Unsuccess
+[wp] [Alt-Ergo 2.0.0] Goal typed_main_requires_qed_ok_3 : Unsuccess
+[wp] [Alt-Ergo 2.0.0] Goal typed_main_requires_qed_ok_4 : Unsuccess
+[wp] [Alt-Ergo 2.0.0] Goal typed_main_requires_qed_ok_5 : Unsuccess (Stronger)
+[wp] [Alt-Ergo 2.0.0] Goal typed_main_requires_qed_ok_6 : Unsuccess (Stronger)
+[wp] [Alt-Ergo 2.0.0] Goal typed_main_requires_qed_ok_7 : Unsuccess (Stronger)
+[wp] [Alt-Ergo 2.0.0] Goal typed_main_requires_qed_ok_8 : Unsuccess (Stronger)
+[wp] [Alt-Ergo 2.0.0] Goal typed_main_requires_qed_ok_9 : Unsuccess (Stronger)
+[wp] [Alt-Ergo 2.0.0] Goal typed_main_requires_qed_ok_10 : Unsuccess (Stronger)
+[wp] [Alt-Ergo 2.0.0] Goal typed_main_requires_qed_ok_11 : Unsuccess (Stronger)
+[wp] [Alt-Ergo 2.0.0] Goal typed_main_requires_qed_ok_12 : Unsuccess (Stronger)
+[wp] [Alt-Ergo 2.0.0] Goal typed_main_requires_qed_ok_13 : Unsuccess (Stronger)
+[wp] [Alt-Ergo 2.0.0] Goal typed_main_requires_qed_ok_14 : Unsuccess (Stronger)
+[wp] [Alt-Ergo 2.0.0] Goal typed_main_requires_qed_ok_15 : Unsuccess (Stronger)
+[wp] [Alt-Ergo 2.0.0] Goal typed_main_requires_qed_ok_16 : Unsuccess (Stronger)
+[wp] [Alt-Ergo 2.0.0] Goal typed_main_requires_qed_ok_17 : Unsuccess (Stronger)
+[wp] [Alt-Ergo 2.0.0] Goal typed_main_requires_qed_ok_18 : Unsuccess (Stronger)
 [wp] Proved goals:    4 / 21
-  Qed:             4 
-  Alt-Ergo:        0  (unsuccess: 17)
+  Qed:               4 
+  Alt-Ergo 2.0.0:    0  (unsuccess: 17)
 [wp] Report in:  'tests/wp_acsl/oracle_qualif/logic.0.report.json'
 [wp] Report out: 'tests/wp_acsl/result_qualif/logic.0.report.json'
 -------------------------------------------------------------
