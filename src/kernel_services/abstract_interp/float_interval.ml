@@ -223,7 +223,7 @@ module Make (F: Float_sig.S) = struct
   let pos_zero prec = singleton (Cst.pos_zero prec)
   let one prec = singleton (F.of_float Near prec 1.)
   let pos_infinity prec = singleton (Cst.pos_infinity prec)
-  let _neg_infinity prec = singleton (Cst.neg_infinity prec)
+  let neg_infinity prec = singleton (Cst.neg_infinity prec)
 
   let minus_one_one prec ~nan =
     FRange.inject ~nan (F.of_float Near prec (-1.)) (F.of_float Near prec 1.)
@@ -420,6 +420,20 @@ module Make (F: Float_sig.S) = struct
     | FRange.NaN -> Comp.False
     | FRange.Itv (_b, _e, nan) -> if nan then Comp.Unknown else Comp.True
 
+  let is_pos_infinity = function
+    | FRange.NaN -> Comp.False
+    | FRange.Itv (b, e, _) ->
+      if not (Cmp.is_pos_infinity e) then Comp.False
+      else if not (Cmp.is_pos_infinity b) then Comp.Unknown
+      else Comp.True
+
+  let is_neg_infinity = function
+    | FRange.NaN -> Comp.False
+    | FRange.Itv (b, e, _) ->
+      if not (Cmp.is_neg_infinity b) then Comp.False
+      else if not (Cmp.is_neg_infinity e) then Comp.Unknown
+      else Comp.True
+
   let is_finite = function
     | FRange.NaN -> Comp.False
     | FRange.Itv (b, e, nan) ->
@@ -440,6 +454,11 @@ module Make (F: Float_sig.S) = struct
   let backward_is_not_nan = function
     | FRange.NaN -> `Bottom
     | FRange.Itv (b, e, _) -> `Value (FRange.inject ~nan:false b e)
+
+  let backward_is_nan = function
+    | FRange.Itv (_, _, false) -> `Bottom
+    | FRange.Itv (_, _, true)
+    | FRange.NaN -> `Value nan
 
   let backward_is_finite prec = function
     | FRange.NaN -> `Bottom

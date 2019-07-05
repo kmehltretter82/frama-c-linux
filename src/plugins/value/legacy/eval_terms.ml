@@ -633,6 +633,9 @@ let known_logic_funs = [
   "\\sign", ACSL;
   "\\min", ACSL;
   "\\max", ACSL;
+  "\\plus_infinity", ACSL;
+  "\\minus_infinity", ACSL;
+  "\\NaN", ACSL;
 ]
 let known_predicates = [
   "\\warning", ACSL;
@@ -745,6 +748,16 @@ let rec eval_term ~alarm_mode env t =
   (* Special case for the constants \pi and \e. *)
   | TLval (TVar {lv_name = "\\pi"}, _) -> ereal (V.inject_float Fval.pi)
   | TLval (TVar {lv_name = "\\e"}, _)  -> ereal (V.inject_float Fval.e)
+  | TLval (TVar {lv_name = "\\plus_infinity"}, _) ->
+    let v = Cvalue.V.inject_float (Fval.pos_infinity Float_sig.Single) in
+    { etype = Cil.floatType; eunder = v; eover = v; ldeps = empty_logic_deps }
+  | TLval (TVar {lv_name = "\\minus_infinity"}, _) ->
+    let v = Cvalue.V.inject_float (Fval.neg_infinity Float_sig.Single) in
+    { etype = Cil.floatType; eunder = v; eover = v; ldeps = empty_logic_deps }
+  | TLval (TVar {lv_name = "\\NaN"}, _) ->
+    let v = Cvalue.V.inject_float Fval.nan in
+    { etype = Cil.floatType; eunder = v; eover = v; ldeps = empty_logic_deps }
+
   | TLval _ ->
     let lval = eval_tlval ~alarm_mode env t in
     let typ = lval.etype in
@@ -1220,6 +1233,7 @@ and eval_tif : 'a. (alarm_mode:_ -> _ -> _ -> 'a eval_result) -> ('a -> 'a -> 'a
     | false, false -> assert false (* a logic alarm would have been raised*)
 
 (* if you add something here, update known_logic_funs above also *)
+(* Constants are directly in eval_terms *)
 and eval_known_logic_function ~alarm_mode env li labels args =
   let lvi = li.l_var_info in
   match lvi.lv_name, li.l_type, labels, args with
@@ -1271,7 +1285,6 @@ and eval_known_logic_function ~alarm_mode env li labels args =
   | "\\max", Some Lreal, _, [t1; t2] ->
     let backward = Cvalue.V.backward_comp_float_left_true Comp.Ge Fval.Real in
     eval_extremum Cil.doubleType backward ~alarm_mode env t1 t2
-
   | _ -> assert false
 
 and eval_float_builtin_arity2  ~alarm_mode env name arg1 arg2 =
@@ -1694,6 +1707,7 @@ let reduce_by_left_relation ~alarm_mode env positive tl rel tr =
     let debug = false in
     if debug then Format.printf "#Left term %a@." Printer.pp_term tl;
     let typ_loc, locs = eval_term_as_exact_locs ~alarm_mode env tl in
+    if debug then Format.printf "HERE@.";
     let reduce = Eval_op.backward_comp_left_from_type typ_loc in
     let rtl = eval_term ~alarm_mode env tr in
     let cond_v = rtl.eover in
@@ -1747,40 +1761,40 @@ let rec reduce_by_relation ~alarm_mode env positive t1 rel t2 =
    May raise LogicEvalError or Not_an_exact_loc, when no reduction can be done,
    and Reduce_to_bottom, in which case the reduction leads to bottom. *)
 let reduce_by_known_papp ~alarm_mode env positive li _labels args =
-  match positive, li.l_var_info.lv_name, args with
-  | true, "\\is_finite", [arg]
-  | false, "\\is_NaN", [arg] -> begin
-      let fval_reduce =
-        (* positive is true for is_finite, false for is_NaN. *)
-        if positive
-        then Fval.backward_is_finite
-        else (fun _fkind -> Fval.backward_is_not_nan)
-      in
-      try
-        let alarm_mode = alarm_reduce_mode () in
-        let typ_loc, locs = eval_term_as_exact_locs ~alarm_mode env arg in
-        let aux loc env =
-          let state = env_current_state env in
-          let v = find_or_alarm ~alarm_mode state loc in
-          let v =  Cvalue_forward.reinterpret typ_loc v in
-          let v = match Cil.unrollType typ_loc with
-            | TFloat (fkind,_) -> begin
-                let v = Cvalue.V.project_float v in
-                let kind = Fval.kind fkind in
-                match fval_reduce kind v with
-                | `Value f -> V.inject_float f
-                | `Bottom -> V.bottom
-              end
-            | _ -> (* Better safe than sorry, we may have e.g. en int location
-                      here *)
-              raise Not_an_exact_loc
-          in
-          let state' = Cvalue.Model.reduce_previous_binding state loc v in
-          overwrite_current_state env state'
+  let reduce_float fval_reduce arg =
+    try
+      let alarm_mode = alarm_reduce_mode () in
+      let typ_loc, locs = eval_term_as_exact_locs ~alarm_mode env arg in
+      let aux loc env =
+        let state = env_current_state env in
+        let v = find_or_alarm ~alarm_mode state loc in
+        let v =  Cvalue_forward.reinterpret typ_loc v in
+        let v = match Cil.unrollType typ_loc with
+          | TFloat (fkind,_) -> begin
+              let v = Cvalue.V.project_float v in
+              let kind = Fval.kind fkind in
+              match fval_reduce kind v with
+              | `Value f -> V.inject_float f
+              | `Bottom -> V.bottom
+            end
+          | _ -> (* Better safe than sorry, we may have e.g. en int location
+                    here *)
+            raise Not_an_exact_loc
         in
-        Eval_op.apply_on_all_locs aux locs env
-      with Cvalue.V.Not_based_on_null -> env
-    end
+        let state' = Cvalue.Model.reduce_previous_binding state loc v in
+        overwrite_current_state env state'
+      in
+      Eval_op.apply_on_all_locs aux locs env
+    with LogicEvalError _ | Not_an_exact_loc | Cvalue.V.Not_based_on_null ->
+      env
+  in
+  match positive, li.l_var_info.lv_name, args with
+  | true, "\\is_finite", [arg] ->
+    reduce_float Fval.backward_is_finite arg
+  | false, "\\is_NaN", [arg] ->
+    reduce_float (fun _fkind -> Fval.backward_is_not_nan) arg
+  | true, "\\is_NaN", [arg] ->
+    reduce_float (fun _fkind -> Fval.backward_is_nan) arg
   | _ , ("\\eq_float" | "\\eq_double"), [t1;t2] ->
     reduce_by_relation ~alarm_mode env positive t1 Req t2
   | _ , ("\\ne_float" | "\\ne_double"), [t1;t2] ->
@@ -2289,6 +2303,8 @@ and eval_predicate env pred =
           Value_parameters.abort
             "Wrong argument: \\warning expects a constant string"
       end
+    | "\\is_plus_infinity", [arg] -> unary_float Fval.is_pos_infinity arg
+    | "\\is_minus_infinity", [arg] -> unary_float Fval.is_neg_infinity arg
     | "\\subset", [argl;argr] -> begin
         try
           let l = eval_term ~alarm_mode env argl in
