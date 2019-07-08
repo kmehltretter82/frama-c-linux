@@ -1676,26 +1676,8 @@ let reduce_by_valid env positive access (tset: term) =
   in
   do_one env tset
 
-let rec reduce_by_relation ~alarm_mode env positive t1 rel t2 =
-  (* special case: t1 is a term of the form "a rel' b",
-     and is compared to "== 0" or "!= 0" => evaluate t1 directly;
-     note: such terms may be created by other evaluation/reduction functions
-     e.g. eval_predicate, reduce_by_predicate_content *)
-  match t1.term_node, rel with
-  | TBinOp (bop, t1', t2'), Rneq when is_rel_binop bop && Cil.isLogicZero t2 ->
-    reduce_by_relation ~alarm_mode env positive t1' (rel_of_binop bop) t2'
-  | TBinOp (bop, t1', t2'), Req when is_rel_binop bop && Cil.isLogicZero t2 ->
-    reduce_by_relation ~alarm_mode env (not positive) t1' (rel_of_binop bop) t2'
-  | _ ->
-    let env = reduce_by_left_relation ~alarm_mode env positive t1 rel t2 in
-    let sym_rel = match rel with
-      | Rgt -> Rlt | Rlt -> Rgt | Rle -> Rge | Rge -> Rle
-      | Req -> Req | Rneq -> Rneq
-    in
-    reduce_by_left_relation ~alarm_mode env positive t2 sym_rel t1
-
 (* reduce [tl] so that [rl rel tr] holds *)
-and reduce_by_left_relation ~alarm_mode env positive tl rel tr =
+let reduce_by_left_relation ~alarm_mode env positive tl rel tr =
   try
     let debug = false in
     if debug then Format.printf "#Left term %a@." Printer.pp_term tl;
@@ -1729,6 +1711,24 @@ and reduce_by_left_relation ~alarm_mode env positive tl rel tr =
     in
     Eval_op.apply_on_all_locs aux locs env
   with Not_an_exact_loc | LogicEvalError _ -> env
+
+let rec reduce_by_relation ~alarm_mode env positive t1 rel t2 =
+  (* special case: t1 is a term of the form "a rel' b",
+     and is compared to "== 0" or "!= 0" => evaluate t1 directly;
+     note: such terms may be created by other evaluation/reduction functions
+     e.g. eval_predicate, reduce_by_predicate_content *)
+  match t1.term_node, rel with
+  | TBinOp (bop, t1', t2'), Rneq when is_rel_binop bop && Cil.isLogicZero t2 ->
+    reduce_by_relation ~alarm_mode env positive t1' (rel_of_binop bop) t2'
+  | TBinOp (bop, t1', t2'), Req when is_rel_binop bop && Cil.isLogicZero t2 ->
+    reduce_by_relation ~alarm_mode env (not positive) t1' (rel_of_binop bop) t2'
+  | _ ->
+    let env = reduce_by_left_relation ~alarm_mode env positive t1 rel t2 in
+    let sym_rel = match rel with
+      | Rgt -> Rlt | Rlt -> Rgt | Rle -> Rge | Rge -> Rle
+      | Req -> Req | Rneq -> Rneq
+    in
+    reduce_by_left_relation ~alarm_mode env positive t2 sym_rel t1
 
 (* if you add something here, update [known_predicates] above also
    (and of course [eval_known_papp] below). *)
