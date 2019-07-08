@@ -1,12 +1,13 @@
 /* run.config*
    STDOPT: #"-warn-decimal-float all -float-hex"
+   STDOPT: #"-warn-decimal-float all -float-hex -warn-special-float none"
 */
 
 volatile v;
 
-void test_is_finite(void);
 
-int main() {
+
+void test_equality () {
   if (v) {
     double d = 0.1;
     //@ assert !(d == 0.1);
@@ -23,10 +24,7 @@ int main() {
   }
 
   // assert 0.1 == v;
-
-  test_is_finite();
 }
-
 
 
 /*@ assigns \result \from f;
@@ -75,4 +73,10 @@ void test_is_finite(void) {
 
   /* Tests that is_finite validates the input. */
   float g4 = my_ratio_body(-3.3);
+}
+
+
+int main () {
+  test_equality();
+  test_is_finite();
 }
