@@ -60,7 +60,7 @@ Defined.
 
 (* Why3 goal *)
 Definition concat {a:Type} {a_WT:WhyType a} : (list a) -> (list a) -> list a.
-  Open Local Scope list_scope.
+  Local Open Scope list_scope.
   exact(fun u v => u ++ v).
 Defined.
 
