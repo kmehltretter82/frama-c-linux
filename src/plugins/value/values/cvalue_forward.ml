@@ -206,8 +206,8 @@ let assume_not_nan ~assume_finite fkind v =
   let kind = Fval.kind fkind in
   let evaluate, backward_propagate =
     if assume_finite
-    then Fval.is_finite, Fval.backward_is_finite
-    else Fval.is_not_nan, fun _fkind -> Fval.backward_is_not_nan
+    then Fval.is_finite, Fval.backward_is_finite ~positive:true
+    else Fval.is_not_nan, fun _fkind -> Fval.backward_is_nan ~positive:false
   in
   match Cvalue.V.project_float v with
   | exception Cvalue.V.Not_based_on_null ->

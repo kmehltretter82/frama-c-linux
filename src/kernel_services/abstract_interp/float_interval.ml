@@ -451,22 +451,27 @@ module Make (F: Float_sig.S) = struct
     | FRange.Itv (_, _, true)
     | FRange.NaN -> Comp.Unknown
 
-  let backward_is_not_nan = function
-    | FRange.NaN -> `Bottom
-    | FRange.Itv (b, e, _) -> `Value (FRange.inject ~nan:false b e)
+  let backward_is_nan ~positive = function
+    | FRange.NaN as v -> if positive then `Value v else `Bottom
+    | FRange.Itv (_, _, false) as v -> if positive then `Bottom else `Value v
+    | FRange.Itv (b, e, true) ->
+      if positive then `Value nan else `Value (FRange.inject ~nan:false b e)
 
-  let backward_is_nan = function
-    | FRange.Itv (_, _, false) -> `Bottom
-    | FRange.Itv (_, _, true)
-    | FRange.NaN -> `Value nan
-
-  let backward_is_finite prec = function
-    | FRange.NaN -> `Bottom
-    | FRange.Itv (b, e, _) as f ->
-      if Cmp.equal b e && F.is_infinite b
-      then `Bottom (* [f] is exactly an infinite, we can return `Bottom even
-                      in the [Real] case *)
-      else narrow (top_finite prec) f
+  let backward_is_finite ~positive prec = function
+    | FRange.NaN as v -> if positive then `Bottom else `Value v
+    | FRange.Itv (b, e, nan) as f ->
+      if positive
+      then
+        if Cmp.equal b e && F.is_infinite b
+        then `Bottom (* [f] is exactly an infinite, we can return `Bottom
+                        even in the [Real] case. *)
+        else narrow (top_finite prec) f
+      else
+        match F.is_infinite b, F.is_infinite e with
+        | true, true -> `Value f (* No possible reduction. *)
+        | true, false -> `Value (FRange.inject ~nan b b)
+        | false, true -> `Value (FRange.inject ~nan e e)
+        | false, false -> if nan then `Value FRange.nan else `Bottom
 
   let has_greater_min_bound t1 t2 =
     match t1, t2 with

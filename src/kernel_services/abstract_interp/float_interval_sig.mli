@@ -93,9 +93,8 @@ module type S = sig
   val is_not_nan: t -> Abstract_interp.Comp.result
   val is_pos_infinity: t -> Abstract_interp.Comp.result
   val is_neg_infinity: t -> Abstract_interp.Comp.result
-  val backward_is_finite: prec -> t -> t or_bottom
-  val backward_is_not_nan: t -> t or_bottom
-  val backward_is_nan: t -> t or_bottom
+  val backward_is_finite: positive:bool -> prec -> t -> t or_bottom
+  val backward_is_nan: positive:bool -> t -> t or_bottom
 
   (** [has_greater_min_bound f1 f2] returns 1 if the interval [f1] has a better
       minimum bound (i.e. greater) than the interval [f2]. *)

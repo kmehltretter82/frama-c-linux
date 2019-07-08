@@ -1789,12 +1789,10 @@ let reduce_by_known_papp ~alarm_mode env positive li _labels args =
       env
   in
   match positive, li.l_var_info.lv_name, args with
-  | true, "\\is_finite", [arg] ->
-    reduce_float Fval.backward_is_finite arg
-  | false, "\\is_NaN", [arg] ->
-    reduce_float (fun _fkind -> Fval.backward_is_not_nan) arg
-  | true, "\\is_NaN", [arg] ->
-    reduce_float (fun _fkind -> Fval.backward_is_nan) arg
+  | _, "\\is_finite", [arg] ->
+    reduce_float (Fval.backward_is_finite ~positive) arg
+  | _, "\\is_NaN", [arg] ->
+    reduce_float (fun _fkind -> Fval.backward_is_nan ~positive) arg
   | _ , ("\\eq_float" | "\\eq_double"), [t1;t2] ->
     reduce_by_relation ~alarm_mode env positive t1 Req t2
   | _ , ("\\ne_float" | "\\ne_double"), [t1;t2] ->
