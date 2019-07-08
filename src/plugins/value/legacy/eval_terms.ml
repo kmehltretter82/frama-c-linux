@@ -1551,70 +1551,6 @@ let rel_of_binop = function
 exception DoNotReduce
 exception Reduce_to_bottom
 
-(* if you add something here, update [known_predicates] above also
-   (and of course [eval_known_papp] below). *)
-let reduce_by_known_papp env positive li _labels args =
-  match positive, li.l_var_info.lv_name, args with
-  | true, "\\is_finite", [arg]
-  | false, "\\is_NaN", [arg] -> begin
-      let fval_reduce =
-        (* positive is true for is_finite, false for is_NaN. *)
-        if positive
-        then Fval.backward_is_finite
-        else (fun _fkind -> Fval.backward_is_not_nan)
-      in
-      try
-        let alarm_mode = alarm_reduce_mode () in
-        let typ_loc, locs = eval_term_as_exact_locs ~alarm_mode env arg in
-        let aux loc env =
-          let state = env_current_state env in
-          let v = find_or_alarm ~alarm_mode state loc in
-          let v =  Cvalue_forward.reinterpret typ_loc v in
-          let v = match Cil.unrollType typ_loc with
-            | TFloat (fkind,_) -> begin
-                let v = Cvalue.V.project_float v in
-                let kind = Fval.kind fkind in
-                match fval_reduce kind v with
-                | `Value f -> V.inject_float f
-                | `Bottom -> V.bottom
-              end
-            | _ -> (* Better safe than sorry, we may have e.g. en int location
-                      here *)
-              raise Not_an_exact_loc
-          in
-          let state' = Cvalue.Model.reduce_previous_binding state loc v in
-          overwrite_current_state env state'
-        in
-        Eval_op.apply_on_all_locs aux locs env
-      with LogicEvalError _ | Not_an_exact_loc | Cvalue.V.Not_based_on_null ->
-        env
-    end
-
-  | true, "\\subset", [argl;argr] -> begin
-      try
-        let alarm_mode = alarm_reduce_mode () in
-        let vr = (eval_term ~alarm_mode env argr).eover in
-        let _typ, locsl = eval_term_as_exact_locs ~alarm_mode env argl in
-        let aux locl env =
-          let state = env_current_state env in
-          let vl = find_or_alarm ~alarm_mode state locl in
-          let reduced = V.narrow vl vr in
-          if V.equal V.bottom reduced then raise Reduce_to_bottom;
-          let state' =
-            Cvalue.Model.reduce_previous_binding state locl reduced
-          in
-          overwrite_current_state env state'
-        in
-        Eval_op.apply_on_all_locs aux locsl env
-      with
-      | LogicEvalError _ | Not_an_exact_loc -> env
-      | Reduce_to_bottom -> overwrite_current_state env Model.bottom
-    end
-
-  | _ -> (* Do not fail here. We can be asked to reduce on predicates that we
-            can evaluate, but on which we are not able to reduce on (yet ?).*)
-    env
-
 let reduce_by_valid env positive access (tset: term) =
   (* Auxiliary function that reduces \valid(lv+offs), where lv is atomic
      (no more tsets), and offs is a bits-expressed constant offset.
@@ -1794,6 +1730,69 @@ and reduce_by_left_relation ~alarm_mode env positive tl rel tr =
     Eval_op.apply_on_all_locs aux locs env
   with Not_an_exact_loc | LogicEvalError _ -> env
 
+(* if you add something here, update [known_predicates] above also
+   (and of course [eval_known_papp] below). *)
+let reduce_by_known_papp env positive li _labels args =
+  match positive, li.l_var_info.lv_name, args with
+  | true, "\\is_finite", [arg]
+  | false, "\\is_NaN", [arg] -> begin
+      let fval_reduce =
+        (* positive is true for is_finite, false for is_NaN. *)
+        if positive
+        then Fval.backward_is_finite
+        else (fun _fkind -> Fval.backward_is_not_nan)
+      in
+      try
+        let alarm_mode = alarm_reduce_mode () in
+        let typ_loc, locs = eval_term_as_exact_locs ~alarm_mode env arg in
+        let aux loc env =
+          let state = env_current_state env in
+          let v = find_or_alarm ~alarm_mode state loc in
+          let v =  Cvalue_forward.reinterpret typ_loc v in
+          let v = match Cil.unrollType typ_loc with
+            | TFloat (fkind,_) -> begin
+                let v = Cvalue.V.project_float v in
+                let kind = Fval.kind fkind in
+                match fval_reduce kind v with
+                | `Value f -> V.inject_float f
+                | `Bottom -> V.bottom
+              end
+            | _ -> (* Better safe than sorry, we may have e.g. en int location
+                      here *)
+              raise Not_an_exact_loc
+          in
+          let state' = Cvalue.Model.reduce_previous_binding state loc v in
+          overwrite_current_state env state'
+        in
+        Eval_op.apply_on_all_locs aux locs env
+      with LogicEvalError _ | Not_an_exact_loc | Cvalue.V.Not_based_on_null ->
+        env
+    end
+
+  | true, "\\subset", [argl;argr] -> begin
+      try
+        let alarm_mode = alarm_reduce_mode () in
+        let vr = (eval_term ~alarm_mode env argr).eover in
+        let _typ, locsl = eval_term_as_exact_locs ~alarm_mode env argl in
+        let aux locl env =
+          let state = env_current_state env in
+          let vl = find_or_alarm ~alarm_mode state locl in
+          let reduced = V.narrow vl vr in
+          if V.equal V.bottom reduced then raise Reduce_to_bottom;
+          let state' =
+            Cvalue.Model.reduce_previous_binding state locl reduced
+          in
+          overwrite_current_state env state'
+        in
+        Eval_op.apply_on_all_locs aux locsl env
+      with
+      | LogicEvalError _ | Not_an_exact_loc -> env
+      | Reduce_to_bottom -> overwrite_current_state env Model.bottom
+    end
+
+  | _ -> (* Do not fail here. We can be asked to reduce on predicates that we
+            can evaluate, but on which we are not able to reduce on (yet ?).*)
+    env
 
 (** Big recursive functions for predicates *)
 
