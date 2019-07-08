@@ -638,6 +638,18 @@ let known_predicates = [
   "\\warning", ACSL;
   "\\is_finite", ACSL;
   "\\is_NaN", ACSL;
+  "\\eq_float", ACSL;
+  "\\ne_float", ACSL;
+  "\\lt_float", ACSL;
+  "\\le_float", ACSL;
+  "\\gt_float", ACSL;
+  "\\ge_float", ACSL;
+  "\\eq_double", ACSL;
+  "\\ne_double", ACSL;
+  "\\lt_double", ACSL;
+  "\\le_double", ACSL;
+  "\\gt_double", ACSL;
+  "\\ge_double", ACSL;
   "\\subset", ACSL;
   "valid_read_string", Libc;
   "valid_string", Libc;
@@ -1731,8 +1743,10 @@ let rec reduce_by_relation ~alarm_mode env positive t1 rel t2 =
     reduce_by_left_relation ~alarm_mode env positive t2 sym_rel t1
 
 (* if you add something here, update [known_predicates] above also
-   (and of course [eval_known_papp] below). *)
-let reduce_by_known_papp env positive li _labels args =
+   (and of course [eval_known_papp] below).
+   May raise LogicEvalError or Not_an_exact_loc, when no reduction can be done,
+   and Reduce_to_bottom, in which case the reduction leads to bottom. *)
+let reduce_by_known_papp ~alarm_mode env positive li _labels args =
   match positive, li.l_var_info.lv_name, args with
   | true, "\\is_finite", [arg]
   | false, "\\is_NaN", [arg] -> begin
@@ -1765,30 +1779,35 @@ let reduce_by_known_papp env positive li _labels args =
           overwrite_current_state env state'
         in
         Eval_op.apply_on_all_locs aux locs env
-      with LogicEvalError _ | Not_an_exact_loc | Cvalue.V.Not_based_on_null ->
-        env
+      with Cvalue.V.Not_based_on_null -> env
     end
-
-  | true, "\\subset", [argl;argr] -> begin
-      try
-        let alarm_mode = alarm_reduce_mode () in
-        let vr = (eval_term ~alarm_mode env argr).eover in
-        let _typ, locsl = eval_term_as_exact_locs ~alarm_mode env argl in
-        let aux locl env =
-          let state = env_current_state env in
-          let vl = find_or_alarm ~alarm_mode state locl in
-          let reduced = V.narrow vl vr in
-          if V.equal V.bottom reduced then raise Reduce_to_bottom;
-          let state' =
-            Cvalue.Model.reduce_previous_binding state locl reduced
-          in
-          overwrite_current_state env state'
-        in
-        Eval_op.apply_on_all_locs aux locsl env
-      with
-      | LogicEvalError _ | Not_an_exact_loc -> env
-      | Reduce_to_bottom -> overwrite_current_state env Model.bottom
-    end
+  | _ , ("\\eq_float" | "\\eq_double"), [t1;t2] ->
+    reduce_by_relation ~alarm_mode env positive t1 Req t2
+  | _ , ("\\ne_float" | "\\ne_double"), [t1;t2] ->
+    reduce_by_relation ~alarm_mode env positive t1 Rneq t2
+  | _ , ("\\lt_float" | "\\lt_double"), [t1;t2] ->
+    reduce_by_relation ~alarm_mode env positive t1 Rlt t2
+  | _ , ("\\le_float" | "\\le_double"), [t1;t2] ->
+    reduce_by_relation ~alarm_mode env positive t1 Rle t2
+  | _ , ("\\gt_float" | "\\gt_double"), [t1;t2] ->
+    reduce_by_relation ~alarm_mode env positive t1 Rgt t2
+  | _ , ("\\ge_float" | "\\ge_double"), [t1;t2] ->
+    reduce_by_relation ~alarm_mode env positive t1 Rge t2
+  | true, "\\subset", [argl;argr] ->
+    let alarm_mode = alarm_reduce_mode () in
+    let vr = (eval_term ~alarm_mode env argr).eover in
+    let _typ, locsl = eval_term_as_exact_locs ~alarm_mode env argl in
+    let aux locl env =
+      let state = env_current_state env in
+      let vl = find_or_alarm ~alarm_mode state locl in
+      let reduced = V.narrow vl vr in
+      if V.equal V.bottom reduced then raise Reduce_to_bottom;
+      let state' =
+        Cvalue.Model.reduce_previous_binding state locl reduced
+      in
+      overwrite_current_state env state'
+    in
+    Eval_op.apply_on_all_locs aux locsl env
 
   | _ -> (* Do not fail here. We can be asked to reduce on predicates that we
             can evaluate, but on which we are not able to reduce on (yet ?).*)
@@ -1936,12 +1955,14 @@ let rec reduce_by_predicate ~alarm_mode env positive p =
       end
     | _,Papp (li, labels, args) -> begin
         if is_known_predicate li.l_var_info then
-          reduce_by_known_papp env positive li labels args
+          try reduce_by_known_papp ~alarm_mode env positive li labels args
+          with
+          | Reduce_to_bottom -> overwrite_current_state env Model.bottom
+          | LogicEvalError _ | Not_an_exact_loc -> env
         else
           match Inline.inline_predicate ~inline ~current:env.e_cur p with
           | None -> env
-          | Some p' ->
-            reduce_by_predicate_content env positive p'.pred_content
+          | Some p' -> reduce_by_predicate_content env positive p'.pred_content
       end
     | _,Pif (tcond, ptrue, pfalse) ->
       begin
@@ -2225,7 +2246,34 @@ and eval_predicate env pred =
   (* Logic predicates. Update the list known_predicates above if you
      add something here. *)
   and eval_known_papp env li _labels args =
+    let unary_float unary_fun arg =
+      try
+        let eval_result = eval_term ~alarm_mode env arg in
+        unary_fun (V.project_float eval_result.eover)
+      with
+      | V.Not_based_on_null -> Unknown
+      | LogicEvalError ee -> display_evaluation_error ~loc ee; Unknown
+    in
+    let fval_cmp comp arg1 arg2 =
+      try
+        let e1 = eval_term ~alarm_mode env arg1
+        and e2 = eval_term ~alarm_mode env arg2 in
+        let f1 = V.project_float e1.eover
+        and f2 = V.project_float e2.eover in
+        Fval.forward_comp comp f1 f2
+      with
+      | V.Not_based_on_null -> Unknown
+      | LogicEvalError ee -> display_evaluation_error ~loc ee; Unknown
+    in
     match li.l_var_info.lv_name, args with
+    | "\\is_finite", [arg] -> unary_float Fval.is_finite arg
+    | "\\is_NaN", [arg] -> inv_truth (unary_float Fval.is_not_nan arg)
+    | ("\\eq_float" | "\\eq_double"), [arg1;arg2] -> fval_cmp Comp.Eq arg1 arg2
+    | ("\\ne_float" | "\\ne_double"), [arg1;arg2] -> fval_cmp Comp.Ne arg1 arg2
+    | ("\\lt_float" | "\\lt_double"), [arg1;arg2] -> fval_cmp Comp.Lt arg1 arg2
+    | ("\\le_float" | "\\le_double"), [arg1;arg2] -> fval_cmp Comp.Le arg1 arg2
+    | ("\\gt_float" | "\\gt_double"), [arg1;arg2] -> fval_cmp Comp.Gt arg1 arg2
+    | ("\\ge_float" | "\\ge_double"), [arg1;arg2] -> fval_cmp Comp.Ge arg1 arg2
     | "\\warning", _ -> begin
         match args with
         | [{ term_node = TConst(LStr(str))}] ->
@@ -2233,22 +2281,6 @@ and eval_predicate env pred =
         | _ ->
           Value_parameters.abort
             "Wrong argument: \\warning expects a constant string"
-      end
-    | "\\is_finite", [arg] -> begin
-        try
-          let eval_result = eval_term ~alarm_mode env arg in
-          match V.project_float eval_result.eover with
-          | exception Cvalue.V.Not_based_on_null -> Unknown
-          | f -> Fval.is_finite f
-        with LogicEvalError ee -> display_evaluation_error ~loc ee; Unknown
-      end
-    | "\\is_NaN", [arg] -> begin
-        try
-          let eval_result = eval_term ~alarm_mode env arg in
-          match V.project_float eval_result.eover with
-          | exception Cvalue.V.Not_based_on_null -> Unknown
-          | f -> Abstract_interp.inv_truth (Fval.is_not_nan f)
-        with LogicEvalError ee -> display_evaluation_error ~loc ee; Unknown
       end
     | "\\subset", [argl;argr] -> begin
         try
