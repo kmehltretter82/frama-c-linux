@@ -420,20 +420,6 @@ module Make (F: Float_sig.S) = struct
     | FRange.NaN -> Comp.False
     | FRange.Itv (_b, _e, nan) -> if nan then Comp.Unknown else Comp.True
 
-  let is_pos_infinity = function
-    | FRange.NaN -> Comp.False
-    | FRange.Itv (b, e, _) ->
-      if not (Cmp.is_pos_infinity e) then Comp.False
-      else if not (Cmp.is_pos_infinity b) then Comp.Unknown
-      else Comp.True
-
-  let is_neg_infinity = function
-    | FRange.NaN -> Comp.False
-    | FRange.Itv (b, e, _) ->
-      if not (Cmp.is_neg_infinity b) then Comp.False
-      else if not (Cmp.is_neg_infinity e) then Comp.Unknown
-      else Comp.True
-
   let is_finite = function
     | FRange.NaN -> Comp.False
     | FRange.Itv (b, e, nan) ->

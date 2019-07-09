@@ -2286,6 +2286,12 @@ and eval_predicate env pred =
     in
     match li.l_var_info.lv_name, args with
     | "\\is_finite", [arg] -> unary_float Fval.is_finite arg
+    | "\\is_plus_infinity", [arg] ->
+      let pos_inf = Fval.pos_infinity Float_sig.Single in
+      unary_float (fun f -> Fval.forward_comp Comp.Eq f pos_inf) arg
+    | "\\is_minus_infinity", [arg] ->
+      let neg_inf = Fval.neg_infinity Float_sig.Single in
+      unary_float (fun f -> Fval.forward_comp Comp.Eq f neg_inf) arg
     | "\\is_NaN", [arg] -> inv_truth (unary_float Fval.is_not_nan arg)
     | ("\\eq_float" | "\\eq_double"), [arg1;arg2] -> fval_cmp Comp.Eq arg1 arg2
     | ("\\ne_float" | "\\ne_double"), [arg1;arg2] -> fval_cmp Comp.Ne arg1 arg2
@@ -2301,8 +2307,6 @@ and eval_predicate env pred =
           Value_parameters.abort
             "Wrong argument: \\warning expects a constant string"
       end
-    | "\\is_plus_infinity", [arg] -> unary_float Fval.is_pos_infinity arg
-    | "\\is_minus_infinity", [arg] -> unary_float Fval.is_neg_infinity arg
     | "\\subset", [argl;argr] -> begin
         try
           let l = eval_term ~alarm_mode env argl in

@@ -91,8 +91,6 @@ module type S = sig
 
   val is_finite: t -> Abstract_interp.Comp.result
   val is_not_nan: t -> Abstract_interp.Comp.result
-  val is_pos_infinity: t -> Abstract_interp.Comp.result
-  val is_neg_infinity: t -> Abstract_interp.Comp.result
   val backward_is_finite: positive:bool -> prec -> t -> t or_bottom
   val backward_is_nan: positive:bool -> t -> t or_bottom
 
