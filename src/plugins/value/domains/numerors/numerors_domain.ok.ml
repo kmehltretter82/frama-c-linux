@@ -150,7 +150,7 @@ module Domain = struct
     match f, Value_parameters.NumerorsLogFile.get () with
     | _, s when s = "" -> ()
     | `Value _, s ->
-      let log = Pervasives.open_out s in
+      let log = open_out s in
       let fmt = Format.formatter_of_out_channel log in
       List.iter (fun f -> f fmt ()) !Numerors_Value.dprint_callstack ;
       close_out log
