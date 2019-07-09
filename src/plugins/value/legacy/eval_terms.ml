@@ -633,9 +633,6 @@ let known_logic_funs = [
   "\\sign", ACSL;
   "\\min", ACSL;
   "\\max", ACSL;
-  "\\plus_infinity", ACSL;
-  "\\minus_infinity", ACSL;
-  "\\NaN", ACSL;
 ]
 let known_predicates = [
   "\\warning", ACSL;
@@ -747,17 +744,17 @@ let rec eval_term ~alarm_mode env t =
       eunder = loc_bits_to_loc_bytes_under r.eunder;
       eover = loc_bits_to_loc_bytes r.eover }
 
-  (* Special case for the constants \pi and \e. *)
+  (* Special case for the constants \pi, \e, \infinity and \NaN. *)
   | TLval (TVar {lv_name = "\\pi"}, _) -> ereal (V.inject_float Fval.pi)
   | TLval (TVar {lv_name = "\\e"}, _)  -> ereal (V.inject_float Fval.e)
   | TLval (TVar {lv_name = "\\plus_infinity"}, _) ->
-    let v = Cvalue.V.inject_float (Fval.pos_infinity Float_sig.Single) in
+    let v = V.inject_float (Fval.pos_infinity Float_sig.Single) in
     { etype = Cil.floatType; eunder = v; eover = v; ldeps = empty_logic_deps }
   | TLval (TVar {lv_name = "\\minus_infinity"}, _) ->
-    let v = Cvalue.V.inject_float (Fval.neg_infinity Float_sig.Single) in
+    let v = V.inject_float (Fval.neg_infinity Float_sig.Single) in
     { etype = Cil.floatType; eunder = v; eover = v; ldeps = empty_logic_deps }
   | TLval (TVar {lv_name = "\\NaN"}, _) ->
-    let v = Cvalue.V.inject_float Fval.nan in
+    let v = V.inject_float Fval.nan in
     { etype = Cil.floatType; eunder = v; eover = v; ldeps = empty_logic_deps }
 
   | TLval _ ->
@@ -1235,7 +1232,6 @@ and eval_tif : 'a. (alarm_mode:_ -> _ -> _ -> 'a eval_result) -> ('a -> 'a -> 'a
     | false, false -> assert false (* a logic alarm would have been raised*)
 
 (* if you add something here, update known_logic_funs above also *)
-(* Constants are directly in eval_terms *)
 and eval_known_logic_function ~alarm_mode env li labels args =
   let lvi = li.l_var_info in
   match lvi.lv_name, li.l_type, labels, args with
@@ -1709,7 +1705,6 @@ let reduce_by_left_relation ~alarm_mode env positive tl rel tr =
     let debug = false in
     if debug then Format.printf "#Left term %a@." Printer.pp_term tl;
     let typ_loc, locs = eval_term_as_exact_locs ~alarm_mode env tl in
-    if debug then Format.printf "HERE@.";
     let reduce = Eval_op.backward_comp_left_from_type typ_loc in
     let rtl = eval_term ~alarm_mode env tr in
     let cond_v = rtl.eover in
@@ -1763,9 +1758,11 @@ let rec reduce_by_relation ~alarm_mode env positive t1 rel t2 =
    May raise LogicEvalError or Not_an_exact_loc, when no reduction can be done,
    and Reduce_to_bottom, in which case the reduction leads to bottom. *)
 let reduce_by_known_papp ~alarm_mode env positive li _labels args =
+  (* If the term [arg] is a floating-point lvalue with an exact location,
+     reduces its value in [env] by using the backward propagator on fval
+     [fval_reduce]. *)
   let reduce_float fval_reduce arg =
     try
-      let alarm_mode = alarm_reduce_mode () in
       let typ_loc, locs = eval_term_as_exact_locs ~alarm_mode env arg in
       let aux loc env =
         let state = env_current_state env in
@@ -1787,9 +1784,10 @@ let reduce_by_known_papp ~alarm_mode env positive li _labels args =
         overwrite_current_state env state'
       in
       Eval_op.apply_on_all_locs aux locs env
-    with LogicEvalError _ | Not_an_exact_loc | Cvalue.V.Not_based_on_null ->
-      env
+    with Cvalue.V.Not_based_on_null -> env
   in
+  (* Reduces [f] to positive or negative infinity (according to [pos]),
+     or to the complement if [positive] is false. *)
   let reduce_by_infinity ~pos prec f =
     let inf = if pos then Fval.pos_infinity prec else Fval.neg_infinity prec in
     let fval =
@@ -1799,28 +1797,28 @@ let reduce_by_known_papp ~alarm_mode env positive li _labels args =
     in
     Fval.narrow fval f
   in
-  match positive, li.l_var_info.lv_name, args with
-  | _, "\\is_finite", [arg] ->
+  match li.l_var_info.lv_name, args with
+  | "\\is_finite", [arg] ->
     reduce_float (Fval.backward_is_finite ~positive) arg
-  | _, "\\is_plus_infinity", [arg] ->
+  | "\\is_plus_infinity", [arg] ->
     reduce_float (reduce_by_infinity ~pos:true) arg
-  | _, "\\is_minus_infinity", [arg] ->
+  | "\\is_minus_infinity", [arg] ->
     reduce_float (reduce_by_infinity ~pos:false) arg
-  | _, "\\is_NaN", [arg] ->
+  | "\\is_NaN", [arg] ->
     reduce_float (fun _fkind -> Fval.backward_is_nan ~positive) arg
-  | _ , ("\\eq_float" | "\\eq_double"), [t1;t2] ->
+  | ("\\eq_float" | "\\eq_double"), [t1;t2] ->
     reduce_by_relation ~alarm_mode env positive t1 Req t2
-  | _ , ("\\ne_float" | "\\ne_double"), [t1;t2] ->
+  | ("\\ne_float" | "\\ne_double"), [t1;t2] ->
     reduce_by_relation ~alarm_mode env positive t1 Rneq t2
-  | _ , ("\\lt_float" | "\\lt_double"), [t1;t2] ->
+  | ("\\lt_float" | "\\lt_double"), [t1;t2] ->
     reduce_by_relation ~alarm_mode env positive t1 Rlt t2
-  | _ , ("\\le_float" | "\\le_double"), [t1;t2] ->
+  | ("\\le_float" | "\\le_double"), [t1;t2] ->
     reduce_by_relation ~alarm_mode env positive t1 Rle t2
-  | _ , ("\\gt_float" | "\\gt_double"), [t1;t2] ->
+  | ("\\gt_float" | "\\gt_double"), [t1;t2] ->
     reduce_by_relation ~alarm_mode env positive t1 Rgt t2
-  | _ , ("\\ge_float" | "\\ge_double"), [t1;t2] ->
+  | ("\\ge_float" | "\\ge_double"), [t1;t2] ->
     reduce_by_relation ~alarm_mode env positive t1 Rge t2
-  | true, "\\subset", [argl;argr] ->
+  | "\\subset", [argl;argr] when positive ->
     let alarm_mode = alarm_reduce_mode () in
     let vr = (eval_term ~alarm_mode env argr).eover in
     let _typ, locsl = eval_term_as_exact_locs ~alarm_mode env argl in
