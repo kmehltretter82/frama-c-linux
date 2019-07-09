@@ -1,6 +1,0 @@
-[eva] Warning: Unknown message key summary
-[kernel] Parsing tests/value/INFINITY_NAN.c (with preprocessing)
-[kernel] tests/value/INFINITY_NAN.c:8: Failure: Cannot resolve variable INFINITY
-[kernel] User Error: stopping on file "tests/value/INFINITY_NAN.c" that has errors. Add
-  '-kernel-msg-key pp' for preprocessing command.
-[kernel] Frama-C aborted: invalid user input.
