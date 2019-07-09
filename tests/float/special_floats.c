@@ -5,7 +5,7 @@
 /* Tests on special float values NaN and infinites. */
 
 volatile int rand;
-
+volatile double any_double;
 
 /* All comparisons involving NaN are false, except for inequalities that are
    true. */
@@ -20,8 +20,50 @@ void nan_comparisons () {
   int ne2 = (n != d) ? 1 : 0;
 }
 
-
 #include <math.h>
+
+/* Tests the logical predicates \is_plus_infinite & co. */
+void is_infinite () {
+  /* Tests the evaluation on singletons. */
+  double zero = -0.;
+  /*@ check true: \is_finite(zero); */
+  /*@ check false: !\is_finite(zero); */
+  /*@ check false: \is_plus_infinity(zero); */
+  /*@ check false: \is_minus_infinity(zero); */
+  double inf = INFINITY;
+  /*@ check false: \is_finite(inf); */
+  /*@ check true: !\is_finite(inf); */
+  /*@ check true: \is_plus_infinity(inf); */
+  /*@ check false: \is_minus_infinity(inf); */
+  double nan = NAN;
+  /*@ check false: \is_finite(nan); */
+  /*@ check true: !\is_finite(nan); */
+  /*@ check false: \is_plus_infinity(nan); */
+  /*@ check false: \is_minus_infinity(nan); */
+  double d = any_double;
+  /* Tests the reduction by assertions. */
+  if (rand) {
+    /*@ assert \is_plus_infinity(d); */
+    Frama_C_show_each_pos_infinity(d);
+  }
+  if (rand) {
+    /*@ assert \is_minus_infinity(d); */
+    Frama_C_show_each_neg_infinity(d);
+  }
+  if (rand) {
+    /*@ assert !\is_plus_infinity(d); */
+    /*@ assert !\is_minus_infinity(d); */
+    Frama_C_show_each_finite_nan(d);
+  }
+  if (rand) {
+    /*@ assert !\is_finite(d); */
+    Frama_C_show_each_top(d);
+  }
+  if (d > 0.) {
+    /*@ assert !\is_finite(d); */
+    Frama_C_show_each_pos_infinity(d);
+  }
+}
 
 /* Tests the C and logic macros INFINITY and HUGE_VAL. */
 void macro_infinity () {
@@ -47,6 +89,7 @@ void macro_nan () {
 
 void main () {
   nan_comparisons ();
+  is_infinite ();
   macro_infinity ();
   macro_nan ();
 }
