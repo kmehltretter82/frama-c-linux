@@ -640,6 +640,8 @@ let known_logic_funs = [
 let known_predicates = [
   "\\warning", ACSL;
   "\\is_finite", ACSL;
+  "\\is_plus_infinity", ACSL;
+  "\\is_minus_infinity", ACSL;
   "\\is_NaN", ACSL;
   "\\eq_float", ACSL;
   "\\ne_float", ACSL;
@@ -1788,9 +1790,22 @@ let reduce_by_known_papp ~alarm_mode env positive li _labels args =
     with LogicEvalError _ | Not_an_exact_loc | Cvalue.V.Not_based_on_null ->
       env
   in
+  let reduce_by_infinity ~pos prec f =
+    let inf = if pos then Fval.pos_infinity prec else Fval.neg_infinity prec in
+    let fval =
+      if positive
+      then inf
+      else Fval.(join nan (join (Fval.neg inf) (top_finite prec)))
+    in
+    Fval.narrow fval f
+  in
   match positive, li.l_var_info.lv_name, args with
   | _, "\\is_finite", [arg] ->
     reduce_float (Fval.backward_is_finite ~positive) arg
+  | _, "\\is_plus_infinity", [arg] ->
+    reduce_float (reduce_by_infinity ~pos:true) arg
+  | _, "\\is_minus_infinity", [arg] ->
+    reduce_float (reduce_by_infinity ~pos:false) arg
   | _, "\\is_NaN", [arg] ->
     reduce_float (fun _fkind -> Fval.backward_is_nan ~positive) arg
   | _ , ("\\eq_float" | "\\eq_double"), [t1;t2] ->
