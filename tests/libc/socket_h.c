@@ -2,7 +2,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <stdlib.h>
-
+volatile int v;
 int main() {
   int sockfd = socket(AF_INET, SOCK_STREAM, 0);
   if (sockfd < 0) exit(1);
@@ -16,5 +16,8 @@ int main() {
   int optval;
   socklen_t optlen = sizeof(optval);
   rc = getsockopt(sockfd, SOL_SOCKET, SO_ERROR, (void *)&optval, &optlen);
+  struct sockaddr_in addr2;
+  socklen_t socklen = sizeof(addr2);
+  rc = getsockname(sockfd, (struct sockaddr *)&addr2, &socklen);
   return rc;
 }
