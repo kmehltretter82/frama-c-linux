@@ -161,9 +161,12 @@ module Precedence = struct
   let upperLevel = 110          (* Occurence order in [logic_parser.mly]:
                                    1 [%right prec_named]
                                    2 [%nonassoc TYPENAME] *)
-  let questionLevel = 100 (* Pif, Aquestion:
+
+  let binderLevel = 100          (* 3 [%nonassoc prec_forall prec_exists
+                                                prec_lambda LET] *)
+
+  let questionLevel = 90 (* Pif, Aquestion:
                                    4 [%right QUESTION prec_question]  ??? *)
-  let binderLevel = 90          (* 3 [%nonassoc prec_forall prec_exists prec_lambda LET]  ??? *)
 
   let iff_level = 89            (* 5 [%left IFF] *)
   let implies_level = 87 (* and +1 for positive side
