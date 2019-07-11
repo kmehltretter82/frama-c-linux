@@ -195,9 +195,7 @@ module Precedence = struct
 
   let unaryLevel = 30          (* 21 [%right prec_cast TILDE NOT prec_unary_op] *)
   let addrOfLevel = 30         (* 21 [%right prec_cast TILDE NOT prec_unary_op] *)
-  let subtypeLevel = 23        (* 22 [%nonassoc LTCOLON COLONGT] *)
-
-  let coerseLevel = 25         (* -  [%token] *)
+  let subtypeLevel = 25        (* 22 [%nonassoc LTCOLON COLONGT] *)
 
   let memOffset_level = 20     (* 23 [%left DOT ARROW LSQUARE] *)
   let derefStarLevel = 20      (* 23 [%left DOT ARROW LSQUARE] *)
@@ -313,7 +311,7 @@ module Precedence = struct
     | TStartOf(_)
     | TUnOp((Neg|BNot|LNot),_) -> unaryLevel
     (* Unary post *)
-    | TCoerce _ | TCoerceE _ -> coerseLevel
+    | TCoerce _ | TCoerceE _ -> subtypeLevel
     (* Lvals *)
     | TLval(TMem _ , _) -> derefStarLevel
     | TLval(TVar _, (TField _|TIndex _|TModel _)) -> indexLevel
