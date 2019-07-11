@@ -165,8 +165,7 @@ module Precedence = struct
   let binderLevel = 100          (* 3 [%nonassoc prec_forall prec_exists
                                                 prec_lambda LET] *)
 
-  let questionLevel = 90 (* Pif, Aquestion:
-                                   4 [%right QUESTION prec_question]  ??? *)
+  let questionLevel = 90 (* 4 [%right QUESTION prec_question] *)
 
   let iff_level = 89            (* 5 [%left IFF] *)
   let implies_level = 87 (* and +1 for positive side
@@ -186,10 +185,8 @@ module Precedence = struct
                                   13 [%left HAT]
                                   14 [%left STARHAT] (releted to \repeat)
                                   15 [%left AMP] *)
-    
-  let belongLevel = 72         (* 16 [%nonassoc IN] *)
 
-  let subtypeLevel = 75        (* 22 [%nonassoc LTCOLON COLONGT] ??? *)
+  let belongLevel = 72         (* 16 [%nonassoc IN] *)
 
   let comparativeLevel = 70    (* 17 [%left LT] *)
   let additiveLevel = 60       (* 18 [%left LTLT GTGT]
@@ -198,6 +195,7 @@ module Precedence = struct
 
   let unaryLevel = 30          (* 21 [%right prec_cast TILDE NOT prec_unary_op] *)
   let addrOfLevel = 30         (* 21 [%right prec_cast TILDE NOT prec_unary_op] *)
+  let subtypeLevel = 23        (* 22 [%nonassoc LTCOLON COLONGT] *)
 
   let coerseLevel = 25         (* -  [%token] *)
 
