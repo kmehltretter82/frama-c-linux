@@ -245,7 +245,10 @@ module Precedence = struct
     | Pxor _ -> xor_level
     | Pand _ -> and_level
 
-    | Papp _ as p -> if subset_is_backslash_in p = None then 0 else belongLevel
+    | Papp _ as p ->
+        if subset_is_backslash_in p = None then
+          applicationLevel
+        else belongLevel
     | Prel _ -> comparativeLevel
     | Pnot _ -> unaryLevel
     | Psubtype _ -> subtypeLevel
@@ -2553,9 +2556,9 @@ class cil_printer () = object (self)
         match Precedence.subset_is_backslash_in p with
         | Some (tl, tr) ->
           fprintf fmt "@[%a %s@ %a@]"
-            self#term tl
+            term tl
             (if Kernel.Unicode.get () then Utf8_logic.inset else "\\in")
-            self#term tr
+            term tr
         | None ->
           fprintf fmt "@[%a%a%a@]"
             self#logic_info pi
