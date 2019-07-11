@@ -446,9 +446,13 @@ let einteger v =
 
 (* Note: some reals cannot be exactly represented as floats; in which
    case we do not know their under-approximation. *)
-let ereal v =
+let efloating_point etype fval =
+  let v = V.inject_float fval in
   let eunder = under_from_over v in
-  { etype = Cil.doubleType; eunder; eover = v; ldeps = empty_logic_deps }
+  { etype; eunder; eover = v; ldeps = empty_logic_deps }
+
+let ereal = efloating_point Cil.doubleType
+let efloat = efloating_point Cil.floatType
 
 let is_true = function
   | `True | `TrueReduced _ -> true
@@ -725,7 +729,7 @@ let rec eval_term ~alarm_mode env t =
       let r_lower = Fval.F.of_float r_lower in
       let r_upper = Fval.F.of_float r_upper in
       let f = Fval.inject Fval.Real r_lower r_upper in
-      ereal (V.inject_ival (Ival.inject_float f))
+      ereal f
     end
 
   (*  | TConst ((CStr | CWstr) Missing cases *)
@@ -745,17 +749,13 @@ let rec eval_term ~alarm_mode env t =
       eover = loc_bits_to_loc_bytes r.eover }
 
   (* Special case for the constants \pi, \e, \infinity and \NaN. *)
-  | TLval (TVar {lv_name = "\\pi"}, _) -> ereal (V.inject_float Fval.pi)
-  | TLval (TVar {lv_name = "\\e"}, _)  -> ereal (V.inject_float Fval.e)
+  | TLval (TVar {lv_name = "\\pi"}, _) -> ereal Fval.pi
+  | TLval (TVar {lv_name = "\\e"}, _)  -> ereal Fval.e
   | TLval (TVar {lv_name = "\\plus_infinity"}, _) ->
-    let v = V.inject_float (Fval.pos_infinity Float_sig.Single) in
-    { etype = Cil.floatType; eunder = v; eover = v; ldeps = empty_logic_deps }
+    efloat Fval.(pos_infinity Single)
   | TLval (TVar {lv_name = "\\minus_infinity"}, _) ->
-    let v = V.inject_float (Fval.neg_infinity Float_sig.Single) in
-    { etype = Cil.floatType; eunder = v; eover = v; ldeps = empty_logic_deps }
-  | TLval (TVar {lv_name = "\\NaN"}, _) ->
-    let v = V.inject_float Fval.nan in
-    { etype = Cil.floatType; eunder = v; eover = v; ldeps = empty_logic_deps }
+    efloat Fval.(neg_infinity Single)
+  | TLval (TVar {lv_name = "\\NaN"}, _) -> efloat Fval.nan
 
   | TLval _ ->
     let lval = eval_tlval ~alarm_mode env t in
