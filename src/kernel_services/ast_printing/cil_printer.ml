@@ -2282,6 +2282,7 @@ class cil_printer () = object (self)
 
   method term_node fmt t =
     let current_level = Precedence.getParenthLevelLogic t.term_node in
+    let term = self#term_prec current_level in
     match t.term_node with
     | TConst s -> fprintf fmt "%a" self#logic_constant s
     | TDataCons(ci,args) ->
@@ -2304,18 +2305,13 @@ class cil_printer () = object (self)
       fprintf fmt "%a(%a)" self#pp_acsl_keyword "alignof" (self#typ None) e
     | TAlignOfE e ->
       fprintf fmt "%a(%a)" self#pp_acsl_keyword "alignof" self#term e
-    | TUnOp (op,e) -> fprintf fmt "%a%a"
-                        self#unop op (self#term_prec current_level) e
+    | TUnOp (op,e) -> fprintf fmt "%a%a" self#unop op term e
     | TBinOp (LAnd, l, r) when not state.print_cil_as_is ->
       fprintf fmt "@[%a@]" self#tand_list (get_tand_list l [r])
     | TBinOp (op,l,r) ->
-      fprintf fmt "@[%a@ %a@ %a@]"
-        (self#term_prec current_level) l
-        self#term_binop op
-        (self#term_prec current_level) r
+      fprintf fmt "@[%a@ %a@ %a@]" term l self#term_binop op term r
     | TCastE (ty,e) ->
-      fprintf fmt "(%a)%a" (self#typ None) ty
-        (self#term_prec current_level) e
+      fprintf fmt "(%a)%a" (self#typ None) ty term e
     | TAddrOf lv ->
       fprintf fmt "&%a" (self#term_lval_prec Precedence.addrOfLevel) lv
     | TStartOf lv -> fprintf fmt "(%a)%a"
@@ -2325,24 +2321,17 @@ class cil_printer () = object (self)
        in print-as-is mode. *)
     | Tapp ({ l_var_info },[],[e1; e2])
       when l_var_info.lv_name = "\\concat" && not state.print_cil_as_is ->
-      fprintf fmt "%a ^ %a"
-        (self#term_prec current_level) e1
-        (self#term_prec current_level) e2
+      fprintf fmt "%a ^ %a" term e1 term e2
     | Tapp ({ l_var_info },[],[e1;e2])
       when l_var_info.lv_name = "\\repeat" && not state.print_cil_as_is ->
-      fprintf fmt "%a *^ %a"
-        (self#term_prec current_level) e1
-        (self#term_prec current_level) e2
+      fprintf fmt "%a *^ %a" term e1 term e2
     | Tapp (f, labels, tl) ->
       fprintf fmt "%a%a%a"
         self#logic_info f
         self#labels labels
         (Pretty_utils.pp_list ~pre:"@[(" ~suf:")@]" ~sep:",@ " self#term) tl
     | Tif (cond,th,el) ->
-      fprintf fmt "@[<2>%a?@;%a:@;%a@]"
-        (self#term_prec current_level) cond
-        (self#term_prec current_level) th
-        (self#term_prec current_level) el
+      fprintf fmt "@[<2>%a?@;%a:@;%a@]" term cond term th term el
     | Tat (t,lab) ->
       let old_label = current_label in
       current_label <- lab;
@@ -2362,12 +2351,9 @@ class cil_printer () = object (self)
       fprintf fmt "%a%a(%a)" self#pp_acsl_keyword "\\block_length"
         self#labels [l] self#term t
     | Tnull -> self#pp_acsl_keyword fmt "\\null"
-    | TCoerce (e,ty) ->
-      fprintf fmt "%a@ :>@ %a"
-        (self#term_prec current_level) e (self#typ None) ty
+    | TCoerce (e,ty) -> fprintf fmt "%a@ :>@ %a" term e (self#typ None) ty
     | TCoerceE (e,ce) ->
-      fprintf fmt "%a :> %a"
-        (self#term_prec current_level) e (self#term_prec current_level) ce
+        fprintf fmt "%a :> %a" term e (self#term_prec current_level) ce
     | TUpdate (t,toff,v) ->
       fprintf fmt "{%a %a %a = %a}"
         self#term t
@@ -2377,7 +2363,7 @@ class cil_printer () = object (self)
     | Tlambda(prms,expr) ->
       fprintf fmt "@[<2>%a@ %a;@ %a@]"
         self#pp_acsl_keyword "\\lambda"
-        self#quantifiers prms (self#term_prec current_level) expr
+        self#quantifiers prms term expr
     | Ttypeof t ->
       fprintf fmt "%a(%a)" self#pp_acsl_keyword "\\typeof" self#term t
     | Ttype ty ->
@@ -2394,19 +2380,17 @@ class cil_printer () = object (self)
         self#pp_acsl_keyword "\\inter"
         (Pretty_utils.pp_list ~sep:",@ " self#term) locs
     | Tempty_set -> self#pp_acsl_keyword fmt "\\empty"
-    | Tcomprehension(lv,quant,pred) ->
+    | Tcomprehension(lv,quant,p) ->
       fprintf fmt "{@[%a@ |@ %a%a@]}"
-        self#term lv self#quantifiers quant
+        (self#term_prec Precedence.bitwiseLevel) lv self#quantifiers quant
         (Pretty_utils.pp_opt
-           (fun fmt p -> fprintf fmt ";@ %a" self#predicate p))
-        pred
+           (fun fmt p -> fprintf fmt ";@ %a" self#predicate p)) p
     | Trange(low,high) ->
-      let pp_term = self#term_prec current_level in
-      fprintf fmt "@[%a..%a@]"
-        (Pretty_utils.pp_opt
-           (fun fmt v -> Format.fprintf fmt "%a " pp_term v)) low
-        (Pretty_utils.pp_opt
-           (fun fmt v -> Format.fprintf fmt "@ %a" pp_term v)) high;
+        fprintf fmt "@[%a..%a@]"
+          (Pretty_utils.pp_opt
+             (fun fmt v -> Format.fprintf fmt "%a " term v)) low
+          (Pretty_utils.pp_opt
+             (fun fmt v -> Format.fprintf fmt "@ %a" term v)) high;
     | Tlet(def,body) ->
       assert
         (Kernel.verify (def.l_labels = [])
@@ -2431,13 +2415,13 @@ class cil_printer () = object (self)
               self#pp_acsl_keyword "\\lambda"
               self#quantifiers args)
         pp_defn
-        (self#term_prec current_level) body
+        term body
     | TLogic_coerce(ty,t) ->
       if (not (Cil.no_op_coerce ty t)) ||
          Kernel.is_debug_key_enabled Kernel.dkey_print_logic_coercions
       then
         fprintf fmt "(%a)" (self#logic_type None) ty;
-      self#term_prec current_level fmt t;
+      term fmt t;
 
   method private term_lval_prec contextprec fmt lv =
     if Precedence.getParenthLevelLogic (TLval lv) > contextprec then

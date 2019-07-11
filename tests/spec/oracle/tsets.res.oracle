@@ -120,7 +120,7 @@ predicate Smember_and_or(set<ℤ>  s, ℤ v1, ℤ v2) =
  */
 /*@
 logic set<ℤ>  Scomprehension(set<ℤ>  s, ℤ mask) =
-  { (k | 1) | int k; (k | mask) ∈ s};
+  {(k | 1) | int k; (k | mask) ∈ s};
 
 */
 
