@@ -181,8 +181,6 @@ module Precedence = struct
   let assoc_connector_level x =
     and_level <= x && x <= or_level
 
-  let logic_level = 77 (* Tif:     4 [%right QUESTION prec_question]  ??? *)
-
   let bitwiseLevel = 75        (* 10 [%left BIFF]
                                   11 [%right BIMPLIES]
                                   12 [%left PIPE]
@@ -334,7 +332,7 @@ module Precedence = struct
     (* Constructions that do not require parentheses *)
     | TConst _
     | Tnull | TLval (TResult _,TNoOffset) | Tcomprehension _  | Tempty_set -> 0
-    | Tif (_, _, _)  -> logic_level
+    | Tif (_, _, _)  -> questionLevel
     | TLogic_coerce(_,e) -> (getParenthLevelLogic e.term_node) + 1
 
   (* Create an expression of the same shape, and use {!getParenthLevel} *)
