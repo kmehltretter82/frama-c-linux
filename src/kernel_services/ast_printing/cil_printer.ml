@@ -176,8 +176,7 @@ module Precedence = struct
   let or_level = 85             (* 7 [%left OR] *)
   let xor_level = 84            (* 8 [%left HATHAT] *)
   let and_level = 83            (* 9 [%left AND] *)
-  let and_or_level = 80         (* 7 [%left OR]
-                                   9 [%left AND] ???  *)
+
   let assoc_connector_level x =
     and_level <= x && x <= or_level
 
@@ -267,7 +266,8 @@ module Precedence = struct
 
   let getParenthLevel e = match (Cil.stripInfo e).enode with
     | Info _ -> assert false
-    | BinOp((LAnd | LOr), _,_,_) -> and_or_level
+    | BinOp(LAnd, _,_,_) -> and_level
+    | BinOp(LOr, _,_,_) -> or_level
     (* Bit operations. *)
     | BinOp((BOr|BXor|BAnd),_,_,_) -> bitwiseLevel
     (* Comparisons *)
@@ -293,7 +293,8 @@ module Precedence = struct
 
   let rec getParenthLevelLogic = function
     | Tlambda _ | Trange _ | Tlet _ -> binderLevel
-    | TBinOp((LAnd | LOr), _,_) -> and_or_level
+    | TBinOp(LAnd, _,_) -> and_level
+    | TBinOp(LOr, _,_) -> or_level
     (* Bit operations. *)
     | TBinOp((BOr|BXor|BAnd),_,_) -> bitwiseLevel
     | Tapp({ l_var_info },[],[_;_])
