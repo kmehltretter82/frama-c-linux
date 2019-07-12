@@ -65,6 +65,9 @@ void is_infinite () {
   }
 }
 
+float global_infinity = INFINITY;
+float global_nan = NAN;
+
 /* Tests the C and logic macros INFINITY and HUGE_VAL. */
 void macro_infinity () {
   float infinity_f = INFINITY;

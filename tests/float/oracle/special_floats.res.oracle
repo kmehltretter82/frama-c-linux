@@ -5,12 +5,14 @@
 [eva:initial-state] Values of globals at initialization
   rand ∈ [--..--]
   any_double ∈ [--..--]
+  global_infinity ∈ {inf}
+  global_nan ∈ NaN
 [eva] computing for function nan_comparisons <- main.
-  Called from tests/float/special_floats.c:91.
+  Called from tests/float/special_floats.c:94.
 [eva] Recording results for nan_comparisons
 [eva] Done for function nan_comparisons
 [eva] computing for function is_infinite <- main.
-  Called from tests/float/special_floats.c:92.
+  Called from tests/float/special_floats.c:95.
 [eva] tests/float/special_floats.c:29: check 'true' got status valid.
 [eva:alarm] tests/float/special_floats.c:30: Warning: 
   check 'false' got status invalid.
@@ -54,17 +56,17 @@
 [eva] Recording results for is_infinite
 [eva] Done for function is_infinite
 [eva] computing for function macro_infinity <- main.
-  Called from tests/float/special_floats.c:93.
-[eva] tests/float/special_floats.c:71: Frama_C_show_each_infinity: {inf}
-[eva] tests/float/special_floats.c:72: assertion got status valid.
+  Called from tests/float/special_floats.c:96.
+[eva] tests/float/special_floats.c:74: Frama_C_show_each_infinity: {inf}
+[eva] tests/float/special_floats.c:75: assertion got status valid.
 [eva] Recording results for macro_infinity
 [eva] Done for function macro_infinity
 [eva] computing for function macro_nan <- main.
-  Called from tests/float/special_floats.c:94.
-[eva] tests/float/special_floats.c:81: Frama_C_show_each_nan: NaN
-[eva] tests/float/special_floats.c:82: assertion got status valid.
-[eva] tests/float/special_floats.c:83: assertion got status valid.
-[eva] tests/float/special_floats.c:84: assertion got status valid.
+  Called from tests/float/special_floats.c:97.
+[eva] tests/float/special_floats.c:84: Frama_C_show_each_nan: NaN
+[eva] tests/float/special_floats.c:85: assertion got status valid.
+[eva] tests/float/special_floats.c:86: assertion got status valid.
+[eva] tests/float/special_floats.c:87: assertion got status valid.
 [eva] Recording results for macro_nan
 [eva] Done for function macro_nan
 [eva] Recording results for main
