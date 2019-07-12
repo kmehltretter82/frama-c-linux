@@ -132,10 +132,7 @@ class check ?(is_normalized=true) what : Visitor.frama_c_visitor =
            (check_abort "variables %s and %s have the same id (%d)"
               v.vname v'.vname v.vid))
       else
-        if v.vformal || v.vglob || not v.vdefined then
-          (* A defined local will only enter scope when the corresponding
-             Local_init statement is reached. *)
-          Varinfo.Hashtbl.add known_vars v v;
+        Varinfo.Hashtbl.add known_vars v v;
       match v.vlogic_var_assoc with
       | None -> Cil.DoChildren
       | Some ({ lv_origin = Some v'} as lv) when v == v' ->
@@ -378,7 +375,7 @@ class check ?(is_normalized=true) what : Visitor.frama_c_visitor =
         self#pop_behavior_stack ();
         f
       in
-      Cil.ChangeDoChildrenPost(f,check)
+      Cil.DoChildrenPost check
 
     method private check_label s =
       let ok = List.exists (function Label _ -> true | _ -> false) !s.labels in

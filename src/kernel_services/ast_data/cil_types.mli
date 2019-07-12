@@ -1066,7 +1066,7 @@ and stmt = {
 
   mutable sattr : attributes
   (** Statement attributes.
-      @since Frama-C+dev *)
+      @since 19.0-Potassium *)
 }
 
 (** Labels *)
@@ -1403,8 +1403,6 @@ and term_node =
       The logic type must not be a Ctype. In particular, used to denote
       lifting to Linteger and Lreal.
   *)
-  | TCoerce of term * typ (** coercion to a given C type. *)
-  | TCoerceE of term * term (** coercion to the type of a given term. *)
   | TUpdate of term * term_offset * term
       (** functional update of a field. *)
   | Ttypeof of term (** type tag for a term. *)
@@ -1583,8 +1581,6 @@ and predicate_node =
   | Pfresh of logic_label * logic_label * term * term
       (** \fresh(pointer, n)
 	  A memory block of n bytes is newly allocated to the pointer.*)
-  | Psubtype of term * term
-      (** First term is a type tag that is a subtype of the second. *)
 
 (** predicate with an unique identifier.  Use {!Logic_const.new_predicate} to
     create fresh predicates *)

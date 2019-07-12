@@ -988,7 +988,7 @@ controlled by the following options:
   (default is: \texttt{1000}).
 \end{description}
 
-\subsection{Decision Procedures Interface}
+\subsection{Prover Selection}
 \label{wp-provers}
 
 The generated proof obligations are submitted to external decision
@@ -1103,41 +1103,69 @@ then save the proof scripts in order to replay them in batch mode.
 \item[\tt -wp-coq-project='<name>'] override the \verb+_CoqProject+ file name
   for Emacs and Proof General.
 \end{description}
-
 \hrule
-\paragraph{Why3.}
-Since \textsf{WP} version \verb+0.7+ (Fluorine), native support for \textsf{Why3}
-and \textsf{Why3-Ide} are provided. The older system \textsf{Why}
-\verb+2.x+ is \emph{no} longer supported.
+
+\pagebreak
+\paragraph{Why-3.}
+Native support for \textsf{Why-3} is provided (for versions 1.0 and newer).
+\\
+Support for \textsf{Why-3 IDE} is no longer provided.
 \begin{description}
-\item[\tt -wp-prover "why3ide"] runs \textsf{Why3-Ide} with all
-  generated goals.  On exit, the \textsf{WP} plug-in reads back your
-  \textsf{Why3} session and updates the proof obligation status accordingly.
-\item[\tt -wp-prover "<p>"] runs a \textsf{Why3} prover named \texttt{<p>}.
-\item[\tt -wp-prover "why3:<p>"] useful alias when \texttt{"<p>"} can
-  be ambiguous. It is actually different to run \texttt{alt-ergo} or \texttt{coq}
-  directly from \textsf{WP} or through \textsf{Why3}.
-\item[\tt -wp-detect] lists the provers available with \textsf{Why3}.
-  This command calls \texttt{why3 --list-provers} but you have to
-  configure \textsf{Why3} on your own before, for instance by using
-  \texttt{why3config}. Consult the \textsf{Why3} user manual for details.
-  The listed prover names can be directly used with the \texttt{-wp-prover} option.
-\item[\tt -wp-why3='<cmd>'] override the \verb+why3+ command.
+\item[\tt -wp-prover "why3:<p>"] runs a \textsf{Why-3} prover named \texttt{<p>}, and
+  exactly behaves like invoking \verb+why3 prover -P <p>+. The list of prover
+  names \verb+<p>+ must be extracted from the \verb+[alias]+ section of your \textsf{Why-3}
+  configuration, which \verb+frama-c -wp-detect+ does for you (see below).
+\item[\tt -wp-prover "<p>"] can also be used instead of \verb+-wp-prover "why3:<p>"+
+  when \verb+<p>+ is not natively supported by \textsf{WP}, like \texttt{alt-ergo},
+  \texttt{altgr-ergo}, \texttt{coq}, \texttt{coqide}, \texttt{script} and \texttt{tip}.
+\item[\tt -wp-detect] lists the provers available for \textsf{Why-3}.
+  This command can only work if \textsf{why3} API was installed before building and
+  installing \textsf{Frama-C}.
+  The option reads your \textsf{Why-3} configuration and prints the available
+  provers with their \verb+-wp-prover <p>+ code names.
+\item[\tt -wp-why3='<cmd>'] overrides the path to the \verb+why3+ command.
 \end{description}
 
-\paragraph{Sessions.}
-Your \textsf{Why3} session is saved in the \texttt{"project.session"}
-sub-directory of \texttt{-wp-out}. You may run
-\texttt{why3ide} by hand by issuing the following command:
-\begin{shell}
-# why3ide -I <frama-c-share>/wp <out>/project.session
-\end{shell}
+\paragraph{Example of using Why-3.}
+Suppose you have the following configuration:
 
-Proof recovering features of \textsf{Why3} are fully available, and
-you can interleave proving from \textsf{WP} with manual runs of
-\texttt{why3ide}. Interactive proofs with \textsf{Why3} are completely
-separated from those managed by the native \textsf{WP} interface with
-\textsf{Coq}.
+\begin{logs}
+# frama-c -wp-detect
+[wp] Why3 provers detected:
+   - Alt-Ergo 2.0.0 [why3:alt-ergo,altergo]
+   - CVC4 1.6 [cvc4]
+   - CVC4 1.6 (counterexamples) [cvc4-ce]
+   - Coq 8.9.0 [why3:coq]
+   - Z3 4.6.0 [z3]
+   - Z3 4.6.0 (counterexamples) [z3-ce]
+   - Z3 4.6.0 (noBV) [z3-nobv]
+\end{logs}
+
+Then, to use (for instance) \textsf{CVC4 1.6},
+you can use \verb+-wp-prover cvc4+ (since this name is not conflicting
+with any native prover). Alternatively, you can also use the less ambiguous
+name  \verb+-wp-prover why3:cvc4+ if you prefer.
+Similarly, if you want to use \textsf{Z3 4.6.0} without bitvectors, you can use \verb+-wp-prover z3-nobv+
+or \verb+-wp-prover why3:z3-nobv+.
+
+However, to use \textsf{Alt-Ergo 2.0.0} \emph{via} \textsf{Why-3}, you shall use
+\verb+-wp-prover why3:alt-ergo+, since \verb+-wp-prover alt-ergo+ would select
+the native support of \textsf{Alt-Ergo} prover. Finally, since \textsf{Why-3} also provides the alias
+\verb+altergo+ for this prover, \verb+-wp-prover altergo+ will also run it \emph{via} \textsf{Why-3}.
+
+%% \paragraph{Sessions.}
+%% Your \textsf{Why3} session is saved in the \texttt{"project.session"}
+%% sub-directory of \texttt{-wp-out}. You may run
+%% \texttt{why3ide} by hand by issuing the following command:
+%% \begin{shell}
+%% # why3ide -I <frama-c-share>/wp <out>/project.session
+%% \end{shell}
+
+%% Proof recovering features of \textsf{Why3} are fully available, and
+%% you can interleave proving from \textsf{WP} with manual runs of
+%% \texttt{why3ide}. Interactive proofs with \textsf{Why3} are completely
+%% separated from those managed by the native \textsf{WP} interface with
+%% \textsf{Coq}.
 
 \subsection{Generated Proof Obligations}
 Your proof obligations are generated and saved to several text

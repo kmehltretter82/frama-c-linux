@@ -25,14 +25,14 @@ open Strategy
 
 let configure (console : #Tactical.feedback) strategy =
   let { tactical ; selection ; arguments } = strategy in
-  let verdict =
+  let verdict () =
     try
       tactical#reset ;
       Strategy.set_args tactical arguments ;
       tactical#select console selection
     with Not_found | Exit -> Not_applicable
   in
-  match verdict with
+  match Lang.local ~pool:console#pool verdict () with
   | Applicable process when not console#has_error ->
       let title = tactical#title in
       let script = ProofScript.jtactic ~title tactical selection in

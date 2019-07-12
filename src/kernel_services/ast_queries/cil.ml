@@ -2485,14 +2485,6 @@ and childrenTermNode vis tn =
         let t' = vTerm t in 
 	if t' != t || s' != s then Tblock_length (s',t') else tn
     | Tnull -> tn
-    | TCoerce(te,ty) ->
-        let ty' = vTyp ty in
-        let te' = vTerm te in
-        if ty' != ty || te' != te then TCoerce(te',ty') else tn
-    | TCoerceE(te,tc) ->
-        let tc' = vTerm tc in
-        let te' = vTerm te in
-        if tc' != tc || te' != te then TCoerceE(te',tc') else tn
     | TUpdate (tc,toff,te) ->
 	let tc' = vTerm tc in
         let te' = vTerm te in
@@ -2894,10 +2886,6 @@ and childrenLogicLabel vis l =
 	 let t' = vTerm t in
 	 let n' = vTerm n in 
 	 if t' != t || n' != n || s1 != s1' || s2 != s2' then Pfresh (s1',s2',t',n') else p
-     | Psubtype(te,tc) ->
-	 let tc' = vTerm tc in
-	 let te' = vTerm te in
-	 if tc' != tc || te' != te then Psubtype(te',tc') else p
 
 and visitCilIdTerm vis loc =
    doVisitCil vis vis#behavior.cidentified_term vis#videntified_term
@@ -3794,10 +3782,10 @@ and childrenExp (vis: cilVisitor) (e: exp) : exp =
        Cil_datatype.Varinfo.pretty nv
    end;
    f.svar <- nv; (* hit the function name *)
-   (* visit local declarations *)
-   f.slocals <- mapNoCopy (visitCilVarDecl vis) f.slocals;
    (* visit the formals *)
    let newformals = mapNoCopy (visitCilVarDecl vis) f.sformals in
+   (* visit local declarations *)
+   f.slocals <- mapNoCopy (visitCilVarDecl vis) f.slocals;
    (* Make sure the type reflects the formals *)
    let selection = State_selection.singleton FormalsDecl.self in
    if vis#behavior.is_copy_behavior || newformals != f.sformals then begin
@@ -7769,10 +7757,8 @@ let rec free_vars_term bound_vars t = match t.term_node with
   | Toffset (_,t)
   | Tbase_addr (_,t)
   | Tblock_length (_,t)
-  | TCoerce (t,_)
   | Ttypeof t -> free_vars_term bound_vars t
-  | TBinOp (_,t1,t2)
-  | TCoerceE (t1,t2) ->
+  | TBinOp (_,t1,t2) ->
     Logic_var.Set.union
       (free_vars_term bound_vars t1)
       (free_vars_term bound_vars t2)
@@ -7882,7 +7868,6 @@ and free_vars_predicate bound_vars p = match p.pred_content with
       seps
   | Pfresh (_,_,t1,t2) 
   | Prel (_,t1,t2)
-  | Psubtype (t1,t2)
     ->
     Logic_var.Set.union
       (free_vars_term bound_vars t1)

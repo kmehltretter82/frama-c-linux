@@ -418,6 +418,8 @@ object(self)
 
   val mutable can_throw = false
 
+  val mutable fct_can_throw = false
+
   val mutable catched_var = None
 
   val mutable label_counter = 0
@@ -511,6 +513,7 @@ object(self)
   method private jumps_to_default_handler loc =
     if Stack.is_empty catch_all_label then begin
       (* no catch-all clause in the function: just go up in the stack. *)
+      fct_can_throw <- true;
       let kf = Extlib.the self#current_kf in
       let ret = Kernel_function.find_return kf in
       let rtyp = Kernel_function.get_return_type kf in
@@ -617,7 +620,16 @@ object(self)
     ignore (Visitor.visitFramacBlock (self :> Visitor.frama_c_visitor) b);
     add_unreachable_block b
 
-  method! vfunc _ = label_counter <- 0; DoChildren
+  method! vfunc _ =
+    label_counter <- 0;
+    fct_can_throw <- false;
+    let update_body f =
+      if fct_can_throw then begin
+        Oneret.encapsulate_local_vars f
+      end;
+      f
+    in
+    DoChildrenPost update_body
 
   method private modify_current () =
     modified_funcs <-

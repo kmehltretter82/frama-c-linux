@@ -2,9 +2,13 @@
 { pkgs, stdenv, src ? ../., opam2nix, ocaml_version ? "ocaml-ng.ocamlPackages_4_05.ocaml", plugins ? { } }:
 
 let mk_buildInputs = { opamPackages ? [], nixPackages ? [] } :
-    [ pkgs.gnugrep pkgs.gnused  pkgs.autoconf pkgs.gnumake pkgs.gcc pkgs.ncurses pkgs.time pkgs.python3 pkgs.perl pkgs.file ] ++ nixPackages ++ opam2nix.build {
+    [ pkgs.gnugrep pkgs.gnused  pkgs.autoconf pkgs.gnumake pkgs.gcc pkgs.ncurses pkgs.time pkgs.python3 pkgs.perl pkgs.file] ++ nixPackages ++ opam2nix.build {
            specs = opam2nix.toSpecs ([ "ocamlfind" "zarith" "ocamlgraph" "yojson"
-                { name = "coq"; constraint = "=8.7.2"; }
+                { name = "coq"; constraint = "=8.7.2";  }
+                { name = "why3" ; constraint = "=1.2.0"; }
+                { name = "why3-coq" ; constraint = "=1.2.0"; }
+                { name = "menhir"; constraint = "=20181113"; }
+                "camlzip" #so that why3 is always compiled with it
                 ] ++ opamPackages ++
                 (if ocaml_version == "pkgs.ocaml-ng.ocamlPackages_4_02.ocaml"
                 then [ { name = "ocamlbuild" ; constraint = "=0"; } ] else [])
@@ -151,7 +155,6 @@ rec {
         name = "frama-c-wp-qualif";
         buildInputs = mk_buildInputs { opamPackages = [
                     { name = "alt-ergo"; constraint = "=2.0.0"; }
-                    { name = "why3" ; constraint = "=1.1.1"; }
                ]; };
         build_dir = main.build_dir;
         src = main.build_dir + "/dir.tar";

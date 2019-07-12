@@ -192,7 +192,6 @@ let wp_update_script label () =
 
 let wp_panel
     ~(main:Design.main_window_extension_points)
-    ~(available_provers:GuiConfig.available)
     ~(configure_provers:unit -> unit)
   =
   let vbox = GPack.vbox () in
@@ -221,7 +220,7 @@ let wp_panel
     ~label:"Provers..." ~tooltip:"Detect WP Provers" () in
   prover_cfg#connect configure_provers ;
   form#add_label_widget prover_cfg#coerce ;
-  let prover_menu = new GuiConfig.dp_button ~available:available_provers in
+  let prover_menu = new GuiConfig.dp_button in
   form#add_field prover_menu#coerce ;
   Gtk_form.register demon prover_menu#update ;
   (* End Form *)
@@ -314,8 +313,8 @@ let wp_panel
     "WP" , vbox#coerce , Some (Gtk_form.refresh demon) ;
   end
 
-let register ~main ~available_provers ~configure_provers =
+let register ~main ~configure_provers =
   main#register_panel
-    (fun main -> wp_panel ~main ~available_provers ~configure_provers)
+    (fun main -> wp_panel ~main ~configure_provers)
 
 (* -------------------------------------------------------------------------- *)

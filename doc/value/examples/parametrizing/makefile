@@ -11,10 +11,13 @@ TARGETS = \
   widen-hints.log \
   slevel.1.log \
   slevel.2.log \
-  nor.1.log \
-  nor.2.log \
   ilevel.1.log \
-  ilevel.2.log
+  ilevel.2.log \
+	loop-unroll-const.log \
+	loop-unroll-nested.log \
+	loop-unroll-insuf.log \
+	split-array.log \
+	split-fabs.log
 
 .SECONDEXPANSION:
 .PHONY: all clean
@@ -35,8 +38,4 @@ context-depth.3.log: FCFLAGS += -context-width 1 -context-depth 1 -context-valid
 slevel.1.log: FCFLAGS += -slevel 55
 slevel.2.log: FCFLAGS += -slevel 28
 ilevel.2.log: FCFLAGS += -val-ilevel 16
-
-nor.1.log nor.2.log: nor.c
-	time --format "\nuser time: %Us" $(FRAMAC) $(FCFLAGS) -val $< > $@ 2>&1
-nor.1.log: FCFLAGS += -slevel 2001
-nor.2.log: FCFLAGS += -slevel 2001 -no-results-function irrelevant_function
+split-fabs.log: FCFLAGS += -eva-equality-domain

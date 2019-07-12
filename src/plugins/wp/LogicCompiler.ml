@@ -875,7 +875,7 @@ struct
         match LogicBuiltins.logic cst with
         | ACSLDEF -> call_fun env cst [] []
         | HACK phi -> phi []
-        | LFUN f -> e_fun f []
+        | LFUN phi -> e_fun phi [] ~result:(Lang.tau_of_ltype x.lv_type)
       in Cvalues.plain x.lv_type v
     with Not_found ->
       Wp_parameters.fatal "Unbound logic variable '%a'"

@@ -1,6 +1,8 @@
 [kernel] Parsing tests/libc/unistd_h.c (with preprocessing)
 [eva] Splitting return states on:
   \return(access) == 0 (auto)
+  \return(chdir) == 0 (auto)
+  \return(chroot) == 0 (auto)
   \return(chown) == 0 (auto)
   \return(dup) == -1 (auto)
   \return(getcwd) == 0 (auto)
@@ -501,6 +503,21 @@
 [eva] computing for function chown <- main.
   Called from tests/libc/unistd_h.c:84.
 [eva] Done for function chown
+[eva] computing for function chdir <- main.
+  Called from tests/libc/unistd_h.c:86.
+[eva] using specification for function chdir
+[eva] tests/libc/unistd_h.c:86: 
+  function chdir: precondition 'valid_string_path' got status valid.
+[eva] Done for function chdir
+[eva] computing for function chroot <- main.
+  Called from tests/libc/unistd_h.c:88.
+[eva] using specification for function chroot
+[eva] tests/libc/unistd_h.c:88: 
+  function chroot: precondition 'valid_string_path' got status valid.
+[eva] Done for function chroot
+[eva] computing for function chroot <- main.
+  Called from tests/libc/unistd_h.c:88.
+[eva] Done for function chroot
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

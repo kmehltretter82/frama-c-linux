@@ -27,18 +27,20 @@
 # See also COQ_LIBS_CEA
 
 ## Used in share/why3
-WHY3_LIBS_CEA:= \
- ArcTrigo.why   \
- Cbits.why      \
- Cfloat.why     \
- Cint.why       \
- Cmath.why      \
- ExpLog.why     \
- Memory.why     \
- Qed.why        \
- Square.why     \
- Vlist.why      \
- Vset.why
+
+WHY3_LIBS_CEA:=	\
+ ArcTrigo.mlw   \
+ cbits.mlw 	\
+ cint.mlw 	\
+ cfloat.mlw 	\
+ cmath.mlw 	\
+ memory.mlw 	\
+ qed.mlw 	\
+ vset.mlw	\
+ vlist.mlw
+
+## Used in share/why3
+WHY3_API_LIBS_CEA:= WHY3_LIBS_CEA
 
 # --------------------------------------------------------------------------
 # ---  Coq Libraries
@@ -68,6 +70,7 @@ COQ_LIBS_INRIA:=\
  bool/Bool.v 	\
  int/Abs.v 	\
  int/ComputerDivision.v	\
+ int/EuclideanDivision.v \
  int/Exponentiation.v	\
  int/Int.v 	\
  int/MinMax.v 	\
@@ -82,7 +85,8 @@ COQ_LIBS_INRIA:=\
  real/Square.v \
  real/ExpLog.v \
  real/PowerReal.v \
- real/Trigonometry.v
+ real/Trigonometry.v \
+ for_drivers/ComputerOfEuclideanDivision.v
 
 # --------------------------------------------------------------------------
 # ---  Alt-Ergo Libraries
@@ -133,7 +137,7 @@ ERGO_LIBS_INRIA:= \
 WP_SHARE_SRC_CEA_RESOURCES:= \
 	wp.driver \
 	why3/coq.drv \
-	$(addprefix why3/,  $(WHY3_LIBS_CEA)) \
+	$(addprefix why3/frama_c_wp/,  $(WHY3_LIBS_CEA)) \
 	$(addprefix why3/,  $(COQ_LIBS_CEA)) \
 	$(addprefix coqwp/, $(COQ_LIBS_CEA)) \
 	$(addprefix ergo/,  $(ERGO_LIBS_CEA))

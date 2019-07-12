@@ -655,7 +655,7 @@ let prove_prop wpo ~mode ~axioms ~prop =
   let gid = wpo.po_gid in
   let leg = wpo.po_leg in
   let model = wpo.po_model in
-  let script = DISK.file_goal ~pid ~model ~prover:Coq in
+  let script = DISK.file_goal ~pid ~model ~prover:NativeCoq in
   let includes , headers , goal =
     Model.with_model model (assemble_goal ~pid axioms) prop
   in

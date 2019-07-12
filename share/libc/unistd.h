@@ -745,7 +745,25 @@ extern int          access(const char *path, int amode);
 
 extern unsigned int alarm(unsigned int);
 extern int          brk(void *);
+
+/*@ // missing: may assign to errno: EACCES, ELOOP, ENAMETOOLONG, ENOENT,
+    //                               ENOTDIR
+    // missing: assigns \result \from 'filesystem'
+  requires valid_string_path: valid_read_string(path);
+  assigns \result \from indirect:path, indirect:path[0..];
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+*/
 extern int          chdir(const char *path);
+
+
+/*@ // missing: may assign to errno: EACCES, ELOOP, ENAMETOOLONG, ENOENT,
+    //                               ENOTDIR, EPERM
+    // missing: assigns \result \from 'filesystem, permissions'
+    // missing: assigns 'filesystem view' \from path[0..];
+  requires valid_string_path: valid_read_string(path);
+  assigns \result \from indirect:path, indirect:path[0..];
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+*/
 extern int          chroot(const char *path);
 
 

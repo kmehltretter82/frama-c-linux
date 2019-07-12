@@ -195,12 +195,10 @@ module Precedence = struct
 
   let unaryLevel = 30          (* 21 [%right prec_cast TILDE NOT prec_unary_op] *)
   let addrOfLevel = 30         (* 21 [%right prec_cast TILDE NOT prec_unary_op] *)
-  let subtypeLevel = 25        (* 22 [%nonassoc LTCOLON COLONGT] *)
-
-  let memOffset_level = 20     (* 23 [%left DOT ARROW LSQUARE] *)
-  let derefStarLevel = 20      (* 23 [%left DOT ARROW LSQUARE] *)
-  let indexLevel = 20          (* 23 [%left DOT ARROW LSQUARE] *)
-  let arrowLevel = 20          (* 23 [%left DOT ARROW LSQUARE] *)
+  let memOffset_level = 20     (* 22 [%left DOT ARROW LSQUARE] *)
+  let derefStarLevel = 20      (* 22 [%left DOT ARROW LSQUARE] *)
+  let indexLevel = 20          (* 22 [%left DOT ARROW LSQUARE] *)
+  let arrowLevel = 20          (* 22 [%left DOT ARROW LSQUARE] *)
   let sizeOfLevel = 20         (* -  [%token] *)
   let alignOfLevel = 20        (* -  [%token] *)
 
@@ -227,7 +225,6 @@ module Precedence = struct
     | Pseparated _
     | Pat _
     | Pfresh _ -> 0
-
     | Plet _
     | Pforall _
     | Pexists _ -> binderLevel
@@ -244,7 +241,6 @@ module Precedence = struct
         else belongLevel
     | Prel _ -> comparativeLevel
     | Pnot _ -> unaryLevel
-    | Psubtype _ -> subtypeLevel
 
   let compareLevel x y =
     if assoc_connector_level x && assoc_connector_level y then 0
@@ -310,8 +306,6 @@ module Precedence = struct
     | TAddrOf(_)
     | TStartOf(_)
     | TUnOp((Neg|BNot|LNot),_) -> unaryLevel
-    (* Unary post *)
-    | TCoerce _ | TCoerceE _ -> subtypeLevel
     (* Lvals *)
     | TLval(TMem _ , _) -> derefStarLevel
     | TLval(TVar _, (TField _|TIndex _|TModel _)) -> indexLevel
@@ -599,7 +593,16 @@ class cil_printer () = object (self)
   method varname fmt v = pp_print_string fmt v
 
   (* variable use *)
-  method varinfo fmt v = self#varname fmt v.vname
+  method varinfo fmt v =
+    if Kernel.is_debug_key_enabled Kernel.dkey_print_vid then begin
+      Format.fprintf fmt "/* vid:%d" v.vid;
+      (match v.vlogic_var_assoc with
+         None -> ()
+       | Some v -> Format.fprintf fmt ", lvid:%d" v.lv_id
+      );
+      Format.fprintf fmt " */"
+    end;
+    self#varname fmt v.vname
 
   (* variable declaration *)
   method vdecl fmt (v:varinfo) =
@@ -2346,9 +2349,6 @@ class cil_printer () = object (self)
       fprintf fmt "%a%a(%a)" self#pp_acsl_keyword "\\block_length"
         self#labels [l] self#term t
     | Tnull -> self#pp_acsl_keyword fmt "\\null"
-    | TCoerce (e,ty) -> fprintf fmt "%a@ :>@ %a" term e (self#typ None) ty
-    | TCoerceE (e,ce) ->
-        fprintf fmt "%a :> %a" term e (self#term_prec current_level) ce
     | TUpdate (t,toff,v) ->
       fprintf fmt "{%a %a %a = %a}"
         self#term t
@@ -2455,7 +2455,16 @@ class cil_printer () = object (self)
     self#term_lval fmt (lh, TNoOffset)
 
   method logic_info fmt li = self#logic_var fmt li.l_var_info
-  method logic_var fmt v = self#varname fmt v.lv_name
+
+  method logic_var fmt v =
+    if Kernel.is_debug_key_enabled Kernel.dkey_print_vid then begin
+      Format.fprintf fmt "/* ";
+      (match v.lv_origin with
+         None -> ()
+       | Some v -> Format.fprintf fmt "vid:%d, " v.vid);
+      Format.fprintf fmt "lvid:%d */" v.lv_id
+    end;
+    self#varname fmt v.lv_name
 
   method quantifiers fmt l =
     Pretty_utils.pp_list ~sep:",@ "
@@ -2671,8 +2680,6 @@ class cil_printer () = object (self)
           self#pred_prec_named (Precedence.upperLevel,p)
           self#logic_label lab;
       current_label <- old_label
-    | Psubtype (e,ce) ->
-      fprintf fmt "@[%a@ <:@ %a@]" term e term ce
 
   method private decrement kw fmt (t, rel) = match rel with
     | None -> fprintf fmt "@[<2>%a@ %a;@]" self#pp_acsl_keyword kw self#term t

@@ -26,15 +26,15 @@ let ko_status = `Share "theme/default/unknown.png"
 let wg_status = `Share "theme/default/invalid.png"
 
 let filter = function
-  | VCS.Qed | VCS.Tactical | VCS.Why3ide | VCS.Coq -> false
-  | VCS.Why3 _ | VCS.AltErgo -> true
+  | VCS.Qed | VCS.Tactical | VCS.NativeCoq -> false
+  | VCS.Why3 _ | VCS.NativeAltErgo -> true
 
 (* -------------------------------------------------------------------------- *)
 (* --- Palette Tool                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
 let timeout_for = function
-  | VCS.AltErgo | VCS.Why3 _ ->
+  | VCS.NativeAltErgo | VCS.Why3 _ ->
       let value = Wp_parameters.Timeout.get () in
       let spin = new Widget.spinner
         ~tooltip:"Prover Timeout (0 for none)"
@@ -43,7 +43,7 @@ let timeout_for = function
   | _ -> None
 
 let stepout_for = function
-  | VCS.AltErgo ->
+  | VCS.NativeAltErgo ->
       let value = Wp_parameters.Steps.get () in
       let spin = new Widget.spinner
         ~tooltip:"Prover Step Limit (0 for none)"
@@ -52,7 +52,7 @@ let stepout_for = function
   | _ -> None
 
 let depth_for = function
-  | VCS.AltErgo ->
+  | VCS.NativeAltErgo ->
       let value = Wp_parameters.Depth.get () in
       let spin = new Widget.spinner
         ~tooltip:"Search Depth (-age-bound, 0 for prover default)"

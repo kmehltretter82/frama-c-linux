@@ -82,5 +82,10 @@ int main() {
   char *tty = ttyname(1);
 
   r = chown("/tmp/a.txt", 01000, 01000);
+
+  r = chdir("/tmp/");
+
+  r = chroot("/tmp");
+
   return 0;
 }

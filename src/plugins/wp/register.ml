@@ -513,8 +513,10 @@ let compute_provers ~mode =
       (fun pname prvs ->
          match VCS.prover_of_name pname with
          | None -> prvs
+         (*
          | Some VCS.Why3ide ->
              mode.why3ide <- true; prvs
+         *)
          | Some VCS.Tactical ->
              mode.tactical <- true ;
              if pname = "tip" then mode.update <- true ;
@@ -626,8 +628,10 @@ let do_wp_proofs_iter iter =
   let spawned = mode.why3ide || mode.tactical || mode.provers <> [] in
   begin
     if spawned then do_list_scheduled iter ;
+    (*
     if mode.why3ide then
       launch (ProverWhy3ide.prove ~callback:do_why3_result ~iter) ;
+    *)
     spawn_wp_proofs_iter ~mode iter ;
     if spawned then
       begin
@@ -841,21 +845,27 @@ let () = Cmdline.run_after_setting_files
        if Wp_parameters.has_dkey dkey_shell then
          Log.print_on_output pp_wp_parameters)
 
+let () = Cmdline.run_after_configuring_stage Why3_api.parse_why3_options
+
 let do_prover_detect () =
   if not !Config.is_gui && Wp_parameters.Detect.get () then
-    begin
-      let open ProverDetect in
-      let dps = detect () in
-      let pp_provers fmt dps =
-        List.iter (fun dp ->
-            Format.fprintf fmt "@\n - %a %a"
-              VCS.pretty dp VCS.pp_shortcuts dp.VCS.dp_shortcuts
-          ) dps in
-      if dps = [] then
-        Wp_parameters.result "No Why3 provers detected."
-      else
-        Wp_parameters.result "Why3 provers detected:%a" pp_provers dps
-    end
+    let provers = VCS.Why3_prover.provers () in
+    if provers = [] then
+      Wp_parameters.result "No Why3 provers detected."
+    else
+      let open Why3.Whyconf in
+      let shortcuts = get_prover_shortcuts (VCS.Why3_prover.get_config ()) in
+      List.iter
+        (fun p ->
+           Wp_parameters.result "Prover %10s %-10s %s [%t%a]"
+             p.prover_name p.prover_version p.prover_altern
+             (fun fmt ->
+                Why3.Wstdlib.Mstr.iter
+                  (fun name p' -> if Prover.equal p p' then
+                      Format.fprintf fmt "%s," name)
+                  shortcuts)
+             print_prover_parseable_format p
+        ) provers
 
 (* ------------------------------------------------------------------------ *)
 (* ---  Main Entry Point                                                --- *)

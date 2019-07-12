@@ -72,6 +72,8 @@ module Stdlib: sig
   val incr: int ref -> unit
   val min: 'a -> 'a -> 'a
   val max: 'a -> 'a -> 'a
+  val min_int: int
+  val max_int: int
 end
 
 (** 4.08 *)

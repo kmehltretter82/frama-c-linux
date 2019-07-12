@@ -699,10 +699,6 @@ and pp_term_node fmt = function
   | Tnull -> Format.fprintf fmt "Tnull"
   | TLogic_coerce(logic_type,term) ->
     Format.fprintf fmt "TLogic_coerce(%a,%a)"  pp_logic_type logic_type  pp_term term
-  | TCoerce(term,typ) ->
-    Format.fprintf fmt "TCoerce(%a,%a)"  pp_term term  pp_typ typ
-  | TCoerceE(term1,term2) ->
-    Format.fprintf fmt "TCoerceE(%a,%a)"  pp_term term1  pp_term term2
   | TUpdate(term1,term_offset,term2) ->
     Format.fprintf fmt "TUpdate(%a,%a,%a)"  pp_term term1  pp_term_offset term_offset  pp_term term2
   | Ttypeof(term) -> Format.fprintf fmt "Ttypeof(%a)"  pp_term term
@@ -879,8 +875,6 @@ and pp_predicate_node fmt = function
   | Pfresh(logic_label1,logic_label2,term1,term2) ->
     Format.fprintf fmt "Pfresh(%a,%a,%a,%a)"  pp_logic_label logic_label1  pp_logic_label logic_label2
       pp_term term1  pp_term term2
-  | Psubtype(term1,term2) ->
-    Format.fprintf fmt "Psubtype(%a,%a)"  pp_term term1  pp_term term2
 
 and pp_identified_predicate fmt identified_predicate =
   Format.fprintf fmt "{ip_id=%d;ip_content=%a}"

@@ -98,6 +98,19 @@ val finally : 'a task -> ('a status -> unit) -> 'a task
 val callback : 'a task -> ('a status -> unit) -> unit task
   (** Same as [finally] but the status of the task is discarded. *)
 
+type 'a async =
+  | Yield (** give up the control *)
+  | Wait of int (** wait for the number of milliseconds *)
+  | Return of 'a (** return a value *)
+
+type coin =
+  | Coin (** continue to work *)
+  | Kill (** stop the computation *)
+
+val async : (coin -> 'a status async) -> 'a task
+(** low level command for managing ressource with active wait *)
+
+
 val (>>>) : 'a task -> ('a status -> 'b task) -> 'b task (** [bind] infix. *)
 val (>>=) : 'a task -> ('a -> 'b task) -> 'b task  (** [sequence] infix. *)
 val (>>?) : 'a task -> ('a status -> unit) -> 'a task (** [finally] infix. *)

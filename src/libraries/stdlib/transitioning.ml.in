@@ -64,6 +64,8 @@ module Stdlib = struct
   let incr = incr
   let min = min
   let max = max
+  let min_int = min_int
+  let max_int = max_int
 end
 
 [@@@ warning "-3"]
