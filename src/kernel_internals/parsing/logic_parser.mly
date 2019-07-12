@@ -256,7 +256,7 @@
 %token GHOST MODEL CASE
 %token VOID CHAR SIGNED UNSIGNED SHORT LONG DOUBLE STRUCT ENUM UNION
 %token BSUNION INTER
-%token LTCOLON COLONGT TYPE BEHAVIOR BEHAVIORS ASSUMES COMPLETE DISJOINT
+%token TYPE BEHAVIOR BEHAVIORS ASSUMES COMPLETE DISJOINT
 %token TERMINATES
 %token BIFF BIMPLIES STARHAT HAT HATHAT PIPE TILDE GTGT LTLT
 %token SIZEOF LAMBDA LET
@@ -289,7 +289,6 @@
 %left PLUS MINUS
 %left STAR SLASH PERCENT
 %right prec_cast TILDE NOT prec_unary_op
-%nonassoc LTCOLON COLONGT
 %left DOT ARROW LSQUARE
 
 %type <Logic_ptree.lexpr> lexpr_eof
@@ -1944,7 +1943,6 @@ wildcard:
 | COLON { () }
 | COLON2 { () }
 | COLONCOLON { () }
-| COLONGT { () }
 | COMMA { () }
 | CONSTANT { () }
 | CONSTANT10 { () }
@@ -1969,7 +1967,6 @@ wildcard:
 | LSQUARE { () }
 | LSQUAREPIPE { () }
 | LT { () }
-| LTCOLON { () }
 | LTLT { () }
 | MINUS { () }
 | NE { () }
