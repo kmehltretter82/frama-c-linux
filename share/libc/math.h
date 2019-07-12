@@ -61,6 +61,9 @@ typedef double double_t;
 #define FP_SUBNORMAL 3
 #define FP_NORMAL 4
 
+#define FP_ILOGB0 __FC_INT_MIN
+#define FP_ILOGBNAN __FC_INT_MIN
+
 #include "float.h" // for DBL_MIN and FLT_MIN
 
 /*@
