@@ -725,11 +725,14 @@ let rec eval_term ~alarm_mode env t =
      | _ -> ast_error "non-evaluable constant")
   | TConst (LChr c) ->
     einteger (Cvalue.V.inject_int (Cil.charConstToInt c))
-  | TConst (LReal { r_lower ; r_upper }) -> begin
-      let r_lower = Fval.F.of_float r_lower in
-      let r_upper = Fval.F.of_float r_upper in
-      let f = Fval.inject Fval.Real r_lower r_upper in
-      ereal f
+  | TConst (LReal { r_nearest; r_lower ; r_upper }) -> begin
+      if Fc_float.is_nan r_nearest
+      then ereal Fval.nan
+      else
+        let r_lower = Fval.F.of_float r_lower in
+        let r_upper = Fval.F.of_float r_upper in
+        let f = Fval.inject Fval.Real r_lower r_upper in
+        ereal f
     end
 
   (*  | TConst ((CStr | CWstr) Missing cases *)
