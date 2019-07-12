@@ -6891,6 +6891,19 @@ and doExp local_env
                    "Invalid call to builtin_expect"
              end
 
+           | "__fc_infinity" -> begin
+               piscall := false;
+               let cst = CReal (infinity, FFloat, Some "INFINITY") in
+               pres := Cil.new_exp ~loc (Const cst);
+               prestype := Cil.floatType;
+             end
+           | "__fc_nan" -> begin
+               piscall := false;
+               let cst = CReal (nan, FFloat, Some "NAN") in
+               pres := Cil.new_exp ~loc (Const cst);
+               prestype := Cil.floatType;
+             end
+
            (* TODO: Only keep the side effects of the 1st or 2nd argument
               | "__builtin_choose_expr" ->
               begin match !pargs with

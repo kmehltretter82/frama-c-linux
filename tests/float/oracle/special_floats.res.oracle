@@ -18,20 +18,12 @@
   check 'false' got status invalid.
 [eva:alarm] tests/float/special_floats.c:32: Warning: 
   check 'false' got status invalid.
-[eva] computing for function __fc_infinity <- is_infinite <- main.
-  Called from tests/float/special_floats.c:33.
-[eva] using specification for function __fc_infinity
-[eva] Done for function __fc_infinity
 [eva:alarm] tests/float/special_floats.c:34: Warning: 
   check 'false' got status invalid.
 [eva] tests/float/special_floats.c:35: check 'true' got status valid.
 [eva] tests/float/special_floats.c:36: check 'true' got status valid.
 [eva:alarm] tests/float/special_floats.c:37: Warning: 
   check 'false' got status invalid.
-[eva] computing for function __fc_nan <- is_infinite <- main.
-  Called from tests/float/special_floats.c:38.
-[eva] using specification for function __fc_nan
-[eva] Done for function __fc_nan
 [eva:alarm] tests/float/special_floats.c:39: Warning: 
   check 'false' got status invalid.
 [eva] tests/float/special_floats.c:40: check 'true' got status valid.
@@ -63,31 +55,16 @@
 [eva] Done for function is_infinite
 [eva] computing for function macro_infinity <- main.
   Called from tests/float/special_floats.c:93.
-[eva] computing for function __fc_infinity <- macro_infinity <- main.
-  Called from tests/float/special_floats.c:70.
-[eva] Done for function __fc_infinity
 [eva] tests/float/special_floats.c:71: Frama_C_show_each_infinity: {inf}
 [eva] tests/float/special_floats.c:72: assertion got status valid.
-[eva] computing for function __fc_infinity <- macro_infinity <- main.
-  Called from tests/float/special_floats.c:73.
-[eva] Done for function __fc_infinity
-[eva] computing for function __fc_infinity <- macro_infinity <- main.
-  Called from tests/float/special_floats.c:74.
-[eva] Done for function __fc_infinity
 [eva] Recording results for macro_infinity
 [eva] Done for function macro_infinity
 [eva] computing for function macro_nan <- main.
   Called from tests/float/special_floats.c:94.
-[eva] computing for function __fc_nan <- macro_nan <- main.
-  Called from tests/float/special_floats.c:80.
-[eva] Done for function __fc_nan
 [eva] tests/float/special_floats.c:81: Frama_C_show_each_nan: NaN
 [eva] tests/float/special_floats.c:82: assertion got status valid.
 [eva] tests/float/special_floats.c:83: assertion got status valid.
 [eva] tests/float/special_floats.c:84: assertion got status valid.
-[eva] computing for function __fc_nan <- macro_nan <- main.
-  Called from tests/float/special_floats.c:85.
-[eva] Done for function __fc_nan
 [eva] Recording results for macro_nan
 [eva] Done for function macro_nan
 [eva] Recording results for main
