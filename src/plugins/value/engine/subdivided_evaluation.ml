@@ -772,8 +772,7 @@ module Make
       in
       subdivide_subexpr vars valuation result alarms
 
-  let evaluate context valuation expr =
-    let subdivnb = Value_parameters.LinearLevel.get () in
+  let evaluate context valuation ~subdivnb expr =
     if subdivnb = 0 || not activated
     then Eva.evaluate context valuation expr
     else subdivide_evaluation context valuation subdivnb expr

@@ -746,6 +746,9 @@ module Make
   type context =
     { (* The abstract domain state in which the evaluation takes place. *)
       state: Domain.t;
+      (* Maximum number of subdivisions. See {!Subdivided_evaluation} for
+         more details. *)
+      subdivision: int;
       (* The remaining fuel: maximum number of nested oracle uses, decremented
          at each call to the oracle. *)
       remaining_fuel: int;
@@ -1093,7 +1096,8 @@ module Make
       fun expr ->
         let valuation = !cache in
         let context = { context with remaining_fuel } in
-        Subdivided_Evaluation.evaluate context valuation expr
+        let subdivnb = context.subdivision in
+        Subdivided_Evaluation.evaluate context valuation ~subdivnb expr
         >>=: fun (valuation, value) ->
         cache := valuation;
         value
@@ -1104,15 +1108,20 @@ module Make
      with maximal precision. *)
   let root_context state =
     let remaining_fuel = root_fuel () in
-    { state; remaining_fuel; oracle }
+    let subdivision = Value_parameters.LinearLevel.get () in
+    { state; subdivision; remaining_fuel; oracle }
 
-  (* Context for a fast forward evaluation with minimal precision. *)
+  (* Context for a fast forward evaluation with minimal precision:
+     no subdivisions and no call to the oracle. *)
   let low_context state =
     let remaining_fuel = no_fuel in
-    { state; remaining_fuel; oracle }
+    let subdivision = 0 in
+    { state; subdivision; remaining_fuel; oracle }
 
   let subdivided_forward_eval valuation state expr =
-    Subdivided_Evaluation.evaluate (root_context state) valuation expr
+    let context = root_context state in
+    let subdivnb = context.subdivision in
+    Subdivided_Evaluation.evaluate context valuation ~subdivnb expr
 
   (* ------------------------------------------------------------------------
                            Backward Evaluation

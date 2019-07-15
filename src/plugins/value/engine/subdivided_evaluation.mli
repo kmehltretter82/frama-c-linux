@@ -44,7 +44,8 @@ module Make
   : sig
 
     val evaluate:
-      Eva.context -> Valuation.t -> exp -> (Valuation.t * Value.t) evaluated
+      Eva.context -> Valuation.t -> subdivnb:int ->
+      exp -> (Valuation.t * Value.t) evaluated
 
     val reduce_by_enumeration:
       Eva.context -> Valuation.t -> exp -> bool -> Valuation.t or_bottom
