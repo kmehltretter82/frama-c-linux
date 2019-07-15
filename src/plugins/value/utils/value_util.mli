@@ -46,6 +46,7 @@ val pp_callstack : Format.formatter -> unit
 (* TODO: Document the rest of this file. *)
 val emitter : Emitter.t
 val get_slevel : Kernel_function.t -> Value_parameters.SlevelFunction.value
+val get_subdivision: stmt -> int
 val pretty_actuals :
   Format.formatter -> (Cil_types.exp * Cvalue.V.t * 'b) list -> unit
 val pretty_current_cfunction_name : Format.formatter -> unit

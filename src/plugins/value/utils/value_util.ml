@@ -71,6 +71,12 @@ let get_slevel kf =
   try Value_parameters.SlevelFunction.find kf
   with Not_found -> Value_parameters.SemanticUnrollingLevel.get ()
 
+let get_subdivision stmt =
+  try
+    let kf = Kernel_function.find_englobing_kf stmt in
+    Value_parameters.LinearLevelFunction.find kf
+  with Not_found -> Value_parameters.LinearLevel.get ()
+
 let pretty_actuals fmt actuals =
   let pp fmt (e,x,_) = Cvalue.V.pretty_typ (Some (Cil.typeOf e)) fmt x in
   Pretty_utils.pp_flowlist pp fmt actuals

@@ -90,8 +90,7 @@ let is_determinate kf =
           || (name >= "Frama_C" && name < "Frama_D")
           || Builtins.find_builtin_override kf <> None)
 
-let subdivide_stmt _stmt =
-  Value_parameters.LinearLevel.get ()
+let subdivide_stmt = Value_util.get_subdivision
 
 let subdivide_kinstr = function
   | Kglobal -> Value_parameters.LinearLevel.get ()

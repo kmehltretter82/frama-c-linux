@@ -1021,6 +1021,30 @@ let () = add_precision_dep LinearLevel.parameter
 let () = LinearLevel.add_aliases ["-val-subdivide-non-linear"]
 
 let () = Parameter_customize.set_group precision_tuning
+module LinearLevelFunction =
+  Kernel_function_map
+    (struct
+      include Datatype.Int
+      type key = Cil_types.kernel_function
+      let of_string ~key:_ ~prev:_ s =
+        Extlib.opt_map
+          (fun s ->
+             try int_of_string s
+             with Failure _ ->
+               raise (Cannot_build ("'" ^ s ^ "' is not an integer")))
+          s
+      let to_string ~key:_ = Extlib.opt_map string_of_int
+    end)
+    (struct
+      let option_name = "-eva-subdivide-non-linear-function"
+      let arg_name = "f:n"
+      let help = "override the global option -eva-subdivide-non-linear with <n>\
+                  when analyzing the function <f>."
+      let default = Kernel_function.Map.empty
+    end)
+let () = add_precision_dep LinearLevelFunction.parameter
+
+let () = Parameter_customize.set_group precision_tuning
 let () = Parameter_customize.argument_may_be_fundecl ()
 module UsePrototype =
   Kernel_function_set
