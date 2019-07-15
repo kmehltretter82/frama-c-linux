@@ -196,20 +196,21 @@ module type S = sig
                                 and type origin = origin
                                 and type loc = loc
   val evaluate :
-    ?valuation:Valuation.t -> ?reduction:bool ->
+    ?valuation:Valuation.t -> ?reduction:bool -> ?subdivnb:int ->
     state -> exp -> (Valuation.t * value) evaluated
   val copy_lvalue :
-    ?valuation:Valuation.t ->
+    ?valuation:Valuation.t -> ?subdivnb:int ->
     state -> lval -> (Valuation.t * value flagged_value) evaluated
   val lvaluate :
-    ?valuation:Valuation.t -> for_writing:bool ->
+    ?valuation:Valuation.t -> ?subdivnb:int -> for_writing:bool ->
     state -> lval -> (Valuation.t * loc * typ) evaluated
   val reduce:
     ?valuation:Valuation.t -> state -> exp -> bool -> Valuation.t evaluated
   val assume:
     ?valuation:Valuation.t -> state -> exp -> value -> Valuation.t or_bottom
   val eval_function_exp:
-    exp -> ?args:exp list -> state -> (Kernel_function.t * Valuation.t) list evaluated
+    ?subdivnb:int -> exp -> ?args:exp list -> state ->
+    (Kernel_function.t * Valuation.t) list evaluated
   val interpret_truth:
     alarm:(unit -> Alarms.t) -> 'a -> 'a Abstract_value.truth -> 'a evaluated
 end
@@ -1106,9 +1107,15 @@ module Make
 
   (* Context for the forward evaluation of a root expression in state [state]
      with maximal precision. *)
-  let root_context state =
+  let root_context ?subdivnb state =
     let remaining_fuel = root_fuel () in
-    let subdivision = Value_parameters.LinearLevel.get () in
+    (* By default, use the number of subdivision defined by the global option
+       -eva-subdivide-non-linear. *)
+    let subdivision =
+      match subdivnb with
+      | None -> Value_parameters.LinearLevel.get ()
+      | Some n -> n
+    in
     { state; subdivision; remaining_fuel; oracle }
 
   (* Context for a fast forward evaluation with minimal precision:
@@ -1118,8 +1125,8 @@ module Make
     let subdivision = 0 in
     { state; subdivision; remaining_fuel; oracle }
 
-  let subdivided_forward_eval valuation state expr =
-    let context = root_context state in
+  let subdivided_forward_eval valuation ?subdivnb state expr =
+    let context = root_context ?subdivnb state in
     let subdivnb = context.subdivision in
     Subdivided_Evaluation.evaluate context valuation ~subdivnb expr
 
@@ -1476,8 +1483,8 @@ module Make
 
   module Valuation = Cache
 
-  let evaluate ?(valuation=Cache.empty) ?(reduction=true) state expr =
-    let eval, alarms = subdivided_forward_eval valuation state expr in
+  let evaluate ?(valuation=Cache.empty) ?(reduction=true) ?subdivnb state expr =
+    let eval, alarms = subdivided_forward_eval valuation ?subdivnb state expr in
     let result =
       if not reduction || Alarmset.is_empty alarms
       then eval
@@ -1489,9 +1496,9 @@ module Make
     in
     result, alarms
 
-  let copy_lvalue ?(valuation=Cache.empty) state lval =
+  let copy_lvalue ?(valuation=Cache.empty) ?subdivnb state lval =
     let expr = Value_util.lval_to_exp lval
-    and context = root_context state in
+    and context = root_context ?subdivnb state in
     try
       let record, report = Cache.find' valuation expr in
       if less_fuel_than context.remaining_fuel report.fuel
@@ -1511,29 +1518,30 @@ module Make
 
   (* When evaluating an lvalue, we use the subdivided evaluation for the
      expressions included in the lvalue. *)
-  let rec evaluate_offsets valuation state = function
+  let rec evaluate_offsets valuation ?subdivnb state = function
     | NoOffset             -> `Value valuation, Alarmset.none
-    | Field (_, offset)    -> evaluate_offsets valuation state offset
+    | Field (_, offset)    -> evaluate_offsets valuation ?subdivnb state offset
     | Index (expr, offset) ->
-      subdivided_forward_eval valuation state expr
+      subdivided_forward_eval valuation ?subdivnb state expr
       >>= fun (valuation, _value) ->
-      evaluate_offsets valuation state offset
+      evaluate_offsets valuation ?subdivnb state offset
 
-  let evaluate_host valuation state = function
+  let evaluate_host valuation ?subdivnb state = function
     | Var _    -> `Value valuation, Alarmset.none
     | Mem expr ->
-      subdivided_forward_eval valuation state expr >>=: fst
+      subdivided_forward_eval valuation ?subdivnb state expr >>=: fst
 
-  let lvaluate ?(valuation=Cache.empty) ~for_writing state lval =
+  let lvaluate ?(valuation=Cache.empty) ?subdivnb ~for_writing state lval =
     (* If [for_writing] is true, the location of [lval] is reduced by removing
        const bases. Use [for_writing:false] if const bases can be written
        through a mutable field or an initializing function. *)
     let for_writing = for_writing && not (Cil.is_mutable_or_initialized lval) in
     let host, offset = lval in
-    evaluate_host valuation state host >>= fun valuation ->
-    evaluate_offsets valuation state offset >>= fun valuation ->
+    evaluate_host valuation ?subdivnb state host >>= fun valuation ->
+    evaluate_offsets valuation ?subdivnb state offset >>= fun valuation ->
     cache := valuation;
-    lval_to_loc (root_context state) ~for_writing ~reduction:true lval
+    let context = root_context ?subdivnb state in
+    lval_to_loc context ~for_writing ~reduction:true lval
     >>=. fun (_, typ, _) ->
     backward_lval (backward_fuel ()) state lval >>-: fun _ ->
     match Cache.find_loc !cache lval with
@@ -1544,7 +1552,8 @@ module Make
     (* Generate [e == 0] *)
     let expr = Value_util.normalize_as_cond expr (not positive) in
     cache := valuation;
-    root_forward_eval (root_context state) expr >>=. fun (_v, volatile) ->
+    let context = root_context ~subdivnb:0 state in
+    root_forward_eval context expr >>=. fun (_v, volatile) ->
     (* Reduce by [(e == 0) == 0] *)
     backward_eval (backward_fuel ()) state expr (Some Value.zero)
     >>- fun () ->
@@ -1590,14 +1599,14 @@ module Make
     let expr = Cil.mkBinOp ~loc:expr.eloc Ne expr addr in
     fst (reduce ~valuation state expr false)
 
-  let eval_function_exp funcexp ?args state =
+  let eval_function_exp ?subdivnb funcexp ?args state =
     match funcexp.enode with
     | Lval (Var vinfo, NoOffset) ->
       `Value [Globals.Functions.get vinfo, Valuation.empty],
       Alarmset.none
     | Lval (Mem v, NoOffset) ->
       begin
-        evaluate state v >>= fun (valuation, value) ->
+        evaluate ?subdivnb state v >>= fun (valuation, value) ->
         let kfs, alarm = Value.resolve_functions value in
         match kfs with
         | `Top -> top_function_pointer funcexp

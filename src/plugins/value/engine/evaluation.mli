@@ -52,7 +52,7 @@ module type S = sig
       The [reduction] argument allows deactivating the backward reduction
       performed after the forward evaluation. *)
   val evaluate :
-    ?valuation:Valuation.t -> ?reduction:bool ->
+    ?valuation:Valuation.t -> ?reduction:bool -> ?subdivnb:int ->
     state -> exp -> (Valuation.t * value) evaluated
 
   (** Computes the value of a lvalue, with possible indeterminateness: the
@@ -62,7 +62,7 @@ module type S = sig
       The [valuation] argument is a cache of already computed expressions.
       It is empty by default. *)
   val copy_lvalue :
-    ?valuation:Valuation.t ->
+    ?valuation:Valuation.t -> ?subdivnb:int ->
     state -> lval -> (Valuation.t * value flagged_value) evaluated
 
   (** [lvaluate ~valuation ~for_writing state lval] evaluates the left value
@@ -72,7 +72,7 @@ module type S = sig
       read or written. It is useful for the emission of the alarms, and for the
       reduction of the location. *)
   val lvaluate :
-    ?valuation:Valuation.t -> for_writing:bool ->
+    ?valuation:Valuation.t -> ?subdivnb:int -> for_writing:bool ->
     state -> lval -> (Valuation.t * loc * typ) evaluated
 
   (** [reduce ~valuation state expr positive] evaluates the expression [expr]
@@ -96,7 +96,7 @@ module type S = sig
     state -> exp -> value -> Valuation.t or_bottom
 
   val eval_function_exp:
-    exp -> ?args:exp list -> state ->
+    ?subdivnb:int -> exp -> ?args:exp list -> state ->
     (Kernel_function.t * Valuation.t) list evaluated
   (** Evaluation of the function argument of a [Call] constructor *)
 
