@@ -1523,11 +1523,13 @@ let _ =
 let () =
   Cmdline.run_after_configuring_stage
     (fun () ->
-        feedback "BEFORE Project.remove";
-        Remove_projects.iter (fun project -> Project.remove ~project ());
-        feedback "AFTER Project.remove";
-        Remove_projects.unsafe_set Project.Datatype.Set.empty;
-        feedback "AFTER Clearing option")
+       (* clear "-remove-projects" before itering over (a copy of) its contents
+          in order to prevent warnings about dangling pointer deletion (since it
+          is itself projectified and so contains a pointer to the project being
+          removed). *)
+       let s = Remove_projects.get () in
+       Remove_projects.clear ();
+       Project.Datatype.Set.iter (fun project -> Project.remove ~project ()) s)
 
 (* ************************************************************************* *)
 (** {2 Others options} *)
