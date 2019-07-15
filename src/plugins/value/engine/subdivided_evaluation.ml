@@ -361,10 +361,9 @@ end
 module type Forward_Evaluation = sig
   type value
   type valuation
-  type state
+  type context
   val evaluate:
-    ?valuation:valuation -> fuel:int ->
-    state -> exp -> (valuation * value) evaluated
+    ?valuation:valuation -> context -> exp -> (valuation * value) evaluated
 end
 
 module Make
@@ -646,7 +645,7 @@ module Make
      [valuation] is the result of the evaluation of [expr] without subdivision.
      This function returns the alarms and the valuation resulting from the
      subdivided evaluation. *)
-  let subdivide_lvals ~fuel subdivnb valuation state expr subexpr lvals =
+  let subdivide_lvals context subdivnb valuation expr subexpr lvals =
     let Hypotheses.L variables = Hypotheses.from_list lvals in
     (* Split function for the subvalues of [lvals]. *)
     let split = make_split valuation variables in
@@ -661,7 +660,7 @@ module Make
       (* Updates [variables] with their new [subvalues]. *)
       let valuation = update_variables cleared_valuation variables subvalues in
       (* Evaluates [expr] with this new valuation. *)
-      let eval, alarms = Eva.evaluate ~fuel ~valuation state expr in
+      let eval, alarms = Eva.evaluate context ~valuation expr in
       let result = eval >>-: snd in
       (* Optimization if [subexpr] = [expr]. *)
       if eq_equal_subexpr
@@ -704,12 +703,12 @@ module Make
     eval_result, alarms
 
   (* Builds the information for an lvalue. *)
-  let get_info ~fuel valuation state lval =
+  let get_info context valuation lval =
     let lv_expr = Value_util.lval_to_exp lval in
     (* Reevaluates the lvalue in the initial state, as its value could have
        been reduced in the evaluation of the complete expression, and we cannot
        omit the alarms for the removed values. *)
-    fst (Eva.evaluate ~fuel ~valuation state lv_expr) >>- fun (valuation, _) ->
+    fst (Eva.evaluate context ~valuation lv_expr) >>- fun (valuation, _) ->
     let lv_record = find_val valuation lv_expr in
     lv_record.value.v >>-: fun lv_value ->
     { lval; lv_expr; lv_record; lv_value }
@@ -717,8 +716,8 @@ module Make
   (* Makes a list of lvalue information from a list of lvalues. Removes lvalues
      whose cvalue is singleton or contains addresses, as we cannot subdivide on
      such values. *)
-  let make_info_list ~fuel valuation state lvals =
-    let get_info = get_info ~fuel valuation state in
+  let make_info_list context valuation lvals =
+    let get_info = get_info context valuation in
     let get_info acc lval = Bottom.add_to_list (get_info lval) acc in
     let list = List.fold_left get_info [] lvals in
     List.filter (fun info -> can_be_subdivided (get_cval info.lv_value)) list
@@ -732,9 +731,9 @@ module Make
     | `Value (valuation, result) -> f valuation result alarms
 
   (* Subdivided evaluation of [expr] in state [state]. *)
-  let subdivide_evaluation ~fuel subdivnb initial_valuation state expr =
+  let subdivide_evaluation context subdivnb initial_valuation expr =
     (* Evaluation of [expr] without subdivision. *)
-    let default = Eva.evaluate ~fuel ~valuation:initial_valuation state expr in
+    let default = Eva.evaluate context ~valuation:initial_valuation expr in
     default >>> fun valuation result alarms ->
     (* Do not try to subdivide if the result is singleton or contains some
        pointers: the better_bound heuristic only works on numerical values. *)
@@ -750,7 +749,7 @@ module Make
         | (subexpr, lvals) :: tail ->
           (* Retrieve necessary information about the lvalues.
              Also remove lvalues with pointer or singleton values. *)
-          let lvals_info = make_info_list ~fuel initial_valuation state lvals in
+          let lvals_info = make_info_list context initial_valuation lvals in
           match lvals_info with
           | [] -> subdivide_subexpr tail valuation result alarms
           | _ ->
@@ -769,16 +768,16 @@ module Make
             Value_parameters.result ~current:true ~once:true ~dkey
               "subdividing on %a"
               (Pretty_utils.pp_list ~sep:", " Printer.pp_lval) lvals;
-            subdivide_lvals ~fuel subdivnb valuation state expr subexpr lvals_info
+            subdivide_lvals context subdivnb valuation expr subexpr lvals_info
             >>> subdivide_subexpr tail
       in
       subdivide_subexpr vars valuation result alarms
 
-  let evaluate ?(valuation=Valuation.empty) ~fuel state expr =
+  let evaluate ?(valuation=Valuation.empty) context expr =
     let subdivnb = Value_parameters.LinearLevel.get () in
     if subdivnb = 0 || not activated
-    then Eva.evaluate ~valuation ~fuel state expr
-    else subdivide_evaluation ~fuel subdivnb valuation state expr
+    then Eva.evaluate ~valuation context expr
+    else subdivide_evaluation context subdivnb valuation expr
 
 
   (* ---------------------- Reduction by enumeration ------------------------ *)
@@ -867,13 +866,13 @@ module Make
   let get_influential_exprs valuation expr =
     get_influential_vars valuation expr []
 
-  let reduce_by_cond_enumerate valuation state cond positive influentials =
+  let reduce_by_cond_enumerate valuation context cond positive influentials =
     (* Test whether the condition [expr] may still be true when the
        sub-expression [e] has the value [v]. *)
     let condition_may_still_be_true valuation expr record value =
       let value = { record.value with v = `Value value } in
       let valuation = Valuation.add valuation expr { record with value } in
-      let eval, _alarms = Eva.evaluate ~valuation ~fuel:0 state cond in
+      let eval, _alarms = Eva.evaluate context ~valuation cond in
       match eval with
       | `Bottom -> false
       | `Value (_valuation, value) ->

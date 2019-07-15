@@ -29,10 +29,9 @@ open Cil_types
 module type Forward_Evaluation = sig
   type value
   type valuation
-  type state
+  type context
   val evaluate:
-    ?valuation:valuation -> fuel:int ->
-    state -> exp -> (valuation * value) Eval.evaluated
+    ?valuation:valuation -> context -> exp -> (valuation * value) Eval.evaluated
 end
 
 module Make
@@ -45,11 +44,11 @@ module Make
   : sig
 
     val evaluate:
-      ?valuation:Valuation.t -> fuel:int ->
-      Eva.state -> exp -> (Valuation.t * Value.t) Eval.evaluated
+      ?valuation:Valuation.t -> Eva.context -> exp ->
+      (Valuation.t * Value.t) Eval.evaluated
 
     val reduce_by_enumeration:
-      Valuation.t -> Eva.state -> exp -> bool -> Valuation.t Eval.or_bottom
+      Valuation.t -> Eva.context -> exp -> bool -> Valuation.t Eval.or_bottom
   end
 
 
