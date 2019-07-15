@@ -34,7 +34,7 @@ type label_mapping = Cil_types.logic_label -> Clabels.c_label
 class norm_at (mapping : label_mapping) =
   object(self)
     inherit Visitor.generic_frama_c_visitor
-        (Visitor_behavior.copy_visit (Project.current ()))
+        (Visitor_behavior.copy (Project.current ()))
 
     val mutable current_label = None
 

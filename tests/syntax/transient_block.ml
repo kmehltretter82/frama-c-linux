@@ -9,7 +9,7 @@ class vis prj = object(self)
     let s1 = Cil.mkStmtOneInstr ~valid_sid:true instr in
     let b = Cil.mkBlock [s1] in
     if create then begin
-      let f = Visitor_behavior.get_fundec
+      let f = Visitor_behavior.Get.fundec
           self#behavior (Extlib.the self#current_func) in
       let y = Cil.makeLocalVar f ~scope:b "y" (TInt(IInt,[])) in
       my_var <- Some y;
@@ -32,7 +32,7 @@ class vis prj = object(self)
        with Log.AbortFatal _ ->
          Kernel.feedback "transient_block fatal error on %a as expected"
            Printer.pp_instr instr;
-         let f = Visitor_behavior.get_fundec
+         let f = Visitor_behavior.Get.fundec
              self#behavior (Extlib.the self#current_func) in
          let y = Extlib.the my_var in
          f.slocals <-

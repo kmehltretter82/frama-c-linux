@@ -693,9 +693,9 @@ object(self)
   method private clean_catch_clause (bind,b as handler) acc =
     let remove_local v =
       let f =
-        Visitor_behavior.get_fundec self#behavior (Extlib.the self#current_func)
+        Visitor_behavior.Get.fundec self#behavior (Extlib.the self#current_func)
       in
-      let v = Visitor_behavior.get_varinfo self#behavior v in
+      let v = Visitor_behavior.Get.varinfo self#behavior v in
       f.slocals <- List.filter (fun v' -> v!=v') f.slocals;
     in
     match bind with

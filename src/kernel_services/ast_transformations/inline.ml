@@ -90,7 +90,7 @@ let inline_call loc caller callee return args =
 
     method! vvrbl v =
       if v.vglob then
-        Cil.ChangeTo (Visitor_behavior.get_original_varinfo self#behavior v)
+        Cil.ChangeTo (Visitor_behavior.Get_orig.varinfo self#behavior v)
       else Cil.DoChildren
 
     method! vterm_lval (host,offset) =

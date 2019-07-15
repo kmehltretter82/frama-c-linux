@@ -55,7 +55,6 @@ open Logic_const
 open Format
 open Cil_datatype
 open Cil_types
-module VisBhv = Visitor_behavior
 
 (* ************************************************************************* *)
 (* Reporting messages *)
@@ -737,7 +736,7 @@ let register_behavior_extension name ext = Hashtbl.add visitor_tbl name ext
 (** A visitor interface for traversing CIL trees. Create instantiations of
  * this type by specializing the class {!Cil.nopCilVisitor}. *)
 class type cilVisitor = object
-  method behavior: VisBhv.t
+  method behavior: Visitor_behavior.t
 
   method project: Project.t option
 
@@ -918,7 +917,7 @@ class internal_genericCilVisitor current_func behavior queue: cilVisitor =
   object(self)
     method behavior = behavior
 
-    method project = VisBhv.get_project behavior
+    method project = Visitor_behavior.get_project behavior
 
     method plain_copy_visitor =
       let obj =
@@ -1054,7 +1053,7 @@ class genericCilVisitor bhv =
   internal_genericCilVisitor current_func bhv queue
 
 class nopCilVisitor = object
-  inherit genericCilVisitor (VisBhv.inplace_visit ())
+  inherit genericCilVisitor (Visitor_behavior.inplace ())
 end
 
 let apply_on_project ?selection vis f arg =
@@ -1276,14 +1275,14 @@ let debugVisit = false
 let visitCilConst vis c =
   match c with
   | CEnum ei -> (* In case of deep copy, we must change the enumitem*)
-    let ei' = VisBhv.get_enumitem vis#behavior ei in
+    let ei' = Visitor_behavior.Get.enumitem vis#behavior ei in
     if ei' != ei then CEnum ei' else c
   |  _ -> c
 
 let visitCilLConst vis c =
   match c with
   | LEnum ei -> (* In case of deep copy, we must change the enumitem*)
-    let ei' = VisBhv.get_enumitem vis#behavior ei in
+    let ei' = Visitor_behavior.Get.enumitem vis#behavior ei in
     if ei' != ei then LEnum ei' else c
   |  _ -> c
 
@@ -1436,12 +1435,12 @@ and childrenTermNode vis tn =
 
 and visitCilLogicLabel vis l =
   doVisitCil vis
-    (copy_logic_label vis#behavior.is_copy_behavior)
+    (copy_logic_label (Visitor_behavior.is_copy vis#behavior))
     vis#vlogic_label childrenLogicLabel l
 
 and childrenLogicLabel vis l =
   match l with
-    StmtLabel s -> s := VisBhv.get_stmt vis#behavior !s; l
+    StmtLabel s -> s := Visitor_behavior.Get.stmt vis#behavior !s; l
   | FormalLabel _ | BuiltinLabel _ -> l
 
 and visitCilTermLval vis tl =
@@ -1474,21 +1473,21 @@ and childrenTermOffset vis toff =
     TNoOffset -> toff
   | TField (fi, t) ->
     let t' = vOffset t in
-    let fi' = VisBhv.get_fieldinfo vis#behavior fi in
+    let fi' = Visitor_behavior.Get.fieldinfo vis#behavior fi in
     if t' != t || fi != fi' then TField(fi',t') else toff
   | TIndex(t,o) ->
     let t' = vTerm t in let o' = vOffset o in
     if t' != t || o' != o then TIndex(t',o') else toff
   | TModel (mi,t) ->
     let t' = vOffset t in
-    let mi' = VisBhv.get_model_info vis#behavior mi in
+    let mi' = Visitor_behavior.Get.model_info vis#behavior mi in
     if t' != t || mi != mi' then TModel(mi', t') else toff
 
 and visitCilLogicInfoUse vis li =
   (* First, visit the underlying varinfo to fill the copy tables if needed. *)
   let new_v = visitCilLogicVarUse vis li.l_var_info in
   let new_li =
-    doVisitCil vis (VisBhv.get_logic_info vis#behavior)
+    doVisitCil vis (Visitor_behavior.Get.logic_info vis#behavior)
       vis#vlogic_info_use alphabetabeta li
   in
   new_li.l_var_info <- new_v;
@@ -1501,7 +1500,7 @@ and visitCilLogicInfo vis li =
   let new_v = visitCilLogicVarDecl vis li.l_var_info in
   let res =
     doVisitCil
-      vis (VisBhv.memo_logic_info vis#behavior)
+      vis (Visitor_behavior.Memo.logic_info vis#behavior)
       vis#vlogic_info_decl childrenLogicInfo li
   in res.l_var_info <- new_v; res
 
@@ -1536,7 +1535,7 @@ and childrenLogicInfo vis li =
   li
 
 and visitCilLogicTypeInfo vis lt =
-  doVisitCil vis (VisBhv.memo_logic_type_info vis#behavior)
+  doVisitCil vis (Visitor_behavior.Memo.logic_type_info vis#behavior)
     vis#vlogic_type_info_decl childrenLogicTypeInfo lt
 
 and childrenLogicTypeInfo vis lt =
@@ -1557,7 +1556,7 @@ and childrenLogicTypeDef vis def =
 
 and visitCilLogicCtorInfoAddTable vis ctor =
   let ctor' = visitCilLogicCtorInfo vis ctor in
-  if VisBhv.is_copy vis#behavior then
+  if Visitor_behavior.is_copy vis#behavior then
     Queue.add
       (fun () ->
          Logic_env.add_logic_ctor ctor'.ctor_name ctor')
@@ -1568,7 +1567,7 @@ and visitCilLogicCtorInfo vis ctor =
   doVisitCil vis id vis#vlogic_ctor_info_decl childrenLogicCtorInfo ctor
 
 and childrenLogicCtorInfo vis ctor =
-  let ctor_type = doVisitCil vis (VisBhv.get_logic_type_info vis#behavior)
+  let ctor_type = doVisitCil vis (Visitor_behavior.Get.logic_type_info vis#behavior)
       vis#vlogic_type_info_use alphabetabeta ctor.ctor_type
   in
   let ctor_params = ctor.ctor_params in
@@ -1587,7 +1586,7 @@ and childrenLogicType vis ty =
     if t != t' then Ctype t' else ty
   | Linteger | Lreal -> ty
   | Ltype (s,l) ->
-    let s' = doVisitCil vis (VisBhv.get_logic_type_info vis#behavior)
+    let s' = doVisitCil vis (Visitor_behavior.Get.logic_type_info vis#behavior)
         vis#vlogic_type_info_use alphabetabeta s in
     let l' = mapNoCopy (visitCilLogicType vis) l in
     if s' != s || l' != l then Ltype (s',l') else ty
@@ -1602,7 +1601,7 @@ and visitCilLogicVarDecl vis lv =
   (match lv.lv_origin with
      None -> ()
    | Some cv -> lv.lv_name <- cv.vname);
-  doVisitCil vis (VisBhv.memo_logic_var vis#behavior) vis#vlogic_var_decl
+  doVisitCil vis (Visitor_behavior.Memo.logic_var vis#behavior) vis#vlogic_var_decl
     childrenLogicVarDecl lv
 
 and childrenLogicVarDecl vis lv =
@@ -1612,7 +1611,7 @@ and childrenLogicVarDecl vis lv =
   lv
 
 and visitCilLogicVarUse vis lv =
-  if VisBhv.is_copy vis#behavior &&
+  if Visitor_behavior.is_copy vis#behavior &&
      (* In a copy visitor, there's always a project. Furthermore, if
         we target the current project, builtins are by definition already
         tied to logic_infos and should not be copied.
@@ -1640,7 +1639,7 @@ and visitCilLogicVarUse vis lv =
          end)
       vis#get_filling_actions;
   end;
-  doVisitCil vis (VisBhv.get_logic_var vis#behavior) vis#vlogic_var_use
+  doVisitCil vis (Visitor_behavior.Get.logic_var vis#behavior) vis#vlogic_var_use
     childrenLogicVarUse lv
 
 and childrenLogicVarUse vis lv =
@@ -1653,7 +1652,7 @@ and visitCilQuantifiers vis lv =
 and visitCilIdPredicate vis ip =
   doVisitCil
     vis
-    (VisBhv.cidentified_predicate vis#behavior)
+    (Visitor_behavior.cidentified_predicate vis#behavior)
     vis#videntified_predicate
     childrenIdentified_predicate
     ip
@@ -1793,7 +1792,7 @@ and childrenPredicateNode vis p =
     if t' != t || n' != n || s1 != s1' || s2 != s2' then Pfresh (s1',s2',t',n') else p
 
 and visitCilIdTerm vis loc =
-  doVisitCil vis (VisBhv.cidentified_term vis#behavior) vis#videntified_term
+  doVisitCil vis (Visitor_behavior.cidentified_term vis#behavior) vis#videntified_term
     childrenIdentified_term loc
 and childrenIdentified_term vis loc =
   let loc' = visitCilTerm vis loc.it_content in
@@ -1842,7 +1841,7 @@ and childrenDeps vis d =
     if l !=l' then From l' else d
 
 and visitCilBehavior vis b =
-  doVisitCil vis (VisBhv.cfunbehavior vis#behavior)
+  doVisitCil vis (Visitor_behavior.cfunbehavior vis#behavior)
     vis#vbehavior childrenBehavior b
 
 and childrenBehavior vis b =
@@ -1864,7 +1863,7 @@ and visitCilExtended vis orig =
     with Not_found -> (fun _ _ -> DoChildren)
   in
   let e' = doVisitCil vis id (visit vis) childrenCilExtended orig.ext_kind in
-  if is_fresh_behavior vis#behavior then
+  if Visitor_behavior.is_fresh vis#behavior then
     Logic_const.new_acsl_extension orig.ext_name orig.ext_loc
       orig.ext_has_status e'
   else if orig.ext_kind == e' then orig else {orig with ext_kind = e'}
@@ -1884,7 +1883,7 @@ and visitCilPredicates vis ps = mapNoCopy (visitCilIdPredicate vis) ps
 and visitCilBehaviors vis bs = mapNoCopy (visitCilBehavior vis) bs
 
 and visitCilFunspec vis s =
-  doVisitCil vis (VisBhv.cfunspec vis#behavior) vis#vspec childrenSpec s
+  doVisitCil vis (Visitor_behavior.cfunspec vis#behavior) vis#vspec childrenSpec s
 
 and childrenSpec vis s =
   s.spec_behavior <- visitCilBehaviors vis s.spec_behavior;
@@ -1947,13 +1946,13 @@ and visitCilModelInfo vis m =
   CurrentLoc.set m.mi_decl;
   let m' =
     doVisitCil
-      vis (VisBhv.memo_model_info vis#behavior) vis#vmodel_info childrenModelInfo m
+      vis (Visitor_behavior.Memo.model_info vis#behavior) vis#vmodel_info childrenModelInfo m
   in
   CurrentLoc.set oldloc;
   if m' != m then begin
     (* reflect changes in the behavior tables for copy visitor. *)
-    VisBhv.set_model_info vis#behavior m m';
-    VisBhv.set_orig_model_info vis#behavior m' m;
+    Visitor_behavior.Set.model_info vis#behavior m m';
+    Visitor_behavior.Set_orig.model_info vis#behavior m' m;
   end;
   m'
 
@@ -1968,7 +1967,7 @@ and childrenAnnotation vis a =
   match a with
   | Dfun_or_pred (li,loc) ->
     let li' = visitCilLogicInfo vis li in
-    if VisBhv.is_copy vis#behavior then
+    if Visitor_behavior.is_copy vis#behavior then
       Queue.add
         (fun () ->
            Logic_env.add_logic_function_gen alphabetafalse li')
@@ -1976,7 +1975,7 @@ and childrenAnnotation vis a =
     if li' != li then Dfun_or_pred (li',loc) else a
   | Dtype (ti,loc) ->
     let ti' = visitCilLogicTypeInfo vis ti in
-    if VisBhv.is_copy vis#behavior then
+    if Visitor_behavior.is_copy vis#behavior then
       Queue.add
         (fun () ->
            Logic_env.add_logic_type ti'.lt_name ti')
@@ -1990,21 +1989,21 @@ and childrenAnnotation vis a =
     else a
   | Dinvariant (p,loc) ->
     let p' = visitCilLogicInfo vis p in
-    if VisBhv.is_copy vis#behavior then
+    if Visitor_behavior.is_copy vis#behavior then
       Queue.add
         (fun () -> Logic_env.add_logic_function_gen alphabetafalse p')
         vis#get_filling_actions;
     if p' != p then Dinvariant (p',loc) else a
   | Dtype_annot (ta,loc) ->
     let ta' = visitCilLogicInfo vis ta in
-    if VisBhv.is_copy vis#behavior then
+    if Visitor_behavior.is_copy vis#behavior then
       Queue.add
         (fun () -> Logic_env.add_logic_function_gen alphabetafalse ta')
         vis#get_filling_actions;
     if ta' != ta then Dtype_annot (ta',loc) else a
   | Dmodel_annot (mfi,loc) ->
     let mfi' = visitCilModelInfo vis mfi in
-    if VisBhv.is_copy vis#behavior then
+    if Visitor_behavior.is_copy vis#behavior then
       Queue.add (fun () -> Logic_env.add_model_field mfi')
         vis#get_filling_actions;
     if mfi' != mfi then Dmodel_annot (mfi',loc) else a
@@ -2033,7 +2032,7 @@ and childrenAnnotation vis a =
 
 and visitCilCodeAnnotation vis ca =
   doVisitCil
-    vis (VisBhv.ccode_annotation vis#behavior) vis#vcode_annot childrenCodeAnnot ca
+    vis (Visitor_behavior.ccode_annotation vis#behavior) vis#vcode_annot childrenCodeAnnot ca
 
 and childrenCodeAnnot vis ca =
   let vPred p = visitCilPredicate vis p in
@@ -2078,7 +2077,7 @@ and childrenCodeAnnot vis ca =
 and visitCilExpr (vis: cilVisitor) (e: exp) : exp =
   let oldLoc = CurrentLoc.get () in
   CurrentLoc.set e.eloc;
-  let res = doVisitCil vis (VisBhv.cexpr vis#behavior) vis#vexpr childrenExp e in
+  let res = doVisitCil vis (Visitor_behavior.cexpr vis#behavior) vis#vexpr childrenExp e in
   CurrentLoc.set oldLoc; res
 
 and childrenExp (vis: cilVisitor) (e: exp) : exp =
@@ -2180,7 +2179,7 @@ and childrenOffset (vis: cilVisitor) (off: offset) : offset =
   match off with
     Field (f, o) ->
     let o' = vOff o in
-    let f' = VisBhv.get_fieldinfo vis#behavior f in
+    let f' = Visitor_behavior.Get.fieldinfo vis#behavior f in
     if o' != o || f' != f then Field (f', o') else off
   | Index (e, o) ->
     let e' = visitCilExpr vis e in
@@ -2261,8 +2260,8 @@ and childrenInstr (vis: cilVisitor) (i: instr) : instr =
               if e' != e then (id,s,e') else pair) asm_inputs_pre
        in
        let asm_gotos =
-         if VisBhv.is_copy vis#behavior then
-           List.map (fun s -> ref (VisBhv.memo_stmt vis#behavior !s)) ext.asm_gotos
+         if Visitor_behavior.is_copy vis#behavior then
+           List.map (fun s -> ref (Visitor_behavior.Memo.stmt vis#behavior !s)) ext.asm_gotos
          else ext.asm_gotos
        in
        if asm_outputs != asm_outputs_pre
@@ -2286,7 +2285,7 @@ and visitCilStmt (vis:cilVisitor) (s: stmt) : stmt =
   let toPrepend : instr list ref = ref [] in (* childrenStmt may add to this *)
   let res =
     doVisitCil vis
-      (VisBhv.memo_stmt vis#behavior) vis#vstmt (childrenStmt toPrepend) s in
+      (Visitor_behavior.Memo.stmt vis#behavior) vis#vstmt (childrenStmt toPrepend) s in
   let ghost = res.ghost in
   (* Now see if we have saved some instructions *)
   toPrepend := !toPrepend @ vis#unqueueInstr ();
@@ -2330,9 +2329,9 @@ and childrenStmt (toPrepend: instr list ref) (vis:cilVisitor) (s:stmt): stmt =
              let writes' = mapNoCopy (visitCilLval vis) writes in
              let reads' = mapNoCopy (visitCilLval vis) reads in
              let calls' =
-               if VisBhv.is_copy vis#behavior then
+               if Visitor_behavior.is_copy vis#behavior then
                  (* we need new references anyway, no need for mapNoCopy *)
-                 List.map (fun x -> ref (VisBhv.memo_stmt vis#behavior !x)) calls
+                 List.map (fun x -> ref (Visitor_behavior.Memo.stmt vis#behavior !x)) calls
                else calls
              in
              if stmt' != stmt || writes' != writes || reads' != reads ||
@@ -2344,8 +2343,8 @@ and childrenStmt (toPrepend: instr list ref) (vis:cilVisitor) (s:stmt): stmt =
       in
       if seq' != seq then UnspecifiedSequence seq' else s.skind
     | Goto (sr,l) ->
-      if VisBhv.is_copy vis#behavior then
-	Goto(ref (VisBhv.memo_stmt vis#behavior !sr),l)
+      if Visitor_behavior.is_copy vis#behavior then
+        Goto(ref (Visitor_behavior.Memo.stmt vis#behavior !sr),l)
       else s.skind
     | Return (Some e, l) ->
       let e' = fExp e in
@@ -2368,7 +2367,7 @@ and childrenStmt (toPrepend: instr list ref) (vis:cilVisitor) (s:stmt): stmt =
       let e' = fExp e in
       toPrepend := vis#unqueueInstr (); (* insert these before the switch *)
       let b' = fBlock b in
-      let stmts' = mapNoCopy (VisBhv.get_stmt vis#behavior) stmts in
+      let stmts' = mapNoCopy (Visitor_behavior.Get.stmt vis#behavior) stmts in
       (* the stmts in b should have cleaned up after themselves.*)
       assertEmptyQueue vis;
       if e' != e || b' != b || stmts' != stmts then
@@ -2450,8 +2449,8 @@ and visitCilCatch_binder vis cb =
     if v != v' || l != l' then Catch_exn(v',l') else cb
   | Catch_all -> cb
 and visitCilBlock (vis: cilVisitor) (b: block) : block =
-  let b' = VisBhv.cblock vis#behavior b in
-  if VisBhv.is_copy vis#behavior then begin
+  let b' = Visitor_behavior.cblock vis#behavior b in
+  if Visitor_behavior.is_copy vis#behavior then begin
     (* in case we are the main block of the current function,
        update immediately the sbody, so that makeLocalVar can be used
        seamlessly by the underlying visitor and associate the
@@ -2459,7 +2458,7 @@ and visitCilBlock (vis: cilVisitor) (b: block) : block =
     *)
     match vis#current_func with
     | Some fd when fd.sbody == b ->
-      (VisBhv.get_fundec vis#behavior fd).sbody <- b'
+      (Visitor_behavior.Get.fundec vis#behavior fd).sbody <- b'
     | Some _ | None -> ()
   end;
   doVisitCil vis id vis#vblock childrenBlock b'
@@ -2469,8 +2468,8 @@ and childrenBlock (vis: cilVisitor) (b: block) : block =
      that wish to create a local into the innermost scope can simply append
      it to the current block.
   *)
-  let locals' = mapNoCopy (VisBhv.get_varinfo vis#behavior) b.blocals in
-  let statics' = mapNoCopy (VisBhv.get_varinfo vis#behavior) b.bstatics in
+  let locals' = mapNoCopy (Visitor_behavior.Get.varinfo vis#behavior) b.blocals in
+  let statics' = mapNoCopy (Visitor_behavior.Get.varinfo vis#behavior) b.bstatics in
   b.blocals <- locals';
   b.bstatics <- statics';
   let stmts' = mapNoCopy fStmt b.bstmts in
@@ -2501,7 +2500,7 @@ and childrenType (vis : cilVisitor) (t : typ) : typ =
   (* DON'T recurse into the compinfo, this is done in visitCilGlobal.
      User can iterate over cinfo.cfields manually, if desired.*)
   | TComp(cinfo, _, a) ->
-    let cinfo' = VisBhv.get_compinfo vis#behavior cinfo in
+    let cinfo' = Visitor_behavior.Get.compinfo vis#behavior cinfo in
     let a' = fAttr a in
     if a != a' || cinfo' != cinfo then TComp(cinfo',empty_size_cache (), a') else t
 
@@ -2522,11 +2521,11 @@ and childrenType (vis : cilVisitor) (t : typ) : typ =
 
   | TNamed(t1, a) ->
     let a' = fAttr a in
-    let t1' = VisBhv.get_typeinfo vis#behavior t1 in
+    let t1' = Visitor_behavior.Get.typeinfo vis#behavior t1 in
     if a' != a  || t1' != t1 then TNamed (t1', a') else t
   | TEnum(enum,a) ->
     let a' = fAttr a in
-    let enum' = VisBhv.get_enuminfo vis#behavior enum in
+    let enum' = Visitor_behavior.Get.enuminfo vis#behavior enum in
     if a' != a || enum' != enum then TEnum(enum',a') else t
   | TVoid _ | TInt _ | TFloat _ | TBuiltin_va_list _  ->
     (* no nested type. visit only the attributes. *)
@@ -2540,7 +2539,7 @@ and visitCilVarDecl (vis : cilVisitor) (v : varinfo) : varinfo =
   let oldloc = CurrentLoc.get () in
   CurrentLoc.set v.vdecl;
   let res =
-    doVisitCil vis (VisBhv.memo_varinfo vis#behavior)
+    doVisitCil vis (Visitor_behavior.Memo.varinfo vis#behavior)
       vis#vvdec childrenVarDecl v
   in CurrentLoc.set oldloc; res
 
@@ -2548,7 +2547,7 @@ and childrenVarDecl (vis : cilVisitor) (v : varinfo) : varinfo =
   (* in case of refresh visitor, the associated new logic var has a different
      id. We must visit the original logic var associated to it. *)
   let visit_orig_var_assoc lv =
-    let o = VisBhv.get_original_logic_var vis#behavior lv in
+    let o = Visitor_behavior.Get_orig.logic_var vis#behavior lv in
     visitCilLogicVarDecl vis o
   in
   v.vtype <- visitCilType vis v.vtype;
@@ -2557,7 +2556,7 @@ and childrenVarDecl (vis : cilVisitor) (v : varinfo) : varinfo =
   v
 
 and visitCilVarUse vis v =
-  doVisitCil vis (VisBhv.get_varinfo vis#behavior) vis#vvrbl alphabetabeta v
+  doVisitCil vis (Visitor_behavior.Get.varinfo vis#behavior) vis#vvrbl alphabetabeta v
 
 and visitCilAttributes (vis: cilVisitor) (al: attribute list) : attribute list=
   let al' =
@@ -2631,19 +2630,19 @@ and childrenAttrparam (vis: cilVisitor) (aa: attrparam) : attrparam =
 let rec fix_succs_preds_block b block =
   List.iter (fix_succs_preds b) block.bstmts
 and fix_succs_preds b stmt =
-  stmt.succs <- mapNoCopy (VisBhv.get_stmt b) stmt.succs;
-  stmt.preds <- mapNoCopy (VisBhv.get_stmt b) stmt.preds;
+  stmt.succs <- mapNoCopy (Visitor_behavior.Get.stmt b) stmt.succs;
+  stmt.preds <- mapNoCopy (Visitor_behavior.Get.stmt b) stmt.preds;
   match stmt.skind with
     If(_,bthen,belse,_) ->
     fix_succs_preds_block b bthen;
     fix_succs_preds_block b belse
   | Switch(e,cases,stmts,l) ->
     fix_succs_preds_block b cases;
-    stmt.skind <- Switch(e,cases,List.map (VisBhv.get_stmt b) stmts,l)
+    stmt.skind <- Switch(e,cases,List.map (Visitor_behavior.Get.stmt b) stmts,l)
   | Loop(annot,block,loc,stmt1,stmt2) ->
     fix_succs_preds_block b block;
-    let stmt1' = optMapNoCopy (VisBhv.get_stmt b) stmt1 in
-    let stmt2' = optMapNoCopy (VisBhv.get_stmt b) stmt2 in
+    let stmt1' = optMapNoCopy (Visitor_behavior.Get.stmt b) stmt1 in
+    let stmt2' = optMapNoCopy (Visitor_behavior.Get.stmt b) stmt2 in
     stmt.skind <- Loop(annot,block,loc,stmt1',stmt2')
   | Block block -> fix_succs_preds_block b block
   | TryFinally(block1,block2,_) ->
@@ -2659,7 +2658,7 @@ let rec visitCilFunction (vis : cilVisitor) (f : fundec) : fundec =
   assertEmptyQueue vis;
   vis#set_current_func f;
   (* update fundec tables *)
-  let f = VisBhv.memo_fundec vis#behavior f in
+  let f = Visitor_behavior.Memo.fundec vis#behavior f in
   let f =
     doVisitCil vis id (* copy has already been done *)
       vis#vfunc childrenFunction f
@@ -2668,10 +2667,10 @@ let rec visitCilFunction (vis : cilVisitor) (f : fundec) : fundec =
   if toPrepend <> [] then
     f.sbody.bstmts <-
       (List.map (fun i -> mkStmt (Instr i)) toPrepend) @ f.sbody.bstmts;
-  if VisBhv.is_copy vis#behavior then begin
+  if Visitor_behavior.is_copy vis#behavior then begin
     fix_succs_preds_block vis#behavior f.sbody;
     f.sallstmts <-
-      List.rev (List.rev_map (VisBhv.get_stmt vis#behavior) f.sallstmts)
+      List.rev (List.rev_map (Visitor_behavior.Get.stmt vis#behavior) f.sallstmts)
   end;
   vis#reset_current_func ();
   f
@@ -2680,7 +2679,7 @@ and childrenFunction (vis : cilVisitor) (f : fundec) : fundec =
   (* we have already made a copy of the svar, but not visited it.
      Use the original variable as argument of visitCilVarDecl,
      update fundec table in case the vid gets changed. *)
-  let v = VisBhv.get_original_varinfo vis#behavior f.svar in
+  let v = Visitor_behavior.Get_orig.varinfo vis#behavior f.svar in
   let nv = visitCilVarDecl vis v in
   if not (Cil_datatype.Varinfo.equal nv f.svar) then begin
     Kernel.fatal
@@ -2694,7 +2693,7 @@ and childrenFunction (vis : cilVisitor) (f : fundec) : fundec =
   f.slocals <- mapNoCopy (visitCilVarDecl vis) f.slocals;
   (* Make sure the type reflects the formals *)
   let selection = State_selection.singleton FormalsDecl.self in
-  if VisBhv.is_copy vis#behavior || newformals != f.sformals then begin
+  if Visitor_behavior.is_copy vis#behavior || newformals != f.sformals then begin
     apply_on_project ~selection vis (setFormals f) newformals;
   end;
   (* Remember any new instructions that were generated while visiting
@@ -2716,8 +2715,8 @@ let childrenFieldInfo vis fi =
   fi
 
 let visitCilFieldInfo vis f =
-  let f = VisBhv.get_original_fieldinfo vis#behavior f in
-  doVisitCil vis (VisBhv.memo_fieldinfo vis#behavior) vis#vfieldinfo childrenFieldInfo f
+  let f = Visitor_behavior.Get_orig.fieldinfo vis#behavior f in
+  doVisitCil vis (Visitor_behavior.Memo.fieldinfo vis#behavior) vis#vfieldinfo childrenFieldInfo f
 
 let childrenCompInfo vis comp =
   comp.cfields <- mapNoCopy (visitCilFieldInfo vis) comp.cfields;
@@ -2725,15 +2724,15 @@ let childrenCompInfo vis comp =
   comp
 
 let visitCilCompInfo vis c =
-  doVisitCil vis (VisBhv.memo_compinfo vis#behavior) vis#vcompinfo childrenCompInfo c
+  doVisitCil vis (Visitor_behavior.Memo.compinfo vis#behavior) vis#vcompinfo childrenCompInfo c
 
 let childrenEnumItem vis e =
   e.eival <- visitCilExpr vis e.eival;
-  e.eihost <- VisBhv.get_enuminfo vis#behavior e.eihost;
+  e.eihost <- Visitor_behavior.Get.enuminfo vis#behavior e.eihost;
   e
 
 let visitCilEnumItem vis e =
-  doVisitCil vis (VisBhv.memo_enumitem vis#behavior) vis#venumitem childrenEnumItem e
+  doVisitCil vis (Visitor_behavior.Memo.enumitem vis#behavior) vis#venumitem childrenEnumItem e
 
 let childrenEnumInfo vis e =
   e.eitems <- mapNoCopy (visitCilEnumItem vis) e.eitems;
@@ -2741,7 +2740,7 @@ let childrenEnumInfo vis e =
   e
 
 let visitCilEnumInfo vis e =
-  doVisitCil vis (VisBhv.memo_enuminfo vis#behavior) vis#venuminfo childrenEnumInfo e
+  doVisitCil vis (Visitor_behavior.Memo.enuminfo vis#behavior) vis#venuminfo childrenEnumInfo e
 
 let rec visitCilGlobal (vis: cilVisitor) (g: global) : global list =
   let oldloc = CurrentLoc.get () in
@@ -2756,15 +2755,15 @@ and childrenGlobal (vis: cilVisitor) (g: global) : global =
     let f' = visitCilFunction vis f in
     if f' != f then GFun (f', l) else g
   | GType(t, l) ->
-    let t' = VisBhv.memo_typeinfo vis#behavior t in
+    let t' = Visitor_behavior.Memo.typeinfo vis#behavior t in
     t'.ttype <- visitCilType vis t'.ttype;
     if t' != t then GType(t',l) else g
   | GEnumTagDecl (enum,l) ->
-    let enum' = VisBhv.memo_enuminfo vis#behavior enum in
+    let enum' = Visitor_behavior.Memo.enuminfo vis#behavior enum in
     if enum != enum' then GEnumTagDecl(enum',l) else g
   (* real visit'll be done in the definition *)
   | GCompTagDecl (comp,l) ->
-    let comp' = VisBhv.memo_compinfo vis#behavior comp in
+    let comp' = Visitor_behavior.Memo.compinfo vis#behavior comp in
     if comp != comp' then GCompTagDecl(comp',l) else g
   | GEnumTag (enum, l) ->
     let enum' = visitCilEnumInfo vis enum in
@@ -2783,7 +2782,7 @@ and childrenGlobal (vis: cilVisitor) (g: global) : global =
     let form' = optMapNoCopy (mapNoCopy (visitCilVarDecl vis)) form in
     let spec' =
       if is_empty_funspec spec then begin
-        if VisBhv.is_copy vis#behavior then
+        if Visitor_behavior.is_copy vis#behavior then
           empty_funspec ()
         else spec (* do not need to change it if it's not a copy visitor. *)
       end else begin
@@ -2794,7 +2793,7 @@ and childrenGlobal (vis: cilVisitor) (g: global) : global =
       begin
         (match form' with
          | Some formals
-           when VisBhv.is_copy vis#behavior || form != form' ->
+           when Visitor_behavior.is_copy vis#behavior || form != form' ->
            let selection = State_selection.singleton FormalsDecl.self in
            apply_on_project
              ~selection vis (unsafeSetFormalsDecl v') formals
@@ -2804,7 +2803,7 @@ and childrenGlobal (vis: cilVisitor) (g: global) : global =
     else g
   | GVar (v, inito, l) ->
     let v' = visitCilVarDecl vis v in
-    let inito' = VisBhv.cinitinfo vis#behavior inito in
+    let inito' = Visitor_behavior.cinitinfo vis#behavior inito in
     (match inito'.init with
        None -> ()
      | Some i -> let i' = visitCilInit vis v NoOffset i in
@@ -5384,7 +5383,7 @@ let removeOffsetLval ((b, off): lval) : lval * offset =
   (b, off'), last
 
 class copyVisitExpr = object
-  inherit genericCilVisitor (VisBhv.copy_visit (Project.current ()))
+  inherit genericCilVisitor (Visitor_behavior.copy (Project.current ()))
   method! vexpr e =
     ChangeDoChildrenPost ({e with eid = Eid.next ()}, fun x -> x)
 end
@@ -5493,11 +5492,11 @@ let post_file vis f =
 
 (* A visitor for the whole file that does not change the globals *)
 let visitCilFileSameGlobals (vis : cilVisitor) (f : file) : unit =
-  if VisBhv.is_copy vis#behavior then
+  if Visitor_behavior.is_copy vis#behavior then
     Kernel.fatal ~current:true "You used visitCilFileSameGlobals with a copy visitor. Nothing is done"
   else
     ignore
-      (doVisitCil vis (VisBhv.cfile vis#behavior) (post_file vis) childrenFileSameGlobals f)
+      (doVisitCil vis (Visitor_behavior.cfile vis#behavior) (post_file vis) childrenFileSameGlobals f)
 
 let childrenFileCopy vis f =
   let fGlob g = visitCilGlobal vis g in
@@ -5516,13 +5515,13 @@ let childrenFileCopy vis f =
 
 (* Be careful with visiting the whole file because it might be huge. *)
 let visitCilFileCopy (vis : cilVisitor) (f : file) : file =
-  if VisBhv.is_copy vis#behavior then begin
+  if Visitor_behavior.is_copy vis#behavior then begin
     Queue.add Logic_env.prepare_tables vis#get_filling_actions;
   end;
-  doVisitCil vis (VisBhv.cfile vis#behavior) (post_file vis) childrenFileCopy f
+  doVisitCil vis (Visitor_behavior.cfile vis#behavior) (post_file vis) childrenFileCopy f
 
 let visitCilFile vis f =
-  if VisBhv.is_copy vis#behavior then
+  if Visitor_behavior.is_copy vis#behavior then
     Kernel.fatal ~current:true "You used visitCilFile with a copy visitor. Nothing is done"
   else ignore (visitCilFileCopy vis f)
 
@@ -6989,7 +6988,7 @@ let () = dependency_on_ast Switch_cases.self
 let separate_switch_succs = Switch_cases.memo separate_switch_succs
 
 class dropAttributes ?select () = object
-  inherit genericCilVisitor (VisBhv.copy_visit (Project.current ()))
+  inherit genericCilVisitor (Visitor_behavior.copy (Project.current ()))
   method! vattr a =
     match select with
     | None -> ChangeTo []
@@ -7026,154 +7025,154 @@ let typeHasAttributeDeep t =
 
 (* Visitor behavior compatibility *)
 
-type visitor_behavior = VisBhv.t
+type visitor_behavior = Visitor_behavior.t
 
-let refresh_visit = VisBhv.refresh_visit
-let copy_visit = VisBhv.copy_visit
-let inplace_visit = VisBhv.inplace_visit
+let refresh_visit = Visitor_behavior.refresh
+let copy_visit = Visitor_behavior.copy
+let inplace_visit = Visitor_behavior.inplace
 
-let is_copy_behavior = VisBhv.is_copy
-let is_fresh_behavior = VisBhv.is_fresh
+let is_copy_behavior = Visitor_behavior.is_copy
+let is_fresh_behavior = Visitor_behavior.is_fresh
 
-let memo_varinfo = VisBhv.memo_varinfo
-let memo_compinfo = VisBhv.memo_compinfo
-let memo_fieldinfo = VisBhv.memo_fieldinfo
-let memo_model_info = VisBhv.memo_model_info
-let memo_enuminfo = VisBhv.memo_enuminfo
-let memo_enumitem = VisBhv.memo_enumitem
-let memo_stmt = VisBhv.memo_stmt
-let memo_typeinfo = VisBhv.memo_typeinfo
-let memo_logic_info = VisBhv.memo_logic_info
-let memo_logic_type_info = VisBhv.memo_logic_type_info
-let memo_logic_var = VisBhv.memo_logic_var
-let memo_kernel_function = VisBhv.memo_kernel_function
-let memo_fundec = VisBhv.memo_fundec
+let memo_varinfo = Visitor_behavior.Memo.varinfo
+let memo_compinfo = Visitor_behavior.Memo.compinfo
+let memo_fieldinfo = Visitor_behavior.Memo.fieldinfo
+let memo_model_info = Visitor_behavior.Memo.model_info
+let memo_enuminfo = Visitor_behavior.Memo.enuminfo
+let memo_enumitem = Visitor_behavior.Memo.enumitem
+let memo_stmt = Visitor_behavior.Memo.stmt
+let memo_typeinfo = Visitor_behavior.Memo.typeinfo
+let memo_logic_info = Visitor_behavior.Memo.logic_info
+let memo_logic_type_info = Visitor_behavior.Memo.logic_type_info
+let memo_logic_var = Visitor_behavior.Memo.logic_var
+let memo_kernel_function = Visitor_behavior.Memo.kernel_function
+let memo_fundec = Visitor_behavior.Memo.fundec
 
-let reset_behavior_varinfo = VisBhv.reset_varinfo
-let reset_behavior_compinfo = VisBhv.reset_compinfo
-let reset_behavior_enuminfo = VisBhv.reset_enuminfo
-let reset_behavior_enumitem = VisBhv.reset_enumitem
-let reset_behavior_typeinfo = VisBhv.reset_typeinfo
-let reset_behavior_logic_info = VisBhv.reset_logic_info
-let reset_behavior_logic_type_info = VisBhv.reset_logic_type_info
-let reset_behavior_fieldinfo = VisBhv.reset_fieldinfo
-let reset_behavior_model_info = VisBhv.reset_model_info
-let reset_behavior_stmt = VisBhv.reset_stmt
-let reset_logic_var = VisBhv.reset_logic_var
-let reset_behavior_kernel_function = VisBhv.reset_kernel_function
-let reset_behavior_fundec = VisBhv.reset_fundec
+let reset_behavior_varinfo = Visitor_behavior.Reset.varinfo
+let reset_behavior_compinfo = Visitor_behavior.Reset.compinfo
+let reset_behavior_enuminfo = Visitor_behavior.Reset.enuminfo
+let reset_behavior_enumitem = Visitor_behavior.Reset.enumitem
+let reset_behavior_typeinfo = Visitor_behavior.Reset.typeinfo
+let reset_behavior_logic_info = Visitor_behavior.Reset.logic_info
+let reset_behavior_logic_type_info = Visitor_behavior.Reset.logic_type_info
+let reset_behavior_fieldinfo = Visitor_behavior.Reset.fieldinfo
+let reset_behavior_model_info = Visitor_behavior.Reset.model_info
+let reset_behavior_stmt = Visitor_behavior.Reset.stmt
+let reset_logic_var = Visitor_behavior.Reset.logic_var
+let reset_behavior_kernel_function = Visitor_behavior.Reset.kernel_function
+let reset_behavior_fundec = Visitor_behavior.Reset.fundec
 
-let get_varinfo = VisBhv.get_varinfo
-let get_compinfo = VisBhv.get_compinfo
-let get_fieldinfo = VisBhv.get_fieldinfo
-let get_model_info = VisBhv.get_model_info
-let get_enuminfo = VisBhv.get_enuminfo
-let get_enumitem = VisBhv.get_enumitem
-let get_stmt = VisBhv.get_stmt
-let get_typeinfo = VisBhv.get_typeinfo
-let get_logic_info = VisBhv.get_logic_info
-let get_logic_type_info = VisBhv.get_logic_type_info
-let get_logic_var = VisBhv.get_logic_var
-let get_kernel_function = VisBhv.get_kernel_function
-let get_fundec = VisBhv.get_fundec
+let get_varinfo = Visitor_behavior.Get.varinfo
+let get_compinfo = Visitor_behavior.Get.compinfo
+let get_fieldinfo = Visitor_behavior.Get.fieldinfo
+let get_model_info = Visitor_behavior.Get.model_info
+let get_enuminfo = Visitor_behavior.Get.enuminfo
+let get_enumitem = Visitor_behavior.Get.enumitem
+let get_stmt = Visitor_behavior.Get.stmt
+let get_typeinfo = Visitor_behavior.Get.typeinfo
+let get_logic_info = Visitor_behavior.Get.logic_info
+let get_logic_type_info = Visitor_behavior.Get.logic_type_info
+let get_logic_var = Visitor_behavior.Get.logic_var
+let get_kernel_function = Visitor_behavior.Get.kernel_function
+let get_fundec = Visitor_behavior.Get.fundec
 
-let get_original_varinfo = VisBhv.get_original_varinfo
-let get_original_compinfo = VisBhv.get_original_compinfo
-let get_original_fieldinfo = VisBhv.get_original_fieldinfo
-let get_original_model_info = VisBhv.get_original_model_info
-let get_original_enuminfo = VisBhv.get_original_enuminfo
-let get_original_enumitem = VisBhv.get_original_enumitem
-let get_original_stmt = VisBhv.get_original_stmt
-let get_original_typeinfo = VisBhv.get_original_typeinfo
-let get_original_logic_info = VisBhv.get_original_logic_info
-let get_original_logic_type_info = VisBhv.get_original_logic_type_info
-let get_original_logic_var = VisBhv.get_original_logic_var
-let get_original_kernel_function = VisBhv.get_original_kernel_function
-let get_original_fundec = VisBhv.get_original_fundec
+let get_original_varinfo = Visitor_behavior.Get_orig.varinfo
+let get_original_compinfo = Visitor_behavior.Get_orig.compinfo
+let get_original_fieldinfo = Visitor_behavior.Get_orig.fieldinfo
+let get_original_model_info = Visitor_behavior.Get_orig.model_info
+let get_original_enuminfo = Visitor_behavior.Get_orig.enuminfo
+let get_original_enumitem = Visitor_behavior.Get_orig.enumitem
+let get_original_stmt = Visitor_behavior.Get_orig.stmt
+let get_original_typeinfo = Visitor_behavior.Get_orig.typeinfo
+let get_original_logic_info = Visitor_behavior.Get_orig.logic_info
+let get_original_logic_type_info = Visitor_behavior.Get_orig.logic_type_info
+let get_original_logic_var = Visitor_behavior.Get_orig.logic_var
+let get_original_kernel_function = Visitor_behavior.Get_orig.kernel_function
+let get_original_fundec = Visitor_behavior.Get_orig.fundec
 
-let set_varinfo = VisBhv.set_varinfo
-let set_compinfo = VisBhv.set_compinfo
-let set_fieldinfo = VisBhv.set_fieldinfo
-let set_model_info = VisBhv.set_model_info
-let set_enuminfo = VisBhv.set_enuminfo
-let set_enumitem = VisBhv.set_enumitem
-let set_stmt = VisBhv.set_stmt
-let set_typeinfo = VisBhv.set_typeinfo
-let set_logic_info = VisBhv.set_logic_info
-let set_logic_type_info = VisBhv.set_logic_type_info
-let set_logic_var = VisBhv.set_logic_var
-let set_kernel_function = VisBhv.set_kernel_function
-let set_fundec = VisBhv.set_fundec
+let set_varinfo = Visitor_behavior.Set.varinfo
+let set_compinfo = Visitor_behavior.Set.compinfo
+let set_fieldinfo = Visitor_behavior.Set.fieldinfo
+let set_model_info = Visitor_behavior.Set.model_info
+let set_enuminfo = Visitor_behavior.Set.enuminfo
+let set_enumitem = Visitor_behavior.Set.enumitem
+let set_stmt = Visitor_behavior.Set.stmt
+let set_typeinfo = Visitor_behavior.Set.typeinfo
+let set_logic_info = Visitor_behavior.Set.logic_info
+let set_logic_type_info = Visitor_behavior.Set.logic_type_info
+let set_logic_var = Visitor_behavior.Set.logic_var
+let set_kernel_function = Visitor_behavior.Set.kernel_function
+let set_fundec = Visitor_behavior.Set.fundec
 
-let set_orig_varinfo = VisBhv.set_orig_varinfo
-let set_orig_compinfo = VisBhv.set_orig_compinfo
-let set_orig_fieldinfo = VisBhv.set_orig_fieldinfo
-let set_orig_model_info = VisBhv.set_model_info
-let set_orig_enuminfo = VisBhv.set_orig_enuminfo
-let set_orig_enumitem = VisBhv.set_orig_enumitem
-let set_orig_stmt = VisBhv.set_orig_stmt
-let set_orig_typeinfo = VisBhv.set_orig_typeinfo
-let set_orig_logic_info = VisBhv.set_orig_logic_info
-let set_orig_logic_type_info = VisBhv.set_orig_logic_type_info
-let set_orig_logic_var = VisBhv.set_orig_logic_var
-let set_orig_kernel_function= VisBhv.set_orig_kernel_function
-let set_orig_fundec = VisBhv.set_orig_fundec
+let set_orig_varinfo = Visitor_behavior.Set_orig.varinfo
+let set_orig_compinfo = Visitor_behavior.Set_orig.compinfo
+let set_orig_fieldinfo = Visitor_behavior.Set_orig.fieldinfo
+let set_orig_model_info = Visitor_behavior.Set_orig.model_info
+let set_orig_enuminfo = Visitor_behavior.Set_orig.enuminfo
+let set_orig_enumitem = Visitor_behavior.Set_orig.enumitem
+let set_orig_stmt = Visitor_behavior.Set_orig.stmt
+let set_orig_typeinfo = Visitor_behavior.Set_orig.typeinfo
+let set_orig_logic_info = Visitor_behavior.Set_orig.logic_info
+let set_orig_logic_type_info = Visitor_behavior.Set_orig.logic_type_info
+let set_orig_logic_var = Visitor_behavior.Set_orig.logic_var
+let set_orig_kernel_function= Visitor_behavior.Set_orig.kernel_function
+let set_orig_fundec = Visitor_behavior.Set_orig.fundec
 
-let unset_varinfo = VisBhv.unset_varinfo
-let unset_compinfo = VisBhv.unset_compinfo
-let unset_fieldinfo = VisBhv.unset_fieldinfo
-let unset_model_info = VisBhv.unset_model_info
-let unset_enuminfo = VisBhv.unset_enuminfo
-let unset_enumitem = VisBhv.unset_enumitem
-let unset_stmt = VisBhv.unset_stmt
-let unset_typeinfo = VisBhv.unset_typeinfo
-let unset_logic_info = VisBhv.unset_logic_info
-let unset_logic_type_info = VisBhv.unset_logic_type_info
-let unset_logic_var = VisBhv.unset_logic_var
-let unset_kernel_function = VisBhv.unset_kernel_function
-let unset_fundec = VisBhv.unset_fundec
+let unset_varinfo = Visitor_behavior.Unset.varinfo
+let unset_compinfo = Visitor_behavior.Unset.compinfo
+let unset_fieldinfo = Visitor_behavior.Unset.fieldinfo
+let unset_model_info = Visitor_behavior.Unset.model_info
+let unset_enuminfo = Visitor_behavior.Unset.enuminfo
+let unset_enumitem = Visitor_behavior.Unset.enumitem
+let unset_stmt = Visitor_behavior.Unset.stmt
+let unset_typeinfo = Visitor_behavior.Unset.typeinfo
+let unset_logic_info = Visitor_behavior.Unset.logic_info
+let unset_logic_type_info = Visitor_behavior.Unset.logic_type_info
+let unset_logic_var = Visitor_behavior.Unset.logic_var
+let unset_kernel_function = Visitor_behavior.Unset.kernel_function
+let unset_fundec = Visitor_behavior.Unset.fundec
 
-let unset_orig_varinfo = VisBhv.unset_orig_varinfo
-let unset_orig_compinfo = VisBhv.unset_orig_compinfo
-let unset_orig_fieldinfo = VisBhv.unset_orig_fieldinfo
-let unset_orig_model_info = VisBhv.unset_model_info
-let unset_orig_enuminfo = VisBhv.unset_orig_enuminfo
-let unset_orig_enumitem = VisBhv.unset_orig_enumitem
-let unset_orig_stmt = VisBhv.unset_orig_stmt
-let unset_orig_typeinfo = VisBhv.unset_orig_typeinfo
-let unset_orig_logic_info = VisBhv.unset_orig_logic_info
-let unset_orig_logic_type_info = VisBhv.unset_orig_logic_type_info
-let unset_orig_logic_var = VisBhv.unset_orig_logic_var
-let unset_orig_kernel_function= VisBhv.unset_orig_kernel_function
-let unset_orig_fundec = VisBhv.unset_orig_fundec
+let unset_orig_varinfo = Visitor_behavior.Unset_orig.varinfo
+let unset_orig_compinfo = Visitor_behavior.Unset_orig.compinfo
+let unset_orig_fieldinfo = Visitor_behavior.Unset_orig.fieldinfo
+let unset_orig_model_info = Visitor_behavior.Unset_orig.model_info
+let unset_orig_enuminfo = Visitor_behavior.Unset_orig.enuminfo
+let unset_orig_enumitem = Visitor_behavior.Unset_orig.enumitem
+let unset_orig_stmt = Visitor_behavior.Unset_orig.stmt
+let unset_orig_typeinfo = Visitor_behavior.Unset_orig.typeinfo
+let unset_orig_logic_info = Visitor_behavior.Unset_orig.logic_info
+let unset_orig_logic_type_info = Visitor_behavior.Unset_orig.logic_type_info
+let unset_orig_logic_var = Visitor_behavior.Unset_orig.logic_var
+let unset_orig_kernel_function= Visitor_behavior.Unset_orig.kernel_function
+let unset_orig_fundec = Visitor_behavior.Unset_orig.fundec
 
-let iter_visitor_varinfo = VisBhv.iter_visitor_varinfo
-let iter_visitor_compinfo = VisBhv.iter_visitor_compinfo
-let iter_visitor_enuminfo = VisBhv.iter_visitor_enuminfo
-let iter_visitor_enumitem = VisBhv.iter_visitor_enumitem
-let iter_visitor_typeinfo = VisBhv.iter_visitor_typeinfo
-let iter_visitor_stmt = VisBhv.iter_visitor_stmt
-let iter_visitor_logic_info= VisBhv.iter_visitor_logic_info
-let iter_visitor_logic_type_info = VisBhv.iter_visitor_logic_type_info
-let iter_visitor_fieldinfo = VisBhv.iter_visitor_fieldinfo
-let iter_visitor_model_info = VisBhv.iter_visitor_model_info
-let iter_visitor_logic_var = VisBhv.iter_visitor_logic_var
-let iter_visitor_kernel_function = VisBhv.iter_visitor_kernel_function
-let iter_visitor_fundec = VisBhv.iter_visitor_fundec
+let iter_visitor_varinfo = Visitor_behavior.Iter.varinfo
+let iter_visitor_compinfo = Visitor_behavior.Iter.compinfo
+let iter_visitor_enuminfo = Visitor_behavior.Iter.enuminfo
+let iter_visitor_enumitem = Visitor_behavior.Iter.enumitem
+let iter_visitor_typeinfo = Visitor_behavior.Iter.typeinfo
+let iter_visitor_stmt = Visitor_behavior.Iter.stmt
+let iter_visitor_logic_info= Visitor_behavior.Iter.logic_info
+let iter_visitor_logic_type_info = Visitor_behavior.Iter.logic_type_info
+let iter_visitor_fieldinfo = Visitor_behavior.Iter.fieldinfo
+let iter_visitor_model_info = Visitor_behavior.Iter.model_info
+let iter_visitor_logic_var = Visitor_behavior.Iter.logic_var
+let iter_visitor_kernel_function = Visitor_behavior.Iter.kernel_function
+let iter_visitor_fundec = Visitor_behavior.Iter.fundec
 
-let fold_visitor_varinfo = VisBhv.fold_visitor_varinfo
-let fold_visitor_compinfo = VisBhv.fold_visitor_compinfo
-let fold_visitor_enuminfo = VisBhv.fold_visitor_enuminfo
-let fold_visitor_enumitem = VisBhv.fold_visitor_enumitem
-let fold_visitor_typeinfo = VisBhv.fold_visitor_typeinfo
-let fold_visitor_stmt = VisBhv.fold_visitor_stmt
-let fold_visitor_logic_info = VisBhv.fold_visitor_logic_info
-let fold_visitor_logic_type_info = VisBhv.fold_visitor_logic_type_info
-let fold_visitor_fieldinfo = VisBhv.fold_visitor_fieldinfo
-let fold_visitor_model_info = VisBhv.fold_visitor_model_info
-let fold_visitor_logic_var = VisBhv.fold_visitor_logic_var
-let fold_visitor_kernel_function = VisBhv.fold_visitor_kernel_function
-let fold_visitor_fundec = VisBhv.fold_visitor_fundec
+let fold_visitor_varinfo = Visitor_behavior.Fold.varinfo
+let fold_visitor_compinfo = Visitor_behavior.Fold.compinfo
+let fold_visitor_enuminfo = Visitor_behavior.Fold.enuminfo
+let fold_visitor_enumitem = Visitor_behavior.Fold.enumitem
+let fold_visitor_typeinfo = Visitor_behavior.Fold.typeinfo
+let fold_visitor_stmt = Visitor_behavior.Fold.stmt
+let fold_visitor_logic_info = Visitor_behavior.Fold.logic_info
+let fold_visitor_logic_type_info = Visitor_behavior.Fold.logic_type_info
+let fold_visitor_fieldinfo = Visitor_behavior.Fold.fieldinfo
+let fold_visitor_model_info = Visitor_behavior.Fold.model_info
+let fold_visitor_logic_var = Visitor_behavior.Fold.logic_var
+let fold_visitor_kernel_function = Visitor_behavior.Fold.kernel_function
+let fold_visitor_fundec = Visitor_behavior.Fold.fundec
 
 (*
 Local Variables:

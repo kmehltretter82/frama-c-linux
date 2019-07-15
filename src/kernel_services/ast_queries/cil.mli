@@ -1493,12 +1493,12 @@ type visitor_behavior = Visitor_behavior.t
       @plugin development guide *)
 
 val inplace_visit: unit -> Visitor_behavior.t
-[@@ ocaml.deprecated "Use Visitor_behavior.inplace_visit"]
+[@@ ocaml.deprecated "Use Visitor_behavior.inplace"]
   (** In-place modification. Behavior of the original cil visitor.
       @plugin development guide *)
 
 val copy_visit: Project.t -> Visitor_behavior.t
-[@@ ocaml.deprecated "Use Visitor_behavior.copy_visit"]
+[@@ ocaml.deprecated "Use Visitor_behavior.copy"]
   (** Makes fresh copies of the mutable structures.
       - preserves sharing for varinfo.
       - makes fresh copy of varinfo only for declarations. Variables that are
@@ -1510,7 +1510,7 @@ val copy_visit: Project.t -> Visitor_behavior.t
       @plugin development guide *)
 
 val refresh_visit: Project.t -> Visitor_behavior.t
-[@@ ocaml.deprecated "Use Visitor_behavior.refresh_visit"]
+[@@ ocaml.deprecated "Use Visitor_behavior.refresh"]
   (** Makes fresh copies of the mutable structures and provides fresh id
       for the structures that have ids. Note that as for {!copy_visit}, only
       varinfo that are declared in the scope of the visit will be copied and
@@ -1534,367 +1534,366 @@ val is_copy_behavior: Visitor_behavior.t -> bool
 [@@ ocaml.deprecated "Use Visitor_behavior.is_copy"]
 
 val reset_behavior_varinfo: Visitor_behavior.t -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.reset_varinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Reset.varinfo"]
 (** resets the internal tables used by the given Visitor_behavior.t.  If you use
     fresh instances of visitor for each round of transformation, this should
     not be needed. In place modifications do not need that at all.
-    @deprecated Potassium-19.0+dev. Use {!Visitor_behavior.reset_behavior_varinfo}.
+    @deprecated Potassium-19.0+dev. Use {!Visitor_behavior.Reset.varinfo}.
     @plugin development guide
  *)
 
 val reset_behavior_compinfo: Visitor_behavior.t -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.reset_compinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Reset.compinfo"]
 val reset_behavior_enuminfo: Visitor_behavior.t -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.reset_enuminfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Reset.enuminfo"]
 val reset_behavior_enumitem: Visitor_behavior.t -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.reset_enumitem"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Reset.enumitem"]
 val reset_behavior_typeinfo: Visitor_behavior.t -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.reset_typeinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Reset.typeinfo"]
 val reset_behavior_stmt: Visitor_behavior.t -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.reset_stmt"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Reset.stmt"]
 val reset_behavior_logic_info: Visitor_behavior.t -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.reset_logic_info"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Reset.logic_info"]
 val reset_behavior_logic_type_info: Visitor_behavior.t -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.reset_logic_type_info"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Reset.logic_type_info"]
 val reset_behavior_fieldinfo: Visitor_behavior.t -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.reset_fieldinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Reset.fieldinfo"]
 val reset_behavior_model_info: Visitor_behavior.t -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.reset_model_info"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Reset.model_info"]
 val reset_logic_var: Visitor_behavior.t -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.reset_logic_var"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Reset.logic_var"]
 val reset_behavior_kernel_function: Visitor_behavior.t -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.reset_kernel_function"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Reset.kernel_function"]
 val reset_behavior_fundec: Visitor_behavior.t -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.reset_fundec"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Reset.fundec"]
 
 val get_varinfo: Visitor_behavior.t -> varinfo -> varinfo
-[@@ ocaml.deprecated "Use Visitor_behavior.get_varinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Get.varinfo"]
 (** retrieve the representative of a given varinfo in the current
     state of the visitor
-    @deprecated Potassium-19.0+dev. Use {!Visitor_behavior.get_varinfo}.
+    @deprecated Potassium-19.0+dev. Use {!Visitor_behavior.Get.varinfo}.
     @plugin development guide
  *)
 
 val get_compinfo: Visitor_behavior.t -> compinfo -> compinfo
-[@@ ocaml.deprecated "Use Visitor_behavior.get_compinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Get.compinfo"]
 val get_enuminfo: Visitor_behavior.t -> enuminfo -> enuminfo
-[@@ ocaml.deprecated "Use Visitor_behavior.get_enuminfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Get.enuminfo"]
 val get_enumitem: Visitor_behavior.t -> enumitem -> enumitem
-[@@ ocaml.deprecated "Use Visitor_behavior.get_enumitem"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Get.enumitem"]
 val get_typeinfo: Visitor_behavior.t -> typeinfo -> typeinfo
-[@@ ocaml.deprecated "Use Visitor_behavior.get_typeinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Get.typeinfo"]
 val get_stmt: Visitor_behavior.t -> stmt -> stmt
-[@@ ocaml.deprecated "Use Visitor_behavior.get_stmt"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Get.stmt"]
 (** @plugin development guide *)
 
 val get_logic_info: Visitor_behavior.t -> logic_info -> logic_info
-[@@ ocaml.deprecated "Use Visitor_behavior.get_logic_info"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Get.logic_info"]
 val get_logic_type_info: Visitor_behavior.t -> logic_type_info -> logic_type_info
-[@@ ocaml.deprecated "Use Visitor_behavior.get_logic_type_info"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Get.logic_type_info"]
 val get_fieldinfo: Visitor_behavior.t -> fieldinfo -> fieldinfo
-[@@ ocaml.deprecated "Use Visitor_behavior.get_fieldinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Get.fieldinfo"]
 val get_model_info: Visitor_behavior.t -> model_info -> model_info
-[@@ ocaml.deprecated "Use Visitor_behavior.get_model_info"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Get.model_info"]
 val get_logic_var: Visitor_behavior.t -> logic_var -> logic_var
-[@@ ocaml.deprecated "Use Visitor_behavior.get_logic_var"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Get.logic_var"]
 val get_kernel_function: Visitor_behavior.t -> kernel_function -> kernel_function
-[@@ ocaml.deprecated "Use Visitor_behavior.get_kernel_function"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Get.kernel_function"]
 (** @plugin development guide *)
-  
 val get_fundec: Visitor_behavior.t -> fundec -> fundec
-[@@ ocaml.deprecated "Use Visitor_behavior.get_fundec"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Get.fundec"]
 
 val get_original_varinfo: Visitor_behavior.t -> varinfo -> varinfo
-[@@ ocaml.deprecated "Use Visitor_behavior.get_original_varinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Get_orig.varinfo"]
   (** retrieve the original representative of a given copy of a varinfo
       in the current state of the visitor.
-      @deprecated Potassium-19.0+dev. Use {!Visitor_behavior.get_original_varinfo}.
+      @deprecated Potassium-19.0+dev. Use {!Visitor_behavior.Get_orig.varinfo}.
       @plugin development guide
    *)
 
 val get_original_compinfo: Visitor_behavior.t -> compinfo -> compinfo
-[@@ ocaml.deprecated "Use Visitor_behavior.get_original_compinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Get_orig.compinfo"]
 val get_original_enuminfo: Visitor_behavior.t -> enuminfo -> enuminfo
-[@@ ocaml.deprecated "Use Visitor_behavior.get_original_enuminfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Get_orig.enuminfo"]
 val get_original_enumitem: Visitor_behavior.t -> enumitem -> enumitem
-[@@ ocaml.deprecated "Use Visitor_behavior.get_original_enumitem"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Get_orig.enumitem"]
 val get_original_typeinfo: Visitor_behavior.t -> typeinfo -> typeinfo
-[@@ ocaml.deprecated "Use Visitor_behavior.get_original_typeinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Get_orig.typeinfo"]
 val get_original_stmt: Visitor_behavior.t -> stmt -> stmt
-[@@ ocaml.deprecated "Use Visitor_behavior.get_original_stmt"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Get_orig.stmt"]
 val get_original_logic_info: Visitor_behavior.t -> logic_info -> logic_info
-[@@ ocaml.deprecated "Use Visitor_behavior.get_original_logic_info"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Get_orig.logic_info"]
 val get_original_logic_type_info:
   Visitor_behavior.t -> logic_type_info -> logic_type_info
-[@@ ocaml.deprecated "Use Visitor_behavior.get_original_logic_type_info"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Get_orig.logic_type_info"]
 val get_original_fieldinfo: Visitor_behavior.t -> fieldinfo -> fieldinfo
-[@@ ocaml.deprecated "Use Visitor_behavior.get_original_fieldinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Get_orig.fieldinfo"]
 val get_original_model_info: Visitor_behavior.t -> model_info -> model_info
-[@@ ocaml.deprecated "Use Visitor_behavior.get_original_model_info"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Get_orig.model_info"]
 val get_original_logic_var: Visitor_behavior.t -> logic_var -> logic_var
-[@@ ocaml.deprecated "Use Visitor_behavior.get_original_logic_var"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Get_orig.logic_var"]
 val get_original_kernel_function:
   Visitor_behavior.t -> kernel_function -> kernel_function
-[@@ ocaml.deprecated "Use Visitor_behavior.get_original_kernel_function"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Get_orig.kernel_function"]
 val get_original_fundec: Visitor_behavior.t -> fundec -> fundec
-[@@ ocaml.deprecated "Use Visitor_behavior.get_original_fundec"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Get_orig.fundec"]
 
 val set_varinfo: Visitor_behavior.t -> varinfo -> varinfo -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.set_varinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Set.varinfo"]
   (** change the representative of a given varinfo in the current
       state of the visitor. Use with care (i.e. makes sure that the old one
       is not referenced anywhere in the AST, or sharing will be lost.
-      @deprecated Potassium-19.0+dev. Use {!Visitor_behavior.set_varinfo}.
+      @deprecated Potassium-19.0+dev. Use {!Visitor_behavior.Set.varinfo}.
       @plugin development guide
   *)
 val set_compinfo: Visitor_behavior.t -> compinfo -> compinfo -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.set_compinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Set.compinfo"]
 val set_enuminfo: Visitor_behavior.t -> enuminfo -> enuminfo -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.set_enuminfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Set.enuminfo"]
 val set_enumitem: Visitor_behavior.t -> enumitem -> enumitem -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.set_enumitem"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Set.enumitem"]
 val set_typeinfo: Visitor_behavior.t -> typeinfo -> typeinfo -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.set_typeinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Set.typeinfo"]
 val set_stmt: Visitor_behavior.t -> stmt -> stmt -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.set_stmt"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Set.stmt"]
 val set_logic_info: Visitor_behavior.t -> logic_info -> logic_info -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.set_logic_info"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Set.logic_info"]
 val set_logic_type_info:
   Visitor_behavior.t -> logic_type_info -> logic_type_info -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.set_logic_type_info"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Set.logic_type_info"]
 val set_fieldinfo: Visitor_behavior.t -> fieldinfo -> fieldinfo -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.set_fieldinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Set.fieldinfo"]
 val set_model_info: Visitor_behavior.t -> model_info -> model_info -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.set_model_info"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Set.model_info"]
 val set_logic_var: Visitor_behavior.t -> logic_var -> logic_var -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.set_logic_var"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Set.logic_var"]
 val set_kernel_function:
   Visitor_behavior.t -> kernel_function -> kernel_function -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.set_kernel_function"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Set.kernel_function"]
 val set_fundec: Visitor_behavior.t -> fundec -> fundec -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.set_fundec"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Set.fundec"]
 
 val set_orig_varinfo: Visitor_behavior.t -> varinfo -> varinfo -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.set_orig_varinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Set_orig.varinfo"]
   (** change the reference of a given new varinfo in the current
       state of the visitor. Use with care
-      @deprecated Potassium-19.0+dev. Use {!Visitor_behavior.set_orig_varinfo}.
+      @deprecated Potassium-19.0+dev. Use {!Visitor_behavior.Set_orig.varinfo}.
   *)
 val set_orig_compinfo: Visitor_behavior.t -> compinfo -> compinfo -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.set_orig_compinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Set_orig.compinfo"]
 val set_orig_enuminfo: Visitor_behavior.t -> enuminfo -> enuminfo -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.set_orig_enuminfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Set_orig.enuminfo"]
 val set_orig_enumitem: Visitor_behavior.t -> enumitem -> enumitem -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.set_orig_enumitem"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Set_orig.enumitem"]
 val set_orig_typeinfo: Visitor_behavior.t -> typeinfo -> typeinfo -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.set_orig_typeinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Set_orig.typeinfo"]
 val set_orig_stmt: Visitor_behavior.t -> stmt -> stmt -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.set_orig_stmt"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Set_orig.stmt"]
 val set_orig_logic_info: Visitor_behavior.t -> logic_info -> logic_info -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.set_orig_logic_info"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Set_orig.logic_info"]
 val set_orig_logic_type_info:
   Visitor_behavior.t -> logic_type_info -> logic_type_info -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.set_orig_logic_type_info"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Set_orig.logic_type_info"]
 val set_orig_fieldinfo: Visitor_behavior.t -> fieldinfo -> fieldinfo -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.set_orig_fieldinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Set_orig.fieldinfo"]
 val set_orig_model_info: Visitor_behavior.t -> model_info -> model_info -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.set_orig_model_info"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Set_orig.model_info"]
 val set_orig_logic_var: Visitor_behavior.t -> logic_var -> logic_var -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.set_orig_logic_var"]
-val set_orig_kernel_function: 
+[@@ ocaml.deprecated "Use Visitor_behavior.Set_orig.logic_var"]
+val set_orig_kernel_function:
   Visitor_behavior.t -> kernel_function -> kernel_function -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.set_orig_kernel_function"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Set_orig.kernel_function"]
 val set_orig_fundec: Visitor_behavior.t -> fundec -> fundec -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.set_orig_fundec"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Set_orig.fundec"]
 
 val unset_varinfo: Visitor_behavior.t -> varinfo -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.unset_varinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Unset.varinfo"]
   (** remove the entry associated to the given varinfo in the current
       state of the visitor. Use with care (i.e. make sure that you will never
       visit again this varinfo in the same visiting context).
-      @deprecated Potassium-19.0+dev. Use {!Visitor_behavior.unset_varinfo}.
+      @deprecated Potassium-19.0+dev. Use {!Visitor_behavior.Unset.varinfo}.
       @plugin development guide
   *)
 val unset_compinfo: Visitor_behavior.t -> compinfo -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.unset_compinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Unset.compinfo"]
 val unset_enuminfo: Visitor_behavior.t -> enuminfo -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.unset_enuminfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Unset.enuminfo"]
 val unset_enumitem: Visitor_behavior.t -> enumitem -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.unset_enumitem"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Unset.enumitem"]
 val unset_typeinfo: Visitor_behavior.t -> typeinfo -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.unset_typeinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Unset.typeinfo"]
 val unset_stmt: Visitor_behavior.t -> stmt -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.unset_stmt"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Unset.stmt"]
 val unset_logic_info: Visitor_behavior.t -> logic_info -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.unset_logic_info"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Unset.logic_info"]
 val unset_logic_type_info: Visitor_behavior.t -> logic_type_info -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.unset_logic_type_info"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Unset.logic_type_info"]
 val unset_fieldinfo: Visitor_behavior.t -> fieldinfo -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.unset_fieldinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Unset.fieldinfo"]
 val unset_model_info: Visitor_behavior.t -> model_info -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.unset_model_info"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Unset.model_info"]
 val unset_logic_var: Visitor_behavior.t -> logic_var -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.unset_logic_var"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Unset.logic_var"]
 val unset_kernel_function: Visitor_behavior.t -> kernel_function -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.unset_kernel_function"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Unset.kernel_function"]
 val unset_fundec: Visitor_behavior.t -> fundec -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.unset_fundec"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Unset.fundec"]
 
 val unset_orig_varinfo: Visitor_behavior.t -> varinfo -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.unset_orig_varinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Unset_orig.varinfo"]
   (** remove the entry associated with the given new varinfo in the current
       state of the visitor. Use with care
-      @deprecated Potassium-19.0+dev. Use {!Visitor_behavior.unset_orig_varinfo}.
+      @deprecated Potassium-19.0+dev. Use {!Visitor_behavior.Unset_orig.varinfo}.
   *)
 val unset_orig_compinfo: Visitor_behavior.t -> compinfo -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.unset_orig_compinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Unset_orig.compinfo"]
 val unset_orig_enuminfo: Visitor_behavior.t -> enuminfo -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.unset_orig_enuminfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Unset_orig.enuminfo"]
 val unset_orig_enumitem: Visitor_behavior.t -> enumitem -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.unset_orig_enumitem"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Unset_orig.enumitem"]
 val unset_orig_typeinfo: Visitor_behavior.t -> typeinfo -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.unset_orig_typeinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Unset_orig.typeinfo"]
 val unset_orig_stmt: Visitor_behavior.t -> stmt -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.unset_orig_stmt"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Unset_orig.stmt"]
 val unset_orig_logic_info: Visitor_behavior.t -> logic_info -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.unset_orig_logic_info"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Unset_orig.logic_info"]
 val unset_orig_logic_type_info: Visitor_behavior.t -> logic_type_info -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.unset_orig_logic_type_info"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Unset_orig.logic_type_info"]
 val unset_orig_fieldinfo: Visitor_behavior.t -> fieldinfo -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.unset_orig_fieldinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Unset_orig.fieldinfo"]
 val unset_orig_model_info: Visitor_behavior.t -> model_info -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.unset_orig_model_info"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Unset_orig.model_info"]
 val unset_orig_logic_var: Visitor_behavior.t -> logic_var -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.unset_orig_logic_var"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Unset_orig.logic_var"]
 val unset_orig_kernel_function: Visitor_behavior.t -> kernel_function -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.unset_orig_kernel_function"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Unset_orig.kernel_function"]
 val unset_orig_fundec: Visitor_behavior.t -> fundec -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.unset_orig_fundec"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Unset_orig.fundec"]
 
 val memo_varinfo: Visitor_behavior.t -> varinfo -> varinfo
-[@@ ocaml.deprecated "Use Visitor_behavior.memo_varinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Memo.varinfo"]
   (** finds a binding in new project for the given varinfo, creating one
-      if it does not already exists. 
-      @deprecated Potassium-19.0+dev. Use {!Visitor_behavior.memo_varinfo}.
+      if it does not already exists.
+      @deprecated Potassium-19.0+dev. Use {!Visitor_behavior.Memo.varinfo}.
   *)
 val memo_compinfo: Visitor_behavior.t -> compinfo -> compinfo
-[@@ ocaml.deprecated "Use Visitor_behavior.memo_compinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Memo.compinfo"]
 val memo_enuminfo: Visitor_behavior.t -> enuminfo -> enuminfo
-[@@ ocaml.deprecated "Use Visitor_behavior.memo_enuminfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Memo.enuminfo"]
 val memo_enumitem: Visitor_behavior.t -> enumitem -> enumitem
-[@@ ocaml.deprecated "Use Visitor_behavior.memo_enumitem"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Memo.enumitem"]
 val memo_typeinfo: Visitor_behavior.t -> typeinfo -> typeinfo
-[@@ ocaml.deprecated "Use Visitor_behavior.memo_typeinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Memo.typeinfo"]
 val memo_stmt: Visitor_behavior.t -> stmt -> stmt
-[@@ ocaml.deprecated "Use Visitor_behavior.memo_stmt"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Memo.stmt"]
 val memo_logic_info: Visitor_behavior.t -> logic_info -> logic_info
-[@@ ocaml.deprecated "Use Visitor_behavior.memo_logic_info"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Memo.logic_info"]
 val memo_logic_type_info: Visitor_behavior.t -> logic_type_info -> logic_type_info
-[@@ ocaml.deprecated "Use Visitor_behavior.memo_logic_type_info"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Memo.logic_type_info"]
 val memo_fieldinfo: Visitor_behavior.t -> fieldinfo -> fieldinfo
-[@@ ocaml.deprecated "Use Visitor_behavior.memo_fieldinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Memo.fieldinfo"]
 val memo_model_info: Visitor_behavior.t -> model_info -> model_info
-[@@ ocaml.deprecated "Use Visitor_behavior.memo_model_info"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Memo.model_info"]
 val memo_logic_var: Visitor_behavior.t -> logic_var -> logic_var
-[@@ ocaml.deprecated "Use Visitor_behavior.memo_logic_var"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Memo.logic_var"]
 val memo_kernel_function:
   Visitor_behavior.t -> kernel_function -> kernel_function
-[@@ ocaml.deprecated "Use Visitor_behavior.memo_kernel_function"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Memo.kernel_function"]
 val memo_fundec: Visitor_behavior.t -> fundec -> fundec
-[@@ ocaml.deprecated "Use Visitor_behavior.memo_fundec"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Memo.fundec"]
 
 (** [iter_visitor_varinfo vis f] iterates [f] over each pair of 
     varinfo registered in [vis]. Varinfo for the old AST is presented 
     to [f] first.
     @since Oxygen-20120901 
-    @deprecated Potassium-19.0+dev. Use {!Visitor_behavior.iter_visitor_varinfo}.
+    @deprecated Potassium-19.0+dev. Use {!Visitor_behavior.Iter.varinfo}.
 *)
 val iter_visitor_varinfo:
   Visitor_behavior.t -> (varinfo -> varinfo -> unit) -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.iter_visitor_varinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Iter.varinfo"]
 val iter_visitor_compinfo:
   Visitor_behavior.t -> (compinfo -> compinfo -> unit) -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.iter_visitor_compinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Iter.compinfo"]
 val iter_visitor_enuminfo: 
   Visitor_behavior.t -> (enuminfo -> enuminfo -> unit) -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.iter_visitor_enuminfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Iter.enuminfo"]
 val iter_visitor_enumitem:
   Visitor_behavior.t -> (enumitem -> enumitem -> unit) -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.iter_visitor_enumitem"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Iter.enumitem"]
 val iter_visitor_typeinfo:
   Visitor_behavior.t -> (typeinfo -> typeinfo -> unit) -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.iter_visitor_typeinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Iter.typeinfo"]
 val iter_visitor_stmt:
   Visitor_behavior.t -> (stmt -> stmt -> unit) -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.iter_visitor_stmt"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Iter.stmt"]
 val iter_visitor_logic_info:
   Visitor_behavior.t -> (logic_info -> logic_info -> unit) -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.iter_visitor_logic_info"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Iter.logic_info"]
 val iter_visitor_logic_type_info:
   Visitor_behavior.t -> (logic_type_info -> logic_type_info -> unit) -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.iter_visitor_logic_type_info"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Iter.logic_type_info"]
 val iter_visitor_fieldinfo: 
   Visitor_behavior.t -> (fieldinfo -> fieldinfo -> unit) -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.iter_visitor_fieldinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Iter.fieldinfo"]
 val iter_visitor_model_info: 
   Visitor_behavior.t -> (model_info -> model_info -> unit) -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.iter_visitor_model_info"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Iter.model_info"]
 val iter_visitor_logic_var: 
   Visitor_behavior.t -> (logic_var -> logic_var -> unit) -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.iter_visitor_logic_var"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Iter.logic_var"]
 val iter_visitor_kernel_function:
   Visitor_behavior.t -> (kernel_function -> kernel_function -> unit) -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.iter_visitor_kernel_function"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Iter.kernel_function"]
 val iter_visitor_fundec: 
   Visitor_behavior.t -> (fundec -> fundec -> unit) -> unit
-[@@ ocaml.deprecated "Use Visitor_behavior.iter_visitor_fundec"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Iter.fundec"]
 
 (** [fold_visitor_varinfo vis f] folds [f] over each pair of varinfo registered
     in [vis]. Varinfo for the old AST is presented to [f] first.
     @since Oxygen-20120901 
-    @deprecated Potassium-19.0+dev. Use {!Visitor_behavior.fold_visitor_varinfo}.
+    @deprecated Potassium-19.0+dev. Use {!Visitor_behavior.Fold.varinfo}.
 *)
 val fold_visitor_varinfo:
   Visitor_behavior.t -> (varinfo -> varinfo -> 'a -> 'a) -> 'a -> 'a
-[@@ ocaml.deprecated "Use Visitor_behavior.fold_visitor_varinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Fold.varinfo"]
 val fold_visitor_compinfo:
   Visitor_behavior.t -> (compinfo -> compinfo -> 'a -> 'a) -> 'a -> 'a
-[@@ ocaml.deprecated "Use Visitor_behavior.fold_visitor_compinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Fold.compinfo"]
 val fold_visitor_enuminfo: 
   Visitor_behavior.t -> (enuminfo -> enuminfo -> 'a -> 'a) -> 'a -> 'a
-[@@ ocaml.deprecated "Use Visitor_behavior.fold_visitor_enuminfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Fold.enuminfo"]
 val fold_visitor_enumitem:
   Visitor_behavior.t -> (enumitem -> enumitem -> 'a -> 'a) -> 'a -> 'a
-[@@ ocaml.deprecated "Use Visitor_behavior.fold_visitor_enumitem"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Fold.enumitem"]
 val fold_visitor_typeinfo:
   Visitor_behavior.t -> (typeinfo -> typeinfo -> 'a -> 'a) -> 'a -> 'a
-[@@ ocaml.deprecated "Use Visitor_behavior.fold_visitor_typeinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Fold.typeinfo"]
 val fold_visitor_stmt:
   Visitor_behavior.t -> (stmt -> stmt -> 'a -> 'a) -> 'a -> 'a
-[@@ ocaml.deprecated "Use Visitor_behavior.fold_visitor_stmt"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Fold.stmt"]
 val fold_visitor_logic_info:
   Visitor_behavior.t -> (logic_info -> logic_info -> 'a -> 'a) -> 'a -> 'a
-[@@ ocaml.deprecated "Use Visitor_behavior.fold_visitor_logic_info"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Fold.logic_info"]
 val fold_visitor_logic_type_info:
   Visitor_behavior.t ->
   (logic_type_info -> logic_type_info -> 'a -> 'a) -> 'a -> 'a
-[@@ ocaml.deprecated "Use Visitor_behavior.fold_visitor_logic_type_info"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Fold.logic_type_info"]
 val fold_visitor_fieldinfo: 
   Visitor_behavior.t -> (fieldinfo -> fieldinfo -> 'a -> 'a) -> 'a -> 'a
-[@@ ocaml.deprecated "Use Visitor_behavior.fold_visitor_fieldinfo"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Fold.fieldinfo"]
 val fold_visitor_model_info: 
   Visitor_behavior.t -> (model_info -> model_info -> 'a -> 'a) -> 'a -> 'a
-[@@ ocaml.deprecated "Use Visitor_behavior.fold_visitor_model_info"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Fold.model_info"]
 val fold_visitor_logic_var: 
   Visitor_behavior.t -> (logic_var -> logic_var -> 'a -> 'a) -> 'a -> 'a
-[@@ ocaml.deprecated "Use Visitor_behavior.fold_visitor_logic_var"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Fold.logic_var"]
 val fold_visitor_kernel_function:
   Visitor_behavior.t ->
   (kernel_function -> kernel_function -> 'a -> 'a) -> 'a -> 'a
-[@@ ocaml.deprecated "Use Visitor_behavior.fold_visitor_kernel_function"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Fold.kernel_function"]
 val fold_visitor_fundec: 
   Visitor_behavior.t -> (fundec -> fundec -> 'a -> 'a) -> 'a -> 'a
-[@@ ocaml.deprecated "Use Visitor_behavior.fold_visitor_fundec"]
+[@@ ocaml.deprecated "Use Visitor_behavior.Fold.fundec"]
 
 (** {3 Visitor class} *)
 

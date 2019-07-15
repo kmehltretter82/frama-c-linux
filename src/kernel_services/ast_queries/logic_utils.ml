@@ -2513,7 +2513,7 @@ let eval_term_lval global_find_init (lhost, loff) =
   | _ -> None
 
 class simplify_const_lval global_find_init = object (self)
-  inherit Cil.genericCilVisitor (Visitor_behavior.copy_visit (Project.current ()))
+  inherit Cil.genericCilVisitor (Visitor_behavior.copy (Project.current ()))
 
   method! vterm t =
     match t.term_node with

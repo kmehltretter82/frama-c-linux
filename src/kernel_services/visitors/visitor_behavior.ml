@@ -197,7 +197,7 @@ let alphabetabeta _ x = x
 let unitunit: unit -> unit = id
 let alphaunit _ = ()
 
-let inplace_visit () =
+let inplace () =
   { cfile = id;
     get_compinfo = id;
     get_fieldinfo = id;
@@ -915,8 +915,8 @@ let copy_visit_gen fresh prj =
          Cil_datatype.Varinfo.Hashtbl.fold f fundecs i);
   }
 
-let copy_visit = copy_visit_gen false
-let refresh_visit = copy_visit_gen true
+let copy = copy_visit_gen false
+let refresh = copy_visit_gen true
 
 let is_copy b = b.is_copy_behavior
 let is_fresh b = b.is_fresh_behavior
@@ -933,142 +933,214 @@ let cblock b = b.cblock
 let cinitinfo b = b.cinitinfo
 let cfile b = b.cfile
 
-let memo_varinfo b = b.memo_varinfo
-let memo_compinfo b = b.memo_compinfo
-let memo_fieldinfo b = b.memo_fieldinfo
-let memo_model_info b = b.memo_model_info
-let memo_enuminfo b = b.memo_enuminfo
-let memo_enumitem b = b.memo_enumitem
-let memo_stmt b = b.memo_stmt
-let memo_typeinfo b = b.memo_typeinfo
-let memo_logic_info b = b.memo_logic_info
-let memo_logic_type_info b = b.memo_logic_type_info
-let memo_logic_var b = b.memo_logic_var
-let memo_kernel_function b = b.memo_kernel_function
-let memo_fundec b = b.memo_fundec
+module Memo = struct
+  let varinfo b = b.memo_varinfo
+  let compinfo b = b.memo_compinfo
+  let fieldinfo b = b.memo_fieldinfo
+  let model_info b = b.memo_model_info
+  let enuminfo b = b.memo_enuminfo
+  let enumitem b = b.memo_enumitem
+  let stmt b = b.memo_stmt
+  let typeinfo b = b.memo_typeinfo
+  let logic_info b = b.memo_logic_info
+  let logic_type_info b = b.memo_logic_type_info
+  let logic_var b = b.memo_logic_var
+  let kernel_function b = b.memo_kernel_function
+  let fundec b = b.memo_fundec
+end
 
-let reset_varinfo b = b.reset_behavior_varinfo ()
-let reset_compinfo b = b.reset_behavior_compinfo ()
-let reset_enuminfo b = b.reset_behavior_enuminfo ()
-let reset_enumitem b = b.reset_behavior_enumitem ()
-let reset_typeinfo b = b.reset_behavior_typeinfo ()
-let reset_logic_info b = b.reset_behavior_logic_info ()
-let reset_logic_type_info b = b.reset_behavior_logic_type_info ()
-let reset_fieldinfo b = b.reset_behavior_fieldinfo ()
-let reset_model_info b = b.reset_behavior_model_info ()
-let reset_stmt b = b.reset_behavior_stmt ()
-let reset_logic_var b = b.reset_logic_var ()
-let reset_kernel_function b = b.reset_behavior_kernel_function ()
-let reset_fundec b = b.reset_behavior_fundec ()
+module Reset = struct
+  let varinfo b = b.reset_behavior_varinfo ()
+  let compinfo b = b.reset_behavior_compinfo ()
+  let enuminfo b = b.reset_behavior_enuminfo ()
+  let enumitem b = b.reset_behavior_enumitem ()
+  let typeinfo b = b.reset_behavior_typeinfo ()
+  let logic_info b = b.reset_behavior_logic_info ()
+  let logic_type_info b = b.reset_behavior_logic_type_info ()
+  let fieldinfo b = b.reset_behavior_fieldinfo ()
+  let model_info b = b.reset_behavior_model_info ()
+  let stmt b = b.reset_behavior_stmt ()
+  let logic_var b = b.reset_logic_var ()
+  let kernel_function b = b.reset_behavior_kernel_function ()
+  let fundec b = b.reset_behavior_fundec ()
+end
 
-let get_varinfo b = b.get_varinfo
-let get_compinfo b = b.get_compinfo
-let get_fieldinfo b = b.get_fieldinfo
-let get_model_info b = b.get_model_info
-let get_enuminfo b = b.get_enuminfo
-let get_enumitem b = b.get_enumitem
-let get_stmt b = b.get_stmt
-let get_typeinfo b = b.get_typeinfo
-let get_logic_info b = b.get_logic_info
-let get_logic_type_info b = b.get_logic_type_info
-let get_logic_var b = b.get_logic_var
-let get_kernel_function b = b.get_kernel_function
-let get_fundec b = b.get_fundec
+module type Get = sig
+  val varinfo: t -> varinfo -> varinfo
+  val compinfo: t -> compinfo -> compinfo
+  val enuminfo: t -> enuminfo -> enuminfo
+  val enumitem: t -> enumitem -> enumitem
+  val typeinfo: t -> typeinfo -> typeinfo
+  val stmt: t -> stmt -> stmt
+  val logic_info: t -> logic_info -> logic_info
+  val logic_type_info: t -> logic_type_info -> logic_type_info
+  val fieldinfo: t -> fieldinfo -> fieldinfo
+  val model_info: t -> model_info -> model_info
+  val logic_var: t -> logic_var -> logic_var
+  val kernel_function: t -> kernel_function -> kernel_function
+  val fundec: t -> fundec -> fundec
+end
 
-let get_original_varinfo b = b.get_original_varinfo
-let get_original_compinfo b = b.get_original_compinfo
-let get_original_fieldinfo b = b.get_original_fieldinfo
-let get_original_model_info b = b.get_original_model_info
-let get_original_enuminfo b = b.get_original_enuminfo
-let get_original_enumitem b = b.get_original_enumitem
-let get_original_stmt b = b.get_original_stmt
-let get_original_typeinfo b = b.get_original_typeinfo
-let get_original_logic_info b = b.get_original_logic_info
-let get_original_logic_type_info b = b.get_original_logic_type_info
-let get_original_logic_var b = b.get_original_logic_var
-let get_original_kernel_function b = b.get_original_kernel_function
-let get_original_fundec b = b.get_original_fundec
+module Get = struct
+  let varinfo b = b.get_varinfo
+  let compinfo b = b.get_compinfo
+  let fieldinfo b = b.get_fieldinfo
+  let model_info b = b.get_model_info
+  let enuminfo b = b.get_enuminfo
+  let enumitem b = b.get_enumitem
+  let stmt b = b.get_stmt
+  let typeinfo b = b.get_typeinfo
+  let logic_info b = b.get_logic_info
+  let logic_type_info b = b.get_logic_type_info
+  let logic_var b = b.get_logic_var
+  let kernel_function b = b.get_kernel_function
+  let fundec b = b.get_fundec
+end
 
-let set_varinfo b = b.set_varinfo
-let set_compinfo b = b.set_compinfo
-let set_fieldinfo b = b.set_fieldinfo
-let set_model_info b = b.set_model_info
-let set_enuminfo b = b.set_enuminfo
-let set_enumitem b = b.set_enumitem
-let set_stmt b = b.set_stmt
-let set_typeinfo b = b.set_typeinfo
-let set_logic_info b = b.set_logic_info
-let set_logic_type_info b = b.set_logic_type_info
-let set_logic_var b = b.set_logic_var
-let set_kernel_function b = b.set_kernel_function
-let set_fundec b = b.set_fundec
+module Get_orig = struct
+  let varinfo b = b.get_original_varinfo
+  let compinfo b = b.get_original_compinfo
+  let fieldinfo b = b.get_original_fieldinfo
+  let model_info b = b.get_original_model_info
+  let enuminfo b = b.get_original_enuminfo
+  let enumitem b = b.get_original_enumitem
+  let stmt b = b.get_original_stmt
+  let typeinfo b = b.get_original_typeinfo
+  let logic_info b = b.get_original_logic_info
+  let logic_type_info b = b.get_original_logic_type_info
+  let logic_var b = b.get_original_logic_var
+  let kernel_function b = b.get_original_kernel_function
+  let fundec b = b.get_original_fundec
+end
 
-let set_orig_varinfo b = b.set_orig_varinfo
-let set_orig_compinfo b = b.set_orig_compinfo
-let set_orig_fieldinfo b = b.set_orig_fieldinfo
-let set_orig_model_info b = b.set_model_info
-let set_orig_enuminfo b = b.set_orig_enuminfo
-let set_orig_enumitem b = b.set_orig_enumitem
-let set_orig_stmt b = b.set_orig_stmt
-let set_orig_typeinfo b = b.set_orig_typeinfo
-let set_orig_logic_info b = b.set_orig_logic_info
-let set_orig_logic_type_info b = b.set_orig_logic_type_info
-let set_orig_logic_var b = b.set_orig_logic_var
-let set_orig_kernel_function b = b.set_orig_kernel_function
-let set_orig_fundec b = b.set_orig_fundec
+module type Set = sig
+  val varinfo: t -> varinfo -> varinfo -> unit
+  val compinfo: t -> compinfo -> compinfo -> unit
+  val enuminfo: t -> enuminfo -> enuminfo -> unit
+  val enumitem: t -> enumitem -> enumitem -> unit
+  val typeinfo: t -> typeinfo -> typeinfo -> unit
+  val stmt: t -> stmt -> stmt -> unit
 
-let unset_varinfo b = b.unset_varinfo
-let unset_compinfo b = b.unset_compinfo
-let unset_fieldinfo b = b.unset_fieldinfo
-let unset_model_info b = b.unset_model_info
-let unset_enuminfo b = b.unset_enuminfo
-let unset_enumitem b = b.unset_enumitem
-let unset_stmt b = b.unset_stmt
-let unset_typeinfo b = b.unset_typeinfo
-let unset_logic_info b = b.unset_logic_info
-let unset_logic_type_info b = b.unset_logic_type_info
-let unset_logic_var b = b.unset_logic_var
-let unset_kernel_function b = b.unset_kernel_function
-let unset_fundec b = b.unset_fundec
+  val logic_info: t -> logic_info -> logic_info -> unit
+  val logic_type_info:
+    t -> logic_type_info -> logic_type_info -> unit
+  val fieldinfo: t -> fieldinfo -> fieldinfo -> unit
+  val model_info: t -> model_info -> model_info -> unit
+  val logic_var: t -> logic_var -> logic_var -> unit
+  val kernel_function:
+    t -> kernel_function -> kernel_function -> unit
+  val fundec: t -> fundec -> fundec -> unit
+end
 
-let unset_orig_varinfo b = b.unset_orig_varinfo
-let unset_orig_compinfo b = b.unset_orig_compinfo
-let unset_orig_fieldinfo b = b.unset_orig_fieldinfo
-let unset_orig_model_info b = b.unset_model_info
-let unset_orig_enuminfo b = b.unset_orig_enuminfo
-let unset_orig_enumitem b = b.unset_orig_enumitem
-let unset_orig_stmt b = b.unset_orig_stmt
-let unset_orig_typeinfo b = b.unset_orig_typeinfo
-let unset_orig_logic_info b = b.unset_orig_logic_info
-let unset_orig_logic_type_info b = b.unset_orig_logic_type_info
-let unset_orig_logic_var b = b.unset_orig_logic_var
-let unset_orig_kernel_function b = b.unset_orig_kernel_function
-let unset_orig_fundec b = b.unset_orig_fundec
+module Set = struct
+  let varinfo b = b.set_varinfo
+  let compinfo b = b.set_compinfo
+  let fieldinfo b = b.set_fieldinfo
+  let model_info b = b.set_model_info
+  let enuminfo b = b.set_enuminfo
+  let enumitem b = b.set_enumitem
+  let stmt b = b.set_stmt
+  let typeinfo b = b.set_typeinfo
+  let logic_info b = b.set_logic_info
+  let logic_type_info b = b.set_logic_type_info
+  let logic_var b = b.set_logic_var
+  let kernel_function b = b.set_kernel_function
+  let fundec b = b.set_fundec
+end
 
-let iter_visitor_varinfo b = b.iter_visitor_varinfo
-let iter_visitor_compinfo b = b.iter_visitor_compinfo
-let iter_visitor_enuminfo b = b.iter_visitor_enuminfo
-let iter_visitor_enumitem b = b.iter_visitor_enumitem
-let iter_visitor_typeinfo b = b.iter_visitor_typeinfo
-let iter_visitor_stmt b = b.iter_visitor_stmt
-let iter_visitor_logic_info b = b.iter_visitor_logic_info
-let iter_visitor_logic_type_info b = b.iter_visitor_logic_type_info
-let iter_visitor_fieldinfo b = b.iter_visitor_fieldinfo
-let iter_visitor_model_info b = b.iter_visitor_model_info
-let iter_visitor_logic_var b = b.iter_visitor_logic_var
-let iter_visitor_kernel_function b = b.iter_visitor_kernel_function
-let iter_visitor_fundec b = b.iter_visitor_fundec
+module Set_orig = struct
+  let varinfo b = b.set_orig_varinfo
+  let compinfo b = b.set_orig_compinfo
+  let fieldinfo b = b.set_orig_fieldinfo
+  let model_info b = b.set_model_info
+  let enuminfo b = b.set_orig_enuminfo
+  let enumitem b = b.set_orig_enumitem
+  let stmt b = b.set_orig_stmt
+  let typeinfo b = b.set_orig_typeinfo
+  let logic_info b = b.set_orig_logic_info
+  let logic_type_info b = b.set_orig_logic_type_info
+  let logic_var b = b.set_orig_logic_var
+  let kernel_function b = b.set_orig_kernel_function
+  let fundec b = b.set_orig_fundec
+end
 
-let fold_visitor_varinfo b = b.fold_visitor_varinfo
-let fold_visitor_compinfo b = b.fold_visitor_compinfo
-let fold_visitor_enuminfo b = b.fold_visitor_enuminfo
-let fold_visitor_enumitem b = b.fold_visitor_enumitem
-let fold_visitor_typeinfo b = b.fold_visitor_typeinfo
-let fold_visitor_stmt b = b.fold_visitor_stmt
-let fold_visitor_logic_info b = b.fold_visitor_logic_info
-let fold_visitor_logic_type_info b = b.fold_visitor_logic_type_info
-let fold_visitor_fieldinfo b = b.fold_visitor_fieldinfo
-let fold_visitor_model_info b = b.fold_visitor_model_info
-let fold_visitor_logic_var b = b.fold_visitor_logic_var
-let fold_visitor_kernel_function b = b.fold_visitor_kernel_function
-let fold_visitor_fundec b = b.fold_visitor_fundec
+module type Unset = sig
+  val varinfo: t -> varinfo -> unit
+  val compinfo: t -> compinfo -> unit
+  val enuminfo: t -> enuminfo -> unit
+  val enumitem: t -> enumitem -> unit
+  val typeinfo: t -> typeinfo -> unit
+  val stmt: t -> stmt -> unit
+
+  val logic_info: t -> logic_info -> unit
+  val logic_type_info: t -> logic_type_info -> unit
+  val fieldinfo: t -> fieldinfo -> unit
+  val model_info: t -> model_info -> unit
+  val logic_var: t -> logic_var -> unit
+  val kernel_function: t -> kernel_function -> unit
+  val fundec: t -> fundec -> unit
+end
+
+module Unset = struct
+  let varinfo b = b.unset_varinfo
+  let compinfo b = b.unset_compinfo
+  let fieldinfo b = b.unset_fieldinfo
+  let model_info b = b.unset_model_info
+  let enuminfo b = b.unset_enuminfo
+  let enumitem b = b.unset_enumitem
+  let stmt b = b.unset_stmt
+  let typeinfo b = b.unset_typeinfo
+  let logic_info b = b.unset_logic_info
+  let logic_type_info b = b.unset_logic_type_info
+  let logic_var b = b.unset_logic_var
+  let kernel_function b = b.unset_kernel_function
+  let fundec b = b.unset_fundec
+end
+
+module Unset_orig = struct
+  let varinfo b = b.unset_orig_varinfo
+  let compinfo b = b.unset_orig_compinfo
+  let fieldinfo b = b.unset_orig_fieldinfo
+  let model_info b = b.unset_model_info
+  let enuminfo b = b.unset_orig_enuminfo
+  let enumitem b = b.unset_orig_enumitem
+  let stmt b = b.unset_orig_stmt
+  let typeinfo b = b.unset_orig_typeinfo
+  let logic_info b = b.unset_orig_logic_info
+  let logic_type_info b = b.unset_orig_logic_type_info
+  let logic_var b = b.unset_orig_logic_var
+  let kernel_function b = b.unset_orig_kernel_function
+  let fundec b = b.unset_orig_fundec
+end
+
+module Iter = struct
+  let varinfo b = b.iter_visitor_varinfo
+  let compinfo b = b.iter_visitor_compinfo
+  let enuminfo b = b.iter_visitor_enuminfo
+  let enumitem b = b.iter_visitor_enumitem
+  let typeinfo b = b.iter_visitor_typeinfo
+  let stmt b = b.iter_visitor_stmt
+  let logic_info b = b.iter_visitor_logic_info
+  let logic_type_info b = b.iter_visitor_logic_type_info
+  let fieldinfo b = b.iter_visitor_fieldinfo
+  let model_info b = b.iter_visitor_model_info
+  let logic_var b = b.iter_visitor_logic_var
+  let kernel_function b = b.iter_visitor_kernel_function
+  let fundec b = b.iter_visitor_fundec
+end
+
+module Fold = struct
+  let varinfo b = b.fold_visitor_varinfo
+  let compinfo b = b.fold_visitor_compinfo
+  let enuminfo b = b.fold_visitor_enuminfo
+  let enumitem b = b.fold_visitor_enumitem
+  let typeinfo b = b.fold_visitor_typeinfo
+  let stmt b = b.fold_visitor_stmt
+  let logic_info b = b.fold_visitor_logic_info
+  let logic_type_info b = b.fold_visitor_logic_type_info
+  let fieldinfo b = b.fold_visitor_fieldinfo
+  let model_info b = b.fold_visitor_model_info
+  let logic_var b = b.fold_visitor_logic_var
+  let kernel_function b = b.fold_visitor_kernel_function
+  let fundec b = b.fold_visitor_fundec
+end

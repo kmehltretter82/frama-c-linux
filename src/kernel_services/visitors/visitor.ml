@@ -66,7 +66,7 @@ object(self)
   method current_kf = !current_kf
 
   method! private vstmt stmt =
-    let orig_stmt = Visitor_behavior.get_original_stmt self#behavior stmt in
+    let orig_stmt = Visitor_behavior.Get_orig.stmt self#behavior stmt in
     let annots =
       Annotations.fold_code_annot (fun e a acc -> (e, a) :: acc) orig_stmt []
     in
@@ -115,7 +115,7 @@ object(self)
     let change_stmt stmt (add, remove) =
       if (add <> [] || remove <> []) then begin
         let kf = Extlib.the self#current_kf in
-        let new_kf = Visitor_behavior.get_kernel_function self#behavior kf in
+        let new_kf = Visitor_behavior.Get.kernel_function self#behavior kf in
         Queue.add
           (fun () ->
              List.iter
@@ -178,7 +178,7 @@ object(self)
       else b
     in
     let res = self#vbehavior b' in
-    let new_kf = Visitor_behavior.get_kernel_function self#behavior kf in
+    let new_kf = Visitor_behavior.Get.kernel_function self#behavior kf in
     let add_queue a = Queue.add a self#get_filling_actions in
     let visit_clauses vis f =
       (* Ensures that we have a table associated to new_kf in Annotations. *)
@@ -385,7 +385,7 @@ object(self)
 
   method private vfunspec_annot () =
     let kf = Extlib.the self#current_kf in
-    let new_kf = Visitor_behavior.get_kernel_function self#behavior kf in
+    let new_kf = Visitor_behavior.Get.kernel_function self#behavior kf in
     let old_behaviors =
       Annotations.fold_behaviors (fun e b acc -> (e,b)::acc) kf []
     in
@@ -625,18 +625,18 @@ object(self)
   method! vglob g =
     let fundec, has_kf = match g with
       | GFunDecl(_,v,_) ->
-        let ov = Visitor_behavior.get_original_varinfo self#behavior v in
+        let ov = Visitor_behavior.Get_orig.varinfo self#behavior v in
         let kf = try Globals.Functions.get ov with Not_found ->
           Kernel.fatal "No kernel function for %s(%d)" v.vname v.vid
         in
         (* Just make a copy of current kernel function in case it is needed *)
-        let new_kf = Visitor_behavior.memo_kernel_function self#behavior kf in
+        let new_kf = Visitor_behavior.Memo.kernel_function self#behavior kf in
         if Visitor_behavior.is_copy self#behavior then
           new_kf.spec <- Cil.empty_funspec ();
         self#set_current_kf kf;
         None, true
       | GFun(f,_) ->
-        let v = Visitor_behavior.get_original_varinfo self#behavior f.svar in
+        let v = Visitor_behavior.Get_orig.varinfo self#behavior f.svar in
         let kf = 
 	  try Globals.Functions.get v 
 	  with Not_found ->
@@ -644,7 +644,7 @@ object(self)
 	      v.vname
 	      Project.pretty (Project.current ())
 	in
-        let new_kf = Visitor_behavior.memo_kernel_function self#behavior kf in
+        let new_kf = Visitor_behavior.Memo.kernel_function self#behavior kf in
         if Visitor_behavior.is_copy self#behavior then
           new_kf.spec <- Cil.empty_funspec ();
         self#set_current_kf kf;
@@ -689,7 +689,7 @@ object(self)
         | GFunDecl(_,v,l) ->
             (match self#current_kf with
               | Some kf ->
-                  let new_kf = Visitor_behavior.get_kernel_function self#behavior kf in
+                  let new_kf = Visitor_behavior.Get.kernel_function self#behavior kf in
                   if cond then begin
                     Queue.add
                       (fun () ->
@@ -743,7 +743,7 @@ object(self)
         if cond then begin
           match self#current_kf with
             | Some kf ->
-                let new_kf = Visitor_behavior.get_kernel_function self#behavior kf in
+                let new_kf = Visitor_behavior.Get.kernel_function self#behavior kf in
                 Queue.add
                   (fun () ->
                     Kernel.debug ~dkey:Kernel.dkey_visitor
@@ -837,13 +837,13 @@ class generic_frama_c_visitor bhv =
   internal_generic_frama_c_visitor current_fundec queue current_kf bhv
 
 class frama_c_copy prj =
-  generic_frama_c_visitor (Visitor_behavior.copy_visit prj)
+  generic_frama_c_visitor (Visitor_behavior.copy prj)
 
 class frama_c_refresh prj =
-  generic_frama_c_visitor (Visitor_behavior.refresh_visit prj)
+  generic_frama_c_visitor (Visitor_behavior.refresh prj)
 
 class frama_c_inplace =
-  generic_frama_c_visitor (Visitor_behavior.inplace_visit())
+  generic_frama_c_visitor (Visitor_behavior.inplace())
 
 let visitFramacFileCopy vis f = visitCilFileCopy (vis:>cilVisitor) f
 
@@ -857,7 +857,7 @@ let visitFramacGlobal vis g =
   vis#fill_global_tables; g'
 
 let visitFramacFunction vis f =
-  let orig_var = Visitor_behavior.get_original_varinfo vis#behavior f.svar in
+  let orig_var = Visitor_behavior.Get_orig.varinfo vis#behavior f.svar in
   let old_current_kf = vis#current_kf in
   vis#set_current_kf (Globals.Functions.get orig_var);
   let f' = visitCilFunction (vis:>cilVisitor) f in
@@ -872,7 +872,7 @@ let visitFramacKf vis kf =
   | None -> kf
   | Some prj ->
     let vi = Kernel_function.get_vi kf in
-    let vi' = Visitor_behavior.get_varinfo vis#behavior vi in
+    let vi' = Visitor_behavior.Get.varinfo vis#behavior vi in
     Project.on prj Globals.Functions.get vi'
 
 let visitFramacExpr vis e =

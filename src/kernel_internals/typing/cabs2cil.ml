@@ -9997,7 +9997,7 @@ and doStatement local_env (s : A.statement) : chunk =
 
 let copy_spec (old_f,new_f) formals_map spec =
   let obj = object
-    inherit Cil.genericCilVisitor (Visitor_behavior.refresh_visit (Project.current()))
+    inherit Cil.genericCilVisitor (Visitor_behavior.refresh (Project.current()))
     method! vlogic_var_use lv =
       match lv.lv_origin with
       | None -> DoChildren
