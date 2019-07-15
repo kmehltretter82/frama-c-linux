@@ -227,7 +227,7 @@ let generate_kf ~loc fname env ret_ty params_ty li =
       li.l_profile;
     Env.set_current_kf
       env
-      (Cil.get_original_kernel_function (Env.get_behavior env) old_kf)
+      (Visitor_behavior.Get_orig.kernel_function (Env.get_behavior env) old_kf)
   in
   vi, kf, gen_body
 

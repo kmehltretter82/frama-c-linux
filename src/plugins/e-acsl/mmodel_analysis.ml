@@ -713,7 +713,7 @@ if there are memory-related annotations.@]"
 let must_model_vi bhv ?kf ?stmt vi =
   let vi = match bhv with
     | None -> vi
-    | Some bhv -> Cil.get_original_varinfo bhv vi
+    | Some bhv -> Visitor_behavior.Get_orig.varinfo bhv vi
   in
   let _kf = match kf, stmt with
     | None, None | Some _, _ -> kf

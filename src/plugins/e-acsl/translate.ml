@@ -226,7 +226,7 @@ let cast_integer_to_float lty lty_t e =
 
 let rec thost_to_host kf env th = match th with
   | TVar { lv_origin = Some v } ->
-    Var (Cil.get_varinfo (Env.get_behavior env) v), env, v.vname
+    Var (Visitor_behavior.Get.varinfo (Env.get_behavior env) v), env, v.vname
   | TVar ({ lv_origin = None } as logic_v) ->
     Var (Env.Logic_binding.get env logic_v), env, logic_v.lv_name
   | TResult _typ ->
@@ -234,7 +234,7 @@ let rec thost_to_host kf env th = match th with
     let kf = Extlib.the vis#current_kf in
     let lhost = Misc.result_lhost kf in
     (match lhost with
-    | Var v -> Var (Cil.get_varinfo (Env.get_behavior env) v), env, "result"
+    | Var v -> Var (Visitor_behavior.Get.varinfo (Env.get_behavior env) v), env, "result"
     | _ -> assert false)
   | TMem t ->
     let e, env = term_to_exp kf env t in
@@ -646,7 +646,7 @@ and at_to_exp_no_lscope env t_opt label e =
   end
   in
   let bhv = Env.get_behavior new_env in
-  ignore( Visitor.visitFramacStmt o (Cil.get_stmt bhv stmt));
+  ignore( Visitor.visitFramacStmt o (Visitor_behavior.Get.stmt bhv stmt));
   res, !env_ref, false
 
 and env_of_li li kf env loc =
