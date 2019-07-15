@@ -210,11 +210,7 @@ let selfMachine_is_computed = TheMachine.is_computed
 
 let debugConstFold = false
 
-(* TODO: migrate that to Cil_const as well *)
-module Eid = Cil_const.Eid
-module Sid = Cil_const.Sid
-
-let new_exp ~loc e = { eloc = loc; eid = Eid.next (); enode = e }
+let new_exp ~loc e = { eloc = loc; eid = Cil_const.Eid.next (); enode = e }
 
 let dummy_exp e = { eid = -1; enode = e; eloc = Cil_datatype.Location.unknown }
 
@@ -290,7 +286,7 @@ let mkStmt ?(ghost=false) ?(valid_sid=false) ?(sattr=[]) (sk: stmtkind) : stmt =
        safely be used in tables. I only do it when performing Jessie
        analysis, as other plugins rely on specific sid values for their tests
        (e.g. slicing). *)
-    sid = if valid_sid then Sid.next () else -1;
+    sid = if valid_sid then Cil_const.Sid.next () else -1;
     succs = []; preds = [];
     ghost = ghost;
     sattr = sattr;}
@@ -689,9 +685,6 @@ let missingFieldName = "" (* "___missing_field_name"*)
 (** Get the full name of a comp *)
 let compFullName comp =
   (if comp.cstruct then "struct " else "union ") ^ comp.cname
-
-let copyCompInfo = Cil_const.copyCompInfo
-let mkCompInfo = Cil_const.mkCompInfo
 
 (** Different visiting actions. 'a will be instantiated with [exp], [instr],
     etc.
@@ -3146,7 +3139,7 @@ let mkStmtCfg ~before ~(new_stmtkind:stmtkind) ~(ref_stmt:stmt) : stmt =
                labels = [];
                sid = -1; succs = []; preds = []; ghost = false; sattr = [] }
   in
-  new_.sid <- Sid.next ();
+  new_.sid <- Cil_const.Sid.next ();
   if before then begin
     new_.succs <- [ref_stmt];
     let old_preds = ref_stmt.preds in
@@ -3175,7 +3168,7 @@ let mkStmtCfg ~before ~(new_stmtkind:stmtkind) ~(ref_stmt:stmt) : stmt =
   new_
 
 let mkStmtCfgBlock sl =
-  let sid = Sid.next () in
+  let sid = Cil_const.Sid.next () in
   let n = mkStmt (Block (mkBlock sl)) in
   n.sid <- sid;
   match sl with
@@ -5385,7 +5378,7 @@ let removeOffsetLval ((b, off): lval) : lval * offset =
 class copyVisitExpr = object
   inherit genericCilVisitor (Visitor_behavior.copy (Project.current ()))
   method! vexpr e =
-    ChangeDoChildrenPost ({e with eid = Eid.next ()}, fun x -> x)
+    ChangeDoChildrenPost ({e with eid = Cil_const.Eid.next ()}, fun x -> x)
 end
 
 let copy_exp e = visitCilExpr (new copyVisitExpr) e
@@ -7022,157 +7015,6 @@ let typeHasAttributeDeep t =
   Kernel.deprecated "Cil.typeHasAttributeDeep"
     ~now:"Cil.typeHasAttributeMemoryBlock"
     typeHasAttributeMemoryBlock t
-
-(* Visitor behavior compatibility *)
-
-type visitor_behavior = Visitor_behavior.t
-
-let refresh_visit = Visitor_behavior.refresh
-let copy_visit = Visitor_behavior.copy
-let inplace_visit = Visitor_behavior.inplace
-
-let is_copy_behavior = Visitor_behavior.is_copy
-let is_fresh_behavior = Visitor_behavior.is_fresh
-
-let memo_varinfo = Visitor_behavior.Memo.varinfo
-let memo_compinfo = Visitor_behavior.Memo.compinfo
-let memo_fieldinfo = Visitor_behavior.Memo.fieldinfo
-let memo_model_info = Visitor_behavior.Memo.model_info
-let memo_enuminfo = Visitor_behavior.Memo.enuminfo
-let memo_enumitem = Visitor_behavior.Memo.enumitem
-let memo_stmt = Visitor_behavior.Memo.stmt
-let memo_typeinfo = Visitor_behavior.Memo.typeinfo
-let memo_logic_info = Visitor_behavior.Memo.logic_info
-let memo_logic_type_info = Visitor_behavior.Memo.logic_type_info
-let memo_logic_var = Visitor_behavior.Memo.logic_var
-let memo_kernel_function = Visitor_behavior.Memo.kernel_function
-let memo_fundec = Visitor_behavior.Memo.fundec
-
-let reset_behavior_varinfo = Visitor_behavior.Reset.varinfo
-let reset_behavior_compinfo = Visitor_behavior.Reset.compinfo
-let reset_behavior_enuminfo = Visitor_behavior.Reset.enuminfo
-let reset_behavior_enumitem = Visitor_behavior.Reset.enumitem
-let reset_behavior_typeinfo = Visitor_behavior.Reset.typeinfo
-let reset_behavior_logic_info = Visitor_behavior.Reset.logic_info
-let reset_behavior_logic_type_info = Visitor_behavior.Reset.logic_type_info
-let reset_behavior_fieldinfo = Visitor_behavior.Reset.fieldinfo
-let reset_behavior_model_info = Visitor_behavior.Reset.model_info
-let reset_behavior_stmt = Visitor_behavior.Reset.stmt
-let reset_logic_var = Visitor_behavior.Reset.logic_var
-let reset_behavior_kernel_function = Visitor_behavior.Reset.kernel_function
-let reset_behavior_fundec = Visitor_behavior.Reset.fundec
-
-let get_varinfo = Visitor_behavior.Get.varinfo
-let get_compinfo = Visitor_behavior.Get.compinfo
-let get_fieldinfo = Visitor_behavior.Get.fieldinfo
-let get_model_info = Visitor_behavior.Get.model_info
-let get_enuminfo = Visitor_behavior.Get.enuminfo
-let get_enumitem = Visitor_behavior.Get.enumitem
-let get_stmt = Visitor_behavior.Get.stmt
-let get_typeinfo = Visitor_behavior.Get.typeinfo
-let get_logic_info = Visitor_behavior.Get.logic_info
-let get_logic_type_info = Visitor_behavior.Get.logic_type_info
-let get_logic_var = Visitor_behavior.Get.logic_var
-let get_kernel_function = Visitor_behavior.Get.kernel_function
-let get_fundec = Visitor_behavior.Get.fundec
-
-let get_original_varinfo = Visitor_behavior.Get_orig.varinfo
-let get_original_compinfo = Visitor_behavior.Get_orig.compinfo
-let get_original_fieldinfo = Visitor_behavior.Get_orig.fieldinfo
-let get_original_model_info = Visitor_behavior.Get_orig.model_info
-let get_original_enuminfo = Visitor_behavior.Get_orig.enuminfo
-let get_original_enumitem = Visitor_behavior.Get_orig.enumitem
-let get_original_stmt = Visitor_behavior.Get_orig.stmt
-let get_original_typeinfo = Visitor_behavior.Get_orig.typeinfo
-let get_original_logic_info = Visitor_behavior.Get_orig.logic_info
-let get_original_logic_type_info = Visitor_behavior.Get_orig.logic_type_info
-let get_original_logic_var = Visitor_behavior.Get_orig.logic_var
-let get_original_kernel_function = Visitor_behavior.Get_orig.kernel_function
-let get_original_fundec = Visitor_behavior.Get_orig.fundec
-
-let set_varinfo = Visitor_behavior.Set.varinfo
-let set_compinfo = Visitor_behavior.Set.compinfo
-let set_fieldinfo = Visitor_behavior.Set.fieldinfo
-let set_model_info = Visitor_behavior.Set.model_info
-let set_enuminfo = Visitor_behavior.Set.enuminfo
-let set_enumitem = Visitor_behavior.Set.enumitem
-let set_stmt = Visitor_behavior.Set.stmt
-let set_typeinfo = Visitor_behavior.Set.typeinfo
-let set_logic_info = Visitor_behavior.Set.logic_info
-let set_logic_type_info = Visitor_behavior.Set.logic_type_info
-let set_logic_var = Visitor_behavior.Set.logic_var
-let set_kernel_function = Visitor_behavior.Set.kernel_function
-let set_fundec = Visitor_behavior.Set.fundec
-
-let set_orig_varinfo = Visitor_behavior.Set_orig.varinfo
-let set_orig_compinfo = Visitor_behavior.Set_orig.compinfo
-let set_orig_fieldinfo = Visitor_behavior.Set_orig.fieldinfo
-let set_orig_model_info = Visitor_behavior.Set_orig.model_info
-let set_orig_enuminfo = Visitor_behavior.Set_orig.enuminfo
-let set_orig_enumitem = Visitor_behavior.Set_orig.enumitem
-let set_orig_stmt = Visitor_behavior.Set_orig.stmt
-let set_orig_typeinfo = Visitor_behavior.Set_orig.typeinfo
-let set_orig_logic_info = Visitor_behavior.Set_orig.logic_info
-let set_orig_logic_type_info = Visitor_behavior.Set_orig.logic_type_info
-let set_orig_logic_var = Visitor_behavior.Set_orig.logic_var
-let set_orig_kernel_function= Visitor_behavior.Set_orig.kernel_function
-let set_orig_fundec = Visitor_behavior.Set_orig.fundec
-
-let unset_varinfo = Visitor_behavior.Unset.varinfo
-let unset_compinfo = Visitor_behavior.Unset.compinfo
-let unset_fieldinfo = Visitor_behavior.Unset.fieldinfo
-let unset_model_info = Visitor_behavior.Unset.model_info
-let unset_enuminfo = Visitor_behavior.Unset.enuminfo
-let unset_enumitem = Visitor_behavior.Unset.enumitem
-let unset_stmt = Visitor_behavior.Unset.stmt
-let unset_typeinfo = Visitor_behavior.Unset.typeinfo
-let unset_logic_info = Visitor_behavior.Unset.logic_info
-let unset_logic_type_info = Visitor_behavior.Unset.logic_type_info
-let unset_logic_var = Visitor_behavior.Unset.logic_var
-let unset_kernel_function = Visitor_behavior.Unset.kernel_function
-let unset_fundec = Visitor_behavior.Unset.fundec
-
-let unset_orig_varinfo = Visitor_behavior.Unset_orig.varinfo
-let unset_orig_compinfo = Visitor_behavior.Unset_orig.compinfo
-let unset_orig_fieldinfo = Visitor_behavior.Unset_orig.fieldinfo
-let unset_orig_model_info = Visitor_behavior.Unset_orig.model_info
-let unset_orig_enuminfo = Visitor_behavior.Unset_orig.enuminfo
-let unset_orig_enumitem = Visitor_behavior.Unset_orig.enumitem
-let unset_orig_stmt = Visitor_behavior.Unset_orig.stmt
-let unset_orig_typeinfo = Visitor_behavior.Unset_orig.typeinfo
-let unset_orig_logic_info = Visitor_behavior.Unset_orig.logic_info
-let unset_orig_logic_type_info = Visitor_behavior.Unset_orig.logic_type_info
-let unset_orig_logic_var = Visitor_behavior.Unset_orig.logic_var
-let unset_orig_kernel_function= Visitor_behavior.Unset_orig.kernel_function
-let unset_orig_fundec = Visitor_behavior.Unset_orig.fundec
-
-let iter_visitor_varinfo = Visitor_behavior.Iter.varinfo
-let iter_visitor_compinfo = Visitor_behavior.Iter.compinfo
-let iter_visitor_enuminfo = Visitor_behavior.Iter.enuminfo
-let iter_visitor_enumitem = Visitor_behavior.Iter.enumitem
-let iter_visitor_typeinfo = Visitor_behavior.Iter.typeinfo
-let iter_visitor_stmt = Visitor_behavior.Iter.stmt
-let iter_visitor_logic_info= Visitor_behavior.Iter.logic_info
-let iter_visitor_logic_type_info = Visitor_behavior.Iter.logic_type_info
-let iter_visitor_fieldinfo = Visitor_behavior.Iter.fieldinfo
-let iter_visitor_model_info = Visitor_behavior.Iter.model_info
-let iter_visitor_logic_var = Visitor_behavior.Iter.logic_var
-let iter_visitor_kernel_function = Visitor_behavior.Iter.kernel_function
-let iter_visitor_fundec = Visitor_behavior.Iter.fundec
-
-let fold_visitor_varinfo = Visitor_behavior.Fold.varinfo
-let fold_visitor_compinfo = Visitor_behavior.Fold.compinfo
-let fold_visitor_enuminfo = Visitor_behavior.Fold.enuminfo
-let fold_visitor_enumitem = Visitor_behavior.Fold.enumitem
-let fold_visitor_typeinfo = Visitor_behavior.Fold.typeinfo
-let fold_visitor_stmt = Visitor_behavior.Fold.stmt
-let fold_visitor_logic_info = Visitor_behavior.Fold.logic_info
-let fold_visitor_logic_type_info = Visitor_behavior.Fold.logic_type_info
-let fold_visitor_fieldinfo = Visitor_behavior.Fold.fieldinfo
-let fold_visitor_model_info = Visitor_behavior.Fold.model_info
-let fold_visitor_logic_var = Visitor_behavior.Fold.logic_var
-let fold_visitor_kernel_function = Visitor_behavior.Fold.kernel_function
-let fold_visitor_fundec = Visitor_behavior.Fold.fundec
 
 (*
 Local Variables:
