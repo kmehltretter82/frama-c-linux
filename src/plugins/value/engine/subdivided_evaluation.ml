@@ -362,8 +362,7 @@ module type Forward_Evaluation = sig
   type value
   type valuation
   type context
-  val evaluate:
-    ?valuation:valuation -> context -> exp -> (valuation * value) evaluated
+  val evaluate: context -> valuation -> exp -> (valuation * value) evaluated
 end
 
 module Make
@@ -645,7 +644,7 @@ module Make
      [valuation] is the result of the evaluation of [expr] without subdivision.
      This function returns the alarms and the valuation resulting from the
      subdivided evaluation. *)
-  let subdivide_lvals context subdivnb valuation expr subexpr lvals =
+  let subdivide_lvals context valuation subdivnb expr subexpr lvals =
     let Hypotheses.L variables = Hypotheses.from_list lvals in
     (* Split function for the subvalues of [lvals]. *)
     let split = make_split valuation variables in
@@ -660,7 +659,7 @@ module Make
       (* Updates [variables] with their new [subvalues]. *)
       let valuation = update_variables cleared_valuation variables subvalues in
       (* Evaluates [expr] with this new valuation. *)
-      let eval, alarms = Eva.evaluate context ~valuation expr in
+      let eval, alarms = Eva.evaluate context valuation expr in
       let result = eval >>-: snd in
       (* Optimization if [subexpr] = [expr]. *)
       if eq_equal_subexpr
@@ -708,7 +707,7 @@ module Make
     (* Reevaluates the lvalue in the initial state, as its value could have
        been reduced in the evaluation of the complete expression, and we cannot
        omit the alarms for the removed values. *)
-    fst (Eva.evaluate context ~valuation lv_expr) >>- fun (valuation, _) ->
+    fst (Eva.evaluate context valuation lv_expr) >>- fun (valuation, _) ->
     let lv_record = find_val valuation lv_expr in
     lv_record.value.v >>-: fun lv_value ->
     { lval; lv_expr; lv_record; lv_value }
@@ -731,9 +730,9 @@ module Make
     | `Value (valuation, result) -> f valuation result alarms
 
   (* Subdivided evaluation of [expr] in state [state]. *)
-  let subdivide_evaluation context subdivnb initial_valuation expr =
+  let subdivide_evaluation context initial_valuation subdivnb expr =
     (* Evaluation of [expr] without subdivision. *)
-    let default = Eva.evaluate context ~valuation:initial_valuation expr in
+    let default = Eva.evaluate context initial_valuation expr in
     default >>> fun valuation result alarms ->
     (* Do not try to subdivide if the result is singleton or contains some
        pointers: the better_bound heuristic only works on numerical values. *)
@@ -768,16 +767,16 @@ module Make
             Value_parameters.result ~current:true ~once:true ~dkey
               "subdividing on %a"
               (Pretty_utils.pp_list ~sep:", " Printer.pp_lval) lvals;
-            subdivide_lvals context subdivnb valuation expr subexpr lvals_info
+            subdivide_lvals context valuation subdivnb expr subexpr lvals_info
             >>> subdivide_subexpr tail
       in
       subdivide_subexpr vars valuation result alarms
 
-  let evaluate ?(valuation=Valuation.empty) context expr =
+  let evaluate context valuation expr =
     let subdivnb = Value_parameters.LinearLevel.get () in
     if subdivnb = 0 || not activated
-    then Eva.evaluate ~valuation context expr
-    else subdivide_evaluation context subdivnb valuation expr
+    then Eva.evaluate context valuation expr
+    else subdivide_evaluation context valuation subdivnb expr
 
 
   (* ---------------------- Reduction by enumeration ------------------------ *)
@@ -866,13 +865,13 @@ module Make
   let get_influential_exprs valuation expr =
     get_influential_vars valuation expr []
 
-  let reduce_by_cond_enumerate valuation context cond positive influentials =
+  let reduce_by_cond_enumerate context valuation cond positive influentials =
     (* Test whether the condition [expr] may still be true when the
        sub-expression [e] has the value [v]. *)
     let condition_may_still_be_true valuation expr record value =
       let value = { record.value with v = `Value value } in
       let valuation = Valuation.add valuation expr { record with value } in
-      let eval, _alarms = Eva.evaluate context ~valuation cond in
+      let eval, _alarms = Eva.evaluate context valuation cond in
       match eval with
       | `Bottom -> false
       | `Value (_valuation, value) ->
@@ -916,11 +915,11 @@ module Make
   (* If the value module contains no cvalue component, this function is
      inoperative. Otherwise, it calls reduce_by_cond_enumerate with the
      value accessor for the cvalue component. *)
-  let reduce_by_enumeration valuation state expr positive =
+  let reduce_by_enumeration context valuation expr positive =
     if activated && Value_parameters.EnumerateCond.get ()
     then
       get_influential_exprs valuation expr >>- fun split_on ->
-      reduce_by_cond_enumerate valuation state expr positive split_on
+      reduce_by_cond_enumerate context valuation expr positive split_on
     else `Value valuation
 end
 

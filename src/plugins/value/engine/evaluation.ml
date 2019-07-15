@@ -1077,7 +1077,7 @@ module Make
      the reference for the oracle given to the domains. *)
   module Forward_Evaluation = struct
     type nonrec context = context
-    let evaluate ?(valuation=Cache.empty) context expr =
+    let evaluate context valuation expr =
       cache := valuation;
       root_forward_eval context expr >>=: fun (value, _) ->
       !cache, value
@@ -1093,7 +1093,7 @@ module Make
       fun expr ->
         let valuation = !cache in
         let context = { context with remaining_fuel } in
-        Subdivided_Evaluation.evaluate ~valuation context expr
+        Subdivided_Evaluation.evaluate context valuation expr
         >>=: fun (valuation, value) ->
         cache := valuation;
         value
@@ -1112,7 +1112,7 @@ module Make
     { state; remaining_fuel; oracle }
 
   let subdivided_forward_eval valuation state expr =
-    Subdivided_Evaluation.evaluate ~valuation (root_context state) expr
+    Subdivided_Evaluation.evaluate (root_context state) valuation expr
 
   (* ------------------------------------------------------------------------
                            Backward Evaluation
@@ -1545,7 +1545,7 @@ module Make
       if volatile then `Value !cache
       else
         let context = low_context state in
-        Subdivided_Evaluation.reduce_by_enumeration !cache context expr false
+        Subdivided_Evaluation.reduce_by_enumeration context !cache expr false
 
   let assume ?valuation:(valuation=Cache.empty) state expr value =
     cache := valuation;

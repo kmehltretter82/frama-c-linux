@@ -25,30 +25,29 @@
     by disjunction on their abstract value, in order to gain precision. *)
 
 open Cil_types
+open Eval
 
 module type Forward_Evaluation = sig
   type value
   type valuation
   type context
-  val evaluate:
-    ?valuation:valuation -> context -> exp -> (valuation * value) Eval.evaluated
+  val evaluate: context -> valuation -> exp -> (valuation * value) evaluated
 end
 
 module Make
     (Value : Abstract.Value.External)
     (Loc: Abstract_location.S with type value = Value.t)
-    (Valuation: Eval.Valuation with type value = Value.t
-                                and type loc = Loc.location)
+    (Valuation: Valuation with type value = Value.t
+                           and type loc = Loc.location)
     (Eva: Forward_Evaluation with type value := Value.t
                               and type valuation := Valuation.t)
   : sig
 
     val evaluate:
-      ?valuation:Valuation.t -> Eva.context -> exp ->
-      (Valuation.t * Value.t) Eval.evaluated
+      Eva.context -> Valuation.t -> exp -> (Valuation.t * Value.t) evaluated
 
     val reduce_by_enumeration:
-      Valuation.t -> Eva.context -> exp -> bool -> Valuation.t Eval.or_bottom
+      Eva.context -> Valuation.t -> exp -> bool -> Valuation.t or_bottom
   end
 
 
