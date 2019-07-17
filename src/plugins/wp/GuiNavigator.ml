@@ -42,8 +42,8 @@ type focus =
   | `Call of GuiSource.call
   | `Property of Property.t ]
 
-let index_of_lemma (l,_,_,_,_) =
-  match LogicUsage.section_of_lemma l with
+let index_of_lemma l =
+  match LogicUsage.section_of_lemma l.il_name with
   | LogicUsage.Toplevel _ -> Wpo.Axiomatic None
   | LogicUsage.Axiomatic a -> Wpo.Axiomatic (Some a.LogicUsage.ax_name)
 
@@ -54,7 +54,7 @@ let focus_of_selection selection scope =
   | S_call c , `Module -> `Index (Wpo.Function(c.s_caller,None))
   | S_fun kf , (`Select | `Module) -> `Index(Wpo.Function(kf,None))
   | S_prop (IPLemma ilem) , `Module -> `Index(index_of_lemma ilem)
-  | S_prop (IPAxiomatic(name,_)) , _ -> `Index(Wpo.Axiomatic (Some name))
+  | S_prop (IPAxiomatic {iax_name=name}) , _ -> `Index(Wpo.Axiomatic (Some name))
   | S_prop ip , `Select -> `Property ip
   | S_prop ip , `Module ->
       begin

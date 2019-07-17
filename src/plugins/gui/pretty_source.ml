@@ -237,18 +237,19 @@ exception Found of int*int
    the same location in the source code, typically because one of them
    is not printed. Feel free to add other heuristics if needed. *)
 let equal_or_same_loc loc1 loc2 =
+  let open Property in
   Localizable.equal loc1 loc2 ||
   match loc1, loc2 with
-  | PIP (Property.IPReachable (_, Kstmt s, _)), PStmt (_, s')
-  | PStmt (_, s'), PIP (Property.IPReachable (_, Kstmt s, _))
-  | PIP (Property.IPPropertyInstance (_, s, _, _)), PStmt (_, s')
-  | PStmt (_, s'), PIP (Property.IPPropertyInstance (_, s, _, _))
+  | PIP (IPReachable {ir_kinstr=Kstmt s}), PStmt (_, s')
+  | PStmt (_, s'), PIP (IPReachable {ir_kinstr=Kstmt s})
+  | PIP (IPPropertyInstance {ii_stmt=s}), PStmt (_, s')
+  | PStmt (_, s'), PIP (IPPropertyInstance {ii_stmt=s})
     when
       Cil_datatype.Stmt.equal s s' -> true
-  | PIP (Property.IPReachable (Some kf, Kglobal, _)),
+  | PIP (IPReachable {ir_kf=Some kf; ir_kinstr=Kglobal}),
     (PVDecl (_, _, vi) | PGlobal (GFun ({ svar = vi }, _)))
   | (PVDecl (_, _, vi) | PGlobal (GFun ({ svar = vi }, _))),
-    PIP (Property.IPReachable (Some kf, Kglobal, _))
+    PIP (IPReachable {ir_kf=Some kf;ir_kinstr=Kglobal})
     when Kernel_function.get_vi kf = vi
     -> true
   | _ -> false

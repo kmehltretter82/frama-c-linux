@@ -73,7 +73,7 @@ let selection_of_localizable = function
 let kind_of_property = function
   | Property.IPLemma _ -> "lemma"
   | Property.IPCodeAnnot _ -> "annotation"
-  | Property.IPPredicate( Property.PKRequires _ , _ , Kglobal , _ ) ->
+  | Property.(IPPredicate {ip_kind=PKRequires _;ip_kinstr = Kglobal}) ->
       "precondition for callers"
   | _ -> "property"
 

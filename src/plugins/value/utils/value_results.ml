@@ -188,8 +188,8 @@ let get_results () =
       aux_statuses (fun st -> Property.Hashtbl.add statuses ip st) ip
     in
     match ip with
-    | Property.IPCodeAnnot (_,_,ca) -> begin
-        match Alarms.find ca with
+    | Property.(IPCodeAnnot {ica_ca}) -> begin
+        match Alarms.find ica_ca with
         | None -> (* real property *) add ()
         | Some _ -> (* alarm; do not save it here *) ()
       end
@@ -496,10 +496,10 @@ let make_report ()  =
   let report = empty_report () in
   let report_property ip =
     match ip with
-    | Property.IPCodeAnnot (_kf, _stmt, code_annot) ->
+    | Property.(IPCodeAnnot {ica_ca}) ->
       begin
         let status = get_status ip in
-        match Alarms.find code_annot with
+        match Alarms.find ica_ca with
         | None -> report_status report.assertions status
         | Some alarm ->
           let acc_status, acc_alarms = report.alarms in

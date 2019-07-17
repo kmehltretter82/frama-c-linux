@@ -355,61 +355,69 @@ That is forbidden (kernel invariant broken)."
   register_as_kernel_logical_consequence ppt
 
 (* the functions below and this one MUST be synchronized *)
-and register_as_kernel_logical_consequence ppt = match ppt with
-  | Property.IPAxiom _ 
-  | Property.IPPredicate(Property.PKAssumes _, _, _, _) ->
+and register_as_kernel_logical_consequence ppt =
+  let open Property in match ppt with
+  | IPAxiom _ 
+  | IPPredicate {ip_kind = PKAssumes _} ->
     (* always valid, but must be verifiable by the end-user,
        see [is_not_verifiable_but_valid] *)
     ()
-  | Property.IPAxiomatic(_, l) -> logical_consequence Emitter.kernel ppt l
-  | Property.IPBehavior(kf, ki, active, b) ->
-    let active = Datatype.String.Set.elements active in
+  | IPAxiomatic {iax_props} -> logical_consequence Emitter.kernel ppt iax_props
+  | IPBehavior {ib_kf; ib_kinstr; ib_active; ib_bhv} ->
+    let active = Datatype.String.Set.elements ib_active in
     (* logical consequence of its postconditions *)
     logical_consequence
-      Emitter.kernel ppt (Property.ip_post_cond_of_behavior kf ki active b)
-  | Property.IPReachable(None, Cil_types.Kglobal, Property.Before) ->
+      Emitter.kernel ppt (ip_post_cond_of_behavior ib_kf ib_kinstr active ib_bhv)
+  | IPReachable {ir_kf = None; ir_kinstr = Cil_types.Kglobal;
+                 ir_program_point = Before} ->
       (* valid: global properties are always reachable *)
     emit_valid ppt
-  | Property.IPReachable(None, Cil_types.Kglobal, Property.After) -> 
+  | IPReachable {ir_kf = None; ir_kinstr = Cil_types.Kglobal;
+                 ir_program_point = After} ->
     assert false
-  | Property.IPReachable(None, Cil_types.Kstmt _, _) ->
+  | IPReachable {ir_kf = None; ir_kinstr = Cil_types.Kstmt _} ->
     Kernel.fatal "reachability of a stmt without function"
-  | Property.IPReachable(Some kf, Cil_types.Kglobal, Property.Before) ->
+  | IPReachable {ir_kf = Some kf; ir_kinstr = Cil_types.Kglobal;
+                 ir_program_point = Before} ->
     let f = kf.Cil_types.fundec in
     if Ast_info.Function.get_name f = Kernel.MainFunction.get_plain_string ()
       (* main is always reachable *)
     then emit_valid ppt
-  | Property.IPOther _  | Property.IPReachable _
-  | Property.IPExtended _
-  | Property.IPPredicate _ | Property.IPCodeAnnot _ | Property.IPComplete _ 
-  | Property.IPDisjoint _ | Property.IPAssigns _ | Property.IPFrom _ 
-  | Property.IPAllocation _ | Property.IPDecrease _ | Property.IPLemma _
-  | Property.IPPropertyInstance _
-  | Property.IPTypeInvariant _ | Property.IPGlobalInvariant _ ->
+  | IPOther _  | IPReachable _
+  | IPExtended _
+  | IPPredicate _ | IPCodeAnnot _ | IPComplete _ 
+  | IPDisjoint _ | IPAssigns _ | IPFrom _ 
+  | IPAllocation _ | IPDecrease _ | IPLemma _
+  | IPPropertyInstance _
+  | IPTypeInvariant _ | IPGlobalInvariant _ ->
     ()
 
 (* the functions above and below MUST be synchronized *)
-and is_kernel_logical_consequence ppt = match ppt with
-  | Property.IPPredicate(Property.PKAssumes _, _, _, _)
-  | Property.IPBehavior(_, _, _, _)
-  | Property.IPReachable(None, Cil_types.Kglobal, Property.Before) ->
+and is_kernel_logical_consequence ppt =
+  let open Property in match ppt with
+  | IPPredicate {ip_kind = PKAssumes _}
+  | IPBehavior _
+  | IPReachable {ir_kf = None; ir_kinstr = Cil_types.Kglobal;
+                 ir_program_point = Before} ->
     true
-  | Property.IPReachable(None, Cil_types.Kglobal, Property.After) ->
+  | IPReachable {ir_kf = None; ir_kinstr = Cil_types.Kglobal;
+                 ir_program_point = After} ->
     assert false
-  | Property.IPReachable(None, Cil_types.Kstmt _, _) ->
+  | IPReachable {ir_kf = None; ir_kinstr = Cil_types.Kstmt _} ->
     Kernel.fatal "reachability of a stmt without function"
-  | Property.IPReachable(Some kf, Cil_types.Kglobal, Property.Before) ->
+  | IPReachable {ir_kf = Some kf; ir_kinstr = Cil_types.Kglobal;
+                 ir_program_point = Before} ->
     let f = kf.Cil_types.fundec in (* main is always reachable *)
     Ast_info.Function.get_name f = Kernel.MainFunction.get_plain_string ()
-  | Property.IPAxiom _
-  | Property.IPExtended _
-  | Property.IPAxiomatic _
-  | Property.IPOther _  | Property.IPReachable _
-  | Property.IPPredicate _ | Property.IPCodeAnnot _ | Property.IPComplete _
-  | Property.IPDisjoint _ | Property.IPAssigns _ | Property.IPFrom _ 
-  | Property.IPAllocation _ | Property.IPDecrease _ | Property.IPLemma _
-  | Property.IPPropertyInstance _
-  | Property.IPTypeInvariant _ | Property.IPGlobalInvariant _ ->
+  | IPAxiom _
+  | IPExtended _
+  | IPAxiomatic _
+  | IPOther _  | IPReachable _
+  | IPPredicate _ | IPCodeAnnot _ | IPComplete _
+  | IPDisjoint _ | IPAssigns _ | IPFrom _ 
+  | IPAllocation _ | IPDecrease _ | IPLemma _
+  | IPPropertyInstance _
+  | IPTypeInvariant _ | IPGlobalInvariant _ ->
     false
 
 and unsafe_emit_and_get e ~hyps ~auto ppt ?(distinct=false) s =
@@ -533,20 +541,20 @@ let () =
     register_as_kernel_logical_consequence
 
 let emit_and_get e ~hyps ppt ?distinct s =
-  begin match ppt with
-  | Property.IPBehavior _ | Property.IPAxiom _ | Property.IPAxiomatic _
-  | Property.IPPredicate (Property.PKAssumes _, _, _, _) ->
+  let open Property in begin match ppt with
+  | IPBehavior _ | IPAxiom _ | IPAxiomatic _
+  | IPPredicate {ip_kind = PKAssumes _} ->
     Kernel.fatal
       "only the kernel should set the status of property %a"
-      Property.pretty
+      pretty
       ppt
-  | Property.IPPredicate _ | Property.IPCodeAnnot _ | Property.IPComplete _ 
-  | Property.IPDisjoint _ | Property.IPAssigns _ | Property.IPFrom _ 
-  | Property.IPDecrease _ | Property.IPLemma _ | Property.IPReachable _
-  | Property.IPAllocation _ | Property.IPOther _
-  | Property.IPPropertyInstance _
-  | Property.IPExtended _
-  | Property.IPTypeInvariant _ | Property.IPGlobalInvariant _ -> ()
+  | IPPredicate _ | IPCodeAnnot _ | IPComplete _ 
+  | IPDisjoint _ | IPAssigns _ | IPFrom _ 
+  | IPDecrease _ | IPLemma _ | IPReachable _
+  | IPAllocation _ | IPOther _
+  | IPPropertyInstance _
+  | IPExtended _
+  | IPTypeInvariant _ | IPGlobalInvariant _ -> ()
   end;
   unsafe_emit_and_get e ~hyps ~auto:false ppt ?distinct s
 
@@ -653,11 +661,10 @@ let is_not_verifiable_but_valid ppt status = match status with
 	  false
 	else
 	  (* postconditions of functions without code are not verifiable *)
-	  match ppt with
-	  | Property.IPPredicate
-	      ((Property.PKEnsures _ | Property.PKTerminates), _, _, _)
-	  | Property.IPAssigns _ | Property.IPAllocation _ 
-	  | Property.IPFrom _ -> true
+      let open Property in match ppt with
+      | IPPredicate {ip_kind = PKEnsures _ | PKTerminates}
+	  | IPAssigns _ | IPAllocation _ 
+	  | IPFrom _ -> true
 	  | _ -> false)
   | Best((True | False_if_reachable | False_and_reachable | Dont_know), _)
   | Inconsistent _ ->

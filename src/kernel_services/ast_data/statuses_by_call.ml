@@ -192,7 +192,7 @@ module PreCondAt =
 let rec transpose_precondition stmt pid kf funcexp args =
   let formals = Kernel_function.get_formals kf in
   let ip = match pid with
-    | Property.IPPredicate (_, _, _, ip) -> ip
+    | Property.(IPPredicate {ip_pred}) -> ip_pred
     | _ -> assert false
   in
   let ip = transpose_pred_at_callsite ~formals ~concretes:args ip in

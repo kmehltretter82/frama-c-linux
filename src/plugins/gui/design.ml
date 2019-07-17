@@ -419,109 +419,109 @@ let to_do_on_select
         (formal_or_local vi) pp_defining_fun vi pp_decl vi.vdecl
   in
   if button = 1 then begin
-    match selected with
+    let open Property in match selected with
     | PStmtStart _ -> ()
     | PStmt (kf, stmt) ->
         current_statement_msg (Some kf) (Kstmt stmt);
         print_code_annotations main_ui kf stmt;
         print_call_preconditions main_ui stmt;
-    | PIP (Property.IPCodeAnnot (kf,stmt,ca) as ip) ->
+    | PIP (IPCodeAnnot {ica_kf;ica_stmt;ica_ca} as ip) ->
         current_statement_msg
-          ?loc:(Cil_datatype.Code_annotation.loc ca) (Some kf) (Kstmt stmt);
+          ?loc:(Cil_datatype.Code_annotation.loc ica_ca)
+          (Some ica_kf) (Kstmt ica_stmt);
         if main_ui#show_ids then
-          main_ui#pretty_information "Code annotation id: %d@." ca.annot_id;
+          main_ui#pretty_information "Code annotation id: %d@." ica_ca.annot_id;
         main_ui#pretty_information "%a@." pretty_predicate_status ip
-    | PIP(Property.IPAllocation _ as ip) ->
+    | PIP(IPAllocation _ as ip) ->
         main_ui#pretty_information "This is an allocation clause@.%a@."
           pretty_predicate_status ip;
-        main_ui#view_original (Property.location ip)
-    | PIP(Property.IPAssigns _ as ip) ->
+        main_ui#view_original (location ip)
+    | PIP(IPAssigns _ as ip) ->
         main_ui#pretty_information "This is an assigns clause@.%a@."
           pretty_predicate_status ip;
-        main_ui#view_original (Property.location ip)
-    | PIP(Property.IPFrom _ as ip) ->
+        main_ui#view_original (location ip)
+    | PIP(IPFrom _ as ip) ->
         main_ui#pretty_information "This is a from clause@.%a@."
           pretty_predicate_status ip;
-        main_ui#view_original (Property.location ip)
-    | PIP (Property.IPPredicate (Property.PKRequires _,_,_,_) as ip) ->
+        main_ui#view_original (location ip)
+    | PIP (IPPredicate {ip_kind = PKRequires _} as ip) ->
         main_ui#pretty_information "This is a requires clause.@.%a@."
           pretty_predicate_status ip;
-        main_ui#view_original (Property.location ip)
-    | PIP (Property.IPExtended(_,{ext_name}) as ip) ->
+        main_ui#view_original (location ip)
+    | PIP (IPExtended {ie_ext={ext_name}} as ip) ->
         main_ui#pretty_information "This clause is a %s extension.@.%a@."
           ext_name pretty_predicate_status ip;
-        main_ui#view_original (Property.location ip)
-    | PIP (Property.IPPredicate (Property.PKTerminates,_,_,_) as ip) ->
+        main_ui#view_original (location ip)
+    | PIP (IPPredicate {ip_kind = PKTerminates} as ip) ->
         main_ui#pretty_information "This is a terminates clause.@.%a@."
           pretty_predicate_status ip;
-        main_ui#view_original (Property.location ip)
-    | PIP (Property.IPPredicate (Property.PKEnsures (_,Normal),_,_,_) as ip) ->
+        main_ui#view_original (location ip)
+    | PIP (IPPredicate {ip_kind = PKEnsures (_,Normal)} as ip) ->
         main_ui#pretty_information "This is an ensures clause.@.%a@."
           pretty_predicate_status ip;
-        main_ui#view_original (Property.location ip)
-    | PIP (Property.IPPredicate (Property.PKEnsures (_,Exits),_,_,_) as ip) ->
+        main_ui#view_original (location ip)
+    | PIP (IPPredicate {ip_kind = PKEnsures (_,Exits)} as ip) ->
         main_ui#pretty_information "This is an exits clause.@.%a@."
           pretty_predicate_status ip;
-        main_ui#view_original (Property.location ip)
-    | PIP (Property.IPPredicate (Property.PKEnsures (_,Returns),_,_,_) as ip) ->
+        main_ui#view_original (location ip)
+    | PIP (IPPredicate {ip_kind = PKEnsures (_,Returns)} as ip) ->
         main_ui#pretty_information "This is a returns clause.@.%a@."
           pretty_predicate_status ip;
-        main_ui#view_original (Property.location ip)
-    | PIP (Property.IPPredicate (Property.PKEnsures (_,Breaks),_,_,_) as ip) ->
+        main_ui#view_original (location ip)
+    | PIP (IPPredicate {ip_kind = PKEnsures (_,Breaks)} as ip) ->
         main_ui#pretty_information "This is a breaks clause.@.%a@."
           pretty_predicate_status ip;
-        main_ui#view_original (Property.location ip)
-    | PIP
-        (Property.IPPredicate (Property.PKEnsures (_,Continues),_,_,_) as ip) ->
+        main_ui#view_original (location ip)
+    | PIP (IPPredicate {ip_kind = PKEnsures (_,Continues)} as ip) ->
         main_ui#pretty_information "This is a continues clause.@.%a@."
           pretty_predicate_status ip;
-        main_ui#view_original (Property.location ip)
-    | PIP (Property.IPPredicate(Property.PKAssumes _,_,_,_) as ip) ->
+        main_ui#view_original (location ip)
+    | PIP (IPPredicate {ip_kind = PKAssumes _} as ip) ->
         main_ui#pretty_information "This is an assumes clause.@.";
-        main_ui#view_original (Property.location ip)
-    | PIP (Property.IPDecrease (_,Kglobal,_,_) as ip) ->
+        main_ui#view_original (location ip)
+    | PIP (IPDecrease {id_kinstr=Kglobal} as ip) ->
         main_ui#pretty_information
           "This is a decreases clause.@.%a@."
           pretty_predicate_status ip;
-        main_ui#view_original (Property.location ip)
-    | PIP (Property.IPDecrease (_,Kstmt _,_,_) as ip) ->
+        main_ui#view_original (location ip)
+    | PIP (IPDecrease {id_kinstr=Kstmt _} as ip) ->
         main_ui#pretty_information
           "This is a loop variant.@.%a@."
           pretty_predicate_status ip;
-        main_ui#view_original (Property.location ip)
-    | PIP(Property.IPDisjoint _ as ip) ->
+        main_ui#view_original (location ip)
+    | PIP(IPDisjoint _ as ip) ->
         main_ui#pretty_information
           "This is a disjoint behaviors clause.@.%a@."
           pretty_predicate_status ip;
-        main_ui#view_original (Property.location ip)
-    | PIP(Property.IPComplete _ as ip) ->
+        main_ui#view_original (location ip)
+    | PIP(IPComplete _ as ip) ->
         main_ui#pretty_information
           "This is a complete behaviors clause.@.%a@."
           pretty_predicate_status ip;
-        main_ui#view_original (Property.location ip)
-    | PIP(Property.IPAxiom _ as ip) ->
+        main_ui#view_original (location ip)
+    | PIP(IPAxiom _ as ip) ->
         main_ui#pretty_information "This is an axiom.@.";
-        main_ui#view_original (Property.location ip)
-    | PIP(Property.IPAxiomatic _ as ip) ->
+        main_ui#view_original (location ip)
+    | PIP(IPAxiomatic _ as ip) ->
         main_ui#pretty_information "This is an axiomatic.@.";
-        main_ui#view_original (Property.location ip)
-    | PIP(Property.IPLemma _ as ip) ->
+        main_ui#view_original (location ip)
+    | PIP(IPLemma _ as ip) ->
         main_ui#pretty_information "This is a lemma.@.";
-        main_ui#view_original (Property.location ip)
-    | PIP(Property.IPTypeInvariant _ as ip) ->
+        main_ui#view_original (location ip)
+    | PIP(IPTypeInvariant _ as ip) ->
         main_ui#pretty_information "This is a type invariant.@.";
-        main_ui#view_original (Property.location ip)
-    | PIP(Property.IPGlobalInvariant _ as ip) ->
+        main_ui#view_original (location ip)
+    | PIP(IPGlobalInvariant _ as ip) ->
         main_ui#pretty_information "This is a global invariant.@.";
-        main_ui#view_original (Property.location ip)
-    | PIP(Property.IPBehavior _ as ip) ->
+        main_ui#view_original (location ip)
+    | PIP(IPBehavior _ as ip) ->
         main_ui#pretty_information "This is a behavior.@.";
-        main_ui#view_original (Property.location ip)
-    | PIP (Property.IPPropertyInstance (_, _, _, ip') as ip) ->
+        main_ui#view_original (location ip)
+    | PIP (IPPropertyInstance {ii_ip=ip'} as ip) ->
       main_ui#pretty_information "@[This is an instance of property `%a'.@]@."
-        Property.short_pretty ip';
-        main_ui#view_original (Property.location ip)
-    | PIP(Property.IPReachable _ | Property.IPOther _) ->
+        short_pretty ip';
+        main_ui#view_original (location ip)
+    | PIP(IPReachable _ | IPOther _) ->
         (* these properties are not selectable *)
         assert false
     | PGlobal _g -> main_ui#pretty_information "This is a global.@.";

@@ -612,29 +612,30 @@ let make_panel (main_ui:main_window_extension_points) =
 
   view#set_model (Some model#coerce);
 
-  let visible ip = match ip with
-    | Property.IPOther _ -> other.get ()
-    | Property.IPReachable _ -> reachable.get ()
-    | Property.IPBehavior (_,Kglobal,_,_) -> behaviors.get ()
-    | Property.IPBehavior (_,Kstmt _,_,_) -> behaviors.get () && stmtSpec.get ()
-    | Property.IPPredicate(Property.PKRequires _,_,Kglobal,_) ->
+  let visible ip =
+    let open Property in match ip with
+    | IPOther _ -> other.get ()
+    | IPReachable _ -> reachable.get ()
+    | IPBehavior {ib_kinstr=Kglobal} -> behaviors.get ()
+    | IPBehavior {ib_kinstr=Kstmt _} -> behaviors.get () && stmtSpec.get ()
+    | IPPredicate {ip_kind=PKRequires _;ip_kinstr=Kglobal} ->
         preconditions.get ()
-    | Property.IPPredicate(Property.PKRequires _,_,Kstmt _,_) ->
+    | IPPredicate {ip_kind=PKRequires _;ip_kinstr=Kstmt _} ->
         preconditions.get () && stmtSpec.get ()
-    | Property.IPPredicate(Property.PKAssumes _,_,_,_) -> false
-    | Property.IPPredicate(Property.PKEnsures _,_,Kglobal,_) -> ensures.get ()
-    | Property.IPExtended(_,_) -> extended.get ()
-    | Property.IPPredicate(Property.PKEnsures _,_,Kstmt _,_) ->
+    | IPPredicate {ip_kind = PKAssumes _} -> false
+    | IPPredicate {ip_kind=PKEnsures _;ip_kinstr=Kglobal} -> ensures.get ()
+    | IPExtended _ -> extended.get ()
+    | IPPredicate {ip_kind=PKEnsures _;ip_kinstr=Kstmt _} -> 
         ensures.get() && stmtSpec.get()
-    | Property.IPPredicate(Property.PKTerminates,_,_,_) -> terminates.get ()
-    | Property.IPAxiom _ -> false
-    | Property.IPTypeInvariant _ -> typeInvariants.get()
-    | Property.IPGlobalInvariant _ -> globalInvariants.get()
-    | Property.IPAxiomatic _ -> axiomatic.get () && not (onlyCurrent.get ())
-    | Property.IPLemma _ -> lemmas.get ()
-    | Property.IPComplete _ -> complete_disjoint.get ()
-    | Property.IPDisjoint _ -> complete_disjoint.get ()
-    | Property.IPCodeAnnot(_,_,({annot_content = AAssert (_, kind, _)} as ca)) ->
+    | IPPredicate {ip_kind = PKTerminates} -> terminates.get ()
+    | IPAxiom _ -> false
+    | IPTypeInvariant _ -> typeInvariants.get()
+    | IPGlobalInvariant _ -> globalInvariants.get()
+    | IPAxiomatic _ -> axiomatic.get () && not (onlyCurrent.get ())
+    | IPLemma _ -> lemmas.get ()
+    | IPComplete _ -> complete_disjoint.get ()
+    | IPDisjoint _ -> complete_disjoint.get ()
+    | IPCodeAnnot {ica_ca={annot_content = AAssert (_, kind, _)} as ca} ->
       begin
         match Alarms.find ca with
         | Some a -> rte.get () && active_alarm a
@@ -643,24 +644,24 @@ let make_panel (main_ui:main_window_extension_points) =
           | Assert -> user_assertions.get ()
           | Check -> user_checks.get ()
       end
-    | Property.IPCodeAnnot(_,_,{annot_content = AInvariant _}) ->
+    | IPCodeAnnot {ica_ca={annot_content = AInvariant _}} ->
         invariant.get ()
-    | Property.IPCodeAnnot(_,_,{annot_content = APragma p}) ->
+    | IPCodeAnnot {ica_ca={annot_content = APragma p}} ->
         Logic_utils.is_property_pragma p (* currently always false. *)
-    | Property.IPCodeAnnot(_, _, _) -> false (* status of inner nodes *)
-    | Property.IPAllocation (_,Kglobal,_,_) -> allocations.get ()
-    | Property.IPAllocation (_,Kstmt _,Property.Id_loop _,_) ->
+    | IPCodeAnnot _ -> false (* status of inner nodes *)
+    | IPAllocation {ial_kinstr=Kglobal} -> allocations.get ()
+    | IPAllocation {ial_kinstr=Kstmt _;ial_bhv=Id_loop _} ->
         allocations.get ()
-    | Property.IPAllocation (_,Kstmt _,Property.Id_contract _,_) ->
+    | IPAllocation {ial_kinstr=Kstmt _;ial_bhv=Id_contract _} ->
         allocations.get() && stmtSpec.get()
-    | Property.IPAssigns (_,Kglobal,_,_) -> assigns.get ()
-    | Property.IPAssigns (_,Kstmt _,Property.Id_loop _,_) ->
+    | IPAssigns {ias_kinstr=Kglobal} -> assigns.get ()
+    | IPAssigns {ias_kinstr=Kstmt _;ias_bhv=Id_loop _} ->
         assigns.get ()
-    | Property.IPAssigns (_,Kstmt _,Property.Id_contract _,_) ->
+    | IPAssigns {ias_kinstr=Kstmt _;ias_bhv=Id_contract _} ->
         assigns.get() && stmtSpec.get()
-    | Property.IPFrom _ -> from.get ()
-    | Property.IPDecrease _ -> variant.get ()
-    | Property.IPPropertyInstance _ -> instances.get ()
+    | IPFrom _ -> from.get ()
+    | IPDecrease _ -> variant.get ()
+    | IPPropertyInstance _ -> instances.get ()
   in
   let visible_status_aux = function
     | Consolidation.Never_tried -> untried.get ()
@@ -774,7 +775,7 @@ let highlighter (buffer:reactive_buffer) localizable ~start ~stop =
          'Unknown'. *)
       let filter (ip_src, _ip_copy) =
         match ip_src with
-        | Property.IPPredicate (Property.PKRequires bhv, _, _, _) ->
+        | Property.(IPPredicate {ip_kind=PKRequires bhv}) ->
             bhv.b_assumes = []
         | _ -> false
       in

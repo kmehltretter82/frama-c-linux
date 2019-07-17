@@ -66,7 +66,7 @@ let ask_for_lval (main_ui:Design.main_window_extension_points) kf =
             None
 
 let get_annot_opt localizable = match localizable with
-  | Pretty_source.PIP(Property.IPCodeAnnot(_,_,annot)) -> Some annot
+  | Pretty_source.PIP(Property.(IPCodeAnnot {ica_ca})) -> Some ica_ca
   | _ -> None
 
 (** [kf_opt] is used if we want to ask the lval to the user in a popup *)
@@ -464,8 +464,8 @@ let highlighter (buffer:Design.reactive_buffer) localizable ~start ~stop =
       put_tag (DataScope.tag_stmt stmt);
       put_tag (Zones.tag_stmt stmt );
       put_tag (ShowDef.tag_stmt stmt)
-    | PIP (Property.IPCodeAnnot (_, _, annot)) ->
-      put_tag (Pscope.tag_annot annot)
+    | PIP (Property.(IPCodeAnnot {ica_ca})) ->
+      put_tag (Pscope.tag_annot ica_ca)
     | PStmtStart _ | PExp _
     | PVDecl _ | PTermLval _ | PLval _ | PGlobal _ | PIP _ -> ()
   with Not_found -> ()
