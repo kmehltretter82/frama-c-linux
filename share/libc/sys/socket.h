@@ -269,7 +269,7 @@ extern unsigned char *CMSG_DATA(struct cmsghdr *cmsg);
 
 #define SOMAXCONN 128
 
-enum {
+enum __fc_shutdown {
   SHUT_RD,
   SHUT_WR,
   SHUT_RDWR
