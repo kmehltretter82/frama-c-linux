@@ -1,7 +1,7 @@
 
 This file is part of the Frama-C plug-in `Dive'.
 
-Copyright (C) 2018
+Copyright (C) 2007-2019
   CEA (Commissariat à l'énergie atomique et aux énergies
        alternatives)
 
@@ -16,3 +16,4 @@ GNU Lesser General Public License for more details.
 
 See the GNU Lesser General Public License version 2.1
 for more details (enclosed in the file licenses/LGPLv2.1).
+
