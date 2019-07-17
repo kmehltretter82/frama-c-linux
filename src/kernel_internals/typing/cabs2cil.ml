@@ -6514,10 +6514,9 @@ and doExp local_env
         | Lval (Var fv, NoOffset) -> Cil.is_special_builtin fv.vname
         | _ -> false
       in
+      let init_chunk = unspecified_chunk empty in
       (* Do the arguments. In REVERSE order !!! Both GCC and MSVC do this *)
-      let rec loopArgs
-          ?(init_chunk=unspecified_chunk empty) ?(are_ghost=false)
-        = function
+      let rec loopArgs ?(are_ghost=false) = function
         | ([], []) ->
           (match argTypes, f''.enode with
            | None, Lval (Var f,NoOffset) ->
@@ -6537,13 +6536,12 @@ and doExp local_env
         | _, [] ->
           if not isSpecialBuiltin then
             Kernel.error ~once:true ~current:true
-              "Too few %s in call to %a."
-              ((if are_ghost then "ghost " else "") ^ "arguments")
-              Cil_printer.pp_exp f' ;
+              "Too few%s arguments in call to %a."
+              (if are_ghost then " ghost" else "") Cil_printer.pp_exp f' ;
           (init_chunk, [])
 
         | ((_, at, _) :: atypes, a :: args) ->
-          let (ss, args') = loopArgs ~init_chunk ~are_ghost (atypes, args) in
+          let (ss, args') = loopArgs ~are_ghost (atypes, args) in
           (* Do not cast as part of translating the argument. We let
            * the castTo do this work. This was necessary for
            * test/small1/union5, in which a transparent union is passed
@@ -6617,9 +6615,8 @@ and doExp local_env
           if not isvar && argTypes != None && not isSpecialBuiltin then
             (* Do not give a warning for functions without a prototype*)
             Kernel.error ~once:true ~current:true
-              "Too many %s in call to %a"
-              ((if are_ghost then "ghost " else "") ^ "arguments")
-              Cil_printer.pp_exp f';
+              "Too many%s arguments in call to %a"
+              (if are_ghost then " ghost" else "") Cil_printer.pp_exp f';
           let rec loop = function
               [] -> (init_chunk, [])
             | a :: args ->
@@ -6676,7 +6673,9 @@ and doExp local_env
       in
       let args = if ghost then args @ ghost_args else args in
       let (sghost, ghosts') = loopArgs ~are_ghost:true (ghostArgTypes, ghost_args) in
-      let (sargs, args') = loopArgs ~init_chunk:sghost (argTypes, args) in
+      let (sargs, args') = loopArgs (argTypes, args) in
+
+      let sargs = sghost @@ (sargs, false) in
 
       let (sargs, args') = (sargs, args' @ ghosts') in
       (* Setup some pointer to the elements of the call. We may change

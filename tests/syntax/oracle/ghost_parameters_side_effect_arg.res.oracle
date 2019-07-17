@@ -14,6 +14,8 @@ void caller(void)
   int tmp_1;
   /*@ ghost int g_tmp_2; */
   int tmp_2;
+  /*@ ghost int g_tmp_3; */
+  /*@ ghost int g_tmp_4; */
   int x = 0;
   /*@ ghost int g = 0; */
   int t[3] = {0, 0, 0};
@@ -44,6 +46,14 @@ void caller(void)
   /*@ ghost g_tmp_2 = other(x,g); */
   tmp_2 = other(x)/*@ ghost (g) */;
   function(tmp_2)/*@ ghost (g_tmp_2) */;
+  /*@ ghost int i = 1; */
+  /*@ ghost g_tmp_3 = i;
+            i ++;
+            ;
+            g_tmp_4 = g;
+            g ++;
+            ; */
+  /*@ ghost function(g_tmp_4,g_tmp_3); */
   return;
 }
 
