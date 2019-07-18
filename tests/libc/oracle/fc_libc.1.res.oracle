@@ -6867,6 +6867,30 @@ extern int setitimer(int which,
 extern int select(int nfds, fd_set *readfds, fd_set *writefds,
                   fd_set *errorfds, struct timeval *timeout);
 
+/*@ requires valid_string_path: valid_read_string(path);
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result
+      \from (indirect: path), (indirect: *(path + (0 ..))), (indirect: mode);
+ */
+extern int mkdir(char const *path, mode_t mode);
+
+/*@ requires valid_pathname: valid_read_string(pathname);
+    requires valid_buf: \valid(buf);
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    ensures
+      init_on_success: initialization: buf:
+        \result ≡ 0 ⇒ \initialized(\old(buf));
+    assigns \result, *buf;
+    assigns \result \from *(pathname + (0 ..));
+    assigns *buf \from *(pathname + (0 ..));
+ */
+extern int stat(char const *pathname, struct stat *buf);
+
+/*@ assigns \result;
+    assigns \result \from (indirect: cmask); */
+extern mode_t umask(mode_t cmask);
+
 /*@ assigns *(*(outbuf + (0 .. *outbytesleft - 1))), __fc_errno;
     assigns *(*(outbuf + (0 .. *outbytesleft - 1)))
       \from *(*(inbuf + (0 .. *inbytesleft - 1)));
@@ -7197,30 +7221,6 @@ extern int getrusage(int r, struct rusage *ru);
 /*@ assigns \result;
     assigns \result \from r, rl->rlim_cur, rl->rlim_max; */
 extern int setrlimit(int r, struct rlimit const *rl);
-
-/*@ requires valid_string_path: valid_read_string(path);
-    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
-    assigns \result;
-    assigns \result
-      \from (indirect: path), (indirect: *(path + (0 ..))), (indirect: mode);
- */
-extern int mkdir(char const *path, mode_t mode);
-
-/*@ requires valid_pathname: valid_read_string(pathname);
-    requires valid_buf: \valid(buf);
-    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
-    ensures
-      init_on_success: initialization: buf:
-        \result ≡ 0 ⇒ \initialized(\old(buf));
-    assigns \result, *buf;
-    assigns \result \from *(pathname + (0 ..));
-    assigns *buf \from *(pathname + (0 ..));
- */
-extern int stat(char const *pathname, struct stat *buf);
-
-/*@ assigns \result;
-    assigns \result \from (indirect: cmask); */
-extern mode_t umask(mode_t cmask);
 
 /*@ requires valid_buffer: \valid(buffer);
     assigns \result, *buffer;

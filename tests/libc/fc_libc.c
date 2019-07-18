@@ -77,6 +77,7 @@
 #include "fenv.h"
 #include "float.h"
 #include "fnmatch.h"
+#include "ftw.h"
 #include "getopt.h"
 #include "glob.h"
 #include "grp.h"

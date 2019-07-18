@@ -222,6 +222,7 @@ share/libc/fenv.h: CEA_LGPL
 share/libc/fenv.c: CEA_LGPL
 share/libc/float.h: CEA_LGPL
 share/libc/fnmatch.h: CEA_LGPL
+share/libc/ftw.h: CEA_LGPL
 share/libc/getopt.c: CEA_LGPL
 share/libc/getopt.h: CEA_LGPL
 share/libc/glob.c: CEA_LGPL

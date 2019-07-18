@@ -55,6 +55,7 @@ skipping share/libc/complex.h
 [kernel] Parsing share/libc/fenv.h (with preprocessing)
 [kernel] Parsing share/libc/float.h (with preprocessing)
 [kernel] Parsing share/libc/fnmatch.h (with preprocessing)
+[kernel] Parsing share/libc/ftw.h (with preprocessing)
 [kernel] Parsing share/libc/getopt.h (with preprocessing)
 [kernel] Parsing share/libc/glob.h (with preprocessing)
 [kernel] Parsing share/libc/grp.h (with preprocessing)
