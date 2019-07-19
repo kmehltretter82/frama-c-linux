@@ -1368,6 +1368,17 @@ val bitfield_attribute_name: string
     NotAnAttrParam with the offending subexpression *)
 val expToAttrParam: exp -> attrparam
 
+
+(** Return the attributes of the global annotation, if any.
+    @since Frama-C+dev
+*)
+val global_annotationAttributes: global_annotation -> attributes
+
+(** Return the attributes of the global, if any.
+    @since Frama-C+dev
+*)
+val globalAttributes: global -> attributes
+
 exception NotAnAttrParam of exp
 
 (* ************************************************************************* *)

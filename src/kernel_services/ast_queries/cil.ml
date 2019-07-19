@@ -6646,6 +6646,29 @@ let mapGlobals (fl: file)
        | _ -> Kernel.fatal ~current:true "mapGlobals: globinit is not a function"
      end)
 
+let global_annotationAttributes = function
+  | Dfun_or_pred _ -> []
+  | Dvolatile (_,_,_,attrs,_) -> attrs
+  | Daxiomatic (_,_,attrs,_) -> attrs
+  | Dtype _ -> []
+  | Dlemma (_,_,_,_,_,attrs,_) -> attrs
+  | Dinvariant _ -> []
+  | Dtype_annot _ -> []
+  | Dmodel_annot _ -> []
+  | Dextended (_,attrs,_) -> attrs
+  | Dcustom_annot (_,_,attrs,_) -> attrs
+
+let globalAttributes = function
+  | GType ({ttype},_) -> typeAttrs ttype
+  | GCompTag({cattr = attrs},_) | GCompTagDecl({cattr = attrs},_)
+  | GEnumTag({eattr = attrs},_) | GEnumTagDecl({eattr = attrs},_)
+  | GVarDecl({vattr = attrs},_) | GVar({vattr = attrs},_,_) -> attrs
+  | GFun({svar = {vattr = attrs}},_)
+  | GFunDecl(_,{vattr = attrs},_) -> attrs
+  | GPragma (attr, _) -> [attr]
+  | GAnnot (gannot,_) -> global_annotationAttributes gannot
+  | GAsm _ | GText _ -> []
+
 (***************************************************************************)
 
 (* Convert an expression into an attribute, if possible. Otherwise raise
