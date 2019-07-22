@@ -175,7 +175,7 @@ and identified_property =
   | IPPropertyInstance of identified_instance
   | IPTypeInvariant of identified_type_invariant
   | IPGlobalInvariant of identified_global_invariant
-  | IPOther of identified_other 
+  | IPOther of identified_other
 
 let pretty_predicate_kind fmt = function
   | PKRequires _ -> Format.pp_print_string fmt "requires"
@@ -183,11 +183,11 @@ let pretty_predicate_kind fmt = function
   | PKEnsures(_, tk)  ->
     Format.pp_print_string fmt
       (match tk with
-      | Normal -> "ensures"
-      | Exits -> "exits"
-      | Breaks -> "breaks"
-      | Continues -> "continues"
-      | Returns -> "returns")
+       | Normal -> "ensures"
+       | Exits -> "exits"
+       | Breaks -> "breaks"
+       | Continues -> "continues"
+       | Returns -> "returns")
   | PKTerminates -> Format.pp_print_string fmt "terminates"
 
 let other_loc_equal le1 le2 =
@@ -289,26 +289,26 @@ let rec location = function
   | IPReachable {ir_kf=None; ir_kinstr=Kstmt s}
   | IPPropertyInstance {ii_stmt=s} -> Cil_datatype.Stmt.loc s
   | IPCodeAnnot {ica_stmt=s; ica_ca=ca} -> (
-    match Cil_datatype.Code_annotation.loc ca with
-    | None -> Cil_datatype.Stmt.loc s
-    | Some loc -> loc)
+      match Cil_datatype.Code_annotation.loc ca with
+      | None -> Cil_datatype.Stmt.loc s
+      | Some loc -> loc)
   | IPReachable {ir_kf=None; ir_kinstr=Kglobal} -> Cil_datatype.Location.unknown
   | IPAssigns {ias_kf=kf; ias_kinstr=ki; ias_froms=a} ->
     (match a with
-      | [] -> loc_of_kf_ki kf ki
-      | (t,_) :: _ -> t.it_content.term_loc)
+     | [] -> loc_of_kf_ki kf ki
+     | (t,_) :: _ -> t.it_content.term_loc)
   | IPAllocation {ial_kf=kf; ial_kinstr=ki; ial_allocs=fa} ->
     (match fa with
-      | [],[] -> loc_of_kf_ki kf ki
-      | (t :: _),_
-      | _,(t :: _) -> t.it_content.term_loc)
+     | [],[] -> loc_of_kf_ki kf ki
+     | (t :: _),_
+     | _,(t :: _) -> t.it_content.term_loc)
   | IPFrom {if_from=(t, _)} -> t.it_content.term_loc
   | IPDecrease {id_variant=(t, _)} -> t.term_loc
   | IPAxiom {il_loc} -> il_loc
   | IPAxiomatic {iax_props} ->
     (match iax_props with
-      | [] -> Cil_datatype.Location.unknown
-      | p :: _ -> location p)
+     | [] -> Cil_datatype.Location.unknown
+     | p :: _ -> location p)
   | IPLemma {il_loc} -> il_loc
   | IPExtended {ie_ext={ext_loc}} -> ext_loc
   | IPOther {io_loc} -> loc_of_loc_o io_loc
@@ -534,7 +534,7 @@ include Datatype.Make_with_collections
         | IPPredicate {ip_pred=s1}, IPPredicate {ip_pred=s2} -> s1.ip_id = s2.ip_id
         | IPExtended {ie_ext={ext_id=i1}}, IPExtended {ie_ext={ext_id=i2}} ->
           Datatype.Int.equal i1 i2
-        | IPAxiom {il_name=s1}, IPAxiom {il_name=s2} 
+        | IPAxiom {il_name=s1}, IPAxiom {il_name=s2}
         | IPAxiomatic {iax_name=s1}, IPAxiomatic {iax_name=s2}
         | IPTypeInvariant {iti_name=s1}, IPTypeInvariant {iti_name=s2}
         | IPGlobalInvariant {igi_name=s1}, IPGlobalInvariant {igi_name=s2}
@@ -640,7 +640,7 @@ include Datatype.Make_with_collections
             if n = 0 then Transitioning.Stdlib.compare ba1 ba2 else n
           else
             n
-        | IPAxiom {il_name=s1}, IPAxiom {il_name=s2} 
+        | IPAxiom {il_name=s1}, IPAxiom {il_name=s2}
         | IPAxiomatic {iax_name=s1}, IPAxiomatic {iax_name=s2}
         | IPTypeInvariant {iti_name=s1}, IPTypeInvariant {iti_name=s2}
         | IPGlobalInvariant {igi_name=s1}, IPGlobalInvariant {igi_name=s2}
@@ -648,7 +648,7 @@ include Datatype.Make_with_collections
           Datatype.String.compare s1 s2
         | IPOther {io_name=s1;io_loc=l1}, IPOther {io_name=s2;io_loc=l2} ->
           let s = Datatype.String.compare s1 s2 in
-          if s <> 0 then s else other_loc_compare l1 l2 
+          if s <> 0 then s else other_loc_compare l1 l2
         | IPAllocation {ial_kf=f1;ial_kinstr=ki1;ial_bhv=b1},
           IPAllocation {ial_kf=f2;ial_kinstr=ki2;ial_bhv=b2} ->
           cmp_bhv (f1,ki1,b1) (f2,ki2,b2)
@@ -1315,7 +1315,7 @@ let ip_of_assigns ias_kf ias_kinstr ias_bhv = function
   | Writes [(a,_)] when Logic_utils.is_result a.it_content ->
     (* We're only assigning the result (with dependencies), but no
        global variables, this amounts to \nothing.
-     *)
+    *)
     Some (IPAssigns {ias_kf; ias_kinstr; ias_bhv; ias_froms=[]})
   | Writes ias_froms ->
     Some (IPAssigns {ias_kf; ias_kinstr; ias_bhv; ias_froms})
@@ -1326,8 +1326,8 @@ let ip_assigns_of_behavior kf st ~active b =
 
 let ip_of_from if_kf if_kinstr if_bhv if_from =
   match snd if_from with
-    | FromAny -> None
-    | From _ -> Some (IPFrom {if_kf;if_kinstr;if_bhv;if_from})
+  | FromAny -> None
+  | From _ -> Some (IPFrom {if_kf;if_kinstr;if_bhv;if_from})
 
 let ip_from_of_behavior kf st ~active b =
   match b.b_assigns with
@@ -1337,10 +1337,10 @@ let ip_from_of_behavior kf st ~active b =
       | FromAny -> acc
       | From _ ->
         let a = Datatype.String.Set.of_list active in
-	let ip =
+        let ip =
           Extlib.the (ip_of_from kf st (Id_contract (a,b)) (out, froms))
         in
-	ip :: acc
+        ip :: acc
     in
     List.fold_left treat_from [] l
 
@@ -1356,11 +1356,11 @@ let ip_from_of_code_annot kf st ca = match ca.annot_content with
   | AAssigns(_,WritesAny) -> []
   | AAssigns (_,Writes l) ->
     let treat_from acc (out, froms) = match froms with FromAny -> acc
-      | From _ ->
-        let ip =
-          Extlib.the (ip_of_from kf st (Id_loop ca) (out, froms))
-        in
-        ip::acc
+                                                     | From _ ->
+                                                       let ip =
+                                                         Extlib.the (ip_of_from kf st (Id_loop ca) (out, froms))
+                                                       in
+                                                       ip::acc
     in
     List.fold_left treat_from [] l
   | _ -> []
@@ -1375,7 +1375,7 @@ let ip_of_behavior ib_kf ib_kinstr ~active ib_bhv =
   let ib_active = Datatype.String.Set.of_list active in
   IPBehavior {ib_kf; ib_kinstr; ib_active; ib_bhv}
 
-let ip_of_requires ip_kf ip_kinstr b ip_pred = 
+let ip_of_requires ip_kf ip_kinstr b ip_pred =
   IPPredicate {ip_kind=PKRequires b; ip_kf; ip_kinstr; ip_pred}
 
 let ip_requires_of_behavior kf st b =
@@ -1448,7 +1448,7 @@ let ip_of_code_annot kf stmt ca =
   | AVariant t ->
     [ IPDecrease {id_kf=kf;id_kinstr=ki;id_ca=Some ca; id_variant=t}]
   | AAllocation _ ->
-      Extlib.list_of_opt (ip_allocation_of_code_annot kf ki ca)
+    Extlib.list_of_opt (ip_allocation_of_code_annot kf ki ca)
     @ ip_from_of_code_annot kf ki ca
   | AAssigns _ ->
     Extlib.list_of_opt (ip_assigns_of_code_annot kf ki ca)
@@ -1474,7 +1474,7 @@ let ip_of_code_annot_single kf stmt ca = match ip_of_code_annot kf stmt ca with
   | ip :: _ ->
     Kernel.warning
       "@[choosing one of multiple properties associated \
-           to code annotation@\n%a@]"
+       to code annotation@\n%a@]"
       Cil_printer.pp_code_annotation ca;
     ip
 
@@ -1492,25 +1492,25 @@ let ip_of_global_annotation a =
       ip_lemma {il_name; il_labels; il_args; il_pred; il_loc} :: acc
     | Dinvariant(l, igi_loc) ->
       let igi_pred = match l.l_body with
-	| LBpred p -> p
-	| _ -> assert false
+        | LBpred p -> p
+        | _ -> assert false
       in
       IPGlobalInvariant {igi_name=l.l_var_info.lv_name; igi_pred; igi_loc} :: acc
     | Dtype_annot(l, iti_loc) ->
       let parameter = match l.l_profile with
-	| h :: [] -> h
-	| _ -> assert false
+        | h :: [] -> h
+        | _ -> assert false
       in
       let iti_type = match parameter.lv_type with
-	| Ctype x -> x
-	| _ -> assert false
+        | Ctype x -> x
+        | _ -> assert false
       in
       let iti_pred = match l.l_body with
-	| LBpred p -> p
-	| _ -> assert false
+        | LBpred p -> p
+        | _ -> assert false
       in
       IPTypeInvariant {iti_name=l.l_var_info.lv_name;
-        iti_type; iti_pred; iti_loc} :: acc
+                       iti_type; iti_pred; iti_loc} :: acc
     | Dcustom_annot(_c, _n, _, _) ->
       (* TODO *)
       Kernel.warning ~once "ignoring status of custom annotation";

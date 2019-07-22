@@ -34,10 +34,10 @@ let preconditions_emitter =
 module PreCondProxyGenerated =
   State_builder.Hashtbl(Property.Hashtbl)(Datatype.List(Property))
     (struct
-       let name = "Call Preconditions Generated"
-       let dependencies = [Ast.self]
-       let size = 97
-     end)
+      let name = "Call Preconditions Generated"
+      let dependencies = [Ast.self]
+      let size = 97
+    end)
 
 
 module PropStmt =
@@ -50,7 +50,7 @@ module FunctionPointers =
       let name = "Statuses_by_call.FunctionPointers"
       let dependencies = [Ast.self]
       let size = 37
-     end)
+    end)
 
 let add_called_function stmt kf =
   let prev =
@@ -226,7 +226,7 @@ and precondition_at_call kf pid stmt =
 and setup_precondition_proxy called_kf precondition =
   if not (PreCondProxyGenerated.mem precondition) then begin
     Kernel.debug "Setting up syntactic call-preconditions for precondition \
-      of %a" Kernel_function.pretty called_kf;
+                  of %a" Kernel_function.pretty called_kf;
     let call_preconditions =
       List.map
         (fun (_,stmt) -> precondition_at_call called_kf precondition stmt)
@@ -261,7 +261,7 @@ let all_call_preconditions_at ~warn_missing kf stmt =
       if warn_missing then
         Kernel.fatal ~source:(fst (Cil_datatype.Stmt.loc stmt))
           "Preconditions %a for %a not yet registered at this statement"
-          Printer.pp_identified_predicate precond Kernel_function.pretty kf;      
+          Printer.pp_identified_predicate precond Kernel_function.pretty kf;
       properties)
   in
   fold_requires aux kf []
@@ -281,7 +281,7 @@ let replace_call_precondition ip stmt ip_at_call =
      let all = PreCondProxyGenerated.find ip in
      let all' = Extlib.filter_out (Property.equal cur) all in
      PreCondProxyGenerated.replace ip all';
-  with Not_found -> ());
+   with Not_found -> ());
   PreCondAt.replace (ip, stmt) ip_at_call;
   add_call_precondition ip ip_at_call
 

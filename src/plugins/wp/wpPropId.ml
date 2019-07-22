@@ -580,9 +580,9 @@ let propid_hints hs p =
   match p.p_kind , p.p_prop with
   | PKCheck , _ -> ()
   | PKProp , Property.(IPAssigns {ias_kinstr=Kstmt _}) ->
-    add_required hs "stmt-assigns"
+      add_required hs "stmt-assigns"
   | PKProp , Property.(IPAssigns {ias_kinstr=Kglobal}) ->
-    add_required hs "fct-assigns"
+      add_required hs "fct-assigns"
   | PKPropLoop , Property.IPAssigns _ -> add_required hs "loop-assigns"
   | PKPropLoop , _ -> add_required hs "invariant"
   | PKProp , _ -> add_required hs "property"
@@ -629,12 +629,12 @@ let property_hints hs =
   let open Property in function
     | IPAxiom  {il_name; il_pred}
     | IPLemma  {il_name; il_pred} ->
-      List.iter (add_required hs) (il_name::il_pred.pred_name)
+        List.iter (add_required hs) (il_name::il_pred.pred_name)
     | IPBehavior _ -> ()
     | IPComplete {ic_bhvs} | IPDisjoint {ic_bhvs} ->
-      List.iter (add_required hs) ic_bhvs
+        List.iter (add_required hs) ic_bhvs
     | IPPredicate {ip_pred} ->
-      List.iter (add_hint hs) ip_pred.ip_content.pred_name
+        List.iter (add_hint hs) ip_pred.ip_content.pred_name
     | IPExtended {ie_ext={ext_name}} -> List.iter (add_hint hs) [ext_name]
     | IPCodeAnnot {ica_ca} -> annot_hints hs ica_ca.annot_content
     | IPAssigns {ias_froms} -> assigns_hints hs ias_froms
@@ -1016,7 +1016,7 @@ let get_induction p =
         | Some (kf, s) -> get_loop_stmt kf s
       in loop_stmt_opt
   | PKPropLoop ->
-    let open Property in
+      let open Property in
       let loop_stmt_opt = match property_of_id p with
         | IPCodeAnnot {ica_kf; ica_stmt;
                        ica_ca = {annot_content = AInvariant(_, loop, _)}} ->

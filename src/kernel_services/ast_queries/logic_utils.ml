@@ -2152,7 +2152,7 @@ let complete_types f = Cil.visitCilFile (new complete_types) f
 (**
    - false => keywords are all ACSL keywords
    - true => only C keywords are recognized as such.
-   (other remains plain identifiers/typenames)
+     (other remains plain identifiers/typenames)
 *)
 let kw_c_mode = ref false
 

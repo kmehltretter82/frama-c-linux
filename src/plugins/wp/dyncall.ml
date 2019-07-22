@@ -140,47 +140,47 @@ class dyncall =
       | Cil_types.AExtended
           (bhvs, _,
            ({ext_name = "calls"; ext_kind = Ext_terms calls} as extended)) ->
-        if calls <> [] && (scope <> [] || not (Stack.is_empty block_calls))
-        then begin
-          let bhvs =
-            match bhvs with
-            | [] -> [ Cil.default_behavior_name ]
-            | bhvs -> bhvs
-          in
-          let debug_calls bhv stmt kfs =
-            if Wp_parameters.has_dkey dkey_calls then
-              let source = snd (Stmt.loc stmt) in
-              if Cil.default_behavior_name = bhv then
-                Wp_parameters.result ~source
-                  "@[<hov 2>Calls%a@]" pp_calls kfs
-              else
-                Wp_parameters.result ~source
-                  "@[<hov 2>Calls (for %s)%a@]" bhv pp_calls kfs
-          in
-          let pool = ref [] in (* collect emitted properties *)
-          let add_calls_info kf stmt =
-            count <- succ count ;
+          if calls <> [] && (scope <> [] || not (Stack.is_empty block_calls))
+          then begin
+            let bhvs =
+              match bhvs with
+              | [] -> [ Cil.default_behavior_name ]
+              | bhvs -> bhvs
+            in
+            let debug_calls bhv stmt kfs =
+              if Wp_parameters.has_dkey dkey_calls then
+                let source = snd (Stmt.loc stmt) in
+                if Cil.default_behavior_name = bhv then
+                  Wp_parameters.result ~source
+                    "@[<hov 2>Calls%a@]" pp_calls kfs
+                else
+                  Wp_parameters.result ~source
+                    "@[<hov 2>Calls (for %s)%a@]" bhv pp_calls kfs
+            in
+            let pool = ref [] in (* collect emitted properties *)
+            let add_calls_info kf stmt =
+              count <- succ count ;
+              List.iter
+                (fun bhv ->
+                   let kfs = List.map get_call calls in
+                   debug_calls bhv stmt kfs ;
+                   let prop = property ~kf ~bhv ~stmt kfs in
+                   pool := prop :: !pool ;
+                   CallPoints.add (bhv,stmt) (prop,kfs))
+                bhvs
+            in
+            let kf = self#kf in
             List.iter
-              (fun bhv ->
-                 let kfs = List.map get_call calls in
-                 debug_calls bhv stmt kfs ;
-                 let prop = property ~kf ~bhv ~stmt kfs in
-                 pool := prop :: !pool ;
-                 CallPoints.add (bhv,stmt) (prop,kfs))
-              bhvs
-          in
-          let kf = self#kf in
-          List.iter
-            (add_calls_info kf)
-            (if scope <> [] then scope else Stack.top block_calls) ;
-          if !pool <> [] then
-            begin
-              let eloc = Property.ELStmt(kf,self#stmt) in
-              let annot = Property.ip_of_extended eloc extended in
-              Property_status.logical_consequence emitter annot !pool ;
-            end
-        end;
-        SkipChildren
+              (add_calls_info kf)
+              (if scope <> [] then scope else Stack.top block_calls) ;
+            if !pool <> [] then
+              begin
+                let eloc = Property.ELStmt(kf,self#stmt) in
+                let annot = Property.ip_of_extended eloc extended in
+                Property_status.logical_consequence emitter annot !pool ;
+              end
+          end;
+          SkipChildren
       | _ -> SkipChildren
 
     method! vspec spec =

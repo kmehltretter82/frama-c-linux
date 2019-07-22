@@ -34,17 +34,17 @@ open Cil_types
    - use private records instead of tuples whenever possible
    - extend identified_property to any possible annotations
    - design more consistent type
-   For instance,
+     For instance,
    - why code annotations are represented so differently?
    - why type [behavior_or_loop] does not contain "assigns" somewhere in its
-   name?
+     name?
    - why this last type cannot be private? *)
 
 (** assigns can belong either to a contract or a loop annotation *)
 type behavior_or_loop = (* private *)
   | Id_contract of Datatype.String.Set.t * funbehavior
-      (** in case of statement contract, we can have different contracts
-          based on different sets of active behaviors. *)
+  (** in case of statement contract, we can have different contracts
+      based on different sets of active behaviors. *)
   | Id_loop of code_annotation
 
 (** Only AAssert, AInvariant, or APragma. Other code annotations are
@@ -92,8 +92,8 @@ type identified_behavior = {
   ib_bhv : funbehavior
 }
 (** for statement contract, the set of parent behavior for which the
-  contract is active is part of its identification. If the set is empty,
-  the contract is active for all parent behaviors.
+    contract is active is part of its identification. If the set is empty,
+    the contract is active for all parent behaviors.
 *)
 
 type identified_complete = {
@@ -218,7 +218,7 @@ val short_pretty: Format.formatter -> t -> unit
     reverting back to the full ACSL formula if it can't find one.
     The name is not meant to uniquely identify the property.
     @since Neon-20140301
- *)
+*)
 
 (** @since Oxygen-20120901 *)
 val pretty_predicate_kind: Format.formatter -> predicate_kind -> unit
@@ -246,7 +246,7 @@ val ip_other: string -> other_loc -> identified_property
 (** Create a non-standard property.
     @since Nitrogen-20111001
     @modify 18.0-Argon Refine localisation argument
- *)
+*)
 
 val ip_reachable_stmt: kernel_function -> stmt -> identified_property
 (** @since Oxygen-20120901 *)
@@ -320,7 +320,7 @@ val ip_of_assigns:
     See {!ip_allocation_of_behavior} for signification of [active].
     @since Carbon-20110201
     @modify Aluminium-20160501 added active argument
- *)
+*)
 val ip_assigns_of_behavior:
   kernel_function -> kinstr -> active:string list ->
   funbehavior -> identified_property option
@@ -358,7 +358,7 @@ val ip_from_of_code_annot:
     of the [active] argument.
     @since Carbon-20110201
     @modify Aluminium-20160501 added active argument
- *)
+*)
 val ip_post_cond_of_behavior:
   kernel_function -> kinstr -> active:string list ->
   funbehavior -> identified_property list
@@ -442,7 +442,7 @@ val ip_decreases_of_spec:
     See {!ip_post_cond_of_behavior} for more information.
     @since Carbon-20110201
     @modify Aluminium-20160501 added active argument
- *)
+*)
 val ip_post_cond_of_spec:
   kernel_function -> kinstr -> active:string list ->
   funspec -> identified_property list
