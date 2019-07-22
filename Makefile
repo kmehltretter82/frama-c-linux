@@ -1417,7 +1417,7 @@ acsl_tests: byte
 	find doc/speclang -name \*.c -exec ./bin/toplevel.byte$(EXE) {} \; > /dev/null
 
 LONELY_TESTS_ML_FILES:=\
-  $(shell find $(TEST_DIRS_AS_PLUGIN:%=tests/%) -name '*.ml')
+  $(sort $(shell find $(TEST_DIRS_AS_PLUGIN:%=tests/%) -not -path '*/\.*' -name '*.ml'))
 $(foreach file,$(LONELY_TESTS_ML_FILES),\
   $(eval $(file:%.ml=%.cmo): BFLAGS+=-I $(dir $(file))))
 $(foreach file,$(LONELY_TESTS_ML_FILES),\
