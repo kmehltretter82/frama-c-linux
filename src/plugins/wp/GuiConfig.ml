@@ -165,7 +165,7 @@ type mprover =
   | COQ
   | WHY of VCS.Why3_prover.t
 
-class dp_button =
+class dp_button () =
   let render = function
     | NONE -> "(none)"
     | ERGO -> "Alt-Ergo (native)"

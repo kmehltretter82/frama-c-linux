@@ -220,7 +220,7 @@ let wp_panel
     ~label:"Provers..." ~tooltip:"Detect WP Provers" () in
   prover_cfg#connect configure_provers ;
   form#add_label_widget prover_cfg#coerce ;
-  let prover_menu = new GuiConfig.dp_button in
+  let prover_menu = new GuiConfig.dp_button () in
   form#add_field prover_menu#coerce ;
   Gtk_form.register demon prover_menu#update ;
   (* End Form *)
