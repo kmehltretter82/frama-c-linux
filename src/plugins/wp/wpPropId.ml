@@ -577,11 +577,12 @@ let kinstr_hints hs = function
   | Kglobal -> ()
 
 let propid_hints hs p =
+  let open Property in
   match p.p_kind , p.p_prop with
   | PKCheck , _ -> ()
-  | PKProp , Property.(IPAssigns {ias_kinstr=Kstmt _}) ->
+  | PKProp , IPAssigns {ias_kinstr=Kstmt _} ->
       add_required hs "stmt-assigns"
-  | PKProp , Property.(IPAssigns {ias_kinstr=Kglobal}) ->
+  | PKProp , IPAssigns {ias_kinstr=Kglobal} ->
       add_required hs "fct-assigns"
   | PKPropLoop , Property.IPAssigns _ -> add_required hs "loop-assigns"
   | PKPropLoop , _ -> add_required hs "invariant"
@@ -709,9 +710,10 @@ let is_assigns p =
   | Property.IPAssigns _ -> true
   | _ -> false
 
-let is_requires = function
-  | Property.(IPPredicate {ip_kind = PKRequires _}) -> true
-  | _ -> false
+let is_requires =
+  let open Property in function
+    | IPPredicate {ip_kind = PKRequires _} -> true
+    | _ -> false
 
 let is_loop_preservation p =
   match p.p_kind with

@@ -305,8 +305,9 @@ let filter_assign config pid =
 
 let filter_speconly config pid =
   if Cil2cfg.cfg_spec_only config.cfg then
+    let open Property in
     match WpPropId.property_of_id pid with
-    | Property.(IPPredicate {ip_kind = PKRequires _; ip_kinstr = Kglobal}) -> true
+    | IPPredicate {ip_kind = PKRequires _; ip_kinstr = Kglobal} -> true
     | _ -> false
   else true
 
@@ -1336,8 +1337,9 @@ let get_strategies assigns kf model behaviors ki property =
 let get_precond_strategies ~model p =
   debug "[get_precond_strategies] %s@."
     (Property.Names.get_prop_name_id p);
+  let open Property in
   match p with
-  | Property.(IPPredicate {ip_kind = PKRequires b; ip_kf; ip_kinstr = Kglobal}) ->
+  | IPPredicate {ip_kind = PKRequires b; ip_kf; ip_kinstr = Kglobal} ->
       let strategies =
         if WpStrategy.is_main_init ip_kf then
           get_strategies NoAssigns ip_kf model [b.b_name] None (IdProp p)
