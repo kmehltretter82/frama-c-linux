@@ -742,9 +742,9 @@ let update_fundec_in_theFile vi (f:global -> unit) =
 let update_funspec_in_theFile vi spec =
   let rec aux = function
     | [] -> assert false
-    | GFun (f,_) :: _ ->
+    | GFun (f,oldloc) :: _ ->
       Cil.CurrentLoc.set vi.vdecl;
-      Logic_utils.merge_funspec f.sspec spec
+      Logic_utils.merge_funspec ~oldloc f.sspec spec
     | _ :: tl -> aux tl
   in
   aux (findVarInTheFile vi)
@@ -8443,8 +8443,9 @@ and createGlobal ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool * A
                        msg vi.vname;
                      empty_funspec ()
                  in
+                 let oldloc = Cil.CurrentLoc.get () in
                  Cil.CurrentLoc.set vi.vdecl;
-                 Logic_utils.merge_funspec old_spec spec
+                 Logic_utils.merge_funspec ~oldloc old_spec spec
                | _ -> assert false
              in
              update_fundec_in_theFile vi merge_spec
@@ -9065,12 +9066,13 @@ and doDecl local_env (isglobal: bool) : A.definition -> chunk = function
       end;
       (* Merge pre-existing spec if needed. *)
       if has_decl then begin
+        let oldloc = CurrentLoc.get () in
         let merge_spec = function
           | GFunDecl(old_spec,_,loc) as g ->
             if not (Cil.is_empty_funspec old_spec) then begin
               rename_spec g;
               Cil.CurrentLoc.set loc;
-              Logic_utils.merge_funspec
+              Logic_utils.merge_funspec ~oldloc
                 !currentFunctionFDEC.sspec old_spec;
               Logic_utils.clear_funspec old_spec;
             end

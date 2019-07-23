@@ -244,8 +244,9 @@ module Functions = struct
     let loc = match kf.fundec with
       | Definition (_, loc) | Declaration (_, _, _, loc) -> loc 
     in
+    let oldloc = Cil.CurrentLoc.get () in
     Cil.CurrentLoc.set loc;
-    Logic_utils.merge_funspec kf.spec spec
+    Logic_utils.merge_funspec ~oldloc kf.spec spec
 
   let replace_by_declaration s v l=
 (*    Kernel.feedback "replacing %a by decl" Cil_datatype.Varinfo.pretty v;*)
