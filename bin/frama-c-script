@@ -26,10 +26,13 @@ while [ $# -ge 1 -a "$1" = "-check" ]; do
     shift
 done
 
-if [ $# -lt 1 ]; then
+usage() {
    echo "usage: $0 cmd [args]"
    echo ""
    echo "  where cmd is:"
+   echo ""
+   echo "  - help"
+   echo "      Display this help message and exit."
    echo ""
    echo "  - make-template [dir]"
    echo "      Interactively prepares a template for running analysis scripts,"
@@ -74,7 +77,11 @@ if [ $# -lt 1 ]; then
    echo "  - normalize-jcdb [path/to/compile_commands.json]"
    echo "      Applies some transformations to an existing compile_commands.json"
    echo "      (such as relativizing paths) to improve portability"
-   exit
+   exit $1
+}
+
+if [ $# -lt 1 ]; then
+    usage 1
 fi
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
@@ -276,6 +283,9 @@ normalize_jcdb() {
 }
 
 case "$command" in
+    "help" | "-help" | "--help" | "-h")
+        usage 0;
+        ;;
     "make-template")
         shift;
         make_template "$@";
@@ -313,5 +323,6 @@ case "$command" in
         normalize_jcdb "$@";
         ;;
     *)
-        echo "error: unrecognized command: $command"
+        echo "error: unrecognized command: $command";
+        exit 1
 esac
