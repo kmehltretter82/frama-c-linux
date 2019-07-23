@@ -66,7 +66,7 @@ extern int memcmp (const void *s1, const void *s2, size_t n);
 
 /*@ requires valid:
          valid_read_or_empty(s, n)
-         || \valid_read(((unsigned char*)s)+(..memchr_off((char*)s,c,n)));
+         || \valid_read(((unsigned char*)s)+(0..memchr_off((char*)s,c,n)));
   @ requires initialization:
         \initialized(((unsigned char*)s)+(0..n - 1))
      || \initialized(((unsigned char*)s)+(0..memchr_off((char*)s,c,n)));
