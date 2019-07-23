@@ -15,8 +15,9 @@ pre-processes the other files with the following command.
 \end{shell}
 
 The option \optiondef{-}{cpp-command} may be used to change
-the default pre-processing command. Placeholders can be used for advanced
-commands. If no placeholders are used, the pre-processor is invoked in the
+the default pre-processing command. Placeholders (see below)
+can be used for advanced commands.
+If no placeholders are used, the pre-processor is invoked in the
 following way.
 \begin{commands}
 \texttt{<cmd> <args> -o <output file> <input file>}
@@ -26,7 +27,7 @@ In this command, \texttt{<output file>} is chosen by \FramaC while
 \texttt{<input file>} is one of the filenames provided by the user.
 
 For commands which do not follow this pattern, it is also possible to use
-the following patterns:
+the following placeholders:
 
 \begin{tabular}{|l|l|}
 \hline
@@ -65,7 +66,8 @@ it to retrieve preprocessing macros such as \texttt{-D} and \texttt{-I}
 for each file in the database, via option
 \optiondef{-}{json-compilation-database} \texttt{<path>}, where \texttt{<path>}
 is the path to the JSON file or to a directory containing a
-\texttt{compile\_commands.json} file. With this option set, \FramaC will parse
+file named \texttt{compile\_commands.json}. With this option set,
+\FramaC will parse
 the compilation database and include associated preprocessing flags.
 
 By default, \acsl annotations are pre-processed (option \optiondef{-}{pp-annot}
