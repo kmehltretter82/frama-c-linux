@@ -26,9 +26,6 @@
 #if defined(__FC_MACHDEP_X86_32) || defined(__FC_MACHDEP_GCC_X86_32)
 #define __FC_FORCE_INCLUDE_MACHDEP__
 #include "__fc_machdep_linux_shared.h"
-#ifdef __FC_MACHDEP_GCC_X86_32
-#include "__fc_gcc_builtins.h"
-#endif
 #undef __FC_FORCE_INCLUDE_MACHDEP__
 #define  __FC_BYTE_ORDER __LITTLE_ENDIAN
 /* Required */
@@ -112,14 +109,15 @@
 #define __FC_WINT_MIN 0
 #define __FC_WINT_MAX __FC_UINT_MAX
 
+#ifdef __FC_MACHDEP_GCC_X86_32
+#include "__fc_gcc_builtins.h"
+#endif
+
 // End of X86_32 || GCC_X86_32
 #else
 #if defined(__FC_MACHDEP_X86_64) || defined(__FC_MACHDEP_GCC_X86_64)
 #define __FC_FORCE_INCLUDE_MACHDEP__
 #include "__fc_machdep_linux_shared.h"
-#ifdef __FC_MACHDEP_GCC_X86_64
-#include "__fc_gcc_builtins.h"
-#endif
 #undef __FC_FORCE_INCLUDE_MACHDEP__
 #define  __FC_BYTE_ORDER __LITTLE_ENDIAN
 /* Required */
@@ -212,14 +210,15 @@
 #define __FC_WINT_MIN 0
 #define __FC_WINT_MAX __FC_UINT_MAX
 
+#ifdef __FC_MACHDEP_GCC_X86_64
+#include "__fc_gcc_builtins.h"
+#endif
+
 // End of X86_64 || GCC_X86_64
 #else
 #if defined(__FC_MACHDEP_X86_16) || defined(__FC_MACHDEP_GCC_X86_16)
 #define __FC_FORCE_INCLUDE_MACHDEP__
 #include "__fc_machdep_linux_shared.h"
-#ifdef __FC_MACHDEP_GCC_X86_16
-#include "__fc_gcc_builtins.h"
-#endif
 #undef __FC_FORCE_INCLUDE_MACHDEP__
 #define  __FC_BYTE_ORDER __LITTLE_ENDIAN
 /* Required */
@@ -314,6 +313,10 @@
 #define __FC_WEOF (0xFFFFFFFFUL)
 #define __FC_WINT_MIN 0
 #define __FC_WINT_MAX __FC_ULONG_MAX
+
+#ifdef __FC_MACHDEP_GCC_X86_16
+#include "__fc_gcc_builtins.h"
+#endif
 
 // End of X86_16 || GCC_X86_16
 #else
