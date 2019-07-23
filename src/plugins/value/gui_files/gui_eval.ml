@@ -40,15 +40,14 @@ let term_c_type t =
 let classify_pre_post kf ip =
   let open Property in
   match ip with
-  | IPPredicate (PKEnsures (_, Normal),_,_,_) ->
-    Some (GL_Post kf)
-  | IPPredicate (PKEnsures _,_,_,_) | IPAxiom _ | IPAxiomatic _ | IPLemma _
+  | IPPredicate {ip_kind = PKEnsures (_, Normal)} -> Some (GL_Post kf)
+  | IPPredicate {ip_kind=PKEnsures _} | IPAxiom _ | IPAxiomatic _ | IPLemma _
   | IPTypeInvariant _ | IPGlobalInvariant _
   | IPOther _ | IPCodeAnnot _ | IPAllocation _ | IPReachable _
   | IPExtended _
   | IPBehavior _ -> None
-  | IPPropertyInstance (kf, stmt, _, _ip) -> Some (GL_Stmt (kf, stmt))
-  | IPPredicate (PKRequires _,_,_,_ | PKAssumes _,_,_,_ | PKTerminates ,_,_,_)
+  | IPPropertyInstance {ii_kf; ii_stmt} -> Some (GL_Stmt (ii_kf, ii_stmt))
+  | IPPredicate {ip_kind=PKRequires _ | PKAssumes _ | PKTerminates}
   | IPComplete _ | IPDisjoint _  | IPAssigns _ | IPFrom _ | IPDecrease _ ->
     Some (GL_Pre kf)
 

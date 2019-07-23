@@ -413,32 +413,32 @@ let rec monitored_property ip =
   let open Property in
   match ip with
   | IPBehavior _ -> false
-  | IPPredicate (PKAssumes _,_,_,_) -> false
-  | IPPredicate (PKRequires _,_,_,_) -> true
-  | IPPredicate (PKEnsures _,_,_,_) -> true
-  | IPPredicate (PKTerminates,_,_,_) -> true
-  | IPAllocation(_,_,_,_) -> true
-  | IPAssigns(_,_,_,_) -> true
-  | IPFrom(_,_,_,_) -> true
-  | IPDecrease (_,_,_,_) -> true
-  | IPCodeAnnot (_,_, { annot_content = AStmtSpec _ } ) -> false
-  | IPCodeAnnot (_,_, { annot_content = APragma _ } ) -> false
-  | IPCodeAnnot (_,_, { annot_content = AExtended _ } ) -> true
-  | IPCodeAnnot (_,_, { annot_content = AAssert _ } ) -> true
-  | IPCodeAnnot (_,_, { annot_content = AInvariant _ } ) -> true
-  | IPCodeAnnot (_,_, { annot_content = AVariant _ } ) -> true
-  | IPCodeAnnot (_,_, { annot_content = AAssigns _ } ) -> true
-  | IPCodeAnnot (_,_, { annot_content = AAllocation _ } ) -> true
-  | IPComplete (_,_,_,_) -> true
-  | IPDisjoint(_,_,_,_) -> true
-  | IPReachable (None,_,_) -> false
-  | IPReachable (Some _,_,_) -> true
+  | IPPredicate {ip_kind = PKAssumes _} -> false
+  | IPPredicate {ip_kind = PKRequires _} -> true
+  | IPPredicate {ip_kind = PKEnsures _} -> true
+  | IPPredicate {ip_kind = PKTerminates} -> true
+  | IPAllocation _ -> true
+  | IPAssigns _ -> true
+  | IPFrom _-> true
+  | IPDecrease _ -> true
+  | IPCodeAnnot {ica_ca = { annot_content = AStmtSpec _ }} -> false
+  | IPCodeAnnot {ica_ca = { annot_content = APragma _ }} -> false
+  | IPCodeAnnot {ica_ca = { annot_content = AExtended _ }} -> true
+  | IPCodeAnnot {ica_ca = { annot_content = AAssert _ }} -> true
+  | IPCodeAnnot {ica_ca = { annot_content = AInvariant _ }} -> true
+  | IPCodeAnnot {ica_ca = { annot_content = AVariant _ }} -> true
+  | IPCodeAnnot {ica_ca = { annot_content = AAssigns _ }} -> true
+  | IPCodeAnnot {ica_ca = { annot_content = AAllocation _ }} -> true
+  | IPComplete _ -> true
+  | IPDisjoint _ -> true
+  | IPReachable {ir_kf=None} -> false
+  | IPReachable {ir_kf=Some _} -> true
   | IPAxiomatic _ | IPAxiom _ -> false
-  | IPLemma(_,_,_,_,_) -> true
-  | IPTypeInvariant(_,_,_,_) | IPGlobalInvariant(_,_,_) -> true
-  | IPOther(_,_) -> true
+  | IPLemma _ -> true
+  | IPTypeInvariant _ | IPGlobalInvariant _ -> true
+  | IPOther _ -> true
   | IPExtended _ -> true
-  | IPPropertyInstance (_, _, _, ip) -> monitored_property ip
+  | IPPropertyInstance {ii_ip} -> monitored_property ii_ip
 
 let monitor_status properties ip =
   if monitored_property ip then

@@ -38,31 +38,31 @@ class type computer =
 (* -------------------------------------------------------------------------- *)
 
 let compute_ip cc ip =
-  match ip with
-  | Property.IPLemma _
-  | Property.IPAxiomatic _
+  let open Property in match ip with
+  | IPLemma _
+  | IPAxiomatic _
     ->
       let rec iter cc = function
-        | Property.IPLemma(name,_,_,_,_) -> cc#add_lemma (LogicUsage.logic_lemma name)
-        | Property.IPAxiomatic(_,ips) -> List.iter (iter cc) ips
+        | IPLemma {il_name} -> cc#add_lemma (LogicUsage.logic_lemma il_name)
+        | IPAxiomatic {iax_props} -> List.iter (iter cc) iax_props
         | _ -> ()
       in iter cc ip ;
       cc#compute
 
-  | Property.IPBehavior (kf,_,_,b)  ->
+  | IPBehavior {ib_kf; ib_bhv} ->
       let model = cc#model in
-      let bhv = [b.Cil_types.b_name] in
+      let bhv = [ib_bhv.Cil_types.b_name] in
       let assigns = WpAnnot.WithAssigns in
       List.iter cc#add_strategy
-        (WpAnnot.get_function_strategies ~model ~assigns ~bhv kf) ;
+        (WpAnnot.get_function_strategies ~model ~assigns ~bhv ib_kf) ;
       cc#compute
-  | Property.IPComplete _
-  | Property.IPDisjoint _
-  | Property.IPCodeAnnot _
-  | Property.IPAllocation _
-  | Property.IPAssigns _
-  | Property.IPDecrease _
-  | Property.IPPredicate _
+  | IPComplete _
+  | IPDisjoint _
+  | IPCodeAnnot _
+  | IPAllocation _
+  | IPAssigns _
+  | IPDecrease _
+  | IPPredicate _
     ->
       let model = cc#model in
       let assigns = WpAnnot.WithAssigns in
@@ -70,16 +70,16 @@ let compute_ip cc ip =
         (WpAnnot.get_id_prop_strategies ~model ~assigns ip) ;
       cc#compute
 
-  | Property.IPFrom _
-  | Property.IPAxiom _
-  | Property.IPReachable _
-  | Property.IPPropertyInstance _
-  | Property.IPOther _
-  | Property.IPTypeInvariant _
-  | Property.IPGlobalInvariant _
-  | Property.IPExtended _
+  | IPFrom _
+  | IPAxiom _
+  | IPReachable _
+  | IPPropertyInstance _
+  | IPOther _
+  | IPTypeInvariant _
+  | IPGlobalInvariant _
+  | IPExtended _
     ->
-      Wp_parameters.result "Nothing to compute for '%a'" Property.pretty ip ;
+      Wp_parameters.result "Nothing to compute for '%a'" pretty ip ;
       Bag.empty
 
 (* -------------------------------------------------------------------------- *)

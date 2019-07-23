@@ -42,13 +42,13 @@ module Behavior_extensions = struct
     | Ext_preds preds ->
       Pretty_utils.pp_list ~sep:",@ " printer#predicate fmt preds
 
-  let pp (printer) fmt (_,name,_,_,ext) =
+  let pp (printer) fmt {ext_name; ext_kind} =
     let pp =
       try
-        Hashtbl.find printer_tbl name
+        Hashtbl.find printer_tbl ext_name
       with Not_found -> default_pp
     in
-    Format.fprintf fmt "@[<hov 2>%s %a;@]" name (pp printer) ext
+    Format.fprintf fmt "@[<hov 2>%s %a;@]" ext_name (pp printer) ext_kind
 
 end
 let register_behavior_extension = Behavior_extensions.register
@@ -152,7 +152,7 @@ let state =
    parenthesized if its parentheses level is >= that that of its context.
    Identifiers have the lowest level and weakly binding operators (e.g. |)
    have the largest level. The correctness criterion is that a smaller level
-   MUST correspond to a stronger precedence! 
+   MUST correspond to a stronger precedence!
    These levels must be coherent with the precedence used in file
    [src/kernel_internals/parsing/logic_parser.mly].
 *)
@@ -236,9 +236,9 @@ module Precedence = struct
     | Pand _ -> and_level
 
     | Papp _ as p ->
-        if subset_is_backslash_in p = None then
-          applicationLevel
-        else belongLevel
+      if subset_is_backslash_in p = None then
+        applicationLevel
+      else belongLevel
     | Prel _ -> comparativeLevel
     | Pnot _ -> unaryLevel
 
@@ -2381,11 +2381,11 @@ class cil_printer () = object (self)
         (Pretty_utils.pp_opt
            (fun fmt p -> fprintf fmt ";@ %a" self#predicate p)) p
     | Trange(low,high) ->
-        fprintf fmt "@[%a..%a@]"
-          (Pretty_utils.pp_opt
-             (fun fmt v -> Format.fprintf fmt "%a " term v)) low
-          (Pretty_utils.pp_opt
-             (fun fmt v -> Format.fprintf fmt "@ %a" term v)) high;
+      fprintf fmt "@[%a..%a@]"
+        (Pretty_utils.pp_opt
+           (fun fmt v -> Format.fprintf fmt "%a " term v)) low
+        (Pretty_utils.pp_opt
+           (fun fmt v -> Format.fprintf fmt "@ %a" term v)) high;
     | Tlet(def,body) ->
       assert
         (Kernel.verify (def.l_labels = [])

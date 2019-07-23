@@ -902,7 +902,11 @@ and pp_spec fmt spec =
       (pp_list (pp_list pp_string)) spec.spec_complete_behaviors
       (pp_list (pp_list pp_string)) spec.spec_disjoint_behaviors
 
-and pp_acsl_extension fmt = pp_tuple5 pp_int pp_string pp_location pp_bool pp_acsl_extension_kind fmt
+and pp_acsl_extension fmt ext =
+  Format.fprintf fmt
+    "{ext_id=%d;ext_name=%s;ext_loc=%a;ext_has_status=%B;ext_kind=%a}"
+    ext.ext_id ext.ext_name pp_location ext.ext_loc ext.ext_has_status
+    pp_acsl_extension_kind ext.ext_kind
 
 and pp_acsl_extension_kind fmt = function
   | Ext_id(int) -> Format.fprintf fmt "Ext_id(%a)"  pp_int int
