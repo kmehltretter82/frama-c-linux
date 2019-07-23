@@ -775,7 +775,7 @@ let highlighter (buffer:reactive_buffer) localizable ~start ~stop =
        'Unknown'. *)
     let filter (ip_src, _ip_copy) =
       match ip_src with
-      | Property.IPPredicate {Property.ip_kind=PKRequires bhv} ->
+      | Property.IPPredicate {Property.ip_kind=Property.PKRequires bhv} ->
         bhv.b_assumes = []
       | _ -> false
     in
