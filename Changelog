@@ -17,6 +17,7 @@
 Open Source Release <next-release>
 ##################################
 
+o!  Kernel    [2019/07/23] Types in Properties are now records and not tuples
 o!  Kernel    [2019/06/28] removes AST constructors TCoerce, TCoerceE,
               PLCoercion, PLCoercionE, Psubtype and PLsubtype
 -*  Kernel    [2019/06/20] fixes dangling ref when removing unused static local
