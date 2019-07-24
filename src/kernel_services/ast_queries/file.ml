@@ -392,52 +392,24 @@ let safe_remove_file (f : Datatype.Filepath.t) =
     Extlib.safe_remove (f :> string)
 
 let build_cpp_cmd cmdl supp_args in_file out_file =
+  (* using Filename.quote for filenames which contain space or shell
+     metacharacters *)
+  let in_file = Filename.quote in_file
+  and out_file = Filename.quote out_file in
+  let substitute s =
+    match Str.matched_string s with
+    | "%%" -> "%"
+    | "%args" -> supp_args
+    | "%1" | "%i" | "%input" -> in_file
+    | "%2" | "%o" | "%output" -> out_file
+    | s -> s (* Unrecognized parameters are left intact *)
+  in
+  let regexp = Str.regexp "%%\\|%[a-z0-9]+" in
   try
-    (* Format.eprintf "-cpp-command=|%s|@\n" cmdl; *)
-    (* look at the command line to find two "%s" or one "%1" and a "%2"
-    *)
-    let percent1 = String.index cmdl '%' in
-    (* Format.eprintf "-cpp-command percent1=%d@\n" percent1;
-       Format.eprintf "-cpp-command %%%c@\n" (String.get cmdl
-       (percent1+1)); *)
-    let percent2 = String.index_from cmdl (percent1+1) '%' in
-    (* Format.eprintf "-cpp-command percent2=%d@\n" percent2;
-       Format.eprintf "-cpp-command %%%c@\n" (String.get cmdl
-       (percent2+1)); *)
-    let file1, file2 =
-      match String.get cmdl (percent1+1), String.get cmdl (percent2+1)
-      with
-      | '1', '2' ->
-        in_file, out_file
-      (* "%1" followed by "%2" is used to printf 'ppf' after 'f' *)
-      | '2', '1' ->
-        out_file, in_file
-      | _, _ -> raise (Invalid_argument "maybe a bad cpp command")
-    in
-    let cmd1 = String.sub cmdl 0 percent1 in
-    (* Format.eprintf "-cpp-command cmd1=|%s|@\n" cmd1; *)
-    let cmd2 =
-      String.sub cmdl (percent1 + 2) (percent2 - (percent1 + 2))
-    in
-    (* Format.eprintf "-cpp-command cmd2=|%s|@\n" cmd2; *)
-    let cmd3 =
-      String.sub cmdl (percent2 + 2) (String.length cmdl - (percent2 + 2))
-    in
-    (* Format.eprintf "-cpp-command cmd3=|%s|@\n" cmd3; *)
-    Format.sprintf "%s%s %s %s%s%s" cmd1
-      (* using Filename.quote for filenames which contain space or
-         shell metacharacters *)
-      (Filename.quote file1)
-      supp_args
-      cmd2 (Filename.quote file2) cmd3
-  with
-  | Invalid_argument _
-  | Not_found ->
-    Format.sprintf "%s %s -o %s %s" cmdl
-      supp_args
-      (* using Filename.quote for filenames which contain space or
-         shell metacharacters *)
-      (Filename.quote out_file) (Filename.quote in_file)
+    ignore (Str.search_forward regexp cmdl 0); (* Try to find one match *)
+    Str.global_substitute regexp substitute cmdl
+  with Not_found ->
+    Format.sprintf "%s %s -o %s %s" cmdl supp_args out_file in_file
 
 let parse_cabs = function
   | NoCPP f ->
