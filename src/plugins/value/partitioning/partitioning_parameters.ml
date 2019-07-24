@@ -58,7 +58,7 @@ struct
     !Db.Properties.Interp.term_to_exp ~result:None term
 
   let min_loop_unroll = MinLoopUnroll.get ()
-
+  let auto_loop_unroll = AutoLoopUnroll.get ()
   let default_loop_unroll = DefaultLoopUnroll.get ()
 
   let warn_no_loop_unroll stmt =
@@ -76,7 +76,11 @@ struct
         "%s loop without unroll annotation" loop_kind
 
   let unroll stmt =
-    let default = Partition.IntLimit min_loop_unroll in
+    let default =
+      if auto_loop_unroll > min_loop_unroll
+      then Partition.AutoUnroll (stmt, min_loop_unroll, auto_loop_unroll)
+      else Partition.IntLimit min_loop_unroll
+    in
     match get_unroll_annot stmt with
     | [] -> warn_no_loop_unroll stmt; default
     | [None] -> Partition.IntLimit default_loop_unroll

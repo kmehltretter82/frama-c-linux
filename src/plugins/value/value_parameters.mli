@@ -93,6 +93,7 @@ module SlevelFunction:
 module SlevelMergeAfterLoop: Parameter_sig.Kernel_function_set
 
 module MinLoopUnroll : Parameter_sig.Int
+module AutoLoopUnroll : Parameter_sig.Int
 module DefaultLoopUnroll : Parameter_sig.Int
 module HistoryPartitioning : Parameter_sig.Int
 module ValuePartitioning : Parameter_sig.String_set
