@@ -288,7 +288,7 @@ let string_to_float_lconstant string =
      constant and the nearest parsed float is exact. Otherwise, use the upper
      and lower float computed by [parse]. *)
   let l = String.length string - 1 in
-  let last = Transitioning.Char.uppercase_ascii string.[l] in
+  let last = Char.uppercase_ascii string.[l] in
   let exact = last = 'F' || last = 'D' in
   if exact
   then LReal (real_of_float string f.Floating_point.f_nearest)

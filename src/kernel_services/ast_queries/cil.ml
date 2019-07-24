@@ -4149,7 +4149,7 @@ let parseIntAux (str:string) =
     fun s ->
       let ls = String.length s in
       l >= ls &&
-      s = Transitioning.String.uppercase_ascii (String.sub str (l - ls) ls)
+      s = String.uppercase_ascii (String.sub str (l - ls) ls)
   in
   let l = String.length str in
   (* See if it is octal or hex or binary *)

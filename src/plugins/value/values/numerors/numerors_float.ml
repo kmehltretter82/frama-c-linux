@@ -101,7 +101,7 @@ let of_float  ?(rnd = Rounding.Near) ?(prec = P.Real) f =
 let of_string ?(rnd = Rounding.Near) ?(prec = P.Real) str =
   prec >>- fun () ->
   let l = String.length str - 1 in
-  let last = Transitioning.Char.lowercase_ascii str.[l] in
+  let last = Char.lowercase_ascii str.[l] in
   let str =
     if last = 'f' || last = 'd' || last = 'l'
     then String.sub str 0 l

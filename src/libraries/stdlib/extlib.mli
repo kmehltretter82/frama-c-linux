@@ -154,7 +154,9 @@ val mapi: (int -> 'a -> 'b) -> 'a list -> 'b list
       @since Oxygen-20120901 *)
 
 val sort_unique: ('a -> 'a -> int) -> 'a list -> 'a list
-  (**  Same as List.sort , but also remove duplicates. *)
+  (**  Same as List.sort , but also remove duplicates.
+       @deprecated use List.sort_uniq instead
+  *)
 
 val subsets: int -> 'a list -> 'a list list
   (** [subsets k l] computes the combinations of [k] elements from list [l].

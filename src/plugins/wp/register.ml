@@ -145,7 +145,7 @@ let do_wp_report () =
       begin
         let stats = WpReport.fcstat () in
         begin
-          match Transitioning.String.split_on_char ':' jreport with
+          match String.split_on_char ':' jreport with
           | [] | [""] -> ()
           | [joutput] ->
               WpReport.export_json stats ~joutput () ;

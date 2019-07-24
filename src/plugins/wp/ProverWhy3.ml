@@ -52,7 +52,7 @@ let cluster_file c =
 
 let theory_name_of_cluster c =
   let base = cluster_id c in
-  Transitioning.String.capitalize_ascii base
+  String.capitalize_ascii base
 
 let theory_name_of_pid pid = "VC" ^ WpPropId.get_propid pid
 
@@ -148,13 +148,13 @@ class visitor fmt c =
       self#lines ;
       let name = (cluster_id c) in
       Format.fprintf fmt "use %s.%s@\n"
-        name (Transitioning.String.capitalize_ascii name) ;
+        name (String.capitalize_ascii name) ;
       deps <- (D_cluster c) :: deps
 
     method add_extlib file =
       let thy = filenoext file in
       let path = LogicBuiltins.find_lib file in
-      self#add_import2 thy (Transitioning.String.capitalize_ascii thy) ;
+      self#add_import2 thy (String.capitalize_ascii thy) ;
       self#add_dfile path
 
     method on_library thy =
@@ -163,7 +163,7 @@ class visitor fmt c =
         | [file] ->
             let filenoext = filenoext file in
             self#add_import2 filenoext
-              (Transitioning.String.capitalize_ascii filenoext) ;
+              (String.capitalize_ascii filenoext) ;
             self#add_dfile file
         | [file;lib] ->
             self#add_import2 (filenoext file) lib ;
