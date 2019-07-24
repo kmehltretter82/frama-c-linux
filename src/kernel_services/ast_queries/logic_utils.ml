@@ -1939,15 +1939,15 @@ let merge_behaviors ?(oldloc=Cil_datatype.Location.unknown) ~silent old_behavior
           if not (is_same_behavior b old_b) then begin
             if not silent then
               let curloc = CurrentLoc.get () in
-              let source =
-                if Cil_datatype.Location.(equal oldloc unknown) then fst curloc
-                else fst oldloc
+              let source, oldloc =
+                if Cil_datatype.Location.(equal oldloc unknown) then
+                  fst curloc, oldloc
+                else fst oldloc, curloc
               in
               Kernel.warning ~source "found two %s%a. Merging them%t"
                 (if Cil.is_default_behavior b then "contracts"
                  else "behaviors named " ^ b.b_name)
-                pp_old_loc (if Cil_datatype.Position.equal source (fst curloc)
-                            then Cil_datatype.Location.unknown else curloc)
+                pp_old_loc oldloc
                 (fun fmt ->
                    if Kernel.debug_atleast 1 then
                      Format.fprintf fmt ":@ @[%a@] vs. @[%a@]"
@@ -1982,16 +1982,29 @@ let merge_funspec ?(oldloc=Cil_datatype.Location.unknown) ?(silent_about_merging
        | Some _, None -> ()
        | None, Some _ -> old_spec.spec_variant <- fresh_spec.spec_variant
        | Some _old, Some _fresh ->
-         Kernel.warning ~current:true
-           "found two variants for function specification%a. Keeping only the first one."
+         let curloc = CurrentLoc.get() in
+         let source, oldloc =
+           if Cil_datatype.Location.(equal oldloc unknown) then
+             fst curloc, oldloc
+           else fst oldloc, curloc
+         in
+         Kernel.warning ~source
+           "found two variants for function specification%a. \
+            Keeping only the first one."
            pp_old_loc oldloc);
       (match old_spec.spec_terminates, fresh_spec.spec_terminates with
        | None, None -> ()
        | Some p1, Some p2 when is_same_identified_predicate p1 p2 -> ()
        | _ ->
-         Kernel.warning ~current:true
-           "found two different terminates clauses for function specification%a. \
-            keeping only the fist one"
+         let curloc = CurrentLoc.get() in
+         let source, oldloc =
+           if Cil_datatype.Location.(equal oldloc unknown) then
+             fst curloc, oldloc
+           else fst oldloc, curloc
+         in
+         Kernel.warning ~source
+           "found two different terminates clauses \
+            for function specification%a. Keeping only the first one"
            pp_old_loc oldloc);
       old_spec.spec_complete_behaviors <-
         List.fold_left (fun acc b ->
