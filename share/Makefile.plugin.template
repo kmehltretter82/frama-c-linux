@@ -553,12 +553,7 @@ endif # PLUGIN_HAS_META
 @PLUGIN_NAME@_PLUGIN_MLI:= $(PLUGIN_DIR)/@PLUGIN_NAME@.mli
 @PLUGIN_NAME@_CHECK_PLUGIN_MLI:=$(PLUGIN_DIR)/@PLUGIN_NAME@.check_mli_exists
 
-# Prevents warning 58 in OCaml 4.03 for our plugins.
-ifeq ($(HAS_OCAML403),yes)
-  $(TARGET_CMI): BFLAGS:=$($(NAME_BFLAGS)) -opaque
-else
-  $(TARGET_CMI): BFLAGS:=$($(NAME_BFLAGS))
-endif
+$(TARGET_CMI): BFLAGS:=$($(NAME_BFLAGS)) -opaque
 
 $(TARGET_CMI): $(PLUGIN_CMO)
 

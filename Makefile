@@ -1536,11 +1536,8 @@ STDLIB_FILES:=\
 	stack \
 	string \
 	sys \
-        weak
-
-ifeq ($(HAS_OCAML403),yes)
-  STDLIB_FILES+=ephemeron
-endif
+	weak \
+	ephemeron
 
 ifeq ($(HAS_OCAML407),no)
   STDLIB_FILES+=pervasives
