@@ -86,6 +86,7 @@ why3.import += "frama_c_wp.cint.Cint";
 altergo.file += "ergo/Cint.mlw";
 
 library cbits: cint
+logic boolean "bit_test"(integer,integer) := \bit_test_stdlib;
 coq.file += "coqwp/Cbits.v";
 altergo.file += "ergo/Cbits.mlw";
 why3.import += "frama_c_wp.cbits.Cbits";

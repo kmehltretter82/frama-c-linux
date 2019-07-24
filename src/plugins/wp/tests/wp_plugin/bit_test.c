@@ -31,3 +31,14 @@ void check2(int order1, int order2)
 {
   return;
 }
+
+
+#include "__fc_integer.h"
+
+/*@
+    ensures ko: bit_test(order1, 0) ≡ bit_test(order2, 0);
+ */
+void check3(int order1, int order2)
+{
+  return;
+}

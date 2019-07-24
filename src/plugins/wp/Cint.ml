@@ -94,10 +94,13 @@ let f_land = Lang.extern_f ~library ~result ~category:(Operator op_land) ~balanc
 let f_lxor = Lang.extern_f ~library ~result ~category:(Operator op_lxor) ~balance "lxor"
 let f_lsl = Lang.extern_f ~library ~result "lsl"
 let f_lsr = Lang.extern_f ~library ~result "lsr"
-let f_bit = Lang.extern_p ~library ~bool:"bit_testb" ~prop:"bit_test" ()
 
 let f_bitwised = [ f_lnot ; f_lor ; f_land ; f_lxor ; f_lsl ; f_lsr ]
 
+let f_bit_stdlib = Lang.extern_p ~library ~bool:"bit_testb" ~prop:"bit_test" ()
+let f_bit        = Lang.extern_p ~library ~bool:"bit_testb" ~prop:"bit_test" ()
+
+let () = let open LogicBuiltins in add_builtin "\\bit_test_stdlib" [Z;Z] f_bit_stdlib
 let () = let open LogicBuiltins in add_builtin "\\bit_test" [Z;Z] f_bit
 
 (* -------------------------------------------------------------------------- *)
@@ -465,7 +468,13 @@ let smp2 f zf = (* f(c1,c2) ~> zf(c1,c2),  f(c1,c2,...) ~> f(zf(c1,c2),...) *)
     end
   | _ -> raise Not_found
 
-let bitk_positive k e = e_fun f_bit [e;k]
+let bitk_positive k e = F.e_fun f_bit [e;k]
+let smp_intro_bitk_positive = function
+  | [ a ; k ] when is_positive_or_null k -> bitk_positive k a
+  | [ a ; k ] -> (* TODO: expand the current logic definition of the ACSL stdlib symbol *)
+      F.e_neq F.e_zero (F.e_fun f_land [a; (F.e_fun f_lsl [F.e_one;k])])
+  | _ -> raise Not_found
+
 let smp_bitk_positive = function
   | [ a ; k ] -> (* requires k>=0 *)
       begin
@@ -753,6 +762,7 @@ let () =
         begin
           let mk_builtin n f ?eq ?leq smp = n, { f ; eq; leq; smp } in
 
+          let bi_lbit_stdlib = mk_builtin "f_bit_stdlib" f_bit_stdlib smp_intro_bitk_positive in
           let bi_lbit = mk_builtin "f_bit" f_bit smp_bitk_positive in
           let bi_lnot = mk_builtin "f_lnot" f_lnot ~eq:smp_eq_with_lnot
               (smp1 Integer.lognot) in
@@ -777,7 +787,7 @@ let () =
                | None -> ()
                | Some leq -> F.set_builtin_leq f leq)
             end
-            [bi_lbit; bi_lnot; bi_lxor; bi_lor; bi_land; bi_lsl; bi_lsr]
+            [bi_lbit_stdlib ; bi_lbit; bi_lnot; bi_lxor; bi_lor; bi_land; bi_lsl; bi_lsr]
 
         end
     end
