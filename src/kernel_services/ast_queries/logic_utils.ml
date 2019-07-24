@@ -1938,13 +1938,7 @@ let merge_behaviors ?(oldloc=Cil_datatype.Location.unknown) ~silent old_behavior
           let old_b = List.find (fun x -> x.b_name = b.b_name) old_behaviors in
           if not (is_same_behavior b old_b) then begin
             if not silent then
-              let curloc = CurrentLoc.get () in
-              let source, oldloc =
-                if Cil_datatype.Location.(equal oldloc unknown) then
-                  fst curloc, oldloc
-                else fst oldloc, curloc
-              in
-              Kernel.warning ~source "found two %s%a. Merging them%t"
+              Kernel.warning ~current:true "found two %s%a. Merging them%t"
                 (if Cil.is_default_behavior b then "contracts"
                  else "behaviors named " ^ b.b_name)
                 pp_old_loc oldloc
@@ -1982,13 +1976,7 @@ let merge_funspec ?(oldloc=Cil_datatype.Location.unknown) ?(silent_about_merging
        | Some _, None -> ()
        | None, Some _ -> old_spec.spec_variant <- fresh_spec.spec_variant
        | Some _old, Some _fresh ->
-         let curloc = CurrentLoc.get() in
-         let source, oldloc =
-           if Cil_datatype.Location.(equal oldloc unknown) then
-             fst curloc, oldloc
-           else fst oldloc, curloc
-         in
-         Kernel.warning ~source
+         Kernel.warning ~current:true
            "found two variants for function specification%a. \
             Keeping only the first one."
            pp_old_loc oldloc);
@@ -1996,13 +1984,7 @@ let merge_funspec ?(oldloc=Cil_datatype.Location.unknown) ?(silent_about_merging
        | None, None -> ()
        | Some p1, Some p2 when is_same_identified_predicate p1 p2 -> ()
        | _ ->
-         let curloc = CurrentLoc.get() in
-         let source, oldloc =
-           if Cil_datatype.Location.(equal oldloc unknown) then
-             fst curloc, oldloc
-           else fst oldloc, curloc
-         in
-         Kernel.warning ~source
+         Kernel.warning ~current:true
            "found two different terminates clauses \
             for function specification%a. Keeping only the first one"
            pp_old_loc oldloc);
