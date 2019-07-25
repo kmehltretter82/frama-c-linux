@@ -264,6 +264,7 @@ DISTRIB_FILES:=\
       share/analysis-scripts/frama_c_results.py                         \
       share/analysis-scripts/git_utils.py                               \
       share/analysis-scripts/list_files.py                              \
+      share/analysis-scripts/make_template.py                           \
       share/analysis-scripts/make_wrapper.py                            \
       share/analysis-scripts/parse-coverage.sh                          \
       share/analysis-scripts/README.md                                  \

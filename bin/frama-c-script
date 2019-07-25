@@ -120,62 +120,6 @@ open_file() {
     esac
 }
 
-make_template() {
-    if [ "$#" -gt 0 ]; then
-        dir="${1%/}"
-    else
-        dir="."
-    fi
-    path="$dir/GNUmakefile"
-    path_tmp="${path}.tmp"
-    check_path_exists "$path"
-    read -p "Main target name: " main
-    if [[ ! ( "$main" =~ ^[a-zA-Z_0-9]+$ ) ]]; then
-        echo "error: invalid main target name";
-        exit 1
-    fi
-    read -p "Source files separated by spaces (default if empty: *.c): " sources
-    if [ "$sources" = "" ]; then
-        sources="*.c"
-    fi
-
-    add_main_stub=0
-    read -p "Add stub for function main (only needed if it uses command-line arguments)? [y/N] " yn
-    case $yn in
-        [Yy])
-            add_main_stub=1
-            sources="fc_stubs.c $sources"
-            ;;
-        *)
-            ;;
-    esac
-
-    sed "s/^MAIN_TARGET :=/MAIN_TARGET := ${main}/" "${FRAMAC_SHARE}/analysis-scripts/template.mk" > "$path"
-    sed "s|\$(MAIN_TARGET).parse:|\$(MAIN_TARGET).parse: $sources|" "$path" | sed "/# Remove these lines after defining the main target/{N;N;N;N;d;}" > "$path_tmp"; mv "$path_tmp" "$path"
-    if [ -e "compile_commands.json" ]; then
-        read -p "compile_commands.json exists, add option -json-compilation-database? [Y/n] " yn
-        case $yn in
-            [Nn])
-                echo "Option not added; you can later add it to FCFLAGS."
-                ;;
-            *)
-                # the command below inserts a line after matching a given
-                # pattern; compatible with macOS sed
-                sed -e '/^FCFLAGS[[:space:]]\++=/a\
-\ \ -json-compilation-database .\\' "$path" > "$path_tmp"; mv "$path_tmp" "$path"
-                ;;
-        esac
-    fi
-    if [ $add_main_stub -eq 1 ]; then
-        check_path_exists "fc_stubs.c"
-        cp "${FRAMAC_SHARE}/analysis-scripts/fc_stubs.c" "./"
-        echo "Created stub for main function: fc_stubs.c"
-        sed -e '/^FCFLAGS[[:space:]]\++=/a\
-\ \ -main eva_main \\' "$path" > "$path_tmp"; mv "$path_tmp" "$path"
-    fi
-    echo "Template created: $path"
-}
-
 make_path() {
     cat <<EOF > frama-c-path.mk
 FRAMAC_DIR=${DIR}
@@ -288,7 +232,7 @@ case "$command" in
         ;;
     "make-template")
         shift;
-        make_template "$@";
+        ${FRAMAC_SHARE}/analysis-scripts/make_template.py "$0" "$@";
         ;;
     "make-path")
         shift;
