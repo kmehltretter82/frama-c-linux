@@ -435,25 +435,28 @@ let rec of_term ~cnv expected t : Why3.Term.term =
         let t_app ls l r  =
           Why3.Term.t_app ls l r
         in
-        let apply_from_ns s l =
-          match Why3.Theory.(ns_find_ls (get_namespace cnv.th) (cut_path s)), sort with
-          | ls, (Prop | Bool) -> t_app ls l (of_tau cnv sort)
-          | ls, _ -> t_app ls l (of_tau cnv expected)
+        let apply_from_ns s l sort =
+          match Why3.Theory.(ns_find_ls (get_namespace cnv.th) (cut_path s)), expected with
+          | ls, (Prop | Bool) ->
+              coerce ~cnv sort expected $
+              t_app ls l (of_tau cnv sort)
+          | ls, _ ->
+              coerce ~cnv sort expected $
+              t_app ls l (of_tau cnv sort)
           | exception Not_found -> Wp_parameters.fatal "Can't find [%s] in why3 namespace" s
         in
         let apply_from_ns' s l =
           apply_from_ns s (List.map (fun e -> of_term' cnv e) l)
         in
-        coerce ~cnv sort expected $
         match lfun_name f, expected with
-        | F_call s, _ -> apply_from_ns' s l
+        | F_call s, _ -> apply_from_ns' s l sort
         | Qed.Engine.F_subst _, _ -> Wp_parameters.not_yet_implemented "lfun with subst"
         | Qed.Engine.F_left s, _ | Qed.Engine.F_assoc s, _ ->
             let rec aux = function
               | [] -> Wp_parameters.fatal "Empty application"
               | [a] -> of_term cnv expected a
               | a::l ->
-                  apply_from_ns s [of_term' cnv a; aux l]
+                  apply_from_ns s [of_term' cnv a; aux l] sort
             in
             aux l
         | Qed.Engine.F_right s, _ ->
@@ -461,18 +464,18 @@ let rec of_term ~cnv expected t : Why3.Term.term =
               | [] -> Wp_parameters.fatal "Empty application"
               | [a] -> of_term cnv expected a
               | a::l ->
-                  apply_from_ns s [aux l;of_term' cnv a]
+                  apply_from_ns s [aux l;of_term' cnv a] sort
             in
             aux (List.rev l)
         | Qed.Engine.F_list (fcons,fnil), _ ->
             let rec aux = function
-              | [] -> apply_from_ns fnil []
+              | [] -> apply_from_ns fnil [] sort
               | a::l ->
-                  apply_from_ns fcons [of_term' cnv a;aux l]
+                  apply_from_ns fcons [of_term' cnv a;aux l] sort
             in
             aux l
         | Qed.Engine.F_bool_prop (s,_), Bool | Qed.Engine.F_bool_prop (_,s), Prop ->
-            apply_from_ns' s l
+            apply_from_ns' s l expected
         | Qed.Engine.F_bool_prop (_,_), _ ->
             Wp_parameters.fatal "badly expected type %a for term %a"
               Lang.F.pp_tau expected Lang.F.pp_term t
