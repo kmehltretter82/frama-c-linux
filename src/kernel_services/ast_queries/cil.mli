@@ -1372,12 +1372,12 @@ val expToAttrParam: exp -> attrparam
 (** Return the attributes of the global annotation, if any.
     @since Frama-C+dev
 *)
-val global_annotationAttributes: global_annotation -> attributes
+val global_annotation_attributes: global_annotation -> attributes
 
 (** Return the attributes of the global, if any.
     @since Frama-C+dev
 *)
-val globalAttributes: global -> attributes
+val global_attributes: global -> attributes
 
 exception NotAnAttrParam of exp
 
