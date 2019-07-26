@@ -208,30 +208,45 @@ We recommend to rely on it for the installation of Frama-C.
    Do not forget to `opam init` and ``eval `opam config env` `` for a proper
    opam installation (if not already done before on your machine).
 
-2. Install *required* dependencies for Frama-C:
+2. Set up a compatible OCaml version (replace `<version>` with the version
+   indicated in the 'recommended working configuration' section):
+
+    ```shell
+    opam switch create <version>
+    ```
+
+3. Install *required* dependencies for Frama-C:
 
     ```shell
     brew install gmp gtk+ gtksourceview libgnomecanvas
     ```
 
-3. Install *recommended* dependencies for Frama-C:
+4. Install *recommended* dependencies for Frama-C:
 
     ```shell
     brew install graphviz
     opam install why3
     ```
 
-4. Install *optional* dependencies for Frama-C/WP:
+5. Install *optional* dependencies for Frama-C/WP:
 
     ```shell
     opam install coq coqide why3-coq
     ```
 
-5. Install Frama-C:
+6. Install Frama-C:
 
     ```shell
     opam install frama-c
     ```
+    **Note:** for some packages, Homebrew may emit *caveats* about the
+              necessity of manually setting environment variables,
+              e.g. for `libffi`.
+              If installation of some opam package fails, the error message
+              should hopefully indicate which packages are causing it.
+              Reinstalling these Homebrew packages can provide details and
+              help solve the issue.
+
 
 ## Installing Frama-C via your Linux distribution (Debian/Ubuntu/Fedora)
 
