@@ -993,7 +993,7 @@ the sequence above is read in order and defines a configuration level
 
 \begin{itemize}
 \item
-  \texttt{CMD} allows to change the command that is used for the
+  \texttt{CMD} allows changing the command that is used for the
   following \texttt{OPT} directives (until a new \texttt{CMD}
   directive is found). No new test case is generated
   if there is no further \texttt{OPT} directive. At a given
@@ -1068,7 +1068,14 @@ or
   \texttt{@macro-name@} in a \texttt{CMD}, \texttt{LOG}, \texttt{OPT},
   \texttt{STDOPT} or \texttt{EXECNOW} directive at this configuration level
   or in any level below it will be replaced by \texttt{content}. Existing
-  pre-defined macros are listed in section~\ref{sec:ptests-macros}. 
+  pre-defined macros are listed in section~\ref{sec:ptests-macros}.
+\item \texttt{MODULE}\nscodeidx{Test!Directive}{MODULE}
+ directive takes as argument the name of a \texttt{.cmxs}
+  module. It will then add a directive to compile this file with the
+  command \texttt{@PTEST\_MAKE\_MODULE@ <MODULE>} where
+  \texttt{@PTEST\_MAKE\_MODULE@} defaults to \texttt{make -s}. Option
+  \texttt{-load-module <MODULE>} will then be appended to any subsequent Frama-C
+  command triggered by the test.
 \item The \texttt{FILEREG}\nscodeidx{Test!Directive}{FILEREG}
   directive contains a regular expression indicating which files in
   the directory containing the current test suite are actually part of
