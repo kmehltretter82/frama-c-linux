@@ -210,7 +210,7 @@ let pp_active fmt active =
     (Datatype.String.Set.elements active)
 
 let pp_capitalize fmt s =
-  Format.pp_print_string fmt (Transitioning.String.capitalize_ascii s)
+  Format.pp_print_string fmt (String.capitalize_ascii s)
 
 let pp_acsl_extension fmt {ext_name} = pp_capitalize fmt ext_name
 

@@ -93,7 +93,7 @@ let parse_c_option opt =
     let coqid = Filename.chop_extension (Filename.basename c_file) in
     let c_module =
       Printf.sprintf "%s.%s" c_name
-        (Transitioning.String.capitalize_ascii coqid)
+        (String.capitalize_ascii coqid)
     in
     { c_id = opt ; c_source ; c_file ; c_path ; c_name ; c_module }
   with Not_found ->
@@ -101,7 +101,7 @@ let parse_c_option opt =
     let c_source = Filename.dirname opt in
     let c_file = Filename.basename opt in
     let c_module =
-      Transitioning.String.capitalize_ascii (Filename.chop_extension c_file)
+      String.capitalize_ascii (Filename.chop_extension c_file)
     in
     { c_id = opt ; c_source ; c_file ; c_path = "." ; c_name = "" ; c_module }
 

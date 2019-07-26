@@ -21,12 +21,11 @@
 (**************************************************************************)
 
 module R = Report_parameters
-module T = Transitioning
 
 type action = SKIP | INFO | ERROR | REVIEW
 
 let action s =
-  match T.String.uppercase_ascii s with
+  match String.uppercase_ascii s with
   | "INFO" -> INFO
   | "ERROR" -> ERROR
   | "REVIEW" -> REVIEW
@@ -358,7 +357,7 @@ let monitor_log_event (evt : Log.event) =
         Printf.sprintf "%s.unclassified.%s" evt.evt_plugin env.rs_name in
       let e_title =
         Printf.sprintf "Unclassified %s (Plugin '%s')"
-          (T.String.capitalize_ascii env.rs_name) evt.evt_plugin in
+          (String.capitalize_ascii env.rs_name) evt.evt_plugin in
       let e_action = action (env.rs_action ()) in
       { unclassified with e_id ; e_title ; e_action } in
     monitor ~lookup ~category ~msg ~source unclassified
@@ -449,7 +448,7 @@ let monitor_status properties ip =
       let e_id = "unclassified." ^ properties.ps_name in
       let e_title = name in
       let e_action = properties.ps_action () |> action in
-      let e_descr = T.String.capitalize_ascii properties.ps_name ^ " status" in
+      let e_descr = String.capitalize_ascii properties.ps_name ^ " status" in
       { unclassified with e_id ; e_action ; e_title ; e_descr }
     in monitor ~lookup ~category:[] ~msg:name ~source unclassified
 

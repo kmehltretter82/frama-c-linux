@@ -329,7 +329,7 @@ let load_module m =
                 if is_package m && mem_package m then load_packages [m]
                 else
                   let fc =
-                    "frama-c-" ^ Transitioning.String.lowercase_ascii m
+                    "frama-c-" ^ String.lowercase_ascii m
                   in
                   if mem_package fc then load_packages [fc]
                   else Klog.error "package or module '%s' not found" m

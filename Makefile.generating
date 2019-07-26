@@ -126,30 +126,6 @@ endif
 
 GENERATED+= src/libraries/utils/json.ml src/libraries/stdlib/transitioning.ml
 
-ifeq ($(HAS_OCAML403),yes)
-  STACK_FOLD=Stack.fold
-else
-  STACK_FOLD=stack_fold
-endif
-
-ifeq ($(HAS_OCAML404),yes)
-  SPLIT_ON_CHAR=String.split_on_char
-else
-  SPLIT_ON_CHAR=split_on_char
-endif
-
-ifeq ($(HAS_OCAML405),yes)
-  NTH_OPT=List.nth_opt
-  FIND_OPT=List.find_opt
-  ASSOC_OPT=List.assoc_opt
-  ASSQ_OPT=List.assq_opt
-else
-  NTH_OPT=nth_opt
-  FIND_OPT=find_opt
-  ASSOC_OPT=assoc_opt
-  ASSQ_OPT=assq_opt
-endif
-
 ifeq ($(HAS_OCAML408),yes)
   DYNLINK_INIT=fun () -> ()
   FORMAT_STAG=stag

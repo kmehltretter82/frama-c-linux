@@ -639,7 +639,7 @@ class visitor (ctx:context) c =
     method on_cluster c =
       let name = Definitions.cluster_id c in
       Wp_parameters.debug ~dkey:dkey_api "Start on_cluster %s@." name;
-      let th_name = Transitioning.String.capitalize_ascii name in
+      let th_name = String.capitalize_ascii name in
       let thy =
         let age = try fst (CLUSTERS.find c) with Not_found -> (-1) in
         if age < Definitions.cluster_age c then
@@ -714,7 +714,7 @@ class visitor (ctx:context) c =
             let filenoext = filenoext file in
             copy_file file;
             self#add_import2 [filenoext]
-              (Transitioning.String.capitalize_ascii filenoext);
+              (String.capitalize_ascii filenoext);
         | [file;lib] ->
             copy_file file;
             self#add_import2 [filenoext file] lib;

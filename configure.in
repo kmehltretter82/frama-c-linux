@@ -107,8 +107,8 @@ AC_MSG_CHECKING(version of OCaml)
 OCAMLVERSION=`$OCAMLC -v | sed -n -e 's|.*version *\(.*\)$|\1|p' `
 AC_MSG_RESULT($OCAMLVERSION)
 case $OCAMLVERSION in
-  0.*|1.*|2.*|3.*|4.00.*|4.01.*|4.02.[[012]])
-     AC_MSG_ERROR(Incompatible OCaml version; use 4.02.3+.);;
+  0.*|1.*|2.*|3.*|4.00.*|4.01.*|4.02.*|4.03.*|4.04.*)
+     AC_MSG_ERROR(Incompatible OCaml version; use 4.05+.);;
    *)
      OCAML_ANNOT_OPTION="-bin-annot";;
 esac
@@ -117,9 +117,6 @@ AC_SUBST(OCAMLMAJORNB)
 AC_SUBST(OCAMLMINORNB)
 AC_SUBST(OCAMLPATCHNB)
 
-AC_SUBST(HAS_OCAML403)
-AC_SUBST(HAS_OCAML404)
-AC_SUBST(HAS_OCAML405)
 AC_SUBST(HAS_OCAML407)
 AC_SUBST(HAS_OCAML408)
 
@@ -128,26 +125,11 @@ OCAMLMINORNB=$(echo $OCAMLVERSION | cut -f 2 -d .)
 OCAMLPATCHNB=$(echo $OCAMLVERSION | cut -f 3 -d .)
 
 if test $OCAMLMAJORNB -gt 4; then
-  HAS_OCAML403=yes;
-  HAS_OCAML404=yes;
-  HAS_OCAML405=yes;
   HAS_OCAML407=yes;
   HAS_OCAML408=yes;
 else
-  HAS_OCAML403=no;
-  HAS_OCAML404=no;
-  HAS_OCAML405=no;
   HAS_OCAML407=no;
   HAS_OCAML408=no;
-  if test $OCAMLMINORNB -ge 3; then
-    HAS_OCAML403=yes;
-  fi;
-  if test $OCAMLMINORNB -ge 4; then
-    HAS_OCAML404=yes;
-  fi;
-  if test $OCAMLMINORNB -ge 5; then
-    HAS_OCAML405=yes;
-  fi;
   if test $OCAMLMINORNB -ge 7; then
     HAS_OCAML407=yes;
   fi;

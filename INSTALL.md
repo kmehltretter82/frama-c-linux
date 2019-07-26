@@ -266,7 +266,7 @@ Arch Linux: `pikaur -S frama-c`
 ### Quick Start
 
 1. Install OCaml, OCamlfind, OCamlGraph and Zarith if not already installed.
-   Note that OCaml >= 4.02.3 is needed in order to compile Frama-C.
+   Note that OCaml >= 4.05.0 is needed in order to compile Frama-C.
 
 2. (Optional) For the GUI, also install Gtk, GtkSourceView, GnomeCanvas and
    Lablgtk2 or Lablgtk3 + Lablgtksourceview3 if not already installed.
@@ -291,7 +291,7 @@ Arch Linux: `pikaur -S frama-c`
 #### Frama-C Requirements
 
 - GNU make version >= 3.81
-- OCaml >= 4.02.3
+- OCaml >= 4.05.0
 - a C compiler with standard C and POSIX headers and libraries
 - [OCamlGraph][OCamlGraph] >= 1.8.8
 - [findlib][findlib] >= 1.6.1

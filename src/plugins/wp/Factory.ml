@@ -45,7 +45,7 @@ type driver = LogicBuiltins.driver
 let main (i,t) name =
   begin
     Buffer.add_string i name ;
-    Buffer.add_string t (Transitioning.String.capitalize_ascii name) ;
+    Buffer.add_string t (String.capitalize_ascii name) ;
   end
 
 let add (i,t) part =
@@ -54,7 +54,7 @@ let add (i,t) part =
     Buffer.add_string i part ;
     Buffer.add_char t ' ' ;
     Buffer.add_char t '(' ;
-    Buffer.add_string t (Transitioning.String.capitalize_ascii part) ;
+    Buffer.add_string t (String.capitalize_ascii part) ;
     Buffer.add_char t ')' ;
   end
 
@@ -317,7 +317,7 @@ let split ~warning (m:string) : string list =
        | _ -> warning (Printf.sprintf
                          "In model spec %S : unexpected character '%c'" m c)
     )
-    (Transitioning.String.uppercase_ascii m) ;
+    (String.uppercase_ascii m) ;
   flush () ; !tk
 
 let update_config ~warning m s = function

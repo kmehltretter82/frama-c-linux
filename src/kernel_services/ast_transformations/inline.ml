@@ -190,7 +190,7 @@ let inliner functions_to_inline = object (self)
 
   method private recursive_call_limit kf =
     let nb_calls =
-      Transitioning.Stack.fold
+      Stack.fold
         (fun res kf' -> if Cil_datatype.Kf.equal kf kf' then res + 1 else res)
         0 call_stack
     in

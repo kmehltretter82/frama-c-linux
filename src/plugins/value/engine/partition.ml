@@ -335,7 +335,7 @@ struct
       | `Bottom -> None
       | `Value (_cache, value) ->
         let is_included (_, _, v) = Abstract.Val.is_included v value in
-        match Transitioning.List.find_opt is_included expected_values with
+        match List.find_opt is_included expected_values with
         | None -> None
         | Some (stamp, i, _) ->
           if Cvalue.V.cardinal_zero_or_one (get value)

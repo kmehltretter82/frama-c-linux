@@ -320,7 +320,7 @@ let machdep_macro = function
   | "ppc_32"                -> "__FC_MACHDEP_PPC_32"
   | "msvc_x86_64"           -> "__FC_MACHDEP_MSVC_X86_64"
   | s ->
-    let res = "__FC_MACHDEP_" ^ (Transitioning.String.uppercase_ascii s) in
+    let res = "__FC_MACHDEP_" ^ (String.uppercase_ascii s) in
     Kernel.warning ~once:true
       "machdep %s has no registered macro. Using %s for pre-processing" s res;
     res

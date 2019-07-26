@@ -17,6 +17,7 @@
 Open Source Release <next-release>
 ##################################
 
+-! Kernel     [2019/07/24] OCaml version greater than or equal to 4.05.0 required.
 -   Kernel    [2019/07/24] Improve placeholders handling in -cpp-command
 o!  Kernel    [2019/07/23] Types in Properties are now records and not tuples
 o!  Kernel    [2019/06/28] removes AST constructors TCoerce, TCoerceE,
@@ -706,7 +707,7 @@ o* Kernel     [2016/05/18] Fixes merging of contract when using
               expressions such as x*x+y*y, or t[i*i].
 -  Eva        [2016/04/01] Support for options -warn-signed-downcast and
               -warn-unsigned-downcast.
--! Kernel     [2016/03/31] OCaml version greater or equal than 4.02.3 required.
+-! Kernel     [2016/03/31] OCaml version greater than or equal to 4.02.3 required.
 o  Makefile   [2016/03/31] Warnings and warn-error are activated only if a file
               .for_devel is present along side the Makefile (also for plugins)
 o! Kernel     [2016/03/29] Functions Integer.pgcd and Integer.ppcm are now
