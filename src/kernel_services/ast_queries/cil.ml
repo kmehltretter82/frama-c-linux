@@ -6647,14 +6647,14 @@ let mapGlobals (fl: file)
      end)
 
 let global_annotation_attributes = function
-  | Dfun_or_pred _ -> []
+  | Dfun_or_pred ({l_var_info = { lv_attr }}, _) -> lv_attr
   | Dvolatile (_,_,_,attrs,_) -> attrs
   | Daxiomatic (_,_,attrs,_) -> attrs
-  | Dtype _ -> []
+  | Dtype ({ lt_attr }, _) -> lt_attr
   | Dlemma (_,_,_,_,_,attrs,_) -> attrs
-  | Dinvariant _ -> []
-  | Dtype_annot _ -> []
-  | Dmodel_annot _ -> []
+  | Dinvariant ({l_var_info = { lv_attr }}, _) -> lv_attr
+  | Dtype_annot ({l_var_info = { lv_attr }}, _) -> lv_attr
+  | Dmodel_annot ({ mi_attr }, _) -> mi_attr
   | Dextended (_,attrs,_) -> attrs
   | Dcustom_annot (_,_,attrs,_) -> attrs
 
