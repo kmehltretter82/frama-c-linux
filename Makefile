@@ -1162,7 +1162,7 @@ PLUGIN_TESTS_LIB:= tests/slicing/libSelect.ml tests/slicing/libAnim.ml \
 	tests/slicing/adpcm.ml
 PLUGIN_DISTRIBUTED:=yes
 PLUGIN_INTERNAL_TEST:=yes
-PLUGIN_DEPENDENCIES:=Pdg Callgraph Eva
+PLUGIN_DEPENDENCIES:=Pdg Callgraph Eva Sparecode
 
 $(eval $(call include_generic_plugin_Makefile,$(PLUGIN_NAME)))
 
