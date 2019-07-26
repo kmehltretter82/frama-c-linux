@@ -17,7 +17,8 @@
 Open Source Release <next-release>
 ##################################
 
--! Kernel     [2019/07/24] OCaml version greater than or equal to 4.05.0 required.
+o!  Sparecode [2019/07/26] Removed from Db. Use proper Sparecode API instead.
+-!  Kernel    [2019/07/24] OCaml version greater than or equal to 4.05.0 required.
 -   Kernel    [2019/07/24] Improve placeholders handling in -cpp-command
 o!  Kernel    [2019/07/23] Types in Properties are now records and not tuples
 o!  Kernel    [2019/06/28] removes AST constructors TCoerce, TCoerceE,
