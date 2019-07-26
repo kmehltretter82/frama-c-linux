@@ -161,8 +161,7 @@ let init =
             "\\pointer_comparable", [], [], [("p1", fun_ptr);
                                          ("p2", object_ptr)];
             "\\pointer_comparable", [], [], [("p1", object_ptr);
-                                             ("p2", fun_ptr)];
-            "\\bit_test", [], [], ["x", Linteger; "pos", Linteger] ;
+                                         ("p2", fun_ptr)];
           ];
         (* functions *)
         List.iter
