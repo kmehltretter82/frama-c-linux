@@ -65,7 +65,7 @@ class norm_at (mapping : label_mapping) =
       | TAddrOf (h, _) | TLval (h, _) | TStartOf (h, _)  ->
           let old_label = current_label in
           let at_label = match h with
-            | TResult _ -> Some Clabels.post
+            | TResult _ | TVar{lv_name="\\exit_status"} -> Some Clabels.post
             | _ -> old_label
           in
           current_label <- None;

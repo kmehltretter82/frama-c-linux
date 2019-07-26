@@ -912,7 +912,7 @@ struct
 
   let assignable_lval env ~unfold lv =
     match fst lv with
-    | TResult _ -> [] (* special case ! *)
+    | TResult _  | TVar{lv_name="\\exit_status"} -> [] (* special case ! *)
     | _ ->
         let offsets =
           let obj = Ctypes.object_of_logic_type (Cil.typeOfTermLval lv) in

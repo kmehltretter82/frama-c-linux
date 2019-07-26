@@ -449,7 +449,7 @@ and term (env:ctx) (t:term) : model = match t.term_node with
 
 (* --- Lvalues --- *)
 and term_lval env (h,ofs) = match h with
-  | TResult _ -> nothing
+  | TResult _ | TVar{lv_name="\\exit_status"} -> nothing
   | TVar( {lv_origin=None ; lv_kind=LVLocal} as lvar) ->
       (* var bound by a \\let *)
       load (term_offset env (get_tlet env.local lvar) ofs)
@@ -470,6 +470,8 @@ and term_offset env (l:model) = function
 
 and addr_lval env (h,ofs) = match h with
   | TResult _ -> Wp_parameters.abort ~current:true "Address of \\result"
+  | TVar{lv_name="\\exit_status"} ->
+      Wp_parameters.abort ~current:true "Address of \\exit_status"
   | TMem t -> term_offset env (term env t) ofs
   | TVar( {lv_origin=Some x} ) -> term_offset env (Loc_var x) ofs
   | TVar( {lv_origin=None} as x ) ->
