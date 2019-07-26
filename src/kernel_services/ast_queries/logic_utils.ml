@@ -1946,13 +1946,13 @@ let merge_behaviors ?(oldloc=Cil_datatype.Location.unknown) ~silent old_behavior
                    if Kernel.debug_atleast 1 then
                      Format.fprintf fmt ":@ @[%a@] vs. @[%a@]"
                        Cil_printer.pp_behavior b Cil_printer.pp_behavior old_b)
-              ;
-              old_b.b_assumes <- merge_ip_list old_b.b_assumes b.b_assumes;
-              old_b.b_requires <- merge_ip_list old_b.b_requires b.b_requires;
-              old_b.b_post_cond <-
-                merge_post_cond old_b.b_post_cond b.b_post_cond;
-              old_b.b_assigns <- merge_assigns old_b.b_assigns b.b_assigns;
-              old_b.b_allocation <- merge_allocation old_b.b_allocation b.b_allocation;
+            ;
+            old_b.b_assumes <- merge_ip_list old_b.b_assumes b.b_assumes;
+            old_b.b_requires <- merge_ip_list old_b.b_requires b.b_requires;
+            old_b.b_post_cond <-
+              merge_post_cond old_b.b_post_cond b.b_post_cond;
+            old_b.b_assigns <- merge_assigns old_b.b_assigns b.b_assigns;
+            old_b.b_allocation <- merge_allocation old_b.b_allocation b.b_allocation;
           end ;
           false
         with Not_found -> true)
