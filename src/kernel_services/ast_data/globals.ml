@@ -41,8 +41,7 @@ let get_locals f = match f.fundec with
   | Declaration(_, _, _, _) -> []
 
 let get_location kf = match kf.fundec with
-  | Definition (_, loc) -> loc
-  | Declaration (_,vi,_, _) -> vi.vdecl
+  | Definition (_, loc) | Declaration (_,_,_, loc) -> loc
 
 let find_first_stmt = Extlib.mk_fun "Globals.find_first_stmt"
 
@@ -232,6 +231,7 @@ module Functions = struct
          update_orig_name kf; kf)
 
   let update_kf kf fundec spec =
+    let oldloc = get_location kf in
     (match kf.fundec, fundec with
       (* we never update a definition with a declaration (see bug 1914).
          If you really want to play this game, just mutate the kf in place and
@@ -241,11 +241,8 @@ module Functions = struct
       | _ -> kf.fundec <- fundec);
 (*    Kernel.feedback "UPDATE Spec of function %a (%a)" 
       Cil_datatype.Kf.pretty kf Printer.pp_funspec spec;*)
-    let loc = match kf.fundec with
-      | Definition (_, loc) | Declaration (_, _, _, loc) -> loc 
-    in
-    let oldloc = Cil.CurrentLoc.get () in
-    Cil.CurrentLoc.set loc;
+    (match fundec with
+     | Definition(_,loc) | Declaration(_,_,_,loc) -> CurrentLoc.set loc);
     Logic_utils.merge_funspec ~oldloc kf.spec spec
 
   let replace_by_declaration s v l=
