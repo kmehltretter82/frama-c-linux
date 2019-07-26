@@ -1923,7 +1923,14 @@ let merge_post_cond l1 l2 =
        else pc::acc)
     l1 l2
 
-let merge_behaviors ~silent old_behaviors fresh_behaviors =
+let pp_old_loc fmt oldloc =
+  if Cil_datatype.Location.(equal oldloc unknown) then
+    Format.ifprintf fmt ""
+  else
+    Format.fprintf fmt " (old location: %a)"
+      Cil_datatype.Location.pretty oldloc
+
+let merge_behaviors ?(oldloc=Cil_datatype.Location.unknown) ~silent old_behaviors fresh_behaviors =
   old_behaviors @
   (List.filter
      (fun b ->
@@ -1931,9 +1938,10 @@ let merge_behaviors ~silent old_behaviors fresh_behaviors =
           let old_b = List.find (fun x -> x.b_name = b.b_name) old_behaviors in
           if not (is_same_behavior b old_b) then begin
             if not silent then
-              Kernel.warning ~current:true "found two %s. Merging them%t"
+              Kernel.warning ~current:true "found two %s%a. Merging them%t"
                 (if Cil.is_default_behavior b then "contracts"
                  else "behaviors named " ^ b.b_name)
+                pp_old_loc oldloc
                 (fun fmt ->
                    if Kernel.debug_atleast 1 then
                      Format.fprintf fmt ":@ @[%a@] vs. @[%a@]"
@@ -1950,7 +1958,7 @@ let merge_behaviors ~silent old_behaviors fresh_behaviors =
         with Not_found -> true)
      fresh_behaviors)
 
-let merge_funspec ?(silent_about_merging_behav=false) old_spec fresh_spec =
+let merge_funspec ?(oldloc=Cil_datatype.Location.unknown) ?(silent_about_merging_behav=false) old_spec fresh_spec =
   if not (is_same_spec old_spec fresh_spec || Cil.is_empty_funspec fresh_spec)
   then
     if Cil.is_empty_funspec old_spec then begin
@@ -1961,7 +1969,7 @@ let merge_funspec ?(silent_about_merging_behav=false) old_spec fresh_spec =
       old_spec.spec_variant <- fresh_spec.spec_variant;
     end else begin
       old_spec.spec_behavior <-
-        merge_behaviors ~silent:silent_about_merging_behav
+        merge_behaviors ~oldloc ~silent:silent_about_merging_behav
           old_spec.spec_behavior fresh_spec.spec_behavior ;
       (match old_spec.spec_variant,fresh_spec.spec_variant with
        | None,None -> ()
@@ -1969,14 +1977,17 @@ let merge_funspec ?(silent_about_merging_behav=false) old_spec fresh_spec =
        | None, Some _ -> old_spec.spec_variant <- fresh_spec.spec_variant
        | Some _old, Some _fresh ->
          Kernel.warning ~current:true
-           "found two variants for function specification. Keeping only the first one.");
+           "found two variants for function specification%a. \
+            Keeping only the first one."
+           pp_old_loc oldloc);
       (match old_spec.spec_terminates, fresh_spec.spec_terminates with
        | None, None -> ()
        | Some p1, Some p2 when is_same_identified_predicate p1 p2 -> ()
        | _ ->
          Kernel.warning ~current:true
-           "found two different terminates clause for function specification. \
-            keeping only the fist one");
+           "found two different terminates clauses \
+            for function specification%a. Keeping only the first one"
+           pp_old_loc oldloc);
       old_spec.spec_complete_behaviors <-
         List.fold_left (fun acc b ->
             if List.mem b old_spec.spec_complete_behaviors then acc
