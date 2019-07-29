@@ -903,12 +903,15 @@ let removeUnusedTemps ?(isRoot : rootsFilter = isExportedRoot) ast =
       (* mark everything reachable from the global roots *)
       markReachable isRoot ast reachable_tbl;
 
-      let elements =
-        InfoHashtbl.fold (fun k v acc -> Format.asprintf "%a:%B" pp_info k v :: acc)
-          reachable_tbl []
-      in
-      Kernel.debug ~dkey "reachable_tbl: %a"
-        (Pretty_utils.pp_list ~sep:"@\n" Format.pp_print_string) elements;
+      Kernel.debug ~dkey "reachable_tbl: %t"
+        (fun fmt ->
+           let elements =
+             InfoHashtbl.fold (fun k v acc ->
+                 Format.asprintf "%a:%B" pp_info k v :: acc)
+               reachable_tbl []
+           in
+           Format.fprintf fmt "%a"
+             (Pretty_utils.pp_list ~sep:"@\n" Format.pp_print_string) elements);
 
       markReferenced ast;
 
