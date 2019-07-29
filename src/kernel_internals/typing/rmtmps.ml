@@ -71,7 +71,6 @@ module InfoHashtbl = Hashtbl.Make(struct
       | Var v -> Cil_datatype.Varinfo.hash v
   end)
 
-(* Used by external plug-ins: *)
 let keepUnused = ref false
 
 (* Possibly no longer used: *)
@@ -885,10 +884,10 @@ let removeUnmarked isRoot ast reachable_tbl =
 
 type rootsFilter = global -> bool
 
-let removeUnusedTemps ?(isRoot : rootsFilter = isExportedRoot) ast =
+let removeUnused ?(isRoot=isExportedRoot) ast =
   if not !keepUnused then
     begin
-      Kernel.debug ~dkey "Removing unused temporaries" ;
+      Kernel.debug ~dkey "Removing unused" ;
 
       (* digest any pragmas that would create additional roots *)
       let keepers = categorizePragmas ast in

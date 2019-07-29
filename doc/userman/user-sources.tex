@@ -249,6 +249,10 @@ a negative value, and choose the smallest rank possible starting from
   set by default. So you mostly use the opposite form, namely
   \optiondef{-}{remove-unused-specified-functions}.
 
+\item \optiondef{-}{keep-unused-types} does not remove unused types and
+  enum/struct/union declarations. By default, such types are removed,
+  that is, its opposite option \optiondef{-}{remove-unused-types} is set.
+
 \item \texttt{\optiondef{-}{machdep} <machine architecture name>} defines the
   target platform. The default value is a \texttt{x86\_32} bits
   platform. Analyzers may take into account the \emph{endianness} of the

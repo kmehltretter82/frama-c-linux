@@ -242,6 +242,9 @@ Defaults to no.
 -keep-unused-specified-functions
 : see **-remove-unused-specified-functions**.
 
+-keep-unused-types
+: see **-remove-unused-types**.
+
 -kernel-log *kind:file*
 : copies log messages from the Frama-C's kernel to file. *kind* specifies which
 kinds of messages to be copied (e.g. **w** for warnings, **e** for errors,
@@ -358,6 +361,11 @@ functions were fully inlined.
 : keeps function prototypes that have an ACSL specification but are not used
 in the code. This is the default. Functions having the attribute
 **FRAMAC_BUILTIN** are always kept.
+
+-remove-unused-types
+: remove types and struct/union/enum declarations that are not referenced
+anywhere else in the code. This is the default. Use **-keep-unused-types**
+to keep these definitions.
 
 -safe-arrays
 : for multidimensional arrays or arrays that are fields inside structs,
