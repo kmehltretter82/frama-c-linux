@@ -99,6 +99,7 @@ let f_bitwised = [ f_lnot ; f_lor ; f_land ; f_lxor ; f_lsl ; f_lsr ]
 
 let f_bit_stdlib = Lang.extern_p ~library ~bool:"bit_testb" ~prop:"bit_test" ()
 let f_bit        = Lang.extern_p ~library ~bool:"bit_testb" ~prop:"bit_test" ()
+let f_bit_export = Lang.extern_p ~library ~bool:"bit_testb" ~prop:"bit_test" ()
 
 let () = let open LogicBuiltins in add_builtin "\\bit_test_stdlib" [Z;Z] f_bit_stdlib
 let () = let open LogicBuiltins in add_builtin "\\bit_test" [Z;Z] f_bit
@@ -216,6 +217,10 @@ let match_list_head match_f = function
   | [] -> raise Not_found
   | e::es -> (match_f e), es
 
+let match_binop_one_arg1 binop e = match F.repr e with
+  | Logic.Fun( f , [one; e2] ) when Fun.equal f binop && one == e_one -> e2
+  | _ -> raise Not_found
+
 let match_list_extraction match_f =
   let match_f_opt n = try Some (match_f n) with Not_found -> None in
   let rec aux rs = function
@@ -235,6 +240,8 @@ let match_positive_or_null_integer_arg2 =
 let match_integer_extraction = match_list_head match_integer
 
 let match_power2_extraction = match_list_extraction match_power2
+let match_binop_one_extraction binop = match_list_extraction (match_binop_one_arg1 binop)
+
 
 (* -------------------------------------------------------------------------- *)
 (* --- Conversion Symbols                                                 --- *)
@@ -747,6 +754,15 @@ let smp_leq_with_lsr a0 b0 =
     else
       smp_cmp_with_lsr e_leq a0 b0
 
+(* Rewritting at export *)
+let export_eq_with_land a b =
+  let es = match_fun f_land a in
+  if b == e_zero then
+    let k,_,es = match_binop_one_extraction f_lsl es in
+    (* e1 & ... & en & (1 << k) = 0   <==> !bit_test(e1 & ... & en, k) *)
+    e_not (e_fun f_bit_export [e_fun f_land es ; k ])
+  else raise Not_found
+
 (* ACSL Semantics *)
 type l_builtin = {
   f: lfun ;
@@ -787,8 +803,9 @@ let () =
                | None -> ()
                | Some leq -> F.set_builtin_leq f leq)
             end
-            [bi_lbit_stdlib ; bi_lbit; bi_lnot; bi_lxor; bi_lor; bi_land; bi_lsl; bi_lsr]
+            [bi_lbit_stdlib ; bi_lbit; bi_lnot; bi_lxor; bi_lor; bi_land; bi_lsl; bi_lsr];
 
+          Lang.For_export.set_builtin_eq f_land export_eq_with_land
         end
     end
 
