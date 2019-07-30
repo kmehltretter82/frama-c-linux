@@ -1001,6 +1001,10 @@ module For_export = struct
     add_init (fun () -> QZERO.set_builtin f c)
   let set_builtin' f c =
     add_init (fun () -> QZERO.set_builtin' f c)
+  let set_builtin_eq f c =
+    add_init (fun () -> QZERO.set_builtin_eq f c)
+  let set_builtin_leq f c =
+    add_init (fun () -> QZERO.set_builtin_leq f c)
 
   let in_state f v = QZERO.in_state (get_state ()) f v
 
