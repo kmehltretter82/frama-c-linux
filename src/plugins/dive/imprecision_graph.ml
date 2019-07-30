@@ -181,7 +181,7 @@ let ouptput_to_dot out_channel g =
   in
   Dot.output_graph out_channel g
 
-let ouptput_to_json out_channel g =
+let to_json g =
   let rec output_kinstr = function
     | Cil_types.Kglobal -> Json.of_string "global"
     | Cil_types.Kstmt stmt -> Json.of_int stmt.Cil_types.sid
@@ -250,5 +250,8 @@ let ouptput_to_json out_channel g =
   in
   let nodes = Json.of_list (fold_vertex output_node g [])
   and deps = Json.of_list (fold_edges_e output_dep g []) in
-  let json = Json.of_fields [("nodes", nodes) ; ("deps", deps)] in
+  Json.of_fields [("nodes", nodes) ; ("deps", deps)]
+
+let ouptput_to_json out_channel g =
+  let json = to_json g in
   Json.save_channel ~pretty:true out_channel json

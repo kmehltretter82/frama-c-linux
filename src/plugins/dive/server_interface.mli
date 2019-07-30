@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C plug-in `Dive'.                      *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2019                                               *)
+(*  Copyright (C) 2018                                                    *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -20,22 +20,4 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Graph_types
-
-include Graph.Sig.G with type V.t = node
-
-val create : ?size:int -> unit -> t
-
-val create_node :
-  ?node_precision:node_precision ->
-  node_kind:node_kind ->
-  node_locality:node_locality -> t -> node
-
-val update_node_precision : node -> node_precision -> unit
-
-val create_dependency : allow_folding:bool -> t -> node -> dependency_kind ->
-  node -> unit
-
-val to_json : t -> Json.t
-val ouptput_to_dot : out_channel -> t -> unit
-val ouptput_to_json : out_channel -> t -> unit
+module Variable : Server.Data.S_collection with type t = Cil_types.varinfo
