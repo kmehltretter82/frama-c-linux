@@ -1227,8 +1227,6 @@ src/plugins/value/engine/partitioning_parameters.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/engine/partitioning_parameters.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/engine/recursion.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/engine/recursion.mli: CEA_LGPL_OR_PROPRIETARY
-src/plugins/value/engine/split_return.ml: CEA_LGPL_OR_PROPRIETARY
-src/plugins/value/engine/split_return.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/engine/subdivided_evaluation.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/engine/subdivided_evaluation.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/engine/trace_partitioning.ml: CEA_LGPL_OR_PROPRIETARY
@@ -1265,6 +1263,8 @@ src/plugins/value/register.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/register.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/partitioning/per_stmt_slevel.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/partitioning/per_stmt_slevel.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/partitioning/split_return.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/partitioning/split_return.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/partitioning/split_strategy.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/partitioning/split_strategy.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/test.assert.sh: .ignore

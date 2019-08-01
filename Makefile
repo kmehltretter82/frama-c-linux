@@ -860,7 +860,7 @@ PLUGIN_CMO:= partitioning/split_strategy value_parameters \
 	utils/value_perf utils/value_util utils/red_statuses \
 	utils/mark_noresults \
 	utils/widen_hints_ext utils/widen utils/partitioning_annots \
-	engine/split_return \
+	partitioning/split_return \
 	partitioning/per_stmt_slevel \
 	utils/library_functions \
 	utils/eval_typ utils/backward_formals \
