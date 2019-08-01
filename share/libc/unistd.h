@@ -35,7 +35,8 @@ __PUSH_FC_STDLIB
 #include "__fc_define_pid_t.h"
 #include "__fc_define_useconds_t.h"
 #include "__fc_define_intptr_t.h"
-
+#include "__fc_define_fds.h"
+#include "__fc_select.h"
 
 
 #include "limits.h"
@@ -721,16 +722,6 @@ enum __fc_confstr_name
     _CS_V7_ENV
 #define _CS_V7_ENV			_CS_V7_ENV
   };
-
-
-// arbitrary number
-#define __FC_MAX_OPEN_FILES 1024
-
-// __fc_fds represents the state of open file descriptors.
-//@ ghost int __fc_fds[__FC_MAX_OPEN_FILES];
-// TODO: Model the state of some functions more precisely.
-// TODO: define __fc_fds as volatile.
-
 
 /*@ // missing: may assign to errno: EACCES, ELOOP, ENAMETOOLONG, ENOENT,
     //                               ENOTDIR, EROFS, ETXTBSY

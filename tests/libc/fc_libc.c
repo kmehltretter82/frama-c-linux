@@ -44,6 +44,7 @@
 #include "__fc_define_dev_t.h"
 #include "__fc_define_eof.h"
 #include "__fc_define_fd_set_t.h"
+#include "__fc_define_fds.h"
 #include "__fc_define_file.h"
 #include "__fc_define_fpos_t.h"
 #include "__fc_define_fs_cnt.h"

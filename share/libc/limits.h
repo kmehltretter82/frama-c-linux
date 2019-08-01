@@ -95,4 +95,9 @@
  */
 #define ARG_MAX 4096
 
+// POSIX; used by <sys/uio.h>.
+// Must be >= _XOPEN_IOV_MAX, which is 16.
+// 1024 is the value used by some Linux implementations.
+#define IOV_MAX 1024
+
 #endif

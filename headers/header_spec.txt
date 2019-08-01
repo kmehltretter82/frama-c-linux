@@ -180,6 +180,7 @@ share/libc/__fc_define_clockid_t.h: CEA_LGPL
 share/libc/__fc_define_dev_t.h: CEA_LGPL
 share/libc/__fc_define_eof.h: CEA_LGPL
 share/libc/__fc_define_fd_set_t.h: CEA_LGPL
+share/libc/__fc_define_fds.h: CEA_LGPL
 share/libc/__fc_define_file.h: CEA_LGPL
 share/libc/__fc_define_fpos_t.h: CEA_LGPL
 share/libc/__fc_define_fs_cnt.h: CEA_LGPL
