@@ -823,7 +823,7 @@ PLUGIN_ENABLE:=$(ENABLE_EVA)
 PLUGIN_NAME:=Eva
 PLUGIN_DIR:=src/plugins/value
 PLUGIN_EXTRA_DIRS:=engine values domains domains/cvalue domains/apron \
-	domains/gauges domains/equality legacy slevel utils gui_files \
+	domains/gauges domains/equality legacy partitioning utils gui_files \
 	values/numerors domains/numerors
 PLUGIN_TESTS_DIRS+=value/traces
 
@@ -856,12 +856,12 @@ endif
 
 # General rules for ordering files within PLUGIN_CMO:
 # - try to keep the legacy Value before Eva
-PLUGIN_CMO:= slevel/split_strategy value_parameters \
+PLUGIN_CMO:= partitioning/split_strategy value_parameters \
 	utils/value_perf utils/value_util utils/red_statuses \
 	utils/mark_noresults \
 	utils/widen_hints_ext utils/widen utils/partitioning_annots \
 	engine/split_return \
-	slevel/per_stmt_slevel \
+	partitioning/per_stmt_slevel \
 	utils/library_functions \
 	utils/eval_typ utils/backward_formals \
 	alarmset eval utils/structure utils/abstract \
