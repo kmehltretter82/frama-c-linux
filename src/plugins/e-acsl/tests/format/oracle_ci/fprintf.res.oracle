@@ -47,7 +47,7 @@
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdio.h:82: Warning: 
-  E-ACSL construct `@[abnormal termination case in behavior@]'
+  E-ACSL construct `abnormal termination case in behavior'
   is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
