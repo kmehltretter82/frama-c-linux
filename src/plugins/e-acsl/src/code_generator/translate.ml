@@ -1011,7 +1011,7 @@ let translate_postconditions kf env behaviors =
 	      in
 	      translate_named_predicate kf env p
 	    | Exits | Breaks | Continues | Returns ->
-	      not_yet env "@[abnormal termination case in behavior@]"
+	      not_yet env "abnormal termination case in behavior"
 	  in
 	  handle_error do_it env
 	else env)
