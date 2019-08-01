@@ -38,10 +38,10 @@
 
    The heuristic is syntactic and limited to the current function: it does not
    handle assignment through pointers or function calls.
-   Thus, the condition [cond] must only contains direct accesses to variables
+   Thus, the condition [cond] should only contains direct accesses to variables
    whose address is never taken (they cannot be modified through pointers). If
-   the loop contains a function call, the condition [cond] must not contain any
-   global variable (as they may be modified in the function called).
+   the loop contains a function call, the condition [cond] should not contain
+   global variables (as they may be modified in the function called).
    A first analyze of the loop gathers all such variables modified within the
    loop; all others are constant, and can be evaluated in the loop entry state.
 
@@ -113,7 +113,7 @@ end
 
 (* The status of a lvalue for the automatic loop unroll heuristic. *)
 type var_status =
-  | Constant  (* The lvalue is constant within the loop. *)
+  | Constant  (* The lvalue is probably constant within the loop. *)
   | Candidate (* The lvalue is a good candidate for the heuristic:
                  integer type, access to a varinfo whose address is not taken,
                  modified within the loop but not in another function called
@@ -134,13 +134,17 @@ let classify loop_effect lval =
     | AlignOf _ | AlignOfE _ | AddrOf _ | StartOf _ -> true
   and classify_lval = function
     | Var varinfo, offset ->
-      if varinfo.vaddrof
-      || (varinfo.vglob && loop_effect.call)
+      if (varinfo.vglob && loop_effect.call)
       || not (is_const_offset offset)
       then Unsuitable
       else if Cil_datatype.Varinfo.Set.mem varinfo loop_effect.written_vars
-      then if is_integer lval then Candidate else Unsuitable
-      else Constant
+      then
+        if is_integer lval && not varinfo.vaddrof then Candidate else Unsuitable
+      else
+        (* If the address of the variable is taken, it could be modified within
+           the loop. We suppose here that this is not the case, but this could
+           lead to some loop unrolling. *)
+        Constant
     | Mem _, _ -> Unsuitable (* Pointers are not supported by the heuristic. *)
   and is_const_offset = function
     | NoOffset -> true
