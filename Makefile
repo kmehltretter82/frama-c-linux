@@ -900,7 +900,8 @@ PLUGIN_CMO:= partitioning/split_strategy value_parameters \
 	engine/subdivided_evaluation engine/evaluation engine/abstractions \
 	engine/recursion engine/transfer_stmt engine/transfer_specification \
 	engine/partitioning_index engine/mem_exec \
-	engine/partition engine/partitioning_parameters engine/trace_partitioning \
+	engine/partition partitioning/partitioning_parameters \
+	engine/trace_partitioning \
 	engine/iterator \
 	engine/initialization \
 	engine/compute_functions engine/analysis register \

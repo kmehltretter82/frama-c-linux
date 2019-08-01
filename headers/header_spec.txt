@@ -1223,8 +1223,6 @@ src/plugins/value/engine/partition.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/engine/partition.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/engine/partitioning_index.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/engine/partitioning_index.mli: CEA_LGPL_OR_PROPRIETARY
-src/plugins/value/engine/partitioning_parameters.ml: CEA_LGPL_OR_PROPRIETARY
-src/plugins/value/engine/partitioning_parameters.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/engine/recursion.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/engine/recursion.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/engine/subdivided_evaluation.ml: CEA_LGPL_OR_PROPRIETARY
@@ -1261,6 +1259,8 @@ src/plugins/value/legacy/function_args.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/legacy/function_args.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/register.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/register.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/partitioning/partitioning_parameters.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/partitioning/partitioning_parameters.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/partitioning/per_stmt_slevel.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/partitioning/per_stmt_slevel.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/partitioning/split_return.ml: CEA_LGPL_OR_PROPRIETARY
