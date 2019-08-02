@@ -7,12 +7,12 @@ Start
   
 [eva:alarm] tests/syntax/Refresh_visitor.i:17: Warning: 
   assertion got status unknown.
+[eva:loop-unroll] tests/syntax/Refresh_visitor.i:26: Automatic loop unrolling.
 [eva] tests/syntax/Refresh_visitor.i:23: loop invariant got status valid.
 [eva] tests/syntax/Refresh_visitor.i:24: loop invariant got status valid.
+[eva:loop-unroll] tests/syntax/Refresh_visitor.i:32: Automatic loop unrolling.
 [eva] tests/syntax/Refresh_visitor.i:29: loop invariant got status valid.
 [eva] tests/syntax/Refresh_visitor.i:30: loop invariant got status valid.
-[eva] tests/syntax/Refresh_visitor.i:32: starting to merge loop iterations
-[eva] tests/syntax/Refresh_visitor.i:26: starting to merge loop iterations
 [eva:alarm] tests/syntax/Refresh_visitor.i:14: Warning: 
   function main: postcondition got status unknown.
 [eva] Recording results for main
