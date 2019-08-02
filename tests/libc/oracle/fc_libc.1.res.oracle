@@ -7499,6 +7499,19 @@ extern uid_t getuid(void);
  */
 extern int isatty(int fd);
 
+/*@ requires valid_fd: 0 ≤ fd < 1024;
+    requires valid_whence: whence ≡ 0 ∨ whence ≡ 1 ∨ whence ≡ 2;
+    ensures result_error_or_offset: \result ≡ -1 ∨ 0 ≤ \result;
+    assigns \result, __fc_fds[fd];
+    assigns \result
+      \from (indirect: fd), (indirect: __fc_fds[fd]), (indirect: offset),
+            (indirect: whence);
+    assigns __fc_fds[fd]
+      \from (indirect: fd), __fc_fds[fd], (indirect: offset),
+            (indirect: whence);
+ */
+extern off_t lseek(int fd, off_t offset, int whence);
+
 /*@ requires valid_path: valid_read_string(path);
     assigns \result;
     assigns \result \from (indirect: *(path + (0 ..))), (indirect: name);

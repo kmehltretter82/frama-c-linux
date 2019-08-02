@@ -23,6 +23,10 @@ int main() {
   //@ assert fd == -1 || fd >= 0;
   if (fd == -1) return 1;
 
+  off_t offset = 42;
+  offset = lseek(fd, offset, SEEK_SET);
+  if (offset == -1) return 1;
+
   int fd2 = dup2(2, fd);
   if (nondet) {
     dup2(2, -2);

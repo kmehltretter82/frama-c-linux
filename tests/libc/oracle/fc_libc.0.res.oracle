@@ -40,7 +40,7 @@
    unsetenv (0 call); wcscat (0 call); wcscpy (0 call); wcslen (2 calls);
    wcsncat (0 call); wcsncpy (0 call); wmemcpy (0 call); wmemset (0 call); 
   
-  Undefined functions (381)
+  Undefined functions (382)
   =========================
    FD_CLR (0 call); FD_ISSET (0 call); FD_SET (0 call); FD_ZERO (0 call);
    Frama_C_int_interval (0 call); Frama_C_long_interval (0 call);
@@ -109,13 +109,13 @@
    localtime (0 call); log (0 call); log10 (0 call); log10f (0 call);
    log10l (0 call); log2 (0 call); log2f (0 call); log2l (0 call);
    logf (0 call); logl (0 call); longjmp (0 call); lrand48 (0 call);
-   malloc (7 calls); mblen (0 call); mbstowcs (0 call); mbtowc (0 call);
-   mkdir (0 call); mkstemp (0 call); mktime (0 call); mrand48 (0 call);
-   nan (0 call); nanf (0 call); nanl (0 call); nanosleep (0 call);
-   nrand48 (0 call); ntohl (0 call); ntohs (0 call); open (0 call);
-   openat (0 call); opendir (0 call); openlog (0 call); pathconf (0 call);
-   pclose (0 call); perror (0 call); pipe (0 call); poll (0 call);
-   popen (0 call); pow (0 call); powf (0 call);
+   lseek (0 call); malloc (7 calls); mblen (0 call); mbstowcs (0 call);
+   mbtowc (0 call); mkdir (0 call); mkstemp (0 call); mktime (0 call);
+   mrand48 (0 call); nan (0 call); nanf (0 call); nanl (0 call);
+   nanosleep (0 call); nrand48 (0 call); ntohl (0 call); ntohs (0 call);
+   open (0 call); openat (0 call); opendir (0 call); openlog (0 call);
+   pathconf (0 call); pclose (0 call); perror (0 call); pipe (0 call);
+   poll (0 call); popen (0 call); pow (0 call); powf (0 call);
    pthread_cond_broadcast (0 call); pthread_cond_destroy (0 call);
    pthread_cond_init (0 call); pthread_cond_wait (0 call);
    pthread_create (0 call); pthread_join (0 call);
@@ -178,7 +178,7 @@
   Goto = 89
   Assignment = 438
   Exit point = 82
-  Function = 463
+  Function = 464
   Function call = 89
   Pointer dereferencing = 158
   Cyclomatic complexity = 286

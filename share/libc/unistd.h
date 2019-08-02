@@ -960,7 +960,19 @@ extern int          isatty(int fd);
 extern int          lchown(const char *, uid_t, gid_t);
 extern int          link(const char *, const char *);
 extern int          lockf(int, int, off_t);
-extern off_t        lseek(int, off_t, int);
+
+/*@ //missing: may assign to errno: EBADF, EINVAL, EOVERFLOW, ESPIPE, ENXIO (Linux);
+  requires valid_fd: 0 <= fd < __FC_MAX_OPEN_FILES;
+  requires valid_whence: whence == SEEK_SET || whence == SEEK_CUR ||
+                         whence == SEEK_END;
+  assigns \result \from indirect:fd, indirect:__fc_fds[fd], indirect:offset,
+                        indirect:whence;
+  assigns __fc_fds[fd] \from indirect:fd, __fc_fds[fd], indirect:offset,
+                             indirect:whence;
+  ensures result_error_or_offset: \result == -1 || 0 <= \result;
+ */
+extern off_t        lseek(int fd, off_t offset, int whence);
+
 extern int          nice(int);
 
 /*@ // missing: may assign to errno: EACCES, EINVAL, ELOOP, ENOENT, ENOTDIR
