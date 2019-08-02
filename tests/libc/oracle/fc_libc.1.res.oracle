@@ -5557,7 +5557,8 @@ char *strerror(int errnum)
   return __retres;
 }
 
-/*@ assigns \result;
+/*@ requires valid_string_s: valid_read_string(s);
+    assigns \result;
     assigns \result
       \from (indirect: *(s + (0 .. strlen{Old}(s)))),
             (indirect: __fc_heap_status);
