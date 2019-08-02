@@ -457,7 +457,8 @@ extern size_t strxfrm (char *restrict dest,
 
 // Allocate strings
 
-/*@ allocates \result;
+/*@ requires valid_string_s: valid_read_string(s);
+  @ allocates \result;
   @ assigns \result \from indirect:s[0..strlen(s)], indirect:__fc_heap_status;
   @ behavior allocation:
   @   assumes can_allocate: is_allocable(strlen(s));

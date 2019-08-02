@@ -247,6 +247,8 @@
   The specification of function 'strdup' is currently not supported by Eva.
   Consider adding ./share/libc/string.c to the analyzed source files.
 [eva] tests/libc/string_h.c:119: Warning: ignoring unsupported \allocates clause
+[eva] tests/libc/string_h.c:119: 
+  function strdup: precondition 'valid_string_s' got status valid.
 [eva] Done for function strdup
 [eva] computing for function strndup <- main.
   Called from tests/libc/string_h.c:120.
