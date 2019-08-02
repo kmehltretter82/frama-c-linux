@@ -115,7 +115,7 @@ let empty_local_env =
     rte = true }
 
 let dummy =
-  { visitor = new Visitor.generic_frama_c_visitor (Cil.inplace_visit ());
+  { visitor = new Visitor.generic_frama_c_visitor (Visitor_behavior.inplace ());
     lscope = Lscope.empty;
     lscope_reset = true;
     annotation_kind = Misc.Assertion;
@@ -150,7 +150,7 @@ let current_kf env =
   let v = env.visitor in
   match v#current_kf with
   | None -> None
-  | Some kf -> Some (Cil.get_kernel_function v#behavior kf)
+  | Some kf -> Some (Visitor_behavior.Get.kernel_function v#behavior kf)
 
 let set_current_kf env kf =
   let v = env.visitor in

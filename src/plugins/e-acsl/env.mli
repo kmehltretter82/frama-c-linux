@@ -125,7 +125,7 @@ val get_generated_variables: t -> (varinfo * localized_scope) list
 (** All the new variables local to the visited function. *)
 
 val get_visitor: t -> Visitor.generic_frama_c_visitor
-val get_behavior: t -> Cil.visitor_behavior
+val get_behavior: t -> Visitor_behavior.t
 val current_kf: t -> kernel_function option
 (** Kernel function currently visited in the new project. *)
 

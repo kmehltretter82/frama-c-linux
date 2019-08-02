@@ -54,7 +54,7 @@ end = struct
       fold
         (fun vi env ->
            if Mmodel_analysis.must_model_vi ~kf vi then
-             let vi = Cil.get_varinfo (Env.get_behavior env) vi in
+             let vi = Visitor_behavior.Get.varinfo (Env.get_behavior env) vi in
              Env.add_stmt ?before env (mk_stmt vi)
            else
              env)
@@ -144,7 +144,7 @@ struct
   let exp_in_depth env e =
     let env_ref = ref env in
     let o = object
-      inherit Cil.genericCilVisitor (Cil.copy_visit (Project.current ()))
+      inherit Cil.genericCilVisitor (Visitor_behavior.copy (Project.current ()))
       method !vexpr e = match e.enode with
       (* the guard below could be optimized: if no annotation **depends on this
          string**, then it is not required to monitor it.
@@ -172,11 +172,11 @@ module Global_observer: sig
   val add_initializer: varinfo -> offset -> init -> unit
   (* add the initializer for the given observed variable *)
 
-  val mk_init: Cil.visitor_behavior -> Env.t -> varinfo * fundec * Env.t
+  val mk_init: Visitor_behavior.t -> Env.t -> varinfo * fundec * Env.t
   (* generates a new C function containing the observers for global variable
      declaration and initialization *)
 
-  val mk_delete: Cil.visitor_behavior -> stmt list -> stmt list
+  val mk_delete: Visitor_behavior.t -> stmt list -> stmt list
   (* generates the observers for global variable de-allocation *)
 
 end = struct
@@ -254,7 +254,7 @@ end = struct
     let env, stmts =
       Varinfo.Hashtbl.fold_sorted
         (fun old_vi l stmts ->
-          let new_vi = Cil.get_varinfo bhv old_vi in
+          let new_vi = Visitor_behavior.Get.varinfo bhv old_vi in
           List.fold_left
             (fun (env, stmts) (off, init) ->
               let env = literal_in_initializer env init in
@@ -269,7 +269,7 @@ end = struct
     let stmts =
       Varinfo.Hashtbl.fold_sorted
         (fun old_vi _ stmts ->
-          let new_vi = Cil.get_varinfo bhv old_vi in
+          let new_vi = Visitor_behavior.Get.varinfo bhv old_vi in
           (* a global is both allocated and initialized *)
           Misc.mk_store_stmt new_vi
           :: Misc.mk_initialize ~loc:Location.unknown (Cil.var new_vi)
@@ -329,7 +329,7 @@ end = struct
     let mk_delete bhv stmts =
       Varinfo.Hashtbl.fold_sorted
         (fun old_vi _l acc ->
-          let new_vi = Cil.get_varinfo bhv old_vi in
+          let new_vi = Visitor_behavior.Get.varinfo bhv old_vi in
           Misc.mk_delete_stmt new_vi :: acc)
         tbl
         stmts
@@ -340,7 +340,7 @@ end
 class e_acsl_visitor prj generate = object (self)
 
   inherit Visitor.generic_frama_c_visitor
-    (if generate then Cil.copy_visit prj else Cil.inplace_visit ())
+    (if generate then Visitor_behavior.copy prj else Visitor_behavior.inplace ())
 
   val mutable main_fct = None
   (* fundec of the main entry point, in the new project [prj].
@@ -472,7 +472,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
     if generate then
       Cil.JustCopyPost
         (fun l ->
-          let new_vi = Cil.get_varinfo self#behavior vi in
+          let new_vi = Visitor_behavior.Get.varinfo self#behavior vi in
           if Misc.is_library_loc vi.vdecl then
             Misc.register_library_function new_vi;
           if Builtins.mem vi.vname then Builtins.update vi.vname new_vi;
@@ -514,7 +514,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       (* Make a unique mapping for each global variable omitting initializers.
          Initializers (used to capture literal strings) are added to
          [global_vars] via the [vinit] visitor method (see comments below). *)
-      Global_observer.add (Cil.get_original_varinfo self#behavior vi)
+      Global_observer.add (Visitor_behavior.Get_orig.varinfo self#behavior vi)
     | _ -> ());
     if generate then Cil.DoChildrenPost(fun g -> List.iter do_it g; g)
     else Cil.DoChildren
@@ -550,7 +550,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
 
   method !vvdec vi =
     (try
-       let old_vi = Cil.get_original_varinfo self#behavior vi in
+       let old_vi = Visitor_behavior.Get_orig.varinfo self#behavior vi in
        let old_kf = Globals.Functions.get old_vi in
        funspec :=
          Cil.visitCilFunspec
@@ -611,12 +611,12 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       try Kernel_function.find_return old_kf
       with Kernel_function.No_Statement -> assert false
     in
-    Stmt.equal stmt (Cil.get_stmt self#behavior old_ret)
+    Stmt.equal stmt (Visitor_behavior.Get.stmt self#behavior old_ret)
 
   method private is_first_stmt old_kf stmt =
     try
       Stmt.equal
-        (Cil.get_original_stmt self#behavior stmt)
+        (Visitor_behavior.Get_orig.stmt self#behavior stmt)
         (Kernel_function.find_first_stmt old_kf)
     with Kernel_function.No_Statement ->
       assert false
@@ -674,7 +674,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
               Project.on prj (Translate.translate_pre_code_annotation kf env) a
             in
             env, a :: new_annots)
-          (Cil.get_original_stmt self#behavior stmt)
+          (Visitor_behavior.Get_orig.stmt self#behavior stmt)
           (env, [])
       else
         env, []
@@ -722,9 +722,9 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
           let new_stmt, env, must_mv =
             Loops.preserve_invariant prj env kf stmt
           in
-          let orig = Cil.get_original_stmt self#behavior stmt in
-          Cil.set_orig_stmt self#behavior new_stmt orig;
-          Cil.set_stmt self#behavior orig new_stmt;
+          let orig = Visitor_behavior.Get_orig.stmt self#behavior stmt in
+          Visitor_behavior.Set_orig.stmt self#behavior new_stmt orig;
+          Visitor_behavior.Set.stmt self#behavior orig new_stmt;
           new_stmt, env, must_mv
         else
           stmt, env, false
@@ -835,9 +835,9 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
             if not (Cil_datatype.Stmt.equal new_stmt res) then
               E_acsl_label.move (self :> Visitor.generic_frama_c_visitor)
                 new_stmt res;
-            let orig = Cil.get_original_stmt self#behavior stmt in
-            Cil.set_stmt self#behavior orig res;
-            Cil.set_orig_stmt self#behavior res orig;
+            let orig = Visitor_behavior.Get_orig.stmt self#behavior stmt in
+            Visitor_behavior.Set.stmt self#behavior orig res;
+            Visitor_behavior.Set_orig.stmt self#behavior res orig;
             res, env
           end else
             stmt, env
@@ -999,7 +999,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
             List.fold_left
               (fun acc vi ->
                  if Mmodel_analysis.must_model_vi vi && not vi.vdefined then
-                   let vi = Cil.get_varinfo self#behavior vi in
+                   let vi = Visitor_behavior.Get.varinfo self#behavior vi in
                    Misc.mk_store_stmt vi :: acc
                  else acc)
               new_blk.bstmts

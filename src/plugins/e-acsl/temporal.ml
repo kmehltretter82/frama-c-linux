@@ -487,7 +487,7 @@ let mk_global_init ~loc vi off init env =
   in
   (* The input [vi] is from the old project, so get the corresponding variable
      from the new one, otherwise AST integrity is violated *)
-  let vi = Cil.get_varinfo (Env.get_behavior env) vi in
+  let vi = Visitor_behavior.Get.varinfo (Env.get_behavior env) vi in
   let lv = Var vi, off in
   mk_stmt_from_assign loc lv exp
 (* }}} *)
@@ -504,7 +504,7 @@ let handle_function_parameters kf env =
   if is_enabled () then
     let env, _ = List.fold_left
       (fun (env, index) param ->
-        let param = Cil.get_varinfo (Env.get_behavior env) param in
+        let param = Visitor_behavior.Get.varinfo (Env.get_behavior env) param in
         let env =
           if Mmodel_analysis.must_model_vi ~kf param then
             track_argument param index env

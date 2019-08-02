@@ -215,7 +215,7 @@ let put_block_at_label env block label =
   end
   in
   let bhv = Env.get_behavior env in
-  ignore(Visitor.visitFramacStmt o (Cil.get_stmt bhv stmt));
+  ignore(Visitor.visitFramacStmt o (Visitor_behavior.Get.stmt bhv stmt));
   !env_ref
 
 let to_exp ~loc kf env pot label =

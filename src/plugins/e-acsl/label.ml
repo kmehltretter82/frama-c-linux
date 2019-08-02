@@ -44,12 +44,12 @@ let move (vis:Visitor.generic_frama_c_visitor) ~old new_stmt =
   | _ :: _ ->
     old.labels <- [];
     new_stmt.labels <- labels @ new_stmt.labels;
-    let old = Cil.get_original_stmt vis#behavior old in
+    let old = Visitor_behavior.Get_orig.stmt vis#behavior old in
     Labeled_stmts.add old new_stmt;
     (* update the gotos of the function jumping to one of the labels *)
     let o orig_stmt = object
       inherit Visitor.frama_c_inplace
-      (* invariant of this method: [s = Cil.memo_stmt vis#behavior orig_stmt] *)
+      (* invariant of this method: [s = Visitor_behavior.Memo.stmt vis#behavior orig_stmt] *)
       method !vstmt_aux s = match s.skind, orig_stmt.skind with
       | Goto(s_ref, _), Goto(orig_ref, _) ->
         if Cil_datatype.Stmt.equal !orig_ref old && s_ref != orig_ref then
@@ -65,7 +65,7 @@ let move (vis:Visitor.generic_frama_c_visitor) ~old new_stmt =
     end in
     let f = Extlib.the vis#current_func in
     let mv_labels s =
-      ignore (Visitor.visitFramacStmt (o s) (Cil.memo_stmt vis#behavior s))
+      ignore (Visitor.visitFramacStmt (o s) (Visitor_behavior.Memo.stmt vis#behavior s))
     in
     List.iter mv_labels f.sallstmts
 

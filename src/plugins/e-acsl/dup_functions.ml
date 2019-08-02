@@ -65,7 +65,7 @@ let dup_funspec tbl bhv spec =
       if Global.mem_logic_info li then
 	Cil.ChangeDoChildrenPost
 	  ({ li with l_var_info = li.l_var_info } (* force a copy *),
-	   Cil.get_logic_info bhv)
+	   Visitor_behavior.Get.logic_info bhv)
       else
 	Cil.JustCopy
 
@@ -73,8 +73,8 @@ let dup_funspec tbl bhv spec =
       Cil.DoChildrenPost
 	(function
 	(* no way to directly visit fieldinfo and model_info uses *)	
-	| TField(fi, off) -> TField(Cil.get_fieldinfo bhv fi, off)
-	| TModel(mi, off) -> TModel(Cil.get_model_info bhv mi, off)
+	| TField(fi, off) -> TField(Visitor_behavior.Get.fieldinfo bhv fi, off)
+	| TModel(mi, off) -> TModel(Visitor_behavior.Get.model_info bhv mi, off)
 	| off -> off)
 
     method !vlogic_var_use orig_lvi =
@@ -91,7 +91,7 @@ let dup_funspec tbl bhv spec =
 	  Cil.ChangeDoChildrenPost
 	    ({ orig_lvi with lv_id = orig_lvi.lv_id } (* force a copy *),
 	     fun lvi -> 
-	       (* using [Cil.get_logic_var bhv lvi] is correct only because the
+	       (* using [Visitor_behavior.Get.logic_var bhv lvi] is correct only because the
 		  lv_id used to compare the lvi does not change between the
 		  original one and this copy *)
 	       try 
@@ -105,7 +105,7 @@ let dup_funspec tbl bhv spec =
 		 lvi
 	       with Not_found -> 
 		 assert vi.vglob;
-		 Cil.get_logic_var bhv lvi)
+		 Visitor_behavior.Get.logic_var bhv lvi)
 
     method !videntified_term _ = 
       Cil.DoChildrenPost Logic_const.refresh_identified_term
@@ -192,7 +192,7 @@ let dup_global loc actions spec bhv sound_verdict_vi kf vi new_vi =
   (* remove the specs attached to the previous kf iff it is a definition:
      it is necessary to keep stable the number of annotations in order to get
      [Keep_status] working fine. *)
-  let kf = Cil.get_kernel_function bhv kf in
+  let kf = Visitor_behavior.Get.kernel_function bhv kf in
   if Kernel_function.is_definition kf then begin
     Queue.add
       (fun () ->
@@ -351,14 +351,14 @@ if there are memory-related annotations.@]"
         end;
         let kf =
           try
-            Globals.Functions.get (Cil.get_original_varinfo self#behavior vi)
+            Globals.Functions.get (Visitor_behavior.Get_orig.varinfo self#behavior vi)
           with Not_found ->
             Options.fatal
               "unknown function `%s' while trying to duplicate it"
               vi.vname
         in
         let spec = Annotations.funspec ~populate:false kf in
-        let vi_bhv = Cil.get_varinfo self#behavior vi in
+        let vi_bhv = Visitor_behavior.Get.varinfo self#behavior vi in
         let new_g, new_decl =
           dup_global
             loc
