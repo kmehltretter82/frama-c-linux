@@ -107,13 +107,13 @@ let join ty1 ty2 = match ty1, ty2 with
 exception Not_a_number
 let typ_of_number_ty = function
   | C_type ik -> TInt(ik, [])
-  | Gmpz -> Gmp.z_t ()
+  | Gmpz -> Gmp.Z.t ()
   | Real -> Real.t ()
   | Nan -> raise Not_a_number
 
 let typ_of_lty = function
   | Ctype cty -> cty
-  | Linteger -> Gmp.z_t ()
+  | Linteger -> Gmp.Z.t ()
   | Lreal ->
     (* TODO RATIONAL: implement this case *)
     assert false

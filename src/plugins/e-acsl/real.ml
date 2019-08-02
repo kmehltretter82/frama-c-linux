@@ -27,7 +27,7 @@ let t () =
     the following typ MUST be changed into a typ that can represent them.
     It is sound to use GMPQ for the time being since irrationals
     raise not_yet. *)
-  Gmp.q_t ()
+  Gmp.Q.t ()
 
 let is_t ty = Cil_datatype.Typ.equal ty (t ())
 
@@ -40,7 +40,7 @@ let init_set ~loc lval vi_e e =
         Gmp.affect ~loc lval vi_e e ]))
 
 let mk_real ~loc ?name e env t_opt =
-  if Gmp.is_z_t (Cil.typeOf e) then
+  if Gmp.Z.is_t (Cil.typeOf e) then
     (* GMPQ has no builtin for creating Q from Z. Hence:
        1) Get the MPZ as a string: gmZ_get_str
        2) Set the MPQ with that string: gmpQ_set_str *)

@@ -24,35 +24,29 @@
 
 open Cil_types
 
+val init_t: unit -> unit
+(** Must be called before any use of GMP *)
+
 (**************************************************************************)
 (******************************** Types ***********************************)
 (**************************************************************************)
 
-val init_t: unit -> unit
-(** Must be called before any use of GMP *)
+module type S = sig
+  val t: unit -> typ
+  val set_t: typeinfo -> unit
+  val is_now_referenced: unit -> unit
+  val is_t: typ -> bool
+end
 
-val set_z_t: typeinfo -> unit
-val set_q_t: typeinfo -> unit
-
-val z_t: unit -> typ
-(** type [mpz_t] *)
-
-val z_t_ptr: unit -> typ
+(** Representation of the unbounded integer type at runtime *)
+module Z: sig
+  include S
+  val t_ptr: unit -> typ
   (** type "_mpz_struct *" *)
+end
 
-val q_t: unit -> typ
-(** type [mpq_t] *)
-
-val is_z_now_referenced: unit -> unit
-(** Should be called once one variable of type [mpz_t] exists *)
-
-val is_q_now_referenced: unit -> unit
-(** Should be called once one variable of type [mpq_t] exists *)
-
-val is_z_t: typ -> bool
-(** is the type equal to [mpz_t]? *)
-val is_q_t: typ -> bool
-(** is the type equal to [mpq_t]? *)
+(** Representation of the rational type at runtime *)
+module Q: S
 
 (**************************************************************************)
 (************************* Calls to builtins ******************************)

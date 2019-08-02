@@ -73,7 +73,7 @@ let add_cast ~loc ?name env ctx sty t_opt e =
       ?name
       env
       t_opt
-      (Gmp.z_t ())
+      (Gmp.Z.t ())
       (fun lv v -> [ Gmp.init_set ~loc (Cil.var lv) v e ])
     in
     e, env
@@ -88,8 +88,8 @@ let add_cast ~loc ?name env ctx sty t_opt e =
     e, env
   | Some ctx ->
     let ty = Cil.typeOf e in
-    if Gmp.is_z_t ctx then
-      if Gmp.is_z_t ty then
+    if Gmp.Z.is_t ctx then
+      if Gmp.Z.is_t ty then
         e, env
       else if Real.is_t ty then
         Real.cast_to_z ~loc ?name e env
@@ -113,7 +113,7 @@ let add_cast ~loc ?name env ctx sty t_opt e =
       else Real.mk_real ~loc ?name e env t_opt
     else
       (* handle a C-integer context *)
-      if Gmp.is_z_t ty || sty = StrZ then
+      if Gmp.Z.is_t ty || sty = StrZ then
         (* we get an mpz, but it fits into a C integer: convert it *)
         let fname, new_ty =
           if Cil.isSignedInteger ctx then
@@ -155,7 +155,7 @@ let constant_to_exp ~loc t c =
        | Typing.C_type kind ->
          let cast = Typing.get_cast t in
          match cast, kind with
-         | Some ty, (ILongLong | IULongLong) when Gmp.is_z_t ty ->
+         | Some ty, (ILongLong | IULongLong) when Gmp.Z.is_t ty ->
            raise Cil.Not_representable
          | Some ty, (ILongLong | IULongLong) when Real.is_t ty ->
            mk_real (Integer.to_string n)
@@ -273,7 +273,7 @@ and context_insensitive_term_to_exp kf env t =
   | TUnOp(Neg | BNot as op, t') ->
     let ty = Typing.get_typ t in
     let e, env = term_to_exp kf env t' in
-    if Gmp.is_z_t ty then
+    if Gmp.Z.is_t ty then
       let name, vname = match op with
 	| Neg -> "__gmpz_neg", "neg"
 	| BNot -> "__gmpz_com", "bnot"
@@ -294,7 +294,7 @@ and context_insensitive_term_to_exp kf env t =
       Cil.new_exp ~loc (UnOp(op, e, ty)), env, Not_a_strnum, ""
   | TUnOp(LNot, t) ->
     let ty = Typing.get_op t in
-    if Gmp.is_z_t ty then
+    if Gmp.Z.is_t ty then
       (* [!t] is converted into [t == 0] *)
       let zero = Logic_const.tinteger 0 in
       let ctx = Typing.get_number_ty t in
@@ -314,7 +314,7 @@ and context_insensitive_term_to_exp kf env t =
     let ty = Typing.get_typ t in
     let e1, env = term_to_exp kf env t1 in
     let e2, env = term_to_exp kf env t2 in
-    if Gmp.is_z_t ty then
+    if Gmp.Z.is_t ty then
       let name = name_of_mpz_arith_bop bop in
       let mk_stmts _ e = [ Misc.mk_call ~loc name [ e; e1; e2 ] ] in
       let name = Misc.name_of_binop bop in
@@ -334,7 +334,7 @@ and context_insensitive_term_to_exp kf env t =
     let ty = Typing.get_typ t in
     let e1, env = term_to_exp kf env t1 in
     let e2, env = term_to_exp kf env t2 in
-    if Gmp.is_z_t ty then
+    if Gmp.Z.is_t ty then
       (* TODO: preventing division by zero should not be required anymore.
          RTE should do this automatically. *)
       let ctx = Typing.get_number_ty t in
@@ -352,7 +352,7 @@ and context_insensitive_term_to_exp kf env t =
           ~loc kf env Typing.gmpz ~e1:e2 ~name Eq t2 zero t
       in
       let mk_stmts _v e =
-	assert (Gmp.is_z_t ty);
+	assert (Gmp.Z.is_t ty);
 	let vis = Env.get_visitor env in
 	let kf = Extlib.the vis#current_kf in
 	let cond =
@@ -904,7 +904,7 @@ exception No_simple_translation of term
 let term_to_exp typ t =
   (* infer a context from the given [typ] whenever possible *)
   let ctx_of_typ ty =
-    if Gmp.is_z_t ty then Typing.gmpz
+    if Gmp.Z.is_t ty then Typing.gmpz
     else if Real.is_t ty then Typing.libr
     else
       match ty with

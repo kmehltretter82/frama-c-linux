@@ -198,10 +198,10 @@ let acc_list_rev acc l = List.fold_left (fun acc x -> x :: acc) acc l
 let do_new_var ~loc ?(scope=Local_block) ?(name="") env t ty mk_stmts =
   let local_env, tl_env = top env in
   let local_block = local_env.block_info in
-  let is_z_t = Gmp.is_z_t ty in
-  if is_z_t then Gmp.is_z_now_referenced ();
-  let is_q_t = Gmp.is_q_t ty in
-  if is_q_t then Gmp.is_q_now_referenced ();
+  let is_z_t = Gmp.Z.is_t ty in
+  if is_z_t then Gmp.Z.is_now_referenced ();
+  let is_q_t = Gmp.Q.is_t ty in
+  if is_q_t then Gmp.Q.is_now_referenced ();
   let n = succ env.cpt in
   let v =
     Cil.makeVarinfo
@@ -301,7 +301,7 @@ let new_var_and_mpz_init ~loc ?scope ?name env t mk_stmts =
     ?name
     env
     t
-    (Gmp.z_t ())
+    (Gmp.Z.t ())
     (fun v e -> Gmp.init ~loc e :: mk_stmts v e)
 
 module Logic_binding = struct
@@ -322,7 +322,7 @@ module Logic_binding = struct
       | Some ty -> ty
       | None -> match logic_v.lv_type with
         | Ctype ty -> ty
-        | Linteger -> Gmp.z_t ()
+        | Linteger -> Gmp.Z.t ()
         | Ltype _ as ty when Logic_const.is_boolean_type ty -> Cil.charType
         | Ltype _ | Lvar _ | Lreal | Larrow _ as lty ->
           let msg =

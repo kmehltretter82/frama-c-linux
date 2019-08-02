@@ -23,61 +23,53 @@
 open Cil_types
 
 (**************************************************************************)
-(***************************** mpz type ***********************************)
+(***************************** mpz types***********************************)
 (**************************************************************************)
 
-let z_t_torig_ref =
+let mk_dummy_type_info_ref () =
   ref
     { torig_name = "";
       tname = "";
       ttype = TVoid [];
       treferenced = false }
 
-let z_t_struct_torig_ref =
-  ref
-    { torig_name = "";
-      tname = "";
-      ttype = TVoid [];
-      treferenced = false }
+module type S = sig
+  val t: unit -> typ
+  val set_t: typeinfo -> unit
+  val is_now_referenced: unit -> unit
+  val is_t: typ -> bool
+end
 
-let set_z_t ty = z_t_torig_ref := ty
+module Make(X: sig end) = struct
+  let t_torig_ref = mk_dummy_type_info_ref ()
+  let set_t ty = t_torig_ref := ty
+  let is_now_referenced () = !t_torig_ref.treferenced <- true
+  let t () = TNamed(!t_torig_ref, [])
+  let is_t ty = Cil_datatype.Typ.equal ty (t ())
+end
 
-let is_z_now_referenced () = !z_t_torig_ref.treferenced <- true
+module Z = struct
 
-let z_t () = TNamed(!z_t_torig_ref, [])
+  include Make(struct end)
 
-let z_t_ptr () = TNamed(
-  {
-    torig_name = "";
-    tname = "__e_acsl_mpz_struct *";
-    ttype = TArray(
-      TNamed(!z_t_struct_torig_ref, []),
-      Some (Cil.one ~loc:Cil_datatype.Location.unknown),
-      {scache = Not_Computed},
-      []);
-    treferenced = true;
-  },
-[])
+  let t_struct_torig_ref = mk_dummy_type_info_ref ()
 
-let is_z_t ty = Cil_datatype.Typ.equal ty (z_t ())
+  let t_ptr () =
+    TNamed(
+      {
+        torig_name = "";
+        tname = "__e_acsl_mpz_struct *";
+        ttype = TArray(
+            TNamed(!t_struct_torig_ref, []),
+            Some (Cil.one ~loc:Cil_datatype.Location.unknown),
+            {scache = Not_Computed},
+            []);
+        treferenced = true;
+      },
+      [])
+end
 
-(**************************************************************************)
-(***************************** mpq type ***********************************)
-(**************************************************************************)
-
-let q_t_torig_ref =
-  ref
-    { torig_name = "";
-      tname = "";
-      ttype = TVoid [];
-      treferenced = false }
-
-let set_q_t ty = q_t_torig_ref := ty
-
-let is_q_now_referenced () = !q_t_torig_ref.treferenced <- true
-
-let q_t () = TNamed(!q_t_torig_ref, [])
-let is_q_t ty = Cil_datatype.Typ.equal ty (q_t ())
+module Q = Make(struct end)
 
 (**************************************************************************)
 (******************* Initialization of mpz and mpq types ******************)
@@ -89,10 +81,10 @@ let init_t () =
     inherit Cil.nopCilVisitor
     method !vglob = function
     | GType({ torig_name = s } as info, _) when s = "__e_acsl_mpz_t" ->
-      set_z_t info;
+      Z.set_t info;
       Cil.SkipChildren
     | GType({ torig_name = s } as info, _) when s = "__e_acsl_mpq_t" ->
-      set_q_t info;
+      Q.set_t info;
       Cil.SkipChildren
     | _ ->
       Cil.SkipChildren
@@ -106,11 +98,12 @@ let init_t () =
 let apply_on_var ~loc funname e =
   let prefix =
     let ty = Cil.typeOf e in
-    if is_z_t ty then "__gmpz_"
-    else if is_q_t ty then "__gmpq_"
+    if Z.is_t ty then "__gmpz_"
+    else if Q.is_t ty then "__gmpq_"
     else assert false
   in
   Misc.mk_call ~loc (prefix ^ funname) [ e ]
+
 let init ~loc e = apply_on_var "init" ~loc e
 let clear ~loc e = apply_on_var "clear" ~loc e
 
@@ -118,7 +111,7 @@ exception Longlong of ikind
 
 let get_set_suffix_and_arg e =
   let ty = Cil.typeOf e in
-  if is_z_t ty || is_q_t ty then "", [ e ]
+  if Z.is_t ty || Q.is_t ty then "", [ e ]
   else
     match Cil.unrollType ty with
     | TInt(IChar, _) ->
@@ -135,8 +128,9 @@ let get_set_suffix_and_arg e =
       [ e; Cil.integer ~loc:e.eloc 10 ]
     | TFloat((FDouble | FFloat), _) ->
       (* FFloat is a strict subset of FDouble (modulo exceptional numbers)
-        Hence, calling [set_d] for bor of them is sound.
-        HOWEVER: the machdep MUST NOT be vulnerable to double rounding *)
+         Hence, calling [set_d] for both of them is sound.
+         HOWEVER: the machdep MUST NOT be vulnerable to double rounding *)
+      (* TODO RATIONAL: check machdep *)
       "_d", [ e ]
     | TFloat(FLongDouble, _) ->
       Error.not_yet "creating gmp from long double"
@@ -145,18 +139,19 @@ let get_set_suffix_and_arg e =
 
 let generic_affect ~loc fname lv ev e =
   let ty = Cil.typeOf ev in
-  if is_z_t ty then begin
+  if Z.is_t ty then begin
     assert
-      (* Missing cast/wrong typing happened previously *)
-      (not (is_q_t (Cil.typeOf e)));
+      (* Missing cast/wrong typing happened in the past *)
+      (not (Q.is_t (Cil.typeOf e)));
     let suf, args = get_set_suffix_and_arg e in
     Misc.mk_call ~loc (fname ^ suf) (ev :: args)
-  end else if is_q_t ty then begin
+  end else if Q.is_t ty then begin
     assert
-      (* Missing cast/wrong typing happened previously *)
-      (not (is_z_t (Cil.typeOf e)));
-    (* TODO: If we try to factorize the following the above
-      then the result is different... why ?! *)
+      (* Missing cast/wrong typing happened in the past *)
+      (not (Z.is_t (Cil.typeOf e)));
+    (* TODO RATIONAL: [from Fonenantsoa:]
+       If we try to factorize the following the above
+       then the result is different... why ?! *)
     let suf, args = get_set_suffix_and_arg e in
     Misc.mk_call ~loc (fname ^ suf) (ev :: args)
   end else
@@ -165,9 +160,9 @@ let generic_affect ~loc fname lv ev e =
 let init_set ~loc lv ev e =
   let fname =
     let ty = Cil.typeOf ev in
-    if is_z_t ty then
+    if Z.is_t ty then
       "__gmpz_init_set"
-    else if is_q_t ty then
+    else if Q.is_t ty then
       Options.fatal "no __gmpq_init_set: init then set separately"
     else
       ""
@@ -177,7 +172,7 @@ let init_set ~loc lv ev e =
   | Longlong IULongLong ->
     (match e.enode with
     | Lval elv ->
-      assert (is_z_t (Cil.typeOf ev));
+      assert (Z.is_t (Cil.typeOf ev));
       let call = Misc.mk_call
         ~loc
         "__gmpz_import"
@@ -198,8 +193,8 @@ let init_set ~loc lv ev e =
 let affect ~loc lv ev e =
   let fname =
     let ty = Cil.typeOf ev in
-    if is_z_t ty then "__gmpz_set"
-    else if is_q_t ty then "__gmpq_set"
+    if Z.is_t ty then "__gmpz_set"
+    else if Q.is_t ty then "__gmpq_set"
     else ""
   in
   try generic_affect ~loc fname lv ev e

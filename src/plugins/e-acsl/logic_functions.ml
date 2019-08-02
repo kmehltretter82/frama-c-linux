@@ -41,7 +41,7 @@ let term_to_exp_ref
 
 (* @return true iff the result of the function is provided by reference as the
    first extra argument at each call *)
-let result_as_extra_argument = Gmp.is_z_t
+let result_as_extra_argument = Gmp.Z.is_t
 (* TODO: to be extended to any compound type? E.g. returning a struct is not
    good practice... *)
 
@@ -125,7 +125,7 @@ let generate_kf ~loc fname env ret_ty params_ty li =
           | Typing.Gmpz ->
             (* GMP's integer are arrays: consider them as pointers in function's
                parameters *)
-            Gmp.z_t_ptr ()
+            Gmp.Z.t_ptr ()
           | Typing.C_type ik -> TInt(ik, [])
           | Typing.Real ->
             (* TODO RATIONAL: implement this case *)
@@ -196,7 +196,7 @@ let generate_kf ~loc fname env ret_ty params_ty li =
         | TInt _ as ty -> Interval.Env.add lvi (Interval.interv_of_typ ty)
         | ty ->
             (* TODO RATIONAL: what to do with rationals? *)
-          if Gmp.is_z_t ty then
+          if Gmp.Z.is_t ty then
             Interval.Env.add lvi (Ival.inject_range None None));
         Env.Logic_binding.add_binding env lvi vi
       in
