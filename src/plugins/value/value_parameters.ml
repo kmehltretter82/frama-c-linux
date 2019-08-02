@@ -1546,6 +1546,7 @@ let get array n = if n < 0 then 0 else array.(n)
 
 let () =
   bind (module MinLoopUnroll) (fun n -> max 0 (n - 4));
+  bind (module AutoLoopUnroll) (fun n -> if n = 0 then 0 else 4 lsl n);
   bind (module SemanticUnrollingLevel) (get slevel_power);
   bind (module WideningDelay) (fun n -> 1 + n / 2);
   bind (module ILevel) (get ilevel_power);
