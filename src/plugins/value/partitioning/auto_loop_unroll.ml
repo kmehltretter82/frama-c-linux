@@ -233,6 +233,17 @@ module Make (Abstract: Abstractions.Eva) = struct
   let (>>) v f = match v with `Value v -> f v | _ -> None
   let (>>=) v f = match v with Some v -> f v | None -> None
 
+  let cvalue_complement typ cvalue =
+    let open Eval_typ in
+    match Eval_typ.classify_as_scalar typ with
+    | Some (TSFloat _ | TSPtr _) | None -> None
+    | Some (TSInt ik) ->
+      try
+        let ival = Cvalue.V.project_ival cvalue in
+        Ival.complement_int_under ~size:ik.i_bits ~signed:ik.i_signed ival
+        >> fun ival -> Some (Cvalue.V.inject_ival ival)
+      with Cvalue.V.Not_based_on_null -> None
+
   (* Reduces the condition "[condition] = [positive]" to a sufficient hypothesis
      on the value of the expression [expr]: computes a value [v] such that
      if the expression [expr] evaluates to [v], then [condition] = [positive].
@@ -241,18 +252,33 @@ module Make (Abstract: Abstractions.Eva) = struct
      and in the given valuation. *)
   let reduce_to_expr valuation ~expr ~condition ~positive =
     let state = Abstract.Dom.top in
-    (* Assumes that the [condition] is [positive]. *)
-    fst (Eval.reduce ~valuation state condition positive)
-    >> fun resulting_valuation ->
-    (* Finds the value of [expr] in the resulting valuation. *)
-    Valuation.find resulting_valuation expr >> fun record ->
-    record.value.v >> fun value ->
-    (* If the value of [expr] is top, no reduction has been performed. *)
-    if Val.(equal top value) then None
-    else
-      (* Otherwise, re-evaluate the condition with the hypothesis that [expr]
-         evaluates to [value]. If the condition is satisfied, then
-         [expr] ∈ [value] ⇒ [condition] = [positive]. *)
+    (* Reduces [expr] by assuming that [condition] is [positive]. *)
+    let reduce positive =
+      (* Assumes that [condition] is [positive]. *)
+      fst (Eval.reduce ~valuation state condition positive) >> fun valuation ->
+      (* Finds the value of [expr] in the resulting valuation. *)
+      Valuation.find valuation expr >> fun record ->
+      record.value.v >> fun value ->
+      (* If the new value of [expr] is top, no reduction has been performed. *)
+      if Val.(equal top value) then None else Some (value, record)
+    in
+    (* Different strategies whether cvalue is present. *)
+    match Val.get Main_values.CVal.key with
+    | Some get_cvalue ->
+      (* Assumes that [condition] is NOT [positive]. *)
+      reduce (not positive) >>= fun (value, _record) ->
+      (* [value] is an over-approximation of the values of [expr] for which
+         [condition] is NOT positive; its complement is an under-approximation
+         of the values for which [condition] is positive. *)
+      let cvalue = get_cvalue value in
+      cvalue_complement (Cil.typeOf expr) cvalue >>= fun cvalue ->
+      Some (Val.set Main_values.CVal.key cvalue Val.top)
+    | None ->
+      (* Assumes that [condition] is [positive]. Returns an over-approximation
+         of the values for which [condition] is [positive]. *)
+      reduce positive >>= fun (value, record) ->
+      (* Evaluates [condition] with the hypothesis [expr] ∈ [value], to check
+         whether [expr] ∈ [value] ⇒ [condition] = [positive]. *)
       let valuation = Valuation.add valuation expr record in
       fst (Eval.evaluate ~valuation ~reduction:false state condition)
       >> fun (_valuation, v) ->
