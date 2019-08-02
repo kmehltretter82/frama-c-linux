@@ -4,6 +4,7 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
+[eva:loop-unroll] tests/nonterm/callstack.i:11: Automatic loop unrolling.
 [eva] computing for function g <- main.
   Called from tests/nonterm/callstack.i:12.
 [eva] computing for function f <- g <- main.
