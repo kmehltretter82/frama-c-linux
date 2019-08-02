@@ -350,7 +350,8 @@ let generate_exn_union e exns =
   in
   let union_name = "__fc_exn_union" in
   let exn_kind_union =
-    Cil.mkCompInfo false union_name ~norig:union_name create_union_fields []
+    Cil_const.mkCompInfo
+      false union_name ~norig:union_name create_union_fields []
   in
   let create_struct_fields _ =
     let uncaught = (exn_uncaught_name, Cil.intType, None, [], loc) in
@@ -363,7 +364,8 @@ let generate_exn_union e exns =
   in
   let struct_name = "__fc_exn_struct" in
   let exn_struct =
-    Cil.mkCompInfo true struct_name ~norig:struct_name create_struct_fields []
+    Cil_const.mkCompInfo
+      true struct_name ~norig:struct_name create_struct_fields []
   in
   exn_kind_union, exn_struct
 
@@ -690,8 +692,10 @@ object(self)
 
   method private clean_catch_clause (bind,b as handler) acc =
     let remove_local v =
-      let f = Cil.get_fundec self#behavior (Extlib.the self#current_func) in
-      let v = Cil.get_varinfo self#behavior v in
+      let f =
+        Visitor_behavior.Get.fundec self#behavior (Extlib.the self#current_func)
+      in
+      let v = Visitor_behavior.Get.varinfo self#behavior v in
       f.slocals <- List.filter (fun v' -> v!=v') f.slocals;
     in
     match bind with

@@ -1567,7 +1567,7 @@ let prepare_from_c_files () =
 
 let init_project_from_visitor ?(reorder=false) prj
     (vis:Visitor.frama_c_visitor) =
-  if not (Cil.is_copy_behavior vis#behavior)
+  if not (Visitor_behavior.is_copy vis#behavior)
   || not (Project.equal prj (Extlib.the vis#project))
   then
     Kernel.fatal

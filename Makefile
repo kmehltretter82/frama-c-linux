@@ -520,6 +520,7 @@ KERNEL_CMO=\
 	src/kernel_services/ast_queries/cil_const.cmo                \
 	src/kernel_services/ast_queries/logic_env.cmo                \
 	src/kernel_services/ast_queries/logic_const.cmo              \
+	src/kernel_services/visitors/visitor_behavior.cmo		\
 	src/kernel_services/ast_queries/cil.cmo                      \
 	src/kernel_internals/parsing/errorloc.cmo                      \
 	src/kernel_services/ast_printing/cil_printer.cmo                \

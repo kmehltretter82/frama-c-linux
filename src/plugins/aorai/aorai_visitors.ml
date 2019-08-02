@@ -978,7 +978,7 @@ object(self)
         Cil.mkStmtOneInstr
           (Set((Var vi_init,NoOffset), Cil.zero ~loc, loc))
       in
-      stmt_varset.sid<-(Cil.Sid.next ());
+      stmt_varset.sid<-(Cil_const.Sid.next ());
       stmt_varset.ghost<-true;
       begin
         (* Function adapted from the cil printer *)

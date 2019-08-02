@@ -84,6 +84,26 @@ process_file ()
    -e "s/Transitioning\.List\./List./g" \
    -e "s/Transitioning\.Stack\./Stack./g" \
    -e "s/Transitioning\.String\./String./g" \
+   -e "s/Cil\.Eid/Cil_const\.Eid/g" \
+   -e "s/Cil\.Sid/Cil_const\.Sid/g" \
+   -e "s/Cil\.mkCompInfo/Cil_const\.mkCompInfo/g" \
+   -e "s/Cil\.copyCompInfo/Cil_const\.copyCompInfo/g" \
+   -e "s/Cil\.visitor_behavior/Visitor_behavior\.t/g" \
+   -e "s/Cil\.inplace_visit/Visitor_behavior\.inplace/g" \
+   -e "s/Cil\.copy_visit/Visitor_behavior\.copy/g" \
+   -e "s/Cil\.refresh_visit/Visitor_behavior\.refresh/g" \
+   -e "s/Cil\.is_fresh_behavior/Visitor_behavior\.is_fresh/g" \
+   -e "s/Cil\.is_copy_behavior/Visitor_behavior\.is_copy/g" \
+   -e "s/Cil\.reset_behavior_/Visitor_behavior\.Reset\./g" \
+   -e "s/Cil\.get_original_/Visitor_behavior\.Get_orig\./g" \
+   -e "s/Cil\.get_/Visitor_behavior\.Get\./g" \
+   -e "s/Cil\.set_orig_/Visitor_behavior\.Set_orig\./g" \
+   -e "s/Cil\.set_/Visitor_behavior\.Set\./g" \
+   -e "s/Cil\.unset_orig_/Visitor_behavior\.Unset_orig\./g" \
+   -e "s/Cil\.unset_/Visitor_behavior\.Unset\./g" \
+   -e "s/Cil\.memo_/Visitor_behavior\.Memo\./g" \
+   -e "s/Cil\.iter_visitor_/Visitor_behavior\.Iter\./g" \
+   -e "s/Cil\.fold_visitor_/Visitor_behavior\.Fold\./g" \
    $file
 }
 
