@@ -5,7 +5,7 @@ stages:
 
 variables:
     CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "stable/potassium"
+    DEFAULT: "master"
     OCAML: "4_05"
     FRAMA_CI_OPT: "--override e-acsl:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
 
