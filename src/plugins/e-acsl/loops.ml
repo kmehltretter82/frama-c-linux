@@ -224,7 +224,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     let env = match ctx_one with
       | Typing.C_type _ -> env
       | Typing.Gmpz -> Env.add_stmt env (Gmp.init ~loc x)
-      | Typing.Libr | Typing.Nan -> assert false
+      | Typing.Real | Typing.Nan -> assert false
     in
     (* build the inner loops and loop body *)
     let body, env =
@@ -304,7 +304,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     let vi_of_lv, exp_of_lv, env = Env.Logic_binding.add ~ty env lv in
     let e, env = term_to_exp kf env t in
     let ty = Cil.typeOf e in
-    let init_set = if Libr.is_t ty then Libr.init_set else Gmp.init_set in
+    let init_set = if Real.is_t ty then Real.init_set else Gmp.init_set in
     let let_stmt = init_set ~loc (Cil.var vi_of_lv) exp_of_lv  e in
     let stmts, env =
       mk_nested_loops ~loc mk_innermost_block kf env lscope_vars'

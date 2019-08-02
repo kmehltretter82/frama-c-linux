@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Library for real numbers.
+(** Realary for real numbers.
     For the sake of maintainability, the only access to the installed
     real library MUST be through the current module.
     For example, if it is `libgmp` then we MUST NEVER directly call gmp

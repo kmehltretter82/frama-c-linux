@@ -232,7 +232,7 @@ let to_exp ~loc kf env pot label =
     begin match Typing.get_number_ty t with
     | Typing.C_type _ | Typing.Nan ->
       Typing.get_typ t
-    | Typing.Libr ->
+    | Typing.Real ->
       Error.not_yet "\\at on purely logic variables and over real type"
     | Typing.Gmpz ->
       Error.not_yet "\\at on purely logic variables and over gmp type"
@@ -267,7 +267,7 @@ let to_exp ~loc kf env pot label =
         Error.not_yet
           "\\at on purely logic variables that needs to allocate \
             too much memory (bigger than int_max bytes)"
-      | Typing.Libr | Typing.Nan ->
+      | Typing.Real | Typing.Nan ->
         Options.fatal
           "quantification over non-integer type is not part of E-ACSL"
       in
@@ -317,7 +317,7 @@ let to_exp ~loc kf env pot label =
         (* We CANNOT return [block.bstmts] because it does NOT contain
           variable declarations. *)
         [ Cil.mkStmt ~valid_sid:true (Block block) ], env
-      | Typing.Libr ->
+      | Typing.Real ->
         Error.not_yet "\\at on purely logic variables and over real type"
       | Typing.Gmpz ->
         Error.not_yet "\\at on purely logic variables and over gmp type"

@@ -214,7 +214,7 @@ let call_memory_block ~loc kf name ctx env ptr r p =
     | Typing.C_type _ ->
       let size, env = term_to_exp kf env size_term in
       Cil.constFold false size, env
-    | Typing.Libr | Typing.Nan ->
+    | Typing.Real | Typing.Nan ->
       assert false
   in
   (* base and base_addr *)

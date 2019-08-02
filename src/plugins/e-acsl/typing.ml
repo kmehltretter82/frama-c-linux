@@ -39,13 +39,13 @@ let compute_quantif_guards_ref
 type number_ty =
   | C_type of ikind
   | Gmpz
-  | Libr
+  | Real
   | Nan
 
 let c_int = C_type IInt
 let ikind ik = C_type ik
 let gmpz = Gmpz
-let libr = Libr
+let libr = Real
 let nan = Nan
 
 module D =
@@ -86,11 +86,11 @@ module D =
 let join ty1 ty2 = match ty1, ty2 with
   | Nan, Nan ->
     Nan
-  | Nan, Libr | Libr, Nan ->
+  | Nan, Real | Real, Nan ->
     Options.fatal "[typing] join failure: real and nan"
-  | Libr, Libr -> Libr
-  | Libr, (Gmpz | C_type _) | (Gmpz | C_type _), Libr ->
-    Libr
+  | Real, Real -> Real
+  | Real, (Gmpz | C_type _) | (Gmpz | C_type _), Real ->
+    Real
   | Nan, (Gmpz | C_type _) | (Gmpz | C_type _), Nan ->
     Options.fatal "[typing] join failure: integer and nan"
   | Gmpz, _ | _, Gmpz -> Gmpz
@@ -108,7 +108,7 @@ exception Not_a_number
 let typ_of_number_ty = function
   | C_type ik -> TInt(ik, [])
   | Gmpz -> Gmp.z_t ()
-  | Libr -> Libr.t ()
+  | Real -> Real.t ()
   | Nan -> raise Not_a_number
 
 let typ_of_lty = function
@@ -185,9 +185,9 @@ let ty_of_logic_ty = function
   | Linteger -> Gmpz
   | Ctype ty -> (match Cil.unrollType ty with
     | TInt(ik, _) -> C_type ik
-    | TFloat _ -> Libr
+    | TFloat _ -> Real
     | _ -> Nan)
-  | Lreal -> Libr
+  | Lreal -> Real
   | Larrow _ -> Nan
   | Ltype _ -> Error.not_yet "user-defined logic type"
   | Lvar _ -> Error.not_yet "type variable"
@@ -205,10 +205,10 @@ let ty_of_interv ?ctx i =
      | None | Some (Gmpz | Nan) -> C_type kind
      | Some (C_type ik as ctx) ->
        if Cil.intTypeIncluded kind ik then ctx else C_type kind
-     | Some Libr -> Libr)
+     | Some Real -> Real)
   with Cil.Not_representable ->
     match ctx with
-    | Some (Libr) -> Libr
+    | Some (Real) -> Real
     | None | Some _ -> Gmpz
 
 (* compute a new {!computed_info} by coercing the given type [ty] to the given
@@ -250,7 +250,7 @@ let offset_ty t =
    is true. *)
 let mk_ctx ~use_gmp_opt = function
   | C_type _ as c -> if use_gmp_opt && Options.Gmp_only.get () then Gmpz else c
-  | Gmpz | Libr | Nan as c -> c
+  | Gmpz | Real | Nan as c -> c
 
 let infer_if_integer li =
   let li_t = Misc.term_of_li li in
@@ -258,7 +258,7 @@ let infer_if_integer li =
   | C_type _ | Gmpz ->
     let i = Interval.infer li_t in
     Interval.Env.add li.l_var_info i
-  | Libr | Nan ->
+  | Real | Nan ->
     ()
 
 (* type the term [t] in a context [ctx] by taking --e-acsl-gmp-only into account
@@ -402,7 +402,7 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
       ignore (type_term ~use_gmp_opt:true ~ctx t2);
       let ty = match ctx with
         | Nan -> c_int
-        | Libr | Gmpz | C_type _ -> ctx
+        | Real | Gmpz | C_type _ -> ctx
       in
       c_int, ty
 
@@ -623,7 +623,7 @@ let rec type_predicate p =
       ignore (type_term ~use_gmp_opt:true ~ctx t2);
       (match ctx with
       | Nan -> c_int
-      | Libr | Gmpz | C_type _ -> ctx)
+      | Real | Gmpz | C_type _ -> ctx)
     | Pand(p1, p2)
     | Por(p1, p2)
     | Pxor(p1, p2)
@@ -691,7 +691,7 @@ let rec type_predicate p =
             | C_type _ -> i
             | Gmpz -> Ival.inject_range None None (* [ -\infty; +\infty ] *)
             | Nan -> assert false
-            | Libr -> Error.not_yet "reals: quantification"
+            | Real -> Error.not_yet "reals: quantification"
           in
           Interval.Env.add x i)
         guards;
@@ -749,7 +749,7 @@ let extract_typ t ty =
     | Ctype _ ->
       Logic_utils.logicCType lty
     | Lreal ->
-      Libr.t ()
+      Real.t ()
     | Ltype _ | Lvar _ | Linteger | Larrow _ ->
       if Cil.isLogicRealType lty then TFloat(FLongDouble, [])
       else if Cil.isLogicFloatType lty then  Logic_utils.logicCType lty

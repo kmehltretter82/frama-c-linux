@@ -55,7 +55,7 @@ open Cil_types
 type number_ty = private
   | C_type of ikind
   | Gmpz
-  | Libr
+  | Real
   | Nan
 
 module Datatype: Datatype.S_with_collections with type t = number_ty
@@ -73,7 +73,7 @@ val nan: number_ty
 exception Not_a_number
 val typ_of_number_ty: number_ty -> typ
 (** @return the C type corresponding to an {!number_ty}. That is [Gmp.z_t ()]
-    for [Gmpz], [Libr.t ()] for [Libr] and [TInt(ik, [[]])] for [Ctype ik].
+    for [Gmpz], [Real.t ()] for [Real] and [TInt(ik, [[]])] for [Ctype ik].
     @raise Not_a_number in case of [Nan]. *)
 
 val number_ty_of_typ: typ -> number_ty

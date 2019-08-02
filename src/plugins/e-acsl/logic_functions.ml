@@ -127,7 +127,7 @@ let generate_kf ~loc fname env ret_ty params_ty li =
                parameters *)
             Gmp.z_t_ptr ()
           | Typing.C_type ik -> TInt(ik, [])
-          | Typing.Libr ->
+          | Typing.Real ->
             (* TODO RATIONAL: implement this case *)
             assert false
           | Typing.Nan -> Typing.typ_of_lty lvi.lv_type

@@ -62,7 +62,7 @@ val ikind_of_interv: Ival.t -> Cil_types.ikind
 val interv_of_typ: Cil_types.typ -> Ival.t
 (** @return the smallest interval which contains the given C type.
     @raise Is_a_real if the given type is a float type.
-      (* TODO: also return is_real=true if ty=Libr.t *)
+      (* TODO: also return is_real=true if ty=Real.t *)
     @raise Not_a_number if the given type does not represent numbers. *)
 
 (* ************************************************************************** *)

@@ -62,7 +62,7 @@ let rec interv_of_typ_with_real ty is_real = match Cil.unrollType ty with
   | TFloat _ ->
     (* TODO: Do not systematically consider floats as reals for efficiency *)
     Ival.bottom, true
-  | _ when Libr.is_t ty ->
+  | _ when Real.is_t ty ->
     Ival.bottom, true
   | _ ->
     raise Not_a_number

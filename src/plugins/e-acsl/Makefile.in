@@ -71,7 +71,7 @@ PLUGIN_CMO:= local_config \
 	label \
 	lscope \
 	env \
-	libr \
+	real \
 	keep_status \
 	dup_functions \
 	interval \
