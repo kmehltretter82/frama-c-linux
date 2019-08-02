@@ -1864,7 +1864,7 @@ let toplevel play =
               (fun f -> ignore (Glib.Timeout.add ~ms:50 ~callback:f));
             let project_name = Gui_parameters.Project_name.get () in
             if project_name = "" then
-                Project.set_current_as_last_created ()
+              Project.set_current_as_last_created ()
             else
               Project.set_current (Project.from_unique_name project_name);
             Ast.compute ()
