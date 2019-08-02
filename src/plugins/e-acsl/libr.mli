@@ -24,14 +24,14 @@
     For the sake of maintainability, the only access to the installed
     real library MUST be through the current module.
     For example, if it is `libgmp` then we MUST NEVER directly call gmp
-    builtins in outer modules (eg: `Typing` or `Translate`) for handling reals.
+    builtins in outer modules (e.g. `Typing` or `Translate`) for handling reals.
     This way, if we want to change `libgmp` to something else, say `mpfr`, then
     all changes will be centralized here. *)
 
 open Cil_types
 
 val t: unit -> typ
-(** Real typ *)
+(** C type representing reals in the generated code  *)
 
 val is_t: typ -> bool
 (** Is the typ real? *)
@@ -59,7 +59,7 @@ val add_cast: loc:location -> ?name:string -> exp -> Env.t -> typ ->
 (** Assumes that the given exp is of real type and casts it into
     the given typ *)
 
-val mk_binop: loc:location -> binop -> exp -> exp -> Env.t -> term option ->
+val binop: loc:location -> binop -> exp -> exp -> Env.t -> term option ->
   exp * Env.t
 (** Applies [binop] to the given expressions. The optional term
     indicates whether the comparison has a correspondance in the logic. *)

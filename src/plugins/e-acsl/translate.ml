@@ -323,7 +323,7 @@ and context_insensitive_term_to_exp kf env t =
       in
       e, env, Not_a_strnum, ""
     else if Libr.is_t ty then
-      let e, env = Libr.mk_binop ~loc bop e1 e2 env (Some t) in
+      let e, env = Libr.binop ~loc bop e1 e2 env (Some t) in
       e, env, Not_a_strnum, ""
     else
       if Logic_typing.is_integral_type t.term_type then
@@ -370,7 +370,7 @@ and context_insensitive_term_to_exp kf env t =
       let _, e, env = Env.new_var_and_mpz_init ~loc ~name env t mk_stmts in
       e, env, Not_a_strnum, ""
     else if Libr.is_t ty then
-      let e, env = Libr.mk_binop ~loc bop e1 e2 env (Some t) in
+      let e, env = Libr.binop ~loc bop e1 e2 env (Some t) in
       e, env, Not_a_strnum, ""
     else
       (* no guard required since RTEs are generated separately *)

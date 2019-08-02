@@ -124,12 +124,6 @@ val mk_ptr_sizeof: typ -> location -> exp
 (** [mk_ptr_sizeof ptr_typ loc] takes the pointer typ [ptr_typ] that points
     to a [typ] typ and returns [sizeof(typ)]. *)
 
-val dec_to_frac: string -> string
-(** Computes the fractional representation of a decimal number.
-    Does NOT perform reduction.
-    Eg: [dec_to_frac "43.567"] evaluates to ["43567/1000"]
-    @raise [Invalid_argument] if input is not written in decimal expansion. *)
-
 val name_of_binop: binop -> string
 (** Returns the name of the given binop as a string *)
 

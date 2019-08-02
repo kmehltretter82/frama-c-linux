@@ -315,58 +315,6 @@ let finite_min_and_max i = match Ival.min_and_max i with
   | Some min, Some max -> min, max
   | None, _ | _, None -> assert false
 
-(* Author: Frédéric Recoules
-  Complexity: Linear
-  It iterates **once** over [str] during which three cases are distinguished,
-  example for "43.567":
-  Case1: pre: no '.' has been found yet ==> copy current char into buf
-    buf: | 4 |   |   |   |   |   |   |   |   |   |   |   |
-         | 4 | 3 |   |   |   |   |   |   |   |   |   |   |
-  Case2: mid: current char is '.' ==> put "/1" into buf at [(length str) - 1]
-    buf: | 4 | 3 |   |   |   | / | 1 |   |   |   |   |   |
-  Case3: post: a '.' was found ==> put current char in numerator AND '0' in den
-    buf: | 4 | 3 | 5 |   |   | / | 1 | 0 |   |   |   |   |
-         | 4 | 3 | 5 | 6 |   | / | 1 | 0 | 0 |   |   |   |
-         | 4 | 3 | 5 | 6 | 7 | / | 1 | 0 | 0 | 0 |   |   | *)
-let dec_to_frac str =
-  let rec post str len buf len' i =
-    if i = len then
-      Bytes.sub_string buf 0 len'
-    else
-      match String.unsafe_get str i with
-      | c when '0' <= c && c <= '9' ->
-        Bytes.unsafe_set buf (i - 1) c;
-        Bytes.unsafe_set buf len' '0';
-        post str len buf (len' + 1) (i + 1)
-      | _ ->
-        raise (Invalid_argument str)
-  in
-  let mid buf len =
-    Bytes.unsafe_set buf (len - 1) '/';
-    Bytes.unsafe_set buf len '1'
-  in
-  let rec pre str len buf i =
-    if i = len then
-      str
-    else
-      match String.unsafe_get str i with
-      | '.' ->
-        mid buf len;
-        post str len buf (len + 1) (i + 1)
-      | c when '0' <= c && c <= '9' ->
-        Bytes.unsafe_set buf i c;
-        pre str len buf (i + 1)
-      | _ ->
-        raise (Invalid_argument str)
-  in
-  let strlen = String.length str in
-  let buflen =
-    (* The fractional representation is at most twice as lengthy
-      as the decimal one. *)
-    2 * strlen
-  in
-  pre str strlen (Bytes.create buflen) 0
-
 let name_of_binop = function
   | Lt -> "lt"
   | Gt -> "gt"

@@ -42,65 +42,123 @@ let init_set ~loc lval vi_e e =
 let mk_real ~loc ?name e env t_opt =
   if Gmp.is_z_t (Cil.typeOf e) then
     (* GMPQ has no builtin for creating Q from Z. Hence:
-      1) Get the MPZ as a string: gmZ_get_str
-      2) Set the MPQ with that string: gmpQ_set_str *)
+       1) Get the MPZ as a string: gmZ_get_str
+       2) Set the MPQ with that string: gmpQ_set_str *)
     Error.not_yet "reals: creating Q from Z"
   else
-    let _, e, env = Env.new_var
-      ~loc
-      ?name
-      env
-      t_opt
-      (t ())
-      (fun vi vi_e ->
-        [ Gmp.init ~loc vi_e ;
-          Gmp.affect ~loc (Cil.var vi) vi_e e ])
+    let _, e, env =
+      Env.new_var
+        ~loc
+        ?name
+        env
+        t_opt
+        (t ())
+        (fun vi vi_e ->
+           [ Gmp.init ~loc vi_e ;
+             Gmp.affect ~loc (Cil.var vi) vi_e e ])
     in
     e, env
 
+exception Not_a_decimal of string
+
+(* Computes the fractional representation of a decimal number.
+   Does NOT perform reduction.
+   Example: [dec_to_frac "43.567"] evaluates to ["43567/1000"]
+   Complexity: Linear
+   Original Author: Frédéric Recoules
+
+   It iterates **once** over [str] during which three cases are distinguished,
+   example for "43.567":
+   Case1: pre: no '.' has been found yet ==> copy current char into buf
+    buf: | 4 |   |   |   |   |   |   |   |   |   |   |   |
+         | 4 | 3 |   |   |   |   |   |   |   |   |   |   |
+   Case2: mid: current char is '.' ==> put "/1" into buf at [(length str) - 1]
+    buf: | 4 | 3 |   |   |   | / | 1 |   |   |   |   |   |
+   Case3: post: a '.' was found ==> put current char in numerator AND '0' in den
+    buf: | 4 | 3 | 5 |   |   | / | 1 | 0 |   |   |   |   |
+         | 4 | 3 | 5 | 6 |   | / | 1 | 0 | 0 |   |   |   |
+         | 4 | 3 | 5 | 6 | 7 | / | 1 | 0 | 0 | 0 |   |   | *)
+let decimal_to_fractional str =
+  let rec post str len buf len' i =
+    if i = len then
+      Bytes.sub_string buf 0 len'
+    else
+      match String.unsafe_get str i with
+      | c when '0' <= c && c <= '9' ->
+        Bytes.unsafe_set buf (i - 1) c;
+        Bytes.unsafe_set buf len' '0';
+        post str len buf (len' + 1) (i + 1)
+      | _ ->
+        raise (Not_a_decimal str)
+  in
+  let mid buf len =
+    Bytes.unsafe_set buf (len - 1) '/';
+    Bytes.unsafe_set buf len '1'
+  in
+  let rec pre str len buf i =
+    if i = len then
+      str
+    else
+      match String.unsafe_get str i with
+      | '.' ->
+        mid buf len;
+        post str len buf (len + 1) (i + 1)
+      | c when '0' <= c && c <= '9' ->
+        Bytes.unsafe_set buf i c;
+        pre str len buf (i + 1)
+      | _ ->
+        raise (Not_a_decimal str)
+  in
+  let strlen = String.length str in
+  let buflen =
+    (* The fractional representation is at most twice as lengthy
+      as the decimal one. *)
+    2 * strlen
+  in
+  pre str strlen (Bytes.create buflen) 0
+
 (* ACSL considers strings written in decimal expansion to be reals.
-  Yet GMPQ considers them to be double:
-  they MUST be converted into fractional representation. *)
+   Yet GMPQ considers them to be double:
+   they MUST be converted into fractional representation. *)
 let normalize_str str =
   try
-    Misc.dec_to_frac str
+    decimal_to_fractional str
   with Invalid_argument _ ->
     Error.not_yet "number not written in decimal expansion"
 
-let cast_to_z ~loc ?name e env =
-  ignore (loc, name, e, env);
+let cast_to_z ~loc:_ ?name:_ e _env =
+  assert (is_t (Cil.typeOf e));
   Error.not_yet "reals: cast from R to Z"
 
 let add_cast ~loc ?name e env ty =
-  (* TODO: The best solution would actually be to directly write all the
-           needed functions as C builtins then just call them here
-           depending on the situation at hand. *)
+  (* TODO: The best solution would actually be to directly write all the needed
+     functions as C builtins then just call them here depending on the situation
+     at hand. *)
   assert (is_t (Cil.typeOf e));
   let get_double e env =
-    let _, e, env = Env.new_var
-      ~loc
-      ?name
-      env
-      None
-      Cil.doubleType
-      (fun v _ ->
-        [ Misc.mk_call ~loc ~result:(Cil.var v) "__gmpq_get_d" [ e ] ])
+    let _, e, env =
+      Env.new_var
+        ~loc
+        ?name
+        env
+        None
+        Cil.doubleType
+        (fun v _ ->
+           [ Misc.mk_call ~loc ~result:(Cil.var v) "__gmpq_get_d" [ e ] ])
     in
     e, env
   in
-  match ty with
+  match Cil.unrollType ty with
   | TFloat(FLongDouble, _) ->
     (* The biggest floating-point type we can extract from GMPQ is double *)
     Error.not_yet "R to long double"
   | TFloat(FDouble, _) ->
     get_double e env
   | TFloat(FFloat, _) ->
-    (* There is no such thing as [get_float] in GMPQ.
-      Fortunately, [float] \subset [double].
-      HOWEVER: going through double as intermediate step might be unsound
-               since it could cause double rounding.
-               See: [Boldo2013, Sec 2.2]
-                    https://hal.inria.fr/hal-00777639/document *)
+    (* No "get_float" in GMPQ, but fortunately, [float] \subset [double].
+       HOWEVER: going through double as intermediate step might be unsound since
+       it could cause double rounding. See: [Boldo2013, Sec 2.2]
+       https://hal.inria.fr/hal-00777639/document *)
     let e, env = get_double e env in
     Options.warning
       ~once:true "R to float: double rounding might cause unsoundness";
@@ -116,32 +174,24 @@ let add_cast ~loc ?name e env ty =
   | _ ->
     Error.not_yet "R to <typ>"
 
-let potentially_mk_real ~loc e env =
-  (* TODO: sounds mergeable with add_cast *)
+let real ~loc e env =
   if is_t (Cil.typeOf e) then e, env else mk_real ~loc e env None
 
 let cmp ~loc bop e1 e2 env t_opt =
   let fname = "__gmpq_cmp" in
   let name = Misc.name_of_binop bop in
-  let e1, env = potentially_mk_real ~loc e1 env in
-  let e2, env = potentially_mk_real ~loc e2 env in
-  let _, e, env = Env.new_var
-    ~loc
-    env
-    t_opt
-    ~name
-    Cil.intType
-    (fun v _ -> [ Misc.mk_call ~loc ~result:(Cil.var v) fname [ e1; e2 ] ])
+  let e1, env = real ~loc e1 env in
+  let e2, env = real ~loc e2 env in
+  let _, e, env =
+    Env.new_var
+      ~loc
+      env
+      t_opt
+      ~name
+      Cil.intType
+      (fun v _ -> [ Misc.mk_call ~loc ~result:(Cil.var v) fname [ e1; e2 ] ])
   in
   Cil.new_exp ~loc (BinOp(bop, e, Cil.zero ~loc, Cil.intType)), env
-
-let name_arith_bop = function
-  | PlusA -> "__gmpq_add"
-  | MinusA -> "__gmpq_sub"
-  | Mult -> "__gmpq_mul"
-  | Div -> "__gmpq_div"
-  | Mod | Lt | Gt | Le | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr
-  | Shiftlt | Shiftrt | PlusPI | IndexPI | MinusPI | MinusPP -> assert false
 
 let new_var_and_init ~loc ?scope ?name env t_opt mk_stmts =
   Env.new_var
@@ -153,10 +203,18 @@ let new_var_and_init ~loc ?scope ?name env t_opt mk_stmts =
     (t ())
     (fun v e -> Gmp.init ~loc e :: mk_stmts v e)
 
-let mk_binop ~loc bop e1 e2 env t_opt =
+let name_arith_bop = function
+  | PlusA -> "__gmpq_add"
+  | MinusA -> "__gmpq_sub"
+  | Mult -> "__gmpq_mul"
+  | Div -> "__gmpq_div"
+  | Mod | Lt | Gt | Le | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr
+  | Shiftlt | Shiftrt | PlusPI | IndexPI | MinusPI | MinusPP -> assert false
+
+let binop ~loc bop e1 e2 env t_opt =
   let name = name_arith_bop bop in
-  let e1, env = potentially_mk_real ~loc e1 env in
-  let e2, env = potentially_mk_real ~loc e2 env in
+  let e1, env = real ~loc e1 env in
+  let e2, env = real ~loc e2 env in
   let mk_stmts _ e = [ Misc.mk_call ~loc name [ e; e1; e2 ] ] in
   let name = Misc.name_of_binop bop in
   let _, e, env = new_var_and_init ~loc ~name env t_opt mk_stmts in
