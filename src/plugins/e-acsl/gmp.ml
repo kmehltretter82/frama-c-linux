@@ -77,19 +77,30 @@ module Q = Make(struct end)
 
 let init_t () =
   Options.feedback ~level:2 "initializing GMP types.";
-  let set_mp_t = object
+  let set_mp_t = object (self)
     inherit Cil.nopCilVisitor
+
+    (* exit after having initialized both Z.t and Q.t *)
+    val mutable visited = false
+    method private set f info =
+      f info;
+      if visited then
+        raise Exit
+      else begin
+        visited <- true;
+        Cil.SkipChildren
+      end
+
     method !vglob = function
     | GType({ torig_name = s } as info, _) when s = "__e_acsl_mpz_t" ->
-      Z.set_t info;
-      Cil.SkipChildren
+      self#set Z.set_t info
     | GType({ torig_name = s } as info, _) when s = "__e_acsl_mpq_t" ->
-      Q.set_t info;
-      Cil.SkipChildren
+      self#set Q.set_t info
     | _ ->
       Cil.SkipChildren
+
   end in
-  Cil.visitCilFileSameGlobals set_mp_t (Ast.get ())
+  try Cil.visitCilFileSameGlobals set_mp_t (Ast.get ()) with Exit -> ()
 
 (**************************************************************************)
 (************************* Calls to builtins ******************************)

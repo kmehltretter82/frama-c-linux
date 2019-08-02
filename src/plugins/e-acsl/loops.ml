@@ -309,7 +309,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     let stmts, env =
       mk_nested_loops ~loc mk_innermost_block kf env lscope_vars'
     in
-    (* remove logic binding now that the block is constructed *)
+    (* remove the logic binding now that the block is constructed *)
     Env.Logic_binding.remove env lv;
     (* return *)
     let_stmt :: stmts, env
