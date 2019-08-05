@@ -71,7 +71,6 @@ module InfoHashtbl = Hashtbl.Make(struct
       | Var v -> Cil_datatype.Varinfo.hash v
   end)
 
-(* Used by external plug-ins: *)
 let keepUnused = ref false
 
 (* Possibly no longer used: *)
@@ -885,10 +884,10 @@ let removeUnmarked isRoot ast reachable_tbl =
 
 type rootsFilter = global -> bool
 
-let removeUnusedTemps ?(isRoot : rootsFilter = isExportedRoot) ast =
+let removeUnused ?(isRoot=isExportedRoot) ast =
   if not !keepUnused then
     begin
-      Kernel.debug ~dkey "Removing unused temporaries" ;
+      Kernel.debug ~dkey "Removing unused" ;
 
       (* digest any pragmas that would create additional roots *)
       let keepers = categorizePragmas ast in
@@ -903,12 +902,15 @@ let removeUnusedTemps ?(isRoot : rootsFilter = isExportedRoot) ast =
       (* mark everything reachable from the global roots *)
       markReachable isRoot ast reachable_tbl;
 
-      let elements =
-        InfoHashtbl.fold (fun k v acc -> Format.asprintf "%a:%B" pp_info k v :: acc)
-          reachable_tbl []
-      in
-      Kernel.debug ~dkey "reachable_tbl: %a"
-        (Pretty_utils.pp_list ~sep:"@\n" Format.pp_print_string) elements;
+      Kernel.debug ~dkey "reachable_tbl: %t"
+        (fun fmt ->
+           let elements =
+             InfoHashtbl.fold (fun k v acc ->
+                 Format.asprintf "%a:%B" pp_info k v :: acc)
+               reachable_tbl []
+           in
+           Format.fprintf fmt "%a"
+             (Pretty_utils.pp_list ~sep:"@\n" Format.pp_print_string) elements);
 
       markReferenced ast;
 

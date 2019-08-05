@@ -1132,6 +1132,15 @@ module Keep_unused_specified_functions =
         end)
 
 let () = Parameter_customize.set_group normalisation
+let () = Parameter_customize.set_negative_option_name "-remove-unused-types"
+module Keep_unused_types =
+  False(struct
+    let option_name = "-keep-unused-types"
+    let module_name = "Keep_unused_types"
+    let help = "keep unused types (false by default)"
+  end)
+
+let () = Parameter_customize.set_group normalisation
 module SimplifyTrivialLoops =
   True(struct
           let option_name = "-simplify-trivial-loops"
