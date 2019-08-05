@@ -604,11 +604,11 @@ let () =
 
 
 
-(** Keep defined entry point even if not defined, and possibly the functions
-    with only specifications (according to parameter
-    keep_unused_specified_function). This function is meant to be passed to
-    {!Rmtmps.removeUnused}. *)
-let keep_entry_point ?(specs=Kernel.Keep_unused_specified_functions.get ()) g =
+(* Keep defined entry point even if not defined, and possibly
+   other unused globals according to relevant command-line parameters.
+   This function is meant to be passed to {!Rmtmps.removeUnused}. *)
+let isRoot g =
+  let specs = Kernel.Keep_unused_specified_functions.get () in
   let keepTypes = Kernel.Keep_unused_types.get () in
   Rmtmps.isExportedRoot g ||
   match g with
@@ -1099,7 +1099,7 @@ let prepare_cil_file ast =
   Transform_before_cleanup.apply ast;
   (* Remove unused temp variables and globals. *)
   Kernel.feedback ~level:2 "cleaning unused parts";
-  Rmtmps.removeUnused ~isRoot:keep_entry_point ast;
+  Rmtmps.removeUnused ~isRoot ast;
   if Kernel.Check.get () then begin
     Filecheck.check_ast ~is_normalized:false ~ast "Removed temp vars"
   end;
