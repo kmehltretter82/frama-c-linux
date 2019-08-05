@@ -17,6 +17,8 @@
 Open Source Release <next-release>
 ##################################
 
+o   Ptests    [2019/08/05] Add new MODULE directive for compiling and loading
+              an auxiliary OCaml module for a test
 -   Kernel    [2019/08/05] Add -keep-unused-types normalization option
 -   Libc      [2019/08/05] Remove obsolete (and forcing cpp error) builtins.h
 o!  Kernel    [2019/08/02] Functions over visitor's behaviors have been moved
