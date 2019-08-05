@@ -745,7 +745,7 @@ occurs currently in the following cases:
 
 \begin{example}
   Test \texttt{tests/sparecode/calls.c} declares the following directives.
-  \sscodeidx{Test}{Directive}{OPT}
+  \nscodeidx{Test!Directive}{OPT}
 \begin{listing-nonumber}
 /* run.config
    OPT: -sparecode-analysis
@@ -895,54 +895,59 @@ the configuration header of a test (or a test suite).
 \textbf{Kind} & \textbf{Name} & \textbf{Specification} & \textbf{default}\\
 \hline
 \hline \multirow{4}{23mm}{\centering{Command}}
-& \texttt{CMD}\sscodeidxdef{Test}{Directive}{CMD}
+& \texttt{CMD}\nscodeidxdef{Test!Directive}{CMD}
 & Program to run
 & \texttt{./bin/toplevel.opt}
 \\
-& \texttt{OPT}\sscodeidxdef{Test}{Directive}{OPT}
+& \texttt{OPT}\nscodeidxdef{Test!Directive}{OPT}
 & Options given to the program
 & \texttt{-val -out -input -deps}
 \\
-& \texttt{STDOPT}\sscodeidxdef{Test}{Directive}{STDOPT}
+& \texttt{STDOPT}\nscodeidxdef{Test!Directive}{STDOPT}
 & Add and remove options from the default set
 & \textit{None}
 \\
-& \texttt{LOG}\sscodeidxdef{Test}{Directive}{LOG}
+& \texttt{LOG}\nscodeidxdef{Test!Directive}{LOG}
 & Add an additional file to compare against an oracle
 & \textit{None}
 \\ 
-& \texttt{EXECNOW}\sscodeidxdef{Test}{Directive}{EXECNOW}
+& \texttt{EXECNOW}\nscodeidxdef{Test!Directive}{EXECNOW}
 & Run a command before the following commands. When specified in a configuration
 file, run it only once.
 & \textit{None}
 \\
-& \texttt{EXEC}\sscodeidxdef{Test}{Directive}{EXEC}
+& \texttt{EXEC}\nscodeidxdef{Test!Directive}{EXEC}
 & Similar to \texttt{EXECNOW}, but run it once per testing file.
 & \textit{None}
 \\
-& \texttt{MACRO}\sscodeidxdef{Test}{Directive}{MACRO}
+& \texttt{MACRO}\nscodeidxdef{Test!Directive}{MACRO}
 & Define a new macro
 & \textit{None}
 \\
-& \texttt{FILTER}\sscodeidxdef{Test}{Directive}{FILTER}
+& \texttt{FILTER}\nscodeidxdef{Test!Directive}{FILTER}
 & Command used to filter results
 & \textit{None}
 \\
+& \texttt{MODULE}\nscodeidxdef{Test!Directive}{MODULE}
+& Register a dynamic module to be built and to be loaded with each subsequent
+test
+& \textit{None}
+\\
 \hline \multirow{2}{23mm}{\centering{Test suite}}
-& \texttt{DONTRUN}\sscodeidxdef{Test}{Directive}{DONTRUN}
+& \texttt{DONTRUN}\nscodeidxdef{Test!Directive}{DONTRUN}
 & Do not execute this test
 & \textit{None}
 \\
-& \texttt{FILEREG}\sscodeidxdef{Test}{Directive}{FILEREG}
+& \texttt{FILEREG}\nscodeidxdef{Test!Directive}{FILEREG}
 & selects the files to test
 & \texttt{.*\bss.\bss(c|i\bss)}
 \\
 \hline \multirow{2}{23mm}{\centering{Miscellaneous}}
-& \texttt{COMMENT}\sscodeidxdef{Test}{Directive}{COMMENT}
+& \texttt{COMMENT}\nscodeidxdef{Test!Directive}{COMMENT}
 & Comment in the configuration
 & \textit{None}
 \\
-& \texttt{GCC}\sscodeidxdef{Test}{Directive}{GCC}
+& \texttt{GCC}\nscodeidxdef{Test!Directive}{GCC}
 & Unused (compatibility only)
 & \textit{None}
 \\
@@ -988,12 +993,12 @@ the sequence above is read in order and defines a configuration level
 
 \begin{itemize}
 \item
-  \texttt{CMD} allows to change the command that is used for the
+  \texttt{CMD} allows changing the command that is used for the
   following \texttt{OPT} directives (until a new \texttt{CMD}
   directive is found). No new test case is generated
   if there is no further \texttt{OPT} directive. At a given
   configuration level, the default value for directive
-  \texttt{CMD}\sscodeidxdef{Test}{Directive}{CMD} is the last
+  \texttt{CMD}\nscodeidx{Test!Directive}{CMD} is the last
   \texttt{CMD} directive of the preceding configuration level.
 \item \texttt{LOG} adds a file to be compared against an oracle in the
   next \texttt{OPT} directive. Several files can be monitored from a single
@@ -1007,7 +1012,7 @@ the sequence above is read in order and defines a configuration level
   configuration level, they correspond to different test cases. The
   \texttt{OPT} directive(s) of a given configuration level replace(s)
   the ones of the preceding level.
-\item The \texttt{STDOPT}\sscodeidxdef{Test}{Directive}{STDOPT}
+\item The \texttt{STDOPT}\nscodeidx{Test!Directive}{STDOPT}
   directive takes as default set of options
   the last \texttt{OPT} directive(s) of the preceding configuration
   level. If the preceding configuration level contains several
@@ -1025,8 +1030,8 @@ options). As with \texttt{OPT}, each \texttt{STDOPT} corresponds to a different
 (set of) test case(s). \texttt{LOG} directives preceding an \texttt{STDOPT}
 are taken into account.
 \item The syntax for directives
-  \texttt{EXECNOW}\sscodeidxdef{Test}{Directive}{EXECNOW}
-  and \texttt{EXEC}\sscodeidxdef{Test}{Directive}{EXEC} is the following.
+  \texttt{EXECNOW}\nscodeidx{Test!Directive}{EXECNOW}
+  and \texttt{EXEC}\nscodeidxdef{Test!Directive}{EXEC} is the following.
   \begin{code}
     EXECNOW: [ [ LOG file | BIN file ] ... ] cmd
   \end{code}
@@ -1052,7 +1057,7 @@ or
   the command is put in a test configuration file:
   \texttt{EXECNOW} executes the command only once for the test suite, while
   \texttt{EXEC} executes it once per test file of the test suite.
-\item The \texttt{MACRO}\sscodeidxdef{Test}{Directive}{MACRO} directive
+\item The \texttt{MACRO}\nscodeidx{Test!Directive}{MACRO} directive
   has the following syntax:
   \begin{code}
     MACRO: macro-name content
@@ -1063,8 +1068,15 @@ or
   \texttt{@macro-name@} in a \texttt{CMD}, \texttt{LOG}, \texttt{OPT},
   \texttt{STDOPT} or \texttt{EXECNOW} directive at this configuration level
   or in any level below it will be replaced by \texttt{content}. Existing
-  pre-defined macros are listed in section~\ref{sec:ptests-macros}. 
-\item The \texttt{FILEREG}\sscodeidxdef{Test}{Directive}{FILEREG}
+  pre-defined macros are listed in section~\ref{sec:ptests-macros}.
+\item \texttt{MODULE}\nscodeidx{Test!Directive}{MODULE}
+ directive takes as argument the name of a \texttt{.cmxs}
+  module. It will then add a directive to compile this file with the
+  command \texttt{@PTEST\_MAKE\_MODULE@ <MODULE>} where
+  \texttt{@PTEST\_MAKE\_MODULE@} defaults to \texttt{make -s}. Option
+  \texttt{-load-module <MODULE>} will then be appended to any subsequent Frama-C
+  command triggered by the test.
+\item The \texttt{FILEREG}\nscodeidx{Test!Directive}{FILEREG}
   directive contains a regular expression indicating which files in
   the directory containing the current test suite are actually part of
   the suite. This directive is only
