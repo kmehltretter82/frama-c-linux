@@ -881,9 +881,6 @@ let removeUnmarked isRoot ast reachable_tbl =
  *
 *)
 
-
-type rootsFilter = global -> bool
-
 let removeUnused ?(isRoot=isExportedRoot) ast =
   if not !keepUnused then
     begin
