@@ -653,16 +653,44 @@ extern double expm1(double x);
 extern float expm1f(float x);
 extern long double expm1l(long double x);
 
+/*@
+  requires valid_exp: \valid(exp);
+  assigns \result, *exp \from value;
+  ensures initialization:exp:\initialized(exp);
+ */
 extern double frexp(double value, int *exp);
+
+/*@
+  requires valid_exp: \valid(exp);
+  assigns \result, *exp \from value;
+  ensures initialization:exp:\initialized(exp);
+ */
 extern float frexpf(float value, int *exp);
+
+/*@
+  requires valid_exp: \valid(exp);
+  assigns \result, *exp \from value;
+  ensures initialization:exp:\initialized(exp);
+ */
 extern long double frexpl(long double value, int *exp);
 
 extern int ilogb(double x);
 extern int ilogbf(float x);
 extern int ilogbl(long double x);
 
+/*@
+  assigns \result \from x, exp;
+ */
 extern double ldexp(double x, int exp);
+
+/*@
+  assigns \result \from x, exp;
+ */
 extern float ldexpf(float x, int exp);
+
+/*@
+  assigns \result \from x, exp;
+ */
 extern long double ldexpl(long double x, int exp);
 
 /*@

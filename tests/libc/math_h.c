@@ -28,26 +28,28 @@ const long double huge_vall = HUGE_VALL;
 const float infinity = INFINITY;
 const double fp_ilogb0 = FP_ILOGB0;
 const double fp_ilogbnan = FP_ILOGBNAN;
+volatile int int_top;
 
-#define TEST_VAL(type,f,c) type f##_##c = f(c)
-#define TEST_FUN(type,f,prefix)                 \
-  TEST_VAL(type,f,prefix##pi);                  \
-  TEST_VAL(type,f,prefix##half_pi);             \
-  TEST_VAL(type,f,prefix##e);                   \
-  TEST_VAL(type,f,zero);                        \
-  TEST_VAL(type,f,minus_zero);                  \
-  TEST_VAL(type,f,one);                         \
-  TEST_VAL(type,f,minus_one);                   \
-  TEST_VAL(type,f,large);                       \
-  TEST_VAL(type,f,prefix##top)
+#define TEST_VAL_CONST(type,f,cst) type f##_##cst = f(cst)
+#define TEST_FUN_CONSTS(type,f,prefix)          \
+  TEST_VAL_CONST(type,f,prefix##pi);            \
+  TEST_VAL_CONST(type,f,prefix##half_pi);       \
+  TEST_VAL_CONST(type,f,prefix##e);             \
+  TEST_VAL_CONST(type,f,zero);                  \
+  TEST_VAL_CONST(type,f,minus_zero);            \
+  TEST_VAL_CONST(type,f,one);                   \
+  TEST_VAL_CONST(type,f,minus_one);             \
+  TEST_VAL_CONST(type,f,large);                 \
+  TEST_VAL_CONST(type,f,prefix##top)
 
+void test_simple_specs(void);
 int main() {
-  TEST_FUN(double,atan,);
-  TEST_FUN(float,atanf,f_);
-  TEST_FUN(long double,atanl,ld_);
-  TEST_FUN(double,fabs,);
-  TEST_FUN(float,fabsf,f_);
-  TEST_FUN(long double,fabsl,ld_);
+  TEST_FUN_CONSTS(double,atan,);
+  TEST_FUN_CONSTS(float,atanf,f_);
+  TEST_FUN_CONSTS(long double,atanl,ld_);
+  TEST_FUN_CONSTS(double,fabs,);
+  TEST_FUN_CONSTS(float,fabsf,f_);
+  TEST_FUN_CONSTS(long double,fabsl,ld_);
 
 #ifdef NONFINITE
   int r;
@@ -64,4 +66,20 @@ int main() {
   r = isfinite(NAN);
   //@ assert !r;
 #endif
+
+  test_simple_specs();
+}
+
+#define TEST_VAL_VAR(type,fn,...) type res_##fn = fn(__VA_ARGS__)
+
+#define TEST_FUN_VAR(fn,...)                    \
+  TEST_VAL_VAR(double,fn,__VA_ARGS__);          \
+  TEST_VAL_VAR(float,fn##f,__VA_ARGS__);        \
+  TEST_VAL_VAR(long double,fn##l,__VA_ARGS__);
+
+void test_simple_specs() {
+  int exponent;
+  TEST_FUN_VAR(frexp, ld_top, &exponent);
+  TEST_FUN_VAR(ldexp, ld_top, int_top);
+  //@ assert \initialized(&exponent);
 }

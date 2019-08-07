@@ -3081,6 +3081,42 @@ extern double exp(double x);
  */
 extern float expf(float x);
 
+/*@ requires valid_exp: \valid(exp);
+    ensures initialization: exp: \initialized(\old(exp));
+    assigns \result, *exp;
+    assigns \result \from value;
+    assigns *exp \from value;
+ */
+extern double frexp(double value, int *exp);
+
+/*@ requires valid_exp: \valid(exp);
+    ensures initialization: exp: \initialized(\old(exp));
+    assigns \result, *exp;
+    assigns \result \from value;
+    assigns *exp \from value;
+ */
+extern float frexpf(float value, int *exp);
+
+/*@ requires valid_exp: \valid(exp);
+    ensures initialization: exp: \initialized(\old(exp));
+    assigns \result, *exp;
+    assigns \result \from value;
+    assigns *exp \from value;
+ */
+extern long double frexpl(long double value, int *exp);
+
+/*@ assigns \result;
+    assigns \result \from x, exp; */
+extern double ldexp(double x, int exp);
+
+/*@ assigns \result;
+    assigns \result \from x, exp; */
+extern float ldexpf(float x, int exp);
+
+/*@ assigns \result;
+    assigns \result \from x, exp; */
+extern long double ldexpl(long double x, int exp);
+
 /*@ requires finite_arg: \is_finite(x);
     requires arg_positive: x > 0;
     ensures finite_result: \is_finite(\result);
