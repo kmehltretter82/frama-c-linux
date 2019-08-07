@@ -27,13 +27,32 @@ let gen_invocation () =
   let arguments = List.tl (Array.to_list Sys.argv) in
   Invocation.create ~commandLine ~arguments ()
 
+let gen_remark alarm =
+  let open Markdown in
+  [ Block
+      [ Text
+          (plain
+             (Printf.sprintf "This alarms represents a potential %s."
+                (Alarms.get_description alarm)
+             )
+          )
+      ]
+  ]
+
 let make_message alarm annot remark =
   let open Markdown in
-  let kind = plain (Alarms.get_name alarm ^ ":") in
+  let name = Alarms.get_name alarm in
+  let text = name ^ "." in
+  let kind = plain (name ^ ":") in
   let descr = codelines "acsl" Printer.pp_code_annotation annot in
   let summary = Block [Text kind; descr] in
-  let markdown = summary :: remark in
-  Message.markdown ~markdown ()
+  let markdown =
+    match remark with
+      | [] -> summary :: gen_remark alarm
+      | _ -> summary :: remark
+  in
+  let richText = Format.asprintf "@[%a@]" Markdown.pp_elements markdown in
+  Message.create ~text ~richText ()
 
 let gen_results remarks =
   let treat_alarm _e _kf s ~rank:_ alarm annot (i, content) =
@@ -65,7 +84,7 @@ let level_of_status =
   | Inconsistent -> note
 
 let make_ip_message ip =
-  let text = Format.asprintf "@[%a@]" Property.short_pretty ip in
+  let text = Format.asprintf "@[%a.@]" Property.short_pretty ip in
   Message.plain_text ~text ()
 
 let gen_status ip =
