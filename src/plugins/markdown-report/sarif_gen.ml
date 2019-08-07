@@ -50,6 +50,37 @@ let gen_results remarks =
   let _, content = Alarms.fold treat_alarm (0, []) in
   List.rev content
 
+let is_alarm = function
+  | Property.IPCodeAnnot (_,_,ca) -> Extlib.has_some (Alarms.find ca)
+  | _ -> false
+
+let level_of_status =
+  let open Property_status.Feedback in
+  let open Sarif.Result_level in
+  function
+  | Never_tried -> notApplicable
+  | Considered_valid | Valid | Valid_under_hyp | Valid_but_dead -> pass
+  | Unknown | Unknown_but_dead -> warning
+  | Invalid | Invalid_under_hyp | Invalid_but_dead -> error
+  | Inconsistent -> note
+
+let make_ip_message ip =
+  let text = Format.asprintf "@[%a@]" Property.short_pretty ip in
+  Message.plain_text ~text ()
+
+let gen_status ip =
+  let status = Property_status.Feedback.get ip in
+  let level = level_of_status status in
+  let locations = [ Location.of_loc (Property.location ip) ] in
+  let message = make_ip_message ip in
+  Sarif_result.create ~level ~locations ~message ()
+
+let gen_statuses () =
+  let f ip content =
+    if is_alarm ip then content else (gen_status ip) :: content
+  in
+  List.rev (Property_status.fold f [])
+
 let gen_files () =
   let add_src_file f =
     let key = Filename.chop_extension (Filename.basename f) in
@@ -64,6 +95,7 @@ let gen_run remarks =
   let tool = frama_c_sarif in
   let invocations = [gen_invocation ()] in
   let results = gen_results remarks in
+  let results = results @ (gen_statuses ()) in
   let files = gen_files () in
   Run.create ~tool ~invocations ~results ~files ()
 
