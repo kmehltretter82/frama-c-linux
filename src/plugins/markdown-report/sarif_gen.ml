@@ -39,6 +39,16 @@ let gen_remark alarm =
       ]
   ]
 
+let level_of_status =
+  let open Property_status.Feedback in
+  let open Sarif.Result_level in
+  function
+  | Never_tried -> notApplicable
+  | Considered_valid | Valid | Valid_under_hyp | Valid_but_dead -> pass
+  | Unknown | Unknown_but_dead -> warning
+  | Invalid | Invalid_under_hyp | Invalid_but_dead -> error
+  | Inconsistent -> note
+
 let make_message alarm annot remark =
   let open Markdown in
   let name = Alarms.get_name alarm in
@@ -57,9 +67,10 @@ let make_message alarm annot remark =
   Message.create ~text ~richText ()
 
 let gen_results remarks =
-  let treat_alarm _e _kf s ~rank:_ alarm annot (i, content) =
+  let treat_alarm _e kf s ~rank:_ alarm annot (i, content) =
+    let prop = Property.ip_of_code_annot_single kf s annot in
     let label = "Alarm-" ^ string_of_int i in
-    let level = Result_level.warning in
+    let level = level_of_status (Property_status.Feedback.get prop) in
     let remark = get_remark remarks label in
     let message = make_message alarm annot remark in
     let locations = [ Location.of_loc (Cil_datatype.Stmt.loc s) ] in
@@ -74,16 +85,6 @@ let gen_results remarks =
 let is_alarm = function
   | Property.IPCodeAnnot (_,_,ca) -> Extlib.has_some (Alarms.find ca)
   | _ -> false
-
-let level_of_status =
-  let open Property_status.Feedback in
-  let open Sarif.Result_level in
-  function
-  | Never_tried -> notApplicable
-  | Considered_valid | Valid | Valid_under_hyp | Valid_but_dead -> pass
-  | Unknown | Unknown_but_dead -> warning
-  | Invalid | Invalid_under_hyp | Invalid_but_dead -> error
-  | Inconsistent -> note
 
 let make_ip_message ip =
   let text = Format.asprintf "@[%a.@]" Property.short_pretty ip in
