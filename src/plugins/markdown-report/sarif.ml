@@ -77,7 +77,9 @@ let plain_text ~text ?id:messageId ?arguments () =
   create ~text ?messageId ?arguments ()
 
 let markdown ~markdown ?id:richMessageId ?arguments () =
-  let richText = Format.asprintf "@[%a@]" Markdown.pp_elements markdown in
+  let richText =
+    String.trim (Format.asprintf "@[%a@]" Markdown.pp_elements markdown)
+  in
   create ~richText ?richMessageId ?arguments ()
 
 let default = create ()
