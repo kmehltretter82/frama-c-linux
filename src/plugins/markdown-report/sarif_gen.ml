@@ -130,10 +130,18 @@ let make_rule_dictionary rules = Datatype.String.Map.fold add_rule rules []
 let gen_run remarks =
   let tool = frama_c_sarif in
   let invocations = [gen_invocation ()] in
-  let used_alarms, results = gen_results remarks in
-  let rules = make_rule_dictionary used_alarms in
+  let rules, results = gen_results remarks in
+  let user_annot_results = gen_statuses () in
+  let rules =
+    match user_annot_results with
+      | [] -> rules
+      | _ ->
+          Datatype.String.Map.add
+            "user-spec" "User written ACSL specification" rules
+  in
+  let rules = make_rule_dictionary rules in
   let resources = Resources.create ~rules () in
-  let results = results @ (gen_statuses ()) in
+  let results = results @ user_annot_results in
   let files = gen_files () in
   Run.create ~tool ~invocations ~results ~resources ~files ()
 
