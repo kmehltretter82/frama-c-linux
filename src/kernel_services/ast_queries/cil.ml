@@ -587,7 +587,10 @@ let rec unrollTypeSkel = function
   | x -> x
 
 (* Make a varinfo. Used mostly as a helper function below  *)
-let makeVarinfo ?(source=true) ?(temp=false) ?(referenced=false) global formal name typ =
+let makeVarinfo
+    ?(source=true) ?(temp=false) ?(referenced=false) ?(ghost=false)
+    global formal name typ
+  =
   let vi =
     { vorig_name = name;
       vname = name;
@@ -605,7 +608,7 @@ let makeVarinfo ?(source=true) ?(temp=false) ?(referenced=false) global formal n
       vreferenced = referenced;
       vdescr = None;
       vdescrpure = true;
-      vghost = false;
+      vghost = ghost;
       vsource = source;
       vlogic_var_assoc = None
     }
@@ -626,22 +629,18 @@ module FormalsDecl =
 let selfFormalsDecl = FormalsDecl.self
 let () = dependency_on_ast selfFormalsDecl
 
-let makeFormalsVarDecl (n,t,a) =
-  let vi = makeVarinfo ~temp:false false true n t in
-  vi.vghost <- hasAttribute frama_c_ghost a ;
+let makeFormalsVarDecl ?ghost (n,t,a) =
+  let vi = makeVarinfo ?ghost ~temp:false false true n t in
   vi.vattr <- a;
   vi
 
 let setFormalsDecl vi typ =
   match unrollType typ with
   | TFun(_, Some args, _, _) ->
-    let args = if vi.vghost then
-      let ghost_attr = Attr (frama_c_ghost, []) in
-      let add_attr a = addAttribute ghost_attr a in
-      List.map (fun (n,t,a) -> (n,t, add_attr a)) args
-    else
-      args
+    let is_ghost (_, _, a) =
+      vi.vghost || hasAttribute frama_c_ghost a
     in
+    let makeFormalsVarDecl x = makeFormalsVarDecl ~ghost:(is_ghost x) x in
     FormalsDecl.replace vi (List.map makeFormalsVarDecl args)
   | TFun(_,None,_,_) -> ()
   | _ ->

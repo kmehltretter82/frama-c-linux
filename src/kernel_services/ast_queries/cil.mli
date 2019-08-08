@@ -180,7 +180,7 @@ val setMaxId: fundec -> unit
 val selfFormalsDecl: State.t
   (** state of the table associating formals to each prototype. *)
 
-val makeFormalsVarDecl: (string * typ * attributes) -> varinfo
+val makeFormalsVarDecl: ?ghost:bool -> (string * typ * attributes) -> varinfo
   (** creates a new varinfo for the parameter of a prototype. *)
 
 (** Update the formals of a function declaration from its identifier and its
@@ -655,11 +655,13 @@ val splitFunctionTypeVI:
   [vsource] .
   The [referenced] argument defaults to [false], and corresponds to the field
   [vreferenced] .
+  The [ghost] argument defaults to [false], and corresponds to the field
+  [vghost] .
   The first unnamed argument specifies whether the varinfo is for a global and
   the second is for formals. *)
 val makeVarinfo:
-  ?source:bool -> ?temp:bool -> ?referenced:bool -> bool -> bool -> string ->
-  typ -> varinfo
+  ?source:bool -> ?temp:bool -> ?referenced:bool -> ?ghost:bool -> bool -> bool
+  -> string -> typ -> varinfo
 
 (** Make a formal variable for a function declaration. Insert it in both the
     sformals and the type of the function. You can optionally specify where to

@@ -1178,8 +1178,7 @@ let get_temp_name ?(ghost=false) () =
 let newTempVar ~ghost descr (descrpure:bool) typ =
   let t' = (!typeForInsertedVar) typ in
   let name = get_temp_name ~ghost () in
-  let vi = makeVarinfo ~temp:true false false name t' in
-  vi.vghost <- ghost;
+  let vi = makeVarinfo ~ghost ~temp:true false false name t' in
   vi.vdescr <- Some descr;
   vi.vdescrpure <- descrpure;
   alphaConvertVarAndAddToEnv false vi
@@ -4720,12 +4719,11 @@ and makeVarInfoCabs
     Kernel.error ~once:true ~current:true "inline for a non-function: %s" n;
   checkRestrictQualifierDeep vtype;
   (*  log "Looking at %s(%b): (%a)@." n isformal d_attrlist nattr;*)
-  let vi = makeVarinfo ~referenced ~temp:isgenerated isglobal isformal n vtype
+  let vi = makeVarinfo ~ghost ~referenced ~temp:isgenerated isglobal isformal n vtype
   in
   vi.vstorage <- sto;
   vi.vattr <- nattr;
   vi.vdecl <- ldecl;
-  vi.vghost <- ghost;
   vi.vdefined <-
     not (isFunctionType vtype) && isglobal && (sto = NoStorage || sto = Static);
 
@@ -5079,9 +5077,6 @@ and doType (ghost:bool) isFuncArg
             Kernel.error ~once:true ~current:true
               "named parameter '%s' has void type" vi.vname
         end;
-        if is_ghost then begin
-          vi.vattr <- Cil.addAttribute (Attr (Cil.frama_c_ghost, [])) vi.vattr
-        end ;
         (* Add the formal to the environment, so it can be referenced by
            other formals  (e.g. in an array type, although that will be
            changed to a pointer later, or though typeof).  *)
@@ -5160,8 +5155,10 @@ and doType (ghost:bool) isFuncArg
           fixupArgumentTypes 0 argl;
           let arg_type_from_vi vi =
             let attrs =
-              if vi.vghost then addAttribute (Attr (frama_c_ghost, [])) vi.vattr
-              else vi.vattr
+              if vi.vghost then
+                cabsAddAttributes [Attr (frama_c_ghost, [])] vi.vattr
+              else
+                vi.vattr
             in (vi.vname, vi.vtype, attrs)
           in
           Some (List.map arg_type_from_vi argl)
@@ -9015,10 +9012,9 @@ and doDecl local_env (isglobal: bool) : A.definition -> chunk = function
         (* sfg: extract tsets for the formals from dt *)
         let doFormal (loc : location) (fn, ft, fa) =
           let ghost = Cil.hasAttribute Cil.frama_c_ghost fa in
-          let f = makeVarinfo ~temp:false false true fn ft in
+          let f = makeVarinfo ~ghost ~temp:false false true fn ft in
           (f.vdecl <- loc;
            f.vattr <- fa;
-           f.vghost <- ghost;
            alphaConvertVarAndAddToEnv true f)
         in
         let rec doFormals fl' ll' =
