@@ -2,7 +2,7 @@ ifndef FRAMAC_SHARE
   FRAMAC_SHARE:=$(shell frama-c -print-share-path)
 endif
 
-Report_markdown_VERSION:=0.1~alpha
+Report_markdown_VERSION:=0.1~beta
 
 PLUGIN_NAME:=Report_markdown
 PLUGIN_GENERATED:=mdr_version.ml
