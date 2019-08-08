@@ -22,9 +22,20 @@ let get_remark remarks label =
   | None -> []
   | Some l -> l
 
+let command_line () = Array.to_list Sys.argv
+
+module Analysis_cmdline =
+  State_builder.Ref(Datatype.List(Datatype.String))
+    (struct
+      let name = "Sarif_gen.Analysis_cmdline"
+      let dependencies = []
+      let default = command_line
+    end)
+
 let gen_invocation () =
-  let commandLine = Array.fold_right (fun s acc -> s ^ " " ^ acc) Sys.argv "" in
-  let arguments = List.tl (Array.to_list Sys.argv) in
+  let cl = Analysis_cmdline.get () in
+  let commandLine = String.concat " " cl in
+  let arguments = List.tl cl in
   Invocation.create ~commandLine ~arguments ()
 
 let gen_remark alarm =
