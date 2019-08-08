@@ -32,7 +32,10 @@ type node_locality = {
   loc_callstack : Callstack.t;
 }
 
-type node_precision = Unevaluated | Singleton | Normal | Wide | Critical
+type precision_interval = {min: float; max: float}
+
+type node_precision = Unevaluated | Singleton | Normal of precision_interval |
+                      Wide of precision_interval | Critical of precision_interval
 
 type node = {
   node_key : int;

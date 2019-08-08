@@ -65,9 +65,9 @@ let create_node ?(node_precision=Unevaluated) ~node_kind ~node_locality g =
 let update_node_precision node new_precision =
   node.node_precision <-
     match node.node_precision, new_precision with
-    | Critical, _ | _, Critical -> Critical
-    | Wide, _ | _, Wide -> Wide
-    | Normal, _ | _, Normal -> Normal
+    | Critical i, _ | _, Critical i -> Critical i
+    | Wide i, _ | _, Wide i -> Wide i
+    | Normal i, _ | _, Normal i -> Normal i
     | Singleton, _ | _, Singleton -> Singleton
     | Unevaluated, Unevaluated -> Unevaluated
 
@@ -152,11 +152,11 @@ let ouptput_to_dot out_channel g =
           | Unevaluated -> []
           | Singleton -> [`Color 0x88aaff ;
                           `Style `Filled ; `Fillcolor 0xaaccff]
-          | Normal -> [ `Color 0x004400 ;
+          | Normal _ -> [ `Color 0x004400 ;
                         `Style `Filled ; `Fillcolor 0xeeffee ]
-          | Wide -> [ `Color 0xff0000 ;
+          | Wide _ -> [ `Color 0xff0000 ;
                       `Style `Filled ; `Fillcolor 0xffbbbb ]
-          | Critical -> [ `Color 0xff0000 ; `Style `Bold ;
+          | Critical _ -> [ `Color 0xff0000 ; `Style `Bold ;
                           `Style `Filled ; `Fillcolor 0xff0000 ]
         in
         l := precision @ kind @ !l;
@@ -213,9 +213,9 @@ let to_json g =
     let s = match precision with
       | Unevaluated -> "unevaluated"
       | Singleton -> "singleton"
-      | Normal -> "normal"
-      | Wide -> "wide"
-      | Critical -> "critical"
+      | Normal _ -> "normal"
+      | Wide _ -> "wide"
+      | Critical _ -> "critical"
     in
     Json.of_string s
   and output_dep_kind kind =
@@ -226,6 +226,17 @@ let to_json g =
       | Control -> "ctrl"
     in
     Json.of_string s
+  and output_node_precision_width precision =
+    let precision_with_ival ival =
+      Json.of_float (ival.max -. ival.min);
+    in
+    let precision_no_ival = Json.of_float 0. in
+    match precision with
+      | Unevaluated -> precision_no_ival
+      | Singleton -> precision_no_ival
+      | Normal iv -> precision_with_ival iv
+      | Wide iv -> precision_with_ival iv
+      | Critical iv -> precision_with_ival iv
   in
   let output_node node acc =
     if node.node_kind = Cluster then acc
@@ -237,6 +248,7 @@ let to_json g =
         ("kind", output_node_kind node.node_kind) ;
         ("locality", output_node_locality node.node_locality) ;
         ("precision", output_node_precision node.node_precision) ;
+        ("precision_width", output_node_precision_width node.node_precision) ;
         ("explored", Json.of_bool node.node_deps_computed)
       ] :: acc
   and output_dep (n1,dep,n2) acc =

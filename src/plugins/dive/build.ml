@@ -64,10 +64,15 @@ let compute_node_precision kinstr lval =
   then Singleton
   else
     match Cvalue.V.project_ival cvalue, typ with
-    | Ival.Float fval, TFloat (fkind,_) ->
-      if fval_has_large_range fkind fval then Wide else Normal
-    | _ -> Normal
-    | exception Cvalue.V.Not_based_on_null -> Normal
+    | Ival.Float fval, TFloat (fkind,_) -> begin
+        match Fval.min_and_max fval with
+        | Some (min,max), _ ->
+          let ival = {min=Fval.F.to_float min; max=Fval.F.to_float max} in
+          if fval_has_large_range fkind fval then Wide ival else Normal ival
+        | None, _ -> Unevaluated
+      end
+    | _ -> Unevaluated
+    | exception Cvalue.V.Not_based_on_null -> Unevaluated
 
 
 (* --- Locations handling --- *)
@@ -244,7 +249,7 @@ let build_lval context callstack kinstr lval =
 let build_alarm context callstack stmt alarm =
   let node_kind = Alarm (stmt,alarm) in
   let node_locality = build_node_locality callstack node_kind
-  and node_precision = Critical in
+  and node_precision = Critical {min=0.; max=0.} in
   Graph.create_node context.graph ~node_precision ~node_kind ~node_locality
 
 
