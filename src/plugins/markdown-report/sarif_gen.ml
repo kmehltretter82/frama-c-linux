@@ -67,20 +67,26 @@ let make_message alarm annot remark =
   Message.create ~text ~richText ()
 
 let gen_results remarks =
-  let treat_alarm _e kf s ~rank:_ alarm annot (i, content) =
+  let treat_alarm _e kf s ~rank:_ alarm annot (i, rules, content) =
     let prop = Property.ip_of_code_annot_single kf s annot in
+    let ruleId = Alarms.get_name alarm in
+    let rules =
+      Datatype.String.Map.add ruleId (Alarms.get_description alarm) rules
+    in
     let label = "Alarm-" ^ string_of_int i in
     let level = level_of_status (Property_status.Feedback.get prop) in
     let remark = get_remark remarks label in
     let message = make_message alarm annot remark in
     let locations = [ Location.of_loc (Cil_datatype.Stmt.loc s) ] in
     let res =
-      Sarif_result.create ~level ~message ~locations ()
+      Sarif_result.create ~level ~ruleId ~message ~locations ()
     in
-    (i+1, res :: content)
+    (i+1, rules, res :: content)
   in
-  let _, content = Alarms.fold treat_alarm (0, []) in
-  List.rev content
+  let _, rules, content =
+    Alarms.fold treat_alarm (0, Datatype.String.Map.empty,[])
+  in
+  rules, List.rev content
 
 let is_alarm = function
   | Property.IPCodeAnnot (_,_,ca) -> Extlib.has_some (Alarms.find ca)
@@ -113,13 +119,23 @@ let gen_files () =
   in
   List.map add_src_file (Kernel.Files.get ())
 
+let add_rule id desc l =
+  let text = desc ^ "." in
+  let shortDescription = Message.plain_text ~text () in
+  let rule = Rule.create ~id ~shortDescription () in
+  (id, rule) :: l
+
+let make_rule_dictionary rules = Datatype.String.Map.fold add_rule rules []
+
 let gen_run remarks =
   let tool = frama_c_sarif in
   let invocations = [gen_invocation ()] in
-  let results = gen_results remarks in
+  let used_alarms, results = gen_results remarks in
+  let rules = make_rule_dictionary used_alarms in
+  let resources = Resources.create ~rules () in
   let results = results @ (gen_statuses ()) in
   let files = gen_files () in
-  Run.create ~tool ~invocations ~results ~files ()
+  Run.create ~tool ~invocations ~results ~resources ~files ()
 
 let generate () =
   let remarks = get_remarks () in

@@ -760,6 +760,22 @@ module Rule = struct
     helpUri = "";
     properties = Properties.default;
   }
+
+  let create
+        ~id
+        ?(name="")
+        ?(shortDescription=Message.default)
+        ?(fullDescription=Message.default)
+        ?(messageStrings=Additional_properties.default)
+        ?(richMessageStrings=Additional_properties.default)
+        ?(configuration=RuleConfiguration.default)
+        ?(helpUri="")
+        ?(properties=Properties.default)
+        ()
+    =
+    { id; name; shortDescription; fullDescription; messageStrings;
+      richMessageStrings; configuration; helpUri; properties }
+
 end
 
 module Rule_dictionary = Json_dictionary(Rule)
@@ -774,6 +790,13 @@ module Resources = struct
   let default = {
     messageStrings = Additional_properties.default;
     rules = [] }
+
+  let create
+        ?(messageStrings=Additional_properties.default)
+        ?(rules=[])
+        ()
+    =
+    { messageStrings; rules }
 end
 
 module Result_level:
