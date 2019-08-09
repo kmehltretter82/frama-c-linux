@@ -9,6 +9,7 @@
   \return(gethostname) == 0 (auto)
   \return(getpgrp) == 0 (auto)
   \return(isatty) == 0 (auto)
+  \return(pipe) == 0 (auto)
   \return(setegid) == 0 (auto)
   \return(seteuid) == 0 (auto)
   \return(setgid) == 0 (auto)
@@ -477,6 +478,8 @@
 [eva] computing for function ttyname <- main.
   Called from tests/libc/unistd_h.c:86.
 [eva] using specification for function ttyname
+[eva] tests/libc/unistd_h.c:86: 
+  function ttyname: precondition 'valid_fildes' got status valid.
 [eva] Done for function ttyname
 [eva] computing for function ttyname <- main.
   Called from tests/libc/unistd_h.c:86.
@@ -529,6 +532,32 @@
 [eva] computing for function chroot <- main.
   Called from tests/libc/unistd_h.c:92.
 [eva] Done for function chroot
+[eva] computing for function pipe <- main.
+  Called from tests/libc/unistd_h.c:95.
+[eva] using specification for function pipe
+[eva:alarm] tests/libc/unistd_h.c:95: Warning: 
+  function pipe: precondition 'valid_pipefd' got status invalid.
+[eva] Done for function pipe
+[eva] computing for function pipe <- main.
+  Called from tests/libc/unistd_h.c:95.
+[eva] Done for function pipe
+[eva] computing for function pipe <- main.
+  Called from tests/libc/unistd_h.c:100.
+[eva:alarm] tests/libc/unistd_h.c:100: Warning: 
+  function pipe: precondition 'valid_pipefd' got status invalid.
+[eva] Done for function pipe
+[eva] computing for function pipe <- main.
+  Called from tests/libc/unistd_h.c:100.
+[eva] Done for function pipe
+[eva] computing for function pipe <- main.
+  Called from tests/libc/unistd_h.c:104.
+[eva] tests/libc/unistd_h.c:104: 
+  function pipe: precondition 'valid_pipefd' got status valid.
+[eva] Done for function pipe
+[eva] computing for function pipe <- main.
+  Called from tests/libc/unistd_h.c:104.
+[eva] Done for function pipe
+[eva] tests/libc/unistd_h.c:105: check 'ok' got status valid.
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -554,4 +583,6 @@
   sgid ∈ [--..--] or UNINITIALIZED
   p ∈ [--..--]
   tty ∈ {{ NULL ; &__fc_ttyname[0] }}
+  halfpipe ∈ UNINITIALIZED
+  pipefd[0..1] ∈ [0..1023] or UNINITIALIZED
   __retres ∈ {0; 1}

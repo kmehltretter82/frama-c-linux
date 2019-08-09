@@ -1660,7 +1660,8 @@ extern off_t lseek(int fd, off_t offset, int whence);
  */
 extern long pathconf(char const *path, int name);
 
-/*@ ensures initialization: pipefd: \initialized(\old(pipefd) + (0 .. 1));
+/*@ requires valid_pipefd: \valid(pipefd + (0 .. 1));
+    ensures initialization: pipefd: \initialized(\old(pipefd) + (0 .. 1));
     ensures valid_fd0: 0 ≤ *(\old(pipefd) + 0) < 1024;
     ensures valid_fd1: 0 ≤ *(\old(pipefd) + 1) < 1024;
     ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
@@ -1744,7 +1745,8 @@ extern long sysconf(int name);
 extern char volatile __fc_ttyname[32];
 
 char volatile *__fc_p_ttyname = __fc_ttyname;
-/*@ ensures
+/*@ requires valid_fildes: 0 ≤ fildes < 1024;
+    ensures
       result_name_or_null: \result ≡ __fc_p_ttyname ∨ \result ≡ \null;
     assigns \result;
     assigns \result \from __fc_p_ttyname, (indirect: fildes);
@@ -6144,9 +6146,10 @@ extern clock_t clock(void);
     assigns \result \from time1, time0; */
 extern double difftime(time_t time1, time_t time0);
 
-/*@ assigns *timeptr, \result;
+/*@ requires valid_timeptr: \valid(timeptr);
+    assigns *timeptr, \result;
     assigns *timeptr \from *timeptr;
-    assigns \result \from *timeptr;
+    assigns \result \from (indirect: *timeptr);
  */
 extern time_t mktime(struct tm *timeptr);
 
@@ -6188,7 +6191,8 @@ extern char *ctime(time_t const *timer);
 
 struct tm __fc_time_tm;
 struct tm * const __fc_p_time_tm = & __fc_time_tm;
-/*@ ensures
+/*@ requires valid_timer: \valid_read(timer);
+    ensures
       result_null_or_internal_tm:
         \result ≡ &__fc_time_tm ∨ \result ≡ \null;
     assigns \result, __fc_time_tm;
@@ -6197,7 +6201,8 @@ struct tm * const __fc_p_time_tm = & __fc_time_tm;
  */
 extern struct tm *gmtime(time_t const *timer);
 
-/*@ ensures
+/*@ requires valid_timer: \valid_read(timer);
+    ensures
       result_null_or_internal_tm:
         \result ≡ &__fc_time_tm ∨ \result ≡ \null;
     assigns \result, __fc_time_tm;
@@ -6373,8 +6378,6 @@ extern int clock_nanosleep(clockid_t clock_id, int flags,
             (indirect: rmtp);
  */
 extern int nanosleep(struct timespec const *rqtp, struct timespec *rmtp);
-
-extern void tzset(void);
 
 extern char *tzname[2];
 
@@ -7183,8 +7186,12 @@ extern int __va_openat_mode_t(int dirfd, char const *filename, int flags,
 
 /*@ ghost extern int __fc_tz __attribute__((__FRAMA_C_MODEL__)); */
 
-/*@ assigns \result;
-    assigns \result \from *(path + (0 ..)), *(times + (0 .. 1));
+/*@ requires valid_path: valid_read_string(path);
+    requires valid_times: \valid_read(times + (0 .. 1));
+    assigns \result;
+    assigns \result
+      \from (indirect: *(path + (0 .. strlen{Old}(path)))),
+            (indirect: *(times + (0 .. 1)));
  */
 extern int utimes(char const *path, struct timeval const * /*[2]*/ times);
 
@@ -7248,13 +7255,15 @@ extern int utimes(char const *path, struct timeval const * /*[2]*/ times);
  */
 extern int gettimeofday(struct timeval * __restrict tv, void * __restrict tz);
 
-/*@ assigns \result, __fc_time, __fc_tz;
-    assigns \result
-      \from tv->tv_sec, tv->tv_usec, tz->tz_dsttime, tz->tz_minuteswest;
+/*@ requires valid_tv_or_null: \valid_read(tv) ∨ tv ≡ \null;
+    requires valid_tz_or_null: \valid_read(tz) ∨ tz ≡ \null;
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns __fc_time, __fc_tz, \result;
     assigns __fc_time
       \from tv->tv_sec, tv->tv_usec, tz->tz_dsttime, tz->tz_minuteswest;
     assigns __fc_tz
       \from tv->tv_sec, tv->tv_usec, tz->tz_dsttime, tz->tz_minuteswest;
+    assigns \result \from (indirect: *tv), (indirect: *tz);
  */
 extern int settimeofday(struct timeval const *tv, struct timezone const *tz);
 
@@ -7758,23 +7767,28 @@ extern int getpriority(int which, id_t who);
     assigns \result \from which, who, prio; */
 extern int setpriority(int which, id_t who, int prio);
 
-/*@ assigns \result, rl->rlim_cur, rl->rlim_max;
-    assigns \result \from r;
-    assigns rl->rlim_cur \from r;
-    assigns rl->rlim_max \from r;
+/*@ requires valid_rlp: \valid(rlp);
+    assigns \result, *rlp;
+    assigns \result \from resource;
+    assigns *rlp \from resource;
  */
-extern int getrlimit(int r, struct rlimit *rl);
+extern int getrlimit(int resource, struct rlimit *rlp);
 
-/*@ assigns \result, ru->ru_utime, ru->ru_stime;
-    assigns \result \from r;
-    assigns ru->ru_utime \from r;
-    assigns ru->ru_stime \from r;
+/*@ requires valid_r_usage: \valid(r_usage);
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns *r_usage, \result;
+    assigns *r_usage \from who;
+    assigns \result \from (indirect: who);
  */
-extern int getrusage(int r, struct rusage *ru);
+extern int getrusage(int who, struct rusage *r_usage);
 
-/*@ assigns \result;
-    assigns \result \from r, rl->rlim_cur, rl->rlim_max; */
-extern int setrlimit(int r, struct rlimit const *rl);
+/*@ requires valid_rlp: \valid_read(rlp);
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns *rlp, \result;
+    assigns *rlp \from resource;
+    assigns \result \from (indirect: resource), (indirect: *rlp);
+ */
+extern int setrlimit(int resource, struct rlimit const *rlp);
 
 /*@ requires valid_buffer: \valid(buffer);
     assigns \result, *buffer;
