@@ -104,6 +104,12 @@ let () = Request.register ~page
     (fun () -> Build.get_graph (get_graph ()))
 
 let () = Request.register ~page
+    ~kind:`EXEC ~name:"dive.clear"
+    ~descr:(Markdown.rm "Erase the graph and start over with an empty one")
+    ~input:(module Data.Junit) ~output:(module Data.Junit)
+    (fun () -> Build.clear (get_graph ()))
+
+let () = Request.register ~page
     ~kind:`EXEC ~name:"dive.add_var"
     ~descr:(Markdown.rm "Add a variable to the graph")
     ~input:(module Variable) ~output:(module Graph)

@@ -161,10 +161,10 @@ module BaseSet = Cil_datatype.Varinfo.Set
 module FunctionMap = Kernel_function.Map
 
 type t = {
-  graph: Graph.t;
-  node_table: node NodeTable.t;
-  file_table: node FileTable.t;
-  callstack_table: node CallstackTable.t;
+  mutable graph: Graph.t;
+  mutable node_table: node NodeTable.t;
+  mutable file_table: node FileTable.t;
+  mutable callstack_table: node CallstackTable.t;
   mutable unfolded_bases: BaseSet.t;
   mutable hidden_bases: BaseSet.t;
   mutable focus: bool FunctionMap.t;
@@ -411,7 +411,6 @@ let build_node_deps context node =
   | Cluster -> ()
 
 
-
 (* --- Graph initialization --- *)
 
 let create () =
@@ -426,6 +425,14 @@ let create () =
     focus = FunctionMap.empty;
     roots = [];
   }
+
+let clear context =
+  context.graph <- Graph.create ();
+  context.node_table <- NodeTable.create 13;
+  context.file_table <- FileTable.create 13;
+  context.callstack_table <- CallstackTable.create 13;
+  context.focus <- FunctionMap.empty;
+  context.roots <- []
 
 
 (* --- Accessors --- *)
