@@ -1308,6 +1308,23 @@ axiomatic StrChr {
   }
  */
 /*@
+axiomatic WMemChr {
+  logic 𝔹 wmemchr{L}(wchar_t *s, wchar_t c, ℤ n) 
+    reads *(s + (0 .. n - 1));
+  
+  logic ℤ wmemchr_off{L}(wchar_t *s, wchar_t c, ℤ n) 
+    reads *(s + (0 .. n - 1));
+  
+  axiom wmemchr_def{L}:
+    ∀ wchar_t *s;
+    ∀ int c;
+    ∀ ℤ n;
+      wmemchr(s, c, n) ≡ \true ⇔
+      (∃ int i; 0 ≤ i < n ∧ *(s + i) ≡ c);
+  
+  }
+ */
+/*@
 axiomatic WcsLen {
   logic ℤ wcslen{L}(wchar_t *s) 
     reads *(s + (0 ..));
@@ -4583,12 +4600,17 @@ extern int vsprintf(char * __restrict s, char const * __restrict format,
 extern int fgetc(FILE *stream);
 
 /*@ requires valid_stream: \valid(stream);
+    requires room_s: \valid(s + (0 .. size - 1));
     ensures result_null_or_same: \result ≡ \null ∨ \result ≡ \old(s);
+    ensures
+      initialization: at_least_one:
+        \result ≢ \null ⇒ \initialized(\old(s) + 0);
     ensures
       terminated_string_on_success:
         \result ≢ \null ⇒ valid_string(\old(s));
-    assigns *(s + (0 .. size)), \result;
-    assigns *(s + (0 .. size)) \from (indirect: size), (indirect: *stream);
+    assigns *(s + (0 .. size - 1)), \result;
+    assigns *(s + (0 .. size - 1))
+      \from (indirect: size), (indirect: *stream);
     assigns \result \from s, (indirect: size), (indirect: *stream);
  */
 extern char *fgets(char * __restrict s, int size, FILE * __restrict stream);
@@ -4610,15 +4632,26 @@ extern int getc(FILE *stream);
     assigns \result \from *__fc_stdin; */
 extern int getchar(void);
 
-/*@ ensures result_null_or_same: \result ≡ \old(s) ∨ \result ≡ \null;
-    assigns *(s + (..)), \result;
-    assigns *(s + (..)) \from *__fc_stdin;
-    assigns \result \from s, __fc_stdin;
+/*@ axiomatic GetsLength {
+      logic size_t gets_length{L}
+        reads *__fc_stdin;
+      
+      }
+
+*/
+/*@ requires room_s: \valid(s + (0 .. gets_length));
+    ensures result_null_or_same: \result ≡ \old(s) ∨ \result ≡ \null;
+    assigns *(s + (0 .. gets_length{Old})), \result, *__fc_stdin;
+    assigns *(s + (0 .. gets_length{Old})) \from *__fc_stdin;
+    assigns \result \from s, *__fc_stdin;
+    assigns *__fc_stdin \from *__fc_stdin;
  */
 extern char *gets(char *s);
 
-/*@ assigns *stream;
-    assigns *stream \from c; */
+/*@ requires valid_stream: \valid(stream);
+    assigns *stream;
+    assigns *stream \from c;
+ */
 extern int putc(int c, FILE *stream);
 
 /*@ assigns *__fc_stdout;
@@ -4629,8 +4662,10 @@ extern int putchar(int c);
     assigns *__fc_stdout \from *(s + (..)); */
 extern int puts(char const *s);
 
-/*@ assigns *stream;
-    assigns *stream \from c; */
+/*@ requires valid_stream: \valid(stream);
+    assigns *stream;
+    assigns *stream \from c;
+ */
 extern int ungetc(int c, FILE *stream);
 
 /*@ requires valid_ptr_block: \valid((char *)ptr + (0 .. nmemb * size - 1));
@@ -4688,46 +4723,63 @@ extern int fsetpos(FILE *stream, fpos_t const *pos);
  */
 extern long ftell(FILE *stream);
 
-/*@ assigns *stream;
-    assigns *stream \from \nothing; */
+/*@ requires valid_stream: \valid(stream);
+    assigns *stream;
+    assigns *stream \from \nothing;
+ */
 extern void rewind(FILE *stream);
 
-/*@ assigns *stream;
-    assigns *stream \from \nothing; */
+/*@ requires valid_stream: \valid(stream);
+    assigns *stream;
+    assigns *stream \from \nothing;
+ */
 extern void clearerr(FILE *stream);
 
-/*@ assigns \result;
-    assigns \result \from *stream; */
+/*@ requires valid_stream: \valid(stream);
+    assigns \result;
+    assigns \result \from *stream;
+ */
 extern int feof(FILE *stream);
 
-/*@ assigns \result;
-    assigns \result \from *stream; */
+/*@ requires valid_stream: \valid(stream);
+    assigns \result;
+    assigns \result \from *stream;
+ */
 extern int fileno(FILE *stream);
 
-/*@ assigns *stream;
-    assigns *stream \from \nothing; */
+/*@ requires valid_stream: \valid(stream);
+    assigns *stream;
+    assigns *stream \from \nothing;
+ */
 extern void flockfile(FILE *stream);
 
-/*@ assigns *stream;
-    assigns *stream \from \nothing; */
+/*@ requires valid_stream: \valid(stream);
+    assigns *stream;
+    assigns *stream \from \nothing;
+ */
 extern void funlockfile(FILE *stream);
 
-/*@ assigns \result, *stream;
+/*@ requires valid_stream: \valid(stream);
+    assigns \result, *stream;
     assigns \result \from \nothing;
     assigns *stream \from \nothing;
  */
 extern int ftrylockfile(FILE *stream);
 
-/*@ assigns \result;
-    assigns \result \from *stream; */
+/*@ requires valid_stream: \valid(stream);
+    assigns \result;
+    assigns \result \from *stream;
+ */
 extern int ferror(FILE *stream);
 
-/*@ assigns __fc_stdout;
+/*@ requires valid_string_s: valid_read_string(s);
+    assigns __fc_stdout;
     assigns __fc_stdout \from __fc_errno, *(s + (..));
  */
 extern void perror(char const *s);
 
-/*@ assigns \result, *stream;
+/*@ requires valid_stream: \valid(stream);
+    assigns \result, *stream;
     assigns \result \from *stream;
     assigns *stream \from *stream;
  */
@@ -4737,28 +4789,38 @@ extern int getc_unlocked(FILE *stream);
     assigns \result \from *__fc_stdin; */
 extern int getchar_unlocked(void);
 
-/*@ assigns *stream;
-    assigns *stream \from c; */
+/*@ requires valid_stream: \valid(stream);
+    assigns *stream;
+    assigns *stream \from c;
+ */
 extern int putc_unlocked(int c, FILE *stream);
 
 /*@ assigns *__fc_stdout;
     assigns *__fc_stdout \from c; */
 extern int putchar_unlocked(int c);
 
-/*@ assigns *stream;
-    assigns *stream \from \nothing; */
+/*@ requires valid_stream: \valid(stream);
+    assigns *stream;
+    assigns *stream \from \nothing;
+ */
 extern void clearerr_unlocked(FILE *stream);
 
-/*@ assigns \result;
-    assigns \result \from *stream; */
+/*@ requires valid_stream: \valid(stream);
+    assigns \result;
+    assigns \result \from *stream;
+ */
 extern int feof_unlocked(FILE *stream);
 
-/*@ assigns \result;
-    assigns \result \from *stream; */
+/*@ requires valid_stream: \valid(stream);
+    assigns \result;
+    assigns \result \from *stream;
+ */
 extern int ferror_unlocked(FILE *stream);
 
-/*@ assigns \result;
-    assigns \result \from *stream; */
+/*@ requires valid_stream: \valid(stream);
+    assigns \result;
+    assigns \result \from *stream;
+ */
 extern int fileno_unlocked(FILE *stream);
 
 /*@ axiomatic pipe_streams {
@@ -6321,7 +6383,21 @@ extern char *tzname[2];
  */
 extern void tzset(void);
 
-/*@ ensures
+/*@ requires
+      valid:
+        valid_read_or_empty((void *)s, (unsigned int)(sizeof(wchar_t) * n)) ∨
+        \valid_read((unsigned char *)s + (0 .. wmemchr_off(s, c, n)));
+    requires
+      initialization:
+        \initialized(s + (0 .. n - 1)) ∨
+        \initialized(s + (0 .. wmemchr_off(s, c, n)));
+    requires
+      danglingness:
+        non_escaping((void *)s, (unsigned int)(sizeof(wchar_t) * n)) ∨
+        non_escaping((void *)s,
+                    (unsigned int)(sizeof(wchar_t) *
+                                   (wmemchr_off(s, c, n) + 1)));
+    ensures
       result_null_or_inside_s:
         \result ≡ \null ∨ \subset(\result, \old(s) + (0 .. \old(n) - 1));
     assigns \result;
@@ -6330,7 +6406,21 @@ extern void tzset(void);
  */
 extern wchar_t *wmemchr(wchar_t const *s, wchar_t c, size_t n);
 
-/*@ assigns \result;
+/*@ requires
+      valid_s1:
+        valid_read_or_empty((void *)s1, (unsigned int)(sizeof(wchar_t) * n));
+    requires
+      valid_s2:
+        valid_read_or_empty((void *)s2, (unsigned int)(sizeof(wchar_t) * n));
+    requires initialization: s1: \initialized(s1 + (0 .. n - 1));
+    requires initialization: s2: \initialized(s2 + (0 .. n - 1));
+    requires
+      danglingness: s1:
+        non_escaping((void *)s1, (unsigned int)(sizeof(wchar_t) * n));
+    requires
+      danglingness: s2:
+        non_escaping((void *)s2, (unsigned int)(sizeof(wchar_t) * n));
+    assigns \result;
     assigns \result
       \from (indirect: *(s1 + (0 .. n - 1))),
             (indirect: *(s2 + (0 .. n - 1))), (indirect: n);
@@ -6339,7 +6429,9 @@ extern int wmemcmp(wchar_t const *s1, wchar_t const *s2, size_t n);
 
 wchar_t *wmemcpy(wchar_t *dest, wchar_t const *src, size_t n);
 
-/*@ ensures result_ptr: \result ≡ \old(dest);
+/*@ requires valid_src: \valid_read(src + (0 .. n - 1));
+    requires valid_dest: \valid(dest + (0 .. n - 1));
+    ensures result_ptr: \result ≡ \old(dest);
     assigns *(dest + (0 .. n - 1)), \result;
     assigns *(dest + (0 .. n - 1))
       \from *(src + (0 .. n - 1)), (indirect: src), (indirect: n);
@@ -6360,7 +6452,9 @@ wchar_t *wcscat(wchar_t *dest, wchar_t const *src);
  */
 extern wchar_t *wcschr(wchar_t const *wcs, wchar_t wc);
 
-/*@ assigns \result;
+/*@ requires valid_wstring_s1: valid_read_wstring(s1);
+    requires valid_wstring_s2: valid_read_wstring(s2);
+    assigns \result;
     assigns \result
       \from (indirect: *(s1 + (0 ..))), (indirect: *(s2 + (0 ..)));
  */
@@ -6368,13 +6462,25 @@ extern int wcscmp(wchar_t const *s1, wchar_t const *s2);
 
 wchar_t *wcscpy(wchar_t *dest, wchar_t const *src);
 
-/*@ assigns \result;
+/*@ requires valid_wstring_wcs: valid_read_wstring(wcs);
+    requires valid_wstring_accept: valid_read_wstring(accept);
+    assigns \result;
     assigns \result
       \from (indirect: *(wcs + (0 ..))), (indirect: *(accept + (0 ..)));
  */
 extern size_t wcscspn(wchar_t const *wcs, wchar_t const *accept);
 
-/*@ assigns *(dest + (0 ..)), \result;
+/*@ requires valid_nwstring_src: valid_read_nwstring(src, n);
+    requires valid_wstring_dest: valid_wstring(dest);
+    requires
+      room_for_concatenation:
+        \valid(dest + (wcslen(dest) .. wcslen(dest) + \min(wcslen(src), n)));
+    requires
+      separation:
+        \separated(
+          dest + (0 .. wcslen(dest) + wcslen(src)), src + (0 .. wcslen(src))
+          );
+    assigns *(dest + (0 ..)), \result;
     assigns *(dest + (0 ..))
       \from *(dest + (0 ..)), (indirect: dest), *(src + (0 .. n - 1)),
             (indirect: src), (indirect: n);
@@ -6385,7 +6491,9 @@ extern size_t wcscspn(wchar_t const *wcs, wchar_t const *accept);
 extern size_t wcslcat(wchar_t * __restrict dest,
                       wchar_t const * __restrict src, size_t n);
 
-/*@ requires
+/*@ requires valid_wstring_src: valid_read_wstring(src);
+    requires room_nwstring: \valid(dest + (0 .. n));
+    requires
       separation: dest: src:
         \separated(dest + (0 .. n - 1), src + (0 .. n - 1));
     assigns *(dest + (0 .. n - 1)), \result;
@@ -6401,7 +6509,9 @@ size_t wcslen(wchar_t const *str);
 
 wchar_t *wcsncat(wchar_t *dest, wchar_t const *src, size_t n);
 
-/*@ assigns \result;
+/*@ requires valid_wstring_s1: valid_read_wstring(s1);
+    requires valid_wstring_s2: valid_read_wstring(s2);
+    assigns \result;
     assigns \result
       \from (indirect: *(s1 + (0 .. n - 1))),
             (indirect: *(s2 + (0 .. n - 1))), (indirect: n);
@@ -6410,7 +6520,9 @@ extern int wcsncmp(wchar_t const *s1, wchar_t const *s2, size_t n);
 
 wchar_t *wcsncpy(wchar_t *dest, wchar_t const *src, size_t n);
 
-/*@ ensures
+/*@ requires valid_wstring_wcs: valid_read_wstring(wcs);
+    requires valid_wstring_accept: valid_read_wstring(accept);
+    ensures
       result_null_or_inside_wcs:
         \result ≡ \null ∨ \subset(\result, \old(wcs) + (0 ..));
     assigns \result;
@@ -6419,21 +6531,28 @@ wchar_t *wcsncpy(wchar_t *dest, wchar_t const *src, size_t n);
  */
 extern wchar_t *wcspbrk(wchar_t const *wcs, wchar_t const *accept);
 
-/*@ ensures
+/*@ requires valid_wstring_wcs: valid_read_wstring(wcs);
+    ensures
       result_null_or_inside_wcs:
         \result ≡ \null ∨ \subset(\result, \old(wcs) + (0 ..));
     assigns \result;
-    assigns \result \from wcs, (indirect: *(wcs + (0 ..))), (indirect: wc);
+    assigns \result
+      \from wcs, (indirect: *(wcs + (0 .. wcslen{Old}(wcs)))), (indirect: wc);
  */
 extern wchar_t *wcsrchr(wchar_t const *wcs, wchar_t wc);
 
-/*@ assigns \result;
+/*@ requires valid_wstring_wcs: valid_read_wstring(wcs);
+    requires valid_wstring_accept: valid_read_wstring(accept);
+    assigns \result;
     assigns \result
-      \from (indirect: *(wcs + (0 ..))), (indirect: *(accept + (0 ..)));
+      \from (indirect: *(wcs + (0 .. wcslen{Old}(wcs)))),
+            (indirect: *(accept + (0 .. wcslen{Old}(accept))));
  */
 extern size_t wcsspn(wchar_t const *wcs, wchar_t const *accept);
 
-/*@ ensures
+/*@ requires valid_wstring_haystack: valid_read_wstring(haystack);
+    requires valid_wstring_needle: valid_read_wstring(needle);
+    ensures
       result_null_or_inside_haystack:
         \result ≡ \null ∨ \subset(\result, \old(haystack) + (0 ..));
     assigns \result;
@@ -6443,13 +6562,14 @@ extern size_t wcsspn(wchar_t const *wcs, wchar_t const *accept);
  */
 extern wchar_t *wcsstr(wchar_t const *haystack, wchar_t const *needle);
 
-/*@ requires valid_stream: \valid(stream);
+/*@ requires room_nwstring: \valid(ws + (0 .. n - 1));
+    requires valid_stream: \valid(stream);
     ensures result_null_or_same: \result ≡ \null ∨ \result ≡ \old(ws);
     ensures
       terminated_string_on_success:
         \result ≢ \null ⇒ valid_wstring(\old(ws));
-    assigns *(ws + (0 .. n)), \result;
-    assigns *(ws + (0 .. n)) \from (indirect: n), (indirect: *stream);
+    assigns *(ws + (0 .. n - 1)), \result;
+    assigns *(ws + (0 .. n - 1)) \from (indirect: n), (indirect: *stream);
     assigns \result \from ws, (indirect: n), (indirect: *stream);
  */
 extern wchar_t *fgetws(wchar_t * __restrict ws, int n,
@@ -6462,6 +6582,12 @@ extern wchar_t *fgetws(wchar_t * __restrict ws, int n,
 
 */
 /*@ requires
+      valid_dest:
+        valid_or_empty((void *)dest, (unsigned int)(sizeof(wchar_t) * n));
+    requires
+      valid_src:
+        valid_read_or_empty((void *)src, (unsigned int)(sizeof(wchar_t) * n));
+    requires
       separation: dest: src:
         \separated(dest + (0 .. n - 1), src + (0 .. n - 1));
     ensures result_ptr: \result ≡ \old(dest);
@@ -6482,7 +6608,8 @@ wchar_t *wmemcpy(wchar_t *dest, wchar_t const *src, size_t n)
   return dest;
 }
 
-/*@ ensures result_ptr: \result ≡ \old(dest);
+/*@ requires valid_wcs: \valid(dest + (0 .. len - 1));
+    ensures result_ptr: \result ≡ \old(dest);
     ensures
       initialization: wcs: \initialized(\old(dest) + (0 .. \old(len) - 1));
     ensures
@@ -6504,11 +6631,15 @@ wchar_t *wmemset(wchar_t *dest, wchar_t val, size_t len)
   return dest;
 }
 
-/*@ ensures result_ptr: \result ≡ \old(dest);
-    assigns *(dest + (0 ..)), \result;
-    assigns *(dest + (0 ..))
-      \from *(src + (0 ..)), (indirect: src), *(dest + (0 ..)),
-            (indirect: dest);
+/*@ requires valid_wstring_src: valid_read_wstring(src);
+    requires room_wstring: \valid(dest + (0 .. wcslen(src)));
+    requires
+      separation:
+        \separated(dest + (0 .. wcslen(src)), src + (0 .. wcslen(src)));
+    ensures result_ptr: \result ≡ \old(dest);
+    assigns *(dest + (0 .. wcslen{Old}(src))), \result;
+    assigns *(dest + (0 .. wcslen{Old}(src)))
+      \from *(src + (0 .. wcslen{Old}(src))), (indirect: src);
     assigns \result \from dest;
  */
 wchar_t *wcscpy(wchar_t *dest, wchar_t const *src)
@@ -6524,8 +6655,9 @@ wchar_t *wcscpy(wchar_t *dest, wchar_t const *src)
 }
 
 /*@ requires valid_string_s: valid_read_wstring(str);
+    ensures result_is_length: \result ≡ wcslen(\old(str));
     assigns \result;
-    assigns \result \from (indirect: *(str + (0 ..)));
+    assigns \result \from (indirect: *(str + (0 .. wcslen{Old}(str))));
  */
 size_t wcslen(wchar_t const *str)
 {
@@ -6535,10 +6667,13 @@ size_t wcslen(wchar_t const *str)
   return i;
 }
 
-/*@ requires
+/*@ requires valid_wstring_src: valid_read_wstring(src);
+    requires room_nwstring: \valid(dest + (0 .. n - 1));
+    requires
       separation: dest: src:
         \separated(dest + (0 .. n - 1), src + (0 .. n - 1));
     ensures result_ptr: \result ≡ \old(dest);
+    ensures initialization: \initialized(\old(dest) + (0 .. \old(n) - 1));
     assigns *(dest + (0 .. n - 1)), \result;
     assigns *(dest + (0 .. n - 1))
       \from *(src + (0 .. n - 1)), (indirect: src), (indirect: n);
@@ -6560,7 +6695,17 @@ wchar_t *wcsncpy(wchar_t *dest, wchar_t const *src, size_t n)
   return dest;
 }
 
-/*@ ensures result_ptr: \result ≡ \old(dest);
+/*@ requires valid_wstring_src: valid_read_wstring(src);
+    requires valid_wstring_dest: valid_wstring(dest);
+    requires
+      room_for_concatenation:
+        \valid(dest + (wcslen(dest) .. wcslen(dest) + wcslen(src)));
+    requires
+      separation:
+        \separated(
+          dest + (0 .. wcslen(dest) + wcslen(src)), src + (0 .. wcslen(src))
+          );
+    ensures result_ptr: \result ≡ \old(dest);
     assigns *(dest + (0 ..)), \result;
     assigns *(dest + (0 ..))
       \from *(dest + (0 ..)), (indirect: dest), *(src + (0 ..)),
@@ -6580,7 +6725,17 @@ wchar_t *wcscat(wchar_t *dest, wchar_t const *src)
   return dest;
 }
 
-/*@ ensures result_ptr: \result ≡ \old(dest);
+/*@ requires valid_nwstring_src: valid_read_nwstring(src, n);
+    requires valid_wstring_dest: valid_wstring(dest);
+    requires
+      room_for_concatenation:
+        \valid(dest + (wcslen(dest) .. wcslen(dest) + \min(wcslen(src), n)));
+    requires
+      separation:
+        \separated(
+          dest + (0 .. wcslen(dest) + wcslen(src)), src + (0 .. wcslen(src))
+          );
+    ensures result_ptr: \result ≡ \old(dest);
     assigns *(dest + (0 ..)), \result;
     assigns *(dest + (0 ..))
       \from *(dest + (0 ..)), (indirect: dest), *(src + (0 .. n - 1)),

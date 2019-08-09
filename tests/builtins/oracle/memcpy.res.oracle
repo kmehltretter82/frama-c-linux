@@ -1055,6 +1055,8 @@
             Unverifiable but considered Valid.
 [ Extern  ] Axiom 'wcsncmp_zero'
             Unverifiable but considered Valid.
+[ Extern  ] Axiom 'wmemchr_def'
+            Unverifiable but considered Valid.
 [  Valid  ] Axiomatic 'MemChr'
             by Frama-C kernel.
 [  Valid  ] Axiomatic 'MemCmp'
@@ -1068,6 +1070,8 @@
 [  Valid  ] Axiomatic 'StrLen'
             by Frama-C kernel.
 [  Valid  ] Axiomatic 'StrNCmp'
+            by Frama-C kernel.
+[  Valid  ] Axiomatic 'WMemChr'
             by Frama-C kernel.
 [  Valid  ] Axiomatic 'WcsChr'
             by Frama-C kernel.
@@ -2216,9 +2220,9 @@
 --------------------------------------------------------------------------------
 --- Status Report Summary
 --------------------------------------------------------------------------------
-   161 Completely validated
-   238 Considered valid
+   162 Completely validated
+   239 Considered valid
     29 To be validated
      4 Alarms emitted
-   432 Total
+   434 Total
 --------------------------------------------------------------------------------

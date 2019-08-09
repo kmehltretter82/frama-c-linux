@@ -1223,6 +1223,12 @@
 [ Extern  ] Axiom 'wcsncmp_zero'
             axiom wcsncmp_zero
             Unverifiable but considered Valid.
+[ Extern  ] Axiom 'wmemchr_def'
+            axiom wmemchr_def
+            Unverifiable but considered Valid.
+[  Valid  ] Axiomatic 'GetsLength'
+            axiomatic GetsLength
+            by Frama-C kernel.
 [  Valid  ] Axiomatic 'MemChr'
             axiomatic MemChr
             by Frama-C kernel.
@@ -1243,6 +1249,9 @@
             by Frama-C kernel.
 [  Valid  ] Axiomatic 'StrNCmp'
             axiomatic StrNCmp
+            by Frama-C kernel.
+[  Valid  ] Axiomatic 'WMemChr'
+            axiomatic WMemChr
             by Frama-C kernel.
 [  Valid  ] Axiomatic 'WcsChr'
             axiomatic WcsChr
@@ -1577,19 +1586,24 @@
             ensures
             result_null_or_same: \result ≡ \null ∨ \result ≡ \old(s)
             Unverifiable but considered Valid.
+[ Extern  ] Post-condition 'initialization,at_least_one'
+            ensures
+            initialization: at_least_one:
+              \result ≢ \null ⇒ \initialized(\old(s) + 0)
+            Unverifiable but considered Valid.
 [ Extern  ] Post-condition 'terminated_string_on_success'
             ensures
             terminated_string_on_success:
               \result ≢ \null ⇒ valid_string(\old(s))
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/stdio.h, line 225)
-            assigns *(s + (0 .. size)), \result;
-            Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 225)
-            assigns *(s + (0 .. size))
-              \from (indirect: size), (indirect: *stream);
+[ Extern  ] Assigns (file share/libc/stdio.h, line 226)
+            assigns *(s + (0 .. size - 1)), \result;
             Unverifiable but considered Valid.
 [ Extern  ] Froms (file share/libc/stdio.h, line 226)
+            assigns *(s + (0 .. size - 1))
+              \from (indirect: size), (indirect: *stream);
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file share/libc/stdio.h, line 227)
             assigns \result \from s, (indirect: size), (indirect: *stream);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1600,7 +1614,7 @@
 --- Properties of Function 'fputc'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 234)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 238)
             assigns *stream;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1611,10 +1625,10 @@
 --- Properties of Function 'fputs'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 237)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 241)
             assigns *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 237)
+[ Extern  ] Froms (file share/libc/stdio.h, line 241)
             assigns *stream \from *(s + (..));
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1625,13 +1639,13 @@
 --- Properties of Function 'getc'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 241)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 245)
             assigns \result, *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 241)
+[ Extern  ] Froms (file share/libc/stdio.h, line 245)
             assigns \result \from *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 241)
+[ Extern  ] Froms (file share/libc/stdio.h, line 245)
             assigns *stream \from *stream;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1645,7 +1659,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 244)
+[ Extern  ] Froms (file share/libc/stdio.h, line 248)
             assigns \result \from *__fc_stdin;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1660,14 +1674,17 @@
             ensures
             result_null_or_same: \result ≡ \old(s) ∨ \result ≡ \null
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/stdio.h, line 248)
-            assigns *(s + (..)), \result;
+[ Extern  ] Assigns (file share/libc/stdio.h, line 260)
+            assigns *(s + (0 .. gets_length{Old})), \result, *__fc_stdin;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 248)
-            assigns *(s + (..)) \from *__fc_stdin;
+[ Extern  ] Froms (file share/libc/stdio.h, line 260)
+            assigns *(s + (0 .. gets_length{Old})) \from *__fc_stdin;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 249)
-            assigns \result \from s, __fc_stdin;
+[ Extern  ] Froms (file share/libc/stdio.h, line 261)
+            assigns \result \from s, *__fc_stdin;
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file share/libc/stdio.h, line 262)
+            assigns *__fc_stdin \from *__fc_stdin;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             default behavior
@@ -1677,10 +1694,10 @@
 --- Properties of Function 'putc'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 254)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 269)
             assigns *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 254)
+[ Extern  ] Froms (file share/libc/stdio.h, line 269)
             assigns *stream \from c;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1691,10 +1708,10 @@
 --- Properties of Function 'putchar'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 257)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 273)
             assigns *__fc_stdout;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 257)
+[ Extern  ] Froms (file share/libc/stdio.h, line 273)
             assigns *__fc_stdout \from c;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1705,10 +1722,10 @@
 --- Properties of Function 'puts'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 260)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 276)
             assigns *__fc_stdout;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 260)
+[ Extern  ] Froms (file share/libc/stdio.h, line 276)
             assigns *__fc_stdout \from *(s + (..));
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1719,10 +1736,10 @@
 --- Properties of Function 'ungetc'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 263)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 281)
             assigns *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 263)
+[ Extern  ] Froms (file share/libc/stdio.h, line 281)
             assigns *stream \from c;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1742,14 +1759,14 @@
               \initialized((char *)\old(ptr) +
                            (0 .. \result * \old(size) - 1))
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/stdio.h, line 269)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 288)
             assigns *((char *)ptr + (0 .. nmemb * size - 1)), \result;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 269)
+[ Extern  ] Froms (file share/libc/stdio.h, line 288)
             assigns *((char *)ptr + (0 .. nmemb * size - 1))
               \from size, nmemb, *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 270)
+[ Extern  ] Froms (file share/libc/stdio.h, line 289)
             assigns \result \from size, *stream;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1763,13 +1780,13 @@
 [ Extern  ] Post-condition 'size_written'
             ensures size_written: \result ≤ \old(nmemb)
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/stdio.h, line 282)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 301)
             assigns *stream, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 282)
+[ Extern  ] Froms (file share/libc/stdio.h, line 301)
             assigns *stream \from *((char *)ptr + (0 .. nmemb * size - 1));
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 282)
+[ Extern  ] Froms (file share/libc/stdio.h, line 301)
             assigns \result \from *((char *)ptr + (0 .. nmemb * size - 1));
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1780,10 +1797,10 @@
 --- Properties of Function 'fgetpos'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 290)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 309)
             assigns *pos;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 290)
+[ Extern  ] Froms (file share/libc/stdio.h, line 309)
             assigns *pos \from *stream;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1794,19 +1811,19 @@
 --- Properties of Function 'fseek'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 297)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 316)
             assigns *stream, \result, __fc_errno;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 297)
+[ Extern  ] Froms (file share/libc/stdio.h, line 316)
             assigns *stream
               \from *stream, (indirect: offset), (indirect: whence);
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 298)
+[ Extern  ] Froms (file share/libc/stdio.h, line 317)
             assigns \result
               \from (indirect: *stream), (indirect: offset),
                     (indirect: whence);
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 298)
+[ Extern  ] Froms (file share/libc/stdio.h, line 317)
             assigns __fc_errno
               \from (indirect: *stream), (indirect: offset),
                     (indirect: whence);
@@ -1819,10 +1836,10 @@
 --- Properties of Function 'fsetpos'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 303)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 322)
             assigns *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 303)
+[ Extern  ] Froms (file share/libc/stdio.h, line 322)
             assigns *stream \from *pos;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1839,13 +1856,13 @@
               \result ≡ -1 ∨
               (\result ≥ 0 ∧ __fc_errno ≡ \old(__fc_errno))
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/stdio.h, line 308)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 327)
             assigns \result, __fc_errno;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 308)
+[ Extern  ] Froms (file share/libc/stdio.h, line 327)
             assigns \result \from (indirect: *stream);
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 308)
+[ Extern  ] Froms (file share/libc/stdio.h, line 327)
             assigns __fc_errno \from (indirect: *stream);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1856,10 +1873,10 @@
 --- Properties of Function 'rewind'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 314)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 335)
             assigns *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 314)
+[ Extern  ] Froms (file share/libc/stdio.h, line 335)
             assigns *stream \from \nothing;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1870,10 +1887,10 @@
 --- Properties of Function 'clearerr'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 317)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 341)
             assigns *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 317)
+[ Extern  ] Froms (file share/libc/stdio.h, line 341)
             assigns *stream \from \nothing;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1887,7 +1904,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 320)
+[ Extern  ] Froms (file share/libc/stdio.h, line 347)
             assigns \result \from *stream;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1901,7 +1918,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 323)
+[ Extern  ] Froms (file share/libc/stdio.h, line 353)
             assigns \result \from *stream;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1912,10 +1929,10 @@
 --- Properties of Function 'flockfile'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 326)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 359)
             assigns *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 326)
+[ Extern  ] Froms (file share/libc/stdio.h, line 359)
             assigns *stream \from \nothing;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1926,10 +1943,10 @@
 --- Properties of Function 'funlockfile'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 329)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 365)
             assigns *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 329)
+[ Extern  ] Froms (file share/libc/stdio.h, line 365)
             assigns *stream \from \nothing;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1940,13 +1957,13 @@
 --- Properties of Function 'ftrylockfile'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 332)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 371)
             assigns \result, *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 332)
+[ Extern  ] Froms (file share/libc/stdio.h, line 371)
             assigns \result \from \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 332)
+[ Extern  ] Froms (file share/libc/stdio.h, line 371)
             assigns *stream \from \nothing;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1960,7 +1977,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 335)
+[ Extern  ] Froms (file share/libc/stdio.h, line 377)
             assigns \result \from *stream;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1971,10 +1988,10 @@
 --- Properties of Function 'perror'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 338)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 383)
             assigns __fc_stdout;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 338)
+[ Extern  ] Froms (file share/libc/stdio.h, line 383)
             assigns __fc_stdout \from __fc_errno, *(s + (..));
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1985,13 +2002,13 @@
 --- Properties of Function 'getc_unlocked'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 341)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 389)
             assigns \result, *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 341)
+[ Extern  ] Froms (file share/libc/stdio.h, line 389)
             assigns \result \from *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 341)
+[ Extern  ] Froms (file share/libc/stdio.h, line 389)
             assigns *stream \from *stream;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2005,7 +2022,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 343)
+[ Extern  ] Froms (file share/libc/stdio.h, line 392)
             assigns \result \from *__fc_stdin;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2016,10 +2033,10 @@
 --- Properties of Function 'putc_unlocked'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 345)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 397)
             assigns *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 345)
+[ Extern  ] Froms (file share/libc/stdio.h, line 397)
             assigns *stream \from c;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2030,10 +2047,10 @@
 --- Properties of Function 'putchar_unlocked'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 347)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 401)
             assigns *__fc_stdout;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 347)
+[ Extern  ] Froms (file share/libc/stdio.h, line 401)
             assigns *__fc_stdout \from c;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2044,10 +2061,10 @@
 --- Properties of Function 'clearerr_unlocked'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 350)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 406)
             assigns *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 350)
+[ Extern  ] Froms (file share/libc/stdio.h, line 406)
             assigns *stream \from \nothing;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2061,7 +2078,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 352)
+[ Extern  ] Froms (file share/libc/stdio.h, line 412)
             assigns \result \from *stream;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2075,7 +2092,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 354)
+[ Extern  ] Froms (file share/libc/stdio.h, line 418)
             assigns \result \from *stream;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2089,7 +2106,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 356)
+[ Extern  ] Froms (file share/libc/stdio.h, line 424)
             assigns \result \from *stream;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2107,14 +2124,14 @@
               (\subset(\result, &__fc_fopen[0 .. 16 - 1]) ∧
                is_open_pipe(\result))
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/stdio.h, line 381)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 451)
             assigns \result, __fc_fopen[0 ..];
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 381)
+[ Extern  ] Froms (file share/libc/stdio.h, line 451)
             assigns \result
               \from (indirect: *command), (indirect: *type), __fc_p_fopen;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 383)
+[ Extern  ] Froms (file share/libc/stdio.h, line 453)
             assigns __fc_fopen[0 ..]
               \from (indirect: *command), (indirect: *type), __fc_fopen[0 ..];
             Unverifiable but considered Valid.
@@ -2132,7 +2149,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 395)
+[ Extern  ] Froms (file share/libc/stdio.h, line 465)
             assigns \result \from (indirect: *stream);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3922,9 +3939,9 @@
 --------------------------------------------------------------------------------
 --- Status Report Summary
 --------------------------------------------------------------------------------
-   175 Completely validated
+   177 Completely validated
     16 Locally validated
-   454 Considered valid
+   457 Considered valid
     56 To be validated
-   701 Total
+   706 Total
 --------------------------------------------------------------------------------
