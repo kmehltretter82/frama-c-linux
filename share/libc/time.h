@@ -86,7 +86,11 @@ extern clock_t clock(void);
 /*@ assigns \result \from time1, time0; */
 extern double difftime(time_t time1, time_t time0);
 
-/*@ assigns *timeptr, \result \from *timeptr; */
+/*@
+  requires valid_timeptr: \valid(timeptr);
+  assigns *timeptr \from *timeptr;
+  assigns \result \from indirect:*timeptr;
+ */
 extern time_t mktime(struct tm *timeptr);
 
 /*@
@@ -122,14 +126,18 @@ extern char *ctime(const time_t *timer);
 struct tm __fc_time_tm;
 struct tm * const  __fc_p_time_tm = &__fc_time_tm;
 
-/*@ assigns \result \from __fc_p_time_tm;
+/*@
+  requires valid_timer: \valid_read(timer);
+  assigns \result \from __fc_p_time_tm;
   assigns __fc_time_tm \from *timer;
   ensures result_null_or_internal_tm:
     \result == &__fc_time_tm || \result == \null ;
 */
 extern struct tm *gmtime(const time_t *timer);
 
-/*@ assigns \result \from __fc_p_time_tm;
+/*@
+  requires valid_timer: \valid_read(timer);
+  assigns \result \from __fc_p_time_tm;
   assigns __fc_time_tm \from *timer;
   ensures result_null_or_internal_tm:
     \result == &__fc_time_tm || \result == \null;
@@ -290,7 +298,6 @@ extern int timer_getoverrun(timer_t);
 extern int timer_gettime(timer_t, struct itimerspec *);
 extern int timer_settime(timer_t, int, const struct itimerspec *restrict,
                          struct itimerspec *restrict);
-extern void tzset(void);
 
 extern int daylight;
 extern long timezone;
