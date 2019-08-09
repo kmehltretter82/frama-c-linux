@@ -487,22 +487,36 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
   | g when Misc.is_library_loc (Global.loc g) ->
     if generate then Cil.JustCopy else Cil.SkipChildren
   | g ->
+    let unghost_function vi =
+      assert (match vi.vtype with TFun(_) -> true | _ -> false) ;
+      vi.vghost <- false ;
+      vi.vtype <- match vi.vtype with
+        | TFun(res, Some l, va, attr) ->
+          let retype (n, t, a) = (n, t, Cil.dropAttribute "fc_ghost" a) in
+          TFun(res, Some (List.map retype l), va, attr)
+        | _ -> vi.vtype
+    in
     let do_it = function
       | GVar(vi, _, _) ->
         vi.vghost <- false
       | GFun({ svar = vi } as fundec, _) ->
-        vi.vghost <- false;
+        unghost_function vi ;
         Builtins.update vi.vname vi;
         (* remember that we have to remove the main later (see method
            [vfile]); do not use the [vorig_name] since both [main] and
            [__e_acsl_main] have the same [vorig_name]. *)
         if vi.vname = Kernel.MainFunction.get () then
           main_fct <- Some fundec
-      | GVarDecl(vi, _) | GFunDecl(_, vi, _) ->
+      | GVarDecl(vi, _) ->
         (* do not convert extern ghost variables, because they can't be linked,
            see bts #1392 *)
         if vi.vstorage <> Extern then
           vi.vghost <- false
+      | GFunDecl(_, vi, _) ->
+        (* do not convert extern ghost variables, because they can't be linked,
+           see bts #1392 *)
+        if vi.vstorage <> Extern then
+          unghost_function vi
       | _ ->
         ()
     in
@@ -594,7 +608,12 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       if Functions.instrument kf then Exit_points.generate f;
       Options.feedback ~dkey ~level:2 "entering in function %a."
         Kernel_function.pretty kf;
-      List.iter (fun vi -> vi.vghost <- false) f.slocals;
+      let unghost_vi vi =
+        vi.vghost <- false ;
+        vi.vattr <- Cil.dropAttribute "fc_ghost" vi.vattr
+      in
+      List.iter unghost_vi f.slocals;
+      List.iter unghost_vi f.sformals;
       Cil.DoChildrenPost
         (fun f ->
           Exit_points.clear ();
