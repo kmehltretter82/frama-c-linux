@@ -222,9 +222,13 @@ extern int fgetc(FILE *stream);
 
 /*@
   requires valid_stream: \valid(stream);
-  assigns s[0..size] \from indirect:size, indirect:*stream;
+  requires room_s: \valid(s+(0..size-1));
+  assigns s[0..size-1] \from indirect:size, indirect:*stream;
   assigns \result \from s, indirect:size, indirect:*stream;
   ensures result_null_or_same: \result == \null || \result == s;
+  ensures initialization:at_least_one:\result != \null ==> \initialized(&s[0]);
+          // the return value does not tell how many characters were written,
+          // so we can only ensure the first one was initialized
   ensures terminated_string_on_success:
     \result != \null ==> valid_string(s);
  */
@@ -244,14 +248,26 @@ extern int getc(FILE *stream);
 /*@ assigns \result \from *__fc_stdin ; */
 extern int getchar(void);
 
+// Number of characters that will read by gets()
 /*@
-  assigns s[..] \from *__fc_stdin ;
-  assigns \result \from s, __fc_stdin;
+  axiomatic GetsLength {
+    logic size_t gets_length{L} reads *__fc_stdin;
+  }
+*/
+
+/*@
+  requires room_s: \valid(s+(0..gets_length));
+  assigns s[0..gets_length] \from *__fc_stdin ;
+  assigns \result \from s, *__fc_stdin;
+  assigns *__fc_stdin \from *__fc_stdin;
   ensures result_null_or_same: \result == s || \result == \null;
  */
 extern char *gets(char *s);
 
-/*@ assigns *stream \from c; */
+/*@
+  requires valid_stream: \valid(stream);
+  assigns *stream \from c;
+*/
 extern int putc(int c, FILE *stream);
 
 /*@ assigns *__fc_stdout \from c; */
@@ -260,7 +276,10 @@ extern int putchar(int c);
 /*@ assigns *__fc_stdout \from s[..]; */
 extern int puts(const char *s);
 
-/*@ assigns *stream \from c; */
+/*@
+  requires valid_stream: \valid(stream);
+  assigns *stream \from c;
+*/
 extern int ungetc(int c, FILE *stream);
 
 /*@
@@ -311,50 +330,101 @@ extern int fsetpos(FILE *stream, const fpos_t *pos);
 */
 extern long int ftell(FILE *stream);
 
-/*@  assigns *stream \from \nothing; */
+/*@
+  requires valid_stream: \valid(stream);
+  assigns *stream \from \nothing;
+ */
 extern void rewind(FILE *stream);
 
-/*@  assigns *stream  \from \nothing; */
+/*@
+  requires valid_stream: \valid(stream);
+  assigns *stream  \from \nothing;
+ */
 extern void clearerr(FILE *stream);
 
-/*@ assigns \result \from *stream ;*/
+/*@
+  requires valid_stream: \valid(stream);
+  assigns \result \from *stream;
+*/
 extern int feof(FILE *stream);
 
-/*@ assigns \result \from *stream ;*/
+/*@
+  requires valid_stream: \valid(stream);
+  assigns \result \from *stream;
+*/
 extern int fileno(FILE *stream);
 
-/*@ assigns *stream \from \nothing ;*/
+/*@
+  requires valid_stream: \valid(stream);
+  assigns *stream \from \nothing;
+*/
 extern void flockfile(FILE *stream);
 
-/*@ assigns *stream \from \nothing ;*/
+/*@
+  requires valid_stream: \valid(stream);
+  assigns *stream \from \nothing;
+*/
 extern void funlockfile(FILE *stream);
 
-/*@ assigns \result,*stream \from \nothing ;*/
+/*@
+  requires valid_stream: \valid(stream);
+  assigns \result,*stream \from \nothing;
+*/
 extern int ftrylockfile(FILE *stream);
 
-/*@ assigns \result \from *stream ;*/
+/*@
+  requires valid_stream: \valid(stream);
+  assigns \result \from *stream;
+*/
 extern int ferror(FILE *stream);
 
-/*@ assigns __fc_stdout \from __fc_errno, s[..]; */
+/*@
+  requires valid_string_s: valid_read_string(s);
+  assigns __fc_stdout \from __fc_errno, s[..];
+ */
 extern void perror(const char *s);
 
-/*@ assigns \result,*stream \from *stream; */
+/*@
+  requires valid_stream: \valid(stream);
+  assigns \result,*stream \from *stream;
+*/
 extern int getc_unlocked(FILE *stream);
 /*@ assigns \result \from *__fc_stdin ; */
 extern int getchar_unlocked(void);
-/*@ assigns *stream \from c; */
+
+/*@
+  requires valid_stream: \valid(stream);
+  assigns *stream \from c;
+*/
 extern int putc_unlocked(int c, FILE *stream);
+
 /*@ assigns *__fc_stdout \from c; */
 extern int putchar_unlocked(int c);
 
-/*@  assigns *stream  \from \nothing; */
+/*@
+  requires valid_stream: \valid(stream);
+  assigns *stream  \from \nothing;
+*/
 extern void clearerr_unlocked(FILE *stream);
-/*@ assigns \result \from *stream ;*/
+
+/*@
+  requires valid_stream: \valid(stream);
+  assigns \result \from *stream;
+*/
 extern int feof_unlocked(FILE *stream);
-/*@ assigns \result \from *stream ;*/
+
+/*@
+  requires valid_stream: \valid(stream);
+  assigns \result \from *stream;
+*/
 extern int ferror_unlocked(FILE *stream);
-/*@ assigns \result \from *stream ;*/
+
+/*@
+  requires valid_stream: \valid(stream);
+  assigns \result \from *stream;
+*/
 extern int fileno_unlocked(FILE *stream);
+
 extern int fflush_unlocked(FILE *stream);
 extern int fgetc_unlocked(FILE *stream);
 extern int fputc_unlocked(int c, FILE *stream);
