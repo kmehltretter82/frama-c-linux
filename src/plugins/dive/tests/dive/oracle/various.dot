@@ -22,19 +22,18 @@ digraph G {
         style="filled", ];
   cp13 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
         style="filled", ];
-  cp14 [label=<pf>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
-        style="filled", ];
+  cp14 [label=<pf>, shape=box, ];
   cp15 [style="invis,dotted", ];
   cp16 [label=<x2>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
         style="filled", ];
   cp17 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
         style="filled", ];
   cp18 [label=<is_nan_or_infinite: \is_finite((float)((double)((double)y * 2.0)))>,
-        shape=doubleoctagon, fillcolor="#FF0000", color="#FF0000",
-        style="bold,filled,bold", ];
+        fillcolor="#FF0000", color="#FF0000", shape=doubleoctagon,
+        style="filled,bold", ];
   cp19 [label=<is_nan_or_infinite: \is_finite((float)(y + w))>,
-        shape=doubleoctagon, fillcolor="#FF0000", color="#FF0000",
-        style="bold,filled,bold", ];
+        fillcolor="#FF0000", color="#FF0000", shape=doubleoctagon,
+        style="filled,bold", ];
   
   subgraph cluster_cs_1 { label=<f>; cp18;cp2;cp1;cp0;
      };

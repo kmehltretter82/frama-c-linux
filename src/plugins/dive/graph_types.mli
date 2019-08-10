@@ -32,16 +32,21 @@ type node_locality = {
   loc_callstack : Callstack.t;
 }
 
-type precision_interval = {min: float; max: float}
+type float_interval = {min: float; max: float}
 
-type node_precision = Unevaluated | Singleton | Normal of precision_interval |
-                      Wide of precision_interval | Critical of precision_interval
+type precision_grade = Singleton | Normal | Wide
+
+type node_values = {
+  values_interval : float_interval;
+  values_limits : float_interval;
+  values_grade : precision_grade;
+}
 
 type node = {
   node_key : int;
   node_kind : node_kind;
   node_locality : node_locality;
-  mutable node_precision : node_precision;
+  mutable node_values : node_values option;
   mutable node_deps_computed : bool;
 }
 

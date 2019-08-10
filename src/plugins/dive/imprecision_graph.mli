@@ -27,11 +27,11 @@ include Graph.Sig.G with type V.t = node
 val create : ?size:int -> unit -> t
 
 val create_node :
-  ?node_precision:node_precision ->
+  ?node_values:node_values ->
   node_kind:node_kind ->
   node_locality:node_locality -> t -> node
 
-val update_node_precision : node -> node_precision -> unit
+val update_node_values : node -> node_values -> unit
 
 val create_dependency : allow_folding:bool -> t -> node -> dependency_kind ->
   node -> unit

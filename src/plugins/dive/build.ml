@@ -33,46 +33,62 @@ let _fval_contains_maximal_bounds fkind fval =
   Fval.has_greater_min_bound top fval >= 0 ||
   Fval.has_smaller_max_bound top fval >= 0
 
+let fkind_limits =
+  let single = {
+    min = float_of_string "0x1p-126";
+    max = float_of_string "0x1.fffffep+127";
+  }
+  and double = {
+    min = float_of_string "0x1p-1022";
+    max = float_of_string "0x1.fffffffffffffp+1023";
+  }
+  in function
+  | FFloat      -> single
+  | FDouble     -> double
+  | FLongDouble -> assert false
 
 let precision_limits =
   let single = float_of_string "0x1p+120"
   and double = float_of_string "0x1p+960"
   and long_double = float_of_string "0x1p+15360"
-  in function 
+  in function
     | FFloat      -> single
     | FDouble     -> double
     | FLongDouble -> long_double
 
-let fval_has_large_range fkind fval =
+let is_large_range fkind (min,max) =
   let limit = precision_limits fkind in
-  match Fval.min_and_max fval with
-  | None, _ -> false
-  | Some (min,max), _ ->
-    let min' = Fval.F.to_float min and max' = Fval.F.to_float max in
-    if (min' < 0.0) = (max' < 0.0) then
-      max' -. min' >= limit
-    else
-      min' <= -.limit || max' >= limit
+  if (min < 0.0) = (max < 0.0) then (* if bounds have same sign *)
+    max -. min >= limit
+  else
+    min <= -.limit || max >= limit
 
-let compute_node_precision kinstr lval =
+let qualify_range fkind (min,max) =
+  if min = max then
+    Singleton
+  else if is_large_range fkind (min,max) then
+    Wide
+  else
+    Normal
+
+let update_node_values node kinstr lval =
   let typ = Cil.typeOfLval lval in
   let state = Db.Value.get_state kinstr in
   let _,cvalue = !Db.Value.eval_lval None state lval in
-  let size = Integer.of_int (Cil.bitsSizeOf typ) in
-  let cardinal = Cvalue.V.cardinal_estimate ~size cvalue in
-  if Integer.(le cardinal one)
-  then Singleton
-  else
-    match Cvalue.V.project_ival cvalue, typ with
-    | Ival.Float fval, TFloat (fkind,_) -> begin
-        match Fval.min_and_max fval with
-        | Some (min,max), _ ->
-          let ival = {min=Fval.F.to_float min; max=Fval.F.to_float max} in
-          if fval_has_large_range fkind fval then Wide ival else Normal ival
-        | None, _ -> Unevaluated
+  try match typ with
+    | TFloat (fkind,_) ->
+      begin match Ival.min_and_max_float (Cvalue.V.project_ival cvalue) with
+        | None, _can_be_nan -> ()
+        | Some (min, max), _can_be_nan ->
+          let min = Fval.F.to_float min and max = Fval.F.to_float max in
+          Imprecision_graph.update_node_values node {
+            values_interval = {min;max};
+            values_limits = fkind_limits fkind;
+            values_grade = qualify_range fkind (min,max);
+          }
       end
-    | _ -> Unevaluated
-    | exception Cvalue.V.Not_based_on_null -> Unevaluated
+    | _ -> ()
+  with Cvalue.V.Not_based_on_null -> ()
 
 
 (* --- Locations handling --- *)
@@ -241,16 +257,13 @@ let build_lval context callstack kinstr lval =
   match build_node context callstack location lval with
   | None -> None
   | Some node ->
-    (* Update the precision information *)
-    let node_precision = compute_node_precision kinstr lval in
-    Graph.update_node_precision node node_precision;
+    update_node_values node kinstr lval;
     Some node
 
 let build_alarm context callstack stmt alarm =
   let node_kind = Alarm (stmt,alarm) in
-  let node_locality = build_node_locality callstack node_kind
-  and node_precision = Critical {min=0.; max=0.} in
-  Graph.create_node context.graph ~node_precision ~node_kind ~node_locality
+  let node_locality = build_node_locality callstack node_kind in
+  Graph.create_node context.graph ~node_kind ~node_locality
 
 
 exception Too_many_deps of lval

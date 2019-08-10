@@ -49,12 +49,12 @@ include G
 let next_node_key = ref 0
 let next_dependency_key = ref 0
 
-let create_node ?(node_precision=Unevaluated) ~node_kind ~node_locality g =
+let create_node ?node_values ~node_kind ~node_locality g =
   let node = {
     node_key = !next_node_key;
     node_kind;
     node_locality;
-    node_precision;
+    node_values;
     node_deps_computed = false;
   }
   in
@@ -62,14 +62,28 @@ let create_node ?(node_precision=Unevaluated) ~node_kind ~node_locality g =
   add_vertex g node;
   node
 
-let update_node_precision node new_precision =
-  node.node_precision <-
-    match node.node_precision, new_precision with
-    | Critical i, _ | _, Critical i -> Critical i
-    | Wide i, _ | _, Wide i -> Wide i
-    | Normal i, _ | _, Normal i -> Normal i
-    | Singleton, _ | _, Singleton -> Singleton
-    | Unevaluated, Unevaluated -> Unevaluated
+let union_interval i1 i2 =
+  { min = min i1.min i2.min ; max = max i1.max i2.max }
+
+let worst_precision_grade q1 q2 =
+  match q1, q2 with
+  | Wide, _ | _, Wide -> Wide
+  | Normal, _ | _, Normal -> Normal
+  | Singleton, Singleton -> Singleton
+
+let merge_precisions p1 p2 =
+  (* TODO: prevent assertion failure *)
+  assert (p1.values_limits = p2.values_limits);
+  {
+    values_interval = union_interval p1.values_interval p2.values_interval;
+    values_limits = p1.values_limits;
+    values_grade = worst_precision_grade p1.values_grade p2.values_grade; 
+  }
+
+let update_node_values node new_values =
+  node.node_values <-
+    Some (Extlib.opt_fold merge_precisions node.node_values new_values)
+
 
 let create_dependency ~allow_folding g v1 dependency_kind v2 =
   let same_kind (_,e,_) =
@@ -146,20 +160,20 @@ let ouptput_to_dot out_channel g =
           | Scalar _ -> [`Shape `Box]
           | Composite _ -> [ `Shape `Box3d ]
           | Scattered _ -> [ `Shape `Parallelogram ]
-          | Alarm _ ->  [ `Shape `Doubleoctagon ; `Style `Bold ]
-          | Cluster -> [ `Style `Invis ]
-        and precision = match v.node_precision with
-          | Unevaluated -> []
-          | Singleton -> [`Color 0x88aaff ;
-                          `Style `Filled ; `Fillcolor 0xaaccff]
-          | Normal _ -> [ `Color 0x004400 ;
-                        `Style `Filled ; `Fillcolor 0xeeffee ]
-          | Wide _ -> [ `Color 0xff0000 ;
-                      `Style `Filled ; `Fillcolor 0xffbbbb ]
-          | Critical _ -> [ `Color 0xff0000 ; `Style `Bold ;
+          | Alarm _ ->  [ `Shape `Doubleoctagon ;
+                          `Style `Bold ; `Color 0xff0000 ;
                           `Style `Filled ; `Fillcolor 0xff0000 ]
+          | Cluster -> [ `Style `Invis ]
+        and values = match v.node_values with
+          | None -> []
+          | Some ({values_grade=Singleton}) ->
+            [`Color 0x88aaff ; `Style `Filled ; `Fillcolor 0xaaccff ]
+          | Some ({values_grade=Normal}) ->
+            [ `Color 0x004400 ; `Style `Filled ; `Fillcolor 0xeeffee ]
+          | Some ({values_grade=Wide}) ->
+            [ `Color 0xff0000 ; `Style `Filled ; `Fillcolor 0xffbbbb ]
         in
-        l := precision @ kind @ !l;
+        l := values @ kind @ !l;
         if not v.node_deps_computed then
           l := [ `Style `Dotted ] @ !l;
         !l
@@ -209,13 +223,11 @@ let to_json g =
       | cs -> [f1 ; ("fun", output_callstack cs)]
     in
     Json.of_fields fields
-  and output_node_precision precision =
-    let s = match precision with
-      | Unevaluated -> "unevaluated"
+  and output_node_precision_grade grade =
+    let s = match grade with
       | Singleton -> "singleton"
-      | Normal _ -> "normal"
-      | Wide _ -> "wide"
-      | Critical _ -> "critical"
+      | Normal -> "normal"
+      | Wide -> "wide"
     in
     Json.of_string s
   and output_dep_kind kind =
@@ -226,31 +238,34 @@ let to_json g =
       | Control -> "ctrl"
     in
     Json.of_string s
-  and output_node_precision_width precision =
-    let precision_with_ival ival =
-      Json.of_float (ival.max -. ival.min);
-    in
-    let precision_no_ival = Json.of_float 0. in
-    match precision with
-      | Unevaluated -> precision_no_ival
-      | Singleton -> precision_no_ival
-      | Normal iv -> precision_with_ival iv
-      | Wide iv -> precision_with_ival iv
-      | Critical iv -> precision_with_ival iv
+  and output_float_interval interval =
+    Json.of_fields [
+      ("min", Json.of_float interval.min) ;
+      ("max", Json.of_float interval.max) ;
+    ]
+  in
+  let output_node_values values =
+    Json.of_fields [
+        ("values", output_float_interval values.values_interval) ;
+        ("limits", output_float_interval values.values_limits) ;
+        ("grade", output_node_precision_grade values.values_grade) ;
+      ]
   in
   let output_node node acc =
     if node.node_kind = Cluster then acc
     else
       let label = Pretty_utils.to_string Node_kind.pretty node.node_kind in
-      Json.of_fields [
+      Json.of_fields ([
         ("id", Json.of_int node.node_key) ;
         ("label", Json.of_string label) ;
         ("kind", output_node_kind node.node_kind) ;
         ("locality", output_node_locality node.node_locality) ;
-        ("precision", output_node_precision node.node_precision) ;
-        ("precision_width", output_node_precision_width node.node_precision) ;
         ("explored", Json.of_bool node.node_deps_computed)
-      ] :: acc
+      ] @
+          match node.node_values with
+          | None -> []
+          | Some node_values -> [("values", output_node_values node_values)]
+        ) :: acc
   and output_dep (n1,dep,n2) acc =
     Json.of_fields [
       ("id", Json.of_int dep.dependency_key) ;
