@@ -5211,11 +5211,11 @@ let rec findUniqueName ?(suffix="") fdec name =
 let refresh_local_name fdec vi =
   let new_name = findUniqueName fdec vi.vname in vi.vname <- new_name
 
-let makeLocal ?(temp=false) ?referenced ?(formal=false) fdec name typ =
+let makeLocal ?(temp=false) ?referenced ?ghost ?(formal=false) fdec name typ =
   (* a helper function *)
   let name = findUniqueName fdec name in
   fdec.smaxid <- 1 + fdec.smaxid;
-  let vi = makeVarinfo ~temp ?referenced false formal name typ in
+  let vi = makeVarinfo ~temp ?referenced ?ghost false formal name typ in
   vi
 
 (* Make a local variable and add it to a function *)
@@ -5286,20 +5286,27 @@ let setMaxId (f: fundec) =
  * it is inserted last. Otherwise where must be the name of a formal after
  * which to insert this. By default it is inserted at the end. *)
 let makeFormalVar fdec ?(where = "$") name typ : varinfo =
+  let makeit ghost name =
+    let vi = makeLocal ~ghost ~formal:true fdec name typ in
+    if ghost then vi.vattr <- addAttribute (Attr(frama_c_ghost, [])) vi.vattr ;
+    vi
+  in
   (* Search for the insertion place *)
-  let makeit name = makeLocal ~formal:true fdec name typ in
   let rec loopFormals acc = function
-      [] ->
-      if where = "$" then
-        let vi = makeit name in vi, List.rev (vi::acc)
-      else Kernel.fatal ~current:true
-          "makeFormalVar: cannot find insert-after formal %s" where
+    | [] when where = "$" || where = "$g" || where = "^g" ->
+      let ghost = where = "$g" || where = "^g" in
+      let vi = makeit ghost name in vi, List.rev (vi::acc)
+    | [] ->
+      Kernel.fatal ~current:true
+        "makeFormalVar: cannot find insert-after formal %s" where
     | f :: rest when f.vname = where ->
-      let vi = makeit name in vi, List.rev_append acc (f :: vi :: rest)
+      let vi = makeit f.vghost name in vi, List.rev_append acc (f :: vi :: rest)
+    | f :: rest when (f.vghost && where = "^g") ->
+      let vi = makeit true name in vi, List.rev_append acc (vi :: f :: rest)
     | f :: rest -> loopFormals (f::acc) rest
   in
   let vi, newformals =
-    if where = "^" then let vi = makeit name in vi, vi :: fdec.sformals
+    if where = "^" then let vi = makeit false name in vi, vi :: fdec.sformals
     else
       loopFormals [] fdec.sformals
   in
