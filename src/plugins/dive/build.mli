@@ -37,3 +37,5 @@ val unhide_base : t -> Cil_types.varinfo -> unit
 val add_lval : ?depth:int -> t -> Cil_types.kinstr -> Cil_types.lval -> unit
 val add_var : ?depth:int -> t -> Cil_types.varinfo -> unit
 val add_alarm : ?depth:int -> t -> Cil_types.stmt -> Alarms.alarm -> unit
+val explore_from_vertex : depth:int -> t -> int -> unit
+val take_last_differences : t -> Graph_types.graph_diff

@@ -175,6 +175,7 @@ module NodeRef = Datatype.Pair_with_collections
     (struct let module_name = "Build.NodeRef" end)
 
 module Graph = Imprecision_graph
+module VertexTable = Datatype.Int.Hashtbl
 module NodeTable = FCHashtbl.Make (NodeRef)
 module FileTable = Datatype.String.Hashtbl
 module CallstackTable = Value_types.Callstack.Hashtbl
@@ -183,6 +184,7 @@ module FunctionMap = Kernel_function.Map
 
 type t = {
   mutable graph: Graph.t;
+  mutable vertex_table: node VertexTable.t;
   mutable node_table: node NodeTable.t;
   mutable file_table: node FileTable.t;
   mutable callstack_table: node CallstackTable.t;
@@ -190,20 +192,41 @@ type t = {
   mutable hidden_bases: BaseSet.t;
   mutable focus: bool FunctionMap.t;
   mutable roots: node list;
+  mutable graph_diff: graph_diff;
 }
+
+let get_node context node_key =
+  VertexTable.find context.vertex_table node_key
+
+let add_node context ~node_kind ~node_locality =
+  let node = Graph.create_node context.graph ~node_kind ~node_locality in
+  VertexTable.add context.vertex_table node.node_key node;
+  context.graph_diff <- {
+    context.graph_diff with
+    added_nodes = node :: context.graph_diff.added_nodes
+  };
+  node
+
+let _remove_node context node =
+  Graph.remove_node context.graph node;
+  VertexTable.remove context.vertex_table node.node_key;
+  context.graph_diff <- {
+    context.graph_diff with
+    removed_nodes = node :: context.graph_diff.removed_nodes
+  }
 
 let reference_node_locality context node_locality =
   let { loc_file ; loc_callstack } = node_locality in
   let rec add_file _ =
     let node_locality = { node_locality with loc_callstack = [] } in
-    Graph.create_node context.graph ~node_kind:Cluster ~node_locality
+    add_node context ~node_kind:Cluster ~node_locality
   and add_callstack = function
     | [] -> assert false
     | _ :: t as loc_callstack ->
       let node_locality = { node_locality with loc_callstack } in
       if t <> [] then
         ignore (CallstackTable.memo context.callstack_table t add_callstack);
-      Graph.create_node context.graph ~node_kind:Cluster ~node_locality
+      add_node context ~node_kind:Cluster ~node_locality
   in
   match loc_callstack with
   | [] ->
@@ -233,7 +256,7 @@ let build_node context callstack location lval  =
     let node_locality = build_node_locality callstack node_kind in
     reference_node_locality context node_locality;
     let build_new_node _location =
-      Graph.create_node context.graph ~node_kind ~node_locality
+      add_node context ~node_kind ~node_locality
     in
     (* Compute the new location which might have changed after folding *)
     let location' =
@@ -263,7 +286,7 @@ let build_lval context callstack kinstr lval =
 let build_alarm context callstack stmt alarm =
   let node_kind = Alarm (stmt,alarm) in
   let node_locality = build_node_locality callstack node_kind in
-  Graph.create_node context.graph ~node_kind ~node_locality
+  add_node context ~node_kind ~node_locality
 
 
 exception Too_many_deps of lval
@@ -435,6 +458,7 @@ let create () =
   !Db.Value.compute ();
   {
     graph = Graph.create ();
+    vertex_table = VertexTable.create 13;
     node_table = NodeTable.create 13;
     file_table = FileTable.create 13;
     callstack_table = CallstackTable.create 13;
@@ -442,15 +466,18 @@ let create () =
     hidden_bases = BaseSet.empty;
     focus = FunctionMap.empty;
     roots = [];
+    graph_diff = { added_nodes=[] ; removed_nodes=[] };
   }
 
 let clear context =
   context.graph <- Graph.create ();
+  context.vertex_table <- VertexTable.create 13;
   context.node_table <- NodeTable.create 13;
   context.file_table <- FileTable.create 13;
   context.callstack_table <- CallstackTable.create 13;
   context.focus <- FunctionMap.empty;
-  context.roots <- []
+  context.roots <- [];
+  context.graph_diff <- { added_nodes=[] ; removed_nodes=[] }
 
 
 (* --- Accessors --- *)
@@ -481,8 +508,7 @@ let should_auto_explore node =
   | Scalar _ | Composite _ | Alarm _ -> true
   | Scattered _ | Cluster -> false
 
-let complete_in_depth ~depth context root =
-  context.roots <- root :: context.roots;
+let explore ~depth context root =
   (* Breadth first search *)
   let queue : (node * int) Queue.t = Queue.create () in
   Queue.add (root,0) queue;
@@ -502,6 +528,10 @@ let complete_in_depth ~depth context root =
     end;
   done
 
+let complete_in_depth ~depth context root =
+  context.roots <- root :: context.roots;
+  explore ~depth context root
+
 let add_var ?(depth=1) context varinfo =
   let callstack = [] in
   let node = build_var context callstack varinfo in
@@ -519,3 +549,11 @@ let add_alarm ?(depth=1) context stmt alarm =
   let callstack = Callstack.init (Kernel_function.find_englobing_kf stmt) in
   let node = build_alarm context callstack stmt alarm in
   complete_in_depth ~depth context node
+
+let explore_from_vertex ~depth context node_key =
+  explore ~depth context (get_node context node_key)
+
+let take_last_differences context =
+  let diff = context.graph_diff in
+  context.graph_diff <- { added_nodes=[] ; removed_nodes=[] };
+  diff

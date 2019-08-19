@@ -31,11 +31,15 @@ val create_node :
   node_kind:node_kind ->
   node_locality:node_locality -> t -> node
 
+val remove_node : t -> node -> unit
+
 val update_node_values : node -> node_values -> unit
 
 val create_dependency : allow_folding:bool -> t -> node -> dependency_kind ->
   node -> unit
 
-val to_json : t -> Json.t
 val ouptput_to_dot : out_channel -> t -> unit
 val ouptput_to_json : out_channel -> t -> unit
+
+val to_json : t -> Json.t
+val diff_to_json : t -> graph_diff -> Json.t

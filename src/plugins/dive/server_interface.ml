@@ -45,6 +45,13 @@ struct
   let to_json = Imprecision_graph.to_json
 end
 
+module GraphDiff =
+struct
+  type t = Imprecision_graph.t * Graph_types.graph_diff
+  let syntax = Syntax.any
+  let to_json = fun (g,d) -> Imprecision_graph.diff_to_json g d
+end
+
 module Variable = Data.Collection (struct
     type t = Cil_types.varinfo
     let syntax = Syntax.publish ~page ~name:"variable"
@@ -112,11 +119,21 @@ let () = Request.register ~page
 let () = Request.register ~page
     ~kind:`EXEC ~name:"dive.add_var"
     ~descr:(Markdown.rm "Add a variable to the graph")
-    ~input:(module Variable) ~output:(module Graph)
+    ~input:(module Variable) ~output:(module GraphDiff)
     begin fun var ->
       let depth = Self.DepthLimit.get () in
       let g = get_graph () in
       Build.add_var ~depth g var;
-      Build.get_graph g
+      Build.get_graph g, Build.take_last_differences g
     end
 
+let () = Request.register ~page
+    ~kind:`EXEC ~name:"dive.explore"
+    ~descr:(Markdown.rm "Explore the graph starting from an existing vertex")
+    ~input:(module Data.Jint) ~output:(module GraphDiff)
+    begin fun node_key ->
+      let depth = Self.DepthLimit.get () in
+      let g = get_graph () in
+      Build.explore_from_vertex ~depth g node_key;
+      Build.get_graph g, Build.take_last_differences g
+    end

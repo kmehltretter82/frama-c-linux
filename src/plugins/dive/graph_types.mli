@@ -57,3 +57,8 @@ type dependency = {
   dependency_kind : dependency_kind;
   mutable dependency_multiple : bool;
 }
+
+type graph_diff = {
+  added_nodes: node list;
+  removed_nodes: node list;
+}

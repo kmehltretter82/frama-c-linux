@@ -62,6 +62,8 @@ let create_node ?node_values ~node_kind ~node_locality g =
   add_vertex g node;
   node
 
+let remove_node = remove_vertex
+
 let union_interval i1 i2 =
   { min = min i1.min i2.min ; max = max i1.max i2.max }
 
@@ -195,18 +197,21 @@ let ouptput_to_dot out_channel g =
   in
   Dot.output_graph out_channel g
 
-let to_json g =
-  let rec output_kinstr = function
+module JsonPrinter =
+struct
+  let output_kinstr = function
     | Cil_types.Kglobal -> Json.of_string "global"
     | Cil_types.Kstmt stmt -> Json.of_int stmt.Cil_types.sid
-  and output_callsite (kf,kinstr) =
+
+  let output_callsite (kf,kinstr) =
     Json.of_fields [
       ("fun", Json.of_string (Kernel_function.get_name kf)) ;
       ("instr", output_kinstr kinstr) ;
     ]
-  and output_callstack cs =
+
+  let output_callstack cs =
     Json.of_list (List.map output_callsite cs)
-  in
+
   let output_node_kind kind =
     let s = match kind with
       | Scalar _ -> "scalar"
@@ -216,21 +221,24 @@ let to_json g =
       | Cluster -> "dummy"
     in
     Json.of_string s
-  and output_node_locality { loc_file ; loc_callstack } =
+
+  let output_node_locality { loc_file ; loc_callstack } =
     let f1 = ("file", Json.of_string loc_file) in
     let fields = match loc_callstack with
       | [] -> [f1]
-      | cs -> [f1 ; ("fun", output_callstack cs)]
+      | cs -> [f1 ; ("callstack", output_callstack cs)]
     in
     Json.of_fields fields
-  and output_node_precision_grade grade =
+
+  let output_node_precision_grade grade =
     let s = match grade with
       | Singleton -> "singleton"
       | Normal -> "normal"
       | Wide -> "wide"
     in
     Json.of_string s
-  and output_dep_kind kind =
+
+  let output_dep_kind kind =
     let s = match kind with
       | Callee -> "callee"
       | Data -> "data"
@@ -238,47 +246,96 @@ let to_json g =
       | Control -> "ctrl"
     in
     Json.of_string s
-  and output_float_interval interval =
+
+  let output_float_interval interval =
     Json.of_fields [
       ("min", Json.of_float interval.min) ;
       ("max", Json.of_float interval.max) ;
     ]
-  in
+
   let output_node_values values =
     Json.of_fields [
-        ("values", output_float_interval values.values_interval) ;
+        ("computed", output_float_interval values.values_interval) ;
         ("limits", output_float_interval values.values_limits) ;
         ("grade", output_node_precision_grade values.values_grade) ;
       ]
-  in
-  let output_node node acc =
-    if node.node_kind = Cluster then acc
-    else
-      let label = Pretty_utils.to_string Node_kind.pretty node.node_kind in
-      Json.of_fields ([
-        ("id", Json.of_int node.node_key) ;
-        ("label", Json.of_string label) ;
-        ("kind", output_node_kind node.node_kind) ;
-        ("locality", output_node_locality node.node_locality) ;
-        ("explored", Json.of_bool node.node_deps_computed)
-      ] @
-          match node.node_values with
-          | None -> []
-          | Some node_values -> [("values", output_node_values node_values)]
-        ) :: acc
-  and output_dep (n1,dep,n2) acc =
+
+  let output_node node =
+    let label = Pretty_utils.to_string Node_kind.pretty node.node_kind in
+    Json.of_fields ([
+      ("id", Json.of_int node.node_key) ;
+      ("label", Json.of_string label) ;
+      ("kind", output_node_kind node.node_kind) ;
+      ("locality", output_node_locality node.node_locality) ;
+      ("explored", Json.of_bool node.node_deps_computed)
+    ] @
+        match node.node_values with
+        | None -> []
+        | Some node_values -> [("values", output_node_values node_values)]
+      )
+
+  let output_dep (n1,dep,n2) =
     Json.of_fields [
       ("id", Json.of_int dep.dependency_key) ;
       ("src", Json.of_int n1.node_key) ;
       ("dst", Json.of_int n2.node_key) ;
       ("kind", output_dep_kind dep.dependency_kind) ;
       ("multiple", Json.of_bool dep.dependency_multiple)
-    ] :: acc
-  in
-  let nodes = Json.of_list (fold_vertex output_node g [])
-  and deps = Json.of_list (fold_edges_e output_dep g []) in
-  Json.of_fields [("nodes", nodes) ; ("deps", deps)]
+    ]
+
+  let output_graph g =
+    let add_node node acc =
+      if node.node_kind = Cluster
+      then acc
+      else output_node node :: acc
+    and add_edge d acc =
+      output_dep d :: acc
+    in
+    Json.of_fields [
+      ("nodes", Json.of_list (fold_vertex add_node g [])) ;
+      ("deps", Json.of_list (fold_edges_e add_edge g []))
+    ]
+
+  let output_diff g diff =
+    let add_node acc node =
+      if node.node_kind = Cluster
+      then acc
+      else output_node node :: acc
+    and add_dep d acc =
+      output_dep d :: acc
+    in
+    let added_nodes =
+      List.fold_left add_node [] diff.added_nodes
+    and added_deps =
+      let module Set = Set.Make (struct
+          type t = edge
+          let compare (_,d1,_) (_,d2,_) = d1.dependency_key - d2.dependency_key
+        end)
+      in
+      let collect_deps set node =
+        let set = fold_pred_e Set.add g node set in
+        let set = fold_succ_e Set.add g node set in
+        set
+      in
+      let set = List.fold_left collect_deps Set.empty diff.added_nodes in
+      Set.fold add_dep set []
+    and removed_nodes =
+      List.map (fun node -> Json.of_int node.node_key) diff.removed_nodes
+    in
+    Json.of_fields [
+      ("add", Json.of_fields [
+          ("nodes", Json.of_list added_nodes) ;
+          ("deps", Json.of_list added_deps)
+        ]) ;
+      ("sub", Json.of_list removed_nodes)]
+end
 
 let ouptput_to_json out_channel g =
-  let json = to_json g in
+  let json = JsonPrinter.output_graph g in
   Json.save_channel ~pretty:true out_channel json
+
+let to_json g =
+  JsonPrinter.output_graph g
+
+let diff_to_json g diff =
+  JsonPrinter.output_diff g diff
