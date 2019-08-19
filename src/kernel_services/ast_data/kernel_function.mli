@@ -113,7 +113,7 @@ val common_block: stmt -> stmt -> block
     both [s1] and [s2], provided the statements belong to the same function.
     raises a fatal error if this is not the case.
 
-    @since Frama-C+dev
+    @since 19.0-Potassium
 *)
 
 val stmt_in_loop: t -> stmt -> bool
@@ -135,13 +135,20 @@ val find_syntactic_callsites : t -> (t * stmt) list
       [stmt].
       @since Carbon-20110201 *)
 
+val local_definition: t -> varinfo -> stmt
+(** [local_definition f v] returns the statement initializing the (defined)
+    local variable [v] of [f].
+    @raise AbortFatal if [v] is not defined or is not a local of [f]
+    @since Frama-C+dev
+*)
+
 val var_is_in_scope: stmt -> varinfo -> bool
   (** [var_is_in_scope kf stmt vi] returns [true] iff the local variable [vi]
       is syntactically visible from statement [stmt] in function [kf]. Note
       that on the contrary to {!Globals.Syntactic_search.find_in_scope}, the
       variable is searched according to its [vid], not its [vorig_name].
 
-      @since Frama-C+dev *)
+      @since 19.0-Potassium *)
 
 val find_enclosing_stmt_in_block: block -> stmt -> stmt
   (** [find_enclosing_stmt_in_block b s] returns the statements [s']
@@ -149,18 +156,19 @@ val find_enclosing_stmt_in_block: block -> stmt -> stmt
       an inner block (recursively) containing [s].
 
       @raise AbortFatal if [b] is not equal to [find_enclosing_block s]
-      @since Frama-C+dev
+      @since 19.0-Potassium
   *)
 
 val is_between: block -> stmt -> stmt -> stmt -> bool
 (** [is_between b s1 s2 s3] returns [true] if the statement [s2] appears
-    between [s1] and [s3] inside the [b.bstmts] list. All three statements
+    strictly between [s1] and [s3] inside the [b.bstmts] list.
+    All three statements
     must actually occur in [b.bstmts], either directly or indirectly
     (see {!Kernel_function.find_enclosing_stmt_in_block}).
 
     @raise AbortFatal if pre-conditions are not met.
 
-    @since Frama-C+dev
+    @since 19.0-Potassium
 *)
 
 

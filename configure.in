@@ -107,8 +107,8 @@ AC_MSG_CHECKING(version of OCaml)
 OCAMLVERSION=`$OCAMLC -v | sed -n -e 's|.*version *\(.*\)$|\1|p' `
 AC_MSG_RESULT($OCAMLVERSION)
 case $OCAMLVERSION in
-  0.*|1.*|2.*|3.*|4.00.*|4.01.*|4.02.[[012]])
-     AC_MSG_ERROR(Incompatible OCaml version; use 4.02.3+.);;
+  0.*|1.*|2.*|3.*|4.00.*|4.01.*|4.02.*|4.03.*|4.04.*)
+     AC_MSG_ERROR(Incompatible OCaml version; use 4.05+.);;
    *)
      OCAML_ANNOT_OPTION="-bin-annot";;
 esac
@@ -117,9 +117,6 @@ AC_SUBST(OCAMLMAJORNB)
 AC_SUBST(OCAMLMINORNB)
 AC_SUBST(OCAMLPATCHNB)
 
-AC_SUBST(HAS_OCAML403)
-AC_SUBST(HAS_OCAML404)
-AC_SUBST(HAS_OCAML405)
 AC_SUBST(HAS_OCAML407)
 AC_SUBST(HAS_OCAML408)
 
@@ -128,26 +125,11 @@ OCAMLMINORNB=$(echo $OCAMLVERSION | cut -f 2 -d .)
 OCAMLPATCHNB=$(echo $OCAMLVERSION | cut -f 3 -d .)
 
 if test $OCAMLMAJORNB -gt 4; then
-  HAS_OCAML403=yes;
-  HAS_OCAML404=yes;
-  HAS_OCAML405=yes;
   HAS_OCAML407=yes;
   HAS_OCAML408=yes;
 else
-  HAS_OCAML403=no;
-  HAS_OCAML404=no;
-  HAS_OCAML405=no;
   HAS_OCAML407=no;
   HAS_OCAML408=no;
-  if test $OCAMLMINORNB -ge 3; then
-    HAS_OCAML403=yes;
-  fi;
-  if test $OCAMLMINORNB -ge 4; then
-    HAS_OCAML404=yes;
-  fi;
-  if test $OCAMLMINORNB -ge 5; then
-    HAS_OCAML405=yes;
-  fi;
   if test $OCAMLMINORNB -ge 7; then
     HAS_OCAML407=yes;
   fi;
@@ -319,7 +301,7 @@ ZARITH=$($OCAMLFIND query zarith -format %v)
 if test -z "$ZARITH" ; then
   AC_MSG_ERROR(Cannot find zarith via ocamlfind.)
 else
-  AC_MSG_RESULT(found)
+  AC_MSG_RESULT(found $ZARITH)
 fi
 
 # yojson
@@ -331,6 +313,8 @@ YOJSON=$($OCAMLFIND query yojson -format %v)
 if test -z "$YOJSON" ; then
   AC_MSG_ERROR(Cannot find yojson via ocamlfind \
 (requires yojson 1.4.1 or higher).)
+else
+  AC_MSG_RESULT(found $YOJSON)
 fi
 
 #################################################
@@ -967,7 +951,7 @@ if test "$SOURCEVIEW_PATH" = ""; then
        echo "Ocamlfind -> using $LABLGTK_PATH"
        LABLGTKPATH_FOR_CONFIGURE=$LABLGTK_PATH
   fi;
-  SOURCEVIEW_PATH=$LABLGTK_PATH;
+  SOURCEVIEW_PATH=$LABLGTKPATH_FOR_CONFIGURE;
 else
   LABLGTK_VERSION=3
   echo "ocamlfind -> using $LABLGTK_PATH"

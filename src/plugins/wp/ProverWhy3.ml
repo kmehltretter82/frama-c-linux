@@ -52,7 +52,7 @@ let cluster_file c =
 
 let theory_name_of_cluster c =
   let base = cluster_id c in
-  Transitioning.String.capitalize_ascii base
+  String.capitalize_ascii base
 
 let theory_name_of_pid pid = "VC" ^ WpPropId.get_propid pid
 
@@ -148,13 +148,13 @@ class visitor fmt c =
       self#lines ;
       let name = (cluster_id c) in
       Format.fprintf fmt "use %s.%s@\n"
-        name (Transitioning.String.capitalize_ascii name) ;
+        name (String.capitalize_ascii name) ;
       deps <- (D_cluster c) :: deps
 
     method add_extlib file =
       let thy = filenoext file in
       let path = LogicBuiltins.find_lib file in
-      self#add_import2 thy (Transitioning.String.capitalize_ascii thy) ;
+      self#add_import2 thy (String.capitalize_ascii thy) ;
       self#add_dfile path
 
     method on_library thy =
@@ -163,7 +163,7 @@ class visitor fmt c =
         | [file] ->
             let filenoext = filenoext file in
             self#add_import2 filenoext
-              (Transitioning.String.capitalize_ascii filenoext) ;
+              (String.capitalize_ascii filenoext) ;
             self#add_dfile file
         | [file;lib] ->
             self#add_import2 (filenoext file) lib ;
@@ -392,7 +392,7 @@ let assemble_wpo wpo =
         end
     | Wpo.Function (kf,_behv) ->
         let model = Model.get_model () in
-        let file = Wpo.DISK.file_kf ~kf ~model ~prover:VCS.Why3ide in
+        let file = Wpo.DISK.file_kf ~kf ~model ~prover:(VCS.Why3 "") in
         let age = try FunFile.find kf with Not_found -> -1 in
         begin if age < Wpo.age wpo then
             let age_max = ref (-1) in
@@ -490,22 +490,6 @@ type error =
   | Error_No
   | Error_Generated of Lexing.position * string
 
-let rec split spec i =
-  try
-    let j = String.index_from spec i ':' in
-    if j > i then
-      String.sub spec i (j-i) :: split spec (succ j)
-    else
-      split spec (succ j)
-  with Not_found ->
-    let n = String.length spec - i in
-    if n > 0 then [ String.sub spec i n ] else []
-
-let chop_version spec = match split spec 0 with
-  | [] | [_] -> spec
-  | [a;b] -> Printf.sprintf "%s,%s," a b
-  | a::b::c::_ -> Printf.sprintf "%s,%s,%s" a b c
-
 class why3 ~timeout ~prover ~pid ~file ~includes ~logout ~logerr =
   object(why)
 
@@ -570,7 +554,7 @@ class why3 ~timeout ~prover ~pid ~file ~includes ~logout ~logerr =
       why#add ["--extra-config"; Wp_parameters.Share.file "why3/why3.conf"];
       why#add (Wp_parameters.WhyFlags.get ()) ;
       why#add [ file.file ] ;
-      why#add ["-P";chop_version prover];
+      why#add ["-P";Why3.Whyconf.prover_parseable_format prover];
       why#add ["-T";file.theory];
       why#add ["-G";file.goal];
       why#add_positive ~name:"-t" ~value:time ;

@@ -1,4 +1,4 @@
-# frama-c -wp -wp-timeout 90 -wp-steps 1500 [...]
+# frama-c -wp -wp-timeout 45 -wp-steps 1500 [...]
 [kernel] Parsing tests/wp_bts/nupw-bcl-bts1120.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Loading driver 'share/wp.driver'
@@ -17,7 +17,7 @@
 [wp] [Qed] Goal typed_g_assigns_normal_part2 : Valid
 [wp] [Qed] Goal typed_g_assigns_normal_part3 : Valid
 [wp] [Qed] Goal typed_unreachable_smt_with_contract_ensures_ok_2 : Valid
-[wp] [Qed] Goal typed_unreachable_smt_with_contract_call_f_with_precond_requires_ok : Valid
+[wp] [Qed] Goal typed_unreachable_smt_with_contract_call_f_with_precond_2_requires_ok : Valid
 [wp] Proved goals:    8 / 8
   Qed:             8
 [wp] Report in:  'tests/wp_bts/oracle_qualif/nupw-bcl-bts1120.0.report.json'

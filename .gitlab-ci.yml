@@ -138,47 +138,52 @@ build-from-distrib-tarball:
   tags:
    - nix
 
-internal:
+.build_template: &internal_template
   stage: distrib_and_compatibility
   variables:
     OCAML: "4_05"
-  script:
-   - nix/frama-ci.sh build -A frama-c.internal
   tags:
    - nix
+
+internal:
+  <<: *internal_template
+  script:
+   - nix/frama-ci.sh build -A frama-c.internal
+  when: manual
+
+
+internal_nightly:
+  <<: *internal_template
+  script:
+   - nix/frama-ci.sh build -A frama-c.internal
+  only:
+  - schedules
+
 
 .build_template: &frama-c-ocaml
   stage: distrib_and_compatibility
   script:
-   - nix/frama-ci.sh build -A frama-c.installed
+   - nix/frama-ci.sh build -A frama-c.tests
   tags:
    - nix
-
-
-frama-c-ocaml-4.02:
-  variables:
-    OCAML: "4_02"
-  <<: *frama-c-ocaml
-
-frama-c-ocaml-4.03:
-  variables:
-    OCAML: "4_03"
-  <<: *frama-c-ocaml
-
-frama-c-ocaml-4.04:
-  variables:
-    OCAML: "4_04"
-  <<: *frama-c-ocaml
 
 frama-c-ocaml-4.06:
   variables:
     OCAML: "4_06"
   <<: *frama-c-ocaml
+  only:
+  - schedules
 
 frama-c-ocaml-4.07:
   variables:
     OCAML: "4_07"
   <<: *frama-c-ocaml
+
+#frama-c-ocaml-4.08:
+#  variables:
+#    OCAML: "4_08"
+#  <<: *frama-c-ocaml
+
 
 caveat-importer:
   stage: tests

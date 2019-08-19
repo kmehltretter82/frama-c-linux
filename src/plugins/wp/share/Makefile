@@ -51,7 +51,8 @@ WHY3INCLUDES= -R $(WHY3LIB)/coq Why3 -R $(WPLSHARE)/why3 ''
 
 $(WPLSHARE)/why3/%.vo: $(WPLSHARE)/why3/%.v
 	echo "Coqc         $@"
-	@coqc -w none $(WHY3INCLUDES) $<
+	echo coqc -w none $(WHY3INCLUDES) $<
+	coqc -w none $(WHY3INCLUDES) $<
 
 $(WPLSHARE)/why3/%.ide: $(WPLSHARE)/why3/%.v
 	echo "Coqide       $@"

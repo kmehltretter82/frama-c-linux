@@ -135,13 +135,13 @@ val opt_of_list: 'a list -> 'a option
       @since Oxygen-20120901 *)
 
 val find_opt : ('a -> 'b option) -> 'a list -> 'b
-[@@deprecated "Use Transitioning.List.find_opt instead."]
+[@@deprecated "Use List.find_opt instead."]
   (** [find_option p l] returns the value [p e], [e] being the first
       element of [l] such that [p e] is not [None]. Raise [Not_found] if there
       is no such value the list l.
 
       @since Nitrogen-20111001
-      @deprecated 18.0-Argon use [Transitioning.List.find_opt] instead *)
+      @deprecated 18.0-Argon use [List.find_opt] instead *)
 
 val iteri: (int -> 'a -> unit) -> 'a list -> unit
   (** Same as iter, but the function to be applied take also as argument the
@@ -154,7 +154,9 @@ val mapi: (int -> 'a -> 'b) -> 'a list -> 'b list
       @since Oxygen-20120901 *)
 
 val sort_unique: ('a -> 'a -> int) -> 'a list -> 'a list
-  (**  Same as List.sort , but also remove duplicates. *)
+  (**  Same as List.sort , but also remove duplicates.
+       @deprecated use List.sort_uniq instead
+  *)
 
 val subsets: int -> 'a list -> 'a list list
   (** [subsets k l] computes the combinations of [k] elements from list [l].
@@ -340,7 +342,7 @@ val mkdir : ?parents:bool -> string -> Unix.file_perm -> unit
       user execution of the created directory. This will leave the filesystem
       in a modified state before raising an exception.
       @raise Unix.Unix_error if cannot create [name] or its parents.
-      @since Frama-C+dev  *)
+      @since 19.0-Potassium  *)
 
 val safe_at_exit : (unit -> unit) -> unit
   (** Register function to call with [Pervasives.at_exit], but only

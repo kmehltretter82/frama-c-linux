@@ -85,9 +85,6 @@ OCAMLMAJORNB    ?=@OCAMLMAJORNB@
 OCAMLMINORNB    ?=@OCAMLMINORNB@
 OCAMLPATCHNB    ?=@OCAMLPATCHNB@
 
-HAS_OCAML403    ?=@HAS_OCAML403@
-HAS_OCAML404    ?=@HAS_OCAML404@
-HAS_OCAML405    ?=@HAS_OCAML405@
 HAS_OCAML407    ?=@HAS_OCAML407@
 HAS_OCAML408    ?=@HAS_OCAML408@
 
@@ -186,7 +183,8 @@ ENABLE_USERS	                  ?=@ENABLE_USERS@
 ENABLE_EVA                      ?=@ENABLE_EVA@
 
 #bytes is part of the stdlib, but is used as a transitional package.
-LIBRARY_NAMES := findlib ocamlgraph unix str dynlink bytes zarith yojson
+LIBRARY_NAMES := \
+  findlib ocamlgraph unix str dynlink bytes zarith yojson bigarray
 
 ifeq ($(HAS_LANDMARKS),yes)
 LIBRARY_NAMES += landmarks landmarks.ppx

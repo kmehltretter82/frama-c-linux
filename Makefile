@@ -522,6 +522,7 @@ KERNEL_CMO=\
 	src/kernel_services/ast_queries/cil_const.cmo                \
 	src/kernel_services/ast_queries/logic_env.cmo                \
 	src/kernel_services/ast_queries/logic_const.cmo              \
+	src/kernel_services/visitors/visitor_behavior.cmo		\
 	src/kernel_services/ast_queries/cil.cmo                      \
 	src/kernel_internals/parsing/errorloc.cmo                      \
 	src/kernel_services/ast_printing/cil_printer.cmo                \
@@ -1164,7 +1165,7 @@ PLUGIN_TESTS_LIB:= tests/slicing/libSelect.ml tests/slicing/libAnim.ml \
 	tests/slicing/adpcm.ml
 PLUGIN_DISTRIBUTED:=yes
 PLUGIN_INTERNAL_TEST:=yes
-PLUGIN_DEPENDENCIES:=Pdg Callgraph Eva
+PLUGIN_DEPENDENCIES:=Pdg Callgraph Eva Sparecode
 
 $(eval $(call include_generic_plugin_Makefile,$(PLUGIN_NAME)))
 
@@ -1419,7 +1420,7 @@ acsl_tests: byte
 	find doc/speclang -name \*.c -exec ./bin/toplevel.byte$(EXE) {} \; > /dev/null
 
 LONELY_TESTS_ML_FILES:=\
-  $(shell find $(TEST_DIRS_AS_PLUGIN:%=tests/%) -name '*.ml')
+  $(sort $(shell find $(TEST_DIRS_AS_PLUGIN:%=tests/%) -not -path '*/\.*' -name '*.ml'))
 $(foreach file,$(LONELY_TESTS_ML_FILES),\
   $(eval $(file:%.ml=%.cmo): BFLAGS+=-I $(dir $(file))))
 $(foreach file,$(LONELY_TESTS_ML_FILES),\
@@ -1560,11 +1561,8 @@ STDLIB_FILES:=\
 	stack \
 	string \
 	sys \
-        weak
-
-ifeq ($(HAS_OCAML403),yes)
-  STDLIB_FILES+=ephemeron
-endif
+	weak \
+	ephemeron
 
 ifeq ($(HAS_OCAML407),no)
   STDLIB_FILES+=pervasives

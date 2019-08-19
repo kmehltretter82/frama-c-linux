@@ -49,7 +49,7 @@ let eval_error_reason fmt e =
   then Eval_terms.pretty_logic_evaluation_error fmt e
 
 let assigns_inputs_to_zone state assigns =
-  let env = Eval_terms.env_pre_f ~pre:state () in
+  let env = Eval_terms.env_assigns ~pre:state in
   let treat_asgn acc (_,ins as asgn) =
     match ins with
     | FromAny -> Zone.top

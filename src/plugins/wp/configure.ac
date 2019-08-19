@@ -53,6 +53,31 @@ plugin_require(wp,qed)
 plugin_require(wp,rtegen)
 plugin_use(wp,gui)
 
+# Why3 API dependency
+######################
+# REQUIRE_LIBRARY: library *must* be present in order to build plugins
+# USE_LIBRARY: better for plugins if library is present, but not required
+# HAS_LIBRARY: is the library available?
+
+REQUIRE_WHY3=
+USE_WHY3=
+HAS_WHY3=
+
+WHY3_PATH=`ocamlfind query why3 | tr -d '\\r\\n'`
+echo "Ocamlfind -> using $WHY3_PATH"
+WHY3PATH_FOR_CONFIGURE=$WHY3_PATH
+
+configure_library([WHY3],
+                  [$WHY3PATH_FOR_CONFIGURE/why3.$LIB_SUFFIX],
+                  [$WHY3PATH_FOR_CONFIGURE/why3.$LIB_SUFFIX not found.],
+                  no)
+
+
+plugin_require_external(wp,why3)
+
+AC_SUBST(HAS_WHY3)
+
+
 check_plugin_dependencies
 
 # NB: this would deserve to use plugin_requires mechanism

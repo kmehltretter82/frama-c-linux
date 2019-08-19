@@ -234,14 +234,6 @@ val mapGlobals: file -> (global -> global) -> unit
   * refer to any struct or union types in the function type.*)
 val findOrCreateFunc: file -> string -> typ -> varinfo
 
-module Sid: sig
-  val next: unit -> int
-end
-
-module Eid: sig
-  val next: unit -> int
-end
-
 (** creates an expression with a fresh id *)
 val new_exp: loc:location -> exp_node -> exp
 
@@ -421,34 +413,6 @@ val isSignedInteger: typ -> bool
     @since Oxygen-20120901 *)
 val isUnsignedInteger: typ -> bool
 
-
-(** Creates a (potentially recursive) composite type. The arguments are:
- * (1) a boolean indicating whether it is a struct or a union, (2) the name
- * (always non-empty), (3) a function that when given a representation of the
- * structure type constructs the type of the fields recursive type (the first
- * argument is only useful when some fields need to refer to the type of the
- * structure itself), and (4) a list of attributes to be associated with the
- * composite type. The resulting compinfo has the field "cdefined" only if
- * the list of fields is non-empty. *)
-val mkCompInfo: bool ->      (* whether it is a struct or a union *)
-               string -> (* name of the composite type; cannot be empty *)
-               ?norig:string -> (* original name of the composite type, empty when anonymous *)
-               (compinfo ->
-                  (string * typ * int option * attributes * location) list) ->
-               (* a function that when given a forward
-                  representation of the structure type constructs the type of
-                  the fields. The function can ignore this argument if not
-                  constructing a recursive type.  *)
-               attributes -> compinfo
-
-(** Makes a shallow copy of a {!Cil_types.compinfo} changing the name. It also
-    copies the fields, and makes sure that the copied field points back to the
-    copied compinfo.
-    If [fresh] is [true] (the default), it will also give a fresh id to the
-    copy. 
-*)
-val copyCompInfo: ?fresh:bool -> compinfo -> string -> compinfo
-
 (** This is a constant used as the name of an unnamed bitfield. These fields
     do not participate in initialization and their name is not printed. *)
 val missingFieldName: string
@@ -538,12 +502,12 @@ val isCharArrayType: typ -> bool
 val isIntegralType: typ -> bool
 
 (** True if the argument is [_Bool]
-    @since Frama-C+dev
+    @since 19.0-Potassium
 *)
 val isBoolType: typ -> bool
 
 (** True if the argument is [_Bool] or [boolean].
-    @since Frama-C+dev
+    @since 19.0-Potassium
  *)
 val isLogicPureBooleanType: logic_type -> bool
 
@@ -855,7 +819,7 @@ val isLogicNull: term -> bool
 (** [no_op_coerce typ term] is [true] iff converting [term] to [typ] does
     not modify its value.
 
-    @since Frama-C+dev
+    @since 19.0-Potassium
 *)
 val no_op_coerce: logic_type -> term -> bool
 
@@ -1368,6 +1332,17 @@ val bitfield_attribute_name: string
     NotAnAttrParam with the offending subexpression *)
 val expToAttrParam: exp -> attrparam
 
+
+(** Return the attributes of the global annotation, if any.
+    @since Frama-C+dev
+*)
+val global_annotation_attributes: global_annotation -> attributes
+
+(** Return the attributes of the global, if any.
+    @since Frama-C+dev
+*)
+val global_attributes: global -> attributes
+
 exception NotAnAttrParam of exp
 
 (* ************************************************************************* *)
@@ -1463,266 +1438,6 @@ val find_default_requires: behavior list -> identified_predicate list
 (** {2 Visitor mechanism} *)
 (* ************************************************************************* *)
 
-(** {3 Visitor behavior} *)
-type visitor_behavior
-  (** How the visitor should behave in front of mutable fields: in
-      place modification or copy of the structure. This type is abstract.
-      Use one of the two values below in your classes.
-      @plugin development guide *)
-
-val inplace_visit: unit -> visitor_behavior
-  (** In-place modification. Behavior of the original cil visitor.
-      @plugin development guide *)
-
-val copy_visit: Project.t -> visitor_behavior
-  (** Makes fresh copies of the mutable structures.
-      - preserves sharing for varinfo.
-      - makes fresh copy of varinfo only for declarations. Variables that are
-      only used in the visited AST are thus still shared with the original
-      AST. This allows for instance to copy a function with its
-      formals and local variables, and to keep the references to other
-      globals in the function's body.
-      @plugin development guide *)
-
-val refresh_visit: Project.t -> visitor_behavior
-  (** Makes fresh copies of the mutable structures and provides fresh id
-      for the structures that have ids. Note that as for {!copy_visit}, only
-      varinfo that are declared in the scope of the visit will be copied and
-      provided with a new id.
-      @since Sodium-20150201
-   *)
-
-(** true iff the behavior provides fresh id for copied structs with id.
-    Always [false] for an inplace visitor.
-    @since Sodium-20150201 
-*)
-val is_fresh_behavior: visitor_behavior -> bool
-
-(** true iff the behavior is a copy behavior. *)
-val is_copy_behavior: visitor_behavior -> bool
-
-val reset_behavior_varinfo: visitor_behavior -> unit
-(** resets the internal tables used by the given visitor_behavior.  If you use
-    fresh instances of visitor for each round of transformation, this should
-    not be needed. In place modifications do not need that at all.
-    @plugin development guide
- *)
-
-val reset_behavior_compinfo: visitor_behavior -> unit
-val reset_behavior_enuminfo: visitor_behavior -> unit
-val reset_behavior_enumitem: visitor_behavior -> unit
-val reset_behavior_typeinfo: visitor_behavior -> unit
-val reset_behavior_stmt: visitor_behavior -> unit
-val reset_behavior_logic_info: visitor_behavior -> unit
-val reset_behavior_logic_type_info: visitor_behavior -> unit
-val reset_behavior_fieldinfo: visitor_behavior -> unit
-val reset_behavior_model_info: visitor_behavior -> unit
-val reset_logic_var: visitor_behavior -> unit
-val reset_behavior_kernel_function: visitor_behavior -> unit
-val reset_behavior_fundec: visitor_behavior -> unit
-
-val get_varinfo: visitor_behavior -> varinfo -> varinfo
-(** retrieve the representative of a given varinfo in the current
-    state of the visitor
-    @plugin development guide
- *)
-
-val get_compinfo: visitor_behavior -> compinfo -> compinfo
-val get_enuminfo: visitor_behavior -> enuminfo -> enuminfo
-val get_enumitem: visitor_behavior -> enumitem -> enumitem
-val get_typeinfo: visitor_behavior -> typeinfo -> typeinfo
-val get_stmt: visitor_behavior -> stmt -> stmt
-(** @plugin development guide *)
-
-val get_logic_info: visitor_behavior -> logic_info -> logic_info
-val get_logic_type_info: visitor_behavior -> logic_type_info -> logic_type_info
-val get_fieldinfo: visitor_behavior -> fieldinfo -> fieldinfo
-val get_model_info: visitor_behavior -> model_info -> model_info
-val get_logic_var: visitor_behavior -> logic_var -> logic_var
-val get_kernel_function: visitor_behavior -> kernel_function -> kernel_function
-(** @plugin development guide *)
-  
-val get_fundec: visitor_behavior -> fundec -> fundec
-
-val get_original_varinfo: visitor_behavior -> varinfo -> varinfo
-  (** retrieve the original representative of a given copy of a varinfo
-      in the current state of the visitor.
-    @plugin development guide
-   *)
-
-val get_original_compinfo: visitor_behavior -> compinfo -> compinfo
-val get_original_enuminfo: visitor_behavior -> enuminfo -> enuminfo
-val get_original_enumitem: visitor_behavior -> enumitem -> enumitem
-val get_original_typeinfo: visitor_behavior -> typeinfo -> typeinfo
-val get_original_stmt: visitor_behavior -> stmt -> stmt
-val get_original_logic_info: visitor_behavior -> logic_info -> logic_info
-val get_original_logic_type_info:
-  visitor_behavior -> logic_type_info -> logic_type_info
-val get_original_fieldinfo: visitor_behavior -> fieldinfo -> fieldinfo
-val get_original_model_info: visitor_behavior -> model_info -> model_info
-val get_original_logic_var: visitor_behavior -> logic_var -> logic_var
-val get_original_kernel_function:
-  visitor_behavior -> kernel_function -> kernel_function
-val get_original_fundec: visitor_behavior -> fundec -> fundec
-
-val set_varinfo: visitor_behavior -> varinfo -> varinfo -> unit
-  (** change the representative of a given varinfo in the current
-      state of the visitor. Use with care (i.e. makes sure that the old one
-      is not referenced anywhere in the AST, or sharing will be lost.
-      @plugin development guide
-  *)
-val set_compinfo: visitor_behavior -> compinfo -> compinfo -> unit
-val set_enuminfo: visitor_behavior -> enuminfo -> enuminfo -> unit
-val set_enumitem: visitor_behavior -> enumitem -> enumitem -> unit
-val set_typeinfo: visitor_behavior -> typeinfo -> typeinfo -> unit
-val set_stmt: visitor_behavior -> stmt -> stmt -> unit
-val set_logic_info: visitor_behavior -> logic_info -> logic_info -> unit
-val set_logic_type_info:
-  visitor_behavior -> logic_type_info -> logic_type_info -> unit
-val set_fieldinfo: visitor_behavior -> fieldinfo -> fieldinfo -> unit
-val set_model_info: visitor_behavior -> model_info -> model_info -> unit
-val set_logic_var: visitor_behavior -> logic_var -> logic_var -> unit
-val set_kernel_function:
-  visitor_behavior -> kernel_function -> kernel_function -> unit
-val set_fundec: visitor_behavior -> fundec -> fundec -> unit
-
-val set_orig_varinfo: visitor_behavior -> varinfo -> varinfo -> unit
-  (** change the reference of a given new varinfo in the current
-      state of the visitor. Use with care
-  *)
-val set_orig_compinfo: visitor_behavior -> compinfo -> compinfo -> unit
-val set_orig_enuminfo: visitor_behavior -> enuminfo -> enuminfo -> unit
-val set_orig_enumitem: visitor_behavior -> enumitem -> enumitem -> unit
-val set_orig_typeinfo: visitor_behavior -> typeinfo -> typeinfo -> unit
-val set_orig_stmt: visitor_behavior -> stmt -> stmt -> unit
-val set_orig_logic_info: visitor_behavior -> logic_info -> logic_info -> unit
-val set_orig_logic_type_info:
-  visitor_behavior -> logic_type_info -> logic_type_info -> unit
-val set_orig_fieldinfo: visitor_behavior -> fieldinfo -> fieldinfo -> unit
-val set_orig_model_info: visitor_behavior -> model_info -> model_info -> unit
-val set_orig_logic_var: visitor_behavior -> logic_var -> logic_var -> unit
-val set_orig_kernel_function: 
-  visitor_behavior -> kernel_function -> kernel_function -> unit
-val set_orig_fundec: visitor_behavior -> fundec -> fundec -> unit
-
-val unset_varinfo: visitor_behavior -> varinfo -> unit
-  (** remove the entry associated to the given varinfo in the current
-      state of the visitor. Use with care (i.e. make sure that you will never
-      visit again this varinfo in the same visiting context).
-      @plugin development guide
-  *)
-val unset_compinfo: visitor_behavior -> compinfo -> unit
-val unset_enuminfo: visitor_behavior -> enuminfo -> unit
-val unset_enumitem: visitor_behavior -> enumitem -> unit
-val unset_typeinfo: visitor_behavior -> typeinfo -> unit
-val unset_stmt: visitor_behavior -> stmt -> unit
-val unset_logic_info: visitor_behavior -> logic_info -> unit
-val unset_logic_type_info: visitor_behavior -> logic_type_info -> unit
-val unset_fieldinfo: visitor_behavior -> fieldinfo -> unit
-val unset_model_info: visitor_behavior -> model_info -> unit
-val unset_logic_var: visitor_behavior -> logic_var -> unit
-val unset_kernel_function: visitor_behavior -> kernel_function -> unit
-val unset_fundec: visitor_behavior -> fundec -> unit
-
-val unset_orig_varinfo: visitor_behavior -> varinfo -> unit
-  (** remove the entry associated with the given new varinfo in the current
-      state of the visitor. Use with care
-  *)
-val unset_orig_compinfo: visitor_behavior -> compinfo -> unit
-val unset_orig_enuminfo: visitor_behavior -> enuminfo -> unit
-val unset_orig_enumitem: visitor_behavior -> enumitem -> unit
-val unset_orig_typeinfo: visitor_behavior -> typeinfo -> unit
-val unset_orig_stmt: visitor_behavior -> stmt -> unit
-val unset_orig_logic_info: visitor_behavior -> logic_info -> unit
-val unset_orig_logic_type_info: visitor_behavior -> logic_type_info -> unit
-val unset_orig_fieldinfo: visitor_behavior -> fieldinfo -> unit
-val unset_orig_model_info: visitor_behavior -> model_info -> unit
-val unset_orig_logic_var: visitor_behavior -> logic_var -> unit
-val unset_orig_kernel_function: visitor_behavior -> kernel_function -> unit
-val unset_orig_fundec: visitor_behavior -> fundec -> unit
-
-val memo_varinfo: visitor_behavior -> varinfo -> varinfo
-  (** finds a binding in new project for the given varinfo, creating one
-      if it does not already exists. *)
-val memo_compinfo: visitor_behavior -> compinfo -> compinfo
-val memo_enuminfo: visitor_behavior -> enuminfo -> enuminfo
-val memo_enumitem: visitor_behavior -> enumitem -> enumitem
-val memo_typeinfo: visitor_behavior -> typeinfo -> typeinfo
-val memo_stmt: visitor_behavior -> stmt -> stmt
-val memo_logic_info: visitor_behavior -> logic_info -> logic_info
-val memo_logic_type_info: visitor_behavior -> logic_type_info -> logic_type_info
-val memo_fieldinfo: visitor_behavior -> fieldinfo -> fieldinfo
-val memo_model_info: visitor_behavior -> model_info -> model_info
-val memo_logic_var: visitor_behavior -> logic_var -> logic_var
-val memo_kernel_function:
-  visitor_behavior -> kernel_function -> kernel_function
-val memo_fundec: visitor_behavior -> fundec -> fundec
-
-(** [iter_visitor_varinfo vis f] iterates [f] over each pair of 
-    varinfo registered in [vis]. Varinfo for the old AST is presented 
-    to [f] first.
-    @since Oxygen-20120901 
-*)
-val iter_visitor_varinfo:
-  visitor_behavior -> (varinfo -> varinfo -> unit) -> unit
-val iter_visitor_compinfo:
-  visitor_behavior -> (compinfo -> compinfo -> unit) -> unit
-val iter_visitor_enuminfo: 
-  visitor_behavior -> (enuminfo -> enuminfo -> unit) -> unit
-val iter_visitor_enumitem:
-  visitor_behavior -> (enumitem -> enumitem -> unit) -> unit
-val iter_visitor_typeinfo:
-  visitor_behavior -> (typeinfo -> typeinfo -> unit) -> unit
-val iter_visitor_stmt:
-  visitor_behavior -> (stmt -> stmt -> unit) -> unit
-val iter_visitor_logic_info:
-  visitor_behavior -> (logic_info -> logic_info -> unit) -> unit
-val iter_visitor_logic_type_info:
-  visitor_behavior -> (logic_type_info -> logic_type_info -> unit) -> unit
-val iter_visitor_fieldinfo: 
-  visitor_behavior -> (fieldinfo -> fieldinfo -> unit) -> unit
-val iter_visitor_model_info: 
-  visitor_behavior -> (model_info -> model_info -> unit) -> unit
-val iter_visitor_logic_var: 
-  visitor_behavior -> (logic_var -> logic_var -> unit) -> unit
-val iter_visitor_kernel_function:
-  visitor_behavior -> (kernel_function -> kernel_function -> unit) -> unit
-val iter_visitor_fundec: 
-  visitor_behavior -> (fundec -> fundec -> unit) -> unit
-
-(** [fold_visitor_varinfo vis f] folds [f] over each pair of varinfo registered
-    in [vis]. Varinfo for the old AST is presented to [f] first.
-    @since Oxygen-20120901 
-*)
-val fold_visitor_varinfo:
-  visitor_behavior -> (varinfo -> varinfo -> 'a -> 'a) -> 'a -> 'a
-val fold_visitor_compinfo:
-  visitor_behavior -> (compinfo -> compinfo -> 'a -> 'a) -> 'a -> 'a
-val fold_visitor_enuminfo: 
-  visitor_behavior -> (enuminfo -> enuminfo -> 'a -> 'a) -> 'a -> 'a
-val fold_visitor_enumitem:
-  visitor_behavior -> (enumitem -> enumitem -> 'a -> 'a) -> 'a -> 'a
-val fold_visitor_typeinfo:
-  visitor_behavior -> (typeinfo -> typeinfo -> 'a -> 'a) -> 'a -> 'a
-val fold_visitor_stmt:
-  visitor_behavior -> (stmt -> stmt -> 'a -> 'a) -> 'a -> 'a
-val fold_visitor_logic_info:
-  visitor_behavior -> (logic_info -> logic_info -> 'a -> 'a) -> 'a -> 'a
-val fold_visitor_logic_type_info:
-  visitor_behavior -> 
-  (logic_type_info -> logic_type_info -> 'a -> 'a) -> 'a -> 'a
-val fold_visitor_fieldinfo: 
-  visitor_behavior -> (fieldinfo -> fieldinfo -> 'a -> 'a) -> 'a -> 'a
-val fold_visitor_model_info: 
-  visitor_behavior -> (model_info -> model_info -> 'a -> 'a) -> 'a -> 'a
-val fold_visitor_logic_var: 
-  visitor_behavior -> (logic_var -> logic_var -> 'a -> 'a) -> 'a -> 'a
-val fold_visitor_kernel_function:
-  visitor_behavior -> 
-  (kernel_function -> kernel_function -> 'a -> 'a) -> 'a -> 'a
-val fold_visitor_fundec: 
-  visitor_behavior -> (fundec -> fundec -> 'a -> 'a) -> 'a -> 'a
-
 (** {3 Visitor class} *)
 
 (** A visitor interface for traversing CIL trees. Create instantiations of
@@ -1739,7 +1454,7 @@ val fold_visitor_fundec:
     
     @plugin development guide *)
 class type cilVisitor = object
-  method behavior: visitor_behavior
+  method behavior: Visitor_behavior.t
   (** the kind of behavior expected for the behavior.
       @plugin development guide *)
 
@@ -1967,12 +1682,12 @@ val register_behavior_extension:
 
 (**/**)
 class internal_genericCilVisitor:
-  fundec option ref -> visitor_behavior -> (unit->unit) Queue.t -> cilVisitor
+  fundec option ref -> Visitor_behavior.t -> (unit->unit) Queue.t -> cilVisitor
 (**/**)
 
 (** generic visitor, parameterized by its copying behavior.
     Traverses the CIL tree without modifying anything *)
-class genericCilVisitor: visitor_behavior -> cilVisitor
+class genericCilVisitor: Visitor_behavior.t -> cilVisitor
 
 (** Default in place visitor doing nothing and operating on current project. *)
 class nopCilVisitor: cilVisitor
@@ -2074,7 +1789,7 @@ val visitCilBlock: cilVisitor -> block -> block
     and contain definitions of local variables that are not part of the block.
 
     @since Phosphorus-20170501-beta1
-    @modify Frama-C+dev: do not raise fatal as soon as the block has locals
+    @modify 19.0-Potassium: do not raise fatal as soon as the block has locals
 *)
 val transient_block: block -> block
 

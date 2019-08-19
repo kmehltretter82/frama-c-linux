@@ -15,25 +15,37 @@ pre-processes the other files with the following command.
 \end{shell}
 
 The option \optiondef{-}{cpp-command} may be used to change
-the default pre-processing command. If patterns \texttt{\%1} and \texttt{\%2}
-do not appear in the provided command, the pre-processor is invoked in the
+the default pre-processing command. Placeholders (see below)
+can be used for advanced commands.
+If no placeholders are used, the pre-processor is invoked in the
 following way.
 \begin{commands}
-\texttt{<cmd> -o <output file> <input file>}
+\texttt{<cmd> <args> -o <output file> <input file>}
 \end{commands}
 
 In this command, \texttt{<output file>} is chosen by \FramaC while
 \texttt{<input file>} is one of the filenames provided by the user.
-It is also possible to
-use the patterns \texttt{\%1} and \texttt{\%2} in the command as place-holders
-for the input files and the output file respectively. Here are some examples
-for using this option.
+
+For commands which do not follow this pattern, it is also possible to use
+the following placeholders:
+
+\begin{tabular}{|l|l|}
+\hline
+\texttt{\%input}, \texttt{\%i} or \texttt{\%1} & Input file \\
+\hline
+\texttt{\%output}, \texttt{\%o} or \texttt{\%2} & Output file \\
+\hline
+\texttt{\%args} & Additional arguments (see \texttt{-cpp-extra-args} below)\\
+\hline
+\end{tabular}
+
+Here are some examples for using this option.
 \begin{shell}
 \$ frama-c -cpp-command 'gcc -C -E -I. -x c' file1.src file2.i
-\$ frama-c -cpp-command 'gcc -C -E -I. -o %2 %1' file1.c file2.i
-\$ frama-c -cpp-command 'cp %1 %2'  file1.c file2.i
-\$ frama-c -cpp-command 'cat %1 > %2' file1.c file2.i
-\$ frama-c -cpp-command 'CL.exe /C /E %1 > %2' file1.c file2.i
+\$ frama-c -cpp-command 'gcc -C -E -I. %args -o %o %i' file1.c file2.i
+\$ frama-c -cpp-command 'cp %i %o'  file1.c file2.i
+\$ frama-c -cpp-command 'cat %i > %o' file1.c file2.i
+\$ frama-c -cpp-command 'CL.exe /C /E %args %i > %o' file1.c file2.i
 \end{shell}
 
 If you use the above option, you may use the option \optiondef{-}{cpp-frama-c-compliant}
@@ -54,7 +66,8 @@ it to retrieve preprocessing macros such as \texttt{-D} and \texttt{-I}
 for each file in the database, via option
 \optiondef{-}{json-compilation-database} \texttt{<path>}, where \texttt{<path>}
 is the path to the JSON file or to a directory containing a
-\texttt{compile\_commands.json} file. With this option set, \FramaC will parse
+file named \texttt{compile\_commands.json}. With this option set,
+\FramaC will parse
 the compilation database and include associated preprocessing flags.
 
 By default, \acsl annotations are pre-processed (option \optiondef{-}{pp-annot}
@@ -235,6 +248,10 @@ a negative value, and choose the smallest rank possible starting from
   AST uncalled function prototypes that have ACSL contracts. This option is
   set by default. So you mostly use the opposite form, namely
   \optiondef{-}{remove-unused-specified-functions}.
+
+\item \optiondef{-}{keep-unused-types} does not remove unused types and
+  enum/struct/union declarations. By default, such types are removed,
+  that is, its opposite option \optiondef{-}{remove-unused-types} is set.
 
 \item \texttt{\optiondef{-}{machdep} <machine architecture name>} defines the
   target platform. The default value is a \texttt{x86\_32} bits

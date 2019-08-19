@@ -170,8 +170,8 @@ end
   \item  \lstinline+Project.set_current+, \lstinline+Project.on+
 \begin{ocamlcode}
 let main () =
-  let p = 
-    !Db.Sparecode.get
+  let p =
+    Sparecode.Register.get
       ~select_annot:false
       ~select_slice_pragma:false
    in

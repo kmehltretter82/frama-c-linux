@@ -339,7 +339,7 @@ module Lenv = struct
       | BuiltinLabel LoopEntry -> Some "LoopEntry"
       | StmtLabel s ->
         (match
-           Transitioning.List.find_opt
+           List.find_opt
              (function Label (_,_,b) -> b | _ -> false) !s.labels
          with
          | None -> None
@@ -1015,8 +1015,6 @@ struct
       | TStartOf (_,o) -> needs_at_offset o
       | Tapp(_,_,l) | TDataCons(_,l) -> List.exists needs_at l
       | Tlambda(_,t) -> needs_at t
-      | TCoerce(t,_) -> needs_at t
-      | TCoerceE(t,_) -> needs_at t
       | TUpdate(t1,o,t2) -> needs_at t1 || needs_at_offset o || needs_at t2
       | Tunion l | Tinter l -> List.exists needs_at l
       | Tcomprehension(t,_,None) -> needs_at t
@@ -1044,7 +1042,6 @@ struct
       | Pinitialized (_,t) | Pdangling (_, t)
       | Pallocable(_,t) | Pfreeable(_,t)-> needs_at t
       | Pfresh (_,_,t,n) -> (needs_at t) && (needs_at n)
-      | Psubtype _ -> false
     in
     if needs_at idx then tat ~loc:idx.term_loc (idx,here_label) else idx
 
@@ -2048,7 +2045,7 @@ struct
       | TSizeOfStr _ | TAlignOf _ | TAlignOfE _
       | TUnOp _ | TBinOp _ | TCastE _ | TAddrOf _ | TStartOf _
       | Tapp _  | TDataCons _ | Tbase_addr _ | Toffset _
-      | Tblock_length _ | Tnull | TCoerce _ | TCoerceE _
+      | Tblock_length _ | Tnull
       | TUpdate _ | Ttypeof _ | Ttype _ | Tempty_set
       (* [VP] I suppose that an union of functions
          is theoretically possible but I'm not sure that we want to
@@ -2333,8 +2330,8 @@ struct
       | Trange _ | TConst _ | TSizeOf _ | TSizeOfE _ | TSizeOfStr _ | TAlignOf _
       | TAlignOfE _ | TUnOp (_,_) | TBinOp (_,_,_) | TCastE (_,_)
       | TStartOf _ | Tlambda (_,_) | TDataCons (_,_) | Tbase_addr (_,_)
-      | Toffset (_,_) | Tblock_length (_,_) | Tnull | Tapp _ | TCoerce (_,_)
-      | TCoerceE (_,_) | TUpdate (_,_,_) | Ttypeof _ | Ttype _ ->
+      | Toffset (_,_) | Tblock_length (_,_) | Tnull | Tapp _
+      | TUpdate (_,_,_) | Ttypeof _ | Ttype _ ->
         false
     in
     aux t
@@ -2870,17 +2867,6 @@ struct
       let ct = Logic_const.unroll_ltdef (logic_type ctxt loc env ty) in
       let { term_node; term_type } = mk_cast ~explicit:true t ct in
       (term_node, term_type)
-    | PLcoercion (t,ty) ->
-      let t = term env t in
-      (match Logic_const.unroll_ltdef (logic_type ctxt loc env ty) with
-       | Ctype ty as cty
-         -> TCoerce (t, ty), cty
-       | Linteger | Lreal | Ltype _ | Lvar _ | Larrow _ ->
-         ctxt.error loc "cannot cast to logic type")
-    | PLcoercionE (t,tc) ->
-      let t = term env t in
-      let tc = term env tc in
-      TCoerceE (t, tc), tc.term_type
     | PLrel (t1, (Eq | Neq | Lt | Le | Gt | Ge as op), t2) ->
       let f _ op t1 t2 =
         (TBinOp(binop_of_rel op, t1, t2),
@@ -3000,7 +2986,7 @@ struct
     | PLfresh _ | PLallocable _ | PLfreeable _
     | PLinitialized _ | PLdangling _ | PLexists _ | PLforall _
     | PLimplies _ | PLiff _
-    | PLxor _ | PLsubtype _ | PLseparated _ ->
+    | PLxor _ | PLseparated _ ->
       if ctxt.silent then raise Backtrack;
       ctxt.error loc "syntax error (expression expected but predicate found)"
   and type_relation:
@@ -3424,14 +3410,13 @@ struct
     | PLcast _ | PLblock_length _ | PLbase_addr _ | PLoffset _
     | PLrepeat _ | PLlist _ | PLarrget _ | PLarrow _
     | PLdot _ | PLbinop _ | PLunop _ | PLconstant _
-    | PLnull | PLresult | PLcoercion _ | PLcoercionE _ | PLsizeof _
+    | PLnull | PLresult | PLsizeof _
     | PLsizeofE _ | PLlambda _
     | PLupdate _ | PLinitIndex _ | PLinitField _
     | PLtypeof _ | PLtype _ -> boolean_to_predicate ctxt env p0
     | PLrange _ -> ctxt.error loc "cannot use operator .. within a predicate"
     | PLnamed (n, p) ->
       let p = predicate env p in { p with pred_name = n::p.pred_name }
-    | PLsubtype (t,tc) -> psubtype ~loc (term env t, term env tc)
     | PLseparated seps ->
       let seps = List.map (term_ptr ~check_non_void:true) seps in
       pseparated ~loc seps

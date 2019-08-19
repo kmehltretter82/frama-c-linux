@@ -90,7 +90,7 @@ let inline_call loc caller callee return args =
 
     method! vvrbl v =
       if v.vglob then
-        Cil.ChangeTo (Cil.get_original_varinfo self#behavior v)
+        Cil.ChangeTo (Visitor_behavior.Get_orig.varinfo self#behavior v)
       else Cil.DoChildren
 
     method! vterm_lval (host,offset) =
@@ -190,7 +190,7 @@ let inliner functions_to_inline = object (self)
 
   method private recursive_call_limit kf =
     let nb_calls =
-      Transitioning.Stack.fold
+      Stack.fold
         (fun res kf' -> if Cil_datatype.Kf.equal kf kf' then res + 1 else res)
         0 call_stack
     in

@@ -168,16 +168,13 @@ struct
 
   let node = Node.create
 
-  let identify subst ~src ~tgt =
+  let identify sigma ~src ~tgt =
     S.iter2
       (fun _chunk u v ->
          match u,v with
-         | Some x , Some y ->
-             subst := F.Tmap.add (F.e_var x) (F.e_var y) !subst
+         | Some x , Some y -> F.Subst.add sigma (F.e_var x) (F.e_var y)
          | _ -> ())
       src tgt
-
-  let assoc m e = F.Tmap.find e m
 
   module E = struct
     type t = S.t sequence * F.pred
@@ -186,10 +183,10 @@ struct
     let create seq p = seq,p
 
     let relocate tgt (src,p) =
-      let subst = ref F.Tmap.empty in
-      identify subst ~src:src.pre ~tgt:tgt.pre ;
-      identify subst ~src:src.post ~tgt:tgt.post ;
-      tgt , F.p_subst (assoc !subst) p
+      let sigma = Lang.sigma () in
+      identify sigma ~src:src.pre ~tgt:tgt.pre ;
+      identify sigma ~src:src.post ~tgt:tgt.post ;
+      tgt , F.p_subst sigma p
 
     let reads (seq,_) = S.domain seq.pre
     let writes (seq,_) = S.writes seq
@@ -200,14 +197,14 @@ struct
     let get = snd
     let create seq p = seq,p
     let relocate tgt (src,p) =
-      let subst = ref F.Tmap.empty in
-      identify subst ~src ~tgt ;
-      tgt , F.p_subst (assoc !subst) p
+      let sigma = Lang.sigma () in
+      identify sigma ~src ~tgt ;
+      tgt , F.p_subst sigma p
     let reads (src,_) = S.domain src
     let equal (s1,p1) (s2,p2) =
-      let subst = ref F.Tmap.empty in
-      identify subst ~src:s1 ~tgt:s2 ;
-      F.eqp (F.p_subst (assoc !subst) p1) p2
+      let sigma = Lang.sigma () in
+      identify sigma ~src:s1 ~tgt:s2 ;
+      F.eqp (F.p_subst sigma p1) p2
   end
 
   module P = struct
@@ -219,17 +216,17 @@ struct
     let create smap p = smap,p
 
     let relocate tgt (src,p) =
-      let subst = ref F.Tmap.empty in
+      let sigma = Lang.sigma () in
       Node.Map.iter2
         (fun n src tgt ->
            match src,tgt with
-           | Some src , Some tgt -> identify subst ~src ~tgt
+           | Some src , Some tgt -> identify sigma ~src ~tgt
            | Some _, None ->
                invalid_arg (Format.asprintf "P.relocate: tgt is smaller than src at %a" Node.pp n)
            | _ -> ())
         src tgt ;
       let tgt = Node.Map.inter (fun _ _ tgt -> tgt) src tgt in
-      tgt , F.p_subst (assoc !subst) p
+      tgt , F.p_subst sigma p
 
     let reads (smap,_) = Node.Map.map (fun _ s -> S.domain s) smap
     let nodes (smap,_) = Node.Map.fold (fun k _ acc -> Node.Set.add k acc) smap Node.Set.empty
@@ -257,16 +254,16 @@ struct
     let reads (smap,_) = Node.Map.map (fun _ s -> S.domain s) smap
 
     let relocate tgt (src,p) =
-      let subst = ref F.Tmap.empty in
+      let sigma = Lang.sigma () in
       Node.Map.iter2
         (fun _ src tgt ->
            match src,tgt with
-           | Some src , Some tgt -> identify subst ~src ~tgt
+           | Some src , Some tgt -> identify sigma ~src ~tgt
            | Some _, None -> invalid_arg "T.relocate: tgt is smaller than src"
            | _ -> ())
         src tgt ;
       let tgt = Node.Map.inter (fun _ _ tgt -> tgt) src tgt in
-      tgt , F.e_subst (assoc !subst) p
+      tgt , F.e_subst sigma p
 
     let init node_set f =
       let node_map = Node.Set.fold (fun x m ->

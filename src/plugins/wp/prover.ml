@@ -30,13 +30,18 @@ open Task
 open Wpo
 
 let dispatch ?(config=VCS.default) mode prover wpo =
+  let why3 prover =
+    Why3_api.prove
+      ~timeout:(VCS.get_timeout config)
+      ~steplimit:(VCS.get_stepout config)
+      ~prover wpo
+  in
   begin
     match prover with
-    | AltErgo -> ProverErgo.prove ~config ~mode wpo
-    | Coq -> ProverCoq.prove mode wpo
-    | Why3 prover -> ProverWhy3.prove ?timeout:config.timeout ~prover wpo
+    | NativeAltErgo -> ProverErgo.prove ~config ~mode wpo
+    | NativeCoq -> ProverCoq.prove mode wpo
+    | Why3 prover -> why3 prover
     | Qed | Tactical -> Task.return VCS.no_result
-    | _ -> Task.failed "Prover '%a' not available" VCS.pp_prover prover
   end
 
 let started ?start wpo =

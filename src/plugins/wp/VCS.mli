@@ -26,11 +26,39 @@
 
 (** {2 Prover} *)
 
+module Why3_prover: sig
+  type t = Why3.Whyconf.prover
+
+  val find: ?donotfail:unit -> string -> t
+  (** Find the why3 prover with the given name.
+      If it can't be found and donotfail is chosen, a
+      prover with the given name and version is used instead
+      Raises exception when the string doesn't corresponds to a prover filter
+  *)
+
+  val find_opt: string -> t option
+  (** Try to find the why3 prover with the given name. *)
+
+  val provers : unit -> t list
+  val provers_set: unit -> Why3.Whyconf.Sprover.t
+
+  val print : t -> string
+  val title : t -> string
+
+  val compare : t -> t -> int
+
+  val has_shortcut : t -> string -> bool
+  (** check if a prover has a given shortcut *)
+
+  val get_config: unit -> Why3.Whyconf.config
+
+  val is_available : t -> bool
+end
+
 type prover =
-  | Why3 of string (* Prover via WHY *)
-  | Why3ide
-  | AltErgo       (* Alt-Ergo *)
-  | Coq           (* Coq and Coqide *)
+  | Why3 of Why3_prover.t (* Prover via WHY *)
+  | NativeAltErgo (* Direct Alt-Ergo *)
+  | NativeCoq     (* Direct Coq and Coqide *)
   | Qed           (* Qed Solver *)
   | Tactical      (* Interactive Prover *)
 
@@ -61,24 +89,6 @@ val pp_language : Format.formatter -> language -> unit
 val pp_mode : Format.formatter -> mode -> unit
 
 val cmp_prover : prover -> prover -> int
-
-(* -------------------------------------------------------------------------- *)
-(** {2 Why3 Provers} *)
-(* -------------------------------------------------------------------------- *)
-
-type dp = {
-  dp_name : string ;
-  dp_version : string ;
-  dp_altern : string ;
-  dp_shortcuts : string list ;
-}
-
-val prover_of_dp : dp -> prover
-
-(** Without shortcuts *)
-val pretty : Format.formatter -> dp -> unit
-val pp_shortcut : Format.formatter -> string -> unit
-val pp_shortcuts : Format.formatter -> string list -> unit
 
 (* -------------------------------------------------------------------------- *)
 (** {2 Config}
@@ -154,3 +164,7 @@ val dkey_no_time_info: Wp_parameters.category
 val dkey_no_step_info: Wp_parameters.category
 val dkey_no_goals_info: Wp_parameters.category
 val dkey_success_only: Wp_parameters.category
+
+(** {2 Why3} *)
+
+val why3_config: Why3.Whyconf.config Lazy.t

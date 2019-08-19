@@ -41,7 +41,7 @@ may be found in the file \texttt{INSTALL.md} of the source distribution.
   higher, as well as various POSIX commands, libraries and header files.
 \item[The \caml compiler]\index{OCaml compiler}\footnote{\url{http://ocaml.org}}
   is required both for compiling \FramaC from source \emph{and} for compiling additional
-  plug-ins. Version greater or equal than 4.02.3 of the compiler must be used.
+  plug-ins. Version greater or equal than 4.05.0 of the compiler must be used.
 
 %  Support for some plug-ins in native compilation mode (see
 %  Section~\ref{sec:modes})\index{Native-compiled} requires the so-called
@@ -71,9 +71,12 @@ may be found in the file \texttt{INSTALL.md} of the source distribution.
 \item \texttt{frama-c.byte}\codeidx{frama-c.byte}: bytecode batch version;
 \item \texttt{frama-c-gui}\codeidx{frama-c-gui}: natively-compiled interactive
   version;
-\item \texttt{frama-c-gui.byte}\codeidx{frama-c-gui.byte}: bytecode interactive version.
+\item \texttt{frama-c-gui.byte}\codeidx{frama-c-gui.byte}: bytecode interactive version;
 \item \texttt{frama-c-config}\codeidx{frama-c-config}: auxiliary batch version for
-  quickly retrieving configuration information (e.g. installation path).
+  quickly retrieving configuration information (e.g. installation path);
+\item \texttt{frama-c-script}\codeidx{frama-c-script}: contains several
+  utilities related to source preparation, results visualization and analysis
+  automation. Run it without arguments to obtain more details.
 \end{itemize}
 The differences between these versions are described below.
 \begin{description}

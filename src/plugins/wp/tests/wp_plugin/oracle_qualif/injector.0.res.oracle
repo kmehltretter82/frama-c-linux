@@ -1,11 +1,11 @@
-# frama-c -wp -wp-timeout 90 -wp-steps 1500 [...]
+# frama-c -wp -wp-timeout 45 -wp-steps 1500 [...]
 [kernel] Parsing tests/wp_plugin/injector.c (with preprocessing)
 [wp] Running WP plugin...
 [wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 [wp] 13 goals scheduled
 [wp] [Qed] Goal typed_f_call_g_requires : Valid
-[wp] [Qed] Goal typed_f_call_g_requires : Valid
+[wp] [Qed] Goal typed_f_call_g_2_requires : Valid
 [wp] [Qed] Goal typed_f_FST_FAIL_ensures_qed_ok : Valid
 [wp] [Qed] Goal typed_f_FST_FAIL_ensures_qed_ok_2 : Valid
 [wp] [Qed] Goal typed_f_FST_FAIL_ensures_qed_ok_3 : Valid

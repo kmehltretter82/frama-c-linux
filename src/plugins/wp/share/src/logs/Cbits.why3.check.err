@@ -1,0 +1,420 @@
+<<<<<<< HEAD
+||||||| merged common ancestors
+File "../why3/Qed.why", line 42, characters 6-17:
+warning: axiom c_euclidian does not contain any local abstract symbol
+File "../why3/Qed.why", line 47, characters 6-16:
+warning: axiom cdiv_cases does not contain any local abstract symbol
+File "../why3/Qed.why", line 57, characters 6-16:
+warning: axiom cmod_cases does not contain any local abstract symbol
+File "../why3/Qed.why", line 67, characters 6-20:
+warning: axiom cmod_remainder does not contain any local abstract symbol
+File "../why3/Qed.why", line 79, characters 6-18:
+warning: axiom cdiv_neutral does not contain any local abstract symbol
+File "../why3/Qed.why", line 82, characters 6-14:
+warning: axiom cdiv_inv does not contain any local abstract symbol
+File "../why3/Cbits.why", line 11, characters 6-18:
+warning: axiom bit_test_def does not contain any local abstract symbol
+File "../why3/Cbits.why", line 14, characters 6-25:
+warning: axiom bit_test_extraction does not contain any local abstract symbol
+File "../why3/Cbits.why", line 18, characters 6-13:
+warning: axiom lsl_1_0 does not contain any local abstract symbol
+File "../why3/Cbits.why", line 20, characters 6-29:
+warning: axiom bit_test_extraction_bis does not contain any local abstract symbol
+File "../why3/Cbits.why", line 23, characters 6-32:
+warning: axiom bit_test_extraction_bis_eq does not contain any local abstract symbol
+File "../why3/Cbits.why", line 26, characters 6-21:
+warning: axiom lnot_extraction does not contain any local abstract symbol
+File "../why3/Cbits.why", line 30, characters 6-21:
+warning: axiom land_extraction does not contain any local abstract symbol
+File "../why3/Cbits.why", line 34, characters 6-20:
+warning: axiom lor_extraction does not contain any local abstract symbol
+File "../why3/Cbits.why", line 38, characters 6-21:
+warning: axiom lxor_extraction does not contain any local abstract symbol
+File "../why3/Cbits.why", line 42, characters 6-18:
+warning: axiom land_1_lsl_1 does not contain any local abstract symbol
+File "../why3/Cbits.why", line 48, characters 6-24:
+warning: axiom lsl_extraction_sup does not contain any local abstract symbol
+File "../why3/Cbits.why", line 53, characters 6-24:
+warning: axiom lsl_extraction_inf does not contain any local abstract symbol
+File "../why3/Cbits.why", line 57, characters 6-21:
+warning: axiom lsr_extractionl does not contain any local abstract symbol
+File "../why3/Cbits.why", line 61, characters 6-21:
+warning: axiom lsl1_extraction does not contain any local abstract symbol
+File "../why3/Cbits.why", line 65, characters 6-29:
+warning: axiom to_uint8_extraction_sup does not contain any local abstract symbol
+File "../why3/Cbits.why", line 69, characters 6-29:
+warning: axiom to_uint8_extraction_inf does not contain any local abstract symbol
+File "../why3/Cbits.why", line 73, characters 6-30:
+warning: axiom to_uint16_extraction_sup does not contain any local abstract symbol
+File "../why3/Cbits.why", line 77, characters 6-30:
+warning: axiom to_uint16_extraction_inf does not contain any local abstract symbol
+File "../why3/Cbits.why", line 81, characters 6-30:
+warning: axiom to_uint32_extraction_sup does not contain any local abstract symbol
+File "../why3/Cbits.why", line 85, characters 6-30:
+warning: axiom to_uint32_extraction_inf does not contain any local abstract symbol
+File "../why3/Cbits.why", line 89, characters 6-30:
+warning: axiom to_uint64_extraction_sup does not contain any local abstract symbol
+File "../why3/Cbits.why", line 93, characters 6-30:
+warning: axiom to_uint64_extraction_inf does not contain any local abstract symbol
+File "../why3/Cbits.why", line 97, characters 6-29:
+warning: axiom to_sint8_extraction_sup does not contain any local abstract symbol
+File "../why3/Cbits.why", line 101, characters 6-29:
+warning: axiom to_sint8_extraction_inf does not contain any local abstract symbol
+File "../why3/Cbits.why", line 105, characters 6-30:
+warning: axiom to_sint16_extraction_sup does not contain any local abstract symbol
+File "../why3/Cbits.why", line 109, characters 6-30:
+warning: axiom to_sint16_extraction_inf does not contain any local abstract symbol
+File "../why3/Cbits.why", line 113, characters 6-30:
+warning: axiom to_sint32_extraction_sup does not contain any local abstract symbol
+File "../why3/Cbits.why", line 117, characters 6-30:
+warning: axiom to_sint32_extraction_inf does not contain any local abstract symbol
+File "../why3/Cbits.why", line 121, characters 6-30:
+warning: axiom to_sint64_extraction_sup does not contain any local abstract symbol
+File "../why3/Cbits.why", line 125, characters 6-30:
+warning: axiom to_sint64_extraction_inf does not contain any local abstract symbol
+File "../why3/Cbits.why", line 129, characters 6-18:
+warning: axiom is_uint_lxor does not contain any local abstract symbol
+File "../why3/Cbits.why", line 132, characters 6-19:
+warning: axiom is_uint8_lxor does not contain any local abstract symbol
+File "../why3/Cbits.why", line 136, characters 6-18:
+warning: axiom is_uint8_lor does not contain any local abstract symbol
+File "../why3/Cbits.why", line 140, characters 6-19:
+warning: axiom is_uint8_land does not contain any local abstract symbol
+File "../why3/Cbits.why", line 144, characters 6-18:
+warning: axiom is_uint8_lsr does not contain any local abstract symbol
+File "../why3/Cbits.why", line 148, characters 6-23:
+warning: axiom is_uint8_lsl1_inf does not contain any local abstract symbol
+File "../why3/Cbits.why", line 152, characters 6-23:
+warning: axiom is_uint8_lsl1_sup does not contain any local abstract symbol
+File "../why3/Cbits.why", line 155, characters 6-20:
+warning: axiom is_uint16_lxor does not contain any local abstract symbol
+File "../why3/Cbits.why", line 159, characters 6-19:
+warning: axiom is_uint16_lor does not contain any local abstract symbol
+File "../why3/Cbits.why", line 163, characters 6-20:
+warning: axiom is_uint16_land does not contain any local abstract symbol
+File "../why3/Cbits.why", line 167, characters 6-19:
+warning: axiom is_uint16_lsr does not contain any local abstract symbol
+File "../why3/Cbits.why", line 171, characters 6-24:
+warning: axiom is_uint16_lsl1_inf does not contain any local abstract symbol
+File "../why3/Cbits.why", line 175, characters 6-24:
+warning: axiom is_uint16_lsl1_sup does not contain any local abstract symbol
+File "../why3/Cbits.why", line 178, characters 6-20:
+warning: axiom is_uint32_lxor does not contain any local abstract symbol
+File "../why3/Cbits.why", line 182, characters 6-19:
+warning: axiom is_uint32_lor does not contain any local abstract symbol
+File "../why3/Cbits.why", line 186, characters 6-20:
+warning: axiom is_uint32_land does not contain any local abstract symbol
+File "../why3/Cbits.why", line 190, characters 6-19:
+warning: axiom is_uint32_lsr does not contain any local abstract symbol
+File "../why3/Cbits.why", line 194, characters 6-24:
+warning: axiom is_uint32_lsl1_inf does not contain any local abstract symbol
+File "../why3/Cbits.why", line 198, characters 6-24:
+warning: axiom is_uint32_lsl1_sup does not contain any local abstract symbol
+File "../why3/Cbits.why", line 201, characters 6-20:
+warning: axiom is_uint64_lxor does not contain any local abstract symbol
+File "../why3/Cbits.why", line 205, characters 6-19:
+warning: axiom is_uint64_lor does not contain any local abstract symbol
+File "../why3/Cbits.why", line 209, characters 6-20:
+warning: axiom is_uint64_land does not contain any local abstract symbol
+File "../why3/Cbits.why", line 213, characters 6-19:
+warning: axiom is_uint64_lsr does not contain any local abstract symbol
+File "../why3/Cbits.why", line 217, characters 6-24:
+warning: axiom is_uint64_lsl1_inf does not contain any local abstract symbol
+File "../why3/Cbits.why", line 221, characters 6-24:
+warning: axiom is_uint64_lsl1_sup does not contain any local abstract symbol
+File "../why3/Cbits.why", line 224, characters 6-19:
+warning: axiom is_sint8_lnot does not contain any local abstract symbol
+File "../why3/Cbits.why", line 227, characters 6-19:
+warning: axiom is_sint8_lxor does not contain any local abstract symbol
+File "../why3/Cbits.why", line 231, characters 6-18:
+warning: axiom is_sint8_lor does not contain any local abstract symbol
+File "../why3/Cbits.why", line 235, characters 6-19:
+warning: axiom is_sint8_land does not contain any local abstract symbol
+File "../why3/Cbits.why", line 239, characters 6-18:
+warning: axiom is_sint8_lsr does not contain any local abstract symbol
+File "../why3/Cbits.why", line 243, characters 6-19:
+warning: axiom is_sint8_lsl1 does not contain any local abstract symbol
+File "../why3/Cbits.why", line 245, characters 6-23:
+warning: axiom is_sint8_lsl1_inf does not contain any local abstract symbol
+File "../why3/Cbits.why", line 249, characters 6-23:
+warning: axiom is_sint8_lsl1_sup does not contain any local abstract symbol
+File "../why3/Cbits.why", line 252, characters 6-20:
+warning: axiom is_sint16_lnot does not contain any local abstract symbol
+File "../why3/Cbits.why", line 255, characters 6-20:
+warning: axiom is_sint16_lxor does not contain any local abstract symbol
+File "../why3/Cbits.why", line 259, characters 6-19:
+warning: axiom is_sint16_lor does not contain any local abstract symbol
+File "../why3/Cbits.why", line 263, characters 6-20:
+warning: axiom is_sint16_land does not contain any local abstract symbol
+File "../why3/Cbits.why", line 267, characters 6-19:
+warning: axiom is_sint16_lsr does not contain any local abstract symbol
+File "../why3/Cbits.why", line 271, characters 6-20:
+warning: axiom is_sint16_lsl1 does not contain any local abstract symbol
+File "../why3/Cbits.why", line 273, characters 6-24:
+warning: axiom is_sint16_lsl1_inf does not contain any local abstract symbol
+File "../why3/Cbits.why", line 277, characters 6-24:
+warning: axiom is_sint16_lsl1_sup does not contain any local abstract symbol
+File "../why3/Cbits.why", line 280, characters 6-20:
+warning: axiom is_sint32_lnot does not contain any local abstract symbol
+File "../why3/Cbits.why", line 283, characters 6-20:
+warning: axiom is_sint32_lxor does not contain any local abstract symbol
+File "../why3/Cbits.why", line 287, characters 6-19:
+warning: axiom is_sint32_lor does not contain any local abstract symbol
+File "../why3/Cbits.why", line 291, characters 6-20:
+warning: axiom is_sint32_land does not contain any local abstract symbol
+File "../why3/Cbits.why", line 295, characters 6-19:
+warning: axiom is_sint32_lsr does not contain any local abstract symbol
+File "../why3/Cbits.why", line 299, characters 6-20:
+warning: axiom is_sint32_lsl1 does not contain any local abstract symbol
+File "../why3/Cbits.why", line 301, characters 6-24:
+warning: axiom is_sint32_lsl1_inf does not contain any local abstract symbol
+File "../why3/Cbits.why", line 305, characters 6-24:
+warning: axiom is_sint32_lsl1_sup does not contain any local abstract symbol
+File "../why3/Cbits.why", line 308, characters 6-20:
+warning: axiom is_sint64_lnot does not contain any local abstract symbol
+File "../why3/Cbits.why", line 311, characters 6-20:
+warning: axiom is_sint64_lxor does not contain any local abstract symbol
+File "../why3/Cbits.why", line 315, characters 6-19:
+warning: axiom is_sint64_lor does not contain any local abstract symbol
+File "../why3/Cbits.why", line 319, characters 6-20:
+warning: axiom is_sint64_land does not contain any local abstract symbol
+File "../why3/Cbits.why", line 323, characters 6-19:
+warning: axiom is_sint64_lsr does not contain any local abstract symbol
+File "../why3/Cbits.why", line 327, characters 6-20:
+warning: axiom is_sint64_lsl1 does not contain any local abstract symbol
+File "../why3/Cbits.why", line 329, characters 6-24:
+warning: axiom is_sint64_lsl1_inf does not contain any local abstract symbol
+File "../why3/Cbits.why", line 333, characters 6-24:
+warning: axiom is_sint64_lsl1_sup does not contain any local abstract symbol
+File "../why3/Cbits.why", line 336, characters 6-18:
+warning: axiom lor_addition does not contain any local abstract symbol
+File "../why3/Cbits.why", line 339, characters 6-19:
+warning: axiom lxor_addition does not contain any local abstract symbol
+=======
+File "../why3/Qed.why", line 42, characters 6-17:
+warning: axiom c_euclidian does not contain any local abstract symbol
+File "../why3/Qed.why", line 47, characters 6-16:
+warning: axiom cdiv_cases does not contain any local abstract symbol
+File "../why3/Qed.why", line 57, characters 6-16:
+warning: axiom cmod_cases does not contain any local abstract symbol
+File "../why3/Qed.why", line 67, characters 6-20:
+warning: axiom cmod_remainder does not contain any local abstract symbol
+File "../why3/Qed.why", line 79, characters 6-18:
+warning: axiom cdiv_neutral does not contain any local abstract symbol
+File "../why3/Qed.why", line 82, characters 6-14:
+warning: axiom cdiv_inv does not contain any local abstract symbol
+File "../why3/Cint.why", line 61, characters 6-14:
+warning: axiom is_bool0 does not contain any local abstract symbol
+File "../why3/Cint.why", line 63, characters 6-14:
+warning: axiom is_bool1 does not contain any local abstract symbol
+File "../why3/Cbits.why", line 11, characters 6-15:
+warning: axiom lnot_bool does not contain any local abstract symbol
+File "../why3/Cbits.why", line 14, characters 6-16:
+warning: axiom land_idemp does not contain any local abstract symbol
+File "../why3/Cbits.why", line 16, characters 6-12:
+warning: axiom land_0 does not contain any local abstract symbol
+File "../why3/Cbits.why", line 18, characters 6-15:
+warning: axiom land_0bis does not contain any local abstract symbol
+File "../why3/Cbits.why", line 20, characters 6-12:
+warning: axiom land_1 does not contain any local abstract symbol
+File "../why3/Cbits.why", line 23, characters 6-15:
+warning: axiom land_1bis does not contain any local abstract symbol
+File "../why3/Cbits.why", line 26, characters 6-15:
+warning: axiom lor_idemp does not contain any local abstract symbol
+File "../why3/Cbits.why", line 28, characters 6-11:
+warning: axiom lor_1 does not contain any local abstract symbol
+File "../why3/Cbits.why", line 31, characters 6-14:
+warning: axiom lor_1bis does not contain any local abstract symbol
+File "../why3/Cbits.why", line 34, characters 6-11:
+warning: axiom lor_0 does not contain any local abstract symbol
+File "../why3/Cbits.why", line 36, characters 6-14:
+warning: axiom lor_0bis does not contain any local abstract symbol
+File "../why3/Cbits.why", line 38, characters 6-20:
+warning: axiom lxor_nilpotent does not contain any local abstract symbol
+File "../why3/Cbits.why", line 40, characters 6-12:
+warning: axiom lxor_1 does not contain any local abstract symbol
+File "../why3/Cbits.why", line 43, characters 6-15:
+warning: axiom lxor_1bis does not contain any local abstract symbol
+File "../why3/Cbits.why", line 46, characters 6-12:
+warning: axiom lxor_0 does not contain any local abstract symbol
+File "../why3/Cbits.why", line 48, characters 6-15:
+warning: axiom lxor_0bis does not contain any local abstract symbol
+File "../why3/Cbits.why", line 50, characters 6-18:
+warning: axiom bit_test_def does not contain any local abstract symbol
+File "../why3/Cbits.why", line 53, characters 6-25:
+warning: axiom bit_test_extraction does not contain any local abstract symbol
+File "../why3/Cbits.why", line 57, characters 6-13:
+warning: axiom lsl_1_0 does not contain any local abstract symbol
+File "../why3/Cbits.why", line 59, characters 6-29:
+warning: axiom bit_test_extraction_bis does not contain any local abstract symbol
+File "../why3/Cbits.why", line 62, characters 6-32:
+warning: axiom bit_test_extraction_bis_eq does not contain any local abstract symbol
+File "../why3/Cbits.why", line 65, characters 6-21:
+warning: axiom lnot_extraction does not contain any local abstract symbol
+File "../why3/Cbits.why", line 69, characters 6-21:
+warning: axiom land_extraction does not contain any local abstract symbol
+File "../why3/Cbits.why", line 73, characters 6-20:
+warning: axiom lor_extraction does not contain any local abstract symbol
+File "../why3/Cbits.why", line 77, characters 6-21:
+warning: axiom lxor_extraction does not contain any local abstract symbol
+File "../why3/Cbits.why", line 81, characters 6-18:
+warning: axiom land_1_lsl_1 does not contain any local abstract symbol
+File "../why3/Cbits.why", line 87, characters 6-24:
+warning: axiom lsl_extraction_sup does not contain any local abstract symbol
+File "../why3/Cbits.why", line 92, characters 6-24:
+warning: axiom lsl_extraction_inf does not contain any local abstract symbol
+File "../why3/Cbits.why", line 96, characters 6-21:
+warning: axiom lsr_extractionl does not contain any local abstract symbol
+File "../why3/Cbits.why", line 100, characters 6-21:
+warning: axiom lsl1_extraction does not contain any local abstract symbol
+File "../why3/Cbits.why", line 104, characters 6-29:
+warning: axiom to_uint8_extraction_sup does not contain any local abstract symbol
+File "../why3/Cbits.why", line 108, characters 6-29:
+warning: axiom to_uint8_extraction_inf does not contain any local abstract symbol
+File "../why3/Cbits.why", line 112, characters 6-30:
+warning: axiom to_uint16_extraction_sup does not contain any local abstract symbol
+File "../why3/Cbits.why", line 116, characters 6-30:
+warning: axiom to_uint16_extraction_inf does not contain any local abstract symbol
+File "../why3/Cbits.why", line 120, characters 6-30:
+warning: axiom to_uint32_extraction_sup does not contain any local abstract symbol
+File "../why3/Cbits.why", line 124, characters 6-30:
+warning: axiom to_uint32_extraction_inf does not contain any local abstract symbol
+File "../why3/Cbits.why", line 128, characters 6-30:
+warning: axiom to_uint64_extraction_sup does not contain any local abstract symbol
+File "../why3/Cbits.why", line 132, characters 6-30:
+warning: axiom to_uint64_extraction_inf does not contain any local abstract symbol
+File "../why3/Cbits.why", line 136, characters 6-29:
+warning: axiom to_sint8_extraction_sup does not contain any local abstract symbol
+File "../why3/Cbits.why", line 140, characters 6-29:
+warning: axiom to_sint8_extraction_inf does not contain any local abstract symbol
+File "../why3/Cbits.why", line 144, characters 6-30:
+warning: axiom to_sint16_extraction_sup does not contain any local abstract symbol
+File "../why3/Cbits.why", line 148, characters 6-30:
+warning: axiom to_sint16_extraction_inf does not contain any local abstract symbol
+File "../why3/Cbits.why", line 152, characters 6-30:
+warning: axiom to_sint32_extraction_sup does not contain any local abstract symbol
+File "../why3/Cbits.why", line 156, characters 6-30:
+warning: axiom to_sint32_extraction_inf does not contain any local abstract symbol
+File "../why3/Cbits.why", line 160, characters 6-30:
+warning: axiom to_sint64_extraction_sup does not contain any local abstract symbol
+File "../why3/Cbits.why", line 164, characters 6-30:
+warning: axiom to_sint64_extraction_inf does not contain any local abstract symbol
+File "../why3/Cbits.why", line 168, characters 6-18:
+warning: axiom is_uint_lxor does not contain any local abstract symbol
+File "../why3/Cbits.why", line 171, characters 6-19:
+warning: axiom is_uint8_lxor does not contain any local abstract symbol
+File "../why3/Cbits.why", line 175, characters 6-18:
+warning: axiom is_uint8_lor does not contain any local abstract symbol
+File "../why3/Cbits.why", line 179, characters 6-19:
+warning: axiom is_uint8_land does not contain any local abstract symbol
+File "../why3/Cbits.why", line 183, characters 6-18:
+warning: axiom is_uint8_lsr does not contain any local abstract symbol
+File "../why3/Cbits.why", line 187, characters 6-23:
+warning: axiom is_uint8_lsl1_inf does not contain any local abstract symbol
+File "../why3/Cbits.why", line 191, characters 6-23:
+warning: axiom is_uint8_lsl1_sup does not contain any local abstract symbol
+File "../why3/Cbits.why", line 194, characters 6-20:
+warning: axiom is_uint16_lxor does not contain any local abstract symbol
+File "../why3/Cbits.why", line 198, characters 6-19:
+warning: axiom is_uint16_lor does not contain any local abstract symbol
+File "../why3/Cbits.why", line 202, characters 6-20:
+warning: axiom is_uint16_land does not contain any local abstract symbol
+File "../why3/Cbits.why", line 206, characters 6-19:
+warning: axiom is_uint16_lsr does not contain any local abstract symbol
+File "../why3/Cbits.why", line 210, characters 6-24:
+warning: axiom is_uint16_lsl1_inf does not contain any local abstract symbol
+File "../why3/Cbits.why", line 214, characters 6-24:
+warning: axiom is_uint16_lsl1_sup does not contain any local abstract symbol
+File "../why3/Cbits.why", line 217, characters 6-20:
+warning: axiom is_uint32_lxor does not contain any local abstract symbol
+File "../why3/Cbits.why", line 221, characters 6-19:
+warning: axiom is_uint32_lor does not contain any local abstract symbol
+File "../why3/Cbits.why", line 225, characters 6-20:
+warning: axiom is_uint32_land does not contain any local abstract symbol
+File "../why3/Cbits.why", line 229, characters 6-19:
+warning: axiom is_uint32_lsr does not contain any local abstract symbol
+File "../why3/Cbits.why", line 233, characters 6-24:
+warning: axiom is_uint32_lsl1_inf does not contain any local abstract symbol
+File "../why3/Cbits.why", line 237, characters 6-24:
+warning: axiom is_uint32_lsl1_sup does not contain any local abstract symbol
+File "../why3/Cbits.why", line 240, characters 6-20:
+warning: axiom is_uint64_lxor does not contain any local abstract symbol
+File "../why3/Cbits.why", line 244, characters 6-19:
+warning: axiom is_uint64_lor does not contain any local abstract symbol
+File "../why3/Cbits.why", line 248, characters 6-20:
+warning: axiom is_uint64_land does not contain any local abstract symbol
+File "../why3/Cbits.why", line 252, characters 6-19:
+warning: axiom is_uint64_lsr does not contain any local abstract symbol
+File "../why3/Cbits.why", line 256, characters 6-24:
+warning: axiom is_uint64_lsl1_inf does not contain any local abstract symbol
+File "../why3/Cbits.why", line 260, characters 6-24:
+warning: axiom is_uint64_lsl1_sup does not contain any local abstract symbol
+File "../why3/Cbits.why", line 263, characters 6-19:
+warning: axiom is_sint8_lnot does not contain any local abstract symbol
+File "../why3/Cbits.why", line 266, characters 6-19:
+warning: axiom is_sint8_lxor does not contain any local abstract symbol
+File "../why3/Cbits.why", line 270, characters 6-18:
+warning: axiom is_sint8_lor does not contain any local abstract symbol
+File "../why3/Cbits.why", line 274, characters 6-19:
+warning: axiom is_sint8_land does not contain any local abstract symbol
+File "../why3/Cbits.why", line 278, characters 6-18:
+warning: axiom is_sint8_lsr does not contain any local abstract symbol
+File "../why3/Cbits.why", line 282, characters 6-19:
+warning: axiom is_sint8_lsl1 does not contain any local abstract symbol
+File "../why3/Cbits.why", line 284, characters 6-23:
+warning: axiom is_sint8_lsl1_inf does not contain any local abstract symbol
+File "../why3/Cbits.why", line 288, characters 6-23:
+warning: axiom is_sint8_lsl1_sup does not contain any local abstract symbol
+File "../why3/Cbits.why", line 291, characters 6-20:
+warning: axiom is_sint16_lnot does not contain any local abstract symbol
+File "../why3/Cbits.why", line 294, characters 6-20:
+warning: axiom is_sint16_lxor does not contain any local abstract symbol
+File "../why3/Cbits.why", line 298, characters 6-19:
+warning: axiom is_sint16_lor does not contain any local abstract symbol
+File "../why3/Cbits.why", line 302, characters 6-20:
+warning: axiom is_sint16_land does not contain any local abstract symbol
+File "../why3/Cbits.why", line 306, characters 6-19:
+warning: axiom is_sint16_lsr does not contain any local abstract symbol
+File "../why3/Cbits.why", line 310, characters 6-20:
+warning: axiom is_sint16_lsl1 does not contain any local abstract symbol
+File "../why3/Cbits.why", line 312, characters 6-24:
+warning: axiom is_sint16_lsl1_inf does not contain any local abstract symbol
+File "../why3/Cbits.why", line 316, characters 6-24:
+warning: axiom is_sint16_lsl1_sup does not contain any local abstract symbol
+File "../why3/Cbits.why", line 319, characters 6-20:
+warning: axiom is_sint32_lnot does not contain any local abstract symbol
+File "../why3/Cbits.why", line 322, characters 6-20:
+warning: axiom is_sint32_lxor does not contain any local abstract symbol
+File "../why3/Cbits.why", line 326, characters 6-19:
+warning: axiom is_sint32_lor does not contain any local abstract symbol
+File "../why3/Cbits.why", line 330, characters 6-20:
+warning: axiom is_sint32_land does not contain any local abstract symbol
+File "../why3/Cbits.why", line 334, characters 6-19:
+warning: axiom is_sint32_lsr does not contain any local abstract symbol
+File "../why3/Cbits.why", line 338, characters 6-20:
+warning: axiom is_sint32_lsl1 does not contain any local abstract symbol
+File "../why3/Cbits.why", line 340, characters 6-24:
+warning: axiom is_sint32_lsl1_inf does not contain any local abstract symbol
+File "../why3/Cbits.why", line 344, characters 6-24:
+warning: axiom is_sint32_lsl1_sup does not contain any local abstract symbol
+File "../why3/Cbits.why", line 347, characters 6-20:
+warning: axiom is_sint64_lnot does not contain any local abstract symbol
+File "../why3/Cbits.why", line 350, characters 6-20:
+warning: axiom is_sint64_lxor does not contain any local abstract symbol
+File "../why3/Cbits.why", line 354, characters 6-19:
+warning: axiom is_sint64_lor does not contain any local abstract symbol
+File "../why3/Cbits.why", line 358, characters 6-20:
+warning: axiom is_sint64_land does not contain any local abstract symbol
+File "../why3/Cbits.why", line 362, characters 6-19:
+warning: axiom is_sint64_lsr does not contain any local abstract symbol
+File "../why3/Cbits.why", line 366, characters 6-20:
+warning: axiom is_sint64_lsl1 does not contain any local abstract symbol
+File "../why3/Cbits.why", line 368, characters 6-24:
+warning: axiom is_sint64_lsl1_inf does not contain any local abstract symbol
+File "../why3/Cbits.why", line 372, characters 6-24:
+warning: axiom is_sint64_lsl1_sup does not contain any local abstract symbol
+File "../why3/Cbits.why", line 375, characters 6-18:
+warning: axiom lor_addition does not contain any local abstract symbol
+File "../why3/Cbits.why", line 378, characters 6-19:
+warning: axiom lxor_addition does not contain any local abstract symbol
+>>>>>>> origin/master

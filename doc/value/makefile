@@ -11,6 +11,7 @@ OPENSOURCE?=yes
 export OPENSOURCE
 
 main: ../../VERSION *.c
+	$(MAKE) -C examples/parametrizing
 	$(MAKE) $(FRAMAC_MODERN)
 	latexmk -pdf main.tex
 ifeq ($(OPENSOURCE),no)

@@ -42,8 +42,8 @@ type focus =
   | `Call of GuiSource.call
   | `Property of Property.t ]
 
-let index_of_lemma (l,_,_,_,_) =
-  match LogicUsage.section_of_lemma l with
+let index_of_lemma l =
+  match LogicUsage.section_of_lemma l.il_name with
   | LogicUsage.Toplevel _ -> Wpo.Axiomatic None
   | LogicUsage.Axiomatic a -> Wpo.Axiomatic (Some a.LogicUsage.ax_name)
 
@@ -54,7 +54,7 @@ let focus_of_selection selection scope =
   | S_call c , `Module -> `Index (Wpo.Function(c.s_caller,None))
   | S_fun kf , (`Select | `Module) -> `Index(Wpo.Function(kf,None))
   | S_prop (IPLemma ilem) , `Module -> `Index(index_of_lemma ilem)
-  | S_prop (IPAxiomatic(name,_)) , _ -> `Index(Wpo.Axiomatic (Some name))
+  | S_prop (IPAxiomatic {iax_name=name}) , _ -> `Index(Wpo.Axiomatic (Some name))
   | S_prop ip , `Select -> `Property ip
   | S_prop ip , `Module ->
       begin
@@ -239,9 +239,11 @@ class behavior
           Task.spawn server thread ;
           Task.launch server in
         match prover with
+        (*
         | VCS.Why3ide ->
             let iter f = Wpo.iter ~on_goal:f () in
             schedule (ProverWhy3ide.prove ~callback:result ~iter)
+        *)
         | VCS.Tactical ->
             begin
               match mode , ProverScript.get w with
@@ -255,8 +257,8 @@ class behavior
         | _ ->
             let mode = match mode , prover with
               | Some m , _ -> m
-              | None , VCS.Coq -> VCS.EditMode
-              | None , VCS.AltErgo -> VCS.FixMode
+              | None , VCS.NativeCoq -> VCS.EditMode
+              | None , VCS.NativeAltErgo -> VCS.FixMode
               | _ -> VCS.BatchMode in
             schedule (Prover.prove w ~mode ~result prover)
       end
@@ -301,12 +303,12 @@ class behavior
       match popup_target with
       | Some(w,Some p) -> (popup_target <- None ; self#prove ~mode w p)
       | _ -> popup_target <- None
-
+(*
     method private popup_why3ide () =
       match popup_target with
       | Some(w,_) -> (popup_target <- None ; self#prove w VCS.Why3ide)
       | _ -> popup_target <- None
-
+*)
     method private add_popup_delete popup =
       begin
         popup#add_separator ;
@@ -331,11 +333,13 @@ class behavior
           [ "Run",BatchMode ; "Open Altgr-Ergo on Fail",EditMode ; "Open Altgr-Ergo",EditMode ] ;
         self#add_popup_proofmodes popup_coq
           [ "Check Proof",BatchMode ; "Edit on Fail",EditMode ; "Edit Proof",EditMode ] ;
+        (*
         List.iter
           (fun menu ->
              menu#add_item ~label:"Open Why3ide" ~callback:self#popup_why3ide ;
              self#add_popup_delete menu ;
           ) [ popup_qed ; popup_why3 ; popup_ergo ; popup_coq ] ;
+        *)
       end
 
     method private popup w p =
@@ -344,9 +348,9 @@ class behavior
         popup_target <- Some (w,p) ;
         match p with
         | None | Some Tactical -> popup_tip#run ()
-        | Some (Qed|Why3ide) -> popup_qed#run ()
-        | Some Coq -> popup_coq#run ()
-        | Some AltErgo -> popup_ergo#run ()
+        | Some Qed -> popup_qed#run ()
+        | Some NativeCoq -> popup_coq#run ()
+        | Some NativeAltErgo -> popup_ergo#run ()
         | Some (Why3 _) -> popup_why3#run ()
       end
 
@@ -406,10 +410,9 @@ let make (main : main_window_extension_points) =
     (* --- Provers                                                            --- *)
     (* -------------------------------------------------------------------------- *)
 
-    let available = new GuiConfig.available () in
     let enabled = new GuiConfig.enabled "wp.enabled" in
 
-    let dp_chooser = new GuiConfig.dp_chooser ~main ~available ~enabled in
+    let dp_chooser = new GuiConfig.dp_chooser ~main ~enabled in
 
     (* -------------------------------------------------------------------------- *)
     (* --- Focus Bar                                                          --- *)
@@ -501,8 +504,8 @@ let make (main : main_window_extension_points) =
     ignore (main#lower_notebook#append_page ~tab_label panel#coerce) ;
     main#register_source_highlighter source#highlight ;
     main#register_source_selector popup#register ;
+
     GuiPanel.register ~main
-      ~available_provers:available
       ~configure_provers:dp_chooser#run ;
   end
 

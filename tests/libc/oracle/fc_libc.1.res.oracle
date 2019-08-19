@@ -5431,7 +5431,7 @@ char *strrchr(char const *s, int c)
 /*@ requires
       valid:
         valid_read_or_empty(s, n) ∨
-        \valid_read((unsigned char *)s + (.. memchr_off((char *)s, c, n)));
+        \valid_read((unsigned char *)s + (0 .. memchr_off((char *)s, c, n)));
     requires
       initialization:
         \initialized((unsigned char *)s + (0 .. n - 1)) ∨
@@ -5557,7 +5557,8 @@ char *strerror(int errnum)
   return __retres;
 }
 
-/*@ assigns \result;
+/*@ requires valid_string_s: valid_read_string(s);
+    assigns \result;
     assigns \result
       \from (indirect: *(s + (0 .. strlen{Old}(s)))),
             (indirect: __fc_heap_status);
@@ -6867,6 +6868,30 @@ extern int setitimer(int which,
 extern int select(int nfds, fd_set *readfds, fd_set *writefds,
                   fd_set *errorfds, struct timeval *timeout);
 
+/*@ requires valid_string_path: valid_read_string(path);
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result
+      \from (indirect: path), (indirect: *(path + (0 ..))), (indirect: mode);
+ */
+extern int mkdir(char const *path, mode_t mode);
+
+/*@ requires valid_pathname: valid_read_string(pathname);
+    requires valid_buf: \valid(buf);
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    ensures
+      init_on_success: initialization: buf:
+        \result ≡ 0 ⇒ \initialized(\old(buf));
+    assigns \result, *buf;
+    assigns \result \from *(pathname + (0 ..));
+    assigns *buf \from *(pathname + (0 ..));
+ */
+extern int stat(char const *pathname, struct stat *buf);
+
+/*@ assigns \result;
+    assigns \result \from (indirect: cmask); */
+extern mode_t umask(mode_t cmask);
+
 /*@ assigns *(*(outbuf + (0 .. *outbytesleft - 1))), __fc_errno;
     assigns *(*(outbuf + (0 .. *outbytesleft - 1)))
       \from *(*(inbuf + (0 .. *inbytesleft - 1)));
@@ -7198,30 +7223,6 @@ extern int getrusage(int r, struct rusage *ru);
     assigns \result \from r, rl->rlim_cur, rl->rlim_max; */
 extern int setrlimit(int r, struct rlimit const *rl);
 
-/*@ requires valid_string_path: valid_read_string(path);
-    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
-    assigns \result;
-    assigns \result
-      \from (indirect: path), (indirect: *(path + (0 ..))), (indirect: mode);
- */
-extern int mkdir(char const *path, mode_t mode);
-
-/*@ requires valid_pathname: valid_read_string(pathname);
-    requires valid_buf: \valid(buf);
-    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
-    ensures
-      init_on_success: initialization: buf:
-        \result ≡ 0 ⇒ \initialized(\old(buf));
-    assigns \result, *buf;
-    assigns \result \from *(pathname + (0 ..));
-    assigns *buf \from *(pathname + (0 ..));
- */
-extern int stat(char const *pathname, struct stat *buf);
-
-/*@ assigns \result;
-    assigns \result \from (indirect: cmask); */
-extern mode_t umask(mode_t cmask);
-
 /*@ requires valid_buffer: \valid(buffer);
     assigns \result, *buffer;
     assigns \result \from __fc_time;
@@ -7317,6 +7318,20 @@ extern int tcsetattr(int fd, int optional_actions, struct termios *termios_p);
       \from (indirect: path), (indirect: *(path + (0 ..))), (indirect: amode);
  */
 extern int access(char const *path, int amode);
+
+/*@ requires valid_string_path: valid_read_string(path);
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result \from (indirect: path), (indirect: *(path + (0 ..)));
+ */
+extern int chdir(char const *path);
+
+/*@ requires valid_string_path: valid_read_string(path);
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result \from (indirect: path), (indirect: *(path + (0 ..)));
+ */
+extern int chroot(char const *path);
 
 /*@ requires valid_string_path: valid_read_string(path);
     ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
@@ -7483,6 +7498,19 @@ extern uid_t getuid(void);
     assigns \result \from (indirect: fd), (indirect: __fc_fds[fd]);
  */
 extern int isatty(int fd);
+
+/*@ requires valid_fd: 0 ≤ fd < 1024;
+    requires valid_whence: whence ≡ 0 ∨ whence ≡ 1 ∨ whence ≡ 2;
+    ensures result_error_or_offset: \result ≡ -1 ∨ 0 ≤ \result;
+    assigns \result, __fc_fds[fd];
+    assigns \result
+      \from (indirect: fd), (indirect: __fc_fds[fd]), (indirect: offset),
+            (indirect: whence);
+    assigns __fc_fds[fd]
+      \from (indirect: fd), __fc_fds[fd], (indirect: offset),
+            (indirect: whence);
+ */
+extern off_t lseek(int fd, off_t offset, int whence);
 
 /*@ requires valid_path: valid_read_string(path);
     assigns \result;

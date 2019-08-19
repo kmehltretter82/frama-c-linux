@@ -3,7 +3,6 @@
 \newcommand{\cbopen}{\mbox{\tt \{}}
 \newcommand{\cbclose}{\mbox{\tt \}}}
 \newcommand{\cnn}{\mbox{ISO C99}}
-\newcommand{\optnoall}{\mbox{\lstinline|-rte-no-all|}}
 \newcommand{\optsigned}{\mbox{\lstinline|-rte-signed|}}
 \newcommand{\optnodowncast}{\mbox{\lstinline|-rte-no-downcast|}}
 \newcommand{\rte}{\textsf{RTE}\xspace}
@@ -790,15 +789,15 @@ annotations are not generated twice.
 
 \begin{table}
 \begin{center}
-\begin{tabular}{|l|l|p{8cm}|}
+\begin{tabular}{|l|l|p{4.5cm}|}
 \hline
 {\bf Option} & {\bf Type (Default)} & {\bf Description} \\
 \hline
 \lstinline|-warn-unsigned-overflow| & boolean (false) & Generate annotations for
-unsigned overflows (not entailed by \lstinline|-rte-all|) \\
+unsigned overflows\\
 \hline
 \lstinline|-warn-unsigned-downcast| & boolean (false) & Generate annotations for
-unsigned integer downcast (not entailed by \lstinline|-rte-all|) \\
+unsigned integer downcast\\
 \hline
 \lstinline|-warn-signed-overflow| & boolean (true) & Generate annotations for
 signed overflows \\ 
@@ -825,7 +824,7 @@ special floats are produced: infinite floats or NaN (by default), only on NaN or
 
 \begin{table}
 \begin{center}
-\begin{tabular}{|l|l|p{8cm}|}
+\begin{tabular}{|l|l|p{7cm}|}
 \hline
 {\bf Option} & {\bf Type (Default)} & {\bf Description} \\
 \hline

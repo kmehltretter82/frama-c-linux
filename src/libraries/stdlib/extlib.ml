@@ -158,18 +158,7 @@ let mapi f l =
     snd (List.fold_left (fun (i,acc) x -> (i+1,f i x :: acc)) (0,[]) l)
   in List.rev res
 
-(* Remove duplicates from a sorted list *)
-let list_unique cmp l =
-  let rec aux acc = function
-   | [] -> acc
-   | [e] -> e :: acc
-   | e1 :: (e2 :: _ as q) ->
-     if cmp e1 e2 = 0 then aux acc q else aux (e1 :: acc) q
-  in
-  List.rev (aux [] l)
-
-(* Remove once OCaml 4.02 is mandatory *)
-let sort_unique cmp l = list_unique cmp (List.sort cmp l)
+let sort_unique cmp l = List.sort_uniq cmp l
 
 let subsets k l =
   let rec aux k l len =
@@ -510,8 +499,8 @@ external compare_basic: 'a -> 'a -> int = "%compare"
 
 let compare_ignore_case s1 s2 =
   String.compare
-    (Transitioning.String.lowercase_ascii s1)
-    (Transitioning.String.lowercase_ascii s2)
+    (String.lowercase_ascii s1)
+    (String.lowercase_ascii s2)
 
 (*
 Local Variables:

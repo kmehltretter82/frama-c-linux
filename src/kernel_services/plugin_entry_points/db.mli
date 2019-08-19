@@ -1240,24 +1240,6 @@ module Pdg : sig
 end
 
 
-(** Interface for the unused code detection.
-    @see <../sparecode/index.html> internal documentation. *)
-module Sparecode : sig
-  val get: (select_annot:bool -> select_slice_pragma:bool -> Project.t) ref
-     (** Remove in each function what isn't used to compute its outputs,
-      *   or its annotations when [select_annot] is true,
-      *   or its slicing pragmas when [select_slice_pragmas] is true.
-      *  @return a new project where the sparecode has been removed.
-      *)
-  val rm_unused_globals : (?new_proj_name:string -> ?project:Project.t -> unit -> Project.t) ref
-    (** Remove  unused global types and variables from the given project
-      * (the current one if no project given).
-      * The source project is not modified.
-      * The result is in the returned new project.
-      * @modify Carbon-20110201 optional argument [new_proj_name] added
-      * *)
-end
-
 (** Signature common to some Inout plugin options. The results of
     the computations are available on a per function basis. *)
 module type INOUTKF = sig
