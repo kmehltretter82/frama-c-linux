@@ -5285,28 +5285,35 @@ let setMaxId (f: fundec) =
  * this one. If where = "^" then it is inserted first. If where = "$" then
  * it is inserted last. Otherwise where must be the name of a formal after
  * which to insert this. By default it is inserted at the end. *)
-let makeFormalVar fdec ?(where = "$") name typ : varinfo =
-  let makeit ghost name =
+let makeFormalVar fdec ?(ghost=fdec.svar.vghost) ?(where = "$") name typ : varinfo =
+  assert ((not fdec.svar.vghost) || ghost) ;
+  let makeit name =
     let vi = makeLocal ~ghost ~formal:true fdec name typ in
-    if ghost then vi.vattr <- addAttribute (Attr(frama_c_ghost, [])) vi.vattr ;
+    if ghost && not fdec.svar.vghost then
+      vi.vattr <- addAttribute (Attr(frama_c_ghost, [])) vi.vattr ;
     vi
+  in
+  let error () = Kernel.fatal ~current:true
+      "makeFormalVar: cannot find insert-after formal %s" where
   in
   (* Search for the insertion place *)
   let rec loopFormals acc = function
-    | [] when where = "$" || where = "$g" || where = "^g" ->
-      let ghost = where = "$g" || where = "^g" in
-      let vi = makeit ghost name in vi, List.rev (vi::acc)
     | [] ->
-      Kernel.fatal ~current:true
-        "makeFormalVar: cannot find insert-after formal %s" where
-    | f :: rest when f.vname = where ->
-      let vi = makeit f.vghost name in vi, List.rev_append acc (f :: vi :: rest)
-    | f :: rest when (f.vghost && where = "^g") ->
-      let vi = makeit true name in vi, List.rev_append acc (vi :: f :: rest)
+      if where = "$" || (ghost && where = "^") then
+        let vi = makeit name in vi, List.rev (vi :: acc)
+      else error ()
+    | f :: rest when not ghost && f.vghost ->
+      if where = "$" then
+        let vi = makeit name in vi, List.rev_append acc (vi :: f :: rest)
+      else error ()
+    | f :: rest when f.vname = where && f.vghost = ghost ->
+      let vi = makeit name in vi, List.rev_append acc (f :: vi :: rest)
+    | f :: rest when ghost && f.vghost && where = "^" ->
+      let vi = makeit name in vi, List.rev_append acc (vi :: f :: rest)
     | f :: rest -> loopFormals (f::acc) rest
   in
   let vi, newformals =
-    if where = "^" then let vi = makeit false name in vi, vi :: fdec.sformals
+    if where = "^" && not ghost then let vi = makeit name in vi, vi :: fdec.sformals
     else
       loopFormals [] fdec.sformals
   in

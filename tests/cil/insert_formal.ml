@@ -6,9 +6,10 @@ class visitor = object
   method! vfunc f =
     let insert_circ f = Cil.makeFormalVar f ~where:"^" "x" Cil.intType in
     let insert_dollar f = Cil.makeFormalVar f ~where:"$" "x" Cil.intType in
-    let insert_circ_g f = Cil.makeFormalVar f ~where:"^g" "x" Cil.intType in
-    let insert_dollar_g f = Cil.makeFormalVar f ~where:"$g" "x" Cil.intType in
+    let insert_circ_g f = Cil.makeFormalVar f ~ghost:true ~where:"^" "x" Cil.intType in
+    let insert_dollar_g f = Cil.makeFormalVar f ~ghost:true ~where:"$" "x" Cil.intType in
     let insert_a f = Cil.makeFormalVar f ~where:"a" "x" Cil.intType in
+    let insert_a_g f = Cil.makeFormalVar f ~ghost:true ~where:"a" "x" Cil.intType in
     let circ_list = [
       "void_circumflex" ;
       "a_circumflex" ;
@@ -31,12 +32,14 @@ class visitor = object
     ] in
     let a_list = [
       "a_a" ;
-      "ghost_a_a" ;
       "a_b_c_a" ;
       "b_a_c_a" ;
+      "a_ghost_b_c_a" ;
+    ] in
+    let a_g_list = [
+      "ghost_a_a" ;
       "all_ghost_a_b_c_a" ;
       "all_ghost_b_a_c_a" ;
-      "a_ghost_b_c_a" ;
       "b_ghost_a_c_a"
     ] in
     if List.mem f.svar.vname circ_list then ignore(insert_circ f) ;
@@ -44,6 +47,7 @@ class visitor = object
     if List.mem f.svar.vname circ_g_list then ignore(insert_circ_g f) ;
     if List.mem f.svar.vname dollar_g_list then ignore(insert_dollar_g f) ;
     if List.mem f.svar.vname a_list then ignore(insert_a f) ;
+    if List.mem f.svar.vname a_g_list then ignore(insert_a_g f) ;
     Cil.DoChildren
 end
 
