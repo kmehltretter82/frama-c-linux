@@ -1919,20 +1919,27 @@ let rec reduce_by_predicate ~alarm_mode env positive p =
           (* See comments in the code for the evaluation of Pinitialized *)
           let star_tsets = deref_tsets tsets in
           let rlocb = eval_tlval ~alarm_mode env star_tsets in
-          let size = Eval_typ.sizeof_lval_typ rlocb.etype in
-          let state = env_state env lbl_initialized in
-          let fred = match p_content with
-            | Pinitialized _ -> V_Or_Uninitialized.reduce_by_initializedness
-            | Pdangling _ -> V_Or_Uninitialized.reduce_by_danglingness
-            | _ -> assert false
-          in
-          let fred = Eval_op.reduce_by_initialized_defined (fred positive) in
-          let state_reduced =
-            let loc = make_loc rlocb.eunder size in
-            let loc = Eval_op.make_loc_contiguous loc in
-            Eval_op.apply_on_all_locs fred loc state
-          in
-          overwrite_state env state_reduced lbl_initialized
+          (* No reduction on negations of \initialized or \dangling on multiple
+             locations: at least one of them is non initialized/dangling, but
+             which one? Reduction would only be possible in the rare case where
+             only one of the locations might be non initialized/dangling. *)
+          if not (positive || Location_Bits.cardinal_zero_or_one rlocb.eover)
+          then env
+          else
+            let size = Eval_typ.sizeof_lval_typ rlocb.etype in
+            let state = env_state env lbl_initialized in
+            let fred = match p_content with
+              | Pinitialized _ -> V_Or_Uninitialized.reduce_by_initializedness
+              | Pdangling _ -> V_Or_Uninitialized.reduce_by_danglingness
+              | _ -> assert false
+            in
+            let fred = Eval_op.reduce_by_initialized_defined (fred positive) in
+            let state_reduced =
+              let loc = make_loc rlocb.eunder size in
+              let loc = Eval_op.make_loc_contiguous loc in
+              Eval_op.apply_on_all_locs fred loc state
+            in
+            overwrite_state env state_reduced lbl_initialized
         with LogicEvalError _ -> env
       end
 
