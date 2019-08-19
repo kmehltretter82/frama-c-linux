@@ -155,7 +155,7 @@ val register_sig : ('a,'b) signature -> (rq -> 'a -> 'b) -> unit
         ----------------------------------------------------------------------
         Request.result           { f: a  }    'a (* shall be set by process *)
         Request.result ~default  { f: a  }    'a (* defined by default *)
-        Request.param_opt        { f: a? }    'a option
+        Request.result_opt       { f: a? }    'a option
 
     ]
 

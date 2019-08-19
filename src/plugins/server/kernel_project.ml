@@ -110,13 +110,13 @@ let () = Request.register ~page
 
 let () = Request.register ~page
     ~kind:`SET ~name:"kernel.project.setOn"
-    ~descr:(Md.rm "Execute a GET request within the given project")
+    ~descr:(Md.rm "Execute a SET request within the given project")
     ~input:(module ProjectRequest) ~output:(module Jany)
     (ProjectRequest.process `SET)
 
 let () = Request.register ~page
     ~kind:`EXEC ~name:"kernel.project.execOn"
-    ~descr:(Md.rm "Execute a GET request within the given project")
+    ~descr:(Md.rm "Execute an EXEC request within the given project")
     ~input:(module ProjectRequest) ~output:(module Jany)
     (ProjectRequest.process `EXEC)
 
