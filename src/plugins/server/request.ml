@@ -51,8 +51,6 @@ type 'a output = (module Output with type t = 'a)
 (* --- Sanity Checks                                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
-module STR = Transitioning.String
-
 let re_set = Str.regexp_string_case_fold "SET"
 let re_get = Str.regexp_case_fold "\\(GET\\|PRINT\\)"
 let re_exec = Str.regexp_case_fold "\\(EXEC\\|COMPUTE\\)"
@@ -67,8 +65,8 @@ let check_name name =
       "Request %S is not a dot-separated list of (camlCased) identifiers" name
 
 let check_plugin plugin name =
-  let p = STR.lowercase_ascii plugin in
-  let n = STR.lowercase_ascii name in
+  let p = String.lowercase_ascii plugin in
+  let n = String.lowercase_ascii name in
   let k = String.length plugin in
   if not (String.length name > k &&
           String.sub n 0 k = p &&
@@ -76,7 +74,7 @@ let check_plugin plugin name =
   then
     Senv.warning ~wkey:wpage
       "Request '%s' shall be named « %s.* »"
-      name (STR.capitalize_ascii plugin)
+      name (String.capitalize_ascii plugin)
 
 let check_page page name =
   match Doc.chapter page with

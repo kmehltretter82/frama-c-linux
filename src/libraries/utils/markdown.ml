@@ -121,7 +121,7 @@ type href = [
   | `Section of string * string
 ]
 
-let filepath m = Transitioning.String.split_on_char '/' m
+let filepath m = String.split_on_char '/' m
 
 let rec relative source target =
   match source , target with
@@ -134,7 +134,7 @@ let lnk target =
 
 let id m =
   let buffer = Buffer.create (String.length m) in
-  let lowercase = Transitioning.Char.lowercase_ascii in
+  let lowercase = Char.lowercase_ascii in
   let dash = ref false in
   let emit c =
     if !dash then (Buffer.add_char buffer '-' ; dash := false) ;
@@ -220,7 +220,7 @@ let code ?(lang="") pp fmt =
     let bfmt = Format.formatter_of_buffer buffer in
     pp bfmt ; Format.pp_print_flush bfmt () ;
     let content = Buffer.contents buffer in
-    let lines = Transitioning.String.split_on_char '\n' content in
+    let lines = String.split_on_char '\n' content in
     let rec clean = function [] -> [] | ""::w -> clean w | w -> w in
     List.iter
       (fun l -> Format.fprintf fmt "@\n%s" l)

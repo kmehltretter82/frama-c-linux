@@ -97,7 +97,7 @@ let _ = page `Protocol ~title:"Architecture" ~filename:"server.md"
 let title_of_chapter = function
   | `Protocol -> "Server Protocols"
   | `Kernel -> "Kernel Services"
-  | `Plugin name -> "Plugin " ^ Transitioning.String.capitalize_ascii name
+  | `Plugin name -> "Plugin " ^ String.capitalize_ascii name
 
 let pages_of_chapter c =
   let w = ref [] in

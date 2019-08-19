@@ -22,12 +22,11 @@
 
 (* -------------------------------------------------------------------------- *)
 
-module STR = Transitioning.String
 module Senv = Server_parameters
 
 let check_plugin plugin name =
-  let p = STR.lowercase_ascii plugin in
-  let n = STR.lowercase_ascii name in
+  let p = String.lowercase_ascii plugin in
+  let n = String.lowercase_ascii name in
   let k = String.length plugin in
   if not (String.length name > k &&
           String.sub n 0 k = p &&
