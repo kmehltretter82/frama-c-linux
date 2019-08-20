@@ -63,7 +63,8 @@ val interv_of_typ: Cil_types.typ -> Ival.t
 (** @return the smallest interval which contains the given C type.
     @raise Is_a_real if the given type is a float type.
       (* TODO: also return is_real=true if ty=Real.t *)
-    @raise Not_a_number if the given type does not represent numbers. *)
+    (* TODO RATIONAL: why not returning [-\infty; +\infty]? *)
+    @raise Not_a_number if the given type does not represent any number. *)
 
 (* ************************************************************************** *)
 (** {3 Environment for interval computations} *)
@@ -85,8 +86,10 @@ end
 val infer: Cil_types.term -> Ival.t
 (** [infer t] infers the smallest possible integer interval which the values
     of the term can fit in.
-    @raise Is_a_real if the term is a float or a real
-    @raise Not_a_number if the term does not represent a number. *)
+    @raise Is_a_real if the term is either a float or a real.
+(*  TODO RATIONAL: why raising Is_a_real since Eva is able to infer such *)
+    intervals?
+    @raise Not_a_number if the term does not represent any number. *)
 
 (*
 Local Variables:

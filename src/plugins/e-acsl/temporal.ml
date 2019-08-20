@@ -284,7 +284,7 @@ end = struct
     let rhs = Cil.new_exp ~loc (Lval ret) in
     let vals = assign ret rhs loc in
     (* Track referent numbers of assignments via function calls.
-       Realary functions (i.e., with no source code available) that return
+       Library functions (i.e., with no source code available) that return
        values are considered to be functions that allocate memory. They are
        considered so because they need to be handled exactly as memory
        allocating functions, that is, the referent of the returned pointer is

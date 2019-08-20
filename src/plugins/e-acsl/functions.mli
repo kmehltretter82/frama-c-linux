@@ -61,7 +61,7 @@ module RTL: sig
 
   val is_rtl_name: string -> bool
   (** @return [true] if the prefix of the given name indicates that it
-      belongs to the public API of the E-ACSL Runtime Realary *)
+      belongs to the public API of the E-ACSL Runtime Library *)
 
   val is_generated_literal_string_name: string -> bool
   (** Same as [is_generated_name] but indicates that the name represents a local

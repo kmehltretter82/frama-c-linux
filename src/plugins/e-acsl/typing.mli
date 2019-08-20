@@ -86,8 +86,7 @@ val join: number_ty -> number_ty -> number_ty
 (** {!number_ty} is a join-semi-lattice if you do not consider [Other]. If
     there is no [Other] in argument, this function computes the join of this
     semi-lattice. If one of the argument is {!Other}, the function assumes that
-    the other argument is also {!Other}. In this case, the result is [Other].
-    TODO: is now extended to support reals *)
+    the other argument is also {!Other}. In this case, the result is [Other]. *)
 
 (******************************************************************************)
 (** {2 Typing} *)
