@@ -613,6 +613,53 @@ let eval_logic_charchr builtin env s c ldeps_s ldeps_c =
   let ldeps = join_logic_deps ldeps_s ldeps_c in
   { etype; ldeps; eover; empty = false; eunder }
 
+(* Evaluates the logical functions memchr_off/wmemchr_off. *)
+let eval_logic_memchr_off builtin env s c n ldeps_s ldeps_c ldeps_n =
+  let max_bounds =
+    try
+      Ival.max_int (Cvalue.V.project_ival n)
+    with Cvalue.V.Not_based_on_null | Error_Bottom -> None
+  in
+  let v_bounds =
+    Cvalue.V.inject_ival (Ival.inject_range (Some Int.zero) (Extlib.opt_map Int.pred max_bounds))
+  in
+  let eover =
+    match builtin (env_current_state env) [s; c; n] with
+    | None, _ -> v_bounds
+    | Some offsm, alarms ->
+      if alarms
+      then v_bounds
+      else
+        begin
+          let normalized_v =
+            let v = Extlib.the (Cvalue.V_Offsetmap.single_interval_value offsm) in
+            let r = Cvalue.V_Or_Uninitialized.get_v v in
+            try
+              let ir = Cvalue.V.project_ival r in
+              match Ival.max_int ir with
+              | None -> v_bounds
+              | Some m ->
+                let normalized_i =
+                  match max_bounds with
+                  | Some n ->
+                    if Int.(equal m n) then
+                      Ival.join (Ival.inject_singleton (Int.pred m)) ir
+                    else ir
+                  | None -> ir
+                in
+                Cvalue.V.inject_ival normalized_i
+            with
+            | Cvalue.V.Not_based_on_null -> v_bounds
+          in
+          Cvalue.V.meet normalized_v v_bounds
+        end
+  in
+  let eunder = under_from_over eover in
+  let etype = Cil.intType in
+  let ldeps = join_logic_deps ldeps_s (join_logic_deps ldeps_c ldeps_n) in
+  { etype; ldeps; eover; eunder }
+
+
 (* Evaluates the logical predicate is_allocable, according to the following
    logic:
    - if the size to allocate is always too large (> SIZE_MAX), allocation fails;
@@ -682,6 +729,8 @@ let known_logic_funs = [
   "wcslen", Libc;
   "strchr", Libc;
   "wcschr", Libc;
+  "memchr_off", Libc;
+  "wmemchr_off", Libc;
   "atan2", ACSL;
   "atan2f", ACSL;
   "pow", ACSL;
@@ -1303,6 +1352,17 @@ and eval_known_logic_function ~alarm_mode env li labels args =
       else Builtins_string.frama_c_wcslen_wrapper
     in
     eval_logic_charlen builtin { env with e_cur = lbl } r.eover r.ldeps
+
+  | ("memchr_off" | "wmemchr_off") as b,  _, [lbl], [arg_s; arg_c; arg_n] ->
+    let s = eval_term ~alarm_mode env arg_s in
+    let c = eval_term ~alarm_mode env arg_c in
+    let n = eval_term ~alarm_mode env arg_n in
+    let builtin =
+      if b = "memchr_off" then Builtins_string.frama_c_memchr_off_wrapper
+      else Builtins_string.frama_c_wmemchr_off_wrapper
+    in
+    eval_logic_memchr_off builtin
+      { env with e_cur = lbl } s.eover c.eover n.eover s.ldeps c.ldeps n.ldeps
 
   | ("strchr" | "wcschr") as b,  _, [lbl], [arg_s; arg_c] ->
     let s = eval_term ~alarm_mode env arg_s in
