@@ -48,7 +48,7 @@ module DepthLimit = Int
       let option_name = "-dive-depth-limit"
       let help = "Build dependencies up to a depth of N."
       let arg_name = "N"
-      let default = 3
+      let default = 2
     end)
 
 module FromFunctionAlarms = Kernel_function_set
