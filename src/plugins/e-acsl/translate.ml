@@ -69,7 +69,7 @@ type strnum =
   | C_number      (* integers AND floats) included *)
 
 (* convert [e] in a way that it is compatible with the given typing context. *)
-let add_cast ~loc ?name env ctx sty t_opt e =
+let add_cast ~loc ?name env ctx strnum t_opt e =
   let mk_mpz e =
     let _, e, env = Env.new_var
       ~loc
@@ -81,7 +81,7 @@ let add_cast ~loc ?name env ctx sty t_opt e =
     in
     e, env
   in
-  let e, env = match sty with
+  let e, env = match strnum with
     | Str_Z -> mk_mpz e
     | Str_R -> Real.mk_real ~loc ?name e env t_opt
     | C_number -> e, env
@@ -103,9 +103,9 @@ let add_cast ~loc ?name env ctx sty t_opt e =
            also possible to get a non integralType (or Gmp.z_t) with a non-one in
            the case of \null *)
         let e =
-          if Cil.isIntegralType ty || sty = Str_Z then
+          if Cil.isIntegralType ty || strnum = Str_Z then
             e
-          else if not (Cil.isIntegralType ty) && sty = C_number then
+          else if not (Cil.isIntegralType ty) && strnum = C_number then
             Cil.mkCast e Cil.longType (* \null *)
           else (* Remaining: not (Cil.isIntegralType ty) && sty = StrR *)
             assert false
@@ -116,7 +116,7 @@ let add_cast ~loc ?name env ctx sty t_opt e =
       else Real.mk_real ~loc ?name e env t_opt
     else
       (* handle a C-integer context *)
-      if Gmp.Z.is_t ty || sty = Str_Z then
+      if Gmp.Z.is_t ty || strnum = Str_Z then
         (* we get an mpz, but it fits into a C integer: convert it *)
         let fname, new_ty =
           if Cil.isSignedInteger ctx then
@@ -134,7 +134,7 @@ let add_cast ~loc ?name env ctx sty t_opt e =
             (fun v _ -> [ Misc.mk_call ~loc ~result:(Cil.var v) fname [ e ] ])
         in
         e, env
-      else if Real.is_t ty || sty = Str_R then
+      else if Real.is_t ty || strnum = Str_R then
         Real.add_cast ~loc ?name e env ctx
       else
         Cil.mkCastT ~force:false ~e ~oldt:ty ~newt:ctx, env
