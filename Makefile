@@ -451,7 +451,8 @@ LIB_CMO =\
 	src/libraries/utils/leftistheap \
 	src/libraries/stdlib/integer \
 	src/libraries/utils/json \
-	src/libraries/utils/rich_text
+	src/libraries/utils/rich_text \
+	src/libraries/utils/dotgraph
 
 NON_OPAQUE_DEPS+=\
   src/libraries/datatype/unmarshal_z \
