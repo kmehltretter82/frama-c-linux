@@ -20,7 +20,49 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Helper for Printing Dot-graphs *)
+(** Helper for Printing Dot-graphs.
+
+    This module provides smart-constructors for constructing Dot input
+    files. Basically, a [dot] object is a buffer to a [<file.dot>] on
+    disk where smart constructors write Dot statements.
+
+    Once the [<file.dot>] has been created, it is possible to layout it
+    by running the [dot] command with various engines.
+
+    Typically, let say you have a graph with nodes of type
+    [M.elt] with [M : Map.S] and assumes the graph is stored
+    as a map [graph : M.elt list M.t] with [roots : M.elt list]
+    then you can use:
+
+    {[
+      let module G = Dotgraph in
+      let module N = G.Node(M) in
+      begin
+        let dot = G.open_dot ~name:"mygraph" () in
+        (* For each generated node, declare it and link to its children. *)
+        N.push dot
+          (fun a ->
+             let na = N.inode dot a in
+             try
+               List.iter
+                 (fun b -> G.link dot na (N.get b))
+                 (M.find a graph)
+             with Not_found -> ()) ;
+        (* Starts by emitting roots *)
+        List.iter
+          (fun r -> ignore (N.get r))
+          roots ;
+        (* Proceeds to the traversal *)
+        G.pop_all dot ;
+        (* You may then complete your graph
+           with other decorations after the traversal... *)
+        G.close dot ;
+        (* Now call the layout engine, if installed. *)
+        G.layout dot ~format:"pdf" () ;
+      end
+    ]}
+
+*)
 
 open Pretty_utils
 
@@ -168,7 +210,7 @@ sig
   val add : key -> 'a -> 'a t -> 'a t
 end
 
-(** Lazily associates a node to any element *)
+(** Lazily associates a node to any element. *)
 module Node(M : Map) :
 sig
   type t = M.key
@@ -179,9 +221,15 @@ sig
   val irecord : dot -> t -> ?rounded:bool -> ?attr:attr list -> record -> node
   val clear : unit -> unit
 
-  (** Execute the callback {i once} for all created nodes.
+  (** Executes the callback {i once} for all created nodes.
       Any previously registered callback by [once] or [push] is replaced
-      by the new one. *)
+      by the new one.
+
+      {b Warning:} the callback is executed as soon as [get] is called
+      for the first time, possibly interfering with your current output
+      on a [dot] buffer. To insert additional Dot material with a callback,
+      use [push] instead.
+  *)
   val once : (t -> node -> unit) -> unit
 
   (** Pushes the callback {i once} for all created nodes.
@@ -195,18 +243,19 @@ sig
   val prefix : string -> unit
 end
 
-(** Register a continuation to be executed later *)
+(** Register a continuation to be executed later. *)
 val push : dot -> (unit -> unit) -> unit
 
-(** Flushes all pending continuations *)
+(** Flushes all pending continuations. *)
 val pop_all : dot -> unit
 
 (** {1 Decorator} *)
 
 (** A text buffer to compose labels and attributes.
-    You may add text and attributes to the buffer, and finally
-    flush it by calling [attributes] on it.
-    Any text material will be output into a single [`Label] attribute. *)
+    You can add text and attributes to the buffer, and finally
+    flush it by calling [attributes].
+    A single [`Label] attribute is finally emitted with
+    all the added text (if non-empty). *)
 type buffer
 
 (** Create a buffer initialized with the given attributes. *)
