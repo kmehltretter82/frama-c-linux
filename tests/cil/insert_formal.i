@@ -102,3 +102,40 @@ void a_ghost_b_c_a ( int a )/*@ ghost (int b, int c) */ {
 void b_ghost_a_c_a ( int b )/*@ ghost (int a, int c) */ {
 
 }
+
+/*@ ghost
+  //                     v
+  void g_void_circumflex( void ) {
+
+  }
+
+  //                      v
+  void g_void_dollar( void ) {
+
+  }
+
+  //                  v
+  void g_a_circumflex( int a ) {
+
+  }
+
+  //                    v
+  void g_a_dollar( int a ) {
+
+  }
+
+  //               v
+  void g_a_a( int a ){
+
+  }
+
+  //                    v
+  void g_a_b_c_a (int a, int b, int c) {
+
+  }
+
+  //                           v
+  void g_b_a_c_a (int b, int a, int c) {
+
+  }
+*/
