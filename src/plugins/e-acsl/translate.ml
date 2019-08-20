@@ -71,17 +71,19 @@ type strnum =
 (* convert [e] in a way that it is compatible with the given typing context. *)
 let add_cast ~loc ?name env ctx strnum t_opt e =
   let mk_mpz e =
-    let _, e, env = Env.new_var
-      ~loc
-      ?name
-      env
-      t_opt
-      (Gmp.Z.t ())
-      (fun lv v -> [ Gmp.init_set ~loc (Cil.var lv) v e ])
+    let _, e, env =
+      Env.new_var
+        ~loc
+        ?name
+        env
+        t_opt
+        (Gmp.Z.t ())
+        (fun lv v -> [ Gmp.init_set ~loc (Cil.var lv) v e ])
     in
     e, env
   in
   let e, env = match strnum with
+    (* TODO RATIONAL: make this matching consistent *)
     | Str_Z -> mk_mpz e
     | Str_R -> Real.mk_real ~loc ?name e env t_opt
     | C_number -> e, env
@@ -91,6 +93,9 @@ let add_cast ~loc ?name env ctx strnum t_opt e =
     e, env
   | Some ctx ->
     let ty = Cil.typeOf e in
+    (* TODO RATIONAL:
+       spaghetti code below. Would be nice to be improved (or at least
+       more commented) ==> boolean pattern matching? *)
     if Gmp.Z.is_t ctx then
       if Gmp.Z.is_t ty then
         e, env
@@ -98,17 +103,20 @@ let add_cast ~loc ?name env ctx strnum t_opt e =
         Real.cast_to_z ~loc ?name e env
       else
         (* Convert the C integer into a mpz.
-           Remember: very long integer constants have been temporary converted
-           into strings;
-           also possible to get a non integralType (or Gmp.z_t) with a non-one in
+           Remember:
+           - very long constants have been temporary converted into strings;
+           - possible to get a non integral type (or Gmp.z_t) with a non-one in
            the case of \null *)
         let e =
           if Cil.isIntegralType ty || strnum = Str_Z then
             e
           else if not (Cil.isIntegralType ty) && strnum = C_number then
             Cil.mkCast e Cil.longType (* \null *)
-          else (* Remaining: not (Cil.isIntegralType ty) && sty = StrR *)
-            assert false
+          else
+            (* TODO RATIONAL: this case seems to be possible:
+               getting a very long rational constants (so a string) to be casted
+               to an integer *)
+            assert (not (Cil.isIntegralType ty) && sty = Str_R)
         in
         mk_mpz e
     else if Real.is_t ctx then
@@ -152,12 +160,17 @@ let constant_to_exp ~loc t c =
        | Typing.Nan ->
          assert false
        | Typing.Real ->
+         (* TODO RATIONAL:
+            - is it possible?
+            - why converting the integer to a string? *)
          mk_real (Integer.to_string n)
        | Typing.Gmpz ->
          raise Cil.Not_representable
        | Typing.C_type kind ->
          let cast = Typing.get_cast t in
          match cast, kind with
+         (* TODO RATIONAL: why are the two first cases not the same?
+            (exception vs builder) *)
          | Some ty, (ILongLong | IULongLong) when Gmp.Z.is_t ty ->
            raise Cil.Not_representable
          | Some ty, (ILongLong | IULongLong) when Real.is_t ty ->
@@ -202,6 +215,7 @@ let conditional_to_exp ?(name="if") loc t_opt e1 (e2, env2) (e3, env3) =
           let lv = Cil.var v in
           let ty = Cil.typeOf ev in
           let init_set =
+            (* TODO RATIONAL: how is it possible to get a real here? *)
             if Real.is_t ty then Real.init_set else Gmp.init_set
           in
           let affect e = init_set ~loc lv ev e in
@@ -301,8 +315,8 @@ and context_insensitive_term_to_exp kf env t =
       let zero = Logic_const.tinteger 0 in
       let ctx = Typing.get_number_ty t in
       Typing.type_term ~use_gmp_opt:true ~ctx zero;
-      let e, env = comparison_to_exp
-          kf ~loc ~name:"not" env Typing.gmpz Eq t zero (Some t)
+      let e, env =
+        comparison_to_exp kf ~loc ~name:"not" env Typing.gmpz Eq t zero (Some t)
       in
       e, env, C_number, ""
     else if Real.is_t ty then
@@ -331,6 +345,7 @@ and context_insensitive_term_to_exp kf env t =
     if Logic_typing.is_integral_type t.term_type then
       Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)), env, C_number, ""
     else
+      (* TODO RATIONAL: why question mark? *)
       not_yet env "floating-point context (?)"
   | TBinOp(Div | Mod as bop, t1, t2) ->
     let ty = Typing.get_typ t in
@@ -379,6 +394,7 @@ and context_insensitive_term_to_exp kf env t =
     if Logic_typing.is_integral_type t.term_type then
       Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)), env, C_number, ""
     else
+      (* TODO RATIONAL: why question mark? *)
       not_yet env "floating-point context (?)"
   | TBinOp(Lt | Gt | Le | Ge | Eq | Ne as bop, t1, t2) ->
     (* comparison operators *)
@@ -633,8 +649,8 @@ and at_to_exp_no_lscope env t_opt label e =
   let o = object
     inherit Visitor.frama_c_inplace
     method !vstmt_aux stmt =
-      (* either a standard C affectation or something else according to type of
-         [e] *)
+      (* either a standard C affectation or a call to an initializer according
+         to the type of [e] *)
       let ty = Cil.typeOf e in
       let init_set = if Real.is_t ty then Real.init_set else Gmp.init_set in
       let new_stmt = init_set ~loc (Cil.var res_v) res e in
