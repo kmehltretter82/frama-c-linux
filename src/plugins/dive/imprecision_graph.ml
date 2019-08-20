@@ -22,7 +22,7 @@
 
 open Graph_types
 
-module Vertex =
+module Node =
 struct
   type t = node
   let compare v1 v2 = v1.node_key - v2.node_key
@@ -30,12 +30,12 @@ struct
   let equal v1 v2 = v1.node_key = v2.node_key
 end
 
-module Edge =
+module Dependency =
 struct
   type t = dependency
   let compare e1 e2 = e1.dependency_key - e2.dependency_key
-  let _hash e = e.dependency_key
-  let _equal e1 e2 = e1.dependency_key = e2.dependency_key
+  let hash e = e.dependency_key
+  let equal e1 e2 = e1.dependency_key = e2.dependency_key
   let default = {
     dependency_key = -1;
     dependency_kind = Data;
@@ -43,22 +43,22 @@ struct
   }
 end
 
-module G = Graph.Imperative.Digraph.ConcreteBidirectionalLabeled (Vertex) (Edge)
+module G =
+  Graph.Imperative.Digraph.ConcreteBidirectionalLabeled (Node) (Dependency)
 include G
 
-let next_node_key = ref 0
-let next_dependency_key = ref 0
+let next_key = ref 0
 
 let create_node ?node_values ~node_kind ~node_locality g =
   let node = {
-    node_key = !next_node_key;
+    node_key = !next_key;
     node_kind;
     node_locality;
     node_values;
     node_deps_computed = false;
   }
   in
-  incr next_node_key;
+  incr next_key;
   add_vertex g node;
   node
 
@@ -104,12 +104,12 @@ let create_dependency ~allow_folding g v1 dependency_kind v2 =
     e.dependency_multiple <- true
   | None ->
     let e = {
-      dependency_key = !next_dependency_key;
+      dependency_key = !next_key;
       dependency_kind;
       dependency_multiple = false;
     }
     in
-    incr next_dependency_key;
+    incr next_key;
     add_edge_e g (v1,e,v2)
 
 

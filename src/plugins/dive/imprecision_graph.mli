@@ -22,7 +22,13 @@
 
 open Graph_types
 
-include Graph.Sig.G with type V.t = node
+include Graph.Sig.G
+  with type V.t = node
+   and type E.t = node * dependency * node
+
+module Node : Graph.Sig.COMPARABLE with type t = node
+
+module Dependency : Graph.Sig.COMPARABLE with type t = dependency
 
 val create : ?size:int -> unit -> t
 

@@ -198,13 +198,19 @@ type t = {
 let get_node context node_key =
   VertexTable.find context.vertex_table node_key
 
+let update_node context node =  
+  if
+    not (List.exists (Graph.Node.equal node) context.graph_diff.added_nodes)
+  then
+    context.graph_diff <- {
+      context.graph_diff with
+      added_nodes = node :: context.graph_diff.added_nodes
+    }
+
 let add_node context ~node_kind ~node_locality =
   let node = Graph.create_node context.graph ~node_kind ~node_locality in
   VertexTable.add context.vertex_table node.node_key node;
-  context.graph_diff <- {
-    context.graph_diff with
-    added_nodes = node :: context.graph_diff.added_nodes
-  };
+  update_node context node;
   node
 
 let _remove_node context node =
@@ -438,6 +444,7 @@ let build_node_deps context node =
       Graph.create_dependency ~allow_folding context.graph dst kind node
 
   in
+  update_node context node;
   let callstack = node.node_locality.loc_callstack in
   match node.node_kind with
   | Scalar (vi,_typ,offset) ->
