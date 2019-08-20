@@ -112,11 +112,13 @@ let add_cast ~loc ?name env ctx strnum t_opt e =
             e
           else if not (Cil.isIntegralType ty) && strnum = C_number then
             Cil.mkCast e Cil.longType (* \null *)
-          else
+          else begin
             (* TODO RATIONAL: this case seems to be possible:
                getting a very long rational constants (so a string) to be casted
                to an integer *)
-            assert (not (Cil.isIntegralType ty) && sty = Str_R)
+            assert (not (Cil.isIntegralType ty) && strnum = Str_R);
+            assert false
+          end
         in
         mk_mpz e
     else if Real.is_t ctx then
