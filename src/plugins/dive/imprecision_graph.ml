@@ -267,12 +267,20 @@ struct
       ("label", Json.of_string label) ;
       ("kind", output_node_kind node.node_kind) ;
       ("locality", output_node_locality node.node_locality) ;
-      ("explored", Json.of_bool node.node_deps_computed)
+      ("explored", Json.of_bool node.node_deps_computed) ;
     ] @
-        match node.node_values with
-        | None -> []
-        | Some node_values -> [("values", output_node_values node_values)]
-      )
+        begin match node.node_values with
+          | None -> []
+          | Some node_values -> [("values", output_node_values node_values)]
+        end
+        @
+        begin match Node_kind.to_lval node.node_kind with
+          | None -> []
+          | Some lval ->
+            let typ = Cil.typeOfLval lval in
+            let str = Pretty_utils.to_string Cil_printer.pp_typ typ in
+            [("type", Json.of_string str)]
+        end)
 
   let output_dep (n1,dep,n2) =
     Json.of_fields [
