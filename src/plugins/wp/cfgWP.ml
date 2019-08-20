@@ -789,7 +789,7 @@ struct
   let rec cc_case_values ks vs sigma = function
     | [] -> ks , vs
     | e::es ->
-        match Ctypes.get_int e with
+        match Ctypes.get_int64 e with
         | Some k ->
             cc_case_values (k::ks) (F.e_int64 k::vs) sigma es
         | None ->

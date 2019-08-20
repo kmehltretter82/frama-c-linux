@@ -86,63 +86,42 @@ let compute_ip cc ip =
 (* --- Annotations Entry Point                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
-type functions =
-  | F_All
-  | F_List of Cil_datatype.Kf.Set.t
-  | F_Skip of Cil_datatype.Kf.Set.t
-
-let iter_kf phi = function
-  | None -> Globals.Functions.iter phi
-  | Some kf -> phi kf
-
-let iter_fct phi = function
-  | F_All -> Globals.Functions.iter phi
-  | F_Skip fs ->
-      Globals.Functions.iter
-        (fun kf -> if not (Cil_datatype.Kf.Set.mem kf fs) then phi kf)
-  | F_List fs -> Cil_datatype.Kf.Set.iter phi fs
-
 let add_kf cc ?bhv ?prop kf =
   let model = cc#model in
   let assigns = WpAnnot.WithAssigns in
   List.iter cc#add_strategy
     (WpAnnot.get_function_strategies ~model ~assigns ?bhv ?prop kf)
 
+let add_lemmas cc = function
+  | None | Some[] ->
+      LogicUsage.iter_lemmas
+        (fun lem ->
+           let idp = WpPropId.mk_lemma_id lem in
+           if WpAnnot.filter_status idp then cc#add_lemma lem)
+  | Some ps ->
+      if List.mem "-@lemmas" ps then ()
+      else LogicUsage.iter_lemmas
+          (fun lem ->
+             let idp = WpPropId.mk_lemma_id lem in
+             if WpAnnot.filter_status idp && WpPropId.select_by_name ps idp
+             then cc#add_lemma lem)
+
 let compute_kf cc ?kf ?bhv ?prop () =
   begin
-    iter_kf (add_kf cc ?bhv ?prop) kf ;
+    Extlib.may (add_kf cc ?bhv ?prop) kf ;
     cc#compute
   end
 
-let do_lemmas = function F_All | F_Skip _ -> true | F_List _ -> false
-
-let compute_selection cc ?(fct=F_All) ?bhv ?prop () =
+let compute_selection cc ?(fct=Wp_parameters.Fct_all) ?bhv ?prop () =
   begin
-    if do_lemmas fct then
-      begin
-        match prop with
-        | None | Some[] ->
-            LogicUsage.iter_lemmas
-              (fun lem ->
-                 let idp = WpPropId.mk_lemma_id lem in
-                 if WpAnnot.filter_status idp then cc#add_lemma lem)
-        | Some ps ->
-            if List.mem "-@lemmas" ps then ()
-            else LogicUsage.iter_lemmas
-                (fun lem ->
-                   let idp = WpPropId.mk_lemma_id lem in
-                   if WpAnnot.filter_status idp && WpPropId.select_by_name ps idp
-                   then cc#add_lemma lem)
-      end ;
-    iter_fct (add_kf cc ?bhv ?prop) fct ;
+    add_lemmas cc prop ;
+    Wp_parameters.iter_fct (add_kf cc ?bhv ?prop) fct ;
     cc#compute
   end
-
-(* -------------------------------------------------------------------------- *)
-(* --- Calls Entry Point                                                  --- *)
-(* -------------------------------------------------------------------------- *)
 
 let compute_call cc stmt =
   let model = cc#model in
   List.iter cc#add_strategy (WpAnnot.get_call_pre_strategies ~model stmt) ;
   cc#compute
+
+(* -------------------------------------------------------------------------- *)

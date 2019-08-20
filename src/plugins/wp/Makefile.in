@@ -67,10 +67,12 @@ PLUGIN_CMO:= \
 	dyncall ctypes clabels \
 	MemoryContext \
 	LogicUsage RefUsage \
+	Layout Region \
+	RegionAnnot RegionAccess RegionDump RegionAnalysis \
 	cil2cfg normAtLabels wpPropId mcfg \
 	Context Warning Model Lang Repr Matrix Passive Splitter \
 	LogicBuiltins Definitions \
-	Cmath Cint Cfloat Vset Vlist Region Cstring Cvalues \
+	Cmath Cint Cfloat Vset Vlist Cstring Cvalues \
 	Letify Cleaning \
 	Sigs Mstate Conditions \
 	Filtering \

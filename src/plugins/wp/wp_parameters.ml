@@ -105,23 +105,6 @@ module Properties =
     end)
 let () = on_reset Properties.clear
 
-type job =
-  | WP_None
-  | WP_All
-  | WP_SkipFct of Cil_datatype.Kf.Set.t
-  | WP_Fct of Cil_datatype.Kf.Set.t
-
-let job () =
-  if WP.get () || not (Functions.is_empty()) ||
-     not (Behaviors.is_empty()) || not (Properties.is_empty())
-  then
-    if Functions.is_empty() then
-      if SkipFunctions.is_empty () then WP_All
-      else WP_SkipFct (SkipFunctions.get())
-    else
-      WP_Fct (Cil_datatype.Kf.Set.diff (Functions.get()) (SkipFunctions.get()))
-  else WP_None
-
 let () = Parameter_customize.set_group wp_generation
 module StatusAll =
   False(struct
@@ -149,6 +132,42 @@ module StatusMaybe =
     let option_name = "-wp-status-maybe"
     let help = "Select properties with status 'Maybe'."
   end)
+
+(* ------------------------------------------------------------------------ *)
+(* --- Selected Functions                                               --- *)
+(* ------------------------------------------------------------------------ *)
+
+module Fct = Cil_datatype.Kf.Set
+
+type functions =
+  | Fct_none
+  | Fct_all
+  | Fct_skip of Fct.t
+  | Fct_list of Fct.t
+
+let iter_fct phi = function
+  | Fct_none -> ()
+  | Fct_all -> Globals.Functions.iter phi
+  | Fct_skip fs ->
+      Globals.Functions.iter
+        (fun kf -> if not (Fct.mem kf fs) then phi kf)
+  | Fct_list fs -> Fct.iter phi fs
+
+let get_kf () =
+  if Functions.is_empty() then
+    if SkipFunctions.is_empty () then Fct_all
+    else Fct_skip (SkipFunctions.get())
+  else
+    Fct_list (Fct.diff (Functions.get()) (SkipFunctions.get()))
+
+let get_wp () =
+  if WP.get () || not (Functions.is_empty()) ||
+     not (Behaviors.is_empty()) || not (Properties.is_empty())
+  then get_kf ()
+  else Fct_none
+
+let iter_wp f = iter_fct f (get_wp ())
+let iter_kf f = iter_fct f (get_kf ())
 
 (* ------------------------------------------------------------------------ *)
 (* ---  Memory Models                                                   --- *)
@@ -245,6 +264,83 @@ module Volatile =
     let help = "Sound modeling of volatile access.\n\
                 Use -wp-no-volatile to ignore volatile attributes."
   end)
+
+(* -------------------------------------------------------------------------- *)
+(* --- Region Model                                                       --- *)
+(* -------------------------------------------------------------------------- *)
+
+let wp_region = add_group "Region Analysis"
+
+let () = Parameter_customize.set_group wp_region
+let () = Parameter_customize.do_not_save ()
+module Region =
+  False
+    (struct
+      let option_name = "-wp-region"
+      let help = "Perform Region Analysis (experimental)"
+    end)
+
+let () = Parameter_customize.set_group wp_region
+let () = Parameter_customize.do_not_save ()
+module Region_fixpoint =
+  True
+    (struct
+      let option_name = "-wp-region-fixpoint"
+      let help = "Compute region aliasing fixpoint"
+    end)
+
+let () = Parameter_customize.set_group wp_region
+let () = Parameter_customize.do_not_save ()
+module Region_cluster =
+  True
+    (struct
+      let option_name = "-wp-region-cluster"
+      let help = "Compute region clustering fixpoint"
+    end)
+
+let () = Parameter_customize.set_group wp_region
+let () = Parameter_customize.do_not_save ()
+module Region_inline =
+  True
+    (struct
+      let option_name = "-wp-region-inline"
+      let help = "Inline aliased sub-clusters"
+    end)
+
+let () = Parameter_customize.set_group wp_region
+let () = Parameter_customize.do_not_save ()
+module Region_rw =
+  True
+    (struct
+      let option_name = "-wp-region-rw"
+      let help = "Written region are considered read-write by default"
+    end)
+
+let () = Parameter_customize.set_group wp_region
+let () = Parameter_customize.do_not_save ()
+module Region_pack =
+  True
+    (struct
+      let option_name = "-wp-region-pack"
+      let help = "Pack clusters by default"
+    end)
+
+let () = Parameter_customize.set_group wp_region
+let () = Parameter_customize.do_not_save ()
+module Region_flat =
+  False
+    (struct
+      let option_name = "-wp-region-flat"
+      let help = "Flatten arrays by default"
+    end)
+
+let () = Parameter_customize.set_group wp_region
+module Region_annot =
+  False
+    (struct
+      let option_name = "-region-annot"
+      let help = "Register '@region' ACSL Annotations (auto with -wp-region)"
+    end)
 
 (* ------------------------------------------------------------------------ *)
 (* ---  WP Strategy                                                     --- *)

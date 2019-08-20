@@ -20,57 +20,51 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* -------------------------------------------------------------------------- *)
-(** Merging Set Functor *)
-(* -------------------------------------------------------------------------- *)
+open Cil_types
 
-module type Elt =
+type lrange =
+  | R_index of term
+  | R_range of term option * term option
+
+type lpath = {
+  loc : location ;
+  lnode : lnode ;
+  ltype : typ ;
+}
+and lnode =
+  | L_var of varinfo
+  | L_region of string
+  | L_addr of lpath
+  | L_star of typ * lpath
+  | L_shift of lpath * typ * lrange
+  | L_index of lpath * typ * lrange
+  | L_field of lpath * fieldinfo list
+  | L_cast of typ * lpath
+
+module Lpath :
 sig
-  type t
+  type t = lpath
   val equal : t -> t -> bool
   val compare : t -> t -> int
+  val pretty : Format.formatter -> t -> unit
 end
 
-module Make(E : Elt) :
-sig
+type region_pattern =
+  | FREE
+  | PVAR
+  | PREF
+  | PMEM
+  | PVECTOR
+  | PMATRIX
 
-  type elt = E.t
+type region_spec = {
+  region_name: string option ;
+  region_pattern: region_pattern ;
+  region_lpath: lpath list ;
+}
 
-  type t = elt list
-  val equal : t -> t -> bool
-  val compare : t -> t -> int
+val p_name : region_pattern -> string
+val of_extension : acsl_extension -> region_spec list
+val of_behavior : behavior -> region_spec list
 
-  val empty : t
-  val is_empty : t -> bool
-
-  (* good sharing *)
-  val add : elt -> t -> t
-
-  (* good sharing *)
-  val remove : elt -> t -> t
-  val mem : elt -> t -> bool
-  val iter : (elt -> unit) -> t -> unit
-  val fold : (elt -> 'a -> 'a) -> t -> 'a -> 'a
-
-  (* good sharing *)
-  val filter : (elt -> bool) -> t -> t
-  val partition : (elt -> bool) -> t -> t * t
-
-  (* good sharing *)
-  val union : t -> t -> t
-
-  (* good sharing *)
-  val inter : t -> t -> t
-
-  (* good sharing *)
-  val diff : t -> t -> t
-
-  val subset : t -> t -> bool
-  val intersect : t -> t -> bool
-  val factorize : t -> t -> t * t * t
-  (** Returns (left,common,right) *)
-
-  val big_union : t list -> t
-  val big_inter : t list -> t
-
-end
+val register : unit -> unit (** Auto when `-wp-region` *)

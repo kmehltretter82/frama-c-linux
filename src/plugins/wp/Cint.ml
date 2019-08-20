@@ -244,8 +244,8 @@ let match_power2_extraction = match_list_extraction match_power2
 (* to_iota(e) where e = to_iota'(e'), only ranges for iota *)
 let simplify_range_comp f iota e conv e' =
   let iota' = to_cint conv in
-  let size' = Ctypes.range iota' in
-  let size = Ctypes.range iota in
+  let size' = Ctypes.i_bits iota' in
+  let size = Ctypes.i_bits iota in
   if size <= size'
   then e_fun f [e']
   (* rule B:
@@ -275,7 +275,7 @@ let configure_to_int iota =
     begin
       try match F.repr e with
         | Logic.Kint value ->
-            let size = Integer.of_int (Ctypes.range iota) in
+            let size = Integer.of_int (Ctypes.i_bits iota) in
             let signed = Ctypes.signed iota in
             F.e_zint (Integer.cast ~size ~signed ~value)
         | Logic.Fun( fland , es )
@@ -495,7 +495,7 @@ let smp_bitk_positive = function
             F.e_not (bitk_positive k a)
         | Logic.Fun( conv , [a] ) (* when is_to_c_int conv *) ->
             let iota = to_cint conv in
-            let range = Ctypes.range iota in
+            let range = Ctypes.i_bits iota in
             let signed = Ctypes.signed iota in
             if signed then (* beware of sign-bit *)
               begin match is_leq k (e_int (range-2)) with

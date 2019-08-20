@@ -20,57 +20,23 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Cil_types
+open Region
+
 (* -------------------------------------------------------------------------- *)
-(** Merging Set Functor *)
+
+val cc_lval : map -> lval -> region
+val cc_read : map -> exp -> unit
+val cc_assign : map -> stmt -> lval -> exp -> unit
+val cc_init : map -> stmt -> lval -> init -> unit
+val cc_instr : map -> stmt -> instr -> unit
+val cc_fundec : map -> fundec -> unit
+
+val cc_pred : map -> predicate -> unit
+val cc_term : map -> term -> unit
+val cc_spec : map -> spec -> unit
+
+open RegionAnnot
+val cc_region : map -> region_spec -> unit
+
 (* -------------------------------------------------------------------------- *)
-
-module type Elt =
-sig
-  type t
-  val equal : t -> t -> bool
-  val compare : t -> t -> int
-end
-
-module Make(E : Elt) :
-sig
-
-  type elt = E.t
-
-  type t = elt list
-  val equal : t -> t -> bool
-  val compare : t -> t -> int
-
-  val empty : t
-  val is_empty : t -> bool
-
-  (* good sharing *)
-  val add : elt -> t -> t
-
-  (* good sharing *)
-  val remove : elt -> t -> t
-  val mem : elt -> t -> bool
-  val iter : (elt -> unit) -> t -> unit
-  val fold : (elt -> 'a -> 'a) -> t -> 'a -> 'a
-
-  (* good sharing *)
-  val filter : (elt -> bool) -> t -> t
-  val partition : (elt -> bool) -> t -> t * t
-
-  (* good sharing *)
-  val union : t -> t -> t
-
-  (* good sharing *)
-  val inter : t -> t -> t
-
-  (* good sharing *)
-  val diff : t -> t -> t
-
-  val subset : t -> t -> bool
-  val intersect : t -> t -> bool
-  val factorize : t -> t -> t * t * t
-  (** Returns (left,common,right) *)
-
-  val big_union : t list -> t
-  val big_inter : t list -> t
-
-end
