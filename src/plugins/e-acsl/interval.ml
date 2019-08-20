@@ -60,9 +60,12 @@ let rec interv_of_typ_with_real ty is_real = match Cil.unrollType ty with
   | TEnum(enuminfo, _) ->
     interv_of_typ_with_real (TInt (enuminfo.ekind, [])) is_real
   | TFloat _ ->
+    (* TODO RATIONAL: examine TODO below. In particular this case is equivalent
+     * to the next case when [Real.is_t ty].  *)
     (* TODO: Do not systematically consider floats as reals for efficiency *)
     Ival.bottom, true
   | _ when Real.is_t ty ->
+    (* TODO RATIONAL: why bottom and not top? Why not raising Is_a_real? *)
     Ival.bottom, true
   | _ ->
     raise Not_a_number
@@ -71,6 +74,7 @@ let interv_of_logic_typ = function
   | Ctype ty -> interv_of_typ_with_real ty false
   | Linteger -> Ival.inject_range None None, false
   | Lreal -> Ival.bottom, true
+  (* TODO RATIONAL: why bottom and not top? Why not raising Is_a_real? *)
   | Ltype _ -> Error.not_yet "user-defined logic type"
   | Lvar _ -> Error.not_yet "type variable"
   | Larrow _ -> Error.not_yet "functional type"
@@ -385,9 +389,12 @@ and infer_term_host thost is_real =
      match v.lv_type with
      | Linteger ->
        Ival.inject_range None None, false
-     | Ctype (TFloat _) -> (* TODO: handle in MR !226 *)
+     | Ctype (TFloat _) ->
+       (* TODO RATIONAL: examine below. That is MR !226! *)
+       (* TODO: handle in MR !226 *)
        raise Not_an_integer
      | Lreal ->
+       (* TODO RATIONAL: why bottom and not top? Why not raising Is_a_real? *)
        Ival.bottom, true
      | Ctype _ ->
        (* TODO RATIONAL: check if [false] is the correct value *)

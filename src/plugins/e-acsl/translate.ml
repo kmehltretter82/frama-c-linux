@@ -905,11 +905,11 @@ let term_to_exp typ t =
   (* infer a context from the given [typ] whenever possible *)
   let ctx_of_typ ty =
     if Gmp.Z.is_t ty then Typing.gmpz
-    else if Real.is_t ty then Typing.libr
+    else if Real.is_t ty then Typing.real
     else
       match ty with
       | TInt(ik, _) -> Typing.ikind ik
-      | TFloat _ -> Typing.libr
+      | TFloat _ -> Typing.real
       | _ -> Typing.nan
   in
   let ctx = Extlib.opt_map ctx_of_typ typ in

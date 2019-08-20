@@ -65,7 +65,7 @@ module Datatype: Datatype.S_with_collections with type t = number_ty
 val c_int: number_ty
 val ikind: ikind -> number_ty
 val gmpz: number_ty
-val libr: number_ty
+val real: number_ty
 val nan: number_ty
 
 (** {3 Useful operations over {!number_ty}} *)
