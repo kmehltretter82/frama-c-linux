@@ -81,7 +81,8 @@ PLUGIN_CMO:= \
 	LogicCompiler \
 	LogicSemantics LogicAssigns  \
 	Sigma MemLoader \
-	MemEmpty MemZeroAlias MemVar MemTyped \
+	MemEmpty MemZeroAlias MemVar \
+	MemMemory MemTyped \
 	wpStrategy wpRTE wpAnnot \
 	CfgCompiler StmtSemantics \
 	VCS script proof wpo wpReport \
