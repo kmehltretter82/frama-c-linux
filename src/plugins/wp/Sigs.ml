@@ -434,7 +434,7 @@ sig
      location [loc] which is represented by [t] in [sigma.post].
   *)
 
-  val assigned : sigma sequence -> c_object -> loc sloc -> pred list
+  val assigned : sigma sequence -> c_object -> loc sloc -> equation list
   (**
      Return a set of formula that express that two memory state are the same
      except at the given set of memory location.

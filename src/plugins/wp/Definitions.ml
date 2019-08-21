@@ -212,6 +212,8 @@ let newcluster ~id ?title ?position () =
 let cluster ~id ?title ?position () =
   Cluster.memoize (fun id -> newcluster ~id ?title ?position ()) id
 
+let dummy () = cluster ~id:"dummy" ()
+
 let axiomatic ax =
   Cluster.memoize
     (fun id ->

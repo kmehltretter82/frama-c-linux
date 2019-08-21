@@ -450,7 +450,8 @@ let rec of_term ~cnv expected t : Why3.Term.term =
         in
         match lfun_name f, expected with
         | F_call s, _ -> apply_from_ns' s l sort
-        | Qed.Engine.F_subst _, _ -> Wp_parameters.not_yet_implemented "lfun with subst"
+        | Qed.Engine.F_subst _, _ ->
+            raise (Invalid_argument "Can not export 'F_subst' pattern to why-3")
         | Qed.Engine.F_left s, _ | Qed.Engine.F_assoc s, _ ->
             let rec aux = function
               | [] -> Wp_parameters.fatal "Empty application"
