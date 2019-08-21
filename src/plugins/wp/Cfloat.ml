@@ -176,6 +176,51 @@ let code_lit ulp value original =
   | Real , _ , Some r -> F.e_real (parse_literal ~model:Real value r)
 
 (* -------------------------------------------------------------------------- *)
+(* --- Literal Output                                                     --- *)
+(* -------------------------------------------------------------------------- *)
+
+let printers = [
+  Printf.sprintf "%.0g" ;
+  Printf.sprintf "%.1g" ;
+  Printf.sprintf "%.2g" ;
+  Printf.sprintf "%.3g" ;
+  Printf.sprintf "%.4g" ;
+  Printf.sprintf "%.5g" ;
+  Printf.sprintf "%.6g" ;
+  Printf.sprintf "%.9g" ;
+  Printf.sprintf "%.12g" ;
+  Printf.sprintf "%.15g" ;
+  Printf.sprintf "%.18g" ;
+  Printf.sprintf "%.21g" ;
+  Printf.sprintf "%.32g" ;
+  Printf.sprintf "%.64g" ;
+]
+
+let re_int = Str.regexp "[0-9]+"
+
+let force_float r =
+  if Str.string_match re_int r 0 &&
+     Str.match_end () = String.length r
+  then (r ^ ".0") else r
+
+let float_lit ulp (q : Q.t) =
+  let v = match ulp with
+    | Float32 -> rfloat @@ Transitioning.Q.to_float q
+    | Float64 -> Transitioning.Q.to_float q in
+  let reparse ulp r =
+    match ulp with
+    | Float32 -> rfloat @@ float_of_string r
+    | Float64 -> float_of_string r
+  in
+  let rec lookup ulp v = function
+    | [] -> Pretty_utils.to_string Floating_point.pretty v
+    | pp::pps ->
+        let r = force_float @@ pp v in
+        if reparse ulp r = v then r else
+          lookup ulp v pps
+  in lookup ulp v printers
+
+(* -------------------------------------------------------------------------- *)
 (* --- Computations                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -186,13 +231,23 @@ let rec exact e =
   | Qed.Logic.Fun( f , [ q ] ) when f == fq32 || f == fq64 -> exact q
   | _ -> raise Not_found
 
+let round ulp e =
+  match F.repr e with
+  | Qed.Logic.Fun( f , [ b ] ) ->
+      begin
+        match find f with
+        | REAL , ulp2 when ulp2 = ulp -> b
+        | _ -> qmake ulp (exact e )
+      end
+  | _ -> qmake ulp (exact e)
+
 let compute op ulp xs =
   match op , xs with
   | NEG , [ x ] -> qmake ulp (Q.neg (exact x))
   | ADD , [ x ; y ] -> qmake ulp (Q.add (exact x) (exact y))
   | MUL , [ x ; y ] -> qmake ulp (Q.mul (exact x) (exact y))
   | DIV , [ x ; y ] -> qmake ulp (Q.div (exact x) (exact y))
-  | ROUND , [ x ] -> qmake ulp (exact x)
+  | ROUND , [ x ] -> round ulp x
   | REAL , [ x ] -> F.e_real (exact x)
   | LE , [ x ; y ] -> F.e_bool (Q.leq (exact x) (exact y))
   | LT , [ x ; y ] -> F.e_bool (Q.lt (exact x) (exact y))
