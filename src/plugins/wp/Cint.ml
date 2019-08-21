@@ -821,14 +821,12 @@ module Dom = struct
 
   let top = Tmap.empty
 
-  let print fmt dom =
+  [@@@ warning "-32"]
+  let pretty fmt dom =
     Tmap.iter (fun k v ->
         Format.fprintf fmt "%a: %a,@ " Lang.F.pp_term k Ival.pretty v)
       dom
-
-  let find t dom = Tmap.find t dom
-
-  let get t dom = try find t dom with Not_found -> Ival.top
+  [@@@ warning "+32"]
 
   let narrow t v dom =
     if Ival.is_bottom v then raise Lang.Contradiction
@@ -894,7 +892,7 @@ module Dom = struct
         | Fun(g,[a]) -> begin try (* just checks for a contraction *)
               let ubound =
                 c_int_bounds_ival (is_cint g) (* may raise Not_found *) in
-              let v = find a dom (* may raise Not_found *) in
+              let v = Tmap.find a dom (* may raise Not_found *) in
               if Ival.is_included v ubound then raise Lang.Contradiction;
               dom
             with Not_found -> dom
