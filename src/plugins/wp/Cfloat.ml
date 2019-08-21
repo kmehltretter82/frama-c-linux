@@ -250,35 +250,34 @@ let register_builtin_comparison suffix ft =
     add_builtin ("\\le_" ^ suffix) signature (flt_le ft) ;
     add_builtin ("\\gt_" ^ suffix) signature gt ;
     add_builtin ("\\ge_" ^ suffix) signature ge ;
-    Context.register
-      begin fun () ->
-        let converse phi x y = e_fun phi [y;x] in
-        Lang.F.set_builtin_2 gt (converse (flt_lt ft)) ;
-        Lang.F.set_builtin_2 ge (converse (flt_le ft)) ;
-      end
+    let converse phi x y = e_fun phi [y;x] in
+    Lang.F.set_builtin_2 gt (converse (flt_lt ft)) ;
+    Lang.F.set_builtin_2 ge (converse (flt_le ft)) ;
   end
 
 let () =
-  begin
-    register_builtin_comparison "float" Float32 ;
-    register_builtin_comparison "double" Float64 ;
-  end
+  Context.register
+    begin fun () ->
+      register_builtin_comparison "float" Float32 ;
+      register_builtin_comparison "double" Float64 ;
+    end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Models                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
 let () =
-  begin
-    let open LogicBuiltins in
-    let register_builtin ft =
-      add_builtin "\\model" [F ft] (f_model ft) ;
-      add_builtin "\\delta" [F ft] (f_delta ft) ;
-      add_builtin "\\epsilon" [F ft] (f_epsilon ft) ;
-    in
-    register_builtin Float32 ;
-    register_builtin Float64 ;
-  end
+  Context.register
+    begin fun () ->
+      let open LogicBuiltins in
+      let register_builtin ft =
+        add_builtin "\\model" [F ft] (f_model ft) ;
+        add_builtin "\\delta" [F ft] (f_delta ft) ;
+        add_builtin "\\epsilon" [F ft] (f_epsilon ft) ;
+      in
+      register_builtin Float32 ;
+      register_builtin Float64 ;
+    end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Conversion Symbols                                                 --- *)

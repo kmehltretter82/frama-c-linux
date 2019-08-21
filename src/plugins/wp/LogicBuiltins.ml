@@ -285,11 +285,11 @@ let builtin_driver = {
 }
 
 let add_builtin name kinds lfun =
-  begin
-    Context.set driver builtin_driver;
-    register name kinds (LFUN lfun);
-    Context.clear driver;
-  end
+  let phi = LFUN lfun in
+  if Context.defined driver then
+    register name kinds phi
+  else
+    Context.bind driver builtin_driver (register name kinds) phi
 
 let create ~id ?(descr=id) ?(includes=[]) () =
   {
@@ -303,3 +303,5 @@ let create ~id ?(descr=id) ?(includes=[]) () =
 
 let init ~id ?descr ?includes () =
   Context.set driver (create ~id ?descr ?includes ())
+
+(* -------------------------------------------------------------------------- *)
