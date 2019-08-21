@@ -52,7 +52,7 @@ module D =
   Datatype.Make_with_collections
     (struct
       type t = number_ty
-      let name = "E_ACSL.New_typing.t"
+      let name = "E_ACSL.Typing.t"
       let reprs = [ Gmpz; Real; Nan; c_int ]
       include Datatype.Undefined
 

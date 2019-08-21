@@ -66,7 +66,7 @@ let name_of_mpz_arith_bop = function
 type strnum =
   | Str_Z         (* integers *)
   | Str_R         (* reals *)
-  | C_number      (* integers AND floats) included *)
+  | C_number      (* integers and floats included *)
 
 (* convert [e] in a way that it is compatible with the given typing context. *)
 let add_cast ~loc ?name env ctx strnum t_opt e =
@@ -235,15 +235,19 @@ let conditional_to_exp ?(name="if") loc t_opt e1 (e2, env2) (e3, env3) =
 
 let rec thost_to_host kf env th = match th with
   | TVar { lv_origin = Some v } ->
-    Var (Visitor_behavior.Get.varinfo (Env.get_behavior env) v), env, v.vname
+    let v' = Visitor_behavior.Get.varinfo (Env.get_behavior env) v in
+    Var v', env, v.vname
   | TVar ({ lv_origin = None } as logic_v) ->
-    Var (Env.Logic_binding.get env logic_v), env, logic_v.lv_name
+    let v' = Env.Logic_binding.get env logic_v in
+    Var v', env, logic_v.lv_name
   | TResult _typ ->
     let vis = Env.get_visitor env in
     let kf = Extlib.the vis#current_kf in
     let lhost = Misc.result_lhost kf in
     (match lhost with
-     | Var v -> Var (Visitor_behavior.Get.varinfo (Env.get_behavior env) v), env, "result"
+     | Var v ->
+       let v' = Visitor_behavior.Get.varinfo (Env.get_behavior env) v in
+       Var v', env, "result"
      | _ -> assert false)
   | TMem t ->
     let e, env = term_to_exp kf env t in

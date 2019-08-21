@@ -30,6 +30,8 @@ open Cil_types
 (* Basic datatypes and operations *)
 (* ********************************************************************* *)
 
+(* TODO RATIONAL: both exceptions should be handle in the same way in this
+   module *)
 exception Is_a_real
 exception Not_a_number
 
@@ -57,21 +59,18 @@ let rec interv_of_typ_with_real ty is_real = match Cil.unrollType ty with
   | TEnum(enuminfo, _) ->
     interv_of_typ_with_real (TInt (enuminfo.ekind, [])) is_real
   | TFloat _ ->
-    (* TODO RATIONAL: examine TODO below. In particular this case is equivalent
-     * to the next case when [Real.is_t ty].  *)
-    (* TODO: Do not systematically consider floats as reals for efficiency *)
-    Ival.bottom, true
+    raise Is_a_real
   | _ when Real.is_t ty ->
-    (* TODO RATIONAL: why bottom and not top? Why not raising Is_a_real? *)
-    Ival.bottom, true
-  | _ ->
+    raise Is_a_real
+  | TVoid _ | TPtr _ | TArray _ | TFun _ | TComp _ | TBuiltin_va_list _ ->
     raise Not_a_number
+  | TNamed _ ->
+    assert false
 
 let interv_of_logic_typ = function
   | Ctype ty -> interv_of_typ_with_real ty false
   | Linteger -> Ival.inject_range None None, false
-  | Lreal -> Ival.bottom, true
-  (* TODO RATIONAL: why bottom and not top? Why not raising Is_a_real? *)
+  | Lreal -> raise Is_a_real
   | Ltype _ -> Error.not_yet "user-defined logic type"
   | Lvar _ -> Error.not_yet "type variable"
   | Larrow _ -> Error.not_yet "functional type"
@@ -99,6 +98,7 @@ module rec Env: sig
   val remove: Cil_types.logic_var -> unit
   val replace: Cil_types.logic_var -> Ival.t -> unit
 end = struct
+
   open Cil_datatype
   let tbl: Ival.t Logic_var.Hashtbl.t = Logic_var.Hashtbl.create 7
 
@@ -113,7 +113,7 @@ end = struct
 
 end
 
-(* Environment for handling recursive logic functions *)
+(* Environment for handling logic functions *)
 and Logic_function_env: sig
   val widen:
     infer_with_real:(term -> bool -> Ival.t * bool) -> term -> Ival.t
@@ -327,7 +327,11 @@ let rec infer_with_real t is_real =
            List.iter (fun lv -> Env.remove lv) li.l_profile;
            fixpoint i
        in
-       fixpoint Ival.bottom
+       let i = fixpoint Ival.bottom in
+       (* call [interv_of_logic_typ] in order to raise Is_a_real or Not_a_number
+          when the function does not return an integer *)
+       Extlib.may (fun lty -> ignore (interv_of_logic_typ lty)) li.l_type;
+       i
      | LBnone
      | LBreads _ ->
        (match li.l_type with

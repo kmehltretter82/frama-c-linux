@@ -127,10 +127,7 @@ let generate_kf ~loc fname env ret_ty params_ty li =
                parameters *)
             Gmp.Z.t_ptr ()
           | Typing.C_type ik -> TInt(ik, [])
-          | Typing.Real ->
-            (* TODO RATIONAL: implement this case *)
-            assert false
-          | Typing.Nan -> Typing.typ_of_lty lvi.lv_type
+          | Typing.Real | Typing.Nan -> Typing.typ_of_lty lvi.lv_type
         in
         (* build the formals: cannot use [Cil.makeFormal] since the function
            does not yet exist *)
@@ -192,12 +189,15 @@ let generate_kf ~loc fname env ret_ty params_ty li =
        before generating the code (code generation invokes typing) *)
     let env =
       let add env lvi vi =
-        (match vi.vtype with
-        | TInt _ as ty -> Interval.Env.add lvi (Interval.interv_of_typ ty)
-        | ty ->
-            (* TODO RATIONAL: what to do with rationals? *)
-          if Gmp.Z.is_t ty then
-            Interval.Env.add lvi (Ival.inject_range None None));
+        let i =
+          try
+            Interval.interv_of_typ vi.vtype
+          with
+          | Interval.Not_a_number
+          | Interval.Is_a_real ->
+            Ival.inject_range None None
+        in
+        Interval.Env.add lvi i;
         Env.Logic_binding.add_binding env lvi vi
       in
       List.fold_left2 add env li.l_profile params
