@@ -85,6 +85,16 @@ type 'a result =
 (** Polarity of predicate compilation *)
 type polarity = [ `Positive | `Negative | `NoPolarity ]
 
+(** Frame Conditions.
+    Consider a function [phi(m)] over memory [m],
+    we want memories [m1,m2] and condition [p] such that
+    [p(m1,m2) -> phi(m1) = phi(m2)].
+    - [name] used for generating lemma
+    - [triggers] for the lemma
+    - [conditions] for the frame lemma to hold
+    - [mem1,mem2] to two memories for which the lemma holds *)
+type frame = string * Definitions.trigger list * pred list * term * term
+
 (* -------------------------------------------------------------------------- *)
 (** {1 Reversing Models}
 

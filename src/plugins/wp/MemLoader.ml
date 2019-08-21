@@ -39,8 +39,6 @@ open Sigs
 let cluster () =
   Definitions.cluster ~id:"Compound" ~title:"Memory Compound Loader" ()
 
-type frame = string * Definitions.trigger list * pred list * term * term
-
 module type Model =
 sig
 
