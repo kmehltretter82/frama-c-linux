@@ -337,7 +337,7 @@ and context_insensitive_term_to_exp kf env t =
       let mk_stmts _ e = [ Misc.mk_call ~loc name [ e; e1; e2 ] ] in
       let name = Misc.name_of_binop bop in
       let _, e, env =
-	Env.new_var_and_mpz_init ~loc ~name env (Some t) mk_stmts
+        Env.new_var_and_mpz_init ~loc ~name env (Some t) mk_stmts
       in
       e, env, C_number, ""
     else if Real.is_t ty then

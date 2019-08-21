@@ -32,9 +32,6 @@ open Cil_types
 
 exception Is_a_real
 exception Not_a_number
-(* Not_a_number has priority over Is_a_real *)
-
-exception Not_an_integer
 
 (* constructors *)
 
@@ -166,7 +163,7 @@ end = struct
              (* TODO RATIONAL: what to do with is_real? *)
              Env.add param larger_i;
              larger_i
-           with Not_an_integer ->
+           with Not_a_number ->
              (* no need to add [param] to the environment *)
              Ival.bottom)
         li.l_profile
@@ -317,7 +314,7 @@ let rec infer_with_real t is_real =
      | LBterm t' ->
        let rec fixpoint i =
          let is_included, new_i =
-           Logic_function_env.widen ~infer_with_real t' i
+           Logic_function_env.widen ~infer_with_real t i
          in
          if is_included then begin
            List.iter (fun lv -> Env.remove lv) li.l_profile;
@@ -389,11 +386,7 @@ and infer_term_host thost is_real =
      match v.lv_type with
      | Linteger ->
        Ival.inject_range None None, false
-     | Ctype (TFloat _) ->
-       (* TODO RATIONAL: examine below. That is MR !226! *)
-       (* TODO: handle in MR !226 *)
-       raise Not_an_integer
-     | Lreal ->
+     | Ctype (TFloat _) | Lreal ->
        (* TODO RATIONAL: why bottom and not top? Why not raising Is_a_real? *)
        Ival.bottom, true
      | Ctype _ ->

@@ -53,7 +53,10 @@ module Z = struct
   include Make(struct end)
 
   let t_struct_torig_ref = mk_dummy_type_info_ref ()
+  let set_t_struct ty = t_struct_torig_ref := ty
 
+  (* TODO: why not a pointer here (but an array of size 1 instead? *)
+  (* TODO: should be const *)
   let t_ptr () =
     TNamed(
       {
@@ -94,6 +97,8 @@ let init_t () =
     method !vglob = function
     | GType({ torig_name = s } as info, _) when s = "__e_acsl_mpz_t" ->
       self#set Z.set_t info
+    | GType({ torig_name = s } as info, _) when s = "__e_acsl_mpz_struct" ->
+      self#set Z.set_t_struct info
     | GType({ torig_name = s } as info, _) when s = "__e_acsl_mpq_t" ->
       self#set Q.set_t info
     | _ ->
