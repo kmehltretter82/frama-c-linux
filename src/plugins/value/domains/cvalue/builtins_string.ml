@@ -436,7 +436,7 @@ let _frama_c_strnlen_wrapper =
     ~search:Ival.zero ~stop_at_0:false ~typ:Char ~length:true ~limit:1
 
 let frama_c_memchr_off_wrapper =
-  register_builtin "__fc_memchr_off"
+  do_search
     ~search:Ival.bottom ~stop_at_0:false ~typ:Char ~length:true ~limit:2
 
 let _frama_c_memchr_wrapper =
@@ -456,7 +456,7 @@ let frama_c_wcslen_wrapper =
     ~search:Ival.zero ~stop_at_0:false ~typ:Wide ~length:true ?limit:None
 
 let frama_c_wmemchr_off_wrapper =
-  register_builtin "__fc_wmemchr_off"
+  do_search
     ~search:Ival.bottom ~stop_at_0:false ~typ:Wide ~length:true ~limit:2
 
 let frama_c_wcschr_wrapper =
