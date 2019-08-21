@@ -614,51 +614,23 @@ let eval_logic_charchr builtin env s c ldeps_s ldeps_c =
   { etype; ldeps; eover; empty = false; eunder }
 
 (* Evaluates the logical functions memchr_off/wmemchr_off. *)
-let eval_logic_memchr_off builtin env s c n ldeps_s ldeps_c ldeps_n =
-  let max_bounds =
-    try
-      Ival.max_int (Cvalue.V.project_ival n)
-    with Cvalue.V.Not_based_on_null | Error_Bottom -> None
-  in
-  let v_bounds =
-    Cvalue.V.inject_ival (Ival.inject_range (Some Int.zero) (Extlib.opt_map Int.pred max_bounds))
-  in
+let eval_logic_memchr_off builtin env s c n =
+  let minus_one = Cvalue.V.inject_int Integer.minus_one in
+  let positive = Cvalue.V.inject_ival Ival.positive_integers in
+  let pred_n = Cvalue.V.add_untyped Int_Base.one n.eover minus_one in
+  let n_pos = Cvalue.V.narrow positive pred_n in
   let eover =
-    match builtin (env_current_state env) [s; c; n] with
-    | None, _ -> v_bounds
-    | Some offsm, alarms ->
-      if alarms
-      then v_bounds
-      else
-        begin
-          let normalized_v =
-            let v = Extlib.the (Cvalue.V_Offsetmap.single_interval_value offsm) in
-            let r = Cvalue.V_Or_Uninitialized.get_v v in
-            try
-              let ir = Cvalue.V.project_ival r in
-              match Ival.max_int ir with
-              | None -> v_bounds
-              | Some m ->
-                let normalized_i =
-                  match max_bounds with
-                  | Some n ->
-                    if Int.(equal m n) then
-                      Ival.join (Ival.inject_singleton (Int.pred m)) ir
-                    else ir
-                  | None -> ir
-                in
-                Cvalue.V.inject_ival normalized_i
-            with
-            | Cvalue.V.Not_based_on_null -> v_bounds
-          in
-          Cvalue.V.meet normalized_v v_bounds
-        end
+    if Cvalue.V.is_bottom n_pos then minus_one else
+      match builtin (env_current_state env) [s.eover; c.eover; n_pos] with
+      | None, _ -> pred_n
+      | Some offsm, alarms ->
+        let v = Extlib.the (Cvalue.V_Offsetmap.single_interval_value offsm) in
+        let v = Cvalue.V_Or_Uninitialized.get_v v in
+        if alarms then Cvalue.V.join pred_n v else
+        if Cvalue.V.equal n_pos pred_n then v else Cvalue.V.join minus_one v
   in
-  let eunder = under_from_over eover in
-  let etype = Cil.intType in
-  let ldeps = join_logic_deps ldeps_s (join_logic_deps ldeps_c ldeps_n) in
-  { etype; ldeps; eover; eunder }
-
+  let ldeps = join_logic_deps s.ldeps (join_logic_deps c.ldeps n.ldeps) in
+  { (einteger eover) with ldeps }
 
 (* Evaluates the logical predicate is_allocable, according to the following
    logic:
@@ -1358,11 +1330,11 @@ and eval_known_logic_function ~alarm_mode env li labels args =
     let c = eval_term ~alarm_mode env arg_c in
     let n = eval_term ~alarm_mode env arg_n in
     let builtin =
-      if b = "memchr_off" then Builtins_string.frama_c_memchr_off_wrapper
+      if b = "memchr_off"
+      then Builtins_string.frama_c_memchr_off_wrapper
       else Builtins_string.frama_c_wmemchr_off_wrapper
     in
-    eval_logic_memchr_off builtin
-      { env with e_cur = lbl } s.eover c.eover n.eover s.ldeps c.ldeps n.ldeps
+    eval_logic_memchr_off builtin { env with e_cur = lbl } s c n
 
   | ("strchr" | "wcschr") as b,  _, [lbl], [arg_s; arg_c] ->
     let s = eval_term ~alarm_mode env arg_s in
