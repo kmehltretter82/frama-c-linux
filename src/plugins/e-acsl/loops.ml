@@ -120,44 +120,46 @@ let bounds_for_small_type ~loc (t1, lv, t2) =
   | Linteger ->
     t1, t2, None
   | Ctype ty ->
-    let i1 = Interval.infer t1 in
-    let i2 = Interval.infer t2 in
-    let i =
-      (* Ival.join would NOT be correct here:
-         Eg: (Ival.join [-3..-3] [300..300]) gives {-3, 300}
-             but NOT [-3..300] *)
-      Ival.inject_range (Ival.min_int i1) (Ival.max_int i2)
-    in
-    let ity = Interval.interv_of_typ ty in
-    if Ival.is_included i ity then
-      (* case 1 *)
-      t1, t2, None
-    else if Ival.is_singleton_int i1 && Ival.is_singleton_int i2 then begin
-      (* case 2 *)
-      let i = Ival.meet i ity in
-      (* now we potentially have a better interval for [lv]
-         ==> update the binding *)
-      Interval.Env.replace lv i;
-      (* the smaller bounds *)
-      let min, max = Misc.finite_min_and_max i in
-      let t1 = Logic_const.tint ~loc min in
-      let t2 = Logic_const.tint ~loc max in
-      let ctx = Typing.number_ty_of_typ ty in
-      (* we are assured that we will not have a GMP,
-        once again because we intersected with [ity] *)
-      Typing.type_term ~use_gmp_opt:false ~ctx t1;
-      Typing.type_term ~use_gmp_opt:false ~ctx t2;
-      t1, t2, None
-    end else
-      (* case 3 *)
-      let min, max = Misc.finite_min_and_max ity in
-      let guard_lower = Logic_const.tint ~loc min in
-      let guard_upper = Logic_const.tint ~loc max in
-      let lv_term = Logic_const.tvar ~loc lv in
-      let guard_lower = Logic_const.prel ~loc (Rle, guard_lower, lv_term) in
-      let guard_upper = Logic_const.prel ~loc (Rle, lv_term, guard_upper) in
-      let guard = Logic_const.pand ~loc (guard_lower, guard_upper) in
-      t1, t2, Some guard
+    (try
+       let i1 = Interval.infer t1 in
+       let i2 = Interval.infer t2 in
+       let i =
+         (* Ival.join would NOT be correct here:
+            Eg: (Ival.join [-3..-3] [300..300]) gives {-3, 300}
+                but NOT [-3..300] *)
+         Ival.inject_range (Ival.min_int i1) (Ival.max_int i2)
+       in
+       let ity = Interval.interv_of_typ ty in
+       if Ival.is_included i ity then
+         (* case 1 *)
+         t1, t2, None
+       else if Ival.is_singleton_int i1 && Ival.is_singleton_int i2 then begin
+         (* case 2 *)
+         let i = Ival.meet i ity in
+         (* now we potentially have a better interval for [lv]
+            ==> update the binding *)
+         Interval.Env.replace lv i;
+         (* the smaller bounds *)
+         let min, max = Misc.finite_min_and_max i in
+         let t1 = Logic_const.tint ~loc min in
+         let t2 = Logic_const.tint ~loc max in
+         let ctx = Typing.number_ty_of_typ ty in
+         (* we are assured that we will not have a GMP,
+            once again because we intersected with [ity] *)
+         Typing.type_term ~use_gmp_opt:false ~ctx t1;
+         Typing.type_term ~use_gmp_opt:false ~ctx t2;
+         t1, t2, None
+       end else
+         (* case 3 *)
+         let min, max = Misc.finite_min_and_max ity in
+         let guard_lower = Logic_const.tint ~loc min in
+         let guard_upper = Logic_const.tint ~loc max in
+         let lv_term = Logic_const.tvar ~loc lv in
+         let guard_lower = Logic_const.prel ~loc (Rle, guard_lower, lv_term) in
+         let guard_upper = Logic_const.prel ~loc (Rle, lv_term, guard_upper) in
+         let guard = Logic_const.pand ~loc (guard_lower, guard_upper) in
+         t1, t2, Some guard
+     with Interval.Not_a_number | Interval.Is_a_real -> assert false)
   | Ltype _ | Lvar _ | Lreal | Larrow _ ->
     Options.abort "quantification over non-integer type is not part of E-ACSL"
 

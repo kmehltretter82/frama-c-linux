@@ -95,7 +95,10 @@ let rec sizes_and_shifts_from_quantifs ~loc kf lscope sizes_and_shifts =
       | _ ->
         Options.fatal "Unexpected comparison operator"
     in
-    let i = Interval.infer t_size in
+    let i =
+      try Interval.infer t_size
+      with Interval.Not_a_number | Interval.Is_a_real -> assert false
+    in
     (* The EXACT amount of memory that is needed can be known at runtime. This
       is because the tightest bounds for the variables can be known at runtime.
       Example: In the following predicate
