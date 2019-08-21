@@ -56,27 +56,33 @@ module D =
       let reprs = [ Gmpz; Real; Nan; c_int ]
       include Datatype.Undefined
 
-      (* TODO RATIONAL: re-implement this datatype *)
-      (*
       let compare ty1 ty2 = match ty1, ty2 with
         | C_type i1, C_type i2 ->
           if i1 = i2 then 0
           else if Cil.intTypeIncluded i1 i2 then -1 else 1
-        | (Other | C_type _), Gmp | Other, C_type _ -> -1
-        | Gmp, (C_type _ | Other) | C_type _, Other -> 1
-        | Gmp, Gmp | Other, Other -> 0
+        | (C_type _ | Gmpz | Real), Nan
+        | (C_type _ | Gmpz), Real
+        | C_type _, Gmpz ->
+          -1
+        | (Gmpz | Real | Nan), C_type _
+        | (Real | Nan), Gmpz
+        | Nan, Real ->
+          1
+        | Gmpz, Gmpz | Real, Real | Nan, Nan -> 0
 
       let equal = Datatype.from_compare
 
       let hash = function
-        | Gmp -> 787
-        | Other -> 1011
-        | C_type ik -> Hashtbl.hash ik
+        | C_type ik -> 7 * Hashtbl.hash ik
+        | Gmpz -> 787
+        | Real -> 1011
+        | Nan -> 1277
 
       let pretty fmt = function
-        | Gmp -> Format.pp_print_string fmt "GMP"
         | C_type k -> Printer.pp_ikind fmt k
-        | Other -> Format.pp_print_string fmt "OTHER"*)
+        | Gmpz -> Format.pp_print_string fmt "Gmpz"
+        | Real -> Format.pp_print_string fmt "Real"
+        | Nan -> Format.pp_print_string fmt "Nan"
     end)
 
 (******************************************************************************)
