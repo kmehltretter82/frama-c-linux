@@ -135,6 +135,7 @@ sig
   type t
   val self : string (** Chunk names, for pretty-printing. *)
   val hash : t -> int
+  val equal : t -> t -> bool
   val compare : t -> t -> int
   val pretty : Format.formatter -> t -> unit
 

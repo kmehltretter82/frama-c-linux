@@ -34,7 +34,6 @@ open Definitions
 
 let dkey_layout = Wp_parameters.register_category "layout"
 
-
 module L = Qed.Logic
 
 let datatype = "MemTyped"

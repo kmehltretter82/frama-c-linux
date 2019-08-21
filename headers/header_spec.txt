@@ -1408,6 +1408,8 @@ src/plugins/wp/MemoryContext.ml: CEA_WP
 src/plugins/wp/MemoryContext.mli: CEA_WP
 src/plugins/wp/MemEmpty.ml: CEA_WP
 src/plugins/wp/MemEmpty.mli: CEA_WP
+src/plugins/wp/MemLoader.ml: CEA_WP
+src/plugins/wp/MemLoader.mli: CEA_WP
 src/plugins/wp/MemTyped.ml: CEA_WP
 src/plugins/wp/MemTyped.mli: CEA_WP
 src/plugins/wp/MemVar.ml: CEA_WP
