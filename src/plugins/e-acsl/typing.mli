@@ -79,9 +79,6 @@ val typ_of_number_ty: number_ty -> typ
 val number_ty_of_typ: typ -> number_ty
 (** Reverse of [typ_of_number_ty] *)
 
-val ty_of_logic_ty: logic_type -> number_ty
-(** @return the {!integer_ty} that correponds to the given logic type. *)
-
 val join: number_ty -> number_ty -> number_ty
 (** {!number_ty} is a join-semi-lattice if you do not consider [Other]. If
     there is no [Other] in argument, this function computes the join of this

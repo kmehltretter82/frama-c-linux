@@ -187,19 +187,6 @@ end
 (** {2 Coercion rules} *)
 (******************************************************************************)
 
-let ty_of_logic_ty = function
-  | Linteger -> Gmpz
-  | Ctype ty -> (match Cil.unrollType ty with
-    | TInt(ik, _) -> C_type ik
-    | TFloat _ -> Real
-    | _ -> Nan)
-  | Lreal -> Real
-  | Larrow _ -> Nan
-  | Ltype _ -> Error.not_yet "user-defined logic type"
-  | Lvar _ -> Error.not_yet "type variable"
-
-let number_ty_of_typ ty = ty_of_logic_ty (Ctype ty)
-
 (* Compute the smallest type (bigger than [int]) which can contain the whole
    interval. It is the \theta operator of the JFLA's paper. *)
 let ty_of_interv ?ctx i =
@@ -233,10 +220,43 @@ let coerce ~arith_operand ~ctx ~op ty =
     then { ty; op; cast = Some ctx }
     else { ty; op; cast = None }
 
+let number_ty_of_typ ty = match Cil.unrollType ty with
+  | TInt(ik, _) | TEnum({ ekind = ik }, _) -> C_type ik
+  | TFloat _ -> Real
+  | TVoid _ | TPtr _ | TArray _ | TFun _ | TComp _ | TBuiltin_va_list _ -> Nan
+  | TNamed _ -> assert false
+
+let ty_of_logic_ty ?term lty =
+  let get_ty = function
+    | Linteger -> Gmpz
+    | Ctype ty -> number_ty_of_typ ty
+    | Lreal -> Real
+    | Larrow _ -> Nan
+    | Ltype _ -> Error.not_yet "user-defined logic type"
+    | Lvar _ -> Error.not_yet "type variable"
+  in
+  match term with
+  | None -> get_ty lty
+  | Some t ->
+    if Options.Gmp_only.get () && lty = Linteger then Gmpz
+    else
+      let i = Interval.infer t in
+      ty_of_interv i
+
+(******************************************************************************)
+(** {2 Type system} *)
+(******************************************************************************)
+
+(* generate a context [c]. Take --e-acsl-gmp-only into account iff [use_gmp_opt]
+   is true. *)
+let mk_ctx ~use_gmp_opt = function
+  | C_type _ as c -> if use_gmp_opt && Options.Gmp_only.get () then Gmpz else c
+  | Gmpz | Real | Nan as c -> c
+
 (* the number_ty corresponding to [t] whenever use as an offset.
    In that case, it cannot be a GMP, so it must be coerced to an integral type
    in that case *)
-let offset_ty t =
+let type_offset t =
   try
     let i = Interval.infer t in
     match ty_of_interv i with
@@ -249,17 +269,7 @@ let offset_ty t =
   | Interval.Not_a_number ->
     Options.fatal "expected an integral type for %a" Printer.pp_term t
 
-(******************************************************************************)
-(** {2 Type system} *)
-(******************************************************************************)
-
-(* generate a context [c]. Take --e-acsl-gmp-only into account iff [use_gmp_opt]
-   is true. *)
-let mk_ctx ~use_gmp_opt = function
-  | C_type _ as c -> if use_gmp_opt && Options.Gmp_only.get () then Gmpz else c
-  | Gmpz | Real | Nan as c -> c
-
-let infer_if_integer li =
+let type_letin li =
   let li_t = Misc.term_of_li li in
   match ty_of_logic_ty li_t.term_type with
   | C_type _ | Gmpz ->
@@ -373,10 +383,8 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
             let i2 = Interval.infer t2 in
             compute_ctx ?ctx (Ival.join i (Ival.join i1 i2))
           with
-          | Interval.Is_a_real ->
-            dup real
-          | Interval.Not_a_number ->
-            assert false (* only Is_a_real could be raised *)
+          | Interval.Is_a_real -> dup real
+          | Interval.Not_a_number -> assert false
         in
         (* it is enough to explicitly coerce when required one operand to [ctx]
            (through [arith_operand]) in order to force the type of the
@@ -484,7 +492,7 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
       | TBinOp ((PlusPI | IndexPI | MinusPI), t1, t2) ->
         (* both [t1] and [t2] must be typed. *)
         ignore (type_term ~use_gmp_opt:true ~ctx:nan t1);
-        let ctx = offset_ty t2 in
+        let ctx = type_offset t2 in
         ignore (type_term ~use_gmp_opt:false ~ctx t2);
         dup nan
 
@@ -516,24 +524,8 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
               | None ->
                 assert false
               | Some lty ->
-                match lty with
-                | Linteger ->
-                  let i = Interval.infer t in
-                  if Options.Gmp_only.get () then dup Gmpz
-                  else dup (ty_of_interv i)
-                | Ctype TInt(ik, _ ) ->
-                  dup (C_type ik)
-                | Ctype TFloat _ -> (* TODO: handle in MR !226 *)
-                  (* TODO RATIONAL: re-implement this case *)
-                  assert false (* dup Other *)
-                | Lreal ->
-                  (* TODO RATIONAL: implement this case *)
-                  Error.not_yet "real numbers"
-                | Ctype _ ->
-                  (* TODO RATIONAL: re-implement this case *)
-                  assert false (* dup Other *)
-                | Ltype _ | Lvar _ | Larrow _ ->
-                  Options.fatal "unexpected type"
+                let ty = ty_of_logic_ty ~term:t lty in
+                dup ty
             end
           | LBnone ->
             Error.not_yet "logic functions with no definition nor reads clause"
@@ -555,7 +547,7 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
       | Trange(None, _) | Trange(_, None) ->
         Options.abort "unbounded ranges are not part of E-ACSl"
       | Tlet(li, t) ->
-        infer_if_integer li;
+        type_letin li;
         let li_t = Misc.term_of_li li in
         ignore (type_term ~use_gmp_opt:true li_t);
         dup (type_term ~use_gmp_opt:true ?ctx t).ty
@@ -595,7 +587,7 @@ and type_term_offset = function
   | TField(_, toff)
   | TModel(_, toff) -> type_term_offset toff
   | TIndex(t, toff) ->
-    let ctx = offset_ty t in
+    let ctx = type_offset t in
     ignore (type_term ~use_gmp_opt:false ~ctx t);
     type_term_offset toff
 
@@ -653,7 +645,7 @@ let rec type_predicate p =
       ignore (type_predicate p2);
       c_int
     | Plet(li, p) ->
-      infer_if_integer li;
+      type_letin li;
       let li_t = Misc.term_of_li li in
       ignore (type_term ~use_gmp_opt:true li_t);
       (type_predicate p).ty
