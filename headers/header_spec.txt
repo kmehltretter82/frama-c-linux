@@ -1412,6 +1412,8 @@ src/plugins/wp/MemLoader.ml: CEA_WP
 src/plugins/wp/MemLoader.mli: CEA_WP
 src/plugins/wp/MemMemory.ml: CEA_WP
 src/plugins/wp/MemMemory.mli: CEA_WP
+src/plugins/wp/MemRegion.ml: CEA_WP
+src/plugins/wp/MemRegion.mli: CEA_WP
 src/plugins/wp/MemTyped.ml: CEA_WP
 src/plugins/wp/MemTyped.mli: CEA_WP
 src/plugins/wp/MemVar.ml: CEA_WP

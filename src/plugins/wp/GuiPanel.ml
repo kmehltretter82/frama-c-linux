@@ -87,7 +87,7 @@ let run_and_prove
 (* ---  Model Panel                                                     --- *)
 (* ------------------------------------------------------------------------ *)
 
-type memory = TREE | HOARE | TYPED
+type memory = TREE | HOARE | TYPED | REGION
 
 class model_selector (main : Design.main_window_extension_points) =
   let dialog = new Wpane.dialog
@@ -128,6 +128,7 @@ class model_selector (main : Design.main_window_extension_points) =
       begin
         (match s.mheap with
          | ZeroAlias -> memory#set TREE
+         | Region -> memory#set REGION
          | Hoare -> memory#set HOARE
          | Typed m -> memory#set TYPED ; c_casts#set (m = MemTyped.Unsafe)) ;
         c_byref#set (s.mvar = Ref) ;
@@ -138,6 +139,7 @@ class model_selector (main : Design.main_window_extension_points) =
     method get : setup =
       let m = match memory#get with
         | TREE -> ZeroAlias
+        | REGION -> Region
         | HOARE -> Hoare
         | TYPED -> Typed
                      (if c_casts#get then MemTyped.Unsafe else MemTyped.Fits)
