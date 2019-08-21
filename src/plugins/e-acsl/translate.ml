@@ -124,7 +124,7 @@ let add_cast ~loc ?name env ctx strnum t_opt e =
     else if Real.is_t ctx then
       if Real.is_t (Cil.typeOf e) then e, env
       else Real.mk_real ~loc ?name e env t_opt
-    else
+    else (* the context is neither MPZ nor MPQ *)
       (* handle a C-integer context *)
       if Gmp.Z.is_t ty || strnum = Str_Z then
         (* we get an mpz, but it fits into a C integer: convert it *)
@@ -605,7 +605,7 @@ and term_to_exp kf env t =
 
 (* generate the C code equivalent to [t1 bop t2]. *)
 and comparison_to_exp
-    ~loc ?e1 kf env ity bop ?(name=Misc.name_of_binop bop) t1 t2 t_opt =
+    ~loc ?e1 kf env ity bop ?(name = Misc.name_of_binop bop) t1 t2 t_opt =
   let e1, env = match e1 with
     | None ->
       let e1, env = term_to_exp kf env t1 in

@@ -88,7 +88,7 @@ let ikind_of_interv i =
       if Cil.intTypeIncluded kind IInt then IInt else kind
     | None, None -> raise Cil.Not_representable (* GMP *)
     | None, Some _ | Some _, None ->
-      Kernel.fatal ~current:true "ival: %a" Ival.pretty i
+      Kernel.fatal ~current:true "unexpected ival: %a" Ival.pretty i
 
 (* function call profiles (intervals for their formal parameters) *)
 module Profile = struct
@@ -252,7 +252,7 @@ let infer_alignof ty = singleton_of_int (Cil.bytesAlignOf ty)
 let rec infer_with_real t is_real =
   let get_cty t = match t.term_type with Ctype ty -> ty | _ -> assert false in
   match t.term_node with
-  | TConst (Integer (n,_)) -> Ival.inject_singleton n, is_real
+  | TConst (Integer (n, _)) -> Ival.inject_singleton n, is_real
   | TConst (LChr c) ->
     let n = Cil.charConstToInt c in
     Ival.inject_singleton n, is_real

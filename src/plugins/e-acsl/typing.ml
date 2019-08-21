@@ -56,19 +56,22 @@ module D =
       let reprs = [ Gmpz; Real; Nan; c_int ]
       include Datatype.Undefined
 
-      let compare ty1 ty2 = match ty1, ty2 with
-        | C_type i1, C_type i2 ->
-          if i1 = i2 then 0
-          else if Cil.intTypeIncluded i1 i2 then -1 else 1
-        | (C_type _ | Gmpz | Real), Nan
-        | (C_type _ | Gmpz), Real
-        | C_type _, Gmpz ->
-          -1
-        | (Gmpz | Real | Nan), C_type _
-        | (Real | Nan), Gmpz
-        | Nan, Real ->
-          1
-        | Gmpz, Gmpz | Real, Real | Nan, Nan -> 0
+      let compare ty1 ty2 =
+        if ty1 == ty2 then 0
+        else
+          match ty1, ty2 with
+          | C_type i1, C_type i2 ->
+            if i1 = i2 then 0
+            else if Cil.intTypeIncluded i1 i2 then -1 else 1
+          | (C_type _ | Gmpz | Real), Nan
+          | (C_type _ | Gmpz), Real
+          | C_type _, Gmpz ->
+            -1
+          | (Gmpz | Real | Nan), C_type _
+          | (Real | Nan), Gmpz
+          | Nan, Real ->
+            1
+          | Gmpz, Gmpz | Real, Real | Nan, Nan -> assert false
 
       let equal = Datatype.from_compare
 
@@ -192,11 +195,11 @@ end
 let ty_of_interv ?ctx i =
   try
     let kind = Interval.ikind_of_interv i in
-    (* ctx type whenever possible to prevent superfluous casts in the generated
-       code *)
     (match ctx with
      | None | Some (Gmpz | Nan) -> C_type kind
      | Some (C_type ik as ctx) ->
+       (* return [ctx] type for types smaller than int to prevent superfluous
+          casts in the generated code *)
        if Cil.intTypeIncluded kind ik then ctx else C_type kind
      | Some Real -> Real)
   with Cil.Not_representable ->
@@ -306,7 +309,7 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
        that every subterm is typed, even if it is not an integer. *)
     match t.term_node with
     | TConst (LReal _) ->
-      (* TODO: real: irrationals raise not_yet *)
+      (* TODO RATIONAL: real: irrationals raise not_yet *)
       dup real
     | TConst (Integer _ | LChr _ | LEnum _)
     | TSizeOf _
