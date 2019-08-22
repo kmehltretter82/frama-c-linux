@@ -90,7 +90,6 @@ PLUGIN_CMO:= \
 	TacRewrite TacBitwised TacBitrange TacShift \
 	TacCongruence TacOverflow Auto \
 	ProofSession ProofScript ProofEngine \
-	why3_xml \
 	ProverTask ProverErgo ProverCoq \
 	filter_axioms why3_api \
 	driver prover ProverSearch ProverScript \
@@ -104,8 +103,8 @@ PLUGIN_GENERATED:= \
    $(PLUGIN_DIR)/script.ml \
    $(PLUGIN_DIR)/rformat.ml \
    $(PLUGIN_DIR)/driver.ml \
-   $(PLUGIN_DIR)/why3_xml.ml \
    $(PLUGIN_DIR)/Wp.mli
+
 PLUGIN_DEPENDENCIES:= rtegen qed
 PLUGIN_UNDOC+=
 PLUGIN_INTRO:=$(PLUGIN_DIR)/intro_wp.txt
@@ -120,7 +119,7 @@ PLUGIN_DISTRIB_EXTERNAL:= \
 	                    $(ALL_UNMODIFIED_WHY3_RESOURCES) \
 	                    $(ALL_MODIFIED_WHY3_RESOURCES))
 
-CEA_WP_GENEREATED=why3_xml.ml script.ml rformat.ml driver.ml
+CEA_WP_GENEREATED= script.ml rformat.ml driver.ml
 
 
 # --------------------------------------------------------------------------

@@ -1950,8 +1950,6 @@ src/plugins/wp/share/why3/frama_c_wp/vlist.mlw: CEA_WP
 src/plugins/wp/share/why3/frama_c_wp/vset.mlw: CEA_WP
 src/plugins/wp/share/wp.driver: CEA_WP
 src/plugins/wp/share/wpcoqdoc.zip: .ignore
-src/plugins/wp/why3_xml.mli: MODIFIED_WHY3
-src/plugins/wp/why3_xml.mll: MODIFIED_WHY3
 src/plugins/wp/wpAnnot.ml: CEA_WP
 src/plugins/wp/wpAnnot.mli: CEA_WP
 src/plugins/wp/wpPropId.ml: CEA_WP

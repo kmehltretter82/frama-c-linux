@@ -95,7 +95,6 @@ end
 
 type prover =
   | Why3 of Why3_prover.t (* Prover via WHY *)
-  (* | Why3ide *)
   | NativeAltErgo (* Direct Alt-Ergo *)
   | NativeCoq     (* Direct Coq and Coqide *)
   | Qed           (* Qed Solver *)
@@ -120,19 +119,16 @@ let prover_of_name = function
   | "native:coq" | "native:coqide" -> Some NativeCoq
   | "script" -> Some Tactical
   | "tip" -> Some Tactical
-  (* | "why3ide" -> Some Why3ide *)
   | "why3" -> Some (Why3 { Why3.Whyconf.prover_name = "why3";
                            Why3.Whyconf.prover_version = "";
                            Why3.Whyconf.prover_altern = "generate only" })
   | s ->
       match Extlib.string_del_prefix "why3:" s with
       | Some "" -> None
-      (* | Some "ide" -> Some Why3ide *)
       | Some s' -> Some (Why3 (Why3_prover.find s'))
       | None -> Some (Why3 (Why3_prover.find s))
 
 let name_of_prover = function
-  (* | Why3ide -> "why3ide" *)
   | Why3 s -> "why3:" ^ (Why3_prover.print s)
   | NativeAltErgo -> "alt-ergo"
   | NativeCoq -> "coq"
@@ -140,7 +136,6 @@ let name_of_prover = function
   | Tactical -> "script"
 
 let title_of_prover = function
-  (* | Why3ide -> "Why3" *)
   | Why3 s -> (Why3_prover.title s)
   | NativeAltErgo -> "Alt-Ergo"
   | NativeCoq -> "Coq"
@@ -168,7 +163,6 @@ let sanitize_why3 s =
 
 let filename_for_prover = function
   | Why3 s -> sanitize_why3 (Why3_prover.print s)
-  (* | Why3ide -> "Why3_ide" *)
   | NativeAltErgo -> "Alt-Ergo"
   | NativeCoq -> "Coq"
   | Qed -> "Qed"
@@ -176,7 +170,6 @@ let filename_for_prover = function
 
 let language_of_prover = function
   | Why3 _ -> L_why3
-  (* | Why3ide -> L_why3 *)
   | NativeCoq -> L_coq
   | NativeAltErgo -> L_altergo
   | Qed | Tactical -> L_why3
