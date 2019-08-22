@@ -331,13 +331,14 @@ module Logic_binding = struct
           in
           Error.not_yet msg
     in
-    let v, e, env = new_var
-      ~loc:Location.unknown
-      env
-      ~name:logic_v.lv_name
-      None
-      ty
-      (fun _ _ -> [])
+    let v, e, env =
+      new_var
+        ~loc:Location.unknown
+        env
+        ~name:logic_v.lv_name
+        None
+        ty
+        (fun _ _ -> [])
     in
     v, e, add_binding env logic_v v
 

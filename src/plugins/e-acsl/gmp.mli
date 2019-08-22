@@ -33,7 +33,7 @@ val init_t: unit -> unit
 
 module type S = sig
   val t: unit -> typ
-  val set_t: typeinfo -> unit
+  val t_as_ptr: unit -> typ (** type equivalent to [t] but seen as a pointer *)
   val is_now_referenced: unit -> unit
   val is_t: typ -> bool
 end
@@ -41,8 +41,6 @@ end
 (** Representation of the unbounded integer type at runtime *)
 module Z: sig
   include S
-  val t_ptr: unit -> typ
-  (** type "_mpz_struct *" *)
 end
 
 (** Representation of the rational type at runtime *)

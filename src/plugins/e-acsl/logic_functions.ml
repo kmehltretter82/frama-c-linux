@@ -125,9 +125,10 @@ let generate_kf ~loc fname env ret_ty params_ty li =
           | Typing.Gmpz ->
             (* GMP's integer are arrays: consider them as pointers in function's
                parameters *)
-            Gmp.Z.t_ptr ()
+            Gmp.Z.t_as_ptr ()
           | Typing.C_type ik -> TInt(ik, [])
-          | Typing.Real | Typing.Nan -> Typing.typ_of_lty lvi.lv_type
+          | Typing.Real -> assert false (* TODO RATIONAL: to be implemented *)
+          | Typing.Nan -> Typing.typ_of_lty lvi.lv_type
         in
         (* build the formals: cannot use [Cil.makeFormal] since the function
            does not yet exist *)

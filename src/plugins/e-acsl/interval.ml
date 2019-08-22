@@ -90,6 +90,17 @@ let ikind_of_interv i =
     | None, Some _ | Some _, None ->
       Kernel.fatal ~current:true "ival: %a" Ival.pretty i
 
+(* function call profiles (intervals for their formal parameters) *)
+module Profile = struct
+  include Datatype.List_with_collections
+      (Ival)
+      (struct
+        let module_name = "E_ACSL.Interval.Logic_function_env.Profile"
+      end)
+  let is_included p1 p2 = List.for_all2 Ival.is_included p1 p2
+  let _join p1 p2 = List.map2 Ival.join p1 p2 (* TODO: to be removed *)
+end
+
 (* Imperative environments *)
 module rec Env: sig
   val clear: unit -> unit
@@ -102,6 +113,9 @@ end = struct
   open Cil_datatype
   let tbl: Ival.t Logic_var.Hashtbl.t = Logic_var.Hashtbl.create 7
 
+  (* TODO: when adding, also join with the old value (if any). Would certainly
+     be the correct way to handle a \let in a recursive logic functions (if the
+     \let body depends on one formal) *)
   let add = Logic_var.Hashtbl.add tbl
   let remove = Logic_var.Hashtbl.remove tbl
   let replace = Logic_var.Hashtbl.replace tbl
@@ -121,11 +135,19 @@ and Logic_function_env: sig
   val clear: unit -> unit
 end = struct
 
-  module Profile =
-    Datatype.List_with_collections
-      (Ival)
+  (* The environment associates to each term (denoting a logic function
+     application) a profile, i.e. the list of intervals for its formal
+     parameters.  It helps to type these applications.
+
+     For each pair of function name and profile, an interval containing the
+     result is also stored. It helps to generate the function definitions for
+     each logic function (for each function, one definition per profile) . *)
+
+  module Terms = Hashtbl.Make
       (struct
-        let module_name = "E_ACSL.Interval.Logic_function_env.Profile"
+        type t = term
+        let equal = (==)
+        let hash = Cil_datatype.Term.hash
       end)
 
   module LF =
@@ -136,9 +158,12 @@ end = struct
         let module_name = "E_ACSL.Interval.Logic_function_env.LF"
       end)
 
-  let tbl = LF.Hashtbl.create 7
+  let terms: Profile.t Terms.t = Terms.create 7
+  let named_profiles = LF.Hashtbl.create 7
 
-  let clear () = LF.Hashtbl.clear tbl
+  let clear () =
+    Terms.clear terms;
+    LF.Hashtbl.clear named_profiles
 
   let interv_of_typ_containing_interv i =
     try
@@ -148,11 +173,20 @@ end = struct
       (* infinity *)
       Ival.inject_range None None, false
 
-  let extract_profile ~infer_with_real t = match t.term_node with
+  let rec map3 f l1 l2 l3 = match l1, l2, l3 with
+    | [], [], [] -> []
+    | x1 :: l1, x2 :: l2, x3 :: l3 -> f x1 x2 x3 :: map3 f l1 l2 l3
+    | _, _, _ -> invalid_arg "E_ACSL.Interval.map3"
+
+  let extract_profile ~infer_with_real old_profile t = match t.term_node with
     | Tapp(li, _, args) ->
+      let old_profile = match old_profile with
+        | None -> List.map (fun _ -> Ival.bottom) li.l_profile
+        | Some p -> p
+      in
       li.l_var_info.lv_name,
-      List.map2
-        (fun param arg ->
+      map3
+        (fun param old_i arg ->
            try
              (* TODO RATIONAL: what if a rational is used as argument or
                 returned? *)
@@ -161,29 +195,46 @@ end = struct
                 faster, and to generate fewer specialized functions *)
              let larger_i, _is_real = interv_of_typ_containing_interv i in
              (* TODO RATIONAL: what to do with is_real? *)
-             Env.add param larger_i;
-             larger_i
+             (* merge the old profile and the new one *)
+             let new_i = Ival.join larger_i old_i in
+             Env.add param new_i;
+             new_i
            with Not_a_number ->
              (* no need to add [param] to the environment *)
              Ival.bottom)
         li.l_profile
+        old_profile
         args
     | _ ->
       assert false
 
-  let widen ~infer_with_real t i =
-    let p = extract_profile ~infer_with_real t in
+  let widen_one_callsite ~infer_with_real old_profile t i =
+    let (_,p as named_p) = extract_profile ~infer_with_real old_profile t in
     try
-      let old_i = LF.Hashtbl.find tbl p in
-      if Ival.is_included i old_i then true, old_i
+      let old_i = LF.Hashtbl.find named_profiles named_p in
+      if Ival.is_included i old_i then true, p, old_i
       else begin
         let j = Ival.join i old_i in
-        LF.Hashtbl.replace tbl p j;
-        false, j
+        LF.Hashtbl.replace named_profiles named_p j;
+        false, p, j
       end
     with Not_found ->
-      LF.Hashtbl.add tbl p i;
-      false, i
+      LF.Hashtbl.add named_profiles named_p i;
+      false, p, i
+
+  let widen ~infer_with_real t i =
+    try
+      let old_p = Terms.find terms t in
+      let b, new_p, i = widen_one_callsite ~infer_with_real (Some old_p) t i in
+      if Profile.is_included new_p old_p then b, i
+      else begin
+        Terms.replace terms t new_p;
+        false, i
+      end
+    with Not_found ->
+      let b, p, i = widen_one_callsite ~infer_with_real None t i in
+      Terms.add terms t p;
+      b, i
 
 end
 
