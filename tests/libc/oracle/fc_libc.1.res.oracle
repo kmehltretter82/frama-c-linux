@@ -4467,10 +4467,22 @@ FILE *__fc_stdin;
 
 FILE *__fc_stdout;
 
-/*@ assigns \nothing; */
+/*@ requires valid_filename: valid_read_string(filename);
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result
+      \from (indirect: *(filename + (0 .. strlen{Old}(filename))));
+ */
 extern int remove(char const *filename);
 
-/*@ assigns \nothing; */
+/*@ requires valid_old_name: valid_read_string(old_name);
+    requires valid_new_name: valid_read_string(new_name);
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result
+      \from (indirect: *(old_name + (0 .. strlen{Old}(old_name)))),
+            (indirect: *(new_name + (0 .. strlen{Old}(new_name))));
+ */
 extern int rename(char const *old_name, char const *new_name);
 
 FILE __fc_fopen[16];
@@ -4483,23 +4495,52 @@ FILE * const __fc_p_fopen = __fc_fopen;
  */
 extern FILE *tmpfile(void);
 
-/*@ assigns \result, *(s + (..));
-    assigns \result \from *(s + (..));
-    assigns *(s + (..)) \from \nothing;
+char __fc_tmpnam[2048];
+char * const __fc_p_tmpnam = __fc_tmpnam;
+/*@ requires valid_s_or_null: s ≡ \null ∨ \valid(s + (0 .. 2048));
+    ensures
+      result_string_or_null:
+        \result ≡ \null ∨ \result ≡ \old(s) ∨
+        \result ≡ __fc_p_tmpnam;
+    assigns *(__fc_p_tmpnam + (0 .. 2048)), *(s + (0 .. 2048)), \result;
+    assigns *(__fc_p_tmpnam + (0 .. 2048))
+      \from *(__fc_p_tmpnam + (0 .. 2048)), (indirect: s);
+    assigns *(s + (0 .. 2048))
+      \from (indirect: s), *(__fc_p_tmpnam + (0 .. 2048));
+    assigns \result \from s, __fc_p_tmpnam;
  */
 extern char *tmpnam(char *s);
 
 /*@ requires valid_stream: \valid(stream);
     ensures result_zero_or_EOF: \result ≡ 0 ∨ \result ≡ -1;
     assigns \result;
-    assigns \result \from stream, stream->__fc_FILE_id;
+    assigns \result \from (indirect: *stream);
  */
 extern int fclose(FILE *stream);
 
 /*@ requires null_or_valid_stream: stream ≡ \null ∨ \valid_read(stream);
     ensures result_zero_or_EOF: \result ≡ 0 ∨ \result ≡ -1;
-    assigns \result;
-    assigns \result \from stream, stream->__fc_FILE_id;
+    assigns \result, *stream, __fc_fopen[0 .. 16 - 1];
+    assigns \result \from (indirect: *stream);
+    assigns *stream
+      \from (indirect: stream), *stream, __fc_fopen[0 .. 16 - 1];
+    assigns __fc_fopen[0 .. 16 - 1]
+      \from (indirect: stream), *stream, __fc_fopen[0 .. 16 - 1];
+    
+    behavior flush_all:
+      assumes all_streams: stream ≡ \null;
+      assigns __fc_fopen[0 .. 16 - 1], \result;
+      assigns __fc_fopen[0 .. 16 - 1] \from __fc_fopen[0 .. 16 - 1];
+      assigns \result \from (indirect: __fc_fopen[0 .. 16 - 1]);
+    
+    behavior flush_stream:
+      assumes single_stream: stream ≢ \null;
+      assigns *stream, \result;
+      assigns *stream \from *stream;
+      assigns \result \from (indirect: *stream);
+    
+    complete behaviors flush_stream, flush_all;
+    disjoint behaviors flush_stream, flush_all;
  */
 extern int fflush(FILE *stream);
 
@@ -4510,8 +4551,8 @@ extern int fflush(FILE *stream);
         \result ≡ \null ∨ \subset(\result, &__fc_fopen[0 .. 16 - 1]);
     assigns \result;
     assigns \result
-      \from (indirect: *(filename + (..))), (indirect: *(mode + (..))),
-            __fc_p_fopen;
+      \from (indirect: *(filename + (0 .. strlen{Old}(filename)))),
+            (indirect: *(mode + (0 .. strlen{Old}(mode)))), __fc_p_fopen;
  */
 extern FILE *fopen(char const * __restrict filename,
                    char const * __restrict mode);
@@ -4522,10 +4563,10 @@ extern FILE *fopen(char const * __restrict filename,
         \result ≡ \null ∨ \subset(\result, &__fc_fopen[0 .. 16 - 1]);
     assigns \result, __fc_fopen[fd];
     assigns \result
-      \from (indirect: fd), (indirect: *(mode + (0 ..))),
+      \from (indirect: fd), (indirect: *(mode + (0 .. strlen{Old}(mode)))),
             (indirect: __fc_fopen[fd]), __fc_p_fopen;
     assigns __fc_fopen[fd]
-      \from (indirect: fd), (indirect: *(mode + (0 ..))),
+      \from (indirect: fd), (indirect: *(mode + (0 .. strlen{Old}(mode)))),
             (indirect: __fc_fopen[fd]), __fc_p_fopen;
  */
 extern FILE *fdopen(int fd, char const *mode);
@@ -4617,21 +4658,32 @@ extern int fgetc(FILE *stream);
  */
 extern char *fgets(char * __restrict s, int size, FILE * __restrict stream);
 
-/*@ assigns *stream; */
+/*@ requires valid_stream: \valid(stream);
+    assigns *stream, \result;
+    assigns *stream \from c, *stream;
+    assigns \result \from (indirect: *stream);
+ */
 extern int fputc(int c, FILE *stream);
 
-/*@ assigns *stream;
-    assigns *stream \from *(s + (..)); */
+/*@ requires valid_string_s: valid_read_string(s);
+    assigns *stream, \result;
+    assigns *stream \from *(s + (0 .. strlen{Old}(s)));
+    assigns \result
+      \from (indirect: *(s + (0 .. strlen{Old}(s)))), (indirect: *stream);
+ */
 extern int fputs(char const * __restrict s, FILE * __restrict stream);
 
-/*@ assigns \result, *stream;
+/*@ requires valid_stream: \valid(stream);
+    assigns \result, *stream;
     assigns \result \from *stream;
     assigns *stream \from *stream;
  */
 extern int getc(FILE *stream);
 
-/*@ assigns \result;
-    assigns \result \from *__fc_stdin; */
+/*@ assigns \result, *__fc_stdin;
+    assigns \result \from *__fc_stdin;
+    assigns *__fc_stdin \from *__fc_stdin;
+ */
 extern int getchar(void);
 
 /*@ axiomatic GetsLength {
@@ -4651,22 +4703,32 @@ extern int getchar(void);
 extern char *gets(char *s);
 
 /*@ requires valid_stream: \valid(stream);
-    assigns *stream;
+    assigns *stream, \result;
     assigns *stream \from c;
+    assigns \result \from (indirect: *stream);
  */
 extern int putc(int c, FILE *stream);
 
-/*@ assigns *__fc_stdout;
-    assigns *__fc_stdout \from c; */
+/*@ assigns *__fc_stdout, \result;
+    assigns *__fc_stdout \from c;
+    assigns \result \from (indirect: *__fc_stdout);
+ */
 extern int putchar(int c);
 
-/*@ assigns *__fc_stdout;
-    assigns *__fc_stdout \from *(s + (..)); */
+/*@ requires valid_string_s: valid_read_string(s);
+    assigns *__fc_stdout, \result;
+    assigns *__fc_stdout \from *(s + (0 .. strlen{Old}(s)));
+    assigns \result
+      \from (indirect: *(s + (0 .. strlen{Old}(s)))),
+            (indirect: *__fc_stdout);
+ */
 extern int puts(char const *s);
 
 /*@ requires valid_stream: \valid(stream);
-    assigns *stream;
-    assigns *stream \from c;
+    ensures result_ok_or_error: \result ≡ \old(c) ∨ \result ≡ -1;
+    assigns *stream, \result;
+    assigns *stream \from (indirect: c);
+    assigns \result \from (indirect: c), (indirect: *stream);
  */
 extern int ungetc(int c, FILE *stream);
 
@@ -4678,8 +4740,8 @@ extern int ungetc(int c, FILE *stream);
         \initialized((char *)\old(ptr) + (0 .. \result * \old(size) - 1));
     assigns *((char *)ptr + (0 .. nmemb * size - 1)), \result;
     assigns *((char *)ptr + (0 .. nmemb * size - 1))
-      \from size, nmemb, *stream;
-    assigns \result \from size, *stream;
+      \from (indirect: size), (indirect: nmemb), (indirect: *stream);
+    assigns \result \from size, (indirect: *stream);
  */
 extern size_t fread(void * __restrict ptr, size_t size, size_t nmemb,
                     FILE * __restrict stream);
@@ -4689,14 +4751,21 @@ extern size_t fread(void * __restrict ptr, size_t size, size_t nmemb,
     requires valid_stream: \valid(stream);
     ensures size_written: \result ≤ \old(nmemb);
     assigns *stream, \result;
-    assigns *stream \from *((char *)ptr + (0 .. nmemb * size - 1));
-    assigns \result \from *((char *)ptr + (0 .. nmemb * size - 1));
+    assigns *stream
+      \from (indirect: *((char *)ptr + (0 .. nmemb * size - 1)));
+    assigns \result
+      \from (indirect: *((char *)ptr + (0 .. nmemb * size - 1)));
  */
 extern size_t fwrite(void const * __restrict ptr, size_t size, size_t nmemb,
                      FILE * __restrict stream);
 
-/*@ assigns *pos;
-    assigns *pos \from *stream; */
+/*@ requires valid_stream: \valid(stream);
+    requires valid_pos: \valid(pos);
+    requires initialization: pos: \initialized(pos);
+    assigns *pos, \result;
+    assigns *pos \from (indirect: *stream);
+    assigns \result \from (indirect: *stream);
+ */
 extern int fgetpos(FILE * __restrict stream, fpos_t * __restrict pos);
 
 /*@ requires valid_stream: \valid(stream);
@@ -4710,8 +4779,12 @@ extern int fgetpos(FILE * __restrict stream, fpos_t * __restrict pos);
  */
 extern int fseek(FILE *stream, long offset, int whence);
 
-/*@ assigns *stream;
-    assigns *stream \from *pos; */
+/*@ requires valid_stream: \valid(stream);
+    requires valid_pos: \valid_read(pos);
+    requires initialization: pos: \initialized(pos);
+    assigns *stream;
+    assigns *stream \from *pos;
+ */
 extern int fsetpos(FILE *stream, fpos_t const *pos);
 
 /*@ requires valid_stream: \valid(stream);
@@ -4739,13 +4812,13 @@ extern void clearerr(FILE *stream);
 
 /*@ requires valid_stream: \valid(stream);
     assigns \result;
-    assigns \result \from *stream;
+    assigns \result \from (indirect: *stream);
  */
 extern int feof(FILE *stream);
 
 /*@ requires valid_stream: \valid(stream);
     assigns \result;
-    assigns \result \from *stream;
+    assigns \result \from (indirect: *stream);
  */
 extern int fileno(FILE *stream);
 
@@ -4770,13 +4843,13 @@ extern int ftrylockfile(FILE *stream);
 
 /*@ requires valid_stream: \valid(stream);
     assigns \result;
-    assigns \result \from *stream;
+    assigns \result \from (indirect: *stream);
  */
 extern int ferror(FILE *stream);
 
 /*@ requires valid_string_s: valid_read_string(s);
     assigns __fc_stdout;
-    assigns __fc_stdout \from __fc_errno, *(s + (..));
+    assigns __fc_stdout \from __fc_errno, *(s + (0 .. strlen{Old}(s)));
  */
 extern void perror(char const *s);
 
@@ -4792,13 +4865,16 @@ extern int getc_unlocked(FILE *stream);
 extern int getchar_unlocked(void);
 
 /*@ requires valid_stream: \valid(stream);
-    assigns *stream;
+    assigns *stream, \result;
     assigns *stream \from c;
+    assigns \result \from (indirect: *stream);
  */
 extern int putc_unlocked(int c, FILE *stream);
 
-/*@ assigns *__fc_stdout;
-    assigns *__fc_stdout \from c; */
+/*@ assigns *__fc_stdout, \result;
+    assigns *__fc_stdout \from c;
+    assigns \result \from (indirect: *__fc_stdout);
+ */
 extern int putchar_unlocked(int c);
 
 /*@ requires valid_stream: \valid(stream);
@@ -4809,19 +4885,19 @@ extern void clearerr_unlocked(FILE *stream);
 
 /*@ requires valid_stream: \valid(stream);
     assigns \result;
-    assigns \result \from *stream;
+    assigns \result \from (indirect: *stream);
  */
 extern int feof_unlocked(FILE *stream);
 
 /*@ requires valid_stream: \valid(stream);
     assigns \result;
-    assigns \result \from *stream;
+    assigns \result \from (indirect: *stream);
  */
 extern int ferror_unlocked(FILE *stream);
 
 /*@ requires valid_stream: \valid(stream);
     assigns \result;
-    assigns \result \from *stream;
+    assigns \result \from (indirect: *stream);
  */
 extern int fileno_unlocked(FILE *stream);
 
