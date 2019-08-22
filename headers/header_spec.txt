@@ -1442,8 +1442,6 @@ src/plugins/wp/ProverSearch.ml: CEA_WP
 src/plugins/wp/ProverSearch.mli: CEA_WP
 src/plugins/wp/ProverTask.ml: CEA_WP
 src/plugins/wp/ProverTask.mli: CEA_WP
-src/plugins/wp/ProverWhy3.ml: CEA_WP
-src/plugins/wp/ProverWhy3.mli: CEA_WP
 src/plugins/wp/REVISION: .ignore
 src/plugins/wp/RefUsage.ml: CEA_WP
 src/plugins/wp/RefUsage.mli: CEA_WP

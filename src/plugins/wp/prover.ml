@@ -38,9 +38,9 @@ let dispatch ?(config=VCS.default) mode prover wpo =
   in
   begin
     match prover with
+    | Why3 prover -> why3 prover
     | NativeAltErgo -> ProverErgo.prove ~config ~mode wpo
     | NativeCoq -> ProverCoq.prove mode wpo
-    | Why3 prover -> why3 prover
     | Qed | Tactical -> Task.return VCS.no_result
   end
 
