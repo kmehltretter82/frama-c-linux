@@ -170,7 +170,7 @@ let add_cast ~loc ?name e env ty =
     (* 1) Cast R to Z using cast_to_z
        2) Extract ulong from Z
        3) Potentially cast ulong to ty *)
-    Error.not_yet "R to TInt"
+    Error.not_yet "R to Int"
   | _ ->
     Error.not_yet "R to <typ>"
 

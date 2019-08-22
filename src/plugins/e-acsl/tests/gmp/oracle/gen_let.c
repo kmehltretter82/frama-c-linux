@@ -93,18 +93,18 @@ int main(void)
   /*@ assert \let u = f; u ≡ f; */
   {
     __e_acsl_mpq_t __gen_e_acsl_u_10;
-    __e_acsl_mpq_t __gen_e_acsl_f;
+    __e_acsl_mpq_t __gen_e_acsl_;
     int __gen_e_acsl_eq;
     __gmpq_init(__gen_e_acsl_u_10);
     __gmpq_set_d(__gen_e_acsl_u_10,(double)f);
-    __gmpq_init(__gen_e_acsl_f);
-    __gmpq_set_d(__gen_e_acsl_f,(double)f);
+    __gmpq_init(__gen_e_acsl_);
+    __gmpq_set_d(__gen_e_acsl_,(double)f);
     __gen_e_acsl_eq = __gmpq_cmp((__e_acsl_mpq_struct const *)(__gen_e_acsl_u_10),
-                                 (__e_acsl_mpq_struct const *)(__gen_e_acsl_f));
+                                 (__e_acsl_mpq_struct const *)(__gen_e_acsl_));
     __e_acsl_assert(__gen_e_acsl_eq == 0,(char *)"Assertion",(char *)"main",
                     (char *)"\\let u = f; u == f",27);
     __gmpq_clear(__gen_e_acsl_u_10);
-    __gmpq_clear(__gen_e_acsl_f);
+    __gmpq_clear(__gen_e_acsl_);
   }
   int t[4] = {1, 2, 3, 4};
   /*@ assert \let u = &t[1]; 1 ≡ 1; */

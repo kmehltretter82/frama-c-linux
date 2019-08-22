@@ -244,19 +244,19 @@ mystruct __gen_e_acsl_t1(mystruct m)
 
 int __gen_e_acsl_p1(int x, int y)
 {
-  int __retres = x + y > 0L;
+  int __retres = x + (long)y > 0L;
   return __retres;
 }
 
 long __gen_e_acsl_t2(mystruct m)
 {
-  long __retres = m.k + m.l;
+  long __retres = m.k + (long)m.l;
   return __retres;
 }
 
 int __gen_e_acsl_p2(int x, int y)
 {
-  int __retres = x + y > 0L;
+  int __retres = x + (long)y > 0L;
   return __retres;
 }
 
@@ -312,7 +312,7 @@ int __gen_e_acsl_k_pred(int x)
 
 long __gen_e_acsl_f1(int x, int y)
 {
-  long __retres = x + y;
+  long __retres = x + (long)y;
   return __retres;
 }
 
