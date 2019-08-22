@@ -25,7 +25,6 @@ type node_kind =
   | Composite of Cil_types.varinfo
   | Scattered of Cil_types.lval * Locations.location
   | Alarm of Cil_types.stmt * Alarms.alarm
-  | Cluster (* Dummy node, hack for Ocamlgraph Graphviz Dot module *)
 
 type node_locality = {
   loc_file : string;

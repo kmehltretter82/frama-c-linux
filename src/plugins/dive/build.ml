@@ -419,7 +419,6 @@ let build_node_deps context node =
   | Scattered (_lval, _location) -> () (* TODO: implements *)
   | Alarm (stmt,alarm) ->
     build_alarm_deps callstack stmt alarm
-  | Cluster -> ()
 
 
 (* --- Graph initialization --- *)
@@ -474,7 +473,7 @@ let explore ~depth context root =
     let is_root = Graph.Node.equal node root (* the root is always explored *)
     and is_intersting_kind = match node.node_kind with
      | Scalar _ | Composite _ | Alarm _ -> true
-     | Scattered _ | Cluster -> false
+     | Scattered _ -> false
     in
     is_root || (not node.node_hidden && is_intersting_kind)
   in

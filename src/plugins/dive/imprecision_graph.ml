@@ -47,6 +47,12 @@ module G =
   Graph.Imperative.Digraph.ConcreteBidirectionalLabeled (Node) (Dependency)
 include G
 
+let vertices g =
+  fold_vertex (fun n acc -> n ::acc) g []
+
+let edges g =
+  fold_edges_e (fun d acc -> d ::acc) g []
+
 let next_key = ref 0
 
 let create_node ?node_values ~node_kind ~node_locality g =
@@ -127,45 +133,12 @@ let find_independant_nodes g roots =
   let module Table = Hashtbl.Make (Node) in
   let table = Table.create 13 in
   List.iter (Dfs.prefix_component (fun n -> Table.add table n true) g) roots;
-  let keep_node n =
-    Table.mem table n || n.node_kind = Cluster
-  in
-  fold_vertex (fun n acc -> if keep_node n then acc else n :: acc) g []
-
-
-let add_dummy_nodes g =
-  let module FileTable = Datatype.String.Hashtbl in
-  let module CallstackTable = Value_types.Callstack.Hashtbl in
-  let file_table = FileTable.create 13 in
-  let callstack_table = CallstackTable.create 13 in
-  let g = copy g in
-
-  let create_locality_vertex { node_locality } =
-    let { loc_file ; loc_callstack } = node_locality in
-    let rec add_file _ =
-      let node_locality = { node_locality with loc_callstack = [] } in
-      create_node g ~node_kind:Cluster ~node_locality
-    and add_callstack = function
-      | [] -> assert false
-      | _ :: t as loc_callstack ->
-        let node_locality = { node_locality with loc_callstack } in
-        if t <> [] then
-          ignore (CallstackTable.memo callstack_table t add_callstack);
-        create_node g ~node_kind:Cluster ~node_locality
-    in
-    match loc_callstack with
-    | [] ->
-      ignore (FileTable.memo file_table loc_file add_file)
-    | cs ->
-      ignore (CallstackTable.memo callstack_table cs add_callstack)
-  in
-  iter_vertex create_locality_vertex g;
-  g
+  fold_vertex (fun n acc -> if Table.mem table n then acc else n :: acc) g []
 
 
 let ouptput_to_dot out_channel g =
   let open Graph.Graphviz.DotAttributes in
-  let g = add_dummy_nodes g in
+  (* let g = add_dummy_nodes g in *)
 
   let build_label s = `HtmlLabel (Extlib.html_escape s) in
 
@@ -216,7 +189,6 @@ let ouptput_to_dot out_channel g =
           | Alarm _ ->  [ `Shape `Doubleoctagon ;
                           `Style `Bold ; `Color 0xff0000 ;
                           `Style `Filled ; `Fillcolor 0xff0000 ]
-          | Cluster -> [ `Style `Invis ]
         and values = match v.node_values with
           | None -> []
           | Some ({values_grade=Singleton}) ->
@@ -269,7 +241,6 @@ struct
       | Composite _ -> "composite"
       | Scattered _ -> "scattered"
       | Alarm _ -> "alarm"
-      | Cluster -> "dummy"
     in
     Json.of_string s
 
@@ -343,28 +314,13 @@ struct
     ]
 
   let output_graph g =
-    let add_node node acc =
-      if node.node_kind = Cluster
-      then acc
-      else output_node node :: acc
-    and add_edge d acc =
-      output_dep d :: acc
-    in
     Json.of_fields [
-      ("nodes", Json.of_list (fold_vertex add_node g [])) ;
-      ("deps", Json.of_list (fold_edges_e add_edge g []))
+      ("nodes", Json.of_list (List.map output_node (vertices g))) ;
+      ("deps", Json.of_list (List.map output_dep (edges g)))
     ]
 
   let output_diff g diff =
-    let add_node acc node =
-      if node.node_kind = Cluster
-      then acc
-      else output_node node :: acc
-    and add_dep d acc =
-      output_dep d :: acc
-    in
-    let added_nodes =
-      List.fold_left add_node [] diff.added_nodes
+    let added_nodes = List.map output_node diff.added_nodes
     and added_deps =
       let module Set = Set.Make (struct
           type t = edge
@@ -377,7 +333,7 @@ struct
         set
       in
       let set = List.fold_left collect_deps Set.empty diff.added_nodes in
-      Set.fold add_dep set []
+      List.map output_dep (Set.elements set)
     and removed_nodes =
       List.map (fun node -> Json.of_int node.node_key) diff.removed_nodes
     in

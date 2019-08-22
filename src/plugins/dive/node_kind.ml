@@ -35,14 +35,14 @@ struct
 
   let name = "Node_kind"
 
-  let reprs = [ Cluster ]
+  let reprs = [ Scalar (
+      List.hd Cil_datatype.Varinfo.reprs,
+      List.hd Cil_datatype.Typ.reprs,
+      List.hd Cil_datatype.Offset.reprs) ]
 
   let compare k1 k2 =
     let open Cil_datatype in
     match k1, k2 with
-    | Cluster, Cluster -> 0
-    | Cluster, _ -> 1
-    | _, Cluster -> -1
     | Scalar (vi1, _, offset1), Scalar (vi2, _, offset2) ->
       Varinfo.compare vi1 vi2 <?> (OffsetStructEq.compare, offset1, offset2)
     | Scalar _, _ -> 1
@@ -60,7 +60,6 @@ struct
   let equal k1 k2 =
     let open Cil_datatype in
     match k1, k2 with
-    | Cluster, Cluster -> true
     | Scalar (vi1, _, offset1), Scalar (vi2, _, offset2) ->
       Varinfo.equal vi1 vi2 && OffsetStructEq.equal offset1 offset2
     | Composite vi1, Composite vi2 -> Varinfo.equal vi1 vi2
@@ -73,7 +72,6 @@ struct
   let hash k =
     let open Cil_datatype in
     match k with
-    | Cluster -> Hashtbl.hash 0
     | Scalar (vi, _, offset) ->
       Hashtbl.hash (1, Varinfo.hash vi, OffsetStructEq.hash offset)
     | Composite vi -> Hashtbl.hash (2, Varinfo.hash vi)
@@ -88,7 +86,7 @@ include Datatype.Make (DatatypeInput)
 
 let get_base = function
   | Scalar (vi,_,_) | Composite (vi) -> Some vi
-  | Scattered _ | Alarm _ | Cluster -> None
+  | Scattered _ | Alarm _ -> None
 
 let to_location = function
   | Scalar (vi,typ,offset) ->
@@ -98,17 +96,16 @@ let to_location = function
     Some (Locations.loc_of_varinfo vi)
   | Scattered (_,loc) ->
     Some loc
-  | Alarm _ | Cluster -> None
+  | Alarm _  -> None
 
 let to_lval = function
   | Scalar (vi,_typ,offset) -> Some (Cil_types.Var vi, offset)
   | Composite (vi) -> Some (Cil_types.Var vi, Cil_types.NoOffset)
   | Scattered (lval,_) -> Some lval
-  | Alarm (_,_) | Cluster -> None
+  | Alarm (_,_) -> None
 
 let pretty fmt = function
   | (Scalar _ | Composite _ | Scattered _) as kind ->
     Cil_printer.pp_lval fmt (Extlib.the (to_lval kind))
   | Alarm (_stmt,alarm) ->
     Cil_printer.pp_predicate fmt (Alarms.create_predicate alarm)
-  | Cluster -> ()
