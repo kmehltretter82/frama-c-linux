@@ -34,9 +34,6 @@ ifneq ("$(FRAMAC_INTERNAL)","yes")
 include $(FRAMAC_SHARE)/Makefile.config
 endif
 
-# Why3 API Available
-WHY3API=@WHY3API@
-
 # Coq Resources Installation
 include $(PLUGIN_DIR)/share/Makefile.resources
 
@@ -121,7 +118,6 @@ PLUGIN_DISTRIB_EXTERNAL:= \
 
 CEA_WP_GENEREATED= script.ml rformat.ml driver.ml
 
-
 # --------------------------------------------------------------------------
 # --- Tests                                                              ---
 # --------------------------------------------------------------------------
@@ -149,7 +145,13 @@ else
 CONFIG_STATUS_DIR=.
 endif
 
-$(Wp_DIR)/Makefile: $(Wp_DIR)/Makefile.in $(Wp_DIR)/share/Makefile.resources $(CONFIG_STATUS_DIR)/config.status
+WP_CONFIGURE_MAKEFILE= \
+	$(Wp_DIR)/Makefile.in \
+	$(Wp_DIR)/share/Makefile.coqwp \
+	$(Wp_DIR)/share/Makefile.resources \
+	$(CONFIG_STATUS_DIR)/config.status
+
+$(Wp_DIR)/Makefile: $(WP_CONFIGURE_MAKEFILE)
 	@cd $(CONFIG_STATUS_DIR) && ./config.status --file $@
 
 # --------------------------------------------------------------------------
@@ -226,23 +228,16 @@ clean::
 
 ## All relative to share/
 
-WP_COQ_SOURCES= $(addprefix coqwp/, $(COQ_LIBS_CEA) $(COQ_LIBS_INRIA))
-WHY3_COQ_SOURCES= $(addprefix why3/, $(COQ_LIBS_CEA))
-
-ALL_COQ_SOURCES= $(WP_COQ_SOURCES) $(WHY3_COQ_SOURCES)
+ALL_COQ_SOURCES= $(addprefix coqwp/, $(COQ_LIBS_CEA) $(COQ_LIBS_INRIA))
 ALL_COQ_BINARIES= $(addsuffix o, $(ALL_COQ_SOURCES))
 ALL_ERGO_SOURCES= $(addprefix ergo/, $(ERGO_LIBS_CEA) $(ERGO_LIBS_INRIA))
 ALL_WHY3_SOURCES= $(addprefix why3/frama_c_wp/, $(WHY3_LIBS_CEA))
-ALL_WHY3_API_SOURCES= $(addprefix why3/frama_c_wp/, $(WHY3_LIBS_CEA))
 
 ALL_RESOURCES= \
 	wp.driver \
-	why3/coq.drv \
-	why3/why3.conf \
 	$(ALL_COQ_SOURCES) \
 	$(ALL_ERGO_SOURCES) \
-	$(ALL_WHY3_SOURCES) \
-	$(ALL_WHY3_API_SOURCES)
+	$(ALL_WHY3_SOURCES)
 
 INSTALL_OPT?=
 INSTALL_SHARE=@$(Wp_DIR)/share/instwp $(INSTALL_OPT)
@@ -260,55 +255,17 @@ $(Wp_DIR)/share/instwp: $(Wp_DIR)/share/install.ml
 # --- Pre-Compiled Coq Libraries                                         ---
 # --------------------------------------------------------------------------
 
-.PHONY: wp-coq wp-why3 wp-coq-all wp-coq-clean wp-coq-install wp-coq-uninstall
-
-wp-coq-all: wp-coq wp-why3
-
-wp-coq: coqwpcompile
-	@echo "Run 'make wp-coq-install' to install all precompiled libraries"
-
-wp-why3:  why3compile
-	@echo "Run 'make wp-coq-install' to install all precompiled libraries"
-
 WP_COQC_ENABLED=@COQC@
-WP_WHY3COQC_ENABLED=@WHY3COQC@
 
-include $(Wp_DIR)/share/Makefile
+ifeq ($(WP_COQC_ENABLED),yes)
 
-wp-coq-install:
-	$(PRINT_INSTALL) "Coq Libraries"
-	$(INSTALL_SHARE) -f -p -s \
-		-i $(Wp_DIR)/share \
-		-d $(FRAMAC_DATADIR)/wp \
-		$(ALL_COQ_BINARIES)
+include $(Wp_DIR)/share/Makefile.coqwp
 
-wp-coq-uninstall:
-	$(PRINT_RM) "Coq Libraries"
-	@rm -f $(FRAMAC_DATADIR)/wp/why3/*.vo
-	@rm -f $(FRAMAC_DATADIR)/wp/coqwp/*.vo
-	@rm -f $(FRAMAC_DATADIR)/wp/coqwp/*/*.vo
+byte:: coqwpcompile
+opt:: coqwpcompile
+clean:: wp-coq-clean
 
-# --------------------------------------------------------------------------
-# --- Why3 configuration
-# --------------------------------------------------------------------------
-
-byte:: $(Wp_DIR)/share/why3/why3.conf
-opt:: $(Wp_DIR)/share/why3/why3.conf
-
-$(Wp_DIR)/share/why3/why3.conf: config.status $(Wp_DIR)/Makefile.in
-	$(PRINT_MAKING) "extra-config for why3"
-	$(RM) $@
-	@printf "[prover_modifiers]\n" >> $@
-	@printf "name=\"Coq\"\n" >> $@
-	@printf "option=\"-Q $(FRAMAC_DATADIR)/wp/why3 ''\"\n" >> $@
-	@printf "driver=\"$(FRAMAC_DATADIR)/wp/why3/coq.drv\"\n" >> $@
-	@printf "\n"  >> $@
-	@printf "[editor_modifiers coqide]\n" >> $@
-	@printf "option=\"-I $(FRAMAC_DATADIR)/wp/why3\"\n" >> $@
-	@printf "\n"  >> $@
-	@printf "[editor_modifiers proofgeneral-coq]\n" >> $@
-	@printf "option=\"--eval \\\\\"(setq coq-load-path (cons '(\\\\\\\\\\\\\"$(FRAMAC_DATADIR)/wp/why3\\\\\\\\\\\\\" \\\\\\\\\\\\\"\\\\\\\\\\\\\") coq-load-path))\\\\\"\"\n"  >> $@
-	$(CHMOD_RO) $@
+endif #($(WP_COQC_ENABLED),yes)
 
 # --------------------------------------------------------------------------
 # --- Installation                                                       ---

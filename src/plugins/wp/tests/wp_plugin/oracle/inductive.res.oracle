@@ -18,7 +18,7 @@
   Require Import int.Abs.
   Require Import int.ComputerDivision.
   Require Import int.EuclideanDivision.
-  Require Import for_drivers.ComputerOfEuclideanDivision.
+  Require Import int.ComputerOfEuclideanDivision.
   Require Import real.Real.
   Require Import real.RealInfix.
   Require Import real.FromInt.
@@ -45,7 +45,7 @@
   Require Import int.Abs.
   Require Import int.ComputerDivision.
   Require Import int.EuclideanDivision.
-  Require Import for_drivers.ComputerOfEuclideanDivision.
+  Require Import int.ComputerOfEuclideanDivision.
   Require Import real.Real.
   Require Import real.RealInfix.
   Require Import real.FromInt.
@@ -96,7 +96,7 @@
   Require Import int.Abs.
   Require Import int.ComputerDivision.
   Require Import int.EuclideanDivision.
-  Require Import for_drivers.ComputerOfEuclideanDivision.
+  Require Import int.ComputerOfEuclideanDivision.
   Require Import real.Real.
   Require Import real.RealInfix.
   Require Import real.FromInt.
