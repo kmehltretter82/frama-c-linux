@@ -1,25 +1,25 @@
 digraph G {
-  cp0 [style="invis,dotted", ];
-  cp1 [label=<res>, shape=box, ];
-  cp2 [style="invis,dotted", ];
-  cp3 [label=<__retres>, shape=box, ];
-  cp4 [label=<c>, shape=box, ];
+  cp0 [label=<res>, shape=box, ];
+  cp1 [label=<__retres>, shape=box, ];
+  cp3 [label=<c>, shape=box, ];
   cp5 [label=<w>, shape=box, ];
-  cp6 [label=<x>, shape=box, ];
-  cp7 [label=<y>, shape=box, ];
-  cp8 [label=<i>, shape=box, style="dotted", ];
+  cp7 [label=<x>, shape=box, ];
+  cp9 [label=<y>, shape=box, ];
+  cp11 [label=<i>, shape=box, style="dotted", ];
+  cp14 [style="invis,dotted", ];
+  cp15 [style="invis,dotted", ];
   
-  subgraph cluster_cs_1 { label=<main>; cp8;cp1;cp0;
-    subgraph cluster_cs_2 { label=<f>; cp7;cp6;cp5;cp4;cp3;cp2;
+  subgraph cluster_cs_1 { label=<main>; cp14;cp11;cp0;
+    subgraph cluster_cs_2 { label=<f>; cp15;cp9;cp7;cp5;cp3;cp1;
        };
      };
   
+  cp1 -> cp0;
   cp3 -> cp1;
-  cp4 -> cp3;
-  cp5 -> cp3;
-  cp6 -> cp4;
-  cp7 -> cp5;
-  cp8 -> cp6;
-  cp8 -> cp7;
+  cp5 -> cp1;
+  cp7 -> cp3;
+  cp9 -> cp5;
+  cp11 -> cp7;
+  cp11 -> cp9;
   
   }

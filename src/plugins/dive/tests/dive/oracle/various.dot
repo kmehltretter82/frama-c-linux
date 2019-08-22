@@ -1,70 +1,70 @@
 digraph G {
-  cp0 [style="invis,dotted", ];
-  cp1 [label=<x2>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+  cp0 [label=<x2>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
        style="filled", ];
-  cp2 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+  cp1 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
        style="filled", ];
-  cp3 [style="invis,dotted", ];
-  cp4 [label=<x>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
+  cp3 [label=<x>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
        style="filled", ];
-  cp5 [style="invis,dotted", ];
-  cp6 [label=<g>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
+  cp7 [label=<g>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
        style="filled", ];
-  cp7 [label=<z>, shape=box, ];
-  cp8 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
-       style="filled", ];
-  cp9 [label=<w>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
-       style="filled", ];
-  cp10 [style="invis,dotted", ];
-  cp11 [label=<x2>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+  cp9 [label=<z>, shape=box, ];
+  cp10 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
         style="filled", ];
-  cp12 [label=<tmp_0>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+  cp12 [label=<w>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
         style="filled", ];
-  cp13 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+  cp14 [label=<x2>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
         style="filled", ];
-  cp14 [label=<pf>, shape=box, ];
-  cp15 [style="invis,dotted", ];
-  cp16 [label=<x2>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+  cp16 [label=<tmp_0>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
         style="filled", ];
-  cp17 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+  cp18 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
         style="filled", ];
-  cp18 [label=<is_nan_or_infinite: \is_finite((float)((double)((double)y * 2.0)))>,
+  cp21 [label=<pf>, shape=box, ];
+  cp23 [label=<x2>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+        style="filled", ];
+  cp26 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+        style="filled", ];
+  cp30 [label=<is_nan_or_infinite: \is_finite((float)((double)((double)y * 2.0)))>,
         fillcolor="#FF0000", color="#FF0000", shape=doubleoctagon,
         style="filled,bold", ];
-  cp19 [label=<is_nan_or_infinite: \is_finite((float)(y + w))>,
+  cp32 [label=<is_nan_or_infinite: \is_finite((float)(y + w))>,
         fillcolor="#FF0000", color="#FF0000", shape=doubleoctagon,
         style="filled,bold", ];
+  cp35 [style="invis,dotted", ];
+  cp36 [style="invis,dotted", ];
+  cp37 [style="invis,dotted", ];
+  cp38 [style="invis,dotted", ];
+  cp39 [style="invis,dotted", ];
   
-  subgraph cluster_cs_1 { label=<f>; cp18;cp2;cp1;cp0;
+  subgraph cluster_cs_1 { label=<f>; cp35;cp30;cp1;cp0;
      };
-  subgraph cluster_cs_2 { label=<main>; cp19;cp14;cp12;cp9;cp8;cp7;cp4;cp3;
-    subgraph cluster_cs_3 { label=<f>; cp13;cp11;cp10;
+  subgraph cluster_cs_2 { label=<main>; cp36;cp32;cp21;cp16;cp12;cp10;cp9;cp3;
+    subgraph cluster_cs_3 { label=<f>; cp38;cp18;cp14;
        };
-    subgraph cluster_cs_4 { label=<f>; cp17;cp16;cp15;
+    subgraph cluster_cs_4 { label=<f>; cp39;cp26;cp23;
        };
      };
-  subgraph cluster_file_1 { label=<tests/dive/various.i>; cp6;cp5;
+  subgraph cluster_file_1 { label=<tests/dive/various.i>; cp37;cp7;
      };
   
-  cp1 -> cp2;
-  cp2 -> cp1;
-  cp2 -> cp18;
-  cp4 -> cp1;
-  cp4 -> cp4;
-  cp4 -> cp11;
-  cp4 -> cp16;
-  cp6 -> cp4;
-  cp8 -> cp7;
-  cp8 -> cp19;
-  cp9 -> cp7;
-  cp9 -> cp19;
-  cp11 -> cp8;
-  cp11 -> cp13;
+  cp0 -> cp1;
+  cp1 -> cp0;
+  cp1 -> cp30;
+  cp3 -> cp0;
+  cp3 -> cp3;
+  cp3 -> cp14;
+  cp3 -> cp23;
+  cp7 -> cp3;
+  cp10 -> cp9;
+  cp10 -> cp32;
   cp12 -> cp9;
-  cp13 -> cp11;
-  cp14 -> cp12 [color="#00FF00", ];
+  cp12 -> cp32;
+  cp14 -> cp10;
+  cp14 -> cp18;
   cp16 -> cp12;
-  cp16 -> cp17;
-  cp17 -> cp16;
+  cp18 -> cp14;
+  cp21 -> cp16 [color="#00FF00", ];
+  cp23 -> cp16;
+  cp23 -> cp26;
+  cp26 -> cp23;
   
   }
