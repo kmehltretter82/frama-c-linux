@@ -608,7 +608,7 @@ module CLUSTERS = Model.Index
     (struct
       type key = Definitions.cluster
       type data = int * Why3.Theory.theory
-      let name = "Why3_api.CLUSTERS"
+      let name = "ProverWhy3.CLUSTERS"
       let compare = Definitions.cluster_compare
       let pretty = Definitions.pp_cluster
     end)

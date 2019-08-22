@@ -1442,6 +1442,8 @@ src/plugins/wp/ProverSearch.ml: CEA_WP
 src/plugins/wp/ProverSearch.mli: CEA_WP
 src/plugins/wp/ProverTask.ml: CEA_WP
 src/plugins/wp/ProverTask.mli: CEA_WP
+src/plugins/wp/ProverWhy3.mli: CEA_WP
+src/plugins/wp/ProverWhy3.ml: CEA_WP
 src/plugins/wp/REVISION: .ignore
 src/plugins/wp/RefUsage.ml: CEA_WP
 src/plugins/wp/RefUsage.mli: CEA_WP
@@ -1525,8 +1527,6 @@ src/plugins/wp/ctypes.ml: CEA_WP
 src/plugins/wp/ctypes.mli: CEA_WP
 src/plugins/wp/filter_axioms.ml: CEA_WP
 src/plugins/wp/filter_axioms.mli: CEA_WP
-src/plugins/wp/why3_api.mli: CEA_WP
-src/plugins/wp/why3_api.ml: CEA_WP
 src/plugins/wp/doc/MakeDoc: .ignore
 src/plugins/wp/doc/coqdoc/Makefile: .ignore
 src/plugins/wp/doc/coqdoc/coqdoc.sty: .ignore

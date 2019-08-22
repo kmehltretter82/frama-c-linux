@@ -88,7 +88,7 @@ PLUGIN_CMO:= \
 	TacCongruence TacOverflow Auto \
 	ProofSession ProofScript ProofEngine \
 	ProverTask ProverErgo ProverCoq \
-	filter_axioms why3_api \
+	filter_axioms ProverWhy3 \
 	driver prover ProverSearch ProverScript \
 	Generator Factory \
 	calculus cfgDump cfgWP \
