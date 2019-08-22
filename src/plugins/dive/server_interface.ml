@@ -137,3 +137,24 @@ let () = Request.register ~page
       Build.explore_from_vertex ~depth g node_key;
       Build.get_graph g, Build.take_last_differences g
     end
+
+let () = Request.register ~page
+    ~kind:`EXEC ~name:"dive.show"
+    ~descr:(Markdown.rm "Show the dependencies of an existing vertex")
+    ~input:(module Data.Jint) ~output:(module GraphDiff)
+    begin fun node_key ->
+      let depth = Self.DepthLimit.get () in
+      let g = get_graph () in
+      Build.show ~depth g node_key;
+      Build.get_graph g, Build.take_last_differences g
+    end
+
+let () = Request.register ~page
+    ~kind:`EXEC ~name:"dive.hide"
+    ~descr:(Markdown.rm "Hide the dependencies of an existing vertex")
+    ~input:(module Data.Jint) ~output:(module GraphDiff)
+    begin fun node_key ->
+      let g = get_graph () in
+      Build.hide g node_key;
+      Build.get_graph g, Build.take_last_differences g
+    end

@@ -54,6 +54,7 @@ let create_node ?node_values ~node_kind ~node_locality g =
     node_key = !next_key;
     node_kind;
     node_locality;
+    node_hidden = false;
     node_values;
     node_deps_computed = false;
   }
@@ -112,9 +113,59 @@ let create_dependency ~allow_folding g v1 dependency_kind v2 =
     incr next_key;
     add_edge_e g (v1,e,v2)
 
+let remove_dependency g edge =
+  remove_edge_e g edge
+
+
+let find_independant_nodes g roots =
+  let module Dfs = Graph.Traverse.Dfs (struct
+      include G
+      let iter_succ = G.iter_pred
+      let fold_succ = G.fold_pred
+    end)
+  in
+  let module Table = Hashtbl.Make (Node) in
+  let table = Table.create 13 in
+  List.iter (Dfs.prefix_component (fun n -> Table.add table n true) g) roots;
+  let keep_node n =
+    Table.mem table n || n.node_kind = Cluster
+  in
+  fold_vertex (fun n acc -> if keep_node n then acc else n :: acc) g []
+
+
+let add_dummy_nodes g =
+  let module FileTable = Datatype.String.Hashtbl in
+  let module CallstackTable = Value_types.Callstack.Hashtbl in
+  let file_table = FileTable.create 13 in
+  let callstack_table = CallstackTable.create 13 in
+  let g = copy g in
+
+  let create_locality_vertex { node_locality } =
+    let { loc_file ; loc_callstack } = node_locality in
+    let rec add_file _ =
+      let node_locality = { node_locality with loc_callstack = [] } in
+      create_node g ~node_kind:Cluster ~node_locality
+    and add_callstack = function
+      | [] -> assert false
+      | _ :: t as loc_callstack ->
+        let node_locality = { node_locality with loc_callstack } in
+        if t <> [] then
+          ignore (CallstackTable.memo callstack_table t add_callstack);
+        create_node g ~node_kind:Cluster ~node_locality
+    in
+    match loc_callstack with
+    | [] ->
+      ignore (FileTable.memo file_table loc_file add_file)
+    | cs ->
+      ignore (CallstackTable.memo callstack_table cs add_callstack)
+  in
+  iter_vertex create_locality_vertex g;
+  g
+
 
 let ouptput_to_dot out_channel g =
   let open Graph.Graphviz.DotAttributes in
+  let g = add_dummy_nodes g in
 
   let build_label s = `HtmlLabel (Extlib.html_escape s) in
 

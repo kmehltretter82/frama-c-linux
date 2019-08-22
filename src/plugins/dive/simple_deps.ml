@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C plug-in `Dive'.                      *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2019                                               *)
+(*  Copyright (C) 2018                                                    *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -20,36 +20,46 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Graph_types
+open Cil_types
 
-include Graph.Sig.G
-  with type V.t = node
-   and type E.t = node * dependency * node
+class find_write target_vi = object (self)
+  inherit Visitor.frama_c_inplace
 
-module Node : Graph.Sig.COMPARABLE with type t = node
+  val mutable res = ([] : stmt list)
 
-module Dependency : Graph.Sig.COMPARABLE with type t = dependency
+  method add_current_stmt () =
+    res <-  Extlib.the self#current_stmt :: res
 
-val create : ?size:int -> unit -> t
+  method! vinst i =
+    begin match i with
+      | Call (None,_,_,_) | Asm _ | Skip _ | Code_annot _ -> () (* No effect *)
+      | Local_init(vi,_,_) ->
+        if Cil_datatype.Varinfo.equal vi target_vi then
+          self#add_current_stmt ()
+      | Call (Some dest,_,_,_)
+      | Set (dest,_,_) ->
+        match dest with
+        | Var vi, _ when vi = target_vi -> self#add_current_stmt ()
+        | _ -> ()
+    end;
+    Cil.SkipChildren
 
-val create_node :
-  ?node_values:node_values ->
-  node_kind:node_kind ->
-  node_locality:node_locality -> t -> node
+    method result = res
+end
 
-val remove_node : t -> node -> unit
+let find_assignments kf vi =
+  let fundec = Kernel_function.get_definition kf
+  and vis = new find_write vi in
+  ignore (Visitor.visitFramacFunction (vis :> Visitor.frama_c_visitor) fundec);
+  vis#result
 
-val update_node_values : node -> node_values -> unit
-
-val create_dependency : allow_folding:bool -> t -> node -> dependency_kind ->
-  node -> unit
-
-val remove_dependency : t -> node * dependency * node -> unit
-
-val find_independant_nodes : t -> node list -> node list
-
-val ouptput_to_dot : out_channel -> t -> unit
-val ouptput_to_json : out_channel -> t -> unit
-
-val to_json : t -> Json.t
-val diff_to_json : t -> graph_diff -> Json.t
+let compute lval =
+  match lval with
+  | Var vi, NoOffset when not vi.vaddrof ->
+    Self.feedback "%a %B" Cil_printer.pp_varinfo vi vi.vaddrof;
+    begin try
+        let kf = Kernel_function.find_defining_kf vi in
+        Extlib.opt_map (fun kf -> find_assignments kf vi) kf
+      with Not_found -> None
+    end
+  | _ -> None

@@ -23,7 +23,7 @@
 type node_kind =
   | Scalar of Cil_types.varinfo * Cil_types.typ * Cil_types.offset
   | Composite of Cil_types.varinfo
-  | Scattered of Cil_types.lval
+  | Scattered of Cil_types.lval * Locations.location
   | Alarm of Cil_types.stmt * Alarms.alarm
   | Cluster (* Dummy node, hack for Ocamlgraph Graphviz Dot module *)
 
@@ -46,6 +46,7 @@ type node = {
   node_key : int;
   node_kind : node_kind;
   node_locality : node_locality;
+  mutable node_hidden : bool;
   mutable node_values : node_values option;
   mutable node_deps_computed : bool;
 }

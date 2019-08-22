@@ -22,34 +22,8 @@
 
 open Graph_types
 
-include Graph.Sig.G
-  with type V.t = node
-   and type E.t = node * dependency * node
+include Datatype.S with type t = Graph_types.node_kind
 
-module Node : Graph.Sig.COMPARABLE with type t = node
-
-module Dependency : Graph.Sig.COMPARABLE with type t = dependency
-
-val create : ?size:int -> unit -> t
-
-val create_node :
-  ?node_values:node_values ->
-  node_kind:node_kind ->
-  node_locality:node_locality -> t -> node
-
-val remove_node : t -> node -> unit
-
-val update_node_values : node -> node_values -> unit
-
-val create_dependency : allow_folding:bool -> t -> node -> dependency_kind ->
-  node -> unit
-
-val remove_dependency : t -> node * dependency * node -> unit
-
-val find_independant_nodes : t -> node list -> node list
-
-val ouptput_to_dot : out_channel -> t -> unit
-val ouptput_to_json : out_channel -> t -> unit
-
-val to_json : t -> Json.t
-val diff_to_json : t -> graph_diff -> Json.t
+val get_base : t -> Cil_types.varinfo option
+val to_location : t -> Locations.location option
+val to_lval : t -> Cil_types.lval option

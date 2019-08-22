@@ -137,10 +137,10 @@ let build_node_kind ~is_folded_base lval location =
           Scalar (vi, typ, offset')
         with Bit_utils.NoMatchingOffset | Ival.Not_Singleton_Int ->
           (* TODO: handle Bit_utils.NoMatchingOffset (strict aliasing ?) *)
-          Scattered (lval)
+          Scattered (lval, location)
       end
   | None ->
-    Scattered (lval)
+    Scattered (lval, location)
 
 let default_node_locality callstack =
   match callstack with
@@ -171,75 +171,25 @@ let build_node_locality callstack node_kind =
 (* --- Context object --- *)
 
 module NodeRef = Datatype.Pair_with_collections
-    (Locations.Location) (Callstack)
+    (Node_kind) (Callstack)
     (struct let module_name = "Build.NodeRef" end)
 
 module Graph = Imprecision_graph
-module VertexTable = Datatype.Int.Hashtbl
+module Index = Datatype.Int.Hashtbl
 module NodeTable = FCHashtbl.Make (NodeRef)
-module FileTable = Datatype.String.Hashtbl
-module CallstackTable = Value_types.Callstack.Hashtbl
 module BaseSet = Cil_datatype.Varinfo.Set
 module FunctionMap = Kernel_function.Map
 
 type t = {
   mutable graph: Graph.t;
-  mutable vertex_table: node VertexTable.t;
+  mutable vertex_table: node Index.t;
   mutable node_table: node NodeTable.t;
-  mutable file_table: node FileTable.t;
-  mutable callstack_table: node CallstackTable.t;
   mutable unfolded_bases: BaseSet.t;
   mutable hidden_bases: BaseSet.t;
   mutable focus: bool FunctionMap.t;
   mutable roots: node list;
   mutable graph_diff: graph_diff;
 }
-
-let get_node context node_key =
-  VertexTable.find context.vertex_table node_key
-
-let update_node context node =  
-  if
-    not (List.exists (Graph.Node.equal node) context.graph_diff.added_nodes)
-  then
-    context.graph_diff <- {
-      context.graph_diff with
-      added_nodes = node :: context.graph_diff.added_nodes
-    }
-
-let add_node context ~node_kind ~node_locality =
-  let node = Graph.create_node context.graph ~node_kind ~node_locality in
-  VertexTable.add context.vertex_table node.node_key node;
-  update_node context node;
-  node
-
-let _remove_node context node =
-  Graph.remove_node context.graph node;
-  VertexTable.remove context.vertex_table node.node_key;
-  context.graph_diff <- {
-    context.graph_diff with
-    removed_nodes = node :: context.graph_diff.removed_nodes
-  }
-
-let reference_node_locality context node_locality =
-  let { loc_file ; loc_callstack } = node_locality in
-  let rec add_file _ =
-    let node_locality = { node_locality with loc_callstack = [] } in
-    add_node context ~node_kind:Cluster ~node_locality
-  and add_callstack = function
-    | [] -> assert false
-    | _ :: t as loc_callstack ->
-      let node_locality = { node_locality with loc_callstack } in
-      if t <> [] then
-        ignore (CallstackTable.memo context.callstack_table t add_callstack);
-      add_node context ~node_kind:Cluster ~node_locality
-  in
-  match loc_callstack with
-  | [] ->
-    ignore (FileTable.memo context.file_table loc_file add_file)
-  | cs ->
-    ignore (CallstackTable.memo context.callstack_table cs add_callstack)
-
 
 let is_folded context vi =
   not (BaseSet.mem vi context.unfolded_bases)
@@ -249,6 +199,39 @@ let is_hidden context node_kind =
   | Some vi when BaseSet.mem vi context.hidden_bases -> true
   | _ -> false
 
+let get_node context node_key =
+  Index.find context.vertex_table node_key
+
+let update_node context node =
+  if
+    not (List.exists (Graph.Node.equal node) context.graph_diff.added_nodes)
+  then
+    context.graph_diff <- {
+      context.graph_diff with
+      added_nodes = node :: context.graph_diff.added_nodes
+    }
+
+let add_node context ~node_kind ~node_locality =
+  let node_ref = (node_kind, node_locality.loc_callstack) in
+  let add_new _ =
+    let node = Graph.create_node context.graph ~node_kind ~node_locality in
+    node.node_hidden <- is_hidden context node.node_kind;
+    Index.add context.vertex_table node.node_key node;
+    update_node context node;
+    node
+  in
+  NodeTable.memo context.node_table node_ref add_new
+
+let remove_node context node =
+  let node_ref = (node.node_kind, node.node_locality.loc_callstack) in
+  Graph.remove_node context.graph node;
+  Index.remove context.vertex_table node.node_key;
+  NodeTable.remove context.node_table node_ref;
+  context.graph_diff <- {
+    context.graph_diff with
+    removed_nodes = node :: context.graph_diff.removed_nodes
+  }
+
 
 (* --- Graph building --- *)
 
@@ -256,24 +239,8 @@ let is_hidden context node_kind =
 let build_node context callstack location lval  =
   let is_folded_base = is_folded context in
   let node_kind = build_node_kind ~is_folded_base lval location in
-  if is_hidden context node_kind then
-    None
-  else begin
-    let node_locality = build_node_locality callstack node_kind in
-    reference_node_locality context node_locality;
-    let build_new_node _location =
-      add_node context ~node_kind ~node_locality
-    in
-    (* Compute the new location which might have changed after folding *)
-    let location' =
-      match Node_kind.to_location node_kind with
-      | None -> location
-      | Some location' -> location'
-    in
-    let ref = (location', node_locality.loc_callstack) in
-    let node = NodeTable.memo context.node_table ref build_new_node in
-    Some node
-  end
+  let node_locality = build_node_locality callstack node_kind in
+  add_node context ~node_kind ~node_locality
 
 let build_var context callstack varinfo =
   let location = Locations.loc_of_varinfo varinfo
@@ -283,11 +250,9 @@ let build_var context callstack varinfo =
 let build_lval context callstack kinstr lval =
   (* If possible, refine the lval to a non-symbolic one *)
   let location = !Db.Value.lval_to_loc kinstr lval in
-  match build_node context callstack location lval with
-  | None -> None
-  | Some node ->
-    update_node_values node kinstr lval;
-    Some node
+  let node = build_node context callstack location lval in
+  update_node_values node kinstr lval;
+  node
 
 let build_alarm context callstack stmt alarm =
   let node_kind = Alarm (stmt,alarm) in
@@ -437,11 +402,9 @@ let build_node_deps context node =
       build_exp_deps callstack stmt kind e2
 
   and build_lval_deps callstack stmt kind lval =
-    match build_lval context callstack (Kstmt stmt) lval with
-    | None -> ()
-    | Some dst ->
-      let allow_folding = true in
-      Graph.create_dependency ~allow_folding context.graph dst kind node
+    let dst = build_lval context callstack (Kstmt stmt) lval in
+    let allow_folding = true in
+    Graph.create_dependency ~allow_folding context.graph dst kind node
 
   in
   update_node context node;
@@ -453,7 +416,7 @@ let build_node_deps context node =
   | Composite (vi) ->
     build_writes_deps callstack (Cil_types.Var vi, Cil_types.NoOffset);
     if vi.vformal then build_arg_deps callstack vi
-  | Scattered (_lval) -> () (* TODO: implements *)
+  | Scattered (_lval, _location) -> () (* TODO: implements *)
   | Alarm (stmt,alarm) ->
     build_alarm_deps callstack stmt alarm
   | Cluster -> ()
@@ -465,10 +428,8 @@ let create () =
   !Db.Value.compute ();
   {
     graph = Graph.create ();
-    vertex_table = VertexTable.create 13;
+    vertex_table = Index.create 13;
     node_table = NodeTable.create 13;
-    file_table = FileTable.create 13;
-    callstack_table = CallstackTable.create 13;
     unfolded_bases = BaseSet.empty;
     hidden_bases = BaseSet.empty;
     focus = FunctionMap.empty;
@@ -478,10 +439,8 @@ let create () =
 
 let clear context =
   context.graph <- Graph.create ();
-  context.vertex_table <- VertexTable.create 13;
+  context.vertex_table <- Index.create 13;
   context.node_table <- NodeTable.create 13;
-  context.file_table <- FileTable.create 13;
-  context.callstack_table <- CallstackTable.create 13;
   context.focus <- FunctionMap.empty;
   context.roots <- [];
   context.graph_diff <- { added_nodes=[] ; removed_nodes=[] }
@@ -510,22 +469,27 @@ let hide_base context vi =
 let unhide_base context vi =
   context.hidden_bases <- BaseSet.add vi context.hidden_bases
 
-let should_auto_explore node =
-  match node.node_kind with
-  | Scalar _ | Composite _ | Alarm _ -> true
-  | Scattered _ | Cluster -> false
-
 let explore ~depth context root =
+  let should_auto_explore node =
+    let is_root = Graph.Node.equal node root (* the root is always explored *)
+    and is_intersting_kind = match node.node_kind with
+     | Scalar _ | Composite _ | Alarm _ -> true
+     | Scattered _ | Cluster -> false
+    in
+    is_root || (not node.node_hidden && is_intersting_kind)
+  in
   (* Breadth first search *)
   let queue : (node * int) Queue.t = Queue.create () in
   Queue.add (root,0) queue;
   while not (Queue.is_empty queue) do
     let (n,d) = Queue.take queue in
     if d < depth then begin
-      if not (n.node_deps_computed) && should_auto_explore n then begin
+      if not (n.node_deps_computed) && should_auto_explore n then
+      begin
         begin try
             build_node_deps context n;
           with Too_many_deps lval ->
+            (* TODO: give a mean to explore more dependencies *)
             Self.warning "Too many dependencies for %a ; throwing them out"
               Cil_printer.pp_lval lval;
         end;
@@ -542,7 +506,7 @@ let complete_in_depth ~depth context root =
 let add_var ?(depth=1) context varinfo =
   let callstack = [] in
   let node = build_var context callstack varinfo in
-  Extlib.may (complete_in_depth ~depth context) node
+  complete_in_depth ~depth context node
 
 let add_lval ?(depth=1) context kinstr lval =
   let callstack = match kinstr with
@@ -550,7 +514,7 @@ let add_lval ?(depth=1) context kinstr lval =
     | Kstmt stmt -> Callstack.init (Kernel_function.find_englobing_kf stmt)
   in
   let node = build_lval context callstack kinstr lval in
-  Extlib.may (complete_in_depth ~depth context) node
+  complete_in_depth ~depth context node
 
 let add_alarm ?(depth=1) context stmt alarm =
   let callstack = Callstack.init (Kernel_function.find_englobing_kf stmt) in
@@ -560,7 +524,36 @@ let add_alarm ?(depth=1) context stmt alarm =
 let explore_from_vertex ~depth context node_key =
   explore ~depth context (get_node context node_key)
 
+let show ?(depth=1) context node_key =
+  let node = get_node context node_key in
+  node.node_hidden <- false;
+  explore ~depth context node
+
+let hide context node_key =
+  let node = get_node context node_key in
+  if not node.node_hidden then
+    begin
+      let g = get_graph context in
+      (* Set the node as hidden *)
+      node.node_hidden <- true;
+      (* Remove incomming edges *)
+      let incomming_edges = Graph.pred_e g node in
+      List.iter (Graph.remove_dependency g) incomming_edges;
+      (* Remove disconnected vertices *)
+      let disconnected_nodes = Graph.find_independant_nodes g context.roots in
+      List.iter (remove_node context) disconnected_nodes;
+      (* Dependencies are not there anymore *)
+      node.node_deps_computed <- false;
+      (* Notify node update *)
+      update_node context node
+    end
+
 let take_last_differences context =
+  let pp_node fmt n = Format.pp_print_int fmt n.node_key in
+  let pp_node_list = Pretty_utils.pp_list ~sep:",@, " pp_node in
   let diff = context.graph_diff in
+  Self.debug ~dkey "added: %a,@, subbed: %a"
+    pp_node_list diff.added_nodes
+    pp_node_list diff.removed_nodes;
   context.graph_diff <- { added_nodes=[] ; removed_nodes=[] };
   diff
