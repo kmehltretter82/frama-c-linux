@@ -60,6 +60,11 @@ let mk_real ~loc ?name e env t_opt =
     e, env
 
 exception Not_a_decimal of string
+exception Is_a_float
+
+(* The possible float suffixes (ISO C 6.4.4.2) are lLfF.
+   dD is a GNU extension accepted by Frama-C (only!) in the logic *)
+let float_suffixes = [ 'f'; 'F'; 'l'; 'L'; 'd'; 'D' ]
 
 (* Computes the fractional representation of a decimal number.
    Does NOT perform reduction.
@@ -88,6 +93,10 @@ let decimal_to_fractional str =
         Bytes.unsafe_set buf (i - 1) c;
         Bytes.unsafe_set buf len' '0';
         post str len buf (len' + 1) (i + 1)
+      | c when List.mem c float_suffixes ->
+        (* [JS] a suffix denoting a C type is possible *)
+        assert (i = len - 1);
+        raise Is_a_float
       | _ ->
         raise (Not_a_decimal str)
   in
@@ -106,6 +115,10 @@ let decimal_to_fractional str =
       | c when '0' <= c && c <= '9' ->
         Bytes.unsafe_set buf i c;
         pre str len buf (i + 1)
+      | c when List.mem c float_suffixes ->
+        (* [JS] a suffix denoting a C type is possible *)
+        assert (i = len - 1);
+        raise Is_a_float
       | _ ->
         raise (Not_a_decimal str)
   in
@@ -115,7 +128,8 @@ let decimal_to_fractional str =
       as the decimal one. *)
     2 * strlen
   in
-  pre str strlen (Bytes.create buflen) 0
+  try pre str strlen (Bytes.create buflen) 0
+  with Is_a_float -> str (* just left it unchanged *)
 
 (* ACSL considers strings written in decimal expansion to be reals.
    Yet GMPQ considers them to be double:

@@ -3,20 +3,6 @@
   (warn-once: no further messages from category 'parser:decimal-float' will be emitted)
 [e-acsl] beginning translation.
 [e-acsl] Warning: R to float: double rounding might cause unsoundness
-[e-acsl] tests/gmp/reals.c:33: Warning: 
-  E-ACSL construct `creating gmp from long double' is not yet supported.
-  Ignoring annotation.
-[e-acsl] tests/gmp/reals.c:34: Warning: 
-  E-ACSL construct `number not written in decimal expansion'
-  is not yet supported.
-  Ignoring annotation.
-[e-acsl] tests/gmp/reals.c:35: Warning: 
-  E-ACSL construct `number not written in decimal expansion'
-  is not yet supported.
-  Ignoring annotation.
-[e-acsl] tests/gmp/reals.c:37: Warning: 
-  E-ACSL construct `reals: creating Q from Z' is not yet supported.
-  Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
@@ -27,6 +13,7 @@
   __e_acsl_math_HUGE_VAL ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
   __e_acsl_math_HUGE_VALF ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
   __e_acsl_math_INFINITY ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+  __e_acsl_sound_verdict ∈ [--..--]
 [eva] using specification for function __e_acsl_memory_init
 [eva] using specification for function __gmpq_init
 [eva] using specification for function __gmpq_set_str
@@ -78,7 +65,7 @@
   function __e_acsl_assert: precondition got status unknown.
 [eva:alarm] tests/gmp/reals.c:6: Warning: 
   function __gen_e_acsl_avg: postcondition got status unknown.
-[eva:alarm] tests/gmp/reals.c:33: Warning: assertion got status unknown.
-[eva:alarm] tests/gmp/reals.c:34: Warning: assertion got status unknown.
-[eva:alarm] tests/gmp/reals.c:36: Warning: assertion got status unknown.
+[eva:alarm] tests/gmp/reals.c:31: Warning: assertion got status unknown.
+[eva:alarm] tests/gmp/reals.c:31: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
 [eva] done for function main

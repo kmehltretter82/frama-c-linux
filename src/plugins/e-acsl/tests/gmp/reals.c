@@ -28,11 +28,12 @@ int main(void) {
 
   avg(4.3, 11.7);
 
+  /*@ assert 1.1d != 1 + 0.1; */ ;
+
   // Not yet:
-  long double ld = 0.1l;
-  /*@ assert d + 1 != ld + 1; */ ; // long double
-  /*@ assert 1.1d != 1 + 0.1; */ ; // number not written in decimal expansion form
-  /*@ assert 3 != 1e5; */ ; // number not written in decimal expansion form
-  /*@ assert \let n = 99999999999999999999999999;
-        4 != n + 3.7; */ ; // creating Q from Z
+  // long double ld = 0.1l;
+  // /*@ assert d + 1 != ld + 1; */ ; // long double
+  // /*@ assert 3 != 1e5; */ ; // number not written in decimal expansion form
+  ///*@ assert \let n = 99999999999999999999999999;
+  //     4 != n + 3.7; */ ; // creating Q from Z
 }
