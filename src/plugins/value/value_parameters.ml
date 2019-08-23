@@ -174,6 +174,18 @@ module BitwiseOffsmDomain = Domain_Parameter
       let default = false
     end)
 
+let numerors_available = ref false
+let register_numerors () = numerors_available := true
+
+let numerors_hook _ _ =
+  if not !numerors_available
+  then
+    abort
+      "The numerors domain has been requested but is not available,@ \
+       as Frama-C did not found the MPFR library. The analysis is aborted."
+  else if not (is_debug_key_enabled dkey_experimental) then
+    warning  "The numerors domain is experimental.";
+
 module NumerorsDomain = Domain_Parameter
     (struct
       let option_name = "-eva-numerors-domain"
@@ -182,6 +194,7 @@ module NumerorsDomain = Domain_Parameter
                   computations"
       let default = false
     end)
+let () = NumerorsDomain.add_set_hook numerors_hook
 
 let apron_help = "Experimental binding of the numerical domains provided \
                   by the APRON library: http://apron.cri.ensmp.fr/library \n"

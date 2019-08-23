@@ -832,32 +832,18 @@ endif
 NUMERORS_FILES:= \
 	values/numerors/numerors_utils values/numerors/numerors_float \
 	values/numerors/numerors_interval values/numerors/numerors_arithmetics \
-	values/numerors/numerors_value
+	values/numerors/numerors_value domains/numerors/numerors_domain
 
 ifeq ($(HAS_MPFR),yes)
 PLUGIN_REQUIRES+= gmp
 PLUGIN_TESTS_DIRS+=value/numerors
 NUMERORS_CMO:= $(NUMERORS_FILES)
-src/plugins/value/domains/numerors/numerors_domain.ml: \
-		src/plugins/value/domains/numerors/numerors_domain.ok.ml \
-		share/Makefile.config
-	$(CP_IF_DIFF) $< $@
-	$(CHMOD_RO) $@
 else
 # Do not compile numerors files, but include them in the distributed files.
 NUMERORS_CMO:=
 PLUGIN_DISTRIB_EXTERNAL+= $(addsuffix .ml,$(NUMERORS_FILES))
 PLUGIN_DISTRIB_EXTERNAL+= $(addsuffix .mli,$(NUMERORS_FILES))
-src/plugins/value/domains/numerors/numerors_domain.ml: \
-		src/plugins/value/domains/numerors/numerors_domain.ko.ml \
-		share/Makefile.config
-	$(CP_IF_DIFF) $< $@
-	$(CHMOD_RO) $@
 endif
-PLUGIN_GENERATED+= src/plugins/value/domains/numerors/numerors_domain.ml
-PLUGIN_DISTRIB_EXTERNAL+= \
-	domains/numerors/numerors_domain.ok.ml \
-	domains/numerors/numerors_domain.ko.ml
 
 # General rules for ordering files within PLUGIN_CMO:
 # - try to keep the legacy Value before Eva
@@ -886,7 +872,6 @@ PLUGIN_CMO:= slevel/split_strategy value_parameters \
 	domains/offsm_domain \
 	domains/symbolic_locs \
 	domains/sign_domain \
-	$(NUMERORS_CMO) domains/numerors/numerors_domain \
 	domains/cvalue/warn domains/cvalue/locals_scoping \
 	domains/cvalue/cvalue_offsetmap \
 	utils/value_results \
@@ -909,7 +894,7 @@ PLUGIN_CMO:= slevel/split_strategy value_parameters \
 	engine/iterator \
 	engine/initialization \
 	engine/compute_functions engine/analysis register \
-	$(APRON_CMO)
+	$(APRON_CMO) $(NUMERORS_CMO)
 PLUGIN_CMI:= values/abstract_value values/abstract_location \
 	domains/abstract_domain domains/simpler_domains
 PLUGIN_DEPENDENCIES:=Callgraph LoopAnalysis RteGen

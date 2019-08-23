@@ -237,6 +237,9 @@ val dkey_widening : category
 (** Notifies that the binding to Apron domains is available. *)
 val register_apron: unit -> unit
 
+(** Notifies that the numerors domain is available. *)
+val register_numerors: unit -> unit
+
 (*
 Local Variables:
 compile-command: "make -C ../../.."
