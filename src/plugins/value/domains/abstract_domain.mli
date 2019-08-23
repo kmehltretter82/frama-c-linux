@@ -400,7 +400,7 @@ end
 
 
 (** Keys identify abstract domains through the type of their abstract values. *)
-type 'a key = 'a Structure.Key_Domain.k
+type 'a key = 'a Structure.Key_Domain.key
 
 (** Describes the internal structure of a domain.
     Used internally to automatically generate efficient accessors from a

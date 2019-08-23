@@ -27,7 +27,7 @@ val pretty_debug : t Pretty_utils.formatter
 (** Reduction of an error value according to a floating-point interval. *)
 val reduce: Fval.t -> t -> t Eval.or_bottom
 
-val error_key : t Structure.Key_Value.k
+val error_key : t Structure.Key_Value.key
 
 val set_absolute_to_top : t -> t
 val set_relative_to_top : t -> t

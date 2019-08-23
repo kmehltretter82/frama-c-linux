@@ -184,7 +184,7 @@ end
 (** Key and structure for values. See {structure.mli},
     and {domain.mli} where the mechanism is explained in detail.*)
 
-type 'a key = 'a Structure.Key_Value.k
+type 'a key = 'a Structure.Key_Value.key
 type 'a structure = 'a Structure.Key_Value.structure
 
 module type Internal = sig

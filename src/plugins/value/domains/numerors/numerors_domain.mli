@@ -22,7 +22,7 @@
 
 type value
 type location = Precise_locs.precise_location
-val value_key : value Structure.Key_Value.k
+val value_key : value Structure.Key_Value.key
 
 (** True if the numerors domain is available;
     False if the MPFR library has not been found. *)

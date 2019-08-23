@@ -26,4 +26,4 @@ include Abstract_value.Internal
 
 val pretty_debug: t Pretty_utils.formatter
 
-val sign_key : t Structure.Key_Value.k
+val sign_key : t Structure.Key_Value.key

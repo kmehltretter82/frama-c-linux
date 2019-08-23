@@ -22,7 +22,7 @@
 
 type offsm_or_top = O of Cvalue.V_Offsetmap.t | Top
 
-val offsm_key : offsm_or_top Structure.Key_Value.k
+val offsm_key : offsm_or_top Structure.Key_Value.key
 
 val cast :
   old_size: Integer.t -> new_size: Integer.t -> signed: bool ->

@@ -24,16 +24,16 @@
 type (_,_) eq = Eq : ('a,'a) eq
 
 module type Key = sig
-  type 'a k
+  type 'a key
 
-  val create_key: string -> 'a k
-  val eq_type : 'a k -> 'b k -> ('a, 'b) eq option
+  val create_key: string -> 'a key
+  val eq_type : 'a key -> 'b key -> ('a, 'b) eq option
 
-  val print: 'a k Pretty_utils.formatter
-  val compare: 'a k -> 'b k -> int
-  val equal: 'a k -> 'b k -> bool
-  val hash : 'a k -> int
-  val tag: 'a k -> int
+  val print: 'a key Pretty_utils.formatter
+  val compare: 'a key -> 'b key -> int
+  val equal: 'a key -> 'b key -> bool
+  val hash : 'a key -> int
+  val tag: 'a key -> int
 end
 
 module type Shape = sig
@@ -41,15 +41,15 @@ module type Shape = sig
 
   type 'a structure =
     | Void : 'a structure
-    | Leaf : 'a k -> 'a structure
+    | Leaf : 'a key -> 'a structure
     | Node : 'a structure * 'b structure -> ('a * 'b) structure
 end
 
 
 module Make (X : sig end) = struct
 
-  type 'a k = { tag: int;
-                name: string }
+  type 'a key = { tag: int;
+                  name: string }
 
   let c = ref (-1)
   let id () = incr c; !c
@@ -57,7 +57,7 @@ module Make (X : sig end) = struct
   let create_key name = { tag = id (); name }
 
   let equal x y = x.tag = y.tag
-  let eq_type : type a b. a k -> b k -> (a,b) eq option = fun a b ->
+  let eq_type : type a b. a key -> b key -> (a,b) eq option = fun a b ->
     if equal a b
     then Some ((Obj.magic (Eq : (a,a) eq)) : (a,b) eq)
     else None
@@ -70,7 +70,7 @@ module Make (X : sig end) = struct
 
   type 'a structure =
     | Void : 'a structure
-    | Leaf : 'a k -> 'a structure
+    | Leaf : 'a key -> 'a structure
     | Node : 'a structure * 'b structure -> ('a * 'b) structure
 end
 
@@ -110,7 +110,7 @@ module Open
 
   open Shape
 
-  let rec mem : type a. 'v Shape.k -> a structure -> bool = fun key -> function
+  let rec mem : type a. 'v Shape.key -> a structure -> bool = fun key -> function
     | Void -> false
     | Leaf k -> Shape.equal key k
     | Node (left, right) -> mem key left || mem key right
@@ -118,7 +118,7 @@ module Open
   let mem key = mem key M.structure
 
 
-  type ('a, 'b) get = 'b Shape.k * ('a -> 'b)
+  type ('a, 'b) get = 'b Shape.key * ('a -> 'b)
 
   type 'a getter = Get : ('a, 'b) get -> 'a getter
 
@@ -138,7 +138,7 @@ module Open
       KMap.merge merge l r
 
   let getters = compute_getters M.structure
-  let get (type a) (key: a Shape.k) : (M.t -> a) option =
+  let get (type a) (key: a Shape.key) : (M.t -> a) option =
     match KMap.find key getters with
     | None -> None
     | Some (Get (k, get)) -> match Shape.eq_type key k with
@@ -146,7 +146,7 @@ module Open
       | Some Eq -> Some get
 
 
-  type ('a, 'b) set = 'b Shape.k * ('b -> 'a -> 'a)
+  type ('a, 'b) set = 'b Shape.key * ('b -> 'a -> 'a)
 
   type 'a setter = Set : ('a, 'b) set -> 'a setter
 
@@ -162,7 +162,7 @@ module Open
       KMap.merge merge l r
 
   let setters = compute_setters M.structure
-  let set (type a) (key: a Shape.k) : (a -> M.t -> M.t) =
+  let set (type a) (key: a Shape.key) : (a -> M.t -> M.t) =
     match KMap.find key setters with
     | None -> fun _ t -> t
     | Some (Set (k, set)) -> match Shape.eq_type key k with

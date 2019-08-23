@@ -122,7 +122,7 @@ end
 (** Key and structure for locations. See {structure.mli},
     and {domain.mli} where the mechanism is explained in detail.*)
 
-type 'a key = 'a Structure.Key_Location.k
+type 'a key = 'a Structure.Key_Location.key
 type 'a structure = 'a Structure.Key_Location.structure
 
 module type Internal = sig
