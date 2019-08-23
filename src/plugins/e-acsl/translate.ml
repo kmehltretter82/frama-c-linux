@@ -210,8 +210,8 @@ let conditional_to_exp ?(name="if") loc t_opt e1 (e2, env2) (e3, env3) =
           let lv = Cil.var v in
           let ty = Cil.typeOf ev in
           let init_set =
-            (* TODO RATIONAL: how is it possible to get a real here? *)
-            if Real.is_t ty then Real.init_set else Gmp.init_set
+            assert (not (Real.is_t ty));
+            Gmp.init_set
           in
           let affect e = init_set ~loc lv ev e in
           let then_block, _ =
@@ -340,12 +340,10 @@ and context_insensitive_term_to_exp kf env t =
     else if Real.is_t ty then
       let e, env = Real.binop ~loc bop e1 e2 env (Some t) in
       e, env, C_number, ""
-    else
-    if Logic_typing.is_integral_type t.term_type then
+    else begin
+      assert (Logic_typing.is_integral_type t.term_type);
       Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)), env, C_number, ""
-    else
-      (* TODO RATIONAL: why question mark? *)
-      not_yet env "floating-point context (?)"
+    end
   | TBinOp(Div | Mod as bop, t1, t2) ->
     let ty = Typing.get_typ t in
     let e1, env = term_to_exp kf env t1 in
@@ -368,19 +366,19 @@ and context_insensitive_term_to_exp kf env t =
           ~loc kf env Typing.gmpz ~e1:e2 ~name Eq t2 zero t
       in
       let mk_stmts _v e =
-	assert (Gmp.Z.is_t ty);
-	let vis = Env.get_visitor env in
-	let kf = Extlib.the vis#current_kf in
-	let cond =
-	  Misc.mk_e_acsl_guard
-	    (Env.annotation_kind env)
-	    kf
-	    guard
-	    (Logic_const.prel ~loc (Req, t2, zero))
-	in
-	Env.add_assert env cond (Logic_const.prel (Rneq, t2, zero));
-	let instr = Misc.mk_call ~loc name [ e; e1; e2 ] in
-	[ cond; instr ]
+        assert (Gmp.Z.is_t ty);
+        let vis = Env.get_visitor env in
+        let kf = Extlib.the vis#current_kf in
+        let cond =
+          Misc.mk_e_acsl_guard
+            (Env.annotation_kind env)
+            kf
+            guard
+            (Logic_const.prel ~loc (Req, t2, zero))
+        in
+        Env.add_assert env cond (Logic_const.prel (Rneq, t2, zero));
+        let instr = Misc.mk_call ~loc name [ e; e1; e2 ] in
+        [ cond; instr ]
       in
       let name = Misc.name_of_binop bop in
       let _, e, env = Env.new_var_and_mpz_init ~loc ~name env t mk_stmts in
@@ -388,13 +386,11 @@ and context_insensitive_term_to_exp kf env t =
     else if Real.is_t ty then
       let e, env = Real.binop ~loc bop e1 e2 env (Some t) in
       e, env, C_number, ""
-    else
+    else begin
+      assert (Logic_typing.is_integral_type t.term_type);
       (* no guard required since RTEs are generated separately *)
-    if Logic_typing.is_integral_type t.term_type then
       Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)), env, C_number, ""
-    else
-      (* TODO RATIONAL: why question mark? *)
-      not_yet env "floating-point context (?)"
+    end
   | TBinOp(Lt | Gt | Le | Ge | Eq | Ne as bop, t1, t2) ->
     (* comparison operators *)
     let ity = Typing.get_integer_op t in
