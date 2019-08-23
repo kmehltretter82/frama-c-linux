@@ -24,14 +24,12 @@ open Cil_types
 
 (* Implements Figure 3 of J. Signoles' JFLA'15 paper "Rester statique pour
    devenir plus rapide, plus précis et plus mince".
-   Also implements a partial support for real numbers. *)
+   Also implements a support for real numbers. *)
 
 (* ********************************************************************* *)
 (* Basic datatypes and operations *)
 (* ********************************************************************* *)
 
-(* TODO RATIONAL: both exceptions should be handle in the same way in this
-   module *)
 exception Is_a_real
 exception Not_a_number
 
@@ -48,16 +46,16 @@ let interv_of_unknown_block =
        (Some (Bit_utils.max_byte_address ())))
 
 (* The boolean indicates whether we have real numbers *)
-let rec interv_of_typ_with_real ty is_real = match Cil.unrollType ty with
+let rec interv_of_typ ty = match Cil.unrollType ty with
   | TInt (k,_) as ty ->
     let n = Cil.bitsSizeOf ty in
     let l, u =
       if Cil.isSigned k then Cil.min_signed_number n, Cil.max_signed_number n
       else Integer.zero, Cil.max_unsigned_number n
     in
-    Ival.inject_range (Some l) (Some u), is_real
+    Ival.inject_range (Some l) (Some u)
   | TEnum(enuminfo, _) ->
-    interv_of_typ_with_real (TInt (enuminfo.ekind, [])) is_real
+    interv_of_typ (TInt (enuminfo.ekind, []))
   | TFloat _ ->
     raise Is_a_real
   | _ when Real.is_t ty ->
@@ -68,8 +66,8 @@ let rec interv_of_typ_with_real ty is_real = match Cil.unrollType ty with
     assert false
 
 let interv_of_logic_typ = function
-  | Ctype ty -> interv_of_typ_with_real ty false
-  | Linteger -> Ival.inject_range None None, false
+  | Ctype ty -> interv_of_typ ty
+  | Linteger -> Ival.inject_range None None
   | Lreal -> raise Is_a_real
   | Ltype _ -> Error.not_yet "user-defined logic type"
   | Lvar _ -> Error.not_yet "type variable"
@@ -129,9 +127,7 @@ end
 
 (* Environment for handling logic functions *)
 and Logic_function_env: sig
-  val widen:
-    infer_with_real:(term -> bool -> Ival.t * bool) -> term -> Ival.t
-    -> bool * Ival.t
+  val widen: infer:(term -> Ival.t) -> term -> Ival.t -> bool * Ival.t
   val clear: unit -> unit
 end = struct
 
@@ -168,17 +164,17 @@ end = struct
   let interv_of_typ_containing_interv i =
     try
       let kind = ikind_of_interv i in
-      interv_of_typ_with_real (TInt(kind, [])) false
+      interv_of_typ (TInt(kind, []))
     with Cil.Not_representable ->
       (* infinity *)
-      Ival.inject_range None None, false
+      Ival.inject_range None None
 
   let rec map3 f l1 l2 l3 = match l1, l2, l3 with
     | [], [], [] -> []
     | x1 :: l1, x2 :: l2, x3 :: l3 -> f x1 x2 x3 :: map3 f l1 l2 l3
     | _, _, _ -> invalid_arg "E_ACSL.Interval.map3"
 
-  let extract_profile ~infer_with_real old_profile t = match t.term_node with
+  let extract_profile ~infer old_profile t = match t.term_node with
     | Tapp(li, _, args) ->
       let old_profile = match old_profile with
         | None -> List.map (fun _ -> Ival.bottom) li.l_profile
@@ -188,13 +184,10 @@ end = struct
       map3
         (fun param old_i arg ->
            try
-             (* TODO RATIONAL: what if a rational is used as argument or
-                returned? *)
-             let i, _is_real = infer_with_real arg false in
+             let i = infer arg in
              (* over-approximation of the interval to reach the fixpoint
                 faster, and to generate fewer specialized functions *)
-             let larger_i, _is_real = interv_of_typ_containing_interv i in
-             (* TODO RATIONAL: what to do with is_real? *)
+             let larger_i = interv_of_typ_containing_interv i in
              (* merge the old profile and the new one *)
              let new_i = Ival.join larger_i old_i in
              Env.add param new_i;
@@ -208,8 +201,8 @@ end = struct
     | _ ->
       assert false
 
-  let widen_one_callsite ~infer_with_real old_profile t i =
-    let (_,p as named_p) = extract_profile ~infer_with_real old_profile t in
+  let widen_one_callsite ~infer old_profile t i =
+    let (_, p as named_p) = extract_profile ~infer old_profile t in
     try
       let old_i = LF.Hashtbl.find named_profiles named_p in
       if Ival.is_included i old_i then true, p, old_i
@@ -222,19 +215,19 @@ end = struct
       LF.Hashtbl.add named_profiles named_p i;
       false, p, i
 
-  let widen ~infer_with_real t i =
+  let widen ~infer t i =
     try
       let old_p = Terms.find terms t in
-      let b, new_p, i = widen_one_callsite ~infer_with_real (Some old_p) t i in
-      if Profile.is_included new_p old_p then b, i
+      let is_included, new_p, i = widen_one_callsite ~infer (Some old_p) t i in
+      if Profile.is_included new_p old_p then is_included, i
       else begin
         Terms.replace terms t new_p;
         false, i
       end
     with Not_found ->
-      let b, p, i = widen_one_callsite ~infer_with_real None t i in
+      let is_included, p, i = widen_one_callsite ~infer None t i in
       Terms.add terms t p;
-      b, i
+      is_included, i
 
 end
 
@@ -242,81 +235,79 @@ end
 (* Main algorithm *)
 (* ********************************************************************* *)
 
-let infer_sizeof ty is_real =
-  try singleton_of_int (Cil.bytesSizeOf ty), is_real
-  with Cil.SizeOfError _ ->
-    interv_of_typ_with_real Cil.theMachine.Cil.typeOfSizeOf is_real
+let infer_sizeof ty =
+  try singleton_of_int (Cil.bytesSizeOf ty)
+  with Cil.SizeOfError _ -> interv_of_typ Cil.theMachine.Cil.typeOfSizeOf
 
 let infer_alignof ty = singleton_of_int (Cil.bytesAlignOf ty)
 
-let rec infer_with_real t is_real =
+let rec infer t =
   let get_cty t = match t.term_type with Ctype ty -> ty | _ -> assert false in
   match t.term_node with
-  | TConst (Integer (n, _)) -> Ival.inject_singleton n, is_real
+  | TConst (Integer (n, _)) -> Ival.inject_singleton n
   | TConst (LChr c) ->
     let n = Cil.charConstToInt c in
-    Ival.inject_singleton n, is_real
+    Ival.inject_singleton n
   | TConst (LEnum enumitem) ->
     let rec find_idx n = function
       | [] -> assert false
       | ei :: l -> if ei == enumitem then n else find_idx (n + 1) l
     in
     let n = Integer.of_int (find_idx 0 enumitem.eihost.eitems) in
-    Ival.inject_singleton n, is_real
-  | TLval lv -> infer_term_lval lv is_real
-  | TSizeOf ty -> infer_sizeof ty is_real
-  | TSizeOfE t -> infer_sizeof (get_cty t) is_real
-  | TSizeOfStr str ->
-    singleton_of_int (String.length str + 1 (* '\0' *)), is_real
-  | TAlignOf ty -> infer_alignof ty, is_real
-  | TAlignOfE t -> infer_alignof (get_cty t), is_real
+    Ival.inject_singleton n
+  | TLval lv -> infer_term_lval lv
+  | TSizeOf ty -> infer_sizeof ty
+  | TSizeOfE t -> infer_sizeof (get_cty t)
+  | TSizeOfStr str -> singleton_of_int (String.length str + 1 (* '\0' *))
+  | TAlignOf ty -> infer_alignof ty
+  | TAlignOfE t -> infer_alignof (get_cty t)
 
   | TUnOp (Neg, t) ->
-    let i, is_real = infer_with_real t is_real in
-    Ival.neg_int i, is_real
+    let i = infer t in
+    Ival.neg_int i
   | TUnOp (BNot, t) ->
-    let i, is_real = infer_with_real t is_real in
-    Ival.bitwise_signed_not i, is_real
+    let i = infer t in
+    Ival.bitwise_signed_not i
   | TUnOp (LNot, _)
-
   | TBinOp ((Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr), _, _) ->
-    Ival.zero_or_one, is_real
+    Ival.zero_or_one
+
   | TBinOp (PlusA, t1, t2) ->
-    let i1, is_real1 = infer_with_real t1 is_real in
-    let i2, is_real2 = infer_with_real t2 is_real in
-    Ival.add_int i1 i2, is_real1 || is_real2
+    let i1 = infer t1 in
+    let i2 = infer t2 in
+    Ival.add_int i1 i2
   | TBinOp (MinusA, t1, t2) ->
-    let i1, is_real1 = infer_with_real t1 is_real in
-    let i2, is_real2 = infer_with_real t2 is_real in
-    Ival.sub_int i1 i2, is_real1 || is_real2
+    let i1 = infer t1 in
+    let i2 = infer t2 in
+    Ival.sub_int i1 i2
   | TBinOp (Mult, t1, t2) ->
-    let i1, is_real1 = infer_with_real t1 is_real in
-    let i2, is_real2 = infer_with_real t2 is_real in
-    Ival.mul i1 i2, is_real1 || is_real2
+    let i1 = infer t1 in
+    let i2 = infer t2 in
+    Ival.mul i1 i2
   | TBinOp (Div, t1, t2) ->
-    let i1, is_real1 = infer_with_real t1 is_real in
-    let i2, is_real2 = infer_with_real t2 is_real in
-    Ival.div i1 i2, is_real1 || is_real2
+    let i1 = infer t1 in
+    let i2 = infer t2 in
+    Ival.div i1 i2
   | TBinOp (Mod, t1, t2) ->
-    let i1, is_real1 = infer_with_real t1 is_real in
-    let i2, is_real2 = infer_with_real t2 is_real in
-    Ival.c_rem i1 i2, is_real1 || is_real2
+    let i1 = infer t1 in
+    let i2 = infer t2 in
+    Ival.c_rem i1 i2
   | TBinOp (Shiftlt , _, _) -> Error.not_yet "right shift"
   | TBinOp (Shiftrt , _, _) -> Error.not_yet "left shift"
   | TBinOp (BAnd, _, _) -> Error.not_yet "bitwise and"
   | TBinOp (BXor, t1, t2) ->
-    let i1, is_real1 = infer_with_real t1 is_real in
-    let i2, is_real2 = infer_with_real t2 is_real in
-    Ival.bitwise_xor i1 i2, is_real1 || is_real2
+    let i1 = infer t1 in
+    let i2 = infer t2 in
+    Ival.bitwise_xor i1 i2
   | TBinOp (BOr, t1, t2) ->
-    let i1, is_real1 = infer_with_real t1 is_real in
-    let i2, is_real2 = infer_with_real t2 is_real in
-    Ival.bitwise_or i1 i2, is_real1 || is_real2
+    let i1 = infer t1 in
+    let i2 = infer t2 in
+    Ival.bitwise_or i1 i2
   | TCastE (ty, t) ->
     (try
-       let it, is_real1 = infer_with_real t is_real in
-       let ity, is_real2 = interv_of_typ_with_real ty is_real in
-       Ival.meet it ity, is_real1 || is_real2
+       let it = infer t in
+       let ity = interv_of_typ ty in
+       Ival.meet it ity
      with Not_a_number ->
        if Cil.isIntegralType ty then begin
          (* heterogeneous cast from a non-integral term to an integral type:
@@ -326,15 +317,15 @@ let rec infer_with_real t is_real =
            ~once:true "possibly unsafe cast from term '%a' to type '%a'."
            Printer.pp_term t
            Printer.pp_typ ty;
-         interv_of_typ_with_real ty is_real
+         interv_of_typ ty
        end else
          raise Not_a_number)
   | Tif (_, t2, t3) ->
-    let i2, is_real2 = infer_with_real t2 is_real in
-    let i3, is_real3 = infer_with_real t3 is_real in
-    Ival.join i2 i3, is_real2 || is_real3
+    let i2 = infer t2 in
+    let i3 = infer t3 in
+    Ival.join i2 i3
   | Tat (t, _) ->
-    infer_with_real t is_real
+    infer t
   | TBinOp (MinusPP, t, _) ->
     (match Cil.unrollType (get_cty t) with
      | TArray(_, _, { scache = Computed n (* size in bits *) }, _) ->
@@ -344,37 +335,35 @@ let rec infer_with_real t is_real =
        let i =
          Ival.inject_range (Some Integer.zero) (Some (Integer.of_int nb_bytes))
        in
-       i, is_real
-     | TArray _ | TPtr _ -> Lazy.force interv_of_unknown_block, is_real
+       i
+     | TArray _ | TPtr _ ->
+       Lazy.force interv_of_unknown_block
      | _ -> assert false)
   | Tblock_length (_, t)
   | Toffset(_, t) ->
     (match Cil.unrollType (get_cty t) with
      | TArray(_, _, { scache = Computed n (* size in bits *) }, _) ->
        let nb_bytes = if n mod 8 = 0 then n / 8 else n / 8 + 1 in
-       singleton_of_int nb_bytes, is_real
-     | TArray _ | TPtr _ -> Lazy.force interv_of_unknown_block, is_real
+       singleton_of_int nb_bytes
+     | TArray _ | TPtr _ -> Lazy.force interv_of_unknown_block
      | _ -> assert false)
-  | Tnull  -> singleton_of_int 0, is_real
-  | TLogic_coerce (_, t) -> infer_with_real t is_real
+  | Tnull  -> singleton_of_int 0
+  | TLogic_coerce (_, t) -> infer t
 
   | Tapp (li, _, _args) ->
     (match li.l_body with
      | LBpred _ ->
-       Ival.zero_or_one, false
+       Ival.zero_or_one
      | LBterm t' ->
        let rec fixpoint i =
          let is_included, new_i =
-           Logic_function_env.widen ~infer_with_real t i
+           Logic_function_env.widen ~infer t i
          in
          if is_included then begin
            List.iter (fun lv -> Env.remove lv) li.l_profile;
-           (* TODO RATIONAL: check if returning [false] is correct *)
-           new_i, false
+           new_i
          end else
-           (* TODO RATIONAL: check if [false] is the correct value *)
-           (* TODO RATIONAL: what if a real is returned? *)
-           let i, _ = infer_with_real t' false in
+           let i = infer t' in
            List.iter (fun lv -> Env.remove lv) li.l_profile;
            fixpoint i
        in
@@ -395,22 +384,22 @@ let rec infer_with_real t is_real =
   | Tinter _ -> Error.not_yet "tset intersection"
   | Tcomprehension (_,_,_) -> Error.not_yet "tset comprehension"
   | Trange(Some n1, Some n2) ->
-    let i1, is_real1 = infer_with_real n1 is_real in
-    let i2, is_real2 = infer_with_real n2 is_real in
-    Ival.join i1 i2, is_real1 || is_real2
+    let i1 = infer n1 in
+    let i2 = infer n2 in
+    Ival.join i1 i2
   | Trange(None, _) | Trange(_, None) ->
     Options.abort "unbounded ranges are not part of E-ACSl"
 
-  | Tlet (li,t) ->
+  | Tlet (li, t) ->
     let li_t = Misc.term_of_li li in
     let li_v = li.l_var_info in
-    let i, is_real = infer_with_real li_t is_real in
-    Env.add li_v i;
-    let i, is_real = infer_with_real t is_real in
+    let i1 = infer li_t in
+    Env.add li_v i1;
+    let i2 = infer t in
     Env.remove li_v;
-    i, is_real
+    i2
   | TConst (LReal _) ->
-    Ival.bottom, true
+    raise Is_a_real
   | TConst (LStr _ | LWStr _)
   | TBinOp (PlusPI,_,_)
   | TBinOp (IndexPI,_,_)
@@ -426,48 +415,34 @@ let rec infer_with_real t is_real =
   | Tempty_set ->
     raise Not_a_number
 
-and infer_term_lval (host, offset as tlv) is_real =
+and infer_term_lval (host, offset as tlv) =
   match offset with
-  | TNoOffset -> infer_term_host host is_real
+  | TNoOffset -> infer_term_host host
   | _ ->
     let ty = Logic_utils.logicCType (Cil.typeOfTermLval tlv) in
-    interv_of_typ_with_real ty is_real
+    interv_of_typ ty
 
-and infer_term_host thost is_real =
+and infer_term_host thost =
   match thost with
   | TVar v ->
-    (try Env.find v, is_real
+    (try Env.find v
      with Not_found ->
      match v.lv_type with
-     | Linteger ->
-       Ival.inject_range None None, false
-     | Ctype (TFloat _) | Lreal ->
-       (* TODO RATIONAL: why bottom and not top? Why not raising Is_a_real? *)
-       Ival.bottom, true
-     | Ctype _ ->
-       (* TODO RATIONAL: check if [false] is the correct value *)
-       interv_of_typ_with_real (Logic_utils.logicCType v.lv_type) false
-     | Ltype _ | Lvar _ | Larrow _ ->
-       Options.fatal "unexpected logic type")
+     | Linteger -> Ival.inject_range None None
+     | Ctype (TFloat _) | Lreal -> raise Is_a_real
+     | Ctype _ -> interv_of_typ (Logic_utils.logicCType v.lv_type)
+     | Ltype _ | Lvar _ | Larrow _ -> Options.fatal "unexpected logic type")
   | TResult ty ->
-    interv_of_typ_with_real ty is_real
+    interv_of_typ ty
   | TMem t ->
     let ty = Logic_utils.logicCType t.term_type in
     match Cil.unrollType ty with
     | TPtr(ty, _) | TArray(ty, _, _, _) ->
-      interv_of_typ_with_real ty is_real
+      interv_of_typ ty
     | _ ->
       Options.fatal "unexpected type %a for term %a"
         Printer.pp_typ ty
         Printer.pp_term t
-
-let infer t =
-  let i, is_real = infer_with_real t false in
-  if is_real then raise Is_a_real else i
-
-let interv_of_typ ty =
-  let i, is_real = interv_of_typ_with_real ty false in
-  if is_real then raise Is_a_real else i
 
 (*
 Local Variables:
