@@ -29,7 +29,7 @@ module Static = struct
 
     let name = "Unit domain"
     let log_category = log_key
-    let structure = Abstract.Domain.Void
+    let structure = Abstract.Domain.Unit
 
     let top = ()
     let is_included _ _ = true

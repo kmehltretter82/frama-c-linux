@@ -60,7 +60,7 @@ module type Shape = sig
       Describes the internal structure of a data type.
       Used internally to automatically generate efficient accessors of its nodes. *)
   type 'a structure =
-    | Void : 'a structure
+    | Unit : unit structure
     | Leaf : 'a key -> 'a structure
     | Node : 'a structure * 'b structure -> ('a * 'b) structure
 
