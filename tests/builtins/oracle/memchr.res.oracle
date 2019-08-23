@@ -21,14 +21,8 @@
 [eva] computing for function memchr_small_sets <- main.
   Called from tests/builtins/memchr.c:652.
 [eva] tests/builtins/memchr.c:90: Call to builtin memchr
-[eva] share/libc/string.h:69: 
-  Cannot evaluate range bound memchr_off((char *)s, c, n)
-  (unsupported ACSL construct: logic function memchr_off). Approximating
 [eva:alarm] tests/builtins/memchr.c:90: Warning: 
   function memchr: precondition 'valid' got status unknown.
-[eva] share/libc/string.h:72: 
-  Cannot evaluate range bound memchr_off((char *)s, c, n)
-  (unsupported ACSL construct: logic function memchr_off). Approximating
 [eva:alarm] tests/builtins/memchr.c:90: Warning: 
   function memchr: precondition 'initialization' got status unknown.
 [eva:alarm] tests/builtins/memchr.c:90: Warning: 
@@ -99,11 +93,11 @@
 [eva] tests/builtins/memchr.c:121: assertion got status valid.
 [eva] tests/builtins/memchr.c:122: Call to builtin memchr
 [eva:alarm] tests/builtins/memchr.c:122: Warning: 
-  function memchr: precondition 'valid' got status unknown.
-[eva:alarm] tests/builtins/memchr.c:122: Warning: 
-  function memchr: precondition 'initialization' got status unknown.
-[eva:alarm] tests/builtins/memchr.c:122: Warning: 
-  function memchr: precondition 'danglingness' got status unknown.
+  function memchr: precondition 'valid' got status invalid.
+[eva] tests/builtins/memchr.c:122: 
+  function memchr: no state left, precondition 'initialization' got status valid.
+[eva] tests/builtins/memchr.c:122: 
+  function memchr: no state left, precondition 'danglingness' got status valid.
 [eva] tests/builtins/memchr.c:128: Call to builtin memchr
 [eva:alarm] tests/builtins/memchr.c:128: Warning: 
   function memchr: precondition 'valid' got status unknown.
@@ -128,9 +122,9 @@
 [eva] tests/builtins/memchr.c:140: 
   function memchr: precondition 'valid' got status valid.
 [eva:alarm] tests/builtins/memchr.c:140: Warning: 
-  function memchr: precondition 'initialization' got status unknown.
+  function memchr: precondition 'initialization' got status invalid.
 [eva] tests/builtins/memchr.c:140: 
-  function memchr: precondition 'danglingness' got status valid.
+  function memchr: no state left, precondition 'danglingness' got status valid.
 [eva] tests/builtins/memchr.c:145: Call to builtin memchr
 [eva] tests/builtins/memchr.c:145: 
   function memchr: precondition 'valid' got status valid.
@@ -169,12 +163,12 @@
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] tests/builtins/memchr.c:205: Call to builtin memchr
-[eva:alarm] tests/builtins/memchr.c:205: Warning: 
-  function memchr: precondition 'valid' got status unknown.
-[eva:alarm] tests/builtins/memchr.c:205: Warning: 
-  function memchr: precondition 'initialization' got status unknown.
-[eva:alarm] tests/builtins/memchr.c:205: Warning: 
-  function memchr: precondition 'danglingness' got status unknown.
+[eva] tests/builtins/memchr.c:205: 
+  function memchr: precondition 'valid' got status valid.
+[eva] tests/builtins/memchr.c:205: 
+  function memchr: precondition 'initialization' got status valid.
+[eva] tests/builtins/memchr.c:205: 
+  function memchr: precondition 'danglingness' got status valid.
 [eva] tests/builtins/memchr.c:205: Frama_C_show_each_mymemchr: {20; 75}
 [eva] tests/builtins/memchr.c:206: assertion got status valid.
 [eva] tests/builtins/memchr.c:207: assertion 'refined' got status valid.
@@ -184,12 +178,12 @@
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] tests/builtins/memchr.c:210: Call to builtin memchr
-[eva:alarm] tests/builtins/memchr.c:210: Warning: 
-  function memchr: precondition 'valid' got status unknown.
-[eva:alarm] tests/builtins/memchr.c:210: Warning: 
-  function memchr: precondition 'initialization' got status unknown.
-[eva:alarm] tests/builtins/memchr.c:210: Warning: 
-  function memchr: precondition 'danglingness' got status unknown.
+[eva] tests/builtins/memchr.c:210: 
+  function memchr: precondition 'valid' got status valid.
+[eva] tests/builtins/memchr.c:210: 
+  function memchr: precondition 'initialization' got status valid.
+[eva] tests/builtins/memchr.c:210: 
+  function memchr: precondition 'danglingness' got status valid.
 [eva] tests/builtins/memchr.c:210: Frama_C_show_each_mymemchr: {20}
 [eva] tests/builtins/memchr.c:211: assertion got status valid.
 [eva] tests/builtins/memchr.c:212: assertion 'refined' got status valid.
@@ -199,12 +193,12 @@
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] tests/builtins/memchr.c:215: Call to builtin memchr
-[eva:alarm] tests/builtins/memchr.c:215: Warning: 
-  function memchr: precondition 'valid' got status unknown.
-[eva:alarm] tests/builtins/memchr.c:215: Warning: 
-  function memchr: precondition 'initialization' got status unknown.
-[eva:alarm] tests/builtins/memchr.c:215: Warning: 
-  function memchr: precondition 'danglingness' got status unknown.
+[eva] tests/builtins/memchr.c:215: 
+  function memchr: precondition 'valid' got status valid.
+[eva] tests/builtins/memchr.c:215: 
+  function memchr: precondition 'initialization' got status valid.
+[eva] tests/builtins/memchr.c:215: 
+  function memchr: precondition 'danglingness' got status valid.
 [eva] tests/builtins/memchr.c:215: Frama_C_show_each_mymemchr: {75}
 [eva] tests/builtins/memchr.c:216: assertion got status valid.
 [eva] tests/builtins/memchr.c:217: assertion 'refined' got status valid.
@@ -328,11 +322,11 @@
   Called from tests/builtins/memchr.c:658.
 [eva] tests/builtins/memchr.c:307: Call to builtin memchr
 [eva:alarm] tests/builtins/memchr.c:307: Warning: 
-  function memchr: precondition 'valid' got status unknown.
-[eva:alarm] tests/builtins/memchr.c:307: Warning: 
-  function memchr: precondition 'initialization' got status unknown.
-[eva:alarm] tests/builtins/memchr.c:307: Warning: 
-  function memchr: precondition 'danglingness' got status unknown.
+  function memchr: precondition 'valid' got status invalid.
+[eva] tests/builtins/memchr.c:307: 
+  function memchr: no state left, precondition 'initialization' got status valid.
+[eva] tests/builtins/memchr.c:307: 
+  function memchr: no state left, precondition 'danglingness' got status valid.
 [eva] tests/builtins/memchr.c:310: Call to builtin memchr
 [eva:alarm] tests/builtins/memchr.c:310: Warning: 
   function memchr: precondition 'valid' got status unknown.
@@ -357,9 +351,9 @@
 [eva] tests/builtins/memchr.c:316: 
   function memchr: precondition 'valid' got status valid.
 [eva:alarm] tests/builtins/memchr.c:316: Warning: 
-  function memchr: precondition 'initialization' got status unknown.
+  function memchr: precondition 'initialization' got status invalid.
 [eva] tests/builtins/memchr.c:316: 
-  function memchr: precondition 'danglingness' got status valid.
+  function memchr: no state left, precondition 'danglingness' got status valid.
 [eva] tests/builtins/memchr.c:317: Call to builtin memchr
 [eva] tests/builtins/memchr.c:317: 
   function memchr: precondition 'valid' got status valid.
@@ -370,30 +364,30 @@
 [eva] tests/builtins/memchr.c:317: Frama_C_show_each_mymemchr: {3}
 [eva] tests/builtins/memchr.c:318: assertion got status valid.
 [eva] tests/builtins/memchr.c:319: Call to builtin memchr
-[eva:alarm] tests/builtins/memchr.c:319: Warning: 
-  function memchr: precondition 'valid' got status unknown.
-[eva:alarm] tests/builtins/memchr.c:319: Warning: 
-  function memchr: precondition 'initialization' got status unknown.
-[eva:alarm] tests/builtins/memchr.c:319: Warning: 
-  function memchr: precondition 'danglingness' got status unknown.
+[eva] tests/builtins/memchr.c:319: 
+  function memchr: precondition 'valid' got status valid.
+[eva] tests/builtins/memchr.c:319: 
+  function memchr: precondition 'initialization' got status valid.
+[eva] tests/builtins/memchr.c:319: 
+  function memchr: precondition 'danglingness' got status valid.
 [eva] tests/builtins/memchr.c:319: Frama_C_show_each_mymemchr: {4}
 [eva] tests/builtins/memchr.c:320: assertion got status valid.
 [eva] tests/builtins/memchr.c:321: Call to builtin memchr
-[eva:alarm] tests/builtins/memchr.c:321: Warning: 
-  function memchr: precondition 'valid' got status unknown.
-[eva:alarm] tests/builtins/memchr.c:321: Warning: 
-  function memchr: precondition 'initialization' got status unknown.
-[eva:alarm] tests/builtins/memchr.c:321: Warning: 
-  function memchr: precondition 'danglingness' got status unknown.
+[eva] tests/builtins/memchr.c:321: 
+  function memchr: precondition 'valid' got status valid.
+[eva] tests/builtins/memchr.c:321: 
+  function memchr: precondition 'initialization' got status valid.
+[eva] tests/builtins/memchr.c:321: 
+  function memchr: precondition 'danglingness' got status valid.
 [eva] tests/builtins/memchr.c:321: Frama_C_show_each_mymemchr: {5}
 [eva] tests/builtins/memchr.c:322: assertion got status valid.
 [eva] tests/builtins/memchr.c:323: Call to builtin memchr
-[eva:alarm] tests/builtins/memchr.c:323: Warning: 
-  function memchr: precondition 'valid' got status unknown.
-[eva:alarm] tests/builtins/memchr.c:323: Warning: 
-  function memchr: precondition 'initialization' got status unknown.
-[eva:alarm] tests/builtins/memchr.c:323: Warning: 
-  function memchr: precondition 'danglingness' got status unknown.
+[eva] tests/builtins/memchr.c:323: 
+  function memchr: precondition 'valid' got status valid.
+[eva] tests/builtins/memchr.c:323: 
+  function memchr: precondition 'initialization' got status valid.
+[eva] tests/builtins/memchr.c:323: 
+  function memchr: precondition 'danglingness' got status valid.
 [eva] tests/builtins/memchr.c:323: Frama_C_show_each_mymemchr: {9}
 [eva] tests/builtins/memchr.c:324: assertion got status valid.
 [eva] Recording results for memchr_misc
@@ -423,12 +417,12 @@
 [eva] tests/builtins/memchr.c:336: Frama_C_show_each_mymemchr2: {3; 4}
 [eva] tests/builtins/memchr.c:337: assertion got status valid.
 [eva] tests/builtins/memchr.c:341: Call to builtin memchr
-[eva:alarm] tests/builtins/memchr.c:341: Warning: 
-  function memchr: precondition 'valid' got status unknown.
-[eva:alarm] tests/builtins/memchr.c:341: Warning: 
-  function memchr: precondition 'initialization' got status unknown.
-[eva:alarm] tests/builtins/memchr.c:341: Warning: 
-  function memchr: precondition 'danglingness' got status unknown.
+[eva] tests/builtins/memchr.c:341: 
+  function memchr: precondition 'valid' got status valid.
+[eva] tests/builtins/memchr.c:341: 
+  function memchr: precondition 'initialization' got status valid.
+[eva] tests/builtins/memchr.c:341: 
+  function memchr: precondition 'danglingness' got status valid.
 [eva:alarm] tests/builtins/memchr.c:341: Warning: 
   pointer subtraction. assert \base_addr(_ss_1) ≡ \base_addr(s1);
 [eva] tests/builtins/memchr.c:341: Frama_C_show_each_mymemchr: {3; 4}
@@ -439,6 +433,12 @@
 [eva] tests/builtins/memchr.c:341: Call to builtin memchr
 [eva] tests/builtins/memchr.c:341: Frama_C_show_each_mymemchr: {3; 4}
 [eva] tests/builtins/memchr.c:341: Call to builtin memchr
+[eva:alarm] tests/builtins/memchr.c:341: Warning: 
+  function memchr: precondition 'valid' got status unknown.
+[eva:alarm] tests/builtins/memchr.c:341: Warning: 
+  function memchr: precondition 'initialization' got status unknown.
+[eva:alarm] tests/builtins/memchr.c:341: Warning: 
+  function memchr: precondition 'danglingness' got status unknown.
 [eva] tests/builtins/memchr.c:341: Frama_C_show_each_mymemchr: {3; 4; 7; 8}
 [eva] tests/builtins/memchr.c:348: Call to builtin memchr
 [eva] tests/builtins/memchr.c:348: 
@@ -457,9 +457,9 @@
 [eva] tests/builtins/memchr.c:170: 
   function memchr: precondition 'valid' got status valid.
 [eva:alarm] tests/builtins/memchr.c:170: Warning: 
-  function memchr: precondition 'initialization' got status unknown.
+  function memchr: precondition 'initialization' got status invalid.
 [eva] tests/builtins/memchr.c:170: 
-  function memchr: precondition 'danglingness' got status valid.
+  function memchr: no state left, precondition 'danglingness' got status valid.
 [eva] Recording results for memchr_bitfields
 [eva] Done for function memchr_bitfields
 [eva] computing for function memchr_bitfields2 <- main.
@@ -493,8 +493,8 @@
   function memchr: precondition 'valid' got status valid.
 [eva] tests/builtins/memchr.c:270: 
   function memchr: precondition 'initialization' got status valid.
-[eva:alarm] tests/builtins/memchr.c:270: Warning: 
-  function memchr: precondition 'danglingness' got status unknown.
+[eva] tests/builtins/memchr.c:270: 
+  function memchr: precondition 'danglingness' got status valid.
 [eva] tests/builtins/memchr.c:270: Frama_C_show_each_mymemchr: {0}
 [eva] tests/builtins/memchr.c:271: assertion got status valid.
 [eva] Recording results for memchr_escaping
@@ -662,12 +662,12 @@
 [eva] tests/builtins/memchr.c:431: Frama_C_show_each_mymemchr2: {-1; 3}
 [eva] tests/builtins/memchr.c:432: assertion got status valid.
 [eva] tests/builtins/memchr.c:435: Call to builtin memchr
-[eva:alarm] tests/builtins/memchr.c:435: Warning: 
-  function memchr: precondition 'valid' got status unknown.
-[eva:alarm] tests/builtins/memchr.c:435: Warning: 
-  function memchr: precondition 'initialization' got status unknown.
-[eva:alarm] tests/builtins/memchr.c:435: Warning: 
-  function memchr: precondition 'danglingness' got status unknown.
+[eva] tests/builtins/memchr.c:435: 
+  function memchr: precondition 'valid' got status valid.
+[eva] tests/builtins/memchr.c:435: 
+  function memchr: precondition 'initialization' got status valid.
+[eva] tests/builtins/memchr.c:435: 
+  function memchr: precondition 'danglingness' got status valid.
 [eva] tests/builtins/memchr.c:435: Frama_C_show_each_mymemchr2: {-1; 3; 7}
 [eva] tests/builtins/memchr.c:436: assertion got status valid.
 [eva] Recording results for memchr_small_sets_n
@@ -821,12 +821,12 @@
 [eva] computing for function memchr_unbounded_n <- main.
   Called from tests/builtins/memchr.c:667.
 [eva] tests/builtins/memchr.c:501: Call to builtin memchr
-[eva:alarm] tests/builtins/memchr.c:501: Warning: 
-  function memchr: precondition 'valid' got status unknown.
-[eva:alarm] tests/builtins/memchr.c:501: Warning: 
-  function memchr: precondition 'initialization' got status unknown.
-[eva:alarm] tests/builtins/memchr.c:501: Warning: 
-  function memchr: precondition 'danglingness' got status unknown.
+[eva] tests/builtins/memchr.c:501: 
+  function memchr: precondition 'valid' got status valid.
+[eva] tests/builtins/memchr.c:501: 
+  function memchr: precondition 'initialization' got status valid.
+[eva] tests/builtins/memchr.c:501: 
+  function memchr: precondition 'danglingness' got status valid.
 [eva] tests/builtins/memchr.c:501: Frama_C_show_each_mymemchr: {-1; 3}
 [eva] tests/builtins/memchr.c:502: assertion got status valid.
 [eva] tests/builtins/memchr.c:504: Call to builtin memchr
@@ -839,12 +839,12 @@
 [eva] tests/builtins/memchr.c:504: Frama_C_show_each_mymemchr: {-1; 3}
 [eva] tests/builtins/memchr.c:505: assertion got status valid.
 [eva] tests/builtins/memchr.c:507: Call to builtin memchr
-[eva:alarm] tests/builtins/memchr.c:507: Warning: 
-  function memchr: precondition 'valid' got status unknown.
-[eva:alarm] tests/builtins/memchr.c:507: Warning: 
-  function memchr: precondition 'initialization' got status unknown.
-[eva:alarm] tests/builtins/memchr.c:507: Warning: 
-  function memchr: precondition 'danglingness' got status unknown.
+[eva] tests/builtins/memchr.c:507: 
+  function memchr: precondition 'valid' got status valid.
+[eva] tests/builtins/memchr.c:507: 
+  function memchr: precondition 'initialization' got status valid.
+[eva] tests/builtins/memchr.c:507: 
+  function memchr: precondition 'danglingness' got status valid.
 [eva] tests/builtins/memchr.c:507: Frama_C_show_each_mymemchr: {-1; 3}
 [eva] tests/builtins/memchr.c:508: assertion got status valid.
 [eva] Recording results for memchr_unbounded_n
@@ -1103,12 +1103,12 @@
 [eva] tests/builtins/memchr.c:603: assertion got status valid.
 [eva] tests/builtins/memchr.c:606: Frama_C_show_each_c: {98}
 [eva] tests/builtins/memchr.c:607: Call to builtin memchr
-[eva:alarm] tests/builtins/memchr.c:607: Warning: 
-  function memchr: precondition 'valid' got status unknown.
-[eva:alarm] tests/builtins/memchr.c:607: Warning: 
-  function memchr: precondition 'initialization' got status unknown.
-[eva:alarm] tests/builtins/memchr.c:607: Warning: 
-  function memchr: precondition 'danglingness' got status unknown.
+[eva] tests/builtins/memchr.c:607: 
+  function memchr: precondition 'valid' got status valid.
+[eva] tests/builtins/memchr.c:607: 
+  function memchr: precondition 'initialization' got status valid.
+[eva] tests/builtins/memchr.c:607: 
+  function memchr: precondition 'danglingness' got status valid.
 [eva] tests/builtins/memchr.c:607: Frama_C_show_each_mymemchr: {1}
 [eva] tests/builtins/memchr.c:607: Call to builtin memchr
 [eva] tests/builtins/memchr.c:607: 
@@ -1200,12 +1200,12 @@
 [eva] tests/builtins/memchr.c:624: assertion got status valid.
 [eva] tests/builtins/memchr.c:627: Frama_C_show_each_c: {98; 99}
 [eva] tests/builtins/memchr.c:628: Call to builtin memchr
-[eva:alarm] tests/builtins/memchr.c:628: Warning: 
-  function memchr: precondition 'valid' got status unknown.
-[eva:alarm] tests/builtins/memchr.c:628: Warning: 
-  function memchr: precondition 'initialization' got status unknown.
-[eva:alarm] tests/builtins/memchr.c:628: Warning: 
-  function memchr: precondition 'danglingness' got status unknown.
+[eva] tests/builtins/memchr.c:628: 
+  function memchr: precondition 'valid' got status valid.
+[eva] tests/builtins/memchr.c:628: 
+  function memchr: precondition 'initialization' got status valid.
+[eva] tests/builtins/memchr.c:628: 
+  function memchr: precondition 'danglingness' got status valid.
 [eva] tests/builtins/memchr.c:628: Frama_C_show_each_mymemchr: {1; 2}
 [eva] tests/builtins/memchr.c:628: Call to builtin memchr
 [eva] tests/builtins/memchr.c:628: 

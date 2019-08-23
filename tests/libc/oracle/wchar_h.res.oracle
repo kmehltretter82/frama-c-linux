@@ -24,20 +24,14 @@
 [eva] tests/libc/wchar_h.c:13: Call to builtin wmemchr
 [eva] tests/libc/wchar_h.c:13: 
   function wmemchr: precondition 'valid' got status valid.
-[eva] share/libc/wchar.h:58: 
-  Cannot evaluate range bound wmemchr_off(s, c, n)
-  (unsupported ACSL construct: logic function wmemchr_off). Approximating
-[eva:alarm] tests/libc/wchar_h.c:13: Warning: 
-  function wmemchr: precondition 'initialization' got status unknown.
+[eva] tests/libc/wchar_h.c:13: 
+  function wmemchr: precondition 'initialization' got status valid.
 [eva] tests/libc/wchar_h.c:13: 
   function wmemchr: precondition 'danglingness' got status valid.
 [eva] tests/libc/wchar_h.c:14: check 'ok' got status valid.
 [eva] tests/libc/wchar_h.c:15: Call to builtin wmemchr
-[eva] share/libc/wchar.h:55: 
-  Cannot evaluate range bound wmemchr_off(s, c, n)
-  (unsupported ACSL construct: logic function wmemchr_off). Approximating
-[eva:alarm] tests/libc/wchar_h.c:15: Warning: 
-  function wmemchr: precondition 'valid' got status unknown.
+[eva] tests/libc/wchar_h.c:15: 
+  function wmemchr: precondition 'valid' got status valid.
 [eva] tests/libc/wchar_h.c:15: 
   function wmemchr: precondition 'initialization' got status valid.
 [eva] tests/libc/wchar_h.c:15: 
@@ -47,40 +41,40 @@
 [eva] tests/libc/wchar_h.c:18: 
   function wmemchr: precondition 'valid' got status valid.
 [eva:alarm] tests/libc/wchar_h.c:18: Warning: 
-  function wmemchr: precondition 'initialization' got status unknown.
+  function wmemchr: precondition 'initialization' got status invalid.
 [eva] tests/libc/wchar_h.c:18: 
-  function wmemchr: precondition 'danglingness' got status valid.
+  function wmemchr: no state left, precondition 'danglingness' got status valid.
 [eva] tests/libc/wchar_h.c:21: Call to builtin wmemchr
-[eva:alarm] tests/libc/wchar_h.c:21: Warning: 
-  function wmemchr: precondition 'valid' got status unknown.
-[eva:alarm] tests/libc/wchar_h.c:21: Warning: 
-  function wmemchr: precondition 'initialization' got status unknown.
-[eva:alarm] tests/libc/wchar_h.c:21: Warning: 
-  function wmemchr: precondition 'danglingness' got status unknown.
+[eva] tests/libc/wchar_h.c:21: 
+  function wmemchr: precondition 'valid' got status valid.
+[eva] tests/libc/wchar_h.c:21: 
+  function wmemchr: precondition 'initialization' got status valid.
+[eva] tests/libc/wchar_h.c:21: 
+  function wmemchr: precondition 'danglingness' got status valid.
 [eva] tests/libc/wchar_h.c:22: check 'ok' got status valid.
 [eva] tests/libc/wchar_h.c:24: Call to builtin wmemchr
-[eva:alarm] tests/libc/wchar_h.c:24: Warning: 
-  function wmemchr: precondition 'valid' got status unknown.
-[eva:alarm] tests/libc/wchar_h.c:24: Warning: 
-  function wmemchr: precondition 'initialization' got status unknown.
-[eva:alarm] tests/libc/wchar_h.c:24: Warning: 
-  function wmemchr: precondition 'danglingness' got status unknown.
+[eva] tests/libc/wchar_h.c:24: 
+  function wmemchr: precondition 'valid' got status valid.
+[eva] tests/libc/wchar_h.c:24: 
+  function wmemchr: precondition 'initialization' got status valid.
+[eva] tests/libc/wchar_h.c:24: 
+  function wmemchr: precondition 'danglingness' got status valid.
 [eva] tests/libc/wchar_h.c:25: check 'ok' got status valid.
 [eva] tests/libc/wchar_h.c:26: Call to builtin wmemchr
-[eva:alarm] tests/libc/wchar_h.c:26: Warning: 
-  function wmemchr: precondition 'valid' got status unknown.
+[eva] tests/libc/wchar_h.c:26: 
+  function wmemchr: precondition 'valid' got status valid.
 [eva:alarm] tests/libc/wchar_h.c:26: Warning: 
   function wmemchr: precondition 'initialization' got status unknown.
-[eva:alarm] tests/libc/wchar_h.c:26: Warning: 
-  function wmemchr: precondition 'danglingness' got status unknown.
+[eva] tests/libc/wchar_h.c:26: 
+  function wmemchr: precondition 'danglingness' got status valid.
 [eva] tests/libc/wchar_h.c:27: check 'ok' got status valid.
 [eva] tests/libc/wchar_h.c:29: Call to builtin wmemchr
-[eva:alarm] tests/libc/wchar_h.c:29: Warning: 
-  function wmemchr: precondition 'valid' got status unknown.
-[eva:alarm] tests/libc/wchar_h.c:29: Warning: 
-  function wmemchr: precondition 'initialization' got status unknown.
-[eva:alarm] tests/libc/wchar_h.c:29: Warning: 
-  function wmemchr: precondition 'danglingness' got status unknown.
+[eva] tests/libc/wchar_h.c:29: 
+  function wmemchr: precondition 'valid' got status valid.
+[eva] tests/libc/wchar_h.c:29: 
+  function wmemchr: precondition 'initialization' got status valid.
+[eva] tests/libc/wchar_h.c:29: 
+  function wmemchr: precondition 'danglingness' got status valid.
 [eva] tests/libc/wchar_h.c:30: check 'ok' got status valid.
 [eva] computing for function wcsncpy <- main.
   Called from tests/libc/wchar_h.c:33.
