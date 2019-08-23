@@ -29,11 +29,12 @@ type model = {
   descr : string ; (* Title of the Model (for pretty) *)
   emitter : Emitter.t ;
   hypotheses : hypotheses ;
-  mutable tuning : tuning list ;
+  tuning : tuning list ;
 }
 
 and tuning = unit -> unit
 and hypotheses = Kernel_function.t -> MemoryContext.clause list
+and t = model
 
 let nohyp (_kf) = []
 let repr = {
@@ -43,6 +44,18 @@ let repr = {
   hypotheses = nohyp ;
 }
 
+module MODEL =
+struct
+  type t = model
+  let hash a = Hashtbl.hash a.id
+  let equal a b = String.equal a.id b.id
+  let compare a b = String.compare a.id b.id
+end
+
+module Set = Set.Make(MODEL)
+module Hash = Hashtbl.Make(MODEL)
+
+(*
 module D = Datatype.Make_with_collections(struct
     type t = model
     let name = "WP.Model"
@@ -64,7 +77,7 @@ module D = Datatype.Make_with_collections(struct
     let mem_project = Datatype.never_any_project
     let varname _ = "m"
   end)
-
+*)
 
 module MODELS =
 struct
@@ -76,13 +89,8 @@ struct
 
   let mem id = H.mem id !h
   let add m = h := H.add m.id m !h
-  let find id = H.find id !h
-  let iter f = H.iter (fun _ m -> f m) !h
 
 end
-
-let find ~id = MODELS.find id
-let iter f = MODELS.iter f
 
 let register ~id ?(descr=id) ?(tuning=[]) ?(hypotheses=nohyp) () =
   if MODELS.mem id then
@@ -449,6 +457,3 @@ struct
   let clear = G.clear
   let remove = G.remove
 end
-
-module S = D
-type t = S.t

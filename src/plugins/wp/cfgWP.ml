@@ -1474,7 +1474,7 @@ struct
 end
 
 (* Cache because computer functors can not be instantiated twice *)
-module COMPUTERS = WpContext.S.Hashtbl
+module COMPUTERS = WpContext.Hash
 let computers = COMPUTERS.create 1
 
 let computer setup driver =

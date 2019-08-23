@@ -22,11 +22,13 @@
 
 (** Model Registration *)
 
-module S : Datatype.S_with_collections
-type t = S.t
-type model = S.t
+type t
+type model = t
 type tuning = (unit -> unit)
 type hypotheses = Kernel_function.t -> MemoryContext.clause list
+
+module Set : Set.S with type elt = model
+module Hash : Hashtbl.S with type key = model
 
 val repr : model
 val register :
@@ -40,9 +42,6 @@ val get_id : model -> string
 val get_descr : model -> string
 val get_emitter : model -> Emitter.t
 val get_hypotheses : model -> hypotheses
-
-val find : id:string -> model
-val iter : (model -> unit) -> unit
 
 val with_model : model -> ('a -> 'b) -> 'a -> 'b
 val on_model : model -> (unit -> unit) -> unit

@@ -68,7 +68,7 @@ let computer () =
 (* --- Memory Model Hypotheses                                          --- *)
 (* ------------------------------------------------------------------------ *)
 
-module Models = WpContext.S.Set
+module Models = WpContext.Set
 module Fmap = Kernel_function.Map
 
 let wp_iter_model ?ip ?index job =
