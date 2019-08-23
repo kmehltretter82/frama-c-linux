@@ -99,7 +99,7 @@ let run () =
 
   let run_test kf =
     let fct = Kernel_function.get_definition kf in
-    Model.on_scope (Some kf) (fun () ->
+    WpContext.on_scope (Some kf) (fun () ->
         let block = Interpreted_automata.Compute.get_automaton ~annotations:true kf in
         let formal = List.hd (fct.sformals) in
 
@@ -161,7 +161,7 @@ let run () =
 
   List.iter (fun kf ->
       if Kernel_function.is_definition kf then
-        (Model.with_model model (Lang.local run_test) kf))
+        (WpContext.with_model model (Lang.local run_test) kf))
     ordered_kf
 
 

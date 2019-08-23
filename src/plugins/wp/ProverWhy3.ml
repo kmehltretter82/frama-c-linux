@@ -35,7 +35,7 @@ let option_import = LogicBuiltins.create_option
 
 let config = VCS.why3_config
 
-module Env = Model.Index(struct
+module Env = WpContext.Index(struct
     include Datatype.Unit
     type key = unit
     type data = Why3.Env.env
@@ -46,7 +46,7 @@ let get_why3_env =
       let config = Lazy.force config in
       let main = Why3.Whyconf.get_main config in
       let ld =
-        (Model.directory ())::
+        (WpContext.directory ())::
         (Wp_parameters.Share.file "why3")::
         (Why3.Whyconf.loadpath main) in
       Why3.Env.create_env ld
@@ -604,7 +604,7 @@ let mk_binders cnv l =
 
 (** visit definitions and add them in the task *)
 
-module CLUSTERS = Model.Index
+module CLUSTERS = WpContext.Index
     (struct
       type key = Definitions.cluster
       type data = int * Why3.Theory.theory
@@ -653,7 +653,7 @@ class visitor (ctx:context) c =
               begin fun fmt ->
                 Format.fprintf fmt "---------------------------------------------@\n" ;
                 Format.fprintf fmt "--- Model '%s' Cluster '%s' @\n"
-                  (Model.get_id (Model.get_model ())) name;
+                  (WpContext.get_id (WpContext.get_model ())) name;
                 Format.fprintf fmt "---------------------------------------------@\n" ;
                 Why3.Pretty.print_theory fmt th;
               end ;
@@ -703,7 +703,7 @@ class visitor (ctx:context) c =
         if Filepath.normalize (Filename.dirname source) <>
            Filepath.normalize (Wp_parameters.Share.dir ())
         then
-          let tgtdir = Model.directory () in
+          let tgtdir = WpContext.directory () in
           let why3src = Filename.basename source in
           let target = Printf.sprintf "%s/%s" tgtdir why3src in
           Command.copy source target
@@ -1076,7 +1076,7 @@ let prove ?timeout ?steplimit ~prover wpo =
         else Task.return VCS.no_result
       else call_prover ~timeout ~steplimit prover task wpo
     in
-    Model.with_model wpo.Wpo.po_model do_ ()
+    WpContext.with_model wpo.Wpo.po_model do_ ()
   with exn ->
     let bt = Printexc.get_raw_backtrace () in
     Wp_parameters.fatal "Error in why3:%a@.%s@."

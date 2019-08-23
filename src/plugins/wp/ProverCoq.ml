@@ -32,7 +32,7 @@ open Definitions
 let dkey = Wp_parameters.register_category "prover"
 
 let cluster_file c =
-  let dir = Model.directory () in
+  let dir = WpContext.directory () in
   let base = cluster_id c in
   Printf.sprintf "%s/%s.v" dir base
 
@@ -249,7 +249,7 @@ let need_recompile ~source ~target =
 
 (* Used to mark version of clusters already available *)
 
-module CLUSTERS = Model.Index
+module CLUSTERS = WpContext.Index
     (struct
       type key = cluster
       type data = int * depend list
@@ -331,7 +331,7 @@ and assemble_coqlib coqcc c =
 
 let assemble_goal ~pid axioms prop =
   let title = Pretty_utils.to_string WpPropId.pretty pid in
-  let model = Model.directory () in
+  let model = WpContext.directory () in
   let id = WpPropId.get_propid pid in
   let file = Printf.sprintf "%s/%s.coq" model id in
   let goal = cluster ~id ~title () in
@@ -657,7 +657,7 @@ let prove_prop wpo ~mode ~axioms ~prop =
   let model = wpo.po_model in
   let script = DISK.file_goal ~pid ~model ~prover:NativeCoq in
   let includes , headers , goal =
-    Model.with_model model (assemble_goal ~pid axioms) prop
+    WpContext.with_model model (assemble_goal ~pid axioms) prop
   in
   prove_session ~mode {
     cw_pid = pid ;
@@ -673,7 +673,7 @@ let prove_annot wpo vcq ~mode =
   Task.todo
     begin fun () ->
       let prop =
-        Model.with_model wpo.po_model GOAL.compute_proof vcq.VC_Annot.goal in
+        WpContext.with_model wpo.po_model GOAL.compute_proof vcq.VC_Annot.goal in
       prove_prop wpo ~mode ~axioms:None ~prop
     end
 

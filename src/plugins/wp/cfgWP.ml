@@ -1264,7 +1264,7 @@ struct
 
   let make_oblig index pid vcq =
     {
-      po_model = Model.get_model () ;
+      po_model = WpContext.get_model () ;
       po_pid = pid ;
       po_sid = "" ;
       po_gid = "" ;
@@ -1305,7 +1305,7 @@ struct
     Gmap.iter_sorted
       (fun target -> Splitter.iter (group_vc groups target))
       wp.vcs ;
-    let model = Model.get_model () in
+    let model = WpContext.get_model () in
     PMAP.iter
       begin fun pid group ->
         let trivial_wpo =
@@ -1315,7 +1315,7 @@ struct
         let provers_wpo =
           Bag.map (make_oblig index pid) group.verifs
         in
-        let mid = Model.get_id model in
+        let mid = WpContext.get_id model in
         let group =
           if is_empty group.trivial then
             if Bag.is_empty provers_wpo
@@ -1352,7 +1352,7 @@ struct
       begin
         let id = WpPropId.mk_lemma_id l in
         let def = L.lemma l in
-        let model = Model.get_model () in
+        let model = WpContext.get_model () in
         let vca = {
           Wpo.VC_Lemma.depends = l.lem_depends ;
           Wpo.VC_Lemma.lemma = def ;
@@ -1361,7 +1361,7 @@ struct
         let index = match LogicUsage.section_of_lemma l.lem_name with
           | LogicUsage.Toplevel _ -> Wpo.Axiomatic None
           | LogicUsage.Axiomatic a -> Wpo.Axiomatic (Some a.ax_name) in
-        let mid = Model.get_id model in
+        let mid = WpContext.get_id model in
         let sid = WpPropId.get_propid id in
         let leg = WpPropId.get_legacy id in
         let wpo = {
@@ -1414,7 +1414,7 @@ struct
   module VCG = VC(M)
   module WP = Calculus.Cfg(VCG)
 
-  class wp (m:Model.t) =
+  class wp (m:WpContext.t) =
     object
       val mutable lemmas : LogicUsage.logic_lemma Bag.t = Bag.empty
       val mutable annots : WpStrategy.strategy Bag.t = Bag.empty
@@ -1428,9 +1428,9 @@ struct
           Lang.F.release () ;
           Datatype.String.Set.iter Lang.F.Check.set
             (Wp_parameters.QedChecks.get ()) ;
-          Model.on_model m
+          WpContext.on_model m
             begin fun () ->
-              Model.on_global
+              WpContext.on_global
                 (fun () ->
                    LogicUsage.iter_lemmas VCG.compile_lemma ;
                    Bag.iter (VCG.prove_lemma collection) lemmas ;
@@ -1439,7 +1439,7 @@ struct
                 (fun strategy ->
                    let cfg = WpStrategy.cfg_of_strategy strategy in
                    let kf = WpStrategy.get_kf strategy in
-                   Model.on_kf kf
+                   WpContext.on_kf kf
                      begin fun () ->
                        let bhv = WpStrategy.get_bhv strategy in
                        let index = Wpo.Function( kf , bhv ) in
@@ -1474,7 +1474,7 @@ struct
 end
 
 (* Cache because computer functors can not be instantiated twice *)
-module COMPUTERS = Model.S.Hashtbl
+module COMPUTERS = WpContext.S.Hashtbl
 let computers = COMPUTERS.create 1
 
 let computer setup driver =

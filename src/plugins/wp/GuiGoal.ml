@@ -366,7 +366,7 @@ class pane (enabled : GuiConfig.enabled) =
             let browser = self#browse in
             tactic#select ~process ~composer ~browser ~tree sel
           in
-          Model.with_model model (List.iter select) tactics ;
+          WpContext.with_model model (List.iter select) tactics ;
           let tgt =
             if List.exists (fun tactics -> tactics#targeted) tactics
             then sel else Tactical.Empty in
@@ -512,7 +512,7 @@ class pane (enabled : GuiConfig.enabled) =
               self#update in
             let model = ProofEngine.tree_model proof in
             let print = composer#print cc ~quit in
-            text#printf "%t@." (Model.with_model model print) ;
+            text#printf "%t@." (WpContext.with_model model print) ;
             text#hrule ;
             text#printf "%t@."
               (printer#goal (ProofEngine.head proof)) ;
@@ -526,7 +526,7 @@ class pane (enabled : GuiConfig.enabled) =
               self#update in
             let model = ProofEngine.tree_model proof in
             let print = browser#print cc ~quit in
-            text#printf "%t@." (Model.with_model model print) ;
+            text#printf "%t@." (WpContext.with_model model print) ;
             text#hrule ;
             text#printf "%t@."
               (printer#goal (ProofEngine.head proof)) ;

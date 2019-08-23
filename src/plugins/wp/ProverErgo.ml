@@ -70,7 +70,7 @@ let rec locate_error files file line =
       else locate_error files file (line-n)
 
 let cluster_file c =
-  let dir = Model.directory () in
+  let dir = WpContext.directory () in
   let base = cluster_id c in
   Printf.sprintf "%s/%s.ergo" dir base
 
@@ -89,7 +89,7 @@ let pp_depend fmt = function
                            Definitions.pp_cluster cluster
 [@@@warning "+32"]
 
-module TYPES = Model.Index
+module TYPES = WpContext.Index
     (struct
       type key = adt
       type data = tau
@@ -233,7 +233,7 @@ let write_cluster c job =
       begin fun fmt ->
         Format.fprintf fmt "---------------------------------------------@\n" ;
         Format.fprintf fmt "--- File '%s/%s.ergo' @\n"
-          (Model.get_id (Model.get_model ())) (cluster_id c) ;
+          (WpContext.get_id (WpContext.get_model ())) (cluster_id c) ;
         Format.fprintf fmt "---------------------------------------------@\n" ;
         Command.pp_from_file fmt f ;
       end ;
@@ -243,7 +243,7 @@ let write_cluster c job =
 (* --- File Assembly                                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
-module CLUSTERS = Model.Index
+module CLUSTERS = WpContext.Index
     (struct
       type key = cluster
       type data = int * depend list
@@ -479,10 +479,10 @@ let prove_prop ~config ~pid ~mode ~model ~axioms ~prop =
   let logerr = DISK.file_logerr ~pid ~model ~prover in
   let id = WpPropId.get_propid pid in
   let title = Pretty_utils.to_string WpPropId.pretty pid in
-  let lines = Model.with_model model
+  let lines = WpContext.with_model model
       (assemble_goal ~file ~id ~title ~axioms) prop in
   if Wp_parameters.has_print_generated () then
-    Model.with_model model (fun () ->
+    WpContext.with_model model (fun () ->
         let goal = cluster ~id ~title () in
         Wp_parameters.print_generated (cluster_file goal)
       ) () ;

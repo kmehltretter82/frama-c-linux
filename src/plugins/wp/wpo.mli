@@ -36,14 +36,14 @@ type index =
 
 module DISK :
 sig
-  val cache_log : pid:prop_id -> model:Model.t ->
+  val cache_log : pid:prop_id -> model:WpContext.t ->
     prover:prover -> result:result -> string
-  val pretty : pid:prop_id -> model:Model.t ->
+  val pretty : pid:prop_id -> model:WpContext.t ->
     prover:prover -> result:result -> Format.formatter -> unit
-  val file_kf : kf:kernel_function -> model:Model.t -> prover:prover -> string
-  val file_goal : pid:prop_id -> model:Model.t -> prover:prover -> string
-  val file_logout : pid:prop_id -> model:Model.t -> prover:prover -> string
-  val file_logerr : pid:prop_id -> model:Model.t -> prover:prover -> string
+  val file_kf : kf:kernel_function -> model:WpContext.t -> prover:prover -> string
+  val file_goal : pid:prop_id -> model:WpContext.t -> prover:prover -> string
+  val file_logout : pid:prop_id -> model:WpContext.t -> prover:prover -> string
+  val file_logerr : pid:prop_id -> model:WpContext.t -> prover:prover -> string
 end
 
 module GOAL :
@@ -120,7 +120,7 @@ type po = t and t = {
     po_sid   : string ;  (** goal short identifier (without model) *)
     po_name  : string ;  (** goal informal name *)
     po_idx   : index ;   (** goal index *)
-    po_model : Model.t ;
+    po_model : WpContext.t ;
     po_pid   : WpPropId.prop_id ; (* goal target property *)
     po_formula : formula ; (* proof obligation *)
   }
@@ -140,7 +140,7 @@ val get_gid: t -> string
 val get_property: t -> Property.t
 val get_index : t -> index
 val get_label : t -> string
-val get_model : t -> Model.t
+val get_model : t -> WpContext.t
 val get_model_id : t -> string
 val get_model_name : t -> string
 val get_file_logout : t -> prover -> string (** only filename, might not exists *)

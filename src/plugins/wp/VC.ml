@@ -45,7 +45,7 @@ let get_formula po =
   | GoalCheck c -> c.VC_Check.goal
   | GoalLemma l -> l.VC_Lemma.lemma.Definitions.l_lemma
   | GoalAnnot { VC_Annot.goal = g } ->
-      Model.with_model po.po_model Wpo.GOAL.compute_proof g
+      WpContext.with_model po.po_model Wpo.GOAL.compute_proof g
 
 let clear = Wpo.clear
 let proof = Wpo.goals_of_property

@@ -98,12 +98,12 @@ let generator =
 
 let generate kf model =
   let update = ref false in
-  let cint = Model.with_model model Cint.current () in
+  let cint = WpContext.with_model model Cint.current () in
   List.iter (configure ~update ~generate:true kf cint) generator ;
   if !update then !Db.RteGen.annotate_kf kf
 
 let missing_guards kf model =
   let update = ref false in
-  let cint = Model.with_model model Cint.current () in
+  let cint = WpContext.with_model model Cint.current () in
   List.iter (configure ~update ~generate:false kf cint) generator ;
   !update

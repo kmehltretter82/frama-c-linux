@@ -130,7 +130,7 @@ struct
 
   (** A memory model context has to be set. *)
   let hypotheses () =
-    let kf = Model.get_scope () in
+    let kf = WpContext.get_scope () in
     let init = match kf with
       | None -> false
       | Some f -> WpStrategy.is_main_init f in
@@ -168,7 +168,7 @@ let is_formal_ptr x =
   x.vformal && Cil.isPointerType x.vtype
 
 let refusage_param ~byref ~context x =
-  let kf = Model.get_scope () in
+  let kf = WpContext.get_scope () in
   let init = match kf with
     | None -> false
     | Some f ->
@@ -278,7 +278,7 @@ module COMPILERS = FCMap.Make
         if cmp <> 0 then cmp else LogicBuiltins.compare d d'
     end)
 
-let instances = ref (COMPILERS.empty : Model.t COMPILERS.t)
+let instances = ref (COMPILERS.empty : WpContext.t COMPILERS.t)
 
 let instance (s:setup) (d:driver) =
   try COMPILERS.find (s,d) !instances
@@ -286,14 +286,14 @@ let instance (s:setup) (d:driver) =
     let id,descr = describe s in
     let module CC = (val compiler s.mheap s.mvar) in
     let tuning = [configure s d] in
-    let hypotheses kf = Model.on_scope (Some kf) CC.M.hypotheses () in
+    let hypotheses kf = WpContext.on_scope (Some kf) CC.M.hypotheses () in
     let id,descr =
       if LogicBuiltins.is_default d then id,descr
       else
         ( id ^ "_" ^ LogicBuiltins.id d ,
           descr ^ " (Driver " ^ LogicBuiltins.descr d ^ ")" )
     in
-    let model = Model.register ~id ~descr ~tuning ~hypotheses () in
+    let model = WpContext.register ~id ~descr ~tuning ~hypotheses () in
     instances := COMPILERS.add (s,d) model !instances ; model
 
 let ident s = fst (describe s)

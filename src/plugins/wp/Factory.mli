@@ -39,8 +39,8 @@ type driver = LogicBuiltins.driver
 val ident : setup -> string
 val descr : setup -> string
 val compiler : mheap -> mvar -> (module Sigs.Compiler)
-val configure : setup -> driver -> Model.tuning
-val instance : setup -> driver -> Model.t
+val configure : setup -> driver -> WpContext.tuning
+val instance : setup -> driver -> WpContext.t
 val default : setup (** ["Var,Typed,Nat,Real"] memory model. *)
 val parse :
   ?default:setup ->

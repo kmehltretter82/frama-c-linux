@@ -174,7 +174,7 @@ type registered_shift =
   | RS_Field of fieldinfo * term (* offset of the field *)
   | RS_Shift of Z.t  (* size of the element *)
 
-module RegisterShift = Model.Static
+module RegisterShift = WpContext.Static
     (struct
       type key = lfun
       type data = registered_shift
@@ -542,7 +542,7 @@ let cluster_memory () =
 
 let cluster_dummy () = Definitions.cluster ~id:"dummy" ()
 
-module ShiftFieldDef = Model.StaticGenerator(Cil_datatype.Fieldinfo)
+module ShiftFieldDef = WpContext.StaticGenerator(Cil_datatype.Fieldinfo)
     (struct
       let name = "MemTyped.ShiftFieldDef"
       type key = fieldinfo
@@ -569,7 +569,7 @@ module ShiftFieldDef = Model.StaticGenerator(Cil_datatype.Fieldinfo)
       let compile = Lang.local generate
     end)
 
-module ShiftField = Model.Generator(Cil_datatype.Fieldinfo)
+module ShiftField = WpContext.Generator(Cil_datatype.Fieldinfo)
     (struct
       let name = "MemTyped.ShiftField"
       type key = fieldinfo
@@ -590,7 +590,7 @@ end
 
 (* This is a model-independent generator,
    which will be inherited from the model-dependent clusters *)
-module ShiftGen = Model.StaticGenerator(Cobj)
+module ShiftGen = WpContext.StaticGenerator(Cobj)
     (struct
       let name = "MemTyped.ShiftDef"
       type key = c_object
@@ -634,7 +634,7 @@ module ShiftGen = Model.StaticGenerator(Cobj)
     end)
 
 (* The model-dependent derivation of model-independent ShiftDef *)
-module Shift = Model.Generator(Cobj)
+module Shift = WpContext.Generator(Cobj)
     (struct
       let name = "MemTyped.Shift"
       type key = c_object
@@ -663,7 +663,7 @@ module EID = State_builder.Ref(Datatype.Int)
       let default () = 0
     end)
 
-module STRING = Model.Generator(LITERAL)
+module STRING = WpContext.Generator(LITERAL)
     (struct
       let name = "MemTyped.STRING"
       type key = LITERAL.t
@@ -741,7 +741,7 @@ module STRING = Model.Generator(LITERAL)
 
     end)
 
-module RegisterBASE = Model.Static
+module RegisterBASE = WpContext.Static
     (struct
       type key = lfun
       type data = varinfo
@@ -749,7 +749,7 @@ module RegisterBASE = Model.Static
       include Lang.Fun
     end)
 
-module BASE = Model.Generator(Varinfo)
+module BASE = WpContext.Generator(Varinfo)
     (struct
       let name = "MemTyped.BASE"
       type key = varinfo
@@ -932,7 +932,7 @@ struct
 
 end
 
-module COMP = Model.Generator(Compinfo)
+module COMP = WpContext.Generator(Compinfo)
     (struct
       let name = "MemTyped.COMP"
       type key = compinfo
@@ -964,7 +964,7 @@ module COMP = Model.Generator(Compinfo)
       let compile = Lang.local generate
     end)
 
-module ARRAY = Model.Generator(Matrix.NATURAL)
+module ARRAY = WpContext.Generator(Matrix.NATURAL)
     (struct
       open Matrix
       let name = "MemTyped.ARRAY"

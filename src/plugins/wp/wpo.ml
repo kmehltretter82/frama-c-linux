@@ -85,7 +85,7 @@ module DISK =
 struct
 
   let file ~id ~model ?prover ?suffix ~ext () =
-    let mid = Wp_parameters.get_output_dir (Model.get_id model) in
+    let mid = Wp_parameters.get_output_dir (WpContext.get_id model) in
     let buffer = Buffer.create 80 in
     let fmt = Format.formatter_of_buffer buffer in
     Format.fprintf fmt "%s/%s" mid id ;
@@ -386,7 +386,7 @@ type po = t and t = {
     po_sid   : string ;  (* goal short identifier (without model) *)
     po_name  : string ;  (* goal informal name *)
     po_idx   : index ;   (* goal index *)
-    po_model : Model.t ;
+    po_model : WpContext.t ;
     po_pid   : WpPropId.prop_id ; (* goal target property *)
     po_formula : formula ; (* proof obligation *)
   }
@@ -394,8 +394,8 @@ type po = t and t = {
 let get_index w = w.po_idx
 let get_label w = WpPropId.label_of_prop_id w.po_pid
 let get_model x = x.po_model
-let get_model_id w = Model.get_id (get_model w)
-let get_model_name w = Model.get_descr (get_model w)
+let get_model_id w = WpContext.get_id (get_model w)
+let get_model_name w = WpContext.get_descr (get_model w)
 let get_depend = function
   | { po_formula = GoalAnnot { VC_Annot.deps = ips } } ->
       Property.Set.elements ips
@@ -459,7 +459,7 @@ module S =
           po_sid = "";
           po_gid = "";
           po_leg = "";
-          po_model = Model.repr ;
+          po_model = WpContext.repr ;
           po_name = "dummy";
           po_formula = GoalAnnot VC_Annot.repr ;
         }]
@@ -735,7 +735,7 @@ let update_property_status g r =
     in
     let target = WpAnnot.target proof in
     let depends = WpAnnot.dependencies proof in
-    let emitter = Model.get_emitter g.po_model in
+    let emitter = WpContext.get_emitter g.po_model in
     Property_status.emit emitter ~hyps:depends target status ;
   with err ->
     Wp_parameters.failure "Update-status failed (%s)" (Printexc.to_string err) ;
@@ -789,8 +789,8 @@ let is_trivial g =
 let reduce g =
   match g.po_formula with
   | GoalCheck _ -> false
-  | GoalLemma vc -> Model.with_model g.po_model VC_Lemma.is_trivial vc
-  | GoalAnnot vc -> Model.with_model g.po_model VC_Annot.resolve vc
+  | GoalLemma vc -> WpContext.with_model g.po_model VC_Lemma.is_trivial vc
+  | GoalAnnot vc -> WpContext.with_model g.po_model VC_Annot.resolve vc
 
 let resolve g =
   let valid = reduce g in
@@ -802,13 +802,13 @@ let resolve g =
 let compute g =
   match g.po_formula with
   | GoalAnnot { VC_Annot.axioms ; VC_Annot.goal = goal } ->
-      axioms , Model.with_model g.po_model GOAL.compute_descr goal
+      axioms , WpContext.with_model g.po_model GOAL.compute_descr goal
   | GoalLemma ({ VC_Lemma.depends = depends ; VC_Lemma.lemma = lemma } as w) ->
       let open Definitions in
       Some( lemma.l_cluster , depends ) ,
-      Model.with_model g.po_model VC_Lemma.sequent w
+      WpContext.with_model g.po_model VC_Lemma.sequent w
   | GoalCheck { VC_Check.goal = goal } ->
-      None , Model.with_model g.po_model Conditions.lemma goal
+      None , WpContext.with_model g.po_model Conditions.lemma goal
 
 let is_proved g =
   is_trivial g || List.exists (fun (_,r) -> VCS.is_valid r) (get_results g)
@@ -843,7 +843,7 @@ let pp_goal_model fmt w =
         VC_Check.pretty fmt vck
   end
 
-let pp_goal fmt w = Model.with_model w.po_model (pp_goal_model fmt) w
+let pp_goal fmt w = WpContext.with_model w.po_model (pp_goal_model fmt) w
 
 let pp_goal_flow fmt g =
   begin

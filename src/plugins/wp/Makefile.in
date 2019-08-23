@@ -62,10 +62,10 @@ PLUGIN_CMO:= \
 	rformat wprop \
 	wp_parameters wp_error \
 	dyncall ctypes clabels \
-	MemoryContext \
+	Context Warning MemoryContext wpContext \
 	LogicUsage RefUsage \
 	cil2cfg normAtLabels wpPropId mcfg \
-	Context Warning Model Lang Repr Matrix Passive Splitter \
+	Lang Repr Matrix Passive Splitter \
 	LogicBuiltins Definitions \
 	Cmath Cint Cfloat Vset Vlist Region Cstring Cvalues \
 	Letify Cleaning \
@@ -165,7 +165,7 @@ WP_API_BASE= \
 	LogicUsage.mli RefUsage.mli \
 	normAtLabels.mli \
 	wpPropId.mli mcfg.ml \
-	Context.mli Warning.mli Model.mli \
+	Context.mli Warning.mli wpContext.mli \
 	Lang.mli Repr.mli Passive.mli Splitter.mli \
 	LogicBuiltins.mli Definitions.mli \
 	Cint.mli Cfloat.mli Vset.mli Cstring.mli \

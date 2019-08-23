@@ -238,7 +238,7 @@ let rec reduce_eqcomp = function
   | _::ws -> reduce_eqcomp ws
   | [] -> raise Not_found
 
-module EQARRAY = Model.Generator(Matrix.NATURAL)
+module EQARRAY = WpContext.Generator(Matrix.NATURAL)
     (struct
       open Matrix
       type key = matrix

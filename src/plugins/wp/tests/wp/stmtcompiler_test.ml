@@ -91,7 +91,7 @@ let run () =
 
   (** Test on real Cil functions *)
   let _run_test kf =
-    Model.on_scope (Some kf) (fun () ->
+    WpContext.on_scope (Some kf) (fun () ->
         let automaton = Interpreted_automata.Compute.get_automaton ~annotations:true kf in
         (* Format.printf "@[%s body cil:%a@]@." fct Printer.pp_block block; *)
         let seq = {Sigs.pre = Cfg.node (); post = Cfg.node ()} in
@@ -108,7 +108,7 @@ let run () =
   in
 
   let run_test_ia kf =
-    Model.on_scope (Some kf) (fun () ->
+    WpContext.on_scope (Some kf) (fun () ->
         let paths,start = Compiler.compute_kf kf in
         let cfg, goals = paths.Compiler.paths_cfg, paths.Compiler.paths_goals in
         let fname = Filename.temp_file "cfg_pre_" (Kernel_function.get_name kf) in
@@ -135,8 +135,8 @@ let run () =
 
   List.iter (fun kf ->
       if Kernel_function.is_definition kf then begin
-        (* (Model.with_model model (Lang.local run_test) kf); *)
-        (Model.with_model model (Lang.local run_test_ia) kf);
+        (* (WpContext.with_model model (Lang.local run_test) kf); *)
+        (WpContext.with_model model (Lang.local run_test_ia) kf);
       end
     )
     ordered_kf

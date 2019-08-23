@@ -31,7 +31,7 @@ open VCS
 type t (** elementary proof obligation *)
 
 val get_id : t -> string
-val get_model : t -> Model.t
+val get_model : t -> WpContext.t
 val get_description : t -> string
 val get_property : t -> Property.t
 val get_result : t -> prover -> result

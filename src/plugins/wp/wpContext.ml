@@ -199,14 +199,14 @@ struct
         include Datatype.Undefined
         let mem_project = Datatype.never_any_project
         let reprs = [{index=MAP.empty;lock=SET.empty}]
-        let name = freetype ("Wp.Model.Index." ^ E.name)
+        let name = freetype ("Wp.Context.Index." ^ E.name)
       end)
 
   module REGISTRY = State_builder.Hashtbl
       (Datatype.String.Hashtbl)
       (ENTRIES)
       (struct
-        let name = freetype ("Wp.Model." ^ E.name)
+        let name = freetype ("Wp.Context." ^ E.name)
         let dependencies = [Ast.self]
         let size = 32
       end)
@@ -310,14 +310,14 @@ struct
         type t = entries
         include Datatype.Undefined
         let reprs = [{index=MAP.empty;lock=SET.empty}]
-        let name = "Wp.Model.Index." ^ E.name
+        let name = "Wp.Context.Index." ^ E.name
         let mem_project = Datatype.never_any_project
       end)
 
   module REGISTRY = State_builder.Ref
       (ENTRIES)
       (struct
-        let name = "Wp.Model." ^ E.name
+        let name = "Wp.Context." ^ E.name
         let dependencies = [Ast.self]
         let default () = { index=MAP.empty ; lock=SET.empty }
       end)

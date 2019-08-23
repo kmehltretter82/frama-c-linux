@@ -47,7 +47,7 @@ type tree = {
   mutable root : node option ; (* the root node *)
 }
 
-module PROOFS = Model.StaticGenerator(Wpo.S)
+module PROOFS = WpContext.StaticGenerator(Wpo.S)
     (struct
       type key = Wpo.S.t
       type data = tree

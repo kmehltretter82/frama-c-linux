@@ -30,7 +30,7 @@ type status =
 let files : (string,status) Hashtbl.t = Hashtbl.create 32
 
 let filename ?(legacy=false) wpo =
-  let m = Model.get_id wpo.po_model in
+  let m = WpContext.get_id wpo.po_model in
   let d = Wp_parameters.get_session_dir m in
   Printf.sprintf "%s/%s.json" d (if legacy then wpo.po_leg else wpo.po_gid)
 

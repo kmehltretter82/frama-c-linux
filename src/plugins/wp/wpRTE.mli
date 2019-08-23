@@ -22,8 +22,8 @@
 
 (** Invoke RTE to generate missing annotations
     for the given function and model. *)
-val generate : Kernel_function.t -> Model.t -> unit
+val generate : Kernel_function.t -> WpContext.t -> unit
 
 (** Returns [true] if RTE annotations should be generated for
     the given function and model (and are not generated yet). *)
-val missing_guards : Kernel_function.t -> Model.t -> bool
+val missing_guards : Kernel_function.t -> WpContext.t -> bool
