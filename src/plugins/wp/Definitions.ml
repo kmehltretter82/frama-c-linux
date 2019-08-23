@@ -178,7 +178,7 @@ let define_type c t =
   end
 
 let parameters f =
-  if WpContext.is_model_defined () then
+  if WpContext.is_defined () then
     try List.map Lang.F.QED.sort_of_var (Symbol.find f).d_params
     with Not_found -> []
   else []

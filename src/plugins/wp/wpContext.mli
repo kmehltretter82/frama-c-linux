@@ -22,15 +22,11 @@
 
 (** Model Registration *)
 
-type t
-type model = t
+type model
+type scope = Global | Kf of Kernel_function.t
 type tuning = (unit -> unit)
-type hypotheses = Kernel_function.t -> MemoryContext.clause list
+type hypotheses = unit -> MemoryContext.clause list
 
-module Set : Set.S with type elt = model
-module Hash : Hashtbl.S with type key = model
-
-val repr : model
 val register :
   id:string ->
   ?descr:string ->
@@ -38,21 +34,48 @@ val register :
   ?hypotheses:hypotheses ->
   unit -> model
 
-val get_id : model -> string
 val get_descr : model -> string
 val get_emitter : model -> Emitter.t
-val get_hypotheses : model -> hypotheses
 
-val with_model : model -> ('a -> 'b) -> 'a -> 'b
-val on_model : model -> (unit -> unit) -> unit
-val get_model : unit -> model (** Current model *)
-val is_model_defined : unit -> bool
+val compute_hypotheses : model -> Kernel_function.t -> MemoryContext.clause list
 
-type scope = Kernel_function.t option
-val on_scope : scope -> ('a -> 'b) -> 'a -> 'b
-val on_kf : Kernel_function.t -> (unit -> unit) -> unit (** on_scope (Some kf) *)
-val on_global : (unit -> unit) -> unit (** on_scope None *)
+type context = model * scope
+type t = context
+
+module S :
+sig
+  type t = context
+  val id : t -> string
+  val hash : t -> int
+  val equal : t -> t -> bool
+  val compare : t -> t -> int
+end
+
+module MODEL :
+sig
+  type t = model
+  val id : t -> string
+  val descr : t -> string
+  val hash : t -> int
+  val equal : t -> t -> bool
+  val compare : t -> t -> int
+  val repr : t
+end
+
+module SCOPE :
+sig
+  type t = scope
+  val id : t -> string
+  val hash : t -> int
+  val equal : t -> t -> bool
+  val compare : t -> t -> int
+end
+
+val is_defined : unit -> bool
+val on_context : context -> ('a -> 'b) -> 'a -> 'b
+val get_model : unit -> model
 val get_scope : unit -> scope
+val get_context : unit -> context
 
 val directory : unit -> string (** Current model in ["-wp-out"] directory *)
 

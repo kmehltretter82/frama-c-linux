@@ -1315,7 +1315,7 @@ struct
         let provers_wpo =
           Bag.map (make_oblig index pid) group.verifs
         in
-        let mid = WpContext.get_id model in
+        let mid = WpContext.MODEL.id model in
         let group =
           if is_empty group.trivial then
             if Bag.is_empty provers_wpo
@@ -1361,7 +1361,7 @@ struct
         let index = match LogicUsage.section_of_lemma l.lem_name with
           | LogicUsage.Toplevel _ -> Wpo.Axiomatic None
           | LogicUsage.Axiomatic a -> Wpo.Axiomatic (Some a.ax_name) in
-        let mid = WpContext.get_id model in
+        let mid = WpContext.MODEL.id model in
         let sid = WpPropId.get_propid id in
         let leg = WpPropId.get_legacy id in
         let wpo = {
@@ -1414,12 +1414,12 @@ struct
   module VCG = VC(M)
   module WP = Calculus.Cfg(VCG)
 
-  class wp (m:WpContext.t) =
+  class wp (model:WpContext.model) =
     object
       val mutable lemmas : LogicUsage.logic_lemma Bag.t = Bag.empty
       val mutable annots : WpStrategy.strategy Bag.t = Bag.empty
       method lemma = true
-      method model = m
+      method model = model
       method add_lemma lemma = lemmas <- Bag.append lemmas lemma
       method add_strategy strategy = annots <- Bag.append annots strategy
       method compute : Wpo.t Bag.t =
@@ -1428,41 +1428,39 @@ struct
           Lang.F.release () ;
           Datatype.String.Set.iter Lang.F.Check.set
             (Wp_parameters.QedChecks.get ()) ;
-          WpContext.on_model m
+          WpContext.on_context (model,WpContext.Global)
             begin fun () ->
-              WpContext.on_global
-                (fun () ->
-                   LogicUsage.iter_lemmas VCG.compile_lemma ;
-                   Bag.iter (VCG.prove_lemma collection) lemmas ;
-                ) ;
-              Bag.iter
-                (fun strategy ->
-                   let cfg = WpStrategy.cfg_of_strategy strategy in
-                   let kf = WpStrategy.get_kf strategy in
-                   WpContext.on_kf kf
-                     begin fun () ->
-                       let bhv = WpStrategy.get_bhv strategy in
-                       let index = Wpo.Function( kf , bhv ) in
-                       if WpRTE.missing_guards kf m then
-                         Wp_parameters.warning ~current:false ~once:true
-                           "Missing RTE guards" ;
-                       try
-                         let (results,_) = WP.compute cfg strategy in
-                         List.iter (VCG.compile collection index) results
-                       with Warning.Error(source,reason) ->
-                         Wp_parameters.failure
-                           ~current:false "From %s: %s" source reason
-                     end
-                ) annots ;
-              if not (Lang.F.Check.is_set ()) then
-                begin
-                  Wp_parameters.feedback ~ontty:`Transient "Collecting checks" ;
-                  Bag.iter
-                    (fun w -> ignore (Wpo.reduce w))
-                    !collection ;
-                  Lang.F.Check.iter (add_qed_check collection m) ;
-                end
-            end ;
+              LogicUsage.iter_lemmas VCG.compile_lemma ;
+              Bag.iter (VCG.prove_lemma collection) lemmas ;
+            end () ;
+          Bag.iter
+            (fun strategy ->
+               let cfg = WpStrategy.cfg_of_strategy strategy in
+               let kf = WpStrategy.get_kf strategy in
+               WpContext.on_context (model,WpContext.Kf kf)
+                 begin fun () ->
+                   let bhv = WpStrategy.get_bhv strategy in
+                   let index = Wpo.Function( kf , bhv ) in
+                   if WpRTE.missing_guards model kf then
+                     Wp_parameters.warning ~current:false ~once:true
+                       "Missing RTE guards" ;
+                   try
+                     let (results,_) = WP.compute cfg strategy in
+                     List.iter (VCG.compile collection index) results
+                   with Warning.Error(source,reason) ->
+                     Wp_parameters.failure
+                       ~current:false "From %s: %s" source reason
+                 end ()
+            ) annots ;
+          if not (Lang.F.Check.is_set ()) then
+            WpContext.on_context (model,WpContext.Global)
+              begin fun () ->
+                Wp_parameters.feedback ~ontty:`Transient "Collecting checks" ;
+                Bag.iter
+                  (fun w -> ignore (Wpo.reduce w))
+                  !collection ;
+                Lang.F.Check.iter (add_qed_check collection model) ;
+              end () ;
           lemmas <- Bag.empty ;
           annots <- Bag.empty ;
           Lang.F.Check.reset () ;
@@ -1474,7 +1472,7 @@ struct
 end
 
 (* Cache because computer functors can not be instantiated twice *)
-module COMPUTERS = WpContext.Hash
+module COMPUTERS = Hashtbl.Make(WpContext.MODEL)
 let computers = COMPUTERS.create 1
 
 let computer setup driver =

@@ -655,9 +655,10 @@ let prove_prop wpo ~mode ~axioms ~prop =
   let gid = wpo.po_gid in
   let leg = wpo.po_leg in
   let model = wpo.po_model in
+  let context = Wpo.get_context wpo in
   let script = DISK.file_goal ~pid ~model ~prover:NativeCoq in
   let includes , headers , goal =
-    WpContext.with_model model (assemble_goal ~pid axioms) prop
+    WpContext.on_context context (assemble_goal ~pid axioms) prop
   in
   prove_session ~mode {
     cw_pid = pid ;
@@ -673,7 +674,8 @@ let prove_annot wpo vcq ~mode =
   Task.todo
     begin fun () ->
       let prop =
-        WpContext.with_model wpo.po_model GOAL.compute_proof vcq.VC_Annot.goal in
+        WpContext.on_context (Wpo.get_context wpo)
+          GOAL.compute_proof vcq.VC_Annot.goal in
       prove_prop wpo ~mode ~axioms:None ~prop
     end
 

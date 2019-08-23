@@ -652,8 +652,8 @@ class visitor (ctx:context) c =
             Log.print_on_output
               begin fun fmt ->
                 Format.fprintf fmt "---------------------------------------------@\n" ;
-                Format.fprintf fmt "--- Model '%s' Cluster '%s' @\n"
-                  (WpContext.get_id (WpContext.get_model ())) name;
+                Format.fprintf fmt "--- Context '%s' Cluster '%s' @\n"
+                  (WpContext.get_context () |> WpContext.S.id) name;
                 Format.fprintf fmt "---------------------------------------------@\n" ;
                 Why3.Pretty.print_theory fmt th;
               end ;
@@ -1076,7 +1076,7 @@ let prove ?timeout ?steplimit ~prover wpo =
         else Task.return VCS.no_result
       else call_prover ~timeout ~steplimit prover task wpo
     in
-    WpContext.with_model wpo.Wpo.po_model do_ ()
+    WpContext.on_context (Wpo.get_context wpo) do_ ()
   with exn ->
     let bt = Printexc.get_raw_backtrace () in
     Wp_parameters.fatal "Error in why3:%a@.%s@."

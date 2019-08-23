@@ -84,8 +84,8 @@ let jfork tree ?node jtactic =
   try
     let anchor = ProofEngine.anchor tree ?node () in
     let goal = ProofEngine.goal anchor in
-    let model = ProofEngine.node_model anchor in
-    match WpContext.with_model model (jconfigure console jtactic) goal with
+    let ctxt = ProofEngine.node_context anchor in
+    match WpContext.on_context ctxt (jconfigure console jtactic) goal with
     | None -> None
     | Some (script,process) ->
         Some (ProofEngine.fork tree ~anchor script process)

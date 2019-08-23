@@ -233,7 +233,7 @@ let write_cluster c job =
       begin fun fmt ->
         Format.fprintf fmt "---------------------------------------------@\n" ;
         Format.fprintf fmt "--- File '%s/%s.ergo' @\n"
-          (WpContext.get_id (WpContext.get_model ())) (cluster_id c) ;
+          (WpContext.get_context () |> WpContext.S.id) (cluster_id c) ;
         Format.fprintf fmt "---------------------------------------------@\n" ;
         Command.pp_from_file fmt f ;
       end ;
@@ -472,17 +472,18 @@ let prove_file ~config ~pid ~mode ~file ~lines ~logout ~logerr =
       try_prove ~config ~pid ~gui:true ~file ~lines ~logout ~logerr
   | r -> Task.return r
 
-let prove_prop ~config ~pid ~mode ~model ~axioms ~prop =
+let prove_prop ~config ~pid ~mode ~context ~axioms ~prop =
   let prover = NativeAltErgo in
+  let model = fst context in
   let file = DISK.file_goal ~pid ~model ~prover in
   let logout = DISK.file_logout ~pid ~model ~prover in
   let logerr = DISK.file_logerr ~pid ~model ~prover in
   let id = WpPropId.get_propid pid in
   let title = Pretty_utils.to_string WpPropId.pretty pid in
-  let lines = WpContext.with_model model
+  let lines = WpContext.on_context context
       (assemble_goal ~file ~id ~title ~axioms) prop in
   if Wp_parameters.has_print_generated () then
-    WpContext.with_model model (fun () ->
+    WpContext.on_context context (fun () ->
         let goal = cluster ~id ~title () in
         Wp_parameters.print_generated (cluster_file goal)
       ) () ;
@@ -490,36 +491,36 @@ let prove_prop ~config ~pid ~mode ~model ~axioms ~prop =
   then Task.return VCS.no_result
   else prove_file ~config ~pid ~mode ~file ~lines ~logout ~logerr
 
-let prove_annot model pid vcq ~config ~mode =
+let prove_annot context pid vcq ~config ~mode =
   Task.todo
     begin fun () ->
       let axioms = vcq.VC_Annot.axioms in
       let prop = GOAL.compute_proof vcq.VC_Annot.goal in
-      prove_prop ~pid ~config ~mode ~model ~axioms ~prop
+      prove_prop ~pid ~config ~mode ~context ~axioms ~prop
     end
 
-let prove_lemma model pid vca ~config ~mode =
+let prove_lemma context pid vca ~config ~mode =
   Task.todo
     begin fun () ->
       let lemma = vca.Wpo.VC_Lemma.lemma in
       let depends = vca.Wpo.VC_Lemma.depends in
       let prop = F.p_forall lemma.l_forall lemma.l_lemma in
       let axioms = Some(lemma.l_cluster,depends) in
-      prove_prop ~pid ~config ~mode ~model ~axioms ~prop
+      prove_prop ~pid ~config ~mode ~context ~axioms ~prop
     end
 
-let prove_check model pid vck ~config ~mode =
+let prove_check context pid vck ~config ~mode =
   Task.todo
     begin fun () ->
       let prop = vck.VC_Check.goal in
       let axioms = None in
-      prove_prop ~pid ~config ~mode ~model ~axioms ~prop
+      prove_prop ~pid ~config ~mode ~context ~axioms ~prop
     end
 
 let prove ~config ~mode wpo =
   let pid = wpo.Wpo.po_pid in
-  let model = wpo.Wpo.po_model in
+  let context = Wpo.get_context wpo in
   match wpo.Wpo.po_formula with
-  | Wpo.GoalAnnot vcq -> prove_annot model pid vcq ~config ~mode
-  | Wpo.GoalLemma vca -> prove_lemma model pid vca ~config ~mode
-  | Wpo.GoalCheck vck -> prove_check model pid vck ~config ~mode
+  | Wpo.GoalAnnot vcq -> prove_annot context pid vcq ~config ~mode
+  | Wpo.GoalLemma vca -> prove_lemma context pid vca ~config ~mode
+  | Wpo.GoalCheck vck -> prove_check context pid vck ~config ~mode

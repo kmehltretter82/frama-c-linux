@@ -33,51 +33,28 @@ type model = {
 }
 
 and tuning = unit -> unit
-and hypotheses = Kernel_function.t -> MemoryContext.clause list
-and t = model
+and scope = Global | Kf of Kernel_function.t
+and hypotheses = unit -> MemoryContext.clause list
+and context = model * scope
+and t = context
 
 let nohyp (_kf) = []
-let repr = {
-  id = "?model" ; descr = "?model" ;
-  emitter = Emitter.kernel ;
-  tuning = [ fun () -> () ] ;
-  hypotheses = nohyp ;
-}
 
 module MODEL =
 struct
   type t = model
+  let id a = a.id
+  let descr a = a.descr
   let hash a = Hashtbl.hash a.id
   let equal a b = String.equal a.id b.id
   let compare a b = String.compare a.id b.id
+  let repr = {
+    id = "?model" ; descr = "?model" ;
+    emitter = Emitter.kernel ;
+    tuning = [ fun () -> () ] ;
+    hypotheses = nohyp ;
+  }
 end
-
-module Set = Set.Make(MODEL)
-module Hash = Hashtbl.Make(MODEL)
-
-(*
-module D = Datatype.Make_with_collections(struct
-    type t = model
-    let name = "WP.Model"
-
-    let rehash = Datatype.identity (** TODO: register and find below? *)
-    let structural_descr =
-      let open Structural_descr in
-      t_record [| p_string; p_string; pack (t_option t_string) ;
-                  Emitter.packed_descr; pack (t_list t_unknown)  |]
-
-    let reprs = [repr]
-
-    let equal x y = Datatype.String.equal x.id y.id
-    let compare x y = Datatype.String.compare x.id y.id
-    let hash x = Datatype.String.hash x.id
-    let copy = Datatype.identity
-    let internal_pretty_code _ fmt x = Format.pp_print_string fmt x.id
-    let pretty fmt x = Format.pp_print_string fmt x.descr
-    let mem_project = Datatype.never_any_project
-    let varname _ = "m"
-  end)
-*)
 
 module MODELS =
 struct
@@ -110,38 +87,66 @@ let register ~id ?(descr=id) ?(tuning=[]) ?(hypotheses=nohyp) () =
   } in
   MODELS.add model ; model
 
-let get_id m = m.id
 let get_descr m = m.descr
-let get_hypotheses m = m.hypotheses
+let get_emitter m = m.emitter
 
-type scope = Kernel_function.t option
-let scope : scope Context.value = Context.create "Wp.Scope"
-let model : model Context.value = Context.create "Wp.Model"
+module SCOPE =
+struct
+  type t = scope
+  let id = function
+    | Global -> "__frama_c_global"
+    | Kf f -> Kernel_function.get_name f
+  let compare f g =
+    match f,g with
+    | Global , Global -> 0
+    | Global , _ -> (-1)
+    | _ , Global -> 1
+    | Kf f , Kf g -> Kernel_function.compare f g
+  let equal f g = (compare f g = 0)
+  let hash = function Global -> 0 | Kf kf -> Kernel_function.hash kf
+end
 
-let rec bind = function [] -> () | f::fs -> f () ; bind fs
-let back = function None -> () | Some c -> bind c.tuning
-let with_model m f x =
-  let current = Context.push model m in
+let context : context Context.value = Context.create "WpContext"
+
+let configure (model,_) = List.iter (fun f -> f()) model.tuning
+let rollback = function None -> () | Some ctxt -> configure ctxt
+
+let on_context gamma f x =
+  let current = Context.push context gamma in
   try
     Context.configure () ;
-    bind m.tuning ;
+    configure gamma ;
     let result = f x in
-    Context.pop model current ;
-    back current ; result
+    Context.pop context current ;
+    rollback current ; result
   with err ->
-    Context.pop model current ;
-    back current ; raise err
-let on_model m f = with_model m f ()
-let on_scope s f a = Context.bind scope s f a
-let on_kf kf f = on_scope (Some kf) f ()
-let on_global f = on_scope None f ()
-let get_scope () = Context.get scope
+    Context.pop context current ;
+    rollback current ; raise err
 
-let get_model () = Context.get model
-let get_emitter model = model.emitter
-let is_model_defined () = Context.defined model
+let is_defined () = Context.defined context
+let get_context () = Context.get context
+let get_model () = Context.get context |> fst
+let get_scope () = Context.get context |> snd
 
-let directory () = Wp_parameters.get_output_dir (Context.get model).id
+let compute_hypotheses m f = on_context (m,Kf f) m.hypotheses ()
+
+module S =
+struct
+  type t = context
+  let id (model,scope) =
+    match scope with
+    | Global -> model.id
+    | Kf kf -> Printf.sprintf "%s_%s" model.id (Kernel_function.get_name kf)
+  let hash (m,s) = match s with
+    | Global -> 2 * MODEL.hash m
+    | Kf kf -> 3 * MODEL.hash m + 5 * Kernel_function.hash kf
+  let equal (m1,s1) (m2,s2) = MODEL.equal m1 m2 && SCOPE.equal s1 s2
+  let compare (m1,s1) (m2,s2) =
+    let cmp = MODEL.compare m1 m2 in
+    if cmp<>0 then cmp else SCOPE.compare s1 s2
+end
+
+let directory () = get_context () |> S.id |> Wp_parameters.get_output_dir
 
 module type Entries =
 sig
@@ -221,11 +226,11 @@ struct
   (* Projectified entry map, indexed by model *)
 
   let entries () : entries =
-    let mid = (Context.get model).id in
-    try REGISTRY.find mid
+    let cid = get_context () |> S.id in
+    try REGISTRY.find cid
     with Not_found ->
       let e = { index=MAP.empty ; lock=SET.empty } in
-      REGISTRY.add mid e ; e
+      REGISTRY.add cid e ; e
 
   let clear () =
     begin

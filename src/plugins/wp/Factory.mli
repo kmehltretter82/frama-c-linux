@@ -40,7 +40,7 @@ val ident : setup -> string
 val descr : setup -> string
 val compiler : mheap -> mvar -> (module Sigs.Compiler)
 val configure : setup -> driver -> WpContext.tuning
-val instance : setup -> driver -> WpContext.t
+val instance : setup -> driver -> WpContext.model
 val default : setup (** ["Var,Typed,Nat,Real"] memory model. *)
 val parse :
   ?default:setup ->

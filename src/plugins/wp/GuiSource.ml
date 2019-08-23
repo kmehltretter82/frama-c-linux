@@ -97,7 +97,7 @@ class popup () =
       let setup = Factory.parse (Wp_parameters.Model.get ()) in
       let driver = Driver.load_driver () in
       let model = Factory.instance setup driver in
-      WpRTE.generate kf model
+      WpRTE.generate model kf
 
     method private rte_option
         (menu : GMenu.menu GMenu.factory)

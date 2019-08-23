@@ -358,7 +358,7 @@ class pane (enabled : GuiConfig.enabled) =
           printer#set_target Tactical.Empty ;
           strategies#connect None ;
           List.iter (fun tactic -> tactic#clear) tactics
-      | Some(model,tree,sequent,sel) ->
+      | Some(tree,sequent,sel) ->
           strategies#connect (Some (self#strategies sequent)) ;
           let select (tactic : GuiTactic.tactic) =
             let process = self#apply in
@@ -366,7 +366,8 @@ class pane (enabled : GuiConfig.enabled) =
             let browser = self#browse in
             tactic#select ~process ~composer ~browser ~tree sel
           in
-          WpContext.with_model model (List.iter select) tactics ;
+          let ctxt = ProofEngine.tree_context tree in
+          WpContext.on_context ctxt (List.iter select) tactics ;
           let tgt =
             if List.exists (fun tactics -> tactics#targeted) tactics
             then sel else Tactical.Empty in
@@ -470,8 +471,7 @@ class pane (enabled : GuiConfig.enabled) =
               self#update_provers (Some wpo) ;
               let sequent = printer#sequent in
               let select = printer#selection in
-              let model = wpo.Wpo.po_model in
-              self#update_tactics (Some(model,proof,sequent,select)) ;
+              self#update_tactics (Some(proof,sequent,select)) ;
             end
       | Composer _ | Browser _ -> ()
 
@@ -510,9 +510,9 @@ class pane (enabled : GuiConfig.enabled) =
               state <- Proof proof ;
               printer#restore tgt ;
               self#update in
-            let model = ProofEngine.tree_model proof in
+            let ctxt = ProofEngine.tree_context proof in
             let print = composer#print cc ~quit in
-            text#printf "%t@." (WpContext.with_model model print) ;
+            text#printf "%t@." (WpContext.on_context ctxt print) ;
             text#hrule ;
             text#printf "%t@."
               (printer#goal (ProofEngine.head proof)) ;
@@ -524,9 +524,9 @@ class pane (enabled : GuiConfig.enabled) =
               state <- Proof proof ;
               printer#restore tgt ;
               self#update in
-            let model = ProofEngine.tree_model proof in
+            let ctxt = ProofEngine.tree_context proof in
             let print = browser#print cc ~quit in
-            text#printf "%t@." (WpContext.with_model model print) ;
+            text#printf "%t@." (WpContext.on_context ctxt print) ;
             text#hrule ;
             text#printf "%t@."
               (printer#goal (ProofEngine.head proof)) ;
