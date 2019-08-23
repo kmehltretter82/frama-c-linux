@@ -176,7 +176,7 @@ end
 
 module Val = struct
   include CVal
-  include Structure.Open (Structure.Key_Value) (CVal)
+  include Structure.Open (Abstract.Value) (CVal)
   let reduce t = t
 end
 

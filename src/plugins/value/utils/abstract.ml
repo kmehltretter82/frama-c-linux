@@ -30,7 +30,7 @@ module type Interface = sig
 end
 
 module Value = struct
-  include Structure.Key_Value
+  include Structure.Shape (Structure.Key_Value)
 
   module type Internal = sig
     include Abstract_value.S
@@ -45,7 +45,7 @@ module Value = struct
 end
 
 module Location = struct
-  include Structure.Key_Location
+  include Structure.Shape (Structure.Key_Location)
 
   module type Internal = sig
     include Abstract_location.S
@@ -60,7 +60,7 @@ module Location = struct
 end
 
 module Domain = struct
-  include Structure.Key_Domain
+  include Structure.Shape (Structure.Key_Domain)
 
   module type Internal = sig
     include Abstract_domain.Internal

@@ -36,16 +36,6 @@ module type Key = sig
   val tag: 'a key -> int
 end
 
-module type Shape = sig
-  include Key
-
-  type 'a structure =
-    | Void : 'a structure
-    | Leaf : 'a key -> 'a structure
-    | Node : 'a structure * 'b structure -> ('a * 'b) structure
-end
-
-
 module Make (X : sig end) = struct
 
   type 'a key = { tag: int;
@@ -67,17 +57,43 @@ module Make (X : sig end) = struct
   let tag x = x.tag
 
   let print fmt x = Format.pp_print_string fmt x.name
-
-  type 'a structure =
-    | Void : 'a structure
-    | Leaf : 'a key -> 'a structure
-    | Node : 'a structure * 'b structure -> ('a * 'b) structure
 end
 
 module Key_Value = Make (struct end)
 module Key_Location = Make (struct end)
 module Key_Domain = Make (struct end)
 
+module type Shape = sig
+  include Key
+
+  type 'a structure =
+    | Void : 'a structure
+    | Leaf : 'a key -> 'a structure
+    | Node : 'a structure * 'b structure -> ('a * 'b) structure
+
+  val eq_structure: 'a structure -> 'b structure -> ('a, 'b) eq option
+end
+
+module Shape (Key: Key) = struct
+  include Key
+
+  type 'a structure =
+    | Void : 'a structure
+    | Leaf : 'a Key.key -> 'a structure
+    | Node : 'a structure * 'b structure -> ('a * 'b) structure
+
+  let rec eq_structure : type a b. a structure -> b structure -> (a, b) eq option
+    = fun a b ->
+      match a, b with
+      | Leaf key1, Leaf key2 -> Key.eq_type key1 key2
+      | Node (l1, r1), Node (l2, r2) ->
+        begin
+          match eq_structure l1 l2, eq_structure r1 r2 with
+          | Some Eq, Some Eq -> Some Eq
+          | _, _ -> None
+        end
+      | _, _ -> None
+end
 
 module type Internal = sig
   type t
@@ -92,7 +108,6 @@ module type External = sig
   val get : 'a key -> (t -> 'a) option
   val set : 'a key -> 'a -> t -> t
 end
-
 
 module Open
     (Shape : Shape)

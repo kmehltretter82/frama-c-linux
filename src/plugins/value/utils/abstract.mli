@@ -60,7 +60,6 @@ end
 module Value : sig
   include Structure.Shape
     with type 'a key = 'a Structure.Key_Value.key
-     and type 'a structure = 'a Structure.Key_Value.structure
 
   module type Internal = sig
     include Abstract_value.S
@@ -79,7 +78,6 @@ end
 module Location : sig
   include Structure.Shape
     with type 'a key = 'a Structure.Key_Location.key
-     and type 'a structure = 'a Structure.Key_Location.structure
 
   module type Internal = sig
     include Abstract_location.S
@@ -98,7 +96,6 @@ end
 module Domain : sig
   include Structure.Shape
     with type 'a key = 'a Structure.Key_Domain.key
-     and type 'a structure = 'a Structure.Key_Domain.structure
 
   module type Internal = sig
     include Abstract_domain.Internal

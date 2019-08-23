@@ -41,6 +41,17 @@ module type Key = sig
   val tag: 'a key -> int
 end
 
+module Make (X : sig end) : Key
+
+(** Keys module for the abstract values of Eva. *)
+module Key_Value : Key
+
+(** Keys module for the abstract locations of Eva. *)
+module Key_Location : Key
+
+(** Keys module for the abstract domains of Eva. *)
+module Key_Domain : Key
+
 (** A Key module with its structure type. *)
 module type Shape = sig
   include Key
@@ -52,20 +63,11 @@ module type Shape = sig
     | Void : 'a structure
     | Leaf : 'a key -> 'a structure
     | Node : 'a structure * 'b structure -> ('a * 'b) structure
+
+  val eq_structure: 'a structure -> 'b structure -> ('a, 'b) eq option
 end
 
-module Make (X : sig end) : Shape
-
-
-(** Keys module for the abstract values of Eva. *)
-module Key_Value : Shape
-
-(** Keys module for the abstract locations of Eva. *)
-module Key_Location : Shape
-
-(** Keys module for the abstract domains of Eva. *)
-module Key_Domain : Shape
-
+module Shape (Key : Key) : Shape with type 'a key = 'a Key.key
 
 (** Internal view of the tree, with the structure. *)
 module type Internal = sig

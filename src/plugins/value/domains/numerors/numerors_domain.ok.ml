@@ -88,7 +88,7 @@ module Numerors_Value = struct
 end
 
 let add_numerors_value (module Value: Abstract.Value.Internal) =
-  let module External_Value = Structure.Open (Structure.Key_Value) (Value) in
+  let module External_Value = Structure.Open (Abstract.Value) (Value) in
   let module V = struct
     include Value_product.Make (Value) (Numerors_value)
 

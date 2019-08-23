@@ -114,7 +114,7 @@ end
 
 module CVal = struct
   include Internal_CVal
-  include Structure.Open (Structure.Key_Value) (Internal_CVal)
+  include Structure.Open (Abstract.Value) (Internal_CVal)
 end
 
 module Internal_PLoc = struct
@@ -153,7 +153,7 @@ let open_value_abstraction value =
   let module Value = (val value : Abstract.Value.Internal) in
   (module struct
     include Value
-    include Structure.Open (Structure.Key_Value) (Value)
+    include Structure.Open (Abstract.Value) (Value)
   end : V)
 
 let build_value config =
@@ -321,7 +321,7 @@ let add_generic_equalities (module Acc : Abstract) =
 
 let add_equalities (type v) (module Acc : Abstract with type Val.t = v) =
   match Acc.Val.structure with
-  | Structure.Key_Value.Leaf key ->
+  | Abstract.Value.Leaf key ->
     begin
       match Structure.Key_Value.eq_type key Main_values.CVal.key with
       | None -> add_generic_equalities (module Acc)
@@ -493,7 +493,7 @@ let build_abstractions config =
   let module V = (val value : V) in
   let abstractions =
     match V.structure with
-    | Structure.Key_Value.Leaf key
+    | Abstract.Value.Leaf key
       when Structure.Key_Value.equal key Main_values.CVal.key ->
       default_root_abstraction config
     | _ -> build_root_abstraction config value
@@ -617,17 +617,17 @@ module Reduce (Value : Abstract.Value.External) = struct
 end
 
 let open_abstractions abstraction =
-  let module Abstract = (val abstraction : Abstract) in
-  let module Val = Reduce (Abstract.Val) in
+  let module Acc = (val abstraction : Abstract) in
+  let module Val = Reduce (Acc.Val) in
   let module Loc = struct
-    include Abstract.Loc
+    include Acc.Loc
     include Structure.Open
-        (Structure.Key_Location)
-        (struct include Abstract.Loc type t = location end)
+        (Abstract.Location)
+        (struct include Acc.Loc type t = location end)
   end in
   let module Domain = struct
-    include Abstract.Dom
-    include Structure.Open (Structure.Key_Domain) (Abstract.Dom)
+    include Acc.Dom
+    include Structure.Open (Abstract.Domain) (Acc.Dom)
   end in
   (module struct
     module Val = Val
