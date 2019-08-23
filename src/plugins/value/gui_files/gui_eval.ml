@@ -144,12 +144,12 @@ module Make (X: Analysis.S) = struct
   module Analysis = X
 
   let get_cvalue_state =
-    match X.Dom.get Cvalue_domain.key with
+    match X.Dom.get Cvalue_domain.State.key with
     | None -> fun _ -> Cvalue.Model.top
-    | Some get -> fun state -> get state
+    | Some get -> fun state -> Cvalue_domain.project (get state)
 
   let get_precise_loc =
-    match X.Loc.get Main_locations.ploc_key with
+    match X.Loc.get Main_locations.PLoc.key with
     | None -> fun _ -> Precise_locs.loc_top
     | Some get -> fun loc -> get loc
 

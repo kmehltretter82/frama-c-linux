@@ -20,23 +20,56 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Initial abstract state at the beginning of a call. From most precise to
-    less precise. *)
-type call_init_state =
-  | ISCaller (** information from the caller is propagated in the callee. May be
-                 more precise, but problematic w.r.t Memexec because it increases
-                 cache miss dramatically. *)
-  | ISFormals (** empty state, except for the equalities between a formal and
-                  the corresponding actual. Lesser impact on Memexec. *)
-  | ISEmpty (** completely empty state, without impact on Memexec. *)
+(** External interface of an abstraction, built by {!Structure.Open}. *)
+module type Interface = sig
+  type t
+  type 'a key
+  val mem : 'a key -> bool
+  val get : 'a key -> (t -> 'a) option
+  val set : 'a key -> 'a -> t -> t
+end
 
+module Value = struct
+  include Structure.Key_Value
 
-module Make (Value : Abstract.Value.External) : sig
-  include Abstract_domain.Leaf with type value = Value.t
-                                and type location = Precise_locs.precise_location
+  module type Internal = sig
+    include Abstract_value.S
+    val structure: t structure
+  end
 
-  val pretty_debug : Format.formatter -> t -> unit
+  module type External = sig
+    include Internal
+    include Structure.External with type t := t
+                                and type 'a key := 'a key
+  end
+end
 
-  type equalities
-  val project : t -> equalities
+module Location = struct
+  include Structure.Key_Location
+
+  module type Internal = sig
+    include Abstract_location.S
+    val structure: location structure
+  end
+
+  module type External = sig
+    include Internal
+    include Structure.External with type t := location
+                                and type 'a key := 'a key
+  end
+end
+
+module Domain = struct
+  include Structure.Key_Domain
+
+  module type Internal = sig
+    include Abstract_domain.Internal
+    val structure: t structure
+  end
+
+  module type External = sig
+    include Internal
+    include Structure.External with type t := t
+                                and type 'a key := 'a key
+  end
 end

@@ -53,7 +53,7 @@ val configure : unit -> config
 
 
 module type Value = sig
-  include Abstract_value.External
+  include Abstract.Value.External
   val reduce : t -> t
 end
 
@@ -61,8 +61,8 @@ end
     abstractions.*)
 module type S = sig
   module Val : Value
-  module Loc : Abstract_location.External with type value = Val.t
-  module Dom : Abstract_domain.External with type value = Val.t
+  module Loc : Abstract.Location.External with type value = Val.t
+  module Dom : Abstract.Domain.External with type value = Val.t
                                          and type location = Loc.location
 end
 
@@ -78,7 +78,7 @@ module type Eva = sig
 end
 
 (** Type of abstractions that use the builtin types for values and locations *)
-module type Standard_abstraction = Abstract_domain.Internal
+module type Standard_abstraction = Abstract_domain.Leaf
   with type value = Cvalue.V.t
    and type location = Precise_locs.precise_location
 

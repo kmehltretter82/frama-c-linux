@@ -1272,6 +1272,8 @@ src/plugins/value/slevel/split_strategy.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/slevel/split_strategy.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/test.assert.sh: .ignore
 src/plugins/value/test.sh: .ignore
+src/plugins/value/utils/abstract.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/utils/abstract.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/backward_formals.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/backward_formals.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/eval_typ.ml: CEA_LGPL_OR_PROPRIETARY

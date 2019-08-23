@@ -33,7 +33,8 @@
 module type Domain = sig
   include Abstract_domain.Lattice
   include Datatype.S_with_collections with type t = state
-  include Abstract_domain.Interface with type t := state
+  include Abstract.Interface with type t := state
+                              and type 'a key := 'a Abstract_domain.key
 end
 
 module Make (Domain: Domain) : sig

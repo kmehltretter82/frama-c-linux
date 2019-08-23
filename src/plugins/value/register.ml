@@ -169,9 +169,14 @@ let () =
 
 open Eval
 
-module Val = struct
+module CVal = struct
   include Main_values.CVal
-  include Structure.Open (Structure.Key_Value) (Main_values.CVal)
+  let structure = Abstract.Value.Leaf key
+end
+
+module Val = struct
+  include CVal
+  include Structure.Open (Structure.Key_Value) (CVal)
   let reduce t = t
 end
 

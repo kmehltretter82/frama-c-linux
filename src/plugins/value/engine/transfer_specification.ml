@@ -227,14 +227,14 @@ module Make
 
   (* Extraction of the precise location and of the cvalue domain:
      needed to evaluate the location of an assigns clause. *)
-  let get_ploc = match Location.get Main_locations.ploc_key with
+  let get_ploc = match Location.get Main_locations.PLoc.key with
     | None -> fun _ -> Main_locations.PLoc.top
     | Some get -> get
-  let set_ploc = Location.set Main_locations.ploc_key
+  let set_ploc = Location.set Main_locations.PLoc.key
   let set_location loc = set_ploc (Main_locations.PLoc.make loc)
-  let get_cvalue_state = match Domain.get Cvalue_domain.key with
+  let get_cvalue_state = match Domain.get Cvalue_domain.State.key with
     | None -> fun _ -> Cvalue.Model.top
-    | Some get -> get
+    | Some get -> fun s -> Cvalue_domain.project (get s)
 
   let make_env state = Eval_terms.env_assigns (get_cvalue_state state)
 

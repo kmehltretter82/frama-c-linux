@@ -22,25 +22,20 @@
 
 let ok = false
 
-module type S = Abstract_domain.Internal
+module type S = Abstract_domain.Leaf
   with type value = Main_values.Interval.t
    and type location = Precise_locs.precise_location
 
-module U = Unit_domain.Make (Main_values.Interval) (Main_locations.PLoc)
+module U = struct
+  include Unit_domain.Make (Main_values.Interval) (Main_locations.PLoc)
+  let key = Structure.Key_Domain.create_key "dummy_apron"
+end
 
 module Octagon = U
 module Box = U
 module Polka_Loose = U
 module Polka_Strict = U
 module Polka_Equalities = U
-
-let dummy_key = Structure.Key_Domain.create_key "dummy_apron"
-let octagon_key = dummy_key
-let box_key = dummy_key
-let polka_loose_key = dummy_key
-let polka_strict_key = dummy_key
-let polka_equalities_key = dummy_key
-
 
 (*
 Local Variables:

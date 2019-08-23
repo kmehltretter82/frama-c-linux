@@ -51,8 +51,6 @@ module Make
       (struct let module_name = name end)
   type state = t
 
-  let structure = Abstract_domain.Node (Left.structure, Right.structure)
-
   let log_category = product_category
 
   let top = Left.top, Right.top

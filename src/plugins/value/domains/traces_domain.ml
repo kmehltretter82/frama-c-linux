@@ -846,8 +846,6 @@ let rec complete_graph (graph:Graph.t) =
     ) graph Graph.empty
 
 
-let key = Structure.Key_Domain.create_key "traces domain"
-
 module Internal = struct
   type nonrec state = state
   type value = Cvalue.V.t
@@ -858,7 +856,6 @@ module Internal = struct
              include Abstract_domain.Lattice with type state := state
            end)
 
-  let structure : t Abstract_domain.structure = Abstract_domain.Leaf key
   let log_category = Value_parameters.register_category "d-traces"
 
   type origin = unit
@@ -1271,8 +1268,7 @@ let output_dot filename state =
   close_out out
 
 module D = struct
-  include Internal
-  module Store = Domain_store.Make(Internal)
+  include Domain_builder.Complete (Internal)
 
   let post_analysis state =
     let return_stmt = Kernel_function.find_return (fst (Globals.entry_point ())) in

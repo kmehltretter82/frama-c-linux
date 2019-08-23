@@ -149,17 +149,17 @@ module Make (Abstract: Abstractions.Eva) = struct
   let initial_state = Init.initial_state
 
   let get_cvalue =
-    match Abstract.Dom.get Cvalue_domain.key with
+    match Abstract.Dom.get Cvalue_domain.State.key with
     | None -> fun _ -> Cvalue.Model.top
-    | Some get -> fun state -> get state
+    | Some get -> fun state -> Cvalue_domain.project (get state)
 
   let get_cval =
-    match Abstract.Val.get Main_values.cvalue_key with
+    match Abstract.Val.get Main_values.CVal.key with
     | None -> fun _ -> assert false
     | Some get -> fun value -> get value
 
   let get_ploc =
-    match Abstract.Loc.get Main_locations.ploc_key with
+    match Abstract.Loc.get Main_locations.PLoc.key with
     | None -> fun _ -> assert false
     | Some get -> fun location -> get location
 
@@ -312,17 +312,16 @@ module Make (Abstract: Abstractions.Eva) = struct
         let cvalue_states, cacheable =
           Builtins.apply_builtin builtin cvalue_call cvalue_state
         in
-        let insert (cvalue_state, clobbered_set) =
-          Abstract.Dom.set Locals_scoping.key clobbered_set
-            (Abstract.Dom.set Cvalue_domain.key cvalue_state final_state)
+        let insert cvalue_state =
+          Abstract.Dom.set Cvalue_domain.State.key cvalue_state final_state
         in
         let states = Bottom.bot_of_list (List.map insert cvalue_states) in
         Transfer.{states; cacheable; builtin=true}
 
   let compute_call =
-    if Abstract.Dom.mem Cvalue_domain.key
-    && Abstract.Val.mem Main_values.cvalue_key
-    && Abstract.Loc.mem Main_locations.ploc_key
+    if Abstract.Dom.mem Cvalue_domain.State.key
+    && Abstract.Val.mem Main_values.CVal.key
+    && Abstract.Loc.mem Main_locations.PLoc.key
     then compute_call_or_builtin
     else compute_and_cache_call
 

@@ -263,7 +263,7 @@ let indeterminate_copy lval result alarms =
 
 
 module type Value = sig
-  include Abstract_value.External
+  include Abstract.Value.External
   val reduce : t -> t
 end
 

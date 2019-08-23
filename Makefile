@@ -878,7 +878,7 @@ PLUGIN_CMO:= slevel/split_strategy value_parameters \
 	slevel/per_stmt_slevel \
 	utils/library_functions \
 	utils/eval_typ utils/backward_formals \
-	alarmset eval utils/structure \
+	alarmset eval utils/structure utils/abstract \
 	values/value_product values/location_lift \
 	values/cvalue_forward values/cvalue_backward \
 	values/main_values values/main_locations \

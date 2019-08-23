@@ -45,7 +45,6 @@ module Make
   include (Domain : Datatype.S_with_collections with type t = Domain.t)
   include (Domain : Abstract_domain.Lattice with type state = Domain.state)
 
-  let structure = Domain.structure
   let log_category = Domain.log_category
 
   type value = Convert.extended_value

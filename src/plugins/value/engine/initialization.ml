@@ -80,7 +80,7 @@ let (>>>) t f = match t with
 let counter = ref 0
 
 module Make
-    (Domain: Abstract_domain.External)
+    (Domain: Abstract.Domain.External)
     (Eva: Evaluation.S with type state = Domain.state
                         and type loc = Domain.location)
     (Transfer: Transfer_stmt.S with type state = Domain.t)
@@ -270,7 +270,7 @@ module Make
   (* Use the values supplied in [actuals] for the formals of [kf], and
      bind them in [state] *)
   let add_supplied_main_formals kf actuals state =
-    match Domain.get Cvalue_domain.key with
+    match Domain.get Cvalue_domain.State.key with
     | None ->
       Value_parameters.abort "Function Db.Value.fun_set_args cannot be used \
                               without the Cvalue domain"
@@ -278,7 +278,7 @@ module Make
       let formals = Kernel_function.get_formals kf in
       if (List.length formals) <> List.length actuals then
         raise Db.Value.Incorrect_number_of_arguments;
-      let cvalue_state = get_cvalue state in
+      let cvalue_state = Cvalue_domain.project (get_cvalue state) in
       let add_actual state actual formal =
         let actual = Eval_op.offsetmap_of_v ~typ:formal.vtype actual in
         Cvalue.Model.add_base (Base.of_varinfo formal) actual state
@@ -286,8 +286,8 @@ module Make
       let cvalue_state =
         List.fold_left2 add_actual cvalue_state actuals formals
       in
-      let set_domain = Domain.set Cvalue_domain.key in
-      set_domain cvalue_state state
+      let set_domain = Domain.set Cvalue_domain.State.key in
+      set_domain (Cvalue_domain.inject cvalue_state) state
 
   let add_main_formals kf state =
     match Db.Value.fun_get_args () with
@@ -354,7 +354,9 @@ module Make
   let supplied_state () =
     let cvalue_state = Db.Value.globals_state () in
     if Cvalue.Model.is_reachable cvalue_state
-    then `Value (Domain.set Cvalue_domain.key cvalue_state Domain.top)
+    then
+      let cvalue_state = Cvalue_domain.inject cvalue_state in
+      `Value (Domain.set Cvalue_domain.State.key cvalue_state Domain.top)
     else `Bottom
 
   let initial_state ~lib_entry =

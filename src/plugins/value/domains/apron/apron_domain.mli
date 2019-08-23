@@ -28,7 +28,7 @@
 val ok : bool
 
 (** Signature of an Apron domain in Eva. *)
-module type S = Abstract_domain.Internal
+module type S = Abstract_domain.Leaf
   with type value = Main_values.Interval.t
    and type location = Precise_locs.precise_location
 
@@ -50,16 +50,6 @@ module Polka_Strict : S
 
 (** Linear equalities. *)
 module Polka_Equalities : S
-
-
-(** Domain keys for the Apron domains in Eva. *)
-
-val octagon_key : Octagon.t Abstract_domain.key
-val box_key : Box.t Abstract_domain.key
-val polka_loose_key : Polka_Loose.t Abstract_domain.key
-val polka_strict_key : Polka_Strict.t Abstract_domain.key
-val polka_equalities_key : Polka_Equalities.t Abstract_domain.key
-
 
 (*
 Local Variables:

@@ -433,10 +433,10 @@ module Make_Dataflow
       edge_info.fireable <- true;
     flow
 
-  let get_cvalue = Domain.get Cvalue_domain.key
+  let get_cvalue = Domain.get Cvalue_domain.State.key
   let gather_cvalues states =
     match get_cvalue with
-    | Some get -> List.map get states
+    | Some get -> List.map (fun s -> Cvalue_domain.project (get s)) states
     | None -> []
 
   let call_statement_callbacks (stmt : stmt) (f : flow) : unit =

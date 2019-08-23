@@ -71,7 +71,7 @@ val current: state -> loops
 val globals: state -> Cil_types.varinfo list
 val entry_formals: state -> Cil_types.varinfo list
 
-module D: Abstract_domain.Internal
+module D: Abstract_domain.Leaf
   with type value = Cvalue.V.t
    and type location = Precise_locs.precise_location
    and type state = state

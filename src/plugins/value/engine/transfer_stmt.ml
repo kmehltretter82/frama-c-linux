@@ -318,7 +318,7 @@ module Make (Abstract: Abstractions.Eva) = struct
   (* ------------------- Retro propagation on formals ----------------------- *)
 
 
-  let get_precise_location = Location.get Main_locations.ploc_key
+  let get_precise_location = Location.get Main_locations.PLoc.key
 
   (* [is_safe_argument valuation expr] is true iff the expression [expr] could
      not have been written during the last call.
@@ -559,9 +559,9 @@ module Make (Abstract: Abstractions.Eva) = struct
 
   (* ----------------- show_each and dump_each directives ------------------- *)
 
-  let extract_cvalue = match Domain.get Cvalue_domain.key with
+  let extract_cvalue = match Domain.get Cvalue_domain.State.key with
     | None -> fun _ -> Cvalue.Model.top
-    | Some get -> get
+    | Some get -> fun s -> Cvalue_domain.project (get s)
 
   (* The product of domains formats the printing of each leaf domains, by
      checking their log_category and adding their name before the dump. If the
@@ -609,7 +609,7 @@ module Make (Abstract: Abstractions.Eva) = struct
 
   (* For non scalar expressions, prints the offsetmap of the cvalue domain. *)
   let show_offsm =
-    match Domain.get Cvalue_domain.key, Location.get Main_locations.ploc_key with
+    match Domain.get Cvalue_domain.State.key, Location.get Main_locations.PLoc.key with
     | None, _ | _, None ->
       fun fmt _ _ -> Format.fprintf fmt "%s" (Unicode.top_string ())
     | Some get_cvalue, Some get_ploc ->
@@ -622,7 +622,7 @@ module Make (Abstract: Abstractions.Eva) = struct
                 fst (Eval.lvaluate ~for_writing:false state lval)
                 >>- fun (_, loc, _) ->
                 let ploc = get_ploc loc
-                and cvalue_state = get_cvalue state in
+                and cvalue_state = Cvalue_domain.project (get_cvalue state) in
                 Eval_op.offsetmap_of_loc ploc cvalue_state
               in
               let typ = Cil.typeOf expr in
@@ -634,7 +634,7 @@ module Make (Abstract: Abstractions.Eva) = struct
 
   (* For scalar expressions, prints the cvalue component of their values. *)
   let show_value =
-    match Value.get Main_values.cvalue_key with
+    match Value.get Main_values.CVal.key with
     | None -> fun fmt _ _ -> Format.fprintf fmt "%s" (Unicode.top_string ())
     | Some get_cval ->
       fun fmt expr state ->

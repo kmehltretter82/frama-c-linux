@@ -27,7 +27,7 @@ open Cil_types
 
 type value = Numerors_value.t
 type location = Precise_locs.precise_location
-let value_key = Numerors_value.error_key
+let value_key = Numerors_value.key
 
 let ok = true
 
@@ -87,12 +87,15 @@ module Numerors_Value = struct
     ]
 end
 
-let add_numerors_value (module Value: Abstract_value.Internal) =
+let add_numerors_value (module Value: Abstract.Value.Internal) =
   let module External_Value = Structure.Open (Structure.Key_Value) (Value) in
   let module V = struct
     include Value_product.Make (Value) (Numerors_value)
 
-    let forward_cast = match External_Value.get Main_values.cvalue_key with
+    let structure =
+      Abstract.Value.(Node (Value.structure, Leaf Numerors_value.key))
+
+    let forward_cast = match External_Value.get Main_values.CVal.key with
       | None -> forward_cast
       | Some get_cvalue ->
         fun ~src_type ~dst_type (value, num) ->
@@ -116,13 +119,13 @@ let add_numerors_value (module Value: Abstract_value.Internal) =
           in
           value', num
   end in
-  (module V: Abstract_value.Internal)
+  (module V: Abstract.Value.Internal)
 
-let reduce_error (type v) (module V: Abstract_value.External with type t = v) =
-  match V.get Numerors_value.error_key, V.get Main_values.cvalue_key with
+let reduce_error (type v) (module V: Abstract.Value.External with type t = v) =
+  match V.get Numerors_value.key, V.get Main_values.CVal.key with
   | Some get_error, Some get_cvalue ->
     begin
-      let set_error = V.set Numerors_value.error_key in
+      let set_error = V.set Numerors_value.key in
       fun t ->
         let cvalue = get_cvalue t in
         try
@@ -159,5 +162,5 @@ end
 
 let numerors_domain () =
   Value_parameters.warning "The numerors domain is experimental.";
-  (module Domain: Abstract_domain.Internal with type value = value
-                                            and type location = location)
+  (module Domain: Abstract_domain.Leaf with type value = value
+                                        and type location = location)

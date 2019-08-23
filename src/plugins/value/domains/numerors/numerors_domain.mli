@@ -35,15 +35,15 @@ val ok: bool
     numerors values on casts from integer to floating-point values.
     Fails if numerors domain is not available.  *)
 val add_numerors_value:
-  (module Abstract_value.Internal) -> (module Abstract_value.Internal)
+  (module Abstract.Value.Internal) -> (module Abstract.Value.Internal)
 
 (* From a given abstract value product, creates the reduction function that
    reduces numerors values by using cvalues. Returns the identity if the given
    value product does not contain numerors and cvalue componants. *)
 val reduce_error:
-  (module Abstract_value.External with type t = 'v) -> ('v -> 'v)
+  (module Abstract.Value.External with type t = 'v) -> ('v -> 'v)
 
 (** Returns the numerors domain module, if available. Fails otherwise. *)
 val numerors_domain:
-  unit -> (module Abstract_domain.Internal with type value = value
-                                            and type location = location)
+  unit -> (module Abstract_domain.Leaf with type value = value
+                                        and type location = location)

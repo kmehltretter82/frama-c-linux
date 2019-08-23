@@ -32,12 +32,12 @@ module type Conversion = sig
 end
 
 module Make
-    (Loc: Abstract_location.Internal)
+    (Loc: Abstract_location.S)
     (Convert : Conversion with type internal_value := Loc.value)
 = struct
 
   (* Import most of [Loc] *)
-  include (Loc: Abstract_location.Internal
+  include (Loc: Abstract_location.S
            with type value := Loc.value (* we are converting this type *)
             and type location = Loc.location
             and type offset = Loc.offset)

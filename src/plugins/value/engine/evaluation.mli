@@ -104,7 +104,7 @@ module type S = sig
 end
 
 module type Value = sig
-  include Abstract_value.External
+  include Abstract.Value.External
 
   (** Inter-reduction of values. Useful when the value module is a reduced
       product of several abstraction.
