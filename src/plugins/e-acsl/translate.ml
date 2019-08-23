@@ -93,46 +93,37 @@ let add_cast ~loc ?name env ctx strnum t_opt e =
     e, env
   | Some ctx ->
     let ty = Cil.typeOf e in
-    (* TODO RATIONAL:
-       spaghetti code below. Would be nice to be improved (or at least
-       more commented) ==> boolean pattern matching? *)
-    if Gmp.Z.is_t ctx then
-      if Gmp.Z.is_t ty then
-        e, env
-      else if Real.is_t ty then
+    match Gmp.Z.is_t ty, Gmp.Z.is_t ctx with
+    | true, true ->
+      (* Z --> Z *)
+      e, env
+    | false, true ->
+      if Real.is_t ty then
+        (* R --> Z *)
         Real.cast_to_z ~loc ?name e env
       else
-        (* Convert the C integer into a mpz.
-           Remember:
-           - very long constants have been temporary converted into strings;
-           - possible to get a non integral type (or Gmp.z_t) with a non-one in
-           the case of \null *)
+        (* C integer --> Z *)
         let e =
-          if Cil.isIntegralType ty || strnum = Str_Z then
-            e
-          else if not (Cil.isIntegralType ty) && strnum = C_number then
+          if not (Cil.isIntegralType ty) && strnum = C_number then
+            (* special case for \null that must be casted to long: it is the
+               only non integral value that can be seen as an integer, while the
+               type system infers that it is C-representable (see
+               tests/runtime/null.i) *)
             Cil.mkCast e Cil.longType (* \null *)
-          else begin
-            (* TODO RATIONAL: this case seems to be possible:
-               getting a very long rational constants (so a string) to be casted
-               to an integer *)
-            assert (not (Cil.isIntegralType ty) && strnum = Str_R);
-            assert false
-          end
+          else
+            e
         in
         mk_mpz e
-    else if Real.is_t ctx then
-      if Real.is_t (Cil.typeOf e) then e, env
-      else Real.mk_real ~loc ?name e env t_opt
-    else (* the context is neither MPZ nor MPQ *)
-      (* handle a C-integer context *)
-      if Gmp.Z.is_t ty || strnum = Str_Z then
-        (* we get an mpz, but it fits into a C integer: convert it *)
+    | _, false ->
+      if Real.is_t ctx then
+        if Real.is_t (Cil.typeOf e) then (* R --> R *) e, env
+        else (* C integer or Z --> R *) Real.mk_real ~loc ?name e env t_opt
+      else if Gmp.Z.is_t ty || strnum = Str_Z then
+        (* Z --> C type or the integer is represented by a string:
+           anyway, it fits into a C integer: convert it *)
         let fname, new_ty =
-          if Cil.isSignedInteger ctx then
-            "__gmpz_get_si", Cil.longType
-          else
-            "__gmpz_get_ui", Cil.ulongType
+          if Cil.isSignedInteger ctx then "__gmpz_get_si", Cil.longType
+          else "__gmpz_get_ui", Cil.ulongType
         in
         let _, e, env =
           Env.new_var
@@ -145,8 +136,10 @@ let add_cast ~loc ?name env ctx strnum t_opt e =
         in
         e, env
       else if Real.is_t ty || strnum = Str_R then
+        (* R --> C type or the real is represented by a string *)
         Real.add_cast ~loc ?name e env ctx
       else
+        (* C type --> another C type *)
         Cil.mkCastT ~force:false ~e ~oldt:ty ~newt:ctx, env
 
 let constant_to_exp ~loc t c =
