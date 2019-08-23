@@ -47,7 +47,7 @@ let fkind_limits =
   | FDouble     -> double
   | FLongDouble -> assert false
 
-let precision_limits =
+let float_grade_limits =
   let single = float_of_string "0x1p+120"
   and double = float_of_string "0x1p+960"
   and long_double = float_of_string "0x1p+15360"
@@ -56,39 +56,83 @@ let precision_limits =
     | FDouble     -> double
     | FLongDouble -> long_double
 
-let is_large_range fkind (min,max) =
-  let limit = precision_limits fkind in
+let is_large_float_range fkind (min,max) =
+  let limit = float_grade_limits fkind in
   if (min < 0.0) = (max < 0.0) then (* if bounds have same sign *)
     max -. min >= limit
   else
     min <= -.limit || max >= limit
 
-let qualify_range fkind (min,max) =
+let float_grade fkind (min,max) =
   if min = max then
     Singleton
-  else if is_large_range fkind (min,max) then
+  else if is_large_float_range fkind (min,max) then
     Wide
   else
     Normal
+
+let ikind_limits ikind =
+  let open Cil in
+  let bits = bitsSizeOfInt ikind in
+  if isSigned ikind then
+    { min=min_signed_number bits; max=max_signed_number bits }
+  else
+    { min=Integer.zero; max=max_unsigned_number bits }
+
+let int_grade_limits ikind =
+  let bits = Cil.bitsSizeOfInt ikind in
+  Integer.(pred (two_power_of_int (bits - bits / 8)))
+
+let is_large_int_range ikind (l,u) =
+  let limit = int_grade_limits ikind in
+  if Integer.(lt l zero) = Integer.(lt u zero) then (* if bounds have same sign *)
+    Integer.(ge (sub u l) limit)
+  else
+    Integer.(le l (neg limit)) || Integer.(ge u limit)
+
+let int_grade ikind (min,max) =
+  if min = max then
+    Singleton
+  else if is_large_int_range ikind (min,max) then
+    Wide
+  else
+    Normal
+
 
 let update_node_values node kinstr lval =
   let typ = Cil.typeOfLval lval in
   let state = Db.Value.get_state kinstr in
   let _,cvalue = !Db.Value.eval_lval None state lval in
-  try match typ with
+  try
+    let ival = Cvalue.V.project_ival cvalue in
+    match typ with
+    | TInt (ikind,_) ->
+      let size =  Integer.of_int (Cil.bitsSizeOfInt ikind)
+      and signed = Cil.isSigned ikind in
+      let ival = Ival.reinterpret_as_int ~size ~signed ival in
+      let min, max = match Ival.min_and_max ival with
+        | Some min, Some max -> min, max
+        | _, _ -> assert false (* ival have been reinterpreted *)
+      in
+      Imprecision_graph.update_node_int_values node {
+        values_interval = {min;max};
+        values_limits = ikind_limits ikind;
+        values_grade = int_grade ikind (min,max)
+      }
+
     | TFloat (fkind,_) ->
-      begin match Ival.min_and_max_float (Cvalue.V.project_ival cvalue) with
+      begin match Ival.min_and_max_float ival with
         | None, _can_be_nan -> ()
         | Some (min, max), _can_be_nan ->
           let min = Fval.F.to_float min and max = Fval.F.to_float max in
-          Imprecision_graph.update_node_values node {
+          Imprecision_graph.update_node_float_values node {
             values_interval = {min;max};
             values_limits = fkind_limits fkind;
-            values_grade = qualify_range fkind (min,max);
+            values_grade = float_grade fkind (min,max);
           }
       end
-    | _ -> ()
-  with Cvalue.V.Not_based_on_null -> ()
+    | _ -> Self.result "node %a has type %a" Node_kind.pretty node.node_kind Cil_printer.pp_typ typ
+  with Cvalue.V.Not_based_on_null -> Self.result "node %a is not numeric" Node_kind.pretty node.node_kind
 
 
 (* --- Locations handling --- *)

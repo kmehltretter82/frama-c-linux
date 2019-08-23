@@ -33,13 +33,13 @@ module Dependency : Graph.Sig.COMPARABLE with type t = dependency
 val create : ?size:int -> unit -> t
 
 val create_node :
-  ?node_values:node_values ->
   node_kind:node_kind ->
   node_locality:node_locality -> t -> node
 
 val remove_node : t -> node -> unit
 
-val update_node_values : node -> node_values -> unit
+val update_node_int_values : node -> Integer.t node_values -> unit
+val update_node_float_values : node -> float node_values -> unit
 
 val create_dependency : allow_folding:bool -> t -> node -> dependency_kind ->
   node -> unit

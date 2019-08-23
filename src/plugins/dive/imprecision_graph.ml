@@ -55,13 +55,14 @@ let edges g =
 
 let next_key = ref 0
 
-let create_node ?node_values ~node_kind ~node_locality g =
+let create_node ~node_kind ~node_locality g =
   let node = {
     node_key = !next_key;
     node_kind;
     node_locality;
     node_hidden = false;
-    node_values;
+    node_int_values = None;
+    node_float_values = None;
     node_deps_computed = false;
   }
   in
@@ -71,7 +72,10 @@ let create_node ?node_values ~node_kind ~node_locality g =
 
 let remove_node = remove_vertex
 
-let union_interval i1 i2 =
+let union_int_interval i1 i2 =
+  { min = Integer.min i1.min i2.min ; max = Integer.max i1.max i2.max }
+
+let union_float_interval i1 i2 =
   { min = min i1.min i2.min ; max = max i1.max i2.max }
 
 let worst_precision_grade q1 q2 =
@@ -80,18 +84,32 @@ let worst_precision_grade q1 q2 =
   | Normal, _ | _, Normal -> Normal
   | Singleton, Singleton -> Singleton
 
-let merge_precisions p1 p2 =
+let merge_int_values p1 p2 =
   (* TODO: prevent assertion failure *)
-  assert (p1.values_limits = p2.values_limits);
+  assert (Integer.equal p1.values_limits.min p2.values_limits.min);
+  assert (Integer.equal p1.values_limits.max p2.values_limits.max);
   {
-    values_interval = union_interval p1.values_interval p2.values_interval;
+    values_interval = union_int_interval p1.values_interval p2.values_interval;
     values_limits = p1.values_limits;
     values_grade = worst_precision_grade p1.values_grade p2.values_grade; 
   }
 
-let update_node_values node new_values =
-  node.node_values <-
-    Some (Extlib.opt_fold merge_precisions node.node_values new_values)
+let merge_float_values p1 p2 =
+  (* TODO: prevent assertion failure *)
+  assert (p1.values_limits = p2.values_limits);
+  {
+    values_interval = union_float_interval p1.values_interval p2.values_interval;
+    values_limits = p1.values_limits;
+    values_grade = worst_precision_grade p1.values_grade p2.values_grade; 
+  }
+
+let update_node_int_values node new_values =
+  node.node_int_values <-
+    Some (Extlib.opt_fold merge_int_values node.node_int_values new_values)
+
+let update_node_float_values node new_values =
+  node.node_float_values <-
+    Some (Extlib.opt_fold merge_float_values node.node_float_values new_values)
 
 
 let create_dependency ~allow_folding g v1 dependency_kind v2 =
@@ -178,6 +196,13 @@ let ouptput_to_dot out_channel g =
       let default_vertex_attributes _g = []
       let vertex_name v = "cp" ^ (string_of_int v.node_key)
       let vertex_attributes v =
+        let grade = match v.node_int_values, v.node_float_values with
+          | Some v1, Some v2 ->
+            Some (worst_precision_grade v1.values_grade v2.values_grade)
+          | Some v, _ -> Some v.values_grade
+          | _, Some v -> Some v.values_grade
+          | None, None -> None
+        in
         let l = ref [] in
         let text = Pretty_utils.to_string Node_kind.pretty v.node_kind in
         if text <> "" then
@@ -189,13 +214,13 @@ let ouptput_to_dot out_channel g =
           | Alarm _ ->  [ `Shape `Doubleoctagon ;
                           `Style `Bold ; `Color 0xff0000 ;
                           `Style `Filled ; `Fillcolor 0xff0000 ]
-        and values = match v.node_values with
+        and values = match grade with
           | None -> []
-          | Some ({values_grade=Singleton}) ->
+          | Some Singleton ->
             [`Color 0x88aaff ; `Style `Filled ; `Fillcolor 0xaaccff ]
-          | Some ({values_grade=Normal}) ->
+          | Some Normal ->
             [ `Color 0x004400 ; `Style `Filled ; `Fillcolor 0xeeffee ]
-          | Some ({values_grade=Wide}) ->
+          | Some Wide ->
             [ `Color 0xff0000 ; `Style `Filled ; `Fillcolor 0xffbbbb ]
         in
         l := values @ kind @ !l;
@@ -269,13 +294,27 @@ struct
     in
     Json.of_string s
 
+  let output_int_interval interval =
+    (* TODO: handle overflow *)
+    Json.of_fields [
+      ("min", Json.of_int (Integer.to_int interval.min)) ;
+      ("max", Json.of_int (Integer.to_int interval.max)) ;
+    ]
+
   let output_float_interval interval =
     Json.of_fields [
       ("min", Json.of_float interval.min) ;
       ("max", Json.of_float interval.max) ;
     ]
 
-  let output_node_values values =
+  let output_node_int_values values =
+    Json.of_fields [
+      ("computed", output_int_interval values.values_interval) ;
+      ("limits", output_int_interval values.values_limits) ;
+      ("grade", output_node_precision_grade values.values_grade) ;
+    ]
+
+  let output_node_float_values values =
     Json.of_fields [
         ("computed", output_float_interval values.values_interval) ;
         ("limits", output_float_interval values.values_limits) ;
@@ -291,11 +330,16 @@ struct
       ("locality", output_node_locality node.node_locality) ;
       ("explored", Json.of_bool node.node_deps_computed) ;
     ] @
-        begin match node.node_values with
+        begin match node.node_int_values with
           | None -> []
-          | Some node_values -> [("values", output_node_values node_values)]
-        end
-        @
+          | Some node_values ->
+            [("int_values", output_node_int_values node_values)]
+        end @
+        begin match node.node_float_values with
+          | None -> []
+          | Some node_values ->
+            [("float_values", output_node_float_values node_values)]
+        end @
         begin match Node_kind.to_lval node.node_kind with
           | None -> []
           | Some lval ->

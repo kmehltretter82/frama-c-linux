@@ -31,13 +31,13 @@ type node_locality = {
   loc_callstack : Callstack.t;
 }
 
-type float_interval = {min: float; max: float}
+type 'a interval = {min: 'a; max: 'a}
 
 type precision_grade = Singleton | Normal | Wide
 
-type node_values = {
-  values_interval : float_interval;
-  values_limits : float_interval;
+type 'a node_values = {
+  values_interval : 'a interval;
+  values_limits : 'a interval;
   values_grade : precision_grade;
 }
 
@@ -46,7 +46,8 @@ type node = {
   node_kind : node_kind;
   node_locality : node_locality;
   mutable node_hidden : bool;
-  mutable node_values : node_values option;
+  mutable node_int_values : (Integer.t node_values) option;
+  mutable node_float_values : (float node_values) option;
   mutable node_deps_computed : bool;
 }
 

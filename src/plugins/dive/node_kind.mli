@@ -20,8 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Graph_types
-
 include Datatype.S with type t = Graph_types.node_kind
 
 val get_base : t -> Cil_types.varinfo option
