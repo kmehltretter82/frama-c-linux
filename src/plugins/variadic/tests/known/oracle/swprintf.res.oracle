@@ -67,7 +67,8 @@ int volatile nondet;
     requires valid_read_wstring(param0);
     assigns \result, *(ws + (0 ..));
     assigns \result
-      \from (indirect: n), (indirect: *(format + (0 ..))), *(param0 + (0 ..));
+      \from (indirect: n), (indirect: *(format + (0 ..))),
+            (indirect: *(param0 + (0 ..)));
     assigns *(ws + (0 ..))
       \from (indirect: n), (indirect: *(format + (0 ..))), *(param0 + (0 ..));
  */
@@ -81,7 +82,8 @@ int swprintf_va_1(wchar_t *ws, size_t n, wchar_t const *format,
     requires valid_read_wstring(param0);
     assigns \result, *(ws + (0 ..));
     assigns \result
-      \from (indirect: n), (indirect: *(format + (0 ..))), *(param0 + (0 ..));
+      \from (indirect: n), (indirect: *(format + (0 ..))),
+            (indirect: *(param0 + (0 ..)));
     assigns *(ws + (0 ..))
       \from (indirect: n), (indirect: *(format + (0 ..))), *(param0 + (0 ..));
  */
