@@ -234,6 +234,8 @@ val dkey_callbacks : category
 val dkey_widening : category
 
 
+(** Notifies that the binding to Apron domains is available. *)
+val register_apron: unit -> unit
 
 (*
 Local Variables:

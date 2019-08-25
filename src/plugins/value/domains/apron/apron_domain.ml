@@ -20,21 +20,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
-#24 "src/plugins/value/domains/apron/apron_domain.ok.ml"
-
 open Cil_types
 open Eval
 open Apron
 
 let dkey = Value_parameters.register_category "d-apron"
 
-let ok = true
-
 let debug = false
-
-module type S = Abstract_domain.Leaf
-  with type value = Main_values.Interval.t
-   and type location = Precise_locs.precise_location
 
 let abort exclog =
   let open Manager in
@@ -357,13 +349,13 @@ let ival_to_interval = function
 (*                          Abstract Domain Functor                           *)
 (* -------------------------------------------------------------------------- *)
 
-module Make
-    (Man: sig
-       type t
-       val manager: t Manager.t
-       val name: string
-     end)
-= struct
+module type Input = sig
+  type t
+  val manager: t Manager.t
+  val name: string
+end
+
+module Make (Man : Input) = struct
 
   type state = Man.t Abstract1.t
   type value = Main_values.Interval.t
@@ -753,11 +745,21 @@ end
 (** Apron manager allocation changes the rounding mode. *)
 let () = Floating_point.set_round_nearest_even ()
 
-module Octagon = Domain_builder.Complete (Make (Apron_Octagon))
-module Box = Domain_builder.Complete (Make (Apron_Box))
-module Polka_Loose = Domain_builder.Complete (Make (Apron_Polka_Loose))
-module Polka_Strict = Domain_builder.Complete (Make (Apron_Polka_Strict))
-module Polka_Equalities = Domain_builder.Complete (Make (Apron_Polka_Equalities))
+let make name enable (module Man: Input) =
+  let module Domain = Domain_builder.Complete (Make (Man)) in
+  let open Abstractions in
+  register ~enable { name;
+                     values = Single (module Main_values.Interval);
+                     domain = Domain (module Domain); }
+
+let () =
+  let open Value_parameters in
+  make "apron octagons" ApronOctagon.get (module Apron_Octagon);
+  make "apron box" ApronBox.get (module Apron_Box);
+  make "polka loose" PolkaLoose.get (module Apron_Polka_Loose);
+  make "polka strict" PolkaStrict.get (module Apron_Polka_Strict);
+  make "polka equalities" PolkaEqualities.get (module Apron_Polka_Equalities);
+  register_apron ()
 
 
 (*

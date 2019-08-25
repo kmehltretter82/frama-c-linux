@@ -77,6 +77,8 @@ let dkey_incompatible_states = register_category "incompatible-states"
 let dkey_iterator = register_category "iterator"
 let dkey_callbacks = register_category "callbacks"
 let dkey_widening = register_category "widening"
+let dkey_experimental = register_category "experimental-ok"
+
 
 let () =
   let activate dkey = add_debug_keys dkey in
@@ -184,12 +186,23 @@ module NumerorsDomain = Domain_Parameter
 let apron_help = "Experimental binding of the numerical domains provided \
                   by the APRON library: http://apron.cri.ensmp.fr/library \n"
 
+let apron_available = ref false
+let register_apron () = apron_available := true
+
+let apron_hook _ _ =
+  if not !apron_available
+  then
+    abort "an Apron domain is requested but the apron binding is not available."
+  else if not (is_debug_key_enabled dkey_experimental) then
+    warning  "The Apron domains binding is experimental.";
+
 module ApronOctagon = Domain_Parameter
     (struct
       let option_name = "-eva-apron-oct"
       let help = apron_help ^ "Use the octagon domain of apron."
       let default = false
     end)
+let () = ApronOctagon.add_set_hook apron_hook
 
 module ApronBox = Domain_Parameter
     (struct
@@ -197,6 +210,7 @@ module ApronBox = Domain_Parameter
       let help = apron_help ^ "Use the box domain of apron."
       let default = false
     end)
+let () = ApronBox.add_set_hook apron_hook
 
 module PolkaLoose = Domain_Parameter
     (struct
@@ -204,6 +218,7 @@ module PolkaLoose = Domain_Parameter
       let help = apron_help ^ "Use the loose polyhedra domain of apron."
       let default = false
     end)
+let () = PolkaLoose.add_set_hook apron_hook
 
 module PolkaStrict = Domain_Parameter
     (struct
@@ -211,6 +226,7 @@ module PolkaStrict = Domain_Parameter
       let help = apron_help ^ "Use the strict polyhedra domain of apron."
       let default = false
     end)
+let () = PolkaStrict.add_set_hook apron_hook
 
 module PolkaEqualities = Domain_Parameter
     (struct
@@ -218,6 +234,7 @@ module PolkaEqualities = Domain_Parameter
       let help = apron_help ^ "Use the linear equalities domain of apron."
       let default = false
     end)
+let () = PolkaEqualities.add_set_hook apron_hook
 
 module InoutDomain = Domain_Parameter
     (struct
