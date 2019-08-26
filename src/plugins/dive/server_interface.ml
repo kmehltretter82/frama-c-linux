@@ -53,12 +53,25 @@ struct
 end
 
 module Variable = Data.Collection (struct
+    module Info = struct
+      let page = page
+      let name = "variable"
+      let descr = Markdown.rm "Variable from the program"
+    end
+
+    module R = Data.Record (Info)
+
     type t = Cil_types.varinfo
-    let syntax = Syntax.publish ~page ~name:"variable"
-        ~synopsis:(Syntax.record [
-            "fun", Syntax.option Syntax.string ;
-            "var", Syntax.string ])
-        ~descr:(Markdown.rm "Variable from the program") ()
+
+    let syntax = R.syntax
+
+    let fun_field = R.option "fun"
+        ~descr:(Markdown.rm "owner function for a local variable")
+        (module Data.Jstring)
+
+    let var_field = R.field "var"
+        ~descr:(Markdown.rm "variable name")
+        (module Data.Jstring)
 
     let to_json v =
       let varname = v.Cil_types.vname in
