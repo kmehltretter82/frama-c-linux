@@ -32,7 +32,7 @@ module type Conversion = sig
 end
 
 module Make
-    (Loc: Abstract_location.S)
+    (Loc: Abstract_location.Leaf)
     (Convert : Conversion with type internal_value := Loc.value)
 = struct
 
@@ -42,6 +42,8 @@ module Make
             and type location = Loc.location
             and type offset = Loc.offset)
   type value = Convert.extended_value
+
+  let structure = Abstract.Location.Leaf (Loc.key, (module Loc))
 
   (* Now lift the functions that contain {!value} in their type. *)
 

@@ -209,29 +209,15 @@ module Internal_Value = struct
         | Unit -> fun _ -> ()
       in
       get structure
-  end
-end
-
-(* --- Building domain abstractions ----------------------------------------- *)
-
-module Lift_Domain
-    (Value: Abstract.Value.External)
-    (Domain: Abstract_domain.Leaf with type location = precise_loc)
-    (Struct: sig type v = Domain.value val s : v value end)
-= struct
-
-  module Convert = struct
-    include Internal_Value.Convert (Value) (Struct)
 
     type extended_location = Main_locations.PLoc.location
 
     let restrict_loc = fun x -> x
     let extend_loc = fun x -> x
   end
-
-  include Domain_lift.Make (Domain) (Convert)
-  let key = Domain.key
 end
+
+(* --- Building domain abstractions ----------------------------------------- *)
 
 module type internal_domain =
   Abstract.Domain.Internal with type location = Precise_locs.precise_location
@@ -245,34 +231,30 @@ let eq_value:
       | Abstract.Value.Leaf (key, _) -> Abstract.Value.eq_type key V.key
       | _ -> None
 
-let add_domain (type v) (abstraction: v abstraction) acc =
-  let module Acc = (val acc: Acc) in
-  let new_domain : (module leaf_domain with type value = Acc.Val.t) =
+let add_domain (type v) (abstraction: v abstraction) (module Acc: Acc) =
+  let domain : (module internal_domain with type value = Acc.Val.t) =
     match abstraction.domain with
     | Functor make ->
       let module Make = (val make: domain_functor) in
-      (module Make (Acc.Val))
+      (module Leaf_Domain (Make (Acc.Val)))
     | Domain domain ->
       match eq_value Acc.Val.structure abstraction.values with
-      | Some Structure.Eq -> domain
+      | Some Structure.Eq ->
+        let module Domain = (val domain) in
+        (module Leaf_Domain (Domain))
       | None ->
-        let module Dom = (val domain : leaf_domain with type value = v) in
+        let module Domain = (val domain : leaf_domain with type value = v) in
         let module Struct = struct
-          type v = Dom.value
+          type v = Domain.value
           let s = abstraction.values
         end in
-        (module Lift_Domain (Acc.Val) (Dom) (Struct))
+        let module Convert = Internal_Value.Convert (Acc.Val) (Struct) in
+        (module Domain_lift.Make (Domain) (Convert))
   in
-  let module Domain = (val new_domain) in
-  let module Domain = Leaf_Domain (Domain) in
   let domain : (module internal_domain with type value = Acc.Val.t) =
-    match Acc.Dom.structure with
-    | Abstract.Domain.Unit -> (module Domain)
-    | s ->
-      (module struct
-        include Domain_product.Make (Acc.Val) (Acc.Dom) (Domain)
-        let structure = Abstract.Domain.Node (s, Domain.structure)
-      end)
+    match Abstract.Domain.(eq_structure Acc.Dom.structure Unit) with
+    | Some _ -> domain
+    | None -> (module Domain_product.Make (Acc.Val) (Acc.Dom) ((val domain)))
   in
   (module struct
     module Val = Acc.Val
@@ -325,9 +307,7 @@ let register_value_reduction reduced_product =
 let reduce_apron_itv cvalue ival =
   match ival with
   | None -> begin
-      try
-        let ival = Cvalue.V.project_ival cvalue in
-        cvalue, (Some ival)
+      try cvalue, Some (Cvalue.V.project_ival cvalue)
       with Cvalue.V.Not_based_on_null -> cvalue, ival
     end
   | Some ival ->
@@ -338,7 +318,7 @@ let reduce_apron_itv cvalue ival =
        | _ -> ());
       let reduced_ival = Ival.narrow ival ival' in
       let cvalue = Cvalue.V.inject_ival reduced_ival in
-      cvalue, (Some reduced_ival)
+      cvalue, Some reduced_ival
     with Cvalue.V.Not_based_on_null -> cvalue, Some ival
 
 let () =
@@ -400,17 +380,13 @@ module Open (Acc: Acc) : S = struct
 end
 
 module Unit_Acc (Value: Abstract.Value.External) : Acc = struct
-  module PLoc = Main_locations.PLoc
   module Struct = struct
     type v = Cvalue.V.t
     let s = Single (module Main_values.CVal)
   end
   module Conv = Internal_Value.Convert (Value) (Struct)
   module Val = Value
-  module Loc = struct
-    include Location_lift.Make (PLoc) (Conv)
-    let structure = Abstract.Location.Leaf (PLoc.key, (module PLoc))
-  end
+  module Loc = Location_lift.Make (Main_locations.PLoc) (Conv)
   module Dom = Unit_domain.Make (Value) (Loc)
 end
 

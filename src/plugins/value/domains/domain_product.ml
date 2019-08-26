@@ -28,8 +28,8 @@ let product_category = Value_parameters.register_category "domain_product"
 
 module Make
     (Value: Abstract_value.S)
-    (Left:  Abstract_domain.Internal with type value = Value.t)
-    (Right: Abstract_domain.Internal with type value = Left.value
+    (Left:  Abstract.Domain.Internal with type value = Value.t)
+    (Right: Abstract.Domain.Internal with type value = Left.value
                                       and type location = Left.location)
 = struct
 
@@ -50,6 +50,8 @@ module Make
       (Right)
       (struct let module_name = name end)
   type state = t
+
+  let structure = Abstract.Domain.Node (Left.structure, Right.structure)
 
   let log_category = product_category
 

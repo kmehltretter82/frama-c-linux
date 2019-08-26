@@ -30,11 +30,11 @@ module type Conversion = sig
 end
 
 module Make
-    (Loc: Abstract_location.S)
+    (Loc: Abstract_location.Leaf)
     (Convert : Conversion with type internal_value := Loc.value)
-  : Abstract_location.S with type location = Loc.location
-                         and type offset = Loc.offset
-                         and type value = Convert.extended_value
+  : Abstract.Location.Internal with type location = Loc.location
+                                and type offset = Loc.offset
+                                and type value = Convert.extended_value
 
 
 (*
