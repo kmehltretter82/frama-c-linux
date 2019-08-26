@@ -34,17 +34,13 @@ let _fval_contains_maximal_bounds fkind fval =
   Fval.has_smaller_max_bound top fval >= 0
 
 let fkind_limits =
-  let single = {
-    min = float_of_string "0x1p-126";
-    max = float_of_string "0x1.fffffep+127";
-  }
-  and double = {
-    min = float_of_string "0x1p-1022";
-    max = float_of_string "0x1.fffffffffffffp+1023";
-  }
-  in function
-  | FFloat      -> single
-  | FDouble     -> double
+  let max_single = float_of_string "0x1.fffffep+127"
+  and max_double = float_of_string "0x1.fffffffffffffp+1023" in
+  let single_limits = { min = -. max_single ;  max = max_single }
+  and double_limits =  { min = -. max_double ;  max = max_double } in
+  function
+  | FFloat      -> single_limits
+  | FDouble     -> double_limits
   | FLongDouble -> assert false
 
 let float_grade_limits =
