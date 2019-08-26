@@ -171,7 +171,7 @@ open Eval
 
 module CVal = struct
   include Main_values.CVal
-  let structure = Abstract.Value.Leaf key
+  let structure = Abstract.Value.Leaf (key, (module Main_values.CVal))
 end
 
 module Val = struct

@@ -65,27 +65,29 @@ module Key_Domain = Make (struct end)
 
 module type Shape = sig
   include Key
+  type 'a data
 
   type 'a structure =
     | Unit : unit structure
-    | Leaf : 'a key -> 'a structure
+    | Leaf : 'a key * 'a data -> 'a structure
     | Node : 'a structure * 'b structure -> ('a * 'b) structure
 
   val eq_structure: 'a structure -> 'b structure -> ('a, 'b) eq option
 end
 
-module Shape (Key: Key) = struct
+module Shape (Key: Key) (Data: sig type 'a t end) = struct
   include Key
+  type 'a data = 'a Data.t
 
   type 'a structure =
     | Unit : unit structure
-    | Leaf : 'a Key.key -> 'a structure
+    | Leaf : 'a key * 'a data -> 'a structure
     | Node : 'a structure * 'b structure -> ('a * 'b) structure
 
   let rec eq_structure : type a b. a structure -> b structure -> (a, b) eq option
     = fun a b ->
       match a, b with
-      | Leaf key1, Leaf key2 -> Key.eq_type key1 key2
+      | Leaf (key1, _), Leaf (key2, _) -> Key.eq_type key1 key2
       | Node (l1, r1), Node (l2, r2) ->
         begin
           match eq_structure l1 l2, eq_structure r1 r2 with
@@ -128,7 +130,7 @@ module Open
 
   let rec mem : type a. 'v Shape.key -> a structure -> bool = fun key -> function
     | Unit -> false
-    | Leaf k -> Shape.equal key k
+    | Leaf (k, _) -> Shape.equal key k
     | Node (left, right) -> mem key left || mem key right
 
   let mem key = mem key M.structure
@@ -147,7 +149,7 @@ module Open
 
   let rec compute_getters : type a. a structure -> (a getter) KMap.t = function
     | Unit -> KMap.empty
-    | Leaf key ->  KMap.singleton key (Get (key, fun (t : a) -> t))
+    | Leaf (key, _) ->  KMap.singleton key (Get (key, fun (t : a) -> t))
     | Node (left, right) ->
       let l = compute_getters left and r = compute_getters right in
       let l = KMap.map (lift_get fst) l and r = KMap.map (lift_get snd) r in
@@ -170,7 +172,7 @@ module Open
 
   let rec compute_setters : type a. a structure -> (a setter) KMap.t = function
     | Unit -> KMap.empty
-    | Leaf key -> KMap.singleton key (Set (key, fun v _t -> v))
+    | Leaf (key, _) -> KMap.singleton key (Set (key, fun v _t -> v))
     | Node (left, right) ->
       let l = compute_setters left and r = compute_setters right in
       let l = KMap.map (lift_set (fun set (l, r) -> set l, r)) l

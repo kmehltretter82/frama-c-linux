@@ -483,7 +483,8 @@ module CvalueOffsm : Abstract.Value.Internal with type t = V.t * offsm_or_top
   include Value_product.Make (Main_values.CVal) (Offsm)
 
   let structure =
-    Abstract.Value.(Node (Leaf Main_values.CVal.key, Leaf Offsm.key))
+    Abstract.Value.(Node (Leaf (Main_values.CVal.key, (module Main_values.CVal)),
+                          Leaf (Offsm.key, (module Offsm))))
 
   let size typ = Integer.of_int (Cil.bitsSizeOf typ)
 

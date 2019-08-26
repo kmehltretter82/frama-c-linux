@@ -93,7 +93,8 @@ let add_numerors_value (module Value: Abstract.Value.Internal) =
     include Value_product.Make (Value) (Numerors_value)
 
     let structure =
-      Abstract.Value.(Node (Value.structure, Leaf Numerors_value.key))
+      Abstract.Value.(Node (Value.structure,
+                            Leaf (Numerors_value.key, (module Numerors_value))))
 
     let forward_cast = match External_Value.get Main_values.CVal.key with
       | None -> forward_cast

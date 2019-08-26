@@ -55,19 +55,22 @@ module Key_Domain : Key
 (** A Key module with its structure type. *)
 module type Shape = sig
   include Key
+  type 'a data
 
   (** The gadt, based on keys giving the type of each node.
       Describes the internal structure of a data type.
       Used internally to automatically generate efficient accessors of its nodes. *)
   type 'a structure =
     | Unit : unit structure
-    | Leaf : 'a key -> 'a structure
+    | Leaf : 'a key * 'a data -> 'a structure
     | Node : 'a structure * 'b structure -> ('a * 'b) structure
 
   val eq_structure: 'a structure -> 'b structure -> ('a, 'b) eq option
 end
 
-module Shape (Key : Key) : Shape with type 'a key = 'a Key.key
+module Shape (Key: Key) (Data: sig type 'a t end) :
+  Shape with type 'a key = 'a Key.key
+         and type 'a data = 'a Data.t
 
 (** Internal view of the tree, with the structure. *)
 module type Internal = sig
