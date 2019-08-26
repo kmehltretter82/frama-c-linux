@@ -741,7 +741,7 @@ module STRING = WpContext.Generator(LITERAL)
 
     end)
 
-module RegisterBASE = WpContext.Static
+module RegisterBASE = WpContext.Index
     (struct
       type key = lfun
       type data = varinfo

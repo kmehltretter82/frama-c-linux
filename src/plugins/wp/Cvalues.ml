@@ -228,22 +228,26 @@ let volatile ?warn () =
       warn ; false )
 
 (* -------------------------------------------------------------------------- *)
-(* --- ACSL Equality                                                      --- *)
+(* --- ACSL Equality BootStrap                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
-let s_eq = ref (fun _ _ _ -> assert false) (* recursion for equal_object *)
+let equal_rec = ref (fun _ _ _ -> assert false) (* recursion for equal_object *)
 
 let rec reduce_eqcomp = function
   | [a;b] when Lang.F.equal a b -> F.e_true
   | _::ws -> reduce_eqcomp ws
   | [] -> raise Not_found
 
-module EQARRAY = WpContext.Generator(Matrix.NATURAL)
+(* -------------------------------------------------------------------------- *)
+(* --- ACSL Array Equality                                                --- *)
+(* -------------------------------------------------------------------------- *)
+
+module EQARRAYDEF = WpContext.StaticGenerator(Matrix.NATURAL)
     (struct
       open Matrix
+      let name = "Cvalues.EqArrayDef"
       type key = matrix
-      type data = Lang.lfun
-      let name = "Cvalues.EqArray"
+      type data = dfun
       let compile (te,ds) =
         let lfun = Lang.generated_f ~sort:Logic.Sprop "EqArray%s_%s"
             (Matrix.id ds) (Matrix.natural_id te)
@@ -257,60 +261,87 @@ module EQARRAY = WpContext.Generator(Matrix.NATURAL)
         let tb = e_var xb in
         let ta_xs = List.fold_left e_get ta denv.index_val in
         let tb_xs = List.fold_left e_get tb denv.index_val in
-        let property = p_hyps (denv.index_range) (!s_eq te ta_xs tb_xs) in
+        let property = p_hyps (denv.index_range) (!equal_rec te ta_xs tb_xs) in
         let definition = p_forall denv.index_var property in
+        Lang.F.set_builtin lfun reduce_eqcomp ;
         (* Definition of the symbol *)
-        Definitions.define_symbol {
+        {
           d_lfun = lfun ; d_types = 0 ;
           d_params = denv.size_var @ [xa ; xb ] ;
           d_definition = Predicate(Def,definition) ;
           d_cluster = cluster ;
-        } ;
-        Lang.F.set_builtin lfun reduce_eqcomp ;
-        (* Finally return symbol *)
-        lfun
+        }
     end)
 
-let rec equal_object obj a b =
-  match obj with
-  | C_int _ | C_float _ | C_pointer _ -> p_equal a b
-  | C_array t ->
-      equal_array (Matrix.of_array t) a b
-  | C_comp c ->
-      equal_comp c a b
+module EQARRAY = WpContext.Generator(Matrix.NATURAL)
+    (struct
+      open Matrix
+      let name = "Cvalues.EqArrray"
+      type key = matrix
+      type data = Lang.lfun
+      let compile mtx =
+        let def = EQARRAYDEF.get mtx in
+        Definitions.define_symbol def ; def.d_lfun
+    end)
 
-and equal_typ typ a b = equal_object (Ctypes.object_of typ) a b
+(* -------------------------------------------------------------------------- *)
+(* --- ACSL Compound Equality                                             --- *)
+(* -------------------------------------------------------------------------- *)
 
-and equal_comp c a b =
-  Definitions.call_pred
-    (Lang.generated_p ("Eq" ^ Lang.comp_id c))
-    (fun lfun ->
-       let basename = if c.cstruct then "S" else "U" in
-       let xa = Lang.freshvar ~basename (Lang.tau_of_comp c) in
-       let xb = Lang.freshvar ~basename (Lang.tau_of_comp c) in
-       let ra = e_var xa in
-       let rb = e_var xb in
-       let def = p_all
-           (fun f ->
-              let fd = Cfield f in
-              equal_typ f.ftype
-                (e_getfield ra fd) (e_getfield rb fd))
-           c.cfields
-       in
-       Lang.F.set_builtin lfun reduce_eqcomp ;
-       {
-         d_lfun = lfun ; d_types = 0 ; d_params = [xa;xb] ;
-         d_cluster = Definitions.compinfo c ;
-         d_definition = Predicate(Def,def) ;
-       }
-    ) [a;b]
+module EQCOMPDEF = WpContext.StaticGenerator(Cil_datatype.Compinfo)
+    (struct
+      let name = "Cvalues.EqCompDef"
+      type key = compinfo
+      type data = dfun
+      let compile c =
+        let lfun = Lang.generated_p ("Eq" ^ Lang.comp_id c) in
+        let basename = if c.cstruct then "S" else "U" in
+        let xa = Lang.freshvar ~basename (Lang.tau_of_comp c) in
+        let xb = Lang.freshvar ~basename (Lang.tau_of_comp c) in
+        let ra = e_var xa in
+        let rb = e_var xb in
+        let def = p_all
+            (fun f ->
+               let fd = Cfield f in
+               !equal_rec (Ctypes.object_of f.ftype)
+                 (e_getfield ra fd) (e_getfield rb fd))
+            c.cfields
+        in
+        Lang.F.set_builtin lfun reduce_eqcomp ;
+        {
+          d_lfun = lfun ; d_types = 0 ; d_params = [xa;xb] ;
+          d_cluster = Definitions.compinfo c ;
+          d_definition = Predicate(Def,def) ;
+        }
+    end)
 
-and equal_array m a b =
+module EQCOMP = WpContext.Generator(Cil_datatype.Compinfo)
+    (struct
+      let name = "Cvalues.EqComp"
+      type key = compinfo
+      type data = Lang.lfun
+      let compile ci =
+        let def = EQCOMPDEF.get ci in
+        Definitions.define_symbol def ; def.d_lfun
+    end)
+
+(* -------------------------------------------------------------------------- *)
+(* --- ACSL Equality                                                      --- *)
+(* -------------------------------------------------------------------------- *)
+
+let equal_comp c a b = p_call (EQCOMP.get c) [a;b]
+let equal_array m a b =
   match m with
   | _obj , [None] -> p_equal a b
-  | _ -> p_call (EQARRAY.get m) (Matrix.size m @ [a;b])
+  | m ->  p_call (EQARRAY.get m) (Matrix.size m @ [a;b])
 
-let () = s_eq := equal_object
+let equal_object obj a b =
+  match obj with
+  | C_int _ | C_float _ | C_pointer _ -> p_equal a b
+  | C_comp c -> equal_comp c a b
+  | C_array t -> equal_array (Matrix.of_array t) a b
+
+let () = equal_rec := equal_object
 
 (* -------------------------------------------------------------------------- *)
 (* --- Lifting Values                                                     --- *)
