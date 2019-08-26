@@ -949,7 +949,7 @@ let why3_of_qed ~id ~title ~name ?axioms t =
   let cnv = empty_cnv ~in_goal:true ~polarity:`Positive ctx in
   let t = convert cnv Prop (Lang.F.e_prop t) in
   let decl = Why3.Decl.create_prop_decl Pgoal goal_id t in
-  let th =   Why3.Theory.close_theory ctx.th in
+  let th = Why3.Theory.close_theory ctx.th in
   if Wp_parameters.has_print_generated () then begin
     let th_uc_tmp = Why3.Theory.add_decl ~warn:false ctx.th decl in
     let th_tmp    = Why3.Theory.close_theory th_uc_tmp in

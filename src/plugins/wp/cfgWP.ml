@@ -1341,42 +1341,7 @@ struct
 
       end !groups
 
-  (* -------------------------------------------------------------------------- *)
-  (* --- WPO Lemmas                                                         --- *)
-  (* -------------------------------------------------------------------------- *)
-
-  let compile_lemma l = ignore (L.lemma l)
-
-  let prove_lemma collection l =
-    if not l.lem_axiom then
-      begin
-        let id = WpPropId.mk_lemma_id l in
-        let def = L.lemma l in
-        let model = WpContext.get_model () in
-        let vca = {
-          Wpo.VC_Lemma.depends = l.lem_depends ;
-          Wpo.VC_Lemma.lemma = def ;
-          Wpo.VC_Lemma.sequent = None ;
-        } in
-        let index = match LogicUsage.section_of_lemma l.lem_name with
-          | LogicUsage.Toplevel _ -> Wpo.Axiomatic None
-          | LogicUsage.Axiomatic a -> Wpo.Axiomatic (Some a.ax_name) in
-        let mid = WpContext.MODEL.id model in
-        let sid = WpPropId.get_propid id in
-        let leg = WpPropId.get_legacy id in
-        let wpo = {
-          Wpo.po_model = model ;
-          Wpo.po_gid = Printf.sprintf "%s_%s" mid sid ;
-          Wpo.po_leg = Printf.sprintf "%s_%s" mid leg ;
-          Wpo.po_sid = sid ;
-          Wpo.po_name = Printf.sprintf "Lemma '%s'" l.lem_name ;
-          Wpo.po_idx = index ;
-          Wpo.po_pid = id ;
-          Wpo.po_formula = Wpo.GoalLemma vca ;
-        } in
-        Wpo.add wpo ;
-        collection := Bag.append !collection wpo ;
-      end
+  let lemma = L.lemma
 
 end
 
@@ -1408,20 +1373,75 @@ let add_qed_check collection model ~qed ~raw ~goal =
 (* --- WPO Computer                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
+module KFmap = Kernel_function.Map
+
 module Computer(M : Sigs.Compiler) =
 struct
 
   module VCG = VC(M)
   module WP = Calculus.Cfg(VCG)
 
+  let compile_lemma l = ignore (VCG.lemma l)
+
+  let prove_lemma collection l =
+    if not l.lem_axiom then
+      begin
+        let id = WpPropId.mk_lemma_id l in
+        let def = VCG.lemma l in
+        let model = WpContext.get_model () in
+        let vca = {
+          Wpo.VC_Lemma.depends = l.lem_depends ;
+          Wpo.VC_Lemma.lemma = def ;
+          Wpo.VC_Lemma.sequent = None ;
+        } in
+        let index = match LogicUsage.section_of_lemma l.lem_name with
+          | LogicUsage.Toplevel _ -> Wpo.Axiomatic None
+          | LogicUsage.Axiomatic a -> Wpo.Axiomatic (Some a.ax_name) in
+        let mid = WpContext.MODEL.id model in
+        let sid = WpPropId.get_propid id in
+        let leg = WpPropId.get_legacy id in
+        let wpo = {
+          Wpo.po_model = model ;
+          Wpo.po_gid = Printf.sprintf "%s_%s" mid sid ;
+          Wpo.po_leg = Printf.sprintf "%s_%s" mid leg ;
+          Wpo.po_sid = sid ;
+          Wpo.po_name = Printf.sprintf "Lemma '%s'" l.lem_name ;
+          Wpo.po_idx = index ;
+          Wpo.po_pid = id ;
+          Wpo.po_formula = Wpo.GoalLemma vca ;
+        } in
+        Wpo.add wpo ;
+        collection := Bag.append !collection wpo ;
+      end
+
+  let prove_strategy collection model kf strategy =
+    let cfg = WpStrategy.cfg_of_strategy strategy in
+    let bhv = WpStrategy.get_bhv strategy in
+    let index = Wpo.Function( kf , bhv ) in
+    if WpRTE.missing_guards model kf then
+      Wp_parameters.warning ~current:false ~once:true
+        "Missing RTE guards" ;
+    try
+      let (results,_) = WP.compute cfg strategy in
+      List.iter (VCG.compile collection index) results
+    with Warning.Error(source,reason) ->
+      Wp_parameters.failure
+        ~current:false "From %s: %s" source reason
+
   class wp (model:WpContext.model) =
     object
       val mutable lemmas : LogicUsage.logic_lemma Bag.t = Bag.empty
-      val mutable annots : WpStrategy.strategy Bag.t = Bag.empty
+      val mutable annots : WpStrategy.strategy Bag.t KFmap.t = KFmap.empty
       method lemma = true
       method model = model
+
       method add_lemma lemma = lemmas <- Bag.append lemmas lemma
-      method add_strategy strategy = annots <- Bag.append annots strategy
+
+      method add_strategy strategy =
+        let kf = WpStrategy.get_kf strategy in
+        let sf = try KFmap.find kf annots with Not_found -> Bag.empty in
+        annots <- KFmap.add kf (Bag.append sf strategy) annots
+
       method compute : Wpo.t Bag.t =
         begin
           let collection = ref Bag.empty in
@@ -1430,26 +1450,15 @@ struct
             (Wp_parameters.QedChecks.get ()) ;
           WpContext.on_context (model,WpContext.Global)
             begin fun () ->
-              LogicUsage.iter_lemmas VCG.compile_lemma ;
-              Bag.iter (VCG.prove_lemma collection) lemmas ;
+              LogicUsage.iter_lemmas compile_lemma ;
+              Bag.iter (prove_lemma collection) lemmas ;
             end () ;
-          Bag.iter
-            (fun strategy ->
-               let cfg = WpStrategy.cfg_of_strategy strategy in
-               let kf = WpStrategy.get_kf strategy in
+          KFmap.iter
+            (fun kf strategies ->
                WpContext.on_context (model,WpContext.Kf kf)
                  begin fun () ->
-                   let bhv = WpStrategy.get_bhv strategy in
-                   let index = Wpo.Function( kf , bhv ) in
-                   if WpRTE.missing_guards model kf then
-                     Wp_parameters.warning ~current:false ~once:true
-                       "Missing RTE guards" ;
-                   try
-                     let (results,_) = WP.compute cfg strategy in
-                     List.iter (VCG.compile collection index) results
-                   with Warning.Error(source,reason) ->
-                     Wp_parameters.failure
-                       ~current:false "From %s: %s" source reason
+                   LogicUsage.iter_lemmas compile_lemma ;
+                   Bag.iter (prove_strategy collection model kf) strategies ;
                  end ()
             ) annots ;
           if not (Lang.F.Check.is_set ()) then
@@ -1462,7 +1471,7 @@ struct
                 Lang.F.Check.iter (add_qed_check collection model) ;
               end () ;
           lemmas <- Bag.empty ;
-          annots <- Bag.empty ;
+          annots <- KFmap.empty ;
           Lang.F.Check.reset () ;
           Lang.F.release () ;
           !collection
