@@ -148,11 +148,6 @@ module Make (Abstract: Abstractions.Eva) = struct
 
   let initial_state = Init.initial_state
 
-  let get_cvalue =
-    match Abstract.Dom.get Cvalue_domain.State.key with
-    | None -> fun _ -> Cvalue.Model.top
-    | Some get -> fun state -> Cvalue_domain.project (get state)
-
   let get_cval =
     match Abstract.Val.get Main_values.CVal.key with
     | None -> fun _ -> assert false
@@ -191,7 +186,7 @@ module Make (Abstract: Abstractions.Eva) = struct
           then `Spec (Annotations.funspec kf)
           else `Def def
     in
-    let cvalue_state = get_cvalue state in
+    let cvalue_state = Abstract.Dom.get_cvalue_or_top state in
     let resulting_states, cacheable = match use_spec with
       | `Spec spec ->
         Db.Value.Call_Type_Value_Callbacks.apply
@@ -237,9 +232,9 @@ module Make (Abstract: Abstractions.Eva) = struct
         in
         call_result
       | Some (states, i) ->
-        let stack_with_call = Value_util.call_stack () in
-        Db.Value.Call_Type_Value_Callbacks.apply
-          (`Memexec, get_cvalue init_state, stack_with_call);
+        let stack = Value_util.call_stack () in
+        let cvalue = Abstract.Dom.get_cvalue_or_top init_state in
+        Db.Value.Call_Type_Value_Callbacks.apply (`Memexec, cvalue, stack);
         (* Evaluate the preconditions of kf, to update the statuses
            at this call. *)
         let spec = Annotations.funspec call.kf in
@@ -300,7 +295,7 @@ module Make (Abstract: Abstractions.Eva) = struct
       in
       Locations.Location_Bytes.do_track_garbled_mix true;
       let final_state = states >>- join_states in
-      let cvalue_state = get_cvalue state in
+      let cvalue_state = Abstract.Dom.get_cvalue_or_top state in
       match final_state with
       | `Bottom ->
         let cs = Value_util.call_stack () in
@@ -329,7 +324,7 @@ module Make (Abstract: Abstractions.Eva) = struct
 
   let store_initial_state kf init_state =
     Abstract.Dom.Store.register_initial_state (Value_util.call_stack ()) init_state;
-    let cvalue_state = get_cvalue init_state in
+    let cvalue_state = Abstract.Dom.get_cvalue_or_top init_state in
     Db.Value.Call_Value_Callbacks.apply (cvalue_state, [kf, Kglobal])
 
   let compute kf init_state =

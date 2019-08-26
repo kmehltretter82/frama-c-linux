@@ -232,11 +232,8 @@ module Make
     | Some get -> get
   let set_ploc = Location.set Main_locations.PLoc.key
   let set_location loc = set_ploc (Main_locations.PLoc.make loc)
-  let get_cvalue_state = match Domain.get Cvalue_domain.State.key with
-    | None -> fun _ -> Cvalue.Model.top
-    | Some get -> fun s -> Cvalue_domain.project (get s)
 
-  let make_env state = Eval_terms.env_assigns (get_cvalue_state state)
+  let make_env state = Eval_terms.env_assigns (Domain.get_cvalue_or_top state)
 
   let is_result = function
     | Assigns (term, _)
@@ -299,7 +296,7 @@ module Make
         end
     in
     let check_one_state state =
-      let cvalue_state = get_cvalue_state state in
+      let cvalue_state = Domain.get_cvalue_or_top state in
       List.iter (check_one_assign cvalue_state) assigns
     in
     States.iter check_one_state states

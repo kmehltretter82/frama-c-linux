@@ -22,14 +22,7 @@
 
 open Eval
 
-let key = Structure.Key_Domain.create_key "cvalue_domain"
 let dkey_card = Value_parameters.register_category "cardinal"
-
-let extract get = match get key with
-  | None -> fun _ -> Cvalue.Model.top
-  | Some get -> function
-    | `Bottom -> Cvalue.Model.bottom
-    | `Value state -> fst (get state)
 
 module Model = struct
 
@@ -189,7 +182,7 @@ module State = struct
     end )
 
   let name = "Cvalue domain"
-  let key = key
+  let key = Structure.Key_Domain.create_key "cvalue_domain"
 
   type value = Model.value
   type location = Model.location
@@ -548,9 +541,6 @@ module State = struct
 end
 
 let () = Db.Value.display := (fun fmt kf -> State.display ~fmt kf)
-
-let inject cvalue_model = cvalue_model, Locals_scoping.bottom ()
-let project (state, _) = state
 
 
 type prefix = Hptmap.prefix

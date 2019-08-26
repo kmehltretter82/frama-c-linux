@@ -384,6 +384,18 @@ module Open (Acc: Acc) : S = struct
   module Dom = struct
     include Acc.Dom
     include Structure.Open (Abstract.Domain) (Acc.Dom)
+
+    let get_cvalue = match get Cvalue_domain.State.key with
+      | None -> None
+      | Some get -> Some (fun s -> fst (get s))
+
+    let get_cvalue_or_top = match get Cvalue_domain.State.key with
+      | None -> fun _ -> Cvalue.Model.top
+      | Some get -> fun s -> fst (get s)
+
+    let get_cvalue_or_bottom = function
+      | `Bottom -> Cvalue.Model.bottom
+      | `Value state -> get_cvalue_or_top state
   end
 end
 

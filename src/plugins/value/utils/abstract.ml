@@ -86,5 +86,9 @@ module Domain = struct
     include Internal
     include Structure.External with type t := t
                                 and type 'a key := 'a key
+
+    val get_cvalue: (t -> Cvalue.Model.t) option
+    val get_cvalue_or_top: t -> Cvalue.Model.t
+    val get_cvalue_or_bottom: t Bottom.or_bottom -> Cvalue.Model.t
   end
 end

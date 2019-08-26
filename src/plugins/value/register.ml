@@ -188,6 +188,8 @@ module Eva =
 
 module Transfer = Cvalue_domain.State.Transfer (Eva.Valuation)
 
+let inject_cvalue state = state, Locals_scoping.bottom ()
+
 let bot_value = function
   | `Bottom -> Cvalue.V.bottom
   | `Value v -> v
@@ -197,7 +199,7 @@ let bot_state = function
   | `Value s -> s
 
 let update valuation state =
-  bot_state (Transfer.update valuation state >>-: Cvalue_domain.project)
+  bot_state (Transfer.update valuation state >>-: fst)
 
 let rec eval_deps state e =
   match e.enode with
@@ -236,7 +238,7 @@ let notify_opt with_alarms alarms =
   Extlib.may (fun mode -> Alarmset.notify mode alarms) with_alarms
 
 let eval_expr_with_valuation ?with_alarms deps state expr=
-  let state = Cvalue_domain.inject state in
+  let state = inject_cvalue state in
   let deps = match deps with
     | None -> None
     | Some deps ->
@@ -256,7 +258,7 @@ let eval_expr_with_valuation ?with_alarms deps state expr=
 module Eval = struct
 
   let eval_expr ?with_alarms state expr =
-    let state = Cvalue_domain.inject state in
+    let state = inject_cvalue state in
     let eval, alarms = Eva.evaluate ~reduction:false state expr in
     notify_opt with_alarms alarms;
     bot_value (eval >>-: snd)
@@ -278,7 +280,7 @@ module Eval = struct
 
 
   let reduce_by_cond state expr positive =
-    let state = Cvalue_domain.inject state in
+    let state = inject_cvalue state in
     let eval, _alarms =
       Eva.reduce state expr positive
     in
@@ -289,7 +291,7 @@ module Eval = struct
     if not (Cvalue.Model.is_reachable state)
     then state, deps, Precise_locs.loc_bottom, (Cil.typeOfLval lval)
     else
-      let state = Cvalue_domain.inject state in
+      let state = inject_cvalue state in
       let deps = match deps with
         | None -> None
         | Some deps ->
@@ -338,7 +340,7 @@ module Eval = struct
 
   let resolv_func_vinfo ?with_alarms deps state funcexp =
     let open Cil_types in
-    let state = Cvalue_domain.inject state in
+    let state = inject_cvalue state in
     let deps = match funcexp.enode with
       | Lval (Var _, NoOffset) -> deps
       | Lval (Mem v, _) ->

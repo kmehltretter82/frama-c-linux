@@ -133,7 +133,7 @@ let set_current_analyzer config (analyzer: (module Analyzer)) =
 let cvalue_initial_state () =
   let module A = (val snd !ref_analyzer) in
   let _, lib_entry = Globals.entry_point () in
-  Cvalue_domain.extract A.Dom.get (A.initial_state ~lib_entry)
+  A.Dom.get_cvalue_or_bottom (A.initial_state ~lib_entry)
 
 (* Builds the Analyzer module corresponding to a given configuration,
    and sets it as the current analyzer. *)

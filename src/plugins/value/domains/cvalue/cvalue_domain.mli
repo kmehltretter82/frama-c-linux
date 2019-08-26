@@ -27,15 +27,6 @@ module State : Abstract_domain.Leaf
    and type location = Main_locations.PLoc.location
    and type state = Cvalue.Model.t * Locals_scoping.clobbered_set
 
-val extract :
-  (State.t Structure.Key_Domain.key ->
-   ('state -> State.t) option) ->
-  'state Eval.or_bottom -> Cvalue.Model.t
-
-val inject : Cvalue.Model.t -> State.t
-val project : State.t -> Cvalue.Model.t
-
-
 (** Specific functions for partitioning optimizations.  *)
 
 type prefix
