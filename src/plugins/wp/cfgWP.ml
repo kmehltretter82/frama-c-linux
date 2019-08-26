@@ -1346,30 +1346,6 @@ struct
 end
 
 (* -------------------------------------------------------------------------- *)
-(* --- Qed Checks                                                         --- *)
-(* -------------------------------------------------------------------------- *)
-
-let kid_qed_check = ref 0
-
-let add_qed_check collection model ~qed ~raw ~goal =
-  let k = incr kid_qed_check ; !kid_qed_check in
-  let id = Printf.sprintf "Qed-%04d" k in
-  let pip = Property.(ip_other id (OLGlob Cil_datatype.Location.unknown)) in
-  let pid = WpPropId.mk_check pip in
-  let vck = let open VC_Check in { raw ; qed ; goal } in
-  let w = let open Wpo in {
-      po_gid = id ;
-      po_leg = "" ; (* no use for legacy checks *)
-      po_sid = id ;
-      po_name = id ;
-      po_idx = Axiomatic None ;
-      po_model = model ;
-      po_pid = pid ;
-      po_formula = GoalCheck vck ;
-    } in
-  Wpo.add w ; collection := Bag.append !collection w
-
-(* -------------------------------------------------------------------------- *)
 (* --- WPO Computer                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -1446,8 +1422,6 @@ struct
         begin
           let collection = ref Bag.empty in
           Lang.F.release () ;
-          Datatype.String.Set.iter Lang.F.Check.set
-            (Wp_parameters.QedChecks.get ()) ;
           WpContext.on_context (model,WpContext.Global)
             begin fun () ->
               LogicUsage.iter_lemmas compile_lemma ;
@@ -1461,18 +1435,8 @@ struct
                    Bag.iter (prove_strategy collection model kf) strategies ;
                  end ()
             ) annots ;
-          if not (Lang.F.Check.is_set ()) then
-            WpContext.on_context (model,WpContext.Global)
-              begin fun () ->
-                Wp_parameters.feedback ~ontty:`Transient "Collecting checks" ;
-                Bag.iter
-                  (fun w -> ignore (Wpo.reduce w))
-                  !collection ;
-                Lang.F.Check.iter (add_qed_check collection model) ;
-              end () ;
           lemmas <- Bag.empty ;
           annots <- KFmap.empty ;
-          Lang.F.Check.reset () ;
           Lang.F.release () ;
           !collection
         end

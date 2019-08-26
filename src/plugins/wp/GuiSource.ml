@@ -209,7 +209,6 @@ class highlighter (main:Design.main_window_extension_points) =
           | Some { Wpo.po_pid = pid ; Wpo.po_formula = f } ->
               begin
                 match f with
-                | GoalCheck _ -> ()
                 | GoalLemma l ->
                     deps <- lemmas l.VC_Lemma.depends
                 | GoalAnnot a ->

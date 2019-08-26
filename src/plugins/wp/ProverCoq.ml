@@ -689,16 +689,7 @@ let prove_lemma wpo vca ~mode =
       prove_prop wpo ~mode ~axioms ~prop
     end
 
-let prove_check wpo vck ~mode =
-  Task.todo
-    begin fun () ->
-      let axioms = None in
-      let prop = vck.VC_Check.goal in
-      prove_prop wpo ~mode ~axioms ~prop
-    end
-
 let prove mode wpo =
   match wpo.Wpo.po_formula with
   | GoalAnnot vcq -> prove_annot wpo vcq ~mode
   | GoalLemma vca -> prove_lemma wpo vca ~mode
-  | GoalCheck vck -> prove_check wpo vck ~mode

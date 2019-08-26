@@ -44,7 +44,6 @@ let is_proved = Wpo.is_proved
 
 let get_formula po =
   match po.po_formula with
-  | GoalCheck c -> c.VC_Check.goal
   | GoalLemma l -> l.VC_Lemma.lemma.Definitions.l_lemma
   | GoalAnnot { VC_Annot.goal = g } ->
       WpContext.on_context (get_context po) Wpo.GOAL.compute_proof g

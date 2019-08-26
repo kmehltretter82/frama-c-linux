@@ -358,27 +358,12 @@ struct
 end
 
 (* ------------------------------------------------------------------------ *)
-(* ---  VC-Check                                                        --- *)
-(* ------------------------------------------------------------------------ *)
-
-module VC_Check =
-struct
-  type t = { qed : F.term ; raw : F.term ; goal : F.pred }
-  let pretty fmt v =
-    Format.fprintf fmt "Class %d - instance %d@\n"
-      (F.QED.id v.qed) (F.QED.id v.raw) ;
-    Format.fprintf fmt "@[<hov 2>Prove %a@]@."
-      F.pp_pred v.goal
-end
-
-(* ------------------------------------------------------------------------ *)
 (* ---  Proof Obligations Database                                      --- *)
 (* ------------------------------------------------------------------------ *)
 
 type formula =
   | GoalLemma of VC_Lemma.t
   | GoalAnnot of VC_Annot.t
-  | GoalCheck of VC_Check.t
 
 type po = t and t = {
     po_gid   : string ;  (* goal identifier *)
@@ -404,7 +389,6 @@ let get_depend = function
       Property.Set.elements ips
   | { po_formula = GoalLemma { VC_Lemma.depends = ips } } ->
       List.map LogicUsage.ip_lemma ips
-  | { po_formula = GoalCheck _ } -> []
 
 let get_file_logout w prover =
   DISK.file_logout ~pid:w.po_pid ~model:(get_model w) ~prover
@@ -513,16 +497,12 @@ let get_property =
 
 let qed_time wpo =
   match wpo.po_formula with
-  | GoalCheck _ | GoalLemma _ -> 0.0
+  | GoalLemma _ -> 0.0
   | GoalAnnot { VC_Annot.goal = g } -> GOAL.qed_time g
 
 (* -------------------------------------------------------------------------- *)
 (* --- Proof Collector                                                    --- *)
 (* -------------------------------------------------------------------------- *)
-
-let is_check t = match t.po_formula with
-  | GoalCheck _ -> true
-  | _ -> false
 
 let is_tactic t = WpPropId.is_tactic t.po_pid
 
@@ -706,7 +686,6 @@ let remove g =
 let warnings = function
   | { po_formula = GoalAnnot vcq } -> vcq.VC_Annot.warn
   | { po_formula = GoalLemma _ } -> []
-  | { po_formula = GoalCheck _ } -> []
 
 let get_time = function { prover_time=t } -> t
 let get_steps= function { prover_steps=n } -> n
@@ -786,12 +765,10 @@ let is_trivial g =
   match g.po_formula with
   | GoalLemma vc -> VC_Lemma.is_trivial vc
   | GoalAnnot vc -> VC_Annot.is_trivial vc
-  | GoalCheck _ -> false
 
 
 let reduce g =
   match g.po_formula with
-  | GoalCheck _ -> false
   | GoalLemma vc -> WpContext.on_context (get_context g) VC_Lemma.is_trivial vc
   | GoalAnnot vc -> WpContext.on_context (get_context g) VC_Annot.resolve vc
 
@@ -811,8 +788,6 @@ let compute g =
       let open Definitions in
       Some( lemma.l_cluster , depends ) ,
       WpContext.on_context ctxt VC_Lemma.sequent w
-  | GoalCheck { VC_Check.goal = goal } ->
-      None , WpContext.on_context ctxt Conditions.lemma goal
 
 let is_proved g =
   is_trivial g || List.exists (fun (_,r) -> VCS.is_valid r) (get_results g)
@@ -843,8 +818,6 @@ let pp_goal_model fmt w =
         VC_Annot.pretty fmt w.po_pid vcq (get_results w)
     | GoalLemma vca ->
         VC_Lemma.pretty fmt vca (get_results w)
-    | GoalCheck vck ->
-        VC_Check.pretty fmt vck
   end
 
 let pp_goal fmt w = WpContext.on_context (get_context w) (pp_goal_model fmt) w
@@ -972,7 +945,6 @@ let get_files w =
         [ "Goal" , VC_Annot.cache_descr ~pid:w.po_pid vcq results ]
     | GoalLemma vca ->
         [ "Lemma" , VC_Lemma.cache_descr vca results ]
-    | GoalCheck _ -> []
   in
   let result_files =
     List.fold_right

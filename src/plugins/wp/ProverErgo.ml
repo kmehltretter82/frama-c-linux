@@ -509,18 +509,9 @@ let prove_lemma context pid vca ~config ~mode =
       prove_prop ~pid ~config ~mode ~context ~axioms ~prop
     end
 
-let prove_check context pid vck ~config ~mode =
-  Task.todo
-    begin fun () ->
-      let prop = vck.VC_Check.goal in
-      let axioms = None in
-      prove_prop ~pid ~config ~mode ~context ~axioms ~prop
-    end
-
 let prove ~config ~mode wpo =
   let pid = wpo.Wpo.po_pid in
   let context = Wpo.get_context wpo in
   match wpo.Wpo.po_formula with
   | Wpo.GoalAnnot vcq -> prove_annot context pid vcq ~config ~mode
   | Wpo.GoalLemma vca -> prove_lemma context pid vca ~config ~mode
-  | Wpo.GoalCheck vck -> prove_check context pid vck ~config ~mode

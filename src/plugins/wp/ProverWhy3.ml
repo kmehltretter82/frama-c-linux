@@ -984,10 +984,6 @@ let task_of_wpo wpo =
       let prop = Lang.F.p_forall lemma.l_forall lemma.l_lemma in
       let axioms = Some(lemma.l_cluster,depends) in
       prove_prop ~pid ~prop ?axioms
-  | Wpo.GoalCheck v ->
-      let prop = v.Wpo.VC_Check.goal in
-      let axioms = None in
-      prove_prop ~pid ~prop ?axioms
 
 let altergo_step_limit = Str.regexp "^Steps limit reached:"
 

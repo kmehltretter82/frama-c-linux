@@ -364,9 +364,8 @@ let do_wpo_success goal s =
                   end
           end
     | Some prover ->
-        if not (Wpo.is_check goal) then
-          Wp_parameters.feedback ~ontty:`Silent
-            "[%a] Goal %s : Valid" VCS.pp_prover prover (Wpo.get_gid goal)
+        Wp_parameters.feedback ~ontty:`Silent
+          "[%a] Goal %s : Valid" VCS.pp_prover prover (Wpo.get_gid goal)
 
 let do_report_time fmt s =
   begin

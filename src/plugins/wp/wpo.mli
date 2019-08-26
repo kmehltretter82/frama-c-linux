@@ -94,17 +94,6 @@ sig
 
 end
 
-module VC_Check :
-sig
-
-  type t = {
-    qed : Lang.F.term ;
-    raw : Lang.F.term ;
-    goal : Lang.F.pred ;
-  }
-
-end
-
 (* ------------------------------------------------------------------------ *)
 (**{1 Proof Obligations}                                                    *)
 (* ------------------------------------------------------------------------ *)
@@ -112,7 +101,6 @@ end
 type formula =
   | GoalLemma of VC_Lemma.t
   | GoalAnnot of VC_Annot.t
-  | GoalCheck of VC_Check.t
 
 type po = t and t = {
     po_gid   : string ;  (** goal identifier *)
@@ -181,7 +169,6 @@ val is_valid: result -> bool
 val get_time: result -> float
 val get_steps: result -> int
 
-val is_check : t -> bool
 val is_tactic : t -> bool
 
 val iter :

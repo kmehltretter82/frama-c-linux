@@ -481,16 +481,6 @@ sig
 
   val release : unit -> unit (** Empty local caches *)
 
-  (** {3 Internal Checks} *)
-
-  module Check :
-  sig
-    val reset : unit -> unit
-    val set : string -> unit (* check constructor *)
-    val is_set : unit -> bool
-    val iter : (qed:term -> raw:term -> goal:pred -> unit) -> unit
-  end
-
 end
 
 

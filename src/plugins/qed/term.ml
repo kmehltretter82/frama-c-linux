@@ -722,7 +722,6 @@ struct
     mutable kid : int ;
     weak : W.t ;
     cache : term C.cache ;
-    mutable checks : STset.t STmap.t ;
     mutable builtins_fun : (term list -> tau option -> term) BUILTIN.t ;
     mutable builtins_get : (term list -> tau option -> term -> term) BUILTIN.t ;
     mutable builtins_eq  : (term -> term -> term) BUILTIN.t ;
@@ -733,7 +732,6 @@ struct
     kid = 0 ;
     weak = W.create 32993 ; (* 3-th Leyland Prime number *)
     cache = C.create ~size:0x1000 ; (* 4096 entries *)
-    checks = STmap.empty ;
     builtins_fun = BUILTIN.empty ;
     builtins_get = BUILTIN.empty ;
     builtins_eq  = BUILTIN.empty ;
@@ -743,9 +741,7 @@ struct
   let state = ref (empty ())
   let get_state () = !state
   let set_state st = state := st
-  let release () =
-    C.clear !state.cache ;
-    !state.checks <- STmap.empty
+  let release () = C.clear !state.cache
 
   let in_state st f x =
     let old = !state in
@@ -769,7 +765,6 @@ struct
     st.kid <- 0 ;
     W.clear st.weak;
     C.clear st.cache;
-    st.checks <- STmap.empty;
     st.builtins_fun <- BUILTIN.empty ;
     st.builtins_get <- BUILTIN.empty ;
     st.builtins_eq  <- BUILTIN.empty ;
@@ -811,30 +806,6 @@ struct
         tau;
       }
       in W.add !state.weak e ; e
-
-  (* -------------------------------------------------------------------------- *)
-  (* --- Checker                                                            --- *)
-  (* -------------------------------------------------------------------------- *)
-
-  let check r x =
-    let y = insert r in
-    if x != y then
-      begin
-        let s =
-          try STmap.find x !state.checks
-          with Not_found -> STset.empty in
-        !state.checks <- STmap.add x (STset.add y s) !state.checks
-      end ;
-    x
-
-  let check_unit ~qed ~raw =
-    let p = insert (Eq(qed,raw)) in p
-  (* TODO:VAR: Vars.fold (fun x p -> insert (Bind(Forall,x,p))) p.vars p *)
-
-  let iter_checks f =
-    STmap.iter
-      (fun qed s -> STset.iter (fun raw -> f ~qed ~raw) s)
-      !state.checks
 
   (* -------------------------------------------------------------------------- *)
   (* --- Constructors for normalized terms                                  --- *)

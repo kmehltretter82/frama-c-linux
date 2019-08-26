@@ -658,39 +658,6 @@ struct
   include QED
 
   (* -------------------------------------------------------------------------- *)
-  (* --- Term Checking                                                      --- *)
-  (* -------------------------------------------------------------------------- *)
-
-  module Check =
-  struct
-    let refs = Hashtbl.create 8
-    let empty = ref true
-    let register c =
-      let r = ref false in
-      Hashtbl.add refs c r ; r
-
-    let reset () =
-      Hashtbl.iter (fun _ r -> r := false) refs ; empty := true
-
-    let set c =
-      try (Hashtbl.find refs c) := true ; empty := false
-      with Not_found ->
-        Wp_parameters.warning "[Lang] unknown check '%s'" c
-
-    let iter f =
-      QED.iter_checks
-        (fun ~qed ~raw -> f ~qed ~raw ~goal:(QED.check_unit ~qed ~raw))
-
-    let is_set () = !empty
-  end
-
-  let e_imply =
-    let c = Check.register "e_imply" in
-    fun a b ->
-      let r = QED.e_imply a b in
-      if !c then QED.check (Imply(a,b)) r else r
-
-  (* -------------------------------------------------------------------------- *)
   (* --- Term Extensions                                                    --- *)
   (* -------------------------------------------------------------------------- *)
 
