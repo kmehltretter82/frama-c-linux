@@ -821,14 +821,14 @@ module Dom = struct
 
   let top = Tmap.empty
 
+  [@@@ warning "-32"]
   let print fmt dom =
     Tmap.iter (fun k v ->
         Format.fprintf fmt "%a: %a,@ " Lang.F.pp_term k Ival.pretty v)
       dom
+  [@@@ warning "+32"]
 
   let find t dom = Tmap.find t dom
-
-  let get t dom = try find t dom with Not_found -> Ival.top
 
   let narrow t v dom =
     if Ival.is_bottom v then raise Lang.Contradiction

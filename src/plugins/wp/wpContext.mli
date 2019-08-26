@@ -95,6 +95,7 @@ sig
   type key = E.key
   type data = E.data
 
+  val id : basename:string -> key -> string
   val mem : key -> bool
   val find : key -> data
   val get : key -> data option
@@ -136,6 +137,15 @@ sig
   val compile : key -> data
 end
 
+module type IData =
+sig
+  type key
+  type data
+  val name : string
+  val basename : key -> string
+  val compile : key -> string -> data
+end
+
 module type Generator =
 sig
   type key
@@ -153,5 +163,15 @@ module Generator(K : Key)(D : Data with type key = K.t) : Generator
 
 (** projectified, independent from the model, not serialized *)
 module StaticGenerator(K : Key)(D : Data with type key = K.t) : Generator
+  with type key = D.key
+   and type data = D.data
+
+(** projectified, depend on the model, not serialized *)
+module GeneratorID(K : Key)(D : IData with type key = K.t) : Generator
+  with type key = D.key
+   and type data = D.data
+
+(** projectified, independent from the model, not serialized *)
+module StaticGeneratorID(K : Key)(D : IData with type key = K.t) : Generator
   with type key = D.key
    and type data = D.data

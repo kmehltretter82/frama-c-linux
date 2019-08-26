@@ -106,30 +106,6 @@ struct
   let hash = function Global -> 0 | Kf kf -> Kernel_function.hash kf
 end
 
-let context : context Context.value = Context.create "WpContext"
-
-let configure (model,_) = List.iter (fun f -> f()) model.tuning
-let rollback = function None -> () | Some ctxt -> configure ctxt
-
-let on_context gamma f x =
-  let current = Context.push context gamma in
-  try
-    Context.configure () ;
-    configure gamma ;
-    let result = f x in
-    Context.pop context current ;
-    rollback current ; result
-  with err ->
-    Context.pop context current ;
-    rollback current ; raise err
-
-let is_defined () = Context.defined context
-let get_context () = Context.get context
-let get_model () = Context.get context |> fst
-let get_scope () = Context.get context |> snd
-
-let compute_hypotheses m f = on_context (m,Kf f) m.hypotheses ()
-
 module S =
 struct
   type t = context
@@ -146,7 +122,33 @@ struct
     if cmp<>0 then cmp else SCOPE.compare s1 s2
 end
 
-let directory () = get_context () |> S.id |> Wp_parameters.get_output_dir
+let context : (string * context) Context.value = Context.create "WpContext"
+
+let configure (model,_) = List.iter (fun f -> f()) model.tuning
+let rollback = function None -> () | Some (_,ctxt) -> configure ctxt
+
+let on_context gamma f x =
+  let id = S.id gamma in
+  let current = Context.push context (id,gamma) in
+  try
+    Context.configure () ;
+    configure gamma ;
+    let result = f x in
+    Context.pop context current ;
+    rollback current ; result
+  with err ->
+    Context.pop context current ;
+    rollback current ; raise err
+
+let is_defined () = Context.defined context
+let get_ident () = Context.get context |> fst
+let get_context () = Context.get context |> snd
+let get_model () = get_context () |> fst
+let get_scope () = get_context () |> snd
+
+let compute_hypotheses m f = on_context (m,Kf f) m.hypotheses ()
+
+let directory () = get_ident () |> Wp_parameters.get_output_dir
 
 module type Entries =
 sig
@@ -163,6 +165,7 @@ sig
   type key = E.key
   type data = E.data
 
+  val id : basename:string -> key -> string
   val mem : key -> bool
   val find : key -> data
   val get : key -> data option
@@ -186,6 +189,8 @@ let freetype a =
   with Not_found ->
     Hashtbl.add types a 1 ; a
 
+module NAMES = FCMap.Make(String)
+
 module Index(E : Entries) =
 struct
 
@@ -202,7 +207,16 @@ struct
 
   type entries = {
     mutable index : E.data MAP.t ;
+    mutable ident : string MAP.t ;
+    mutable names : int NAMES.t ;
     mutable lock : SET.t ;
+  }
+
+  let create () = {
+    index=MAP.empty;
+    ident=MAP.empty;
+    names=NAMES.empty;
+    lock=SET.empty;
   }
 
   module ENTRIES : Datatype.S with type t = entries =
@@ -211,7 +225,7 @@ struct
         type t = entries
         include Datatype.Undefined
         let mem_project = Datatype.never_any_project
-        let reprs = [{index=MAP.empty;lock=SET.empty}]
+        let reprs = [create ()]
         let name = freetype ("Wp.Context.Index." ^ E.name)
       end)
 
@@ -226,11 +240,10 @@ struct
   (* Projectified entry map, indexed by model *)
 
   let entries () : entries =
-    let cid = get_context () |> S.id in
+    let cid = get_ident () in
     try REGISTRY.find cid
     with Not_found ->
-      let e = { index=MAP.empty ; lock=SET.empty } in
-      REGISTRY.add cid e ; e
+      let e = create () in REGISTRY.add cid e ; e
 
   let clear () =
     begin
@@ -250,6 +263,21 @@ struct
   let find k = let e = entries () in MAP.find k e.index
 
   let get k = try Some (find k) with Not_found -> None
+
+  let id ~basename k =
+    begin
+      let e = entries () in
+      try MAP.find k e.ident with Not_found ->
+        let kid,id =
+          try
+            let kid = succ (NAMES.find basename e.names) in
+            kid,Printf.sprintf "%s_%d" basename kid
+          with Not_found ->
+            0,basename
+        in
+        e.names <- NAMES.add basename kid e.names ;
+        e.ident <- MAP.add k id e.ident ; id
+    end
 
   let fire k d =
     List.iter (fun f -> f k d) !demon
@@ -314,7 +342,16 @@ struct
 
   type entries = {
     mutable index : E.data MAP.t ;
+    mutable ident : string MAP.t ;
+    mutable names : int NAMES.t ;
     mutable lock : SET.t ;
+  }
+
+  let create () = {
+    index=MAP.empty;
+    ident=MAP.empty;
+    names=NAMES.empty;
+    lock=SET.empty;
   }
 
   module ENTRIES : Datatype.S with type t = entries =
@@ -322,7 +359,7 @@ struct
       (struct
         type t = entries
         include Datatype.Undefined
-        let reprs = [{index=MAP.empty;lock=SET.empty}]
+        let reprs = [create ()]
         let name = "Wp.Context.Index." ^ E.name
         let mem_project = Datatype.never_any_project
       end)
@@ -332,7 +369,7 @@ struct
       (struct
         let name = "Wp.Context." ^ E.name
         let dependencies = [Ast.self]
-        let default () = { index=MAP.empty ; lock=SET.empty }
+        let default = create
       end)
   (* Projectified entry map *)
 
@@ -356,6 +393,21 @@ struct
 
   let find k = let e = entries () in MAP.find k e.index
   let get k = try Some (find k) with Not_found -> None
+
+  let id ~basename k =
+    begin
+      let e = entries () in
+      try MAP.find k e.ident with Not_found ->
+        let kid,id =
+          try
+            let kid = succ (NAMES.find basename e.names) in
+            kid,Printf.sprintf "%s_%d" basename kid
+          with Not_found ->
+            0,basename
+        in
+        e.names <- NAMES.add basename kid e.names ;
+        e.ident <- MAP.add k id e.ident ; id
+    end
 
   let fire k d =
     List.iter (fun f -> f k d) !demon
@@ -419,6 +471,15 @@ sig
   val compile : key -> data
 end
 
+module type IData =
+sig
+  type key
+  type data
+  val name : string
+  val basename : key -> string
+  val compile : key -> string -> data
+end
+
 module type Generator =
 sig
   type key
@@ -458,6 +519,40 @@ struct
   type key = D.key
   type data = D.data
   let get = G.memoize D.compile
+  let mem = G.mem
+  let clear = G.clear
+  let remove = G.remove
+end
+
+module GeneratorID(K : Key)(D : IData with type key = K.t) =
+struct
+
+  module G = Index
+      (struct
+        include K
+        include D
+      end)
+
+  type key = D.key
+  type data = D.data
+  let get = G.memoize (fun k -> D.compile k (G.id ~basename:(D.basename k) k))
+  let mem = G.mem
+  let clear = G.clear
+  let remove = G.remove
+end
+
+module StaticGeneratorID(K : Key)(D : IData with type key = K.t) =
+struct
+
+  module G = Static
+      (struct
+        include K
+        include D
+      end)
+
+  type key = D.key
+  type data = D.data
+  let get = G.memoize (fun k -> D.compile k (G.id ~basename:(D.basename k) k))
   let mem = G.mem
   let clear = G.clear
   let remove = G.remove
