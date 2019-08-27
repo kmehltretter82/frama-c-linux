@@ -163,7 +163,9 @@ let build_simple_location lval (l : Locations.location)
     end
   | _ -> None
 
-let build_node_kind ~is_folded_base lval location =
+let build_node_kind ~is_folded_base lval kinstr =
+  (* If possible, refine the lval to a non-symbolic one *)
+  let location = !Db.Value.lval_to_loc kinstr lval in
   match build_simple_location lval location with
   | Some (vi, ival) ->
     if is_foldable_type vi.vtype && is_folded_base vi then
@@ -177,10 +179,10 @@ let build_node_kind ~is_folded_base lval location =
           Scalar (vi, typ, offset')
         with Bit_utils.NoMatchingOffset | Ival.Not_Singleton_Int ->
           (* TODO: handle Bit_utils.NoMatchingOffset (strict aliasing ?) *)
-          Scattered (lval, location)
+          Scattered (lval, kinstr)
       end
   | None ->
-    Scattered (lval, location)
+    Scattered (lval, kinstr)
 
 let default_node_locality callstack =
   match callstack with
@@ -276,21 +278,18 @@ let remove_node context node =
 (* --- Graph building --- *)
 
 (* Update or create a node *)
-let build_node context callstack location lval  =
+let build_node context callstack lval kinstr =
   let is_folded_base = is_folded context in
-  let node_kind = build_node_kind ~is_folded_base lval location in
+  let node_kind = build_node_kind ~is_folded_base lval kinstr in
   let node_locality = build_node_locality callstack node_kind in
   add_node context ~node_kind ~node_locality
 
 let build_var context callstack varinfo =
-  let location = Locations.loc_of_varinfo varinfo
-  and lval = Var varinfo, NoOffset in
-  build_node context callstack location lval
+  let lval = Var varinfo, NoOffset in
+  build_node context callstack lval Kglobal
 
 let build_lval context callstack kinstr lval =
-  (* If possible, refine the lval to a non-symbolic one *)
-  let location = !Db.Value.lval_to_loc kinstr lval in
-  let node = build_node context callstack location lval in
+  let node = build_node context callstack lval kinstr in
   update_node_values node kinstr lval;
   node
 
@@ -300,12 +299,15 @@ let build_alarm context callstack stmt alarm =
   add_node context ~node_kind ~node_locality
 
 
-exception Too_many_deps of lval
+exception Too_many_deps
 
 let build_node_deps context node =
-  let rec build_writes_deps callstack lval =
-    Self.debug ~dkey "computing deps for %a" Cil_printer.pp_lval lval;
-    let zone = !Db.Value.lval_to_zone Kglobal lval in
+  let rec build_lval_write_deps callstack kinstr lval =
+    let zone = !Db.Value.lval_to_zone kinstr lval in
+    build_write_deps callstack zone
+
+  and build_write_deps callstack zone =
+    Self.debug ~dkey "computing deps for %a" Node_kind.pretty node.node_kind;
     let writes = Studia.Writes.compute zone
     and add_deps (stmt,effects) =
       match stmt.skind with
@@ -341,7 +343,7 @@ let build_node_deps context node =
     let count = List.length writes in
     Self.debug ~dkey "%d found" count;
     if count > 20 then
-      raise (Too_many_deps lval)
+      raise Too_many_deps
     else
       List.iter add_deps writes
 
@@ -449,16 +451,23 @@ let build_node_deps context node =
   in
   update_node context node;
   let callstack = node.node_locality.loc_callstack in
-  match node.node_kind with
-  | Scalar (vi,_typ,offset) ->
-    build_writes_deps callstack (Cil_types.Var vi, offset);
-    if vi.vformal then build_arg_deps callstack vi
-  | Composite (vi) ->
-    build_writes_deps callstack (Cil_types.Var vi, Cil_types.NoOffset);
-    if vi.vformal then build_arg_deps callstack vi
-  | Scattered (_lval, _location) -> () (* TODO: implements *)
-  | Alarm (stmt,alarm) ->
-    build_alarm_deps callstack stmt alarm
+  begin match node.node_kind with
+    | Scalar (vi,_typ,offset) ->
+      let lval = (Cil_types.Var vi, offset) in
+      build_lval_write_deps callstack Kglobal lval
+    | Composite (vi) ->
+      let lval = (Cil_types.Var vi, Cil_types.NoOffset) in
+      build_lval_write_deps callstack Kglobal lval
+    | Scattered (lval,kinstr) ->
+      build_lval_write_deps callstack kinstr lval
+    | Alarm (stmt,alarm) ->
+      build_alarm_deps callstack stmt alarm
+  end;
+  begin match Node_kind.get_base node.node_kind with
+    (* TODO refine formal dependency computation for non-scalar formals *)
+    | Some vi when vi.vformal -> build_arg_deps callstack vi
+    | _ -> ()
+  end
 
 
 (* --- Graph initialization --- *)
@@ -527,10 +536,10 @@ let explore ~depth context root =
       begin
         begin try
             build_node_deps context n;
-          with Too_many_deps lval ->
+          with Too_many_deps ->
             (* TODO: give a mean to explore more dependencies *)
             Self.warning "Too many dependencies for %a ; throwing them out"
-              Cil_printer.pp_lval lval;
+              Node_kind.pretty n.node_kind;
         end;
         n.node_deps_computed <- true;
       end;

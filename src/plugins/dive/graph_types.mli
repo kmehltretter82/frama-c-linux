@@ -23,7 +23,7 @@
 type node_kind =
   | Scalar of Cil_types.varinfo * Cil_types.typ * Cil_types.offset
   | Composite of Cil_types.varinfo
-  | Scattered of Cil_types.lval * Locations.location
+  | Scattered of Cil_types.lval * Cil_types.kinstr
   | Alarm of Cil_types.stmt * Alarms.alarm
 
 type node_locality = {

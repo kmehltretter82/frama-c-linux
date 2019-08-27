@@ -23,5 +23,4 @@
 include Datatype.S with type t = Graph_types.node_kind
 
 val get_base : t -> Cil_types.varinfo option
-val to_location : t -> Locations.location option
 val to_lval : t -> Cil_types.lval option
