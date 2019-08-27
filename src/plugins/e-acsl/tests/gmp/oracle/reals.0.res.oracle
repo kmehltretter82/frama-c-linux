@@ -1,9 +1,9 @@
-[kernel:parser:decimal-float] tests/gmp/reals.c:21: Warning: 
+[kernel:parser:decimal-float] tests/gmp/reals.c:22: Warning: 
   Floating-point constant 0.2f is not represented exactly. Will use 0x1.99999a0000000p-3.
   (warn-once: no further messages from category 'parser:decimal-float' will be emitted)
 [e-acsl] beginning translation.
 [e-acsl] Warning: R to float: double rounding might cause unsoundness
-[e-acsl] tests/gmp/reals.c:18: Warning: 
+[e-acsl] tests/gmp/reals.c:19: Warning: 
   E-ACSL construct `predicate with no definition nor reads clause'
   is not yet supported.
   Ignoring annotation.
@@ -33,35 +33,35 @@
 [eva:alarm] tests/gmp/reals.c:16: Warning: assertion got status unknown.
 [eva:alarm] tests/gmp/reals.c:16: Warning: 
   function __e_acsl_assert: precondition got status unknown.
-[eva:alarm] tests/gmp/reals.c:17: Warning: assertion got status unknown.
+[eva:alarm] tests/gmp/reals.c:18: Warning: assertion got status unknown.
 [eva] using specification for function __gmpq_get_d
-[eva:alarm] tests/gmp/reals.c:17: Warning: 
+[eva:alarm] tests/gmp/reals.c:18: Warning: 
   non-finite double value. assert \is_finite(__gen_e_acsl__8);
-[eva:alarm] tests/gmp/reals.c:17: Warning: 
-  function __e_acsl_assert: precondition got status unknown.
-[eva:alarm] tests/gmp/reals.c:18: Warning: 
-  non-finite double value. assert \is_finite(__gen_e_acsl__11);
-[eva:alarm] tests/gmp/reals.c:18: Warning: 
-  non-finite double value. assert \is_finite(__gen_e_acsl__12);
-[eva:alarm] tests/gmp/reals.c:18: Warning: 
-  non-finite float value. assert \is_finite((float)__gen_e_acsl__11);
 [eva:alarm] tests/gmp/reals.c:18: Warning: 
   function __e_acsl_assert: precondition got status unknown.
-[eva:alarm] tests/gmp/reals.c:19: Warning: assertion got status unknown.
 [eva:alarm] tests/gmp/reals.c:19: Warning: 
-  non-finite double value. assert \is_finite(__gen_e_acsl__14);
+  non-finite double value. assert \is_finite(__gen_e_acsl__11);
+[eva:alarm] tests/gmp/reals.c:19: Warning: 
+  non-finite double value. assert \is_finite(__gen_e_acsl__12);
+[eva:alarm] tests/gmp/reals.c:19: Warning: 
+  non-finite float value. assert \is_finite((float)__gen_e_acsl__11);
 [eva:alarm] tests/gmp/reals.c:19: Warning: 
   function __e_acsl_assert: precondition got status unknown.
 [eva:alarm] tests/gmp/reals.c:20: Warning: assertion got status unknown.
-[eva] using specification for function __gmpq_sub
+[eva:alarm] tests/gmp/reals.c:20: Warning: 
+  non-finite double value. assert \is_finite(__gen_e_acsl__14);
 [eva:alarm] tests/gmp/reals.c:20: Warning: 
   function __e_acsl_assert: precondition got status unknown.
-[eva] using specification for function __gmpq_mul
-[eva:alarm] tests/gmp/reals.c:24: Warning: 
+[eva:alarm] tests/gmp/reals.c:21: Warning: assertion got status unknown.
+[eva] using specification for function __gmpq_sub
+[eva:alarm] tests/gmp/reals.c:21: Warning: 
   function __e_acsl_assert: precondition got status unknown.
-[eva:alarm] tests/gmp/reals.c:25: Warning: assertion got status unknown.
-[eva] using specification for function __gmpq_set_si
+[eva] using specification for function __gmpq_mul
 [eva:alarm] tests/gmp/reals.c:25: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[eva:alarm] tests/gmp/reals.c:26: Warning: assertion got status unknown.
+[eva] using specification for function __gmpq_set_si
+[eva:alarm] tests/gmp/reals.c:26: Warning: 
   function __e_acsl_assert: precondition got status unknown.
 [eva] using specification for function __gmpq_set
 [eva] using specification for function __gmpq_div
@@ -69,7 +69,7 @@
   function __e_acsl_assert: precondition got status unknown.
 [eva:alarm] tests/gmp/reals.c:6: Warning: 
   function __gen_e_acsl_avg: postcondition got status unknown.
-[eva:alarm] tests/gmp/reals.c:31: Warning: assertion got status unknown.
-[eva:alarm] tests/gmp/reals.c:31: Warning: 
+[eva:alarm] tests/gmp/reals.c:32: Warning: assertion got status unknown.
+[eva:alarm] tests/gmp/reals.c:32: Warning: 
   function __e_acsl_assert: precondition got status unknown.
 [eva] done for function main

@@ -14,6 +14,7 @@ int main(void) {
   /*@ assert 3 != 1.5; */ ;
   /*@ assert 3 == 1.5 + 1.5; */ ;
   /*@ assert 0.1 == 0.1; */ ;
+  /*@ assert (double)1.0 == 1.0; */ ;
   /*@ assert (double)0.1 != 0.1; */ ;
   /*@ assert (float)0.1 != (double)0.1; */ ;
   /*@ assert (double)1.1 != 1 + 0.1 ;*/ ;
