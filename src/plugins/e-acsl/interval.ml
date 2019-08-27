@@ -148,14 +148,16 @@ let lift_binop ~safe_float f i1 i2 = match i1, i2 with
              | FDouble ->
                -. Transitioning.Float.max_float,
                Transitioning.Float.max_float
-             | FLongDouble -> raise Exit
+             | FLongDouble ->
+               raise Exit
            in
            if mini >= minf && maxi <= maxf then Float(k, None) else Rational
          with Z.Overflow | Exit ->
            Rational)
       | None, Some _ | Some _, None ->
         assert false
-    else Rational (* sound over-approximation *)
+    else
+      Rational (* sound over-approximation *)
   | (Ival _ | Float _ | Rational), (Float _ | Rational)
   | Rational, Ival _ ->
     Rational
