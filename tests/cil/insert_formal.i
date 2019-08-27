@@ -1,5 +1,6 @@
 /* run.config
-OPT: -load-script tests/cil/insert_formal.ml -print
+EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
+OPT: -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs -print
 */
 
 //                   v
