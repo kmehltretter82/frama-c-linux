@@ -53,8 +53,10 @@ open Cil_types
 (** Possible types infered by the system. *)
 
 type number_ty = private
-  | C_type of ikind
+  | C_integer of ikind
+  | C_float of fkind
   | Gmpz
+  | Rational
   | Real
   | Nan
 
@@ -64,8 +66,9 @@ module Datatype: Datatype.S_with_collections with type t = number_ty
 
 val c_int: number_ty
 val ikind: ikind -> number_ty
+val fkind: fkind -> number_ty
 val gmpz: number_ty
-val real: number_ty
+val rational: number_ty
 val nan: number_ty
 
 (** {3 Useful operations over {!number_ty}} *)
@@ -139,7 +142,7 @@ val unsafe_set: term -> ?ctx:number_ty -> number_ty -> unit
 (** {2 Typing/types-related utils} *)
 (*****************************************************************************)
 
-val ty_of_interv: ?ctx:number_ty -> Ival.t -> number_ty
+val ty_of_interv: ?ctx:number_ty -> Interval.t -> number_ty
 (* Compute the smallest type (bigger than [int]) which can contain the whole
    interval. It is the \theta operator of the JFLA's paper. *)
 

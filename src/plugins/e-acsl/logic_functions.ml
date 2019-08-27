@@ -126,8 +126,11 @@ let generate_kf ~loc fname env ret_ty params_ty li =
             (* GMP's integer are arrays: consider them as pointers in function's
                parameters *)
             Gmp.Z.t_as_ptr ()
-          | Typing.C_type ik -> TInt(ik, [])
-          | Typing.Real -> assert false (* TODO RATIONAL: to be implemented *)
+          | Typing.C_integer ik -> TInt(ik, [])
+          | Typing.C_float ik -> TFloat(ik, [])
+          (* for the time being, no reals but rationals instead *)
+          | Typing.Rational -> Real.t ()
+          | Typing.Real -> Error.not_yet "real number"
           | Typing.Nan -> Typing.typ_of_lty lvi.lv_type
         in
         (* build the formals: cannot use [Cil.makeFormal] since the function
@@ -190,14 +193,7 @@ let generate_kf ~loc fname env ret_ty params_ty li =
        before generating the code (code generation invokes typing) *)
     let env =
       let add env lvi vi =
-        let i =
-          try
-            Interval.interv_of_typ vi.vtype
-          with
-          | Interval.Not_a_number
-          | Interval.Is_a_real ->
-            Ival.inject_range None None
-        in
+        let i = Interval.interv_of_typ vi.vtype in
         Interval.Env.add lvi i;
         Env.Logic_binding.add_binding env lvi vi
       in

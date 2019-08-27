@@ -83,7 +83,6 @@ let add_cast ~loc ?name env ctx strnum t_opt e =
     e, env
   in
   let e, env = match strnum with
-    (* TODO RATIONAL: make this matching consistent *)
     | Str_Z -> mk_mpz e
     | Str_R -> Real.mk_real ~loc ?name e env t_opt
     | C_number -> e, env
@@ -149,42 +148,38 @@ let constant_to_exp ~loc t c =
   in
   match c with
   | Integer(n, _repr) ->
-    (try
-       let ity = Typing.get_number_ty t in
-       match ity with
-       | Typing.Nan ->
-         assert false
-       | Typing.Real ->
-         (* TODO RATIONAL:
-            - is it possible?
-            - why converting the integer to a string? *)
+    let ity = Typing.get_number_ty t in
+    (match ity with
+     | Typing.Nan -> assert false
+     | Typing.Real -> Error.not_yet "real number constant"
+     | Typing.Rational -> mk_real (Integer.to_string n)
+     | Typing.Gmpz ->
+       (* too large integer *)
+       Cil.mkString ~loc (Integer.to_string n), Str_Z
+     | Typing.C_float _fkind -> assert false (* TODO RATIONAL *)
+     | Typing.C_integer kind ->
+       let cast = Typing.get_cast t in
+       match cast, kind with
+       | Some ty, (ILongLong | IULongLong) when Gmp.Z.is_t ty ->
+         (* too large integer *)
+         Cil.mkString ~loc (Integer.to_string n), Str_Z
+       | Some ty, _ when Real.is_t ty ->
          mk_real (Integer.to_string n)
-       | Typing.Gmpz ->
-         raise Cil.Not_representable
-       | Typing.C_type kind ->
-         let cast = Typing.get_cast t in
-         match cast, kind with
-         (* TODO RATIONAL: why are the two first cases not the same?
-            (exception vs builder) *)
-         | Some ty, (ILongLong | IULongLong) when Gmp.Z.is_t ty ->
-           raise Cil.Not_representable
-         | Some ty, (ILongLong | IULongLong) when Real.is_t ty ->
-           mk_real (Integer.to_string n)
-         | (None | Some _), _ ->
-           (* do not keep the initial string representation because the
-              generated constant must reflect its type computed by the type
-              system. For instance, when translating [INT_MAX+1], we must
-              generate a [long long] addition and so [1LL]. If we keep the
-              initial string representation, the kind would be ignored in the
-              generated code and so [1] would be generated. *)
-           Cil.kinteger64 ~loc ~kind n, C_number
-     with Cil.Not_representable ->
-       (* too big integer *)
-       Cil.mkString ~loc (Integer.to_string n), Str_Z)
+       | (None | Some _), _ ->
+         (* do not keep the initial string representation because the generated
+            constant must reflect its type computed by the type system. For
+            instance, when translating [INT_MAX+1], we must generate a [long
+            long] addition and so [1LL]. If we keep the initial string
+            representation, the kind would be ignored in the generated code and
+            so [1] would be generated. *)
+         Cil.kinteger64 ~loc ~kind n, C_number)
   | LStr s -> Cil.new_exp ~loc (Const (CStr s)), C_number
   | LWStr s -> Cil.new_exp ~loc (Const (CWStr s)), C_number
   | LChr c -> Cil.new_exp ~loc (Const (CChr c)), C_number
-  | LReal {r_literal=s; r_nearest=_; r_lower=_; r_upper=_} -> mk_real s
+  | LReal lr ->
+    if lr.r_lower = lr.r_upper
+    then Cil.kfloat ~loc FDouble lr.r_nearest, C_number
+    else mk_real lr.r_literal
   | LEnum e -> Cil.new_exp ~loc (Const (CEnum e)), C_number
 
 let conditional_to_exp ?(name="if") loc t_opt e1 (e2, env2) (e3, env3) =
@@ -436,14 +431,14 @@ and context_insensitive_term_to_exp kf env t =
     Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)), env, C_number, ""
   | TBinOp(MinusPP, t1, t2) ->
     begin match Typing.get_number_ty t with
-      | Typing.C_type _ ->
+      | Typing.C_integer _ ->
         let e1, env = term_to_exp kf env t1 in
         let e2, env = term_to_exp kf env t2 in
         let ty = Typing.get_typ t in
         Cil.new_exp ~loc (BinOp(MinusPP, e1, e2, ty)), env, C_number, ""
       | Typing.Gmpz ->
         not_yet env "pointer subtraction resulting in gmp"
-      | Typing.Real | Typing.Nan ->
+      | Typing.(C_float _ | Rational | Real | Nan) ->
         assert false
     end
   | TCastE(ty, t') ->
@@ -497,7 +492,6 @@ and context_insensitive_term_to_exp kf env t =
                let e, env =
                  try
                    let ty = Typing.typ_of_number_ty param_ty in
-                   (* TODO RATIONAL: check [Not_a_strnum] *)
                    add_cast loc env (Some ty) C_number (Some targ) e
                  with Typing.Not_a_number ->
                    e, env
@@ -604,7 +598,7 @@ and comparison_to_exp
   in
   let e2, env = term_to_exp kf env t2 in
   match ity with
-  | Typing.C_type _ | Typing.Nan ->
+  | Typing.C_integer _ | Typing.C_float _ | Typing.Nan ->
     Cil.mkBinOp ~loc bop e1 e2, env
   | Typing.Gmpz ->
     let _, e, env = Env.new_var
@@ -617,8 +611,10 @@ and comparison_to_exp
            [ Misc.mk_call ~loc ~result:(Cil.var v) "__gmpz_cmp" [ e1; e2 ] ])
     in
     Cil.new_exp ~loc (BinOp(bop, e, Cil.zero ~loc, Cil.intType)), env
-  | Typing.Real ->
+  | Typing.Rational ->
     Real.cmp ~loc bop e1 e2 env t_opt
+  | Typing.Real ->
+    Error.not_yet "comparison involving real numbers"
 
 and at_to_exp_no_lscope env t_opt label e =
   let stmt = E_acsl_label.get_stmt (Env.get_visitor env) label in
@@ -672,12 +668,14 @@ and env_of_li li kf env loc =
   let vi, vi_e, env = Env.Logic_binding.add ~ty env li.l_var_info in
   let e, env = term_to_exp kf env t in
   let stmt = match Typing.get_number_ty t with
-    | Typing.C_type _ | Typing.Nan ->
+    | Typing.(C_integer _ | C_float _ | Nan) ->
       Cil.mkStmtOneInstr (Set (Cil.var vi, e, loc))
     | Typing.Gmpz ->
       Gmp.init_set ~loc (Cil.var vi) vi_e e
-    | Typing.Real ->
+    | Typing.Rational ->
       Real.init_set ~loc (Cil.var vi) vi_e e
+    | Typing.Real ->
+      Error.not_yet "real number"
   in
   Env.add_stmt env stmt
 
@@ -739,8 +737,8 @@ and named_predicate_content_to_exp ?name kf env p =
       kf
       env
       (Logic_const.pand ~loc
-	 (Logic_const.pimplies ~loc (p1, p2),
-	  Logic_const.pimplies ~loc (p2, p1)))
+         (Logic_const.pimplies ~loc (p1, p2),
+          Logic_const.pimplies ~loc (p2, p1)))
   | Pnot p ->
     let e, env = named_predicate_to_exp kf env p in
     Cil.new_exp ~loc (UnOp(LNot, e, Cil.intType)), env
@@ -919,11 +917,11 @@ let term_to_exp typ t =
   (* infer a context from the given [typ] whenever possible *)
   let ctx_of_typ ty =
     if Gmp.Z.is_t ty then Typing.gmpz
-    else if Real.is_t ty then Typing.real
+    else if Real.is_t ty then Typing.rational
     else
       match ty with
       | TInt(ik, _) -> Typing.ikind ik
-      | TFloat _ -> Typing.real
+      | TFloat(fk, _) -> Typing.fkind fk
       | _ -> Typing.nan
   in
   let ctx = Extlib.opt_map ctx_of_typ typ in

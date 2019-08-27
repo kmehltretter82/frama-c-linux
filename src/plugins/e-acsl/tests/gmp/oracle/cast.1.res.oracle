@@ -1,6 +1,7 @@
 [e-acsl] beginning translation.
 [e-acsl] tests/gmp/cast.i:23: Warning: 
-  E-ACSL construct `R to Int' is not yet supported. Ignoring annotation.
+  E-ACSL construct `reals: cast from R to Z' is not yet supported.
+  Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state

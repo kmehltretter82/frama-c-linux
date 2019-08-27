@@ -37,15 +37,18 @@ let compute_quantif_guards_ref
 (******************************************************************************)
 
 type number_ty =
-  | C_type of ikind
+  | C_integer of ikind
+  | C_float of fkind
   | Gmpz
+  | Rational
   | Real
   | Nan
 
-let c_int = C_type IInt
-let ikind ik = C_type ik
+let ikind ik = C_integer ik
+let c_int = ikind IInt
 let gmpz = Gmpz
-let real = Real
+let fkind fk = C_float fk
+let rational = Rational
 let nan = Nan
 
 module D =
@@ -60,30 +63,44 @@ module D =
         if ty1 == ty2 then 0
         else
           match ty1, ty2 with
-          | C_type i1, C_type i2 ->
+          | C_integer i1, C_integer i2 ->
             if i1 = i2 then 0
             else if Cil.intTypeIncluded i1 i2 then -1 else 1
-          | (C_type _ | Gmpz | Real), Nan
-          | (C_type _ | Gmpz), Real
-          | C_type _, Gmpz ->
+          | C_float f1, C_float f2 ->
+            Stdlib.compare f1 f2
+          | (C_integer _ | C_float _ | Gmpz | Rational | Real), Nan
+          | (C_integer _ | C_float _ | Gmpz | Rational ), Real
+          | (C_integer _ | C_float _ | Gmpz), Rational
+          | (C_integer _ | C_float _), Gmpz
+          | C_integer _, C_float _ ->
             -1
-          | (Gmpz | Real | Nan), C_type _
-          | (Real | Nan), Gmpz
+          | (C_float _ | Gmpz | Rational | Real | Nan), C_integer _
+          | (Gmpz | Rational | Real | Nan), C_float _
+          | (Rational | Real | Nan), Gmpz
+          | (Real | Nan), Rational
           | Nan, Real ->
             1
-          | Gmpz, Gmpz | Real, Real | Nan, Nan -> assert false
+          | Gmpz, Gmpz
+          | Rational, Rational
+          | Real, Real
+          | Nan, Nan ->
+            assert false
 
       let equal = Datatype.from_compare
 
       let hash = function
-        | C_type ik -> 7 * Hashtbl.hash ik
+        | C_integer ik -> 7 * Hashtbl.hash ik
+        | C_float fk -> 97 * Hashtbl.hash fk
         | Gmpz -> 787
+        | Rational -> 907
         | Real -> 1011
         | Nan -> 1277
 
       let pretty fmt = function
-        | C_type k -> Printer.pp_ikind fmt k
+        | C_integer k -> Printer.pp_ikind fmt k
+        | C_float k -> Printer.pp_fkind fmt k
         | Gmpz -> Format.pp_print_string fmt "Gmpz"
+        | Rational -> Format.pp_print_string fmt "Rational"
         | Real -> Format.pp_print_string fmt "Real"
         | Nan -> Format.pp_print_string fmt "Nan"
     end)
@@ -92,40 +109,58 @@ module D =
 (** Basic operations *)
 (******************************************************************************)
 
-let join ty1 ty2 = match ty1, ty2 with
-  | Nan, Nan ->
-    Nan
-  | Nan, Real | Real, Nan ->
-    Options.fatal "[typing] join failure: real and nan"
-  | Real, Real -> Real
-  | Real, (Gmpz | C_type _) | (Gmpz | C_type _), Real ->
-    Real
-  | Nan, (Gmpz | C_type _) | (Gmpz | C_type _), Nan ->
-    Options.fatal "[typing] join failure: integer and nan"
-  | Gmpz, _ | _, Gmpz -> Gmpz
-  | C_type i1, C_type i2 ->
-    if Options.Gmp_only.get () then Gmpz
-    else
-      let ty = Cil.arithmeticConversion (TInt(i1, [])) (TInt(i2, [])) in
-      match ty with
-      | TInt(i, _) -> C_type i
-      | _ ->
-        Options.fatal "[typing] join failure: unexpected result %a"
-          Printer.pp_typ ty
+let join_cty ty1 ty2 =
+  let ty = Cil.arithmeticConversion ty1 ty2 in
+  match ty with
+  | TInt(i, _) -> C_integer i
+  | TFloat(f, _) -> C_float f
+  | _ ->
+    Options.fatal "[typing] join failure: unexpected result %a"
+      Printer.pp_typ ty
+
+let join ty1 ty2 =
+  if ty1 == ty2 then ty1
+  else
+    match ty1, ty2 with
+    | Nan, Nan | Real, Real | Rational, Rational | Gmpz, Gmpz ->
+      assert false
+    | Nan, (C_integer _ | C_float _ | Gmpz | Rational | Real as ty)
+    | (C_integer _ | C_float _ | Gmpz | Rational | Real as ty), Nan ->
+      Options.fatal "[typing] join failure: number %a and nan" D.pretty ty
+    | Real, (C_integer _ | C_float _ | Gmpz | Rational)
+    | (C_integer _ | C_float _ | Rational | Gmpz), Real ->
+      Real
+    | Rational, (C_integer _ | C_float _ | Gmpz)
+    | (C_integer _ | C_float _ | Gmpz), Rational
+    | C_float _, Gmpz
+    | Gmpz, C_float _ ->
+      Rational
+    | Gmpz, C_integer _
+    | C_integer _, Gmpz ->
+      Gmpz
+    | C_float f1, C_float f2 ->
+      join_cty (TFloat(f1, [])) (TFloat(f2, []))
+    | C_float f, C_integer n
+    | C_integer n, C_float f ->
+      join_cty (TFloat(f, [])) (TInt(n, []))
+    | C_integer i1, C_integer i2 ->
+      if Options.Gmp_only.get () then Gmpz
+      else join_cty (TInt(i1, [])) (TInt(i2, []))
 
 exception Not_a_number
 let typ_of_number_ty = function
-  | C_type ik -> TInt(ik, [])
+  | C_integer ik -> TInt(ik, [])
+  | C_float fk -> TFloat(fk, [])
   | Gmpz -> Gmp.Z.t ()
-  | Real -> Real.t ()
+  (* for the time being, no reals but rationals instead *)
+  | Rational -> Real.t ()
+  | Real -> Error.not_yet "real number type"
   | Nan -> raise Not_a_number
 
 let typ_of_lty = function
   | Ctype cty -> cty
   | Linteger -> Gmp.Z.t ()
-  | Lreal ->
-    (* TODO RATIONAL: implement this case *)
-    assert false
+  | Lreal -> Error.not_yet "real type"
   | Ltype _ | Lvar _ | Larrow _ -> Options.fatal "unexpected logic type"
 
 (******************************************************************************)
@@ -192,20 +227,31 @@ end
 
 (* Compute the smallest type (bigger than [int]) which can contain the whole
    interval. It is the \theta operator of the JFLA's paper. *)
-let ty_of_interv ?ctx i =
-  try
-    let kind = Interval.ikind_of_interv i in
-    (match ctx with
-     | None | Some (Gmpz | Nan) -> C_type kind
-     | Some (C_type ik as ctx) ->
-       (* return [ctx] type for types smaller than int to prevent superfluous
-          casts in the generated code *)
-       if Cil.intTypeIncluded kind ik then ctx else C_type kind
-     | Some Real -> Real)
-  with Cil.Not_representable ->
-    match ctx with
-    | Some Real -> Real
-    | None | Some _ -> Gmpz
+let ty_of_interv ?ctx = function
+  | Interval.Float(fk, _) -> C_float fk
+  | Interval.Rational -> Rational
+  | Interval.Real -> Real
+  | Interval.Nan -> Nan
+  | Interval.Ival iv ->
+    try
+      let kind = Interval.ikind_of_ival iv in
+      (match ctx with
+       | None
+       | Some (Gmpz | Nan) ->
+         C_integer kind
+       | Some (C_integer ik as ctx) ->
+         (* return [ctx] type for types smaller than int to prevent superfluous
+            casts in the generated code *)
+         if Cil.intTypeIncluded kind ik then ctx else C_integer kind
+       | Some (C_float _ | Rational) ->
+         Rational
+       | Some Real ->
+         Real)
+    with Cil.Not_representable ->
+      match ctx with
+      | None | Some(C_integer _ | Gmpz | Nan) -> Gmpz
+      | Some (C_float _ | Rational) -> Rational
+      | Some Real -> Real
 
 (* compute a new {!computed_info} by coercing the given type [ty] to the given
    context [ctx]. [op] is the type for the operator. *)
@@ -224,8 +270,8 @@ let coerce ~arith_operand ~ctx ~op ty =
     else { ty; op; cast = None }
 
 let number_ty_of_typ ty = match Cil.unrollType ty with
-  | TInt(ik, _) | TEnum({ ekind = ik }, _) -> C_type ik
-  | TFloat _ -> Real
+  | TInt(ik, _) | TEnum({ ekind = ik }, _) -> C_integer ik
+  | TFloat(fk, _) -> C_float fk
   | TVoid _ | TPtr _ | TArray _ | TFun _ | TComp _ | TBuiltin_va_list _ -> Nan
   | TNamed _ -> assert false
 
@@ -243,12 +289,8 @@ let ty_of_logic_ty ?term lty =
   | Some t ->
     if Options.Gmp_only.get () && lty = Linteger then Gmpz
     else
-      try
-        let i = Interval.infer t in
-        ty_of_interv i
-      with
-      | Interval.Not_a_number -> nan
-      | Interval.Is_a_real -> real
+      let i = Interval.infer t in
+      ty_of_interv i
 
 (******************************************************************************)
 (** {2 Type system} *)
@@ -257,33 +299,23 @@ let ty_of_logic_ty ?term lty =
 (* generate a context [c]. Take --e-acsl-gmp-only into account iff [use_gmp_opt]
    is true. *)
 let mk_ctx ~use_gmp_opt = function
-  | C_type _ as c -> if use_gmp_opt && Options.Gmp_only.get () then Gmpz else c
-  | Gmpz | Real | Nan as c -> c
+  | C_integer _ as c ->
+    if use_gmp_opt && Options.Gmp_only.get () then Gmpz
+    else c
+  | C_float _ | Gmpz | Rational | Real | Nan as c -> c
 
 (* the number_ty corresponding to [t] whenever use as an offset.
    In that case, it cannot be a GMP, so it must be coerced to an integral type
    in that case *)
 let type_offset t =
-  try
-    let i = Interval.infer t in
-    match ty_of_interv i with
-    | Gmpz -> C_type ILongLong (* largest possible type *)
-    | ty -> ty
-  with
-  | Interval.Is_a_real ->
-    (* TODO RATIONAL: shouldn't it be 'assert false' because of typing? *)
-    C_type ILongLong
-  | Interval.Not_a_number ->
-    Options.fatal "expected an integral type for %a" Printer.pp_term t
+  let i = Interval.infer t in
+  match ty_of_interv i with
+  | Gmpz -> C_integer ILongLong (* largest possible type *)
+  | ty -> ty
 
-let type_letin li =
-  let li_t = Misc.term_of_li li in
-  match ty_of_logic_ty li_t.term_type with
-  | C_type _ | Gmpz ->
-    let i = Interval.infer li_t in
-    Interval.Env.add li.l_var_info i
-  | Real | Nan ->
-    ()
+let type_letin li li_t =
+  let i = Interval.infer li_t in
+  Interval.Env.add li.l_var_info i
 
 (* type the term [t] in a context [ctx] by taking --e-acsl-gmp-only into account
    iff [use_gmp_opt] is true. *)
@@ -308,31 +340,17 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
        (and of course also covers the missing cases). Also enforce the invariant
        that every subterm is typed, even if it is not an integer. *)
     match t.term_node with
-    | TConst (LReal _) ->
-      (* TODO RATIONAL: real: irrationals raise not_yet *)
-      dup real
-    | TConst (Integer _ | LChr _ | LEnum _)
+    | TConst (Integer _ | LChr _ | LEnum _ | LReal _)
     | TSizeOf _
     | TSizeOfStr _
     | TAlignOf _ ->
-      let ty =
-        try
-          let i = Interval.infer t in
-          ty_of_interv ?ctx i
-        with
-        | Interval.Not_a_number -> nan
-        | Interval.Is_a_real -> assert false
-      in
+      let i = Interval.infer t in
+      let ty = ty_of_interv ?ctx i in
       dup ty
+
     | TLval tlv ->
-      let ty =
-        try
-          let i = Interval.infer t in
-          ty_of_interv ?ctx i
-        with
-        | Interval.Not_a_number -> nan
-        | Interval.Is_a_real -> real
-      in
+      let i = Interval.infer t in
+      let ty = ty_of_interv ?ctx i in
       type_term_lval tlv;
       dup ty
 
@@ -340,42 +358,24 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
     | Tblock_length(_, t')
     | TSizeOfE t'
     | TAlignOfE t' ->
-      let ty =
-        try
-          let i = Interval.infer t in
-          (* [t'] must be typed, but it is a pointer *)
-          ignore (type_term ~use_gmp_opt:true ~ctx:nan t');
-          ty_of_interv ?ctx i
-        with (* this term is an integer *)
-        | Interval.Is_a_real
-        | Interval.Not_a_number -> assert false
-      in
+      let i = Interval.infer t in
+      (* [t'] must be typed, but it is a pointer *)
+      ignore (type_term ~use_gmp_opt:true ~ctx:Nan t');
+      let ty = ty_of_interv ?ctx i in
       dup ty
 
     | TBinOp (MinusPP, t1, t2) ->
-      let ty =
-        try
-          let i = Interval.infer t in
-          (* [t1] and [t2] must be typed, but they are pointers *)
-          ignore (type_term ~use_gmp_opt:true ~ctx:nan t1);
-          ignore (type_term ~use_gmp_opt:true ~ctx:nan t2);
-          ty_of_interv ?ctx i
-        with (* this term is an integer *)
-        | Interval.Is_a_real
-        | Interval.Not_a_number -> assert false
-      in
+      let i = Interval.infer t in
+      (* [t1] and [t2] must be typed, but they are pointers *)
+      ignore (type_term ~use_gmp_opt:true ~ctx:Nan t1);
+      ignore (type_term ~use_gmp_opt:true ~ctx:Nan t2);
+      let ty = ty_of_interv ?ctx i in
       dup ty
 
     | TUnOp (unop, t') ->
-      let ctx_res, ctx =
-        try
-          let i = Interval.infer t in
-          let i' = Interval.infer t' in
-          compute_ctx ?ctx (Ival.join i i')
-        with
-        | Interval.Is_a_real -> real, real
-        | Interval.Not_a_number -> assert false
-      in
+      let i = Interval.infer t in
+      let i' = Interval.infer t' in
+      let ctx_res, ctx = compute_ctx ?ctx (Interval.join i i') in
       ignore (type_term ~use_gmp_opt:true ~arith_operand:true ~ctx t');
       (match unop with
        | LNot -> c_int, ctx_res (* converted into [t == 0] in case of GMP *)
@@ -383,15 +383,11 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
 
     | TBinOp ((PlusA | MinusA | Mult | Div | Mod | Shiftlt | Shiftrt), t1, t2)
       ->
+      let i = Interval.infer t in
+      let i1 = Interval.infer t1 in
+      let i2 = Interval.infer t2 in
       let ctx_res, ctx =
-        try
-          let i = Interval.infer t in
-          let i1 = Interval.infer t1 in
-          let i2 = Interval.infer t2 in
-          compute_ctx ?ctx (Ival.join i (Ival.join i1 i2))
-        with
-        | Interval.Is_a_real -> dup real
-        | Interval.Not_a_number -> assert false
+        compute_ctx ?ctx (Interval.join i (Interval.join i1 i2))
       in
       (* it is enough to explicitly coerce when required one operand to [ctx]
          (through [arith_operand]) in order to force the type of the
@@ -410,33 +406,23 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
 
     | TBinOp ((Lt | Gt | Le | Ge | Eq | Ne), t1, t2) ->
       assert (match ctx with None -> true | Some c -> D.compare c c_int >= 0);
+      let i1 = Interval.infer t1 in
+      let i2 = Interval.infer t2 in
       let ctx =
-        try
-          let i1 = Interval.infer t1 in
-          let i2 = Interval.infer t2 in
-          mk_ctx ~use_gmp_opt:true (ty_of_interv ?ctx (Ival.join i1 i2))
-        with
-        | Interval.Is_a_real -> real
-        | Interval.Not_a_number -> nan
+        mk_ctx ~use_gmp_opt:true (ty_of_interv ?ctx (Interval.join i1 i2))
       in
       ignore (type_term ~use_gmp_opt:true ~ctx t1);
       ignore (type_term ~use_gmp_opt:true ~ctx t2);
       let ty = match ctx with
         | Nan -> c_int
-        | Real | Gmpz | C_type _ -> ctx
+        | Real | Rational | Gmpz | C_float _ | C_integer _ -> ctx
       in
       c_int, ty
 
     | TBinOp ((LAnd | LOr), t1, t2) ->
-      let ty =
-        try
-          let i1 = Interval.infer t1 in
-          let i2 = Interval.infer t2 in
-          ty_of_interv ?ctx (Ival.join i1 i2)
-        with (* this term is an integer *)
-        | Interval.Is_a_real
-        | Interval.Not_a_number -> assert false
-      in
+      let i1 = Interval.infer t1 in
+      let i2 = Interval.infer t2 in
+      let ty = ty_of_interv ?ctx (Interval.join i1 i2) in
       (* both operands fit in an int. *)
       ignore (type_term ~use_gmp_opt:true ~ctx:c_int t1);
       ignore (type_term ~use_gmp_opt:true ~ctx:c_int t2);
@@ -447,17 +433,11 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
     | TBinOp (BOr, _, _) -> Error.not_yet "bitwise or"
 
     | TCastE(_, t') ->
-      let ctx =
-        try
-          (* compute the smallest interval from the whole term [t] *)
-          let i = Interval.infer t in
-          (* nothing more to do: [i] is already more precise than what we
-             could infer from the arguments of the cast. *)
-          ty_of_interv ?ctx i
-        with
-        | Interval.Not_a_number -> nan
-        | Interval.Is_a_real -> real
-      in
+      (* compute the smallest interval from the whole term [t] *)
+      let i = Interval.infer t in
+      (* nothing more to do: [i] is already more precise than what we could
+         infer from the arguments of the cast. *)
+      let ctx = ty_of_interv ?ctx i in
       ignore (type_term ~use_gmp_opt:true ~ctx t');
       dup ctx
 
@@ -467,16 +447,10 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
       in
       ignore (type_term ~use_gmp_opt:false ~ctx:ctx1 t1);
       let i = Interval.infer t in
-      let ctx =
-        try
-          let i2 = Interval.infer t2 in
-          let i3 = Interval.infer t3 in
-          let ctx = ty_of_interv ?ctx (Ival.join i (Ival.join i2 i3)) in
-          mk_ctx ~use_gmp_opt:true ctx
-        with
-        | Interval.Is_a_real -> real
-        | Interval.Not_a_number -> nan
-      in
+      let i2 = Interval.infer t2 in
+      let i3 = Interval.infer t3 in
+      let ctx = ty_of_interv ?ctx (Interval.join i (Interval.join i2 i3)) in
+      let ctx = mk_ctx ~use_gmp_opt:true ctx in
       ignore (type_term ~use_gmp_opt:true ~ctx t2);
       ignore (type_term ~use_gmp_opt:true ~ctx t3);
       dup ctx
@@ -489,19 +463,19 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
     | TStartOf tlv ->
       (* it is a pointer, but subterms must be typed. *)
       type_term_lval tlv;
-      dup nan
+      dup Nan
 
     | Tbase_addr (_, t) ->
       (* it is a pointer, but subterms must be typed. *)
-      ignore (type_term ~use_gmp_opt:true ~ctx:nan t);
-      dup nan
+      ignore (type_term ~use_gmp_opt:true ~ctx:Nan t);
+      dup Nan
 
     | TBinOp ((PlusPI | IndexPI | MinusPI), t1, t2) ->
       (* both [t1] and [t2] must be typed. *)
-      ignore (type_term ~use_gmp_opt:true ~ctx:nan t1);
+      ignore (type_term ~use_gmp_opt:true ~ctx:Nan t1);
       let ctx = type_offset t2 in
       ignore (type_term ~use_gmp_opt:false ~ctx t2);
-      dup nan
+      dup Nan
 
     | Tapp(li, _, args) ->
       if Builtins.mem li.l_var_info.lv_name then
@@ -531,6 +505,7 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
             | None ->
               assert false
             | Some lty ->
+              (* TODO: what if the function returns a real? *)
               let ty = ty_of_logic_ty ~term:t lty in
               dup ty
           end
@@ -545,24 +520,22 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
     | Tunion _ -> Error.not_yet "tset union"
     | Tinter _ -> Error.not_yet "tset intersection"
     | Tcomprehension (_,_,_) -> Error.not_yet "tset comprehension"
-    | Trange(Some n1, Some n2) ->
-      ignore (type_term ~use_gmp_opt n1);
-      ignore (type_term ~use_gmp_opt n2);
-      (try
-         let i = Interval.infer t in
-         let ty = ty_of_interv ?ctx i in
-         dup ty
-       with
-        | Interval.Is_a_real -> dup real
-        | Interval.Not_a_number -> dup nan)
 
     | Trange(None, _) | Trange(_, None) ->
       Options.abort "unbounded ranges are not part of E-ACSl"
+    | Trange(Some n1, Some n2) ->
+      ignore (type_term ~use_gmp_opt n1);
+      ignore (type_term ~use_gmp_opt n2);
+      let i = Interval.infer t in
+      let ty = ty_of_interv ?ctx i in
+      dup ty
+
     | Tlet(li, t) ->
-      type_letin li;
       let li_t = Misc.term_of_li li in
+      type_letin li li_t;
       ignore (type_term ~use_gmp_opt:true li_t);
       dup (type_term ~use_gmp_opt:true ?ctx t).ty
+
     | Tlambda (_,_) -> Error.not_yet "lambda"
     | TDataCons (_,_) -> Error.not_yet "datacons"
     | TUpdate (_,_,_) -> Error.not_yet "update"
@@ -571,7 +544,7 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
     | TConst (LStr _ | LWStr _)
     | Ttypeof _
     | Ttype _
-    | Tempty_set  -> dup nan
+    | Tempty_set  -> dup Nan
   in
   Memo.memo
     (fun t ->
@@ -588,7 +561,7 @@ and type_term_lval (host, offset) =
 and type_term_lhost = function
   | TVar _
   | TResult _ -> ()
-  | TMem t -> ignore (type_term ~use_gmp_opt:false ~ctx:nan t)
+  | TMem t -> ignore (type_term ~use_gmp_opt:false ~ctx:Nan t)
 
 and type_term_offset = function
   | TNoOffset -> ()
@@ -613,28 +586,22 @@ let rec type_predicate p =
              a retyping is done there *)
           c_int
         | LBnone -> (* Eg: \is_finite *)
-          Error.not_yet "logic functions with no definition nor reads clause"
+          Error.not_yet "predicate with no definition nor reads clause"
         | LBreads _ | LBterm _ | LBinductive _ ->
           Options.fatal "unexpected logic definition"
       end
     | Pseparated _ -> Error.not_yet "\\separated"
     | Pdangling _ -> Error.not_yet "\\dangling"
     | Prel(_, t1, t2) ->
-      let ctx =
-        try
-          let i1 = Interval.infer t1 in
-          let i2 = Interval.infer t2 in
-          let i = Ival.join i1 i2 in
-          mk_ctx ~use_gmp_opt:true (ty_of_interv ~ctx:c_int i)
-        with
-        | Interval.Not_a_number -> nan
-        | Interval.Is_a_real -> real
-      in
+      let i1 = Interval.infer t1 in
+      let i2 = Interval.infer t2 in
+      let i = Interval.join i1 i2 in
+      let ctx = mk_ctx ~use_gmp_opt:true (ty_of_interv ~ctx:c_int i) in
       ignore (type_term ~use_gmp_opt:true ~ctx t1);
       ignore (type_term ~use_gmp_opt:true ~ctx t2);
       (match ctx with
        | Nan -> c_int
-       | Real | Gmpz | C_type _ -> ctx)
+       | Real | Rational | Gmpz | C_float _ | C_integer _ -> ctx)
     | Pand(p1, p2)
     | Por(p1, p2)
     | Pxor(p1, p2)
@@ -653,64 +620,63 @@ let rec type_predicate p =
       ignore (type_predicate p2);
       c_int
     | Plet(li, p) ->
-      type_letin li;
       let li_t = Misc.term_of_li li in
+      type_letin li li_t;
       ignore (type_term ~use_gmp_opt:true li_t);
       (type_predicate p).ty
 
     | Pforall(bounded_vars, { pred_content = Pimplies(hyps, goal) })
     | Pexists(bounded_vars, { pred_content = Pand(hyps, goal) }) ->
       let guards = !compute_quantif_guards_ref p bounded_vars hyps in
-      (try
-         List.iter
-           (fun (t1, r1, x, r2, t2) ->
-              let i1 = Interval.infer t1 in
-              let i1 = match r1 with
-                | Rlt -> Ival.add_singleton_int Integer.one i1
-                | Rle -> i1
-                | _ -> assert false
-              in
-              let i2 = Interval.infer t2 in
-              (* add one to [i2], since we increment the loop counter one more
-                 time before going outside the loop. *)
-              let i2 = match r2 with
-                | Rlt -> i2
-                | Rle -> Ival.add_singleton_int Integer.one i2
-                | _ -> assert false
-              in
-              let i = Ival.join i1 i2 in
-              let ctx = match x.lv_type with
-                | Linteger -> mk_ctx ~use_gmp_opt:true (ty_of_interv ~ctx:Gmpz i)
-                | Ctype ty ->
-                  (match Cil.unrollType ty with
-                   | TInt(ik, _) -> mk_ctx ~use_gmp_opt:true (C_type ik)
-                   | ty ->
-                     Options.fatal "unexpected type %a for quantified variable %a"
-                       Printer.pp_typ ty
-                       Printer.pp_logic_var x)
-                | lty ->
+      let iv_plus_one iv =
+        Interval.Ival (Ival.add_singleton_int Integer.one iv)
+      in
+      List.iter
+        (fun (t1, r1, x, r2, t2) ->
+           let i1 = Interval.infer t1 in
+           let i1 = match r1, i1 with
+             | Rlt, Interval.Ival iv -> iv_plus_one iv
+             | Rle, _ -> i1
+             | _ -> assert false
+           in
+           let i2 = Interval.infer t2 in
+           (* add one to [i2], since we increment the loop counter one more
+              time before going outside the loop. *)
+           let i2 = match r2, i2 with
+             | Rlt, _ -> i2
+             | Rle, Interval.Ival iv -> iv_plus_one iv
+             | _ -> assert false
+           in
+           let i = Interval.join i1 i2 in
+           let ctx = match x.lv_type with
+             | Linteger -> mk_ctx ~use_gmp_opt:true (ty_of_interv ~ctx:Gmpz i)
+             | Ctype ty ->
+               (match Cil.unrollType ty with
+                | TInt(ik, _) -> mk_ctx ~use_gmp_opt:true (C_integer ik)
+                | ty ->
                   Options.fatal "unexpected type %a for quantified variable %a"
-                    Printer.pp_logic_type lty
-                    Printer.pp_logic_var x
-              in
-              (* forcing when typing bounds prevents to generate an extra useless
-                 GMP variable when --e-acsl-gmp-only *)
-              ignore (type_term ~use_gmp_opt:false ~ctx t1);
-              ignore (type_term ~use_gmp_opt:false ~ctx t2);
-              (* if we must generate GMP code, degrade the interval in order to
-                 guarantee that [x] will be a GMP when typing the goal *)
-              let i = match ctx with
-                | C_type _ -> i
-                | Gmpz -> Ival.inject_range None None (* [ -\infty; +\infty ] *)
-                | Nan -> assert false
-                | Real -> Error.not_yet "reals: quantification"
-              in
-              Interval.Env.add x i)
-           guards;
-         (type_predicate goal).ty
-       with
-       | Interval.Not_a_number -> assert false
-       | Interval.Is_a_real -> Error.not_yet "quantification over real numbers")
+                    Printer.pp_typ ty
+                    Printer.pp_logic_var x)
+             | lty ->
+               Options.fatal "unexpected type %a for quantified variable %a"
+                 Printer.pp_logic_type lty
+                 Printer.pp_logic_var x
+           in
+           (* forcing when typing bounds prevents to generate an extra useless
+              GMP variable when --e-acsl-gmp-only *)
+           ignore (type_term ~use_gmp_opt:false ~ctx t1);
+           ignore (type_term ~use_gmp_opt:false ~ctx t2);
+           (* if we must generate GMP code, degrade the interval in order to
+              guarantee that [x] will be a GMP when typing the goal *)
+           let i = match ctx with
+             | C_integer _ -> i
+             | Gmpz -> Interval.top_ival (* [ -\infty; +\infty ] *)
+             | C_float _ | Rational | Real | Nan ->
+               Options.fatal "unexpected quantification over %a" D.pretty ctx
+           in
+           Interval.Env.add x i)
+        guards;
+      (type_predicate goal).ty
 
     | Pinitialized(_, t)
     | Pfreeable(_, t)
@@ -718,7 +684,7 @@ let rec type_predicate p =
     | Pvalid(_, t)
     | Pvalid_read(_, t)
     | Pvalid_function t ->
-      ignore (type_term ~use_gmp_opt:false ~ctx:nan t);
+      ignore (type_term ~use_gmp_opt:false ~ctx:Nan t);
       c_int
 
     | Pforall _ -> Error.not_yet "unguarded \\forall quantification"
@@ -761,7 +727,8 @@ let extract_typ t ty =
   with Not_a_number ->
     match t.term_type with
     | Ctype _ as lty -> Logic_utils.logicCType lty
-    | Linteger | Lreal -> assert false
+    | Linteger | Lreal ->
+      Options.fatal "unexpected context NaN for term %a" Printer.pp_term t
     | Ltype _ -> Error.not_yet "unsupported logic type: user-defined type"
     | Lvar _ -> Error.not_yet "unsupported logic type: type variable"
     | Larrow _ -> Error.not_yet "unsupported logic type: type arrow"

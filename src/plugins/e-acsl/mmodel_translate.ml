@@ -211,10 +211,10 @@ let call_memory_block ~loc kf name ctx env ptr r p =
   let size, env = match Typing.get_number_ty size_term with
     | Typing.Gmpz ->
       gmp_to_sizet ~loc kf env size_term p
-    | Typing.C_type _ ->
+    | Typing.(C_integer _ | C_float _) ->
       let size, env = term_to_exp kf env size_term in
       Cil.constFold false size, env
-    | Typing.Real | Typing.Nan ->
+    | Typing.(Rational | Real | Nan) ->
       assert false
   in
   (* base and base_addr *)

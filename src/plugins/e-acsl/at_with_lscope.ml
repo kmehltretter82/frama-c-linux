@@ -95,10 +95,7 @@ let rec sizes_and_shifts_from_quantifs ~loc kf lscope sizes_and_shifts =
       | _ ->
         Options.fatal "Unexpected comparison operator"
     in
-    let i =
-      try Interval.infer t_size
-      with Interval.Not_a_number | Interval.Is_a_real -> assert false
-    in
+    let iv = Interval.(extract_ival (infer t_size)) in
     (* The EXACT amount of memory that is needed can be known at runtime. This
       is because the tightest bounds for the variables can be known at runtime.
       Example: In the following predicate
@@ -116,7 +113,7 @@ let rec sizes_and_shifts_from_quantifs ~loc kf lscope sizes_and_shifts =
       beneficial. In particular, though we may allocate more memory than
       needed, the number of reads/writes into it is the same in both cases.
       Conclusion: over-approximate [t_size] *)
-    let t_size = match Ival.min_and_max i with
+    let t_size = match Ival.min_and_max iv with
       | _, Some max ->
         Logic_const.tint ~loc max
       | _, None ->
@@ -233,9 +230,9 @@ let to_exp ~loc kf env pot label =
     Cil.intType
   | Misc.PoT_term t ->
     begin match Typing.get_number_ty t with
-    | Typing.C_type _ | Typing.Nan ->
+    | Typing.(C_integer _ | C_float _ | Nan) ->
       Typing.get_typ t
-    | Typing.Real ->
+    | Typing.(Rational | Real) ->
       Error.not_yet "\\at on purely logic variables and over real type"
     | Typing.Gmpz ->
       Error.not_yet "\\at on purely logic variables and over gmp type"
@@ -259,20 +256,19 @@ let to_exp ~loc kf env pot label =
       in
       Typing.type_term ~use_gmp_opt:false t_size;
       let malloc_stmt = match Typing.get_number_ty t_size with
-      | Typing.C_type IInt ->
+      | Typing.C_integer IInt ->
         let e_size, _ = term_to_exp kf env t_size in
         let e_size = Cil.constFold false e_size in
         let malloc_stmt =
           Misc.mk_call ~loc ~result:(Cil.var vi) "malloc" [e_size]
         in
         malloc_stmt
-      | Typing.C_type _ | Typing.Gmpz ->
+      | Typing.(C_integer _ | C_float _ | Gmpz) ->
         Error.not_yet
           "\\at on purely logic variables that needs to allocate \
-            too much memory (bigger than int_max bytes)"
-      | Typing.Real | Typing.Nan ->
-        Options.fatal
-          "quantification over non-integer type is not part of E-ACSL"
+           too much memory (bigger than int_max bytes)"
+      | Typing.(Rational | Real | Nan) ->
+        Error.not_yet "quantification over non-integer type"
       in
       let free_stmt = Misc.mk_call ~loc "free" [e] in
       (* The list of stmts returned by the current closure are inserted
@@ -306,7 +302,7 @@ let to_exp ~loc kf env pot label =
       [ Cil.mkStmt ~valid_sid:true (Block block) ], env
     | Misc.PoT_term t ->
       begin match Typing.get_number_ty t with
-      | Typing.C_type _ | Typing.Nan ->
+      | Typing.(C_integer _ | C_float _ | Nan) ->
         let env = Env.push env in
         let lval, env = lval_at_index ~loc kf env (e_at, vi_at, t_index) in
         let e, env = term_to_exp kf env t in
@@ -320,7 +316,7 @@ let to_exp ~loc kf env pot label =
         (* We CANNOT return [block.bstmts] because it does NOT contain
           variable declarations. *)
         [ Cil.mkStmt ~valid_sid:true (Block block) ], env
-      | Typing.Real ->
+      | Typing.(Rational | Real) ->
         Error.not_yet "\\at on purely logic variables and over real type"
       | Typing.Gmpz ->
         Error.not_yet "\\at on purely logic variables and over gmp type"

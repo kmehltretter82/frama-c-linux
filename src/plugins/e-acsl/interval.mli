@@ -51,15 +51,30 @@
 (** {3 Useful operations on intervals} *)
 (* ************************************************************************** *)
 
-exception Is_a_real
-exception Not_a_number
+type ival =
+  | Ival of Ival.t
+  | Float of Cil_types.fkind * float option
+  | Rational
+  | Real
+  | Nan
 
-val ikind_of_interv: Ival.t -> Cil_types.ikind
+include Datatype.S_with_collections with type t = ival
+
+val is_included: t -> t -> bool
+val join: t -> t -> t
+
+val top_ival: t
+val ival: Integer.t -> Integer.t -> t
+
+(** assume [Ival _] as argument *)
+val extract_ival: t -> Ival.t
+
+val ikind_of_ival: Ival.t -> Cil_types.ikind
 (** @return the smallest ikind that contains the given interval.
     @raise Cil.Not_representable if the given interval does not fit into any C
     integral type. *)
 
-val interv_of_typ: Cil_types.typ -> Ival.t
+val interv_of_typ: Cil_types.typ -> t
 (** @return the smallest interval which contains the given C type.
     @raise Is_a_real if the given type is a float type.
     @raise Not_a_number if the given type does not represent any number. *)
@@ -72,16 +87,16 @@ val interv_of_typ: Cil_types.typ -> Ival.t
     be extended from outside. *)
 module Env: sig
   val clear: unit -> unit
-  val add: Cil_types.logic_var -> Ival.t -> unit
+  val add: Cil_types.logic_var -> t -> unit
   val remove: Cil_types.logic_var -> unit
-  val replace: Cil_types.logic_var -> Ival.t -> unit
+  val replace: Cil_types.logic_var -> t -> unit
 end
 
 (* ************************************************************************** *)
 (** {3 Inference system} *)
 (* ************************************************************************** *)
 
-val infer: Cil_types.term -> Ival.t
+val infer: Cil_types.term -> t
 (** [infer t] infers the smallest possible integer interval which the values
     of the term can fit in.
     @raise Is_a_real if the term is either a float or a real.

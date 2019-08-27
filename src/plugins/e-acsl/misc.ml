@@ -246,6 +246,7 @@ let rec ptr_index ?(loc=Location.unknown) ?(index=(Cil.zero loc)) exp =
   | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _
     -> assert false
 
+(* TODO: should not be in this file *)
 let term_of_li li =  match li.l_body with
 | LBterm t -> t
 | LBnone | LBreads _ | LBpred _ | LBinductive _ ->

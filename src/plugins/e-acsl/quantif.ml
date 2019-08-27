@@ -113,25 +113,21 @@ let rec has_empty_quantif_with_false_negative = function
     (* case 2 *)
     false
   | (t1, rel1, _, rel2, t2) :: guards ->
-    try
-      let i1 = Interval.infer t1 in
-      let i2 = Interval.infer t2 in
-      let lower_bound, _ = Ival.min_and_max i1 in
-      let _, upper_bound = Ival.min_and_max i2 in
-      match lower_bound, upper_bound with
-      | Some lower_bound, Some upper_bound ->
-        let res = match rel1, rel2 with
-          | Rle, Rle -> lower_bound > upper_bound
-          | Rle, Rlt | Rlt, Rle -> lower_bound >= upper_bound
-          | Rlt, Rlt -> lower_bound >= Z.sub upper_bound Z.one
-          | _ -> assert false
-        in
-        res (* case 1 *) || has_empty_quantif_with_false_negative guards
-      | None, _ | _, None ->
-        has_empty_quantif_with_false_negative guards
-    with
-    | Interval.Not_a_number -> assert false
-    | Interval.Is_a_real -> Error.not_yet "quantification over real numbers"
+    let iv1 = Interval.(extract_ival (infer t1)) in
+    let iv2 = Interval.(extract_ival (infer t2)) in
+    let lower_bound, _ = Ival.min_and_max iv1 in
+    let _, upper_bound = Ival.min_and_max iv2 in
+    match lower_bound, upper_bound with
+    | Some lower_bound, Some upper_bound ->
+      let res = match rel1, rel2 with
+        | Rle, Rle -> lower_bound > upper_bound
+        | Rle, Rlt | Rlt, Rle -> lower_bound >= upper_bound
+        | Rlt, Rlt -> lower_bound >= Z.sub upper_bound Z.one
+        | _ -> assert false
+      in
+      res (* case 1 *) || has_empty_quantif_with_false_negative guards
+    | None, _ | _, None ->
+      has_empty_quantif_with_false_negative guards
 
 let () = Typing.compute_quantif_guards_ref := compute_quantif_guards
 
