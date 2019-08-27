@@ -243,10 +243,8 @@ let ty_of_interv ?ctx = function
          (* return [ctx] type for types smaller than int to prevent superfluous
             casts in the generated code *)
          if Cil.intTypeIncluded kind ik then ctx else C_integer kind
-       | Some (C_float _ | Rational) ->
-         Rational
-       | Some Real ->
-         Real)
+       | Some (C_float _ | Rational | Real as ty) ->
+         ty)
     with Cil.Not_representable ->
       match ctx with
       | None | Some(C_integer _ | Gmpz | Nan) -> Gmpz

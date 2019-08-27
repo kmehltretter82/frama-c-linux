@@ -120,14 +120,42 @@ let lift_unop f = function
   | Rational | Real | Nan as i -> i
 
 let lift_binop ~safe_float f i1 i2 = match i1, i2 with
+  | Ival iv, i when Ival.is_bottom iv -> i
+  | i, Ival iv when Ival.is_bottom iv -> i
   | Ival i1, Ival i2 ->
     Ival (f i1 i2)
   | Float(k1, _), Float(k2, _) when safe_float ->
     let k = if Stdlib.compare k1 k2 >= 0 then k1 else k2 in
     Float(k, None (* lost value, if any before *))
+  | Ival iv, Float(k, _)
+  | Float(k, _), Ival iv ->
+    if safe_float
+    then
+      match Ival.min_and_max iv with
+      | None, None ->
+        (* unbounded integers *)
+        Rational
+      | Some min, Some max ->
+        (* if the interval of integers fits into the float types, then return
+           this float type; otherwise return Rational *)
+        (try
+           let to_float n = Int64.to_float (Integer.to_int64 n) in
+           let mini, maxi = to_float min, to_float max in
+           let minf, maxf = match k with
+             | FFloat ->
+               Floating_point.most_negative_single_precision_float,
+               Floating_point.max_single_precision_float
+             | FDouble -> -. Float.max_float, Float.max_float
+             | FLongDouble -> raise Exit
+           in
+           if mini >= minf && maxi <= maxf then Float(k, None) else Rational
+         with Z.Overflow | Exit ->
+           Rational)
+      | None, Some _ | Some _, None ->
+        assert false
+    else Rational (* sound over-approximation *)
   | (Ival _ | Float _ | Rational), (Float _ | Rational)
-  | (Float _ | Rational), Ival _ ->
-    (* any binary operator over a float or a rational generates a rational *)
+  | Rational, Ival _ ->
     Rational
   | (Ival _ | Float _ | Rational | Real), Real
   | Real, (Ival _ | Float _ | Rational) ->
@@ -336,7 +364,7 @@ end = struct
     let (_, p as named_p) = extract_profile ~infer old_profile t in
     try
       let old_i = LF.Hashtbl.find named_profiles named_p in
-      if is_included i old_i then true, p, old_i
+      if is_included i old_i then true, p, old_i (* fixpoint reached *)
       else begin
         let j = join i old_i in
         LF.Hashtbl.replace named_profiles named_p j;

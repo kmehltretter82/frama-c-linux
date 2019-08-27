@@ -19,37 +19,35 @@
   __e_acsl_math_INFINITY ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
   __e_acsl_sound_verdict ∈ [--..--]
 [eva] using specification for function __e_acsl_memory_init
+[eva] using specification for function __e_acsl_assert
 [eva] using specification for function __gmpq_init
 [eva] using specification for function __gmpq_set_str
 [eva] using specification for function __gmpq_set_d
-[eva] using specification for function __gmpq_cmp
-[eva] using specification for function __e_acsl_assert
-[eva:alarm] tests/gmp/reals.c:14: Warning: 
-  function __e_acsl_assert: precondition got status unknown.
-[eva] using specification for function __gmpq_clear
 [eva] using specification for function __gmpq_add
+[eva] using specification for function __gmpq_cmp
 [eva:alarm] tests/gmp/reals.c:15: Warning: 
   function __e_acsl_assert: precondition got status unknown.
+[eva] using specification for function __gmpq_clear
 [eva:alarm] tests/gmp/reals.c:16: Warning: assertion got status unknown.
 [eva:alarm] tests/gmp/reals.c:16: Warning: 
   function __e_acsl_assert: precondition got status unknown.
 [eva:alarm] tests/gmp/reals.c:18: Warning: assertion got status unknown.
 [eva] using specification for function __gmpq_get_d
 [eva:alarm] tests/gmp/reals.c:18: Warning: 
-  non-finite double value. assert \is_finite(__gen_e_acsl__8);
+  non-finite double value. assert \is_finite(__gen_e_acsl__6);
 [eva:alarm] tests/gmp/reals.c:18: Warning: 
   function __e_acsl_assert: precondition got status unknown.
 [eva:alarm] tests/gmp/reals.c:19: Warning: 
-  non-finite double value. assert \is_finite(__gen_e_acsl__11);
+  non-finite double value. assert \is_finite(__gen_e_acsl__9);
 [eva:alarm] tests/gmp/reals.c:19: Warning: 
-  non-finite double value. assert \is_finite(__gen_e_acsl__12);
+  non-finite double value. assert \is_finite(__gen_e_acsl__10);
 [eva:alarm] tests/gmp/reals.c:19: Warning: 
-  non-finite float value. assert \is_finite((float)__gen_e_acsl__11);
+  non-finite float value. assert \is_finite((float)__gen_e_acsl__9);
 [eva:alarm] tests/gmp/reals.c:19: Warning: 
   function __e_acsl_assert: precondition got status unknown.
 [eva:alarm] tests/gmp/reals.c:20: Warning: assertion got status unknown.
 [eva:alarm] tests/gmp/reals.c:20: Warning: 
-  non-finite double value. assert \is_finite(__gen_e_acsl__14);
+  non-finite double value. assert \is_finite(__gen_e_acsl__12);
 [eva:alarm] tests/gmp/reals.c:20: Warning: 
   function __e_acsl_assert: precondition got status unknown.
 [eva:alarm] tests/gmp/reals.c:21: Warning: assertion got status unknown.

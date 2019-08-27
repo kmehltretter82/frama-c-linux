@@ -156,7 +156,8 @@ let constant_to_exp ~loc t c =
      | Typing.Gmpz ->
        (* too large integer *)
        Cil.mkString ~loc (Integer.to_string n), Str_Z
-     | Typing.C_float _fkind -> assert false (* TODO RATIONAL *)
+     | Typing.C_float fkind ->
+       Cil.kfloat ~loc fkind (Int64.to_float (Integer.to_int64 n)), C_number
      | Typing.C_integer kind ->
        let cast = Typing.get_cast t in
        match cast, kind with

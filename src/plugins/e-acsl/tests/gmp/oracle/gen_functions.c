@@ -74,6 +74,8 @@ int glob = 5;
  */
 /*@ logic double f2(double x) = (double)(1 / x);
  */
+double __gen_e_acsl_f2(double x);
+
 /*@ predicate p_notyet{L}(ℤ x) = x > 0;
  */
 /*@ logic ℤ f_notyet{L}(ℤ x) = x;
@@ -203,6 +205,14 @@ int main(void)
                     (char *)"main",(char *)"t2(t1(m)) == 17",63);
   }
   __gen_e_acsl_k(9);
+  double d = 2.0;
+  /*@ assert f2(d) > 0; */
+  {
+    double __gen_e_acsl_f2_2;
+    __gen_e_acsl_f2_2 = __gen_e_acsl_f2(d);
+    __e_acsl_assert(__gen_e_acsl_f2_2 > 0.,(char *)"Assertion",
+                    (char *)"main",(char *)"f2(d) > 0",68);
+  }
   __retres = 0;
   return __retres;
 }
@@ -228,6 +238,27 @@ int __gen_e_acsl_h_short(int s)
 int __gen_e_acsl_g_hidden(int x)
 {
   return x;
+}
+
+double __gen_e_acsl_f2(double x)
+{
+  __e_acsl_mpq_t __gen_e_acsl__8;
+  __e_acsl_mpq_t __gen_e_acsl__9;
+  __e_acsl_mpq_t __gen_e_acsl_div;
+  double __gen_e_acsl__10;
+  __gmpq_init(__gen_e_acsl__8);
+  __gmpq_set_str(__gen_e_acsl__8,"1",10);
+  __gmpq_init(__gen_e_acsl__9);
+  __gmpq_set_d(__gen_e_acsl__9,x);
+  __gmpq_init(__gen_e_acsl_div);
+  __gmpq_div(__gen_e_acsl_div,(__e_acsl_mpq_struct const *)(__gen_e_acsl__8),
+             (__e_acsl_mpq_struct const *)(__gen_e_acsl__9));
+  __gen_e_acsl__10 = __gmpq_get_d((__e_acsl_mpq_struct const *)(__gen_e_acsl_div));
+  __gmpq_clear(__gen_e_acsl__8);
+  __gmpq_clear(__gen_e_acsl__9);
+  __gmpq_clear(__gen_e_acsl_div);
+  /*@ assert Eva: is_nan_or_infinite: \is_finite(__gen_e_acsl__10); */
+  return __gen_e_acsl__10;
 }
 
 int __gen_e_acsl_g(int x)
