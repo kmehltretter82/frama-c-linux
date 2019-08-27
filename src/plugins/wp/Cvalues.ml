@@ -252,7 +252,6 @@ module EQARRAYDEF = WpContext.StaticGenerator(Matrix.NATURAL)
         let lfun = Lang.generated_f ~sort:Logic.Sprop "EqArray%s_%s"
             (Matrix.id ds) (Matrix.natural_id te)
         in
-        let cluster = Definitions.matrix te in
         let denv = Matrix.denv ds in
         let tau = Matrix.tau te ds in
         let xa = Lang.freshvar ~basename:"T" tau in
@@ -269,7 +268,7 @@ module EQARRAYDEF = WpContext.StaticGenerator(Matrix.NATURAL)
           d_lfun = lfun ; d_types = 0 ;
           d_params = denv.size_var @ [xa ; xb ] ;
           d_definition = Predicate(Def,definition) ;
-          d_cluster = cluster ;
+          d_cluster = Definitions.dummy () ;
         }
     end)
 
@@ -281,7 +280,9 @@ module EQARRAY = WpContext.Generator(Matrix.NATURAL)
       type data = Lang.lfun
       let compile mtx =
         let def = EQARRAYDEF.get mtx in
-        Definitions.define_symbol def ; def.d_lfun
+        let d_cluster = Definitions.matrix (fst mtx) in
+        Definitions.define_symbol { def with d_cluster } ;
+        def.d_lfun
     end)
 
 (* -------------------------------------------------------------------------- *)
@@ -310,7 +311,7 @@ module EQCOMPDEF = WpContext.StaticGenerator(Cil_datatype.Compinfo)
         Lang.F.set_builtin lfun reduce_eqcomp ;
         {
           d_lfun = lfun ; d_types = 0 ; d_params = [xa;xb] ;
-          d_cluster = Definitions.compinfo c ;
+          d_cluster = Definitions.dummy () ;
           d_definition = Predicate(Def,def) ;
         }
     end)
@@ -322,7 +323,9 @@ module EQCOMP = WpContext.Generator(Cil_datatype.Compinfo)
       type data = Lang.lfun
       let compile ci =
         let def = EQCOMPDEF.get ci in
-        Definitions.define_symbol def ; def.d_lfun
+        let d_cluster = Definitions.compinfo ci in
+        Definitions.define_symbol { def with d_cluster } ;
+        def.d_lfun
     end)
 
 (* -------------------------------------------------------------------------- *)

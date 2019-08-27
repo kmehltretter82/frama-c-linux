@@ -540,8 +540,6 @@ let cluster_globals () =
 let cluster_memory () =
   Definitions.cluster ~id:"Compound" ~title:"Memory Compound Updates" ()
 
-let cluster_dummy () = Definitions.cluster ~id:"dummy" ()
-
 module ShiftFieldDef = WpContext.StaticGenerator(Cil_datatype.Fieldinfo)
     (struct
       let name = "MemTyped.ShiftFieldDef"
@@ -563,7 +561,7 @@ module ShiftFieldDef = WpContext.StaticGenerator(Cil_datatype.Fieldinfo)
           d_lfun = lfun ; d_types = 0 ;
           d_params = [xloc] ;
           d_definition = dfun ;
-          d_cluster = cluster_dummy () ;
+          d_cluster = Definitions.dummy () ;
         }
 
       let compile = Lang.local generate
@@ -627,7 +625,7 @@ module ShiftGen = WpContext.StaticGenerator(Cobj)
           d_lfun = shift ; d_types = 0 ;
           d_params = [xloc;xk] ;
           d_definition = dfun ;
-          d_cluster = cluster_dummy () ;
+          d_cluster = Definitions.dummy () ;
         }
 
       let compile = Lang.local generate

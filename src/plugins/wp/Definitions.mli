@@ -28,6 +28,7 @@ open Lang.F
 
 type cluster
 
+val dummy : unit -> cluster
 val cluster : id:string -> ?title:string -> ?position:Filepath.position -> unit -> cluster
 val axiomatic : axiomatic -> cluster
 val section : logic_section -> cluster
