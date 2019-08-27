@@ -164,7 +164,7 @@ let lfun_name (lfun:Lang.lfun) =
   match lfun with
   | ACSL f -> Qed.Engine.F_call (Lang.logic_id f)
   | CTOR c -> Qed.Engine.F_call (Lang.ctor_id c)
-  | Model({m_source=Generated n}) -> Qed.Engine.F_call n
+  | Model({m_source=Generated(_,n)}) -> Qed.Engine.F_call n
   | Model({m_source=Extern e}) -> e.Lang.ext_link.Lang.why3
 
 
@@ -629,12 +629,12 @@ class visitor (ctx:context) c =
     (* --- Files, Theories and Clusters --- *)
 
     method add_builtin_lib =
-      self#add_import2 ["bool"] "Bool" ;
-      self#add_import2 ["int"] "Int" ;
-      self#add_import2 ["int"] "ComputerDivision" ;
-      self#add_import2 ["real"] "RealInfix" ;
+      self#add_import_file ["bool"] "Bool" ;
+      self#add_import_file ["int"] "Int" ;
+      self#add_import_file ["int"] "ComputerDivision" ;
+      self#add_import_file ["real"] "RealInfix" ;
       self#on_library "qed";
-      self#add_import2 ["map"] "Map"
+      self#add_import_file ["map"] "Map"
 
     method on_cluster c =
       let name = Definitions.cluster_id c in
@@ -677,15 +677,15 @@ class visitor (ctx:context) c =
       | [] -> Wp_parameters.fatal "empty import option"
       | l ->
           let file, thy = Why3.Lists.chop_last l in
-          self#add_import4 file thy (Why3.Opt.get_def thy was) ~import:true
+          self#add_import_use file thy (Why3.Opt.get_def thy was) ~import:true
 
-    method add_import2 file thy =
-      self#add_import4 file thy thy ~import:true
+    method add_import_file file thy =
+      self#add_import_use ~import:true file thy thy
 
-    method add_import3 file thy name =
-      self#add_import4 file thy name ~import:false
+    method add_import_file_as file thy name =
+      self#add_import_use ~import:false file thy name
 
-    method add_import4 ~import file thy name =
+    method add_import_use ~import file thy name =
       Wp_parameters.debug ~dkey:dkey_api
         "@[use@ %s@ @[%a.%s@]@ as@ %s@]"
         (if import then "import" else "")
@@ -713,14 +713,14 @@ class visitor (ctx:context) c =
         | [file] ->
             let filenoext = filenoext file in
             copy_file file;
-            self#add_import2 [filenoext]
+            self#add_import_file [filenoext]
               (String.capitalize_ascii filenoext);
         | [file;lib] ->
             copy_file file;
-            self#add_import2 [filenoext file] lib;
+            self#add_import_file [filenoext file] lib;
         | [file;lib;name] ->
             copy_file file;
-            self#add_import3 [filenoext file] lib name;
+            self#add_import_file_as [filenoext file] lib name;
         | _ -> Wp_parameters.failure ~current:false
                  "Driver: why3.file %S not recognized (theory %s)"
                  opt thy
@@ -841,6 +841,7 @@ class visitor (ctx:context) c =
       end
 
     method on_dfun d =
+      Wp_parameters.debug ~dkey:dkey_api "Define %a@." Lang.Fun.pretty d.d_lfun ;
       let cnv = empty_cnv ctx in
       List.iter (Lang.F.add_var cnv.pool) d.d_params;
       begin
@@ -944,6 +945,13 @@ let why3_of_qed ~id ~title ~name ?axioms t =
   let goal = Definitions.cluster ~id ~title () in
   let ctx = empty_context name in
   let v = new visitor ctx goal in
+  Wp_parameters.debug ~dkey:dkey_api "%t"
+    begin fun fmt ->
+      Format.fprintf fmt "---------------------------------------------@\n" ;
+      Format.fprintf fmt "EXPORT GOAL %s@." id ;
+      Format.fprintf fmt "PROP @[<hov 2>%a@]@." Lang.F.pp_pred t ;
+      Format.fprintf fmt "---------------------------------------------@\n" ;
+    end ;
   v#add_builtin_lib;
   v#vgoal axioms t;
   let cnv = empty_cnv ~in_goal:true ~polarity:`Positive ctx in

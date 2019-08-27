@@ -242,16 +242,21 @@ let rec reduce_eqcomp = function
 (* --- ACSL Array Equality                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
-module EQARRAYDEF = WpContext.StaticGenerator(Matrix.NATURAL)
+module EQARRAY = WpContext.Generator(Matrix.NATURAL)
     (struct
       open Matrix
-      let name = "Cvalues.EqArrayDef"
+      let name = "Cvalues.EqArray"
       type key = matrix
-      type data = dfun
+      type data = lfun
       let compile (te,ds) =
-        let lfun = Lang.generated_f ~sort:Logic.Sprop "EqArray%s_%s"
-            (Matrix.id ds) (Matrix.natural_id te)
-        in
+        (* Contextual Symbol *)
+        let lfun = Lang.generated_f
+            ~context:true
+            ~sort:Logic.Sprop
+            "EqArray%s_%s" (Matrix.id ds) (Matrix.natural_id te) in
+        (* Simplification of the symbol *)
+        Lang.F.set_builtin lfun reduce_eqcomp ;
+        (* Definition of the symbol *)
         let denv = Matrix.denv ds in
         let tau = Matrix.tau te ds in
         let xa = Lang.freshvar ~basename:"T" tau in
@@ -262,40 +267,30 @@ module EQARRAYDEF = WpContext.StaticGenerator(Matrix.NATURAL)
         let tb_xs = List.fold_left e_get tb denv.index_val in
         let property = p_hyps (denv.index_range) (!equal_rec te ta_xs tb_xs) in
         let definition = p_forall denv.index_var property in
-        Lang.F.set_builtin lfun reduce_eqcomp ;
-        (* Definition of the symbol *)
-        {
+        (* Registration *)
+        Definitions.define_symbol {
+          d_cluster = Definitions.matrix te ;
           d_lfun = lfun ; d_types = 0 ;
           d_params = denv.size_var @ [xa ; xb ] ;
           d_definition = Predicate(Def,definition) ;
-          d_cluster = Definitions.dummy () ;
-        }
-    end)
-
-module EQARRAY = WpContext.Generator(Matrix.NATURAL)
-    (struct
-      open Matrix
-      let name = "Cvalues.EqArrray"
-      type key = matrix
-      type data = Lang.lfun
-      let compile mtx =
-        let def = EQARRAYDEF.get mtx in
-        let d_cluster = Definitions.matrix (fst mtx) in
-        Definitions.define_symbol { def with d_cluster } ;
-        def.d_lfun
+        } ; lfun
     end)
 
 (* -------------------------------------------------------------------------- *)
 (* --- ACSL Compound Equality                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-module EQCOMPDEF = WpContext.StaticGenerator(Cil_datatype.Compinfo)
+module EQCOMP = WpContext.Generator(Cil_datatype.Compinfo)
     (struct
-      let name = "Cvalues.EqCompDef"
+      let name = "Cvalues.EqComp"
       type key = compinfo
-      type data = dfun
+      type data = lfun
       let compile c =
-        let lfun = Lang.generated_p ("Eq" ^ Lang.comp_id c) in
+        (* Contextual Symbol *)
+        let lfun = Lang.generated_p ~context:true ("Eq" ^ Lang.comp_id c) in
+        (* Simplification of the symbol *)
+        Lang.F.set_builtin lfun reduce_eqcomp ;
+        (* Definition of the symbol *)
         let basename = if c.cstruct then "S" else "U" in
         let xa = Lang.freshvar ~basename (Lang.tau_of_comp c) in
         let xb = Lang.freshvar ~basename (Lang.tau_of_comp c) in
@@ -308,24 +303,12 @@ module EQCOMPDEF = WpContext.StaticGenerator(Cil_datatype.Compinfo)
                  (e_getfield ra fd) (e_getfield rb fd))
             c.cfields
         in
-        Lang.F.set_builtin lfun reduce_eqcomp ;
-        {
+        (* Registration *)
+        Definitions.define_symbol {
+          d_cluster = Definitions.compinfo c ;
           d_lfun = lfun ; d_types = 0 ; d_params = [xa;xb] ;
-          d_cluster = Definitions.dummy () ;
           d_definition = Predicate(Def,def) ;
-        }
-    end)
-
-module EQCOMP = WpContext.Generator(Cil_datatype.Compinfo)
-    (struct
-      let name = "Cvalues.EqComp"
-      type key = compinfo
-      type data = Lang.lfun
-      let compile ci =
-        let def = EQCOMPDEF.get ci in
-        let d_cluster = Definitions.compinfo ci in
-        Definitions.define_symbol { def with d_cluster } ;
-        def.d_lfun
+        } ; lfun
     end)
 
 (* -------------------------------------------------------------------------- *)
@@ -336,7 +319,7 @@ let equal_comp c a b = p_call (EQCOMP.get c) [a;b]
 let equal_array m a b =
   match m with
   | _obj , [None] -> p_equal a b
-  | m ->  p_call (EQARRAY.get m) (Matrix.size m @ [a;b])
+  | m -> p_call (EQARRAY.get m) (Matrix.size m @ [a;b])
 
 let equal_object obj a b =
   match obj with

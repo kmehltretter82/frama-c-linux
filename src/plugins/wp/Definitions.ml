@@ -246,8 +246,7 @@ let matrix = function
   | C_array _ -> assert false
   | C_comp c -> compinfo c
   | C_int _ | C_float _ | C_pointer _ ->
-      Cluster.memoize
-        (fun id -> newcluster ~id ~title:"Basic Arrays" ()) "Matrix"
+      cluster ~id:"Matrix" ~title:"Basic Arrays" ()
 
 let call_fun ~result lfun cc es =
   Symbol.compile (Lang.local cc) lfun ;
