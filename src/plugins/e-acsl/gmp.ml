@@ -149,8 +149,8 @@ let get_set_suffix_and_arg e =
     | TFloat((FDouble | FFloat), _) ->
       (* FFloat is a strict subset of FDouble (modulo exceptional numbers)
          Hence, calling [set_d] for both of them is sound.
-         HOWEVER: the machdep MUST NOT be vulnerable to double rounding *)
-      (* TODO RATIONAL: check machdep *)
+         HOWEVER: the machdep MUST NOT be vulnerable to double rounding
+         [TODO] check the statement above *)
       "_d", [ e ]
     | TFloat(FLongDouble, _) ->
       Error.not_yet "creating gmp from long double"
@@ -159,19 +159,7 @@ let get_set_suffix_and_arg e =
 
 let generic_affect ~loc fname lv ev e =
   let ty = Cil.typeOf ev in
-  if Z.is_t ty then begin
-    assert
-      (* Missing cast/wrong typing happened in the past *)
-      (not (Q.is_t (Cil.typeOf e)));
-    let suf, args = get_set_suffix_and_arg e in
-    Misc.mk_call ~loc (fname ^ suf) (ev :: args)
-  end else if Q.is_t ty then begin
-    assert
-      (* Missing cast/wrong typing happened in the past *)
-      (not (Z.is_t (Cil.typeOf e)));
-    (* TODO RATIONAL: [from Fonenantsoa:]
-       If we try to factorize the following the above
-       then the result is different... why ?! *)
+  if Z.is_t ty || Q.is_t ty then begin
     let suf, args = get_set_suffix_and_arg e in
     Misc.mk_call ~loc (fname ^ suf) (ev :: args)
   end else
