@@ -314,8 +314,6 @@ and context_insensitive_term_to_exp kf env t =
         comparison_to_exp kf ~loc ~name:"not" env Typing.gmpz Eq t zero (Some t)
       in
       e, env, C_number, ""
-    else if Real.is_t ty then
-      not_yet env "reals: LNot"
     else begin
       assert (Cil.isIntegralType ty);
       let e, env = term_to_exp kf env t in
