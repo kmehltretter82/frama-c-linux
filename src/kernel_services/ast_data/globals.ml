@@ -410,11 +410,11 @@ module Functions = struct
     let o = object
       method fold: 'a. (kernel_function -> 'a -> 'a) -> 'a -> 'a =
         fun f acc ->
-          fold
-            (fun kf acc -> match kf.fundec with
-               | Definition _ -> if is_definition then f kf acc else acc
-               | Declaration _ -> if is_definition then acc else f kf acc)
-            acc
+        fold
+          (fun kf acc -> match kf.fundec with
+             | Definition _ -> if is_definition then f kf acc else acc
+             | Declaration _ -> if is_definition then acc else f kf acc)
+          acc
       method mem kf =
         State.mem (get_vi kf) &&
         (is_definition = Ast_info.Function.is_definition kf.fundec)
@@ -431,11 +431,11 @@ module Functions = struct
     let o = object
       method fold: 'a. (fundec -> 'a -> 'a) -> 'a -> 'a =
         fun f acc ->
-          fold
-            (fun kf acc -> match kf.fundec with
-               | Definition(fundec, _) -> f fundec acc
-               | Declaration _ -> acc)
-            acc
+        fold
+          (fun kf acc -> match kf.fundec with
+             | Definition(fundec, _) -> f fundec acc
+             | Declaration _ -> acc)
+          acc
       method mem f = State.mem f.svar
     end in
     Parameter_category.create "functions" Cil_datatype.Fundec.ty

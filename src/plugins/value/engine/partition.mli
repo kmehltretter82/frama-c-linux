@@ -127,10 +127,10 @@ type action =
   | Restrict of Cil_types.exp * Integer.t list
   (** [Restrict (exp, list)] restricts the rationing according to the evaluation
       of the expression [exp]:
-      - for each integer [i] in [list], states in which [exp] evaluates exactly
+      – for each integer [i] in [list], states in which [exp] evaluates exactly
         to the singleton [i] receive the same unique stamp, and will thus be
         joined together but kept separate from other states;
-      - all other states are joined together.
+      – all other states are joined together.
       Previous rationing is erased and replaced by this new stamping.
       Implementation of the option -eva-split-return. *)
   | Split of Cil_types.exp * split_kind * split_monitor

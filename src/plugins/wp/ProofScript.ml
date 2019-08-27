@@ -445,13 +445,13 @@ class console ~pool ~title =
       ?range:bool -> ?vmin:int -> ?vmax:int ->
       ?filter:(Lang.F.term -> bool) -> 'a field -> unit =
       fun ?enabled ?title ?tooltip ?range ?vmin ?vmax ?filter field ->
-        ignore enabled ;
-        ignore title ;
-        ignore tooltip ;
-        ignore field ;
-        ignore vmin ; ignore vmax ;
-        ignore range ; ignore filter ;
-        ()
+      ignore enabled ;
+      ignore title ;
+      ignore tooltip ;
+      ignore field ;
+      ignore vmin ; ignore vmax ;
+      ignore range ; ignore filter ;
+      ()
 
     val mutable errors = false
     method has_error = errors

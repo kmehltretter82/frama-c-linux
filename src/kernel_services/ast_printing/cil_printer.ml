@@ -516,20 +516,20 @@ class cil_printer () = object (self)
   method without_annot:
     'a. (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a -> unit =
     fun f fmt x ->
-      let tmp = logic_printer_enabled in
-      logic_printer_enabled <- false;
-      let finally () = logic_printer_enabled <- tmp in
-      Extlib.try_finally ~finally (f fmt) x;
+    let tmp = logic_printer_enabled in
+    logic_printer_enabled <- false;
+    let finally () = logic_printer_enabled <- tmp in
+    Extlib.try_finally ~finally (f fmt) x;
 
   val mutable force_brace = false
 
   method force_brace:
     'a. (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a -> unit =
     fun f fmt x ->
-      let tmp = force_brace in
-      force_brace <- true;
-      let finally () = force_brace <- tmp in
-      Extlib.try_finally ~finally f fmt x;
+    let tmp = force_brace in
+    force_brace <- true;
+    let finally () = force_brace <- tmp in
+    Extlib.try_finally ~finally f fmt x;
 
   val current_stmt = Stack.create ()
 

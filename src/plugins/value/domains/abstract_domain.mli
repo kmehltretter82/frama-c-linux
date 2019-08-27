@@ -128,8 +128,8 @@ module type Queries = sig
         of [exp]. [Alarmset.all] is always a sound over-approximation of these
         alarms.
       - a value for the expression, which can be:
-        - `Bottom if its evaluation is infeasible;
-        - `Value (v, o) where [v] is an over-approximation of the abstract
+        – `Bottom if its evaluation is infeasible;
+        – `Value (v, o) where [v] is an over-approximation of the abstract
            value of the expression [exp], and [o] is the origin of the value. *)
 
   (** Query function for compound expressions:
@@ -232,7 +232,7 @@ module type Transfer = sig
       - [stmt] is the statement of the call site;
       - [call] represents the function call and its arguments.
       - [pre] and [post] are the states before and at the end of the call
-      respectively. *)
+        respectively. *)
   val finalize_call:
     stmt -> (location, value) call -> pre:state -> post:state -> state or_bottom
 
@@ -384,8 +384,8 @@ module type S = sig
 
   (** [initialize_variable lval loc ~initialized init_value state] initializes
       the value of the location [loc] of lvalue [lval] in [state] with:
-      - bits 0 if init_value = Zero;
-      - any bits if init_value = Top.
+      – bits 0 if init_value = Zero;
+      – any bits if init_value = Top.
       The boolean initialized is true if the location is initialized, and false
       if the location may be not initialized. *)
   val initialize_variable:

@@ -465,12 +465,12 @@ module Make
 
   (* Sound over-approximations of the effects of a function can be computed
      through its specification in three different ways:
-     - the default behavior is always an over-approximation of the function
+     – the default behavior is always an over-approximation of the function
        effects, but can be very imprecise. We use it only if the two other ways
        are inapplicable (both are strictly more precise).
-     - any behavior whose assumes clause is true in the current state is also a
+     – any behavior whose assumes clause is true in the current state is also a
        sound approximation of the function effects applied to this state.
-     - the union of any complete set of behaviors is an over-approximation of
+     – the union of any complete set of behaviors is an over-approximation of
        the function effects.
      To obtain the highest precision, the states resulting from the
      interpretation of any true behavior and of any complete set should be

@@ -408,10 +408,10 @@ class tactic
       ?range:bool -> ?vmin:int -> ?vmax:int ->
       ?filter:(Lang.F.term -> bool) -> 'a field -> unit =
       fun ?enabled ?title ?tooltip ?range ?vmin ?vmax ?filter field ->
-        let id = Tactical.ident field in
-        List.iter (fun (fd : wfield) ->
-            fd#update ?enabled ?title ?tooltip ?range ?vmin ?vmax ?filter id
-          ) wfields
+      let id = Tactical.ident field in
+      List.iter (fun (fd : wfield) ->
+          fd#update ?enabled ?title ?tooltip ?range ?vmin ?vmax ?filter id
+        ) wfields
 
     (* -------------------------------------------------------------------------- *)
     (* --- Widget Behavior                                                    --- *)
