@@ -145,7 +145,9 @@ let lift_binop ~safe_float f i1 i2 = match i1, i2 with
              | FFloat ->
                Floating_point.most_negative_single_precision_float,
                Floating_point.max_single_precision_float
-             | FDouble -> -. Float.max_float, Float.max_float
+             | FDouble ->
+               -. Transitioning.Float.max_float,
+               Transitioning.Float.max_float
              | FLongDouble -> raise Exit
            in
            if mini >= minf && maxi <= maxf then Float(k, None) else Rational
