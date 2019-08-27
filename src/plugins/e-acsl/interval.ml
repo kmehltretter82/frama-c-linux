@@ -117,7 +117,8 @@ let lift_unop f = function
     (* any unary operator over a float generates a rational
        TODO: actually, certainly possible to generate a float *)
     Rational
-  | Rational | Real | Nan as i -> i
+  | Rational | Real | Nan as i ->
+    i
 
 let lift_binop ~safe_float f i1 i2 = match i1, i2 with
   | Ival iv, i when Ival.is_bottom iv -> i
