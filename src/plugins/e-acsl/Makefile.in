@@ -54,38 +54,39 @@ SED?=sed
 #########################
 
 PLUGIN_DIR ?=.
+PLUGIN_EXTRA_DIRS:=src
 PLUGIN_ENABLE:=@ENABLE_E_ACSL@
 PLUGIN_DYNAMIC:=@DYNAMIC_E_ACSL@
 PLUGIN_NAME:=E_ACSL
-PLUGIN_CMO:= local_config \
-	options \
-	rte \
-	error \
-	builtins \
-	functions \
-	misc \
-	gmp \
-	literal_strings \
-	mmodel_analysis \
-	exit_points \
-	label \
-	lscope \
-	env \
-	real \
-	keep_status \
-	dup_functions \
-	interval \
-	typing \
-	loops \
-	quantif \
-	at_with_lscope \
-	mmodel_translate \
-	logic_functions \
-	translate \
-	temporal \
-	prepare_ast \
-	visit \
-	main
+PLUGIN_CMO:= src/local_config \
+	src/options \
+	src/rte \
+	src/error \
+	src/builtins \
+	src/functions \
+	src/misc \
+	src/gmp \
+	src/literal_strings \
+	src/mmodel_analysis \
+	src/exit_points \
+	src/label \
+	src/lscope \
+	src/env \
+	src/real \
+	src/keep_status \
+	src/dup_functions \
+	src/interval \
+	src/typing \
+	src/loops \
+	src/quantif \
+	src/at_with_lscope \
+	src/mmodel_translate \
+	src/logic_functions \
+	src/translate \
+	src/temporal \
+	src/prepare_ast \
+	src/visit \
+	src/main
 
 PLUGIN_HAS_MLI:=yes
 PLUGIN_DISTRIBUTED:=yes
@@ -93,10 +94,10 @@ PLUGIN_DISTRIBUTED:=yes
 # We "save" this variable so that it can be used once PLUGIN_DIR has been reset
 EACSL_PLUGIN_DIR:=$(PLUGIN_DIR)
 
-# Suppress a spurious warning in ocaml 4.04.0
-$(EACSL_PLUGIN_DIR)/mmodel_analysis.cmo \
-$(EACSL_PLUGIN_DIR)/mmodel_analysis.cmi: E_ACSL_BFLAGS+= -w -60
-$(EACSL_PLUGIN_DIR)/mmodel_analysis.cmx: E_ACSL_OFLAGS+= -w -60
+# Suppress a spurious warning with OCaml >= 4.04.0
+$(EACSL_PLUGIN_DIR)/src/mmodel_analysis.cmo \
+$(EACSL_PLUGIN_DIR)/src/mmodel_analysis.cmi: E_ACSL_BFLAGS+= -w -60
+$(EACSL_PLUGIN_DIR)/src/mmodel_analysis.cmx: E_ACSL_OFLAGS+= -w -60
 
 ###############
 # Local Flags #
@@ -108,7 +109,7 @@ IS_DISTRIBUTED:=no
 # Local configuration #
 #######################
 
-PLUGIN_GENERATED:= $(EACSL_PLUGIN_DIR)/local_config.ml
+PLUGIN_GENERATED:= $(EACSL_PLUGIN_DIR)/src/local_config.ml
 
 ifeq ("$(FRAMAC_INTERNAL)","yes")
 VERSION_FILE=$(FRAMAC_ROOT_SRCDIR)/VERSION
@@ -122,7 +123,7 @@ endif
 
 EACSL_VERSION:=$(shell sed -e 's/\\(.*\\)/\\1/' $(VERSION_FILE))
 
-$(EACSL_PLUGIN_DIR)/local_config.ml: $(EACSL_PLUGIN_DIR)/Makefile.in $(VERSION_FILE)
+$(EACSL_PLUGIN_DIR)/src/local_config.ml: $(EACSL_PLUGIN_DIR)/Makefile.in $(VERSION_FILE)
 	$(PRINT_MAKING) $@
 	$(RM) $@
 	$(ECHO) "(* This file was automatically generated from $<. Don't edit it. *)" >> $@
@@ -225,7 +226,7 @@ clean::
 
 EACSL_CLEANFILES = doc/doxygen/doxygen.cfg \
 	Makefile config.log config.status configure .depend autom4te.cache/* \
-	META.frama-c-e_acsl Makefile.plugin.generated local_config.ml top/*
+	META.frama-c-e_acsl Makefile.plugin.generated src/local_config.ml top/*
 
 e-acsl-distclean:: clean
 	$(PRINT_RM) generated project files
@@ -294,10 +295,10 @@ PLUGIN_HEADER_EXCEPTIONS:=
 PLUGIN_DISTRIB_TESTS:= $(EACSL_DISTRIB_TESTS)
 
 # for e-csl-distrib target:
-EACSL_OCAML_FILES = *.mli \
+EACSL_OCAML_FILES = E_ACSL.mli src/*.mli \
   $(patsubst $(EACSL_PLUGIN_DIR)/%, %, \
-    $(filter-out $(wildcard $(EACSL_PLUGIN_DIR)/*local_config.ml), \
-		 $(wildcard $(EACSL_PLUGIN_DIR)/*.ml)))
+    $(filter-out $(wildcard $(EACSL_PLUGIN_DIR)/src/*local_config.ml), \
+		 $(wildcard $(EACSL_PLUGIN_DIR)/src/*.ml)))
 
 EACSL_DISTRIB_FILES = \
   $(patsubst $(EACSL_PLUGIN_DIR)/%,%,\
@@ -371,7 +372,7 @@ EACSL_SHARE_BARE= share/e-acsl/*.[ch] share/e-acsl/*/*.[ch]
 EACSL_SHARE=$(addprefix $(EACSL_PLUGIN_DIR)/, $(EACSL_SHARE_BARE))
 EACSL_CEA_SHARE=$(filter-out $(EACSL_SPARETIMELABS), $(wildcard $(EACSL_SHARE)))
 
-EACSL_CEA_LGPL_BARE= *.ml *.mli Makefile.in configure.ac \
+EACSL_CEA_LGPL_BARE= src/*.ml src/*.mli E_ACSL.mli Makefile.in configure.ac \
   scripts/*.sh tests/print.ml man/e-acsl-gcc.sh.1
 EACSL_CEA_LGPL=$(addprefix $(EACSL_PLUGIN_DIR)/, $(EACSL_CEA_LGPL_BARE)) \
                $(EACSL_CEA_SHARE)
