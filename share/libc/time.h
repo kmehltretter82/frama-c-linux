@@ -216,9 +216,8 @@ extern int clock_gettime(clockid_t clk_id, struct timespec *tp);
     assumes no_einval: valid_clock_id(clock_id);
     assigns \result \from indirect:__fc_time, indirect:clock_id, indirect:rqtp,
                           indirect:*rqtp;
-    assigns rmtp == \null ? \empty : *rmtp \from __fc_time, indirect:clock_id,
-                                                 indirect:rqtp, indirect:*rqtp,
-                                                 indirect:rmtp;
+    assigns *rmtp \from __fc_time, indirect:clock_id, indirect:rqtp,
+                        indirect:*rqtp, indirect:rmtp;
     ensures result_interrupted: \result == EINTR;
     ensures initialization:interrupted_remaining:
       rmtp != \null ==> \initialized(&rmtp->tv_sec) && \initialized(&rmtp->tv_nsec);
@@ -263,9 +262,8 @@ extern struct tm *localtime_r(const time_t *restrict timep,
   requires valid_nanosecs: 0 <= rqtp->tv_nsec < 1000000000;
   requires valid_remaining_or_null: rmtp == \null || \valid(rmtp);
   assigns \result \from indirect:__fc_time, indirect:rqtp, indirect:*rqtp;
-  assigns rmtp == \null ? \empty : *rmtp \from indirect:__fc_time,
-                                               indirect:rqtp, indirect:*rqtp,
-                                               indirect:rmtp;
+  assigns *rmtp \from indirect:__fc_time, indirect:rqtp, indirect:*rqtp,
+                      indirect:rmtp;
   ensures result_elapsed_or_interrupted: \result == 0 || \result == -1;
   ensures initialization:interrupted_remaining:
     rmtp != \null && \result == -1 ==>
