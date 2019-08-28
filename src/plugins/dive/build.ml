@@ -301,7 +301,12 @@ let build_all_scattered_node context callstack kinstr lval =
   let is_folded_base = is_folded context in
   try
     let cells = enumerate_cells ~is_folded_base ~limit:20 lval kinstr in
-    List.map (add_or_update_node context callstack) cells
+    let add node_kind =
+      let node = add_or_update_node context callstack node_kind in
+      update_node_values node kinstr lval;
+      node
+    in
+    List.map add cells
   with NotACell ->
     Self.warning "Unable to enumerate cells for %a"
       Cil_printer.pp_lval lval;
