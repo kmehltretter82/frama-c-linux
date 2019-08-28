@@ -321,13 +321,19 @@ module type Specific_dir = sig
 
 end
 
+type existence = Must_exist | Must_not_exist | Indifferent
+
 (** signature for normalized pathnames. *)
 module type Filepath = sig
 
   exception No_file
-  exception File_exists
+  (** raised by {!set} if no file exists and [existence] is [Must_exist]. *)
 
-  val existence : Filepath.existence
+  exception File_exists
+  (** raised by {!set} if some file exists and [existence] is
+      [Must_nos_exist]. *)
+
+  val existence: existence
 
   include S with type t = Filepath.Normalized.t
 
@@ -531,7 +537,7 @@ module type Builder = sig
 
   module Filepath(X: sig
       include Input_with_arg
-      val existence: Filepath.existence
+      val existence: existence
     end): Filepath
 
   exception Cannot_build of string

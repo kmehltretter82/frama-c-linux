@@ -720,7 +720,7 @@ module LoadState =
     (struct
        let option_name = "-load"
        let arg_name = "filename"
-       let existence = Filepath.Must_exist
+       let existence = Parameter_sig.Must_exist
        let help = "load a previously-saved session from file <filename>"
      end)
 

@@ -451,7 +451,7 @@ struct
   module Filepath
       (X: sig
          include Parameter_sig.Input_with_arg
-         val existence : Filepath.existence
+         val existence : Parameter_sig.existence
        end) =
   struct
 
@@ -468,11 +468,11 @@ struct
 
     let check_existence existence fp =
       match existence with
-      | Filepath.Indifferent -> ()
-      | Filepath.Must_exist ->
+      | Parameter_sig.Indifferent -> ()
+      | Parameter_sig.Must_exist ->
         if not (Sys.file_exists (Filepath.Normalized.to_pretty_string fp)) then
           raise No_file
-      | Filepath.Must_not_exist ->
+      | Parameter_sig.Must_not_exist ->
         if Sys.file_exists (Filepath.Normalized.to_pretty_string fp) then
           raise File_exists
 

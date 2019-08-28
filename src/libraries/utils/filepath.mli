@@ -141,8 +141,6 @@ type position =
 *)
 val pp_pos : Format.formatter -> position -> unit
 
-type existence = Must_exist | Must_not_exist | Indifferent
-
 (*
   Local Variables:
   compile-command: "make -C ../../.."
