@@ -17,6 +17,13 @@ struct __fc_fenv_t {
    unsigned short __unused5 ;
 };
 typedef struct __fc_fenv_t fenv_t;
+typedef int wchar_t;
+typedef int ssize_t;
+typedef unsigned int gid_t;
+typedef unsigned int uid_t;
+typedef long off_t;
+typedef int pid_t;
+typedef unsigned int useconds_t;
 struct option {
    char const *name ;
    int has_arg ;
@@ -35,7 +42,6 @@ struct __fc_glob_t {
    int (*gl_stat)(char const * __restrict , void * __restrict ) ;
 };
 typedef struct __fc_glob_t glob_t;
-typedef int wchar_t;
 struct __fc_div_t {
    int quot ;
    int rem ;
@@ -119,9 +125,6 @@ struct __fc_pthread_t {
    int _fc ;
 };
 typedef struct __fc_pthread_t pthread_t;
-typedef int pid_t;
-typedef unsigned int gid_t;
-typedef unsigned int uid_t;
 typedef unsigned long sigset_t;
 union sigval {
    int sival_int ;
@@ -151,7 +154,6 @@ struct sockaddr {
    sa_family_t sa_family ;
    char sa_data[14] ;
 };
-typedef int ssize_t;
 struct iovec {
    void *iov_base ;
    size_t iov_len ;
@@ -239,7 +241,6 @@ typedef unsigned int blksize_t;
 typedef unsigned int dev_t;
 typedef unsigned int mode_t;
 typedef unsigned int nlink_t;
-typedef long off_t;
 struct stat {
    dev_t st_dev ;
    ino_t st_ino ;
@@ -301,7 +302,6 @@ struct __fc_fd_set {
    long __fc_fd_set[(unsigned int)1024 / ((unsigned int)8 * sizeof(long))] ;
 };
 typedef struct __fc_fd_set fd_set;
-typedef unsigned int useconds_t;
 struct flock {
    short l_type ;
    short l_whence ;
@@ -343,11 +343,11 @@ struct __fc_sigjmp_buf {
    sigset_t sigs ;
 };
 typedef struct __fc_sigjmp_buf sigjmp_buf;
-struct _code {
+struct __fc_code {
    char const *c_name ;
    int c_val ;
 };
-typedef struct _code CODE;
+typedef struct __fc_code CODE;
 typedef unsigned long rlim_t;
 struct rlimit {
    rlim_t rlim_cur ;
@@ -1147,95 +1147,6 @@ int fesetenv(fenv_t const *envp)
   return __retres;
 }
 
-extern char *optarg;
-
-int optind;
-
-extern int opterr;
-
-extern int optopt;
-
-/*@ assigns \result, *optarg, optind, opterr, optopt;
-    assigns \result
-      \from argc, *(argv + (0 .. argc - 1)), *(optstring + (0 ..));
-    assigns *optarg
-      \from argc, *(argv + (0 .. argc - 1)), *(optstring + (0 ..));
-    assigns optind
-      \from argc, *(argv + (0 .. argc - 1)), *(optstring + (0 ..));
-    assigns opterr
-      \from argc, *(argv + (0 .. argc - 1)), *(optstring + (0 ..));
-    assigns optopt
-      \from argc, *(argv + (0 .. argc - 1)), *(optstring + (0 ..));
- */
-extern int getopt(int argc, char * const *argv, char const *optstring);
-
-/*@ assigns \result, *optarg, optind, opterr, optopt,
-            *((longopts + (0 ..))->flag);
-    assigns \result
-      \from argc, *(argv + (0 .. argc - 1)), *(shortopts + (0 ..)),
-            *(longopts + (0 ..));
-    assigns *optarg
-      \from argc, *(argv + (0 .. argc - 1)), *(shortopts + (0 ..)),
-            *(longopts + (0 ..));
-    assigns optind
-      \from argc, *(argv + (0 .. argc - 1)), *(shortopts + (0 ..)),
-            *(longopts + (0 ..));
-    assigns opterr
-      \from argc, *(argv + (0 .. argc - 1)), *(shortopts + (0 ..)),
-            *(longopts + (0 ..));
-    assigns optopt
-      \from argc, *(argv + (0 .. argc - 1)), *(shortopts + (0 ..)),
-            *(longopts + (0 ..));
-    assigns *((longopts + (0 ..))->flag)
-      \from argc, *(argv + (0 .. argc - 1)), *(shortopts + (0 ..)),
-            *(longopts + (0 ..));
- */
-extern int getopt_long(int argc, char * const *argv, char const *shortopts,
-                       struct option const *longopts, int *longind);
-
-/*@ assigns \result, *optarg, optind, opterr, optopt,
-            *((longopts + (0 ..))->flag);
-    assigns \result
-      \from argc, *(argv + (0 .. argc - 1)), *(shortopts + (0 ..)),
-            *(longopts + (0 ..));
-    assigns *optarg
-      \from argc, *(argv + (0 .. argc - 1)), *(shortopts + (0 ..)),
-            *(longopts + (0 ..));
-    assigns optind
-      \from argc, *(argv + (0 .. argc - 1)), *(shortopts + (0 ..)),
-            *(longopts + (0 ..));
-    assigns opterr
-      \from argc, *(argv + (0 .. argc - 1)), *(shortopts + (0 ..)),
-            *(longopts + (0 ..));
-    assigns optopt
-      \from argc, *(argv + (0 .. argc - 1)), *(shortopts + (0 ..)),
-            *(longopts + (0 ..));
-    assigns *((longopts + (0 ..))->flag)
-      \from argc, *(argv + (0 .. argc - 1)), *(shortopts + (0 ..)),
-            *(longopts + (0 ..));
- */
-extern int getopt_long_only(int argc, char * const *argv,
-                            char const *shortopts,
-                            struct option const *longopts, int *longind);
-
-int optind = 1;
-int glob(char const *pattern, int flags,
-         int (*errfunc)(char const *epath, int eerrno), glob_t *pglob);
-
-void globfree(glob_t *pglob);
-
-/*@ ghost extern int __fc_heap_status __attribute__((__FRAMA_C_MODEL__)); */
-
-/*@
-axiomatic dynamic_allocation {
-  predicate is_allocable{L}(ℤ n) 
-    reads __fc_heap_status;
-  
-  axiom never_allocable{L}:
-    ∀ ℤ i; i < 0 ∨ i > 4294967295U ⇒ ¬is_allocable(i);
-  
-  }
- */
 /*@
 axiomatic MemCmp {
   logic ℤ memcmp{L1, L2}(char *s1, char *s2, ℤ n) 
@@ -1521,6 +1432,472 @@ predicate valid_read_nwstring{L}(wchar_t *s, ℤ n) =
 /*@
 predicate valid_wstring_or_null{L}(wchar_t *s) =
   s ≡ \null ∨ valid_wstring(s);
+
+*/
+/*@ ghost int __fc_fds[1024]; */
+/*@ requires valid_string_path: valid_read_string(path);
+    requires valid_amode: (amode & ~((4 | 2) | 1)) ≡ 0 ∨ amode ≡ 0;
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result
+      \from (indirect: path), (indirect: *(path + (0 ..))), (indirect: amode);
+ */
+extern int access(char const *path, int amode);
+
+/*@ requires valid_string_path: valid_read_string(path);
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result \from (indirect: path), (indirect: *(path + (0 ..)));
+ */
+extern int chdir(char const *path);
+
+/*@ requires valid_string_path: valid_read_string(path);
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result \from (indirect: path), (indirect: *(path + (0 ..)));
+ */
+extern int chroot(char const *path);
+
+/*@ requires valid_string_path: valid_read_string(path);
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result
+      \from (indirect: path), (indirect: *(path + (0 ..))),
+            (indirect: owner), (indirect: group);
+ */
+extern int chown(char const *path, uid_t owner, gid_t group);
+
+/*@ requires valid_fd: 0 ≤ fd < 1024;
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns __fc_fds[fd], \result;
+    assigns __fc_fds[fd] \from fd, __fc_fds[fd];
+    assigns \result \from (indirect: fd), (indirect: __fc_fds[fd]);
+ */
+extern int close(int fd);
+
+/*@ requires valid_fildes: 0 ≤ fildes < 1024;
+    ensures
+      result_valid_fildes_or_error:
+        \result ≡ -1 ∨ (\old(fildes) ≤ \result < 1024);
+    assigns __fc_fds[fildes ..], \result;
+    assigns __fc_fds[fildes ..] \from fildes;
+    assigns \result \from fildes;
+ */
+extern int dup(int fildes);
+
+/*@ requires valid_fildes: 0 ≤ fildes < 1024;
+    requires valid_fildes2: 0 ≤ fildes2 < 1024;
+    ensures
+      result_fildes2_or_error: \result ≡ \old(fildes2) ∨ \result ≡ -1;
+    assigns __fc_fds[fildes2], \result;
+    assigns __fc_fds[fildes2] \from fildes, fildes2, __fc_fds[fildes2];
+    assigns \result
+      \from fildes, fildes2, __fc_fds[fildes], __fc_fds[fildes2];
+ */
+extern int dup2(int fildes, int fildes2);
+
+/*@ requires valid_string_path: valid_read_string(path);
+    requires valid_string_arg: valid_read_string(arg);
+    assigns \result;
+    assigns \result \from *(path + (0 ..)), *(arg + (0 ..));
+ */
+extern int execl(char const *path, char const *arg, void * const *__va_params);
+
+/*@ requires valid_string_path: valid_read_string(path);
+    requires valid_string_arg: valid_read_string(arg);
+    assigns \result;
+    assigns \result \from *(path + (0 ..)), *(arg + (0 ..));
+ */
+extern int execle(char const *path, char const *arg,
+                  void * const *__va_params);
+
+/*@ requires valid_string_path: valid_read_string(path);
+    requires valid_string_arg: valid_read_string(arg);
+    assigns \result;
+    assigns \result \from *(path + (0 ..)), *(arg + (0 ..));
+ */
+extern int execlp(char const *path, char const *arg,
+                  void * const *__va_params);
+
+/*@ requires valid_string_path: valid_read_string(path);
+    requires valid_string_argv0: valid_read_string(*(argv + 0));
+    assigns \result;
+    assigns \result \from *(path + (0 ..)), *(argv + (0 ..));
+ */
+extern int execv(char const *path, char * const *argv);
+
+/*@ requires valid_path: valid_read_string(path);
+    requires valid_argv0: valid_read_string(*(argv + 0));
+    assigns \result;
+    assigns \result \from *(path + (0 ..)), *(argv + (0 ..));
+ */
+extern int execve(char const *path, char * const *argv, char * const *env);
+
+/*@ requires valid_string_path: valid_read_string(path);
+    requires valid_string_argv0: valid_read_string(*(argv + 0));
+    assigns \result;
+    assigns \result \from *(path + (0 ..)), *(argv + (0 ..));
+ */
+extern int execvp(char const *path, char * const *argv);
+
+/*@ ensures never_terminates: \false;
+    assigns \nothing; */
+extern  __attribute__((__noreturn__)) void _exit(int);
+
+/*@ ensures
+      result_ok_child_or_error:
+        \result ≡ 0 ∨ \result > 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result \from \nothing;
+ */
+extern pid_t fork(void);
+
+/*@ requires valid_buf: \valid(buf + (0 .. size - 1));
+    ensures result_ok_or_error: \result ≡ \null ∨ \result ≡ \old(buf);
+    assigns *(buf + (0 .. size - 1)), \result;
+    assigns *(buf + (0 .. size - 1)) \from (indirect: buf), (indirect: size);
+    assigns \result \from buf, (indirect: size);
+ */
+extern char *getcwd(char *buf, size_t size);
+
+/*@ assigns \result;
+    assigns \result \from \nothing; */
+extern gid_t getegid(void);
+
+/*@ assigns \result;
+    assigns \result \from \nothing; */
+extern uid_t geteuid(void);
+
+/*@ assigns \result;
+    assigns \result \from \nothing; */
+extern gid_t getgid(void);
+
+extern char volatile __fc_hostname[64];
+
+/*@ requires name_has_room: \valid(name + (0 .. len - 1));
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result, *(name + (0 .. len - 1));
+    assigns \result
+      \from (indirect: __fc_hostname[0 .. len]), (indirect: len);
+    assigns *(name + (0 .. len - 1))
+      \from (indirect: __fc_hostname[0 .. len]), (indirect: len);
+ */
+extern int gethostname(char *name, size_t len);
+
+/*@ requires name_valid_string: valid_read_nstring(name, len);
+    requires bounded_len: len ≤ 64;
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns __fc_hostname[0 .. len], \result;
+    assigns __fc_hostname[0 .. len]
+      \from *(name + (0 .. len - 1)), (indirect: len);
+    assigns \result \from (indirect: __fc_hostname[0 .. len]);
+ */
+extern int sethostname(char const *name, size_t len);
+
+/*@ assigns \result;
+    assigns \result \from (indirect: pid); */
+extern pid_t getpgid(pid_t pid);
+
+/*@ assigns \result;
+    assigns \result \from \nothing; */
+extern pid_t getpgrp(void);
+
+/*@ assigns \result;
+    assigns \result \from \nothing; */
+extern pid_t getpid(void);
+
+/*@ assigns \result;
+    assigns \result \from \nothing; */
+extern pid_t getppid(void);
+
+/*@ assigns \result;
+    assigns \result \from \nothing; */
+extern pid_t getsid(pid_t);
+
+/*@ assigns \result;
+    assigns \result \from \nothing; */
+extern uid_t getuid(void);
+
+/*@ ensures result_true_or_false: \result ≡ 0 ∨ \result ≡ 1;
+    assigns \result;
+    assigns \result \from (indirect: fd), (indirect: __fc_fds[fd]);
+ */
+extern int isatty(int fd);
+
+/*@ requires valid_fd: 0 ≤ fd < 1024;
+    requires valid_whence: whence ≡ 0 ∨ whence ≡ 1 ∨ whence ≡ 2;
+    ensures result_error_or_offset: \result ≡ -1 ∨ 0 ≤ \result;
+    assigns \result, __fc_fds[fd];
+    assigns \result
+      \from (indirect: fd), (indirect: __fc_fds[fd]), (indirect: offset),
+            (indirect: whence);
+    assigns __fc_fds[fd]
+      \from (indirect: fd), __fc_fds[fd], (indirect: offset),
+            (indirect: whence);
+ */
+extern off_t lseek(int fd, off_t offset, int whence);
+
+/*@ requires valid_path: valid_read_string(path);
+    assigns \result;
+    assigns \result \from (indirect: *(path + (0 ..))), (indirect: name);
+ */
+extern long pathconf(char const *path, int name);
+
+/*@ ensures initialization: pipefd: \initialized(\old(pipefd) + (0 .. 1));
+    ensures valid_fd0: 0 ≤ *(\old(pipefd) + 0) < 1024;
+    ensures valid_fd1: 0 ≤ *(\old(pipefd) + 1) < 1024;
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns *(pipefd + (0 .. 1)), \result;
+    assigns *(pipefd + (0 .. 1)) \from (indirect: __fc_fds[0 ..]);
+    assigns \result \from (indirect: __fc_fds[0 ..]);
+ */
+extern int pipe(int * /*[2]*/ pipefd);
+
+/*@ requires valid_fd: 0 ≤ fd < 1024;
+    requires buf_has_room: \valid((char *)buf + (0 .. count - 1));
+    ensures
+      result_error_or_read_length:
+        (0 ≤ \result ≤ \old(count)) ∨ \result ≡ -1;
+    ensures
+      initialization: buf:
+        \initialized((char *)\old(buf) + (0 .. \result - 1));
+    assigns __fc_fds[fd], \result, *((char *)buf + (0 .. count - 1));
+    assigns __fc_fds[fd] \from __fc_fds[fd];
+    assigns \result \from (indirect: __fc_fds[fd]), (indirect: count);
+    assigns *((char *)buf + (0 .. count - 1))
+      \from (indirect: __fc_fds[fd]), (indirect: count);
+ */
+extern ssize_t read(int fd, void *buf, size_t count);
+
+/*@ ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result \from (indirect: gid);
+ */
+extern int setegid(gid_t gid);
+
+/*@ ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result \from (indirect: uid);
+ */
+extern int seteuid(uid_t uid);
+
+/*@ ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result \from (indirect: gid);
+ */
+extern int setgid(gid_t gid);
+
+/*@ ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result \from (indirect: pid), (indirect: pgid);
+ */
+extern int setpgid(pid_t pid, pid_t pgid);
+
+/*@ ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result \from (indirect: rgid), (indirect: egid);
+ */
+extern int setregid(gid_t rgid, gid_t egid);
+
+/*@ ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result \from (indirect: ruid), (indirect: euid);
+ */
+extern int setreuid(uid_t ruid, uid_t euid);
+
+/*@ ensures result_pgid_or_error: \result ≡ -1 ∨ \result ≥ 0;
+    assigns \result;
+    assigns \result \from \nothing;
+ */
+extern pid_t setsid(void);
+
+/*@ ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result \from (indirect: uid);
+ */
+extern int setuid(uid_t uid);
+
+/*@ assigns \nothing; */
+extern void sync(void);
+
+/*@ assigns \result;
+    assigns \result \from (indirect: name); */
+extern long sysconf(int name);
+
+extern char volatile __fc_ttyname[32];
+
+char volatile *__fc_p_ttyname = __fc_ttyname;
+/*@ ensures
+      result_name_or_null: \result ≡ __fc_p_ttyname ∨ \result ≡ \null;
+    assigns \result;
+    assigns \result \from __fc_p_ttyname, (indirect: fildes);
+ */
+extern char *ttyname(int fildes);
+
+/*@ requires valid_string_path: valid_read_string(path);
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result \from *(path + (0 ..));
+ */
+extern int unlink(char const *path);
+
+/*@ ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result, Frama_C_entropy_source;
+    assigns \result
+      \from (indirect: usec), (indirect: Frama_C_entropy_source);
+    assigns Frama_C_entropy_source \from Frama_C_entropy_source;
+ */
+extern int usleep(useconds_t usec);
+
+/*@ requires valid_fd: 0 ≤ fd < 1024;
+    requires buf_has_room: \valid_read((char *)buf + (0 .. count - 1));
+    ensures
+      result_error_or_written_bytes:
+        \result ≡ -1 ∨ (0 ≤ \result ≤ \old(count));
+    assigns __fc_fds[fd], \result;
+    assigns __fc_fds[fd]
+      \from (indirect: fd), (indirect: count), __fc_fds[fd];
+    assigns \result
+      \from (indirect: fd), (indirect: count), (indirect: __fc_fds[fd]);
+ */
+extern ssize_t write(int fd, void const *buf, size_t count);
+
+/*@ requires valid_ruid: \valid(ruid);
+    requires valid_euid: \valid(suid);
+    requires valid_suid: \valid(euid);
+    ensures
+      initialization: result_ok_or_error:
+        (\result ≡ 0 ∧ \initialized(\old(ruid)) ∧
+         \initialized(\old(euid)) ∧ \initialized(\old(suid))) ∨
+        \result ≡ -1;
+    assigns *ruid, *euid, *suid, \result;
+    assigns *ruid \from \nothing;
+    assigns *euid \from \nothing;
+    assigns *suid \from \nothing;
+    assigns \result
+      \from (indirect: ruid), (indirect: euid), (indirect: suid);
+ */
+int getresuid(uid_t *ruid, uid_t *euid, uid_t *suid);
+
+/*@ ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result
+      \from (indirect: ruid), (indirect: euid), (indirect: suid);
+ */
+int setresuid(uid_t ruid, uid_t euid, uid_t suid);
+
+/*@ requires valid_rgid: \valid(rgid);
+    requires valid_egid: \valid(sgid);
+    requires valid_sgid: \valid(egid);
+    ensures
+      initialization: result_ok_or_error:
+        (\result ≡ 0 ∧ \initialized(\old(rgid)) ∧
+         \initialized(\old(egid)) ∧ \initialized(\old(sgid))) ∨
+        \result ≡ -1;
+    assigns *rgid, *egid, *sgid, \result;
+    assigns *rgid \from \nothing;
+    assigns *egid \from \nothing;
+    assigns *sgid \from \nothing;
+    assigns \result
+      \from (indirect: rgid), (indirect: egid), (indirect: sgid);
+ */
+int getresgid(gid_t *rgid, gid_t *egid, gid_t *sgid);
+
+/*@ ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result
+      \from (indirect: rgid), (indirect: egid), (indirect: sgid);
+ */
+int setresgid(gid_t rgid, gid_t egid, gid_t sgid);
+
+extern char *optarg;
+
+int optind;
+
+extern int opterr;
+
+extern int optopt;
+
+/*@ assigns \result, *optarg, optind, opterr, optopt;
+    assigns \result
+      \from argc, *(argv + (0 .. argc - 1)), *(optstring + (0 ..));
+    assigns *optarg
+      \from argc, *(argv + (0 .. argc - 1)), *(optstring + (0 ..));
+    assigns optind
+      \from argc, *(argv + (0 .. argc - 1)), *(optstring + (0 ..));
+    assigns opterr
+      \from argc, *(argv + (0 .. argc - 1)), *(optstring + (0 ..));
+    assigns optopt
+      \from argc, *(argv + (0 .. argc - 1)), *(optstring + (0 ..));
+ */
+extern int getopt(int argc, char * const *argv, char const *optstring);
+
+/*@ assigns \result, *optarg, optind, opterr, optopt,
+            *((longopts + (0 ..))->flag);
+    assigns \result
+      \from argc, *(argv + (0 .. argc - 1)), *(shortopts + (0 ..)),
+            *(longopts + (0 ..));
+    assigns *optarg
+      \from argc, *(argv + (0 .. argc - 1)), *(shortopts + (0 ..)),
+            *(longopts + (0 ..));
+    assigns optind
+      \from argc, *(argv + (0 .. argc - 1)), *(shortopts + (0 ..)),
+            *(longopts + (0 ..));
+    assigns opterr
+      \from argc, *(argv + (0 .. argc - 1)), *(shortopts + (0 ..)),
+            *(longopts + (0 ..));
+    assigns optopt
+      \from argc, *(argv + (0 .. argc - 1)), *(shortopts + (0 ..)),
+            *(longopts + (0 ..));
+    assigns *((longopts + (0 ..))->flag)
+      \from argc, *(argv + (0 .. argc - 1)), *(shortopts + (0 ..)),
+            *(longopts + (0 ..));
+ */
+extern int getopt_long(int argc, char * const *argv, char const *shortopts,
+                       struct option const *longopts, int *longind);
+
+/*@ assigns \result, *optarg, optind, opterr, optopt,
+            *((longopts + (0 ..))->flag);
+    assigns \result
+      \from argc, *(argv + (0 .. argc - 1)), *(shortopts + (0 ..)),
+            *(longopts + (0 ..));
+    assigns *optarg
+      \from argc, *(argv + (0 .. argc - 1)), *(shortopts + (0 ..)),
+            *(longopts + (0 ..));
+    assigns optind
+      \from argc, *(argv + (0 .. argc - 1)), *(shortopts + (0 ..)),
+            *(longopts + (0 ..));
+    assigns opterr
+      \from argc, *(argv + (0 .. argc - 1)), *(shortopts + (0 ..)),
+            *(longopts + (0 ..));
+    assigns optopt
+      \from argc, *(argv + (0 .. argc - 1)), *(shortopts + (0 ..)),
+            *(longopts + (0 ..));
+    assigns *((longopts + (0 ..))->flag)
+      \from argc, *(argv + (0 .. argc - 1)), *(shortopts + (0 ..)),
+            *(longopts + (0 ..));
+ */
+extern int getopt_long_only(int argc, char * const *argv,
+                            char const *shortopts,
+                            struct option const *longopts, int *longind);
+
+int optind = 1;
+int glob(char const *pattern, int flags,
+         int (*errfunc)(char const *epath, int eerrno), glob_t *pglob);
+
+void globfree(glob_t *pglob);
+
+/*@ ghost extern int __fc_heap_status __attribute__((__FRAMA_C_MODEL__)); */
+
+/*@
+axiomatic dynamic_allocation {
+  predicate is_allocable{L}(ℤ n) 
+    reads __fc_heap_status;
+  
+  axiom never_allocable{L}:
+    ∀ ℤ i; i < 0 ∨ i > 4294967295U ⇒ ¬is_allocable(i);
+  
+  }
 
 */
 /*@ requires valid_nptr: \valid_read(nptr);
@@ -2296,9 +2673,9 @@ imaxdiv_t imaxdiv(intmax_t numer, intmax_t denom)
   return r;
 }
 
-struct lconv *__frama_c_locale;
+extern struct lconv *__fc_locale;
 
-char *__frama_c_locale_names[512];
+extern char *__fc_locale_names[512];
 
 char *setlocale(int category, char const *locale);
 
@@ -2337,11 +2714,10 @@ char *__frama_c_locale_names[512] = {(char *)"C"};
     ensures
       result_null_or_locale_name:
         \result ≡ \null ∨
-        (\valid(\result) ∧
-         (∃ ℤ i; \result ≡ __frama_c_locale_names[i]));
-    assigns __frama_c_locale, \result;
-    assigns __frama_c_locale \from category, *(locale + (..));
-    assigns \result \from __frama_c_locale, category, *(locale + (..));
+        (\valid(\result) ∧ (∃ ℤ i; \result ≡ __fc_locale_names[i]));
+    assigns __fc_locale, \result;
+    assigns __fc_locale \from category, *(locale + (..));
+    assigns \result \from __fc_locale, category, *(locale + (..));
  */
 char *setlocale(int category, char const *locale)
 {
@@ -2355,7 +2731,7 @@ char *setlocale(int category, char const *locale)
   return_label: return __retres;
 }
 
-/*@ ensures result_current_locale: \result ≡ __frama_c_locale;
+/*@ ensures result_current_locale: \result ≡ __fc_locale;
     assigns \nothing;
  */
 struct lconv *localeconv(void)
@@ -3184,6 +3560,11 @@ extern int kill(pid_t pid, int sig);
     assigns \result \from (indirect: pgrp), (indirect: sig);
  */
 extern int killpg(pid_t pgrp, int sig);
+
+/*@ requires valid_read_iov: \valid_read(iov + (0 .. iovcnt - 1));
+    assigns *((char *)(iov + (0 .. iovcnt - 1))->iov_base + (0 ..));
+ */
+extern ssize_t readv(int fd, struct iovec const *iov, int iovcnt);
 
 /*@ ghost struct __fc_sockfds_type __fc_sockfds[1024]; */
 /*@ ghost extern int __fc_socket_counter __attribute__((__FRAMA_C_MODEL__));
@@ -7224,11 +7605,6 @@ extern int setrlimit(int r, struct rlimit const *rl);
  */
 extern clock_t times(struct tms *buffer);
 
-/*@ requires valid_read_iov: \valid_read(iov + (0 .. iovcnt - 1));
-    assigns *((char *)(iov + (0 .. iovcnt - 1))->iov_base + (0 ..));
- */
-extern ssize_t readv(int fd, struct iovec const *iov, int iovcnt);
-
 /*@ ensures result_ok_or_error: \result ≡ -1 ∨ \result ≥ 0;
     ensures
       initialization: stat_loc_init_on_success:
@@ -7302,382 +7678,6 @@ extern int tcgetattr(int fd, struct termios *termios_p);
             (indirect: Frama_C_entropy_source), (indirect: *termios_p);
  */
 extern int tcsetattr(int fd, int optional_actions, struct termios *termios_p);
-
-/*@ ghost int __fc_fds[1024]; */
-/*@ requires valid_string_path: valid_read_string(path);
-    requires valid_amode: (amode & ~((4 | 2) | 1)) ≡ 0 ∨ amode ≡ 0;
-    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
-    assigns \result;
-    assigns \result
-      \from (indirect: path), (indirect: *(path + (0 ..))), (indirect: amode);
- */
-extern int access(char const *path, int amode);
-
-/*@ requires valid_string_path: valid_read_string(path);
-    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
-    assigns \result;
-    assigns \result \from (indirect: path), (indirect: *(path + (0 ..)));
- */
-extern int chdir(char const *path);
-
-/*@ requires valid_string_path: valid_read_string(path);
-    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
-    assigns \result;
-    assigns \result \from (indirect: path), (indirect: *(path + (0 ..)));
- */
-extern int chroot(char const *path);
-
-/*@ requires valid_string_path: valid_read_string(path);
-    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
-    assigns \result;
-    assigns \result
-      \from (indirect: path), (indirect: *(path + (0 ..))),
-            (indirect: owner), (indirect: group);
- */
-extern int chown(char const *path, uid_t owner, gid_t group);
-
-/*@ requires valid_fd: 0 ≤ fd < 1024;
-    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
-    assigns __fc_fds[fd], \result;
-    assigns __fc_fds[fd] \from fd, __fc_fds[fd];
-    assigns \result \from (indirect: fd), (indirect: __fc_fds[fd]);
- */
-extern int close(int fd);
-
-/*@ requires valid_fildes: 0 ≤ fildes < 1024;
-    ensures
-      result_valid_fildes_or_error:
-        \result ≡ -1 ∨ (\old(fildes) ≤ \result < 1024);
-    assigns __fc_fds[fildes ..], \result;
-    assigns __fc_fds[fildes ..] \from fildes;
-    assigns \result \from fildes;
- */
-extern int dup(int fildes);
-
-/*@ requires valid_fildes: 0 ≤ fildes < 1024;
-    requires valid_fildes2: 0 ≤ fildes2 < 1024;
-    ensures
-      result_fildes2_or_error: \result ≡ \old(fildes2) ∨ \result ≡ -1;
-    assigns __fc_fds[fildes2], \result;
-    assigns __fc_fds[fildes2] \from fildes, fildes2, __fc_fds[fildes2];
-    assigns \result
-      \from fildes, fildes2, __fc_fds[fildes], __fc_fds[fildes2];
- */
-extern int dup2(int fildes, int fildes2);
-
-/*@ requires valid_string_path: valid_read_string(path);
-    requires valid_string_arg: valid_read_string(arg);
-    assigns \result;
-    assigns \result \from *(path + (0 ..)), *(arg + (0 ..));
- */
-extern int execl(char const *path, char const *arg, void * const *__va_params);
-
-/*@ requires valid_string_path: valid_read_string(path);
-    requires valid_string_arg: valid_read_string(arg);
-    assigns \result;
-    assigns \result \from *(path + (0 ..)), *(arg + (0 ..));
- */
-extern int execle(char const *path, char const *arg,
-                  void * const *__va_params);
-
-/*@ requires valid_string_path: valid_read_string(path);
-    requires valid_string_arg: valid_read_string(arg);
-    assigns \result;
-    assigns \result \from *(path + (0 ..)), *(arg + (0 ..));
- */
-extern int execlp(char const *path, char const *arg,
-                  void * const *__va_params);
-
-/*@ requires valid_string_path: valid_read_string(path);
-    requires valid_string_argv0: valid_read_string(*(argv + 0));
-    assigns \result;
-    assigns \result \from *(path + (0 ..)), *(argv + (0 ..));
- */
-extern int execv(char const *path, char * const *argv);
-
-/*@ requires valid_path: valid_read_string(path);
-    requires valid_argv0: valid_read_string(*(argv + 0));
-    assigns \result;
-    assigns \result \from *(path + (0 ..)), *(argv + (0 ..));
- */
-extern int execve(char const *path, char * const *argv, char * const *env);
-
-/*@ requires valid_string_path: valid_read_string(path);
-    requires valid_string_argv0: valid_read_string(*(argv + 0));
-    assigns \result;
-    assigns \result \from *(path + (0 ..)), *(argv + (0 ..));
- */
-extern int execvp(char const *path, char * const *argv);
-
-/*@ ensures never_terminates: \false;
-    assigns \nothing; */
-extern  __attribute__((__noreturn__)) void _exit(int);
-
-/*@ ensures
-      result_ok_child_or_error:
-        \result ≡ 0 ∨ \result > 0 ∨ \result ≡ -1;
-    assigns \result;
-    assigns \result \from \nothing;
- */
-extern pid_t fork(void);
-
-/*@ requires valid_buf: \valid(buf + (0 .. size - 1));
-    ensures result_ok_or_error: \result ≡ \null ∨ \result ≡ \old(buf);
-    assigns *(buf + (0 .. size - 1)), \result;
-    assigns *(buf + (0 .. size - 1)) \from (indirect: buf), (indirect: size);
-    assigns \result \from buf, (indirect: size);
- */
-extern char *getcwd(char *buf, size_t size);
-
-/*@ assigns \result;
-    assigns \result \from \nothing; */
-extern gid_t getegid(void);
-
-/*@ assigns \result;
-    assigns \result \from \nothing; */
-extern uid_t geteuid(void);
-
-/*@ assigns \result;
-    assigns \result \from \nothing; */
-extern gid_t getgid(void);
-
-extern char volatile __fc_hostname[64];
-
-/*@ requires name_has_room: \valid(name + (0 .. len - 1));
-    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
-    assigns \result, *(name + (0 .. len - 1));
-    assigns \result
-      \from (indirect: __fc_hostname[0 .. len]), (indirect: len);
-    assigns *(name + (0 .. len - 1))
-      \from (indirect: __fc_hostname[0 .. len]), (indirect: len);
- */
-extern int gethostname(char *name, size_t len);
-
-/*@ requires name_valid_string: valid_read_nstring(name, len);
-    requires bounded_len: len ≤ 64;
-    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
-    assigns __fc_hostname[0 .. len], \result;
-    assigns __fc_hostname[0 .. len]
-      \from *(name + (0 .. len - 1)), (indirect: len);
-    assigns \result \from (indirect: __fc_hostname[0 .. len]);
- */
-extern int sethostname(char const *name, size_t len);
-
-/*@ assigns \result;
-    assigns \result \from (indirect: pid); */
-extern pid_t getpgid(pid_t pid);
-
-/*@ assigns \result;
-    assigns \result \from \nothing; */
-extern pid_t getpgrp(void);
-
-/*@ assigns \result;
-    assigns \result \from \nothing; */
-extern pid_t getpid(void);
-
-/*@ assigns \result;
-    assigns \result \from \nothing; */
-extern pid_t getppid(void);
-
-/*@ assigns \result;
-    assigns \result \from \nothing; */
-extern pid_t getsid(pid_t);
-
-/*@ assigns \result;
-    assigns \result \from \nothing; */
-extern uid_t getuid(void);
-
-/*@ ensures result_true_or_false: \result ≡ 0 ∨ \result ≡ 1;
-    assigns \result;
-    assigns \result \from (indirect: fd), (indirect: __fc_fds[fd]);
- */
-extern int isatty(int fd);
-
-/*@ requires valid_fd: 0 ≤ fd < 1024;
-    requires valid_whence: whence ≡ 0 ∨ whence ≡ 1 ∨ whence ≡ 2;
-    ensures result_error_or_offset: \result ≡ -1 ∨ 0 ≤ \result;
-    assigns \result, __fc_fds[fd];
-    assigns \result
-      \from (indirect: fd), (indirect: __fc_fds[fd]), (indirect: offset),
-            (indirect: whence);
-    assigns __fc_fds[fd]
-      \from (indirect: fd), __fc_fds[fd], (indirect: offset),
-            (indirect: whence);
- */
-extern off_t lseek(int fd, off_t offset, int whence);
-
-/*@ requires valid_path: valid_read_string(path);
-    assigns \result;
-    assigns \result \from (indirect: *(path + (0 ..))), (indirect: name);
- */
-extern long pathconf(char const *path, int name);
-
-/*@ ensures initialization: pipefd: \initialized(\old(pipefd) + (0 .. 1));
-    ensures valid_fd0: 0 ≤ *(\old(pipefd) + 0) < 1024;
-    ensures valid_fd1: 0 ≤ *(\old(pipefd) + 1) < 1024;
-    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
-    assigns *(pipefd + (0 .. 1)), \result;
-    assigns *(pipefd + (0 .. 1)) \from (indirect: __fc_fds[0 ..]);
-    assigns \result \from (indirect: __fc_fds[0 ..]);
- */
-extern int pipe(int * /*[2]*/ pipefd);
-
-/*@ requires valid_fd: 0 ≤ fd < 1024;
-    requires buf_has_room: \valid((char *)buf + (0 .. count - 1));
-    ensures
-      result_error_or_read_length:
-        (0 ≤ \result ≤ \old(count)) ∨ \result ≡ -1;
-    ensures
-      initialization: buf:
-        \initialized((char *)\old(buf) + (0 .. \result - 1));
-    assigns __fc_fds[fd], \result, *((char *)buf + (0 .. count - 1));
-    assigns __fc_fds[fd] \from __fc_fds[fd];
-    assigns \result \from (indirect: __fc_fds[fd]), (indirect: count);
-    assigns *((char *)buf + (0 .. count - 1))
-      \from (indirect: __fc_fds[fd]), (indirect: count);
- */
-extern ssize_t read(int fd, void *buf, size_t count);
-
-/*@ ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
-    assigns \result;
-    assigns \result \from (indirect: gid);
- */
-extern int setegid(gid_t gid);
-
-/*@ ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
-    assigns \result;
-    assigns \result \from (indirect: uid);
- */
-extern int seteuid(uid_t uid);
-
-/*@ ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
-    assigns \result;
-    assigns \result \from (indirect: gid);
- */
-extern int setgid(gid_t gid);
-
-/*@ ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
-    assigns \result;
-    assigns \result \from (indirect: pid), (indirect: pgid);
- */
-extern int setpgid(pid_t pid, pid_t pgid);
-
-/*@ ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
-    assigns \result;
-    assigns \result \from (indirect: rgid), (indirect: egid);
- */
-extern int setregid(gid_t rgid, gid_t egid);
-
-/*@ ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
-    assigns \result;
-    assigns \result \from (indirect: ruid), (indirect: euid);
- */
-extern int setreuid(uid_t ruid, uid_t euid);
-
-/*@ ensures result_pgid_or_error: \result ≡ -1 ∨ \result ≥ 0;
-    assigns \result;
-    assigns \result \from \nothing;
- */
-extern pid_t setsid(void);
-
-/*@ ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
-    assigns \result;
-    assigns \result \from (indirect: uid);
- */
-extern int setuid(uid_t uid);
-
-/*@ assigns \nothing; */
-extern void sync(void);
-
-/*@ assigns \result;
-    assigns \result \from (indirect: name); */
-extern long sysconf(int name);
-
-extern char volatile __fc_ttyname[32];
-
-char *__fc_p_ttyname = (char *)(__fc_ttyname);
-/*@ ensures
-      result_name_or_null: \result ≡ __fc_p_ttyname ∨ \result ≡ \null;
-    assigns \result;
-    assigns \result \from __fc_p_ttyname, (indirect: fildes);
- */
-extern char *ttyname(int fildes);
-
-/*@ requires valid_string_path: valid_read_string(path);
-    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
-    assigns \result;
-    assigns \result \from *(path + (0 ..));
- */
-extern int unlink(char const *path);
-
-/*@ ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
-    assigns \result, Frama_C_entropy_source;
-    assigns \result
-      \from (indirect: usec), (indirect: Frama_C_entropy_source);
-    assigns Frama_C_entropy_source \from Frama_C_entropy_source;
- */
-extern int usleep(useconds_t usec);
-
-/*@ requires valid_fd: 0 ≤ fd < 1024;
-    requires buf_has_room: \valid_read((char *)buf + (0 .. count - 1));
-    ensures
-      result_error_or_written_bytes:
-        \result ≡ -1 ∨ (0 ≤ \result ≤ \old(count));
-    assigns __fc_fds[fd], \result;
-    assigns __fc_fds[fd]
-      \from (indirect: fd), (indirect: count), __fc_fds[fd];
-    assigns \result
-      \from (indirect: fd), (indirect: count), (indirect: __fc_fds[fd]);
- */
-extern ssize_t write(int fd, void const *buf, size_t count);
-
-/*@ requires valid_ruid: \valid(ruid);
-    requires valid_euid: \valid(suid);
-    requires valid_suid: \valid(euid);
-    ensures
-      initialization: result_ok_or_error:
-        (\result ≡ 0 ∧ \initialized(\old(ruid)) ∧
-         \initialized(\old(euid)) ∧ \initialized(\old(suid))) ∨
-        \result ≡ -1;
-    assigns *ruid, *euid, *suid, \result;
-    assigns *ruid \from \nothing;
-    assigns *euid \from \nothing;
-    assigns *suid \from \nothing;
-    assigns \result
-      \from (indirect: ruid), (indirect: euid), (indirect: suid);
- */
-int getresuid(uid_t *ruid, uid_t *euid, uid_t *suid);
-
-/*@ ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
-    assigns \result;
-    assigns \result
-      \from (indirect: ruid), (indirect: euid), (indirect: suid);
- */
-int setresuid(uid_t ruid, uid_t euid, uid_t suid);
-
-/*@ requires valid_rgid: \valid(rgid);
-    requires valid_egid: \valid(sgid);
-    requires valid_sgid: \valid(egid);
-    ensures
-      initialization: result_ok_or_error:
-        (\result ≡ 0 ∧ \initialized(\old(rgid)) ∧
-         \initialized(\old(egid)) ∧ \initialized(\old(sgid))) ∨
-        \result ≡ -1;
-    assigns *rgid, *egid, *sgid, \result;
-    assigns *rgid \from \nothing;
-    assigns *egid \from \nothing;
-    assigns *sgid \from \nothing;
-    assigns \result
-      \from (indirect: rgid), (indirect: egid), (indirect: sgid);
- */
-int getresgid(gid_t *rgid, gid_t *egid, gid_t *sgid);
-
-/*@ ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
-    assigns \result;
-    assigns \result
-      \from (indirect: rgid), (indirect: egid), (indirect: sgid);
- */
-int setresgid(gid_t rgid, gid_t egid, gid_t sgid);
 
 void main(void)
 {
