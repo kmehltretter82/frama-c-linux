@@ -7,15 +7,11 @@ digraph G {
   cp7 [label=<__retres>, shape=box, ];
   cp9 [label=<x>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
        style="filled,dotted", ];
-  cp11 [style="invis,dotted", ];
-  cp12 [style="invis,dotted", ];
-  cp13 [style="invis,dotted", ];
-  cp14 [style="invis,dotted", ];
   
-  subgraph cluster_cs_1 { label=<main>; cp11;cp1;cp0;
-    subgraph cluster_cs_2 { label=<f>; cp12;cp9;cp3;
-      subgraph cluster_cs_3 { label=<g>; cp13;cp5;
-        subgraph cluster_cs_4 { label=<h>; cp14;cp7;
+  subgraph cluster_cs_1 { label=<main>; cp1;cp0;
+    subgraph cluster_cs_2 { label=<f>; cp9;cp3;
+      subgraph cluster_cs_3 { label=<g>; cp5;
+        subgraph cluster_cs_4 { label=<h>; cp7;
            };
          };
        };

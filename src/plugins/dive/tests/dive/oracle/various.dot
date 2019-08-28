@@ -29,21 +29,16 @@ digraph G {
   cp32 [label=<is_nan_or_infinite: \is_finite((float)(y + w))>,
         fillcolor="#FF0000", color="#FF0000", shape=doubleoctagon,
         style="filled,bold", ];
-  cp35 [style="invis,dotted", ];
-  cp36 [style="invis,dotted", ];
-  cp37 [style="invis,dotted", ];
-  cp38 [style="invis,dotted", ];
-  cp39 [style="invis,dotted", ];
   
-  subgraph cluster_cs_1 { label=<f>; cp35;cp30;cp1;cp0;
+  subgraph cluster_cs_1 { label=<f>; cp30;cp1;cp0;
      };
-  subgraph cluster_cs_2 { label=<main>; cp36;cp32;cp21;cp16;cp12;cp10;cp9;cp3;
-    subgraph cluster_cs_3 { label=<f>; cp38;cp18;cp14;
+  subgraph cluster_cs_2 { label=<main>; cp32;cp21;cp16;cp12;cp10;cp9;cp3;
+    subgraph cluster_cs_3 { label=<f>; cp18;cp14;
        };
-    subgraph cluster_cs_4 { label=<f>; cp39;cp26;cp23;
+    subgraph cluster_cs_4 { label=<f>; cp26;cp23;
        };
      };
-  subgraph cluster_file_1 { label=<tests/dive/various.i>; cp37;cp7;
+  subgraph cluster_file_1 { label=<tests/dive/various.i>; cp7;
      };
   
   cp0 -> cp1;

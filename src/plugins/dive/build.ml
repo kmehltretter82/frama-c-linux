@@ -129,8 +129,8 @@ let update_node_values node kinstr lval =
             values_grade = float_grade fkind (min,max);
           }
       end
-    | _ -> Self.result "node %a has type %a" Node_kind.pretty node.node_kind Cil_printer.pp_typ typ
-  with Cvalue.V.Not_based_on_null -> Self.result "node %a is not numeric" Node_kind.pretty node.node_kind
+    | _ -> ()
+  with Cvalue.V.Not_based_on_null -> ()
 
 
 (* --- Locations handling --- *)

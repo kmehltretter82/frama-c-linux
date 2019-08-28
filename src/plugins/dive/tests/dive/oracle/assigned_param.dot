@@ -1,14 +1,15 @@
 digraph G {
   cp0 [label=<w>, shape=box, ];
   cp1 [label=<x>, shape=box, ];
-  cp3 [label=<z>, shape=box, ];
-  cp5 [label=<x>, shape=box, ];
-  cp7 [label=<z>, shape=box, ];
-  cp9 [style="invis,dotted", ];
-  cp10 [style="invis,dotted", ];
+  cp3 [label=<z>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+       style="filled", ];
+  cp5 [label=<x>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+       style="filled", ];
+  cp7 [label=<z>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+       style="filled", ];
   
-  subgraph cluster_cs_1 { label=<main>; cp9;cp7;cp5;cp0;
-    subgraph cluster_cs_2 { label=<f>; cp10;cp3;cp1;
+  subgraph cluster_cs_1 { label=<main>; cp7;cp5;cp0;
+    subgraph cluster_cs_2 { label=<f>; cp3;cp1;
        };
      };
   

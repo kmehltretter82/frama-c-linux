@@ -6,12 +6,10 @@ digraph G {
        style="filled", ];
   cp5 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
        style="filled,dotted", ];
-  cp7 [style="invis,dotted", ];
-  cp8 [style="invis,dotted", ];
   
-  subgraph cluster_cs_1 { label=<main>; cp7;cp5;cp3;cp0;
+  subgraph cluster_cs_1 { label=<main>; cp5;cp3;cp0;
      };
-  subgraph cluster_file_1 { label=<tests/dive/global.i>; cp8;cp1;
+  subgraph cluster_file_1 { label=<tests/dive/global.i>; cp1;
      };
   
   cp1 -> cp0;
