@@ -430,23 +430,20 @@ else
     EXE=
   fi
 
-  if test "$OCAMLBEST" = opt; then
-    # OCaml native threads
-    AC_MSG_CHECKING([OCaml native threads])
-    echo "let f = Thread.create (fun () -> ())" > test_native_threads.ml
-    if ($OCAMLOPT -thread -o test_native_threads unix.cmxa threads.cmxa \
-         test_native_threads.ml) 2> /dev/null ;
-    then
-      HAS_NATIVE_THREADS=yes
-      AC_MSG_RESULT([ok.]);
-    else
-      HAS_NATIVE_THREADS=no
-      AC_MSG_WARN([unsupported.]);
-    fi
-    rm -f test_native_threads*;
+  # OCaml native threads
+  AC_MSG_CHECKING([OCaml native threads])
+  echo "let f = Thread.create (fun () -> ())" > test_native_threads.ml
+  if
+    ($OCAMLC -thread -o test_native_threads unix.cma threads.cma \
+       test_native_threads.ml) 2> /dev/null
+  then
+    HAS_NATIVE_THREADS=yes
+    AC_MSG_RESULT([ok.]);
   else
-    HAS_NATIVE_THREADS=no; # no native compilation anyway
-  fi
+    HAS_NATIVE_THREADS=no
+    AC_MSG_WARN([unsupported.]);
+    fi
+  rm -f test_native_threads*;
 fi
 
 # C and POSIX standard headers used by C bindings.
