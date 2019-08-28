@@ -120,6 +120,9 @@ module Normalized: sig
 
   (** Unknown filepath, used as 'dummy' for [Datatype.Filepath]. *)
   val unknown: t
+
+  (** @since Frama-C+dev *)
+  val is_unknown: t -> bool
 end
 
 (** Describes a position in a source file.
