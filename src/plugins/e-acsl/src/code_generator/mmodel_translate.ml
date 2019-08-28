@@ -70,7 +70,7 @@ let rec has_set_as_index = function
 let eliminate_ranges_from_index_of_term ~loc t =
   match t.term_node with
   | Trange(Some n1, Some n2) ->
-    let name = Env.Varname.get ~scope:Env.Local_block "range" in
+    let name = Varname.get ~scope:Varname.Block "range" in
     let lv = Cil_const.make_logic_var_kind name LVQuant Linteger in
     let tlv = Logic_const.tvar ~loc lv in
     tlv, (n1, lv, n2)

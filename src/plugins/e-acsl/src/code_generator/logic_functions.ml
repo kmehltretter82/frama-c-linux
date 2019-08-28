@@ -41,7 +41,7 @@ let term_to_exp_ref
 
 (* @return true iff the result of the function is provided by reference as the
    first extra argument at each call *)
-let result_as_extra_argument = Gmp.Z.is_t
+let result_as_extra_argument = Gmp_types.Z.is_t
 (* TODO: to be extended to any compound type? E.g. returning a struct is not
    good practice... *)
 
@@ -125,11 +125,11 @@ let generate_kf ~loc fname env ret_ty params_ty li =
           | Typing.Gmpz ->
             (* GMP's integer are arrays: consider them as pointers in function's
                parameters *)
-            Gmp.Z.t_as_ptr ()
+            Gmp_types.Z.t_as_ptr ()
           | Typing.C_integer ik -> TInt(ik, [])
           | Typing.C_float ik -> TFloat(ik, [])
           (* for the time being, no reals but rationals instead *)
-          | Typing.Rational -> Real.t ()
+          | Typing.Rational -> Gmp_types.Q.t ()
           | Typing.Real -> Error.not_yet "real number"
           | Typing.Nan -> Typing.typ_of_lty lvi.lv_type
         in
@@ -343,3 +343,9 @@ let tapp_to_exp ~loc fname env t li params_ty args =
     (Some t)
     ret_ty
     (fun vi _ -> [ Cil.mkStmtOneInstr ~valid_sid:true (mkcall vi) ])
+
+(*
+Local Variables:
+compile-command: "make -C ../.."
+End:
+*)

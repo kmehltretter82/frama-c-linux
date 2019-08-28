@@ -242,7 +242,7 @@ let to_exp ~loc kf env pot label =
   let vi_at, e_at, env = Env.new_var
     ~loc
     ~name:"at"
-    ~scope:Env.Function
+    ~scope:Varname.Function
     env
     None
     ty_ptr
@@ -341,3 +341,9 @@ let to_exp ~loc kf env pot label =
   let lval_at_index, env = lval_at_index ~loc kf env (e_at, vi_at, t_index) in
   let e = Cil.new_exp ~loc (Lval lval_at_index) in
   e, env
+
+(*
+Local Variables:
+compile-command: "make -C ../.."
+End:
+*)

@@ -20,25 +20,43 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Transformations to detect temporal memory errors (e.g., dereference of
-    stale pointers). *)
+open Cil_types
 
-val enable: bool -> unit
-(** Enable/disable temporal transformations *)
+(** Generate C implementations of user-defined logic functions.
+    A logic function can have multiple C implementations depending on
+    the types computed for its arguments.
+    Eg: Consider the following definition: [integer g(integer x) = x]
+      with the following calls: [g(5)] and [g(10*INT_MAX)]
+      They will respectively generate the C prototypes [int g_1(int)]
+      and [long g_2(long)] *)
 
-val is_enabled: unit -> bool
-(** Return a boolean value indicating whether temporal analysis is enabled *)
+(**************************************************************************)
+(************** Logic functions without labels ****************************)
+(**************************************************************************)
 
-val handle_function_parameters: Cil_types.kernel_function -> Env.t -> Env.t
-(** [handle_function_parameters kf env] updates the local environment [env],
-    according to the parameters of [kf], with statements allowing to track
-    referent numbers across function calls. *)
+val reset: unit -> unit
 
-val handle_stmt: Cil_types.stmt -> Env.t -> Env.t
-(** Update local environment ([Env.t]) with statements tracking temporal
-    properties of memory blocks *)
+val tapp_to_exp:
+  loc:location ->
+  string -> Env.t -> term -> logic_info -> Typing.number_ty list -> exp list ->
+  varinfo * exp * Env.t
 
-val generate_global_init: Cil_types.varinfo -> Cil_types.offset ->
-  Cil_types.init -> Env.t -> Cil_types.stmt option
-  (** Generate [Some s], where [s] is a statement tracking global initializer
-      or [None] if there is no need to track it *)
+val add_generated_functions: global list -> global list
+(* @return the input list of globals in which the generated functions have been
+   inserted at the right places (both their declaration and their definition) *)
+
+(**************************************************************************)
+(********************** Forward references ********************************)
+(**************************************************************************)
+
+val named_predicate_to_exp_ref:
+  (kernel_function -> Env.t -> predicate -> exp * Env.t) ref
+
+val term_to_exp_ref:
+  (kernel_function -> Env.t -> term -> exp * Env.t) ref
+
+(*
+Local Variables:
+compile-command: "make -C ../.."
+End:
+*)

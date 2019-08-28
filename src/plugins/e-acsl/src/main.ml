@@ -149,7 +149,6 @@ let generate_code =
       apply_on_e_acsl_ast
         (fun () ->
           Options.feedback "beginning translation.";
-          Temporal.enable (Options.Temporal_validity.get ());
           let prepared_prj = Prepare_ast.prepare () in
           let res =
             Project.on prepared_prj
@@ -159,7 +158,7 @@ let generate_code =
                 Project.on
                   dup_prj
                   (fun () ->
-                    Gmp.init_t ();
+                    Gmp_types.init ();
                     Mmodel_analysis.reset ();
                     let visit prj = Visit.do_visit ~prj true in
                     let prj = File.create_project_from_visitor name visit in
@@ -257,7 +256,7 @@ let main () =
     if Options.Check.get () then
       apply_on_e_acsl_ast
         (fun () ->
-          Gmp.init_t ();
+          Gmp_types.init ();
           ignore (check ()))
         ()
 
@@ -265,6 +264,6 @@ let () = Db.Main.extend main
 
 (*
 Local Variables:
-compile-command: "make"
+compile-command: "make -C .."
 End:
 *)

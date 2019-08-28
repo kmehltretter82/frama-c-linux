@@ -20,10 +20,22 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val do_visit: ?prj:Project.t -> bool -> Visitor.frama_c_visitor
+(* Variable name generator wrt a lexical scope. *)
+
+type scope =
+  | Global
+  | Function
+  | Block
+
+val get: scope:scope -> string -> string
+(** @return a fresh variable name for the given scope wrt the given name. *)
+
+val clear_locals: unit -> unit
+(** Reset the generator for variables that are local to a block or a
+    function. *)
 
 (*
 Local Variables:
-compile-command: "make"
+compile-command: "make -C ../.."
 End:
 *)

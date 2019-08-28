@@ -124,7 +124,7 @@ struct
       let vi, exp, env =
         Env.new_var
           ~loc
-          ~scope:Env.Global
+          ~scope:Varname.Global
           ~name:"literal_string"
           env
           None
@@ -1055,6 +1055,6 @@ let do_visit ?(prj=Project.current ()) generate =
 
 (*
 Local Variables:
-compile-command: "make"
+compile-command: "make -C ../.."
 End:
 *)

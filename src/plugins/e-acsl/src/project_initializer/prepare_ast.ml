@@ -63,7 +63,7 @@ class prepare_visitor prj = object (self)
 
   (* Add align attributes to local variables (required by temporal analysis) *)
   method !vblock _ =
-    if Temporal.is_enabled () then
+    if Options.Temporal_validity.get () then
       Cil.DoChildrenPost (fun blk ->
         List.iter (fun vi ->
           (* 4 bytes alignment is required to allow sufficient space for storage
@@ -219,3 +219,9 @@ let prepare () =
   File.create_project_from_visitor
     "e_acsl_prepare_ast"
     (new prepare_visitor)
+
+(*
+Local Variables:
+compile-command: "make -C ../.."
+End:
+*)

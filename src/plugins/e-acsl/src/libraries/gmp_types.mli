@@ -20,38 +20,36 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** GMP Values. *)
+
 open Cil_types
 
-(** [translate_*] translates a given ACSL annotation into the corresponding C
-    statement (if any) for runtime assertion checking. This C statements are
-    part of the resulting environment. *)
+val init: unit -> unit
+(** Must be called before any use of GMP *)
 
-val translate_pre_spec: kernel_function -> Env.t -> funspec -> Env.t
-val translate_post_spec: kernel_function -> Env.t -> funspec -> Env.t
-val translate_pre_code_annotation:
-  kernel_function -> Env.t -> code_annotation -> Env.t
-val translate_post_code_annotation:
-  kernel_function -> Env.t -> code_annotation -> Env.t
-val translate_named_predicate:
-  kernel_function -> Env.t -> predicate -> Env.t
+(**************************************************************************)
+(******************************** Types ***********************************)
+(**************************************************************************)
 
-val translate_rte_annots:
-  (Format.formatter -> 'a -> unit) ->
-  'a ->
-  kernel_function ->
-  Env.t ->
-  code_annotation list ->
-  Env.t
+(** Signature of a GMP type *)
+module type S = sig
 
-exception No_simple_translation of term
-val term_to_exp: typ option -> term -> exp
+  val t: unit -> typ
+  (** @return the GMP type *)
 
-val predicate_to_exp: kernel_function -> predicate -> exp
+  val t_as_ptr: unit -> typ
+  (** type equivalent to [t] but seen as a pointer *)
 
-val set_original_project: Project.t -> unit
+  val is_now_referenced: unit -> unit
+  (** Call this function when using this type for the first time. *)
 
-(*
-Local Variables:
-compile-command: "make"
-End:
-*)
+  val is_t: typ -> bool
+  (** @return true iff the given type is equivalent to the GMP type. *)
+
+end
+
+(** Representation of the unbounded integer type at runtime *)
+module Z: S
+
+(** Representation of the rational type at runtime *)
+module Q: S

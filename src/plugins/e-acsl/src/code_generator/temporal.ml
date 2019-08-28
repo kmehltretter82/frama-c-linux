@@ -31,13 +31,6 @@ open Cil_types
 open Cil_datatype
 
 (* ************************************************************************** *)
-(* Configuration {{{ *)
-(* ************************************************************************** *)
-
-let generate = ref false
-(* }}} *)
-
-(* ************************************************************************** *)
 (* Types {{{ *)
 (* ************************************************************************** *)
 
@@ -496,12 +489,8 @@ let mk_global_init ~loc vi off init env =
 (* Public API {{{ *)
 (* ************************************************************************** *)
 
-let enable param = generate := param
-
-let is_enabled () = !generate
-
 let handle_function_parameters kf env =
-  if is_enabled () then
+  if Options.Temporal_validity.get () then
     let env, _ = List.fold_left
       (fun (env, index) param ->
         let param = Visitor_behavior.Get.varinfo (Env.get_behavior env) param in
@@ -517,7 +506,7 @@ let handle_function_parameters kf env =
     env
 
 let handle_stmt stmt env =
-  if is_enabled () then begin
+  if Options.Temporal_validity.get () then begin
     match stmt.skind with
     | Instr instr -> handle_instruction stmt instr env
     | Return(ret, loc) -> Extlib.may_map
@@ -529,8 +518,14 @@ let handle_stmt stmt env =
     env
 
 let generate_global_init vi off init env =
-  if is_enabled () then
+  if Options.Temporal_validity.get () then
     mk_global_init ~loc:vi.vdecl vi off init env
   else
     None
 (* }}} *)
+
+(*
+Local Variables:
+compile-command: "make -C ../.."
+End:
+*)
