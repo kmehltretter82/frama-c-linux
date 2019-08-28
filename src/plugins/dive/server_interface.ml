@@ -34,8 +34,8 @@ let get_graph =
       g
 
 
-let page = Doc.page (`Plugin "Dive")
-    ~title:"Dive into dependency graph"
+let page = Doc.page (`Plugin "dive")
+    ~title:"Dive Services"
     ~filename:"dive.md"
 
 module Graph =
@@ -55,8 +55,8 @@ end
 module Variable = Data.Collection (struct
     module Info = struct
       let page = page
-      let name = "variable"
-      let descr = Markdown.rm "Variable from the program"
+      let name = "dive-variable-name"
+      let descr = Markdown.rm "The name of variable of the program"
     end
 
     module R = Data.Record (Info)
@@ -75,7 +75,7 @@ module Variable = Data.Collection (struct
 
     let to_json v =
       let varname = v.Cil_types.vname in
-      let fields =  [ "var" , `String varname ] in
+      let fields =  [ "var", `String varname ] in
       let fields = match Kernel_function.find_defining_kf v with
         | Some kf -> ("fun", `String (Kernel_function.get_name kf)) :: fields
         | None -> fields
@@ -83,11 +83,12 @@ module Variable = Data.Collection (struct
       `Assoc fields
 
     let of_json json =
+      let open Yojson.Basic.Util in
       try
         let funname =
-          try Some (Json.(string (field "fun" json)))
+          try Some (json |> member "fun" |> to_string)
           with Not_found -> None
-        and varname = Json.(string (field "var" json)) in
+        and varname = json |> member "var" |> to_string in
         match funname with
         | Some name ->
           let kf =
@@ -116,6 +117,44 @@ module Variable = Data.Collection (struct
         Data.failure json "Invalid source format"
   end)
 
+module Function = Data.Collection (struct
+    type t = Cil_types.kernel_function
+
+    let syntax = Syntax.publish ~page ~name:"dive-function-name"
+        ~synopsis:Syntax.string
+        ~descr:(Markdown.rm "The name of a function of the program") ()
+
+    let to_json kf =
+      `String (Kernel_function.get_name kf)
+
+    let of_json json =
+      let open Yojson.Basic.Util in
+      let name = to_string json in
+      try
+        Globals.Functions.find_by_name name
+      with Not_found ->
+        Data.failure json "no function '%s'" name
+  end)
+
+module Node = Data.Collection (struct
+    type t = Graph_types.node
+
+    let syntax = Syntax.publish ~page ~name:"dive-node"
+        ~synopsis:Syntax.int
+        ~descr:(Markdown.rm "A node identifier in the graph") ()
+
+    let to_json node =
+      `Int node.Graph_types.node_key
+
+    let of_json json =
+      let open Yojson.Basic.Util in
+      let node_key = to_int json in
+      try
+        Build.find_node (get_graph ()) node_key
+      with Not_found ->
+        Data.failure json "no node '%d' in the current graph" node_key
+  end)
+
 
 let () = Request.register ~page
     ~kind:`GET ~name:"dive.graph"
@@ -141,33 +180,44 @@ let () = Request.register ~page
     end
 
 let () = Request.register ~page
-    ~kind:`EXEC ~name:"dive.explore"
-    ~descr:(Markdown.rm "Explore the graph starting from an existing vertex")
-    ~input:(module Data.Jint) ~output:(module GraphDiff)
-    begin fun node_key ->
+    ~kind:`EXEC ~name:"dive.add_function_alarms"
+    ~descr:(Markdown.rm "Add all alarms of the given function")
+    ~input:(module Function) ~output:(module GraphDiff)
+    begin fun kf ->
       let depth = Self.DepthLimit.get () in
       let g = get_graph () in
-      Build.explore_from_vertex ~depth g node_key;
+      Build.add_function_alarms ~depth g kf;
+      Build.get_graph g, Build.take_last_differences g
+    end
+
+let () = Request.register ~page
+    ~kind:`EXEC ~name:"dive.explore"
+    ~descr:(Markdown.rm "Explore the graph starting from an existing vertex")
+    ~input:(module Node) ~output:(module GraphDiff)
+    begin fun node ->
+      let depth = Self.DepthLimit.get () in
+      let g = get_graph () in
+      Build.explore_from_node ~depth g node;
       Build.get_graph g, Build.take_last_differences g
     end
 
 let () = Request.register ~page
     ~kind:`EXEC ~name:"dive.show"
     ~descr:(Markdown.rm "Show the dependencies of an existing vertex")
-    ~input:(module Data.Jint) ~output:(module GraphDiff)
-    begin fun node_key ->
+    ~input:(module Node) ~output:(module GraphDiff)
+    begin fun node ->
       let depth = Self.DepthLimit.get () in
       let g = get_graph () in
-      Build.show ~depth g node_key;
+      Build.show ~depth g node;
       Build.get_graph g, Build.take_last_differences g
     end
 
 let () = Request.register ~page
     ~kind:`EXEC ~name:"dive.hide"
     ~descr:(Markdown.rm "Hide the dependencies of an existing vertex")
-    ~input:(module Data.Jint) ~output:(module GraphDiff)
-    begin fun node_key ->
+    ~input:(module Node) ~output:(module GraphDiff)
+    begin fun node ->
       let g = get_graph () in
-      Build.hide g node_key;
+      Build.hide g node;
       Build.get_graph g, Build.take_last_differences g
     end

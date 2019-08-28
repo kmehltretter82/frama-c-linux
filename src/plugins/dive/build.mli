@@ -34,12 +34,15 @@ val fold_base : t -> Cil_types.varinfo -> unit
 val hide_base : t -> Cil_types.varinfo -> unit
 val unhide_base : t -> Cil_types.varinfo -> unit
 
+val find_node : t -> int -> Graph_types.node
+
 val add_lval : ?depth:int -> t -> Cil_types.kinstr -> Cil_types.lval -> unit
 val add_var : ?depth:int -> t -> Cil_types.varinfo -> unit
 val add_alarm : ?depth:int -> t -> Cil_types.stmt -> Alarms.alarm -> unit
-val explore_from_vertex : depth:int -> t -> int -> unit
+val add_function_alarms : ?depth:int -> t -> Cil_types.kernel_function -> unit
+val explore_from_node : depth:int -> t -> Graph_types.node -> unit
 
-val show : ?depth:int -> t -> int -> unit
-val hide : t -> int -> unit
+val show : ?depth:int -> t -> Graph_types.node -> unit
+val hide : t -> Graph_types.node -> unit
 
 val take_last_differences : t -> Graph_types.graph_diff

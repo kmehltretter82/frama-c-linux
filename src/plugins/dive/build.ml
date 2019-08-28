@@ -252,7 +252,7 @@ let is_hidden context node_kind =
   | Some vi when BaseSet.mem vi context.hidden_bases -> true
   | _ -> false
 
-let get_node context node_key =
+let find_node context node_key =
   Index.find context.vertex_table node_key
 
 let update_node context node =
@@ -601,16 +601,21 @@ let add_alarm ?(depth=1) context stmt alarm =
   let node = build_alarm context callstack stmt alarm in
   complete_in_depth ~depth context node
 
-let explore_from_vertex ~depth context node_key =
-  explore ~depth context (get_node context node_key)
+let add_function_alarms ?(depth=1) context kf =
+  let add_one_alarm _emitter kf' stmt ~rank:_ alarm _code_annot =
+    if Kernel_function.equal kf' kf then
+      add_alarm ~depth context stmt alarm
+  in
+  Alarms.iter add_one_alarm
 
-let show ?(depth=1) context node_key =
-  let node = get_node context node_key in
+let explore_from_node ~depth context node =
+  explore ~depth context node
+
+let show ?(depth=1) context node =
   node.node_hidden <- false;
   explore ~depth context node
 
-let hide context node_key =
-  let node = get_node context node_key in
+let hide context node =
   if not node.node_hidden then
     begin
       let g = get_graph context in

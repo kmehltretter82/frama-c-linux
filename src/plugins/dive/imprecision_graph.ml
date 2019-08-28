@@ -248,17 +248,17 @@ let ouptput_to_dot out_channel g =
 module JsonPrinter =
 struct
   let output_kinstr = function
-    | Cil_types.Kglobal -> Json.of_string "global"
-    | Cil_types.Kstmt stmt -> Json.of_int stmt.Cil_types.sid
+    | Cil_types.Kglobal -> `String "global"
+    | Cil_types.Kstmt stmt -> `Int stmt.Cil_types.sid
 
   let output_callsite (kf,kinstr) =
-    Json.of_fields [
-      ("fun", Json.of_string (Kernel_function.get_name kf)) ;
+    `Assoc [
+      ("fun", `String (Kernel_function.get_name kf)) ;
       ("instr", output_kinstr kinstr) ;
     ]
 
   let output_callstack cs =
-    Json.of_list (List.map output_callsite cs)
+    `List (List.map output_callsite cs)
 
   let output_node_kind kind =
     let s = match kind with
@@ -267,15 +267,15 @@ struct
       | Scattered _ -> "scattered"
       | Alarm _ -> "alarm"
     in
-    Json.of_string s
+    `String s
 
   let output_node_locality { loc_file ; loc_callstack } =
-    let f1 = ("file", Json.of_string loc_file) in
+    let f1 = ("file", `String loc_file) in
     let fields = match loc_callstack with
       | [] -> [f1]
       | cs -> [f1 ; ("callstack", output_callstack cs)]
     in
-    Json.of_fields fields
+    `Assoc fields
 
   let output_node_precision_grade grade =
     let s = match grade with
@@ -283,7 +283,7 @@ struct
       | Normal -> "normal"
       | Wide -> "wide"
     in
-    Json.of_string s
+    `String s
 
   let output_dep_kind kind =
     let s = match kind with
@@ -293,30 +293,30 @@ struct
       | Control -> "ctrl"
       | Composition -> "comp"
     in
-    Json.of_string s
+    `String s
 
   let output_int_interval interval =
     (* TODO: handle overflow *)
-    Json.of_fields [
-      ("min", Json.of_int (Integer.to_int interval.min)) ;
-      ("max", Json.of_int (Integer.to_int interval.max)) ;
+    `Assoc [
+      ("min", `Int (Integer.to_int interval.min)) ;
+      ("max", `Int (Integer.to_int interval.max)) ;
     ]
 
   let output_float_interval interval =
-    Json.of_fields [
-      ("min", Json.of_float interval.min) ;
-      ("max", Json.of_float interval.max) ;
+    `Assoc [
+      ("min", `Float interval.min) ;
+      ("max", `Float interval.max) ;
     ]
 
   let output_node_int_values values =
-    Json.of_fields [
+    `Assoc [
       ("computed", output_int_interval values.values_interval) ;
       ("limits", output_int_interval values.values_limits) ;
       ("grade", output_node_precision_grade values.values_grade) ;
     ]
 
   let output_node_float_values values =
-    Json.of_fields [
+    `Assoc [
         ("computed", output_float_interval values.values_interval) ;
         ("limits", output_float_interval values.values_limits) ;
         ("grade", output_node_precision_grade values.values_grade) ;
@@ -324,12 +324,12 @@ struct
 
   let output_node node =
     let label = Pretty_utils.to_string Node_kind.pretty node.node_kind in
-    Json.of_fields ([
-      ("id", Json.of_int node.node_key) ;
-      ("label", Json.of_string label) ;
+    `Assoc ([
+      ("id", `Int node.node_key) ;
+      ("label", `String label) ;
       ("kind", output_node_kind node.node_kind) ;
       ("locality", output_node_locality node.node_locality) ;
-      ("explored", Json.of_bool node.node_deps_computed) ;
+      ("explored", `Bool node.node_deps_computed) ;
     ] @
         begin match node.node_int_values with
           | None -> []
@@ -346,22 +346,22 @@ struct
           | Some lval ->
             let typ = Cil.typeOfLval lval in
             let str = Pretty_utils.to_string Cil_printer.pp_typ typ in
-            [("type", Json.of_string str)]
+            [("type", `String str)]
         end)
 
   let output_dep (n1,dep,n2) =
-    Json.of_fields [
-      ("id", Json.of_int dep.dependency_key) ;
-      ("src", Json.of_int n1.node_key) ;
-      ("dst", Json.of_int n2.node_key) ;
+    `Assoc [
+      ("id", `Int dep.dependency_key) ;
+      ("src", `Int n1.node_key) ;
+      ("dst", `Int n2.node_key) ;
       ("kind", output_dep_kind dep.dependency_kind) ;
-      ("multiple", Json.of_bool dep.dependency_multiple)
+      ("multiple", `Bool dep.dependency_multiple)
     ]
 
   let output_graph g =
-    Json.of_fields [
-      ("nodes", Json.of_list (List.map output_node (vertices g))) ;
-      ("deps", Json.of_list (List.map output_dep (edges g)))
+    `Assoc [
+      ("nodes", `List (List.map output_node (vertices g))) ;
+      ("deps", `List (List.map output_dep (edges g)))
     ]
 
   let output_diff g diff =
@@ -380,19 +380,19 @@ struct
       let set = List.fold_left collect_deps Set.empty diff.added_nodes in
       List.map output_dep (Set.elements set)
     and removed_nodes =
-      List.map (fun node -> Json.of_int node.node_key) diff.removed_nodes
+      List.map (fun node -> `Int node.node_key) diff.removed_nodes
     in
-    Json.of_fields [
-      ("add", Json.of_fields [
-          ("nodes", Json.of_list added_nodes) ;
-          ("deps", Json.of_list added_deps)
+    `Assoc [
+      ("add", `Assoc [
+          ("nodes", `List added_nodes) ;
+          ("deps", `List added_deps)
         ]) ;
-      ("sub", Json.of_list removed_nodes)]
+      ("sub", `List removed_nodes)]
 end
 
 let ouptput_to_json out_channel g =
   let json = JsonPrinter.output_graph g in
-  Json.save_channel ~pretty:true out_channel json
+  Yojson.Basic.to_channel out_channel json
 
 let to_json g =
   JsonPrinter.output_graph g
