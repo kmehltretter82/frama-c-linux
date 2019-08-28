@@ -1,0 +1,16 @@
+/* run.config
+   COMMENT: real numbers
+*/
+
+/*@ ensures
+    \let delta = 1;
+    \let third_real = a/3;
+    third_real - delta < \result < third_real + delta; */
+double third(double a) {
+  return a/3;
+}
+
+int main(void) {
+  int n = 1;
+  third(11.7);
+}

@@ -117,34 +117,36 @@ let preserve_invariant prj env kf stmt = match stmt.skind with
     Return: R with a guard guaranteeing that [lv] does not overflow *)
 let bounds_for_small_type ~loc (t1, lv, t2) =
   match lv.lv_type with
+  | Ltype _ | Lvar _ | Lreal | Larrow _ ->
+    Options.abort "quantification over non-integer type is not part of E-ACSL"
+
   | Linteger ->
     t1, t2, None
+
   | Ctype ty ->
-    let i1 = Interval.infer t1 in
-    let i2 = Interval.infer t2 in
-    let i =
-      (* Ival.join would NOT be correct here:
-         Eg: (Ival.join [-3..-3] [300..300]) gives {-3, 300}
-             but NOT [-3..300] *)
-      Ival.inject_range (Ival.min_int i1) (Ival.max_int i2)
-    in
-    let ity = Interval.interv_of_typ ty in
-    if Ival.is_included i ity then
+    let iv1 = Interval.(extract_ival (infer t1)) in
+    let iv2 = Interval.(extract_ival (infer t2)) in
+    (* Ival.join is NOT correct here:
+       Eg: (Ival.join [-3..-3] [300..300]) gives {-3, 300}
+       but NOT [-3..300] *)
+    let iv = Ival.inject_range (Ival.min_int iv1) (Ival.max_int iv2) in
+    let ity = Interval.extract_ival (Interval.interv_of_typ ty) in
+    if Ival.is_included iv ity then
       (* case 1 *)
       t1, t2, None
-    else if Ival.is_singleton_int i1 && Ival.is_singleton_int i2 then begin
+    else if Ival.is_singleton_int iv1 && Ival.is_singleton_int iv2 then begin
       (* case 2 *)
-      let i = Ival.meet i ity in
+      let i = Ival.meet iv ity in
       (* now we potentially have a better interval for [lv]
          ==> update the binding *)
-      Interval.Env.replace lv i;
+      Interval.Env.replace lv (Interval.Ival i);
       (* the smaller bounds *)
       let min, max = Misc.finite_min_and_max i in
       let t1 = Logic_const.tint ~loc min in
       let t2 = Logic_const.tint ~loc max in
-      let ctx = Typing.integer_ty_of_typ ty in
+      let ctx = Typing.number_ty_of_typ ty in
       (* we are assured that we will not have a GMP,
-        once again because we intersected with [ity] *)
+         once again because we intersected with [ity] *)
       Typing.type_term ~use_gmp_opt:false ~ctx t1;
       Typing.type_term ~use_gmp_opt:false ~ctx t2;
       t1, t2, None
@@ -158,8 +160,6 @@ let bounds_for_small_type ~loc (t1, lv, t2) =
       let guard_upper = Logic_const.prel ~loc (Rle, lv_term, guard_upper) in
       let guard = Logic_const.pand ~loc (guard_lower, guard_upper) in
       t1, t2, Some guard
-  | Ltype _ | Lvar _ | Lreal | Larrow _ ->
-    Options.abort "quantification over non-integer type is not part of E-ACSL"
 
 let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
   let term_to_exp = !term_to_exp_ref in
@@ -171,8 +171,8 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
       bounds_for_small_type ~loc (t1, logic_x, t2)
     in
     let ctx =
-      let ty1 = Typing.get_integer_ty t1 in
-      let ty2 = Typing.get_integer_ty t2 in
+      let ty1 = Typing.get_number_ty t1 in
+      let ty2 = Typing.get_number_ty t2 in
       Typing.join ty1 ty2
     in
     let t_plus_one ?ty t =
@@ -210,21 +210,21 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     in
     Typing.type_term ~use_gmp_opt:false ~ctx t2_one;
     let ctx_one =
-      let ty1 = Typing.get_integer_ty t1 in
-      let ty2 = Typing.get_integer_ty t2_one in
+      let ty1 = Typing.get_number_ty t1 in
+      let ty2 = Typing.get_number_ty t2_one in
       Typing.join ty1 ty2
     in
     let ty =
-      try Typing.typ_of_integer_ty ctx_one
-      with Typing.Not_an_integer -> assert false
+      try Typing.typ_of_number_ty ctx_one
+      with Typing.Not_a_number -> assert false
     in
     (* loop counter corresponding to the quantified variable *)
     let var_x, x, env = Env.Logic_binding.add ~ty env logic_x in
     let lv_x = var var_x in
     let env = match ctx_one with
-      | Typing.C_type _ -> env
-      | Typing.Gmp -> Env.add_stmt env (Gmpz.init ~loc x)
-      | Typing.Other -> assert false
+      | Typing.C_integer _ -> env
+      | Typing.Gmpz -> Env.add_stmt env (Gmp.init ~loc x)
+      | Typing.(C_float _ | Rational | Real | Nan) -> assert false
     in
     (* build the inner loops and loop body *)
     let body, env =
@@ -234,7 +234,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     let e1, env = term_to_exp kf (Env.push env) t1 in
     let init_blk, env = Env.pop_and_get
       env
-      (Gmpz.affect ~loc:e1.eloc lv_x x e1)
+      (Gmp.affect ~loc:e1.eloc lv_x x e1)
       ~global_clear:false
       Env.Middle
     in
@@ -268,7 +268,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     let incr, env = term_to_exp kf (Env.push env) tlv_one in
     let next_blk, env = Env.pop_and_get
       env
-      (Gmpz.affect ~loc:incr.eloc lv_x x incr)
+      (Gmp.affect ~loc:incr.eloc lv_x x incr)
       ~global_clear:false
       Env.Middle
     in
@@ -303,11 +303,13 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     let ty = Typing.get_typ t in
     let vi_of_lv, exp_of_lv, env = Env.Logic_binding.add ~ty env lv in
     let e, env = term_to_exp kf env t in
-    let let_stmt = Gmpz.init_set ~loc (Cil.var vi_of_lv) exp_of_lv  e in
+    let ty = Cil.typeOf e in
+    let init_set = if Real.is_t ty then Real.init_set else Gmp.init_set in
+    let let_stmt = init_set ~loc (Cil.var vi_of_lv) exp_of_lv  e in
     let stmts, env =
       mk_nested_loops ~loc mk_innermost_block kf env lscope_vars'
     in
-    (* remove logic binding now that the block is constructed *)
+    (* remove the logic binding now that the block is constructed *)
     Env.Logic_binding.remove env lv;
     (* return *)
     let_stmt :: stmts, env

@@ -41,7 +41,7 @@ let term_to_exp_ref
 
 (* @return true iff the result of the function is provided by reference as the
    first extra argument at each call *)
-let result_as_extra_argument = Gmpz.is_t
+let result_as_extra_argument = Gmp.Z.is_t
 (* TODO: to be extended to any compound type? E.g. returning a struct is not
    good practice... *)
 
@@ -88,7 +88,7 @@ let pred_to_block ~loc kf env ret_vi p =
 
 (* Generate the function's body for terms. *)
 let term_to_block ~loc kf env ret_ty ret_vi t =
-  Typing.type_term ~use_gmp_opt:false ~ctx:(Typing.integer_ty_of_typ ret_ty) t;
+  Typing.type_term ~use_gmp_opt:false ~ctx:(Typing.number_ty_of_typ ret_ty) t;
   let e, env = !term_to_exp_ref kf env t in
   if Cil.isVoidType ret_ty then
     (* if the function's result is a GMP, it is the first parameter of the
@@ -96,7 +96,7 @@ let term_to_block ~loc kf env ret_ty ret_vi t =
     let set =
       let lv_star_ret = Cil.mkMem ~addr:(Cil.evar ~loc ret_vi) ~off:NoOffset in
       let star_ret = Cil.new_exp ~loc (Lval lv_star_ret) in
-      Gmpz.init_set ~loc lv_star_ret star_ret e
+      Gmp.init_set ~loc lv_star_ret star_ret e
     in
     let return_void = Cil.mkStmt ~valid_sid:true (Return (None, loc)) in
     let b, env = Env.pop_and_get env set ~global_clear:false Env.Middle in
@@ -122,12 +122,16 @@ let generate_kf ~loc fname env ret_ty params_ty li =
     List.fold_right2
       (fun lvi pty (params, params_ty) ->
         let ty = match pty with
-          | Typing.Gmp ->
+          | Typing.Gmpz ->
             (* GMP's integer are arrays: consider them as pointers in function's
                parameters *)
-            Gmpz.t_ptr ()
-          | Typing.C_type ik -> TInt(ik, [])
-          | Typing.Other -> Typing.typ_of_lty lvi.lv_type
+            Gmp.Z.t_as_ptr ()
+          | Typing.C_integer ik -> TInt(ik, [])
+          | Typing.C_float ik -> TFloat(ik, [])
+          (* for the time being, no reals but rationals instead *)
+          | Typing.Rational -> Real.t ()
+          | Typing.Real -> Error.not_yet "real number"
+          | Typing.Nan -> Typing.typ_of_lty lvi.lv_type
         in
         (* build the formals: cannot use [Cil.makeFormal] since the function
            does not yet exist *)
@@ -189,11 +193,8 @@ let generate_kf ~loc fname env ret_ty params_ty li =
        before generating the code (code generation invokes typing) *)
     let env =
       let add env lvi vi =
-        (match vi.vtype with
-        | TInt _ as ty -> Interval.Env.add lvi (Interval.interv_of_typ ty)
-        | ty ->
-          if Gmpz.is_t ty then
-            Interval.Env.add lvi (Ival.inject_range None None));
+        let i = Interval.interv_of_typ vi.vtype in
+        Interval.Env.add lvi i;
         Env.Logic_binding.add_binding env lvi vi
       in
       List.fold_left2 add env li.l_profile params

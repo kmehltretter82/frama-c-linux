@@ -98,11 +98,11 @@ val cty: logic_type -> typ
 val ptr_index: ?loc:location -> ?index:exp -> exp
   -> Cil_types.exp * Cil_types.exp
 (** Split pointer-arithmetic expression of the type `p + i` into its
-pointer and integer parts. *)
+    pointer and integer parts. *)
 
 val term_of_li: logic_info -> term
 (** [term_of_li li] assumes that [li.l_body] matches [LBterm t]
-   and returns [t]. *)
+    and returns [t]. *)
 
 val is_set_of_ptr_or_array: logic_type -> bool
 (** Checks whether the given logic type is a set of pointers. *)
@@ -122,7 +122,10 @@ type pred_or_term = PoT_pred of predicate | PoT_term of term
 
 val mk_ptr_sizeof: typ -> location -> exp
 (** [mk_ptr_sizeof ptr_typ loc] takes the pointer typ [ptr_typ] that points
-   to a [typ] typ and returns [sizeof(typ)]. *)
+    to a [typ] typ and returns [sizeof(typ)]. *)
+
+val name_of_binop: binop -> string
+(** Returns the name of the given binop as a string *)
 
 val finite_min_and_max: Ival.t -> Integer.t * Integer.t
 (** [finite_min_and_max i] takes the finite ival [i] and returns its bounds *)

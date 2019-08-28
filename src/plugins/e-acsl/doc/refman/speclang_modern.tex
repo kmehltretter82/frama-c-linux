@@ -45,12 +45,6 @@ only difference between \eacsl and \acsl predicates are quantifications.
 \label{fig:gram:binders}
 \end{figure}
 
-\begin{notimplementedenv}
-  Reals are not correctly supported by the \eacsl plug-in right now. Only
-  floating point numbers are supported: real constants and operations are seen as
-  \C floating point constants and operations.
-\end{notimplementedenv}
-
 \subsection*{Quantification}
 \eacsl quantification must be computable. They are limited to two limited forms.
 
@@ -260,10 +254,17 @@ It is not possible to define logic types introduced by the specification writer
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{\notimplemented{Real numbers} and floating point numbers}
+\subsection{Real numbers and floating point numbers}
+\label{sec:reals}
 \nodiff
 
-\difficults{\notimplemented{Exact real numbers} and even floating point numbers}
+\difficults{Exact real numbers and even floating point numbers}
+
+\begin{notimplementedenv}
+  Real numbers beyond rationals are currently not supported by the \eacsl
+  plug-in. Only rationals (in $\mathbb{Q}$) and floating point numbers are
+  supported.
+\end{notimplementedenv}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

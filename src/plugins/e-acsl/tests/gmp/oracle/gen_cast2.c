@@ -135,38 +135,7 @@ int main(void)
     __gmpz_clear(__gen_e_acsl__12);
   }
   int t[2] = {0, 1};
-  /*@ assert (float)x ≡ t[(int)0.1]; */
-  {
-    __e_acsl_mpz_t __gen_e_acsl__13;
-    long __gen_e_acsl_cast_9;
-    __e_acsl_mpz_t __gen_e_acsl___gen_e_acsl_cast_9;
-    __e_acsl_mpz_t __gen_e_acsl__14;
-    int __gen_e_acsl_lt;
-    __e_acsl_mpz_t __gen_e_acsl__15;
-    int __gen_e_acsl_le;
-    __gmpz_init_set_si(__gen_e_acsl__13,(long)0.1);
-    __gen_e_acsl_cast_9 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl__13));
-    __gmpz_init_set_si(__gen_e_acsl___gen_e_acsl_cast_9,__gen_e_acsl_cast_9);
-    __gmpz_init_set_si(__gen_e_acsl__14,2L);
-    __gen_e_acsl_lt = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl___gen_e_acsl_cast_9),
-                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl__14));
-    __e_acsl_assert(__gen_e_acsl_lt < 0,(char *)"RTE",(char *)"main",
-                    (char *)"index_bound: __gen_e_acsl_cast_9 < 2",23);
-    __gmpz_init_set_si(__gen_e_acsl__15,0L);
-    __gen_e_acsl_le = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__15),
-                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl___gen_e_acsl_cast_9));
-    __e_acsl_assert(__gen_e_acsl_le <= 0,(char *)"RTE",(char *)"main",
-                    (char *)"index_bound: 0 <= __gen_e_acsl_cast_9",23);
-    /*@ assert Eva: index_bound: 0 ≤ __gen_e_acsl_cast_9; */
-    /*@ assert Eva: index_bound: __gen_e_acsl_cast_9 < 2; */
-    __e_acsl_assert((float)x == (float)t[__gen_e_acsl_cast_9],
-                    (char *)"Assertion",(char *)"main",
-                    (char *)"(float)x == t[(int)0.1]",23);
-    __gmpz_clear(__gen_e_acsl__13);
-    __gmpz_clear(__gen_e_acsl___gen_e_acsl_cast_9);
-    __gmpz_clear(__gen_e_acsl__14);
-    __gmpz_clear(__gen_e_acsl__15);
-  }
+  /*@ assert (float)x ≡ t[(int)0.1]; */ ;
   __retres = 0;
   return __retres;
 }

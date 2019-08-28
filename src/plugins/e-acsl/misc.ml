@@ -246,6 +246,7 @@ let rec ptr_index ?(loc=Location.unknown) ?(index=(Cil.zero loc)) exp =
   | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _
     -> assert false
 
+(* TODO: should not be in this file *)
 let term_of_li li =  match li.l_body with
 | LBterm t -> t
 | LBnone | LBreads _ | LBpred _ | LBinductive _ ->
@@ -314,6 +315,27 @@ let mk_ptr_sizeof typ loc =
 let finite_min_and_max i = match Ival.min_and_max i with
   | Some min, Some max -> min, max
   | None, _ | _, None -> assert false
+
+let name_of_binop = function
+  | Lt -> "lt"
+  | Gt -> "gt"
+  | Le -> "le"
+  | Ge -> "ge"
+  | Eq -> "eq"
+  | Ne -> "ne"
+  | LOr -> "or"
+  | LAnd -> "and"
+  | BOr -> "bor"
+  | BXor -> "bxor"
+  | BAnd -> "band"
+  | Shiftrt -> "shiftr"
+  | Shiftlt -> "shiftl"
+  | Mod -> "mod"
+  | Div -> "div"
+  | Mult -> "mul"
+  | PlusA -> "add"
+  | MinusA -> "sub"
+  | MinusPP | MinusPI | IndexPI | PlusPI -> assert false
 
 (*
 Local Variables:

@@ -4,7 +4,7 @@
 [kernel:annot:missing-spec] tests/temporal/t_fun_lib.c:20: Warning: 
   Neither code nor specification for function realpath, generating default assigns from the prototype
 [e-acsl] translation done in project "e-acsl".
-[eva] tests/temporal/t_fun_lib.c:20: Warning: 
+[eva:invalid-assigns] tests/temporal/t_fun_lib.c:20: 
   Completely invalid destination for assigns clause *(x_0 + (0 ..)). Ignoring.
-[eva] tests/temporal/t_fun_lib.c:21: Warning: 
+[eva:invalid-assigns] tests/temporal/t_fun_lib.c:21: 
   Completely invalid destination for assigns clause *(x_0 + (0 ..)). Ignoring.

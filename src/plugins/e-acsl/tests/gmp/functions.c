@@ -64,9 +64,10 @@ int main (void) {
 
   k(9);
 
+  double d = 2.0;
+  /*@ assert f2(d) > 0; */ ;
+
   // not yet supported
-  /* double d = 2.0; */
-  /* /\*@ assert f2(d) > 0; *\/ ; */
   /* /\*@ assert p_notyet(27); *\/ ; */
   /* /\*@ assert f_notyet(27) == 27; *\/ ; */
 }

@@ -190,7 +190,7 @@ let call_memory_block ~loc kf name ctx env ptr r p =
       Logic_const.term ~loc (TBinOp(Mult, s, n1)) Linteger))
     (Ctype typ_charptr)
   in
-  Typing.type_term ~use_gmp_opt:false ~ctx:Typing.other ptr;
+  Typing.type_term ~use_gmp_opt:false ~ctx:Typing.nan ptr;
   let term_to_exp = !term_to_exp_ref in
   let ptr, env = term_to_exp kf (Env.rte env true) ptr in
   (* size *)
@@ -208,13 +208,13 @@ let call_memory_block ~loc kf name ctx env ptr r p =
       Linteger
   in
   Typing.type_term ~use_gmp_opt:false size_term;
-  let size, env = match Typing.get_integer_ty size_term with
-    | Typing.Gmp ->
+  let size, env = match Typing.get_number_ty size_term with
+    | Typing.Gmpz ->
       gmp_to_sizet ~loc kf env size_term p
-    | Typing.C_type _ ->
+    | Typing.(C_integer _ | C_float _) ->
       let size, env = term_to_exp kf env size_term in
       Cil.constFold false size, env
-    | Typing.Other ->
+    | Typing.(Rational | Real | Nan) ->
       assert false
   in
   (* base and base_addr *)

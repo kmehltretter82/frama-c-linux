@@ -28,4 +28,14 @@
   function __e_acsl_assert: precondition got status unknown.
 [eva:alarm] tests/gmp/functions.c:49: Warning: 
   function __e_acsl_assert: precondition got status unknown.
+[eva] using specification for function __gmpq_init
+[eva] using specification for function __gmpq_set_str
+[eva] using specification for function __gmpq_set_d
+[eva] using specification for function __gmpq_div
+[eva] using specification for function __gmpq_get_d
+[eva] using specification for function __gmpq_clear
+[eva:alarm] tests/gmp/functions.c:68: Warning: 
+  non-finite double value. assert \is_finite(__gen_e_acsl__10);
+[eva:alarm] tests/gmp/functions.c:68: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
 [eva] done for function main

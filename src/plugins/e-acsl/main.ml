@@ -159,7 +159,7 @@ let generate_code =
                 Project.on
                   dup_prj
                   (fun () ->
-                    Gmpz.init_t ();
+                    Gmp.init_t ();
                     Mmodel_analysis.reset ();
                     let visit prj = Visit.do_visit ~prj true in
                     let prj = File.create_project_from_visitor name visit in
@@ -257,7 +257,7 @@ let main () =
     if Options.Check.get () then
       apply_on_e_acsl_ast
         (fun () ->
-          Gmpz.init_t ();
+          Gmp.init_t ();
           ignore (check ()))
         ()
 

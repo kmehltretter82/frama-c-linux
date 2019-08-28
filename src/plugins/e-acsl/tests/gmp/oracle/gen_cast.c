@@ -28,9 +28,7 @@ int main(void)
                   (char *)"(unsigned int)y != (unsigned int)0xfffffffffffffff",
                   18);
   int t[2] = {0, 1};
-  /*@ assert (float)x ≡ t[(int)0.1]; */
-  __e_acsl_assert((float)x == (float)t[0],(char *)"Assertion",(char *)"main",
-                  (char *)"(float)x == t[(int)0.1]",23);
+  /*@ assert (float)x ≡ t[(int)0.1]; */ ;
   __retres = 0;
   return __retres;
 }
