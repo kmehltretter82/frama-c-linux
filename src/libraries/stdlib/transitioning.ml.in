@@ -37,6 +37,10 @@ module Dynlink = struct
   let init = @DYNLINK_INIT@
 end
 
+module Float = struct
+  let max_float = @FLOAT_MAX_FLOAT@
+end
+
 module Format = struct
   type stag = Format.@FORMAT_STAG@
   let string_of_stag s = @FORMAT_STRING_OF_STAG@
