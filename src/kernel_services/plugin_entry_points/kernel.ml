@@ -716,10 +716,11 @@ let () = Parameter_customize.set_cmdline_stage Cmdline.Loading
    reset *) 
 (*let () = Parameter_customize.do_not_projectify ()*)
 module LoadState =
-  P.Empty_string
+  P.Filepath
     (struct
        let option_name = "-load"
        let arg_name = "filename"
+       let existence = Parameter_sig.Must_exist
        let help = "load a previously-saved session from file <filename>"
      end)
 
@@ -1522,7 +1523,14 @@ let _ =
 
 let () =
   Cmdline.run_after_configuring_stage
-    (fun () -> Remove_projects.iter (fun project -> Project.remove ~project ()))
+    (fun () ->
+       (* clear "-remove-projects" before itering over (a copy of) its contents
+          in order to prevent warnings about dangling pointer deletion (since it
+          is itself projectified and so contains a pointer to the project being
+          removed). *)
+       let s = Remove_projects.get () in
+       Remove_projects.clear ();
+       Project.Datatype.Set.iter (fun project -> Project.remove ~project ()) s)
 
 (* ************************************************************************* *)
 (** {2 Others options} *)

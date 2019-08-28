@@ -534,7 +534,7 @@ struct
 
     let pp_source fmt = function
       | None -> ()
-      | Some src -> Format.fprintf fmt "%a:" Filepath.pp_pos src
+      | Some src -> Format.fprintf fmt "%a:" Fc_Filepath.pp_pos src
   end
 
   (* Output must be synchronized with functions [prefix_*] in module Log. *)

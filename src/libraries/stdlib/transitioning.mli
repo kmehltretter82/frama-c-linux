@@ -49,6 +49,11 @@ module Dynlink: sig
   val init: unit -> unit
 end
 
+(** 4.07 *)
+module Float: sig
+  val max_float: float
+end
+
 (** 4.08 *)
 module Format: sig
   type stag
