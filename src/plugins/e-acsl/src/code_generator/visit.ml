@@ -487,36 +487,32 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
   | g when Misc.is_library_loc (Global.loc g) ->
     if generate then Cil.JustCopy else Cil.SkipChildren
   | g ->
-    let unghost_function vi =
-      assert (match vi.vtype with TFun(_) -> true | _ -> false) ;
+    let unghost_vi vi =
       vi.vghost <- false ;
       vi.vtype <- match vi.vtype with
         | TFun(res, Some l, va, attr) ->
-          let retype (n, t, a) = (n, t, Cil.dropAttribute "fc_ghost" a) in
+          let frama_c_ghost = Extlib.strip_underscore Cil.frama_c_ghost in
+          let retype (n, t, a) = (n, t, Cil.dropAttribute frama_c_ghost a) in
           TFun(res, Some (List.map retype l), va, attr)
-        | _ -> vi.vtype
+        | _ ->
+          vi.vtype
     in
     let do_it = function
       | GVar(vi, _, _) ->
-        vi.vghost <- false
+        unghost_vi vi
       | GFun({ svar = vi } as fundec, _) ->
-        unghost_function vi ;
+        unghost_vi vi ;
         Builtins.update vi.vname vi;
         (* remember that we have to remove the main later (see method
            [vfile]); do not use the [vorig_name] since both [main] and
            [__e_acsl_main] have the same [vorig_name]. *)
         if vi.vname = Kernel.MainFunction.get () then
           main_fct <- Some fundec
-      | GVarDecl(vi, _) ->
+      | GVarDecl(vi, _) | GFunDecl(_, vi, _) ->
         (* do not convert extern ghost variables, because they can't be linked,
            see bts #1392 *)
         if vi.vstorage <> Extern then
-          vi.vghost <- false
-      | GFunDecl(_, vi, _) ->
-        (* do not convert extern ghost variables, because they can't be linked,
-           see bts #1392 *)
-        if vi.vstorage <> Extern then
-          unghost_function vi
+          unghost_vi vi
       | _ ->
         ()
     in
@@ -608,12 +604,13 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       if Functions.instrument kf then Exit_points.generate f;
       Options.feedback ~dkey ~level:2 "entering in function %a."
         Kernel_function.pretty kf;
-      let unghost_vi vi =
+      let unghost_formal vi =
         vi.vghost <- false ;
-        vi.vattr <- Cil.dropAttribute "fc_ghost" vi.vattr
+        let frama_c_ghost = Extlib.strip_underscore Cil.frama_c_ghost in
+        vi.vattr <- Cil.dropAttribute frama_c_ghost vi.vattr
       in
-      List.iter unghost_vi f.slocals;
-      List.iter unghost_vi f.sformals;
+      List.iter (fun vi -> vi.vghost <- false) f.slocals;
+      List.iter unghost_formal f.sformals;
       Cil.DoChildrenPost
         (fun f ->
           Exit_points.clear ();
