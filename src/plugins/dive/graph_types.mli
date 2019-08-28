@@ -51,7 +51,7 @@ type node = {
   mutable node_deps_computed : bool;
 }
 
-type dependency_kind = Callee | Data | Address | Control
+type dependency_kind = Callee | Data | Address | Control | Composition
 
 type dependency = {
   dependency_key : int;

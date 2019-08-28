@@ -25,6 +25,8 @@ open Graph_types
 
 let dkey = Self.register_category "build"
 
+exception Too_many_deps
+
 
 (* --- Precision evaluation --- *)
 
@@ -143,46 +145,55 @@ let is_foldable_type typ =
   | TBuiltin_va_list _ -> false
   | TNamed _ -> assert false (* the type have been unrolled *)
 
-let build_simple_location lval (l : Locations.location)
-  : (Cil_types.varinfo * Ival.t) option =
+exception NoMatchingOffset
+
+let cell_to_scalar typ vi offset =
+  (* TODO: exceptions must be shown to the user somehow *)
+  try
+    let matching = Bit_utils.MatchType typ in
+    let offset', _ = Bit_utils.find_offset vi.vtype ~offset matching in
+    Scalar (vi, typ, offset')
+  with Bit_utils.NoMatchingOffset -> raise NoMatchingOffset
+
+exception NotACell
+
+let enumerate_cells ~is_folded_base ~limit lval kinstr =
+  (* TODO: non-variable bases must be shown to the user somehow *)
+  (* TODO: exceptions must be shown to the user somehow *)
+  (* If possible, refine the lval to a non-symbolic one *)
+  let location = !Db.Value.lval_to_loc kinstr lval
+  and typ = Cil.typeOfLval lval in
   let open Locations in
-  match l.loc with
-  | Location_Bits.Map m ->
-    let one_couple base ival acc =
-      if Extlib.has_some acc then raise Exit;
-      match base with
-      | Base.Var (vi,_) -> Some (vi, ival)
-      | _ -> raise Exit
-    in
-    begin try
-        let r = Location_Bits.M.fold one_couple m None in
-        if not (Extlib.has_some r) then
-          Self.warning "Cannot resolve location %a" Cil_printer.pp_lval lval;
-        r
-      with Exit -> None
-    end
-  | _ -> None
+  let add (acc,count) node_kind =
+    if count > limit then
+      raise Too_many_deps;
+    (node_kind :: acc, count+1)
+  in
+  let add_base base ival (acc,count) =
+    match base with
+    | Base.Var (vi,_) ->
+      begin
+        if is_foldable_type vi.vtype && is_folded_base vi then
+          add (acc,count) (Composite (vi))
+        else
+          let add_cells offset (acc,count) =
+            add (acc,count) (cell_to_scalar typ vi offset)
+          in
+          try
+            Ival.fold_int add_cells ival (acc,count)
+          with Abstract_interp.Error_Top -> raise NotACell
+      end
+    | _ -> raise NotACell
+  in
+  try
+    fst (Location_Bits.fold_i add_base location.loc ([],0))
+  with Abstract_interp.Error_Top | NoMatchingOffset -> raise NotACell
 
 let build_node_kind ~is_folded_base lval kinstr =
-  (* If possible, refine the lval to a non-symbolic one *)
-  let location = !Db.Value.lval_to_loc kinstr lval in
-  match build_simple_location lval location with
-  | Some (vi, ival) ->
-    if is_foldable_type vi.vtype && is_folded_base vi then
-      Composite (vi)
-    else
-      begin try
-          let typ = Cil.typeOfLval lval in
-          let offset = Ival.project_int ival
-          and matching = Bit_utils.MatchType typ in
-          let offset', _ = Bit_utils.find_offset vi.vtype ~offset matching in
-          Scalar (vi, typ, offset')
-        with Bit_utils.NoMatchingOffset | Ival.Not_Singleton_Int ->
-          (* TODO: handle Bit_utils.NoMatchingOffset (strict aliasing ?) *)
-          Scattered (lval, kinstr)
-      end
-  | None ->
-    Scattered (lval, kinstr)
+  match enumerate_cells ~is_folded_base ~limit:1 lval kinstr with
+  | [node_kind] -> node_kind
+  | _ -> Scattered (lval, kinstr)
+  | exception NotACell -> Scattered (lval, kinstr)
 
 let default_node_locality callstack =
   match callstack with
@@ -277,12 +288,24 @@ let remove_node context node =
 
 (* --- Graph building --- *)
 
-(* Update or create a node *)
+let add_or_update_node context callstack node_kind =
+  let node_locality = build_node_locality callstack node_kind in
+  add_node context ~node_kind ~node_locality
+
 let build_node context callstack lval kinstr =
   let is_folded_base = is_folded context in
   let node_kind = build_node_kind ~is_folded_base lval kinstr in
-  let node_locality = build_node_locality callstack node_kind in
-  add_node context ~node_kind ~node_locality
+  add_or_update_node context callstack node_kind
+
+let build_all_scattered_node context callstack kinstr lval =
+  let is_folded_base = is_folded context in
+  try
+    let cells = enumerate_cells ~is_folded_base ~limit:20 lval kinstr in
+    List.map (add_or_update_node context callstack) cells
+  with NotACell ->
+    Self.warning "Unable to enumerate cells for %a"
+      Cil_printer.pp_lval lval;
+    []
 
 let build_var context callstack varinfo =
   let lval = Var varinfo, NoOffset in
@@ -297,9 +320,6 @@ let build_alarm context callstack stmt alarm =
   let node_kind = Alarm (stmt,alarm) in
   let node_locality = build_node_locality callstack node_kind in
   add_node context ~node_kind ~node_locality
-
-
-exception Too_many_deps
 
 let build_node_deps context node =
   let rec build_lval_write_deps callstack kinstr lval =
@@ -445,8 +465,15 @@ let build_node_deps context node =
 
   and build_lval_deps callstack stmt kind lval =
     let dst = build_lval context callstack (Kstmt stmt) lval in
-    let allow_folding = true in
-    Graph.create_dependency ~allow_folding context.graph dst kind node
+    Graph.create_dependency ~allow_folding:true context.graph dst kind node
+
+  and build_scattered_deps callstack kinstr lval =
+    let nodes = build_all_scattered_node context callstack kinstr lval in
+    let kind = Composition in
+    let add_dep dst =
+      Graph.create_dependency ~allow_folding:true context.graph dst kind node
+    in
+    List.iter add_dep nodes
 
   in
   update_node context node;
@@ -459,7 +486,7 @@ let build_node_deps context node =
       let lval = (Cil_types.Var vi, Cil_types.NoOffset) in
       build_lval_write_deps callstack Kglobal lval
     | Scattered (lval,kinstr) ->
-      build_lval_write_deps callstack kinstr lval
+      build_scattered_deps callstack kinstr lval
     | Alarm (stmt,alarm) ->
       build_alarm_deps callstack stmt alarm
   end;

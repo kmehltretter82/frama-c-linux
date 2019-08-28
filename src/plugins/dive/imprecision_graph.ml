@@ -291,6 +291,7 @@ struct
       | Data -> "data"
       | Address -> "addr"
       | Control -> "ctrl"
+      | Composition -> "comp"
     in
     Json.of_string s
 
