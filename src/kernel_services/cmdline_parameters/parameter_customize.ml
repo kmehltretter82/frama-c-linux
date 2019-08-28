@@ -95,10 +95,6 @@ let no_category () = use_category_ref := false
 
 let is_permissive_ref = ref false
 
-let filepath_existence_ref = ref Filepath.Indifferent
-let set_filepath_existence e = filepath_existence_ref := e
-let filepath_existence () = !filepath_existence_ref
-
 let find_kf_by_name: (string -> Cil_types.kernel_function) ref =
   Extlib.mk_fun "Parameter_customize.find_kf_by_name"
 
