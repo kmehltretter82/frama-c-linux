@@ -66,6 +66,7 @@ autom4te.cache
 /share/manuals/
 
 #doc
+
 /doc/manuals/
 /doc/*/*.dot
 /doc/*/*.aux
@@ -136,6 +137,8 @@ autom4te.cache
 /doc/pdg/pdg0*.html
 /doc/pdg/pdg00*.png
 /doc/pdg/previous_motif.gif
+
+/doc/server/
 
 #lib
 /lib/fc/

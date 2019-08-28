@@ -84,6 +84,7 @@ PLUGIN_BIN_DOC_LIST:=
 PLUGIN_DIST_EXTERNAL_LIST:=
 PLUGIN_DIST_TESTS_LIST:=
 PLUGIN_DISTRIBUTED_NAME_LIST:=
+MERLIN_PACKAGES:=
 
 PLUGIN_HEADER_SPEC_LIST :=
 PLUGIN_HEADER_DIRS_LIST :=
@@ -451,6 +452,7 @@ LIB_CMO =\
 	src/libraries/utils/leftistheap \
 	src/libraries/stdlib/integer \
 	src/libraries/utils/json \
+	src/libraries/utils/markdown \
 	src/libraries/utils/rich_text \
 	src/libraries/utils/dotgraph
 
@@ -1510,6 +1512,28 @@ plugins-doc:
 	   $(filter \
 	     $(addsuffix _DOC,$(PLUGIN_DISTRIBUTED_NAME_LIST)),\
 	     $(PLUGIN_DOC_LIST)))
+
+.PHONY: server-doc-md server-doc-html server-doc
+
+server-doc-md: byte
+	$(PRINT) 'Generating Markdown server documentation'
+	@rm -fr doc/server
+	@mkdir -p doc/server
+	./bin/frama-c.byte -server-doc doc/server
+
+server-doc-html: server-doc-md
+	$(PRINT) 'Generating HTML server documentation'
+	@find doc/server -name "*.md" -print -exec pandoc \
+			--standalone --toc --toc-depth=2 --to html \
+			--template doc/pandoc/template.html \
+			--metadata-file {}.json \
+			--lua-filter doc/pandoc/href.lua \
+			{} -o {}.html \;
+	@cp -f doc/pandoc/style.css doc/server/
+	$(PRINT) 'HTML server documentation ready:'
+	$(PRINT) '  open doc/server/readme.md.html'
+
+server-doc: server-doc-html
 
 # to make the documentation for one plugin only,
 # the name of the plugin should begin with a capital letter :

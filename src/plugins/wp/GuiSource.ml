@@ -232,7 +232,7 @@ class highlighter (main:Design.main_window_extension_points) =
         ~(start:int) ~(stop:int) =
       let buffer = buffer#buffer in
       begin match loc with
-        | PStmt( _ , stmt ) ->
+        | PStmt( _ , stmt ) | PStmtStart( _ , stmt ) ->
             begin
               match effect with
               | Some(s,_) when Stmt.equal stmt s ->
@@ -250,7 +250,7 @@ class highlighter (main:Design.main_window_extension_points) =
                   if DEPS.mem ip deps then
                     apply_depend buffer start stop
             end
-        | PStmtStart _ | PGlobal _
+        | PGlobal _
         | PVDecl _ | PTermLval _ | PLval _ | PExp _ -> ()
       end
 
