@@ -65,11 +65,11 @@ module Variable = Data.Collection (struct
 
     let syntax = R.syntax
 
-    let fun_field = R.option "fun"
+    let _fun_field = R.option "fun"
         ~descr:(Markdown.rm "owner function for a local variable")
         (module Data.Jstring)
 
-    let var_field = R.field "var"
+    let _var_field = R.field "var"
         ~descr:(Markdown.rm "variable name")
         (module Data.Jstring)
 
