@@ -648,6 +648,8 @@ src/libraries/utils/cilconfig.ml: CIL
 src/libraries/utils/cilconfig.mli: CIL
 src/libraries/utils/command.ml: CEA_LGPL
 src/libraries/utils/command.mli: CEA_LGPL
+src/libraries/utils/dotgraph.ml: CEA_LGPL
+src/libraries/utils/dotgraph.mli: CEA_LGPL
 src/libraries/utils/escape.ml: CIL
 src/libraries/utils/escape.mli: CIL
 src/libraries/utils/filepath.ml: CEA_LGPL
