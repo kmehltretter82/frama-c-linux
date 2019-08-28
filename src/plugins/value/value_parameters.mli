@@ -204,6 +204,9 @@ val wkey_missing_loop_unroll_for : warn_category
 (** Warning category for signed overflows *)
 val wkey_signed_overflow : warn_category
 
+(** Warning category for 'completely invalid' assigns clause *)
+val wkey_invalid_assigns : warn_category
+
 (** Debug category used to print information about invalid pointer comparisons*)
 val dkey_pointer_comparison: category
 

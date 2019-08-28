@@ -3145,10 +3145,9 @@ struct sigaction *__fc_p_sigaction = __fc_sigaction;
         \old(oldact) ≡ \null ∨
         *\old(oldact) ∈ *(__fc_p_sigaction + \old(signum));
     ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
-    assigns oldact ≡ \null? \empty: *oldact,
-            act ≡ \null? \empty: *(__fc_p_sigaction + signum), \result;
-    assigns oldact ≡ \null? \empty: *oldact \from __fc_p_sigaction;
-    assigns act ≡ \null? \empty: *(__fc_p_sigaction + signum) \from *act;
+    assigns *oldact, *(__fc_p_sigaction + signum), \result;
+    assigns *oldact \from __fc_p_sigaction;
+    assigns *(__fc_p_sigaction + signum) \from *act;
     assigns \result
       \from (indirect: signum), (indirect: act), (indirect: *act),
             (indirect: oldact), (indirect: *oldact);
@@ -3166,11 +3165,10 @@ extern int sigaction(int signum, struct sigaction const * __restrict act,
       initialization: oldset_initialized:
         \old(oldset) ≢ \null ∧ \result ≡ 0 ⇒
         \initialized(\old(oldset));
-    assigns \result, oldset ≡ \null? \empty: *oldset;
+    assigns \result, *oldset;
     assigns \result
       \from (indirect: how), (indirect: set), (indirect: oldset);
-    assigns oldset ≡ \null? \empty: *oldset
-      \from (indirect: how), (indirect: oldset);
+    assigns *oldset \from (indirect: how), (indirect: oldset);
  */
 extern int sigprocmask(int how, sigset_t const * __restrict set,
                        sigset_t * __restrict oldset);
@@ -5840,11 +5838,11 @@ axiomatic nanosleep_predicates {
       ensures
         remaining_valid:
           \old(rmtp) ≢ \null ⇒ 0 ≤ \old(rmtp)->tv_nsec < 1000000000;
-      assigns \result, rmtp ≡ \null? \empty: *rmtp;
+      assigns \result, *rmtp;
       assigns \result
         \from (indirect: __fc_time), (indirect: clock_id), (indirect: rqtp),
               (indirect: *rqtp);
-      assigns rmtp ≡ \null? \empty: *rmtp
+      assigns *rmtp
         \from __fc_time, (indirect: clock_id), (indirect: rqtp),
               (indirect: *rqtp), (indirect: rmtp);
     
@@ -5901,10 +5899,10 @@ extern int clock_nanosleep(clockid_t clock_id, int flags,
       interrupted_remaining_valid:
         \old(rmtp) ≢ \null ∧ \result ≡ -1 ⇒
         0 ≤ \old(rmtp)->tv_nsec < 1000000000;
-    assigns \result, rmtp ≡ \null? \empty: *rmtp;
+    assigns \result, *rmtp;
     assigns \result
       \from (indirect: __fc_time), (indirect: rqtp), (indirect: *rqtp);
-    assigns rmtp ≡ \null? \empty: *rmtp
+    assigns *rmtp
       \from (indirect: __fc_time), (indirect: rqtp), (indirect: *rqtp),
             (indirect: rmtp);
  */
@@ -6753,8 +6751,8 @@ extern int getitimer(int which, struct itimerval *curr_value);
     requires
       old_value_null_or_valid: old_value ≡ \null ∨ \valid(old_value);
     ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
-    assigns old_value ≢ \null? *old_value: \empty, \result;
-    assigns old_value ≢ \null? *old_value: \empty
+    assigns *old_value, \result;
+    assigns *old_value
       \from (indirect: which), (indirect: old_value), (indirect: new_value),
             __fc_itimer_real, __fc_itimer_virtual, __fc_itimer_prof;
     assigns \result
@@ -6767,10 +6765,9 @@ extern int getitimer(int which, struct itimerval *curr_value);
           0 ≤ new_value->it_interval.tv_usec ≤ 999999;
       ensures result_ok: \result ≡ 0;
       ensures initialization: old_value: \initialized(\old(old_value));
-      assigns \result, old_value ≢ \null? *old_value: \empty,
-              __fc_itimer_real;
+      assigns \result, *old_value, __fc_itimer_real;
       assigns \result \from \nothing;
-      assigns old_value ≢ \null? *old_value: \empty \from __fc_itimer_real;
+      assigns *old_value \from __fc_itimer_real;
       assigns __fc_itimer_real \from *new_value;
     
     behavior virtual:
@@ -6780,10 +6777,9 @@ extern int getitimer(int which, struct itimerval *curr_value);
           0 ≤ new_value->it_interval.tv_usec ≤ 999999;
       ensures result_ok: \result ≡ 0;
       ensures initialization: old_value: \initialized(\old(old_value));
-      assigns \result, old_value ≢ \null? *old_value: \empty;
+      assigns \result, *old_value;
       assigns \result \from \nothing;
-      assigns old_value ≢ \null? *old_value: \empty
-        \from __fc_itimer_virtual;
+      assigns *old_value \from __fc_itimer_virtual;
     
     behavior prof:
       assumes
@@ -6792,9 +6788,9 @@ extern int getitimer(int which, struct itimerval *curr_value);
           0 ≤ new_value->it_interval.tv_usec ≤ 999999;
       ensures result_ok: \result ≡ 0;
       ensures initialization: old_value: \initialized(\old(old_value));
-      assigns \result, old_value ≢ \null? *old_value: \empty;
+      assigns \result, *old_value;
       assigns \result \from \nothing;
-      assigns old_value ≢ \null? *old_value: \empty \from __fc_itimer_prof;
+      assigns *old_value \from __fc_itimer_prof;
     
     behavior invalid:
       assumes
@@ -6818,27 +6814,25 @@ extern int setitimer(int which,
     requires writefds: writefds ≡ \null ∨ \valid(writefds);
     requires errorfds: errorfds ≡ \null ∨ \valid(errorfds);
     requires timeout: timeout ≡ \null ∨ \valid(timeout);
-    assigns __fc_fds_state, readfds ≡ \null? \empty: *readfds,
-            writefds ≡ \null? \empty: *writefds,
-            errorfds ≡ \null? \empty: *errorfds,
-            timeout ≡ \null? \empty: *timeout, \result;
+    assigns __fc_fds_state, *readfds, *writefds, *errorfds, *timeout,
+            \result;
     assigns __fc_fds_state \from __fc_fds_state;
-    assigns readfds ≡ \null? \empty: *readfds
+    assigns *readfds
       \from (indirect: nfds), (indirect: readfds), (indirect: *readfds),
             (indirect: writefds), (indirect: *writefds),
             (indirect: errorfds), (indirect: *errorfds), (indirect: timeout),
             (indirect: *timeout), __fc_fds_state;
-    assigns writefds ≡ \null? \empty: *writefds
+    assigns *writefds
       \from (indirect: nfds), (indirect: readfds), (indirect: *readfds),
             (indirect: writefds), (indirect: *writefds),
             (indirect: errorfds), (indirect: *errorfds), (indirect: timeout),
             (indirect: *timeout), __fc_fds_state;
-    assigns errorfds ≡ \null? \empty: *errorfds
+    assigns *errorfds
       \from (indirect: nfds), (indirect: readfds), (indirect: *readfds),
             (indirect: writefds), (indirect: *writefds),
             (indirect: errorfds), (indirect: *errorfds), (indirect: timeout),
             (indirect: *timeout), __fc_fds_state;
-    assigns timeout ≡ \null? \empty: *timeout
+    assigns *timeout
       \from (indirect: nfds), (indirect: readfds), (indirect: *readfds),
             (indirect: writefds), (indirect: *writefds),
             (indirect: errorfds), (indirect: *errorfds), (indirect: timeout),
@@ -7129,11 +7123,11 @@ extern int __va_ioctl_void(int fd, int request);
  */
 extern int __va_ioctl_int(int fd, int request, int arg);
 
-/*@ assigns \result, argp ≢ \null? *((char *)argp + (0 ..)): \empty;
+/*@ assigns \result, *((char *)argp + (0 ..));
     assigns \result
       \from (indirect: fd), (indirect: request),
             (indirect: *((char *)argp + (0 ..)));
-    assigns argp ≢ \null? *((char *)argp + (0 ..)): \empty
+    assigns *((char *)argp + (0 ..))
       \from (indirect: fd), (indirect: request), *((char *)argp + (0 ..));
  */
 extern int __va_ioctl_ptr(int fd, int request, void *argp);

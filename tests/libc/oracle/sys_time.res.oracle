@@ -11,6 +11,8 @@
   function setitimer: precondition 'valid_new_value' got status valid.
 [eva] tests/libc/sys_time.c:6: 
   function setitimer: precondition 'old_value_null_or_valid' got status valid.
+[eva:invalid-assigns] tests/libc/sys_time.c:6: 
+  Completely invalid destination for assigns clause *old_value. Ignoring.
 [eva] Done for function setitimer
 [eva] tests/libc/sys_time.c:7: assertion got status valid.
 [eva] computing for function setitimer <- main.

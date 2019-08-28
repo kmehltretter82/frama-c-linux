@@ -138,6 +138,7 @@ let reduce_to_valid_location out loc =
       begin
         if is_assigns out && not (Locations.is_bottom_loc loc) then
           Value_parameters.warning ~current:true ~once:true
+            ~wkey:Value_parameters.wkey_invalid_assigns
             "@[Completely invalid destination@ for %a.@ \
              Ignoring.@]" pp_assign_free_alloc out;
         None

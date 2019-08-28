@@ -976,7 +976,7 @@ let base_output () =
               | dir ->
                   make_output_dir dir ; dir in
       base_output := Some output;
-      Filepath.add_symbolic_dir "WPOUT" output ;
+      Fc_Filepath.add_symbolic_dir "WPOUT" output ;
       output
   | Some output -> output
 
@@ -1018,7 +1018,7 @@ let has_print_generated () = has_dkey cat_print_generated
 
 let print_generated ?header file =
   let header = match header with
-    | None -> Filepath.Normalized.to_pretty_string (Datatype.Filepath.of_string file)
+    | None -> Fc_Filepath.Normalized.to_pretty_string (Datatype.Filepath.of_string file)
     | Some head -> head in
   debug ~dkey:cat_print_generated "%S@\n%t@." header
     begin fun fmt ->

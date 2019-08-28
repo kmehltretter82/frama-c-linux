@@ -151,16 +151,16 @@ extern int getitimer(int which, struct itimerval *curr_value);
 /*@
   requires valid_new_value: \valid_read(new_value);
   requires old_value_null_or_valid: old_value == \null || \valid(old_value);
-  assigns old_value != \null ? *old_value : \empty \from
-    indirect:which, indirect:old_value, indirect:new_value,
-    __fc_itimer_real, __fc_itimer_virtual, __fc_itimer_prof;
+  assigns *old_value \from indirect:which, indirect:old_value,
+                           indirect:new_value, __fc_itimer_real,
+                           __fc_itimer_virtual, __fc_itimer_prof;
   assigns \result \from indirect:which, indirect:new_value, indirect:*new_value;
   ensures result_ok_or_error: \result == 0 || \result == -1;
   behavior real:
     assumes itimer_real_and_valid:
       which == ITIMER_REAL && __VALID_ITIMERVAL(new_value);
     assigns \result \from \nothing;
-    assigns old_value != \null ? *old_value : \empty \from __fc_itimer_real;
+    assigns *old_value \from __fc_itimer_real;
     assigns __fc_itimer_real \from *new_value;
     ensures result_ok: \result == 0;
     ensures initialization:old_value: \initialized(old_value);
@@ -168,14 +168,14 @@ extern int getitimer(int which, struct itimerval *curr_value);
     assumes itimer_virtual_and_valid:
       which == ITIMER_VIRTUAL && __VALID_ITIMERVAL(new_value);
     assigns \result \from \nothing;
-    assigns old_value != \null ? *old_value : \empty  \from __fc_itimer_virtual;
+    assigns *old_value \from __fc_itimer_virtual;
     ensures result_ok: \result == 0;
     ensures initialization:old_value: \initialized(old_value);
   behavior prof:
     assumes itimer_prof_and_valid:
       which == ITIMER_PROF && __VALID_ITIMERVAL(new_value);
     assigns \result \from \nothing;
-    assigns old_value != \null ? *old_value : \empty  \from __fc_itimer_prof;
+    assigns *old_value \from __fc_itimer_prof;
     ensures result_ok: \result == 0;
     ensures initialization:old_value: \initialized(old_value);
   behavior invalid:

@@ -716,10 +716,11 @@ let () = Parameter_customize.set_cmdline_stage Cmdline.Loading
    reset *) 
 (*let () = Parameter_customize.do_not_projectify ()*)
 module LoadState =
-  P.Empty_string
+  P.Filepath
     (struct
        let option_name = "-load"
        let arg_name = "filename"
+       let existence = Parameter_sig.Must_exist
        let help = "load a previously-saved session from file <filename>"
      end)
 
