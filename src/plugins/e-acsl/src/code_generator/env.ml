@@ -29,11 +29,6 @@ type localized_scope =
   | LFunction of kernel_function
   | LLocal_block of kernel_function
 
-type scope =
-  | Global
-  | Function
-  | Local_block
-
 type mp_tbl = {
   new_exps: (varinfo * exp) Term.Map.t;
   (* generated mp variables as exp from terms *)
@@ -75,33 +70,6 @@ type t = {
   cpt: int;
   (* counter used when generating variables *)
 }
-
-module Varname: sig
-  val get: scope:scope -> string -> string
-  val clear: unit -> unit
-end = struct
-
-  module H = Datatype.String.Hashtbl
-  let tbl = H.create 7
-  let globals = H.create 7
-
-  let get ~scope s =
-    let _, u =
-      Extlib.make_unique_name
-        (fun s -> H.mem tbl s || H.mem globals s)
-        ~sep:"_"
-        s
-    in
-    let add = match scope with
-      | Global -> H.add globals
-      | Function | Local_block -> H.add tbl
-    in
-    add u ();
-    u
-
-  let clear () = H.clear tbl
-
-end
 
 let empty_block =
   { new_block_vars = [];
@@ -195,13 +163,13 @@ let generate_rte env =
 (* eta-expansion required for typing generalisation *)
 let acc_list_rev acc l = List.fold_left (fun acc x -> x :: acc) acc l
 
-let do_new_var ~loc ?(scope=Local_block) ?(name="") env t ty mk_stmts =
+let do_new_var ~loc ?(scope=Varname.Block) ?(name="") env t ty mk_stmts =
   let local_env, tl_env = top env in
   let local_block = local_env.block_info in
-  let is_z_t = Gmp.Z.is_t ty in
-  if is_z_t then Gmp.Z.is_now_referenced ();
-  let is_q_t = Gmp.Q.is_t ty in
-  if is_q_t then Gmp.Q.is_now_referenced ();
+  let is_z_t = Gmp_types.Z.is_t ty in
+  if is_z_t then Gmp_types.Z.is_now_referenced ();
+  let is_q_t = Gmp_types.Q.is_t ty in
+  if is_q_t then Gmp_types.Q.is_now_referenced ();
   let n = succ env.cpt in
   let v =
     Cil.makeVarinfo
@@ -214,17 +182,17 @@ let do_new_var ~loc ?(scope=Local_block) ?(name="") env t ty mk_stmts =
   in
   v.vreferenced <- true;
   let lscope = match scope with
-    | Global -> LGlobal
-    | Function -> LFunction (Extlib.the (current_kf env))
-    | Local_block -> LLocal_block (Extlib.the (current_kf env))
+    | Varname.Global -> LGlobal
+    | Varname.Function -> LFunction (Extlib.the (current_kf env))
+    | Varname.Block -> LLocal_block (Extlib.the (current_kf env))
   in
 (*  Options.feedback "new variable %a (global? %b)" Varinfo.pretty v global;*)
   let e = Cil.evar v in
   let stmts = mk_stmts v e in
   let new_stmts = acc_list_rev local_block.new_stmts stmts in
   let new_block_vars = match scope with
-    | Global | Function -> local_block.new_block_vars
-    | Local_block -> v :: local_block.new_block_vars
+    | Varname.Global | Varname.Function -> local_block.new_block_vars
+    | Varname.Block -> v :: local_block.new_block_vars
   in
   let new_block =
     { new_block_vars = new_block_vars;
@@ -246,7 +214,7 @@ let do_new_var ~loc ?(scope=Local_block) ?(name="") env t ty mk_stmts =
           | Some t -> Term.Map.add t (v, e) tbl.new_exps }
     in
     match scope with
-    | Global | Function ->
+    | Varname.Global | Varname.Function ->
       let local_env = { local_env with block_info = new_block } in
       (* also memoize the new variable, but must never be used *)
       { env with
@@ -254,7 +222,7 @@ let do_new_var ~loc ?(scope=Local_block) ?(name="") env t ty mk_stmts =
         new_global_vars = (v, lscope) :: env.new_global_vars;
         global_mp_tbl = extend_tbl env.global_mp_tbl;
         env_stack = local_env :: tl_env }
-    | Local_block ->
+    | Varname.Block ->
       let local_env =
         { block_info = new_block;
           mp_tbl = extend_tbl local_env.mp_tbl;
@@ -278,7 +246,7 @@ let do_new_var ~loc ?(scope=Local_block) ?(name="") env t ty mk_stmts =
 
 exception No_term
 
-let new_var ~loc ?(scope=Local_block) ?name env t ty mk_stmts =
+let new_var ~loc ?(scope=Varname.Block) ?name env t ty mk_stmts =
   let local_env, _ = top env in
   let memo tbl =
     try
@@ -291,8 +259,8 @@ let new_var ~loc ?(scope=Local_block) ?name env t ty mk_stmts =
       do_new_var ~loc ~scope ?name env t ty mk_stmts
   in
   match scope with
-  | Global | Function -> memo env.global_mp_tbl
-  | Local_block -> memo local_env.mp_tbl
+  | Varname.Global | Varname.Function -> memo env.global_mp_tbl
+  | Varname.Block -> memo local_env.mp_tbl
 
 let new_var_and_mpz_init ~loc ?scope ?name env t mk_stmts =
   new_var
@@ -301,7 +269,7 @@ let new_var_and_mpz_init ~loc ?scope ?name env t mk_stmts =
     ?name
     env
     t
-    (Gmp.Z.t ())
+    (Gmp_types.Z.t ())
     (fun v e -> Gmp.init ~loc e :: mk_stmts v e)
 
 module Logic_binding = struct
@@ -322,7 +290,7 @@ module Logic_binding = struct
       | Some ty -> ty
       | None -> match logic_v.lv_type with
         | Ctype ty -> ty
-        | Linteger -> Gmp.Z.t ()
+        | Linteger -> Gmp_types.Z.t ()
         | Ltype _ as ty when Logic_const.is_boolean_type ty -> Cil.charType
         | Ltype _ | Lvar _ | Lreal | Larrow _ as lty ->
           let msg =
@@ -443,7 +411,7 @@ let pop_and_get ?(split=false) env stmt ~global_clear where =
   let local_env, tl = top env in
   let clear =
     if global_clear then begin
-      Varname.clear ();
+      Varname.clear_locals ();
       env.global_mp_tbl.clear_stmts @ local_env.mp_tbl.clear_stmts
     end else
       local_env.mp_tbl.clear_stmts
@@ -551,6 +519,6 @@ let pretty fmt env =
 
 (*
 Local Variables:
-compile-command: "make"
+compile-command: "make -C ../.."
 End:
 *)

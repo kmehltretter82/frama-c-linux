@@ -20,11 +20,28 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Prepare AST for E-ACSL generation.
+(** Calls to the GMP's API. *)
 
-    So for this module performs two tasks:
-    - move declarations of variables declared in the bodies of switch
-    statements to upper scopes;
-    - store what is necessary to translate in [Keep_status]. *)
+open Cil_types
 
-val prepare: unit -> Project.t
+val init: loc:location -> exp -> stmt
+(** build stmt [mpz_init(v)] or [mpq_init(v)] depending on typ of [v] *)
+
+val init_set: loc:location -> lval -> exp -> exp -> stmt
+(** [init_set x_as_lv x_as_exp e] builds stmt [x = e] or [mpz_init_set*(v, e)]
+    or [mpq_init_set*(v, e)] with the good function 'set'
+    according to the type of [e] *)
+
+val clear: loc:location -> exp -> stmt
+(** build stmt [mpz_clear(v)] or [mpq_clear(v)] depending on typ of [v] *)
+
+val affect: loc:location -> lval -> exp -> exp -> stmt
+(** [affect x_as_lv x_as_exp e] builds stmt [x = e] or [mpz_set*(e)]
+    or [mpq_set*(e)] with the good function 'set'
+    according to the type of [e] *)
+
+(*
+Local Variables:
+compile-command: "make -C ../.."
+End:
+*)

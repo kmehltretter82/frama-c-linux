@@ -220,11 +220,11 @@ let rec interv_of_typ ty = match Cil.unrollType ty with
     ival l u
   | TEnum(enuminfo, _) ->
     interv_of_typ (TInt(enuminfo.ekind, []))
-  | _ when Gmp.Z.is_t ty ->
+  | _ when Gmp_types.Z.is_t ty ->
     top_ival
   | TFloat (k, _) ->
     Float(k, None)
-  | _ when Real.is_t ty ->
+  | _ when Gmp_types.Q.is_t ty ->
     Rational (* only rationals are implemented *)
   | TVoid _ | TPtr _ | TArray _ | TFun _ | TComp _ | TBuiltin_va_list _ ->
     Nan
@@ -593,6 +593,6 @@ include D
 
 (*
 Local Variables:
-compile-command: "make"
+compile-command: "make -C ../.."
 End:
  *)

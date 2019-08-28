@@ -68,3 +68,9 @@ val cmp: loc:location -> binop -> exp -> exp -> Env.t -> term option ->
   exp * Env.t
 (** Compares two expressions according to the given [binop]. The optional term
     indicates whether the comparison has a correspondance in the logic. *)
+
+(*
+Local Variables:
+compile-command: "make -C ../.."
+End:
+*)

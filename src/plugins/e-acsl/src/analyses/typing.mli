@@ -160,6 +160,6 @@ val compute_quantif_guards_ref
 
 (*
 Local Variables:
-compile-command: "make"
+compile-command: "make -C ../.."
 End:
 *)

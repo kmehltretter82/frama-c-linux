@@ -20,37 +20,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
+val do_visit: ?prj:Project.t -> bool -> Visitor.frama_c_visitor
 
-(** Generate C implementations of user-defined logic functions.
-    A logic function can have multiple C implementations depending on
-    the types computed for its arguments.
-    Eg: Consider the following definition: [integer g(integer x) = x]
-      with the following calls: [g(5)] and [g(10*INT_MAX)]
-      They will respectively generate the C prototypes [int g_1(int)]
-      and [long g_2(long)] *)
-
-(**************************************************************************)
-(************** Logic functions without labels ****************************)
-(**************************************************************************)
-
-val reset: unit -> unit
-
-val tapp_to_exp:
-  loc:location ->
-  string -> Env.t -> term -> logic_info -> Typing.number_ty list -> exp list ->
-  varinfo * exp * Env.t
-
-val add_generated_functions: global list -> global list
-(* @return the input list of globals in which the generated functions have been
-   inserted at the right places (both their declaration and their definition) *)
-
-(**************************************************************************)
-(********************** Forward references ********************************)
-(**************************************************************************)
-
-val named_predicate_to_exp_ref:
-  (kernel_function -> Env.t -> predicate -> exp * Env.t) ref
-
-val term_to_exp_ref:
-  (kernel_function -> Env.t -> term -> exp * Env.t) ref
+(*
+Local Variables:
+compile-command: "make -C ../.."
+End:
+*)

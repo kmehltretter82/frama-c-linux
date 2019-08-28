@@ -123,8 +123,8 @@ let dup_fundec loc spec bhv sound_verdict_vi kf vi new_vi =
       if vi.vname = "" then
         (* unnamed formal parameter: must generate a fresh name since a fundec
            cannot have unnamed formals (see bts #2303). *)
-        Env.Varname.get
-          ~scope:Env.Function
+        Varname.get
+          ~scope:Varname.Function
           (Functions.RTL.mk_gen_name "unamed_formal")
       else
         vi.vname

@@ -41,17 +41,8 @@ type localized_scope =
   | LFunction of kernel_function
   | LLocal_block of kernel_function
 
-type scope =
-  | Global
-  | Function
-  | Local_block
-
-module Varname: sig
-  val get: scope:scope -> string -> string
-end
-
 val new_var:
-  loc:location -> ?scope:scope -> ?name:string ->
+  loc:location -> ?scope:Varname.scope -> ?name:string ->
   t -> term option -> typ -> 
   (varinfo -> exp (* the var as exp *) -> stmt list) -> 
   varinfo * exp * t
@@ -62,7 +53,7 @@ val new_var:
     initialized by applying it to [mk_stmts]. *)
 
 val new_var_and_mpz_init:
-  loc:location -> ?scope:scope -> ?name:string ->
+  loc:location -> ?scope:Varname.scope -> ?name:string ->
   t -> term option -> 
   (varinfo -> exp (* the var as exp *) -> stmt list) -> 
   varinfo * exp * t
@@ -188,6 +179,6 @@ val pretty: Format.formatter -> t -> unit
 
 (*
 Local Variables:
-compile-command: "make"
+compile-command: "make -C ../.."
 End:
 *)

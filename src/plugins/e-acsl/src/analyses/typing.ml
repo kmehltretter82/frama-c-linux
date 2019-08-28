@@ -151,15 +151,15 @@ exception Not_a_number
 let typ_of_number_ty = function
   | C_integer ik -> TInt(ik, [])
   | C_float fk -> TFloat(fk, [])
-  | Gmpz -> Gmp.Z.t ()
+  | Gmpz -> Gmp_types.Z.t ()
   (* for the time being, no reals but rationals instead *)
-  | Rational -> Real.t ()
+  | Rational -> Gmp_types.Q.t ()
   | Real -> Error.not_yet "real number type"
   | Nan -> raise Not_a_number
 
 let typ_of_lty = function
   | Ctype cty -> cty
-  | Linteger -> Gmp.Z.t ()
+  | Linteger -> Gmp_types.Z.t ()
   | Lreal -> Error.not_yet "real type"
   | Ltype _ | Lvar _ | Larrow _ -> Options.fatal "unexpected logic type"
 
@@ -755,6 +755,6 @@ module Datatype = D
 
 (*
 Local Variables:
-compile-command: "make"
+compile-command: "make -C ../.."
 End:
 *)

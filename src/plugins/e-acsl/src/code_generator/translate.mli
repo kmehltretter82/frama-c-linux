@@ -20,54 +20,38 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** GMP Values. *)
-
 open Cil_types
 
-val init_t: unit -> unit
-(** Must be called before any use of GMP *)
+(** [translate_*] translates a given ACSL annotation into the corresponding C
+    statement (if any) for runtime assertion checking. This C statements are
+    part of the resulting environment. *)
 
-(**************************************************************************)
-(******************************** Types ***********************************)
-(**************************************************************************)
+val translate_pre_spec: kernel_function -> Env.t -> funspec -> Env.t
+val translate_post_spec: kernel_function -> Env.t -> funspec -> Env.t
+val translate_pre_code_annotation:
+  kernel_function -> Env.t -> code_annotation -> Env.t
+val translate_post_code_annotation:
+  kernel_function -> Env.t -> code_annotation -> Env.t
+val translate_named_predicate:
+  kernel_function -> Env.t -> predicate -> Env.t
 
-module type S = sig
-  val t: unit -> typ
-  val t_as_ptr: unit -> typ (** type equivalent to [t] but seen as a pointer *)
-  val is_now_referenced: unit -> unit
-  val is_t: typ -> bool
-end
+val translate_rte_annots:
+  (Format.formatter -> 'a -> unit) ->
+  'a ->
+  kernel_function ->
+  Env.t ->
+  code_annotation list ->
+  Env.t
 
-(** Representation of the unbounded integer type at runtime *)
-module Z: sig
-  include S
-end
+exception No_simple_translation of term
+val term_to_exp: typ option -> term -> exp
 
-(** Representation of the rational type at runtime *)
-module Q: S
+val predicate_to_exp: kernel_function -> predicate -> exp
 
-(**************************************************************************)
-(************************* Calls to builtins ******************************)
-(**************************************************************************)
-
-val init: loc:location -> exp -> stmt
-(** build stmt [mpz_init(v)] or [mpq_init(v)] depending on typ of [v] *)
-
-val init_set: loc:location -> lval -> exp -> exp -> stmt
-(** [init_set x_as_lv x_as_exp e] builds stmt [x = e] or [mpz_init_set*(v, e)]
-    or [mpq_init_set*(v, e)] with the good function 'set'
-    according to the type of [e] *)
-
-val clear: loc:location -> exp -> stmt
-(** build stmt [mpz_clear(v)] or [mpq_clear(v)] depending on typ of [v] *)
-
-val affect: loc:location -> lval -> exp -> exp -> stmt
-(** [affect x_as_lv x_as_exp e] builds stmt [x = e] or [mpz_set*(e)]
-    or [mpq_set*(e)] with the good function 'set'
-    according to the type of [e] *)
+val set_original_project: Project.t -> unit
 
 (*
 Local Variables:
-compile-command: "make"
+compile-command: "make -C ../.."
 End:
 *)
