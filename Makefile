@@ -272,6 +272,10 @@ DISTRIB_FILES:=\
       share/analysis-scripts/template.mk                                \
       $(wildcard share/emacs/*.el) share/autocomplete_frama-c           \
       share/_frama-c                                                    \
+      share/compliance/c11_functions.json                               \
+      share/compliance/glibc_functions.json                             \
+      share/compliance/nonstandard_identifiers.json                     \
+      share/compliance/posix_identifiers.json                           \
       share/configure.ac                                                \
       share/Makefile.config.in share/Makefile.common                    \
       share/Makefile.generic						\
@@ -1944,6 +1948,12 @@ install:: install-lib
 	$(MKDIR) $(FRAMAC_DATADIR)/analysis-scripts/examples
 	$(CP) share/analysis-scripts/examples/* \
 	  $(FRAMAC_DATADIR)/analysis-scripts/examples
+	$(MKDIR) $(FRAMAC_DATADIR)/compliance
+	$(CP) share/compliance/c11_functions.json \
+	  share/compliance/glibc_functions.json \
+	  share/compliance/nonstandard_identifiers.json \
+	  share/compliance/posix_identifiers.json \
+	  $(FRAMAC_DATADIR)/compliance
 	$(MKDIR) $(FRAMAC_DATADIR)/emacs
 	$(CP) $(wildcard share/emacs/*.el) $(FRAMAC_DATADIR)/emacs
 	$(CP) share/frama-c.rc $(ICONS) $(FRAMAC_DATADIR)
