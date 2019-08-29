@@ -1243,12 +1243,15 @@ bin/toplevel.opt$(EXE): $(ALL_BATCH_CMX) $(GEN_OPT_LIBS) \
 LIB_KERNEL_CMO= $(filter-out src/kernel_internals/runtime/gui_init.cmo, $(CMO))
 LIB_KERNEL_CMX= $(filter-out src/kernel_internals/runtime/gui_init.cmx, $(CMX))
 
-lib/fc/frama-c.cma: $(LIB_KERNEL_CMO) $(GEN_OPT_LIBS) $(LIB_KERNEL_CMX) lib/fc/META.frama-c
-	$(PRINT_LINKING) $@ and lib/fc/frama-c.cmxa
+lib/fc/frama-c.cma: $(LIB_KERNEL_CMO) $(GEN_BYTE_LIBS) lib/fc/META.frama-c
+	$(PRINT_LINKING) $@
 	$(MKDIR) $(FRAMAC_LIB)
-	$(OCAMLMKLIB) -o lib/fc/frama-c $(OPT_LIBS) $(LIB_KERNEL_CMO) $(LIB_KERNEL_CMX)
+	$(OCAMLMKLIB) -o lib/fc/frama-c $(BYTE_LIBS) $(LIB_KERNEL_CMO)
 
-lib/fc/frama-c.cmxa: lib/fc/frama-c.cma
+lib/fc/frama-c.cmxa: lib/fc/frama-c.cma $(GEN_OPT_LIBS) $(LIB_KERNEL_CMX)
+	$(MKDIR) $(FRAMAC_LIB)
+	$(PRINT_LINKING) $@
+	$(OCAMLMKLIB) -o lib/fc/frama-c $(OPT_LIBS) $(LIB_KERNEL_CMX)
 
 ####################
 # (Ocaml) Toplevel #
@@ -1891,11 +1894,15 @@ clean-install:
 	$(PRINT_RM) "Installation directory"
 	$(RM) -r $(FRAMAC_LIBDIR)
 
-install-lib: clean-install
+install-lib-byte: clean-install
 	$(PRINT_INSTALL) kernel API
 	$(MKDIR) $(FRAMAC_LIBDIR)
-	$(CP) $(LIB_BYTE_TO_INSTALL) $(LIB_OPT_TO_INSTALL) $(FRAMAC_LIBDIR)
-	$(CP) $(addprefix lib/fc/,dllframa-c.so libframa-c.a frama-c.cma frama-c.a frama-c.cmxa META.frama-c)  $(FRAMAC_LIBDIR)
+	$(CP) $(LIB_BYTE_TO_INSTALL) $(FRAMAC_LIBDIR)
+	$(CP) $(addprefix lib/fc/,dllframa-c.so libframa-c.a frama-c.cma META.frama-c) $(FRAMAC_LIBDIR)
+
+install-lib-opt: install-lib-byte
+	$(CP) $(LIB_OPT_TO_INSTALL) $(FRAMAC_LIBDIR)
+	$(CP) $(addprefix lib/fc/,frama-c.a frama-c.cmxa) $(FRAMAC_LIBDIR)
 
 install-doc-code:
 	$(PRINT_INSTALL) API documentation
@@ -1907,7 +1914,7 @@ install-doc-code:
 		| (cd $(FRAMAC_DATADIR)/doc ; tar xf -))
 
 .PHONY: install
-install:: install-lib
+install:: install-lib-$(OCAMLBEST)
 	$(PRINT_MAKING) destination directories
 	$(MKDIR) $(BINDIR)
 	$(MKDIR) $(MANDIR)/man1
