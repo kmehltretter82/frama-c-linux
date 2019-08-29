@@ -87,7 +87,7 @@ SRC_CODE_GENERATOR:= \
 	gmp \
 	label \
 	env \
-	real \
+	rational \
 	loops \
 	quantif \
 	at_with_lscope \

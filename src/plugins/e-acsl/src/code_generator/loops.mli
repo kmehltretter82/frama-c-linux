@@ -70,6 +70,6 @@ val term_to_exp_ref:
 
 (*
 Local Variables:
-compile-command: "make"
+compile-command: "make -C ../.."
 End:
 *)

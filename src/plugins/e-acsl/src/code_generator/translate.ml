@@ -84,7 +84,7 @@ let add_cast ~loc ?name env ctx strnum t_opt e =
   in
   let e, env = match strnum with
     | Str_Z -> mk_mpz e
-    | Str_R -> Real.mk_real ~loc ?name e env t_opt
+    | Str_R -> Rational.create ~loc ?name e env t_opt
     | C_number -> e, env
   in
   match ctx with
@@ -97,9 +97,9 @@ let add_cast ~loc ?name env ctx strnum t_opt e =
       (* Z --> Z *)
       e, env
     | false, true ->
-      if Real.is_t ty then
+      if Gmp_types.Q.is_t ty then
         (* R --> Z *)
-        Real.cast_to_z ~loc ?name e env
+        Rational.cast_to_z ~loc ?name e env
       else
         (* C integer --> Z *)
         let e =
@@ -114,9 +114,9 @@ let add_cast ~loc ?name env ctx strnum t_opt e =
         in
         mk_mpz e
     | _, false ->
-      if Real.is_t ctx then
-        if Real.is_t (Cil.typeOf e) then (* R --> R *) e, env
-        else (* C integer or Z --> R *) Real.mk_real ~loc ?name e env t_opt
+      if Gmp_types.Q.is_t ctx then
+        if Gmp_types.Q.is_t (Cil.typeOf e) then (* R --> R *) e, env
+        else (* C integer or Z --> R *) Rational.create ~loc ?name e env t_opt
       else if Gmp_types.Z.is_t ty || strnum = Str_Z then
         (* Z --> C type or the integer is represented by a string:
            anyway, it fits into a C integer: convert it *)
@@ -134,16 +134,16 @@ let add_cast ~loc ?name env ctx strnum t_opt e =
             (fun v _ -> [ Misc.mk_call ~loc ~result:(Cil.var v) fname [ e ] ])
         in
         e, env
-      else if Real.is_t ty || strnum = Str_R then
+      else if Gmp_types.Q.is_t ty || strnum = Str_R then
         (* R --> C type or the real is represented by a string *)
-        Real.add_cast ~loc ?name e env ctx
+        Rational.add_cast ~loc ?name e env ctx
       else
         (* C type --> another C type *)
         Cil.mkCastT ~force:false ~e ~oldt:ty ~newt:ctx, env
 
 let constant_to_exp ~loc t c =
   let mk_real s =
-    let s = Real.normalize_str s in
+    let s = Rational.normalize_str s in
     Cil.mkString ~loc s, Str_R
   in
   match c with
@@ -164,7 +164,7 @@ let constant_to_exp ~loc t c =
        | Some ty, (ILongLong | IULongLong) when Gmp_types.Z.is_t ty ->
          (* too large integer *)
          Cil.mkString ~loc (Integer.to_string n), Str_Z
-       | Some ty, _ when Real.is_t ty ->
+       | Some ty, _ when Gmp_types.Q.is_t ty ->
          mk_real (Integer.to_string n)
        | (None | Some _), _ ->
          (* do not keep the initial string representation because the generated
@@ -206,7 +206,7 @@ let conditional_to_exp ?(name="if") loc t_opt e1 (e2, env2) (e3, env3) =
           let lv = Cil.var v in
           let ty = Cil.typeOf ev in
           let init_set =
-            assert (not (Real.is_t ty));
+            assert (not (Gmp_types.Q.is_t ty));
             Gmp.init_set
           in
           let affect e = init_set ~loc lv ev e in
@@ -299,7 +299,7 @@ and context_insensitive_term_to_exp kf env t =
           (fun _ ev -> [ Misc.mk_call ~loc name [ ev; e ] ])
       in
       e, env, C_number, ""
-    else if Real.is_t ty then
+    else if Gmp_types.Q.is_t ty then
       not_yet env "reals: Neg | BNot"
     else
       Cil.new_exp ~loc (UnOp(op, e, ty)), env, C_number, ""
@@ -331,8 +331,8 @@ and context_insensitive_term_to_exp kf env t =
         Env.new_var_and_mpz_init ~loc ~name env (Some t) mk_stmts
       in
       e, env, C_number, ""
-    else if Real.is_t ty then
-      let e, env = Real.binop ~loc bop e1 e2 env (Some t) in
+    else if Gmp_types.Q.is_t ty then
+      let e, env = Rational.binop ~loc bop e1 e2 env (Some t) in
       e, env, C_number, ""
     else begin
       assert (Logic_typing.is_integral_type t.term_type);
@@ -377,8 +377,8 @@ and context_insensitive_term_to_exp kf env t =
       let name = Misc.name_of_binop bop in
       let _, e, env = Env.new_var_and_mpz_init ~loc ~name env t mk_stmts in
       e, env, C_number, ""
-    else if Real.is_t ty then
-      let e, env = Real.binop ~loc bop e1 e2 env (Some t) in
+    else if Gmp_types.Q.is_t ty then
+      let e, env = Rational.binop ~loc bop e1 e2 env (Some t) in
       e, env, C_number, ""
     else begin
       assert (Logic_typing.is_integral_type t.term_type);
@@ -611,7 +611,7 @@ and comparison_to_exp
     in
     Cil.new_exp ~loc (BinOp(bop, e, Cil.zero ~loc, Cil.intType)), env
   | Typing.Rational ->
-    Real.cmp ~loc bop e1 e2 env t_opt
+    Rational.cmp ~loc bop e1 e2 env t_opt
   | Typing.Real ->
     Error.not_yet "comparison involving real numbers"
 
@@ -642,7 +642,9 @@ and at_to_exp_no_lscope env t_opt label e =
       (* either a standard C affectation or a call to an initializer according
          to the type of [e] *)
       let ty = Cil.typeOf e in
-      let init_set = if Real.is_t ty then Real.init_set else Gmp.init_set in
+      let init_set =
+        if Gmp_types.Q.is_t ty then Rational.init_set else Gmp.init_set
+      in
       let new_stmt = init_set ~loc (Cil.var res_v) res e in
       assert (!env_ref == new_env);
       (* generate the new block of code for the labeled statement and the
@@ -672,7 +674,7 @@ and env_of_li li kf env loc =
     | Typing.Gmpz ->
       Gmp.init_set ~loc (Cil.var vi) vi_e e
     | Typing.Rational ->
-      Real.init_set ~loc (Cil.var vi) vi_e e
+      Rational.init_set ~loc (Cil.var vi) vi_e e
     | Typing.Real ->
       Error.not_yet "real number"
   in

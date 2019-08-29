@@ -22,15 +22,6 @@
 
 open Cil_types
 
-let t () =
-  (* When support for irrationals will be provided,
-    the following typ MUST be changed into a typ that can represent them.
-    It is sound to use GMPQ for the time being since irrationals
-    raise not_yet. *)
-  Gmp_types.Q.t ()
-
-let is_t ty = Cil_datatype.Typ.equal ty (t ())
-
 (* No init_set for GMPQ: init then set separately *)
 let init_set ~loc lval vi_e e =
   Cil.mkStmt
@@ -39,12 +30,15 @@ let init_set ~loc lval vi_e e =
       [ Gmp.init ~loc vi_e ;
         Gmp.affect ~loc lval vi_e e ]))
 
-let mk_real ~loc ?name e env t_opt =
-  if Gmp_types.Z.is_t (Cil.typeOf e) then
+let create ~loc ?name e env t_opt =
+  let ty = Cil.typeOf e in
+  if Gmp_types.Z.is_t ty then
     (* GMPQ has no builtin for creating Q from Z. Hence:
        1) Get the MPZ as a string: gmZ_get_str
        2) Set the MPQ with that string: gmpQ_set_str *)
     Error.not_yet "reals: creating Q from Z"
+  else if Gmp_types.Q.is_t ty then
+    e, env
   else
     let _, e, env =
       Env.new_var
@@ -52,7 +46,7 @@ let mk_real ~loc ?name e env t_opt =
         ?name
         env
         t_opt
-        (t ())
+        (Gmp_types.Q.t ())
         (fun vi vi_e ->
            [ Gmp.init ~loc vi_e ;
              Gmp.affect ~loc (Cil.var vi) vi_e e ])
@@ -141,14 +135,14 @@ let normalize_str str =
     Error.not_yet "number not written in decimal expansion"
 
 let cast_to_z ~loc:_ ?name:_ e _env =
-  assert (is_t (Cil.typeOf e));
+  assert (Gmp_types.Q.is_t (Cil.typeOf e));
   Error.not_yet "reals: cast from R to Z"
 
 let add_cast ~loc ?name e env ty =
   (* TODO: The best solution would actually be to directly write all the needed
      functions as C builtins then just call them here depending on the situation
      at hand. *)
-  assert (is_t (Cil.typeOf e));
+  assert (Gmp_types.Q.is_t (Cil.typeOf e));
   let get_double e env =
     let _, e, env =
       Env.new_var
@@ -188,14 +182,11 @@ let add_cast ~loc ?name e env ty =
   | _ ->
     Error.not_yet "R to <typ>"
 
-let real ~loc e env =
-  if is_t (Cil.typeOf e) then e, env else mk_real ~loc e env None
-
 let cmp ~loc bop e1 e2 env t_opt =
   let fname = "__gmpq_cmp" in
   let name = Misc.name_of_binop bop in
-  let e1, env = real ~loc e1 env in
-  let e2, env = real ~loc e2 env in
+  let e1, env = create ~loc e1 env None (* TODO: t1_opt could be provided *) in
+  let e2, env = create ~loc e2 env None (* TODO: t2_opt could be provided *) in
   let _, e, env =
     Env.new_var
       ~loc
@@ -214,7 +205,7 @@ let new_var_and_init ~loc ?scope ?name env t_opt mk_stmts =
     ?name
     env
     t_opt
-    (t ())
+    (Gmp_types.Q.t ())
     (fun v e -> Gmp.init ~loc e :: mk_stmts v e)
 
 let name_arith_bop = function
@@ -227,8 +218,8 @@ let name_arith_bop = function
 
 let binop ~loc bop e1 e2 env t_opt =
   let name = name_arith_bop bop in
-  let e1, env = real ~loc e1 env in
-  let e2, env = real ~loc e2 env in
+  let e1, env = create ~loc e1 env None (* TODO: t1_opt could be provided *) in
+  let e2, env = create ~loc e2 env None (* TODO: t2_opt could be provided *) in
   let mk_stmts _ e = [ Misc.mk_call ~loc name [ e; e1; e2 ] ] in
   let name = Misc.name_of_binop bop in
   let _, e, env = new_var_and_init ~loc ~name env t_opt mk_stmts in
