@@ -9,11 +9,8 @@ int f(int x) {
 
 int Y = 1;
 
-// does not work since it is converted into \result == \old(x) and, 
-// in this particular case, the pre-state and the post-state are the same and 
-// it does not work yet (related to issue in at.i).
-// /*@ ensures \result == x; */ 
-/*@ ensures \result == Y; */
+/*@ ensures \result == x;
+  @ ensures \result == Y; */
 int g(int x) { 
   return x; 
 }
