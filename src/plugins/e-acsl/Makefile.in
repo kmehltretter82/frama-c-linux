@@ -180,7 +180,6 @@ else
 
 PLUGIN_TESTS_DIRS := \
 	format \
-	reject \
 	runtime \
 	bts \
 	gmp \
