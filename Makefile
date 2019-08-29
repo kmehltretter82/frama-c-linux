@@ -1300,12 +1300,6 @@ gui: gui-$(OCAMLBEST)
 ALL_GUI_CMO= $(ALL_CMO) $(GRAPH_GUICMO) $(GUICMO)
 ALL_GUI_CMX= $(patsubst %.cma,%.cmxa,$(ALL_GUI_CMO:.cmo=.cmx))
 
-ifeq ($(LABLGTK_VERSION),3)
-THREAD=-thread
-else
-THREAD=
-endif
-
 bin/viewer.byte$(EXE): BYTE_LIBS+= $(GRAPH_GUICMO)
 bin/viewer.byte$(EXE): $(filter-out $(GRAPH_GUICMO),$(ALL_GUI_CMO)) \
 			$(GEN_BYTE_LIBS) \

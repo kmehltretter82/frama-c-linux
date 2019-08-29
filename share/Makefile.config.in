@@ -108,9 +108,11 @@ HAS_GTKSOURCEVIEW ?=@HAS_GTKSOURCEVIEW@
 LABLGTK_VERSION ?=@LABLGTK_VERSION@
 ifeq ("$(LABLGTK_VERSION)","3")
   GTKSOURCEVIEW:=lablgtk3-sourceview3
+  THREAD:=-thread
 else
   GTKSOURCEVIEW:=\
     $(patsubst lablgtk%,$(LABLGTK).%,$(basename $(notdir @GTKSOURCEVIEW@)))
+  THREAD:=
 endif
 
 # lablgnomecanvas
