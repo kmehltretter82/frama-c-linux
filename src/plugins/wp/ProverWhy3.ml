@@ -20,17 +20,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* -------------------------------------------------------------------------- *)
-(* --- Prover Why3 Interface                                          --- *)
-(* -------------------------------------------------------------------------- *)
-
-open Cil_types
-open Qed
-open Lang
-open Definitions
+[@@@ warning "-40-42"]
 
 let dkey = Wp_parameters.register_category "prover"
-let why3_goal_name = "WP"
+let dkey_api = Wp_parameters.register_category "why3_api"
 
 let option_file = LogicBuiltins.create_option
     (fun ~driver_dir x -> Filename.concat driver_dir x)
@@ -40,137 +33,694 @@ let option_import = LogicBuiltins.create_option
     (fun ~driver_dir:_ x -> x)
     "why3" "import"
 
+let config = VCS.why3_config
 
-(* -------------------------------------------------------------------------- *)
-(* --- Making Goal File                                                   --- *)
-(* -------------------------------------------------------------------------- *)
+module Env = Model.Index(struct
+    include Datatype.Unit
+    type key = unit
+    type data = Why3.Env.env
+  end)
 
-let cluster_file c =
-  let dir = Model.directory () in
-  let base = cluster_id c in
-  Printf.sprintf "%s/%s.why" dir base
+let get_why3_env =
+  Env.memoize (fun () ->
+      let config = Lazy.force config in
+      let main = Why3.Whyconf.get_main config in
+      let ld =
+        (Model.directory ())::
+        (Wp_parameters.Share.file "why3")::
+        (Why3.Whyconf.loadpath main) in
+      Why3.Env.create_env ld
+    )
 
-let theory_name_of_cluster c =
-  let base = cluster_id c in
-  String.capitalize_ascii base
+type context = {
+  mutable th : Why3.Theory.theory_uc;
+  env: Why3.Env.env;
+}
 
-let theory_name_of_pid pid = "VC" ^ WpPropId.get_propid pid
+type convert = {
+  th : Why3.Theory.theory_uc;
+  env: Why3.Env.env;
+  subst: Why3.Term.term Lang.F.Tmap.t;
+  pool: Lang.F.pool;
+  polarity: Cvalues.polarity;
+  in_goal: bool;
+  mutable convert_for_export: Lang.F.term Lang.F.Tmap.t;
+}
 
-(* -------------------------------------------------------------------------- *)
-(* --- Exporting Formulae to Why3                                         --- *)
-(* -------------------------------------------------------------------------- *)
+(** The reason for the rebuild *)
+let specific_equalities: Lang.For_export.specific_equality list ref =
+  ref [Vlist.specialize_eq_list]
 
-type depend =
-  | D_file of string
-  | D_cluster of cluster
+(** get symbols *)
 
-let engine =
-  let module E = Qed.Export_why3.Make(Lang.F.QED) in
-  object(self)
-    inherit E.engine as super
-    inherit Lang.idprinting
-    method infoprover p = p.why3
+let get_ls ~cnv ~f ~l ~p =
+  let th = Why3.Env.read_theory cnv.env f l in
+  let ls =
+    try
+      Why3.Theory.ns_find_ls th.th_export p
+    with Not_found ->
+      Wp_parameters.fatal "The symbol %a can't be found in %a.%s"
+        Why3.Pp.(print_list dot string) p
+        Why3.Pp.(print_list dot string) f l
+  in
+  ls
 
-    val mutable goal = false
-    method set_goal g = goal <- g
+let get_ts ~cnv ~f ~l ~p =
+  let th = Why3.Env.read_theory cnv.env f l in
+  let ls =
+    try
+      Why3.Theory.ns_find_ts th.th_export p
+    with Not_found ->
+      Wp_parameters.fatal "The type %a can't be found in %a.%s"
+        Why3.Pp.(print_list dot string) p
+        Why3.Pp.(print_list dot string) f l
+  in
+  ls
 
-    method private is_vlist polarity a b =
-      goal && self#mode = polarity &&
-      (Vlist.check_term a || Vlist.check_term b)
 
-    method! pp_equal fmt a b =
-      if self#is_vlist Qed.Engine.Mpositive a b
-      then Qed.Plib.pp_call_apply "vlist_eq" self#pp_term fmt [a;b]
-      else super#pp_equal fmt a b
+let t_app ~cnv ~f ~l ~p tl =
+  Why3.Term.t_app_infer (get_ls ~cnv ~f ~l ~p) tl
 
-    method! pp_noteq fmt a b =
-      if self#is_vlist Qed.Engine.Mnegative a b
-      then
+let t_app' ~cnv ~f ~l ~p tl ty =
+  Why3.Term.t_app (get_ls ~cnv ~f ~l ~p) tl ty
+
+(** Conversion *)
+
+(** why3 1.3
+    let const_int (z:Z.t) =
+    Why3.(Term.t_const Number.(int_const (BigInt.of_string (Z.to_string z)))) Why3.Ty.ty_int
+
+    let const_real ~cnv (q:Q.t) =
+    let mk_real_int z =
+    let c = Why3.Number.real_const (Why3.BigInt.of_string (Z.to_string z)) in
+    Why3.(Term.t_const c) Why3.Ty.ty_real
+    in
+    if Z.equal Z.one q.den
+    then mk_real_int q.num
+    else
+    t_app ~cnv ~f:["real"] ~l:"Real" ~p:["infix /"] [mk_real_int q.num;mk_real_int q.den]
+
+*)
+
+let const_int (z:Z.t) =
+  Why3.(Term.t_const Number.(const_of_big_int (BigInt.of_string (Z.to_string z)))) Why3.Ty.ty_int
+
+let const_real ~cnv (q:Q.t) =
+  let mk_real_int z =
+    let rc_negative = Z.sign z < 0 in
+    let z = Z.abs z in
+    let rc_abs = Why3.Number.real_const_dec (Z.to_string z) "" None in
+    let c = Why3.Number.ConstReal { Why3.Number.rc_negative; rc_abs } in
+    Why3.(Term.t_const c) Why3.Ty.ty_real
+  in
+  if Z.equal Z.one q.den
+  then mk_real_int q.num
+  else
+    t_app ~cnv ~f:["real"] ~l:"Real" ~p:["infix /"] [mk_real_int q.num;mk_real_int q.den]
+
+(** fold map list of at least one element *)
+let fold_map map fold = function
+  | [] -> assert false (** absurd: forbidden by qed  *)
+  | a::tl ->
+      List.fold_left (fun acc a -> fold acc (map a)) (map a) tl
+
+let empty_context name : context = {
+  th = Why3.Theory.create_theory (Why3.Ident.id_fresh name);
+  env = get_why3_env ();
+}
+
+let empty_cnv ?(polarity=`NoPolarity) ?(in_goal=false) (ctx:context) : convert = {
+  th = ctx.th;
+  subst = Lang.F.Tmap.empty;
+  pool = Lang.F.pool ();
+  env = ctx.env;
+  polarity;
+  in_goal;
+  convert_for_export = Lang.F.Tmap.empty;
+}
+
+
+let lfun_name (lfun:Lang.lfun) =
+  match lfun with
+  | ACSL f -> Qed.Engine.F_call (Lang.logic_id f)
+  | CTOR c -> Qed.Engine.F_call (Lang.ctor_id c)
+  | Model({m_source=Generated n}) -> Qed.Engine.F_call n
+  | Model({m_source=Extern e}) -> e.Lang.ext_link.Lang.why3
+
+
+let coerce ~cnv sort expected r =
+  match sort, expected with
+  | Qed.Logic.Bool, Qed.Logic.Prop -> Why3.Term.(t_equ r t_bool_true)
+  | Qed.Logic.Int, Qed.Logic.Real ->
+      t_app ~cnv ~f:["real"] ~l:"FromInt" ~p:["from_int"] [r]
+  | _ -> r
+
+let name_of_adt = function
+  | Lang.Mtype a -> a.Lang.ext_link.Lang.why3
+  | Mrecord(a,_) -> a.Lang.ext_link.Lang.why3
+  | Comp c -> Lang.comp_id c
+  | Atype lt -> Lang.type_id lt
+
+let tvar =
+  let tvar = Datatype.Int.Hashtbl.create 10 in
+  fun i ->
+    Datatype.Int.Hashtbl.memo tvar i
+      (fun i ->
+         let id = Why3.Ident.id_fresh (Printf.sprintf "a%i" i) in
+         Why3.Ty.create_tvsymbol id
+      )
+
+
+(** Sharing *)
+
+let shared (_ : Lang.F.term) = false
+
+let shareable e =
+  match Lang.F.repr e with
+  | Kint _ | Kreal _ | True | False -> false
+  | Times _ | Add _ | Mul _ | Div _ | Mod _ -> true
+  | Eq _ | Neq _ | Leq _ | Lt _ -> false
+  | Aget _ | Aset _ | Rget _ | Rdef _ | Acst _ -> true
+  | And _ | Or _ | Not _ | Imply _ | If _ -> false
+  | Fun _ -> not (Lang.F.is_prop e)
+  | Bvar _ | Fvar _ | Apply _ | Bind _ -> false
+
+let subterms f e =
+  match Lang.F.repr e with
+  | Rdef fts ->
+      begin
+        match Lang.F.record_with fts with
+        | None -> Lang.F.lc_iter f e
+        | Some(a,fts) -> f a ; List.iter (fun (_,e) -> f e) fts
+      end
+  | _ -> Lang.F.lc_iter f e
+
+(* path splitting *)
+let regexp_col = Str.regexp_string ":"
+let regexp_com = Str.regexp_string ","
+let regexp_dot = Str.regexp_string "."
+
+let cut_path s = Str.split_delim regexp_dot s
+
+(* conversion *)
+
+let rec of_tau ~cnv (t:Lang.F.tau) =
+  match t with
+  | Prop -> None
+  | Bool -> Some Why3.Ty.ty_bool
+  | Int -> Some Why3.Ty.ty_int
+  | Real -> Some Why3.Ty.ty_real
+  | Array(k,v) ->
+      let ts = get_ts ~cnv ~f:["map"] ~l:"Map" ~p:["map"] in
+      Some (Why3.Ty.ty_app ts [Why3.Opt.get (of_tau ~cnv k); Why3.Opt.get (of_tau ~cnv v)])
+  | Data(adt,l) -> begin
+      let s = name_of_adt adt in
+      match Why3.Theory.(ns_find_ts (get_namespace cnv.th) (cut_path s)) with
+      | ts -> Some (Why3.Ty.ty_app ts (List.map (fun e -> Why3.Opt.get (of_tau ~cnv e)) l))
+      | exception Not_found -> Wp_parameters.fatal "Can't find type [%s] in why3 namespace" s
+    end
+  | Tvar i -> Some (Why3.Ty.ty_var (tvar i))
+  | Record _ ->
+      Wp_parameters.not_yet_implemented "Type %a not yet convertible"
+        Lang.F.pp_tau t
+
+let rec full_trigger = function
+  | Qed.Engine.TgAny -> false
+  | TgVar _ -> true
+  | TgGet(a,k) -> full_trigger a && full_trigger k
+  | TgSet(a,k,v) -> full_trigger a && full_trigger k && full_trigger v
+  | TgFun(_,xs) | TgProp(_,xs) -> List.for_all full_trigger xs
+
+let rec full_triggers = function
+  | [] -> []
+  | ts :: tgs ->
+      match List.filter full_trigger ts with
+      | [] -> full_triggers tgs
+      | ts -> ts :: full_triggers tgs
+
+let rec of_trigger ~cnv t =
+  match t with
+  | Qed.Engine.TgAny -> assert false (** absurd: filter by full_triggers *)
+  | Qed.Engine.TgVar v -> begin
+      try Lang.F.Tmap.find (Lang.F.e_var v) cnv.subst
+      with Not_found -> Wp_parameters.fatal "Unbound variable %a" Lang.F.pp_var v
+    end
+  | Qed.Engine.TgGet(m,k) ->
+      t_app ~cnv ~f:["map"] ~l:"Map" ~p:["get"] [of_trigger cnv m;of_trigger cnv k]
+  | TgSet(m,k,v) ->
+      t_app ~cnv ~f:["map"] ~l:"Map" ~p:["set"] [of_trigger cnv m;of_trigger cnv k;of_trigger cnv v]
+  | TgFun (f,l) -> begin
+      match lfun_name f with
+      | F_call s ->
+          let ls = Why3.Theory.(ns_find_ls (get_namespace cnv.th) (cut_path s)) in
+          Why3.Term.t_app_infer ls (List.map (fun e -> of_trigger cnv e) l)
+      | _ -> Wp_parameters.not_yet_implemented "lfun in triggers"
+    end
+  | TgProp (f,l) ->
+      begin
+        match lfun_name f with
+        | F_call s ->
+            let ls = Why3.Theory.(ns_find_ls (get_namespace cnv.th) (cut_path s)) in
+            Why3.Term.t_app_infer ls (List.map (fun e -> of_trigger cnv e) l)
+        | _ -> Wp_parameters.not_yet_implemented "lfun in triggers"
+      end
+
+let rec of_term ~cnv expected t : Why3.Term.term =
+  Wp_parameters.debug ~dkey:dkey_api
+    "of_term %a %a@."
+    Lang.F.Tau.pretty expected Lang.F.pp_term t;
+  let sort = Lang.F.typeof t in
+  let ($) f x = f x in
+  let r =
+    try coerce ~cnv sort expected $ Lang.F.Tmap.find t cnv.subst
+    with Not_found ->
+    match Lang.F.repr t, sort, expected with
+    | (Fvar _, _, _) -> invalid_arg "unbound variable in of_term"
+    | (Bvar _, _, _) -> invalid_arg "bound variable in of_term"
+    | Bind((Forall|Exists) as q,_,_), _, _ ->
+        coerce ~cnv Prop expected $
+        let why3_vars, t = successive_binders cnv q t in
+        let quant = match q with
+          | Qed.Logic.Forall -> Why3.Term.Tforall
+          | Qed.Logic.Exists -> Why3.Term.Texists
+          | _ -> assert false
+        in
+        Why3.Term.t_quant quant (Why3.Term.t_close_quant why3_vars [] t)
+    | True, _, Prop -> Why3.Term.t_true
+    | True, _, Bool -> Why3.Term.t_bool_true
+    | False, _, Prop -> Why3.Term.t_false
+    | False, _, Bool -> Why3.Term.t_bool_false
+    | Kint z, Int, _ -> coerce ~cnv sort expected $ const_int z
+    | Kreal q, Real, _ -> coerce ~cnv sort expected $ const_real ~cnv q
+    | Times(z,t), Int, _ ->
+        coerce ~cnv sort expected $
+        t_app ~cnv ~f:["int"] ~l:"Int" ~p:["infix *"] [const_int z; of_term cnv sort t]
+    | Times(z,t), Real, _ ->
+        coerce ~cnv sort expected $
+        t_app ~cnv ~f:["real"] ~l:"Real" ~p:["infix *"]
+          [const_real ~cnv (Q.of_bigint z); of_term cnv sort t]
+    | Add l, Int, _ ->
+        coerce ~cnv sort expected $
+        t_app_fold ~f:["int"] ~l:"Int" ~p:["infix +"] ~cnv sort l
+    | Add l, Real, _ ->
+        coerce ~cnv sort expected $
+        t_app_fold ~f:["real"] ~l:"Real" ~p:["infix +"] ~cnv sort l
+    | Mul l, Int, _ ->
+        coerce ~cnv sort expected $
+        t_app_fold ~f:["int"] ~l:"Int" ~p:["infix *"] ~cnv sort l
+    | Mul l, Real, _ ->
+        coerce ~cnv sort expected $
+        t_app_fold ~f:["real"] ~l:"Real" ~p:["infix *"] ~cnv sort l
+    | Leq (a,b), _, Prop ->
+        int_or_real ~cnv
+          ~fint:["int"] ~lint:"Int" ~pint:["infix <="]
+          ~freal:["real"] ~lreal:"Real" ~preal:["infix <="]
+          a b
+    | Div(a,b), Int, _ ->
+        coerce ~cnv sort expected $
+        t_app ~cnv ~f:["int"] ~l:"ComputerDivision" ~p:["div"]
+          [of_term ~cnv sort a; of_term ~cnv sort b]
+    | Mod(a,b), Int, _ ->
+        coerce ~cnv sort expected $
+        t_app ~cnv ~f:["int"] ~l:"ComputerDivision" ~p:["mod"]
+          [of_term ~cnv sort a; of_term ~cnv sort b]
+    | Div(a,b), Real, _ ->
+        coerce ~cnv sort expected $
+        t_app ~cnv ~f:["real"] ~l:"Real" ~p:["infix /"]
+          [of_term ~cnv sort a; of_term ~cnv sort b]
+    | Lt (a,b), _, Prop ->
+        int_or_real ~cnv
+          ~fint:["int"] ~lint:"Int" ~pint:["infix <"]
+          ~freal:["real"] ~lreal:"Real" ~preal:["infix <"]
+          a b
+    | Leq (a,b), _, Bool ->
+        int_or_real ~cnv
+          ~fint:["qed"] ~lint:"Qed" ~pint:["zleq"]
+          ~freal:["qed"] ~lreal:"Qed" ~preal:["rleq"]
+          a b
+    | Lt (a,b), _, Bool ->
+        int_or_real ~cnv
+          ~fint:["qed"] ~lint:"Qed" ~pint:["zlt"]
+          ~freal:["qed"] ~lreal:"Qed" ~preal:["rlt"]
+          a b
+    | And l, _, Bool ->
+        t_app_fold ~f:["bool"] ~l:"Bool" ~p:["andb"] ~cnv expected l
+    | And l, _, Prop ->
+        fold_map (of_term ~cnv expected) Why3.Term.t_and l
+    | Or l, _, Bool ->
+        t_app_fold ~f:["bool"] ~l:"Bool" ~p:["orb"] ~cnv expected l
+    | Or l, _, Prop ->
+        fold_map (of_term ~cnv expected) Why3.Term.t_or l
+    | Not e, _, Bool ->
+        let cnv = {cnv with polarity = Cvalues.negate cnv.polarity} in
+        t_app ~cnv ~f:["bool"] ~l:"Bool" ~p:["notb"] [of_term ~cnv expected e]
+    | Not e, _, Prop ->
+        let cnv = {cnv with polarity = Cvalues.negate cnv.polarity} in
+        Why3.Term.t_not (of_term cnv expected e)
+    | Imply (l,e), _, _ ->
+        let e = (of_term ~cnv expected) e in
+        let cnv' = {cnv with polarity = Cvalues.negate cnv.polarity} in
+        let fold acc a =
+          let a = of_term ~cnv:cnv' expected a in
+          match expected with
+          | Prop -> Why3.Term.t_implies a acc
+          | _ (* Bool *) ->
+              t_app ~cnv:cnv' ~f:["bool"] ~l:"Bool" ~p:["implb"] [a;acc]
+        in
+        List.fold_left fold e (List.rev l)
+    | Eq (a,b), _, Prop -> begin
+        match Lang.F.typeof a with
+        | Prop | Bool ->
+            Why3.Term.t_iff (of_term cnv Prop a) (of_term cnv Prop b)
+        | tau ->
+            match List.find (fun spe -> spe.Lang.For_export.for_tau tau) !specific_equalities with
+            | spe when cnv.polarity = `Positive -> of_term cnv expected (spe.mk_new_eq a b)
+            | exception Not_found -> Why3.Term.t_equ (of_term' cnv a) (of_term' cnv b)
+            | _                   -> Why3.Term.t_equ (of_term' cnv a) (of_term' cnv b)
+      end
+    | Neq (a,b), _, Prop ->
         begin
-          Format.fprintf fmt "@[<hov 2>not@,(" ;
-          Qed.Plib.pp_call_apply "vlist_eq" self#pp_term fmt [a;b] ;
-          Format.fprintf fmt ")@]" ;
+          match Lang.F.typeof a with
+          | Prop | Bool ->
+              Why3.Term.t_not (Why3.Term.t_iff (of_term cnv Prop a) (of_term cnv Prop b))
+          | tau ->
+              match List.find (fun spe -> spe.Lang.For_export.for_tau tau) !specific_equalities with
+              | spe when cnv.polarity = `Negative ->
+                  Why3.Term.t_not (of_term cnv expected (spe.mk_new_eq a b))
+              | exception Not_found -> Why3.Term.t_neq (of_term' cnv a) (of_term' cnv b)
+              | _                   -> Why3.Term.t_neq (of_term' cnv a) (of_term' cnv b)
         end
-      else super#pp_noteq fmt a b
+    | Eq (a,b), _, Bool ->
+        t_app ~cnv ~f:["qed"] ~l:"Qed" ~p:["eqb"] [of_term' cnv a; of_term' cnv b]
+    | Neq (a,b), _, Bool ->
+        t_app ~cnv ~f:["qed"] ~l:"Qed" ~p:["neqb"] [of_term' cnv a; of_term' cnv b]
+    | If(a,b,c), _, _ ->
+        let cnv' = {cnv with polarity = `NoPolarity} in
+        Why3.Term.t_if (of_term cnv' Prop a) (of_term cnv expected b) (of_term cnv expected c)
+    | Aget(m,k), _, _ ->
+        coerce ~cnv sort expected $
+        let mtau = Lang.F.typeof m in
+        let ksort = match mtau with
+          | Array(ksort,_) -> ksort
+          | _ -> assert false (** absurd: by qed typing *)in
+        t_app ~cnv ~f:["map"] ~l:"Map" ~p:["get"] [of_term cnv mtau m;of_term cnv ksort k]
+    | Aset(m,k,v), Array(ksort,vsort), _ ->
+        coerce ~cnv sort expected $
+        t_app ~cnv ~f:["map"] ~l:"Map" ~p:["set"] [of_term cnv sort m;of_term cnv ksort k;of_term cnv vsort v]
+    | Acst(_,v), Array(_,vsort), _ ->
+        coerce ~cnv sort expected $
+        t_app' ~cnv ~f:["map"] ~l:"Const" ~p:["const"] [of_term cnv vsort v] (of_tau cnv sort)
+    (* Generic *)
+    | Fun (f,l), _, _ -> begin
+        let t_app ls l r  =
+          Why3.Term.t_app ls l r
+        in
+        let apply_from_ns s l sort =
+          match Why3.Theory.(ns_find_ls (get_namespace cnv.th) (cut_path s)), expected with
+          | ls, (Prop | Bool) ->
+              coerce ~cnv sort expected $
+              t_app ls l (of_tau cnv sort)
+          | ls, _ ->
+              coerce ~cnv sort expected $
+              t_app ls l (of_tau cnv sort)
+          | exception Not_found -> Wp_parameters.fatal "Can't find [%s] in why3 namespace" s
+        in
+        let apply_from_ns' s l =
+          apply_from_ns s (List.map (fun e -> of_term' cnv e) l)
+        in
+        match lfun_name f, expected with
+        | F_call s, _ -> apply_from_ns' s l sort
+        | Qed.Engine.F_subst _, _ -> Wp_parameters.not_yet_implemented "lfun with subst"
+        | Qed.Engine.F_left s, _ | Qed.Engine.F_assoc s, _ ->
+            let rec aux = function
+              | [] -> Wp_parameters.fatal "Empty application"
+              | [a] -> of_term cnv expected a
+              | a::l ->
+                  apply_from_ns s [of_term' cnv a; aux l] sort
+            in
+            aux l
+        | Qed.Engine.F_right s, _ ->
+            let rec aux = function
+              | [] -> Wp_parameters.fatal "Empty application"
+              | [a] -> of_term cnv expected a
+              | a::l ->
+                  apply_from_ns s [aux l;of_term' cnv a] sort
+            in
+            aux (List.rev l)
+        | Qed.Engine.F_list (fcons,fnil), _ ->
+            let rec aux = function
+              | [] -> apply_from_ns fnil [] sort
+              | a::l ->
+                  apply_from_ns fcons [of_term' cnv a;aux l] sort
+            in
+            aux l
+        | Qed.Engine.F_bool_prop (s,_), Bool | Qed.Engine.F_bool_prop (_,s), Prop ->
+            apply_from_ns' s l expected
+        | Qed.Engine.F_bool_prop (_,_), _ ->
+            Wp_parameters.fatal "badly expected type %a for term %a"
+              Lang.F.pp_tau expected Lang.F.pp_term t
+      end
+    | Rget(a,f), _ , _ -> begin
+        let s = Lang.name_of_field f in
+        match Why3.Theory.(ns_find_ls (get_namespace cnv.th) (cut_path s)) with
+        | ls -> Why3.Term.t_app ls [of_term' cnv a] (of_tau cnv expected)
+        | exception Not_found -> Wp_parameters.fatal "Can't find [%s] in why3 namespace" s
+      end
+    | Rdef(l), Data(Comp c,_) , _ -> begin
+        (* l is already sorted by field *)
+        let s = Lang.comp_id c in
+        match Why3.Theory.(ns_find_ls (get_namespace cnv.th) (cut_path s)) with
+        | ls ->
+            let l = List.map (fun (_,t) -> of_term' cnv t) l in
+            Why3.Term.t_app ls l (of_tau cnv expected)
+        | exception Not_found -> Wp_parameters.fatal "Can't find [%s] in why3 namespace" s
+      end
+    | (Rdef _, Data ((Mtype _|Mrecord (_, _)|Atype _), _), _)
+    | (Rdef _, (Prop|Bool|Int|Real|Tvar _|Array (_, _)), _)
+    | (Aset (_, _, _), (Prop|Bool|Int|Real|Tvar _|Record _|Data (_, _)), _)
+    | (Neq (_, _), _, (Int|Real|Tvar _|Array (_, _)|Record _|Data (_, _)))
+    | (Eq (_, _), _, (Int|Real|Tvar _|Array (_, _)|Record _|Data (_, _)))
+    | (Not _, _, (Int|Real|Tvar _|Array (_, _)|Record _|Data (_, _)))
+    | (Or _, _, (Int|Real|Tvar _|Array (_, _)|Record _|Data (_, _)))
+    | (And _, _, (Int|Real|Tvar _|Array (_, _)|Record _|Data (_, _)))
+    | (Lt (_, _), _, (Int|Real|Tvar _|Array (_, _)|Record _|Data (_, _)))
+    | (Leq (_, _), _, (Int|Real|Tvar _|Array (_, _)|Record _|Data (_, _)))
+    | (Div (_, _), (Prop|Bool|Tvar _|Array (_, _)|Record _|Data (_, _)), _)
+    | (Mod (_, _), (Prop|Bool|Real|Tvar _|Array (_, _)|Record _|Data (_, _)), _)
+    | (Mul _, (Prop|Bool|Tvar _|Array (_, _)|Record _|Data (_, _)), _)
+    | (Add _, (Prop|Bool|Tvar _|Array (_, _)|Record _|Data (_, _)), _)
+    | (Times (_, _), (Prop|Bool|Tvar _|Array (_, _)|Record _|Data (_, _)), _)
+    | (Kreal _, (Prop|Bool|Int|Tvar _|Array (_, _)|Record _|Data (_, _)), _)
+    | (Kint _, (Prop|Bool|Real|Tvar _|Array (_, _)|Record _|Data (_, _)), _)
+    | (False, _, (Int|Real|Tvar _|Array (_, _)|Record _|Data (_, _)))
+    | (True, _, (Int|Real|Tvar _|Array (_, _)|Record _|Data (_, _)))
+    | (Acst (_, _), (Prop|Bool|Int|Real|Tvar _|Record _|Data (_, _)), _)
+      -> assert false (** absurd: by typing *)
+    | (Bind (Lambda, _, _), _, _)
+    | Apply _ , _, _
+    | Rdef _, Record _, _ ->
+        Wp_parameters.not_yet_implemented
+          "Can't convert to why3 the qed term %a of type %a"
+          Lang.F.pp_term t Lang.F.pp_tau sort
+  in
+  r
 
-    method! pp_fun cmode fct ts =
-      if fct == Vlist.f_concat
-      then Vlist.export self ts
-      else super#pp_fun cmode fct ts
+and t_app_fold  ~cnv ~f ~l ~p expected lt =
+  let fold acc a =
+    t_app ~cnv ~f ~l ~p [acc;a]
+  in
+  fold_map (of_term ~cnv expected) fold lt
 
-  end
+and of_term' cnv t =
+  of_term cnv (Lang.F.typeof t) t
+
+and share cnv expected t =
+  let l = Lang.F.QED.shared ~shareable ~shared ~subterms [t] in
+  let cnv,lets = mk_lets cnv l in
+  let t = of_term ~cnv expected t in
+  let t = List.fold_left (fun t (x,e') ->
+      Why3.Term.t_let_close x e' t
+    ) t lets
+  in
+  t
+
+and mk_lets cnv l =
+  List.fold_left (fun (cnv,lets) e ->
+      let cnv' = {cnv with polarity = `NoPolarity} in
+      let e' = of_term cnv' (Lang.F.typeof e) e in
+      match e'.t_ty with
+      | None -> ({cnv with subst = Lang.F.Tmap.add e e' cnv.subst},lets)
+      | Some ty ->
+          let x = Why3.Ident.id_fresh (Lang.F.basename e) in
+          let x = Why3.Term.create_vsymbol x ty in
+          (* Format.printf "lets %a = %a : %a@."
+           *   Why3.Pretty.print_vsty x
+           *   Why3.Pretty.print_term e'
+           *   Why3.Pretty.print_ty (Why3.Term.t_type e'); *)
+          let cnv = {cnv with subst = Lang.F.Tmap.add e (Why3.Term.t_var x) cnv.subst } in
+          let lets = (x,e')::lets in
+          cnv,lets
+    ) (cnv,[]) l
+
+and successive_binders cnv q t =
+  match Lang.F.repr t with
+  | Bind((Forall|Exists) as q',tau,t) when q' = q ->
+      let x = Lang.F.fresh cnv.pool tau in
+      let x' = Why3.Ident.id_fresh (Lang.F.Tau.basename tau) in
+      let x' = Why3.Term.create_vsymbol x' (Why3.Opt.get (of_tau cnv tau)) in
+      let cnv = {cnv with subst = Lang.F.Tmap.add (Lang.F.e_var x) (Why3.Term.t_var x') cnv.subst} in
+      let t = Lang.F.QED.e_unbind x t in
+      let why3_vars, t = successive_binders cnv q t in
+      x'::why3_vars, t
+  | _ ->
+      [], share cnv Prop t
+
+and int_or_real ~cnv ~fint ~lint ~pint ~freal ~lreal ~preal a b =
+  match (Lang.F.typeof a), (Lang.F.typeof b) with
+  | Int, Int ->
+      t_app_fold ~f:fint ~l:lint ~p:pint ~cnv Int [a; b]
+  | Real, Int | Real, Real | Int, Real ->
+      t_app_fold ~f:freal ~l:lreal ~p:preal ~cnv Real [a; b]
+  | _ -> assert false
+
+let convert cnv expected t =
+  (** rewrite terms which normal form inside qed are different from the one of the provers *)
+  let t, convert_for_export = Lang.For_export.rebuild ~cache:cnv.convert_for_export t in
+  cnv.convert_for_export <- convert_for_export;
+  Lang.For_export.in_state (share cnv expected) t
+
+let mk_binders cnv l =
+  List.fold_left (fun (cnv,lets) v ->
+      match of_tau cnv (Lang.F.tau_of_var v) with
+      | None -> Wp_parameters.fatal "Quantification on prop"
+      | Some ty ->
+          let x = Why3.Ident.id_fresh (Lang.F.Var.basename v) in
+          let x = Why3.Term.create_vsymbol x ty in
+          let e = Lang.F.e_var v in
+          let cnv = {cnv with subst = Lang.F.Tmap.add e (Why3.Term.t_var x) cnv.subst } in
+          let lets = x::lets in
+          cnv,lets
+    ) (cnv,[]) (List.rev l)
+
+(** visit definitions and add them in the task *)
+
+module CLUSTERS = Model.Index
+    (struct
+      type key = Definitions.cluster
+      type data = int * Why3.Theory.theory
+      let name = "ProverWhy3.CLUSTERS"
+      let compare = Definitions.cluster_compare
+      let pretty = Definitions.pp_cluster
+    end)
+
+
 
 let filenoext file =
   let basename = Filename.basename file in
   (try Filename.chop_extension basename
    with Invalid_argument _ -> basename)
 
-let regexp_col = Str.regexp_string ":"
-let regexp_com = Str.regexp_string ","
-
-class visitor fmt c =
+class visitor (ctx:context) c =
   object(self)
 
     inherit Definitions.visitor c
-    inherit ProverTask.printer fmt (cluster_title c)
 
-    val mutable deps = []
-
-    (* --- Managing Formatter --- *)
-
-    method flush =
-      begin
-        Format.pp_print_newline fmt () ;
-        List.rev deps
-      end
 
     (* --- Files, Theories and Clusters --- *)
 
-    method add_dfile f =
-      let df = D_file f in
-      if not (List.mem df deps) then deps <- df :: deps
-
-    method add_import ?was thy =
-      self#lines ;
-      match was with
-      | None     -> Format.fprintf fmt "use %s@\n" thy
-      | Some was -> Format.fprintf fmt "use %s as %s@\n" thy was
-
-    method add_import2 file thy =
-      self#lines ;
-      Format.fprintf fmt "use %s.%s@\n" file thy
-
-    method add_import3 file thy name =
-      self#lines ;
-      Format.fprintf fmt "use %s.%s as %s@\n" file thy name
+    method add_builtin_lib =
+      self#add_import2 ["bool"] "Bool" ;
+      self#add_import2 ["int"] "Int" ;
+      self#add_import2 ["int"] "ComputerDivision" ;
+      self#add_import2 ["real"] "RealInfix" ;
+      self#on_library "qed";
+      self#add_import2 ["map"] "Map"
 
     method on_cluster c =
-      self#lines ;
-      let name = (cluster_id c) in
-      Format.fprintf fmt "use %s.%s@\n"
-        name (String.capitalize_ascii name) ;
-      deps <- (D_cluster c) :: deps
+      let name = Definitions.cluster_id c in
+      Wp_parameters.debug ~dkey:dkey_api "Start on_cluster %s@." name;
+      let th_name = String.capitalize_ascii name in
+      let thy =
+        let age = try fst (CLUSTERS.find c) with Not_found -> (-1) in
+        if age < Definitions.cluster_age c then
+          let ctx = empty_context th_name in
+          let v = new visitor ctx c in
+          v#add_builtin_lib;
+          v#vself;
+          let th = Why3.Theory.close_theory ctx.th in
+          if Wp_parameters.has_dkey ProverErgo.dkey_cluster then
+            Log.print_on_output
+              begin fun fmt ->
+                Format.fprintf fmt "---------------------------------------------@\n" ;
+                Format.fprintf fmt "--- Model '%s' Cluster '%s' @\n"
+                  (Model.get_id (Model.get_model ())) name;
+                Format.fprintf fmt "---------------------------------------------@\n" ;
+                Why3.Pretty.print_theory fmt th;
+              end ;
+          CLUSTERS.update c (Definitions.cluster_age c, th);
+          th
+        else
+          snd (CLUSTERS.find c)
+      in
+      let th = ctx.th in
+      let th = Why3.Theory.open_scope th name in
+      let th = Why3.Theory.use_export th thy in
+      let th = Why3.Theory.close_scope th true in
+      Wp_parameters.debug ~dkey:dkey_api "End  on_cluster %s@." name;
+      ctx.th <- th
 
-    method add_extlib file =
-      let thy = filenoext file in
-      let path = LogicBuiltins.find_lib file in
-      self#add_import2 thy (String.capitalize_ascii thy) ;
-      self#add_dfile path
+
+    method section _ = ()
+
+    method add_import ?was thy =
+      match Str.split_delim regexp_dot thy with
+      | [] -> Wp_parameters.fatal "empty import option"
+      | l ->
+          let file, thy = Why3.Lists.chop_last l in
+          self#add_import4 file thy (Why3.Opt.get_def thy was) ~import:true
+
+    method add_import2 file thy =
+      self#add_import4 file thy thy ~import:true
+
+    method add_import3 file thy name =
+      self#add_import4 file thy name ~import:false
+
+    method add_import4 ~import file thy name =
+      Wp_parameters.debug ~dkey:dkey_api
+        "@[use@ %s@ @[%a.%s@]@ as@ %s@]"
+        (if import then "import" else "")
+        Why3.Pp.(print_list (Why3.Pp.constant_string ".") string) file
+        thy name ;
+      let thy = Why3.Env.read_theory ctx.env file thy in
+      let th = ctx.th in
+      let th = Why3.Theory.open_scope th name in
+      let th = Why3.Theory.use_export th thy in
+      let th = Why3.Theory.close_scope th import in
+      ctx.th <- th
 
     method on_library thy =
+      let copy_file source =
+        if Filepath.normalize (Filename.dirname source) <>
+           Filepath.normalize (Wp_parameters.Share.dir ())
+        then
+          let tgtdir = Model.directory () in
+          let why3src = Filename.basename source in
+          let target = Printf.sprintf "%s/%s" tgtdir why3src in
+          Command.copy source target
+      in
       let iter_file opt =
         match Str.split_delim regexp_col opt with
         | [file] ->
             let filenoext = filenoext file in
-            self#add_import2 filenoext
-              (String.capitalize_ascii filenoext) ;
-            self#add_dfile file
+            copy_file file;
+            self#add_import2 [filenoext]
+              (String.capitalize_ascii filenoext);
         | [file;lib] ->
-            self#add_import2 (filenoext file) lib ;
-            self#add_dfile file
+            copy_file file;
+            self#add_import2 [filenoext file] lib;
         | [file;lib;name] ->
-            self#add_import3 (filenoext file) lib name;
-            self#add_dfile file
+            copy_file file;
+            self#add_import3 [filenoext file] lib name;
         | _ -> Wp_parameters.failure ~current:false
                  "Driver: why3.file %S not recognized (theory %s)"
                  opt thy
@@ -193,414 +743,359 @@ class visitor fmt c =
       end
 
     method on_type lt def =
-      begin
-        self#lines ;
-        engine#declare_type fmt (Lang.atype lt) (List.length lt.lt_params) def ;
-      end
+      match def with
+      | Tabs ->
+          let id = Why3.Ident.id_fresh (Lang.type_id lt) in
+          let map i _ = tvar i in
+          let tv_args = List.mapi map lt.lt_params in
+          let id = Why3.Ty.create_tysymbol id tv_args NoDef in
+          let decl = Why3.Decl.create_ty_decl id in
+          ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
+      | Tdef t ->
+          let id = Why3.Ident.id_fresh (Lang.type_id lt) in
+          let map i _ = tvar i in
+          let tv_args = List.mapi map lt.lt_params in
+          let cnv = empty_cnv ctx in
+          let t = Why3.Opt.get (of_tau ~cnv t) in
+          let id = Why3.Ty.create_tysymbol id tv_args (Alias t) in
+          let decl = Why3.Decl.create_ty_decl id in
+          ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
+      | Tsum cases ->
+          let id = Why3.Ident.id_fresh (Lang.type_id lt) in
+          let map i _ = tvar i in
+          let tv_args = List.mapi map lt.lt_params in
+          let tys = Why3.Ty.create_tysymbol id tv_args NoDef in
+          let tv_args = List.map Why3.Ty.ty_var tv_args in
+          let return_ty = Why3.Ty.ty_app tys tv_args in
+          let cnv = empty_cnv ctx in
+          let constr = List.length cases in
+          let cases = List.map (fun (c,targs) ->
+              let name = match c with | Lang.CTOR c -> Lang.ctor_id c | _ -> assert false in
+              let id = Why3.Ident.id_fresh name in
+              let targs = List.map (fun t -> Why3.Opt.get (of_tau ~cnv t)) targs in
+              let ls = Why3.Term.create_fsymbol ~constr id targs return_ty in
+              let proj = List.map (fun _ -> None) targs in
+              (ls,proj)
+            ) cases in
+          let decl = Why3.Decl.create_data_decl [tys,cases] in
+          ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
+      | Trec fields ->
+          let id = Why3.Ident.id_fresh (Lang.type_id lt) in
+          let map i _ = tvar i in
+          let tv_args = List.mapi map lt.lt_params in
+          let tys = Why3.Ty.create_tysymbol id tv_args NoDef in
+          let tv_args = List.map Why3.Ty.ty_var tv_args in
+          let return_ty = Why3.Ty.ty_app tys tv_args in
+          let cnv = empty_cnv ctx in
+          let fields,args = List.split @@ List.map (fun (f,ty) ->
+              let name = Lang.name_of_field f in
+              let id = Why3.Ident.id_fresh name in
+              let ty = Why3.Opt.get (of_tau ~cnv ty) in
+              let ls = Why3.Term.create_fsymbol id [return_ty] ty in
+              Some ls,ty
+            ) fields in
+          let id = Why3.Ident.id_fresh (Lang.type_id lt) in
+          let cstr = Why3.Term.create_fsymbol ~constr:1 id args return_ty in
+          let decl = Why3.Decl.create_data_decl [tys,[cstr,fields]] in
+          ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
 
-    method on_comp c fts =
+    method on_comp c (fts:(Lang.field * Lang.tau) list) =
       begin
+        let compare_field (f,_) (g,_) =
+          let cmp = Lang.Field.compare f g in
+          if cmp = 0 then assert false (* by definition *) else cmp
+        in
+        let fts = List.sort compare_field fts in
         (*TODO:NUPW: manage UNIONS *)
-        self#lines ;
-        engine#declare_type fmt (Lang.comp c) 0 (Qed.Engine.Trec fts) ;
+        let id = Why3.Ident.id_fresh (Lang.comp_id c) in
+        let ts = Why3.Ty.create_tysymbol id [] Why3.Ty.NoDef in
+        let ty = Why3.Ty.ty_app ts [] in
+        let id = Why3.Ident.id_fresh (Lang.comp_id c) in
+        let cnv = empty_cnv ctx in
+        let map (f,tau) =
+          let ty_ctr = of_tau ~cnv tau in
+          let id = Why3.Ident.id_fresh (Lang.name_of_field f) in
+          let ls = Why3.Term.create_lsymbol id [ty] ty_ctr in
+          (Some ls,Why3.Opt.get ty_ctr)
+        in
+        let fields = List.map map fts in
+        let constr = Why3.Term.create_fsymbol ~constr:1 id (List.map snd fields) ty in
+        let decl = Why3.Decl.create_data_decl [ts,[constr,List.map fst fields]] in
+        ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
       end
 
     method on_dlemma l =
       begin
-        self#paragraph ;
-        let kind = if l.l_assumed then "axiom" else "lemma" in
-        engine#declare_prop ~kind fmt
-          (Lang.lemma_id l.l_name)
-          l.l_forall l.l_triggers
-          (F.e_prop l.l_lemma)
+        let kind = Why3.Decl.(if l.l_assumed then Paxiom else Plemma) in
+        let id = Why3.Ident.id_fresh (Lang.lemma_id l.l_name) in
+        let id = Why3.Decl.create_prsymbol id in
+        let cnv = empty_cnv ctx in
+        List.iter (Lang.F.add_var cnv.pool) l.l_forall;
+        let cnv, vars = Lang.For_export.in_state (mk_binders cnv) l.l_forall in
+        let t = convert cnv Prop (Lang.F.e_prop l.l_lemma) in
+        let triggers = full_triggers l.l_triggers in
+        let triggers = Lang.For_export.in_state (List.map (List.map (of_trigger ~cnv))) triggers in
+        let t = Why3.Term.t_forall_close vars triggers t in
+        let decl = Why3.Decl.create_prop_decl kind id t in
+        ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
       end
 
     method on_dfun d =
+      let cnv = empty_cnv ctx in
+      List.iter (Lang.F.add_var cnv.pool) d.d_params;
       begin
-        self#paragraph ;
         match d.d_definition with
         | Logic t ->
-            engine#declare_signature fmt
-              d.d_lfun (List.map F.tau_of_var d.d_params) t ;
-        | Function(t,mu,v) ->
-            let pp = match mu with
-              | Rec -> engine#declare_fixpoint ~prefix:"fix_"
-              | Def -> engine#declare_definition
-            in pp fmt d.d_lfun d.d_params t v
-        | Predicate(mu,p) ->
-            let pp = match mu with
-              | Rec -> engine#declare_fixpoint ~prefix:"fix_"
-              | Def -> engine#declare_definition
-            in pp fmt d.d_lfun d.d_params Logic.Prop (F.e_prop p)
-        | Inductive dl ->
-            engine#declare_signature fmt
-              d.d_lfun (List.map F.tau_of_var d.d_params) Logic.Prop;
-            List.iter self#on_dlemma dl
+            let id = Why3.Ident.id_fresh (Qed.Export.link_name (lfun_name d.d_lfun)) in
+            let map e = Why3.Opt.get (of_tau ~cnv (Lang.F.tau_of_var e)) in
+            let ty_args = List.map map d.d_params in
+            let id = Why3.Term.create_lsymbol id ty_args (of_tau ~cnv t) in
+            let decl = Why3.Decl.create_param_decl id in
+            ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
+        | Function(t,mu,v) -> begin
+            match mu with
+            | Rec -> (* transform recursive function into an axioms *)
+                let name = Qed.Export.link_name (lfun_name d.d_lfun) in
+                let id = Why3.Ident.id_fresh name in
+                let map e = Why3.Opt.get (of_tau ~cnv (Lang.F.tau_of_var e)) in
+                let ty_args = List.map map d.d_params in
+                let result = of_tau ~cnv t in
+                let id = Why3.Term.create_lsymbol id ty_args result in
+                let decl = Why3.Decl.create_param_decl id in
+                ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
+                let cnv = empty_cnv ctx in
+                List.iter (Lang.F.add_var cnv.pool) d.d_params;
+                let cnv, vars = mk_binders cnv d.d_params in
+                let t = share cnv t v in
+                let t =
+                  Why3.Term.t_forall_close vars []
+                    (Why3.Term.t_equ
+                       (Why3.Term.t_app id (List.map Why3.Term.t_var vars) result)
+                       t)
+                in
+                let decl =
+                  Why3.Decl.create_prop_decl Why3.Decl.Paxiom
+                    (Why3.Decl.create_prsymbol (Why3.Ident.id_fresh (name^"_def")))
+                    t in
+                ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
+            | Def ->
+                let id = Why3.Ident.id_fresh (Qed.Export.link_name (lfun_name d.d_lfun)) in
+                let map e = Why3.Opt.get (of_tau ~cnv (Lang.F.tau_of_var e)) in
+                let ty_args = List.map map d.d_params in
+                let result = of_tau ~cnv t in
+                let id = Why3.Term.create_lsymbol id ty_args result in
+                let cnv, vars = mk_binders cnv d.d_params in
+                let t = share cnv t v in
+                let decl = Why3.Decl.make_ls_defn id vars t in
+                let decl = Why3.Decl.create_logic_decl [decl] in
+                ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl
+          end
+        | Predicate(mu,p) -> begin
+            match mu with
+            | Rec ->
+                let name = Qed.Export.link_name (lfun_name d.d_lfun) in
+                let id = Why3.Ident.id_fresh name in
+                let map e = Why3.Opt.get (of_tau ~cnv (Lang.F.tau_of_var e)) in
+                let ty_args = List.map map d.d_params in
+                let result = None in
+                let id = Why3.Term.create_lsymbol id ty_args result in
+                let decl = Why3.Decl.create_param_decl id in
+                ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
+                let cnv = empty_cnv ctx in
+                List.iter (Lang.F.add_var cnv.pool) d.d_params;
+                let cnv, vars = mk_binders cnv d.d_params in
+                let t = share cnv Prop (Lang.F.e_prop p) in
+                let t =
+                  Why3.Term.t_forall_close vars []
+                    (Why3.Term.t_equ
+                       (Why3.Term.t_app id (List.map Why3.Term.t_var vars) result)
+                       t)
+                in
+                let decl =
+                  Why3.Decl.create_prop_decl Why3.Decl.Paxiom
+                    (Why3.Decl.create_prsymbol (Why3.Ident.id_fresh (name^"_def")))
+                    t in
+                ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
+            | Def ->
+                let id = Why3.Ident.id_fresh (Qed.Export.link_name (lfun_name d.d_lfun)) in
+                let map e = Why3.Opt.get (of_tau ~cnv (Lang.F.tau_of_var e)) in
+                let ty_args = List.map map d.d_params in
+                let id = Why3.Term.create_lsymbol id ty_args None in
+                let cnv, vars = mk_binders cnv d.d_params in
+                let t = share cnv Prop (Lang.F.e_prop p) in
+                let decl = Why3.Decl.make_ls_defn id vars t in
+                let decl = Why3.Decl.create_logic_decl [decl] in
+                ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl
+          end
+        | Inductive _dl ->
+            Wp_parameters.not_yet_implemented "inductive"
+            (* engine#declare_signature fmt
+             *   d.d_lfun (List.map F.tau_of_var d.d_params) Logic.Prop;
+             * List.iter self#on_dlemma dl *)
       end
 
   end
 
-let write_cluster c =
-  let f = cluster_file c in
-  Wp_parameters.debug ~dkey "Generate '%s'" f ;
-  Command.print_file f
-    begin fun fmt ->
-      let v = new visitor fmt c in
-      let name = theory_name_of_cluster c in
-      engine#set_goal false ;
-      v#printf "@[<hv 2>theory %s@\n" name;
-      v#lines ;
-      (** TODO add them only when needed *)
-      v#add_import "bool.Bool" ;
-      v#add_import "int.Int" ;
-      v#add_import "int.ComputerDivision" ;
-      v#add_import "real.RealInfix" ;
-      v#on_library "qed";
-      v#add_import "map.Map" ;
-      v#vself ;
-      v#printf "@]@\nend@\n";
-      v#flush ;
-    end
 
-(* -------------------------------------------------------------------------- *)
-(* --- File Assembly                                                      --- *)
-(* -------------------------------------------------------------------------- *)
+let goal_id = (Why3.Decl.create_prsymbol (Why3.Ident.id_fresh "wp_goal"))
 
-module CLUSTERS = Model.Index
-    (struct
-      type key = cluster
-      type data = int * depend list
-      let name = "ProverWhy3.CLUSTERS"
-      let compare = cluster_compare
-      let pretty = pp_cluster
-    end)
+let why3_of_qed ~id ~title ~name ?axioms t =
+  (* Format.printf "why3_of_qed start@."; *)
+  let goal = Definitions.cluster ~id ~title () in
+  let ctx = empty_context name in
+  let v = new visitor ctx goal in
+  v#add_builtin_lib;
+  v#vgoal axioms t;
+  let cnv = empty_cnv ~in_goal:true ~polarity:`Positive ctx in
+  let t = convert cnv Prop (Lang.F.e_prop t) in
+  let decl = Why3.Decl.create_prop_decl Pgoal goal_id t in
+  let th =   Why3.Theory.close_theory ctx.th in
+  if Wp_parameters.has_print_generated () then begin
+    let th_uc_tmp = Why3.Theory.add_decl ~warn:false ctx.th decl in
+    let th_tmp    = Why3.Theory.close_theory th_uc_tmp in
+    Wp_parameters.debug ~dkey:Wp_parameters.cat_print_generated "%a" Why3.Pretty.print_theory th_tmp
+  end;
+  th, decl
 
-let assemble_cluster e =
-  let rec assemble = function
-    | D_cluster c -> assemble_cluster c
-    | D_file path -> assemble_userlib path
+(** Prover call *)
 
-  and assemble_cluster c =
-    let (age,deps) = try CLUSTERS.find c with Not_found -> (-1,[]) in
-    let deps =
-      if age < cluster_age c then
-        let deps = write_cluster c in
-        CLUSTERS.update c (cluster_age c , deps) ; deps
-      else deps in
-    List.iter assemble deps
-
-  and assemble_userlib source =
-    if Filepath.normalize (Filename.dirname source) <>
-       Filepath.normalize (Filename.concat (Wp_parameters.Share.dir ()) "why3")
-    then
-      let tgtdir = Model.directory () in
-      let coqsrc = Filename.basename source in
-      let target = Printf.sprintf "%s/%s" tgtdir coqsrc in
-      Command.copy source target
-  in
-  assemble e
-
-(* -------------------------------------------------------------------------- *)
-(* --- Goal Module                                                        --- *)
-(* -------------------------------------------------------------------------- *)
-
-type goal =
-  {
-    file : string;
-    theory : string;
-    goal : string;
-  }
-
-module Goal =
-struct
-  type t = goal
-  let compare = Transitioning.Stdlib.compare
-  let pretty fmt g =
-    Format.fprintf fmt "[%s]%s.%s" g.file g.theory g.goal
-end
-
-(* -------------------------------------------------------------------------- *)
-(* --- Assembling Goal                                                    --- *)
-(* -------------------------------------------------------------------------- *)
-
-let sanitize_expl fmt title =
-  for i = 0 to String.length title - 1 do
-    match title.[i] with
-    | '\n' | '\t' -> Format.pp_print_char fmt ' '
-    | c -> Format.pp_print_char fmt c
-  done
-
-let assemble_goal ~id ~title ~theory ?axioms prop fmt =
-  (** Also create the directory *)
-  let goal = cluster ~id ~title () in
-  let deps =
-    let v = new visitor fmt goal in
-    engine#set_goal false ;
-    v#printf "@[<hv 2>theory %s@\n" theory ;
-    v#add_import "bool.Bool" ;
-    v#add_import "int.Int" ;
-    v#add_import "int.ComputerDivision" ;
-    v#add_import "real.RealInfix" ;
-    v#on_library "qed";
-    v#add_import "map.Map" ;
-    v#vgoal axioms prop ;
-    let libs = Wp_parameters.WhyLibs.get () in
-    if libs <> [] then
-      begin
-        v#section "Additional Libraries" ;
-        List.iter v#add_extlib libs ;
-        v#hline ;
-      end ;
-    v#paragraph ;
-    engine#set_goal true ;
-    engine#global
-      begin fun () ->
-        v#printf "@[<hv 2>goal %s[@expl:%a]:@ %a@]@\n@\n"
-          why3_goal_name
-          sanitize_expl title
-          engine#pp_prop (F.e_prop prop) ;
-      end ;
-    engine#set_goal false ;
-    v#printf "end@]@.";
-    v#flush
-  in
-  List.iter assemble_cluster deps
-
-module FunFile = Model.Index
-    (struct
-      type key = kernel_function
-      type data = int (* age *)
-      let name = "ProverWhy3.FunFile"
-      let compare = Kernel_function.compare
-      let pretty = Kernel_function.pretty
-    end)
-
-let assemble_wpo wpo =
-  let dir = Model.directory () in
-  let index = Wpo.get_index wpo in
-  let goal = match index with
-    | Wpo.Axiomatic _ ->
-        begin match wpo.Wpo.po_formula with
-          | Wpo.GoalAnnot _ | Wpo.GoalCheck _ -> assert false
-          | Wpo.GoalLemma vca ->
-              let lemma = vca.Wpo.VC_Lemma.lemma in
-              assemble_cluster (D_cluster lemma.l_cluster);
-              let file = cluster_file lemma.l_cluster in
-              let theory = theory_name_of_cluster lemma.l_cluster in
-              let goal = Lang.lemma_id lemma.l_name in
-              { file ; theory ; goal }
-        end
-    | Wpo.Function (kf,_behv) ->
-        let model = Model.get_model () in
-        let file = Wpo.DISK.file_kf ~kf ~model ~prover:(VCS.Why3 "") in
-        let age = try FunFile.find kf with Not_found -> -1 in
-        begin if age < Wpo.age wpo then
-            let age_max = ref (-1) in
-            let on_goal fmt wpo =
-              (** iter on all the goal of a kf unfortunately not just
-                  the one of the current model *)
-              let pid = wpo.Wpo.po_pid in
-              let model = Model.get_model () in
-              if Model.S.equal wpo.Wpo.po_model model then begin
-                age_max := max (!age_max) (Wpo.age wpo);
-                match wpo.Wpo.po_formula with
-                | Wpo.GoalAnnot vcq ->
-                    let prop = Wpo.GOAL.compute_proof vcq.Wpo.VC_Annot.goal in
-                    if Lang.F.p_true != prop then
-                      let id = WpPropId.get_propid pid in
-                      let title = Pretty_utils.to_string WpPropId.pretty pid in
-                      let theory = theory_name_of_pid pid in
-                      assemble_goal ~theory ~id ~title prop fmt
-                | Wpo.GoalLemma _ | Wpo.GoalCheck _ -> assert false
-              end in
-            Command.print_file file
-              (fun fmt ->
-                 let fun_index = Wpo.Function(kf,None) in
-                 Wpo.iter ~index:fun_index ~on_goal:(on_goal fmt) ());
-            assert (!age_max >= Wpo.age wpo);
-            FunFile.update kf (!age_max);
-        end;
-        let pid = wpo.Wpo.po_pid in
-        {
-          file ;
-          theory = theory_name_of_pid pid ;
-          goal = why3_goal_name ;
-        }
-  in
-  [dir], goal
-
-let assemble_tactic wpo vcq =
-  let pid = wpo.Wpo.po_pid in
-  let axioms = vcq.Wpo.VC_Annot.axioms in
-  let goal = vcq.Wpo.VC_Annot.goal in
-  let dir = Model.directory () in
+let prove_prop ?axioms ~pid ~prop =
   let id = WpPropId.get_propid pid in
-  let cluster = cluster ~id () in
-  let file = cluster_file cluster in
-  let prop = Wpo.GOAL.compute_proof goal in
   let title = Pretty_utils.to_string WpPropId.pretty pid in
-  Command.print_file file (assemble_goal ~theory:"VC" ~id ?axioms ~title prop) ;
-  [dir] , { file ; theory = "VC" ; goal = why3_goal_name }
+  let name = "WP" in
+  let th, decl = why3_of_qed ?axioms ~id ~title ~name prop in
+  let t = None in
+  let t = Why3.Task.use_export t th in
+  Why3.Task.add_decl t decl
 
-let assemble_check vck =
-  let module Check = Wpo.VC_Check in
-  let id = Printf.sprintf "Qed-%d-%d"
-      (Lang.F.QED.id vck.Check.qed) (Lang.F.QED.id vck.Check.raw) in
-  let goal = cluster ~id () in
-  let file = cluster_file goal in
-  Command.print_file file
-    (assemble_goal ~title:"Qed Check" ~id ~theory:"Check" vck.Check.goal) ;
-  let dir = Model.directory () in
-  [dir], { file ; theory = "Check" ; goal = why3_goal_name }
 
-let assemble_goal wpo =
+let task_of_wpo wpo =
+  let pid = wpo.Wpo.po_pid in
   match wpo.Wpo.po_formula with
-  | Wpo.GoalCheck vck ->
-      Some (Model.with_model wpo.Wpo.po_model assemble_check vck)
-  | Wpo.GoalAnnot vcq ->
-      let goal =
-        Model.with_model wpo.Wpo.po_model
-          Wpo.GOAL.compute_proof vcq.Wpo.VC_Annot.goal in
-      if goal == Lang.F.p_true then (** The wpo is trivial *) None
-      else
-      if WpPropId.is_tactic wpo.Wpo.po_pid then
-        Some (Model.with_model wpo.Wpo.po_model (assemble_tactic wpo) vcq)
-      else
-        Some (Model.with_model wpo.Wpo.po_model assemble_wpo wpo)
-  | Wpo.GoalLemma _ ->
-      Some (Model.with_model wpo.Wpo.po_model assemble_wpo wpo)
+  | Wpo.GoalAnnot v ->
+      let pid = wpo.Wpo.po_pid in
+      let axioms = v.Wpo.VC_Annot.axioms in
+      let prop = Wpo.GOAL.compute_proof v.Wpo.VC_Annot.goal in
+      (* Format.printf "Goal: %a@." Lang.F.pp_pred prop; *)
+      prove_prop ~pid ~prop ?axioms
+  | Wpo.GoalLemma v ->
+      let lemma = v.Wpo.VC_Lemma.lemma in
+      let depends = v.Wpo.VC_Lemma.depends in
+      let prop = Lang.F.p_forall lemma.l_forall lemma.l_lemma in
+      let axioms = Some(lemma.l_cluster,depends) in
+      prove_prop ~pid ~prop ?axioms
+  | Wpo.GoalCheck v ->
+      let prop = v.Wpo.VC_Check.goal in
+      let axioms = None in
+      prove_prop ~pid ~prop ?axioms
 
-(* -------------------------------------------------------------------------- *)
-(* --- Running Why3                                                       --- *)
-(* -------------------------------------------------------------------------- *)
+let altergo_step_limit = Str.regexp "^Steps limit reached:"
 
-open ProverTask
+let call_prover ~timeout ~steplimit prover task wpo =
+  let steplimit = match steplimit with Some 0 -> None | _ -> steplimit in
+  let config = Lazy.force config in
+  let env = get_why3_env () in
+  let prover_config = Why3.Whyconf.get_prover_config config prover in
+  let command = Why3.Whyconf.get_complete_command prover_config ~with_steps:(steplimit<>None) in
+  let drv =
+    Why3.Whyconf.load_driver (Why3.Whyconf.get_main config) env prover_config.driver prover_config.extra_drivers in
+  let limit =
+    let def = Why3.Call_provers.empty_limit in
+    { def with
+      Why3.Call_provers.limit_time = Why3.Opt.get_def def.limit_time timeout;
+      Why3.Call_provers.limit_steps = Why3.Opt.get_def def.limit_time steplimit;
+    } in
+  let remove_for_prover =
+    if prover.prover_name = "Alt-Ergo"
+    then Filter_axioms.remove_for_altergo
+    else Filter_axioms.remove_for_why3
+  in
+  let trans = Why3.Trans.seq [remove_for_prover; Filter_axioms.trans; Filter_axioms.def_into_axiom] in
+  let task =
+    if prover.prover_name = "Coq"
+    then task
+    else Why3.Trans.apply trans task in
+  let task = Why3.Driver.prepare_task drv task in
+  let file = Wpo.DISK.file_goal ~pid:wpo.Wpo.po_pid ~model:wpo.Wpo.po_model ~prover:(VCS.Why3 prover) in
+  (* This printing is currently just for debugging *)
+  let _ = Command.print_file file (fun fmt -> Why3.Driver.print_task_prepared drv fmt task) in
+  if Wp_parameters.Check.get ()
+  then (** Why3 typed checked the task during its build *)
+    Task.return VCS.checked
+  else
+    let call =
+      Why3.Driver.prove_task_prepared ~command ~limit drv task in
+    Wp_parameters.debug ~dkey
+      "@[@[Why3 run prover %a with %i timeout %i steplimit@]@]@."
+      Why3.Whyconf.print_prover prover (Why3.Opt.get_def (-1) timeout) (Why3.Opt.get_def (-1) steplimit);
+    let ping _ (* why3 seems not to be able to kill a started prover *) =
+      match Why3.Call_provers.query_call call with
+      | NoUpdates
+      | ProverStarted -> Task.Yield
+      | InternalFailure exn ->
+          Task.Return (Task.Result (VCS.failed (Format.asprintf "%a" Why3.Exn_printer.exn_printer exn)))
+      | ProverInterrupted -> Task.Return (Task.Result (VCS.failed "interrupted"))
+      | ProverFinished pr ->
+          let r = match pr.pr_answer with
+            | Timeout -> VCS.timeout (int_of_float pr.pr_time)
+            | Valid -> VCS.result ~time:pr.pr_time ~steps:pr.pr_steps VCS.Valid
+            | Invalid -> VCS.result ~time:pr.pr_time ~steps:pr.pr_steps VCS.Invalid
+            | OutOfMemory -> VCS.failed "out of memory"
+            | StepLimitExceeded -> VCS.stepout
+            | Unknown _ -> VCS.unknown
+            | Failure s -> VCS.failed s
+            | HighFailure ->
+                let alt_ergo_hack = prover.prover_name = "Alt-Ergo" &&
+                                    Str.string_match altergo_step_limit pr.pr_output 0
+                in
+                if alt_ergo_hack then VCS.stepout
+                else VCS.failed "Unknown error"
+          in
+          Wp_parameters.debug ~dkey
+            "@[@[Why3 result for %a:@] @[%a@] and @[%a@]@."
+            Why3.Whyconf.print_prover prover
+            (* why3 1.3 (Why3.Call_provers.print_prover_result ~json_model:false) pr *)
+            (Why3.Call_provers.print_prover_result) pr
+            VCS.pp_result r;
+          Task.Return (Task.Result r)
+    in
+    Task.async ping
 
-let p_goal = ".* [a-zA-Z0-9_]+: "
-let p_valid = p_goal ^ "Valid (" ^ p_float ^ "s\\(,[^)]*\\)?)"
-let p_limit = p_goal ^ "Timeout"
-let p_error = "File " ^ p_string ^ ", line " ^ p_int ^ ", characters "
-              ^ p_int ^ "-" ^ p_int ^ ":\nsyntax error"
+let add_specific_equality ~for_tau ~mk_new_eq =
+  specific_equalities := { for_tau; mk_new_eq }::!specific_equalities
 
-let re_valid = Str.regexp p_valid
-let re_limit = Str.regexp p_limit
-let re_error = Str.regexp p_error
+let version = Why3.Config.version
 
-type error =
-  | Error_No
-  | Error_Generated of Lexing.position * string
-
-class why3 ~timeout ~prover ~pid ~file ~includes ~logout ~logerr =
-  object(why)
-
-    initializer ignore pid
-
-    inherit ProverTask.command (Wp_parameters.Why3.get ())
-
-    val mutable files = []
-    val mutable error = Error_No
-    val mutable valid = false
-    val mutable limit = false
-    val mutable time = 0.0
-
-    method private time t = time <- t
-
-    method private error (a : pattern) =
-      let lpos = ProverTask.location (a#get_string 1) (a#get_int 2) in
-      error <- Error_Generated ( lpos , "why3 " ^ a#get_after ~offset:1 4 )
-
-    method private valid (a : pattern) =
-      begin
-        valid <- true ;
-        time <- a#get_float 1 ;
-      end
-
-    method private limit (_a : pattern) =
-      begin
-        limit <- true ;
-      end
-
-    method result r =
-      let why3_cmd = (Wp_parameters.Why3.get ()) in
-      if r = 127
-      then VCS.kfailed "Command '%s' not found" why3_cmd
-      else
-        match error with
-        | Error_Generated(pos,message) ->
-            let source = Cil_datatype.Position.of_lexing_pos pos in
-            Wp_parameters.error ~source "%s" message ;
-            VCS.failed ~pos message
-        | Error_No ->
-            if r = 0 || r = 1 then
-              let verdict =
-                if valid then VCS.Valid else
-                if limit then VCS.Timeout else
-                  VCS.Unknown in
-              VCS.result ~time verdict
-            else
-              begin
-                if Wp_parameters.verbose_atleast 1 then
-                  begin
-                    ProverTask.pp_file ~message:"Why3 (stdout)" ~file:logout ;
-                    ProverTask.pp_file ~message:"Why3 (stderr)" ~file:logerr ;
-                  end ;
-                VCS.kfailed "Why3 exits with status %d." r
-              end
-
-    method prove =
-      why#add [ "prove" ] ;
-      if Wp_parameters.Check.get () then why#add ["--type-only"] ;
-      let time = ProverTask.timeout timeout in
-      why#add ["--extra-config"; Wp_parameters.Share.file "why3/why3.conf"];
-      why#add (Wp_parameters.WhyFlags.get ()) ;
-      why#add [ file.file ] ;
-      why#add ["-P";Why3.Whyconf.prover_parseable_format prover];
-      why#add ["-T";file.theory];
-      why#add ["-G";file.goal];
-      why#add_positive ~name:"-t" ~value:time ;
-      if Wp_parameters.ProofTrace.get () then
-        (* [VP] This also keeps temp files. To be changed with FB's new option
-                 when it is implemented. *)
-        why#add ["--debug"; "call_prover"];
-      why#timeout time ;
-      why#add_list ~name:"-L" includes;
-      why#add ["-L";Wp_parameters.Share.file "why3"];
-      why#validate_time why#time ;
-      (* The order is important. Warning are detected as error
-         which they are not. *)
-      why#validate_pattern ~logs:`OUT re_limit why#limit ;
-      why#validate_pattern ~logs:`ERR re_error why#error ;
-      why#validate_pattern ~logs:`OUT re_valid why#valid ;
-      why#run ~logout ~logerr
-
-  end
-
-open VCS
-open Wpo
-open Task
-
-let prove_file ~timeout ~prover ~pid ~file ~includes ~logout ~logerr =
-  let why = new why3 ~timeout ~prover ~pid ~file ~includes ~logout ~logerr in
-  why#prove () >>> function
-  | Task.Timeout t -> Task.return (VCS.timeout t)
-  | Task.Result r -> Task.call why#result r
-  | st -> Task.status (Task.map (fun _ -> assert false) st)
-
-let prove_prop ~timeout ~prover ~wpo =
-  match assemble_goal wpo with
-  | None -> Task.return VCS.no_result
-  | Some (includes,file) ->
-      Wp_parameters.print_generated file.file;
+let prove ?timeout ?steplimit ~prover wpo =
+  try
+    let do_ () =
+      let task = task_of_wpo wpo in
       if Wp_parameters.Generate.get ()
-      then Task.return VCS.no_result
-      else
-        let model = wpo.po_model in
-        let pid = wpo.Wpo.po_pid in
-        let logout = DISK.file_logout ~pid ~model ~prover:(Why3 prover) in
-        let logerr = DISK.file_logerr ~pid ~model ~prover:(Why3 prover) in
-        prove_file ~timeout ~prover ~pid ~file ~includes ~logout ~logerr
+      then if Wp_parameters.Check.get ()
+        then Task.return VCS.checked
+        else Task.return VCS.no_result
+      else call_prover ~timeout ~steplimit prover task wpo
+    in
+    Model.with_model wpo.Wpo.po_model do_ ()
+  with exn ->
+    let bt = Printexc.get_raw_backtrace () in
+    Wp_parameters.fatal "Error in why3:%a@.%s@."
+      Why3.Exn_printer.exn_printer exn
+      (Printexc.raw_backtrace_to_string bt)
 
-let prove ?timeout ~prover wpo =
-  Task.todo (fun () -> prove_prop ~timeout ~wpo ~prover)
-
-(* ------------------------------------------------------------------------- *)
+let parse_why3_options =
+  let todo = ref true in
+  fun () ->
+    if !todo then begin
+      let args = Array.of_list ("why3"::Wp_parameters.WhyFlags.get ()) in
+      begin try
+          Arg.parse_argv ~current:(ref 0) args
+            (Why3.Debug.Args.[desc_debug;desc_debug_all;desc_debug_list])
+            (fun _ -> raise (Arg.Help "Unknown why3 option"))
+            "Why3 options"
+        with Arg.Bad s -> Wp_parameters.abort "%s" s
+      end;
+      ignore (Why3.Debug.Args.option_list ());
+      Why3.Debug.Args.set_flags_selected ();
+      todo := false
+    end

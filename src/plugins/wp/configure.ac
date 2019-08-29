@@ -42,13 +42,6 @@ AC_ARG_ENABLE(
   WPCOQ=yes
 )
 
-AC_ARG_ENABLE(
-  wp-why3,
-  [  --enable-wp-why3        Wp precompiled Why3-Coq libraries (default: yes)],
-  WPWHY3COQ=$enableval,
-  WPWHY3COQ=yes
-)
-
 plugin_require(wp,qed)
 plugin_require(wp,rtegen)
 plugin_use(wp,gui)
@@ -104,49 +97,6 @@ if test "$ENABLE_WP" != "no"; then
     COQC="no"
   fi
   AC_SUBST(COQC)
-
-  ## Configuring for WHY3-COQ
-  if test "$COQC" = "yes" -a "$WPWHY3COQ" = "yes" ; then
-    AC_CHECK_PROG(WHY3COQC,why3,yes,no)
-    if test "$WHY3COQC" = "yes" ; then
-      WHY3VERSION=`why3 --version | sed -n -e 's|.*version *\([[^ ]]*\)$|\1|p' `
-      case $WHY3VERSION in
-        1.*)
-          AC_MSG_RESULT(why3 version $WHY3VERSION found)
-	  WHY3LIB=`why3 --print-libdir`
-	  if test -f $WHY3LIB/coq/BuiltIn.vo ; then
-	    AC_MSG_RESULT(why3 compiled coq libraries found)
-	  else
-            AC_MSG_RESULT(why3 compiled coq libraries not found in $WHY3LIB)
-	    WHY3COQC="no"
-          fi
-          ;;
-        *)
-          AC_MSG_RESULT(why3 unsupported version $WHY3VERSION)
-          WHY3COQC="no"
-          ;;
-      esac
-    else
-      AC_MSG_NOTICE(rerun configure to make wp using why3 (1.0.0+))
-    fi
-  else
-    WHY3COQC="no"
-  fi
-  AC_SUBST(WHY3COQC)
-
-  ## Configuring for WHY3-API
-  WHY3API_VERSION=$($OCAMLFIND query why3 -format %v)
-  case $WHY3API_VERSION in
-    1.*)
-        AC_MSG_RESULT(why3 api $WHY3API_VERSION found)
-        WHY3API="yes"
-        ;;
-    *)
-        AC_MSG_RESULT(why3 api not found (no why3 prover detection))
-        WHY3API="no"
-        ;;
-  esac
-  AC_SUBST(WHY3API)
 
 fi
 

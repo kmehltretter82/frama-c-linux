@@ -21,69 +21,18 @@
 ##########################################################################
 
 
+WPLSHARE=$(Wp_DIR)/share
+
 # --------------------------------------------------------------------------
 # ---  Coq Compilation
 # --------------------------------------------------------------------------
 
-.PHONY: all why3compile coqwpcompile clean depend wp-coq-clean
-
-WPLSHARE=$(Wp_DIR)/share
-
-wp-coq-clean:
-	find $(Wp_DIR) \( -name "*.vo" -or -name "*.glob" \) -print -delete
-	rm -f $(WPLSHARE)/coqwp/.depend $(WPLSHARE)/why3/.depend
-clean:: wp-coq-clean
-
-clean:: wp-coq-clean
-
-#########################
-## For why3 directory ##
-
-ifeq ($(WP_WHY3COQC_ENABLED),yes)
-
-byte:: why3compile
-opt:: why3compile
-
-why3compile: $(addprefix $(WPLSHARE)/why3/, $(addsuffix o, $(COQ_LIBS_CEA)))
-
-WHY3LIB:=$(shell why3 --print-libdir)
-WHY3INCLUDES= -R $(WHY3LIB)/coq Why3 -R $(WPLSHARE)/why3 ''
-
-$(WPLSHARE)/why3/%.vo: $(WPLSHARE)/why3/%.v
-	echo "Coqc         $@"
-	echo coqc -w none $(WHY3INCLUDES) $<
-	coqc -w none $(WHY3INCLUDES) $<
-
-$(WPLSHARE)/why3/%.ide: $(WPLSHARE)/why3/%.v
-	echo "Coqide       $@"
-	@coqide $(WHY3INCLUDES) $<
-
-$(WPLSHARE)/why3/.depend: $(addprefix $(WPLSHARE)/, $(WHY3_COQ_SOURCES))
-	echo "Coqdep for $(WPLSHARE)/why3"
-	@coqdep $(WHY3INCLUDES) $(WPLSHARE)/why3/*.v $(WPLSHARE)/why3/**/*.v > $@
-
-ifneq ($(MAKECMDGOALS),clean)
-ifneq ($(MAKECMDGOALS),distclean)
-ifneq ($(MAKECMDGOALS),smartclean)
-sinclude $(WPLSHARE)/why3/.depend
-endif
-endif
-endif
-
-endif # ($(WP_WHY3COQC_ENABLED),yes)
-
-#########################
-## For coqwp directory ##
-
-ifeq ($(WP_COQC_ENABLED),yes)
-
-byte:: coqwpcompile
-opt:: coqwpcompile
-
-
-coqwpcompile: $(addprefix $(WPLSHARE)/coqwp/, $(addsuffix o, $(COQ_LIBS_CEA) $(COQ_LIBS_INRIA)))
+.PHONY: coqwpcompile
 
 COQWPINCLUDES= -R $(WPLSHARE)/coqwp ''
+COQWPBINARIES= $(addprefix $(WPLSHARE)/, $(ALL_COQ_BINARIES))
+
+coqwpcompile: $(COQWPBINARIES)
 
 $(WPLSHARE)/coqwp/%.vo: $(WPLSHARE)/coqwp/%.v
 	echo "Coqc         $<"
@@ -94,8 +43,38 @@ $(WPLSHARE)/coqwp/%.ide: $(WPLSHARE)/coqwp/%.v
 	coqide $(COQWPINCLUDES) $<
 
 $(WPLSHARE)/coqwp/.depend: $(addprefix $(WPLSHARE)/, $(WP_COQ_SOURCES))
-	echo "Coqdep for $(WPLSHARE)/coqwp"
+	echo "Coqdep       $(WPLSHARE)/coqwp"
 	@coqdep $(COQWPINCLUDES) $(WPLSHARE)/coqwp/*.v $(WPLSHARE)/coqwp/**/*.v > $@
+
+# --------------------------------------------------------------------------
+# ---  Additional Targets
+# --------------------------------------------------------------------------
+
+.PHONY: wp-coq-compile wp-coq-clean wp-coq-install wp-coq-uninstall
+
+wp-coq-compile: coqwpcompile
+	@echo "Run 'make wp-coq-install' to install all precompiled libraries"
+
+wp-coq-clean:
+	find $(Wp_DIR) \( -name "*.vo" -or -name "*.glob" -or -name ".*.aux" \) -delete
+	rm -f $(WPLSHARE)/coqwp/.depend
+
+wp-coq-install:
+	$(PRINT_INSTALL) "Coq Libraries"
+	$(INSTALL_SHARE) -f -p -s \
+		-i $(Wp_DIR)/share \
+		-d $(FRAMAC_DATADIR)/wp \
+		$(ALL_COQ_BINARIES)
+
+wp-coq-uninstall:
+	$(PRINT_RM) "Coq Libraries"
+	@rm -f $(FRAMAC_DATADIR)/wp/why3/*.vo
+	@rm -f $(FRAMAC_DATADIR)/wp/coqwp/*.vo
+	@rm -f $(FRAMAC_DATADIR)/wp/coqwp/*/*.vo
+
+# --------------------------------------------------------------------------
+# ---  Coq Dependencies
+# --------------------------------------------------------------------------
 
 ifneq ($(MAKECMDGOALS),clean)
 ifneq ($(MAKECMDGOALS),distclean)
@@ -105,11 +84,4 @@ endif
 endif
 endif
 
-endif #($(WP_COQC_ENABLED),yes)
-
-# End of file
-
-##########################################################################
-# Local Variables:
-# mode: makefile
-# End:
+# --------------------------------------------------------------------------

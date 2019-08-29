@@ -24,8 +24,6 @@
 # ---  Why-3 Libraries
 # --------------------------------------------------------------------------
 
-# See also COQ_LIBS_CEA
-
 ## Used in share/why3
 
 WHY3_LIBS_CEA:=	\
@@ -46,7 +44,8 @@ WHY3_API_LIBS_CEA:= WHY3_LIBS_CEA
 # ---  Coq Libraries
 # --------------------------------------------------------------------------
 
-## Used in share/coqwp and share/why3
+## Used in share/coqwp
+
 COQ_LIBS_CEA:=	\
  ArcTrigo.v     \
  Bits.v 	\
@@ -63,7 +62,6 @@ COQ_LIBS_CEA:=	\
  Vlist.v	\
  Zbits.v
 
-## Used in share/coqwp only
 COQ_LIBS_INRIA:=\
  BuiltIn.v 	\
  HighOrd.v 	\
@@ -71,6 +69,7 @@ COQ_LIBS_INRIA:=\
  int/Abs.v 	\
  int/ComputerDivision.v	\
  int/EuclideanDivision.v \
+ int/ComputerOfEuclideanDivision.v \
  int/Exponentiation.v	\
  int/Int.v 	\
  int/MinMax.v 	\
@@ -85,14 +84,14 @@ COQ_LIBS_INRIA:=\
  real/Square.v \
  real/ExpLog.v \
  real/PowerReal.v \
- real/Trigonometry.v \
- for_drivers/ComputerOfEuclideanDivision.v
+ real/Trigonometry.v
 
 # --------------------------------------------------------------------------
 # ---  Alt-Ergo Libraries
 # --------------------------------------------------------------------------
 
 # Used in share/ergo
+
 ERGO_LIBS_CEA:= \
  ArcTrigo.mlw   \
  Cbits.mlw 	\
@@ -106,11 +105,11 @@ ERGO_LIBS_CEA:= \
  Vset.mlw	\
  Vlist.mlw
 
-# Used in share/ergo
 ERGO_LIBS_INRIA:= \
  bool.Bool.mlw 	\
  int.Abs.mlw 	\
  int.ComputerDivision.mlw \
+ int.ComputerOfEuclideanDivision.mlw \
  int.Int.mlw 	\
  int.MinMax.mlw \
  map.Map.mlw 	\
@@ -138,14 +137,13 @@ WP_SHARE_SRC_CEA_RESOURCES:= \
 	wp.driver \
 	why3/coq.drv \
 	$(addprefix why3/frama_c_wp/,  $(WHY3_LIBS_CEA)) \
-	$(addprefix why3/,  $(COQ_LIBS_CEA)) \
 	$(addprefix coqwp/, $(COQ_LIBS_CEA)) \
 	$(addprefix ergo/,  $(ERGO_LIBS_CEA))
 
 ALL_CEA_RESOURCES+= \
 	install.ml \
 	Makefile.resources \
-	Makefile \
+	Makefile.coqwp \
 	$(WP_SHARE_SRC_CEA_RESOURCES)
 
 ALL_UNMODIFIED_WHY3_RESOURCES:= \

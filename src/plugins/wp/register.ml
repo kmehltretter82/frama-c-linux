@@ -513,10 +513,6 @@ let compute_provers ~mode =
       (fun pname prvs ->
          match VCS.prover_of_name pname with
          | None -> prvs
-         (*
-         | Some VCS.Why3ide ->
-             mode.why3ide <- true; prvs
-         *)
          | Some VCS.Tactical ->
              mode.tactical <- true ;
              if pname = "tip" then mode.update <- true ;
@@ -628,10 +624,6 @@ let do_wp_proofs_iter iter =
   let spawned = mode.why3ide || mode.tactical || mode.provers <> [] in
   begin
     if spawned then do_list_scheduled iter ;
-    (*
-    if mode.why3ide then
-      launch (ProverWhy3ide.prove ~callback:do_why3_result ~iter) ;
-    *)
     spawn_wp_proofs_iter ~mode iter ;
     if spawned then
       begin
@@ -845,7 +837,7 @@ let () = Cmdline.run_after_setting_files
        if Wp_parameters.has_dkey dkey_shell then
          Log.print_on_output pp_wp_parameters)
 
-let () = Cmdline.run_after_configuring_stage Why3_api.parse_why3_options
+let () = Cmdline.run_after_configuring_stage ProverWhy3.parse_why3_options
 
 let do_prover_detect () =
   if not !Config.is_gui && Wp_parameters.Detect.get () then
