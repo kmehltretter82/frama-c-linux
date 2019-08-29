@@ -10,5 +10,8 @@ imprecision_graph.mli: LGPL.Dive
 main.ml: LGPL.Dive
 Makefile.in: LGPL.Dive
 node_kind.ml: LGPL.Dive
+node_kind.mli: LGPL.Dive
 self.ml: LGPL.Dive
 self.mli: LGPL.Dive
+server_interface.ml: LGPL.Dive
+server_interface.mli: LGPL.Dive
