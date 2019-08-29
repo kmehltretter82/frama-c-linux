@@ -48,8 +48,6 @@ val term_to_exp: typ option -> term -> exp
 
 val predicate_to_exp: kernel_function -> predicate -> exp
 
-val set_original_project: Project.t -> unit
-
 (*
 Local Variables:
 compile-command: "make -C ../.."

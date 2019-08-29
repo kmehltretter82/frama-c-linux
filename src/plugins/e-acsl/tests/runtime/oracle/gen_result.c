@@ -13,7 +13,8 @@ int f(int x)
 }
 
 int Y = 1;
-/*@ ensures \result ≡ Y; */
+/*@ ensures \result ≡ \old(x);
+    ensures \result ≡ Y; */
 int __gen_e_acsl_g(int x);
 
 int g(int x)
@@ -48,17 +49,22 @@ int __gen_e_acsl_h(void)
   int __retres;
   __retres = h();
   __e_acsl_assert(__retres == 0,(char *)"Postcondition",(char *)"h",
-                  (char *)"\\result == 0",21);
+                  (char *)"\\result == 0",18);
   return __retres;
 }
 
-/*@ ensures \result ≡ Y; */
+/*@ ensures \result ≡ \old(x);
+    ensures \result ≡ Y; */
 int __gen_e_acsl_g(int x)
 {
+  int __gen_e_acsl_at;
   int __retres;
+  __gen_e_acsl_at = x;
   __retres = g(x);
+  __e_acsl_assert(__retres == __gen_e_acsl_at,(char *)"Postcondition",
+                  (char *)"g",(char *)"\\result == \\old(x)",12);
   __e_acsl_assert(__retres == Y,(char *)"Postcondition",(char *)"g",
-                  (char *)"\\result == Y",16);
+                  (char *)"\\result == Y",13);
   return __retres;
 }
 

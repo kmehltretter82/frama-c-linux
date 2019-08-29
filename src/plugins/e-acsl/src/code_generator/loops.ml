@@ -304,7 +304,9 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     let vi_of_lv, exp_of_lv, env = Env.Logic_binding.add ~ty env lv in
     let e, env = term_to_exp kf env t in
     let ty = Cil.typeOf e in
-    let init_set = if Real.is_t ty then Real.init_set else Gmp.init_set in
+    let init_set =
+      if Gmp_types.Q.is_t ty then Rational.init_set else Gmp.init_set
+    in
     let let_stmt = init_set ~loc (Cil.var vi_of_lv) exp_of_lv  e in
     let stmts, env =
       mk_nested_loops ~loc mk_innermost_block kf env lscope_vars'
@@ -320,9 +322,8 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     Error.not_yet
       "creating nested loops from global logic variable"
 
-
 (*
 Local Variables:
-compile-command: "make"
+compile-command: "make -C ../.."
 End:
 *)

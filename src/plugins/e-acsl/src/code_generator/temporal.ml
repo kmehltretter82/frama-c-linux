@@ -30,6 +30,10 @@ module Libc = Functions.Libc
 open Cil_types
 open Cil_datatype
 
+let generate = ref false
+let enable param = generate := param
+let is_enabled () = !generate
+
 (* ************************************************************************** *)
 (* Types {{{ *)
 (* ************************************************************************** *)
@@ -490,7 +494,7 @@ let mk_global_init ~loc vi off init env =
 (* ************************************************************************** *)
 
 let handle_function_parameters kf env =
-  if Options.Temporal_validity.get () then
+  if is_enabled () then
     let env, _ = List.fold_left
       (fun (env, index) param ->
         let param = Visitor_behavior.Get.varinfo (Env.get_behavior env) param in
@@ -506,7 +510,7 @@ let handle_function_parameters kf env =
     env
 
 let handle_stmt stmt env =
-  if Options.Temporal_validity.get () then begin
+  if is_enabled () then begin
     match stmt.skind with
     | Instr instr -> handle_instruction stmt instr env
     | Return(ret, loc) -> Extlib.may_map
@@ -518,7 +522,7 @@ let handle_stmt stmt env =
     env
 
 let generate_global_init vi off init env =
-  if Options.Temporal_validity.get () then
+  if is_enabled () then
     mk_global_init ~loc:vi.vdecl vi off init env
   else
     None

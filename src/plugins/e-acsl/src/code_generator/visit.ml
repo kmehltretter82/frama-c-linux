@@ -1031,8 +1031,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
     Literal_strings.reset ();
     Global_observer.reset ();
     Keep_status.before_translation ();
-    self#reset_env ();
-    Translate.set_original_project (Project.current ())
+    self#reset_env ()
 
 end
 

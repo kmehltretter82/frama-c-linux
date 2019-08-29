@@ -20,23 +20,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Realary for real numbers.
-    For the sake of maintainability, the only access to the installed
-    real library MUST be through the current module.
-    For example, if it is `libgmp` then we MUST NEVER directly call gmp
-    builtins in outer modules (e.g. `Typing` or `Translate`) for handling reals.
-    This way, if we want to change `libgmp` to something else, say `mpfr`, then
-    all changes will be centralized here. *)
+(** Generation of rational numbers. *)
 
 open Cil_types
 
-val t: unit -> typ
-(** C type representing reals in the generated code  *)
-
-val is_t: typ -> bool
-(** Is the typ real? *)
-
-val mk_real: loc:location -> ?name:string -> exp -> Env.t -> term option ->
+val create: loc:location -> ?name:string -> exp -> Env.t -> term option ->
   exp * Env.t
 (** Create a real *)
 
