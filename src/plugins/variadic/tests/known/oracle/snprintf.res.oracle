@@ -56,7 +56,8 @@ int volatile nondet;
     requires valid_read_string(param0);
     assigns \result, *(s + (0 ..));
     assigns \result
-      \from (indirect: n), (indirect: *(format + (0 ..))), *(param0 + (0 ..));
+      \from (indirect: n), (indirect: *(format + (0 ..))),
+            (indirect: *(param0 + (0 ..)));
     assigns *(s + (0 ..))
       \from (indirect: n), (indirect: *(format + (0 ..))), *(param0 + (0 ..));
  */
@@ -70,7 +71,8 @@ int snprintf_va_1(char * __restrict s, size_t n,
     requires valid_read_string(param0);
     assigns \result, *(s + (0 ..));
     assigns \result
-      \from (indirect: n), (indirect: *(format + (0 ..))), *(param0 + (0 ..));
+      \from (indirect: n), (indirect: *(format + (0 ..))),
+            (indirect: *(param0 + (0 ..)));
     assigns *(s + (0 ..))
       \from (indirect: n), (indirect: *(format + (0 ..))), *(param0 + (0 ..));
  */

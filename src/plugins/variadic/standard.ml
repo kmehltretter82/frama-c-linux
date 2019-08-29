@@ -448,6 +448,16 @@ let build_fun_spec env loc vf format_fun tvparams formals =
     (* Cil.hasAttribute "const" *)
     add_lval (lval,dir)
   in
+  let make_indirect iterm =
+    (* Add "indirect" to an identified term, if it isn't already *)
+    if List.mem "indirect" iterm.it_content.term_name then iterm
+    else
+      let it_content =
+        { iterm.it_content with
+          term_name = "indirect" :: iterm.it_content.term_name }
+      in
+      { iterm with it_content }
+  in
 
   (* Build variadic parameter source/dest list *)
   let dirs = List.map snd tvparams in
@@ -541,14 +551,20 @@ let build_fun_spec env loc vf format_fun tvparams formals =
   | Syslog, _ -> ()
   end;
 
-  (* Add return value dest *)
-  let rettyp = Cil.getReturnType vf.vf_decl.vtype in
-  if not (Cil.isVoidType rettyp) then
-    add_lval ~indirect:true (Build.tresult rettyp, `ArgOut);
-
-  (* Build the assign clause *)
+  (* Build the assigns clause (without \result, for now; it will be added
+     separately) *)
   let froms = List.map (fun iterm -> iterm, From !sources) !dests in
-  let assigns = Writes froms in
+
+  (* Add return value dest: it is different from above since it is _indirectly_
+     assigned from all sources *)
+  let rettyp = Cil.getReturnType vf.vf_decl.vtype in
+  let froms_for_result =
+    if Cil.isVoidType rettyp then []
+    else
+      [iterm (Build.tresult rettyp),
+       From (List.map make_indirect !sources)]
+  in
+  let assigns = Writes (froms_for_result @ froms) in
 
   (* Build the default behaviour *)
   let bhv = Cil.mk_behavior ~assigns
