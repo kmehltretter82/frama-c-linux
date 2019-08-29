@@ -1301,11 +1301,9 @@ ALL_GUI_CMO= $(ALL_CMO) $(GRAPH_GUICMO) $(GUICMO)
 ALL_GUI_CMX= $(patsubst %.cma,%.cmxa,$(ALL_GUI_CMO:.cmo=.cmx))
 
 ifeq ($(LABLGTK_VERSION),3)
-ifeq ($(NATIVE_THREADS),yes)
 THREAD=-thread
 else
-THREAD=-vmthread
-endif
+THREAD=
 endif
 
 bin/viewer.byte$(EXE): BYTE_LIBS+= $(GRAPH_GUICMO)
@@ -1378,7 +1376,7 @@ include Makefile.generating
 # Tests #
 #########
 
-ifeq ($(PTESTSBEST),opt)
+ifeq ($(OCAMLBEST),opt)
 PTESTS_FILES=ptests_config.cmi ptests_config.cmx ptests_config.o
 else
 PTESTS_FILES=ptests_config.cmi ptests_config.cmo
@@ -1400,9 +1398,9 @@ update_external_tests: external_tests
 
 oracles: byte opt ptests
 	$(PRINT_MAKING) oracles
-	./bin/ptests.$(PTESTSBEST)$(EXE) -make "$(MAKE)" $(PLUGIN_TESTS_LIST) \
+	./bin/ptests.$(OCAMLBEST)$(EXE) -make "$(MAKE)" $(PLUGIN_TESTS_LIST) \
 		> /dev/null 2>&1
-	./bin/ptests.$(PTESTSBEST)$(EXE) -make "$(MAKE)" -update \
+	./bin/ptests.$(OCAMLBEST)$(EXE) -make "$(MAKE)" -update \
 		$(PLUGIN_TESTS_LIST)
 
 btests: byte ./bin/ptests.byte$(EXE)
@@ -1412,13 +1410,13 @@ btests: byte ./bin/ptests.byte$(EXE)
 
 tests_dist: dist ptests
 	$(PRINT_EXEC) ptests
-	time -p ./bin/ptests.$(PTESTSBEST)$(EXE) -make "$(MAKE)" \
+	time -p ./bin/ptests.$(OCAMLBEST)$(EXE) -make "$(MAKE)" \
 		$(PLUGIN_TESTS_LIST)
 
 # test only one test suite : make suite_tests
 %_tests: opt ptests
 	$(PRINT_EXEC) ptests
-	./bin/ptests.$(PTESTSBEST)$(EXE) -make "$(MAKE)" $($*_TESTS_OPTS) $*
+	./bin/ptests.$(OCAMLBEST)$(EXE) -make "$(MAKE)" $($*_TESTS_OPTS) $*
 
 # full test suite
 wp_TESTS_OPTS=-j 1
@@ -1993,8 +1991,8 @@ install:: install-lib-$(OCAMLBEST)
 	if [ -x bin/viewer.byte$(EXE) ] ; then \
 	  $(CP) bin/viewer.byte$(EXE) $(BINDIR)/frama-c-gui.byte$(EXE); \
 	fi
-	$(CP) bin/ptests.$(PTESTSBEST)$(EXE) \
-	      $(BINDIR)/ptests.$(PTESTSBEST)$(EXE)
+	$(CP) bin/ptests.$(OCAMLBEST)$(EXE) \
+	      $(BINDIR)/ptests.$(OCAMLBEST)$(EXE)
 	if [ -x bin/fc-config$(EXE) ] ; then \
 		$(CP) bin/fc-config$(EXE) $(BINDIR)/frama-c-config$(EXE); \
 	fi
@@ -2031,7 +2029,7 @@ install:: install-lib-$(OCAMLBEST)
 .PHONY: uninstall
 uninstall::
 	$(PRINT_RM) installed binaries
-	$(RM) $(BINDIR)/frama-c* $(BINDIR)/ptests.$(PTESTSBEST)$(EXE)
+	$(RM) $(BINDIR)/frama-c* $(BINDIR)/ptests.$(OCAMLBEST)$(EXE)
 	$(PRINT_RM) installed shared files
 	$(RM) -R $(FRAMAC_DATADIR)
 	$(PRINT_RM) installed libraries
@@ -2346,22 +2344,16 @@ PTESTS_SRC=ptests/ptests_config.ml ptests/ptests.ml
 # that does not contain a 'tests' dir
 PTESTS_CONFIG:= $(shell if test -d tests; then echo tests/ptests_config; fi)
 
-ifeq ($(NATIVE_THREADS),yes)
-PTEST_THREAD=-thread
-ptests: bin/ptests.$(PTESTSBEST)$(EXE) $(PTESTS_CONFIG)
-else
-PTEST_THREAD=-vmthread
-ptests: bin/ptests.byte$(EXE) $(PTESTS_CONFIG)
-endif
+ptests: bin/ptests.$(OCAMLBEST)$(EXE) $(PTESTS_CONFIG)
 
 bin/ptests.byte$(EXE): $(PTESTS_SRC)
 	$(PRINT_LINKING) $@
-	$(OCAMLC) -I ptests -dtypes $(PTEST_THREAD) -g -o $@ \
+	$(OCAMLC) -I ptests -dtypes -thread -g -o $@ \
 	    unix.cma threads.cma str.cma dynlink.cma $^
 
 bin/ptests.opt$(EXE): $(PTESTS_SRC)
 	$(PRINT_LINKING) $@
-	$(OCAMLOPT) -I ptests -dtypes $(PTEST_THREAD) -o $@ \
+	$(OCAMLOPT) -I ptests -dtypes -thread -o $@ \
 	    unix.cmxa threads.cmxa str.cmxa dynlink.cmxa $^
 
 GENERATED+=ptests/ptests_config.ml tests/ptests_config
