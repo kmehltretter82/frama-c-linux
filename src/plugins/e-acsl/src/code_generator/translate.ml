@@ -954,9 +954,6 @@ let assumes_predicate bhv =
     Logic_const.ptrue
     bhv.b_assumes
 
-let original_project_ref = ref Project_skeleton.dummy
-let set_original_project p = original_project_ref := p
-
 let translate_preconditions kf env behaviors =
   let env = Env.set_annotation_kind env Misc.Precondition in
   let do_behavior env b =

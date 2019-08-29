@@ -23,6 +23,12 @@
 (** Transformations to detect temporal memory errors (e.g., dereference of
     stale pointers). *)
 
+val enable: bool -> unit
+(** Enable/disable temporal transformations *)
+
+val is_enabled: unit -> bool
+(** Return a boolean value indicating whether temporal analysis is enabled *)
+
 val handle_function_parameters: Cil_types.kernel_function -> Env.t -> Env.t
 (** [handle_function_parameters kf env] updates the local environment [env],
     according to the parameters of [kf], with statements allowing to track

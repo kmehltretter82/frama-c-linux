@@ -146,49 +146,53 @@ let () =
 let generate_code =
   Resulting_projects.memo
     (fun name ->
-      apply_on_e_acsl_ast
-        (fun () ->
-          Options.feedback "beginning translation.";
-          let prepared_prj = Prepare_ast.prepare () in
-          let res =
-            Project.on prepared_prj
-            (fun () ->
-              let dup_prj = Dup_functions.dup () in
-              let res =
-                Project.on
-                  dup_prj
-                  (fun () ->
-                    Gmp_types.init ();
-                    Mmodel_analysis.reset ();
-                    let visit prj = Visit.do_visit ~prj true in
-                    let prj = File.create_project_from_visitor name visit in
-                    Loops.apply_after_transformation prj;
-                    (* remove the RTE's results computed from E-ACSL: their are
-                       partial and associated with the wrong kernel function
-                       (the one of the old project). *)
-                    let selection =
-                      State_selection.with_dependencies !Db.RteGen.self
-                    in
-                    Project.clear ~selection ~project:prj ();
-                    Resulting_projects.mark_as_computed ();
-                    Project.copy
-                      ~selection:(State_selection.singleton Kernel.Files.self)
-                      prj;
-                    prj)
+       apply_on_e_acsl_ast
+         (fun () ->
+            Options.feedback "beginning translation.";
+            Temporal.enable (Options.Temporal_validity.get ());
+            let prepared_prj = Prepare_ast.prepare () in
+            let res =
+              Project.on prepared_prj
+                (fun () ->
+                   let dup_prj = Dup_functions.dup () in
+                   let res =
+                     Project.on
+                       dup_prj
+                       (fun () ->
+                          Gmp_types.init ();
+                          Mmodel_analysis.reset ();
+                          let visit prj = Visit.do_visit ~prj true in
+                          let prj =
+                            File.create_project_from_visitor name visit
+                          in
+                          Loops.apply_after_transformation prj;
+                          (* remove the RTE's results computed from E-ACSL:
+                             their are partial and associated with the wrong
+                             kernel function (the one of the old project). *)
+                          let selection =
+                            State_selection.with_dependencies !Db.RteGen.self
+                          in
+                          Project.clear ~selection ~project:prj ();
+                          Resulting_projects.mark_as_computed ();
+                          let selection =
+                            State_selection.singleton Kernel.Files.self
+                          in
+                          Project.copy ~selection prj;
+                          prj)
+                       ()
+                   in
+                   if Options.Debug.get () = 0 then
+                     Project.remove ~project:dup_prj ();
+                   res)
                 ()
-              in
-              if Options.Debug.get () = 0 then
-                Project.remove ~project:dup_prj ();
-              res)
-              ()
-          in
-          if Options.Debug.get () = 0 then begin
-            Project.remove ~project:prepared_prj ();
-          end;
-          Options.feedback "translation done in project \"%s\"."
-            (Options.Project_name.get ());
-          res)
-        ())
+            in
+            if Options.Debug.get () = 0 then begin
+              Project.remove ~project:prepared_prj ();
+            end;
+            Options.feedback "translation done in project \"%s\"."
+              (Options.Project_name.get ());
+            res)
+         ())
 
 let generate_code =
   Dynamic.register
