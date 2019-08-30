@@ -308,7 +308,7 @@ EACSL_DISTRIB_TESTS = \
 
 EACSL_RTL_FILES = $(EACSL_RTL_SRC)
 
-EACSL_SCRIPT_FILES = scripts/e-acsl-gcc.sh scripts/testrun.sh
+EACSL_SCRIPT_FILES = scripts/e-acsl-gcc.sh
 
 EACSL_LICENSE_FILES = \
   license/CEA_LGPL license/SPARETIMELABS \
