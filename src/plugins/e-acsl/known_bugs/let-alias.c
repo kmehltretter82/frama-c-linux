@@ -2,7 +2,8 @@
    DONTRUN:
 */
 
-/* let binding on alias, memory must be fully instrumented */
+/* let binding on alias: only work with -e-acsl-full-mmodel;
+   should not be the case. */
 
 int main(void) {
   int t[4] = {1,2,3,4};
