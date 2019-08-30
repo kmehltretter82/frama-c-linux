@@ -1,4 +1,4 @@
-/* run.config
+/* run.config_ci
 	 COMMENT: Tests for function-based implementation of ctype.h features
 */
 

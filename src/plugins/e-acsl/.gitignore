@@ -54,7 +54,9 @@
 /tests/*.annot
 /tests/*_DEP
 /tests/test_config
-/tests/*/result/*
+/tests/test_config_ci
+/tests/test_config_dev
+/tests/*/result*/*
 /tests/check/obj/*
 .frama-c
 tests/ptests_config

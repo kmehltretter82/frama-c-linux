@@ -1,4 +1,4 @@
-/* run.config
+/* run.config_ci
    COMMENT: recursive logic functions
    STDOPT: +"-eva-ignore-recursive-calls"
 */

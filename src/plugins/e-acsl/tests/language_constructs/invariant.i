@@ -1,4 +1,4 @@
-/* run.config
+/* run.config_ci
    COMMENT: invariant
    STDOPT: +"-slevel 11"
 */

@@ -1,4 +1,4 @@
-/* run.config
+/* run.config_ci
    COMMENT: arrays
    STDOPT: #"-slevel 5"
 */

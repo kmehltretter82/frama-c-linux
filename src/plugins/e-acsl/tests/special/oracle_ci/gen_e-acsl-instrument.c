@@ -75,6 +75,7 @@ int vol(int n , ...)
   int tmp;
   __builtin_va_start(vl,n);
   tmp = __builtin_va_arg (vl, int);
+  /*@ assert Eva: initialization: \initialized(&tmp); */
   int r = tmp;
   __builtin_va_end(vl);
   __retres = 1;

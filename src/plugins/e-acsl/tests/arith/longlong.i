@@ -1,4 +1,4 @@
-/* run.config
+/* run.config_ci
    COMMENT: upgrading longlong to GMP
    STDOPT: +"-eva-ignore-recursive-calls"
 */

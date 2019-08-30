@@ -8,3 +8,7 @@
 [e-acsl] tests/special/e-acsl-instrument.c:58: Warning: 
   ignoring effect of variadic function vol
 [e-acsl] translation done in project "e-acsl".
+[eva:alarm] tests/special/e-acsl-instrument.c:44: Warning: 
+  accessing uninitialized left-value.
+  assert \initialized(&tmp);
+  (tmp from vararg)

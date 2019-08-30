@@ -1,4 +1,4 @@
-/* run.config
+/* run.config_ci
    COMMENT: loop invariants
    STDOPT: +"-slevel 160"
 */

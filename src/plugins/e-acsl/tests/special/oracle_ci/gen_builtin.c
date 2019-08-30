@@ -38,19 +38,11 @@ int __gen_e_acsl_f(int i)
   __gen_e_acsl_at = i;
   __retres = f(i);
   {
-    __e_acsl_mpz_t __gen_e_acsl_result;
     int __gen_e_acsl_incr_app;
-    __e_acsl_mpz_t __gen_e_acsl_app;
-    int __gen_e_acsl_eq;
-    __gmpz_init_set_si(__gen_e_acsl_result,(long)__retres);
     __gen_e_acsl_incr_app = incr(__gen_e_acsl_at);
-    __gmpz_init_set_si(__gen_e_acsl_app,(long)__gen_e_acsl_incr_app);
-    __gen_e_acsl_eq = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_result),
-                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl_app));
-    __e_acsl_assert(__gen_e_acsl_eq == 0,(char *)"Postcondition",(char *)"f",
-                    (char *)"\\result == incr(\\old(i))",12);
-    __gmpz_clear(__gen_e_acsl_result);
-    __gmpz_clear(__gen_e_acsl_app);
+    __e_acsl_assert(__retres == __gen_e_acsl_incr_app,
+                    (char *)"Postcondition",(char *)"f",
+                    (char *)"\\result == incr(\\old(i))",9);
     return __retres;
   }
 }

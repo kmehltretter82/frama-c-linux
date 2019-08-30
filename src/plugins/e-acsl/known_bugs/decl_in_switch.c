@@ -1,4 +1,4 @@
-/* run.config
+/* run.config_ci
    DONTRUN:
    COMMENT: Variables declared in the body of switch statements so far cannot
    COMMENT: be tracked

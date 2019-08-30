@@ -181,27 +181,37 @@ PLUGIN_TESTS_DIRS := \
 	format \
 	temporal \
 	special
-
 # [JS 2019/02/26] deactivate tests 'builtin' as long as setjmp/longjmp is not
 # supported.
-#	builtin \
+#	builtin
 
-PLUGIN_TESTS_LIB := $(EACSL_PLUGIN_DIR)/tests/print.ml
-E_ACSL_TESTS: $(EACSL_PLUGIN_DIR)/tests/test_config
+PLUGIN_TESTS_LIB := $(EACSL_PLUGIN_DIR)/tests/print.cmxs
 
-E_ACSL_DEFAULT_TESTS: \
-	$(EACSL_PLUGIN_DIR)/tests/test_config \
-	$(EACSL_PLUGIN_DIR)/tests/print.cmxs \
-	$(EACSL_PLUGIN_DIR)/tests/print.cmo
+DEV=
+ifeq ("$(DEV)","yes")
+  EACSL_TEST_CONFIG=dev
+else
+  EACSL_TEST_CONFIG:=ci
+endif
+PLUGIN_PTESTS_OPTS:=-config $(EACSL_TEST_CONFIG)
 
-$(EACSL_PLUGIN_DIR)/tests/test_config: \
-		$(EACSL_PLUGIN_DIR)/tests/test_config.in \
+E_ACSL_TESTS E_ACSL_DEFAULT_TESTS: \
+	$(EACSL_PLUGIN_DIR)/tests/ptests_config \
+	$(EACSL_PLUGIN_DIR)/tests/test_config_$(EACSL_TEST_CONFIG)
+
+$(EACSL_PLUGIN_DIR)/tests/test_config_ci: \
+		$(EACSL_PLUGIN_DIR)/tests/test_config_ci.in \
 		$(EACSL_PLUGIN_DIR)/Makefile
 	$(PRINT_MAKING) $@
 	$(SED) -e "s|@SEDCMD@|`which sed `|g" $< > $@
 
-tests:: $(EACSL_PLUGIN_DIR)/tests/ptests_config \
-	$(EACSL_PLUGIN_DIR)/tests/print.cmxs
+$(EACSL_PLUGIN_DIR)/tests/test_config_dev: \
+		$(EACSL_PLUGIN_DIR)/tests/test_config_dev.in \
+		$(EACSL_PLUGIN_DIR)/Makefile
+	$(PRINT_MAKING) $@
+	$(SED) -e "s|@SEDCMD@|`which sed `|g" $< > $@
+
+tests:: $(EACSL_PLUGIN_DIR)/tests/ptests_config
 
 clean::
 	for d in $(E_ACSL_EXTRA_DIRS); do \

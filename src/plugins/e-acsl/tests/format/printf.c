@@ -1,4 +1,4 @@
-/* run.config
+/* run.config_ci
    COMMENT: Check detection of format-string vulnerabilities via printf
    DONTRUN:
 */
