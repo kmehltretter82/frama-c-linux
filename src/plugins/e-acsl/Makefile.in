@@ -176,6 +176,7 @@ PLUGIN_TESTS_DIRS := \
 	language_constructs \
 	arith \
 	memory \
+	gmp-only \
 	full-mmodel \
 	format \
 	temporal \
