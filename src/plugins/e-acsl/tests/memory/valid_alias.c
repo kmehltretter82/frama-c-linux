@@ -1,6 +1,5 @@
 /* run.config
    COMMENT: \valid in presence of aliasing
-   STDOPT: +"-no-val-alloc-returns-null"
 */
 
 #include "stdlib.h"

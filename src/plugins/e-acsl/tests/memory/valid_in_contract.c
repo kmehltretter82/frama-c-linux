@@ -1,6 +1,5 @@
 /* run.config
    COMMENT: function contract involving \valid
-   STDOPT:
 */
 
 #include <stdlib.h>

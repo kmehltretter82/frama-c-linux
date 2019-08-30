@@ -32,11 +32,11 @@ int main(void)
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)P,sizeof(int),
                                                   (void *)P,(void *)(& P));
     __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"main",
-                    (char *)"mem_access: \\valid_read(P)",14);
+                    (char *)"mem_access: \\valid_read(P)",13);
     __gen_e_acsl_valid = __e_acsl_valid((void *)P,sizeof(int),(void *)P,
                                         (void *)(& P));
     __e_acsl_assert(__gen_e_acsl_valid,(char *)"RTE",(char *)"main",
-                    (char *)"mem_access: \\valid(P)",14);
+                    (char *)"mem_access: \\valid(P)",13);
   }
   (*P) ++;
   /*@ assert *q ≡ G; */
@@ -54,9 +54,9 @@ int main(void)
     }
     else __gen_e_acsl_and = 0;
     __e_acsl_assert(__gen_e_acsl_and,(char *)"RTE",(char *)"main",
-                    (char *)"mem_access: \\valid_read(q)",15);
+                    (char *)"mem_access: \\valid_read(q)",14);
     __e_acsl_assert(*q == G,(char *)"Assertion",(char *)"main",
-                    (char *)"*q == G",15);
+                    (char *)"*q == G",14);
   }
   __retres = 0;
   __e_acsl_delete_block((void *)(& P));

@@ -1,5 +1,4 @@
 /* run.config
-   STDOPT:
    COMMENT: Behaviours of the \initialized E-ACSL predicate
 */
 

@@ -1,11 +1,8 @@
 /* run.config
    COMMENT: function call
-   STDOPT: +"-no-val-alloc-returns-null"
 */
 
 #include <stdlib.h>
-
-//extern void *malloc(unsigned int size);
 
 /*@ ensures \valid(\result); */
 int *f(int *x, int *y) {

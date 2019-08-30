@@ -1,6 +1,5 @@
 /* run.config
    COMMENT: \freeable
-   STDOPT:
 */
 
 #include <stdlib.h>

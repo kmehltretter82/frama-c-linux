@@ -1,6 +1,5 @@
 /* run.config
    COMMENT: function call + initialized
-   STDOPT: +"-no-val-alloc-returns-null"
 */
 
 #include<stdlib.h>
@@ -9,7 +8,7 @@ int LAST;
 
 int* new_inversed(int len, int *v) {
   int i, *p;
-  // @ assert \valid(v) && \offset(v)+len*sizeof(int) <= \block_length(v);
+  //@ assert \valid(v) && \offset(v)+len*sizeof(int) <= \block_length(v);
   p = malloc(sizeof(int)*len);
   for(i=0; i<len; i++)
     p[i] = v[len-i-1];
@@ -19,7 +18,7 @@ int* new_inversed(int len, int *v) {
 int main(void) {
   int x = 3;
   int v1[3]= { 1, 2, x }, *v2;
-  // @ assert \valid(&v1[2]);
+  //@ assert \valid(&v1[2]);
   LAST = v1[2];
   //@ assert \initialized(v1+2);
   v2 = new_inversed(3, v1);

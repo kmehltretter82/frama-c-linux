@@ -26,7 +26,7 @@ int main(void)
                                                   (void *)0);
     __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"main",
                     (char *)"mem_access: \\valid_read(&state->bitsInQueue)",
-                    22);
+                    19);
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& state->dataQueue[
                                                     state->bitsInQueue / 8U]),
                                                     sizeof(unsigned char __attribute__((
@@ -34,7 +34,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_initialized,(char *)"Assertion",
                     (char *)"main",
                     (char *)"!\\initialized(&state->dataQueue[state->bitsInQueue / 8])",
-                    22);
+                    19);
   }
   free((void *)state);
   __retres = 0;

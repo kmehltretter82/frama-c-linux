@@ -1,6 +1,5 @@
 /* run.config
    COMMENT: cast
-   STDOPT: #"-no-warn-signed-downcast" #"-no-warn-unsigned-downcast"
 */
 
 int main(void) {

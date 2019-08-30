@@ -1,11 +1,8 @@
 /* run.config
    COMMENT: allocation and de-allocation of local variables
-   STDOPT: +"-no-val-alloc-returns-null"
 */
 
 #include <stdlib.h>
-
-extern void *malloc(size_t size);
 
 struct list {
   int element;

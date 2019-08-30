@@ -1,6 +1,5 @@
 /* run.config
    COMMENT: ghost code
-   STDOPT:
 */
 
 /*@ ghost int G = 0; */

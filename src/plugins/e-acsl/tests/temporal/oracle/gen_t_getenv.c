@@ -65,7 +65,7 @@ int main(int argc, char const **argv)
       __gen_e_acsl_or = __gen_e_acsl_and;
     }
     __e_acsl_assert(__gen_e_acsl_or,(char *)"Assertion",(char *)"main",
-                    (char *)"g1 == \\null || \\valid(g1)",14);
+                    (char *)"g1 == \\null || \\valid(g1)",13);
   }
   /*@ assert g2 ≡ \null ∨ \valid(g2); */
   {
@@ -89,7 +89,7 @@ int main(int argc, char const **argv)
       __gen_e_acsl_or_2 = __gen_e_acsl_and_2;
     }
     __e_acsl_assert(__gen_e_acsl_or_2,(char *)"Assertion",(char *)"main",
-                    (char *)"g2 == \\null || \\valid(g2)",15);
+                    (char *)"g2 == \\null || \\valid(g2)",14);
   }
   __retres = 0;
   __e_acsl_delete_block((void *)(& g2));

@@ -1,12 +1,8 @@
 /* run.config
    COMMENT: \valid
-   STDOPT: +"-no-val-alloc-returns-null"
 */
 
 #include "stdlib.h"
-
-extern void *malloc(size_t p);
-extern void free(void* p);
 
 int *X, Z;
 

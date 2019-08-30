@@ -56,7 +56,7 @@ int *__gen_e_acsl_f(int *x, int *y)
                                         (void *)__retres,
                                         (void *)(& __retres));
     __e_acsl_assert(__gen_e_acsl_valid,(char *)"Postcondition",(char *)"f",
-                    (char *)"\\valid(\\result)",10);
+                    (char *)"\\valid(\\result)",7);
     __e_acsl_delete_block((void *)(& y));
     __e_acsl_delete_block((void *)(& x));
     __e_acsl_delete_block((void *)(& __retres));

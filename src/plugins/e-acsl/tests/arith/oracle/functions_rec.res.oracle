@@ -1,5 +1,23 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
+[eva:alarm] tests/arith/functions_rec.c:22: Warning: 
+  assertion got status unknown.
+[eva:alarm] tests/arith/functions_rec.c:22: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[eva:alarm] tests/arith/functions_rec.c:23: Warning: 
+  assertion got status unknown.
+[eva:alarm] tests/arith/functions_rec.c:23: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[eva:alarm] tests/arith/functions_rec.c:24: Warning: 
+  assertion got status unknown.
+[eva] tests/arith/functions_rec.c:7: Warning: 
+  recursive call during value analysis
+  of __gen_e_acsl_f1_2 (__gen_e_acsl_f1_2 <- __gen_e_acsl_f1_2 :: tests/arith/functions_rec.c:7 <-
+                                             __gen_e_acsl_f1 :: tests/arith/functions_rec.c:24 <-
+                                             main).
+  Assuming the call has no effect. The analysis will be unsound.
+[eva:alarm] tests/arith/functions_rec.c:24: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
 [eva:alarm] tests/arith/functions_rec.c:26: Warning: 
   assertion got status unknown.
 [eva] tests/arith/functions_rec.c:10: Warning: 
