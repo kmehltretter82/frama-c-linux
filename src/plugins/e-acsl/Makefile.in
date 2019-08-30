@@ -171,7 +171,9 @@ ifeq (@MAY_RUN_TESTS@,yes)
 -include in_frama_ci
 
 PLUGIN_TESTS_DIRS := \
+	examples \
 	bts \
+	language_constructs \
 	arith \
 	memory \
 	full-mmodel \
