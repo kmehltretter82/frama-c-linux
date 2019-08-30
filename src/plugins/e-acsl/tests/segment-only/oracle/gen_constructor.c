@@ -6,7 +6,7 @@ char *__gen_e_acsl_literal_string;
 void f(void) __attribute__((__constructor__));
 void f(void)
 {
-  __gen_e_acsl_printf_va_1(__gen_e_acsl_literal_string);
+  printf(__gen_e_acsl_literal_string);
   char *buf = malloc((unsigned long)10 * sizeof(char));
   free((void *)buf);
   return;
@@ -14,15 +14,19 @@ void f(void)
 
 void __e_acsl_globals_init(void)
 {
-  __gen_e_acsl_literal_string_2 = "main\n";
-  __e_acsl_store_block((void *)__gen_e_acsl_literal_string_2,
-                       sizeof("main\n"));
-  __e_acsl_full_init((void *)__gen_e_acsl_literal_string_2);
-  __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_2);
-  __gen_e_acsl_literal_string = "f\n";
-  __e_acsl_store_block((void *)__gen_e_acsl_literal_string,sizeof("f\n"));
-  __e_acsl_full_init((void *)__gen_e_acsl_literal_string);
-  __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string);
+  static char __e_acsl_already_run = 0;
+  if (! __e_acsl_already_run) {
+    __e_acsl_already_run = 1;
+    __gen_e_acsl_literal_string_2 = "main\n";
+    __e_acsl_store_block((void *)__gen_e_acsl_literal_string_2,
+                         sizeof("main\n"));
+    __e_acsl_full_init((void *)__gen_e_acsl_literal_string_2);
+    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_2);
+    __gen_e_acsl_literal_string = "f\n";
+    __e_acsl_store_block((void *)__gen_e_acsl_literal_string,sizeof("f\n"));
+    __e_acsl_full_init((void *)__gen_e_acsl_literal_string);
+    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string);
+  }
   return;
 }
 
@@ -31,7 +35,7 @@ int main(void)
   int __retres;
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   __e_acsl_globals_init();
-  __gen_e_acsl_printf_va_2(__gen_e_acsl_literal_string_2);
+  printf(__gen_e_acsl_literal_string_2);
   __retres = 0;
   __e_acsl_memory_clean();
   return __retres;

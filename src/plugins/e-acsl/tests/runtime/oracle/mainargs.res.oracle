@@ -41,4 +41,3 @@
 [eva:alarm] tests/runtime/mainargs.c:20: Warning: assertion got status unknown.
 [eva:alarm] tests/runtime/mainargs.c:20: Warning: 
   function __e_acsl_assert: precondition got status unknown.
-[scope:rm_asserts] removing 1 assertion(s)

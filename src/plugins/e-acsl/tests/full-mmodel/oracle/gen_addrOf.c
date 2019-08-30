@@ -28,16 +28,53 @@ void f(void)
   return;
 }
 
+void __e_acsl_globals_init(void)
+{
+  static char __e_acsl_already_run = 0;
+  if (! __e_acsl_already_run) {
+    __e_acsl_already_run = 1;
+    __e_acsl_store_block((void *)(& f),(size_t)1);
+    __e_acsl_full_init((void *)(& f));
+    __e_acsl_store_block((void *)(& __fc_p_fopen),(size_t)8);
+    __e_acsl_full_init((void *)(& __fc_p_fopen));
+    __e_acsl_store_block((void *)(__fc_fopen),(size_t)128);
+    __e_acsl_full_init((void *)(& __fc_fopen));
+    __e_acsl_store_block((void *)(& __fc_p_random48_counter),(size_t)8);
+    __e_acsl_full_init((void *)(& __fc_p_random48_counter));
+    __e_acsl_store_block((void *)(random48_counter),(size_t)6);
+    __e_acsl_full_init((void *)(& random48_counter));
+    __e_acsl_store_block((void *)(& __fc_random48_init),(size_t)4);
+    __e_acsl_full_init((void *)(& __fc_random48_init));
+    __e_acsl_store_block((void *)(& __fc_rand_max),(size_t)8);
+    __e_acsl_full_init((void *)(& __fc_rand_max));
+  }
+  return;
+}
+
 int main(void)
 {
   int __retres;
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_globals_init();
+  __e_acsl_store_block((void *)(& __retres),(size_t)4);
   int x = 0;
+  __e_acsl_store_block((void *)(& x),(size_t)4);
+  __e_acsl_full_init((void *)(& x));
   f();
   /*@ assert &x ≡ &x; */
   __e_acsl_assert(& x == & x,(char *)"Assertion",(char *)"main",
                   (char *)"&x == &x",16);
+  __e_acsl_full_init((void *)(& __retres));
   __retres = 0;
+  __e_acsl_delete_block((void *)(& f));
+  __e_acsl_delete_block((void *)(& __fc_p_fopen));
+  __e_acsl_delete_block((void *)(__fc_fopen));
+  __e_acsl_delete_block((void *)(& __fc_p_random48_counter));
+  __e_acsl_delete_block((void *)(random48_counter));
+  __e_acsl_delete_block((void *)(& __fc_random48_init));
+  __e_acsl_delete_block((void *)(& __fc_rand_max));
+  __e_acsl_delete_block((void *)(& x));
+  __e_acsl_delete_block((void *)(& __retres));
   __e_acsl_memory_clean();
   return __retres;
 }

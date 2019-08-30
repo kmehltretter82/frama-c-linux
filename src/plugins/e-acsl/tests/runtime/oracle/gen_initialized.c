@@ -304,7 +304,6 @@ int main(void)
   /*@ assert ¬\initialized(q); */
   {
     int __gen_e_acsl_initialized_31;
-    /*@ assert Eva: dangling_pointer: ¬\dangling(&q); */
     __gen_e_acsl_initialized_31 = __e_acsl_initialized((void *)q,sizeof(int));
     __e_acsl_assert(! __gen_e_acsl_initialized_31,(char *)"Assertion",
                     (char *)"main",(char *)"!\\initialized(q)",86);
@@ -335,12 +334,8 @@ int main(void)
   {
     int i = 0;
     while (i < size) {
-      if (i % 2 != 0) 
-        /*@ assert Eva: mem_access: \valid(partsc + i); */
-        *(partsc + i) = (char)'0';
-      else 
-        /*@ assert Eva: mem_access: \valid(partsi + i); */
-        *(partsi + i) = (char)0;
+      if (i % 2 != 0) *(partsc + i) = (char)'0';
+      else *(partsi + i) = (char)0;
       i ++;
     }
   }

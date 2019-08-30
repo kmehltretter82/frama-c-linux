@@ -32,3 +32,7 @@
   is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
+[eva:alarm] FRAMAC_SHARE/libc/string.h:98: Warning: 
+  function __gen_e_acsl_memcpy: postcondition 'copied_contents' got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:118: Warning: 
+  function __gen_e_acsl_memset: postcondition 'acsl_c_equiv' got status unknown.

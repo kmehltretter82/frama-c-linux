@@ -1,3 +1,0 @@
-EXEC: ./scripts/testrun.sh @PTEST_NAME@ full-mmodel-only "1" "--frama-c=@frama-c@ --full-mmodel"
-LOG: gen_@PTEST_NAME@.c
-OPT: -machdep gcc_x86_64 -check -e-acsl -e-acsl-full-mmodel -then-last -load-script tests/print.cmxs -print -ocode tests/full-mmodel-only/result/gen_@PTEST_NAME@.c -kernel-verbose 0 -eva @EVA_OPTIONS@

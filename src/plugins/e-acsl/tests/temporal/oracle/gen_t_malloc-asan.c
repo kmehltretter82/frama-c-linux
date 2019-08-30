@@ -2,8 +2,6 @@
 #include "stdio.h"
 #include "stdlib.h"
 char *__gen_e_acsl_literal_string;
-extern int __e_acsl_sound_verdict;
-
 void __e_acsl_globals_init(void)
 {
   static char __e_acsl_already_run = 0;
@@ -59,18 +57,15 @@ int main(void)
       __e_acsl_temporal_reset_parameters();
       __e_acsl_temporal_reset_return();
       __e_acsl_temporal_save_nreferent_parameter((void *)(& p),1U);
-      __gen_e_acsl_printf_va_1(__gen_e_acsl_literal_string,(void *)p,counter);
+      printf(__gen_e_acsl_literal_string,p,counter);
       break;
     }
     __e_acsl_temporal_store_nblock((void *)(& p),(void *)0);
     __e_acsl_full_init((void *)(& p));
     p = (int *)0;
   }
-  /*@ assert Eva: dangling_pointer: ¬\dangling(&p); */
   if (p) {
-    /*@ assert Eva: dangling_pointer: ¬\dangling(&q); */
     __e_acsl_initialize((void *)q,sizeof(int));
-    /*@ assert Eva: mem_access: \valid(q); */
     *q = 1;
     __e_acsl_initialize((void *)p,sizeof(int));
     *p = 2;

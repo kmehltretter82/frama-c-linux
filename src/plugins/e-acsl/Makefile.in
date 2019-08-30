@@ -183,8 +183,8 @@ PLUGIN_TESTS_DIRS := \
 	runtime \
 	bts \
 	gmp \
-	no-main \
 	full-mmodel \
+	segment-only \
 	temporal \
 	special
 
@@ -202,6 +202,15 @@ E_ACSL_DEFAULT_TESTS: \
 	$(EACSL_PLUGIN_DIR)/tests/test_config \
 	$(EACSL_PLUGIN_DIR)/tests/print.cmxs \
 	$(EACSL_PLUGIN_DIR)/tests/print.cmo
+
+$(EACSL_PLUGIN_DIR)/tests/test_config: \
+		$(EACSL_PLUGIN_DIR)/tests/test_config.in \
+		$(EACSL_PLUGIN_DIR)/Makefile
+	$(PRINT_MAKING) $@
+	$(SED) -e "s|@SEDCMD@|`which sed `|g" $< > $@
+
+tests:: $(EACSL_PLUGIN_DIR)/tests/ptests_config \
+	$(EACSL_PLUGIN_DIR)/tests/print.cmxs
 
 clean::
 	for d in $(E_ACSL_EXTRA_DIRS); do \
@@ -284,7 +293,8 @@ EACSL_DOC_FILES = \
 	man/e-acsl-gcc.sh.1
 
 EACSL_TEST_FILES = \
-  tests/test_config.in tests/print.ml
+	tests/test_config.in \
+	tests/print.ml
 
 # Test files without header management
 EACSL_DISTRIB_TESTS = \
@@ -484,19 +494,6 @@ uninstall::
 	$(RM) $(BINDIR)/e-acsl-gcc.sh
 	$(PRINT_RM) E-ACSL man pages
 	$(RM) $(MANDIR)/man1/e-acsl-gcc.sh.1
-
-####################
-# Testing (part 2) #
-####################
-
-ifeq (@MAY_RUN_TESTS@,yes)
-
-$(E_ACSL_DIR)/tests/test_config: $(E_ACSL_DIR)/tests/test_config.in \
-	$(E_ACSL_DIR)/Makefile
-	$(PRINT_MAKING) $@
-	$(SED) -e "s|@SEDCMD@|`which sed `|g" $< > $@
-
-endif
 
 #####################################
 # Regenerating the Makefile on need #

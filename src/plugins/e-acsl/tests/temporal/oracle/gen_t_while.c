@@ -58,9 +58,6 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_and_2,(char *)"Assertion",(char *)"main",
                     (char *)"!\\valid(q)",36);
   }
-  __e_acsl_initialize((void *)q,sizeof(int));
-  /*@ assert Eva: mem_access: \valid(q); */
-  *q = 1;
   __retres = 0;
   return_label: __e_acsl_store_block_duplicate((void *)(& q),(size_t)8);
   __e_acsl_delete_block((void *)(& q));

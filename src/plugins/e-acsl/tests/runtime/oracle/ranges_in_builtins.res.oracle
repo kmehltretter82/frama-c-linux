@@ -4,7 +4,5 @@
   is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] tests/runtime/ranges_in_builtins.c:19: Warning: 
-  assertion got status unknown.
 [eva:alarm] tests/runtime/ranges_in_builtins.c:21: Warning: 
   assertion got status invalid (stopping propagation).
