@@ -494,13 +494,13 @@
   function strlen: precondition 'valid_string_s' got status valid.
 [eva] Recording results for strlen
 [eva] Done for function strlen
-[eva] share/libc/string.h:407: 
+[eva] share/libc/string.h:413: 
   function strcat: postcondition 'sum_of_lengths' got status valid.
-[eva] share/libc/string.h:410: 
+[eva] share/libc/string.h:416: 
   function strcat: postcondition 'initialization,dest' got status valid.
-[eva] share/libc/string.h:411: 
+[eva] share/libc/string.h:417: 
   function strcat: postcondition 'dest_null_terminated' got status valid.
-[eva] share/libc/string.h:412: 
+[eva] share/libc/string.h:418: 
   function strcat: postcondition 'result_ptr' got status valid.
 [eva] Recording results for strcat
 [eva] Done for function strcat
@@ -559,11 +559,11 @@
   function strcpy: precondition 'room_string' got status valid.
 [eva] tests/libc/string_c.c:142: 
   function strcpy: precondition 'separation' got status valid.
-[eva] share/libc/string.h:351: 
+[eva] share/libc/string.h:357: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strcmp
-[eva:alarm] share/libc/string.h:351: Warning: 
+[eva:alarm] share/libc/string.h:357: Warning: 
   function strcpy: postcondition 'equal_contents' got status unknown.
-[eva] share/libc/string.h:352: 
+[eva] share/libc/string.h:358: 
   function strcpy: postcondition 'result_ptr' got status valid.
 [eva] Recording results for strcpy
 [eva] Done for function strcpy
@@ -603,13 +603,13 @@
   function strncpy: precondition 'room_nstring' got status valid.
 [eva] tests/libc/string_c.c:154: 
   function strncpy: precondition 'separation' got status valid.
-[eva] share/libc/string.h:363: 
+[eva] share/libc/string.h:369: 
   function strncpy: postcondition 'result_ptr' got status valid.
-[eva] share/libc/string.h:364: 
+[eva] share/libc/string.h:370: 
   function strncpy: postcondition 'initialization' got status valid.
-[eva] share/libc/string.h:367: 
+[eva] share/libc/string.h:373: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strcmp
-[eva:alarm] share/libc/string.h:367: Warning: 
+[eva:alarm] share/libc/string.h:373: Warning: 
   function strncpy, behavior complete: postcondition 'equal_after_copy' got status unknown.
 [eva] Recording results for strncpy
 [eva] Done for function strncpy
@@ -623,9 +623,9 @@
   function strncpy: precondition 'room_nstring' got status valid.
 [eva] tests/libc/string_c.c:157: 
   function strncpy: precondition 'separation' got status valid.
-[eva] share/libc/string.h:370: 
+[eva] share/libc/string.h:376: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
-[eva:alarm] share/libc/string.h:370: Warning: 
+[eva:alarm] share/libc/string.h:376: Warning: 
   function strncpy, behavior partial: postcondition 'equal_prefix' got status unknown.
 [eva] Recording results for strncpy
 [eva] Done for function strncpy
@@ -712,13 +712,13 @@
   function strlen: precondition 'valid_string_s' got status valid.
 [eva] Recording results for strlen
 [eva] Done for function strlen
-[eva] share/libc/string.h:179: 
+[eva] share/libc/string.h:185: 
   function strrchr, behavior found: postcondition 'result_char' got status valid.
-[eva] share/libc/string.h:180: 
+[eva] share/libc/string.h:186: 
   function strrchr, behavior found: postcondition 'result_same_base' got status valid.
-[eva] share/libc/string.h:181: 
-  function strrchr, behavior found: postcondition 'result_valid_string' got status valid.
 [eva] share/libc/string.h:187: 
+  function strrchr, behavior found: postcondition 'result_valid_string' got status valid.
+[eva] share/libc/string.h:193: 
   function strrchr, behavior default: postcondition 'result_null_or_same_base' got status valid.
 [eva] Recording results for strrchr
 [eva] Done for function strrchr
@@ -728,7 +728,7 @@
 [eva] tests/libc/string_c.c:216: 
   function strrchr: precondition 'valid_string_s' got status valid.
 [eva] share/libc/string.c:237: Reusing old results for call to strlen
-[eva] share/libc/string.h:184: 
+[eva] share/libc/string.h:190: 
   function strrchr, behavior not_found: postcondition 'result_null' got status valid.
 [eva] Recording results for strrchr
 [eva] Done for function strrchr
@@ -883,9 +883,9 @@
   function strstr: precondition 'valid_string_haystack' got status valid.
 [eva] tests/libc/string_c.c:261: 
   function strstr: precondition 'valid_string_needle' got status valid.
-[eva] share/libc/string.h:221: 
+[eva] share/libc/string.h:227: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
-[eva:alarm] share/libc/string.h:219: Warning: 
+[eva:alarm] share/libc/string.h:225: Warning: 
   function strstr: postcondition 'result_null_or_in_haystack' got status unknown.
 [eva] Recording results for strstr
 [eva] Done for function strstr
@@ -905,7 +905,7 @@
   function strstr: precondition 'valid_string_haystack' got status valid.
 [eva] tests/libc/string_c.c:265: 
   function strstr: precondition 'valid_string_needle' got status valid.
-[eva] share/libc/string.h:219: 
+[eva] share/libc/string.h:225: 
   function strstr: postcondition 'result_null_or_in_haystack' got status valid.
 [eva] Recording results for strstr
 [eva] Done for function strstr
