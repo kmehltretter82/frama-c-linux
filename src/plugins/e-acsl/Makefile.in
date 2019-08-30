@@ -171,12 +171,11 @@ ifeq (@MAY_RUN_TESTS@,yes)
 -include in_frama_ci
 
 PLUGIN_TESTS_DIRS := \
-	format \
-	runtime \
 	bts \
-	gmp \
+	arith \
+	memory \
 	full-mmodel \
-	segment-only \
+	format \
 	temporal \
 	special
 

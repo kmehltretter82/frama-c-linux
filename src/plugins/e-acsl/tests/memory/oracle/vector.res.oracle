@@ -1,0 +1,5 @@
+[e-acsl] beginning translation.
+[e-acsl] translation done in project "e-acsl".
+[eva:alarm] tests/memory/vector.c:26: Warning: 
+  accessing uninitialized left-value. assert \initialized(v2 + 2);
+[eva:alarm] tests/memory/vector.c:28: Warning: assertion got status unknown.
