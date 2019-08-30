@@ -170,14 +170,6 @@ ifeq (@MAY_RUN_TESTS@,yes)
 
 -include in_frama_ci
 
-ifeq ($(IN_FRAMA_CI),yes)
-
-PLUGIN_TESTS_DIRS := \
-	gmp \
-	no-main
-
-else
-
 PLUGIN_TESTS_DIRS := \
 	format \
 	runtime \
@@ -191,9 +183,6 @@ PLUGIN_TESTS_DIRS := \
 # [JS 2019/02/26] deactivate tests 'builtin' as long as setjmp/longjmp is not
 # supported.
 #	builtin \
-
-
-endif
 
 PLUGIN_TESTS_LIB := $(EACSL_PLUGIN_DIR)/tests/print.ml
 E_ACSL_TESTS: $(EACSL_PLUGIN_DIR)/tests/test_config
