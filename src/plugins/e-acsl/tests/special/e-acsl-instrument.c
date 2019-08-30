@@ -1,7 +1,7 @@
 /* run.config_ci
    COMMENT: test option -e-acsl-instrument; cannot run Eva on this example
    LOG: gen_@PTEST_NAME@.c
-   STDOPT: #"-e-acsl-instrument='@@all,-uninstrument1,-uninstrument2'"
+   STDOPT:#"-e-acsl-instrument='@@all,-uninstrument1,-uninstrument2'"
 */
 
 #include <stdarg.h>

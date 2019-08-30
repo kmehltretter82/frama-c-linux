@@ -41,10 +41,10 @@ int main(void)
                                                   (void *)__gen_e_acsl_u,
                                                   (void *)(& __gen_e_acsl_u));
     __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"main",
-                    (char *)"mem_access: \\valid_read(__gen_e_acsl_u + 2)",7);
+                    (char *)"mem_access: \\valid_read(__gen_e_acsl_u + 2)",9);
     __e_acsl_assert(*(__gen_e_acsl_u + 2) == 4,(char *)"Assertion",
                     (char *)"main",(char *)"\\let u = &t[1]; *(u + 2) == 4",
-                    7);
+                    9);
   }
   /*@ assert (\let u = &t[1]; *(u + 2)) ≡ 4; */
   {
@@ -57,10 +57,10 @@ int main(void)
                                                     (void *)(& __gen_e_acsl_u_2));
     __e_acsl_assert(__gen_e_acsl_valid_read_2,(char *)"RTE",(char *)"main",
                     (char *)"mem_access: \\valid_read(__gen_e_acsl_u_2 + 2)",
-                    8);
+                    10);
     __e_acsl_assert(*(__gen_e_acsl_u_2 + 2) == 4,(char *)"Assertion",
                     (char *)"main",
-                    (char *)"(\\let u = &t[1]; *(u + 2)) == 4",8);
+                    (char *)"(\\let u = &t[1]; *(u + 2)) == 4",10);
   }
   __e_acsl_full_init((void *)(& __retres));
   __retres = 0;

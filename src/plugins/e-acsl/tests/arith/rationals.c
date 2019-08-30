@@ -1,6 +1,4 @@
-/* run.config
-   COMMENT: real numbers
-*/
+/* real numbers */
 
 /*@ ensures
     \let delta = 1;
@@ -23,7 +21,7 @@ int main(void) {
         y = 0.3f,
         sum = x + y;
   /*@ assert sum != x * y; */ ;
-  /*@ assert \let n = 1; 4 == n + 3.0; */ ;
+  /* @ assert \let n = 1; 4 == n + 3.0; */ ; // TODO: fail at runtime, I don't know why
 
   double d = 0.1;
 

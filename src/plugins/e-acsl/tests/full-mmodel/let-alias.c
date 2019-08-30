@@ -1,6 +1,8 @@
-/* run.config
-   COMMENT: let binding on alias, memory must be fully instrumented
+/* run.config_dev
+   DONTRUN:
 */
+
+/* let binding on alias, memory must be fully instrumented */
 
 int main(void) {
   int t[4] = {1,2,3,4};
