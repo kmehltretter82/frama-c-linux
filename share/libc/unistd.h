@@ -68,7 +68,7 @@ extern volatile int Frama_C_entropy_source;
 __BEGIN_DECLS
 
 /* Values for the NAME argument to `pathconf' and `fpathconf'.  */
-enum
+enum __fc_pathconf_name
   {
     _PC_LINK_MAX,
 #define	_PC_LINK_MAX			_PC_LINK_MAX
@@ -115,7 +115,7 @@ enum
   };
 
 /* Values for the argument to `sysconf'.  */
-enum
+enum __fc_sysconf_name
   {
     _SC_ARG_MAX,
 #define	_SC_ARG_MAX			_SC_ARG_MAX
@@ -577,7 +577,7 @@ enum
   };
 
 /* Values for the NAME argument to `confstr'.  */
-enum
+enum __fc_confstr_name
   {
     _CS_PATH,			/* The default search path.  */
 #define _CS_PATH		_CS_PATH
