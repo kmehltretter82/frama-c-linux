@@ -391,19 +391,36 @@ extern int fseek(FILE *stream, long int offset, int whence);
 
 /*@
   requires valid_stream: \valid(stream);
+  requires whence_enum: whence == SEEK_SET || whence == SEEK_CUR || whence == SEEK_END;
+  assigns *stream \from *stream, indirect:offset, indirect:whence;
+  assigns \result, __fc_errno \from indirect:*stream, indirect:offset,
+                                    indirect:whence;
+*/
+extern int fseeko(FILE *stream, off_t offset, int whence);
+
+/*@
+  requires valid_stream: \valid(stream);
   requires valid_pos: \valid_read(pos);
   requires initialization:pos: \initialized(pos);
   assigns *stream \from *pos;
 */
 extern int fsetpos(FILE *stream, const fpos_t *pos);
 
-/*@
+/*@ // missing: assigns errno: EBADF, EOVERFLOW, ESPIPE
   requires valid_stream: \valid(stream);
   assigns \result, __fc_errno \from indirect:*stream ;
   ensures success_or_error:
     \result == -1 || (\result >= 0 && __fc_errno == \old(__fc_errno));
 */
 extern long int ftell(FILE *stream);
+
+/*@ // missing: assigns errno: EBADF, EOVERFLOW, ESPIPE
+  requires valid_stream: \valid(stream);
+  assigns \result, __fc_errno \from indirect:*stream ;
+  ensures success_or_error:
+    \result == -1 || (\result >= 0 && __fc_errno == \old(__fc_errno));
+*/
+extern off_t ftello(FILE *stream);
 
 /*@
   requires valid_stream: \valid(stream);

@@ -4812,6 +4812,17 @@ extern int fgetpos(FILE * __restrict stream, fpos_t * __restrict pos);
 extern int fseek(FILE *stream, long offset, int whence);
 
 /*@ requires valid_stream: \valid(stream);
+    requires whence_enum: whence ≡ 0 ∨ whence ≡ 1 ∨ whence ≡ 2;
+    assigns *stream, \result, __fc_errno;
+    assigns *stream \from *stream, (indirect: offset), (indirect: whence);
+    assigns \result
+      \from (indirect: *stream), (indirect: offset), (indirect: whence);
+    assigns __fc_errno
+      \from (indirect: *stream), (indirect: offset), (indirect: whence);
+ */
+extern int fseeko(FILE *stream, off_t offset, int whence);
+
+/*@ requires valid_stream: \valid(stream);
     requires valid_pos: \valid_read(pos);
     requires initialization: pos: \initialized(pos);
     assigns *stream;
@@ -4829,6 +4840,17 @@ extern int fsetpos(FILE *stream, fpos_t const *pos);
     assigns __fc_errno \from (indirect: *stream);
  */
 extern long ftell(FILE *stream);
+
+/*@ requires valid_stream: \valid(stream);
+    ensures
+      success_or_error:
+        \result ≡ -1 ∨
+        (\result ≥ 0 ∧ __fc_errno ≡ \old(__fc_errno));
+    assigns \result, __fc_errno;
+    assigns \result \from (indirect: *stream);
+    assigns __fc_errno \from (indirect: *stream);
+ */
+extern off_t ftello(FILE *stream);
 
 /*@ requires valid_stream: \valid(stream);
     assigns *stream;

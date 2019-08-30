@@ -232,6 +232,11 @@ void __gen_e_acsl_k(int x)
   return;
 }
 
+int __gen_e_acsl_h_short(int s)
+{
+  return s;
+}
+
 int __gen_e_acsl_g_hidden(int x)
 {
   return x;
@@ -377,11 +382,6 @@ void __gen_e_acsl_f1_7(__e_acsl_mpz_t *__retres_arg, __e_acsl_mpz_struct * x,
 int __gen_e_acsl_h_char(int c)
 {
   return c;
-}
-
-int __gen_e_acsl_h_short(int s)
-{
-  return s;
 }
 
 

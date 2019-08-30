@@ -23,6 +23,9 @@ int main() {
   FILE *tmp = tmpfile();
   if (!tmp) return 2;
   fseek(tmp, 0L, SEEK_SET);
+  fseeko(tmp, 0, SEEK_SET);
+  long told = ftell(tmp);
+  off_t toldo = ftello(tmp);
   fclose(tmp);
 
   FILE *redirected = freopen("/tmp/mytmp.txt", "w+", stdout);
