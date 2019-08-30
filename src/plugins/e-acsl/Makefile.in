@@ -173,7 +173,7 @@ ifeq (@MAY_RUN_TESTS@,yes)
 PLUGIN_TESTS_DIRS := \
 	examples \
 	bts \
-	language_constructs \
+	constructs \
 	arith \
 	memory \
 	gmp-only \
