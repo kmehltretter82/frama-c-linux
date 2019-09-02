@@ -125,6 +125,11 @@ module Leaf_Value (V: Abstract_value.Leaf) = struct
   let structure = Abstract.Value.Leaf (V.key, (module V))
 end
 
+module Leaf_Location (Loc: Abstract_location.Leaf) = struct
+  include Loc
+  let structure = Abstract.Location.Leaf (Loc.key, (module Loc))
+end
+
 module Leaf_Domain (D: Abstract_domain.Leaf) = struct
   include D
   let structure = Abstract.Domain.Leaf (D.key, (module D))
@@ -219,8 +224,10 @@ end
 
 (* --- Building domain abstractions ----------------------------------------- *)
 
+module type internal_loc =
+  Abstract.Location.Internal with type location = precise_loc
 module type internal_domain =
-  Abstract.Domain.Internal with type location = Precise_locs.precise_location
+  Abstract.Domain.Internal with type location = precise_loc
 
 let eq_value:
   type a b. a Abstract.Value.structure -> b value -> (a,b) Structure.eq option
@@ -379,25 +386,34 @@ module Open (Acc: Acc) : S = struct
   end
 end
 
-module Unit_Acc (Value: Abstract.Value.External) : Acc = struct
-  module Struct = struct
-    type v = Cvalue.V.t
-    let s = Single (module Main_values.CVal)
-  end
-  module Conv = Internal_Value.Convert (Value) (Struct)
-  module Val = Value
-  module Loc = Location_lift.Make (Main_locations.PLoc) (Conv)
-  module Dom = Unit_domain.Make (Value) (Loc)
-end
+module CVal = Leaf_Value (Main_values.CVal)
+
+let unit_acc (module Value: Abstract.Value.External) =
+  let loc : (module internal_loc with type value = Value.t) =
+    match Abstract.Value.eq_structure Value.structure CVal.structure with
+    | Some Structure.Eq -> (module Leaf_Location (Main_locations.PLoc))
+    | _ ->
+      let module Struct = struct
+        type v = Cvalue.V.t
+        let s = Single (module Main_values.CVal)
+      end in
+      let module Conv = Internal_Value.Convert (Value) (Struct) in
+      (module Location_lift.Make (Main_locations.PLoc) (Conv))
+  in
+  (module struct
+    module Val = Value
+    module Loc = (val loc)
+    module Dom = Unit_domain.Make (Val) (Loc)
+  end : Acc)
 
 let build_abstractions config =
   let initial_value : (module Abstract.Value.Internal) =
     if Config.mem Config.bitwise config
     then (module Offsm_value.CvalueOffsm)
-    else (module Leaf_Value (Main_values.CVal))
+    else (module CVal)
   in
   let value = Internal_Value.build_values config initial_value in
-  let acc = (module Unit_Acc (val value): Acc) in
+  let acc = unit_acc value in
   build_domain config acc
 
 let configure = Config.configure
