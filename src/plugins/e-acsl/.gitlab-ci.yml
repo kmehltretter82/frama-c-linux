@@ -39,6 +39,13 @@ Tests:
   tags:
    - nix
 
+Tests-dev:
+  stage: tests
+  script:
+   - nix/frama-ci.sh build -A e-acsl.tests-dev
+  tags:
+   - nix
+
 Cfp:
   stage: tests
   script:
