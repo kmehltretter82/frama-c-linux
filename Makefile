@@ -140,7 +140,7 @@ OFLAGS	= $(PACKAGES) $(FLAGS) $(DEBUG) $(INCLUDES) -compact \
 BLINKFLAGS += -linkpkg $(BFLAGS) -linkall -custom
 OLINKFLAGS += -linkpkg $(OFLAGS) -linkall
 
-DOC_FLAGS= -colorize-code -stars -m A $(PACKAGES) $(INCLUDES) $(GUI_INCLUDES)
+DOC_FLAGS= -charset utf8 -colorize-code -stars -m A $(PACKAGES) $(INCLUDES) $(GUI_INCLUDES)
 
 ifneq ($(VERBOSEMAKE),yes)
 DOC_FLAGS+= -hide-warnings
