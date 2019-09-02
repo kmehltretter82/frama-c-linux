@@ -2,6 +2,7 @@
 #include "signal.h"
 #include "stdio.h"
 #include "stdlib.h"
+#include "sys/select.h"
 #include "sys/time.h"
 #include "sys/wait.h"
 char *__gen_e_acsl_literal_string_30;
