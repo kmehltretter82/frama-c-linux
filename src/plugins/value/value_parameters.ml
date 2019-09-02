@@ -1375,8 +1375,8 @@ module MallocLevel =
       let option_name = "-eva-mlevel"
       let default = 0
       let arg_name = "m"
-      let help = "sets to [m] the number of precise dynamic allocation for any \
-                  given callstack"
+      let help = "sets to [m] the number of precise dynamic allocations \
+                  besides the initial one, for each callstack (defaults to 0)"
     end)
 let () = MallocLevel.add_aliases ["-val-mlevel"]
 
