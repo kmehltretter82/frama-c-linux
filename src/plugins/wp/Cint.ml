@@ -97,12 +97,15 @@ let f_lsr = Lang.extern_f ~library ~result "lsr"
 
 let f_bitwised = [ f_lnot ; f_lor ; f_land ; f_lxor ; f_lsl ; f_lsr ]
 
-let f_bit_stdlib = Lang.extern_p ~library ~bool:"bit_testb" ~prop:"bit_test" ()
-let f_bit        = Lang.extern_p ~library ~bool:"bit_testb" ~prop:"bit_test" ()
-let f_bit_export = Lang.extern_p ~library ~bool:"bit_testb" ~prop:"bit_test" ()
+(* [f_bit_stdlib] is related to the function [bit_test] of Frama-C StdLib *)
+let f_bit_stdlib   = Lang.extern_p ~library ~bool:"bit_testb" ~prop:"bit_test" ()
+(* [f_bit_positive] is actually exported in forgoting the fact the position is positive *)
+let f_bit_positive = Lang.extern_p ~library ~bool:"bit_testb" ~prop:"bit_test" ()
+(* At export, some constructs such as [e & (1 << k)] are written into [f_bit_export] construct *)
+let f_bit_export   = Lang.extern_p ~library ~bool:"bit_testb" ~prop:"bit_test" ()
 
 let () = let open LogicBuiltins in add_builtin "\\bit_test_stdlib" [Z;Z] f_bit_stdlib
-let () = let open LogicBuiltins in add_builtin "\\bit_test" [Z;Z] f_bit
+let () = let open LogicBuiltins in add_builtin "\\bit_test" [Z;Z] f_bit_positive
 
 (* -------------------------------------------------------------------------- *)
 (* --- Matching utilities for simplifications                             --- *)
@@ -475,10 +478,14 @@ let smp2 f zf = (* f(c1,c2) ~> zf(c1,c2),  f(c1,c2,...) ~> f(zf(c1,c2),...) *)
     end
   | _ -> raise Not_found
 
-let bitk_positive k e = F.e_fun f_bit [e;k]
-let smp_intro_bitk_positive = function
-  | [ a ; k ] when is_positive_or_null k -> bitk_positive k a
-  | [ a ; k ] -> (* TODO: expand the current logic definition of the ACSL stdlib symbol *)
+let bitk_positive k e = F.e_fun f_bit_positive [e;k]
+let smp_mk_bit_stdlib = function
+  | [ a ; k ] when is_positive_or_null k ->
+      (* No need to expand the logic definition of the ACSL stdlib symbol when
+         [k] is positive (the definition must comply with that simplification). *)
+      bitk_positive k a
+  | [ a ; k ] ->
+      (* TODO: expand the current logic definition of the ACSL stdlib symbol *)
       F.e_neq F.e_zero (F.e_fun f_land [a; (F.e_fun f_lsl [F.e_one;k])])
   | _ -> raise Not_found
 
@@ -778,8 +785,10 @@ let () =
         begin
           let mk_builtin n f ?eq ?leq smp = n, { f ; eq; leq; smp } in
 
-          let bi_lbit_stdlib = mk_builtin "f_bit_stdlib" f_bit_stdlib smp_intro_bitk_positive in
-          let bi_lbit = mk_builtin "f_bit" f_bit smp_bitk_positive in
+          (* From [smp_mk_bit_stdlib], the built-in [f_bit_stdlib] is such that there is
+             no creation of [e_fun f_bit_stdlib args] *)
+          let bi_lbit_stdlib = mk_builtin "f_bit_stdlib" f_bit_stdlib smp_mk_bit_stdlib in
+          let bi_lbit = mk_builtin "f_bit" f_bit_positive smp_bitk_positive in
           let bi_lnot = mk_builtin "f_lnot" f_lnot ~eq:smp_eq_with_lnot
               (smp1 Integer.lognot) in
           let bi_lxor = mk_builtin "f_lxor" f_lxor ~eq:smp_eq_with_lxor
