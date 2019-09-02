@@ -185,7 +185,7 @@ PLUGIN_TESTS_DIRS := \
 # supported.
 #	builtin
 
-PLUGIN_TESTS_LIB := $(EACSL_PLUGIN_DIR)/tests/print.cmxs
+PLUGIN_TESTS_LIB := $(EACSL_PLUGIN_DIR)/tests/print.ml
 
 DEV=
 ifeq ("$(DEV)","yes")
@@ -197,7 +197,10 @@ PLUGIN_PTESTS_OPTS:=-config $(EACSL_TEST_CONFIG)
 
 E_ACSL_TESTS E_ACSL_DEFAULT_TESTS: \
 	$(EACSL_PLUGIN_DIR)/tests/ptests_config \
-	$(EACSL_PLUGIN_DIR)/tests/test_config_$(EACSL_TEST_CONFIG)
+	$(EACSL_PLUGIN_DIR)/tests/test_config_$(EACSL_TEST_CONFIG) \
+	$(EACSL_PLUGIN_DIR)/tests/print.cmxs \
+	$(EACSL_PLUGIN_DIR)/tests/print.cmo
+
 
 $(EACSL_PLUGIN_DIR)/tests/test_config_ci: \
 		$(EACSL_PLUGIN_DIR)/tests/test_config_ci.in \
