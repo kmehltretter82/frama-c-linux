@@ -222,7 +222,8 @@ clean::
 	done
 	$(PRINT_RM) cleaning generated test files
 	$(RM) $(E_ACSL_DIR)/tests/*.cm* $(E_ACSL_DIR)/tests/*.o
-	$(RM) $(E_ACSL_DIR)/tests/test_config
+	$(RM) $(E_ACSL_DIR)/tests/test_config_ci \
+		$(E_ACSL_DIR)/tests/test_config_dev
 	$(RM) $(foreach dir, $(PLUGIN_TESTS_DIRS), tests/$(dir)/result/*)
 
 endif
@@ -297,7 +298,18 @@ EACSL_DOC_FILES = \
 	man/e-acsl-gcc.sh.1
 
 EACSL_TEST_FILES = \
-	tests/test_config.in \
+	tests/test_config_dev.in \
+	tests/test_config_ci.in \
+	tests/gmp-only/test_config_ci \
+	tests/gmp-only/test_config_dev \
+	tests/full-mmodel/test_config_ci \
+	tests/full-mmodel/test_config_dev \
+	tests/builtin/test_config_ci \
+	tests/builtin/test_config_dev \
+	tests/temporal/test_config_ci \
+	tests/temporal/test_config_dev \
+	tests/format/test_config_ci \
+	tests/format/test_config_dev \
 	tests/print.ml
 
 # Test files without header management
