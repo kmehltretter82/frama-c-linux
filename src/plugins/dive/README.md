@@ -14,7 +14,7 @@ The front-end of Dive relies on several external tools and libraries :
 - electron: a javascript framework for gui applications
 - Ivette: the future Frama-C and other tools GUI
 - Cytoscape: a javascript library to display graphs and interact with them
-
+- Zmq (C library and opam package)
 
 Compilation
 ===========
