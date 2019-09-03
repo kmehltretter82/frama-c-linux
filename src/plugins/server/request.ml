@@ -276,9 +276,16 @@ let mk_input (type a) name defaults (input : a rq_input) : (rq -> json -> a) =
   | Pnone -> Senv.fatal "No input defined for request '%s'" name
   | Pdata d ->
     let module D = (val d) in
-    (fun rq js -> rq.result <- defaults ; D.of_json js)
+    begin fun rq js ->
+      rq.result <- defaults ;
+      try D.of_json js
+      with Jutil.Type_error (msg, js) -> Main.error_from_json msg js
+    end
   | Pfields _ ->
-    (fun rq js -> rq.param <- fmap_of_json rq.param js)
+    begin fun rq js ->
+      try rq.param <- fmap_of_json rq.param js
+      with Jutil.Type_error (msg, js) -> Main.error_from_json msg js
+    end
 
 (* json output processing *)
 let mk_output (type b) name required (output : b rq_output) : (rq -> b -> json) =

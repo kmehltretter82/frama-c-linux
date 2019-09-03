@@ -66,6 +66,21 @@ type 'a message = {
   callback : 'a response list -> unit ;
 }
 
+(** Exception thrown during request execution.
+    The string parameter is the message to be sent to the client. *)
+exception Error of string
+
+(** Throw an Error exception with the given message.
+    It shall only be called during the execution of a request. *)
+val error : string -> 'a
+
+(** Throw an Error exception with the given message and json object.
+    It shall only be called during the execution of a request and is intended
+    to be called with the parameters of a Yojson.Basic.Util.Type_error
+    exception. *)
+val error_from_json : string -> json -> 'a
+
+
 (**
    Run a server with the provided low-level network primitives to
    actually exchange data.

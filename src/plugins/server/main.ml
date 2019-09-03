@@ -101,6 +101,20 @@ type 'a server = {
 exception Killed
 
 (* -------------------------------------------------------------------------- *)
+(* --- Errors                                                             --- *)
+(* -------------------------------------------------------------------------- *)
+
+exception Error of string
+
+let error msg =
+  raise (Error msg)
+
+let error_from_json msg json =
+  let pretty_json = Yojson.Basic.pretty_print ~std:false in
+  let msg = Format.asprintf "%s@\n@[<hov 2>at: %a@]@." msg pretty_json json in
+  raise (Error msg)
+
+(* -------------------------------------------------------------------------- *)
 (* --- Debug                                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -136,17 +150,21 @@ let no_yield () = ()
 
 let execute yield exec : _ response =
   let db = !Db.progress in
-  try
-    Db.progress := if exec.yield then yield else no_yield ;
-    let data = exec.handler exec.data in
-    Db.progress := db ; `Data(exec.id,data)
-  with
-  | Killed -> Db.progress := db ; `Killed exec.id
-  | exn ->
-    Db.progress := db ;
-    Senv.warning "[%s] Uncaught exception:@\n%s"
-      exec.request (Cmdline.protect exn) ;
-    `Error(exec.id,Printexc.to_string exn)
+  let response =
+    try
+      Db.progress := if exec.yield then yield else no_yield ;
+      let data = exec.handler exec.data in
+      `Data(exec.id,data)
+    with
+    | Killed -> `Killed exec.id
+    | Error msg -> `Error(exec.id,msg)
+    | exn ->
+      Senv.warning "[%s] Uncaught exception:@\n%s"
+        exec.request (Cmdline.protect exn) ;
+      `Error(exec.id,Printexc.to_string exn)
+  in
+  Db.progress := db ;
+  response
 
 let execute_debug pp yield exec =
   if Senv.debug_atleast 1 then
