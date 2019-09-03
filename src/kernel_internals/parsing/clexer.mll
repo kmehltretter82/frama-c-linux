@@ -495,6 +495,7 @@ let no_parse_pragma =
                  (* Embedded world *)
              | "global_register" | "location"
 
+let ghost_comments = "//\n" | ("//" [^'\n''@'] [^'\n']* '\n')
 
 rule initial = parse
 | "/*" ("" | "@{" | "@}" as suf) (* Skip special doxygen comments. Use of '@'
@@ -813,7 +814,7 @@ and msasmnobrace = parse
                           cur ^ (msasmnobrace lexbuf) }
 
 and annot_first_token = parse
-  | "ghost" ((blank| '\n' | ("//" [^'\n']* '\n') )* as comments) "else" {
+  | "ghost" ((blank| '\n' | ghost_comments)* as comments) "else" {
       if is_oneline_ghost () then E.parse_error "nested ghost code";
       Buffer.clear buf;
       let loc = currentLoc () in
