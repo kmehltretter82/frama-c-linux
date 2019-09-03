@@ -98,6 +98,7 @@ module Config = struct
 
   let cvalue = make 9 "cvalue" CvalueDomain.get (module Cvalue_domain.State)
   let gauges = make 6 "gauges" GaugesDomain.get (module Gauges_domain.D)
+  let octagons = make 6 "octagons" OctagonsDomain.get (module Octagons)
   let inout = make 5 "inout" InoutDomain.get (module Inout_domain.D)
   let traces = make 2 "traces" TracesDomain.get (module Traces_domain.D)
   let printer = make 2 "printer" PrinterDomain.get (module Printer_domain)

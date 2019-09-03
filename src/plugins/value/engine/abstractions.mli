@@ -132,6 +132,7 @@ module Config : sig
   val equality: flag
   val symbolic_locations: flag
   val gauges: flag
+  val octagons: flag
   val bitwise: flag
   val inout: flag
   val sign: flag
