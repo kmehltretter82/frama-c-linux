@@ -158,7 +158,7 @@ let execute yield exec : _ response =
     with
     | Killed -> `Killed exec.id
     | Error msg -> `Error(exec.id,msg)
-    | exn ->
+    | exn when Cmdline.catch_at_toplevel exn ->
       Senv.warning "[%s] Uncaught exception:@\n%s"
         exec.request (Cmdline.protect exn) ;
       `Error(exec.id,Printexc.to_string exn)
