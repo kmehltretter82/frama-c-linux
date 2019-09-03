@@ -101,20 +101,6 @@ type 'a server = {
 exception Killed
 
 (* -------------------------------------------------------------------------- *)
-(* --- Errors                                                             --- *)
-(* -------------------------------------------------------------------------- *)
-
-exception Error of string
-
-let error msg =
-  raise (Error msg)
-
-let error_from_json msg json =
-  let pretty_json = Yojson.Basic.pretty_print ~std:false in
-  let msg = Format.asprintf "%s@\n@[<hov 2>at: %a@]@." msg pretty_json json in
-  raise (Error msg)
-
-(* -------------------------------------------------------------------------- *)
 (* --- Debug                                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -157,7 +143,7 @@ let execute yield exec : _ response =
       `Data(exec.id,data)
     with
     | Killed -> `Killed exec.id
-    | Error msg -> `Error(exec.id,msg)
+    | Data.InputError msg -> `Error(exec.id,msg)
     | exn when Cmdline.catch_at_toplevel exn ->
       Senv.warning "[%s] Uncaught exception:@\n%s"
         exec.request (Cmdline.protect exn) ;

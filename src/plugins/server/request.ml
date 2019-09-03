@@ -175,7 +175,7 @@ type ('a,'b) signature = {
 }
 
 let failure_missing fmap name =
-  Data.failure (fmap_to_json fmap) "Missing parameter '%s'" name
+  Data.failure ~json:(fmap_to_json fmap) "Missing parameter '%s'" name
 
 let check_required fmap fd =
   if not (Fmap.mem fd fmap) then failure_missing fmap fd
@@ -279,12 +279,12 @@ let mk_input (type a) name defaults (input : a rq_input) : (rq -> json -> a) =
     begin fun rq js ->
       rq.result <- defaults ;
       try D.of_json js
-      with Jutil.Type_error (msg, js) -> Main.error_from_json msg js
+      with Jutil.Type_error (msg, js) -> Data.failure_from_type_error msg js
     end
   | Pfields _ ->
     begin fun rq js ->
       try rq.param <- fmap_of_json rq.param js
-      with Jutil.Type_error (msg, js) -> Main.error_from_json msg js
+      with Jutil.Type_error (msg, js) -> Data.failure_from_type_error msg js
     end
 
 (* json output processing *)

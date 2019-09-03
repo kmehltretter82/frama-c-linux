@@ -181,10 +181,16 @@ end
 module Dictionary(E : Enum) : S_collection with type t = E.t
 
 (* -------------------------------------------------------------------------- *)
-(** {2 Misc} *)
+(** {2 Error handling} *)
 (* -------------------------------------------------------------------------- *)
 
-val failure : json -> ('a, Format.formatter, unit, 'b) format4 -> 'a
-(** @raise Yojson.Basic.Util.Type_error with provided message *)
+(** Exception thrown during the decoding of a request's inputs *)
+exception InputError of string
+
+val failure : ?json:json -> ('a, Format.formatter, unit, 'b) format4 -> 'a
+(** @raise InputError with provided message *)
+
+val failure_from_type_error : string -> json -> 'a
+(** @raise InputError from Yojson.Basic.Util.Type_error arguments *)
 
 (* -------------------------------------------------------------------------- *)

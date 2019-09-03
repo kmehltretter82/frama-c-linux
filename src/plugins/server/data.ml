@@ -47,8 +47,21 @@ end
 
 type 'a data = (module S with type t = 'a)
 
-let failure js msg =
-  Pretty_utils.ksfprintf (fun msg -> raise(Ju.Type_error(msg,js))) msg
+exception InputError of string
+
+let failure ?json msg =
+  let add_json msg =
+    let msg = match json with
+      | None -> msg
+      | Some json ->
+        Format.asprintf "@[%s:@ %s@]" msg (Js.pretty_to_string json)
+    in
+    raise(InputError(msg))
+  in
+  Pretty_utils.ksfprintf add_json msg
+
+let failure_from_type_error msg json =
+  failure ~json "%s" msg
 
 (* -------------------------------------------------------------------------- *)
 (* --- Option                                                             --- *)
@@ -84,7 +97,7 @@ struct
   let to_json (x,y) = `List [ A.to_json x ; B.to_json y ]
   let of_json = function
     | `List [ ja ; jb ] -> A.of_json ja , B.of_json jb
-    | js -> failure js "Expected list with 2 elements"
+    | js -> failure ~json:js "Expected list with 2 elements"
 end
 
 module Jtriple(A : S)(B : S)(C : S) : S with type t = A.t * B.t * C.t =
@@ -94,7 +107,7 @@ struct
   let to_json (x,y,z) = `List [ A.to_json x ; B.to_json y ; C.to_json z ]
   let of_json = function
     | `List [ ja ; jb ; jc ] -> A.of_json ja , B.of_json jb , C.of_json jc
-    | js -> failure js "Expected list with 3 elements"
+    | js -> failure ~json:js "Expected list with 3 elements"
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -354,7 +367,7 @@ struct
     let id = Ju.to_int js in
     try find m id
     with Not_found ->
-      failure js "[%s] No registered id #%d" I.name id
+      failure "[%s] No registered id #%d" I.name id
 
 end
 
@@ -453,7 +466,7 @@ struct
         let of_json js =
           let k = Ju.to_int js in
           try find k
-          with Not_found -> failure js "[%s] No registered id #%d" A.name k
+          with Not_found -> failure "[%s] No registered id #%d" A.name k
       end)
 
 end
