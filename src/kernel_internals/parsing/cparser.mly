@@ -289,6 +289,7 @@ let transformOffsetOf (speclist, dtype) member =
   { addrExpr with expr_node = CAST (sizeofType, SINGLE_INIT addrExpr)}
 
 let no_ghost_stmt s = {stmt_ghost = false ; stmt_node = s}
+let ghost_stmt s = {stmt_ghost = true ; stmt_node = s}
 
 let no_ghost = List.map no_ghost_stmt
 
@@ -300,6 +301,12 @@ let in_block l =
         no_ghost_stmt (BLOCK ({ blabels = []; battrs = []; bstmts = l},
                               get_statementloc (List.hd l),
                               get_statementloc (Extlib.last l)))
+
+let in_ghost_block ?(battrs=[]) l =
+  let l = in_ghost l in
+  ghost_stmt (BLOCK ({ blabels = []; battrs ; bstmts = l},
+                       get_statementloc (List.hd l),
+                       get_statementloc (Extlib.last l)))
 
 %}
 
@@ -908,7 +915,7 @@ else_part:
 |   ELSE annotated_statement
     { in_block $2 }
 |   LGHOST_ELSE annotated_statement RGHOST
-    { in_block $2 }
+    { in_ghost_block ~battrs:[ ("ghost_else" , []) ] $2 }
     %prec GHOST_ELSE_NO_ELSE /* To force the non ghost else to be attached to the current if */
 |   LGHOST_ELSE annotated_statement RGHOST ELSE annotated_statement
     {
