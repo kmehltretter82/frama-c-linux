@@ -347,6 +347,10 @@ let lex_comment remainder buffer lexbuf =
   (match buffer with None -> () | Some b -> Buffer.add_string b s) ;
   remainder buffer lexbuf
 
+let error_count_lines comments =
+  let newline_if_n c = if c = '\n' then E.newline () in
+  String.iter newline_if_n comments
+
 let do_lex_comment ?(first_string="") remainder lexbuf =
   let buffer =
     if Kernel.PrintComments.get () then begin
@@ -809,11 +813,13 @@ and msasmnobrace = parse
                           cur ^ (msasmnobrace lexbuf) }
 
 and annot_first_token = parse
-  | "ghost" (blank| '\n' | ("//" [^'\n']* '\n') )* "else" {
+  | "ghost" ((blank| '\n' | ("//" [^'\n']* '\n') )* as comments) "else" {
       if is_oneline_ghost () then E.parse_error "nested ghost code";
       Buffer.clear buf;
+      let loc = currentLoc () in
+      error_count_lines comments ;
       enter_ghost_code ();
-      LGHOST_ELSE (currentLoc ())
+      LGHOST_ELSE (loc)
     }
   | "ghost" {
       if is_oneline_ghost () then E.parse_error "nested ghost code";
