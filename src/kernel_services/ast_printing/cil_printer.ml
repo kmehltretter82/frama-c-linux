@@ -462,12 +462,51 @@ class cil_printer () = object (self)
 
   method pp_keyword fmt s = pp_print_string fmt s
   method pp_acsl_keyword = self#pp_keyword
+
+  val mutable annot = false
+  val mutable internal_annot = false
+
   method pp_open_annotation ?(block=true) ?(pre=format_of_string "/*@@") fmt =
+    let pre = if not annot then begin annot <- true ; pre end
+      else if not internal_annot then begin
+        internal_annot <- true ; format_of_string "/@@"
+      end else
+        assert false (* cannot enter an annotation in a internal annotation *)
+    in
     (if block then Pretty_utils.pp_open_block else Format.fprintf)
       fmt "%(%)" pre
   method pp_close_annotation ?(block=true) ?(suf=format_of_string "*/") fmt =
+    let suf = if not annot then
+        assert false (* we should not have to close an annotation that is not open *)
+      else if internal_annot then begin
+        internal_annot <- false ; format_of_string "@@/"
+      end else begin
+        annot <- false ; suf
+      end
+    in
     (if block then Pretty_utils.pp_close_block else Format.fprintf)
       fmt "%(%)" suf
+
+  val mutable verbose = false
+
+  (* number of opened ghost code *)
+  val mutable is_ghost = false
+  method private display_comment () = not is_ghost || verbose
+
+  method private in_ghost_if_needed fmt ghost ~pre_fmt ~post_fmt ?block do_it =
+    let display_ghost = ghost && not is_ghost in
+    if display_ghost then begin
+      is_ghost <- true ;
+      Format.fprintf fmt pre_fmt
+        (fun fmt -> self#pp_open_annotation ?block fmt)
+        self#pp_acsl_keyword "ghost"
+    end ;
+    do_it () ;
+    if display_ghost then begin
+      is_ghost <- false;
+      Format.fprintf fmt post_fmt
+        (fun fmt -> self#pp_close_annotation ?block fmt)
+    end
 
   method without_annot:
     'a. (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a -> unit =
@@ -487,11 +526,10 @@ class cil_printer () = object (self)
       let finally () = force_brace <- tmp in
       Extlib.try_finally ~finally f fmt x;
 
-  val mutable verbose = false
-  (* Do not add a value that depends on a
-     non-constant variable of the kernel here (e.g. [Kernel.Debug.get ()]). Due
-     to the way the pretty-printing class is instantiated, this value would be
-     evaluated too soon. Override the [reset] method instead. *)
+      (* Do not add a value that depends on a
+         non-constant variable of the kernel here (e.g. [Kernel.Debug.get ()]). Due
+         to the way the pretty-printing class is instantiated, this value would be
+         evaluated too soon. Override the [reset] method instead. *)
 
   val current_stmt = Stack.create ()
 
@@ -1094,10 +1132,6 @@ class cil_printer () = object (self)
 
   method fundec fmt fd =  fprintf fmt "%a" self#varinfo fd.svar
 
-  (* number of opened ghost code *)
-  val mutable is_ghost = false
-  method private display_comment () = not is_ghost || verbose
-
   method annotated_stmt (next: stmt) fmt (s: stmt) =
     pp_open_hvbox fmt 0;
     self#stmt_labels fmt s;
@@ -1105,18 +1139,8 @@ class cil_printer () = object (self)
     if Cil.is_skip s.skind && not s.ghost && s.sattr = [] then begin
       if verbose || s.labels <> [] then fprintf fmt ";"
     end else begin
-      let was_ghost = is_ghost in
-      let display_ghost = s.ghost && not was_ghost in
-      if display_ghost then begin
-        is_ghost <- true;
-        Format.fprintf fmt "%t %a "
-          (fun fmt -> self#pp_open_annotation fmt) self#pp_acsl_keyword "ghost"
-      end;
-      self#stmtkind s.sattr next fmt s.skind ;
-      if display_ghost then begin
-        is_ghost <- false;
-        self#pp_close_annotation fmt
-      end
+      self#in_ghost_if_needed fmt s.ghost ~pre_fmt:"%t %a " ~post_fmt:"%t"
+        (fun () -> self#stmtkind s.sattr next fmt s.skind)
     end;
     pp_close_box fmt ()
 
@@ -1190,18 +1214,10 @@ class cil_printer () = object (self)
     | _ -> false
 
   method private vdecl_complete fmt v =
-    let display_ghost = v.vghost && not is_ghost in
-    Format.fprintf fmt "@[<hov 0>%t%a;%t@]"
-      (if display_ghost then (fun fmt ->
-           Format.fprintf fmt "%t %a@ "
-             (fun fmt -> self#pp_open_annotation ~block:false fmt)
-             self#pp_acsl_keyword "ghost")
-       else ignore)
-      self#vdecl v
-      (if display_ghost
-       then (fun fmt -> Format.fprintf fmt "@ %t"
-                (fun fmt -> self#pp_close_annotation ~block:false fmt))
-       else ignore)
+    Format.fprintf fmt "@[<hov 0>" ;
+    self#in_ghost_if_needed fmt v.vghost ~pre_fmt:"%t %a@ " ~post_fmt:"@ %t" ~block:false
+      (fun () -> Format.fprintf fmt "%a;" self#vdecl v) ;
+    Format.fprintf fmt "@]"
 
   (* no box around the block *)
   method private unboxed_block
@@ -1541,22 +1557,24 @@ class cil_printer () = object (self)
       match g with
       | GFun (fundec, l) ->
         self#in_current_function fundec.svar;
-        (* If the function has attributes then print a prototype because
-         * GCC cannot accept function attributes in a definition *)
-        let oldattr = fundec.svar.vattr in
-        let oldattr = List.filter keep_attr oldattr in
-        (* Always print the file name before function declarations *)
-        (* Prototype first *)
-        if oldattr <> [] then
-          (self#line_directive fmt l;
-           fprintf fmt "%a@\n"
-             self#vdecl_complete fundec.svar);
-        (* Temporarily remove the function attributes *)
-        fundec.svar.vattr <- [];
-        (* Body now *)
-        self#line_directive ~forcefile:true fmt l;
-        self#fundecl fmt fundec;
-        fundec.svar.vattr <- oldattr;
+        self#in_ghost_if_needed fmt fundec.svar.vghost ~pre_fmt:"%t %a@ " ~post_fmt:"%t@\n"
+          (fun () ->
+             (* If the function has attributes then print a prototype because
+              * GCC cannot accept function attributes in a definition *)
+             let oldattr = fundec.svar.vattr in
+             let oldattr = List.filter keep_attr oldattr in
+             (* Always print the file name before function declarations *)
+             (* Prototype first *)
+             if oldattr <> [] then
+               (self#line_directive fmt l;
+                fprintf fmt "%a@\n"
+                  self#vdecl_complete fundec.svar);
+             (* Temporarily remove the function attributes *)
+             fundec.svar.vattr <- [];
+             (* Body now *)
+             self#line_directive ~forcefile:true fmt l;
+             self#fundecl fmt fundec;
+             fundec.svar.vattr <- oldattr) ;
         fprintf fmt "@\n";
         self#out_current_function
 
@@ -1610,21 +1628,16 @@ class cil_printer () = object (self)
       | GVar (vi, io, l) ->
         self#line_directive ~forcefile:true fmt l;
         Format.fprintf fmt "@[<hov 2>";
-        if vi.vghost then
-          Format.fprintf fmt "%t %a@ "
-            (fun fmt -> self#pp_open_annotation ~block:false fmt)
-            self#pp_acsl_keyword "ghost";
-        self#vdecl fmt vi;
-        (match io.init with
-         | None -> ()
-         | Some i ->
-           fprintf fmt " =@ ";
-           self#init fmt i;
-        );
-        fprintf fmt ";";
-        if vi.vghost then
-          Format.fprintf fmt "@ %t"
-            (fun fmt -> self#pp_close_annotation ~block:false fmt);
+        self#in_ghost_if_needed fmt vi.vghost ~pre_fmt:"%t %a@ " ~post_fmt:"@ %t" ~block:false
+          (fun () ->
+             self#vdecl fmt vi;
+             (match io.init with
+              | None -> ()
+              | Some i ->
+                fprintf fmt " =@ ";
+                self#init fmt i;
+             );
+             fprintf fmt ";") ;
         fprintf fmt "@]@\n";
 
         (* print global variable 'extern' declarations *)
@@ -1724,26 +1737,13 @@ class cil_printer () = object (self)
 
   method private fundecl fmt f =
     (* declaration. *)
-    let was_ghost = is_ghost in
-    let entering_ghost = f.svar.vghost && not was_ghost in
-    fprintf fmt "@[%t%a@\n@[<v 2>"
-      (if entering_ghost then (fun fmt ->
-           Format.fprintf fmt "%t %a@ "
-             (fun fmt -> self#pp_open_annotation ~block:false fmt)
-             self#pp_acsl_keyword "ghost")
-       else ignore)
-      self#vdecl f.svar;
-    (* We take care of locals in blocks. *)
-    (*List.iter (fprintf fmt "@\n%a;" self#vdecl) f.slocals ;*)
-    (* body. *)
-    if entering_ghost then is_ghost <- true;
-    self#unboxed_block Body fmt f.sbody;
-    if entering_ghost then is_ghost <- false;
-    fprintf fmt "@]%t@]@."
-      (if entering_ghost
-       then (fun fmt -> Format.fprintf fmt "@ %t"
-                (fun fmt -> self#pp_close_annotation ~block:false fmt))
-       else ignore)
+    fprintf fmt "@[";
+    self#in_ghost_if_needed fmt f.svar.vghost ~pre_fmt:"%t %a@ " ~post_fmt:"@ %t" ~block:false
+      (fun () ->
+         fprintf fmt "%a@\n@[<v 2>" self#vdecl f.svar;
+         self#unboxed_block Body fmt f.sbody;
+         fprintf fmt "@]") ;
+    fprintf fmt "@]@."
 
   (***** PRINTING DECLARATIONS and TYPES ****)
 
