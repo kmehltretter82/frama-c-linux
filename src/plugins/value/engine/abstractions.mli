@@ -56,9 +56,14 @@ type 'v domain =
   | Domain: (module leaf_domain with type value = 'v) -> 'v domain
   | Functor: (module domain_functor) -> _ domain
 
-(** Abstraction to be registered. *)
+(** Abstraction to be registered. The name of each abstraction must be unique.
+    The priority can be any integer; domains with higher priority are always
+    processed first. The domains currently provided by Eva have priority ranging
+    between 1 and 19, so a priority of 0 (respectively 20) ensures that a new
+    domain is processed after (respectively before) the classic Eva domains. *)
 type 'v abstraction =
   { name: string;      (** Name of the abstraction. Must be unique. *)
+    priority: int;     (** Domains with higher priority are processed first. *)
     values: 'v value;  (** The value abstraction. *)
     domain: 'v domain; (** The domain over the value abstraction. *)
   }

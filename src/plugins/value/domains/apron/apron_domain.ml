@@ -748,7 +748,7 @@ let () = Floating_point.set_round_nearest_even ()
 let make name enable (module Man: Input) =
   let module Domain = Domain_builder.Complete (Make (Man)) in
   let open Abstractions in
-  register ~enable { name;
+  register ~enable { name; priority = 1;
                      values = Single (module Main_values.Interval);
                      domain = Domain (module Domain); }
 

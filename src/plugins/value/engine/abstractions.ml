@@ -40,6 +40,7 @@ type 'v domain =
 
 type 'v abstraction =
   { name: string;
+    priority: int;
     values: 'v value;
     domain: 'v domain; }
 
@@ -50,7 +51,11 @@ module Config = struct
 
   module Flag = struct
     type t = flag
-    let compare (Flag f1) (Flag f2) = Datatype.String.compare f1.name f2.name
+
+    (* Flags are sorted by increasing priority order, and then by name. *)
+    let compare (Flag f1) (Flag f2) =
+      let c = Datatype.Int.compare f1.priority f2.priority in
+      if c <> 0 then c else Datatype.String.compare f1.name f2.name
   end
 
   include Set.Make (Flag)
@@ -81,30 +86,34 @@ module Config = struct
   (* --- Register default abstractions -------------------------------------- *)
 
   let create ~enable abstract = register ~enable abstract; Flag abstract
-  let create_domain name enable values domain =
-    create ~enable { name; values = Single values; domain = Domain domain }
+  let create_domain priority name enable values domain =
+    create ~enable
+      { name; priority; values = Single values; domain = Domain domain }
 
   open Value_parameters
 
   (* Register standard domains over cvalues. *)
-  let make name enable = create_domain name enable (module Main_values.CVal)
+  let make rank name enable =
+    create_domain rank name enable (module Main_values.CVal)
 
-  let cvalue = make "cvalue" CvalueDomain.get (module Cvalue_domain.State)
-  let gauges = make "gauges" GaugesDomain.get (module Gauges_domain.D)
-  let inout = make "inout" InoutDomain.get (module Inout_domain.D)
-  let printer = make "printer" PrinterDomain.get (module Printer_domain)
+  let cvalue = make 9 "cvalue" CvalueDomain.get (module Cvalue_domain.State)
+  let gauges = make 6 "gauges" GaugesDomain.get (module Gauges_domain.D)
+  let inout = make 5 "inout" InoutDomain.get (module Inout_domain.D)
+  let printer = make 2 "printer" PrinterDomain.get (module Printer_domain)
   let symbolic_locations =
-    make "symbolic_locations" SymbolicLocsDomain.get (module Symbolic_locs.D)
+    make 7  "symbolic_locations" SymbolicLocsDomain.get (module Symbolic_locs.D)
 
   let sign =
-    create_domain "sign" SignDomain.get (module Sign_value) (module Sign_domain)
+    create_domain 4 "sign" SignDomain.get
+      (module Sign_value) (module Sign_domain)
 
   let bitwise =
-    create_domain "bitwise" BitwiseOffsmDomain.get
+    create_domain 3 "bitwise" BitwiseOffsmDomain.get
       (module Offsm_value.Offsm) (module Offsm_domain.D)
 
   let equality_domain =
     { name = "equality";
+      priority = 8;
       values = Struct Abstract.Value.Unit;
       domain = Functor (module Equality_domain.Make); }
   let equality = create ~enable:EqualityDomain.get equality_domain
@@ -261,7 +270,10 @@ let add_domain (type v) (abstraction: v abstraction) (module Acc: Acc) =
   let domain : (module internal_domain with type value = Acc.Val.t) =
     match Abstract.Domain.(eq_structure Acc.Dom.structure Unit) with
     | Some _ -> domain
-    | None -> (module Domain_product.Make (Acc.Val) (Acc.Dom) ((val domain)))
+    | None ->
+      (* The new [domain] becomes the left leaf of the domain product, and will
+         be processed before the domains from [Acc.Dom] during the analysis. *)
+      (module Domain_product.Make (Acc.Val) ((val domain)) (Acc.Dom))
   in
   (module struct
     module Val = Acc.Val
@@ -271,6 +283,9 @@ let add_domain (type v) (abstraction: v abstraction) (module Acc: Acc) =
 
 let build_domain config abstract =
   let build (Config.Flag abstraction) acc = add_domain abstraction acc in
+  (* Domains in the [config] are sorted by increasing priority: domains with
+     higher priority are added last: they will be at the top of the domains
+     tree, and thus will be processed first during the analysis. *)
   Config.fold build config abstract
 
 

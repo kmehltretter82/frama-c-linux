@@ -156,6 +156,7 @@ let () =
   let open Abstractions in
   let domain =
     { name = "numerors";
+      priority = 0;
       values = Single (module Numerors_value);
       domain = Domain (module Domain); }
   in
