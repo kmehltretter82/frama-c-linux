@@ -287,18 +287,24 @@ let run ~pretty ?(equal=(=)) ~fetch () =
       shutdown = false ;
     } in
     try
+      (* TODO: remove the following line once the Why3 signal handler is not
+         used anymore. *)
+      Sys.catch_break true;
       signal true ;
       Senv.feedback "Server running." ;
-      while not server.shutdown do
-        let activity = process server in
-        if not activity then Unix.sleepf idle_s ;
-      done ;
+      begin try
+          while not server.shutdown do
+            let activity = process server in
+            if not activity then Unix.sleepf idle_s ;
+          done ;
+        with Sys.Break -> () (* Ctr+C, just leave the loop normally *)
+      end;
       Senv.feedback "Server shutdown." ;
       signal false ;
-    with err ->
+    with exn ->
       Senv.feedback "Server interruped (fatal error)." ;
       signal false ;
-      raise err
+      raise exn
   end
 
 (* -------------------------------------------------------------------------- *)
