@@ -14,10 +14,21 @@ The front-end of Dive relies on several external tools and libraries :
 - electron: a javascript framework for gui applications
 - Ivette: the future Frama-C and other tools GUI
 - Cytoscape: a javascript library to display graphs and interact with them
-- Zmq (C library and opam package)
+- Zmq: a multilanguage framework for common simple networking patterns
+
 
 Compilation
 ===========
+
+Dependencies
+------------
+
+- Zmq must be installed with opam (with its system dependencies) for the
+  `-server-zmq` option to be available.
+
+
+Instructions
+------------
 
 The Frama-C plugin can be cloned into the Frama-C plugin source directory.
 
