@@ -459,6 +459,8 @@ module Octagons = struct
   include Hptmap.Make (Pair) (Diamond)
       (Hptmap.Comp_unused) (Initial_Values) (Dependencies)
 
+  let internal_join = join
+
   let pretty fmt t =
     let iter f = iter (fun k v -> f (k, v)) in
     let pretty fmt (pair, diamond) =
@@ -634,6 +636,8 @@ module Intervals = struct
 
   include Hptmap.Make (Variable) (Ival)
       (Hptmap.Comp_unused) (Initial_Values) (Dependencies)
+
+  let internal_join = join
 
   let top = empty
 
@@ -1238,9 +1242,57 @@ module Domain = struct
   let initialize_variable _lval _location ~initialized:_ _value state = state
   let initialize_variable_using_type _kind _varinfo state = state
 
-  let relate _kf _bases _state = Base.SetLattice.empty
-  let filter _kf _kind _bases state = state
-  let reuse _kf _bases ~current_input:_ ~previous_output = previous_output
+  let relate _kf bases state =
+    if intraprocedural ()
+    then Base.SetLattice.empty
+    else
+      let aux base acc =
+        try
+          let varinfo = Base.to_varinfo base in
+          let varset = Relations.find varinfo state.relations in
+          let baseset =
+            VariableSet.fold
+              (fun vi acc -> Base.Hptset.add (Base.of_varinfo vi) acc)
+              varset Base.Hptset.empty
+          in
+          Base.SetLattice.(join (inject baseset) acc)
+        with Base.Not_a_C_variable | Not_found -> acc
+      in
+      Base.Hptset.fold aux bases Base.SetLattice.empty
+
+  let filter _kf _kind bases state =
+    if intraprocedural ()
+    then state
+    else
+      let mem_vi varinfo = Base.Hptset.mem (Base.of_varinfo varinfo) bases in
+      let mem_pair pair =
+        let x, y = Pair.get pair in
+        mem_vi x && mem_vi y
+      in
+      let octagons = Octagons.filter mem_pair state.octagons in
+      let intervals = Intervals.filter mem_vi state.intervals in
+      let relations = Relations.filter mem_vi state.relations in
+      { state with octagons; intervals; relations; }
+
+  let reuse =
+    let cache = Hptmap_sig.PersistentCache "Octagons.reuse"
+    and symmetric = false
+    and idempotent = true
+    and decide _key left _right = left in
+    let join_oct = Octagons.internal_join ~cache ~symmetric ~idempotent ~decide
+    and join_itv = Intervals.internal_join ~cache ~symmetric ~idempotent ~decide
+    and join_rel = Relations.union in
+    fun _kf _bases ~current_input ~previous_output ->
+      if intraprocedural ()
+      then previous_output
+      else
+        let current_input = kill previous_output.modified current_input in
+        let prev_output = previous_output in
+        check "reuse result"
+          { octagons = join_oct prev_output.octagons current_input.octagons;
+            intervals = join_itv prev_output.intervals current_input.intervals;
+            relations = join_rel prev_output.relations current_input.relations;
+            modified = current_input.modified }
 
   let name = "Octagon domain"
   let log_category = Value_parameters.register_category "d-octagons"
