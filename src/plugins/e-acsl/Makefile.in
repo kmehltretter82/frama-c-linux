@@ -170,39 +170,51 @@ ifeq (@MAY_RUN_TESTS@,yes)
 
 -include in_frama_ci
 
-ifeq ($(IN_FRAMA_CI),yes)
-
 PLUGIN_TESTS_DIRS := \
-	gmp \
-	no-main
-
-else
-
-PLUGIN_TESTS_DIRS := \
-	format \
-	reject \
-	runtime \
+	examples \
 	bts \
-	gmp \
-	no-main \
+	constructs \
+	arith \
+	memory \
+	gmp-only \
 	full-mmodel \
+	format \
 	temporal \
 	special
-
 # [JS 2019/02/26] deactivate tests 'builtin' as long as setjmp/longjmp is not
 # supported.
-#	builtin \
-
-
-endif
+#	builtin
 
 PLUGIN_TESTS_LIB := $(EACSL_PLUGIN_DIR)/tests/print.ml
-E_ACSL_TESTS: $(EACSL_PLUGIN_DIR)/tests/test_config
 
-E_ACSL_DEFAULT_TESTS: \
-	$(EACSL_PLUGIN_DIR)/tests/test_config \
+DEV=
+ifeq ("$(DEV)","yes")
+  EACSL_TEST_CONFIG=dev
+else
+  EACSL_TEST_CONFIG:=ci
+endif
+PLUGIN_PTESTS_OPTS:=-config $(EACSL_TEST_CONFIG)
+
+E_ACSL_TESTS E_ACSL_DEFAULT_TESTS: \
+	$(EACSL_PLUGIN_DIR)/tests/ptests_config \
+	$(EACSL_PLUGIN_DIR)/tests/test_config_$(EACSL_TEST_CONFIG) \
 	$(EACSL_PLUGIN_DIR)/tests/print.cmxs \
 	$(EACSL_PLUGIN_DIR)/tests/print.cmo
+
+
+$(EACSL_PLUGIN_DIR)/tests/test_config_ci: \
+		$(EACSL_PLUGIN_DIR)/tests/test_config_ci.in \
+		$(EACSL_PLUGIN_DIR)/Makefile
+	$(PRINT_MAKING) $@
+	$(SED) -e "s|@SEDCMD@|`which sed `|g" $< > $@
+
+$(EACSL_PLUGIN_DIR)/tests/test_config_dev: \
+		$(EACSL_PLUGIN_DIR)/tests/test_config_dev.in \
+		$(EACSL_PLUGIN_DIR)/Makefile
+	$(PRINT_MAKING) $@
+	$(SED) -e "s|@SEDCMD@|`which sed `|g" $< > $@
+
+tests:: $(EACSL_PLUGIN_DIR)/tests/ptests_config
 
 clean::
 	for d in $(E_ACSL_EXTRA_DIRS); do \
@@ -210,7 +222,8 @@ clean::
 	done
 	$(PRINT_RM) cleaning generated test files
 	$(RM) $(E_ACSL_DIR)/tests/*.cm* $(E_ACSL_DIR)/tests/*.o
-	$(RM) $(E_ACSL_DIR)/tests/test_config
+	$(RM) $(E_ACSL_DIR)/tests/test_config_ci \
+		$(E_ACSL_DIR)/tests/test_config_dev
 	$(RM) $(foreach dir, $(PLUGIN_TESTS_DIRS), tests/$(dir)/result/*)
 
 endif
@@ -285,7 +298,19 @@ EACSL_DOC_FILES = \
 	man/e-acsl-gcc.sh.1
 
 EACSL_TEST_FILES = \
-  tests/test_config.in tests/print.ml
+	tests/test_config_dev.in \
+	tests/test_config_ci.in \
+	tests/gmp-only/test_config_ci \
+	tests/gmp-only/test_config_dev \
+	tests/full-mmodel/test_config_ci \
+	tests/full-mmodel/test_config_dev \
+	tests/builtin/test_config_ci \
+	tests/builtin/test_config_dev \
+	tests/temporal/test_config_ci \
+	tests/temporal/test_config_dev \
+	tests/format/test_config_ci \
+	tests/format/test_config_dev \
+	tests/print.ml
 
 # Test files without header management
 EACSL_DISTRIB_TESTS = \
@@ -298,7 +323,7 @@ EACSL_DISTRIB_TESTS = \
 
 EACSL_RTL_FILES = $(EACSL_RTL_SRC)
 
-EACSL_SCRIPT_FILES = scripts/e-acsl-gcc.sh scripts/testrun.sh
+EACSL_SCRIPT_FILES = scripts/e-acsl-gcc.sh
 
 EACSL_LICENSE_FILES = \
   license/CEA_LGPL license/SPARETIMELABS \
@@ -485,19 +510,6 @@ uninstall::
 	$(RM) $(BINDIR)/e-acsl-gcc.sh
 	$(PRINT_RM) E-ACSL man pages
 	$(RM) $(MANDIR)/man1/e-acsl-gcc.sh.1
-
-####################
-# Testing (part 2) #
-####################
-
-ifeq (@MAY_RUN_TESTS@,yes)
-
-$(E_ACSL_DIR)/tests/test_config: $(E_ACSL_DIR)/tests/test_config.in \
-	$(E_ACSL_DIR)/Makefile
-	$(PRINT_MAKING) $@
-	$(SED) -e "s|@SEDCMD@|`which sed `|g" $< > $@
-
-endif
 
 #####################################
 # Regenerating the Makefile on need #
