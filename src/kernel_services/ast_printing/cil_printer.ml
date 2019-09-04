@@ -1304,6 +1304,9 @@ class cil_printer () = object (self)
   val mutable lastFileName = Datatype.Filepath.dummy
   val mutable lastLineNumber = -1
 
+  method private is_ghost_else b =
+    Cil.hasAttribute "ghost_else" b.battrs
+
   (* Make sure that you only call self#line_directive on an empty line *)
   method line_directive ?(forcefile=false) fmt l =
     match state.line_directive_style with
@@ -1424,7 +1427,7 @@ class cil_printer () = object (self)
         (self#unboxed_block Other) t
 
     | If(be,{bstmts=[];battrs=[]},e,l)
-      when not state.print_cil_as_is ->
+      when not (self#is_ghost_else e) && not state.print_cil_as_is ->
       fprintf fmt "@[<hv>%a@[<v 2>%a (%a) %a@]@]"
         (fun fmt -> self#line_directive ~forcefile:false fmt) l
         self#pp_keyword "if"
@@ -1432,7 +1435,7 @@ class cil_printer () = object (self)
         (self#unboxed_block Other) e
 
     | If(be,{bstmts=[{skind=Goto(gref,_);labels=[]}]; battrs=[]},e,l)
-      when !gref == next && not state.print_cil_as_is ->
+      when not (self#is_ghost_else e) && !gref == next && not state.print_cil_as_is ->
       fprintf fmt "@[<hv>%a@[<v 2>%a (%a) %a@]@]"
         (fun fmt -> self#line_directive ~forcefile:false fmt) l
         self#pp_keyword "if"
@@ -1454,9 +1457,17 @@ class cil_printer () = object (self)
         self#exp be
         (self#unboxed_block Then_with_else) t;
       if else_at_newline then fprintf fmt "@\n" else fprintf fmt "@ ";
-      fprintf fmt "@[<v 2>%a %a@]"
-        self#pp_keyword "else"
-        (self#unboxed_block Other) e;
+      let do_print () =
+        let e = { e with battrs = Cil.dropAttribute "ghost_else" e.battrs } in
+        fprintf fmt "%a %a"
+          self#pp_keyword "else"
+          (self#unboxed_block Other) e;
+      in
+      fprintf fmt "@[<v 2>" ;
+      self#in_ghost_if_needed
+        fmt (self#is_ghost_else e) ~block:false
+        ~post_fmt:"%t" do_print ;
+      fprintf fmt "@]" ;
       pp_close_box fmt ()
 
     | Switch(e,b,_,l) ->
