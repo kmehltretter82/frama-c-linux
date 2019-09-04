@@ -604,6 +604,9 @@ module For_export : sig
   val set_builtin : Fun.t -> (term list -> term) -> unit
   val set_builtin' : Fun.t -> (term list -> tau option -> term) -> unit
 
+  val set_builtin_eq : Fun.t -> (term -> term -> term) -> unit
+  val set_builtin_leq : Fun.t -> (term -> term -> term) -> unit
+
   val in_state: ('a -> 'b) -> 'a -> 'b
 
 end
