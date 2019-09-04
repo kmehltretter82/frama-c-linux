@@ -134,28 +134,28 @@ let pp_response pp fmt (r : _ response) =
 
 let no_yield () = ()
 
-let execute yield exec : _ response =
+let execute exec : _ response =
+  try
+    let data = exec.handler exec.data in
+    `Data(exec.id,data)
+  with
+  | Killed -> `Killed exec.id
+  | Data.InputError msg -> `Error(exec.id,msg)
+  | Sys.Break as exn -> raise exn (* Silently pass the exception *)
+  | exn when Cmdline.catch_at_toplevel exn ->
+    Senv.warning "[%s] Uncaught exception:@\n%s"
+      exec.request (Cmdline.protect exn) ;
+    `Error(exec.id,Printexc.to_string exn)
+
+let execute_with_yield yield exec =
   let db = !Db.progress in
-  let response =
-    try
-      Db.progress := if exec.yield then yield else no_yield ;
-      let data = exec.handler exec.data in
-      `Data(exec.id,data)
-    with
-    | Killed -> `Killed exec.id
-    | Data.InputError msg -> `Error(exec.id,msg)
-    | exn when Cmdline.catch_at_toplevel exn ->
-      Senv.warning "[%s] Uncaught exception:@\n%s"
-        exec.request (Cmdline.protect exn) ;
-      `Error(exec.id,Printexc.to_string exn)
-  in
-  Db.progress := db ;
-  response
+  Db.progress := if exec.yield then yield else no_yield ;
+  Extlib.try_finally ~finally:(fun () -> Db.progress := db) execute exec
 
 let execute_debug pp yield exec =
   if Senv.debug_atleast 1 then
     Senv.debug "Trigger %s:%a" exec.request pp exec.id ;
-  execute yield exec
+  execute_with_yield yield exec
 
 let reply_debug server resp =
   if Senv.debug_atleast 1 then
@@ -195,7 +195,7 @@ let process_request (server : 'a server) (request : 'a request) : unit =
       | Some( `GET , handler ) ->
         let exec = { id ; request ; handler ; data ;
                      yield = false ; killed = false } in
-        reply_debug server (execute no_yield exec)
+        reply_debug server (execute exec)
       | Some( `SET , handler ) ->
         let exec = { id ; request ; handler ; data ;
                      yield = false ; killed = false } in
