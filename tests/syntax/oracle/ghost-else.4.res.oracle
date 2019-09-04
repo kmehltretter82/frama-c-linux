@@ -1,0 +1,14 @@
+[kernel] Parsing tests/syntax/ghost-else.c (with preprocessing)
+[kernel] tests/syntax/ghost-else.c:125: 
+  syntax error:
+  Location: between lines 125 and 127, before or at token: /
+  123   
+  124   void if_ghost_else_one_line_bad(int x, int y) {
+  
+  125     if (x) {
+  126       x++;
+  127     } //@ ghost else
+  
+  128     y++;
+  129   }
+[kernel] Frama-C aborted: invalid user input.
