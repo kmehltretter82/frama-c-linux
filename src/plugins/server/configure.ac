@@ -38,20 +38,6 @@ m4_ifndef([FRAMAC_M4_MACROS], [m4_include(FRAMAC_SHARE/configure.ac)])
 check_plugin(server,PLUGIN_RELATIVE_PATH(plugin_file),[Server plug-in],yes)
 
 ########################################
-# Server Main Configuration            #
-########################################
-
-AC_MSG_CHECKING(for Yojson)
-SERVER_LIB_YOJSON=$($OCAMLFIND query yojson -format %v)
-if test -z "$SERVER_LIB_YOJSON"
-then
-  AC_MSG_RESULT(Server disabled (use 'opam install yojson'))
-  plugin_disable(server)
-else
-  AC_MSG_RESULT(yes)
-fi
-
-########################################
 # Server ZMQ Configuration             #
 ########################################
 
@@ -64,18 +50,10 @@ AC_ARG_ENABLE(
 
 if test "$SERVER_ZMQ" = "yes" ;
 then
-        AC_MSG_CHECKING(for ZeroMQ)
-        SERVER_LIB_ZMQ=$($OCAMLFIND query zmq -format %v)
-        if test -z "$SERVER_LIB_ZMQ"
-        then
-          AC_MSG_RESULT(Server support for ZeroMQ disabled (use 'opam install zmq').)
-          SERVER_ZMQ=no
-        else
-          AC_MSG_RESULT(yes);
-        fi
+        configure_pkg([ZMQ],[zmq],
+                      [Server support for ZeroMQ disabled (try 'opam install zmq').])
+        plugin_use_pkg(server,zmq)
 fi
-
-AC_SUBST(SERVER_ZMQ)
 
 #######################
 # Generating Makefile #
