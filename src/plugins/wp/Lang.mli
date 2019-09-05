@@ -87,7 +87,7 @@ and model = {
 }
 
 and source =
-  | Generated of string
+  | Generated of WpContext.context option * string
   | Extern of Engine.link extern
 
 val mem_builtin_type : name:string -> bool
@@ -140,12 +140,11 @@ val extern_p :
 val extern_fp : library:library -> ?params:sort list ->
   ?link:string infoprover -> string -> lfun
 
-val generated_f : ?category:lfun category ->
+val generated_f : ?context:bool -> ?category:lfun category ->
   ?params:sort list -> ?sort:sort -> ?result:tau ->
   ('a,Format.formatter,unit,lfun) format4 -> 'a
 
-val generated_p : string -> lfun
-
+val generated_p : ?context:bool -> string -> lfun
 
 (** {2 Sorting and Typing} *)
 
@@ -480,16 +479,6 @@ sig
   val set_builtin_eqp : lfun -> cmp -> unit
 
   val release : unit -> unit (** Empty local caches *)
-
-  (** {3 Internal Checks} *)
-
-  module Check :
-  sig
-    val reset : unit -> unit
-    val set : string -> unit (* check constructor *)
-    val is_set : unit -> bool
-    val iter : (qed:term -> raw:term -> goal:pred -> unit) -> unit
-  end
 
 end
 

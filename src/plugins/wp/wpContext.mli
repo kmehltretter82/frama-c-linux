@@ -22,13 +22,11 @@
 
 (** Model Registration *)
 
-module S : Datatype.S_with_collections
-type t = S.t
-type model = S.t
+type model
+type scope = Global | Kf of Kernel_function.t
 type tuning = (unit -> unit)
-type hypotheses = Kernel_function.t -> MemoryContext.clause list
+type hypotheses = unit -> MemoryContext.clause list
 
-val repr : model
 val register :
   id:string ->
   ?descr:string ->
@@ -36,24 +34,48 @@ val register :
   ?hypotheses:hypotheses ->
   unit -> model
 
-val get_id : model -> string
 val get_descr : model -> string
 val get_emitter : model -> Emitter.t
-val get_hypotheses : model -> hypotheses
 
-val find : id:string -> model
-val iter : (model -> unit) -> unit
+val compute_hypotheses : model -> Kernel_function.t -> MemoryContext.clause list
 
-val with_model : model -> ('a -> 'b) -> 'a -> 'b
-val on_model : model -> (unit -> unit) -> unit
-val get_model : unit -> model (** Current model *)
-val is_model_defined : unit -> bool
+type context = model * scope
+type t = context
 
-type scope = Kernel_function.t option
-val on_scope : scope -> ('a -> 'b) -> 'a -> 'b
-val on_kf : Kernel_function.t -> (unit -> unit) -> unit (** on_scope (Some kf) *)
-val on_global : (unit -> unit) -> unit (** on_scope None *)
+module S :
+sig
+  type t = context
+  val id : t -> string
+  val hash : t -> int
+  val equal : t -> t -> bool
+  val compare : t -> t -> int
+end
+
+module MODEL :
+sig
+  type t = model
+  val id : t -> string
+  val descr : t -> string
+  val hash : t -> int
+  val equal : t -> t -> bool
+  val compare : t -> t -> int
+  val repr : t
+end
+
+module SCOPE :
+sig
+  type t = scope
+  val id : t -> string
+  val hash : t -> int
+  val equal : t -> t -> bool
+  val compare : t -> t -> int
+end
+
+val is_defined : unit -> bool
+val on_context : context -> ('a -> 'b) -> 'a -> 'b
+val get_model : unit -> model
 val get_scope : unit -> scope
+val get_context : unit -> context
 
 val directory : unit -> string (** Current model in ["-wp-out"] directory *)
 
@@ -73,6 +95,7 @@ sig
   type key = E.key
   type data = E.data
 
+  val id : basename:string -> key -> string
   val mem : key -> bool
   val find : key -> data
   val get : key -> data option
@@ -114,6 +137,15 @@ sig
   val compile : key -> data
 end
 
+module type IData =
+sig
+  type key
+  type data
+  val name : string
+  val basename : key -> string
+  val compile : key -> string -> data
+end
+
 module type Generator =
 sig
   type key
@@ -131,5 +163,15 @@ module Generator(K : Key)(D : Data with type key = K.t) : Generator
 
 (** projectified, independent from the model, not serialized *)
 module StaticGenerator(K : Key)(D : Data with type key = K.t) : Generator
+  with type key = D.key
+   and type data = D.data
+
+(** projectified, depend on the model, not serialized *)
+module GeneratorID(K : Key)(D : IData with type key = K.t) : Generator
+  with type key = D.key
+   and type data = D.data
+
+(** projectified, independent from the model, not serialized *)
+module StaticGeneratorID(K : Key)(D : IData with type key = K.t) : Generator
   with type key = D.key
    and type data = D.data

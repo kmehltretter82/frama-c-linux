@@ -1447,8 +1447,6 @@ src/plugins/wp/MemVar.mli: CEA_WP
 src/plugins/wp/MemZeroAlias.ml: CEA_WP
 src/plugins/wp/MemZeroAlias.mli: CEA_WP
 src/plugins/wp/Sigs.ml: CEA_WP
-src/plugins/wp/Model.ml: CEA_WP
-src/plugins/wp/Model.mli: CEA_WP
 src/plugins/wp/Mstate.ml: CEA_WP
 src/plugins/wp/Mstate.mli: CEA_WP
 src/plugins/wp/Partitioning.ml: CEA_WP
@@ -1919,6 +1917,8 @@ src/plugins/wp/share/why3/frama_c_wp/vset.mlw: CEA_WP
 src/plugins/wp/share/wp.driver: CEA_WP
 src/plugins/wp/wpAnnot.ml: CEA_WP
 src/plugins/wp/wpAnnot.mli: CEA_WP
+src/plugins/wp/wpContext.ml: CEA_WP
+src/plugins/wp/wpContext.mli: CEA_WP
 src/plugins/wp/wpPropId.ml: CEA_WP
 src/plugins/wp/wpPropId.mli: CEA_WP
 src/plugins/wp/wpReport.ml: CEA_WP

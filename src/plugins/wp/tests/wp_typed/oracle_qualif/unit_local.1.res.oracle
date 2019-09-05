@@ -14,6 +14,6 @@
 [wp] Report out: 'tests/wp_typed/result_qualif/unit_local.1.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
-foo                 -       2 (20..32)       2       100%
+foo                 -       2 (16..28)       2       100%
 bar                 -       1 (16..28)       1       100%
 -------------------------------------------------------------

@@ -444,14 +444,6 @@ module BoundForallUnfolding =
     let default = 1000
   end)
 
-let () = Parameter_customize.set_group wp_simplifier
-module QedChecks =
-  String_set(struct
-    let option_name = "-wp-qed-checks"
-    let arg_name = "qed-key,..."
-    let help = "Check internal simplifications."
-  end)
-
 (* ------------------------------------------------------------------------ *)
 (* ---  Prover Interface                                                --- *)
 (* ------------------------------------------------------------------------ *)

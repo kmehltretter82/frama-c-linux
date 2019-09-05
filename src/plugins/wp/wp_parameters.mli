@@ -78,7 +78,6 @@ module Prenex: Parameter_sig.Bool
 module Bits: Parameter_sig.Bool
 module Ground: Parameter_sig.Bool
 module Reduce: Parameter_sig.Bool
-module QedChecks : Parameter_sig.String_set
 module UnfoldAssigns : Parameter_sig.Bool
 module Split: Parameter_sig.Bool
 module SplitDepth: Parameter_sig.Int

@@ -390,7 +390,7 @@ and model = {
 }
 
 and source =
-  | Generated of string
+  | Generated of WpContext.context option * string
   | Extern of Engine.link extern
 
 let tau_of_lfun phi ts =
@@ -409,8 +409,15 @@ type balance = Nary | Left | Right
 
 let not_found _ = raise Not_found
 
+let generated ?(context=false) name =
+  let ctxt = if context
+    then Some (WpContext.get_context ())
+    else None in
+  Generated(ctxt,name)
+
 let symbolf
     ?library
+    ?context
     ?link
     ?(balance=Nary) (** specify a default for link *)
     ?(category=Logic.Function)
@@ -425,7 +432,9 @@ let symbolf
        Format.pp_print_flush fmt () ;
        let name = Buffer.contents buffer in
        let source = match library with
-         | None -> assert (link = None); Generated name
+         | None ->
+             assert (link = None);
+             generated ?context name
          | Some th ->
              let conv n = function
                | Nary  -> Engine.F_call n
@@ -492,16 +501,16 @@ let extern_fp ~library ?(params=[]) ?link phi =
                          ~debug:phi)
   }
 
-let generated_f ?category ?params ?sort ?result name =
-  symbolf ?category ?params ?sort ?result name
+let generated_f ?context ?category ?params ?sort ?result name =
+  symbolf ?context ?category ?params ?sort ?result name
 
-let generated_p name =
+let generated_p ?context name =
   Model {
     m_category = Logic.Function ;
     m_params = [] ;
     m_result = Logic.Sprop;
     m_typeof = not_found;
-    m_source = Generated name
+    m_source = generated ?context name
   }
 
 module Fun =
@@ -512,26 +521,38 @@ struct
   let debug = function
     | ACSL f -> logic_id f
     | CTOR c -> ctor_id c
-    | Model({m_source=Generated n}) -> n
+    | Model({m_source=Generated(_,n)}) -> n
     | Model({m_source=Extern e})    -> e.ext_debug
 
   let hash = function
     | ACSL f -> Logic_info.hash f
     | CTOR c -> Logic_ctor_info.hash c
-    | Model({m_source=Generated n}) -> Datatype.String.hash n
+    | Model({m_source=Generated(_,n)}) -> Datatype.String.hash n
     | Model({m_source=Extern e})    -> e.ext_id
+
+  let compare_context c1 c2 =
+    match c1 , c2 with
+    | None , None -> 0
+    | None , _ -> (-1)
+    | _ , None -> 1
+    | Some c1 , Some c2 -> WpContext.S.compare c1 c2
+
+  let compare_source s1 s2 =
+    match s1 , s2 with
+    | Generated(m1,f1), Generated(m2,f2) ->
+        let cmp = String.compare f1 f2 in
+        if cmp<>0 then cmp else compare_context m1 m2
+    | Extern f , Extern g ->
+        ext_compare f g
+    | Generated _ , Extern _ -> (-1)
+    | Extern _ , Generated _ -> 1
 
   let compare f g =
     if f==g then 0 else
       match f , g with
-      | Model({m_source=Generated f}), Model({m_source=Generated g})
-        -> String.compare f g
-      | Model({m_source=Generated _}), _ -> (-1)
-      | _, Model({m_source=Generated _}) -> 1
-      | Model({m_source=Extern f}), Model({m_source=Extern g})
-        -> ext_compare f g
-      | Model({m_source=Extern _}), _ -> (-1)
-      | _, Model({m_source=Extern _}) -> 1
+      | Model {m_source=mf} , Model {m_source=mg} -> compare_source mf mg
+      | Model _ , _ -> (-1)
+      | _ , Model _ -> 1
       | ACSL f , ACSL g -> Logic_info.compare f g
       | ACSL _ , _ -> (-1)
       | _ , ACSL _ -> 1
@@ -583,14 +604,14 @@ class virtual idprinting =
     method link = function
       | ACSL f -> Engine.F_call (self#sanitize_fun (logic_id f))
       | CTOR c -> Engine.F_call (self#sanitize_fun (ctor_id c))
-      | Model({m_source=Generated n}) -> Engine.F_call (self#sanitize_fun n)
-      | Model({m_source=Extern e})    -> self#infoprover e.ext_link
+      | Model({m_source=Generated(_,n)}) -> Engine.F_call (self#sanitize_fun n)
+      | Model({m_source=Extern e}) -> self#infoprover e.ext_link
   end
 
 let name_of_lfun = function
   | ACSL f -> logic_id f
   | CTOR c -> ctor_id c
-  | Model({m_source=Generated f}) -> f
+  | Model({m_source=Generated(_,f)}) -> f
   | Model({m_source=Extern e}) -> e.ext_debug
 
 let name_of_field = function
@@ -656,39 +677,6 @@ struct
       QZERO.typeof ~field ~record ~call e
   end
   include QED
-
-  (* -------------------------------------------------------------------------- *)
-  (* --- Term Checking                                                      --- *)
-  (* -------------------------------------------------------------------------- *)
-
-  module Check =
-  struct
-    let refs = Hashtbl.create 8
-    let empty = ref true
-    let register c =
-      let r = ref false in
-      Hashtbl.add refs c r ; r
-
-    let reset () =
-      Hashtbl.iter (fun _ r -> r := false) refs ; empty := true
-
-    let set c =
-      try (Hashtbl.find refs c) := true ; empty := false
-      with Not_found ->
-        Wp_parameters.warning "[Lang] unknown check '%s'" c
-
-    let iter f =
-      QED.iter_checks
-        (fun ~qed ~raw -> f ~qed ~raw ~goal:(QED.check_unit ~qed ~raw))
-
-    let is_set () = !empty
-  end
-
-  let e_imply =
-    let c = Check.register "e_imply" in
-    fun a b ->
-      let r = QED.e_imply a b in
-      if !c then QED.check (Imply(a,b)) r else r
 
   (* -------------------------------------------------------------------------- *)
   (* --- Term Extensions                                                    --- *)
@@ -999,6 +987,7 @@ module For_export = struct
 
   let set_builtin f c =
     add_init (fun () -> QZERO.set_builtin f c)
+
   let set_builtin' f c =
     add_init (fun () -> QZERO.set_builtin' f c)
   let set_builtin_eq f c =

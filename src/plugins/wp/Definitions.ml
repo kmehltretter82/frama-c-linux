@@ -121,7 +121,7 @@ end
 (* --- Registry                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Cluster = Model.Index
+module Cluster = WpContext.Index
     (struct
       type key = string
       type data = cluster
@@ -130,7 +130,7 @@ module Cluster = Model.Index
       let pretty = Format.pp_print_string
     end)
 
-module Symbol = Model.Index
+module Symbol = WpContext.Index
     (struct
       type key = lfun
       type data = dfun
@@ -139,7 +139,7 @@ module Symbol = Model.Index
       let pretty = Lang.Fun.pretty
     end)
 
-module Lemma = Model.Index
+module Lemma = WpContext.Index
     (struct
       type key = string
       type data = dlemma
@@ -178,7 +178,7 @@ let define_type c t =
   end
 
 let parameters f =
-  if Model.is_model_defined () then
+  if WpContext.is_defined () then
     try List.map Lang.F.QED.sort_of_var (Symbol.find f).d_params
     with Not_found -> []
   else []
@@ -212,6 +212,8 @@ let newcluster ~id ?title ?position () =
 let cluster ~id ?title ?position () =
   Cluster.memoize (fun id -> newcluster ~id ?title ?position ()) id
 
+let dummy () = cluster ~id:"dummy" ()
+
 let axiomatic ax =
   Cluster.memoize
     (fun id ->
@@ -244,8 +246,7 @@ let matrix = function
   | C_array _ -> assert false
   | C_comp c -> compinfo c
   | C_int _ | C_float _ | C_pointer _ ->
-      Cluster.memoize
-        (fun id -> newcluster ~id ~title:"Basic Arrays" ()) "Matrix"
+      cluster ~id:"Matrix" ~title:"Basic Arrays" ()
 
 let call_fun ~result lfun cc es =
   Symbol.compile (Lang.local cc) lfun ;

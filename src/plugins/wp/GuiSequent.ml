@@ -714,7 +714,6 @@ class focused (wtext : Wtext.text) =
     method goal w fmt =
       let open Wpo in
       match w.po_formula with
-      | GoalCheck _ -> Wpo.pp_goal fmt w
       | GoalLemma _ ->
           Format.fprintf fmt "@\n@{<wp:clause>Lemma@} %a:@\n" Wpo.pp_title w ;
           let _,sequent = Wpo.compute w in

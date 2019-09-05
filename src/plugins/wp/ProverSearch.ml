@@ -44,8 +44,8 @@ let fork tree anchor strategy =
     ~pool:(ProofEngine.pool tree)
     ~title:strategy.tactical#title in
   try
-    let model = ProofEngine.node_model anchor in
-    match Model.with_model model (configure console) strategy with
+    let context = ProofEngine.node_context anchor in
+    match WpContext.on_context context (configure console) strategy with
     | None -> None
     | Some (script,process) ->
         Some (ProofEngine.fork tree ~anchor script process)
@@ -91,8 +91,8 @@ let search tree ?anchor ?sequent heuristics =
     match sequent with
     | Some s -> s | None -> snd (Wpo.compute (ProofEngine.goal anchor)) in
   let lookup h = try h#search pool#add sequent with Not_found -> () in
-  Model.with_model
-    (ProofEngine.node_model anchor)
+  WpContext.on_context
+    (ProofEngine.node_context anchor)
     (List.iter lookup) heuristics ;
   first tree ~anchor pool#sort
 

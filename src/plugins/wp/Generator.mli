@@ -26,8 +26,8 @@
 
 class type computer =
   object
-    method model : Model.t
     method lemma : bool
+    method model : WpContext.model
     method add_strategy : WpStrategy.strategy -> unit
     method add_lemma : LogicUsage.logic_lemma -> unit
     method compute : Wpo.t Bag.t

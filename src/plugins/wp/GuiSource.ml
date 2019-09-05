@@ -97,7 +97,7 @@ class popup () =
       let setup = Factory.parse (Wp_parameters.Model.get ()) in
       let driver = Driver.load_driver () in
       let model = Factory.instance setup driver in
-      WpRTE.generate kf model
+      WpRTE.generate model kf
 
     method private rte_option
         (menu : GMenu.menu GMenu.factory)
@@ -209,7 +209,6 @@ class highlighter (main:Design.main_window_extension_points) =
           | Some { Wpo.po_pid = pid ; Wpo.po_formula = f } ->
               begin
                 match f with
-                | GoalCheck _ -> ()
                 | GoalLemma l ->
                     deps <- lemmas l.VC_Lemma.depends
                 | GoalAnnot a ->

@@ -68,7 +68,7 @@ let computer () =
 (* --- Memory Model Hypotheses                                          --- *)
 (* ------------------------------------------------------------------------ *)
 
-module Models = Model.S.Set
+module Models = Set.Make(WpContext.MODEL)
 module Fmap = Kernel_function.Map
 
 let wp_iter_model ?ip ?index job =
@@ -91,7 +91,7 @@ let wp_print_memory_context kf m hyp fmt =
     let printer = new Printer.extensible_printer () in
     let pp_vdecl = printer#without_annot printer#vdecl in
     Format.fprintf fmt
-      "@[<hv 0>@[<hv 3>/*@@@ behavior %s:" (Model.get_id m) ;
+      "@[<hv 0>@[<hv 3>/*@@@ behavior %s:" (WpContext.MODEL.id m) ;
     List.iter (MemoryContext.pp_clause fmt) hyp ;
     let vkf = Kernel_function.get_vi kf in
     Format.fprintf fmt "@ @]*/@]@\n@[<hov 2>%a;@]@\n"
@@ -102,7 +102,7 @@ let wp_warn_memory_context () =
   begin
     wp_iter_model
       begin fun kf m ->
-        let hyp = Model.get_hypotheses m kf in
+        let hyp = WpContext.compute_hypotheses m kf in
         if hyp <> [] then
           Wp_parameters.warning
             ~current:false
@@ -364,9 +364,8 @@ let do_wpo_success goal s =
                   end
           end
     | Some prover ->
-        if not (Wpo.is_check goal) then
-          Wp_parameters.feedback ~ontty:`Silent
-            "[%a] Goal %s : Valid" VCS.pp_prover prover (Wpo.get_gid goal)
+        Wp_parameters.feedback ~ontty:`Silent
+          "[%a] Goal %s : Valid" VCS.pp_prover prover (Wpo.get_gid goal)
 
 let do_report_time fmt s =
   begin

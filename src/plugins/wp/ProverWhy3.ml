@@ -35,7 +35,7 @@ let option_import = LogicBuiltins.create_option
 
 let config = VCS.why3_config
 
-module Env = Model.Index(struct
+module Env = WpContext.Index(struct
     include Datatype.Unit
     type key = unit
     type data = Why3.Env.env
@@ -46,7 +46,7 @@ let get_why3_env =
       let config = Lazy.force config in
       let main = Why3.Whyconf.get_main config in
       let ld =
-        (Model.directory ())::
+        (WpContext.directory ())::
         (Wp_parameters.Share.file "why3")::
         (Why3.Whyconf.loadpath main) in
       Why3.Env.create_env ld
@@ -164,7 +164,7 @@ let lfun_name (lfun:Lang.lfun) =
   match lfun with
   | ACSL f -> Qed.Engine.F_call (Lang.logic_id f)
   | CTOR c -> Qed.Engine.F_call (Lang.ctor_id c)
-  | Model({m_source=Generated n}) -> Qed.Engine.F_call n
+  | Model({m_source=Generated(_,n)}) -> Qed.Engine.F_call n
   | Model({m_source=Extern e}) -> e.Lang.ext_link.Lang.why3
 
 
@@ -604,7 +604,7 @@ let mk_binders cnv l =
 
 (** visit definitions and add them in the task *)
 
-module CLUSTERS = Model.Index
+module CLUSTERS = WpContext.Index
     (struct
       type key = Definitions.cluster
       type data = int * Why3.Theory.theory
@@ -629,12 +629,12 @@ class visitor (ctx:context) c =
     (* --- Files, Theories and Clusters --- *)
 
     method add_builtin_lib =
-      self#add_import2 ["bool"] "Bool" ;
-      self#add_import2 ["int"] "Int" ;
-      self#add_import2 ["int"] "ComputerDivision" ;
-      self#add_import2 ["real"] "RealInfix" ;
+      self#add_import_file ["bool"] "Bool" ;
+      self#add_import_file ["int"] "Int" ;
+      self#add_import_file ["int"] "ComputerDivision" ;
+      self#add_import_file ["real"] "RealInfix" ;
       self#on_library "qed";
-      self#add_import2 ["map"] "Map"
+      self#add_import_file ["map"] "Map"
 
     method on_cluster c =
       let name = Definitions.cluster_id c in
@@ -652,8 +652,8 @@ class visitor (ctx:context) c =
             Log.print_on_output
               begin fun fmt ->
                 Format.fprintf fmt "---------------------------------------------@\n" ;
-                Format.fprintf fmt "--- Model '%s' Cluster '%s' @\n"
-                  (Model.get_id (Model.get_model ())) name;
+                Format.fprintf fmt "--- Context '%s' Cluster '%s' @\n"
+                  (WpContext.get_context () |> WpContext.S.id) name;
                 Format.fprintf fmt "---------------------------------------------@\n" ;
                 Why3.Pretty.print_theory fmt th;
               end ;
@@ -677,15 +677,15 @@ class visitor (ctx:context) c =
       | [] -> Wp_parameters.fatal "empty import option"
       | l ->
           let file, thy = Why3.Lists.chop_last l in
-          self#add_import4 file thy (Why3.Opt.get_def thy was) ~import:true
+          self#add_import_use file thy (Why3.Opt.get_def thy was) ~import:true
 
-    method add_import2 file thy =
-      self#add_import4 file thy thy ~import:true
+    method add_import_file file thy =
+      self#add_import_use ~import:true file thy thy
 
-    method add_import3 file thy name =
-      self#add_import4 file thy name ~import:false
+    method add_import_file_as file thy name =
+      self#add_import_use ~import:false file thy name
 
-    method add_import4 ~import file thy name =
+    method add_import_use ~import file thy name =
       Wp_parameters.debug ~dkey:dkey_api
         "@[use@ %s@ @[%a.%s@]@ as@ %s@]"
         (if import then "import" else "")
@@ -703,7 +703,7 @@ class visitor (ctx:context) c =
         if Filepath.normalize (Filename.dirname source) <>
            Filepath.normalize (Wp_parameters.Share.dir ())
         then
-          let tgtdir = Model.directory () in
+          let tgtdir = WpContext.directory () in
           let why3src = Filename.basename source in
           let target = Printf.sprintf "%s/%s" tgtdir why3src in
           Command.copy source target
@@ -713,14 +713,14 @@ class visitor (ctx:context) c =
         | [file] ->
             let filenoext = filenoext file in
             copy_file file;
-            self#add_import2 [filenoext]
+            self#add_import_file [filenoext]
               (String.capitalize_ascii filenoext);
         | [file;lib] ->
             copy_file file;
-            self#add_import2 [filenoext file] lib;
+            self#add_import_file [filenoext file] lib;
         | [file;lib;name] ->
             copy_file file;
-            self#add_import3 [filenoext file] lib name;
+            self#add_import_file_as [filenoext file] lib name;
         | _ -> Wp_parameters.failure ~current:false
                  "Driver: why3.file %S not recognized (theory %s)"
                  opt thy
@@ -841,6 +841,7 @@ class visitor (ctx:context) c =
       end
 
     method on_dfun d =
+      Wp_parameters.debug ~dkey:dkey_api "Define %a@." Lang.Fun.pretty d.d_lfun ;
       let cnv = empty_cnv ctx in
       List.iter (Lang.F.add_var cnv.pool) d.d_params;
       begin
@@ -944,12 +945,19 @@ let why3_of_qed ~id ~title ~name ?axioms t =
   let goal = Definitions.cluster ~id ~title () in
   let ctx = empty_context name in
   let v = new visitor ctx goal in
+  Wp_parameters.debug ~dkey:dkey_api "%t"
+    begin fun fmt ->
+      Format.fprintf fmt "---------------------------------------------@\n" ;
+      Format.fprintf fmt "EXPORT GOAL %s@." id ;
+      Format.fprintf fmt "PROP @[<hov 2>%a@]@." Lang.F.pp_pred t ;
+      Format.fprintf fmt "---------------------------------------------@\n" ;
+    end ;
   v#add_builtin_lib;
   v#vgoal axioms t;
   let cnv = empty_cnv ~in_goal:true ~polarity:`Positive ctx in
   let t = convert cnv Prop (Lang.F.e_prop t) in
   let decl = Why3.Decl.create_prop_decl Pgoal goal_id t in
-  let th =   Why3.Theory.close_theory ctx.th in
+  let th = Why3.Theory.close_theory ctx.th in
   if Wp_parameters.has_print_generated () then begin
     let th_uc_tmp = Why3.Theory.add_decl ~warn:false ctx.th decl in
     let th_tmp    = Why3.Theory.close_theory th_uc_tmp in
@@ -983,10 +991,6 @@ let task_of_wpo wpo =
       let depends = v.Wpo.VC_Lemma.depends in
       let prop = Lang.F.p_forall lemma.l_forall lemma.l_lemma in
       let axioms = Some(lemma.l_cluster,depends) in
-      prove_prop ~pid ~prop ?axioms
-  | Wpo.GoalCheck v ->
-      let prop = v.Wpo.VC_Check.goal in
-      let axioms = None in
       prove_prop ~pid ~prop ?axioms
 
 let altergo_step_limit = Str.regexp "^Steps limit reached:"
@@ -1076,7 +1080,7 @@ let prove ?timeout ?steplimit ~prover wpo =
         else Task.return VCS.no_result
       else call_prover ~timeout ~steplimit prover task wpo
     in
-    Model.with_model wpo.Wpo.po_model do_ ()
+    WpContext.on_context (Wpo.get_context wpo) do_ ()
   with exn ->
     let bt = Printexc.get_raw_backtrace () in
     Wp_parameters.fatal "Error in why3:%a@.%s@."
