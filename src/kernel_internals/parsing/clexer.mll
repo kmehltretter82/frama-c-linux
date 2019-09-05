@@ -847,7 +847,7 @@ and might_end_ghost_annot = parse
           make_annot ~one_line:false initial lexbuf s }
   | "" { Buffer.add_char buf !annot_char; annot_token lexbuf }
 and annot_one_line = parse
-  | "ghost" "else" {
+  | "ghost" blank+ "else" {
       if is_oneline_ghost () then E.parse_error "nested ghost code";
       enter_oneline_ghost (); LGHOST_ELSE (currentLoc ())
   }
