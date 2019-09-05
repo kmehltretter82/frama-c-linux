@@ -915,7 +915,7 @@ else_part:
 |   ELSE annotated_statement
     { in_block $2 }
 |   LGHOST_ELSE annotated_statement RGHOST
-    { in_ghost_block ~battrs:[ ("ghost_else" , []) ] $2 }
+    { in_ghost_block ~battrs:[ (Cil.frama_c_ghost_else , []) ] $2 }
     %prec GHOST_ELSE_NO_ELSE /* To force the non ghost else to be attached to the current if */
 |   LGHOST_ELSE annotated_statement RGHOST ELSE annotated_statement
     {

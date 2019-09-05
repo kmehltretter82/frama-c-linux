@@ -84,8 +84,8 @@ let adjust_assigns_clause loc var code_annot =
           if not (contains_var l) then begin
             let (changed, a) = List.fold_left adjust_lval (false,l) l in
             let a =
-              if changed then a 
-              else 
+              if changed then a
+              else
                 (Logic_const.new_identified_term (Logic_const.tvar ~loc var),
                  FromAny)
                 :: a

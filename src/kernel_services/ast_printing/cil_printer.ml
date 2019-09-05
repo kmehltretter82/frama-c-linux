@@ -78,6 +78,7 @@ let register_shallow_attribute s =
 let () = register_shallow_attribute Cil.frama_c_ghost_formal
 let () = register_shallow_attribute Cil.frama_c_mutable
 let () = register_shallow_attribute Cil.frama_c_init_obj
+let () = register_shallow_attribute Cil.frama_c_ghost_else
 
 let keep_attr = function
   | Attr _ as a -> not (List.mem (Cil.attributeName a) !reserved_attributes)
@@ -1306,7 +1307,7 @@ class cil_printer () = object (self)
   val mutable lastLineNumber = -1
 
   method private is_ghost_else b =
-    Cil.hasAttribute "ghost_else" b.battrs
+    Cil.hasAttribute Cil.frama_c_ghost_else b.battrs
 
   (* Make sure that you only call self#line_directive on an empty line *)
   method line_directive ?(forcefile=false) fmt l =
@@ -1459,7 +1460,6 @@ class cil_printer () = object (self)
         (self#unboxed_block Then_with_else) t;
       if else_at_newline then fprintf fmt "@\n" else fprintf fmt "@ ";
       let do_print () =
-        let e = { e with battrs = Cil.dropAttribute "ghost_else" e.battrs } in
         fprintf fmt "%a %a"
           self#pp_keyword "else"
           (self#unboxed_block Other) e;

@@ -583,6 +583,11 @@ let () = registerAttribute frama_c_init_obj (AttrName false)
 let () =
   registerAttribute (Extlib.strip_underscore frama_c_init_obj) (AttrName false)
 
+let frama_c_ghost_else = "__fc_ghost_else"
+let () = registerAttribute frama_c_ghost_else (AttrName false)
+let () =
+  registerAttribute (Extlib.strip_underscore frama_c_ghost_else) (AttrName false)
+
 let unrollType (t: typ) : typ =
   let rec withAttrs (al: attributes) (t: typ) : typ =
     match t with

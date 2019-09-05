@@ -21,15 +21,13 @@ void normal_if_else_intricated(int x, int y)
 
 void if_ghost_else_one_line(int x, int y)
 {
-  if (x) x ++;
-  /*@ ghost else y ++;*/
+  if (x) x ++; /*@ ghost else y ++;*/
   return;
 }
 
 void if_ghost_else_block(int x, int y)
 {
-  if (x) x ++;
-  /*@ ghost else y ++;*/
+  if (x) x ++; /*@ ghost else y ++;*/
   return;
 }
 
@@ -46,24 +44,21 @@ void if_ghost_else_multi_line_block(int x, int y)
 
 void if_ghost_else_block_comments(int x, int y)
 {
-  if (x) x ++;
-  /*@ ghost else y ++;*/
+  if (x) x ++; /*@ ghost else y ++;*/
   return;
 }
 
 void normal_if_ghost_else_intricated(int x, int y)
 {
   if (x) 
-    if (x) x ++;
-    /*@ ghost else y ++;*/
+    if (x) x ++; /*@ ghost else y ++;*/
   return;
 }
 
 void ghost_else_plus_else_association(int x, int y)
 {
   if (x) {
-    if (x) x ++;
-    /*@ ghost else y --;*/
+    if (x) x ++; /*@ ghost else y --;*/
   }
   else x ++;
   return;

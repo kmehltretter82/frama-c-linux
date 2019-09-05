@@ -1229,6 +1229,12 @@ val frama_c_mutable: string
  *)
 val frama_c_init_obj: string
 
+(** A block marked with this attribute is known to be a ghost else.
+
+    @since 19.0-Potassium+dev
+*)
+val frama_c_ghost_else: string
+
 (** [true] if the given lval is allowed to be assigned to thanks to
     a [frama_c_init_obj] or a [frama_c_mutable] attribute.
 *)
