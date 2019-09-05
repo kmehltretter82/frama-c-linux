@@ -59,4 +59,14 @@ void normal_if_ghost_else_intricated(int x, int y)
   return;
 }
 
+void ghost_else_plus_else_association(int x, int y)
+{
+  if (x) {
+    if (x) x ++;
+    /*@ ghost else y --;*/
+  }
+  else x ++;
+  return;
+}
+
 

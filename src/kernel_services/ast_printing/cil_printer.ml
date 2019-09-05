@@ -1243,6 +1243,7 @@ class cil_printer () = object (self)
     | _ -> false
 
   method private block_has_dangling_else blk = match blk.bstmts with
+    | [ { skind = If(_, _, e, _) }] when self#is_ghost_else e -> true
     | [ { skind = If(_, { bstmts=[]; battrs=[] }, _, _)
                 | If(_, {bstmts=[{skind=Goto _; labels=[]}]; battrs=[]}, _, _)
                 | If(_, _, { bstmts=[]; battrs=[] }, _)

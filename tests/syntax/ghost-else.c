@@ -70,6 +70,15 @@ void normal_if_ghost_else_intricated(int x, int y) {
     //@ ghost else y++;
 }
 
+void ghost_else_plus_else_association(int x, int y){
+  // we must take care to keep the "if" bloc when pretty-printing
+  // as removing the brackets changes the program.
+  if (x){
+    if (x) x++ ;
+    //@ ghost else y-- ;
+  } else x ++ ;
+}
+
 #ifdef ERROR_LOC_WITH_COMMENTS // Must check that the line indicated for undeclared "z" is correct
 
 void if_ghost_else_block_comments_then_error(int x, int y) {

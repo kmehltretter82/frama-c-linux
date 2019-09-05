@@ -1,14 +1,14 @@
 [kernel] Parsing tests/syntax/ghost-else.c (with preprocessing)
-[kernel] tests/syntax/ghost-else.c:112: 
+[kernel] tests/syntax/ghost-else.c:121: 
   syntax error:
-  Location: between lines 112 and 114, before or at token: else
-  110     if(x){
-  111       x++ ;
+  Location: between lines 121 and 123, before or at token: else
+  119     if(x){
+  120       x++ ;
   
-  112     } /*@ ghost
-  113       //@ ensures \true ;
-  114       else {
+  121     } /*@ ghost
+  122       //@ ensures \true ;
+  123       else {
   
-  115         y++ ;
-  116       }
+  124         y++ ;
+  125       }
 [kernel] Frama-C aborted: invalid user input.
