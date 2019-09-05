@@ -1,0 +1,76 @@
+/* run.config
+   OPT: -no-autoload-plugins -print
+*/
+
+void normal_only_if(int x, int y) {
+  if (x) {
+    x++;
+  }
+}
+
+void normal_if_else(int x, int y) {
+  if (x) {
+    x++;
+  } else {
+    y++;
+  }
+}
+
+void normal_if_else_intricated(int x, int y) {
+  if (x)
+    if (y)
+      y++;
+    else
+      x++;
+}
+
+void if_ghost_else_one_line(int x, int y) {
+  if (x) {
+    x++;
+  } //@ ghost else y ++ ;
+}
+
+void if_ghost_else_block(int x, int y) {
+  if (x) {
+    x++;
+  } /*@ ghost else {
+    y ++ ;
+  } */
+}
+
+void if_ghost_else_multi_line_block(int x, int y) {
+  if (x) {
+    x++;
+  } /*@ ghost else {
+    y ++ ;
+    y += x;
+    -- y ;
+  } */
+}
+
+void if_ghost_else_block_comments(int x, int y) {
+  if (x) {
+    x++;
+  } /*@ ghost
+    // comment 1
+    // comment 2
+  else {
+    y ++ ;
+  } */
+}
+
+void normal_if_ghost_else_intricated(int x, int y) {
+  if (x)
+    if (x)
+      x++;
+    //@ ghost else y++;
+}
+
+void ghost_else_plus_else_association(int x, int y){
+  // we must take care to keep the "if" bloc when pretty-printing
+  // as removing the brackets changes the program.
+  if (x){
+    if (x) x++ ;
+    //@ ghost else y-- ;
+  } else x ++ ;
+}
