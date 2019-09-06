@@ -123,15 +123,13 @@ module Shape(Key: Id_Datatype) = struct
       *)
 
   let compare =
-      if Key.compare == Datatype.undefined
-      then (
-        Cmdline.Kernel_log.debug
-          "%s shape, missing comparison function: %b"
-          (Type.name Key.ty)
-            (Key.compare == Datatype.undefined);
-          Datatype.undefined
-        )
-      else compare_v
+    if Key.compare == Datatype.undefined
+    then begin
+      Cmdline.Kernel_log.debug
+        "%s shape, missing comparison function" (Type.name Key.ty);
+      Datatype.undefined
+    end
+    else compare_v
 
   let rec iter f htr =
     match htr with
@@ -199,17 +197,14 @@ struct
           prefix mask  pretty_debug t1 pretty_debug t2
 
     let compare =
-      if Key.compare == Datatype.undefined ||
-        V.compare == Datatype.undefined 
-      then (
+      if V.compare == Datatype.undefined
+      then begin
         Cmdline.Kernel_log.debug
-          "(%s, %s) ptmap, missing comparison function: %b %b"
-            (Type.name Key.ty) (Type.name V.ty)
-            (Key.compare == Datatype.undefined)
-            (V.compare == Datatype.undefined);
-          Datatype.undefined
-        )
-      else Shape.compare_v V.compare
+          "(%s, %s) ptmap, missing comparison function"
+          (Type.name Key.ty) (Type.name V.ty);
+        Datatype.undefined
+      end
+      else Shape.compare V.compare
 
     let compositional_bool t = 
       match t with
@@ -231,11 +226,7 @@ struct
 
     let iter = Shape.iter
 
-    let pretty fmt tree =
-      Pretty_utils.pp_iter2
-        ~pre:"@[<v 3>{[ " ~suf:" ]}@]" ~sep:"@ " ~between:" -> "
-        iter Key.pretty (fun fmt v -> Format.fprintf fmt "@[%a@]" V.pretty v)
-        fmt tree
+    let pretty = Shape.pretty V.pretty
 
     let empty = Empty
 
@@ -831,6 +822,9 @@ struct
           else if tree1' == Empty then tree0'
           else wrap_Branch p m tree0' tree1'
 
+    (** [endo_map] is similar to [map], but attempts to physically share its
+        result with its input. This saves memory when [f] is the identity
+        function. *)
     let rec endo_map f tree =
       match tree with
       | Empty ->
