@@ -233,6 +233,13 @@ module SignDomain = Domain_Parameter
       let default = false
     end)
 
+module TracesDomain = Domain_Parameter
+    (struct
+      let option_name = "-eva-traces-domain"
+      let help = "Use a domain to record traces of Eva. Experimental."
+      let default = false
+    end)
+
 module PrinterDomain = Domain_Parameter
     (struct
       let option_name = "-eva-printer-domain"
@@ -275,28 +282,6 @@ module EqualityCallFunction =
     end)
 let () = add_precision_dep EqualityCallFunction.parameter
 
-module TracesDomain = Domain_Parameter
-    (struct
-      let option_name = "-eva-traces-domain"
-      let help = "Use a domain to record traces of Eva. Experimental."
-      let default = false
-    end)
-
-module TracesUnrollLoop = Domain_Parameter
-    (struct
-      let option_name = "-eva-traces-unroll-loop"
-      let help = "Specify if the traces domain should unroll the loops."
-      let default = true
-    end)
-
-module TracesUnifyLoop = Domain_Parameter
-    (struct
-      let option_name = "-eva-traces-unify-loop"
-      let help = "Specify if all the instances of a loop should try to share theirs traces."
-      let default = false
-    end)
-
-
 let () = Parameter_customize.set_group domains
 module Numerors_Real_Size =
   Int
@@ -329,15 +314,25 @@ let () =
 let () = add_precision_dep Numerors_Mode.parameter
 
 let () = Parameter_customize.set_group domains
-module TracesStorage =
+module TracesUnrollLoop =
   Bool
     (struct
-      let option_name = "-eva-traces-storage"
-      let help = "Stores the states of the traces domain during the \
-                  analysis."
+      let option_name = "-eva-traces-unroll-loop"
+      let help = "Specify if the traces domain should unroll the loops."
       let default = true
     end)
-let () = add_precision_dep TracesStorage.parameter
+let () = add_precision_dep TracesUnrollLoop.parameter
+
+let () = Parameter_customize.set_group domains
+module TracesUnifyLoop =
+  Bool
+    (struct
+      let option_name = "-eva-traces-unify-loop"
+      let help = "Specify if all the instances of a loop should try \
+                  to share theirs traces."
+      let default = false
+    end)
+let () = add_precision_dep TracesUnifyLoop.parameter
 
 let () = Parameter_customize.set_group domains
 module TracesDot = Empty_string
@@ -347,7 +342,6 @@ module TracesDot = Empty_string
       let arg_name = "FILENAME"
     end)
 
-
 let () = Parameter_customize.set_group domains
 module TracesProject = Bool
     (struct
@@ -355,8 +349,6 @@ module TracesProject = Bool
       let help = "Try to convert the Cfg into a program in a new project."
       let default = false
     end)
-let () = add_precision_dep TracesProject.parameter
-
 
 (* -------------------------------------------------------------------------- *)
 (* --- Performance options                                                --- *)
