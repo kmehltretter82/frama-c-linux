@@ -20,12 +20,22 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val add_specific_equality:
-  for_tau:(Lang.tau -> bool) ->
-  mk_new_eq:Lang.F.binop ->
-  unit
-(** Equality used in the goal, simpler to prove than polymorphic equality *)
+val version : string
+val config : unit -> Why3.Whyconf.config
+val configure : unit -> unit
 
-val prove : ?timeout:int -> ?steplimit:int -> prover:Why3Provers.t ->
-  Wpo.t -> VCS.result Task.task
-(** Return NoResult if it is already proved by Qed *)
+type t = Why3.Whyconf.prover
+
+val find_opt : string -> t option
+val find : ?donotfail:unit -> string -> t
+
+val print : t -> string
+val title : t -> string
+val compare : t -> t -> int
+
+val provers : unit -> t list
+val provers_set : unit -> Why3.Whyconf.Sprover.t
+val is_available : t -> bool
+val has_shortcut : t -> string -> bool
+
+(**************************************************************************)

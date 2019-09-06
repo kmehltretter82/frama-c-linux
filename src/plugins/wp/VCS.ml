@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (* -------------------------------------------------------------------------- *)
-(* --- Provers                                                            --- *)
+(* --- Prover Results                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
 let dkey_no_time_info = Wp_parameters.register_category "no-time-info"
@@ -29,72 +29,8 @@ let dkey_no_step_info = Wp_parameters.register_category "no-step-info"
 let dkey_no_goals_info = Wp_parameters.register_category "no-goals-info"
 let dkey_success_only = Wp_parameters.register_category "success-only"
 
-let why3_config =
-  lazy begin
-    try
-      Why3.Whyconf.read_config None
-    with exn ->
-      Wp_parameters.abort "%a" Why3.Exn_printer.exn_printer exn
-  end
-
-module Why3_prover = struct
-  type t = Why3.Whyconf.prover
-
-  let find_opt   : string -> t option = fun s ->
-    try
-      let config = Lazy.force why3_config in
-      let filter = Why3.Whyconf.parse_filter_prover s in
-      let filter = Why3.Whyconf.filter_prover_with_shortcut config filter in
-      Some ((Why3.Whyconf.filter_one_prover config filter).Why3.Whyconf.prover)
-    with
-    | (Why3.Whyconf.ProverNotFound _ | Why3.Whyconf.ParseFilterProver _ | Why3.Whyconf.ProverAmbiguity _ ) ->
-        None
-
-  let find   : ?donotfail:unit -> string -> t = fun ?donotfail s ->
-    try
-      try
-        let config = Lazy.force why3_config in
-        let filter = Why3.Whyconf.parse_filter_prover s in
-        let filter = Why3.Whyconf.filter_prover_with_shortcut config filter in
-        (Why3.Whyconf.filter_one_prover config filter).Why3.Whyconf.prover
-      with
-      | Why3.Whyconf.ProverNotFound _ as exn when donotfail <> None ->
-          Wp_parameters.warning ~once:true "%a" Why3.Exn_printer.exn_printer exn;
-          (** from Why3.Whyconf.parse_filter_prover *)
-          let sl = Why3.Strings.rev_split ',' s in
-          (* reverse order *)
-          let prover_name, prover_version, prover_altern =
-            match sl with
-            | [name] -> name,"",""
-            | [version;name] -> name,version,""
-            | [altern;version;name] -> name,version,altern
-            | _ -> raise (Why3.Whyconf.ParseFilterProver s) in
-          { Why3.Whyconf.prover_name; Why3.Whyconf.prover_version; Why3.Whyconf.prover_altern }
-    with
-    | (Why3.Whyconf.ProverNotFound _ | Why3.Whyconf.ParseFilterProver _ | Why3.Whyconf.ProverAmbiguity _ ) as exn ->
-        Wp_parameters.abort "%a" Why3.Exn_printer.exn_printer exn
-
-  let print   : t -> string = Why3.Whyconf.prover_parseable_format
-  let title   : t -> string = fun p -> Pretty_utils.sfprintf "%a" Why3.Whyconf.print_prover p
-  let compare : t -> t -> int = Why3.Whyconf.Prover.compare
-  let get_config () : Why3.Whyconf.config = (Lazy.force why3_config)
-  let provers () : t list =
-    Why3.Whyconf.Mprover.keys (Why3.Whyconf.get_provers (get_config ()))
-  let provers_set () : Why3.Whyconf.Sprover.t =
-    Why3.Whyconf.Mprover.domain (Why3.Whyconf.get_provers (get_config ()))
-  let is_available p =
-    Why3.Whyconf.Mprover.mem p (Why3.Whyconf.get_provers (get_config ()))
-
-  let has_shortcut p s =
-    match Why3.Wstdlib.Mstr.find_opt s
-            (Why3.Whyconf.get_prover_shortcuts (get_config ())) with
-    | None -> false
-    | Some p' -> Why3.Whyconf.Prover.equal p p'
-
-end
-
 type prover =
-  | Why3 of Why3_prover.t (* Prover via WHY *)
+  | Why3 of Why3Provers.t (* Prover via WHY *)
   | NativeAltErgo (* Direct Alt-Ergo *)
   | NativeCoq     (* Direct Coq and Coqide *)
   | Qed           (* Qed Solver *)
@@ -114,7 +50,7 @@ let prover_of_name = function
   | "" | "none" -> None
   | "qed" | "Qed" -> Some Qed
   | "coq" | "coqide" -> Some NativeCoq
-  | "alt-ergo" | "altgr-ergo" -> Some (Why3 (Why3_prover.find "alt-ergo"))
+  | "alt-ergo" | "altgr-ergo" -> Some (Why3 (Why3Provers.find "alt-ergo"))
   | "native:alt-ergo" | "native:altgr-ergo" -> Some NativeAltErgo
   | "native:coq" | "native:coqide" -> Some NativeCoq
   | "script" -> Some Tactical
@@ -125,18 +61,18 @@ let prover_of_name = function
   | s ->
       match Extlib.string_del_prefix "why3:" s with
       | Some "" -> None
-      | Some s' -> Some (Why3 (Why3_prover.find s'))
-      | None -> Some (Why3 (Why3_prover.find s))
+      | Some s' -> Some (Why3 (Why3Provers.find s'))
+      | None -> Some (Why3 (Why3Provers.find s))
 
 let name_of_prover = function
-  | Why3 s -> "why3:" ^ (Why3_prover.print s)
+  | Why3 s -> "why3:" ^ (Why3Provers.print s)
   | NativeAltErgo -> "alt-ergo"
   | NativeCoq -> "coq"
   | Qed -> "qed"
   | Tactical -> "script"
 
 let title_of_prover = function
-  | Why3 s -> (Why3_prover.title s)
+  | Why3 s -> (Why3Provers.title s)
   | NativeAltErgo -> "Alt-Ergo"
   | NativeCoq -> "Coq"
   | Qed -> "Qed"
@@ -162,7 +98,7 @@ let sanitize_why3 s =
   Buffer.contents buffer
 
 let filename_for_prover = function
-  | Why3 s -> sanitize_why3 (Why3_prover.print s)
+  | Why3 s -> sanitize_why3 (Why3Provers.print s)
   | NativeAltErgo -> "Alt-Ergo"
   | NativeCoq -> "Coq"
   | Qed -> "Qed"
@@ -203,16 +139,16 @@ let cmp_prover p q =
   | NativeCoq , NativeCoq -> 0
   | NativeCoq , _ -> (-1)
   | _ , NativeCoq -> 1
-  | Why3 p , Why3 q -> Why3_prover.compare p q
+  | Why3 p , Why3 q -> Why3Provers.compare p q
 
 let pp_prover fmt = function
   | NativeAltErgo -> Format.pp_print_string fmt "Alt-Ergo (Native)"
   | NativeCoq -> Format.pp_print_string fmt "Coq (Native)"
   | Why3 smt ->
       if Wp_parameters.debug_atleast 1 then
-        Format.fprintf fmt "Why:%s" (Why3_prover.print smt)
+        Format.fprintf fmt "Why:%s" (Why3Provers.print smt)
       else
-        Format.pp_print_string fmt (Why3_prover.title smt)
+        Format.pp_print_string fmt (Why3Provers.title smt)
   | Qed -> Format.fprintf fmt "Qed"
   | Tactical -> Format.pp_print_string fmt "Tactical"
 

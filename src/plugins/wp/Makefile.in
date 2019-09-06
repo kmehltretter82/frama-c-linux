@@ -62,6 +62,7 @@ PLUGIN_CMO:= \
 	rformat wprop \
 	wp_parameters wp_error \
 	dyncall ctypes clabels \
+	Why3Provers \
 	Context Warning MemoryContext wpContext \
 	LogicUsage RefUsage \
 	cil2cfg normAtLabels wpPropId mcfg \

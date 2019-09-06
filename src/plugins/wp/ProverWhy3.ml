@@ -33,8 +33,6 @@ let option_import = LogicBuiltins.create_option
     (fun ~driver_dir:_ x -> x)
     "why3" "import"
 
-let config = VCS.why3_config
-
 module Env = WpContext.Index(struct
     include Datatype.Unit
     type key = unit
@@ -43,7 +41,7 @@ module Env = WpContext.Index(struct
 
 let get_why3_env = Env.memoize
     begin fun () ->
-      let config = Lazy.force config in
+      let config = Why3Provers.config () in
       let main = Why3.Whyconf.get_main config in
       let ld =
         (WpContext.directory ())::
@@ -70,6 +68,9 @@ type convert = {
 (** The reason for the rebuild *)
 let specific_equalities: Lang.For_export.specific_equality list ref =
   ref [Vlist.specialize_eq_list]
+
+let add_specific_equality ~for_tau ~mk_new_eq =
+  specific_equalities := { for_tau; mk_new_eq }::!specific_equalities
 
 (** get symbols *)
 
@@ -937,10 +938,13 @@ class visitor (ctx:context) c =
 
   end
 
+(* -------------------------------------------------------------------------- *)
+(* --- Goal Compilation                                                   --- *)
+(* -------------------------------------------------------------------------- *)
 
 let goal_id = (Why3.Decl.create_prsymbol (Why3.Ident.id_fresh "wp_goal"))
 
-let why3_of_qed ~id ~title ~name ?axioms t =
+let prove_goal ~id ~title ~name ?axioms t =
   (* Format.printf "why3_of_qed start@."; *)
   let goal = Definitions.cluster ~id ~title () in
   let ctx = empty_context name in
@@ -961,17 +965,16 @@ let why3_of_qed ~id ~title ~name ?axioms t =
   if Wp_parameters.has_print_generated () then begin
     let th_uc_tmp = Why3.Theory.add_decl ~warn:false ctx.th decl in
     let th_tmp    = Why3.Theory.close_theory th_uc_tmp in
-    Wp_parameters.debug ~dkey:Wp_parameters.cat_print_generated "%a" Why3.Pretty.print_theory th_tmp
+    Wp_parameters.debug ~dkey:Wp_parameters.cat_print_generated "%a"
+      Why3.Pretty.print_theory th_tmp
   end;
   th, decl
-
-(** Prover call *)
 
 let prove_prop ?axioms ~pid ~prop =
   let id = WpPropId.get_propid pid in
   let title = Pretty_utils.to_string WpPropId.pretty pid in
   let name = "WP" in
-  let th, decl = why3_of_qed ?axioms ~id ~title ~name prop in
+  let th, decl = prove_goal ?axioms ~id ~title ~name prop in
   let t = None in
   let t = Why3.Task.use_export t th in
   Why3.Task.add_decl t decl
@@ -992,21 +995,17 @@ let task_of_wpo wpo =
       let axioms = Some(lemma.l_cluster,depends) in
       prove_prop ~pid ~prop ?axioms
 
-let altergo_step_limit = Str.regexp "^Steps limit reached:"
+(* -------------------------------------------------------------------------- *)
+(* --- Prover Task                                                        --- *)
+(* -------------------------------------------------------------------------- *)
 
-let call_prover ~timeout ~steplimit prover wpo =
+let prover_task prover wpo =
   let env = get_why3_env () in
   let task = task_of_wpo wpo in
-  let config = Lazy.force config in
+  let config = Why3Provers.config () in
   let prover_config = Why3.Whyconf.get_prover_config config prover in
   let drv = Why3.Whyconf.load_driver (Why3.Whyconf.get_main config)
       env prover_config.driver prover_config.extra_drivers in
-  let limit =
-    let def = Why3.Call_provers.empty_limit in
-    { def with
-      Why3.Call_provers.limit_time = Why3.Opt.get_def def.limit_time timeout;
-      Why3.Call_provers.limit_steps = Why3.Opt.get_def def.limit_time steplimit;
-    } in
   let remove_for_prover =
     if prover.prover_name = "Alt-Ergo"
     then Filter_axioms.remove_for_altergo
@@ -1020,100 +1019,103 @@ let call_prover ~timeout ~steplimit prover wpo =
   let task =
     if prover.prover_name = "Coq"
     then task
-    else Why3.Trans.apply trans task in
-  let task = Why3.Driver.prepare_task drv task in
-  let file = Wpo.DISK.file_goal
-      ~pid:wpo.Wpo.po_pid
-      ~model:wpo.Wpo.po_model
-      ~prover:(VCS.Why3 prover) in
-  (* This printing is currently just for debugging *)
-  let _ = Command.print_file file (fun fmt ->
-      Why3.Driver.print_task_prepared drv fmt task
-    ) in
-  if Wp_parameters.Check.get ()
-  then (** Why3 typed checked the task during its build *)
-    Task.return VCS.checked
-  else
-    let steplimit = match steplimit with Some 0 -> None | _ -> steplimit in
-    let command = Why3.Whyconf.get_complete_command prover_config
-        ~with_steps:(steplimit<>None) in
-    let call =
-      Why3.Driver.prove_task_prepared ~command ~limit drv task in
-    Wp_parameters.debug ~dkey
-      "@[@[Why3 run prover %a with %i timeout %i steplimit@]@]@."
-      Why3.Whyconf.print_prover prover
-      (Why3.Opt.get_def (-1) timeout)
-      (Why3.Opt.get_def (-1) steplimit);
-    let ping _ (* why3 seems not to be able to kill a started prover *) =
-      match Why3.Call_provers.query_call call with
-      | NoUpdates
-      | ProverStarted -> Task.Yield
-      | InternalFailure exn ->
-          let msg = Format.asprintf "%a" Why3.Exn_printer.exn_printer exn in
-          Task.Return (Task.Result (VCS.failed msg))
-      | ProverInterrupted ->
-          Task.Return (Task.Result (VCS.failed "interrupted"))
-      | ProverFinished pr ->
-          let r = match pr.pr_answer with
-            | Timeout -> VCS.timeout (int_of_float pr.pr_time)
-            | Valid -> VCS.result ~time:pr.pr_time ~steps:pr.pr_steps VCS.Valid
-            | Invalid -> VCS.result ~time:pr.pr_time ~steps:pr.pr_steps VCS.Invalid
-            | OutOfMemory -> VCS.failed "out of memory"
-            | StepLimitExceeded -> VCS.stepout
-            | Unknown _ -> VCS.unknown
-            | Failure s -> VCS.failed s
-            | HighFailure ->
-                let alt_ergo_hack =
-                  prover.prover_name = "Alt-Ergo" &&
-                  Str.string_match altergo_step_limit pr.pr_output 0
-                in
-                if alt_ergo_hack then VCS.stepout
-                else VCS.failed "Unknown error"
-          in
-          Wp_parameters.debug ~dkey
-            "@[@[Why3 result for %a:@] @[%a@] and @[%a@]@."
-            Why3.Whyconf.print_prover prover
-            (* why3 1.3 (Why3.Call_provers.print_prover_result ~json_model:false) pr *)
-            (Why3.Call_provers.print_prover_result) pr
-            VCS.pp_result r;
-          Task.Return (Task.Result r)
-    in
-    Task.async ping
+    else Why3.Trans.apply trans task
+  in
+  drv , prover_config , Why3.Driver.prepare_task drv task
 
-let add_specific_equality ~for_tau ~mk_new_eq =
-  specific_equalities := { for_tau; mk_new_eq }::!specific_equalities
+(* -------------------------------------------------------------------------- *)
+(* --- Prover Call                                                        --- *)
+(* -------------------------------------------------------------------------- *)
 
-let version = Why3.Config.version
+let altergo_step_limit = Str.regexp "^Steps limit reached:"
+
+let call_prover ~timeout ~steplimit drv prover prover_config task =
+  let steps = match steplimit with Some 0 -> None | _ -> steplimit in
+  let limit =
+    let def = Why3.Call_provers.empty_limit in
+    { def with
+      Why3.Call_provers.limit_time = Why3.Opt.get_def def.limit_time timeout;
+      Why3.Call_provers.limit_steps = Why3.Opt.get_def def.limit_time steps;
+    } in
+  let command = Why3.Whyconf.get_complete_command prover_config
+      ~with_steps:(steps<>None) in
+  let call =
+    Why3.Driver.prove_task_prepared ~command ~limit drv task in
+  Wp_parameters.debug ~dkey "Why3 run prover %a with %i timeout %i steps@."
+    Why3.Whyconf.print_prover prover
+    (Why3.Opt.get_def (-1) timeout)
+    (Why3.Opt.get_def (-1) steps);
+  let ping _ (* why3 seems not to be able to kill a started prover *) =
+    match Why3.Call_provers.query_call call with
+    | NoUpdates
+    | ProverStarted -> Task.Yield
+    | InternalFailure exn ->
+        let msg = Format.asprintf "%a" Why3.Exn_printer.exn_printer exn in
+        Task.Return (Task.Result (VCS.failed msg))
+    | ProverInterrupted ->
+        Task.Return (Task.Result (VCS.failed "interrupted"))
+    | ProverFinished pr ->
+        let r = match pr.pr_answer with
+          | Timeout -> VCS.timeout (int_of_float pr.pr_time)
+          | Valid -> VCS.result ~time:pr.pr_time ~steps:pr.pr_steps VCS.Valid
+          | Invalid -> VCS.result ~time:pr.pr_time ~steps:pr.pr_steps VCS.Invalid
+          | OutOfMemory -> VCS.failed "out of memory"
+          | StepLimitExceeded -> VCS.stepout
+          | Unknown _ -> VCS.unknown
+          | Failure s -> VCS.failed s
+          | HighFailure ->
+              let alt_ergo_hack =
+                prover.prover_name = "Alt-Ergo" &&
+                Str.string_match altergo_step_limit pr.pr_output 0
+              in
+              if alt_ergo_hack then VCS.stepout
+              else VCS.failed "Unknown error"
+        in
+        Wp_parameters.debug ~dkey
+          "@[@[Why3 result for %a:@] @[%a@] and @[%a@]@."
+          Why3.Whyconf.print_prover prover
+          (* why3 1.3 (Why3.Call_provers.print_prover_result ~json_model:false) pr *)
+          (Why3.Call_provers.print_prover_result) pr
+          VCS.pp_result r;
+        Task.Return (Task.Result r)
+  in
+  Task.async ping
+
+(* -------------------------------------------------------------------------- *)
+(* --- Prove WPO                                                          --- *)
+(* -------------------------------------------------------------------------- *)
 
 let prove ?timeout ?steplimit ~prover wpo =
   try
-    let do_ () =
-      if Wp_parameters.Generate.get ()
-      then if Wp_parameters.Check.get ()
-        then Task.return VCS.checked
-        else Task.return VCS.no_result
-      else call_prover ~timeout ~steplimit prover wpo
-    in
-    WpContext.on_context (Wpo.get_context wpo) do_ ()
+    WpContext.on_context (Wpo.get_context wpo)
+      begin fun () ->
+        if Wp_parameters.Generate.get ()
+        then if Wp_parameters.Check.get ()
+          then Task.return VCS.checked
+          else Task.return VCS.no_result
+        else
+          let drv , prover_config , task = prover_task prover wpo in
+          if Wp_parameters.Check.get ()
+          then
+            (* Why3 typed checked the task during its build *)
+            Task.return VCS.checked
+          else
+            let file = Wpo.DISK.file_goal
+                ~pid:wpo.Wpo.po_pid
+                ~model:wpo.Wpo.po_model
+                ~prover:(VCS.Why3 prover) in
+            (* This printing is currently just for debugging *)
+            let _ = Command.print_file file (fun fmt ->
+                Why3.Driver.print_task_prepared drv fmt task
+              ) in
+            let hash = Digest.file file |> Digest.to_hex in
+            Format.eprintf "[HASH] %s@."  hash ;
+            call_prover ~timeout ~steplimit drv prover prover_config task
+      end ()
   with exn ->
     let bt = Printexc.get_raw_backtrace () in
     Wp_parameters.fatal "Error in why3:%a@.%s@."
       Why3.Exn_printer.exn_printer exn
       (Printexc.raw_backtrace_to_string bt)
 
-let parse_why3_options =
-  let todo = ref true in
-  fun () ->
-    if !todo then begin
-      let args = Array.of_list ("why3"::Wp_parameters.WhyFlags.get ()) in
-      begin try
-          Arg.parse_argv ~current:(ref 0) args
-            (Why3.Debug.Args.[desc_debug;desc_debug_all;desc_debug_list])
-            (fun _ -> raise (Arg.Help "Unknown why3 option"))
-            "Why3 options"
-        with Arg.Bad s -> Wp_parameters.abort "%s" s
-      end;
-      ignore (Why3.Debug.Args.option_list ());
-      Why3.Debug.Args.set_flags_selected ();
-      todo := false
-    end
+(* -------------------------------------------------------------------------- *)

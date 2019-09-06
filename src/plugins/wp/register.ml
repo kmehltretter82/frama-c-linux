@@ -836,16 +836,16 @@ let () = Cmdline.run_after_setting_files
        if Wp_parameters.has_dkey dkey_shell then
          Log.print_on_output pp_wp_parameters)
 
-let () = Cmdline.run_after_configuring_stage ProverWhy3.parse_why3_options
+let () = Cmdline.run_after_configuring_stage Why3Provers.configure
 
 let do_prover_detect () =
   if not !Config.is_gui && Wp_parameters.Detect.get () then
-    let provers = VCS.Why3_prover.provers () in
+    let provers = Why3Provers.provers () in
     if provers = [] then
       Wp_parameters.result "No Why3 provers detected."
     else
       let open Why3.Whyconf in
-      let shortcuts = get_prover_shortcuts (VCS.Why3_prover.get_config ()) in
+      let shortcuts = get_prover_shortcuts (Why3Provers.config ()) in
       List.iter
         (fun p ->
            Wp_parameters.result "Prover %10s %-10s %s [%t%a]"
