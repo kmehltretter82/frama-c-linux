@@ -454,6 +454,12 @@ let rec has_unprotected_local_init s =
   | Block { bscoping = false; bstmts = s :: _ } -> has_unprotected_local_init s
   | _ -> false
 
+(** Annotation context in which the Printer is *)
+type annot_ctxt =
+  | Not_in_annot     (** not in annotation *)
+  | In_simple_annot  (** in /*@ ... */ annotation *)
+  | In_nested_annot  (** in /@ ... @/ annotation *)
+
 class cil_printer () = object (self)
 
   val mutable logic_printer_enabled = true
@@ -463,41 +469,36 @@ class cil_printer () = object (self)
   method pp_keyword fmt s = pp_print_string fmt s
   method pp_acsl_keyword = self#pp_keyword
 
-  val mutable annot = false
-  val mutable internal_annot = false
+  val mutable annot_ctxt = Not_in_annot
 
   method pp_open_annotation ?(block=true) ?(pre=format_of_string "/*@@") fmt =
-    let pre = if not annot then begin annot <- true ; pre end
-      else if not internal_annot then begin
-        internal_annot <- true ; format_of_string "/@@"
-      end else
-        assert false (* cannot enter an annotation in a internal annotation *)
+    let pre = match annot_ctxt with
+      | Not_in_annot -> annot_ctxt <- In_simple_annot ; pre
+      | In_simple_annot -> annot_ctxt <- In_nested_annot ; format_of_string "/@@"
+      | _ -> assert false (* cannot enter an annotation in a internal annotation *)
     in
     (if block then Pretty_utils.pp_open_block else Format.fprintf)
       fmt "%(%)" pre
   method pp_close_annotation ?(block=true) ?(suf=format_of_string "*/") fmt =
-    let suf = if not annot then
-        assert false (* we should not have to close an annotation that is not open *)
-      else if internal_annot then begin
-        internal_annot <- false ; format_of_string "@@/"
-      end else begin
-        annot <- false ; suf
-      end
+    let suf = match annot_ctxt with
+      | In_nested_annot -> annot_ctxt <- In_simple_annot ; format_of_string "@@/"
+      | In_simple_annot -> annot_ctxt <- Not_in_annot ; suf
+      | _ -> assert false (* we should not have to close an annotation that is not open *)
     in
     (if block then Pretty_utils.pp_close_block else Format.fprintf)
       fmt "%(%)" suf
 
   val mutable verbose = false
 
-  (* number of opened ghost code *)
+  (* indicates whether we are printing ghost elements *)
   val mutable is_ghost = false
   method private display_comment () = not is_ghost || verbose
 
-  method private in_ghost_if_needed fmt ghost ~pre_fmt ~post_fmt ?block do_it =
-    let display_ghost = ghost && not is_ghost in
+  method private in_ghost_if_needed fmt ghost_flag ~post_fmt ?block do_it =
+    let display_ghost = ghost_flag && not is_ghost in
     if display_ghost then begin
       is_ghost <- true ;
-      Format.fprintf fmt pre_fmt
+      Format.fprintf fmt "%t %a@ "
         (fun fmt -> self#pp_open_annotation ?block fmt)
         self#pp_acsl_keyword "ghost"
     end ;
@@ -1139,7 +1140,7 @@ class cil_printer () = object (self)
     if Cil.is_skip s.skind && not s.ghost && s.sattr = [] then begin
       if verbose || s.labels <> [] then fprintf fmt ";"
     end else begin
-      self#in_ghost_if_needed fmt s.ghost ~pre_fmt:"%t %a " ~post_fmt:"%t"
+      self#in_ghost_if_needed fmt s.ghost ~post_fmt:"%t"
         (fun () -> self#stmtkind s.sattr next fmt s.skind)
     end;
     pp_close_box fmt ()
@@ -1215,7 +1216,7 @@ class cil_printer () = object (self)
 
   method private vdecl_complete fmt v =
     Format.fprintf fmt "@[<hov 0>" ;
-    self#in_ghost_if_needed fmt v.vghost ~pre_fmt:"%t %a@ " ~post_fmt:"@ %t" ~block:false
+    self#in_ghost_if_needed fmt v.vghost ~post_fmt:"@ %t" ~block:false
       (fun () -> Format.fprintf fmt "%a;" self#vdecl v) ;
     Format.fprintf fmt "@]"
 
@@ -1557,7 +1558,7 @@ class cil_printer () = object (self)
       match g with
       | GFun (fundec, l) ->
         self#in_current_function fundec.svar;
-        self#in_ghost_if_needed fmt fundec.svar.vghost ~pre_fmt:"%t %a@ " ~post_fmt:"%t@\n"
+        self#in_ghost_if_needed fmt fundec.svar.vghost ~post_fmt:"%t@\n"
           (fun () ->
              (* If the function has attributes then print a prototype because
               * GCC cannot accept function attributes in a definition *)
@@ -1628,7 +1629,7 @@ class cil_printer () = object (self)
       | GVar (vi, io, l) ->
         self#line_directive ~forcefile:true fmt l;
         Format.fprintf fmt "@[<hov 2>";
-        self#in_ghost_if_needed fmt vi.vghost ~pre_fmt:"%t %a@ " ~post_fmt:"@ %t" ~block:false
+        self#in_ghost_if_needed fmt vi.vghost ~post_fmt:"@ %t" ~block:false
           (fun () ->
              self#vdecl fmt vi;
              (match io.init with
@@ -1738,7 +1739,7 @@ class cil_printer () = object (self)
   method private fundecl fmt f =
     (* declaration. *)
     fprintf fmt "@[";
-    self#in_ghost_if_needed fmt f.svar.vghost ~pre_fmt:"%t %a@ " ~post_fmt:"@ %t" ~block:false
+    self#in_ghost_if_needed fmt f.svar.vghost ~post_fmt:"@ %t" ~block:false
       (fun () ->
          fprintf fmt "%a@\n@[<v 2>" self#vdecl f.svar;
          self#unboxed_block Body fmt f.sbody;
