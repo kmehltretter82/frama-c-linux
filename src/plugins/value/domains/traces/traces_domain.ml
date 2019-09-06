@@ -703,15 +703,16 @@ module Traces = struct
   let add_loop stmt state =
     let (n,g) = get_current state in
     let succs = find_succs n g in
-    let same_loop = function
-      | Loop(_,stmt',s,last) when Stmt.equal stmt' stmt ->
-        Some (s,last)
-      | _ -> None in
-    let s,last = match Extlib.find_opt same_loop succs with
-      | (s,last) -> s,(Graph.from_shape_id last)
-      | exception Not_found ->
+    let rec find_same_loop = function
+      | [] ->
         Stmt.Hashtbl.memo state.all_loop_start stmt (fun _ -> Node.next (),Graph.empty)
+      | edge :: tl ->
+        match edge with
+        | Loop (_,stmt',s,last) when Stmt.equal stmt' stmt ->
+          s, Graph.from_shape_id last
+        | _ -> find_same_loop tl
     in
+    let s,last = find_same_loop succs in
     let current = OpenLoop(stmt,s,last,s,Graph.empty,state.current) in
     { state with current }
 
@@ -1090,7 +1091,7 @@ end
 let dummy_loc = Location.unknown
 
 let subst_in_full var_mapping =
-  let visit = Cil.copy_visit (Project.current ()) in
+  let visit = Visitor_behavior.copy (Project.current ()) in
   visit, object
     inherit Cil.genericCilVisitor (visit)
     method! vvrbl vi =
@@ -1155,7 +1156,7 @@ let rec stmts_of_cfg cfg current var_map locals return_exp acc =
         let exp = subst_in_exp var_map exp in
         let predicate = (Logic_utils.expr_to_predicate ~cast:true exp).Cil_types.ip_content in
         let predicate = if b then predicate else Logic_const.pnot predicate in
-        let code_annot = Logic_const.new_code_annotation(Cil_types.AAssert([],predicate)) in
+        let code_annot = Logic_const.new_code_annotation(Cil_types.AAssert([],Assert,predicate)) in
         let stmt = Cil.mkStmtOneInstr ~valid_sid (Cil_types.Code_annot(code_annot,dummy_loc)) in
         stmts_of_cfg cfg n var_map locals return_exp (stmt::acc)
 
@@ -1196,7 +1197,7 @@ let rec stmts_of_cfg cfg current var_map locals return_exp acc =
           let exp = subst_in_exp var_map exp in
           let exp = if bloop then exp else Cil.new_exp ~loc:dummy_loc (UnOp(LNot,exp,Cil.intType)) in
           let body = stmts_of_cfg g nloop var_map locals None [] in
-          let acc = (List.rev (Cil.mkWhile ~guard:exp ~body)) @ acc in
+          let acc = (List.rev (Cil.mkLoop ?sattr:None ~guard:exp ~body)) @ acc in
           stmts_of_cfg cfg n2 var_map locals return_exp acc
     end
   | l ->
@@ -1230,7 +1231,7 @@ let project_of_cfg vreturn s =
           | Cil_types.GFun _ -> Cil.ChangeTo([])
           | _ -> Cil.JustCopy
         method! vfunc fundec =
-          if Varinfo.equal (Cil.get_original_varinfo self#behavior fundec.Cil_types.svar) main then begin
+          if Varinfo.equal (Visitor_behavior.Get_orig.varinfo self#behavior fundec.Cil_types.svar) main then begin
             (** copy of the fundec structure has already been done *)
             fundec.slocals <- [];
             let var_map = Varinfo.Map.empty in
