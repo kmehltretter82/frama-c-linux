@@ -216,7 +216,7 @@ type ('loc, 'value) call = {
   return: varinfo option;                     (** Fake varinfo to store the
                                                   return value of the call.
                                                   Same varinfo for every
-                                                  call to a function. *)
+                                                  call to a given function. *)
   recursive: bool;
 }
 
