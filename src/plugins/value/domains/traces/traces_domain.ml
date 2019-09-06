@@ -309,8 +309,15 @@ module Internal = struct
   end
 
   (* Memexec *)
-  let filter_by_bases _bases state = state
-  let reuse ~current_input:state ~previous_output:_ = state
+  (* This domains infers no relation between variables. *)
+  let relate _kf _bases _state = Base.SetLattice.bottom
+  (* Do not filter the state: the memexec cache will be applied only on function
+     calls for which the entry states are equal. This almost completely
+     disable memexec, but is always sound. *)
+  let filter _kf _kind _bases state = state
+  (* As memexec cache is only applied on equal entry states, the previous
+     output state is a correct output for the current input state. *)
+  let reuse _kf _bases ~current_input:_ ~previous_output:state = state
 
   let empty () = Traces.empty
   let introduce_globals _vars state = state
