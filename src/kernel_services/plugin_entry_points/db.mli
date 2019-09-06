@@ -266,13 +266,14 @@ module Value : sig
   val get_initial_state_callstack :
     kernel_function -> state Value_types.Callstack.Hashtbl.t option
   val get_state : ?after:bool -> kinstr -> state
-
+  (** [after] is false by default. *)
 
   val get_stmt_state_callstack:
     after:bool -> stmt -> state Value_types.Callstack.Hashtbl.t option
 
   val get_stmt_state : ?after:bool -> stmt -> state
-  (** @plugin development guide *)
+  (** [after] is false by default.
+      @plugin development guide *)
 
   val fold_stmt_state_callstack :
     (state -> 'a -> 'a) -> 'a -> after:bool -> stmt -> 'a
@@ -521,7 +522,7 @@ module Value : sig
 
   val noassert_get_state : ?after:bool -> kinstr -> state
     (** To be used during the value analysis itself (instead of
-        {!get_state}). *)
+        {!get_state}). [after] is false by default. *)
 
   val recursive_call_occurred: kernel_function -> unit
 

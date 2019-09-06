@@ -212,10 +212,14 @@ module Make (Domain: InputDomain) = struct
     if not (Storage.get ())
     then `Value Domain.top
     else
-      try `Value ((if after then AfterTable.find else Table.find) s)
+      let (find, add), find_by_callstack =
+        if after
+        then AfterTable.(find, add), AfterTable_By_Callstack.find
+        else Table.(find, add), Table_By_Callstack.find
+      in
+      try `Value (find s)
       with Not_found ->
-        let ho = try Some ((if after then AfterTable_By_Callstack.find
-                            else Table_By_Callstack.find) s) with Not_found -> None in
+        let ho = try Some (find_by_callstack s) with Not_found -> None in
         let state =
           match ho with
           | None -> `Bottom
@@ -224,7 +228,7 @@ module Make (Domain: InputDomain) = struct
               (fun _cs state acc -> Bottom.join Domain.join acc (`Value state))
               h `Bottom
         in
-        ignore (state >>-: (if after then AfterTable.add else Table.add) s);
+        ignore (state >>-: add s);
         state
 
   let get_stmt_state_by_callstack ~after stmt =

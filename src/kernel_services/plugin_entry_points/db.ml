@@ -530,17 +530,14 @@ module Value = struct
     if !no_results (Kernel_function.(get_definition (find_englobing_kf s)))
     then Cvalue.Model.top
     else
-      let tbl : (module State_builder.Hashtbl with type key = Cil_types.stmt
-                                               and type data = Cvalue.Model.t) =
-        if after then (module AfterTable) else (module Table) in
-      let module Tbl = (val tbl) in
-      try Tbl.find s
+      let (find, add), find_by_callstack =
+        if after
+        then AfterTable.(find, add), AfterTable_By_Callstack.find
+        else Table.(find, add), Table_By_Callstack.find
+      in
+      try find s
       with Not_found ->
-        let ho =
-          try
-            Some (if after then AfterTable_By_Callstack.find s else
-                    Table_By_Callstack.find s)
-          with Not_found -> None in
+        let ho = try Some (find_by_callstack s) with Not_found -> None in
         let state =
           match ho with
           | None -> Cvalue.Model.bottom
@@ -549,7 +546,7 @@ module Value = struct
               Cvalue.Model.join acc state
             ) h Cvalue.Model.bottom
         in
-        Tbl.add s state;
+        add s state;
         state
 
   let noassert_get_state ?(after=false) k =
@@ -559,12 +556,10 @@ module Value = struct
         noassert_get_stmt_state ~after s
 
   let get_stmt_state ?(after=false) s =
-    (* [QB]: false was previous default. *)
     assert (is_computed ()); (* this assertion fails during value analysis *)
     noassert_get_stmt_state ~after s
 
   let get_state ?(after=false) k =
-    (* [QB]: false was previous default. *)
     assert (is_computed ()); (* this assertion fails during value analysis *)
     noassert_get_state ~after k
 
