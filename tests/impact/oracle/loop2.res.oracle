@@ -210,16 +210,16 @@
 [pdg] done for function init
 [pdg] computing for function f
 [pdg] done for function f
-[impact] impacted statements of stmt(s) 57 are:
-    tests/impact/loop2.i:19 (sid 53): t[i] = u[i];
-    tests/impact/loop2.i:27 (sid 149): f(i);
-    tests/impact/loop2.i:27 (sid 156): f(i);
-    tests/impact/loop2.i:27 (sid 163): f(i);
-    tests/impact/loop2.i:27 (sid 170): f(i);
-    tests/impact/loop2.i:27 (sid 177): f(i);
-    tests/impact/loop2.i:27 (sid 184): f(i);
-    tests/impact/loop2.i:27 (sid 191): f(i);
-    tests/impact/loop2.i:27 (sid 198): f(i);
-    tests/impact/loop2.i:27 (sid 205): f(i);
-    tests/impact/loop2.i:27 (sid 212): f(i);
+[impact] impacted statements of stmt(s) 83 are:
+    tests/impact/loop2.i:19 (sid 79): t[i] = u[i];
+    tests/impact/loop2.i:27 (sid 201): f(i);
+    tests/impact/loop2.i:27 (sid 208): f(i);
+    tests/impact/loop2.i:27 (sid 215): f(i);
+    tests/impact/loop2.i:27 (sid 222): f(i);
+    tests/impact/loop2.i:27 (sid 229): f(i);
+    tests/impact/loop2.i:27 (sid 236): f(i);
+    tests/impact/loop2.i:27 (sid 243): f(i);
+    tests/impact/loop2.i:27 (sid 250): f(i);
+    tests/impact/loop2.i:27 (sid 257): f(i);
+    tests/impact/loop2.i:27 (sid 264): f(i);
 [impact] analysis done
