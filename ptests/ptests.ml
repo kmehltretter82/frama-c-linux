@@ -1617,10 +1617,10 @@ let dispatcher () =
          execnow=false;
         }
       in
-      let process_macros_cmd s =
-        basic_command_string
-          { file = file;
-	    nb_files = nb_files;
+      let mk_cmd s =
+          {
+            file = file;
+            nb_files = nb_files;
             log_files = [];
             options = "";
             toplevel = s;
@@ -1628,9 +1628,12 @@ let dispatcher () =
             directory = directory;
             filter = config.dc_filter;
             macros = config.dc_macros;
-            execnow = true; }
+            execnow = true;
+          }
       in
-      let process_macros s = Macros.expand config.dc_macros s in
+      let process_macros_cmd s = basic_command_string (mk_cmd s) in
+      let macros = get_macros (mk_cmd "/bin/true") in
+      let process_macros s = Macros.expand macros s in
       let make_execnow_cmd execnow =
         let res =
           {
