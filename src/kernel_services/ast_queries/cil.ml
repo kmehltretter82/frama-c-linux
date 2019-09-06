@@ -260,25 +260,6 @@ let mkBlock (slst: stmt list) : block =
 
 let mkBlockNonScoping l = let b = mkBlock l in b.bscoping <- false; b
 
-let rec enforceGhostStmtCoherence ?(force_ghost=false) stmt =
-  let force_ghost = force_ghost || stmt.ghost in
-  stmt.ghost <- force_ghost ;
-  begin match stmt.skind with
-    | Break(_) | Continue(_) | Goto(_) | Throw(_)
-    | Instr(_) | Return(_) -> ()
-    | UnspecifiedSequence(_) -> ()
-    | If(_, b1, b2, _) | TryFinally(b1, b2, _) | TryExcept(b1, _, b2, _) ->
-      enforceGhostBlockCoherence ~force_ghost b1 ;
-      enforceGhostBlockCoherence ~force_ghost b2
-    | Switch(_, b, _, _) | Loop(_, b, _, _, _) | Block(b) ->
-      enforceGhostBlockCoherence ~force_ghost b
-    | TryCatch(b, l, _) ->
-      enforceGhostBlockCoherence ~force_ghost b ;
-      List.iter (fun (_, b) -> enforceGhostBlockCoherence ~force_ghost b) l
-  end
-and enforceGhostBlockCoherence ?force_ghost block =
-  List.iter (enforceGhostStmtCoherence ?force_ghost) block.bstmts
-
 let mkStmt ?(ghost=false) ?(valid_sid=false) ?(sattr=[]) (sk: stmtkind) : stmt =
   { skind = sk;
     labels = [];
@@ -603,6 +584,26 @@ let () = punrollType := unrollType
 let rec unrollTypeSkel = function
   | TNamed (r, _) -> unrollTypeSkel r.ttype
   | x -> x
+
+let rec enforceGhostStmtCoherence ?(force_ghost=false) stmt =
+  let force_ghost = force_ghost || stmt.ghost in
+  stmt.ghost <- force_ghost ;
+  begin match stmt.skind with
+    | Break(_) | Continue(_) | Goto(_) | Throw(_)
+    | Instr(_) | Return(_) -> ()
+    | UnspecifiedSequence(_) -> ()
+    | If(_, b1, b2, _) | TryFinally(b1, b2, _) | TryExcept(b1, _, b2, _) ->
+      enforceGhostBlockCoherence ~force_ghost b1 ;
+      enforceGhostBlockCoherence ~force_ghost b2
+    | Switch(_, b, _, _) | Loop(_, b, _, _, _) | Block(b) ->
+      enforceGhostBlockCoherence ~force_ghost b
+    | TryCatch(b, l, _) ->
+      enforceGhostBlockCoherence ~force_ghost b ;
+      List.iter (fun (_, b) -> enforceGhostBlockCoherence ~force_ghost b) l
+  end
+and enforceGhostBlockCoherence ?(force_ghost=false) block =
+  let force_ghost = force_ghost || (hasAttribute frama_c_ghost_else block.battrs) in
+  List.iter (enforceGhostStmtCoherence ~force_ghost) block.bstmts
 
 (* Make a varinfo. Used mostly as a helper function below  *)
 let makeVarinfo
