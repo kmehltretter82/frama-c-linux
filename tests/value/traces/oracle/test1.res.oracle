@@ -24,9 +24,9 @@ c -> 5
     6 -> Assign: tmp = 0 -> 7
     7 -> Assume: c true -> 8; Assume: c false -> 10
     8 -> Assign: tmp = g -> 9
-    9 -> EnterScope: i -> 15
+    9 -> EnterScope: i -> 12
     10 -> Assign: tmp = 2 -> 11
-    11 -> EnterScope: i -> 12
+    11 -> EnterScope: i -> 15
     12 -> initialize variable: i -> 13
     13 -> Assign: i = 0 -> 14
     14 -> enter_loop -> 19
@@ -35,34 +35,36 @@ c -> 5
     17 -> enter_loop -> 18
     18 -> Assume: i < 3 true -> 20
     19 -> Assume: i < 3 true -> 21
-    20 -> Assign: tmp = tmp + 1 -> 23
-    21 -> Assign: tmp = tmp + 1 -> 22
+    20 -> Assign: tmp = tmp + 1 -> 22
+    21 -> Assign: tmp = tmp + 1 -> 23
     22 -> Assign: i = i + 1 -> 24
     23 -> Assign: i = i + 1 -> 25
     24 -> Assume: i < 3 true -> 27
     25 -> Assume: i < 3 true -> 26
-    26 -> Assign: tmp = tmp + 1 -> 29
-    27 -> Assign: tmp = tmp + 1 -> 28
+    26 -> Assign: tmp = tmp + 1 -> 28
+    27 -> Assign: tmp = tmp + 1 -> 29
     28 -> Assign: i = i + 1 -> 30
     29 -> Assign: i = i + 1 -> 31
     30 -> Assume: i < 3 true -> 33
     31 -> Assume: i < 3 true -> 32
-    32 -> Assign: tmp = tmp + 1 -> 35
-    33 -> Assign: tmp = tmp + 1 -> 34
+    32 -> Assign: tmp = tmp + 1 -> 34
+    33 -> Assign: tmp = tmp + 1 -> 35
     34 -> Assign: i = i + 1 -> 36
     35 -> Assign: i = i + 1 -> 37
     36 -> Assume: i < 3 false -> 39
     37 -> Assume: i < 3 false -> 38
-    38 -> LeaveScope: i -> 40
-    39 -> LeaveScope: i -> 41
+    38 -> LeaveScope: i -> 41
+    39 -> LeaveScope: i -> 40
     40 -> LeaveScope: i -> 42
     41 -> LeaveScope: i -> 43
-    42 -> Assign: g = tmp -> 45
-    43 -> Assign: g = tmp -> 44
-    44 -> join -> 46
-    45 -> join -> 46
-    46 -> EnterScope: \result<main> -> 47
-    47 -> Assign: \result<main> = tmp -> 48 ]} at 48
+    42 -> Assign: g = tmp -> 44
+    43 -> Assign: g = tmp -> 45
+    44 -> EnterScope: \result<main> -> 46
+    45 -> EnterScope: \result<main> -> 48
+    46 -> Assign: \result<main> = tmp -> 47
+    47 -> join -> 50
+    48 -> Assign: \result<main> = tmp -> 49
+    49 -> join -> 50 ]} at 50
 [from] Computing for function main
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======

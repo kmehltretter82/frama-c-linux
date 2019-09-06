@@ -54,7 +54,7 @@ c -> 1
     36 -> finalize_call: loop -> 37
     37 -> Assign: tmp = \result<loop> -> 38
     38 -> LeaveScope: \result<loop> -> 39
-    39 -> join -> 79
+    39 -> EnterScope: \result<main> -> 80
     40 -> EnterScope: j -> 41
     41 -> Assign: j = tmp -> 42
     42 -> EnterScope: i -> 44
@@ -75,13 +75,15 @@ c -> 1
     58 -> LeaveScope: i -> 59
     59 -> EnterScope: \result<loop> -> 60
     60 -> Assign: \result<loop> = j -> 61
-    61 -> LeaveScope: j -> 75
-    75 -> finalize_call: loop -> 76
-    76 -> Assign: tmp = \result<loop> -> 77
-    77 -> LeaveScope: \result<loop> -> 78
-    78 -> join -> 79
-    79 -> EnterScope: \result<main> -> 80
-    80 -> Assign: \result<main> = tmp -> 81 ]} at 81
+    61 -> LeaveScope: j -> 76
+    76 -> finalize_call: loop -> 77
+    77 -> Assign: tmp = \result<loop> -> 78
+    78 -> LeaveScope: \result<loop> -> 79
+    79 -> EnterScope: \result<main> -> 82
+    80 -> Assign: \result<main> = tmp -> 81
+    81 -> join -> 84
+    82 -> Assign: \result<main> = tmp -> 83
+    83 -> join -> 84 ]} at 84
 [from] Computing for function loop
 [from] Done for function loop
 [from] Computing for function main
