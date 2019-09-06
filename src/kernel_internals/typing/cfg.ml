@@ -49,7 +49,6 @@ open Cil
 open Cil_types
 open Cil_datatype
 
-
 (* All the nodes of the function visited, in a flat list *)
 let nodeList : stmt list ref = ref []
 
@@ -228,6 +227,13 @@ and cfgStmt env (s: stmt) next break cont =
       else
         ()
   | Return _  | Throw _ -> ()
+  | Goto (p,_) when not s.ghost && !p.ghost ->
+    Kernel.warning
+      ~wkey:Kernel.wkey_ghost_bad_non_ghost
+      "%a:@ '%a' cannot see target label (ghost), removing ghost status of the label."
+      Location.pretty (Stmt.loc s) Cil_printer.pp_stmt s ;
+    (!p).ghost <- false ;
+    addSucc !p
   | Goto (p,_) -> addSucc !p
   | Break _ -> addOptionSucc break
   | Continue _ -> addOptionSucc cont
