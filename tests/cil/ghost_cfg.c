@@ -1,0 +1,110 @@
+/* run.config
+   OPT:-no-autoload-plugins -cpp-extra-args="-DCAN_CHECK"
+   OPT:-no-autoload-plugins -cpp-extra-args="-DCANT_CHECK"
+*/
+
+#ifdef CAN_CHECK
+
+int first_stmt(void){
+  //@ ghost goto X ;   // breaks CFG by reaching "return 1" instead of "return 0"
+  return 0 ;
+  //@ ghost X: ;
+  return 1 ;
+}
+
+void break_allowed(){ // OK
+  /*@ ghost
+    for(int i = 0 ; ; ++i){
+      if(i == 10) break ;
+    }
+  */
+}
+
+void break_refuse(){
+  int i = 0;
+  while(i < 10){
+    //@ ghost if(i == 0) break ; // by-passes loop body
+    i++;
+  }
+}
+
+void continue_refuse(){
+  int i = 0;
+  while(i < 10){
+    //@ ghost if(i == 0) continue ; // by-passes loop body
+    i++;
+  }
+}
+
+void if_construct(int x){ // OK
+  //@ ghost int c ;
+
+  x ++ ;
+  /*@ ghost
+    if (x == 0){
+      c = 1 ;
+    }
+    else {
+      c = 2 ;
+    }
+  */
+  x ++ ;
+}
+
+void switch_construct(){
+  int i = 42 ;
+  int x = 0 ;
+  //@ ghost int g ;
+  switch(i){
+  case 0: x = 3 ; break ;
+    { /*@ ghost case 1: g = 3 ;*/ }             // case 1 instead of going to default goes to case 2
+  case 2: /*@ ghost g = 5 ;*/ i = 101 ; break ;
+  /*@ ghost case 3: g = 6 ; break ;*/
+  }
+}
+
+void block_with_assert(){ // OK
+  int x = 1 ;
+
+  {
+    //@ assert x == 1 ;
+  }
+
+  x = 2 ;
+}
+
+int ghost_goto_non_ghost(){
+  int x = 3 ;
+
+  //@ ghost goto X ; // reaches return without executing "x = 2"
+  x = 2;
+
+ X:
+  return 0;
+}
+
+int ghost_goto_ghost(){
+  int x = 3 ;
+
+  //@ ghost goto X ; // reaches return without executing "x = 2"
+  x = 2;
+
+  //@ ghost X:
+  return 0;
+}
+
+#endif
+
+#ifdef CANT_CHECK
+
+int main(){
+  goto X ; // This non-ghost goto cannot see the label "X" as it is ghost
+
+  int x = 4 ;
+
+  //@ ghost X:
+
+  x = 2 ;
+}
+
+#endif
