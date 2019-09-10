@@ -1116,7 +1116,7 @@ let task_hash wpo drv prover task =
           ~prover:(VCS.Why3 prover) in
       let _ = Command.print_file file
           begin fun fmt ->
-            Format.fprintf fmt "(* WP Task for Prover %s *)"
+            Format.fprintf fmt "(* WP Task for Prover %s *)@\n"
               (Why3Provers.print prover) ;
             Why3.Driver.print_task_prepared drv fmt task ;
           end
@@ -1186,6 +1186,10 @@ let set_cache_result ~mode hash prover result =
         Wp_parameters.failure ~once:true "can not update cache (%s)"
           (Printexc.to_string err)
 
+let is_trivial (t : Why3.Task.task) =
+  let goal = Why3.Task.task_goal_fmla t in
+  Why3.Term.t_equal goal Why3.Term.t_true
+
 (* -------------------------------------------------------------------------- *)
 (* --- Prove WPO                                                          --- *)
 (* -------------------------------------------------------------------------- *)
@@ -1204,6 +1208,9 @@ let prove ?timeout ?steplimit ~prover wpo =
           then
             (* Why3 typed checked the task during its build *)
             Task.return VCS.checked
+          else
+          if is_trivial task then
+            Task.return VCS.valid
           else
             let mode = get_mode () in
             match mode with
