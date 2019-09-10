@@ -74,7 +74,7 @@ let find ?donotfail s =
       let config = Lazy.force cfg in
       let filter = Why3.Whyconf.parse_filter_prover s in
       let filter = Why3.Whyconf.filter_prover_with_shortcut config filter in
-        (Why3.Whyconf.filter_one_prover config filter).Why3.Whyconf.prover
+      (Why3.Whyconf.filter_one_prover config filter).Why3.Whyconf.prover
     with
     | Why3.Whyconf.ProverNotFound _ as exn when donotfail <> None ->
         Wp_parameters.warning ~once:true "%a" Why3.Exn_printer.exn_printer exn;

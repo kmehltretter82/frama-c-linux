@@ -72,7 +72,7 @@ let name_of_prover = function
   | Tactical -> "script"
 
 let title_of_prover = function
-  | Why3 s -> (Why3Provers.title s)
+  | Why3 s -> Why3Provers.title s
   | NativeAltErgo -> "Alt-Ergo"
   | NativeCoq -> "Coq"
   | Qed -> "Qed"
@@ -293,7 +293,7 @@ let checked = result Checked
 let invalid = result Invalid
 let unknown = result Unknown
 let timeout t = result ~time:(float t) Timeout
-let stepout = result Stepout
+let stepout n = result ~steps:n Stepout
 let computing kill = result (Computing kill)
 let failed ?pos msg = {
   verdict = Failed ;

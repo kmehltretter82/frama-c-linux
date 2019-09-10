@@ -109,7 +109,7 @@ val valid : result
 val checked : result
 val invalid : result
 val unknown : result
-val stepout : result
+val stepout : int -> result
 val timeout : int -> result
 val computing : (unit -> unit) -> result
 val failed : ?pos:Lexing.position -> string -> result

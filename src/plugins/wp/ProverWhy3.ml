@@ -20,10 +20,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
-[@@@ warning "-40-42"]
+[@@@ warning "-40-42-32"]
 
 let dkey = Wp_parameters.register_category "prover"
 let dkey_api = Wp_parameters.register_category "why3_api"
+let dkey_cache = Wp_parameters.register_category "cache"
 
 let option_file = LogicBuiltins.create_option
     (fun ~driver_dir x -> Filename.concat driver_dir x)
@@ -1060,7 +1061,7 @@ let call_prover ~timeout ~steplimit drv prover prover_config task =
           | Valid -> VCS.result ~time:pr.pr_time ~steps:pr.pr_steps VCS.Valid
           | Invalid -> VCS.result ~time:pr.pr_time ~steps:pr.pr_steps VCS.Invalid
           | OutOfMemory -> VCS.failed "out of memory"
-          | StepLimitExceeded -> VCS.stepout
+          | StepLimitExceeded -> VCS.result ?steps VCS.Stepout
           | Unknown _ -> VCS.unknown
           | Failure s -> VCS.failed s
           | HighFailure ->
@@ -1068,7 +1069,7 @@ let call_prover ~timeout ~steplimit drv prover prover_config task =
                 prover.prover_name = "Alt-Ergo" &&
                 Str.string_match altergo_step_limit pr.pr_output 0
               in
-              if alt_ergo_hack then VCS.stepout
+              if alt_ergo_hack then VCS.result ?steps VCS.Stepout
               else VCS.failed "Unknown error"
         in
         Wp_parameters.debug ~dkey
@@ -1080,6 +1081,101 @@ let call_prover ~timeout ~steplimit drv prover prover_config task =
         Task.Return (Task.Result r)
   in
   Task.async ping
+
+(* -------------------------------------------------------------------------- *)
+(* --- Cache Management                                                   --- *)
+(* -------------------------------------------------------------------------- *)
+
+type mode = NoCache | Update | Replay | Rebuild | Offline | Markup
+
+let get_mode () =
+  match Wp_parameters.Cache.get () with
+  | "none" -> NoCache
+  | "update" -> Update
+  | "replay" -> Replay
+  | "rebuild" -> Rebuild
+  | "offline" -> Offline
+  | "markup" -> Markup
+  | m -> Wp_parameters.error
+           "Unknown -wp-cache %S (use 'none' instead)" m ; NoCache
+
+let task_hash wpo drv prover task =
+  lazy
+    begin
+      let file = Wpo.DISK.file_goal
+          ~pid:wpo.Wpo.po_pid
+          ~model:wpo.Wpo.po_model
+          ~prover:(VCS.Why3 prover) in
+      let _ = Command.print_file file
+          begin fun fmt ->
+            Format.fprintf fmt "(* WP Task for Prover %s *)"
+              (Why3Provers.print prover) ;
+            Why3.Driver.print_task_prepared drv fmt task ;
+          end
+      in Digest.file file |> Digest.to_hex
+    end
+
+let time_fits time = function
+  | None | Some 0 -> true
+  | Some limit -> time <= float limit
+
+let step_fits steps = function
+  | None | Some 0 -> true
+  | Some limit -> steps <= limit
+
+let promote ~timeout ~steplimit (res : VCS.result) =
+  match res.verdict with
+  | VCS.NoResult | VCS.Computing _ | VCS.Checked -> VCS.no_result
+  | VCS.Failed -> res
+  | VCS.Invalid | VCS.Valid | VCS.Unknown ->
+      if not (step_fits res.prover_steps steplimit) then
+        { res with verdict = Stepout }
+      else
+      if not (time_fits res.prover_time timeout) then
+        { res with verdict = Timeout }
+      else res
+  | Timeout ->
+      if not (step_fits res.prover_steps steplimit) then
+        { res with verdict = Stepout }
+      else
+      if time_fits res.prover_time timeout then
+        VCS.no_result
+      else res
+  | Stepout ->
+      if step_fits res.prover_steps steplimit then
+        VCS.no_result
+      else
+      if not (time_fits res.prover_time timeout) then
+        { res with verdict = Timeout }
+      else res
+
+let get_cache_result ~mode hash =
+  match mode with
+  | NoCache | Rebuild -> VCS.no_result
+  | Update | Markup | Replay | Offline ->
+      let dir = Wp_parameters.get_session_dir "cache" in
+      let file = Printf.sprintf "%s/%s.json" dir (Lazy.force hash) in
+      if not (Sys.file_exists file) then VCS.no_result
+      else
+        try
+          Json.load_file file |> ProofScript.result_of_json
+        with err ->
+          Wp_parameters.failure ~once:true "invalid cache entry (%s)"
+            (Printexc.to_string err) ;
+          VCS.no_result
+
+let set_cache_result ~mode hash prover result =
+  match mode with
+  | NoCache | Replay | Offline -> ()
+  | Rebuild | Update | Markup ->
+      let dir = Wp_parameters.get_session_dir "cache" in
+      let file = Printf.sprintf "%s/%s.json" dir (Lazy.force hash) in
+      try
+        ProofScript.json_of_result (VCS.Why3 prover) result
+        |> Json.save_file file
+      with err ->
+        Wp_parameters.failure ~once:true "can not update cache (%s)"
+          (Printexc.to_string err)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Prove WPO                                                          --- *)
@@ -1094,23 +1190,36 @@ let prove ?timeout ?steplimit ~prover wpo =
           then Task.return VCS.checked
           else Task.return VCS.no_result
         else
-          let drv , prover_config , task = prover_task prover wpo in
+          let drv , config , task = prover_task prover wpo in
           if Wp_parameters.Check.get ()
           then
             (* Why3 typed checked the task during its build *)
             Task.return VCS.checked
           else
-            let file = Wpo.DISK.file_goal
-                ~pid:wpo.Wpo.po_pid
-                ~model:wpo.Wpo.po_model
-                ~prover:(VCS.Why3 prover) in
-            (* This printing is currently just for debugging *)
-            let _ = Command.print_file file (fun fmt ->
-                Why3.Driver.print_task_prepared drv fmt task
-              ) in
-            let hash = Digest.file file |> Digest.to_hex in
-            Format.eprintf "[HASH] %s@."  hash ;
-            call_prover ~timeout ~steplimit drv prover prover_config task
+            let mode = get_mode () in
+            match mode with
+            | NoCache ->
+                call_prover ~timeout ~steplimit drv prover config task
+            | Offline ->
+                let hash = task_hash wpo drv prover task in
+                Task.return (get_cache_result ~mode hash)
+            | Update | Replay | Rebuild | Markup ->
+                let hash = task_hash wpo drv prover task in
+                let result =
+                  get_cache_result ~mode hash
+                  |> promote ~timeout ~steplimit in
+                if VCS.is_verdict result
+                then
+                  ( if mode = Markup then
+                      set_cache_result ~mode hash prover result ;
+                    Task.return result )
+                else
+                  Task.finally
+                    (call_prover ~timeout ~steplimit drv prover config task)
+                    (function
+                      | Task.Result result when VCS.is_verdict result ->
+                          set_cache_result ~mode hash prover result
+                      | _ -> ())
       end ()
   with exn ->
     let bt = Printexc.get_raw_backtrace () in
