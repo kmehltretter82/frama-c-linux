@@ -50,10 +50,14 @@ type language =
 let prover_of_name = function
   | "" | "none" -> None
   | "qed" | "Qed" -> Some Qed
-  | "coq" | "coqide" -> Some NativeCoq
   | "alt-ergo" | "altgr-ergo" -> Some (Why3 (Why3Provers.find "alt-ergo"))
-  | "native:alt-ergo" | "native:altgr-ergo" -> Some NativeAltErgo
-  | "native:coq" | "native:coqide" -> Some NativeCoq
+  | "native-alt-ergo" | "native-altgr-ergo"
+  | "native:alt-ergo" | "native:altgr-ergo"
+    -> Some NativeAltErgo
+  | "coq" | "coqide"
+  | "native-coq" | "native-coqide"
+  | "native:coq" | "native:coqide"
+    -> Some NativeCoq
   | "script" -> Some Tactical
   | "tip" -> Some Tactical
   | "why3" -> Some (Why3 { Why3.Whyconf.prover_name = "why3";
@@ -119,7 +123,8 @@ let language_of_prover_name = function
 
 let mode_of_prover_name = function
   | "coqedit" -> EditMode
-  | "coqide" | "altgr-ergo" | "tactical" -> FixMode
+  | "coqide" | "native-coqide" | "native:coqide"
+  | "altgr-ergo" | "tactical" -> FixMode
   | _ -> BatchMode
 
 let is_auto = function

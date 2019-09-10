@@ -151,7 +151,6 @@ why3.import += "real.PowerReal" ;
 coq.file += "coqwp:int/Exponentiation.v" ;
 coq.file += "coqwp:int/Power.v" ;
 coq.file += "coqwp:real/PowerReal.v" ;
-altergo.file += "ergo/int.Exponentiation.mlw" ;
 altergo.file += "ergo/int.Power.mlw" ;
 altergo.file += "ergo/real.PowerReal.mlw" ;
 

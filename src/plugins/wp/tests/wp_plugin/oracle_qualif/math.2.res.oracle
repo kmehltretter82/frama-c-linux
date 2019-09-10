@@ -15,6 +15,8 @@
 [wp] [Alt-Ergo 2.0.0] Goal typed_ko_ensures_ko_sqrt_pos : Unsuccess
 [wp] Proved goals:    0 / 9
   Alt-Ergo 2.0.0:    0  (unsuccess: 9)
+[wp] Report in:  'tests/wp_plugin/oracle_qualif/math.2.report.json'
+[wp] Report out: 'tests/wp_plugin/result_qualif/math.2.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
 ko                  -      -                 9       0.0%
