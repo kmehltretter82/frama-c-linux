@@ -29,3 +29,11 @@ val add_specific_equality:
 val prove : ?timeout:int -> ?steplimit:int -> prover:Why3Provers.t ->
   Wpo.t -> VCS.result Task.task
 (** Return NoResult if it is already proved by Qed *)
+
+type mode = NoCache | Update | Replay | Rebuild | Offline | Markup
+val get_mode : unit -> mode
+
+val reset : unit -> unit (** Reset cache statistics *)
+val get_hits : unit -> int
+val get_miss : unit -> int
+

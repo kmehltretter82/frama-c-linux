@@ -24,7 +24,6 @@
 
 let dkey = Wp_parameters.register_category "prover"
 let dkey_api = Wp_parameters.register_category "why3_api"
-let dkey_cache = Wp_parameters.register_category "cache"
 
 let option_file = LogicBuiltins.create_option
     (fun ~driver_dir x -> Filename.concat driver_dir x)
@@ -1088,6 +1087,13 @@ let call_prover ~timeout ~steplimit drv prover prover_config task =
 
 type mode = NoCache | Update | Replay | Rebuild | Offline | Markup
 
+let hits = ref 0
+let miss = ref 0
+
+let reset () = hits := 0 ; miss := 0
+let get_hits () = !hits
+let get_miss () = !miss
+
 let get_mode () =
   match Wp_parameters.Cache.get () with
   | "none" -> NoCache
@@ -1097,7 +1103,9 @@ let get_mode () =
   | "offline" -> Offline
   | "markup" -> Markup
   | m -> Wp_parameters.error
-           "Unknown -wp-cache %S (use 'none' instead)" m ; NoCache
+           ~once:true
+           "Unknown -wp-cache %S (use 'none' instead)" m ;
+      NoCache
 
 let task_hash wpo drv prover task =
   lazy
@@ -1117,7 +1125,8 @@ let task_hash wpo drv prover task =
 
 let time_fits time = function
   | None | Some 0 -> true
-  | Some limit -> time <= float limit
+  | Some limit ->
+      time < float limit
 
 let step_fits steps = function
   | None | Some 0 -> true
@@ -1202,24 +1211,31 @@ let prove ?timeout ?steplimit ~prover wpo =
                 call_prover ~timeout ~steplimit drv prover config task
             | Offline ->
                 let hash = task_hash wpo drv prover task in
-                Task.return (get_cache_result ~mode hash)
+                let result = get_cache_result ~mode hash |> VCS.cached in
+                Task.return result
             | Update | Replay | Rebuild | Markup ->
                 let hash = task_hash wpo drv prover task in
                 let result =
                   get_cache_result ~mode hash
-                  |> promote ~timeout ~steplimit in
+                  |> promote ~timeout ~steplimit |> VCS.cached in
                 if VCS.is_verdict result
                 then
-                  ( if mode = Markup then
+                  begin
+                    incr hits ;
+                    if mode = Markup then
                       set_cache_result ~mode hash prover result ;
-                    Task.return result )
+                    Task.return result
+                  end
                 else
-                  Task.finally
-                    (call_prover ~timeout ~steplimit drv prover config task)
-                    (function
-                      | Task.Result result when VCS.is_verdict result ->
-                          set_cache_result ~mode hash prover result
-                      | _ -> ())
+                  begin
+                    incr miss ;
+                    Task.finally
+                      (call_prover ~timeout ~steplimit drv prover config task)
+                      (function
+                        | Task.Result result when VCS.is_verdict result ->
+                            set_cache_result ~mode hash prover result
+                        | _ -> ())
+                  end
       end ()
   with exn ->
     let bt = Printexc.get_raw_backtrace () in

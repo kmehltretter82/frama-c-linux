@@ -201,6 +201,7 @@ type pstat = {
   mutable proved : int ;
   mutable unknown : int ;
   mutable interrupted : int ;
+  mutable incache : int ;
   mutable failed : int ;
   mutable n_time : int ;   (* nbr of measured times *)
   mutable a_time : float ; (* sum of measured times *)
@@ -229,6 +230,7 @@ let clear_scheduled () =
     exercised := 0 ;
     proved := GOALS.empty ;
     provers := PM.empty ;
+    ProverWhy3.reset () ;
   end
 
 let get_pstat p =
@@ -239,6 +241,7 @@ let get_pstat p =
       interrupted = 0 ;
       failed = 0 ;
       steps = 0 ;
+      incache = 0 ;
       n_time = 0 ;
       a_time = 0.0 ;
       u_time = 0.0 ;
@@ -297,6 +300,7 @@ let do_progress goal msg =
 let do_wpo_stat goal prover res =
   let s = get_pstat prover in
   let open VCS in
+  if res.cached then s.incache <- succ s.incache ;
   match res.verdict with
   | Checked | NoResult | Computing _ | Invalid | Unknown ->
       s.unknown <- succ s.unknown
@@ -329,23 +333,17 @@ let do_wpo_result goal prover res =
       do_wpo_stat goal prover res ;
     end
 
-let do_why3_result goal prover res =
-  if VCS.is_verdict res then
-    begin
-      do_wpo_stat goal prover res ;
-      let open VCS in
-      if res.verdict <> Valid then
-        Wp_parameters.result
-          "[%a] Goal %s : %a"
-          VCS.pp_prover prover (Wpo.get_gid goal)
-          VCS.pp_result res ;
-    end
-
 let do_wpo_success goal s =
   if not (Wp_parameters.Check.get ()) then
-    match s with
-    | None ->
-        if not (Wp_parameters.Generate.get ()) then
+    if Wp_parameters.Generate.get () then
+      match s with
+      | None -> ()
+      | Some prover ->
+          Wp_parameters.feedback ~ontty:`Silent
+            "[%a] Goal %s : Valid" VCS.pp_prover prover (Wpo.get_gid goal)
+    else
+      match s with
+      | None ->
           begin
             match Wpo.get_results goal with
             | [p,r] ->
@@ -363,9 +361,12 @@ let do_wpo_success goal s =
                       ) pres ;
                   end
           end
-    | Some prover ->
-        Wp_parameters.feedback ~ontty:`Silent
-          "[%a] Goal %s : Valid" VCS.pp_prover prover (Wpo.get_gid goal)
+      | Some p ->
+          let r = Wpo.get_result goal p in
+          Wp_parameters.feedback ~ontty:`Silent
+            "[%a] Goal %s : %a%a"
+            VCS.pp_prover p (Wpo.get_gid goal)
+            VCS.pp_result r pp_warnings goal
 
 let do_report_time fmt s =
   begin
@@ -411,9 +412,11 @@ let do_report_stopped fmt s =
   else
     begin
       if s.interrupted > 0 then
-        Format.fprintf fmt " (interrupted: %d)" s.interrupted ;
+        Format.fprintf fmt " (stopped: %d)" s.interrupted ;
       if s.unknown > 0 then
         Format.fprintf fmt " (unknown: %d)" s.unknown ;
+      if s.incache > 0 then
+        Format.fprintf fmt " (cached: %d)" s.incache ;
     end
 
 let do_report_prover_stats pp_prover fmt (p,s) =
@@ -428,27 +431,68 @@ let do_report_prover_stats pp_prover fmt (p,s) =
     Format.fprintf fmt "@\n" ;
   end
 
+let dkey_cache = Wp_parameters.register_category "cache"
+
+let do_report_cache_usage () =
+  if Wp_parameters.has_dkey dkey_cache
+  then
+    let hits = ProverWhy3.get_hits () in
+    let miss = ProverWhy3.get_miss () in
+    if hits <= 0 && miss <= 0 then
+      Wp_parameters.result "[Cache] not used"
+    else
+      let mode = ProverWhy3.get_mode () in
+      Wp_parameters.result "[Cache]%t"
+        begin fun fmt ->
+          let sep = ref " " in
+          let pp_cache fmt n job =
+            if n > 0 then
+              ( Format.fprintf fmt "%s%s:%d" !sep job n ; sep := ", " ) in
+          match mode with
+          | ProverWhy3.NoCache -> ()
+          | ProverWhy3.Replay ->
+              pp_cache fmt hits "found" ;
+              pp_cache fmt miss "missed" ;
+              Format.pp_print_newline fmt () ;
+          | ProverWhy3.Offline ->
+              pp_cache fmt hits "found" ;
+              pp_cache fmt miss "failed" ;
+              Format.pp_print_newline fmt () ;
+          | ProverWhy3.Update ->
+              pp_cache fmt hits "found" ;
+              pp_cache fmt miss "updated" ;
+              Format.pp_print_newline fmt () ;
+          | ProverWhy3.Markup ->
+              pp_cache fmt hits "found" ;
+              pp_cache fmt miss "missed" ;
+              pp_cache fmt (hits+miss) "updated" ;
+              Format.pp_print_newline fmt () ;
+          | ProverWhy3.Rebuild ->
+              pp_cache fmt (hits+miss) "updated" ;
+              Format.pp_print_newline fmt () ;
+        end
+
 let do_report_scheduled () =
   if not (Wp_parameters.has_dkey VCS.dkey_no_goals_info) then
     if Wp_parameters.Generate.get () then
       let plural = if !exercised > 1 then "s" else "" in
       Wp_parameters.result "%d goal%s generated" !exercised plural
     else
-      begin
-        let proved = GOALS.cardinal !proved in
-        Wp_parameters.result "%t"
-          (fun fmt ->
-             Format.fprintf fmt "Proved goals: %4d / %d@\n" proved !scheduled ;
-             Pretty_utils.pp_items
-               ~min:12 ~align:`Left
-               ~title:(fun (prover,_) -> VCS.title_of_prover prover)
-               ~iter:(fun f -> PM.iter (fun p s -> f (p,s)) !provers)
-               ~pp_title:(fun fmt a -> Format.fprintf fmt "%s:" a)
-               ~pp_item:do_report_prover_stats fmt) ;
-      end
+      let proved = GOALS.cardinal !proved in
+      Wp_parameters.result "%t"
+        begin fun fmt ->
+          Format.fprintf fmt "Proved goals: %4d / %d@\n" proved !scheduled ;
+          Pretty_utils.pp_items
+            ~min:12 ~align:`Left
+            ~title:(fun (prover,_) -> VCS.title_of_prover prover)
+            ~iter:(fun f -> PM.iter (fun p s -> f (p,s)) !provers)
+            ~pp_title:(fun fmt a -> Format.fprintf fmt "%s:" a)
+            ~pp_item:do_report_prover_stats fmt ;
+        end
 
 let do_list_scheduled_result () =
   begin
+    do_report_cache_usage () ;
     do_report_scheduled () ;
     clear_scheduled () ;
   end

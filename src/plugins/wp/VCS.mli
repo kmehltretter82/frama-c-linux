@@ -96,6 +96,7 @@ type verdict =
 
 type result = {
   verdict : verdict ;
+  cached : bool ;
   solver_time : float ;
   prover_time : float ;
   prover_steps : int ;
@@ -114,7 +115,9 @@ val timeout : int -> result
 val computing : (unit -> unit) -> result
 val failed : ?pos:Lexing.position -> string -> result
 val kfailed : ?pos:Lexing.position -> ('a,Format.formatter,unit,result) format4 -> 'a
-val result : ?solver:float -> ?time:float -> ?steps:int -> ?depth:int -> verdict -> result
+val cached : result -> result (** only for true verdicts *)
+
+val result : ?cached:bool -> ?solver:float -> ?time:float -> ?steps:int -> ?depth:int -> verdict -> result
 
 val is_auto : prover -> bool
 val is_verdict : result -> bool
@@ -133,4 +136,5 @@ val best : result list -> result
 val dkey_no_time_info: Wp_parameters.category
 val dkey_no_step_info: Wp_parameters.category
 val dkey_no_goals_info: Wp_parameters.category
+val dkey_no_cache_info: Wp_parameters.category
 val dkey_success_only: Wp_parameters.category

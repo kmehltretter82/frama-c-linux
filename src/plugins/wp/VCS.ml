@@ -27,6 +27,7 @@
 let dkey_no_time_info = Wp_parameters.register_category "no-time-info"
 let dkey_no_step_info = Wp_parameters.register_category "no-step-info"
 let dkey_no_goals_info = Wp_parameters.register_category "no-goals-info"
+let dkey_no_cache_info = Wp_parameters.register_category "no-cache-info"
 let dkey_success_only = Wp_parameters.register_category "success-only"
 
 type prover =
@@ -214,6 +215,7 @@ type verdict =
 
 type result = {
   verdict : verdict ;
+  cached : bool ;
   solver_time : float ;
   prover_time : float ;
   prover_steps : int ;
@@ -276,9 +278,10 @@ let autofit r =
   step_fits r.prover_steps &&
   depth_fits r.prover_depth
 
-let result ?(solver=0.0) ?(time=0.0) ?(steps=0) ?(depth=0) verdict =
+let result ?(cached=false) ?(solver=0.0) ?(time=0.0) ?(steps=0) ?(depth=0) verdict =
   {
     verdict ;
+    cached = cached ;
     solver_time = solver ;
     prover_time = time ;
     prover_steps = steps ;
@@ -297,6 +300,7 @@ let stepout n = result ~steps:n Stepout
 let computing kill = result (Computing kill)
 let failed ?pos msg = {
   verdict = Failed ;
+  cached = false ;
   solver_time = 0.0 ;
   prover_time = 0.0 ;
   prover_steps = 0 ;
@@ -304,6 +308,8 @@ let failed ?pos msg = {
   prover_errpos = pos ;
   prover_errmsg = msg ;
 }
+
+let cached r = if is_verdict r then { r with cached=true } else r
 
 let kfailed ?pos msg = Pretty_utils.ksfprintf (failed ?pos) msg
 
@@ -319,15 +325,17 @@ let pp_perf ~extended fmt r =
     then Format.fprintf fmt " (%a)" Rformat.pp_time t ;
     let s = r.prover_steps in
     if s > 0 && perfo extended dkey_no_step_info
-    then Format.fprintf fmt " (%d)" s
+    then Format.fprintf fmt " (%d)" s ;
+    if r.cached && perfo extended dkey_no_cache_info
+    then Format.fprintf fmt " (cached)" ;
   end
 
 let pp_res ~extended fmt r =
   match r.verdict with
   | NoResult -> Format.pp_print_string fmt (if extended then "No Result" else "-")
-  | Invalid -> Format.pp_print_string fmt "Invalid"
   | Computing _ -> Format.pp_print_string fmt "Computing"
   | Checked -> Format.fprintf fmt "Typechecked"
+  | Invalid -> Format.pp_print_string fmt "Invalid"
   | Valid when Wp_parameters.has_dkey dkey_success_only ->
       Format.pp_print_string fmt "Valid"
   | (Timeout|Stepout|Unknown) when Wp_parameters.has_dkey dkey_success_only ->
@@ -372,6 +380,7 @@ let merge r1 r2 =
   let err = if r1.prover_errmsg <> "" then r1 else r2 in
   {
     verdict = combine r1.verdict r2.verdict ;
+    cached = r1.cached && r2.cached ;
     solver_time = max r1.solver_time r2.solver_time ;
     prover_time = max r1.prover_time r2.prover_time ;
     prover_steps = max r1.prover_steps r2.prover_steps ;
