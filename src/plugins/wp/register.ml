@@ -361,12 +361,16 @@ let do_wpo_success goal s =
                       ) pres ;
                   end
           end
+      | Some (VCS.Tactical as p) ->
+          Wp_parameters.feedback ~ontty:`Silent
+            "[%a] Goal %s : Valid"
+            VCS.pp_prover p (Wpo.get_gid goal)
       | Some p ->
           let r = Wpo.get_result goal p in
           Wp_parameters.feedback ~ontty:`Silent
-            "[%a] Goal %s : %a%a"
+            "[%a] Goal %s : %a"
             VCS.pp_prover p (Wpo.get_gid goal)
-            VCS.pp_result r pp_warnings goal
+            VCS.pp_result r
 
 let do_report_time fmt s =
   begin
@@ -412,7 +416,7 @@ let do_report_stopped fmt s =
   else
     begin
       if s.interrupted > 0 then
-        Format.fprintf fmt " (stopped: %d)" s.interrupted ;
+        Format.fprintf fmt " (interrupted: %d)" s.interrupted ;
       if s.unknown > 0 then
         Format.fprintf fmt " (unknown: %d)" s.unknown ;
       if s.incache > 0 then

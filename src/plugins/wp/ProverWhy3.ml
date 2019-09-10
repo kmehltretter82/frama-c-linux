@@ -20,7 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-[@@@ warning "-40-42-32"]
+(* Allow type-desambiguation for symbols *)
+[@@@ warning "-40-42"]
 
 let dkey = Wp_parameters.register_category "prover"
 let dkey_api = Wp_parameters.register_category "why3_api"
@@ -1094,18 +1095,36 @@ let reset () = hits := 0 ; miss := 0
 let get_hits () = !hits
 let get_miss () = !miss
 
-let get_mode () =
-  match Wp_parameters.Cache.get () with
+let parse_mode ~origin ~fallback = function
   | "none" -> NoCache
   | "update" -> Update
   | "replay" -> Replay
   | "rebuild" -> Rebuild
   | "offline" -> Offline
   | "markup" -> Markup
-  | m -> Wp_parameters.error
-           ~once:true
-           "Unknown -wp-cache %S (use 'none' instead)" m ;
-      NoCache
+  | m ->
+      Wp_parameters.warning ~current:false
+        "Unknown %s mode %S (use %s instead)" origin m fallback ;
+      raise Not_found
+
+module MODE = WpContext.StaticGenerator(Datatype.Unit)
+    (struct
+      type key = unit
+      type data = mode
+      let name = "Wp.Cache.mode"
+      let compile () =
+        try
+          let origin = "FRAMAC_WP_CACHE" in
+          parse_mode ~origin ~fallback:"-wp-cache" (Sys.getenv origin)
+        with Not_found ->
+        try
+          parse_mode ~origin:"-wp-cache" ~fallback:"'none'"
+            (Wp_parameters.Cache.get())
+        with Not_found ->
+          NoCache
+    end)
+
+let get_mode = MODE.get
 
 let task_hash wpo drv prover task =
   lazy
@@ -1209,7 +1228,7 @@ let prove ?timeout ?steplimit ~prover wpo =
             (* Why3 typed checked the task during its build *)
             Task.return VCS.checked
           else
-          if is_trivial task then
+          if false && is_trivial task then
             Task.return VCS.valid
           else
             let mode = get_mode () in

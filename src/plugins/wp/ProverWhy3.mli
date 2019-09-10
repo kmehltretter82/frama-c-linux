@@ -37,3 +37,4 @@ val reset : unit -> unit (** Reset cache statistics *)
 val get_hits : unit -> int
 val get_miss : unit -> int
 
+(**************************************************************************)
