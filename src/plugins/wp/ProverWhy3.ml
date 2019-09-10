@@ -1000,9 +1000,8 @@ let task_of_wpo wpo =
 (* --- Prover Task                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-let prover_task prover wpo =
+let prover_task prover task =
   let env = get_why3_env () in
-  let task = task_of_wpo wpo in
   let config = Why3Provers.config () in
   let prover_config = Why3.Whyconf.get_prover_config config prover in
   let drv = Why3.Whyconf.load_driver (Why3.Whyconf.get_main config)
@@ -1217,17 +1216,15 @@ let prove ?timeout ?steplimit ~prover wpo =
   try
     WpContext.on_context (Wpo.get_context wpo)
       begin fun () ->
-        if Wp_parameters.Generate.get ()
-        then if Wp_parameters.Check.get ()
-          then Task.return VCS.checked
-          else Task.return VCS.no_result
+        (* Always generate common task *)
+        let task = task_of_wpo wpo in
+        if Wp_parameters.Check.get ()
+        then Task.return VCS.checked (* Why3 tasks are type-checked *)
         else
-          let drv , config , task = prover_task prover wpo in
-          if Wp_parameters.Check.get ()
-          then
-            (* Why3 typed checked the task during its build *)
-            Task.return VCS.checked
-          else
+        if Wp_parameters.Generate.get ()
+        then Task.return VCS.no_result (* Only generate *)
+        else
+          let drv , config , task = prover_task prover task in
           if false && is_trivial task then
             Task.return VCS.valid
           else
