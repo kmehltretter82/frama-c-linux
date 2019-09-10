@@ -702,19 +702,6 @@ endif
 SOURCEVIEWCOMPAT:=GSourceView
 GENERATED+=src/plugins/gui/GSourceView.ml src/plugins/gui/GSourceView.mli
 
-DGRAPHCOMPAT:=
-ifeq ($(HAS_GNOMECANVAS),no)
-DGRAPHCOMPAT:=dgraph
-src/plugins/gui/dgraph.ml: src/plugins/gui/dgraph.ml.in
-	$(CP) $< $@
-	$(CHMOD_RO) $@
-src/plugins/gui/dgraph.mli: src/plugins/gui/dgraph.mli.in
-	$(CP) $< $@
-	$(CHMOD_RO) $@
-
-GENERATED+=src/plugins/gui/dgraph.ml src/plugins/gui/dgraph.mli
-endif
-
 ifeq ($(LABLGTK),lablgtk3)
 src/plugins/gui/gtk_compat.ml: src/plugins/gui/gtk_compat.3.ml
 	$(CP) $< $@
@@ -726,14 +713,20 @@ src/plugins/gui/gtk_compat.ml: src/plugins/gui/gtk_compat.2.ml
 endif
 GENERATED+=src/plugins/gui/gtk_compat.ml
 
+ifeq ($(HAS_DGRAPH),yes)
+  DGRAPHFILES:=debug_manager property_navigator
+else
+  DGRAPHFILES:=
+endif
+
 SINGLE_GUI_CMO:= \
 	wutil_once \
 	gtk_compat \
 	$(WTOOLKIT) \
 	$(SOURCEVIEWCOMPAT) \
-	$(DGRAPHCOMPAT) \
 	gui_parameters \
-	gtk_helper gtk_form \
+	gtk_helper \
+        gtk_form \
 	source_viewer pretty_source source_manager book_manager \
 	warning_manager \
 	filetree \
@@ -742,9 +735,9 @@ SINGLE_GUI_CMO:= \
 	history \
 	gui_printers \
 	design \
-	analyses_manager file_manager project_manager debug_manager \
+	analyses_manager file_manager project_manager \
 	help_manager \
-	property_navigator
+        $(DGRAPHFILES)
 
 SINGLE_GUI_CMO:= $(patsubst %,src/plugins/gui/%.cmo,$(SINGLE_GUI_CMO))
 
@@ -1052,9 +1045,10 @@ PLUGIN_ENABLE:=$(ENABLE_IMPACT)
 PLUGIN_NAME:=Impact
 PLUGIN_DIR:=src/plugins/impact
 PLUGIN_CMO:= options pdg_aux reason_graph compute_impact register
+ifeq ($(HAS_DGRAPH),yes)
 PLUGIN_GUI_CMO:= register_gui
+endif
 PLUGIN_DISTRIBUTED:=yes
-# PLUGIN_UNDOC:=impact_gui.ml
 PLUGIN_INTERNAL_TEST:=yes
 PLUGIN_DEPENDENCIES:=Inout Eva Pdg Slicing
 
