@@ -4,8 +4,7 @@
 */
 
 /* run.config_qualif
-   CMD: @frama-c@ -wp-share ./share -wp-msg-key cluster,shell -wp-par 1 -wp-timeout 100 -wp-steps 500
-   OPT: -wp-model Typed -wp -wp-check -then -wp-model Typed+ref -wp -wp-check
+   OPT: -wp-msg-key cluster -wp-model Typed -wp-check -then -wp -wp-model Typed+ref -wp-check
 */
 
 //@ predicate P(integer a);

@@ -32,8 +32,6 @@ val prove : ?timeout:int -> ?steplimit:int -> prover:Why3Provers.t ->
 
 type mode = NoCache | Update | Replay | Rebuild | Offline | Cleanup
 val get_mode : unit -> mode
-
-val reset : unit -> unit (** Reset cache statistics *)
 val get_hits : unit -> int
 val get_miss : unit -> int
 val get_removed : unit -> int

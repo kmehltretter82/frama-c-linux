@@ -230,7 +230,6 @@ let clear_scheduled () =
     exercised := 0 ;
     proved := GOALS.empty ;
     provers := PM.empty ;
-    ProverWhy3.reset () ;
   end
 
 let get_pstat p =
@@ -502,6 +501,7 @@ let do_report_cache_usage mode =
             Format.pp_print_newline fmt () ;
       end
 
+(* registered at frama-c (normal) exit *)
 let do_cache_cleanup () =
   begin
     let mode = ProverWhy3.get_mode () in
@@ -680,7 +680,6 @@ let do_wp_proofs_iter iter =
   begin
     if spawned then do_list_scheduled iter ;
     spawn_wp_proofs_iter ~mode iter ;
-    do_cache_cleanup () ;
     if spawned then
       begin
         do_list_scheduled_result () ;
@@ -916,39 +915,8 @@ let do_prover_detect () =
         ) provers
 
 (* ------------------------------------------------------------------------ *)
-(* ---  Main Entry Point                                                --- *)
+(* ---  Main Entry Points                                               --- *)
 (* ------------------------------------------------------------------------ *)
-
-(*
-(* This filter can be changed to make exceptions interrupting
-   the sequence immediately *)
-let catch_exn (_:exn) =
-  not (Wp_parameters.has_dkey "raised")
-
-(* This order can be changed *)
-let reraised_exn (first:exn) (_last:exn) = Some first
-
-(* Don't use Extlib.try_finally:
-   No exception is used for control here.
-   Backtrace is dumped here for debugging purpose.
-   We just record one of the raised exceptions (to be raised again),
-   while ensuring all tasks are finally executed. *)
-let protect err job =
-  try job ()
-  with e when catch_exn e ->
-    let b = Printexc.get_raw_backtrace () in
-    Wp_parameters.failure "%s@\n%s"
-      (Printexc.to_string e)
-      (Printexc.raw_backtrace_to_string b) ;
-    match !err with
-    | None -> err := Some e
-    | Some previous -> err := reraised_exn previous e
-
-let sequence jobs =
-  let err = ref None in
-  List.iter (protect err) jobs ;
-  match !err with None -> () | Some e -> raise e
-*)
 
 let rec try_sequence jobs () = match jobs with
   | [] -> ()
@@ -980,4 +948,7 @@ let main = sequence [
     (fun () -> Wp_parameters.debug ~dkey:job_key "Stop WP plugin...@.") ;
   ]
 
+let () = Cmdline.at_normal_exit do_cache_cleanup
 let () = Db.Main.extend main
+
+(* ------------------------------------------------------------------------ *)

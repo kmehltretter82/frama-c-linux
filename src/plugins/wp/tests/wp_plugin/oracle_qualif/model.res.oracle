@@ -1,6 +1,6 @@
-# frama-c -wp -wp-timeout 100 -wp-steps 500 [...]
+# frama-c -wp [...]
 [kernel] Parsing tests/wp_plugin/model.i (no preprocessing)
-[kernel] tests/wp_plugin/model.i:11: Warning: 
+[kernel] tests/wp_plugin/model.i:10: Warning: 
   parsing obsolete ACSL construct 'logic declaration'. 'an axiomatic block' should be used instead.
 [wp] Running WP plugin...
 [wp] Loading driver 'share/wp.driver'
@@ -50,7 +50,13 @@ theory Axiomatic
 end
 [wp] [Alt-Ergo 2.0.0] Goal typed_f_ensures : Typechecked
 [wp] Proved goals:    0 / 1
-  Alt-Ergo 2.0.0:    0  (unknown: 1)
+  Alt-Ergo 2.0.0:    0  (unsuccess: 1)
+[wp] Report in:  'tests/wp_plugin/oracle_qualif/model.0.report.json'
+[wp] Report out: 'tests/wp_plugin/result_qualif/model.0.report.json'
+-------------------------------------------------------------
+Functions           WP     Alt-Ergo        Total   Success
+f                   -      -                 1       0.0%
+-------------------------------------------------------------
 [wp] Running WP plugin...
 [wp] 2 goals scheduled
 [wp] [Alt-Ergo 2.0.0] Goal typed_f_ensures : Typechecked
@@ -98,4 +104,10 @@ theory Axiomatic1
 end
 [wp] [Alt-Ergo 2.0.0] Goal typed_ref_f_ensures : Typechecked
 [wp] Proved goals:    0 / 2
-  Alt-Ergo 2.0.0:    0  (unknown: 2)
+  Alt-Ergo 2.0.0:    0  (unsuccess: 2)
+[wp] Report in:  'tests/wp_plugin/oracle_qualif/model.0.report.json'
+[wp] Report out: 'tests/wp_plugin/result_qualif/model.0.report.json'
+-------------------------------------------------------------
+Functions           WP     Alt-Ergo        Total   Success
+f                   -      -                 2       0.0%
+-------------------------------------------------------------

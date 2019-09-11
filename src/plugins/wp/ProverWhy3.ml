@@ -1090,15 +1090,8 @@ type mode = NoCache | Update | Replay | Rebuild | Offline | Cleanup
 let hits = ref 0
 let miss = ref 0
 let removed = ref 0
-let cleanup = Hashtbl.create 0 (* used entries *)
-
-let reset () =
-  begin
-    hits := 0 ;
-    miss := 0 ;
-    removed := 0 ;
-    Hashtbl.clear cleanup ;
-  end
+let cleanup = Hashtbl.create 0
+(* used entries, never to be reset since cleanup is performed at exit *)
 
 let get_hits () = !hits
 let get_miss () = !miss
@@ -1108,7 +1101,7 @@ let mark_cache ~mode hash =
   if mode = Cleanup then Hashtbl.replace cleanup hash ()
 
 let cleanup_cache ~mode =
-  if mode = Cleanup then
+  if mode = Cleanup && (!hits > 0 || !miss > 0) then
     let dir = Wp_parameters.get_session_dir "cache" in
     try
       if Sys.is_directory dir then
@@ -1181,38 +1174,41 @@ let task_hash wpo drv prover task =
 
 let time_fits time = function
   | None | Some 0 -> true
-  | Some limit ->
-      time < float limit
+  | Some limit -> time <= float limit
 
-let step_fits steps = function
+let steps_fits steps = function
   | None | Some 0 -> true
   | Some limit -> steps <= limit
+
+let time_seized time = function
+  | None | Some 0 -> false
+  | Some limit -> float limit <= time
+
+let steps_seized steps steplimit =
+  steps <> 0 &&
+  match steplimit with
+  | None | Some 0 -> false
+  | Some limit -> limit <= steps
 
 let promote ~timeout ~steplimit (res : VCS.result) =
   match res.verdict with
   | VCS.NoResult | VCS.Computing _ | VCS.Checked -> VCS.no_result
   | VCS.Failed -> res
   | VCS.Invalid | VCS.Valid | VCS.Unknown ->
-      if not (step_fits res.prover_steps steplimit) then
+      if not (steps_fits res.prover_steps steplimit) then
         { res with verdict = Stepout }
       else
       if not (time_fits res.prover_time timeout) then
         { res with verdict = Timeout }
       else res
-  | Timeout ->
-      if not (step_fits res.prover_steps steplimit) then
+  | VCS.Timeout | VCS.Stepout ->
+      if steps_seized res.prover_steps steplimit then
         { res with verdict = Stepout }
       else
-      if time_fits res.prover_time timeout then
-        VCS.no_result
-      else res
-  | Stepout ->
-      if step_fits res.prover_steps steplimit then
-        VCS.no_result
-      else
-      if not (time_fits res.prover_time timeout) then
+      if time_seized res.prover_time timeout then
         { res with verdict = Timeout }
-      else res
+      else (* can be run a longer time or widely *)
+        VCS.no_result
 
 let get_cache_result ~mode hash =
   match mode with
@@ -1288,8 +1284,6 @@ let prove ?timeout ?steplimit ~prover wpo =
                 then
                   begin
                     incr hits ;
-                    if mode = Cleanup then
-                      set_cache_result ~mode hash prover result ;
                     Task.return result
                   end
                 else
