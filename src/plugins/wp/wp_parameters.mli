@@ -104,7 +104,6 @@ module CoqTimeout: Parameter_sig.Int
 module CoqCompiler : Parameter_sig.String
 module CoqIde : Parameter_sig.String
 module CoqProject : Parameter_sig.String
-module Depth: Parameter_sig.Int
 module Steps: Parameter_sig.Int
 module Procs: Parameter_sig.Int
 module ProofTrace: Parameter_sig.Bool

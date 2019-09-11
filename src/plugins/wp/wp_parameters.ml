@@ -498,15 +498,6 @@ module Drivers =
     end)
 
 let () = Parameter_customize.set_group wp_prover
-module Depth =
-  Int(struct
-    let option_name = "-wp-depth"
-    let default = 0
-    let arg_name = "p"
-    let help = "Set depth of exploration for provers."
-  end)
-
-let () = Parameter_customize.set_group wp_prover
 module Steps =
   Int(struct
     let option_name = "-wp-steps"
