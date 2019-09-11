@@ -224,13 +224,6 @@ module ExternArrays =
   end)
 
 let () = Parameter_customize.set_group wp_model
-module ExtEqual =
-  False(struct
-    let option_name = "-wp-extensional"
-    let help = "Use extensional equality on compounds (hypotheses only)."
-  end)
-
-let () = Parameter_customize.set_group wp_model
 module Overflows =
   False(struct
     let option_name = "-wp-overflows"
@@ -371,6 +364,13 @@ module Reduce =
   True(struct
     let option_name = "-wp-reduce"
     let help = "Reduce function equalities with precedence to constructors."
+  end)
+
+let () = Parameter_customize.set_group wp_simplifier
+module ExtEqual =
+  True(struct
+    let option_name = "-wp-extensional"
+    let help = "Use extensional equality on compounds (hypotheses only)."
   end)
 
 let () = Parameter_customize.set_group wp_simplifier
