@@ -465,8 +465,8 @@ module Provers = String_list
          - 'coq', 'coqide' (see also -wp-script)\n\
          - 'native:alt-ergo'\n\
          - 'native:coq'\n\
-         - 'native:coqide'\n\
-         - 'why3ide' (why3 gui)"
+         - 'native:coqide'\
+        "
     end)
 
 let () = Parameter_customize.set_group wp_prover
@@ -474,15 +474,17 @@ module Cache = String
     (struct
       let option_name = "-wp-cache"
       let arg_name = "mode"
-      let default = "none"
+      let default = ""
       let help =
         "WP cache mode:\n\
          - 'none': no cache, run provers (default)\n\
-         - 'update': use cache or run prover and update cache\n\
-         - 'markup': use cache or run prover with forced cache update\n\
-         - 'replay': use cache or run prover with no cache update\n\
-         - 'rebuild': run prover and update cache\n\
-         - 'offline': use cache only"
+         - 'update': use cache or run provers and update cache\n\
+         - 'cleanup': update mode with garbage collection\n\
+         - 'replay': update mode with no cache update\n\
+         - 'rebuild': always run provers and update cache\n\
+         - 'offline': use cache but never run provers\n\
+         This option is overriden by environment variable FRAMAC_WP_CACHE.\
+        "
     end)
 
 let () = Parameter_customize.set_group wp_prover

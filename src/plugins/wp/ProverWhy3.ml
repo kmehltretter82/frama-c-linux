@@ -1137,6 +1137,7 @@ let parse_mode ~origin ~fallback = function
   | "rebuild" -> Rebuild
   | "offline" -> Offline
   | "cleanup" -> Cleanup
+  | "" -> raise Not_found
   | m ->
       Wp_parameters.warning ~current:false
         "Unknown %s mode %S (use %s instead)" origin m fallback ;
@@ -1156,7 +1157,8 @@ module MODE = WpContext.StaticGenerator(Datatype.Unit)
           parse_mode ~origin:"-wp-cache" ~fallback:"'none'"
             (Wp_parameters.Cache.get())
         with Not_found ->
-          NoCache
+          if Wp_parameters.Session.Dir_name.is_set ()
+          then Update else NoCache
     end)
 
 let get_mode = MODE.get
