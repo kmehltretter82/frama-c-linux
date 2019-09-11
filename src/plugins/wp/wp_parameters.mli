@@ -50,6 +50,7 @@ module Model : Parameter_sig.String_list
 module ByValue : Parameter_sig.String_set
 module ByRef : Parameter_sig.String_set
 module InHeap : Parameter_sig.String_set
+module AliasInit: Parameter_sig.Bool
 module InCtxt : Parameter_sig.String_set
 module ExternArrays: Parameter_sig.Bool
 module ExtEqual : Parameter_sig.Bool
@@ -63,7 +64,6 @@ module Volatile : Parameter_sig.Bool
 (** {2 Computation Strategies} *)
 
 module Init: Parameter_sig.Bool
-module InitAlias: Parameter_sig.Bool
 module InitWithForall: Parameter_sig.Bool
 module BoundForallUnfolding: Parameter_sig.Int
 module RTE: Parameter_sig.Bool

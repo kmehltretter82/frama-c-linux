@@ -201,6 +201,13 @@ module InHeap =
     end)
 
 let () = Parameter_customize.set_group wp_model
+module AliasInit =
+  False(struct
+    let option_name = "-wp-alias-init"
+    let help = "Use initializers for aliasing propagation."
+  end)
+
+let () = Parameter_customize.set_group wp_model
 module InCtxt =
   String_set
     (struct
@@ -257,12 +264,6 @@ module Init =
   False(struct
     let option_name = "-wp-init-const"
     let help = "Use initializers for global const variables."
-  end)
-
-module InitAlias =
-  False(struct
-    let option_name = "-wp-init-alias"
-    let help = "Use initializers for aliasing propagation."
   end)
 
 let () = Parameter_customize.set_group wp_strategy

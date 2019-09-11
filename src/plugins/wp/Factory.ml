@@ -171,7 +171,7 @@ let refusage_param ~byref ~context x =
     | WpContext.Kf f ->
         Some f ,
         WpStrategy.is_main_init f ||
-        Wp_parameters.InitAlias.get () ||
+        Wp_parameters.AliasInit.get () ||
         ( WpStrategy.isInitConst () &&
           WpStrategy.isGlobalInitConst x ) in
   match RefUsage.get ?kf ~init x with
