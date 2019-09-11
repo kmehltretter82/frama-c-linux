@@ -868,9 +868,9 @@ let pp_wp_parameters fmt =
     then Format.pp_print_string fmt " -wp-no-prune" ;
     if Wp_parameters.Split.get () then Format.pp_print_string fmt " -wp-split" ;
     let tm = Wp_parameters.Timeout.get () in
-    if tm > 10 then Format.fprintf fmt " -wp-timeout %d" tm ;
+    if tm <> 10 then Format.fprintf fmt " -wp-timeout %d" tm ;
     let st = Wp_parameters.Steps.get () in
-    if tm > 10 then Format.fprintf fmt " -wp-steps %d" st ;
+    if st > 0 then Format.fprintf fmt " -wp-steps %d" st ;
     let dp = Wp_parameters.Depth.get () in
     if dp > 0 then Format.fprintf fmt " -wp-depth %d" dp ;
     if not (Kernel.SignedOverflow.get ()) then

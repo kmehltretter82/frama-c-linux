@@ -50,7 +50,7 @@ let status wpo =
         try
           let f' = List.find Sys.file_exists (legacies wpo) in
           Wp_parameters.warning ~current:false
-            "Deprecated script for '%s'" wpo.po_sid ;
+            "Deprecated script for '%s' (use prover tip to upgrade)" wpo.po_sid ;
           Deprecated f'
         with Not_found -> NoScript
     in Hashtbl.add files f status ; status
