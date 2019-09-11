@@ -435,47 +435,6 @@ let do_report_prover_stats pp_prover fmt (p,s) =
     Format.fprintf fmt "@\n" ;
   end
 
-let dkey_cache = Wp_parameters.register_category "cache"
-
-let do_report_cache_usage () =
-  if Wp_parameters.has_dkey dkey_cache
-  then
-    let hits = ProverWhy3.get_hits () in
-    let miss = ProverWhy3.get_miss () in
-    if hits <= 0 && miss <= 0 then
-      Wp_parameters.result "[Cache] not used"
-    else
-      let mode = ProverWhy3.get_mode () in
-      Wp_parameters.result "[Cache]%t"
-        begin fun fmt ->
-          let sep = ref " " in
-          let pp_cache fmt n job =
-            if n > 0 then
-              ( Format.fprintf fmt "%s%s:%d" !sep job n ; sep := ", " ) in
-          match mode with
-          | ProverWhy3.NoCache -> ()
-          | ProverWhy3.Replay ->
-              pp_cache fmt hits "found" ;
-              pp_cache fmt miss "missed" ;
-              Format.pp_print_newline fmt () ;
-          | ProverWhy3.Offline ->
-              pp_cache fmt hits "found" ;
-              pp_cache fmt miss "failed" ;
-              Format.pp_print_newline fmt () ;
-          | ProverWhy3.Update ->
-              pp_cache fmt hits "found" ;
-              pp_cache fmt miss "updated" ;
-              Format.pp_print_newline fmt () ;
-          | ProverWhy3.Markup ->
-              pp_cache fmt hits "found" ;
-              pp_cache fmt miss "missed" ;
-              pp_cache fmt (hits+miss) "updated" ;
-              Format.pp_print_newline fmt () ;
-          | ProverWhy3.Rebuild ->
-              pp_cache fmt (hits+miss) "updated" ;
-              Format.pp_print_newline fmt () ;
-        end
-
 let do_report_scheduled () =
   if not (Wp_parameters.has_dkey VCS.dkey_no_goals_info) then
     if Wp_parameters.Generate.get () then
@@ -496,9 +455,59 @@ let do_report_scheduled () =
 
 let do_list_scheduled_result () =
   begin
-    do_report_cache_usage () ;
     do_report_scheduled () ;
     clear_scheduled () ;
+  end
+
+(* ------------------------------------------------------------------------ *)
+(* ---  Caching                                                         --- *)
+(* ------------------------------------------------------------------------ *)
+
+let dkey_cache = Wp_parameters.register_category "cache"
+
+let do_report_cache_usage mode =
+  let hits = ProverWhy3.get_hits () in
+  let miss = ProverWhy3.get_miss () in
+  let removed = ProverWhy3.get_removed () in
+  if hits <= 0 && miss <= 0 then
+    Wp_parameters.result "[Cache] not used"
+  else
+    Wp_parameters.result "[Cache]%t"
+      begin fun fmt ->
+        let sep = ref " " in
+        let pp_cache fmt n job =
+          if n > 0 then
+            ( Format.fprintf fmt "%s%s:%d" !sep job n ; sep := ", " ) in
+        match mode with
+        | ProverWhy3.NoCache -> ()
+        | ProverWhy3.Replay ->
+            pp_cache fmt hits "found" ;
+            pp_cache fmt miss "missed" ;
+            Format.pp_print_newline fmt () ;
+        | ProverWhy3.Offline ->
+            pp_cache fmt hits "found" ;
+            pp_cache fmt miss "failed" ;
+            Format.pp_print_newline fmt () ;
+        | ProverWhy3.Update ->
+            pp_cache fmt hits "found" ;
+            pp_cache fmt miss "updated" ;
+            Format.pp_print_newline fmt () ;
+        | ProverWhy3.Cleanup ->
+            pp_cache fmt hits "found" ;
+            pp_cache fmt miss "missed" ;
+            pp_cache fmt removed "removed" ;
+            Format.pp_print_newline fmt () ;
+        | ProverWhy3.Rebuild ->
+            pp_cache fmt (hits+miss) "updated" ;
+            Format.pp_print_newline fmt () ;
+      end
+
+let do_cache_cleanup () =
+  begin
+    let mode = ProverWhy3.get_mode () in
+    ProverWhy3.cleanup_cache ~mode ;
+    if Wp_parameters.has_dkey dkey_cache
+    then do_report_cache_usage mode ;
   end
 
 (* ------------------------------------------------------------------------ *)
@@ -672,6 +681,7 @@ let do_wp_proofs_iter iter =
   begin
     if spawned then do_list_scheduled iter ;
     spawn_wp_proofs_iter ~mode iter ;
+    do_cache_cleanup () ;
     if spawned then
       begin
         do_list_scheduled_result () ;

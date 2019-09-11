@@ -1085,14 +1085,50 @@ let call_prover ~timeout ~steplimit drv prover prover_config task =
 (* --- Cache Management                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-type mode = NoCache | Update | Replay | Rebuild | Offline | Markup
+type mode = NoCache | Update | Replay | Rebuild | Offline | Cleanup
 
 let hits = ref 0
 let miss = ref 0
+let removed = ref 0
+let cleanup = Hashtbl.create 0 (* used entries *)
 
-let reset () = hits := 0 ; miss := 0
+let reset () =
+  begin
+    hits := 0 ;
+    miss := 0 ;
+    removed := 0 ;
+    Hashtbl.clear cleanup ;
+  end
+
 let get_hits () = !hits
 let get_miss () = !miss
+let get_removed () = !removed
+
+let mark_cache ~mode hash =
+  if mode = Cleanup then Hashtbl.replace cleanup hash ()
+
+let cleanup_cache ~mode =
+  if mode = Cleanup then
+    let dir = Wp_parameters.get_session_dir "cache" in
+    try
+      if Sys.is_directory dir then
+        Array.iter
+          (fun f ->
+             if Filename.check_suffix f ".json" then
+               let hash = Filename.chop_suffix f ".json" in
+               if not (Hashtbl.mem cleanup hash) then
+                 begin
+                   incr removed ;
+                   Extlib.safe_remove (Printf.sprintf "%s/%s" dir f) ;
+                 end
+          ) (Sys.readdir dir) ;
+    with Unix.Unix_error _ as exn ->
+      Wp_parameters.failure "Can not cleanup cache (%s)"
+        (Printexc.to_string exn)
+
+(* -------------------------------------------------------------------------- *)
+(* --- Cache Management                                                   --- *)
+(* -------------------------------------------------------------------------- *)
 
 let parse_mode ~origin ~fallback = function
   | "none" -> NoCache
@@ -1100,7 +1136,7 @@ let parse_mode ~origin ~fallback = function
   | "replay" -> Replay
   | "rebuild" -> Rebuild
   | "offline" -> Offline
-  | "markup" -> Markup
+  | "cleanup" -> Cleanup
   | m ->
       Wp_parameters.warning ~current:false
         "Unknown %s mode %S (use %s instead)" origin m fallback ;
@@ -1179,12 +1215,14 @@ let promote ~timeout ~steplimit (res : VCS.result) =
 let get_cache_result ~mode hash =
   match mode with
   | NoCache | Rebuild -> VCS.no_result
-  | Update | Markup | Replay | Offline ->
+  | Update | Cleanup | Replay | Offline ->
       let dir = Wp_parameters.get_session_dir "cache" in
-      let file = Printf.sprintf "%s/%s.json" dir (Lazy.force hash) in
+      let hash = Lazy.force hash in
+      let file = Printf.sprintf "%s/%s.json" dir hash in
       if not (Sys.file_exists file) then VCS.no_result
       else
         try
+          mark_cache ~mode hash ;
           Json.load_file file |> ProofScript.result_of_json
         with err ->
           Wp_parameters.failure ~once:true "invalid cache entry (%s)"
@@ -1194,10 +1232,12 @@ let get_cache_result ~mode hash =
 let set_cache_result ~mode hash prover result =
   match mode with
   | NoCache | Replay | Offline -> ()
-  | Rebuild | Update | Markup ->
+  | Rebuild | Update | Cleanup ->
       let dir = Wp_parameters.get_session_dir "cache" in
-      let file = Printf.sprintf "%s/%s.json" dir (Lazy.force hash) in
+      let hash = Lazy.force hash in
+      let file = Printf.sprintf "%s/%s.json" dir hash in
       try
+        mark_cache ~mode hash ;
         ProofScript.json_of_result (VCS.Why3 prover) result
         |> Json.save_file file
       with err ->
@@ -1235,8 +1275,9 @@ let prove ?timeout ?steplimit ~prover wpo =
             | Offline ->
                 let hash = task_hash wpo drv prover task in
                 let result = get_cache_result ~mode hash |> VCS.cached in
+                if VCS.is_verdict result then incr hits else incr miss ;
                 Task.return result
-            | Update | Replay | Rebuild | Markup ->
+            | Update | Replay | Rebuild | Cleanup ->
                 let hash = task_hash wpo drv prover task in
                 let result =
                   get_cache_result ~mode hash
@@ -1245,7 +1286,7 @@ let prove ?timeout ?steplimit ~prover wpo =
                 then
                   begin
                     incr hits ;
-                    if mode = Markup then
+                    if mode = Cleanup then
                       set_cache_result ~mode hash prover result ;
                     Task.return result
                   end
