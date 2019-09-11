@@ -37,7 +37,6 @@
   Qed:              11 
   Script:           12 
   Alt-Ergo 2.0.0:    0  (unsuccess: 12)
-[wp] Updated session with 12 new valid scripts.
 [wp] Report in:  'tests/wp_typed/oracle_qualif/user_init.1.report.json'
 [wp] Report out: 'tests/wp_typed/result_qualif/user_init.1.report.json'
 -------------------------------------------------------------

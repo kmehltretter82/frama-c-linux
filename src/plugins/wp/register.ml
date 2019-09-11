@@ -615,8 +615,7 @@ let compute_auto ~mode =
                  "Strategy -wp-auto '%s' unknown (ignored)." id
         ) auto ;
       mode.auto <- List.rev mode.auto ;
-      if mode.auto <> [] then
-        ( mode.tactical <- true ; mode.update <- true ) ;
+      if mode.auto <> [] then mode.tactical <- true ;
     end
 
 let do_update_session mode iter =

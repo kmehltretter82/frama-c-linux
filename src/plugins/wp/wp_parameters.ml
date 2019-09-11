@@ -596,8 +596,7 @@ module Auto = String_list
       let arg_name = "s"
       let help =
         "Activate auto-search with strategy <s>.\n\
-         Implies -wp-prover 'tip'.\n\
-         Use '-wp-prover ?' for listing strategies."
+         Use '-wp-auto <?>' for available strategies."
     end)
 
 let () = Parameter_customize.set_group wp_prover
