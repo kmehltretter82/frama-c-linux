@@ -30,7 +30,8 @@ include share/Makefile.dynamic_config.internal
 
 #Check share/Makefile.config available
 ifndef FRAMAC_ROOT_SRCDIR
-$(error "You should run ./configure first (or autoconf if there is no configure)")
+$(error \
+  "You should run ./configure first (or autoconf if there is no configure)")
 endif
 
 ###################
@@ -99,7 +100,8 @@ DEFAULT_HEADER_DIRS := headers
 DEFAULT_HEADER_EXCEPTIONS := configure
 # default value used for CEA_PROPRIETARY_FILES and PLUGIN_CEA_PROPRIETARY_FILES
 DEFAULT_CEA_PROPRIETARY_FILES := tests/non-free/%
-# default value used for CEA_PROPRIETARY_HEADERS and PLUGIN_CEA_PROPRIETARY_HEADERS
+# default value used for CEA_PROPRIETARY_HEADERS
+# and PLUGIN_CEA_PROPRIETARY_HEADERS
 DEFAULT_CEA_PROPRIETARY_HEADERS := CEA_PROPRIETARY
 
 MERLIN_PACKAGES:=
@@ -306,7 +308,11 @@ DISTRIB_FILES:=\
 
 # Test files to be included in the distribution (without header checking).
 # Plug-ins should use PLUGIN_DISTRIB_TESTS to export their test files. 
-DISTRIB_TESTS=$(shell git ls-files tests src/plugins/aorai/tests src/plugins/report/tests src/plugins/wp/tests)
+DISTRIB_TESTS=$(shell git ls-files \
+                  tests \
+                  src/plugins/aorai/tests \
+                  src/plugins/report/tests \
+                  src/plugins/wp/tests)
 
 
 # files that are needed to compile API documentation of external plugins
@@ -349,7 +355,8 @@ rebuild: config.status
 		 $(MAKE) depend $(FRAMAC_PARALLEL) && \
 		 $(MAKE) all $(FRAMAC_PARALLEL))
 
-sinclude .Makefile.user # Should defines FRAMAC_PARALLEL, FRAMAC_USER_FLAGS, FRAMAC_USER_MERLIN_FLAGS
+sinclude .Makefile.user
+# Should define FRAMAC_PARALLEL, FRAMAC_USER_FLAGS, FRAMAC_USER_MERLIN_FLAGS
 
 #Create link in share for local execution if
 .PHONY:create_share_link
@@ -700,7 +707,8 @@ src/plugins/gui/GSourceView.mli: src/plugins/gui/GSourceView2.mli.in
 endif
 
 SOURCEVIEWCOMPAT:=GSourceView
-GENERATED+=src/plugins/gui/GSourceView.ml src/plugins/gui/GSourceView.mli
+GENERATED+=src/plugins/gui/GSourceView.ml src/plugins/gui/GSourceView.mli \
+           src/plugins/gui/dgraph_helper.ml src/plugins/gui/gtk_compat.ml
 
 ifeq ($(LABLGTK),lablgtk3)
 src/plugins/gui/gtk_compat.ml: src/plugins/gui/gtk_compat.3.ml
@@ -714,9 +722,15 @@ endif
 GENERATED+=src/plugins/gui/gtk_compat.ml
 
 ifeq ($(HAS_DGRAPH),yes)
-  DGRAPHFILES:=debug_manager property_navigator
+  DGRAPHFILES:=debug_manager
+  src/plugins/gui/dgraph_helper.ml: src/plugins/gui/dgraph_helper.yes.ml
+	$(CP) $< $@
+	$(CHMOD_RO) $@
 else
   DGRAPHFILES:=
+  src/plugins/gui/dgraph_helper.ml: src/plugins/gui/dgraph_helper.no.ml
+	$(CP) $< $@
+	$(CHMOD_RO) $@
 endif
 
 SINGLE_GUI_CMO:= \
@@ -726,6 +740,7 @@ SINGLE_GUI_CMO:= \
 	$(SOURCEVIEWCOMPAT) \
 	gui_parameters \
 	gtk_helper \
+        dgraph_helper \
         gtk_form \
 	source_viewer pretty_source source_manager book_manager \
 	warning_manager \
@@ -737,7 +752,8 @@ SINGLE_GUI_CMO:= \
 	design \
 	analyses_manager file_manager project_manager \
 	help_manager \
-        $(DGRAPHFILES)
+        $(DGRAPHFILES) \
+        property_navigator \
 
 SINGLE_GUI_CMO:= $(patsubst %,src/plugins/gui/%.cmo,$(SINGLE_GUI_CMO))
 
