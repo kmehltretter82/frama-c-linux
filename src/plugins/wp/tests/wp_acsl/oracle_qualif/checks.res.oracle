@@ -1,4 +1,4 @@
-# frama-c -wp -wp-timeout 45 -wp-steps 5 [...]
+# frama-c -wp -wp-steps 5 [...]
 [kernel] Parsing tests/wp_acsl/checks.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Loading driver 'share/wp.driver'

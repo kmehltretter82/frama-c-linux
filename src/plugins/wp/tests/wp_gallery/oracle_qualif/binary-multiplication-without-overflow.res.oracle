@@ -1,4 +1,4 @@
-# frama-c -wp -wp-timeout 45 -wp-steps 1500 -warn-unsigned-overflow [...]
+# frama-c -wp -warn-unsigned-overflow [...]
 [kernel] Parsing tests/wp_gallery/binary-multiplication-without-overflow.c (with preprocessing)
 [wp] Running WP plugin...
 [wp] Loading driver 'share/wp.driver'

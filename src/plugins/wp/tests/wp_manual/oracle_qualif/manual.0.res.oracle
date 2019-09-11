@@ -1,4 +1,4 @@
-# frama-c -wp -wp-timeout 45 -wp-steps 1500 [...]
+# frama-c -wp [...]
 [kernel] Parsing tests/wp_manual/manual.i (no preprocessing)
 [kernel] Parsing tests/wp_manual/working_dir/swap.c (with preprocessing)
 [kernel] Parsing tests/wp_manual/working_dir/swap1.h (with preprocessing)

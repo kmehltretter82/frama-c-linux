@@ -1,4 +1,4 @@
-# frama-c -wp -wp-timeout 45 -wp-steps 1500 [...]
+# frama-c -wp [...]
 [kernel] Parsing tests/wp_gallery/frama_c_exo2_solved.c (with preprocessing)
 [wp] Running WP plugin...
 [wp] Loading driver 'share/wp.driver'

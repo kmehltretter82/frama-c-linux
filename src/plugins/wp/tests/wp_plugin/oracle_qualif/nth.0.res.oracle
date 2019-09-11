@@ -1,4 +1,4 @@
-# frama-c -wp -wp-timeout 45 -wp-steps 1500 -wp-depth 16 [...]
+# frama-c -wp -wp-depth 16 [...]
 [kernel] Parsing tests/wp_plugin/nth.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Loading driver 'share/wp.driver'
