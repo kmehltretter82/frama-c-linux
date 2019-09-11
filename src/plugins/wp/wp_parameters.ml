@@ -463,7 +463,7 @@ module Provers = String_list
          - 'tip' (failed scripts only)\n\
          - 'alt-ergo' (default)\n\
          - 'altgr-ergo' (gui)\n\
-         - 'coq', 'coqide' (see also -wp-script)\n\
+         - 'coq', 'coqide' (see also -wp-coq-script)\n\
          - 'why3:<dp>' or '<dp>' (why3 prover, see -wp-detect)\n\
          - 'native:alt-ergo'\n\
          - 'native:altgr-ergo'\n\
@@ -614,7 +614,7 @@ module BackTrack = Int
 let () = Parameter_customize.set_group wp_prover_options
 module Script =
   String(struct
-    let option_name = "-wp-script"
+    let option_name = "-wp-coq-script"
     let arg_name = "f.script"
     let default = ""
     let help = "Set user's file for Coq proofs."
@@ -623,7 +623,7 @@ module Script =
 let () = Parameter_customize.set_group wp_prover_options
 module UpdateScript =
   True(struct
-    let option_name = "-wp-update-script"
+    let option_name = "-wp-update-coq-script"
     let help = "If turned off, do not save or modify user's proofs."
   end)
 
@@ -677,7 +677,7 @@ let () = Parameter_customize.set_group wp_prover_options
 module CoqTactic =
   String
     (struct
-      let option_name = "-wp-tactic"
+      let option_name = "-wp-coq-tactic"
       let arg_name = "proof"
       let default = "auto with zarith"
       let help = "Default tactic for Coq"
@@ -687,7 +687,7 @@ let () = Parameter_customize.set_group wp_prover_options
 module TryHints =
   False
     (struct
-      let option_name = "-wp-tryhints"
+      let option_name = "-wp-coq-tryhints"
       let help = "Try scripts from other goals (see also -wp-hints)"
     end)
 
@@ -695,7 +695,7 @@ let () = Parameter_customize.set_group wp_prover_options
 module Hints =
   Int
     (struct
-      let option_name = "-wp-hints"
+      let option_name = "-wp-coq-hints"
       let arg_name = "n"
       let default = 3
       let help = "Maximum number of proposed Coq scripts (default 3)"
