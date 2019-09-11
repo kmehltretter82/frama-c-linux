@@ -377,7 +377,7 @@ let () = Parameter_customize.set_group wp_simplifier
 module Filter =
   True(struct
     let option_name = "-wp-filter"
-    let help = "Use variable filtering."
+    let help = "Filter non-used variables and related hypotheses."
   end)
 
 let () = Parameter_customize.set_group wp_simplifier
