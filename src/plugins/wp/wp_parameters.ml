@@ -261,7 +261,7 @@ let wp_strategy = add_group "Computation Strategies"
 
 let () = Parameter_customize.set_group wp_strategy
 module Init =
-  False(struct
+  True(struct
     let option_name = "-wp-init-const"
     let help = "Use initializers for global const variables."
   end)
