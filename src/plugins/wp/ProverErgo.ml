@@ -352,7 +352,6 @@ class altergo ~config ~pid ~gui ~file ~lines ~logout ~logerr =
     val mutable unsat = false
     val mutable timer = 0.0
     val mutable steps = 0
-    val mutable depth = 0
 
     method private time t = timer <- t
 
@@ -398,7 +397,7 @@ class altergo ~config ~pid ~gui ~file ~lines ~logout ~logerr =
                   raise Not_found in
               VCS.result
                 ~time:(if gui then 0.0 else timer)
-                ~steps ~depth verdict
+                ~steps verdict
             with
             | Not_found when Wp_parameters.Check.get () ->
                 if r = 0 then VCS.checked
@@ -422,13 +421,11 @@ class altergo ~config ~pid ~gui ~file ~lines ~logout ~logerr =
 
     method prove =
       files <- lines ;
-      depth <- VCS.get_depth config ;
       if gui then ergo#set_command (Wp_parameters.AltGrErgo.get ()) ;
       if Wp_parameters.Check.get () then
         ergo#add ["-type-only"]
       else
         begin
-          ergo#add_positive ~name:"-age-bound" ~value:depth ;
           ergo#add_parameter ~name:"-proof" Wp_parameters.ProofTrace.get ;
           ergo#add_parameter ~name:"-model" Wp_parameters.ProofTrace.get ;
         end ;

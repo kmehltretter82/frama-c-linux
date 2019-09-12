@@ -141,10 +141,6 @@ let stepout = function
   | None -> Wp_parameters.Steps.get ()
   | Some t -> t
 
-let depth = function
-  | None -> Wp_parameters.Depth.get ()
-  | Some t -> t
-
 let pp_file ~message ~file =
   if Sys.file_exists file then
     Log.print_on_output

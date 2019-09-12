@@ -252,12 +252,6 @@ let wp_panel
     ~packing:(addcontrol 1 2)
     Wp_parameters.Steps.get Wp_parameters.Steps.set demon ;
 
-  Gtk_form.label ~text:"Depth" ~packing:(addcontrol 2 1) () ;
-  Gtk_form.spinner ~lower:0 ~upper:100000
-    ~tooltip:"Search space bound for alt-ergo prover"
-    ~packing:(addcontrol 2 2)
-    Wp_parameters.Depth.get Wp_parameters.Depth.set demon ;
-
   Gtk_form.label ~text:"Timeout" ~packing:(addcontrol 3 1) () ;
   Gtk_form.spinner ~lower:0 ~upper:100000
     ~tooltip:"Timeout for proving one proof obligation"

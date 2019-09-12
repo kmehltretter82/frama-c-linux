@@ -51,22 +51,12 @@ let stepout_for = function
       Some spin
   | _ -> None
 
-let depth_for = function
-  | VCS.NativeAltErgo ->
-      let value = Wp_parameters.Depth.get () in
-      let spin = new Widget.spinner
-        ~tooltip:"Search Depth (-age-bound, 0 for prover default)"
-        ~min:0 ~step:100 ~value () in
-      Some spin
-  | _ -> None
-
 class prover ~(console:Wtext.text) ~prover =
   let tooltip = "Configure Prover" in
   let content = new Wpane.form () in
   let result = new Widget.label ~style:`Code ~align:`Center ~text:"No Result" () in
   let timeout = timeout_for prover in
   let stepout = stepout_for prover in
-  let depth = depth_for prover in
   object(self)
     inherit Wpalette.tool ~tooltip ~content:content#widget ()
     initializer
@@ -75,7 +65,6 @@ class prover ~(console:Wtext.text) ~prover =
         content#add_row ~xpadding:6 ~ypadding:4 result#coerce ;
         Wutil.on timeout (fun spin -> content#add_field ~label:"Timeout" spin#coerce) ;
         Wutil.on stepout (fun spin -> content#add_field ~label:"Steps" spin#coerce) ;
-        Wutil.on depth (fun spin -> content#add_field ~label:"Depth" spin#coerce) ;
       end
 
     method prover = prover
@@ -101,7 +90,6 @@ class prover ~(console:Wtext.text) ~prover =
           VCS.valid = false ;
           VCS.timeout = spinner timeout ;
           VCS.stepout = spinner stepout ;
-          VCS.depth = spinner depth ;
         } in
         let result wpo _prv _res = self#update wpo in
         let task = Prover.prove ~config ~result wpo prover in
