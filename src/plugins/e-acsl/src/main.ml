@@ -167,7 +167,7 @@ let generate_code =
                           in
                           Loops.apply_after_transformation prj;
                           (* remove the RTE's results computed from E-ACSL:
-                             their are partial and associated with the wrong
+                             they are partial and associated with the wrong
                              kernel function (the one of the old project). *)
                           let selection =
                             State_selection.with_dependencies !Db.RteGen.self
