@@ -82,7 +82,7 @@ Frama-C 19 (Potassium):
 - lablgtk.2.18.5 | lablgtk3.3.0.beta5 + lablgtk3-sourceview3.3.0.beta5
 - mlgmpidl.1.2.9 (optional)
 - ocamlgraph.1.8.8
-- why3.1.2.0 (optional)
+- why3.1.2.0
 - why3-coq.1.2.0 (optional)
 - yojson.1.4.1
 - zarith.1.7
@@ -225,7 +225,6 @@ We recommend to rely on it for the installation of Frama-C.
 
     ```shell
     brew install graphviz
-    opam install why3
     ```
 
 5. Install *optional* dependencies for Frama-C/WP:
