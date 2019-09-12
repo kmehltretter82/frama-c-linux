@@ -177,7 +177,6 @@ type config = {
   valid : bool ;
   timeout : int option ;
   stepout : int option ;
-  depth : int option ;
 }
 
 let param f = let v = f() in if v>0 then Some v else None
@@ -186,10 +185,9 @@ let current () = {
   valid = false ;
   timeout = param Wp_parameters.Timeout.get ;
   stepout = param Wp_parameters.Steps.get ;
-  depth = param Wp_parameters.Depth.get ;
 }
 
-let default = { valid = false ; timeout = None ; stepout = None ; depth = None }
+let default = { valid = false ; timeout = None ; stepout = None }
 
 let get_timeout = function
   | { timeout = None } -> Wp_parameters.Timeout.get ()
@@ -198,10 +196,6 @@ let get_timeout = function
 let get_stepout = function
   | { stepout = None } -> Wp_parameters.Steps.get ()
   | { stepout = Some t } -> t
-
-let get_depth = function
-  | { depth = None } -> Wp_parameters.Depth.get ()
-  | { depth = Some t } -> t
 
 (* -------------------------------------------------------------------------- *)
 (* --- Results                                                            --- *)
@@ -224,7 +218,6 @@ type result = {
   solver_time : float ;
   prover_time : float ;
   prover_steps : int ;
-  prover_depth : int ;
   prover_errpos : Lexing.position option ;
   prover_errmsg : string ;
 }
@@ -248,17 +241,13 @@ let configure r =
   let stepout =
     if r.prover_steps > 0 && r.prover_time <= 0.0 then
       let stepout = Wp_parameters.Steps.get () in
-      let margin = 1000 + r.prover_depth in
+      let margin = 1000 in
       Some(max stepout margin)
     else None in
-  let depth =
-    if r.prover_depth > 0 then Some r.prover_depth else None
-  in
   {
     valid ;
     timeout ;
     stepout ;
-    depth ;
   }
 
 let time_fits t =
@@ -273,24 +262,17 @@ let step_fits n =
   let stepout = Wp_parameters.Steps.get () in
   stepout = 0 || n < stepout
 
-let depth_fits n =
-  n = 0 ||
-  let depth = Wp_parameters.Depth.get () in
-  depth = 0 || n < depth
-
 let autofit r =
   time_fits r.prover_time &&
-  step_fits r.prover_steps &&
-  depth_fits r.prover_depth
+  step_fits r.prover_steps
 
-let result ?(cached=false) ?(solver=0.0) ?(time=0.0) ?(steps=0) ?(depth=0) verdict =
+let result ?(cached=false) ?(solver=0.0) ?(time=0.0) ?(steps=0) verdict =
   {
     verdict ;
     cached = cached ;
     solver_time = solver ;
     prover_time = time ;
     prover_steps = steps ;
-    prover_depth = depth ;
     prover_errpos = None ;
     prover_errmsg = "" ;
   }
@@ -309,7 +291,6 @@ let failed ?pos msg = {
   solver_time = 0.0 ;
   prover_time = 0.0 ;
   prover_steps = 0 ;
-  prover_depth = 0 ;
   prover_errpos = pos ;
   prover_errmsg = msg ;
 }
@@ -389,7 +370,6 @@ let merge r1 r2 =
     solver_time = max r1.solver_time r2.solver_time ;
     prover_time = max r1.prover_time r2.prover_time ;
     prover_steps = max r1.prover_steps r2.prover_steps ;
-    prover_depth = max r1.prover_depth r2.prover_depth ;
     prover_errpos = err.prover_errpos ;
     prover_errmsg = err.prover_errmsg ;
   }

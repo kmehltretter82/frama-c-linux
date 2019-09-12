@@ -869,8 +869,6 @@ let pp_wp_parameters fmt =
     if tm <> 10 then Format.fprintf fmt " -wp-timeout %d" tm ;
     let st = Wp_parameters.Steps.get () in
     if st > 0 then Format.fprintf fmt " -wp-steps %d" st ;
-    let dp = Wp_parameters.Depth.get () in
-    if dp > 0 then Format.fprintf fmt " -wp-depth %d" dp ;
     if not (Kernel.SignedOverflow.get ()) then
       Format.pp_print_string fmt " -no-warn-signed-overflow" ;
     if Kernel.UnsignedOverflow.get () then

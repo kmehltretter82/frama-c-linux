@@ -71,7 +71,6 @@ type config = {
   valid : bool ;
   timeout : int option ;
   stepout : int option ;
-  depth : int option ;
 }
 
 val current : unit -> config (** Current parameters *)
@@ -79,7 +78,6 @@ val default : config (** all None *)
 
 val get_timeout : config -> int (** 0 means no-timeout *)
 val get_stepout : config -> int (** 0 means no-stepout *)
-val get_depth : config -> int (** 0 means prover default *)
 
 (** {2 Results} *)
 
@@ -100,7 +98,6 @@ type result = {
   solver_time : float ;
   prover_time : float ;
   prover_steps : int ;
-  prover_depth : int ;
   prover_errpos : Lexing.position option ;
   prover_errmsg : string ;
 }
@@ -117,7 +114,7 @@ val failed : ?pos:Lexing.position -> string -> result
 val kfailed : ?pos:Lexing.position -> ('a,Format.formatter,unit,result) format4 -> 'a
 val cached : result -> result (** only for true verdicts *)
 
-val result : ?cached:bool -> ?solver:float -> ?time:float -> ?steps:int -> ?depth:int -> verdict -> result
+val result : ?cached:bool -> ?solver:float -> ?time:float -> ?steps:int -> verdict -> result
 
 val is_auto : prover -> bool
 val is_verdict : result -> bool
