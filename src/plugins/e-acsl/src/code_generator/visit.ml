@@ -491,8 +491,9 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       vi.vghost <- false ;
       vi.vtype <- match vi.vtype with
         | TFun(res, Some l, va, attr) ->
-          let frama_c_ghost = Extlib.strip_underscore Cil.frama_c_ghost in
-          let retype (n, t, a) = (n, t, Cil.dropAttribute frama_c_ghost a) in
+          let retype (n, t, a) =
+	    (n, t, Cil.dropAttribute Cil.frama_c_ghost_formal a)
+          in
           TFun(res, Some (List.map retype l), va, attr)
         | _ ->
           vi.vtype
@@ -606,8 +607,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
         Kernel_function.pretty kf;
       let unghost_formal vi =
         vi.vghost <- false ;
-        let frama_c_ghost = Extlib.strip_underscore Cil.frama_c_ghost in
-        vi.vattr <- Cil.dropAttribute frama_c_ghost vi.vattr
+        vi.vattr <- Cil.dropAttribute Cil.frama_c_ghost_formal vi.vattr
       in
       List.iter (fun vi -> vi.vghost <- false) f.slocals;
       List.iter unghost_formal f.sformals;
