@@ -529,6 +529,9 @@ class focused (wtext : Wtext.text) =
     method set_iformat = plang#set_iformat
     method get_iformat = plang#get_iformat
 
+    method set_rformat = plang#set_rformat
+    method get_rformat = plang#get_rformat
+
     method selected =
       begin
         self#set_target self#selection ;
