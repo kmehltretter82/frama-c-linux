@@ -200,7 +200,7 @@ let main (window: Design.main_window_extension_points) =
                 try
                   (* display the callgraph through its dot output *)
                   Service_graph.frama_c_display true;
-                  Gtk_helper.graph_window
+                  Dgraph_helper.graph_window
                     ~parent:window#main_window ~title:"Callgraph"
                     (make_graph_view services);
                   if warn then
@@ -232,7 +232,7 @@ let main (window: Design.main_window_extension_points) =
                       else false, false
                     in
                     Service_graph.frama_c_display true;
-                    Gtk_helper.graph_window
+                    Dgraph_helper.graph_window
                       ~parent:window#main_window ~title:"Callgraph"
                       (make_graph_view ~root:kf services);
                     (* restore old value *)
