@@ -1195,7 +1195,11 @@ val dropAttribute: string -> attributes -> attributes
  *  Maintains the attributes in sorted order *)
 val dropAttributes: string list -> attributes -> attributes
 
-val frama_c_ghost: string
+(** A varinfo marked with this attribute is known to be a ghost formal.
+
+    @since 19.0-Potassium+dev
+*)
+val frama_c_ghost_formal: string
 
 (** a field struct marked with this attribute is known to be mutable, i.e.
     it can be modified even on a const object.
@@ -1216,6 +1220,18 @@ val frama_c_init_obj: string
     a [frama_c_init_obj] or a [frama_c_mutable] attribute.
 *)
 val is_mutable_or_initialized: lval -> bool
+
+(** [true] if the given varinfo is a ghost formal variable.
+
+    @since 19.0-Potassium+dev
+*)
+val isGhostFormalVarinfo: varinfo -> bool
+
+(** [true] if the given formal declaration corresponds to a ghost formal variable.
+
+    @since 19.0-Potassium+dev
+*)
+val isGhostFormalVarDecl: (string * typ * attributes) -> bool
 
 (** Remove attributes whose name appears in the first argument that are
     present anywhere in the fully expanded version of the type.

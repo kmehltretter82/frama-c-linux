@@ -3039,8 +3039,8 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
           (try
              let old_formals_env = getFormalsDecl oldvi in
              List.iter2
-               (fun old (name,typ,attr) ->
-                  let new_ghost = Cil.hasAttribute Cil.frama_c_ghost attr in
+               (fun old ((name,typ,attr) as decl) ->
+                  let new_ghost = Cil.isGhostFormalVarDecl decl in
                   if old.vghost <> new_ghost then
                     raise (Invalid_argument "Incompatible ghost status")
                   else if name <> "" then begin
@@ -5156,7 +5156,7 @@ and doType (ghost:bool) isFuncArg
           let arg_type_from_vi vi =
             let attrs =
               if vi.vghost then
-                cabsAddAttributes [Attr (frama_c_ghost, [])] vi.vattr
+                cabsAddAttributes [Attr (frama_c_ghost_formal, [])] vi.vattr
               else
                 vi.vattr
             in (vi.vname, vi.vtype, attrs)
@@ -6663,10 +6663,7 @@ and doExp local_env
           )
       in
       let (argTypes, ghostArgTypes) =
-        List.partition
-          (fun (_, _, a) ->
-             not (Cil.hasAttribute Cil.frama_c_ghost a) || ghost)
-          argTypesList
+        List.partition (fun d -> not (isGhostFormalVarDecl d) || ghost) argTypesList
       in
       let args = if ghost then args @ ghost_args else args in
       let (sghost, ghosts') = loopArgs ~are_ghost:true (ghostArgTypes, ghost_args) in
@@ -9010,8 +9007,8 @@ and doDecl local_env (isglobal: bool) : A.definition -> chunk = function
 
         (* Create the formals and add them to the environment. *)
         (* sfg: extract tsets for the formals from dt *)
-        let doFormal (loc : location) (fn, ft, fa) =
-          let ghost = Cil.hasAttribute Cil.frama_c_ghost fa in
+        let doFormal (loc : location) ((fn, ft, fa) as fd) =
+          let ghost = isGhostFormalVarDecl fd in
           let f = makeVarinfo ~ghost ~temp:false false true fn ft in
           (f.vdecl <- loc;
            f.vattr <- fa;

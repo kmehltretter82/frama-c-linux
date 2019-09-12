@@ -65,7 +65,7 @@ let register_shallow_attribute s =
   reserved_attributes:=
     (Extlib.strip_underscore s)::!reserved_attributes
 
-let () = register_shallow_attribute Cil.frama_c_ghost
+let () = register_shallow_attribute Cil.frama_c_ghost_formal
 let () = register_shallow_attribute Cil.frama_c_mutable
 let () = register_shallow_attribute Cil.frama_c_init_obj
 
@@ -1941,19 +1941,13 @@ class cil_printer () = object (self)
               (self#typ (Some (fun fmt -> fprintf fmt "%s" aname))) atype
               self#attributes rest
           in
-          let p = partition_ghosts
-              (fun (_,_,a) -> Cil.hasAttribute Cil.frama_c_ghost a)
-              args
-          in
+          let p = partition_ghosts Cil.isGhostFormalVarDecl args in
           pp_params fmt p pp_args
         | Some fundecl ->
           let args =
             try Some (Cil.getFormalsDecl fundecl) with Not_found -> None
           in
-          let p = partition_ghosts
-              (fun vi -> Cil.hasAttribute Cil.frama_c_ghost vi.vattr)
-              args
-          in
+          let p = partition_ghosts Cil.isGhostFormalVarinfo args in
           pp_params fmt p self#vdecl
       in
       self#typ (Some pp_params) fmt restyp

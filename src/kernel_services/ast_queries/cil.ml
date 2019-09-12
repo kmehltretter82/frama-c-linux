@@ -555,10 +555,10 @@ let partitionAttributes
   in
   loop ([], [], []) attrs
 
-let frama_c_ghost = "__fc_ghost"
-let () = registerAttribute frama_c_ghost (AttrName false)
+let frama_c_ghost_formal = "__fc_ghost_formal"
+let () = registerAttribute frama_c_ghost_formal (AttrName false)
 let () =
-  registerAttribute (Extlib.strip_underscore frama_c_ghost) (AttrName false)
+  registerAttribute (Extlib.strip_underscore frama_c_ghost_formal) (AttrName false)
 
 let frama_c_mutable = "__fc_mutable"
 let () = registerAttribute frama_c_mutable (AttrName false)
@@ -634,12 +634,16 @@ let makeFormalsVarDecl ?ghost (n,t,a) =
   vi.vattr <- a;
   vi
 
+let isGhostFormalVarinfo vi =
+  hasAttribute frama_c_ghost_formal vi.vattr
+
+let isGhostFormalVarDecl (_name, _type, attr) =
+  hasAttribute frama_c_ghost_formal attr
+
 let setFormalsDecl vi typ =
   match unrollType typ with
   | TFun(_, Some args, _, _) ->
-    let is_ghost (_, _, a) =
-      vi.vghost || hasAttribute frama_c_ghost a
-    in
+    let is_ghost d = vi.vghost || isGhostFormalVarDecl d in
     let makeFormalsVarDecl x = makeFormalsVarDecl ~ghost:(is_ghost x) x in
     FormalsDecl.replace vi (List.map makeFormalsVarDecl args)
   | TFun(_,None,_,_) -> ()
@@ -5290,7 +5294,7 @@ let makeFormalVar fdec ?(ghost=fdec.svar.vghost) ?(where = "$") name typ : varin
   let makeit name =
     let vi = makeLocal ~ghost ~formal:true fdec name typ in
     if ghost && not fdec.svar.vghost then
-      vi.vattr <- addAttribute (Attr(frama_c_ghost, [])) vi.vattr ;
+      vi.vattr <- addAttribute (Attr(frama_c_ghost_formal, [])) vi.vattr ;
     vi
   in
   let error () = Kernel.fatal ~current:true
@@ -5819,7 +5823,7 @@ let splitFunctionTypeVI (fvi: varinfo)
 
 let argsToPairOfLists args =
   List.partition
-    (fun (_,_,a) -> not(hasAttribute frama_c_ghost a))
+    (fun (_,_,a) -> not(hasAttribute frama_c_ghost_formal a))
     (argsToList args)
 
 let remove_attributes_for_integral_promotion a =
