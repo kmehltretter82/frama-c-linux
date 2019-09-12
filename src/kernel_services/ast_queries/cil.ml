@@ -302,6 +302,16 @@ let stmt_of_instr_list ?(loc=Location.unknown) = function
 
 (**** ATTRIBUTES ****)
 
+(* Attributes are added as they are (e.g. if we add ["__attr"] and then ["attr"] both are added).
+   When checking for the presence of an attribute [x] or trying to remove it, underscores are
+   removed at the beginning and the end of the attribute for both the [x] attribute and the
+   attributes of the list. For example, if have a call:
+
+   dropAttribute "__const" [ Attr("const", []) ; Attr("__const", []) ; Attr("__const__", []) ]
+
+   The result is [].
+*)
+
 let bitfield_attribute_name = "FRAMA_C_BITFIELD_SIZE"
 
 (** Construct sorted lists of attributes ***)
@@ -326,11 +336,12 @@ let addAttributes al0 (al: attributes) : attributes =
     List.fold_left (fun acc a -> addAttribute a acc) al al0
 
 let dropAttribute (an: string) (al: attributes) =
+  let an = Extlib.strip_underscore an in
   List.filter (fun a -> attributeName a <> an) al
 
-let hasAttribute (s: string) (al: attribute list) : bool =
-  let s = Extlib.strip_underscore s in
-  List.exists (fun a -> attributeName a = s) al
+let hasAttribute (an: string) (al: attribute list) : bool =
+  let an = Extlib.strip_underscore an in
+  List.exists (fun a -> attributeName a = an) al
 
 let rec dropAttributes (anl: string list) (al: attributes) =
   match al with
@@ -342,13 +353,15 @@ let rec dropAttributes (anl: string list) (al: attributes) =
     else
     if q' == q then al (* preserve sharing *) else a :: q'
 
-let filterAttributes (s: string) (al: attribute list) : attribute list =
-  List.filter (fun a -> attributeName a = s) al
+let filterAttributes (an: string) (al: attribute list) : attribute list =
+  let an = Extlib.strip_underscore an in
+  List.filter (fun a -> attributeName a = an) al
 
-let findAttribute (s: string) (al: attribute list) : attrparam list =
+let findAttribute (an: string) (al: attribute list) : attrparam list =
+  let an = Extlib.strip_underscore an in
   List.fold_left
     (fun acc -> function
-       | Attr (an, param) when an = s -> param @ acc
+       | Attr (_, param) as a0 when attributeName a0 = an -> param @ acc
        | _ -> acc)
     [] al
 
