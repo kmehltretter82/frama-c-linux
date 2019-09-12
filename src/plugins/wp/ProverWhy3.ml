@@ -20,6 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* Allow type-desambiguation for symbols *)
 [@@@ warning "-40-42"]
 
 let dkey = Wp_parameters.register_category "prover"
@@ -33,24 +34,22 @@ let option_import = LogicBuiltins.create_option
     (fun ~driver_dir:_ x -> x)
     "why3" "import"
 
-let config = VCS.why3_config
-
 module Env = WpContext.Index(struct
     include Datatype.Unit
     type key = unit
     type data = Why3.Env.env
   end)
 
-let get_why3_env =
-  Env.memoize (fun () ->
-      let config = Lazy.force config in
+let get_why3_env = Env.memoize
+    begin fun () ->
+      let config = Why3Provers.config () in
       let main = Why3.Whyconf.get_main config in
       let ld =
         (WpContext.directory ())::
         (Wp_parameters.Share.file "why3")::
         (Why3.Whyconf.loadpath main) in
       Why3.Env.create_env ld
-    )
+    end
 
 type context = {
   mutable th : Why3.Theory.theory_uc;
@@ -70,6 +69,9 @@ type convert = {
 (** The reason for the rebuild *)
 let specific_equalities: Lang.For_export.specific_equality list ref =
   ref [Vlist.specialize_eq_list]
+
+let add_specific_equality ~for_tau ~mk_new_eq =
+  specific_equalities := { for_tau; mk_new_eq }::!specific_equalities
 
 (** get symbols *)
 
@@ -937,10 +939,13 @@ class visitor (ctx:context) c =
 
   end
 
+(* -------------------------------------------------------------------------- *)
+(* --- Goal Compilation                                                   --- *)
+(* -------------------------------------------------------------------------- *)
 
 let goal_id = (Why3.Decl.create_prsymbol (Why3.Ident.id_fresh "wp_goal"))
 
-let why3_of_qed ~id ~title ~name ?axioms t =
+let prove_goal ~id ~title ~name ?axioms t =
   (* Format.printf "why3_of_qed start@."; *)
   let goal = Definitions.cluster ~id ~title () in
   let ctx = empty_context name in
@@ -961,21 +966,19 @@ let why3_of_qed ~id ~title ~name ?axioms t =
   if Wp_parameters.has_print_generated () then begin
     let th_uc_tmp = Why3.Theory.add_decl ~warn:false ctx.th decl in
     let th_tmp    = Why3.Theory.close_theory th_uc_tmp in
-    Wp_parameters.debug ~dkey:Wp_parameters.cat_print_generated "%a" Why3.Pretty.print_theory th_tmp
+    Wp_parameters.debug ~dkey:Wp_parameters.cat_print_generated "%a"
+      Why3.Pretty.print_theory th_tmp
   end;
   th, decl
-
-(** Prover call *)
 
 let prove_prop ?axioms ~pid ~prop =
   let id = WpPropId.get_propid pid in
   let title = Pretty_utils.to_string WpPropId.pretty pid in
   let name = "WP" in
-  let th, decl = why3_of_qed ?axioms ~id ~title ~name prop in
+  let th, decl = prove_goal ?axioms ~id ~title ~name prop in
   let t = None in
   let t = Why3.Task.use_export t th in
   Why3.Task.add_decl t decl
-
 
 let task_of_wpo wpo =
   let pid = wpo.Wpo.po_pid in
@@ -993,113 +996,311 @@ let task_of_wpo wpo =
       let axioms = Some(lemma.l_cluster,depends) in
       prove_prop ~pid ~prop ?axioms
 
-let altergo_step_limit = Str.regexp "^Steps limit reached:"
+(* -------------------------------------------------------------------------- *)
+(* --- Prover Task                                                        --- *)
+(* -------------------------------------------------------------------------- *)
 
-let call_prover ~timeout ~steplimit prover task wpo =
-  let steplimit = match steplimit with Some 0 -> None | _ -> steplimit in
-  let config = Lazy.force config in
+let prover_task prover task =
   let env = get_why3_env () in
+  let config = Why3Provers.config () in
   let prover_config = Why3.Whyconf.get_prover_config config prover in
-  let command = Why3.Whyconf.get_complete_command prover_config ~with_steps:(steplimit<>None) in
-  let drv =
-    Why3.Whyconf.load_driver (Why3.Whyconf.get_main config) env prover_config.driver prover_config.extra_drivers in
-  let limit =
-    let def = Why3.Call_provers.empty_limit in
-    { def with
-      Why3.Call_provers.limit_time = Why3.Opt.get_def def.limit_time timeout;
-      Why3.Call_provers.limit_steps = Why3.Opt.get_def def.limit_time steplimit;
-    } in
+  let drv = Why3.Whyconf.load_driver (Why3.Whyconf.get_main config)
+      env prover_config.driver prover_config.extra_drivers in
   let remove_for_prover =
     if prover.prover_name = "Alt-Ergo"
     then Filter_axioms.remove_for_altergo
     else Filter_axioms.remove_for_why3
   in
-  let trans = Why3.Trans.seq [remove_for_prover; Filter_axioms.trans; Filter_axioms.def_into_axiom] in
+  let trans = Why3.Trans.seq [
+      remove_for_prover;
+      Filter_axioms.trans;
+      Filter_axioms.def_into_axiom
+    ] in
   let task =
     if prover.prover_name = "Coq"
     then task
-    else Why3.Trans.apply trans task in
-  let task = Why3.Driver.prepare_task drv task in
-  let file = Wpo.DISK.file_goal ~pid:wpo.Wpo.po_pid ~model:wpo.Wpo.po_model ~prover:(VCS.Why3 prover) in
-  (* This printing is currently just for debugging *)
-  let _ = Command.print_file file (fun fmt -> Why3.Driver.print_task_prepared drv fmt task) in
-  if Wp_parameters.Check.get ()
-  then (** Why3 typed checked the task during its build *)
-    Task.return VCS.checked
-  else
-    let call =
-      Why3.Driver.prove_task_prepared ~command ~limit drv task in
-    Wp_parameters.debug ~dkey
-      "@[@[Why3 run prover %a with %i timeout %i steplimit@]@]@."
-      Why3.Whyconf.print_prover prover (Why3.Opt.get_def (-1) timeout) (Why3.Opt.get_def (-1) steplimit);
-    let ping _ (* why3 seems not to be able to kill a started prover *) =
-      match Why3.Call_provers.query_call call with
-      | NoUpdates
-      | ProverStarted -> Task.Yield
-      | InternalFailure exn ->
-          Task.Return (Task.Result (VCS.failed (Format.asprintf "%a" Why3.Exn_printer.exn_printer exn)))
-      | ProverInterrupted -> Task.Return (Task.Result (VCS.failed "interrupted"))
-      | ProverFinished pr ->
-          let r = match pr.pr_answer with
-            | Timeout -> VCS.timeout (int_of_float pr.pr_time)
-            | Valid -> VCS.result ~time:pr.pr_time ~steps:pr.pr_steps VCS.Valid
-            | Invalid -> VCS.result ~time:pr.pr_time ~steps:pr.pr_steps VCS.Invalid
-            | OutOfMemory -> VCS.failed "out of memory"
-            | StepLimitExceeded -> VCS.stepout
-            | Unknown _ -> VCS.unknown
-            | Failure s -> VCS.failed s
-            | HighFailure ->
-                let alt_ergo_hack = prover.prover_name = "Alt-Ergo" &&
-                                    Str.string_match altergo_step_limit pr.pr_output 0
-                in
-                if alt_ergo_hack then VCS.stepout
-                else VCS.failed "Unknown error"
-          in
-          Wp_parameters.debug ~dkey
-            "@[@[Why3 result for %a:@] @[%a@] and @[%a@]@."
-            Why3.Whyconf.print_prover prover
-            (* why3 1.3 (Why3.Call_provers.print_prover_result ~json_model:false) pr *)
-            (Why3.Call_provers.print_prover_result) pr
-            VCS.pp_result r;
-          Task.Return (Task.Result r)
-    in
-    Task.async ping
+    else Why3.Trans.apply trans task
+  in
+  drv , prover_config , Why3.Driver.prepare_task drv task
 
-let add_specific_equality ~for_tau ~mk_new_eq =
-  specific_equalities := { for_tau; mk_new_eq }::!specific_equalities
+(* -------------------------------------------------------------------------- *)
+(* --- Prover Call                                                        --- *)
+(* -------------------------------------------------------------------------- *)
 
-let version = Why3.Config.version
+let altergo_step_limit = Str.regexp "^Steps limit reached:"
+
+let call_prover ~timeout ~steplimit drv prover prover_config task =
+  let steps = match steplimit with Some 0 -> None | _ -> steplimit in
+  let limit =
+    let def = Why3.Call_provers.empty_limit in
+    { def with
+      Why3.Call_provers.limit_time = Why3.Opt.get_def def.limit_time timeout;
+      Why3.Call_provers.limit_steps = Why3.Opt.get_def def.limit_time steps;
+    } in
+  let command = Why3.Whyconf.get_complete_command prover_config
+      ~with_steps:(steps<>None) in
+  let call =
+    Why3.Driver.prove_task_prepared ~command ~limit drv task in
+  Wp_parameters.debug ~dkey "Why3 run prover %a with %i timeout %i steps@."
+    Why3.Whyconf.print_prover prover
+    (Why3.Opt.get_def (-1) timeout)
+    (Why3.Opt.get_def (-1) steps);
+  let ping _ (* why3 seems not to be able to kill a started prover *) =
+    match Why3.Call_provers.query_call call with
+    | NoUpdates
+    | ProverStarted -> Task.Yield
+    | InternalFailure exn ->
+        let msg = Format.asprintf "%a" Why3.Exn_printer.exn_printer exn in
+        Task.Return (Task.Result (VCS.failed msg))
+    | ProverInterrupted ->
+        Task.Return (Task.Result (VCS.failed "interrupted"))
+    | ProverFinished pr ->
+        let r = match pr.pr_answer with
+          | Timeout -> VCS.timeout (int_of_float pr.pr_time)
+          | Valid -> VCS.result ~time:pr.pr_time ~steps:pr.pr_steps VCS.Valid
+          | Invalid -> VCS.result ~time:pr.pr_time ~steps:pr.pr_steps VCS.Invalid
+          | OutOfMemory -> VCS.failed "out of memory"
+          | StepLimitExceeded -> VCS.result ?steps VCS.Stepout
+          | Unknown _ -> VCS.unknown
+          | Failure s -> VCS.failed s
+          | HighFailure ->
+              let alt_ergo_hack =
+                prover.prover_name = "Alt-Ergo" &&
+                Str.string_match altergo_step_limit pr.pr_output 0
+              in
+              if alt_ergo_hack then VCS.result ?steps VCS.Stepout
+              else VCS.failed "Unknown error"
+        in
+        Wp_parameters.debug ~dkey
+          "@[@[Why3 result for %a:@] @[%a@] and @[%a@]@."
+          Why3.Whyconf.print_prover prover
+          (* why3 1.3 (Why3.Call_provers.print_prover_result ~json_model:false) pr *)
+          (Why3.Call_provers.print_prover_result) pr
+          VCS.pp_result r;
+        Task.Return (Task.Result r)
+  in
+  Task.async ping
+
+(* -------------------------------------------------------------------------- *)
+(* --- Cache Management                                                   --- *)
+(* -------------------------------------------------------------------------- *)
+
+type mode = NoCache | Update | Replay | Rebuild | Offline | Cleanup
+
+let hits = ref 0
+let miss = ref 0
+let removed = ref 0
+let cleanup = Hashtbl.create 0
+(* used entries, never to be reset since cleanup is performed at exit *)
+
+let get_hits () = !hits
+let get_miss () = !miss
+let get_removed () = !removed
+
+let mark_cache ~mode hash =
+  if mode = Cleanup then Hashtbl.replace cleanup hash ()
+
+let cleanup_cache ~mode =
+  if mode = Cleanup && (!hits > 0 || !miss > 0) then
+    let dir = Wp_parameters.get_session_dir "cache" in
+    try
+      if Sys.is_directory dir then
+        Array.iter
+          (fun f ->
+             if Filename.check_suffix f ".json" then
+               let hash = Filename.chop_suffix f ".json" in
+               if not (Hashtbl.mem cleanup hash) then
+                 begin
+                   incr removed ;
+                   Extlib.safe_remove (Printf.sprintf "%s/%s" dir f) ;
+                 end
+          ) (Sys.readdir dir) ;
+    with Unix.Unix_error _ as exn ->
+      Wp_parameters.failure "Can not cleanup cache (%s)"
+        (Printexc.to_string exn)
+
+(* -------------------------------------------------------------------------- *)
+(* --- Cache Management                                                   --- *)
+(* -------------------------------------------------------------------------- *)
+
+let parse_mode ~origin ~fallback = function
+  | "none" -> NoCache
+  | "update" -> Update
+  | "replay" -> Replay
+  | "rebuild" -> Rebuild
+  | "offline" -> Offline
+  | "cleanup" -> Cleanup
+  | "" -> raise Not_found
+  | m ->
+      Wp_parameters.warning ~current:false
+        "Unknown %s mode %S (use %s instead)" origin m fallback ;
+      raise Not_found
+
+module MODE = WpContext.StaticGenerator(Datatype.Unit)
+    (struct
+      type key = unit
+      type data = mode
+      let name = "Wp.Cache.mode"
+      let compile () =
+        try
+          let origin = "FRAMAC_WP_CACHE" in
+          parse_mode ~origin ~fallback:"-wp-cache" (Sys.getenv origin)
+        with Not_found ->
+        try
+          parse_mode ~origin:"-wp-cache" ~fallback:"'none'"
+            (Wp_parameters.Cache.get())
+        with Not_found ->
+          if Wp_parameters.Session.Dir_name.is_set ()
+          then Update else NoCache
+    end)
+
+let get_mode = MODE.get
+
+let task_hash wpo drv prover task =
+  lazy
+    begin
+      let file = Wpo.DISK.file_goal
+          ~pid:wpo.Wpo.po_pid
+          ~model:wpo.Wpo.po_model
+          ~prover:(VCS.Why3 prover) in
+      let _ = Command.print_file file
+          begin fun fmt ->
+            Format.fprintf fmt "(* WP Task for Prover %s *)@\n"
+              (Why3Provers.print prover) ;
+            Why3.Driver.print_task_prepared drv fmt task ;
+          end
+      in Digest.file file |> Digest.to_hex
+    end
+
+let time_fits time = function
+  | None | Some 0 -> true
+  | Some limit -> time <= float limit
+
+let steps_fits steps = function
+  | None | Some 0 -> true
+  | Some limit -> steps <= limit
+
+let time_seized time = function
+  | None | Some 0 -> false
+  | Some limit -> float limit <= time
+
+let steps_seized steps steplimit =
+  steps <> 0 &&
+  match steplimit with
+  | None | Some 0 -> false
+  | Some limit -> limit <= steps
+
+let promote ~timeout ~steplimit (res : VCS.result) =
+  match res.verdict with
+  | VCS.NoResult | VCS.Computing _ | VCS.Checked -> VCS.no_result
+  | VCS.Failed -> res
+  | VCS.Invalid | VCS.Valid | VCS.Unknown ->
+      if not (steps_fits res.prover_steps steplimit) then
+        { res with verdict = Stepout }
+      else
+      if not (time_fits res.prover_time timeout) then
+        { res with verdict = Timeout }
+      else res
+  | VCS.Timeout | VCS.Stepout ->
+      if steps_seized res.prover_steps steplimit then
+        { res with verdict = Stepout }
+      else
+      if time_seized res.prover_time timeout then
+        { res with verdict = Timeout }
+      else (* can be run a longer time or widely *)
+        VCS.no_result
+
+let get_cache_result ~mode hash =
+  match mode with
+  | NoCache | Rebuild -> VCS.no_result
+  | Update | Cleanup | Replay | Offline ->
+      let dir = Wp_parameters.get_session_dir "cache" in
+      let hash = Lazy.force hash in
+      let file = Printf.sprintf "%s/%s.json" dir hash in
+      if not (Sys.file_exists file) then VCS.no_result
+      else
+        try
+          mark_cache ~mode hash ;
+          Json.load_file file |> ProofScript.result_of_json
+        with err ->
+          Wp_parameters.failure ~once:true "invalid cache entry (%s)"
+            (Printexc.to_string err) ;
+          VCS.no_result
+
+let set_cache_result ~mode hash prover result =
+  match mode with
+  | NoCache | Replay | Offline -> ()
+  | Rebuild | Update | Cleanup ->
+      let dir = Wp_parameters.get_session_dir "cache" in
+      let hash = Lazy.force hash in
+      let file = Printf.sprintf "%s/%s.json" dir hash in
+      try
+        mark_cache ~mode hash ;
+        ProofScript.json_of_result (VCS.Why3 prover) result
+        |> Json.save_file file
+      with err ->
+        Wp_parameters.failure ~once:true "can not update cache (%s)"
+          (Printexc.to_string err)
+
+let is_trivial (t : Why3.Task.task) =
+  let goal = Why3.Task.task_goal_fmla t in
+  Why3.Term.t_equal goal Why3.Term.t_true
+
+(* -------------------------------------------------------------------------- *)
+(* --- Prove WPO                                                          --- *)
+(* -------------------------------------------------------------------------- *)
 
 let prove ?timeout ?steplimit ~prover wpo =
   try
-    let do_ () =
-      let task = task_of_wpo wpo in
-      if Wp_parameters.Generate.get ()
-      then if Wp_parameters.Check.get ()
-        then Task.return VCS.checked
-        else Task.return VCS.no_result
-      else call_prover ~timeout ~steplimit prover task wpo
-    in
-    WpContext.on_context (Wpo.get_context wpo) do_ ()
+    WpContext.on_context (Wpo.get_context wpo)
+      begin fun () ->
+        (* Always generate common task *)
+        let task = task_of_wpo wpo in
+        if Wp_parameters.Check.get ()
+        then Task.return VCS.checked (* Why3 tasks are type-checked *)
+        else
+        if Wp_parameters.Generate.get ()
+        then Task.return VCS.no_result (* Only generate *)
+        else
+          let drv , config , task = prover_task prover task in
+          if false && is_trivial task then
+            Task.return VCS.valid
+          else
+            let mode = get_mode () in
+            match mode with
+            | NoCache ->
+                call_prover ~timeout ~steplimit drv prover config task
+            | Offline ->
+                let hash = task_hash wpo drv prover task in
+                let result = get_cache_result ~mode hash |> VCS.cached in
+                if VCS.is_verdict result then incr hits else incr miss ;
+                Task.return result
+            | Update | Replay | Rebuild | Cleanup ->
+                let hash = task_hash wpo drv prover task in
+                let result =
+                  get_cache_result ~mode hash
+                  |> promote ~timeout ~steplimit |> VCS.cached in
+                if VCS.is_verdict result
+                then
+                  begin
+                    incr hits ;
+                    Task.return result
+                  end
+                else
+                  begin
+                    incr miss ;
+                    Task.finally
+                      (call_prover ~timeout ~steplimit drv prover config task)
+                      (function
+                        | Task.Result result when VCS.is_verdict result ->
+                            set_cache_result ~mode hash prover result
+                        | _ -> ())
+                  end
+      end ()
   with exn ->
     let bt = Printexc.get_raw_backtrace () in
     Wp_parameters.fatal "Error in why3:%a@.%s@."
       Why3.Exn_printer.exn_printer exn
       (Printexc.raw_backtrace_to_string bt)
 
-let parse_why3_options =
-  let todo = ref true in
-  fun () ->
-    if !todo then begin
-      let args = Array.of_list ("why3"::Wp_parameters.WhyFlags.get ()) in
-      begin try
-          Arg.parse_argv ~current:(ref 0) args
-            (Why3.Debug.Args.[desc_debug;desc_debug_all;desc_debug_list])
-            (fun _ -> raise (Arg.Help "Unknown why3 option"))
-            "Why3 options"
-        with Arg.Bad s -> Wp_parameters.abort "%s" s
-      end;
-      ignore (Why3.Debug.Args.option_list ());
-      Why3.Debug.Args.set_flags_selected ();
-      todo := false
-    end
+(* -------------------------------------------------------------------------- *)

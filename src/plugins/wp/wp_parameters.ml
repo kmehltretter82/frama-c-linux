@@ -466,10 +466,27 @@ module Provers = String_list
          - 'coq', 'coqide' (see also -wp-coq-script)\n\
          - 'why3:<dp>' or '<dp>' (why3 prover, see -wp-detect)\n\
          - 'native:alt-ergo'\n\
-         - 'native:altgr-ergo'\n\
          - 'native:coq'\n\
-         - 'native:coqide'\n\
-         - 'why3ide' (why3 gui)"
+         - 'native:coqide'\
+        "
+    end)
+
+let () = Parameter_customize.set_group wp_prover
+module Cache = String
+    (struct
+      let option_name = "-wp-cache"
+      let arg_name = "mode"
+      let default = ""
+      let help =
+        "WP cache mode:\n\
+         - 'none': no cache, run provers (default)\n\
+         - 'update': use cache or run provers and update cache\n\
+         - 'cleanup': update mode with garbage collection\n\
+         - 'replay': update mode with no cache update\n\
+         - 'rebuild': always run provers and update cache\n\
+         - 'offline': use cache but never run provers\n\
+         This option is overriden by environment variable FRAMAC_WP_CACHE.\
+        "
     end)
 
 let () = Parameter_customize.set_group wp_prover
@@ -574,8 +591,7 @@ module Auto = String_list
       let arg_name = "s"
       let help =
         "Activate auto-search with strategy <s>.\n\
-         Implies -wp-prover 'tip'.\n\
-         Use '-wp-prover ?' for listing strategies."
+         Use '-wp-auto <?>' for available strategies."
     end)
 
 let () = Parameter_customize.set_group wp_prover
@@ -971,7 +987,6 @@ let base_output () =
       Fc_Filepath.add_symbolic_dir "WPOUT" output ;
       output
   | Some output -> output
-
 
 let get_session () = Session.dir ~error:false ()
 

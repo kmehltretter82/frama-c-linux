@@ -1,4 +1,4 @@
-# frama-c -wp -wp-model 'Typed (Caveat)' -wp-timeout 45 -wp-steps 50 [...]
+# frama-c -wp -wp-model 'Typed (Caveat)' -wp-steps 50 [...]
 [kernel] Parsing tests/wp_acsl/struct_use_case.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Loading driver 'share/wp.driver'

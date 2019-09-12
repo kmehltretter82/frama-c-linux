@@ -1543,6 +1543,8 @@ src/plugins/wp/Vset.ml: CEA_WP
 src/plugins/wp/Vset.mli: CEA_WP
 src/plugins/wp/Warning.ml: CEA_WP
 src/plugins/wp/Warning.mli: CEA_WP
+src/plugins/wp/Why3Provers.ml: CEA_WP
+src/plugins/wp/Why3Provers.mli: CEA_WP
 src/plugins/wp/Wp.mli: .ignore
 src/plugins/wp/WpTac.ml: CEA_WP
 src/plugins/wp/WpTac.mli: CEA_WP

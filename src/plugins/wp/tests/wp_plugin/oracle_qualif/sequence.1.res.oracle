@@ -1,4 +1,4 @@
-# frama-c -wp -wp-model 'Typed (Caveat)' -wp-timeout 45 -wp-steps 1500 [...]
+# frama-c -wp -wp-model 'Typed (Caveat)' [...]
 [kernel] Parsing tests/wp_plugin/sequence.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Loading driver 'share/wp.driver'
