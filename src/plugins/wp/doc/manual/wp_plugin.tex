@@ -283,6 +283,8 @@ This mode is well suited for replaying a proof bench, by using a combination of 
 
 The \verb+tip+ prover is similar, except that it never runs sub-goals that are known to be stuck but updates the proof scripts on success or when an automated proof fails. Using the \verb+tip+ prover is less time consuming and eventually prepares new scripts for failed proofs to be edited later under the TIP.
 
+Notice that, as soon as you have setup a wp-session directory, you benefit from cache facilities to speedup your proofs. Consult Section~\ref{wp-cache} for details.
+
 \clearpage
 A typical proof session consists then in the following stages:
 
@@ -1153,6 +1155,8 @@ However, to use \textsf{Alt-Ergo 2.0.0} \emph{via} \textsf{Why-3}, you shall use
 the native support of \textsf{Alt-Ergo} prover. Finally, since \textsf{Why-3} also provides the alias
 \verb+altergo+ for this prover, \verb+-wp-prover altergo+ will also run it \emph{via} \textsf{Why-3}.
 
+Notice that \textsf{Why-3} provers benefit from a cache management when used in combination with a \textsf{WP}-session, see Section~\ref{wp-cache} for more details.
+
 %% \paragraph{Sessions.}
 %% Your \textsf{Why3} session is saved in the \texttt{"project.session"}
 %% sub-directory of \texttt{-wp-out}. You may run
@@ -1364,6 +1368,36 @@ by a link (`\user{link};'). The available tags are depicted on figure~\ref{wp-dr
 \end{figure}
 
 \clearpage
+\subsection{Proof Cache}
+\label{wp-cache}
+
+Running provers have a cost in terms of memory and CPU resources. When working
+interactively or incrementally, it is often the case where most proof obligations remain unchanged
+from one \textsf{WP} execution to the other. To reduce this costs, a cache of prover results can be used
+and stored in your session.
+
+The cache can only be used with \textsf{Why-3} provers, it does not work with native \textsf{Alt-Ergo} and \textsf{Coq} provers. There are different ways of using the cache, depending on your precise needs.
+The main option to control cache usage is \verb+-wp-cache+, documented below:
+
+\begin{description}
+\item[\tt -wp-cache <mode>] selects the cache mode to use with why3 provers. The default mode is \verb'update' if \verb+-wp-session+ is set, and \verb+none+ otherwize. The cache entries
+are stored in the session directory, which would be \verb+./frama-c/wp/cache+ by default.
+\end{description}
+
+The available cache modes are described below:
+\begin{description}
+\item [\tt -wp-cache update]: use cache entries or run the provers, and store new results in the cache. This mode is useful when you are working interactively : proofs can be partial and volatile, and you want to accumulate and keep as much previous results as you can.
+\item [\tt -wp-cache cleanup]: same as \verb+update+ mode but at the end of \textsf{Frama-C} execution, any cache entry that was not used nor updated will be deleted. This mode shall be only used when you want to cleanup your cache with old useless entries, typically at the end of an interactive session.
+\item [\tt -wp-cache replay]: same as \verb+update+ mode but new results are \emph{not} stored in the cache. This mode is useful for continuous integration, when you are not sure your cache is complete but don't want to modify it.
+\item [\tt -wp-cache offline]: similar to \verb+replay+ mode but cache entries are the unique source of results. Provers are never run and missing cache entries would result in a «~Failed~» verdict. This mode is useful to fasten continuous integration and enforcing cache completeness.
+\item [\tt -wp-cache rebuild]: force prover execution and store all results in the cache. Previous results will be replaced with new onces, but entries for non relevant proofs would be kept and you might need a cleanup stage after. This mode is useful when you modify you why3 or prover installation and you don't want to reuse your previous cache entries.
+\item [\tt -wp-cache none]: do not use nor modify cache entries; provers are run normally. This option must be used if you have a session set and you don't want to use the cache, since the default is mode \verb+update+ in this case. But you probably always to benefit from a cache when you have an (interactive) session.
+\end{description}
+
+When using cache with a non-\verb+offline+ mode, time and steps limits recorded in the cache are compared to the command line settings to produce meaningful and consistent results. Hence, if you provide more time or more steps from the command line than before, the prover would be run again. If you provide less or equal limits, the cache entries are reused, but \textsf{WP} still report the cached time and step limits to inform you of your previous attempts. For instance, if you have in the cache a « Valid » entry with time 12.4s and re-run it with a timeout of 5s, you will have a « Timeout » result with time 12.4s printed on the console.
+
+Cached result are indicated on the standard output. You might also have additional information with \verb+-wp-msg-key cache+ or you might silent them with \verb+-wp-msg-key no-cache-info+.
+
 \section{Plug-in Developer Interface}
 \label{wp-api}
 
