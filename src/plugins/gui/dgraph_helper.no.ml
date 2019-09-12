@@ -27,7 +27,11 @@ let window_msg_unavailable () =
     "Frama-C has not been compiled against a library with \
      working graph visualization. Property dependencies graph can't be shown."
   in
-  ignore (GWindow.message_dialog ~buttons ~message_type ~message ())
+  let dialog =
+    GWindow.message_dialog ~buttons ~show:true ~message_type ~message ()
+  in
+  let callback _ = dialog#destroy () in
+  ignore (dialog#connect#response ~callback)
 
 let graph_window ~parent:_ ~title:_ _ =
   window_msg_unavailable ()
