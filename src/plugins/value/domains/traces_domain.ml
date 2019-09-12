@@ -36,15 +36,17 @@ open Cil_datatype
 module Node : sig
   include Datatype.S_with_collections
   val id: t -> int
-  val of_int: int -> t
+  val start: t
   val dumb: t
   val next: unit -> t
 end = struct
   include Datatype.Int
   let id x = x
-  let of_int x = x
-  let dumb = 0
-  module Counter = State_builder.Counter(struct let name = "Traces_domain.Edge.Counter" end)
+  let start = 0
+  let dumb = (- 1)
+  module Counter =
+    State_builder.Counter
+      (struct let name = "Value.Traces_domain.Node.Counter" end)
   let next () = Counter.next ()
 end
 
@@ -73,6 +75,8 @@ module rec Edge : sig
   val succ : t -> node
   val change_next : node -> t -> t
 
+  val has_transition : transition -> edge -> bool
+
   val pretty_list : t list Pretty_utils.formatter
 end = struct
   module T = struct
@@ -83,7 +87,7 @@ end = struct
 
     let reprs = [ {
         edge_trans = Msg "msg";
-        edge_dst = Node.dumb;
+        edge_dst = Node.start;
       }]
 
     let structural_descr = Structural_descr.t_abstract
@@ -104,6 +108,8 @@ end = struct
   end
 
   include Datatype.Make_with_collections(T)
+
+  let has_transition t e = Transition.equal t e.edge_trans
 
   let pretty_list fmt l = Pretty_utils.pp_list ~sep:";@ " pretty fmt l
 
@@ -215,7 +221,8 @@ end = struct
 end
 
 module EdgeList = struct
-  include Datatype.List_with_collections(Edge)(struct let module_name = "Traces_domain.EdgeList" end)
+  include Datatype.List_with_collections(Edge)
+      (struct let module_name = "Value.Traces_domain.EdgeList" end)
   let pretty = Edge.pretty_list
   let pretty_debug = pretty
 end
@@ -275,46 +282,72 @@ module Graph = struct
     merge ~cache ~symmetric:false ~idempotent:false
       ~decide_both ~decide_left ~decide_right
 
-  let succs g (n : Node.t) = try find n g with Not_found -> []
+  let succs (n : Node.t) g = try find n g with Not_found -> []
+
+  let rec epsilon_path current stop g =
+    Node.equal current stop ||
+    begin
+      Node.compare current stop <= 0 &&
+      match find current g with
+      | exception Not_found -> false
+      | l ->
+        let exists = function
+          | { edge_dst; edge_trans = Msg _ } -> epsilon_path edge_dst stop g
+          | _ -> false
+        in
+        List.exists exists l
+    end
 end
 
-let is_included_graph = Graph.is_included
+let create_edge all_edges_ever_created current e =
+  let m = Graph.singleton current [e] in
+  let old = !all_edges_ever_created in
+  let new_ = Graph.join old m in
+  (* if not (Graph.equal old new_) then *)
+  (*   Format.printf "@[<hv>@[create_edge: %a ->@]@ %a@]@." *)
+  (*     Node.pretty current Edge.pretty e; *)
+  all_edges_ever_created := new_;
+  m
 
-let join_graph = Graph.join
+let join_path ~all_edges_ever_created g c1 c2 =
+  if Graph.epsilon_path c1 c2 g then (c2, g)
+  else if Graph.epsilon_path c2 c1 g then (c1, g)
+  else
+    let t_join = Msg "join" in
+    let is_join e = Transition.equal e.edge_trans t_join in
+    let e =
+      let succs1 = Graph.succs c1 !all_edges_ever_created in
+      let succs2 = Graph.succs c2 !all_edges_ever_created in
+      let succs1 = List.filter is_join succs1 in
+      let find s1 = List.exists (Edge.equal s1) succs2 in
+      begin match List.find find succs1 with
+        | exception Not_found ->
+          { edge_dst = Node.next () ; edge_trans = t_join }
+        | m ->
+          { edge_dst = Edge.succ m ; edge_trans = t_join }
+      end
+    in
+    let m1 = create_edge all_edges_ever_created c1 e in
+    let m2 = create_edge all_edges_ever_created c2 e in
+    let g = Graph.join (Graph.join m1 g) m2 in
+    (e.edge_dst, g)
 
-let diff_graph = Graph.diff
-
-let rec epsilon_path current stop g =
-  Node.equal current stop ||
-  begin
-    Node.compare current stop <= 0 &&
-    match Graph.find current g with
-    | exception Not_found -> false
-    | l ->
-      let exists = function
-        | { edge_dst; edge_trans = Msg _ } -> epsilon_path edge_dst stop g
-        | _ -> false
-      in
-      List.exists exists l
-  end
-
-
-
-(* A loop
-   .*)
+(* A loop .*)
 type loops =
   | Base of Node.t * Graph.t (* current last *)
   | OpenLoop of Cil_types.stmt * Node.t (* start node *) * Graph.t (* last iteration *) * Node.t (** current *) * Graph.t * loops
   | UnrollLoop of Cil_types.stmt * loops
 
 module Loops = struct
+  type t = loops
+
   let rec is_included l1 l2 = match l1, l2 with
     | Base _, (OpenLoop _ | UnrollLoop _)
     | (OpenLoop _ | UnrollLoop _), Base _ ->
       (* not in the same number of loops *)
       false
     | Base (c1,_), Base (c2,g2) ->
-      epsilon_path c1 c2 g2
+      Graph.epsilon_path c1 c2 g2
     | (OpenLoop(stmt1,_,_,_,_,_) | UnrollLoop(stmt1,_)),
       (OpenLoop(stmt2,_,_,_,_,_) | UnrollLoop(stmt2,_)) when not (Stmt.equal stmt1 stmt2) ->
       (* not same loop *)
@@ -327,7 +360,7 @@ module Loops = struct
       is_included l1 l2 &&
       Graph.is_included last1 last2 &&
       Graph.is_included g1 g2' &&
-      epsilon_path c1 c2 g2'
+      Graph.epsilon_path c1 c2 g2'
     | UnrollLoop(_,l1), UnrollLoop(_,l2) ->
       is_included l1 l2
     | OpenLoop(_,_,_,_,_,_), UnrollLoop(_,_) ->
@@ -414,11 +447,59 @@ module Loops = struct
       Format.fprintf fmt "@[<hv>@[unroll(%a)@]@ %a"
         Stmt.pretty_sid stmt
         pretty l
+
+  let rec hash = function
+    | Base (c,g) ->
+      Hashtbl.seeded_hash (Hashtbl.seeded_hash 1 (Graph.hash g)) (Node.hash c)
+    | OpenLoop(stmt,s,last,c,g,l) ->
+      Hashtbl.seeded_hash 2
+        (Stmt.hash stmt, Node.hash s, Graph.hash last, Node.hash c,
+         Graph.hash g, hash l)
+    | UnrollLoop(stmt,l) ->
+      Hashtbl.seeded_hash 2
+        (Stmt.hash stmt, hash l)
 end
 
-let is_included_loops = Loops.is_included
+let rec join_loops ~all_edges_ever_created l1 l2 =
+  match l1, l2 with
+  | Base _, (OpenLoop _ | UnrollLoop _) | (OpenLoop _ | UnrollLoop _), Base _ ->
+    (* not in the same number of loops *)
+    `Top
+  | Base (c1,g1), Base (c2,g2) ->
+    let g = Graph.join g1 g2 in
+    let (n,g) = join_path ~all_edges_ever_created g c1 c2 in
+    `Value( Base (n, g))
+  | (OpenLoop(stmt1,_,_,_,_,_) | UnrollLoop(stmt1,_)),
+    (OpenLoop(stmt2,_,_,_,_,_) | UnrollLoop(stmt2,_)) when not (Stmt.equal stmt1 stmt2) ->
+    (* not same loop *)
+    `Top
+  | OpenLoop(stmt1,s1,last1,c1,g1,l1), OpenLoop(_,s2,_,_,_,l2) when not (Node.equal s1 s2) ->
+    (* not entered in the loop at the same time, take arbitrarily one of them *)
+    begin match join_loops ~all_edges_ever_created l1 l2 with
+      | `Top -> `Top
+      | `Value(l) -> `Value(OpenLoop(stmt1,s1,last1,c1,g1,l))
+    end
+  | OpenLoop(stmt,s,last1,c1,g1,l1), OpenLoop(_,_,last2,c2,g2,l2) ->
+    begin match join_loops ~all_edges_ever_created l1 l2 with
+      | `Top -> `Top
+      | `Value(l) ->
+        let last = Graph.join last1 last2 in
+        let g = Graph.join g1 g2 in
+        let (n,g) = join_path ~all_edges_ever_created g c1 c2 in
+        `Value(OpenLoop(stmt,s,last,n,g,l))
+    end
+  | UnrollLoop(stmt,l1), UnrollLoop(_,l2) ->
+    begin match join_loops ~all_edges_ever_created l1 l2 with
+      | `Top -> `Top
+      | `Value l -> `Value (UnrollLoop(stmt,l))
+    end
+  | (OpenLoop(stmt,s,last,c,g,l1), UnrollLoop(_,l2))
+  | (UnrollLoop(_,l2), OpenLoop(stmt,s,last,c,g,l1)) ->
+    begin match join_loops ~all_edges_ever_created l1 l2 with
+      | `Top -> `Top
+      | `Value l -> `Value (OpenLoop(stmt,s,last,c,g,l))
+    end
 
-let diff_loops = Loops.diff
 
 type state = { start : Node.t; current : loops;
                call_declared_function: bool;
@@ -438,18 +519,14 @@ let entry_formals s = s.main_formals
 module Traces = struct
 
   (** impossible for normal values start must be bigger than current *)
-  let new_empty () = { start = Node.of_int 0; current = Base (Node.of_int 0, Graph.empty);
+  let new_empty () = { start = Node.start; current = Base (Node.start, Graph.empty);
                        call_declared_function = false;
                        globals = []; main_formals = [];
                        all_edges_ever_created = ref Graph.empty;
                        all_loop_start = Stmt.Hashtbl.create 10;
                      }
   let empty = new_empty ()
-  let top = { (new_empty ()) with current = Base (Node.of_int (-1), Graph.empty); }
-
-  let compare_loops = Loops.compare
-
-  let pretty_loops = Loops.pretty
+  let top = { (new_empty ()) with current = Base (Node.dumb, Graph.empty); }
 
   (* Frama-C "datatype" for type [inout] *)
   include Datatype.Make_with_collections(struct
@@ -472,7 +549,7 @@ module Traces = struct
       let compare m1 m2 =
         let c = Node.compare m1.start m2.start in
         if c <> 0 then c else
-          let c = compare_loops m1.current m2.current in
+          let c = Loops.compare m1.current m2.current in
           if c <> 0 then c else
             let c = Datatype.Bool.compare m1.call_declared_function m2.call_declared_function in
             if c <> 0 then c else
@@ -487,19 +564,10 @@ module Traces = struct
             Node.pretty m.start
             (Pretty_utils.pp_list ~sep:",@ " Varinfo.pretty) m.globals
             (Pretty_utils.pp_list ~sep:",@ " Varinfo.pretty) m.main_formals
-            pretty_loops m.current
-
-      let rec hash_loops = function
-        | Base (c,g) -> Hashtbl.seeded_hash (Hashtbl.seeded_hash 1 (Graph.hash g)) (Node.hash c)
-        | OpenLoop(stmt,s,last,c,g,l) ->
-          Hashtbl.seeded_hash 2
-            (Stmt.hash stmt, Node.hash s, Graph.hash last, Node.hash c, Graph.hash g, hash_loops l)
-        | UnrollLoop(stmt,l) ->
-          Hashtbl.seeded_hash 2
-            (Stmt.hash stmt, hash_loops l)
+            Loops.pretty m.current
 
       let hash m =
-        Hashtbl.seeded_hash (Node.hash m.start) (hash_loops m.current)
+        Hashtbl.seeded_hash (Node.hash m.start) (Loops.hash m.current)
 
       let copy c = c
 
@@ -509,25 +577,17 @@ module Traces = struct
     if m == top then `Top
     else `Other m
 
-  let move_to c g state =
+  let map_base f state =
     let rec aux = function
-      | Base (_,_) -> Base (c,g)
-      | OpenLoop(stmt,s,last,_,_,l) ->
-        OpenLoop(stmt,s,last,c,g,l)
-      | UnrollLoop(stmt,l) ->
-        UnrollLoop(stmt,aux l)
-    in
-    let current = aux state.current in
-    {state with current}
+      | Base (c, g) ->
+        let c, g = f (c, g) in Base (c, g)
+      | OpenLoop (stmt, s, last, c, g, l) ->
+        let c, g = f (c, g) in OpenLoop(stmt, s, last, c, g, l)
+      | UnrollLoop (stmt, l) -> UnrollLoop (stmt, aux l)
+    in { state with current = aux state.current }
 
-  let replace_to c state =
-    let rec aux = function
-      | Base (_,g) -> Base (c,g)
-      | OpenLoop(stmt,s,last,_,g,l) ->
-        OpenLoop(stmt,s,last,c,g,l)
-      | UnrollLoop(stmt,l) -> UnrollLoop(stmt,aux l) in
-    let current = aux state.current in
-    {state with current}
+  let move_to c g = map_base (fun _ -> c, g)
+  let replace_to c = map_base (fun (_, g) -> c, g)
 
   let get_current state =
     let rec aux = function
@@ -537,81 +597,48 @@ module Traces = struct
         aux l in
     aux state.current
 
-  let find_succs current g =
-    match Graph.find current g with
-    | exception Not_found -> []
-    | l -> l
-
-  let change_next = Edge.change_next
-
-  let same_edge edge edge' =
-    Transition.equal edge.edge_trans edge'.edge_trans
-
-  let create_edge all_edges_ever_created current e =
-    let m = Graph.singleton current [e] in
-    let old = !all_edges_ever_created in
-    let new_ = join_graph old m in
-    (* if not (Graph.equal old new_) then *)
-    (*   Format.printf "@[<hv>@[create_edge: %a ->@]@ %a@]@." *)
-    (*     Node.pretty current Edge.pretty e; *)
-    all_edges_ever_created := new_;
-    m
-
-  let get_node = Edge.succ
-
-  let add_edge_aux c edge =
-    let (current,graph) = get_current c in
-    let reusable =
-      let succs = find_succs current !(c.all_edges_ever_created) in
-      List.find_opt (same_edge edge) succs
+  let add_trans_aux state t =
+    let add_edge (current, graph) =
+      let e =
+        (** try to reuse an edge from the pool *)
+        let succs = Graph.succs current !(state.all_edges_ever_created) in
+        try List.find (Edge.has_transition t) succs
+        with Not_found ->
+          (** create a new edge *)
+          { edge_trans = t; edge_dst = Node.next () }
+      in
+      let n = e.edge_dst in
+      let m = create_edge state.all_edges_ever_created current e in
+      let graph = Graph.join m graph in
+      (n, graph)
     in
-    let (n,e) = match reusable with
-      | Some e ->
-        (** reuse an edge from last *)
-        let n = get_node e in
-        (n,e)
-      | None ->
-        (** create a new edge *)
-        let n = Node.next () in
-        let e = change_next n edge in
-        (n,e)
-    in
-    let m = create_edge c.all_edges_ever_created current e in
-    let graph = join_graph m graph in
-    move_to n graph c
+    map_base add_edge state
 
-  let add_edge c e =
+  let add_trans c t =
     if c == top then c
     else if c.call_declared_function then c (** forget intermediary state *)
     else
       let c = if c == empty then new_empty () else c in
-      add_edge_aux c e
-
-  let add_edge_tmp c dest trans =
-    if c == top then c
-    else if c.call_declared_function then c (** forget intermediary state *)
-    else
-      let c = if c == empty then new_empty () else c in
-      add_edge_aux c { edge_dst = dest; edge_trans = trans }
+      add_trans_aux c t
 
   let copy_edges s old_current_node g state =
     let cache = Node.Hashtbl.create 10 in
     let rec aux old_current_node state =
       let current_node = (fst (get_current state)) in
-      let succs = find_succs old_current_node g in
+      let succs = Graph.succs old_current_node g in
       let fold state e =
-        let next_old = get_node e in
+        let next_old = Edge.succ e in
         let state = match Node.Hashtbl.find cache next_old with
           | exception Not_found ->
-            let state = add_edge state e in
+            let state = add_trans state e.edge_trans in
             Node.Hashtbl.add cache next_old (fst (get_current state));
             let state = aux next_old state in
             replace_to current_node state
           | next ->
             let (_,g) = get_current state in
-            let e = change_next next e in
+            let e = Edge.change_next next e in
             let m = create_edge state.all_edges_ever_created current_node e in
-            let g = join_graph m g in
+            let g = Graph.join m g in
             move_to next g state
         in
         replace_to current_node state
@@ -626,7 +653,7 @@ module Traces = struct
     (* start is the same *)
     let r =
       c1.start = c2.start &&
-      is_included_loops c1.current c2.current in
+      Loops.is_included c1.current c2.current in
     if not r && compare c1 c2 = 0 then
       Printf.printf "bad is_included@.";
     r
@@ -636,75 +663,6 @@ module Traces = struct
     c1.globals != c2.globals ||
     c1.main_formals != c2.main_formals ||
     c1.all_edges_ever_created != c2.all_edges_ever_created
-
-  let join_path ~all_edges_ever_created graph c1 c2 =
-    if epsilon_path c1 c2 graph
-    then (c2, graph)
-    else if epsilon_path c2 c1 graph
-    then (c1, graph)
-    else
-      let m = { edge_dst = Node.dumb; edge_trans = Msg("join") } in (* TODO *)
-      let reusable =
-        let succs1 = find_succs c1 !all_edges_ever_created in
-        let succs1 = List.filter (same_edge m) succs1 in
-        let succs2 = find_succs c2 !all_edges_ever_created in
-        let find s1 = List.exists (Edge.equal s1) succs2 in
-        List.find_opt find succs1
-      in
-      let (n,m) = match reusable with
-        | None ->
-          let n = Node.next () in
-          let m = change_next n m in
-          (n,m)
-        | Some m ->
-          (** reuse an edge from last *)
-          let n = get_node m in
-          (n,m)
-      in
-      let m1 = create_edge all_edges_ever_created c1 m in
-      let m2 = create_edge all_edges_ever_created c2 m in
-      let g = join_graph (join_graph m1 graph) m2 in
-      ( n, g)
-
-  let rec join_loops ~all_edges_ever_created l1 l2 =
-    match l1, l2 with
-    | Base _, (OpenLoop _ | UnrollLoop _) | (OpenLoop _ | UnrollLoop _), Base _ ->
-      (* not in the same number of loops *)
-      `Top
-    | Base (c1,g1), Base (c2,g2) ->
-      let g = join_graph g1 g2 in
-      let (n,g) = join_path ~all_edges_ever_created g c1 c2 in
-      `Value( Base (n, g))
-    | (OpenLoop(stmt1,_,_,_,_,_) | UnrollLoop(stmt1,_)),
-      (OpenLoop(stmt2,_,_,_,_,_) | UnrollLoop(stmt2,_)) when not (Stmt.equal stmt1 stmt2) ->
-      (* not same loop *)
-      `Top
-    | OpenLoop(stmt1,s1,last1,c1,g1,l1), OpenLoop(_,s2,_,_,_,l2) when not (Node.equal s1 s2) ->
-      (* not entered in the loop at the same time, take arbitrarily one of them *)
-      begin match join_loops ~all_edges_ever_created l1 l2 with
-        | `Top -> `Top
-        | `Value(l) -> `Value(OpenLoop(stmt1,s1,last1,c1,g1,l))
-      end
-    | OpenLoop(stmt,s,last1,c1,g1,l1), OpenLoop(_,_,last2,c2,g2,l2) ->
-      begin match join_loops ~all_edges_ever_created l1 l2 with
-        | `Top -> `Top
-        | `Value(l) ->
-          let last = join_graph last1 last2 in
-          let g = join_graph g1 g2 in
-          let (n,g) = join_path ~all_edges_ever_created g c1 c2 in
-          `Value(OpenLoop(stmt,s,last,n,g,l))
-      end
-    | UnrollLoop(stmt,l1), UnrollLoop(_,l2) ->
-      begin match join_loops ~all_edges_ever_created l1 l2 with
-        | `Top -> `Top
-        | `Value l -> `Value (UnrollLoop(stmt,l))
-      end
-    | (OpenLoop(stmt,s,last,c,g,l1), UnrollLoop(_,l2))
-    | (UnrollLoop(_,l2), OpenLoop(stmt,s,last,c,g,l1)) ->
-      begin match join_loops ~all_edges_ever_created l1 l2 with
-        | `Top -> `Top
-        | `Value l -> `Value (OpenLoop(stmt,s,last,c,g,l))
-      end
 
   let join c1 c2 =
     if c1.call_declared_function <> c2.call_declared_function
@@ -727,7 +685,7 @@ module Traces = struct
 
   let add_loop stmt state =
     let (n,g) = get_current state in
-    let succs = find_succs n g in
+    let succs = Graph.succs n g in
     let rec find_same_loop = function
       | [] ->
         Stmt.Hashtbl.memo state.all_loop_start stmt (fun _ -> Node.next (),Graph.empty)
@@ -741,32 +699,31 @@ module Traces = struct
     let current = OpenLoop(stmt,s,last,s,Graph.empty,state.current) in
     { state with current }
 
-
   let widen _ stmt' c1 c2 =
     if false then
       begin
-        if compare_loops c1.current c2.current = 0
+        if Loops.compare c1.current c2.current = 0
         then
           Format.printf "@[<hv 2>@[widen %a: same loops, states are%s equal @]@]@."
             Stmt.pretty_sid stmt' (if compare c1 c2 = 0 then "" else " not")
         else
-          let c1' = diff_loops c1.current c2.current in
-          let c2' = diff_loops c2.current c1.current in
-          if (Bottom.compare compare_loops) c1' c2' = 0 then
+          let c1' = Loops.diff c1.current c2.current in
+          let c2' = Loops.diff c2.current c1.current in
+          if (Bottom.compare Loops.compare) c1' c2' = 0 then
             Format.printf "@[<hv 2>@[widen %a diff equal:@]@ @[<hv 1>@[c1:@]@ %a@]@ @[<hv 1>@[c2:@]@ %a@]@]@."
               Stmt.pretty_sid stmt'
-              pretty_loops c1.current
-              pretty_loops c2.current
+              Loops.pretty c1.current
+              Loops.pretty c2.current
 
           else
             Format.printf "@[<hv 2>@[widen %a diff different:@]@ @[<hv 1>@[c1':@]@ %a@]@ @[<hv 1>@[c2':@]@ %a@]@]@."
               Stmt.pretty_sid stmt'
-              (Bottom.pretty pretty_loops) c1'
-              (Bottom.pretty pretty_loops) c2'
+              (Bottom.pretty Loops.pretty) c1'
+              (Bottom.pretty Loops.pretty) c2'
       end;
     if false then
       begin
-        if compare_loops c1.current c2.current = 0
+        if Loops.compare c1.current c2.current = 0
         then
           Format.printf "@[<hv 2>@[widen %a: same loops, states are%s equal @]@]@."
             Stmt.pretty_sid stmt' (if compare c1 c2 = 0 then "" else " not")
@@ -786,7 +743,6 @@ module Traces = struct
         add_loop stmt' {c2 with current = l}
     end
 
-
   let narrow _c1 c2 = `Value c2
 end
 
@@ -804,7 +760,7 @@ module GraphDot = OCamlGraph.Graphviz.Dot(struct
         | Head (src,loops,_,_) -> {node=src;loops}
         | Back (_,loops,src) -> {node=src;loops}
       let dst = function
-        | Usual (_,edge,loops) -> {node=Traces.get_node edge;loops}
+        | Usual (_,edge,loops) -> {node=Edge.succ edge;loops}
         | Head (_,_,s,loops) -> {node=s;loops}
         | Back (dst,loops,_) -> {node=dst;loops}
     end
@@ -870,7 +826,7 @@ let rec complete_graph (graph:Graph.t) =
   Graph.fold (fun k l graph ->
       let graph, l =
         Extlib.fold_map (fun graph e ->
-            let m = Graph.singleton (Traces.get_node e) [] in
+            let m = Graph.singleton (Edge.succ e) [] in
             let e = match e.edge_trans with
               | Assign (_,_,_)
               | Assume (_,_)
@@ -883,10 +839,10 @@ let rec complete_graph (graph:Graph.t) =
                 let g = Graph.shape (complete_graph (Graph.from_shape_id g)) in
                 { edge_dst = n; edge_trans = Loop(stmt,s,g) }
             in
-            join_graph graph m, e)
+            Graph.join graph m, e)
           graph l
       in
-      join_graph graph (Graph.singleton k l)
+      Graph.join graph (Graph.singleton k l)
     ) graph Graph.empty
 
 
@@ -924,22 +880,22 @@ module Internal = struct
 
     let assign _ki lv e _v _valuation state =
       let trans = Assign (lv.Eval.lval, lv.Eval.ltyp, e) in
-      `Value (Traces.add_edge_tmp state Node.dumb trans)
+      `Value (Traces.add_trans state trans)
 
     let assume _stmt e pos _valuation state =
       let trans = Assume (e, pos) in
-      `Value (Traces.add_edge_tmp state Node.dumb trans)
+      `Value (Traces.add_trans state trans)
 
     let start_call _stmt call _valuation state =
       if Kernel_function.is_definition call.Eval.kf
       then
         let msg = Format.asprintf "start_call: %s (%b)" (Kernel_function.get_name call.Eval.kf)
             (Kernel_function.is_definition call.Eval.kf) in
-        let state = Traces.add_edge_tmp state Node.dumb (Msg msg) in
+        let state = Traces.add_trans state (Msg msg) in
         let formals = List.map (fun arg -> arg.Eval.formal) call.Eval.arguments in
-        let state = Traces.add_edge_tmp state Node.dumb (EnterScope formals) in
+        let state = Traces.add_trans state (EnterScope formals) in
         let state = List.fold_left (fun state arg ->
-            Traces.add_edge_tmp state Node.dumb
+            Traces.add_trans state
               (Assign (Cil.var arg.Eval.formal,
                        arg.Eval.formal.Cil_types.vtype,
                        arg.Eval.concrete))) state call.Eval.arguments in
@@ -948,10 +904,10 @@ module Internal = struct
         (** enter the scope of the dumb result variable *)
         let var = call.Eval.return in
         let state = match var with
-          | Some var -> Traces.add_edge_tmp state Node.dumb (EnterScope [var])
+          | Some var -> Traces.add_trans state (EnterScope [var])
           | None -> state in
         let exps = List.map (fun arg -> arg.Eval.concrete) call.Eval.arguments in
-        let state = Traces.add_edge_tmp state Node.dumb
+        let state = Traces.add_trans state
             (CallDeclared (call.Eval.kf, exps, Extlib.opt_map Cil.var var))
         in `Value {state with call_declared_function = true}
 
@@ -960,7 +916,7 @@ module Internal = struct
       then `Value {post with call_declared_function = false}
       else
         let msg = Format.asprintf "finalize_call: %s" (Kernel_function.get_name call.Eval.kf) in
-        let state = Traces.add_edge_tmp post Node.dumb (Msg msg) in
+        let state = Traces.add_trans post (Msg msg) in
         `Value state
 
     let update _valuation state = `Value state
@@ -983,7 +939,7 @@ module Internal = struct
   let introduce_globals vars state =
     {state with globals = vars @ state.globals}
   let initialize_variable lv _ ~initialized:_ _ state =
-    Traces.add_edge_tmp state Node.dumb (Msg(Format.asprintf "initialize variable: %a" Printer.pp_lval lv ))
+    Traces.add_trans state (Msg(Format.asprintf "initialize variable: %a" Printer.pp_lval lv ))
   let initialize_variable_using_type init_kind varinfo state =
     let state =
       match init_kind with
@@ -999,11 +955,11 @@ module Internal = struct
         init_kind
         Varinfo.pretty varinfo
     in
-    Traces.add_edge_tmp state Node.dumb (Msg msg)
+    Traces.add_trans state (Msg msg)
 
   (* TODO *)
   let logic_assign _assign _location ~pre:_ state =
-    Traces.add_edge_tmp state Node.dumb (Msg "logic assign")
+    Traces.add_trans state (Msg "logic assign")
 
   (* Logic *)
   let evaluate_predicate _ _ _ = Alarmset.Unknown
@@ -1020,7 +976,7 @@ module Internal = struct
     `Value (loc, value)
 
   let enter_loop stmt state =
-    let state = Traces.add_edge_tmp state Node.dumb (Msg "enter_loop") in
+    let state = Traces.add_trans state (Msg "enter_loop") in
     let state = if not (Value_parameters.TracesUnrollLoop.get ())
       then Traces.add_loop stmt state
       else { state with current = UnrollLoop(stmt,state.current) } in
@@ -1031,10 +987,10 @@ module Internal = struct
     | Base _ -> assert false
     | UnrollLoop(_,_) -> state
     | OpenLoop(stmt,s,last,_,g,l) ->
-      let last = join_graph last g in
+      let last = Graph.join last g in
       let last = if Value_parameters.TracesUnifyLoop.get () then
           let s',old_last = Stmt.Hashtbl.find state.all_loop_start stmt in
-          let last = join_graph last old_last in
+          let last = Graph.join last old_last in
           assert (Node.equal s s');
           Stmt.Hashtbl.add state.all_loop_start stmt (s,last);
           last
@@ -1042,7 +998,7 @@ module Internal = struct
       in
       let current = OpenLoop(stmt,s,last,s,Graph.empty,l) in
       let state = { state with current } in
-      (* Traces.add_edge state (Msg(Node.dumb,"incr_loop_counter")) *)
+      (* Traces.add_trans state (Msg("incr_loop_counter")) *)
       state
 
   let leave_loop stmt' state =
@@ -1054,22 +1010,20 @@ module Internal = struct
       let state = { state with current } in
       let last = if Value_parameters.TracesUnifyLoop.get () then
           let s',old_last = Stmt.Hashtbl.find state.all_loop_start stmt in
-          let last = join_graph last old_last in
+          let last = Graph.join last old_last in
           assert (Node.equal s s');
           Stmt.Hashtbl.add state.all_loop_start stmt (s,last);
           last
         else last
       in
       let state = if Graph.is_empty last then state
-        else Traces.add_edge_tmp state Node.dumb (Loop(stmt,s,Graph.shape last)) in
+        else Traces.add_trans state (Loop(stmt,s,Graph.shape last)) in
       let state = Traces.copy_edges s old_current_node g state in
-      Traces.add_edge_tmp state Node.dumb (Msg "leave_loop")
+      Traces.add_trans state (Msg "leave_loop")
 
 
-  let enter_scope _kf vars state =
-    Traces.add_edge_tmp state Node.dumb (EnterScope vars)
-  let leave_scope _kf vars state =
-    Traces.add_edge_tmp state Node.dumb (LeaveScope vars)
+  let enter_scope _kf vars state = Traces.add_trans state (EnterScope vars)
+  let leave_scope _kf vars state = Traces.add_trans state (LeaveScope vars)
 
   let reduce_further _state _expr _value = [] (*Nothing intelligent to suggest*)
 
@@ -1174,7 +1128,7 @@ let rec stmts_of_cfg cfg current var_map locals return_exp acc =
       | Loop (_,s,g) ->
         let g = Graph.from_shape (fun _ v -> v) g in
         let is_while =
-          match Traces.find_succs s g, Traces.find_succs n cfg with
+          match Graph.succs s g, Graph.succs n cfg with
           | [{ edge_dst = n1'; edge_trans = Assume(exp1,b1) }],
             [{ edge_dst = n2'; edge_trans = Assume(exp2,b2) }]
             when ExpStructEq.equal exp1 exp2 && b1 != b2 ->

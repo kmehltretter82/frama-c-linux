@@ -60,6 +60,10 @@ type loops =
   | OpenLoop of Cil_types.stmt * Node.t (* start node *) * Graph.t (* last iteration *) * Node.t (** current *) * Graph.t * loops
   | UnrollLoop of Cil_types.stmt * loops
 
+module Loops : sig
+  type t = loops
+end
+
 type state
 
 val start: state -> Node.t
