@@ -134,24 +134,28 @@ let pp_response pp fmt (r : _ response) =
 
 let no_yield () = ()
 
-let execute yield exec : _ response =
-  let db = !Db.progress in
+let execute exec : _ response =
   try
-    Db.progress := if exec.yield then yield else no_yield ;
     let data = exec.handler exec.data in
-    Db.progress := db ; `Data(exec.id,data)
+    `Data(exec.id,data)
   with
-  | Killed -> Db.progress := db ; `Killed exec.id
-  | exn ->
-    Db.progress := db ;
+  | Killed -> `Killed exec.id
+  | Data.InputError msg -> `Error(exec.id,msg)
+  | Sys.Break as exn -> raise exn (* Silently pass the exception *)
+  | exn when Cmdline.catch_at_toplevel exn ->
     Senv.warning "[%s] Uncaught exception:@\n%s"
       exec.request (Cmdline.protect exn) ;
     `Error(exec.id,Printexc.to_string exn)
 
+let execute_with_yield yield exec =
+  let db = !Db.progress in
+  Db.progress := if exec.yield then yield else no_yield ;
+  Extlib.try_finally ~finally:(fun () -> Db.progress := db) execute exec
+
 let execute_debug pp yield exec =
   if Senv.debug_atleast 1 then
     Senv.debug "Trigger %s:%a" exec.request pp exec.id ;
-  execute yield exec
+  execute_with_yield yield exec
 
 let reply_debug server resp =
   if Senv.debug_atleast 1 then
@@ -191,7 +195,7 @@ let process_request (server : 'a server) (request : 'a request) : unit =
       | Some( `GET , handler ) ->
         let exec = { id ; request ; handler ; data ;
                      yield = false ; killed = false } in
-        reply_debug server (execute no_yield exec)
+        reply_debug server (execute exec)
       | Some( `SET , handler ) ->
         let exec = { id ; request ; handler ; data ;
                      yield = false ; killed = false } in
@@ -283,18 +287,24 @@ let run ~pretty ?(equal=(=)) ~fetch () =
       shutdown = false ;
     } in
     try
+      (* TODO: remove the following line once the Why3 signal handler is not
+         used anymore. *)
+      Sys.catch_break true;
       signal true ;
       Senv.feedback "Server running." ;
-      while not server.shutdown do
-        let activity = process server in
-        if not activity then Unix.sleepf idle_s ;
-      done ;
+      begin try
+          while not server.shutdown do
+            let activity = process server in
+            if not activity then Unix.sleepf idle_s ;
+          done ;
+        with Sys.Break -> () (* Ctr+C, just leave the loop normally *)
+      end;
       Senv.feedback "Server shutdown." ;
       signal false ;
-    with err ->
+    with exn ->
       Senv.feedback "Server interruped (fatal error)." ;
       signal false ;
-      raise err
+      raise exn
   end
 
 (* -------------------------------------------------------------------------- *)

@@ -107,13 +107,14 @@ module Stmt = Data.Collection
           ~descr:(Md.rm "Code statement identifier") ()
       let to_json st = `String (Tag.of_stmt st)
       let of_json js =
+        let id = Js.to_string js in
         try
           let open Printer_tag in
-          match Tag.lookup (Js.to_string js) with
+          match Tag.lookup id with
           | PStmt(_,st) -> st
           | _ -> raise Not_found
         with Not_found ->
-          Data.failure js "Unknown stmt id"
+          Data.failure "Unknown stmt id: '%s'" id
     end)
 
 module Ki = Data.Collection
@@ -137,8 +138,9 @@ module Kf = Data.Collection
       let to_json kf =
         `String (Kernel_function.get_name kf)
       let of_json js =
-        try Js.to_string js |> Globals.Functions.find_by_name
-        with Not_found -> Data.failure js "Undefined function"
+        let key = Js.to_string js in
+        try Globals.Functions.find_by_name key
+        with Not_found -> Data.failure "Undefined function '%s'" key
     end)
 
 (* -------------------------------------------------------------------------- *)
