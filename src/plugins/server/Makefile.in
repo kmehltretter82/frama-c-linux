@@ -52,7 +52,7 @@ PLUGIN_CMO:= \
 PLUGIN_UNDOC:= server_batch.ml server_zmq.ml
 
 PLUGIN_GENERATED:= $(PLUGIN_DIR)/Server.mli
-PLUGIN_TESTS :=
+PLUGIN_TESTS_DIRS := batch
 
 # --------------------------------------------------------------------------
 # --- ZeroMQ Support

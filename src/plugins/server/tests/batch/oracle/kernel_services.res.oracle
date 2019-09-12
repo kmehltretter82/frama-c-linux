@@ -1,0 +1,5 @@
+[kernel] Parsing tests/batch/kernel_services.i (no preprocessing)
+[server] Script "tests/batch/kernel_services.json"
+[server] [GET] kernel.getLogs
+[server] [SET] kernel.setLogs
+[server] Output "tests/batch/result/kernel_services.out.json"

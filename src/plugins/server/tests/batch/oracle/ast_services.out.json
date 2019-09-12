@@ -1,0 +1,14 @@
+[
+  { "id": "getFunctions", "data": [ "f", "main" ] },
+  {
+    "id": "printFunction",
+    "data": [
+      "",
+      [ "#v19", "void f(void)" ],
+      "\n{\n  ",
+      [ "#s7", [ "#k7", "return;" ] ],
+      "\n}\n",
+      "\n"
+    ]
+  }
+]

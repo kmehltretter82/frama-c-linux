@@ -41,7 +41,18 @@ module Batch = Senv.String_list
          associated results in <file.out.json>."
     end)
 
+let () = Parameter_customize.set_group batch_group
+module BatchOutputDir = Senv.Empty_string
+    (struct
+      let option_name = "-server-batch-output-dir"
+      let arg_name = "path"
+      let help =
+        "Outputs the results of -server-batch in <path> instead of the input \
+         directory."
+    end)
+
 let _ = Doc.page `Protocol ~title:"Batch Protocol" ~filename:"server_batch.md"
+
 
 (* -------------------------------------------------------------------------- *)
 (* --- Execute JSON                                                       --- *)
@@ -64,9 +75,8 @@ let execute_command js =
     try
       Senv.feedback "[%a] %s" Main.pp_kind kind request ;
       `Assoc [ "id" , id ; "data" , handler data ]
-    with Ju.Type_error(msg,js) ->
-      Senv.error "[%s] incorrect encoding:@\n%s@\n@[<hov 2>At: %a@]@."
-        request msg pretty js ;
+    with Data.InputError(msg) ->
+      Senv.error "[%s] %s@." request msg ;
       `Assoc [ "id" , id ; "error" , `String msg ; "at" , js ]
 
 let rec execute_batch js =
@@ -90,9 +100,15 @@ let execute () =
       begin fun file ->
         Senv.feedback "Script %S" file ;
         let response = execute_batch (Js.from_file file) in
-        let output = Filename.remove_extension file ^ ".out.js" in
+        let output = Filename.remove_extension file ^ ".out.json" in
+        let output = match BatchOutputDir.get () with
+          | "" -> output
+          | dir -> Filename.(dir ^ dir_sep ^ basename output)
+        in
         Senv.feedback "Output %S" output ;
-        Js.to_file output response ;
+        let out = open_out output in
+        Js.pretty_to_channel out response ;
+        close_out out
       end
       (Batch.get()) ;
   end
