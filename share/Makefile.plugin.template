@@ -456,8 +456,8 @@ $(NAME_DOCFLAGS):= $(DOC_FLAGS) $(PLUGIN_DOCFLAGS) \
 			$(addprefix -package ,$(PLUGIN_REQUIRES) $(LIBRARY_NAMES))
 
 ifeq ($(HAS_GUI),yes)
-$(NAME_GUI_BFLAGS):=$($(NAME_BFLAGS)) $(addprefix -package ,$(LIBRARY_NAMES_GUI))
-$(NAME_GUI_OFLAGS):=$($(NAME_OFLAGS)) $(addprefix -package ,$(LIBRARY_NAMES_GUI))
+$(NAME_GUI_BFLAGS):=$($(NAME_BFLAGS)) $(THREAD) $(addprefix -package ,$(LIBRARY_NAMES_GUI))
+$(NAME_GUI_OFLAGS):=$($(NAME_OFLAGS)) $(THREAD) $(addprefix -package ,$(LIBRARY_NAMES_GUI))
 $(TARGET_GUI_BFLAGS):= $(PLUGIN_LINK_GUI_BFLAGS)
 $(TARGET_GUI_OFLAGS):= $(PLUGIN_LINK_GUI_OFLAGS)
 $(NAME_DOCFLAGS) := $($(NAME_DOCFLAGS)) $(addprefix -package ,$(LIBRARY_NAMES_GUI))
