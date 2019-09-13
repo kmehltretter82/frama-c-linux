@@ -164,17 +164,6 @@ class model_selector (main : Design.main_window_extension_points) =
 (* ---  WP Panel                                                        --- *)
 (* ------------------------------------------------------------------------ *)
 
-let wp_dir = ref (Sys.getcwd())
-
-let wp_script () =
-  let file = Gtk_helper.select_file
-      ~title:"Script File for Coq proofs"
-      ~dir:wp_dir ~filename:"wp.script" ()
-  in
-  match file with
-  | Some f -> Wp_parameters.Script.set f
-  | None -> ()
-
 let wp_update_model label () =
   let s = Factory.parse (Wp_parameters.Model.get ()) in
   label#set_text (Factory.descr s)
@@ -185,11 +174,6 @@ let wp_configure_model main label () =
     wp_update_model label () ;
   end
 
-let wp_update_script label () =
-  let file = Wp_parameters.Script.get () in
-  let text = if file = "" then "(None)" else Filename.basename file in
-  label#set_text text
-
 let wp_panel
     ~(main:Design.main_window_extension_points)
     ~(configure_provers:unit -> unit)
@@ -199,6 +183,7 @@ let wp_panel
   let packing = vbox#pack in
 
   let form = new Wpane.form () in
+
   (* Model Row *)
   let model_cfg = new Widget.button
     ~label:"Model..." ~tooltip:"Configure WP Model" () in
@@ -207,41 +192,12 @@ let wp_panel
   model_cfg#connect (wp_configure_model main model_lbl) ;
   form#add_label_widget model_cfg#coerce ;
   form#add_field model_lbl#coerce ;
-  (* Script Row *)
-  let script_cfg = new Widget.button
-    ~label:"Script..." ~tooltip:"Load/Save User Scripts file" () in
-  let script_lbl = GMisc.label ~xalign:0.0 () in
-  Gtk_form.register demon (wp_update_script script_lbl) ;
-  script_cfg#connect wp_script ;
-  form#add_label_widget script_cfg#coerce ;
-  form#add_field script_lbl#coerce ;
-  (* Prover Row *)
   let prover_cfg = new Widget.button
     ~label:"Provers..." ~tooltip:"Detect WP Provers" () in
   prover_cfg#connect configure_provers ;
   form#add_label_widget prover_cfg#coerce ;
-  let prover_menu = new GuiConfig.dp_button () in
-  form#add_field prover_menu#coerce ;
-  Gtk_form.register demon prover_menu#update ;
   (* End Form *)
   packing form#coerce ;
-
-  let options = GPack.hbox ~spacing:16 ~packing () in
-
-  Gtk_form.check ~label:"RTE"
-    ~tooltip:"Generates RTE guards for WP"
-    ~packing:options#pack
-    Wp_parameters.RTE.get Wp_parameters.RTE.set demon ;
-
-  Gtk_form.check ~label:"Split"
-    ~tooltip:"Splits conjunctions into sub-goals"
-    ~packing:options#pack
-    Wp_parameters.Split.get Wp_parameters.Split.set demon ;
-
-  Gtk_form.check ~label:"Trace"
-    ~tooltip:"Reports proof information from provers"
-    ~packing:options#pack
-    Wp_parameters.ProofTrace.get Wp_parameters.ProofTrace.set demon ;
 
   let control = GPack.table ~columns:2 ~col_spacings:8 ~rows:4 ~packing () in
   let addcontrol line col w = control#attach ~left:(col-1) ~top:(line-1) ~expand:`NONE w in

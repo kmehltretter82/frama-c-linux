@@ -238,24 +238,28 @@ class behavior
           let server = ProverTask.server () in
           Task.spawn server thread ;
           Task.launch server in
-        match prover with
-        | VCS.Tactical ->
-            begin
-              match mode , ProverScript.get w with
-              | (None | Some VCS.BatchMode) , `Script ->
-                  schedule (ProverScript.prove ~success w)
-              | _ ->
-                  card#set `Goal ;
-                  clear#set_enabled false ;
-                  self#navigator true (Some w) ;
-            end
-        | _ ->
-            let mode = match mode , prover with
-              | Some m , _ -> m
-              | None , VCS.NativeCoq -> VCS.EditMode
-              | None , VCS.NativeAltErgo -> VCS.FixMode
-              | _ -> VCS.BatchMode in
-            schedule (Prover.prove w ~mode ~result prover)
+        if not (VCS.is_valid (Wpo.get_result w VCS.Qed)) &&
+           not (VCS.is_computing (Wpo.get_result w prover))
+        then
+          match prover with
+          | VCS.Tactical ->
+              begin
+                match mode , ProverScript.get w with
+                | (None | Some VCS.BatchMode) , `Script ->
+                    schedule (ProverScript.prove ~success w)
+                | _ ->
+                    card#set `Goal ;
+                    clear#set_enabled false ;
+                    self#navigator true (Some w) ;
+              end
+          | _ ->
+              let mode = match mode , prover with
+                | Some m , _ -> m
+                | None , VCS.NativeCoq -> VCS.EditMode
+                | None , VCS.NativeAltErgo -> VCS.FixMode
+                | _ -> VCS.BatchMode in
+              schedule (Prover.prove w ~mode ~result prover) ;
+              refresh w
       end
 
     method private clear () =

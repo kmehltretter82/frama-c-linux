@@ -33,8 +33,12 @@ class dp_chooser :
     method run : unit -> unit (** Edit enabled provers *)
   end
 
+(*
 class dp_button : unit ->
   object
     inherit Widget.widget
     method update : unit -> unit
   end
+*)
+
+(* ------------------------------------------------------------------------ *)

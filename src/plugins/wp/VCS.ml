@@ -207,7 +207,8 @@ let is_verdict r = match r.verdict with
   | Valid | Checked | Unknown | Invalid | Timeout | Stepout | Failed -> true
   | NoResult | Computing _ -> false
 
-let is_valid r = r.verdict = Valid
+let is_valid = function { verdict = Valid } -> true | _ -> false
+let is_computing = function { verdict=Computing _ } -> true | _ -> false
 
 let configure r =
   let valid = (r.verdict = Valid) in
