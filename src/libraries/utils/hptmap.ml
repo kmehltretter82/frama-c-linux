@@ -38,6 +38,23 @@ module Big_Endian = struct
 
   let shorter (m:int) (n:int) = m > n
 
+  (* Returns a mask for the highest bit differing between [p0] and [p1]. *)
+  let branching_bit p0 p1 =
+    (* We want to compute the leftmost bit set in [v]; let's call it [i]. *)
+    let v = p0 lxor p1 in
+    (* Set all bits to the right of [i] in [v]; note that [i] is already set. *)
+    let v = v lor (v lsr 1) in
+    (* Now the 2 bits starting from [i] are set: [v] is 0-011?-?. *)
+    let v = v lor (v lsr 2) in
+    (* Now the 4 bits starting from [i] are set: [v] is 0-01111?-?. Etc. *)
+    let v = v lor (v lsr 4) in
+    let v = v lor (v lsr 8) in
+    let v = v lor (v lsr 16) in
+    let v = if Sys.int_size > 32 then v lor (v lsr 32) else v in
+    (* All bits at the right of [i] are set: [v] is 0-011-1.
+       Gets the highest bit set in [v]. *)
+    (succ v) lsr 1
+
 end
 
 (*i ------------------------------------------------------------------------ i*)
@@ -441,26 +458,8 @@ struct
        matter how large $t_0$ and $t_1$ are, we can merge them simply by
        creating a new [Branch] node that has $t_0$ and $t_1$ as children! *)
     let join p0 t0 p1 t1 =
-      let m = (* Big_Endian.branching_bit p0 p1 in (inlined) *)
-	let v = p0 lxor p1 in
-	(* compute highest bit. 
-	   First, set all bits with weight less than
-	   the highest set bit *)
-	let v1 = v lsr 1 in
-	let v2 = v lsr 2 in
-	let v = v lor v1 in
-	let v = v lor v2 in
-	let v1 = v lsr 3 in
-	let v2 = v lsr 6 in
-	let v = v lor v1 in
-	let v = v lor v2 in
-	let v1 = v lsr 9 in
-	let v2 = v lsr 18 in
-	let v = v lor v1 in
-	let v = v lor v2 in
-	(* then get highest bit *)
-	(succ v) lsr 1
-      in
+      (* Computes a mask for the highest bit differing between [p0] and [p1]. *)
+      let m = Big_Endian.branching_bit p0 p1 in
       let p = Big_Endian.mask p0 (* for instance *) m in
       if (p0 land m) = 0 then
 	wrap_Branch p m t0 t1
