@@ -49,13 +49,13 @@ let prover_of_name = function
   | "native:alt-ergo" | "native:altgr-ergo"
     ->
       Wp_parameters.warning ~once:true ~current:false
-        "native support for Alt-Ergo is deprecated, use why-3 instead" ;
+        "native support for alt-ergo is deprecated, use why3 instead" ;
       Some NativeAltErgo
   | "native-coq" (* for wp-reports *)
   | "native:coq" | "native:coqide" | "native:coqedit"
     ->
       Wp_parameters.warning ~once:true ~current:false
-        "native support for Coq is deprecated, use tip or why-3 instead" ;
+        "native support for coq is deprecated, use tip instead" ;
       Some NativeCoq
   | "script" -> Some Tactical
   | "tip" -> Some Tactical
