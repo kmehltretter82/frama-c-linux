@@ -195,7 +195,7 @@ frama-c-gui
 
 [opam](https://opam.ocaml.org) works perfectly on macOS via
 [Homebrew](https://brew.sh).
-We recommend to rely on it for the installation of Frama-C.
+We highly recommend to rely on it for the installation of Frama-C.
 
 1. Install *required* general macOS tools for OCaml:
 
@@ -204,7 +204,7 @@ We recommend to rely on it for the installation of Frama-C.
     ```
 
    Do not forget to `opam init` and ``eval `opam config env` `` for a proper
-   opam installation (if not already done before on your machine).
+   opam installation (if not already done before).
 
 2. Set up a compatible OCaml version (replace `<version>` with the version
    indicated in the 'recommended working configuration' section):
@@ -217,6 +217,14 @@ We recommend to rely on it for the installation of Frama-C.
 
     ```shell
     brew install gmp gtk+ gtksourceview libgnomecanvas
+    ```
+
+    The graphical libraries requires additional manual configuration of your
+    bash profile. Consult this [issue](https://github.com/ocaml/opam-repository/issues/13709) on opam
+    for details. A known working configuration is:
+
+    ```shell
+    export PKG_CONFIG_PATH=/usr/local/Cellar/libffi/3.2.1/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/local/opt/libxml2/lib/pkgconfig
     ```
 
 4. Install *recommended* dependencies for Frama-C:
