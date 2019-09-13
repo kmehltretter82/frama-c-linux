@@ -42,22 +42,21 @@ type mode =
   | EditMode  (* Edit then check scripts *)
   | FixMode   (* Try check script, then edit script on non-success *)
 
-type language =
-  | L_why3
-  | L_coq
-  | L_altergo
-
 let prover_of_name = function
   | "" | "none" -> None
   | "qed" | "Qed" -> Some Qed
-  | "alt-ergo" | "altgr-ergo" -> Some (Why3 (Why3Provers.find "alt-ergo"))
-  | "native-alt-ergo" | "native-altgr-ergo"
+  | "native-alt-ergo" (* for wp-reports *)
   | "native:alt-ergo" | "native:altgr-ergo"
-    -> Some NativeAltErgo
-  | "coq" | "coqide"
-  | "native-coq" | "native-coqide"
-  | "native:coq" | "native:coqide"
-    -> Some NativeCoq
+    ->
+      Wp_parameters.warning ~once:true ~current:false
+        "native support for Alt-Ergo is deprecated, use why-3 instead" ;
+      Some NativeAltErgo
+  | "native-coq" (* for wp-reports *)
+  | "native:coq" | "native:coqide" | "native:coqedit"
+    ->
+      Wp_parameters.warning ~once:true ~current:false
+        "native support for Coq is deprecated, use tip or why-3 instead" ;
+      Some NativeCoq
   | "script" -> Some Tactical
   | "tip" -> Some Tactical
   | "why3" -> Some (Why3 { Why3.Whyconf.prover_name = "why3";
@@ -68,6 +67,11 @@ let prover_of_name = function
       | Some "" -> None
       | Some s' -> Some (Why3 (Why3Provers.find s'))
       | None -> Some (Why3 (Why3Provers.find s))
+
+let mode_of_prover_name = function
+  | "native:coqedit" -> EditMode
+  | "native:coqide" | "native:altgr-ergo" -> FixMode
+  | _ -> BatchMode
 
 let name_of_prover = function
   | Why3 s -> "why3:" ^ (Why3Provers.print s)
@@ -109,24 +113,6 @@ let filename_for_prover = function
   | Qed -> "Qed"
   | Tactical -> "Tactical"
 
-let language_of_prover = function
-  | Why3 _ -> L_why3
-  | NativeCoq -> L_coq
-  | NativeAltErgo -> L_altergo
-  | Qed | Tactical -> L_why3
-
-let language_of_prover_name = function
-  | "" | "none" -> None
-  | "alt-ergo" | "altgr-ergo" -> Some L_altergo
-  | "coq" | "coqide" -> Some L_coq
-  | _ -> Some L_why3
-
-let mode_of_prover_name = function
-  | "coqedit" -> EditMode
-  | "coqide" | "native-coqide" | "native:coqide"
-  | "altgr-ergo" | "tactical" -> FixMode
-  | _ -> BatchMode
-
 let is_auto = function
   | Qed | NativeAltErgo | Why3 _ -> true
   | Tactical | NativeCoq -> false
@@ -157,11 +143,6 @@ let pp_prover fmt = function
         Format.pp_print_string fmt (Why3Provers.title smt)
   | Qed -> Format.fprintf fmt "Qed"
   | Tactical -> Format.pp_print_string fmt "Tactical"
-
-let pp_language fmt = function
-  | L_altergo -> Format.pp_print_string fmt "Alt-Ergo"
-  | L_coq -> Format.pp_print_string fmt "Coq"
-  | L_why3 -> Format.pp_print_string fmt "Why3"
 
 let pp_mode fmt m = Format.pp_print_string fmt (title_of_mode m)
 

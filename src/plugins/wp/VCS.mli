@@ -38,25 +38,17 @@ type mode =
   | EditMode  (* Edit then check scripts *)
   | FixMode   (* Try check script, then edit script on non-success *)
 
-type language =
-  | L_why3
-  | L_coq
-  | L_altergo
-
 module Pset : Set.S with type elt = prover
 module Pmap : Map.S with type key = prover
 
-val language_of_prover : prover -> language
 val name_of_prover : prover -> string
 val title_of_prover : prover -> string
 val filename_for_prover : prover -> string
 val prover_of_name : string -> prover option
-val language_of_prover_name: string -> language option
 val mode_of_prover_name : string -> mode
 val title_of_mode : mode -> string
 
 val pp_prover : Format.formatter -> prover -> unit
-val pp_language : Format.formatter -> language -> unit
 val pp_mode : Format.formatter -> mode -> unit
 
 val cmp_prover : prover -> prover -> int

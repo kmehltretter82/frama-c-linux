@@ -2,6 +2,7 @@
 [kernel] Parsing tests/wp_plugin/inductive.c (with preprocessing)
 [wp] Running WP plugin...
 [wp] Loading driver 'share/wp.driver'
+[wp] Warning: native support for Coq is deprecated, use tip or why-3 instead
 [wp] 2 goals scheduled
 [wp:print-generated] 
   "WPOUT/typed/Compound.v"
