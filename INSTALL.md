@@ -219,12 +219,12 @@ We highly recommend to rely on it for the installation of Frama-C.
     brew install gmp gtk+ gtksourceview libgnomecanvas
     ```
 
-    The graphical libraries requires additional manual configuration of your
+    The graphical libraries require additional manual configuration of your
     bash profile. Consult this [issue](https://github.com/ocaml/opam-repository/issues/13709) on opam
     for details. A known working configuration is:
 
     ```shell
-    export PKG_CONFIG_PATH=/usr/local/Cellar/libffi/3.2.1/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/local/opt/libxml2/lib/pkgconfig
+    export PKG_CONFIG_PATH=/usr/local/opt/libffi/lib/pkgconfig:/usr/local/opt/libxml2/lib/pkgconfig:/usr/local/lib/pkgconfig
     ```
 
 4. Install *recommended* dependencies for Frama-C:
@@ -233,7 +233,7 @@ We highly recommend to rely on it for the installation of Frama-C.
     brew install graphviz
     ```
 
-5. Install *recommanded* dependencies for Frama-C/WP:
+5. Install *recommended* dependencies for Frama-C/WP:
 
     ```shell
     opam install why3 alt-ergo
