@@ -30,10 +30,10 @@ module GraphShape : sig type 'value t end
 type node = Node.t
 
 type transition =
-  | Assign of lval * typ * exp
-  | Assume of exp * bool
-  | EnterScope of varinfo list
-  | LeaveScope of varinfo list
+  | Assign of kinstr * lval * typ * exp
+  | Assume of stmt * exp * bool
+  | EnterScope of kernel_function * varinfo list
+  | LeaveScope of kernel_function * varinfo list
   (** For call of functions without definition *)
   | CallDeclared of kernel_function * exp list * lval option
   | Loop of stmt * node (** start *) * edge list GraphShape.t

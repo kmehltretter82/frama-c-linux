@@ -56,10 +56,10 @@ module GraphShape = Hptmap.Shape(Node)
 type node = Node.t
 
 type transition =
-  | Assign of lval * typ * exp
-  | Assume of exp * bool
-  | EnterScope of varinfo list
-  | LeaveScope of varinfo list
+  | Assign of kinstr * lval * typ * exp
+  | Assume of stmt * exp * bool
+  | EnterScope of kernel_function * varinfo list
+  | LeaveScope of kernel_function * varinfo list
   (** For call of functions without definition *)
   | CallDeclared of kernel_function * exp list * lval option
   | Loop of stmt * node (** start *) * edge list GraphShape.t
@@ -128,19 +128,19 @@ end = struct
   type t = transition
 
   let compare (t1: t) (t2: t) = match t1, t2 with
-    | Assign (loc1, typ1, exp1), Assign (loc2, typ2, exp2) ->
+    | Assign (_, loc1, typ1, exp1), Assign (_, loc2, typ2, exp2) ->
       let c = Lval.compare loc1 loc2 in
       if c <> 0 then c else
         let c = Typ.compare typ1 typ2 in
         if c <> 0 then c else
           ExpStructEq.compare exp1 exp2
-    | Assume (e1, b1), Assume (e2, b2) ->
+    | Assume (_, e1, b1), Assume (_, e2, b2) ->
       let c = ExpStructEq.compare e1 e2 in
       if c <> 0 then c else
         Pervasives.compare b1 b2
-    | EnterScope vs1, EnterScope vs2 ->
+    | EnterScope (_, vs1), EnterScope (_, vs2) ->
       Extlib.list_compare Varinfo.compare vs1 vs2
-    | LeaveScope vs1, LeaveScope vs2 ->
+    | LeaveScope (_, vs1), LeaveScope (_, vs2) ->
       Extlib.list_compare Varinfo.compare vs1 vs2
     | CallDeclared (kf1, es1, lv1), CallDeclared (kf2, es2, lv2) ->
       let c = Kernel_function.compare kf1 kf2 in
@@ -172,15 +172,15 @@ end = struct
   let equal t1 t2 = (compare t1 t2 = 0)
 
   let pretty fmt = function
-    | Assign (loc, _typ, exp) ->
+    | Assign (_, loc, _typ, exp) ->
       Format.fprintf fmt "Assign:@ %a = %a"
         Lval.pretty loc ExpStructEq.pretty exp
-    | Assume (e, b) ->
+    | Assume (_, e, b) ->
       Format.fprintf fmt "Assume:@ %a %b" ExpStructEq.pretty e b
-    | EnterScope vs ->
+    | EnterScope (_, vs) ->
       Format.fprintf fmt "EnterScope:@ %a"
         (Pretty_utils.pp_list ~sep:"@ " Varinfo.pretty) vs
-    | LeaveScope vs ->
+    | LeaveScope (_, vs) ->
       Format.fprintf fmt "LeaveScope:@ %a"
         (Pretty_utils.pp_list ~sep:"@ " Varinfo.pretty) vs
     | CallDeclared(kf1, exp1, lval1) ->
@@ -196,16 +196,16 @@ end = struct
         (GraphShape.pretty (Edge.pretty_list)) g
 
   let hash = function
-    | Assume (e, b) ->
+    | Assume (_, e, b) ->
       Hashtbl.seeded_hash (Hashtbl.hash b) (ExpStructEq.hash e)
-    | Assign (lv, t, e) ->
+    | Assign (_, lv, t, e) ->
       Hashtbl.seeded_hash (ExpStructEq.hash e)
         (Hashtbl.seeded_hash (Typ.hash t)
            (Hashtbl.seeded_hash 2 (Lval.hash lv)))
-    | EnterScope vs ->
+    | EnterScope (_, vs) ->
       List.fold_left
         (fun acc e -> Hashtbl.seeded_hash acc (Varinfo.hash e)) 3 vs
-    | LeaveScope vs ->
+    | LeaveScope (_, vs) ->
       List.fold_left
         (fun acc e -> Hashtbl.seeded_hash acc (Varinfo.hash e)) 5 vs
     | CallDeclared (kf, es, lv) ->
@@ -828,8 +828,8 @@ let rec complete_graph (graph:Graph.t) =
         Extlib.fold_map (fun graph e ->
             let m = Graph.singleton (Edge.succ e) [] in
             let e = match e.edge_trans with
-              | Assign (_,_,_)
-              | Assume (_,_)
+              | Assign (_, _,_,_)
+              | Assume (_, _,_)
               | EnterScope _
               | LeaveScope _
               | CallDeclared (_,_,_)
@@ -878,25 +878,25 @@ module Internal = struct
     type location = Precise_locs.precise_location
     type valuation = Valuation.t
 
-    let assign _ki lv e _v _valuation state =
-      let trans = Assign (lv.Eval.lval, lv.Eval.ltyp, e) in
+    let assign ki lv e _v _valuation state =
+      let trans = Assign (ki, lv.Eval.lval, lv.Eval.ltyp, e) in
       `Value (Traces.add_trans state trans)
 
-    let assume _stmt e pos _valuation state =
-      let trans = Assume (e, pos) in
+    let assume stmt e pos _valuation state =
+      let trans = Assume (stmt, e, pos) in
       `Value (Traces.add_trans state trans)
 
-    let start_call _stmt call _valuation state =
-      if Kernel_function.is_definition call.Eval.kf
-      then
+    let start_call stmt call _valuation state =
+      let kf = call.Eval.kf in
+      if Kernel_function.is_definition kf then
         let msg = Format.asprintf "start_call: %s (%b)" (Kernel_function.get_name call.Eval.kf)
             (Kernel_function.is_definition call.Eval.kf) in
         let state = Traces.add_trans state (Msg msg) in
         let formals = List.map (fun arg -> arg.Eval.formal) call.Eval.arguments in
-        let state = Traces.add_trans state (EnterScope formals) in
+        let state = Traces.add_trans state (EnterScope (kf, formals)) in
         let state = List.fold_left (fun state arg ->
             Traces.add_trans state
-              (Assign (Cil.var arg.Eval.formal,
+              (Assign (Kstmt stmt, Cil.var arg.Eval.formal,
                        arg.Eval.formal.Cil_types.vtype,
                        arg.Eval.concrete))) state call.Eval.arguments in
         `Value state
@@ -904,7 +904,7 @@ module Internal = struct
         (** enter the scope of the dumb result variable *)
         let var = call.Eval.return in
         let state = match var with
-          | Some var -> Traces.add_trans state (EnterScope [var])
+          | Some var -> Traces.add_trans state (EnterScope (kf, [var]))
           | None -> state in
         let exps = List.map (fun arg -> arg.Eval.concrete) call.Eval.arguments in
         let state = Traces.add_trans state
@@ -1022,8 +1022,8 @@ module Internal = struct
       Traces.add_trans state (Msg "leave_loop")
 
 
-  let enter_scope _kf vars state = Traces.add_trans state (EnterScope vars)
-  let leave_scope _kf vars state = Traces.add_trans state (LeaveScope vars)
+  let enter_scope kf vars state = Traces.add_trans state (EnterScope (kf, vars))
+  let leave_scope kf vars state = Traces.add_trans state (LeaveScope (kf, vars))
 
   let reduce_further _state _expr _value = [] (*Nothing intelligent to suggest*)
 
@@ -1088,13 +1088,13 @@ let rec stmts_of_cfg cfg current var_map locals return_exp acc =
       let n = a.edge_dst in
       match a.edge_trans with
 
-      | Assign (lval,_typ,exp) ->
+      | Assign (_, lval,_typ,exp) ->
         let exp = subst_in_exp var_map exp in
         let lval = subst_in_lval var_map lval in
         let stmt = Cil.mkStmtOneInstr ~valid_sid (Cil_types.Set(lval,exp,dummy_loc)) in
         stmts_of_cfg cfg n var_map locals return_exp (stmt::acc)
 
-      | Assume (exp,b) ->
+      | Assume (_, exp,b) ->
         let exp = subst_in_exp var_map exp in
         let predicate = (Logic_utils.expr_to_predicate ~cast:true exp).Cil_types.ip_content in
         let predicate = if b then predicate else Logic_const.pnot predicate in
@@ -1102,7 +1102,7 @@ let rec stmts_of_cfg cfg current var_map locals return_exp acc =
         let stmt = Cil.mkStmtOneInstr ~valid_sid (Cil_types.Code_annot(code_annot,dummy_loc)) in
         stmts_of_cfg cfg n var_map locals return_exp (stmt::acc)
 
-      | EnterScope (vs) ->
+      | EnterScope (_, vs) ->
         (** all our variables are assigned, not defined *)
         let var_map = List.fold_left fresh_varinfo var_map vs in
         let vs = List.map (subst_in_varinfo var_map) vs in
@@ -1129,8 +1129,8 @@ let rec stmts_of_cfg cfg current var_map locals return_exp acc =
         let g = Graph.from_shape (fun _ v -> v) g in
         let is_while =
           match Graph.succs s g, Graph.succs n cfg with
-          | [{ edge_dst = n1'; edge_trans = Assume(exp1,b1) }],
-            [{ edge_dst = n2'; edge_trans = Assume(exp2,b2) }]
+          | [{ edge_dst = n1'; edge_trans = Assume(_,exp1,b1) }],
+            [{ edge_dst = n2'; edge_trans = Assume(_,exp2,b2) }]
             when ExpStructEq.equal exp1 exp2 && b1 != b2 ->
             Some (exp1, n1', b1, n2')
           | _ -> None in
@@ -1146,8 +1146,8 @@ let rec stmts_of_cfg cfg current var_map locals return_exp acc =
   | l ->
     let is_if = match l with
       | [] | [_] -> assert false (* absurd *)
-      | [{ edge_dst = n1'; edge_trans = Assume(exp1,b1) } ;
-         { edge_dst = n2'; edge_trans = Assume(exp2,b2) }]
+      | [{ edge_dst = n1'; edge_trans = Assume(_,exp1,b1) } ;
+         { edge_dst = n2'; edge_trans = Assume(_,exp2,b2) }]
         when ExpStructEq.equal exp1 exp2 && b1 != b2 ->
         if b1 then Some (exp1, n1', n2') else Some (exp1,n2',n1')
       | _ -> None in
