@@ -76,14 +76,12 @@ The following set of packages is known to be a working configuration for
 Frama-C 19 (Potassium):
 
 - OCaml 4.05.0
-- alt-ergo-free.2.0.0 (optional)
 - apron.20160125 (optional)
-- coq.8.9.0 (optional)
 - lablgtk.2.18.5 | lablgtk3.3.0.beta5 + lablgtk3-sourceview3.3.0.beta5
 - mlgmpidl.1.2.9 (optional)
 - ocamlgraph.1.8.8
-- why3.1.2.0
-- why3-coq.1.2.0 (optional)
+- why3.1.2.0 (for wp)
+- alt-ergo.2.0.0 (for wp, optional)
 - yojson.1.4.1
 - zarith.1.7
 
@@ -227,10 +225,10 @@ We recommend to rely on it for the installation of Frama-C.
     brew install graphviz
     ```
 
-5. Install *optional* dependencies for Frama-C/WP:
+5. Install *recommanded* dependencies for Frama-C/WP:
 
     ```shell
-    opam install coq coqide why3-coq
+    opam install why3 alt-ergo
     ```
 
 6. Install Frama-C:
