@@ -31,6 +31,8 @@ val prove : ?timeout:int -> ?steplimit:int -> prover:Why3Provers.t ->
 (** Return NoResult if it is already proved by Qed *)
 
 type mode = NoCache | Update | Replay | Rebuild | Offline | Cleanup
+
+val set_mode : mode -> unit
 val get_mode : unit -> mode
 val get_hits : unit -> int
 val get_miss : unit -> int

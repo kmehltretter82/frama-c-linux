@@ -1145,6 +1145,14 @@ let parse_mode ~origin ~fallback = function
         "Unknown %s mode %S (use %s instead)" origin m fallback ;
       raise Not_found
 
+let mode_name = function
+  | NoCache -> "none"
+  | Update -> "update"
+  | Replay -> "replay"
+  | Rebuild -> "rebuild"
+  | Offline -> "offline"
+  | Cleanup -> "cleanup"
+
 module MODE = WpContext.StaticGenerator(Datatype.Unit)
     (struct
       type key = unit
@@ -1164,6 +1172,7 @@ module MODE = WpContext.StaticGenerator(Datatype.Unit)
     end)
 
 let get_mode = MODE.get
+let set_mode m = MODE.clear () ; Wp_parameters.Cache.set (mode_name m)
 
 let task_hash wpo drv prover task =
   lazy

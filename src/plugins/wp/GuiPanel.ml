@@ -164,15 +164,8 @@ class model_selector (main : Design.main_window_extension_points) =
 (* ---  WP Panel                                                        --- *)
 (* ------------------------------------------------------------------------ *)
 
-let wp_update_model label () =
-  let s = Factory.parse (Wp_parameters.Model.get ()) in
-  label#set_text (Factory.descr s)
-
-let wp_configure_model main label () =
-  begin
-    (new model_selector main)#run ;
-    wp_update_model label () ;
-  end
+let wp_configure_model main () =
+  (new model_selector main)#run
 
 let wp_panel
     ~(main:Design.main_window_extension_points)
@@ -182,48 +175,47 @@ let wp_panel
   let demon = Gtk_form.demon () in
   let packing = vbox#pack in
 
-  let form = new Wpane.form () in
-
-  (* Model Row *)
-  let model_cfg = new Widget.button
-    ~label:"Model..." ~tooltip:"Configure WP Model" () in
-  let model_lbl = GMisc.label ~xalign:0.0 () in
-  Gtk_form.register demon (wp_update_model model_lbl) ;
-  model_cfg#connect (wp_configure_model main model_lbl) ;
-  form#add_label_widget model_cfg#coerce ;
-  form#add_field model_lbl#coerce ;
-  let prover_cfg = new Widget.button
-    ~label:"Provers..." ~tooltip:"Detect WP Provers" () in
-  prover_cfg#connect configure_provers ;
-  form#add_label_widget prover_cfg#coerce ;
-  (* End Form *)
-  packing form#coerce ;
-
-  let control = GPack.table ~columns:2 ~col_spacings:8 ~rows:4 ~packing () in
+  let control = GPack.table ~columns:2 ~col_spacings:8 ~rows:2 ~packing () in
   let addcontrol line col w = control#attach ~left:(col-1) ~top:(line-1) ~expand:`NONE w in
 
-  Gtk_form.label ~text:"Steps" ~packing:(addcontrol 1 1) () ;
-  Gtk_form.spinner ~lower:0 ~upper:100000
-    ~tooltip:"Search steps for alt-ergo prover"
-    ~packing:(addcontrol 1 2)
-    Wp_parameters.Steps.get Wp_parameters.Steps.set demon ;
-
-  Gtk_form.label ~text:"Timeout" ~packing:(addcontrol 3 1) () ;
+  Gtk_form.label ~text:"timeout" ~packing:(addcontrol 1 2) () ;
   Gtk_form.spinner ~lower:0 ~upper:100000
     ~tooltip:"Timeout for proving one proof obligation"
-    ~packing:(addcontrol 3 2)
+    ~packing:(addcontrol 1 1)
     Wp_parameters.Timeout.get Wp_parameters.Timeout.set demon ;
 
-  Gtk_form.label ~text:"Process" ~packing:(addcontrol 4 1) () ;
+  Gtk_form.label ~text:"process" ~packing:(addcontrol 2 2) () ;
   Gtk_form.spinner ~lower:1 ~upper:32
     ~tooltip:"Maximum number of parallel running provers"
-    ~packing:(addcontrol 4 2)
+    ~packing:(addcontrol 2 1)
     Wp_parameters.Procs.get
     (fun n ->
        Wp_parameters.Procs.set n ;
        ignore (ProverTask.server ())
        (* to make server procs updated is server exists *)
     ) demon ;
+
+  let hbox = GPack.hbox ~packing () in
+
+  let model_cfg = new Widget.button
+    ~label:"Model..." ~tooltip:"Configure WP Model" () in
+  model_cfg#connect (wp_configure_model main) ;
+  hbox#pack model_cfg#coerce ;
+
+  let prover_cfg = new Widget.button
+    ~label:"Provers..." ~tooltip:"Detect WP Provers" () in
+  prover_cfg#connect configure_provers ;
+  hbox#pack prover_cfg#coerce ;
+
+  Gtk_form.menu [
+    "No Cache" ,    ProverWhy3.NoCache ;
+    "Update" ,  ProverWhy3.Update ;
+    "Cleanup" , ProverWhy3.Cleanup ;
+    "Rebuild" , ProverWhy3.Rebuild ;
+    "Replay" ,  ProverWhy3.Replay ;
+    "Offline" , ProverWhy3.Offline ;
+  ] ~packing:hbox#pack ~tooltip:"Proof Cache Mode"
+    ProverWhy3.get_mode ProverWhy3.set_mode demon ;
 
   let pbox = GPack.hbox ~packing ~show:false () in
   let progress = GRange.progress_bar ~packing:(pbox#pack ~expand:true ~fill:true) () in
