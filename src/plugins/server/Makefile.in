@@ -29,17 +29,13 @@ ifndef FRAMAC_LIBDIR
 FRAMAC_LIBDIR :=$(shell frama-c-config -print-libpath)
 endif
 
-include $(FRAMAC_SHARE)/Makefile.config
-# --------------------------------------------------------------------------
-# ---  Plugin Setting
-# --------------------------------------------------------------------------
+###################
+# Plug-in Setting #
+###################
 
+PLUGIN_DIR ?=.
 PLUGIN_ENABLE:=@ENABLE_SERVER@
 PLUGIN_NAME:=Server
-PLUGIN_DISTRIBUTED:=$(PLUGIN_ENABLE)
-PLUGIN_DISTRIB_EXTERNAL:= Makefile.in configure.ac configure
-
-PLUGIN_REQUIRES:= yojson
 PLUGIN_CMO:= \
 	server_parameters \
 	jbuffer \
@@ -48,30 +44,34 @@ PLUGIN_CMO:= \
 	kernel_main \
 	kernel_project \
 	kernel_ast
+PLUGIN_DISTRIBUTED:=$(PLUGIN_ENABLE)
+PLUGIN_DISTRIB_EXTERNAL:= Makefile.in configure.ac configure
+PLUGIN_TESTS_DIRS := batch
+
+PLUGIN_REQUIRES:= yojson
 
 PLUGIN_UNDOC:= server_batch.ml server_zmq.ml
 
 PLUGIN_GENERATED:= $(PLUGIN_DIR)/Server.mli
-PLUGIN_TESTS :=
 
-# --------------------------------------------------------------------------
-# --- ZeroMQ Support
-# --------------------------------------------------------------------------
+##################
+# ZeroMQ Support #
+##################
 
 ifeq (@SERVER_ZMQ@,yes)
 PLUGIN_REQUIRES+= zmq
 PLUGIN_CMO+= server_zmq
 endif
 
-# --------------------------------------------------------------------------
-# --- Frama-C Dynamic Plug-in
-# --------------------------------------------------------------------------
+################
+# Generic part #
+################
 
 include $(FRAMAC_SHARE)/Makefile.dynamic
 
-# --------------------------------------------------------------------------
-# --- Server API
-# --------------------------------------------------------------------------
+##############
+# Server API #
+##############
 
 SERVER_API= \
 	doc.mli syntax.mli data.mli request.mli
@@ -100,9 +100,9 @@ $(Server_DIR)/Server.mli: $(Server_DIR)/Makefile $(SERVER_MLI)
 	$(CHMOD_RO) $@.tmp
 	$(MV) $@.tmp $@
 
-# --------------------------------------------------------------------------
-# --- Configure
-# --------------------------------------------------------------------------
+#####################################
+# Regenerating the Makefile on need #
+#####################################
 
 ifeq ("$(FRAMAC_INTERNAL)","yes")
 CONFIG_STATUS_DIR=$(FRAMAC_SRC)
@@ -113,5 +113,3 @@ endif
 $(Server_DIR)/Makefile: $(Server_DIR)/Makefile.in \
 	$(CONFIG_STATUS_DIR)/config.status
 	cd $(CONFIG_STATUS_DIR) && ./config.status --file $@
-
-# --------------------------------------------------------------------------
