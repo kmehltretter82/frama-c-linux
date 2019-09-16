@@ -24,7 +24,7 @@
 (* ---  Prover List in Configuration                                    --- *)
 (* ------------------------------------------------------------------------ *)
 
-class enabled key =
+class provers key =
   object(self)
     inherit [Why3.Whyconf.Sprover.t] Wutil.selector Why3.Whyconf.Sprover.empty
 
@@ -63,7 +63,7 @@ class enabled key =
         let selection = List.fold_left
             (fun acc e ->
                match Why3Provers.find_opt e with
-               | None-> acc
+               | None -> acc
                | Some p -> Why3.Whyconf.Sprover.add p acc)
             settings cmdline
         in
@@ -79,7 +79,7 @@ class enabled key =
 
 class dp_chooser
     ~(main:Design.main_window_extension_points)
-    ~(enabled:enabled)
+    ~(provers:provers)
   =
   let dialog = new Wpane.dialog
     ~title:"Why3 Provers"
@@ -123,7 +123,7 @@ class dp_chooser
       end
 
     method private apply () =
-      enabled#set
+      provers#set
         (Why3.Whyconf.Mprover.map_filter
            (function
              | true -> Some ()
@@ -132,7 +132,7 @@ class dp_chooser
 
     method run () =
       let dps = Why3Provers.provers_set () in
-      let sel = enabled#get in
+      let sel = provers#get in
       selected <- Why3.Whyconf.Mprover.merge
           (fun _ avail enab ->
              match avail, enab with

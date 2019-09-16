@@ -24,11 +24,11 @@
 (* ---  WP Provers Configuration Panel                                  --- *)
 (* ------------------------------------------------------------------------ *)
 
-class enabled : string -> [Why3.Whyconf.Sprover.t] Widget.selector
+class provers : string -> [Why3.Whyconf.Sprover.t] Widget.selector
 
 class dp_chooser :
   main:Design.main_window_extension_points ->
-  enabled:enabled ->
+  provers:provers ->
   object
     method run : unit -> unit (** Edit enabled provers *)
   end

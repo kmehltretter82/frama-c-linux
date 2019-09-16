@@ -73,7 +73,7 @@ class iformat =
 (* --- Goal Panel                                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
-class pane (enabled : GuiConfig.enabled) =
+class pane (gprovers : GuiConfig.provers) =
   let icon = new Widget.image GuiProver.no_status in
   let status = new Widget.label () in
   let text = new Wtext.text () in
@@ -127,7 +127,7 @@ class pane (enabled : GuiConfig.enabled) =
           VCS.([ new GuiProver.prover ~console:text ~prover:NativeAltErgo ] @
                List.map
                  (fun dp -> new GuiProver.prover text (VCS.Why3 dp))
-                 (Why3.Whyconf.Sprover.elements enabled#get)) ;
+                 (Why3.Whyconf.Sprover.elements gprovers#get)) ;
         List.iter (fun p -> palette#add_tool p#tool) provers ;
         palette#add_tool strategies#tool ;
         Strategy.iter strategies#register ;
@@ -137,11 +137,11 @@ class pane (enabled : GuiConfig.enabled) =
              tactics <- gtac :: tactics ;
              palette#add_tool gtac#tool) ;
         tactics <- List.rev tactics ;
-        self#register_provers enabled#get;
+        self#register_provers gprovers#get;
         printer#on_selection (fun () -> self#update) ;
         scripter#on_click self#goto ;
         scripter#on_backtrack self#backtrack ;
-        enabled#connect self#register_provers ;
+        gprovers#connect self#register_provers ;
         delete#connect (fun () -> self#interrupt ProofEngine.reset) ;
         cancel#connect (fun () -> self#interrupt ProofEngine.cancel) ;
         forward#connect (fun () -> self#forward) ;

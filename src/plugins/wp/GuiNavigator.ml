@@ -397,9 +397,9 @@ let make (main : main_window_extension_points) =
     (* --- Provers                                                            --- *)
     (* -------------------------------------------------------------------------- *)
 
-    let enabled = new GuiConfig.enabled "wp.enabled" in
+    let provers = new GuiConfig.provers "wp.provers" in
 
-    let dp_chooser = new GuiConfig.dp_chooser ~main ~enabled in
+    let dp_chooser = new GuiConfig.dp_chooser ~main ~provers in
 
     (* -------------------------------------------------------------------------- *)
     (* --- Focus Bar                                                          --- *)
@@ -423,7 +423,7 @@ let make (main : main_window_extension_points) =
         (index :> widget) ;
         (next :> widget) ;
       ] in
-    let provers = new Widget.button ~label:"Provers..." () in
+    let pvrs = new Widget.button ~label:"Provers..." () in
     let clear = new Widget.button ~label:"Clear" ~icon:`DELETE () in
     let focusbar = GPack.hbox ~spacing:0 () in
     begin
@@ -431,8 +431,8 @@ let make (main : main_window_extension_points) =
       focusbar#pack ~padding:20 ~expand:false scope#coerce ;
       focusbar#pack ~padding:20 ~expand:false filter#coerce ;
       focusbar#pack ~from:`END ~expand:false clear#coerce ;
-      focusbar#pack ~from:`END ~expand:false provers#coerce ;
-      provers#connect dp_chooser#run ;
+      focusbar#pack ~from:`END ~expand:false pvrs#coerce ;
+      pvrs#connect dp_chooser#run ;
     end ;
 
     (* -------------------------------------------------------------------------- *)
@@ -452,8 +452,8 @@ let make (main : main_window_extension_points) =
     (* -------------------------------------------------------------------------- *)
 
     let book = new Wpane.notebook ~default:`List () in
-    let list = new GuiList.pane enabled in
-    let goal = new GuiGoal.pane enabled in
+    let list = new GuiList.pane provers in
+    let goal = new GuiGoal.pane provers in
     begin
       book#add `List list#coerce ;
       book#add `Goal goal#coerce ;
