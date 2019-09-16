@@ -55,10 +55,6 @@ module InCtxt : Parameter_sig.String_set
 module ExternArrays: Parameter_sig.Bool
 module Literals : Parameter_sig.Bool
 module Volatile : Parameter_sig.Bool
-(* module Overflows : Parameter_sig.Bool *)
-(* use get_overflows() below *)
-(* module BoolRange : Parameter_sig.Bool *)
-(* use get_bool_range() below *)
 
 (** {2 Computation Strategies} *)
 
