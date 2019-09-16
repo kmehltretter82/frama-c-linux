@@ -21,7 +21,6 @@
 (**************************************************************************)
 
 module Fc_config = Config
-module STRING = String
 let () = Plugin.is_share_visible ()
 let () = Plugin.is_session_visible ()
 include Plugin.Register
@@ -718,15 +717,6 @@ module Hints =
     end)
 
 let () = Parameter_customize.set_group wp_prover_options
-module Includes =
-  String_list
-    (struct
-      let option_name = "-wp-include"
-      let arg_name = "dir,...,++sharedir"
-      let help = "Directory where to find libraries and drivers for provers"
-    end)
-
-let () = Parameter_customize.set_group wp_prover_options
 module CoqLibs =
   String_list
     (struct
@@ -990,16 +980,6 @@ let get_output_dir d =
   let base = get_output () in
   let path = Printf.sprintf "%s/%s" base d in
   make_output_dir path ; path
-
-let get_includes () =
-  List.map
-    (fun d ->
-       if STRING.get d 0 = '+' then
-         Printf.sprintf "%s/%s"
-           (Kernel.Share.dir ())
-           (STRING.sub d 1 (STRING.length d - 1))
-       else d)
-    (Includes.get ())
 
 let cat_print_generated = register_category "print-generated"
 

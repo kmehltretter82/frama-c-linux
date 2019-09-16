@@ -137,7 +137,6 @@ val get_session : unit -> string
 val get_session_dir : string -> string
 val get_output : unit -> string
 val get_output_dir : string -> string
-val get_includes : unit -> string list
 val make_output_dir : string -> unit
 val get_overflows : unit -> bool
 
