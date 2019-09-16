@@ -398,9 +398,9 @@ let build_node_deps context node =
 
   and build_return_deps callstack stmt args kf =
     match Kernel_function.find_return kf with
-    | {skind = Return (Some {enode = Lval lval_res},_)} ->
+    | {skind = Return (Some {enode = Lval lval_res},_)} as return_stmt ->
       let callstack = Callstack.push (kf,stmt) callstack in
-      build_lval_deps callstack stmt Data lval_res
+      build_lval_deps callstack return_stmt Data lval_res
     | _ -> assert false (* Cil invariant *)
     | exception Kernel_function.No_Statement ->
       (* the function is only a prototype *)

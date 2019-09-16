@@ -6,9 +6,12 @@ digraph G {
        style="filled", ];
   cp5 [label=<z>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
        style="filled", ];
-  cp7 [label=<y>, shape=box, ];
-  cp9 [label=<y>, shape=box, ];
-  cp11 [label=<y>, shape=box, ];
+  cp7 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+       style="filled", ];
+  cp9 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+       style="filled", ];
+  cp11 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+        style="filled", ];
   cp13 [label=<x>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
         style="filled", ];
   cp15 [label=<x>, shape=box, fillcolor="#FFBBBB", color="#FF0000",

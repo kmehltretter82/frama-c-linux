@@ -1,6 +1,7 @@
 digraph G {
   cp0 [label=<w>, shape=box, ];
-  cp1 [label=<x>, shape=box, ];
+  cp1 [label=<x>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+       style="filled", ];
   cp3 [label=<z>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
        style="filled", ];
   cp5 [label=<x>, shape=box, fillcolor="#FFBBBB", color="#FF0000",

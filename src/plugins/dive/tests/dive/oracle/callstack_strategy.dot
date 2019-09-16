@@ -8,10 +8,12 @@ digraph G {
        style="filled", ];
   cp7 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
        style="filled", ];
-  cp9 [label=<z>, shape=box, ];
+  cp9 [label=<z>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+       style="filled", ];
   cp11 [label=<a>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
         style="filled", ];
-  cp13 [label=<z>, shape=box, ];
+  cp13 [label=<z>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+        style="filled", ];
   cp16 [label=<x>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
         style="filled", ];
   

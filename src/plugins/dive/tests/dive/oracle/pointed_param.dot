@@ -2,9 +2,12 @@ digraph G {
   cp0 [label=<y>, shape=box, ];
   cp1 [label=<tmp>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
        style="filled", ];
-  cp3 [label=<tmp>, shape=box, ];
-  cp5 [label=<tmp>, shape=box, ];
-  cp7 [label=<__retres>, shape=box, ];
+  cp3 [label=<tmp>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+       style="filled", ];
+  cp5 [label=<tmp>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+       style="filled", ];
+  cp7 [label=<__retres>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+       style="filled", ];
   cp9 [label=<x>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
        style="filled,dotted", ];
   
