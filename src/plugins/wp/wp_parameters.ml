@@ -745,15 +745,6 @@ module Why3 =
   end)
 
 let () = Parameter_customize.set_group wp_prover_options
-module WhyLibs =
-  String_list
-    (struct
-      let option_name = "-wp-why-lib"
-      let arg_name = "*.why"
-      let help = "Additional libraries for Why"
-    end)
-
-let () = Parameter_customize.set_group wp_prover_options
 let () = Parameter_customize.no_category ()
 module WhyFlags =
   String_list
