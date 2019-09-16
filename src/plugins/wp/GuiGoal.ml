@@ -102,6 +102,7 @@ class pane (gprovers : GuiConfig.provers) =
   let autofocus = new autofocus in
   let iformat = new iformat in
   let strategies = new GuiTactic.strategies () in
+  let native = List.mem "native:alt-ergo" (Wp_parameters.Provers.get ()) in
   object(self)
 
     val mutable state : state = Empty
@@ -123,11 +124,15 @@ class pane (gprovers : GuiConfig.provers) =
             Config.config_float ~key:"GuiGoal.palette" ~default:0.8 content
           );
         layout#populate (Wbox.panel ~top:toolbar content#widget) ;
-        provers <-
-          VCS.([ new GuiProver.prover ~console:text ~prover:NativeAltErgo ] @
-               List.map
-                 (fun dp -> new GuiProver.prover text (VCS.Why3 dp))
-                 (Why3.Whyconf.Sprover.elements gprovers#get)) ;
+        let native_ergo =
+          if native then [
+            new GuiProver.prover ~console:text ~prover:VCS.NativeAltErgo
+          ] else [] in
+        let why3_provers =
+          List.map
+            (fun dp -> new GuiProver.prover ~console:text ~prover:(VCS.Why3 dp))
+            (Why3.Whyconf.Sprover.elements gprovers#get) in
+        provers <- native_ergo @ why3_provers ;
         List.iter (fun p -> palette#add_tool p#tool) provers ;
         palette#add_tool strategies#tool ;
         Strategy.iter strategies#register ;
@@ -250,12 +255,17 @@ class pane (gprovers : GuiConfig.provers) =
           in
           autofocus#set mode ; self#update
 
+    method private provers =
+      (if native then [ VCS.NativeAltErgo ] else []) @
+      (List.map (fun dp -> VCS.Why3 dp)
+         (Why3.Whyconf.Sprover.elements gprovers#get))
+
     method private play_script =
       match state with
       | Proof p ->
           ProofEngine.reset p ;
           ProverScript.spawn
-            ~provers:[ VCS.NativeAltErgo ]
+            ~provers:self#provers
             ~result:
               (fun wpo prv res ->
                  text#printf "[%a] %a : %a@."
@@ -569,12 +579,12 @@ class pane (gprovers : GuiConfig.provers) =
               VCS.pp_prover prv Wpo.pp_title wpo VCS.pp_result res
           end
         ~success:(fun _ _ -> Wutil.later self#commit)
-        ~pool provers
+        ~pool (List.map (fun dp -> VCS.BatchMode , dp) provers)
 
     method private fork proof fork =
       Wutil.later
         begin fun () ->
-          let provers = VCS.[ BatchMode, NativeAltErgo ] in
+          let provers = self#provers in
           let pool = Task.pool () in
           ProofEngine.iter (self#schedule pool provers) fork ;
           let server = ProverTask.server () in
