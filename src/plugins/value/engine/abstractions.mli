@@ -135,6 +135,7 @@ module Config : sig
   val bitwise: flag
   val inout: flag
   val sign: flag
+  val traces: flag
   val printer: flag
 
   val default: t (** The default configuration of Eva. *)
