@@ -20,17 +20,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-#24 "src/plugins/value/domains/numerors/numerors_domain.ok.ml"
-
 open Eval
 open Cil_types
 
-type value = Numerors_value.t
-type location = Precise_locs.precise_location
-let value_key = Numerors_value.error_key
-
-let ok = true
-
+(* The numerors values, plus some builtin functions. *)
 module Numerors_Value = struct
   include Numerors_value
 
@@ -87,61 +80,7 @@ module Numerors_Value = struct
     ]
 end
 
-let add_numerors_value (module Value: Abstract_value.Internal) =
-  let module External_Value = Structure.Open (Structure.Key_Value) (Value) in
-  let module V = struct
-    include Value_product.Make (Value) (Numerors_value)
-
-    let forward_cast = match External_Value.get Main_values.cvalue_key with
-      | None -> forward_cast
-      | Some get_cvalue ->
-        fun ~src_type ~dst_type (value, num) ->
-          forward_cast ~src_type ~dst_type (value, num) >>-: fun (value', num) ->
-          let num = match src_type, dst_type with
-            | Eval_typ.TSInt _, Eval_typ.TSFloat fkind ->
-              begin
-                try
-                  let cvalue = get_cvalue value in
-                  let ival = Cvalue.V.project_ival cvalue in
-                  match Ival.min_and_max ival with
-                  | Some min, Some max ->
-                    let min, max = Integer.to_int min, Integer.to_int max in
-                    let prec = Numerors_utils.Precisions.of_fkind fkind in
-                    Numerors_value.of_ints ~prec min max
-                  | _, _ -> num
-                (* Integer.to_int may fail for too big integers. *)
-                with Cvalue.V.Not_based_on_null | Z.Overflow -> num
-              end
-            | _, _ -> num
-          in
-          value', num
-  end in
-  (module V: Abstract_value.Internal)
-
-let reduce_error (type v) (module V: Abstract_value.External with type t = v) =
-  match V.get Numerors_value.error_key, V.get Main_values.cvalue_key with
-  | Some get_error, Some get_cvalue ->
-    begin
-      let set_error = V.set Numerors_value.error_key in
-      fun t ->
-        let cvalue = get_cvalue t in
-        try
-          let ival = Cvalue.V.project_ival cvalue in
-          match ival with
-          | Ival.Float fval ->
-            begin
-              let error = get_error t in
-              let error = Numerors_value.reduce fval error in
-              match error with
-              | `Value error -> set_error error t
-              | `Bottom -> t (* TODO: we should be able to reduce to bottom. *)
-            end
-          | _ -> t
-        with Cvalue.V.Not_based_on_null -> t
-    end
-  | _, _ -> fun x -> x
-
-
+(* The numerors domain: a simple memory over the numerors value. *)
 module Domain = struct
   module Name = struct let name = "numerors" end
   include Simple_memory.Make_Domain (Name) (Numerors_Value)
@@ -157,7 +96,72 @@ module Domain = struct
     | _, _ -> ()
 end
 
-let numerors_domain () =
-  Value_parameters.warning "The numerors domain is experimental.";
-  (module Domain: Abstract_domain.Internal with type value = value
-                                            and type location = location)
+(* Reduced product between the cvalue values and the numerors values. *)
+let reduce_error cvalue error =
+  try
+    let ival = Cvalue.V.project_ival cvalue in
+    match ival with
+    | Ival.Float fval ->
+      begin
+        match Numerors_value.reduce fval error with
+        | `Value error -> cvalue, error
+        | `Bottom -> cvalue, error (* TODO: we should be able to reduce to bottom. *)
+      end
+    | _ -> cvalue, error
+  with Cvalue.V.Not_based_on_null -> cvalue, error
+
+(* Reduction of the numerors value resulting from a cast from int to float type,
+   using the cvalue component of value abstractions. *)
+let reduce_cast (module Abstract: Abstractions.S) =
+  let module Val = struct
+    include Abstract.Val
+
+    (* Redefines the [forward_cast] function of the value component. *)
+    let forward_cast =
+      (* If cvalue or numerors do not belong to the abstraction, no reduction:
+         the [forward_cast] function is unchanged. *)
+      match get Main_values.CVal.key, mem Numerors_value.key with
+      | None, _ | _, false -> forward_cast
+      | Some get_cvalue, true ->
+        (* Otherwise, applies the [forward_cast] function, but updates the
+           numerors component of the result. *)
+        fun ~src_type ~dst_type value ->
+          forward_cast ~src_type ~dst_type value >>-: fun result ->
+          match src_type, dst_type with
+          | Eval_typ.TSInt _, Eval_typ.TSFloat fkind ->
+            begin
+              try
+                let cvalue = get_cvalue value in
+                let ival = Cvalue.V.project_ival cvalue in
+                match Ival.min_and_max ival with
+                | Some min, Some max ->
+                  let min, max = Integer.to_int min, Integer.to_int max in
+                  let prec = Numerors_utils.Precisions.of_fkind fkind in
+                  let num = Numerors_value.of_ints ~prec min max in
+                  set Numerors_value.key num result
+                | _, _ -> result
+              (* Integer.to_int may fail for too big integers. *)
+              with Cvalue.V.Not_based_on_null | Z.Overflow -> result
+            end
+          | _, _ -> result
+  end in
+  (module struct
+    module Val = Val
+    module Loc = Abstract.Loc
+    module Dom = Abstract.Dom
+  end: Abstractions.S)
+
+(* Register the domain as an Eva abstractions. *)
+let () =
+  let open Abstractions in
+  let domain =
+    { name = "numerors";
+      priority = 0;
+      values = Single (module Numerors_value);
+      domain = Domain (module Domain); }
+  in
+  let reduced_product = Main_values.CVal.key, Numerors_value.key, reduce_error in
+  register ~enable:Value_parameters.NumerorsDomain.get domain;
+  register_value_reduction reduced_product;
+  register_hook reduce_cast;
+  Value_parameters.register_numerors ()

@@ -821,52 +821,29 @@ PLUGIN_TESTS_DIRS+=value/traces
 # Files for the binding to Apron domains. Only available if Apron is available.
 ifeq ($(HAS_APRON),yes)
 PLUGIN_REQUIRES+= apron.octMPQ apron.boxMPQ apron.polkaMPQ apron.apron gmp
-src/plugins/value/domains/apron/apron_domain.ml: \
-		src/plugins/value/domains/apron/apron_domain.ok.ml \
-		share/Makefile.config
-	$(CP_IF_DIFF) $< $@
-	$(CHMOD_RO) $@
+APRON_CMO:= domains/apron/apron_domain
 else
-src/plugins/value/domains/apron/apron_domain.ml: \
-		src/plugins/value/domains/apron/apron_domain.ko.ml \
-		share/Makefile.config
-	$(CP_IF_DIFF) $< $@
-	$(CHMOD_RO) $@
-endif
-PLUGIN_GENERATED+= src/plugins/value/domains/apron/apron_domain.ml
+APRON_CMO:=
 PLUGIN_DISTRIB_EXTERNAL+= \
-	domains/apron/apron_domain.ok.ml domains/apron/apron_domain.ko.ml
+	domains/apron/apron_domain.ml domains/apron/apron_domain.mli
+endif
 
 # Files for the numerors domain. Only available is MPFR is available.
 NUMERORS_FILES:= \
 	values/numerors/numerors_utils values/numerors/numerors_float \
 	values/numerors/numerors_interval values/numerors/numerors_arithmetics \
-	values/numerors/numerors_value
+	values/numerors/numerors_value domains/numerors/numerors_domain
 
 ifeq ($(HAS_MPFR),yes)
 PLUGIN_REQUIRES+= gmp
 PLUGIN_TESTS_DIRS+=value/numerors
 NUMERORS_CMO:= $(NUMERORS_FILES)
-src/plugins/value/domains/numerors/numerors_domain.ml: \
-		src/plugins/value/domains/numerors/numerors_domain.ok.ml \
-		share/Makefile.config
-	$(CP_IF_DIFF) $< $@
-	$(CHMOD_RO) $@
 else
 # Do not compile numerors files, but include them in the distributed files.
 NUMERORS_CMO:=
 PLUGIN_DISTRIB_EXTERNAL+= $(addsuffix .ml,$(NUMERORS_FILES))
 PLUGIN_DISTRIB_EXTERNAL+= $(addsuffix .mli,$(NUMERORS_FILES))
-src/plugins/value/domains/numerors/numerors_domain.ml: \
-		src/plugins/value/domains/numerors/numerors_domain.ko.ml \
-		share/Makefile.config
-	$(CP_IF_DIFF) $< $@
-	$(CHMOD_RO) $@
 endif
-PLUGIN_GENERATED+= src/plugins/value/domains/numerors/numerors_domain.ml
-PLUGIN_DISTRIB_EXTERNAL+= \
-	domains/numerors/numerors_domain.ok.ml \
-	domains/numerors/numerors_domain.ko.ml
 
 # General rules for ordering files within PLUGIN_CMO:
 # - try to keep the legacy Value before Eva
@@ -878,7 +855,7 @@ PLUGIN_CMO:= slevel/split_strategy value_parameters \
 	slevel/per_stmt_slevel \
 	utils/library_functions \
 	utils/eval_typ utils/backward_formals \
-	alarmset eval utils/structure \
+	alarmset eval utils/structure utils/abstract \
 	values/value_product values/location_lift \
 	values/cvalue_forward values/cvalue_backward \
 	values/main_values values/main_locations \
@@ -890,13 +867,11 @@ PLUGIN_CMO:= slevel/split_strategy value_parameters \
 	domains/traces_domain \
 	domains/simple_memory \
 	domains/gauges/gauges_domain \
-	domains/apron/apron_domain \
 	domains/hcexprs \
 	domains/equality/equality domains/equality/equality_domain \
 	domains/offsm_domain \
 	domains/symbolic_locs \
 	domains/sign_domain \
-	$(NUMERORS_CMO) domains/numerors/numerors_domain \
 	domains/cvalue/warn domains/cvalue/locals_scoping \
 	domains/cvalue/cvalue_offsetmap \
 	utils/value_results \
@@ -918,7 +893,8 @@ PLUGIN_CMO:= slevel/split_strategy value_parameters \
 	engine/partition engine/partitioning_parameters engine/trace_partitioning \
 	engine/iterator \
 	engine/initialization \
-	engine/compute_functions engine/analysis register
+	engine/compute_functions engine/analysis register \
+	$(APRON_CMO) $(NUMERORS_CMO)
 PLUGIN_CMI:= values/abstract_value values/abstract_location \
 	domains/abstract_domain domains/simpler_domains
 PLUGIN_DEPENDENCIES:=Callgraph LoopAnalysis RteGen
