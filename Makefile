@@ -793,11 +793,11 @@ PLUGIN_NAME:=Callgraph
 PLUGIN_DISTRIBUTED:=yes
 PLUGIN_DIR:=src/plugins/callgraph
 PLUGIN_CMO:= options journalize subgraph cg services uses register
-#GTK3: no DGraph available.
-ifeq ($(HAS_GNOMECANVAS),yes)
+ifeq ($(HAS_DGRAPH),yes)
 PLUGIN_GUI_CMO:=cg_viewer
 else
 PLUGIN_GUI_CMO:=
+PLUGIN_DISTRIB_EXTERNAL:=cg_viewer.ml
 endif
 PLUGIN_CMI:= callgraph_api
 PLUGIN_INTERNAL_TEST:=yes
