@@ -37,6 +37,7 @@ module InoutDomain: Parameter_sig.Bool
 module SignDomain: Parameter_sig.Bool
 module PrinterDomain: Parameter_sig.Bool
 module NumerorsDomain: Parameter_sig.Bool
+module TracesDomain: Parameter_sig.Bool
 
 module ApronOctagon: Parameter_sig.Bool
 module ApronBox: Parameter_sig.Bool
@@ -49,12 +50,16 @@ module EqualityCallFunction:
   Parameter_sig.Map with type key = Cil_types.kernel_function
                      and type value = string
 
+module TracesUnrollLoop: Parameter_sig.Bool
+module TracesUnifyLoop: Parameter_sig.Bool
+module TracesDot: Parameter_sig.String
+module TracesProject: Parameter_sig.Bool
+
 module EqualityStorage: Parameter_sig.Bool
 module SymbolicLocsStorage: Parameter_sig.Bool
 module GaugesStorage: Parameter_sig.Bool
 module ApronStorage: Parameter_sig.Bool
 module BitwiseOffsmStorage: Parameter_sig.Bool
-
 
 module AutomaticContextMaxDepth: Parameter_sig.Int
 module AutomaticContextMaxWidth: Parameter_sig.Int

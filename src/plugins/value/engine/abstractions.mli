@@ -38,6 +38,7 @@ type config = {
   signs: bool;
   printer: bool;
   numerors: bool;
+  traces: bool;
 }
 
 (** Default configuration of Eva. *)

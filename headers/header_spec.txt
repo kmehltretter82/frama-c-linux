@@ -1185,6 +1185,8 @@ src/plugins/value/domains/equality/equality_domain.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/equality/equality_domain.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/gauges/gauges_domain.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/gauges/gauges_domain.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/domains/traces_domain.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/domains/traces_domain.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/hcexprs.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/hcexprs.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/inout_domain.ml: CEA_LGPL_OR_PROPRIETARY

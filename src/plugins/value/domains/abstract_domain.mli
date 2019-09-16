@@ -193,6 +193,8 @@ module type Transfer = sig
       assignment has been performed.
       - [kinstr] is the statement of the assignment, or Kglobal for the
         initialization of a global variable.
+      - when the kinstr is a function call, [expr] is the special variable in
+        [!Eval.call.return].
       - [v] carries the value being assigned to [lv], i.e. the value of the
         expression [expr]. [v] also denotes the kind of assignment: Assign for
         the default assignment of the value, or Copy for the exact copy of a
@@ -470,12 +472,14 @@ module type Store = sig
   val register_state_before_stmt: Value_types.callstack -> stmt -> state -> unit
   val register_state_after_stmt: Value_types.callstack -> stmt -> state -> unit
 
+  (** Allows accessing the states inferred by an Eva analysis after it has
+      been computed with the domain enabled. *)
   val get_global_state: unit -> state or_bottom
   val get_initial_state: kernel_function -> state or_bottom
   val get_initial_state_by_callstack:
     kernel_function -> state Value_types.Callstack.Hashtbl.t or_top_or_bottom
 
-  val get_stmt_state: stmt -> state or_bottom
+  val get_stmt_state: after:bool -> stmt -> state or_bottom
   val get_stmt_state_by_callstack:
     after:bool -> stmt -> state Value_types.Callstack.Hashtbl.t or_top_or_bottom
 end

@@ -233,6 +233,13 @@ module SignDomain = Domain_Parameter
       let default = false
     end)
 
+module TracesDomain = Domain_Parameter
+    (struct
+      let option_name = "-eva-traces-domain"
+      let help = "Use a domain to record traces of Eva. Experimental."
+      let default = false
+    end)
+
 module PrinterDomain = Domain_Parameter
     (struct
       let option_name = "-eva-printer-domain"
@@ -305,6 +312,43 @@ module Numerors_Mode =
 let () =
   Numerors_Mode.set_possible_values ["relative"; "absolute"; "none"; "both"]
 let () = add_precision_dep Numerors_Mode.parameter
+
+let () = Parameter_customize.set_group domains
+module TracesUnrollLoop =
+  Bool
+    (struct
+      let option_name = "-eva-traces-unroll-loop"
+      let help = "Specify if the traces domain should unroll the loops."
+      let default = true
+    end)
+let () = add_precision_dep TracesUnrollLoop.parameter
+
+let () = Parameter_customize.set_group domains
+module TracesUnifyLoop =
+  Bool
+    (struct
+      let option_name = "-eva-traces-unify-loop"
+      let help = "Specify if all the instances of a loop should try \
+                  to share theirs traces."
+      let default = false
+    end)
+let () = add_precision_dep TracesUnifyLoop.parameter
+
+let () = Parameter_customize.set_group domains
+module TracesDot = Empty_string
+    (struct
+      let option_name = "-eva-traces-dot"
+      let help = "Output to the given filename the Cfg in dot format."
+      let arg_name = "FILENAME"
+    end)
+
+let () = Parameter_customize.set_group domains
+module TracesProject = Bool
+    (struct
+      let option_name = "-eva-traces-project"
+      let help = "Try to convert the Cfg into a program in a new project."
+      let default = false
+    end)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Performance options                                                --- *)

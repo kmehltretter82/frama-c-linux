@@ -317,6 +317,9 @@ module type S = sig
       More efficient than just performing successive {!add} the elements
       of the other map *)
 
+  val from_shape_id: v shape -> t
+  (** Same as [from_shape (fun _ v -> v)]. *)
+
   val shape: t -> v shape
   (** Export the map as a value suitable for functions {!inter_with_shape}
       and {!from_shape} *)
