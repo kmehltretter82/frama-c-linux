@@ -84,37 +84,34 @@ module Variable = Data.Collection (struct
 
     let of_json json =
       let open Yojson.Basic.Util in
-      try
-        let funname =
-          try Some (json |> member "fun" |> to_string)
-          with Not_found -> None
-        and varname = json |> member "var" |> to_string in
-        match funname with
-        | Some name ->
-          let kf =
-            try
-              Globals.Functions.find_by_name name
-            with Not_found ->
-              Data.failure json "no function '%s'" name
-          in
-          let vi = 
-            try Globals.Vars.find_from_astinfo varname (Cil_types.VLocal kf)
-            with Not_found ->
-            try Globals.Vars.find_from_astinfo varname (Cil_types.VFormal kf)
-            with Not_found ->
-              Data.failure json "no variable '%s' in function '%s'"
-                varname name
-          in
-          vi
+      let funname =
+        try Some (json |> member "fun" |> to_string)
+        with Not_found -> None
+      and varname = json |> member "var" |> to_string in
+      match funname with
+      | Some name ->
+        let kf =
+          try
+            Globals.Functions.find_by_name name
+          with Not_found ->
+            Data.failure "no function '%s'" name
+        in
+        let vi =
+          try Globals.Vars.find_from_astinfo varname (Cil_types.VLocal kf)
+          with Not_found ->
+          try Globals.Vars.find_from_astinfo varname (Cil_types.VFormal kf)
+          with Not_found ->
+            Data.failure "no variable '%s' in function '%s'"
+              varname name
+        in
+        vi
+      | None ->
+        match
+          Globals.Syntactic_search.find_in_scope varname Cil_types.Program
+        with
+        | Some vi -> vi
         | None ->
-          match
-            Globals.Syntactic_search.find_in_scope varname Cil_types.Program
-          with
-          | Some vi -> vi
-          | None ->
-            Data.failure json "no global variable '%s'" varname
-      with Not_found | Failure _ ->
-        Data.failure json "Invalid source format"
+          Data.failure "no global variable '%s'" varname
   end)
 
 module Function = Data.Collection (struct
@@ -133,7 +130,7 @@ module Function = Data.Collection (struct
       try
         Globals.Functions.find_by_name name
       with Not_found ->
-        Data.failure json "no function '%s'" name
+        Data.failure "no function '%s'" name
   end)
 
 module Node = Data.Collection (struct
@@ -152,7 +149,7 @@ module Node = Data.Collection (struct
       try
         Build.find_node (get_graph ()) node_key
       with Not_found ->
-        Data.failure json "no node '%d' in the current graph" node_key
+        Data.failure "no node '%d' in the current graph" node_key
   end)
 
 
