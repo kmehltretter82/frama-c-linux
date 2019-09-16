@@ -737,10 +737,10 @@ module CoqLibs =
 
 let () = Parameter_customize.set_group wp_prover_options
 let () = Parameter_customize.no_category ()
-module WhyFlags =
+module Why3Flags =
   String_list
     (struct
-      let option_name = "-wp-why-opt"
+      let option_name = "-wp-why3-opt"
       let arg_name = "option,..."
       let help = "Additional options for Why3"
     end)
