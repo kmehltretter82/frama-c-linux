@@ -39,9 +39,10 @@ the \textsf{WP} plug-in, the \emph{Weakest Precondition} calculus and
 \emph{Memory Models}. Then, Chapter~\ref{wp-plugin} details how to use
 and tune the plug-in within the \textsf{Frama-C}
 platform. Chapter~\ref{wp-models} provides a description for the
-included memory models. Finally, we present in
-Chapter~\ref{wp-simplifier} the simplifier module and the efficient weakest
-precondition engine implemented in the \textsf{WP} plug-in.
+included memory models. We present in Chapter~\ref{wp-simplifier} the
+simplifier module and the efficient weakest precondition engine implemented
+in the \textsf{WP} plug-in. Finally, in Chapter~\ref{wp-builtins}, we
+provide additional information on the supported ACSL built-in symbols.
 
 \clearpage
 
@@ -56,7 +57,7 @@ you should install at least one external prover in
 order to fulfill proof obligations. An easy choice is to install the
 \textsf{Alt-Ergo} theorem prover developed at
 \textsc{inria}\footnote{\textsf{Alt-Ergo}:
-  \url{http://alt-ergo.lri.fr}}. When using the \textsf{Opam} package
+  \url{https://alt-ergo.ocamlpro.com/}}. When using the \textsf{Opam} package
   manager, these tools are automatically installed with \textsf{Frama-C}.
 See section~\ref{wp-install-provers} for installing other provers.
 
@@ -296,11 +297,11 @@ Chapter~\ref{wp-models} is dedicated to a more detailed description of
 memory models, and how the \textsf{WP} plug-in uses and \emph{combines}
 them to generate efficient proof obligations.
 
-\paragraph{Remark.}
-The original \texttt{Store} and \texttt{Runtime} memory models are no
-longer available since \textsf{WP} version \verb+0.7+ (Fluorine); the \texttt{Typed} model
-replaces the \texttt{Store} one; the \texttt{Runtime} model will be entirely
-re-implemented as \texttt{Bytes} model in some future release.
+% \paragraph{Remark.}
+% The original \texttt{Store} and \texttt{Runtime} memory models are no
+% longer available since \textsf{WP} version \verb+0.7+ (Fluorine); the \texttt{Typed} model
+% replaces the \texttt{Store} one; the \texttt{Runtime} model will be entirely
+% re-implemented as \texttt{Bytes} model in some future release.
 
 \clearpage
 \section{Arithmetic Models}
