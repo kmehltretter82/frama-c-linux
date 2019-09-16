@@ -736,15 +736,6 @@ module CoqLibs =
     end)
 
 let () = Parameter_customize.set_group wp_prover_options
-module Why3 =
-  String(struct
-    let option_name = "-wp-why3"
-    let default = "why3"
-    let arg_name = "cmd"
-    let help = "Command to run Why-3 (default: 'why3')"
-  end)
-
-let () = Parameter_customize.set_group wp_prover_options
 let () = Parameter_customize.no_category ()
 module WhyFlags =
   String_list
