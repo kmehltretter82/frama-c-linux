@@ -132,8 +132,7 @@ This panel is dedicated to the \textsf{WP} plug-in. It shows the
 generated proof obligations and their status for each prover.
 By clicking on a prover
 column, you can also submit a proof obligation to a prover by
-hand. Right-click provides more options depending on the prover, such
-as proof-script editing for \textsf{Coq}.
+hand. Right-click provides more options depending on the prover.
 
 \paragraph{Interactive Proof Editor.}
 From the Goals Panel view, you can double-click on a row and open the \emph{interactive proof editor} panel as described in section~\ref{wp-proof-editor}.
@@ -1033,10 +1032,10 @@ Suppose you have the following configuration:
 \begin{logs}
 # frama-c -wp-detect
 [wp] Why3 provers detected:
-   - Alt-Ergo 2.0.0 [why3:alt-ergo,altergo]
+   - Alt-Ergo 2.0.0 [alt-ergo,altergo]
    - CVC4 1.6 [cvc4]
    - CVC4 1.6 (counterexamples) [cvc4-ce]
-   - Coq 8.9.0 [why3:coq]
+   - Coq 8.9.0 [coq]
    - Z3 4.6.0 [z3]
    - Z3 4.6.0 (counterexamples) [z3-ce]
    - Z3 4.6.0 (noBV) [z3-nobv]
@@ -1089,8 +1088,7 @@ obligations are:
 \label{prooflibs}
 
 It is possible to add additional bases of knowledge to decision
-procedures.  This support is provided for \textsf{Alt-Ergo},
-\textsf{Why3} and \textsf{Coq} thanks to the following options:
+procedures thanks to the following option:
 \begin{description}
 \item[\tt -wp-share <dir>] modifies the default directory where
   resources are found.  This option can be useful for running a modified or
@@ -1154,7 +1152,7 @@ resets the option to the singleton of the given string
 and binding with the \verb'+=' operator
 adds the given string to the current value of the option.
 The following options are defined by the plugin:
-\texttt{coq.file}, \texttt{altergo.file}, \texttt{why3.file} and \texttt{why3.import}.
+\texttt{why3.file} and \texttt{why3.import}.
 
 \textsf{C}-Comments are allowed in the file. For overloaded
 \textsf{ACSL} symbols, it is necessary to provide one \user{link} symbol for
@@ -1162,29 +1160,22 @@ each existing signature. The same \user{link} symbol is used for all provers,
 and must be defined in the specified libraries, or in the external
 ones (see~\ref{prooflibs}).
 
-It is also possible to specify different names
-for each prover, with the following syntax:
-\texttt{\{coq=\user{a};altergo=\user{b};why3=\user{c}\}}.
 Alternatively, a link-name can be an arbitrary string
 with patterns substituted by arguments, \verb="(%1+%2)"= for instance.
 
 When a library \user{lib} is specified, the loaded module depends on the
-target solver:
+option:
 \begin{center}\tt
-  \begin{tabular}{llll}
-    & \textrm{Option} & \textrm{Format} \\
+  \begin{tabular}{lll}
+    \textrm{Option} & \textrm{Format} \\
     \hline
-    \textsf{Coq}: & coq.file & \verb+[dir:]path.v+ \\
-    \textsf{Alt-Ergo}: & altergo.file & \verb+path.mlw+ \\
-    \textsf{Why3}: & why3.file & \verb+path.why[:name][:as]+ \\
-                   & why3.import & \verb+theory[:as]+ \\
+    why3.file & \verb+path.why[:name][:as]+ \\
+    why3.import & \verb+theory[:as]+ \\
   \end{tabular}
 \end{center}
 
 Precise meaning of formats is given by the following examples (all filenames are relatives to the driver file's directory):
 \begin{description}
-\item[\tt coq.file="mydir/bar.v"] Imports module \verb+Bar+ from file \verb+mydir/bar.vo+.
-\item[\tt coq.file="mydir/foo:Foo.v"] Loads coq library \verb+foo.Foo+ from file \verb+mydir/foo/Foo.vo+.
 \item[\tt why3.file="mydir/foo.why"] Imports theory \verb+foo.Foo+ from directory \verb+mydir+.
 \item[\tt why3.file="mydir/foo.why:Bar"] Imports theory \verb+foo.Bar+ from directory \verb+mydir+.
 \item[\tt why3.file="mydir/foo.why:Bar:T"] Imports theory \verb+foo.Bar as T+ from directory \verb+mydir+.
@@ -1251,7 +1242,8 @@ interactively or incrementally, it is often the case where most proof obligation
 from one \textsf{WP} execution to the other. To reduce this costs, a cache of prover results can be used
 and stored in your session.
 
-The cache can only be used with \textsf{Why-3} provers, it does not work with native \textsf{Alt-Ergo} and \textsf{Coq} provers. There are different ways of using the cache, depending on your precise needs.
+% The cache can only be used with \textsf{Why-3} provers, it does not work with native \textsf{Alt-Ergo} and \textsf{Coq} provers. 
+There are different ways of using the cache, depending on your precise needs.
 The main option to control cache usage is \verb+-wp-cache+, documented below:
 
 \begin{description}
