@@ -303,7 +303,8 @@ let build_all_scattered_node context callstack kinstr lval =
     let cells = enumerate_cells ~is_folded_base ~limit:20 lval kinstr in
     let add node_kind =
       let node = add_or_update_node context callstack node_kind in
-      update_node_values node kinstr lval;
+      let new_lval = Extlib.the (Node_kind.to_lval node_kind) in
+      update_node_values node kinstr new_lval;
       node
     in
     List.map add cells
