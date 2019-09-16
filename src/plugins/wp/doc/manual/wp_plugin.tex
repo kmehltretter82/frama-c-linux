@@ -1279,12 +1279,6 @@ Cached usage is indicated on the standard output, unless you specify \verb+-wp-m
 \section{Plug-in Developer Interface}
 \label{wp-api}
 
-% The \textsf{WP} plug-in has several entry points registered in the
-% \texttt{Dynamic}\footnote{See the \emph{plug-in development guide}}
-% module of \textsf{Frama-C}.
-
-% Those entry points are however deprecated.
-% Instead, a full featured \textsf{OCaml} API is now exported with the
 A full featured \textsf{OCaml} API is exported with the
 \textsf{WP} plug-in. As documented in the \textsf{Frama-C} user manual, simply add the directive \verb!PLUGIN_DEPENDENCIES+=Wp! to the Makefile of your plug-in.
 
