@@ -320,6 +320,21 @@ module EqualityCallFunction =
 let () = add_precision_dep EqualityCallFunction.parameter
 
 let () = Parameter_customize.set_group domains
+module OctagonsCall =
+  Bool
+    (struct
+      let option_name = "-eva-octagons-through-calls"
+      let help = "Whether the relations inferred by the octagons domain are \
+                  propagated through function calls. Disabled by default: \
+                  the octagons analysis is intra-procedural, starting \
+                  each function with an empty octagons state, \
+                  and losing the octagons inferred at the end. \
+                  The interprocedural analysis is more precise but slower."
+      let default = false
+    end)
+let () = add_precision_dep OctagonsCall.parameter
+
+let () = Parameter_customize.set_group domains
 module Numerors_Real_Size =
   Int
     (struct

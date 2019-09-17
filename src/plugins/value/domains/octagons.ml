@@ -38,6 +38,12 @@ let infer_intervals = true
    minimal drop in efficiency. *)
 let saturate_octagons = true
 
+(* Is the domain intraprocedural, according to the -eva-octagons-through-calls
+   option. In this case, the analysis of each function starts with an empty
+   state, and the relations inferred in a function are not propagated back to
+   the caller either. *)
+let intraprocedural () = not (Value_parameters.OctagonsCall.get ())
+
 (* -------------------------------------------------------------------------- *)
 (*                  Basic types: pair of variables and Ival.t                 *)
 (* -------------------------------------------------------------------------- *)
@@ -1190,11 +1196,22 @@ module Domain = struct
 
     let assume _stmt _exp _bool = update
 
-    let start_call _stmt _call _valuation _state = `Value (empty ())
+    let start_call _stmt call valuation state =
+      if intraprocedural ()
+      then `Value (empty ())
+      else
+        let state = { state with modified = Locations.Zone.bottom } in
+        let assign_formal state { formal; concrete; avalue } =
+          state >>- assign_variable formal concrete avalue valuation
+        in
+        List.fold_left assign_formal (`Value state) call.arguments
 
     let finalize_call _stmt _call ~pre ~post =
-      let written_zone = post.modified in
-      `Value (kill written_zone pre)
+      if intraprocedural ()
+      then `Value (kill post.modified pre)
+      else
+        let modified = Locations.Zone.join post.modified pre.modified in
+        `Value { post with modified }
 
     let show_expr _valuation _state _fmt _expr = ()
   end

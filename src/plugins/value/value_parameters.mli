@@ -51,6 +51,8 @@ module EqualityCallFunction:
   Parameter_sig.Map with type key = Cil_types.kernel_function
                      and type value = string
 
+module OctagonsCall: Parameter_sig.Bool
+
 module TracesUnrollLoop: Parameter_sig.Bool
 module TracesUnifyLoop: Parameter_sig.Bool
 module TracesDot: Parameter_sig.String
