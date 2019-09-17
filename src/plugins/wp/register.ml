@@ -748,14 +748,15 @@ let cmdline_run () =
         RefUsage.compute ();
         RefUsage.dump ();
       end ;
-    if Wp_parameters.has_dkey dkey_builtins then
-      begin
-        LogicBuiltins.dump ();
-      end ;
     let bhv = Wp_parameters.Behaviors.get () in
     let prop = Wp_parameters.Properties.get () in
     (** TODO entry point *)
     let computer = computer () in
+    if Wp_parameters.has_dkey dkey_builtins then
+      begin
+        WpContext.on_context (computer#model,WpContext.Global)
+          LogicBuiltins.dump ();
+      end ;
     Generator.compute_selection computer ~fct ~bhv ~prop ()
   in
   match Wp_parameters.job () with
