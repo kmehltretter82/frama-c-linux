@@ -824,6 +824,8 @@ let get ?kf ?(init=false) vi =
 
 let compute () = ignore (usage ())
 
+let print x m fmt = Access.pretty x fmt m
+
 let dump () =
   Log.print_on_output
     begin fun fmt ->
