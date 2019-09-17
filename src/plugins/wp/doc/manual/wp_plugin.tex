@@ -1380,8 +1380,8 @@ The cache can only be used with \textsf{Why-3} provers, it does not work with na
 The main option to control cache usage is \verb+-wp-cache+, documented below:
 
 \begin{description}
-\item[\tt -wp-cache <mode>] selects the cache mode to use with why3 provers. The default mode is \verb'update' if \verb+-wp-session+ is set, and \verb+none+ otherwize. The cache entries
-are stored in the session directory, which would be \verb+./frama-c/wp/cache+ by default.
+\item[\tt -wp-cache <mode>] selects the cache mode to use with why3 provers. The default mode is \verb'update' if \verb+-wp-session+ is set or when using the Frama-C/Gui, and \verb+none+ otherwize. The cache entries
+are stored in the session directory, which is \verb+./frama-c/wp/cache+ by default.
 \end{description}
 
 The available cache modes are described below:
