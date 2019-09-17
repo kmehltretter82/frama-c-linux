@@ -33,7 +33,7 @@ class ['v, 'e, 'c] services_view view = object (self)
   val services:
     (service_id,
      bool ref * Services.G.V.t DGraphViewItem.view_item list ref)
-    Hashtbl.t
+      Hashtbl.t
     = Hashtbl.create 10
 
   method is_root (n:'v DGraphViewItem.view_item) = n#item.Service_graph.is_root
@@ -57,10 +57,10 @@ class ['v, 'e, 'c] services_view view = object (self)
          if not (self#is_root n) then n#show ();
          view#iter_succ_e
            (fun e -> match self#edge_kind e with
-            | Service_graph.Inter_functions | Service_graph.Both ->
+              | Service_graph.Inter_functions | Service_graph.Both ->
                 e#compute ();
                 e#show ()
-            | Service_graph.Inter_services ->
+              | Service_graph.Inter_services ->
                 e#hide ())
            n)
       !nodes
@@ -77,8 +77,8 @@ class ['v, 'e, 'c] services_view view = object (self)
          if not (self#is_root n) then n#hide ();
          view#iter_succ_e
            (fun e -> match self#edge_kind e with
-            | Service_graph.Inter_services | Service_graph.Both -> e#show ()
-            | Service_graph.Inter_functions -> e#hide ())
+              | Service_graph.Inter_services | Service_graph.Both -> e#show ()
+              | Service_graph.Inter_functions -> e#hide ())
            n)
       !nodes
 
@@ -86,32 +86,32 @@ class ['v, 'e, 'c] services_view view = object (self)
     Kernel_function.get_id n#item.Service_graph.root.Service_graph.node
 
   initializer
-  let add_in_service n s =
-    try
-      let _, nodes = Hashtbl.find services s in
-      nodes := n :: !nodes
-    with Not_found ->
-      Hashtbl.add services s (ref false, ref [ n ])
-  in
-  let connect_trigger_to_node n =
-    let callback = function
-      | `BUTTON_PRESS _ ->
+    let add_in_service n s =
+      try
+        let _, nodes = Hashtbl.find services s in
+        nodes := n :: !nodes
+      with Not_found ->
+        Hashtbl.add services s (ref false, ref [ n ])
+    in
+    let connect_trigger_to_node n =
+      let callback = function
+        | `BUTTON_PRESS _ ->
           if self#is_deployed (self#service n) then self#undeploy n
           else self#deploy n;
           false
-      | _ ->
+        | _ ->
           false
+      in
+      n#connect_event ~callback
     in
-    n#connect_event ~callback
-  in
-  view#iter_nodes
-    (fun n ->
-       add_in_service n (self#service n);
-       if self#is_root n then connect_trigger_to_node n else n#hide ());
-  view#iter_edges_e
-    (fun e -> match self#edge_kind e with
-     | Service_graph.Inter_services | Service_graph.Both -> e#show ()
-     | Service_graph.Inter_functions -> e#hide ())
+    view#iter_nodes
+      (fun n ->
+         add_in_service n (self#service n);
+         if self#is_root n then connect_trigger_to_node n else n#hide ());
+    view#iter_edges_e
+      (fun e -> match self#edge_kind e with
+         | Service_graph.Inter_services | Service_graph.Both -> e#show ()
+         | Service_graph.Inter_functions -> e#hide ())
 
 end
 
@@ -160,7 +160,7 @@ let has_entry_point () =
   with Globals.No_such_entry_point _ -> false
 
 let can_show_service_graph () =
-   has_entry_point () && Options.Service_roots.is_empty ()
+  has_entry_point () && Options.Service_roots.is_empty ()
 
 let get_current_function () =
   match History.get_current () with

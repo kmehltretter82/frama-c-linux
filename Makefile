@@ -233,7 +233,7 @@ clean-check-libc:
 # itself, rather than copied: otherwise, it could include references to
 # non-distributed plug-ins.
 DISTRIB_FILES:=\
-      $(wildcard bin/migration_scripts/*2*.sh) bin/local_export.sh                        \
+      $(wildcard bin/migration_scripts/*2*.sh) bin/local_export.sh      \
       bin/frama-c bin/frama-c.byte bin/frama-c-gui bin/frama-c-gui.byte \
       bin/frama-c-config bin/frama-c-script                             \
       share/frama-c.WIN32.rc share/frama-c.Unix.rc                      \
@@ -793,11 +793,11 @@ PLUGIN_NAME:=Callgraph
 PLUGIN_DISTRIBUTED:=yes
 PLUGIN_DIR:=src/plugins/callgraph
 PLUGIN_CMO:= options journalize subgraph cg services uses register
-#GTK3: no DGraph available.
-ifeq ($(HAS_GNOMECANVAS),yes)
+ifeq ($(HAS_DGRAPH),yes)
 PLUGIN_GUI_CMO:=cg_viewer
 else
 PLUGIN_GUI_CMO:=
+PLUGIN_DISTRIB_EXTERNAL:=cg_viewer.ml
 endif
 PLUGIN_CMI:= callgraph_api
 PLUGIN_INTERNAL_TEST:=yes
@@ -1061,9 +1061,7 @@ PLUGIN_ENABLE:=$(ENABLE_IMPACT)
 PLUGIN_NAME:=Impact
 PLUGIN_DIR:=src/plugins/impact
 PLUGIN_CMO:= options pdg_aux reason_graph compute_impact register
-ifeq ($(HAS_DGRAPH),yes)
 PLUGIN_GUI_CMO:= register_gui
-endif
 PLUGIN_DISTRIBUTED:=yes
 PLUGIN_INTERNAL_TEST:=yes
 PLUGIN_DEPENDENCIES:=Inout Eva Pdg Slicing
