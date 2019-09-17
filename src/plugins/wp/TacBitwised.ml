@@ -117,7 +117,7 @@ let rec lookup push clause ~nbits ~priority p =
 class autobitwise =
   object(self)
 
-    method private nbits = Ctypes.range (Ctypes.c_ptr ())
+    method private nbits = Ctypes.i_bits (Ctypes.c_ptr ())
 
     method id = "wp:bitwised"
     method title =

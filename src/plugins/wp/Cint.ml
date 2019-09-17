@@ -257,8 +257,8 @@ let match_binop_one_extraction binop = match_list_extraction (match_binop_one_ar
 (* to_iota(e) where e = to_iota'(e'), only ranges for iota *)
 let simplify_range_comp f iota e conv e' =
   let iota' = to_cint conv in
-  let size' = Ctypes.range iota' in
-  let size = Ctypes.range iota in
+  let size' = Ctypes.i_bits iota' in
+  let size = Ctypes.i_bits iota in
   if size <= size'
   then e_fun f [e']
   (* rule B:
@@ -288,7 +288,7 @@ let configure_to_int iota =
     begin
       try match F.repr e with
         | Logic.Kint value ->
-            let size = Integer.of_int (Ctypes.range iota) in
+            let size = Integer.of_int (Ctypes.i_bits iota) in
             let signed = Ctypes.signed iota in
             F.e_zint (Integer.cast ~size ~signed ~value)
         | Logic.Fun( fland , es )
@@ -518,7 +518,7 @@ let smp_bitk_positive = function
             F.e_not (bitk_positive k a)
         | Logic.Fun( conv , [a] ) (* when is_to_c_int conv *) ->
             let iota = to_cint conv in
-            let range = Ctypes.range iota in
+            let range = Ctypes.i_bits iota in
             let signed = Ctypes.signed iota in
             if signed then (* beware of sign-bit *)
               begin match is_leq k (e_int (range-2)) with
@@ -858,13 +858,14 @@ module Dom = struct
   let top = Tmap.empty
 
   [@@@ warning "-32"]
-  let print fmt dom =
+  let pretty fmt dom =
     Tmap.iter (fun k v ->
         Format.fprintf fmt "%a: %a,@ " Lang.F.pp_term k Ival.pretty v)
       dom
-  [@@@ warning "+32"]
 
   let find t dom = Tmap.find t dom
+
+  let get t dom = try find t dom with Not_found -> Ival.top
 
   let narrow t v dom =
     if Ival.is_bottom v then raise Lang.Contradiction
@@ -930,7 +931,7 @@ module Dom = struct
         | Fun(g,[a]) -> begin try (* just checks for a contraction *)
               let ubound =
                 c_int_bounds_ival (is_cint g) (* may raise Not_found *) in
-              let v = find a dom (* may raise Not_found *) in
+              let v = Tmap.find a dom (* may raise Not_found *) in
               if Ival.is_included v ubound then raise Lang.Contradiction;
               dom
             with Not_found -> dom

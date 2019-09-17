@@ -85,6 +85,16 @@ type 'a result =
 (** Polarity of predicate compilation *)
 type polarity = [ `Positive | `Negative | `NoPolarity ]
 
+(** Frame Conditions.
+    Consider a function [phi(m)] over memory [m],
+    we want memories [m1,m2] and condition [p] such that
+    [p(m1,m2) -> phi(m1) = phi(m2)].
+    - [name] used for generating lemma
+    - [triggers] for the lemma
+    - [conditions] for the frame lemma to hold
+    - [mem1,mem2] to two memories for which the lemma holds *)
+type frame = string * Definitions.trigger list * pred list * term * term
+
 (* -------------------------------------------------------------------------- *)
 (** {1 Reversing Models}
 
@@ -135,6 +145,7 @@ sig
   type t
   val self : string (** Chunk names, for pretty-printing. *)
   val hash : t -> int
+  val equal : t -> t -> bool
   val compare : t -> t -> int
   val pretty : Format.formatter -> t -> unit
 
@@ -423,7 +434,7 @@ sig
      location [loc] which is represented by [t] in [sigma.post].
   *)
 
-  val assigned : sigma sequence -> c_object -> loc sloc -> pred list
+  val assigned : sigma sequence -> c_object -> loc sloc -> equation list
   (**
      Return a set of formula that express that two memory state are the same
      except at the given set of memory location.

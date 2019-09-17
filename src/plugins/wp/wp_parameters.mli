@@ -24,6 +24,20 @@ include Plugin.S
 
 val reset : unit -> unit
 
+(** {2 Function Selection} *)
+
+type functions =
+  | Fct_none
+  | Fct_all
+  | Fct_skip of Cil_datatype.Kf.Set.t
+  | Fct_list of Cil_datatype.Kf.Set.t
+
+val get_kf : unit -> functions
+val get_wp : unit -> functions
+val iter_fct : (Kernel_function.t -> unit) -> functions -> unit
+val iter_kf : (Kernel_function.t -> unit) -> unit
+val iter_wp : (Kernel_function.t -> unit) -> unit
+
 (** {2 Goal Selection} *)
 
 module WP          : Parameter_sig.Bool
@@ -33,14 +47,6 @@ module StatusAll   : Parameter_sig.Bool
 module StatusTrue  : Parameter_sig.Bool
 module StatusFalse : Parameter_sig.Bool
 module StatusMaybe : Parameter_sig.Bool
-
-type job =
-  | WP_None
-  | WP_All
-  | WP_SkipFct of Cil_datatype.Kf.Set.t
-  | WP_Fct of Cil_datatype.Kf.Set.t
-
-val job : unit -> job
 
 (** {2 Model Selection} *)
 
@@ -59,6 +65,15 @@ module Volatile : Parameter_sig.Bool
 (* use get_overflows() below *)
 (* module BoolRange : Parameter_sig.Bool *)
 (* use get_bool_range() below *)
+
+module Region: Parameter_sig.Bool
+module Region_rw: Parameter_sig.Bool
+module Region_pack: Parameter_sig.Bool
+module Region_flat: Parameter_sig.Bool
+module Region_annot: Parameter_sig.Bool
+module Region_inline: Parameter_sig.Bool
+module Region_fixpoint: Parameter_sig.Bool
+module Region_cluster: Parameter_sig.Bool
 
 (** {2 Computation Strategies} *)
 

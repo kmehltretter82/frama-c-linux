@@ -1422,6 +1422,8 @@ src/plugins/wp/GuiSource.ml: CEA_WP
 src/plugins/wp/GuiSource.mli: CEA_WP
 src/plugins/wp/GuiTactic.ml: CEA_WP
 src/plugins/wp/GuiTactic.mli: CEA_WP
+src/plugins/wp/Layout.ml: CEA_WP
+src/plugins/wp/Layout.mli: CEA_WP
 src/plugins/wp/Lang.ml: CEA_WP
 src/plugins/wp/Lang.mli: CEA_WP
 src/plugins/wp/Letify.ml: CEA_WP
@@ -1444,6 +1446,12 @@ src/plugins/wp/MemoryContext.ml: CEA_WP
 src/plugins/wp/MemoryContext.mli: CEA_WP
 src/plugins/wp/MemEmpty.ml: CEA_WP
 src/plugins/wp/MemEmpty.mli: CEA_WP
+src/plugins/wp/MemLoader.ml: CEA_WP
+src/plugins/wp/MemLoader.mli: CEA_WP
+src/plugins/wp/MemMemory.ml: CEA_WP
+src/plugins/wp/MemMemory.mli: CEA_WP
+src/plugins/wp/MemRegion.ml: CEA_WP
+src/plugins/wp/MemRegion.mli: CEA_WP
 src/plugins/wp/MemTyped.ml: CEA_WP
 src/plugins/wp/MemTyped.mli: CEA_WP
 src/plugins/wp/MemVar.ml: CEA_WP
@@ -1487,6 +1495,14 @@ src/plugins/wp/RefUsage.ml: CEA_WP
 src/plugins/wp/RefUsage.mli: CEA_WP
 src/plugins/wp/Region.ml: CEA_WP
 src/plugins/wp/Region.mli: CEA_WP
+src/plugins/wp/RegionAccess.ml: CEA_WP
+src/plugins/wp/RegionAccess.mli: CEA_WP
+src/plugins/wp/RegionAnalysis.ml: CEA_WP
+src/plugins/wp/RegionAnalysis.mli: CEA_WP
+src/plugins/wp/RegionAnnot.ml: CEA_WP
+src/plugins/wp/RegionAnnot.mli: CEA_WP
+src/plugins/wp/RegionDump.ml: CEA_WP
+src/plugins/wp/RegionDump.mli: CEA_WP
 src/plugins/wp/Repr.ml: CEA_WP
 src/plugins/wp/Repr.mli: CEA_WP
 src/plugins/wp/Sigma.ml: CEA_WP

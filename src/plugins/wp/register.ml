@@ -759,24 +759,17 @@ let cmdline_run () =
       end ;
     Generator.compute_selection computer ~fct ~bhv ~prop ()
   in
-  match Wp_parameters.job () with
-  | Wp_parameters.WP_None -> ()
-  | Wp_parameters.WP_All ->
+  let fct = Wp_parameters.get_wp () in
+  match fct with
+  | Wp_parameters.Fct_none -> ()
+  | Wp_parameters.Fct_all ->
       begin
-        ignore (wp_main Generator.F_All);
+        ignore (wp_main fct);
         do_wp_proofs ();
         do_wp_print ();
         do_wp_report ();
       end
-  | jb ->
-      let fct =
-        let open Wp_parameters in
-        match jb with
-        | WP_None -> Generator.F_List Cil_datatype.Kf.Set.empty
-        | WP_All -> Generator.F_All
-        | WP_Fct fs -> Generator.F_List fs
-        | WP_SkipFct fs -> Generator.F_Skip fs
-      in
+  | _ ->
       begin
         let goals = wp_main fct in
         do_wp_proofs_for goals ;

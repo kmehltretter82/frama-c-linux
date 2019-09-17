@@ -24,7 +24,7 @@
 (* --- Model Factory                                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
-type mheap = Hoare | ZeroAlias | Typed of MemTyped.pointer
+type mheap = Hoare | ZeroAlias | Region | Typed of MemTyped.pointer
 type mvar = Raw | Var | Ref | Caveat
 
 type setup = {

@@ -6,7 +6,7 @@
 [wp:print-generated] 
   "WPOUT/typed/Compound.v"
   (* ---------------------------------------------------------- *)
-  (* --- Memory Compound Updates                            --- *)
+  (* --- Memory Compound Loader                             --- *)
   (* ---------------------------------------------------------- *)
   
   Require Import ZArith.
