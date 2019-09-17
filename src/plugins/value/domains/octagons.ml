@@ -23,6 +23,9 @@
 open Cil_types
 open Eval
 
+(* If [true], checks invariants of the states created by most functions. *)
+let debug = false
+
 (* Whether the domain infers non-relational intervals (ivals) to improve the
    precision of the join operation: this avoids losing all relations that have
    been inferred in only one side of the join. Enhances the domain accuracy
@@ -127,6 +130,13 @@ type octagon =
     operation: operation;   (* Whether the relation is about X+Y or X-Y. *)
     value: Ival.t;          (* The interval of X±Y. *)
   }
+
+let _pretty_octagon fmt octagon =
+  let x, y = Pair.get octagon.variables in
+  let op = match octagon.operation with Add -> "+" | Sub -> "-" in
+  Format.fprintf fmt "%a %s %a %s %a"
+    Printer.pp_varinfo x op Printer.pp_varinfo y
+    (Unicode.inset_string ()) Ival.pretty octagon.value
 
 (* Transforms Cil expressions into mathematical octagons.
    Use Ival.t to evaluate expressions. *)
@@ -450,14 +460,15 @@ module Octagons = struct
       let pretty_one op ival =
         if not Ival.(equal top ival)
         then
-          Format.fprintf fmt "@[@[%a %s %a@]@ ->@ @[%a@]@]"
-            Variable.pretty x op Variable.pretty y Ival.pretty ival
+          Format.fprintf fmt "@[@[%a %s %a@] %s @[%a@]@]@,"
+            Variable.pretty x op Variable.pretty y
+            (Unicode.inset_string ()) Ival.pretty ival
       in
       pretty_one "+" diamond.add;
       pretty_one "-" diamond.sub
     in
     Pretty_utils.pp_iter
-      ~pre:"@[<v 3>{[ " ~suf:" ]}@]" ~sep:"@ "
+      ~pre:"@[<v 3>{[ " ~suf:" ]}@]" ~sep:""
       iter pretty fmt t
 
   let top = empty
@@ -705,11 +716,37 @@ module State = struct
                         Relations.hash t.relations,
                         Zone.hash t.modified)
 
-        let pretty fmt { octagons; intervals } =
-          Format.fprintf fmt
-            "@[<hov>%a@ %a@]"
-            Octagons.pretty octagons Intervals.pretty intervals
+        let pretty fmt { octagons } =
+          Format.fprintf fmt "@[%a@]" Octagons.pretty octagons
       end)
+
+  let pretty_debug fmt { octagons; intervals; relations } =
+    Format.fprintf fmt "@[<v> Octagons: %a@; Intervals: %a@; Relations: %a@]"
+      Octagons.pretty octagons Intervals.pretty intervals
+      Relations.pretty relations
+
+  (* Verify the internal structure of a state [t], depending on the boolean
+     variable [debug]. *)
+  let check =
+    if not debug
+    then fun _ t -> t
+    else fun msg t ->
+      (* Checks that an octagon is properly registered in [t.relations]. This is
+         mandatory for the soundness of the domain. On the other hand, two
+         variables can be related in [t.relations] without an actual octagon
+         between them. *)
+      let check_octagon pair _ =
+        let x, y = Pair.get pair in
+        try VariableSet.mem x (Relations.find y t.relations)
+            && VariableSet.mem y (Relations.find x t.relations)
+        with Not_found -> false
+      in
+      if Octagons.for_all check_octagon t.octagons
+      then t
+      else
+        Value_parameters.abort
+          "Incorrect octagons state computed by function %s:@ %a"
+          msg pretty_debug t
 
   (* ------------------------------ Lattice --------------------------------- *)
 
@@ -755,9 +792,12 @@ module State = struct
       then Relations.union t1.relations t2.relations
       else Relations.inter t1.relations t2.relations
     in
-    { octagons; relations;
-      intervals = Intervals.join t1.intervals t2.intervals;
-      modified = Zone.join t1.modified t2.modified; }
+    let state =
+      { octagons; relations;
+        intervals = Intervals.join t1.intervals t2.intervals;
+        modified = Zone.join t1.modified t2.modified; }
+    in
+    check "join" state
 
   let widen _kf _hints t1 t2 =
     let octagons =
@@ -788,9 +828,12 @@ module State = struct
       then Relations.union t1.relations t2.relations
       else Relations.inter t1.relations t2.relations
     in
-    { octagons; relations;
-      intervals = Intervals.widen t1.intervals t2.intervals;
-      modified = Zone.join t1.modified t2.modified; }
+    let state =
+      { octagons; relations;
+        intervals = Intervals.widen t1.intervals t2.intervals;
+        modified = Zone.join t1.modified t2.modified; }
+    in
+    check "widen" state
 
   let narrow t1 t2 =
     Octagons.narrow t1.octagons t2.octagons >>- fun octagons ->
@@ -1087,7 +1130,7 @@ module Domain = struct
           end
         | _ -> state
       in
-      try `Value (Valuation.fold aux valuation state)
+      try `Value (check "update" (Valuation.fold aux valuation state))
       with EBottom -> `Bottom
 
     let assign_interval varinfo assigned state =
@@ -1124,10 +1167,13 @@ module Domain = struct
       (* On the assignment X = E; if X-E can be rewritten as ±(X±Y-v),
          then the octagonal constraint [X±Y ∈ v] holds. *)
       let octagons = Rewriting.rewrite_binop evaluate left_expr Sub expr in
-      List.fold_left
-        (fun acc (_sign, octagon) ->
-           acc >>- fun state -> State.add_octagon state octagon)
-        (`Value state) octagons
+      let state =
+        List.fold_left
+          (fun acc (_sign, octagon) ->
+             acc >>- fun state -> State.add_octagon state octagon)
+          (`Value state) octagons
+      in
+      state >>-: check "precise assign"
 
     let assign _kinstr left_value expr assigned valuation state =
       update valuation state >>- fun state ->
@@ -1140,7 +1186,7 @@ module Domain = struct
           Locations.(enumerate_valid_bits Write written_loc)
         in
         let state = kill written_zone state in
-        `Value state
+        `Value (check "imprecise assign" state)
 
     let assume _stmt _exp _bool = update
 
@@ -1156,14 +1202,16 @@ module Domain = struct
   let logic_assign _logic_assign location ~pre:_ state =
     let loc = Precise_locs.imprecise_location location in
     let zone = Locations.(enumerate_valid_bits Write loc) in
-    kill zone state
+    let state = kill zone state in
+    check "logic_assign" state
 
   let evaluate_predicate _env _state _pred = Alarmset.Unknown
   let reduce_by_predicate _env state _pred _positive = `Value state
 
   let enter_scope _kf _varinfos state = state
   let leave_scope _kf varinfos state =
-    List.fold_left State.remove state varinfos
+    let state = List.fold_left State.remove state varinfos in
+    check "leave_scope" state
 
   let enter_loop _stmt state = state
   let incr_loop_counter _stmt state = state
