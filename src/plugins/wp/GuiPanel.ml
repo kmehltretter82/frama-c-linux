@@ -97,6 +97,7 @@ class model_selector (main : Design.main_window_extension_points) =
   let r_typed  = memory#add_radio ~label:"Typed Memory Model" ~value:TYPED () in
   let c_casts  = new Widget.checkbox ~label:"Unsafe casts" () in
   let c_byref  = new Widget.checkbox ~label:"Reference Arguments" () in
+  let c_ctxt   = new Widget.checkbox ~label:"Context Arguments (Caveat)" () in
   let c_cint   = new Widget.checkbox ~label:"Machine Integers" () in
   let c_cfloat = new Widget.checkbox ~label:"Floating Points" () in
   let m_label  = new Widget.label ~style:`Title () in
@@ -108,6 +109,7 @@ class model_selector (main : Design.main_window_extension_points) =
         dialog#add_row r_typed#coerce ;
         dialog#add_row c_casts#coerce ;
         dialog#add_row c_byref#coerce ;
+        dialog#add_row c_ctxt#coerce ;
         dialog#add_row c_cint#coerce ;
         dialog#add_row c_cfloat#coerce ;
         dialog#add_row m_label#coerce ;
@@ -117,6 +119,7 @@ class model_selector (main : Design.main_window_extension_points) =
         memory#on_event self#connect ;
         c_casts#on_event self#connect ;
         c_byref#on_event self#connect ;
+        c_ctxt#on_event self#connect ;
         c_cint#on_event self#connect ;
         c_cfloat#on_event self#connect ;
         dialog#on_value `APPLY self#update ;
@@ -131,6 +134,7 @@ class model_selector (main : Design.main_window_extension_points) =
          | Hoare -> memory#set HOARE
          | Typed m -> memory#set TYPED ; c_casts#set (m = MemTyped.Unsafe)) ;
         c_byref#set (s.mvar = Ref) ;
+        c_ctxt#set (s.mvar = Caveat) ;
         c_cint#set (s.cint = Cint.Machine) ;
         c_cfloat#set (s.cfloat = Cfloat.Float) ;
       end
@@ -143,12 +147,16 @@ class model_selector (main : Design.main_window_extension_points) =
                      (if c_casts#get then MemTyped.Unsafe else MemTyped.Fits)
       in {
         mheap = m ;
-        mvar = if c_byref#get then Ref else Var ;
+        mvar = if c_ctxt#get then Caveat else if c_byref#get then Ref else Var ;
         cint = if c_cint#get then Cint.Machine else Cint.Natural ;
         cfloat = if c_cfloat#get then Cfloat.Float else Cfloat.Real ;
       }
 
-    method connect () = m_label#set_text (Factory.descr self#get)
+    method connect () =
+      begin
+        m_label#set_text (Factory.descr self#get) ;
+        c_byref#set_enabled (not c_ctxt#get) ;
+      end
 
     method run =
       begin
