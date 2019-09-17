@@ -277,7 +277,7 @@ sig
 
   (** {2 Model Definition} *)
 
-  val configure : Model.tuning
+  val configure : WpContext.tuning
   (** Initializers to be run before using the model.
       Typically sets {!Context} values. *)
 

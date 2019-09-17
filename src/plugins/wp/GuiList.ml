@@ -143,7 +143,7 @@ class pane (enabled:GuiConfig.enabled) =
         let render w =
           [`TEXT (Pretty_utils.to_string Wpo.pp_title w)] in
         ignore (list#add_column_text ~title:"Goal" [] render) ;
-        let render w = [`TEXT (Wpo.get_model_name w)] in
+        let render w = [`TEXT (Wpo.get_model w |> WpContext.MODEL.descr)] in
         ignore (list#add_column_text ~title:"Model" [] render) ;
         List.iter
           self#create_prover

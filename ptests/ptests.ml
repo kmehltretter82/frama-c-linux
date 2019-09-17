@@ -291,8 +291,8 @@ let rec argspec =
   " Start the tests in Frama-C's gui.";
   "-update", Arg.Unit (fun () -> behavior := Update) ,
   " Take the current logs as oracles.";
-  "-show", Arg.Unit (fun () -> behavior := Show; use_byte := true) ,
-  " Show the results of the tests. Sets -byte.";
+  "-show", Arg.Unit (fun () -> behavior := Show) ,
+  " Show the results of the tests.";
   "-run", Arg.Unit (fun () -> behavior := Run) ,
   " (default) Delete logs, run tests, then examine logs different from \
   oracles.";
@@ -592,7 +592,7 @@ type config =
       (** full path of the default toplevel. *)
       dc_filter     : string option; (** optional filter to apply to
                               standard output *)
-      dc_toplevels    : (string * string * string list) list;
+      dc_toplevels    : (string * string * string list * Macros.t) list;
       (** toplevel full path, options to launch the toplevel on, and list
        of output files to monitor beyond stdout and stderr. *)
       dc_dont_run   : bool;
@@ -612,7 +612,7 @@ let default_config () =
     dc_execnow = [];
     dc_filter = None ;
     dc_default_toplevel = !toplevel_path;
-    dc_toplevels = [ !toplevel_path, default_options, [] ];
+    dc_toplevels = [ !toplevel_path, default_options, [], Macros.empty ];
     dc_dont_run = false;
     dc_default_log = []
   }
@@ -674,7 +674,7 @@ let scan_execnow ~once dir (s:string) =
 (* the default toplevel for the current level of options. *)
 let current_default_toplevel = ref !toplevel_path
 let current_default_log = ref []
-let current_default_cmds = ref [!toplevel_path,default_options,[] ]
+let current_default_cmds = ref [!toplevel_path,default_options,[], Macros.empty]
 
 let make_custom_opts =
   let space = Str.regexp " " in
@@ -742,7 +742,7 @@ let config_options =
 
     "OPT",
     (fun _ s current ->
-       let t = current.dc_default_toplevel, s, current.dc_default_log in
+       let t = current.dc_default_toplevel, s, current.dc_default_log, current.dc_macros in
        { current with
 (*           dc_default_toplevel = !current_default_toplevel;*)
            dc_default_log = !current_default_log;
@@ -752,7 +752,7 @@ let config_options =
     (fun _ s current ->
        let new_top =
          List.map
-           (fun (cmd,opts, log) -> cmd, make_custom_opts opts s, log)
+           (fun (cmd,opts, log, macros) -> cmd, make_custom_opts opts s, log, current.dc_macros)
            !current_default_cmds
        in
        { current with dc_toplevels = new_top @ current.dc_toplevels;
@@ -1610,17 +1610,17 @@ let dispatcher () =
       let i = ref 0 in
       let e = ref 0 in
       let nb_files = List.length config.dc_toplevels in
-      let make_toplevel_cmd (toplevel, options, log_files) =
+      let make_toplevel_cmd (toplevel, options, log_files, macros) =
         let n = !i in
         {file; options; toplevel; nb_files; directory; n; log_files;
-         filter = config.dc_filter; macros = config.dc_macros;
+         filter = config.dc_filter; macros;
          execnow=false;
         }
       in
-      let process_macros_cmd s =
-        basic_command_string
-          { file = file;
-	    nb_files = nb_files;
+      let mk_cmd s =
+          {
+            file = file;
+            nb_files = nb_files;
             log_files = [];
             options = "";
             toplevel = s;
@@ -1628,9 +1628,12 @@ let dispatcher () =
             directory = directory;
             filter = config.dc_filter;
             macros = config.dc_macros;
-            execnow = true; }
+            execnow = true;
+          }
       in
-      let process_macros s = Macros.expand config.dc_macros s in
+      let process_macros_cmd s = basic_command_string (mk_cmd s) in
+      let macros = get_macros (mk_cmd "/bin/true") in
+      let process_macros s = Macros.expand macros s in
       let make_execnow_cmd execnow =
         let res =
           {

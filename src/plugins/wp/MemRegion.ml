@@ -103,7 +103,7 @@ type index_builtin = {
   consistent : (F.term list -> F.pred) ;
 }
 
-module IndexBuiltin = Model.Static
+module IndexBuiltin = WpContext.Static
     (struct
       type key = Lang.lfun
       type data = index_builtin
@@ -263,7 +263,7 @@ struct
 end
 
 (* Model Independant Generators *)
-module FIELD_GEN = Model.StaticGenerator(FIELD)
+module FIELD_GEN = WpContext.StaticGenerator(FIELD)
     (struct
       type key = FIELD.t
       type data = cluster -> Lang.lfun
@@ -280,7 +280,7 @@ module FIELD_GEN = Model.StaticGenerator(FIELD)
     end)
 
 (* Model Dependent Definitions *)
-module FIELD_MODEL = Model.Generator(FIELD)
+module FIELD_MODEL = WpContext.Generator(FIELD)
     (struct
       type key = FIELD.t
       type data = Lang.lfun
@@ -392,7 +392,7 @@ struct
 
 end
 
-module ARRAY_GEN = Model.StaticGenerator(ARRAY)
+module ARRAY_GEN = WpContext.StaticGenerator(ARRAY)
     (struct
       type key = ARRAY.t
       type data = (cluster -> Lang.lfun)
@@ -410,7 +410,7 @@ module ARRAY_GEN = Model.StaticGenerator(ARRAY)
           ~consistent:(ARRAY.builtin_consistent ns)
     end)
 
-module ARRAY_MODEL = Model.Generator(ARRAY)
+module ARRAY_MODEL = WpContext.Generator(ARRAY)
     (struct
       type key = ARRAY.t
       type data = Lang.lfun
@@ -444,7 +444,12 @@ let error msg = Warning.error ~source:"Region Model" msg
 (* --- Region Maps                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-let map () = RegionAnalysis.get (Model.get_scope ())
+let map () =
+  RegionAnalysis.get
+    begin match WpContext.get_scope () with
+      | WpContext.Global -> None
+      | WpContext.Kf kf -> Some kf
+    end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Locations                                                          --- *)

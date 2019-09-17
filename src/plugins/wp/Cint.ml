@@ -94,11 +94,18 @@ let f_land = Lang.extern_f ~library ~result ~category:(Operator op_land) ~balanc
 let f_lxor = Lang.extern_f ~library ~result ~category:(Operator op_lxor) ~balance "lxor"
 let f_lsl = Lang.extern_f ~library ~result "lsl"
 let f_lsr = Lang.extern_f ~library ~result "lsr"
-let f_bit = Lang.extern_p ~library ~bool:"bit_testb" ~prop:"bit_test" ()
 
 let f_bitwised = [ f_lnot ; f_lor ; f_land ; f_lxor ; f_lsl ; f_lsr ]
 
-let () = let open LogicBuiltins in add_builtin "\\bit_test" [Z;Z] f_bit
+(* [f_bit_stdlib] is related to the function [bit_test] of Frama-C StdLib *)
+let f_bit_stdlib   = Lang.extern_p ~library ~bool:"bit_testb" ~prop:"bit_test" ()
+(* [f_bit_positive] is actually exported in forgoting the fact the position is positive *)
+let f_bit_positive = Lang.extern_p ~library ~bool:"bit_testb" ~prop:"bit_test" ()
+(* At export, some constructs such as [e & (1 << k)] are written into [f_bit_export] construct *)
+let f_bit_export   = Lang.extern_p ~library ~bool:"bit_testb" ~prop:"bit_test" ()
+
+let () = let open LogicBuiltins in add_builtin "\\bit_test_stdlib" [Z;Z] f_bit_stdlib
+let () = let open LogicBuiltins in add_builtin "\\bit_test" [Z;Z] f_bit_positive
 
 (* -------------------------------------------------------------------------- *)
 (* --- Matching utilities for simplifications                             --- *)
@@ -213,6 +220,10 @@ let match_list_head match_f = function
   | [] -> raise Not_found
   | e::es -> (match_f e), es
 
+let match_binop_one_arg1 binop e = match F.repr e with
+  | Logic.Fun( f , [one; e2] ) when Fun.equal f binop && one == e_one -> e2
+  | _ -> raise Not_found
+
 let match_list_extraction match_f =
   let match_f_opt n = try Some (match_f n) with Not_found -> None in
   let rec aux rs = function
@@ -232,6 +243,8 @@ let match_positive_or_null_integer_arg2 =
 let match_integer_extraction = match_list_head match_integer
 
 let match_power2_extraction = match_list_extraction match_power2
+let match_binop_one_extraction binop = match_list_extraction (match_binop_one_arg1 binop)
+
 
 (* -------------------------------------------------------------------------- *)
 (* --- Conversion Symbols                                                 --- *)
@@ -465,7 +478,17 @@ let smp2 f zf = (* f(c1,c2) ~> zf(c1,c2),  f(c1,c2,...) ~> f(zf(c1,c2),...) *)
     end
   | _ -> raise Not_found
 
-let bitk_positive k e = e_fun f_bit [e;k]
+let bitk_positive k e = F.e_fun f_bit_positive [e;k]
+let smp_mk_bit_stdlib = function
+  | [ a ; k ] when is_positive_or_null k ->
+      (* No need to expand the logic definition of the ACSL stdlib symbol when
+         [k] is positive (the definition must comply with that simplification). *)
+      bitk_positive k a
+  | [ a ; k ] ->
+      (* TODO: expand the current logic definition of the ACSL stdlib symbol *)
+      F.e_neq F.e_zero (F.e_fun f_land [a; (F.e_fun f_lsl [F.e_one;k])])
+  | _ -> raise Not_found
+
 let smp_bitk_positive = function
   | [ a ; k ] -> (* requires k>=0 *)
       begin
@@ -738,6 +761,15 @@ let smp_leq_with_lsr a0 b0 =
     else
       smp_cmp_with_lsr e_leq a0 b0
 
+(* Rewritting at export *)
+let export_eq_with_land a b =
+  let es = match_fun f_land a in
+  if b == e_zero then
+    let k,_,es = match_binop_one_extraction f_lsl es in
+    (* e1 & ... & en & (1 << k) = 0   <==> !bit_test(e1 & ... & en, k) *)
+    e_not (e_fun f_bit_export [e_fun f_land es ; k ])
+  else raise Not_found
+
 (* ACSL Semantics *)
 type l_builtin = {
   f: lfun ;
@@ -753,7 +785,10 @@ let () =
         begin
           let mk_builtin n f ?eq ?leq smp = n, { f ; eq; leq; smp } in
 
-          let bi_lbit = mk_builtin "f_bit" f_bit smp_bitk_positive in
+          (* From [smp_mk_bit_stdlib], the built-in [f_bit_stdlib] is such that there is
+             no creation of [e_fun f_bit_stdlib args] *)
+          let bi_lbit_stdlib = mk_builtin "f_bit_stdlib" f_bit_stdlib smp_mk_bit_stdlib in
+          let bi_lbit = mk_builtin "f_bit" f_bit_positive smp_bitk_positive in
           let bi_lnot = mk_builtin "f_lnot" f_lnot ~eq:smp_eq_with_lnot
               (smp1 Integer.lognot) in
           let bi_lxor = mk_builtin "f_lxor" f_lxor ~eq:smp_eq_with_lxor
@@ -777,8 +812,9 @@ let () =
                | None -> ()
                | Some leq -> F.set_builtin_leq f leq)
             end
-            [bi_lbit; bi_lnot; bi_lxor; bi_lor; bi_land; bi_lsl; bi_lsr]
+            [bi_lbit_stdlib ; bi_lbit; bi_lnot; bi_lxor; bi_lor; bi_land; bi_lsl; bi_lsr];
 
+          Lang.For_export.set_builtin_eq f_land export_eq_with_land
         end
     end
 
@@ -826,7 +862,10 @@ module Dom = struct
     Tmap.iter (fun k v ->
         Format.fprintf fmt "%a: %a,@ " Lang.F.pp_term k Ival.pretty v)
       dom
-  [@@@ warning "+32"]
+
+  let find t dom = Tmap.find t dom
+
+  let get t dom = try find t dom with Not_found -> Ival.top
 
   let narrow t v dom =
     if Ival.is_bottom v then raise Lang.Contradiction

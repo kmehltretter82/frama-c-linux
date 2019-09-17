@@ -108,6 +108,28 @@ let filter_map' f filter l=
     | [] -> []
     | x::tl -> let x' = f x in if filter x' then x' :: aux tl else aux tl
   in aux l
+let rec filter_map_opt f = function
+  | [] -> []
+  | x::tl ->
+    match f x with
+    | None -> filter_map_opt f tl
+    | Some x' -> x' :: filter_map_opt  f tl
+
+let rec fold_map f acc = function
+  | [] -> acc, []
+  | x::tl ->
+    let (acc,x) = f acc x in
+    let (acc,tl) = fold_map f acc tl in
+    (acc,x::tl)
+
+let rec fold_map_opt f acc = function
+  | [] -> acc, []
+  | x::tl ->
+    match f acc x with
+    | acc, None -> fold_map_opt f acc tl
+    | acc, Some x ->
+      let (acc,tl) = fold_map_opt f acc tl in
+      (acc,x::tl)
 
 let product_fold f acc e1 e2 =
   List.fold_left

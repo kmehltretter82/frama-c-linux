@@ -5,7 +5,7 @@
 [wp] Warning: Missing RTE guards
 [wp] 2 goals scheduled
 ---------------------------------------------
---- Model 'typed' Cluster 'S2_A' 
+--- Context 'typed_myMain' Cluster 'S2_A' 
 ---------------------------------------------
 theory S2_A
   (* use why3.BuiltIn.BuiltIn *)
@@ -32,7 +32,7 @@ theory S2_A
   predicate EqS2_A (s:S2_A) (s1:S2_A) = F2_A_dummy s1 = F2_A_dummy s
 end
 ---------------------------------------------
---- Model 'typed' Cluster 'Compound' 
+--- Context 'typed_myMain' Cluster 'Compound' 
 ---------------------------------------------
 theory Compound
   (* use why3.BuiltIn.BuiltIn *)

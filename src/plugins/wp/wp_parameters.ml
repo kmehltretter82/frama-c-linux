@@ -220,6 +220,13 @@ module InHeap =
     end)
 
 let () = Parameter_customize.set_group wp_model
+module AliasInit =
+  False(struct
+    let option_name = "-wp-alias-init"
+    let help = "Use initializers for aliasing propagation."
+  end)
+
+let () = Parameter_customize.set_group wp_model
 module InCtxt =
   String_set
     (struct
@@ -233,13 +240,6 @@ module ExternArrays =
   False(struct
     let option_name = "-wp-extern-arrays"
     let help = "Put some default size for extern arrays."
-  end)
-
-let () = Parameter_customize.set_group wp_model
-module ExtEqual =
-  False(struct
-    let option_name = "-wp-extensional"
-    let help = "Use extensional equality on compounds (hypotheses only)."
   end)
 
 let () = Parameter_customize.set_group wp_model
@@ -350,15 +350,9 @@ let wp_strategy = add_group "Computation Strategies"
 
 let () = Parameter_customize.set_group wp_strategy
 module Init =
-  False(struct
+  True(struct
     let option_name = "-wp-init-const"
     let help = "Use initializers for global const variables."
-  end)
-
-module InitAlias =
-  False(struct
-    let option_name = "-wp-init-alias"
-    let help = "Use initializers for aliasing propagation."
   end)
 
 let () = Parameter_customize.set_group wp_strategy
@@ -469,10 +463,17 @@ module Reduce =
   end)
 
 let () = Parameter_customize.set_group wp_simplifier
+module ExtEqual =
+  True(struct
+    let option_name = "-wp-extensional"
+    let help = "Use extensional equality on compounds (hypotheses only)."
+  end)
+
+let () = Parameter_customize.set_group wp_simplifier
 module Filter =
   True(struct
     let option_name = "-wp-filter"
-    let help = "Use variable filtering."
+    let help = "Filter non-used variables and related hypotheses."
   end)
 
 let () = Parameter_customize.set_group wp_simplifier
@@ -540,14 +541,6 @@ module BoundForallUnfolding =
     let default = 1000
   end)
 
-let () = Parameter_customize.set_group wp_simplifier
-module QedChecks =
-  String_set(struct
-    let option_name = "-wp-qed-checks"
-    let arg_name = "qed-key,..."
-    let help = "Check internal simplifications."
-  end)
-
 (* ------------------------------------------------------------------------ *)
 (* ---  Prover Interface                                                --- *)
 (* ------------------------------------------------------------------------ *)
@@ -566,13 +559,30 @@ module Provers = String_list
          - 'tip' (failed scripts only)\n\
          - 'alt-ergo' (default)\n\
          - 'altgr-ergo' (gui)\n\
-         - 'coq', 'coqide' (see also -wp-script)\n\
+         - 'coq', 'coqide' (see also -wp-coq-script)\n\
          - 'why3:<dp>' or '<dp>' (why3 prover, see -wp-detect)\n\
          - 'native:alt-ergo'\n\
-         - 'native:altgr-ergo'\n\
          - 'native:coq'\n\
-         - 'native:coqide'\n\
-         - 'why3ide' (why3 gui)"
+         - 'native:coqide'\
+        "
+    end)
+
+let () = Parameter_customize.set_group wp_prover
+module Cache = String
+    (struct
+      let option_name = "-wp-cache"
+      let arg_name = "mode"
+      let default = ""
+      let help =
+        "WP cache mode:\n\
+         - 'none': no cache, run provers (default)\n\
+         - 'update': use cache or run provers and update cache\n\
+         - 'cleanup': update mode with garbage collection\n\
+         - 'replay': update mode with no cache update\n\
+         - 'rebuild': always run provers and update cache\n\
+         - 'offline': use cache but never run provers\n\
+         This option is overriden by environment variable FRAMAC_WP_CACHE.\
+        "
     end)
 
 let () = Parameter_customize.set_group wp_prover
@@ -599,15 +609,6 @@ module Drivers =
       let arg_name = "file,..."
       let help = "Load drivers for linking to external libraries"
     end)
-
-let () = Parameter_customize.set_group wp_prover
-module Depth =
-  Int(struct
-    let option_name = "-wp-depth"
-    let default = 0
-    let arg_name = "p"
-    let help = "Set depth of exploration for provers."
-  end)
 
 let () = Parameter_customize.set_group wp_prover
 module Steps =
@@ -686,8 +687,7 @@ module Auto = String_list
       let arg_name = "s"
       let help =
         "Activate auto-search with strategy <s>.\n\
-         Implies -wp-prover 'tip'.\n\
-         Use '-wp-prover ?' for listing strategies."
+         Use '-wp-auto <?>' for available strategies."
     end)
 
 let () = Parameter_customize.set_group wp_prover
@@ -726,7 +726,7 @@ module BackTrack = Int
 let () = Parameter_customize.set_group wp_prover_options
 module Script =
   String(struct
-    let option_name = "-wp-script"
+    let option_name = "-wp-coq-script"
     let arg_name = "f.script"
     let default = ""
     let help = "Set user's file for Coq proofs."
@@ -735,7 +735,7 @@ module Script =
 let () = Parameter_customize.set_group wp_prover_options
 module UpdateScript =
   True(struct
-    let option_name = "-wp-update-script"
+    let option_name = "-wp-update-coq-script"
     let help = "If turned off, do not save or modify user's proofs."
   end)
 
@@ -789,7 +789,7 @@ let () = Parameter_customize.set_group wp_prover_options
 module CoqTactic =
   String
     (struct
-      let option_name = "-wp-tactic"
+      let option_name = "-wp-coq-tactic"
       let arg_name = "proof"
       let default = "auto with zarith"
       let help = "Default tactic for Coq"
@@ -799,7 +799,7 @@ let () = Parameter_customize.set_group wp_prover_options
 module TryHints =
   False
     (struct
-      let option_name = "-wp-tryhints"
+      let option_name = "-wp-coq-tryhints"
       let help = "Try scripts from other goals (see also -wp-hints)"
     end)
 
@@ -807,7 +807,7 @@ let () = Parameter_customize.set_group wp_prover_options
 module Hints =
   Int
     (struct
-      let option_name = "-wp-hints"
+      let option_name = "-wp-coq-hints"
       let arg_name = "n"
       let default = 3
       let help = "Maximum number of proposed Coq scripts (default 3)"
@@ -1083,7 +1083,6 @@ let base_output () =
       Fc_Filepath.add_symbolic_dir "WPOUT" output ;
       output
   | Some output -> output
-
 
 let get_session () = Session.dir ~error:false ()
 

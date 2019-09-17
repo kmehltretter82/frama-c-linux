@@ -41,7 +41,8 @@
     assigns \result, __fc_stdin->__fc_FILE_data, *param2, *param1,
             *(param0 + (0 ..));
     assigns \result
-      \from (indirect: __fc_stdin->__fc_FILE_id), __fc_stdin->__fc_FILE_data,
+      \from (indirect: __fc_stdin->__fc_FILE_id),
+            (indirect: __fc_stdin->__fc_FILE_data),
             (indirect: *(format + (0 ..)));
     assigns __fc_stdin->__fc_FILE_data
       \from (indirect: __fc_stdin->__fc_FILE_id), __fc_stdin->__fc_FILE_data,

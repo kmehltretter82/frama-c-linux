@@ -1,4 +1,4 @@
-# frama-c -wp -wp-timeout 45 -wp-steps 300 [...]
+# frama-c -wp -wp-steps 300 [...]
 [kernel] Parsing tests/wp_typed/user_init.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Loading driver 'share/wp.driver'

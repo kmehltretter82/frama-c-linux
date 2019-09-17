@@ -127,7 +127,7 @@ type addr_builtin = {
   offset: term list -> term ;
 }
 
-module ADDR_BUILTIN = Model.Static
+module ADDR_BUILTIN = WpContext.Static
     (struct
       type key = lfun
       type data = addr_builtin

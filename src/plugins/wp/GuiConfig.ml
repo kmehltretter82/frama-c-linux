@@ -62,7 +62,7 @@ class enabled key =
         let cmdline = Wp_parameters.Provers.get () in
         let selection = List.fold_left
             (fun acc e ->
-               match VCS.Why3_prover.find_opt e with
+               match Why3Provers.find_opt e with
                | None-> acc
                | Some p -> Why3.Whyconf.Sprover.add p acc)
             settings cmdline
@@ -97,7 +97,7 @@ class dp_chooser
       Why3.Whyconf.Mprover.find dp selected
 
     method private entry dp =
-      let text = VCS.Why3_prover.title dp in
+      let text = Why3Provers.title dp in
       let sw = new Widget.switch () in
       let lb = new Widget.label ~align:`Left ~text () in
       sw#set (self#lookup dp) ;
@@ -119,7 +119,7 @@ class dp_chooser
 
     method private detect () =
       begin
-        self#configure (VCS.Why3_prover.provers_set ());
+        self#configure (Why3Provers.provers_set ());
       end
 
     method private apply () =
@@ -131,7 +131,7 @@ class dp_chooser
            selected)
 
     method run () =
-      let dps = VCS.Why3_prover.provers_set () in
+      let dps = Why3Provers.provers_set () in
       let sel = enabled#get in
       selected <- Why3.Whyconf.Mprover.merge
           (fun _ avail enab ->
@@ -163,16 +163,16 @@ type mprover =
   | NONE
   | ERGO
   | COQ
-  | WHY of VCS.Why3_prover.t
+  | WHY of Why3Provers.t
 
 class dp_button () =
   let render = function
     | NONE -> "(none)"
     | ERGO -> "Alt-Ergo (native)"
     | COQ -> "Coq (native)"
-    | WHY p when VCS.Why3_prover.has_shortcut p "alt-ergo" ->
+    | WHY p when Why3Provers.has_shortcut p "alt-ergo" ->
         "Alt-Ergo (why3)"
-    | WHY dp -> VCS.Why3_prover.title dp in
+    | WHY dp -> Why3Provers.title dp in
   let select = function
     | ERGO -> VCS.NativeAltErgo
     | COQ -> VCS.NativeCoq
@@ -186,7 +186,7 @@ class dp_button () =
         | Some (VCS.NativeAltErgo|VCS.Tactical) -> ERGO
         | Some VCS.NativeCoq -> COQ
         | Some (VCS.Why3 p) ->
-            if Why3.Whyconf.Sprover.mem p (VCS.Why3_prover.provers_set ())
+            if Why3.Whyconf.Sprover.mem p (Why3Provers.provers_set ())
             then WHY p
             else import others
   in
@@ -202,7 +202,7 @@ class dp_button () =
     method update () =
       (* called in polling mode *)
       begin
-        let avl = VCS.Why3_prover.provers_set () in
+        let avl = Why3Provers.provers_set () in
         if Why3.Whyconf.Sprover.equal avl dps then
           begin
             dps <- avl ;

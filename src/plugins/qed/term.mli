@@ -56,12 +56,6 @@ module Make
     (** Register a constant in the global state. *)
     val constant : term -> term
 
-    (** {2 Registered Checks} *)
-
-    val check : repr -> term -> term
-    val check_unit : qed:term -> raw:term -> term
-    val iter_checks : (qed:term -> raw:term -> unit) -> unit
-
     (** {2 Context Release} *)
 
     val release : unit -> unit

@@ -247,7 +247,7 @@ let phi_index size = function
   | [p;k] -> e_add (a_offset p) (F.e_fact size k)
   | _ -> raise Not_found
 
-module RegisterShift = Model.Static
+module RegisterShift = WpContext.Static
     (struct
       type key = lfun
       type data = shift
@@ -255,7 +255,7 @@ module RegisterShift = Model.Static
       include Lang.Fun
     end)
 
-module ShiftFieldDef = Model.StaticGenerator(Cil_datatype.Fieldinfo)
+module ShiftFieldDef = WpContext.StaticGenerator(Cil_datatype.Fieldinfo)
     (struct
       let name = "MemTyped.ShiftFieldDef"
       type key = fieldinfo
@@ -282,7 +282,7 @@ module ShiftFieldDef = Model.StaticGenerator(Cil_datatype.Fieldinfo)
       let compile = Lang.local generate
     end)
 
-module ShiftField = Model.Generator(Cil_datatype.Fieldinfo)
+module ShiftField = WpContext.Generator(Cil_datatype.Fieldinfo)
     (struct
       let name = "MemTyped.ShiftField"
       type key = fieldinfo
@@ -303,7 +303,7 @@ end
 
 (* This is a model-independent generator,
    which will be inherited from the model-dependent clusters *)
-module ShiftGen = Model.StaticGenerator(Cobj)
+module ShiftGen = WpContext.StaticGenerator(Cobj)
     (struct
       let name = "MemTyped.ShiftDef"
       type key = c_object
@@ -347,7 +347,7 @@ module ShiftGen = Model.StaticGenerator(Cobj)
     end)
 
 (* The model-dependent derivation of model-independent ShiftDef *)
-module Shift = Model.Generator(Cobj)
+module Shift = WpContext.Generator(Cobj)
     (struct
       let name = "MemTyped.Shift"
       type key = c_object
@@ -376,7 +376,7 @@ module EID = State_builder.Ref(Datatype.Int)
       let default () = 0
     end)
 
-module STRING = Model.Generator(LITERAL)
+module STRING = WpContext.Generator(LITERAL)
     (struct
       let name = "MemTyped.STRING"
       type key = LITERAL.t
@@ -458,7 +458,7 @@ module STRING = Model.Generator(LITERAL)
 (* --- Base Registration                                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
-module RegisterBASE = Model.Static
+module RegisterBASE = WpContext.Index
     (struct
       type key = lfun
       type data = varinfo
@@ -466,7 +466,7 @@ module RegisterBASE = Model.Static
       include Lang.Fun
     end)
 
-module BASE = Model.Generator(Varinfo)
+module BASE = WpContext.Generator(Varinfo)
     (struct
       let name = "MemTyped.BASE"
       type key = varinfo

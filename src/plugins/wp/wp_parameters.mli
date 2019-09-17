@@ -56,9 +56,9 @@ module Model : Parameter_sig.String_list
 module ByValue : Parameter_sig.String_set
 module ByRef : Parameter_sig.String_set
 module InHeap : Parameter_sig.String_set
+module AliasInit: Parameter_sig.Bool
 module InCtxt : Parameter_sig.String_set
 module ExternArrays: Parameter_sig.Bool
-module ExtEqual : Parameter_sig.Bool
 module Literals : Parameter_sig.Bool
 module Volatile : Parameter_sig.Bool
 (* module Overflows : Parameter_sig.Bool *)
@@ -78,7 +78,6 @@ module Region_cluster: Parameter_sig.Bool
 (** {2 Computation Strategies} *)
 
 module Init: Parameter_sig.Bool
-module InitAlias: Parameter_sig.Bool
 module InitWithForall: Parameter_sig.Bool
 module BoundForallUnfolding: Parameter_sig.Int
 module RTE: Parameter_sig.Bool
@@ -93,7 +92,7 @@ module Prenex: Parameter_sig.Bool
 module Bits: Parameter_sig.Bool
 module Ground: Parameter_sig.Bool
 module Reduce: Parameter_sig.Bool
-module QedChecks : Parameter_sig.String_set
+module ExtEqual : Parameter_sig.Bool
 module UnfoldAssigns : Parameter_sig.Bool
 module Split: Parameter_sig.Bool
 module SplitDepth: Parameter_sig.Int
@@ -110,6 +109,7 @@ module PrecondWeakening : Parameter_sig.Bool
 module Detect: Parameter_sig.Bool
 module Generate:Parameter_sig.Bool
 module Provers: Parameter_sig.String_list
+module Cache: Parameter_sig.String
 module Drivers: Parameter_sig.String_list
 module Script: Parameter_sig.String
 module UpdateScript: Parameter_sig.Bool
@@ -120,7 +120,6 @@ module CoqTimeout: Parameter_sig.Int
 module CoqCompiler : Parameter_sig.String
 module CoqIde : Parameter_sig.String
 module CoqProject : Parameter_sig.String
-module Depth: Parameter_sig.Int
 module Steps: Parameter_sig.Int
 module Procs: Parameter_sig.Int
 module ProofTrace: Parameter_sig.Bool

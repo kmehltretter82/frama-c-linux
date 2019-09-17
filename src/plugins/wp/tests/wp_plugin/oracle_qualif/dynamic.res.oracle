@@ -1,4 +1,4 @@
-# frama-c -wp -wp-timeout 45 -wp-steps 1500 [...]
+# frama-c -wp [...]
 [kernel] Parsing tests/wp_plugin/dynamic.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Loading driver 'share/wp.driver'
@@ -63,8 +63,8 @@
 [wp] Report out: 'tests/wp_plugin/result_qualif/dynamic.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
-call                 2      2 (48..60)       4       100%
-guarded_call         4      1 (8..20)        5       100%
+call                 2      2 (40..52)       4       100%
+guarded_call         4      1 (4..16)        5       100%
 behavior             9     -                 9       100%
 some_behaviors      24     -                24       100%
 missing_context      4     -                 5      80.0%

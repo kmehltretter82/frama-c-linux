@@ -34,7 +34,7 @@ __PUSH_FC_STDLIB
 #include "__fc_define_pid_t.h"
 #include "__fc_define_useconds_t.h"
 #include "__fc_define_intptr_t.h"
-#include "__fc_select.h"
+
 
 
 #include "limits.h"
@@ -68,7 +68,7 @@ extern volatile int Frama_C_entropy_source;
 __BEGIN_DECLS
 
 /* Values for the NAME argument to `pathconf' and `fpathconf'.  */
-enum
+enum __fc_pathconf_name
   {
     _PC_LINK_MAX,
 #define	_PC_LINK_MAX			_PC_LINK_MAX
@@ -115,7 +115,7 @@ enum
   };
 
 /* Values for the argument to `sysconf'.  */
-enum
+enum __fc_sysconf_name
   {
     _SC_ARG_MAX,
 #define	_SC_ARG_MAX			_SC_ARG_MAX
@@ -577,7 +577,7 @@ enum
   };
 
 /* Values for the NAME argument to `confstr'.  */
-enum
+enum __fc_confstr_name
   {
     _CS_PATH,			/* The default search path.  */
 #define _CS_PATH		_CS_PATH
@@ -1096,7 +1096,7 @@ extern int          tcsetpgrp(int, pid_t);
 extern int          truncate(const char *, off_t);
 
 extern volatile char __fc_ttyname[TTY_NAME_MAX];
-extern char *__fc_p_ttyname = __fc_ttyname;
+volatile char *__fc_p_ttyname = __fc_ttyname;
 
 /*@
   // missing: may assign to errno: EBADF, ENOTTY
@@ -1187,6 +1187,15 @@ int getresgid(gid_t *rgid, gid_t *egid, gid_t *sgid);
   ensures result_ok_or_error: \result == 0 || \result == -1;
  */
 int setresgid(gid_t rgid, gid_t egid, gid_t sgid);
+
+extern char *optarg;
+extern int optind, opterr, optopt;
+
+/*@
+  assigns \result, *optarg, optind, opterr, optopt
+             \from argc, argv[0..argc-1], optstring[0..];
+ */
+extern int getopt(int argc, char * const argv[], const char *optstring);
 
 
 __END_DECLS

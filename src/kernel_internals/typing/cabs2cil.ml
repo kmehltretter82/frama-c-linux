@@ -613,7 +613,15 @@ let process_pragmas_pack_align_field_attributes fi fattrs cattr =
            Drop existing "aligned" attributes, if there are invalid ones. *)
         if Cil.hasAttribute "packed" cattr then (dropAttribute "aligned" fattrs)
         else begin
-          let align = Integer.(min n (of_int (Cil.bytesSizeOf fi.ftype))) in
+          let sizeof_type =
+            match Cil.unrollType fi.ftype with
+            | TArray (_, None, _, _) ->
+              (* flexible array member: use size of pointer *)
+              Cil.bitsSizeOf theMachine.upointType
+            | _ ->
+              Cil.bytesSizeOf fi.ftype
+          in
+          let align = Integer.(min n (of_int sizeof_type)) in
           Kernel.feedback ~dkey:Kernel.dkey_typing_pragma ~current:true
             "adding aligned(%a) attribute to field '%s.%s' due to packing pragma"
             (Integer.pretty ~hexa:false) align fi.fcomp.cname fi.fname;

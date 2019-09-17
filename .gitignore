@@ -42,9 +42,8 @@ autom4te.cache
 
 #tests
 /tests/ptests_config
-/tests/*/result/
-/tests/*/*/result/
-/tests/*/result_*/
+/tests/**/result/
+/tests/**/result_*/
 /tests/journal/intra.byte
 /tests/misc/my_visitor_plugin/my_visitor.opt
 /tests/misc/my_visitor.sav
@@ -66,6 +65,7 @@ autom4te.cache
 /share/manuals/
 
 #doc
+
 /doc/manuals/
 /doc/*/*.dot
 /doc/*/*.aux
@@ -136,6 +136,8 @@ autom4te.cache
 /doc/pdg/pdg0*.html
 /doc/pdg/pdg00*.png
 /doc/pdg/previous_motif.gif
+
+/doc/server/
 
 #lib
 /lib/fc/

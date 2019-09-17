@@ -29,10 +29,10 @@ Require int.Int.
 Require int.Abs.
 Require int.EuclideanDivision.
 Require int.ComputerDivision.
+Require int.ComputerOfEuclideanDivision.
 Require real.Real.
 Require real.RealInfix.
 Require real.FromInt.
-Require for_drivers.ComputerOfEuclideanDivision.
 
 (* Why3 goal *)
 Definition match_bool {a:Type} {a_WT:WhyType a} : bool -> a -> a -> a.

@@ -411,8 +411,6 @@ if test "$OCAML_OS_TYPE" = "Win32"; then
   PLATFORM=Win32
   OCAMLWIN32=yes
   EXE=.exe
-  # OCaml on Win32 does not support vmthreads, use native ones.
-  HAS_NATIVE_THREADS=yes
 else
   OCAMLWIN32=no
   if test "$OCAML_OS_TYPE" = "Cygwin"; then
@@ -428,24 +426,6 @@ else
       PLATFORM=Unix
     fi
     EXE=
-  fi
-
-  if test "$OCAMLBEST" = opt; then
-    # OCaml native threads
-    AC_MSG_CHECKING([OCaml native threads])
-    echo "let f = Thread.create (fun () -> ())" > test_native_threads.ml
-    if ($OCAMLOPT -thread -o test_native_threads unix.cmxa threads.cmxa \
-         test_native_threads.ml) 2> /dev/null ;
-    then
-      HAS_NATIVE_THREADS=yes
-      AC_MSG_RESULT([ok.]);
-    else
-      HAS_NATIVE_THREADS=no
-      AC_MSG_WARN([unsupported.]);
-    fi
-    rm -f test_native_threads*;
-  else
-    HAS_NATIVE_THREADS=no; # no native compilation anyway
   fi
 fi
 
@@ -980,21 +960,6 @@ configure_library([LABLGTK],
 
 configure_tool([DOT],[dot],[dot not found: you should install GraphViz],no)
 
-# Checking some other things which cannot be done too early
-###########################################################
-
-# Native version of ptests can be used only if
-# - a native compiler exists
-# - native threads are usable
-
-PTESTSBEST=byte
-if test \
-     "$OCAMLBEST" = "opt" -a \
-     "$HAS_NATIVE_THREADS" = "yes"; \
-then
-   PTESTSBEST=opt;
-fi
-
 ########################
 # Plug-in dependencies #
 ########################
@@ -1043,8 +1008,6 @@ AC_SUBST(CC)
 
 AC_SUBST(EXTERNAL_PLUGINS)
 
-AC_SUBST(HAS_NATIVE_THREADS)
-AC_SUBST(PTESTSBEST)
 AC_SUBST(LABLGTK_PATH)
 
 # m4_foreach_w is not supported in some old autoconf versions.

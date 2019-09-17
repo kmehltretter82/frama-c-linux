@@ -1,4 +1,4 @@
-# frama-c -wp -wp-model 'Typed (Ref)' -wp-timeout 45 -wp-steps 1500 [...]
+# frama-c -wp -wp-model 'Typed (Ref)' [...]
 [kernel] Parsing tests/wp_gallery/frama_c_exo3_solved.old.c (with preprocessing)
 [wp] Running WP plugin...
 [wp] Loading driver 'share/wp.driver'

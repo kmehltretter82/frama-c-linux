@@ -163,7 +163,7 @@ struct
     let pretty fmt (r,c) = Format.fprintf fmt "%d:%a" r Compinfo.pretty c
   end
 
-  module COMP = Model.Generator(COMP_KEY)
+  module COMP = WpContext.Generator(COMP_KEY)
       (struct
         let name = M.name ^ ".COMP"
         type key = int * compinfo
@@ -209,7 +209,7 @@ struct
       if r1 = r2 then Matrix.NATURAL.compare m1 m2 else r1-r2
   end
 
-  module ARRAY = Model.Generator(ARRAY_KEY)
+  module ARRAY = WpContext.Generator(ARRAY_KEY)
       (struct
         open Matrix
         let name = M.name ^ ".ARRAY"

@@ -1,0 +1,4 @@
+[
+  { id:"getFunctions", request:"kernel.ast.getFunctions", data:null },
+  { id:"printFunction", request:"kernel.ast.printFunction", data:"f" }
+]

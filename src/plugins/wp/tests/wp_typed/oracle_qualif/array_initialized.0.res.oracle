@@ -1,4 +1,4 @@
-# frama-c -wp -wp-timeout 45 -wp-steps 1500 [...]
+# frama-c -wp [...]
 [kernel] Parsing tests/wp_typed/array_initialized.c (with preprocessing)
 [kernel] tests/wp_typed/array_initialized.c:13: Warning: 
   Too many initializers for array g

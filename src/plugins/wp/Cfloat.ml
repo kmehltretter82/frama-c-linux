@@ -107,7 +107,7 @@ let op_name = function
 (* --- Registry                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-module REGISTRY = Model.Static
+module REGISTRY = WpContext.Static
     (struct
       type key = lfun
       type data = op * c_float

@@ -1,4 +1,4 @@
-# frama-c -wp -wp-timeout 45 -wp-steps 1500 [...]
+# frama-c -wp [...]
 [kernel] Parsing tests/wp_plugin/init_extern.i (no preprocessing)
 [kernel] Parsing tests/wp_plugin/init_linker.i (no preprocessing)
 [wp] Running WP plugin...

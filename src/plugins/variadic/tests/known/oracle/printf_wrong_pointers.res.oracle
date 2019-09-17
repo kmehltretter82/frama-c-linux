@@ -58,7 +58,8 @@
     assigns \result, __fc_stdout->__fc_FILE_data, *param0;
     assigns \result
       \from (indirect: __fc_stdout->__fc_FILE_id),
-            __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..)));
+            (indirect: __fc_stdout->__fc_FILE_data),
+            (indirect: *(format + (0 ..)));
     assigns __fc_stdout->__fc_FILE_data
       \from (indirect: __fc_stdout->__fc_FILE_id),
             __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..)));
@@ -74,7 +75,8 @@ int printf_va_1(char const * __restrict format, int *param0);
     assigns \result, __fc_stdout->__fc_FILE_data, *param0;
     assigns \result
       \from (indirect: __fc_stdout->__fc_FILE_id),
-            __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..)));
+            (indirect: __fc_stdout->__fc_FILE_data),
+            (indirect: *(format + (0 ..)));
     assigns __fc_stdout->__fc_FILE_data
       \from (indirect: __fc_stdout->__fc_FILE_id),
             __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..)));
@@ -90,7 +92,8 @@ int printf_va_2(char const * __restrict format, int *param0);
     assigns \result, __fc_stdout->__fc_FILE_data, *param0;
     assigns \result
       \from (indirect: __fc_stdout->__fc_FILE_id),
-            __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..)));
+            (indirect: __fc_stdout->__fc_FILE_data),
+            (indirect: *(format + (0 ..)));
     assigns __fc_stdout->__fc_FILE_data
       \from (indirect: __fc_stdout->__fc_FILE_id),
             __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..)));
@@ -105,8 +108,8 @@ int printf_va_3(char const * __restrict format, signed char *param0);
     assigns \result, __fc_stdout->__fc_FILE_data;
     assigns \result
       \from (indirect: __fc_stdout->__fc_FILE_id),
-            __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..))),
-            *(param0 + (0 ..));
+            (indirect: __fc_stdout->__fc_FILE_data),
+            (indirect: *(format + (0 ..))), (indirect: *(param0 + (0 ..)));
     assigns __fc_stdout->__fc_FILE_data
       \from (indirect: __fc_stdout->__fc_FILE_id),
             __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..))),
@@ -119,8 +122,8 @@ int printf_va_4(char const * __restrict format, char *param0);
     assigns \result, __fc_stdout->__fc_FILE_data;
     assigns \result
       \from (indirect: __fc_stdout->__fc_FILE_id),
-            __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..))),
-            *(param0 + (0 ..));
+            (indirect: __fc_stdout->__fc_FILE_data),
+            (indirect: *(format + (0 ..))), (indirect: *(param0 + (0 ..)));
     assigns __fc_stdout->__fc_FILE_data
       \from (indirect: __fc_stdout->__fc_FILE_id),
             __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..))),

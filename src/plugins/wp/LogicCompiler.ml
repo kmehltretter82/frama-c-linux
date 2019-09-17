@@ -452,7 +452,7 @@ struct
   (* --- Registering User-Defined Signatures                                --- *)
   (* -------------------------------------------------------------------------- *)
 
-  module Typedefs = Model.Index
+  module Typedefs = WpContext.Index
       (struct
         type key = logic_type_info
         type data = unit
@@ -461,7 +461,7 @@ struct
         let pretty = Logic_type_info.pretty
       end)
 
-  module Signature = Model.Index
+  module Signature = WpContext.Index
       (struct
         type key = logic_info
         type data = signature

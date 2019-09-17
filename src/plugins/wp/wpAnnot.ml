@@ -1294,7 +1294,7 @@ let process_unreached_annots cfg =
 (*----------------------------------------------------------------------------*)
 
 let get_cfg kf model =
-  if Wp_parameters.RTE.get () then WpRTE.generate kf model ;
+  if Wp_parameters.RTE.get () then WpRTE.generate model kf ;
   let cfg = Cil2cfg.get kf in
   let _ = process_unreached_annots cfg in cfg
 

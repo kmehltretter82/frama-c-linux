@@ -59,7 +59,8 @@
     assigns \result, stream->__fc_FILE_data, *param2, *(param1 + (0 ..)),
             *param0;
     assigns \result
-      \from (indirect: stream->__fc_FILE_id), stream->__fc_FILE_data,
+      \from (indirect: stream->__fc_FILE_id),
+            (indirect: stream->__fc_FILE_data),
             (indirect: *(format + (0 ..)));
     assigns stream->__fc_FILE_data
       \from (indirect: stream->__fc_FILE_id), stream->__fc_FILE_data,
@@ -85,7 +86,8 @@ int fscanf_va_1(FILE * __restrict stream, char const * __restrict format,
     assigns \result, __fc_stdin->__fc_FILE_data, *param2, *(param1 + (0 ..)),
             *param0;
     assigns \result
-      \from (indirect: __fc_stdin->__fc_FILE_id), __fc_stdin->__fc_FILE_data,
+      \from (indirect: __fc_stdin->__fc_FILE_id),
+            (indirect: __fc_stdin->__fc_FILE_data),
             (indirect: *(format + (0 ..)));
     assigns __fc_stdin->__fc_FILE_data
       \from (indirect: __fc_stdin->__fc_FILE_id), __fc_stdin->__fc_FILE_data,

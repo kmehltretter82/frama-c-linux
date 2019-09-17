@@ -1,4 +1,4 @@
-# frama-c -wp -wp-model 'Typed (Ref)' -wp-timeout 45 -wp-steps 1500 [...]
+# frama-c -wp -wp-model 'Typed (Ref)' [...]
 [kernel] Parsing tests/wp_typed/user_bitwise.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Loading driver 'share/wp.driver'
@@ -23,10 +23,10 @@
 [wp] Report out: 'tests/wp_typed/result_qualif/user_bitwise.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
-rl1                  1      1 (48..60)       2       100%
-rr1                 -       2 (44..56)       2       100%
-rln32               -       2 (96..120)      2       100%
-rrn32               -       2 (96..120)      2       100%
-rln64               -       2 (96..120)      2       100%
-rrn64               -       2 (96..120)      2       100%
+rl1                  1      1 (52..64)       2       100%
+rr1                 -       2 (52..64)       2       100%
+rln32               -       2 (64..88)       2       100%
+rrn32               -       2 (64..88)       2       100%
+rln64               -       2 (64..88)       2       100%
+rrn64               -       2 (64..88)       2       100%
 -------------------------------------------------------------

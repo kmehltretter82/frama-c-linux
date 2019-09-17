@@ -148,7 +148,7 @@ module Make
       if Base.Hptset.equal expanded_bases bases
       then Base.SetLattice.inject expanded_bases
       else if count <= 0 then Base.SetLattice.top
-      else expand_inputs_with_relations (count - 1) kf new_bases state
+      else expand_inputs_with_relations (count - 1) kf expanded_bases state
 
   let store_computed_call kf input_state args
       (call_result: Domain.t list Bottom.or_bottom) =

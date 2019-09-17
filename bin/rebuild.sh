@@ -5,4 +5,4 @@ autoconf -f
 ./configure
 make clean
 make depend
-make -j
+make -kj

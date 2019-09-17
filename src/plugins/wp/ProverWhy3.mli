@@ -20,40 +20,22 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Task
-open VCS
+val add_specific_equality:
+  for_tau:(Lang.tau -> bool) ->
+  mk_new_eq:Lang.F.binop ->
+  unit
+(** Equality used in the goal, simpler to prove than polymorphic equality *)
 
-(* -------------------------------------------------------------------------- *)
-(* --- Why3 Multi-Theorem Prover                                          --- *)
-(* -------------------------------------------------------------------------- *)
+val prove : ?timeout:int -> ?steplimit:int -> prover:Why3Provers.t ->
+  Wpo.t -> VCS.result Task.task
+(** Return NoResult if it is already proved by Qed *)
 
-type goal =
-  {
-    file : string;
-    theory : string;
-    goal : string;
-  }
+type mode = NoCache | Update | Replay | Rebuild | Offline | Cleanup
+val get_mode : unit -> mode
+val get_hits : unit -> int
+val get_miss : unit -> int
+val get_removed : unit -> int
 
-val assemble_goal: Wpo.t -> (string list (* includes *) * goal) option
-(** None if the po is trivial *)
+val cleanup_cache : mode:mode -> unit
 
-val prove : ?timeout:int -> prover:Why3.Whyconf.prover -> Wpo.t -> result task
-(** The string must be a valid why3 prover identifier
-    Return NoResult if it is already proved by Qed
-*)
-(* -------------------------------------------------------------------------- *)
-(* --- Why3 Multi-Theorem Prover                                          --- *)
-(* -------------------------------------------------------------------------- *)
-
-module Goal :
-sig
-  type t = goal
-  val compare : t -> t -> int
-  val pretty : Format.formatter -> t -> unit
-end
-
-
-val option_file: LogicBuiltins.doption
-val option_import: LogicBuiltins.doption
-
-(* -------------------------------------------------------------------------- *)
+(**************************************************************************)
