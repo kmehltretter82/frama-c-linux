@@ -155,9 +155,13 @@ let generate_code =
               Project.on prepared_prj
                 (fun () ->
                    let dup_prj = Dup_functions.dup () in
+                   let cname = Project.get_name dup_prj ^ " (copy)" in
+                   let copied_prj =
+                     Project.create_by_copy cname ~last:true ~src:dup_prj
+                   in
                    let res =
                      Project.on
-                       dup_prj
+                       copied_prj
                        (fun () ->
                           Gmp_types.init ();
                           Mmodel_analysis.reset ();
