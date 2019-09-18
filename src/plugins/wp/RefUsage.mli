@@ -26,12 +26,13 @@
 
 open Cil_types
 
+(** By lattice order of usage *)
 type access =
-  | NoAccess
-  | ByRef     (* The expression ["*x"], equal to [load(load(&x))] *)
-  | ByArray   (* The expression ["x[_]"], equal to [load(shift(load(&x),_))] *)
-  | ByValue   (* The expression ["x"], equal to [load(&x)] *)
-  | ByAddr    (* The expression ["&x"] *)
+  | NoAccess (** Never used *)
+  | ByRef   (** Only used as ["*x"],   equals to [load(shift(load(&x),0))] *)
+  | ByArray (** Only used as ["x[_]"], equals to [load(shift(load(&x),_))] *)
+  | ByValue (** Only used as ["x"],    equals to [load(&x)] *)
+  | ByAddr  (** Widely used, potentially up to ["&x"] *)
 
 val get : ?kf:kernel_function -> ?init:bool -> varinfo -> access
 

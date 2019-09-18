@@ -32,12 +32,13 @@ open Cil_datatype
 (* --- Varinfo Accesses                                               --- *)
 (* ---------------------------------------------------------------------- *)
 
+(** By lattice order of usage *)
 type access =
-  | NoAccess
-  | ByRef   (* The expr ["*x"],   equals to [load(load(&x))] *)
-  | ByArray (* The expr ["x[_]"], equals to [load(shift(load(&x),_))] *)
-  | ByValue (* The expr ["x"],    equals to [load(&x)] *)
-  | ByAddr  (* The expr ["&x"] *)
+  | NoAccess (** Never used *)
+  | ByRef   (** Only used as ["*x"],   equals to [load(shift(load(&x),0))] *)
+  | ByArray (** Only used as ["x[_]"], equals to [load(shift(load(&x),_))] *)
+  | ByValue (** Only used as ["x"],    equals to [load(&x)] *)
+  | ByAddr  (** Widely used, potentially up to ["&x"] *)
 
 module Access :
 sig
@@ -59,8 +60,8 @@ struct
   let rank = function
     | NoAccess -> 0
     | ByRef -> 1
-    | ByValue -> 2
-    | ByArray -> 3
+    | ByArray -> 2
+    | ByValue -> 3
     | ByAddr -> 4
 
   let cup a b = if rank a < rank b then b else a

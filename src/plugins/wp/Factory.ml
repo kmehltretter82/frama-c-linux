@@ -172,27 +172,33 @@ end
 (* --- RefUsage-based Proxies                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-let is_formal_ptr x =
-  let open Cil_types in
-  x.vformal && Cil.isPointerType x.vtype
+let is_ptr x = Cil.isPointerType x.Cil_types.vtype
+let is_fun_ptr x = Cil.isFunctionType x.Cil_types.vtype
+let is_formal_ptr x = x.Cil_types.vformal && is_ptr x
+let is_init kf x =
+  WpStrategy.is_main_init kf ||
+  Wp_parameters.AliasInit.get () ||
+  ( WpStrategy.isInitConst () && WpStrategy.isGlobalInitConst x )
 
 let refusage_param ~byref ~context x =
   let kf,init = match WpContext.get_scope () with
-    | WpContext.Global -> None,false
-    | WpContext.Kf f ->
-        Some f ,
-        WpStrategy.is_main_init f ||
-        Wp_parameters.AliasInit.get () ||
-        ( WpStrategy.isInitConst () &&
-          WpStrategy.isGlobalInitConst x ) in
+    | WpContext.Global -> None , false
+    | WpContext.Kf kf -> Some kf , is_init kf x in
   match RefUsage.get ?kf ~init x with
   | RefUsage.NoAccess -> MemoryContext.NotUsed
   | RefUsage.ByAddr -> MemoryContext.ByAddr
-  | RefUsage.ByRef when byref -> MemoryContext.ByRef
-  | RefUsage.ByArray when context && is_formal_ptr x -> MemoryContext.InArray
-  | RefUsage.ByValue when context && is_formal_ptr x -> MemoryContext.InContext
-  | RefUsage.ByRef | RefUsage.ByValue -> MemoryContext.ByValue
-  | RefUsage.ByArray -> MemoryContext.ByShift
+  | RefUsage.ByValue ->
+      if context && is_formal_ptr x then MemoryContext.InContext
+      else if is_ptr x && not (is_fun_ptr x) then MemoryContext.ByShift
+      else MemoryContext.ByValue
+  | RefUsage.ByRef ->
+      if byref
+      then MemoryContext.ByRef
+      else MemoryContext.ByValue
+  | RefUsage.ByArray ->
+      if context && is_formal_ptr x
+      then MemoryContext.InArray
+      else MemoryContext.ByShift
 
 let refusage_iter ?kf ~init f = RefUsage.iter ?kf ~init (fun x _usage -> f x)
 
