@@ -190,16 +190,15 @@ let inject_set_or_top_or_bottom = function
 (* Computes [min], [max], [rem] and [modu] from an integer set. *)
 let make_top_from_set s =
   let min = Int_set.min s in
-  let modu =
-    Int_set.fold
-      (fun x acc ->
-         if Int.equal x min
-         then acc
-         else Int.pgcd (Int.sub x min) acc)
-      s
-      Int.zero
+  let rem, modu =
+    if Int_set.cardinal s = 1
+    then Int.zero, min
+    else
+      let modu =
+        Int_set.fold (fun x acc -> Int.pgcd (Int.sub x min) acc) s Int.zero
+      in
+      Int.e_rem min modu, modu
   in
-  let rem = Int.e_rem min modu in
   let max = Some (Int_set.max s) in
   let min = Some min in
   min, max, rem, modu

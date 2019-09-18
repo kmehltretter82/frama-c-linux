@@ -86,8 +86,7 @@ val max_int: t -> Integer.t option
 val min_and_max: t -> Integer.t option * Integer.t option
 
 (** Returns [min, max, rem, modu] such that for all integers [i] represented by
-    the given abstraction, [i] satisfies min ≤ i ≤ max and i ≅ rem [modu].
-    The abstraction must not be a singleton. *)
+    the given abstraction, [i] satisfies min ≤ i ≤ max and i ≅ rem [modu]. *)
 val min_max_rem_modu:
   t -> Integer.t option * Integer.t option * Integer.t * Integer.t
 
