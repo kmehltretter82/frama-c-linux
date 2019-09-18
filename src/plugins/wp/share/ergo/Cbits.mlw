@@ -27,14 +27,12 @@
 (** The theory bool_Bool_ must be appended to this file*)
 (** The theory int_Int_ must be appended to this file*)
 (** The theory int_Abs_ must be appended to this file*)
-(** The theory int_EuclideanDivision_ must be appended to this file*)
 (** The theory int_ComputerDivision_ must be appended to this file*)
 (** The theory real_Real_ must be appended to this file*)
 (** The theory real_RealInfix_ must be appended to this file*)
 (** The theory real_FromInt_ must be appended to this file*)
-(** The theory for_drivers_ComputerOfEuclideanDivision_ must be appended to this file*)
 (** The theory Cint_ must be appended to this file*)
-<<<<<<< HEAD
+
 logic bit_testb : int, int -> bool
 
 logic bit_test : int, int -> prop
@@ -51,8 +49,6 @@ logic lsl : int, int -> int
 
 logic lsr : int, int -> int
 
-||||||| merged common ancestors
-=======
 axiom lnot_bool : (lnot(0) = (-1))
 
 axiom lnot_bool1 : (lnot((-1)) = 0)
@@ -87,7 +83,6 @@ axiom lxor_0 : (forall x:int [lxor(0, x)]. (lxor(0, x) = x))
 
 axiom lxor_0bis : (forall x:int [lxor(x, 0)]. (lxor(x, 0) = x))
 
->>>>>>> origin/master
 axiom bit_test_def :
   (forall x:int. forall k:int [bit_testb(x, k)]. ((bit_testb(x, k) = true) ->
   bit_test(x, k)))
@@ -536,4 +531,3 @@ axiom lor_addition :
 axiom lxor_addition :
   (forall x:int. forall y:int [land(x, y), lxor(x, y)]. ((land(x, y) = 0) ->
   ((x + y) = lxor(x, y))))
-

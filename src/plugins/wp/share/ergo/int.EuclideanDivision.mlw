@@ -1,5 +1,0 @@
-(* this is the prelude for Alt-Ergo, version >= 0.95.2 *)
-(** The theory BuiltIn_ must be appended to this file*)
-(** The theory Bool_ must be appended to this file*)
-(** The theory int_Int_ must be appended to this file*)
-(** The theory int_Abs_ must be appended to this file*)
