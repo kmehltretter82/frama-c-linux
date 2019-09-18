@@ -20,10 +20,15 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Small sets of integers. Above a certain limit fixed by [set_small_cardinal],
-    these sets must be converted into intervals. The functions that make the
-    set grow returns a [set_or_top] type : either the resulting sets is small
-    enough, or it is converted into an interval. *)
+(** Small sets of integers.
+
+    Above a certain limit fixed by [set_small_cardinal], these sets must be
+    converted into intervals. The functions that make the set grow returns a
+    [set_or_top] type : either the resulting sets is small enough, or it is
+    converted into an interval.
+
+    Sets are always non-empty. The functions reducing the sets returns a
+    [set or_bottom] type: either the result is non-empty, or it is `Bottom. *)
 
 open Bottom.Type
 

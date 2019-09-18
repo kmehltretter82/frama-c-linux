@@ -254,30 +254,18 @@ let fold_enum f v acc = fold_int (fun x acc -> f (inject_singleton x) acc) v acc
 
 let min_int = function
   | Itv i -> fst (Int_interval.min_and_max i)
-  | Set s ->
-    if Int_set.cardinal s = 0
-    then raise Error_Bottom
-    else Some (Int_set.min s)
+  | Set s -> Some (Int_set.min s)
 
 let max_int = function
   | Itv i -> snd (Int_interval.min_and_max i)
-  | Set s ->
-    if Int_set.cardinal s = 0
-    then raise Error_Bottom
-    else Some (Int_set.max s)
+  | Set s -> Some (Int_set.max s)
 
 let min_and_max = function
-  | Set s ->
-    let l = Int_set.cardinal s in
-    if l = 0
-    then raise Error_Bottom
-    else Some (Int_set.min s), Some (Int_set.max s)
+  | Set s -> Some (Int_set.min s), Some (Int_set.max s)
   | Itv i -> Int_interval.min_and_max i
 
 let min_max_rem_modu = function
-  | Set s ->
-    assert (Int_set.cardinal s >= 2);
-    make_top_from_set s
+  | Set s -> make_top_from_set s
   | Itv i -> Int_interval.min_max_rem_modu i
 
 exception Not_Singleton
@@ -344,11 +332,12 @@ let diff_if_one value rem =
         | Some mn, Some mx when
             Int.equal (Int.sub mx mn) (Int.mul modu (small_cardinal_Int ()))
             && Int_interval.mem v i ->
-          (* We create a set with an element in excess, but we remove [v]
-             just after, so the resulting set is correct. *)
-          let number = Int.succ (small_cardinal_Int ()) in
-          let set = Int_set.inject_periodic ~from:mn ~period:modu ~number in
-          Int_set.remove set v >>-: inject_set
+          let list =
+            Int_interval.fold_int
+              (fun i acc -> if Int.equal i v then acc else i :: acc)
+              i []
+          in
+          `Value (Set (Int_set.inject_list list))
         | _, _ -> `Value value
     end
   | _ -> `Value value
@@ -362,7 +351,6 @@ let diff value rem =
 let is_included t1 t2 =
   (t1 == t2) ||
   match t1, t2 with
-  | Set s, _ when Int_set.cardinal s = 0 -> true
   | Itv i1, Itv i2 -> Int_interval.is_included i1 i2
   | Itv _, Set _ -> false (* Itv _ represents more elements
                              than can be represented by Set _ *)
@@ -379,25 +367,22 @@ let join v1 v2 =
     match v1,v2 with
     | Itv i1, Itv i2 -> Itv (Int_interval.join i1 i2)
     | Set i1, Set i2 -> inject_set_or_top (Int_set.join i1 i2)
-    | Set s, (Itv i as t)
-    | (Itv i as t), Set s ->
+    | Set s, Itv i
+    | Itv i, Set s ->
       let min, max, r, modu = Int_interval.min_max_rem_modu i in
-      let l = Int_set.cardinal s in
-      if l = 0 then t
-      else
-        let f elt modu = Int.pgcd modu (Int.abs (Int.sub r elt)) in
-        let modu = Int_set.fold f s modu in
-        let rem = Int.e_rem r modu in
-        let min = match min with
-            None -> None
-          | Some m -> Some (Int.min m (Int_set.min s))
-        in
-        let max = match max with
-            None -> None
-          | Some m -> Some (Int.max m (Int_set.max s))
-        in
-        check ~min ~max ~rem ~modu;
-        Itv (Int_interval.make ~min ~max ~rem ~modu)
+      let f elt modu = Int.pgcd modu (Int.abs (Int.sub r elt)) in
+      let modu = Int_set.fold f s modu in
+      let rem = Int.e_rem r modu in
+      let min = match min with
+          None -> None
+        | Some m -> Some (Int.min m (Int_set.min s))
+      in
+      let max = match max with
+          None -> None
+        | Some m -> Some (Int.max m (Int_set.max s))
+      in
+      check ~min ~max ~rem ~modu;
+      Itv (Int_interval.make ~min ~max ~rem ~modu)
 
 let link v1 v2 =
   match v1, v2 with
@@ -458,9 +443,7 @@ let add v1 v2 =
   | Set s1, Set s2 -> inject_set_or_top (Int_set.add s1 s2)
   | Itv i1, Itv i2 -> Itv (Int_interval.add i1 i2)
   | Set s, Itv i | Itv i, Set s ->
-    let l = Int_set.cardinal s in
-    assert (l > 0);
-    if l = 1
+    if Int_set.cardinal s = 1
     then Itv (Int_interval.add_singleton_int (Int_set.min s) i)
     else Itv (Int_interval.add i (make_itv_from_set s))
 
@@ -469,9 +452,7 @@ let add_under v1 v2 =
   | Set s1, Set s2 -> `Value (inject_set_or_top (Int_set.add_under s1 s2))
   | Itv i1, Itv i2 -> Int_interval.add_under i1 i2 >>-: inject_itv
   | Set s, Itv i | Itv i, Set s ->
-    let l = Int_set.cardinal s in
-    assert (l > 0);
-    if l <> 1
+    if Int_set.cardinal s <> 1
     then log_imprecision "Ival.add_int_under";
     (* This is precise if [s] has only one element. Otherwise, this is not worse
        than another computation. *)
@@ -517,9 +498,7 @@ let mul v1 v2 =
     | Set s1, Set s2 -> inject_set_or_top (Int_set.mul s1 s2)
     | Itv i1, Itv i2 -> Itv (Int_interval.mul i1 i2)
     | Set s, Itv i | Itv i, Set s ->
-      let l = Int_set.cardinal s in
-      assert (l > 0);
-      if l = 1
+      if Int_set.cardinal s = 1
       then Itv (Int_interval.scale (Int_set.min s) i)
       else Itv (Int_interval.mul i (make_itv_from_set s))
 

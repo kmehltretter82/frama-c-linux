@@ -33,9 +33,31 @@ let debug_cardinal = false
 let emitter = Lattice_messages.register "Int_set";;
 let log_imprecision s = Lattice_messages.emit_imprecision emitter s
 
+let small_nums = Array.init 33 (fun i -> [| (Integer.of_int i) |])
+
+(* Small sets of integers, implemented as sorted non-empty arrays. *)
 type set = Int.t array
 
-let small_nums = Array.init 33 (fun i -> [| (Integer.of_int i) |])
+(* Redefine functions creating arrays to forbid empty arrays and arrays with
+   more elements than [!small_cardinal]. *)
+module Array = struct
+  include Array
+
+  (* Do not warn on unused functions: all functions creating arrays should be
+     refefined here, even if they are not used yet. *)
+  [@@@ warning "-32"]
+
+  (* This function creates a zero array of the same size as the array [a].
+     No need to check the length as the [a] must already satisfies the
+     invariants. *)
+  let zero_copy a =
+    let l = Array.length a in
+    make l Int.zero, l
+
+  let make n x = assert (n > 0 && n <= !small_cardinal); make n x
+  let init n f = assert (n > 0 && n <= !small_cardinal); init n f
+  let sub a start len = assert (len > 0); sub a start len
+end
 
 let zero = small_nums.(0)
 let one = small_nums.(1)
@@ -48,7 +70,6 @@ let inject_singleton e =
   else [| e |]
 
 let share_array a s =
-  assert (s > 0);
   let e = a.(0) in
   if s = 1 && Int.le Int.zero e && Int.le e Int.thirtytwo
   then small_nums.(Int.to_int e)
@@ -56,12 +77,8 @@ let share_array a s =
   then zero_or_one
   else a
 
-let share_array_or_bottom a s =
-  if s = 0 then `Bottom else `Value (share_array a s)
-
 let inject_periodic ~from ~period ~number =
   let l = Int.to_int number in
-  assert (l > 0);
   let s = Array.make l Int.zero in
   let v = ref from in
   let i = ref 0 in
@@ -78,7 +95,6 @@ module O = FCSet.Make (Integer)
 let inject_list list =
   let o = List.fold_left (fun o r -> O.add r o) O.empty list in
   let cardinal = O.cardinal o in
-  assert (cardinal > 0 && cardinal <= !small_cardinal);
   let a = Array.make cardinal Int.zero in
   let i = ref 0 in
   O.iter (fun e -> a.(!i) <- e; incr i) o;
@@ -138,7 +154,14 @@ include Datatype.Make_with_collections
 
 (* ---------------------------------- Utils --------------------------------- *)
 
-let cardinal = Array.length
+let cardinal =
+  if debug_cardinal
+  then
+    fun s ->
+      let l = Array.length s in
+      assert (l > 0 && l <= !small_cardinal);
+      l
+  else Array.length
 
 let for_all f (a : Integer.t array) =
   let l = Array.length a in
@@ -154,7 +177,6 @@ let fold ?(increasing=true) =
   else Array.fold_right
 
 let truncate_no_bottom r i =
-  assert (i > 0);
   if i = 1
   then inject_singleton r.(0)
   else Array.sub r 0 i
@@ -163,7 +185,6 @@ let truncate_or_bottom r i =
   if i = 0 then `Bottom else `Value (truncate_no_bottom r i)
 
 let map_reduce (f : 'a -> 'b) (g : 'b -> 'b -> 'b) (set : 'a array) : 'b =
-  assert (Array.length set > 0);
   let acc = ref (f set.(0)) in
   for i = 1 to Array.length set - 1 do
     acc := g !acc (f set.(i))
@@ -171,8 +192,7 @@ let map_reduce (f : 'a -> 'b) (g : 'b -> 'b -> 'b) (set : 'a array) : 'b =
   !acc
 
 let filter (f : Int.t -> bool) (a : Int.t array) : t or_bottom =
-  let l = Array.length a in
-  let r = Array.make l Int.zero in
+  let r, l = Array.zero_copy a in
   let j = ref 0 in
   for i = 0 to l  - 1 do
     let x = a.(i) in
@@ -250,7 +270,6 @@ let o_one = O.singleton Int.one
 let o_zero_or_one = O.union o_zero o_one
 
 let share_set o s =
-  assert (s > 0);
   if s = 1
   then begin
     let e = O.min_elt o in
@@ -304,8 +323,7 @@ let set_to_ival_under set =
 (* ------------------------------ Apply and map ----------------------------- *)
 
 let apply_bin_1_strict_incr f x (s : Integer.t array) =
-  let l = Array.length s in
-  let r = Array.make l Int.zero in
+  let r, l = Array.zero_copy s in
   let rec c i =
     if i = l
     then share_array r l
@@ -317,8 +335,7 @@ let apply_bin_1_strict_incr f x (s : Integer.t array) =
   c 0
 
 let apply_bin_1_strict_decr f x (s : Integer.t array) =
-  let l = Array.length s in
-  let r = Array.make l Int.zero in
+  let r, l = Array.zero_copy s in
   let rec c i =
     if i = l
     then share_array r l
@@ -356,9 +373,7 @@ let apply2_notzero f (s1 : Integer.t array) s2 =
        s1)
 
 let map_set_decr f (s : Integer.t array) =
-  let l = Array.length s in
-  assert (l > 0);
-  let r = Array.make l Int.zero in
+  let r, l = Array.zero_copy s in
   let rec c srcindex dstindex last =
     if srcindex < 0
     then begin
@@ -378,8 +393,7 @@ let map_set_decr f (s : Integer.t array) =
   c (l-2) 0 (f s.(pred l))
 
 let map_set_strict_decr f (s : Integer.t array) =
-  let l = Array.length s in
-  let r = Array.make l Int.zero in
+  let r, l = Array.zero_copy s in
   let rec c i =
     if i = l
     then share_array r l
@@ -391,9 +405,7 @@ let map_set_strict_decr f (s : Integer.t array) =
   c 0
 
 let map_set_incr f (s : Integer.t array) =
-  let l = Array.length s in
-  assert (l > 0);
-  let r = Array.make l Int.zero in
+  let r, l = Array.zero_copy s in
   let rec c srcindex dstindex last =
     if srcindex = l
     then begin
@@ -513,13 +525,9 @@ let join l1 s1 l2 s2 =
 
 let join s1 s2 =
   let l1 = Array.length s1 in
-  if l1 = 0
-  then `Set s2
-  else
-    let l2 = Array.length s2 in
-    if l2 = 0
-    then `Set s1
-    else join l1 s1 l2 s2
+  let l2 = Array.length s2 in
+  if debug_cardinal then assert (l1 > 0 && l2 > 0);
+  join l1 s1 l2 s2
 
 let link s1 s2 =
   let s1 = Array.fold_right Int.Set.add s1 Int.Set.empty in
@@ -570,12 +578,12 @@ let remove s v =
   let index = mem v s in
   if index >= 0
   then
-    let l = Array.length s in
-    let pl = pred l in
-    let r = Array.make pl Int.zero in
-    Array.blit s 0 r 0 index;
-    Array.blit s (succ index) r index (pl-index);
-    share_array_or_bottom r pl
+    let l = pred (Array.length s) in
+    if l <= 0 then `Bottom else
+      let r = Array.make l Int.zero in
+      Array.blit s 0 r 0 index;
+      Array.blit s (succ index) r index (l-index);
+      `Value (share_array r l)
   else `Value s
 
 (* ------------------------------ Arithmetics ------------------------------- *)
@@ -636,7 +644,6 @@ let bitwise_signed_not = map_set_strict_decr Int.lognot
 
 let subdivide s =
   let len = Array.length s in
-  assert (len > 0);
   if len <= 1 then raise Can_not_subdiv;
   let m = len lsr 1 in
   let lenhi = len - m in
