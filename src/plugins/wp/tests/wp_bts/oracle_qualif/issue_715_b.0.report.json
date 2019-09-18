@@ -1,0 +1,13 @@
+{ "wp:global": { "qed": { "total": 1, "valid": 1 },
+                 "wp:main": { "total": 2, "valid": 1, "unknown": 1 } },
+  "wp:functions": { "foo": { "dummy_requires_2": { "qed": { "total": 1,
+                                                            "valid": 1 },
+                                                   "wp:main": { "total": 1,
+                                                                "valid": 1 } },
+                             "dummy_requires": { "wp:main": { "total": 1,
+                                                              "unknown": 1 } },
+                             "wp:section": { "qed": { "total": 1,
+                                                      "valid": 1 },
+                                             "wp:main": { "total": 2,
+                                                          "valid": 1,
+                                                          "unknown": 1 } } } } }
