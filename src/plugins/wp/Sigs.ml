@@ -612,12 +612,6 @@ sig
   type nonrec result = M.loc result
   type sigma = M.Sigma.t
 
-  (** {2 Debug} *)
-
-  val pp_logic : Format.formatter -> logic -> unit
-  val pp_sloc : Format.formatter -> loc sloc -> unit
-  val pp_region : Format.formatter -> region -> unit
-
   (** {2 Frames}
 
       Frames are compilation environment for ACSL. A frame typically

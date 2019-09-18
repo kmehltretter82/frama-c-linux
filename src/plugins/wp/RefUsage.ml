@@ -358,7 +358,8 @@ and expr (e:Cil_types.exp) : model = match e.enode with
   | CastE(ty_tgt,e) -> cast (cast_ctyp ty_tgt (Cil.typeOf e)) (expr e)
 
   (* Address *)
-  | AddrOf lval | StartOf lval -> lvalue lval
+  | AddrOf lval -> lvalue lval
+  | StartOf lval -> startof (lvalue lval) (Cil.typeOfLval lval)
 
   (* Load *)
   | Lval lval -> load (lvalue lval)
@@ -372,6 +373,9 @@ and offset (m:model) = function
   | NoOffset -> m
   | Field(_,ofs) -> offset (field m) ofs
   | Index(e,ofs) -> offset (shift m (vexpr e)) ofs
+
+and startof (m:model) typ =
+  if Cil.isArrayType typ then shift m E.bot else m
 
 (* ---------------------------------------------------------------------- *)
 (* --- Compilation of ACSL-Terms                                      --- *)

@@ -11,7 +11,6 @@
 
 Goal Instance of 'Pre-condition (file tests/wp_bts/issue_715_a.i, line 2) in 'dummy'' in 'foo' at call 'dummy' (file tests/wp_bts/issue_715_a.i, line 9)
 :
-Assume { Type: is_sint32(p). (* Initializer *) Init: p[0] = 0. }
-Prove: 0 <= p.
+Prove: true.
 
 ------------------------------------------------------------
