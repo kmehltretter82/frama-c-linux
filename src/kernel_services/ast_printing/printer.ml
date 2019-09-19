@@ -189,20 +189,6 @@ class printer_with_annot () = object (self)
       fmt
       annots
 
-  method private in_ghost_if_needed fmt ghost_flag do_it =
-    let display_ghost = ghost_flag && not is_ghost in
-    if display_ghost then begin
-      is_ghost <- true ;
-      Format.fprintf fmt "@[%t %a@ "
-        (fun fmt -> self#pp_open_annotation fmt)
-        self#pp_acsl_keyword "ghost"
-    end ;
-    do_it () ;
-    if display_ghost then begin
-      is_ghost <- false;
-      Format.fprintf fmt "%t@]" (fun fmt -> self#pp_close_annotation fmt)
-    end
-
   method! annotated_stmt next fmt s =
     (* To debug location setting:
        (let loc = fst (Cil_datatype.Stmt.loc s.skind) in
@@ -227,7 +213,7 @@ class printer_with_annot () = object (self)
           Cil_datatype.Code_annotation.compare
           (Annotations.code_annot s)
       in
-      self#in_ghost_if_needed fmt s.ghost
+      self#in_ghost_if_needed fmt s.ghost ~post_fmt:"%t"
         (fun () -> match all_annot with
            | [] ->  self#stmtkind s.sattr next fmt s.skind;
            | [ a ] when Cil.is_skip s.skind && not s.ghost ->
