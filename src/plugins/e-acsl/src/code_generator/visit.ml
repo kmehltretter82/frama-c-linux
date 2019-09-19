@@ -20,7 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Libc = Functions.Libc
 module E_acsl_label = Label
 open Cil_types
 open Cil_datatype
@@ -616,8 +615,9 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
          (eventually). This is such that each call to [alloca] becomes
          [__fc_vla_alloc]. It is already handled using the code below. *)
       (match init with
-      | ConsInit (fvi, sz :: _, _) when Libc.is_vla_alloc_name fvi.vname ->
-        fvi.vname <- Libc.actual_alloca;
+       | ConsInit (fvi, sz :: _, _)
+         when Functions.Libc.is_vla_alloc_name fvi.vname ->
+        fvi.vname <- Functions.Libc.actual_alloca;
         (* Since we need to pass [vi] by value cannot use [Misc.mk_store_stmt]
            here. Do it manually. *)
         let sname = Functions.RTL.mk_api_name "store_block" in
@@ -625,10 +625,10 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
         Env.add_stmt ~post:true env store
       (* Rewrite format functions (e.g., [printf]). See some comments below *)
       | ConsInit (fvi, args, knd) when check_formats
-          && Libc.is_printf_name fvi.vname ->
+          && Functions.Libc.is_printf_name fvi.vname ->
         let name = Functions.RTL.get_rtl_replacement_name fvi.vname in
         let new_vi = Misc.get_lib_fun_vi name in
-        let fmt = Libc.get_printf_argument_str ~loc fvi.vname args in
+        let fmt = Functions.Libc.get_printf_argument_str ~loc fvi.vname args in
         stmt.skind <-
           Instr(Local_init(vi, ConsInit(new_vi, fmt :: args, knd), loc));
         env
@@ -646,18 +646,19 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       | Lval(Var vi, _) when replace_libc_fn &&
           Functions.RTL.has_rtl_replacement vi.vname ->
         vi.vname <- Functions.RTL.get_rtl_replacement_name vi.vname
-      | Lval(Var vi , _) when Libc.is_vla_free_name vi.vname ->
+      | Lval(Var vi , _) when Functions.Libc.is_vla_free_name vi.vname ->
         (* Handle variable-length array allocation via [__fc_vla_free].
            Rewrite its name to [delete_block]. The rest is in place. *)
         vi.vname <- Functions.RTL.mk_api_name "delete_block"
-      | Lval(Var vi, _) when check_formats && Libc.is_printf_name vi.vname ->
+      | Lval(Var vi, _)
+        when check_formats && Functions.Libc.is_printf_name vi.vname ->
         (* Rewrite names of format functions (such as printf). This case
            differs from the above because argument list of format functions is
            extended with an argument describing actual variadic arguments *)
         (* Replacement name, e.g., [printf] -> [__e_acsl_builtin_printf] *)
         let name = Functions.RTL.get_rtl_replacement_name vi.vname in
         (* Variadic arguments descriptor *)
-        let fmt = Libc.get_printf_argument_str ~loc vi.vname args in
+        let fmt = Functions.Libc.get_printf_argument_str ~loc vi.vname args in
         (* get the name of the library function we need. Cannot just rewrite
            the name as AST check will then fail *)
         let vi = Misc.get_lib_fun_vi name in
