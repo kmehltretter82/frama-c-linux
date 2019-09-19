@@ -332,6 +332,13 @@ PLUGIN_HEADER_EXCEPTIONS:=
 # and dedicated to distributed tests
 PLUGIN_DISTRIB_TESTS:= $(EACSL_DISTRIB_TESTS)
 
+########
+# Misc #
+########
+
+wc:
+	ocamlwc -p $(EACSL_OCAML_FILES)
+
 ##########
 # Header #
 ##########
