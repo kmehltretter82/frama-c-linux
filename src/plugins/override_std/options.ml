@@ -30,7 +30,7 @@ include Plugin.Register
       let help = "Overrides standard library functions"
     end)
 
-module Enabled = True
+module Enabled = False
     (struct
       let option_name = "-override-std-perform"
       let help = ""
