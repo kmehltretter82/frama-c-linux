@@ -62,7 +62,7 @@ let size_var t value = {
   l_tparams = [];
   l_labels = [];
   l_profile = [];
-  l_body = LBterm value;  
+  l_body = LBterm value;
 }
 
 (** Features related to terms *)
@@ -71,11 +71,11 @@ let cvar_to_tvar vi = tvar (cvar_to_lvar vi)
 
 let tminus ?loc t1 t2 =
   let minus, typ = match t1.term_type, t2.term_type with
-    | Ctype(t1), Ctype(t2) when Cil.isPointerType t1 && Cil.isPointerType t2 -> 
+    | Ctype(t1), Ctype(t2) when Cil.isPointerType t1 && Cil.isPointerType t2 ->
       MinusPP, Linteger
     | Ctype(t), _ when Cil.isPointerType t ->
       MinusPI, Ctype(t)
-    | t, _ -> 
+    | t, _ ->
       MinusA, t
   in
   term ?loc (TBinOp(minus, t1, t2)) typ

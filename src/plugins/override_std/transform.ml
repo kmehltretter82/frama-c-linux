@@ -48,7 +48,7 @@ let get_globals loc =
 let called_function = function
   | Call(_, { enode = Lval((Var fct), NoOffset) }, _, _)
   | Local_init(_, ConsInit(fct, _, Plain_func), _) -> fct
-  | _ -> assert false 
+  | _ -> assert false
 
 let called_function_name inst =
   let fct = called_function inst in fct.vname

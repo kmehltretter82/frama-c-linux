@@ -48,7 +48,7 @@ let pcopied_memcpy ?loc p1 p2 len =
 let pcopied_len_bytes ?loc p1 p2 bytes_len =
   plet_len_div_size ?loc p1.term_type bytes_len (pcopied_memcpy ?loc p1 p2)
 
-let generate_requires loc dest src len = 
+let generate_requires loc dest src len =
   List.map new_predicate [
     { (pcorrect_len_bytes ~loc dest.term_type len)    with pred_name = ["aligned_end"] } ;
     { (pvalid_len_bytes ~loc here_label dest len)     with pred_name = ["valid_dest"] } ;
@@ -62,7 +62,7 @@ let generate_assigns loc t dest src len =
   let copy = dest_range, From [src_range] in
   let result = new_identified_term (tresult t) in
   let dest = new_identified_term dest in
-  let res = result, From [dest] in  
+  let res = result, From [dest] in
   Writes [ copy ; res ]
 
 let generate_ensures loc dest src len =

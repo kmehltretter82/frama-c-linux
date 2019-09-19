@@ -24,16 +24,16 @@ let name = "Override Std"
 let shortname = "override-std"
 
 include Plugin.Register
-  (struct
-    let name = name
-    let shortname = shortname
-    let help = "Overrides standard library functions"
-   end)
+    (struct
+      let name = name
+      let shortname = shortname
+      let help = "Overrides standard library functions"
+    end)
 
 module Enabled = True
-  (struct
-    let option_name = "-override-std-perform"
-    let help = ""
-   end)
+    (struct
+      let option_name = "-override-std-perform"
+      let help = ""
+    end)
 
 let emitter = Emitter.create shortname [Emitter.Funspec] ~correctness:[] ~tuning:[]
