@@ -21,7 +21,6 @@
 (**************************************************************************)
 
 module Libc = Functions.Libc
-module RTL = Functions.RTL
 module E_acsl_label = Label
 open Cil_types
 open Cil_datatype
@@ -36,305 +35,6 @@ let dkey = Options.dkey_translation
 let function_env = ref Env.dummy
 let dft_funspec = Cil.empty_funspec ()
 let funspec = ref dft_funspec
-
-(* extend the environment with statements which allocate/deallocate memory
-   blocks *)
-module Memory: sig
-  val store: ?before:stmt -> Env.t -> kernel_function -> varinfo list -> Env.t
-  val duplicate_store:
-    ?before:stmt -> Env.t -> kernel_function -> Varinfo.Set.t -> Env.t
-  val delete_from_list:
-    ?before:stmt -> Env.t -> kernel_function -> varinfo list -> Env.t
-  val delete_from_set:
-    ?before:stmt -> Env.t -> kernel_function -> Varinfo.Set.t -> Env.t
-end = struct
-
-  let tracking_stmt ?before fold mk_stmt env kf vars =
-    if Functions.instrument kf then
-      fold
-        (fun vi env ->
-           if Mmodel_analysis.must_model_vi ~kf vi then
-             let vi = Visitor_behavior.Get.varinfo (Env.get_behavior env) vi in
-             Env.add_stmt ?before env (mk_stmt vi)
-           else
-             env)
-        vars
-        env
-    else
-      env
-
-  let store ?before env kf vars =
-    tracking_stmt
-      ?before
-      List.fold_right (* small list *)
-      Misc.mk_store_stmt
-    env
-      kf
-      vars
-
-  let duplicate_store ?before env kf vars =
-    tracking_stmt
-      ?before
-      Varinfo.Set.fold
-      Misc.mk_duplicate_store_stmt
-      env
-      kf
-      vars
-
-  let delete_from_list ?before env kf vars =
-    tracking_stmt
-      ?before
-      List.fold_right (* small list *)
-      Misc.mk_delete_stmt
-      env
-      kf
-      vars
-
-  let delete_from_set ?before env kf vars =
-    tracking_stmt
-      ?before
-      Varinfo.Set.fold
-      Misc.mk_delete_stmt
-      env
-      kf
-      vars
-
-end
-
-(* Observation of literal strings in C expressions *)
-module Literal_observer: sig
-
-  val exp: Env.t -> exp -> exp * Env.t
-  (* replace the given exp by an observed variable if it is a literal string *)
-
-  val exp_in_depth: Env.t -> exp -> exp * Env.t
-  (* replace any sub-expression of the given exp that is a literal string by an
-     observed variable   *)
-
-end =
-struct
-
-  let literal loc env s =
-    try
-      let vi = Literal_strings.find s in
-      (* if the literal string was already created, just get it. *)
-      Cil.evar ~loc vi, env
-    with Not_found ->
-      (* never seen this string before: replace it by a new global var *)
-      let vi, exp, env =
-        Env.new_var
-          ~loc
-          ~scope:Varname.Global
-          ~name:"literal_string"
-          env
-          None
-          Cil.charPtrType
-          (fun _ _ -> [] (* done in the initializer, see {!vglob_aux} *))
-      in
-      Literal_strings.add s vi;
-      exp, env
-
-  let exp env e = match e.enode with
-    (* the guard below could be optimized: if no annotation **depends on this
-       string**, then it is not required to monitor it.
-       (currently, the guard says: "no annotation uses the memory model" *)
-    | Const (CStr s) when Mmodel_analysis.use_model () -> literal e.eloc env s
-    | _ -> e, env
-
-  let exp_in_depth env e =
-    let env_ref = ref env in
-    let o = object
-      inherit Cil.genericCilVisitor (Visitor_behavior.copy (Project.current ()))
-      method !vexpr e = match e.enode with
-      (* the guard below could be optimized: if no annotation **depends on this
-         string**, then it is not required to monitor it.
-         (currently, the guard says: "no annotation uses the memory model" *)
-      | Const (CStr s) when Mmodel_analysis.use_model () ->
-        let e, env = literal e.eloc !env_ref s in
-        env_ref := env;
-        Cil.ChangeTo e
-      | _ ->
-        Cil.DoChildren
-    end in
-    let e = Cil.visitCilExpr o e in
-    e, !env_ref
-
-end
-
-(* Observation of global variables. *)
-module Global_observer: sig
-  val function_name: string (* name of the function in which [mk_init] generates
-                               the code *)
-  val reset: unit -> unit
-  val is_empty: unit -> bool
-
-  val add: varinfo -> unit (* observes the given variable if necessary *)
-  val add_initializer: varinfo -> offset -> init -> unit
-  (* add the initializer for the given observed variable *)
-
-  val mk_init: Visitor_behavior.t -> Env.t -> varinfo * fundec * Env.t
-  (* generates a new C function containing the observers for global variable
-     declaration and initialization *)
-
-  val mk_delete: Visitor_behavior.t -> stmt list -> stmt list
-  (* generates the observers for global variable de-allocation *)
-
-end = struct
-
-  let function_name = RTL.mk_api_name "globals_init"
-
-  (* Hashtable mapping global variables (as Cil_type.varinfo) to their
-     initializers (if any).
-
-     NOTE: here, varinfos as keys belong to the original project while values
-     belong to the new one *)
-  let tbl
-      : (offset (* compound initializers *) * init) list ref Varinfo.Hashtbl.t
-      = Varinfo.Hashtbl.create 7
-
-  let reset () = Varinfo.Hashtbl.reset tbl
-
-  let is_empty () = Varinfo.Hashtbl.length tbl = 0
-
-  let add vi =
-    if Mmodel_analysis.must_model_vi vi then
-      Varinfo.Hashtbl.replace tbl vi (ref [])
-
-  let add_initializer vi offset init =
-    if Mmodel_analysis.must_model_vi vi then
-      try
-        let l = Varinfo.Hashtbl.find tbl vi in
-        l := (offset, init) :: !l
-      with Not_found ->
-        assert false
-
-  let rec literal_in_initializer env = function
-    | SingleInit exp -> snd (Literal_observer.exp_in_depth env exp)
-    | CompoundInit (_, l) ->
-      List.fold_left (fun env (_, i) -> literal_in_initializer env i) env l
-
-  let mk_init bhv env =
-    (* Create [__e_acsl_globals_init] function with definition
-       for initialization of global variables *)
-    let vi =
-      Cil.makeGlobalVar ~source:true
-        function_name
-        (TFun(Cil.voidType, Some [], false, []))
-    in
-    vi.vdefined <- true;
-    (* There is no contract associated with the function *)
-    let spec = Cil.empty_funspec () in
-    (* Create function definition which no stmt yet: they will be added
-       afterwards *)
-    let blk = Cil.mkBlock [] in
-    let fundec =
-      { svar = vi;
-        sformals = [];
-        slocals = [];
-        smaxid = 0;
-        sbody = blk;
-        smaxstmtid = None;
-        sallstmts = [];
-        sspec = spec }
-    in
-    let fct = Definition(fundec, Location.unknown) in
-    (* Create and register [__e_acsl_globals_init] as kernel
-       function *)
-    let kf =
-      { fundec = fct; spec = spec }
-    in
-    Globals.Functions.register kf;
-    Globals.Functions.replace_by_definition spec fundec Location.unknown;
-    (* Now generate the statements. The generation is done only now because it
-       depends on the local variable [already_run] whose generation required the
-       existence of [fundec] *)
-    let env = Env.push env in
-    (* 2-stage observation of initializers: temporal analysis must be performed
-       after generating observers of **all** globals *)
-    let env, stmts =
-      Varinfo.Hashtbl.fold_sorted
-        (fun old_vi l stmts ->
-          let new_vi = Visitor_behavior.Get.varinfo bhv old_vi in
-          List.fold_left
-            (fun (env, stmts) (off, init) ->
-              let env = literal_in_initializer env init in
-              let stmt = Temporal.generate_global_init new_vi off init env in
-              env, match stmt with None -> stmts | Some stmt -> stmt :: stmts)
-            stmts
-            !l)
-        tbl
-        (env, [])
-    in
-    (* allocation and initialization of globals *)
-    let stmts =
-      Varinfo.Hashtbl.fold_sorted
-        (fun old_vi _ stmts ->
-          let new_vi = Visitor_behavior.Get.varinfo bhv old_vi in
-          (* a global is both allocated and initialized *)
-          Misc.mk_store_stmt new_vi
-          :: Misc.mk_initialize ~loc:Location.unknown (Cil.var new_vi)
-          :: stmts)
-        tbl
-        stmts
-    in
-    (* literal strings allocations and initializations *)
-    let stmts =
-      Literal_strings.fold
-        (fun s vi stmts ->
-          let loc = Location.unknown in
-          let e = Cil.new_exp ~loc:loc (Const (CStr s)) in
-          let str_size = Cil.new_exp loc (SizeOfStr s) in
-          Cil.mkStmtOneInstr ~valid_sid:true (Set(Cil.var vi, e, loc))
-          :: Misc.mk_store_stmt ~str_size vi
-          :: Misc.mk_full_init_stmt ~addr:false vi
-          :: Misc.mk_mark_readonly vi
-          :: stmts)
-        stmts
-    in
-    (* Create a new code block with generated statements *)
-    let (b, env), stmts = match stmts with
-      | [] -> assert false
-      | stmt :: stmts ->
-        Env.pop_and_get env stmt ~global_clear:true Env.Before, stmts
-    in
-    let stmts = Cil.mkStmt ~valid_sid:true (Block b) :: stmts in
-    (* Prevent multiple calls to globals_init *)
-    let loc = Location.unknown in
-    let vi_already_run =
-      Cil.makeLocalVar fundec (RTL.mk_api_name "already_run") (TInt(IChar, []))
-    in
-    vi_already_run.vdefined <- true;
-    vi_already_run.vreferenced <- true;
-    vi_already_run.vstorage <- Static;
-    let init = AssignInit (SingleInit (Cil.zero ~loc)) in
-    let init_stmt =
-      Cil.mkStmtOneInstr ~valid_sid:true
-        (Local_init (vi_already_run, init, loc))
-    in
-    let already_run =
-      Cil.mkStmtOneInstr ~valid_sid:true
-        (Set (Cil.var vi_already_run, Cil.one ~loc, loc))
-    in
-    let stmts = already_run :: stmts in
-    let guard =
-      Cil.mkStmt
-        ~valid_sid:true
-        (If (Cil.evar vi_already_run, Cil.mkBlock [], Cil.mkBlock stmts, loc))
-    in
-    let return = Cil.mkStmt ~valid_sid:true (Return (None, loc)) in
-    let stmts = [ init_stmt; guard; return ] in
-    blk.bstmts <- stmts;
-    vi, fundec, env
-
-    let mk_delete bhv stmts =
-      Varinfo.Hashtbl.fold_sorted
-        (fun old_vi _l acc ->
-          let new_vi = Visitor_behavior.Get.varinfo bhv old_vi in
-          Misc.mk_delete_stmt new_vi :: acc)
-        tbl
-        stmts
-
-end
 
 (* the main visitor performing e-acsl checking and C code generator *)
 class e_acsl_visitor prj generate = object (self)
@@ -447,7 +147,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
               in
               let ptr_size = Cil.sizeOf loc Cil.voidPtrType in
               let args = args @ [ ptr_size ] in
-              let name = RTL.mk_api_name "memory_init" in
+              let name = Functions.RTL.mk_api_name "memory_init" in
               let init = Misc.mk_call loc name args in
               main.sbody.bstmts <- init :: main.sbody.bstmts
             in
@@ -663,7 +363,9 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
         (* JS: should be done in the new project? *)
         let env =
           if generate && not is_main then
-            let env = Memory.store env kf (Kernel_function.get_formals kf) in
+            let env =
+              Memory_observer.store env kf (Kernel_function.get_formals kf)
+            in
             Temporal.handle_function_parameters kf env
           else
             env
@@ -702,7 +404,8 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
      * init calls appear before store calls. *)
     let duplicates = Exit_points.store_vars stmt in
     let env =
-      if generate then Memory.duplicate_store ~before:stmt env kf duplicates
+      if generate
+      then Memory_observer.duplicate_store ~before:stmt env kf duplicates
       else env
     in
     function_env := env;
@@ -758,7 +461,8 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
         (* Remove local variables which scopes ended via goto/break/continue. *)
         let del_vars = Exit_points.delete_vars stmt in
         let env =
-          if generate then Memory.delete_from_set ~before:stmt env kf del_vars
+          if generate
+          then Memory_observer.delete_from_set ~before:stmt env kf del_vars
           else env
         in
         if self#is_return kf stmt then
@@ -783,7 +487,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
             (* Remove recorded function arguments *)
             let fargs = Kernel_function.get_formals kf in
             let env =
-              if generate then Memory.delete_from_list env kf fargs
+              if generate then Memory_observer.delete_from_list env kf fargs
               else env
             in
             let b, env =
@@ -792,7 +496,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
             if is_main && Mmodel_analysis.use_model () then begin
               let stmts = b.bstmts in
               let l = List.rev stmts in
-              let mclean = (RTL.mk_api_name "memory_clean") in
+              let mclean = (Functions.RTL.mk_api_name "memory_clean") in
               match l with
               | [] -> assert false (* at least the 'return' stmt *)
               | ret :: l ->
@@ -916,13 +620,13 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
         fvi.vname <- Libc.actual_alloca;
         (* Since we need to pass [vi] by value cannot use [Misc.mk_store_stmt]
            here. Do it manually. *)
-        let sname = RTL.mk_api_name "store_block" in
+        let sname = Functions.RTL.mk_api_name "store_block" in
         let store = Misc.mk_call ~loc sname [ Cil.evar vi ; sz ] in
         Env.add_stmt ~post:true env store
       (* Rewrite format functions (e.g., [printf]). See some comments below *)
       | ConsInit (fvi, args, knd) when check_formats
           && Libc.is_printf_name fvi.vname ->
-        let name = RTL.get_rtl_replacement_name fvi.vname in
+        let name = Functions.RTL.get_rtl_replacement_name fvi.vname in
         let new_vi = Misc.get_lib_fun_vi name in
         let fmt = Libc.get_printf_argument_str ~loc fvi.vname args in
         stmt.skind <-
@@ -931,8 +635,8 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       (* Rewrite names of functions for which we have alternative
         definitions in the RTL. *)
       | ConsInit (fvi, _, _) when replace_libc_fn &&
-        RTL.has_rtl_replacement fvi.vname ->
-        fvi.vname <- RTL.get_rtl_replacement_name fvi.vname;
+        Functions.RTL.has_rtl_replacement fvi.vname ->
+        fvi.vname <- Functions.RTL.get_rtl_replacement_name fvi.vname;
         env
       | _ -> env)
     | Instr(Call (result, exp, args, loc)) ->
@@ -940,18 +644,18 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
          definitions in the RTL. *)
       (match exp.enode with
       | Lval(Var vi, _) when replace_libc_fn &&
-          RTL.has_rtl_replacement vi.vname ->
-        vi.vname <- RTL.get_rtl_replacement_name vi.vname
+          Functions.RTL.has_rtl_replacement vi.vname ->
+        vi.vname <- Functions.RTL.get_rtl_replacement_name vi.vname
       | Lval(Var vi , _) when Libc.is_vla_free_name vi.vname ->
         (* Handle variable-length array allocation via [__fc_vla_free].
            Rewrite its name to [delete_block]. The rest is in place. *)
-        vi.vname <- RTL.mk_api_name "delete_block"
+        vi.vname <- Functions.RTL.mk_api_name "delete_block"
       | Lval(Var vi, _) when check_formats && Libc.is_printf_name vi.vname ->
         (* Rewrite names of format functions (such as printf). This case
            differs from the above because argument list of format functions is
            extended with an argument describing actual variadic arguments *)
         (* Replacement name, e.g., [printf] -> [__e_acsl_builtin_printf] *)
-        let name = RTL.get_rtl_replacement_name vi.vname in
+        let name = Functions.RTL.get_rtl_replacement_name vi.vname in
         (* Variadic arguments descriptor *)
         let fmt = Libc.get_printf_argument_str ~loc vi.vname args in
         (* get the name of the library function we need. Cannot just rewrite
@@ -962,7 +666,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       (* Add statement tracking initialization of return values of function
          calls *)
       (match result with
-        | Some lv when not (RTL.is_generated_kf kf) ->
+        | Some lv when not (Functions.RTL.is_generated_kf kf) ->
           add_initializer loc lv ~post:false stmt env kf
         | _ -> env)
     | _ -> env

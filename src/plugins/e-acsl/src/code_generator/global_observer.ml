@@ -1,0 +1,186 @@
+(**************************************************************************)
+(*                                                                        *)
+(*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
+(*                                                                        *)
+(*  Copyright (C) 2012-2018                                               *)
+(*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
+(*         alternatives)                                                  *)
+(*                                                                        *)
+(*  you can redistribute it and/or modify it under the terms of the GNU   *)
+(*  Lesser General Public License as published by the Free Software       *)
+(*  Foundation, version 2.1.                                              *)
+(*                                                                        *)
+(*  It is distributed in the hope that it will be useful,                 *)
+(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
+(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *)
+(*  GNU Lesser General Public License for more details.                   *)
+(*                                                                        *)
+(*  See the GNU Lesser General Public License version 2.1                 *)
+(*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
+(*                                                                        *)
+(**************************************************************************)
+
+open Cil_types
+open Cil_datatype
+
+let function_name = Functions.RTL.mk_api_name "globals_init"
+
+(* Hashtable mapping global variables (as Cil_type.varinfo) to their
+   initializers (if any).
+
+   NOTE: here, varinfos as keys belong to the original project while values
+   belong to the new one *)
+let tbl
+  : (offset (* compound initializers *) * init) list ref Varinfo.Hashtbl.t
+  = Varinfo.Hashtbl.create 7
+
+let reset () = Varinfo.Hashtbl.reset tbl
+
+let is_empty () = Varinfo.Hashtbl.length tbl = 0
+
+let add vi =
+  if Mmodel_analysis.must_model_vi vi then
+    Varinfo.Hashtbl.replace tbl vi (ref [])
+
+let add_initializer vi offset init =
+  if Mmodel_analysis.must_model_vi vi then
+    try
+      let l = Varinfo.Hashtbl.find tbl vi in
+      l := (offset, init) :: !l
+    with Not_found ->
+      assert false
+
+let rec literal_in_initializer env = function
+  | SingleInit exp -> snd (Literal_observer.exp_in_depth env exp)
+  | CompoundInit (_, l) ->
+    List.fold_left (fun env (_, i) -> literal_in_initializer env i) env l
+
+let mk_init bhv env =
+  (* Create [__e_acsl_globals_init] function with definition
+     for initialization of global variables *)
+  let vi =
+    Cil.makeGlobalVar ~source:true
+      function_name
+      (TFun(Cil.voidType, Some [], false, []))
+  in
+  vi.vdefined <- true;
+  (* There is no contract associated with the function *)
+  let spec = Cil.empty_funspec () in
+  (* Create function definition which no stmt yet: they will be added
+     afterwards *)
+  let blk = Cil.mkBlock [] in
+  let fundec =
+    { svar = vi;
+      sformals = [];
+      slocals = [];
+      smaxid = 0;
+      sbody = blk;
+      smaxstmtid = None;
+      sallstmts = [];
+      sspec = spec }
+  in
+  let fct = Definition(fundec, Location.unknown) in
+  (* Create and register [__e_acsl_globals_init] as kernel
+     function *)
+  let kf =
+    { fundec = fct; spec = spec }
+  in
+  Globals.Functions.register kf;
+  Globals.Functions.replace_by_definition spec fundec Location.unknown;
+  (* Now generate the statements. The generation is done only now because it
+     depends on the local variable [already_run] whose generation required the
+     existence of [fundec] *)
+  let env = Env.push env in
+  (* 2-stage observation of initializers: temporal analysis must be performed
+     after generating observers of **all** globals *)
+  let env, stmts =
+    Varinfo.Hashtbl.fold_sorted
+      (fun old_vi l stmts ->
+         let new_vi = Visitor_behavior.Get.varinfo bhv old_vi in
+         List.fold_left
+           (fun (env, stmts) (off, init) ->
+              let env = literal_in_initializer env init in
+              let stmt = Temporal.generate_global_init new_vi off init env in
+              env, match stmt with None -> stmts | Some stmt -> stmt :: stmts)
+           stmts
+           !l)
+      tbl
+      (env, [])
+  in
+  (* allocation and initialization of globals *)
+  let stmts =
+    Varinfo.Hashtbl.fold_sorted
+      (fun old_vi _ stmts ->
+         let new_vi = Visitor_behavior.Get.varinfo bhv old_vi in
+         (* a global is both allocated and initialized *)
+         Misc.mk_store_stmt new_vi
+         :: Misc.mk_initialize ~loc:Location.unknown (Cil.var new_vi)
+         :: stmts)
+      tbl
+      stmts
+  in
+  (* literal strings allocations and initializations *)
+  let stmts =
+    Literal_strings.fold
+      (fun s vi stmts ->
+         let loc = Location.unknown in
+         let e = Cil.new_exp ~loc:loc (Const (CStr s)) in
+         let str_size = Cil.new_exp loc (SizeOfStr s) in
+         Cil.mkStmtOneInstr ~valid_sid:true (Set(Cil.var vi, e, loc))
+         :: Misc.mk_store_stmt ~str_size vi
+         :: Misc.mk_full_init_stmt ~addr:false vi
+         :: Misc.mk_mark_readonly vi
+         :: stmts)
+      stmts
+  in
+  (* Create a new code block with generated statements *)
+  let (b, env), stmts = match stmts with
+    | [] -> assert false
+    | stmt :: stmts ->
+      Env.pop_and_get env stmt ~global_clear:true Env.Before, stmts
+  in
+  let stmts = Cil.mkStmt ~valid_sid:true (Block b) :: stmts in
+  (* Prevent multiple calls to globals_init *)
+  let loc = Location.unknown in
+  let vi_already_run =
+    Cil.makeLocalVar
+      fundec
+      (Functions.RTL.mk_api_name "already_run")
+      (TInt(IChar, []))
+  in
+  vi_already_run.vdefined <- true;
+  vi_already_run.vreferenced <- true;
+  vi_already_run.vstorage <- Static;
+  let init = AssignInit (SingleInit (Cil.zero ~loc)) in
+  let init_stmt =
+    Cil.mkStmtOneInstr ~valid_sid:true
+      (Local_init (vi_already_run, init, loc))
+  in
+  let already_run =
+    Cil.mkStmtOneInstr ~valid_sid:true
+      (Set (Cil.var vi_already_run, Cil.one ~loc, loc))
+  in
+  let stmts = already_run :: stmts in
+  let guard =
+    Cil.mkStmt
+      ~valid_sid:true
+      (If (Cil.evar vi_already_run, Cil.mkBlock [], Cil.mkBlock stmts, loc))
+  in
+  let return = Cil.mkStmt ~valid_sid:true (Return (None, loc)) in
+  let stmts = [ init_stmt; guard; return ] in
+  blk.bstmts <- stmts;
+  vi, fundec, env
+
+let mk_delete bhv stmts =
+  Varinfo.Hashtbl.fold_sorted
+    (fun old_vi _l acc ->
+       let new_vi = Visitor_behavior.Get.varinfo bhv old_vi in
+       Misc.mk_delete_stmt new_vi :: acc)
+    tbl
+    stmts
+
+(*
+Local Variables:
+compile-command: "make -C ../.."
+End:
+*)
