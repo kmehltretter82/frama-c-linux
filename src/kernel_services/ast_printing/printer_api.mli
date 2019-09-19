@@ -86,11 +86,11 @@ class type extensible_printer_type = object
     (unit -> unit)
     -> unit
   (** Open a ghost context if the the first [bool] is true and we are not
-     already in a ghost context. [post_fmt] is a format like ["%t"] and is used
-     to define the format at the end of the ghost context. [block] indicates
-     whether we should open a C block or not (defaults to [true]). The last
-     parameter is the function to be applied in the ghost context (generally
-     some AST element).
+      already in a ghost context. [post_fmt] is a format like ["%t"] and is used
+      to define the format at the end of the ghost context. [block] indicates
+      whether we should open a C block or not (defaults to [true]). The last
+      parameter is the function to be applied in the ghost context (generally
+      some AST element).
 
       @since 19.0-Potassium+dev *)
 
