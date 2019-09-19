@@ -76,7 +76,8 @@ SRC_CODE_GENERATOR:= \
 	logic_functions \
 	translate \
 	temporal \
-	visit
+	visit \
+	injector
 SRC_CODE_GENERATOR:=$(addprefix src/code_generator/, $(SRC_CODE_GENERATOR))
 
 #########################
