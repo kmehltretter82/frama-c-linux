@@ -489,6 +489,10 @@ class cil_printer () = object (self)
       fmt "%(%)" suf
 
   val mutable verbose = false
+  (* Do not add a value that depends on a
+     non-constant variable of the kernel here (e.g. [Kernel.Debug.get ()]). Due
+     to the way the pretty-printing class is instantiated, this value would be
+     evaluated too soon. Override the [reset] method instead. *)
 
   (* indicates whether we are printing ghost elements *)
   val mutable is_ghost = false
@@ -526,11 +530,6 @@ class cil_printer () = object (self)
       force_brace <- true;
       let finally () = force_brace <- tmp in
       Extlib.try_finally ~finally f fmt x;
-
-      (* Do not add a value that depends on a
-         non-constant variable of the kernel here (e.g. [Kernel.Debug.get ()]). Due
-         to the way the pretty-printing class is instantiated, this value would be
-         evaluated too soon. Override the [reset] method instead. *)
 
   val current_stmt = Stack.create ()
 
