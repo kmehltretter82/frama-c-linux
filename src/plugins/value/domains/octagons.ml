@@ -91,6 +91,8 @@ type operation = Add | Sub
 module Arith = struct
   open Ival
 
+  let top_float = Ival.inject_float Fval.top
+
   let narrow x y =
     let r = narrow x y in
     if is_bottom r then `Bottom else `Value r
@@ -124,6 +126,31 @@ module Arith = struct
   let apply = function
     | Add -> add
     | Sub -> sub
+
+  (* Creates the ival covering the integer range [range]. *)
+  let make_range range =
+    let min = Eval_typ.range_lower_bound range in
+    let max = Eval_typ.range_upper_bound range in
+    Ival.inject_range (Some min) (Some max)
+
+  (* Does an ival represents all values of a C type [typ]? *)
+  let is_top_for_typ typ ival =
+    let open Eval_typ in
+    Ival.(equal top ival) ||
+    match classify_as_scalar typ with
+    | None -> assert false
+    | Some (TSFloat _) -> Ival.equal top_float ival
+    | Some (TSInt range | TSPtr range) ->
+      (* TODO: this could be more efficient. *)
+      let range = make_range range in
+      Ival.is_included range ival || Ival.is_included range (neg_int ival)
+
+  (* Does an ival represents all possible values of a pair of variables? *)
+  let is_top_for_pair pair =
+    let x, y = Pair.get pair in
+    if Cil_datatype.Typ.equal x.vtype y.vtype
+    then is_top_for_typ x.vtype
+    else fun ival -> is_top_for_typ x.vtype ival && is_top_for_typ y.vtype ival
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -148,16 +175,10 @@ let _pretty_octagon fmt octagon =
    Use Ival.t to evaluate expressions. *)
 module Rewriting = struct
 
-  (* Checks that the interval [ival] fits in the C range [range].
+  (* Checks if the interval [ival] fits in the C typ [typ].
      This is used to ensure that an expression cannot overflow: this module
      uses the mathematical semantics of arithmetic operations, and cannot
      soundly translate overflows in the C semantics.  *)
-  let fits_in_range range ival =
-    let min = Eval_typ.range_lower_bound range in
-    let max = Eval_typ.range_upper_bound range in
-    let range = Ival.inject_range (Some min) (Some max) in
-    Ival.is_included ival range
-
   let may_overflow typ ival =
     let open Eval_typ in
     match classify_as_scalar typ with
@@ -167,7 +188,7 @@ module Rewriting = struct
       not
         ((range.i_signed && Kernel.SignedOverflow.get ()) ||
          (not range.i_signed && Kernel.UnsignedOverflow.get ()) ||
-         fits_in_range range ival)
+         Ival.is_included ival (Arith.make_range range))
 
   (* Simplified form [±X-coeff] for expressions,
      where X is a variable and coeff an interval. *)
@@ -196,7 +217,7 @@ module Rewriting = struct
     evaluate e2 >> fun v2 ->
     let typ_e1 = Cil.typeOf e1 in
     let result = Arith.apply op typ_e1 v1 v2 in
-    if may_overflow typ_e1 result || may_overflow typ result
+    if may_overflow typ result
     then []
     else f typ_e1 v1 v2
 
@@ -266,7 +287,11 @@ module Rewriting = struct
         in
         let value = Arith.add (Cil.typeOf e1) var1.coeff var2.coeff in
         let value = if sign then value else Arith.neg value in
-        (sign, { variables; operation; value }) :: acc
+        (* Do not include this rewriting if the [value] exceeds all possible
+           values for the type of [var1] and [var2]. *)
+        if Arith.is_top_for_pair variables value
+        then acc
+        else (sign, { variables; operation; value }) :: acc
     in
     Extlib.product_fold aux [] vars1 vars2
 
@@ -364,7 +389,7 @@ module Rewriting = struct
           | _, _ -> Ival.top
         in
         let ival = Ival.narrow ival ival2 in
-        if may_overflow typ ival || may_overflow typ_e1 ival
+        if may_overflow typ ival
         then default
         else ival, overflow_alarms typ expr ival
     | BinOp ((Lt | Gt | Le | Ge | Eq as binop), e1, e2, _typ)
@@ -429,7 +454,6 @@ module Diamond = struct
   let pretty_debug = pretty
 
   let top = { add = Ival.top; sub = Ival.top }
-  let is_top = equal top
 
   let is_included x y =
     Ival.is_included x.add y.add && Ival.is_included x.sub y.sub
@@ -448,6 +472,16 @@ module Diamond = struct
      about (Y, X). *)
   let reverse_variables swap t =
     if swap then { t with sub = Arith.neg t.sub } else t
+
+  (* Normalizes a diamond for the pair of variables [pair]: replaces too large
+     ivals by Ival.top. Returns None if both ivals are meaningless. *)
+  let trim pair t =
+    let is_top = Arith.is_top_for_pair pair in
+    match is_top t.add, is_top t.sub with
+    | true, true -> None
+    | true, false -> Some { t with add = Ival.top }
+    | false, true -> Some { t with sub = Ival.top }
+    | false, false -> Some t
 end
 
 
@@ -505,39 +539,27 @@ module Octagons = struct
 
   let simple_join =
     let cache = Hptmap_sig.PersistentCache "Octagons.Octagons.join" in
-    let decide _pair x y =
-      let r = Diamond.join x y in
-      if Diamond.is_top r then None else Some r
-    in
+    let decide pair x y = Diamond.trim pair (Diamond.join x y) in
     inter ~cache ~symmetric:true ~idempotent:true ~decide
 
   let join ~decide_left ~decide_right =
     let cache = Hptmap_sig.NoCache in
     let decide_left = Traversing decide_left
     and decide_right = Traversing decide_right in
-    let decide_both _pair x y =
-      let r = Diamond.join x y in
-      if Diamond.is_top r then None else Some r
-    in
+    let decide_both pair x y = Diamond.trim pair (Diamond.join x y) in
     merge ~cache ~symmetric:false ~idempotent:true
       ~decide_left ~decide_right ~decide_both
 
   let simple_widen =
     let cache = Hptmap_sig.PersistentCache "Octagons.Octagons.widen" in
-    let decide _pair x y =
-      let r = Diamond.widen x y in
-      if Diamond.is_top r then None else Some r
-    in
+    let decide pair x y = Diamond.trim pair (Diamond.widen x y) in
     inter ~cache ~symmetric:false ~idempotent:true ~decide
 
   let widen ~decide_left ~decide_right =
     let cache = Hptmap_sig.NoCache in
     let decide_left = Traversing decide_left
     and decide_right = Traversing decide_right in
-    let decide_both _pair x y =
-      let r = Diamond.widen x y in
-      if Diamond.is_top r then None else Some r
-    in
+    let decide_both pair x y = Diamond.trim pair (Diamond.widen x y) in
     merge ~cache ~symmetric:false ~idempotent:true
       ~decide_left ~decide_right ~decide_both
 
@@ -790,7 +812,7 @@ module State = struct
             let add = Arith.add v1.vtype i1 i2
             and sub = Arith.sub v1.vtype i1 i2 in
             let diamond = Diamond.join diamond { add; sub } in
-            if Diamond.is_top diamond then None else Some diamond
+            Diamond.trim pair diamond
           with Not_found -> None
         in
         let decide_left = decide_empty t2.intervals
@@ -826,7 +848,7 @@ module State = struct
               then Diamond.widen { add; sub } diamond
               else Diamond.widen diamond { add; sub }
             in
-            if Diamond.is_top diamond then None else Some diamond
+            Diamond.trim pair diamond
           with Not_found -> None
         in
         let decide_left = decide_empty false t2.intervals
@@ -858,13 +880,13 @@ module State = struct
     { vars: varinfo * varinfo;
       diamond: diamond; }
 
-  let add_relation state rel =
-    let x, z = rel.vars in
-    let pair, swap = Pair.make x z in
-    let diamond = Diamond.reverse_variables swap rel.diamond in
-    Octagons.add pair diamond state.octagons >>-: fun octagons ->
-    let relations = Relations.relate pair state.relations in
-    { state with octagons; relations }
+  let add_diamond state pair diamond =
+    match Diamond.trim pair diamond with
+    | None -> `Value state
+    | Some diamond ->
+      Octagons.add pair diamond state.octagons >>-: fun octagons ->
+      let relations = Relations.relate pair state.relations in
+      { state with octagons; relations }
 
   let inverse { vars; diamond } =
     let var1, var2 = vars in
@@ -890,9 +912,9 @@ module State = struct
         (Arith.add typ rel1.diamond.sub rel2.diamond.sub)
     in
     let diamond = {add; sub} in
-    if Diamond.is_top diamond then raise Not_found else
-      let vars = fst rel1.vars, snd rel2.vars in
-      { vars; diamond }
+    let pair, swap = Pair.make (fst rel1.vars) (snd rel2.vars) in
+    let diamond = Diamond.reverse_variables swap diamond in
+    pair, diamond
 
   let saturate state x y rel1 =
     try
@@ -905,36 +927,34 @@ module State = struct
           let diamond = Octagons.find pair state.octagons in
           let vars = Pair.get pair in
           let rel2 = { vars; diamond } in
-          let new_relation = transitive_relation y rel1 rel2 in
-          add_relation state new_relation
+          let pair, diamond = transitive_relation y rel1 rel2 in
+          add_diamond state pair diamond
         with Not_found -> `Value state
       in
       VariableSet.fold aux y_related (`Value state)
     with Not_found -> `Value state
 
-  let add_octagon_aux state octagon =
-    if Ival.(equal top octagon.value)
+  let add_octagon state octagon =
+    if Arith.is_top_for_pair octagon.variables octagon.value
     then `Value state
     else
+      let state =
+        if saturate_octagons
+        then
+          let x, y = Pair.get octagon.variables in
+          let diamond = match octagon.operation with
+            | Add -> { add = octagon.value; sub = Ival.top }
+            | Sub -> { add = Ival.top; sub = octagon.value }
+          in
+          let relation = { vars = x, y; diamond } in
+          saturate state y x relation >>- fun state ->
+          saturate state x y relation
+        else `Value state
+      in
+      state >>- fun state ->
       Octagons.add_octagon octagon state.octagons >>-: fun octagons ->
       let relations = Relations.relate octagon.variables state.relations in
       { state with octagons; relations }
-
-  let add_octagon state octagon =
-    let state =
-      if saturate_octagons
-      then
-        let x, y = Pair.get octagon.variables in
-        let diamond = match octagon.operation with
-          | Add -> { add = octagon.value; sub = Ival.top }
-          | Sub -> { add = Ival.top; sub = octagon.value }
-        in
-        let relation = { vars = x, y; diamond } in
-        saturate state y x relation >>- fun state ->
-        saturate state x y relation
-      else `Value state
-    in
-    state >>- fun state -> add_octagon_aux state octagon
 
   let remove state x =
     let intervals = Intervals.remove x state.intervals in
