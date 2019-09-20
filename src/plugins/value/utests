@@ -12,7 +12,7 @@ if [ $res -ne 0 ]; then
 fi
 
 TESTS=(float value idct builtins)
-CONFIGS=(apron equalities bitwise symblocs gauges)
+CONFIGS=(apron equalities bitwise symblocs gauges octagons)
 
 for C in ${CONFIGS[@]}
 do

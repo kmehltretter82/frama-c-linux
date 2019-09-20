@@ -1,7 +1,7 @@
 #!/bin/bash -eu
 
 DEFAULT_TESTS=(float value idct builtins)
-CONFIGS=( apron equalities bitwise symblocs gauges)
+CONFIGS=( apron equalities bitwise symblocs gauges octagons)
 
 ARGS=("${@-}")
 
