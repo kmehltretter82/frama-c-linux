@@ -1542,7 +1542,9 @@ let () =
   bind (module EqualityDomain) (fun n -> n > 1);
   bind (module EqualityCall) (fun n -> if n > 2 then "formals" else "none");
   bind (module GaugesDomain) (fun n -> n > 3);
-  bind (module SplitReturn) (fun n -> if n > 4 then "auto" else "");
+  bind (module OctagonsDomain) (fun n -> n > 4);
+  bind (module OctagonsCall) (fun n -> n > 5);
+  bind (module SplitReturn) (fun n -> if n > 6 then "auto" else "");
   ()
 
 let set_analysis n =
