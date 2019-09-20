@@ -1029,9 +1029,6 @@ for_clause:
 |   declaration                  { FC_DECL $1 }
 ;
 
-/* 01/12/2017: ghost_parameter_opt and ghost_parameter are parsed
-   then thrown
-*/
 ghost_parameter_opt:
      /* empty */        {[]}
  |   ghost_parameter    {$1}
