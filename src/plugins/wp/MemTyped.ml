@@ -542,12 +542,7 @@ let null = a_null (* as a loc *)
 let literal ~eid cst =
   shift (a_global (STRING.get (eid,cst))) (C_int (Ctypes.c_char ())) e_zero
 
-let cvar x =
-  let base = a_global (BASE.get x) in
-  if Cil.isArrayType x.vtype then
-    let t_elt = Cil.typeOf_array_elem x.vtype in
-    shift base (Ctypes.object_of t_elt) e_zero
-  else base
+let cvar x = a_global (BASE.get x)
 
 let pointer_loc t = t
 let pointer_val t = t

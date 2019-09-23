@@ -357,6 +357,42 @@ let plain lt e =
     Vexp e
 
 (* -------------------------------------------------------------------------- *)
+(* --- Printing Values                                                    --- *)
+(* -------------------------------------------------------------------------- *)
+
+type 'a printer = Format.formatter -> 'a -> unit
+
+let pp_bound fmt = function None -> () | Some p -> F.pp_term fmt p
+
+let pp_value pp fmt = function
+  | Loc l -> pp fmt l
+  | Val v -> F.pp_term fmt v
+
+let pp_logic pp fmt = function
+  | Vexp e -> F.pp_term fmt e
+  | Vloc l -> pp fmt l
+  | Lset _ | Vset _ -> Format.pp_print_string fmt "<set>"
+
+let pp_rloc pp fmt = function
+  | Rloc(obj,l) ->
+      Format.fprintf fmt "@[<hov 2>%a:@,%a@]" pp l Ctypes.pretty obj
+  | Rrange(l,obj,a,b) ->
+      Format.fprintf fmt "@[<hov2>%a@,.(%a@,..%a):@,%a@]"
+        pp l pp_bound a pp_bound b Ctypes.pretty obj
+
+let pp_sloc pp fmt = function
+  | Sloc l -> pp fmt l
+  | Sarray(l,_,n) ->
+      Format.fprintf fmt "@[<hov2>%a@,.(..%d)@]" pp l (n-1)
+  | Srange(l,_,a,b) ->
+      Format.fprintf fmt "@[<hov2>%a@,.(%a@,..%a)@]" pp l pp_bound a pp_bound b
+  | Sdescr(xs,l,p) ->
+      Format.fprintf fmt "@[<hov2>{ %a | %a }@]" pp l F.pp_pred (F.p_forall xs p)
+
+let pp_region pp fmt sloc =
+  List.iter (fun (_,s) -> Format.fprintf fmt "@ %a" (pp_sloc pp) s) sloc
+
+(* -------------------------------------------------------------------------- *)
 (* --- Int-As-Booleans                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -369,6 +405,16 @@ let bool_or  a b = e_or  [e_neq a e_zero ; e_neq b e_zero]
 let bool_val e = e_if e e_one e_zero
 let is_true p = e_if (e_prop p) e_one e_zero
 let is_false p = e_if (e_prop p) e_zero e_one
+
+(* -------------------------------------------------------------------------- *)
+(* --- Start Of Arrays                                                    --- *)
+(* -------------------------------------------------------------------------- *)
+
+let startof ~shift loc typ =
+  if Cil.isArrayType typ then
+    let t_elt = Cil.typeOf_array_elem typ in
+    shift loc (Ctypes.object_of t_elt) e_zero
+  else loc
 
 (* -------------------------------------------------------------------------- *)
 (* --- Lifting Memory Model to Values                                     --- *)

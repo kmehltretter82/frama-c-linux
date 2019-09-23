@@ -32,12 +32,13 @@ open Cil_datatype
 (* --- Varinfo Accesses                                               --- *)
 (* ---------------------------------------------------------------------- *)
 
+(** By lattice order of usage *)
 type access =
-  | NoAccess
-  | ByRef   (* The expr ["*x"],   equals to [load(load(&x))] *)
-  | ByArray (* The expr ["x[_]"], equals to [load(shift(load(&x),_))] *)
-  | ByValue (* The expr ["x"],    equals to [load(&x)] *)
-  | ByAddr  (* The expr ["&x"] *)
+  | NoAccess (** Never used *)
+  | ByRef   (** Only used as ["*x"],   equals to [load(shift(load(&x),0))] *)
+  | ByArray (** Only used as ["x[_]"], equals to [load(shift(load(&x),_))] *)
+  | ByValue (** Only used as ["x"],    equals to [load(&x)] *)
+  | ByAddr  (** Widely used, potentially up to ["&x"] *)
 
 module Access :
 sig
@@ -59,8 +60,8 @@ struct
   let rank = function
     | NoAccess -> 0
     | ByRef -> 1
-    | ByValue -> 2
-    | ByArray -> 3
+    | ByArray -> 2
+    | ByValue -> 3
     | ByAddr -> 4
 
   let cup a b = if rank a < rank b then b else a
@@ -357,7 +358,8 @@ and expr (e:Cil_types.exp) : model = match e.enode with
   | CastE(ty_tgt,e) -> cast (cast_ctyp ty_tgt (Cil.typeOf e)) (expr e)
 
   (* Address *)
-  | AddrOf lval | StartOf lval -> lvalue lval
+  | AddrOf lval -> lvalue lval
+  | StartOf lval -> startof (lvalue lval) (Cil.typeOfLval lval)
 
   (* Load *)
   | Lval lval -> load (lvalue lval)
@@ -371,6 +373,9 @@ and offset (m:model) = function
   | NoOffset -> m
   | Field(_,ofs) -> offset (field m) ofs
   | Index(e,ofs) -> offset (shift m (vexpr e)) ofs
+
+and startof (m:model) typ =
+  if Cil.isArrayType typ then shift m E.bot else m
 
 (* ---------------------------------------------------------------------- *)
 (* --- Compilation of ACSL-Terms                                      --- *)

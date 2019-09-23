@@ -78,29 +78,6 @@ struct
   let guards = C.guards
 
   (* -------------------------------------------------------------------------- *)
-  (* --- Debugging                                                          --- *)
-  (* -------------------------------------------------------------------------- *)
-
-  let pp_logic fmt = function
-    | Vexp e -> F.pp_term fmt e
-    | Vloc l -> M.pretty fmt l
-    | Lset _ | Vset _ -> Format.pp_print_string fmt "<set>"
-
-  let pp_bound fmt = function None -> () | Some p -> F.pp_term fmt p
-
-  let pp_sloc fmt = function
-    | Sloc l -> M.pretty fmt l
-    | Sarray(l,_,n) -> Format.fprintf fmt "@[<hov2>%a@,.(..%d)@]"
-                         M.pretty l (n-1)
-    | Srange(l,_,a,b) -> Format.fprintf fmt "@[<hov2>%a@,.(%a@,..%a)@]"
-                           M.pretty l pp_bound a pp_bound b
-    | Sdescr(xs,l,p) -> Format.fprintf fmt "@[<hov2>{ %a | %a }@]"
-                          M.pretty l F.pp_pred (F.p_forall xs p)
-
-  let pp_region fmt sloc =
-    List.iter (fun (_,s) -> Format.fprintf fmt "@ %a" pp_sloc s) sloc
-
-  (* -------------------------------------------------------------------------- *)
   (* --- Translation Environment & Recursion                                --- *)
   (* -------------------------------------------------------------------------- *)
 
@@ -261,7 +238,7 @@ struct
           match logic_var env lv with
           | VAL v ->
               Wp_parameters.abort ~current:true
-                "Address of logic value (%a)@." pp_logic v
+                "Address of logic value (%a)@." (Cvalues.pp_logic M.pretty) v
           | VAR x ->
               logic_offset env x.vtype (Vloc (M.cvar x)) loffset
         end
@@ -663,6 +640,7 @@ struct
   (* -------------------------------------------------------------------------- *)
   (* --- Term Nodes                                                         --- *)
   (* -------------------------------------------------------------------------- *)
+
   let term_node (env:env) t =
     match t.term_node with
     | TConst c -> Vexp (Cvalues.logic_constant c)
@@ -674,7 +652,16 @@ struct
            Cvalues.volatile ~warn:"unsafe volatile access to (term) l-value" ()
         then term_undefined t
         else term_lval env lval
-    | TAddrOf lval | TStartOf lval -> addr_lval env lval
+    | TAddrOf lval -> addr_lval env lval
+    | TStartOf lval ->
+        begin
+          let lt = Cil.typeOfTermLval lval in
+          let base = addr_lval env lval in
+          match Logic_utils.unroll_type lt with
+          | Ctype ct ->
+              L.map_loc (fun l -> Cvalues.startof ~shift:M.shift l ct) base
+          | _ -> base
+        end
 
     | TUnOp(Neg,t) when not (Logic_typing.is_integral_type t.term_type) ->
         L.map F.e_opp (C.logic env t)
