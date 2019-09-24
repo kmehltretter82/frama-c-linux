@@ -938,6 +938,8 @@ src/plugins/override_std/memcpy.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/override_std/memcpy.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/override_std/options.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/override_std/options.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/override_std/override_table.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/override_std/override_table.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/override_std/OverrideStd.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/override_std/register.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/override_std/transform.ml: CEA_LGPL_OR_PROPRIETARY

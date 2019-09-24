@@ -24,8 +24,6 @@ open Cil_types
 open Logic_const
 open Basic_blocks
 
-let table: (typ, varinfo) Hashtbl.t = Hashtbl.create 5
-
 let function_name = "memcpy"
 
 let pseparated_memcpy_len_bytes ?loc p1 p2 bytes_len =
@@ -93,7 +91,7 @@ let finalize_override vi loc =
     | _ -> assert false
   in
   generate_spec loc kf dest src len ;
-  spec, vi
+  GFunDecl(spec, vi, loc)
 
 let generate_prototype t =
   let name = function_name ^ "_" ^ (string_of_typ t) in
@@ -109,28 +107,27 @@ let generate_prototype t =
   Cil.setFormalsDecl vi fun_t ;
   vi
 
-let get_override t = try
-    Hashtbl.find table t
-  with Not_found ->
-    let fct = generate_prototype t in
-    Hashtbl.add table t fct ;
-    fct
+module Table = Override_table.Make(struct
+    let function_name = function_name
+    let build_prototype = generate_prototype
+    let finalize = finalize_override
+  end)
 
-let memcpy_type_from_parameter x =
+let type_from_parameter x =
   let x = Cil.stripCasts x in
   let xt = Cil.unrollTypeDeep (Cil.typeOf x) in
   let xt = Cil.type_remove_qualifier_attributes_deep xt in
   Cil.typeOf_pointed xt
 
 let well_typed_parameters dest src =
-  let dt = memcpy_type_from_parameter dest in
-  let st = memcpy_type_from_parameter src in
+  let dt = type_from_parameter dest in
+  let st = type_from_parameter src in
   Cil_datatype.Typ.equal dt st
 
 let create_call fct (dest, src, len) =
   if well_typed_parameters dest src then
-    let typ = memcpy_type_from_parameter dest in
-    let fct = get_override typ in
+    let typ = type_from_parameter dest in
+    let fct = Table.get_override typ in
     let dest = Cil.stripCasts dest in
     let src = Cil.stripCasts src in
     fct, (dest, src, len)
@@ -146,16 +143,9 @@ let replace_call = function
     Local_init(r, ConsInit(fct, [ dest ; src ; len ], Plain_func), loc)
   | _ -> assert false
 
-let get_globals loc =
-  let add_global _ vi l =
-    let spec, vi = finalize_override vi loc in
-    GFunDecl(spec, vi, loc) :: l
-  in
-  Hashtbl.fold add_global table []
-
 let () = Transform.register (module struct
     let function_name = function_name
     let replace_call  = replace_call
-    let get_globals   = get_globals
-    let reset      () = Hashtbl.reset table
+    let get_globals   = Table.get_globals
+    let mark_as_computed = Table.mark_as_computed
   end)

@@ -26,7 +26,7 @@ module type Override = sig
   val function_name: string
   val replace_call: instr -> instr
   val get_globals: location -> global list
-  val reset: unit -> unit
+  val mark_as_computed: ?project:Project.t -> unit -> unit
 end
 
 let base : (string, (module Override)) Hashtbl.t = Hashtbl.create 17
@@ -34,9 +34,9 @@ let base : (string, (module Override)) Hashtbl.t = Hashtbl.create 17
 let register ((module M: Override) as m) =
   Hashtbl.add base M.function_name m
 
-let reset_tables () =
-  let reset _ m = let module M = (val m: Override) in M.reset () in
-  Hashtbl.iter reset base
+let mark_as_computed () =
+  let mark _ m = let module M = (val m: Override) in M.mark_as_computed () in
+  Hashtbl.iter mark base
 
 let get_globals loc =
   let get_globals m =
@@ -74,7 +74,7 @@ class visitor = object(_)
       let loc = Cil.CurrentLoc.get() in
       let globals = get_globals loc in
       f.globals <- globals @ f.globals ;
-      reset_tables () ;
+      mark_as_computed () ;
       Ast.mark_as_changed () ;
       f
     in

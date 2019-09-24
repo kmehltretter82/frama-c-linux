@@ -20,14 +20,16 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
+module type Override_generator = sig
+  val function_name: String.t
+  val build_prototype: Cil_types.typ -> Cil_types.varinfo
+  val finalize: Cil_types.varinfo -> Cil_types.location -> Cil_types.global
+end
 
-module type Override = sig
-  val function_name: string
-  val replace_call: instr -> instr
-  val get_globals: location -> global list
+module type Table = sig
+  val get_override: Cil_types.typ -> Cil_types.varinfo
+  val get_globals: Cil_types.location -> Cil_types.global list
   val mark_as_computed: ?project:Project.t -> unit -> unit
 end
-val register: (module Override) -> unit
 
-val transform: Cil_types.file -> unit
+module Make (M: Override_generator) : Table
