@@ -68,8 +68,11 @@ let generate_ensures loc dest src len =
     { (pcopied_len_bytes ~loc dest src len) with pred_name = [ "copied"] }
   ]
 
-let generate_spec loc kf cdest csrc clen =
-  Kernel.feedback "Spec for: %a" Kernel_function.pretty kf ;
+let generate_spec vi loc =
+  let (cdest, csrc, clen) = match Cil.getFormalsDecl vi with
+    | [ dest ; src ; len ] -> dest, src, len
+    | _ -> assert false
+  in
   let t = cdest.vtype in
   let dest = cvar_to_tvar cdest in
   let src = cvar_to_tvar csrc in
@@ -77,21 +80,7 @@ let generate_spec loc kf cdest csrc clen =
   let requires = generate_requires loc dest src len in
   let assigns  = generate_assigns loc t dest src len in
   let ensures  = generate_ensures loc dest src len in
-  Annotations.add_requires Options.emitter kf requires ;
-  Annotations.add_assigns ~keep_empty:false Options.emitter kf assigns ;
-  Annotations.add_ensures Options.emitter kf ensures ;
-  ()
-
-let finalize_override vi loc =
-  let spec = Cil.empty_funspec () in
-  Globals.Functions.replace_by_declaration spec vi loc ;
-  let kf = Globals.Functions.get vi in
-  let (dest, src, len) = match Cil.getFormalsDecl vi with
-    | [ dest ; src ; len ] -> dest, src, len
-    | _ -> assert false
-  in
-  generate_spec loc kf dest src len ;
-  GFunDecl(spec, vi, loc)
+  make_funspec [make_behavior ~requires ~assigns ~ensures ()] ()
 
 let generate_prototype t =
   let name = function_name ^ "_" ^ (string_of_typ t) in
@@ -110,7 +99,7 @@ let generate_prototype t =
 module Table = Override_table.Make(struct
     let function_name = function_name
     let build_prototype = generate_prototype
-    let finalize = finalize_override
+    let build_spec = generate_spec
   end)
 
 let type_from_parameter x =

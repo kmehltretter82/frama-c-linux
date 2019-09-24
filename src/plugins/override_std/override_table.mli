@@ -23,7 +23,7 @@
 module type Override_generator = sig
   val function_name: String.t
   val build_prototype: Cil_types.typ -> Cil_types.varinfo
-  val finalize: Cil_types.varinfo -> Cil_types.location -> Cil_types.global
+  val build_spec: Cil_types.varinfo -> Cil_types.location -> Cil_types.funspec
 end
 
 module type Table = sig

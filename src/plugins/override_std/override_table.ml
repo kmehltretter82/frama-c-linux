@@ -29,7 +29,7 @@ end
 module type Override_generator = sig
   val function_name: String.t
   val build_prototype: Cil_types.typ -> Cil_types.varinfo
-  val finalize: Cil_types.varinfo -> Cil_types.location -> Cil_types.global
+  val build_spec: Cil_types.varinfo -> Cil_types.location -> Cil_types.funspec
 end
 
 module Make_internal_table (M: Override_generator) =
@@ -51,8 +51,12 @@ module Make (Generator: Override_generator) = struct
       fct
 
   let get_globals loc =
-    let add_global _ vi l = (Generator.finalize vi loc) :: l in
-    Internal_table.fold add_global []
+    let finalize vi =
+      let spec = Generator.build_spec vi loc in
+      Globals.Functions.replace_by_declaration spec vi loc ;
+      Cil_types.GFunDecl(Cil.empty_funspec(), vi, loc)
+    in
+    Internal_table.fold (fun _ vi l -> (finalize vi) :: l) []
 
   let mark_as_computed = Internal_table.mark_as_computed
 end

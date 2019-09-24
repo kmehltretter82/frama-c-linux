@@ -138,3 +138,36 @@ let pseparated_memories ?loc p1 len1 p2 len2 =
   let b1 = tbuffer_range ?loc p1 len1 in
   let b2 = tbuffer_range ?loc p2 len2 in
   pseparated ?loc [ b1 ; b2 ]
+
+let make_behavior
+    ?(name=Cil.default_behavior_name)
+    ?(assumes=[]) ?(requires=[]) ?(ensures=[])?(assigns=WritesAny)
+    ?(alloc=FreeAllocAny) ?(extension=[])
+    () =
+  {
+    b_name = name ;
+    b_requires = requires ;
+    b_assumes = assumes ;
+    b_post_cond = ensures ;
+    b_assigns = assigns ;
+    b_allocation = alloc;
+    b_extended = extension
+  }
+
+let default_comp_disj bhvs =
+  let b_names = List.filter (fun b -> not (String.equal Cil.default_behavior_name b))
+      (List.fold_left (fun l b -> b.b_name :: l) [] bhvs)
+  in match b_names with
+  | [] -> [], []
+  | _  -> [b_names], [b_names]
+
+let make_funspec bhvs ?(termination=None)
+    ?(complete_disjoint=(default_comp_disj bhvs)) () =
+  let complete, disjoint = complete_disjoint in
+  {
+    spec_behavior = bhvs ;
+    spec_variant = None ;
+    spec_terminates = termination ;
+    spec_complete_behaviors = complete ;
+    spec_disjoint_behaviors = disjoint
+  }

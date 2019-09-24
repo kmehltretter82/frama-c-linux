@@ -46,3 +46,21 @@ val pseparated_memories: ?loc:location -> term -> term -> term -> term -> predic
 
 val plet_len_div_size:
   ?loc:location -> logic_type -> term -> (term -> predicate) -> predicate
+
+val make_behavior:
+  ?name:string ->
+  ?assumes:identified_predicate list ->
+  ?requires:identified_predicate list ->
+  ?ensures:(termination_kind * identified_predicate) list ->
+  ?assigns:assigns ->
+  ?alloc:allocation ->
+  ?extension:acsl_extension list ->
+  unit ->
+  behavior
+
+val make_funspec:
+  behavior list ->
+  ?termination:identified_predicate option ->
+  ?complete_disjoint:(string list list * string list list) ->
+  unit ->
+  funspec
