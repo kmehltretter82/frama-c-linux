@@ -61,10 +61,6 @@ module InCtxt : Parameter_sig.String_set
 module ExternArrays: Parameter_sig.Bool
 module Literals : Parameter_sig.Bool
 module Volatile : Parameter_sig.Bool
-(* module Overflows : Parameter_sig.Bool *)
-(* use get_overflows() below *)
-(* module BoolRange : Parameter_sig.Bool *)
-(* use get_bool_range() below *)
 
 module Region: Parameter_sig.Bool
 module Region_rw: Parameter_sig.Bool
@@ -127,9 +123,7 @@ module CoqLibs: Parameter_sig.String_list
 module CoqTactic: Parameter_sig.String
 module Hints: Parameter_sig.Int
 module TryHints: Parameter_sig.Bool
-module Why3: Parameter_sig.String
-module WhyLibs: Parameter_sig.String_list
-module WhyFlags: Parameter_sig.String_list
+module Why3Flags: Parameter_sig.String_list
 module AltErgo: Parameter_sig.String
 module AltGrErgo: Parameter_sig.String
 module AltErgoLibs: Parameter_sig.String_list
@@ -158,7 +152,6 @@ val get_session : unit -> string
 val get_session_dir : string -> string
 val get_output : unit -> string
 val get_output_dir : string -> string
-val get_includes : unit -> string list
 val make_output_dir : string -> unit
 val get_overflows : unit -> bool
 

@@ -40,7 +40,7 @@ let configure =
   begin fun () ->
     if !todo then
       begin
-        let args = Array.of_list ("why3"::Wp_parameters.WhyFlags.get ()) in
+        let args = Array.of_list ("why3"::Wp_parameters.Why3Flags.get ()) in
         begin try
             Arg.parse_argv ~current:(ref 0) args
               (Why3.Debug.Args.[desc_debug;desc_debug_all;desc_debug_list])
