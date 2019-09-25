@@ -70,6 +70,22 @@ so that we can add it to the Frama-C `depext` package.
     # install Frama-C
     opam install frama-c
 
+### Configuring provers for Frama-C/WP
+
+Frama-C/WP uses the Why-3 platform to run external provers for proving ACSL annotations.
+The Why-3 platform and the Alt-Ergo prover are automatically installed _via_ opam
+when installing Frama-C.
+
+However, CVC4 or Z3 are also very efficient provers to be used alternatively or in combination with Alt-Ergo.
+Actually, you can use any prover supported by Why-3 in combination with Frama-C/WP.
+
+Most provers are available on all platforms, although you shall configure Why-3 after installation
+to make them available for Frama-C/WP:
+
+    ```shell
+    why3 config --detect
+    ```
+
 ### Known working configuration
 
 The following set of packages is known to be a working configuration for
