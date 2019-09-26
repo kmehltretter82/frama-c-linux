@@ -189,48 +189,11 @@ void __e_acsl_globals_init(void)
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string_17,sizeof("1"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_17);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_17);
-<<<<<<< HEAD:tests/format/oracle_ci/gen_fprintf.c
     __gen_e_acsl_literal_string_16 = "-%s-";
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string_16,
                          sizeof("-%s-"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_16);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_16);
-=======
-    __e_acsl_store_block((void *)(& __gen_e_acsl_waitpid),(size_t)1);
-    __e_acsl_full_init((void *)(& __gen_e_acsl_waitpid));
-    __e_acsl_store_block((void *)(& __gen_e_acsl_fclose),(size_t)1);
-    __e_acsl_full_init((void *)(& __gen_e_acsl_fclose));
-    __e_acsl_store_block((void *)(& __gen_e_acsl_tmpfile),(size_t)1);
-    __e_acsl_full_init((void *)(& __gen_e_acsl_tmpfile));
-    __e_acsl_store_block((void *)(& __gen_e_acsl_exit),(size_t)1);
-    __e_acsl_full_init((void *)(& __gen_e_acsl_exit));
-    __e_acsl_store_block((void *)(& signal_eval),(size_t)1);
-    __e_acsl_full_init((void *)(& signal_eval));
-    __e_acsl_store_block((void *)(& testno),(size_t)4);
-    __e_acsl_full_init((void *)(& testno));
-    __e_acsl_store_block((void *)(& __fc_fds_state),(size_t)4);
-    __e_acsl_full_init((void *)(& __fc_fds_state));
-    __e_acsl_store_block((void *)(& __fc_time),(size_t)4);
-    __e_acsl_full_init((void *)(& __fc_time));
-    __e_acsl_store_block((void *)(& __fc_p_sigaction),(size_t)8);
-    __e_acsl_full_init((void *)(& __fc_p_sigaction));
-    __e_acsl_store_block((void *)(sigaction),(size_t)2080);
-    __e_acsl_full_init((void *)(& sigaction));
-    __e_acsl_store_block((void *)(& __fc_p_fopen),(size_t)8);
-    __e_acsl_full_init((void *)(& __fc_p_fopen));
-    __e_acsl_store_block((void *)(__fc_fopen),(size_t)128);
-    __e_acsl_full_init((void *)(& __fc_fopen));
-    __e_acsl_store_block((void *)(& stdout),(size_t)8);
-    __e_acsl_full_init((void *)(& stdout));
-    __e_acsl_store_block((void *)(& __fc_p_random48_counter),(size_t)8);
-    __e_acsl_full_init((void *)(& __fc_p_random48_counter));
-    __e_acsl_store_block((void *)(random48_counter),(size_t)6);
-    __e_acsl_full_init((void *)(& random48_counter));
-    __e_acsl_store_block((void *)(& __fc_random48_init),(size_t)4);
-    __e_acsl_full_init((void *)(& __fc_random48_init));
-    __e_acsl_store_block((void *)(& __fc_rand_max),(size_t)8);
-    __e_acsl_full_init((void *)(& __fc_rand_max));
->>>>>>> From changes in the libC: fixes specification of abort and exit functions:tests/format/oracle/gen_fprintf.c
   }
   return;
 }
@@ -541,25 +504,6 @@ int main(int argc, char const **argv)
     }
   }
   __retres = 0;
-<<<<<<< HEAD:tests/format/oracle_ci/gen_fprintf.c
-=======
-  __e_acsl_delete_block((void *)(& argv));
-  __e_acsl_delete_block((void *)(& argc));
-  __e_acsl_delete_block((void *)(& signal_eval));
-  __e_acsl_delete_block((void *)(& testno));
-  __e_acsl_delete_block((void *)(& __fc_fds_state));
-  __e_acsl_delete_block((void *)(& __fc_time));
-  __e_acsl_delete_block((void *)(& __fc_p_sigaction));
-  __e_acsl_delete_block((void *)(sigaction));
-  __e_acsl_delete_block((void *)(& __fc_p_fopen));
-  __e_acsl_delete_block((void *)(__fc_fopen));
-  __e_acsl_delete_block((void *)(& stdout));
-  __e_acsl_delete_block((void *)(& __fc_p_random48_counter));
-  __e_acsl_delete_block((void *)(random48_counter));
-  __e_acsl_delete_block((void *)(& __fc_random48_init));
-  __e_acsl_delete_block((void *)(& __fc_rand_max));
-  __e_acsl_delete_block((void *)(buf));
->>>>>>> From changes in the libC: fixes specification of abort and exit functions:tests/format/oracle/gen_fprintf.c
   __e_acsl_delete_block((void *)(& fh));
   __e_acsl_memory_clean();
   return __retres;

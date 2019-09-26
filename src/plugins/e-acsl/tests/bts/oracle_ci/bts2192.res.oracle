@@ -2,14 +2,7 @@
 [e-acsl] Warning: annotating undefined function `atoi':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
-<<<<<<< HEAD:tests/bts/oracle_ci/bts2192.res.oracle
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:78: Warning: 
-=======
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:486: Warning: 
-  E-ACSL construct `logic functions with labels' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:486: Warning: 
->>>>>>> From changes in the libC: fixes specification of abort and exit functions:tests/temporal/oracle/t_getenv.res.oracle
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
