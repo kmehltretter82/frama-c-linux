@@ -233,7 +233,7 @@ module Rewriting = struct
   let rec rewrite evaluate expr =
     match expr.enode with
     | Lval (Var varinfo, NoOffset) ->
-      if Cil.isArithmeticType varinfo.vtype
+      if Cil.isIntegralType varinfo.vtype
       && not (Cil.typeHasQualifier "volatile" varinfo.vtype)
       && not (is_singleton (evaluate expr))
       then [ { varinfo; sign = true; coeff = Ival.zero } ]
@@ -1064,7 +1064,7 @@ module Domain = struct
 
   let reduce_further state expr value =
     match expr.enode with
-    | Lval (Var x, NoOffset) ->
+    | Lval (Var x, NoOffset) when Cil.isIntegralType x.vtype ->
       begin
         try
           let x_ival = Cvalue.V.project_ival value in
@@ -1140,7 +1140,7 @@ module Domain = struct
       else
         match expr.enode with
         | Lval (Var varinfo, NoOffset)
-          when Cil.isArithmeticType varinfo.vtype ->
+          when Cil.isIntegralType varinfo.vtype ->
           let intervals = Intervals.add varinfo ival state.intervals in
           { state with intervals }
         | _ -> state
@@ -1208,7 +1208,7 @@ module Domain = struct
     let assign _kinstr left_value expr assigned valuation state =
       update valuation state >>- fun state ->
       match left_value.lval with
-      | Var varinfo, NoOffset when Cil.isArithmeticType varinfo.vtype ->
+      | Var varinfo, NoOffset when Cil.isIntegralType varinfo.vtype ->
         assign_variable varinfo expr assigned valuation state
       | _ ->
         let written_loc = Precise_locs.imprecise_location left_value.lloc in
