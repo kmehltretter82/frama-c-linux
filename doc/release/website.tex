@@ -153,12 +153,19 @@ You'll need a GitHub account to create a pull request on the official opam repos
 \item Make sure you are on \texttt{master} and your branch is up-to-date
 \item Create a new directory: \\
   \texttt{packages/frama-c/frama-c.<version>} \\
-\item Copy the following files, from the release to the opam repository clone: \\
-  \texttt{opam/opam} $\rightarrow$ \texttt{packages/frama-c/frama-c.<version>/opam} \\
-  \texttt{opam/descr} $\rightarrow$ \texttt{packages/frama-c/frama-c.<version>/descr} \\
-  \texttt{opam/files} $\rightarrow$ \texttt{packages/frama-c/frama-c.<version>/files}\\
-\item Compute the MD5sum of the .tar.gz file and update this file: \\
-  \texttt{packages/frama-c/frama-c.<version>/url} (and also update the filename inside it)
+\item Copy the file \texttt{opam/opam} from the release
+ to the opam repository clone in
+ \texttt{packages/frama-c/frama-c.<version>/opam}.
+\item Compute the MD5sum of the .tar.gz file and update the \texttt{opam} file
+with the following entry:
+\begin{verbatim}
+url {
+  src: "https://frama-c.com/download/frama-c-<version>-<version-name>.tar.gz"
+  checksum: "md5=<xxxxxx>"
+}
+\end{verbatim}
+You can provide \verb|sha256| and/or \verb|sha512| checksums as well if
+you wish.
 \item Create a branch with any name you want (e.g. frama-c.<version>) and push it to your remote Github
 \item Create a pull request to opam-repository. If all tests pass,
   someone from opam should merge it for you.
