@@ -1368,20 +1368,31 @@ by a link (`\user{link};'). The available tags are depicted on figure~\ref{wp-dr
 \end{figure}
 
 \clearpage
-\subsection{Proof Cache}
+\subsection{Proof Session \& Cache}
 \label{wp-cache}
 
-Running provers have a cost in terms of memory and CPU resources. When working
+The \textsf{WP} plugin can use a session directory to store informations to be used from one execution to another one.
+It is used to store proof scripts edited from the TIP (see Section~\ref{wp-proof-editor}) and to replay them from the command line.
+And it is also used to speedup the invocation of provers by reusing previous runs.
+
+Actually, running provers can be demanding in terms of memory and CPU resources. When working
 interactively or incrementally, it is often the case where most proof obligations remain unchanged
 from one \textsf{WP} execution to the other. To reduce this costs, a cache of prover results can be used
 and stored in your session.
 
-The cache can only be used with \textsf{Why-3} provers, it does not work with native \textsf{Alt-Ergo} and \textsf{Coq} provers. There are different ways of using the cache, depending on your precise needs.
-The main option to control cache usage is \verb+-wp-cache+, documented below:
+The cache can only be used with \textsf{Why-3} provers, it does not work with native \textsf{Alt-Ergo}
+and \textsf{Coq} provers -- although proof scripts works with both.
+There are different ways of using the cache, depending on your precise needs.
+
+The \textsf{WP} options to control session and cache are \verb+-wp-session+ and \verb+-wp-cache+, as documented below:
 
 \begin{description}
-\item[\tt -wp-cache <mode>] selects the cache mode to use with why3 provers. The default mode is \verb'update' if \verb+-wp-session+ is set, and \verb+none+ otherwize. The cache entries
-are stored in the session directory, which would be \verb+./frama-c/wp/cache+ by default.
+\item[\tt -wp-session <dir>] select the directory where cached results and proof scripts
+  are stored. If the local directory \verb+'.frama-c'+ already exists, the default session
+  directory \verb+'.frama-c/wp'+ will be used to setup the \textsf{WP} session.
+\item[\tt -wp-cache <mode>] selects the cache mode to use with why3 provers. The default mode is \verb'update'
+  if a \textsf{WP} session is set, and \verb+none+ otherwise. The cache entries are stored in the session directory,
+  which is \verb+./.frama-c/wp/cache+ by default.
 \end{description}
 
 The available cache modes are described below:
@@ -1395,8 +1406,7 @@ The available cache modes are described below:
 \end{description}
 
 When using cache with a non-\verb+offline+ mode, time and steps limits recorded in the cache are compared to the command line settings to produce meaningful and consistent results. Hence, if you provide more time or more steps from the command line than before, the prover would be run again. If you provide less or equal limits, the cache entries are reused, but \textsf{WP} still report the cached time and step limits to inform you of your previous attempts. For instance, if you have in the cache a « Valid » entry with time 12.4s and re-run it with a timeout of 5s, you will have a « Timeout » result with time 12.4s printed on the console.
-
-Cached result are indicated on the standard output. You might also have additional information with \verb+-wp-msg-key cache+ or you might silent them with \verb+-wp-msg-key no-cache-info+.
+Cached usage is indicated on the standard output, unless you specify \verb+-wp-msg-key no-cache-info+.
 
 \section{Plug-in Developer Interface}
 \label{wp-api}

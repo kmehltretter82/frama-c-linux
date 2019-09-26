@@ -21,7 +21,10 @@
 (**************************************************************************)
 
 open Factory
-let job_key= Wp_parameters.register_category "trace-job"
+
+let dkey_main = Wp_parameters.register_category "main"
+let dkey_raised = Wp_parameters.register_category "raised"
+let dkey_shell = Wp_parameters.register_category "shell"
 
 (* --------- Command Line ------------------- *)
 
@@ -296,6 +299,49 @@ let do_progress goal msg =
         pp goal.Wpo.po_sid msg ;
   end
 
+(* ------------------------------------------------------------------------ *)
+(* ---  Caching                                                         --- *)
+(* ------------------------------------------------------------------------ *)
+
+let do_report_cache_usage mode =
+  if not (Wp_parameters.has_dkey dkey_shell) &&
+     not (Wp_parameters.has_dkey VCS.dkey_no_cache_info)
+  then
+    let hits = ProverWhy3.get_hits () in
+    let miss = ProverWhy3.get_miss () in
+    if hits <= 0 && miss <= 0 then
+      Wp_parameters.result "[Cache] not used"
+    else
+      Wp_parameters.result "[Cache]%t"
+        begin fun fmt ->
+          let sep = ref " " in
+          let pp_cache fmt n job =
+            if n > 0 then
+              ( Format.fprintf fmt "%s%s:%d" !sep job n ; sep := ", " ) in
+          match mode with
+          | ProverWhy3.NoCache -> ()
+          | ProverWhy3.Replay ->
+              pp_cache fmt hits "found" ;
+              pp_cache fmt miss "missed" ;
+              Format.pp_print_newline fmt () ;
+          | ProverWhy3.Offline ->
+              pp_cache fmt hits "found" ;
+              pp_cache fmt miss "failed" ;
+              Format.pp_print_newline fmt () ;
+          | ProverWhy3.Update | ProverWhy3.Cleanup ->
+              pp_cache fmt hits "found" ;
+              pp_cache fmt miss "updated" ;
+              Format.pp_print_newline fmt () ;
+          | ProverWhy3.Rebuild ->
+              pp_cache fmt hits "replaced" ;
+              pp_cache fmt miss "updated" ;
+              Format.pp_print_newline fmt () ;
+        end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Prover Results                                                     --- *)
+(* -------------------------------------------------------------------------- *)
+
 let do_wpo_stat goal prover res =
   let s = get_pstat prover in
   let open VCS in
@@ -441,6 +487,8 @@ let do_report_scheduled () =
       Wp_parameters.result "%d goal%s generated" !exercised plural
     else
       let proved = GOALS.cardinal !proved in
+      let mode = ProverWhy3.get_mode () in
+      if mode <> ProverWhy3.NoCache then do_report_cache_usage mode ;
       Wp_parameters.result "%t"
         begin fun fmt ->
           Format.fprintf fmt "Proved goals: %4d / %d@\n" proved !scheduled ;
@@ -456,58 +504,6 @@ let do_list_scheduled_result () =
   begin
     do_report_scheduled () ;
     clear_scheduled () ;
-  end
-
-(* ------------------------------------------------------------------------ *)
-(* ---  Caching                                                         --- *)
-(* ------------------------------------------------------------------------ *)
-
-let dkey_cache = Wp_parameters.register_category "cache"
-
-let do_report_cache_usage mode =
-  let hits = ProverWhy3.get_hits () in
-  let miss = ProverWhy3.get_miss () in
-  let removed = ProverWhy3.get_removed () in
-  if hits <= 0 && miss <= 0 then
-    Wp_parameters.result "[Cache] not used"
-  else
-    Wp_parameters.result "[Cache]%t"
-      begin fun fmt ->
-        let sep = ref " " in
-        let pp_cache fmt n job =
-          if n > 0 then
-            ( Format.fprintf fmt "%s%s:%d" !sep job n ; sep := ", " ) in
-        match mode with
-        | ProverWhy3.NoCache -> ()
-        | ProverWhy3.Replay ->
-            pp_cache fmt hits "found" ;
-            pp_cache fmt miss "missed" ;
-            Format.pp_print_newline fmt () ;
-        | ProverWhy3.Offline ->
-            pp_cache fmt hits "found" ;
-            pp_cache fmt miss "failed" ;
-            Format.pp_print_newline fmt () ;
-        | ProverWhy3.Update ->
-            pp_cache fmt hits "found" ;
-            pp_cache fmt miss "updated" ;
-            Format.pp_print_newline fmt () ;
-        | ProverWhy3.Cleanup ->
-            pp_cache fmt hits "found" ;
-            pp_cache fmt miss "missed" ;
-            pp_cache fmt removed "removed" ;
-            Format.pp_print_newline fmt () ;
-        | ProverWhy3.Rebuild ->
-            pp_cache fmt (hits+miss) "updated" ;
-            Format.pp_print_newline fmt () ;
-      end
-
-(* registered at frama-c (normal) exit *)
-let do_cache_cleanup () =
-  begin
-    let mode = ProverWhy3.get_mode () in
-    ProverWhy3.cleanup_cache ~mode ;
-    if Wp_parameters.has_dkey dkey_cache
-    then do_report_cache_usage mode ;
   end
 
 (* ------------------------------------------------------------------------ *)
@@ -693,6 +689,19 @@ let do_wp_proofs () = do_wp_proofs_iter (fun f -> Wpo.iter ~on_goal:f ())
 
 let do_wp_proofs_for goals = do_wp_proofs_iter (fun f -> Bag.iter f goals)
 
+(* registered at frama-c (normal) exit *)
+let do_cache_cleanup () =
+  begin
+    let mode = ProverWhy3.get_mode () in
+    ProverWhy3.cleanup_cache ~mode ;
+    let removed = ProverWhy3.get_removed () in
+    if removed > 0 &&
+       not (Wp_parameters.has_dkey dkey_shell) &&
+       not (Wp_parameters.has_dkey VCS.dkey_no_cache_info)
+    then
+      Wp_parameters.result "[Cache] removed:%d" removed
+  end
+
 (* ------------------------------------------------------------------------ *)
 (* ---  Secondary Entry Points                                          --- *)
 (* ------------------------------------------------------------------------ *)
@@ -877,12 +886,14 @@ let pp_wp_parameters fmt =
     Format.pp_print_newline fmt () ;
   end
 
-let dkey_shell = Wp_parameters.register_category "shell"
-
 let () = Cmdline.run_after_setting_files
     (fun _ ->
        if Wp_parameters.has_dkey dkey_shell then
          Log.print_on_output pp_wp_parameters)
+
+(* -------------------------------------------------------------------------- *)
+(* --- Prover Configuration & Detection                                   --- *)
+(* -------------------------------------------------------------------------- *)
 
 let () = Cmdline.run_after_configuring_stage Why3Provers.configure
 
@@ -915,8 +926,6 @@ let rec try_sequence jobs () = match jobs with
   | head :: tail ->
       Extlib.try_finally ~finally:(try_sequence tail) head ()
 
-let dkey_raised = Wp_parameters.register_category "raised"
-
 let sequence jobs () =
   if Wp_parameters.has_dkey dkey_raised
   then List.iter (fun f -> f ()) jobs
@@ -932,12 +941,12 @@ let tracelog () =
   end
 
 let main = sequence [
-    (fun () -> Wp_parameters.debug ~dkey:job_key "Start WP plugin...@.") ;
+    (fun () -> Wp_parameters.debug ~dkey:dkey_main "Start WP plugin...@.") ;
     do_prover_detect ;
     cmdline_run ;
     tracelog ;
     Wp_parameters.reset ;
-    (fun () -> Wp_parameters.debug ~dkey:job_key "Stop WP plugin...@.") ;
+    (fun () -> Wp_parameters.debug ~dkey:dkey_main "Stop WP plugin...@.") ;
   ]
 
 let () = Cmdline.at_normal_exit do_cache_cleanup

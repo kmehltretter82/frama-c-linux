@@ -1147,10 +1147,10 @@ module MODE = WpContext.StaticGenerator(Datatype.Unit)
           parse_mode ~origin ~fallback:"-wp-cache" (Sys.getenv origin)
         with Not_found ->
         try
-          parse_mode ~origin:"-wp-cache" ~fallback:"'none'"
+          parse_mode ~origin:"-wp-cache" ~fallback:"none"
             (Wp_parameters.Cache.get())
         with Not_found ->
-          if Wp_parameters.Session.Dir_name.is_set ()
+          if Wp_parameters.has_session ()
           then Update else NoCache
     end)
 

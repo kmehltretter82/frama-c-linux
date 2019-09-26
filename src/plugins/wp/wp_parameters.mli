@@ -144,10 +144,10 @@ module ReportName: Parameter_sig.String
 module MemoryContext: Parameter_sig.Bool
 module Check: Parameter_sig.Bool
 
-(** {2 Environment Variables} *)
+(** {2 Getters} *)
 
-val get_env : ?default:string -> string -> string
-val is_out : unit -> bool (* -wp-out <dir> positioned *)
+val has_out : unit -> bool
+val has_session : unit -> bool
 val get_session : unit -> string
 val get_session_dir : string -> string
 val get_output : unit -> string

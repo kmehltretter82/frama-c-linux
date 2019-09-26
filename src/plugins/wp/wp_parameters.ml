@@ -20,7 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Fc_config = Config
+module Fc_Config = Config
+
 let () = Plugin.is_share_visible ()
 let () = Plugin.is_session_visible ()
 include Plugin.Register
@@ -962,7 +963,7 @@ module Check =
 let () = on_reset Print.clear
 
 (* -------------------------------------------------------------------------- *)
-(* --- OS environment variables                                           --- *)
+(* --- Overflows                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
 let active_unless_rte option =
@@ -974,24 +975,13 @@ let active_unless_rte option =
 
 let get_overflows () = Overflows.get () && active_unless_rte "-wp-overflows"
 
-let dkey = register_category "env"
-
-let get_env ?default var =
-  try
-    let varval = Sys.getenv var in
-    debug ~dkey "ENV %s=%S" var varval ; varval
-  with Not_found ->
-    debug ~dkey "ENV %s not set." var ;
-    match default with
-    | Some varval ->
-        debug ~dkey "ENV %s default(%S)" var varval ; varval
-    | None ->
-        debug ~dkey "ENV %s undefined." var ;
-        raise Not_found
+(* -------------------------------------------------------------------------- *)
+(* --- Output Dir                                                         --- *)
+(* -------------------------------------------------------------------------- *)
 
 let dkey = register_category "prover"
 
-let is_out () = !Fc_config.is_gui || OutputDir.get() <> ""
+let has_out () = OutputDir.get () <> ""
 
 let make_output_dir dir =
   if Sys.file_exists dir then
@@ -1046,7 +1036,7 @@ let base_output () =
   | None -> let output =
               match OutputDir.get () with
               | "" ->
-                  if !Fc_config.is_gui
+                  if !Fc_Config.is_gui
                   then make_gui_dir ()
                   else make_tmp_dir ()
               | dir ->
@@ -1055,13 +1045,6 @@ let base_output () =
       Fc_Filepath.add_symbolic_dir "WPOUT" output ;
       output
   | Some output -> output
-
-let get_session () = Session.dir ~error:false ()
-
-let get_session_dir d =
-  let base = get_session () in
-  let path = Printf.sprintf "%s/%s" base d in
-  make_output_dir path ; path
 
 let get_output () =
   let base = base_output () in
@@ -1074,6 +1057,23 @@ let get_output () =
 
 let get_output_dir d =
   let base = get_output () in
+  let path = Printf.sprintf "%s/%s" base d in
+  make_output_dir path ; path
+
+(* -------------------------------------------------------------------------- *)
+(* --- Session dir                                                        --- *)
+(* -------------------------------------------------------------------------- *)
+
+let default = Sys.getcwd () ^ "/.frama-c"
+
+let has_session () =
+  Session.Dir_name.is_set () ||
+  ( Sys.file_exists default && Sys.is_directory default )
+
+let get_session () = Session.dir ~error:false ()
+
+let get_session_dir d =
+  let base = get_session () in
   let path = Printf.sprintf "%s/%s" base d in
   make_output_dir path ; path
 
