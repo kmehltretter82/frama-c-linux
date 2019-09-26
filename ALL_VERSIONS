@@ -1,5 +1,6 @@
 Version number			Date of release		Notes
 ==============			===============		=====
+19.1 (Potassium)                2019, September 18      OCaml 4.08 compatibility
 19.0 (Potassium)                2019, June 21
 18.0 (Argon)                    2018, November 29
 Chlorine-20180502               2018, July 06           Bug fixed

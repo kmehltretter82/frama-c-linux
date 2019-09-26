@@ -781,8 +781,9 @@ src/plugins/gui/debug_manager.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/debug_manager.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/design.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/design.mli: CEA_LGPL_OR_PROPRIETARY
-src/plugins/gui/dgraph.ml.in: CEA_LGPL_OR_PROPRIETARY
-src/plugins/gui/dgraph.mli.in: CEA_LGPL_OR_PROPRIETARY
+src/plugins/gui/dgraph_helper.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/gui/dgraph_helper.no.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/gui/dgraph_helper.yes.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/file_manager.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/file_manager.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/filetree.ml: CEA_LGPL_OR_PROPRIETARY

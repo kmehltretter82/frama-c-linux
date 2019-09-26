@@ -13,15 +13,15 @@
         - [Quick Start](#quick-start)
         - [Full Compilation Guide](#full-compilation-guide)
 - [Testing the Installation](#testing-the-installation)
-- [Available resources](#available-resources)
-    - [Executables: (in `/INSTALL_DIR/bin`)](#executables-in-install_dirbin)
-    - [Shared files: (in `/INSTALL_DIR/share/frama-c` and subdirectories)](#shared-files-in-install_dirshareframa-c-and-subdirectories)
-    - [Documentation files: (in `/INSTALL_DIR/share/frama-c/doc`)](#documentation-files-in-install_dirshareframa-cdoc)
-    - [Object files: (in `/INSTALL_DIR/lib/frama-c`)](#object-files-in-install_dirlibframa-c)
-    - [Plugin files: (in `/INSTALL_DIR/lib/frama-c/plugins`)](#plugin-files-in-install_dirlibframa-cplugins)
-    - [Man files: (in `/INSTALL_DIR/man/man1`)](#man-files-in-install_dirmanman1)
+    - [Available resources](#available-resources)
+        - [Executables: (in `/INSTALL_DIR/bin`)](#executables-in-install_dirbin)
+        - [Shared files: (in `/INSTALL_DIR/share/frama-c` and subdirectories)](#shared-files-in-install_dirshareframa-c-and-subdirectories)
+        - [Documentation files: (in `/INSTALL_DIR/share/frama-c/doc`)](#documentation-files-in-install_dirshareframa-cdoc)
+        - [Object files: (in `/INSTALL_DIR/lib/frama-c`)](#object-files-in-install_dirlibframa-c)
+        - [Plugin files: (in `/INSTALL_DIR/lib/frama-c/plugins`)](#plugin-files-in-install_dirlibframa-cplugins)
+        - [Man files: (in `/INSTALL_DIR/man/man1`)](#man-files-in-install_dirmanman1)
 - [Installing Additional Frama-C Plugins](#installing-additional-frama-c-plugins)
-- [HAVE FUN WITH FRAMA-C!](#have-fun-with-frama-c)
+    - [HAVE FUN WITH FRAMA-C!](#have-fun-with-frama-c)
 
 ## Installing Frama-C via opam
 
