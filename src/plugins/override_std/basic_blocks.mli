@@ -24,7 +24,6 @@ open Cil_types
 
 val ptr_of: typ -> typ
 val const_of: typ -> typ
-val restrict_of: typ -> typ
 
 val size_t: unit -> typ
 

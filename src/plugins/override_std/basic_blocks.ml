@@ -27,7 +27,6 @@ open Logic_const
 
 let ptr_of t = TPtr(t, [])
 let const_of t = Cil.typeAddAttributes [Attr("const", [])] t
-let restrict_of t = Cil.typeAddAttributes [Attr("restrict", [])] t
 
 let size_t () =
   Globals.Types.find_type Logic_typing.Typedef "size_t"

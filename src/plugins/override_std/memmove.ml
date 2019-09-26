@@ -80,8 +80,8 @@ let generate_spec vi loc =
 
 let generate_prototype t =
   let name = function_name ^ "_" ^ (string_of_typ t) in
-  let dt = ptr_of (restrict_of t) in
-  let st = ptr_of (restrict_of (const_of t)) in
+  let dt = ptr_of t in
+  let st = ptr_of (const_of t) in
   let params = [
     ("dest", dt, []) ;
     ("src", st, []) ;
