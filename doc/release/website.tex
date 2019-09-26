@@ -166,6 +166,15 @@ url {
 \end{verbatim}
 You can provide \verb|sha256| and/or \verb|sha512| checksums as well if
 you wish.
+\item (optional) Check locally that everything is fine:
+\begin{verbatim}
+opam switch create local <some-ocaml-compiler-version>
+opam repository add local <path-to-repository-clone>
+opam repository set-repos local
+opam install frama-c
+\end{verbatim}
+(of course, if you already create a local switch before and it uses your
+local version of the repository, you just have to switch to it).
 \item Create a branch with any name you want (e.g. frama-c.<version>) and push it to your remote Github
 \item Create a pull request to opam-repository. If all tests pass,
   someone from opam should merge it for you.
