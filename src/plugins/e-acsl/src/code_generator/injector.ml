@@ -25,12 +25,9 @@ open Cil_datatype
 
 let dkey = Options.dkey_translation
 
+(* [TODO ARCHI] move it in another module *)
 let is_main kf =
-  try
-    let main, _ = Globals.entry_point () in
-    Kernel_function.equal kf main
-  with Globals.No_such_entry_point _s ->
-    false
+  Datatype.String.equal (Kernel_function.get_name kf) "main"
 
 (* ************************************************************************** *)
 (* Code *)
