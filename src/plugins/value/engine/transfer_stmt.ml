@@ -361,9 +361,9 @@ module Make (Abstract: Abstractions.Eva) = struct
 
   (* At the end of a call, this function gathers the arguments whose value can
      be reduced at the call site. These are the arguments such that:
-     - the formal has not been written during the call, but its value has been
+     – the formal has not been written during the call, but its value has been
        reduced;
-     - no variable of the concrete argument has been written during the call
+     – no variable of the concrete argument has been written during the call
        (thus the concrete argument is still equal to the formal).
      [state] is the state at the return statement of the called function;
      it is used to evaluate the formals; their values are then compared to the

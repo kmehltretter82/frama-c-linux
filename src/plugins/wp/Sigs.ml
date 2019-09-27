@@ -326,9 +326,9 @@ sig
       shall be performed, otherwise return [Mvalue].
 
       Recognized [Cil] patterns:
-       - [Mvar x,[Mindex 0]] is rendered as [*x] when [x] has a pointer type
-       - [Mmem p,[Mfield f;...]] is rendered as [p->f...] like in Cil
-       - [Mmem p,[Mindex k;...]] is rendered as [p[k]...] to catch Cil [Mem(AddPI(p,k)),...] *)
+      - [Mvar x,[Mindex 0]] is rendered as [*x] when [x] has a pointer type
+      - [Mmem p,[Mfield f;...]] is rendered as [p->f...] like in Cil
+      - [Mmem p,[Mindex k;...]] is rendered as [p[k]...] to catch Cil [Mem(AddPI(p,k)),...] *)
   val lookup : state -> term -> mval
 
   (** Try to interpret a sequence of states into updates.

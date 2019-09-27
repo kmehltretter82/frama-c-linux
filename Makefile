@@ -140,7 +140,7 @@ OFLAGS	= $(PACKAGES) $(FLAGS) $(DEBUG) $(INCLUDES) -compact \
 BLINKFLAGS += -linkpkg $(BFLAGS) -linkall -custom
 OLINKFLAGS += -linkpkg $(OFLAGS) -linkall
 
-DOC_FLAGS= -colorize-code -stars -m A $(PACKAGES) $(INCLUDES) $(GUI_INCLUDES)
+DOC_FLAGS= -charset utf8 -colorize-code -stars -m A $(PACKAGES) $(INCLUDES) $(GUI_INCLUDES)
 
 ifneq ($(VERBOSEMAKE),yes)
 DOC_FLAGS+= -hide-warnings
@@ -1769,8 +1769,8 @@ check-ocp-indent-version:
 	if command -v ocp-indent >/dev/null; then \
 		$(eval ocp_version_major := $(shell ocp-indent --version | $(SED) -E "s/^([0-9]+)\.[0-9]+\..*/\1/")) \
 		$(eval ocp_version_minor := $(shell ocp-indent --version | $(SED) -E "s/^[0-9]+\.([0-9]+)\..*/\1/")) \
-		if [ "$(ocp_version_major)" -gt 1 -o "$(ocp_version_minor)" -gt 7 ]; then \
-			echo "error: ocp-indent <1.7.0 required for linting (got $(ocp_version_major).$(ocp_version_minor))"; \
+		if [ "$(ocp_version_major)" -lt 1 -o "$(ocp_version_minor)" -lt 7 ]; then \
+			echo "error: ocp-indent >=1.7.0 required for linting (got $(ocp_version_major).$(ocp_version_minor))"; \
 			exit 1; \
 		fi; \
 	else \

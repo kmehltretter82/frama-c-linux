@@ -480,8 +480,8 @@ let force_packed_attribute a =
 let is_power_of_two i = i > 0 && i land (i-1) = 0
 
 (* Computes the numeric value corresponding to an 'aligned' attribute:
-   - if 'aligned' (without integer), then use the maximum machine alignment;
-   - else, try to const-fold the expression to an integer value.
+   – if 'aligned' (without integer), then use the maximum machine alignment;
+   – else, try to const-fold the expression to an integer value.
    Returns [Some n] in case of success, [None] otherwise.
    Note that numeric values that are not powers of two are invalid and
    also return [None]. *)
@@ -558,9 +558,9 @@ let process_pragmas_pack_align_comp_attributes ci cattrs =
       match combine_aligned_attributes cattrs with
       | None ->
         (* No valid aligned attributes in this field.
-           - if the composite type has a packed attribute, then add the
+           – if the composite type has a packed attribute, then add the
              alignment given by the pack pragma;
-           - otherwise, no alignment attribute is necessary.
+           – otherwise, no alignment attribute is necessary.
            Drop existing "aligned" attributes, if there are invalid ones. *)
         if Cil.hasAttribute "packed" cattrs then (dropAttribute "aligned" cattrs)
         else begin
@@ -607,9 +607,9 @@ let process_pragmas_pack_align_field_attributes fi fattrs cattr =
       match combine_aligned_attributes fattrs with
       | None ->
         (* No valid aligned attributes in this field.
-           - if the composite type has a packed attribute, nothing needs to be
-           done (the composite will have the "packed" attribute anyway);
-           - otherwise, align on min(n,sizeof(fi.ftyp)).
+           – if the composite type has a packed attribute, nothing needs to be
+             done (the composite will have the "packed" attribute anyway);
+           – otherwise, align on min(n,sizeof(fi.ftyp)).
            Drop existing "aligned" attributes, if there are invalid ones. *)
         if Cil.hasAttribute "packed" cattr then (dropAttribute "aligned" fattrs)
         else begin
@@ -2089,9 +2089,9 @@ struct
 
     method private push: 'a.bool->'a->'a visitAction =
       fun flag x ->
-        Stack.push flag unspecified_stack;
-        ChangeDoChildrenPost
-          (x,fun x -> ignore(Stack.pop unspecified_stack); x)
+      Stack.push flag unspecified_stack;
+      ChangeDoChildrenPost
+        (x,fun x -> ignore(Stack.pop unspecified_stack); x)
 
 
     method! vblock b =
@@ -4541,10 +4541,10 @@ let rec doSpecList ghost (suggestedAnonName: string)
          constant's type is the smallest type (but at least int) that
          will hold the value, with a preference for unsigned types.
          The underlying type EI of the enum is picked as follows:
-         - let T be the smallest integer type that holds all the enum's
-         values; T is signed if any enum value is negative, unsigned otherwise
-         - if the enum is packed or sizeof(T) >= sizeof(int), then EI = T
-         - otherwise EI = int if T is signed and unsigned int otherwise
+         – let T be the smallest integer type that holds all the enum's
+           values; T is signed if any enum value is negative, unsigned otherwise
+         – if the enum is packed or sizeof(T) >= sizeof(int), then EI = T
+         – otherwise EI = int if T is signed and unsigned int otherwise
          Note that these rules make the enum unsigned if possible *)
       let updateEnum i : ikind =
         if Integer.lt i !smallest then
@@ -5163,8 +5163,8 @@ and isVariableSizedArray ghost (dt: A.decl_type)
       ARRAY (JUSTBASE, al, lo) when lo.expr_node != A.NOTHING ->
       (* Checks whether the expression is an integer constant expression,
          that is:
-         - it contains no side-effect
-         - it can be evaluated at compile-time
+         – it contains no side-effect
+         – it can be evaluated at compile-time
          Note that we should not pass true as asconst argument for doExp,
          since we are precisely trying to determine whether the expression
          is a constant or not.
@@ -7787,22 +7787,22 @@ and doInitializer local_env (vi: varinfo) (inite: A.init_expression)
 
 (* Consume some initializers. This is used by both global and local variables
    initialization.
-   - local_env is the current environment
-   - asconst is used to indicate that expressions must be compile-time constant
+   – local_env is the current environment
+   – asconst is used to indicate that expressions must be compile-time constant
      (i.e. we are in a global initializer)
-   - add_implicit_ensures is a callback to add an ensures clause to contracts
+   – add_implicit_ensures is a callback to add an ensures clause to contracts
      above current initialized part when it is partially initialized.
      Does nothing initially. Useful only for initialization of locals
-   - preinit corresponds to the initializers seen previously (for globals)
-   - so contains the information about the current subobject currently being
+   – preinit corresponds to the initializers seen previously (for globals)
+   – so contains the information about the current subobject currently being
      initialized
-   - acc is the chunk corresponding to initializations seen previously
+   – acc is the chunk corresponding to initializations seen previously
      (for locals)
-   - initl is the current list of initializers to be processed
+   – initl is the current list of initializers to be processed
    doInit returns a triple:
-   - chunk performing initialization
-   - preinit corresponding to the complete initialization
-   - the list of unused initializers if any (should be empty most of the time)
+   – chunk performing initialization
+   – preinit corresponding to the complete initialization
+   – the list of unused initializers if any (should be empty most of the time)
 *)
 and doInit local_env asconst add_implicit_ensures preinit so acc initl =
   let ghost = local_env.is_ghost in

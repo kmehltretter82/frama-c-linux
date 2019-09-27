@@ -732,15 +732,15 @@ module Base_checker = struct
 
       method private check_ei: 'a. enumitem -> 'a Cil.visitAction =
         fun ei ->
-          try
-            let ei' = Enumitem.Hashtbl.find known_enumitems ei in
-            if ei != ei' then
-              check_abort "enumitem %s is not shared between declaration and use"
-                ei.einame;
-            Cil.DoChildren
-          with Not_found ->
-            check_abort "enumitem %s is used but not declared"
-              ei.einame
+        try
+          let ei' = Enumitem.Hashtbl.find known_enumitems ei in
+          if ei != ei' then
+            check_abort "enumitem %s is not shared between declaration and use"
+              ei.einame;
+          Cil.DoChildren
+        with Not_found ->
+          check_abort "enumitem %s is used but not declared"
+            ei.einame
 
       (* can't use vlogic_label, as it also visits the declared labels in
          Tapp and Papp. *)

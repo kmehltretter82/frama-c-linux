@@ -46,6 +46,7 @@ module type S = sig
         or `Value (valuation, value), where [value] is the numeric value computed
         for the expression [expr], and [valuation] contains all the intermediate
         results of the evaluation.
+
       The [valuation] argument is a cache of already computed expressions.
       It is empty by default.
       The [reduction] argument allows deactivating the backward reduction

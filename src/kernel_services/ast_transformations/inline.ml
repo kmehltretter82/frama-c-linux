@@ -51,13 +51,13 @@ module RemoveInlined =
 let inline_parameter_category = object
   method fold: 'a. (kernel_function -> 'a -> 'a) -> 'a -> 'a =
     fun f acc ->
-      Globals.Functions.fold
-        (fun kf acc ->
-           let vi = Kernel_function.get_vi kf in
-           match kf.fundec with
-           | Definition _ -> if vi.vinline then f kf acc else acc
-           | Declaration _ -> acc)
-        acc
+    Globals.Functions.fold
+      (fun kf acc ->
+         let vi = Kernel_function.get_vi kf in
+         match kf.fundec with
+         | Definition _ -> if vi.vinline then f kf acc else acc
+         | Declaration _ -> acc)
+      acc
   method mem kf =
     Kernel_function.is_definition kf && (Kernel_function.get_vi kf).vinline
 end

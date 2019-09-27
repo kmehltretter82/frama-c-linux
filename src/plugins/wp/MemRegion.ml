@@ -487,9 +487,9 @@ type loc =
   | Lfld of region * index * F.term * region overlay
   | Larr of region * index * F.term * F.term list * int * int list
   (* For Lxxx locations:
-      - index: start index inside the chunk
-      - term: additional shift index
-      - term list: array index from start *)
+     - index: start index inside the chunk
+     - term: additional shift index
+     - term list: array index from start *)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Loc Basics                                                         --- *)
