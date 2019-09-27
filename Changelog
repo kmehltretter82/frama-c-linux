@@ -17,6 +17,7 @@
 Open Source Release <next-release>
 ##################################
 
+o   Config    [2019/09/27] ocp-indent 1.7.0 is now used for indentation
 -*  Makefile  [2019/09/12] Fixes #2378 - bytecode only compilation (patch
               contributed by madroach) and use -thread where needed.
 -*  Kernel    [2019/08/20] Fixes a rare but critical bug which occured when
