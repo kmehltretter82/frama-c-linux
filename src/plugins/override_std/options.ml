@@ -32,7 +32,7 @@ include Plugin.Register
 
 module Enabled = False
     (struct
-      let option_name = "-override-std-perform"
+      let option_name = "-override-std"
       let help = ""
     end)
 
