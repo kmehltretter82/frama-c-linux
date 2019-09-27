@@ -47,6 +47,147 @@ let is_return_stmt kf stmt =
 (* Code *)
 (* ************************************************************************** *)
 
+(* [TODO ARCHI] initializers
+  (* Add mappings from global variables to their initializers in [global_vars].
+     Note that the below function captures only [SingleInit]s. All compound
+     initializers containing SingleInits (except for empty compound
+     initializers) are unrapped and thrown away. *)
+  method !vinit vi off _ =
+    if generate then
+      if Mmodel_analysis.must_model_vi vi then begin
+        is_initializer <- vi.vglob;
+        Cil.DoChildrenPost
+          (fun i ->
+            (match is_initializer with
+            | true ->
+              (match i with
+              | CompoundInit(_,[]) ->
+                (* Case of an empty CompoundInit, treat it as if there were
+                   no initializer at all *)
+                ()
+              | CompoundInit(_,_) | SingleInit _ ->
+                (* TODO: [off] should be the one of the new project while it is
+                   from the old project *)
+                Global_observer.add_initializer vi off i)
+            | false-> ());
+            is_initializer <- false;
+          i)
+      end else
+        Cil.JustCopy
+    else
+      Cil.SkipChildren
+*)
+
+let replace_literal_string_in_exp ~is_global_init env kf e =
+  (* [TODO ARCHI] recursive call in sub-expression *)
+  (* do not touch global initializers because they accept only constants;
+     replace literal strings elsewhere *)
+  if is_global_init then e, env else Literal_observer.exp env kf e
+
+let inject_in_instr env kf stmt instr =
+  (* [TODO ARCHI] recursive calls at the right places *)
+  let add_initializer loc ?vi lv ?(post=false) stmt env kf =
+    if Functions.instrument kf then
+      let may_safely_ignore = function
+        | Var vi, NoOffset -> vi.vglob || vi.vformal
+        | _ -> false
+      in
+      let must_model = Mmodel_analysis.must_model_lval ~stmt ~kf lv in
+      if not (may_safely_ignore lv) && must_model then
+        let before = Cil.mkStmt stmt.skind in
+        let new_stmt =
+          (* bitfields are not yet supported ==> no initializer.
+             a [not_yet] will be raised in [Translate]. *)
+          if Cil.isBitfield lv
+          then Cil.mkEmptyStmt ()
+          else Misc.mk_initialize ~loc lv
+        in
+        let env = Env.add_stmt ~post ~before env kf new_stmt in
+        let env = match vi with
+          | None -> env
+          | Some vi ->
+            let new_stmt = Misc.mk_store_stmt vi in
+            Env.add_stmt ~post ~before env kf new_stmt
+        in
+        env
+      else
+        env
+    else
+      env
+  in
+  let check_formats = Options.Validate_format_strings.get () in
+  let replace_libc_fn = Options.Replace_libc_functions.get () in
+  match instr with
+  | Set(lv, _, loc) -> add_initializer loc lv stmt env kf
+  | Local_init(vi, init, loc) ->
+    let lv = (Var vi, NoOffset) in
+    let env = add_initializer loc ~vi lv ~post:true stmt env kf in
+    (* Handle variable-length array allocation via [__fc_vla_alloc].
+       Here each instance of [__fc_vla_alloc] is rewritten to [alloca]
+       (that is used to implement VLA) and further a custom call to
+       [store_block] tracking VLA allocation is issued. *)
+    (* KV: Do not add handling [alloca] allocation here (or anywhere else for
+       that matter). Handling of [alloca] should be implemented in Frama-C
+       (eventually). This is such that each call to [alloca] becomes
+       [__fc_vla_alloc]. It is already handled using the code below. *)
+    (match init with
+     | ConsInit (fvi, sz :: _, _)
+       when Functions.Libc.is_vla_alloc_name fvi.vname ->
+       fvi.vname <- Functions.Libc.actual_alloca;
+       (* Since we need to pass [vi] by value cannot use [Misc.mk_store_stmt]
+          here. Do it manually. *)
+       let sname = Functions.RTL.mk_api_name "store_block" in
+       let store = Misc.mk_call ~loc sname [ Cil.evar vi ; sz ] in
+       Env.add_stmt ~post:true env kf store
+     (* Rewrite format functions (e.g., [printf]). See some comments below *)
+     | ConsInit (fvi, args, knd) when check_formats
+                                   && Functions.Libc.is_printf_name fvi.vname ->
+       let name = Functions.RTL.get_rtl_replacement_name fvi.vname in
+       let new_vi = Misc.get_lib_fun_vi name in
+       let fmt = Functions.Libc.get_printf_argument_str ~loc fvi.vname args in
+       stmt.skind <-
+         Instr(Local_init(vi, ConsInit(new_vi, fmt :: args, knd), loc));
+       env
+     (* Rewrite names of functions for which we have alternative
+        definitions in the RTL. *)
+     | ConsInit (fvi, _, _) when replace_libc_fn &&
+                                 Functions.RTL.has_rtl_replacement fvi.vname ->
+       fvi.vname <- Functions.RTL.get_rtl_replacement_name fvi.vname;
+       env
+     | _ -> env)
+  | Call (result, exp, args, loc) ->
+    (* Rewrite names of functions for which we have alternative
+       definitions in the RTL. *)
+    (match exp.enode with
+     | Lval(Var vi, _) when replace_libc_fn &&
+                            Functions.RTL.has_rtl_replacement vi.vname ->
+       vi.vname <- Functions.RTL.get_rtl_replacement_name vi.vname
+     | Lval(Var vi , _) when Functions.Libc.is_vla_free_name vi.vname ->
+       (* Handle variable-length array allocation via [__fc_vla_free].
+          Rewrite its name to [delete_block]. The rest is in place. *)
+       vi.vname <- Functions.RTL.mk_api_name "delete_block"
+     | Lval(Var vi, _)
+       when check_formats && Functions.Libc.is_printf_name vi.vname ->
+       (* Rewrite names of format functions (such as printf). This case
+          differs from the above because argument list of format functions is
+          extended with an argument describing actual variadic arguments *)
+       (* Replacement name, e.g., [printf] -> [__e_acsl_builtin_printf] *)
+       let name = Functions.RTL.get_rtl_replacement_name vi.vname in
+       (* Variadic arguments descriptor *)
+       let fmt = Functions.Libc.get_printf_argument_str ~loc vi.vname args in
+       (* get the name of the library function we need. Cannot just rewrite
+          the name as AST check will then fail *)
+       let vi = Misc.get_lib_fun_vi name in
+       stmt.skind <- Instr(Call (result, Cil.evar vi, fmt :: args, loc))
+     | _ -> ());
+    (* Add statement tracking initialization of return values of function
+       calls *)
+    (match result with
+     | Some lv when not (Functions.RTL.is_generated_kf kf) ->
+       add_initializer loc lv ~post:false stmt env kf
+     | _ -> env)
+  | _ -> env
+
 let add_new_block_in_stmt env kf stmt =
   (* be careful: since this function is called in a post action, [env] has been
      modified from the time where pre actions have been executed.  Use
@@ -167,7 +308,98 @@ let add_new_block_in_stmt env kf stmt =
     "@[new stmt (from sid %d):@ %a@]" stmt.sid Printer.pp_stmt new_stmt;
   new_stmt, env
 
-let inject_in_stmt env kf stmt =
+(* visit the substmts and build the new skind *)
+let rec inject_in_substmt env kf stmt = match stmt.skind with
+  | Instr instr as skind ->
+    let env = inject_in_instr env kf stmt instr in
+    skind, env
+
+  | Return(Some e, loc)  ->
+    let e, env = replace_literal_string_in_exp false env kf e in
+    Return(Some e, loc), env
+
+  | If(e, blk1, blk2, loc) ->
+    let env = inject_in_block env kf blk1 in
+    let env = inject_in_block env kf blk2 in
+    let e, env = replace_literal_string_in_exp false env kf e in
+    If(e, blk1, blk2, loc), env
+
+  | Switch(e, blk, stmts, loc) ->
+    let env = inject_in_block env kf blk in
+    let stmts, env =
+      List.fold_left
+        (fun (stmts, env) stmt ->
+           let stmt, env = inject_in_stmt env kf stmt in
+           stmt :: stmts, env)
+        ([], env)
+        stmts
+    in
+    let e, env = replace_literal_string_in_exp false env kf e in
+    Switch(e, blk, stmts, loc), env
+
+  | Loop(_ (* ignore AST annotations *), blk, loc, stmt_opt1, stmt_opt2) ->
+    let env = inject_in_block env kf blk in
+    let do_opt env = function
+      | None -> None, env
+      | Some stmt ->
+        let stmt, env = inject_in_stmt env kf stmt in
+        Some stmt, env
+    in
+    let stmt_opt1, env = do_opt env stmt_opt1 in
+    let stmt_opt2, env = do_opt env stmt_opt2 in
+    Loop([], blk, loc, stmt_opt1, stmt_opt2), env
+
+  | Block blk as skind ->
+    skind, inject_in_block env kf blk
+
+  | UnspecifiedSequence l ->
+    let l, env =
+      List.fold_left
+        (fun (l, env) (stmt, l1, l2, l3, srefs) ->
+           let stmt, env = inject_in_stmt env kf stmt in
+           (stmt, l1, l2, l3, srefs) :: l, env)
+        ([], env)
+        l
+    in
+    UnspecifiedSequence l, env
+
+  | Throw(Some(e, ty), loc) ->
+    let e, env = replace_literal_string_in_exp false env kf e in
+    Throw(Some(e, ty), loc), env
+
+  | TryCatch(blk, l, _loc) as skind ->
+    let env = inject_in_block env kf blk in
+    let env =
+      List.fold_left
+        (fun env (cb, blk) ->
+           let env = inject_in_catch_binder env kf cb in
+           inject_in_block env kf blk)
+        env
+        l
+    in
+    skind, env
+
+  | TryFinally(blk1, blk2, _loc) as skind ->
+    let env = inject_in_block env kf blk1 in
+    let env = inject_in_block env kf blk2 in
+    skind, env
+
+  | TryExcept(blk1, (instrs, e), blk2, loc) ->
+    let env = inject_in_block env kf blk1 in
+    let e, env = replace_literal_string_in_exp false env kf e in
+    let env = inject_in_block env kf blk2 in
+    ignore (assert false) (* TODO ARCHI: instrs *);
+    TryExcept(blk1, (instrs, e), blk2, loc), env
+
+  (* nothing to do: *)
+  | Throw(None, _)
+  | Return(None, _)
+  | Goto _ (* do not visit the internal stmt since it has already been handle *)
+  | Break _
+  | Continue _ as skind ->
+    skind, env
+
+and inject_in_stmt env kf stmt =
   Options.debug ~level:4
     "proceeding stmt (sid %d) %a@."
     stmt.sid Stmt.pretty stmt;
@@ -213,11 +445,12 @@ let inject_in_stmt env kf stmt =
      calls. *)
   let duplicates = Exit_points.store_vars stmt in
   let env = Memory_observer.duplicate_store ~before:stmt env kf duplicates in
-  (* [TODO ARCHI] HERE recursive call *)
+  let skind, env = inject_in_substmt env kf stmt in
+  stmt.skind <- skind;
   (* building the new block of code *)
   add_new_block_in_stmt env kf stmt
 
-let inject_in_block (env: Env.t) kf blk =
+and inject_in_block (env: Env.t) kf blk =
   let stmts, env =
     List.fold_right
       (fun stmt (stmts, env) ->
@@ -276,6 +509,12 @@ let inject_in_block (env: Env.t) kf blk =
              else acc)
           blk.bstmts
           blk.blocals;
+    env
+
+and inject_in_catch_binder env kf = function
+  | Catch_exn(_, l) ->
+    List.fold_left (fun env (_, blk) -> inject_in_block env kf blk) env l
+  | Catch_all ->
     env
 
 (* ************************************************************************** *)
