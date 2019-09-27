@@ -20,25 +20,217 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module E_acsl_label = Label (* [Label] is hidden by opening [Cil_datatype *)
 open Cil_types
 open Cil_datatype
 
 let dkey = Options.dkey_translation
 
+(* ************************************************************************** *)
+(* Utilities *)
+(* ************************************************************************** *)
+
 (* [TODO ARCHI] move it in another module *)
 let is_main kf =
   Datatype.String.equal (Kernel_function.get_name kf) "main"
+
+(* [TODO ARCHI] move it *)
+let is_first_stmt kf stmt =
+  try Stmt.equal stmt (Kernel_function.find_first_stmt kf)
+  with Kernel_function.No_Statement -> assert false
+
+let is_return_stmt kf stmt =
+  try Stmt.equal stmt (Kernel_function.find_return kf)
+  with Kernel_function.No_Statement -> assert false
 
 (* ************************************************************************** *)
 (* Code *)
 (* ************************************************************************** *)
 
-let inject_in_block _env _main kf blk =
+let add_new_block_in_stmt env kf stmt =
+  (* be careful: since this function is called in a post action, [env] has been
+     modified from the time where pre actions have been executed.  Use
+     [function_env] to get it back. *)
+  (* [TODO ARCHI] what about the above comment? *)
+  (* Add temporal analysis instrumentations *)
+  let env = Temporal.handle_stmt stmt env kf in
+  let new_stmt, env, must_mv =
+    if Functions.check kf then
+      let env =
+        (* handle ghost statement *)
+        if stmt.ghost then begin
+          stmt.ghost <- false;
+          (* translate potential RTEs of ghost code *)
+          let rtes = Rte.stmt ~warn:false kf stmt in
+          Translate.translate_rte_annots Printer.pp_stmt stmt kf env rtes
+        end else
+          env
+      in
+      (* handle loop invariants *)
+      let new_stmt, env, must_mv = Loops.preserve_invariant env kf stmt in
+      new_stmt, env, must_mv
+    else
+      stmt, env, false
+  in
+  let mk_post_env env stmt =
+    Annotations.fold_code_annot
+      (fun _ a env -> Translate.translate_post_code_annotation kf env a)
+      stmt
+      env
+  in
+  let new_stmt, env =
+    (* Remove local variables which scopes ended via goto/break/continue. *)
+    let del_vars = Exit_points.delete_vars stmt in
+    let env = Memory_observer.delete_from_set ~before:stmt env kf del_vars in
+    if is_return_stmt kf stmt then
+      let env =
+        if Functions.check kf then
+          (* must generate the post_block before including [stmt] (the
+             'return') since no code is executed after it. However, since
+             this statement is pure (Cil invariant), that is semantically
+             correct. *)
+          (* [JS 2019/2/19] TODO: what about the other ways of early exiting
+             a block? *)
+          let env = mk_post_env env stmt in
+          (* also handle the postcondition of the function and clear the
+             env *)
+          Translate.translate_post_spec kf env (Annotations.funspec kf)
+        else
+          env
+      in
+      (* de-allocating memory previously allocating by the kf *)
+      (* remove recorded function arguments *)
+      let fargs = Kernel_function.get_formals kf in
+      let env = Memory_observer.delete_from_list env kf fargs in
+      let b, env =
+        Env.pop_and_get env new_stmt ~global_clear:true Env.After
+      in
+      if is_main kf && Mmodel_analysis.use_model () then begin
+        let stmts = b.bstmts in
+        let l = List.rev stmts in
+        let mclean = (Functions.RTL.mk_api_name "memory_clean") in
+        match l with
+        | [] -> assert false (* at least the 'return' stmt *)
+        | ret :: l ->
+          let loc = Stmt.loc stmt in
+          let delete_stmts =
+            Global_observer.mk_delete_stmts [ Misc.mk_call ~loc mclean []; ret ]
+          in
+          b.bstmts <- List.rev l @ delete_stmts
+      end;
+      let new_stmt = Misc.mk_block stmt b in
+      if not (Cil_datatype.Stmt.equal stmt new_stmt) then begin
+        (* move the labels of the return to the new block in order to
+           evaluate the postcondition when jumping to them. *)
+        E_acsl_label.move kf stmt new_stmt
+      end;
+      new_stmt, env
+    else (* i.e. not (is_return stmt) *)
+      (* must generate [pre_block] which includes [stmt] before generating
+         [post_block] *)
+      let pre_block, env =
+        Env.pop_and_get
+          ~split:true
+          env
+          new_stmt
+          ~global_clear:false
+          Env.After
+      in
+      let env =
+        (* if [kf] is not monitored, do not translate any postcondition,
+           but still push an empty environment consumed by
+           [Env.pop_and_get] below. This [Env.pop_and_get] call is always
+           required in order to generate the code not directly related to
+           the annotations of the current stmt in anycase. *)
+        if Functions.check kf then mk_post_env (Env.push env) stmt
+        else Env.push env
+      in
+      let post_block, env =
+        Env.pop_and_get
+          env
+          (Misc.mk_block new_stmt pre_block)
+          ~global_clear:false
+          Env.Before
+      in
+      let post_block =
+        if post_block.blocals = [] && new_stmt.labels = []
+        then Cil.transient_block post_block
+        else post_block
+      in
+      let res = Misc.mk_block new_stmt post_block in
+      if not (Cil_datatype.Stmt.equal new_stmt res) then
+        E_acsl_label.move kf new_stmt res;
+      res, env
+  in
+  if must_mv then Loops.mv_invariants kf ~old:new_stmt stmt;
+  Options.debug ~level:4
+    "@[new stmt (from sid %d):@ %a@]" stmt.sid Printer.pp_stmt new_stmt;
+  new_stmt, env
+
+let inject_in_stmt env kf stmt =
+  Options.debug ~level:4
+    "proceeding stmt (sid %d) %a@."
+    stmt.sid Stmt.pretty stmt;
+  (* pushing a new context *)
+  let env = Env.push env in
+  let env = match stmt.skind with
+    | Loop _ -> Env.push_loop env
+    | _ -> env
+  in
+  (* initial environment *)
+  let env =
+    if is_first_stmt kf stmt then
+      let env =
+        if is_main kf then
+          env
+        else
+          let env =
+            Memory_observer.store env kf (Kernel_function.get_formals kf)
+          in
+          Temporal.handle_function_parameters kf env
+      in
+      (* translate the precondition of the function *)
+      if Functions.check kf then
+        let funspec = Annotations.funspec kf in
+        Translate.translate_pre_spec kf env funspec
+      else env
+    else
+      env
+  in
+  (* translate code annotations *)
+  let env =
+    if Functions.check kf then
+      Annotations.fold_code_annot
+        (fun _ a env -> Translate.translate_pre_code_annotation kf env a)
+        stmt
+        env
+    else
+      env
+  in
+  (* add [__e_acsl_store_duplicate] calls for local variables which declarations
+     are bypassed by gotos. Note: should be done before visiting instructions
+     (which adds initializers), otherwise init calls appear before store
+     calls. *)
+  let duplicates = Exit_points.store_vars stmt in
+  let env = Memory_observer.duplicate_store ~before:stmt env kf duplicates in
   (* [TODO ARCHI] HERE recursive call *)
+  (* building the new block of code *)
+  add_new_block_in_stmt env kf stmt
+
+let inject_in_block (env: Env.t) kf blk =
+  let stmts, env =
+    List.fold_right
+      (fun stmt (stmts, env) ->
+         let stmt, env = inject_in_stmt env kf stmt in
+         stmt :: stmts, env)
+      blk.bstmts
+      ([], env)
+  in
+  blk.bstmts <- stmts;
   let free_stmts = At_with_lscope.Free.find_all kf in
   match blk.blocals, free_stmts with
   | [], [] ->
-    ()
+    env
   | [], _ :: _ | _ :: _, [] | _ :: _, _ :: _ ->
     let add_locals stmts =
       if Functions.instrument kf then
@@ -83,7 +275,8 @@ let inject_in_block _env _main kf blk =
              then Misc.mk_store_stmt vi :: acc
              else acc)
           blk.bstmts
-          blk.blocals
+          blk.blocals;
+    env
 
 (* ************************************************************************** *)
 (* Function definition *)
@@ -129,7 +322,7 @@ let inject_in_fundec env main fundec =
   Options.feedback ~dkey ~level:2 "entering in function %a."
     Kernel_function.pretty kf;
   (* recursive visit *)
-  inject_in_block env main kf fundec.sbody;
+  let env = inject_in_block env kf fundec.sbody in
   Exit_points.clear ();
   add_generated_variables_in_function env fundec;
   add_malloc_and_free_stmts kf fundec;

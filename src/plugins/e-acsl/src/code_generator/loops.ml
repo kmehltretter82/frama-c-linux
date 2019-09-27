@@ -65,26 +65,23 @@ let mv_invariants kf ~old stmt =
               Annotations.add_code_annot e ~kf stmt ca)
            l)
 
-let preserve_invariant prj env kf stmt = match stmt.skind with
+let preserve_invariant env kf stmt = match stmt.skind with
   | Loop(_, ({ bstmts = stmts } as blk), loc, cont, break) ->
     let rec handle_invariants (stmts, env, _ as acc) = function
       | [] ->
-	(* empty loop body: no need to verify the invariant twice *)
-	acc
+        (* empty loop body: no need to verify the invariant twice *)
+        acc
       | [ last ] ->
-	let invariants, env = Env.pop_loop env in
-	let env = Env.push env in
-	let env =
-    let translate_named_predicate = !translate_named_predicate_ref in
-	  Project.on
-	    prj
-	    (List.fold_left (translate_named_predicate kf) env)
-	    invariants
-	in
-	let blk, env =
-	  Env.pop_and_get env last ~global_clear:false Env.Before
-	in
-	Misc.mk_block prj last blk :: stmts, env, invariants != []
+        let invariants, env = Env.pop_loop env in
+        let env = Env.push env in
+        let env =
+          let translate_named_predicate = !translate_named_predicate_ref in
+          List.fold_left (translate_named_predicate kf) env invariants
+        in
+        let blk, env =
+          Env.pop_and_get env last ~global_clear:false Env.Before
+        in
+        Misc.mk_block last blk :: stmts, env, invariants != []
       | s :: tl -> handle_invariants (s :: stmts, env, false) tl
     in
     let env = Env.set_annotation_kind env Misc.Invariant in

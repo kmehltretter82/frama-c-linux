@@ -124,16 +124,13 @@ let mk_e_acsl_guard ?(reverse=false) kind kf e p =
       Cil.mkString ~loc msg;
       Cil.integer loc line ]
 
-let mk_block prj stmt b =
-  let mk b = match b.bstmts with
-    | [] ->
-      (match stmt.skind with
-      | Instr(Skip _) -> stmt
-      | _ -> assert false)
-    | [ s ] -> s
-    |  _ :: _ -> Cil.mkStmt ~valid_sid:true (Block b)
-  in
-  Project.on prj mk b
+let mk_block stmt b = match b.bstmts with
+  | [] ->
+    (match stmt.skind with
+     | Instr(Skip _) -> stmt
+     | _ -> assert false)
+  | [ s ] -> s
+  |  _ :: _ -> Cil.mkStmt ~valid_sid:true (Block b)
 
 (* ************************************************************************** *)
 (** {2 Handling \result} *)

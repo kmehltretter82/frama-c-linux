@@ -53,7 +53,7 @@ val mk_e_acsl_guard:
   ?reverse:bool -> annotation_kind -> kernel_function -> exp -> predicate
   -> stmt
 
-val mk_block: Project.t -> stmt -> block -> stmt
+val mk_block: stmt -> block -> stmt
 
 (* ************************************************************************** *)
 (** {2 Handling \result} *)
