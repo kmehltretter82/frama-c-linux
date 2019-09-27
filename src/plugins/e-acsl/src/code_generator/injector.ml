@@ -79,114 +79,156 @@ let is_return_stmt kf stmt =
 *)
 
 let replace_literal_string_in_exp ~is_global_init env kf e =
-  (* [TODO ARCHI] recursive call in sub-expression *)
   (* do not touch global initializers because they accept only constants;
      replace literal strings elsewhere *)
-  if is_global_init then e, env else Literal_observer.exp env kf e
+  if is_global_init then e, env else Literal_observer.exp_in_depth env kf e
 
-let inject_in_instr env kf stmt instr =
-  (* [TODO ARCHI] recursive calls at the right places *)
-  let add_initializer loc ?vi lv ?(post=false) stmt env kf =
-    if Functions.instrument kf then
-      let may_safely_ignore = function
-        | Var vi, NoOffset -> vi.vglob || vi.vformal
-        | _ -> false
-      in
-      let must_model = Mmodel_analysis.must_model_lval ~stmt ~kf lv in
-      if not (may_safely_ignore lv) && must_model then
-        let before = Cil.mkStmt stmt.skind in
-        let new_stmt =
-          (* bitfields are not yet supported ==> no initializer.
-             a [not_yet] will be raised in [Translate]. *)
-          if Cil.isBitfield lv
-          then Cil.mkEmptyStmt ()
-          else Misc.mk_initialize ~loc lv
-        in
-        let env = Env.add_stmt ~post ~before env kf new_stmt in
-        let env = match vi with
-          | None -> env
-          | Some vi ->
-            let new_stmt = Misc.mk_store_stmt vi in
-            Env.add_stmt ~post ~before env kf new_stmt
-        in
-        env
-      else
-        env
-    else
-      env
-  in
-  let check_formats = Options.Validate_format_strings.get () in
-  let replace_libc_fn = Options.Replace_libc_functions.get () in
-  match instr with
-  | Set(lv, _, loc) -> add_initializer loc lv stmt env kf
-  | Local_init(vi, init, loc) ->
-    let lv = (Var vi, NoOffset) in
-    let env = add_initializer loc ~vi lv ~post:true stmt env kf in
-    (* Handle variable-length array allocation via [__fc_vla_alloc].
-       Here each instance of [__fc_vla_alloc] is rewritten to [alloca]
-       (that is used to implement VLA) and further a custom call to
-       [store_block] tracking VLA allocation is issued. *)
-    (* KV: Do not add handling [alloca] allocation here (or anywhere else for
+let inject_in_local_init loc env kf vi = function
+  | ConsInit (fvi, sz :: _, _) as init
+    when Functions.Libc.is_vla_alloc_name fvi.vname ->
+    (* handle variable-length array allocation via [__fc_vla_alloc].  Here each
+       instance of [__fc_vla_alloc] is rewritten to [alloca] (that is used to
+       implement VLA) and further a custom call to [store_block] tracking VLA
+       allocation is issued. *)
+    (* KV: do not add handling [alloca] allocation here (or anywhere else for
        that matter). Handling of [alloca] should be implemented in Frama-C
        (eventually). This is such that each call to [alloca] becomes
        [__fc_vla_alloc]. It is already handled using the code below. *)
-    (match init with
-     | ConsInit (fvi, sz :: _, _)
-       when Functions.Libc.is_vla_alloc_name fvi.vname ->
-       fvi.vname <- Functions.Libc.actual_alloca;
-       (* Since we need to pass [vi] by value cannot use [Misc.mk_store_stmt]
-          here. Do it manually. *)
-       let sname = Functions.RTL.mk_api_name "store_block" in
-       let store = Misc.mk_call ~loc sname [ Cil.evar vi ; sz ] in
-       Env.add_stmt ~post:true env kf store
-     (* Rewrite format functions (e.g., [printf]). See some comments below *)
-     | ConsInit (fvi, args, knd) when check_formats
-                                   && Functions.Libc.is_printf_name fvi.vname ->
-       let name = Functions.RTL.get_rtl_replacement_name fvi.vname in
-       let new_vi = Misc.get_lib_fun_vi name in
-       let fmt = Functions.Libc.get_printf_argument_str ~loc fvi.vname args in
-       stmt.skind <-
-         Instr(Local_init(vi, ConsInit(new_vi, fmt :: args, knd), loc));
-       env
-     (* Rewrite names of functions for which we have alternative
-        definitions in the RTL. *)
-     | ConsInit (fvi, _, _) when replace_libc_fn &&
-                                 Functions.RTL.has_rtl_replacement fvi.vname ->
-       fvi.vname <- Functions.RTL.get_rtl_replacement_name fvi.vname;
-       env
-     | _ -> env)
-  | Call (result, exp, args, loc) ->
-    (* Rewrite names of functions for which we have alternative
-       definitions in the RTL. *)
-    (match exp.enode with
-     | Lval(Var vi, _) when replace_libc_fn &&
-                            Functions.RTL.has_rtl_replacement vi.vname ->
-       vi.vname <- Functions.RTL.get_rtl_replacement_name vi.vname
-     | Lval(Var vi , _) when Functions.Libc.is_vla_free_name vi.vname ->
-       (* Handle variable-length array allocation via [__fc_vla_free].
-          Rewrite its name to [delete_block]. The rest is in place. *)
-       vi.vname <- Functions.RTL.mk_api_name "delete_block"
-     | Lval(Var vi, _)
-       when check_formats && Functions.Libc.is_printf_name vi.vname ->
-       (* Rewrite names of format functions (such as printf). This case
-          differs from the above because argument list of format functions is
-          extended with an argument describing actual variadic arguments *)
-       (* Replacement name, e.g., [printf] -> [__e_acsl_builtin_printf] *)
-       let name = Functions.RTL.get_rtl_replacement_name vi.vname in
-       (* Variadic arguments descriptor *)
-       let fmt = Functions.Libc.get_printf_argument_str ~loc vi.vname args in
-       (* get the name of the library function we need. Cannot just rewrite
-          the name as AST check will then fail *)
-       let vi = Misc.get_lib_fun_vi name in
-       stmt.skind <- Instr(Call (result, Cil.evar vi, fmt :: args, loc))
-     | _ -> ());
-    (* Add statement tracking initialization of return values of function
-       calls *)
-    (match result with
-     | Some lv when not (Functions.RTL.is_generated_kf kf) ->
-       add_initializer loc lv ~post:false stmt env kf
-     | _ -> env)
-  | _ -> env
+    fvi.vname <- Functions.Libc.actual_alloca;
+    (* Since we need to pass [vi] by value, cannot use [Misc.mk_store_stmt]
+       here. Do it manually. *)
+    let sname = Functions.RTL.mk_api_name "store_block" in
+    let store = Misc.mk_call ~loc sname [ Cil.evar vi ; sz ] in
+    let env = Env.add_stmt ~post:true env kf store in
+    init, env
+
+  | ConsInit (fvi, args, kind)
+    when Options.Validate_format_strings.get ()
+      && Functions.Libc.is_printf_name fvi.vname
+    ->
+    (* rewrite format functions (e.g., [printf]). *)
+    let name = Functions.RTL.get_rtl_replacement_name fvi.vname in
+    let new_vi = Misc.get_lib_fun_vi name in
+    let fmt = Functions.Libc.get_printf_argument_str ~loc fvi.vname args in
+    ConsInit(new_vi, fmt :: args, kind), env
+
+  | ConsInit (fvi, _, _) as init
+    when Options.Replace_libc_functions.get ()
+      && Functions.RTL.has_rtl_replacement fvi.vname
+    ->
+    (* rewrite names of functions for which we have alternative definitions in
+       the RTL. *)
+    fvi.vname <- Functions.RTL.get_rtl_replacement_name fvi.vname;
+    init, env
+
+  | AssignInit _ | ConsInit _ as init ->
+    (* [TODO ARCHI] for AssignInit: do init *)
+    init, env
+
+(* rewrite names of functions for which we have alternative definitions in the
+   RTL. *)
+let rename_caller loc args exp = match exp.enode with
+  | Lval(Var vi, _)
+    when Options.Replace_libc_functions.get ()
+      && Functions.RTL.has_rtl_replacement vi.vname
+    ->
+    vi.vname <- Functions.RTL.get_rtl_replacement_name vi.vname;
+    exp, args
+
+  | Lval(Var vi , _) when Functions.Libc.is_vla_free_name vi.vname ->
+    (* handle variable-length array allocation via [__fc_vla_free]. Rewrite its
+       name to [delete_block]. The rest is in place. *)
+    vi.vname <- Functions.RTL.mk_api_name "delete_block";
+    exp, args
+
+  | Lval(Var vi, _)
+    when Options.Validate_format_strings.get ()
+      && Functions.Libc.is_printf_name vi.vname
+    ->
+    (* rewrite names of format functions (such as printf). This case differs
+       from the above because argument list of format functions is extended with
+       an argument describing actual variadic arguments *)
+    (* replacement name, e.g., [printf] -> [__e_acsl_builtin_printf] *)
+    let name = Functions.RTL.get_rtl_replacement_name vi.vname in
+    (* variadic arguments descriptor *)
+    let fmt = Functions.Libc.get_printf_argument_str ~loc vi.vname args in
+    (* get the name of the library function we need. Cannot just rewrite the
+       name as AST check will then fail *)
+    let vi = Misc.get_lib_fun_vi name in
+    Cil.evar vi, fmt :: args
+
+  | _ ->
+    exp, args
+
+(* TODO: should be better documented *)
+let add_initializer loc ?vi lv ?(post=false) stmt env kf =
+  if Functions.instrument kf then
+    let may_safely_ignore = function
+      | Var vi, NoOffset -> vi.vglob || vi.vformal
+      | _ -> false
+    in
+    let must_model = Mmodel_analysis.must_model_lval ~stmt ~kf lv in
+    if not (may_safely_ignore lv) && must_model then
+      let before = Cil.mkStmt stmt.skind in
+      let new_stmt =
+        (* bitfields are not yet supported ==> no initializer.
+           a [not_yet] will be raised in [Translate]. *)
+        if Cil.isBitfield lv
+        then Cil.mkEmptyStmt ()
+        else Misc.mk_initialize ~loc lv
+      in
+      let env = Env.add_stmt ~post ~before env kf new_stmt in
+      let env = match vi with
+        | None -> env
+        | Some vi ->
+          let new_stmt = Misc.mk_store_stmt vi in
+          Env.add_stmt ~post ~before env kf new_stmt
+      in
+      env
+    else
+      env
+  else
+    env
+
+let inject_in_instr env kf stmt instr =
+  (* [TODO ARCHI] recursive calls at the right places *)
+  match instr with
+  | Set(lv, e, loc) ->
+    let e, env = replace_literal_string_in_exp false env kf e in
+    let env = add_initializer loc lv stmt env kf in
+    Set(lv, e, loc), env
+
+  | Call(result, caller, args, loc) ->
+    let args, env =
+      List.fold_right
+        (fun a (args, env) ->
+           let a, env = replace_literal_string_in_exp false env kf a in
+           a :: args, env)
+        args
+        ([], env)
+    in
+    let caller, args = rename_caller loc args caller in
+    (* add statement tracking initialization of return values *)
+    let env =
+      match result with
+      | Some lv when not (Functions.RTL.is_generated_kf kf) ->
+        add_initializer loc lv ~post:false stmt env kf
+      | _ ->
+        env
+    in
+    Call(result, caller, args, loc), env
+
+  | Local_init(vi, linit, loc) ->
+    let lv = Var vi, NoOffset in
+    let env = add_initializer loc ~vi lv ~post:true stmt env kf in
+    let linit, env = inject_in_local_init loc env kf vi linit in
+    Local_init(vi, linit, loc), env
+
+  (* nothing to do: *)
+  | Asm _
+  | Skip _
+  | Code_annot _ ->
+    instr, env
 
 let add_new_block_in_stmt env kf stmt =
   (* be careful: since this function is called in a post action, [env] has been
@@ -310,9 +352,9 @@ let add_new_block_in_stmt env kf stmt =
 
 (* visit the substmts and build the new skind *)
 let rec inject_in_substmt env kf stmt = match stmt.skind with
-  | Instr instr as skind ->
-    let env = inject_in_instr env kf stmt instr in
-    skind, env
+  | Instr instr ->
+    let instr, env = inject_in_instr env kf stmt instr in
+    Instr instr, env
 
   | Return(Some e, loc)  ->
     let e, env = replace_literal_string_in_exp false env kf e in
