@@ -78,7 +78,7 @@ let get_subdivision_option stmt =
   with Not_found -> Value_parameters.LinearLevel.get ()
 
 let get_subdivision stmt =
-  match Partitioning_annots.get_subdivision_annot stmt with
+  match Eva_annotations.get_subdivision_annot stmt with
   | [] -> get_subdivision_option stmt
   | [x] -> x
   | x :: _ ->

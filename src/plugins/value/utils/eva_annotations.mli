@@ -20,6 +20,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Registers Eva annotations:
+    - slevel annotations: "slevel default", "slevel merge" and "slevel i"
+    - loop unroll annotations: "loop unroll term"
+    - value partitioning annotations: "split term" and "merge term"
+    - subdivision annotations: "subdivide i"
+
+    Widen hints annotations are still registered in !{widen_hints_ext.ml}. *)
+
 type slevel_annotation =
   | SlevelMerge
   | SlevelDefault
