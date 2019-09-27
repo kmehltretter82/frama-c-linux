@@ -30,7 +30,7 @@ open Cil_types
 
 val apply_after_transformation: Project.t -> unit
 
-val mv_invariants: Env.t -> old:stmt -> stmt -> unit
+val mv_invariants: kernel_function -> old:stmt -> stmt -> unit
 (** Transfer the loop invariants from the [old] loop to the new one.
     Both statements must be loops. *)
 

@@ -22,11 +22,11 @@
 
 open Cil_types
 
-val move: Visitor.generic_frama_c_visitor -> old:stmt -> stmt -> unit
+val move: kernel_function -> old:stmt -> stmt -> unit
 (** Move all labels of the [old] stmt onto the new [stmt].
     Both stmts must be in the new project. *)
 
-val get_stmt: Visitor.generic_frama_c_visitor -> logic_label -> stmt
+val get_stmt: logic_label -> stmt
 (** @return the statement where the logic label points to. *)
 
 val new_labeled_stmt: stmt -> stmt

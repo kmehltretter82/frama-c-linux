@@ -79,7 +79,6 @@ SRC_CODE_GENERATOR:= \
 	memory_observer \
 	literal_observer \
 	global_observer \
-	visit \
 	injector
 SRC_CODE_GENERATOR:=$(addprefix src/code_generator/, $(SRC_CODE_GENERATOR))
 

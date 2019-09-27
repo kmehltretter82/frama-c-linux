@@ -37,14 +37,13 @@ let self = Labeled_stmts.self
 
 let new_labeled_stmt stmt = try Labeled_stmts.find stmt with Not_found -> stmt
 
-let move (vis:Visitor.generic_frama_c_visitor) ~old new_stmt =
+let move kf ~old new_stmt =
   let labels = old.labels in
   match labels with
   | [] -> ()
   | _ :: _ ->
     old.labels <- [];
     new_stmt.labels <- labels @ new_stmt.labels;
-    let old = Visitor_behavior.Get_orig.stmt vis#behavior old in
     Labeled_stmts.add old new_stmt;
     (* update the gotos of the function jumping to one of the labels *)
     let o orig_stmt = object
@@ -63,28 +62,30 @@ let move (vis:Visitor.generic_frama_c_visitor) ~old new_stmt =
       method !vexpr _ = Cil.SkipChildren
       method !vlval _ = Cil.SkipChildren
     end in
-    let f = Extlib.the vis#current_func in
-    let mv_labels s =
-      ignore (Visitor.visitFramacStmt (o s) (Visitor_behavior.Memo.stmt vis#behavior s))
+    let mv_labels s = ignore (Visitor.visitFramacStmt (o s) s) in
+    let f =
+      try Kernel_function.get_definition kf
+      with Kernel_function.No_Definition -> assert false
     in
     List.iter mv_labels f.sallstmts
 
-let get_stmt vis = function
+(* [TODO ARCHI] reimplement it *)
+let get_stmt = function
   | StmtLabel { contents = stmt } -> stmt
   | BuiltinLabel Here ->
-    (match vis#current_stmt with
+(*    (match vis#current_stmt with
     | None -> Error.not_yet "label \"Here\" in function contract"
-    | Some s -> s)
+      | Some s -> s)*) assert false
   | BuiltinLabel(Old | Pre) ->
-    (try Kernel_function.find_first_stmt (Extlib.the vis#current_kf)
-     with Kernel_function.No_Statement -> assert false)
+(*    (try Kernel_function.find_first_stmt (Extlib.the vis#current_kf)
+      with Kernel_function.No_Statement -> assert false)*)assert false
   | BuiltinLabel(Post) ->
-    (try Kernel_function.find_return (Extlib.the vis#current_kf)
-     with Kernel_function.No_Statement -> assert false)
+(*    (try Kernel_function.find_return (Extlib.the vis#current_kf)
+      with Kernel_function.No_Statement -> assert false)*) assert false
   | BuiltinLabel _ | FormalLabel _ -> assert false
 
 (*
 Local Variables:
-compile-command: "make"
+compile-command: "make -C ../.."
 End:
 *)

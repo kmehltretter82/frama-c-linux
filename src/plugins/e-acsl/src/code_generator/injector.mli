@@ -20,6 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+val inject: unit -> unit
+
 (*
 Local Variables:
 compile-command: "make -C ../.."

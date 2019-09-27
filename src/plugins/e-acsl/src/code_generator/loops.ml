@@ -48,25 +48,22 @@ module Loop_invariants_actions = Hook.Make(struct end)
 let apply_after_transformation prj =
   Project.on prj Loop_invariants_actions.apply ()
 
-let mv_invariants env ~old stmt =
+let mv_invariants kf ~old stmt =
   Options.feedback ~current:true ~level:3
     "keep loop invariants attached to its loop";
-  match Env.current_kf env with
-  | None -> assert false
-  | Some kf ->
-    let filter _ ca = match ca.annot_content with
-      | AInvariant(_, b, _) -> b
-      | _ -> false
-    in
-    let l = Annotations.code_annot_emitter ~filter stmt in
-    if l != [] then
-      Loop_invariants_actions.extend
-	(fun () ->
-	  List.iter
-	    (fun (ca, e) ->
-	      Annotations.remove_code_annot e ~kf old ca;
-	      Annotations.add_code_annot e ~kf stmt ca)
-	    l)
+  let filter _ ca = match ca.annot_content with
+    | AInvariant(_, b, _) -> b
+    | _ -> false
+  in
+  let l = Annotations.code_annot_emitter ~filter stmt in
+  if l != [] then
+    Loop_invariants_actions.extend
+      (fun () ->
+         List.iter
+           (fun (ca, e) ->
+              Annotations.remove_code_annot e ~kf old ca;
+              Annotations.add_code_annot e ~kf stmt ca)
+           l)
 
 let preserve_invariant prj env kf stmt = match stmt.skind with
   | Loop(_, ({ bstmts = stmts } as blk), loc, cont, break) ->
@@ -219,11 +216,11 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
       with Typing.Not_a_number -> assert false
     in
     (* loop counter corresponding to the quantified variable *)
-    let var_x, x, env = Env.Logic_binding.add ~ty env logic_x in
+    let var_x, x, env = Env.Logic_binding.add ~ty env kf logic_x in
     let lv_x = var var_x in
     let env = match ctx_one with
       | Typing.C_integer _ -> env
-      | Typing.Gmpz -> Env.add_stmt env (Gmp.init ~loc x)
+      | Typing.Gmpz -> Env.add_stmt env kf (Gmp.init ~loc x)
       | Typing.(C_float _ | Rational | Real | Nan) -> assert false
     in
     (* build the inner loops and loop body *)
@@ -301,7 +298,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     [ start ;  stmt ], env
   | Lscope.Lvs_let(lv, t) :: lscope_vars' ->
     let ty = Typing.get_typ t in
-    let vi_of_lv, exp_of_lv, env = Env.Logic_binding.add ~ty env lv in
+    let vi_of_lv, exp_of_lv, env = Env.Logic_binding.add ~ty env kf lv in
     let e, env = term_to_exp kf env t in
     let ty = Cil.typeOf e in
     let init_set =

@@ -36,11 +36,11 @@ val add: varinfo -> unit
 val add_initializer: varinfo -> offset -> init -> unit
 (** add the initializer for the given observed variable *)
 
-val mk_init: Visitor_behavior.t -> Env.t -> varinfo * fundec * Env.t
+val mk_init_function: Env.t -> varinfo * fundec * Env.t
 (** generates a new C function containing the observers for global variable
      declaration and initialization *)
 
-val mk_delete: Visitor_behavior.t -> stmt list -> stmt list
+val mk_delete_stmts: stmt list -> stmt list
 (** generates the observers for global variable de-allocation *)
 
 (*

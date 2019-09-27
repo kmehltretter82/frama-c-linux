@@ -21,17 +21,12 @@
 (**************************************************************************)
 
 module E_acsl_label = Label
-open Cil_types
-open Cil_datatype
-
-let dkey = Options.dkey_translation
 
 (* ************************************************************************** *)
 (* Visitor *)
 (* ************************************************************************** *)
 
 (* local references to the below visitor and to [do_visit] *)
-let function_env = ref Env.dummy
 let dft_funspec = Cil.empty_funspec ()
 let funspec = ref dft_funspec
 
@@ -41,193 +36,9 @@ class e_acsl_visitor prj generate = object (self)
   inherit Visitor.generic_frama_c_visitor
     (if generate then Visitor_behavior.copy prj else Visitor_behavior.inplace ())
 
-  val mutable main_fct = None
-  (* fundec of the main entry point, in the new project [prj].
-     [None] while the global corresponding to this fundec has not been
-     visited *)
-
   val mutable is_initializer = false
   (* Global flag set to [true] if a currently visited node
      belongs to a global initializer and set to [false] otherwise *)
-
-  method private reset_env () =
-    function_env := Env.empty (self :> Visitor.frama_c_visitor)
-
-  method !vfile _f =
-    (* copy the options used during the visit in the new project: it is the
-       right place to do this: it is still before visiting, but after
-       that the visitor internals reset all of them :-(. *)
-    let cur = Project.current () in
-    let selection =
-      State_selection.of_list
-        [ Options.Gmp_only.self; Options.Check.self; Options.Full_mmodel.self;
-          Kernel.SignedOverflow.self; Kernel.UnsignedOverflow.self;
-          Kernel.SignedDowncast.self; Kernel.UnsignedDowncast.self;
-          Kernel.Machdep.self ]
-    in
-    if generate then Project.copy ~selection ~src:cur prj;
-    Cil.DoChildrenPost
-      (fun f ->
-        (* extend [main] with forward initialization and put it at end *)
-        if generate then begin
-          if not (Global_observer.is_empty () && Literal_strings.is_empty ())
-          then begin
-            let build_initializer () =
-              Options.feedback ~dkey ~level:2 "building global initializer.";
-              let vi, fundec, env =
-                Global_observer.mk_init self#behavior !function_env
-              in
-              function_env := env;
-              let cil_fct = GFun(fundec, Location.unknown) in
-              if Mmodel_analysis.use_model () then
-                match main_fct with
-                | Some main ->
-                  let exp = Cil.evar ~loc:Location.unknown vi in
-                  (* Create [__e_acsl_globals_init();] call *)
-                  let stmt =
-                    Cil.mkStmtOneInstr ~valid_sid:true
-                      (Call(None, exp, [], Location.unknown))
-                  in
-                  vi.vreferenced <- true;
-                  (* insert [__e_acsl_globals_init ();] as first statement of
-                     [main] *)
-                  main.sbody.bstmts <- stmt :: main.sbody.bstmts;
-                  let new_globals =
-                    List.fold_right
-                      (fun g acc -> match g with
-                      | GFun({ svar = vi }, _)
-                          when Varinfo.equal vi main.svar ->
-                        acc
-                      | _ -> g :: acc)
-                      f.globals
-                      [ cil_fct; GFun(main, Location.unknown) ]
-                  in
-                  (* add the literal string varinfos as the very first
-                     globals *)
-                  let new_globals =
-                    Literal_strings.fold
-                      (fun _ vi l ->
-                        GVar(vi, { init = None }, Location.unknown) :: l)
-                      new_globals
-                  in
-                  f.globals <- new_globals
-                | None ->
-                  Kernel.warning "@[no entry point specified:@ \
-you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
-                    Global_observer.function_name;
-                  f.globals <- f.globals @ [ cil_fct ]
-            in
-            Project.on prj build_initializer ()
-          end; (* must_init *)
-          (* Add a call to [__e_acsl_memory_init] that initializes memory
-             storage and potentially records program arguments. Parameters to
-             [__e_acsl_memory_init] are addresses of program arguments or
-             NULLs if [main] is declared without arguments. *)
-          let build_mmodel_initializer () =
-            let loc = Location.unknown in
-            let nulls = [ Cil.zero loc ; Cil.zero loc ] in
-            let handle_main main =
-              let args =
-                (* record arguments only if the second has a pointer type, so a
-                   argument strings can be recorded. This is sufficient to
-                   capture C99 compliant arguments and GCC extensions with
-                   environ. *)
-                match main.sformals with
-                | [] ->
-                  (* no arguments to main given *)
-                  nulls
-                | _argc :: argv :: _ when Cil.isPointerType argv.vtype ->
-                  (* grab addresses of arguments for a call to the main
-                     initialization function, i.e., [__e_acsl_memory_init] *)
-                  List.map Cil.mkAddrOfVi main.sformals;
-                | _ :: _ ->
-                  (* some non-standard arguments. *)
-                  nulls
-              in
-              let ptr_size = Cil.sizeOf loc Cil.voidPtrType in
-              let args = args @ [ ptr_size ] in
-              let name = Functions.RTL.mk_api_name "memory_init" in
-              let init = Misc.mk_call loc name args in
-              main.sbody.bstmts <- init :: main.sbody.bstmts
-            in
-            Extlib.may handle_main main_fct
-          in
-          Project.on
-            prj
-            (fun () ->
-               f.globals <- Logic_functions.add_generated_functions f.globals;
-               build_mmodel_initializer ())
-            ();
-          (* reset copied states at the end to be observationally
-              equivalent to a standard visitor. *)
-          Project.clear ~selection ~project:prj ();
-        end; (* generate *)
-        f)
-
-  method !vglob_aux = function
-  | GVarDecl(vi, _) | GVar(vi, _, _)
-  | GFunDecl(_, vi, _) | GFun({ svar = vi }, _)
-      when Misc.is_library_loc vi.vdecl || Builtins.mem vi.vname ->
-    if generate then
-      Cil.JustCopyPost
-        (fun l ->
-          let new_vi = Visitor_behavior.Get.varinfo self#behavior vi in
-          if Misc.is_library_loc vi.vdecl then
-            Misc.register_library_function new_vi;
-          if Builtins.mem vi.vname then Builtins.update vi.vname new_vi;
-          l)
-    else begin
-      Misc.register_library_function vi;
-      Cil.SkipChildren
-    end
-  | GVarDecl(vi, _) | GVar(vi, _, _) | GFun({ svar = vi }, _)
-      when Cil.is_builtin vi ->
-    if generate then Cil.JustCopy else Cil.SkipChildren
-  | g when Misc.is_library_loc (Global.loc g) ->
-    if generate then Cil.JustCopy else Cil.SkipChildren
-  | g ->
-    let unghost_vi vi =
-      vi.vghost <- false ;
-      vi.vtype <- match vi.vtype with
-        | TFun(res, Some l, va, attr) ->
-          let retype (n, t, a) =
-	    (n, t, Cil.dropAttribute Cil.frama_c_ghost_formal a)
-          in
-          TFun(res, Some (List.map retype l), va, attr)
-        | _ ->
-          vi.vtype
-    in
-    let do_it = function
-      | GVar(vi, _, _) ->
-        unghost_vi vi
-      | GFun({ svar = vi } as fundec, _) ->
-        unghost_vi vi ;
-        Builtins.update vi.vname vi;
-        (* remember that we have to remove the main later (see method
-           [vfile]); do not use the [vorig_name] since both [main] and
-           [__e_acsl_main] have the same [vorig_name]. *)
-        if vi.vname = Kernel.MainFunction.get () then
-          main_fct <- Some fundec
-      | GVarDecl(vi, _) | GFunDecl(_, vi, _) ->
-        (* do not convert extern ghost variables, because they can't be linked,
-           see bts #1392 *)
-        if vi.vstorage <> Extern then
-          unghost_vi vi
-      | _ ->
-        ()
-    in
-    (match g with
-    | GVar(vi, _, _) | GVarDecl(vi, _) | GFun({ svar = vi }, _)
-      (* Track function addresses but the main function that is tracked
-         internally via RTL *)
-        when vi.vorig_name <> Kernel.MainFunction.get () ->
-      (* Make a unique mapping for each global variable omitting initializers.
-         Initializers (used to capture literal strings) are added to
-         [global_vars] via the [vinit] visitor method (see comments below). *)
-      Global_observer.add (Visitor_behavior.Get_orig.varinfo self#behavior vi)
-    | _ -> ());
-    if generate then Cil.DoChildrenPost(fun g -> List.iter do_it g; g)
-    else Cil.DoChildren
 
   (* Add mappings from global variables to their initializers in [global_vars].
      Note that the below function captures only [SingleInit]s. All compound
@@ -269,57 +80,6 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
      with Not_found ->
        ());
     Cil.SkipChildren
-
-  method private add_generated_variables_in_function f =
-    assert generate;
-    let vars = Env.get_generated_variables !function_env in
-    self#reset_env ();
-    let locals, blocks =
-      List.fold_left
-        (fun (local_vars, block_vars as acc) (v, scope) -> match scope with
-        (* TODO: [kf] assumed to be consistent. Should be asserted. *)
-        | Env.LFunction _kf -> v :: local_vars, v :: block_vars
-        | Env.LLocal_block _kf -> v :: local_vars, block_vars
-        | _ -> acc)
-        (f.slocals, f.sbody.blocals)
-        vars
-    in
-    f.slocals <- locals;
-    f.sbody.blocals <- blocks
-
-  (* Memory management for \at on purely logic variables:
-    Put [malloc] stmts at proper locations *)
-  method private insert_malloc_and_free_stmts kf f =
-    let malloc_stmts = At_with_lscope.Malloc.find_all kf in
-    let fstmts = malloc_stmts @ f.sbody.bstmts in
-    f.sbody.bstmts <- fstmts;
-    (* Now that [malloc] stmts for [kf] have been inserted,
-      there is no more need to keep the corresponding entries in the
-      table managing them. *)
-    At_with_lscope.Malloc.remove_all kf
-
-  method !vfunc f =
-    if generate then begin
-      let kf = Extlib.the self#current_kf in
-      if Functions.instrument kf then Exit_points.generate f;
-      Options.feedback ~dkey ~level:2 "entering in function %a."
-        Kernel_function.pretty kf;
-      let unghost_formal vi =
-        vi.vghost <- false ;
-        vi.vattr <- Cil.dropAttribute Cil.frama_c_ghost_formal vi.vattr
-      in
-      List.iter (fun vi -> vi.vghost <- false) f.slocals;
-      List.iter unghost_formal f.sformals;
-      Cil.DoChildrenPost
-        (fun f ->
-          Exit_points.clear ();
-          self#add_generated_variables_in_function f;
-          self#insert_malloc_and_free_stmts kf f;
-          Options.feedback ~dkey ~level:2 "function %a done."
-            Kernel_function.pretty kf;
-          f)
-    end else
-      Cil.DoChildren
 
   method private is_return old_kf stmt =
     let old_ret =
@@ -672,63 +432,6 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
         | _ -> env)
     | _ -> env
 
-  method !vblock blk =
-    let handle_memory new_blk =
-      let kf = Extlib.the self#current_kf in
-      let free_stmts = At_with_lscope.Free.find_all kf in
-      match new_blk.blocals, free_stmts with
-      | [], [] ->
-        new_blk
-      | [], _ :: _ | _ :: _, [] | _ :: _, _ :: _ ->
-        let add_locals stmts =
-          if Functions.instrument kf then
-            List.fold_left
-              (fun acc vi ->
-                 if Mmodel_analysis.must_model_vi ~bhv:self#behavior ~kf vi then
-                   Misc.mk_delete_stmt vi :: acc
-                 else
-                   acc)
-              stmts
-              new_blk.blocals
-          else
-            stmts
-        in
-        let rec insert_in_innermost_last_block blk = function
-          | { skind = Return _ } as ret :: ((potential_clean :: tl) as l) ->
-            (* keep the return (enclosed in a generated block) at the end;
-               preceded by clean if any *)
-            let init, tl =
-              if self#is_main kf && Mmodel_analysis.use_model () then
-                free_stmts @ [ potential_clean; ret ], tl
-              else
-                free_stmts @ [ ret ], l
-            in
-            (* Now that [free] stmts for [kf] have been inserted,
-              there is no more need to keep the corresponding entries in the
-              table managing them. *)
-            At_with_lscope.Free.remove_all kf;
-            blk.bstmts <-
-              List.fold_left (fun acc v -> v :: acc) (add_locals init) tl
-          | { skind = Block b } :: _ ->
-            insert_in_innermost_last_block b (List.rev b.bstmts)
-          | l -> blk.bstmts <-
-            List.fold_left (fun acc v -> v :: acc) (add_locals []) l
-        in
-        insert_in_innermost_last_block new_blk (List.rev new_blk.bstmts);
-        if Functions.instrument kf then
-          new_blk.bstmts <-
-            List.fold_left
-              (fun acc vi ->
-                 if Mmodel_analysis.must_model_vi vi && not vi.vdefined then
-                   let vi = Visitor_behavior.Get.varinfo self#behavior vi in
-                   Misc.mk_store_stmt vi :: acc
-                 else acc)
-              new_blk.bstmts
-              blk.blocals;
-        new_blk
-    in
-    if generate then Cil.DoChildrenPost handle_memory else Cil.DoChildren
-
   (* Processing expressions for the purpose of replacing literal strings found
    in the code with variables generated by E-ACSL. *)
   method !vexpr _ =
@@ -746,32 +449,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
     end else
       Cil.SkipChildren
 
-  initializer
-    Misc.reset ();
-    Logic_functions.reset ();
-    Literal_strings.reset ();
-    Global_observer.reset ();
-    Keep_status.before_translation ();
-    self#reset_env ()
-
 end
-
-let do_visit ?(prj=Project.current ()) generate =
-  (* The main visitor proceeds by tracking declarations belonging to the
-     E-ACSL runtime library and then using these declarations to generate
-     statements used in instrumentation. The following code reorders AST
-     so declarations belonging to E-ACSL library appear atop of any location
-     requiring instrumentation. *)
-  Misc.reorder_ast ();
-  Options.feedback ~level:2 "%s annotations in %a."
-    (if generate then "translating" else "checking")
-    Project.pretty prj;
-  let vis =
-    Extlib.try_finally ~finally:Typing.clear (new e_acsl_visitor prj) generate
-  in
-  (* explicit type annotation in order to check that no new method is
-     introduced by error *)
-  (vis : Visitor.frama_c_visitor)
 
 (*
 Local Variables:

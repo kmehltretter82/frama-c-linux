@@ -121,6 +121,7 @@ let call ~loc kf name ctx env t =
       ~loc
       ~name
       env
+      kf
       None
       ctx
       (fun v _ ->
@@ -154,6 +155,7 @@ let gmp_to_sizet ~loc kf env size p =
     ~loc
     ~name:"size"
     env
+    kf
     None
     sizet
     (fun vi _ ->
@@ -230,6 +232,7 @@ let call_memory_block ~loc kf name ctx env ptr r p =
       ~loc
       ~name
       env
+      kf
       None
       ctx
       (fun v _ ->
@@ -337,6 +340,7 @@ let call_with_size ~loc kf name ctx env t p =
         ~loc
         ~name
         env
+        kf
         None
         ctx
         (fun v _ ->
@@ -374,6 +378,7 @@ let call_valid ~loc kf name ctx env t p =
         ~loc
         ~name
         env
+        kf
         None
         ctx
         (fun v _ ->
@@ -394,3 +399,9 @@ let call_valid ~loc kf name ctx env t p =
     t
     p
     call_for_unsupported_constructs
+
+(*
+Local Variables:
+compile-command: "make -C ../.."
+End:
+*)

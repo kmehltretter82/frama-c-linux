@@ -20,20 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let check () =
-  Visitor.visitFramacFileSameGlobals (Visit.do_visit false) (Ast.get ());
-  let t = Error.nb_untypable () in
-  let n = Error.nb_not_yet () in
-  let print msg n =
-    Options.result "@[%d annotation%s %s ignored,@ being %s.@]"
-      n
-      (if n > 1 then "s" else "")
-      (if n > 1 then "were" else "was")
-      msg
-  in
-  print "untypable" t;
-  print "unsupported" n;
-  n + t = 0
+let check () = assert false (* [TODO ARCHI] kill check *)
 
 let check =
   Dynamic.register
@@ -155,39 +142,30 @@ let generate_code =
               Project.on prepared_prj
                 (fun () ->
                    let dup_prj = Dup_functions.dup () in
-                   let cname = Project.get_name dup_prj ^ " (copy)" in
                    let copied_prj =
-                     Project.create_by_copy cname ~last:true ~src:dup_prj
+                     Project.create_by_copy name ~last:true ~src:dup_prj
                    in
-                   let res =
-                     Project.on
-                       copied_prj
-                       (fun () ->
-                          Gmp_types.init ();
-                          Mmodel_analysis.reset ();
-                          let visit prj = Visit.do_visit ~prj true in
-                          let prj =
-                            File.create_project_from_visitor name visit
-                          in
-                          Loops.apply_after_transformation prj;
-                          (* remove the RTE's results computed from E-ACSL:
-                             they are partial and associated with the wrong
-                             kernel function (the one of the old project). *)
-                          let selection =
-                            State_selection.with_dependencies !Db.RteGen.self
-                          in
-                          Project.clear ~selection ~project:prj ();
-                          Resulting_projects.mark_as_computed ();
-                          let selection =
-                            State_selection.singleton Kernel.Files.self
-                          in
-                          Project.copy ~selection prj;
-                          prj)
-                       ()
-                   in
+                   Project.on
+                     copied_prj
+                     (fun () ->
+                        Gmp_types.init ();
+                        Mmodel_analysis.reset ();
+                        Injector.inject ();
+                        (* [TODO ARCHI] remove the project as arguments *)
+                        Loops.apply_after_transformation copied_prj;
+                        (* remove the RTE's results computed from E-ACSL:
+                           they are partial and associated with the wrong
+                           kernel function (the one of the old project). *)
+                        (* [TODO ARCHI] what if RTE was already computed? *)
+                        let selection =
+                          State_selection.with_dependencies !Db.RteGen.self
+                        in
+                        Project.clear ~selection ~project:copied_prj ();
+                        Resulting_projects.mark_as_computed ())
+                       ();
                    if Options.Debug.get () = 0 then
                      Project.remove ~project:dup_prj ();
-                   res)
+                   copied_prj)
                 ()
             in
             if Options.Debug.get () = 0 then begin

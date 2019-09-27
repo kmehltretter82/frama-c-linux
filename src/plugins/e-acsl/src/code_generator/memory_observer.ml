@@ -27,8 +27,7 @@ let tracking_stmt ?before fold mk_stmt env kf vars =
     fold
       (fun vi env ->
          if Mmodel_analysis.must_model_vi ~kf vi then
-           let vi = Visitor_behavior.Get.varinfo (Env.get_behavior env) vi in
-           Env.add_stmt ?before env (mk_stmt vi)
+           Env.add_stmt ?before env kf (mk_stmt vi)
          else
            env)
       vars

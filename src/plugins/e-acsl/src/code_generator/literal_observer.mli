@@ -24,10 +24,10 @@
 
 open Cil_types
 
-val exp: Env.t -> exp -> exp * Env.t
+val exp: Env.t -> kernel_function -> exp -> exp * Env.t
 (** replace the given exp by an observed variable if it is a literal string *)
 
-val exp_in_depth: Env.t -> exp -> exp * Env.t
+val exp_in_depth: Env.t -> kernel_function -> exp -> exp * Env.t
 (** replace any sub-expression of the given exp that is a literal string by an
      observed variable   *)
 

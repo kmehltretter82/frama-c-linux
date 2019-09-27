@@ -22,7 +22,7 @@
 
 open Cil_types
 
-let literal loc env s =
+let literal loc env kf s =
   try
     let vi = Literal_strings.find s in
     (* if the literal string was already created, just get it. *)
@@ -35,6 +35,7 @@ let literal loc env s =
         ~scope:Varname.Global
         ~name:"literal_string"
         env
+        kf
         None
         Cil.charPtrType
         (fun _ _ -> [] (* done in the initializer, see {!vglob_aux} *))
@@ -42,14 +43,14 @@ let literal loc env s =
     Literal_strings.add s vi;
     exp, env
 
-let exp env e = match e.enode with
+let exp env kf e = match e.enode with
   (* the guard below could be optimized: if no annotation **depends on this
      string**, then it is not required to monitor it.
      (currently, the guard says: "no annotation uses the memory model" *)
-  | Const (CStr s) when Mmodel_analysis.use_model () -> literal e.eloc env s
+  | Const (CStr s) when Mmodel_analysis.use_model () -> literal e.eloc env kf s
   | _ -> e, env
 
-let exp_in_depth env e =
+let exp_in_depth env kf e =
   let env_ref = ref env in
   let o = object
     inherit Cil.genericCilVisitor (Visitor_behavior.copy (Project.current ()))
@@ -58,7 +59,7 @@ let exp_in_depth env e =
          string**, then it is not required to monitor it.
          (currently, the guard says: "no annotation uses the memory model" *)
       | Const (CStr s) when Mmodel_analysis.use_model () ->
-        let e, env = literal e.eloc !env_ref s in
+        let e, env = literal e.eloc !env_ref kf s in
         env_ref := env;
         Cil.ChangeTo e
       | _ ->

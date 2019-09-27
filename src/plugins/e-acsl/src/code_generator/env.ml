@@ -54,7 +54,6 @@ type local_env = {
 }
 
 type t = {
-  visitor: Visitor.frama_c_visitor;
   lscope: Lscope.t;
   lscope_reset: bool;
   annotation_kind: Misc.annotation_kind;
@@ -86,21 +85,8 @@ let empty_local_env =
     mp_tbl = empty_mp_tbl;
     rte = true }
 
-let dummy =
-  { visitor = new Visitor.generic_frama_c_visitor (Visitor_behavior.inplace ());
-    lscope = Lscope.empty;
-    lscope_reset = true;
-    annotation_kind = Misc.Assertion;
-    new_global_vars = [];
-    global_mp_tbl = empty_mp_tbl;
-    env_stack = [];
-    var_mapping = Logic_var.Map.empty;
-    loop_invariants = [];
-    cpt = 0; }
-
-let empty v =
-  { visitor = v;
-    lscope = Lscope.empty;
+let empty =
+  { lscope = Lscope.empty;
     lscope_reset = true;
     annotation_kind = Misc.Assertion;
     new_global_vars = [];
@@ -117,19 +103,6 @@ let top env = match env.env_stack with
 let has_no_new_stmt env =
   let local, _ = top env in
   local.block_info = empty_block
-
-let current_kf env =
-  let v = env.visitor in
-  match v#current_kf with
-  | None -> None
-  | Some kf -> Some (Visitor_behavior.Get.kernel_function v#behavior kf)
-
-let set_current_kf env kf =
-  let v = env.visitor in
-  v#set_current_kf kf
-
-let get_visitor env = env.visitor
-let get_behavior env = env.visitor#behavior
 
 (* ************************************************************************** *)
 (** {2 Loop invariants} *)
@@ -163,7 +136,7 @@ let generate_rte env =
 (* eta-expansion required for typing generalisation *)
 let acc_list_rev acc l = List.fold_left (fun acc x -> x :: acc) acc l
 
-let do_new_var ~loc ?(scope=Varname.Block) ?(name="") env t ty mk_stmts =
+let do_new_var ~loc ?(scope=Varname.Block) ?(name="") env kf t ty mk_stmts =
   let local_env, tl_env = top env in
   let local_block = local_env.block_info in
   let is_z_t = Gmp_types.Z.is_t ty in
@@ -183,8 +156,8 @@ let do_new_var ~loc ?(scope=Varname.Block) ?(name="") env t ty mk_stmts =
   v.vreferenced <- true;
   let lscope = match scope with
     | Varname.Global -> LGlobal
-    | Varname.Function -> LFunction (Extlib.the (current_kf env))
-    | Varname.Block -> LLocal_block (Extlib.the (current_kf env))
+    | Varname.Function -> LFunction kf
+    | Varname.Block -> LLocal_block kf
   in
 (*  Options.feedback "new variable %a (global? %b)" Varinfo.pretty v global;*)
   let e = Cil.evar v in
@@ -246,7 +219,7 @@ let do_new_var ~loc ?(scope=Varname.Block) ?(name="") env t ty mk_stmts =
 
 exception No_term
 
-let new_var ~loc ?(scope=Varname.Block) ?name env t ty mk_stmts =
+let new_var ~loc ?(scope=Varname.Block) ?name env kf t ty mk_stmts =
   let local_env, _ = top env in
   let memo tbl =
     try
@@ -256,18 +229,19 @@ let new_var ~loc ?(scope=Varname.Block) ?name env t ty mk_stmts =
         let v, e = Term.Map.find t tbl.new_exps in
         if Typ.equal ty v.vtype then v, e, env else raise No_term
     with Not_found | No_term ->
-      do_new_var ~loc ~scope ?name env t ty mk_stmts
+      do_new_var ~loc ~scope ?name env kf t ty mk_stmts
   in
   match scope with
   | Varname.Global | Varname.Function -> memo env.global_mp_tbl
   | Varname.Block -> memo local_env.mp_tbl
 
-let new_var_and_mpz_init ~loc ?scope ?name env t mk_stmts =
+let new_var_and_mpz_init ~loc ?scope ?name env kf t mk_stmts =
   new_var
     ~loc
     ?scope
     ?name
     env
+    kf
     t
     (Gmp_types.Z.t ())
     (fun v e -> Gmp.init ~loc e :: mk_stmts v e)
@@ -285,7 +259,7 @@ module Logic_binding = struct
       let var_mapping = Logic_var.Map.add logic_v varinfos env.var_mapping in
       { env with var_mapping = var_mapping }
 
-  let add ?ty env logic_v =
+  let add ?ty env kf logic_v =
     let ty = match ty with
       | Some ty -> ty
       | None -> match logic_v.lv_type with
@@ -303,6 +277,7 @@ module Logic_binding = struct
       new_var
         ~loc:Location.unknown
         env
+        kf
         ~name:logic_v.lv_name
         None
         ty
@@ -336,23 +311,27 @@ module Logic_scope = struct
     else env
 end
 
-let emitter =
+let _emitter = (* [TODO ARCHI] *)
   Emitter.create
     "E_ACSL"
     [ Emitter.Code_annot ]
     ~correctness:[ Options.Gmp_only.parameter ]
     ~tuning:[]
 
-let add_assert env stmt annot = match current_kf env with
+(* [TODO ARCHI] to be reimplemented *)
+let add_assert _env _stmt _annot = assert false
+(*match current_kf env with
   | None -> assert false
-  | Some kf ->
-    Queue.add
+  | Some _kf ->
+(*    Queue.add
       (fun () -> Annotations.add_assert emitter ~kf stmt annot)
       env.visitor#get_filling_actions
+                                   *)*)
 
-let add_stmt ?(post=false) ?before env stmt =
+
+let add_stmt ?(post=false) ?before env kf stmt =
   if not post then
-    Extlib.may (fun old -> E_acsl_label.move env.visitor ~old stmt) before;
+    Extlib.may (fun old -> E_acsl_label.move kf ~old stmt) before;
   let local_env, tl = top env in
   let block = local_env.block_info in
   let block =
@@ -491,15 +470,16 @@ module Context = struct
     if !ctx <> [] then begin
       let vars = env.new_global_vars in
       let env =
-	{ env with new_global_vars =
-	    List.filter
+        { env with
+          new_global_vars =
+            List.filter
               (fun (v, scope) ->
-                (match scope with
-                | LGlobal | LFunction _ -> true
-                | LLocal_block _ -> false)
-                && List.for_all (fun (v', _) -> v != v') vars)
-	      !ctx
-	      @ vars }
+                 (match scope with
+                  | LGlobal | LFunction _ -> true
+                  | LLocal_block _kf -> false)
+                 && List.for_all (fun (v', _) -> v != v') vars)
+              !ctx
+            @ vars }
       in
       ctx := [];
       env

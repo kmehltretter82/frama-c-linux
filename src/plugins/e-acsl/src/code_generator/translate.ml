@@ -69,13 +69,14 @@ type strnum =
   | C_number      (* integers and floats included *)
 
 (* convert [e] in a way that it is compatible with the given typing context. *)
-let add_cast ~loc ?name env ctx strnum t_opt e =
+let add_cast ~loc ?name env kf ctx strnum t_opt e =
   let mk_mpz e =
     let _, e, env =
       Env.new_var
         ~loc
         ?name
         env
+        kf
         t_opt
         (Gmp_types.Z.t ())
         (fun lv v -> [ Gmp.init_set ~loc (Cil.var lv) v e ])
@@ -84,7 +85,7 @@ let add_cast ~loc ?name env ctx strnum t_opt e =
   in
   let e, env = match strnum with
     | Str_Z -> mk_mpz e
-    | Str_R -> Rational.create ~loc ?name e env t_opt
+    | Str_R -> Rational.create ~loc ?name e env kf t_opt
     | C_number -> e, env
   in
   match ctx with
@@ -115,8 +116,10 @@ let add_cast ~loc ?name env ctx strnum t_opt e =
         mk_mpz e
     | _, false ->
       if Gmp_types.Q.is_t ctx then
-        if Gmp_types.Q.is_t (Cil.typeOf e) then (* R --> R *) e, env
-        else (* C integer or Z --> R *) Rational.create ~loc ?name e env t_opt
+        if Gmp_types.Q.is_t (Cil.typeOf e) then (* R --> R *)
+          e, env
+        else (* C integer or Z --> R *)
+          Rational.create ~loc ?name e env kf t_opt
       else if Gmp_types.Z.is_t ty || strnum = Str_Z then
         (* Z --> C type or the integer is represented by a string:
            anyway, it fits into a C integer: convert it *)
@@ -129,6 +132,7 @@ let add_cast ~loc ?name env ctx strnum t_opt e =
             ~loc
             ?name
             env
+            kf
             None
             new_ty
             (fun v _ -> [ Misc.mk_call ~loc ~result:(Cil.var v) fname [ e ] ])
@@ -136,7 +140,7 @@ let add_cast ~loc ?name env ctx strnum t_opt e =
         e, env
       else if Gmp_types.Q.is_t ty || strnum = Str_R then
         (* R --> C type or the real is represented by a string *)
-        Rational.add_cast ~loc ?name e env ctx
+        Rational.add_cast ~loc ?name e env kf ctx
       else
         (* C type --> another C type *)
         Cil.mkCastT ~force:false ~e ~oldt:ty ~newt:ctx, env
@@ -183,7 +187,7 @@ let constant_to_exp ~loc t c =
     else mk_real lr.r_literal
   | LEnum e -> Cil.new_exp ~loc (Const (CEnum e)), C_number
 
-let conditional_to_exp ?(name="if") loc t_opt e1 (e2, env2) (e3, env3) =
+let conditional_to_exp ?(name="if") loc kf t_opt e1 (e2, env2) (e3, env3) =
   let env = Env.pop (Env.pop env3) in
   match e1.enode with
   | Const(CInt64(n, _, _)) when Integer.is_zero n ->
@@ -200,6 +204,7 @@ let conditional_to_exp ?(name="if") loc t_opt e1 (e2, env2) (e3, env3) =
         ~loc
         ~name
         env
+        kf
         t_opt
         ty
         (fun v ev ->
@@ -224,19 +229,14 @@ let conditional_to_exp ?(name="if") loc t_opt e1 (e2, env2) (e3, env3) =
 
 let rec thost_to_host kf env th = match th with
   | TVar { lv_origin = Some v } ->
-    let v' = Visitor_behavior.Get.varinfo (Env.get_behavior env) v in
-    Var v', env, v.vname
+    Var v, env, v.vname
   | TVar ({ lv_origin = None } as logic_v) ->
     let v' = Env.Logic_binding.get env logic_v in
     Var v', env, logic_v.lv_name
   | TResult _typ ->
-    let vis = Env.get_visitor env in
-    let kf = Extlib.the vis#current_kf in
     let lhost = Misc.result_lhost kf in
     (match lhost with
-     | Var v ->
-       let v' = Visitor_behavior.Get.varinfo (Env.get_behavior env) v in
-       Var v', env, "result"
+     | Var v -> Var v, env, "result"
      | _ -> assert false)
   | TMem t ->
     let e, env = term_to_exp kf env t in
@@ -294,6 +294,7 @@ and context_insensitive_term_to_exp kf env t =
         Env.new_var_and_mpz_init
           ~loc
           env
+          kf
           ~name:vname
           (Some t)
           (fun _ ev -> [ Misc.mk_call ~loc name [ ev; e ] ])
@@ -328,11 +329,11 @@ and context_insensitive_term_to_exp kf env t =
       let mk_stmts _ e = [ Misc.mk_call ~loc name [ e; e1; e2 ] ] in
       let name = Misc.name_of_binop bop in
       let _, e, env =
-        Env.new_var_and_mpz_init ~loc ~name env (Some t) mk_stmts
+        Env.new_var_and_mpz_init ~loc ~name env kf (Some t) mk_stmts
       in
       e, env, C_number, ""
     else if Gmp_types.Q.is_t ty then
-      let e, env = Rational.binop ~loc bop e1 e2 env (Some t) in
+      let e, env = Rational.binop ~loc bop e1 e2 env kf (Some t) in
       e, env, C_number, ""
     else begin
       assert (Logic_typing.is_integral_type t.term_type);
@@ -361,8 +362,6 @@ and context_insensitive_term_to_exp kf env t =
       in
       let mk_stmts _v e =
         assert (Gmp_types.Z.is_t ty);
-        let vis = Env.get_visitor env in
-        let kf = Extlib.the vis#current_kf in
         let cond =
           Misc.mk_e_acsl_guard
             (Env.annotation_kind env)
@@ -375,10 +374,10 @@ and context_insensitive_term_to_exp kf env t =
         [ cond; instr ]
       in
       let name = Misc.name_of_binop bop in
-      let _, e, env = Env.new_var_and_mpz_init ~loc ~name env t mk_stmts in
+      let _, e, env = Env.new_var_and_mpz_init ~loc ~name env kf t mk_stmts in
       e, env, C_number, ""
     else if Gmp_types.Q.is_t ty then
-      let e, env = Rational.binop ~loc bop e1 e2 env (Some t) in
+      let e, env = Rational.binop ~loc bop e1 e2 env kf (Some t) in
       e, env, C_number, ""
     else begin
       assert (Logic_typing.is_integral_type t.term_type);
@@ -399,7 +398,7 @@ and context_insensitive_term_to_exp kf env t =
     let env' = Env.push env1 in
     let res2 = term_to_exp kf (Env.push env') t2 in
     let e, env =
-      conditional_to_exp ~name:"or" loc (Some t) e1 (Cil.one loc, env') res2
+      conditional_to_exp ~name:"or" loc kf (Some t) e1 (Cil.one loc, env') res2
     in
     e, env, C_number, ""
   | TBinOp(LAnd, t1, t2) ->
@@ -408,7 +407,8 @@ and context_insensitive_term_to_exp kf env t =
     let _, env2 as res2 = term_to_exp kf (Env.push env1) t2 in
     let env3 = Env.push env2 in
     let e, env =
-      conditional_to_exp ~name:"and" loc (Some t) e1 res2 (Cil.zero loc, env3)
+      conditional_to_exp
+        ~name:"and" loc kf (Some t) e1 res2 (Cil.zero loc, env3)
     in
     e, env, C_number, ""
   | TBinOp((BOr | BXor | BAnd), _, _) ->
@@ -443,7 +443,7 @@ and context_insensitive_term_to_exp kf env t =
   | TCastE(ty, t') ->
     let e, env = term_to_exp kf env t' in
     let e, env =
-      add_cast ~loc ~name:"cast" env (Some ty) C_number (Some t) e
+      add_cast ~loc ~name:"cast" env kf (Some ty) C_number (Some t) e
     in
     e, env, C_number, ""
   | TLogic_coerce _ -> assert false (* handle in [term_to_exp] *)
@@ -477,6 +477,7 @@ and context_insensitive_term_to_exp kf env t =
           ~loc
           ~name:(fname ^ "_app")
           env
+          kf
           (Some t)
           (Misc.cty (Extlib.the li.l_type))
           (fun vi _ ->
@@ -491,7 +492,7 @@ and context_insensitive_term_to_exp kf env t =
                let e, env =
                  try
                    let ty = Typing.typ_of_number_ty param_ty in
-                   add_cast loc env (Some ty) C_number (Some targ) e
+                   add_cast loc env kf (Some ty) C_number (Some targ) e
                  with Typing.Not_a_number ->
                    e, env
                in
@@ -502,7 +503,7 @@ and context_insensitive_term_to_exp kf env t =
         let gen_fname =
           Varname.get ~scope:Varname.Global (Functions.RTL.mk_gen_name fname)
         in
-        Logic_functions.tapp_to_exp ~loc gen_fname env t li params_ty args
+        Logic_functions.tapp_to_exp ~loc gen_fname env kf t li params_ty args
     in
     e, env, C_number, "app"
   | Tapp(_, _ :: _, _) ->
@@ -513,7 +514,7 @@ and context_insensitive_term_to_exp kf env t =
     let e1, env1 = term_to_exp kf (Env.rte env true) t1 in
     let (_, env2 as res2) = term_to_exp kf (Env.push env1) t2 in
     let res3 = term_to_exp kf (Env.push env2) t3 in
-    let e, env = conditional_to_exp loc (Some t) e1 res2 res3 in
+    let e, env = conditional_to_exp loc kf (Some t) e1 res2 res3 in
     e, env, C_number, ""
   | Tat(t, BuiltinLabel Here) ->
     let e, env = term_to_exp kf env t in
@@ -526,7 +527,7 @@ and context_insensitive_term_to_exp kf env t =
       e, env, C_number, ""
     else
       let e, env = term_to_exp kf (Env.push env) t' in
-      let e, env, sty = at_to_exp_no_lscope env (Some t) label e in
+      let e, env, sty = at_to_exp_no_lscope env kf (Some t) label e in
       e, env, sty, ""
   | Tbase_addr(BuiltinLabel Here, t) ->
     let name = "base_addr" in
@@ -580,6 +581,7 @@ and term_to_exp kf env t =
     ~loc:t.term_loc
     ?name
     env
+    kf
     cast
     sty
     (Some t)
@@ -603,6 +605,7 @@ and comparison_to_exp
     let _, e, env = Env.new_var
         ~loc
         env
+        kf
         t_opt
         ~name
         Cil.intType
@@ -611,12 +614,12 @@ and comparison_to_exp
     in
     Cil.new_exp ~loc (BinOp(bop, e, Cil.zero ~loc, Cil.intType)), env
   | Typing.Rational ->
-    Rational.cmp ~loc bop e1 e2 env t_opt
+    Rational.cmp ~loc bop e1 e2 env kf t_opt
   | Typing.Real ->
     Error.not_yet "comparison involving real numbers"
 
-and at_to_exp_no_lscope env t_opt label e =
-  let stmt = E_acsl_label.get_stmt (Env.get_visitor env) label in
+and at_to_exp_no_lscope env kf t_opt label e =
+  let stmt = E_acsl_label.get_stmt label in
   (* generate a new variable denoting [\at(t',label)].
      That is this variable which is the resulting expression.
      ACSL typing rule ensures that the type of this variable is the same as
@@ -628,6 +631,7 @@ and at_to_exp_no_lscope env t_opt label e =
       ~name:"at"
       ~scope:Varname.Function
       env
+      kf
       t_opt
       (Cil.typeOf e)
       (fun _ _ -> [])
@@ -656,17 +660,15 @@ and at_to_exp_no_lscope env t_opt label e =
       Cil.ChangeTo stmt
   end
   in
-  let bhv = Env.get_behavior new_env in
-  let new_stmt =
-    Visitor.visitFramacStmt o (Visitor_behavior.Get.stmt bhv stmt)
-  in
-  Visitor_behavior.Set.stmt bhv stmt new_stmt;
+  let _new_stmt = Visitor.visitFramacStmt o stmt in
+  (* [TODO ARCHI] reimplement *)
+  (*Visitor_behavior.Set.stmt bhv stmt new_stmt;*)
   res, !env_ref, C_number
 
 and env_of_li li kf env loc =
   let t = Misc.term_of_li li in
   let ty = Typing.get_typ t in
-  let vi, vi_e, env = Env.Logic_binding.add ~ty env li.l_var_info in
+  let vi, vi_e, env = Env.Logic_binding.add ~ty env kf li.l_var_info in
   let e, env = term_to_exp kf env t in
   let stmt = match Typing.get_number_ty t with
     | Typing.(C_integer _ | C_float _ | Nan) ->
@@ -678,7 +680,7 @@ and env_of_li li kf env loc =
     | Typing.Real ->
       Error.not_yet "real number"
   in
-  Env.add_stmt env stmt
+  Env.add_stmt env kf stmt
 
 (* Convert an ACSL named predicate into a corresponding C expression (if
    any) in the given environment. Also extend this environment which includes
@@ -715,14 +717,14 @@ and named_predicate_content_to_exp ?name kf env p =
       named_predicate_to_exp kf (Env.push env1) p2 in
     let env3 = Env.push env2 in
     let name = match name with None -> "and" | Some n -> n in
-    conditional_to_exp ~name loc None e1 res2 (Cil.zero loc, env3)
+    conditional_to_exp ~name loc kf None e1 res2 (Cil.zero loc, env3)
   | Por(p1, p2) ->
     (* p1 || p2 <==> if p1 then true else p2 *)
     let e1, env1 = named_predicate_to_exp kf (Env.rte env true) p1 in
     let env' = Env.push env1 in
     let res2 = named_predicate_to_exp kf (Env.push env') p2 in
     let name = match name with None -> "or" | Some n -> n in
-    conditional_to_exp ~name loc None e1 (Cil.one loc, env') res2
+    conditional_to_exp ~name loc kf None e1 (Cil.one loc, env') res2
   | Pxor _ -> not_yet env "xor"
   | Pimplies(p1, p2) ->
     (* (p1 ==> p2) <==> !p1 || p2 *)
@@ -748,7 +750,7 @@ and named_predicate_content_to_exp ?name kf env p =
     let (_, env2 as res2) =
       named_predicate_to_exp kf (Env.push env1) p2 in
     let res3 = named_predicate_to_exp kf (Env.push env2) p3 in
-    conditional_to_exp loc None e1 res2 res3
+    conditional_to_exp loc kf None e1 res2 res3
   | Plet(li, p) ->
     let lvs = Lscope.Lvs_let(li.l_var_info, Misc.term_of_li li) in
     let env = Env.Logic_scope.extend env lvs in
@@ -767,7 +769,7 @@ and named_predicate_content_to_exp ?name kf env p =
     else begin
       (* convert [t'] to [e] in a separated local env *)
       let e, env = named_predicate_to_exp kf (Env.push env) p' in
-      let e, env, sty = at_to_exp_no_lscope env None label e in
+      let e, env, sty = at_to_exp_no_lscope env kf None label e in
       assert (sty = C_number);
       e, env
     end
@@ -835,6 +837,7 @@ and named_predicate_to_exp ?name kf ?rte env p =
     ~loc:p.pred_loc
     ?name
     env
+    kf
     cast
     C_number
     None
@@ -885,6 +888,7 @@ and translate_named_predicate kf env p =
   let env = Env.Logic_scope.reset env in
   Env.add_stmt
     env
+    kf
     (Misc.mk_e_acsl_guard ~reverse:true (Env.annotation_kind env) kf e p)
 
 let named_predicate_to_exp ?name kf env p =
@@ -906,8 +910,7 @@ let () =
    However, it is correct to use it only in specific contexts. *)
 let predicate_to_exp kf p =
   Typing.type_named_predicate ~must_clear:true p;
-  let empty_env = Env.empty (new Visitor.frama_c_copy Project_skeleton.dummy) in
-  let e, _ = named_predicate_to_exp kf empty_env p in
+  let e, _ = named_predicate_to_exp kf Env.empty p in
   assert (Typ.equal (Cil.typeOf e) Cil.intType);
   e
 
@@ -927,8 +930,7 @@ let term_to_exp typ t =
   in
   let ctx = Extlib.opt_map ctx_of_typ typ in
   Typing.type_term ~use_gmp_opt:true ?ctx t;
-  let env = Env.empty (new Visitor.frama_c_copy Project_skeleton.dummy) in
-  let env = Env.push env in
+  let env = Env.push Env.empty in
   let env = Env.rte env false in
   let e, env =
     try term_to_exp (Kernel_function.dummy ()) env t

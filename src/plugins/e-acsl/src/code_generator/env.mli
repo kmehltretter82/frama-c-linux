@@ -22,15 +22,14 @@
 
 open Cil_types
 
-(** Environments. 
+(** Environments.
 
     Environments handle all the new C constructs (variables, statements and
-    annotations. *) 
+    annotations. *)
 
 type t
 
-val dummy: t
-val empty: Visitor.frama_c_visitor -> t
+val empty: t
 
 val has_no_new_stmt: t -> bool
 (** Assume that a local context has been previously pushed.
@@ -43,8 +42,8 @@ type localized_scope =
 
 val new_var:
   loc:location -> ?scope:Varname.scope -> ?name:string ->
-  t -> term option -> typ -> 
-  (varinfo -> exp (* the var as exp *) -> stmt list) -> 
+  t -> kernel_function -> term option -> typ ->
+  (varinfo -> exp (* the var as exp *) -> stmt list) ->
   varinfo * exp * t
 (** [new_var env t ty mk_stmts] extends [env] with a fresh variable of type
     [ty] corresponding to [t]. [scope] is the scope of the new variable (default
@@ -54,14 +53,14 @@ val new_var:
 
 val new_var_and_mpz_init:
   loc:location -> ?scope:Varname.scope -> ?name:string ->
-  t -> term option -> 
-  (varinfo -> exp (* the var as exp *) -> stmt list) -> 
+  t -> kernel_function -> term option ->
+  (varinfo -> exp (* the var as exp *) -> stmt list) ->
   varinfo * exp * t
-(** Same as [new_var], but dedicated to mpz_t variables initialized by 
+(** Same as [new_var], but dedicated to mpz_t variables initialized by
     {!Mpz.init}. *)
 
 module Logic_binding: sig
-  val add: ?ty:typ -> t -> logic_var -> varinfo * exp * t
+  val add: ?ty:typ -> t -> kernel_function -> logic_var -> varinfo * exp * t
   (* Add a new C binding to the list of bindings for the logic variable. *)
 
   val add_binding: t -> logic_var -> varinfo -> t
@@ -80,7 +79,7 @@ val add_assert: t -> stmt -> predicate -> unit
 (** [add_assert env s p] associates the assertion [p] to the statement [s] in
     the environment [env]. *)
 
-val add_stmt: ?post:bool -> ?before:stmt -> t -> stmt -> t
+val add_stmt: ?post:bool -> ?before:stmt -> t -> kernel_function -> stmt -> t
 (** [add_stmt env s] extends [env] with the new statement [s].
     [before] may define which stmt the new one is included before. This is to
     say that any labels attached to [before] are moved to [stmt]. [post]
@@ -115,11 +114,6 @@ val transfer: from:t -> t -> t
 val get_generated_variables: t -> (varinfo * localized_scope) list
 (** All the new variables local to the visited function. *)
 
-val get_visitor: t -> Visitor.generic_frama_c_visitor
-val get_behavior: t -> Visitor_behavior.t
-val current_kf: t -> kernel_function option
-(** Kernel function currently visited in the new project. *)
-
 module Logic_scope: sig
   val get: t -> Lscope.t
   (** Return the logic scope associated to the environment. *)
@@ -140,9 +134,6 @@ module Logic_scope: sig
   (** Getter of the information indicating whether the logic scope should be
     reset at next call to [reset]. *)
 end
-
-val set_current_kf: t -> kernel_function -> unit
-(* Set current kf of the environment *)
 
 (* ************************************************************************** *)
 (** {2 Current annotation kind} *)

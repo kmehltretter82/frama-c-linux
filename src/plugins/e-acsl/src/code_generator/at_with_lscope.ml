@@ -204,7 +204,7 @@ let index_from_sizes_and_shifts ~loc sizes_and_shifts =
   sum
 
 let put_block_at_label env block label =
-  let stmt = Label.get_stmt (Env.get_visitor env) label in
+  let stmt = Label.get_stmt label in
   let env_ref = ref env in
   let o = object
     inherit Visitor.frama_c_inplace
@@ -214,8 +214,7 @@ let put_block_at_label env block label =
       Cil.ChangeTo stmt
   end
   in
-  let bhv = Env.get_behavior env in
-  ignore(Visitor.visitFramacStmt o (Visitor_behavior.Get.stmt bhv stmt));
+  ignore (Visitor.visitFramacStmt o stmt);
   !env_ref
 
 let to_exp ~loc kf env pot label =
@@ -244,6 +243,7 @@ let to_exp ~loc kf env pot label =
     ~name:"at"
     ~scope:Varname.Function
     env
+    kf
     None
     ty_ptr
     (fun vi e ->

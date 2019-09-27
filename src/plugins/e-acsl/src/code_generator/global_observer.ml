@@ -38,6 +38,9 @@ let reset () = Varinfo.Hashtbl.reset tbl
 
 let is_empty () = Varinfo.Hashtbl.length tbl = 0
 
+(* Make a unique mapping for each global variable omitting initializers.
+   Initializers (used to capture literal strings) are added through
+   [add_initializer] below. *)
 let add vi =
   if Mmodel_analysis.must_model_vi vi then
     Varinfo.Hashtbl.replace tbl vi (ref [])
@@ -50,12 +53,12 @@ let add_initializer vi offset init =
     with Not_found ->
       assert false
 
-let rec literal_in_initializer env = function
-  | SingleInit exp -> snd (Literal_observer.exp_in_depth env exp)
+let rec literal_in_initializer env kf = function
+  | SingleInit exp -> snd (Literal_observer.exp_in_depth env kf exp)
   | CompoundInit (_, l) ->
-    List.fold_left (fun env (_, i) -> literal_in_initializer env i) env l
+    List.fold_left (fun env (_, i) -> literal_in_initializer env kf i) env l
 
-let mk_init bhv env =
+let mk_init_function env =
   (* Create [__e_acsl_globals_init] function with definition
      for initialization of global variables *)
   let vi =
@@ -82,9 +85,7 @@ let mk_init bhv env =
   let fct = Definition(fundec, Location.unknown) in
   (* Create and register [__e_acsl_globals_init] as kernel
      function *)
-  let kf =
-    { fundec = fct; spec = spec }
-  in
+  let kf = { fundec = fct; spec = spec } in
   Globals.Functions.register kf;
   Globals.Functions.replace_by_definition spec fundec Location.unknown;
   (* Now generate the statements. The generation is done only now because it
@@ -95,12 +96,11 @@ let mk_init bhv env =
      after generating observers of **all** globals *)
   let env, stmts =
     Varinfo.Hashtbl.fold_sorted
-      (fun old_vi l stmts ->
-         let new_vi = Visitor_behavior.Get.varinfo bhv old_vi in
+      (fun vi l stmts ->
          List.fold_left
            (fun (env, stmts) (off, init) ->
-              let env = literal_in_initializer env init in
-              let stmt = Temporal.generate_global_init new_vi off init env in
+              let env = literal_in_initializer env kf init in
+              let stmt = Temporal.generate_global_init vi off init in
               env, match stmt with None -> stmts | Some stmt -> stmt :: stmts)
            stmts
            !l)
@@ -110,11 +110,10 @@ let mk_init bhv env =
   (* allocation and initialization of globals *)
   let stmts =
     Varinfo.Hashtbl.fold_sorted
-      (fun old_vi _ stmts ->
-         let new_vi = Visitor_behavior.Get.varinfo bhv old_vi in
+      (fun vi _ stmts ->
          (* a global is both allocated and initialized *)
-         Misc.mk_store_stmt new_vi
-         :: Misc.mk_initialize ~loc:Location.unknown (Cil.var new_vi)
+         Misc.mk_store_stmt vi
+         :: Misc.mk_initialize ~loc:Location.unknown (Cil.var vi)
          :: stmts)
       tbl
       stmts
@@ -171,11 +170,10 @@ let mk_init bhv env =
   blk.bstmts <- stmts;
   vi, fundec, env
 
-let mk_delete bhv stmts =
+let mk_delete_stmts stmts =
   Varinfo.Hashtbl.fold_sorted
-    (fun old_vi _l acc ->
-       let new_vi = Visitor_behavior.Get.varinfo bhv old_vi in
-       Misc.mk_delete_stmt new_vi :: acc)
+    (fun vi _l acc ->
+       Misc.mk_delete_stmt vi :: acc)
     tbl
     stmts
 
