@@ -41,7 +41,7 @@ PLUGIN_CMO := options transform override_table basic_blocks memcpy memcmp memmov
 PLUGIN_DISTRIBUTED := $(PLUGIN_ENABLE)
 PLUGIN_DISTRIB_EXTERNAL:= Makefile.in configure.ac configure
 #PLUGIN_NO_DEFAULT_TEST := no
-PLUGIN_TESTS_DIRS := 
+PLUGIN_TESTS_DIRS := functions
 
 ################
 # Generic part #
