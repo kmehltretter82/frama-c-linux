@@ -43,6 +43,9 @@ let pmoved_memmove ?loc dest src len =
 let pmoved_len_bytes ?loc dest src bytes_len =
   plet_len_div_size ?loc dest.term_type bytes_len (pmoved_memmove ?loc dest src)
 
+let presult_dest ?loc t dest =
+  prel ?loc (Req, (tresult ?loc t), dest)
+
 let generate_requires loc dest src len =
   List.map new_predicate [
     { (pcorrect_len_bytes ~loc dest.term_type len)    with pred_name = ["aligned_end"] } ;
@@ -59,9 +62,10 @@ let generate_assigns loc t dest src len =
   let res = result, From [dest] in
   Writes [ copy ; res ]
 
-let generate_ensures loc dest src len =
+let generate_ensures loc t dest src len =
   List.map (fun p -> Normal, new_predicate p) [
-    { (pmoved_len_bytes ~loc dest src len) with pred_name = [ "moved"] }
+    { (pmoved_len_bytes ~loc dest src len) with pred_name = [ "moved"] } ;
+    { (presult_dest ~loc t dest)           with pred_name = [ "result"] }
   ]
 
 let generate_spec vi loc =
@@ -75,7 +79,7 @@ let generate_spec vi loc =
   let len = cvar_to_tvar clen in
   let requires = generate_requires loc dest src len in
   let assigns  = generate_assigns loc t dest src len in
-  let ensures  = generate_ensures loc dest src len in
+  let ensures  = generate_ensures loc t dest src len in
   make_funspec [make_behavior ~requires ~assigns ~ensures ()] ()
 
 let generate_prototype t =
