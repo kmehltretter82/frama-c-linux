@@ -76,11 +76,12 @@ Frama-C/WP uses the [Why3](http://why3.lri.fr/) platform to run external provers
 The Why3 platform and the Alt-Ergo prover are automatically installed _via_ opam
 when installing Frama-C.
 
-However, CVC4 or Z3 are also very efficient provers to be used alternatively or in combination with Alt-Ergo.
+Other recommended, efficient provers are CVC4 and Z3.
+They can be used as replacement or combined with Alt-Ergo.
 Actually, you can use any prover supported by Why3 in combination with Frama-C/WP.
 
-Most provers are available on all platforms, although you shall configure Why3 after installation
-to make them available for Frama-C/WP:
+Most provers are available on all platforms. After their installation,
+Why3 must be configured to make them available for Frama-C/WP:
 
     ```shell
     why3 config --detect
@@ -92,14 +93,15 @@ The following set of packages is known to be a working configuration for
 Frama-C 19 (Potassium):
 
 - OCaml 4.05.0
+- ocamlfind.1.8.0
 - apron.20160125 (optional)
-- lablgtk.2.18.5 | lablgtk3.3.0.beta5 + lablgtk3-sourceview3.3.0.beta5
-- mlgmpidl.1.2.9 (optional)
+- lablgtk.2.18.8 | lablgtk3.3.0.beta6 + lablgtk3-sourceview3.3.0.beta6
+- mlgmpidl.1.2.11 (optional)
 - ocamlgraph.1.8.8
 - why3.1.2.0
 - alt-ergo.2.0.0 (for wp, optional)
-- yojson.1.4.1
-- zarith.1.7
+- yojson.1.7.0
+- zarith.1.9.1
 
 ### Installing Custom Versions of Frama-C
 
