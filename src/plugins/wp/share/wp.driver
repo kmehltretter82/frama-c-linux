@@ -41,7 +41,6 @@ why3.import += "frama_c_wp.qed.Qed";
 altergo.file += "ergo/int.Int.mlw";
 altergo.file += "ergo/int.Abs.mlw";
 altergo.file += "ergo/int.ComputerDivision.mlw";
-altergo.file += "ergo/int.EuclideanDivision.mlw";
 altergo.file += "ergo/int.ComputerOfEuclideanDivision.mlw";
 altergo.file += "ergo/real.Real.mlw";
 altergo.file += "ergo/real.RealInfix.mlw";

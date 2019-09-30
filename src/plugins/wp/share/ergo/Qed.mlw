@@ -26,12 +26,10 @@
 (** The theory bool_Bool_ must be appended to this file*)
 (** The theory int_Int_ must be appended to this file*)
 (** The theory int_Abs_ must be appended to this file*)
-(** The theory int_EuclideanDivision_ must be appended to this file*)
 (** The theory int_ComputerDivision_ must be appended to this file*)
 (** The theory real_Real_ must be appended to this file*)
 (** The theory real_RealInfix_ must be appended to this file*)
 (** The theory real_FromInt_ must be appended to this file*)
-(** The theory for_drivers_ComputerOfEuclideanDivision_ must be appended to this file*)
 logic match_bool : bool, 'a, 'a -> 'a
 
 axiom match_bool1 :
