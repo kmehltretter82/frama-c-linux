@@ -50,10 +50,11 @@ let rec string_of_typ_aux = function
   | TPtr(t, _) -> "ptr_" ^ string_of_typ t
   | TEnum (ei, _) -> ei.ename
   | TComp (ci, _, _) -> ci.cname
-  | TArray (t, _, _, _) -> "arr_" ^ string_of_typ t
+  | TArray (t, Some e, _, _) ->
+    "arr" ^ (string_of_exp e) ^ "_" ^ string_of_typ t
   | _ -> assert false
 and string_of_typ t = string_of_typ_aux (Cil.unrollType t)
-
+and string_of_exp e = Format.asprintf "%a" Cil_printer.pp_exp e
 
 let size_var t value = {
   l_var_info = make_logic_var_local "__fc_len" t;
@@ -98,10 +99,37 @@ let tbuffer_range ?loc ptr len =
   let range = trange ?loc (Some (tinteger ?loc 0), Some last) in
   tplus ?loc ptr range
 
-let tunref_range ?loc ptr len =
+let rec tunref_range ?loc ptr len =
   let typ = ttype_of_pointed ptr.term_type in
   let range = tbuffer_range ?loc ptr len in
-  term (TLval ((TMem range), TNoOffset)) typ
+  let tlval = (TMem range), TNoOffset in
+  let tlval, typ = tunref_range_unfold ?loc tlval typ in
+  term (TLval tlval) typ
+and tunref_range_unfold ?loc lval typ =
+  match typ with
+  | Ctype(TArray(typ, Some e, _, _)) ->
+    let len = Logic_utils.expr_to_term ~cast:false e in
+    let last = tminus ?loc len (tinteger ?loc 1) in
+    let range = trange ?loc (Some (tinteger ?loc 0), Some last) in
+    let lval = addTermOffsetLval (TIndex(range, TNoOffset)) lval in
+    tunref_range_unfold lval (Ctype typ)
+  | _ -> lval, typ
+
+let taccess ?loc ptr offset =
+  let get_lval = function
+    | TLval(lval) -> lval
+    | _ -> assert false
+  in
+  match ptr.term_type with
+  | Ctype(TPtr(_)) ->
+    let address = tplus ?loc ptr offset in
+    let lval = TLval(TMem(address), TNoOffset) in
+    term ?loc lval (ttype_of_pointed ptr.term_type)
+  | Ctype(TArray(_)) ->
+    let lval = get_lval ptr.term_node in
+    let lval = addTermOffsetLval (TIndex(offset, TNoOffset)) lval in
+    term ?loc (TLval lval) (ttype_of_pointed ptr.term_type)
+  | _ -> assert false
 
 let tsizeofpointed ?loc = function
   | Ctype(TPtr(t, _)) | Ctype(TArray(t, _, _, _)) -> tinteger ?loc (Cil.bytesSizeOf t)
@@ -132,6 +160,29 @@ let pcorrect_len_bytes ?loc t bytes_len =
   let sizeof = tsizeofpointed ?loc t in
   let modulo = term ?loc (TBinOp(Mod, bytes_len, sizeof)) Linteger in
   prel ?loc (Req, modulo, tinteger ?loc 0)
+
+let pindex_bounds ?loc low value up =
+  let geq_0 = prel ?loc (Rle, low, value) in
+  let lt_len = prel ?loc (Rlt, value, up) in
+  pand ?loc (geq_0, lt_len)
+
+let rec punfold_all_elems_eq ?loc t1 t2 len =
+  assert(Cil_datatype.Logic_type.equal t1.term_type t2.term_type) ;
+  pall_elems_eq ?loc 0 t1 t2 len
+and pall_elems_eq ?loc depth t1 t2 len =
+  let ind = Cil_const.make_logic_var_quant ("j" ^ (string_of_int depth)) Linteger in
+  let tind = tvar ind in
+  let bounds = pindex_bounds ?loc (tinteger 0) tind len in
+  let t1_acc = taccess ?loc t1 tind in
+  let t2_acc = taccess ?loc t2 tind in
+  let eq = peq_unfold ?loc (depth+1) t1_acc t2_acc in
+  pforall ?loc ([ind], (pimplies ?loc (bounds, eq)))
+and peq_unfold ?loc depth t1 t2 =
+  match t1.term_type with
+  | Ctype(TArray(_, Some len, _, _)) ->
+    let len = Logic_utils.expr_to_term ~cast:false len in
+    pall_elems_eq ?loc depth t1 t2 len
+  | _ -> prel ?loc (Req, t1, t2)
 
 let pseparated_memories ?loc p1 len1 p2 len2 =
   let b1 = tbuffer_range ?loc p1 len1 in

@@ -26,22 +26,8 @@ open Basic_blocks
 
 let function_name = "memmove"
 
-let pmoved_memmove ?loc dest src len =
-  let j = Cil_const.make_logic_var_quant "j" Linteger in
-  let tj = tvar j in
-  let geq_0 = prel ?loc (Rle, (tinteger 0), tj) in
-  let lt_len = prel ?loc (Rlt, tj, len) in
-  let bounds = pand ?loc (geq_0, lt_len) in
-  let dest_j = tplus ?loc dest tj in
-  let dest_acc = term ?loc (TLval(TMem(dest_j), TNoOffset)) (ttype_of_pointed dest.term_type) in
-  let src_j = tplus ?loc src tj in
-  let src_acc = term ?loc (TLval(TMem(src_j), TNoOffset)) (ttype_of_pointed dest.term_type) in
-  let src_acc = tat ?loc (src_acc, pre_label) in
-  let eq = prel ?loc (Req, dest_acc, src_acc) in
-  pforall ?loc ([j], (pimplies ?loc (bounds, eq)))
-
 let pmoved_len_bytes ?loc dest src bytes_len =
-  plet_len_div_size ?loc dest.term_type bytes_len (pmoved_memmove ?loc dest src)
+  plet_len_div_size ?loc dest.term_type bytes_len (punfold_all_elems_eq ?loc dest src)
 
 let presult_dest ?loc t dest =
   prel ?loc (Req, (tresult ?loc t), dest)

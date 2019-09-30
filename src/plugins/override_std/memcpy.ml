@@ -30,21 +30,8 @@ let pseparated_memcpy_len_bytes ?loc p1 p2 bytes_len =
   let generate len = pseparated_memories ?loc p1 len p2 len in
   plet_len_div_size ?loc p1.term_type bytes_len generate
 
-let pcopied_memcpy ?loc p1 p2 len =
-  let j = Cil_const.make_logic_var_quant "j" Linteger in
-  let tj = tvar j in
-  let geq_0 = prel ?loc (Rle, (tinteger 0), tj) in
-  let lt_len = prel ?loc (Rlt, tj, len) in
-  let bounds = pand ?loc (geq_0, lt_len) in
-  let p1_j = tplus ?loc p1 tj in
-  let p1_acc = term ?loc (TLval(TMem(p1_j), TNoOffset)) (ttype_of_pointed p1.term_type) in
-  let p2_j = tplus ?loc p2 tj in
-  let p2_acc = term ?loc (TLval(TMem(p2_j), TNoOffset)) (ttype_of_pointed p2.term_type) in
-  let eq = prel ?loc (Req, p1_acc, p2_acc) in
-  pforall ?loc ([j], (pimplies ?loc (bounds, eq)))
-
 let pcopied_len_bytes ?loc p1 p2 bytes_len =
-  plet_len_div_size ?loc p1.term_type bytes_len (pcopied_memcpy ?loc p1 p2)
+  plet_len_div_size ?loc p1.term_type bytes_len (punfold_all_elems_eq ?loc p1 p2)
 
 let presult_dest ?loc t dest =
   prel ?loc (Req, (tresult ?loc t), dest)

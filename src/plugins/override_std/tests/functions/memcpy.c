@@ -6,3 +6,7 @@ int main(void){
 
   int *p = memcpy(dest, src, sizeof(src));
 }
+
+void nested(int (*dest) [10], int (*src) [10], size_t n){
+  memcpy(dest, src, n) ;
+}

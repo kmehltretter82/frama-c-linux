@@ -6,3 +6,7 @@ int main(void){
 
   int res = memcmp(s1, s2, sizeof(s1));
 }
+
+int nested(int (*dest) [10], int (*src) [10], size_t n){
+  return memcmp(dest, src, n) ;
+}
