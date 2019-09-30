@@ -10,6 +10,8 @@
    STDOPT: +" -cpp-extra-args=-DINCOHERENT_GLOBAL_DECL_MORE_GHOSTS"
    STDOPT: +" -cpp-extra-args=-DINCOHERENT_LOCAL_DECL_MORE_NON_GHOSTS"
    STDOPT: +" -cpp-extra-args=-DINCOHERENT_GLOBAL_DECL_MORE_NON_GHOSTS"
+   STDOPT: +" -cpp-extra-args=-DVOID_EMPTY_GHOST_PARAMETER_LIST"
+   STDOPT: +" -cpp-extra-args=-DVOID_GHOST_PARAMETER"
 */
 
 #ifdef ARGS_NOT_VOID
@@ -185,3 +187,22 @@ void function(int a, int b) /*@ ghost(int c, int d) */ {
 
 #endif
 
+#ifdef VOID_EMPTY_GHOST_PARAMETER_LIST
+
+void function_void(void) /*@ ghost () */ {
+
+}
+
+#endif
+
+#ifdef VOID_GHOST_PARAMETER
+
+void function_void(void) /*@ ghost (void) */ {
+
+}
+
+void function_non_void(int x) /*@ ghost (void) */ {
+
+}
+
+#endif

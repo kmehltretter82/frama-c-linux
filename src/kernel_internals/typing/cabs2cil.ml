@@ -5062,9 +5062,8 @@ and doType (ghost:bool) isFuncArg
           (args', !newisva)
         end else (args, isva)
       in
-      let argl_length = List.length args' in
       (* Make the argument as for a formal *)
-      let doOneArg is_ghost (s, (n, ndt, a, cloc)) : varinfo =
+      let doOneArg argl_length is_ghost (s, (n, ndt, a, cloc)) : varinfo =
         let ghost = is_ghost || ghost in
         let s' = doSpecList ghost n s in
         let vi = makeVarInfoCabs ~ghost ~isformal:true ~isglobal:false
@@ -5084,17 +5083,30 @@ and doType (ghost:bool) isFuncArg
         vi
       in
       let make_noopt_targs ghost args =
-        List.map (doOneArg ghost) args
+        let argl_length = List.length args in
+        List.map (doOneArg argl_length ghost) args
       in
       let noopt_targs = make_noopt_targs false args' in
       let noopt_ghost_targs = make_noopt_targs true ghost_args in
       let targs : varinfo list option =
-        match noopt_targs @ noopt_ghost_targs with
+        match noopt_targs with
         | [] -> None (* No argument list *)
-        | t :: l' when isVoidType t.vtype ->
-          Some l'
-        | l ->
-          Some l
+        | [t] when isVoidType t.vtype -> Some []
+        | l -> Some l
+      in
+      let ghost_targs : varinfo list =
+        match noopt_ghost_targs with
+        | [t] when isVoidType t.vtype ->
+          Kernel.error ~once:true ~current:true
+            "ghost parameters list cannot be void" ;
+          []
+        | l -> l
+      in
+      let all_targs =
+        match targs, ghost_targs with
+        | None, [] -> None
+        | None, g -> Some g
+        | Some ng, g -> Some (ng @ g)
       in
       exitScope ();
       (* Turn [] types into pointers in the arguments and the result type.
@@ -5149,7 +5161,7 @@ and doType (ghost:bool) isFuncArg
           fixupArgumentTypes (argidx + 1) args'
       in
       let args =
-        match targs with
+        match all_targs with
         | None -> None
         | Some argl ->
           fixupArgumentTypes 0 argl;

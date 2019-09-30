@@ -1235,7 +1235,7 @@ direct_decl: /* (* ISO 6.7.5 *) */
                                      let (attrs, size) = $3 in
                                      (n, ARRAY(decl, attrs, size)) }
 |   direct_decl LPAREN RPAREN ghost_parameter_opt {
-   let (n,decl) = $1 in (n, PROTO(decl,[],[],false))
+   let (n,decl) = $1 in (n, PROTO(decl,[],$4,false))
   }
 |   direct_decl parameter_list_startscope rest_par_list RPAREN ghost_parameter_opt
                                    { let (n, decl) = $1 in
@@ -1424,7 +1424,7 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 | IDENT LPAREN RPAREN ghost_parameter_opt
   {
     let loc = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 1, Parsing.rhs_start_pos 1) in
-    let fdec = ($1, PROTO(JUSTBASE,[],[],false),[],loc) in
+    let fdec = ($1, PROTO(JUSTBASE,[],$4,false),[],loc) in
     announceFunctionName fdec;
     (loc, [SpecType Tint], fdec)
   }
