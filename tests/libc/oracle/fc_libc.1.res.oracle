@@ -2346,8 +2346,11 @@ extern void free(void *p);
  */
 extern void *realloc(void *ptr, size_t size);
 
-/*@ ensures never_terminates: \false;
-    assigns \nothing; */
+/*@ exits status: \exit_status ≢ 0;
+    ensures never_terminates: \false;
+    
+    assigns \exit_status \from \nothing;
+ */
 extern  __attribute__((__noreturn__)) void abort(void);
 
 /*@ assigns \result;
@@ -2358,8 +2361,11 @@ extern int atexit(void (*func)(void));
     assigns \result \from \nothing; */
 extern int at_quick_exit(void (*func)(void));
 
-/*@ ensures never_terminates: \false;
-    assigns \nothing; */
+/*@ exits status: \exit_status ≡ \old(status);
+    ensures never_terminates: \false;
+    
+    assigns \exit_status \from status;
+ */
 extern  __attribute__((__noreturn__)) void exit(int status);
 
 /*@ ensures never_terminates: \false;
