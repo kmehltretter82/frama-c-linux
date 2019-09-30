@@ -4792,9 +4792,9 @@ and doAttr ghost (a: A.attribute) : attribute list =
         end
       | A.CONSTANT (A.CONST_FLOAT str) ->
         ACons ("__fc_float", [AStr str])
-      | A.CALL({expr_node = A.VARIABLE n}, args, ghost) -> begin
+      | A.CALL({expr_node = A.VARIABLE n}, args, []) -> begin
           let n' = if strip then stripUnderscore n else n in
-          let ae' = List.map ae (args@ghost) in
+          let ae' = List.map ae args in
           ACons(n', ae')
         end
       | A.EXPR_SIZEOF e -> ASizeOfE (ae e)
