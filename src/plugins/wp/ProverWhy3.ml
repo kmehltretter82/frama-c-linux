@@ -1305,15 +1305,14 @@ let prove ?timeout ?steplimit ~prover wpo =
                     Task.return result
                   end
                 else
-                  begin
-                    incr miss ;
-                    Task.finally
-                      (call_prover ~timeout ~steplimit drv prover config task)
-                      (function
-                        | Task.Result result when VCS.is_verdict result ->
-                            set_cache_result ~mode hash prover result
-                        | _ -> ())
-                  end
+                  Task.finally
+                    (call_prover ~timeout ~steplimit drv prover config task)
+                    begin function
+                      | Task.Result result when VCS.is_verdict result ->
+                          incr miss ;
+                          set_cache_result ~mode hash prover result
+                      | _ -> ()
+                    end
       end ()
   with exn ->
     let bt = Printexc.get_raw_backtrace () in
