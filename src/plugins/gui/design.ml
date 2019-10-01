@@ -1298,18 +1298,18 @@ class main_window () : main_window_extension_points =
     method private push_info_buffer :
       'a. ?buffer:Buffer.t -> ('a, Format.formatter, unit) format -> 'a =
       fun ?buffer fmt ->
-        let b = match buffer with
-          | None -> Buffer.create 80
-          | Some b -> b
-        in
-        let bfmt = Format.formatter_of_buffer b  in
-        Format.kfprintf
-          (function fmt ->
-             Format.pp_print_flush fmt ();
-             let content = Buffer.contents b in
-             ignore (status_context#push content))
-          bfmt
-          fmt
+      let b = match buffer with
+        | None -> Buffer.create 80
+        | Some b -> b
+      in
+      let bfmt = Format.formatter_of_buffer b  in
+      Format.kfprintf
+        (function fmt ->
+           Format.pp_print_flush fmt ();
+           let content = Buffer.contents b in
+           ignore (status_context#push content))
+        bfmt
+        fmt
 
     method push_info fmt = self#push_info_buffer fmt
 

@@ -519,7 +519,7 @@ module Select (Eval: Eval) = struct
              (* Function pointers *)
              (* get the list of functions in the values *)
              let e = Value_util.lval_to_exp lv in
-             match Eval.Analysis.get_kinstr_state ki with
+             match Eval.Analysis.get_kinstr_state ~after:false ki with
              | `Bottom -> ()
              | `Value state ->
                let funs, _ = Eval.Analysis.eval_function_exp state e in

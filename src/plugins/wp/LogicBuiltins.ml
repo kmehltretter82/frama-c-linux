@@ -264,7 +264,7 @@ let add_option ~driver_dir group name ~library value =
 let find_lib file =
   if Sys.file_exists file then file else
     let rec lookup file = function
-      | [] -> Wp_parameters.abort "File '%s' not found (see -wp-include)" file
+      | [] -> Wp_parameters.abort "File '%s' not found" file
       | dir::dirs ->
           let path = Printf.sprintf "%s/%s" dir file in
           if Sys.file_exists path then path else lookup file dirs

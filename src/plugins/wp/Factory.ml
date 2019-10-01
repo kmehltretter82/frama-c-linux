@@ -24,7 +24,7 @@
 (* --- Model Factory                                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
-type mheap = Hoare | ZeroAlias | Typed of MemTyped.pointer
+type mheap = Hoare | ZeroAlias | Region | Typed of MemTyped.pointer
 type mvar = Raw | Var | Ref | Caveat
 
 type setup = {
@@ -64,6 +64,7 @@ let descr_mtyped d = function
   | MemTyped.Fits -> ()
 
 let descr_mheap d = function
+  | Region -> main d "region"
   | ZeroAlias -> main d "zeroalias"
   | Hoare -> main d "hoare"
   | Typed p -> main d "typed" ; descr_mtyped d p
@@ -157,31 +158,47 @@ struct
     end
 end
 
+module Static : Proxy =
+struct
+  let datatype = "Static"
+  let param x =
+    let open Cil_types in
+    if x.vaddrof || Cil.isArrayType x.vtype || Cil.isPointerType x.vtype
+    then MemoryContext.ByAddr else MemoryContext.ByValue
+  let iter = Raw.iter
+end
+
 (* -------------------------------------------------------------------------- *)
 (* --- RefUsage-based Proxies                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-let is_formal_ptr x =
-  let open Cil_types in
-  x.vformal && Cil.isPointerType x.vtype
+let is_ptr x = Cil.isPointerType x.Cil_types.vtype
+let is_fun_ptr x = Cil.isFunctionType x.Cil_types.vtype
+let is_formal_ptr x = x.Cil_types.vformal && is_ptr x
+let is_init kf x =
+  WpStrategy.is_main_init kf ||
+  Wp_parameters.AliasInit.get () ||
+  ( WpStrategy.isInitConst () && WpStrategy.isGlobalInitConst x )
 
 let refusage_param ~byref ~context x =
   let kf,init = match WpContext.get_scope () with
-    | WpContext.Global -> None,false
-    | WpContext.Kf f ->
-        Some f ,
-        WpStrategy.is_main_init f ||
-        Wp_parameters.AliasInit.get () ||
-        ( WpStrategy.isInitConst () &&
-          WpStrategy.isGlobalInitConst x ) in
+    | WpContext.Global -> None , false
+    | WpContext.Kf kf -> Some kf , is_init kf x in
   match RefUsage.get ?kf ~init x with
   | RefUsage.NoAccess -> MemoryContext.NotUsed
   | RefUsage.ByAddr -> MemoryContext.ByAddr
-  | RefUsage.ByRef when byref -> MemoryContext.ByRef
-  | RefUsage.ByArray when context && is_formal_ptr x -> MemoryContext.InArray
-  | RefUsage.ByValue when context && is_formal_ptr x -> MemoryContext.InContext
-  | RefUsage.ByRef | RefUsage.ByValue -> MemoryContext.ByValue
-  | RefUsage.ByArray -> MemoryContext.ByShift
+  | RefUsage.ByValue ->
+      if context && is_formal_ptr x then MemoryContext.InContext
+      else if is_ptr x && not (is_fun_ptr x) then MemoryContext.ByShift
+      else MemoryContext.ByValue
+  | RefUsage.ByRef ->
+      if byref
+      then MemoryContext.ByRef
+      else MemoryContext.ByValue
+  | RefUsage.ByArray ->
+      if context && is_formal_ptr x
+      then MemoryContext.InArray
+      else MemoryContext.ByShift
 
 let refusage_iter ?kf ~init f = RefUsage.iter ?kf ~init (fun x _usage -> f x)
 
@@ -228,6 +245,7 @@ module MakeCompiler(M:Sigs.Model) = struct
   module A = LogicAssigns.Make(M)(C)(L)
 end
 
+module Comp_Region = MakeCompiler(Register(Static)(MemRegion))
 module Comp_MemZeroAlias = MakeCompiler(MemZeroAlias)
 module Comp_Hoare_Raw = MakeCompiler(Model_Hoare_Raw)
 module Comp_Hoare_Ref = MakeCompiler(Model_Hoare_Ref)
@@ -240,6 +258,7 @@ module Comp_Caveat = MakeCompiler(Model_Caveat)
 let compiler mheap mvar : (module Sigs.Compiler) =
   match mheap , mvar with
   | ZeroAlias , _     -> (module Comp_MemZeroAlias)
+  | Region , _        -> (module Comp_Region)
   | _    ,   Caveat   -> (module Comp_Caveat)
   | Hoare , (Raw|Var) -> (module Comp_Hoare_Raw)
   | Hoare ,   Ref     -> (module Comp_Hoare_Ref)
@@ -254,6 +273,7 @@ let compiler mheap mvar : (module Sigs.Compiler) =
 let configure_mheap = function
   | Hoare -> MemEmpty.configure ()
   | ZeroAlias -> MemZeroAlias.configure ()
+  | Region -> MemRegion.configure ()
   | Typed p -> MemTyped.configure () ; Context.set MemTyped.pointer p
 
 let configure (s:setup) (d:driver) () =
@@ -320,6 +340,7 @@ let split ~warning (m:string) : string list =
 
 let update_config ~warning m s = function
   | "ZEROALIAS" -> { s with mheap = ZeroAlias }
+  | "REGION" -> { s with mheap = Region }
   | "HOARE" -> { s with mheap = Hoare }
   | "TYPED" -> { s with mheap = Typed MemTyped.Fits }
   | "CAST" -> { s with mheap = Typed MemTyped.Unsafe }

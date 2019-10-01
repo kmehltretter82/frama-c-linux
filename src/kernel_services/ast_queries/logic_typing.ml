@@ -2992,80 +2992,80 @@ struct
   and type_relation:
     'a. _ -> _ -> (_ -> _ -> _ -> _ -> 'a) -> _ -> _ -> _ -> 'a =
     fun ctxt env f t1 op t2 ->
-      let loc1 = t1.lexpr_loc in
-      let loc2 = t2.lexpr_loc in
-      let loc = loc_join t1.lexpr_loc t2.lexpr_loc in
-      let t1 = ctxt.type_term ctxt env t1 in
-      let ty1 = t1.term_type in
-      let t2 = ctxt.type_term ctxt env t2 in
-      let ty2 = t2.term_type in
-      let rel = match op with
-        | Eq -> "eq"
-        | Neq -> "ne"
-        | Le -> "le"
-        | Lt -> "lt"
-        | Ge -> "ge"
-        | Gt -> "gt"
+    let loc1 = t1.lexpr_loc in
+    let loc2 = t2.lexpr_loc in
+    let loc = loc_join t1.lexpr_loc t2.lexpr_loc in
+    let t1 = ctxt.type_term ctxt env t1 in
+    let ty1 = t1.term_type in
+    let t2 = ctxt.type_term ctxt env t2 in
+    let ty2 = t2.term_type in
+    let rel = match op with
+      | Eq -> "eq"
+      | Neq -> "ne"
+      | Le -> "le"
+      | Lt -> "lt"
+      | Ge -> "ge"
+      | Gt -> "gt"
+    in
+    let conditional_conversion t1 t2 =
+      let env,t,ty1,ty2 =
+        conditional_conversion loc env (Some rel) t1 t2
       in
-      let conditional_conversion t1 t2 =
-        let env,t,ty1,ty2 =
-          conditional_conversion loc env (Some rel) t1 t2
-        in
-        let t1 = { t1 with term_type = instantiate env t1.term_type } in
-        let _,t1 =
-          implicit_conversion ~overloaded:false loc1 t1 t1.term_type ty1
-        in
-        let t2 = { t2 with term_type = instantiate env t2.term_type } in
-        let _,t2 =
-          implicit_conversion ~overloaded:false loc2 t2 t2.term_type ty2
-        in
-        f loc op (mk_cast t1 t) (mk_cast t2 t)
+      let t1 = { t1 with term_type = instantiate env t1.term_type } in
+      let _,t1 =
+        implicit_conversion ~overloaded:false loc1 t1 t1.term_type ty1
       in
-      begin match op with
-        | _ when plain_arithmetic_type ty1 && plain_arithmetic_type ty2 ->
-          conditional_conversion t1 t2
-        | Eq | Neq when isLogicPointer t1 && isLogicNull t2 ->
-          let t1 = mk_logic_pointer_or_StartOf t1 in
-          let t2 =
-            (* in case of a set, we perform two conversions: first from
-               integer to pointer, then from pointer to set of pointer. *)
-            if is_set_type t1.term_type then
-              mk_cast t2 (type_of_set_elem t1.term_type)
-            else t2
-          in
-          f loc op t1 (mk_cast t2 t1.term_type)
-        | Eq | Neq when isLogicPointer t2 && isLogicNull t1 ->
-          let t2 = mk_logic_pointer_or_StartOf t2 in
-          let t1 =
-            if is_set_type t2.term_type then
-              mk_cast t1 (type_of_set_elem t2.term_type)
-            else t1
-          in
-          f loc op (mk_cast t1 t2.term_type) t2
-        | Eq | Neq when isLogicArrayType ty1 && isLogicArrayType ty2 ->
-          if is_same_logic_array_type ty1 ty2 then f loc op t1 t2
-          else
-            ctxt.error loc "comparison of incompatible types %a and %a"
-              Cil_printer.pp_logic_type ty1 Cil_printer.pp_logic_type ty2
-        | _ when isLogicPointer t1 && isLogicPointer t2 ->
-          let t1 = mk_logic_pointer_or_StartOf t1 in
-          let t2 = mk_logic_pointer_or_StartOf t2 in
-          if is_same_logic_ptr_type ty1 ty2 ||
-             ((op = Eq || op = Neq) &&
-              (isLogicVoidPointerType t1.term_type ||
-               isLogicVoidPointerType t2.term_type))
-          then f loc op t1 t2
-          else if (op=Eq || op = Neq) then conditional_conversion t1 t2
-          else
-            ctxt.error loc "comparison of incompatible types: %a and %a"
-              Cil_printer.pp_logic_type t1.term_type
-              Cil_printer.pp_logic_type t2.term_type
-        | Eq | Neq -> conditional_conversion t1 t2
-        | _ ->
+      let t2 = { t2 with term_type = instantiate env t2.term_type } in
+      let _,t2 =
+        implicit_conversion ~overloaded:false loc2 t2 t2.term_type ty2
+      in
+      f loc op (mk_cast t1 t) (mk_cast t2 t)
+    in
+    begin match op with
+      | _ when plain_arithmetic_type ty1 && plain_arithmetic_type ty2 ->
+        conditional_conversion t1 t2
+      | Eq | Neq when isLogicPointer t1 && isLogicNull t2 ->
+        let t1 = mk_logic_pointer_or_StartOf t1 in
+        let t2 =
+          (* in case of a set, we perform two conversions: first from
+             integer to pointer, then from pointer to set of pointer. *)
+          if is_set_type t1.term_type then
+            mk_cast t2 (type_of_set_elem t1.term_type)
+          else t2
+        in
+        f loc op t1 (mk_cast t2 t1.term_type)
+      | Eq | Neq when isLogicPointer t2 && isLogicNull t1 ->
+        let t2 = mk_logic_pointer_or_StartOf t2 in
+        let t1 =
+          if is_set_type t2.term_type then
+            mk_cast t1 (type_of_set_elem t2.term_type)
+          else t1
+        in
+        f loc op (mk_cast t1 t2.term_type) t2
+      | Eq | Neq when isLogicArrayType ty1 && isLogicArrayType ty2 ->
+        if is_same_logic_array_type ty1 ty2 then f loc op t1 t2
+        else
+          ctxt.error loc "comparison of incompatible types %a and %a"
+            Cil_printer.pp_logic_type ty1 Cil_printer.pp_logic_type ty2
+      | _ when isLogicPointer t1 && isLogicPointer t2 ->
+        let t1 = mk_logic_pointer_or_StartOf t1 in
+        let t2 = mk_logic_pointer_or_StartOf t2 in
+        if is_same_logic_ptr_type ty1 ty2 ||
+           ((op = Eq || op = Neq) &&
+            (isLogicVoidPointerType t1.term_type ||
+             isLogicVoidPointerType t2.term_type))
+        then f loc op t1 t2
+        else if (op=Eq || op = Neq) then conditional_conversion t1 t2
+        else
           ctxt.error loc "comparison of incompatible types: %a and %a"
             Cil_printer.pp_logic_type t1.term_type
             Cil_printer.pp_logic_type t2.term_type
-      end
+      | Eq | Neq -> conditional_conversion t1 t2
+      | _ ->
+        ctxt.error loc "comparison of incompatible types: %a and %a"
+          Cil_printer.pp_logic_type t1.term_type
+          Cil_printer.pp_logic_type t2.term_type
+    end
 
   and term_lval f t =
     let check_lval t =

@@ -519,9 +519,9 @@ sig
         order of definition: each trailing terms only depend on heading ones.
 
         The traversal is controlled by two optional arguments:
-        - [shared] those terms are not traversed (considered as atomic, default to none)
-        - [shareable] those terms ([is_simple] excepted) that can be shared (default to all)
-        - [subterms] those sub-terms a term to be considered during
+      - [shared] those terms are not traversed (considered as atomic, default to none)
+      - [shareable] those terms ([is_simple] excepted) that can be shared (default to all)
+      - [subterms] those sub-terms a term to be considered during
           traversal ([lc_iter] by default)
   *)
 

@@ -42,9 +42,8 @@ autom4te.cache
 
 #tests
 /tests/ptests_config
-/tests/*/result/
-/tests/*/*/result/
-/tests/*/result_*/
+/tests/**/result/
+/tests/**/result_*/
 /tests/journal/intra.byte
 /tests/misc/my_visitor_plugin/my_visitor.opt
 /tests/misc/my_visitor.sav
@@ -208,3 +207,5 @@ hello-*.tar.gz
 /src/plugins/gui/GSourceView.ml
 /src/plugins/gui/GSourceView.mli
 /tests/crowbar/integer_bb_pretty
+/src/plugins/gui/dgraph_helper.ml
+/doc/doxygen

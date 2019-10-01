@@ -27,7 +27,6 @@
 ## Used in share/why3
 
 WHY3_LIBS_CEA:=	\
- ArcTrigo.mlw   \
  cbits.mlw 	\
  cint.mlw 	\
  cfloat.mlw 	\

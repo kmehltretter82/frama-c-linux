@@ -245,7 +245,7 @@ struct
                    all states"
     in
     (* Get the cvalue *)
-    let cvalue = match Abstract.Val.get Main_values.cvalue_key with
+    let cvalue = match Abstract.Val.get Main_values.CVal.key with
       | Some get_cvalue -> get_cvalue value
       | None -> fail ~exp "partitioning is disabled when the CValue domain is \
                            not active"
@@ -325,7 +325,7 @@ struct
 
   (* --- Applying partitioning actions onto flows --------------------------- *)
 
-  let stamp_by_value = match Abstract.Val.get Main_values.cvalue_key with
+  let stamp_by_value = match Abstract.Val.get Main_values.CVal.key with
     | None -> fun _ _ _ -> None
     | Some get -> fun expr expected_values state ->
       let typ = Cil.typeOf expr in

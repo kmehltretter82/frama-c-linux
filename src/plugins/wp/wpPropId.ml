@@ -567,7 +567,7 @@ let stmt_hints hs s =
        match label with
        | Label(a,_,src) -> if src then add_hint hs a
        | Default _ -> add_hint hs "default"
-       | Case(e,_) -> match Ctypes.get_int e with
+       | Case(e,_) -> match Ctypes.get_int64 e with
          | Some k -> add_hint hs ("case-" ^ Int64.to_string k)
          | None -> ()
     ) s.labels

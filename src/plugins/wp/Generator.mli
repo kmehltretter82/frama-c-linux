@@ -33,18 +33,17 @@ class type computer =
     method compute : Wpo.t Bag.t
   end
 
-type functions =
-  | F_All
-  | F_List of Cil_datatype.Kf.Set.t
-  | F_Skip of Cil_datatype.Kf.Set.t
+open Wp_parameters
 
 val compute_ip : computer -> Property.t -> Wpo.t Bag.t
 val compute_call : computer -> Cil_types.stmt -> Wpo.t Bag.t
+
 val compute_kf : computer ->
   ?kf:Kernel_function.t ->
   ?bhv:string list ->
   ?prop:string list ->
   unit -> Wpo.t Bag.t
+
 val compute_selection : computer ->
   ?fct:functions ->
   ?bhv:string list ->

@@ -77,6 +77,8 @@ let dkey_incompatible_states = register_category "incompatible-states"
 let dkey_iterator = register_category "iterator"
 let dkey_callbacks = register_category "callbacks"
 let dkey_widening = register_category "widening"
+let dkey_experimental = register_category "experimental-ok"
+
 
 let () =
   let activate dkey = add_debug_keys dkey in
@@ -172,6 +174,18 @@ module BitwiseOffsmDomain = Domain_Parameter
       let default = false
     end)
 
+let numerors_available = ref false
+let register_numerors () = numerors_available := true
+
+let numerors_hook _ _ =
+  if not !numerors_available
+  then
+    abort
+      "The numerors domain has been requested but is not available,@ \
+       as Frama-C did not found the MPFR library. The analysis is aborted."
+  else if not (is_debug_key_enabled dkey_experimental) then
+    warning  "The numerors domain is experimental.";
+
 module NumerorsDomain = Domain_Parameter
     (struct
       let option_name = "-eva-numerors-domain"
@@ -180,9 +194,20 @@ module NumerorsDomain = Domain_Parameter
                   computations"
       let default = false
     end)
+let () = NumerorsDomain.add_set_hook numerors_hook
 
 let apron_help = "Experimental binding of the numerical domains provided \
                   by the APRON library: http://apron.cri.ensmp.fr/library \n"
+
+let apron_available = ref false
+let register_apron () = apron_available := true
+
+let apron_hook _ _ =
+  if not !apron_available
+  then
+    abort "an Apron domain is requested but the apron binding is not available."
+  else if not (is_debug_key_enabled dkey_experimental) then
+    warning  "The Apron domains binding is experimental.";
 
 module ApronOctagon = Domain_Parameter
     (struct
@@ -190,6 +215,7 @@ module ApronOctagon = Domain_Parameter
       let help = apron_help ^ "Use the octagon domain of apron."
       let default = false
     end)
+let () = ApronOctagon.add_set_hook apron_hook
 
 module ApronBox = Domain_Parameter
     (struct
@@ -197,6 +223,7 @@ module ApronBox = Domain_Parameter
       let help = apron_help ^ "Use the box domain of apron."
       let default = false
     end)
+let () = ApronBox.add_set_hook apron_hook
 
 module PolkaLoose = Domain_Parameter
     (struct
@@ -204,6 +231,7 @@ module PolkaLoose = Domain_Parameter
       let help = apron_help ^ "Use the loose polyhedra domain of apron."
       let default = false
     end)
+let () = PolkaLoose.add_set_hook apron_hook
 
 module PolkaStrict = Domain_Parameter
     (struct
@@ -211,6 +239,7 @@ module PolkaStrict = Domain_Parameter
       let help = apron_help ^ "Use the strict polyhedra domain of apron."
       let default = false
     end)
+let () = PolkaStrict.add_set_hook apron_hook
 
 module PolkaEqualities = Domain_Parameter
     (struct
@@ -218,6 +247,7 @@ module PolkaEqualities = Domain_Parameter
       let help = apron_help ^ "Use the linear equalities domain of apron."
       let default = false
     end)
+let () = PolkaEqualities.add_set_hook apron_hook
 
 module InoutDomain = Domain_Parameter
     (struct
@@ -230,6 +260,13 @@ module SignDomain = Domain_Parameter
     (struct
       let option_name = "-eva-sign-domain"
       let help = "Use the sign domain of Eva. For demonstration purposes only."
+      let default = false
+    end)
+
+module TracesDomain = Domain_Parameter
+    (struct
+      let option_name = "-eva-traces-domain"
+      let help = "Use a domain to record traces of Eva. Experimental."
       let default = false
     end)
 
@@ -305,6 +342,43 @@ module Numerors_Mode =
 let () =
   Numerors_Mode.set_possible_values ["relative"; "absolute"; "none"; "both"]
 let () = add_precision_dep Numerors_Mode.parameter
+
+let () = Parameter_customize.set_group domains
+module TracesUnrollLoop =
+  Bool
+    (struct
+      let option_name = "-eva-traces-unroll-loop"
+      let help = "Specify if the traces domain should unroll the loops."
+      let default = true
+    end)
+let () = add_precision_dep TracesUnrollLoop.parameter
+
+let () = Parameter_customize.set_group domains
+module TracesUnifyLoop =
+  Bool
+    (struct
+      let option_name = "-eva-traces-unify-loop"
+      let help = "Specify if all the instances of a loop should try \
+                  to share theirs traces."
+      let default = false
+    end)
+let () = add_precision_dep TracesUnifyLoop.parameter
+
+let () = Parameter_customize.set_group domains
+module TracesDot = Empty_string
+    (struct
+      let option_name = "-eva-traces-dot"
+      let help = "Output to the given filename the Cfg in dot format."
+      let arg_name = "FILENAME"
+    end)
+
+let () = Parameter_customize.set_group domains
+module TracesProject = Bool
+    (struct
+      let option_name = "-eva-traces-project"
+      let help = "Try to convert the Cfg into a program in a new project."
+      let default = false
+    end)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Performance options                                                --- *)

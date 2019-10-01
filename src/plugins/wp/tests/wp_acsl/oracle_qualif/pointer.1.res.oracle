@@ -3,8 +3,10 @@
 [wp] Running WP plugin...
 [wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
-[wp] tests/wp_acsl/pointer.i:50: Warning: Uncomparable locations p_0 and mem:t
-[wp] tests/wp_acsl/pointer.i:49: Warning: Uncomparable locations p_0 and mem:t
+[wp] tests/wp_acsl/pointer.i:50: Warning: 
+  Uncomparable locations p_0 and mem:t.(0)
+[wp] tests/wp_acsl/pointer.i:49: Warning: 
+  Uncomparable locations p_0 and mem:t.(0)
 [wp] 9 goals scheduled
 [wp] [Alt-Ergo 2.0.0] Goal typed_absurd_ensures_qed_ko_Base_oracle_ko : Unsuccess
 [wp] [Alt-Ergo 2.0.0] Goal typed_absurd_ensures_qed_ko_Comp_oracle_ko : Unsuccess
@@ -28,5 +30,5 @@ mixed_array_pointer  -     -                 2       0.0%
 absurd              -      -                 2       0.0%
 -------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'absurd':
-  /*@ behavior typed: requires \separated(&p,q); */
+  /*@ behavior typed: requires \separated(&p,q+(..)); */
   void absurd(int *q);

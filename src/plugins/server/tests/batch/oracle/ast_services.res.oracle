@@ -1,0 +1,5 @@
+[kernel] Parsing tests/batch/ast_services.i (no preprocessing)
+[server] Script "tests/batch/ast_services.json"
+[server] [GET] kernel.ast.getFunctions
+[server] [GET] kernel.ast.printFunction
+[server] Output "tests/batch/result/ast_services.out.json"

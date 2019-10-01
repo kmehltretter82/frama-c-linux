@@ -23,7 +23,8 @@
 module type Domain = sig
   include Abstract_domain.Lattice
   include Datatype.S_with_collections with type t = state
-  include Abstract_domain.Interface with type t := state
+  include Abstract.Interface with type t := state
+                              and type 'a key := 'a Abstract_domain.key
 end
 
 (** Partition of the abstract states, computed for each node by the
@@ -45,12 +46,12 @@ module Make
 
   (* Optimizations relying on specific features of the cvalue domain. *)
 
-  let distinct_subpart = match Domain.get Cvalue_domain.key with
+  let distinct_subpart = match Domain.get Cvalue_domain.State.key with
     | None -> fun _ _ -> None
     | Some get ->
       fun s1 s2 -> Cvalue_domain.distinct_subpart (get s1) (get s2)
 
-  let find_subpart = match Domain.get Cvalue_domain.key with
+  let find_subpart = match Domain.get Cvalue_domain.State.key with
     | None -> fun _ _ -> None
     | Some get ->
       fun state prefix -> Cvalue_domain.find_subpart (get state) prefix

@@ -3244,7 +3244,7 @@ let mkLoop ?(sattr = [Attr("while", [])]) ~(guard:exp) ~(body: stmt list) : stmt
                (mkStmt ~valid_sid:true
                   (If(guard,
                       mkBlock [],
-                      mkBlock [ mkStmt (Break guard.eloc)], guard.eloc)) ::
+                      mkBlock [ mkStmt ~valid_sid:true (Break guard.eloc)], guard.eloc)) ::
                 body), guard.eloc, None, None)) ]
 
 let mkFor ~(start: stmt list) ~(guard: exp) ~(next: stmt list)

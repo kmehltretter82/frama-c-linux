@@ -24,6 +24,20 @@ include Plugin.S
 
 val reset : unit -> unit
 
+(** {2 Function Selection} *)
+
+type functions =
+  | Fct_none
+  | Fct_all
+  | Fct_skip of Cil_datatype.Kf.Set.t
+  | Fct_list of Cil_datatype.Kf.Set.t
+
+val get_kf : unit -> functions
+val get_wp : unit -> functions
+val iter_fct : (Kernel_function.t -> unit) -> functions -> unit
+val iter_kf : (Kernel_function.t -> unit) -> unit
+val iter_wp : (Kernel_function.t -> unit) -> unit
+
 (** {2 Goal Selection} *)
 
 module WP          : Parameter_sig.Bool
@@ -33,14 +47,6 @@ module StatusAll   : Parameter_sig.Bool
 module StatusTrue  : Parameter_sig.Bool
 module StatusFalse : Parameter_sig.Bool
 module StatusMaybe : Parameter_sig.Bool
-
-type job =
-  | WP_None
-  | WP_All
-  | WP_SkipFct of Cil_datatype.Kf.Set.t
-  | WP_Fct of Cil_datatype.Kf.Set.t
-
-val job : unit -> job
 
 (** {2 Model Selection} *)
 
@@ -55,10 +61,15 @@ module InCtxt : Parameter_sig.String_set
 module ExternArrays: Parameter_sig.Bool
 module Literals : Parameter_sig.Bool
 module Volatile : Parameter_sig.Bool
-(* module Overflows : Parameter_sig.Bool *)
-(* use get_overflows() below *)
-(* module BoolRange : Parameter_sig.Bool *)
-(* use get_bool_range() below *)
+
+module Region: Parameter_sig.Bool
+module Region_rw: Parameter_sig.Bool
+module Region_pack: Parameter_sig.Bool
+module Region_flat: Parameter_sig.Bool
+module Region_annot: Parameter_sig.Bool
+module Region_inline: Parameter_sig.Bool
+module Region_fixpoint: Parameter_sig.Bool
+module Region_cluster: Parameter_sig.Bool
 
 (** {2 Computation Strategies} *)
 
@@ -112,9 +123,7 @@ module CoqLibs: Parameter_sig.String_list
 module CoqTactic: Parameter_sig.String
 module Hints: Parameter_sig.Int
 module TryHints: Parameter_sig.Bool
-module Why3: Parameter_sig.String
-module WhyLibs: Parameter_sig.String_list
-module WhyFlags: Parameter_sig.String_list
+module Why3Flags: Parameter_sig.String_list
 module AltErgo: Parameter_sig.String
 module AltGrErgo: Parameter_sig.String
 module AltErgoLibs: Parameter_sig.String_list
@@ -135,15 +144,14 @@ module ReportName: Parameter_sig.String
 module MemoryContext: Parameter_sig.Bool
 module Check: Parameter_sig.Bool
 
-(** {2 Environment Variables} *)
+(** {2 Getters} *)
 
-val get_env : ?default:string -> string -> string
-val is_out : unit -> bool (* -wp-out <dir> positioned *)
+val has_out : unit -> bool
+val has_session : unit -> bool
 val get_session : unit -> string
 val get_session_dir : string -> string
 val get_output : unit -> string
 val get_output_dir : string -> string
-val get_includes : unit -> string list
 val make_output_dir : string -> unit
 val get_overflows : unit -> bool
 

@@ -114,7 +114,7 @@ let dump_buffer buffer = function
       let n = Buffer.length buffer in
       if n > 0 then
         Command.write_file log (fun out -> Buffer.output_buffer out buffer)
-      else if Wp_parameters.is_out () then
+      else if Wp_parameters.has_out () then
         Extlib.safe_remove log
 
 let echo_buffer buffer =

@@ -14,5 +14,5 @@
 [wp] Report out: 'tests/wp_hoare/result_qualif/logicarr.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
-job                 -       3 (32..44)       3       100%
+job                 -       3 (24..36)       3       100%
 -------------------------------------------------------------

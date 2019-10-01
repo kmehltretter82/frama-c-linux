@@ -339,13 +339,13 @@ struct
 
   let merge_all_vcs : vc Splitter.t Gmap.t list -> vc Splitter.t Gmap.t =
     fun cases ->
-      let targets = List.fold_left
-          (fun goals vcs -> Gset.union goals (Gmap.domain vcs))
-          Gset.empty cases in
-      let goal g vcs = try Gmap.find g vcs with Not_found -> Splitter.empty in
-      Gset.mapping
-        (fun g -> Splitter.merge_all merge_vcs (List.map (goal g) cases))
-        targets
+    let targets = List.fold_left
+        (fun goals vcs -> Gset.union goals (Gmap.domain vcs))
+        Gset.empty cases in
+    let goal g vcs = try Gmap.find g vcs with Not_found -> Splitter.empty in
+    Gset.mapping
+      (fun g -> Splitter.merge_all merge_vcs (List.map (goal g) cases))
+      targets
 
   (* -------------------------------------------------------------------------- *)
   (* --- Merge for Calculus                                                 --- *)
@@ -789,7 +789,7 @@ struct
   let rec cc_case_values ks vs sigma = function
     | [] -> ks , vs
     | e::es ->
-        match Ctypes.get_int e with
+        match Ctypes.get_int64 e with
         | Some k ->
             cc_case_values (k::ks) (F.e_int64 k::vs) sigma es
         | None ->

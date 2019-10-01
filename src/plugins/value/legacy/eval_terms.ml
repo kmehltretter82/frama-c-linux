@@ -1198,26 +1198,26 @@ and eval_tlval ~alarm_mode env t =
 
 and eval_tif : 'a. (alarm_mode:_ -> _ -> _ -> 'a eval_result) -> ('a -> 'a -> 'a) -> ('a -> 'a -> 'a) -> alarm_mode:_ -> _ -> _ -> _ -> _ -> 'a eval_result =
   fun eval join meet ~alarm_mode env tcond ttrue tfalse ->
-    let r = eval_term ~alarm_mode env tcond in
-    let ctrue =  Cvalue.V.contains_non_zero r.eover
-    and cfalse =  Cvalue.V.contains_zero r.eover in
-    match ctrue, cfalse with
-    | true, true ->
-      let vtrue = eval ~alarm_mode env ttrue in
-      let vfalse = eval ~alarm_mode env tfalse in
-      if not (same_etype vtrue.etype vfalse.etype) then
-        Value_parameters.failure ~current:true
-          "Incoherent types in conditional: %a vs. %a. \
-           Please report"
-          Printer.pp_typ vtrue.etype Printer.pp_typ vfalse.etype;
-      let eover = join vtrue.eover vfalse.eover in
-      let eunder = meet vtrue.eunder vfalse.eunder in
-      { etype = vtrue.etype;
-        ldeps = join_logic_deps vtrue.ldeps vfalse.ldeps;
-        eunder; eover }
-    | true, false  -> eval ~alarm_mode env ttrue
-    | false, true  -> eval ~alarm_mode env tfalse
-    | false, false -> assert false (* a logic alarm would have been raised*)
+  let r = eval_term ~alarm_mode env tcond in
+  let ctrue =  Cvalue.V.contains_non_zero r.eover
+  and cfalse =  Cvalue.V.contains_zero r.eover in
+  match ctrue, cfalse with
+  | true, true ->
+    let vtrue = eval ~alarm_mode env ttrue in
+    let vfalse = eval ~alarm_mode env tfalse in
+    if not (same_etype vtrue.etype vfalse.etype) then
+      Value_parameters.failure ~current:true
+        "Incoherent types in conditional: %a vs. %a. \
+         Please report"
+        Printer.pp_typ vtrue.etype Printer.pp_typ vfalse.etype;
+    let eover = join vtrue.eover vfalse.eover in
+    let eunder = meet vtrue.eunder vfalse.eunder in
+    { etype = vtrue.etype;
+      ldeps = join_logic_deps vtrue.ldeps vfalse.ldeps;
+      eunder; eover }
+  | true, false  -> eval ~alarm_mode env ttrue
+  | false, true  -> eval ~alarm_mode env tfalse
+  | false, false -> assert false (* a logic alarm would have been raised*)
 
 (* if you add something here, update known_logic_funs above also *)
 and eval_known_logic_function ~alarm_mode env li labels args =

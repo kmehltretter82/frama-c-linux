@@ -30,7 +30,8 @@ include share/Makefile.dynamic_config.internal
 
 #Check share/Makefile.config available
 ifndef FRAMAC_ROOT_SRCDIR
-$(error "You should run ./configure first (or autoconf if there is no configure)")
+$(error \
+  "You should run ./configure first (or autoconf if there is no configure)")
 endif
 
 ###################
@@ -100,7 +101,8 @@ DEFAULT_HEADER_DIRS := headers
 DEFAULT_HEADER_EXCEPTIONS := configure
 # default value used for CEA_PROPRIETARY_FILES and PLUGIN_CEA_PROPRIETARY_FILES
 DEFAULT_CEA_PROPRIETARY_FILES := tests/non-free/%
-# default value used for CEA_PROPRIETARY_HEADERS and PLUGIN_CEA_PROPRIETARY_HEADERS
+# default value used for CEA_PROPRIETARY_HEADERS
+# and PLUGIN_CEA_PROPRIETARY_HEADERS
 DEFAULT_CEA_PROPRIETARY_HEADERS := CEA_PROPRIETARY
 
 MERLIN_PACKAGES:=
@@ -138,7 +140,7 @@ OFLAGS	= $(PACKAGES) $(FLAGS) $(DEBUG) $(INCLUDES) -compact \
 BLINKFLAGS += -linkpkg $(BFLAGS) -linkall -custom
 OLINKFLAGS += -linkpkg $(OFLAGS) -linkall
 
-DOC_FLAGS= -colorize-code -stars -m A $(PACKAGES) $(INCLUDES) $(GUI_INCLUDES)
+DOC_FLAGS= -charset utf8 -colorize-code -stars -m A $(PACKAGES) $(INCLUDES) $(GUI_INCLUDES)
 
 ifneq ($(VERBOSEMAKE),yes)
 DOC_FLAGS+= -hide-warnings
@@ -232,7 +234,7 @@ clean-check-libc:
 # itself, rather than copied: otherwise, it could include references to
 # non-distributed plug-ins.
 DISTRIB_FILES:=\
-      $(wildcard bin/migration_scripts/*2*.sh) bin/local_export.sh                        \
+      $(wildcard bin/migration_scripts/*2*.sh) bin/local_export.sh      \
       bin/frama-c bin/frama-c.byte bin/frama-c-gui bin/frama-c-gui.byte \
       bin/frama-c-config bin/frama-c-script                             \
       share/frama-c.WIN32.rc share/frama-c.Unix.rc                      \
@@ -312,7 +314,11 @@ DISTRIB_FILES:=\
 
 # Test files to be included in the distribution (without header checking).
 # Plug-ins should use PLUGIN_DISTRIB_TESTS to export their test files. 
-DISTRIB_TESTS=$(shell git ls-files tests src/plugins/aorai/tests src/plugins/report/tests src/plugins/wp/tests)
+DISTRIB_TESTS=$(shell git ls-files \
+                  tests \
+                  src/plugins/aorai/tests \
+                  src/plugins/report/tests \
+                  src/plugins/wp/tests)
 
 
 # files that are needed to compile API documentation of external plugins
@@ -355,7 +361,8 @@ rebuild: config.status
 		 $(MAKE) depend $(FRAMAC_PARALLEL) && \
 		 $(MAKE) all $(FRAMAC_PARALLEL))
 
-sinclude .Makefile.user # Should defines FRAMAC_PARALLEL, FRAMAC_USER_FLAGS, FRAMAC_USER_MERLIN_FLAGS
+sinclude .Makefile.user
+# Should define FRAMAC_PARALLEL, FRAMAC_USER_FLAGS, FRAMAC_USER_MERLIN_FLAGS
 
 #Create link in share for local execution if
 .PHONY:create_share_link
@@ -709,20 +716,8 @@ src/plugins/gui/GSourceView.mli: src/plugins/gui/GSourceView2.mli.in
 endif
 
 SOURCEVIEWCOMPAT:=GSourceView
-GENERATED+=src/plugins/gui/GSourceView.ml src/plugins/gui/GSourceView.mli
-
-DGRAPHCOMPAT:=
-ifeq ($(HAS_GNOMECANVAS),no)
-DGRAPHCOMPAT:=dgraph
-src/plugins/gui/dgraph.ml: src/plugins/gui/dgraph.ml.in
-	$(CP) $< $@
-	$(CHMOD_RO) $@
-src/plugins/gui/dgraph.mli: src/plugins/gui/dgraph.mli.in
-	$(CP) $< $@
-	$(CHMOD_RO) $@
-
-GENERATED+=src/plugins/gui/dgraph.ml src/plugins/gui/dgraph.mli
-endif
+GENERATED+=src/plugins/gui/GSourceView.ml src/plugins/gui/GSourceView.mli \
+           src/plugins/gui/dgraph_helper.ml src/plugins/gui/gtk_compat.ml
 
 ifeq ($(LABLGTK),lablgtk3)
 src/plugins/gui/gtk_compat.ml: src/plugins/gui/gtk_compat.3.ml
@@ -735,14 +730,27 @@ src/plugins/gui/gtk_compat.ml: src/plugins/gui/gtk_compat.2.ml
 endif
 GENERATED+=src/plugins/gui/gtk_compat.ml
 
+ifeq ($(HAS_DGRAPH),yes)
+  DGRAPHFILES:=debug_manager
+  src/plugins/gui/dgraph_helper.ml: src/plugins/gui/dgraph_helper.yes.ml
+	$(CP) $< $@
+	$(CHMOD_RO) $@
+else
+  DGRAPHFILES:=
+  src/plugins/gui/dgraph_helper.ml: src/plugins/gui/dgraph_helper.no.ml
+	$(CP) $< $@
+	$(CHMOD_RO) $@
+endif
+
 SINGLE_GUI_CMO:= \
 	wutil_once \
 	gtk_compat \
 	$(WTOOLKIT) \
 	$(SOURCEVIEWCOMPAT) \
-	$(DGRAPHCOMPAT) \
 	gui_parameters \
-	gtk_helper gtk_form \
+	gtk_helper \
+        dgraph_helper \
+        gtk_form \
 	source_viewer pretty_source source_manager book_manager \
 	warning_manager \
 	filetree \
@@ -751,9 +759,10 @@ SINGLE_GUI_CMO:= \
 	history \
 	gui_printers \
 	design \
-	analyses_manager file_manager project_manager debug_manager \
+	analyses_manager file_manager project_manager \
 	help_manager \
-	property_navigator
+        $(DGRAPHFILES) \
+        property_navigator \
 
 SINGLE_GUI_CMO:= $(patsubst %,src/plugins/gui/%.cmo,$(SINGLE_GUI_CMO))
 
@@ -793,11 +802,11 @@ PLUGIN_NAME:=Callgraph
 PLUGIN_DISTRIBUTED:=yes
 PLUGIN_DIR:=src/plugins/callgraph
 PLUGIN_CMO:= options journalize subgraph cg services uses register
-#GTK3: no DGraph available.
-ifeq ($(HAS_GNOMECANVAS),yes)
+ifeq ($(HAS_DGRAPH),yes)
 PLUGIN_GUI_CMO:=cg_viewer
 else
 PLUGIN_GUI_CMO:=
+PLUGIN_DISTRIB_EXTERNAL:=cg_viewer.ml
 endif
 PLUGIN_CMI:= callgraph_api
 PLUGIN_INTERNAL_TEST:=yes
@@ -816,56 +825,34 @@ PLUGIN_DIR:=src/plugins/value
 PLUGIN_EXTRA_DIRS:=engine values domains domains/cvalue domains/apron \
 	domains/gauges domains/equality legacy slevel utils gui_files \
 	values/numerors domains/numerors
+PLUGIN_TESTS_DIRS+=value/traces
 
 # Files for the binding to Apron domains. Only available if Apron is available.
 ifeq ($(HAS_APRON),yes)
 PLUGIN_REQUIRES+= apron.octMPQ apron.boxMPQ apron.polkaMPQ apron.apron gmp
-src/plugins/value/domains/apron/apron_domain.ml: \
-		src/plugins/value/domains/apron/apron_domain.ok.ml \
-		share/Makefile.config
-	$(CP_IF_DIFF) $< $@
-	$(CHMOD_RO) $@
+APRON_CMO:= domains/apron/apron_domain
 else
-src/plugins/value/domains/apron/apron_domain.ml: \
-		src/plugins/value/domains/apron/apron_domain.ko.ml \
-		share/Makefile.config
-	$(CP_IF_DIFF) $< $@
-	$(CHMOD_RO) $@
-endif
-PLUGIN_GENERATED+= src/plugins/value/domains/apron/apron_domain.ml
+APRON_CMO:=
 PLUGIN_DISTRIB_EXTERNAL+= \
-	domains/apron/apron_domain.ok.ml domains/apron/apron_domain.ko.ml
+	domains/apron/apron_domain.ml domains/apron/apron_domain.mli
+endif
 
 # Files for the numerors domain. Only available is MPFR is available.
 NUMERORS_FILES:= \
 	values/numerors/numerors_utils values/numerors/numerors_float \
 	values/numerors/numerors_interval values/numerors/numerors_arithmetics \
-	values/numerors/numerors_value
+	values/numerors/numerors_value domains/numerors/numerors_domain
 
 ifeq ($(HAS_MPFR),yes)
 PLUGIN_REQUIRES+= gmp
 PLUGIN_TESTS_DIRS+=value/numerors
 NUMERORS_CMO:= $(NUMERORS_FILES)
-src/plugins/value/domains/numerors/numerors_domain.ml: \
-		src/plugins/value/domains/numerors/numerors_domain.ok.ml \
-		share/Makefile.config
-	$(CP_IF_DIFF) $< $@
-	$(CHMOD_RO) $@
 else
 # Do not compile numerors files, but include them in the distributed files.
 NUMERORS_CMO:=
 PLUGIN_DISTRIB_EXTERNAL+= $(addsuffix .ml,$(NUMERORS_FILES))
 PLUGIN_DISTRIB_EXTERNAL+= $(addsuffix .mli,$(NUMERORS_FILES))
-src/plugins/value/domains/numerors/numerors_domain.ml: \
-		src/plugins/value/domains/numerors/numerors_domain.ko.ml \
-		share/Makefile.config
-	$(CP_IF_DIFF) $< $@
-	$(CHMOD_RO) $@
 endif
-PLUGIN_GENERATED+= src/plugins/value/domains/numerors/numerors_domain.ml
-PLUGIN_DISTRIB_EXTERNAL+= \
-	domains/numerors/numerors_domain.ok.ml \
-	domains/numerors/numerors_domain.ko.ml
 
 # General rules for ordering files within PLUGIN_CMO:
 # - try to keep the legacy Value before Eva
@@ -877,7 +864,7 @@ PLUGIN_CMO:= slevel/split_strategy value_parameters \
 	slevel/per_stmt_slevel \
 	utils/library_functions \
 	utils/eval_typ utils/backward_formals \
-	alarmset eval utils/structure \
+	alarmset eval utils/structure utils/abstract \
 	values/value_product values/location_lift \
 	values/cvalue_forward values/cvalue_backward \
 	values/main_values values/main_locations \
@@ -886,15 +873,14 @@ PLUGIN_CMO:= slevel/split_strategy value_parameters \
 	domains/domain_store domains/domain_builder \
 	domains/domain_product domains/domain_lift domains/unit_domain \
 	domains/printer_domain \
+	domains/traces_domain \
 	domains/simple_memory \
 	domains/gauges/gauges_domain \
-	domains/apron/apron_domain \
 	domains/hcexprs \
 	domains/equality/equality domains/equality/equality_domain \
 	domains/offsm_domain \
 	domains/symbolic_locs \
 	domains/sign_domain \
-	$(NUMERORS_CMO) domains/numerors/numerors_domain \
 	domains/cvalue/warn domains/cvalue/locals_scoping \
 	domains/cvalue/cvalue_offsetmap \
 	utils/value_results \
@@ -916,7 +902,8 @@ PLUGIN_CMO:= slevel/split_strategy value_parameters \
 	engine/partition engine/partitioning_parameters engine/trace_partitioning \
 	engine/iterator \
 	engine/initialization \
-	engine/compute_functions engine/analysis register
+	engine/compute_functions engine/analysis register \
+	$(APRON_CMO) $(NUMERORS_CMO)
 PLUGIN_CMI:= values/abstract_value values/abstract_location \
 	domains/abstract_domain domains/simpler_domains
 PLUGIN_DEPENDENCIES:=Callgraph LoopAnalysis RteGen
@@ -1063,7 +1050,6 @@ PLUGIN_DIR:=src/plugins/impact
 PLUGIN_CMO:= options pdg_aux reason_graph compute_impact register
 PLUGIN_GUI_CMO:= register_gui
 PLUGIN_DISTRIBUTED:=yes
-# PLUGIN_UNDOC:=impact_gui.ml
 PLUGIN_INTERNAL_TEST:=yes
 PLUGIN_DEPENDENCIES:=Inout Eva Pdg Slicing
 
@@ -1783,8 +1769,8 @@ check-ocp-indent-version:
 	if command -v ocp-indent >/dev/null; then \
 		$(eval ocp_version_major := $(shell ocp-indent --version | $(SED) -E "s/^([0-9]+)\.[0-9]+\..*/\1/")) \
 		$(eval ocp_version_minor := $(shell ocp-indent --version | $(SED) -E "s/^[0-9]+\.([0-9]+)\..*/\1/")) \
-		if [ "$(ocp_version_major)" -gt 1 -o "$(ocp_version_minor)" -gt 7 ]; then \
-			echo "error: ocp-indent <1.7.0 required for linting (got $(ocp_version_major).$(ocp_version_minor))"; \
+		if [ "$(ocp_version_major)" -lt 1 -o "$(ocp_version_minor)" -lt 7 ]; then \
+			echo "error: ocp-indent >=1.7.0 required for linting (got $(ocp_version_major).$(ocp_version_minor))"; \
 			exit 1; \
 		fi; \
 	else \

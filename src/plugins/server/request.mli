@@ -49,12 +49,12 @@ type 'b output = (module Output with type t = 'b)
 (** Register a simple request of type [(a -> b)].
 
     Name, page and kind must be consistent with each others:
-     - No publication on [`Protocol] pages
-     - Kernel requests shall starts with ["Kernel.*"]
-     - Plugin requests shall starts with ["<Plugin>.*"]
-     - SET requests must contain ["set"] (case insensitive)
-     - GET requests must contain ["get"] or ["print"] (case insensitive)
-     - EXEC requests must contain ["exec"] or ["compute"] (case insensitive)
+    - No publication on [`Protocol] pages
+    - Kernel requests shall starts with ["Kernel.*"]
+    - Plugin requests shall starts with ["<Plugin>.*"]
+    - SET requests must contain ["set"] (case insensitive)
+    - GET requests must contain ["get"] or ["print"] (case insensitive)
+    - EXEC requests must contain ["exec"] or ["compute"] (case insensitive)
 
 *)
 val register :

@@ -167,12 +167,10 @@ class printer_with_annot () = object (self)
     super#global fmt glob
 
   method private begin_annotation fmt =
-    let pre = if is_ghost then Some ("@@/": Pretty_utils.sformat) else None in
-    self#pp_open_annotation ~block:false ?pre fmt
+    self#pp_open_annotation ~block:false fmt
 
   method private end_annotation fmt =
-    let suf = if is_ghost then Some ("@@/": Pretty_utils.sformat) else None in
-    self#pp_close_annotation ~block:false ?suf fmt
+    self#pp_close_annotation ~block:false fmt
 
   method private loop_annotations fmt annots =
     if annots <> [] then
@@ -215,35 +213,22 @@ class printer_with_annot () = object (self)
           Cil_datatype.Code_annotation.compare
           (Annotations.code_annot s)
       in
-      let pGhost fmt s =
-        let was_ghost = is_ghost in
-        if not was_ghost && s.ghost then begin
-          Format.fprintf fmt "%t %a "
-            (fun fmt -> self#pp_open_annotation ~pre:"@[/*@@" fmt)
-            self#pp_acsl_keyword "ghost";
-          is_ghost <- true
-        end;
-        self#stmtkind s.sattr next fmt s.skind;
-        if not was_ghost && s.ghost then begin
-          self#pp_close_annotation ~suf:"@,*/@]" fmt;
-          is_ghost <- false;
-        end
-      in
-      (match all_annot with
-       | [] -> pGhost fmt s
-       | [ a ] when Cil.is_skip s.skind && not s.ghost ->
-         Format.fprintf fmt "@[<hv>@[%t@ %a@;<1 1>%t@]@ %a@]"
-           (fun fmt -> self#pp_open_annotation ~block:false fmt)
-           self#code_annotation a
-           (fun fmt -> self#pp_close_annotation ~block:false fmt)
-           (self#stmtkind s.sattr next) s.skind;
-       | _ ->
-         let loop_annot, stmt_annot =
-           List.partition Logic_utils.is_loop_annot all_annot
-         in
-         self#annotations fmt stmt_annot;
-         self#loop_annotations fmt loop_annot;
-         pGhost fmt s)
+      self#in_ghost_if_needed fmt s.ghost ~post_fmt:"%t"
+        (fun () -> match all_annot with
+           | [] ->  self#stmtkind s.sattr next fmt s.skind;
+           | [ a ] when Cil.is_skip s.skind && not s.ghost ->
+             Format.fprintf fmt "@[<hv>@[%t@ %a@;<1 1>%t@]@ %a@]"
+               self#begin_annotation
+               self#code_annotation a
+               self#end_annotation
+               (self#stmtkind s.sattr next) s.skind;
+           | _ ->
+             let loop_annot, stmt_annot =
+               List.partition Logic_utils.is_loop_annot all_annot
+             in
+             self#annotations fmt stmt_annot;
+             self#loop_annotations fmt loop_annot;
+             self#stmtkind s.sattr next fmt s.skind) ;
     end else
       self#stmtkind s.sattr next fmt s.skind;
     Format.pp_close_box fmt ()

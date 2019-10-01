@@ -1162,6 +1162,7 @@ let init_project_from_cil_file prj file =
   Project.copy ~selection prj;
   Project.on prj (fun file -> fill_built_ins (); prepare_cil_file file) file
 
+let files_pre_register_state = Files.pre_register_state
 
 module Global_annotation_graph = struct
   module Base =
