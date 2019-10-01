@@ -84,7 +84,7 @@ let generate_prototype t =
   Cil.setFormalsDecl vi fun_t ;
   vi
 
-module Table = Override_table.Make(struct
+module Table = Builtin_cache.Make(struct
     let function_name = function_name
     let build_prototype = generate_prototype
     let build_spec = generate_spec
@@ -104,7 +104,7 @@ let well_typed_parameters s1 s2 =
 let create_call fct (s1, s2, len) =
   if well_typed_parameters s1 s2 then
     let typ = type_from_parameter s1 in
-    let fct = Table.get_override typ in
+    let fct = Table.get_function typ in
     let s1 = Cil.stripCasts s1 in
     let s2 = Cil.stripCasts s2 in
     fct, (s1, s2, len)

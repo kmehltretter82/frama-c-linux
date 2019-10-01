@@ -20,20 +20,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let name = "Override Std"
-let shortname = "override-std"
+let category = File.register_code_transformation_category "builtin"
 
-include Plugin.Register
-    (struct
-      let name = name
-      let shortname = shortname
-      let help = "Overrides standard library functions"
-    end)
-
-module Enabled = False
-    (struct
-      let option_name = "-override-std"
-      let help = ""
-    end)
-
-let emitter = Emitter.create shortname [Emitter.Funspec] ~correctness:[] ~tuning:[]
+let () =
+  let perform file =
+    if Options.Enabled.get () then
+      Transform.transform file
+  in
+  File.add_code_transformation_after_cleanup category perform

@@ -20,16 +20,20 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module type Override_generator = sig
-  val function_name: String.t
-  val build_prototype: Cil_types.typ -> Cil_types.varinfo
-  val build_spec: Cil_types.varinfo -> Cil_types.location -> Cil_types.funspec
-end
+let name = "Builtin"
+let shortname = "builtin"
 
-module type Table = sig
-  val get_override: Cil_types.typ -> Cil_types.varinfo
-  val get_globals: Cil_types.location -> Cil_types.global list
-  val mark_as_computed: ?project:Project.t -> unit -> unit
-end
+include Plugin.Register
+    (struct
+      let name = name
+      let shortname = shortname
+      let help = "Overrides standard library functions"
+    end)
 
-module Make (M: Override_generator) : Table
+module Enabled = False
+    (struct
+      let option_name = "-builtin"
+      let help = ""
+    end)
+
+let emitter = Emitter.create shortname [Emitter.Funspec] ~correctness:[] ~tuning:[]

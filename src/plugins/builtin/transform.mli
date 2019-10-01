@@ -22,73 +22,12 @@
 
 open Cil_types
 
-module type Override = sig
+module type Builtin = sig
   val function_name: string
   val replace_call: instr -> instr
   val get_globals: location -> global list
   val mark_as_computed: ?project:Project.t -> unit -> unit
 end
+val register: (module Builtin) -> unit
 
-let base : (string, (module Override)) Hashtbl.t = Hashtbl.create 17
-
-let register ((module M: Override) as m) =
-  Hashtbl.add base M.function_name m
-
-let mark_as_computed () =
-  let mark _ m = let module M = (val m: Override) in M.mark_as_computed () in
-  Hashtbl.iter mark base
-
-let get_globals loc =
-  let get_globals m =
-    let module M = (val m: Override) in
-    M.get_globals loc
-  in
-  Hashtbl.fold (fun _ v l -> (get_globals v) @ l) base []
-
-let called_function = function
-  | Call(_, { enode = Lval((Var fct), NoOffset) }, _, _)
-  | Local_init(_, ConsInit(fct, _, Plain_func), _) -> fct
-  | _ -> assert false
-
-let called_function_name inst =
-  let fct = called_function inst in fct.vname
-
-let find_stdlib_attr_in_call inst =
-  let fct = called_function inst in
-  if not (Cil.hasAttribute "fc_stdlib" fct.vattr) then raise Not_found
-
-let replace_call inst =
-  try
-    find_stdlib_attr_in_call inst ;
-    let name = called_function_name inst in
-    let m = Hashtbl.find base name in
-    let module M = (val m: Override) in
-    M.replace_call inst
-  with Not_found -> inst
-
-class visitor = object(_)
-  inherit Visitor.frama_c_inplace
-
-  method! vfile _ =
-    let after f =
-      let loc = Cil.CurrentLoc.get() in
-      let globals = get_globals loc in
-      f.globals <- globals @ f.globals ;
-      mark_as_computed () ;
-      Ast.mark_as_changed () ;
-      f
-    in
-    Cil.DoChildrenPost after
-
-  method! vinst = function
-    | Call(_) | Local_init(_, ConsInit(_, _, Plain_func), _) ->
-      let change = function
-        | [i] -> [ replace_call i ]
-        | _ -> assert false
-      in
-      Cil.DoChildrenPost change
-    | _ -> Cil.DoChildren
-end
-
-let transform file =
-  Visitor.visitFramacFile (new visitor) file
+val transform: Cil_types.file -> unit

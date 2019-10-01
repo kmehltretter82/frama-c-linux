@@ -24,10 +24,14 @@ open Cil_types
 open Logic_const
 open Basic_blocks
 
-let function_name = "memmove"
+let function_name = "memcpy"
 
-let pmoved_len_bytes ?loc dest src bytes_len =
-  plet_len_div_size ?loc dest.term_type bytes_len (punfold_all_elems_eq ?loc dest src)
+let pseparated_memcpy_len_bytes ?loc p1 p2 bytes_len =
+  let generate len = pseparated_memories ?loc p1 len p2 len in
+  plet_len_div_size ?loc p1.term_type bytes_len generate
+
+let pcopied_len_bytes ?loc p1 p2 bytes_len =
+  plet_len_div_size ?loc p1.term_type bytes_len (punfold_all_elems_eq ?loc p1 p2)
 
 let presult_dest ?loc t dest =
   prel ?loc (Req, (tresult ?loc t), dest)
@@ -37,6 +41,7 @@ let generate_requires loc dest src len =
     { (pcorrect_len_bytes ~loc dest.term_type len)    with pred_name = ["aligned_end"] } ;
     { (pvalid_len_bytes ~loc here_label dest len)     with pred_name = ["valid_dest"] } ;
     { (pvalid_read_len_bytes ~loc here_label src len) with pred_name = ["valid_read_src"] } ;
+    { (pseparated_memcpy_len_bytes ~loc dest src len) with pred_name = ["separation"] }
   ]
 
 let generate_assigns loc t dest src len =
@@ -50,8 +55,8 @@ let generate_assigns loc t dest src len =
 
 let generate_ensures loc t dest src len =
   List.map (fun p -> Normal, new_predicate p) [
-    { (pmoved_len_bytes ~loc dest src len) with pred_name = [ "moved"] } ;
-    { (presult_dest ~loc t dest)           with pred_name = [ "result"] }
+    { (pcopied_len_bytes ~loc dest src len) with pred_name = [ "copied"] } ;
+    { (presult_dest ~loc t dest)            with pred_name = [ "result"] }
   ]
 
 let generate_spec vi loc =
@@ -82,7 +87,7 @@ let generate_prototype t =
   Cil.setFormalsDecl vi fun_t ;
   vi
 
-module Table = Override_table.Make(struct
+module Table = Builtin_cache.Make(struct
     let function_name = function_name
     let build_prototype = generate_prototype
     let build_spec = generate_spec
@@ -102,7 +107,7 @@ let well_typed_parameters dest src =
 let create_call fct (dest, src, len) =
   if well_typed_parameters dest src then
     let typ = type_from_parameter dest in
-    let fct = Table.get_override typ in
+    let fct = Table.get_function typ in
     let dest = Cil.stripCasts dest in
     let src = Cil.stripCasts src in
     fct, (dest, src, len)

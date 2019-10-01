@@ -20,11 +20,43 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let category = File.register_code_transformation_category "override-std"
+module type Table = sig
+  val get_function: Cil_types.typ -> Cil_types.varinfo
+  val get_globals: Cil_types.location -> Cil_types.global list
+  val mark_as_computed: ?project:Project.t -> unit -> unit
+end
 
-let () =
-  let perform file =
-    if Options.Enabled.get () then
-      Transform.transform file
-  in
-  File.add_code_transformation_after_cleanup category perform
+module type Generator = sig
+  val function_name: String.t
+  val build_prototype: Cil_types.typ -> Cil_types.varinfo
+  val build_spec: Cil_types.varinfo -> Cil_types.location -> Cil_types.funspec
+end
+
+module Make_internal_table (M: Generator) =
+  (State_builder.Hashtbl(Cil_datatype.Typ.Hashtbl) (Cil_datatype.Varinfo)
+     (struct
+       let size = 5
+       let dependencies = [Ast.self]
+       let name = "Builtins." ^ M.function_name
+     end))
+
+module Make (Generator: Generator) = struct
+  module Internal_table = Make_internal_table(Generator)
+
+  let get_function t = try
+      Internal_table.find t
+    with Not_found ->
+      let fct = Generator.build_prototype t in
+      Internal_table.add t fct ;
+      fct
+
+  let get_globals loc =
+    let finalize vi =
+      let spec = Generator.build_spec vi loc in
+      Globals.Functions.replace_by_declaration spec vi loc ;
+      Cil_types.GFunDecl(Cil.empty_funspec(), vi, loc)
+    in
+    Internal_table.fold (fun _ vi l -> (finalize vi) :: l) []
+
+  let mark_as_computed = Internal_table.mark_as_computed
+end

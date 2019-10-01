@@ -20,45 +20,26 @@
 #                                                                        #
 ##########################################################################
 
-# Do not use ?= to initialize both below variables
-# (fixed efficiency issue, see GNU Make manual, Section 8.11)
-ifndef FRAMAC_SHARE
-FRAMAC_SHARE  :=$(shell frama-c-config -print-share-path)
-endif
-ifndef FRAMAC_LIBDIR
-FRAMAC_LIBDIR :=$(shell frama-c-config -print-libpath)
-endif
+##########################################
+# Builtin stdlib C plugin                #
+##########################################
 
-###################
-# Plug-in Setting #
-###################
+m4_define([plugin_file],Makefile.in)
 
-PLUGIN_DIR ?= .
-PLUGIN_ENABLE := @ENABLE_OVERRIDE_STD@
-PLUGIN_NAME := OverrideStd
-PLUGIN_CMI := 
-PLUGIN_CMO := options transform override_table basic_blocks memcpy memcmp memmove register
-PLUGIN_DISTRIBUTED := $(PLUGIN_ENABLE)
-PLUGIN_DISTRIB_EXTERNAL:= Makefile.in configure.ac configure
-#PLUGIN_NO_DEFAULT_TEST := no
-PLUGIN_TESTS_DIRS := functions
+m4_define([FRAMAC_SHARE_ENV],
+          [m4_normalize(m4_esyscmd([echo $FRAMAC_SHARE]))])
 
-################
-# Generic part #
-################
+m4_define([FRAMAC_SHARE],
+	  [m4_ifval(FRAMAC_SHARE_ENV,[FRAMAC_SHARE_ENV],
+                                     [m4_esyscmd(frama-c -print-path)])])
 
-include $(FRAMAC_SHARE)/Makefile.dynamic
+m4_ifndef([FRAMAC_M4_MACROS], [m4_include(FRAMAC_SHARE/configure.ac)])
 
-#####################################
-# Regenerating the Makefile on need #
-#####################################
+check_plugin(builtin,PLUGIN_RELATIVE_PATH(plugin_file),
+	     [support for builtin plug-in],yes)
 
-ifeq ("$(FRAMAC_INTERNAL)","yes")
-CONFIG_STATUS_DIR=$(FRAMAC_SRC)
-else
-CONFIG_STATUS_DIR=.
-endif
+#######################
+# Generating Makefile #
+#######################
 
-$(OverrideStd_DIR)/Makefile: $(OverrideStd_DIR)/Makefile.in \
-				$(CONFIG_STATUS_DIR)/config.status
-	cd $(CONFIG_STATUS_DIR) && ./config.status --file $@
+write_plugin_config(Makefile)
