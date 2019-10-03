@@ -1,0 +1,54 @@
+# frama-c -wp [...]
+[kernel] Parsing tests/wp_typed/mvar.i (no preprocessing)
+[wp] Running WP plugin...
+[wp] Loading driver 'share/wp.driver'
+[kernel] tests/wp_typed/mvar.i:14: Warning: 
+  No code nor implicit assigns clause for function Write, generating default assigns from the prototype
+[wp] Warning: Missing RTE guards
+[wp] 1 goal scheduled
+[wp] Failure: Error in why3:anomaly: Not_found
+  Raised at file "src/plugins/qed/term.ml", line 2716, characters 11-26
+  Called from file "src/plugins/wp/Definitions.ml", line 357, characters 16-33
+  Called from file "src/plugins/wp/Definitions.ml", line 376, characters 10-19
+  Called from file "list.ml", line 100, characters 12-15
+  Called from file "src/plugins/qed/term.ml", line 331, characters 21-35
+  Called from file "src/plugins/wp/ProverWhy3.ml", line 961, characters 2-9
+  Called from file "src/plugins/wp/ProverWhy3.ml", line 978, characters 17-57
+  Called from file "src/plugins/wp/ProverWhy3.ml", line 1258, characters 19-34
+  Called from file "src/plugins/wp/wpContext.ml", line 136, characters 17-20
+  Re-raised at file "src/plugins/wp/wpContext.ml", line 141, characters 23-32
+  Called from file "src/plugins/wp/ProverWhy3.ml", line 1255, characters 4-1023
+[kernel] Current source was: tests/wp_typed/mvar.i:14
+  The full backtrace is:
+  Raised at file "src/kernel_services/plugin_entry_points/log.ml" (inlined), line 532, characters 24-31
+  Called from file "src/kernel_services/plugin_entry_points/log.ml", line 1098, characters 17-55
+  Called from file "src/kernel_services/plugin_entry_points/log.ml", line 525, characters 9-23
+  Re-raised at file "src/kernel_services/plugin_entry_points/log.ml", line 528, characters 9-16
+  Called from file "src/plugins/wp/prover.ml", line 64, characters 2-34
+  Called from file "src/libraries/utils/task.ml", line 93, characters 38-43
+  Called from file "src/libraries/utils/task.ml", line 93, characters 38-43
+  Called from file "src/libraries/utils/task.ml" (inlined), line 98, characters 19-29
+  Called from file "src/libraries/utils/task.ml", line 363, characters 14-36
+  Re-raised at file "src/libraries/utils/task.ml", line 369, characters 6-13
+  Called from file "src/libraries/utils/task.ml", line 463, characters 9-22
+  Called from file "array.ml", line 90, characters 31-48
+  Called from file "src/libraries/utils/task.ml", line 480, characters 4-45
+  Called from file "src/libraries/utils/task.ml", line 344, characters 14-18
+  Called from file "src/plugins/wp/register.ml", line 717, characters 4-35
+  Called from file "src/plugins/wp/register.ml", line 816, characters 8-23
+  Called from file "src/libraries/stdlib/extlib.ml", line 343, characters 14-17
+  Re-raised at file "src/libraries/stdlib/extlib.ml", line 343, characters 41-48
+  Called from file "src/libraries/stdlib/extlib.ml", line 344, characters 2-12
+  Called from file "src/libraries/stdlib/extlib.ml", line 344, characters 2-12
+  Called from file "queue.ml", line 105, characters 6-15
+  Called from file "src/kernel_internals/runtime/boot.ml", line 36, characters 4-20
+  Called from file "src/kernel_services/cmdline_parameters/cmdline.ml", line 792, characters 2-9
+  Called from file "src/kernel_services/cmdline_parameters/cmdline.ml", line 822, characters 18-64
+  Called from file "src/kernel_services/cmdline_parameters/cmdline.ml", line 229, characters 4-8
+  
+  Plug-in wp aborted: internal error.
+  Please report as 'crash' at http://bts.frama-c.com/.
+  Your Frama-C version is 19.1+dev (Potassium).
+  Note that a version and a backtrace alone often do not contain enough
+  information to understand the bug. Guidelines for reporting bugs are at:
+  http://bts.frama-c.com/dokuwiki/doku.php?id=mantis:frama-c:bug_reporting_guidelines
