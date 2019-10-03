@@ -143,7 +143,7 @@ let translate_call ~fundec block loc mk_call callee pars =
   Self.result ~current:true ~level:2
     "Generic translation of call to variadic function.";
 
-  (* Split params into static and variadic part *)
+  (* Split params into static, variadic and ghost part *)
   let ng_params, g_params = Typ.ghost_partitioned_params (Cil.typeOf callee) in
   let static_size = List.length ng_params - 1 in
   let s_exps, r_exps = List.break static_size pars in
