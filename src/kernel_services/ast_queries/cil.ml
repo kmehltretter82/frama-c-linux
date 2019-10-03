@@ -5836,7 +5836,7 @@ let splitFunctionTypeVI (fvi: varinfo)
 
 let argsToPairOfLists args =
   List.partition
-    (fun (_,_,a) -> not(hasAttribute frama_c_ghost_formal a))
+    (fun f -> not(isGhostFormalVarDecl f))
     (argsToList args)
 
 let remove_attributes_for_integral_promotion a =
