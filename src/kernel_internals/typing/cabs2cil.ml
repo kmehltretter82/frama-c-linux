@@ -6678,6 +6678,8 @@ and doExp local_env
         List.partition (fun d -> not (isGhostFormalVarDecl d) || ghost) argTypesList
       in
       let args = if ghost then args @ ghost_args else args in
+
+      (* Again, we process arguments in REVERSE order. *)
       let (sghost, ghosts') = loopArgs ~are_ghost:true (ghostArgTypes, ghost_args) in
       let (sargs, args') = loopArgs (argTypes, args) in
 
@@ -9020,7 +9022,7 @@ and doDecl local_env (isglobal: bool) : A.definition -> chunk = function
         (* Create the formals and add them to the environment. *)
         (* sfg: extract tsets for the formals from dt *)
         let doFormal (loc : location) ((fn, ft, fa) as fd) =
-          let ghost = isGhostFormalVarDecl fd in
+          let ghost = ghost || isGhostFormalVarDecl fd in
           let f = makeVarinfo ~ghost ~temp:false false true fn ft in
           (f.vdecl <- loc;
            f.vattr <- fa;
