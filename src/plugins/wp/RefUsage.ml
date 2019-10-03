@@ -145,6 +145,16 @@ type model =
   | Val_comp of varinfo * value (* x.f[_].g... *)
   | Val_shift of varinfo * value (* (x + E) *)
 
+[@@@ warning "-32" ]
+let pp_model fmt = function
+  | E v -> E.pretty fmt v
+  | Loc_var x -> Format.fprintf fmt "&%a" Varinfo.pretty x
+  | Loc_shift(x,v) -> Format.fprintf fmt "&%a.(%a)" Varinfo.pretty x E.pretty v
+  | Val_var x -> Varinfo.pretty fmt x
+  | Val_comp(x,v) -> Format.fprintf fmt "%a.(%a)" Varinfo.pretty x E.pretty v
+  | Val_shift(x,v) -> Format.fprintf fmt "%a+(%a)" Varinfo.pretty x E.pretty v
+[@@@ warning "+32" ]
+
 let nothing = E E.bot
 let v_model v = if E.is_bot v then nothing else E v
 
@@ -203,8 +213,12 @@ let field = function
   | m -> shift m E.bot
 
 let load = function
-  | Loc_var x -> Val_var x
-  | Loc_shift(x,e) -> E (E.access x ByValue e)
+  | Loc_var x -> Val_var x (* E.access x ByValue E.bot *)
+  | Loc_shift(x,e) ->
+      if Cil.isArithmeticOrPointerType x.vtype then
+        E (E.access x ByAddr e)
+      else
+        E (E.access x ByValue e)
   | Val_var x -> E (E.access x ByRef E.bot)
   | Val_comp(x,e) -> E (E.access x ByRef e)
   | Val_shift(x,e) -> E (E.access x ByArray e)
@@ -693,17 +707,17 @@ let param a m = match a with
   | ByArray -> e_value (load (shift m E.bot))
 
 let update_call_env (env:global_ctx) v =
-  let r,differ = E.cup_differ env.code v
-  in env.code <- r ;
-  differ
+  let r,differ = E.cup_differ env.code v in
+  env.code <- r ; differ
 
 let call_kf (env:global_ctx) (formals:access list) (models:model list) (reached:bool) =
   let unmodified = ref reached in
   let rec call xs ms = match xs, ms with
-    | [] , _ | _ , [] -> ()
     | x::xs , m::ms ->
-        if update_call_env env (param x m) then unmodified := false;
+        let actual = param x m in
+        if update_call_env env actual then unmodified := false;
         call xs ms
+    | _ -> ()
   in call formals models;
   !unmodified
 
@@ -748,10 +762,11 @@ let compute_usage () =
       in
       (* update from accesses of formals of the called spec for each calls*)
       let specs_formals = called.spec_formals in
-      let formals = Kernel_function.get_formals called_kf in
-      let formals = List.map (fun vi -> E.get vi specs_formals) formals in
+      let params = Kernel_function.get_formals called_kf in
+      let formals = List.map (fun vi -> E.get vi specs_formals) params in
       let kf_call reached call = call_kf env formals call reached in
-      List.fold_left kf_call reached calls in
+      List.fold_left kf_call reached calls
+    in
     state_fp.todo <- KFmap.remove kf state_fp.todo ;
     let cphi = env.cphi in
     let reached = KFmap.fold kf_calls cphi true in

@@ -10,15 +10,12 @@
 ------------------------------------------------------------
 
 Goal Post-condition (file tests/wp_typed/mvar.i, line 12) in 'Job':
-Let x = A[0].
-Let a = 1[0].
 Assume {
-  Type: is_sint8(x).
   (* Heap *)
-  Type: IsArray1_sint8(A).
+  Have: linked(Malloc_0) /\ sconst(Mchar_0).
   (* Call 'Write' *)
-  Have: x = a.
+  Have: A[0] = 1.
 }
-Prove: P_equal(a, 1).
+Prove: P_equal(1, 1).
 
 ------------------------------------------------------------
