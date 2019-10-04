@@ -446,9 +446,13 @@ let einteger v =
 
 (* Note: some reals cannot be exactly represented as floats; in which
    case we do not know their under-approximation. *)
-let ereal v =
+let efloating_point etype fval =
+  let v = V.inject_float fval in
   let eunder = under_from_over v in
-  { etype = Cil.doubleType; eunder; eover = v; ldeps = empty_logic_deps }
+  { etype; eunder; eover = v; ldeps = empty_logic_deps }
+
+let ereal = efloating_point Cil.doubleType
+let efloat = efloating_point Cil.floatType
 
 let is_true = function
   | `True | `TrueReduced _ -> true
@@ -637,6 +641,8 @@ let known_logic_funs = [
 let known_predicates = [
   "\\warning", ACSL;
   "\\is_finite", ACSL;
+  "\\is_plus_infinity", ACSL;
+  "\\is_minus_infinity", ACSL;
   "\\is_NaN", ACSL;
   "\\eq_float", ACSL;
   "\\ne_float", ACSL;
@@ -719,11 +725,14 @@ let rec eval_term ~alarm_mode env t =
      | _ -> ast_error "non-evaluable constant")
   | TConst (LChr c) ->
     einteger (Cvalue.V.inject_int (Cil.charConstToInt c))
-  | TConst (LReal { r_lower ; r_upper }) -> begin
-      let r_lower = Fval.F.of_float r_lower in
-      let r_upper = Fval.F.of_float r_upper in
-      let f = Fval.inject Fval.Real r_lower r_upper in
-      ereal (V.inject_ival (Ival.inject_float f))
+  | TConst (LReal { r_nearest; r_lower ; r_upper }) -> begin
+      if Fc_float.is_nan r_nearest
+      then ereal Fval.nan
+      else
+        let r_lower = Fval.F.of_float r_lower in
+        let r_upper = Fval.F.of_float r_upper in
+        let f = Fval.inject Fval.Real r_lower r_upper in
+        ereal f
     end
 
   (*  | TConst ((CStr | CWstr) Missing cases *)
@@ -742,9 +751,15 @@ let rec eval_term ~alarm_mode env t =
       eunder = loc_bits_to_loc_bytes_under r.eunder;
       eover = loc_bits_to_loc_bytes r.eover }
 
-  (* Special case for the constants \pi and \e. *)
-  | TLval (TVar {lv_name = "\\pi"}, _) -> ereal (V.inject_float Fval.pi)
-  | TLval (TVar {lv_name = "\\e"}, _)  -> ereal (V.inject_float Fval.e)
+  (* Special case for the constants \pi, \e, \infinity and \NaN. *)
+  | TLval (TVar {lv_name = "\\pi"}, _) -> ereal Fval.pi
+  | TLval (TVar {lv_name = "\\e"}, _)  -> ereal Fval.e
+  | TLval (TVar {lv_name = "\\plus_infinity"}, _) ->
+    efloat Fval.(pos_infinity Single)
+  | TLval (TVar {lv_name = "\\minus_infinity"}, _) ->
+    efloat Fval.(neg_infinity Single)
+  | TLval (TVar {lv_name = "\\NaN"}, _) -> efloat Fval.nan
+
   | TLval _ ->
     let lval = eval_tlval ~alarm_mode env t in
     let typ = lval.etype in
@@ -1271,7 +1286,6 @@ and eval_known_logic_function ~alarm_mode env li labels args =
   | "\\max", Some Lreal, _, [t1; t2] ->
     let backward = Cvalue.V.backward_comp_float_left_true Comp.Ge Fval.Real in
     eval_extremum Cil.doubleType backward ~alarm_mode env t1 t2
-
   | _ -> assert false
 
 and eval_float_builtin_arity2  ~alarm_mode env name arg1 arg2 =
@@ -1747,53 +1761,67 @@ let rec reduce_by_relation ~alarm_mode env positive t1 rel t2 =
    May raise LogicEvalError or Not_an_exact_loc, when no reduction can be done,
    and Reduce_to_bottom, in which case the reduction leads to bottom. *)
 let reduce_by_known_papp ~alarm_mode env positive li _labels args =
-  match positive, li.l_var_info.lv_name, args with
-  | true, "\\is_finite", [arg]
-  | false, "\\is_NaN", [arg] -> begin
-      let fval_reduce =
-        (* positive is true for is_finite, false for is_NaN. *)
-        if positive
-        then Fval.backward_is_finite
-        else (fun _fkind -> Fval.backward_is_not_nan)
-      in
-      try
-        let alarm_mode = alarm_reduce_mode () in
-        let typ_loc, locs = eval_term_as_exact_locs ~alarm_mode env arg in
-        let aux loc env =
-          let state = env_current_state env in
-          let v = find_or_alarm ~alarm_mode state loc in
-          let v =  Cvalue_forward.reinterpret typ_loc v in
-          let v = match Cil.unrollType typ_loc with
-            | TFloat (fkind,_) -> begin
-                let v = Cvalue.V.project_float v in
-                let kind = Fval.kind fkind in
-                match fval_reduce kind v with
-                | `Value f -> V.inject_float f
-                | `Bottom -> V.bottom
-              end
-            | _ -> (* Better safe than sorry, we may have e.g. en int location
-                      here *)
-              raise Not_an_exact_loc
-          in
-          let state' = Cvalue.Model.reduce_previous_binding state loc v in
-          overwrite_current_state env state'
+  (* If the term [arg] is a floating-point lvalue with an exact location,
+     reduces its value in [env] by using the backward propagator on fval
+     [fval_reduce]. *)
+  let reduce_float fval_reduce arg =
+    try
+      let typ_loc, locs = eval_term_as_exact_locs ~alarm_mode env arg in
+      let aux loc env =
+        let state = env_current_state env in
+        let v = find_or_alarm ~alarm_mode state loc in
+        let v =  Cvalue_forward.reinterpret typ_loc v in
+        let v = match Cil.unrollType typ_loc with
+          | TFloat (fkind,_) -> begin
+              let v = Cvalue.V.project_float v in
+              let kind = Fval.kind fkind in
+              match fval_reduce kind v with
+              | `Value f -> V.inject_float f
+              | `Bottom -> V.bottom
+            end
+          | _ -> (* Better safe than sorry, we may have e.g. en int location
+                    here *)
+            raise Not_an_exact_loc
         in
-        Eval_op.apply_on_all_locs aux locs env
-      with Cvalue.V.Not_based_on_null -> env
-    end
-  | _ , ("\\eq_float" | "\\eq_double"), [t1;t2] ->
+        let state' = Cvalue.Model.reduce_previous_binding state loc v in
+        overwrite_current_state env state'
+      in
+      Eval_op.apply_on_all_locs aux locs env
+    with Cvalue.V.Not_based_on_null -> env
+  in
+  (* Reduces [f] to positive or negative infinity (according to [pos]),
+     or to the complement if [positive] is false. *)
+  let reduce_by_infinity ~pos prec f =
+    let inf = if pos then Fval.pos_infinity prec else Fval.neg_infinity prec in
+    let fval =
+      if positive
+      then inf
+      else Fval.(join nan (join (Fval.neg inf) (top_finite prec)))
+    in
+    Fval.narrow fval f
+  in
+  match li.l_var_info.lv_name, args with
+  | "\\is_finite", [arg] ->
+    reduce_float (Fval.backward_is_finite ~positive) arg
+  | "\\is_plus_infinity", [arg] ->
+    reduce_float (reduce_by_infinity ~pos:true) arg
+  | "\\is_minus_infinity", [arg] ->
+    reduce_float (reduce_by_infinity ~pos:false) arg
+  | "\\is_NaN", [arg] ->
+    reduce_float (fun _fkind -> Fval.backward_is_nan ~positive) arg
+  | ("\\eq_float" | "\\eq_double"), [t1;t2] ->
     reduce_by_relation ~alarm_mode env positive t1 Req t2
-  | _ , ("\\ne_float" | "\\ne_double"), [t1;t2] ->
+  | ("\\ne_float" | "\\ne_double"), [t1;t2] ->
     reduce_by_relation ~alarm_mode env positive t1 Rneq t2
-  | _ , ("\\lt_float" | "\\lt_double"), [t1;t2] ->
+  | ("\\lt_float" | "\\lt_double"), [t1;t2] ->
     reduce_by_relation ~alarm_mode env positive t1 Rlt t2
-  | _ , ("\\le_float" | "\\le_double"), [t1;t2] ->
+  | ("\\le_float" | "\\le_double"), [t1;t2] ->
     reduce_by_relation ~alarm_mode env positive t1 Rle t2
-  | _ , ("\\gt_float" | "\\gt_double"), [t1;t2] ->
+  | ("\\gt_float" | "\\gt_double"), [t1;t2] ->
     reduce_by_relation ~alarm_mode env positive t1 Rgt t2
-  | _ , ("\\ge_float" | "\\ge_double"), [t1;t2] ->
+  | ("\\ge_float" | "\\ge_double"), [t1;t2] ->
     reduce_by_relation ~alarm_mode env positive t1 Rge t2
-  | true, "\\subset", [argl;argr] ->
+  | "\\subset", [argl;argr] when positive ->
     let alarm_mode = alarm_reduce_mode () in
     let vr = (eval_term ~alarm_mode env argr).eover in
     let _typ, locsl = eval_term_as_exact_locs ~alarm_mode env argl in
@@ -2274,6 +2302,12 @@ and eval_predicate env pred =
     in
     match li.l_var_info.lv_name, args with
     | "\\is_finite", [arg] -> unary_float Fval.is_finite arg
+    | "\\is_plus_infinity", [arg] ->
+      let pos_inf = Fval.pos_infinity Float_sig.Single in
+      unary_float (fun f -> Fval.forward_comp Comp.Eq f pos_inf) arg
+    | "\\is_minus_infinity", [arg] ->
+      let neg_inf = Fval.neg_infinity Float_sig.Single in
+      unary_float (fun f -> Fval.forward_comp Comp.Eq f neg_inf) arg
     | "\\is_NaN", [arg] -> inv_truth (unary_float Fval.is_not_nan arg)
     | ("\\eq_float" | "\\eq_double"), [arg1;arg2] -> fval_cmp Comp.Eq arg1 arg2
     | ("\\ne_float" | "\\ne_double"), [arg1;arg2] -> fval_cmp Comp.Ne arg1 arg2

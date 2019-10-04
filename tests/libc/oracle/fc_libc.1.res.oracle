@@ -3385,6 +3385,23 @@ int __finitef(float f);
 
 int __finite(double d);
 
+/*@ logic float __fc_infinity(ℤ x) = \plus_infinity;
+ */
+/*@ logic float __fc_nan(ℤ x) = \NaN;
+
+*/
+/*@ ensures result_is_infinity: \is_plus_infinity(\result);
+    assigns \result;
+    assigns \result \from \nothing;
+ */
+extern float __fc_infinity(int x);
+
+/*@ ensures result_is_nan: \is_NaN(\result);
+    assigns \result;
+    assigns \result \from \nothing;
+ */
+extern float __fc_nan(int x);
+
 /*@ requires finite_arg: \is_finite(x);
     ensures res_finite: \is_finite(\result);
     ensures positive_result: \result ≥ 0.;
