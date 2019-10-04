@@ -4514,14 +4514,15 @@ extern char *tmpnam(char *s);
 /*@ requires valid_stream: \valid(stream);
     ensures result_zero_or_EOF: \result ≡ 0 ∨ \result ≡ -1;
     assigns \result;
-    assigns \result \from (indirect: *stream);
+    assigns \result \from (indirect: stream), (indirect: *stream);
  */
 extern int fclose(FILE *stream);
 
 /*@ requires null_or_valid_stream: stream ≡ \null ∨ \valid_read(stream);
     ensures result_zero_or_EOF: \result ≡ 0 ∨ \result ≡ -1;
     assigns \result, *stream, __fc_fopen[0 .. 16 - 1];
-    assigns \result \from (indirect: *stream);
+    assigns \result
+      \from (indirect: *stream), (indirect: __fc_fopen[0 .. 16 - 1]);
     assigns *stream
       \from (indirect: stream), *stream, __fc_fopen[0 .. 16 - 1];
     assigns __fc_fopen[0 .. 16 - 1]

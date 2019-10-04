@@ -117,7 +117,7 @@ extern char *tmpnam(char *s);
 /*@
   // missing: assigns errno
   requires valid_stream: \valid(stream);
-  assigns \result \from indirect:*stream;
+  assigns \result \from indirect:stream, indirect:*stream;
   ensures result_zero_or_EOF: \result == 0 || \result == EOF;
 */
 extern int fclose(FILE *stream);
@@ -126,7 +126,8 @@ extern int fclose(FILE *stream);
   // missing: assigns errno
   requires null_or_valid_stream: stream == \null || \valid_read(stream);
   ensures result_zero_or_EOF: \result == 0 || \result == EOF;
-  assigns \result \from indirect:*stream;
+  assigns \result
+    \from indirect:*stream, indirect:__fc_fopen[0 .. __FC_FOPEN_MAX-1];
   assigns *stream, __fc_fopen[0 .. __FC_FOPEN_MAX-1]
     \from indirect:stream, *stream,
           __fc_fopen[0 .. __FC_FOPEN_MAX-1]; // may flush ALL open streams
