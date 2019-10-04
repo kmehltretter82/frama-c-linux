@@ -180,8 +180,11 @@ val setMaxId: fundec -> unit
 val selfFormalsDecl: State.t
   (** state of the table associating formals to each prototype. *)
 
-val makeFormalsVarDecl: (string * typ * attributes) -> varinfo
-  (** creates a new varinfo for the parameter of a prototype. *)
+val makeFormalsVarDecl: ?ghost:bool -> (string * typ * attributes) -> varinfo
+  (** creates a new varinfo for the parameter of a prototype.
+      By default, this formal variable is not ghost.
+      @modify 19.0-Potassium+dev adds a parameter for ghost status
+  *)
 
 (** Update the formals of a function declaration from its identifier and its
     type. For a function definition, use {!Cil.setFormals}.
@@ -580,9 +583,16 @@ val isTypeTagType: logic_type -> bool
     @since Nitrogen-20111001 moved from cabs2cil *)
 val isVariadicListType: typ -> bool
 
-(** Obtain the argument list ([] if None) *)
+(** Obtain the argument list ([] if None).
+    @since 19.0-Potassium+dev Beware that it contains the ghost arguments. *)
 val argsToList:
   (string * typ * attributes) list option -> (string * typ * attributes) list
+
+(** @since 19.0-Potassium+dev
+   Obtain the argument lists (non-ghost, ghosts) ([], [] if None) *)
+val argsToPairOfLists:
+  (string * typ * attributes) list option ->
+  (string * typ * attributes) list * (string * typ * attributes) list
 
 (** True if the argument is an array type *)
 val isArrayType: typ -> bool
@@ -648,19 +658,33 @@ val splitFunctionTypeVI:
   [vsource] .
   The [referenced] argument defaults to [false], and corresponds to the field
   [vreferenced] .
+  The [ghost] argument defaults to [false], and corresponds to the field
+  [vghost] .
   The first unnamed argument specifies whether the varinfo is for a global and
-  the second is for formals. *)
+  the second is for formals.
+  @modify 19.0-Potassium adds an optional ghost parameter
+*)
 val makeVarinfo:
-  ?source:bool -> ?temp:bool -> ?referenced:bool -> bool -> bool -> string ->
-  typ -> varinfo
+  ?source:bool -> ?temp:bool -> ?referenced:bool -> ?ghost:bool -> bool -> bool
+  -> string -> typ -> varinfo
 
 (** Make a formal variable for a function declaration. Insert it in both the
     sformals and the type of the function. You can optionally specify where to
     insert this one. If where = "^" then it is inserted first. If where = "$"
     then it is inserted last. Otherwise where must be the name of a formal
     after which to insert this. By default it is inserted at the end.
+
+    The [ghost] parameter indicates if the variable should be inserted in the
+    list of formals or ghost formals. By default, it takes the ghost status of
+    the function where the formal is inserted. Note that:
+
+    - specifying ghost to false if the function is ghost leads to an error
+    - when [where] is specified, its status must be the same as the formal to
+      insert (else, it cannot be found in the list of ghost or non ghost formals)
+
+    @modify 19.0-Potassium adds the optional ghost parameter
 *)
-val makeFormalVar: fundec -> ?where:string -> string -> typ -> varinfo
+val makeFormalVar: fundec -> ?ghost:bool -> ?where:string -> string -> typ -> varinfo
 
 (** Make a local variable and add it to a function's slocals and to the given
     block (only if insert = true, which is the default).
@@ -1171,6 +1195,12 @@ val dropAttribute: string -> attributes -> attributes
  *  Maintains the attributes in sorted order *)
 val dropAttributes: string list -> attributes -> attributes
 
+(** A varinfo marked with this attribute is known to be a ghost formal.
+
+    @since 19.0-Potassium+dev
+*)
+val frama_c_ghost_formal: string
+
 (** a field struct marked with this attribute is known to be mutable, i.e.
     it can be modified even on a const object.
 
@@ -1190,6 +1220,18 @@ val frama_c_init_obj: string
     a [frama_c_init_obj] or a [frama_c_mutable] attribute.
 *)
 val is_mutable_or_initialized: lval -> bool
+
+(** [true] if the given varinfo is a ghost formal variable.
+
+    @since 19.0-Potassium+dev
+*)
+val isGhostFormalVarinfo: varinfo -> bool
+
+(** [true] if the given formal declaration corresponds to a ghost formal variable.
+
+    @since 19.0-Potassium+dev
+*)
+val isGhostFormalVarDecl: (string * typ * attributes) -> bool
 
 (** Remove attributes whose name appears in the first argument that are
     present anywhere in the fully expanded version of the type.

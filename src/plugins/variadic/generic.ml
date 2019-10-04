@@ -42,7 +42,9 @@ let translate_type = function
 | TFun (ret_typ, args, is_variadic, attributes) ->
     let new_args =
       if is_variadic
-      then Some (Cil.argsToList args @ [vpar])
+      then
+        let ng_args, g_args = Cil.argsToPairOfLists args in
+        Some (ng_args @ [vpar] @ g_args)
       else args
     in
     TFun (ret_typ, new_args, false, attributes)      
@@ -141,9 +143,12 @@ let translate_call ~fundec block loc mk_call callee pars =
   Self.result ~current:true ~level:2
     "Generic translation of call to variadic function.";
 
-  (* Split params into static and variadic part *)
-  let static_size = List.length (Typ.params (Cil.typeOf callee)) - 1 in
-  let s_exps, v_exps = List.break static_size pars in
+  (* Split params into static, variadic and ghost part *)
+  let ng_params, g_params = Typ.ghost_partitioned_params (Cil.typeOf callee) in
+  let static_size = List.length ng_params - 1 in
+  let s_exps, r_exps = List.break static_size pars in
+  let variadic_size = (List.length r_exps) - (List.length g_params) in
+  let v_exps, g_exps = List.break variadic_size r_exps in
 
   (* Create temporary variables to hold parameters *)
   let add_var i exp =
@@ -168,6 +173,6 @@ let translate_call ~fundec block loc mk_call callee pars =
   (* Translate the call *)
   let exp_vargs = Cil.mkAddrOrStartOf ~loc (Cil.var vargs) in
   let new_arg = Cil.mkCast ~force:false ~e:exp_vargs ~newt:(vpar_typ []) in
-  let new_args = s_exps @ [new_arg] in
+  let new_args = s_exps @ [new_arg] @ g_exps in
   let call = mk_call callee new_args in
   instrs @ [call]

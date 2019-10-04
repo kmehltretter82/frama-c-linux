@@ -65,6 +65,7 @@ let register_shallow_attribute s =
   reserved_attributes:=
     (Extlib.strip_underscore s)::!reserved_attributes
 
+let () = register_shallow_attribute Cil.frama_c_ghost_formal
 let () = register_shallow_attribute Cil.frama_c_mutable
 let () = register_shallow_attribute Cil.frama_c_init_obj
 
@@ -871,10 +872,35 @@ class cil_printer () = object (self)
       (match e.enode with
        | Lval(Var _, _) -> self#exp fmt e
        | _ -> fprintf fmt "(%a)"  self#exp e);
+
+      let (_, param_ts, _, _) = Cil.splitFunctionType (Cil.typeOf e) in
+      let _, g_params_ts = Cil.argsToPairOfLists param_ts in
+
+      let rec break n l =
+        if n = 0 then [], l
+        else match l with
+          | [] -> assert false
+          | x :: l' -> let (f, s) = break (n-1) l' in x :: f, s
+      in
+      let args, ghosts = if is_ghost then
+          args, []
+        else
+          let n = List.length args - List.length g_params_ts in
+          break n args
+      in
+
       (* Now the arguments *)
+      Format.fprintf fmt "@[" ;
       Pretty_utils.pp_flowlist ~left:"(" ~sep:"," ~right:")" self#exp fmt args;
+      (* Now the ghost arguments *)
+      begin match ghosts with
+        | [] -> ()
+        | _ -> Pretty_utils.pp_flowlist
+                 ~left:"@;/*@@ ghost (" ~sep:"," ~right:") */"
+                 self#exp fmt ghosts
+      end ;
       (* Now the terminator *)
-      fprintf fmt "%s" instr_terminator
+      fprintf fmt "@]%s" instr_terminator
     in
     match i with
     | Skip _ -> fprintf fmt ";"
@@ -1881,8 +1907,19 @@ class cil_printer () = object (self)
         else if nameOpt = None then printAttributes fmt a
         else fprintf fmt "(%a%a)" printAttributes a pname (a <> [])
       in
-      let pp_params fmt args pp_args =
-        fprintf fmt "%t(@[%t@])" name'
+      let partition_ghosts ghost_arg args =
+        match args with
+        | None -> None, []
+        | Some l ->
+          let ghost_args, args = if is_ghost then
+              [], l
+            else
+              List.partition ghost_arg l
+          in
+          Some args, ghost_args
+      in
+      let pp_params fmt (args, ghost_args) pp_args =
+        fprintf fmt "%t@[<hv>(@[%t@])%t@]" name'
           (fun fmt ->
              match args with
              | (None | Some []) when isvararg -> fprintf fmt "..."
@@ -1891,6 +1928,9 @@ class cil_printer () = object (self)
              | Some args ->
                Pretty_utils.pp_list ~sep:",@ " pp_args fmt args;
                if isvararg then fprintf fmt "@ , ...")
+          (fun fmt ->
+             Pretty_utils.pp_list ~pre:"@;/*@@ ghost (@[" ~suf:"@]) */" ~sep:",@ "
+               pp_args fmt ghost_args)
       in
       let pp_params fmt = match fundecl with
         | None ->
@@ -1902,12 +1942,14 @@ class cil_printer () = object (self)
               (self#typ (Some (fun fmt -> fprintf fmt "%s" aname))) atype
               self#attributes rest
           in
-          pp_params fmt args pp_args
+          let p = partition_ghosts Cil.isGhostFormalVarDecl args in
+          pp_params fmt p pp_args
         | Some fundecl ->
           let args =
             try Some (Cil.getFormalsDecl fundecl) with Not_found -> None
           in
-          pp_params fmt args self#vdecl
+          let p = partition_ghosts Cil.isGhostFormalVarinfo args in
+          pp_params fmt p self#vdecl
       in
       self#typ (Some pp_params) fmt restyp
 
