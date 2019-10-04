@@ -890,16 +890,17 @@ class cil_printer () = object (self)
       in
 
       (* Now the arguments *)
+      Format.fprintf fmt "@[" ;
       Pretty_utils.pp_flowlist ~left:"(" ~sep:"," ~right:")" self#exp fmt args;
       (* Now the ghost arguments *)
       begin match ghosts with
         | [] -> ()
         | _ -> Pretty_utils.pp_flowlist
-                 ~left:"/*@@ ghost (" ~sep:"," ~right:") */"
+                 ~left:"@;/*@@ ghost (" ~sep:"," ~right:") */"
                  self#exp fmt ghosts
       end ;
       (* Now the terminator *)
-      fprintf fmt "%s" instr_terminator
+      fprintf fmt "@]%s" instr_terminator
     in
     match i with
     | Skip _ -> fprintf fmt ";"
@@ -1918,7 +1919,7 @@ class cil_printer () = object (self)
           Some args, ghost_args
       in
       let pp_params fmt (args, ghost_args) pp_args =
-        fprintf fmt "%t(@[%t@])" name'
+        fprintf fmt "%t@[<hv>(@[%t@])%t@]" name'
           (fun fmt ->
              match args with
              | (None | Some []) when isvararg -> fprintf fmt "..."
@@ -1927,9 +1928,9 @@ class cil_printer () = object (self)
              | Some args ->
                Pretty_utils.pp_list ~sep:",@ " pp_args fmt args;
                if isvararg then fprintf fmt "@ , ...")
-        ;
-        Pretty_utils.pp_list ~pre:"/*@@ ghost (" ~suf:") */" ~sep:", "
-          pp_args fmt ghost_args
+          (fun fmt ->
+             Pretty_utils.pp_list ~pre:"@;/*@@ ghost (@[" ~suf:"@]) */" ~sep:",@ "
+               pp_args fmt ghost_args)
       in
       let pp_params fmt = match fundecl with
         | None ->

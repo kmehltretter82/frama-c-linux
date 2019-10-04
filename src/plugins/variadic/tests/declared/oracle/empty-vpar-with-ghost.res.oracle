@@ -18,14 +18,15 @@
     behavior bhv:
       requires c > 0;
       requires a ≤ 42; */
-void f(int const a, int, int c, void * const *__va_params)/*@ ghost (int x) */;
+void f(int const a, int, int c, void * const *__va_params)
+      /*@ ghost (int x) */;
 
 int main(void)
 {
   int __retres;
   {
     void *__va_args[1] = {(void *)0};
-    f(1,2,3,(void * const *)(__va_args))/*@ ghost (4) */;
+    f(1,2,3,(void * const *)(__va_args)) /*@ ghost (4) */;
   }
   __retres = 0;
   return __retres;

@@ -21,7 +21,8 @@
       requires a ≤ 42;
       ensures \result > 0;
  */
-int f(int const a, int, int c, void * const *__va_params)/*@ ghost (int x) */;
+int f(int const a, int, int c, void * const *__va_params)
+     /*@ ghost (int x) */;
 
 int main(void)
 {
@@ -31,7 +32,7 @@ int main(void)
     int __va_arg1 = 5;
     int __va_arg2 = 6;
     void *__va_args[3] = {& __va_arg0, & __va_arg1, & __va_arg2};
-    tmp = f(1,2,3,(void * const *)(__va_args))/*@ ghost (7) */;
+    tmp = f(1,2,3,(void * const *)(__va_args)) /*@ ghost (7) */;
   }
   return tmp;
 }
