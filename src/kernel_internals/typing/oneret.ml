@@ -197,11 +197,12 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
   let lastloc = ref Cil_datatype.Location.unknown in
   let getRetVar =
     let retVar : varinfo option ref = ref None in
-    fun () ->
+    fun ?(loc=Cil_datatype.Location.unknown) ()->
       match !retVar with
 	Some rv -> rv
       | None -> begin
             let rv = makeLocalVar f "__retres" retTyp in (* don't collide *)
+            rv.vdecl <- loc;
             retVar := Some rv;
             rv
       end
@@ -338,7 +339,7 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
      * an instruction that sets the return value (if any). *)
       s.skind <- begin
         match retval with
-            Some rval -> Instr (Set((Var (getRetVar ()), NoOffset), rval, loc))
+            Some rval -> Instr (Set((Var (getRetVar ~loc ()), NoOffset), rval, loc))
           | None -> Instr (Skip loc)
       end;
       let returns_assert = ref ptrue in
