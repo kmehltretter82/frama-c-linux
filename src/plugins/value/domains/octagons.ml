@@ -38,11 +38,11 @@ let infer_intervals = true
    minimal drop in efficiency. *)
 let saturate_octagons = true
 
-(* Is the domain intraprocedural, according to the -eva-octagons-through-calls
+(* Is the domain intraprocedural, according to the -eva-octagon-through-calls
    option. In this case, the analysis of each function starts with an empty
    state, and the relations inferred in a function are not propagated back to
    the caller either. *)
-let intraprocedural () = not (Value_parameters.OctagonsCall.get ())
+let intraprocedural () = not (Value_parameters.OctagonCall.get ())
 
 (* -------------------------------------------------------------------------- *)
 (*                  Basic types: pair of variables and Ival.t                 *)
@@ -420,7 +420,7 @@ end
    while intervals for X+Y and X-Y shape a "leaning" rectangle; the intersection
    of these rectangles shapes an octagon.
    Using a misnomer, we call diamonds the intervals for X+Y and X-Y, and
-   octagons the map from variables to diamonds, even if they does not exactly
+   octagons the maps from variables to diamonds, even if they do not exactly
    shape octagons. *)
 
 (* Relation between a pair of variables (X, Y).
@@ -777,7 +777,7 @@ module State = struct
       then t
       else
         Value_parameters.abort
-          "Incorrect octagons state computed by function %s:@ %a"
+          "Incorrect octagon state computed by function %s:@ %a"
           msg pretty_debug t
 
   (* ------------------------------ Lattice --------------------------------- *)
@@ -1315,7 +1315,7 @@ module Domain = struct
             modified = current_input.modified }
 
   let name = "Octagon domain"
-  let log_category = Value_parameters.register_category "d-octagons"
+  let log_category = Value_parameters.register_category "d-octagon"
 
   let storage () = true
 end

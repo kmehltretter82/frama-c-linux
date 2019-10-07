@@ -32,7 +32,7 @@ module CvalueDomain: Parameter_sig.Bool
 module EqualityDomain: Parameter_sig.Bool
 module GaugesDomain: Parameter_sig.Bool
 module SymbolicLocsDomain: Parameter_sig.Bool
-module OctagonsDomain: Parameter_sig.Bool
+module OctagonDomain: Parameter_sig.Bool
 module BitwiseOffsmDomain: Parameter_sig.Bool
 module InoutDomain: Parameter_sig.Bool
 module SignDomain: Parameter_sig.Bool
@@ -51,7 +51,7 @@ module EqualityCallFunction:
   Parameter_sig.Map with type key = Cil_types.kernel_function
                      and type value = string
 
-module OctagonsCall: Parameter_sig.Bool
+module OctagonCall: Parameter_sig.Bool
 
 module TracesUnrollLoop: Parameter_sig.Bool
 module TracesUnifyLoop: Parameter_sig.Bool

@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +" -eva-octagons-domain -eva-octagons-through-calls -eva-msg-key=d-octagons,-d-cvalue"
+   STDOPT: +" -eva-octagon-domain -eva-octagon-through-calls -eva-msg-key=d-octagon,-d-cvalue"
 */
 
 #include <__fc_builtin.h>
@@ -70,7 +70,7 @@ void arith () {
     Frama_C_show_each_BOTTOM(a, b);
 }
 
-/* Tests the join of the octagons domain. */
+/* Tests the join of the octagon domain. */
 void join () {
   int a, b, r;
   int k = Frama_C_interval(-1, 4);
@@ -96,7 +96,7 @@ void join () {
   Frama_C_show_each_join_negative(r);
 }
 
-/* Tests the octagons domain within loops. */
+/* Tests the octagon domain within loops. */
 void loop () {
   int k = Frama_C_interval(-8, 8);
   int a = Frama_C_interval(-1024, 1024);
@@ -117,7 +117,7 @@ void loop () {
   Frama_C_show_each_precise(d3);
 }
 
-/* Tests the soundness of the octagons domain in presence of pointers. */
+/* Tests the soundness of the octagon domain in presence of pointers. */
 void pointers () {
   int x, y, r;
   int *px = &x, *pr = &r;

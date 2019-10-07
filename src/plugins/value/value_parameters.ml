@@ -167,10 +167,10 @@ module SymbolicLocsDomain = Domain_Parameter
       let default = false
     end)
 
-module OctagonsDomain = Domain_Parameter
+module OctagonDomain = Domain_Parameter
     (struct
-      let option_name = "-eva-octagons-domain"
-      let help = "Use the octagons domain of Eva."
+      let option_name = "-eva-octagon-domain"
+      let help = "Use the octagon domain of Eva."
       let default = false
     end)
 
@@ -320,19 +320,19 @@ module EqualityCallFunction =
 let () = add_precision_dep EqualityCallFunction.parameter
 
 let () = Parameter_customize.set_group domains
-module OctagonsCall =
+module OctagonCall =
   Bool
     (struct
-      let option_name = "-eva-octagons-through-calls"
-      let help = "Whether the relations inferred by the octagons domain are \
+      let option_name = "-eva-octagon-through-calls"
+      let help = "Whether the relations inferred by the octagon domain are \
                   propagated through function calls. Disabled by default: \
-                  the octagons analysis is intra-procedural, starting \
-                  each function with an empty octagons state, \
+                  the octagon analysis is intra-procedural, starting \
+                  each function with an empty octagon state, \
                   and losing the octagons inferred at the end. \
                   The interprocedural analysis is more precise but slower."
       let default = false
     end)
-let () = add_precision_dep OctagonsCall.parameter
+let () = add_precision_dep OctagonCall.parameter
 
 let () = Parameter_customize.set_group domains
 module Numerors_Real_Size =
@@ -1542,8 +1542,8 @@ let () =
   bind (module EqualityDomain) (fun n -> n > 1);
   bind (module EqualityCall) (fun n -> if n > 2 then "formals" else "none");
   bind (module GaugesDomain) (fun n -> n > 3);
-  bind (module OctagonsDomain) (fun n -> n > 4);
-  bind (module OctagonsCall) (fun n -> n > 5);
+  bind (module OctagonDomain) (fun n -> n > 4);
+  bind (module OctagonCall) (fun n -> n > 5);
   bind (module SplitReturn) (fun n -> if n > 6 then "auto" else "");
   ()
 
