@@ -151,7 +151,6 @@ share/Makefile.dynamic_config.internal: CEA_LGPL
 share/Makefile.generic: CEA_LGPL
 share/Makefile.plugin.template: CEA_LGPL
 share/META.frama-c: .ignore
-share/builtin.h: CEA_LGPL
 share/configure.ac: CEA_LGPL
 share/emacs/acsl.el: ACSL_EL
 share/emacs/frama-c-dev.el: CEA_LGPL
@@ -1136,10 +1135,8 @@ src/plugins/value/domains/abstract_domain.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/printer_domain.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/printer_domain.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/simpler_domains.mli: CEA_LGPL_OR_PROPRIETARY
-src/plugins/value/domains/apron/apron_domain.ko.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/apron/apron_domain.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/apron/apron_domain.mli: CEA_LGPL_OR_PROPRIETARY
-src/plugins/value/domains/apron/apron_domain.ok.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/cvalue/builtins.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/cvalue/builtins.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/cvalue/builtins_float.ml: CEA_LGPL_OR_PROPRIETARY
@@ -1199,8 +1196,6 @@ src/plugins/value/domains/powerset.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/sign_domain.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/sign_domain.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/numerors/numerors_domain.ml: CEA_LGPL_OR_PROPRIETARY
-src/plugins/value/domains/numerors/numerors_domain.ok.ml: CEA_LGPL_OR_PROPRIETARY
-src/plugins/value/domains/numerors/numerors_domain.ko.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/numerors/numerors_domain.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/simple_memory.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/simple_memory.mli: CEA_LGPL_OR_PROPRIETARY
@@ -1232,7 +1227,6 @@ src/plugins/value/engine/recursion.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/engine/recursion.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/engine/split_return.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/engine/split_return.mli: CEA_LGPL_OR_PROPRIETARY
-src/plugins/value/engine/state_partitioning.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/engine/subdivided_evaluation.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/engine/subdivided_evaluation.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/engine/trace_partitioning.ml: CEA_LGPL_OR_PROPRIETARY
