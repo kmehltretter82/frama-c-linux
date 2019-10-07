@@ -1178,8 +1178,7 @@ let get_temp_name ?(ghost=false) () =
 let newTempVar ~ghost loc descr (descrpure:bool) typ =
   let t' = (!typeForInsertedVar) typ in
   let name = get_temp_name ~ghost () in
-  let vi = makeVarinfo ~ghost ~temp:true false false name t' in
-  vi.vdecl <- loc;
+  let vi = makeVarinfo ~ghost ~temp:true ~decl:loc false false name t' in
   vi.vdescr <- Some descr;
   vi.vdescrpure <- descrpure;
   alphaConvertVarAndAddToEnv false vi
@@ -4721,11 +4720,10 @@ and makeVarInfoCabs
     Kernel.error ~once:true ~current:true "inline for a non-function: %s" n;
   checkRestrictQualifierDeep vtype;
   (*  log "Looking at %s(%b): (%a)@." n isformal d_attrlist nattr;*)
-  let vi = makeVarinfo ~ghost ~referenced ~temp:isgenerated isglobal isformal n vtype
+  let vi = makeVarinfo ~ghost ~referenced ~temp:isgenerated  ~decl:ldecl isglobal isformal n vtype
   in
   vi.vstorage <- sto;
   vi.vattr <- nattr;
-  vi.vdecl <- ldecl;
   vi.vdefined <-
     not (isFunctionType vtype) && isglobal && (sto = NoStorage || sto = Static);
 
@@ -9040,9 +9038,8 @@ and doDecl local_env (isglobal: bool) : A.definition -> chunk = function
         (* sfg: extract tsets for the formals from dt *)
         let doFormal (loc : location) ((fn, ft, fa) as fd) =
           let ghost = ghost || isGhostFormalVarDecl fd in
-          let f = makeVarinfo ~ghost ~temp:false false true fn ft in
-          (f.vdecl <- loc;
-           f.vattr <- fa;
+          let f = makeVarinfo ~ghost ~temp:false ~decl:loc false true fn ft in
+          (f.vattr <- fa;
            alphaConvertVarAndAddToEnv true f)
         in
         let rec doFormals fl' ll' =

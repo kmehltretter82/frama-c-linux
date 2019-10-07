@@ -197,12 +197,11 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
   let lastloc = ref Cil_datatype.Location.unknown in
   let getRetVar =
     let retVar : varinfo option ref = ref None in
-    fun loc ->
+    fun decl ->
       match !retVar with
 	Some rv -> rv
       | None -> begin
-            let rv = makeLocalVar f "__retres" retTyp in (* don't collide *)
-            rv.vdecl <- loc;
+            let rv = makeLocalVar ~decl f "__retres" retTyp in (* don't collide *)
             retVar := Some rv;
             rv
       end

@@ -601,7 +601,7 @@ let rec unrollTypeSkel = function
 
 (* Make a varinfo. Used mostly as a helper function below  *)
 let makeVarinfo
-    ?(source=true) ?(temp=false) ?(referenced=false) ?(ghost=false)
+    ?(source=true) ?(temp=false) ?(referenced=false) ?(ghost=false) ?(decl=Location.unknown)
     global formal name typ
   =
   let vi =
@@ -613,7 +613,7 @@ let makeVarinfo
       vformal = formal;
       vtemp = temp;
       vtype = typ;
-      vdecl = Location.unknown;
+      vdecl = decl;
       vinline = false;
       vattr = [];
       vstorage = NoStorage;
@@ -5228,16 +5228,17 @@ let rec findUniqueName ?(suffix="") fdec name =
 let refresh_local_name fdec vi =
   let new_name = findUniqueName fdec vi.vname in vi.vname <- new_name
 
-let makeLocal ?(temp=false) ?referenced ?ghost ?(formal=false) fdec name typ =
+let makeLocal ?(temp=false) ?referenced ?ghost ?(formal=false) ?(decl=Location.unknown) fdec name typ =
   (* a helper function *)
   let name = findUniqueName fdec name in
   fdec.smaxid <- 1 + fdec.smaxid;
-  let vi = makeVarinfo ~temp ?referenced ?ghost false formal name typ in
+  let vi = makeVarinfo ~temp ?referenced ?ghost ~decl false formal name typ in
   vi
 
 (* Make a local variable and add it to a function *)
-let makeLocalVar fdec ?scope ?(temp=false) ?referenced ?(insert = true) name typ =
-  let vi = makeLocal ~temp ?referenced fdec name typ in
+let makeLocalVar fdec ?scope ?(temp=false) ?referenced ?(insert=true)
+    ?(decl=Location.unknown) name typ =
+  let vi = makeLocal ~temp ?referenced ~decl fdec name typ in
   refresh_local_name fdec vi;
   if insert then
     begin
@@ -5252,8 +5253,8 @@ let makeLocalVar fdec ?scope ?(temp=false) ?referenced ?(insert = true) name typ
   vi
 
 let makeTempVar fdec ?insert ?(name = "__cil_tmp") ?descr ?(descrpure = true)
-    typ : varinfo =
-  let vi = makeLocalVar fdec ~temp:true ?insert name typ in
+    ?(decl=Location.unknown) typ : varinfo =
+  let vi = makeLocalVar fdec ~temp:true ?insert ~decl name typ in
   vi.vdescr <- descr;
   vi.vdescrpure <- descrpure;
   vi
