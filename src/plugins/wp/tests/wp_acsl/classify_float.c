@@ -2,6 +2,7 @@
    OPT: -wp-prover alt-ergo
    OPT: -wp-prover why3:alt-ergo
    OPT: -wp-prover coq -wp-coq-script tests/wp_acsl/classify_float.script
+   OPT: -wp-model real
  */
 
 /*@

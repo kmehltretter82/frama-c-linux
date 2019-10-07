@@ -141,7 +141,14 @@ let hacks = Hashtbl.create 8
 let hack name phi = Hashtbl.replace hacks name phi
 
 let lookup name kinds =
-  try HACK (Hashtbl.find hacks name)
+  try
+    let hack = Hashtbl.find hacks name in
+    let compute es =
+      try hack es with Not_found ->
+      match lookup_driver name kinds with
+      | ACSLDEF | HACK _ -> Warning.error "No fallback for hacked '%s'" name
+      | LFUN p -> F.e_fun p es
+    in HACK compute
   with Not_found -> lookup_driver name kinds
 
 let register ?source name kinds link =

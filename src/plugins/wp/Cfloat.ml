@@ -221,6 +221,24 @@ let float_lit ulp (q : Q.t) =
   in lookup ulp v printers
 
 (* -------------------------------------------------------------------------- *)
+(* --- Finites                                                            --- *)
+(* -------------------------------------------------------------------------- *)
+
+let fclass value _args =
+  match Context.get model with
+  | Real -> F.e_bool value
+  | Float -> raise Not_found
+
+let () = Context.register
+    begin fun () ->
+      LogicBuiltins.hack "\\is_finite"         (fclass true) ;
+      LogicBuiltins.hack "\\is_NaN"            (fclass false) ;
+      LogicBuiltins.hack "\\is_infinite"       (fclass false) ;
+      LogicBuiltins.hack "\\is_plus_infinity"  (fclass false) ;
+      LogicBuiltins.hack "\\is_minus_infinity" (fclass false) ;
+    end
+
+(* -------------------------------------------------------------------------- *)
 (* --- Computations                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -241,7 +259,7 @@ let round ulp e =
       end
   | _ -> qmake ulp (exact e)
 
-let compute op ulp xs =
+let compute_float op ulp xs =
   match op , xs with
   | NEG , [ x ] -> qmake ulp (Q.neg (exact x))
   | ADD , [ x ; y ] -> qmake ulp (Q.add (exact x) (exact y))
@@ -254,6 +272,24 @@ let compute op ulp xs =
   | EQ , [ x ; y ] -> F.e_bool (Q.equal (exact x) (exact y))
   | NE , [ x ; y ] -> F.e_bool (not (Q.equal (exact x) (exact y)))
   | _ -> raise Not_found
+
+let compute_real op xs =
+  match op , xs with
+  | NEG , [ x ] -> F.e_opp x
+  | ADD , [ x ; y ] -> F.e_add x y
+  | MUL , [ x ; y ] -> F.e_mul x y
+  | DIV , [ x ; y ] -> F.e_div x y
+  | (ROUND|REAL) , [ x ] -> x
+  | LE , [ x ; y ] -> F.e_leq x y
+  | LT , [ x ; y ] -> F.e_lt x y
+  | EQ , [ x ; y ] -> F.e_eq x y
+  | NE , [ x ; y ] -> F.e_neq x y
+  | _ -> raise Not_found
+
+let compute op ulp xs =
+  match Context.get model with
+  | Real -> compute_real op xs
+  | Float -> compute_float op ulp xs
 
 (* -------------------------------------------------------------------------- *)
 (* --- Operations                                                         --- *)
