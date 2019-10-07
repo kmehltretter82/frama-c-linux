@@ -660,14 +660,14 @@ val splitFunctionTypeVI:
   [vreferenced] .
   The [ghost] argument defaults to [false], and corresponds to the field
   [vghost] .
-  The [decl] argument defaults to [Location.unknown], and corresponds to the field
+  The [loc] argument defaults to [Location.unknown], and corresponds to the field
   [vdecl] .
   The first unnamed argument specifies whether the varinfo is for a global and
   the second is for formals.
   @modify 19.0-Potassium adds an optional ghost parameter
 *)
 val makeVarinfo:
-  ?source:bool -> ?temp:bool -> ?referenced:bool -> ?ghost:bool -> ?decl:Location.t -> bool -> bool
+  ?source:bool -> ?temp:bool -> ?referenced:bool -> ?ghost:bool -> ?loc:Location.t -> bool -> bool
   -> string -> typ -> varinfo
 
 (** Make a formal variable for a function declaration. Insert it in both the
@@ -686,7 +686,7 @@ val makeVarinfo:
 
     @modify 19.0-Potassium adds the optional ghost parameter
 *)
-val makeFormalVar: fundec -> ?ghost:bool -> ?where:string -> string -> typ -> varinfo
+val makeFormalVar: fundec -> ?ghost:bool -> ?where:string -> ?loc:Location.t -> string -> typ -> varinfo
 
 (** Make a local variable and add it to a function's slocals and to the given
     block (only if insert = true, which is the default).
@@ -700,7 +700,7 @@ val makeFormalVar: fundec -> ?ghost:bool -> ?where:string -> string -> typ -> va
 *)
 val makeLocalVar:
   fundec -> ?scope:block -> ?temp:bool -> ?referenced:bool -> ?insert:bool ->
-  ?decl:Location.t -> string -> typ -> varinfo
+  ?loc:Location.t -> string -> typ -> varinfo
 
 (** if needed, rename the given varinfo so that its [vname] does not
     clash with the one of a local or formal variable of the given function.
@@ -720,11 +720,11 @@ val refresh_local_name: fundec -> varinfo -> unit
     only be changed if you are completely sure this is not useful.
  *)
 val makeTempVar: fundec -> ?insert:bool -> ?name:string -> ?descr:string ->
-                 ?descrpure:bool -> ?decl:Location.t -> typ -> varinfo
+                 ?descrpure:bool -> ?loc:Location.t -> typ -> varinfo
 
 (** Make a global variable. Your responsibility to make sure that the name
     is unique. [source] defaults to [true]. [temp] defaults to [false].*)
-val makeGlobalVar: ?source:bool -> ?temp:bool -> ?referenced:bool -> string ->
+val makeGlobalVar: ?source:bool -> ?temp:bool -> ?referenced:bool -> ?loc:Location.t -> string ->
   typ -> varinfo
 
 (** Make a shallow copy of a [varinfo] and assign a new identifier.

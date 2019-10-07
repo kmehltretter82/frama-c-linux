@@ -601,7 +601,7 @@ let rec unrollTypeSkel = function
 
 (* Make a varinfo. Used mostly as a helper function below  *)
 let makeVarinfo
-    ?(source=true) ?(temp=false) ?(referenced=false) ?(ghost=false) ?(decl=Location.unknown)
+    ?(source=true) ?(temp=false) ?(referenced=false) ?(ghost=false) ?(loc=Location.unknown)
     global formal name typ
   =
   let vi =
@@ -613,7 +613,7 @@ let makeVarinfo
       vformal = formal;
       vtemp = temp;
       vtype = typ;
-      vdecl = decl;
+      vdecl = loc;
       vinline = false;
       vattr = [];
       vstorage = NoStorage;
@@ -5228,17 +5228,16 @@ let rec findUniqueName ?(suffix="") fdec name =
 let refresh_local_name fdec vi =
   let new_name = findUniqueName fdec vi.vname in vi.vname <- new_name
 
-let makeLocal ?(temp=false) ?referenced ?ghost ?(formal=false) ?(decl=Location.unknown) fdec name typ =
+let makeLocal ?(temp=false) ?referenced ?ghost ?(formal=false) ?loc fdec name typ =
   (* a helper function *)
   let name = findUniqueName fdec name in
   fdec.smaxid <- 1 + fdec.smaxid;
-  let vi = makeVarinfo ~temp ?referenced ?ghost ~decl false formal name typ in
+  let vi = makeVarinfo ~temp ?referenced ?ghost ?loc false formal name typ in
   vi
 
 (* Make a local variable and add it to a function *)
-let makeLocalVar fdec ?scope ?(temp=false) ?referenced ?(insert=true)
-    ?(decl=Location.unknown) name typ =
-  let vi = makeLocal ~temp ?referenced ~decl fdec name typ in
+let makeLocalVar fdec ?scope ?(temp=false) ?referenced ?(insert=true) ?loc name typ =
+  let vi = makeLocal ~temp ?referenced ?loc fdec name typ in
   refresh_local_name fdec vi;
   if insert then
     begin
@@ -5252,9 +5251,8 @@ let makeLocalVar fdec ?scope ?(temp=false) ?referenced ?(insert=true)
     end;
   vi
 
-let makeTempVar fdec ?insert ?(name = "__cil_tmp") ?descr ?(descrpure = true)
-    ?(decl=Location.unknown) typ : varinfo =
-  let vi = makeLocalVar fdec ~temp:true ?insert ~decl name typ in
+let makeTempVar fdec ?insert ?(name = "__cil_tmp") ?descr ?(descrpure = true) ?loc typ : varinfo =
+  let vi = makeLocalVar fdec ~temp:true ?insert ?loc name typ in
   vi.vdescr <- descr;
   vi.vdescrpure <- descrpure;
   vi
@@ -5303,10 +5301,10 @@ let setMaxId (f: fundec) =
  * this one. If where = "^" then it is inserted first. If where = "$" then
  * it is inserted last. Otherwise where must be the name of a formal after
  * which to insert this. By default it is inserted at the end. *)
-let makeFormalVar fdec ?(ghost=fdec.svar.vghost) ?(where = "$") name typ : varinfo =
+let makeFormalVar fdec ?(ghost=fdec.svar.vghost) ?(where = "$") ?loc name typ : varinfo =
   assert ((not fdec.svar.vghost) || ghost) ;
   let makeit name =
-    let vi = makeLocal ~ghost ~formal:true fdec name typ in
+    let vi = makeLocal ~ghost ?loc ~formal:true fdec name typ in
     if ghost && not fdec.svar.vghost then
       vi.vattr <- addAttribute (Attr(frama_c_ghost_formal, [])) vi.vattr ;
     vi
@@ -5340,14 +5338,14 @@ let makeFormalVar fdec ?(ghost=fdec.svar.vghost) ?(where = "$") name typ : varin
 
 (* Make a global variable. Your responsibility to make sure that the name
  * is unique *)
-let makeGlobalVar ?source ?temp ?referenced name typ =
-  makeVarinfo ?source ?temp ?referenced true false name typ
+let makeGlobalVar ?source ?temp ?referenced ?loc name typ =
+  makeVarinfo ?source ?temp ?referenced ?loc true false name typ
 
 let mkPureExprInstr ~fundec ~scope ?loc e =
   let loc = match loc with None -> e.eloc | Some l -> l in
   let typ = typeOf e in
   let descr = Format.asprintf "%a" !pp_exp_ref e in
-  let tmp = makeLocalVar ~temp:true ~scope fundec "tmp" typ in
+  let tmp = makeLocalVar ~temp:true ~scope ~loc fundec "tmp" typ in
   tmp.vdescr <- Some descr;
   tmp.vdefined <- true;
   Local_init(tmp, AssignInit (SingleInit e), loc)
