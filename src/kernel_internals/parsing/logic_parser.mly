@@ -721,8 +721,8 @@ cv:
 
 type_spec_cv:
      type_spec { $1 }
-|    cv type_spec { LTattribute ($2, $1) }
-|    type_spec cv { LTattribute ($1, $2) }
+|    cv type_spec_cv { LTattribute ($2, $1) }
+|    type_spec_cv cv { LTattribute ($1, $2) }
 
 cast_logic_type:
  | type_spec_cv abs_spec_cv_option { $2 $1 }
