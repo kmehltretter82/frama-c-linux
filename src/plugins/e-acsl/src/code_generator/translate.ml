@@ -369,7 +369,7 @@ and context_insensitive_term_to_exp kf env t =
             guard
             (Logic_const.prel ~loc (Req, t2, zero))
         in
-        Env.add_assert env cond (Logic_const.prel (Rneq, t2, zero));
+        Env.add_assert kf cond (Logic_const.prel (Rneq, t2, zero));
         let instr = Misc.mk_call ~loc name [ e; e1; e2 ] in
         [ cond; instr ]
       in
@@ -619,7 +619,7 @@ and comparison_to_exp
     Error.not_yet "comparison involving real numbers"
 
 and at_to_exp_no_lscope env kf t_opt label e =
-  let stmt = E_acsl_label.get_stmt label in
+  let stmt = E_acsl_label.get_stmt kf label in
   (* generate a new variable denoting [\at(t',label)].
      That is this variable which is the resulting expression.
      ACSL typing rule ensures that the type of this variable is the same as
@@ -660,9 +660,10 @@ and at_to_exp_no_lscope env kf t_opt label e =
       Cil.ChangeTo stmt
   end
   in
-  let _new_stmt = Visitor.visitFramacStmt o stmt in
-  (* [TODO ARCHI] reimplement *)
-  (*Visitor_behavior.Set.stmt bhv stmt new_stmt;*)
+  (* [TODO ARCHI] is it still useful? *)
+  ignore (Visitor.visitFramacStmt o stmt);
+  (*let _new_stmt = Visitor.visitFramacStmt o stmt in
+  Visitor_behavior.Set.stmt bhv stmt new_stmt;*)
   res, !env_ref, C_number
 
 and env_of_li li kf env loc =

@@ -69,19 +69,15 @@ let move kf ~old new_stmt =
     in
     List.iter mv_labels f.sallstmts
 
-(* [TODO ARCHI] reimplement it *)
-let get_stmt = function
+let get_stmt kf = function
   | StmtLabel { contents = stmt } -> stmt
-  | BuiltinLabel Here ->
-(*    (match vis#current_stmt with
-    | None -> Error.not_yet "label \"Here\" in function contract"
-      | Some s -> s)*) assert false
+  | BuiltinLabel Here -> Error.not_yet "Label 'Here'"
   | BuiltinLabel(Old | Pre) ->
-(*    (try Kernel_function.find_first_stmt (Extlib.the vis#current_kf)
-      with Kernel_function.No_Statement -> assert false)*)assert false
+    (try Kernel_function.find_first_stmt kf
+      with Kernel_function.No_Statement -> assert false)
   | BuiltinLabel(Post) ->
-(*    (try Kernel_function.find_return (Extlib.the vis#current_kf)
-      with Kernel_function.No_Statement -> assert false)*) assert false
+    (try Kernel_function.find_return kf
+     with Kernel_function.No_Statement -> assert false)
   | BuiltinLabel _ | FormalLabel _ -> assert false
 
 (*

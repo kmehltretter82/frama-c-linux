@@ -203,8 +203,8 @@ let index_from_sizes_and_shifts ~loc sizes_and_shifts =
   in
   sum
 
-let put_block_at_label env block label =
-  let stmt = Label.get_stmt label in
+let put_block_at_label env kf block label =
+  let stmt = Label.get_stmt kf label in
   let env_ref = ref env in
   let o = object
     inherit Visitor.frama_c_inplace
@@ -336,7 +336,7 @@ let to_exp ~loc kf env pot label =
     Env.After
   in
   (* Put at label *)
-  let env = put_block_at_label env storing_loops_block label in
+  let env = put_block_at_label env kf storing_loops_block label in
   (* Returning *)
   let lval_at_index, env = lval_at_index ~loc kf env (e_at, vi_at, t_index) in
   let e = Cil.new_exp ~loc (Lval lval_at_index) in

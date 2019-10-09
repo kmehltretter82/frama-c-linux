@@ -311,23 +311,15 @@ module Logic_scope = struct
     else env
 end
 
-let _emitter = (* [TODO ARCHI] *)
+let emitter =
   Emitter.create
     "E_ACSL"
     [ Emitter.Code_annot ]
     ~correctness:[ Options.Gmp_only.parameter ]
     ~tuning:[]
 
-(* [TODO ARCHI] to be reimplemented *)
-let add_assert _env _stmt _annot = assert false
-(*match current_kf env with
-  | None -> assert false
-  | Some _kf ->
-(*    Queue.add
-      (fun () -> Annotations.add_assert emitter ~kf stmt annot)
-      env.visitor#get_filling_actions
-                                   *)*)
-
+(* [TODO ARCHI] to be inlined? *)
+let add_assert kf stmt annot = Annotations.add_assert emitter ~kf stmt annot
 
 let add_stmt ?(post=false) ?before env kf stmt =
   if not post then

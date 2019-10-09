@@ -75,7 +75,7 @@ module Logic_binding: sig
 
 end
 
-val add_assert: t -> stmt -> predicate -> unit
+val add_assert: kernel_function -> stmt -> predicate -> unit
 (** [add_assert env s p] associates the assertion [p] to the statement [s] in
     the environment [env]. *)
 

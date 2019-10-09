@@ -177,10 +177,8 @@ let generate_kf ~loc fname env ret_ty params_ty li =
   in
   Cil.setMaxId fundec;
   let spec = Cil.empty_funspec () in
-  (*[TODO ARCHI] reimplement *)
-(*  Queue.add
-    (fun () -> Globals.Functions.replace_by_definition spec fundec loc)
-    (Env.get_visitor env)#get_filling_actions;*)
+  (* register the definition *)
+  Globals.Functions.replace_by_definition spec fundec loc;
   (* create the kernel function itself *)
   let kf = { fundec = Definition(fundec, loc); spec } in
   (* closure generating the function's body.
