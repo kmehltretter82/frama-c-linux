@@ -1321,6 +1321,16 @@ module Constfold =
     end)
 
 let () = Parameter_customize.set_group normalisation
+module ContractFiniteFloat =
+  False
+    (struct
+       let option_name = "-contract-finite-float"
+       let module_name = "ContractFiniteFloat"
+       let help = "Add requires in contract to forbid cases that ensures \
+                   infinite or nan behaviors"
+     end)
+
+let () = Parameter_customize.set_group normalisation
 let () = Parameter_customize.do_not_reset_on_copy ()
 module InitializedPaddingLocals =
   True

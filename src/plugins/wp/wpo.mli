@@ -79,7 +79,8 @@ module VC_Annot :
 sig
 
   type t = {
-    axioms : Definitions.axioms option ;
+    axioms
+    : Definitions.axioms option ;
     goal : GOAL.t ;
     tags : Splitter.tag list ;
     warn : Warning.t list ;

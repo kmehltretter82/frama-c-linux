@@ -1,0 +1,39 @@
+[kernel] Parsing tests/float/contract_finite_float.c (with preprocessing)
+[kernel] Failure: No kernel function for __builtin_va_copy(11)
+[kernel] Current source was: :0
+  The full backtrace is:
+  Raised at file "src/kernel_services/plugin_entry_points/log.ml" (inlined), line 532, characters 24-31
+  Called from file "src/kernel_services/plugin_entry_points/log.ml", line 1098, characters 17-55
+  Called from file "src/kernel_services/plugin_entry_points/log.ml", line 525, characters 9-23
+  Re-raised at file "src/kernel_services/plugin_entry_points/log.ml", line 528, characters 9-16
+  Called from file "src/kernel_services/visitors/visitor.ml", line 630, characters 10-68
+  Called from file "src/kernel_services/ast_queries/cil.ml", line 1237, characters 15-31
+  Called from file "src/kernel_services/ast_queries/cil.ml", line 2742, characters 4-52
+  Called from file "src/kernel_services/ast_queries/cil.ml" (inlined), line 5458, characters 16-36
+  Called from file "src/kernel_services/ast_queries/cil.ml", line 5461, characters 13-20
+  Called from file "list.ml", line 106, characters 12-15
+  Called from file "src/kernel_services/ast_queries/cil.ml", line 5108, characters 2-29
+  Called from file "src/kernel_services/ast_queries/cil.ml", line 5459, characters 2-359
+  Called from file "src/kernel_services/ast_queries/cil.ml", line 1182, characters 19-39
+  Called from file "src/kernel_services/ast_queries/cil.ml", line 5492, characters 6-102
+  Called from file "src/kernel_services/visitors/visitor.ml" (inlined), line 853, characters 2-45
+  Called from file "src/kernel_services/ast_transformations/contract_finite_float.ml", line 35, characters 4-48
+  Called from file "src/kernel_services/ast_queries/file.ml", line 1043, characters 2-7
+  Called from file "queue.ml", line 105, characters 6-15
+  Called from file "src/topological.ml", line 137, characters 18-25
+  Called from file "src/kernel_services/ast_queries/file.ml", line 1099, characters 2-36
+  Called from file "src/kernel_services/ast_queries/file.ml", line 1567, characters 2-22
+  Called from file "src/kernel_services/ast_queries/file.ml", line 1645, characters 4-27
+  Called from file "src/kernel_services/ast_data/ast.ml", line 110, characters 2-28
+  Called from file "src/kernel_services/ast_data/ast.ml", line 118, characters 53-71
+  Called from file "src/kernel_internals/runtime/boot.ml", line 29, characters 6-20
+  Called from file "src/kernel_services/cmdline_parameters/cmdline.ml", line 792, characters 2-9
+  Called from file "src/kernel_services/cmdline_parameters/cmdline.ml", line 822, characters 18-64
+  Called from file "src/kernel_services/cmdline_parameters/cmdline.ml", line 229, characters 4-8
+  
+  Frama-C aborted: internal error.
+  Please report as 'crash' at http://bts.frama-c.com/.
+  Your Frama-C version is 19.1+dev (Potassium).
+  Note that a version and a backtrace alone often do not contain enough
+  information to understand the bug. Guidelines for reporting bugs are at:
+  http://bts.frama-c.com/dokuwiki/doku.php?id=mantis:frama-c:bug_reporting_guidelines

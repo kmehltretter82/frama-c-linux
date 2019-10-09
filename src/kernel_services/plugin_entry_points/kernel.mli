@@ -456,6 +456,9 @@ module SimplifyTrivialLoops: Parameter_sig.Bool
 module Constfold: Parameter_sig.Bool
 (** Behavior of option "-constfold" *)
 
+module ContractFiniteFloat: Parameter_sig.Bool
+  (** Behavior of option "-contract-finite-float" *)
+
 module InitializedPaddingLocals: Parameter_sig.Bool
 (** Behavior of option "-initialized-padding-locals" *)
 
