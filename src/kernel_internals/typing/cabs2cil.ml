@@ -857,9 +857,14 @@ type envdata =
                                          * declared labels. The lookup name
                                          * for this category is "label foo" *)
 
-let env : (string, envdata * location) H.t = H.create 307
+let env  = Datatype.String.Hashtbl.create 307
+(* ghost environment: keep track of all symbols, in the order
+   in which they have been introduced. Superset of env *)
+let ghost_env = Datatype.String.Hashtbl.create 307
 (* We also keep a global environment. This is always a subset of the env *)
-let genv : (string, envdata * location) H.t = H.create 307
+let global_env = Datatype.String.Hashtbl.create 307
+(* ghost global environment: superset of global and subset of ghost *)
+let ghost_global_env = Datatype.String.Hashtbl.create 307
 
 let label_env = Datatype.String.Hashtbl.create 307
 
@@ -870,8 +875,9 @@ let add_label_env lab =
       Datatype.String.Map.add v vi map
     | _ -> map
   in
-  let lab_env = H.fold add_if_absent env Datatype.String.Map.empty in
-  Datatype.String.Hashtbl.add label_env lab lab_env
+  let open Datatype.String.Hashtbl in
+  let lab_env = fold add_if_absent env Datatype.String.Map.empty in
+  add label_env lab lab_env
 
 let remove_label_env lab =
   Datatype.String.Hashtbl.remove label_env lab
@@ -879,50 +885,59 @@ let remove_label_env lab =
 (* In the scope we keep the original name, so we can remove them from the
  * hash table easily *)
 type undoScope =
-    UndoRemoveFromEnv of string
+    UndoRemoveFromEnv of bool * string (* boolean indicates whether we should
+                                          remove from ghost env only, or both.*)
   | UndoAlphaEnv of location Alpha.undoAlphaElement list
 
 let scopes :  undoScope list ref list ref = ref []
 
 (* tries to estimate if the name 's' was declared in the current scope;
    note that this may not work in all cases *)
-let declared_in_current_scope s =
+let declared_in_current_scope ~ghost s =
   match !scopes with
-  | [] -> (* global scope: check if present in genv *) H.mem genv s
+  | [] -> (* global scope *)
+    let env = if ghost then ghost_global_env else global_env in
+    Datatype.String.Hashtbl.mem env s
   | cur_scope :: _ ->
     let names_declared_in_current_scope =
       Extlib.filter_map
-        (function UndoRemoveFromEnv _  -> true | UndoAlphaEnv _ -> false)
         (function
-          | UndoRemoveFromEnv s -> s
+          | UndoRemoveFromEnv (ghost',_)  -> ghost || not ghost'
+          | UndoAlphaEnv _ -> false)
+        (function
+          | UndoRemoveFromEnv (_, s) -> s
           | UndoAlphaEnv _ -> assert false (* already filtered *)
         ) !cur_scope
     in
     List.mem s names_declared_in_current_scope
 
 (* When you add to env, you also add it to the current scope *)
-let addLocalToEnv (n: string) (d: envdata) =
-  (*log "%a: adding local %s to env\n" d_loc !currentLoc n; *)
-  H.add env n (d, CurrentLoc.get ());
+let addLocalToEnv ghost name data =
+  let v = data, CurrentLoc.get() in
+  Datatype.String.Hashtbl.add ghost_env name v;
+  if not ghost then Datatype.String.Hashtbl.add env name v;
   (* If we are in a scope, then it means we are not at top level. Add the
    * name to the scope *)
-  (match !scopes with
+  match !scopes with
    | [] -> begin
-       match d with
+      match data with
        | EnvVar _ ->
          Kernel.fatal ~current:true
-           "addLocalToEnv: not in a scope when adding %s!" n
+          "addLocalToEnv: not in a scope when adding %s!" name
        | _ ->
-         H.add genv n (d,CurrentLoc.get()) (* We might add types *)
+        (* Adding a type with local scope *)
+        Datatype.String.Hashtbl.add ghost_global_env name v;
+        if not ghost then Datatype.String.Hashtbl.add global_env name v
      end
-   | s :: _ ->
-     s := (UndoRemoveFromEnv n) :: !s)
+  | s :: _ -> s := UndoRemoveFromEnv (ghost, name) :: !s
 
-let addGlobalToEnv (k: string) (d: envdata) : unit =
-  (*  ignore (E.log "%a: adding global %s to env\n" d_loc !currentLoc k); *)
-  H.add env k (d, CurrentLoc.get ());
-  (* Also add it to the global environment *)
-  H.add genv k (d, CurrentLoc.get ())
+let addGlobalToEnv ghost name data =
+  let open Datatype.String.Hashtbl in
+  let v = data, CurrentLoc.get () in
+  add ghost_env name v;
+  if not ghost then add env name v;
+  add ghost_global_env name v;
+  if not ghost then add global_env name v
 
 (* Create a new name based on a given name. The new name is formed from a
  * prefix (obtained from the given name as the longest prefix that ends with
@@ -966,12 +981,15 @@ let is_same_kind kind info =
   | "", EnvVar _ -> true
   | _, _ -> false
 
-let find_identifier_decl name info =
+let find_identifier_decl ghost name info =
   match info with
-  | UndoRemoveFromEnv name' -> name = name'
+  | UndoRemoveFromEnv (ghost', name') ->
+    (ghost || not ghost') && name = name'
   | _ -> false
 
-let newAlphaName (globalscope: bool) (* The name should have global scope *)
+let newAlphaName
+    ghost
+    (globalscope: bool) (* The name should have global scope *)
     (kind: string)
     (origname: string) : string * location =
   let lookupname = kindPlusName kind origname in
@@ -1001,10 +1019,15 @@ let newAlphaName (globalscope: bool) (* The name should have global scope *)
     try
       let info =
         if !scopes = [] then begin
-          fst (H.find genv lookupname)
+          let env = if ghost then ghost_global_env else global_env in
+          fst (Datatype.String.Hashtbl.find env lookupname)
         end else
-        if List.exists (find_identifier_decl lookupname) !(List.hd !scopes)
-        then fst (H.find env lookupname)
+        if List.exists
+            (find_identifier_decl ghost lookupname) !(List.hd !scopes)
+        then begin
+          let env = if ghost then ghost_env else env in
+          fst (Datatype.String.Hashtbl.find env lookupname)
+        end
         else raise Not_found
       in
       if not (Kernel.C11.get () && kind = "type") then
@@ -1045,51 +1068,33 @@ let constrExprId = ref 0
 
 
 let startFile () =
-  Datatype.String.Hashtbl.clear label_env;
-  H.clear env;
-  H.clear genv;
+  let open Datatype.String.Hashtbl in
+  clear label_env;
+  clear env;
+  clear ghost_env;
   H.clear alphaTable;
-  lastStructId := 0;
-;;
+  lastStructId := 0
 
 (* Lookup a variable name. Return also the location of the definition. Might
  * raise Not_found  *)
-let lookupVar (n: string) : varinfo * location =
-  match H.find env n with
+let lookupVar ghost name =
+  let env = if ghost then ghost_env else env in
+  match Datatype.String.Hashtbl.find env name with
   | (EnvVar vi), loc -> vi, loc
   | _ -> raise Not_found
 
-
-let lookupGlobalVar (n: string) : varinfo * location =
-  match H.find genv n with
+let lookupGlobalVar ghost name =
+  let env = if ghost then ghost_global_env else global_env in
+  match Datatype.String.Hashtbl.find env name with
   | (EnvVar vi), loc -> vi, loc
   | _ -> raise Not_found
-
-let _docEnv () =
-  let acc : (string * (envdata * location)) list ref = ref [] in
-  let doone fmt = function
-      EnvVar vi, l ->
-      Format.fprintf fmt "Var(%s,global=%b) (at %a)"
-        vi.vname vi.vglob Cil_printer.pp_location l
-    | EnvEnum (_item), l -> Format.fprintf fmt "Enum (at %a)" Cil_printer.pp_location l
-    | EnvTyp _t, _l -> Format.fprintf fmt "typ"
-    | EnvLabel l, _ -> Format.fprintf fmt "label %s" l
-  in
-  H.iter (fun k d -> acc := (k, d) :: !acc) env;
-  Pretty_utils.pp_list ~sep:"@\n"
-    (fun fmt (k, d) -> Format.fprintf fmt "  %s -> %a" k doone d)
-    Format.std_formatter
-    !acc
-
-
 
 (* Add a new variable. Do alpha-conversion if necessary *)
-let alphaConvertVarAndAddToEnv (addtoenv: bool) (vi: varinfo) : varinfo =
-(*
-  ignore (E.log "%t: alphaConvert(addtoenv=%b) %s" d_thisloc addtoenv vi.vname);
-*)
+let alphaConvertVarAndAddToEnv addtoenv vi =
   (* Announce the name to the alpha conversion table *)
-  let newname, oldloc = newAlphaName (addtoenv && vi.vglob) "" vi.vname in
+  let newname, oldloc =
+    newAlphaName vi.vghost (addtoenv && vi.vglob) "" vi.vname
+  in
   (* Make a copy of the vi if the name has changed. Never change the name for
    * global variables *)
   let newvi =
@@ -1136,9 +1141,9 @@ let alphaConvertVarAndAddToEnv (addtoenv: bool) (vi: varinfo) : varinfo =
 
   (if addtoenv then
      if vi.vglob then
-       addGlobalToEnv vi.vname (EnvVar newvi)
+       addGlobalToEnv vi.vghost vi.vname (EnvVar newvi)
      else
-       addLocalToEnv vi.vname (EnvVar newvi));
+       addLocalToEnv vi.vghost vi.vname (EnvVar newvi));
 (*
   ignore (E.log "  new=%s\n" newvi.vname);
 *)
@@ -1163,7 +1168,7 @@ end
 let constFoldType (t:typ) : typ =
   visitCilType constFoldTypeVisitor t
 
-let get_temp_name ?(ghost=false) () =
+let get_temp_name ghost () =
   let undolist = ref [] in
   let data = CurrentLoc.get() in
   let name = if ghost then "g_tmp" else "tmp" in
@@ -1177,7 +1182,7 @@ let get_temp_name ?(ghost=false) () =
 (* Create a new temporary variable *)
 let newTempVar ~ghost loc descr (descrpure:bool) typ =
   let t' = (!typeForInsertedVar) typ in
-  let name = get_temp_name ~ghost () in
+  let name = get_temp_name ghost () in
   let vi = makeVarinfo ~ghost ~temp:true ~loc false false name t' in
   vi.vdescr <- Some descr;
   vi.vdescrpure <- descrpure;
@@ -1208,19 +1213,18 @@ let compInfoNameEnv : (string, compinfo) H.t = H.create 113
 let enumInfoNameEnv : (string, enuminfo) H.t = H.create 113
 
 
-let lookupTypeNoError (kind: string)
-    (n: string) : typ * location =
-  let kn = kindPlusName kind n in
-  match H.find env kn with
+let lookupTypeNoError ghost kind name =
+  let kn = kindPlusName kind name in
+  let env = if ghost then ghost_env else env in
+  match Datatype.String.Hashtbl.find env kn with
   | EnvTyp t, l -> t, l
   | _ -> raise Not_found
 
-let lookupType (kind: string)
-    (n: string) : typ * location =
+let lookupType ghost kind name =
   try
-    lookupTypeNoError kind n
+    lookupTypeNoError ghost kind name
   with Not_found ->
-    Kernel.fatal ~current:true "Cannot find type %s (kind:%s)" n kind
+    Kernel.fatal ~current:true "Cannot find type %s (kind:%s)" name kind
 
 (* Create the self ref cell and add it to the map. Return also an indication
  * if this is a new one. *)
@@ -1256,28 +1260,28 @@ let createEnumInfo (n: string) ~(norig:string) : enuminfo * bool =
 
 
 (* kind is either "struct" or "union" or "enum" and n is a name *)
-let findCompType (kind: string) (n: string) (a: attributes) =
+let findCompType ghost kind name attr =
   let makeForward () =
     (* This is a forward reference, either because we have not seen this
      * struct already or because we want to create a version with different
      * attributes  *)
     if kind = "enum" then
-      let enum, isnew = createEnumInfo n n in
+      let enum, isnew = createEnumInfo name name in
       if isnew then
         cabsPushGlobal (GEnumTagDecl (enum, CurrentLoc.get ()));
-      TEnum (enum, a)
+      TEnum (enum, attr)
     else
       let iss = if kind = "struct" then true else false in
-      let self, isnew = createCompInfo iss n ~norig:n in
+      let self, isnew = createCompInfo iss name ~norig:name in
       if isnew then
         cabsPushGlobal (GCompTagDecl (self, CurrentLoc.get ()));
-      TComp (self, empty_size_cache (), a)
+      TComp (self, empty_size_cache (), attr)
   in
   try
-    let old, _ = lookupTypeNoError kind n in (* already defined  *)
+    let old, _ = lookupTypeNoError ghost kind name in (* already defined  *)
     let olda = typeAttrs old in
     let equal =
-      try List.for_all2 Cil_datatype.Attribute.equal olda a
+      try List.for_all2 Cil_datatype.Attribute.equal olda attr
       with Invalid_argument _ -> false
     in
     if equal then old else makeForward ()
@@ -2200,7 +2204,7 @@ type loopstate =
 let continues : loopstate list ref = ref []
 
 (* Sometimes we need to create new label names *)
-let newLabelName (base: string) = fst (newAlphaName false "label" base)
+let newLabelName ghost base = fst (newAlphaName ghost false "label" base)
 
 let continueOrLabelChunk ~ghost (l: location) : chunk =
   match !continues with
@@ -2209,14 +2213,14 @@ let continueOrLabelChunk ~ghost (l: location) : chunk =
     if !doTransformWhile then
       begin
         if !lr = "" then begin
-          lr := newLabelName "__Cont"
+          lr := newLabelName ghost "__Cont"
         end;
         gotoChunk ~ghost !lr l
       end
     else continueChunk ~ghost l
   | NotWhile lr :: _ ->
     if !lr = "" then begin
-      lr := newLabelName "__Cont"
+      lr := newLabelName ghost "__Cont"
     end;
     gotoChunk ~ghost !lr l
 
@@ -2237,21 +2241,21 @@ let exit_break_env () =
   ignore (Stack.pop break_env)
 
 (* In GCC we can have locally declared labels. *)
-let genNewLocalLabel (l: string) =
+let genNewLocalLabel ghost l =
   (* Call the newLabelName to register the label name in the alpha conversion
    * table. *)
-  let l' = newLabelName l in
+  let l' = newLabelName ghost l in
   (* Add it to the environment *)
-  addLocalToEnv (kindPlusName "label" l) (EnvLabel l');
+  addLocalToEnv ghost (kindPlusName "label" l) (EnvLabel l');
   l'
 
-let lookupLabel (l: string) =
+let lookupLabel ghost l =
   try
-    match H.find env (kindPlusName "label" l) with
+    let env = if ghost then ghost_env else env in
+    match Datatype.String.Hashtbl.find env (kindPlusName "label" l) with
     | EnvLabel l', _ -> l'
     | _ -> raise Not_found
-  with Not_found ->
-    l
+  with Not_found -> l
 
 class gatherLabelsClass : V.cabsVisitor = object (self)
   inherit V.nopCabsVisitor
@@ -2297,7 +2301,9 @@ class gatherLabelsClass : V.cabsVisitor = object (self)
              (* Mark this label as defined *)
              H.replace localLabels lbl (Some (CurrentLoc.get())))
         with Not_found -> (* lbl is not a local label *)
-          let newname, oldloc = newAlphaName false "label" lbl in
+          let newname, oldloc =
+            newAlphaName s.stmt_ghost false "label" lbl
+          in
           if newname <> lbl then
             Kernel.error ~once:true ~current:true
               "Duplicate label '%s' (previous definition was at %a)"
@@ -2947,7 +2953,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
         "makeGlobalVarinfo isadef=%B vi.vname=%s(%d), vreferenced=%B"
         isadef vi.vname vi.vid vi.vreferenced;
       (* This may throw an exception Not_found *)
-      let oldvi, oldloc = lookupGlobalVar vi.vname in
+      let oldvi, oldloc = lookupGlobalVar vi.vghost vi.vname in
       Kernel.debug ~dkey:Kernel.dkey_typing_global
         "  %s(%d) already in the env at loc %a"
         vi.vname oldvi.vid Cil_printer.pp_location oldloc;
@@ -3118,8 +3124,9 @@ let setupBuiltin ?(force_keep=false) name ?spec (resTyp, args_or_argtypes, isva)
   v
 ;;
 
+(*  builtin is never ghost *)
 let memoBuiltin ?force_keep ?spec name proto =
-  try fst (lookupGlobalVar name)
+  try fst (lookupGlobalVar false name)
   with Not_found -> setupBuiltin ?force_keep ?spec name proto
 
 let vla_alloc_fun () =
@@ -3812,7 +3819,8 @@ struct
   let find_macro _ = raise Not_found
   let find_var ?label ~var =
     let find_from_curr_env test =
-      match H.find env var with
+      (* logic has always access to the ghost variables. *)
+      match Datatype.String.Hashtbl.find ghost_env var with
       | EnvVar vi, _ when test vi -> cvar_to_lvar vi
       | _ -> raise Not_found
     in
@@ -3831,7 +3839,8 @@ struct
         (Datatype.String.Map.find var
            (Datatype.String.Hashtbl.find label_env lab))
 
-  let find_enum_tag x = match H.find env x with
+  let find_enum_tag x =
+    match Datatype.String.Hashtbl.find ghost_env x with
     | EnvEnum item,_ ->
       dummy_exp (Const (CEnum item)), typeOf item.eival
     | _ -> raise Not_found
@@ -3840,10 +3849,10 @@ struct
 
   let find_type namespace s =
     match namespace with
-    | Logic_typing.Typedef -> let t,_ = lookupTypeNoError "type" s in t
-    | Logic_typing.Union -> findCompType "union" s []
-    | Logic_typing.Struct -> findCompType "struct" s []
-    | Logic_typing.Enum -> findCompType "enum" s []
+    | Logic_typing.Typedef -> let t,_ = lookupTypeNoError true "type" s in t
+    | Logic_typing.Union -> findCompType true "union" s []
+    | Logic_typing.Struct -> findCompType true "struct" s []
+    | Logic_typing.Enum -> findCompType true "enum" s []
 
   include Logic_labels
 
@@ -3902,8 +3911,10 @@ let exitScope () =
   scopes := rest;
   let rec loop = function
       [] -> ()
-    | UndoRemoveFromEnv n :: t ->
-      H.remove env n; loop t
+    | UndoRemoveFromEnv (ghost, n) :: t ->
+      Datatype.String.Hashtbl.remove ghost_env n;
+      if not ghost then Datatype.String.Hashtbl.remove env n;
+      loop t
     | UndoAlphaEnv undolist :: t ->
       Alpha.undoAlphaChanges ~alphaTable ~undolist;
       loop t
@@ -4500,15 +4511,16 @@ let rec doSpecList ghost (suggestedAnonName: string)
       TBuiltin_va_list []
     | [A.Tnamed "__fc_builtin_size_t"] -> Cil.theMachine.typeOfSizeOf
     | [A.Tnamed n] ->
-      (match lookupType "type" n with
+      (match lookupType ghost "type" n with
        | (TNamed _) as x, _ -> x
        | _ ->
          Kernel.fatal ~current:true "Named type %s is not mapped correctly" n)
 
     | [A.Tstruct (n, None, _)] -> (* A reference to a struct *)
       if n = "" then
-        Kernel.error ~once:true ~current:true "Missing struct tag on incomplete struct";
-      findCompType "struct" n []
+        Kernel.error ~once:true ~current:true
+          "Missing struct tag on incomplete struct";
+      findCompType ghost "struct" n []
     | [A.Tstruct (n, Some nglist, extraAttrs)] -> (* A definition of a struct *)
       let n' =
         if n <> "" then n else anonStructName "struct" suggestedAnonName in
@@ -4518,8 +4530,9 @@ let rec doSpecList ghost (suggestedAnonName: string)
 
     | [A.Tunion (n, None, _)] -> (* A reference to a union *)
       if n = "" then
-        Kernel.error ~once:true ~current:true "Missing union tag on incomplete union";
-      findCompType "union" n []
+        Kernel.error ~once:true ~current:true
+          "Missing union tag on incomplete union";
+      findCompType ghost "union" n []
     | [A.Tunion (n, Some nglist, extraAttrs)] -> (* A definition of a union *)
       let n' =
         if n <> "" then n else anonStructName "union" suggestedAnonName in
@@ -4529,14 +4542,15 @@ let rec doSpecList ghost (suggestedAnonName: string)
 
     | [A.Tenum (n, None, _)] -> (* Just a reference to an enum *)
       if n = "" then
-        Kernel.error ~once:true ~current:true "Missing enum tag on incomplete enum";
-      findCompType "enum" n []
+        Kernel.error ~once:true ~current:true
+          "Missing enum tag on incomplete enum";
+      findCompType ghost "enum" n []
 
     | [A.Tenum (n, Some eil, extraAttrs)] -> (* A definition of an enum *)
       let n' =
         if n <> "" then n else anonStructName "enum" suggestedAnonName in
       (* make a new name for this enumeration *)
-      let n'', _  = newAlphaName true "enum" n' in
+      let n'', _  = newAlphaName ghost true "enum" n' in
 
       (* Create the enuminfo, or use one that was created already for a
        * forward reference *)
@@ -4589,14 +4603,14 @@ let rec doSpecList ghost (suggestedAnonName: string)
 
         (* add this tag to the list so that it ends up in the real
          * environment when we're finished  *)
-        let newname, _  = newAlphaName true "" kname in
+        let newname, _  = newAlphaName ghost true "" kname in
         let item = { eiorig_name = kname;
                      einame = newname;
                      eival = i;
                      eiloc = loc;
                      eihost = enum }
         in
-        addLocalToEnv kname (EnvEnum item);
+        addLocalToEnv ghost kname (EnvEnum item);
         (kname, item) :: loop (increm i 1) rest
       end
 
@@ -4653,7 +4667,7 @@ let rec doSpecList ghost (suggestedAnonName: string)
         enum.ekind <- ekind;
       end;
       (* Record the enum name in the environment *)
-      addLocalToEnv (kindPlusName "enum" n') (EnvTyp res);
+      addLocalToEnv ghost (kindPlusName "enum" n') (EnvTyp res);
       (* And define the tag *)
       cabsPushGlobal (GEnumTag (enum, CurrentLoc.get ()));
       res
@@ -4775,8 +4789,8 @@ and doAttr ghost (a: A.attribute) : attribute list =
           (** See if this is an enumeration *)
           try
             if not foldenum then raise Not_found;
-
-            match H.find env n' with
+            let env = if ghost then ghost_env else env in
+            match Datatype.String.Hashtbl.find env n' with
             | EnvEnum item, _ -> begin
                 match constFoldToInt item.eival with
                 | Some i64 when theMachine.lowerConstants ->
@@ -5083,7 +5097,7 @@ and doType (ghost:bool) isFuncArg
         (* Add the formal to the environment, so it can be referenced by
            other formals  (e.g. in an array type, although that will be
            changed to a pointer later, or though typeof).  *)
-        addLocalToEnv vi.vname (EnvVar vi);
+        addLocalToEnv ghost vi.vname (EnvVar vi);
         vi
       in
       let make_noopt_targs ghost args =
@@ -5245,7 +5259,7 @@ and makeCompType ghost (isstruct: bool)
     (a: attribute list) =
   (* Make a new name for the structure *)
   let kind = if isstruct then "struct" else "union" in
-  let n', _  = newAlphaName true kind n in
+  let n', _  = newAlphaName ghost true kind n in
   (* Create the self cell for use in fields and forward references. Or maybe
    * one exists already from a forward reference  *)
   let comp, _ = createCompInfo isstruct n' norig in
@@ -5450,7 +5464,7 @@ and makeCompType ghost (isstruct: bool)
   cabsPushGlobal (GCompTag (comp, CurrentLoc.get ()));
 
   (* There must be a self cell created for this already *)
-  addLocalToEnv (kindPlusName kind n) (EnvTyp res);
+  addLocalToEnv ghost (kindPlusName kind n) (EnvTyp res);
   (* Now create a typedef with just this type *)
   res
 
@@ -5622,7 +5636,8 @@ and doExp local_env
         end;
         (* Look up in the environment *)
         try
-          let envdata = H.find env n in
+          let env = if ghost then ghost_env else env in
+          let envdata = Datatype.String.Hashtbl.find env n in
           match envdata with
           | EnvVar vi, _ ->
             let lval = var vi in
@@ -6446,7 +6461,7 @@ and doExp local_env
                   end
                 | _ -> n
               in
-              let vi, _ = lookupVar n in
+              let vi, _ = lookupVar ghost n in
               let reads =
                 if Lval.Set.mem
                     (var vi) local_env.authorized_reads
@@ -6831,7 +6846,8 @@ and doExp local_env
              begin
                (* Lookup the prototype for the replacement *)
                let v, _  =
-                 try lookupGlobalVar "__builtin_stdarg_start"
+                 (* builtin is not ghost *)
+                 try lookupGlobalVar false "__builtin_stdarg_start"
                  with Not_found ->
                    abort_context
                      "Cannot find __builtin_stdarg_start to replace %s"
@@ -7380,7 +7396,7 @@ and doExp local_env
       end
 
     | A.LABELADDR l -> begin (* GCC's taking the address of a label *)
-        let l = lookupLabel l in (* To support locally declared labels *)
+        let l = lookupLabel ghost l in (* To support locally declared labels *)
         let addrval =
           try H.find gotoTargetHash l
           with Not_found -> begin
@@ -7704,7 +7720,7 @@ and compileCondExp ~ghost ce st sf =
       (* If sf is small then will copy it *)
       try (true, sf, duplicateChunk sf)
       with Failure _ ->
-        let lab = newLabelName "_LAND" in
+        let lab = newLabelName ghost "_LAND" in
         (false, gotoChunk ~ghost lab loc, consLabel ~ghost lab sf loc false)
     in
     let st' = compileCondExp ~ghost ce2 st sf1 in
@@ -7714,7 +7730,7 @@ and compileCondExp ~ghost ce st sf =
          after the else part. This prevents spurious falls-through warning
          afterwards. *)
       let sf' = duplicateChunk sf1 in
-      let lab = newLabelName "_LAND" in
+      let lab = newLabelName ghost "_LAND" in
       let gotostmt =
         if st_fall_through then gotoChunk ~ghost lab loc else skipChunk
       in
@@ -7736,14 +7752,14 @@ and compileCondExp ~ghost ce st sf =
       (* If st is small then will copy it *)
       try (true, st, duplicateChunk st)
       with Failure _ ->
-        let lab = newLabelName "_LOR" in
+        let lab = newLabelName ghost "_LOR" in
         (false, gotoChunk ~ghost lab loc, consLabel ~ghost lab st loc false)
     in
     if not duplicable && !doAlternateConditional then
       let st' = duplicateChunk st1 in
       let sf' = compileCondExp ~ghost ce2 st1 sf in
       let sf_fall_through = chunkFallsThrough sf' in
-      let lab = newLabelName "_LOR" in
+      let lab = newLabelName ghost "_LOR" in
       let gotostmt =
         if sf_fall_through then
           gotoChunk ~ghost lab loc
@@ -8613,7 +8629,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
   | _ when isProto ndt ->
     let vi = createGlobal ghost None specs init_name in
     (* Add it to the environment to shadow previous decls *)
-    addLocalToEnv n (EnvVar vi);
+    addLocalToEnv ghost n (EnvVar vi);
     LocalFuncHook.apply vi;
     empty
 
@@ -8623,7 +8639,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
     (* Now alpha convert it to make sure that it does not conflict with
      * existing globals or locals from this function. *)
     let full_name = !currentFunctionFDEC.svar.vname ^ "_" ^ n in
-    let newname, _  = newAlphaName true "" full_name in
+    let newname, _  = newAlphaName ghost true "" full_name in
     (* Make it global  *)
     let vi = makeVarInfoCabs ~ghost ~isformal:false
         ~isglobal:true
@@ -8638,7 +8654,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
     H.add staticLocals vi.vname vi;
     (* Add it to the environment as a local so that the name goes out of
      * scope properly *)
-    addLocalToEnv n (EnvVar vi);
+    addLocalToEnv ghost n (EnvVar vi);
 
     (* Maybe this is an array whose length depends on something with local
        scope, e.g. "static char device[ sizeof(local) ]".
@@ -8677,7 +8693,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
     let vi = createGlobal ghost None specs init_name in
     (* Add it to the local environment to ensure that it shadows previous
      * local variables *)
-    addLocalToEnv n (EnvVar vi);
+    addLocalToEnv ghost n (EnvVar vi);
     empty
 
   | _ ->
@@ -8822,7 +8838,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
           [], [(Var vi,NoOffset)], Cil_datatype.Lval.Set.elements r), ghost)
     end
 
-and doAliasFun vtype (thisname:string) (othername:string)
+and doAliasFun ghost vtype (thisname:string) (othername:string)
     (sname:single_name) (loc: cabsloc) : unit =
   (* This prototype declares that name is an alias for
      othername, which must be defined in this file *)
@@ -8845,7 +8861,7 @@ and doAliasFun vtype (thisname:string) (othername:string)
   ignore (doDecl empty_local_env true fdef);
   (* get the new function *)
   let v,_ =
-    try lookupGlobalVar thisname
+    try lookupGlobalVar ghost thisname
     with Not_found -> abort_context "error in doDecl"
   in
   v.vattr <- dropAttribute "alias" v.vattr
@@ -8882,7 +8898,7 @@ and doDecl local_env (isglobal: bool) : A.definition -> chunk = function
                Cil_printer.pp_location (CurrentLoc.get ());
              ignore (createGlobal ghost logic_spec spec_res name)
            end else
-             doAliasFun vtype n othername (s, (n,ndt,a,l)) loc
+             doAliasFun ghost vtype n othername (s, (n,ndt,a,l)) loc
          | _ ->
            Kernel.error ~once:true ~current:true
              "Bad alias attribute at %a" Cil_printer.pp_location (CurrentLoc.get()));
@@ -9012,7 +9028,7 @@ and doDecl local_env (isglobal: bool) : A.definition -> chunk = function
        * environment for the original name as well. This will ensure
        * that all uses of this function will refer to the renamed
        * function *)
-      addGlobalToEnv n (EnvVar !currentFunctionFDEC.svar);
+      addGlobalToEnv ghost n (EnvVar !currentFunctionFDEC.svar);
       if H.mem alreadyDefined !currentFunctionFDEC.svar.vname then
         Kernel.error ~once:true ~current:true "There is a definition already for %s" n;
 
@@ -9380,7 +9396,8 @@ and doTypedef ghost ((specs, nl): A.name_group) =
     let tattr = fc_stdlib_attribute tattr in
     let newTyp' = cabsTypeAddAttributes tattr newTyp in
     checkRestrictQualifierDeep newTyp';
-    if H.mem typedefs n && H.mem env n then
+    let env = if ghost then ghost_env else env in
+    if H.mem typedefs n && Datatype.String.Hashtbl.mem env n then
       (* check if type redefinition is allowed (C11 only);
          in all cases, do not create a new type.
          TODO: if local typedef redefinitions are to be supported, then the new type
@@ -9390,7 +9407,7 @@ and doTypedef ghost ((specs, nl): A.name_group) =
           Kernel.failure ~current:true
             "redefinition of a typedef in a non-global scope is currently unsupported";
         let typeinfo = H.find typedefs n in
-        let _, oldloc = lookupType "type" n in
+        let _, oldloc = lookupType ghost "type" n in
         if areCompatibleTypes typeinfo.ttype newTyp' then
           begin
             let error_conflicting_types () =
@@ -9413,7 +9430,7 @@ and doTypedef ghost ((specs, nl): A.name_group) =
                  which are invalid)
                - redefinition via a typedef of a struct/union/enum IS allowed;
                - other types are allowed. *)
-            if declared_in_current_scope n then
+            if declared_in_current_scope ghost n then
               begin
                 match newTyp' with (* do NOT unroll type here,
                                       redefinitions of typedefs are ok *)
@@ -9440,13 +9457,13 @@ and doTypedef ghost ((specs, nl): A.name_group) =
                   if not (Kernel.C11.get ()) then error_c11_redefinition ()
               end
           end
-        else if declared_in_current_scope n then
+        else if declared_in_current_scope ghost n then
           Kernel.error ~current:true
             "redefinition of type '%s' in the same scope with incompatible type.@ \
              Previous declaration was at %a" n Cil_datatype.Location.pretty oldloc;
       end
     else (* effectively create new type *) begin
-      let n', _  = newAlphaName true "type" n in
+      let n', _  = newAlphaName ghost true "type" n in
       let ti =
         { torig_name = n; tname = n';
           ttype = newTyp'; treferenced = false }
@@ -9459,7 +9476,7 @@ and doTypedef ghost ((specs, nl): A.name_group) =
       let namedTyp = TNamed(ti, []) in
       (* Register the type. register it as local because we might be in a
        * local context  *)
-      addLocalToEnv (kindPlusName "type" n) (EnvTyp namedTyp);
+      addLocalToEnv ghost (kindPlusName "type" n) (EnvTyp namedTyp);
       cabsPushGlobal (GType (ti, CurrentLoc.get ()))
     end
   in
@@ -9508,7 +9525,7 @@ and doOnlyTypedef ghost (specs: A.spec_elem list) : unit =
 and doBody local_env (blk: A.block) : chunk =
   let ghost = local_env.is_ghost in
   (* Rename the labels and add them to the environment *)
-  List.iter (fun l -> ignore (genNewLocalLabel l)) blk.blabels;
+  List.iter (fun l -> ignore (genNewLocalLabel ghost l)) blk.blabels;
   (* See if we have some attributes *)
   let battrs = doAttributes ghost blk.A.battrs in
 
@@ -9852,7 +9869,7 @@ and doStatement local_env (s : A.statement) : chunk =
     C_logic_env.add_current_label l;
     (* Lookup the label because it might have been locally defined *)
     let chunk =
-      consLabel ~ghost (lookupLabel l) (doStatement local_env s) loc' true
+      consLabel ~ghost (lookupLabel ghost l) (doStatement local_env s) loc' true
     in
     C_logic_env.reset_current_label (); chunk
 
@@ -9860,7 +9877,7 @@ and doStatement local_env (s : A.statement) : chunk =
     let loc' = convLoc loc in
     CurrentLoc.set loc';
     (* Maybe we need to rename this label *)
-    gotoChunk ~ghost (lookupLabel l) loc'
+    gotoChunk ~ghost (lookupLabel ghost l) loc'
 
   | A.COMPGOTO (e, loc) -> begin
       let loc' = convLoc loc in
@@ -9888,7 +9905,7 @@ and doStatement local_env (s : A.statement) : chunk =
             Kernel.fatal ~current:true
               "Non-empty chunk in creating temporary for goto *";
           let switchv, _ =
-            try lookupVar "__compgoto"
+            try lookupVar ghost "__compgoto"
             with Not_found -> abort_context "Cannot find temporary for goto *";
           in
           (* Make a switch statement. We'll fill in the statements at the
@@ -9956,7 +9973,7 @@ and doStatement local_env (s : A.statement) : chunk =
         let asm_gotos =
           List.map
             (fun label ->
-               let label = lookupLabel label in
+               let label = lookupLabel ghost label in
                let gref = ref dummyStmt in
                addGoto label gref;
                gref)
@@ -9992,7 +10009,7 @@ and doStatement local_env (s : A.statement) : chunk =
             makeVarInfoCabs
               ~ghost ~isformal:false ~isglobal:false ldecl spec (n,ndt,a)
           in
-          addLocalToEnv n (EnvVar vi);
+          addLocalToEnv ghost n (EnvVar vi);
           !currentFunctionFDEC.slocals <- vi :: !currentFunctionFDEC.slocals;
           Catch_exn(vi,[])
       in
@@ -10165,8 +10182,10 @@ let convFile (path, f) =
   H.clear enumInfoNameEnv;
   H.clear staticLocals;
   H.clear typedefs;
-  H.clear env;
-  H.clear genv;
+  Datatype.String.Hashtbl.clear env;
+  Datatype.String.Hashtbl.clear global_env;
+  Datatype.String.Hashtbl.clear ghost_env;
+  Datatype.String.Hashtbl.clear ghost_global_env;
   IH.clear callTempVars;
   H.clear alpha_renaming;
   constrExprId := 0;

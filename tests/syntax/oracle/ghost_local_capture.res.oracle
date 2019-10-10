@@ -5,7 +5,7 @@ void titi(void)
   int c = 0;
   {
     /*@ ghost int c_0 = 1; */
-    c_0 = 2;
+    c = 2;
   }
   /*@ assert c ≡ 2; */ ;
   return;
