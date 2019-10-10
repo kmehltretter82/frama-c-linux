@@ -260,7 +260,10 @@ let to_exp ~loc kf env pot label =
         let e_size, _ = term_to_exp kf env t_size in
         let e_size = Cil.constFold false e_size in
         let malloc_stmt =
-          Misc.mk_call ~loc ~result:(Cil.var vi) "malloc" [e_size]
+          Constructor.mk_lib_call ~loc
+            ~result:(Cil.var vi)
+            "malloc"
+            [e_size]
         in
         malloc_stmt
       | Typing.(C_integer _ | C_float _ | Gmpz) ->
@@ -270,7 +273,7 @@ let to_exp ~loc kf env pot label =
       | Typing.(Rational | Real | Nan) ->
         Error.not_yet "quantification over non-integer type"
       in
-      let free_stmt = Misc.mk_call ~loc "free" [e] in
+      let free_stmt = Constructor.mk_lib_call ~loc "free" [e] in
       (* The list of stmts returned by the current closure are inserted
         LOCALLY to the block where the new var is FIRST used, whatever scope
         is indicated to [Env.new_var].

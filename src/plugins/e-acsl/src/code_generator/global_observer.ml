@@ -112,8 +112,8 @@ let mk_init_function env =
     Varinfo.Hashtbl.fold_sorted
       (fun vi _ stmts ->
          (* a global is both allocated and initialized *)
-         Misc.mk_store_stmt vi
-         :: Misc.mk_initialize ~loc:Location.unknown (Cil.var vi)
+         Constructor.mk_store_stmt vi
+         :: Constructor.mk_initialize ~loc:Location.unknown (Cil.var vi)
          :: stmts)
       tbl
       stmts
@@ -126,9 +126,9 @@ let mk_init_function env =
          let e = Cil.new_exp ~loc:loc (Const (CStr s)) in
          let str_size = Cil.new_exp loc (SizeOfStr s) in
          Cil.mkStmtOneInstr ~valid_sid:true (Set(Cil.var vi, e, loc))
-         :: Misc.mk_store_stmt ~str_size vi
-         :: Misc.mk_full_init_stmt ~addr:false vi
-         :: Misc.mk_mark_readonly vi
+         :: Constructor.mk_store_stmt ~str_size vi
+         :: Constructor.mk_full_init_stmt ~addr:false vi
+         :: Constructor.mk_mark_readonly vi
          :: stmts)
       stmts
   in
@@ -172,8 +172,7 @@ let mk_init_function env =
 
 let mk_delete_stmts stmts =
   Varinfo.Hashtbl.fold_sorted
-    (fun vi _l acc ->
-       Misc.mk_delete_stmt vi :: acc)
+    (fun vi _l acc -> Constructor.mk_delete_stmt vi :: acc)
     tbl
     stmts
 

@@ -84,7 +84,7 @@ let replace_literal_string_in_exp ~is_global_init env kf e =
   if is_global_init then e, env else Literal_observer.exp_in_depth env kf e
 
 let inject_in_local_init loc env kf vi = function
-  | ConsInit (fvi, sz :: _, _) as init
+  | ConsInit (fvi, _sz :: _, _) as init
     when Functions.Libc.is_vla_alloc_name fvi.vname ->
     (* handle variable-length array allocation via [__fc_vla_alloc].  Here each
        instance of [__fc_vla_alloc] is rewritten to [alloca] (that is used to
@@ -97,8 +97,7 @@ let inject_in_local_init loc env kf vi = function
     fvi.vname <- Functions.Libc.actual_alloca;
     (* Since we need to pass [vi] by value, cannot use [Misc.mk_store_stmt]
        here. Do it manually. *)
-    let sname = Functions.RTL.mk_api_name "store_block" in
-    let store = Misc.mk_call ~loc sname [ Cil.evar vi ; sz ] in
+    let store = Constructor.mk_store_stmt vi in
     let env = Env.add_stmt ~post:true env kf store in
     init, env
 
@@ -173,15 +172,14 @@ let add_initializer loc ?vi lv ?(post=false) stmt env kf =
       let new_stmt =
         (* bitfields are not yet supported ==> no initializer.
            a [not_yet] will be raised in [Translate]. *)
-        if Cil.isBitfield lv
-        then Cil.mkEmptyStmt ()
-        else Misc.mk_initialize ~loc lv
+        if Cil.isBitfield lv then Cil.mkEmptyStmt ()
+        else Constructor.mk_initialize ~loc lv
       in
       let env = Env.add_stmt ~post ~before env kf new_stmt in
       let env = match vi with
         | None -> env
         | Some vi ->
-          let new_stmt = Misc.mk_store_stmt vi in
+          let new_stmt = Constructor.mk_store_stmt vi in
           Env.add_stmt ~post ~before env kf new_stmt
       in
       env
@@ -291,17 +289,17 @@ let add_new_block_in_stmt env kf stmt =
       if is_main kf && Mmodel_analysis.use_model () then begin
         let stmts = b.bstmts in
         let l = List.rev stmts in
-        let mclean = (Functions.RTL.mk_api_name "memory_clean") in
         match l with
         | [] -> assert false (* at least the 'return' stmt *)
         | ret :: l ->
           let loc = Stmt.loc stmt in
           let delete_stmts =
-            Global_observer.mk_delete_stmts [ Misc.mk_call ~loc mclean []; ret ]
+            Global_observer.mk_delete_stmts
+              [ Constructor.mk_rtl_call ~loc "memory_clean" []; ret ]
           in
           b.bstmts <- List.rev l @ delete_stmts
       end;
-      let new_stmt = Misc.mk_block stmt b in
+      let new_stmt = Constructor.mk_block stmt b in
       if not (Cil_datatype.Stmt.equal stmt new_stmt) then begin
         (* move the labels of the return to the new block in order to
            evaluate the postcondition when jumping to them. *)
@@ -331,7 +329,7 @@ let add_new_block_in_stmt env kf stmt =
       let post_block, env =
         Env.pop_and_get
           env
-          (Misc.mk_block new_stmt pre_block)
+          (Constructor.mk_block new_stmt pre_block)
           ~global_clear:false
           Env.Before
       in
@@ -340,7 +338,7 @@ let add_new_block_in_stmt env kf stmt =
         then Cil.transient_block post_block
         else post_block
       in
-      let res = Misc.mk_block new_stmt post_block in
+      let res = Constructor.mk_block new_stmt post_block in
       if not (Cil_datatype.Stmt.equal new_stmt res) then
         E_acsl_label.move kf new_stmt res;
       res, env
@@ -512,10 +510,9 @@ and inject_in_block (env: Env.t) kf blk =
       if Functions.instrument kf then
         List.fold_left
           (fun acc vi ->
-             if Mmodel_analysis.must_model_vi ~kf vi then
-               Misc.mk_delete_stmt vi :: acc
-             else
-               acc)
+             if Mmodel_analysis.must_model_vi ~kf vi
+             then Constructor.mk_delete_stmt vi :: acc
+             else acc)
           stmts
           blk.blocals
       else
@@ -548,7 +545,7 @@ and inject_in_block (env: Env.t) kf blk =
         List.fold_left
           (fun acc vi ->
              if Mmodel_analysis.must_model_vi vi && not vi.vdefined
-             then Misc.mk_store_stmt vi :: acc
+             then Constructor.mk_store_stmt vi :: acc
              else acc)
           blk.bstmts
           blk.blocals;
@@ -735,8 +732,7 @@ let inject_mmodel_initializer main =
     in
     let ptr_size = Cil.sizeOf loc Cil.voidPtrType in
     let args = args @ [ ptr_size ] in
-    let name = Functions.RTL.mk_api_name "memory_init" in
-    let init = Misc.mk_call loc name args in
+    let init = Constructor.mk_rtl_call loc "memory_init" args in
     main.sbody.bstmts <- init :: main.sbody.bstmts
   in
   Extlib.may handle_main main

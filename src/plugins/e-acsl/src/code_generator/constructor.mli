@@ -20,56 +20,47 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Smart constructors for building C code. *)
+
+open Cil_types
 open Cil_datatype
 
-let tracking_stmt ?before fold mk_stmt env kf vars =
-  if Functions.instrument kf then
-    fold
-      (fun vi env ->
-         if Mmodel_analysis.must_model_vi ~kf vi then
-           Env.add_stmt ?before env kf (mk_stmt vi)
-         else
-           env)
-      vars
-      env
-  else
-    env
+val mk_deref: loc:Location.t -> exp -> exp
+(** Make a dereference of an expression *)
 
-let store ?before env kf vars =
-  tracking_stmt
-    ?before
-    List.fold_right (* small list *)
-    Constructor.mk_store_stmt
-    env
-    kf
-    vars
+val mk_block: stmt -> block -> stmt
 
-let duplicate_store ?before env kf vars =
-  tracking_stmt
-    ?before
-    Varinfo.Set.fold
-    Constructor.mk_duplicate_store_stmt
-    env
-    kf
-    vars
+(* ********************************************************************** *)
+(* E-ACSL specific code *)
+(* ********************************************************************** *)
 
-let delete_from_list ?before env kf vars =
-  tracking_stmt
-    ?before
-    List.fold_right (* small list *)
-    Constructor.mk_delete_stmt
-    env
-    kf
-    vars
+val mk_lib_call: loc:Location.t -> ?result:lval -> string -> exp list -> stmt
+(** Call of a library function.
+    @raise Unregistered_library_function if the given string does not represent
+    such a function or if these functions were never registered (only possible
+    when using E-ACSL through its API). *)
 
-let delete_from_set ?before env kf vars =
-  tracking_stmt
-    ?before
-    Varinfo.Set.fold
-    Constructor.mk_delete_stmt
-    env
-    kf
-    vars
+val mk_rtl_call: loc:Location.t -> ?result:lval -> string -> exp list -> stmt
+(** Special version of [mk_lib_call] for E-ACSL's RTL functions. *)
+
+val mk_store_stmt: ?str_size:exp -> varinfo -> stmt
+val mk_duplicate_store_stmt: ?str_size:exp -> varinfo -> stmt
+val mk_delete_stmt: varinfo -> stmt
+val mk_full_init_stmt: ?addr:bool -> varinfo -> stmt
+val mk_initialize: loc:location -> lval -> stmt
+val mk_mark_readonly: varinfo -> stmt
+
+type annotation_kind =
+  | Assertion
+  | Precondition
+  | Postcondition
+  | Invariant
+  | RTE
+
+val mk_runtime_check:
+  ?reverse:bool -> annotation_kind -> kernel_function -> exp -> predicate ->
+  stmt
+(** Generate a runtime check of the given expression. *)
 
 (*
 Local Variables:

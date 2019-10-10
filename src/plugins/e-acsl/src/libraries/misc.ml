@@ -60,78 +60,6 @@ let get_lib_fun_vi fname =
            used as a library *)
         raise (Unregistered_library_function fname)
 
-let mk_call ~loc ?result fname args =
-  let vi = get_lib_fun_vi fname in
-  let f = Cil.evar ~loc vi in
-  vi.vreferenced <- true;
-  let make_args args ty_params =
-    List.map2
-      (fun (_, ty, _) arg ->
-        let e =
-          match ty, Cil.unrollType (Cil.typeOf arg), arg.enode with
-          | TPtr _, TArray _, Lval lv -> Cil.new_exp ~loc (StartOf lv)
-          | TPtr _, TArray _, _ -> assert false
-          | _, _, _ -> arg
-        in
-        Cil.mkCast ~force:false ~newt:ty ~e)
-      ty_params
-      args
-  in
-  let args = match vi.vtype with
-    | TFun(_, Some params, _, _) -> make_args args params
-    | TFun(_, None, _, _) -> []
-    | _ -> assert false
-  in
-  Cil.mkStmtOneInstr ~valid_sid:true (Call(result, f, args, loc))
-
-let mk_deref ~loc lv =
-  Cil.new_exp ~loc (Lval(Mem(lv), NoOffset))
-
-type annotation_kind =
-  | Assertion
-  | Precondition
-  | Postcondition
-  | Invariant
-  | RTE
-
-let kind_to_string loc k =
-  Cil.mkString
-    ~loc
-    (match k with
-    | Assertion -> "Assertion"
-    | Precondition -> "Precondition"
-    | Postcondition -> "Postcondition"
-    | Invariant -> "Invariant"
-    | RTE -> "RTE")
-
-(* Build a C conditional doing a runtime assertion check. *)
-let mk_e_acsl_guard ?(reverse=false) kind kf e p =
-  let loc = p.pred_loc in
-  let msg =
-    Kernel.Unicode.without_unicode
-      (Format.asprintf "%a@?" Printer.pp_predicate) p
-  in
-  let line = (fst loc).Filepath.pos_lnum in
-  let e =
-    if reverse then e else Cil.new_exp ~loc:e.eloc (UnOp(LNot, e, Cil.intType))
-  in
-  mk_call
-    ~loc
-    (RTL.mk_api_name "assert")
-    [ e;
-      kind_to_string loc kind;
-      Cil.mkString ~loc (RTL.get_original_name kf);
-      Cil.mkString ~loc msg;
-      Cil.integer loc line ]
-
-let mk_block stmt b = match b.bstmts with
-  | [] ->
-    (match stmt.skind with
-     | Instr(Skip _) -> stmt
-     | _ -> assert false)
-  | [ s ] -> s
-  |  _ :: _ -> Cil.mkStmt ~valid_sid:true (Block b)
-
 (* ************************************************************************** *)
 (** {2 Handling \result} *)
 (* ************************************************************************** *)
@@ -148,55 +76,6 @@ let result_lhost kf =
 let result_vi kf = match result_lhost kf with
   | Var vi -> vi
   | Mem _ -> assert false
-
-(* ************************************************************************** *)
-(** {2 Handling the E-ACSL's C-libraries, part II} *)
-(* ************************************************************************** *)
-
-let mk_full_init_stmt ?(addr=true) vi =
-  let loc = vi.vdecl in
-  let mk = mk_call ~loc (RTL.mk_api_name "full_init") in
-  match addr, Cil.unrollType vi.vtype with
-  | _, TArray(_,Some _, _, _) | false, _ -> mk [ Cil.evar ~loc vi ]
-  | _ -> mk [ Cil.mkAddrOfVi vi ]
-
-let mk_initialize ~loc (host, offset as lv) = match host, offset with
-  | Var _, NoOffset -> mk_call ~loc
-    (RTL.mk_api_name "full_init")
-    [ Cil.mkAddrOf ~loc lv ]
-  | _ ->
-    let typ = Cil.typeOfLval lv in
-    mk_call ~loc
-      (RTL.mk_api_name "initialize")
-      [ Cil.mkAddrOf ~loc lv; Cil.new_exp loc (SizeOf typ) ]
-
-let mk_named_store_stmt name ?str_size vi =
-  let ty = Cil.unrollType vi.vtype in
-  let loc = vi.vdecl in
-  let store = mk_call ~loc (RTL.mk_api_name name) in
-  match ty, str_size with
-  | TArray(_, Some _,_,_), None ->
-    store [ Cil.evar ~loc vi ; Cil.sizeOf ~loc ty ]
-  | TPtr(TInt(IChar, _), _), Some size -> store [ Cil.evar ~loc vi ; size ]
-  | _, None -> store [ Cil.mkAddrOfVi vi ; Cil.sizeOf ~loc ty ]
-  | _, Some _ -> assert false
-
-let mk_store_stmt ?str_size vi =
-  mk_named_store_stmt "store_block" ?str_size vi
-
-let mk_duplicate_store_stmt ?str_size vi =
-  mk_named_store_stmt "store_block_duplicate" ?str_size vi
-
-let mk_delete_stmt vi =
-  let loc = vi.vdecl in
-  let mk = mk_call ~loc (RTL.mk_api_name "delete_block") in
-  match Cil.unrollType vi.vtype with
-  | TArray(_, Some _, _, _) -> mk [ Cil.evar ~loc vi ]
-  | _ -> mk [ Cil.mkAddrOfVi vi ]
-
-let mk_mark_readonly vi =
-  let loc = vi.vdecl in
-  mk_call ~loc (RTL.mk_api_name "mark_readonly") [ Cil.evar ~loc vi ]
 
 (* ************************************************************************** *)
 (** {2 Other stuff} *)
@@ -336,6 +215,6 @@ let name_of_binop = function
 
 (*
 Local Variables:
-compile-command: "make"
+compile-command: "make -C ../.."
 End:
 *)

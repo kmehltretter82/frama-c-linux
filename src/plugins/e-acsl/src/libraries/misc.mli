@@ -23,7 +23,6 @@
 (** Utilities for E-ACSL. *)
 
 open Cil_types
-open Cil_datatype
 
 (* ************************************************************************** *)
 (** {2 Builders} *)
@@ -32,28 +31,6 @@ open Cil_datatype
 exception Unregistered_library_function of string
 val get_lib_fun_vi: string -> varinfo
 (** Return varinfo corresponding to a name of a given library function *)
-
-val mk_call: loc:Location.t -> ?result:lval -> string -> exp list -> stmt
-(** Call an E-ACSL library function or an E-ACSL built-in.
-    @raise Unregistered_library_function if the given string does not represent
-    such a function or if these functions were never registered (only possible
-    when using E-ACSL through its API. *)
-
-val mk_deref: loc:Location.t -> exp -> exp
-(** Make a dereference of an expression *)
-
-type annotation_kind =
-  | Assertion
-  | Precondition
-  | Postcondition
-  | Invariant
-  | RTE
-
-val mk_e_acsl_guard:
-  ?reverse:bool -> annotation_kind -> kernel_function -> exp -> predicate
-  -> stmt
-
-val mk_block: stmt -> block -> stmt
 
 (* ************************************************************************** *)
 (** {2 Handling \result} *)
@@ -73,13 +50,6 @@ val library_files: unit -> string list
 val is_library_loc: location -> bool
 val register_library_function: varinfo -> unit
 val reset: unit -> unit
-
-val mk_store_stmt: ?str_size:exp -> varinfo -> stmt
-val mk_duplicate_store_stmt: ?str_size:exp -> varinfo -> stmt
-val mk_delete_stmt: varinfo -> stmt
-val mk_full_init_stmt: ?addr:bool -> varinfo -> stmt
-val mk_initialize: loc:location -> lval -> stmt
-val mk_mark_readonly: varinfo -> stmt
 
 (* ************************************************************************** *)
 (** {2 Other stuff} *)
@@ -132,6 +102,6 @@ val finite_min_and_max: Ival.t -> Integer.t * Integer.t
 
 (*
 Local Variables:
-compile-command: "make"
+compile-command: "make -C ../.."
 End:
 *)

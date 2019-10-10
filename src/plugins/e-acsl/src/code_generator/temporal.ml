@@ -81,7 +81,7 @@ end = struct
       | Copy -> Options.fatal "Copy flow type in store_reference"
     in
     let fname = RTL.mk_temporal_name fname in
-    Misc.mk_call ~loc fname [ Cil.mkAddrOf ~loc lhs; rhs ]
+    Constructor.mk_lib_call ~loc fname [ Cil.mkAddrOf ~loc lhs; rhs ]
 
   let save_param ~loc flow lhs pos =
     let infix = match flow with
@@ -91,13 +91,13 @@ end = struct
     in
     let fname = "save_" ^ infix ^ "_parameter" in
     let fname = RTL.mk_temporal_name fname in
-    Misc.mk_call ~loc fname [ lhs ; Cil.integer ~loc pos ]
+    Constructor.mk_lib_call ~loc fname [ lhs ; Cil.integer ~loc pos ]
 
   let pull_param ~loc vi pos =
     let exp = Cil.mkAddrOfVi vi in
     let fname = RTL.mk_temporal_name "pull_parameter" in
     let sz = Cil.kinteger ~loc IULong (Cil.bytesSizeOf vi.vtype) in
-    Misc.mk_call ~loc fname [ exp ; Cil.integer ~loc pos ; sz ]
+    Constructor.mk_lib_call ~loc fname [ exp ; Cil.integer ~loc pos ; sz ]
 
   let handle_return_referent ~save ~loc lhs =
     let fname = match save with
@@ -108,15 +108,15 @@ end = struct
     (match (Cil.typeOf lhs) with
       | TPtr _ -> ()
       | _ -> Error.not_yet "Struct in return");
-    Misc.mk_call ~loc (RTL.mk_temporal_name fname) [ lhs ]
+    Constructor.mk_lib_call ~loc (RTL.mk_temporal_name fname) [ lhs ]
 
   let reset_return_referent ~loc =
-    Misc.mk_call ~loc (RTL.mk_temporal_name "reset_return") []
+    Constructor.mk_lib_call ~loc (RTL.mk_temporal_name "reset_return") []
 
   let temporal_memcpy_struct ~loc lhs rhs =
     let fname  = RTL.mk_temporal_name "memcpy" in
     let size = Cil.sizeOf ~loc (Cil.typeOfLval lhs) in
-    Misc.mk_call ~loc fname [ Cil.mkAddrOf ~loc lhs; rhs; size ]
+    Constructor.mk_lib_call ~loc fname [ Cil.mkAddrOf ~loc lhs; rhs; size ]
 end
 (* }}} *)
 
@@ -283,7 +283,7 @@ end = struct
     Extlib.may_map
       (fun (lhs, rhs, flow) ->
         let flow, rhs = match flow with
-          | Indirect when alloc -> Direct, (Misc.mk_deref ~loc rhs)
+          | Indirect when alloc -> Direct, (Constructor.mk_deref ~loc rhs)
           | _ -> flow, rhs
         in
         let stmt =
@@ -304,7 +304,9 @@ end = struct
         | Lval(Var vi, _) -> vi.vname
         | _ -> Options.fatal "[Temporal.call_memxxx] not a left-value"
       in
-      let stmt = Misc.mk_call ~loc (RTL.mk_temporal_name name) args in
+      let stmt =
+        Constructor.mk_lib_call ~loc (RTL.mk_temporal_name name) args
+      in
       Env.add_stmt ~before:current_stmt ~post:false env kf stmt
     else
       env
@@ -318,7 +320,7 @@ end = struct
        the implementation of the function should be empty and compiler should
        be able to optimize that code out. *)
     let name = (RTL.mk_temporal_name "reset_parameters") in
-    let stmt = Misc.mk_call ~loc name [] in
+    let stmt = Constructor.mk_lib_call ~loc name [] in
     let env = Env.add_stmt ~before:current_stmt ~post:false env kf stmt in
     let stmt = Mk.reset_return_referent ~loc in
     let env = Env.add_stmt ~before:current_stmt ~post:false env kf stmt in

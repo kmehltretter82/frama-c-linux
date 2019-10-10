@@ -56,7 +56,7 @@ type local_env = {
 type t = {
   lscope: Lscope.t;
   lscope_reset: bool;
-  annotation_kind: Misc.annotation_kind;
+  annotation_kind: Constructor.annotation_kind;
   new_global_vars: (varinfo * localized_scope) list;
   (* generated variables. The scope indicates the level where the variable
      should be added. *)
@@ -88,7 +88,7 @@ let empty_local_env =
 let empty =
   { lscope = Lscope.empty;
     lscope_reset = true;
-    annotation_kind = Misc.Assertion;
+    annotation_kind = Constructor.Assertion;
     new_global_vars = [];
     global_mp_tbl = empty_mp_tbl;
     env_stack = [];

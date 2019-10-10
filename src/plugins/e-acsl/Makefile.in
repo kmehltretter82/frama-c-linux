@@ -65,6 +65,7 @@ SRC_PROJECT_INITIALIZER:=\
 
 # code generator
 SRC_CODE_GENERATOR:= \
+	constructor \
 	gmp \
 	label \
 	env \

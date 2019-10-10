@@ -81,10 +81,10 @@ let preserve_invariant env kf stmt = match stmt.skind with
         let blk, env =
           Env.pop_and_get env last ~global_clear:false Env.Before
         in
-        Misc.mk_block last blk :: stmts, env, invariants != []
+        Constructor.mk_block last blk :: stmts, env, invariants != []
       | s :: tl -> handle_invariants (s :: stmts, env, false) tl
     in
-    let env = Env.set_annotation_kind env Misc.Invariant in
+    let env = Env.set_annotation_kind env Constructor.Invariant in
     let stmts, env, has_loop = handle_invariants ([], env, false) stmts in
     let new_blk = { blk with bstmts = List.rev stmts } in
     { stmt with skind = Loop([], new_blk, loc, cont, break) },
@@ -274,7 +274,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
       | Some p ->
         let e, env = !named_predicate_ref kf (Env.push env) p in
         let stmt, env =
-          Misc.mk_e_acsl_guard ~reverse:true Misc.RTE kf e p, env
+          Constructor.mk_runtime_check ~reverse:true Constructor.RTE kf e p, env
         in
         let b, env = Env.pop_and_get env stmt ~global_clear:false Env.After in
         let guard_for_small_type = Cil.mkStmt ~valid_sid:true (Block b) in

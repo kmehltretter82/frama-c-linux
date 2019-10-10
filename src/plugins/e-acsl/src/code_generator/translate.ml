@@ -135,7 +135,8 @@ let add_cast ~loc ?name env kf ctx strnum t_opt e =
             kf
             None
             new_ty
-            (fun v _ -> [ Misc.mk_call ~loc ~result:(Cil.var v) fname [ e ] ])
+            (fun v _ ->
+               [ Constructor.mk_lib_call ~loc ~result:(Cil.var v) fname [ e ] ])
         in
         e, env
       else if Gmp_types.Q.is_t ty || strnum = Str_R then
@@ -297,7 +298,7 @@ and context_insensitive_term_to_exp kf env t =
           kf
           ~name:vname
           (Some t)
-          (fun _ ev -> [ Misc.mk_call ~loc name [ ev; e ] ])
+          (fun _ ev -> [ Constructor.mk_lib_call ~loc name [ ev; e ] ])
       in
       e, env, C_number, ""
     else if Gmp_types.Q.is_t ty then
@@ -326,7 +327,7 @@ and context_insensitive_term_to_exp kf env t =
     let e2, env = term_to_exp kf env t2 in
     if Gmp_types.Z.is_t ty then
       let name = name_of_mpz_arith_bop bop in
-      let mk_stmts _ e = [ Misc.mk_call ~loc name [ e; e1; e2 ] ] in
+      let mk_stmts _ e = [ Constructor.mk_lib_call ~loc name [ e; e1; e2 ] ] in
       let name = Misc.name_of_binop bop in
       let _, e, env =
         Env.new_var_and_mpz_init ~loc ~name env kf (Some t) mk_stmts
@@ -363,14 +364,14 @@ and context_insensitive_term_to_exp kf env t =
       let mk_stmts _v e =
         assert (Gmp_types.Z.is_t ty);
         let cond =
-          Misc.mk_e_acsl_guard
+          Constructor.mk_runtime_check
             (Env.annotation_kind env)
             kf
             guard
             (Logic_const.prel ~loc (Req, t2, zero))
         in
         Env.add_assert kf cond (Logic_const.prel (Rneq, t2, zero));
-        let instr = Misc.mk_call ~loc name [ e; e1; e2 ] in
+        let instr = Constructor.mk_lib_call ~loc name [ e; e1; e2 ] in
         [ cond; instr ]
       in
       let name = Misc.name_of_binop bop in
@@ -481,7 +482,7 @@ and context_insensitive_term_to_exp kf env t =
           (Some t)
           (Misc.cty (Extlib.the li.l_type))
           (fun vi _ ->
-             [ Misc.mk_call ~loc ~result:(Cil.var vi) fname args ])
+             [ Constructor.mk_lib_call ~loc ~result:(Cil.var vi) fname args ])
       else
         (* build the arguments and compute the integer_ty of the parameters *)
         let params_ty, args, env =
@@ -610,7 +611,10 @@ and comparison_to_exp
         ~name
         Cil.intType
         (fun v _ ->
-           [ Misc.mk_call ~loc ~result:(Cil.var v) "__gmpz_cmp" [ e1; e2 ] ])
+           [ Constructor.mk_lib_call ~loc
+               ~result:(Cil.var v)
+               "__gmpz_cmp"
+               [ e1; e2 ] ])
     in
     Cil.new_exp ~loc (BinOp(bop, e, Cil.zero ~loc, Cil.intType)), env
   | Typing.Rational ->
@@ -850,7 +854,7 @@ and translate_rte_annots:
   fun pp elt kf env l ->
   let old_valid = !is_visiting_valid in
   let old_kind = Env.annotation_kind env in
-  let env = Env.set_annotation_kind env Misc.RTE in
+  let env = Env.set_annotation_kind env Constructor.RTE in
   let env =
     List.fold_left
       (fun env a -> match a.annot_content with
@@ -890,7 +894,12 @@ and translate_named_predicate kf env p =
   Env.add_stmt
     env
     kf
-    (Misc.mk_e_acsl_guard ~reverse:true (Env.annotation_kind env) kf e p)
+    (Constructor.mk_runtime_check
+       ~reverse:true
+       (Env.annotation_kind env)
+       kf
+       e
+       p)
 
 let named_predicate_to_exp ?name kf env p =
   named_predicate_to_exp ?name kf env p (* forget optional argument ?rte *)
@@ -958,7 +967,7 @@ let assumes_predicate bhv =
     bhv.b_assumes
 
 let translate_preconditions kf env behaviors =
-  let env = Env.set_annotation_kind env Misc.Precondition in
+  let env = Env.set_annotation_kind env Constructor.Precondition in
   let do_behavior env b =
     let assumes_pred = assumes_predicate b in
     List.fold_left
@@ -983,7 +992,7 @@ let translate_preconditions kf env behaviors =
   List.fold_left do_behavior env behaviors
 
 let translate_postconditions kf env behaviors =
-  let env = Env.set_annotation_kind env Misc.Postcondition in
+  let env = Env.set_annotation_kind env Constructor.Postcondition in
   (* generate one guard by postcondition of each behavior *)
   let do_behavior env b =
     let env =
@@ -1077,25 +1086,25 @@ let translate_pre_code_annotation kf env annot =
   let convert env = match annot.annot_content with
     | AAssert(l, _, p) ->
       if Keep_status.must_translate kf Keep_status.K_Assert then
-	let env = Env.set_annotation_kind env Misc.Assertion in
-	if l <> [] then
-	  not_yet env "@[assertion applied only on some behaviors@]";
-	translate_named_predicate kf env p
+        let env = Env.set_annotation_kind env Constructor.Assertion in
+        if l <> [] then
+          not_yet env "@[assertion applied only on some behaviors@]";
+        translate_named_predicate kf env p
       else
-	env
+        env
     | AStmtSpec(l, spec) ->
       if l <> [] then
         not_yet env "@[statement contract applied only on some behaviors@]";
       translate_pre_spec kf env spec ;
     | AInvariant(l, loop_invariant, p) ->
       if Keep_status.must_translate kf Keep_status.K_Invariant then
-	let env = Env.set_annotation_kind env Misc.Invariant in
-	if l <> [] then
-	  not_yet env "@[invariant applied only on some behaviors@]";
-	let env = translate_named_predicate kf env p in
-	if loop_invariant then Env.add_loop_invariant env p else env
+        let env = Env.set_annotation_kind env Constructor.Invariant in
+        if l <> [] then
+          not_yet env "@[invariant applied only on some behaviors@]";
+        let env = translate_named_predicate kf env p in
+        if loop_invariant then Env.add_loop_invariant env p else env
       else
-	env
+        env
     | AVariant _ ->
       if Keep_status.must_translate kf Keep_status.K_Variant
       then not_yet env "variant"

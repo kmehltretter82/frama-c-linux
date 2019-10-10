@@ -33,7 +33,7 @@ let apply_on_var ~loc funname e =
     else if Gmp_types.Q.is_t ty then "__gmpq_"
     else assert false
   in
-  Misc.mk_call ~loc (prefix ^ funname) [ e ]
+  Constructor.mk_lib_call ~loc (prefix ^ funname) [ e ]
 
 let init ~loc e = apply_on_var "init" ~loc e
 let clear ~loc e = apply_on_var "clear" ~loc e
@@ -72,7 +72,7 @@ let generic_affect ~loc fname lv ev e =
   let ty = Cil.typeOf ev in
   if Gmp_types.Z.is_t ty || Gmp_types.Q.is_t ty then begin
     let suf, args = get_set_suffix_and_arg e in
-    Misc.mk_call ~loc (fname ^ suf) (ev :: args)
+    Constructor.mk_lib_call ~loc (fname ^ suf) (ev :: args)
   end else
     Cil.mkStmtOneInstr ~valid_sid:true (Set(lv, e, e.eloc))
 
@@ -92,8 +92,8 @@ let init_set ~loc lv ev e =
     (match e.enode with
     | Lval elv ->
       assert (Gmp_types.Z.is_t (Cil.typeOf ev));
-      let call = Misc.mk_call
-        ~loc
+      let call =
+        Constructor.mk_lib_call ~loc
         "__gmpz_import"
         [ ev;
           Cil.one ~loc;
