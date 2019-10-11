@@ -235,7 +235,7 @@ let add_new_block_in_stmt env kf stmt =
   (* [TODO ARCHI] what about the above comment? *)
   (* Add temporal analysis instrumentations *)
   let env = Temporal.handle_stmt stmt env kf in
-  let new_stmt, env, must_mv =
+  let new_stmt, env =
     if Functions.check kf then
       let env =
         (* handle ghost statement *)
@@ -248,10 +248,10 @@ let add_new_block_in_stmt env kf stmt =
           env
       in
       (* handle loop invariants *)
-      let new_stmt, env, must_mv = Loops.preserve_invariant env kf stmt in
-      new_stmt, env, must_mv
+      let new_stmt, env = Loops.preserve_invariant env kf stmt in
+      new_stmt, env
     else
-      stmt, env, false
+      stmt, env
   in
   let mk_post_env env stmt =
     Annotations.fold_code_annot
@@ -343,7 +343,6 @@ let add_new_block_in_stmt env kf stmt =
         E_acsl_label.move kf new_stmt res;
       res, env
   in
-  if must_mv then Loops.mv_invariants kf ~old:new_stmt stmt;
   Options.debug ~level:4
     "@[new stmt (from sid %d):@ %a@]" stmt.sid Printer.pp_stmt new_stmt;
   new_stmt, env
@@ -769,7 +768,6 @@ let inject () =
   Misc.reorder_ast ();
   let ast = Ast.get () in
   inject_in_file ast;
-  Loops.apply_after_transformation ();
   reset_all ast;
 
 (*

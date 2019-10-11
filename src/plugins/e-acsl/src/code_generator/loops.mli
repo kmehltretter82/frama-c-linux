@@ -28,18 +28,10 @@ open Cil_types
 (************************* Loop invariants ********************************)
 (**************************************************************************)
 
-val apply_after_transformation: unit -> unit
-
-val mv_invariants: kernel_function -> old:stmt -> stmt -> unit
-(** Transfer the loop invariants from the [old] loop to the new one.
-    Both statements must be loops. *)
-
 val preserve_invariant:
-  Env.t -> Kernel_function.t -> stmt -> stmt * Env.t * bool
+  Env.t -> Kernel_function.t -> stmt -> stmt * Env.t
 (** modify the given stmt loop to insert the code which preserves its loop
-    invariants. Also return the modify environment and a boolean which
-    indicates whether the annotations corresponding to the loop invariant must
-    be moved from the new statement to the old one. *)
+    invariants. Also return the modify environment. *)
 
 (**************************************************************************)
 (**************************** Nested loops ********************************)

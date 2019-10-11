@@ -43,30 +43,9 @@ let term_to_exp_ref
 (************************* Loop invariants ********************************)
 (**************************************************************************)
 
-module Loop_invariants_actions = Hook.Make(struct end)
-
-let apply_after_transformation = Loop_invariants_actions.apply
-
-let mv_invariants kf ~old stmt =
-  Options.feedback ~current:true ~level:3
-    "keep loop invariants attached to its loop";
-  let filter _ ca = match ca.annot_content with
-    | AInvariant(_, b, _) -> b
-    | _ -> false
-  in
-  let l = Annotations.code_annot_emitter ~filter stmt in
-  if l != [] then
-    Loop_invariants_actions.extend
-      (fun () ->
-         List.iter
-           (fun (ca, e) ->
-              Annotations.remove_code_annot e ~kf old ca;
-              Annotations.add_code_annot e ~kf stmt ca)
-           l)
-
 let preserve_invariant env kf stmt = match stmt.skind with
   | Loop(_, ({ bstmts = stmts } as blk), loc, cont, break) ->
-    let rec handle_invariants (stmts, env, _ as acc) = function
+    let rec handle_invariants (stmts, env as acc) = function
       | [] ->
         (* empty loop body: no need to verify the invariant twice *)
         acc
@@ -80,16 +59,17 @@ let preserve_invariant env kf stmt = match stmt.skind with
         let blk, env =
           Env.pop_and_get env last ~global_clear:false Env.Before
         in
-        Constructor.mk_block last blk :: stmts, env, invariants != []
-      | s :: tl -> handle_invariants (s :: stmts, env, false) tl
+        Constructor.mk_block last blk :: stmts, env
+      | s :: tl ->
+        handle_invariants (s :: stmts, env) tl
     in
     let env = Env.set_annotation_kind env Constructor.Invariant in
-    let stmts, env, has_loop = handle_invariants ([], env, false) stmts in
+    let stmts, env = handle_invariants ([], env) stmts in
     let new_blk = { blk with bstmts = List.rev stmts } in
     { stmt with skind = Loop([], new_blk, loc, cont, break) },
-    env,
-    has_loop
-  | _ -> stmt, env, false
+    env
+  | _ ->
+    stmt, env
 
 (**************************************************************************)
 (**************************** Nested loops ********************************)
