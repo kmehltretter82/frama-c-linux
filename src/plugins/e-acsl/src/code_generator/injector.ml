@@ -494,14 +494,14 @@ and inject_in_stmt env kf stmt =
 
 and inject_in_block (env: Env.t) kf blk =
   let stmts, env =
-    List.fold_right
-      (fun stmt (stmts, env) ->
+    List.fold_left
+      (fun (stmts, env) stmt ->
          let stmt, env = inject_in_stmt env kf stmt in
          stmt :: stmts, env)
-      blk.bstmts
       ([], env)
+      blk.bstmts
   in
-  blk.bstmts <- stmts;
+  blk.bstmts <- List.rev stmts;
   let free_stmts = At_with_lscope.Free.find_all kf in
   match blk.blocals, free_stmts with
   | [], [] ->

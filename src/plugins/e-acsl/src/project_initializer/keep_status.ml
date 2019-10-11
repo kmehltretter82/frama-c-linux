@@ -150,3 +150,9 @@ let must_translate kf kind =
         pretty_kind kind';
     keep
     with Not_found -> true
+
+(*
+Local Variables:
+compile-command: "make -C ../.."
+End:
+*)

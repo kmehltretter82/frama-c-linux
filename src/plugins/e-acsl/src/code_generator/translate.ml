@@ -980,12 +980,12 @@ let translate_preconditions kf env behaviors =
                  ~loc
                  (assumes_pred,
                   Logic_const.unamed ~loc p.ip_content.pred_content)
-	    in
-	    translate_named_predicate kf env p
-	  else
-	    env
-	in
-	handle_error do_it env)
+             in
+             translate_named_predicate kf env p
+           else
+             env
+         in
+         handle_error do_it env)
       env
       b.b_requires
   in
