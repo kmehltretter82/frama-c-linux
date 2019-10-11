@@ -347,7 +347,9 @@ let add_new_block_in_stmt env kf stmt =
     "@[new stmt (from sid %d):@ %a@]" stmt.sid Printer.pp_stmt new_stmt;
   new_stmt, env
 
-(* [TODO ARCHI] not sure returning the stmt_kind is useful *)
+(* [TODO ARCHI] not sure returning the stmt_kind is useful;
+   actually probably useful for printf-like functions.
+   TO BE TESTED LATER *)
 (* visit the substmts and build the new skind *)
 let rec inject_in_substmt env kf stmt = match stmt.skind with
   | Instr instr ->
