@@ -866,6 +866,8 @@ let global_env = Datatype.String.Hashtbl.create 307
 (* ghost global environment: superset of global and subset of ghost *)
 let ghost_global_env = Datatype.String.Hashtbl.create 307
 
+(* maps a C label to the ghost environment of variables in scope
+   at this program point. Used for typing \at() terms and predicates. *)
 let label_env = Datatype.String.Hashtbl.create 307
 
 let add_label_env lab =
@@ -876,7 +878,7 @@ let add_label_env lab =
     | _ -> map
   in
   let open Datatype.String.Hashtbl in
-  let lab_env = fold add_if_absent env Datatype.String.Map.empty in
+  let lab_env = fold add_if_absent ghost_env Datatype.String.Map.empty in
   add label_env lab lab_env
 
 let remove_label_env lab =

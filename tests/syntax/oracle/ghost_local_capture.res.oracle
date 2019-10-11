@@ -10,7 +10,7 @@ void titi(void)
     c = 2;
     /*@ assert c_0 ≡ 1; */ ;
     /*@ assert \at(c,L0) ≡ 0; */ ;
-    /*@ assert \at(c,L1) ≡ 1; */ ;
+    /*@ assert \at(c_0,L1) ≡ 1; */ ;
   }
   /*@ assert c ≡ 2; */ ;
   return;
