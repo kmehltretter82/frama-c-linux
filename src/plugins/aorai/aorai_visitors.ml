@@ -117,6 +117,7 @@ object (self)
       let vi_pre = Cil_const.copy_with_new_vid vi in
       vi_pre.vname <- Data_for_aorai.get_fresh (vi_pre.vname ^ "_pre_func");
       vi_pre.vdefined <- true;
+      vi_pre.vghost <- true;
       Cil_datatype.Varinfo.Hashtbl.add func_orig_table vi_pre (Pre_func kf);
         (* TODO:
            - what about protos that have no specified args
@@ -135,7 +136,7 @@ object (self)
         else ["res",rettype,[]]
       in
       let vi_post =
-        Cil.makeGlobalVar
+        Cil.makeGlobalVar ~ghost:true
           (Data_for_aorai.get_fresh (vi.vname ^ "_post_func"))
           (TFun(voidType,Some arg,false,[]))
       in
@@ -163,11 +164,12 @@ object (self)
       fun_dec_post.sbody <- post_block;
       fun_dec_post.svar.vdefined <- true;
       let globs = [ GFun(fun_dec_pre,loc); GFun(fun_dec_post,loc);] in
-      fundec.sbody.bstmts <- Cil.mkStmtOneInstr
-        (Call(None,Cil.evar ~loc vi_pre,
-              List.map (fun x -> Cil.evar ~loc x)
-                (Kernel_function.get_formals kf),
-              loc))
+      fundec.sbody.bstmts <-
+        Cil.mkStmtOneInstr ~ghost:true
+          (Call(None,Cil.evar ~loc vi_pre,
+                List.map (fun x -> Cil.evar ~loc x)
+                  (Kernel_function.get_formals kf),
+                loc))
       :: fundec.sbody.bstmts;
       Globals.Functions.replace_by_definition
         (Cil.empty_funspec()) fun_dec_pre loc;
@@ -201,7 +203,8 @@ object (self)
                 Kernel_function.pretty kf
           in
           let call =
-            mkStmtOneInstr (Call (None,Cil.evar ~loc aux_vi,args,loc))
+            mkStmtOneInstr
+              ~ghost:true (Call (None,Cil.evar ~loc aux_vi,args,loc))
           in
           let new_return = mkStmt ~valid_sid:true stmt.skind in
           let new_stmts = [call; new_return] in
@@ -975,11 +978,9 @@ object(self)
 
       let loc = Cil_datatype.Stmt.loc stmt in
       let stmt_varset =
-        Cil.mkStmtOneInstr
+        Cil.mkStmtOneInstr ~ghost:true ~valid_sid:true
           (Set((Var vi_init,NoOffset), Cil.zero ~loc, loc))
       in
-      stmt_varset.sid<-(Cil_const.Sid.next ());
-      stmt_varset.ghost<-true;
       begin
         (* Function adapted from the cil printer *)
         try
@@ -1009,10 +1010,9 @@ object(self)
       (*    2) The associated init variable is set to 1 before the loop *)
       let new_loop = mkStmt ~valid_sid:true stmt.skind in
       let stmt_varset =
-        Cil.mkStmtOneInstr ~valid_sid:true
+        Cil.mkStmtOneInstr ~ghost:true ~valid_sid:true
           (Set((Var(vi_init),NoOffset), Cil.one ~loc, loc))
       in
-      stmt_varset.ghost <- true;
       let block = mkBlock [stmt_varset;new_loop] in
       stmt.skind<-Block(block);
 
