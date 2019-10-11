@@ -151,8 +151,6 @@ let generate_code =
                         Gmp_types.init ();
                         Mmodel_analysis.reset ();
                         Injector.inject ();
-                        (* [TODO ARCHI] remove the project as arguments *)
-                        Loops.apply_after_transformation copied_prj;
                         (* remove the RTE's results computed from E-ACSL:
                            they are partial and associated with the wrong
                            kernel function (the one of the old project). *)

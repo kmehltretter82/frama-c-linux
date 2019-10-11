@@ -28,7 +28,7 @@ open Cil_types
 (************************* Loop invariants ********************************)
 (**************************************************************************)
 
-val apply_after_transformation: Project.t -> unit
+val apply_after_transformation: unit -> unit
 
 val mv_invariants: kernel_function -> old:stmt -> stmt -> unit
 (** Transfer the loop invariants from the [old] loop to the new one.

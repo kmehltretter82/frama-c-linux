@@ -434,7 +434,9 @@ let pop_and_get ?(split=false) env stmt ~global_clear where =
        the final block does not contain any local, so may be transient. *)
     if split then
       match stmt.skind with
-      | Instr (Skip _) -> b
+      (* [TODO ARCHI] would result in nicer generated pieces of code, but
+       * killing statements has huge consequences on Frama-C invariants... *)
+      (*      | Instr (Skip _) -> b *)
       | _ ->
         let sblock = Cil.mkStmt ~valid_sid:true (Block b) in
         Cil.transient_block (Cil.mkBlock [ sblock; stmt ])

@@ -45,8 +45,7 @@ let term_to_exp_ref
 
 module Loop_invariants_actions = Hook.Make(struct end)
 
-let apply_after_transformation prj =
-  Project.on prj Loop_invariants_actions.apply ()
+let apply_after_transformation = Loop_invariants_actions.apply
 
 let mv_invariants kf ~old stmt =
   Options.feedback ~current:true ~level:3

@@ -348,6 +348,7 @@ let add_new_block_in_stmt env kf stmt =
     "@[new stmt (from sid %d):@ %a@]" stmt.sid Printer.pp_stmt new_stmt;
   new_stmt, env
 
+(* [TODO ARCHI] not sure returning the stmt_kind is useful *)
 (* visit the substmts and build the new skind *)
 let rec inject_in_substmt env kf stmt = match stmt.skind with
   | Instr instr ->
@@ -748,23 +749,28 @@ let inject_in_file file =
   file.globals <- Logic_functions.add_generated_functions file.globals;
   inject_mmodel_initializer main
 
-let reset_all () =
+let reset_all ast =
+  Options.Run.off ();
   Misc.reset ();
   Logic_functions.reset ();
   Literal_strings.reset ();
   Global_observer.reset ();
-  Keep_status.before_translation ()
+  Typing.clear ();
+  Cfg.clearFileCFG ~clear_id:false ast;
+  Cfg.computeFileCFG ast;
+  Kernel_function.clear_sid_info ();
+  Ast.mark_as_grown ()
 
 let inject () =
   Options.feedback ~level:2
     "injecting annotations as code in project %a"
     Project.pretty (Project.current ());
-  reset_all ();
+  Keep_status.before_translation ();
   Misc.reorder_ast ();
   let ast = Ast.get () in
   inject_in_file ast;
-  (* [TODO ARCHI] not consistent with the [reset_all] strategy: *)
-  Typing.clear ()
+  Loops.apply_after_transformation ();
+  reset_all ast;
 
 (*
 Local Variables:
