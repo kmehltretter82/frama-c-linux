@@ -45,29 +45,24 @@ let move kf ~old new_stmt =
     old.labels <- [];
     new_stmt.labels <- labels @ new_stmt.labels;
     Labeled_stmts.add old new_stmt;
+    (* move annotations from the old labeled stmt to the new one *)
+    let l = Annotations.fold_code_annot (fun e ca l -> (e, ca) :: l) old [] in
+    List.iter
+      (fun (e, ca) ->
+         Annotations.remove_code_annot ~kf e old ca;
+         Annotations.add_code_annot ~kf e new_stmt ca)
+      l;
     (* update the gotos of the function jumping to one of the labels *)
-    let o orig_stmt = object
-      inherit Visitor.frama_c_inplace
-      (* invariant of this method: [s = Visitor_behavior.Memo.stmt vis#behavior orig_stmt] *)
-      method !vstmt_aux s = match s.skind, orig_stmt.skind with
-      | Goto(s_ref, _), Goto(orig_ref, _) ->
-        if Cil_datatype.Stmt.equal !orig_ref old && s_ref != orig_ref then
-          (* Forward goto: it has already been visited.
-             We must update the reference. *)
-          s_ref := new_stmt;
-        Cil.SkipChildren
-      | _ -> Cil.DoChildren
-      (* improve efficiency: skip children which cannot contain any label *)
-      method !vinst _ = Cil.SkipChildren
-      method !vexpr _ = Cil.SkipChildren
-      method !vlval _ = Cil.SkipChildren
-    end in
-    let mv_labels s = ignore (Visitor.visitFramacStmt (o s) s) in
     let f =
       try Kernel_function.get_definition kf
       with Kernel_function.No_Definition -> assert false
     in
-    List.iter mv_labels f.sallstmts
+    let mv_label s = match s.skind with
+      | Goto(s_ref, _) when Cil_datatype.Stmt.equal !s_ref old ->
+        s_ref := new_stmt
+      | _ -> ()
+    in
+    List.iter mv_label f.sallstmts
 
 let get_stmt kf = function
   | StmtLabel { contents = stmt } -> stmt

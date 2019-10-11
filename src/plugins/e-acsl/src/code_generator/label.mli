@@ -29,6 +29,7 @@ val move: kernel_function -> old:stmt -> stmt -> unit
 val get_stmt: kernel_function -> logic_label -> stmt
 (** @return the statement where the logic label points to. *)
 
+(* [TODO ARCHI] currently unused: *)
 val new_labeled_stmt: stmt -> stmt
 (** @return the labeled stmt to use instead of the given one (which
     previously contained a label *)
@@ -38,6 +39,6 @@ val self: State.t
 
 (*
 Local Variables:
-compile-command: "make"
+compile-command: "make -C ../.."
 End:
 *)
