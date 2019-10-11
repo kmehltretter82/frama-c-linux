@@ -697,10 +697,11 @@ val makeFormalVar: fundec -> ?ghost:bool -> ?where:string -> ?loc:Location.t -> 
     a fresh name will be generated for the varinfo.
 
     @modify Chlorine-20180501 the name of the variable is guaranteed to be fresh.
+    @modify Frama-C+dev add ghost optional argument
 *)
 val makeLocalVar:
   fundec -> ?scope:block -> ?temp:bool -> ?referenced:bool -> ?insert:bool ->
-  ?loc:Location.t -> string -> typ -> varinfo
+  ?ghost:bool -> ?loc:Location.t -> string -> typ -> varinfo
 
 (** if needed, rename the given varinfo so that its [vname] does not
     clash with the one of a local or formal variable of the given function.
@@ -718,14 +719,19 @@ val refresh_local_name: fundec -> varinfo -> unit
     If [insert] is true (the default), the variable will be inserted
     among other locals of the function. The value for [insert] should
     only be changed if you are completely sure this is not useful.
+
+    @modify Frama-C+dev add ghost optional argument
  *)
-val makeTempVar: fundec -> ?insert:bool -> ?name:string -> ?descr:string ->
-                 ?descrpure:bool -> ?loc:Location.t -> typ -> varinfo
+val makeTempVar: fundec -> ?insert:bool -> ?ghost:bool -> ?name:string ->
+  ?descr:string -> ?descrpure:bool -> ?loc:Location.t -> typ -> varinfo
 
 (** Make a global variable. Your responsibility to make sure that the name
-    is unique. [source] defaults to [true]. [temp] defaults to [false].*)
-val makeGlobalVar: ?source:bool -> ?temp:bool -> ?referenced:bool -> ?loc:Location.t -> string ->
-  typ -> varinfo
+    is unique. [source] defaults to [true]. [temp] defaults to [false].
+
+    @modify Frama-C+dev add ghost optional arg
+*)
+val makeGlobalVar: ?source:bool -> ?temp:bool -> ?referenced:bool ->
+  ?ghost:bool -> ?loc:Cil_datatype.Location.t -> string -> typ -> varinfo
 
 (** Make a shallow copy of a [varinfo] and assign a new identifier.
     If the original varinfo has an associated logic var, it is copied too and
