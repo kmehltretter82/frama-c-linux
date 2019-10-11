@@ -8979,7 +8979,7 @@ and doDecl local_env (isglobal: bool) : A.definition -> chunk = function
       (* Make the fundec right away, and we'll populate it later. We
        * need this throughout the code to create temporaries. *)
       currentFunctionFDEC :=
-        { svar     = makeGlobalVar ~temp:false n voidType;
+        { svar     = makeGlobalVar ~temp:false ~ghost n voidType;
           slocals  = []; (* For now we'll put here both the locals and
                           * the formals. Then "endFunction" will
                           * separate them *)

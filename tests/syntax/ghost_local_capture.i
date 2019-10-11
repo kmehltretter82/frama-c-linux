@@ -10,3 +10,6 @@ void titi() {
   }
   /*@ assert c == 2; */
 }
+
+/*@ ghost int x; */
+/*@ ghost void f() { x++; } */

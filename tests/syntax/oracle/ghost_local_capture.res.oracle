@@ -16,4 +16,13 @@ void titi(void)
   return;
 }
 
+/*@ ghost int x; */
+/*@ ghost void f(void)
+          {
+            x ++;
+            return;
+          }
+
+*/
+
 
