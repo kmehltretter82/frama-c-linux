@@ -1175,10 +1175,10 @@ let get_temp_name ?(ghost=false) () =
   name
 
 (* Create a new temporary variable *)
-let newTempVar ~ghost descr (descrpure:bool) typ =
+let newTempVar ~ghost loc descr (descrpure:bool) typ =
   let t' = (!typeForInsertedVar) typ in
   let name = get_temp_name ~ghost () in
-  let vi = makeVarinfo ~ghost ~temp:true false false name t' in
+  let vi = makeVarinfo ~ghost ~temp:true ~loc false false name t' in
   vi.vdescr <- Some descr;
   vi.vdescrpure <- descrpure;
   alphaConvertVarAndAddToEnv false vi
@@ -1566,7 +1566,8 @@ struct
               match Cil_datatype.Varinfo.Hashtbl.find_opt replacements vi with
               | None ->
                 let vi' =
-                  newTempVar (vi.vname ^ " initialization") ~ghost true vi.vtype
+                  newTempVar
+                    ~ghost vi.vdecl (vi.vname ^ " initialization") true vi.vtype
                 in
                 Cil_datatype.Varinfo.Hashtbl.add replacements vi vi';
                 vars := vi' :: !vars;
@@ -4719,11 +4720,10 @@ and makeVarInfoCabs
     Kernel.error ~once:true ~current:true "inline for a non-function: %s" n;
   checkRestrictQualifierDeep vtype;
   (*  log "Looking at %s(%b): (%a)@." n isformal d_attrlist nattr;*)
-  let vi = makeVarinfo ~ghost ~referenced ~temp:isgenerated isglobal isformal n vtype
+  let vi = makeVarinfo ~ghost ~referenced ~temp:isgenerated ~loc:ldecl isglobal isformal n vtype
   in
   vi.vstorage <- sto;
   vi.vattr <- nattr;
-  vi.vdecl <- ldecl;
   vi.vdefined <-
     not (isFunctionType vtype) && isglobal && (sto = NoStorage || sto = Static);
 
@@ -6176,7 +6176,7 @@ and doExp local_env
                   Format.asprintf "%a%s"
                     Cil_descriptive_printer.pp_exp  e'
                     (if uop = A.POSINCR then "++" else "--") in
-                let tmp = newTempVar ~ghost descr true t in
+                let tmp = newTempVar ~ghost loc descr true t in
                 ([var tmp],
                  local_var_chunk se' tmp +++
                  (mkStmtOneInstr ~ghost:local_env.is_ghost ~valid_sid
@@ -6258,7 +6258,7 @@ and doExp local_env
                 let descr =
                   Format.asprintf "%a" Cil_descriptive_printer.pp_lval lv
                 in
-                let tmp = newTempVar ~ghost descr true lvt in
+                let tmp = newTempVar ~ghost loc descr true lvt in
                 let chunk =
                   i2c
                     (mkStmtOneInstr ~ghost:local_env.is_ghost ~valid_sid
@@ -6380,7 +6380,7 @@ and doExp local_env
           finishExp [] se e' intType
         | _ ->
           let tmp =
-            newTempVar ~ghost "<boolean expression>" true intType
+            newTempVar ~ghost loc "<boolean expression>" true intType
           in
           let condChunk =
             compileCondExp ~ghost ce
@@ -6738,7 +6738,7 @@ and doExp local_env
                      match !pwhat with
                      | ASet (is_real,lv, r, lvt) -> is_real, lv, r, lvt
                      | _ ->
-                       let v = newTempVar ~ghost "vararg" true resTyp in
+                       let v = newTempVar ~ghost loc "vararg" true resTyp in
                        locals := v::!locals;
                        false, var v, [], resTyp
                    in
@@ -7054,8 +7054,7 @@ and doExp local_env
                    Cil_descriptive_printer.pp_exp)
                 !pargs
             in
-            let tmp = newTempVar ~ghost descr false restype'' in
-            tmp.vdecl <- loc;
+            let tmp = newTempVar ~ghost loc descr false restype'' in
             locals:=tmp::!locals;
             (* Remember that this variable has been created for this
              * specific call. We will use this in collapseCallCast. *)
@@ -7194,7 +7193,7 @@ and doExp local_env
                let descr =
                  Format.asprintf "%a" Cprint.print_expression e1
                in
-               let tmp = newTempVar ~ghost descr true tresult in
+               let tmp = newTempVar ~ghost loc descr true tresult in
                let tmp_var = var tmp in
                let tmp_lval = new_exp ~loc:e.expr_loc (Lval (tmp_var)) in
                let (r1, se1, _, _) =
@@ -7263,7 +7262,7 @@ and doExp local_env
                 let descr =
                   Format.asprintf "%a" Cprint.print_expression e1
                 in
-                let tmp = newTempVar ~ghost descr true tresult in
+                let tmp = newTempVar ~ghost loc descr true tresult in
                 let tmp_var = var tmp in
                 let tmp_lval = new_exp ~loc:e.expr_loc (Lval (tmp_var)) in
                 let (r1,se1, _, _) =
@@ -7292,7 +7291,7 @@ and doExp local_env
                         Cil_descriptive_printer.pp_exp e2'
                         Cil_descriptive_printer.pp_exp e3'
                     in
-                    let tmp = newTempVar ~ghost descr true tresult in
+                    let tmp = newTempVar ~ghost loc descr true tresult in
                     false, var tmp, [], tresult,
                     local_var_chunk empty tmp
                 in
@@ -7365,7 +7364,7 @@ and doExp local_env
           let se, e =
             match se.stmts with
             | [ { skind = Block b},_, _, _, _ ] ->
-              let vi = newTempVar ~ghost "GNU.body" true t in
+              let vi = newTempVar ~ghost loc "GNU.body" true t in
               b.bstmts <-
                 b.bstmts @
                 [Cil.mkStmtOneInstr ~ghost:local_env.is_ghost ~valid_sid
@@ -8565,7 +8564,10 @@ and cleanup_autoreference vi chunk =
           | Some v' -> ChangeTo v'
           | None ->
             let ghost = v.vghost in
-            let v' = newTempVar ~ghost (vi.vname ^ " initialization") true vi.vtype in
+            let loc = v.vdecl in
+            let v' =
+              newTempVar ~ghost loc (vi.vname ^ " initialization") true vi.vtype
+            in
             temp := Some v';
             ChangeTo v'
         end else SkipChildren
@@ -8765,7 +8767,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
           (* do it in two *)
           let rt, _, _, _ = splitFunctionType alloca.vtype in
           let tmp =
-            newTempVar ~ghost
+            newTempVar ~ghost loc
               (Format.asprintf "alloca(%a)" Cil_printer.pp_exp alloca_size)
               false rt
           in
@@ -9036,9 +9038,8 @@ and doDecl local_env (isglobal: bool) : A.definition -> chunk = function
         (* sfg: extract tsets for the formals from dt *)
         let doFormal (loc : location) ((fn, ft, fa) as fd) =
           let ghost = ghost || isGhostFormalVarDecl fd in
-          let f = makeVarinfo ~ghost ~temp:false false true fn ft in
-          (f.vdecl <- loc;
-           f.vattr <- fa;
+          let f = makeVarinfo ~ghost ~temp:false ~loc false true fn ft in
+          (f.vattr <- fa;
            alphaConvertVarAndAddToEnv true f)
         in
         let rec doFormals fl' ll' =
