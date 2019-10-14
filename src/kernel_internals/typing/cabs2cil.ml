@@ -921,16 +921,16 @@ let addLocalToEnv ghost name data =
   (* If we are in a scope, then it means we are not at top level. Add the
    * name to the scope *)
   match !scopes with
-   | [] -> begin
+  | [] -> begin
       match data with
-       | EnvVar _ ->
-         Kernel.fatal ~current:true
+      | EnvVar _ ->
+        Kernel.fatal ~current:true
           "addLocalToEnv: not in a scope when adding %s!" name
-       | _ ->
+      | _ ->
         (* Adding a type with local scope *)
         Datatype.String.Hashtbl.add ghost_global_env name v;
         if not ghost then Datatype.String.Hashtbl.add global_env name v
-     end
+    end
   | s :: _ -> s := UndoRemoveFromEnv (ghost, name) :: !s
 
 let addGlobalToEnv ghost name data =
