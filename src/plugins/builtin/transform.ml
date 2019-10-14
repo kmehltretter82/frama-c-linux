@@ -22,9 +22,11 @@
 
 open Cil_types
 
+exception Bad_typing of string
+
 module type Builtin = sig
   val function_name: string
-  val replace_call: instr -> instr
+  val replace_call: (varinfo * exp list) -> (varinfo * exp list)
   val get_globals: location -> global list
   val mark_as_computed: ?project:Project.t -> unit -> unit
 end
@@ -45,26 +47,20 @@ let get_globals loc =
   in
   Hashtbl.fold (fun _ v l -> (get_globals v) @ l) base []
 
-let called_function = function
-  | Call(_, { enode = Lval((Var fct), NoOffset) }, _, _)
-  | Local_init(_, ConsInit(fct, _, Plain_func), _) -> fct
-  | _ -> assert false
-
-let called_function_name inst =
-  let fct = called_function inst in fct.vname
-
-let find_stdlib_attr_in_call inst =
-  let fct = called_function inst in
+let find_stdlib_attr fct =
   if not (Cil.hasAttribute "fc_stdlib" fct.vattr) then raise Not_found
 
-let replace_call inst =
+let replace_call (fct, args) =
   try
-    find_stdlib_attr_in_call inst ;
-    let name = called_function_name inst in
-    let m = Hashtbl.find base name in
+    find_stdlib_attr fct ;
+    let m = Hashtbl.find base fct.vname in
     let module M = (val m: Builtin) in
-    M.replace_call inst
-  with Not_found -> inst
+    M.replace_call (fct, args)
+  with
+  | Not_found -> (fct, args)
+  | Bad_typing s ->
+    Options.warning ~current:true "Ignored: %s" s ;
+    (fct, args)
 
 class visitor = object(_)
   inherit Visitor.frama_c_inplace
@@ -76,6 +72,8 @@ class visitor = object(_)
       f.globals <- globals @ f.globals ;
       mark_as_computed () ;
       Ast.mark_as_changed () ;
+      Ast.mark_as_grown () ;
+      File.reorder_ast () ;
       f
     in
     Cil.DoChildrenPost after
@@ -83,7 +81,12 @@ class visitor = object(_)
   method! vinst = function
     | Call(_) | Local_init(_, ConsInit(_, _, Plain_func), _) ->
       let change = function
-        | [i] -> [ replace_call i ]
+        | [ Call(r, ({ enode = Lval((Var fct), NoOffset) } as e), args, loc) ] ->
+          let fct, args = replace_call (fct, args) in
+          [ Call(r, { e with enode = Lval((Var fct), NoOffset) }, args, loc) ]
+        | [ Local_init(r, ConsInit(fct, args, Plain_func), loc) ] ->
+          let fct, args = replace_call (fct, args) in
+          [ Local_init(r, ConsInit(fct, args, Plain_func), loc) ]
         | _ -> assert false
       in
       Cil.DoChildrenPost change

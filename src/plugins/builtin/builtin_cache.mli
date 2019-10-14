@@ -22,12 +22,12 @@
 
 module type Generator = sig
   val function_name: String.t
-  val build_prototype: Cil_types.typ -> Cil_types.varinfo
+  val build_function: Cil_types.typ -> Cil_types.fundec
   val build_spec: Cil_types.varinfo -> Cil_types.location -> Cil_types.funspec
 end
 
 module type Table = sig
-  val get_function: Cil_types.typ -> Cil_types.varinfo
+  val get_varinfo: Cil_types.typ -> Cil_types.varinfo
   val get_globals: Cil_types.location -> Cil_types.global list
   val mark_as_computed: ?project:Project.t -> unit -> unit
 end

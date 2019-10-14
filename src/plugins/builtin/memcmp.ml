@@ -38,14 +38,14 @@ let presult_memcmp ?loc p1 p2 len =
   let res = prel ?loc (Req, (tresult ?loc Cil.intType), (tinteger ?loc 0)) in
   piff ?loc (res, eq)
 
-let generate_assigns loc t s1 s2 len =
+let generate_assigns loc s1 s2 len =
   let indirect_range loc s len =
     let t = { (tunref_range ~loc s len) with term_name = ["indirect"] } in
     new_identified_term t
   in
   let s1_range = indirect_range loc s1 len in
   let s2_range = indirect_range loc s2 len in
-  let result = new_identified_term (tresult t) in
+  let result = new_identified_term (tresult Cil.intType) in
   let res = result, From [s1_range ; s2_range] in
   Writes [ res ]
 
@@ -62,63 +62,69 @@ let generate_spec vi loc =
     | [ s1 ; s2 ; len ] -> s1, s2, len
     | _ -> assert false
   in
-  let t = c_s1.vtype in
   let s1 = cvar_to_tvar c_s1 in
   let s2 = cvar_to_tvar c_s2 in
   let len = cvar_to_tvar clen in
   let requires = generate_requires loc s1 s2 len in
-  let assigns  = generate_assigns loc t s1 s2 len in
+  let assigns  = generate_assigns loc s1 s2 len in
   let ensures  = generate_ensures loc s1 s2 len in
   make_funspec [make_behavior ~requires ~assigns ~ensures ()] ()
 
-let generate_prototype t =
-  let name = function_name ^ "_" ^ (string_of_typ t) in
+let generate_function_type t =
   let t = ptr_of (const_of t) in
   let params = [
     ("s1", t, []) ;
     ("s2", t, []) ;
     ("len", size_t (), [])
   ] in
-  let fun_t = TFun(Cil.intType, Some params, false, []) in
-  let vi = Cil.makeGlobalVar ~referenced:true name fun_t in
-  Cil.setFormalsDecl vi fun_t ;
-  vi
+  TFun(Cil.intType, Some params, false, [])
+
+let generate_body fd =
+  let loc  = Cil_datatype.Location.unknown in
+  let rv   = Cil.makeLocalVar fd "__retres" Cil.intType in
+  let args = List.map Cil.evar fd.sformals in
+  let call = Instr(call_function (Some (Var rv, NoOffset)) function_name args) in
+  let ret  = Return (Some (Cil.evar rv), loc) in
+  let block = Cil.mkBlock (List.map Cil.mkStmt [ call ; ret]) in
+  block.blocals <- [ rv ] ;
+  block
+
+let generate_function t =
+  let name = function_name ^ "_" ^ (string_of_typ t) in
+  let fun_t = generate_function_type t in
+  let fd = prepare_definition name fun_t in
+  set_function_body fd (generate_body fd) ;
+  fd
 
 module Table = Builtin_cache.Make(struct
     let function_name = function_name
-    let build_prototype = generate_prototype
+    let build_function = generate_function
     let build_spec = generate_spec
   end)
 
 let type_from_parameter x =
-  let x = Cil.stripCasts x in
   let xt = Cil.unrollTypeDeep (Cil.typeOf x) in
   let xt = Cil.type_remove_qualifier_attributes_deep xt in
   Cil.typeOf_pointed xt
 
-let well_typed_parameters s1 s2 =
-  let s1_t = type_from_parameter s1 in
-  let s2_t = type_from_parameter s2 in
-  Cil_datatype.Typ.equal s1_t s2_t
-
-let create_call fct (s1, s2, len) =
-  if well_typed_parameters s1 s2 then
-    let typ = type_from_parameter s1 in
-    let fct = Table.get_function typ in
+let replace_call = function
+  | (_fct, [ s1 ; s2 ; len ]) ->
     let s1 = Cil.stripCasts s1 in
     let s2 = Cil.stripCasts s2 in
-    fct, (s1, s2, len)
-  else
-    fct, (s1, s2, len)
-
-let replace_call = function
-  | Call(r, ({ enode = Lval((Var fct), NoOffset) } as e), [ s1 ; s2 ; len ], loc) ->
-    let fct, (s1, s2, len) = create_call fct (s1, s2, len) in
-    Call(r, { e with enode = Lval((Var fct), NoOffset) }, [ s1 ; s2 ; len ], loc)
-  | Local_init(r, ConsInit(fct, [ s1 ; s2 ; len ], Plain_func), loc) ->
-    let fct, (s1, s2, len) = create_call fct (s1, s2, len) in
-    Local_init(r, ConsInit(fct, [ s1 ; s2 ; len ], Plain_func), loc)
-  | _ -> assert false
+    let s1_t = type_from_parameter s1 in
+    let s2_t = type_from_parameter s2 in
+    if Cil_datatype.Typ.equal s1_t s2_t then
+      (Table.get_varinfo s1_t), [ s1 ; s2 ; len ]
+    else
+      let msg =
+        Format.asprintf "incompatible types for %s: src:%a(%a) dest:%a(%a)"
+          function_name
+          Cil_printer.pp_exp s1 Cil_printer.pp_typ s1_t
+          Cil_printer.pp_exp s2 Cil_printer.pp_typ s2_t
+      in
+      raise (Transform.Bad_typing msg)
+  | (_, _) ->
+    raise (Transform.Bad_typing ("Expected 3 arguments for " ^ function_name))
 
 let () = Transform.register (module struct
     let function_name = function_name

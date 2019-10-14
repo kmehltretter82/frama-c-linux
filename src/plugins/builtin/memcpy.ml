@@ -73,8 +73,7 @@ let generate_spec vi loc =
   let ensures  = generate_ensures loc t dest src len in
   make_funspec [make_behavior ~requires ~assigns ~ensures ()] ()
 
-let generate_prototype t =
-  let name = function_name ^ "_" ^ (string_of_typ t) in
+let generate_function_type t =
   let dt = ptr_of t in
   let st = ptr_of (const_of t) in
   let params = [
@@ -82,46 +81,54 @@ let generate_prototype t =
     ("src", st, []) ;
     ("len", size_t (), [])
   ] in
-  let fun_t = TFun(dt, Some params, false, []) in
-  let vi = Cil.makeGlobalVar ~referenced:true name fun_t in
-  Cil.setFormalsDecl vi fun_t ;
-  vi
+  TFun(dt, Some params, false, [])
+
+let generate_body t fd =
+  let loc  = Cil_datatype.Location.unknown in
+  let rv   = Cil.makeLocalVar fd "__retres" (TPtr(t, [])) in
+  let args = List.map Cil.evar fd.sformals in
+  let call = Instr(call_function (Some (Var rv, NoOffset)) function_name args) in
+  let ret  = Return (Some (Cil.evar rv), loc) in
+  let block = Cil.mkBlock (List.map Cil.mkStmt [ call ; ret]) in
+  block.blocals <- [ rv ] ;
+  block
+
+let generate_function t =
+  let name = function_name ^ "_" ^ (string_of_typ t) in
+  let fun_t = generate_function_type t in
+  let fd = prepare_definition name fun_t in
+  set_function_body fd (generate_body t fd) ;
+  fd
 
 module Table = Builtin_cache.Make(struct
     let function_name = function_name
-    let build_prototype = generate_prototype
+    let build_function = generate_function
     let build_spec = generate_spec
   end)
 
 let type_from_parameter x =
-  let x = Cil.stripCasts x in
   let xt = Cil.unrollTypeDeep (Cil.typeOf x) in
   let xt = Cil.type_remove_qualifier_attributes_deep xt in
   Cil.typeOf_pointed xt
 
-let well_typed_parameters dest src =
-  let dt = type_from_parameter dest in
-  let st = type_from_parameter src in
-  Cil_datatype.Typ.equal dt st
-
-let create_call fct (dest, src, len) =
-  if well_typed_parameters dest src then
-    let typ = type_from_parameter dest in
-    let fct = Table.get_function typ in
+let replace_call = function
+  | (_fct, [ dest ; src ; len ]) ->
     let dest = Cil.stripCasts dest in
     let src = Cil.stripCasts src in
-    fct, (dest, src, len)
-  else
-    fct, (dest, src, len)
-
-let replace_call = function
-  | Call(r, ({ enode = Lval((Var fct), NoOffset) } as e), [ dest ; src ; len ], loc) ->
-    let fct, (dest, src, len) = create_call fct (dest, src, len) in
-    Call(r, { e with enode = Lval((Var fct), NoOffset) }, [ dest ; src ; len ], loc)
-  | Local_init(r, ConsInit(fct, [ dest ; src ; len ], Plain_func), loc) ->
-    let fct, (dest, src, len) = create_call fct (dest, src, len) in
-    Local_init(r, ConsInit(fct, [ dest ; src ; len ], Plain_func), loc)
-  | _ -> assert false
+    let dt = type_from_parameter dest in
+    let st = type_from_parameter src in
+    if Cil_datatype.Typ.equal dt st then
+      (Table.get_varinfo dt), [ dest ; src ; len ]
+    else
+      let msg =
+        Format.asprintf "incompatible types for %s: src:%a(%a) dest:%a(%a)"
+          function_name
+          Cil_printer.pp_exp dest Cil_printer.pp_typ dt
+          Cil_printer.pp_exp src Cil_printer.pp_typ st
+      in
+      raise (Transform.Bad_typing msg)
+  | (_, _) ->
+    raise (Transform.Bad_typing ("Expected 3 arguments for " ^ function_name))
 
 let () = Transform.register (module struct
     let function_name = function_name

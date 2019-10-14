@@ -22,9 +22,11 @@
 
 open Cil_types
 
+exception Bad_typing of string
+
 module type Builtin = sig
   val function_name: string
-  val replace_call: instr -> instr
+  val replace_call: (varinfo * exp list) -> (varinfo * exp list)
   val get_globals: location -> global list
   val mark_as_computed: ?project:Project.t -> unit -> unit
 end
