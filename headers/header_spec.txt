@@ -932,8 +932,6 @@ src/plugins/occurrence/register_gui.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/occurrence/register_gui.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/builtin/basic_blocks.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/builtin/basic_blocks.mli: CEA_LGPL_OR_PROPRIETARY
-src/plugins/builtin/builtin_cache.ml: CEA_LGPL_OR_PROPRIETARY
-src/plugins/builtin/builtin_cache.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/builtin/Builtin.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/builtin/configure.ac: CEA_LGPL_OR_PROPRIETARY
 src/plugins/builtin/Makefile.in: CEA_LGPL_OR_PROPRIETARY

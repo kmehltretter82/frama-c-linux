@@ -57,7 +57,7 @@ let generate_ensures loc s1 s2 len =
     { (presult_memcmp_len_bytes ~loc s1 s2 len) with pred_name = [ "equals" ] }
   ]
 
-let generate_spec vi loc =
+let generate_spec _t { svar = vi } loc =
   let (c_s1, c_s2, clen) = match Cil.getFormalsDecl vi with
     | [ s1 ; s2 ; len ] -> s1, s2, len
     | _ -> assert false
@@ -96,39 +96,41 @@ let generate_function t =
   set_function_body fd (generate_body fd) ;
   fd
 
-module Table = Builtin_cache.Make(struct
-    let function_name = function_name
-    let build_function = generate_function
-    let build_spec = generate_spec
-  end)
-
-let type_from_parameter x =
+let type_from_arg x =
+  let x = Cil.stripCasts x in
   let xt = Cil.unrollTypeDeep (Cil.typeOf x) in
   let xt = Cil.type_remove_qualifier_attributes_deep xt in
   Cil.typeOf_pointed xt
 
-let replace_call = function
-  | (_fct, [ s1 ; s2 ; len ]) ->
+let well_typed_call = function
+  | [ s1 ; s2 ; len ] ->
+    (Cil.isIntegralType (Cil.typeOf len)) &&
+    (Cil_datatype.Typ.equal (type_from_arg s1) (type_from_arg s2))
+  | _ -> false
+
+let key_from_call = function
+  | [ s1 ; _ ; _ ] -> type_from_arg s1
+  | _ -> failwith "Call to Memmove.key_from_call on an ill-typed builtin call"
+
+let retype_args override_key = function
+  | [ s1 ; s2 ; len ] ->
     let s1 = Cil.stripCasts s1 in
     let s2 = Cil.stripCasts s2 in
-    let s1_t = type_from_parameter s1 in
-    let s2_t = type_from_parameter s2 in
-    if Cil_datatype.Typ.equal s1_t s2_t then
-      (Table.get_varinfo s1_t), [ s1 ; s2 ; len ]
-    else
-      let msg =
-        Format.asprintf "incompatible types for %s: src:%a(%a) dest:%a(%a)"
-          function_name
-          Cil_printer.pp_exp s1 Cil_printer.pp_typ s1_t
-          Cil_printer.pp_exp s2 Cil_printer.pp_typ s2_t
-      in
-      raise (Transform.Bad_typing msg)
-  | (_, _) ->
-    raise (Transform.Bad_typing ("Expected 3 arguments for " ^ function_name))
+    assert (
+      Cil_datatype.Typ.equal (type_from_arg s1) override_key &&
+      Cil_datatype.Typ.equal (type_from_arg s2) override_key
+    ) ;
+    [ s1 ; s2 ; len ]
+  | _ -> failwith "Call to Memmove.retype_args on an ill-typed builtin call"
 
 let () = Transform.register (module struct
+    module Hashtbl = Cil_datatype.Typ.Hashtbl
+    type override_key = typ
+
     let function_name = function_name
-    let replace_call  = replace_call
-    let get_globals   = Table.get_globals
-    let mark_as_computed = Table.mark_as_computed
+    let well_typed_call = well_typed_call
+    let key_from_call = key_from_call
+    let retype_args = retype_args
+    let generate_function = generate_function
+    let generate_spec = generate_spec
   end)

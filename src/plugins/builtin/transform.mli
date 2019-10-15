@@ -22,14 +22,18 @@
 
 open Cil_types
 
-exception Bad_typing of string
-
 module type Builtin = sig
+  module Hashtbl: Datatype.Hashtbl
+  type override_key = Hashtbl.key
+
   val function_name: string
-  val replace_call: (varinfo * exp list) -> (varinfo * exp list)
-  val get_globals: location -> global list
-  val mark_as_computed: ?project:Project.t -> unit -> unit
+  val well_typed_call: exp list -> bool
+  val key_from_call: exp list -> override_key
+  val retype_args: override_key -> exp list -> exp list
+  val generate_function: override_key -> fundec
+  val generate_spec: override_key -> fundec -> location -> funspec
 end
+
 val register: (module Builtin) -> unit
 
 val transform: Cil_types.file -> unit

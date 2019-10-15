@@ -59,7 +59,7 @@ let generate_ensures loc t dest src len =
     { (presult_dest ~loc t dest)            with pred_name = [ "result"] }
   ]
 
-let generate_spec vi loc =
+let generate_spec _t { svar = vi } loc =
   let (cdest, csrc, clen) = match Cil.getFormalsDecl vi with
     | [ dest ; src ; len ] -> dest, src, len
     | _ -> assert false
@@ -100,39 +100,41 @@ let generate_function t =
   set_function_body fd (generate_body t fd) ;
   fd
 
-module Table = Builtin_cache.Make(struct
-    let function_name = function_name
-    let build_function = generate_function
-    let build_spec = generate_spec
-  end)
-
-let type_from_parameter x =
+let type_from_arg x =
+  let x = Cil.stripCasts x in
   let xt = Cil.unrollTypeDeep (Cil.typeOf x) in
   let xt = Cil.type_remove_qualifier_attributes_deep xt in
   Cil.typeOf_pointed xt
 
-let replace_call = function
-  | (_fct, [ dest ; src ; len ]) ->
+let well_typed_call = function
+  | [ dest ; src ; len ] ->
+    (Cil.isIntegralType (Cil.typeOf len)) &&
+    (Cil_datatype.Typ.equal (type_from_arg dest) (type_from_arg src))
+  | _ -> false
+
+let key_from_call = function
+  | [ dest ; _ ; _ ] -> type_from_arg dest
+  | _ -> failwith "Call to Memcpy.key_from_call on an ill-typed builtin call"
+
+let retype_args override_key = function
+  | [ dest ; src ; len ] ->
     let dest = Cil.stripCasts dest in
     let src = Cil.stripCasts src in
-    let dt = type_from_parameter dest in
-    let st = type_from_parameter src in
-    if Cil_datatype.Typ.equal dt st then
-      (Table.get_varinfo dt), [ dest ; src ; len ]
-    else
-      let msg =
-        Format.asprintf "incompatible types for %s: src:%a(%a) dest:%a(%a)"
-          function_name
-          Cil_printer.pp_exp dest Cil_printer.pp_typ dt
-          Cil_printer.pp_exp src Cil_printer.pp_typ st
-      in
-      raise (Transform.Bad_typing msg)
-  | (_, _) ->
-    raise (Transform.Bad_typing ("Expected 3 arguments for " ^ function_name))
+    assert (
+      Cil_datatype.Typ.equal (type_from_arg dest) override_key &&
+      Cil_datatype.Typ.equal (type_from_arg src) override_key
+    ) ;
+    [ dest ; src ; len ]
+  | _ -> failwith "Call to Memcpy.retype_args on an ill-typed builtin call"
 
 let () = Transform.register (module struct
+    module Hashtbl = Cil_datatype.Typ.Hashtbl
+    type override_key = typ
+
     let function_name = function_name
-    let replace_call  = replace_call
-    let get_globals   = Table.get_globals
-    let mark_as_computed = Table.mark_as_computed
+    let well_typed_call = well_typed_call
+    let key_from_call = key_from_call
+    let retype_args = retype_args
+    let generate_function = generate_function
+    let generate_spec = generate_spec
   end)
