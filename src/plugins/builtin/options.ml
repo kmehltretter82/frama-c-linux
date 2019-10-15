@@ -26,7 +26,7 @@ let shortname = "builtin"
 include Plugin.Register
     (struct
       let name = name
-      let shortname = "-" ^ shortname
+      let shortname = shortname
       let help = "Overrides standard library functions"
     end)
 
