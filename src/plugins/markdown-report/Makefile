@@ -24,14 +24,10 @@ $(Report_markdown_DIR)/mdr_version.ml: $(Report_markdown_DIR)/Makefile
 
 $(Report_markdown_DIR)/Report_markdown.mli: \
   $(Report_markdown_DIR)/mdr_params.mli \
-  $(Report_markdown_DIR)/markdown.mli \
   $(Report_markdown_DIR)/md_gen.mli \
   $(Report_markdown_DIR)/Makefile
 	echo "module Mdr_params: sig" > $@
 	cat $(Report_markdown_DIR)/mdr_params.mli >> $@
-	echo "end" >> $@
-	echo "module Markdown: sig" >> $@
-	cat $(Report_markdown_DIR)/markdown.mli >> $@
 	echo "end" >> $@
 	echo "module Md_gen: sig" >> $@
 	cat $(Report_markdown_DIR)/md_gen.mli >> $@

@@ -1,11 +1,17 @@
 type align = Left | Center | Right
 
+type href =
+  | URL of string
+  | Page of string
+  | Name of string
+  | Section of string * string
+
 type inline =
   | Plain of string
   | Emph of string
   | Bold of string
   | Inline_code of string
-  | Link of text * string (** [Link(text,url)] *)
+  | Link of text * href (** [Link(text,url)] *)
   | Image of string * string (** [Image(alt,location)] *)
 
 and text = inline list
@@ -47,12 +53,41 @@ let plain s = [ Plain s]
 
 let plain_format txt = Format.kasprintf plain txt
 
-let plain_link s = Link ([Inline_code s],s)
+let plain_link h =
+  let s = match h with
+    | URL url -> url
+    | Page p -> p
+    | Section (_,s) -> s
+    | Name a -> a
+  in
+  Link ([Inline_code s], URL s)
 
 let codelines lang pp code =
   let s = Format.asprintf "@[%a@]" pp code in
   let lines = String.split_on_char '\n' s in
   Code_block (lang, lines)
+
+let id m =
+  let buffer = Buffer.create (String.length m) in
+  let lowercase = Char.lowercase_ascii in
+  let dash = ref false in
+  let emit c =
+    if !dash then (Buffer.add_char buffer '-' ; dash := false) ;
+    Buffer.add_char buffer c in
+  String.iter
+    (function
+      | '0'..'9' as c -> emit c
+      | 'a'..'z' as c -> emit c
+      | 'A'..'Z' as c -> emit (lowercase c)
+      | '.' | '_' as c -> emit c
+      | ' ' | '\t' | '\n' | '-' -> dash := (Buffer.length buffer > 0)
+      | _ -> ()) m ;
+  Buffer.contents buffer
+
+let pp_href fmt = function
+  | URL s | Page s -> Format.pp_print_string fmt s
+  | Section (p,s) -> Format.fprintf fmt "%s#%s" p (id s)
+  | Name a -> Format.fprintf fmt "#%s" (id a)
 
 let rec pp_inline fmt =
   function
@@ -60,7 +95,8 @@ let rec pp_inline fmt =
   | Emph s -> Format.fprintf fmt "_%s_" (String.trim s)
   | Bold s -> Format.fprintf fmt "**%s**" (String.trim s)
   | Inline_code s -> Format.fprintf fmt "`%s`" (String.trim s)
-  | Link (text,url) -> Format.fprintf fmt "@[<h>[%a](%s)@]@ " pp_text text url
+  | Link (text,url) ->
+    Format.fprintf fmt "@[<h>[%a](%a)@]@ " pp_text text pp_href url
   | Image (alt,url) -> Format.fprintf fmt "@[<h>![%s](%s)@]@ " alt url
 
 and pp_text fmt l =

@@ -1,11 +1,17 @@
 type align = Left | Center | Right
 
+type href =
+  | URL of string
+  | Page of string
+  | Name of string
+  | Section of string * string
+
 type inline =
   | Plain of string
   | Emph of string
   | Bold of string
   | Inline_code of string
-  | Link of text * string (** [Link(text,url)] *)
+  | Link of text * href
   | Image of string * string (** [Image(alt,location)] *)
 
 and text = inline list
