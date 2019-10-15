@@ -28,8 +28,7 @@ val const_of: typ -> typ
 val size_t: unit -> typ
 
 val prepare_definition: string -> typ -> fundec
-val set_function_body: fundec -> block -> unit
-val call_function: lval option -> string -> exp list -> instr
+val call_function: lval option -> varinfo -> exp list -> instr
 
 val string_of_typ: typ -> string
 

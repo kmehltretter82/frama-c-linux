@@ -30,8 +30,9 @@ module type Builtin = sig
   val well_typed_call: exp list -> bool
   val key_from_call: exp list -> override_key
   val retype_args: override_key -> exp list -> exp list
-  val generate_function: override_key -> fundec
+  val generate_prototype: override_key -> (string * typ)
   val generate_spec: override_key -> fundec -> location -> funspec
+  val args_for_original: override_key -> fundec -> exp list
 end
 
 val register: (module Builtin) -> unit

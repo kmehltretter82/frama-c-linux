@@ -21,6 +21,7 @@
 (**************************************************************************)
 
 open Cil_types
+open Basic_blocks
 
 module type Builtin = sig
   module Hashtbl: Datatype.Hashtbl
@@ -30,8 +31,9 @@ module type Builtin = sig
   val well_typed_call: exp list -> bool
   val key_from_call: exp list -> override_key
   val retype_args: override_key -> exp list -> exp list
-  val generate_function: override_key -> fundec
+  val generate_prototype: override_key -> (string * typ)
   val generate_spec: override_key -> fundec -> location -> funspec
+  val args_for_original: override_key -> fundec -> exp list
 end
 
 module type Internal_builtin = sig
@@ -52,13 +54,34 @@ module Make_internal_builtin (B: Builtin) = struct
         let name = "Builtins." ^ B.function_name
       end)
 
+  let create_and_add key =
+    let (name, typ) = B.generate_prototype key in
+    let fd = Basic_blocks.prepare_definition name typ in
+    let loc  = Cil_datatype.Location.unknown in
+    let open Globals.Functions in
+    let open Extlib in
+    let ret_var = match Cil.getReturnType fd.svar.vtype with
+      | t when Cil.isVoidType t -> None
+      | t -> Some (Cil.makeLocalVar fd "__retres" t)
+    in
+    let call =
+      let orig = get_vi (find_by_name function_name) in
+      let args = B.args_for_original key fd in
+      Instr(call_function (opt_map Cil.var ret_var) orig args)
+    in
+    let ret = Return ( (opt_map Cil.evar ret_var), loc) in
+    fd.sbody <-
+      { (Cil.mkBlock (List.map Cil.mkStmt [ call ; ret ])) 
+        with blocals = list_of_opt ret_var } ;
+    File.must_recompute_cfg fd ;
+    Cache.add key fd
+
   let get_override key =
     try
       Cache.find key
     with Not_found ->
-      let fct = B.generate_function key in
-      Cache.add key fct ;
-      fct
+      create_and_add key ;
+      Cache.find key
 
   let get_globals location =
     let finalize key fd =
@@ -135,12 +158,12 @@ class visitor = object(_)
   method! vinst = function
     | Call(_) | Local_init(_, ConsInit(_, _, Plain_func), _) ->
       let change = function
-        | [ Call(r, ({ enode = Lval((Var fct), NoOffset) } as e), args, loc) ] ->
-          let fct, args = replace_call (fct, args) in
-          [ Call(r, { e with enode = Lval((Var fct), NoOffset) }, args, loc) ]
-        | [ Local_init(r, ConsInit(fct, args, Plain_func), loc) ] ->
-          let fct, args = replace_call (fct, args) in
-          [ Local_init(r, ConsInit(fct, args, Plain_func), loc) ]
+        | [ Call(r, ({ enode = Lval((Var f), NoOffset) } as e), args, loc) ] ->
+          let f, args = replace_call (f, args) in
+          [ Call(r, { e with enode = Lval((Var f), NoOffset) }, args, loc) ]
+        | [ Local_init(r, ConsInit(f, args, Plain_func), loc) ] ->
+          let f, args = replace_call (f, args) in
+          [ Local_init(r, ConsInit(f, args, Plain_func), loc) ]
         | _ -> assert false
       in
       Cil.DoChildrenPost change

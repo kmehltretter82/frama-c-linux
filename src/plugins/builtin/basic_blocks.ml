@@ -33,20 +33,14 @@ let size_t () =
 
 let prepare_definition name fun_type =
   let vi = Cil.makeGlobalVar ~referenced:true name fun_type in
+  vi.vdefined <- true ;
   let fd = Cil.emptyFunctionFromVI vi in
   Cil.setFormalsDecl vi fun_type ;
   fd.sformals <- Cil.getFormalsDecl vi ;
   fd
 
-let set_function_body fd body =
-  fd.sbody <- body ;
-  fd.svar.vdefined <- true ;
-  File.must_recompute_cfg fd
-
-let call_function lval name args =
-  let open Globals.Functions in
+let call_function lval vi args =
   let loc  = Cil_datatype.Location.unknown in
-  let vi = get_vi (find_by_name name) in
   let _, typs, _, _ = Cil.splitFunctionTypeVI vi in
   let typs = Cil.argsToList typs in
   let gen_arg exp (_, typ, _) =

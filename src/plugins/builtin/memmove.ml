@@ -78,22 +78,13 @@ let generate_function_type t =
   ] in
   TFun(dt, Some params, false, [])
 
-let generate_body t fd =
-  let loc  = Cil_datatype.Location.unknown in
-  let rv   = Cil.makeLocalVar fd "__retres" (TPtr(t, [])) in
-  let args = List.map Cil.evar fd.sformals in
-  let call = Instr(call_function (Some (Var rv, NoOffset)) function_name args) in
-  let ret  = Return (Some (Cil.evar rv), loc) in
-  let block = Cil.mkBlock (List.map Cil.mkStmt [ call ; ret]) in
-  block.blocals <- [ rv ] ;
-  block
-
-let generate_function t =
+let generate_prototype t =
+  let fun_type = generate_function_type t in
   let name = function_name ^ "_" ^ (string_of_typ t) in
-  let fun_t = generate_function_type t in
-  let fd = prepare_definition name fun_t in
-  set_function_body fd (generate_body t fd) ;
-  fd
+  name, fun_type
+
+let args_for_original _t fd =
+  List.map Cil.evar fd.sformals
 
 let type_from_arg x =
   let x = Cil.stripCasts x in
@@ -130,6 +121,7 @@ let () = Transform.register (module struct
     let well_typed_call = well_typed_call
     let key_from_call = key_from_call
     let retype_args = retype_args
-    let generate_function = generate_function
+    let generate_prototype = generate_prototype
     let generate_spec = generate_spec
+    let args_for_original = args_for_original
   end)
