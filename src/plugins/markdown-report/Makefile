@@ -5,7 +5,7 @@ endif
 Report_markdown_VERSION:=0.1~beta
 
 PLUGIN_NAME:=Report_markdown
-PLUGIN_GENERATED:=mdr_version.ml
+PLUGIN_GENERATED:=$(PLUGIN_DIR)/mdr_version.ml
 PLUGIN_CMO:=\
   markdown sarif mdr_version mdr_params parse_remarks \
   eva_coverage md_gen sarif_gen mdr_register
@@ -28,13 +28,13 @@ $(Report_markdown_DIR)/Report_markdown.mli: \
   $(Report_markdown_DIR)/md_gen.mli \
   $(Report_markdown_DIR)/Makefile
 	echo "module Mdr_params: sig" > $@
-	cat mdr_params.mli >> $@
+	cat $(Report_markdown_DIR)/mdr_params.mli >> $@
 	echo "end" >> $@
 	echo "module Markdown: sig" >> $@
-	cat markdown.mli >> $@
+	cat $(Report_markdown_DIR)/markdown.mli >> $@
 	echo "end" >> $@
 	echo "module Md_gen: sig" >> $@
-	cat md_gen.mli >> $@
+	cat $(Report_markdown_DIR)/md_gen.mli >> $@
 	echo "end" >> $@
 
 install::
