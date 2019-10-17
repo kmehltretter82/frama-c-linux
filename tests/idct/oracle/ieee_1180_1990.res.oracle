@@ -973,7 +973,7 @@
   S___fc_stdout[0..1] ∈ [--..--]
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
-  6 functions analyzed (out of 44): 13% coverage.
+  6 functions analyzed (out of 6): 100% coverage.
   In these functions, 588 statements reached (out of 626): 93% coverage.
   ----------------------------------------------------------------------------
   Some errors and warnings have been raised during the analysis:

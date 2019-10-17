@@ -379,7 +379,7 @@ let print_coverage fmt =
       else incr ignored
   in
   Globals.Functions.iter_on_fundecs visit;
-  let all = !dead + !analyzed in
+  let all = !ignored + !analyzed in
   if all = 0
   then Format.fprintf fmt "No function to be analyzed.@;"
   else
