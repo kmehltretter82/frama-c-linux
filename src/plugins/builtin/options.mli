@@ -25,7 +25,7 @@ include Plugin.General_services
 module Enabled : Parameter_sig.Bool
 module Kfs : Parameter_sig.Kernel_function_set
 
-module NewBuiltin 
+module NewBuiltin
     (B : sig val function_name: string end) : Parameter_sig.Bool
 
 val emitter: Emitter.t

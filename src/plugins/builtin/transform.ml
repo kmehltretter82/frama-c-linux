@@ -21,148 +21,97 @@
 (**************************************************************************)
 
 open Cil_types
-open Basic_blocks
+open Builtin_builder
 
-module type Builtin = sig
-  module Hashtbl: Datatype.Hashtbl
-  type override_key = Hashtbl.key
+let base : (string, (module Builtin)) Hashtbl.t = Hashtbl.create 17
 
-  val function_name: string
-  val well_typed_call: exp list -> bool
-  val key_from_call: exp list -> override_key
-  val retype_args: override_key -> exp list -> exp list
-  val generate_prototype: override_key -> (string * typ)
-  val generate_spec: override_key -> fundec -> location -> funspec
-  val args_for_original: override_key -> fundec -> exp list
-end
-
-module type Internal_builtin = sig
-  include Builtin
-  module Enabled: Parameter_sig.Bool
-  val get_override: override_key -> fundec
-  val get_globals: location -> global list
-  val mark_as_computed:  ?project:Project.t -> unit -> unit
-end
-
-module Make_internal_builtin (B: Builtin) = struct
-  include B
-  module Enabled = Options.NewBuiltin (B)
-  module Cache = State_builder.Hashtbl (B.Hashtbl) (Cil_datatype.Fundec)
-      (struct
-        let size = 5
-        let dependencies = [Ast.self]
-        let name = "Builtins." ^ B.function_name
-      end)
-
-  let create_and_add key =
-    let (name, typ) = B.generate_prototype key in
-    let fd = Basic_blocks.prepare_definition name typ in
-    let loc  = Cil_datatype.Location.unknown in
-    let open Globals.Functions in
-    let open Extlib in
-    let ret_var = match Cil.getReturnType fd.svar.vtype with
-      | t when Cil.isVoidType t -> None
-      | t -> Some (Cil.makeLocalVar fd "__retres" t)
-    in
-    let call =
-      let orig = get_vi (find_by_name function_name) in
-      let args = B.args_for_original key fd in
-      Instr(call_function (opt_map Cil.var ret_var) orig args)
-    in
-    let ret = Return ( (opt_map Cil.evar ret_var), loc) in
-    fd.sbody <-
-      { (Cil.mkBlock (List.map Cil.mkStmt [ call ; ret ])) 
-        with blocals = list_of_opt ret_var } ;
-    File.must_recompute_cfg fd ;
-    Cache.add key fd
-
-  let get_override key =
-    try
-      Cache.find key
-    with Not_found ->
-      create_and_add key ;
-      Cache.find key
-
-  let get_globals location =
-    let finalize key fd =
-      let spec = B.generate_spec key fd location in
-      Globals.Functions.replace_by_definition spec fd location ;
-      Cil_types.GFun(fd, location)
-    in
-    Cache.fold (fun k vi l -> (finalize k vi) :: l) []
-
-  let mark_as_computed = Cache.mark_as_computed
-end
-
-let base : (string, (module Internal_builtin)) Hashtbl.t = Hashtbl.create 17
-
-let register (module B: Builtin) =
-  let module Internal_builtin = Make_internal_builtin(B) in
-  Hashtbl.add base B.function_name (module Internal_builtin)
+let register (module G: Generator_sig) =
+  let module Builtin = Make_builtin(G) in
+  Hashtbl.add base G.function_name (module Builtin)
 
 let mark_as_computed () =
   let mark_as_computed _ builtin =
-    let module B = (val builtin: Internal_builtin) in B.mark_as_computed ()
+    let module B = (val builtin: Builtin) in B.mark_as_computed ()
   in
   Hashtbl.iter mark_as_computed base
 
-let get_globals loc =
-  let get_globals _ builtin =
-    let module B = (val builtin: Internal_builtin) in B.get_globals loc
+let get_kfs () =
+  let get_kfs _ builtin =
+    let module B = (val builtin: Builtin) in
+    let res = B.get_kfs () in
+    res
   in
-  Hashtbl.fold (fun k v l -> (get_globals k v) @ l) base []
+  Hashtbl.fold (fun k v l -> (get_kfs k v) @ l) base []
 
 let find_stdlib_attr fct =
   if not (Cil.hasAttribute "fc_stdlib" fct.vattr) then raise Not_found
 
-let replace_call (fct, args) =
-  try
-    find_stdlib_attr fct ;
-    let builtin = Hashtbl.find base fct.vname in
-    let module B = (val builtin: Internal_builtin) in
-    if B.well_typed_call args then
-      let key = B.key_from_call args in
-      let fundec = B.get_override key in
-      let new_args = B.retype_args key args in
-      (fundec.svar), new_args
-    else begin
-      Options.warning ~current:true "Ignore call: not well typed" ;
-      (fct, args)
-    end
-  with
-  | Not_found -> (fct, args)
+module VISet = Cil_datatype.Varinfo.Hptset
 
-class visitor = object(_)
+class transformer = object(self)
   inherit Visitor.frama_c_inplace
 
+  val introduced_builtins = ref VISet.empty
+  val used_builtin_last_kf = Queue.create ()
+
   method! vfile _ =
-    let after f =
-      let loc = Cil.CurrentLoc.get() in
-      let globals = get_globals loc in
-      f.globals <- globals @ f.globals ;
-      mark_as_computed () ;
+    let post f =
       Ast.mark_as_changed () ;
       Ast.mark_as_grown () ;
-      File.reorder_ast () ;
+      mark_as_computed () ;
       f
     in
-    Cil.DoChildrenPost after
+    Cil.DoChildrenPost post
+
+  method! vglob_aux _ =
+    let post g =
+      let loc = Cil.CurrentLoc.get() in
+      let folding l fd =
+        if VISet.mem fd.svar !introduced_builtins then l
+        else begin
+          introduced_builtins := VISet.add fd.svar !introduced_builtins ;
+          GFun (fd, loc) :: l
+        end
+      in
+      Queue.fold folding g used_builtin_last_kf
+    in
+    Cil.DoChildrenPost post
 
   method! vfunc f =
     let kf = Globals.Functions.get f.svar in
-    if Options.Kfs.is_empty () || Options.Kfs.mem kf then
+    if not (Options.Kfs.is_set ()) || Options.Kfs.mem kf then
       Cil.DoChildren
     else
       Cil.SkipChildren
+
+  method private replace_call (fct, args) =
+    try
+      find_stdlib_attr fct ;
+      let builtin = Hashtbl.find base fct.vname in
+      let module B = (val builtin: Builtin) in
+      if B.Enabled.get () then
+        if B.well_typed_call args then
+          let key = B.key_from_call args in
+          let fundec = B.get_override key in
+          let new_args = B.retype_args key args in
+          Queue.add fundec used_builtin_last_kf ;
+          (fundec.svar), new_args
+        else begin
+          Options.warning ~current:true "Ignore call: not well typed" ;
+          (fct, args)
+        end
+      else (fct, args)
+    with
+    | Not_found -> (fct, args)
 
   method! vinst = function
     | Call(_) | Local_init(_, ConsInit(_, _, Plain_func), _) ->
       let change = function
         | [ Call(r, ({ enode = Lval((Var f), NoOffset) } as e), args, loc) ] ->
-          let f, args = replace_call (f, args) in
+          let f, args = self#replace_call (f, args) in
           [ Call(r, { e with enode = Lval((Var f), NoOffset) }, args, loc) ]
         | [ Local_init(r, ConsInit(f, args, Plain_func), loc) ] ->
-          let f, args = replace_call (f, args) in
+          let f, args = self#replace_call (f, args) in
           [ Local_init(r, ConsInit(f, args, Plain_func), loc) ]
         | _ -> assert false
       in
@@ -170,10 +119,42 @@ class visitor = object(_)
     | _ -> Cil.DoChildren
 end
 
-let transform file =
-  let filter _ b =
-    let module B = (val b : Internal_builtin) in
-    if B.Enabled.get () then Some b else None
+let validate_property p =
+  Property_status.emit Options.emitter ~hyps:[] p Property_status.True
+
+let compute_preconditions_statuses kf =
+  let stmt = Kernel_function.find_first_stmt kf in
+  let _ = Kernel_function.find_all_enclosing_blocks stmt in
+  match stmt.skind with
+  | Instr (Call(_, { enode = Lval ((Var fct), NoOffset) }, _, _)) ->
+    let called_kf = Globals.Functions.get fct in
+    Statuses_by_call.setup_all_preconditions_proxies called_kf ;
+    let reqs = Statuses_by_call.all_call_preconditions_at
+        ~warn_missing:true called_kf stmt
+    in
+    List.iter (fun (_, p) -> validate_property p) reqs ;
+  | _ -> assert false
+
+let compute_statuses_all_calls () =
+  let kfs = get_kfs () in
+  List.iter compute_preconditions_statuses kfs ;
+
+  let module Kfs = Kernel_function.Hptset in
+  let open Property in
+  let kfs = List.fold_left (fun s kf -> Kfs.add kf s) Kfs.empty kfs in
+  let validate_if_builtin_post ip =
+    match ip with
+    (* Constracts of generated functions *)
+    | IPPredicate { ip_kf=kf ; ip_kind=PKEnsures _ }
+    | IPAssigns { ias_kf=kf }
+    | IPFrom { if_kf=kf }
+      when Kfs.mem kf kfs ->
+      validate_property ip
+    | _ -> ()
   in
-  Hashtbl.filter_map_inplace filter base ;
-  Visitor.visitFramacFile (new visitor) file
+  Property_status.iter validate_if_builtin_post
+
+
+let transform file =
+  Visitor.visitFramacFile (new transformer) file ;
+  compute_statuses_all_calls ()

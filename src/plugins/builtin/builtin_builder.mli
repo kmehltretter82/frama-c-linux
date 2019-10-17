@@ -20,5 +20,32 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val register: (module Builtin_builder.Generator_sig) -> unit
-val transform: Cil_types.file -> unit
+open Cil_types
+
+module type Generator_sig = sig
+  module Hashtbl: Datatype.Hashtbl
+  type override_key = Hashtbl.key
+
+  val function_name: string
+  val well_typed_call: exp list -> bool
+  val key_from_call: exp list -> override_key
+  val retype_args: override_key -> exp list -> exp list
+  val generate_prototype: override_key -> (string * typ)
+  val generate_spec: override_key -> fundec -> location -> funspec
+  val args_for_original: override_key -> fundec -> exp list
+end
+
+module type Builtin = sig
+  module Enabled: Parameter_sig.Bool
+  type override_key
+
+  val function_name: string
+  val well_typed_call: exp list -> bool
+  val key_from_call: exp list -> override_key
+  val retype_args: override_key -> exp list -> exp list
+  val get_override: override_key -> fundec
+  val get_kfs: unit -> kernel_function list
+  val mark_as_computed:  ?project:Project.t -> unit -> unit
+end
+
+module Make_builtin (G: Generator_sig) : Builtin
