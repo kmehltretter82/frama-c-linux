@@ -40,10 +40,12 @@ val tplus: ?loc:location -> term -> term -> term
 val tminus: ?loc:location -> term -> term -> term
 val tdivide: ?loc:location -> term -> term -> term
 
+val pbounds_incl_excl: ?loc:location -> term -> term -> term -> predicate
 val pvalid_len_bytes: ?loc:location -> logic_label -> term -> term -> predicate
 val pvalid_read_len_bytes: ?loc:location -> logic_label -> term -> term -> predicate
 val pcorrect_len_bytes: ?loc:location -> logic_type -> term -> predicate
 val punfold_all_elems_eq: ?loc:location -> term -> term -> term -> predicate
+val punfold_all_elems_eq_val: ?loc:location -> term -> term -> term -> predicate
 
 val pseparated_memories: ?loc:location -> term -> term -> term -> term -> predicate
 
