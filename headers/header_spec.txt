@@ -943,6 +943,8 @@ src/plugins/builtin/memcpy.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/builtin/memcpy.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/builtin/memmove.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/builtin/memmove.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/builtin/memset.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/builtin/memset.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/builtin/options.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/builtin/options.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/builtin/register.ml: CEA_LGPL_OR_PROPRIETARY
