@@ -13,7 +13,6 @@ license/SPARETIMELABS: .ignore
 license/headache_config.txt: .ignore
 man/e-acsl-gcc.sh.1: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 scripts/e-acsl-gcc.sh: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-scripts/testrun.sh: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/bittree_model/e_acsl_bittree.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/bittree_model/e_acsl_bittree_api.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/bittree_model/e_acsl_bittree_mmodel.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL
@@ -100,4 +99,15 @@ src/project_initializer/keep_status.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/project_initializer/prepare_ast.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/project_initializer/prepare_ast.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 tests/print.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-tests/test_config.in: .ignore
+tests/test_config_ci.in: .ignore
+tests/test_config_dev.in: .ignore
+tests/builtin/test_config_ci: .ignore
+tests/builtin/test_config_dev: .ignore
+tests/format/test_config_ci: .ignore
+tests/format/test_config_dev: .ignore
+tests/full-mmodel/test_config_ci: .ignore
+tests/full-mmodel/test_config_dev: .ignore
+tests/gmp-only/test_config_ci: .ignore
+tests/gmp-only/test_config_dev: .ignore
+tests/temporal/test_config_ci: .ignore
+tests/temporal/test_config_dev: .ignore
