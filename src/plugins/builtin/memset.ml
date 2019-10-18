@@ -39,6 +39,20 @@ module With_collection = struct
       (Cil_datatype.Typ) (OptInt) (MemsetKeyInfo)
 end
 
+let rec any_char_composed_type t =
+  match t with
+  | t when Cil.isAnyCharType t -> true
+  | TArray(t, _, _, _) -> any_char_composed_type t
+  | _ -> false
+
+let rec base_char_type t =
+  assert (any_char_composed_type t) ;
+  match t with
+  | t when Cil.isAnyCharType t -> t
+  | TArray(t, _, _, _) -> base_char_type t
+  | _ -> assert false
+
+
 let presult_ptr ?loc t ptr =
   prel ?loc (Req, (tresult ?loc t), ptr)
 
@@ -47,16 +61,20 @@ let pset_len_bytes ?loc p1 value bytes_len =
     (punfold_all_elems_eq_val ?loc p1 value)
 
 let generate_requires loc ptr value len =
-  let pred_name = [ "is_char_value" ] in
   let bounds = match value with
-    | None -> []
+    | None ->
+      [ { (pcorrect_len_bytes ~loc ptr.term_type len) with pred_name = ["aligned_end"] } ]
     | Some value ->
-      let low = (tinteger ~loc 0) in
-      let up  = (tinteger ~loc 256) in
-      [ { (pbounds_incl_excl ~loc low value up) with pred_name } ]
+      let low, up = match value.term_type with
+        | Ctype(TInt((IChar|ISChar),_)) ->
+          (tinteger ~loc (-128)), (tinteger ~loc 127)
+        | Ctype(TInt(IUChar, _)) ->
+          (tinteger ~loc 0), (tinteger ~loc 256)
+        | _ -> assert false
+      in
+      [ { (pbounds_incl_excl ~loc low value up) with pred_name = [ "in_bounds_value" ] } ]
   in
   List.map new_predicate (bounds @ [
-      { (pcorrect_len_bytes ~loc ptr.term_type len)    with pred_name = ["aligned_end"] } ;
       { (pvalid_len_bytes ~loc here_label ptr len)     with pred_name = ["valid_dest"] }
     ])
 
@@ -111,7 +129,7 @@ let memset_value e =
   | _ -> None
 
 let well_typed_call = function
-  | [ ptr ; _ ; _ ] when Cil.isCharType (type_from_arg ptr) -> true
+  | [ ptr ; _ ; _ ] when any_char_composed_type (type_from_arg ptr) -> true
   | [ _ ; value ; _ ] ->
     begin match memset_value value with
       | None -> false
@@ -120,21 +138,22 @@ let well_typed_call = function
   | _ -> false
 
 let key_from_call = function
-  | [ ptr ; _ ; _ ] when Cil.isCharType (type_from_arg ptr) ->
+  | [ ptr ; _ ; _ ] when any_char_composed_type (type_from_arg ptr) ->
     (type_from_arg ptr), None
   | [ ptr ; value ; _ ] ->
     (type_from_arg ptr), (memset_value value)
   | _ -> failwith "Call to Memset.key_from_call on an ill-typed builtin call"
 
-let char_prototype () =
+let char_prototype t =
+  assert (any_char_composed_type t) ;
   let params = [
-    ("ptr", Cil.charPtrType, []) ;
-    ("value", Cil.charType, []) ;
+    ("ptr", ptr_of t, []) ;
+    ("value", base_char_type t, []) ;
     ("num", size_t(), [])
   ] in
-  TFun (Cil.charPtrType, Some params, false, [])
+  TFun (ptr_of t, Some params, false, [])
 
-let prototype_exp t =
+let non_char_prototype t =
   let params = [
     ("ptr", (ptr_of t), []) ;
     ("num", size_t(), [])
@@ -142,14 +161,14 @@ let prototype_exp t =
   TFun ((ptr_of t), Some params, false, [])
 
 let generate_prototype = function
-  | t, _ when Cil.isCharType t ->
+  | t, _ when any_char_composed_type t ->
     let name = function_name ^ "_" ^ (string_of_typ t) in
-    let fun_type = char_prototype () in
+    let fun_type = char_prototype t in
     name, fun_type
   | t, Some x when x = 0 || x = 255 ->
     let ext = if x = 0 then "_0" else if x = 255 then "_FF" else assert false in
     let name = function_name ^ "_" ^ (string_of_typ t) ^ ext in
-    let fun_type = prototype_exp t in
+    let fun_type = non_char_prototype t in
     name, fun_type
   | _, _ ->
     failwith "Call to Memset.generate_prototype on an ill-typed builtin call"
@@ -158,7 +177,9 @@ let retype_args (t, e) args =
   match e, args with
   | None, [ ptr ; v ; n ] ->
     let ptr = Cil.stripCasts ptr in
-    assert (Cil_datatype.Typ.equal (type_from_arg ptr) Cil.charType) ;
+    assert (any_char_composed_type (type_from_arg ptr)) ;
+    let base_type = base_char_type (type_from_arg ptr) in
+    let v = Cil.mkCast v base_type in
     [ ptr ; v ; n ]
   | Some fv, [ ptr ; v ; n ] ->
     let ptr = Cil.stripCasts ptr in
