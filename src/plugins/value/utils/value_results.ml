@@ -368,30 +368,32 @@ let consider_function vi =
        || Cil.hasAttribute "fc_stdlib_generated" vi.vattr)
 
 let print_coverage fmt =
-  let ignored, analyzed = ref 0, ref 0
-  and dead, reachable = ref 0, ref 0 in
-  let is_reachable = Db.Value.is_reachable_stmt in
-  let do_stmt stmt = incr (if is_reachable stmt then reachable else dead) in
+  let dead_function, reachable_function = ref 0, ref 0
+  and dead_stmt, reachable_stmt = ref 0, ref 0 in
+  let do_stmt stmt =
+    incr (if Db.Value.is_reachable_stmt stmt then reachable_stmt else dead_stmt)
+  in
   let visit fundec =
     if consider_function fundec.svar then
       if is_called (Globals.Functions.get fundec.svar)
-      then (incr analyzed; List.iter do_stmt fundec.sallstmts)
-      else incr ignored
+      then (incr reachable_function; List.iter do_stmt fundec.sallstmts)
+      else incr dead_function
   in
   Globals.Functions.iter_on_fundecs visit;
-  let all = !ignored + !analyzed in
-  if all = 0
+  let total_function = !dead_function + !reachable_function in
+  if total_function = 0
   then Format.fprintf fmt "No function to be analyzed.@;"
   else
     Format.fprintf fmt
       "%i function%s analyzed (out of %i): %i%% coverage.@;"
-      !analyzed (plural !analyzed) all (!analyzed * 100 / all);
-  let total = !dead + !reachable in
-  if !analyzed > 0 && total > 0 then
+      !reachable_function (plural !reachable_function) total_function
+      (!reachable_function * 100 / total_function);
+  let total_stmt = !dead_stmt + !reachable_stmt in
+  if !reachable_function > 0 && total_stmt > 0 then
     Format.fprintf fmt
       "In %s, %i statements reached (out of %i): %i%% coverage.@;"
-      (if !analyzed > 1 then "these functions" else "this function")
-      !reachable total (!reachable * 100 / total)
+      (if !reachable_function > 1 then "these functions" else "this function")
+      !reachable_stmt total_stmt (!reachable_stmt * 100 / total_stmt)
 
 let print_warning fmt =
   let eva_warnings, eva_errors = ref 0, ref 0
