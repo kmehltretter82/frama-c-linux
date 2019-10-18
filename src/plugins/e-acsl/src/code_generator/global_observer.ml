@@ -51,7 +51,7 @@ let add_initializer vi offset init =
       let l = Varinfo.Hashtbl.find tbl vi in
       l := (offset, init) :: !l
     with Not_found ->
-      assert false
+      Options.fatal "variable %a is not monitored" Printer.pp_varinfo vi
 
 let rec literal_in_initializer env kf = function
   | SingleInit exp -> snd (Literal_observer.exp_in_depth env kf exp)

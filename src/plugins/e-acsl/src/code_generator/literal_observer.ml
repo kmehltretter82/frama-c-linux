@@ -49,8 +49,8 @@ let exp_in_depth env kf e =
     inherit Cil.genericCilVisitor (Visitor_behavior.copy (Project.current ()))
     method !vlval _ = Cil.SkipChildren (* no literal string in left values *)
     method !vexpr e = match e.enode with
-      (* the guard below could be optimized: if no annotation **depends on this
-         string**, then it is not required to monitor it.
+      (* the guard below could be optimized: if no annotation depends on this
+         string, then it is not required to monitor it.
          (currently, the guard says: "no annotation uses the memory model" *)
       | Const (CStr s) when Mmodel_analysis.use_model () ->
         let e, env = literal e.eloc !env_ref kf s in

@@ -47,41 +47,30 @@ let is_return_stmt kf stmt =
 (* Code *)
 (* ************************************************************************** *)
 
-(* [TODO ARCHI] initializers
-  (* Add mappings from global variables to their initializers in [global_vars].
-     Note that the below function captures only [SingleInit]s. All compound
-     initializers containing SingleInits (except for empty compound
-     initializers) are unrapped and thrown away. *)
-  method !vinit vi off _ =
-    if generate then
-      if Mmodel_analysis.must_model_vi vi then begin
-        is_initializer <- vi.vglob;
-        Cil.DoChildrenPost
-          (fun i ->
-            (match is_initializer with
-            | true ->
-              (match i with
-              | CompoundInit(_,[]) ->
-                (* Case of an empty CompoundInit, treat it as if there were
-                   no initializer at all *)
-                ()
-              | CompoundInit(_,_) | SingleInit _ ->
-                (* TODO: [off] should be the one of the new project while it is
-                   from the old project *)
-                Global_observer.add_initializer vi off i)
-            | false-> ());
-            is_initializer <- false;
-          i)
-      end else
-        Cil.JustCopy
-    else
-      Cil.SkipChildren
-*)
-
-let replace_literal_string_in_exp ~is_global_init env kf e =
+let replace_literal_string_in_exp env kf_opt (* None for globals *) e =
   (* do not touch global initializers because they accept only constants;
      replace literal strings elsewhere *)
-  if is_global_init then e, env else Literal_observer.exp_in_depth env kf e
+  match kf_opt with
+  | None -> e, env
+  | Some kf -> Literal_observer.exp_in_depth env kf e
+
+let rec inject_in_init env kf_opt vi off = function
+  | SingleInit e as init ->
+    if vi.vglob then Global_observer.add_initializer vi off init;
+    let e, env = replace_literal_string_in_exp env kf_opt e in
+    SingleInit e, env
+  | CompoundInit(_, []) as init ->
+    init, env
+  | CompoundInit(typ, l) as init ->
+    let l, env =
+      List.fold_left
+        (fun (l, env) (off, i) ->
+           let i, env = inject_in_init env kf_opt vi off i in
+           (off, i) :: l, env)
+        ([], env)
+        l
+    in
+    CompoundInit(typ, List.rev l), env
 
 let inject_in_local_init loc env kf vi = function
   | ConsInit (fvi, _sz :: _, _) as init
@@ -120,9 +109,20 @@ let inject_in_local_init loc env kf vi = function
     fvi.vname <- Functions.RTL.get_rtl_replacement_name fvi.vname;
     init, env
 
-  | AssignInit _ | ConsInit _ as init ->
-    (* [TODO ARCHI] for AssignInit: do init *)
-    init, env
+  | AssignInit init ->
+    let init, env = inject_in_init env (Some kf) vi NoOffset init in
+    AssignInit init, env
+
+  | ConsInit(vi, l, ck) as init ->
+    let l, env =
+      List.fold_left
+        (fun (l, env) e ->
+           let e, env = replace_literal_string_in_exp env (Some kf) e in
+           e :: l, env)
+        ([], env)
+        l
+    in
+    ConsInit(vi, l, ck), env
 
 (* rewrite names of functions for which we have alternative definitions in the
    RTL. *)
@@ -192,7 +192,7 @@ let inject_in_instr env kf stmt instr =
   (* [TODO ARCHI] recursive calls at the right places *)
   match instr with
   | Set(lv, e, loc) ->
-    let e, env = replace_literal_string_in_exp false env kf e in
+    let e, env = replace_literal_string_in_exp env (Some kf) e in
     let env = add_initializer loc lv stmt env kf in
     Set(lv, e, loc), env
 
@@ -200,7 +200,7 @@ let inject_in_instr env kf stmt instr =
     let args, env =
       List.fold_right
         (fun a (args, env) ->
-           let a, env = replace_literal_string_in_exp false env kf a in
+           let a, env = replace_literal_string_in_exp env (Some kf) a in
            a :: args, env)
         args
         ([], env)
@@ -357,13 +357,13 @@ let rec inject_in_substmt env kf stmt = match stmt.skind with
     Instr instr, env
 
   | Return(Some e, loc)  ->
-    let e, env = replace_literal_string_in_exp false env kf e in
+    let e, env = replace_literal_string_in_exp env (Some kf) e in
     Return(Some e, loc), env
 
   | If(e, blk1, blk2, loc) ->
     let env = inject_in_block env kf blk1 in
     let env = inject_in_block env kf blk2 in
-    let e, env = replace_literal_string_in_exp false env kf e in
+    let e, env = replace_literal_string_in_exp env (Some kf) e in
     If(e, blk1, blk2, loc), env
 
   | Switch(e, blk, stmts, loc) ->
@@ -376,7 +376,7 @@ let rec inject_in_substmt env kf stmt = match stmt.skind with
         ([], env)
         stmts
     in
-    let e, env = replace_literal_string_in_exp false env kf e in
+    let e, env = replace_literal_string_in_exp env (Some kf) e in
     Switch(e, blk, stmts, loc), env
 
   | Loop(_ (* ignore AST annotations *), blk, loc, stmt_opt1, stmt_opt2) ->
@@ -406,7 +406,7 @@ let rec inject_in_substmt env kf stmt = match stmt.skind with
     UnspecifiedSequence l, env
 
   | Throw(Some(e, ty), loc) ->
-    let e, env = replace_literal_string_in_exp false env kf e in
+    let e, env = replace_literal_string_in_exp env (Some kf) e in
     Throw(Some(e, ty), loc), env
 
   | TryCatch(blk, l, _loc) as skind ->
@@ -641,9 +641,18 @@ let inject_in_global (env, main) = function
     env, main
 
   (* variable definition *)
-  | GVar(vi, _initinfo, _) ->
+  | GVar(vi, { init = None }, _) ->
+    Global_observer.add vi;
     vi.vghost <- false;
-    (* [TODO ARCHI] init_info *)
+    env, main
+
+  | GVar(vi, { init = Some init }, _) ->
+    Global_observer.add vi;
+    vi.vghost <- false;
+    (* [TODO ARCHI] check that keeping changes in initializers is useless since
+       all is done in place --> document why returning an expression is useful:
+       what may change? *)
+    let _, env = inject_in_init env None vi NoOffset init in
     env, main
 
   (* function definition *)
