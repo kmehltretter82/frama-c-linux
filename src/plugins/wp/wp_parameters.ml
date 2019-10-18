@@ -1070,12 +1070,23 @@ let has_session () =
   Session.Dir_name.is_set () ||
   ( Sys.file_exists default && Sys.is_directory default )
 
-let get_session () = Session.dir ~error:false ()
+let get_session ~force () =
+  if force then
+    Session.dir ~error:false ()
+  else
+  if Session.Dir_name.is_set () then
+    Session.Dir_name.get ()
+  else
+    Session.dir ~error:false ()
 
-let get_session_dir d =
-  let base = get_session () in
+let get_session_dir ~force d =
+  let base = get_session ~force () in
   let path = Printf.sprintf "%s/%s" base d in
-  make_output_dir path ; path
+  if force then make_output_dir path ; path
+
+(* -------------------------------------------------------------------------- *)
+(* --- Print Generated                                                    --- *)
+(* -------------------------------------------------------------------------- *)
 
 let cat_print_generated = register_category "print-generated"
 
@@ -1094,3 +1105,5 @@ let print_generated ?header file =
             Format.pp_print_string fmt s;
             Format.pp_print_newline fmt ())
     end
+
+(* -------------------------------------------------------------------------- *)

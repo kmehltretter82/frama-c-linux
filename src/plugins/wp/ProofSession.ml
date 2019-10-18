@@ -30,12 +30,12 @@ type status =
 let files : (string,status) Hashtbl.t = Hashtbl.create 32
 
 let filename wpo =
-  let d = Wp_parameters.get_session_dir "script" in
+  let d = Wp_parameters.get_session_dir ~force:false "script" in
   Printf.sprintf "%s/%s.json" d wpo.po_gid
 
 let legacies wpo =
   let m = WpContext.MODEL.id wpo.po_model in
-  let d = Wp_parameters.get_session_dir m in
+  let d = Wp_parameters.get_session_dir ~force:false m in
   List.map (Printf.sprintf "%s/%s.json" d) [
     wpo.po_gid ;
     wpo.po_leg ;
