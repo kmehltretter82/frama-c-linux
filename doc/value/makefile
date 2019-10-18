@@ -1,5 +1,3 @@
-GENERATED=main.aux main.cb main.cb2 main.log main.out main.toc main.pdf
-
 all: main
 
 .PHONY: main
@@ -21,7 +19,7 @@ else
 endif
 
 clean:
-	rm -f $(GENERATED)
+	latexmk -C -bibtex
 
 install:
 	rm -f ../manuals/eva-manual.pdf
