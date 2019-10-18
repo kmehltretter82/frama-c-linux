@@ -122,7 +122,7 @@ end
 let validate_property p =
   Property_status.emit Options.emitter ~hyps:[] p Property_status.True
 
-let compute_preconditions_statuses kf =
+let compute_call_preconditions_statuses kf =
   let stmt = Kernel_function.find_first_stmt kf in
   let _ = Kernel_function.find_all_enclosing_blocks stmt in
   match stmt.skind with
@@ -135,26 +135,22 @@ let compute_preconditions_statuses kf =
     List.iter (fun (_, p) -> validate_property p) reqs ;
   | _ -> assert false
 
-let compute_statuses_all_calls () =
-  let kfs = get_kfs () in
-  List.iter compute_preconditions_statuses kfs ;
-
-  let module Kfs = Kernel_function.Hptset in
-  let open Property in
-  let kfs = List.fold_left (fun s kf -> Kfs.add kf s) Kfs.empty kfs in
-  let validate_if_builtin_post ip =
-    match ip with
-    (* Constracts of generated functions *)
-    | IPPredicate { ip_kf=kf ; ip_kind=PKEnsures _ }
-    | IPAssigns { ias_kf=kf }
-    | IPFrom { if_kf=kf }
-      when Kfs.mem kf kfs ->
-      validate_property ip
-    | _ -> ()
+let compute_postconditions_statuses kf =
+  let open Extlib in
+  let posts bhv =
+    let active = [] in
+    let ensures = Property.ip_ensures_of_behavior kf Kglobal bhv in
+    let assigns = Property.ip_assigns_of_behavior ~active kf Kglobal bhv in
+    let froms = Property.ip_from_of_behavior ~active kf Kglobal bhv in
+    List.iter validate_property (ensures @ (list_of_opt assigns) @ froms)
   in
-  Property_status.iter validate_if_builtin_post
+  Annotations.iter_behaviors (fun _ -> posts) kf
 
+let compute_statuses_all_kfs () =
+  let kfs = get_kfs () in
+  List.iter compute_call_preconditions_statuses kfs ;
+  List.iter compute_postconditions_statuses kfs
 
 let transform file =
   Visitor.visitFramacFile (new transformer) file ;
-  compute_statuses_all_calls ()
+  compute_statuses_all_kfs ()
