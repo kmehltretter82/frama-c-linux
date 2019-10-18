@@ -73,8 +73,8 @@ module Pair = struct
 
   include State_builder.Hashcons (D) (Info)
 
-  (* Creates a pair, and also returns a boolean that is [true] is x, y are swap
-     in the pair. *)
+  (* Creates a pair, and also returns a boolean that is [true] if x, y are
+     swapped in the pair. *)
   let make x y =
     assert (x.vid <> y.vid);
     let pair, swap = if x.vid < y.vid then (x, y), false else (y, x), true in
@@ -133,7 +133,7 @@ module Arith = struct
     let max = Eval_typ.range_upper_bound range in
     Ival.inject_range (Some min) (Some max)
 
-  (* Does an ival represents all values of a C type [typ]? *)
+  (* Does an ival represent all values of a C type [typ]? *)
   let is_top_for_typ typ ival =
     let open Eval_typ in
     Ival.(equal top ival) ||
@@ -145,7 +145,7 @@ module Arith = struct
       let range = make_range range in
       Ival.is_included range ival || Ival.is_included range (neg_int ival)
 
-  (* Does an ival represents all possible values of a pair of variables? *)
+  (* Does an ival represent all possible values of a pair of variables? *)
   let is_top_for_pair pair =
     let x, y = Pair.get pair in
     if Cil_datatype.Typ.equal x.vtype y.vtype
@@ -175,7 +175,7 @@ let _pretty_octagon fmt octagon =
    Use Ival.t to evaluate expressions. *)
 module Rewriting = struct
 
-  (* Checks if the interval [ival] fits in the C typ [typ].
+  (* Checks if the interval [ival] fits in the C type [typ].
      This is used to ensure that an expression cannot overflow: this module
      uses the mathematical semantics of arithmetic operations, and cannot
      soundly translate overflows in the C semantics.  *)
@@ -203,7 +203,7 @@ module Rewriting = struct
     | `Top -> false
     | `Value ival -> Ival.cardinal_zero_or_one ival
 
-  (* If a needed interval is unknown, stop the current computation and returns
+  (* If a needed interval is unknown, stop the current computation and return
      an empty list. *)
   let (>>) value f = match value with
     | `Top -> []
@@ -310,7 +310,7 @@ module Rewriting = struct
      constraints. *)
   let make_octagons evaluate expr ival =
     let make_octagons_from_binop typ e1 op e2 ival =
-      (* equivalent octoganal forms ±(X±Y-v) for [e1 op e2]. *)
+      (* equivalent octagonal forms ±(X±Y-v) for [e1 op e2]. *)
       let rewritings = rewrite_binop evaluate e1 op e2 in
       (* create the final octagon, knowning that [e1 op e2] ∈ [ival]. *)
       let make_octagon (sign, octagon) =
@@ -413,7 +413,7 @@ end
 
 (* This domain infers relations between pairs of variables (X, Y), by inferring
    intervals for the mathematical operations X+Y and X-Y.
-   It also infers non-relational intervals for the separate variable X and Y
+   It also infers non-relational intervals for the separate variables X and Y
    (they could be seen as intervals for X+X and Y+Y, but we chose to store them
    in another way). These intervals are used to make the join more precise.
    Geometrically, in a plan, intervals for X and Y shape a straight rectangle,

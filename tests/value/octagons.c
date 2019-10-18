@@ -81,7 +81,7 @@ void join () {
     a = Frama_C_interval(-32, -10);
     b = k * 5;
   }
-  // In both case, we have b - a >= -1. The "else" branch was more precise.
+  // In both cases, we have b - a >= -1. The "else" branch was more precise.
   r = b - a + 1;
   Frama_C_show_each_join_positive(r);
   if (undet) {
@@ -91,7 +91,7 @@ void join () {
     a = Frama_C_interval(-32, -10);
     b = k * 5;
   }
-  // In both case, we have b + a <= 10. The "then" branch was more precise.
+  // In both cases, we have b + a <= 10. The "then" branch was more precise.
   r = b + a - 10;
   Frama_C_show_each_join_negative(r);
 }
