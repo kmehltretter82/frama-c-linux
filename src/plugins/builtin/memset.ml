@@ -92,7 +92,9 @@ let generate_ensures e loc t ptr value len =
   let content = match e, value with
     | None, Some value ->
       [ { (pset_len_bytes ~loc ptr value len) with pred_name } ]
-    | Some 0, None -> []
+    | Some 0, None ->
+      let value = tinteger ~loc 0 in
+      [ { (pset_len_bytes ~loc ptr value len) with pred_name } ]
     | Some 255, None -> []
     | _ -> assert false
   in
@@ -128,8 +130,13 @@ let memset_value e =
   | Const(CInt64(ni, _, _)) when Integer.equal ni ff -> Some 255
   | _ -> None
 
+let is_union_type = function
+  | TComp({ cstruct = false }, _, _) -> true
+  | _ -> false
+
 let well_typed_call = function
   | [ ptr ; _ ; _ ] when any_char_composed_type (type_from_arg ptr) -> true
+  | [ ptr ; _ ; _ ] when is_union_type (type_from_arg ptr) -> false
   | [ _ ; value ; _ ] ->
     begin match memset_value value with
       | None -> false

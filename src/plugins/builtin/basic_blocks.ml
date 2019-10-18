@@ -210,13 +210,24 @@ and pall_elems_eq ?loc depth t1 value len =
   let tind = tvar ind in
   let bounds = pbounds_incl_excl ?loc (tinteger 0) tind len in
   let t1_acc = taccess ?loc t1 tind in
-  let eq = peq_unfold ?loc (depth+1) t1_acc value in
+  let eq = peq_unfold ?loc depth t1_acc value in
   pforall ?loc ([ind], (pimplies ?loc (bounds, eq)))
+and pall_fields_eq ?loc depth t1 ci value =
+  let eq fi =
+    let lval = match t1.term_node with TLval(lv) -> lv | _ -> assert false in
+    let nlval = addTermOffsetLval (TField(fi, TNoOffset)) lval in
+    let term = term ?loc (TLval nlval) (Ctype fi.ftype) in
+    peq_unfold ?loc depth term value
+  in
+  let eqs = List.map eq ci.cfields in
+  pands eqs
 and peq_unfold ?loc depth t1 value =
   match t1.term_type with
   | Ctype(TArray(_, Some len, _, _)) ->
     let len = Logic_utils.expr_to_term ~cast:false len in
-    pall_elems_eq ?loc depth t1 value len
+    pall_elems_eq ?loc (depth+1) t1 value len
+  | Ctype(TComp(ci, _, _)) ->
+    pall_fields_eq ?loc depth t1 ci value
   | _ -> prel ?loc (Req, t1, value)
 
 let pseparated_memories ?loc p1 len1 p2 len2 =
