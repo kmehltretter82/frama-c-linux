@@ -119,7 +119,7 @@ code and observe an over-approximation of the set of
 values this expression can take at run-time. 
 
 Here is a simple C example:
-\listinginputcaption{1}{\texttt{introduction.c}}{introduction.c}
+\listinginputcaption{1}{\texttt{introduction.c}}{examples/introduction.c}
 
 If either interface of Frama-C is launched with options
 \lstinline|-eva introduction.c|,
@@ -151,7 +151,7 @@ during the last forty years.
 An analyzed application may contain run-time errors: divisions by zero,
 invalid pointer accesses,\ldots
 
-\listinginputcaption{1}{\texttt{rte.c}}{rte.c}
+\listinginputcaption{1}{\texttt{rte.c}}{examples/rte.c}
 
 When launched with \lstinline|frama-c -eva rte.c|,
 \Eva{} emits a warning about an out-of-bound access at line 5:
@@ -658,7 +658,7 @@ as in the example below:
 
 \begin{figure}[hbt]
 \centering
-\includegraphics[width=0.75\textwidth]{gui-loop-to-unroll.png}
+\includegraphics[width=0.75\textwidth]{gui-images/gui-loop-to-unroll.png}
 \caption{Estimating loop unroll bounds in the GUI}
 \label{fig:gui-loop-to-unroll}
 \end{figure}
@@ -1346,7 +1346,7 @@ previously written as a single write that modified the whole set of
 bits exactly.
 
 An example of a program leading to a misaligned read is the following:
-\listinginput{1}{misa.c}
+\listinginput{1}{examples/misa.c}
 The value returned by the function \lstinline|main| is\\
 \lstinline|{{ garbled mix of &{ x; y } (origin: Misaligned { misa.c:6 }) }}|.\\
 The analyzer is by default configured for a 32-bit architecture, 
@@ -1371,7 +1371,7 @@ alignments are fused together. In the example below,
 the memory states from
 the then branch and from the else branch contain in the array
 \lstinline|t| some 32-bit addresses with incompatible alignments.
-\listinginput{1}{merge.c}
+\listinginput{1}{examples/merge.c}
 The value returned by function \lstinline|main| is\\
 \lstinline|{{ garbled mix of &{ x; y } (origin: Merge { merge.c:10 }) }}|.
 
@@ -1393,7 +1393,7 @@ The origin \lstinline$Arithmetic L$
 indicates that arithmetic operations
 take place without the analyzer being able to represent the result
 precisely.
-\listinginput{1}{ari.c}
+\listinginput{1}{examples/ari.c}
 In this example, the return value for \lstinline|f| is\\
 \lstinline|{{ garbled mix of &{ x; y } (origin: Arithmetic { ari.c:4 }) }}|.
 
@@ -1425,7 +1425,7 @@ a dereferenced pointer is valid, it emits an alarm that expresses
 that the pointer needs to be valid at that point. Likewise, direct
 array accesses that may be invalid are flagged. 
 
-\listinginput{1}{invalid.c}
+\listinginput{1}{examples/alarms/invalid.c}
 In the above example, the analysis is not able to guarantee that
 the memory accesses \lstinline|t[i]| and \lstinline|*p| are valid, 
 so it emits a proof obligation for each:
@@ -1465,7 +1465,7 @@ property that the divisor is different from zero when it continues
 the analysis after this point.
 The property expressed by an alarm may also not be taken into account
 when it is not easy to do so.
-\listinginput{1}{div.c}
+\listinginput{1}{examples/alarms/div.c}
 \begin{logs}
 div.c:4: ... division by zero. assert (int)(x*y) != 0;
 div.c:5: ... division by zero. assert x != 0;
@@ -1487,7 +1487,7 @@ indeed, processors are often built in a way that such an
 operation does not produce the \lstinline|0| or \lstinline|-1|
 result that could have been expected. Here is an example
 of program with such an issue, and the resulting alarm:
-\listinginput{1}{shift.c}
+\listinginput{1}{examples/alarms/shift.c}
 \begin{logs}
 shift.c:4: ... invalid RHS operand for shift. assert 0 <= c < 32;
 \end{logs}
@@ -1502,7 +1502,7 @@ and does not lead to an alarm by default.
 However, the option \lstinline|-warn-right-shift-negative| can be used to
 enable such alarms.
 
-\listinginput{1}{lshift.c}
+\listinginput{1}{examples/alarms/lshift.c}
 \begin{logs}
 [eva:alarm] lshift.c:4: Warning: invalid LHS operand for left shift. assert 0 <= x;
 \end{logs}
@@ -1541,7 +1541,7 @@ or unsigned downcasts that may exceed the destination range.
 An alarm is emitted when a floating-point value appears to exceed the
 range of the integer type it is converted to.
 
-\listinginput{1}{ov_float_int.c}
+\listinginput{1}{examples/alarms/ov_float_int.c}
 \begin{logs}
 ...
 [eva:alarm] ov_float_int.c:6: Warning: overflow in conversion from floating-point 
@@ -1560,7 +1560,7 @@ with a finite interval representing the result obtained
 if excluding these possibilities. This interval, like
 any other result, may be over-approximated. An example of this
 first kind of alarm can be seen in the following example.
-\listinginput{1}{double_op_res.c}
+\listinginput{1}{examples/alarms/double_op_res.c}
 \begin{shell}
 frama-c -eva -main sum double_op_res.c
 \end{shell}
@@ -1578,7 +1578,7 @@ from \lstinline|int*| to \lstinline|float*|.  The emitted alarm
 excludes the possibility of the bit sequence used as a the
 argument representing \lstinline|NaN|, an infinite, or an address.
 See the example below.
-\listinginput{1}{double_op_arg.c}
+\listinginput{1}{examples/alarms/double_op_arg.c}
 \begin{shell}
 frama-c -eva double_op_arg.c
 \end{shell}
@@ -1606,7 +1606,7 @@ value of a local variable that has not been initialized, or
 if it appears to manipulate the address of a local variable outside
 of the scope of said variable. Both issues occur in the following
 example:
-\listinginput{1}{uninitialized.c}
+\listinginput{1}{examples/alarms/uninitialized.c}
 \Eva{} emits alarms for lines 5 
 (variable \lstinline|r| may be uninitialized) 
 and 13 (a dangling pointer to local variable \lstinline|t| is used).
@@ -1650,7 +1650,7 @@ the values 0 and 1, but any other value might be a trap representation, that is,
 an object representation that does not represent a valid value of the type.
 Trap representations can be created through unions or pointer casts.
 
-\listinginput{1}{invalid_bool.c}
+\listinginput{1}{examples/alarms/invalid_bool.c}
 \begin{shell}
 frama-c -eva invalid_bool.c
 \end{shell}
@@ -1680,7 +1680,7 @@ accordingly to the emitted alarm. For instance, for the
 quantity \lstinline|&x+2| must be reliably comparable to 0, the
 analysis assumes that the result of the comparison is 1. The
 consequences are visible when analyzing the following example:
-\listinginput{1}{pointer_comparison.c}
+\listinginput{1}{examples/alarms/pointer_comparison.c}
 \Eva{} finds that this program does not terminate.
 This seems incorrect because an actual execution will terminate
 on most architectures.
@@ -1727,7 +1727,7 @@ the example \lstinline|y = *p + x++;|, the post-increment is defined
 as long as \lstinline|*p| does not have any bits in common with
 \lstinline|x|.
 
-\listinginput{1}{se.c}
+\listinginput{1}{examples/alarms/se.c}
 \begin{shell}
 frama-c -eva se.c -unspecified-access
 \end{shell}
@@ -1781,7 +1781,7 @@ These limitations will be addressed in a future version.
 Vaguely related to, but different from, undefined side-effects in expressions,
 \Eva{} warns about the following program:
 
-\listinginput{1}{overlap.c}
+\listinginput{1}{examples/alarms/overlap.c}
 
 The programmer thought implementation-defined behavior was invoked
 in the above program, using an union to type-pun between structs S and T.
@@ -1829,7 +1829,7 @@ if it can give some meaning to the call. This is meant to account
 for frequent misconceptions on type compatibility (e.g. \lstinline|void *|
 and \lstinline|int *| are \emph{not} compatible). 
 
-\listinginput{1}{valid_function.c}
+\listinginput{1}{examples/alarms/valid_function.c}
 
 \begin{logs}
 [eva:alarm] valid_function.c:9: Warning:
@@ -2165,7 +2165,7 @@ introduce approximations when analyzing a loop.
 
 Let us assume, in the following lines, that the function \lstinline|c|
 is unknown:
-\listinginput{1}{boucles.c}
+\listinginput{1}{examples/boucles.c}
 
 The \Eva{} plug-in could provide the best possible sets of values
 if the user explicitly instructed it to study step by step each
@@ -2188,7 +2188,7 @@ call site. In the following example, the body of \lstinline|f| is analyzed again
 at each analysis of the body of the loop. The result of the analysis
 is as precise as the result obtained for the example in section \ref{boucles}.
 
-\listinginput{1}{fonctions.c}
+\listinginput{1}{examples/fonctions.c}
 
 Calls to variadic functions are handled by the \textsf{Variadic} plug-in, which
 translates calls to variadic functions into semantically-equivalent calls,
@@ -2225,7 +2225,7 @@ assume that the actual entry point for the example of section
 \ref{fonctions} is not the function \lstinline|main_1| but the following
 \lstinline|main_main| function:
 
-\listinginput{17}{main.c}
+\listinginput{17}{examples/main.c}
 
 If the user specifies the wrong
 entry point \lstinline|main_1|, the plug-in will provide the
@@ -2479,7 +2479,7 @@ that the analyzed code fits in this hypothesis. On the following example,
 it generates a proof obligation meaning that ``the comparison
 on line 8 is safe only if \lstinline|p| is a valid address or if the base address
 of \lstinline|p| is the same as that of \lstinline|&x|''.
-\listinginput{1}{bases.c}
+\listinginput{1}{examples/bases.c}
 
 It is mandatory to check this proof obligation.  When analyzing this
 example, the analysis infers that the loop never terminates (because
@@ -2568,7 +2568,7 @@ real execution. Currently, \Eva{} is not designed to prove
 the termination of loops or similar liveness properties.
 For instance,
 the following program does not terminate:
-\listinginput{1}{termination.c}
+\listinginput{1}{examples/termination.c}
 If this program is analyzed
 with the default options of \Eva{}, the analysis finds
 that every time execution reaches the end of \lstinline|main|, the value
@@ -4233,7 +4233,7 @@ of this function. In the example below, the dependency of
 \lstinline|double_assign| is \lstinline|a FROM c|.
 The variable \lstinline|b| is not a functional input because the final value
 of \lstinline|a| depends only on \lstinline|c|.
-\listinginput{1}{double_assign.c}
+\listinginput{1}{examples/double_assign.c}
 
 The dependencies of a function may also be listed as \lstinline|NO EFFECTS|.
 This means that the function has no effects when it terminates. There
@@ -4318,7 +4318,7 @@ are guaranteed to have been over-written when the function terminates;
 the latter is a by-product of the computation of operational
 inputs that someone may find useful someday.
 
-\listinginput{1}{op_inputs.c}
+\listinginput{1}{examples/op_inputs.c}
 
 This example, when analyzed with the options \lstinline|-inout -lib-entry -main op|,
 is found to have on termination the operational 
@@ -4406,7 +4406,7 @@ ensure that the property $P$ holds.
 
 Let us consider for instance the following function.
 
-\listinginput{1}{reduction.c}
+\listinginput{1}{examples/reduction.c}
 
 \begin{shell}
 frama-c -eva -eva-slevel 12 -lib-entry -main f reduction.c
@@ -4442,7 +4442,7 @@ in that point of the program.
 This treatment often improves the precision of the analysis. It can be used with tautological assertions
 to provide hints to the analyzer, as shown in the following example.
 
-\listinginput{1}{sq.c}
+\listinginput{1}{examples/sq.c}
 
 \begin{shell}
 frama-c -eva -eva-slevel 2 sq.c
@@ -4481,7 +4481,7 @@ not taken into account at all.
 \smallskip
 
 The two functions below illustrate both of these limitations:
-\listinginput{1}{annotations_2.c}
+\listinginput{1}{examples/annotations_2.c}
 
 If the analyzer is launched with 
 options \lstinline|-lib-entry -main generalization|,
@@ -5003,7 +5003,7 @@ The implementation of these functions might change in future versions
 of Frama-C, but their types and their behavior will stay the same.
 
 Example of use of the functions introducing non-determinism:
-\listinginput{1}{nondet.c}
+\listinginput{1}{examples/nondet.c}
 
 With the command below, the obtained result for 
 variable \lstinline|X| is \lstinline|[-45..150],0%3|.
@@ -5409,7 +5409,7 @@ time. For these reasons, \lstinline|-ulevel| is seldom used nowadays.
 The answers to these questions are ``yes'' and ``yes''. 
 Consider the following example:
 
-\listinginput{1}{vraie_al.c}
+\listinginput{1}{examples/vraie_al.c}
 
 When analyzing this example, \Eva{} does not emit an
 alarm on line 6. This is perfectly correct, since no error occurs at
@@ -5440,7 +5440,7 @@ the case of a false alarm. Deciding whether the first alarm is a true
 or a false one is the responsibility of the user.
 This situation 
 happens in the following example:
-\listinginput{1}{false_al.c}
+\listinginput{1}{examples/false_al.c}
 
 Analyzing this example with the default options produces:
 \begin{logs}
