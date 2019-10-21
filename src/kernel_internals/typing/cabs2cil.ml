@@ -4354,7 +4354,11 @@ let rec doSpecList ghost (suggestedAnonName: string)
    * collected and processed separately. *)
   let attrs : A.attribute list ref = ref [] in      (* __attribute__, etc. *)
   let cvattrs : A.cvspec list ref = ref [] in       (* const/volatile *)
-
+  let suggestedAnonName =
+    if suggestedAnonName <> "" then suggestedAnonName
+    else if get_current_stdheader () = "" then ""
+    else "fc_stdlib"
+  in
   let doSpecElem (se: A.spec_elem)
       (acc: A.typeSpecifier list)
     : A.typeSpecifier list =
