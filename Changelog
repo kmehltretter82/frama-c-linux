@@ -17,6 +17,8 @@
 Open Source Release <next-release>
 ##################################
 
+-   Eva       [2019/10/23] New option -eva-auto-loop-unroll N to unroll all
+              loops whose number of iterations can be easily bounded by <N>.
 -   Eva       [2019/10/21] New octagon domain inferring relations of the form
               l ≤ ±X±Y ≤ e between pairs of integer variables X and Y. Enabled
               with option -eva-octagon-domain. Only infers relations between
