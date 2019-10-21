@@ -33,7 +33,7 @@ struct
 
   exception Not_constant
 
-  let rec eval v exp = 
+  let rec eval v exp =
     match exp.enode with
     | Const (CInt64 (i,_,_)) ->
       (try Integer.to_int i with _ -> raise Not_constant)

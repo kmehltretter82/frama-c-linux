@@ -2,6 +2,9 @@
 OPT: -load-script tests/misc/interpreted_automata_dataflow.ml
 */
 
+/* Tests the dataflow functor of interpreted automata via a caml script
+   implementing a propagation of constants. */
+
 void main(int x)
 {
   int y = 3;
