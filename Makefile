@@ -875,6 +875,7 @@ PLUGIN_CMO:= slevel/split_strategy value_parameters \
 	domains/printer_domain \
 	domains/traces_domain \
 	domains/simple_memory \
+	domains/octagons \
 	domains/gauges/gauges_domain \
 	domains/hcexprs \
 	domains/equality/equality domains/equality/equality_domain \

@@ -3956,6 +3956,55 @@ while (--x > 0) {
  cannot be analyzed precisely, because the relation between \texttt{x}
 and \texttt{y} is not affine.
 
+
+\subsection{Octagons}
+\label{sec:octagons}
+
+Activating option \texttt{-eva-octagon-domain} instructs Eva to infer relations
+between variables as numerical constraints of the form $l \leq \pm X \pm Y \leq
+u$, where $X$ and $Y$ are program variables, and $l$ and $u$ are constants.
+
+These relations are then used to evaluate more precisely the possible values
+of an expression involving $X$ and $Y$, or to deduce a reduction of
+the possible values of $X$ from a reduction of the possible values of $Y$.
+
+The following code is a minimal working example that illustrates
+the precision improvement provided by the octagon domain.
+\begin{lstlisting}
+void main (int y) {
+  int k = Frama_C_interval(0, 10);
+  int x = y + k;               // x - y $\in$ [0..10]
+  int r = x + 3 - y;           // r $\in$ [-7..3]
+  int t;
+  if (y > 15)
+    t = x;                     // t $\in$ [6..$\infty$]
+}
+\end{lstlisting}
+
+
+Currently, the octagon domain is fast but has two strong limitations:
+\begin{itemize}
+\item
+  The domain only infers relations between scalar variables of integer types.
+  It ignores pointers, arrays and structure fields.
+\item
+  The domain only infers relations between pairs of variables occurring in the
+  same instruction, as \lstinline|x = y + k;| or \lstinline|if (x < y + k)|.
+  If an instruction involves 3 variables or more, relations are inferred for
+  each pair of variables.
+\end{itemize}
+
+The domain is intraprocedural by default: the inferred relations are local to
+the current function and are lost when entering a function call or returning
+to its caller.
+
+The option \verb+-eva-octagon-through-calls+ makes the octagon domain
+interprocedural, which is a more precise but slower mode where
+the inferred relations are propagated through function calls.
+The analysis of a function can then use the relations inferred in the callers,
+and at the end, the inferred relations are propagated back to the caller.
+
+
 \subsection{Bitwise values}
 \label{sec:bitwise}
 
@@ -5042,6 +5091,9 @@ of the domain, shown in Figure~\ref{fig:log-category}.
       \tabularnewline
       \midrule
       Gauges & \lstinline|d-gauges| & \ref{sec:gauges}
+      \tabularnewline
+      \midrule
+      Octagons & \lstinline|d-octagon| & \ref{sec:octagons}
       \tabularnewline
       \midrule
       Bitwise & \lstinline|d-bitwise| & \ref{sec:bitwise}

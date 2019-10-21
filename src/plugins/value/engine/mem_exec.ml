@@ -240,18 +240,22 @@ module Make
       raise [Result_found] when this execution exists, or do nothing. *)
   let find_match_in_previous kf (map_inputs: InputBasesToCallEffect.t) state =
     let aux_previous_call binputs hstates =
-      (* restrict [state] to the inputs of this call *)
-      let st_filtered = Domain.filter kf `Pre binputs state in
-      try
-        let bases, outputs, i = Domain.Hashtbl.find hstates st_filtered in
-        (* We have found a previous execution, in which the outputs are
-           [outputs]. Copy them in [state] and return this result. *)
-        let process output =
-          Domain.reuse kf bases ~current_input:state ~previous_output:output
-        in
-        let outputs = List.map process outputs in
-        raise (Result_found (outputs, i))
-      with Not_found -> ()
+      let brelated = Domain.relate kf binputs state in
+      if not Base.SetLattice.(is_included brelated (inject binputs))
+      then ()
+      else
+        (* restrict [state] to the inputs of this call *)
+        let st_filtered = Domain.filter kf `Pre binputs state in
+        try
+          let bases, outputs, i = Domain.Hashtbl.find hstates st_filtered in
+          (* We have found a previous execution, in which the outputs are
+             [outputs]. Copy them in [state] and return this result. *)
+          let process output =
+            Domain.reuse kf bases ~current_input:state ~previous_output:output
+          in
+          let outputs = List.map process outputs in
+          raise (Result_found (outputs, i))
+        with Not_found -> ()
     in
     Base.Hptset.Hashtbl.iter aux_previous_call map_inputs
 
