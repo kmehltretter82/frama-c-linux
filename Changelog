@@ -17,6 +17,12 @@
 Open Source Release <next-release>
 ##################################
 
+-   Eva       [2019/10/21] New octagon domain inferring relations of the form
+              l ≤ ±X±Y ≤ e between pairs of integer variables X and Y. Enabled
+              with option -eva-octagon-domain. Only infers relations between
+              pairs of scalar variables occuring in a same instruction.
+              Intra-procedural by default; octagons can be propagated through
+              function calls with option -eva-octagon-through-calls.
 -   Eva       [2019/10/04] Evaluates ACSL predicates \is_plus_infinity and
               \is_minus_infinity.
 -   Kernel    [2019/10/04] Supports macro INFINITY and NAN.
