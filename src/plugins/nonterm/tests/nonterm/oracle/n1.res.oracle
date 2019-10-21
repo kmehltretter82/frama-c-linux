@@ -4,12 +4,14 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva:loop-unroll] tests/nonterm/n1.i:6: Automatic loop unrolling.
+[eva] tests/nonterm/n1.i:6: starting to merge loop iterations
+[eva:alarm] tests/nonterm/n1.i:7: Warning: 
+  signed overflow. assert res + i ≤ 2147483647;
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   i ∈ {10}
-  res ∈ {45}
+  res ∈ [0..2147483647]
   __retres ∈ {0}
 [nonterm] Analysis done.

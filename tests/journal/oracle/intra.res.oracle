@@ -36,8 +36,8 @@
 [eva] computing for function loop <- main.
   Called from tests/journal/intra.i:85.
 [eva] tests/journal/intra.i:63: assertion got status valid.
-[eva:loop-unroll] tests/journal/intra.i:66: Automatic loop unrolling.
 [eva] tests/journal/intra.i:64: loop invariant got status valid.
+[eva] tests/journal/intra.i:66: starting to merge loop iterations
 [eva] Recording results for loop
 [eva] Done for function loop
 [eva] computing for function assign <- main.

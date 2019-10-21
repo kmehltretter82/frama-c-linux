@@ -818,7 +818,7 @@ module AutoLoopUnroll =
     (struct
       let option_name = "-eva-auto-loop-unroll"
       let arg_name = "n"
-      let default = 128
+      let default = 0
       let help = "limit of the automatic loop unrolling: all loops whose \
                   number of iterations can be easily bounded by <n> \
                   are completely unrolled."

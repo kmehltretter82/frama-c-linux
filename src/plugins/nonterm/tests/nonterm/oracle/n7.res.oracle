@@ -4,7 +4,7 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva:loop-unroll] tests/nonterm/n7.i:5: Automatic loop unrolling.
+[eva] tests/nonterm/n7.i:5: starting to merge loop iterations
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
