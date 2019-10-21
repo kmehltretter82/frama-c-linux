@@ -899,12 +899,10 @@ PLUGIN_CMO:= partitioning/split_strategy value_parameters \
 	domains/cvalue/cvalue_domain \
 	engine/subdivided_evaluation engine/evaluation engine/abstractions \
 	engine/recursion engine/transfer_stmt engine/transfer_specification \
-	engine/partitioning_index engine/mem_exec \
 	partitioning/auto_loop_unroll \
-	engine/partition partitioning/partitioning_parameters \
-	engine/trace_partitioning \
-	engine/iterator \
-	engine/initialization \
+	partitioning/partition partitioning/partitioning_parameters \
+	partitioning/partitioning_index partitioning/trace_partitioning \
+	engine/mem_exec engine/iterator engine/initialization \
 	engine/compute_functions engine/analysis register \
 	$(APRON_CMO) $(NUMERORS_CMO)
 PLUGIN_CMI:= values/abstract_value values/abstract_location \
