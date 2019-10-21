@@ -4668,7 +4668,7 @@ extern int fputc(int c, FILE *stream);
 
 /*@ requires valid_string_s: valid_read_string(s);
     assigns *stream, \result;
-    assigns *stream \from *(s + (0 .. strlen{Old}(s)));
+    assigns *stream \from *(s + (0 .. strlen{Old}(s))), *stream;
     assigns \result
       \from (indirect: *(s + (0 .. strlen{Old}(s)))), (indirect: *stream);
  */
@@ -4705,20 +4705,20 @@ extern char *gets(char *s);
 
 /*@ requires valid_stream: \valid(stream);
     assigns *stream, \result;
-    assigns *stream \from c;
+    assigns *stream \from c, *stream;
     assigns \result \from (indirect: *stream);
  */
 extern int putc(int c, FILE *stream);
 
 /*@ assigns *__fc_stdout, \result;
-    assigns *__fc_stdout \from c;
+    assigns *__fc_stdout \from c, *__fc_stdout;
     assigns \result \from (indirect: *__fc_stdout);
  */
 extern int putchar(int c);
 
 /*@ requires valid_string_s: valid_read_string(s);
     assigns *__fc_stdout, \result;
-    assigns *__fc_stdout \from *(s + (0 .. strlen{Old}(s)));
+    assigns *__fc_stdout \from *(s + (0 .. strlen{Old}(s))), *__fc_stdout;
     assigns \result
       \from (indirect: *(s + (0 .. strlen{Old}(s)))),
             (indirect: *__fc_stdout);
@@ -4739,8 +4739,10 @@ extern int ungetc(int c, FILE *stream);
     ensures
       initialization:
         \initialized((char *)\old(ptr) + (0 .. \result * \old(size) - 1));
-    assigns *((char *)ptr + (0 .. nmemb * size - 1)), \result;
+    assigns *((char *)ptr + (0 .. nmemb * size - 1)), *stream, \result;
     assigns *((char *)ptr + (0 .. nmemb * size - 1))
+      \from (indirect: size), (indirect: nmemb), (indirect: *stream);
+    assigns *stream
       \from (indirect: size), (indirect: nmemb), (indirect: *stream);
     assigns \result \from size, (indirect: *stream);
  */
@@ -7264,11 +7266,12 @@ extern int __va_openat_mode_t(int dirfd, char const *filename, int flags,
 /*@ ghost extern int __fc_tz __attribute__((__FRAMA_C_MODEL__)); */
 
 /*@ requires valid_path: valid_read_string(path);
-    requires valid_times: \valid_read(times + (0 .. 1));
+    requires
+      valid_times_or_null: \valid_read(times + (0 .. 1)) ∨ times ≡ \null;
     assigns \result;
     assigns \result
       \from (indirect: *(path + (0 .. strlen{Old}(path)))),
-            (indirect: *(times + (0 .. 1)));
+            (indirect: times), (indirect: *(times + (0 .. 1)));
  */
 extern int utimes(char const *path, struct timeval const * /*[2]*/ times);
 

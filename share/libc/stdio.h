@@ -104,6 +104,7 @@ char * const __fc_p_tmpnam = __fc_tmpnam;
 /*@
   // Note: the tmpnam example in POSIX uses an array of size L_tmpnam+1
   // missing: assigns __fc_p_tmpnam[0..L_tmpnam] \from 'PRNG and internal state'
+  // missing: if called more than TMP_MAX, behavior is implementation-defined
   requires valid_s_or_null: s == \null || \valid(s+(0 .. L_tmpnam));
   assigns __fc_p_tmpnam[0 .. L_tmpnam] \from __fc_p_tmpnam[0 .. L_tmpnam],
                                              indirect:s;
@@ -285,7 +286,7 @@ extern int fputc(int c, FILE *stream);
 
 /*@
   requires valid_string_s: valid_read_string(s);
-  assigns *stream \from s[0..strlen(s)];
+  assigns *stream \from s[0..strlen(s)], *stream;
   assigns \result \from indirect:s[0..strlen(s)], indirect:*stream;
 */
 extern int fputs(const char * restrict s,
@@ -320,20 +321,20 @@ extern char *gets(char *s);
 
 /*@
   requires valid_stream: \valid(stream);
-  assigns *stream \from c;
+  assigns *stream \from c, *stream;
   assigns \result \from indirect:*stream;
 */
 extern int putc(int c, FILE *stream);
 
 /*@
-  assigns *__fc_stdout \from c;
+  assigns *__fc_stdout \from c, *__fc_stdout;
   assigns \result \from indirect:*__fc_stdout;
 */
 extern int putchar(int c);
 
 /*@
   requires valid_string_s: valid_read_string(s);
-  assigns *__fc_stdout \from s[0..strlen(s)];
+  assigns *__fc_stdout \from s[0..strlen(s)], *__fc_stdout;
   assigns \result \from indirect:s[0..strlen(s)], indirect:*__fc_stdout;
 */
 extern int puts(const char *s);
@@ -349,7 +350,7 @@ extern int ungetc(int c, FILE *stream);
 /*@
   requires valid_ptr_block: \valid(((char*)ptr)+(0..(nmemb*size)-1));
   requires valid_stream: \valid(stream);
-  assigns *(((char*)ptr)+(0..(nmemb*size)-1))
+  assigns *(((char*)ptr)+(0..(nmemb*size)-1)), *stream
     \from indirect:size, indirect:nmemb, indirect:*stream;
   assigns \result \from size, indirect:*stream;
   ensures size_read: \result <= nmemb;
