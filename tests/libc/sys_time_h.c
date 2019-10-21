@@ -18,5 +18,14 @@ int main() {
   i2.it_interval.tv_usec = 1000000; // invalid tv_usec
   res = setitimer(ITIMER_VIRTUAL, &i2, &i1);
   //@ assert res == -1;
+
+  int r1 = utimes("/tmp/utimes", 0);
+  struct timeval tv[2] =
+    {
+     { .tv_sec = 10000000, .tv_usec = 999999 },
+     { .tv_sec = -9000000, .tv_usec = 1 },
+    };
+  int r2 = utimes("/tmp/utimes", tv);
+
   return 0;
 }

@@ -47,8 +47,9 @@ struct timezone {
 
 /*@
   requires valid_path: valid_read_string(path);
-  requires valid_times: \valid_read(times+(0..1));
-  assigns \result \from indirect:path[0..strlen(path)], indirect:times[0..1];
+  requires valid_times_or_null: \valid_read(times+(0..1)) || times == \null;
+  assigns \result \from indirect:path[0..strlen(path)],
+    indirect:times, indirect:times[0..1];
 */
 extern int utimes(const char *path, const struct timeval times[2]);
 
