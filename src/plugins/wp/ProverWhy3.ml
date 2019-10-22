@@ -1282,7 +1282,7 @@ let prove ?timeout ?steplimit ~prover wpo =
         then Task.return VCS.no_result (* Only generate *)
         else
           let drv , config , task = prover_task prover task in
-          if false && is_trivial task then
+          if is_trivial task then
             Task.return VCS.valid
           else
             let mode = get_mode () in

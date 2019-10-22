@@ -53,5 +53,5 @@
 [wp] Report out: 'tests/wp_acsl/result_qualif/e_imply.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
-f                    8     34 (1..8)        42       100%
+f                    8     34               42       100%
 -------------------------------------------------------------
