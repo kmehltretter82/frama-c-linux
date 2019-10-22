@@ -84,23 +84,26 @@ class transformer = object(self)
     else
       Cil.SkipChildren
 
+  method private find_enabled_builtin fct =
+    find_stdlib_attr fct ;
+    let builtin = Hashtbl.find base fct.vname in
+    let module B = (val builtin: Builtin) in
+    if not (B.Enabled.get ()) then raise Not_found ;
+    builtin
+
   method private replace_call (fct, args) =
     try
-      find_stdlib_attr fct ;
-      let builtin = Hashtbl.find base fct.vname in
-      let module B = (val builtin: Builtin) in
-      if B.Enabled.get () then
-        if B.well_typed_call args then
-          let key = B.key_from_call args in
-          let fundec = B.get_override key in
-          let new_args = B.retype_args key args in
-          Queue.add fundec used_builtin_last_kf ;
-          (fundec.svar), new_args
-        else begin
-          Options.warning ~current:true "Ignore call: not well typed" ;
-          (fct, args)
-        end
-      else (fct, args)
+      let module B = (val (self#find_enabled_builtin fct): Builtin) in
+      if B.well_typed_call args then
+        let key = B.key_from_call args in
+        let fundec = B.get_override key in
+        let new_args = B.retype_args key args in
+        Queue.add fundec used_builtin_last_kf ;
+        (fundec.svar), new_args
+      else begin
+        Options.warning ~current:true "Ignore call: not well typed" ;
+        (fct, args)
+      end
     with
     | Not_found -> (fct, args)
 

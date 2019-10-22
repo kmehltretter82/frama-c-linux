@@ -56,9 +56,38 @@ let rec base_char_type t =
 let presult_ptr ?loc t ptr =
   prel ?loc (Req, (tresult ?loc t), ptr)
 
-let pset_len_bytes ?loc p1 value bytes_len =
-  plet_len_div_size ?loc p1.term_type bytes_len
-    (punfold_all_elems_eq_val ?loc p1 value)
+let pset_len_bytes_to_value ?loc ptr value bytes_len =
+  let eq_value ?loc t = prel ?loc (Req, t, value) in
+  plet_len_div_size ?loc ptr.term_type bytes_len
+    (fun len -> punfold_all_elems_pred ?loc ptr len eq_value)
+
+let pset_len_bytes_all_bits_to_one ?loc ptr bytes_len =
+  let nans = Logic_env.find_all_logic_functions "\\is_NaN" in
+  let of_type t = function
+    | { l_profile = [ x ] } when Cil_datatype.Logic_type.equal x.lv_type t -> true
+    | _ -> false
+  in
+  let find_nan_for_type t = List.find (of_type t) nans in
+  let all_bits_to_one ?loc t =
+    match t.term_type with
+    | Ctype(TFloat(_)) ->
+      papp ?loc ((find_nan_for_type t.term_type), [], [t])
+    | Ctype(TPtr(_)) ->
+      pnot ?loc (pvalid_read ?loc (here_label, t))
+    | Ctype(TInt(kind, _)) | Ctype(TEnum({ ekind = kind }, _)) ->
+      let is_signed = Cil.isSigned kind in
+      let bits = Cil.bitsSizeOfInt kind in
+      let value = if is_signed then
+          Cil.min_signed_number bits
+        else
+          Cil.max_signed_number bits
+      in
+      prel ?loc (Req, t, (tinteger ?loc (Integer.to_int value)))
+    | _ -> assert false
+  in
+  plet_len_div_size ?loc ptr.term_type bytes_len
+    (fun len -> punfold_all_elems_pred ?loc ptr len all_bits_to_one)
+
 
 let generate_requires loc ptr value len =
   let bounds = match value with
@@ -91,11 +120,12 @@ let generate_ensures e loc t ptr value len =
   let pred_name = [ "set_content" ] in
   let content = match e, value with
     | None, Some value ->
-      [ { (pset_len_bytes ~loc ptr value len) with pred_name } ]
+      [ { (pset_len_bytes_to_value ~loc ptr value len) with pred_name } ]
     | Some 0, None ->
       let value = tinteger ~loc 0 in
-      [ { (pset_len_bytes ~loc ptr value len) with pred_name } ]
-    | Some 255, None -> []
+      [ { (pset_len_bytes_to_value ~loc ptr value len) with pred_name } ]
+    | Some 255, None ->
+      [ { (pset_len_bytes_all_bits_to_one ~loc ptr len) with pred_name }]
     | _ -> assert false
   in
   List.map (fun p -> Normal, new_predicate p) (content @ [
@@ -147,7 +177,7 @@ let well_typed_call = function
 let key_from_call = function
   | [ ptr ; _ ; _ ] when any_char_composed_type (type_from_arg ptr) ->
     (type_from_arg ptr), None
-  | [ ptr ; value ; _ ] ->
+  | [ ptr ; value ; _ ] when not (is_union_type (type_from_arg ptr)) ->
     (type_from_arg ptr), (memset_value value)
   | _ -> failwith "Call to Memset.key_from_call on an ill-typed builtin call"
 
@@ -172,7 +202,7 @@ let generate_prototype = function
     let name = function_name ^ "_" ^ (string_of_typ t) in
     let fun_type = char_prototype t in
     name, fun_type
-  | t, Some x when x = 0 || x = 255 ->
+  | t, Some x when not (is_union_type t) && (x = 0 || x = 255) ->
     let ext = if x = 0 then "_0" else if x = 255 then "_FF" else assert false in
     let name = function_name ^ "_" ^ (string_of_typ t) ^ ext in
     let fun_type = non_char_prototype t in
@@ -201,7 +231,9 @@ let args_for_original (_t , e) fd =
   | None -> List.map Cil.evar fd.sformals
   | Some n ->
     let loc = Cil_datatype.Location.unknown in
-    (List.map Cil.evar fd.sformals) @ [ Cil.integer ~loc n ]
+    match List.map Cil.evar fd.sformals with
+    | [ ptr ; len ] -> [ ptr ; (Cil.integer ~loc n) ; len]
+    | _ -> assert false
 
 let () = Transform.register (module struct
     module Hashtbl = With_collection.Hashtbl

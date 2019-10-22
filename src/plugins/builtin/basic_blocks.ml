@@ -154,6 +154,10 @@ let sizeofpointed = function
   | Ctype(TPtr(t, _)) | Ctype(TArray(t, _, _, _)) -> Cil.bytesSizeOf t
   | _ -> assert false
 
+let unroll_logic_type = function
+  | Ctype t -> Ctype (Cil.unrollType t)
+  | t -> t
+
 (** Features related to predicates *)
 
 let plet_len_div_size ?loc t bytes_len pred =
@@ -197,38 +201,38 @@ and pall_elems_eq ?loc depth t1 t2 len =
   let eq = peq_unfold ?loc (depth+1) t1_acc t2_acc in
   pforall ?loc ([ind], (pimplies ?loc (bounds, eq)))
 and peq_unfold ?loc depth t1 t2 =
-  match t1.term_type with
+  match unroll_logic_type t1.term_type with
   | Ctype(TArray(_, Some len, _, _)) ->
     let len = Logic_utils.expr_to_term ~cast:false len in
     pall_elems_eq ?loc depth t1 t2 len
   | _ -> prel ?loc (Req, t1, t2)
 
-let rec punfold_all_elems_eq_val ?loc t1 value len =
-  pall_elems_eq ?loc 0 t1 value len
-and pall_elems_eq ?loc depth t1 value len =
+let rec punfold_all_elems_pred ?loc t1 len pred =
+  pall_elems_pred ?loc 0 t1 len pred
+and pall_elems_pred ?loc depth t1 len pred =
   let ind = Cil_const.make_logic_var_quant ("j" ^ (string_of_int depth)) Linteger in
   let tind = tvar ind in
   let bounds = pbounds_incl_excl ?loc (tinteger 0) tind len in
   let t1_acc = taccess ?loc t1 tind in
-  let eq = peq_unfold ?loc depth t1_acc value in
+  let eq = punfold_pred ?loc depth t1_acc pred in
   pforall ?loc ([ind], (pimplies ?loc (bounds, eq)))
-and pall_fields_eq ?loc depth t1 ci value =
+and pall_fields_pred ?loc depth t1 ci pred =
   let eq fi =
     let lval = match t1.term_node with TLval(lv) -> lv | _ -> assert false in
     let nlval = addTermOffsetLval (TField(fi, TNoOffset)) lval in
     let term = term ?loc (TLval nlval) (Ctype fi.ftype) in
-    peq_unfold ?loc depth term value
+    punfold_pred ?loc depth term pred
   in
   let eqs = List.map eq ci.cfields in
   pands eqs
-and peq_unfold ?loc depth t1 value =
-  match t1.term_type with
+and punfold_pred ?loc depth t1 pred =
+  match unroll_logic_type t1.term_type with
   | Ctype(TArray(_, Some len, _, _)) ->
     let len = Logic_utils.expr_to_term ~cast:false len in
-    pall_elems_eq ?loc (depth+1) t1 value len
+    pall_elems_pred ?loc (depth+1) t1 len pred
   | Ctype(TComp(ci, _, _)) ->
-    pall_fields_eq ?loc depth t1 ci value
-  | _ -> prel ?loc (Req, t1, value)
+    pall_fields_pred ?loc depth t1 ci pred
+  | _ -> pred ?loc t1
 
 let pseparated_memories ?loc p1 len1 p2 len2 =
   let b1 = tbuffer_range ?loc p1 len1 in
