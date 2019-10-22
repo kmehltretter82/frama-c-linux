@@ -61,6 +61,19 @@ let pset_len_bytes_to_value ?loc ptr value bytes_len =
   plet_len_div_size ?loc ptr.term_type bytes_len
     (fun len -> punfold_all_elems_pred ?loc ptr len eq_value)
 
+let pset_len_bytes_to_zero ?loc ptr bytes_len =
+  let eq_value ?loc t =
+    let value = match t.term_type with
+      | Ctype(TPtr(_)) -> term Tnull t.term_type
+      | Ctype(TFloat(_)) -> treal ?loc 0.
+      | Ctype(TInt(_)) -> tinteger ?loc 0
+      | _ -> assert false
+    in
+    prel ?loc (Req, t, value)
+  in
+  plet_len_div_size ?loc ptr.term_type bytes_len
+    (fun len -> punfold_all_elems_pred ?loc ptr len eq_value)
+
 let pset_len_bytes_all_bits_to_one ?loc ptr bytes_len =
   let nans = Logic_env.find_all_logic_functions "\\is_NaN" in
   let of_type t = function
@@ -80,9 +93,10 @@ let pset_len_bytes_all_bits_to_one ?loc ptr bytes_len =
       let value = if is_signed then
           Cil.min_signed_number bits
         else
-          Cil.max_signed_number bits
+          Cil.max_unsigned_number bits
       in
-      prel ?loc (Req, t, (tinteger ?loc (Integer.to_int value)))
+      let value = term ?loc (TConst (Integer (value,None))) Linteger in
+      prel ?loc (Req, t, value)
     | _ -> assert false
   in
   plet_len_div_size ?loc ptr.term_type bytes_len
@@ -90,15 +104,22 @@ let pset_len_bytes_all_bits_to_one ?loc ptr bytes_len =
 
 
 let generate_requires loc ptr value len =
+  let open Cil in
   let bounds = match value with
     | None ->
       [ { (pcorrect_len_bytes ~loc ptr.term_type len) with pred_name = ["aligned_end"] } ]
     | Some value ->
       let low, up = match value.term_type with
-        | Ctype(TInt((IChar|ISChar),_)) ->
-          (tinteger ~loc (-128)), (tinteger ~loc 127)
-        | Ctype(TInt(IUChar, _)) ->
-          (tinteger ~loc 0), (tinteger ~loc 256)
+        | Ctype(TInt((IChar|ISChar|IUChar) as kind, _)) ->
+          let bits = bitsSizeOfInt kind in
+          let plus_one = Integer.add (Integer.of_int 1) in
+          let low, up = if (isSigned kind) then
+            (min_signed_number bits), (plus_one (max_signed_number bits))
+          else
+            (Integer.of_int 0), (plus_one (max_unsigned_number bits))
+          in
+          let integer ?loc i = term ?loc (TConst (Integer (i, None))) Linteger in
+          (integer ~loc low), (integer ~loc up)
         | _ -> assert false
       in
       [ { (pbounds_incl_excl ~loc low value up) with pred_name = [ "in_bounds_value" ] } ]
@@ -122,8 +143,7 @@ let generate_ensures e loc t ptr value len =
     | None, Some value ->
       [ { (pset_len_bytes_to_value ~loc ptr value len) with pred_name } ]
     | Some 0, None ->
-      let value = tinteger ~loc 0 in
-      [ { (pset_len_bytes_to_value ~loc ptr value len) with pred_name } ]
+      [ { (pset_len_bytes_to_zero ~loc ptr len) with pred_name } ]
     | Some 255, None ->
       [ { (pset_len_bytes_all_bits_to_one ~loc ptr len) with pred_name }]
     | _ -> assert false
@@ -216,7 +236,7 @@ let retype_args (t, e) args =
     let ptr = Cil.stripCasts ptr in
     assert (any_char_composed_type (type_from_arg ptr)) ;
     let base_type = base_char_type (type_from_arg ptr) in
-    let v = Cil.mkCast v base_type in
+    let v = Cil.mkCast (Cil.stripCasts v) base_type in
     [ ptr ; v ; n ]
   | Some fv, [ ptr ; v ; n ] ->
     let ptr = Cil.stripCasts ptr in
