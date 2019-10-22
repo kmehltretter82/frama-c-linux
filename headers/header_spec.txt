@@ -937,6 +937,8 @@ src/plugins/builtin/builtin_builder.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/builtin/builtin_builder.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/builtin/configure.ac: CEA_LGPL_OR_PROPRIETARY
 src/plugins/builtin/Makefile.in: CEA_LGPL_OR_PROPRIETARY
+src/plugins/builtin/malloc.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/builtin/malloc.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/builtin/memcmp.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/builtin/memcmp.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/builtin/memcpy.ml: CEA_LGPL_OR_PROPRIETARY

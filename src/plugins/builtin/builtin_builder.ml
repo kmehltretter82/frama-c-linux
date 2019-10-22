@@ -92,6 +92,12 @@ module Make_builtin (G: Generator_sig) = struct
     let kf = Globals.Functions.get fd.svar in
     let spec = generate_spec key fd loc in
     Annotations.add_behaviors Options.emitter kf spec.spec_behavior ;
+    List.iter
+      (Annotations.add_complete Options.emitter kf)
+      spec.spec_complete_behaviors ;
+    List.iter
+      (Annotations.add_disjoint Options.emitter kf)
+      spec.spec_disjoint_behaviors ;
     fd
 
   let get_override key =

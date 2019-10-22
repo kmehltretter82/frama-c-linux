@@ -139,20 +139,24 @@ let compute_call_preconditions_statuses kf =
   | _ -> assert false
 
 let compute_postconditions_statuses kf =
-  let open Extlib in
   let posts bhv =
-    let active = [] in
-    let ensures = Property.ip_ensures_of_behavior kf Kglobal bhv in
-    let assigns = Property.ip_assigns_of_behavior ~active kf Kglobal bhv in
-    let froms = Property.ip_from_of_behavior ~active kf Kglobal bhv in
-    List.iter validate_property (ensures @ (list_of_opt assigns) @ froms)
+    List.iter validate_property
+      (Property.ip_post_cond_of_behavior kf ~active:[] Kglobal bhv)
   in
   Annotations.iter_behaviors (fun _ -> posts) kf
+
+let compute_comp_disj_statuses kf =
+  let open Property in
+  let comps c = validate_property (ip_of_complete kf Kglobal ~active:[] c) in
+  let disjs d = validate_property (ip_of_disjoint kf Kglobal ~active:[] d) in
+  Annotations.iter_complete (fun _ -> comps) kf ;
+  Annotations.iter_disjoint (fun _ -> disjs) kf
 
 let compute_statuses_all_kfs () =
   let kfs = get_kfs () in
   List.iter compute_call_preconditions_statuses kfs ;
-  List.iter compute_postconditions_statuses kfs
+  List.iter compute_postconditions_statuses kfs ;
+  List.iter compute_comp_disj_statuses kfs
 
 let transform file =
   Visitor.visitFramacFile (new transformer) file ;
