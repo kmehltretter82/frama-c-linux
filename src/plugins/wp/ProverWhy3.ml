@@ -34,6 +34,9 @@ let option_import = LogicBuiltins.create_option
     (fun ~driver_dir:_ x -> x)
     "why3" "import"
 
+let why3_failure msg =
+  Pretty_utils.ksfprintf failwith msg
+
 module Env = WpContext.Index(struct
     include Datatype.Unit
     type key = unit
@@ -81,7 +84,7 @@ let get_ls ~cnv ~f ~l ~p =
     try
       Why3.Theory.ns_find_ls th.th_export p
     with Not_found ->
-      Wp_parameters.fatal "The symbol %a can't be found in %a.%s"
+      why3_failure "The symbol %a can't be found in %a.%s"
         Why3.Pp.(print_list dot string) p
         Why3.Pp.(print_list dot string) f l
   in
@@ -93,7 +96,7 @@ let get_ts ~cnv ~f ~l ~p =
     try
       Why3.Theory.ns_find_ts th.th_export p
     with Not_found ->
-      Wp_parameters.fatal "The type %a can't be found in %a.%s"
+      why3_failure "The type %a can't be found in %a.%s"
         Why3.Pp.(print_list dot string) p
         Why3.Pp.(print_list dot string) f l
   in
@@ -239,12 +242,12 @@ let rec of_tau ~cnv (t:Lang.F.tau) =
       let s = name_of_adt adt in
       match Why3.Theory.(ns_find_ts (get_namespace cnv.th) (cut_path s)) with
       | ts -> Some (Why3.Ty.ty_app ts (List.map (fun e -> Why3.Opt.get (of_tau ~cnv e)) l))
-      | exception Not_found -> Wp_parameters.fatal "Can't find type [%s] in why3 namespace" s
+      | exception Not_found ->
+          why3_failure "Can't find type '%s' in why3 namespace" s
     end
   | Tvar i -> Some (Why3.Ty.ty_var (tvar i))
   | Record _ ->
-      Wp_parameters.not_yet_implemented "Type %a not yet convertible"
-        Lang.F.pp_tau t
+      why3_failure "Type %a not (yet) convertible" Lang.F.pp_tau t
 
 let rec full_trigger = function
   | Qed.Engine.TgAny -> false
@@ -265,7 +268,7 @@ let rec of_trigger ~cnv t =
   | Qed.Engine.TgAny -> assert false (** absurd: filter by full_triggers *)
   | Qed.Engine.TgVar v -> begin
       try Lang.F.Tmap.find (Lang.F.e_var v) cnv.subst
-      with Not_found -> Wp_parameters.fatal "Unbound variable %a" Lang.F.pp_var v
+      with Not_found -> why3_failure "Unbound variable %a" Lang.F.pp_var v
     end
   | Qed.Engine.TgGet(m,k) ->
       t_app ~cnv ~f:["map"] ~l:"Map" ~p:["get"] [of_trigger cnv m;of_trigger cnv k]
@@ -276,7 +279,7 @@ let rec of_trigger ~cnv t =
       | F_call s ->
           let ls = Why3.Theory.(ns_find_ls (get_namespace cnv.th) (cut_path s)) in
           Why3.Term.t_app_infer ls (List.map (fun e -> of_trigger cnv e) l)
-      | _ -> Wp_parameters.not_yet_implemented "lfun in triggers"
+      | _ -> why3_failure "can not convert extented calls in triggers"
     end
   | TgProp (f,l) ->
       begin
@@ -284,7 +287,7 @@ let rec of_trigger ~cnv t =
         | F_call s ->
             let ls = Why3.Theory.(ns_find_ls (get_namespace cnv.th) (cut_path s)) in
             Why3.Term.t_app_infer ls (List.map (fun e -> of_trigger cnv e) l)
-        | _ -> Wp_parameters.not_yet_implemented "lfun in triggers"
+        | _ -> why3_failure "can not convert extented calls in triggers"
       end
 
 let rec of_term ~cnv expected t : Why3.Term.term =
@@ -445,17 +448,18 @@ let rec of_term ~cnv expected t : Why3.Term.term =
           | ls, _ ->
               coerce ~cnv sort expected $
               t_app ls l (of_tau cnv sort)
-          | exception Not_found -> Wp_parameters.fatal "Can't find [%s] in why3 namespace" s
+          | exception Not_found -> why3_failure "Can't find '%s' in why3 namespace" s
         in
         let apply_from_ns' s l =
           apply_from_ns s (List.map (fun e -> of_term' cnv e) l)
         in
         match lfun_name f, expected with
         | F_call s, _ -> apply_from_ns' s l sort
-        | Qed.Engine.F_subst _, _ -> Wp_parameters.not_yet_implemented "lfun with subst"
+        | Qed.Engine.F_subst _, _ ->
+            why3_failure "Driver link with subst not yet implemented"
         | Qed.Engine.F_left s, _ | Qed.Engine.F_assoc s, _ ->
             let rec aux = function
-              | [] -> Wp_parameters.fatal "Empty application"
+              | [] -> why3_failure "Empty application"
               | [a] -> of_term cnv expected a
               | a::l ->
                   apply_from_ns s [of_term' cnv a; aux l] sort
@@ -463,7 +467,7 @@ let rec of_term ~cnv expected t : Why3.Term.term =
             aux l
         | Qed.Engine.F_right s, _ ->
             let rec aux = function
-              | [] -> Wp_parameters.fatal "Empty application"
+              | [] -> why3_failure "Empty application"
               | [a] -> of_term cnv expected a
               | a::l ->
                   apply_from_ns s [aux l;of_term' cnv a] sort
@@ -479,14 +483,14 @@ let rec of_term ~cnv expected t : Why3.Term.term =
         | Qed.Engine.F_bool_prop (s,_), Bool | Qed.Engine.F_bool_prop (_,s), Prop ->
             apply_from_ns' s l expected
         | Qed.Engine.F_bool_prop (_,_), _ ->
-            Wp_parameters.fatal "badly expected type %a for term %a"
+            why3_failure "badly expected type %a for term %a"
               Lang.F.pp_tau expected Lang.F.pp_term t
       end
     | Rget(a,f), _ , _ -> begin
         let s = Lang.name_of_field f in
         match Why3.Theory.(ns_find_ls (get_namespace cnv.th) (cut_path s)) with
         | ls -> Why3.Term.t_app ls [of_term' cnv a] (of_tau cnv expected)
-        | exception Not_found -> Wp_parameters.fatal "Can't find [%s] in why3 namespace" s
+        | exception Not_found -> why3_failure "Can't find '%s' in why3 namespace" s
       end
     | Rdef(l), Data(Comp c,_) , _ -> begin
         (* l is already sorted by field *)
@@ -495,7 +499,7 @@ let rec of_term ~cnv expected t : Why3.Term.term =
         | ls ->
             let l = List.map (fun (_,t) -> of_term' cnv t) l in
             Why3.Term.t_app ls l (of_tau cnv expected)
-        | exception Not_found -> Wp_parameters.fatal "Can't find [%s] in why3 namespace" s
+        | exception Not_found -> why3_failure "Can't find '%s' in why3 namespace" s
       end
     | (Rdef _, Data ((Mtype _|Mrecord (_, _)|Atype _), _), _)
     | (Rdef _, (Prop|Bool|Int|Real|Tvar _|Array (_, _)), _)
@@ -521,7 +525,7 @@ let rec of_term ~cnv expected t : Why3.Term.term =
     | (Bind (Lambda, _, _), _, _)
     | Apply _ , _, _
     | Rdef _, Record _, _ ->
-        Wp_parameters.not_yet_implemented
+        why3_failure
           "Can't convert to why3 the qed term %a of type %a"
           Lang.F.pp_term t Lang.F.pp_tau sort
   in
@@ -594,7 +598,7 @@ let convert cnv expected t =
 let mk_binders cnv l =
   List.fold_left (fun (cnv,lets) v ->
       match of_tau cnv (Lang.F.tau_of_var v) with
-      | None -> Wp_parameters.fatal "Quantification on prop"
+      | None -> why3_failure "Quantification on prop"
       | Some ty ->
           let x = Why3.Ident.id_fresh (Lang.F.Var.basename v) in
           let x = Why3.Term.create_vsymbol x ty in
@@ -676,7 +680,7 @@ class visitor (ctx:context) c =
 
     method add_import ?was thy =
       match Str.split_delim regexp_dot thy with
-      | [] -> Wp_parameters.fatal "empty import option"
+      | [] -> why3_failure "[driver] empty import option"
       | l ->
           let file, thy = Why3.Lists.chop_last l in
           self#add_import_use file thy (Why3.Opt.get_def thy was) ~import:true
@@ -723,8 +727,8 @@ class visitor (ctx:context) c =
         | [file;lib;name] ->
             copy_file file;
             self#add_import_file_as [filenoext file] lib name;
-        | _ -> Wp_parameters.failure ~current:false
-                 "Driver: why3.file %S not recognized (theory %s)"
+        | _ -> why3_failure
+                 "[driver] incorrect why3.file %S for library '%s'"
                  opt thy
       in
       let iter_import opt =
@@ -732,8 +736,8 @@ class visitor (ctx:context) c =
             match Str.split_delim regexp_col import with
             | [ th ] -> self#add_import th
             | [ th ; was ] -> self#add_import ~was th
-            | _ -> Wp_parameters.failure ~current:false
-                     "Driver: why3.import %S not recognized (theory %s)"
+            | _ -> why3_failure
+                     "[driver] incorrect why3.file %S for library '%s'"
                      opt thy
           ) (Str.split regexp_com opt)
       in
@@ -931,10 +935,7 @@ class visitor (ctx:context) c =
                 ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl
           end
         | Inductive _dl ->
-            Wp_parameters.not_yet_implemented "inductive"
-            (* engine#declare_signature fmt
-             *   d.d_lfun (List.map F.tau_of_var d.d_params) Logic.Prop;
-             * List.iter self#on_dlemma dl *)
+            why3_failure "inductive definitions not yet implemented"
       end
 
   end
@@ -1125,8 +1126,8 @@ let cleanup_cache ~mode =
                  end
           ) (Sys.readdir dir) ;
     with Unix.Unix_error _ as exn ->
-      Wp_parameters.failure "Can not cleanup cache (%s)"
-        (Printexc.to_string exn)
+      Wp_parameters.warning ~current:false
+        "Can not cleanup cache (%s)" (Printexc.to_string exn)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Cache Management                                                   --- *)
@@ -1241,8 +1242,8 @@ let get_cache_result ~mode hash =
           mark_cache ~mode hash ;
           Json.load_file file |> ProofScript.result_of_json
         with err ->
-          Wp_parameters.failure ~once:true "invalid cache entry (%s)"
-            (Printexc.to_string err) ;
+          Wp_parameters.warning ~current:false ~once:true
+            "invalid cache entry (%s)" (Printexc.to_string err) ;
           VCS.no_result
 
 let set_cache_result ~mode hash prover result =
@@ -1257,8 +1258,8 @@ let set_cache_result ~mode hash prover result =
         ProofScript.json_of_result (VCS.Why3 prover) result
         |> Json.save_file file
       with err ->
-        Wp_parameters.failure ~once:true "can not update cache (%s)"
-          (Printexc.to_string err)
+        Wp_parameters.warning ~current:false ~once:true
+          "can not update cache (%s)" (Printexc.to_string err)
 
 let is_trivial (t : Why3.Task.task) =
   let goal = Why3.Task.task_goal_fmla t in
