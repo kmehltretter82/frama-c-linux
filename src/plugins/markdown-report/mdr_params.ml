@@ -6,63 +6,63 @@ include Plugin.Register(
   end)
 
 module Output = String(
-struct
-  let option_name = "-mdr-out"
-  let arg_name = "f"
-  let default = "report.md"
-  let help = "sets the name of the output file to <f>"
-end)
+  struct
+    let option_name = "-mdr-out"
+    let arg_name = "f"
+    let default = "report.md"
+    let help = "sets the name of the output file to <f>"
+  end)
 
 module Generate = String(
-struct
-  let option_name = "-mdr-gen"
-  let arg_name = "kind"
-  let default = "none"
-  let help =
-    "select the <kind> of report to generate among: \
-     none (default), md, draft and sarif"
-end)
+  struct
+    let option_name = "-mdr-gen"
+    let arg_name = "kind"
+    let default = "none"
+    let help =
+      "select the <kind> of report to generate among: \
+       none (default), md, draft and sarif"
+  end)
 
 let () =
   Generate.set_possible_values [ "none"; "md"; "draft"; "sarif" ]
 
 module Remarks = Empty_string(
-struct
-  let option_name = "-mdr-remarks"
-  let arg_name = "f"
-  let help =
-    "reads file <f> to add additional remarks to various sections of the report. \
-     Must be in a format compatible with the file produced by -mdr-gen-draft. \
-     Remarks themselves must be written in pandoc's markdown, although this is \
-     not enforced by the plug-in"
-end
-)
+  struct
+    let option_name = "-mdr-remarks"
+    let arg_name = "f"
+    let help =
+      "reads file <f> to add additional remarks to various sections of the report. \
+       Must be in a format compatible with the file produced by -mdr-gen-draft. \
+       Remarks themselves must be written in pandoc's markdown, although this is \
+       not enforced by the plug-in"
+  end
+  )
 
 module FlameGraph = Empty_string(
-struct
-  let option_name = "-mdr-flamegraph"
-  let arg_name = "f"
-  let help =
-    "reads file <f> to include a FlameGraph (https://github.com/brendangregg/FlameGraph.git),\
-     allowing the most analysis-intensive callstacks to be identified\
-     quickly and accurately"
-end
-)
+  struct
+    let option_name = "-mdr-flamegraph"
+    let arg_name = "f"
+    let help =
+      "reads file <f> to include a FlameGraph (https://github.com/brendangregg/FlameGraph.git),\
+       allowing the most analysis-intensive callstacks to be identified\
+       quickly and accurately"
+  end
+  )
 
 module Authors = String_list(
-struct
-  let option_name = "-mdr-authors"
-  let arg_name = "l"
-  let help = "list of authors of the report"
-end)
+  struct
+    let option_name = "-mdr-authors"
+    let arg_name = "l"
+    let help = "list of authors of the report"
+  end)
 
 module Title = Empty_string(
-struct
-  let option_name = "-mdr-title"
-  let arg_name = "t"
-  let help = "title of the generated document"
-end
-)
+  struct
+    let option_name = "-mdr-title"
+    let arg_name = "t"
+    let help = "title of the generated document"
+  end
+  )
 
 module Stubs = String_list(
   struct

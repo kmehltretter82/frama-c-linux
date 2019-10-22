@@ -318,8 +318,8 @@ let register_sig (type a b) (s : (a,b) signature) (process : rq -> a -> b) =
   let synopsis = Table { caption; header; content } in
   let content =
     [ synopsis ; Block s.details] @
-      doc_input s.input @
-      doc_output s.output
+    doc_input s.input @
+    doc_output s.output
   in
   let _ = Doc.publish ~page:s.page ~name:s.name ~title content [] in
   Main.register s.kind s.name processor ;

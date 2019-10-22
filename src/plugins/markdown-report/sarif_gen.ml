@@ -69,8 +69,8 @@ let make_message alarm annot remark =
   let summary = Block [Text kind; descr] in
   let markdown =
     match remark with
-      | [] -> summary :: gen_remark alarm
-      | _ -> summary :: remark
+    | [] -> summary :: gen_remark alarm
+    | _ -> summary :: remark
   in
   let richText =
     String.trim (Format.asprintf "@[%a@]" Markdown.pp_elements markdown)
@@ -145,10 +145,10 @@ let gen_run remarks =
   let user_annot_results = gen_statuses () in
   let rules =
     match user_annot_results with
-      | [] -> rules
-      | _ ->
-          Datatype.String.Map.add
-            "user-spec" "User written ACSL specification" rules
+    | [] -> rules
+    | _ ->
+      Datatype.String.Map.add
+        "user-spec" "User written ACSL specification" rules
   in
   let rules = make_rule_dictionary rules in
   let resources = Resources.create ~rules () in

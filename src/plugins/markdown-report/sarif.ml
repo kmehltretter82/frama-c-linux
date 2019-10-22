@@ -63,26 +63,26 @@ module Message = struct
     arguments: (string list [@default []]);
   }[@@deriving yojson]
 
-let create
-  ?(text="")
-  ?(messageId="")
-  ?(richText="")
-  ?(richMessageId="")
-  ?(arguments=[])
-  ()
-  =
-  { text; messageId; richText; richMessageId; arguments }
+  let create
+      ?(text="")
+      ?(messageId="")
+      ?(richText="")
+      ?(richMessageId="")
+      ?(arguments=[])
+      ()
+    =
+    { text; messageId; richText; richMessageId; arguments }
 
-let plain_text ~text ?id:messageId ?arguments () =
-  create ~text ?messageId ?arguments ()
+  let plain_text ~text ?id:messageId ?arguments () =
+    create ~text ?messageId ?arguments ()
 
-let markdown ~markdown ?id:richMessageId ?arguments () =
-  let richText =
-    String.trim (Format.asprintf "@[%a@]" Markdown.pp_elements markdown)
-  in
-  create ~richText ?richMessageId ?arguments ()
+  let markdown ~markdown ?id:richMessageId ?arguments () =
+    let richText =
+      String.trim (Format.asprintf "@[%a@]" Markdown.pp_elements markdown)
+    in
+    create ~richText ?richMessageId ?arguments ()
 
-let default = create ()
+  let default = create ()
 end
 
 module FileLocation = struct
@@ -103,55 +103,55 @@ module FileLocation = struct
 end
 
 module FileContent = struct
-type t =
-  | Text of string [@name "text"]
-  | Binary of string [@name "binary"]
-[@@deriving yojson]
+  type t =
+    | Text of string [@name "text"]
+          | Binary of string [@name "binary"]
+  [@@deriving yojson]
 
-let default = Text ""
+  let default = Text ""
 end
 
 module Region = struct
-type t = {
-  startLine: (int [@default 0]);
-  startColumn: (int [@default 0]);
-  endLine: (int [@default 0]);
-  endColumn: (int [@default 0]);
-  charOffset: (int [@default 0]);
-  charLength: (int [@default 0]);
-  byteOffset: (int [@default 0]);
-  byteLength: (int [@default 0]);
-  snippet: (FileContent.t [@default FileContent.default]);
-  message: (Message.t [@default Message.default])
-}[@@deriving yojson]
+  type t = {
+    startLine: (int [@default 0]);
+    startColumn: (int [@default 0]);
+    endLine: (int [@default 0]);
+    endColumn: (int [@default 0]);
+    charOffset: (int [@default 0]);
+    charLength: (int [@default 0]);
+    byteOffset: (int [@default 0]);
+    byteLength: (int [@default 0]);
+    snippet: (FileContent.t [@default FileContent.default]);
+    message: (Message.t [@default Message.default])
+  }[@@deriving yojson]
 
-let create
-  ?(startLine = 0)
-  ?(startColumn = 0)
-  ?(endLine = 0)
-  ?(endColumn = 0)
-  ?(charOffset = 0)
-  ?(charLength = 0)
-  ?(byteOffset = 0)
-  ?(byteLength = 0)
-  ?(snippet = FileContent.default)
-  ?(message = Message.default)
-  ()
-  =
-  { startLine; startColumn; endLine; endColumn; charOffset; charLength;
-    byteOffset; byteLength; snippet; message }
+  let create
+      ?(startLine = 0)
+      ?(startColumn = 0)
+      ?(endLine = 0)
+      ?(endColumn = 0)
+      ?(charOffset = 0)
+      ?(charLength = 0)
+      ?(byteOffset = 0)
+      ?(byteLength = 0)
+      ?(snippet = FileContent.default)
+      ?(message = Message.default)
+      ()
+    =
+    { startLine; startColumn; endLine; endColumn; charOffset; charLength;
+      byteOffset; byteLength; snippet; message }
 
-let default = create ()
+  let default = create ()
 
-let of_loc loc =
-  let open Filepath in
-  let (start, finish) = loc in
-  let startLine = start.pos_lnum in
-  let startColumn = start.pos_cnum - start.pos_bol in
-  let endLine = finish.pos_lnum in
-  let endColumn = finish.pos_cnum - finish.pos_bol in
-  let byteLength = finish.pos_cnum - start.pos_cnum in
-  create ~startLine ~startColumn ~endLine ~endColumn ~byteLength ()
+  let of_loc loc =
+    let open Filepath in
+    let (start, finish) = loc in
+    let startLine = start.pos_lnum in
+    let startColumn = start.pos_cnum - start.pos_bol in
+    let endLine = finish.pos_lnum in
+    let endColumn = finish.pos_cnum - finish.pos_bol in
+    let byteLength = finish.pos_cnum - start.pos_cnum in
+    create ~startLine ~startColumn ~endLine ~endColumn ~byteLength ()
 end
 
 module Rectangle = struct
@@ -161,8 +161,8 @@ module Rectangle = struct
     bottom: (float [@default 0.]);
     right: (float [@default 0.]);
     message: (Message.t [@default Message.default]);
-}
-[@@deriving yojson]
+  }
+  [@@deriving yojson]
 end
 
 module Custom_properties =
@@ -214,11 +214,11 @@ module PhysicalLocation = struct
   }[@@deriving yojson]
 
   let create
-    ?(id = "")
-    ~fileLocation
-    ?(region = Region.default)
-    ?(contextRegion = Region.default)
-    ()
+      ?(id = "")
+      ~fileLocation
+      ?(region = Region.default)
+      ?(contextRegion = Region.default)
+      ()
     =
     { id; fileLocation; region; contextRegion }
 
@@ -241,12 +241,12 @@ module Location = struct
   }[@@deriving yojson]
 
   let create
-    ~physicalLocation
-    ?(fullyQualifiedLogicalName = "")
-    ?(message = Message.default)
-    ?(annotations = [])
-    ?(properties = Properties.default)
-    ()
+      ~physicalLocation
+      ?(fullyQualifiedLogicalName = "")
+      ?(message = Message.default)
+      ?(annotations = [])
+      ?(properties = Properties.default)
+      ()
     =
     { physicalLocation; fullyQualifiedLogicalName;
       message; annotations; properties;
@@ -349,20 +349,20 @@ module CodeFlow = struct
 end
 
 module Sarif_exception = struct
-type t = {
-  kind: (string [@default ""]);
-  message: (string [@default ""]);
-  stack: (Stack.t [@default Stack.default]);
-  innerExceptions: (t list [@default []]);
-}[@@deriving yojson]
+  type t = {
+    kind: (string [@default ""]);
+    message: (string [@default ""]);
+    stack: (Stack.t [@default Stack.default]);
+    innerExceptions: (t list [@default []]);
+  }[@@deriving yojson]
 
-let default =
-  {
-    kind = "";
-    message = "";
-    stack = Stack.default;
-    innerExceptions = []
-  }
+  let default =
+    {
+      kind = "";
+      message = "";
+      stack = Stack.default;
+      innerExceptions = []
+    }
 end
 
 module Notification_kind: sig
@@ -428,7 +428,7 @@ end
 
 module Invocation = struct
 
-type t =  {
+  type t =  {
     commandLine: string;
     arguments: string list;
     responseFiles: (FileLocation.t list [@default []]);
@@ -458,32 +458,32 @@ type t =  {
   }[@@deriving yojson]
 
   let create
-    ~commandLine
-    ?(arguments = [])
-    ?(responseFiles = [])
-    ?(attachments = [])
-    ?(startTime = "")
-    ?(endTime = "")
-    ?(exitCode = 0)
-    ?(toolNotifications = [])
-    ?(configurationNotifications = [])
-    ?(exitCodeDescription = "")
-    ?(exitSignalName = "")
-    ?(exitSignalNumber = 0)
-    ?(processStartFailureMessage = "")
-    ?(toolExecutionSuccessful = true)
-    ?(machine = "")
-    ?(account = "")
-    ?(processId = 0)
-    ?(executableLocation = FileLocation.default)
-    ?(workingDirectory = FileLocation.default)
-    ?(environmentVariables = Additional_properties.default)
-    ?(stdin = FileLocation.default)
-    ?(stdout = FileLocation.default)
-    ?(stderr = FileLocation.default)
-    ?(stdoutStderr = FileLocation.default)
-    ?(properties = Properties.default)
-    ()
+      ~commandLine
+      ?(arguments = [])
+      ?(responseFiles = [])
+      ?(attachments = [])
+      ?(startTime = "")
+      ?(endTime = "")
+      ?(exitCode = 0)
+      ?(toolNotifications = [])
+      ?(configurationNotifications = [])
+      ?(exitCodeDescription = "")
+      ?(exitSignalName = "")
+      ?(exitSignalNumber = 0)
+      ?(processStartFailureMessage = "")
+      ?(toolExecutionSuccessful = true)
+      ?(machine = "")
+      ?(account = "")
+      ?(processId = 0)
+      ?(executableLocation = FileLocation.default)
+      ?(workingDirectory = FileLocation.default)
+      ?(environmentVariables = Additional_properties.default)
+      ?(stdin = FileLocation.default)
+      ?(stdout = FileLocation.default)
+      ?(stderr = FileLocation.default)
+      ?(stdoutStderr = FileLocation.default)
+      ?(properties = Properties.default)
+      ()
     =
     {
       commandLine;
@@ -648,18 +648,18 @@ module File = struct
   }[@@deriving yojson]
 
   let create
-    ?(fileLocation = FileLocation.default)
-    ?(parentKey = "")
-    ?(offset = 0)
-    ?(length = 0)
-    ?(roles = [])
-    ?(mimeType = "")
-    ?(contents = FileContent.default)
-    ?(encoding = "")
-    ?(hashes = [])
-    ?(lastModifiedTime = "")
-    ?(properties = Properties.default)
-    ()
+      ?(fileLocation = FileLocation.default)
+      ?(parentKey = "")
+      ?(offset = 0)
+      ?(length = 0)
+      ?(roles = [])
+      ?(mimeType = "")
+      ?(contents = FileContent.default)
+      ?(encoding = "")
+      ?(hashes = [])
+      ?(lastModifiedTime = "")
+      ?(properties = Properties.default)
+      ()
     =
     {
       fileLocation; parentKey; offset; length; roles; mimeType; contents;
@@ -762,16 +762,16 @@ module Rule = struct
   }
 
   let create
-        ~id
-        ?(name="")
-        ?(shortDescription=Message.default)
-        ?(fullDescription=Message.default)
-        ?(messageStrings=Additional_properties.default)
-        ?(richMessageStrings=Additional_properties.default)
-        ?(configuration=RuleConfiguration.default)
-        ?(helpUri="")
-        ?(properties=Properties.default)
-        ()
+      ~id
+      ?(name="")
+      ?(shortDescription=Message.default)
+      ?(fullDescription=Message.default)
+      ?(messageStrings=Additional_properties.default)
+      ?(richMessageStrings=Additional_properties.default)
+      ?(configuration=RuleConfiguration.default)
+      ?(helpUri="")
+      ?(properties=Properties.default)
+      ()
     =
     { id; name; shortDescription; fullDescription; messageStrings;
       richMessageStrings; configuration; helpUri; properties }
@@ -792,9 +792,9 @@ module Resources = struct
     rules = [] }
 
   let create
-        ?(messageStrings=Additional_properties.default)
-        ?(rules=[])
-        ()
+      ?(messageStrings=Additional_properties.default)
+      ?(rules=[])
+      ()
     =
     { messageStrings; rules }
 end
@@ -879,38 +879,38 @@ module Sarif_result = struct
     properties: (Properties.t [@default Properties.default])
   }[@@deriving yojson]
 
-let create
-  ?(ruleId = "")
-  ?(level=Result_level.notApplicable)
-  ?(message=Message.default)
-  ?(analysisTarget=FileLocation.default)
-  ?(locations=[])
-  ?(instanceGuid="")
-  ?(correlationGuid="")
-  ?(occurrenceCount=1)
-  ?(partialFingerprints=Additional_properties.default)
-  ?(fingerprints=Additional_properties.default)
-  ?(stacks=[])
-  ?(codeFlows=[])
-  ?(graphs=[])
-  ?(graphTraversals=[])
-  ?(relatedLocations=[])
-  ?(suppressionStates=[])
-  ?(baselineState=Result_baselineState.bs_absent)
-  ?(attachments=[])
-  ?(workItemsUris=[])
-  ?(conversionProvenance=[])
-  ?(fixes=[])
-  ?(properties=Properties.default)
-  ()
-  =
-  {
-    ruleId;level; message; analysisTarget; locations; instanceGuid;
-    correlationGuid; occurrenceCount; partialFingerprints; fingerprints;
-    stacks; codeFlows; graphs; graphTraversals; relatedLocations;
-    suppressionStates; baselineState; attachments; workItemsUris;
-    conversionProvenance; fixes; properties
-  }
+  let create
+      ?(ruleId = "")
+      ?(level=Result_level.notApplicable)
+      ?(message=Message.default)
+      ?(analysisTarget=FileLocation.default)
+      ?(locations=[])
+      ?(instanceGuid="")
+      ?(correlationGuid="")
+      ?(occurrenceCount=1)
+      ?(partialFingerprints=Additional_properties.default)
+      ?(fingerprints=Additional_properties.default)
+      ?(stacks=[])
+      ?(codeFlows=[])
+      ?(graphs=[])
+      ?(graphTraversals=[])
+      ?(relatedLocations=[])
+      ?(suppressionStates=[])
+      ?(baselineState=Result_baselineState.bs_absent)
+      ?(attachments=[])
+      ?(workItemsUris=[])
+      ?(conversionProvenance=[])
+      ?(fixes=[])
+      ?(properties=Properties.default)
+      ()
+    =
+    {
+      ruleId;level; message; analysisTarget; locations; instanceGuid;
+      correlationGuid; occurrenceCount; partialFingerprints; fingerprints;
+      stacks; codeFlows; graphs; graphTraversals; relatedLocations;
+      suppressionStates; baselineState; attachments; workItemsUris;
+      conversionProvenance; fixes; properties
+    }
 end
 
 module VersionControlDetails = struct
@@ -965,41 +965,41 @@ module Run = struct
     defaultFileEncoding: (string [@default "utf-8"]);
     columnKind: (ColumnKind.t [@default ColumnKind.unicodeCodePoints]);
     properties: (Properties.t [@default Properties.default]);
-}
-[@@deriving yojson]
-
-let create
-    ~tool
-    ~invocations
-    ?(conversion=Conversion.default)
-    ?(versionControlProvenance=[])
-    ?(originalUriBaseIds=Additional_properties.default)
-    ?(files=[])
-    ?(logicalLocations=[])
-    ?(graphs=[])
-    ?(results=[])
-    ?(resources=Resources.default)
-    ?(instanceGuid="")
-    ?(correlationGuid="")
-    ?(logicalId="")
-    ?(description=Message.default)
-    ?(automationLogicalId="")
-    ?(baselineInstanceGuid="")
-    ?(architecture="")
-    ?(richMessageMimeType="text/markdown;variant=GFM")
-    ?(redactionToken="")
-    ?(defaultFileEncoding="utf-8")
-    ?(columnKind=ColumnKind.unicodeCodePoints)
-    ?(properties=Properties.default)
-    ()
-  =
-  {
-    tool; invocations; conversion; versionControlProvenance; originalUriBaseIds;
-    files; logicalLocations; graphs; results; resources; instanceGuid;
-    correlationGuid; logicalId; description; automationLogicalId;
-    baselineInstanceGuid; architecture; richMessageMimeType;
-    redactionToken; defaultFileEncoding; columnKind; properties
   }
+  [@@deriving yojson]
+
+  let create
+      ~tool
+      ~invocations
+      ?(conversion=Conversion.default)
+      ?(versionControlProvenance=[])
+      ?(originalUriBaseIds=Additional_properties.default)
+      ?(files=[])
+      ?(logicalLocations=[])
+      ?(graphs=[])
+      ?(results=[])
+      ?(resources=Resources.default)
+      ?(instanceGuid="")
+      ?(correlationGuid="")
+      ?(logicalId="")
+      ?(description=Message.default)
+      ?(automationLogicalId="")
+      ?(baselineInstanceGuid="")
+      ?(architecture="")
+      ?(richMessageMimeType="text/markdown;variant=GFM")
+      ?(redactionToken="")
+      ?(defaultFileEncoding="utf-8")
+      ?(columnKind=ColumnKind.unicodeCodePoints)
+      ?(properties=Properties.default)
+      ()
+    =
+    {
+      tool; invocations; conversion; versionControlProvenance; originalUriBaseIds;
+      files; logicalLocations; graphs; results; resources; instanceGuid;
+      correlationGuid; logicalId; description; automationLogicalId;
+      baselineInstanceGuid; architecture; richMessageMimeType;
+      redactionToken; defaultFileEncoding; columnKind; properties
+    }
 end
 
 module Schema = struct

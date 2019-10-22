@@ -37,7 +37,7 @@ let all_eva_domains =
     "-eva-symbolic-locations-domain",
     "domain computing ranges of variation for symbolic locations \
      (e.g. `a[i]` when `i` is not precisely known by `Cvalue`)"
-]
+  ]
 
 let insert_marks env anchor =
   Comment "BEGIN_REMARK"
@@ -66,19 +66,19 @@ let section_domains env =
     let l = get_eva_domains () in
     head
     :: Block
-        (match l with
-         | [] ->
-           [Text
-              (plain
-                 "Only the base domain (`Cvalue`) \
-                  has been used for the analysis")]
-         | _ ->
-           [Text
-              (plain
-                 "In addition to the base domain (`Cvalue`), additional \
-                  domains have been used by EVA");
-            DL l]
-        )
+      (match l with
+       | [] ->
+         [Text
+            (plain
+               "Only the base domain (`Cvalue`) \
+                has been used for the analysis")]
+       | _ ->
+         [Text
+            (plain
+               "In addition to the base domain (`Cvalue`), additional \
+                domains have been used by EVA");
+          DL l]
+      )
     :: insert_remark env anchor
   end
 
@@ -130,14 +130,14 @@ let section_stubs env =
       if env.is_draft then insert_marks env anchor
       else
         (Block
-            [ Text
-                (Inline_code name ::
-                 plain_format
-                   "@[<h>is defined at %a@]" Cil_datatype.Location.pretty loc);
-              codelines "c"
-                Printer.pp_global
-                (GFun (Kernel_function.get_definition kf,loc))
-            ])
+           [ Text
+               (Inline_code name ::
+                plain_format
+                  "@[<h>is defined at %a@]" Cil_datatype.Location.pretty loc);
+             codelines "c"
+               Printer.pp_global
+               (GFun (Kernel_function.get_definition kf,loc))
+           ])
         :: insert_remark env anchor
     in
     H4 ([Inline_code name], Some anchor) :: content
@@ -213,8 +213,8 @@ let gen_inputs env =
         "You can add here some remarks about the set of files \
          that is considered by Frama-C"
       :: insert_marks env anchor
-   else
-     insert_remark env anchor
+    else
+      insert_remark env anchor
   in
   H2 (plain "Input files", Some anchor)
   :: prelude
@@ -268,11 +268,11 @@ let gen_context env =
   @ section_domains env
   @ H3 (plain "Stubbed Functions", Some "stubs")
     :: (
-    if env.is_draft then
-      Comment
-        "You can add here general comments about the stubs that have been used"
-      :: insert_marks env "stubs"
-    else insert_remark env "stubs")
+      if env.is_draft then
+        Comment
+          "You can add here general comments about the stubs that have been used"
+        :: insert_marks env "stubs"
+      else insert_remark env "stubs")
   @ section_stubs env
 
 let gen_coverage env =
@@ -471,7 +471,7 @@ let gen_section_alarms env =
     in
     (i+1,
      sec @ H2 (sec_title, Some label) :: sec_content,
-    [ link; kind; emitter; func; loc_text ] :: content)
+     [ link; kind; emitter; func; loc_text ] :: content)
   in
   let _,sections, content = Alarms.fold treat_alarm (0,[],[]) in
   let content = List.rev content in
@@ -490,7 +490,7 @@ let gen_section_alarms env =
               Plain "in a context matching the one used for the analysis";
               Plain "will be immune from any undefined behavior."
             ]
-          ]
+        ]
         :: insert_remark env anchor
     in
     H1 (plain "Results of the analysis", Some anchor) :: text_content
@@ -618,9 +618,9 @@ let gen_report ~draft:is_draft () =
     else elements
   in
   let elements =
-   Raw [ "\\let\\underscore\\_" ;
-         "\\renewcommand{\\_}{\\discretionary{\\underscore}{}{\\underscore}}"]
-   :: elements
+    Raw [ "\\let\\underscore\\_" ;
+          "\\renewcommand{\\_}{\\discretionary{\\underscore}{}{\\underscore}}"]
+    :: elements
   in
   let doc = Markdown.pandoc ~title ~authors elements in
   try

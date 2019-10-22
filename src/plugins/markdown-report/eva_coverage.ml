@@ -128,8 +128,8 @@ class eva_coverage_vis ~from_entry_point = object(self)
     if not from_entry_point then begin
       Globals.Functions.iter_on_fundecs
         (fun { svar } ->
-             Cil_datatype.Varinfo.Hashtbl.add
-               calls svar (is_analyzed_info svar no_call))
+           Cil_datatype.Varinfo.Hashtbl.add
+             calls svar (is_analyzed_info svar no_call))
     end;
     let vi =
       Globals.Functions.get_vi
@@ -171,10 +171,10 @@ let md_gen () =
     Markdown.plain_format
       "There are %d function definitions that are not stubbed. They represent \
        %d statements, of which %d are potentially reachable through EVA, \
-      resulting in a **statement coverage of %.1f%%** with respect to the \
-      entire application."
+       resulting in a **statement coverage of %.1f%%** with respect to the \
+       entire application."
       (nb_fundefs())
-       stats.total_stmts stats.covered_stmts
+      stats.total_stmts stats.covered_stmts
       (float_of_int stats.covered_stmts *. 100. /.
        float_of_int stats.total_stmts)
   in
