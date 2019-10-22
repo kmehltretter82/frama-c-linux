@@ -225,7 +225,7 @@ module Jtext =
 struct
   include Jany
   let syntax = Syntax.publish ~page:text_page ~name:"text"
-      ~synopsis:Syntax.any ~descr:(Markdown.rm "Formatted text.") ()
+      ~synopsis:Syntax.any ~descr:(Markdown.plain "Formatted text.") ()
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -277,13 +277,13 @@ struct
       | Some v -> Fmap.add name (D.to_json v) r in
     { member ; getter ; setter }
 
-  let fields () = Syntax.fields ~title:"Field" !fdocs
+  let fields = Syntax.fields ~title:"Field" !fdocs
 
   let syntax =
     Syntax.publish ~page:R.page ~name:R.name
       ~descr:R.descr
       ~synopsis:(Syntax.record [])
-      ~details:(Markdown.mk_block fields) ()
+      ~details:[fields] ()
 
   let of_json js =
     List.fold_left
@@ -507,13 +507,17 @@ struct
           ) E.values
       end
 
-  let values () =
-    Markdown.table
-      [ `Left E.name ; `Left "Description" ]
-      (List.map
-         (fun (_,tag,descr) ->
-            [ Markdown.tt (Printf.sprintf "%S" tag) ; descr ]
-         ) E.values)
+  let values =
+    let open Markdown in
+    let caption = Some (plain "Values description") in
+    let header = [ plain E.name, Left; plain "Description", Left ] in
+    let content =
+      List.map
+        (fun (_,tag,descr) ->
+           [ [Markdown.Inline_code (Printf.sprintf "%S" tag)] ; descr ])
+        E.values
+    in
+    Table { caption; header; content }
 
   include Collection
       (struct
@@ -522,7 +526,7 @@ struct
         let syntax = Syntax.publish
             ~page:E.page ~name:E.name
             ~synopsis:Syntax.ident
-            ~descr:E.descr ~details:(Markdown.mk_block values) ()
+            ~descr:E.descr ~details:[values] ()
 
         let to_json value =
           register () ;

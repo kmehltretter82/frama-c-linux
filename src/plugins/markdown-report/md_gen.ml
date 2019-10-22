@@ -430,7 +430,8 @@ let gen_section_warnings env =
             Text [
               Plain "Note that this does not take into account emitted alarms:";
               Plain "they are reported in";
-              Link (plain "the next section", "#alarms")
+              Link (plain "the next section",
+                    Markdown.link_current_page "alarms")
             ]
           ];
           make_warnings_table warnings
@@ -446,7 +447,7 @@ let gen_section_alarms env =
   let treat_alarm e kf s ~rank:_ alarm annot (i, sec, content) =
     let kind = plain (Alarms.get_name alarm) in
     let label = "Alarm-" ^ string_of_int i in
-    let link = [Link (plain_format "%d" i, "#"^label)] in
+    let link = [Link (plain_format "%d" i, link_current_page label)] in
     let func = plain (Kernel_function.get_name kf) in
     let loc = string_of_loc (Cil_datatype.Stmt.loc s) in
     let loc_text = plain loc in
@@ -543,7 +544,7 @@ let gen_section_callgraph env =
         Block [
           Text [
             Plain "The image below shows the flamegraph (";
-            plain_link "http://www.brendangregg.com/flamegraphs.html";
+            plain_link (URL "http://www.brendangregg.com/flamegraphs.html");
             Plain ") for the chosen entry point."
           ]]
         :: Block [ Text [Image ("Flamegraph visualization.", f)] ]
@@ -570,12 +571,6 @@ let gen_alarms env =
   gen_section_alarms env @
   gen_section_callgraph env @
   gen_section_postlude env
-
-let mk_date () =
-  let tm = Unix.gmtime (Unix.time()) in
-  plain
-    (Printf.sprintf "%d-%02d-%02d"
-       (1900 + tm.Unix.tm_year) (1 + tm.Unix.tm_mon) tm.Unix.tm_mday)
 
 let mk_remarks is_draft =
   let f = Mdr_params.Remarks.get () in
@@ -605,7 +600,6 @@ let gen_report ~draft:is_draft () =
     end else plain title
   in
   let authors = List.map (fun x -> plain x) (Mdr_params.Authors.get ()) in
-  let date = mk_date () in
   let elements = context @ coverage @ alarms in
   let elements =
     if is_draft then
@@ -628,7 +622,7 @@ let gen_report ~draft:is_draft () =
          "\\renewcommand{\\_}{\\discretionary{\\underscore}{}{\\underscore}}"]
    :: elements
   in
-  let doc = { title; authors; date; elements;} in
+  let doc = Markdown.pandoc ~title ~authors elements in
   try
     let out = open_out (Mdr_params.Output.get()) in
     let fmt = Format.formatter_of_out_channel out in

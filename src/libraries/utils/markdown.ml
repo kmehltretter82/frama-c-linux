@@ -30,8 +30,8 @@ and block = block_element list
 and element =
   | Block of block
   | Raw of string list
-   (** non-markdown. Each element of the list is printed as-is on its own line.
-       A blank line separates the [Raw] node from the next one. *)
+  (** non-markdown. Each element of the list is printed as-is on its own line.
+      A blank line separates the [Raw] node from the next one. *)
   | Comment of string (** markdown comment, printed <!-- like this --> *)
   | H1 of text * string option (** optional label. *)
   | H2 of text * string option
@@ -40,18 +40,22 @@ and element =
   | H5 of text * string option
   | H6 of text * string option
   | Table of { caption: text option; header: (text * align) list;
-                content: text list list; }
+               content: text list list; }
+
+type elements = element list
 
 type pandoc_markdown =
   { title: text;
     authors: text list;
     date: text;
-    elements: element list
+    elements: elements
   }
 
 let plain s = [ Plain s]
 
 let plain_format txt = Format.kasprintf plain txt
+
+let link_current_page sec = Section("", sec)
 
 let plain_link h =
   let s = match h with
@@ -66,6 +70,26 @@ let codelines lang pp code =
   let s = Format.asprintf "@[%a@]" pp code in
   let lines = String.split_on_char '\n' s in
   Code_block (lang, lines)
+
+let raw_markdown filename =
+  let chan = open_in filename in
+  let res = ref [] in
+  try
+    while true do
+      res := input_line chan :: !res;
+    done;
+    assert false
+  with End_of_file ->
+    close_in chan;
+    Raw (List.rev !res)
+
+let glue ?(sep=[]) texts =
+  let rec aux = function
+    | [] -> []
+    | [t] -> t
+    | hd::tl -> hd @ sep @ aux tl
+  in
+  aux texts
 
 let id m =
   let buffer = Buffer.create (String.length m) in
@@ -83,6 +107,36 @@ let id m =
       | ' ' | '\t' | '\n' | '-' -> dash := (Buffer.length buffer > 0)
       | _ -> ()) m ;
   Buffer.contents buffer
+
+let section ?name ~title elements =
+  let anchor =
+    match name with
+    | None -> id title
+    | Some n -> n
+  in
+  (H1 (plain title, Some anchor)) :: elements
+
+let subsections header body =
+  let body =
+    List.map
+      (function
+        | H1(t,h) -> H2(t,h)
+        | H2(t,h) -> H3(t,h)
+        | H3(t,h) -> H4(t,h)
+        | H4(t,h) -> H5(t,h)
+        | e -> e)
+      (List.concat body)
+  in
+  header @ body
+
+let mk_date () =
+  let tm = Unix.gmtime (Unix.time()) in
+  plain
+    (Printf.sprintf "%d-%02d-%02d"
+       (1900 + tm.Unix.tm_year) (1 + tm.Unix.tm_mon) tm.Unix.tm_mday)
+
+let pandoc ?(title=plain "") ?(authors=[]) ?(date=mk_date()) elements =
+  { title; authors; date; elements }
 
 let pp_href fmt = function
   | URL s | Page s -> Format.pp_print_string fmt s
@@ -116,9 +170,9 @@ let pp_dashes fmt size =
   Format.fprintf fmt "%s+" dashes
 
 let pp_sep_line fmt sizes =
-Format.fprintf fmt "@[<h>+";
-List.iter (pp_dashes fmt) sizes;
-Format.fprintf fmt "@]@\n"
+  Format.fprintf fmt "@[<h>+";
+  List.iter (pp_dashes fmt) sizes;
+  Format.fprintf fmt "@]@\n"
 
 let pp_header fmt (t,_) size =
   let real_size = test_size t in

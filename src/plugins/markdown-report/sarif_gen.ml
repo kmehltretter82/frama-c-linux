@@ -100,7 +100,7 @@ let gen_results remarks =
   rules, List.rev content
 
 let is_alarm = function
-  | Property.IPCodeAnnot (_,_,ca) -> Extlib.has_some (Alarms.find ca)
+  | Property.(IPCodeAnnot { ica_ca }) -> Extlib.has_some (Alarms.find ica_ca)
   | _ -> false
 
 let make_ip_message ip =

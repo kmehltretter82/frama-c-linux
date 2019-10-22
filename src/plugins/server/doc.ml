@@ -24,6 +24,7 @@
 (* --- Server Documentation                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
+open Markdown
 type json = Yojson.Basic.t
 module Senv = Server_parameters
 module Pages = Map.Make(String)
@@ -36,8 +37,8 @@ type page = {
   chapter : chapter ;
   title : string ;
   order : int ;
-  intro : Markdown.section ;
-  mutable sections : Markdown.section list ;
+  intro : Markdown.elements ;
+  mutable sections : Markdown.elements list ;
 }
 
 let order = ref 0
@@ -45,7 +46,7 @@ let pages : page Pages.t ref = ref Pages.empty
 let plugins : string list ref = ref []
 let entries : (string * Markdown.href) list ref = ref []
 let path page = page.path
-let href page name : Markdown.href = `Section( page.path , name )
+let href page name : Markdown.href = Section( page.path , name )
 
 (* -------------------------------------------------------------------------- *)
 (* --- Page Collection                                                    --- *)
@@ -73,8 +74,8 @@ let page chapter ~title ~filename =
         Printf.sprintf "%s/%s/server/%s" Config.datadir name filename in
     let intro =
       if Sys.file_exists intro
-      then Markdown.read_section intro
-      else Markdown.(section ~title empty []) in
+      then [Markdown.raw_markdown intro]
+      else Markdown.(section ~title []) in
     let order = incr order ; !order in
     let page = { order ; rootdir ; path ;
                  chapter ; title ; intro ;
@@ -83,8 +84,8 @@ let page chapter ~title ~filename =
 
 let publish ~page ?name ?(index=[]) ~title content sections =
   let id = match name with Some id -> id | None -> title in
-  let href = `Section( page.path , id ) in
-  let section = Markdown.section ?name ~title content sections in
+  let href = Section( page.path , id ) in
+  let section = Markdown.section ?name ~title (content @ sections) in
   List.iter (fun entry -> entries := (entry , href) :: !entries) index ;
   page.sections <- section :: page.sections ; href
 
@@ -105,27 +106,25 @@ let pages_of_chapter c =
     (fun _ p -> if p.chapter = c then w := p :: !w) !pages ;
   List.sort (fun p q -> p.order - q.order) !w
 
-let table_of_chapter c fmt =
-  begin
-    Format.fprintf fmt "## %s@\n@." (title_of_chapter c) ;
-    List.iter
-      (fun p -> Format.fprintf fmt "   - [%s](%s)@." p.title p.path)
-      (pages_of_chapter c) ;
-    Format.pp_print_newline fmt () ;
-  end
+let table_of_chapter c =
+  [H2 (Markdown.plain (title_of_chapter c), None);
+   Block
+     [UL
+        (List.map
+           (fun p -> [Text [Link(Markdown.plain p.title, Page p.path)]])
+           (pages_of_chapter c))]]
 
-let table_of_contents fmt =
-  begin
-    table_of_chapter `Protocol fmt ;
-    table_of_chapter `Kernel fmt ;
-    List.iter
-      (fun p -> table_of_chapter (`Plugin p) fmt)
-      (List.sort String.compare !plugins)
-  end
+let table_of_contents () =
+  table_of_chapter `Protocol @
+  table_of_chapter `Kernel @
+  List.concat
+    (List.map
+       (fun p -> table_of_chapter (`Plugin p))
+       (List.sort String.compare !plugins))
 
 let index () =
   List.map
-    (fun (title,entry) -> Markdown.href ~title entry)
+    (fun (title,entry) -> Markdown.Link(plain title, entry))
     (List.sort (fun (a,_) (b,_) -> String.compare a b) !entries)
 
 let link ~toc ~title ~href : json =
@@ -162,13 +161,26 @@ let metadata page : json =
 (* --- Dump Documentation                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
+let pp_one_page ~root ~page ~title body =
+  let full_path = Filepath.normalize (root ^ "/" ^ page) in
+  let dir = Filename.dirname full_path in
+  Extlib.mkdir ~parents:true dir 0o755;
+  try
+    let chan = open_out full_path in
+    let fmt = Format.formatter_of_out_channel chan in
+    let title = plain title in
+    Markdown.(pp_pandoc fmt (pandoc ~title body))
+  with Sys_error e ->
+    Senv.fatal "Could not open file %s for writing: %s" full_path e
+
 let dump ~root ?(meta=true) () =
   begin
     Pages.iter
       (fun path page ->
          Senv.feedback "[doc] Page: '%s'" path ;
          let body = Markdown.subsections page.intro (List.rev page.sections) in
-         Markdown.dump ~root ~page:path (Markdown.document body) ;
+         let title = page.title in
+         pp_one_page ~root ~page:path ~title body ;
          if meta then
            let path = Printf.sprintf "%s/%s.json" root path in
            Yojson.Basic.to_file path (metadata page) ;
@@ -177,14 +189,17 @@ let dump ~root ?(meta=true) () =
     if meta then
       let path = Printf.sprintf "%s/readme.md.json" root in
       Yojson.Basic.to_file path maindata ;
-      Markdown.(dump ~root ~page:"readme.md"
-                  begin
-                    h1 "Documentation" </>
-                    par (bf "Version" <+> rm Config.version) </>
-                    fmt_block table_of_contents </>
-                    h2 "Index" </>
-                    list (index ())
-                  end) ;
+      let body =
+        [ H1 (plain "Documentation", None);
+          Block [Text [Bold "Version"; Plain Config.version]]]
+        @
+        table_of_contents ()
+        @
+        [H2 (plain "Index", None);
+         Block [UL (List.map (fun i -> [Text [i]]) (index ()))]]
+      in
+      let title = "Documentation" in
+      pp_one_page ~root ~page:"readme.md" ~title body
   end
 
 let () =

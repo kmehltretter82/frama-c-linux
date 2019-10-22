@@ -38,15 +38,15 @@ let page = Doc.page `Kernel ~title:"Kernel Services" ~filename:"kernel.md"
 let () =
   let get_config = Request.signature
       ~page ~kind:`GET ~name:"kernel.getConfig"
-      ~descr:(Md.rm "Frama-C Kernel configuration")
+      ~descr:(Md.plain "Frama-C Kernel configuration")
       ~input:(module Junit) () in
   let result name descr =
-    Request.result get_config ~name ~descr:(Md.rm descr) (module Jstring) in
+    Request.result get_config ~name ~descr:(Md.plain descr) (module Jstring) in
   let set_version = result "version" "Frama-C version" in
   let set_datadir = result "datadir" "Shared directory (FRAMAC_SHARE)" in
   let set_libdir = result "libdir" "Lib directory (FRAMAC_LIB)" in
   let set_pluginpath = Request.result get_config
-      ~name:"pluginpath" ~descr:(Md.rm "Plugin directories (FRAMAC_PLUGIN)")
+      ~name:"pluginpath" ~descr:(Md.plain "Plugin directories (FRAMAC_PLUGIN)")
       (module Jstring.Jlist) in
   Request.register_sig get_config
     begin fun rq () ->
@@ -65,9 +65,10 @@ struct
   type t = Filepath.position
   let syntax = Sy.publish ~page ~name:"source"
       ~synopsis:(Sy.record [ "file" , Sy.string ; "line" , Sy.int ])
-      ~descr:(Md.rm "Source file positions.")
-      ~details:(Md.praw "The file path is normalized, \
-                         and the line number starts at one.") ()
+      ~descr:(Md.plain "Source file positions.")
+      ~details:Md.([Block [Text (plain "The file path is normalized, \
+                                        and the line number starts at one.")]])
+      ()
 
   let to_json p = `Assoc [
       "file" , `String (p.Filepath.pos_path :> string) ;
@@ -93,14 +94,14 @@ struct
   type t = Log.kind
   let page = page
   let name = "kind"
-  let descr = Md.rm "Frama-C message category."
+  let descr = Md.plain "Frama-C message category."
   let values = [
-    Log.Error,    "ERROR",    Md.rm "User Error" ;
-    Log.Warning,  "WARNING",  Md.rm "User Warning" ;
-    Log.Feedback, "FEEDBACK", Md.rm "Analyzer Feedback" ;
-    Log.Result,   "RESULT",   Md.rm "Analyzer Result" ;
-    Log.Failure,  "FAILURE",  Md.rm "Analyzer Failure" ;
-    Log.Debug,    "DEBUG",    Md.rm "Analyser Debug" ;
+    Log.Error,    "ERROR",    Md.plain "User Error" ;
+    Log.Warning,  "WARNING",  Md.plain "User Warning" ;
+    Log.Feedback, "FEEDBACK", Md.plain "Analyzer Feedback" ;
+    Log.Result,   "RESULT",   Md.plain "Analyzer Result" ;
+    Log.Failure,  "FAILURE",  Md.plain "Analyzer Failure" ;
+    Log.Debug,    "DEBUG",    Md.plain "Analyser Debug" ;
   ]
 end
 
@@ -117,12 +118,12 @@ struct
       (struct
         let page = page
         let name = "log"
-        let descr = Md.rm "Message event record."
+        let descr = Md.plain "Message event record."
       end)
 
   let syntax = R.syntax
 
-  let descr = Md.rm
+  let descr = Md.plain
   let kind = R.field "kind" ~descr:(descr "Message kind") (module LogKind)
   let plugin = R.field "plugin" ~descr:(descr "Emitter plugin") (module Jstring)
   let message = R.field "message" ~descr:(descr "Message text") (module Jstring)
@@ -195,12 +196,12 @@ let () =
 
 let () = Request.register
     ~page ~kind:`SET ~name:"kernel.setLogs"
-    ~descr:(Md.rm "Turn logs monitoring on/off")
+    ~descr:(Md.plain "Turn logs monitoring on/off")
     ~input:(module Jbool) ~output:(module Junit) monitor
 
 let () = Request.register
     ~page ~kind:`GET ~name:"kernel.getLogs"
-    ~descr:(Md.rm "Flush the last emitted logs since last call (max 100)")
+    ~descr:(Md.plain "Flush the last emitted logs since last call (max 100)")
     ~input:(module Junit) ~output:(module LogEvent.Jlist)
     begin fun () ->
       let pool = ref [] in

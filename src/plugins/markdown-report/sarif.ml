@@ -6,8 +6,8 @@
 
 module type Json_type = sig
   type t
-  val of_yojson: Yojson.Safe.json -> t Ppx_deriving_yojson_runtime.error_or
-  val to_yojson: t -> Yojson.Safe.json
+  val of_yojson: Yojson.Safe.t -> t Ppx_deriving_yojson_runtime.error_or
+  val to_yojson: t -> Yojson.Safe.t
 end
 
 module Json_dictionary(J: Json_type):
@@ -167,7 +167,7 @@ end
 
 module Custom_properties =
   Json_dictionary(struct
-    type t = Yojson.Safe.json
+    type t = Yojson.Safe.t
     let of_yojson x = Ok x
     let to_yojson x = x
   end)
@@ -808,8 +808,8 @@ sig
   val warning: t
   val error: t
 
-  val to_yojson: t -> Yojson.Safe.json
-  val of_yojson: Yojson.Safe.json -> (t,string) result
+  val to_yojson: t -> Yojson.Safe.t
+  val of_yojson: Yojson.Safe.t -> (t,string) result
 end
 =
 struct

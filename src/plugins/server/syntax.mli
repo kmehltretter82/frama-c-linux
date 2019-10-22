@@ -33,7 +33,7 @@ val format : t -> Markdown.text
     the description block. *)
 val publish :
   page:Doc.page -> name:string -> descr:Markdown.text ->
-  synopsis:t -> ?details:Markdown.block -> unit -> t
+  synopsis:t -> ?details:Markdown.elements -> unit -> t
 
 val unit : t
 val any : t
@@ -54,6 +54,6 @@ type field = { name : string ; syntax : t ; descr : Markdown.text }
 
 (** Builds a table with fields column named with [~title]
     (shall be capitalized) *)
-val fields : title:string -> field list -> Markdown.block
+val fields : title:string -> field list -> Markdown.element
 
 (* -------------------------------------------------------------------------- *)

@@ -58,55 +58,59 @@ let flow md = { atomic=false ; text=md }
 
 let format { text } = text
 let protect a =
-  if a.atomic then a.text else Markdown.(rm "(" <+> a.text <+> rm ")")
+  if a.atomic then a.text else Markdown.((Plain "(") :: a.text @ [Plain ")"])
 
-let publish ~page ~name ~descr ~synopsis ?(details = Markdown.empty) () =
+let publish ~page ~name ~descr ~synopsis ?(details = []) () =
   check_name name ;
   check_page page name ;
   let id = Printf.sprintf "data-%s" name in
   let title = Printf.sprintf "`DATA` %s" name in
-  let format = ref Markdown.nil in
-  let syntax = Markdown.fmt_block (fun fmt ->
-      Format.fprintf fmt "> %a ::= %a"
-        Markdown.pp_text !format
-        Markdown.pp_text synopsis.text
-    ) in
-  let content = Markdown.( par descr </> syntax </> details ) in
-  let href = Doc.publish ~page ~name:id ~title ~index:[name] content [] in
+  let href = Doc.href page id in
   let link_title = Printf.sprintf "_%s_" name in
-  let link = Markdown.href ~title:link_title href in
-  format := link ; atom @@ link
+  let link = Markdown.(Link (plain link_title, href)) in
+  let syntax =
+    Markdown.(
+      Text
+        (Plain ">" :: link :: Plain "::=" :: synopsis.text))
+  in
+  let content = Markdown.((Block [Text descr; syntax]) :: details) in
+  let _href = Doc.publish ~page ~name:id ~title ~index:[name] content [] in
+  atom @@ [link]
 
-let unit = atom @@ Markdown.rm "-"
-let any = atom @@ Markdown.it "any"
-let int = atom @@ Markdown.it "int"
-let ident = atom @@ Markdown.it "ident"
-let string = atom @@ Markdown.it "string"
-let number = atom @@ Markdown.it "number"
-let boolean = atom @@ Markdown.it "boolean"
+let unit = atom @@ [Markdown.Plain "-"]
+let any = atom @@ [Markdown.Emph "any"]
+let int = atom @@ [Markdown.Emph "int"]
+let ident = atom @@ [Markdown.Emph "ident"]
+let string = atom @@ [Markdown.Emph "string"]
+let number = atom @@ [Markdown.Emph "number"]
+let boolean = atom @@ [Markdown.Emph "boolean"]
 
-let escaped name = Markdown.tt @@ Printf.sprintf "'%s'" @@ String.escaped name
+let escaped name =
+  Markdown.Inline_code (Printf.sprintf "'%s'" @@ String.escaped name)
 
-let tag name = atom @@ escaped name
+let tag name = atom @@ [escaped name]
 
-let array a = atom @@ Markdown.(tt "[" <+> protect a <+> tt ", … ]")
+let array a =
+  atom @@ Markdown.(Inline_code "[" :: protect a @ [Inline_code  ", … ]"])
 
 let tuple ts =
-  atom @@ Markdown.(tt "["
-                    <+> glue ~sep:(raw " `,` ") (List.map protect ts) <+>
-                    tt "]")
+  atom @@
+  Markdown.(
+    Inline_code "[" ::
+    glue ~sep:[Inline_code ","] (List.map protect ts) @
+    [Inline_code "]"])
 
-let union ts = flow @@ Markdown.(glue ~sep:(raw " | ") (List.map protect ts))
+let union ts = flow @@ Markdown.(glue ~sep:(plain "|") (List.map protect ts))
 
-let option t = atom @@ Markdown.(protect t <@> tt "?")
+let option t = atom @@ Markdown.(protect t @ [Inline_code "?"])
 
-let field (a,t) = Markdown.( escaped a <+> tt ":" <+> t.text )
+let field (a,t) = Markdown.( escaped a :: Inline_code ":" :: t.text )
 
 let record fds =
   let fields =
-    if fds = [] then Markdown.rm "…" else
-      Markdown.(glue ~sep:(raw " `;` ") (List.map field fds))
-  in atom @@ Markdown.(tt "{" <+> fields <+> tt "}")
+    if fds = [] then Markdown.plain "…" else
+      Markdown.(glue ~sep:[Inline_code ";"] (List.map field fds))
+  in atom @@ Markdown.(Inline_code "{" :: fields @ [Inline_code "}"])
 
 type field = {
   name : string ;
@@ -115,15 +119,15 @@ type field = {
 }
 
 let fields ~title (fds : field list) =
-  let c_field = `Left title in
-  let c_format = `Center "Format" in
-  let c_descr = `Left "Description" in
-  Markdown.table [ c_field ; c_format ; c_descr ]
-    begin
-      List.map
-        (fun f ->
-           [ Markdown.tt f.name ; format f.syntax ; f.descr ])
-        fds
-    end
+  let open Markdown in
+  let caption = Some (plain "Fields description") in
+  let header =
+    [plain title, Left; plain "Format", Center; plain "Description", Left]
+  in
+  let content =
+    List.map
+      (fun f -> [[Markdown.Inline_code f.name]; format f.syntax ; f.descr]) fds
+  in
+  Markdown.Table { caption; header; content }
 
 (* -------------------------------------------------------------------------- *)
