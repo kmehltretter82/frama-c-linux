@@ -164,7 +164,7 @@ let metadata page : json =
 let pp_one_page ~root ~page ~title body =
   let full_path = Filepath.normalize (root ^ "/" ^ page) in
   let dir = Filename.dirname full_path in
-  Extlib.mkdir ~parents:true dir 0o755;
+  if not (Sys.file_exists dir) then Extlib.mkdir ~parents:true dir 0o755;
   try
     let chan = open_out full_path in
     let fmt = Format.formatter_of_out_channel chan in
