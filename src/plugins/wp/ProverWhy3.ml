@@ -1269,7 +1269,7 @@ let is_trivial (t : Why3.Task.task) =
 (* --- Prove WPO                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-let prove ?timeout ?steplimit ~prover wpo =
+let build_proof_task ?timeout ?steplimit ~prover wpo () =
   try
     WpContext.on_context (Wpo.get_context wpo)
       begin fun () ->
@@ -1316,9 +1316,14 @@ let prove ?timeout ?steplimit ~prover wpo =
                     end
       end ()
   with exn ->
-    let bt = Printexc.get_raw_backtrace () in
-    Wp_parameters.fatal "Error in why3:%a@.%s@."
-      Why3.Exn_printer.exn_printer exn
-      (Printexc.raw_backtrace_to_string bt)
+    if Wp_parameters.has_dkey dkey_api then
+      Wp_parameters.fatal "[Why3 Error] %a@\n%s"
+        Why3.Exn_printer.exn_printer exn
+        Printexc.(raw_backtrace_to_string @@ get_raw_backtrace ())
+    else
+      Task.failed "[Why3 Error] %a" Why3.Exn_printer.exn_printer exn
+
+let prove ?timeout ?steplimit ~prover wpo =
+  Task.later (build_proof_task ?timeout ?steplimit ~prover wpo) ()
 
 (* -------------------------------------------------------------------------- *)
