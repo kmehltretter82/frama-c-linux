@@ -1,5 +1,0 @@
-/*@
-  lemma CountLemma: \forall value_type *a, v, integer i;
-     0 <= i ==> Count(a, v, 0, i+1) ==
-                Count(a, v, 0, i) + Count(a, v, i, i+1);
-*/

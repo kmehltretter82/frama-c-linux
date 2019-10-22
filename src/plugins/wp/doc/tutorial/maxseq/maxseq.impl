@@ -1,4 +1,0 @@
-size_type max_seq(const value_type* a, size_type n)
-{
-  return a[max_element(a,n)];
-}

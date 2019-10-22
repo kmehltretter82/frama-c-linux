@@ -1,5 +1,0 @@
-@SUFFIX "_report.tex"
-@ZERO "-"
-@FUNCTION
-\verb+%function+ & %total & %wp & %ergo & %success\% %ergo:steps \\
-@END

@@ -1,8 +1,0 @@
-# frama-c -wp -wp-rte [...]
-[kernel] Parsing tests/nonmutating/adjacent.i (no preprocessing)
-[kernel] Parsing adjacent/adjacent.c (with preprocessing)
-[rte] annotating function adjacent_find
-------------------------------------------------
-Module               #VC   WP   Ergo   Success
-adjacent_find         23   11    12      100%
-------------------------------------------------

@@ -1,9 +1,0 @@
-# frama-c -wp [...]
-[kernel] Parsing tests/mutating/swapvalues.i (no preprocessing)
-[kernel] Parsing swapvalues/swapvalues.c (with preprocessing)
-[wp] warning: Missing RTE guards
-[rte] annotating function swap_values
-------------------------------------------------
-Module               #VC   WP   Ergo   Success
-swap_values            8    3     5      100%
-------------------------------------------------
