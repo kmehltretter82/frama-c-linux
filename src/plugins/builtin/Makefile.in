@@ -36,14 +36,14 @@ endif
 PLUGIN_DIR ?= .
 PLUGIN_ENABLE := @ENABLE_BUILTIN@
 PLUGIN_NAME := Builtin
-PLUGIN_CMI := 
+PLUGIN_CMI :=
 PLUGIN_CMO := basic_blocks options builtin_builder transform \
 			memcpy memcmp memmove memset \
 			register
 PLUGIN_DISTRIBUTED := $(PLUGIN_ENABLE)
 PLUGIN_DISTRIB_EXTERNAL:= Makefile.in configure.ac configure
 #PLUGIN_NO_DEFAULT_TEST := no
-PLUGIN_TESTS_DIRS := functions
+PLUGIN_TESTS_DIRS := functions options
 
 ################
 # Generic part #
