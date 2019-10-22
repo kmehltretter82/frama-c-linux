@@ -5,7 +5,7 @@ endif
 Report_markdown_VERSION:=0.1~beta
 
 PLUGIN_NAME:=Report_markdown
-PLUGIN_GENERATED:=$(PLUGIN_DIR)/mdr_version.ml
+PLUGIN_GENERATED:=$(PLUGIN_DIR)/mdr_version.ml $(PLUGIN_DIR)/Report_markdown.mli
 PLUGIN_CMO:=\
   sarif mdr_version mdr_params parse_remarks \
   eva_coverage md_gen sarif_gen mdr_register
