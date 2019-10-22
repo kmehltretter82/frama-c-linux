@@ -25,7 +25,6 @@ type align = Left | Center | Right
 type href =
   | URL of string
   | Page of string
-  | Name of string
   | Section of string * string
 
 type inline =
@@ -84,9 +83,8 @@ let plain_link h =
     | URL url -> url
     | Page p -> p
     | Section (_,s) -> s
-    | Name a -> a
   in
-  Link ([Inline_code s], URL s)
+  Link ([Inline_code s], h)
 
 let codelines lang pp code =
   let s = Format.asprintf "@[%a@]" pp code in
@@ -160,32 +158,58 @@ let mk_date () =
 let pandoc ?(title=plain "") ?(authors=[]) ?(date=mk_date()) elements =
   { title; authors; date; elements }
 
-let pp_href fmt = function
-  | URL s | Page s -> Format.pp_print_string fmt s
-  | Section (p,s) -> Format.fprintf fmt "%s#%s" p (id s)
-  | Name a -> Format.fprintf fmt "#%s" (id a)
+let relativize page target =
+  let page_dir = String.split_on_char '/' page in
+  let target_dir = String.split_on_char '/' target in
+  let go_up l = List.map (fun _ -> "..") l in
+  let rec remove_common l1 l2 =
+    match l1 with
+    | [] -> assert false (* split on char is always non-empty *)
+    | [_f1] -> l2
+    | d1 :: p1 ->
+      match l2 with
+      | [] -> assert false
+      | [_f2 ] ->
+        (* it's the length of the argument to go_up that matters, not
+           its exact content *)
+        go_up p1 @ l2
+      | d2 :: p2 when d2 = d1 -> remove_common p1 p2
+      | _ -> go_up p1 @ l2
+  in
+  let relative = remove_common page_dir target_dir in
+  String.concat "/" relative
 
-let rec pp_inline fmt =
+let pp_href ?(page="") fmt = function
+  | URL s -> Format.pp_print_string fmt s
+  | Page s -> Format.pp_print_string fmt (relativize page s)
+  | Section (p,s) -> Format.fprintf fmt "%s#%s" (relativize page p) (id s)
+
+let rec pp_inline ?page fmt =
   function
   | Plain s -> Format.pp_print_string fmt s
   | Emph s -> Format.fprintf fmt "_%s_" (String.trim s)
   | Bold s -> Format.fprintf fmt "**%s**" (String.trim s)
   | Inline_code s -> Format.fprintf fmt "`%s`" (String.trim s)
   | Link (text,url) ->
-    Format.fprintf fmt "@[<h>[%a](%a)@]@ " pp_text text pp_href url
+    Format.fprintf fmt "@[<h>[%a](%a)@]@ "
+      (pp_text ?page) text (pp_href ?page) url
   | Image (alt,url) -> Format.fprintf fmt "@[<h>![%s](%s)@]@ " alt url
 
-and pp_text fmt l =
+and pp_text ?page fmt l =
   match l with
   | [] -> ()
-  | [ elt ] -> pp_inline fmt elt
-  | elt :: text -> Format.fprintf fmt "%a@ %a" pp_inline elt pp_text text
+  | [ elt ] -> pp_inline ?page fmt elt
+  | elt :: text ->
+    Format.fprintf fmt "%a@ %a" (pp_inline ?page) elt (pp_text ?page) text
 
 let pp_lab fmt = function
   | None -> ()
   | Some lab -> Format.fprintf fmt " {#%s}" lab
 
-let test_size txt = String.length (Format.asprintf "%a" pp_text txt)
+let test_size txt =
+  (* get rid of ?page *)
+  let pp_text fmt = pp_text fmt in
+  String.length (Format.asprintf "%a" pp_text txt)
 
 let pp_dashes fmt size =
   let dashes = String.make (size + 2) '-' in
@@ -196,14 +220,14 @@ let pp_sep_line fmt sizes =
   List.iter (pp_dashes fmt) sizes;
   Format.fprintf fmt "@]@\n"
 
-let pp_header fmt (t,_) size =
+let pp_header ?page fmt (t,_) size =
   let real_size = test_size t in
   let spaces = String.make (size - real_size) ' ' in
-  Format.fprintf fmt " %a%s |" pp_text t spaces
+  Format.fprintf fmt " %a%s |" (pp_text ?page) t spaces
 
-let pp_headers fmt l sizes =
+let pp_headers ?page fmt l sizes =
   Format.fprintf fmt "@[<h>|";
-  List.iter2 (pp_header fmt) l sizes;
+  List.iter2 (pp_header ?page fmt) l sizes;
   Format.fprintf fmt "@]@\n"
 
 let compute_sizes headers contents =
@@ -230,27 +254,29 @@ let pp_aligns fmt headers sizes =
   List.iter2 (pp_align fmt) headers sizes;
   Format.fprintf fmt "@]@\n"
 
-let pp_table_cell fmt size t =
+let pp_table_cell ?page fmt size t =
   let real_size = test_size t in
   let spaces = String.make (size - real_size) ' ' in
-  Format.fprintf fmt " %a%s |" pp_text t spaces
+  Format.fprintf fmt " %a%s |" (pp_text ?page) t spaces
 
-let pp_table_line fmt sizes l =
+let pp_table_line ?page fmt sizes l =
   Format.fprintf fmt "@[<h>|";
-  List.iter2 (pp_table_cell fmt) sizes l;
+  List.iter2 (pp_table_cell ?page fmt) sizes l;
   Format.fprintf fmt "@]@\n";
   pp_sep_line fmt sizes
 
-let pp_table_content fmt l sizes =
+let pp_table_content ?page fmt l sizes =
   Format.fprintf fmt "@[<v>";
-  List.iter (pp_table_line fmt sizes) l;
+  List.iter (pp_table_line ?page fmt sizes) l;
   Format.fprintf fmt "@]"
 
-let rec pp_block_element fmt = function
+let rec pp_block_element ?page fmt e =
+  let pp_text fmt = pp_text ?page fmt in
+  match e with
   | Text t -> Format.fprintf fmt "@[<hov>%a@]@\n" pp_text t
-  | Block_quote l -> pp_quote fmt l
-  | UL l -> pp_list "*" fmt l
-  | OL l -> pp_list "#." fmt l
+  | Block_quote l -> pp_quote ?page fmt l
+  | UL l -> pp_list "*" ?page fmt l
+  | OL l -> pp_list "#." ?page fmt l
   | DL l ->
     List.iter
       (fun (term,def) ->
@@ -269,25 +295,29 @@ let rec pp_block_element fmt = function
     List.iter (fun line -> Format.fprintf fmt "@[<h>%s@]@\n" line) lines;
     Format.fprintf fmt "```@\n"
 
-and pp_list prefix fmt l =
+and pp_list ?page prefix fmt l =
   List.iter
     (fun item ->
-       Format.fprintf fmt "@[<v 4>@[<hov>%s %a@]@]" prefix pp_block item)
+       Format.fprintf fmt "@[<v 4>@[<hov>%s %a@]@]"
+         prefix (pp_block ?page) item)
     l
 
-and pp_block fmt l =
+and pp_block ?page fmt l =
   match l with
-  | [ elt ] -> pp_block_element fmt elt
+  | [ elt ] -> pp_block_element ?page fmt elt
   | _ ->
     Format.fprintf fmt "%a@\n"
-      (Format.pp_print_list ~pp_sep:Format.pp_force_newline pp_block_element) l
+      (Format.pp_print_list
+         ~pp_sep:Format.pp_force_newline (pp_block_element ?page)) l
 
-and pp_quote fmt l =
+and pp_quote ?page fmt l =
   List.iter
-    (fun elt -> Format.fprintf fmt "@[<v>> %a@]" pp_element elt) l
+    (fun elt -> Format.fprintf fmt "@[<v>> %a@]" (pp_element ?page) elt) l
 
-and pp_element fmt = function
-  | Block b -> Format.fprintf fmt "@[<v>%a@]" pp_block b
+and pp_element ?page fmt e =
+  let pp_text fmt = pp_text ?page fmt in
+  match e with
+  | Block b -> Format.fprintf fmt "@[<v>%a@]" (pp_block ?page) b
   | Raw l ->
     Format.(
       fprintf fmt "%a"
@@ -307,29 +337,29 @@ and pp_element fmt = function
      | Some t -> Format.fprintf fmt "@[<h>Table: %a@]@\n@\n" pp_text t);
     let sizes = compute_sizes header content in
     pp_sep_line fmt sizes;
-    pp_headers fmt header sizes;
+    pp_headers ?page fmt header sizes;
     pp_aligns fmt header sizes;
-    pp_table_content fmt content sizes
+    pp_table_content ?page fmt content sizes
 
-let pp_elements fmt l =
+let pp_elements ?page fmt l =
   let pp_sep fmt () =
     Format.pp_print_newline fmt ();
     Format.pp_print_newline fmt ()
   in
-  Format.pp_print_list ~pp_sep pp_element fmt l
+  Format.pp_print_list ~pp_sep (pp_element ?page) fmt l
 
-let pp_authors fmt l =
-  List.iter (fun t -> Format.fprintf fmt "@[<h>- %a@]@\n" pp_text t) l
+let pp_authors ?page fmt l =
+  List.iter (fun t -> Format.fprintf fmt "@[<h>- %a@]@\n" (pp_text ?page) t) l
 
-let pp_pandoc fmt { title; authors; date; elements } =
+let pp_pandoc ?page fmt { title; authors; date; elements } =
   Format.fprintf fmt "@[<v>";
   if title <> [] || authors <> [] || date <> [] then begin
     Format.fprintf fmt "@[<h>---@]@\n";
-    Format.fprintf fmt "@[<h>title: %a@]@\n" pp_text title;
-    Format.fprintf fmt "@[<h>author:@]@\n%a" pp_authors authors;
-    Format.fprintf fmt "@[<h>date: %a@]@\n" pp_text date;
+    Format.fprintf fmt "@[<h>title: %a@]@\n" (pp_text ?page) title;
+    Format.fprintf fmt "@[<h>author:@]@\n%a" (pp_authors ?page) authors;
+    Format.fprintf fmt "@[<h>date: %a@]@\n" (pp_text ?page) date;
     Format.fprintf fmt "@[<h>...@]@\n";
     Format.pp_print_newline fmt ();
   end;
-  pp_elements fmt elements;
+  pp_elements ?page fmt elements;
   Format.fprintf fmt "@]%!"

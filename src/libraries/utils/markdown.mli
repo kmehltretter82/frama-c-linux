@@ -23,10 +23,15 @@
 type align = Left | Center | Right
 
 type href =
-  | URL of string
+  | URL of string (** uninterpreted URL *)
   | Page of string
-  | Name of string
-  | Section of string * string
+  (** URL relative to a common root.
+      During pretty-printing, if given the path of the current
+      document, the string will be modified accordingly. For instance,
+      when writing to [foo/bar.md], [Page "foo/bla.md"] will be output as
+      [(bla.md)].
+  *)
+  | Section of string * string (** URL of an anchor within a [Page] *)
 
 type inline =
   | Plain of string
@@ -123,16 +128,16 @@ val plain_link: href -> inline
 val codelines:
   string -> (Format.formatter -> 'a -> unit) -> 'a -> block_element
 
-val pp_inline: Format.formatter -> inline -> unit
+val pp_inline: ?page:string -> Format.formatter -> inline -> unit
 
-val pp_text: Format.formatter -> text -> unit
+val pp_text: ?page:string -> Format.formatter -> text -> unit
 
-val pp_block_element: Format.formatter -> block_element -> unit
+val pp_block_element: ?page:string -> Format.formatter -> block_element -> unit
 
-val pp_block: Format.formatter -> block -> unit
+val pp_block: ?page:string -> Format.formatter -> block -> unit
 
-val pp_element: Format.formatter -> element -> unit
+val pp_element: ?page:string -> Format.formatter -> element -> unit
 
-val pp_elements: Format.formatter -> elements -> unit
+val pp_elements: ?page:string -> Format.formatter -> elements -> unit
 
-val pp_pandoc: Format.formatter -> pandoc_markdown -> unit
+val pp_pandoc: ?page:string -> Format.formatter -> pandoc_markdown -> unit

@@ -99,8 +99,8 @@ module Message = struct
     create ~text ?messageId ?arguments ()
 
   let markdown ~markdown ?id:richMessageId ?arguments () =
-    let richText =
-      String.trim (Format.asprintf "@[%a@]" Markdown.pp_elements markdown)
+    let pp fmt = Markdown.pp_elements fmt in
+    let richText = String.trim (Format.asprintf "@[%a@]" pp markdown)
     in
     create ~richText ?richMessageId ?arguments ()
 

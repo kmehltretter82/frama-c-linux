@@ -66,9 +66,10 @@ let parse_line env line =
           []
         | _ ->
           let res = Markdown.Raw remark in
+          let page = "" in
           Mdr_params.debug ~dkey
             "Remark for section %s:@\n%a"
-            env.current_section Markdown.pp_element res;
+            env.current_section (Markdown.pp_element ~page) res;
           [res]
       in
       env.remarks <-

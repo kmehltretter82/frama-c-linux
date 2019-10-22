@@ -169,7 +169,7 @@ let pp_one_page ~root ~page ~title body =
     let chan = open_out full_path in
     let fmt = Format.formatter_of_out_channel chan in
     let title = plain title in
-    Markdown.(pp_pandoc fmt (pandoc ~title body))
+    Markdown.(pp_pandoc ~page fmt (pandoc ~title body))
   with Sys_error e ->
     Senv.fatal "Could not open file %s for writing: %s" full_path e
 

@@ -95,7 +95,8 @@ let make_message alarm annot remark =
     | _ -> summary :: remark
   in
   let richText =
-    String.trim (Format.asprintf "@[%a@]" Markdown.pp_elements markdown)
+    String.trim
+      (Format.asprintf "@[%a@]" (Markdown.pp_elements ~page:"") markdown)
   in
   Message.create ~text ~richText ()
 
