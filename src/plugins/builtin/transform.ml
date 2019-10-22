@@ -91,11 +91,11 @@ class transformer = object(self)
     if not (B.Enabled.get ()) then raise Not_found ;
     builtin
 
-  method private replace_call (fct, args) =
+  method private replace_call (lval, fct, args) =
     try
       let module B = (val (self#find_enabled_builtin fct): Builtin) in
-      if B.well_typed_call args then
-        let key = B.key_from_call args in
+      if B.well_typed_call lval args then
+        let key = B.key_from_call lval args in
         let fundec = B.get_override key in
         let new_args = B.retype_args key args in
         Queue.add fundec used_builtin_last_kf ;
@@ -111,10 +111,10 @@ class transformer = object(self)
     | Call(_) | Local_init(_, ConsInit(_, _, Plain_func), _) ->
       let change = function
         | [ Call(r, ({ enode = Lval((Var f), NoOffset) } as e), args, loc) ] ->
-          let f, args = self#replace_call (f, args) in
+          let f, args = self#replace_call (r, f, args) in
           [ Call(r, { e with enode = Lval((Var f), NoOffset) }, args, loc) ]
         | [ Local_init(r, ConsInit(f, args, Plain_func), loc) ] ->
-          let f, args = self#replace_call (f, args) in
+          let f, args = self#replace_call (Some (Cil.var r), f, args) in
           [ Local_init(r, ConsInit(f, args, Plain_func), loc) ]
         | _ -> assert false
       in

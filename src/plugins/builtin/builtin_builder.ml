@@ -28,8 +28,8 @@ module type Generator_sig = sig
   type override_key = Hashtbl.key
 
   val function_name: string
-  val well_typed_call: exp list -> bool
-  val key_from_call: exp list -> override_key
+  val well_typed_call: lval option -> exp list -> bool
+  val key_from_call: lval option -> exp list -> override_key
   val retype_args: override_key -> exp list -> exp list
   val generate_prototype: override_key -> (string * typ)
   val generate_spec: override_key -> fundec -> location -> funspec
@@ -41,8 +41,8 @@ module type Builtin = sig
   type override_key
 
   val function_name: string
-  val well_typed_call: exp list -> bool
-  val key_from_call: exp list -> override_key
+  val well_typed_call: lval option -> exp list -> bool
+  val key_from_call: lval option -> exp list -> override_key
   val retype_args: override_key -> exp list -> exp list
   val get_override: override_key -> fundec
   val get_kfs: unit -> kernel_function list

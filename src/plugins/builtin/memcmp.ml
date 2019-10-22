@@ -96,13 +96,13 @@ let type_from_arg x =
   let xt = Cil.type_remove_qualifier_attributes_deep xt in
   Cil.typeOf_pointed xt
 
-let well_typed_call = function
+let well_typed_call _ret = function
   | [ s1 ; s2 ; len ] ->
     (Cil.isIntegralType (Cil.typeOf len)) &&
     (Cil_datatype.Typ.equal (type_from_arg s1) (type_from_arg s2))
   | _ -> false
 
-let key_from_call = function
+let key_from_call _ret = function
   | [ s1 ; _ ; _ ] -> type_from_arg s1
   | _ -> failwith "Call to Memmove.key_from_call on an ill-typed builtin call"
 

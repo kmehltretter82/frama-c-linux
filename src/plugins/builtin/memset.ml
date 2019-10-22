@@ -187,7 +187,7 @@ let is_union_type = function
   | TComp({ cstruct = false }, _, _) -> true
   | _ -> false
 
-let well_typed_call = function
+let well_typed_call _ret = function
   | [ ptr ; _ ; _ ] when any_char_composed_type (type_from_arg ptr) -> true
   | [ ptr ; _ ; _ ] when is_union_type (type_from_arg ptr) -> false
   | [ _ ; value ; _ ] ->
@@ -197,7 +197,7 @@ let well_typed_call = function
     end
   | _ -> false
 
-let key_from_call = function
+let key_from_call _ret = function
   | [ ptr ; _ ; _ ] when any_char_composed_type (type_from_arg ptr) ->
     (type_from_arg ptr), None
   | [ ptr ; value ; _ ] when not (is_union_type (type_from_arg ptr)) ->
