@@ -645,16 +645,29 @@ Before we spend any of our time looking at each of these alarms,
 trying to determine whether they are true or false,
 it is a good idea to make the analyzer spend more of {\em its} time
 trying to determine the same thing.
-There are different settings that influence the compromise
-between precision and resource consumption. When dealing with bounded loops,
-the best approach consists in using an ACSL annotation, \verb+//@ loop unroll N+,
-to direct \Eva{} to analyze precisely the N first iterations of the loop
-before approximating the results.
+There are different settings that influence the trade-off
+between precision and resource consumption.
 
-Currently, annotating loops is done manually; in future releases of Frama-C,
-this will be partly automated. In simple loops, you can obtain its
-bounds via the GUI, by inspecting the values taken by the loop counter,
-as in the example below:
+When dealing with bounded loops, option \verb+-eva-auto-loop-unroll N+ enables
+an automatic analysis which unrolls loops to improve precision,
+based on syntactic heuristics, up to \verb+N+ iterations.
+It should be enabled in most analyses.
+
+If automatic loop unrolling is insufficient, the next best approach consists in
+using an ACSL annotation, \verb+//@ loop unroll N+, to direct \Eva{} to analyze
+precisely the \verb+N+ first iterations of the loop before approximating the
+results.
+
+Note: both approaches can be combined to enable automatic loop unrolling
+{\em except} in a few chosen loops: since the \verb+@loop unroll+ annotation
+takes precedence over other options, adding \verb+@loop unroll 0;+ to a loop
+will prevent it from being unrolled, even when \verb+-eva-auto-loop-unroll+
+is active.
+This is especially useful for loops typical of reactive systems, which are
+often unbounded but enclose most of the application code.
+
+Frama-C's graphical interface can help estimating loop bounds by inspecting the
+values taken by the loop counter, as in the example below:
 
 \begin{figure}[hbt]
 \centering
@@ -682,7 +695,7 @@ then add the loop unroll annotation, as follows:
 
 The value 4 is sufficient to completely unroll the loop, even though \verb|i|
 ranges from 0 to 4 (5 values in total). One way to confirm the unrolling is
-complete is to check that the ``starting to merge loop iterations'' is no
+complete is to check that ``starting to merge loop iterations'' is no
 longer emitted when entering the loop. Also, when a loop unroll annotation
 is present but insufficient to unroll the loop, a message is emitted:
 
@@ -3274,15 +3287,15 @@ on its own in a generic context.
 \label{boucles-traitement}
 
 The default treatment of loops by the analyzer may produce
-results that are too approximate. Tuning 
-the treatment of loops can improve precision.
+results that are too approximate.
+Fine-tuning loops is one of the main ways to improve precision in the analysis.
 
 When encountering a loop, the analyzer tries to compute a state
-that contains all the concrete states possible at
-run-time, including the initial concrete state just before
-entering the loop. This englobing state may be too imprecise
-by construction: typically, if the analyzed loop is initializing
-an array, the user does not expect to see the initial values of
+that contains all the possible concrete states at run-time,
+including the initial concrete state just before entering the loop.
+This enclosing state, by construction, is often imprecise:
+typically, if the analyzed loop is initializing an array,
+the user does not expect to see the initial values of
 the array appear in the state computed by the analyzer.
 The solution in this case is to either unroll loops, using one of several
 available methods, or to add annotations (widening hints or loop invariants)
@@ -3294,16 +3307,30 @@ time remains bounded.
 
 Loop unrolling is often easier to apply, since it does not require much
 knowledge about the loop, other than an estimate of the number of iterations.
-This estimate may not improve precision if too low
-or lead to unnecessary work if too high,
-but will never affect its correctness.
+If the estimate is too low, precision won't improve; if it is too high,
+it may lead to unnecessary work; but under no circumstances it will affect the
+correctness of the analysis.
+
+\subsubsection{Automatic loop unrolling}
+
+\Eva{} includes a syntactic, heuristic-based analysis to automatically infer
+simple loop bounds. It is enabled via option
+\lstinline|-eva-auto-loop-unroll <n>|, where \lstinline|<n>| is the maximum
+bound to be inferred. If the analysis cannot infer that the loop terminates
+within \lstinline|<n>| iterations, then no unrolling is performed.
+
+\lstinline|-eva-auto-loop-unroll| is recommended as the first approach towards
+loop unrolling, due to its low cost and ease of setup.
+However, for a more fine-grained analysis and for non-trivial loops,
+other techniques are available, such as loop unroll annotations.
+These take precedence over the automatic loop unrolling mechanism and can be
+combined with them, e.g. to allow unrolling {\em all but} a few loops.
 
 \subsubsection{Loop unroll annotations}
 
-Whenever a loop has a fixed number of iterations (or a known upper bound),
-an easy and precise way to handle it is to include a
-\lstinline|loop unroll <n>| annotation, where
-\lstinline|<n>| is the number of iterations of the loop.
+Individual loops can be handled by preceding them with a
+\lstinline|loop unroll <n>| annotation, where \lstinline|<n>| is the number
+of iterations of the loop.
 It will indicate \Eva{} to analyze the loop by semantically unrolling each
 iteration, avoiding merging states from different iterations.
 This leads to increased cost in terms of analysis, but usually the cost
@@ -3359,6 +3386,8 @@ The message can be deactived via \lstinline|-eva-warn-key loop-unroll=inactive|.
 Note that using an unrolling parameter which is higher than the actual number
 of iterations of a loop doesn't generally have an effect on the analysis.
 The analyzer will usually detect that further iterations are not useful.
+
+\subsubsection{Systematic loop unrolling}
 
 If all loops in a program need to be unrolled, one way to do it quickly
 consists in using option \lstinline|-eva-min-loop-unroll <n>|,
@@ -5376,29 +5405,30 @@ return \lstinline|6| and \lstinline|36| respectively.
 \question{Which option should I use to improve the handling of loops
   in my program?}
 
-The recommended way is to use \lstinline|loop unroll| annotations on a case by
-case basis, which is the most precise and stable mechanism currently in \Eva{}.
-Alternatively, using \lstinline|-eva-slevel| is the next best approach.
-This option is more costly, often hard to predict, and can only be specified
-globally or at the function level (via \lstinline|-eva-slevel-function|).
-However, it works for loops that are built using \lstinline|goto|s instead of
-\lstinline|for| or \lstinline|while|, and it also improves precision when
-evaluating \lstinline|if| or \lstinline|switch| conditionals (but it is consumed
-by them, which can be confusing for the user).
+Start with \lstinline|-eva-auto-loop-unroll|. If automatic unrolling is not
+sufficient, the recommended way is to use \lstinline|loop unroll| annotations
+on a case by case basis. This is the most precise and stable mechanism
+currently in \Eva{}. It does have the drawback of requiring changes to the
+source code, however.
 
-Both approaches do have a minor drawback, in that they do not allow to observe
-a specific iteration step of the loop. The main advantage of these options is
-that they leave the source code unchanged.
+If none of the above techniques is suitable, using \lstinline|-eva-slevel|
+is the next best approach. Compared to the previous ones, this option is more
+costly, often hard to predict, and can only be specified globally or at the
+function level (via \lstinline|-eva-slevel-function|), however it works with
+loops that are built using \lstinline|goto|s instead of \lstinline|for| or
+\lstinline|while|. It also improves precision when evaluating \lstinline|if| or
+\lstinline|switch| conditionals (but it is consumed by them, which can be
+confusing for the user).
 
-The Frama-C kernel has an option \lstinline|-ulevel|, which performs a
-syntactic modification of the analyzed source code. Its advantage is that,
-by explicitly separating iteration steps, it allows to use
-the graphical user interface to observe values or express properties for a
-specific iteration step of the loop. However, the duplication of loop
-statements and variables can lead to cluttered code. Also, the transformation
-increases the size of the code in the Frama-C AST and, for large functions,
-this has a significant impact in the analysis
-time. For these reasons, \lstinline|-ulevel| is seldom used nowadays.
+Finally, there is an option from the Frama-C kernel, \lstinline|-ulevel|,
+which performs a syntactic modification of the analyzed source code.
+Its advantage is that, by explicitly separating iteration steps,
+it allows using the graphical user interface to observe values or express
+properties for a specific iteration step of the loop.
+However, the duplication of loop statements and variables can clutter the code.
+Also, the transformation increases the size of the code in the Frama-C AST and,
+for large functions, this has a significant impact in the analysis time.
+For these reasons, \lstinline|-ulevel| is seldom used nowadays.
 
 
 \question{Alarms that occur after a true alarm in the analyzed code
