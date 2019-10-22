@@ -3,6 +3,11 @@
 #include "stddef.h"
 #include "string.h"
 #include "strings.h"
+struct X {
+   int x ;
+   int y ;
+};
+typedef int named;
 /*@ requires aligned_end: len % 4 ≡ 0;
     requires
       valid_dest: \let __fc_len = len / 4; \valid(dest + (0 .. __fc_len - 1));
@@ -29,14 +34,84 @@ int *memcpy_int(int *dest, int const *src, size_t len)
   return __retres;
 }
 
-int main(void)
+void integer(int * /*[10]*/ src, int * /*[10]*/ dest)
 {
-  int __retres;
-  int dest[10];
-  int src[10] = {0};
-  int *p = memcpy_int(dest,src,sizeof(src));
-  __retres = 0;
+  int *res = memcpy_int(dest,src,(unsigned int)10 * sizeof(int));
+  memcpy_int(src,res,(unsigned int)10 * sizeof(int));
+  return;
+}
+
+void with_named(named * /*[10]*/ src, named * /*[10]*/ dest)
+{
+  named *res = memcpy_int(dest,src,(unsigned int)10 * sizeof(named));
+  memcpy_int(src,res,(unsigned int)10 * sizeof(named));
+  return;
+}
+
+/*@ requires aligned_end: len % 8 ≡ 0;
+    requires
+      valid_dest: \let __fc_len = len / 8; \valid(dest + (0 .. __fc_len - 1));
+    requires
+      valid_read_src:
+        \let __fc_len = len / 8; \valid_read(src + (0 .. __fc_len - 1));
+    requires
+      separation:
+        \let __fc_len = len / 8;
+          \separated(dest + (0 .. __fc_len - 1), src + (0 .. __fc_len - 1));
+    ensures
+      copied:
+        \let __fc_len = len / 8;
+        ∀ ℤ j0; 0 ≤ j0 < __fc_len ⇒ *(dest + j0) ≡ *(src + j0);
+    ensures result: \result ≡ dest;
+    assigns *(dest + (0 .. len - 1)), \result;
+    assigns *(dest + (0 .. len - 1)) \from *(src + (0 .. len - 1));
+    assigns \result \from dest;
+ */
+struct X *memcpy_X(struct X *dest, struct X const *src, size_t len)
+{
+  struct X *__retres;
+  __retres = (struct X *)memcpy((void *)dest,(void const *)src,len);
   return __retres;
+}
+
+void structure(struct X * /*[10]*/ src, struct X * /*[10]*/ dest)
+{
+  struct X *res = memcpy_X(dest,src,(unsigned int)10 * sizeof(struct X));
+  memcpy_X(src,res,(unsigned int)10 * sizeof(struct X));
+  return;
+}
+
+/*@ requires aligned_end: len % 4 ≡ 0;
+    requires
+      valid_dest: \let __fc_len = len / 4; \valid(dest + (0 .. __fc_len - 1));
+    requires
+      valid_read_src:
+        \let __fc_len = len / 4; \valid_read(src + (0 .. __fc_len - 1));
+    requires
+      separation:
+        \let __fc_len = len / 4;
+          \separated(dest + (0 .. __fc_len - 1), src + (0 .. __fc_len - 1));
+    ensures
+      copied:
+        \let __fc_len = len / 4;
+        ∀ ℤ j0; 0 ≤ j0 < __fc_len ⇒ *(dest + j0) ≡ *(src + j0);
+    ensures result: \result ≡ dest;
+    assigns *(dest + (0 .. len - 1)), \result;
+    assigns *(dest + (0 .. len - 1)) \from *(src + (0 .. len - 1));
+    assigns \result \from dest;
+ */
+int **memcpy_ptr_int(int **dest, int * const *src, size_t len)
+{
+  int **__retres;
+  __retres = (int **)memcpy((void *)dest,(void const *)src,len);
+  return __retres;
+}
+
+void pointers(int ** /*[10]*/ src, int ** /*[10]*/ dest)
+{
+  int **res = memcpy_ptr_int(dest,src,(unsigned int)10 * sizeof(int *));
+  memcpy_ptr_int(src,res,(unsigned int)10 * sizeof(int *));
+  return;
 }
 
 /*@ requires aligned_end: len % 40 ≡ 0;
@@ -70,23 +145,36 @@ int (*memcpy_arr10_int(int (*dest)[10], int const (*src)[10], size_t len))[10]
   return __retres;
 }
 
-void nested(int (*dest)[10], int (*src)[10], size_t n)
+void nested(int (*src)[10], int (*dest)[10], int n)
 {
-  memcpy_arr10_int(dest,src,n);
+  int (*res)[10] =
+    memcpy_arr10_int(dest,src,(unsigned int)n * sizeof(int [10]));
+  memcpy_arr10_int(src,res,(unsigned int)n * sizeof(int [10]));
   return;
 }
 
 
 [kernel] Parsing tests/functions/result/memcpy.c (with preprocessing)
 [kernel] Parsing tests/functions/memcpy.c (with preprocessing)
-[kernel] tests/functions/memcpy.c:3: Warning: 
-  def'n of func main at tests/functions/memcpy.c:3 (sum 1968) conflicts with the one at tests/functions/result/memcpy.c:31 (sum 3742); keeping the one at tests/functions/result/memcpy.c:31.
 [kernel] tests/functions/memcpy.c:10: Warning: 
-  dropping duplicate def'n of func nested at tests/functions/memcpy.c:10 in favor of that at tests/functions/result/memcpy.c:72
+  dropping duplicate def'n of func integer at tests/functions/memcpy.c:10 in favor of that at tests/functions/result/memcpy.c:36
+[kernel] tests/functions/memcpy.c:15: Warning: 
+  dropping duplicate def'n of func with_named at tests/functions/memcpy.c:15 in favor of that at tests/functions/result/memcpy.c:43
+[kernel] tests/functions/memcpy.c:20: Warning: 
+  dropping duplicate def'n of func structure at tests/functions/memcpy.c:20 in favor of that at tests/functions/result/memcpy.c:76
+[kernel] tests/functions/memcpy.c:25: Warning: 
+  dropping duplicate def'n of func pointers at tests/functions/memcpy.c:25 in favor of that at tests/functions/result/memcpy.c:109
+[kernel] tests/functions/memcpy.c:30: Warning: 
+  dropping duplicate def'n of func nested at tests/functions/memcpy.c:30 in favor of that at tests/functions/result/memcpy.c:147
 /* Generated by Frama-C */
 #include "stddef.h"
 #include "string.h"
 #include "strings.h"
+struct X {
+   int x ;
+   int y ;
+};
+typedef int named;
 /*@ requires aligned_end: len % 4 ≡ 0;
     requires
       valid_dest: \let __fc_len = len / 4; \valid(dest + (0 .. __fc_len - 1));
@@ -114,14 +202,90 @@ int *memcpy_int(int *dest, int const *src, size_t len)
   return __retres;
 }
 
-int main(void)
+void integer(int *src, int *dest)
 {
-  int __retres;
-  int dest[10];
-  int src[10] = {0};
-  int *p = memcpy_int(dest,(int const *)(src),sizeof(src));
-  __retres = 0;
+  int *res =
+    memcpy_int(dest,(int const *)src,(unsigned int)10 * sizeof(int));
+  memcpy_int(src,(int const *)res,(unsigned int)10 * sizeof(int));
+  return;
+}
+
+void with_named(named *src, named *dest)
+{
+  named *res =
+    memcpy_int(dest,(int const *)src,(unsigned int)10 * sizeof(named));
+  memcpy_int(src,(int const *)res,(unsigned int)10 * sizeof(named));
+  return;
+}
+
+/*@ requires aligned_end: len % 8 ≡ 0;
+    requires
+      valid_dest: \let __fc_len = len / 8; \valid(dest + (0 .. __fc_len - 1));
+    requires
+      valid_read_src:
+        \let __fc_len = len / 8; \valid_read(src + (0 .. __fc_len - 1));
+    requires
+      separation:
+        \let __fc_len = len / 8;
+          \separated(dest + (0 .. __fc_len - 1), src + (0 .. __fc_len - 1));
+    ensures
+      copied:
+        \let __fc_len = \old(len) / 8;
+        ∀ ℤ j0;
+          0 ≤ j0 < __fc_len ⇒ *(\old(dest) + j0) ≡ *(\old(src) + j0);
+    ensures result: \result ≡ \old(dest);
+    assigns *(dest + (0 .. len - 1)), \result;
+    assigns *(dest + (0 .. len - 1)) \from *(src + (0 .. len - 1));
+    assigns \result \from dest;
+ */
+struct X *memcpy_X(struct X *dest, struct X const *src, size_t len)
+{
+  struct X *__retres;
+  __retres = (struct X *)memcpy((void *)dest,(void const *)src,len);
   return __retres;
+}
+
+void structure(struct X *src, struct X *dest)
+{
+  struct X *res =
+    memcpy_X(dest,(struct X const *)src,(unsigned int)10 * sizeof(struct X));
+  memcpy_X(src,(struct X const *)res,(unsigned int)10 * sizeof(struct X));
+  return;
+}
+
+/*@ requires aligned_end: len % 4 ≡ 0;
+    requires
+      valid_dest: \let __fc_len = len / 4; \valid(dest + (0 .. __fc_len - 1));
+    requires
+      valid_read_src:
+        \let __fc_len = len / 4; \valid_read(src + (0 .. __fc_len - 1));
+    requires
+      separation:
+        \let __fc_len = len / 4;
+          \separated(dest + (0 .. __fc_len - 1), src + (0 .. __fc_len - 1));
+    ensures
+      copied:
+        \let __fc_len = \old(len) / 4;
+        ∀ ℤ j0;
+          0 ≤ j0 < __fc_len ⇒ *(\old(dest) + j0) ≡ *(\old(src) + j0);
+    ensures result: \result ≡ \old(dest);
+    assigns *(dest + (0 .. len - 1)), \result;
+    assigns *(dest + (0 .. len - 1)) \from *(src + (0 .. len - 1));
+    assigns \result \from dest;
+ */
+int **memcpy_ptr_int(int **dest, int * const *src, size_t len)
+{
+  int **__retres;
+  __retres = (int **)memcpy((void *)dest,(void const *)src,len);
+  return __retres;
+}
+
+void pointers(int **src, int **dest)
+{
+  int **res =
+    memcpy_ptr_int(dest,(int * const *)src,(unsigned int)10 * sizeof(int *));
+  memcpy_ptr_int(src,(int * const *)res,(unsigned int)10 * sizeof(int *));
+  return;
 }
 
 /*@ requires aligned_end: len % 40 ≡ 0;
@@ -156,9 +320,13 @@ int (*memcpy_arr10_int(int (*dest)[10], int const (*src)[10], size_t len))[10]
   return __retres;
 }
 
-void nested(int (*dest)[10], int (*src)[10], size_t n)
+void nested(int (*src)[10], int (*dest)[10], int n)
 {
-  memcpy_arr10_int(dest,(int const (*)[10])src,n);
+  int (*res)[10] =
+    memcpy_arr10_int(dest,(int const (*)[10])src,
+                     (unsigned int)n * sizeof(int [10]));
+  memcpy_arr10_int(src,(int const (*)[10])res,
+                   (unsigned int)n * sizeof(int [10]));
   return;
 }
 

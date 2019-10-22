@@ -1,12 +1,33 @@
 #include <string.h>
 
-int main(void){
-  int src[10] = { 0 } ;
-  int dest[10] ;
+struct X {
+  int x ;
+  int y ;
+} ;
 
-  int *p = memmove(dest, src, sizeof(src));
+typedef int named ;
+
+void integer(int src[10], int dest[10]){
+  int * res = memmove(dest, src, 10 * sizeof(int));
+  memmove(src, res, 10 * sizeof(int));
 }
 
-void nested(int (*dest) [10], int (*src) [10], size_t n) {
-  memmove(dest, src, n) ;
+void with_named(named src[10], named dest[10]){
+  named * res = memmove(dest, src, 10 * sizeof(named));
+  memmove(src, res, 10 * sizeof(named));
+}
+
+void structure(struct X src[10], struct X dest[10]){
+  struct X * res = memmove(dest, src, 10 * sizeof(struct X));
+  memmove(src, res, 10 * sizeof(struct X));
+}
+
+void pointers(int* src[10], int* dest[10]){
+  int ** res = memmove(dest, src, 10 * sizeof(int*));
+  memmove(src, res, 10 * sizeof(int*));
+}
+
+void nested(int (*src)[10], int (*dest)[10], int n){
+  int (*res) [10] = memmove(dest, src, n * sizeof(int[10]));
+  memmove(src, res, n * sizeof(int[10]));
 }

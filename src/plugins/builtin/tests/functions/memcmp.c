@@ -1,12 +1,28 @@
 #include <string.h>
 
-int main(void){
-  int s1[10] = { 0 } ;
-  int s2[10] = { 0 };
+struct X {
+  int x ;
+  int y ;
+} ;
 
-  int res = memcmp(s1, s2, sizeof(s1));
+typedef int named ;
+
+int integer(int src[10], int dest[10]){
+  return memcmp(dest, src, 10 * sizeof(int));
 }
 
-int nested(int (*dest) [10], int (*src) [10], size_t n){
-  return memcmp(dest, src, n) ;
+int with_named(named src[10], named dest[10]){
+  return memcmp(dest, src, 10 * sizeof(named));
+}
+
+int structure(struct X src[10], struct X dest[10]){
+  return memcmp(dest, src, 10 * sizeof(struct X));
+}
+
+int pointers(int* src[10], int* dest[10]){
+  return memcmp(dest, src, 10 * sizeof(int*));
+}
+
+int nested(int (*src)[10], int (*dest)[10], int n){
+  return memcmp(dest, src, n * sizeof(int[10]));
 }
