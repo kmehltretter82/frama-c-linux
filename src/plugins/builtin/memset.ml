@@ -77,7 +77,7 @@ let pset_len_bytes_to_zero ?loc ptr bytes_len =
 let pset_len_bytes_all_bits_to_one ?loc ptr bytes_len =
   let nans = Logic_env.find_all_logic_functions "\\is_NaN" in
   let of_type t = function
-    | { l_profile = [ x ] } when Cil_datatype.Logic_type.equal x.lv_type t -> true
+    | { l_profile = [ x ] } -> Cil_datatype.Logic_type.equal x.lv_type t
     | _ -> false
   in
   let find_nan_for_type t = List.find (of_type t) nans in
@@ -107,25 +107,28 @@ let generate_requires loc ptr value len =
   let open Cil in
   let bounds = match value with
     | None ->
-      [ { (pcorrect_len_bytes ~loc ptr.term_type len) with pred_name = ["aligned_end"] } ]
+      [ { (pcorrect_len_bytes ~loc ptr.term_type len)
+          with pred_name = ["aligned_end"] } ]
     | Some value ->
       let low, up = match value.term_type with
         | Ctype(TInt((IChar|ISChar|IUChar) as kind, _)) ->
           let bits = bitsSizeOfInt kind in
           let plus_one = Integer.add (Integer.of_int 1) in
           let low, up = if (isSigned kind) then
-            (min_signed_number bits), (plus_one (max_signed_number bits))
-          else
-            (Integer.of_int 0), (plus_one (max_unsigned_number bits))
+              (min_signed_number bits), (plus_one (max_signed_number bits))
+            else
+              (Integer.of_int 0), (plus_one (max_unsigned_number bits))
           in
           let integer ?loc i = term ?loc (TConst (Integer (i, None))) Linteger in
           (integer ~loc low), (integer ~loc up)
         | _ -> assert false
       in
-      [ { (pbounds_incl_excl ~loc low value up) with pred_name = [ "in_bounds_value" ] } ]
+      [ { (pbounds_incl_excl ~loc low value up)
+          with pred_name = [ "in_bounds_value" ] } ]
   in
   List.map new_predicate (bounds @ [
-      { (pvalid_len_bytes ~loc here_label ptr len)     with pred_name = ["valid_dest"] }
+      { (pvalid_len_bytes ~loc here_label ptr len)
+        with pred_name = ["valid_dest"] }
     ])
 
 let generate_assigns loc t ptr value len =

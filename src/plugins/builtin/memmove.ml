@@ -27,16 +27,20 @@ open Basic_blocks
 let function_name = "memmove"
 
 let pmoved_len_bytes ?loc dest src bytes_len =
-  plet_len_div_size ?loc dest.term_type bytes_len (punfold_all_elems_eq ?loc dest src)
+  plet_len_div_size ?loc dest.term_type bytes_len
+    (punfold_all_elems_eq ?loc dest src)
 
 let presult_dest ?loc t dest =
   prel ?loc (Req, (tresult ?loc t), dest)
 
 let generate_requires loc dest src len =
   List.map new_predicate [
-    { (pcorrect_len_bytes ~loc dest.term_type len)    with pred_name = ["aligned_end"] } ;
-    { (pvalid_len_bytes ~loc here_label dest len)     with pred_name = ["valid_dest"] } ;
-    { (pvalid_read_len_bytes ~loc here_label src len) with pred_name = ["valid_read_src"] } ;
+    { (pcorrect_len_bytes ~loc dest.term_type len)
+      with pred_name = ["aligned_end"] } ;
+    { (pvalid_len_bytes ~loc here_label dest len)
+      with pred_name = ["valid_dest"] } ;
+    { (pvalid_read_len_bytes ~loc here_label src len)
+      with pred_name = ["valid_read_src"] } ;
   ]
 
 let generate_assigns loc t dest src len =

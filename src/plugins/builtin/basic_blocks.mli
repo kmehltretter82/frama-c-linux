@@ -42,14 +42,16 @@ val tdivide: ?loc:location -> term -> term -> term
 
 val pbounds_incl_excl: ?loc:location -> term -> term -> term -> predicate
 val pvalid_len_bytes: ?loc:location -> logic_label -> term -> term -> predicate
-val pvalid_read_len_bytes: ?loc:location -> logic_label -> term -> term -> predicate
+val pvalid_read_len_bytes:
+  ?loc:location -> logic_label -> term -> term -> predicate
 val pcorrect_len_bytes: ?loc:location -> logic_type -> term -> predicate
 val punfold_all_elems_eq: ?loc:location -> term -> term -> term -> predicate
 val punfold_all_elems_pred:
   ?loc:location -> term -> term ->
   (?loc: location -> term -> predicate) -> predicate
 
-val pseparated_memories: ?loc:location -> term -> term -> term -> term -> predicate
+val pseparated_memories:
+  ?loc:location -> term -> term -> term -> term -> predicate
 
 val plet_len_div_size:
   ?loc:location -> logic_type -> term -> (term -> predicate) -> predicate

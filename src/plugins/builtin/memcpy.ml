@@ -31,17 +31,22 @@ let pseparated_memcpy_len_bytes ?loc p1 p2 bytes_len =
   plet_len_div_size ?loc p1.term_type bytes_len generate
 
 let pcopied_len_bytes ?loc p1 p2 bytes_len =
-  plet_len_div_size ?loc p1.term_type bytes_len (punfold_all_elems_eq ?loc p1 p2)
+  plet_len_div_size ?loc p1.term_type bytes_len
+    (punfold_all_elems_eq ?loc p1 p2)
 
 let presult_dest ?loc t dest =
   prel ?loc (Req, (tresult ?loc t), dest)
 
 let generate_requires loc dest src len =
   List.map new_predicate [
-    { (pcorrect_len_bytes ~loc dest.term_type len)    with pred_name = ["aligned_end"] } ;
-    { (pvalid_len_bytes ~loc here_label dest len)     with pred_name = ["valid_dest"] } ;
-    { (pvalid_read_len_bytes ~loc here_label src len) with pred_name = ["valid_read_src"] } ;
-    { (pseparated_memcpy_len_bytes ~loc dest src len) with pred_name = ["separation"] }
+    { (pcorrect_len_bytes ~loc dest.term_type len)
+      with pred_name = ["aligned_end"] } ;
+    { (pvalid_len_bytes ~loc here_label dest len)
+      with pred_name = ["valid_dest"] } ;
+    { (pvalid_read_len_bytes ~loc here_label src len)
+      with pred_name = ["valid_read_src"] } ;
+    { (pseparated_memcpy_len_bytes ~loc dest src len)
+      with pred_name = ["separation"] }
   ]
 
 let generate_assigns loc t dest src len =

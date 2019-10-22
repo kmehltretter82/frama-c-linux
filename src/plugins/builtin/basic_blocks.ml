@@ -174,7 +174,8 @@ let pgeneric_valid_buffer ?loc validity lbl ptr len =
   validity ?loc (lbl, buffer)
 
 let pgeneric_valid_len_bytes ?loc validity lbl ptr bytes_len =
-  plet_len_div_size ?loc ptr.term_type bytes_len (pgeneric_valid_buffer ?loc validity lbl ptr)
+  plet_len_div_size ?loc ptr.term_type bytes_len
+    (pgeneric_valid_buffer ?loc validity lbl ptr)
 
 let pvalid_len_bytes ?loc = pgeneric_valid_len_bytes ?loc pvalid
 let pvalid_read_len_bytes ?loc = pgeneric_valid_len_bytes ?loc pvalid_read
@@ -193,7 +194,7 @@ let rec punfold_all_elems_eq ?loc t1 t2 len =
   assert(Cil_datatype.Logic_type.equal t1.term_type t2.term_type) ;
   pall_elems_eq ?loc 0 t1 t2 len
 and pall_elems_eq ?loc depth t1 t2 len =
-  let ind = Cil_const.make_logic_var_quant ("j" ^ (string_of_int depth)) Linteger in
+  let ind = make_logic_var_quant ("j" ^ (string_of_int depth)) Linteger in
   let tind = tvar ind in
   let bounds = pbounds_incl_excl ?loc (tinteger 0) tind len in
   let t1_acc = taccess ?loc t1 tind in
@@ -210,7 +211,7 @@ and peq_unfold ?loc depth t1 t2 =
 let rec punfold_all_elems_pred ?loc t1 len pred =
   pall_elems_pred ?loc 0 t1 len pred
 and pall_elems_pred ?loc depth t1 len pred =
-  let ind = Cil_const.make_logic_var_quant ("j" ^ (string_of_int depth)) Linteger in
+  let ind = make_logic_var_quant ("j" ^ (string_of_int depth)) Linteger in
   let tind = tvar ind in
   let bounds = pbounds_incl_excl ?loc (tinteger 0) tind len in
   let t1_acc = taccess ?loc t1 tind in
@@ -255,7 +256,8 @@ let make_behavior
   }
 
 let default_comp_disj bhvs =
-  let b_names = List.filter (fun b -> not (String.equal Cil.default_behavior_name b))
+  let b_names = List.filter
+      (fun b -> not (String.equal Cil.default_behavior_name b))
       (List.fold_left (fun l b -> b.b_name :: l) [] bhvs)
   in match b_names with
   | [] -> [], []
