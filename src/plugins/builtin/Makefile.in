@@ -29,6 +29,17 @@ ifndef FRAMAC_LIBDIR
 FRAMAC_LIBDIR :=$(shell frama-c-config -print-libpath)
 endif
 
+SRC_STRING:= \
+	memcpy \
+	memcmp \
+	memmove \
+	memset
+SRC_STRING:=$(addprefix string/, $(SRC_STRING))
+
+SRC_STDLIB:= \
+	malloc
+SRC_STDLIB:=$(addprefix stdlib/, $(SRC_STDLIB))
+
 ###################
 # Plug-in Setting #
 ###################
@@ -36,14 +47,19 @@ endif
 PLUGIN_DIR ?= .
 PLUGIN_ENABLE := @ENABLE_BUILTIN@
 PLUGIN_NAME := Builtin
+PLUGIN_EXTRA_DIRS:=\
+	string\
+	stdlib
 PLUGIN_CMI :=
-PLUGIN_CMO := basic_blocks options builtin_builder transform \
-			malloc memcpy memcmp memmove memset \
-			register
+PLUGIN_CMO := \
+	basic_blocks options builtin_builder transform register \
+	$(SRC_STRING) \
+	$(SRC_STDLIB)
+
 PLUGIN_DISTRIBUTED := $(PLUGIN_ENABLE)
 PLUGIN_DISTRIB_EXTERNAL:= Makefile.in configure.ac configure
 #PLUGIN_NO_DEFAULT_TEST := no
-PLUGIN_TESTS_DIRS := functions options
+PLUGIN_TESTS_DIRS := string options
 
 ################
 # Generic part #
