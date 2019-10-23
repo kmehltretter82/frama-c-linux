@@ -164,6 +164,7 @@ let to_list (p : 'a partition) : 'a list =
 type unroll_limit =
   | ExpLimit of Cil_types.exp
   | IntLimit of int
+  | AutoUnroll of Cil_types.stmt * int * int
 
 type split_kind = Static | Dynamic
 
@@ -219,7 +220,11 @@ struct
   let union (p1 : t) (p2 : t) : t =
     p1 @ p2
 
-  (* --- Evalution and split functions -------------------------------------- *)
+  (* --- Automatic loop unrolling ------------------------------------------- *)
+
+  module AutoLoopUnroll = Auto_loop_unroll.Make (Abstract)
+
+  (* --- Evaluation and split functions ------------------------------------- *)
 
   (* Domains transfer functions. *)
   module TF = Abstract.Dom.Transfer (Abstract.Eval.Valuation)
@@ -403,6 +408,14 @@ struct
           let limit = try match limit_kind with
             | ExpLimit exp -> eval_exp_to_int x exp
             | IntLimit i -> i
+            | AutoUnroll (stmt, min_unroll, max_unroll) ->
+              match AutoLoopUnroll.compute ~max_unroll x stmt with
+              | None -> min_unroll
+              | Some i ->
+                Value_parameters.warning ~once:true ~current:true
+                  ~wkey:Value_parameters.wkey_loop_unroll
+                  "Automatic loop unrolling.";
+                i
             with
             | Operation_failed -> 0
           in

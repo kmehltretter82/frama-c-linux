@@ -76,12 +76,16 @@ type rationing
 (** Creates a new rationing, that can be used successively on several flows. *)
 val new_rationing: limit:int -> merge:bool -> rationing
 
-(** The unroll limit of a loop can be specified as an integer, or as a C
-    expression, which is evaluated when entering the loop in each incoming
-    state. The expression must always evaluate to a singleton integer. *)
+(** The unroll limit of a loop. *)
 type unroll_limit =
   | ExpLimit of Cil_types.exp
+  (** Value of the expression for each incoming state. The expression must
+      evaluate to a singleton integer in each state.  *)
   | IntLimit of int
+  (** Integer limit. *)
+  | AutoUnroll of Cil_types.stmt * int * int
+  (** [AutoUnroll(stmt, min, max)] requests to find a "good" unrolling limit
+      between [min] and [max] for the loop [stmt]. *)
 
 (** Splits on an expression can be static or dynamic:
     - static splits are processed once: the expression is only evaluated at the

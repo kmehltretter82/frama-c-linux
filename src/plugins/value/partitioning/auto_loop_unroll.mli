@@ -20,42 +20,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
-include Plugin.Register
-    (struct
-      let name = "loop"
-      let shortname = "loop"
-      let help = "[DEPRECATED: use Eva's loop unroll annotations and options] \
-                  Find number of iterations in loops, and slevel value"
-    end)
+(** Heuristic for automatic loop unrolling. *)
 
-module Run = False
-    (struct
-      let option_name = "-loop"
-      let help = "[deprecated: use Eva loop unroll annotations or \
-                  -eva-auto-loop-unroll] Launch loop analysis"
-    end)
+module Make (Abstract: Abstractions.Eva) : sig
 
-module MaxIterations = Int
-    (struct
-      let option_name = "-loop-max-iterations"
-      let arg_name = "num"
-      let default = 1000
-      let help = "If slevel is found to be higher than this number in a loop"
-                 ^ "force the use of merge-after-loop (default: 1000)"
-    end)
+  val compute:
+    max_unroll:int -> Abstract.Dom.t -> Cil_types.stmt -> int option
 
-module MaxSlevel = Int
-    (struct
-      let option_name = "-loop-max-slevel"
-      let arg_name = "num"
-      let default = 10000
-      let help = "If slevel is found to be higher than this number,"
-                 ^ "set slevel to 0 instead (default: 10000)"
-    end)
-
-module NoBranches = False
-    (struct
-      let option_name = "-loop-no-branches"
-      let help = "Modify the algorithm use to estimate the slevel: ignore \
-                  branching due to ifs and always merge after loops"
-    end)
+end
