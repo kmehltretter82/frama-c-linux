@@ -21,82 +21,55 @@
 (**************************************************************************)
 
 open Basic_blocks
+open Basic_alloc
 open Cil_types
 open Logic_const
 
 let function_name = "malloc"
 
-let fc_heap_status () =
-  Globals.Vars.find_from_astinfo "__fc_heap_status" VGlobal
-
-let generate_requires loc ptr_type len =
+let generate_requires loc ptr_type size =
   [ new_predicate
-      { (pcorrect_len_bytes ~loc ptr_type len)
+      { (pcorrect_len_bytes ~loc ptr_type size)
         with pred_name = ["aligned_end"] } ]
 
-let generate_global_assigns loc ptr_type len =
-  let len = new_identified_term len in
-  let res = new_identified_term (tresult ~loc ptr_type) in
-  let hs  = new_identified_term (cvar_to_tvar (fc_heap_status ())) in
-  let assigns_result = res, From [ len ; hs ] in
-  let assigns_heap   = hs, From [ len ; hs ] in
+let generate_global_assigns loc ptr_type size =
+  let assigns_result = assigns_result ~loc ptr_type [ size ] in
+  let assigns_heap = assigns_heap [ size ] in
   Writes [ assigns_result ; assigns_heap ]
 
-let is_allocable loc len =
-  pallocable ~loc (here_label, len)
-
-let allocation_assumes loc len =
-  [ new_predicate (is_allocable loc len) ]
-
-let allocation loc ptr_type =
-  FreeAlloc ([], [new_identified_term (tresult ~loc ptr_type)])
-
-let allocation_ensures loc ptr_type len =
-  let result = tresult ~loc ptr_type in
-  let fresh = pfresh ~loc (old_label, here_label, result, len) in
-  [ Normal, new_predicate fresh ]
-
-let make_behavior_allocation loc ptr_type len =
-  let assumes = allocation_assumes loc len in
-  let assigns = generate_global_assigns loc ptr_type len in
-  let alloc   = allocation loc ptr_type in
-  let ensures = allocation_ensures loc ptr_type len in
+let make_behavior_allocation loc ptr_type size =
+  let assumes = [ is_allocable ~loc size ] in
+  let assigns = generate_global_assigns loc ptr_type size in
+  let alloc   = allocates_result ~loc ptr_type in
+  let ensures = [ Normal, fresh_result ~loc ptr_type size ] in
   make_behavior ~name:"allocation" ~assumes ~assigns ~alloc ~ensures ()
 
-let no_allocation_assumes loc len =
-  [ new_predicate (pnot ~loc (is_allocable loc len)) ]
-
-let no_allocation_result loc ptr_type =
-  let tresult = tresult ~loc ptr_type in
-  let tnull = term ~loc Tnull (Ctype ptr_type) in
-  [ Normal, new_predicate (prel ~loc (Req, tresult, tnull)) ]
-
-let make_behavior_no_allocation loc ptr_type len =
-  let assumes = no_allocation_assumes loc len in
-  let assigns = Writes [new_identified_term (tresult ~loc ptr_type), From []] in
-  let ensures = no_allocation_result loc ptr_type in
-  let alloc = FreeAlloc([],[]) in
+let make_behavior_no_allocation loc ptr_type size =
+  let assumes = [ isnt_allocable ~loc size ] in
+  let assigns = Writes [assigns_result ~loc ptr_type []] in
+  let ensures = [ Normal, null_result ~loc ptr_type ] in
+  let alloc = allocates_nothing () in
   make_behavior ~name:"no_allocation" ~assumes ~assigns ~ensures ~alloc ()
 
 let generate_spec alloc_typ { svar = vi } loc =
-  let (clen) = match Cil.getFormalsDecl vi with
-    | [ len ] -> len
+  let (csize) = match Cil.getFormalsDecl vi with
+    | [ size ] -> size
     | _ -> assert false
   in
-  let len = tlogic_coerce ~loc (cvar_to_tvar clen) Linteger in
-  let requires = generate_requires loc (Ctype (ptr_of alloc_typ)) len in
-  let assigns = generate_global_assigns loc (ptr_of alloc_typ) len in
-  let alloc = allocation loc (ptr_of alloc_typ) in
+  let size = tlogic_coerce ~loc (cvar_to_tvar csize) Linteger in
+  let requires = generate_requires loc (Ctype (ptr_of alloc_typ)) size in
+  let assigns = generate_global_assigns loc (ptr_of alloc_typ) size in
+  let alloc = allocates_result ~loc (ptr_of alloc_typ) in
   make_funspec [
     make_behavior ~requires ~assigns ~alloc () ;
-    make_behavior_allocation loc (ptr_of alloc_typ) len ;
-    make_behavior_no_allocation loc (ptr_of alloc_typ) len
+    make_behavior_allocation loc (ptr_of alloc_typ) size ;
+    make_behavior_no_allocation loc (ptr_of alloc_typ) size
   ] ()
 
 let generate_prototype alloc_t =
   let name = function_name ^ "_" ^ (string_of_typ alloc_t) in
   let params = [
-    ("len", size_t (), [])
+    ("size", size_t (), [])
   ] in
   name, (TFun((ptr_of alloc_t), Some params, false, []))
 

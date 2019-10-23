@@ -37,6 +37,7 @@ SRC_STRING:= \
 SRC_STRING:=$(addprefix string/, $(SRC_STRING))
 
 SRC_STDLIB:= \
+	basic_alloc \
 	malloc
 SRC_STDLIB:=$(addprefix stdlib/, $(SRC_STDLIB))
 
