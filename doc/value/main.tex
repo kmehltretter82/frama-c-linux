@@ -648,9 +648,10 @@ trying to determine the same thing.
 There are different settings that influence the trade-off
 between precision and resource consumption.
 
-When dealing with bounded loops, option \verb+-eva-auto-loop-unroll N+ enables
-an automatic analysis which unrolls loops to improve precision,
-based on syntactic heuristics, up to \verb+N+ iterations.
+When dealing with bounded loops, option \verb+-eva-auto-loop-unroll N+
+automatically unrolls simple loops that have less than \verb+N+ iterations.
+This option is based on syntactic heuristics to improve the precision
+at a low cost, and will not handle complex loops.
 It should be enabled in most analyses.
 
 If automatic loop unrolling is insufficient, the next best approach consists in
@@ -663,8 +664,6 @@ Note: both approaches can be combined to enable automatic loop unrolling
 takes precedence over other options, adding \verb+@loop unroll 0;+ to a loop
 will prevent it from being unrolled, even when \verb+-eva-auto-loop-unroll+
 is active.
-This is especially useful for loops typical of reactive systems, which are
-often unbounded but enclose most of the application code.
 
 Frama-C's graphical interface can help estimating loop bounds by inspecting the
 values taken by the loop counter, as in the example below:
@@ -3286,7 +3285,7 @@ on its own in a generic context.
 \section{Improving precision in loops}
 \label{boucles-traitement}
 
-The default treatment of loops by the analyzer may produce
+The default treatment of loops by the analyzer often produces
 results that are too approximate.
 Fine-tuning loops is one of the main ways to improve precision in the analysis.
 
@@ -3305,37 +3304,57 @@ time remains bounded.
 \subsection{Loop unrolling}
 \label{loop-unroll}
 
-Loop unrolling is often easier to apply, since it does not require much
+Whenever a loop has a fixed number of iterations (or a known upper bound),
+Eva can precisely analyze it by semantically unrolling each iteration,
+avoiding merging states from different iterations.
+This leads to increased cost in terms of analysis, but usually the cost
+increase is worth the improvement in precision.
+
+Loop unrolling is often easy to apply, since it does not require much
 knowledge about the loop, other than an estimate of the number of iterations.
 If the estimate is too low, precision won't improve; if it is too high,
-it may lead to unnecessary work; but under no circumstances it will affect the
+it may lead to unnecessary work; but under no circumstances will it affect the
 correctness of the analysis.
 
 \subsubsection{Automatic loop unrolling}
 
-\Eva{} includes a syntactic, heuristic-based analysis to automatically infer
-simple loop bounds. It is enabled via option
-\lstinline|-eva-auto-loop-unroll <n>|, where \lstinline|<n>| is the maximum
-bound to be inferred. If the analysis cannot infer that the loop terminates
-within \lstinline|<n>| iterations, then no unrolling is performed.
+\Eva{} includes a syntactic heuristic to automatically unroll simple loops
+whose number of iterations can be easily bounded.
+It is enabled via option \lstinline|-eva-auto-loop-unroll <n>|, where
+\lstinline|<n>| is the maximum number of iterations to unroll: loops with
+less than \lstinline|<n>| iterations will be completely unrolled.
+If the analysis cannot infer that a loop terminates within less than
+\lstinline|<n>| iterations, then no unrolling is performed.
 
 \lstinline|-eva-auto-loop-unroll| is recommended as the first approach towards
-loop unrolling, due to its low cost and ease of setup.
-However, for a more fine-grained analysis and for non-trivial loops,
-other techniques are available, such as loop unroll annotations.
-These take precedence over the automatic loop unrolling mechanism and can be
-combined with them, e.g. to allow unrolling {\em all but} a few loops.
+loop unrolling, due to its low cost and ease of setup. An unrolling limit
+up to a few hundred seems suitable in most cases.
+
+If \emph{all} loops in a program need to be unrolled, one way to do it quickly
+consists in using option \lstinline|-eva-min-loop-unroll <n>|,
+where \lstinline|<n>| is the number of iterations to unroll in each loop.
+This option is very expensive, and its use should be limited.
+
+For a more fine-grained analysis and for non-trivial loops,
+annotations are available to configure the loop unrolling on a case by case
+basis.
+These annotations take precedence over the automatic loop unrolling mechanism
+and can be combined with them, e.g. to automatically unroll {\em all but} a few
+loops.
+
+With options \lstinline|-eva-auto-loop-unroll AUTO -eva-min-loop-unroll MIN|:
+\begin{itemize}
+\item if a loop has a loop unroll annotation, it is unrolled accordingly;
+\item otherwise, if a loop has evidently less than \lstinline|AUTO| iterations,
+  it is completely unrolled;
+\item otherwise, the \lstinline|MIN| first iterations of the loop are unrolled.
+\end{itemize}
 
 \subsubsection{Loop unroll annotations}
 
-Individual loops can be handled by preceding them with a
+Individual loops can be unrolled by preceding them with a
 \lstinline|loop unroll <n>| annotation, where \lstinline|<n>| is the number
-of iterations of the loop.
-It will indicate \Eva{} to analyze the loop by semantically unrolling each
-iteration, avoiding merging states from different iterations.
-This leads to increased cost in terms of analysis, but usually the cost
-increase is worth the improvement in precision.
-
+of iterations to unroll.
 Such annotations must be placed just before the loop (i.e. before the
 \lstinline|while|, \lstinline|for| or \lstinline|do| introducing the loop),
 and one annotation is required per loop, including nested ones. For instance:
@@ -3387,16 +3406,9 @@ Note that using an unrolling parameter which is higher than the actual number
 of iterations of a loop doesn't generally have an effect on the analysis.
 The analyzer will usually detect that further iterations are not useful.
 
-\subsubsection{Systematic loop unrolling}
-
-If all loops in a program need to be unrolled, one way to do it quickly
-consists in using option \lstinline|-eva-min-loop-unroll <n>|,
-where \lstinline|<n>| is the number of iterations to unroll in each loop.
-This option has lower precedence than \lstinline|loop unroll| annotations:
-\Eva{} will always consider the latter if it is present in a loop.
-This allows, for instance, to prevent unrolling of an infinite loop by
-adding \lstinline|loop unroll 0| before it, while unrolling the remaining
-loops by the specified amount in \lstinline|-eva-min-loop-unroll|.
+Loop annotations can also be used to prevent the automatic loop unrolling
+for some specific loops: adding \lstinline|loop unroll 0| before a loop
+ensures that no iteration of the loop will be unrolled.
 
 \subsubsection{Unrolling via option {\em -eva-slevel}}
 \label{slevel}
