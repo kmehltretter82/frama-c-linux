@@ -1,6 +1,0 @@
-# Implementation Validation (Parts)
-
-To run the proofs:
-```
-why3 ide proofs
-```
