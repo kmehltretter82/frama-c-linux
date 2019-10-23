@@ -461,7 +461,6 @@ LIB_CMO =\
 	src/libraries/utils/rgmap \
 	src/libraries/utils/bitvector \
 	src/libraries/utils/qstack \
-	src/libraries/utils/leftistheap \
 	src/libraries/stdlib/integer \
 	src/libraries/utils/json \
 	src/libraries/utils/markdown \

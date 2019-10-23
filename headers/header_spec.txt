@@ -102,10 +102,8 @@ headers/open-source/UNMODIFIED_WHY3: .ignore
 headers/updates-headers.sh: CEA_PROPRIETARY
 lib/plugins/PLUGINS.README: .ignore
 licenses/CDDL-1.0: .ignore
-licenses/GPLv3: .ignore
 licenses/LGPLv2: .ignore
 licenses/LGPLv2.1: .ignore
-licenses/LGPLv3: .ignore
 licenses/Q_MODIFIED_LICENSE: .ignore
 man/frama-c.1: CEA_LGPL
 opam/descr: .ignore
@@ -670,8 +668,6 @@ src/libraries/utils/hptset.ml: CEA_LGPL
 src/libraries/utils/hptset.mli: CEA_LGPL
 src/libraries/utils/indexer.ml: CEA_LGPL
 src/libraries/utils/indexer.mli: CEA_LGPL
-src/libraries/utils/leftistheap.ml: JCF_LGPL
-src/libraries/utils/leftistheap.mli: JCF_LGPL
 src/libraries/utils/markdown.ml: CEA_LGPL
 src/libraries/utils/markdown.mli: CEA_LGPL
 src/libraries/utils/pretty_utils.ml: CEA_LGPL
