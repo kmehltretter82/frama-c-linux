@@ -22,6 +22,8 @@
 
 open Cil_types
 
+val valid_size: ?loc:location -> typ -> term -> identified_predicate
+
 val is_allocable: ?loc:location -> term -> identified_predicate
 val isnt_allocable: ?loc:location -> term -> identified_predicate
 

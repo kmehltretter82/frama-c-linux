@@ -41,16 +41,20 @@ let pset_len_to_zero ?loc ptr_type len =
   let p = punfold_all_elems_pred ?loc result len eq_value in
   new_predicate { p with pred_name = [ "zero_initialization" ] }
 
+let generate_requires ?loc alloc_typ num size =
+  let only_one = if Cil.has_flexible_array_member alloc_typ then
+    let p = prel ?loc (Req, num, Cil.lone ?loc ()) in
+    Some (new_predicate { p with pred_name = ["only_one"] })
+  else
+    None
+  in
+  [ valid_size ?loc alloc_typ size ] @ (Extlib.list_of_opt only_one)
+
 let pinitialized_len ?loc ptr_type len =
   let result = tresult ?loc ptr_type in
   let initialized ?loc t = pinitialized ?loc (here_label, t) in
   let p = punfold_all_elems_pred ?loc result len initialized in
   new_predicate { p with pred_name = [ "initialization" ] }
-
-let generate_requires loc ptr_type len =
-  [ new_predicate
-      { (pcorrect_len_bytes ~loc ptr_type len)
-        with pred_name = ["aligned_end"] } ]
 
 let generate_global_assigns loc ptr_type num size =
   let assigns_result = assigns_result ~loc ptr_type [ num ; size ] in
@@ -84,7 +88,7 @@ let generate_spec alloc_typ { svar = vi } loc =
   in
   let num = tlogic_coerce ~loc (cvar_to_tvar cnum) Linteger in
   let size = tlogic_coerce ~loc (cvar_to_tvar csize) Linteger in
-  let requires = generate_requires loc (Ctype (ptr_of alloc_typ)) size in
+  let requires = generate_requires ~loc alloc_typ num size in
   let assigns = generate_global_assigns loc (ptr_of alloc_typ) num size in
   let alloc = allocates_result ~loc (ptr_of alloc_typ) in
   make_funspec [

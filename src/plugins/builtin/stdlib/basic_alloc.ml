@@ -21,11 +21,33 @@
 (**************************************************************************)
 
 open Logic_const
+open Basic_blocks
 open Cil_types
+open Extlib
+
+let valid_size ?loc typ size =
+  let p = match typ with
+    | TComp (ci, _, _) when Cil.has_flexible_array_member typ ->
+      let elem = match (last ci.cfields).ftype with
+        | TArray(t, _ , _, _) -> tinteger ?loc (Cil.bytesSizeOf t)
+        | _ -> assert false
+      in
+      let base = tinteger ?loc (Cil.bytesSizeOf typ) in
+      let flex = tminus ?loc size base in
+      let flex_mod = term ?loc (TBinOp(Mod, flex, elem)) Linteger in
+      let flex_at_least_zero = prel ?loc (Rle, Cil.lzero (), flex) in
+      let aligned_flex = prel ?loc (Req, Cil.lzero (), flex_mod) in
+      pand ?loc (flex_at_least_zero, aligned_flex)
+    | _ ->
+      let elem = tinteger ?loc (Cil.bytesSizeOf typ) in
+      let modulo = term ?loc (TBinOp(Mod, size, elem)) Linteger in
+      prel(Req, Cil.lzero (), modulo)
+  in
+  new_predicate { p with pred_name = ["correct_size"] }
 
 let pis_allocable ?loc size =
   let is_allocable = Logic_env.find_all_logic_functions "is_allocable" in
-  let is_allocable = Extlib.as_singleton is_allocable in
+  let is_allocable = as_singleton is_allocable in
   papp ?loc (is_allocable, [here_label], [size])
 
 let is_allocable ?loc size =

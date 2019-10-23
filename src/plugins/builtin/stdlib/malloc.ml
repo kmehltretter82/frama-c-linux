@@ -27,11 +27,6 @@ open Logic_const
 
 let function_name = "malloc"
 
-let generate_requires loc ptr_type size =
-  [ new_predicate
-      { (pcorrect_len_bytes ~loc ptr_type size)
-        with pred_name = ["aligned_end"] } ]
-
 let generate_global_assigns loc ptr_type size =
   let assigns_result = assigns_result ~loc ptr_type [ size ] in
   let assigns_heap = assigns_heap [ size ] in
@@ -57,7 +52,7 @@ let generate_spec alloc_typ { svar = vi } loc =
     | _ -> assert false
   in
   let size = tlogic_coerce ~loc (cvar_to_tvar csize) Linteger in
-  let requires = generate_requires loc (Ctype (ptr_of alloc_typ)) size in
+  let requires = [ valid_size ~loc alloc_typ size ] in
   let assigns = generate_global_assigns loc (ptr_of alloc_typ) size in
   let alloc = allocates_result ~loc (ptr_of alloc_typ) in
   make_funspec [
