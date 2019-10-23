@@ -30,8 +30,8 @@ FRAMAC_LIBDIR :=$(shell frama-c-config -print-libpath)
 endif
 
 SRC_STRING:= \
-	memcpy \
 	memcmp \
+	memcpy \
 	memmove \
 	memset
 SRC_STRING:=$(addprefix string/, $(SRC_STRING))
@@ -39,6 +39,7 @@ SRC_STRING:=$(addprefix string/, $(SRC_STRING))
 SRC_STDLIB:= \
 	basic_alloc \
 	calloc \
+	free \
 	malloc
 SRC_STDLIB:=$(addprefix stdlib/, $(SRC_STDLIB))
 

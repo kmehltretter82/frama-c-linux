@@ -941,6 +941,8 @@ src/plugins/builtin/stdlib/basic_alloc.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/builtin/stdlib/basic_alloc.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/builtin/stdlib/calloc.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/builtin/stdlib/calloc.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/builtin/stdlib/free.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/builtin/stdlib/free.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/builtin/stdlib/malloc.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/builtin/stdlib/malloc.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/builtin/string/memcmp.ml: CEA_LGPL_OR_PROPRIETARY
