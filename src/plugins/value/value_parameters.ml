@@ -1537,29 +1537,31 @@ let bind (type t) (module P: Parameter_sig.S with type t = t) f =
   let set = set (module P) in
   configures := (fun n -> set ~default:(n < 0) (f n)) :: !configures
 
-(*  power             0   1   2   3   4    5    6    7     8     9     10     11 *)
-let slevel_power = [| 0;  10; 20; 50;  75; 100; 200; 500; 1000; 2000; 5000; 10000 |]
-let ilevel_power = [| 8;  12; 16; 24;  32;  64; 128; 256;  256;  256;  256;   256 |]
-let plevel_power = [| 10; 20; 40; 70; 100; 150; 200; 300;  500;  700; 1000;  2000 |]
+(*  power             0    1   2   3    4    5    6    7    8     9    10    11 *)
+let slevel_power = [| 0;  10; 20; 35;  60; 100; 160; 250; 500; 1000; 2000; 5000 |]
+let ilevel_power = [| 8;  12; 16; 24;  32;  48;  64; 128; 192;  256;  256;  256 |]
+let plevel_power = [| 10; 20; 40; 70; 100; 150; 200; 300; 500;  700; 1000; 2000 |]
+let auto_unroll =  [| 0;  16; 32; 64;  96; 128; 192; 256; 384;  512;  768; 1024 |]
 
 let get array n = if n < 0 then 0 else array.(n)
 
 let () =
-  bind (module MinLoopUnroll) (fun n -> max 0 (n - 4));
-  bind (module AutoLoopUnroll) (fun n -> if n = 0 then 0 else 4 lsl n);
-  bind (module SemanticUnrollingLevel) (get slevel_power);
+  bind (module MinLoopUnroll) (fun n -> max 0 (n - 7));
+  bind (module AutoLoopUnroll) (get auto_unroll);
   bind (module WideningDelay) (fun n -> 1 + n / 2);
+  bind (module HistoryPartitioning) (fun n -> (n - 1) / 5);
+  bind (module SemanticUnrollingLevel) (get slevel_power);
   bind (module ILevel) (get ilevel_power);
   bind (module ArrayPrecisionLevel) (get plevel_power);
   bind (module LinearLevel) (fun n -> n * 20);
   bind (module RmAssert) (fun n -> n > 0);
   bind (module SymbolicLocsDomain) (fun n -> n > 0);
   bind (module EqualityDomain) (fun n -> n > 1);
-  bind (module EqualityCall) (fun n -> if n > 2 then "formals" else "none");
-  bind (module GaugesDomain) (fun n -> n > 3);
+  bind (module GaugesDomain) (fun n -> n > 2);
+  bind (module SplitReturn) (fun n -> if n > 3 then "auto" else "");
   bind (module OctagonDomain) (fun n -> n > 4);
-  bind (module OctagonCall) (fun n -> n > 5);
-  bind (module SplitReturn) (fun n -> if n > 6 then "auto" else "");
+  bind (module EqualityCall) (fun n -> if n > 4 then "formals" else "none");
+  bind (module OctagonCall) (fun n -> n > 6);
   ()
 
 let set_analysis n =
