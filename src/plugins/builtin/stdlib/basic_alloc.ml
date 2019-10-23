@@ -24,7 +24,9 @@ open Logic_const
 open Cil_types
 
 let pis_allocable ?loc size =
-  pallocable ?loc (here_label, size)
+  let is_allocable = Logic_env.find_all_logic_functions "is_allocable" in
+  let is_allocable = Extlib.as_singleton is_allocable in
+  papp ?loc (is_allocable, [here_label], [size])
 
 let is_allocable ?loc size =
   let p = pis_allocable ?loc size in
