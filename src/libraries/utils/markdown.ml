@@ -48,22 +48,28 @@ type block_element =
 
 and block = block_element list
 
+and table = {
+    caption: text option;
+    header: (text * align) list;
+    content: text list list;
+  }
+
 and element =
-  | Block of block
-  | Raw of string list
-  (** non-markdown. Each element of the list is printed as-is on its own line.
-      A blank line separates the [Raw] node from the next one. *)
   | Comment of string (** markdown comment, printed <!-- like this --> *)
-  | H1 of text * string option (** optional label. *)
+  | Block of block
+  | Table of table
+  | Raw of string list
+  (** Each element of the list is printed as-is on its own line.
+      A blank line separates the [Raw] node from the next one. *)
+  | Delayed of (unit -> elements)
+  | H1 of text * string option
   | H2 of text * string option
   | H3 of text * string option
   | H4 of text * string option
   | H5 of text * string option
   | H6 of text * string option
-  | Table of { caption: text option; header: (text * align) list;
-               content: text list list; }
 
-type elements = element list
+and elements = element list
 
 type pandoc_markdown =
   { title: text;
@@ -123,8 +129,9 @@ let list items = [UL items]
 let enum items = [OL items]
 let description items = [DL items]
 
-let block b = [Block b]
 let par text = [Block [Text text]]
+let block b = [Block b]
+let delayed f = [Delayed f]
 
 (* -------------------------------------------------------------------------- *)
 (* --- Sectioning                                                         --- *)
@@ -185,6 +192,10 @@ let mk_date () =
 let pandoc ?(title=[Plain ""]) ?(authors=[]) ?(date=mk_date()) elements =
   { title; authors; date; elements }
 
+(* -------------------------------------------------------------------------- *)
+(* --- Printers                                                           --- *)
+(* -------------------------------------------------------------------------- *)
+
 let relativize page target =
   let page_dir = String.split_on_char '/' page in
   let target_dir = String.split_on_char '/' target in
@@ -236,9 +247,8 @@ let pp_lab fmt = function
   | None -> ()
   | Some lab -> Format.fprintf fmt " {#%s}" lab
 
-let test_size txt =
-  (* get rid of ?page *)
-  let pp_text fmt = pp_text fmt in
+let test_size ?page txt =
+  let pp_text fmt = pp_text ?page fmt in
   String.length (Format.asprintf "%a" pp_text txt)
 
 let pp_dashes fmt size =
@@ -251,7 +261,7 @@ let pp_sep_line fmt sizes =
   Format.fprintf fmt "@]@\n"
 
 let pp_header ?page fmt (t,_) size =
-  let real_size = test_size t in
+  let real_size = test_size ?page t in
   let spaces = String.make (size - real_size) ' ' in
   Format.fprintf fmt " %a%s |" (pp_text ?page) t spaces
 
@@ -299,6 +309,47 @@ let pp_table_content ?page fmt l sizes =
   Format.fprintf fmt "@[<v>";
   List.iter (pp_table_line ?page fmt sizes) l;
   Format.fprintf fmt "@]"
+
+let pp_table_caption ?page fmt = function None -> () | Some t ->
+  Format.fprintf fmt "@[<h>Table: %a@]@\n@\n" (pp_text ?page) t
+
+[@@@ warning "-32"]
+let pp_table_extended ?page fmt { caption; header; content } =
+  begin
+    pp_table_caption ?page fmt caption;
+    let sizes = compute_sizes header content in
+    pp_sep_line fmt sizes;
+    pp_headers ?page fmt header sizes;
+    pp_aligns fmt header sizes;
+    pp_table_content ?page fmt content sizes;
+  end
+[@@@ warning "+32"]
+
+let pp_table_inlined ?page fmt { caption; header; content } =
+  begin
+    pp_table_caption ?page fmt caption;
+    Format.fprintf fmt "@[<v>";
+    let pp = pp_text ?page in
+    List.iter
+      (function (h,_) -> Format.fprintf fmt "| @[<h>%a@] " pp h)
+      header;
+    Format.fprintf fmt "|@\n";
+    List.iter
+      (fun (h,align) ->
+         let dash h k = String.make (max 3 (test_size ?page h + k)) '-' in
+         match align with
+         | Left -> Format.fprintf fmt "|:%s" (dash h 1)
+         | Right -> Format.fprintf fmt "|%s:" (dash h 1)
+         | Center -> Format.fprintf fmt "|:%s:" (dash h 0)
+      ) header;
+    Format.fprintf fmt "|@\n" ;
+    List.iter (fun row ->
+        List.iter
+          (fun col -> Format.fprintf fmt "| @[<h>%a@] " pp col) row ;
+        Format.fprintf fmt "|@\n" ;
+      ) content ;
+    Format.fprintf fmt "@]" ;
+  end
 
 let rec pp_block_element ?page fmt e =
   let pp_text fmt = pp_text ?page fmt in
@@ -355,23 +406,17 @@ and pp_element ?page fmt e =
   | Comment s ->
     Format.fprintf fmt
       "@[<hv>@[<hov 5><!-- %a@]@ -->@]" Format.pp_print_text s
+  | Table table -> pp_table_inlined ?page fmt table
+  (* pp_table_extended ?page fmt table *)
+  | Delayed f -> pp_elements ?page fmt (f ())
   | H1(t,lab) -> Format.fprintf fmt "@[<h># %a%a@]" pp_text t pp_lab lab
   | H2(t,lab) -> Format.fprintf fmt "@[<h>## %a%a@]" pp_text t pp_lab lab
   | H3(t,lab) -> Format.fprintf fmt "@[<h>### %a%a@]" pp_text t pp_lab lab
   | H4(t,lab) -> Format.fprintf fmt "@[<h>#### %a%a@]" pp_text t pp_lab lab
   | H5(t,lab) -> Format.fprintf fmt "@[<h>##### %a%a@]" pp_text t pp_lab lab
   | H6(t,lab) -> Format.fprintf fmt "@[<h>###### %a%a@]" pp_text t pp_lab lab
-  | Table { caption; header; content } ->
-    (match caption with
-     | None -> ()
-     | Some t -> Format.fprintf fmt "@[<h>Table: %a@]@\n@\n" pp_text t);
-    let sizes = compute_sizes header content in
-    pp_sep_line fmt sizes;
-    pp_headers ?page fmt header sizes;
-    pp_aligns fmt header sizes;
-    pp_table_content ?page fmt content sizes
 
-let pp_elements ?page fmt l =
+and pp_elements ?page fmt l =
   let pp_sep fmt () =
     Format.pp_print_newline fmt ();
     Format.pp_print_newline fmt ()
@@ -393,3 +438,5 @@ let pp_pandoc ?page fmt { title; authors; date; elements } =
   end;
   pp_elements ?page fmt elements;
   Format.fprintf fmt "@]%!"
+
+(* -------------------------------------------------------------------------- *)

@@ -123,16 +123,16 @@ struct
 
   let syntax = R.syntax
 
-  let descr = Md.plain
-  let kind = R.field "kind" ~descr:(descr "Message kind") (module LogKind)
-  let plugin = R.field "plugin" ~descr:(descr "Emitter plugin") (module Jstring)
-  let message = R.field "message" ~descr:(descr "Message text") (module Jstring)
+  let kind = R.field "kind" ~descr:(Md.plain "Message kind") (module LogKind)
+  let plugin = R.field "plugin" ~descr:(Md.plain "Emitter plugin") (module Jstring)
+  let message = R.field "message" ~descr:(Md.plain "Message text") (module Jstring)
 
   let category = R.option "category"
-      ~descr:(descr "Message category (DEBUG or WARNING)")
+      ~descr:(Md.plain "Message category (DEBUG or WARNING)")
       (module Jstring)
 
-  let source = R.option "source" ~descr:(descr "Source file position")
+  let source = R.option "source"
+      ~descr:(Md.plain "Source file position")
       (module LogSource)
 
   type t = Log.event

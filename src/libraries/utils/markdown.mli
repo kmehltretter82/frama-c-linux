@@ -63,22 +63,28 @@ type block_element =
 
 and block = block_element list
 
+and table = {
+  caption: text option;
+  header: (text * align) list;
+  content: text list list;
+}
+
 and element =
-  | Block of block
-  | Raw of string list
-  (** non-markdown. Each element of the list is printed as-is on its own line.
-      A blank line separates the [Raw] node from the next one. *)
   | Comment of string (** markdown comment, printed <!-- like this --> *)
-  | H1 of text * string option (** optional label. *)
+  | Block of block
+  | Table of table
+  | Raw of string list
+  (** Each element of the list is printed as-is on its own line.
+      A blank line separates the [Raw] node from the next one. *)
+  | Delayed of (unit -> elements)
+  | H1 of text * string option
   | H2 of text * string option
   | H3 of text * string option
   | H4 of text * string option
   | H5 of text * string option
   | H6 of text * string option
-  | Table of { caption: text option; header: (text * align) list;
-               content: text list list; }
 
-type elements = element list
+and elements = element list
 
 type pandoc_markdown =
   { title: text;
@@ -162,6 +168,9 @@ val block : block -> elements
     @raise Sys_error if there's no such file.
 *)
 val rawfile: string -> elements
+
+(** Delayed element. The content is computed on pretty-printing. *)
+val delayed: (unit -> elements) -> elements
 
 (** {2 Document Structure} *)
 

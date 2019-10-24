@@ -309,19 +309,18 @@ let register_sig (type a b) (s : (a,b) signature) (process : rq -> a -> b) =
   in
   let skind = Main.string_of_kind s.kind in
   let title =  Printf.sprintf "`%s` %s" skind s.name in
-  let caption = Some s.descr in
   let header = [ plain "Input", Center; plain "Output", Center] in
   let content =
     [[ Syntax.text @@ sy_input s.input ;
        Syntax.text @@ sy_output s.output ]]
   in
-  let synopsis = Table { caption; header; content } in
-  let content =
-    [ synopsis ; Block s.details] @
+  let synopsis = Table { caption=None ; header; content } in
+  let description =
+    [ Block [Text s.descr ] ; synopsis ; Block s.details] @
     doc_input s.input @
     doc_output s.output
   in
-  let _ = Doc.publish ~page:s.page ~name:s.name ~title content [] in
+  let _ = Doc.publish ~page:s.page ~name:s.name ~title description [] in
   Main.register s.kind s.name processor ;
   s.defined <- true
 

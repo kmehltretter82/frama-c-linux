@@ -277,13 +277,13 @@ struct
       | Some v -> Fmap.add name (D.to_json v) r in
     { member ; getter ; setter }
 
-  let fields = Syntax.fields ~title:"Field" !fdocs
+  let fields () = [Syntax.fields ~title:"Field" !fdocs]
 
   let syntax =
     Syntax.publish ~page:R.page ~name:R.name
       ~descr:R.descr
       ~synopsis:(Syntax.record [])
-      ~details:[fields] ()
+      ~details:(Markdown.delayed fields) ()
 
   let of_json js =
     List.fold_left

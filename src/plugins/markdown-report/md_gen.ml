@@ -432,8 +432,8 @@ let gen_section_warnings env =
             (text @@ glue [
                 plain ("The table below lists the " ^ plural warnings "warning");
                 plain "that have been emitted by the analyzer.";
-              plain "They might put additional assumptions on the relevance";
-              plain "of the analysis results and must be reviewed carefully";
+                plain "They might put additional assumptions on the relevance";
+                plain "of the analysis results and must be reviewed carefully";
               ]) @
             (text @@ glue [
                 plain "Note that this does not take into account emitted alarms:";
