@@ -62,7 +62,7 @@ PLUGIN_CMO := \
 PLUGIN_DISTRIBUTED := $(PLUGIN_ENABLE)
 PLUGIN_DISTRIB_EXTERNAL:= Makefile.in configure.ac configure
 #PLUGIN_NO_DEFAULT_TEST := no
-PLUGIN_TESTS_DIRS := string options
+PLUGIN_TESTS_DIRS := string stdlib options
 
 ################
 # Generic part #

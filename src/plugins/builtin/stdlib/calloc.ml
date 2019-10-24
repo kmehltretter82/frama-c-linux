@@ -61,7 +61,13 @@ let generate_requires ?loc alloc_type num size =
 
 let pinitialized_len ?loc alloc_type num size =
   let result = tresult ?loc (ptr_of alloc_type) in
-  let initialized ?loc t = pinitialized ?loc (here_label, t) in
+  let initialized ?loc t =
+    let t = match t.term_node, t.term_type with
+      | TLval (lv), Ctype t -> taddrof ?loc lv (Ctype (ptr_of t))
+      | _ -> assert false
+    in
+    pinitialized ?loc (here_label, t)
+  in
   let p = if Cil.has_flexible_array_member alloc_type then
       let access = Cil.mkTermMem ~addr:result ~off:TNoOffset in
       let access = term ?loc (TLval access) (Ctype alloc_type) in
