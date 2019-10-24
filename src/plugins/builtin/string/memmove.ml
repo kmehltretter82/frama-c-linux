@@ -44,8 +44,8 @@ let generate_requires loc dest src len =
   ]
 
 let generate_assigns loc t dest src len =
-  let dest_range = new_identified_term (tunref_range ~loc dest len) in
-  let src_range = new_identified_term(tunref_range ~loc src len) in
+  let dest_range = new_identified_term (tunref_range_bytes_len ~loc dest len) in
+  let src_range = new_identified_term(tunref_range_bytes_len ~loc src len) in
   let copy = dest_range, From [src_range] in
   let result = new_identified_term (tresult t) in
   let dest = new_identified_term dest in

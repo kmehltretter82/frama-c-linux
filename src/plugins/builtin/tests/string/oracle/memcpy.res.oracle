@@ -25,8 +25,8 @@ typedef int named;
         \let __fc_len = len / 4;
         ∀ ℤ j0; 0 ≤ j0 < __fc_len ⇒ *(dest + j0) ≡ *(src + j0);
     ensures result: \result ≡ dest;
-    assigns *(dest + (0 .. len - 1)), \result;
-    assigns *(dest + (0 .. len - 1)) \from *(src + (0 .. len - 1));
+    assigns *(dest + (0 .. len / 4 - 1)), \result;
+    assigns *(dest + (0 .. len / 4 - 1)) \from *(src + (0 .. len / 4 - 1));
     assigns \result \from dest;
  */
 int *memcpy_int(int *dest, int const *src, size_t len)
@@ -65,8 +65,8 @@ void with_named(named * /*[10]*/ src, named * /*[10]*/ dest)
         \let __fc_len = len / 8;
         ∀ ℤ j0; 0 ≤ j0 < __fc_len ⇒ *(dest + j0) ≡ *(src + j0);
     ensures result: \result ≡ dest;
-    assigns *(dest + (0 .. len - 1)), \result;
-    assigns *(dest + (0 .. len - 1)) \from *(src + (0 .. len - 1));
+    assigns *(dest + (0 .. len / 8 - 1)), \result;
+    assigns *(dest + (0 .. len / 8 - 1)) \from *(src + (0 .. len / 8 - 1));
     assigns \result \from dest;
  */
 struct X *memcpy_st_X(struct X *dest, struct X const *src, size_t len)
@@ -98,8 +98,8 @@ void structure(struct X * /*[10]*/ src, struct X * /*[10]*/ dest)
         \let __fc_len = len / 4;
         ∀ ℤ j0; 0 ≤ j0 < __fc_len ⇒ *(dest + j0) ≡ *(src + j0);
     ensures result: \result ≡ dest;
-    assigns *(dest + (0 .. len - 1)), \result;
-    assigns *(dest + (0 .. len - 1)) \from *(src + (0 .. len - 1));
+    assigns *(dest + (0 .. len / 4 - 1)), \result;
+    assigns *(dest + (0 .. len / 4 - 1)) \from *(src + (0 .. len / 4 - 1));
     assigns \result \from dest;
  */
 int **memcpy_ptr_int(int **dest, int * const *src, size_t len)
@@ -135,9 +135,9 @@ void pointers(int ** /*[10]*/ src, int ** /*[10]*/ dest)
           (∀ ℤ j1;
              0 ≤ j1 < 10 ⇒ (*(dest + j0))[j1] ≡ (*(src + j0))[j1]);
     ensures result: \result ≡ dest;
-    assigns (*(dest + (0 .. len - 1)))[0 .. 10 - 1], \result;
-    assigns (*(dest + (0 .. len - 1)))[0 .. 10 - 1]
-      \from (*(src + (0 .. len - 1)))[0 .. 10 - 1];
+    assigns (*(dest + (0 .. len / 40 - 1)))[0 .. 10 - 1], \result;
+    assigns (*(dest + (0 .. len / 40 - 1)))[0 .. 10 - 1]
+      \from (*(src + (0 .. len / 40 - 1)))[0 .. 10 - 1];
     assigns \result \from dest;
  */
 int (*memcpy_arr10_int(int (*dest)[10], int const (*src)[10], size_t len))[10]
@@ -202,8 +202,8 @@ typedef int named;
         ∀ ℤ j0;
           0 ≤ j0 < __fc_len ⇒ *(\old(dest) + j0) ≡ *(\old(src) + j0);
     ensures result: \result ≡ \old(dest);
-    assigns *(dest + (0 .. len - 1)), \result;
-    assigns *(dest + (0 .. len - 1)) \from *(src + (0 .. len - 1));
+    assigns *(dest + (0 .. len / 4 - 1)), \result;
+    assigns *(dest + (0 .. len / 4 - 1)) \from *(src + (0 .. len / 4 - 1));
     assigns \result \from dest;
  */
 int *memcpy_int(int *dest, int const *src, size_t len)
@@ -245,8 +245,8 @@ void with_named(named *src, named *dest)
         ∀ ℤ j0;
           0 ≤ j0 < __fc_len ⇒ *(\old(dest) + j0) ≡ *(\old(src) + j0);
     ensures result: \result ≡ \old(dest);
-    assigns *(dest + (0 .. len - 1)), \result;
-    assigns *(dest + (0 .. len - 1)) \from *(src + (0 .. len - 1));
+    assigns *(dest + (0 .. len / 8 - 1)), \result;
+    assigns *(dest + (0 .. len / 8 - 1)) \from *(src + (0 .. len / 8 - 1));
     assigns \result \from dest;
  */
 struct X *memcpy_st_X(struct X *dest, struct X const *src, size_t len)
@@ -281,8 +281,8 @@ void structure(struct X *src, struct X *dest)
         ∀ ℤ j0;
           0 ≤ j0 < __fc_len ⇒ *(\old(dest) + j0) ≡ *(\old(src) + j0);
     ensures result: \result ≡ \old(dest);
-    assigns *(dest + (0 .. len - 1)), \result;
-    assigns *(dest + (0 .. len - 1)) \from *(src + (0 .. len - 1));
+    assigns *(dest + (0 .. len / 4 - 1)), \result;
+    assigns *(dest + (0 .. len / 4 - 1)) \from *(src + (0 .. len / 4 - 1));
     assigns \result \from dest;
  */
 int **memcpy_ptr_int(int **dest, int * const *src, size_t len)
@@ -320,9 +320,9 @@ void pointers(int **src, int **dest)
              0 ≤ j1 < 10 ⇒
              (*(\old(dest) + j0))[j1] ≡ (*(\old(src) + j0))[j1]);
     ensures result: \result ≡ \old(dest);
-    assigns (*(dest + (0 .. len - 1)))[0 .. 10 - 1], \result;
-    assigns (*(dest + (0 .. len - 1)))[0 .. 10 - 1]
-      \from (*(src + (0 .. len - 1)))[0 .. 10 - 1];
+    assigns (*(dest + (0 .. len / 40 - 1)))[0 .. 10 - 1], \result;
+    assigns (*(dest + (0 .. len / 40 - 1)))[0 .. 10 - 1]
+      \from (*(src + (0 .. len / 40 - 1)))[0 .. 10 - 1];
     assigns \result \from dest;
  */
 int (*memcpy_arr10_int(int (*dest)[10], int const (*src)[10], size_t len))[10]

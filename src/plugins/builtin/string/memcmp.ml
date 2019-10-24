@@ -43,8 +43,8 @@ let presult_memcmp ?loc p1 p2 len =
 
 let generate_assigns loc s1 s2 len =
   let indirect_range loc s len =
-    let t = { (tunref_range ~loc s len) with term_name = ["indirect"] } in
-    new_identified_term t
+    new_identified_term
+      { (tunref_range_bytes_len ~loc s len) with term_name = ["indirect"] }
   in
   let s1_range = indirect_range loc s1 len in
   let s2_range = indirect_range loc s2 len in

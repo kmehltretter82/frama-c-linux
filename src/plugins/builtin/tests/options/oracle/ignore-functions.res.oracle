@@ -26,8 +26,8 @@ void foo(void)
         \let __fc_len = len / 4;
         ∀ ℤ j0; 0 ≤ j0 < __fc_len ⇒ *(dest + j0) ≡ *(src + j0);
     ensures result: \result ≡ dest;
-    assigns *(dest + (0 .. len - 1)), \result;
-    assigns *(dest + (0 .. len - 1)) \from *(src + (0 .. len - 1));
+    assigns *(dest + (0 .. len / 4 - 1)), \result;
+    assigns *(dest + (0 .. len / 4 - 1)) \from *(src + (0 .. len / 4 - 1));
     assigns \result \from dest;
  */
 int *memcpy_int(int *dest, int const *src, size_t len)

@@ -3,22 +3,22 @@
 #include "stddef.h"
 #include "string.h"
 #include "strings.h"
-/*@ requires aligned_end: num % 4 ≡ 0;
+/*@ requires aligned_end: len % 4 ≡ 0;
     requires
-      valid_dest: \let __fc_len = num / 4; \valid(ptr + (0 .. __fc_len - 1));
+      valid_dest: \let __fc_len = len / 4; \valid(ptr + (0 .. __fc_len - 1));
     ensures
       set_content:
-        \let __fc_len = num / 4;
+        \let __fc_len = len / 4;
         ∀ ℤ j0; 0 ≤ j0 < __fc_len ⇒ *(ptr + j0) ≡ 0;
     ensures result: \result ≡ ptr;
-    assigns *(ptr + (0 .. num - 1)), \result;
-    assigns *(ptr + (0 .. num - 1)) \from \nothing;
+    assigns *(ptr + (0 .. len / 4 - 1)), \result;
+    assigns *(ptr + (0 .. len / 4 - 1)) \from \nothing;
     assigns \result \from ptr;
  */
-int *memset_int_0(int *ptr, size_t num)
+int *memset_int_0(int *ptr, size_t len)
 {
   int *__retres;
-  __retres = (int *)memset((void *)ptr,0,num);
+  __retres = (int *)memset((void *)ptr,0,len);
   return __retres;
 }
 

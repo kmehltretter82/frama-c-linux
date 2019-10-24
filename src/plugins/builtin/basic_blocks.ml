@@ -164,6 +164,16 @@ let unroll_logic_type = function
   | Ctype t -> Ctype (Cil.unrollType t)
   | t -> t
 
+let tunref_range_bytes_len ?loc ptr bytes_len =
+  let sizeof = sizeofpointed ptr.term_type in
+  if sizeof = 1 then
+    tunref_range ?loc ptr bytes_len
+  else
+    let sizeof = tinteger ?loc sizeof in
+    let len = tdivide ?loc bytes_len sizeof in
+    tunref_range ?loc ptr len
+
+
 (** Features related to predicates *)
 
 let plet_len_div_size ?loc ?name_ext t bytes_len pred =

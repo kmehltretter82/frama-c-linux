@@ -23,8 +23,8 @@ typedef int named;
           (∀ ℤ j0; 0 ≤ j0 < __fc_len ⇒ *(s1 + j0) ≡ *(s2 + j0));
     assigns \result;
     assigns \result
-      \from (indirect: *(s1 + (0 .. len - 1))),
-            (indirect: *(s2 + (0 .. len - 1)));
+      \from (indirect: *(s1 + (0 .. len / 4 - 1))),
+            (indirect: *(s2 + (0 .. len / 4 - 1)));
  */
 int memcmp_int(int const *s1, int const *s2, size_t len)
 {
@@ -61,8 +61,8 @@ int with_named(named * /*[10]*/ s1, named * /*[10]*/ s2)
           (∀ ℤ j0; 0 ≤ j0 < __fc_len ⇒ *(s1 + j0) ≡ *(s2 + j0));
     assigns \result;
     assigns \result
-      \from (indirect: *(s1 + (0 .. len - 1))),
-            (indirect: *(s2 + (0 .. len - 1)));
+      \from (indirect: *(s1 + (0 .. len / 8 - 1))),
+            (indirect: *(s2 + (0 .. len / 8 - 1)));
  */
 int memcmp_st_X(struct X const *s1, struct X const *s2, size_t len)
 {
@@ -92,8 +92,8 @@ int structure(struct X * /*[10]*/ s1, struct X * /*[10]*/ s2)
           (∀ ℤ j0; 0 ≤ j0 < __fc_len ⇒ *(s1 + j0) ≡ *(s2 + j0));
     assigns \result;
     assigns \result
-      \from (indirect: *(s1 + (0 .. len - 1))),
-            (indirect: *(s2 + (0 .. len - 1)));
+      \from (indirect: *(s1 + (0 .. len / 4 - 1))),
+            (indirect: *(s2 + (0 .. len / 4 - 1)));
  */
 int memcmp_ptr_int(int * const *s1, int * const *s2, size_t len)
 {
@@ -126,8 +126,8 @@ int pointers(int ** /*[10]*/ s1, int ** /*[10]*/ s2)
                 0 ≤ j1 < 10 ⇒ (*(s1 + j0))[j1] ≡ (*(s2 + j0))[j1]));
     assigns \result;
     assigns \result
-      \from (indirect: (*(s1 + (0 .. len - 1)))[0 .. 10 - 1]),
-            (indirect: (*(s2 + (0 .. len - 1)))[0 .. 10 - 1]);
+      \from (indirect: (*(s1 + (0 .. len / 40 - 1)))[0 .. 10 - 1]),
+            (indirect: (*(s2 + (0 .. len / 40 - 1)))[0 .. 10 - 1]);
  */
 int memcmp_arr10_int(int const (*s1)[10], int const (*s2)[10], size_t len)
 {
@@ -189,8 +189,8 @@ typedef int named;
              0 ≤ j0 < __fc_len ⇒ *(\old(s1) + j0) ≡ *(\old(s2) + j0));
     assigns \result;
     assigns \result
-      \from (indirect: *(s1 + (0 .. len - 1))),
-            (indirect: *(s2 + (0 .. len - 1)));
+      \from (indirect: *(s1 + (0 .. len / 4 - 1))),
+            (indirect: *(s2 + (0 .. len / 4 - 1)));
  */
 int memcmp_int(int const *s1, int const *s2, size_t len)
 {
@@ -230,8 +230,8 @@ int with_named(named *s1, named *s2)
              0 ≤ j0 < __fc_len ⇒ *(\old(s1) + j0) ≡ *(\old(s2) + j0));
     assigns \result;
     assigns \result
-      \from (indirect: *(s1 + (0 .. len - 1))),
-            (indirect: *(s2 + (0 .. len - 1)));
+      \from (indirect: *(s1 + (0 .. len / 8 - 1))),
+            (indirect: *(s2 + (0 .. len / 8 - 1)));
  */
 int memcmp_st_X(struct X const *s1, struct X const *s2, size_t len)
 {
@@ -263,8 +263,8 @@ int structure(struct X *s1, struct X *s2)
              0 ≤ j0 < __fc_len ⇒ *(\old(s1) + j0) ≡ *(\old(s2) + j0));
     assigns \result;
     assigns \result
-      \from (indirect: *(s1 + (0 .. len - 1))),
-            (indirect: *(s2 + (0 .. len - 1)));
+      \from (indirect: *(s1 + (0 .. len / 4 - 1))),
+            (indirect: *(s2 + (0 .. len / 4 - 1)));
  */
 int memcmp_ptr_int(int * const *s1, int * const *s2, size_t len)
 {
@@ -299,8 +299,8 @@ int pointers(int **s1, int **s2)
                 (*(\old(s1) + j0))[j1] ≡ (*(\old(s2) + j0))[j1]));
     assigns \result;
     assigns \result
-      \from (indirect: (*(s1 + (0 .. len - 1)))[0 .. 10 - 1]),
-            (indirect: (*(s2 + (0 .. len - 1)))[0 .. 10 - 1]);
+      \from (indirect: (*(s1 + (0 .. len / 40 - 1)))[0 .. 10 - 1]),
+            (indirect: (*(s2 + (0 .. len / 40 - 1)))[0 .. 10 - 1]);
  */
 int memcmp_arr10_int(int const (*s1)[10], int const (*s2)[10], size_t len)
 {

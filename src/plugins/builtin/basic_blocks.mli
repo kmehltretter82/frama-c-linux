@@ -71,6 +71,11 @@ val cvar_to_tvar: varinfo -> term
 (** [tunref_range ~loc ptr len] builds [*(ptr + (0 .. len-1))] *)
 val tunref_range: ?loc:location -> term -> term -> term
 
+(** [tunref_range ~loc ptr bytes_len] same as [tunref_range] except that length
+    is provided in bytes.
+*)
+val tunref_range_bytes_len: ?loc:location -> term -> term -> term
+
 (** [tplus ~loc t1 t2] builds [t1+t2] *)
 val tplus: ?loc:location -> term -> term -> term
 
@@ -162,11 +167,11 @@ val punfold_flexible_struct_pred:
 val pvalid_len_bytes: ?loc:location -> logic_label -> term -> term -> predicate
 
 (** [pvalid_read_len_bytes ~loc label ptr bytes_len] generates a predicate
-  - [\valid_read{label}(ptr + (0 .. (len_bytes/sizeof(\*ptr))))].
+    - [\valid_read{label}(ptr + (0 .. (len_bytes/sizeof(\*ptr))))].
 
-  Parameters:
-  - [ptr] must be a term of pointer type.
- *)
+    Parameters:
+    - [ptr] must be a term of pointer type.
+*)
 val pvalid_read_len_bytes:
   ?loc:location -> logic_label -> term -> term -> predicate
 
@@ -187,11 +192,11 @@ val pseparated_memories:
 (** {2 Specification} *)
 
 (** Builds a behavior from its components. If a component is missing,
-  it defaults to:
-  - [name]: [Cil.default_behavior_name]
-  - [requires], [ensures], [extension]: [[]]
-  - [assigns]: = [WritesAny]
-  - [alloc]: [FreeAllocAny]
+    it defaults to:
+    - [name]: [Cil.default_behavior_name]
+    - [requires], [ensures], [extension]: [[]]
+    - [assigns]: = [WritesAny]
+    - [alloc]: [FreeAllocAny]
 *)
 val make_behavior:
   ?name:string ->

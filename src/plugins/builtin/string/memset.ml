@@ -133,7 +133,7 @@ let generate_requires loc ptr value len =
 
 let generate_assigns loc t ptr value len =
   let open Extlib in
-  let ptr_range = new_identified_term (tunref_range ~loc ptr len) in
+  let ptr_range = new_identified_term (tunref_range_bytes_len ~loc ptr len) in
   let value = list_of_opt (opt_map new_identified_term value) in
   let set = ptr_range, From value in
   let result = new_identified_term (tresult t) in
@@ -210,14 +210,14 @@ let char_prototype t =
   let params = [
     ("ptr", ptr_of t, []) ;
     ("value", base_char_type t, []) ;
-    ("num", size_t(), [])
+    ("len", size_t(), [])
   ] in
   TFun (ptr_of t, Some params, false, [])
 
 let non_char_prototype t =
   let params = [
     ("ptr", (ptr_of t), []) ;
-    ("num", size_t(), [])
+    ("len", size_t(), [])
   ] in
   TFun ((ptr_of t), Some params, false, [])
 
