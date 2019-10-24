@@ -7,22 +7,26 @@ struct X {
 
 typedef int named ;
 
-int integer(int src[10], int dest[10]){
-  return memcmp(dest, src, 10 * sizeof(int));
+int integer(int s1[10], int s2[10]){
+  return memcmp(s1, s2, 10 * sizeof(int));
 }
 
-int with_named(named src[10], named dest[10]){
-  return memcmp(dest, src, 10 * sizeof(named));
+int with_named(named s1[10], named s2[10]){
+  return memcmp(s1, s2, 10 * sizeof(named));
 }
 
-int structure(struct X src[10], struct X dest[10]){
-  return memcmp(dest, src, 10 * sizeof(struct X));
+int structure(struct X s1[10], struct X s2[10]){
+  return memcmp(s1, s2, 10 * sizeof(struct X));
 }
 
-int pointers(int* src[10], int* dest[10]){
-  return memcmp(dest, src, 10 * sizeof(int*));
+int pointers(int* s1[10], int* s2[10]){
+  return memcmp(s1, s2, 10 * sizeof(int*));
 }
 
-int nested(int (*src)[10], int (*dest)[10], int n){
-  return memcmp(dest, src, n * sizeof(int[10]));
+int nested(int (*s1)[10], int (*s2)[10], int n){
+  return memcmp(s1, s2, n * sizeof(int[10]));
+}
+
+int with_void(void *s1, void *s2, int n){
+  return memcmp(s1, s2, 10) ;
 }

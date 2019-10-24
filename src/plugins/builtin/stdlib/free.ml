@@ -83,7 +83,9 @@ let generate_prototype alloc_t =
 
 let well_typed_call _ret args =
   match args with
-  | [ ptr ] -> Cil.isPointerType (Cil.typeOf ptr)
+  | [ ptr ] ->
+    let t = Cil.typeOf (Cil.stripCasts ptr) in
+    Cil.isPointerType t && not (Cil.isVoidPtrType t)
   | _ -> false
 
 let key_from_call _ret args =

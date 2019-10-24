@@ -190,6 +190,7 @@ let is_union_type = function
 let well_typed_call _ret = function
   | [ ptr ; _ ; _ ] when any_char_composed_type (type_from_arg ptr) -> true
   | [ ptr ; _ ; _ ] when is_union_type (type_from_arg ptr) -> false
+  | [ ptr ; _ ; _ ] when Cil.isVoidType (type_from_arg ptr) -> false
   | [ _ ; value ; _ ] ->
     begin match memset_value value with
       | None -> false

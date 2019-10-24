@@ -77,3 +77,8 @@ void nested(int (*dest)[10], int n){
   int (*res) [10] = memset(dest, 0xFF, n * sizeof(int[10]));
   memset(res, 0xFF, n * sizeof(int[10]));
 }
+
+void with_void(void* dest){
+  void* res = memset(dest, 0xFF, 10);
+  memset(res, 0xFF, 10);
+}

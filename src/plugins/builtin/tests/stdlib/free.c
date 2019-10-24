@@ -9,3 +9,6 @@ void bar(float * x){
 void baz(int (*x) [10]){
   free(x);
 }
+void with_void(void * x){
+  free(x);
+}

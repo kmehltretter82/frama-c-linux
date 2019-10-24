@@ -16,8 +16,7 @@ int main(void){
   float* pf = calloc(10, sizeof(float)) ;
   struct X* px = calloc(10, sizeof(struct X)) ;
   char* pc = calloc(10, sizeof(char)) ;
-
   int (*pa) [10] = calloc(10, sizeof(int[10])) ;
-
   struct Flex* f = calloc(1, sizeof(struct Flex) + 3 * sizeof(int)) ;
+  void *v = calloc(10, sizeof(char));
 }

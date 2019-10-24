@@ -99,7 +99,8 @@ let type_from_arg x =
 let well_typed_call _ret = function
   | [ s1 ; s2 ; len ] ->
     (Cil.isIntegralType (Cil.typeOf len)) &&
-    (Cil_datatype.Typ.equal (type_from_arg s1) (type_from_arg s2))
+    (Cil_datatype.Typ.equal (type_from_arg s1) (type_from_arg s2)) &&
+    (not (Cil.isVoidType (type_from_arg s1)))
   | _ -> false
 
 let key_from_call _ret = function

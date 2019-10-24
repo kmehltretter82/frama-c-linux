@@ -131,7 +131,9 @@ let generate_prototype alloc_type =
 
 let well_typed_call ret args =
   match ret, args with
-  | Some ret, [ _ ; _ ] -> Cil.isPointerType (Cil.typeOfLval ret)
+  | Some ret, [ _ ; _ ] ->
+    let t = Cil.typeOfLval ret in
+    Cil.isPointerType t && not (Cil.isVoidPtrType t)
   | _ -> false
 
 let key_from_call ret _ =

@@ -16,8 +16,7 @@ int main(void){
   float* pf = malloc(sizeof(float) * 10) ;
   struct X* px = malloc(sizeof(struct X) * 10) ;
   char* pc = malloc(10) ;
-
   int (*pa) [10] = malloc(sizeof(int[10]) * 10) ;
-
   struct Flex* f = malloc(sizeof(struct Flex) + 3 * sizeof(int)) ;
+  void *v = malloc(sizeof(char) * 10);
 }

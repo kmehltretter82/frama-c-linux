@@ -31,3 +31,8 @@ void nested(int (*src)[10], int (*dest)[10], int n){
   int (*res) [10] = memmove(dest, src, n * sizeof(int[10]));
   memmove(src, res, n * sizeof(int[10]));
 }
+
+void with_void(void *src, void *dest, int n){
+  void *res = memmove(dest, src, n);
+  memmove(src, res, n);
+}

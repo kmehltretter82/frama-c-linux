@@ -31,3 +31,8 @@ void nested(int (*src)[10], int (*dest)[10], int n){
   int (*res) [10] = memcpy(dest, src, n * sizeof(int[10]));
   memcpy(src, res, n * sizeof(int[10]));
 }
+
+void with_void(void *src, void *dest, int n){
+  void *res = memcpy(dest, src, n);
+  memcpy(src, res, n);
+}
