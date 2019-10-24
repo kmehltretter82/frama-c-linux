@@ -87,9 +87,6 @@ let generate_prototype t =
   let name = function_name ^ "_" ^ (string_of_typ t) in
   name, fun_type
 
-let args_for_original _t fd =
-  List.map Cil.evar fd.sformals
-
 let type_from_arg x =
   let x = Cil.stripCasts x in
   let xt = Cil.unrollTypeDeep (Cil.typeOf x) in
@@ -117,6 +114,8 @@ let retype_args override_key = function
     ) ;
     [ dest ; src ; len ]
   | _ -> failwith "Call to Memmove.retype_args on an ill-typed builtin call"
+
+let args_for_original _t args = args
 
 let () = Transform.register (module struct
     module Hashtbl = Cil_datatype.Typ.Hashtbl

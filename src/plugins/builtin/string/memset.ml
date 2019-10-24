@@ -250,12 +250,12 @@ let retype_args (t, e) args =
   | _ ->
     failwith "Call to Memset.retype_args on an ill-typed builtin call"
 
-let args_for_original (_t , e) fd =
+let args_for_original (_t , e) args =
   match e with
-  | None -> List.map Cil.evar fd.sformals
+  | None -> args
   | Some n ->
     let loc = Cil_datatype.Location.unknown in
-    match List.map Cil.evar fd.sformals with
+    match args with
     | [ ptr ; len ] -> [ ptr ; (Cil.integer ~loc n) ; len]
     | _ -> assert false
 

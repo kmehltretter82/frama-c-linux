@@ -98,8 +98,7 @@ let key_from_call _ret args =
   | _ -> assert false
 
 let retype_args _typ args = List.map Cil.stripCasts args
-let args_for_original _typ fd =
-  List.map Cil.evar fd.sformals
+let args_for_original _typ args = args
 
 let () = Transform.register (module struct
     module Hashtbl = Cil_datatype.Typ.Hashtbl

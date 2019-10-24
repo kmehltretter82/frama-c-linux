@@ -31,9 +31,9 @@ module type Generator_sig = sig
   val well_typed_call: lval option -> exp list -> bool
   val key_from_call: lval option -> exp list -> override_key
   val retype_args: override_key -> exp list -> exp list
+  val args_for_original: override_key -> exp list -> exp list
   val generate_prototype: override_key -> (string * typ)
   val generate_spec: override_key -> fundec -> location -> funspec
-  val args_for_original: override_key -> fundec -> exp list
 end
 
 module type Builtin = sig
@@ -58,7 +58,8 @@ let build_body caller callee args_generator =
     | t -> Some (Cil.makeLocalVar caller "__retres" t)
   in
   let call =
-    let args = args_generator caller in
+    let args = List.map Cil.evar caller.sformals in
+    let args = args_generator args in
     Cil.mkStmt (Instr(call_function (opt_map Cil.var ret_var) callee args))
   in
   let ret = Cil.mkStmt (Return ( (opt_map Cil.evar ret_var), loc)) in
