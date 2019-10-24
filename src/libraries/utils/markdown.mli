@@ -109,6 +109,9 @@ val code: string -> text
 (** Image *)
 val image: alt:string -> file:string -> text
 
+(** Href link *)
+val href: ?text:text -> href -> text
+
 (** Local links *)
 val link: ?text:text -> ?page:string -> ?name:string -> unit -> text
 

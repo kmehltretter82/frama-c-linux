@@ -108,11 +108,9 @@ let pages_of_chapter c =
 
 let table_of_chapter c =
   [H2 (Markdown.plain (title_of_chapter c), None);
-   Block
-     [UL
-        (List.map
-           (fun p -> [Text [Link(Markdown.plain p.title, Page p.path)]])
-           (pages_of_chapter c))]]
+   Block (list (List.map
+                  (fun p -> text (link ~text:(plain p.title) ~page:p.path ()))
+                  (pages_of_chapter c)))]
 
 let table_of_contents () =
   table_of_chapter `Protocol @
@@ -124,7 +122,7 @@ let table_of_contents () =
 
 let index () =
   List.map
-    (fun (title,entry) -> Markdown.Link(plain title, entry))
+    (fun (title,entry) -> Markdown.href ~text:(plain title) entry)
     (List.sort (fun (a,_) (b,_) -> String.compare a b) !entries)
 
 let link ~toc ~title ~href : json =
@@ -191,12 +189,12 @@ let dump ~root ?(meta=true) () =
       Yojson.Basic.to_file path maindata ;
       let body =
         [ H1 (plain "Documentation", None);
-          Block [Text [Bold "Version"; Plain Config.version]]]
+          Block (text (format "Version %s" Config.version))]
         @
         table_of_contents ()
         @
         [H2 (plain "Index", None);
-         Block [UL (List.map (fun i -> [Text [i]]) (index ()))]]
+         Block (list (List.map text (index ())))]
       in
       let title = "Documentation" in
       pp_one_page ~root ~page:"readme.md" ~title body

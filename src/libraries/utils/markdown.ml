@@ -97,17 +97,17 @@ let format txt = Format.kasprintf plain txt
 
 let image ~alt ~file = [Image(alt,file)]
 
-let mklink ?text href =
+let href ?text href =
   let txt =
     match text with Some txt -> txt | None ->
       let tt = match href with URL u -> u | Page p -> p | Section(_,s) -> s in
       [Inline_code tt]
   in [Link(txt, href)]
 
-let url ?text href = mklink ?text (URL href)
+let url ?text addr = href ?text (URL addr)
 
 let link ?text ?page ?name () =
-  mklink ?text @@ match page, name with
+  href ?text @@ match page, name with
   | None, None -> Page ""
   | Some p, None -> Page p
   | None, Some a -> Section("",a)

@@ -513,8 +513,7 @@ struct
     let header = [ plain E.name, Left; plain "Description", Left ] in
     let content =
       List.map
-        (fun (_,tag,descr) ->
-           [ [Markdown.Inline_code (Printf.sprintf "%S" tag)] ; descr ])
+        (fun (_,tag,descr) -> [ format "`%S`" tag ; descr ])
         E.values
     in
     Table { caption; header; content }

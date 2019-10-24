@@ -74,7 +74,7 @@ let plural l s =
 let get_eva_domains () =
   Extlib.filter_map
     (fun (x,_) -> Dynamic.Parameter.Bool.get x ())
-    (fun (x,y) -> ([Plain "option"; Bold x], plain y))
+    (fun (x,y) -> (plain "option" @ bold x), plain y)
     all_eva_domains
 
 let section_domains env =
@@ -138,7 +138,7 @@ let section_stubs env =
                  Printer.pp_funspec (Annotations.funspec kf) in
              Block ( intro @ funspec ) :: insert_remark env anchor
          in
-         H4 ([Inline_code s], Some anchor) :: content)
+         H4 (code s, Some anchor) :: content)
       l
   in
   let describe_func kf =
@@ -155,7 +155,7 @@ let section_stubs env =
             Printer.pp_global (GFun (Kernel_function.get_definition kf,loc)) in
         Block ( intro @ fundecl ) :: insert_remark env anchor
     in
-    H4 ([Inline_code name], Some anchor) :: content
+    H4 (code name, Some anchor) :: content
   in
   let content =
     if stubbed_kf <> [] then begin
@@ -240,7 +240,7 @@ let gen_inputs env =
          plain "that have been considered during the analysis \
                 are the following:"
         );
-      UL (List.map (fun x -> [Text [ Inline_code x ]]) (get_files()));
+      UL (List.map (fun x -> text @@ code x) (get_files()));
     ]]
 
 let gen_config env =
@@ -339,12 +339,7 @@ let make_events_table print_kind caption events =
     in
     let line =
       [ plain (string_of_pos_opt evt_source);
-        [ Inline_code evt_message;
-          Plain "(emitted by";
-          Inline_code evt_plugin;
-          Plain ")"
-        ]
-      ]
+        format "`%s` (emitted by `%s`)" evt_message evt_plugin ]
     in
     if print_kind then plain (kind evt_kind) :: line else line
   in
@@ -412,15 +407,14 @@ let gen_section_warnings env =
           [ Comment "you can comment on each individual error" ]
         else
           [
-            Block [
-              Text [Bold "Important warning:";
-                    Plain "Frama-C did not complete its execution ";
-                    Plain "successfully. Analysis results may be inaccurate.";
-                    Plain ((plural errs "The error") ^ " listed below must be");
-                    Plain "fixed first before examining other ";
-                    Plain "warnings and alarms."
-                   ];
-            ];
+            Block ( text @@ glue [
+                bold "Important warning:";
+                plain "Frama-C did not complete its execution ";
+                plain "successfully. Analysis results may be inaccurate.";
+                plain ((plural errs "The error") ^ " listed below must be");
+                plain "fixed first before examining other ";
+                plain "warnings and alarms."
+              ] ) ;
             make_errors_table errs
           ]
       in
@@ -434,22 +428,20 @@ let gen_section_warnings env =
       if env.is_draft then
         [Comment "you can comment on each individual error"]
       else
-        [
-          Block [
-            Text [
-              Plain ("The table below lists the " ^ plural warnings "warning");
-              Plain "that have been emitted by the analyzer.";
-              Plain "They might put additional assumptions on the relevance";
-              Plain "of the analysis results and must be reviewed carefully";
-            ];
-            Text (
-              plain "Note that this does not take into account emitted alarms:"@
-              plain "they are reported in"@
-              Markdown.link ~text:(plain "the next section") ~name:"alarms" ()
-            )
-          ];
-          make_warnings_table warnings
-        ]
+        [Block (
+            (text @@ glue [
+                plain ("The table below lists the " ^ plural warnings "warning");
+                plain "that have been emitted by the analyzer.";
+              plain "They might put additional assumptions on the relevance";
+              plain "of the analysis results and must be reviewed carefully";
+              ]) @
+            (text @@ glue [
+                plain "Note that this does not take into account emitted alarms:";
+                plain "they are reported in";
+                link ~text:(plain "the next section") ~name:"alarms" ()
+              ])
+          );
+         make_warnings_table warnings ]
     in
     error_section @
     H1 (plain "Warnings", Some "warnings")
@@ -492,15 +484,13 @@ let gen_section_alarms env =
       if env.is_draft then
         Comment "No alarm!" :: insert_marks env anchor
       else
-        Block [
-          Text
-            [ Bold "No alarm"; Plain "was found during the analysis";
-              Plain "Any execution starting from";
-              Inline_code (Kernel.MainFunction.get_function_name ());
-              Plain "in a context matching the one used for the analysis";
-              Plain "will be immune from any undefined behavior."
-            ]
-        ]
+        Block (text @@ glue [
+            bold "No alarm"; plain "was found during the analysis";
+            plain "Any execution starting from";
+            code (Kernel.MainFunction.get_function_name ());
+            plain "in a context matching the one used for the analysis";
+            plain "will be immune from any undefined behavior."
+          ])
         :: insert_remark env anchor
     in
     H1 (plain "Results of the analysis", Some anchor) :: text_content
@@ -521,18 +511,16 @@ let gen_section_alarms env =
       if env.is_draft then begin
         sections
       end else begin
-        Block [
-          Text
-            [ Plain ("The table below lists the " ^ alarm);
-              Plain "that have been emitted during the analysis.";
-              Plain "Any execution starting from";
-              Inline_code (Kernel.MainFunction.get_function_name());
-              Plain "in a context matching the one used for the analysis";
-              Plain "will be immune from any other undefined behavior.";
-              Plain "More information on each individual alarm is";
-              Plain "given in the remainder of this section"
-            ]
-        ] ::
+        Block (text @@ glue [
+            plain ("The table below lists the " ^ alarm);
+            plain "that have been emitted during the analysis.";
+            plain "Any execution starting from";
+            code (Kernel.MainFunction.get_function_name());
+            plain "in a context matching the one used for the analysis";
+            plain "will be immune from any other undefined behavior.";
+            plain "More information on each individual alarm is";
+            plain "given in the remainder of this section"
+          ]) ::
         Table { content; caption; header } ::
         sections
       end
