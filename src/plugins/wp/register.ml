@@ -905,15 +905,16 @@ let do_prover_detect () =
     else
       let open Why3.Whyconf in
       let shortcuts = get_prover_shortcuts (Why3Provers.config ()) in
+      let print_prover_shortcuts_for fmt p =
+        Why3.Wstdlib.Mstr.iter
+          (fun name p' -> if Prover.equal p p' then
+              Format.fprintf fmt "%s|" name)
+          shortcuts in
       List.iter
         (fun p ->
-           Wp_parameters.result "Prover %10s %-10s %s [%t%a]"
-             p.prover_name p.prover_version p.prover_altern
-             (fun fmt ->
-                Why3.Wstdlib.Mstr.iter
-                  (fun name p' -> if Prover.equal p p' then
-                      Format.fprintf fmt "%s," name)
-                  shortcuts)
+           Wp_parameters.result "Prover %10s %-6s [%a%a]"
+             p.prover_name p.prover_version
+             print_prover_shortcuts_for p
              print_prover_parseable_format p
         ) provers
 
