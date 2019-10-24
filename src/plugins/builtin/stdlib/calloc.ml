@@ -27,9 +27,8 @@ open Logic_const
 
 let function_name = "calloc"
 
-let pset_len_to_zero ?loc ptr_type len =
-  let result = tresult ?loc ptr_type in
-  let eq_value ?loc t =
+let pset_len_to_zero ?loc alloc_type num size =
+  let eq_simpl_value ?loc t =
     let value = match t.term_type with
       | Ctype(TPtr(_)) -> term Tnull t.term_type
       | Ctype(TFloat(_)) -> treal ?loc 0.
@@ -38,72 +37,91 @@ let pset_len_to_zero ?loc ptr_type len =
     in
     prel ?loc (Req, t, value)
   in
-  let p = punfold_all_elems_pred ?loc result len eq_value in
+  let ptr_type = ptr_of alloc_type in
+  let result = tresult ?loc ptr_type in
+  let p = if Cil.has_flexible_array_member alloc_type then
+      let access = Cil.mkTermMem ~addr:result ~off:TNoOffset in
+      let access = term ?loc (TLval access) (Ctype alloc_type) in
+      (* Note: calloc with flexible array member assumes num == 1 *)
+      punfold_flexible_struct_pred ?loc access size eq_simpl_value
+
+    else
+      punfold_all_elems_pred ?loc result num eq_simpl_value
+  in
   new_predicate { p with pred_name = [ "zero_initialization" ] }
 
-let generate_requires ?loc alloc_typ num size =
-  let only_one = if Cil.has_flexible_array_member alloc_typ then
-    let p = prel ?loc (Req, num, Cil.lone ?loc ()) in
-    Some (new_predicate { p with pred_name = ["only_one"] })
-  else
-    None
+let generate_requires ?loc alloc_type num size =
+  let only_one = if Cil.has_flexible_array_member alloc_type then
+      let p = prel ?loc (Req, num, Cil.lone ?loc ()) in
+      Some (new_predicate { p with pred_name = ["only_one"] })
+    else
+      None
   in
-  [ valid_size ?loc alloc_typ size ] @ (Extlib.list_of_opt only_one)
+  [ valid_size ?loc alloc_type size ] @ (Extlib.list_of_opt only_one)
 
-let pinitialized_len ?loc ptr_type len =
-  let result = tresult ?loc ptr_type in
+let pinitialized_len ?loc alloc_type num size =
+  let result = tresult ?loc (ptr_of alloc_type) in
   let initialized ?loc t = pinitialized ?loc (here_label, t) in
-  let p = punfold_all_elems_pred ?loc result len initialized in
+  let p = if Cil.has_flexible_array_member alloc_type then
+      let access = Cil.mkTermMem ~addr:result ~off:TNoOffset in
+      let access = term ?loc (TLval access) (Ctype alloc_type) in
+      (* Note: calloc with flexible array member assumes num == 1 *)
+      punfold_flexible_struct_pred ?loc access size initialized
+    else
+      punfold_all_elems_pred ?loc result num initialized
+  in
   new_predicate { p with pred_name = [ "initialization" ] }
 
-let generate_global_assigns loc ptr_type num size =
-  let assigns_result = assigns_result ~loc ptr_type [ num ; size ] in
+let generate_global_assigns loc alloc_type num size =
+  let assigns_result = assigns_result ~loc (ptr_of alloc_type) [ num ; size ] in
   let assigns_heap = assigns_heap [ num ; size ] in
   Writes [ assigns_result ; assigns_heap ]
 
-let make_behavior_allocation loc ptr_type num size =
+let make_behavior_allocation loc alloc_type num size =
+  let ptr_type = ptr_of alloc_type in
   let len = term ~loc (TBinOp(Mult, num, size)) Linteger in
   let assumes = [ is_allocable ~loc len ] in
-  let assigns = generate_global_assigns loc ptr_type num size in
+  let assigns = generate_global_assigns loc alloc_type num size in
   let alloc   = allocates_result ~loc ptr_type in
   let ensures = [
     Normal, fresh_result ~loc ptr_type len ;
-    Normal, pset_len_to_zero ~loc ptr_type num ;
-    Normal, pinitialized_len ~loc ptr_type num
+    Normal, pset_len_to_zero ~loc alloc_type num size ;
+    Normal, pinitialized_len ~loc alloc_type num size
   ] in
   make_behavior ~name:"allocation" ~assumes ~assigns ~alloc ~ensures ()
 
-let make_behavior_no_allocation loc ptr_type num size =
+let make_behavior_no_allocation loc alloc_type num size =
   let len = term ~loc (TBinOp(Mult, num, size)) Linteger in
+  let ptr_type = ptr_of alloc_type in
   let assumes = [ isnt_allocable ~loc len ] in
   let assigns = Writes [assigns_result ~loc ptr_type []] in
   let ensures = [ Normal, null_result ~loc ptr_type ] in
   let alloc = allocates_nothing () in
   make_behavior ~name:"no_allocation" ~assumes ~assigns ~ensures ~alloc ()
 
-let generate_spec alloc_typ { svar = vi } loc =
+let generate_spec alloc_type { svar = vi } loc =
   let (cnum, csize) = match Cil.getFormalsDecl vi with
     | [ cnum ; csize ] -> cnum, csize
     | _ -> assert false
   in
   let num = tlogic_coerce ~loc (cvar_to_tvar cnum) Linteger in
   let size = tlogic_coerce ~loc (cvar_to_tvar csize) Linteger in
-  let requires = generate_requires ~loc alloc_typ num size in
-  let assigns = generate_global_assigns loc (ptr_of alloc_typ) num size in
-  let alloc = allocates_result ~loc (ptr_of alloc_typ) in
+  let requires = generate_requires ~loc alloc_type num size in
+  let assigns = generate_global_assigns loc alloc_type num size in
+  let alloc = allocates_result ~loc (ptr_of alloc_type) in
   make_funspec [
     make_behavior ~requires ~assigns ~alloc () ;
-    make_behavior_allocation loc (ptr_of alloc_typ) num size ;
-    make_behavior_no_allocation loc (ptr_of alloc_typ) num size
+    make_behavior_allocation loc alloc_type num size ;
+    make_behavior_no_allocation loc alloc_type num size
   ] ()
 
-let generate_prototype alloc_t =
-  let name = function_name ^ "_" ^ (string_of_typ alloc_t) in
+let generate_prototype alloc_type =
+  let name = function_name ^ "_" ^ (string_of_typ alloc_type) in
   let params = [
     ("num", size_t (), []) ;
     ("size", size_t (), [])
   ] in
-  name, (TFun((ptr_of alloc_t), Some params, false, []))
+  name, (TFun((ptr_of alloc_type), Some params, false, []))
 
 let well_typed_call ret args =
   match ret, args with

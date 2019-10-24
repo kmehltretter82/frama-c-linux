@@ -49,12 +49,16 @@ val punfold_all_elems_eq: ?loc:location -> term -> term -> term -> predicate
 val punfold_all_elems_pred:
   ?loc:location -> term -> term ->
   (?loc: location -> term -> predicate) -> predicate
+val punfold_flexible_struct_pred:
+  ?loc:location -> term -> term ->
+  (?loc: location -> term -> predicate) -> predicate
 
 val pseparated_memories:
   ?loc:location -> term -> term -> term -> term -> predicate
 
 val plet_len_div_size:
-  ?loc:location -> logic_type -> term -> (term -> predicate) -> predicate
+  ?loc:location -> ?name_ext:string ->
+  logic_type -> term -> (term -> predicate) -> predicate
 
 val make_behavior:
   ?name:string ->

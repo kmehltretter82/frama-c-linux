@@ -75,8 +75,8 @@ let rec string_of_typ_aux = function
 and string_of_typ t = string_of_typ_aux (Cil.unrollType t)
 and string_of_exp e = Format.asprintf "%a" Cil_printer.pp_exp e
 
-let size_var t value = {
-  l_var_info = make_logic_var_local "__fc_len" t;
+let size_var ?(name_ext="") t value = {
+  l_var_info = make_logic_var_local ("__fc_" ^ name_ext ^ "len") t;
   l_type = Some t;
   l_tparams = [];
   l_labels = [];
@@ -154,19 +154,23 @@ let sizeofpointed = function
   | Ctype(TPtr(t, _)) | Ctype(TArray(t, _, _, _)) -> Cil.bytesSizeOf t
   | _ -> assert false
 
+let sizeof = function
+  | Ctype t -> Cil.bytesSizeOf t
+  | _ -> assert false
+
 let unroll_logic_type = function
   | Ctype t -> Ctype (Cil.unrollType t)
   | t -> t
 
 (** Features related to predicates *)
 
-let plet_len_div_size ?loc t bytes_len pred =
+let plet_len_div_size ?loc ?name_ext t bytes_len pred =
   let sizeof = sizeofpointed t in
   if sizeof = 1 then
     pred bytes_len
   else
     let len = tdivide ?loc bytes_len (tinteger ?loc sizeof) in
-    let len_var = size_var Linteger len in
+    let len_var = size_var ?name_ext Linteger len in
     plet ?loc len_var (pred (tvar len_var.l_var_info))
 
 let pgeneric_valid_buffer ?loc validity lbl ptr len =
@@ -217,23 +221,45 @@ and pall_elems_pred ?loc depth t1 len pred =
   let t1_acc = taccess ?loc t1 tind in
   let eq = punfold_pred ?loc depth t1_acc pred in
   pforall ?loc ([ind], (pimplies ?loc (bounds, eq)))
-and pall_fields_pred ?loc depth t1 ci pred =
-  let eq fi =
-    let lval = match t1.term_node with TLval(lv) -> lv | _ -> assert false in
-    let nlval = addTermOffsetLval (TField(fi, TNoOffset)) lval in
-    let term = term ?loc (TLval nlval) (Ctype fi.ftype) in
-    punfold_pred ?loc depth term pred
-  in
-  let eqs = List.map eq ci.cfields in
-  pands eqs
-and punfold_pred ?loc depth t1 pred =
+and punfold_pred ?loc ?(dyn_len = None) depth t1 pred =
   match unroll_logic_type t1.term_type with
-  | Ctype(TArray(_, Some len, _, _)) ->
-    let len = Logic_utils.expr_to_term ~cast:false len in
+  | Ctype(TArray(_, opt_len, _, _)) ->
+    let len = match opt_len, dyn_len with
+      | Some len, None -> Logic_utils.expr_to_term ~cast:false len
+      | _   , Some len -> len
+      | None, None -> assert false
+    in
     pall_elems_pred ?loc (depth+1) t1 len pred
   | Ctype(TComp(ci, _, _)) ->
     pall_fields_pred ?loc depth t1 ci pred
   | _ -> pred ?loc t1
+and pall_fields_pred ?loc ?(flex_mem_len=None) depth t1 ci pred =
+  let eq dyn_len fi =
+    let lval = match t1.term_node with TLval(lv) -> lv | _ -> assert false in
+    let nlval = addTermOffsetLval (TField(fi, TNoOffset)) lval in
+    let term = term ?loc (TLval nlval) (Ctype fi.ftype) in
+    punfold_pred ?loc ~dyn_len depth term pred
+  in
+  let rec eqs_fields = function
+    | [ x ] -> [ eq flex_mem_len x ]
+    | x :: l -> let x' = eq None x in x' :: (eqs_fields l)
+    | _ -> assert false
+  in
+  pands (eqs_fields ci.cfields)
+
+let punfold_flexible_struct_pred ?loc the_struct bytes_len pred =
+  let struct_len = tinteger ?loc (sizeof the_struct.term_type) in
+  let ci = match the_struct.term_type with
+    | Ctype(TComp(ci, _, _) as t) when Cil.has_flexible_array_member t -> ci
+    | _ -> assert false
+  in
+  let flex_type = Ctype (Extlib.last ci.cfields).ftype in
+  let flex_len = tminus bytes_len struct_len in
+  let pall_fields_pred len =
+    pall_fields_pred ?loc ~flex_mem_len:(Some len) 0 the_struct ci pred
+  in
+  plet_len_div_size ?loc ~name_ext:"flex" flex_type flex_len pall_fields_pred
+
 
 let pseparated_memories ?loc p1 len1 p2 len2 =
   let b1 = tbuffer_range ?loc p1 len1 in
