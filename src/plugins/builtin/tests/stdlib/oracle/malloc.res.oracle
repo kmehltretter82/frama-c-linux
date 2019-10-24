@@ -35,7 +35,7 @@ struct Flex {
     complete behaviors no_allocation, allocation;
     disjoint behaviors no_allocation, allocation;
  */
-struct Flex *malloc_Flex(size_t size)
+struct Flex *malloc_st_Flex(size_t size)
 {
   struct Flex *__retres;
   __retres = (struct Flex *)malloc(size);
@@ -128,7 +128,7 @@ char *malloc_char(size_t size)
     complete behaviors no_allocation, allocation;
     disjoint behaviors no_allocation, allocation;
  */
-struct X *malloc_X(size_t size)
+struct X *malloc_st_X(size_t size)
 {
   struct X *__retres;
   __retres = (struct X *)malloc(size);
@@ -202,11 +202,11 @@ int main(void)
   int __retres;
   int *pi = malloc_int(sizeof(int) * (unsigned int)10);
   float *pf = malloc_float(sizeof(float) * (unsigned int)10);
-  struct X *px = malloc_X(sizeof(struct X) * (unsigned int)10);
+  struct X *px = malloc_st_X(sizeof(struct X) * (unsigned int)10);
   char *pc = malloc_char((unsigned int)10);
   int (*pa)[10] = malloc_arr10_int(sizeof(int [10]) * (unsigned int)10);
   struct Flex *f =
-    malloc_Flex(sizeof(struct Flex) + (unsigned int)3 * sizeof(int));
+    malloc_st_Flex(sizeof(struct Flex) + (unsigned int)3 * sizeof(int));
   void *v = malloc(sizeof(char) * (unsigned int)10);
   __retres = 0;
   return __retres;
@@ -252,7 +252,7 @@ struct Flex {
     complete behaviors no_allocation, allocation;
     disjoint behaviors no_allocation, allocation;
  */
-struct Flex *malloc_Flex(size_t size)
+struct Flex *malloc_st_Flex(size_t size)
 {
   struct Flex *__retres;
   __retres = (struct Flex *)malloc(size);
@@ -345,7 +345,7 @@ char *malloc_char(size_t size)
     complete behaviors no_allocation, allocation;
     disjoint behaviors no_allocation, allocation;
  */
-struct X *malloc_X(size_t size)
+struct X *malloc_st_X(size_t size)
 {
   struct X *__retres;
   __retres = (struct X *)malloc(size);
@@ -419,11 +419,11 @@ int main(void)
   int __retres;
   int *pi = malloc_int(sizeof(int) * (unsigned int)10);
   float *pf = malloc_float(sizeof(float) * (unsigned int)10);
-  struct X *px = malloc_X(sizeof(struct X) * (unsigned int)10);
+  struct X *px = malloc_st_X(sizeof(struct X) * (unsigned int)10);
   char *pc = malloc_char((unsigned int)10);
   int (*pa)[10] = malloc_arr10_int(sizeof(int [10]) * (unsigned int)10);
   struct Flex *f =
-    malloc_Flex(sizeof(struct Flex) + (unsigned int)3 * sizeof(int));
+    malloc_st_Flex(sizeof(struct Flex) + (unsigned int)3 * sizeof(int));
   void *v = malloc(sizeof(char) * (unsigned int)10);
   __retres = 0;
   return __retres;

@@ -295,7 +295,7 @@ void with_named(named * /*[10]*/ dest)
     assigns *(ptr + (0 .. num - 1)) \from \nothing;
     assigns \result \from ptr;
  */
-struct X *memset_X_FF(struct X *ptr, size_t num)
+struct X *memset_st_X_FF(struct X *ptr, size_t num)
 {
   struct X *__retres;
   __retres = (struct X *)memset((void *)ptr,255,num);
@@ -304,8 +304,8 @@ struct X *memset_X_FF(struct X *ptr, size_t num)
 
 void structure(struct X * /*[10]*/ dest)
 {
-  struct X *res = memset_X_FF(dest,(unsigned int)10 * sizeof(struct X));
-  memset_X_FF(res,(unsigned int)10 * sizeof(struct X));
+  struct X *res = memset_st_X_FF(dest,(unsigned int)10 * sizeof(struct X));
+  memset_st_X_FF(res,(unsigned int)10 * sizeof(struct X));
   return;
 }
 
@@ -704,7 +704,7 @@ void with_named(named *dest)
     assigns *(ptr + (0 .. num - 1)) \from \nothing;
     assigns \result \from ptr;
  */
-struct X *memset_X_FF(struct X *ptr, size_t num)
+struct X *memset_st_X_FF(struct X *ptr, size_t num)
 {
   struct X *__retres;
   __retres = (struct X *)memset((void *)ptr,255,num);
@@ -713,8 +713,8 @@ struct X *memset_X_FF(struct X *ptr, size_t num)
 
 void structure(struct X *dest)
 {
-  struct X *res = memset_X_FF(dest,(unsigned int)10 * sizeof(struct X));
-  memset_X_FF(res,(unsigned int)10 * sizeof(struct X));
+  struct X *res = memset_st_X_FF(dest,(unsigned int)10 * sizeof(struct X));
+  memset_st_X_FF(res,(unsigned int)10 * sizeof(struct X));
   return;
 }
 

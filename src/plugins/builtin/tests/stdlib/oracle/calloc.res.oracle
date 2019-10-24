@@ -49,7 +49,7 @@ struct Flex {
     complete behaviors no_allocation, allocation;
     disjoint behaviors no_allocation, allocation;
  */
-struct Flex *calloc_Flex(size_t num, size_t size)
+struct Flex *calloc_st_Flex(size_t num, size_t size)
 {
   struct Flex *__retres;
   __retres = (struct Flex *)calloc(num,size);
@@ -170,7 +170,7 @@ char *calloc_char(size_t num, size_t size)
     complete behaviors no_allocation, allocation;
     disjoint behaviors no_allocation, allocation;
  */
-struct X *calloc_X(size_t num, size_t size)
+struct X *calloc_st_X(size_t num, size_t size)
 {
   struct X *__retres;
   __retres = (struct X *)calloc(num,size);
@@ -256,12 +256,12 @@ int main(void)
   int __retres;
   int *pi = calloc_int((unsigned int)10,sizeof(int));
   float *pf = calloc_float((unsigned int)10,sizeof(float));
-  struct X *px = calloc_X((unsigned int)10,sizeof(struct X));
+  struct X *px = calloc_st_X((unsigned int)10,sizeof(struct X));
   char *pc = calloc_char((unsigned int)10,sizeof(char));
   int (*pa)[10] = calloc_arr10_int((unsigned int)10,sizeof(int [10]));
   struct Flex *f =
-    calloc_Flex((unsigned int)1,
-                sizeof(struct Flex) + (unsigned int)3 * sizeof(int));
+    calloc_st_Flex((unsigned int)1,
+                   sizeof(struct Flex) + (unsigned int)3 * sizeof(int));
   void *v = calloc((unsigned int)10,sizeof(char));
   __retres = 0;
   return __retres;
@@ -320,7 +320,7 @@ struct Flex {
     complete behaviors no_allocation, allocation;
     disjoint behaviors no_allocation, allocation;
  */
-struct Flex *calloc_Flex(size_t num, size_t size)
+struct Flex *calloc_st_Flex(size_t num, size_t size)
 {
   struct Flex *__retres;
   __retres = (struct Flex *)calloc(num,size);
@@ -444,7 +444,7 @@ char *calloc_char(size_t num, size_t size)
     complete behaviors no_allocation, allocation;
     disjoint behaviors no_allocation, allocation;
  */
-struct X *calloc_X(size_t num, size_t size)
+struct X *calloc_st_X(size_t num, size_t size)
 {
   struct X *__retres;
   __retres = (struct X *)calloc(num,size);
@@ -532,12 +532,12 @@ int main(void)
   int __retres;
   int *pi = calloc_int((unsigned int)10,sizeof(int));
   float *pf = calloc_float((unsigned int)10,sizeof(float));
-  struct X *px = calloc_X((unsigned int)10,sizeof(struct X));
+  struct X *px = calloc_st_X((unsigned int)10,sizeof(struct X));
   char *pc = calloc_char((unsigned int)10,sizeof(char));
   int (*pa)[10] = calloc_arr10_int((unsigned int)10,sizeof(int [10]));
   struct Flex *f =
-    calloc_Flex((unsigned int)1,
-                sizeof(struct Flex) + (unsigned int)3 * sizeof(int));
+    calloc_st_Flex((unsigned int)1,
+                   sizeof(struct Flex) + (unsigned int)3 * sizeof(int));
   void *v = calloc((unsigned int)10,sizeof(char));
   __retres = 0;
   return __retres;

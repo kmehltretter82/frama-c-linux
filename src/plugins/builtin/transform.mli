@@ -20,5 +20,17 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Module for AST transformation *)
+
+(** Registers a new [Builtin] to the visitor from the [Generator_sig] module
+    of this builtin. Each new builtin function generator should call this
+    globally.
+*)
 val register: (module Builtin_builder.Generator_sig) -> unit
+
+(** In all selected functions of the given file, for all function call, if there
+    exists a builtin module for this function, and the call is well-typed,
+    replaces it with a call to the generated override function and inserted the
+    generated function in the AST.
+*)
 val transform: Cil_types.file -> unit

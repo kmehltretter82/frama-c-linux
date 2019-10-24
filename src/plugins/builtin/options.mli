@@ -22,9 +22,16 @@
 
 include Plugin.General_services
 
+(** Builtin transformtion enabled *)
 module Enabled : Parameter_sig.Bool
+
+(** Set of kernel function provided for transformation *)
 module Kfs : Parameter_sig.Kernel_function_set
 
+(** Used by [Builtin_builder] to generate builtin options. For a given builtin,
+    the module generate an option "-builtin-(no-)<function_name>" that defaults
+    to true.
+*)
 module NewBuiltin
     (B : sig val function_name: string end) : Parameter_sig.Bool
 

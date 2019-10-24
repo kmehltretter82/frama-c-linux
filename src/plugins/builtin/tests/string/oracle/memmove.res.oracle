@@ -61,7 +61,7 @@ void with_named(named * /*[10]*/ src, named * /*[10]*/ dest)
     assigns *(dest + (0 .. len - 1)) \from *(src + (0 .. len - 1));
     assigns \result \from dest;
  */
-struct X *memmove_X(struct X *dest, struct X const *src, size_t len)
+struct X *memmove_st_X(struct X *dest, struct X const *src, size_t len)
 {
   struct X *__retres;
   __retres = (struct X *)memmove((void *)dest,(void const *)src,len);
@@ -70,8 +70,8 @@ struct X *memmove_X(struct X *dest, struct X const *src, size_t len)
 
 void structure(struct X * /*[10]*/ src, struct X * /*[10]*/ dest)
 {
-  struct X *res = memmove_X(dest,src,(unsigned int)10 * sizeof(struct X));
-  memmove_X(src,res,(unsigned int)10 * sizeof(struct X));
+  struct X *res = memmove_st_X(dest,src,(unsigned int)10 * sizeof(struct X));
+  memmove_st_X(src,res,(unsigned int)10 * sizeof(struct X));
   return;
 }
 
@@ -225,7 +225,7 @@ void with_named(named *src, named *dest)
     assigns *(dest + (0 .. len - 1)) \from *(src + (0 .. len - 1));
     assigns \result \from dest;
  */
-struct X *memmove_X(struct X *dest, struct X const *src, size_t len)
+struct X *memmove_st_X(struct X *dest, struct X const *src, size_t len)
 {
   struct X *__retres;
   __retres = (struct X *)memmove((void *)dest,(void const *)src,len);
@@ -235,8 +235,9 @@ struct X *memmove_X(struct X *dest, struct X const *src, size_t len)
 void structure(struct X *src, struct X *dest)
 {
   struct X *res =
-    memmove_X(dest,(struct X const *)src,(unsigned int)10 * sizeof(struct X));
-  memmove_X(src,(struct X const *)res,(unsigned int)10 * sizeof(struct X));
+    memmove_st_X(dest,(struct X const *)src,
+                 (unsigned int)10 * sizeof(struct X));
+  memmove_st_X(src,(struct X const *)res,(unsigned int)10 * sizeof(struct X));
   return;
 }
 

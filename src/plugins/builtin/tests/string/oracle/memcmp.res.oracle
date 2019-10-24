@@ -64,7 +64,7 @@ int with_named(named * /*[10]*/ s1, named * /*[10]*/ s2)
       \from (indirect: *(s1 + (0 .. len - 1))),
             (indirect: *(s2 + (0 .. len - 1)));
  */
-int memcmp_X(struct X const *s1, struct X const *s2, size_t len)
+int memcmp_st_X(struct X const *s1, struct X const *s2, size_t len)
 {
   int __retres;
   __retres = memcmp((void const *)s1,(void const *)s2,len);
@@ -74,7 +74,7 @@ int memcmp_X(struct X const *s1, struct X const *s2, size_t len)
 int structure(struct X * /*[10]*/ s1, struct X * /*[10]*/ s2)
 {
   int tmp;
-  tmp = memcmp_X(s1,s2,(unsigned int)10 * sizeof(struct X));
+  tmp = memcmp_st_X(s1,s2,(unsigned int)10 * sizeof(struct X));
   return tmp;
 }
 
@@ -233,7 +233,7 @@ int with_named(named *s1, named *s2)
       \from (indirect: *(s1 + (0 .. len - 1))),
             (indirect: *(s2 + (0 .. len - 1)));
  */
-int memcmp_X(struct X const *s1, struct X const *s2, size_t len)
+int memcmp_st_X(struct X const *s1, struct X const *s2, size_t len)
 {
   int __retres;
   __retres = memcmp((void const *)s1,(void const *)s2,len);
@@ -243,8 +243,8 @@ int memcmp_X(struct X const *s1, struct X const *s2, size_t len)
 int structure(struct X *s1, struct X *s2)
 {
   int tmp;
-  tmp = memcmp_X((struct X const *)s1,(struct X const *)s2,
-                 (unsigned int)10 * sizeof(struct X));
+  tmp = memcmp_st_X((struct X const *)s1,(struct X const *)s2,
+                    (unsigned int)10 * sizeof(struct X));
   return tmp;
 }
 

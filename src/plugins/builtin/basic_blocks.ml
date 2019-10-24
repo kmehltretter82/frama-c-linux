@@ -51,6 +51,7 @@ let call_function lval vi args =
   Call(lval, (Cil.evar vi), args, loc)
 
 let rec string_of_typ_aux = function
+  | TVoid(_) -> "void"
   | TInt(IBool, _) -> "bool"
   | TInt(IChar, _) -> "char"
   | TInt(ISChar, _) -> "schar"
@@ -67,8 +68,9 @@ let rec string_of_typ_aux = function
   | TFloat(FDouble, _) -> "double"
   | TFloat(FLongDouble, _) -> "ldouble"
   | TPtr(t, _) -> "ptr_" ^ string_of_typ t
-  | TEnum (ei, _) -> ei.ename
-  | TComp (ci, _, _) -> ci.cname
+  | TEnum (ei, _) -> "e_" ^ ei.ename
+  | TComp (ci, _, _) when ci.cstruct -> "st_" ^ ci.cname
+  | TComp (ci, _, _) -> "un_" ^ ci.cname
   | TArray (t, Some e, _, _) ->
     "arr" ^ (string_of_exp e) ^ "_" ^ string_of_typ t
   | _ -> assert false
