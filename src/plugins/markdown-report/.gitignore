@@ -8,3 +8,4 @@ top/
 .merlin
 *~
 /mdr_version.ml
+/Report_markdown.mli

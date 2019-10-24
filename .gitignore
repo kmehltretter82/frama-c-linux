@@ -209,4 +209,3 @@ hello-*.tar.gz
 /tests/crowbar/integer_bb_pretty
 /src/plugins/gui/dgraph_helper.ml
 /doc/doxygen
-/src/plugins/markdown-report/Report_markdown.mli
