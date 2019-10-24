@@ -20,10 +20,17 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** {2 Markdown Document}
+    Structured representation of Markdown content. *)
+
+(** Table columns alignment *)
 type align = Left | Center | Right
 
+(** Local refs and URLs *)
 type href =
-  | URL of string (** uninterpreted URL *)
+  | URL of string
+  (** URL href is printed as it is. *)
+
   | Page of string
   (** URL relative to a common root.
       During pretty-printing, if given the path of the current
@@ -31,20 +38,22 @@ type href =
       when writing to [foo/bar.md], [Page "foo/bla.md"] will be output as
       [(bla.md)].
   *)
-  | Section of string * string (** URL of an anchor within a [Page] *)
+
+  | Section of string * string
+  (** URL of an anchor within a [Page], see above. *)
 
 type inline =
-  | Plain of string
-  | Emph of string
-  | Bold of string
-  | Inline_code of string
-  | Link of text * href
-  | Image of string * string (** [Image(alt,location)] *)
+  | Plain of string (** Printed as it is *)
+  | Emph of string (** Printed as ["_……_"] *)
+  | Bold of string (** Printed as ["**……**"] *)
+  | Inline_code of string (** Printed as ["`……`"] *)
+  | Link of text * href (** Hyperlink with text and URL *)
+  | Image of string * string (** [Image(alt,path)] with alternative text and image file *)
 
-and text = inline list
+and text = inline list (** Inline elements separated by spaces *)
 
 type block_element =
-  | Text of text (** single paragraph of text. *)
+  | Text of text (** Single paragraph of text. *)
   | Block_quote of element list
   | UL of block list
   | OL of block list
@@ -78,7 +87,82 @@ type pandoc_markdown =
     elements: elements
   }
 
-(** creates a document from a list of elements and optional metadatas.
+(** {2 Formatting Utilities}
+
+    Remark: [text] values are list of [inline] values, hence
+    you may combined with the [(@)] operator or with the [glue ?sep] utility
+    function (see below).
+*)
+
+(** Plain markdown *)
+val plain: string -> text
+
+(** Emph text *)
+val emph: string -> text
+
+(** Bold text *)
+val bold: string -> text
+
+(** Inline code *)
+val code: string -> text
+
+(** Image *)
+val image: alt:string -> file:string -> text
+
+(** Local links *)
+val link: ?text:text -> ?page:string -> ?name:string -> unit -> text
+
+(** URL links *)
+val url: ?text:text -> string -> text
+
+(** Plain markdown content of the formatted string *)
+val format: ('a, Format.formatter, unit, text) format4 -> 'a
+
+(** {2 Blocks Utilities}
+
+    Remark: [block] values are list of [block_element] values, hence
+    you may combined with the [(@)] operator or with the [glue ?sep] utility
+    function (see below).
+*)
+
+(** Text Block *)
+val text : text -> block
+
+(** Itemized list *)
+val list : block list -> block
+
+(** Enumerated list *)
+val enum : block list -> block
+
+(** Description list *)
+val description : (text * text) list -> block
+
+(** [codeblock lang pp code] returns a [Code_block] for [code],
+    written in [lang], as pretty-printed by [pp]. *)
+val codeblock:
+  string -> (Format.formatter -> 'a -> unit) -> 'a -> block
+
+(** {2 Document Elements}
+
+    Remark: [elements] values are list of [element] values, hence
+    you may combined with the [(@)] operator or with the [glue ?sep] utility
+    function (see below).
+*)
+
+(** Single Paragraph element *)
+val par : text -> elements
+
+(** Block element *)
+val block : block -> elements
+
+(** Get the content of a file as raw markdown.
+    @raise Sys_error if there's no such file.
+*)
+val rawfile: string -> elements
+
+(** {2 Document Structure} *)
+
+(** Creates a document from a list of elements and optional metadatas.
     Defaults are:
     - title: empty
     - authors: empty list
@@ -88,24 +172,7 @@ val pandoc:
   ?title:text -> ?authors: text list -> ?date: text -> elements ->
   pandoc_markdown
 
-(** get the content of a file as raw markdown.
-    @raise Sys_error if there's no such file.
-*)
-val raw_markdown: string -> element
-
-val plain: string -> text
-
-val plain_format: ('a, Format.formatter, unit, text) format4 -> 'a
-
-(** glue text fragments. *)
-val glue: ?sep: text -> text list -> text
-
-(** transforms a string into an anchor name, roughly following
-    pandoc's conventions.
-*)
-val id: string -> string
-
-(** adds a [H1] header with the given [title] on top of the given elements.
+(** Adds a [H1] header with the given [title] on top of the given elements.
     If name is not explicitly provided,
     the header will have as associated anchor [id title]
 *)
@@ -117,16 +184,20 @@ val section: ?name:string -> title:string -> elements -> elements
 *)
 val subsections: elements -> elements list -> elements
 
-(** returns an internal link relative to the current page *)
-val link_current_page: string -> href
+(** {2 Other Utilities} *)
 
-(** gives a link whose text is the URL itself. *)
-val plain_link: href -> inline
+(** Glue fragments, typically used for combining [text], [block]
+    and [elements].
+    Default separator is empty. The function is tail-recursive. *)
+val glue: ?sep:'a list -> 'a list list -> 'a list
 
-(** [codelines lang pp code] returns a [Code_block] for [code], written
-    in [lang], as pretty-printed by [pp]. *)
-val codelines:
-  string -> (Format.formatter -> 'a -> unit) -> 'a -> block_element
+(** Transforms a string into an anchor name, roughly following
+    pandoc's conventions. This function is automatically used
+    by pretty-printers and smart constructors to normalize section names
+    and local links. *)
+val label: string -> string
+
+(** {2 Pretty-printers} *)
 
 val pp_inline: ?page:string -> Format.formatter -> inline -> unit
 

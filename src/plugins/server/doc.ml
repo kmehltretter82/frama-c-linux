@@ -74,7 +74,7 @@ let page chapter ~title ~filename =
         Printf.sprintf "%s/%s/server/%s" Config.datadir name filename in
     let intro =
       if Sys.file_exists intro
-      then [Markdown.raw_markdown intro]
+      then Markdown.rawfile intro
       else Markdown.(section ~title []) in
     let order = incr order ; !order in
     let page = { order ; rootdir ; path ;

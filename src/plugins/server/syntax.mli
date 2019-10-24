@@ -26,7 +26,7 @@
 
 type t
 
-val format : t -> Markdown.text
+val text : t -> Markdown.text
 
 (** The provided synopsis must be very short, to fit in one line.
     Extended definition, like record fields and such, must be detailed in

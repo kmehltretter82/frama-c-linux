@@ -131,15 +131,12 @@ let section_stubs env =
          let anchor = sanitize_anchor s in
          let content =
            if env.is_draft then insert_marks env anchor
-           else begin
-             let comment = insert_remark env anchor in
-             Block
-               [ Text
-                   [Inline_code s; Plain "has the following specification"];
-                 codelines
-                   "acsl" Printer.pp_funspec (Annotations.funspec kf)]
-             :: comment
-           end
+           else
+             let intro = Markdown.text @@ Markdown.format
+                 "`%s` has the following specification" s in
+             let funspec = Markdown.codeblock "acsl"
+                 Printer.pp_funspec (Annotations.funspec kf) in
+             Block ( intro @ funspec ) :: insert_remark env anchor
          in
          H4 ([Inline_code s], Some anchor) :: content)
       l
@@ -151,16 +148,12 @@ let section_stubs env =
     let content =
       if env.is_draft then insert_marks env anchor
       else
-        (Block
-           [ Text
-               (Inline_code name ::
-                plain_format
-                  "@[<h>is defined at %a@]" Cil_datatype.Location.pretty loc);
-             codelines "c"
-               Printer.pp_global
-               (GFun (Kernel_function.get_definition kf,loc))
-           ])
-        :: insert_remark env anchor
+        let intro = Markdown.text @@ Markdown.format
+            "`%s` @[<h>is defined at %a@]"
+            name Cil_datatype.Location.pretty loc in
+        let fundecl = Markdown.codeblock "c"
+            Printer.pp_global (GFun (Kernel_function.get_definition kf,loc)) in
+        Block ( intro @ fundecl ) :: insert_remark env anchor
     in
     H4 ([Inline_code name], Some anchor) :: content
   in
@@ -449,12 +442,11 @@ let gen_section_warnings env =
               Plain "They might put additional assumptions on the relevance";
               Plain "of the analysis results and must be reviewed carefully";
             ];
-            Text [
-              Plain "Note that this does not take into account emitted alarms:";
-              Plain "they are reported in";
-              Link (plain "the next section",
-                    Markdown.link_current_page "alarms")
-            ]
+            Text (
+              plain "Note that this does not take into account emitted alarms:"@
+              plain "they are reported in"@
+              Markdown.link ~text:(plain "the next section") ~name:"alarms" ()
+            )
           ];
           make_warnings_table warnings
         ]
@@ -467,33 +459,29 @@ let gen_section_warnings env =
 
 let gen_section_alarms env =
   let treat_alarm e kf s ~rank:_ alarm annot (i, sec, content) =
-    let kind = plain (Alarms.get_name alarm) in
+    let kind = Alarms.get_name alarm in
     let label = "Alarm-" ^ string_of_int i in
-    let link = [Link (plain_format "%d" i, link_current_page label)] in
+    let link = link ~text:(format "%d" i) ~name:label () in
     let func = plain (Kernel_function.get_name kf) in
     let loc = string_of_loc (Cil_datatype.Stmt.loc s) in
     let loc_text = plain loc in
     let emitter = plain (Emitter.get_name e) in
-    let descr = codelines "acsl" Printer.pp_code_annotation annot in
-    let sec_title = plain_format "Alarm %d at %s" i loc in
+    let descr = codeblock "acsl" Printer.pp_code_annotation annot in
+    let sec_title = format "Alarm %d at %s" i loc in
     let sec_content =
       if env.is_draft then
-        Block [ descr ] :: insert_marks env label
+        Block descr :: insert_marks env label
       else
         Block
-          [
-            Text
-              (plain
-                 "The following ACSL assertion must hold to avoid \
-                  an undefined behavior ("
-               @ kind @ plain ")");
-            descr
-          ]
+          ( (text @@ format
+               "The following ACSL assertion must hold to avoid \
+                an undefined behavior (%s)" kind)
+            @ descr )
         :: insert_remark env label
     in
     (i+1,
      sec @ H2 (sec_title, Some label) :: sec_content,
-     [ link; kind; emitter; func; loc_text ] :: content)
+     [ link; plain kind; emitter; func; loc_text ] :: content)
   in
   let _,sections, content = Alarms.fold treat_alarm (0,[],[]) in
   let content = List.rev content in
@@ -563,14 +551,13 @@ let gen_section_callgraph env =
            callstacks whose analysis is the most costly."
         :: insert_marks env anchor
       else
-        Block [
-          Text [
-            Plain "The image below shows the flamegraph (";
-            plain_link (URL "http://www.brendangregg.com/flamegraphs.html");
-            Plain ") for the chosen entry point."
-          ]]
-        :: Block [ Text [Image ("Flamegraph visualization.", f)] ]
-        :: insert_remark env anchor
+        par (
+          plain "The image below shows the flamegraph (" @
+          url "http://www.brendangregg.com/flamegraphs.html" @
+          plain ") for the chosen entry point."
+        )
+        @ par (image ~alt:"Flamegraph visualization." ~file:f)
+        @ insert_remark env anchor
     in
     H1 (plain "Flamegraph", Some anchor) :: content
   end

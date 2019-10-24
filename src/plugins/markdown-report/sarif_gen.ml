@@ -87,8 +87,8 @@ let make_message alarm annot remark =
   let name = Alarms.get_name alarm in
   let text = name ^ "." in
   let kind = plain (name ^ ":") in
-  let descr = codelines "acsl" Printer.pp_code_annotation annot in
-  let summary = Block [Text kind; descr] in
+  let descr = codeblock "acsl" Printer.pp_code_annotation annot in
+  let summary = Block (Text kind :: descr) in
   let markdown =
     match remark with
     | [] -> summary :: gen_remark alarm

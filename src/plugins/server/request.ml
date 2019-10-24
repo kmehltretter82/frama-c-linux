@@ -312,8 +312,8 @@ let register_sig (type a b) (s : (a,b) signature) (process : rq -> a -> b) =
   let caption = Some s.descr in
   let header = [ plain "Input", Center; plain "Output", Center] in
   let content =
-    [[ Syntax.format @@ sy_input s.input ;
-       Syntax.format @@ sy_output s.output ]]
+    [[ Syntax.text @@ sy_input s.input ;
+       Syntax.text @@ sy_output s.output ]]
   in
   let synopsis = Table { caption; header; content } in
   let content =

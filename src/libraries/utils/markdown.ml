@@ -72,26 +72,65 @@ type pandoc_markdown =
     elements: elements
   }
 
-let plain s = [ Plain s]
+let glue ?sep ls =
+  match sep , ls with
+  | (None | Some []) , _ -> List.concat ls
+  | _ , [] -> []
+  | _ , [l] -> l
+  | Some s , ls -> (* tailrec *)
+    let rec aux w s = function
+      | [] -> List.rev w
+      | [e] -> List.rev_append w e
+      | e::el -> aux s (List.rev_append s (List.rev_append e w)) el
+    in aux s [] ls
 
-let plain_format txt = Format.kasprintf plain txt
+(* -------------------------------------------------------------------------- *)
+(* --- Formatting                                                         --- *)
+(* -------------------------------------------------------------------------- *)
 
-let link_current_page sec = Section("", sec)
+let plain s = [ Plain s ]
+let emph s = [ Emph s ]
+let bold s = [ Bold s ]
+let code s = [ Inline_code s ]
 
-let plain_link h =
-  let s = match h with
-    | URL url -> url
-    | Page p -> p
-    | Section (_,s) -> s
-  in
-  Link ([Inline_code s], h)
+let format txt = Format.kasprintf plain txt
 
-let codelines lang pp code =
+let image ~alt ~file = [Image(alt,file)]
+
+let mklink ?text href =
+  let txt =
+    match text with Some txt -> txt | None ->
+      let tt = match href with URL u -> u | Page p -> p | Section(_,s) -> s in
+      [Inline_code tt]
+  in [Link(txt, href)]
+
+let url ?text href = mklink ?text (URL href)
+
+let link ?text ?page ?name () =
+  mklink ?text @@ match page, name with
+  | None, None -> Page ""
+  | Some p, None -> Page p
+  | None, Some a -> Section("",a)
+  | Some p, Some a -> Section(p,a)
+
+let codeblock lang pp code =
   let s = Format.asprintf "@[%a@]" pp code in
   let lines = String.split_on_char '\n' s in
-  Code_block (lang, lines)
+  [Code_block (lang, lines)]
 
-let raw_markdown filename =
+let text text = [Text text]
+let list items = [UL items]
+let enum items = [OL items]
+let description items = [DL items]
+
+let block b = [Block b]
+let par text = [Block [Text text]]
+
+(* -------------------------------------------------------------------------- *)
+(* --- Sectioning                                                         --- *)
+(* -------------------------------------------------------------------------- *)
+
+let rawfile filename =
   let chan = open_in filename in
   let res = ref [] in
   try
@@ -101,17 +140,9 @@ let raw_markdown filename =
     assert false
   with End_of_file ->
     close_in chan;
-    Raw (List.rev !res)
+    [Raw (List.rev !res)]
 
-let glue ?(sep=[]) texts =
-  let rec aux = function
-    | [] -> []
-    | [t] -> t
-    | hd::tl -> hd @ sep @ aux tl
-  in
-  aux texts
-
-let id m =
+let label m =
   let buffer = Buffer.create (String.length m) in
   let lowercase = Char.lowercase_ascii in
   let dash = ref false in
@@ -129,12 +160,8 @@ let id m =
   Buffer.contents buffer
 
 let section ?name ~title elements =
-  let anchor =
-    match name with
-    | None -> id title
-    | Some n -> n
-  in
-  (H1 (plain title, Some anchor)) :: elements
+  let anchor = label @@ match name with Some n -> n | None -> title in
+  (H1 ([Plain title], Some anchor)) :: elements
 
 let subsections header body =
   let body =
@@ -151,11 +178,11 @@ let subsections header body =
 
 let mk_date () =
   let tm = Unix.gmtime (Unix.time()) in
-  plain
-    (Printf.sprintf "%d-%02d-%02d"
-       (1900 + tm.Unix.tm_year) (1 + tm.Unix.tm_mon) tm.Unix.tm_mday)
+  format "%d-%02d-%02d"
+    (1900 + tm.Unix.tm_year)
+    (1 + tm.Unix.tm_mon) tm.Unix.tm_mday
 
-let pandoc ?(title=plain "") ?(authors=[]) ?(date=mk_date()) elements =
+let pandoc ?(title=[Plain ""]) ?(authors=[]) ?(date=mk_date()) elements =
   { title; authors; date; elements }
 
 let relativize page target =
@@ -182,7 +209,7 @@ let relativize page target =
 let pp_href ?(page="") fmt = function
   | URL s -> Format.pp_print_string fmt s
   | Page s -> Format.pp_print_string fmt (relativize page s)
-  | Section (p,s) -> Format.fprintf fmt "%s#%s" (relativize page p) (id s)
+  | Section (p,s) -> Format.fprintf fmt "%s#%s" (relativize page p) (label s)
 
 let rec pp_inline ?page fmt =
   function
@@ -200,7 +227,10 @@ and pp_text ?page fmt l =
   | [] -> ()
   | [ elt ] -> pp_inline ?page fmt elt
   | elt :: text ->
-    Format.fprintf fmt "%a@ %a" (pp_inline ?page) elt (pp_text ?page) text
+    (* tailrec *)
+    pp_inline ?page fmt elt ;
+    Format.pp_print_space fmt () ;
+    pp_text ?page fmt text
 
 let pp_lab fmt = function
   | None -> ()

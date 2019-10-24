@@ -190,7 +190,7 @@ let md_gen () =
   let vis = new eva_coverage_vis ~from_entry_point:false in
   let stats = vis#compute () in
   let summary_whole =
-    Markdown.plain_format
+    Markdown.format
       "There are %d function definitions that are not stubbed. They represent \
        %d statements, of which %d are potentially reachable through EVA, \
        resulting in a **statement coverage of %.1f%%** with respect to the \
@@ -203,7 +203,7 @@ let md_gen () =
   let vis = new eva_coverage_vis ~from_entry_point:true in
   let stats = vis#compute () in
   let summary =
-    Markdown.plain_format
+    Markdown.format
       "There were potentially %d functions syntactically reachable from %s."
       stats.syntactic_calls main
   in
@@ -211,14 +211,14 @@ let md_gen () =
     if stats.indirect_calls = 0 then summary
     else
       summary @
-      Markdown.plain_format
+      Markdown.format
         "In addition, %d were found potentially reachable through \
          indirect calls."
         stats.indirect_calls
   in
   let summary =
     summary @
-    Markdown.plain_format
+    Markdown.format
       "These functions contain %d statements, \
        of which %d are potentially reachable according to EVA, resulting in \
        a **statement coverage of %.1f%%** with respect to the perimeter set \
