@@ -452,11 +452,11 @@ let gen_section_warnings env =
 
 let gen_section_alarms env =
   let treat_alarm e kf s ~rank:_ alarm annot (i, sec, content) =
-    let kind = Alarms.get_name alarm in
     let label = "Alarm-" ^ string_of_int i in
     let link = link ~text:(format "%d" i) ~name:label () in
-    let func = code (Kernel_function.get_name kf) in
-    let loc = string_of_loc (Cil_datatype.Stmt.loc s) in
+    let kind = code @@ Alarms.get_name alarm in
+    let func = code @@ Kernel_function.get_name kf in
+    let loc = string_of_loc @@ Cil_datatype.Stmt.loc s in
     let loc_text = plain loc in
     let emitter = code (Emitter.get_name e) in
     let descr = codeblock "acsl" Printer.pp_code_annotation annot in
@@ -466,15 +466,17 @@ let gen_section_alarms env =
         Block descr :: insert_marks env label
       else
         Block
-          ( (text @@ format
-               "The following ACSL assertion must hold to avoid \
-                an undefined behavior (%s)" kind)
+          ( (text @@ glue [
+                plain "The following ACSL assertion must hold to avoid" ;
+                plain (Alarms.get_description alarm |> String.lowercase_ascii) ;
+                format "(undefined behavior)."
+              ])
             @ descr )
         :: insert_remark env label
     in
     (i+1,
      sec @ H2 (sec_title, Some label) :: sec_content,
-     [ link; code kind; emitter; func; loc_text ] :: content)
+     [ link; kind; emitter; func; loc_text ] :: content)
   in
   let _,sections, content = Alarms.fold treat_alarm (0,[],[]) in
   let content = List.rev content in
