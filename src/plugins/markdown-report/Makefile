@@ -9,10 +9,10 @@ PLUGIN_GENERATED:=$(PLUGIN_DIR)/mdr_version.ml $(PLUGIN_DIR)/Report_markdown.mli
 PLUGIN_CMO:=\
   sarif mdr_version mdr_params parse_remarks \
   eva_coverage md_gen sarif_gen mdr_register
-PLUGIN_NO_TEST:=true
 PLUGIN_REQUIRES:=ppx_deriving ppx_deriving_yojson yojson
 PLUGIN_VERSION:=$(Report_markdown_VERSION)
 PLUGIN_DISTRIB_EXTERNAL:=share/acsl.xml
+PLUGIN_TESTS_DIRS:= eva
 
 include $(FRAMAC_SHARE)/Makefile.dynamic
 
