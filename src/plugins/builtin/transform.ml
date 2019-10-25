@@ -43,9 +43,6 @@ let get_kfs () =
   in
   Hashtbl.fold (fun k v l -> (get_kfs k v) @ l) base []
 
-let find_stdlib_attr fct =
-  if not (Cil.hasAttribute "fc_stdlib" fct.vattr) then raise Not_found
-
 module VISet = Cil_datatype.Varinfo.Hptset
 
 class transformer = object(self)
@@ -85,7 +82,6 @@ class transformer = object(self)
       Cil.SkipChildren
 
   method private find_enabled_builtin fct =
-    find_stdlib_attr fct ;
     let builtin = Hashtbl.find base fct.vname in
     let module B = (val builtin: Builtin) in
     if not (B.Enabled.get ()) then raise Not_found ;
