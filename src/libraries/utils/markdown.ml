@@ -328,12 +328,12 @@ let pp_table_extended ?page fmt { caption; header; content } =
 let pp_table_inlined ?page fmt { caption; header; content } =
   begin
     pp_table_caption ?page fmt caption;
-    Format.fprintf fmt "@[<v>";
     let pp = pp_text ?page in
+    Format.fprintf fmt "@[<v>@[<h>";
     List.iter
-      (function (h,_) -> Format.fprintf fmt "| @[<h>%a@] " pp h)
+      (function (h,_) -> Format.fprintf fmt "| %a " pp h)
       header;
-    Format.fprintf fmt "|@\n";
+    Format.fprintf fmt "|@]@\n@[<h>";
     List.iter
       (fun (h,align) ->
          let dash h k = String.make (max 3 (test_size ?page h + k)) '-' in
@@ -342,11 +342,12 @@ let pp_table_inlined ?page fmt { caption; header; content } =
          | Right -> Format.fprintf fmt "|%s:" (dash h 1)
          | Center -> Format.fprintf fmt "|:%s:" (dash h 0)
       ) header;
-    Format.fprintf fmt "|@\n" ;
+    Format.fprintf fmt "|@]@\n" ;
     List.iter (fun row ->
+        Format.fprintf fmt "@[<h>" ;
         List.iter
-          (fun col -> Format.fprintf fmt "| @[<h>%a@] " pp col) row ;
-        Format.fprintf fmt "|@\n" ;
+          (fun col -> Format.fprintf fmt "| %a " pp col) row ;
+        Format.fprintf fmt "|@]@\n" ;
       ) content ;
     Format.fprintf fmt "@]" ;
   end
