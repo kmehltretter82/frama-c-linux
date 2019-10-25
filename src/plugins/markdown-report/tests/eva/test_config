@@ -1,3 +1,2 @@
-CMD: @frama-c@ -eva @PTEST_FILE@ -mdr-gen md -mdr-out @PTEST_DIR@/result@PTEST_CONFIG@/@PTEST_NAME@.@PTEST_NUMBER@.md
+CMD: @frama-c@ -eva @PTEST_FILE@ -mdr-gen md -mdr-out @PTEST_DIR@/result/@PTEST_NAME@.@PTEST_NUMBER@.md
 LOG: @PTEST_NAME@.@PTEST_NUMBER@.md
-OPT:

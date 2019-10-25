@@ -1,3 +1,7 @@
+/* run.config
+   OPT: -mdr-remarks tests/eva/cwe126.remarks.md
+ */
+
 /* extracted from Juliet test suite v1.3 for C
    https://samate.nist.gov/SRD/view_testcase.php?tID=76270
 */
