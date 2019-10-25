@@ -182,14 +182,14 @@ let gen_run remarks =
 let generate () =
   let remarks = get_remarks () in
   let runs = [ gen_run remarks ] in
-  let json = Schema.create ~runs () in
-  let out = Mdr_params.Output.get () in
-  let chan =
-    if out = "" then stdout
-    else begin
-      try open_out out
-      with Sys_error s ->
-        Mdr_params.abort "Unable to open output file %s: %s" out s
-    end
-  in
-  Yojson.Safe.to_channel chan (Schema.to_yojson json)
+  let json = Schema.create ~runs () |> Schema.to_yojson in
+  let file = Mdr_params.Output.get () in
+  if file = "" then
+    Log.print_on_output (fun fmt -> Yojson.Safe.pretty_print fmt json)
+  else
+    try
+      Command.write_file file
+        (fun out -> Yojson.Safe.pretty_to_channel ~std:true out json) ;
+      Mdr_params.result "Report %s generated" file
+    with Sys_error s ->
+      Mdr_params.abort "Unable to generate %s (%s)" file s

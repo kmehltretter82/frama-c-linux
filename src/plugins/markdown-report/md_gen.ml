@@ -621,12 +621,10 @@ let gen_report ~draft:is_draft () =
     :: elements
   in
   let doc = Markdown.pandoc ~title ~authors elements in
+  let file = Mdr_params.Output.get() in
   try
-    let out = open_out (Mdr_params.Output.get()) in
-    let fmt = Format.formatter_of_out_channel out in
-    Markdown.pp_pandoc fmt doc;
-    close_out out
+    Command.print_file file (fun fmt -> Markdown.pp_pandoc fmt doc) ;
+    Mdr_params.result "Report %s generated" file
   with Sys_error s ->
     Mdr_params.warning
-      "Unable to open %s for writing (%s). No report will be generated"
-      (Mdr_params.Output.get()) s
+      "Unable to open %s for writing (%s). No report generated" file s
