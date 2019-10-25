@@ -49,10 +49,10 @@ type block_element =
 and block = block_element list
 
 and table = {
-    caption: text option;
-    header: (text * align) list;
-    content: text list list;
-  }
+  caption: text option;
+  header: (text * align) list;
+  content: text list list;
+}
 
 and element =
   | Comment of string (** markdown comment, printed <!-- like this --> *)
