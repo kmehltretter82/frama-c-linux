@@ -455,10 +455,10 @@ let gen_section_alarms env =
     let kind = Alarms.get_name alarm in
     let label = "Alarm-" ^ string_of_int i in
     let link = link ~text:(format "%d" i) ~name:label () in
-    let func = plain (Kernel_function.get_name kf) in
+    let func = code (Kernel_function.get_name kf) in
     let loc = string_of_loc (Cil_datatype.Stmt.loc s) in
     let loc_text = plain loc in
-    let emitter = plain (Emitter.get_name e) in
+    let emitter = code (Emitter.get_name e) in
     let descr = codeblock "acsl" Printer.pp_code_annotation annot in
     let sec_title = format "Alarm %d at %s" i loc in
     let sec_content =
@@ -474,7 +474,7 @@ let gen_section_alarms env =
     in
     (i+1,
      sec @ H2 (sec_title, Some label) :: sec_content,
-     [ link; plain kind; emitter; func; loc_text ] :: content)
+     [ link; code kind; emitter; func; loc_text ] :: content)
   in
   let _,sections, content = Alarms.fold treat_alarm (0,[],[]) in
   let content = List.rev content in
