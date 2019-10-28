@@ -1,7 +1,0 @@
-DEFAULT_SUITES= eva
-TOPLEVEL_PATH=/Users/correnson/Frama-C/trunk/bin/toplevel.opt
-FRAMAC_SHARE=/Users/correnson/Frama-C/trunk/share
-FRAMAC_LIB=/Users/correnson/Frama-C/trunk/lib/fc
-FRAMAC_PLUGIN=/Users/correnson/Frama-C/trunk/lib/plugins
-FRAMAC_PLUGIN_GUI=/Users/correnson/Frama-C/trunk/lib/plugins/gui
-OCAMLRUNPARAM=
