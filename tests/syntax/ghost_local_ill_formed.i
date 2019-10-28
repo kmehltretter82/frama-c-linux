@@ -10,3 +10,9 @@ void titi() {
     /*@ assert \at(c,L1) == 1; */
   /*@ assert c == 2; */
 }
+
+void toto () {
+  //@ ghost int c = 0;
+  // ill-formed: the instruction should be ghost as well
+  c++;
+}

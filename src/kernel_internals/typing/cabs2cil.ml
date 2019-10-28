@@ -1085,6 +1085,12 @@ let lookupVar ghost name =
   | (EnvVar vi), loc -> vi, loc
   | _ -> raise Not_found
 
+let only_ghost_symbol name =
+  try ignore (lookupVar false name); false
+  with Not_found ->
+    try ignore (lookupVar true name); true
+    with Not_found -> false
+
 let lookupGlobalVar ghost name =
   let env = if ghost then ghost_global_env else global_env in
   match Datatype.String.Hashtbl.find env name with
@@ -5687,13 +5693,18 @@ and doExp local_env
           | _ -> raise Not_found
         with Not_found -> begin
             if isOldStyleVarArgName n then
-              Kernel.fatal ~current:true
+              Kernel.abort ~current:true
                 "Cannot resolve variable %s. \
-                 This could be a CIL bug due to the handling of old-style variable argument \
-                 functions"
+                 This could be a CIL bug due to \
+                 the handling of old-style variable argument functions"
                 n
+            else if only_ghost_symbol n then
+              Kernel.abort ~current:true
+                "Variable %s is a ghost symbol. \
+                 It cannot be used in non-ghost context. \
+                 Did you forget a /*@@ ghost ... /?" n
             else
-              Kernel.fatal ~current:true "Cannot resolve variable %s" n
+              Kernel.abort ~current:true "Cannot resolve variable %s" n
           end
       end
     | A.INDEX (e1, e2) -> begin
@@ -6487,6 +6498,10 @@ and doExp local_env
                new_exp ~loc:f.expr_loc (Lval(var vi)), vi.vtype)
             (* Found. Do not use finishExp. Simulate what = AExp None  *)
             with Not_found -> begin
+                if only_ghost_symbol n then
+                  Kernel.warning
+                    "calling ghost function %s in non-ghost code. Did you \
+                    forget a /*@ ghost ... */ ?" n;
                 Kernel.debug ~level:3
                   "Calling function %s without prototype." n ;
                 let ftype = TFun(intType, None, false,
