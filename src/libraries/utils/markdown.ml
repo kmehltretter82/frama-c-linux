@@ -119,10 +119,18 @@ let link ?text ?page ?name () =
   | None, Some a -> Section("",a)
   | Some p, Some a -> Section(p,a)
 
-let codeblock lang pp code =
-  let s = Format.asprintf "@[%a@]" pp code in
-  let lines = String.split_on_char '\n' s in
-  [Code_block (lang, lines)]
+let codeblock ?(lang="") content =
+  let buffer = Buffer.create 120 in
+  let fmt = Format.formatter_of_buffer buffer in
+  Format.pp_open_hvbox fmt 0 ;
+  Format.kfprintf
+    (fun fmt ->
+       Format.pp_close_box fmt () ;
+       Format.pp_print_flush fmt () ;
+       let code = Buffer.contents buffer |> String.trim in
+       let lines = String.split_on_char '\n' code in
+       [Code_block(lang,lines)]
+    ) fmt content
 
 let text text = [Text text]
 let list items = [UL items]

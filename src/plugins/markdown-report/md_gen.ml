@@ -134,7 +134,7 @@ let section_stubs env =
            else
              let intro = Markdown.text @@ Markdown.format
                  "`%s` has the following specification" s in
-             let funspec = Markdown.codeblock "acsl"
+             let funspec = Markdown.codeblock ~lang:"acsl" "%a"
                  Printer.pp_funspec (Annotations.funspec kf) in
              Block ( intro @ funspec ) :: insert_remark env anchor
          in
@@ -151,7 +151,7 @@ let section_stubs env =
         let intro = Markdown.text @@ Markdown.format
             "`%s` @[<h>is defined at %a@]"
             name Cil_datatype.Location.pretty loc in
-        let fundecl = Markdown.codeblock "c"
+        let fundecl = Markdown.codeblock ~lang:"c" "%a"
             Printer.pp_global (GFun (Kernel_function.get_definition kf,loc)) in
         Block ( intro @ fundecl ) :: insert_remark env anchor
     in
@@ -373,7 +373,7 @@ let section_event is_err env nb event =
   H2 (plain title, Some lab)
   :: Block (
     (text @@ plain "Message:") @
-    codeblock "log" Format.pp_print_string event.evt_message
+    codeblock "[%s] %s" event.evt_plugin event.evt_message
   )
   :: content
 
@@ -461,7 +461,7 @@ let gen_section_alarms env =
     let loc = string_of_loc @@ Cil_datatype.Stmt.loc s in
     let loc_text = plain loc in
     let emitter = code (Emitter.get_name e) in
-    let descr = codeblock "acsl" Printer.pp_code_annotation annot in
+    let descr = codeblock ~lang:"acsl" "%a" Printer.pp_code_annotation annot in
     let sec_title = format "Alarm %d at %s" i loc in
     let sec_content =
       if env.is_draft then

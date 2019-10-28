@@ -146,10 +146,11 @@ val enum : block list -> block
 (** Description list *)
 val description : (text * text) list -> block
 
-(** [codeblock lang pp code] returns a [Code_block] for [code],
-    written in [lang], as pretty-printed by [pp]. *)
-val codeblock:
-  string -> (Format.formatter -> 'a -> unit) -> 'a -> block
+(** [codeblock lang "...."] returns a [Code_block] for [code],
+    written in [lang] with the given formatted content.
+    The code block content placed inside an englobing hv-box, trimed
+    and finally splitted into lines. *)
+val codeblock : ?lang:string -> ('a,Format.formatter,unit,block) format4 -> 'a
 
 (** {2 Document Elements}
 
