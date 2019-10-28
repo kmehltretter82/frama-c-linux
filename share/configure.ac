@@ -212,22 +212,22 @@ m4_define([configure_library],
   ])
 ])
 
-# 1st param: uppercase name of the ocamlfind package
-# 2nd param: actual name of the ocamlfind package (often lowercase)
-# 3rd param: warning to display if problem
+# 1st param: actual name of the ocamlfind package (often lowercase)
+# 2nd param: warning to display if problem
 m4_define([configure_pkg],
 [
-m4_ifdef(HAS_OCAML_$1,,
+define([PKG_UP],[tovarname($1)])
+m4_ifdef([HAS_OCAML_]PKG_UP,,
   [
-  define([VAR],[OCAML_$1])
-  define([require],[$REQUIRE_OCAML_$1])
-  define([use],[$USE_OCAML_$1])
-  define([msg],[$3])
-  define([has],[HAS_OCAML_$1])
+  define([VAR],[[OCAML_]PKG_UP])
+  define([require],[$[REQUIRE_OCAML_]PKG_UP])
+  define([use],[$[USE_OCAML_]PKG_UP])
+  define([msg],[$2])
+  define([has],[[HAS_OCAML_]PKG_UP])
 
    has=
-  AC_MSG_CHECKING(for OCaml package $2)
-  VAR=$(ocamlfind query $2 -format %v 2>/dev/null)
+  AC_MSG_CHECKING(for OCaml package $1)
+  VAR=$(ocamlfind query $1 -format %v 2>/dev/null)
   if test -z "$VAR" ; then
     AC_MSG_RESULT(not found via ocamlfind.)
     has=no
@@ -239,7 +239,7 @@ m4_ifdef(HAS_OCAML_$1,,
   if test -n "require" -o -n "use" -o "$force_check" = "yes"; then
     if test "$has" = "no"; then
       AC_MSG_WARN([msg])
-      reason="$2 missing"
+      reason="$1 missing"
       for p in require; do
         up=`upper "$p"`
         ep=ENABLE_$up
@@ -249,7 +249,7 @@ m4_ifdef(HAS_OCAML_$1,,
           if eval test "\$$fp" = "yes"; then
             AC_MSG_ERROR([$p requested but $reason.])
           fi
-          eval $ep="no\ \(see\ warning\ about\ $2\)"
+          eval $ep="no\ \(see\ warning\ about\ $1\)"
           AC_MSG_WARN([$p disabled because $reason.])
           eval INFO_$up=\", $reason\"
         fi
@@ -259,18 +259,19 @@ m4_ifdef(HAS_OCAML_$1,,
         ep=ENABLE_$up
         eval eep="\$$ep"
         if test "`echo $eep | sed -e 's/ .*//' `" != "no"; then
-          eval $ep="partial\ \(see\ warning\ about\ $2\)"
+          eval $ep="partial\ \(see\ warning\ about\ $1\)"
           AC_MSG_WARN([$p partially enabled because $reason.])
           eval INFO_$up=\", $reason\"
         fi
       done
     else
-        VAR=$1
+        VAR=PKG_UP
     fi
   fi
   m4_divert_pop(frama_c_configure_tool)
   AC_SUBST(VAR)
   AC_SUBST(has)
+  undefine([PKG_UP])
   undefine([VAR])
   undefine([require])
   undefine([use])

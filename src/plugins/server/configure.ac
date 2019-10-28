@@ -50,7 +50,7 @@ AC_ARG_ENABLE(
 
 if test "$SERVER_ZMQ" = "yes" ;
 then
-        configure_pkg([ZMQ],[zmq],
+        configure_pkg([zmq],
                       [Server support for ZeroMQ disabled (try 'opam install zmq').])
         plugin_use_pkg(server,zmq)
 fi
