@@ -10,8 +10,8 @@ Before submitting the issue, please confirm (by adding a X in the [ ]):
 
 # Contextual information
 
-- Frama-C installation mode: *Opam, Homebrew, from source, ...*
-- Frama-C version: *Frama-C version*
+- Frama-C installation mode: *Opam, Homebrew, package from distribution, from source, ...*
+- Frama-C version: *Frama-C version* (as reported by `frama-c -version`)
 - Plug-in used: *Plug-in used*
 - OS name: *OS name*
 - OS version: *OS version*
@@ -32,4 +32,4 @@ Before submitting the issue, please confirm (by adding a X in the [ ]):
 
 # Fix ideas
 
-*Please tell us if what you have already tried or ideas you have to solve this issue.* 
+*Please tell us if you already tried some work-arounds or have some ideas to solve this issue.*
