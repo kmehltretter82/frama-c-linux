@@ -191,14 +191,16 @@ let subsections header body =
   in
   header @ body
 
-let mk_date () =
-  let tm = Unix.gmtime (Unix.time()) in
-  format "%d-%02d-%02d"
-    (1900 + tm.Unix.tm_year)
-    (1 + tm.Unix.tm_mon) tm.Unix.tm_mday
+let mk_date = function
+  | Some d -> d
+  | None ->
+    let tm = Unix.gmtime (Unix.time()) in
+    format "%d-%02d-%02d"
+      (1900 + tm.Unix.tm_year)
+      (1 + tm.Unix.tm_mon) tm.Unix.tm_mday
 
-let pandoc ?(title=[Plain ""]) ?(authors=[]) ?(date=mk_date()) elements =
-  { title; authors; date; elements }
+let pandoc ?(title=[Plain ""]) ?(authors=[]) ?date elements =
+  { title; authors; date = mk_date date ; elements }
 
 (* -------------------------------------------------------------------------- *)
 (* --- Printers                                                           --- *)

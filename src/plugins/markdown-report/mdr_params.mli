@@ -40,5 +40,8 @@ module Authors: Parameter_sig.String_list
 (** Value of [-mdr-title]. *)
 module Title: Parameter_sig.String
 
+(** Value of [-mdr-date]. *)
+module Date: Parameter_sig.String
+
 (** Value of [-mdr-stubs]. *)
 module Stubs: Parameter_sig.String_list

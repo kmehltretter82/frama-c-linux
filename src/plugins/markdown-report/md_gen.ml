@@ -602,6 +602,9 @@ let gen_report ~draft:is_draft () =
     end else plain title
   in
   let authors = List.map (fun x -> plain x) (Mdr_params.Authors.get ()) in
+  let date = match Mdr_params.Date.get () with
+    | "" -> None
+    | s -> Some (plain s) in
   let elements = context @ coverage @ alarms in
   let elements =
     if is_draft then
@@ -624,7 +627,7 @@ let gen_report ~draft:is_draft () =
           "\\renewcommand{\\_}{\\discretionary{\\underscore}{}{\\underscore}}"]
     :: elements
   in
-  let doc = Markdown.pandoc ~title ~authors elements in
+  let doc = Markdown.pandoc ~title ~authors ?date elements in
   let file = Mdr_params.Output.get() in
   try
     Command.print_file file (fun fmt -> Markdown.pp_pandoc fmt doc) ;

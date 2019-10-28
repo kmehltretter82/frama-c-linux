@@ -83,8 +83,14 @@ module Title = Empty_string(
     let option_name = "-mdr-title"
     let arg_name = "t"
     let help = "title of the generated document"
-  end
-  )
+  end)
+
+module Date = Empty_string(
+  struct
+    let option_name = "-mdr-date"
+    let arg_name = "d"
+    let help = "date of the report"
+  end)
 
 module Stubs = String_list(
   struct
