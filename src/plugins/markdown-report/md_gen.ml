@@ -370,9 +370,11 @@ let section_event is_err env nb event =
       insert_marks env lab
     else insert_remark env lab
   in
-  let pp_warning fmt msg = Format.fprintf fmt "Message: %s" msg in
   H2 (plain title, Some lab)
-  :: Block (codeblock "log" pp_warning event.evt_message)
+  :: Block (
+    (text @@ plain "Message:") @
+    codeblock "log" Format.pp_print_string event.evt_message
+  )
   :: content
 
 let make_events_list is_err env l =
