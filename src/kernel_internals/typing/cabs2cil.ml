@@ -1130,10 +1130,21 @@ let alphaConvertVarAndAddToEnv addtoenv vi =
                 vi.vname newname Cil_printer.pp_location oldloc;
           end
       end else begin
-        (* We have changed the name of a local variable. Can we try to detect
-         * if the other variable was also local in the same scope? Not for
-         * now. *)
-        copyVarinfo vi newname
+        (* favor renaming ghost variables over non-ghost ones *)
+        if not vi.vghost then begin
+          let siblings =
+            fst @@ List.split @@
+            Datatype.String.Hashtbl.find_all ghost_env vi.vname
+          in
+          let check = function
+            | EnvVar vi' -> vi!=vi' && vi.vname = vi'.vname
+            | _ -> false
+          in
+          match List.find_opt check siblings with
+          | Some (EnvVar ({ vghost = true } as oldvi)) ->
+            oldvi.vname <- newname; vi
+          | _ -> copyVarinfo vi newname
+        end else copyVarinfo vi newname
       end
     end
   in

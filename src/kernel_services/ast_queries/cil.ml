@@ -6450,12 +6450,15 @@ let uniqueVarNames (f: file) : unit =
                 newname Location.pretty oldloc ;
             v.vname <- newname
           in
-          (* Do the formals first *)
-          List.iter processLocal fdec.sformals;
+          let ghost vi = vi.vghost in
+          let formals_ghost, formals = List.partition ghost fdec.sformals in
+          let locals_ghost, locals = List.partition ghost fdec.slocals in
+          List.iter processLocal formals;
+          List.iter processLocal locals;
+          List.iter processLocal formals_ghost;
+          List.iter processLocal locals_ghost;
           (* Fix the type again *)
           setFormals fdec fdec.sformals;
-          (* And now the locals *)
-          List.iter processLocal fdec.slocals;
           (* Undo the changes to the global table *)
           Alpha.undoAlphaChanges gAlphaTable !undolist;
           ()
