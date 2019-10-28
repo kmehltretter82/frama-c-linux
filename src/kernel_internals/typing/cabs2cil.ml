@@ -1088,8 +1088,8 @@ let lookupVar ghost name =
 let only_ghost_symbol name =
   try ignore (lookupVar false name); false
   with Not_found ->
-    try ignore (lookupVar true name); true
-    with Not_found -> false
+  try ignore (lookupVar true name); true
+  with Not_found -> false
 
 let lookupGlobalVar ghost name =
   let env = if ghost then ghost_global_env else global_env in
@@ -6501,7 +6501,7 @@ and doExp local_env
                 if only_ghost_symbol n then
                   Kernel.warning
                     "calling ghost function %s in non-ghost code. Did you \
-                    forget a /*@ ghost ... */ ?" n;
+                     forget a /*@ ghost ... */ ?" n;
                 Kernel.debug ~level:3
                   "Calling function %s without prototype." n ;
                 let ftype = TFun(intType, None, false,
