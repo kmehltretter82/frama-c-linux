@@ -234,41 +234,66 @@ end
 
 module Fmap = Map.Make(String)
 
-module Record( R : Info ) =
+type 'a record = json Fmap.t
+
+type ('r,'a) field = {
+  member : 'r record -> bool ;
+  getter : 'r record -> 'a ;
+  setter : 'r record -> 'a -> 'r record ;
+}
+
+type 'a signature = {
+  page : Doc.page ;
+  name : string ;
+  descr : Markdown.text ;
+  mutable fields : Syntax.field list ;
+  mutable default : 'a record ;
+  mutable published : bool ;
+}
+
+module Record =
 struct
 
-  type t = json Fmap.t
+  module type S =
+  sig
+    type r
+    include S with type t = r record
+    val default : t
+    val has : (r,'a) field -> t -> bool
+    val get : (r,'a) field -> t -> 'a
+    val set : (r,'a) field -> 'a -> t -> t
+  end
 
-  type 'a field = {
-    member : t -> bool ;
-    getter : t -> 'a ;
-    setter : t -> 'a -> t ;
+  let signature ~page ~name ~descr () = {
+    page ; name ; descr ;
+    published = false ;
+    fields = [] ;
+    default = Fmap.empty ;
   }
 
-  (* Declared Fields in this Record *)
-  let fdocs = ref []
-  let defaults = ref Fmap.empty
-
-  let default () = !defaults
-  let has fd r = fd.member r
-  let get fd r = fd.getter r
-  let set fd v r = fd.setter r v
-
-  let field (type a) name ~descr ?default (d : a data) : a field =
+  let field (type a r) (s : r signature)
+      ~name ~descr ?default (d : a data) : (r,a) field =
+    if s.published then
+      raise (Invalid_argument "Server.Data.Record.field") ;
     let module D = (val d) in
     begin match default with
       | None -> ()
-      | Some v -> defaults := Fmap.add name (D.to_json v) !defaults
+      | Some v -> s.default <- Fmap.add name (D.to_json v) s.default
     end ;
-    fdocs := Syntax.{ name ; syntax = D.syntax ; descr } :: !fdocs ;
+    let field = Syntax.{ name ; syntax = D.syntax ; descr } in
+    s.fields <- field :: s.fields ;
     let member r = Fmap.mem name r in
     let getter r = D.of_json (Fmap.find name r) in
     let setter r v = Fmap.add name (D.to_json v) r in
     { member ; getter ; setter }
 
-  let option (type a) name ~descr (d : a data) : a option field =
+  let option (type a r) (s : r signature)
+      ~name ~descr (d : a data) : (r,a option) field =
+    if s.published then
+      raise (Invalid_argument "Server.Data.Record.option") ;
     let module D = (val d) in
-    fdocs := Syntax.{ name ; syntax = option D.syntax ; descr } :: !fdocs ;
+    let field = Syntax.{ name ; syntax = option D.syntax ; descr } in
+    s.fields <- field :: s.fields ;
     let member r = Fmap.mem name r in
     let getter r =
       try Some (D.of_json (Fmap.find name r)) with Not_found -> None in
@@ -277,21 +302,36 @@ struct
       | Some v -> Fmap.add name (D.to_json v) r in
     { member ; getter ; setter }
 
-  let fields () = [Syntax.fields ~title:"Field" !fdocs]
-
-  let syntax =
-    Syntax.publish ~page:R.page ~name:R.name
-      ~descr:R.descr
-      ~synopsis:(Syntax.record [])
-      ~details:(Markdown.delayed fields) ()
-
-  let of_json js =
-    List.fold_left
-      (fun r (fd,js) -> Fmap.add fd js r)
-      (default ()) (Ju.to_assoc js)
-
-  let to_json r : json =
-    `Assoc (Fmap.fold (fun fd js fds -> (fd,js) :: fds) r [])
+  let publish (type r) (s : r signature) =
+    if s.published then
+      raise (Invalid_argument "Server.Data.Record.publish") ;
+    let module M =
+    struct
+      type nonrec r = r
+      type t = r record
+      let descr = s.descr
+      let syntax =
+        let fields = Syntax.fields ~title:"Field" (List.rev s.fields) in
+        Syntax.publish ~page:s.page ~name:s.name ~descr
+          ~synopsis:(Syntax.record [])
+          ~details:[fields] ()
+      let default = s.default
+      let has fd r = fd.member r
+      let get fd r = fd.getter r
+      let set fd v r = fd.setter r v
+      let of_json js =
+        List.fold_left
+          (fun r (fd,js) -> Fmap.add fd js r)
+          default (Ju.to_assoc js)
+      let to_json r : json =
+        `Assoc (Fmap.fold (fun fd js fds -> (fd,js) :: fds) r [])
+    end in
+    begin
+      s.default <- Fmap.empty ;
+      s.fields <- [] ;
+      s.published <- true ;
+      (module M : S with type r = r)
+    end
 
 end
 

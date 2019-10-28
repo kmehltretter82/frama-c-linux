@@ -61,7 +61,6 @@ and element =
   | Raw of string list
   (** Each element of the list is printed as-is on its own line.
       A blank line separates the [Raw] node from the next one. *)
-  | Delayed of (unit -> elements)
   | H1 of text * string option
   | H2 of text * string option
   | H3 of text * string option
@@ -84,10 +83,10 @@ let glue ?sep ls =
   | _ , [] -> []
   | _ , [l] -> l
   | Some s , ls -> (* tailrec *)
-    let rec aux w s = function
+    let rec aux sep w = function
       | [] -> List.rev w
       | [e] -> List.rev_append w e
-      | e::el -> aux s (List.rev_append s (List.rev_append e w)) el
+      | e::el -> aux sep (List.rev_append sep (List.rev_append e w)) el
     in aux s [] ls
 
 (* -------------------------------------------------------------------------- *)
@@ -139,7 +138,6 @@ let description items = [DL items]
 
 let par text = [Block [Text text]]
 let block b = [Block b]
-let delayed f = [Delayed f]
 
 (* -------------------------------------------------------------------------- *)
 (* --- Sectioning                                                         --- *)
@@ -419,7 +417,6 @@ and pp_element ?page fmt e =
       "@[<hv>@[<hov 5><!-- %a@]@ -->@]" Format.pp_print_text s
   | Table table -> pp_table_inlined ?page fmt table
   (* pp_table_extended ?page fmt table *)
-  | Delayed f -> pp_elements ?page fmt (f ())
   | H1(t,lab) -> Format.fprintf fmt "@[<h># %a%a@]" pp_text t pp_lab lab
   | H2(t,lab) -> Format.fprintf fmt "@[<h>## %a%a@]" pp_text t pp_lab lab
   | H3(t,lab) -> Format.fprintf fmt "@[<h>### %a%a@]" pp_text t pp_lab lab

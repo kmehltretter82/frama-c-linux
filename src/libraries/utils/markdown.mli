@@ -76,7 +76,6 @@ and element =
   | Raw of string list
   (** Each element of the list is printed as-is on its own line.
       A blank line separates the [Raw] node from the next one. *)
-  | Delayed of (unit -> elements)
   | H1 of text * string option
   | H2 of text * string option
   | H3 of text * string option
@@ -169,9 +168,6 @@ val block : block -> elements
     @raise Sys_error if there's no such file.
 *)
 val rawfile: string -> elements
-
-(** Delayed element. The content is computed on pretty-printing. *)
-val delayed: (unit -> elements) -> elements
 
 (** {2 Document Structure} *)
 

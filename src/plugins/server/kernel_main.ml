@@ -63,6 +63,7 @@ let () =
 module RawSource =
 struct
   type t = Filepath.position
+
   let syntax = Sy.publish ~page ~name:"source"
       ~synopsis:(Sy.record [ "file" , Sy.string ; "line" , Sy.int ])
       ~descr:(Md.plain "Source file positions.")
@@ -114,31 +115,29 @@ module LogKind = Dictionary(RawKind)
 module RawEvent =
 struct
 
-  module R = Record
-      (struct
-        let page = page
-        let name = "log"
-        let descr = Md.plain "Message event record."
-      end)
+  type rlog
 
-  let syntax = R.syntax
+  let jlog : rlog signature = Record.signature ~page
+      ~name:"log" ~descr:(Md.plain "Message event record.") ()
 
-  let kind = R.field "kind" ~descr:(Md.plain "Message kind") (module LogKind)
-  let plugin = R.field "plugin" ~descr:(Md.plain "Emitter plugin") (module Jstring)
-  let message = R.field "message" ~descr:(Md.plain "Message text") (module Jstring)
+  let kind = Record.field jlog ~name:"kind"
+      ~descr:(Md.plain "Message kind") (module LogKind)
+  let plugin = Record.field jlog ~name:"plugin"
+      ~descr:(Md.plain "Emitter plugin") (module Jstring)
+  let message = Record.field jlog ~name:"message"
+      ~descr:(Md.plain "Message text") (module Jstring)
+  let category = Record.option jlog ~name:"category"
+      ~descr:(Md.plain "Message category (DEBUG or WARNING)") (module Jstring)
+  let source = Record.option jlog ~name:"source"
+      ~descr:(Md.plain "Source file position") (module LogSource)
 
-  let category = R.option "category"
-      ~descr:(Md.plain "Message category (DEBUG or WARNING)")
-      (module Jstring)
-
-  let source = R.option "source"
-      ~descr:(Md.plain "Source file position")
-      (module LogSource)
+  module R = (val (Record.publish jlog) : Record.S with type r = rlog)
 
   type t = Log.event
+  let syntax = R.syntax
 
   let to_json evt =
-    R.default () |>
+    R.default |>
     R.set plugin evt.Log.evt_plugin |>
     R.set kind evt.Log.evt_kind |>
     R.set category evt.Log.evt_category |>
