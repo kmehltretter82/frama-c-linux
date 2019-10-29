@@ -91,6 +91,7 @@ class behavior
     ~(clear : Widget.button)
     ~(card : card Widget.selector)
     ~(list : GuiList.pane)
+    ~(provers : GuiConfig.provers)
     ~(goal : GuiGoal.pane)
     ~(source : GuiSource.highlighter)
     ~(popup : GuiSource.popup)
@@ -380,7 +381,7 @@ class behavior
         card#connect (fun _ -> self#details) ;
         scope#connect self#set_scope ;
         popup#on_click self#set_selection ;
-        popup#on_prove (GuiPanel.run_and_prove main) ;
+        popup#on_prove (GuiPanel.run_and_prove main provers) ;
         clear#connect self#clear ;
       end
 
@@ -505,7 +506,7 @@ let make (main : main_window_extension_points) =
     let filter = (filter :> _ Widget.selector) in
     let behavior = new behavior ~main
       ~next ~prev ~index ~scope ~filter ~clear
-      ~list ~card ~goal ~source ~popup in
+      ~list ~provers ~card ~goal ~source ~popup in
     GuiPanel.on_reload behavior#reload ;
     GuiPanel.on_update behavior#update ;
 

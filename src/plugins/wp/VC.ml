@@ -96,6 +96,7 @@ let prove = Prover.prove
 let spawn = Prover.spawn ~delayed:true
 
 let server = ProverTask.server
-let command vcs = Register.do_wp_proofs_iter (fun f -> Bag.iter f vcs)
+let command ?provers ?tip vcs =
+  Register.do_wp_proofs_iter ?provers ?tip (fun f -> Bag.iter f vcs)
 
 (* -------------------------------------------------------------------------- *)

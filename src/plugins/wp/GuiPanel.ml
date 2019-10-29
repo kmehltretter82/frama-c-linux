@@ -63,8 +63,14 @@ let wp_rte_generated s =
         not mem
       else false
 
+let spawn provers vcs =
+  if not (Bag.is_empty vcs) then
+    let provers = Why3.Whyconf.Sprover.elements provers#get in
+    VC.command ~provers ~tip:true vcs
+
 let run_and_prove
     (main:Design.main_window_extension_points)
+    (provers:GuiConfig.provers)
     (selection:GuiSource.selection)
   =
   begin
@@ -72,9 +78,9 @@ let run_and_prove
       begin
         match selection with
         | S_none -> raise Stop
-        | S_fun kf -> VC.(command (generate_kf kf))
-        | S_prop ip -> VC.(command (generate_ip ip))
-        | S_call s -> VC.(command (generate_call s.s_stmt))
+        | S_fun kf -> spawn provers (VC.generate_kf kf)
+        | S_prop ip -> spawn provers (VC.generate_ip ip)
+        | S_call s -> spawn provers (VC.generate_call s.s_stmt)
       end ;
       if wp_rte_generated selection then
         main#redisplay ()
