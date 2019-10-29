@@ -1,18 +1,18 @@
-[variadic] FRAMAC_SHARE/libc/stdio.h:165: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:207: 
   Declaration of variadic function fprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:167: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:209: 
   Declaration of variadic function fscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:169: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:211: 
   Declaration of variadic function printf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:170: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:212: 
   Declaration of variadic function scanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:171: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:213: 
   Declaration of variadic function snprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:173: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:215: 
   Declaration of variadic function sprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:175: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:217: 
   Declaration of variadic function sscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:369: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:521: 
   Declaration of variadic function dprintf.
 [variadic] tests/known/printf_garbled_mix.c:8: 
   Variadic builtin Frama_C_show_each_nb_printed left untransformed.
