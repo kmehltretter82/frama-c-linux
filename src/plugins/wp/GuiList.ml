@@ -121,8 +121,9 @@ class pane (gprovers:GuiConfig.provers) =
         List.iter
           (fun (vcs,column) ->
              match vcs with
-             | VCS.Why3 p when not (Why3.Whyconf.Sprover.mem p dps) ->
-                 ignore (list#view#remove_column column)
+             | VCS.Why3 p ->
+                 column#set_visible (Why3.Whyconf.Sprover.mem p dps) ;
+                 (* ignore (list#view#remove_column column) *)
              | _ -> ()
           ) provers ;
         (* Installing Missing Columns *)
