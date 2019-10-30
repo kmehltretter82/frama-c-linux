@@ -1,4 +1,4 @@
-m4_define([plugin_file],Makefile)
+m4_define([plugin_file],Makefile.in)
 
 m4_define([FRAMAC_SHARE_ENV],
           [m4_normalize(m4_esyscmd([echo $FRAMAC_SHARE]))])
@@ -13,27 +13,12 @@ m4_ifndef([FRAMAC_M4_MACROS],
 
 check_plugin(mdr,PLUGIN_RELATIVE_PATH(plugin_file),[Mardown/SARIF report plug-in],yes)
 
-AC_MSG_CHECKING(for ppx_deriving)
-if $OCAMLFIND query ppx_deriving -qo -qe; then
-  HAS_PPX_DERIVING=yes;
-  AC_MSG_RESULT(yes)
-  AC_MSG_CHECKING(for ppx_deriving_yojson)
-  if $OCAMLFIND query ppx_deriving_yojson -qo -qe; then
-    HAS_PPX_DERIVING_YOJSON=yes;
-  else
-    HAS_PPX_DERIVING_YOJSON=no;
-  fi
-  AC_MSG_RESULT($HAS_PPX_DERIVING_YOJSON);
-else
-  HAS_PPX_DERIVING=no;
-  HAS_PPX_DERIVING_YOJSON=no;
-  AC_MSG_RESULT(no)
-fi
+plugin_require_pkg(mdr,ppx_deriving)
+plugin_require_pkg(mdr,ppx_deriving_yojson)
 
-if test "$HAS_PPX_DERIVING_YOJSON" != "yes"; then
-   plugin_disable(mdr, [ppx_deriving_yojson not available]);
-fi
+configure_pkg(ppx_deriving,[package ppx_deriving not found])
+configure_pkg(ppx_deriving_yojson,[package ppx_deriving_yojson not found])
 
 check_plugin_dependencies
 
-write_plugin_config()
+write_plugin_config(Makefile)

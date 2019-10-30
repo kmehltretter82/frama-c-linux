@@ -10,6 +10,7 @@ PLUGIN_CMO:=\
 PLUGIN_REQUIRES:=ppx_deriving ppx_deriving_yojson yojson
 PLUGIN_DISTRIB_EXTERNAL:=share/acsl.xml
 PLUGIN_TESTS_DIRS:= eva
+PLUGIN_ENABLE:=@ENABLE_MDR@
 
 include $(FRAMAC_SHARE)/Makefile.dynamic
 

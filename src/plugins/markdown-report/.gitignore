@@ -7,6 +7,7 @@ top/
 .depend
 .merlin
 *~
+/Makefile
 /Markdown_report.mli
 /tests/ptests_config
 /tests/*/result
