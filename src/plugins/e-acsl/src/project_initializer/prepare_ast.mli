@@ -24,7 +24,7 @@
 
     So for this module performs two tasks:
     - move declarations of variables declared in the bodies of switch
-    statements to upper scopes;
+      statements to upper scopes;
     - store what is necessary to translate in [Keep_status]. *)
 
 val prepare: unit -> Project.t
