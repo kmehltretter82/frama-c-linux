@@ -25,7 +25,10 @@ $(Markdown_report_DIR)/Markdown_report.mli: \
 	cat $(Markdown_report_DIR)/md_gen.mli >> $@
 	echo "end" >> $@
 
+ifeq ("@ENABLE_MDR@","yes")
 install::
 	$(PRINT_CP) $(FRAMAC_DATADIR)/Markdown_report
 	$(MKDIR) $(FRAMAC_DATADIR)/Markdown_report
-	$(CP) share/acsl.xml $(FRAMAC_DATADIR)/Markdown_report
+	$(CP) $(Markdown_report_DIR)/share/acsl.xml \
+              $(FRAMAC_DATADIR)/Markdown_report
+endif
