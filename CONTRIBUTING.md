@@ -10,9 +10,10 @@ There are several ways to participate in the Frama-C project:
   the
   [Frama-C-discuss mailing list](https://lists.gforge.inria.fr/mailman/listinfo/frama-c-discuss);
 
-- Reporting bugs (via
-  [Github issues](https://github.com/Frama-C/Frama-C-snapshot/issues)) or the
-  [Mantis BTS](https://bts.frama-c.com);
+- Reporting bugs, via
+  [Github issues](https://github.com/Frama-C/Frama-C-snapshot/issues)
+  (preferred) or the
+  [Mantis BTS](https://bts.frama-c.com) (older BTS);
 
 - [Submitting bug fixes, improvements, and features](#submitting-bug-fixes-improvements-and-features)
   via Github pull requests;
@@ -49,7 +50,8 @@ To fit this workflow, we recommend to:
 
 3. Clone the forked Frama-C snapshot repository on your computer;
 
-4. Create and switch in a dedicated branch which should follow the following convention:
+4. Create and switch to a dedicated branch. We suggest the following
+   naming convention:
   - `bugfix/username/short-description` for bug fixes (correcting an incorrect
   behaviour);
   - `improv/username/short-description` for improvements (making even better a
@@ -60,12 +62,13 @@ To fit this workflow, we recommend to:
   the [coding conventions](#coding-conventions);
 
 6. Optionally locally add non-regression test cases to the appropriate
-  subdirectory in `./tests/`. The
+  subdirectory in `./tests/`. The `hello` tutorial in the
   [plug-in developer manual](http://frama-c.com/download/frama-c-plugin-development-guide.pdf)
-  exemplifies the use of the dedicated `ptests` tool used by Frama-C developers
-  in its `hello` tutorial and provides a documentation of it in a full section.
+  provides an example of the use of the dedicated `ptests`
+  tool used by Frama-C developers. The full documentation for `ptests` is also
+  present later in the same manual.
   You can also provide the non-regression test case in the Github issue
-  discussion and we will integrate it).
+  discussion and we will integrate it.
 
 7. Check for unexpected changes (in particular spaces and tabulations);
 
@@ -86,6 +89,10 @@ To fit this workflow, we recommend to:
   (toggling the `compare across forks` view). The base fork should remain as
   `Frama-C/Frama-C-snapshot` and the base as `master` while the head fork
   should be yours and the compare should be your chosen branch name.
+
+12. If needed (i.e. you didn't already do that and your contribution is
+    not trivial in the sense of [this document](TCA.md), please don't forget
+    to sign the [Contributor's Licence Agreement](CLA.md)
 
 For convenience, we recall the typical `git` commands to be used through these steps:
 ```shell
@@ -137,13 +144,14 @@ as newer releases are made available, we recommend the following workflow:
   about your contribution to the Frama-C ecosystem. Well done!
 
 The main advantage of this way to proceed is the delegation to OPAM of the task
-of keeping consistent Frama-C versions and dependencies.
-
+of checking the consistency of your plug-in against
+Frama-C versions (and other OCaml dependencies if any).
 
 Coding conventions
 ==================
 
-- Use [ocp-indent](https://github.com/OCamlPro/ocp-indent) to indent files;
+- Use [ocp-indent](https://github.com/OCamlPro/ocp-indent), v1.7.0
+to indent OCaml source files;
 
 - Avoid trailing whitespaces;
 
