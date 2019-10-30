@@ -1030,36 +1030,58 @@ let prover_task prover task =
 
 let altergo_step_limit = Str.regexp "^Steps limit reached:"
 
-let ping_prover_call (prover : Why3Provers.t) steps killed call =
-  match Why3.Call_provers.query_call call with
+type prover_call = {
+  prover : Why3Provers.t ;
+  call : Why3.Call_provers.prover_call ;
+  steps : int option ;
+  timeover : float option ;
+  mutable interrupted : bool ;
+  mutable killed : bool ;
+}
+
+let ping_prover_call p =
+  match Why3.Call_provers.query_call p.call with
   | NoUpdates
-  | ProverStarted -> Task.Yield
+  | ProverStarted ->
+      let () = match p.timeover with
+        | None -> ()
+        | Some timeout ->
+            let time = Unix.time () in
+            if time > timeout then
+              begin
+                Wp_parameters.debug ~dkey "Hard Kill (late why3server timeout)" ;
+                p.interrupted <- true ;
+                Why3.Call_provers.interrupt_call p.call ;
+              end
+      in Task.Wait 100
   | InternalFailure exn ->
       let msg = Format.asprintf "@[<hov 2>%a@]"
           Why3.Exn_printer.exn_printer exn in
       Task.Return (Task.Result (VCS.failed msg))
   | ProverInterrupted -> Task.(Return Canceled)
-  | ProverFinished _ when !killed -> Task.(Return Canceled)
+  | ProverFinished _ when p.killed -> Task.(Return Canceled)
   | ProverFinished pr ->
-      let r = match pr.pr_answer with
+      let r =
+        match pr.pr_answer with
         | Timeout -> VCS.timeout (int_of_float pr.pr_time)
         | Valid -> VCS.result ~time:pr.pr_time ~steps:pr.pr_steps VCS.Valid
         | Invalid -> VCS.result ~time:pr.pr_time ~steps:pr.pr_steps VCS.Invalid
         | OutOfMemory -> VCS.failed "out of memory"
-        | StepLimitExceeded -> VCS.result ?steps VCS.Stepout
+        | StepLimitExceeded -> VCS.result ?steps:p.steps VCS.Stepout
         | Unknown _ -> VCS.unknown
+        | _ when p.interrupted -> VCS.timeout (int_of_float pr.pr_time)
         | Failure s -> VCS.failed s
         | HighFailure ->
             let alt_ergo_hack =
-              prover.prover_name = "Alt-Ergo" &&
+              p.prover.prover_name = "Alt-Ergo" &&
               Str.string_match altergo_step_limit pr.pr_output 0
             in
-            if alt_ergo_hack then VCS.result ?steps VCS.Stepout
+            if alt_ergo_hack then VCS.result ?steps:p.steps VCS.Stepout
             else VCS.failed "Unknown error"
       in
       Wp_parameters.debug ~dkey
         "@[@[Why3 result for %a:@] @[%a@] and @[%a@]@."
-        Why3.Whyconf.print_prover prover
+        Why3.Whyconf.print_prover p.prover
         (Why3.Call_provers.print_prover_result) pr
         VCS.pp_result r;
       Task.Return (Task.Result r)
@@ -1080,14 +1102,22 @@ let call_prover ~timeout ~steplimit drv prover prover_config task =
     Why3.Whyconf.print_prover prover
     (Why3.Opt.get_def (-1) timeout)
     (Why3.Opt.get_def (-1) steps);
-  let killed = ref false in
+  let timeover = match timeout with
+    | None -> None | Some tlimit ->
+        let started = Unix.time () in
+        Some (started +. 2.0 +. float tlimit) in
+  let pcall = {
+    call ; prover ;
+    killed = false ;
+    interrupted = false ;
+    steps ; timeover ;
+  } in
   let ping = function
     | Task.Kill ->
-        killed := true ;
+        pcall.killed <- true ;
         Why3.Call_provers.interrupt_call call ;
         Task.Yield
-    | Task.Coin ->
-        ping_prover_call prover steps killed call
+    | Task.Coin -> ping_prover_call pcall
   in
   Task.async ping
 
