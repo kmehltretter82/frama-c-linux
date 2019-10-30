@@ -69,6 +69,17 @@ class iformat =
       ]
   end
 
+class rformat =
+  object inherit [Plang.rformat] menu
+      ~key:"GuiGoal.rformat"
+      ~default:`Ratio
+      ~data:[
+        `Ratio , "Real" , "REAL" ;
+        `Float , "Float (32 bits)" , "F32" ;
+        `Double , "Float (64 bits)" , "F64" ;
+      ]
+  end
+
 (* -------------------------------------------------------------------------- *)
 (* --- Goal Panel                                                         --- *)
 (* -------------------------------------------------------------------------- *)
@@ -101,6 +112,7 @@ class pane (enabled : GuiConfig.enabled) =
     ~icon:`SAVE ~tooltip:"Save Script" () in
   let autofocus = new autofocus in
   let iformat = new iformat in
+  let rformat = new rformat in
   let strategies = new GuiTactic.strategies () in
   object(self)
 
@@ -113,7 +125,7 @@ class pane (enabled : GuiConfig.enabled) =
         let toolbar =
           Wbox.(toolbar
                   [ w prev ; w next ; w cancel ; w forward ;
-                    w autofocus ; w iformat ;
+                    w autofocus ; w iformat ; w rformat ;
                     w play_script ; w save_script ;
                     w ~padding:6 icon ; h ~padding:6 status ]
                   [ w help ; w delete ]) in
@@ -151,6 +163,7 @@ class pane (enabled : GuiConfig.enabled) =
         play_script#connect (fun () -> self#play_script) ;
         autofocus#connect self#autofocus ;
         iformat#connect self#iformat ;
+        rformat#connect self#rformat ;
         composer#connect (fun () -> self#update) ;
         browser#connect (fun () -> self#update) ;
         help#connect (fun () -> self#open_help) ;
@@ -220,6 +233,7 @@ class pane (enabled : GuiConfig.enabled) =
           | `Main | `Internal _ -> ()
 
     method private iformat f = printer#set_iformat f ; self#update
+    method private rformat f = printer#set_rformat f ; self#update
 
     method private autofocus = function
       | `Autofocus ->
