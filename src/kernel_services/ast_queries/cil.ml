@@ -302,6 +302,16 @@ let stmt_of_instr_list ?(loc=Location.unknown) = function
 
 (**** ATTRIBUTES ****)
 
+(* Attributes are added as they are (e.g. if we add ["__attr"] and then ["attr"] both are added).
+   When checking for the presence of an attribute [x] or trying to remove it, underscores are
+   removed at the beginning and the end of the attribute for both the [x] attribute and the
+   attributes of the list. For example, if have a call:
+
+   dropAttribute "__const" [ Attr("const", []) ; Attr("__const", []) ; Attr("__const__", []) ]
+
+   The result is [].
+*)
+
 let bitfield_attribute_name = "FRAMA_C_BITFIELD_SIZE"
 
 (** Construct sorted lists of attributes ***)
@@ -326,11 +336,12 @@ let addAttributes al0 (al: attributes) : attributes =
     List.fold_left (fun acc a -> addAttribute a acc) al al0
 
 let dropAttribute (an: string) (al: attributes) =
+  let an = Extlib.strip_underscore an in
   List.filter (fun a -> attributeName a <> an) al
 
-let hasAttribute (s: string) (al: attribute list) : bool =
-  let s = Extlib.strip_underscore s in
-  List.exists (fun a -> attributeName a = s) al
+let hasAttribute (an: string) (al: attribute list) : bool =
+  let an = Extlib.strip_underscore an in
+  List.exists (fun a -> attributeName a = an) al
 
 let rec dropAttributes (anl: string list) (al: attributes) =
   match al with
@@ -342,13 +353,15 @@ let rec dropAttributes (anl: string list) (al: attributes) =
     else
     if q' == q then al (* preserve sharing *) else a :: q'
 
-let filterAttributes (s: string) (al: attribute list) : attribute list =
-  List.filter (fun a -> attributeName a = s) al
+let filterAttributes (an: string) (al: attribute list) : attribute list =
+  let an = Extlib.strip_underscore an in
+  List.filter (fun a -> attributeName a = an) al
 
-let findAttribute (s: string) (al: attribute list) : attrparam list =
+let findAttribute (an: string) (al: attribute list) : attrparam list =
+  let an = Extlib.strip_underscore an in
   List.fold_left
     (fun acc -> function
-       | Attr (an, param) when an = s -> param @ acc
+       | Attr (_, param) as a0 when attributeName a0 = an -> param @ acc
        | _ -> acc)
     [] al
 
@@ -555,6 +568,20 @@ let partitionAttributes
   in
   loop ([], [], []) attrs
 
+let frama_c_ghost_formal = "__fc_ghost_formal"
+let () = registerAttribute frama_c_ghost_formal (AttrName false)
+let () =
+  registerAttribute (Extlib.strip_underscore frama_c_ghost_formal) (AttrName false)
+
+let frama_c_mutable = "__fc_mutable"
+let () = registerAttribute frama_c_mutable (AttrName false)
+let () =
+  registerAttribute (Extlib.strip_underscore frama_c_mutable) (AttrName false)
+
+let frama_c_init_obj = "__fc_initialized_object"
+let () = registerAttribute frama_c_init_obj (AttrName false)
+let () =
+  registerAttribute (Extlib.strip_underscore frama_c_init_obj) (AttrName false)
 
 let unrollType (t: typ) : typ =
   let rec withAttrs (al: attributes) (t: typ) : typ =
@@ -573,7 +600,10 @@ let rec unrollTypeSkel = function
   | x -> x
 
 (* Make a varinfo. Used mostly as a helper function below  *)
-let makeVarinfo ?(source=true) ?(temp=false) ?(referenced=false) global formal name typ =
+let makeVarinfo
+    ?(source=true) ?(temp=false) ?(referenced=false) ?(ghost=false) ?(loc=Location.unknown)
+    global formal name typ
+  =
   let vi =
     { vorig_name = name;
       vname = name;
@@ -583,7 +613,7 @@ let makeVarinfo ?(source=true) ?(temp=false) ?(referenced=false) global formal n
       vformal = formal;
       vtemp = temp;
       vtype = typ;
-      vdecl = Location.unknown;
+      vdecl = loc;
       vinline = false;
       vattr = [];
       vstorage = NoStorage;
@@ -591,7 +621,7 @@ let makeVarinfo ?(source=true) ?(temp=false) ?(referenced=false) global formal n
       vreferenced = referenced;
       vdescr = None;
       vdescrpure = true;
-      vghost = false;
+      vghost = ghost;
       vsource = source;
       vlogic_var_assoc = None
     }
@@ -612,14 +642,22 @@ module FormalsDecl =
 let selfFormalsDecl = FormalsDecl.self
 let () = dependency_on_ast selfFormalsDecl
 
-let makeFormalsVarDecl (n,t,a) =
-  let vi = makeVarinfo ~temp:false false true n t in
+let makeFormalsVarDecl ?ghost (n,t,a) =
+  let vi = makeVarinfo ?ghost ~temp:false false true n t in
   vi.vattr <- a;
   vi
+
+let isGhostFormalVarinfo vi =
+  hasAttribute frama_c_ghost_formal vi.vattr
+
+let isGhostFormalVarDecl (_name, _type, attr) =
+  hasAttribute frama_c_ghost_formal attr
 
 let setFormalsDecl vi typ =
   match unrollType typ with
   | TFun(_, Some args, _, _) ->
+    let is_ghost d = vi.vghost || isGhostFormalVarDecl d in
+    let makeFormalsVarDecl x = makeFormalsVarDecl ~ghost:(is_ghost x) x in
     FormalsDecl.replace vi (List.map makeFormalsVarDecl args)
   | TFun(_,None,_,_) -> ()
   | _ ->
@@ -3509,17 +3547,6 @@ let typeOf_array_elem t =
   | TArray (ty_elem, _, _, _) -> ty_elem
   | _ -> Kernel.fatal "Not an array type %a" !pp_typ_ref t
 
-
-let frama_c_mutable = "__fc_mutable"
-let () = registerAttribute frama_c_mutable (AttrName false)
-let () =
-  registerAttribute (Extlib.strip_underscore frama_c_mutable) (AttrName false)
-
-let frama_c_init_obj = "__fc_initialized_object"
-let () = registerAttribute frama_c_init_obj (AttrName false)
-let () =
-  registerAttribute (Extlib.strip_underscore frama_c_init_obj) (AttrName false)
-
 let no_op_coerce typ t =
   match typ with
   | Lreal -> true
@@ -5201,16 +5228,16 @@ let rec findUniqueName ?(suffix="") fdec name =
 let refresh_local_name fdec vi =
   let new_name = findUniqueName fdec vi.vname in vi.vname <- new_name
 
-let makeLocal ?(temp=false) ?referenced ?(formal=false) fdec name typ =
+let makeLocal ?(temp=false) ?referenced ?ghost ?(formal=false) ?loc fdec name typ =
   (* a helper function *)
   let name = findUniqueName fdec name in
   fdec.smaxid <- 1 + fdec.smaxid;
-  let vi = makeVarinfo ~temp ?referenced false formal name typ in
+  let vi = makeVarinfo ~temp ?referenced ?ghost ?loc false formal name typ in
   vi
 
 (* Make a local variable and add it to a function *)
-let makeLocalVar fdec ?scope ?(temp=false) ?referenced ?(insert = true) name typ =
-  let vi = makeLocal ~temp ?referenced fdec name typ in
+let makeLocalVar fdec ?scope ?(temp=false) ?referenced ?(insert=true) ?loc name typ =
+  let vi = makeLocal ~temp ?referenced ?loc fdec name typ in
   refresh_local_name fdec vi;
   if insert then
     begin
@@ -5224,9 +5251,8 @@ let makeLocalVar fdec ?scope ?(temp=false) ?referenced ?(insert = true) name typ
     end;
   vi
 
-let makeTempVar fdec ?insert ?(name = "__cil_tmp") ?descr ?(descrpure = true)
-    typ : varinfo =
-  let vi = makeLocalVar fdec ~temp:true ?insert name typ in
+let makeTempVar fdec ?insert ?(name = "__cil_tmp") ?descr ?(descrpure = true) ?loc typ : varinfo =
+  let vi = makeLocalVar fdec ~temp:true ?insert ?loc name typ in
   vi.vdescr <- descr;
   vi.vdescrpure <- descrpure;
   vi
@@ -5275,21 +5301,35 @@ let setMaxId (f: fundec) =
  * this one. If where = "^" then it is inserted first. If where = "$" then
  * it is inserted last. Otherwise where must be the name of a formal after
  * which to insert this. By default it is inserted at the end. *)
-let makeFormalVar fdec ?(where = "$") name typ : varinfo =
+let makeFormalVar fdec ?(ghost=fdec.svar.vghost) ?(where = "$") ?loc name typ : varinfo =
+  assert ((not fdec.svar.vghost) || ghost) ;
+  let makeit name =
+    let vi = makeLocal ~ghost ?loc ~formal:true fdec name typ in
+    if ghost && not fdec.svar.vghost then
+      vi.vattr <- addAttribute (Attr(frama_c_ghost_formal, [])) vi.vattr ;
+    vi
+  in
+  let error () = Kernel.fatal ~current:true
+      "makeFormalVar: cannot find insert-after formal %s" where
+  in
   (* Search for the insertion place *)
-  let makeit name = makeLocal ~formal:true fdec name typ in
   let rec loopFormals acc = function
-      [] ->
+    | [] ->
+      if where = "$" || (ghost && where = "^") then
+        let vi = makeit name in vi, List.rev (vi :: acc)
+      else error ()
+    | f :: rest when not ghost && f.vghost ->
       if where = "$" then
-        let vi = makeit name in vi, List.rev (vi::acc)
-      else Kernel.fatal ~current:true
-          "makeFormalVar: cannot find insert-after formal %s" where
-    | f :: rest when f.vname = where ->
+        let vi = makeit name in vi, List.rev_append acc (vi :: f :: rest)
+      else error ()
+    | f :: rest when f.vname = where && f.vghost = ghost ->
       let vi = makeit name in vi, List.rev_append acc (f :: vi :: rest)
+    | f :: rest when ghost && f.vghost && where = "^" ->
+      let vi = makeit name in vi, List.rev_append acc (vi :: f :: rest)
     | f :: rest -> loopFormals (f::acc) rest
   in
   let vi, newformals =
-    if where = "^" then let vi = makeit name in vi, vi :: fdec.sformals
+    if where = "^" && not ghost then let vi = makeit name in vi, vi :: fdec.sformals
     else
       loopFormals [] fdec.sformals
   in
@@ -5298,14 +5338,14 @@ let makeFormalVar fdec ?(where = "$") name typ : varinfo =
 
 (* Make a global variable. Your responsibility to make sure that the name
  * is unique *)
-let makeGlobalVar ?source ?temp ?referenced name typ =
-  makeVarinfo ?source ?temp ?referenced true false name typ
+let makeGlobalVar ?source ?temp ?referenced ?loc name typ =
+  makeVarinfo ?source ?temp ?referenced ?loc true false name typ
 
 let mkPureExprInstr ~fundec ~scope ?loc e =
   let loc = match loc with None -> e.eloc | Some l -> l in
   let typ = typeOf e in
   let descr = Format.asprintf "%a" !pp_exp_ref e in
-  let tmp = makeLocalVar ~temp:true ~scope fundec "tmp" typ in
+  let tmp = makeLocalVar ~temp:true ~scope ~loc fundec "tmp" typ in
   tmp.vdescr <- Some descr;
   tmp.vdefined <- true;
   Local_init(tmp, AssignInit (SingleInit e), loc)
@@ -5792,6 +5832,11 @@ let splitFunctionTypeVI (fvi: varinfo)
   match unrollType fvi.vtype with
     TFun (rt, args, isva, a) -> rt, args, isva, a
   | _ -> Kernel.abort "Function %s invoked on a non function type" fvi.vname
+
+let argsToPairOfLists args =
+  List.partition
+    (fun f -> not(isGhostFormalVarDecl f))
+    (argsToList args)
 
 let remove_attributes_for_integral_promotion a =
   dropAttributes (bitfield_attribute_name :: spare_attributes_for_c_cast) a

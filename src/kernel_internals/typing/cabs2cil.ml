@@ -1163,21 +1163,22 @@ end
 let constFoldType (t:typ) : typ =
   visitCilType constFoldTypeVisitor t
 
-let get_temp_name () =
+let get_temp_name ?(ghost=false) () =
   let undolist = ref [] in
   let data = CurrentLoc.get() in
+  let name = if ghost then "g_tmp" else "tmp" in
   let name, _ =
-    Alpha.newAlphaName ~alphaTable ~undolist ~lookupname:"tmp" ~data
+    Alpha.newAlphaName ~alphaTable ~undolist ~lookupname:name ~data
   in
   let undolist = !undolist in
   Alpha.undoAlphaChanges ~alphaTable ~undolist;
   name
 
 (* Create a new temporary variable *)
-let newTempVar descr (descrpure:bool) typ =
+let newTempVar ~ghost loc descr (descrpure:bool) typ =
   let t' = (!typeForInsertedVar) typ in
-  let name = get_temp_name () in
-  let vi = makeVarinfo ~temp:true false false name t' in
+  let name = get_temp_name ~ghost () in
+  let vi = makeVarinfo ~ghost ~temp:true ~loc false false name t' in
   vi.vdescr <- Some descr;
   vi.vdescrpure <- descrpure;
   alphaConvertVarAndAddToEnv false vi
@@ -1565,7 +1566,8 @@ struct
               match Cil_datatype.Varinfo.Hashtbl.find_opt replacements vi with
               | None ->
                 let vi' =
-                  newTempVar (vi.vname ^ " initialization") true vi.vtype
+                  newTempVar
+                    ~ghost vi.vdecl (vi.vname ^ " initialization") true vi.vtype
                 in
                 Cil_datatype.Varinfo.Hashtbl.add replacements vi vi';
                 vars := vi' :: !vars;
@@ -2619,11 +2621,15 @@ let rec combineTypes (what: combineWhat) (oldt: typ) (t: typ) : typ =
     let newargs, olda' =
       if oldargs = None then args, olda else
       if args = None then oldargs, olda else
-        let oldargslist = argsToList oldargs in
-        let argslist = argsToList args in
+        let (oldargslist, oldghostargslist) = argsToPairOfLists oldargs in
+        let (argslist, ghostargslist) = argsToPairOfLists args in
         if List.length oldargslist <> List.length argslist then
           raise (Cannot_combine "different number of arguments")
+        else if List.length oldghostargslist <> List.length ghostargslist then
+          raise (Cannot_combine "different number of ghost arguments")
         else begin
+          let oldargslist = oldargslist @ oldghostargslist in
+          let argslist = argslist @ ghostargslist in
           (* Construct a mapping between old and new argument names. *)
           let map = H.create 5 in
           List.iter2
@@ -3034,8 +3040,11 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
           (try
              let old_formals_env = getFormalsDecl oldvi in
              List.iter2
-               (fun old (name,typ,attr) ->
-                  if name <> "" then begin
+               (fun old ((name,typ,attr) as decl) ->
+                  let new_ghost = Cil.isGhostFormalVarDecl decl in
+                  if old.vghost <> new_ghost then
+                    raise (Invalid_argument "Incompatible ghost status")
+                  else if name <> "" then begin
                     Kernel.debug ~dkey:Kernel.dkey_typing_global
                       "replacing formal %s with %s" old.vname name;
                     old.vname <- name;
@@ -3961,6 +3970,8 @@ let empty_local_env =
   }
 
 let ghost_local_env ghost = {empty_local_env with is_ghost = ghost }
+let add_ghost_to_local_env env ghost =
+  { env with is_ghost = env.is_ghost || ghost }
 
 let paren_local_env env = { env with is_paren = true }
 let no_paren_local_env env = { env with is_paren = false }
@@ -4343,7 +4354,11 @@ let rec doSpecList ghost (suggestedAnonName: string)
    * collected and processed separately. *)
   let attrs : A.attribute list ref = ref [] in      (* __attribute__, etc. *)
   let cvattrs : A.cvspec list ref = ref [] in       (* const/volatile *)
-
+  let suggestedAnonName =
+    if suggestedAnonName <> "" then suggestedAnonName
+    else if get_current_stdheader () = "" then ""
+    else "fc_stdlib"
+  in
   let doSpecElem (se: A.spec_elem)
       (acc: A.typeSpecifier list)
     : A.typeSpecifier list =
@@ -4709,12 +4724,10 @@ and makeVarInfoCabs
     Kernel.error ~once:true ~current:true "inline for a non-function: %s" n;
   checkRestrictQualifierDeep vtype;
   (*  log "Looking at %s(%b): (%a)@." n isformal d_attrlist nattr;*)
-  let vi = makeVarinfo ~referenced ~temp:isgenerated isglobal isformal n vtype
+  let vi = makeVarinfo ~ghost ~referenced ~temp:isgenerated ~loc:ldecl isglobal isformal n vtype
   in
   vi.vstorage <- sto;
   vi.vattr <- nattr;
-  vi.vdecl <- ldecl;
-  vi.vghost <- ghost;
   vi.vdefined <-
     not (isFunctionType vtype) && isglobal && (sto = NoStorage || sto = Static);
 
@@ -4783,7 +4796,7 @@ and doAttr ghost (a: A.attribute) : attribute list =
         end
       | A.CONSTANT (A.CONST_FLOAT str) ->
         ACons ("__fc_float", [AStr str])
-      | A.CALL({expr_node = A.VARIABLE n}, args) -> begin
+      | A.CALL({expr_node = A.VARIABLE n}, args, []) -> begin
           let n' = if strip then stripUnderscore n else n in
           let ae' = List.map ae args in
           ACons(n', ae')
@@ -5026,7 +5039,7 @@ and doType (ghost:bool) isFuncArg
            function argument";
       doDeclType (TArray(bt, lo, empty_size_cache (), al')) acc d
 
-    | A.PROTO (d, args, isva) ->
+    | A.PROTO (d, args, ghost_args, isva) ->
       (* Start a scope for the parameter names *)
       enterScope ();
       (* Intercept the old-style use of varargs.h. On GCC this means that
@@ -5053,9 +5066,9 @@ and doType (ghost:bool) isFuncArg
           (args', !newisva)
         end else (args, isva)
       in
-      let argl_length = List.length args' in
       (* Make the argument as for a formal *)
-      let doOneArg (s, (n, ndt, a, cloc)) : varinfo =
+      let doOneArg argl_length is_ghost (s, (n, ndt, a, cloc)) : varinfo =
+        let ghost = is_ghost || ghost in
         let s' = doSpecList ghost n s in
         let vi = makeVarInfoCabs ~ghost ~isformal:true ~isglobal:false
             (convLoc cloc) s' (n,ndt,a) in
@@ -5073,13 +5086,31 @@ and doType (ghost:bool) isFuncArg
         addLocalToEnv vi.vname (EnvVar vi);
         vi
       in
+      let make_noopt_targs ghost args =
+        let argl_length = List.length args in
+        List.map (doOneArg argl_length ghost) args
+      in
+      let noopt_targs = make_noopt_targs false args' in
+      let noopt_ghost_targs = make_noopt_targs true ghost_args in
       let targs : varinfo list option =
-        match List.map doOneArg args'  with
+        match noopt_targs with
         | [] -> None (* No argument list *)
+        | [t] when isVoidType t.vtype -> Some []
+        | l -> Some l
+      in
+      let ghost_targs : varinfo list =
+        match noopt_ghost_targs with
         | [t] when isVoidType t.vtype ->
-          Some []
-        | l ->
-          Some l
+          Kernel.error ~once:true ~current:true
+            "ghost parameters list cannot be void" ;
+          []
+        | l -> l
+      in
+      let all_targs =
+        match targs, ghost_targs with
+        | None, [] -> None
+        | None, g -> Some g
+        | Some ng, g -> Some (ng @ g)
       in
       exitScope ();
       (* Turn [] types into pointers in the arguments and the result type.
@@ -5134,11 +5165,19 @@ and doType (ghost:bool) isFuncArg
           fixupArgumentTypes (argidx + 1) args'
       in
       let args =
-        match targs with
+        match all_targs with
         | None -> None
         | Some argl ->
           fixupArgumentTypes 0 argl;
-          Some (List.map (fun a -> (a.vname, a.vtype, a.vattr)) argl)
+          let arg_type_from_vi vi =
+            let attrs =
+              if vi.vghost then
+                cabsAddAttributes [Attr (frama_c_ghost_formal, [])] vi.vattr
+              else
+                vi.vattr
+            in (vi.vname, vi.vtype, attrs)
+          in
+          Some (List.map arg_type_from_vi argl)
       in
       let tres =
         match unrollType bt with
@@ -5180,7 +5219,7 @@ and isVariableSizedArray ghost (dt: A.decl_type)
     | PTR (al, dt) -> PTR (al, findArray dt)
     | JUSTBASE -> JUSTBASE
     | PARENTYPE (prea, dt, posta) -> PARENTYPE (prea, findArray dt, posta)
-    | PROTO (dt, f, a) -> PROTO (findArray dt, f, a)
+    | PROTO (dt, f, g, a) -> PROTO (findArray dt, f, g, a)
   in
   let dt' = findArray dt in
   match !res with
@@ -6034,7 +6073,7 @@ and doExp local_env
             doExp local_env asconst
               (cabs_exp loc
                  (A.CALL (cabs_exp loc (A.VARIABLE "__builtin_next_arg"),
-                          [cabs_exp loc (A.CONSTANT (A.CONST_INT "0"))])))
+                          [cabs_exp loc (A.CONSTANT (A.CONST_INT "0"))],[])))
               what
           end
 
@@ -6141,7 +6180,7 @@ and doExp local_env
                   Format.asprintf "%a%s"
                     Cil_descriptive_printer.pp_exp  e'
                     (if uop = A.POSINCR then "++" else "--") in
-                let tmp = newTempVar descr true t in
+                let tmp = newTempVar ~ghost loc descr true t in
                 ([var tmp],
                  local_var_chunk se' tmp +++
                  (mkStmtOneInstr ~ghost:local_env.is_ghost ~valid_sid
@@ -6223,7 +6262,7 @@ and doExp local_env
                 let descr =
                   Format.asprintf "%a" Cil_descriptive_printer.pp_lval lv
                 in
-                let tmp = newTempVar descr true lvt in
+                let tmp = newTempVar ~ghost loc descr true lvt in
                 let chunk =
                   i2c
                     (mkStmtOneInstr ~ghost:local_env.is_ghost ~valid_sid
@@ -6345,7 +6384,7 @@ and doExp local_env
           finishExp [] se e' intType
         | _ ->
           let tmp =
-            newTempVar "<boolean expression>" true intType
+            newTempVar ~ghost loc "<boolean expression>" true intType
           in
           let condChunk =
             compileCondExp ~ghost ce
@@ -6362,7 +6401,7 @@ and doExp local_env
             intType
       end
 
-    | A.CALL(f, args) ->
+    | A.CALL(f, args, ghost_args) ->
       let (rf,sf, f', ft') =
         match (stripParen f).expr_node with
         (* Treat the VARIABLE case separate because we might be calling a
@@ -6490,14 +6529,14 @@ and doExp local_env
       in
       let init_chunk = unspecified_chunk empty in
       (* Do the arguments. In REVERSE order !!! Both GCC and MSVC do this *)
-      let rec loopArgs = function
+      let rec loopArgs ?(are_ghost=false) = function
         | ([], []) ->
           (match argTypes, f''.enode with
            | None, Lval (Var f,NoOffset) ->
              (* we call a function without prototype with 0 argument.
                 Hence, it really has no parameter.
              *)
-             if not isSpecialBuiltin then begin
+             if not isSpecialBuiltin && not are_ghost then begin
                warn_no_proto f;
                let typ = TFun (resType, Some [], false,attrs) in
                Cil.update_var_type f typ;
@@ -6510,16 +6549,18 @@ and doExp local_env
         | _, [] ->
           if not isSpecialBuiltin then
             Kernel.error ~once:true ~current:true
-              "Too few arguments in call to %a." Cil_printer.pp_exp f' ;
+              "Too few%s arguments in call to %a."
+              (if are_ghost then " ghost" else "") Cil_printer.pp_exp f' ;
           (init_chunk, [])
 
         | ((_, at, _) :: atypes, a :: args) ->
-          let (ss, args') = loopArgs (atypes, args) in
+          let (ss, args') = loopArgs ~are_ghost (atypes, args) in
           (* Do not cast as part of translating the argument. We let
            * the castTo do this work. This was necessary for
            * test/small1/union5, in which a transparent union is passed
            * as an argument *)
           let (sa, a', att) =
+            let local_env = add_ghost_to_local_env local_env are_ghost in
             let (r, c, e, t) =
               doExp (no_paren_local_env local_env) CNoConst a (AExp None)
             in
@@ -6587,7 +6628,8 @@ and doExp local_env
           if not isvar && argTypes != None && not isSpecialBuiltin then
             (* Do not give a warning for functions without a prototype*)
             Kernel.error ~once:true ~current:true
-              "Too many arguments in call to %a" Cil_printer.pp_exp f';
+              "Too many%s arguments in call to %a"
+              (if are_ghost then " ghost" else "") Cil_printer.pp_exp f';
           let rec loop = function
               [] -> (init_chunk, [])
             | a :: args ->
@@ -6636,7 +6678,18 @@ and doExp local_env
            *)
           )
       in
-      let (sargs, args') = loopArgs (argTypesList, args) in
+      let (argTypes, ghostArgTypes) =
+        List.partition (fun d -> not (isGhostFormalVarDecl d) || ghost) argTypesList
+      in
+      let args = if ghost then args @ ghost_args else args in
+
+      (* Again, we process arguments in REVERSE order. *)
+      let (sghost, ghosts') = loopArgs ~are_ghost:true (ghostArgTypes, ghost_args) in
+      let (sargs, args') = loopArgs (argTypes, args) in
+
+      let sargs = sghost @@ (sargs, false) in
+
+      let (sargs, args') = (sargs, args' @ ghosts') in
       (* Setup some pointer to the elements of the call. We may change
        * these below *)
       let s0 = unspecified_chunk empty in
@@ -6666,9 +6719,10 @@ and doExp local_env
         | _ -> e
       in
       (* Get the name of the last formal *)
-      let getNameLastFormal () : string =
+      let getNameLastNonGhostFormal () : string =
         match !currentFunctionFDEC.svar.vtype with
         | TFun(_, Some args, true, _) -> begin
+            let args, _ = Cil.argsToPairOfLists (Some args) in
             match List.rev args with
             | (last_par_name, _, _) :: _ -> last_par_name
             | _ -> ""
@@ -6688,7 +6742,7 @@ and doExp local_env
                      match !pwhat with
                      | ASet (is_real,lv, r, lvt) -> is_real, lv, r, lvt
                      | _ ->
-                       let v = newTempVar "vararg" true resTyp in
+                       let v = newTempVar ~ghost loc "vararg" true resTyp in
                        locals := v::!locals;
                        false, var v, [], resTyp
                    in
@@ -6717,7 +6771,7 @@ and doExp local_env
                    let isOk =
                      match (dropCasts last).enode with
                      | Lval (Var lastv, NoOffset) ->
-                       lastv.vname = getNameLastFormal ()
+                       lastv.vname = getNameLastNonGhostFormal ()
                      | _ -> false
                    in
                    if not isOk && variad then
@@ -6753,7 +6807,7 @@ and doExp local_env
                    let isOk =
                      match (dropCasts last).enode with
                      | Lval (Var lastv, NoOffset) ->
-                       lastv.vname = getNameLastFormal ()
+                       lastv.vname = getNameLastNonGhostFormal ()
                      | _ -> false
                    in
                    if not isOk then
@@ -6792,7 +6846,7 @@ and doExp local_env
                    let isOk =
                      match (dropCasts last).enode with
                      | Lval (Var lastv, NoOffset) ->
-                       lastv.vname = getNameLastFormal ()
+                       lastv.vname = getNameLastNonGhostFormal ()
                      | _ -> false
                    in
                    if not isOk then
@@ -6899,6 +6953,19 @@ and doExp local_env
                    "Invalid call to builtin_expect"
              end
 
+           | "__fc_infinity" -> begin
+               piscall := false;
+               let cst = CReal (infinity, FFloat, Some "INFINITY") in
+               pres := Cil.new_exp ~loc (Const cst);
+               prestype := Cil.floatType;
+             end
+           | "__fc_nan" -> begin
+               piscall := false;
+               let cst = CReal (nan, FFloat, Some "NAN") in
+               pres := Cil.new_exp ~loc (Const cst);
+               prestype := Cil.floatType;
+             end
+
            (* TODO: Only keep the side effects of the 1st or 2nd argument
               | "__builtin_choose_expr" ->
               begin match !pargs with
@@ -6991,8 +7058,7 @@ and doExp local_env
                    Cil_descriptive_printer.pp_exp)
                 !pargs
             in
-            let tmp = newTempVar descr false restype'' in
-            tmp.vdecl <- loc;
+            let tmp = newTempVar ~ghost loc descr false restype'' in
             locals:=tmp::!locals;
             (* Remember that this variable has been created for this
              * specific call. We will use this in collapseCallCast. *)
@@ -7131,7 +7197,7 @@ and doExp local_env
                let descr =
                  Format.asprintf "%a" Cprint.print_expression e1
                in
-               let tmp = newTempVar descr true tresult in
+               let tmp = newTempVar ~ghost loc descr true tresult in
                let tmp_var = var tmp in
                let tmp_lval = new_exp ~loc:e.expr_loc (Lval (tmp_var)) in
                let (r1, se1, _, _) =
@@ -7200,7 +7266,7 @@ and doExp local_env
                 let descr =
                   Format.asprintf "%a" Cprint.print_expression e1
                 in
-                let tmp = newTempVar descr true tresult in
+                let tmp = newTempVar ~ghost loc descr true tresult in
                 let tmp_var = var tmp in
                 let tmp_lval = new_exp ~loc:e.expr_loc (Lval (tmp_var)) in
                 let (r1,se1, _, _) =
@@ -7229,7 +7295,7 @@ and doExp local_env
                         Cil_descriptive_printer.pp_exp e2'
                         Cil_descriptive_printer.pp_exp e3'
                     in
-                    let tmp = newTempVar descr true tresult in
+                    let tmp = newTempVar ~ghost loc descr true tresult in
                     false, var tmp, [], tresult,
                     local_var_chunk empty tmp
                 in
@@ -7302,7 +7368,7 @@ and doExp local_env
           let se, e =
             match se.stmts with
             | [ { skind = Block b},_, _, _, _ ] ->
-              let vi = newTempVar "GNU.body" true t in
+              let vi = newTempVar ~ghost loc "GNU.body" true t in
               b.bstmts <-
                 b.bstmts @
                 [Cil.mkStmtOneInstr ~ghost:local_env.is_ghost ~valid_sid
@@ -8501,7 +8567,11 @@ and cleanup_autoreference vi chunk =
           match !temp with
           | Some v' -> ChangeTo v'
           | None ->
-            let v' = newTempVar (vi.vname ^ " initialization") true vi.vtype in
+            let ghost = v.vghost in
+            let loc = v.vdecl in
+            let v' =
+              newTempVar ~ghost loc (vi.vname ^ " initialization") true vi.vtype
+            in
             temp := Some v';
             ChangeTo v'
         end else SkipChildren
@@ -8530,8 +8600,8 @@ and createLocal ghost ((_, sto, _, _) as specs)
   (* Check if we are declaring a function *)
   let rec isProto (dt: decl_type) : bool =
     match dt with
-    | PROTO (JUSTBASE, _, _) -> true
-    | PROTO (x, _, _) -> isProto x
+    | PROTO (JUSTBASE, _,_, _) -> true
+    | PROTO (x, _,_, _) -> isProto x
     | PARENTYPE (_, x, _) -> isProto x
     | ARRAY (x, _, _) -> isProto x
     | PTR (_, x) -> isProto x
@@ -8701,7 +8771,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
           (* do it in two *)
           let rt, _, _, _ = splitFunctionType alloca.vtype in
           let tmp =
-            newTempVar
+            newTempVar ~ghost loc
               (Format.asprintf "alloca(%a)" Cil_printer.pp_exp alloca_size)
               false rt
           in
@@ -8763,7 +8833,7 @@ and doAliasFun vtype (thisname:string) (othername:string)
   let args = List.map
       (fun (n,_,_) -> { expr_loc = loc; expr_node = A.VARIABLE n})
       (argsToList formals) in
-  let call = A.CALL ({expr_loc = loc; expr_node = A.VARIABLE othername}, args)
+  let call = A.CALL ({expr_loc = loc; expr_node = A.VARIABLE othername}, args,[])
   in
   let stmt = {stmt_ghost = false;
               stmt_node = if isVoidType rt then
@@ -8970,10 +9040,10 @@ and doDecl local_env (isglobal: bool) : A.definition -> chunk = function
 
         (* Create the formals and add them to the environment. *)
         (* sfg: extract tsets for the formals from dt *)
-        let doFormal (loc : location) (fn, ft, fa) =
-          let f = makeVarinfo ~temp:false false true fn ft in
-          (f.vdecl <- loc;
-           f.vattr <- fa;
+        let doFormal (loc : location) ((fn, ft, fa) as fd) =
+          let ghost = ghost || isGhostFormalVarDecl fd in
+          let f = makeVarinfo ~ghost ~temp:false ~loc false true fn ft in
+          (f.vattr <- fa;
            alphaConvertVarAndAddToEnv true f)
         in
         let rec doFormals fl' ll' =
@@ -8992,7 +9062,7 @@ and doDecl local_env (isglobal: bool) : A.definition -> chunk = function
               f' :: fl'
           end
         in
-        let fmlocs = (match dt with PROTO(_, fml, _) -> fml | _ -> []) in
+        let fmlocs = (match dt with PROTO(_, fml, _, _) -> fml | _ -> []) in
         let formals = doFormals (argsToList formals_t) fmlocs in
         (* in case of formals referred to in types of others, doType has
            put dummy varinfos. We need to fix them now that we have proper

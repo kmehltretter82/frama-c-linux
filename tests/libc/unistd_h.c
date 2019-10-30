@@ -91,5 +91,18 @@ int main() {
 
   r = chroot("/tmp");
 
+  if (nondet) {
+    pipe(0); // invalid fildes
+    //@ assert unreachable:\false;
+  }
+  int halfpipe;
+  if (nondet) {
+    pipe(&halfpipe); // invalid fildes
+    //@ assert unreachable:\false;
+  }
+  int pipefd[2];
+  r = pipe(pipefd);
+  //@ check ok: r == 0 || r == -1;
+
   return 0;
 }

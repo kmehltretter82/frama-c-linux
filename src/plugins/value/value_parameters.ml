@@ -167,6 +167,13 @@ module SymbolicLocsDomain = Domain_Parameter
       let default = false
     end)
 
+module OctagonDomain = Domain_Parameter
+    (struct
+      let option_name = "-eva-octagon-domain"
+      let help = "Use the octagon domain of Eva."
+      let default = false
+    end)
+
 module BitwiseOffsmDomain = Domain_Parameter
     (struct
       let option_name = "-eva-bitwise-domain"
@@ -311,6 +318,21 @@ module EqualityCallFunction =
       let arg_name = "f:none|formals|all"
     end)
 let () = add_precision_dep EqualityCallFunction.parameter
+
+let () = Parameter_customize.set_group domains
+module OctagonCall =
+  Bool
+    (struct
+      let option_name = "-eva-octagon-through-calls"
+      let help = "Whether the relations inferred by the octagon domain are \
+                  propagated through function calls. Disabled by default: \
+                  the octagon analysis is intra-procedural, starting \
+                  each function with an empty octagon state, \
+                  and losing the octagons inferred at the end. \
+                  The interprocedural analysis is more precise but slower."
+      let default = false
+    end)
+let () = add_precision_dep OctagonCall.parameter
 
 let () = Parameter_customize.set_group domains
 module Numerors_Real_Size =
@@ -789,6 +811,20 @@ module MinLoopUnroll =
     end)
 let () = add_precision_dep MinLoopUnroll.parameter
 let () = MinLoopUnroll.set_range 0 max_int
+
+let () = Parameter_customize.set_group precision_tuning
+module AutoLoopUnroll =
+  Int
+    (struct
+      let option_name = "-eva-auto-loop-unroll"
+      let arg_name = "n"
+      let default = 0
+      let help = "limit of the automatic loop unrolling: all loops whose \
+                  number of iterations can be easily bounded by <n> \
+                  are completely unrolled."
+    end)
+let () = add_precision_dep AutoLoopUnroll.parameter
+let () = AutoLoopUnroll.set_range 0 max_int
 
 let () = Parameter_customize.set_group precision_tuning
 module DefaultLoopUnroll =
@@ -1501,26 +1537,31 @@ let bind (type t) (module P: Parameter_sig.S with type t = t) f =
   let set = set (module P) in
   configures := (fun n -> set ~default:(n < 0) (f n)) :: !configures
 
-(*  power             0   1   2   3   4    5    6    7     8     9     10     11 *)
-let slevel_power = [| 0;  10; 20; 50;  75; 100; 200; 500; 1000; 2000; 5000; 10000 |]
-let ilevel_power = [| 8;  12; 16; 24;  32;  64; 128; 256;  256;  256;  256;   256 |]
-let plevel_power = [| 10; 20; 40; 70; 100; 150; 200; 300;  500;  700; 1000;  2000 |]
+(*  power             0    1   2   3    4    5    6    7    8     9    10    11 *)
+let slevel_power = [| 0;  10; 20; 35;  60; 100; 160; 250; 500; 1000; 2000; 5000 |]
+let ilevel_power = [| 8;  12; 16; 24;  32;  48;  64; 128; 192;  256;  256;  256 |]
+let plevel_power = [| 10; 20; 40; 70; 100; 150; 200; 300; 500;  700; 1000; 2000 |]
+let auto_unroll =  [| 0;  16; 32; 64;  96; 128; 192; 256; 384;  512;  768; 1024 |]
 
 let get array n = if n < 0 then 0 else array.(n)
 
 let () =
-  bind (module MinLoopUnroll) (fun n -> max 0 (n - 4));
-  bind (module SemanticUnrollingLevel) (get slevel_power);
+  bind (module MinLoopUnroll) (fun n -> max 0 (n - 7));
+  bind (module AutoLoopUnroll) (get auto_unroll);
   bind (module WideningDelay) (fun n -> 1 + n / 2);
+  bind (module HistoryPartitioning) (fun n -> (n - 1) / 5);
+  bind (module SemanticUnrollingLevel) (get slevel_power);
   bind (module ILevel) (get ilevel_power);
   bind (module ArrayPrecisionLevel) (get plevel_power);
   bind (module LinearLevel) (fun n -> n * 20);
   bind (module RmAssert) (fun n -> n > 0);
   bind (module SymbolicLocsDomain) (fun n -> n > 0);
   bind (module EqualityDomain) (fun n -> n > 1);
-  bind (module EqualityCall) (fun n -> if n > 2 then "formals" else "none");
-  bind (module GaugesDomain) (fun n -> n > 3);
-  bind (module SplitReturn) (fun n -> if n > 4 then "auto" else "");
+  bind (module GaugesDomain) (fun n -> n > 2);
+  bind (module SplitReturn) (fun n -> if n > 3 then "auto" else "");
+  bind (module OctagonDomain) (fun n -> n > 4);
+  bind (module EqualityCall) (fun n -> if n > 4 then "formals" else "none");
+  bind (module OctagonCall) (fun n -> n > 6);
   ()
 
 let set_analysis n =

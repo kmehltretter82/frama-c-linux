@@ -173,7 +173,8 @@ let translate_variadics (file : file) =
       | Call(lv, callee, args, loc) ->
         let is_variadic =
           try
-            let last = Extends.List.last (Typ.params (Cil.typeOf callee)) in
+            let args, _ = Typ.ghost_partitioned_params (Cil.typeOf callee) in
+            let last = Extends.List.last args in
             last = Generic.vpar
           with Extends.List.EmptyList -> false
         in

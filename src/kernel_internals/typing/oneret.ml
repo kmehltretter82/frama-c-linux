@@ -197,21 +197,23 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
   let lastloc = ref Cil_datatype.Location.unknown in
   let getRetVar =
     let retVar : varinfo option ref = ref None in
-    fun () ->
+    fun loc ->
       match !retVar with
-	Some rv -> rv
-      | None -> begin
-            let rv = makeLocalVar f "__retres" retTyp in (* don't collide *)
-            retVar := Some rv;
-            rv
-      end
+      | None ->
+        let rv = makeLocalVar ~loc f "__retres" retTyp in (* don't collide *)
+        retVar := Some rv;
+        rv
+      | Some rv ->
+        if rv.vdecl = Cil_datatype.Location.unknown then
+          rv.vdecl <- loc;
+        rv
   in
   let convert_result p =
     let vis = object
       inherit Cil.nopCilVisitor
       method! vterm_lhost = function
         | TResult _ ->
-          let v = getRetVar () in
+          let v = getRetVar Cil_datatype.Location.unknown in
           ChangeTo (TVar (cvar_to_lvar v))
         | TMem _ | TVar _ -> DoChildren
     end
@@ -267,7 +269,7 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
       (* Must create a statement *)
         let rv =
           if hasRet then
-            Some (new_exp ~loc (Lval(Var (getRetVar ()), NoOffset)))
+            Some (new_exp ~loc (Lval(Var (getRetVar loc), NoOffset)))
           else None
       in
         mkStmt (Return (rv, loc))
@@ -338,7 +340,7 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
      * an instruction that sets the return value (if any). *)
       s.skind <- begin
         match retval with
-            Some rval -> Instr (Set((Var (getRetVar ()), NoOffset), rval, loc))
+            Some rval -> Instr (Set((Var (getRetVar loc), NoOffset), rval, loc))
           | None -> Instr (Skip loc)
       end;
       let returns_assert = ref ptrue in
@@ -347,7 +349,7 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
         returns_stack;
       (match retval with
        | Some _ ->
-         let lvar = Cil.cvar_to_lvar (getRetVar()) in
+         let lvar = Cil.cvar_to_lvar (getRetVar loc) in
          Stack.iter
            (fun (_,_,ca) -> adjust_assigns_clause loc lvar ca.annot_content)
            returns_stack

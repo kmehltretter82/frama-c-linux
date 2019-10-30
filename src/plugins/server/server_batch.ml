@@ -42,6 +42,7 @@ module Batch = Senv.String_list
     end)
 
 let () = Parameter_customize.set_group batch_group
+let () = Parameter_customize.do_not_save ()
 module BatchOutputDir = Senv.Empty_string
     (struct
       let option_name = "-server-batch-output-dir"
@@ -96,6 +97,8 @@ let rec execute_batch js =
 
 let execute () =
   begin
+    let files = Batch.get () in
+    Batch.clear () ; (* clear in any case *)
     List.iter
       begin fun file ->
         Senv.feedback "Script %S" file ;
@@ -109,8 +112,7 @@ let execute () =
         let out = open_out output in
         Js.pretty_to_channel out response ;
         close_out out
-      end
-      (Batch.get()) ;
+      end files
   end
 
 (* -------------------------------------------------------------------------- *)

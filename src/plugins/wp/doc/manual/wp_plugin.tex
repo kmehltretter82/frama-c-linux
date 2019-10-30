@@ -34,12 +34,12 @@ The recommended versions for external provers are:
   \begin{tabular}{crlc}
     Prover & Versions & Download &\\
     \hline
-    \textsf{Alt-Ergo} & \verb|2.0.0|  &
-    \url{http://alt-ergo.ocamlpro.com} & \cite{AltErgo2006}\\
-    \textsf{Coq} & \verb|8.9.0| &
-    \url{http://coq.inria.fr} & \cite{Coq84}\\
     \textsf{Why3} & \verb|1.2.0| &
     \url{http://why3.lri.fr} & \cite{Why3}\\
+    \textsf{Alt-Ergo} & \verb|2.0.0|  &
+    \url{http://alt-ergo.ocamlpro.com} & \cite{AltErgo2006}\\
+    % \textsf{Coq} & \verb|8.9.0| &
+    % \url{http://coq.inria.fr} & \cite{Coq84}\\
   \end{tabular}
 \end{center}
 
@@ -47,37 +47,14 @@ Recent \textsf{OPAM}-provided versions should work smoothly.
 Other versions might be supported as well, typically, as far as we know:
 \begin{itemize}
 \item \textsf{Alt-Ergo} \verb+2.2.0+ and \verb+2.3.0+, although distributed under a non-commercial licence.
-\item \textsf{Coq} \verb+8.7.2+ and \verb+8.8.2+, although proof scripts compatibility can be an issue.
+% \item \textsf{Coq} \verb+8.7.2+ and \verb+8.8.2+, although proof scripts compatibility can be an issue.
 \item \textsf{Why3} \verb+1.0.0+ and \verb+1.1.1+, although only \verb+1.2.0+ is provided with Coq support.
 \end{itemize}
 
-Other provers, like \textsf{Gappa}, \textsf{Z3}, \textsf{CVC3},
+Other provers, like \textsf{Coq}, \textsf{Gappa}, \textsf{Z3}, \textsf{CVC3},
 \textsf{CVC4}, \textsf{PVS}, and many others, are accessible from
 \textsf{WP} through \textsf{Why3}. We refer the user to the manual of
 \textsf{Why3} to handle specific configuration tasks.
-
-Provers can be installed at any time, before or after the installation
-of \textsf{Frama-C/WP}. However, when using \textsf{Coq} and
-\textsf{Why-3}, it is better to install them before, or to
-re-configure and re-install \textsf{WP}, as explained below.
-
-\paragraph{Configuration.} When using \textsf{Coq} and \textsf{Why-3}, pre-compiled
-libraries are built during the compilation of \textsf{Frama-C}, which
-speed up the proof process in a significant way. This behavior can be
-turned on/off at configure time, typically:
-\begin{logs}
-# configure --disable-wp-coq --disable-wp-why3
-\end{logs}
-
-\paragraph{Compilation.} If you want to compile the \textsf{Coq} and \textsf{Why-3}
-libraries manually, you can still run the following commands:
-\begin{logs}
-# make wp-coq wp-why3
-# [sudo] make wp-coq-install
-\end{logs}
-
-\paragraph{Remark.} The \textsf{Why}~\cite{Filliatre2003} prover is no longer supported
-since \textsf{WP} version \verb+0.7+ (Fluorine).
 
 \clearpage
 %-----------------------------------------------------------------------------
@@ -100,7 +77,7 @@ described in section~\ref{wp-cmdline}:
 \begin{center}
 \includegraphics[width=\textwidth]{wp-gui-main.png}
 \end{center}
-\caption{WP in the Frama-C GUI}
+\caption{\textsf{WP} in the Frama-C GUI}
 \label{wp-gui-panel}
 \end{figure}
 
@@ -108,7 +85,7 @@ described in section~\ref{wp-cmdline}:
 \begin{center}
 \includegraphics[width=\textwidth]{wp-gui-run.png}
 \end{center}
-\caption{WP run from the GUI}
+\caption{\textsf{WP} run from the GUI}
 \label{wp-gui-run}
 \end{figure}
 
@@ -150,13 +127,12 @@ in the general user's manual of the platform. The status emitted by the \textsf{
   \end{tabular}
 \end{center}
 
-\paragraph{WP Goals Panel.}
+\paragraph{\textsf{WP} Goals Panel.}
 This panel is dedicated to the \textsf{WP} plug-in. It shows the
 generated proof obligations and their status for each prover.
 By clicking on a prover
 column, you can also submit a proof obligation to a prover by
-hand. Right-click provides more options depending on the prover, such
-as proof-script editing for \textsf{Coq}.
+hand. Right-click provides more options depending on the prover.
 
 \paragraph{Interactive Proof Editor.}
 From the Goals Panel view, you can double-click on a row and open the \emph{interactive proof editor} panel as described in section~\ref{wp-proof-editor}.
@@ -311,7 +287,7 @@ c. Consolidating the Bench.
   frama-c [...] -wp-prover script,alt-ergo
 \end{logs}
 
-This mode replays the automated proofs and the interactive ones, re-running Alt-Ergo on every WP goals and every proof tactic sub-goals. The user scripts are never modified — this is a replay mode only.
+This mode replays the automated proofs and the interactive ones, re-running Alt-Ergo on every \textsf{WP} goals and every proof tactic sub-goals. The user scripts are never modified — this is a replay mode only.
 
 \clearpage
 \subsection{Available Tactics}
@@ -550,7 +526,7 @@ of the \texttt{iota} integer domain.
 \subsection{Strategies}
 
 Strategies are heuristics that generate a prioritized bunch of tactics to be tried on the current goal.
-Few built-in strategies are provided by the WP plug-in ; however, the user can extends the proof editor with
+Few built-in strategies are provided by the \textsf{WP} plug-in ; however, the user can extends the proof editor with
 custom ones, as explained in section~\ref{wp-custom-tactics} below.
 
 To run strategies, the interactive proof editor provide a single button \texttt{Strategies} in the tactic panel.
@@ -580,7 +556,7 @@ The name of registered strategies is printed on console by using \texttt{-wp-aut
 
 The proof editor and script runner can be extended by loading additional plug-ins. These plug-ins are regular OCaml files to be loaded with the kernel \texttt{-load-module} option. They will be compiled by \textsf{Frama-C} against its API. The \textsf{WP} plug-in exports a rich API to extend the proof editor with new tactics, strategies, and even term-composer tools.
 
-It is not possible to reproduce here the complete API ; it is better to use the automatically generated HTML documentation from WP's sources. We only provide here a quick tour of this API, as a tutorial on how to implement a basic custom strategy.
+It is not possible to reproduce here the complete API ; it is better to use the automatically generated HTML documentation from \textsf{WP}'s sources. We only provide here a quick tour of this API, as a tutorial on how to implement a basic custom strategy.
 
 The main extension points of the \textsf{WP} plug-in's API are the following ones:
 \begin{center}
@@ -751,7 +727,7 @@ interface of the programmatic API.
 \item [\tt -wp] generates proof obligations for all (selected) properties.
 \item [\tt -wp-fct <f$_1$,...,f$_n$>] selects annotations of functions
   \texttt{f$_1$},...,\texttt{f$_n$} (defaults to all functions).
-\item [\tt -wp-skip-fct <f$_1$,...,f$_n$>] removes annotations of
+\item [\tt -wp-skip-fct <f$_1$,...,f$_n$>] ignores
   functions \texttt{f$_1$},...,\texttt{f$_n$} (defaults to none).
 \item [\tt -wp-bhv <b$_1$,...,b$_n$>] selects annotations for behaviors
   \texttt{b$_1$},...\texttt{b$_n$} (defaults to all behaviors) of the
@@ -772,7 +748,7 @@ interface of the programmatic API.
     and \texttt{loop assigns} properties from the selection.
     \\
     \textbf{Remark:} properties with name \verb+no_wp:+ are always and automatically
-    filtered and never proved by WP.
+    filtered and never proved by \textsf{WP}.
 \item [\tt -wp-(no)-status-all] includes in the goal selection all properties
   regardless of their current status (default is: \texttt{no}).
 \item [\tt -wp-(no)-status-valid] includes in the goal selection those properties
@@ -862,14 +838,6 @@ The available \textsf{WP} command-line options related to model selection are:
   in \textsf{ACSL} contracts to ensure type-checking but are related to identity-casts
   from the code. The option is \texttt{off} by default.
 
-\item[\tt -wp-bool-range] experimental support for \verb+_Bool+ range. This option assumes
-  there is no \emph{trap representations}
-  in considering valid the related assertions generated by \texttt{-wp-rte} (those tagged with \texttt{bool\_value:}).
-  Hence, integer values with boolean type are
-  either equal to \verb+0+ or \verb+1+. Actually, the only way to forge other values
-  is \emph{via} union types and heterogeneous pointer casts, which is currently not allowed
-  in the memory models of \textsf{WP}.
-
 \item[\tt -wp-literals] exports the contents of string literals
   to provers (default: \texttt{no}).
 \item[\tt -wp-extern-arrays] gives an arbitrary large size to arrays
@@ -884,6 +852,7 @@ The available \textsf{WP} command-line options related to model selection are:
       \texttt{ref}: & the variable is a constant pointer and is modeled by the \texttt{Ref}.\\
       \texttt{context}: & the variable is initially non-aliased and uses a fresh global in \texttt{Typed}.\\
   \end{tabular}
+\item[\tt -wp-(no)-alias-init] Use initializers for aliasing propagation (default is: yes).
 \item[\tt -wp-(no)-volatile] this option (de)activate the correct handling of
   volatile access. By default, accessing a volatile l-value returns an undefined
   value, and writing to a volatile l-value is modeled like an \textsf{ACSL} assigns clause.
@@ -914,12 +883,18 @@ weakest precondition calculus.
   to generate guards, and they might be not strong enough to meet the natural model requirements.
   In this case, a warning is emitted for potential runtime errors.
   Refer to Section~\ref{wp-model-arith} for details.
+\item[\tt -wp-(no)-init-const] use initializers for global const variables
+  (defaut is: \texttt{yes}).
 \item[\tt -wp-(no)-split] conjunctions in generated proof obligations are
   recursively split into sub-goals.  The generated goal names are
   suffixed by ``{\tt part<{\it n}>}'' (defaults to \texttt{no}).
+\item[\tt -wp-split-depth <d>] sets the depth of exploration for the
+  \texttt{-wp-split} option. ``-1'' stands for unlimited depth. Default is 0.
 \item[\tt -wp-(no)-callee-precond] includes preconditions of the callee
   after\footnote{Proof obligations are always generated to check preconditions.}
   a call (default is: \texttt{yes}).
+\item[\tt -wp-(no)-precond-weakening] discard pre-conditions of side behaviours (sound but
+  incomplete optimisation, default is: \texttt{no}).
 \item[\tt -wp-(no)-unfold-assigns] prove assigns goal of \texttt{struct}
   compound types field by field. This allows for proving that assigning
   a complete structure is still included into an assignment field by field.
@@ -929,7 +904,7 @@ weakest precondition calculus.
 \item[\tt -wp-(no)-dynamic] handles calls \textit{via} function pointers
   thanks to the dedicated \verb+@calls f1,...,fn+ code annotation.
   For each call to a function pointer \texttt{fp}
-  in the instruction or block under the annotaion,
+  in the instruction or block under the annotation,
   \texttt{fp} is required to belongs to the set \texttt{f1,\ldots,fn} and
   a case analysis is performed with the contract of each provided function
   (default is: \texttt{yes}).
@@ -959,6 +934,8 @@ controlled by the following options:
   expressions and tautologies (default is: \texttt{yes}).
 \item[\tt -wp-(no)-let] propagates equalities by substitutions
   and let-bindings (default is: \texttt{yes}).
+\item[\tt -wp-(no)-filter] filter non used variables and related hypotheses
+  (default is: \texttt{yes}).
 \item[\tt -wp-(no)-core] factorize common properties between branches
   (default is: \texttt{yes}).
 \item[\tt -wp-(no)-pruning] eliminates trivial branches of conditionals
@@ -966,6 +943,8 @@ controlled by the following options:
 \item[\tt -wp-(no)-clean] removes unused terms and variables from
   proof obligations (default is: \texttt{yes}).
 \item[\tt -wp-(no)-ground] replace ground values in equalities
+  (default is: \texttt{yes}).
+\item[\tt -wp-(no)-extensional] use extensional equality on compounds
   (default is: \texttt{yes}).
 \item[\tt -wp-(no)-reduce] replace functions with precedence to constructors and
   operators (default is: \texttt{yes}).
@@ -994,10 +973,12 @@ controlled by the following options:
 \label{wp-provers}
 
 The generated proof obligations are submitted to external decision
-procedures.  If proof obligations have just been generated, by using
-\texttt{-wp}, \texttt{-wp-fct}, \texttt{-wp-bhv} or \texttt{-wp-prop},
-then only the new proof obligations are sent. Otherwise, all unproved
-proof obligations are sent to external decision procedures.
+procedures run through the \textsf{Why-3} platform.  If proof obligations have
+just been generated, by using \texttt{-wp}, \texttt{-wp-fct}, \texttt{-wp-bhv}
+or \texttt{-wp-prop}, then only the new proof obligations are sent. Otherwise,
+all unproved proof obligations are sent to external decision procedures.
+
+Support for \textsf{Why-3 IDE} is no longer provided.
 
 \begin{description}
 \item[\tt -wp-prover <dp,...>] selects the decision procedures used to
@@ -1009,8 +990,11 @@ proof obligations are sent to external decision procedures.
   It is possible to ask for several decision procedures to be tried.
   For each goal, the first decision procedure that succeeds cancels the
   other attempts.
-\item[\tt -wp-proof <dp,...>] \textbf{deprecated} alias for \texttt{-wp-prover} for
-  backward compatibility with \textsf{WP} version \verb+0.6+.
+\item[\tt -wp-detect] lists the provers available for \textsf{Why-3}.
+  This command can only work if \textsf{why3} API was installed before building and
+  installing \textsf{Frama-C}.
+  The option reads your \textsf{Why-3} configuration and prints the available
+  provers with their \verb+-wp-prover <p>+ code names.
 \item[\tt -wp-gen] only generates proof obligations, does not run provers.
   See option \texttt{-wp-out} to obtain the generated proof obligations.
 \item[\tt -wp-par <n>] limits the number of parallel process runs for
@@ -1021,11 +1005,9 @@ proof obligations are sent to external decision procedures.
   obligation files to the first \texttt{n} characters.
   Since numbers can be added as suffixes to ensure unique filenames,
   their length can be longer than \texttt{n}.
-  No truncation is performed when the value equals zero.
+  No truncation is performed when the value equals zero. (default is: 60)
 \item[\tt -wp-(no)-proof-trace] asks for provers to output extra information
   on proved goals when available (default is: \texttt{no}).
-\item[\tt -wp-(no)-unsat-model] asks for provers to output extra information
-  when goals are not proved (default is: \texttt{no}).
 \item[\tt -wp-timeout <n>] sets the timeout (in seconds) for the calls
   to the decision prover (defaults to 10 seconds).
 \item[\tt -wp-time-extra <n>] additional time allocated to provers when
@@ -1037,122 +1019,31 @@ proof obligations are sent to external decision procedures.
   by prover \verb+tip+ to register the proof time. This is used to decrease the
   impact of machine load when proof time is closed to the timeout.
   Default is \verb+5s+.
-\end{description}
-
-\hrule
-\paragraph{Alt-Ergo.}
-Direct support for the \textsf{Alt-Ergo} prover is provided. You need at least
-version \verb+0.99+ of the prover, but more recent versions \verb+1.01+ or
-\verb+1.30+ are preferrable. It is also the default selected prover.
-\begin{description}
-\item[\tt -wp-prover alt-ergo] selects \textsf{Alt-Ergo}.
-\item[\tt -wp-prover altgr-ergo] opens the graphical interface of
-  \textsf{Alt-Ergo} when the goal is not proved.
-\item[\tt -wp-steps <$n$>] sets the maximal number of \textsf{Alt-Ergo}
+\item[\tt -wp-steps <$n$>] sets the maximal number of prover
   steps. This can be used as a machine-independent alternative to timeout.
-\item[\tt -wp-depth <$n$>] sets '\textit{stop}' and
-  '\textit{age-limit}' parameters of \textsf{Alt-Ergo} such that $n$ cycles of
-  quantifier instantiations are enabled.
-\item[\tt -wp-alt-ergo-opt <opt,...>] passes additional options to \textsf{Alt-Ergo}
-  (default: none).
-\item[\tt -wp-alt-ergo='<cmd>'] override the \verb+alt-ergo+ command.
-\item[\tt -wp-altgr-ergo='<cmd>'] override the \verb+altgr-ergo+ command.
+\item[\tt -wp-why3-opt='options,...'] provides additional options to the
+  \verb+why3+ command.
 \end{description}
 
-\hrule
-\paragraph{Coq.}
-Direct support for the \textsf{Coq} proof assistant is provided. The
-generated proof obligations are accepted by \textsf{Coq} version \verb+8.4+.
-When working with \textsf{Coq}, you will enter an interactive session,
-then save the proof scripts in order to replay them in batch mode.
-
-\begin{description}
-\item[\tt -wp-prover coq] runs \texttt{coqc} with the default tactic or
-  with the available proof script (see below).
-\item[\tt -wp-prover coqide] first tries to replay some known proof
-  script (if any). If it does not succeed, then a new interactive
-  session for \texttt{coqide} is opened. As soon as \texttt{coqide}
-  exits, the edited proof script is saved back (see below) and finally
-  checked by \texttt{coqc}.\par
-  The only part of the edited file retained by \textsf{WP} is the proof script
-  between ``\texttt{Proof}\ldots\texttt{Qed.}''.
-\item[\tt -wp-script <f.script>] specifies the file which proof scripts
-  are retrieved from, or saved to. The format of this file is private to
-  the \textsf{WP} plug-in. It is, however, a regular text file from which
-  you can cut and paste part of previously written script proofs.
-  The \textsf{WP} plug-in manages the content of this file for you.
-\item[\tt -wp-(no)-update-script] if turned off, the user's script
-  file will \emph{not} be modified. A warning is emitted if the script data base
-  changed.
-\item[\tt -wp-tactic <ltac>] specifies the \textsf{Coq} tactic to try
-  with when no user script is found. The default tactic is
-  \verb+"auto with zarith"+. See also how to load external libraries
-  and user-defined tactics in section~\ref{prooflibs}.
-\item[\tt -wp-tryhints] When both the user-provided script and the
-  default tactic fail to solve the goal, other scripts for similar goals can
-  be tried instead.
-\item[\tt -wp-hints <n>] sets the maximal number of suggested proof scripts.
-\item[\tt -wp-coq-timeout <n>] sets the maximal time in seconds for running
-  the \texttt{coqc} checker. Does not apply to \texttt{coqide} (default: 30s).
-\item[\tt -wp-coq-opt <opt,...>] additional options for \texttt{coqc} and \texttt{coqide}
-  (default: none).
-\item[\tt -wp-coqc='<cmd>'] override the \verb+coqc+ command.
-\item[\tt -wp-coqide='<cmd>'] override the \verb+coqide+ command.
-  If the command line contains the \verb+emacs+ word (case-insensitive),
-  coq-options are not passed to the command, but a coq-project is used instead.
-  This conforms to Proof General 4.3 settings.
-  The project file can be changed (see below).
-\item[\tt -wp-coq-project='<name>'] override the \verb+_CoqProject+ file name
-  for Emacs and Proof General.
-\end{description}
-\hrule
-
-\pagebreak
-\paragraph{Why-3.}
-Native support for \textsf{Why-3} is provided (for versions 1.0 and newer).
-\\
-Support for \textsf{Why-3 IDE} is no longer provided.
-\begin{description}
-\item[\tt -wp-prover "why3:<p>"] runs a \textsf{Why-3} prover named \texttt{<p>}, and
-  exactly behaves like invoking \verb+why3 prover -P <p>+. The list of prover
-  names \verb+<p>+ must be extracted from the \verb+[alias]+ section of your \textsf{Why-3}
-  configuration, which \verb+frama-c -wp-detect+ does for you (see below).
-\item[\tt -wp-prover "<p>"] can also be used instead of \verb+-wp-prover "why3:<p>"+
-  when \verb+<p>+ is not natively supported by \textsf{WP}, like \texttt{alt-ergo},
-  \texttt{altgr-ergo}, \texttt{coq}, \texttt{coqide}, \texttt{script} and \texttt{tip}.
-\item[\tt -wp-detect] lists the provers available for \textsf{Why-3}.
-  This command can only work if \textsf{why3} API was installed before building and
-  installing \textsf{Frama-C}.
-  The option reads your \textsf{Why-3} configuration and prints the available
-  provers with their \verb+-wp-prover <p>+ code names.
-\item[\tt -wp-why3='<cmd>'] overrides the path to the \verb+why3+ command.
-\end{description}
-
-\paragraph{Example of using Why-3.}
+\paragraph{Example of using provers.}
 Suppose you have the following configuration:
 
 \begin{logs}
 # frama-c -wp-detect
 [wp] Why3 provers detected:
-   - Alt-Ergo 2.0.0 [why3:alt-ergo,altergo]
+   - Alt-Ergo 2.0.0 [alt-ergo,altergo]
    - CVC4 1.6 [cvc4]
    - CVC4 1.6 (counterexamples) [cvc4-ce]
-   - Coq 8.9.0 [why3:coq]
+   - Coq 8.9.0 [coq]
    - Z3 4.6.0 [z3]
    - Z3 4.6.0 (counterexamples) [z3-ce]
    - Z3 4.6.0 (noBV) [z3-nobv]
 \end{logs}
 
 Then, to use (for instance) \textsf{CVC4 1.6},
-you can use \verb+-wp-prover cvc4+ (since this name is not conflicting
-with any native prover). Alternatively, you can also use the less ambiguous
-name  \verb+-wp-prover why3:cvc4+ if you prefer.
-Similarly, if you want to use \textsf{Z3 4.6.0} without bitvectors, you can use \verb+-wp-prover z3-nobv+
-or \verb+-wp-prover why3:z3-nobv+.
-
-However, to use \textsf{Alt-Ergo 2.0.0} \emph{via} \textsf{Why-3}, you shall use
-\verb+-wp-prover why3:alt-ergo+, since \verb+-wp-prover alt-ergo+ would select
-the native support of \textsf{Alt-Ergo} prover. Finally, since \textsf{Why-3} also provides the alias
+you can use \verb+-wp-prover cvc4+.
+Similarly, if you want to use \textsf{Z3 4.6.0} without bitvectors, you can use \verb+-wp-prover z3-nobv+.
+Finally, since \textsf{Why-3} also provides the alias
 \verb+altergo+ for this prover, \verb+-wp-prover altergo+ will also run it \emph{via} \textsf{Why-3}.
 
 Notice that \textsf{Why-3} provers benefit from a cache management when used in combination with a \textsf{WP}-session, see Section~\ref{wp-cache} for more details.
@@ -1196,33 +1087,11 @@ obligations are:
 \label{prooflibs}
 
 It is possible to add additional bases of knowledge to decision
-procedures.  This support is provided for \textsf{Alt-Ergo},
-\textsf{Why3} and \textsf{Coq} thanks to the following options:
+procedures thanks to the following option:
 \begin{description}
 \item[\tt -wp-share <dir>] modifies the default directory where
   resources are found.  This option can be useful for running a modified or
   patched distribution of \textsf{WP}.
-\item[\tt -wp-include <dir,\ldots,++sharedir>] (\textbf{deprecated} use driver instead) sets the directories where external
-  libraries and driver files are looked for.
-  The current directory (implicitly added to that list) is always looked up
-  first.
-  Relative directory names are relative to the current directory except
-  for names prefixed by the characters \texttt{++}.
-  In such a name, the directory is relative to the main \texttt{FRAMAC\_SHARE}
-  directory.
-\item[\tt -wp-alt-ergo-lib <f,\ldots>] (\textbf{deprecated} use altergo.file
-  in driver instead) looks for \textsf{Alt-Ergo}
-  library files \verb+"f.mlw"+ and inlines them into the proof
-  obligation files for \textsf{Alt-Ergo}.
-\item[\tt -wp-coq-lib <f,\ldots>] (\textbf{deprecated} use coq.file
-  in driver instead) looks for \textsf{Coq} files
-  \verb+"f.v"+ or \verb+"f.vo"+. If
-  \verb+"f.vo"+ is not found, then \textsf{WP} copies \verb+"f.v"+
-  into its working directory (see option
-  \texttt{-wp-out}) and compiles it locally.
-\item[\tt -wp-why-lib <f,\ldots>] (\textbf{deprecated} use why3.file in driver instead) looks for \textsf{Why3} library file
-  \verb+"f.why"+ and opens the library \verb+"f.F"+ for the proving the
-  goals.
 \end{description}
 
 \subsection{Linking \textsf{ACSL} Symbols to External Libraries}
@@ -1236,8 +1105,7 @@ if any, are not exported by \textsf{WP}s.
 External linkage is specified in \emph{driver files}. It is possible
 to load one or several drivers with the following \textsf{WP} plug-in option:
 \begin{description}
-\item[\tt -wp-driver <file,\ldots>] load specified driver files,
-  replacing deprecated features from section~\ref{prooflibs}.
+\item[\tt -wp-driver <file,\ldots>] load specified driver files.
 
 \end{description}
 
@@ -1283,7 +1151,7 @@ resets the option to the singleton of the given string
 and binding with the \verb'+=' operator
 adds the given string to the current value of the option.
 The following options are defined by the plugin:
-\texttt{coq.file}, \texttt{altergo.file}, \texttt{why3.file} and \texttt{why3.import}.
+\texttt{why3.file} and \texttt{why3.import}.
 
 \textsf{C}-Comments are allowed in the file. For overloaded
 \textsf{ACSL} symbols, it is necessary to provide one \user{link} symbol for
@@ -1291,29 +1159,22 @@ each existing signature. The same \user{link} symbol is used for all provers,
 and must be defined in the specified libraries, or in the external
 ones (see~\ref{prooflibs}).
 
-It is also possible to specify different names
-for each prover, with the following syntax:
-\texttt{\{coq=\user{a};altergo=\user{b};why3=\user{c}\}}.
 Alternatively, a link-name can be an arbitrary string
 with patterns substituted by arguments, \verb="(%1+%2)"= for instance.
 
 When a library \user{lib} is specified, the loaded module depends on the
-target solver:
+option:
 \begin{center}\tt
-  \begin{tabular}{llll}
-    & \textrm{Option} & \textrm{Format} \\
+  \begin{tabular}{lll}
+    \textrm{Option} & \textrm{Format} \\
     \hline
-    \textsf{Coq}: & coq.file & \verb+[dir:]path.v+ \\
-    \textsf{Alt-Ergo}: & altergo.file & \verb+path.mlw+ \\
-    \textsf{Why3}: & why3.file & \verb+path.why[:name][:as]+ \\
-                   & why3.import & \verb+theory[:as]+ \\
+    why3.file & \verb+path.why[:name][:as]+ \\
+    why3.import & \verb+theory[:as]+ \\
   \end{tabular}
 \end{center}
 
 Precise meaning of formats is given by the following examples (all filenames are relatives to the driver file's directory):
 \begin{description}
-\item[\tt coq.file="mydir/bar.v"] Imports module \verb+Bar+ from file \verb+mydir/bar.vo+.
-\item[\tt coq.file="mydir/foo:Foo.v"] Loads coq library \verb+foo.Foo+ from file \verb+mydir/foo/Foo.vo+.
 \item[\tt why3.file="mydir/foo.why"] Imports theory \verb+foo.Foo+ from directory \verb+mydir+.
 \item[\tt why3.file="mydir/foo.why:Bar"] Imports theory \verb+foo.Bar+ from directory \verb+mydir+.
 \item[\tt why3.file="mydir/foo.why:Bar:T"] Imports theory \verb+foo.Bar as T+ from directory \verb+mydir+.
@@ -1324,7 +1185,7 @@ Precise meaning of formats is given by the following examples (all filenames are
 See also the default \textsf{WP} driver file, in \verb+[wp-share]/wp.driver+.
 
 Optional \textit{property-tags} can be given to
-\texttt{logic} \user{link} symbols to allow the WP to perform
+\texttt{logic} \user{link} symbols to allow the \textsf{WP} plugin to perform
 additional simplifications (See section~\ref{wp-simplifier}).  Tags
 consist of an identifier with column (`\verb+:+'), sometimes followed
 by a link (`\user{link};'). The available tags are depicted on figure~\ref{wp-driver-tags}.
@@ -1380,17 +1241,15 @@ interactively or incrementally, it is often the case where most proof obligation
 from one \textsf{WP} execution to the other. To reduce this costs, a cache of prover results can be used
 and stored in your session.
 
-The cache can only be used with \textsf{Why-3} provers, it does not work with native \textsf{Alt-Ergo}
-and \textsf{Coq} provers -- although proof scripts works with both.
+% The cache can only be used with \textsf{Why-3} provers, it does not work with native \textsf{Alt-Ergo} and \textsf{Coq} provers. 
 There are different ways of using the cache, depending on your precise needs.
-
-The \textsf{WP} options to control session and cache are \verb+-wp-session+ and \verb+-wp-cache+, as documented below:
+The main option to control cache usage is \verb+-wp-cache+, documented below:
 
 \begin{description}
 \item[\tt -wp-session <dir>] select the directory where cached results and proof scripts
   are stored. If the local directory \verb+'.frama-c'+ already exists, the default session
   directory \verb+'.frama-c/wp'+ will be used to setup the \textsf{WP} session.
-\item[\tt -wp-cache <mode>] selects the cache mode to use with why3 provers. The default mode is \verb'update'
+\item[\tt -wp-cache <mode>] selects the cache mode to use with \textsf{Why-3} provers. The default mode is \verb'update'
   if a \textsf{WP} session is set, and \verb+none+ otherwise. The cache entries are stored in the session directory,
   which is \verb+./.frama-c/wp/cache+ by default.
 \end{description}
@@ -1401,7 +1260,7 @@ The available cache modes are described below:
 \item [\tt -wp-cache cleanup]: same as \verb+update+ mode but at the end of \textsf{Frama-C} execution, any cache entry that was not used nor updated will be deleted. This mode shall be only used when you want to cleanup your cache with old useless entries, typically at the end of an interactive session.
 \item [\tt -wp-cache replay]: same as \verb+update+ mode but new results are \emph{not} stored in the cache. This mode is useful for continuous integration, when you are not sure your cache is complete but don't want to modify it.
 \item [\tt -wp-cache offline]: similar to \verb+replay+ mode but cache entries are the unique source of results. Provers are never run and missing cache entries would result in a «~Failed~» verdict. This mode is useful to fasten continuous integration and enforcing cache completeness.
-\item [\tt -wp-cache rebuild]: force prover execution and store all results in the cache. Previous results will be replaced with new onces, but entries for non relevant proofs would be kept and you might need a cleanup stage after. This mode is useful when you modify you why3 or prover installation and you don't want to reuse your previous cache entries.
+\item [\tt -wp-cache rebuild]: force prover execution and store all results in the cache. Previous results will be replaced with new onces, but entries for non relevant proofs would be kept and you might need a cleanup stage after. This mode is useful when you modify your \textsf{Why-3} or prover installation and you don't want to reuse your previous cache entries.
 \item [\tt -wp-cache none]: do not use nor modify cache entries; provers are run normally. This option must be used if you have a session set and you don't want to use the cache, since the default is mode \verb+update+ in this case. But you probably always to benefit from a cache when you have an (interactive) session.
 \end{description}
 
@@ -1411,13 +1270,8 @@ Cached usage is indicated on the standard output, unless you specify \verb+-wp-m
 \section{Plug-in Developer Interface}
 \label{wp-api}
 
-The \textsf{WP} plug-in has several entry points registered in the
-\texttt{Dynamic}\footnote{See the \emph{plug-in development guide}}
-module of \textsf{Frama-C}.
-
-Those entry points are however deprecated.
-Instead, a full featured \textsf{OCaml} API is now exported with the
-\textsf{Wp} plug-in. As documented in the \textsf{Frama-C} user manual, simply add the directive \verb!PLUGIN_DEPENDENCIES+=Wp! to the Makefile of your plug-in.
+A full featured \textsf{OCaml} API is exported with the
+\textsf{WP} plug-in. As documented in the \textsf{Frama-C} user manual, simply add the directive \verb!PLUGIN_DEPENDENCIES+=Wp! to the Makefile of your plug-in.
 
 The high-level API for generating and proving properties is exported
 in module \textsf{Wp.API}. The logical interface, compilers, and memory models are also accessible. See the generated \textsf{HTML} documentation of the platform for details.
