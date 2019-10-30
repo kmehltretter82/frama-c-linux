@@ -33,24 +33,24 @@ let align_error s = raise (Alignment_error s)
  *  - [attrs] has a single align attribute with a value which is less than [algn] *)
 let sufficiently_aligned attrs algn =
   let alignment = List.fold_left (fun acc attr ->
-    match attr with
-    | Attr("align", [AInt i]) ->
-      let alignment = Integer.to_int i in
-      if acc <> 0 && acc <> alignment then
-        (* Multiple align attributes with different values *)
-        align_error "Multiple alignment attributes"
-      else if alignment < algn then
-        (* If there is an alignment attribute it should be greater
-          * or equal to [algn] *)
-        align_error "Insufficient alignment"
-      else
-        alignment
-    | Attr("align", _) ->
-      (* Align attribute with an argument other than a single number,
-      should not happen really *)
-      assert false
-    | _ -> acc
-  ) 0 attrs in alignment > 0
+      match attr with
+      | Attr("align", [AInt i]) ->
+        let alignment = Integer.to_int i in
+        if acc <> 0 && acc <> alignment then
+          (* Multiple align attributes with different values *)
+          align_error "Multiple alignment attributes"
+        else if alignment < algn then
+          (* If there is an alignment attribute it should be greater
+            * or equal to [algn] *)
+          align_error "Insufficient alignment"
+        else
+          alignment
+      | Attr("align", _) ->
+        (* Align attribute with an argument other than a single number,
+           should not happen really *)
+        assert false
+      | _ -> acc
+    ) 0 attrs in alignment > 0
 
 (* Given the type and the list of attributes of [varinfo] ([fieldinfo]) return
  * true if that [varinfo] ([fieldinfo]) requires to be aligned at the boundary
@@ -65,14 +65,14 @@ class prepare_visitor prj = object (self)
   method !vblock _ =
     if Options.Temporal_validity.get () then
       Cil.DoChildrenPost (fun blk ->
-        List.iter (fun vi ->
-          (* 4 bytes alignment is required to allow sufficient space for storage
-             of 32-bit timestamps in a 1:1 shadow. *)
-          if require_alignment vi.vtype vi.vattr 4; then begin
-            vi.vattr <- Attr("aligned",[AInt Integer.four]) :: vi.vattr
-          end)
-          blk.blocals;
-        blk)
+          List.iter (fun vi ->
+              (* 4 bytes alignment is required to allow sufficient space for storage
+                 of 32-bit timestamps in a 1:1 shadow. *)
+              if require_alignment vi.vtype vi.vattr 4; then begin
+                vi.vattr <- Attr("aligned",[AInt Integer.four]) :: vi.vattr
+              end)
+            blk.blocals;
+          blk)
     else
       Cil.DoChildren
 
@@ -92,17 +92,17 @@ class prepare_visitor prj = object (self)
       s.spec_terminates;
     List.iter
       (fun l ->
-        push kf K_Complete (Property.ip_of_complete kf kinstr ~active:[] l))
+         push kf K_Complete (Property.ip_of_complete kf kinstr ~active:[] l))
       s.spec_complete_behaviors;
     List.iter
       (fun l ->
-        push kf K_Disjoint (Property.ip_of_disjoint kf kinstr ~active:[] l))
+         push kf K_Disjoint (Property.ip_of_disjoint kf kinstr ~active:[] l))
       s.spec_disjoint_behaviors;
     List.iter
       (fun b ->
-        List.iter
-          (fun p -> push kf K_Requires (Property.ip_of_requires kf kinstr b p))
-          b.b_requires)
+         List.iter
+           (fun p -> push kf K_Requires (Property.ip_of_requires kf kinstr b p))
+           b.b_requires)
       s.spec_behavior
 
   method private push_post_spec spec =
@@ -160,14 +160,14 @@ class prepare_visitor prj = object (self)
     | AExtended _ -> () (* never translate extensions *)
 
   method private push_post_code_annot a = match a.annot_content with
-  | AStmtSpec(_ (* TODO *), s) -> self#push_post_spec s
-  | AAssert _
-  | AInvariant _
-  | AVariant _
-  | AAssigns _
-  | AAllocation _
-  | APragma _
-  | AExtended _ -> ()
+    | AStmtSpec(_ (* TODO *), s) -> self#push_post_spec s
+    | AAssert _
+    | AInvariant _
+    | AVariant _
+    | AAssigns _
+    | AAllocation _
+    | APragma _
+    | AExtended _ -> ()
 
   (* Move variable declared in the body of a switch statement to the outer
      scope *)
@@ -177,17 +177,17 @@ class prepare_visitor prj = object (self)
       init_stmt;
     Cil.DoChildrenPost
       (fun stmt ->
-        Annotations.iter_code_annot
-          (fun _ a -> self#push_post_code_annot a)
-          init_stmt;
-        match stmt.skind with
-        | Switch(_,sw_blk,_,_) ->
-          let new_blk = Cil.mkBlock [ stmt ] in
-          let new_stmt = Cil.mkStmt (Block new_blk) in
-          new_blk.blocals <- sw_blk.blocals;
-          sw_blk.blocals <- [];
-          new_stmt
-        | _ -> stmt)
+         Annotations.iter_code_annot
+           (fun _ a -> self#push_post_code_annot a)
+           init_stmt;
+         match stmt.skind with
+         | Switch(_,sw_blk,_,_) ->
+           let new_blk = Cil.mkBlock [ stmt ] in
+           let new_stmt = Cil.mkStmt (Block new_blk) in
+           new_blk.blocals <- sw_blk.blocals;
+           sw_blk.blocals <- [];
+           new_stmt
+         | _ -> stmt)
 
   method private is_unvariadic_function vi =
     match Cil.unrollType vi.vtype with
@@ -195,24 +195,24 @@ class prepare_visitor prj = object (self)
     | _ -> false
 
   method !vglob_aux = function
-  | GVarDecl(vi, loc) | GFunDecl(_, vi, loc) | GFun({ svar = vi }, loc)
+    | GVarDecl(vi, loc) | GFunDecl(_, vi, loc) | GFun({ svar = vi }, loc)
       when self#is_unvariadic_function vi
         && not (Misc.is_library_loc loc)
         && not (Cil.is_builtin vi)
-        ->
-    let kf = Extlib.the self#current_kf in
-    let s = Annotations.funspec ~populate:false kf in
-    Cil.DoChildrenPost
-      (fun f ->
-        self#push_pre_spec s;
-        self#push_post_spec s;
-        f)
-  | _ ->
-    Cil.DoChildren
+      ->
+      let kf = Extlib.the self#current_kf in
+      let s = Annotations.funspec ~populate:false kf in
+      Cil.DoChildrenPost
+        (fun f ->
+           self#push_pre_spec s;
+           self#push_post_spec s;
+           f)
+    | _ ->
+      Cil.DoChildren
 
   initializer Project.copy ~selection:(Parameter_state.get_selection ()) prj
 
- end
+end
 
 let prepare () =
   Options.feedback ~level:2 "prepare AST for E-ACSL transformations";
