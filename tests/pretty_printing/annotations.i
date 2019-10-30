@@ -72,7 +72,7 @@ void function_with_ghost(int x) {
   */
 }
 
-/* @ ghost TODO: reactivate this test when ghost-functions are supported
+/*@ ghost
   /@
     requires P(x) && x > 0 ;
     ensures P(x) ;
@@ -104,10 +104,10 @@ void function_with_ghost(int x) {
 }
 */
 
-/* @ ghost TODO: reactivate this test when ghost-functions are supported
+/*@ ghost
   void function_declaration(int variable) ;
 */
 
 void reference_function(void){
-  // @ ghost function_declaration(42) ;
+  //@ ghost function_declaration(42) ;
 }
