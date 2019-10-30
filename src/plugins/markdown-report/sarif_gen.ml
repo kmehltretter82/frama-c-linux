@@ -28,10 +28,8 @@ let frama_c_sarif =
   let semanticVersion = Config.version in
   let fullName = name ^ "-" ^ version in
   let downloadUri = "https://frama-c.com/download.html" in
-  let sarifLoggerVersion = Mdr_version.version in
   Tool.create
-    ~name ~version ~semanticVersion
-    ~fullName ~downloadUri ~sarifLoggerVersion ()
+    ~name ~version ~semanticVersion ~fullName ~downloadUri ()
 
 
 let get_remarks () =
