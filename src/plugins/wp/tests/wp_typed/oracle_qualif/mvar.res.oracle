@@ -14,5 +14,5 @@
 [wp] Report out: 'tests/wp_typed/result_qualif/mvar.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
-Job                 -       1 (1..12)        1       100%
+Job                 -       1                1       100%
 -------------------------------------------------------------

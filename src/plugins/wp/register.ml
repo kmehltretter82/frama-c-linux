@@ -511,7 +511,6 @@ let do_list_scheduled_result () =
 (* ------------------------------------------------------------------------ *)
 
 type mode = {
-  mutable why3ide : bool ;
   mutable tactical : bool ;
   mutable update : bool ;
   mutable depth : int ;
@@ -585,7 +584,7 @@ let dump_strategies =
                )))
 
 let default_mode () = {
-  why3ide = false ; tactical = false ; update=false ; provers = [] ;
+  tactical = false ; update=false ; provers = [] ;
   depth=0 ; width = 0 ; auto=[] ; backtrack = 0 ;
 }
 
@@ -668,11 +667,18 @@ let do_update_session mode iter =
           Wp_parameters.result "Updated session with %d new script%s to complete." f s );
     end
 
-let do_wp_proofs_iter iter =
+let do_wp_proofs_iter ?provers ?tip iter =
   let mode = default_mode () in
   compute_provers ~mode ;
   compute_auto ~mode ;
-  let spawned = mode.why3ide || mode.tactical || mode.provers <> [] in
+  begin match provers with None -> () | Some prvs ->
+    mode.provers <- List.map (fun dp -> VCS.BatchMode , VCS.Why3 dp) prvs
+  end ;
+  begin match tip with None -> () | Some tip ->
+    mode.tactical <- tip ;
+    mode.update <- tip ;
+  end ;
+  let spawned = mode.tactical || mode.provers <> [] in
   begin
     if spawned then do_list_scheduled iter ;
     spawn_wp_proofs_iter ~mode iter ;
@@ -905,15 +911,16 @@ let do_prover_detect () =
     else
       let open Why3.Whyconf in
       let shortcuts = get_prover_shortcuts (Why3Provers.config ()) in
+      let print_prover_shortcuts_for fmt p =
+        Why3.Wstdlib.Mstr.iter
+          (fun name p' -> if Prover.equal p p' then
+              Format.fprintf fmt "%s|" name)
+          shortcuts in
       List.iter
         (fun p ->
-           Wp_parameters.result "Prover %10s %-10s %s [%t%a]"
-             p.prover_name p.prover_version p.prover_altern
-             (fun fmt ->
-                Why3.Wstdlib.Mstr.iter
-                  (fun name p' -> if Prover.equal p p' then
-                      Format.fprintf fmt "%s," name)
-                  shortcuts)
+           Wp_parameters.result "Prover %10s %-6s [%a%a]"
+             p.prover_name p.prover_version
+             print_prover_shortcuts_for p
              print_prover_parseable_format p
         ) provers
 

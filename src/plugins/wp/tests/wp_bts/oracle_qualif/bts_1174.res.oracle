@@ -3,6 +3,7 @@
 [wp] Running WP plugin...
 [wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
+[wp] Warning: native support for coq is deprecated, use tip instead
 [wp] 1 goal scheduled
 [wp] [Coq] Goal typed_real_job_assert_qed_ok : Saved script
 [wp] [Coq (Native)] Goal typed_real_job_assert_qed_ok : Valid

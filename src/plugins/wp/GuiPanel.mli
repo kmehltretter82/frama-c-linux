@@ -27,7 +27,8 @@ val reload : unit -> unit
 val on_reload : (unit -> unit) -> unit
 
 val run_and_prove :
-  Design.main_window_extension_points -> GuiSource.selection -> unit
+  Design.main_window_extension_points ->
+  GuiConfig.provers -> GuiSource.selection -> unit
 
 val register :
   main:Design.main_window_extension_points ->
