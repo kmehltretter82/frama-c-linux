@@ -35,7 +35,7 @@ let page = Doc.page `Kernel ~title:"Ast Services" ~filename:"ast.md"
 
 let () = Request.register ~page
     ~kind:`EXEC ~name:"kernel.ast.compute"
-    ~descr:(Md.rm "Ensures that AST is computed")
+    ~descr:(Md.plain "Ensures that AST is computed")
     ~input:(module Junit) ~output:(module Junit) Ast.compute
 
 (* -------------------------------------------------------------------------- *)
@@ -104,7 +104,7 @@ module Stmt = Data.Collection
       type t = stmt
       let syntax = Sy.publish ~page ~name:"stmt"
           ~synopsis:Sy.ident
-          ~descr:(Md.rm "Code statement identifier") ()
+          ~descr:(Md.plain "Code statement identifier") ()
       let to_json st = `String (Tag.of_stmt st)
       let of_json js =
         let id = Js.to_string js in
@@ -134,7 +134,7 @@ module Kf = Data.Collection
       type t = kernel_function
       let syntax = Sy.publish ~page ~name:"fct-id"
           ~synopsis:Sy.ident
-          ~descr:(Md.rm "Function identified by its global name.") ()
+          ~descr:(Md.plain "Function identified by its global name.") ()
       let to_json kf =
         `String (Kernel_function.get_name kf)
       let of_json js =
@@ -149,7 +149,7 @@ module Kf = Data.Collection
 
 let () = Request.register ~page
     ~kind:`GET ~name:"kernel.ast.getFunctions"
-    ~descr:(Md.rm "Collect all functions in the AST")
+    ~descr:(Md.plain "Collect all functions in the AST")
     ~input:(module Junit) ~output:(module Kf.Jlist)
     begin fun () ->
       let pool = ref [] in
@@ -159,7 +159,7 @@ let () = Request.register ~page
 
 let () = Request.register ~page
     ~kind:`GET ~name:"kernel.ast.printFunction"
-    ~descr:(Md.rm "Print the AST of a function")
+    ~descr:(Md.plain "Print the AST of a function")
     ~input:(module Kf) ~output:(module Jtext)
     (fun kf -> Jbuffer.to_json PP.pp_global (Kernel_function.get_global kf))
 

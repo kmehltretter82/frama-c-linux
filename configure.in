@@ -850,7 +850,7 @@ AC_ARG_ENABLE(external,
 ])
 
 AC_FOREACH([__plugin],m4_esyscmd([ls src/plugins]),
-  [ m4_if(m4_index(KNOWN_SRC_DIRS,__plugin),[-1],
+  [ m4_if(m4_regexp(KNOWN_SRC_DIRS,`\<__plugin\>'),[-1],
       [
         m4_define([plugin_dir],[src/plugins/__plugin])
         m4_syscmd(test -r plugin_dir/configure.in)

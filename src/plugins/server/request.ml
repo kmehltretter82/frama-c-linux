@@ -144,18 +144,18 @@ let sy_output (type b) (output : b rq_output) : Syntax.t =
   | Rfields _ -> Syntax.record []
 
 (* json input documentation *)
-let doc_input (type a) (input : a rq_input) : Markdown.block =
+let doc_input (type a) (input : a rq_input) =
   match input with
   | Pnone -> assert false
-  | Pdata _ -> Markdown.empty
-  | Pfields fs -> Syntax.fields ~title:"Input" (List.rev fs)
+  | Pdata _ -> []
+  | Pfields fs -> [Syntax.fields ~title:"Input" (List.rev fs)]
 
 (* json output syntax *)
-let doc_output (type b) (output : b rq_output) : Markdown.block =
+let doc_output (type b) (output : b rq_output) =
   match output with
   | Rnone -> assert false
-  | Rdata _ -> Markdown.empty
-  | Rfields fs -> Syntax.fields ~title:"Output" (List.rev fs)
+  | Rdata _ -> []
+  | Rfields fs -> [Syntax.fields ~title:"Output" (List.rev fs)]
 
 (* -------------------------------------------------------------------------- *)
 (* --- Multi-Parameters Requests                                          --- *)
@@ -253,8 +253,7 @@ let result_opt (type a b) (s : (a,unit) signature) ~name ~descr
 (* -------------------------------------------------------------------------- *)
 
 let signature
-    ~page ~kind ~name ~descr ?(details=Markdown.empty)
-    ?input ?output () =
+    ~page ~kind ~name ~descr ?(details=[]) ?input ?output () =
   check_name name ;
   check_page page name ;
   check_kind kind name ;
@@ -299,6 +298,7 @@ let mk_output (type b) name required (output : b rq_output) : (rq -> b -> json) 
        fmap_to_json rq.result)
 
 let register_sig (type a b) (s : (a,b) signature) (process : rq -> a -> b) =
+  let open Markdown in
   if s.defined then
     Senv.fatal "Request '%s' is defined twice" s.name ;
   let input = mk_input s.name s.defaults s.input in
@@ -309,20 +309,18 @@ let register_sig (type a b) (s : (a,b) signature) (process : rq -> a -> b) =
   in
   let skind = Main.string_of_kind s.kind in
   let title =  Printf.sprintf "`%s` %s" skind s.name in
-  let synopsis =
-    Markdown.table
-      [`Center "Input" ; `Center "Output" ]
-      [[ Syntax.format @@ sy_input s.input ;
-         Syntax.format @@ sy_output s.output ]] in
+  let header = [ plain "Input", Center; plain "Output", Center] in
   let content =
-    Markdown.concat [
-      Markdown.par s.descr ;
-      synopsis ;
-      s.details ;
-      doc_input s.input ;
-      doc_output s.output ;
-    ] in
-  let _ = Doc.publish ~page:s.page ~name:s.name ~title content [] in
+    [[ Syntax.text @@ sy_input s.input ;
+       Syntax.text @@ sy_output s.output ]]
+  in
+  let synopsis = Table { caption=None ; header; content } in
+  let description =
+    [ Block [Text s.descr ] ; synopsis ; Block s.details] @
+    doc_input s.input @
+    doc_output s.output
+  in
+  let _ = Doc.publish ~page:s.page ~name:s.name ~title description [] in
   Main.register s.kind s.name processor ;
   s.defined <- true
 

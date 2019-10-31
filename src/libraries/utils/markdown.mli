@@ -20,164 +20,204 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* -------------------------------------------------------------------------- *)
-(* --- Markdown Documentation Generation Utility                          --- *)
-(* -------------------------------------------------------------------------- *)
+(** {2 Markdown Document}
+    Structured representation of Markdown content. *)
 
-(** {2 Markdown}
+(** Table columns alignment *)
+type align = Left | Center | Right
 
-    A lightweight helper for generating Markdown documentation.
-    Two levels of formatters are defined to help managing indentation and
-    spaces: [text] for inline markdown, and [block] for markdown paragraphs.
+(** Local refs and URLs *)
+type href =
+  | URL of string
+  (** URL href is printed as it is. *)
 
+  | Page of string
+  (** URL relative to a common root.
+      During pretty-printing, if given the path of the current
+      document, the string will be modified accordingly. For instance,
+      when writing to [foo/bar.md], [Page "foo/bla.md"] will be output as
+      [(bla.md)].
+  *)
+
+  | Section of string * string
+  (** URL of an anchor within a [Page], see above. *)
+
+type inline =
+  | Plain of string (** Printed as it is *)
+  | Emph of string (** Printed as ["_……_"] *)
+  | Bold of string (** Printed as ["**……**"] *)
+  | Inline_code of string (** Printed as ["`……`"] *)
+  | Link of text * href (** Hyperlink with text and URL *)
+  | Image of string * string (** [Image(alt,path)] with alternative text and image file *)
+
+and text = inline list (** Inline elements separated by spaces *)
+
+type block_element =
+  | Text of text (** Single paragraph of text. *)
+  | Block_quote of element list
+  | UL of block list
+  | OL of block list
+  | DL of (text * text) list (** definition list *)
+  | EL of (string option * text) list (** example list *)
+  | Code_block of string * string list
+
+and block = block_element list
+
+and table = {
+  caption: text option;
+  header: (text * align) list;
+  content: text list list;
+}
+
+and element =
+  | Comment of string (** markdown comment, printed <!-- like this --> *)
+  | Block of block
+  | Table of table
+  | Raw of string list
+  (** Each element of the list is printed as-is on its own line.
+      A blank line separates the [Raw] node from the next one. *)
+  | H1 of text * string option
+  | H2 of text * string option
+  | H3 of text * string option
+  | H4 of text * string option
+  | H5 of text * string option
+  | H6 of text * string option
+
+and elements = element list
+
+type pandoc_markdown =
+  { title: text;
+    authors: text list;
+    date: text;
+    elements: elements
+  }
+
+(** {2 Formatting Utilities}
+
+    Remark: [text] values are list of [inline] values, hence
+    you may combined with the [(@)] operator or with the [glue ?sep] utility
+    function (see below).
 *)
 
-type text
-type block
-type section
+(** Plain markdown *)
+val plain: string -> text
 
-val (<@>) : text -> text -> text (** Infix operator for [glue] *)
-val (<+>) : text -> text -> text (** Infix operator for [text] *)
-val (</>) : block -> block -> block (** Infix operator for [concat] *)
+(** Emph text *)
+val emph: string -> text
 
-(** {2 Text Constructors} *)
+(** Bold text *)
+val bold: string -> text
 
-val nil : text (** Empty *)
-val raw : string -> text (** inlined markdown format *)
-val rm : string -> text (** roman (normal) style *)
-val it : string -> text (** italic style *)
-val bf : string -> text (** bold style *)
-val tt : string -> text (** typewriter style *)
+(** Inline code *)
+val code: string -> text
 
-val glue : ?sep:text -> text list -> text (** Glue text fragments *)
-val text : text list -> text (** Glue text fragments with spaces *)
+(** Image *)
+val image: alt:string -> file:string -> text
 
-(** {2 Block Constructors} *)
+(** Href link *)
+val href: ?text:text -> href -> text
 
-val empty : block (** Empty *)
-val hrule : block (** Horizontal rule *)
+(** Local links *)
+val link: ?text:text -> ?page:string -> ?name:string -> unit -> text
 
-val h1 : ?name:string -> string -> block (** Title level 1 *)
-val h2 : ?name:string -> string -> block (** Title level 2 *)
-val h3 : ?name:string -> string -> block (** Title level 3 *)
-val h4 : ?name:string -> string -> block (** Title level 4 *)
+(** URL links *)
+val url: ?text:text -> string -> text
 
-val in_h1 : block -> block (** Increment title levels by 1 *)
-val in_h2 : block -> block (** Increment title levels by 2 *)
-val in_h3 : block -> block (** Increment title levels by 3 *)
-val in_h4 : block -> block (** Increment title levels by 4 *)
+(** Plain markdown content of the formatted string *)
+val format: ('a, Format.formatter, unit, text) format4 -> 'a
 
-val par : text -> block (** Simple text paragraph *)
-val praw : string -> block (** Simple raw paragraph *)
-val list : text list -> block (** Itemized list *)
-val enum : text list -> block (** Enumerated list *)
-val description : (string * text) list -> block (** Description list *)
+(** {2 Blocks Utilities}
 
-(** Formatted code.
-
-    The code content is pretty-printed in a vertical [<v0>] box
-    with default [Format] formatter.
-    Leading and trailing empty lines are removed and indentation is
-    preserved. *)
-val code : ?lang:string -> (Format.formatter -> unit) -> block
-
-val concat : block list -> block (** Glue paragraphs with empty lines *)
-
-(** {2 Hyperlinks}
-
-    [`Page], [`Name] and [`Section] links refers to the current document,
-    see [dump] function below.
-
-    In [`Section(p,t)], [p] is the page path relative to the
-    document {i root}, and [t] is the section title {i or} name.
-
-    For [`Name a], the links refers to name or title [a]
-    in the {i current} page.
-
-    Hence, everywhere throughout a self-content document directory [~root],
-    local page [~page] inside [~root] can be referenced
-    by [`Page page], and its sections can by [`Section(page,title)]
-    or [`Section(page,name)].
-
+    Remark: [block] values are list of [block_element] values, hence
+    you may combined with the [(@)] operator or with the [glue ?sep] utility
+    function (see below).
 *)
 
-type href = [
-  | `URL of string
-  | `Page of string
-  | `Name of string
-  | `Section of string * string
-]
+(** Text Block *)
+val text : text -> block
 
-(** Default [~title] is taken from [href]. When printed,
-    actual link will be relativized with respect to current page. *)
-val href : ?title:string -> href -> text
+(** Itemized list *)
+val list : block list -> block
 
-(** Define a local anchor *)
-val aname : string -> block
+(** Enumerated list *)
+val enum : block list -> block
 
-(** {2 Tables} *)
+(** Description list *)
+val description : (text * text) list -> block
 
-type column = [
-  | `Left of string
-  | `Right of string
-  | `Center of string
-]
+(** [codeblock lang "...."] returns a [Code_block] for [code],
+    written in [lang] with the given formatted content.
+    The code block content placed inside an englobing hv-box, trimed
+    and finally splitted into lines. *)
+val codeblock : ?lang:string -> ('a,Format.formatter,unit,block) format4 -> 'a
 
-val table : column list -> text list list -> block
+(** {2 Document Elements}
 
-(** {2 Markdown Generator}
-    Generating function are called each time the markdown
-    fragment is printed. *)
-
-val mk_text : (unit -> text) -> text
-val mk_block : (unit -> block) -> block
-
-(** {2 Sections}
-
-    Sections are an alternative to [h1-h4] constructors to build
-    properly nested sub-sections. Deep sections at depth 5 and more are
-    flattened.
+    Remark: [elements] values are list of [element] values, hence
+    you may combined with the [(@)] operator or with the [glue ?sep] utility
+    function (see below).
 *)
 
-val section : ?name:string -> title:string -> block -> section list -> section
-val subsections : section -> section list -> section
-val document : section -> block
+(** Single Paragraph element *)
+val par : text -> elements
 
-(** {2 Dump to file}
+(** Block element *)
+val block : block -> elements
 
-    Generate the markdown [~page] in directory [~root] with the given content.
-    The [~root] directory shall be absolute or relative to the current working
-    directory. The [~page] file-path shall be relative to the [~root] directory
-    and will be used to relocate hyperlinks to other [`Page] and [`Section]
-    properly.
-
-    Hence, everywhere throughout the document, [dump ~root ~page doc]
-    is referenced by [`Page page], and its sections are referenced by
-    [`Section(page,title)].
-
+(** Get the content of a file as raw markdown.
+    @raise Sys_error if there's no such file.
 *)
+val rawfile: string -> elements
 
-(** Callback to listen for actual sections when printing a page. *)
-type toc = level:int -> name:string -> title:string -> unit
+(** {2 Document Structure} *)
 
-(** Create a markdown page.
-    - [~root] document directory (relocatable)
-    - [~page] relative file-path of the page in [~root] (non relocatable)
-    - [~names] generate explicit [<a name=...>] tags for all titles
-    - [~toc] optional callback to register table of contents
+(** Creates a document from a list of elements and optional metadatas.
+    Defaults are:
+    - title: empty
+    - authors: empty list
+    - date: current day, in ISO format
 *)
-val dump : root:string -> page:string -> ?names:bool -> ?toc:toc -> block -> unit
+val pandoc:
+  ?title:text -> ?authors: text list -> ?date: text -> elements ->
+  pandoc_markdown
 
-(** {2 Miscellaneous} *)
+(** Adds a [H1] header with the given [title] on top of the given elements.
+    If name is not explicitly provided,
+    the header will have as associated anchor [id title]
+*)
+val section: ?name:string -> title:string -> elements -> elements
 
-val read_text : string -> text
-val read_block : string -> block
-val read_section : string -> section
+(** [subsections header body] returns a list of [element]s where the [body]'s
+    headers have been increased by one (i.e. [H1] becomes [H2]).
+    [H5] stays at [H5], though.
+*)
+val subsections: elements -> elements list -> elements
 
-val fmt_text : (Format.formatter -> unit) -> text
-val fmt_block : (Format.formatter -> unit) -> block
-val pp_text : Format.formatter -> text -> unit
-val pp_block : Format.formatter -> block -> unit
-val pp_section : Format.formatter -> section -> unit
+(** {2 Other Utilities} *)
 
-(* -------------------------------------------------------------------------- *)
+(** Glue fragments, typically used for combining [text], [block]
+    and [elements].
+    Default separator is empty. The function is tail-recursive. *)
+val glue: ?sep:'a list -> 'a list list -> 'a list
+
+(** Transforms a string into an anchor name, roughly following
+    pandoc's conventions. This function is automatically used
+    by pretty-printers and smart constructors to normalize section names
+    and local links. *)
+val label: string -> string
+
+(** {2 Pretty-printers} *)
+
+val pp_inline: ?page:string -> Format.formatter -> inline -> unit
+
+val pp_text: ?page:string -> Format.formatter -> text -> unit
+
+val pp_block_element: ?page:string -> Format.formatter -> block_element -> unit
+
+val pp_block: ?page:string -> Format.formatter -> block -> unit
+
+val pp_element: ?page:string -> Format.formatter -> element -> unit
+
+val pp_elements: ?page:string -> Format.formatter -> elements -> unit
+
+val pp_pandoc: ?page:string -> Format.formatter -> pandoc_markdown -> unit

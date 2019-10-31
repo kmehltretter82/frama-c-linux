@@ -1,0 +1,34 @@
+ifndef FRAMAC_SHARE
+  FRAMAC_SHARE:=$(shell frama-c -print-share-path)
+endif
+
+PLUGIN_NAME:=Markdown_report
+PLUGIN_GENERATED:=$(PLUGIN_DIR)/Markdown_report.mli
+PLUGIN_CMO:=\
+  sarif mdr_params parse_remarks \
+  eva_coverage md_gen sarif_gen mdr_register
+PLUGIN_REQUIRES:=ppx_deriving ppx_deriving_yojson yojson
+PLUGIN_DISTRIB_EXTERNAL:=share/acsl.xml
+PLUGIN_TESTS_DIRS:= eva
+PLUGIN_ENABLE:=@ENABLE_MDR@
+
+include $(FRAMAC_SHARE)/Makefile.dynamic
+
+$(Markdown_report_DIR)/Markdown_report.mli: \
+  $(Markdown_report_DIR)/mdr_params.mli \
+  $(Markdown_report_DIR)/md_gen.mli \
+  $(Markdown_report_DIR)/Makefile
+	echo "module Mdr_params: sig" > $@
+	cat $(Markdown_report_DIR)/mdr_params.mli >> $@
+	echo "end" >> $@
+	echo "module Md_gen: sig" >> $@
+	cat $(Markdown_report_DIR)/md_gen.mli >> $@
+	echo "end" >> $@
+
+ifeq ("@ENABLE_MDR@","yes")
+install::
+	$(PRINT_CP) $(FRAMAC_DATADIR)/Markdown_report
+	$(MKDIR) $(FRAMAC_DATADIR)/Markdown_report
+	$(CP) $(Markdown_report_DIR)/share/acsl.xml \
+              $(FRAMAC_DATADIR)/Markdown_report
+endif

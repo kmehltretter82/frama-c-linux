@@ -20,40 +20,28 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* -------------------------------------------------------------------------- *)
-(** JSON Encoding Documentation *)
-(* -------------------------------------------------------------------------- *)
+include Plugin.S
 
-type t
+(** Value of [-mdr-out]. *)
+module Output: Parameter_sig.String
 
-val text : t -> Markdown.text
+(** Value of [-mdr-gen]. *)
+module Generate: Parameter_sig.String
 
-(** The provided synopsis must be very short, to fit in one line.
-    Extended definition, like record fields and such, must be detailed in
-    the description block. *)
-val publish :
-  page:Doc.page -> name:string -> descr:Markdown.text ->
-  synopsis:t -> ?details:Markdown.elements -> unit -> t
+(** Value of [-mdr-remarks]. *)
+module Remarks: Parameter_sig.String
 
-val unit : t
-val any : t
-val int : t (* small, non-decimal, number *)
-val ident : t (* integer of string *)
-val string : t
-val number : t
-val boolean : t
+(** Value of [-mdr-flamegraph]. *)
+module FlameGraph: Parameter_sig.String
 
-val tag : string -> t
-val array : t -> t
-val tuple : t list -> t
-val union : t list -> t
-val option : t -> t
-val record : (string * t) list -> t
+(** Value of [-mdr-authors]. *)
+module Authors: Parameter_sig.String_list
 
-type field = { name : string ; syntax : t ; descr : Markdown.text }
+(** Value of [-mdr-title]. *)
+module Title: Parameter_sig.String
 
-(** Builds a table with fields column named with [~title]
-    (shall be capitalized) *)
-val fields : title:string -> field list -> Markdown.element
+(** Value of [-mdr-date]. *)
+module Date: Parameter_sig.String
 
-(* -------------------------------------------------------------------------- *)
+(** Value of [-mdr-stubs]. *)
+module Stubs: Parameter_sig.String_list
