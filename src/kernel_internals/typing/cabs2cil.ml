@@ -1135,23 +1135,7 @@ let alphaConvertVarAndAddToEnv addtoenv vi =
                  because of previous occurrence at %a"
                 vi.vname newname Cil_printer.pp_location oldloc;
           end
-      end else begin
-        (* favor renaming ghost variables over non-ghost ones *)
-        if not vi.vghost then begin
-          let siblings =
-            fst @@ List.split @@
-            Datatype.String.Hashtbl.find_all ghost_env vi.vname
-          in
-          let check = function
-            | EnvVar vi' -> vi!=vi' && vi.vname = vi'.vname
-            | _ -> false
-          in
-          match List.find_opt check siblings with
-          | Some (EnvVar ({ vghost = true } as oldvi)) ->
-            oldvi.vname <- newname; vi
-          | _ -> copyVarinfo vi newname
-        end else copyVarinfo vi newname
-      end
+      end else copyVarinfo vi newname
     end
   in
   (* Store all locals in the slocals (in reversed order). *)
