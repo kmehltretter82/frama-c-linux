@@ -17,6 +17,8 @@
 Open Source Release <next-release>
 ##################################
 
+-   MdR       [2019/10/31] New plug-in Markdown-Report (MdR) for markdown and
+              SARIF outputs
 -   Eva       [2019/10/23] New option -eva-auto-loop-unroll N to unroll all
               loops whose number of iterations can be easily bounded by <N>.
 -   Eva       [2019/10/21] New octagon domain inferring relations of the form
