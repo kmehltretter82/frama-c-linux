@@ -2971,8 +2971,14 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
       Kernel.debug ~dkey:Kernel.dkey_typing_global
         "makeGlobalVarinfo isadef=%B vi.vname=%s(%d), vreferenced=%B"
         isadef vi.vname vi.vid vi.vreferenced;
-      (* This may throw an exception Not_found *)
-      let oldvi, oldloc = lookupGlobalVar vi.vghost vi.vname in
+      (* This may throw an exception Not_found
+         Note that we always search in all the context, including ghost *)
+      let oldvi, oldloc = lookupGlobalVar true vi.vname in
+      if oldvi.vghost <> vi.vghost then
+        abort_context "Inconsistent ghost specification for %s.@ \
+                       Previous declaration was at: %a"
+          vi.vname Cil_datatype.Location.pretty oldloc ;
+
       Kernel.debug ~dkey:Kernel.dkey_typing_global
         "  %s(%d) already in the env at loc %a"
         vi.vname oldvi.vid Cil_printer.pp_location oldloc;
