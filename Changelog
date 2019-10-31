@@ -29,6 +29,7 @@ Open Source Release <next-release>
               pairs of scalar variables occuring in a same instruction.
               Intra-procedural by default; octagons can be propagated through
               function calls with option -eva-octagon-through-calls.
+-   ACSL      [2019/10/04] Support for ghost parameters
 -   Eva       [2019/10/04] Evaluates ACSL predicates \is_plus_infinity and
               \is_minus_infinity.
 -   Kernel    [2019/10/04] Supports macro INFINITY and NAN.
