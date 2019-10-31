@@ -2,9 +2,9 @@ Nonterm
 =======
 
 Nonterm (for "non-termination") is a small plug-in used to help identify issues
-when running a Value analysis.
+when running Eva.
 
-It runs after Value and outputs warnings when reachable but definitively
+It runs after Eva and outputs warnings when reachable but definitively
 non-terminating functions/loops are detected, e.g. as in the code below:
 
     void f(int i) {
@@ -17,7 +17,7 @@ non-terminating functions/loops are detected, e.g. as in the code below:
         return 0;
     }
 
-A warning is emitted when a function is reachable by Value, but its return
+A warning is emitted when a function is reachable by Eva, but its return
 statement is unreachable.
 
 Note that normalized void functions have an implicit return statement before
@@ -30,6 +30,6 @@ have unreachable post-states (i.e. their evaluation results in `Bottom`).
 Usage
 -----
 
-Apply it after running Value, as in:
+Apply it after running Eva, as in:
 
-    frama-c -val file.c -then -nonterm
+    frama-c -eva file.c -then -nonterm

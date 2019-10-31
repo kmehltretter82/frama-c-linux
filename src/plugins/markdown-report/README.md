@@ -66,7 +66,7 @@ Sarif document can be validated against the spec
 Checking out [`https://github.com/Frama-C/open-source-case-studies`](https://github.com/Frama-C/open-source-case-studies), start with a simple analysis and generate the intermediary SVG and Markdown files.
 
 ```shell
-frama-c -val 2048.c -val-flamegraph="flamegraph.txt" -save snap.sav
+frama-c -eva 2048.c -eva-flamegraph="flamegraph.txt" -save snap.sav
 flamegraph.pl ./flamegraph.txt > flamegraph.svg
 frama-c -load snap.sav -mdr-gen -mdr-flamegraph="./flamegraph.svg"
 ```
