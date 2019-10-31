@@ -17,6 +17,8 @@
 Open Source Release <next-release>
 ##################################
 
+-!  Kernel    [2019/10/31] More stringent verifications on the use of ghost
+              variable in non ghost-code. Fixes #2421
 -   MdR       [2019/10/31] New plug-in Markdown-Report (MdR) for markdown and
               SARIF outputs
 -   Eva       [2019/10/23] New option -eva-auto-loop-unroll N to unroll all
