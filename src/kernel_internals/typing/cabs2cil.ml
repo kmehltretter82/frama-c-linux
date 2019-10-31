@@ -6505,9 +6505,10 @@ and doExp local_env
             (* Found. Do not use finishExp. Simulate what = AExp None  *)
             with Not_found -> begin
                 if only_ghost_symbol n then
-                  Kernel.warning
-                    "calling ghost function %s in non-ghost code. Did you \
-                     forget a /*@ ghost ... */ ?" n;
+                  Kernel.abort ~current:true
+                    "Function %s is a ghost symbol. \
+                     It cannot be used in non-ghost context. \
+                     Did you forget a /*@@ ghost ... /?" n ;
                 Kernel.debug ~level:3
                   "Calling function %s without prototype." n ;
                 let ftype = TFun(intType, None, false,
