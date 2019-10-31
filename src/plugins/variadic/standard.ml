@@ -179,7 +179,7 @@ let find_null exp_list =
 
 
 let aggregator_call
-    ~fundec {a_target; a_pos; a_type; a_param} scope loc mk_call vf args =
+    ~fundec ~ghost {a_target; a_pos; a_type; a_param} scope loc mk_call vf args =
   let name = vf.vf_decl.vorig_name
   and tparams = Typ.params_types a_target.vtype 
   and pname, ptyp = a_param in
@@ -222,7 +222,7 @@ let aggregator_call
     name a_target.vorig_name;
   let pname = if pname = "" then "param" else pname in
   let vaggr, assigns =
-    Build.array_init ~loc fundec scope pname ptyp args_middle
+    Build.array_init ~loc fundec ~ghost scope pname ptyp args_middle
   in
   let new_arg = Cil.mkAddrOrStartOf ~loc (Cil.var vaggr) in
   let new_args = args_left @ [new_arg] @ args_right in

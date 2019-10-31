@@ -5236,8 +5236,8 @@ let makeLocal ?(temp=false) ?referenced ?ghost ?(formal=false) ?loc fdec name ty
   vi
 
 (* Make a local variable and add it to a function *)
-let makeLocalVar fdec ?scope ?(temp=false) ?referenced ?(insert=true) ?loc name typ =
-  let vi = makeLocal ~temp ?referenced ?loc fdec name typ in
+let makeLocalVar fdec ?scope ?(temp=false) ?referenced ?(insert=true) ?ghost ?loc name typ =
+  let vi = makeLocal ~temp ?referenced ?ghost ?loc fdec name typ in
   refresh_local_name fdec vi;
   if insert then
     begin
@@ -5251,8 +5251,8 @@ let makeLocalVar fdec ?scope ?(temp=false) ?referenced ?(insert=true) ?loc name 
     end;
   vi
 
-let makeTempVar fdec ?insert ?(name = "__cil_tmp") ?descr ?(descrpure = true) ?loc typ : varinfo =
-  let vi = makeLocalVar fdec ~temp:true ?insert ?loc name typ in
+let makeTempVar fdec ?insert ?ghost ?(name = "__cil_tmp") ?descr ?(descrpure = true) ?loc typ : varinfo =
+  let vi = makeLocalVar fdec ~temp:true ?insert ?ghost ?loc name typ in
   vi.vdescr <- descr;
   vi.vdescrpure <- descrpure;
   vi
@@ -5338,8 +5338,8 @@ let makeFormalVar fdec ?(ghost=fdec.svar.vghost) ?(where = "$") ?loc name typ : 
 
 (* Make a global variable. Your responsibility to make sure that the name
  * is unique *)
-let makeGlobalVar ?source ?temp ?referenced ?loc name typ =
-  makeVarinfo ?source ?temp ?referenced ?loc true false name typ
+let makeGlobalVar ?source ?temp ?referenced ?ghost ?loc name typ =
+  makeVarinfo ?source ?temp ?referenced ?ghost ?loc true false name typ
 
 let mkPureExprInstr ~fundec ~scope ?loc e =
   let loc = match loc with None -> e.eloc | Some l -> l in
@@ -6450,12 +6450,15 @@ let uniqueVarNames (f: file) : unit =
                 newname Location.pretty oldloc ;
             v.vname <- newname
           in
-          (* Do the formals first *)
-          List.iter processLocal fdec.sformals;
+          let ghost vi = vi.vghost in
+          let formals_ghost, formals = List.partition ghost fdec.sformals in
+          let locals_ghost, locals = List.partition ghost fdec.slocals in
+          List.iter processLocal formals;
+          List.iter processLocal locals;
+          List.iter processLocal formals_ghost;
+          List.iter processLocal locals_ghost;
           (* Fix the type again *)
           setFormals fdec fdec.sformals;
-          (* And now the locals *)
-          List.iter processLocal fdec.slocals;
           (* Undo the changes to the global table *)
           Alpha.undoAlphaChanges gAlphaTable !undolist;
           ()

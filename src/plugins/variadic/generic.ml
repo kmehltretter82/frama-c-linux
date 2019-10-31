@@ -137,7 +137,7 @@ let translate_va_builtin caller inst =
 
 (* Translation of calls to variadic functions *)
 
-let translate_call ~fundec block loc mk_call callee pars =
+let translate_call ~fundec ~ghost block loc mk_call callee pars =
 
   (* Log translation *)
   Self.result ~current:true ~level:2
@@ -154,7 +154,7 @@ let translate_call ~fundec block loc mk_call callee pars =
   let add_var i exp =
     let typ = Cil.typeOf exp
     and name = "__va_arg" ^ string_of_int i in
-    let res = Cil.makeLocalVar fundec ~scope:block name typ in
+    let res = Cil.makeLocalVar ~ghost fundec ~scope:block name typ in
     res.vdefined <- true;
     res
   in
@@ -165,7 +165,7 @@ let translate_call ~fundec block loc mk_call callee pars =
 
   (* Build an array to store addresses *)
   let addrs = List.map Cil.mkAddrOfVi vis in
-  let vargs, assigns = Build.array_init ~loc fundec block
+  let vargs, assigns = Build.array_init ~loc fundec ~ghost block
     "__va_args" Cil.voidPtrType addrs
   in
   let instrs = instrs @ [assigns] in

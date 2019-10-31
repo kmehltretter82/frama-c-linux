@@ -20,12 +20,16 @@ let update_func f =
   let circ_g_list = [
     "void_circumflex_g" ;
     "a_circumflex_g" ;
-    "ghost_a_circumflex_g"
+    "ghost_a_circumflex_g" ;
+    "g_void_circumflex" ;
+    "g_a_circumflex"
   ] in
   let dollar_g_list = [
     "void_dollar_g" ;
     "a_dollar_g" ;
-    "ghost_a_dollar_g"
+    "ghost_a_dollar_g" ;
+    "g_void_dollar" ;
+    "g_a_dollar"
   ] in
   let a_list = [
     "a_a" ;
@@ -37,7 +41,10 @@ let update_func f =
     "ghost_a_a" ;
     "all_ghost_a_b_c_a" ;
     "all_ghost_b_a_c_a" ;
-    "b_ghost_a_c_a"
+    "b_ghost_a_c_a" ;
+    "g_a_a" ;
+    "g_a_b_c_a" ;
+    "g_b_a_c_a"
   ] in
   if List.mem f.svar.vname circ_list then ignore(insert_circ f) ;
   if List.mem f.svar.vname dollar_list then ignore(insert_dollar f) ;

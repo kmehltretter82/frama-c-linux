@@ -161,6 +161,18 @@ let doDeclaration logic_spec (loc: cabsloc) (specs: spec_elem list) (nl: init_na
       DECDEF (logic_spec, (specs, nl), loc)
     end
 
+let in_ghost =
+  let ghost_me = object
+    inherit Cabsvisit.nopCabsVisitor
+    method! vstmt s =
+      s.stmt_ghost <- true;
+      Cil.DoChildren
+  end
+  in
+  List.map
+    (fun s -> ignore (Cabsvisit.visitCabsStatement ghost_me s); s)
+
+let ghost_global = ref false
 
 let doFunctionDef spec (loc: cabsloc)
                   (lend: cabsloc)
@@ -170,6 +182,7 @@ let doFunctionDef spec (loc: cabsloc)
   let fname = (specs, n) in
   let name = match n with (n,_,_,_) -> n in
   Extlib.may (fun (spec, _) -> check_funspec_abrupt_clauses name spec) spec;
+  let b = if !ghost_global then { b with bstmts = in_ghost b.bstmts } else b in
   FUNDEF (spec, fname, b, loc, lend)
 
 let doOldParDecl (names: string list)
@@ -278,17 +291,6 @@ let transformOffsetOf (speclist, dtype) member =
 let no_ghost_stmt s = {stmt_ghost = false ; stmt_node = s}
 
 let no_ghost = List.map no_ghost_stmt
-
-let in_ghost =
-  let ghost_me = object
-    inherit Cabsvisit.nopCabsVisitor
-    method! vstmt s =
-      s.stmt_ghost <- true;
-      Cil.DoChildren
-  end
-  in
-  List.map
-    (fun s -> ignore (Cabsvisit.visitCabsStatement ghost_me s); s)
 
 let in_block l =
   match l with
@@ -440,15 +442,19 @@ file: globals EOF			{$1}
 globals:
   /* empty */                           { [] }
 | global globals                        { (false,$1) :: $2 }
-| LGHOST ghost_globals globals          { $2 @ $3 }
+| ghost_glob_begin ghost_globals globals          { $2 @ $3 }
 | SEMICOLON globals                     { $2 }
+;
+
+ghost_glob_begin:
+| LGHOST { ghost_global:=true }
 ;
 
 /* Rules for global ghosts: TODO keep the ghost status! */
 ghost_globals:
-| declaration ghost_globals                           { (true,$1)::$2 }
-| function_def ghost_globals                          { (true,$1)::$2 }
-| RGHOST                                              { [] }
+| declaration ghost_globals             { (true,$1)::$2 }
+| function_def ghost_globals            { (true,$1)::$2 }
+| RGHOST                                { ghost_global:=false; [] }
 ;
 
 /*** Global Definition ***/
