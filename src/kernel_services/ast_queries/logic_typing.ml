@@ -4216,33 +4216,39 @@ struct
         List.map
           (term_lval_assignable ctxt ~accept_formal ~accept_const env) tsets
       in
-      let checks_tsets_type fct ctyp =
+      let checks_tsets_type ~reads fct ctyp =
         List.iter
-          (fun t ->
-             let check t = match Logic_utils.unroll_type t with
-               | Ctype ctyp' -> Cil_datatype.Typ.equal ctyp ctyp'
-               | _ -> false
-             in
-             if not (Logic_const.plain_or_set check t.term_type) then
-               C.error t.term_loc "incompatible prototype of '%s' with %a"
-                 fct Cil_printer.pp_term t )
-          tsets
+          begin fun t ->
+            let check t = match Logic_utils.unroll_type t with
+              | Ctype ctyp' ->
+                ( reads || not (Cil.isConstType ctyp') )
+                && Cil_datatype.Typ.equal ctyp
+                  (Cil.type_remove_qualifier_attributes ctyp')
+              | _ -> false
+            in
+            if not (Logic_const.plain_or_set check t.term_type) then
+              C.error t.term_loc
+                "@[<hov 0>can not use '%s' to %s volatile @[<hov 2>'%a'@]"
+                fct (if reads then "read" else "write")
+                Cil_printer.pp_term t
+          end tsets
       in
       let prototype_error s fct =
         C.error loc
           "incompatible prototype of '%s' with volatile %s declaration"
           fct s
       in
-      let volatile_type ret_typ arg1 error =
+      let volatile_type ~reads ret_typ arg1 error =
         (* note: type pointed to by arg1 may differ from the
            return type with respect to qualifiers *)
         if not (isPointerType arg1) then error ();
         let vol_typ = typeOf_pointed arg1 in
-        if not (Cil.isVolatileType vol_typ
-                && Cil_datatype.Typ.equal ret_typ
-                  (Cil.type_remove_qualifier_attributes vol_typ))
+        let base_typ = Cil.type_remove_qualifier_attributes vol_typ in
+        if not (Cil.isVolatileType vol_typ &&
+                ( reads || not (Cil.isConstType vol_typ) ) &&
+                Cil_datatype.Typ.equal ret_typ base_typ)
         then error ();
-        vol_typ
+        base_typ
       in
       let checks_reads_fct fct ty =
         let error () = prototype_error "reads" fct
@@ -4254,10 +4260,8 @@ struct
         | Some [_,arg1,_] when
             (not (isVoidType ret || is_varg_arg))
           -> (* matching prototype: T fct (volatile T *arg1) *)
-          let vol_typ = volatile_type ret arg1 error in
-          if Cil.isConstType vol_typ then
-            Kernel.warning ~current:true "Access function '%s' writes to volatile const locations" fct;
-          checks_tsets_type fct vol_typ (* tsets should have type: volatile T *)
+          let vol_typ = volatile_type ~reads:true ret arg1 error in
+          checks_tsets_type ~reads:true fct vol_typ (* tsets should have type: volatile T *)
         | _ ->
           error ()
       in
@@ -4272,8 +4276,8 @@ struct
             (not (isVoidType ret || is_varg_arg))
             && Cil_datatype.Typ.equal ret (Cil.type_remove_qualifier_attributes arg2)
           -> (* matching prototype: T fct (volatile T *arg1, T arg2) *)
-          let vol_typ = volatile_type ret arg1 error in
-          checks_tsets_type fct vol_typ (* tsets should have type: volatile T *)
+          let vol_typ = volatile_type ~reads:false ret arg1 error in
+          checks_tsets_type ~reads:false fct vol_typ (* tsets should have type: volatile T *)
         | _ ->
           error ()
       in
