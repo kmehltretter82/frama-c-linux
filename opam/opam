@@ -111,6 +111,8 @@ depopts: [
   "mlgmpidl"
   "apron"
   "zmq"
+  "ppx_deriving"
+  "ppx_deriving_yojson"
 ]
 
 conflicts: [
