@@ -26,7 +26,7 @@ let syntax_alarm =
     "Syntactic check" [ Emitter.Code_annot ] ~correctness:[] ~tuning:[]
 
 class non_zero_divisor prj = object (self)
-  inherit Visitor.generic_frama_c_visitor (Cil.copy_visit prj)
+  inherit Visitor.generic_frama_c_visitor (Visitor_behavior.copy prj)
 
   (* A division is an expression: we override the vexpr method *)
   method! vexpr e = match e.enode with
@@ -49,8 +49,8 @@ class non_zero_divisor prj = object (self)
        function of the new project. Cil provides functions to convert a
        statement (function) of the original project to the corresponding
        one of the new project. *)
-    let new_stmt = get_stmt self#behavior stmt in
-    let new_kf = get_kernel_function self#behavior kf in
+    let new_stmt = Visitor_behavior.Get.stmt self#behavior stmt in
+    let new_kf = Visitor_behavior.Get.kernel_function self#behavior kf in
     (* Since we are copying the file in a new project, we cannot insert
        the annotation into the current table, but in the table of the new
        project. To avoid the cost of switching projects back and forth,
