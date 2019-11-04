@@ -3,6 +3,7 @@ stages:
  - build
  - tests
  - distrib_and_compatibility
+ - make_public
 
 variables:
     CURRENT: $CI_COMMIT_REF_NAME
@@ -210,3 +211,18 @@ pathcrawler:
    - nix/frama-ci.sh build -A pathcrawler.tests
   tags:
    - nix
+
+
+
+make_public:
+  stage: make_public
+  script:
+   - (! git merge-base --is-ancestor a1e186c68a6418a53b3dc06237f49e8dcbf75f4a origin/master)
+   - echo "$FRAMA_C_PUBLIC_SSH_PRIVATE_KEY" | nix run -f channel:nixos-19.03 coreutils --command base64 -d > nix/frama-c-public/id_ed25519
+   - nix run -f channel:nixos-19.03 coreutils --command chmod 400 nix/frama-c-public/id_ed25519
+   - GIT_SSH=nix/frama-c-public/ssh.sh nix run -f channel:nixos-19.03 openssh --command git push git@git.frama-c.com:pub/frama-c.git origin/master:refs/heads/master
+  tags:
+  - nix
+  only:
+  - schedules
+  - master
