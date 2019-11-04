@@ -101,15 +101,6 @@ volatile:
   tags:
    - nix
 
-E-ACSL:
-  stage: tests
-  variables:
-    OCAML: "4_05"
-  script:
-   - nix/frama-ci.sh build -A e-acsl.tests
-  tags:
-   - nix
-
 Security:
   stage: tests
   variables:

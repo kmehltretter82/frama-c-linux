@@ -1,0 +1,28 @@
+\begin{syntax}
+  [ function-contract ] ::= requires-clause*;
+                            { decreases-clause? } simple-clause*;
+                            named-behavior* { completeness-clause* }
+  \
+  requires-clause ::= "requires" pred ";"
+  \
+  { decreases-clause } ::= { "decreases" term ("for" id)? ";" }
+  \
+  [ simple-clause ] ::= { assigns-clause } | ensures-clause
+  \
+  { assigns-clause } ::= { "assigns" locations ";" }
+  \
+  { locations } ::= { location ("," location) * | "\nothing" }
+  \
+  { location } ::= { tset }
+  \
+  ensures-clause ::= "ensures" pred ";"
+  \
+  named-behavior ::= "behavior" id ":" behavior-body
+  \
+  behavior-body ::= assumes-clause* requires-clause* simple-clause*
+  \
+  assumes-clause ::= "assumes" pred ";"
+  \
+  { completeness-clause } ::= { "complete" "behaviors" (id (","id)*)? ";" } ;
+     | { "disjoint" "behaviors" (id (","id)*)? ";" }
+\end{syntax}
