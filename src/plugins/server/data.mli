@@ -94,33 +94,62 @@ module Jtext : S with type t = json (** Rich text encoding, see [Jbuffer] *)
 (** {2 Records} *)
 (* -------------------------------------------------------------------------- *)
 
-module Record(R : Info) :
+type 'a record (** Records of type 'a *)
+type 'a signature  (** Opened signature for record of type ['a] *)
+type ('a,'b) field (** Field of type ['b] for a record of type ['a] *)
+
+(** Record factory.
+
+    You shall start by declaring a (ghost) type [r] and call
+    [Record.signature] to create a signature of type [r].
+    Then, populate the record with [Record.field] or [Record.option].
+    Finally, you shall call [Record.publish] to obtain a new data module
+    of type [Record with type r = r], which gives you a [Data] with an opaque
+    type [t = r record] with fields of type [(r,a) field].
+
+    {[
+      (* ---- Exemple of Record Data --- *)
+      type r
+      let s = Record.signature ~page ~kind ~name ~descr () in
+      let fd_a = Record.field s ~name:"a" ~descr:"..." (module A) in
+      let fd_b = Record.field s ~name:"b" ~descr:"..." (module B) in
+
+      module M = (val (Record.publish s) : Record with type r = r)
+
+      let make a b = M.default |> M.set fd_a a |> M.set fd_b b
+    ]}
+*)
+module Record :
 sig
-  (** A new type [t] is created for each application of the functor. *)
-  include S
 
-  (** Parametric field. Can only be used with type [t]. *)
-  type 'a field
+  (** Data with [type t = r record].
+      Also contains getters and setters for fields. *)
+  module type S =
+  sig
+    type r
+    include S with type t = r record
+    val default : t
+    val has : (r,'a) field -> t -> bool
+    val get : (r,'a) field -> t -> 'a
+    val set : (r,'a) field -> 'a -> t -> t
+  end
 
-  (** Field constructor *)
-  val field : string -> descr:Markdown.text -> ?default:'a -> 'a data -> 'a field
+  (** Create a new, opened record type *)
+  val signature : page:Doc.page -> name:string -> descr:Markdown.text ->
+    unit -> 'a signature
 
-  (** Optional field constructor *)
-  val option : string -> descr:Markdown.text -> 'a data -> 'a option field
+  (** Adds a field to an opened record *)
+  val field : 'r signature ->
+    name:string -> descr:Markdown.text -> ?default:'a -> 'a data ->
+    ('r,'a) field
 
-  (** Field presence. If the field has a default value, it will be always
-      present. *)
-  val has : 'a field -> t -> bool
+  (** Adds a optional field to an opened record *)
+  val option : 'r signature ->
+    name:string -> descr:Markdown.text -> 'a data ->
+    ('r,'a option) field
 
-  (** Field accessor.
-      @raise Not_found if the field is optional and not present *)
-  val get : 'a field -> t -> 'a
-
-  (** Field updator. *)
-  val set : 'a field -> 'a -> t -> t
-
-  (** Contains only the default values. *)
-  val default : unit -> t
+  (** Publish and close an opened record *)
+  val publish : 'a signature -> (module S with type r = 'a)
 
 end
 

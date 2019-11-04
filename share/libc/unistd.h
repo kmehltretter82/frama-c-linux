@@ -985,6 +985,7 @@ extern long pathconf(char const *path, int name);
 extern int          pause(void);
 
 /*@
+  requires valid_pipefd: \valid(pipefd+(0..1));
   assigns pipefd[0..1] \from indirect:__fc_fds[0..];
   assigns \result \from indirect:__fc_fds[0..];
   ensures initialization:pipefd: \initialized(&pipefd[0..1]);
@@ -1100,6 +1101,7 @@ volatile char *__fc_p_ttyname = __fc_ttyname;
 
 /*@
   // missing: may assign to errno: EBADF, ENOTTY
+  requires valid_fildes: 0 <= fildes < __FC_MAX_OPEN_FILES;
   assigns \result \from __fc_p_ttyname, indirect:fildes;
   ensures result_name_or_null: \result == __fc_p_ttyname || \result == \null;
  */

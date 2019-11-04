@@ -38,5 +38,6 @@ val get : ?kf:kernel_function -> ?init:bool -> varinfo -> access
 
 val iter: ?kf:kernel_function -> ?init:bool -> (varinfo -> access -> unit) -> unit
 
+val print : varinfo -> access -> Format.formatter -> unit
 val dump : unit -> unit
 val compute : unit -> unit

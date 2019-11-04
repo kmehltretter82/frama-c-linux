@@ -11,5 +11,5 @@
 [wp] Report out: 'tests/wp_bts/result_qualif/issue_447.0.report.json'
 -------------------------------------------------------------
 Axiomatics          WP     Alt-Ergo        Total   Success
-Lemma               -       1 (1..12)        1       100%
+Lemma               -       1                1       100%
 -------------------------------------------------------------

@@ -1,5 +1,3 @@
-GENERATED=main.aux main.cb main.cb2 main.log main.out main.toc main.pdf
-
 all: main
 
 .PHONY: main
@@ -10,7 +8,7 @@ include ../MakeLaTeXModern
 OPENSOURCE?=yes
 export OPENSOURCE
 
-main: ../../VERSION *.c
+main: ../../VERSION examples/**.c
 	$(MAKE) -C examples/parametrizing
 	$(MAKE) $(FRAMAC_MODERN)
 	latexmk -pdf main.tex
@@ -21,7 +19,7 @@ else
 endif
 
 clean:
-	rm -f $(GENERATED)
+	latexmk -C -bibtex
 
 install:
 	rm -f ../manuals/eva-manual.pdf

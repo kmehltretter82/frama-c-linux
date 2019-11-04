@@ -91,6 +91,7 @@ class behavior
     ~(clear : Widget.button)
     ~(card : card Widget.selector)
     ~(list : GuiList.pane)
+    ~(provers : GuiConfig.provers)
     ~(goal : GuiGoal.pane)
     ~(source : GuiSource.highlighter)
     ~(popup : GuiSource.popup)
@@ -238,24 +239,28 @@ class behavior
           let server = ProverTask.server () in
           Task.spawn server thread ;
           Task.launch server in
-        match prover with
-        | VCS.Tactical ->
-            begin
-              match mode , ProverScript.get w with
-              | (None | Some VCS.BatchMode) , `Script ->
-                  schedule (ProverScript.prove ~success w)
-              | _ ->
-                  card#set `Goal ;
-                  clear#set_enabled false ;
-                  self#navigator true (Some w) ;
-            end
-        | _ ->
-            let mode = match mode , prover with
-              | Some m , _ -> m
-              | None , VCS.NativeCoq -> VCS.EditMode
-              | None , VCS.NativeAltErgo -> VCS.FixMode
-              | _ -> VCS.BatchMode in
-            schedule (Prover.prove w ~mode ~result prover)
+        if not (VCS.is_valid (Wpo.get_result w VCS.Qed)) &&
+           not (VCS.is_computing (Wpo.get_result w prover))
+        then
+          match prover with
+          | VCS.Tactical ->
+              begin
+                match mode , ProverScript.get w with
+                | (None | Some VCS.BatchMode) , `Script ->
+                    schedule (ProverScript.prove ~success w)
+                | _ ->
+                    card#set `Goal ;
+                    clear#set_enabled false ;
+                    self#navigator true (Some w) ;
+              end
+          | _ ->
+              let mode = match mode , prover with
+                | Some m , _ -> m
+                | None , VCS.NativeCoq -> VCS.EditMode
+                | None , VCS.NativeAltErgo -> VCS.FixMode
+                | _ -> VCS.BatchMode in
+              schedule (Prover.prove w ~mode ~result prover) ;
+              refresh w
       end
 
     method private clear () =
@@ -376,11 +381,41 @@ class behavior
         card#connect (fun _ -> self#details) ;
         scope#connect self#set_scope ;
         popup#on_click self#set_selection ;
-        popup#on_prove (GuiPanel.run_and_prove main) ;
+        popup#on_prove (GuiPanel.run_and_prove main provers) ;
         clear#connect self#clear ;
       end
 
   end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Model Info for Variables                                           --- *)
+(* -------------------------------------------------------------------------- *)
+
+let model_varinfo :
+  GMenu.menu GMenu.factory ->
+  Design.main_window_extension_points ->
+  button:int -> Pretty_source.localizable -> unit =
+  fun _menu main ~button item ->
+  let open Pretty_source in
+  let open Cil_types in
+  match item with
+  | PLval(Some kf, _ , (Var x,NoOffset))
+  | PTermLval(Some kf, _, _, (TVar {lv_origin=Some x},TNoOffset))
+    when button=1 ->
+      let init = WpStrategy.is_main_init kf in
+      let acc = RefUsage.get ~kf ~init x in
+      let model = match acc with
+        | RefUsage.NoAccess -> "any"
+        | RefUsage.ByValue -> "'var'"
+        | RefUsage.ByRef -> "'ref'"
+        | RefUsage.ByArray when x.vformal && Cil.isPointerType x.vtype
+          -> "'caveat'"
+        | _ -> "'typed'"
+      in
+      main#pretty_information
+        "Is is accessed as %t and fits in %s wp-model@."
+        (RefUsage.print x acc) model ;
+  | _ -> ()
 
 (* -------------------------------------------------------------------------- *)
 (* --- Make Panel and Extend Frama-C GUI                                  --- *)
@@ -393,9 +428,9 @@ let make (main : main_window_extension_points) =
     (* --- Provers                                                            --- *)
     (* -------------------------------------------------------------------------- *)
 
-    let enabled = new GuiConfig.enabled "wp.enabled" in
+    let provers = new GuiConfig.provers "wp.provers" in
 
-    let dp_chooser = new GuiConfig.dp_chooser ~main ~enabled in
+    let dp_chooser = new GuiConfig.dp_chooser ~main ~provers in
 
     (* -------------------------------------------------------------------------- *)
     (* --- Focus Bar                                                          --- *)
@@ -419,7 +454,7 @@ let make (main : main_window_extension_points) =
         (index :> widget) ;
         (next :> widget) ;
       ] in
-    let provers = new Widget.button ~label:"Provers..." () in
+    let pvrs = new Widget.button ~label:"Provers..." () in
     let clear = new Widget.button ~label:"Clear" ~icon:`DELETE () in
     let focusbar = GPack.hbox ~spacing:0 () in
     begin
@@ -427,8 +462,8 @@ let make (main : main_window_extension_points) =
       focusbar#pack ~padding:20 ~expand:false scope#coerce ;
       focusbar#pack ~padding:20 ~expand:false filter#coerce ;
       focusbar#pack ~from:`END ~expand:false clear#coerce ;
-      focusbar#pack ~from:`END ~expand:false provers#coerce ;
-      provers#connect dp_chooser#run ;
+      focusbar#pack ~from:`END ~expand:false pvrs#coerce ;
+      pvrs#connect dp_chooser#run ;
     end ;
 
     (* -------------------------------------------------------------------------- *)
@@ -448,8 +483,8 @@ let make (main : main_window_extension_points) =
     (* -------------------------------------------------------------------------- *)
 
     let book = new Wpane.notebook ~default:`List () in
-    let list = new GuiList.pane enabled in
-    let goal = new GuiGoal.pane enabled in
+    let list = new GuiList.pane provers in
+    let goal = new GuiGoal.pane provers in
     begin
       book#add `List list#coerce ;
       book#add `Goal goal#coerce ;
@@ -471,7 +506,7 @@ let make (main : main_window_extension_points) =
     let filter = (filter :> _ Widget.selector) in
     let behavior = new behavior ~main
       ~next ~prev ~index ~scope ~filter ~clear
-      ~list ~card ~goal ~source ~popup in
+      ~list ~provers ~card ~goal ~source ~popup in
     GuiPanel.on_reload behavior#reload ;
     GuiPanel.on_update behavior#update ;
 
@@ -487,6 +522,7 @@ let make (main : main_window_extension_points) =
     ignore (main#lower_notebook#append_page ~tab_label panel#coerce) ;
     main#register_source_highlighter source#highlight ;
     main#register_source_selector popup#register ;
+    main#register_source_selector model_varinfo ;
 
     GuiPanel.register ~main
       ~configure_provers:dp_chooser#run ;

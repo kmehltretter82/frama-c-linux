@@ -35,6 +35,8 @@ let cfg = lazy
 let version = Why3.Config.version
 let config () = Lazy.force cfg
 
+let set_procs = Why3.Controller_itp.set_session_max_tasks
+
 let configure =
   let todo = ref true in
   begin fun () ->

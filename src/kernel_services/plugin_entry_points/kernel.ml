@@ -996,8 +996,8 @@ module WarnDecimalFloat =
   String(struct
     let option_name = "-warn-decimal-float"
     let arg_name = "freq"
-    let help = "[DEPRECATED: Use -kernel-warn-key decimal-float \
-                (and similar options) instead] \
+    let help = "[DEPRECATED: Use -kernel-warn-key \
+                parser:decimal-float=active (or inactive) instead] \
                 Warn when floating-point constants cannot be exactly \
                 represented; freq must be one of none, once or all"
     let default = "once"

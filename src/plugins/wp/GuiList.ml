@@ -72,7 +72,7 @@ let render_prover_result p =
         end
     | { verdict=r } , _ -> icon_of_verdict r
 
-class pane (enabled:GuiConfig.enabled) =
+class pane (gprovers:GuiConfig.provers) =
   let model = new model in
   let list = new Wtable.list ~headers:true ~rules:true model#coerce in
   object(self)
@@ -121,8 +121,9 @@ class pane (enabled:GuiConfig.enabled) =
         List.iter
           (fun (vcs,column) ->
              match vcs with
-             | VCS.Why3 p when not (Why3.Whyconf.Sprover.mem p dps) ->
-                 ignore (list#view#remove_column column)
+             | VCS.Why3 p ->
+                 column#set_visible (Why3.Whyconf.Sprover.mem p dps) ;
+                 (* ignore (list#view#remove_column column) *)
              | _ -> ()
           ) provers ;
         (* Installing Missing Columns *)
@@ -147,11 +148,16 @@ class pane (enabled:GuiConfig.enabled) =
         ignore (list#add_column_text ~title:"Model" [] render) ;
         List.iter
           self#create_prover
-          [ VCS.Qed ; VCS.Tactical ; VCS.NativeAltErgo ; VCS.NativeCoq ] ;
+          [ VCS.Qed ; VCS.Tactical ] ;
+        let prv = Wp_parameters.Provers.get () in
+        if List.mem "native:alt-ergo" prv then
+          self#create_prover VCS.NativeAltErgo ;
+        if List.mem "native:coq" prv then
+          self#create_prover VCS.NativeCoq ;
         ignore (list#add_column_empty) ;
         list#set_selection_mode `MULTIPLE ;
-        enabled#connect self#configure ;
-        self#configure enabled#get ;
+        gprovers#connect self#configure ;
+        self#configure gprovers#get ;
       end
 
     method private on_cell f w c = f w (self#prover_of_column c)

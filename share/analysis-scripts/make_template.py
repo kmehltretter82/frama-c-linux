@@ -73,7 +73,7 @@ def get_known_machdeps():
     match = re.match("\[kernel\] supported machines are (.*) \(default is (.*)\).", output, re.DOTALL)
     if not match:
         print("error getting known machdeps: " + output)
-        sys.exit()
+        sys.exit(1)
     machdeps = match.group(1).split()
     default_machdep = match.group(2)
     return (default_machdep, machdeps)

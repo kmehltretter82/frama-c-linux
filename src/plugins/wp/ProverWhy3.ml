@@ -34,6 +34,9 @@ let option_import = LogicBuiltins.create_option
     (fun ~driver_dir:_ x -> x)
     "why3" "import"
 
+let why3_failure msg =
+  Pretty_utils.ksfprintf failwith msg
+
 module Env = WpContext.Index(struct
     include Datatype.Unit
     type key = unit
@@ -81,7 +84,7 @@ let get_ls ~cnv ~f ~l ~p =
     try
       Why3.Theory.ns_find_ls th.th_export p
     with Not_found ->
-      Wp_parameters.fatal "The symbol %a can't be found in %a.%s"
+      why3_failure "The symbol %a can't be found in %a.%s"
         Why3.Pp.(print_list dot string) p
         Why3.Pp.(print_list dot string) f l
   in
@@ -93,7 +96,7 @@ let get_ts ~cnv ~f ~l ~p =
     try
       Why3.Theory.ns_find_ts th.th_export p
     with Not_found ->
-      Wp_parameters.fatal "The type %a can't be found in %a.%s"
+      why3_failure "The type %a can't be found in %a.%s"
         Why3.Pp.(print_list dot string) p
         Why3.Pp.(print_list dot string) f l
   in
@@ -239,12 +242,12 @@ let rec of_tau ~cnv (t:Lang.F.tau) =
       let s = name_of_adt adt in
       match Why3.Theory.(ns_find_ts (get_namespace cnv.th) (cut_path s)) with
       | ts -> Some (Why3.Ty.ty_app ts (List.map (fun e -> Why3.Opt.get (of_tau ~cnv e)) l))
-      | exception Not_found -> Wp_parameters.fatal "Can't find type [%s] in why3 namespace" s
+      | exception Not_found ->
+          why3_failure "Can't find type '%s' in why3 namespace" s
     end
   | Tvar i -> Some (Why3.Ty.ty_var (tvar i))
   | Record _ ->
-      Wp_parameters.not_yet_implemented "Type %a not yet convertible"
-        Lang.F.pp_tau t
+      why3_failure "Type %a not (yet) convertible" Lang.F.pp_tau t
 
 let rec full_trigger = function
   | Qed.Engine.TgAny -> false
@@ -265,7 +268,7 @@ let rec of_trigger ~cnv t =
   | Qed.Engine.TgAny -> assert false (** absurd: filter by full_triggers *)
   | Qed.Engine.TgVar v -> begin
       try Lang.F.Tmap.find (Lang.F.e_var v) cnv.subst
-      with Not_found -> Wp_parameters.fatal "Unbound variable %a" Lang.F.pp_var v
+      with Not_found -> why3_failure "Unbound variable %a" Lang.F.pp_var v
     end
   | Qed.Engine.TgGet(m,k) ->
       t_app ~cnv ~f:["map"] ~l:"Map" ~p:["get"] [of_trigger cnv m;of_trigger cnv k]
@@ -276,7 +279,7 @@ let rec of_trigger ~cnv t =
       | F_call s ->
           let ls = Why3.Theory.(ns_find_ls (get_namespace cnv.th) (cut_path s)) in
           Why3.Term.t_app_infer ls (List.map (fun e -> of_trigger cnv e) l)
-      | _ -> Wp_parameters.not_yet_implemented "lfun in triggers"
+      | _ -> why3_failure "can not convert extented calls in triggers"
     end
   | TgProp (f,l) ->
       begin
@@ -284,7 +287,7 @@ let rec of_trigger ~cnv t =
         | F_call s ->
             let ls = Why3.Theory.(ns_find_ls (get_namespace cnv.th) (cut_path s)) in
             Why3.Term.t_app_infer ls (List.map (fun e -> of_trigger cnv e) l)
-        | _ -> Wp_parameters.not_yet_implemented "lfun in triggers"
+        | _ -> why3_failure "can not convert extented calls in triggers"
       end
 
 let rec of_term ~cnv expected t : Why3.Term.term =
@@ -445,17 +448,18 @@ let rec of_term ~cnv expected t : Why3.Term.term =
           | ls, _ ->
               coerce ~cnv sort expected $
               t_app ls l (of_tau cnv sort)
-          | exception Not_found -> Wp_parameters.fatal "Can't find [%s] in why3 namespace" s
+          | exception Not_found -> why3_failure "Can't find '%s' in why3 namespace" s
         in
         let apply_from_ns' s l =
           apply_from_ns s (List.map (fun e -> of_term' cnv e) l)
         in
         match lfun_name f, expected with
         | F_call s, _ -> apply_from_ns' s l sort
-        | Qed.Engine.F_subst _, _ -> Wp_parameters.not_yet_implemented "lfun with subst"
+        | Qed.Engine.F_subst _, _ ->
+            why3_failure "Driver link with subst not yet implemented"
         | Qed.Engine.F_left s, _ | Qed.Engine.F_assoc s, _ ->
             let rec aux = function
-              | [] -> Wp_parameters.fatal "Empty application"
+              | [] -> why3_failure "Empty application"
               | [a] -> of_term cnv expected a
               | a::l ->
                   apply_from_ns s [of_term' cnv a; aux l] sort
@@ -463,7 +467,7 @@ let rec of_term ~cnv expected t : Why3.Term.term =
             aux l
         | Qed.Engine.F_right s, _ ->
             let rec aux = function
-              | [] -> Wp_parameters.fatal "Empty application"
+              | [] -> why3_failure "Empty application"
               | [a] -> of_term cnv expected a
               | a::l ->
                   apply_from_ns s [aux l;of_term' cnv a] sort
@@ -479,14 +483,14 @@ let rec of_term ~cnv expected t : Why3.Term.term =
         | Qed.Engine.F_bool_prop (s,_), Bool | Qed.Engine.F_bool_prop (_,s), Prop ->
             apply_from_ns' s l expected
         | Qed.Engine.F_bool_prop (_,_), _ ->
-            Wp_parameters.fatal "badly expected type %a for term %a"
+            why3_failure "badly expected type %a for term %a"
               Lang.F.pp_tau expected Lang.F.pp_term t
       end
     | Rget(a,f), _ , _ -> begin
         let s = Lang.name_of_field f in
         match Why3.Theory.(ns_find_ls (get_namespace cnv.th) (cut_path s)) with
         | ls -> Why3.Term.t_app ls [of_term' cnv a] (of_tau cnv expected)
-        | exception Not_found -> Wp_parameters.fatal "Can't find [%s] in why3 namespace" s
+        | exception Not_found -> why3_failure "Can't find '%s' in why3 namespace" s
       end
     | Rdef(l), Data(Comp c,_) , _ -> begin
         (* l is already sorted by field *)
@@ -495,7 +499,7 @@ let rec of_term ~cnv expected t : Why3.Term.term =
         | ls ->
             let l = List.map (fun (_,t) -> of_term' cnv t) l in
             Why3.Term.t_app ls l (of_tau cnv expected)
-        | exception Not_found -> Wp_parameters.fatal "Can't find [%s] in why3 namespace" s
+        | exception Not_found -> why3_failure "Can't find '%s' in why3 namespace" s
       end
     | (Rdef _, Data ((Mtype _|Mrecord (_, _)|Atype _), _), _)
     | (Rdef _, (Prop|Bool|Int|Real|Tvar _|Array (_, _)), _)
@@ -521,7 +525,7 @@ let rec of_term ~cnv expected t : Why3.Term.term =
     | (Bind (Lambda, _, _), _, _)
     | Apply _ , _, _
     | Rdef _, Record _, _ ->
-        Wp_parameters.not_yet_implemented
+        why3_failure
           "Can't convert to why3 the qed term %a of type %a"
           Lang.F.pp_term t Lang.F.pp_tau sort
   in
@@ -594,7 +598,7 @@ let convert cnv expected t =
 let mk_binders cnv l =
   List.fold_left (fun (cnv,lets) v ->
       match of_tau cnv (Lang.F.tau_of_var v) with
-      | None -> Wp_parameters.fatal "Quantification on prop"
+      | None -> why3_failure "Quantification on prop"
       | Some ty ->
           let x = Why3.Ident.id_fresh (Lang.F.Var.basename v) in
           let x = Why3.Term.create_vsymbol x ty in
@@ -676,7 +680,7 @@ class visitor (ctx:context) c =
 
     method add_import ?was thy =
       match Str.split_delim regexp_dot thy with
-      | [] -> Wp_parameters.fatal "empty import option"
+      | [] -> why3_failure "[driver] empty import option"
       | l ->
           let file, thy = Why3.Lists.chop_last l in
           self#add_import_use file thy (Why3.Opt.get_def thy was) ~import:true
@@ -723,8 +727,8 @@ class visitor (ctx:context) c =
         | [file;lib;name] ->
             copy_file file;
             self#add_import_file_as [filenoext file] lib name;
-        | _ -> Wp_parameters.failure ~current:false
-                 "Driver: why3.file %S not recognized (theory %s)"
+        | _ -> why3_failure
+                 "[driver] incorrect why3.file %S for library '%s'"
                  opt thy
       in
       let iter_import opt =
@@ -732,8 +736,8 @@ class visitor (ctx:context) c =
             match Str.split_delim regexp_col import with
             | [ th ] -> self#add_import th
             | [ th ; was ] -> self#add_import ~was th
-            | _ -> Wp_parameters.failure ~current:false
-                     "Driver: why3.import %S not recognized (theory %s)"
+            | _ -> why3_failure
+                     "[driver] incorrect why3.file %S for library '%s'"
                      opt thy
           ) (Str.split regexp_com opt)
       in
@@ -931,10 +935,7 @@ class visitor (ctx:context) c =
                 ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl
           end
         | Inductive _dl ->
-            Wp_parameters.not_yet_implemented "inductive"
-            (* engine#declare_signature fmt
-             *   d.d_lfun (List.map F.tau_of_var d.d_params) Logic.Prop;
-             * List.iter self#on_dlemma dl *)
+            why3_failure "inductive definitions not yet implemented"
       end
 
   end
@@ -1029,6 +1030,62 @@ let prover_task prover task =
 
 let altergo_step_limit = Str.regexp "^Steps limit reached:"
 
+type prover_call = {
+  prover : Why3Provers.t ;
+  call : Why3.Call_provers.prover_call ;
+  steps : int option ;
+  timeover : float option ;
+  mutable interrupted : bool ;
+  mutable killed : bool ;
+}
+
+let ping_prover_call p =
+  match Why3.Call_provers.query_call p.call with
+  | NoUpdates
+  | ProverStarted ->
+      let () = match p.timeover with
+        | None -> ()
+        | Some timeout ->
+            let time = Unix.time () in
+            if time > timeout then
+              begin
+                Wp_parameters.debug ~dkey "Hard Kill (late why3server timeout)" ;
+                p.interrupted <- true ;
+                Why3.Call_provers.interrupt_call p.call ;
+              end
+      in Task.Wait 100
+  | InternalFailure exn ->
+      let msg = Format.asprintf "@[<hov 2>%a@]"
+          Why3.Exn_printer.exn_printer exn in
+      Task.Return (Task.Result (VCS.failed msg))
+  | ProverInterrupted -> Task.(Return Canceled)
+  | ProverFinished _ when p.killed -> Task.(Return Canceled)
+  | ProverFinished pr ->
+      let r =
+        match pr.pr_answer with
+        | Timeout -> VCS.timeout (int_of_float pr.pr_time)
+        | Valid -> VCS.result ~time:pr.pr_time ~steps:pr.pr_steps VCS.Valid
+        | Invalid -> VCS.result ~time:pr.pr_time ~steps:pr.pr_steps VCS.Invalid
+        | OutOfMemory -> VCS.failed "out of memory"
+        | StepLimitExceeded -> VCS.result ?steps:p.steps VCS.Stepout
+        | Unknown _ -> VCS.unknown
+        | _ when p.interrupted -> VCS.timeout (int_of_float pr.pr_time)
+        | Failure s -> VCS.failed s
+        | HighFailure ->
+            let alt_ergo_hack =
+              p.prover.prover_name = "Alt-Ergo" &&
+              Str.string_match altergo_step_limit pr.pr_output 0
+            in
+            if alt_ergo_hack then VCS.result ?steps:p.steps VCS.Stepout
+            else VCS.failed "Unknown error"
+      in
+      Wp_parameters.debug ~dkey
+        "@[@[Why3 result for %a:@] @[%a@] and @[%a@]@."
+        Why3.Whyconf.print_prover p.prover
+        (Why3.Call_provers.print_prover_result) pr
+        VCS.pp_result r;
+      Task.Return (Task.Result r)
+
 let call_prover ~timeout ~steplimit drv prover prover_config task =
   let steps = match steplimit with Some 0 -> None | _ -> steplimit in
   let limit =
@@ -1045,39 +1102,22 @@ let call_prover ~timeout ~steplimit drv prover prover_config task =
     Why3.Whyconf.print_prover prover
     (Why3.Opt.get_def (-1) timeout)
     (Why3.Opt.get_def (-1) steps);
-  let ping _ (* why3 seems not to be able to kill a started prover *) =
-    match Why3.Call_provers.query_call call with
-    | NoUpdates
-    | ProverStarted -> Task.Yield
-    | InternalFailure exn ->
-        let msg = Format.asprintf "%a" Why3.Exn_printer.exn_printer exn in
-        Task.Return (Task.Result (VCS.failed msg))
-    | ProverInterrupted ->
-        Task.Return (Task.Result (VCS.failed "interrupted"))
-    | ProverFinished pr ->
-        let r = match pr.pr_answer with
-          | Timeout -> VCS.timeout (int_of_float pr.pr_time)
-          | Valid -> VCS.result ~time:pr.pr_time ~steps:pr.pr_steps VCS.Valid
-          | Invalid -> VCS.result ~time:pr.pr_time ~steps:pr.pr_steps VCS.Invalid
-          | OutOfMemory -> VCS.failed "out of memory"
-          | StepLimitExceeded -> VCS.result ?steps VCS.Stepout
-          | Unknown _ -> VCS.unknown
-          | Failure s -> VCS.failed s
-          | HighFailure ->
-              let alt_ergo_hack =
-                prover.prover_name = "Alt-Ergo" &&
-                Str.string_match altergo_step_limit pr.pr_output 0
-              in
-              if alt_ergo_hack then VCS.result ?steps VCS.Stepout
-              else VCS.failed "Unknown error"
-        in
-        Wp_parameters.debug ~dkey
-          "@[@[Why3 result for %a:@] @[%a@] and @[%a@]@."
-          Why3.Whyconf.print_prover prover
-          (* why3 1.3 (Why3.Call_provers.print_prover_result ~json_model:false) pr *)
-          (Why3.Call_provers.print_prover_result) pr
-          VCS.pp_result r;
-        Task.Return (Task.Result r)
+  let timeover = match timeout with
+    | None -> None | Some tlimit ->
+        let started = Unix.time () in
+        Some (started +. 2.0 +. float tlimit) in
+  let pcall = {
+    call ; prover ;
+    killed = false ;
+    interrupted = false ;
+    steps ; timeover ;
+  } in
+  let ping = function
+    | Task.Kill ->
+        pcall.killed <- true ;
+        Why3.Call_provers.interrupt_call call ;
+        Task.Yield
+    | Task.Coin -> ping_prover_call pcall
   in
   Task.async ping
 
@@ -1098,7 +1138,7 @@ let get_miss () = !miss
 let get_removed () = !removed
 
 let mark_cache ~mode hash =
-  if mode = Cleanup then Hashtbl.replace cleanup hash ()
+  if mode = Cleanup || !Config.is_gui then Hashtbl.replace cleanup hash ()
 
 let cleanup_cache ~mode =
   if mode = Cleanup && (!hits > 0 || !miss > 0) then
@@ -1116,8 +1156,8 @@ let cleanup_cache ~mode =
                  end
           ) (Sys.readdir dir) ;
     with Unix.Unix_error _ as exn ->
-      Wp_parameters.failure "Can not cleanup cache (%s)"
-        (Printexc.to_string exn)
+      Wp_parameters.warning ~current:false
+        "Can not cleanup cache (%s)" (Printexc.to_string exn)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Cache Management                                                   --- *)
@@ -1135,6 +1175,14 @@ let parse_mode ~origin ~fallback = function
       Wp_parameters.warning ~current:false
         "Unknown %s mode %S (use %s instead)" origin m fallback ;
       raise Not_found
+
+let mode_name = function
+  | NoCache -> "none"
+  | Update -> "update"
+  | Replay -> "replay"
+  | Rebuild -> "rebuild"
+  | Offline -> "offline"
+  | Cleanup -> "cleanup"
 
 module MODE = WpContext.StaticGenerator(Datatype.Unit)
     (struct
@@ -1155,6 +1203,7 @@ module MODE = WpContext.StaticGenerator(Datatype.Unit)
     end)
 
 let get_mode = MODE.get
+let set_mode m = MODE.clear () ; Wp_parameters.Cache.set (mode_name m)
 
 let task_hash wpo drv prover task =
   lazy
@@ -1223,8 +1272,8 @@ let get_cache_result ~mode hash =
           mark_cache ~mode hash ;
           Json.load_file file |> ProofScript.result_of_json
         with err ->
-          Wp_parameters.failure ~once:true "invalid cache entry (%s)"
-            (Printexc.to_string err) ;
+          Wp_parameters.warning ~current:false ~once:true
+            "invalid cache entry (%s)" (Printexc.to_string err) ;
           VCS.no_result
 
 let set_cache_result ~mode hash prover result =
@@ -1239,8 +1288,8 @@ let set_cache_result ~mode hash prover result =
         ProofScript.json_of_result (VCS.Why3 prover) result
         |> Json.save_file file
       with err ->
-        Wp_parameters.failure ~once:true "can not update cache (%s)"
-          (Printexc.to_string err)
+        Wp_parameters.warning ~current:false ~once:true
+          "can not update cache (%s)" (Printexc.to_string err)
 
 let is_trivial (t : Why3.Task.task) =
   let goal = Why3.Task.task_goal_fmla t in
@@ -1250,7 +1299,7 @@ let is_trivial (t : Why3.Task.task) =
 (* --- Prove WPO                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-let prove ?timeout ?steplimit ~prover wpo =
+let build_proof_task ?timeout ?steplimit ~prover wpo () =
   try
     WpContext.on_context (Wpo.get_context wpo)
       begin fun () ->
@@ -1263,7 +1312,7 @@ let prove ?timeout ?steplimit ~prover wpo =
         then Task.return VCS.no_result (* Only generate *)
         else
           let drv , config , task = prover_task prover task in
-          if false && is_trivial task then
+          if is_trivial task then
             Task.return VCS.valid
           else
             let mode = get_mode () in
@@ -1287,20 +1336,24 @@ let prove ?timeout ?steplimit ~prover wpo =
                     Task.return result
                   end
                 else
-                  begin
-                    incr miss ;
-                    Task.finally
-                      (call_prover ~timeout ~steplimit drv prover config task)
-                      (function
-                        | Task.Result result when VCS.is_verdict result ->
-                            set_cache_result ~mode hash prover result
-                        | _ -> ())
-                  end
+                  Task.finally
+                    (call_prover ~timeout ~steplimit drv prover config task)
+                    begin function
+                      | Task.Result result when VCS.is_verdict result ->
+                          incr miss ;
+                          set_cache_result ~mode hash prover result
+                      | _ -> ()
+                    end
       end ()
   with exn ->
-    let bt = Printexc.get_raw_backtrace () in
-    Wp_parameters.fatal "Error in why3:%a@.%s@."
-      Why3.Exn_printer.exn_printer exn
-      (Printexc.raw_backtrace_to_string bt)
+    if Wp_parameters.has_dkey dkey_api then
+      Wp_parameters.fatal "[Why3 Error] %a@\n%s"
+        Why3.Exn_printer.exn_printer exn
+        Printexc.(raw_backtrace_to_string @@ get_raw_backtrace ())
+    else
+      Task.failed "[Why3 Error] %a" Why3.Exn_printer.exn_printer exn
+
+let prove ?timeout ?steplimit ~prover wpo =
+  Task.later (build_proof_task ?timeout ?steplimit ~prover wpo) ()
 
 (* -------------------------------------------------------------------------- *)

@@ -142,9 +142,10 @@ let assigns_from_prototype kf =
       (fun (g, t) acc -> if g then acc else t :: acc) inputs []
   in
   let inputs = List.map (fun (_g, t) -> t) inputs in
+  let inputs g = if g then inputs else inputs_no_ghost in
   let arguments =
     List.map
-      (fun (g, content) -> content, From (if g then inputs else inputs_no_ghost))
+      (fun (g, content) -> content, From (inputs g))
       to_assign
   in
   match rtyp with
@@ -155,7 +156,7 @@ let assigns_from_prototype kf =
     (* assigns result from basic args and content of pointer args *)
     let loc = vi.vdecl in
     let result = Logic_const.(new_identified_term (tresult ~loc rtyp)) in
-    (result, From inputs_no_ghost):: arguments
+    (result, From (inputs vi.vghost)):: arguments
 
 let is_frama_c_builtin name =
   Ast_info.is_frama_c_builtin name

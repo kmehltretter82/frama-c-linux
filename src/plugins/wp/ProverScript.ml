@@ -440,7 +440,6 @@ let spawn
               ~depth ~width ~backtrack ~auto
               ~start ~progress ~result ~success wpo)
 
-
 let search
     ?(depth = 0) ?(width = 0) ?(backtrack = 0) ?(auto = []) ?(provers = [])
     ?(progress = skip2) ?(result = skip3) ?(success = skip2)

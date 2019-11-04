@@ -55,58 +55,57 @@ type t = { atomic:bool ; text:Markdown.text }
 
 let atom md = { atomic=true ; text=md }
 let flow md = { atomic=false ; text=md }
+let text { text } = text
 
-let format { text } = text
 let protect a =
-  if a.atomic then a.text else Markdown.(rm "(" <+> a.text <+> rm ")")
+  if a.atomic then a.text else Markdown.(plain "(" @ a.text @ plain ")")
 
-let publish ~page ~name ~descr ~synopsis ?(details = Markdown.empty) () =
+let publish ~page ~name ~descr ~synopsis ?(details = []) () =
   check_name name ;
   check_page page name ;
   let id = Printf.sprintf "data-%s" name in
   let title = Printf.sprintf "`DATA` %s" name in
-  let format = ref Markdown.nil in
-  let syntax = Markdown.fmt_block (fun fmt ->
-      Format.fprintf fmt "> %a ::= %a"
-        Markdown.pp_text !format
-        Markdown.pp_text synopsis.text
-    ) in
-  let content = Markdown.( par descr </> syntax </> details ) in
-  let href = Doc.publish ~page ~name:id ~title ~index:[name] content [] in
-  let link_title = Printf.sprintf "_%s_" name in
-  let link = Markdown.href ~title:link_title href in
-  format := link ; atom @@ link
+  let dref = Doc.href page id in
+  let dlink = Markdown.href ~text:(Markdown.emph name) dref in
+  let syntax = Markdown.(glue [
+      plain "<" ; dlink ; plain ">" ; plain ":=" ; synopsis.text ]) in
+  let content = Markdown.(Block ( text descr @ text syntax ) :: details) in
+  let _href = Doc.publish ~page ~name:id ~title ~index:[name] content [] in
+  atom dlink
 
-let unit = atom @@ Markdown.rm "-"
-let any = atom @@ Markdown.it "any"
-let int = atom @@ Markdown.it "int"
-let ident = atom @@ Markdown.it "ident"
-let string = atom @@ Markdown.it "string"
-let number = atom @@ Markdown.it "number"
-let boolean = atom @@ Markdown.it "boolean"
+let unit = atom @@ Markdown.plain "-"
+let any = atom @@ Markdown.emph "any"
+let int = atom @@ Markdown.emph "int"
+let ident = atom @@ Markdown.emph "ident"
+let string = atom @@ Markdown.emph "string"
+let number = atom @@ Markdown.emph "number"
+let boolean = atom @@ Markdown.emph "boolean"
 
-let escaped name = Markdown.tt @@ Printf.sprintf "'%s'" @@ String.escaped name
+let escaped name =
+  Markdown.code (Printf.sprintf "'%s'" @@ String.escaped name)
 
 let tag name = atom @@ escaped name
-
-let array a = atom @@ Markdown.(tt "[" <+> protect a <+> tt ", … ]")
+let array a = atom @@ Markdown.(code "[" @ protect a @ code  ", … ]")
 
 let tuple ts =
-  atom @@ Markdown.(tt "["
-                    <+> glue ~sep:(raw " `,` ") (List.map protect ts) <+>
-                    tt "]")
+  atom @@
+  Markdown.(
+    code "[" @
+    glue ~sep:(code ",") (List.map protect ts) @
+    code "]"
+  )
 
-let union ts = flow @@ Markdown.(glue ~sep:(raw " | ") (List.map protect ts))
+let union ts = flow @@ Markdown.(glue ~sep:(plain "|") (List.map protect ts))
 
-let option t = atom @@ Markdown.(protect t <@> tt "?")
+let option t = atom @@ Markdown.(protect t @ code "?")
 
-let field (a,t) = Markdown.( escaped a <+> tt ":" <+> t.text )
+let field (a,t) = Markdown.( escaped a @ code ":" @ t.text )
 
 let record fds =
   let fields =
-    if fds = [] then Markdown.rm "…" else
-      Markdown.(glue ~sep:(raw " `;` ") (List.map field fds))
-  in atom @@ Markdown.(tt "{" <+> fields <+> tt "}")
+    if fds = [] then Markdown.plain "…" else
+      Markdown.(glue ~sep:(code ";") (List.map field fds))
+  in atom @@ Markdown.(code "{" @ fields @ code "}")
 
 type field = {
   name : string ;
@@ -115,15 +114,15 @@ type field = {
 }
 
 let fields ~title (fds : field list) =
-  let c_field = `Left title in
-  let c_format = `Center "Format" in
-  let c_descr = `Left "Description" in
-  Markdown.table [ c_field ; c_format ; c_descr ]
-    begin
-      List.map
-        (fun f ->
-           [ Markdown.tt f.name ; format f.syntax ; f.descr ])
-        fds
-    end
+  let open Markdown in
+  let header = [
+    plain title, Left;
+    plain "Format", Center;
+    plain "Description", Left
+  ] in
+  let column f = [ code f.name ; f.syntax.text ; f.descr ] in
+  Markdown.Table {
+    caption = None ; header ; content = List.map column fds ;
+  }
 
 (* -------------------------------------------------------------------------- *)

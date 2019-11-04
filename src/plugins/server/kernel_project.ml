@@ -37,7 +37,7 @@ module ProjectInfo =
       type t = Project.t
 
       let syntax = Sy.publish ~page ~name:"project-info"
-          ~descr:(Md.rm "Project informations")
+          ~descr:(Md.plain "Project informations")
           ~synopsis:Sy.(record[ "id",ident; "name",string; "current",boolean ])
           ()
 
@@ -63,7 +63,7 @@ struct
 
   let syntax = Sy.publish ~page ~name:"project-request"
       ~synopsis:(Sy.(record[ "project",ident; "request",string; "data",any; ]))
-      ~descr:(Md.rm "Request to be executed on the specified project.") ()
+      ~descr:(Md.plain "Request to be executed on the specified project.") ()
 
   let of_json js =
     begin
@@ -86,37 +86,37 @@ end
 
 let () = Request.register ~page
     ~kind:`GET ~name:"kernel.project.getCurrent"
-    ~descr:(Md.rm "Returns the current project")
+    ~descr:(Md.plain "Returns the current project")
     ~input:(module Junit) ~output:(module ProjectInfo)
     Project.current
 
 let () = Request.register ~page
     ~kind:`SET ~name:"kernel.project.setCurrent"
-    ~descr:(Md.rm "Switches the current project")
+    ~descr:(Md.plain "Switches the current project")
     ~input:(module Jident) ~output:(module Junit)
     (fun pid -> Project.(set_current (from_unique_name pid)))
 
 let () = Request.register ~page
     ~kind:`GET ~name:"kernel.project.getList"
-    ~descr:(Md.rm "Returns the list of all projects")
+    ~descr:(Md.plain "Returns the list of all projects")
     ~input:(module Junit) ~output:(module ProjectInfo.Jlist)
     (fun () -> Project.fold_on_projects (fun ids p -> p :: ids) [])
 
 let () = Request.register ~page
     ~kind:`GET ~name:"kernel.project.getOn"
-    ~descr:(Md.rm "Execute a GET request within the given project")
+    ~descr:(Md.plain "Execute a GET request within the given project")
     ~input:(module ProjectRequest) ~output:(module Jany)
     (ProjectRequest.process `GET)
 
 let () = Request.register ~page
     ~kind:`SET ~name:"kernel.project.setOn"
-    ~descr:(Md.rm "Execute a SET request within the given project")
+    ~descr:(Md.plain "Execute a SET request within the given project")
     ~input:(module ProjectRequest) ~output:(module Jany)
     (ProjectRequest.process `SET)
 
 let () = Request.register ~page
     ~kind:`EXEC ~name:"kernel.project.execOn"
-    ~descr:(Md.rm "Execute an EXEC request within the given project")
+    ~descr:(Md.plain "Execute an EXEC request within the given project")
     ~input:(module ProjectRequest) ~output:(module Jany)
     (ProjectRequest.process `EXEC)
 

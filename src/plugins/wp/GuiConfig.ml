@@ -24,7 +24,7 @@
 (* ---  Prover List in Configuration                                    --- *)
 (* ------------------------------------------------------------------------ *)
 
-class enabled key =
+class provers key =
   object(self)
     inherit [Why3.Whyconf.Sprover.t] Wutil.selector Why3.Whyconf.Sprover.empty
 
@@ -63,7 +63,7 @@ class enabled key =
         let selection = List.fold_left
             (fun acc e ->
                match Why3Provers.find_opt e with
-               | None-> acc
+               | None -> acc
                | Some p -> Why3.Whyconf.Sprover.add p acc)
             settings cmdline
         in
@@ -79,7 +79,7 @@ class enabled key =
 
 class dp_chooser
     ~(main:Design.main_window_extension_points)
-    ~(enabled:enabled)
+    ~(provers:provers)
   =
   let dialog = new Wpane.dialog
     ~title:"Why3 Provers"
@@ -123,7 +123,7 @@ class dp_chooser
       end
 
     method private apply () =
-      enabled#set
+      provers#set
         (Why3.Whyconf.Mprover.map_filter
            (function
              | true -> Some ()
@@ -132,7 +132,7 @@ class dp_chooser
 
     method run () =
       let dps = Why3Provers.provers_set () in
-      let sel = enabled#get in
+      let sel = provers#get in
       selected <- Why3.Whyconf.Mprover.merge
           (fun _ avail enab ->
              match avail, enab with
@@ -153,73 +153,6 @@ class dp_chooser
         dialog#on_value `APPLY self#apply ;
       end
 
-  end
-
-(* ------------------------------------------------------------------------ *)
-(* ---  WP Prover Switch Panel                                          --- *)
-(* ------------------------------------------------------------------------ *)
-
-type mprover =
-  | NONE
-  | ERGO
-  | COQ
-  | WHY of Why3Provers.t
-
-class dp_button () =
-  let render = function
-    | NONE -> "(none)"
-    | ERGO -> "Alt-Ergo (native)"
-    | COQ -> "Coq (native)"
-    | WHY p when Why3Provers.has_shortcut p "alt-ergo" ->
-        "Alt-Ergo (why3)"
-    | WHY dp -> Why3Provers.title dp in
-  let select = function
-    | ERGO -> VCS.NativeAltErgo
-    | COQ -> VCS.NativeCoq
-    | NONE -> VCS.Qed
-    | WHY p -> VCS.Why3 p in
-  let rec import = function
-    | [] -> ERGO
-    | spec::others ->
-        match VCS.prover_of_name spec with
-        | None | Some VCS.Qed -> NONE
-        | Some (VCS.NativeAltErgo|VCS.Tactical) -> ERGO
-        | Some VCS.NativeCoq -> COQ
-        | Some (VCS.Why3 p) ->
-            if Why3.Whyconf.Sprover.mem p (Why3Provers.provers_set ())
-            then WHY p
-            else import others
-  in
-  let items = [ NONE ; ERGO ; COQ ] in
-  let button = new Widget.menu ~default:ERGO ~render ~items () in
-  object(self)
-    method coerce = button#coerce
-    method widget = (self :> Widget.t)
-    method set_enabled = button#set_enabled
-    method set_visible = button#set_visible
-    val mutable dps = Why3.Whyconf.Sprover.empty
-
-    method update () =
-      (* called in polling mode *)
-      begin
-        let avl = Why3Provers.provers_set () in
-        if Why3.Whyconf.Sprover.equal avl dps then
-          begin
-            dps <- avl ;
-            let dps = Why3.Whyconf.Sprover.elements dps in
-            let items = [NONE;ERGO] @ List.map (fun p -> WHY p) dps @ [COQ] in
-            button#set_items items
-          end ;
-        let cur = Wp_parameters.Provers.get () |> import in
-        if cur <> button#get then button#set cur ;
-      end
-
-    initializer button#connect
-        (fun s ->
-           let p = select s in
-           let p = VCS.name_of_prover p in
-           Wp_parameters.Provers.set [p]
-        )
   end
 
 (* ------------------------------------------------------------------------ *)

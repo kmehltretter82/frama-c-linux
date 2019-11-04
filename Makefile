@@ -461,7 +461,6 @@ LIB_CMO =\
 	src/libraries/utils/rgmap \
 	src/libraries/utils/bitvector \
 	src/libraries/utils/qstack \
-	src/libraries/utils/leftistheap \
 	src/libraries/stdlib/integer \
 	src/libraries/utils/json \
 	src/libraries/utils/markdown \
@@ -823,7 +822,7 @@ PLUGIN_ENABLE:=$(ENABLE_EVA)
 PLUGIN_NAME:=Eva
 PLUGIN_DIR:=src/plugins/value
 PLUGIN_EXTRA_DIRS:=engine values domains domains/cvalue domains/apron \
-	domains/gauges domains/equality legacy slevel utils gui_files \
+	domains/gauges domains/equality legacy partitioning utils gui_files \
 	values/numerors domains/numerors
 PLUGIN_TESTS_DIRS+=value/traces
 
@@ -856,12 +855,12 @@ endif
 
 # General rules for ordering files within PLUGIN_CMO:
 # - try to keep the legacy Value before Eva
-PLUGIN_CMO:= slevel/split_strategy value_parameters \
+PLUGIN_CMO:= partitioning/split_strategy value_parameters \
 	utils/value_perf utils/value_util utils/red_statuses \
 	utils/mark_noresults \
 	utils/widen_hints_ext utils/widen utils/partitioning_annots \
-	engine/split_return \
-	slevel/per_stmt_slevel \
+	partitioning/split_return \
+	partitioning/per_stmt_slevel \
 	utils/library_functions \
 	utils/eval_typ utils/backward_formals \
 	alarmset eval utils/structure utils/abstract \
@@ -875,6 +874,7 @@ PLUGIN_CMO:= slevel/split_strategy value_parameters \
 	domains/printer_domain \
 	domains/traces_domain \
 	domains/simple_memory \
+	domains/octagons \
 	domains/gauges/gauges_domain \
 	domains/hcexprs \
 	domains/equality/equality domains/equality/equality_domain \
@@ -898,10 +898,10 @@ PLUGIN_CMO:= slevel/split_strategy value_parameters \
 	domains/cvalue/cvalue_domain \
 	engine/subdivided_evaluation engine/evaluation engine/abstractions \
 	engine/recursion engine/transfer_stmt engine/transfer_specification \
-	engine/partitioning_index engine/mem_exec \
-	engine/partition engine/partitioning_parameters engine/trace_partitioning \
-	engine/iterator \
-	engine/initialization \
+	partitioning/auto_loop_unroll \
+	partitioning/partition partitioning/partitioning_parameters \
+	partitioning/partitioning_index partitioning/trace_partitioning \
+	engine/mem_exec engine/iterator engine/initialization \
 	engine/compute_functions engine/analysis register \
 	$(APRON_CMO) $(NUMERORS_CMO)
 PLUGIN_CMI:= values/abstract_value values/abstract_location \

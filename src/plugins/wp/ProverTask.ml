@@ -292,9 +292,14 @@ let getprocs = function Some n -> n | None -> Wp_parameters.Procs.get ()
 let server ?procs () =
   match !server with
   | Some s ->
-      Task.set_procs s (getprocs procs) ; s
+      let np = getprocs procs in
+      Task.set_procs s np ;
+      Why3Provers.set_procs np ;
+      s
   | None ->
-      let s = Task.server ~procs:(getprocs procs) () in
+      let np = getprocs procs in
+      let s = Task.server ~procs:np () in
+      Why3Provers.set_procs np ;
       Task.on_server_stop s Proof.savescripts ;
       server := Some s ; s
 
