@@ -36,16 +36,12 @@ The procedure for creating the source distribution.
 
 There are many administrative steps, coordinated by the release manager.
 \begin{enumerate}
-\item Ensure that you have a clone of \texttt{e-acsl}
-  (\texttt{git@git.frama-c.com:frama-c/e-acsl}) in the \texttt{src/plugins}
-  directory
 \item If a new version of the ACSL manual is to be released, make sure you also
   have a clone of the \texttt{acsl} manual Github repository
   (\url{git@github.com:acsl-language/acsl.git}) in the \texttt{doc}
   directory
-\item Set \texttt{VERSION} file (for beta releases, add suffix \texttt{-beta}) for
-  all \texttt{VERSION} files present in the platform: both Frama-C's and E-ACSL's
-  version
+\item Update files \texttt{VERSION} and \texttt{VERSION\_CODENAME}
+  (for beta releases, add suffix \texttt{-beta})
 \item Update file \texttt{ALL\_VERSIONS} (nothing to do for beta releases). \todo{This section must be put somewhere else in the release manual}
 \item Update files
   \texttt{src/plugins/wp/Changelog} and
@@ -118,10 +114,10 @@ isn't exhaustive:
     \expertise{Virgile} \\
     \textsf{Metrics}  &
     \texttt{doc/metrics} &
-    \expertise{Richard} \\
+    \expertise{André} \\
     \textsf{Value Analysis}  &
     \texttt{doc/value} &
-    \expertise{Boris} \\
+    \expertise{David} \\
     \textsf{WP}  &
     \texttt{src/plugins/wp/doc/manual/} &
     \expertise{Loïc} \\
