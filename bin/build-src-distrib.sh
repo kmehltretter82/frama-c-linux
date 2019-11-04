@@ -221,7 +221,7 @@ case "${STEP}" in
     fi
     run "mkdir -p $BUILD_DIR_ROOT"
     run "rm -rf $BUILD_DIR"
-    run "git worktree add --detach $BUILD_DIR $FRAMAC_BRANCH"
+    run "git worktree add -f --detach $BUILD_DIR $FRAMAC_BRANCH"
     run "cd $BUILD_DIR; autoconf"
     run "cd $BUILD_DIR; ./configure"
     run "cd $BUILD_DIR; make -j OPEN_SOURCE=yes src-distrib"
