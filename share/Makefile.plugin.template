@@ -1013,6 +1013,7 @@ else
 $(PLUGIN_DIR)/@PLUGIN_NAME@_DEP_REDO:
 $(PLUGIN_DIR)/@PLUGIN_NAME@_DEP:
 $(PLUGIN_DIR)/@PLUGIN_NAME@_CLEAN:
+$(PLUGIN_DIR)/@PLUGIN_NAME@_CLEAN_DOC:
 endif
 
 # Reset each "local" plugin variable
