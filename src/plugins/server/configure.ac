@@ -53,7 +53,10 @@ then
         configure_pkg([zmq],
                       [Server support for ZeroMQ disabled (try 'opam install zmq').])
         plugin_use_pkg(server,zmq)
+        SERVER_ZMQ=$HAS_OCAML_ZMQ
 fi
+
+AC_SUBST(SERVER_ZMQ)
 
 #######################
 # Generating Makefile #
