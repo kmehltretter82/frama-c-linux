@@ -2,13 +2,7 @@ MAIN=main
 
 C_CODE=$(wildcard examples/*.[ci])
 VERSION_FILE=../../../../../VERSION
-ifeq ("$(wildcard $(VERSION_FILE))", "")
-VERSION_FILE=../../VERSION
-FC_VERSION= 18.0
-else
-#internal mode
 FC_VERSION=$(shell cat $(VERSION_FILE))
-endif
 EACSL_VERSION= $(shell cat $(VERSION_FILE))
 
 DEPS_MODERN=eacslversion.tex biblio.bib macros.tex \
