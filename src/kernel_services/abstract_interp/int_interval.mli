@@ -60,6 +60,10 @@ val mem: Integer.t -> t -> bool
     Returns [None] if the interval represents an infinite number of integers. *)
 val cardinal: t -> Integer.t option
 
+val complement_under: min:Integer.t -> max:Integer.t -> t -> t or_bottom
+(** Returns an under-approximation of the integers between [min] and [max]
+    that are *not* represented by the given interval. *)
+
 (** {2 Interval semantics.} *)
 
 (** See {!Int_val} for more details. *)

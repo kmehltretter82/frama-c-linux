@@ -415,6 +415,23 @@ let cardinal_zero_or_one t =
 let diff v _ = `Value v
 let diff_if_one v _ = `Value v
 
+let complement_under ~min ~max t =
+  let inject_range min max =
+    if Int.le min max
+    then `Value (inject_range (Some min) (Some max))
+    else `Bottom
+  in
+  match t.min, t.max with
+  | None, None -> `Bottom
+  | Some b, None -> inject_range min (Int.pred b)
+  | None, Some e -> inject_range (Int.succ e) max
+  | Some b, Some e ->
+    let delta_min = Int.sub b min in
+    let delta_max = Int.sub max e in
+    if Int.le delta_min delta_max
+    then inject_range (Int.succ e) max
+    else inject_range min (Int.pred b)
+
 let fold_int ?(increasing=true) f t acc =
   match t.min, t.max with
   | None, _ | _, None -> raise Error_Top

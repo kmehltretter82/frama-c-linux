@@ -431,6 +431,16 @@ let intersects v1 v2 =
   | Set s, Itv itv | Itv itv, Set s ->
     Int_set.exists (fun i -> Int_interval.mem i itv) s
 
+let complement_under ~size ~signed i =
+  let max = Int.two_power_of_int (if signed then size - 1 else size) in
+  let min = if signed then Int.neg max else Int.zero in
+  let max = Int.pred max in
+  match i with
+  | Set set ->
+    inject_set_or_top_or_bottom (Int_set.complement_under ~min ~max set)
+  | Itv itv ->
+    Int_interval.complement_under ~min ~max itv >>-: inject_itv
+
 (* -------------------------------- Arithmetics ----------------------------- *)
 
 let add_singleton i = function

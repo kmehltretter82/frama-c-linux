@@ -172,6 +172,10 @@ val all_values: size:Integer.t -> t -> bool
 
 val overlaps: partial:bool -> size:Integer.t -> t -> t -> bool
 
+val complement_under: size:int -> signed:bool -> t -> t or_bottom
+(** Returns an under-approximation of the integers of the given size and
+    signedness that are *not* represented by the given value. *)
+
 (** Iterates on all integers represented by an abstraction, in increasing order
     by default. If [increasing] is set to false, iterate by decreasing order.
     @raise Abstract_interp.Error_Top if the abstraction is unbounded. *)

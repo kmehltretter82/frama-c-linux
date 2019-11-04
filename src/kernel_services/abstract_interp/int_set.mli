@@ -106,6 +106,8 @@ val meet: t -> t -> t or_bottom
 val narrow: t -> t -> t or_bottom
 val intersects: t -> t -> bool
 val diff_if_one: t -> t -> t or_bottom
+val complement_under:
+  min:Integer.t -> max:Integer.t -> t -> set_or_top_or_bottom
 
 (** {2 Semantics.} *)
 

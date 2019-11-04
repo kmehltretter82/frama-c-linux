@@ -586,6 +586,29 @@ let remove s v =
       `Value (share_array r l)
   else `Value s
 
+let complement_under ~min ~max set =
+  let l = Array.length set in
+  let get idx =
+    if idx < 0 then Int.pred min
+    else if idx >= l then Int.succ max
+    else set.(idx)
+  in
+  let index = ref (-1) in
+  let max_delta = ref Int.zero in
+  for i = 0 to l do
+    let delta = Int.pred (Int.sub (get i) (get (i-1))) in
+    if Int.gt delta !max_delta then begin
+      index := i;
+      max_delta := delta
+    end
+  done;
+  let b, e = Int.succ (get (!index-1)), Int.pred (get !index) in
+  let card = Int.(to_int (succ (sub e b))) in
+  if card <= 0 then `Bottom
+  else if card <= !small_cardinal
+  then `Set (Array.init card (fun i -> Int.add b (Int.of_int i)))
+  else `Top (b, e, Int.one)
+
 (* ------------------------------ Arithmetics ------------------------------- *)
 
 let add_singleton = apply_bin_1_strict_incr Int.add
