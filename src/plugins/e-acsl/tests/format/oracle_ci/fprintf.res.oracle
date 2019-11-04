@@ -15,15 +15,15 @@
 [e-acsl] Warning: annotating undefined function `waitpid':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
-[kernel:annot:missing-spec] FRAMAC_SHARE/libc/stdio.h:165: Warning: 
+[kernel:annot:missing-spec] FRAMAC_SHARE/libc/stdio.h:207: Warning: 
   Neither code nor specification for function fprintf, generating default assigns from the prototype
-[kernel:annot:missing-spec] FRAMAC_SHARE/libc/stdio.h:169: Warning: 
+[kernel:annot:missing-spec] FRAMAC_SHARE/libc/stdio.h:211: Warning: 
   Neither code nor specification for function printf, generating default assigns from the prototype
-[kernel:annot:missing-spec] FRAMAC_SHARE/libc/stdio.h:171: Warning: 
+[kernel:annot:missing-spec] FRAMAC_SHARE/libc/stdio.h:213: Warning: 
   Neither code nor specification for function snprintf, generating default assigns from the prototype
-[kernel:annot:missing-spec] FRAMAC_SHARE/libc/stdio.h:173: Warning: 
+[kernel:annot:missing-spec] FRAMAC_SHARE/libc/stdio.h:215: Warning: 
   Neither code nor specification for function sprintf, generating default assigns from the prototype
-[kernel:annot:missing-spec] FRAMAC_SHARE/libc/stdio.h:369: Warning: 
+[kernel:annot:missing-spec] FRAMAC_SHARE/libc/stdio.h:521: Warning: 
   Neither code nor specification for function dprintf, generating default assigns from the prototype
 [kernel:annot:missing-spec] tests/format/fprintf.c:16: Warning: 
   Neither code nor specification for function fork, generating default assigns from the prototype
@@ -33,20 +33,20 @@
 [e-acsl] FRAMAC_SHARE/libc/sys/wait.h:86: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdio.h:94: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdio.h:120: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdio.h:96: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdio.h:122: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdio.h:82: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdio.h:97: Warning: 
   E-ACSL construct `predicate with no definition nor reads clause'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdio.h:82: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdio.h:97: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdio.h:82: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdio.h:97: Warning: 
   E-ACSL construct `abnormal termination case in behavior'
   is not yet supported.
   Ignoring annotation.
@@ -67,7 +67,7 @@
   accessing uninitialized left-value. assert \initialized(&process_status_0);
 [eva:alarm] tests/format/fprintf.c:20: Warning: 
   accessing uninitialized left-value. assert \initialized(&process_status_1);
-[eva:alarm] FRAMAC_SHARE/libc/stdio.h:94: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/stdio.h:120: Warning: 
   function __e_acsl_assert: precondition got status unknown.
 [eva:alarm] tests/format/fprintf.c:22: Warning: 
   accessing uninitialized left-value. assert \initialized(&process_status_2);
