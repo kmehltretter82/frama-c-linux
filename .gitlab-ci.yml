@@ -12,7 +12,7 @@ variables:
 check-no-old-frama-c:
   stage: git-update
   script:
-   - ! git merge-base --is-ancestor a1e186c68a6418a53b3dc06237f49e8dcbf75f4a HEAD
+   - (! git merge-base --is-ancestor a1e186c68a6418a53b3dc06237f49e8dcbf75f4a HEAD)
    - git merge-base --is-ancestor a35d2118fe6999dddce9e1847eff626fae9cc37c HEAD
   tags:
    - nix
