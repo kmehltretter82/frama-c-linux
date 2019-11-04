@@ -2206,15 +2206,6 @@ clean-doc:: $(PLUGIN_LIST:=_CLEAN_DOC)
 	if [ -f doc/developer/Makefile ]; then \
 	  $(MAKE) --silent -C doc/developer clean; \
 	fi
-	if [ -f doc/architecture/Makefile ]; then \
-	  $(MAKE) --silent -C doc/architecture clean; \
-	fi
-	if [ -f doc/speclang/Makefile ]; then \
-	  $(MAKE)  --silent -C doc/speclang clean; \
-	fi
-	if [ -f doc/www/src/Makefile ]; then \
-	  $(MAKE) --silent -C doc/www/src clean; \
-	fi
 
 clean-gui::
 	$(PRINT_RM) gui
