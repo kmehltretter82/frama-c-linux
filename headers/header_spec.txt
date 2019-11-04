@@ -16,7 +16,6 @@ VERSION: .ignore
 VERSION_CODENAME: .ignore
 bin/.gitignore: .ignore
 bin/build-src-distrib.sh: .ignore
-bin/developers-by-files.sh: CEA_PROPRIETARY
 bin/frama-c: CEA_LGPL
 bin/frama-c-config: CEA_LGPL
 bin/frama-c-script: CEA_LGPL
@@ -43,7 +42,6 @@ bin/migration_scripts/potassium2calcium.sh: CEA_LGPL
 bin/sed_get_binutils_version: .ignore
 bin/sed_get_make_major: .ignore
 bin/sed_get_make_minor: .ignore
-bin/test_all_plugins.sh: CEA_PROPRIETARY
 config.h.in: CEA_LGPL
 configure.in: CEA_INRIA_LGPL
 devel_tools/size.ml: .ignore
