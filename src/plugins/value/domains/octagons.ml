@@ -99,7 +99,7 @@ module Arith = struct
 
   let widen =
     let hints = Integer.zero,
-                (Ival.Widen_Hints.default_widen_hints,
+                (Ival.Widen_Hints.empty,
                  Fc_float.Widen_Hints.default_widen_hints)
     in
     Ival.widen hints
@@ -109,9 +109,10 @@ module Arith = struct
     if Ival.(equal top ival) then Fval.top
     else project_float ival
 
-  let neg = function
-    | Float f -> inject_float (Fval.neg f)
-    | ival -> neg_int ival
+  let neg ival =
+    if Ival.is_int ival
+    then neg_int ival
+    else inject_float (Fval.neg (project_float ival))
 
   let int_or_float_operation i_op f_op = fun typ ->
     match Cil.unrollType typ with
