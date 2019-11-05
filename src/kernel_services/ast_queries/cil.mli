@@ -1451,6 +1451,12 @@ val isGhostType : typ -> bool
     @return true iff a part of the related l-value has ["ghost"] qualifier
     @since Frama-C+dev *)
 
+val isWFGhostType : typ -> bool
+(** Check if the received type is well-formed according to \ghost semantics, that is
+    once the type is not ghost anymore, \ghost cannot appear again.
+    @return true iff the type is well formed
+    @since Frama-C+dev *)
+
 (* ************************************************************************* *)
 (** {2 The visitor} *)
 (* ************************************************************************* *)

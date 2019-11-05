@@ -3841,6 +3841,18 @@ let isVolatileTermLval lv =
 
 let isGhostType typ_lval = typeHasAttributeMemoryBlock "ghost" typ_lval
 
+let rec isWFGhostType t =
+  isWFGhostType' (unrollTypeDeep t)
+and isWFGhostType' t =
+  if not (isGhostType t) then isWFNonGhostType t
+  else match t with
+    | TPtr(t, _) | TArray(t, _, _, _) -> isWFGhostType' t
+    | _ -> true
+and isWFNonGhostType t =
+  if isGhostType t then false
+  else match t with
+    | TPtr(t, _) | TArray(t, _, _, _) -> isWFNonGhostType t
+    | _ -> true
 
 (**
  **

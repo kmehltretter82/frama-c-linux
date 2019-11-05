@@ -6684,6 +6684,9 @@ and doExp local_env
                   if expected pointer and got null pointer constant => ok *)
                not (Cil.isPointerType texpected && Ast_info.is_null_expr a')
              | false, false ->
+               (* Ghost compatibility is considered 'after_cleanup' *)
+               let texpected = Cil.typeRemoveAttributesDeep [ "ghost" ] texpected in
+               let att = Cil.typeRemoveAttributesDeep [ "ghost" ] att in
                (* pointers: check compatible modulo void ptr and modulo
                   literal strings (too many warnings otherwise) *)
                let ok1 =
