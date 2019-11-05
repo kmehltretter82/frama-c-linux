@@ -54,25 +54,6 @@ run () {
   fi
 }
 
-EACSL_GIT="git@git.frama-c.com:frama-c/e-acsl.git"
-EACSL_DIR="./src/plugins/e-acsl"
-if test \! -d $EACSL_DIR/.git ; then
-    echo "WARNING: $EACSL_DIR/.git directory not found; do you want to clone it? (y/n)"
-    read CHOICE
-    case "${CHOICE}" in
-        "Y"|"y")
-            pushd "./src/plugins"
-            run "git clone $EACSL_GIT"
-            popd
-            ;;
-        *)
-            echo "The E-ACSL repository must be linked at $EACSL_DIR (clone or symbolic link)"
-            exit 1
-            ;&
-    esac
-fi
-EACSL_BRANCH=`git --git-dir=$EACSL_DIR/.git rev-parse --abbrev-ref HEAD`
-
 GITHUB_DIR=./Frama-C-snapshot
 GITHUB_GIT="git@github.com:Frama-C/Frama-C-snapshot.git"
 
@@ -168,8 +149,6 @@ BUILD_DIR="$BUILD_DIR_ROOT/frama-c"
 echo "Frama-C Version         : $FRAMAC_VERSION"
 echo "Frama-C Branch          : $FRAMAC_BRANCH"
 echo "Final release           : $FINAL_RELEASE"
-echo "E-ACSL Dir              : $EACSL_DIR"
-echo "E-ACSL Branch           : $EACSL_BRANCH"
 echo "Frama-C-snapshot dir    : $GITHUB_DIR"
 echo "Frama-C-snapshot branch : $GITHUB_BRANCH"
 echo "Frama-C-snapshot wiki   : $GITHUB_WIKI"
@@ -242,8 +221,7 @@ case "${STEP}" in
     fi
     run "mkdir -p $BUILD_DIR_ROOT"
     run "rm -rf $BUILD_DIR"
-    run "git worktree add --detach $BUILD_DIR $FRAMAC_BRANCH"
-    run "cd $EACSL_DIR; git worktree add --detach $BUILD_DIR/src/plugins/e-acsl $EACSL_BRANCH"
+    run "git worktree add -f --detach $BUILD_DIR $FRAMAC_BRANCH"
     run "cd $BUILD_DIR; autoconf"
     run "cd $BUILD_DIR; ./configure"
     run "cd $BUILD_DIR; make -j OPEN_SOURCE=yes src-distrib"
@@ -353,13 +331,13 @@ case "${STEP}" in
     done
     for f in "e-acsl-manual" "e-acsl-implementation"; do
         echo "- [$f](manuals/${f}-${FRAMAC_VERSION_AND_CODENAME}.pdf)" >> $WIKI_PAGE
-        run "cp $EACSL_DIR/doc/manuals/$f.pdf $GITHUB_WIKI/manuals/${f}-${FRAMAC_VERSION_AND_CODENAME}.pdf"
+        run "cp src/plugins/e-acsl/doc/manuals/$f.pdf $GITHUB_WIKI/manuals/${f}-${FRAMAC_VERSION_AND_CODENAME}.pdf"
         run "git -C $GITHUB_WIKI add manuals/${f}-${FRAMAC_VERSION_AND_CODENAME}.pdf"
         if test "$FINAL_RELEASE" = "yes"; then
             SPEC_FILE="$DOWNLOAD_DIR/e-acsl/${f}-${FRAMAC_VERSION_AND_CODENAME}.pdf"
             RELE_FILE="$DOWNLOAD_DIR/e-acsl/$f.pdf"
             run "rm -f $WEBSITE_DIR/$SPEC_FILE $WEBSITE_DIR/$RELE_FILE"
-            run "cp $EACSL_DIR/doc/manuals/$f.pdf $WEBSITE_DIR/$SPEC_FILE"
+            run "cp src/plugins/e-acsl/doc/manuals/$f.pdf $WEBSITE_DIR/$SPEC_FILE"
             run "ln -s ${f}-${FRAMAC_VERSION_AND_CODENAME}.pdf $WEBSITE_DIR/$RELE_FILE";
             run "git -C $WEBSITE_DIR add $SPEC_FILE"
             run "git -C $WEBSITE_DIR add $RELE_FILE"
@@ -368,13 +346,13 @@ case "${STEP}" in
     # E-ACSL manuals based on ACSL version number
     for f in "e-acsl"; do
         echo "- [$f](manuals/${f}-${ACSL_VERSION}.pdf)" >> $WIKI_PAGE
-        run "cp $EACSL_DIR/doc/manuals/$f.pdf $GITHUB_WIKI/manuals/${f}-${ACSL_VERSION}.pdf"
+        run "cp src/plugins/e-acsl/doc/manuals/$f.pdf $GITHUB_WIKI/manuals/${f}-${ACSL_VERSION}.pdf"
         run "git -C $GITHUB_WIKI add manuals/${f}-${ACSL_VERSION}.pdf"
         if test "$FINAL_RELEASE" = "yes"; then
             SPEC_FILE="$DOWNLOAD_DIR/e-acsl/${f}-${ACSL_VERSION}.pdf"
             RELE_FILE="$DOWNLOAD_DIR/e-acsl/$f.pdf"
             run "rm -f $WEBSITE_DIR/$SPEC_FILE $WEBSITE_DIR/$RELE_FILE"
-            run "cp $EACSL_DIR/doc/manuals/$f.pdf $WEBSITE_DIR/$SPEC_FILE"
+            run "cp src/plugins/e-acsl/doc/manuals/$f.pdf $WEBSITE_DIR/$SPEC_FILE"
             run "ln -s ${f}-${ACSL_VERSION}.pdf $WEBSITE_DIR/$RELE_FILE";
             run "git -C $WEBSITE_DIR add $SPEC_FILE"
             run "git -C $WEBSITE_DIR add $RELE_FILE"

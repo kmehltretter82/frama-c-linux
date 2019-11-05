@@ -30,17 +30,6 @@ ifndef FRAMAC_SHARE
 FRAMAC_SHARE  :=$(shell frama-c-config -print-share-path)
 endif
 
-# OCAMLVERSION and HAS_OCAML312 are defined in Frama-C common Makefile but
-# cannot be used at this point. Unfortunatly cannot reuse the same variable name
-# here without introducing unexpected interaction with Frama-C compilation when
-# compiling it with --enable-external=e-acsl.
-EACSL_OCAMLVERSION 	?=@OCAMLVERSION@
-ifeq ($(findstring 3.12,$(EACSL_OCAMLVERSION)),)
-EACSL_HAS_OCAML312 = no
-else
-EACSL_HAS_OCAML312 = yes
-endif
-
 # Utilities used to create the list of contrib/ files to be included in the
 # distribution. In external mode, we can't rely on these variables to be
 # set, as we have to build the list before including Makefile.dynamic.
@@ -143,11 +132,7 @@ IS_DISTRIBUTED:=no
 
 PLUGIN_GENERATED:= $(EACSL_PLUGIN_DIR)/src/local_config.ml
 
-ifeq ("$(FRAMAC_INTERNAL)","yes")
 VERSION_FILE=$(FRAMAC_ROOT_SRCDIR)/VERSION
-else
-VERSION_FILE=$(EACSL_PLUGIN_DIR)/VERSION
-endif
 
 ################
 # Version      #
@@ -330,7 +315,7 @@ EACSL_LICENSE_FILES = \
   license/headache_config.txt license/LGPLv2.1
 
 EACSL_MISC_FILES = \
-  configure.ac Makefile.in INSTALL README VERSION
+  configure.ac Makefile.in INSTALL README
 
 EACSL_SHARE_FILES = share/e-acsl/*.[ch] share/e-acsl/*/*.[ch]
 

@@ -1,13 +1,14 @@
 opam-version: "2.0"
 name: "frama-c"
 synopsis: "Platform dedicated to the analysis of source code written in C"
-version: "19.1"
+version: "20.0"
 maintainer: "francois.bobot@cea.fr"
 authors: [
   "Michele Alberti"
   "Thibaud Antignac"
   "Gergö Barany"
   "Patrick Baudin"
+  "Allan Blanchard"
   "Lionel Blatter"
   "François Bobot"
   "Richard Bonichon"
@@ -25,10 +26,12 @@ authors: [
   "Tristan Le Gall"
   "Jean-Christophe Léchenet"
   "Matthieu Lemerre"
+  "Dara Ly"
   "David Maison"
   "Claude Marché"
   "André Maroneze"
   "Thibault Martin"
+  "Fonenantsoa Maurica"
   "Melody Méaulle"
   "Benjamin Monate"
   "Yannick Moy"
@@ -107,6 +110,9 @@ depopts: [
   "coq"
   "mlgmpidl"
   "apron"
+  "zmq"
+  "ppx_deriving"
+  "ppx_deriving_yojson"
 ]
 
 conflicts: [

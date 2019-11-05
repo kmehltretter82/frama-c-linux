@@ -2,11 +2,7 @@
 # Inputs #
 ##########
 
-# If in internal mode, use Frama-C's VERSION
 VERSION_FILE=$(wildcard ../../../../../VERSION)
-ifeq ("$(VERSION_FILE)","")
-VERSION_FILE=../../VERSION
-endif
 EACSL_VERSION=$(shell cat $(VERSION_FILE))
 
 MAIN=main
