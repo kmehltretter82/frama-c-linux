@@ -87,19 +87,19 @@ void g_decl_star(int \ghost *p); */
 */
 
 /*@ assigns *p; */
-void ng_decl_star(void)/*@ ghost (int \ghost *p) */;
+void ng_decl_star(void) /*@ ghost (int \ghost *p) */;
 
 /*@ assigns *p; */
-void ng_def_star(void)/*@ ghost (int \ghost *p) */
+void ng_def_star(void) /*@ ghost (int \ghost *p) */
 {
   return;
 }
 
 /*@ assigns *p; */
-void ng_decl_star_ng(void)/*@ ghost (int *p) */;
+void ng_decl_star_ng(void) /*@ ghost (int *p) */;
 
 /*@ assigns *p; */
-void ng_def_star_ng(void)/*@ ghost (int *p) */
+void ng_def_star_ng(void) /*@ ghost (int *p) */
 {
   return;
 }
@@ -136,19 +136,19 @@ void g_decl_set(int \ghost *p, int max); */
 */
 
 /*@ assigns *(p + (0 .. max)); */
-void ng_decl_set(int max)/*@ ghost (int \ghost *p) */;
+void ng_decl_set(int max) /*@ ghost (int \ghost *p) */;
 
 /*@ assigns *(p + (0 .. max)); */
-void ng_def_set(int max)/*@ ghost (int \ghost *p) */
+void ng_def_set(int max) /*@ ghost (int \ghost *p) */
 {
   return;
 }
 
 /*@ assigns *(p + (0 .. max)); */
-void ng_decl_set_ng(int max)/*@ ghost (int \ghost *p) */;
+void ng_decl_set_ng(int max) /*@ ghost (int \ghost *p) */;
 
 /*@ assigns *(p + (0 .. max)); */
-void ng_def_set_ng(int max)/*@ ghost (int \ghost *p) */
+void ng_def_set_ng(int max) /*@ ghost (int \ghost *p) */
 {
   return;
 }

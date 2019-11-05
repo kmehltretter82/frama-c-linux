@@ -275,7 +275,7 @@
    ng: normal -> normal
 [kernel] tests/syntax/ghost_cv_var_decl.c:232
    ga: ghost -> ghost
-[kernel] tests/syntax/ghost_cv_var_decl.c:238
+[kernel] tests/syntax/ghost_cv_var_decl.c:245
    x: ghost
 [kernel] tests/syntax/ghost_cv_var_decl.c:239
    i: normal
@@ -291,5 +291,5 @@
    main: normal
 [kernel] tests/syntax/ghost_cv_var_decl.c:248
    value: ghost
-[kernel] :0
+[kernel] tests/syntax/ghost_cv_var_decl.c:249
    __retres: normal

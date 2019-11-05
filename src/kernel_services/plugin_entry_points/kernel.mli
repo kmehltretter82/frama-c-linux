@@ -132,6 +132,10 @@ val dkey_visitor: category
 val wkey_annot_error: warn_category
 (** error in annotation. If only a warning, annotation will just be ignored. *)
 
+val wkey_ghost_already_ghost: warn_category
+(** ghost element is qualified with \ghost while this is already the case
+    by default *)
+
 val wkey_ghost_bad_use: warn_category
 (** error in ghost code *)
 
