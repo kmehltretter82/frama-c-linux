@@ -82,7 +82,7 @@ and funspec =
 
 and cvspec =
   | CV_CONST | CV_VOLATILE | CV_RESTRICT
-  | CV_ATTRIBUTE_ANNOT of string
+  | CV_ATTRIBUTE_ANNOT of string | CV_GHOST
 
 (* Type specifier elements. These appear at the start of a declaration *)
 (* Everywhere they appear in this file, they appear as a 'spec_elem list', *)
@@ -160,7 +160,7 @@ and enum_item = string * expression * cabsloc
 ** Declaration definition (at toplevel)
 *)
 and definition =
-   FUNDEF of 
+   FUNDEF of
        (Logic_ptree.spec*cabsloc) option * single_name * block *
          cabsloc * cabsloc
  | DECDEF of (Logic_ptree.spec*cabsloc) option * init_name_group * cabsloc
@@ -196,7 +196,7 @@ and asm_details =
     { aoutputs: (string option * string * expression) list; (* optional name, constraints and expressions for outputs *)
       ainputs: (string option * string * expression) list; (* optional name, constraints and expressions for inputs *)
       aclobbers: string list; (* clobbered registers *)
-      alabels: string list (* the labels for "asm goto" statements in gcc >= 4.6 *) 
+      alabels: string list (* the labels for "asm goto" statements in gcc >= 4.6 *)
     }
 
 and raw_statement =
@@ -234,7 +234,7 @@ and raw_statement =
      C parser, but can be used by external front-ends.
   *)
  | TRY_CATCH of statement * (single_name option * statement) list * cabsloc
-   (** [TRY_CATCH(s,clauses,loc)] catches exceptions thrown by execution of 
+   (** [TRY_CATCH(s,clauses,loc)] catches exceptions thrown by execution of
        [s], according to [clauses]. An
        exception [e] is caught by the first clause
        [(spec,(name, decl, _, _)),body]

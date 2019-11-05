@@ -4780,6 +4780,7 @@ and convertCVtoAttr (src: A.cvspec list) : A.attribute list =
   | CV_VOLATILE :: tl -> ("volatile",[]) :: (convertCVtoAttr tl)
   | CV_RESTRICT :: tl -> ("restrict",[]) :: (convertCVtoAttr tl)
   | CV_ATTRIBUTE_ANNOT a :: tl -> (mkAttrAnnot a, []) :: convertCVtoAttr tl
+  | CV_GHOST    :: tl -> ("ghost",[]) :: (convertCVtoAttr tl)
 
 and makeVarInfoCabs
     ~(ghost:bool)
