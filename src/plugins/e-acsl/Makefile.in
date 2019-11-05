@@ -30,14 +30,6 @@ ifndef FRAMAC_SHARE
 FRAMAC_SHARE  :=$(shell frama-c-config -print-share-path)
 endif
 
-# Utilities used to create the list of contrib/ files to be included in the
-# distribution. In external mode, we can't rely on these variables to be
-# set, as we have to build the list before including Makefile.dynamic.
-# There is no real alternative to cat and sed anyways, which are both part of
-# POSIX, so that the usefulness of the variables is questionable.
-CAT?=cat
-SED?=sed
-
 ###################
 # Plug-in sources #
 ###################
@@ -269,8 +261,6 @@ e-acsl-distclean:: clean
 # Building source distribution #
 ################################
 
-EXPORT = e-acsl-$(EACSL_VERSION)
-
 EACSL_CONTRIB_FILES = \
   $(EACSL_DLMALLOC_REL_DIR)/dlmalloc.c
 
@@ -336,77 +326,8 @@ PLUGIN_DISTRIB_EXTERNAL:= $(EACSL_DISTRIB_EXTERNAL)
 PLUGIN_HEADER_EXCEPTIONS:=
 
 # Files that are not listed in `DISTRIB_FILES`
-# and decicated to distributed tests
+# and dedicated to distributed tests
 PLUGIN_DISTRIB_TESTS:= $(EACSL_DISTRIB_TESTS)
-
-# for e-csl-distrib target:
-EACSL_OCAML_FILES = \
-	E_ACSL.mli \
-	src/*.mli src/*/*.mli \
-	$(patsubst $(EACSL_PLUGIN_DIR)/%, %, \
-	  $(filter-out $(wildcard $(EACSL_PLUGIN_DIR)/src/*local_config.ml), \
-	  	 $(wildcard $(EACSL_PLUGIN_DIR)/src/*.ml) \
-			$(EACSL_PLUGIN_DIR/src/*/*.ml))
-
-EACSL_DISTRIB_FILES = \
-  $(patsubst $(EACSL_PLUGIN_DIR)/%,%,\
-    $(wildcard $(addprefix $(EACSL_PLUGIN_DIR)/, \
-       $(EACSL_OCAML_FILES) $(EACSL_DISTRIB_EXTERNAL) $(EACSL_DISTRIB_TESTS))))
-
-# BE CAREFUL: manually remove all *.ml* files which should not be released!
-e-acsl-distrib:
-	$(PRINT_TAR) tmp-distrib
-	cd $(EACSL_PLUGIN_DIR); \
-	  $(TAR) cf tmp.tar $(EACSL_DISTRIB_FILES)
-	$(PRINT_MAKING) export directories
-	$(MKDIR) $(EACSL_PLUGIN_DIR)/$(EXPORT)
-	$(PRINT_UNTAR) tmp-distrib
-	cd $(EACSL_PLUGIN_DIR)/$(EXPORT); \
-	  pwd && \
-	  $(TAR) xf ../tmp.tar && \
-	  autoconf && \
-	  $(SED) \
-	    -i -e 's/IS_DISTRIBUTED:=no/IS_DISTRIBUTED:=yes/' Makefile.in && \
-	  $(RM) -rf autom4te.cache
-	$(PRINT_RM) tmp-distrib
-	$(RM) $(EACSL_PLUGIN_DIR)/tmp.tar
-	$(PRINT_MAKING) archive $(EACSL_PLUGIN_DIR)/$(EXPORT).tar.gz
-	cd $(EACSL_PLUGIN_DIR) ; \
-	  $(TAR) czf $(EXPORT).tar.gz $(EXPORT)
-	$(PRINT) Cleaning
-	$(RM) -fr $(EACSL_PLUGIN_DIR)/$(EXPORT)
-
-WWW	?= /localhome/julien/frama-c/doc/www
-e-acsl-install-distrib: e-acsl-distrib
-	$(PRINT) Copying to website
-	$(CP) $(EACSL_PLUGIN_DIR)/$(EXPORT).tar.gz \
-	  $(WWW)/distrib/download/e-acsl
-	$(CP) $(addprefix $(EACSL_PLUGIN_DIR)/, $(EACSL_DOC_FILES)) \
-	  $(WWW)/distrib/download/e-acsl
-ifneq ("$(EACSL_MANUAL_FILES)","")
-	$(CP) $(EACSL_PLUGIN_DIR)/doc/manuals/e-acsl-manual.pdf \
-	      $(WWW)/distrib/download/e-acsl/e-acsl-manual-$(EACSL_VERSION).pdf
-	$(CP) $(EACSL_PLUGIN_DIR)/doc/manuals/e-acsl.pdf \
-	      $(WWW)/distrib/download/e-acsl/e-acsl-1.7.pdf
-	$(CP) $(EACSL_PLUGIN_DIR)/doc/manuals/e-acsl-implementation.pdf \
-	      $(WWW)/distrib/download/e-acsl/e-acsl-implementation-$(EACSL_VERSION).pdf
-endif
-
-##############################
-# Check source distribution  #
-##############################
-e-acsl-distrib-check:
-	$(RM) -rf $(EXPORT)*
-	$(MAKE) e-acsl-distrib
-	$(TAR) -xvf $(EXPORT).tar.gz
-	unset FRAMAC_LIB && \
-	  cd $(EXPORT) && \
-	  ./configure && \
-    $(MAKE) && \
-    $(MAKE) doc && \
-    $(MAKE) tests && \
-    cd ../ && \
-    $(RM) -rf $(EXPORT)*
 
 ##########
 # Header #
