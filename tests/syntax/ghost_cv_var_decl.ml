@@ -22,7 +22,7 @@ open Cil_types
 
 let rec ghost_status fmt lval =
   let t = Cil.unrollType (Cil.typeOfLval lval) in
-  let ghost = false (* Cil.isGhostType t *) in
+  let ghost = Cil.isGhostType t in
 
   Format.fprintf fmt "%s" (if ghost then "ghost" else "normal") ;
   match t with

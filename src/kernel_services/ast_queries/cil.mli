@@ -61,7 +61,7 @@ open Cil_datatype
     before processing the actual list of files provided on the command line (see
     {!File.init_from_c_files}).  Actual list of such built-ins is managed in
     {!Cabs2cil}. *)
-module Frama_c_builtins: 
+module Frama_c_builtins:
   State_builder.Hashtbl with type key = string and type data = Cil_types.varinfo
 
 val is_builtin: Cil_types.varinfo -> bool
@@ -203,7 +203,7 @@ val removeFormalsDecl: varinfo -> unit
 val unsafeSetFormalsDecl: varinfo -> varinfo list -> unit
 
 (** iterate the given function on declared prototypes.
-    @since Oxygen-20120901 
+    @since Oxygen-20120901
 *)
 val iterFormalsDecl: (varinfo -> varinfo list -> unit) -> unit
 
@@ -352,24 +352,24 @@ val ulongType: typ
 val ulongLongType: typ
 
 (** Any unsigned integer type of size 16 bits.
-    It is equivalent to the ISO C uint16_t type but without using the 
-    corresponding header. 
+    It is equivalent to the ISO C uint16_t type but without using the
+    corresponding header.
     Shall not be called if not such type exists in the current architecture.
     @since Nitrogen-20111001
 *)
 val uint16_t: unit -> typ
 
 (** Any unsigned integer type of size 32 bits.
-    It is equivalent to the ISO C uint32_t type but without using the 
-    corresponding header. 
+    It is equivalent to the ISO C uint32_t type but without using the
+    corresponding header.
     Shall not be called if not such type exists in the current architecture.
     @since Nitrogen-20111001
 *)
 val uint32_t: unit -> typ
 
 (** Any unsigned integer type of size 64 bits.
-    It is equivalent to the ISO C uint64_t type but without using the 
-    corresponding header. 
+    It is equivalent to the ISO C uint64_t type but without using the
+    corresponding header.
     Shall not be called if no such type exists in the current architecture.
     @since Nitrogen-20111001
 *)
@@ -822,7 +822,7 @@ val kinteger: loc:location -> ikind -> int -> exp
 val integer: loc:location -> int -> exp
 
 (** Constructs a floating point constant.
-    @since Oxygen-20120901 
+    @since Oxygen-20120901
 *)
 val kfloat: loc:location -> fkind -> float -> exp
 
@@ -916,7 +916,7 @@ val increm64: exp -> Integer.t -> exp
 (** Makes an lvalue out of a given variable *)
 val var: varinfo -> lval
 
-(** Creates an expr representing the variable. 
+(** Creates an expr representing the variable.
     @since Nitrogen-20111001
  *)
 val evar: ?loc:location -> varinfo -> exp
@@ -964,7 +964,7 @@ val mkTermMem: addr:term -> off:term_offset -> term_lval
 (** Make an expression that is a string constant (of pointer type) *)
 val mkString: loc:location -> string -> exp
 
-(** [true] if both types are not equivalent. 
+(** [true] if both types are not equivalent.
     if [force] is [true], returns [true] whenever both types are not equal
     (modulo typedefs). If [force] is [false] (the default), other equivalences
     are considered, in particular between an enum and its representative
@@ -1269,9 +1269,9 @@ val isGhostFormalVarDecl: (string * typ * attributes) -> bool
 val typeDeepDropAttributes: string list -> typ -> typ
   [@@ ocaml.deprecated "Use Cil.typeRemoveAttributesDeep"]
 
-(** Remove any attribute appearing somewhere in the fully expanded 
+(** Remove any attribute appearing somewhere in the fully expanded
     version of the type.
-    @since Oxygen-20120901 
+    @since Oxygen-20120901
 *)
 val typeDeepDropAllAttributes: typ -> typ
 
@@ -1314,7 +1314,7 @@ val typeAddAttributes: attribute list -> typ -> typ
 *)
 val typeRemoveAttributes: string list -> typ -> typ
 
-(** same as above, but remove any existing attribute from the type. 
+(** same as above, but remove any existing attribute from the type.
 
  @since Magnesium-20151001
 *)
@@ -1443,6 +1443,15 @@ val isVolatileTermLval : term_lval -> bool
     @since Sulfur-20171101 *)
 
 (* ************************************************************************* *)
+(** {2 Ghost Attribute} *)
+(* ************************************************************************* *)
+
+val isGhostType : typ -> bool
+(** Check for ["ghost"] qualifier from the type of an l-value (do not follow pointer)
+    @return true iff a part of the related l-value has ["ghost"] qualifier
+    @since Frama-C+dev *)
+
+(* ************************************************************************* *)
 (** {2 The visitor} *)
 (* ************************************************************************* *)
 
@@ -1450,7 +1459,7 @@ val isVolatileTermLval : term_lval -> bool
     etc.
     @plugin development guide *)
 type 'a visitAction =
-  | SkipChildren (** Do not visit the children. Return the node as it is. 
+  | SkipChildren (** Do not visit the children. Return the node as it is.
 		     @plugin development guide *)
   | DoChildren (** Continue with the children of this node. Rebuild the node on
 		   return if any of the children changes (use == test).
@@ -1461,8 +1470,8 @@ type 'a visitAction =
   | JustCopy (** visit the children, but only to make the necessary copies
                  (only useful for copy visitor).
 		 @plugin development guide *)
-  | JustCopyPost of ('a -> 'a) 
-  (** same as JustCopy + applies the given function to the result. 
+  | JustCopyPost of ('a -> 'a)
+  (** same as JustCopy + applies the given function to the result.
       @plugin development guide*)
   | ChangeTo of 'a  (** Replace the expression with the given one.
 			@plugin development guide *)
@@ -1473,7 +1482,7 @@ type 'a visitAction =
   | ChangeDoChildrenPost of 'a * ('a -> 'a)
 (** First consider that the entire exp is replaced by the first parameter. Then
     continue with the children. On return rebuild the node if any of the
-    children has changed and then apply the function on the node. 
+    children has changed and then apply the function on the node.
     @plugin development guide *)
 
 val mk_behavior :
@@ -1513,12 +1522,12 @@ val find_default_requires: behavior list -> identified_predicate list
   that some instructions should be inserted before the current statement.
   Use syntax like [self#queueInstr] to call a method
   associated with the current object.
- 
+
   {b Important Note for Frama-C Users:} Unless you really know what you are
   doing, you should probably inherit from the
   {!Visitor.generic_frama_c_visitor} instead of {!genericCilVisitor} or
     {!nopCilVisitor}
-    
+
     @plugin development guide *)
 class type cilVisitor = object
   method behavior: Visitor_behavior.t
@@ -1565,7 +1574,7 @@ class type cilVisitor = object
   method voffs: offset -> offset visitAction
   (** Invoked on each offset occurrence that is *not* as part of an
       initializer list specification, i.e. in an lval or recursively inside an
-      offset.  
+      offset.
       @plugin development guide *)
 
   method vinitoffs: offset -> offset visitAction
@@ -1582,13 +1591,13 @@ class type cilVisitor = object
       of the original statement. This is done to preserve the sharing with
       [Goto] and [Case] statements that point to the original statement. If you
       use the [ChangeTo] action then you should take care of preserving that
-      sharing yourself.  
+      sharing yourself.
       @plugin development guide *)
 
   method vblock: block -> block visitAction
   (** Block. *)
-  
-  method vfunc: fundec -> fundec visitAction    
+
+  method vfunc: fundec -> fundec visitAction
   (** Function definition. Replaced in place. *)
 
   method vglob: global -> global list visitAction
@@ -1644,7 +1653,7 @@ class type cilVisitor = object
   method current_kinstr: kinstr
     (** [Kstmt stmt] when visiting statement stmt, [Kglobal] when called outside
         of a statement.
-        @since Carbon-20101201 
+        @since Carbon-20101201
 	@plugin development guide *)
 
   method push_stmt : stmt -> unit
@@ -1734,7 +1743,7 @@ class type cilVisitor = object
 end
 
 (** Indicates how an extended behavior clause is supposed to be visited.
-    The default behavior is [DoChildren], which ends up visiting 
+    The default behavior is [DoChildren], which ends up visiting
     each identified predicate in the list and leave the id as is.
 
     @plugin development guide
@@ -2031,7 +2040,7 @@ val uniqueVarNames: file -> unit
     replaces them both. If some replacement happens and [aggressive] is true,
     then the new statements are themselves subject to optimization.  Each
     statement in the list is optimized independently. *)
-val peepHole2: 
+val peepHole2:
   aggressive:bool -> (stmt * stmt -> stmt list option) -> stmt list -> stmt list
 
 (** Similar to [peepHole2] except that the optimization window consists of
@@ -2098,7 +2107,7 @@ val intTypeIncluded: ikind -> ikind -> bool
     @since Oxygen-20120901 *)
 val frank: fkind -> int
 
-(** Represents an integer as for a given kind. 
+(** Represents an integer as for a given kind.
  * Returns a flag saying whether the value was changed
  * during truncation (because it was too large to fit in k). *)
 val truncateInteger64: ikind -> Integer.t -> Integer.t * bool
@@ -2126,7 +2135,7 @@ exception Not_representable
 
 (** @return the smallest kind that will hold the integer's value.
     The kind will be unsigned if the 2nd argument is true.
-    @raise Not_representable if the bigint is not representable. 
+    @raise Not_representable if the bigint is not representable.
     @modify Neon-20130301 may raise Not_representable. *)
 val intKindForValue: Integer.t -> bool -> ikind
 
@@ -2250,14 +2259,14 @@ val extract_free_logicvars_from_predicate :
 
 (** extract [logic_label] elements from a [code_annotation] *)
 val extract_labels_from_annot:
-  code_annotation -> Cil_datatype.Logic_label.Set.t 
+  code_annotation -> Cil_datatype.Logic_label.Set.t
 
 (** extract [logic_label] elements from a [term] *)
-val extract_labels_from_term: term -> Cil_datatype.Logic_label.Set.t 
+val extract_labels_from_term: term -> Cil_datatype.Logic_label.Set.t
 
 (** extract [logic_label] elements from a [pred] *)
-val extract_labels_from_pred: 
-  predicate -> Cil_datatype.Logic_label.Set.t 
+val extract_labels_from_pred:
+  predicate -> Cil_datatype.Logic_label.Set.t
 
 (** extract [stmt] elements from [logic_label] elements *)
 val extract_stmts_from_labels:
@@ -2289,7 +2298,7 @@ val dependency_on_ast: State.t -> unit
 val set_dependencies_of_ast : State.t -> unit
   (** Makes all states that have been marked as depending on the AST by
       {!dependency_on_ast} depend on the given state. Should only be used
-      once when creating the AST state. 
+      once when creating the AST state.
    *)
 
 val pp_typ_ref: (Format.formatter -> typ -> unit) ref

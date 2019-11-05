@@ -381,7 +381,7 @@ let setTypeAttrs t a =
   | TFun (r, args, v, _) -> TFun(r,args,v,a)
   | TBuiltin_va_list _ -> TBuiltin_va_list a
 
-let qualifier_attributes = [ "const"; "restrict"; "volatile"]
+let qualifier_attributes = [ "const"; "restrict"; "volatile"; "ghost" ]
 
 let filter_qualifier_attributes al =
   List.filter
@@ -421,6 +421,44 @@ and arrayPushAttributes al = function
   | TArray (bt, l, s, a) ->
     TArray (arrayPushAttributes al bt, l, s, a)
   | t -> typeAddAttributes al t
+
+(**** Look for the presence of an attribute in a type ****)
+
+let typeHasAttribute attr typ = hasAttribute attr (typeAttrs typ)
+
+let rec typeHasQualifier attr typ =
+  match typ with
+  | TNamed (t, a) ->
+    hasAttribute attr a || typeHasQualifier attr t.ttype
+  | TArray (t, _, _, a) ->
+    typeHasQualifier attr t || (* ill-formed type *) hasAttribute attr a
+  | _ -> hasAttribute attr (typeAttrs typ)
+
+let typeHasAttributeMemoryBlock a (ty:typ): bool =
+  let f attrs = if hasAttribute a attrs then raise Exit in
+  let rec visit (t: typ) : unit =
+    match t with
+    | TNamed (r, a') -> f a' ; visit r.ttype
+    | TArray(t, _, _, a') -> f a'; visit t
+    | TComp (comp, _, a') -> f a';
+      List.iter (fun fi -> f fi.fattr; visit fi.ftype) comp.cfields
+    | TVoid a'
+    | TInt (_, a')
+    | TFloat (_, a')
+    | TEnum (_, a')
+    | TFun (_, _, _, a')
+    | TBuiltin_va_list a'
+    | TPtr(_, a') -> f a'
+  in
+  try visit ty; false
+  with Exit -> true
+
+let typeAddVolatile typ = typeAddAttributes [Attr ("volatile", [])] typ
+let typeAddGhost typ =
+  if not (typeHasAttribute "ghost" typ) then
+    typeAddAttributes [Attr ("ghost", [])] typ
+  else
+    typ
 
 let rec typeRemoveAttributes ?anl t =
   (* Try to preserve sharing. We use sharing to be more efficient, but also
@@ -619,7 +657,7 @@ let makeVarinfo
       vdefined = false;
       vformal = formal;
       vtemp = temp;
-      vtype = typ;
+      vtype = if ghost then typeAddGhost typ else typ;
       vdecl = loc;
       vinline = false;
       vattr = [];
@@ -3780,37 +3818,6 @@ and typeTermOffset basetyp =
       | Larrow _ -> Kernel.fatal ~current:true "typeTermOffset: Field on a function type"
     in Logic_const.transform_element elt_type basetyp
 
-(**** Look for the presence of an attribute in a type ****)
-
-let typeHasAttribute attr typ = hasAttribute attr (typeAttrs typ)
-
-let rec typeHasQualifier attr typ =
-  match typ with
-  | TNamed (t, a) ->
-    hasAttribute attr a || typeHasQualifier attr t.ttype
-  | TArray (t, _, _, a) ->
-    typeHasQualifier attr t || (* ill-formed type *) hasAttribute attr a
-  | _ -> hasAttribute attr (typeAttrs typ)
-
-let typeHasAttributeMemoryBlock a (ty:typ): bool =
-  let f attrs = if hasAttribute a attrs then raise Exit in
-  let rec visit (t: typ) : unit =
-    match t with
-    | TNamed (r, a') -> f a' ; visit r.ttype
-    | TArray(t, _, _, a') -> f a'; visit t
-    | TComp (comp, _, a') -> f a';
-      List.iter (fun fi -> f fi.fattr; visit fi.ftype) comp.cfields
-    | TVoid a'
-    | TInt (_, a')
-    | TFloat (_, a')
-    | TEnum (_, a')
-    | TFun (_, _, _, a')
-    | TBuiltin_va_list a'
-    | TPtr(_, a') -> f a'
-  in
-  try visit ty; false
-  with Exit -> true
-
 (**** Check for const attribute ****)
 
 let isConstType typ_lval = typeHasAttributeMemoryBlock "const" typ_lval
@@ -3829,6 +3836,11 @@ let rec isVolatileLogicType = function
 let isVolatileLval lv = isVolatileType (typeOfLval lv)
 let isVolatileTermLval lv =
   Logic_const.plain_or_set isVolatileLogicType (typeOfTermLval lv)
+
+(**** Check for ghost attribute ****)
+
+let isGhostType typ_lval = typeHasAttributeMemoryBlock "ghost" typ_lval
+
 
 (**
  **
@@ -4849,8 +4861,6 @@ let () = add_special_builtin_family
 let () = List.iter add_special_builtin
     [ "__builtin_stdarg_start"; "__builtin_va_arg";
       "__builtin_va_start"; "__builtin_expect"; "__builtin_next_arg"; ]
-
-let typeAddVolatile typ = typeAddAttributes [Attr ("volatile", [])] typ
 
 module Builtin_functions =
   State_builder.Hashtbl
@@ -6488,7 +6498,7 @@ let is_modifiable_lval lv =
 (* makes sure that the type of a C variable and the type of its associated
    logic variable -if any- stay synchronized. See bts 1538 *)
 let update_var_type v t =
-  v.vtype <- t;
+  v.vtype <- if v.vghost then typeAddGhost t else t;
   match v.vlogic_var_assoc with
   | None -> ()
   | Some lv -> lv.lv_type <- Ctype t
