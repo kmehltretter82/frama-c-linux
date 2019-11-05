@@ -183,7 +183,7 @@ val selfFormalsDecl: State.t
 val makeFormalsVarDecl: ?ghost:bool -> (string * typ * attributes) -> varinfo
   (** creates a new varinfo for the parameter of a prototype.
       By default, this formal variable is not ghost.
-      @modify 19.0-Potassium+dev adds a parameter for ghost status
+      @modify 20.0-Calcium adds a parameter for ghost status
   *)
 
 (** Update the formals of a function declaration from its identifier and its
@@ -584,11 +584,11 @@ val isTypeTagType: logic_type -> bool
 val isVariadicListType: typ -> bool
 
 (** Obtain the argument list ([] if None).
-    @since 19.0-Potassium+dev Beware that it contains the ghost arguments. *)
+    @since 20.0-Calcium Beware that it contains the ghost arguments. *)
 val argsToList:
   (string * typ * attributes) list option -> (string * typ * attributes) list
 
-(** @since 19.0-Potassium+dev
+(** @since 20.0-Calcium
    Obtain the argument lists (non-ghost, ghosts) ([], [] if None) *)
 val argsToPairOfLists:
   (string * typ * attributes) list option ->
@@ -697,7 +697,7 @@ val makeFormalVar: fundec -> ?ghost:bool -> ?where:string -> ?loc:Location.t -> 
     a fresh name will be generated for the varinfo.
 
     @modify Chlorine-20180501 the name of the variable is guaranteed to be fresh.
-    @modify Frama-C+dev add ghost optional argument
+    @modify 20.0-Calcium add ghost optional argument
 *)
 val makeLocalVar:
   fundec -> ?scope:block -> ?temp:bool -> ?referenced:bool -> ?insert:bool ->
@@ -720,7 +720,7 @@ val refresh_local_name: fundec -> varinfo -> unit
     among other locals of the function. The value for [insert] should
     only be changed if you are completely sure this is not useful.
 
-    @modify Frama-C+dev add ghost optional argument
+    @modify 20.0-Calcium add ghost optional argument
  *)
 val makeTempVar: fundec -> ?insert:bool -> ?ghost:bool -> ?name:string ->
   ?descr:string -> ?descrpure:bool -> ?loc:Location.t -> typ -> varinfo
@@ -728,7 +728,7 @@ val makeTempVar: fundec -> ?insert:bool -> ?ghost:bool -> ?name:string ->
 (** Make a global variable. Your responsibility to make sure that the name
     is unique. [source] defaults to [true]. [temp] defaults to [false].
 
-    @modify Frama-C+dev add ghost optional arg
+    @modify 20.0-Calcium add ghost optional arg
 *)
 val makeGlobalVar: ?source:bool -> ?temp:bool -> ?referenced:bool ->
   ?ghost:bool -> ?loc:Cil_datatype.Location.t -> string -> typ -> varinfo
@@ -1206,7 +1206,7 @@ val dropAttributes: string list -> attributes -> attributes
 
 (** A varinfo marked with this attribute is known to be a ghost formal.
 
-    @since 19.0-Potassium+dev
+    @since 20.0-Calcium
 *)
 val frama_c_ghost_formal: string
 
@@ -1232,13 +1232,13 @@ val is_mutable_or_initialized: lval -> bool
 
 (** [true] if the given varinfo is a ghost formal variable.
 
-    @since 19.0-Potassium+dev
+    @since 20.0-Calcium
 *)
 val isGhostFormalVarinfo: varinfo -> bool
 
 (** [true] if the given formal declaration corresponds to a ghost formal variable.
 
-    @since 19.0-Potassium+dev
+    @since 20.0-Calcium
 *)
 val isGhostFormalVarDecl: (string * typ * attributes) -> bool
 
@@ -1385,12 +1385,12 @@ val expToAttrParam: exp -> attrparam
 
 
 (** Return the attributes of the global annotation, if any.
-    @since Frama-C+dev
+    @since 20.0-Calcium
 *)
 val global_annotation_attributes: global_annotation -> attributes
 
 (** Return the attributes of the global, if any.
-    @since Frama-C+dev
+    @since 20.0-Calcium
 *)
 val global_attributes: global -> attributes
 

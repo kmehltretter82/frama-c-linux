@@ -122,7 +122,7 @@ module Normalized: sig
   (** Unknown filepath, used as 'dummy' for [Datatype.Filepath]. *)
   val unknown: t
 
-  (** @since Frama-C+dev *)
+  (** @since 20.0-Calcium *)
   val is_unknown: t -> bool
 end
 

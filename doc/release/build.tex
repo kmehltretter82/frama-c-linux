@@ -175,7 +175,9 @@ work for this purpose):
 \begin{shell}
 ./bin/update_api_doc.sh <NEXT>
 \end{shell}
-\verb+<NEXT>+ is the name of the release, i.e. the contents of VERSION (without any \verb+rc+ suffix).  
+\verb+<NEXT>+ is the long name of the final release, i.e.
+\verb+`cat VERSION`-`VERSION_CODENAME`+
+(without the \verb+beta+ suffix, if any).
 
 Check that no \verb|+dev| suffix remains inside comments:
 
