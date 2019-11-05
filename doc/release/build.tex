@@ -201,8 +201,19 @@ check consistency of API documentation. (the plug-in development guide
 This steps creates the tarball of Frama-C, the tarball of the API and
 copy them to the website. It also copies the manuals.
 
+\textbf{Note}: all standard plugins must be enabled to ensure they are distributed
+in the \verb+.tar.gz+. Some plug-ins require optional dependencies
+(e.g. markdown-report and \verb+ppx_deriving+), so you must ensure that,
+when running \verb+./configure+, no plugins that should be distributed are missing.
+Some of the checks are performed by the release build script, but not all of them.
+Also, some plug-ins may have components depending on optional packages
+(e.g. Server and \verb+zmq+), which are not always thoroughly tested. If such
+plug-ins are only partially enabled, check that the non-compiled sources are
+distributed in any case, or report it as a bug to their developers.
+
 If you have never run \verb+make src-distrib+, you can try a standalone build
-of the \verb+.tar.gz+ itself, before doing the rest.
+of the \verb+.tar.gz+ itself, before doing the rest (don't forget to use
+\verb+OPEN_SOURCE=yes+).
 Refer to Appendix \ref{chap:make-src-distrib} if you have problems when
 doing so. In any case, the archive will be recreated by a script, so you can
 skip this step.
@@ -262,16 +273,17 @@ Please check that the distribution (sources and API) is OK:
 \item check that \texttt{./configure \&\& make \&\& sudo make install} works fine;
 \item test the installed binaries (especially the GUI). (On Linux, OCI tests
   everything but the GUI);
-\item redo the two steps above on Windows \expertise{André}, macOS
-  \expertise{Loïc/Thibaud};
+\item redo the two steps above on Windows/WSL \expertise{André/Allan}, macOS
+  \expertise{André/Loïc/Thibaud};
   \begin{itemize}
-  \item In Cygwin, after installing opam-repository-mingw
-    (https://fdopen.github.io/opam-repository-mingw/),
-    installing Frama-C dependencies, etc., uncompress the .tar.gz and run:
-  \item \verb+./configure --prefix="$(cygpath -a -m $PWD)"/build+
-  \item Then \verb+make+;
-  \item Then \verb+make install+;
-  \item Then try e.g. running \verb+build/bin/frama-c-gui tests/idct/*.c -val -wp -wp-rte+ and click around, see if things work.
+  \item For instance, you can compile and test as follows:
+  \item \verb+./configure --prefix="$PWD/build"+
+  \item \verb+make+;
+  \item \verb+make install+;
+  \item \verb+rm -f ~/.why3.conf; why3 config+;
+  \item \verb+build/bin/frama-c tests/idct/*.c -eva -wp -wp-rte+
+  \item If you have a GUI, replace \verb+frama-c+ above with \verb+frama-c-gui+
+    and click around, see if things work (e.g. no segmentation faults).
   \end{itemize}
 \item have a look at the documentation of the API (untar, open
   \texttt{index.html} in a browser, click on a few links, etc).
