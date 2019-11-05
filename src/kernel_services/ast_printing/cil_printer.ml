@@ -655,10 +655,18 @@ class cil_printer () = object (self)
     end;
     self#varname fmt v.vname
 
+  method private no_ghost_at_first_level = function
+    | TArray(t, e, b, a) ->
+      let t = Cil.typeRemoveAttributes [ "ghost" ] t in
+      let a = Cil.dropAttribute "ghost" a in
+      TArray (t, e, b, a)
+    | t -> Cil.typeRemoveAttributes [ "ghost" ] t
+
   (* variable declaration *)
   method vdecl fmt (v:varinfo) =
     let stom, rest = Cil.separateStorageModifiers v.vattr in
     let fundecl = if Cil.isFunctionType v.vtype then Some v else None in
+    let v = { v with vtype = self#no_ghost_at_first_level v.vtype } in
     (* First the storage modifiers *)
     fprintf fmt "%s%a%a%s%a%a"
       (if v.vinline then "__inline " else "")
@@ -1961,6 +1969,7 @@ class cil_printer () = object (self)
         | None ->
           let pp_args fmt (aname,atype,aattr) =
             (* The storage modifiers come first *)
+            let atype = self#no_ghost_at_first_level atype in
             let stom, rest = Cil.separateStorageModifiers aattr in
             fprintf fmt "%a%a%a"
               self#attributes stom
