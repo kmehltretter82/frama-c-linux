@@ -200,7 +200,9 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
     fun loc ->
       match !retVar with
       | None ->
-        let rv = makeLocalVar ~loc f "__retres" retTyp in (* don't collide *)
+        let ghost = f.svar.vghost in
+        (* don't collide *)
+        let rv = makeLocalVar ~loc ~ghost f "__retres" retTyp in
         retVar := Some rv;
         rv
       | Some rv ->
