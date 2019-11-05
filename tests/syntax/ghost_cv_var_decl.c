@@ -1,8 +1,8 @@
 /* run.config
-   MODULE: @PTEST_DIR@/@PTEST_NAME@.cmxs
    OPT:-cpp-extra-args="-DFAIL_DECL_TYPE"
-   OPT:
+   OPT:-load-script @PTEST_DIR@/@PTEST_NAME@.ml
 */
+
 
 /* When there is no comment, the code should be allowed */
 void f_ints(){
