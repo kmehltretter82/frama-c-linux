@@ -88,9 +88,7 @@ AC_OUTPUT(PLUGIN_RELATIVE_PATH(doc/doxygen/doxygen.cfg), [  ])
 # Generating Makefile #
 #######################
 
-AC_SUBST(OPTIMIZED_RTL)
 AC_SUBST(MAY_RUN_TESTS)
-AC_SUBST(OCAMLVERSION)
 
 write_plugin_config(Makefile)
 
