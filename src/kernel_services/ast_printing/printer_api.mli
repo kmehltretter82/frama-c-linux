@@ -81,18 +81,18 @@ class type extensible_printer_type = object
   method private in_ghost_if_needed:
     Format.formatter ->
     bool ->
-    ?ghost_fmt:(((Format.formatter -> string -> unit) -> string -> unit, Format.formatter, unit) format) ->
+    ?break_ghost:bool ->
     post_fmt:(((Format.formatter -> unit) -> unit, Format.formatter, unit) format) ->
     ?block:bool ->
     (unit -> unit)
     -> unit
   (** Open a ghost context if the the first [bool] is true and we are not
-      already in a ghost context. [ghost_fmt] indicates the format that should applied
-      around the [ghost] keyword (default is ["%a@ "]). [post_fmt] is a format like ["%t"] and is used
-      to define the format at the end of the ghost context. [block] indicates
-      whether we should open a C block or not (defaults to [true]). The last
-      parameter is the function to be applied in the ghost context (generally
-      some AST element).
+      already in a ghost context. [break_ghost] indicates whether we should
+      break after the [ghost] keyword, defaults to true. [post_fmt] is a format
+      like ["%t"] and is used to define the format at the end of the ghost
+      context. [block] indicates whether we should open a C block or not
+      (defaults to [true]). The last parameter is the function to be applied in
+      the ghost context (generally some AST element).
 
       @since 20.0-Calcium *)
 
