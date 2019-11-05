@@ -568,9 +568,13 @@ let inject_in_fundec main fundec =
   let kf = try Globals.Functions.get vi with Not_found -> assert false in
   (* convert ghost variables *)
   vi.vghost <- false;
-  List.iter (fun vi -> vi.vghost <- false) fundec.slocals;
+  let unghost_local vi =
+    vi.vtype <- Cil.typeRemoveAttributesDeep ["ghost"] vi.vtype ;
+    vi.vghost <- false
+  in
+  List.iter unghost_local fundec.slocals;
   let unghost_formal vi =
-    vi.vghost <- false ;
+    unghost_local vi ;
     vi.vattr <- Cil.dropAttribute Cil.frama_c_ghost_formal vi.vattr
   in
   List.iter unghost_formal fundec.sformals;
@@ -602,6 +606,7 @@ let unghost_vi vi =
   (* do not convert extern ghost variables, because they can't be linked,
      see bts #1392 *)
   if vi.vstorage <> Extern then vi.vghost <- false;
+  vi.vtype <- Cil.typeRemoveAttributesDeep ["ghost"] vi.vtype ;
   match Cil.unrollType vi.vtype with
   | TFun(res, Some l, va, attr) ->
     (* unghostify function's parameters *)
