@@ -14,13 +14,11 @@
 [wp] Proved goals:    5 / 5
   Qed:               1 
   Alt-Ergo 2.0.0:    4
-[wp] Report in:  'tests/wp_typed/oracle_qualif/array_initialized.1.report.json'
-[wp] Report out: 'tests/wp_typed/result_qualif/array_initialized.1.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-main1               -       1 (8..20)        1       100%
-main2               -       1 (104..128)     1       100%
-main3                1     -                 1       100%
-main_pointer        -       1 (44..56)       1       100%
-simpl               -       1 (12..24)       1       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  main1                     -        1        1       100%
+  main2                     -        1        1       100%
+  main3                     1        -        1       100%
+  main_pointer              -        1        1       100%
+  simpl                     -        1        1       100%
+------------------------------------------------------------

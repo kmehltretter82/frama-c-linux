@@ -9,11 +9,9 @@
 [wp] [Alt-Ergo 2.0.0] Goal typed_bit_test_check3_ensures_ko : Typechecked
 [wp] Proved goals:    0 / 3
   Alt-Ergo 2.0.0:    0  (unsuccess: 3)
-[wp] Report in:  'tests/wp_plugin/oracle_qualif/bit_test.0.report.json'
-[wp] Report out: 'tests/wp_plugin/result_qualif/bit_test.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-check1              -      -                 1       0.0%
-check2              -      -                 1       0.0%
-check3              -      -                 1       0.0%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  check1                    -        -        1       0.0%
+  check2                    -        -        1       0.0%
+  check3                    -        -        1       0.0%
+------------------------------------------------------------

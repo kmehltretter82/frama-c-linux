@@ -9,11 +9,9 @@
 [wp] [Qed] Goal typed_ref_call_f3_ensures : Valid
 [wp] Proved goals:    3 / 3
   Qed:             3
-[wp] Report in:  'tests/wp_hoare/oracle_qualif/reference_array_simple.0.report.json'
-[wp] Report out: 'tests/wp_hoare/result_qualif/reference_array_simple.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-call_f1              1     -                 1       100%
-call_f2              1     -                 1       100%
-call_f3              1     -                 1       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  call_f1                   1        -        1       100%
+  call_f2                   1        -        1       100%
+  call_f3                   1        -        1       100%
+------------------------------------------------------------

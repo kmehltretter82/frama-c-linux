@@ -8,10 +8,8 @@
 [wp] Proved goals:    2 / 2
   Qed:               0 
   Alt-Ergo 2.0.0:    2
-[wp] Report in:  'tests/wp_bts/oracle_qualif/issue_143.2.report.json'
-[wp] Report out: 'tests/wp_bts/result_qualif/issue_143.2.report.json'
--------------------------------------------------------------
-Axiomatics          WP     Alt-Ergo        Total   Success
-Axiomatic A         -       1 (1..12)        1       100%
-Axiomatic B         -       1 (1..12)        1       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Axiomatics                WP     Alt-Ergo  Total   Success
+  Axiomatic A               -        1        1       100%
+  Axiomatic B               -        1        1       100%
+------------------------------------------------------------

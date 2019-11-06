@@ -16,15 +16,13 @@
 [wp] Proved goals:    8 / 9
   Qed:               7 
   Alt-Ergo 2.0.0:    1  (unsuccess: 1)
-[wp] Report in:  'tests/wp_hoare/oracle_qualif/refguards.0.report.json'
-[wp] Report out: 'tests/wp_hoare/result_qualif/refguards.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-f                    1     -                 1       100%
-g                   -       1 (8..20)        1       100%
-h                    1     -                 1       100%
-s                    5     -                 6      83.3%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  f                         1        -        1       100%
+  g                         -        1        1       100%
+  h                         1        -        1       100%
+  s                         5        -        6      83.3%
+------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'f':
   /*@
      behavior typed_ref:

@@ -12,9 +12,7 @@
 [wp] Proved goals:    5 / 5
   Qed:               2 
   Alt-Ergo 2.0.0:    3
-[wp] Report in:  'tests/wp_typed/oracle_qualif/shift_lemma.0.report.json'
-[wp] Report out: 'tests/wp_typed/result_qualif/shift_lemma.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-f                    2      3 (20..32)       5       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  f                         2        3        5       100%
+------------------------------------------------------------

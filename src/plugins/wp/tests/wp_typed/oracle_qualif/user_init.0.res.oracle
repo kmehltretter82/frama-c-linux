@@ -103,15 +103,13 @@
 [wp] Proved goals:   91 / 91
   Qed:              51 
   Alt-Ergo 2.0.0:   40
-[wp] Report in:  'tests/wp_typed/oracle_qualif/user_init.0.report.json'
-[wp] Report out: 'tests/wp_typed/result_qualif/user_init.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-init                 6      4 (52..64)      10       100%
-init_t1              6      4 (12..24)      10       100%
-init_t2_v1           9      8 (48..60)      17       100%
-init_t2_v2           9      8 (36..48)      17       100%
-init_t2_v3           7      8 (32..44)      15       100%
-init_t2_bis_v1       7      4 (176..224)    11       100%
-init_t2_bis_v2       7      4 (176..224)    11       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  init                      6        4       10       100%
+  init_t1                   6        4       10       100%
+  init_t2_v1                9        8       17       100%
+  init_t2_v2                9        8       17       100%
+  init_t2_v3                7        8       15       100%
+  init_t2_bis_v1            7        4       11       100%
+  init_t2_bis_v2            7        4       11       100%
+------------------------------------------------------------

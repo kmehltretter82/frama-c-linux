@@ -12,9 +12,7 @@
 [wp] [Qed] Goal typed_f_loop_invariant_2_established : Valid
 [wp] Proved goals:    4 / 4
   Qed:             4
-[wp] Report in:  'tests/wp_plugin/oracle_qualif/loopcurrent.0.report.json'
-[wp] Report out: 'tests/wp_plugin/result_qualif/loopcurrent.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-f                    4     -                 4       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  f                         4        -        4       100%
+------------------------------------------------------------

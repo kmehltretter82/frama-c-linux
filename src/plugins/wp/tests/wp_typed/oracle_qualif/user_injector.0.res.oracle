@@ -26,12 +26,10 @@
 [wp] [Qed] Goal typed_job_assigns_normal_part9 : Valid
 [wp] Proved goals:   20 / 20
   Qed:            20
-[wp] Report in:  'tests/wp_typed/oracle_qualif/user_injector.0.report.json'
-[wp] Report out: 'tests/wp_typed/result_qualif/user_injector.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-job                 20     -                20       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  job                      20        -       20       100%
+------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'job':
   /*@
      behavior typed:

@@ -36,11 +36,9 @@
   Qed:              11 
   Script:           12 
   Alt-Ergo 2.0.0:    0  (unsuccess: 12)
-[wp] Report in:  'tests/wp_typed/oracle_qualif/user_init.1.report.json'
-[wp] Report out: 'tests/wp_typed/result_qualif/user_init.1.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-init_t2_v2           3     -  (20..32)       8       100%
-init_t2_v3           4     -  (20..32)       7       100%
-init_t2_bis_v2       4     -  (24..36)       8       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  init_t2_v2                3        -        8       100%
+  init_t2_v3                4        -        7       100%
+  init_t2_bis_v2            4        -        8       100%
+------------------------------------------------------------

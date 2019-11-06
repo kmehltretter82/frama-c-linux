@@ -11,13 +11,11 @@
 [wp] [Qed] Goal typed_job4_ensures : Valid
 [wp] Proved goals:    5 / 5
   Qed:             5
-[wp] Report in:  'tests/wp_acsl/oracle_qualif/bitwise2.0.report.json'
-[wp] Report out: 'tests/wp_acsl/result_qualif/bitwise2.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-job1                 1     -                 1       100%
-job1bis              1     -                 1       100%
-job2                 1     -                 1       100%
-job3                 1     -                 1       100%
-job4                 1     -                 1       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  job1                      1        -        1       100%
+  job1bis                   1        -        1       100%
+  job2                      1        -        1       100%
+  job3                      1        -        1       100%
+  job4                      1        -        1       100%
+------------------------------------------------------------

@@ -10,9 +10,7 @@
 [wp] Proved goals:    3 / 3
   Qed:               2 
   Alt-Ergo 2.0.0:    1
-[wp] Report in:  'tests/wp_bts/oracle_qualif/issue_508.0.report.json'
-[wp] Report out: 'tests/wp_bts/result_qualif/issue_508.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-add                  2      1 (56..68)       3       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  add                       2        1        3       100%
+------------------------------------------------------------

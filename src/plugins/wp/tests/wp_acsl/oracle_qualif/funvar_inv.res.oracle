@@ -9,11 +9,9 @@
 [wp] [Qed] Goal typed_ref_g_loop_assigns : Valid
 [wp] Proved goals:    3 / 3
   Qed:             3
-[wp] Report in:  'tests/wp_acsl/oracle_qualif/funvar_inv.0.report.json'
-[wp] Report out: 'tests/wp_acsl/result_qualif/funvar_inv.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-f                    1     -                 1       100%
-f2                   1     -                 1       100%
-g                    1     -                 1       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  f                         1        -        1       100%
+  f2                        1        -        1       100%
+  g                         1        -        1       100%
+------------------------------------------------------------

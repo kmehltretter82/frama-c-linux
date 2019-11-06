@@ -15,9 +15,7 @@
 [wp] [Qed] Goal typed_main_ensures_VAR_D : Valid
 [wp] Proved goals:    6 / 6
   Qed:             6
-[wp] Report in:  'tests/wp_typed/oracle_qualif/unit_float.0.report.json'
-[wp] Report out: 'tests/wp_typed/result_qualif/unit_float.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-main                 6     -                 6       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  main                      6        -        6       100%
+------------------------------------------------------------

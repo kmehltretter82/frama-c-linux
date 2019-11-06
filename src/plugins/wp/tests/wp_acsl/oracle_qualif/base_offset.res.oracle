@@ -10,9 +10,7 @@
 [wp] Proved goals:    2 / 3
   Qed:               2 
   Alt-Ergo 2.0.0:    0  (unsuccess: 1)
-[wp] Report in:  'tests/wp_acsl/oracle_qualif/base_offset.0.report.json'
-[wp] Report out: 'tests/wp_acsl/result_qualif/base_offset.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-f                    2     -                 3      66.7%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  f                         2        -        3      66.7%
+------------------------------------------------------------

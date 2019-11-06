@@ -17,9 +17,7 @@
 [wp] Proved goals:    8 / 10
   Qed:               3 
   Alt-Ergo 2.0.0:    5  (unsuccess: 2)
-[wp] Report in:  'tests/wp_acsl/oracle_qualif/axioms.0.report.json'
-[wp] Report out: 'tests/wp_acsl/result_qualif/axioms.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-f                    3      5 (56..80)      10      80.0%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  f                         3        5       10      80.0%
+------------------------------------------------------------

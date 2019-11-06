@@ -12,10 +12,8 @@
 [wp] [Qed] Goal typed_f2_assigns : Valid
 [wp] Proved goals:    6 / 6
   Qed:             6
-[wp] Report in:  'tests/wp_bts/oracle_qualif/issue_453.0.report.json'
-[wp] Report out: 'tests/wp_bts/result_qualif/issue_453.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-f1                   3     -                 3       100%
-f2                   3     -                 3       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  f1                        3        -        3       100%
+  f2                        3        -        3       100%
+------------------------------------------------------------

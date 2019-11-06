@@ -7,12 +7,10 @@
 [wp] [Qed] Goal typed_empty_assert : Valid
 [wp] Proved goals:    1 / 1
   Qed:             1
-[wp] Report in:  'tests/wp/oracle_qualif/stmtcompiler_test_rela.0.report.json'
-[wp] Report out: 'tests/wp/result_qualif/stmtcompiler_test_rela.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-empty                1     -                 1       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  empty                     1        -        1       100%
+------------------------------------------------------------
 ------The pred (c_11<c_23) -> (result_0<result_1) 
 #######################################################################
 Sequent: Assume {

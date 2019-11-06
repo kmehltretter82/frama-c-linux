@@ -7,9 +7,7 @@
 [wp] [Qed] Goal typed_check_ensures : Valid
 [wp] Proved goals:    1 / 1
   Qed:             1
-[wp] Report in:  'tests/wp_typed/oracle_qualif/unit_ite.0.report.json'
-[wp] Report out: 'tests/wp_typed/result_qualif/unit_ite.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-check                1     -                 1       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  check                     1        -        1       100%
+------------------------------------------------------------

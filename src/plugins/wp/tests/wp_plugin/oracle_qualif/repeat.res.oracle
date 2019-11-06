@@ -56,12 +56,10 @@
 [wp] Proved goals:   47 / 47
   Qed:              42 
   Alt-Ergo 2.0.0:    5
-[wp] Report in:  'tests/wp_plugin/oracle_qualif/repeat.0.report.json'
-[wp] Report out: 'tests/wp_plugin/result_qualif/repeat.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-master               3     -                 3       100%
-unroll              25     -                25       100%
-induction            7      2 (512..608)     9       100%
-shifted              7      3 (512..608)    10       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  master                    3        -        3       100%
+  unroll                   25        -       25       100%
+  induction                 7        2        9       100%
+  shifted                   7        3       10       100%
+------------------------------------------------------------

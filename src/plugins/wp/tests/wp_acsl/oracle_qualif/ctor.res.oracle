@@ -7,9 +7,7 @@
 [wp] [Qed] Goal typed_lemma_diff : Valid
 [wp] Proved goals:    2 / 2
   Qed:             2
-[wp] Report in:  'tests/wp_acsl/oracle_qualif/ctor.0.report.json'
-[wp] Report out: 'tests/wp_acsl/result_qualif/ctor.0.report.json'
--------------------------------------------------------------
-Axiomatics          WP     Alt-Ergo        Total   Success
-Axiomatic Event      2     -                 2       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Axiomatics                WP     Alt-Ergo  Total   Success
+  Axiomatic Event           2        -        2       100%
+------------------------------------------------------------

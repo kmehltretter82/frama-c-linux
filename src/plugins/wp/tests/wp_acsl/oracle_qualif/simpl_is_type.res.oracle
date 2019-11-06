@@ -25,11 +25,9 @@
 [wp] Proved goals:   18 / 18
   Qed:               7 
   Alt-Ergo 2.0.0:   11
-[wp] Report in:  'tests/wp_acsl/oracle_qualif/simpl_is_type.0.report.json'
-[wp] Report out: 'tests/wp_acsl/result_qualif/simpl_is_type.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-f                    3      6 (56..68)       9       100%
-g                    3      3 (24..36)       6       100%
-check_acsl           1      2 (44..56)       3       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  f                         3        6        9       100%
+  g                         3        3        6       100%
+  check_acsl                1        2        3       100%
+------------------------------------------------------------

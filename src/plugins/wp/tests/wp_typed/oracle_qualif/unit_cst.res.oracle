@@ -8,9 +8,7 @@
 [wp] [Qed] Goal typed_f_ensures_B : Valid
 [wp] Proved goals:    2 / 2
   Qed:             2
-[wp] Report in:  'tests/wp_typed/oracle_qualif/unit_cst.0.report.json'
-[wp] Report out: 'tests/wp_typed/result_qualif/unit_cst.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-f                    2     -                 2       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  f                         2        -        2       100%
+------------------------------------------------------------

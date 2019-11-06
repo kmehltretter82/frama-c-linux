@@ -9,9 +9,7 @@
 [wp] [Qed] Goal typed_foo_call_dummy_requires : Valid
 [wp] Proved goals:    1 / 1
   Qed:             1
-[wp] Report in:  'tests/wp_bts/oracle_qualif/issue_715_a.0.report.json'
-[wp] Report out: 'tests/wp_bts/result_qualif/issue_715_a.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-foo                  1     -                 1       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  foo                       1        -        1       100%
+------------------------------------------------------------

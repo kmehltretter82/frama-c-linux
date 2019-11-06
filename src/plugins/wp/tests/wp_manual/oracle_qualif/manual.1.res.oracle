@@ -17,9 +17,7 @@
 [wp] Proved goals:    8 / 8
   Qed:               5 
   Alt-Ergo 2.0.0:    3
-[wp] Report in:  'tests/wp_manual/oracle_qualif/manual.1.report.json'
-[wp] Report out: 'tests/wp_manual/result_qualif/manual.1.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-swap                 5      3 (16..28)       8       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  swap                      5        3        8       100%
+------------------------------------------------------------

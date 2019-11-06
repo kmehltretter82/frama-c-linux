@@ -18,10 +18,8 @@
 [wp] Proved goals:    9 / 10
   Qed:               8 
   Alt-Ergo 2.0.0:    1  (unsuccess: 1)
-[wp] Report in:  'tests/wp_bts/oracle_qualif/bts_1360.0.report.json'
-[wp] Report out: 'tests/wp_bts/result_qualif/bts_1360.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-foo_wrong            4     -                 5      80.0%
-foo_correct          4      1 (12..24)       5       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  foo_wrong                 4        -        5      80.0%
+  foo_correct               4        1        5       100%
+------------------------------------------------------------

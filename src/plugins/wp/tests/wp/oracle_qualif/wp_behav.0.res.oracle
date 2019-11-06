@@ -55,21 +55,19 @@
 [wp] Proved goals:   32 / 38
   Qed:              30 
   Alt-Ergo 2.0.0:    2  (unsuccess: 6)
-[wp] Report in:  'tests/wp/oracle_qualif/wp_behav.0.report.json'
-[wp] Report out: 'tests/wp/result_qualif/wp_behav.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-f                    5     -                 5       100%
-min                  4     -                 4       100%
-bhv                  2      1 (4..16)        3       100%
-stmt_contract        3     -                 3       100%
-stmt_contract_label   2    -                 2       100%
-stmt_contract_assigns   5   -                5       100%
-local_named_behavior   2   -                 2       100%
-assert_needed        1     -                 2      50.0%
-bts0513             -      -                 2       0.0%
-stmt_assigns         1     -                 2      50.0%
-razT                 1      1 (12..24)       3      66.7%
-more_stmt_assigns    3     -                 3       100%
-part_stmt_bhv        1     -                 2      50.0%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  f                         5        -        5       100%
+  min                       4        -        4       100%
+  bhv                       2        1        3       100%
+  stmt_contract             3        -        3       100%
+  stmt_contract_label       2        -        2       100%
+  stmt_contract_assigns     5        -        5       100%
+  local_named_behavior      2        -        2       100%
+  assert_needed             1        -        2      50.0%
+  bts0513                   -        -        2       0.0%
+  stmt_assigns              1        -        2      50.0%
+  razT                      1        1        3      66.7%
+  more_stmt_assigns         3        -        3       100%
+  part_stmt_bhv             1        -        2      50.0%
+------------------------------------------------------------

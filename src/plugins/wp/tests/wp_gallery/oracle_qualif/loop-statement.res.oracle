@@ -22,12 +22,10 @@
 [wp] Proved goals:   15 / 15
   Qed:              11 
   Alt-Ergo 2.0.0:    4
-[wp] Report in:  'tests/wp_gallery/oracle_qualif/loop-statement.0.report.json'
-[wp] Report out: 'tests/wp_gallery/result_qualif/loop-statement.0.report.json'
--------------------------------------------------------------
-Axiomatics          WP     Alt-Ergo        Total   Success
-Axiomatic Ploop     -       1 (512..608)     1       100%
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-loop_statement      11      3 (88..112)     14       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Axiomatics                WP     Alt-Ergo  Total   Success
+  Axiomatic Ploop           -        1        1       100%
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  loop_statement           11        3       14       100%
+------------------------------------------------------------

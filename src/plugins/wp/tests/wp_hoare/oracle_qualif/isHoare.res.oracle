@@ -7,9 +7,7 @@
 [wp] [Qed] Goal typed_ref_cmp_invalid_addr_as_int_ensures_ok : Valid
 [wp] Proved goals:    1 / 1
   Qed:             1
-[wp] Report in:  'tests/wp_hoare/oracle_qualif/isHoare.0.report.json'
-[wp] Report out: 'tests/wp_hoare/result_qualif/isHoare.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-cmp_invalid_addr_as_int   1   -              1       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  cmp_invalid_addr_as_int   1        -        1       100%
+------------------------------------------------------------

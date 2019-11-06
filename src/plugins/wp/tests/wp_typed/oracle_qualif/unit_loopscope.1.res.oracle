@@ -11,12 +11,10 @@
 [wp] Proved goals:    1 / 2
   Qed:               1 
   Alt-Ergo 2.0.0:    0  (unsuccess: 1)
-[wp] Report in:  'tests/wp_typed/oracle_qualif/unit_loopscope.1.report.json'
-[wp] Report out: 'tests/wp_typed/result_qualif/unit_loopscope.1.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-f                    1     -                 2      50.0%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  f                         1        -        2      50.0%
+------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'f':
   /*@ behavior typed_ref: requires \valid(written); */
   void f(unsigned int *written);

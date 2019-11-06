@@ -8,9 +8,7 @@
 [wp] Proved goals:    1 / 1
   Qed:               0 
   Alt-Ergo 2.0.0:    1
-[wp] Report in:  'tests/wp/oracle_qualif/wp_eqb.0.report.json'
-[wp] Report out: 'tests/wp/result_qualif/wp_eqb.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-f                   -       1 (8..20)        1       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  f                         -        1        1       100%
+------------------------------------------------------------

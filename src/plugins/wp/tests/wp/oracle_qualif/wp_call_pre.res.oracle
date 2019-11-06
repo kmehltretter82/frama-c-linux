@@ -21,13 +21,11 @@
 [wp] Proved goals:   10 / 10
   Qed:               9 
   Alt-Ergo 2.0.0:    1
-[wp] Report in:  'tests/wp/oracle_qualif/wp_call_pre.0.report.json'
-[wp] Report out: 'tests/wp/result_qualif/wp_call_pre.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-double_call          1      1 (4..16)        2       100%
-main                 3     -                 3       100%
-call_main            2     -                 2       100%
-stmt_pre             1     -                 1       100%
-call_g               2     -                 2       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  double_call               1        1        2       100%
+  main                      3        -        3       100%
+  call_main                 2        -        2       100%
+  stmt_pre                  1        -        1       100%
+  call_g                    2        -        2       100%
+------------------------------------------------------------

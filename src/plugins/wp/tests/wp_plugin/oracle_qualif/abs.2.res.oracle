@@ -9,9 +9,7 @@
 [wp] Proved goals:    1 / 1
   Qed:             0 
   Alt-Ergo:        1
-[wp] Report in:  'tests/wp_plugin/oracle_qualif/abs.2.report.json'
-[wp] Report out: 'tests/wp_plugin/result_qualif/abs.2.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-abs                 -      -  (4..16)        1       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  abs                       -        -        1       100%
+------------------------------------------------------------

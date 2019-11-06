@@ -59,17 +59,15 @@
 [wp] Proved goals:   50 / 51
   Qed:              47 
   Alt-Ergo 2.0.0:    3  (unsuccess: 1)
-[wp] Report in:  'tests/wp_plugin/oracle_qualif/dynamic.0.report.json'
-[wp] Report out: 'tests/wp_plugin/result_qualif/dynamic.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-call                 2      2 (40..52)       4       100%
-guarded_call         4      1 (4..16)        5       100%
-behavior             9     -                 9       100%
-some_behaviors      24     -                24       100%
-missing_context      4     -                 5      80.0%
-no_call              4     -                 4       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  call                      2        2        4       100%
+  guarded_call              4        1        5       100%
+  behavior                  9        -        9       100%
+  some_behaviors           24        -       24       100%
+  missing_context           4        -        5      80.0%
+  no_call                   4        -        4       100%
+------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'guarded_call':
   /*@ behavior typed: requires \separated(&X,p); */
   void guarded_call(struct S *p);
