@@ -367,7 +367,7 @@ val merge_behaviors :
 (** [merge_funspec ?oldloc oldspec newspec] merges [newspec] into [oldspec].
     If the funspec belongs to a kernel function, do not forget to call
     {!Kernel_function.set_spec} after merging.
-    @modify Frama-C+dev add optional parameter [oldloc].
+    @modify 20.0-Calcium add optional parameter [oldloc].
 *)
 val merge_funspec :
   ?oldloc:Cil_types.location -> ?silent_about_merging_behav:bool ->

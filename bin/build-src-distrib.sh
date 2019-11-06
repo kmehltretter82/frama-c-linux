@@ -225,6 +225,8 @@ case "${STEP}" in
     run "cd $BUILD_DIR; autoconf"
     run "cd $BUILD_DIR; ./configure"
     run "cd $BUILD_DIR; make -j OPEN_SOURCE=yes src-distrib"
+    # sanity check: markdown-report must be distributed
+    run "tar tf $BUILD_DIR/$TARGZ_FILENAME | grep -q src/plugins/markdown-report"
     # cleanup Frama-C-snapshot
     for file in $(git -C $GITHUB_DIR ls-files); do
         run "rm $GITHUB_DIR/$file";

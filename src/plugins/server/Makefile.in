@@ -61,6 +61,8 @@ PLUGIN_GENERATED:= $(PLUGIN_DIR)/Server.mli
 ifeq (@SERVER_ZMQ@,yes)
 PLUGIN_REQUIRES+= zmq
 PLUGIN_CMO+= server_zmq
+else
+PLUGIN_DISTRIB_EXTERNAL+= server_zmq.ml
 endif
 
 ################

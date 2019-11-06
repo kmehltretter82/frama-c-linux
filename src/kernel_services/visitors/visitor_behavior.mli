@@ -23,7 +23,7 @@
 (**************************************************************************)
 
 (** Operations on visitor behaviors.
-    @since Potassium-19.0+dev.
+    @since 20.0-Calcium.
 *)
 
 open Cil_types
@@ -73,7 +73,7 @@ val get_project: t -> Project.t option
     [Reset.ast_element vis] resets the tables associated to the considered type of
     AST elements in [vis]. For example for {!Cil_types.varinfo}: [Reset.varinfo vis].
 
-    @since Potassium-19.0+dev
+    @since 20.0-Calcium
     @plugin development guide
 *)
 module Reset: sig
@@ -115,7 +115,7 @@ end
     representative of [e] in [vis]. For example for {!Cil_types.varinfo}:
     [Get.varinfo vis vi].
 
-    @since Potassium-19.0+dev
+    @since 20.0-Calcium
     @plugin development guide
 *)
 module Get: Get
@@ -127,7 +127,7 @@ module Get: Get
     original representative of [new_e] in [vis]. For example for
     {!Cil_types.varinfo}: [Get_orig.varinfo vis new_vi].
 
-    @since Potassium-19.0+dev
+    @since 20.0-Calcium
     @plugin development guide
 *)
 module Get_orig: Get
@@ -140,7 +140,7 @@ module Get_orig: Get
     state, if it does not exist this binding is created. For example for
     {!Cil_types.varinfo}: [Memo.varinfo vis vi].
 
-    @since Potassium-19.0+dev
+    @since 20.0-Calcium
     @plugin development guide
 *)
 module Memo: Get
@@ -173,7 +173,7 @@ end
     the representative of [e] to [s] in [vis]. For example, for
     {!Cil_types.varinfo}: [Set.varinfo vis vi new_representative].
 
-    @since Potassium-19.0+dev
+    @since 20.0-Calcium
     @plugin development guide
 *)
 module Set: Set
@@ -186,7 +186,7 @@ module Set: Set
     the original representative of [e] to [s] in [vis]. For example, for
     {!Cil_types.varinfo}: [Set_orig.varinfo vis vi new_original_repr].
 
-    @since Potassium-19.0+dev
+    @since 20.0-Calcium
 *)
 module Set_orig: Set
 
@@ -216,7 +216,7 @@ end
     representative of [e] in the [ast_element] table of [vis]. For example,
     for {!Cil_types.varinfo}: [Unset.varinfo vis vi].
 
-    @since Potassium-19.0+dev
+    @since 20.0-Calcium
 *)
 module Unset: Unset
 
@@ -227,7 +227,7 @@ module Unset: Unset
     original representative of [e] in the [ast_element] table of [vis]. For
     example, for {!Cil_types.varinfo}: [Unset_orig.varinfo vis vi].
 
-    @since Potassium-19.0+dev
+    @since 20.0-Calcium
 *)
 module Unset_orig: Unset
 
@@ -238,7 +238,7 @@ module Unset_orig: Unset
     first (that is, [f] looks like: [let f old_e new_e = ...]. For example for
     {!Cil_types.varinfo}: [Iter.varinfo vis (fun old_vi new_vi -> ())].
 
-    @since Potassium-19.0+dev
+    @since 20.0-Calcium
 *)
 module Iter: sig
   val varinfo:
@@ -277,7 +277,7 @@ end
     for {!Cil_types.varinfo}:
     [Fold.varinfo vis (fun old_vi new_vi acc -> ... )].
 
-    @since Potassium-19.0+dev
+    @since 20.0-Calcium
 *)
 module Fold: sig
   val varinfo:

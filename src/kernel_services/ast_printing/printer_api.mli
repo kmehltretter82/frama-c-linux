@@ -92,7 +92,7 @@ class type extensible_printer_type = object
       parameter is the function to be applied in the ghost context (generally
       some AST element).
 
-      @since 19.0-Potassium+dev *)
+      @since 20.0-Calcium *)
 
   method private current_stmt: stmt option
   (** @return the [stmt] being printed *)

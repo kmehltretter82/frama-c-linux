@@ -264,7 +264,7 @@ module Logic_info: S_with_collections_pretty with type t = logic_info
     the same name and profile except for the name of their type variables
     will compare unequal.
 
-    @since Frama-C+dev
+    @since 20.0-Calcium
 *)
 module Logic_info_structural: S_with_collections_pretty with type t = logic_info
 module Logic_constant: S_with_collections_pretty with type t = logic_constant

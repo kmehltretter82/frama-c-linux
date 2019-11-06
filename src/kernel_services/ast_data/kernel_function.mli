@@ -139,7 +139,7 @@ val local_definition: t -> varinfo -> stmt
 (** [local_definition f v] returns the statement initializing the (defined)
     local variable [v] of [f].
     @raise AbortFatal if [v] is not defined or is not a local of [f]
-    @since Frama-C+dev
+    @since 20.0-Calcium
 *)
 
 val var_is_in_scope: stmt -> varinfo -> bool

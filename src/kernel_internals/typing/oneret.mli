@@ -96,7 +96,7 @@ type callback = returns_clause -> goto_annot list -> unit
     This function assumes that {!Oneret.oneret} has already been run on [f],
     i.e. that there is exactly one return statement in there.
 
-    @since Frama-C+dev
+    @since 20.0-Calcium
 
     @raise Abort.fatal if the function is not defined.
 *)
