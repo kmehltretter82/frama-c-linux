@@ -17,6 +17,10 @@
 Open Source Release <next-release>
 ##################################
 
+####################################
+Open Source Release 20.0 (Calcium)
+####################################
+
 -!  Kernel    [2019/10/31] More stringent verifications on the use of ghost
               variable in non ghost-code. Fixes #2421
 -   MdR       [2019/10/31] New plug-in Markdown-Report (MdR) for markdown and

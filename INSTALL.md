@@ -90,7 +90,7 @@ Why3 must be configured to make them available for Frama-C/WP:
 ### Known working configuration
 
 The following set of packages is known to be a working configuration for
-Frama-C 19 (Potassium):
+Frama-C 20 (Calcium):
 
 - OCaml 4.05.0
 - ocamlfind.1.8.0
