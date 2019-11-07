@@ -214,10 +214,23 @@ module Location = struct
     else
       Format.fprintf fmt "generated"
 
+  let pretty_debug fmt loc =
+    Format.fprintf fmt "(%a:%d:%d,%a:%d:%d)"
+      Datatype.Filepath.pretty (fst loc).Filepath.pos_path
+      (fst loc).Filepath.pos_lnum (fst loc).Filepath.pos_cnum
+      Datatype.Filepath.pretty (snd loc).Filepath.pos_path
+      (snd loc).Filepath.pos_lnum (snd loc).Filepath.pos_cnum
+
   let of_lexing_loc (pos1, pos2) =
     Position.of_lexing_pos pos1, Position.of_lexing_pos pos2
   let to_lexing_loc (pos1, pos2) =
     Position.to_lexing_pos pos1, Position.to_lexing_pos pos2
+
+  let equal_start_semantic (pos1, _) (pos2, _) =
+    Filepath.(Datatype.Filepath.equal pos1.pos_path pos2.pos_path
+              && pos1.pos_lnum = pos2.pos_lnum
+              && pos1.pos_cnum - pos1.pos_bol = pos2.pos_cnum - pos2.pos_bol)
+
 end
 
 module Instr = struct

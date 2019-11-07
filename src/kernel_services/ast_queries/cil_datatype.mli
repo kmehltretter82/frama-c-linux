@@ -69,9 +69,26 @@ module Location: sig
         the full-path to the file. The default pretty-printer [pretty] echoes
         [<dir/f>:<l>] *)
   val pretty_line: t Pretty_utils.formatter
+
+  (** Pretty-print both location start and end, including file, line and
+      character offset.
+
+      @since Frama-C+dev
+   *)
+  val pretty_debug: t Pretty_utils.formatter
+
   (** Prints only the line of the location *)
   val of_lexing_loc : Lexing.position * Lexing.position -> t
   val to_lexing_loc : t -> Lexing.position * Lexing.position
+
+  (** Compares two locations semantically, only taking into account their
+      starting position. Compares normalized filenames, lines and columns,
+      but no absolute character offsets.
+
+      @since Frama-C+dev
+   *)
+  val equal_start_semantic : location -> location -> bool
+
 end
 
 module Localisation: Datatype.S with type t = localisation
