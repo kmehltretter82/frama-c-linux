@@ -3,9 +3,7 @@ open Cil_types
 
 let load_theory = function
   | { pred_content = Papp (_, [], [ { term_node = TConst(LStr _name) } ] ) } ->
-    let open Why3 in ignore (
-      Theory.import_namespace Theory.empty_ns [_name]
-    )
+    raise Not_found
   | _ -> assert false
 
 let typing ~typing_context ~loc lexprs =
@@ -20,3 +18,14 @@ let typing ~typing_context ~loc lexprs =
 
 let () =
   Logic_typing.register_global_extension "why3" false typing
+
+let main () =
+  try
+    Kernel.feedback
+      "Checking handler of exception occurring in extension typing";
+    Ast.compute (); Kernel.fatal "Extension typing should have failed"
+  with Not_found -> Kernel.feedback "Extension typing failed as expected"
+
+let () = Kernel.TypeCheck.set false
+
+let () = Db.Main.extend main

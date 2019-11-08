@@ -1,0 +1,3 @@
+[kernel] Checking handler of exception occurring in extension typing
+[kernel] Parsing tests/spec/extend_extern.i (no preprocessing)
+[kernel] Extension typing failed as expected
