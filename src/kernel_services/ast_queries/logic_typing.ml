@@ -539,11 +539,12 @@ module Extensions = struct
     end
 
   let typer name ~typing_context:typing_context ~loc p =
-    try
-      let status,typer = find_typer name in
-      status, typer ~typing_context ~loc p
-    with Not_found ->
-      Kernel.fatal ~source:(fst loc) "unsupported clause of name '%s'" name
+    let status,typer =
+      try find_typer name
+      with Not_found ->
+        Kernel.fatal ~source:(fst loc) "unsupported clause of name '%s'" name
+    in
+    status, typer ~typing_context ~loc p
 end
 
 let register_behavior_extension name f =
