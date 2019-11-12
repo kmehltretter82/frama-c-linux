@@ -132,24 +132,37 @@ by Frama-C, they must of course be installed as well.
 Frama-C is developed on Linux, but it can be installed on Windows using the
 following tools:
 
-- Windows Subsystem for Linux (Ubuntu 18.04)
+- Windows Subsystem for Linux
 - VcXsrv (X server for Windows)
 
-For enabling WSL on Windows, you may follow these instructions:
+#### Prerequisites: WSL + a Linux distribution
+
+For enabling WSL on Windows, you may follow these instructions
+(we tested with Ubuntu 18.04 LTS; other distributions/versions should also
+work, but the instructions below may require some modifications).
 
 https://docs.microsoft.com/en-us/windows/wsl/install-win10
 
-As a quick guide, the following instructions should work. First, start
-PowerShell with administrator rights and run the following command to activate
-Windows Subsystem for Linux:
+Note: older builds of Windows 10 and systems without access to the
+      Microsoft Store may have no compatible Linux packages.
+
+##### PowerShell-based quick guide
+
+This is a quick guide based on running a PowerShell with administrator rights.
+Note that, depending on your build version of Windows 10, the Ubuntu package
+selected below may not work. If you are unsure, follow the above instructions
+from the Microsoft website.
+
+Inside PowerShell, run the following command to activate Windows Subsystem for Linux:
 
 ```
 Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
 ```
 
-Then, reboot the operating system. After rebooting, run again the PowerShell
-terminal with administrator rights. Move to your user directory, download the
-distribution and install it:
+Then, reboot the operating system.
+
+After rebooting, run again the PowerShell terminal with administrator rights.
+Move to your user directory, download the distribution and install it:
 
 ```
 cd C:\Users\<Your User Directory>
@@ -159,6 +172,8 @@ Add-AppxPackage .\Ubuntu.appx
 
 Ubuntu should now be available in the Windows menu. Run it and follow the
 instructions to create a user.
+
+#### Installing opam and Frama-C on WSL
 
 For installing opam, some packages are required. The following commands can be
 run to update the system and install those packages:
@@ -185,6 +200,8 @@ install the dependencies of the opam packages and then install them:
 opam depext --install -y lablgtk3 lablgtk3-sourceview3
 opam depext --install -y frama-c
 ```
+
+#### Running the Frama-C GUI on WSL
 
 Microsoft WSL does not support graphical user interfaces directly. If you want
 to run Frama-C's GUI, you need to install an X server, such as VcXsrv or
