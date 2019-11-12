@@ -1,4 +1,5 @@
 /* run.config
-   EXECNOW: make -s @PTEST_DIR@/filepath_test.cmxs
-   OPT: -no-autoload-plugins -load-module @PTEST_DIR@/filepath_test
+   MODULE: tests/misc/filepath_test.cmxs
+   COMMENT: the '-load' option below intentionally contains an error
+   OPT: -no-autoload-plugins -load nonexistent_file.sav
  */

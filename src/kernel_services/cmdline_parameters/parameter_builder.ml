@@ -483,7 +483,12 @@ struct
       let newfp = Filepath.Normalized.to_pretty_string newstr in
       f oldfp newfp
 
-    let set fp = check_existence existence fp ; set fp
+    let set fp =
+      try
+        check_existence existence fp ; set fp
+      with
+      | No_file -> P.L.abort "file not found: '%a'" Filepath.Normalized.pretty fp
+      | File_exists -> P.L.abort "file already exists: '%a'" Filepath.Normalized.pretty fp
 
     let set_str s = set (Filepath.Normalized.of_string s)
 

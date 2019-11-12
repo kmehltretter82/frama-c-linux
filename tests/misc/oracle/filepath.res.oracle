@@ -9,4 +9,5 @@
 [kernel] relativize(.): .
 [kernel] relativize(./tests/..): .
 [kernel] relativize(/a/bc/d,base_name:/a/b/): /a/bc/d
-[kernel] Parsing tests/misc/filepath.i (no preprocessing)
+[kernel] User Error: file not found: 'nonexistent_file.sav'
+[kernel] Frama-C aborted: invalid user input.
