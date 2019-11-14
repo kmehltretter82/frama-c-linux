@@ -387,18 +387,21 @@ class pane (gprovers : GuiConfig.provers) =
           strategies#connect None ;
           List.iter (fun tactic -> tactic#clear) tactics
       | Some(tree,sequent,sel) ->
-          strategies#connect (Some (self#strategies sequent)) ;
-          let select (tactic : GuiTactic.tactic) =
-            let process = self#apply in
-            let composer = self#compose in
-            let browser = self#browse in
-            tactic#select ~process ~composer ~browser ~tree sel
-          in
-          on_proof_context tree (List.iter select) tactics ;
-          let tgt =
-            if List.exists (fun tactics -> tactics#targeted) tactics
-            then sel else Tactical.Empty in
-          printer#set_target tgt
+          on_proof_context tree
+            begin fun () ->
+              strategies#connect (Some (self#strategies sequent)) ;
+              let select (tactic : GuiTactic.tactic) =
+                let process = self#apply in
+                let composer = self#compose in
+                let browser = self#browse in
+                tactic#select ~process ~composer ~browser ~tree sel
+              in
+              List.iter select tactics ;
+              let tgt =
+                if List.exists (fun tactics -> tactics#targeted) tactics
+                then sel else Tactical.Empty in
+              printer#set_target tgt
+            end ()
 
     method private update_scriptbar =
       match state with
