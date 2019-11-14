@@ -178,6 +178,7 @@ with open(sharedir / "analysis-scripts" / "template.mk") as f:
         check_path_exists("fc_stubs.c")
         from shutil import copyfile
         copyfile(sharedir / "analysis-scripts" / "fc_stubs.c", "fc_stubs.c")
+        lines = insert_line_after(lines, "^FCFLAGS", "  -main eva_main \\\n")
         print("Created stub for main function: fc_stubs.c")
 
 gnumakefile.write_text("".join(lines))
