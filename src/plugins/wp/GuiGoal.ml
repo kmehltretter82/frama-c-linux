@@ -557,7 +557,7 @@ class pane (gprovers : GuiConfig.provers) =
               text#printf "%t@." (browser#print cc ~quit) ;
               text#hrule ;
               text#printf "%t@." (printer#goal (ProofEngine.head proof)) ;
-          end ()
+            end ()
       | Forking _ -> ()
 
     method update =
