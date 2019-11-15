@@ -437,14 +437,14 @@ let rec expr_to_term ~cast e =
     | Lval lv -> TLval (lval_to_term_lval ~cast lv)
     | Info (e,_) -> (expr_to_term ~cast e).term_node
   in
-  if cast then Logic_const.term ~loc result (Ctype e_typ)
+  let tres = Logic_const.term ~loc result (Ctype e_typ) in
+  if cast then tres
   else
     match e.enode with
-    | Const _ | Lval _ | CastE _ ->
-      (* all immediate values keep their C type by default, and are only lifted
-         to integer/real if needed. *)
-      Logic_const.term ~loc result (Ctype e_typ)
-    | _ -> Logic_const.term ~loc result (typ_to_logic_type e_typ)
+    (* all immediate values keep their C type by default, and are only lifted
+       to integer/real if needed. *)
+    | Const _ | Lval _ | CastE _ -> tres
+    | _ -> numeric_coerce (typ_to_logic_type e_typ) tres
 
 and expr_to_term_coerce ~cast e =
   let t = expr_to_term ~cast e in
