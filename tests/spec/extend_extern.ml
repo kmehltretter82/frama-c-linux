@@ -23,9 +23,14 @@ let main () =
   try
     Kernel.feedback
       "Checking handler of exception occurring in extension typing";
-    Ast.compute (); Kernel.fatal "Extension typing should have failed"
-  with Not_found -> Kernel.feedback "Extension typing failed as expected"
+    Ast.compute (); assert false
+  with
+    | Log.AbortFatal _ -> Kernel.feedback "Extension typing failed as expected"
+    | Not_found -> Kernel.fatal "kernel did not capture our exception"
+    | Assert_failure _ -> Kernel.fatal "kernel silently captured our exception"
 
 let () = Kernel.TypeCheck.set false
+
+let () = Kernel.Debug.set 1
 
 let () = Db.Main.extend main

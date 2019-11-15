@@ -544,7 +544,13 @@ module Extensions = struct
       with Not_found ->
         Kernel.fatal ~source:(fst loc) "unsupported clause of name '%s'" name
     in
-    status, typer ~typing_context ~loc p
+    try
+      status, typer ~typing_context ~loc p
+    with
+    | (Log.AbortError _ | Log.AbortFatal _) as exn -> raise exn
+    | exn ->
+      Kernel.fatal "Typechecking ACSL extension %s raised exception %s"
+        name (Printexc.to_string exn)
 end
 
 let register_behavior_extension name f =
