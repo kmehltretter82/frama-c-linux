@@ -15,10 +15,11 @@ let check_expr_term check fct s e =
       | _ -> Kernel.fatal "Unexpected ensures %a" Printer.pp_post_cond e
   in
   let term' = Logic_utils.expr_to_term ~cast:false exp in
+  let term' = Logic_utils.mk_cast Cil.intType term' in
   if check && not (Cil_datatype.Term.equal term term') then
     Kernel.fatal
-      "translation of C expression %a inconsistent with logic term %a"
-      Printer.pp_exp exp Printer.pp_term term;
+      "translation of C expression %a is %a, inconsistent with logic term %a"
+      Printer.pp_exp exp Printer.pp_term term' Printer.pp_term term;
   let p = List.hd (Logic_env.find_all_logic_functions "int_eq") in
   let app = Logic_const.papp (p,[],[term;term']) in
   let post = Logic_const.new_predicate app in

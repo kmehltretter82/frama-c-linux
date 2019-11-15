@@ -40,4 +40,21 @@ int main(void)
   return __retres;
 }
 
+/*@ ensures int_eq((int)(!(t ≢ 0)), (int)(!(t ≢ 0)));
+    ensures int_eq((int)(!(t ≢ 0)), (int)5);
+ */
+int g(void)
+{
+  int __retres;
+  if (! t) {
+    __retres = 2;
+    goto return_label;
+  }
+  else {
+    __retres = 3;
+    goto return_label;
+  }
+  return_label: return __retres;
+}
+
 

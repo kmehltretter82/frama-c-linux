@@ -230,7 +230,8 @@ let mk_cast ?(loc=Cil_datatype.Location.unknown) ?(force=false) newt t =
     let typ = Cil.type_remove_attributes_for_logic_type newt
     in term ~loc (TCastE (typ, t)) (Ctype typ)
   in
-  let rec aux1 = function
+  let rec aux1 typ t =
+    match typ with
     | Ctype oldt ->
       if not (need_logic_cast oldt newt) && not force then t
       else begin
@@ -246,15 +247,21 @@ let mk_cast ?(loc=Cil_datatype.Location.unknown) ?(force=false) newt t =
                | _, TConst (Integer (i,_)) when Integer.is_zero i -> mk_cast t'
                | _ -> mk_cast t
               )
-            | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef -> aux2 (unroll_ltdef ty)
+            | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
+              aux2 (unroll_ltdef ty)
             | _ -> mk_cast t
           in aux2 t'.term_type
         | _ -> (* Do not remove old cast because they are conversions !!! *)
           mk_cast t
       end
-    | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef -> aux1 (unroll_ltdef ty)
+    | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
+      aux1 (unroll_ltdef ty) t
+    | Linteger | Lreal ->
+      (match t.term_node with
+       | TLogic_coerce (_,t') -> aux1 t'.term_type t'
+       | _ -> mk_cast t)
     | _ -> mk_cast t
-  in aux1 t.term_type
+  in aux1 t.term_type t
 
 let real_of_float s f =
   { r_literal = s ; r_nearest = f ; r_upper = f ; r_lower = f }
