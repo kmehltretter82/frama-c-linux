@@ -343,24 +343,24 @@ let is_zero_comparable t =
 
 let scalar_term_conversion conversion t =
   let loc = t.term_loc in
-  let arith_conversion () = conversion ~loc (Cil.lzero ~loc ()) t in
+  let arith_conversion () = conversion ~loc false t (Cil.lzero ~loc ()) in
   let ptr_conversion () =
-    conversion ~loc (Logic_const.term ~loc Tnull t.term_type) t
+    conversion ~loc false t (Logic_const.term ~loc Tnull t.term_type)
   in
   match unroll_type t.term_type with
   | Ctype (TInt _) -> arith_conversion ()
   | Ctype (TFloat _) ->
-    conversion ~loc (Logic_const.treal_zero ~loc ~ltyp:t.term_type ()) t
+    conversion ~loc false t (Logic_const.treal_zero ~loc ~ltyp:t.term_type ())
   | Ctype (TPtr _) -> ptr_conversion ()
   | Ctype (TArray _) -> ptr_conversion ()
   (* Could be transformed to \true: an array is never \null *)
   | Ctype (TFun _) -> ptr_conversion ()
   (* decay as pointer *)
   | Linteger -> arith_conversion ()
-  | Lreal -> conversion ~loc (Logic_const.treal_zero ~loc ()) t
+  | Lreal -> conversion ~loc false t (Logic_const.treal_zero ~loc ())
   | Ltype ({lt_name = name},[]) when name = Utf8_logic.boolean ->
-    let ctrue = Logic_env.Logic_ctor_info.find "\\false" in
-    conversion ~loc (term ~loc (TDataCons(ctrue,[])) boolean_type) t
+    let ctrue = Logic_env.Logic_ctor_info.find "\\true" in
+    conversion ~loc true t (term ~loc (TDataCons(ctrue,[])) boolean_type)
   | Ltype _ | Lvar _ | Larrow _
   | Ctype (TVoid _ | TNamed _ | TComp _ | TEnum _ | TBuiltin_va_list _)
     -> Kernel.fatal
@@ -368,12 +368,14 @@ let scalar_term_conversion conversion t =
          Cil_printer.pp_logic_type t.term_type
 
 let scalar_term_to_predicate =
-  let conversion ~loc zero t = prel ~loc (Cil_types.Rneq, t, zero) in
+  let conversion ~loc is_eq t1 t2 =
+    let op = if is_eq then Req else Rneq in prel ~loc (op, t1, t2) in
   scalar_term_conversion conversion
 
 let scalar_term_to_boolean =
-  let conversion ~loc zero t =
-    term ~loc (TBinOp(Ne,t,zero)) Logic_const.boolean_type
+  let conversion ~loc is_eq t1 t2 =
+    let op = if is_eq then Eq else Ne in
+    term ~loc (TBinOp(op,t1,t2)) Logic_const.boolean_type
   in
   scalar_term_conversion conversion
 
