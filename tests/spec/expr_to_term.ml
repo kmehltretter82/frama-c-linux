@@ -6,6 +6,7 @@ let check_expr_term check fct s e =
   let exp =
     match s.skind with
       | Instr (Set (lv,_,loc)) -> Cil.new_exp ~loc (Lval lv)
+      | If (c,_,_,_) -> c
       | _ -> Kernel.fatal "Unexpected statement %a" Printer.pp_stmt s
   in
   let term =
@@ -23,7 +24,6 @@ let check_expr_term check fct s e =
   let post = Logic_const.new_predicate app in
   Annotations.add_ensures emitter fct [Normal,post]
 
-
 let treat_fct check fct =
   let stmts = (Kernel_function.get_definition fct).sbody.bstmts in
   let stmts =
@@ -31,6 +31,7 @@ let treat_fct check fct =
       (function 
         { skind = Instr (Set (lv,_,_)) } ->
           (match lv with (Var v,_) -> v.vglob | _ -> true)
+        | { skind = If _ } -> true
         | _ -> false)
       stmts
   in
@@ -49,8 +50,10 @@ let treat_fct check fct =
 let compute () =
   let main = Globals.Functions.find_by_name "main" in
   let f = Globals.Functions.find_by_name "f" in
+  let g = Globals.Functions.find_by_name "g" in
   treat_fct true main;
-  treat_fct false f
+  treat_fct false f;
+  treat_fct true g
 
 
 let () = Db.Main.extend compute

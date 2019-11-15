@@ -1,6 +1,6 @@
 /* run.config
-EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
-OPT: -no-autoload-plugins -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs -print
+MODULE: @PTEST_DIR@/@PTEST_NAME@.cmxs
+OPT: -print
 */
 int x[10];
 
@@ -27,4 +27,9 @@ int main() {
   s.y = 2;
   s.z = 3;
   t = 4;
+}
+
+/*@ ensures int_eq((int)!t,(int)5); */
+int g() {
+  if (!t) return 2; else return 3;
 }
