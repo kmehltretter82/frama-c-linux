@@ -6,6 +6,7 @@ let check_expr_term check fct s e =
   let exp =
     match s.skind with
       | Instr (Set (lv,_,loc)) -> Cil.new_exp ~loc (Lval lv)
+      | If (c,_,_,_) -> c
       | _ -> Kernel.fatal "Unexpected statement %a" Printer.pp_stmt s
   in
   let term =
@@ -14,15 +15,15 @@ let check_expr_term check fct s e =
       | _ -> Kernel.fatal "Unexpected ensures %a" Printer.pp_post_cond e
   in
   let term' = Logic_utils.expr_to_term ~cast:false exp in
+  let term' = Logic_utils.mk_cast Cil.intType term' in
   if check && not (Cil_datatype.Term.equal term term') then
     Kernel.fatal
-      "translation of C expression %a inconsistent with logic term %a"
-      Printer.pp_exp exp Printer.pp_term term;
+      "translation of C expression %a is %a, inconsistent with logic term %a"
+      Printer.pp_exp exp Printer.pp_term term' Printer.pp_term term;
   let p = List.hd (Logic_env.find_all_logic_functions "int_eq") in
   let app = Logic_const.papp (p,[],[term;term']) in
   let post = Logic_const.new_predicate app in
   Annotations.add_ensures emitter fct [Normal,post]
-
 
 let treat_fct check fct =
   let stmts = (Kernel_function.get_definition fct).sbody.bstmts in
@@ -31,6 +32,7 @@ let treat_fct check fct =
       (function 
         { skind = Instr (Set (lv,_,_)) } ->
           (match lv with (Var v,_) -> v.vglob | _ -> true)
+        | { skind = If _ } -> true
         | _ -> false)
       stmts
   in
@@ -49,8 +51,10 @@ let treat_fct check fct =
 let compute () =
   let main = Globals.Functions.find_by_name "main" in
   let f = Globals.Functions.find_by_name "f" in
+  let g = Globals.Functions.find_by_name "g" in
   treat_fct true main;
-  treat_fct false f
+  treat_fct false f;
+  treat_fct true g
 
 
 let () = Db.Main.extend compute

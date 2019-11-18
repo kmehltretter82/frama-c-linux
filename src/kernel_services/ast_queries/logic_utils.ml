@@ -230,7 +230,8 @@ let mk_cast ?(loc=Cil_datatype.Location.unknown) ?(force=false) newt t =
     let typ = Cil.type_remove_attributes_for_logic_type newt
     in term ~loc (TCastE (typ, t)) (Ctype typ)
   in
-  let rec aux1 = function
+  let rec aux1 typ t =
+    match typ with
     | Ctype oldt ->
       if not (need_logic_cast oldt newt) && not force then t
       else begin
@@ -246,15 +247,21 @@ let mk_cast ?(loc=Cil_datatype.Location.unknown) ?(force=false) newt t =
                | _, TConst (Integer (i,_)) when Integer.is_zero i -> mk_cast t'
                | _ -> mk_cast t
               )
-            | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef -> aux2 (unroll_ltdef ty)
+            | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
+              aux2 (unroll_ltdef ty)
             | _ -> mk_cast t
           in aux2 t'.term_type
         | _ -> (* Do not remove old cast because they are conversions !!! *)
           mk_cast t
       end
-    | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef -> aux1 (unroll_ltdef ty)
+    | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
+      aux1 (unroll_ltdef ty) t
+    | Linteger | Lreal ->
+      (match t.term_node with
+       | TLogic_coerce (_,t') -> aux1 t'.term_type t'
+       | _ -> mk_cast t)
     | _ -> mk_cast t
-  in aux1 t.term_type
+  in aux1 t.term_type t
 
 let real_of_float s f =
   { r_literal = s ; r_nearest = f ; r_upper = f ; r_lower = f }
@@ -334,38 +341,43 @@ let is_zero_comparable t =
   | Ltype _ -> false
   | Lvar _ | Larrow _ -> false
 
-let scalar_term_to_predicate t =
+let scalar_term_conversion conversion t =
   let loc = t.term_loc in
-  let conversion zero = prel ~loc (Cil_types.Rneq, t, zero) in
-  let arith_conversion () = conversion (Cil.lzero ~loc ()) in
-  let ptr_conversion () = conversion (Logic_const.term ~loc Tnull t.term_type)
+  let arith_conversion () = conversion ~loc false t (Cil.lzero ~loc ()) in
+  let ptr_conversion () =
+    conversion ~loc false t (Logic_const.term ~loc Tnull t.term_type)
   in
   match unroll_type t.term_type with
   | Ctype (TInt _) -> arith_conversion ()
   | Ctype (TFloat _) ->
-    conversion
-      (Logic_const.treal_zero ~loc ~ltyp:t.term_type ())
+    conversion ~loc false t (Logic_const.treal_zero ~loc ~ltyp:t.term_type ())
   | Ctype (TPtr _) -> ptr_conversion ()
   | Ctype (TArray _) -> ptr_conversion ()
   (* Could be transformed to \true: an array is never \null *)
   | Ctype (TFun _) -> ptr_conversion ()
   (* decay as pointer *)
   | Linteger -> arith_conversion ()
-  | Lreal -> conversion (Logic_const.treal_zero ~loc ())
+  | Lreal -> conversion ~loc false t (Logic_const.treal_zero ~loc ())
   | Ltype ({lt_name = name},[]) when name = Utf8_logic.boolean ->
     let ctrue = Logic_env.Logic_ctor_info.find "\\true" in
-    prel ~loc
-      (Cil_types.Req,t,
-       { term_node = TDataCons(ctrue,[]);
-         term_loc = loc;
-         term_type = Ltype(ctrue.ctor_type,[]);
-         term_name = [];
-       })
+    conversion ~loc true t (term ~loc (TDataCons(ctrue,[])) boolean_type)
   | Ltype _ | Lvar _ | Larrow _
   | Ctype (TVoid _ | TNamed _ | TComp _ | TEnum _ | TBuiltin_va_list _)
     -> Kernel.fatal
-         "Cannot convert to predicate a term of type %a"
+         "Cannot convert a term of type %a"
          Cil_printer.pp_logic_type t.term_type
+
+let scalar_term_to_predicate =
+  let conversion ~loc is_eq t1 t2 =
+    let op = if is_eq then Req else Rneq in prel ~loc (op, t1, t2) in
+  scalar_term_conversion conversion
+
+let scalar_term_to_boolean =
+  let conversion ~loc is_eq t1 t2 =
+    let op = if is_eq then Eq else Ne in
+    term ~loc (TBinOp(op,t1,t2)) Logic_const.boolean_type
+  in
+  scalar_term_conversion conversion
 
 let rec expr_to_term ~cast e =
   let e_typ = unrollType (Cil.typeOf e) in
@@ -403,6 +415,21 @@ let rec expr_to_term ~cast e =
       end
     | UnOp (op, u, _) ->
       let u' = expr_to_term_coerce ~cast u in
+      let u' =
+        match op with
+        | Cil_types.LNot ->
+          (match u'.term_node with
+           | TCastE(_, t) when is_boolean_type t.term_type -> t
+           | _ when is_boolean_type u'.term_type -> u'
+           | _ when is_zero_comparable u' ->
+             scalar_term_to_boolean u'
+           | _ ->
+             Kernel.fatal
+               "expr_to_term: unexpected argument of ! operator %a, \
+                converted to %a"
+               Cil_printer.pp_exp u Cil_printer.pp_term u')
+        | _ -> u'
+      in
       (* See comments for binop case above. *)
       let tcast = match op, cast with
         | Cil_types.LNot, _ -> Some Logic_const.boolean_type
@@ -419,14 +446,14 @@ let rec expr_to_term ~cast e =
     | Lval lv -> TLval (lval_to_term_lval ~cast lv)
     | Info (e,_) -> (expr_to_term ~cast e).term_node
   in
-  if cast then Logic_const.term ~loc result (Ctype e_typ)
+  let tres = Logic_const.term ~loc result (Ctype e_typ) in
+  if cast then tres
   else
     match e.enode with
-    | Const _ | Lval _ | CastE _ ->
-      (* all immediate values keep their C type by default, and are only lifted
-         to integer/real if needed. *)
-      Logic_const.term ~loc result (Ctype e_typ)
-    | _ -> Logic_const.term ~loc result (typ_to_logic_type e_typ)
+    (* all immediate values keep their C type by default, and are only lifted
+       to integer/real if needed. *)
+    | Const _ | Lval _ | CastE _ -> tres
+    | _ -> numeric_coerce (typ_to_logic_type e_typ) tres
 
 and expr_to_term_coerce ~cast e =
   let t = expr_to_term ~cast e in
