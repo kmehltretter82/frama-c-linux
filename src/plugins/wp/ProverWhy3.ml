@@ -934,8 +934,16 @@ class visitor (ctx:context) c =
                 let decl = Why3.Decl.create_logic_decl [decl] in
                 ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl
           end
-        | Inductive _dl ->
-            why3_failure "inductive definitions not yet implemented"
+        | Inductive dl ->
+            (* create predicate symbol *)
+            let id = Why3.Ident.id_fresh (Qed.Export.link_name (lfun_name d.d_lfun)) in
+            let map e = Why3.Opt.get (of_tau ~cnv (Lang.F.tau_of_var e)) in
+            let ty_args = List.map map d.d_params in
+            let id = Why3.Term.create_lsymbol id ty_args None in
+            let decl = Why3.Decl.create_param_decl id in
+            ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl ;
+            (* register axioms *)
+            List.iter (self#on_dlemma) dl
       end
 
   end
