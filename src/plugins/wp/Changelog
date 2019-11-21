@@ -35,6 +35,11 @@ Plugin WP 20.0 (Calcium)
 - WP          [2019/09/11] -wp-extensional now defaults to true
 - WP          [2019/09/11] -wp-init-const now defaults to true
 - WP          [2019/09/11] -wp-init-alias renamed -wp-alias-init
+- WP          [2019/09/11] -wp-script renamed -wp-coq-script
+- WP          [2019/09/11] -wp-update-script renamed -wp-update-coq-script
+- WP          [2019/09/11] -wp-tactic renamed -wp-coq-tactic
+- WP          [2019/09/11] -wp-tryhints renamed -wp-coq-tryhints
+- WP          [2019/09/11] -wp-hints renamed -wp-coq-hints
 -! WP         [2019/09/17] Deprecated native alt-ergo & coq output, see -wp-prover option
 -! WP         [2019/07/05] -wp-prover <p> now defaults to <why3:p> (including default alt-ergo)
 -! WP         [2019/07/05] Use native Why3 API (now requires why3 at compile time)
