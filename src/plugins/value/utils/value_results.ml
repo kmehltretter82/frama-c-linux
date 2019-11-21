@@ -506,7 +506,9 @@ let make_report ()  =
         | Some alarm ->
           let acc_status, acc_alarms = report.alarms in
           report_status acc_status status;
-          report_alarm acc_alarms alarm
+          match status with
+          | None | Some Property_status.True -> ()
+          | _ -> report_alarm acc_alarms alarm
       end
     | Property.IPPropertyInstance _ ->
       let status = get_status ip in
