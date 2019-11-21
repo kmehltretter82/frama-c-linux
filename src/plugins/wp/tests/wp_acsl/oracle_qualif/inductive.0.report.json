@@ -1,9 +1,0 @@
-{ "wp:global": { "wp:main": { "total": 3, "unknown": 3 } },
-  "wp:axiomatics": { "": { "lemma_test_one_label": { "wp:main": { "total": 1,
-                                                                  "unknown": 1 } },
-                           "lemma_test_no_label": { "wp:main": { "total": 1,
-                                                                 "unknown": 1 } },
-                           "lemma_test_multilabel": { "wp:main": { "total": 1,
-                                                                   "unknown": 1 } },
-                           "wp:section": { "wp:main": { "total": 3,
-                                                        "unknown": 3 } } } } }

@@ -2,7 +2,7 @@
    OPT:-wp-prover=why3 -wp-gen -wp-msg-key print-generated
 */
 /* run.config_qualif
-   OPT:-wp-prover=why3 -wp-gen -wp-msg-key print-generated
+   DONTRUN:
 */
 
 /*@ inductive is_gcd(integer a, integer b, integer d) {
