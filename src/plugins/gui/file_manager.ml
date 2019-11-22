@@ -171,6 +171,30 @@ let preferences (host_window: Design.main_window_extension_points) =
   (* Save and cancel buttons. *)
   let hbox_buttons = dialog#action_area in
   let packing = hbox_buttons#pack ~expand:true ~padding:3 in
+
+  let reset_box = GPack.vbox ~spacing:5 ~border_width:10 () in
+  main_box#pack reset_box#coerce;
+  let reset_packing = reset_box#pack in
+  let reset_button = GButton.button
+      ~label:"Reset GUI to factory defaults" ~packing:reset_packing ()
+  in
+  ignore (reset_button#event#connect#button_release
+            ~callback:(fun _ ->
+                let answer =
+                  GToolbox.question_box
+                    ~title:"Reset GUI to factory defaults?"
+                    ~buttons:["Reset GUI" ; "Cancel"] ~default:2
+                    "This will restore all GUI-related settings \
+                     to factory defaults,\n\
+                     including panel sizes and preferences."
+                in
+                if answer = 1 then begin
+                  Gtk_helper.Configuration.reset ();
+                  GToolbox.message_box
+                    ~title:"GUI reset"
+                    "GUI reset will take place after restarting Frama-C.";
+                end; false));
+
   let wb_ok = GButton.button ~label:"Save" ~packing () in
   let wb_cancel = GButton.button ~label:"Cancel" ~packing () in
   wb_ok#grab_default ();

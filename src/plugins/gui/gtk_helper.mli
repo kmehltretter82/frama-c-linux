@@ -74,6 +74,7 @@ module Configuration: sig
 
   val load : unit -> unit
   val save : unit -> unit
+  val reset: unit -> unit
 
   val set : string -> configData -> unit
   (** Set a configuration element, with a key. Overwrites the previous values *)

@@ -51,6 +51,8 @@ module Configuration = struct
     with Gui_parameters.Config.No_dir -> ""
   let load () = loadConfiguration (configuration_file ())
   let save () = saveConfiguration (configuration_file ())
+  let reset () = Extlib.safe_remove (configuration_file ());
+    loadConfiguration (configuration_file ())
   let () = Cmdline.at_normal_exit save
 
   let set = setConfiguration
