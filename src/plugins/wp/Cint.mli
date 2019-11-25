@@ -73,6 +73,9 @@ val f_lsl  : lfun
 val f_lsr  : lfun
 
 val f_bitwised : lfun list (** All except f_bit_positive *)
+val f_bits : lfun list (** All bit-test functions *)
+
+val bit_test : term -> int -> term
 
 (** Simplifiers *)
 
