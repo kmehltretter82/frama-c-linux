@@ -48,9 +48,25 @@ void alarms () {
 void f(void);
 void g(void);
 
+/* 1 valid assertion, 1 unknown assertion, 1 invalid assertion. */
+void logic () {
+  /*@ assert \true; */
+  /*@ assert undet == 0; */
+  if (undet)
+    /*@ assert \false; */
+    ;
+}
+
 // 2 kernel warnings, 1 eva warning, no error.
 void main () {
   alarms ();
+  logic ();
   f(); // kernel warning: no specification for function f
   g(); // kernel warning: no specification for function g
+}
+
+/* Assertions in this function should not appear in the summary. */
+void dead () {
+  /*@ assert \true; */
+  /*@ assert \false; */
 }
