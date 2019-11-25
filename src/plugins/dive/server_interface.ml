@@ -53,25 +53,24 @@ struct
 end
 
 module Variable = Data.Collection (struct
-    module Info = struct
-      let page = page
-      let name = "dive-variable-name"
-      let descr = Markdown.rm "The name of variable of the program"
-    end
+    let name = "dive-variable-name"
+    let descr = Markdown.plain "The name of variable of the program"
 
-    module R = Data.Record (Info)
+    let signature = Data.Record.signature ~page ~name ~descr ()
+
+    let _fun_field = Data.Record.option signature
+        ~descr:(Markdown.plain "owner function for a local variable")
+        (module Data.Jstring)
+
+    let _var_field = Data.Record.field signature
+        ~descr:(Markdown.plain "variable name")
+        (module Data.Jstring)
 
     type t = Cil_types.varinfo
+    module R =
+      (val (Data.Record.publish signature): Data.Record.S with type r = t)
 
     let syntax = R.syntax
-
-    let _fun_field = R.option "fun"
-        ~descr:(Markdown.rm "owner function for a local variable")
-        (module Data.Jstring)
-
-    let _var_field = R.field "var"
-        ~descr:(Markdown.rm "variable name")
-        (module Data.Jstring)
 
     let to_json v =
       let varname = v.Cil_types.vname in
@@ -119,7 +118,7 @@ module Function = Data.Collection (struct
 
     let syntax = Syntax.publish ~page ~name:"dive-function-name"
         ~synopsis:Syntax.string
-        ~descr:(Markdown.rm "The name of a function of the program") ()
+        ~descr:(Markdown.plain "The name of a function of the program") ()
 
     let to_json kf =
       `String (Kernel_function.get_name kf)
@@ -138,7 +137,7 @@ module Node = Data.Collection (struct
 
     let syntax = Syntax.publish ~page ~name:"dive-node"
         ~synopsis:Syntax.int
-        ~descr:(Markdown.rm "A node identifier in the graph") ()
+        ~descr:(Markdown.plain "A node identifier in the graph") ()
 
     let to_json node =
       `Int node.Graph_types.node_key
@@ -155,19 +154,19 @@ module Node = Data.Collection (struct
 
 let () = Request.register ~page
     ~kind:`GET ~name:"dive.graph"
-    ~descr:(Markdown.rm "Retrieve the whole graph")
+    ~descr:(Markdown.plain "Retrieve the whole graph")
     ~input:(module Data.Junit) ~output:(module Graph)
     (fun () -> Build.get_graph (get_graph ()))
 
 let () = Request.register ~page
     ~kind:`EXEC ~name:"dive.clear"
-    ~descr:(Markdown.rm "Erase the graph and start over with an empty one")
+    ~descr:(Markdown.plain "Erase the graph and start over with an empty one")
     ~input:(module Data.Junit) ~output:(module Data.Junit)
     (fun () -> Build.clear (get_graph ()))
 
 let () = Request.register ~page
     ~kind:`EXEC ~name:"dive.add_var"
-    ~descr:(Markdown.rm "Add a variable to the graph")
+    ~descr:(Markdown.plain "Add a variable to the graph")
     ~input:(module Variable) ~output:(module GraphDiff)
     begin fun var ->
       let depth = Self.DepthLimit.get () in
@@ -178,7 +177,7 @@ let () = Request.register ~page
 
 let () = Request.register ~page
     ~kind:`EXEC ~name:"dive.add_function_alarms"
-    ~descr:(Markdown.rm "Add all alarms of the given function")
+    ~descr:(Markdown.plain "Add all alarms of the given function")
     ~input:(module Function) ~output:(module GraphDiff)
     begin fun kf ->
       let depth = Self.DepthLimit.get () in
@@ -189,7 +188,7 @@ let () = Request.register ~page
 
 let () = Request.register ~page
     ~kind:`EXEC ~name:"dive.explore"
-    ~descr:(Markdown.rm "Explore the graph starting from an existing vertex")
+    ~descr:(Markdown.plain "Explore the graph starting from an existing vertex")
     ~input:(module Node) ~output:(module GraphDiff)
     begin fun node ->
       let depth = Self.DepthLimit.get () in
@@ -200,7 +199,7 @@ let () = Request.register ~page
 
 let () = Request.register ~page
     ~kind:`EXEC ~name:"dive.show"
-    ~descr:(Markdown.rm "Show the dependencies of an existing vertex")
+    ~descr:(Markdown.plain "Show the dependencies of an existing vertex")
     ~input:(module Node) ~output:(module GraphDiff)
     begin fun node ->
       let depth = Self.DepthLimit.get () in
@@ -211,7 +210,7 @@ let () = Request.register ~page
 
 let () = Request.register ~page
     ~kind:`EXEC ~name:"dive.hide"
-    ~descr:(Markdown.rm "Hide the dependencies of an existing vertex")
+    ~descr:(Markdown.plain "Hide the dependencies of an existing vertex")
     ~input:(module Node) ~output:(module GraphDiff)
     begin fun node ->
       let g = get_graph () in
