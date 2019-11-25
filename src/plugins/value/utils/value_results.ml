@@ -498,7 +498,8 @@ let make_report ()  =
   let report = empty_report () in
   let report_property ip =
     match ip with
-    | Property.IPCodeAnnot {Property.ica_ca} ->
+    | Property.IPCodeAnnot Property.{ ica_ca; ica_stmt; }
+      when Db.Value.is_reachable_stmt ica_stmt ->
       begin
         let status = get_status ip in
         match Alarms.find ica_ca with
@@ -510,9 +511,9 @@ let make_report ()  =
           | None | Some Property_status.True -> ()
           | _ -> report_alarm acc_alarms alarm
       end
-    | Property.IPPropertyInstance _ ->
-      let status = get_status ip in
-      report_status report.preconds status
+    | Property.IPPropertyInstance {Property.ii_stmt}
+      when Db.Value.is_reachable_stmt ii_stmt ->
+      report_status report.preconds (get_status ip)
     | _ -> ()
   in
   Property_status.iter report_property;
