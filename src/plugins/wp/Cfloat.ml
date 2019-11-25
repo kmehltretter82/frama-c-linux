@@ -196,12 +196,14 @@ let printers = [
   Printf.sprintf "%.64g" ;
 ]
 
-let re_int = Str.regexp "[0-9]+"
+let re_int_float = Str.regexp "\\(-?[0-9]+\\)\\(e[+-]?[0-9]+\\)?$"
 
 let force_float r =
-  if Str.string_match re_int r 0 &&
-     Str.match_end () = String.length r
-  then (r ^ ".0") else r
+  if Str.string_match re_int_float r 0
+  then
+    let group n r = try Str.matched_group n r with Not_found -> ""
+    in group 1 r ^ ".0" ^ group 2 r
+  else r
 
 let float_lit ulp (q : Q.t) =
   let v = match ulp with
