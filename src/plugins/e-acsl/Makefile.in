@@ -292,8 +292,8 @@ EACSL_DISTRIB_TESTS = \
   $(foreach dir, $(addprefix tests/,$(PLUGIN_TESTS_DIRS)), \
       $(dir)/*.[ich] \
       $(dir)/test_config \
-      $(dir)/oracle/*.c \
-      $(dir)/oracle/*.oracle \
+      $(dir)/oracle_ci/*.c \
+      $(dir)/oracle_ci/*.oracle \
   )
 
 EACSL_RTL_FILES = $(EACSL_RTL_SRC)
