@@ -31,7 +31,7 @@ import re
 from subprocess import Popen, PIPE
 from pathlib import Path
 
-MIN_PYTHON = (3, 5) # for glob(recursive)
+MIN_PYTHON = (3, 6) # for glob(recursive) and automatic Path conversions
 if sys.version_info < MIN_PYTHON:
     sys.exit("Python %s.%s or later is required.\n" % MIN_PYTHON)
 
