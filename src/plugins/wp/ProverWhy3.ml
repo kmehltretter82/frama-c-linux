@@ -914,7 +914,7 @@ class visitor (ctx:context) c =
                 let t = share cnv Prop (Lang.F.e_prop p) in
                 let t =
                   Why3.Term.t_forall_close vars []
-                    (Why3.Term.t_implies t
+                    (Why3.Term.t_iff t
                        (Why3.Term.t_app id (List.map Why3.Term.t_var vars) result))
                 in
                 let decl =

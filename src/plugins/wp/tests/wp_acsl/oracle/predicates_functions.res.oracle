@@ -24,7 +24,7 @@
     predicate P_RP int
     
     axiom P_RP_def :
-      forall i:int. i <= 0 \/ P_P i /\ P_RP ((- 1) + i) -> P_RP i
+      forall i:int. i <= 0 \/ P_P i /\ P_RP ((- 1) + i) <-> P_RP i
     
     function L_F (i:int) : int = 2 * i
     
