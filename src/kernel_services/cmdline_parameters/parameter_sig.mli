@@ -327,13 +327,16 @@ type existence = Must_exist | Must_not_exist | Indifferent
 module type Filepath = sig
 
   exception No_file
-  (** raised by {!set} if no file exists and [existence] is [Must_exist]. *)
+  (** raised by {!check_existence} if no file exists and [existence] is [Must_exist]. *)
 
   exception File_exists
-  (** raised by {!set} if some file exists and [existence] is
+  (** raised by {!check_existence} if some file exists and [existence] is
       [Must_nos_exist]. *)
 
   val existence: existence
+
+  val check_existence: existence -> Filepath.Normalized.t -> unit
+  (** Checks the existence/absence of a file. May raise [No_file] or [File_exists]. *)
 
   include S with type t = Filepath.Normalized.t
 
