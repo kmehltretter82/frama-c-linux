@@ -10,53 +10,47 @@ There are several ways to participate in the Frama-C project:
   the
   [Frama-C-discuss mailing list](https://lists.gforge.inria.fr/mailman/listinfo/frama-c-discuss);
 
-- Reporting bugs, via
-  [Github issues](https://github.com/Frama-C/Frama-C-snapshot/issues)
-  (preferred) or the
-  [Mantis BTS](https://bts.frama-c.com) (older BTS);
+- Reporting bugs via
+  [Gitlab issues](https://git.frama-c.com/pub/frama-c/issues);
 
-- [Submitting bug fixes, improvements, and features](#submitting-bug-fixes-improvements-and-features)
-  via Github pull requests;
+- [Submitting bug fixes, improvements and features](#submitting-bug-fixes-improvements-and-features)
+  via Gitlab merge requests;
 
 - [Developing external plug-ins](#developing-external-plug-ins)
-  and sharing it with us through a Github pull request;
+  and sharing it with us through a Gitlab merge request;
 
 - Joining the [Frama-C team](http://frama-c.com/about.html) (as an intern, a PhD
   student, a postdoctoral researcher, or a research engineer).
 
-We give below some guidelines in order to ease the submission of a pull request
+We give below some guidelines in order to ease the submission of a merge request
 and optimize its integration with the Frama-C existing codebase.
 
 
 Submitting bug fixes, improvements, and features
 ================================================
 
-Main Frama-C development happens outside Github. By default, patches and
-improvements are applied upstream and only release candidates and stable
-releases are pushed to Github.
+External contributions can be proposed via the
+public Frama-C gitlab [repository](https://git.frama-c.com/pub/frama-c),
+by following the recommended workflow in git development:
+fork the frama-c repository, develop in a dedicated branch
+and submit a merge request.
 
-Therefore, your pull requests will not be directly merged in the `master` branch
-on Github. Instead, we will port them in our internal development platform and
-they will be available on Github after the next Frama-C release incorporates
-them.
+The detailled steps to submit a contribution to Frama-C are:
 
-To fit this workflow, we recommend to:
+1. If you plan to make a significant contribution to Frama-C, please
+  [open an issue](https://git.frama-c.com/pub/frama-c/issues/new)
+  describing your ideas, to discuss it with the Frama-C development team.
 
-1. [Open an issue](https://github.com/Frama-C/Frama-C-snapshot/issues/new)
-  describing your contribution.
-
-2. [Fork the Frama-C snapshot repository](https://github.com/Frama-C/Frama-C-snapshot/fork)
-  (choosing your Github account as a destination);
+2. [Fork the public Frama-C repository](https://git.frama-c.com/pub/frama-c/-/forks/new)
+  (choosing your Gitlab account as a destination);
 
 3. Clone the forked Frama-C snapshot repository on your computer;
 
 4. Create and switch to a dedicated branch. We suggest the following
    naming convention:
-  - `bugfix/username/short-description` for bug fixes (correcting an incorrect
-  behaviour);
-  - `improv/username/short-description` for improvements (making even better a
-  functionnally correct behaviour);
-  - `feature/username/short-description` for features (adding a new behaviour).
+   - `fix/short-description` for bug fixes (correcting an incorrect
+     behaviourbehaviour);
+   - `feature/short-description` for features (adding a new behaviour).
 
 5. Locally make your contribution by adding/editing/deleting files and following
   the [coding conventions](#coding-conventions);
@@ -67,28 +61,26 @@ To fit this workflow, we recommend to:
   provides an example of the use of the dedicated `ptests`
   tool used by Frama-C developers. The full documentation for `ptests` is also
   present later in the same manual.
-  You can also provide the non-regression test case in the Github issue
+  You can also provide the non-regression test case in the Gitlab issue
   discussion and we will integrate it.
 
-7. Check for unexpected changes (in particular spaces and tabulations);
+7. Check for unexpected changes.
+  Use the command `make lint`
+  in your terminal from the Frama-C root directory to detect trailing spaces,
+  tabulations or incorrect indentation (ocp-ident >= 1.7.0 is needed).
 
 8. Locally run the test framework of Frama-C by typing
-  ```shell
-  make tests
-  ```
+  `make tests`
   in your terminal (you should be in the Frama-C root directory);
 
-9. Locally add (if needed) and commit your contribution. The end of the
-  commit message should refer to the Github issue to which this commit is
-  linked by mentioning its issue identifier preceded by `GH #` (we use the
-  `GH` part to track the provenance as we use several issue trackers);
+9. Locally add (if needed) and commit your contribution;
 
-10. Push your contribution to Github;
+10. Push your contribution to Gitlab;
 
-11. [Make a Github pull request](https://github.com/Frama-C/Frama-C-snapshot/compare)
-  (toggling the `compare across forks` view). The base fork should remain as
-  `Frama-C/Frama-C-snapshot` and the base as `master` while the head fork
-  should be yours and the compare should be your chosen branch name.
+11. [Make a Gitlab merge request](https://git.frama-c.com/pub/frama-c/merge_requests).
+  The target should remain as repository `pub/frama-c` and branch `master`
+  while the source should be your personal project and your chosen branch
+  name.
 
 12. If needed (i.e. you didn't already do that and your contribution is
     not trivial in the sense of [this document](TCA.md), please don't forget
@@ -96,20 +88,19 @@ To fit this workflow, we recommend to:
 
 For convenience, we recall the typical `git` commands to be used through these steps:
 ```shell
-git clone https://github.com/<username>/Frama-C-snapshot.git
+git clone https://git.frama-c.com/<username>/frama-c.git
 git checkout -b <branch-name>
 git diff --check
 git add <file1 file 2>
-git commit -m "<Commit message> (GH #<XXX>)"
+git commit -m "<Commit message>"
 git push origin <branch-name>
 ```
 where:
 
-- `<username>` is your Github username;
+- `<username>` is your Gitlab username;
 - `<branch-name>` is your chosen branch name;
 - `<file1 file2>` are the files to add to the commit;
-- `<Commit message>` is your commit message;
-- `<XXX>` is the Github issue identifier.
+- `<Commit message>` is your commit message.
 
 
 Developing external plug-ins
@@ -151,7 +142,7 @@ Coding conventions
 ==================
 
 - Use [ocp-indent](https://github.com/OCamlPro/ocp-indent), v1.7.0
-to indent OCaml source files;
+  to indent OCaml source files;
 
 - Avoid trailing whitespaces;
 
