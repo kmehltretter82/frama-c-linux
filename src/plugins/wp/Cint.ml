@@ -107,6 +107,11 @@ let f_bit_export   = Lang.extern_p ~library ~bool:"bit_testb" ~prop:"bit_test" (
 let () = let open LogicBuiltins in add_builtin "\\bit_test_stdlib" [Z;Z] f_bit_stdlib
 let () = let open LogicBuiltins in add_builtin "\\bit_test" [Z;Z] f_bit_positive
 
+let f_bits = [ f_bit_stdlib ; f_bit_positive ; f_bit_export ]
+
+let bit_test e k =
+  F.e_fun (if k <= 0 then f_bit_positive else f_bit_stdlib) [e ; e_int k]
+
 (* -------------------------------------------------------------------------- *)
 (* --- Matching utilities for simplifications                             --- *)
 (* -------------------------------------------------------------------------- *)
