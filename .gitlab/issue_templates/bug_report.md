@@ -4,9 +4,9 @@ Please directly edit it inline to provide the required information.
 
 Before submitting the issue, please confirm (by adding a X in the [ ]):
 
-- [ ] the issue has not yet been reported on [Github](https://github.com/Frama-C/Frama-C-snapshot/issues);
+- [ ] the issue has not yet been reported on [Gitlab](https://git.frama-c.com/pub/frama-c/issues);
 - [ ] the issue has not yet been reported on our [BTS](https://bts.frama-c.com);
-- [ ] you installed Frama-C as prescribed in the [instructions](https://github.com/Frama-C/Frama-C-snapshot/blob/master/INSTALL.md).
+- [ ] you installed Frama-C as prescribed in the [instructions](INSTALL.md).
 
 # Contextual information
 
