@@ -224,10 +224,11 @@ become aware that would make this Agreement inaccurate in any respect.
 
 **Signature**
 
-- Name:
+- Full Name:
 - Entity (if applicable):
-- Town:
+- Country/Town:
+- (optional) Full address:
 - Email:
 - Gitlab login:
 - Date:
-- Signature
+- Signature:
