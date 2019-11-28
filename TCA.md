@@ -73,6 +73,6 @@ following Contributions are deemed to be Trivial:
 -   Breaking a source file into multiple source files, or consolidating
     multiple source files into one source file, with no code changes.
 
-However, there are many gray areas. Please reach us at cla@frama-c.com
+However, there are many gray areas. Please reach us at `cla AT frama-c DOT com`
 should you have any questions on the nature of your
 intended Contribution.
