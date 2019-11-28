@@ -35,7 +35,7 @@ by following the recommended workflow in git development:
 fork the frama-c repository, develop in a dedicated branch
 and submit a merge request.
 
-The detailled steps to submit a contribution to Frama-C are:
+The detailed steps to submit a contribution to Frama-C are:
 
 1. If you plan to make a significant contribution to Frama-C, please
   [open an issue](https://git.frama-c.com/pub/frama-c/issues/new)
@@ -49,13 +49,13 @@ The detailled steps to submit a contribution to Frama-C are:
 4. Create and switch to a dedicated branch. We suggest the following
    naming convention:
    - `fix/short-description` for bug fixes (correcting an incorrect
-     behaviourbehaviour);
-   - `feature/short-description` for features (adding a new behaviour).
+     behavior);
+   - `feature/short-description` for features (adding a new behavior).
 
 5. Locally make your contribution by adding/editing/deleting files and following
   the [coding conventions](#coding-conventions);
 
-6. Optionally locally add non-regression test cases to the appropriate
+6. (Optional) Locally add non-regression test cases to the appropriate
   subdirectory in `./tests/`. The `hello` tutorial in the
   [plug-in developer manual](http://frama-c.com/download/frama-c-plugin-development-guide.pdf)
   provides an example of the use of the dedicated `ptests`
@@ -84,7 +84,8 @@ The detailled steps to submit a contribution to Frama-C are:
 
 12. If needed (i.e. you didn't already do that and your contribution is
     not trivial in the sense of [this document](TCA.md), please don't forget
-    to sign the [Contributor's Licence Agreement](CLA.md)
+    to sign the [Contributor Licence Agreement](CLA.md) and us the signed
+    version).
 
 For convenience, we recall the typical `git` commands to be used through these steps:
 ```shell
@@ -126,17 +127,17 @@ as newer releases are made available, we recommend the following workflow:
   [`opam` file of the Hello plug-in](https://github.com/Frama-C/frama-c-hello/blob/master/opam)
   if necessary.
 
-3. Optionnally
+3. Optionally
   [publish your plug-in](http://opam.ocaml.org/doc/Packaging.html#Publishing)
   in the official OPAM packages repository.
 
-4. Let know the
-  [Frama-C-discuss mailing list](https://lists.gforge.inria.fr/mailman/listinfo/frama-c-discuss)
-  about your contribution to the Frama-C ecosystem. Well done!
+4. Announce your contribution to the Frama-C ecosystem on the
+  [Frama-C-discuss mailing list](https://lists.gforge.inria.fr/mailman/listinfo/frama-c-discuss).
+  Well done!
 
-The main advantage of this way to proceed is the delegation to OPAM of the task
-of checking the consistency of your plug-in against
-Frama-C versions (and other OCaml dependencies if any).
+The main advantage of this procedure is that opam will perform several
+consistency checks of your plug-in,
+with respect to several Frama-C versions and OCaml dependencies.
 
 Coding conventions
 ==================
