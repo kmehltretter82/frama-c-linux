@@ -196,9 +196,24 @@ let rec varpoly k x = function
   | [] -> Warning.error "Unbound type parameter <%s>" x
   | y::ys -> if x = y then k else varpoly (succ k) x ys
 
+type t_builtin = E_mdt of mdt | E_poly of (tau list -> tau)
+
 let builtins = Hashtbl.create 131
 
-let rec tau_of_ltype t = match Logic_utils.unroll_type ~unroll_typedef:false t with
+let adt lt =
+  try match Hashtbl.find builtins lt.lt_name with
+    | E_mdt m -> Mtype m
+    | E_poly _ -> assert false
+  with Not_found -> Atype lt
+
+let atype lt ts =
+  try match Hashtbl.find builtins lt.lt_name with
+    | E_mdt m -> Logic.Data(Mtype m,ts)
+    | E_poly ftau -> ftau ts
+  with Not_found -> Logic.Data(Atype lt,ts)
+
+let rec tau_of_ltype t =
+  match Logic_utils.unroll_type ~unroll_typedef:false t with
   | Linteger -> Logic.Int
   | Lreal -> Logic.Real
   | Ctype typ -> tau_of_ctype typ
@@ -207,14 +222,10 @@ let rec tau_of_ltype t = match Logic_utils.unroll_type ~unroll_typedef:false t w
       Warning.error "array type non-supported(%a)"
         Printer.pp_logic_type t
   | Ltype _ as b when Logic_const.is_boolean_type b -> Logic.Bool
-  | Ltype(lt,ps) ->
-      let tau =
-        (*TODO: check arity *)
-        try Mtype(Hashtbl.find builtins lt.lt_name)
-        with Not_found -> Atype lt
-      in Logic.Data(tau,List.map tau_of_ltype ps)
+  | Ltype(lt,lts) -> atype lt (List.map tau_of_ltype lts)
 
-let tau_of_return l = match l.l_type with
+let tau_of_return l =
+  match l.l_type with
   | None -> Logic.Prop
   | Some t -> tau_of_ltype t
 
@@ -268,19 +279,20 @@ end
 (* --- Datatypes                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-let atype lt =
-  try Mtype(Hashtbl.find builtins lt.lt_name)
-  with Not_found -> Atype lt
-
 let get_builtin_type ~name ~link ~library =
-  try Mtype (Hashtbl.find builtins name)
+  try match Hashtbl.find builtins name with
+    | E_mdt m -> Mtype m
+    | E_poly _ -> assert false
   with Not_found ->
     let m = new_extern ~link ~library ~debug:name in
-    Hashtbl.add builtins name m ; Mtype m
+    Hashtbl.add builtins name (E_mdt m) ; Mtype m
 
 let set_builtin_type ~name ~link ~library =
   let m = new_extern ~link ~library ~debug:name in
-  Hashtbl.add builtins name m
+  Hashtbl.add builtins name (E_mdt m)
+
+let set_builtin_poly ~name f =
+  Hashtbl.add builtins name (E_poly f)
 
 let mem_builtin_type ~name =
   Hashtbl.mem builtins name
@@ -290,7 +302,9 @@ let is_builtin lt = Hashtbl.mem builtins lt.lt_name
 let is_builtin_type ~name = function
   | Data(Mtype m,_) ->
       begin
-        try m == Hashtbl.find builtins name
+        try match Hashtbl.find builtins name with
+          | E_mdt m0 -> m == m0
+          | _ -> false
         with Not_found -> false
       end
   | _ -> false

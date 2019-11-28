@@ -353,14 +353,18 @@ class virtual visitor main =
 
     method vparam x = self#vtau (tau_of_var x)
 
-    method private repr ~bool x =
-      self#vtau (Lang.F.typeof x);
-      match F.repr x with
+    method private repr ~bool t =
+      begin
+        try self#vtau (Lang.F.typeof t);
+        with Not_found ->
+          Wp_parameters.debug ~level:2 "@[<hov 2>Untyped term: %a@]" F.pp_term t ;
+      end ;
+      match F.repr t with
       | Fun(f,_) -> self#vsymbol f
       | Rget(_,f) -> self#vfield f
       | Rdef fts -> List.iter (fun (f,_) -> self#vfield f) fts
       | Fvar x -> self#vparam x
-      | Bind(_,t,_) -> self#vtau t
+      | Bind(_,qt,_) -> self#vtau qt
       | True | False | Kint _ | Kreal _ | Bvar _
       | Times _ | Add _ | Mul _ | Div _ | Mod _
       | Aget _ | Aset _ | Apply _ -> ()
@@ -422,7 +426,7 @@ class virtual visitor main =
           match f with
           | Model { m_source = Extern e  } -> self#vlibrary e.ext_library
           | Model { m_source = Generated _ } | ACSL _ -> self#vlfun f
-          | CTOR c -> self#vadt (Lang.atype c.ctor_type)
+          | CTOR c -> self#vadt (Lang.adt c.ctor_type)
         end
 
     method private vtrigger = function

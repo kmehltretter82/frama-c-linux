@@ -94,6 +94,7 @@ and source =
   | Extern of Engine.link extern
 
 val mem_builtin_type : name:string -> bool
+val set_builtin_poly : name:string -> (tau list -> tau) -> unit
 val set_builtin_type : name:string -> link:string infoprover -> library:string -> unit
 val get_builtin_type : name:string -> link:string infoprover -> library:string -> adt
 val is_builtin : logic_type_info -> bool
@@ -101,12 +102,13 @@ val is_builtin_type : name:string -> tau -> bool
 val datatype : library:string -> string -> adt
 val record :
   link:string infoprover -> library:string -> (string * tau) list -> adt
-val atype : logic_type_info -> adt
 val comp : compinfo -> adt
 val field : adt -> string -> field
 val fields_of_adt : adt -> field list
 val fields_of_tau : tau -> field list
 val fields_of_field : field -> field list
+val atype : logic_type_info -> tau list -> tau
+val adt : logic_type_info -> adt (** Must not be a builtin *)
 
 type balance = Nary | Left | Right
 

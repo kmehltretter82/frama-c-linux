@@ -178,7 +178,7 @@ class visitor fmt c =
     method on_type lt def =
       begin
         self#lines ;
-        engine#declare_type fmt (Lang.atype lt) (List.length lt.lt_params) def ;
+        engine#declare_type fmt (Lang.adt lt) (List.length lt.lt_params) def ;
       end
 
     method on_comp c fts =

@@ -294,7 +294,11 @@ let rec of_term ~cnv expected t : Why3.Term.term =
   Wp_parameters.debug ~dkey:dkey_api
     "of_term %a %a@."
     Lang.F.Tau.pretty expected Lang.F.pp_term t;
-  let sort = Lang.F.typeof t in
+  let sort =
+    try Lang.F.typeof t
+    with Not_found ->
+      why3_failure "@[<hov 2>Untyped term: %a@]" Lang.F.pp_term t
+  in
   let ($) f x = f x in
   let r =
     try coerce ~cnv sort expected $ Lang.F.Tmap.find t cnv.subst

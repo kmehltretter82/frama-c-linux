@@ -115,4 +115,7 @@ val lookup : string -> kind list -> builtin
     of this symbol with the provided Qed function on terms. *)
 val hack : string -> (F.term list -> F.term) -> unit
 
+(** Replace a logic type definition or predicate by a built-in type. *)
+val hack_type : string -> (F.tau list -> F.tau) -> unit
+
 val dump : unit -> unit

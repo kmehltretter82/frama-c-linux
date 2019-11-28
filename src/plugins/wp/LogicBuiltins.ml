@@ -235,6 +235,8 @@ let add_type ~source name ~library ?(link=Lang.infoprover name) () =
     Wp_parameters.warning ~source "Redefinition of type '%s'" name ;
   Lang.set_builtin_type ~name ~library ~link
 
+let hack_type name poly = Lang.set_builtin_poly ~name poly
+
 type sanitizer = driver_dir:string -> string -> string
 let sanitizers : ( string * string , sanitizer ) Hashtbl.t = Hashtbl.create 10
 
