@@ -1,5 +1,11 @@
+---
+geometry:
+- top=15mm
+- bottom=15mm
+- margin=10mm
+---
 Contributor Agreement
----------------------
+=====================
 
 Thank you for your interest in contributing to Frama-C, distributed by
 the Commissariat à l'Energie Atomique et aux Energies Alternatives
@@ -215,3 +221,13 @@ or any limited remedy to the maximum extent possible under law.
 
 8.5 You agree to notify Us of any facts or circumstances of which you
 become aware that would make this Agreement inaccurate in any respect.
+
+**Signature**
+
+- Name:
+- Entity (if applicable):
+- Town:
+- Email:
+- Gitlab login:
+- Date:
+- Signature
