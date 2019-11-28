@@ -176,8 +176,8 @@ Trigger failure if a NULL-pointer is used as an input to free function
 On assertion failure exit with the given integer code intead of raising an abort
 signal
 .TP
-.B --external-assert
-Set it if you provide your own implementation of e_acsl_assert
+.B --external-assert=\fI<FILE>
+the filename that contains your own implementation of __e_acsl_assert
 .TP
 .B -m, --memory-model=\fI<model>
 memory model (i.e., a runtime library for checking memory related annotations)
