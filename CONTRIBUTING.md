@@ -83,9 +83,9 @@ The detailed steps to submit a contribution to Frama-C are:
   name.
 
 12. If needed (i.e. you didn't already do that and your contribution is
-    not trivial in the sense of [this document](TCA.md), please don't forget
-    to sign the [Contributor Licence Agreement](CLA.md) and us the signed
-    version).
+    not trivial in the sense of [this document](TCA.md)), please don't forget
+    to fill and sign the [Contributor Licence Agreement](CLA.pdf) and send us
+    the signed version at [cla@frama-c.com](mailto:cla@frama-c.com).
 
 For convenience, we recall the typical `git` commands to be used through these steps:
 ```shell
