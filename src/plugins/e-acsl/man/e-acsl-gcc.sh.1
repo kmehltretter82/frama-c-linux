@@ -70,7 +70,7 @@ By default the -\fIdebug\fP flag is unused.
 pass a value to the \fBFrama-C\fP -\fIverbose\fP option.
 By default the -\fIverbose\fP flag is unused.
 .TP
-.B -V, --check
+.B --check
 check integrity of the generated AST (mostly useful for developers).
 .TP
 .B -o, --ocode=\fI<FILE>
@@ -176,6 +176,9 @@ Trigger failure if a NULL-pointer is used as an input to free function
 On assertion failure exit with the given integer code intead of raising an abort
 signal
 .TP
+.B --external-assert
+Set it if you provide your own implementation of e_acsl_assert
+.TP
 .B -m, --memory-model=\fI<model>
 memory model (i.e., a runtime library for checking memory related annotations)
 to be linked against the instrumented file.
@@ -186,12 +189,16 @@ Valid arguments are:
 
 By default the Patricia trie  memory model is used.
 .TP
-.B --print-models
+.B --print-mmodels
 Print the names of the supported memory models
 .TP
 .B -I, --frama-c=\fI<FILE>
 the name of the \fBFrama-C\fP executable. By default the
 first \fIframa-c\fP executable found in the system path is used.
+.TP
+.B --e-acsl-share=\fI<DIR>
+the name of the \fBE-ACSL\fP share directory. If not provided, it is computed
+from your setting.
 .TP
 .B -G, --gcc=\fI<FILE>
 the name of the \fBGCC\fP executable. By default the first \fIgcc\fP
