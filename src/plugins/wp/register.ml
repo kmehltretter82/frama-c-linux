@@ -304,7 +304,8 @@ let do_progress goal msg =
 (* ------------------------------------------------------------------------ *)
 
 let do_report_cache_usage mode =
-  if not (Wp_parameters.has_dkey dkey_shell) &&
+  if !exercised > 0 &&
+     not (Wp_parameters.has_dkey dkey_shell) &&
      not (Wp_parameters.has_dkey VCS.dkey_no_cache_info)
   then
     let hits = ProverWhy3.get_hits () in

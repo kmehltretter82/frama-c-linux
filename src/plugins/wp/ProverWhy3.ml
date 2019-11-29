@@ -1149,9 +1149,9 @@ let mark_cache ~mode hash =
 
 let cleanup_cache ~mode =
   if mode = Cleanup && (!hits > 0 || !miss > 0) then
-    let dir = Wp_parameters.get_session_dir "cache" in
+    let dir = Wp_parameters.get_session_dir ~force:false "cache" in
     try
-      if Sys.is_directory dir then
+      if Sys.file_exists dir && Sys.is_directory dir then
         Array.iter
           (fun f ->
              if Filename.check_suffix f ".json" then
@@ -1270,24 +1270,27 @@ let get_cache_result ~mode hash =
   match mode with
   | NoCache | Rebuild -> VCS.no_result
   | Update | Cleanup | Replay | Offline ->
-      let dir = Wp_parameters.get_session_dir "cache" in
-      let hash = Lazy.force hash in
-      let file = Printf.sprintf "%s/%s.json" dir hash in
-      if not (Sys.file_exists file) then VCS.no_result
+      let dir = Wp_parameters.get_session_dir ~force:false "cache" in
+      if not (Sys.file_exists dir && Sys.is_directory dir) then
+        VCS.no_result
       else
-        try
-          mark_cache ~mode hash ;
-          Json.load_file file |> ProofScript.result_of_json
-        with err ->
-          Wp_parameters.warning ~current:false ~once:true
-            "invalid cache entry (%s)" (Printexc.to_string err) ;
-          VCS.no_result
+        let hash = Lazy.force hash in
+        let file = Printf.sprintf "%s/%s.json" dir hash in
+        if not (Sys.file_exists file) then VCS.no_result
+        else
+          try
+            mark_cache ~mode hash ;
+            Json.load_file file |> ProofScript.result_of_json
+          with err ->
+            Wp_parameters.warning ~current:false ~once:true
+              "invalid cache entry (%s)" (Printexc.to_string err) ;
+            VCS.no_result
 
 let set_cache_result ~mode hash prover result =
   match mode with
   | NoCache | Replay | Offline -> ()
   | Rebuild | Update | Cleanup ->
-      let dir = Wp_parameters.get_session_dir "cache" in
+      let dir = Wp_parameters.get_session_dir ~force:true "cache" in
       let hash = Lazy.force hash in
       let file = Printf.sprintf "%s/%s.json" dir hash in
       try
