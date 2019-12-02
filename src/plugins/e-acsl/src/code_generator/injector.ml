@@ -168,7 +168,7 @@ let add_initializer loc ?vi lv ?(post=false) stmt env kf =
     in
     let must_model = Mmodel_analysis.must_model_lval ~stmt ~kf lv in
     if not (may_safely_ignore lv) && must_model then
-      let before = Cil.mkStmt stmt.skind in
+      let before = Cil.mkStmt ~valid_sid:true stmt.skind in
       let new_stmt =
         (* bitfields are not yet supported ==> no initializer.
            a [not_yet] will be raised in [Translate]. *)

@@ -183,7 +183,7 @@ class prepare_visitor prj = object (self)
          match stmt.skind with
          | Switch(_,sw_blk,_,_) ->
            let new_blk = Cil.mkBlock [ stmt ] in
-           let new_stmt = Cil.mkStmt (Block new_blk) in
+           let new_stmt = Cil.mkStmt ~valid_sid:true (Block new_blk) in
            new_blk.blocals <- sw_blk.blocals;
            sw_blk.blocals <- [];
            new_stmt
@@ -222,6 +222,6 @@ let prepare () =
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)

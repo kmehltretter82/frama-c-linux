@@ -677,7 +677,7 @@ and env_of_li li kf env loc =
   let e, env = term_to_exp kf env t in
   let stmt = match Typing.get_number_ty t with
     | Typing.(C_integer _ | C_float _ | Nan) ->
-      Cil.mkStmtOneInstr (Set (Cil.var vi, e, loc))
+      Cil.mkStmtOneInstr ~valid_sid:true (Set (Cil.var vi, e, loc))
     | Typing.Gmpz ->
       Gmp.init_set ~loc (Cil.var vi) vi_e e
     | Typing.Rational ->
@@ -1138,6 +1138,6 @@ let translate_post_code_annotation kf env annot =
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)
