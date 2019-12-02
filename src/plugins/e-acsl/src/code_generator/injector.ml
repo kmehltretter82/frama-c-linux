@@ -589,7 +589,7 @@ let add_malloc_and_free_stmts kf fundec =
      to keep the corresponding entries in the table managing them. *)
   At_with_lscope.Malloc.remove_all kf
 
-let inject_in_fundec env main fundec =
+let inject_in_fundec main fundec =
   let vi = fundec.svar in
   let kf = try Globals.Functions.get vi with Not_found -> assert false in
   (* convert ghost variables *)
@@ -603,7 +603,7 @@ let inject_in_fundec env main fundec =
   Options.feedback ~dkey ~level:2 "entering in function %a."
     Kernel_function.pretty kf;
   (* recursive visit *)
-  let env = inject_in_block env kf fundec.sbody in
+  let env = inject_in_block Env.empty kf fundec.sbody in
   Exit_points.clear ();
   add_generated_variables_in_function env fundec;
   add_malloc_and_free_stmts kf fundec;
@@ -657,7 +657,7 @@ let inject_in_global (env, main) = function
 
   (* function definition *)
   | GFun(fundec, _) ->
-    inject_in_fundec env main fundec
+    inject_in_fundec main fundec
 
   (* other globals: nothing to do *)
   | GType _
@@ -783,6 +783,6 @@ let inject () =
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)
