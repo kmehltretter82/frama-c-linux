@@ -61,7 +61,7 @@ let rec inject_in_init env kf_opt vi off = function
     SingleInit e, env
   | CompoundInit(_, []) as init ->
     init, env
-  | CompoundInit(typ, l) as init ->
+  | CompoundInit(typ, l) ->
     let l, env =
       List.fold_left
         (fun (l, env) (off, i) ->
@@ -113,7 +113,7 @@ let inject_in_local_init loc env kf vi = function
     let init, env = inject_in_init env (Some kf) vi NoOffset init in
     AssignInit init, env
 
-  | ConsInit(vi, l, ck) as init ->
+  | ConsInit(vi, l, ck) ->
     let l, env =
       List.fold_left
         (fun (l, env) e ->
