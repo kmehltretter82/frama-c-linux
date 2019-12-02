@@ -1,41 +1,17 @@
 Generation of pandoc and/or sarif reports.
 
-**Important Note:** Requires OCaml 4.04 or newer (uses a new function from
-`String`), instead of the normal 4.02.3 or newer for Frama-C kernel.
-
 # Dependencies
 
 ## Mandatory
-- OCaml >= 4.04;
-- Frama-C 18.0 (Argon)
 - packages `ppx_deriving`, `ppx_deriving_yojson` and `yojson`
-
-**Important Note** In the current version of `ppx_deriving`, the `META` file
-provided misses a line indicating how to load the package in a dynamic manner
-(i.e. what Frama-C does when loading its plug-in), preventing the plug-in
-to be loaded by Frama-C. If Frama-C fails to load the plug-in, please add
-the line
-
-```
-plugin(native) = "ppx_deriving_runtime.cmxs"
-```
-
-to the `package "runtime"` record of the file
-`$(ocamlfind query ppx_deriving)/META`
 
 ## Optional
 - FlameGraph ([`https://github.com/brendangregg/FlameGraph`](https://github.com/brendangregg/FlameGraph))
 
-# Installation
-
-Running `make` and `make install` (possibly with admin rights depending on
-your installation of Frama-C) should compile and install the plugin in
-Frama-C's installation directory.
-
 # Usage
 
-MarkDownReport focuses on results computed by Eva. It has three output formats,
-controlled by the `-mdr-gen` option:
+`markdown-report` focuses on results computed by Eva and WP.
+It has three output formats, controlled by the `-mdr-gen` option:
 
 - `draft`: produces a markdown report with placeholders for writing (markdown)
 comments on the various items (e.g. why is an alarm spurious, or why is
