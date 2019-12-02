@@ -586,6 +586,8 @@ class pane (gprovers : GuiConfig.provers) =
               printer#reset ;
               self#update ;
             end
+          else
+            Wutil.later self#commit
 
     method private schedule pool provers goal =
       Prover.spawn goal
