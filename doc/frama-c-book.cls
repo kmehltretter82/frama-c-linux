@@ -3,29 +3,49 @@
 % --------------------------------------------------------------------------
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{frama-c-book}[2009/02/05 LaTeX Class for Frama-C Books]
+\newif\ifusecc
+\usecctrue
 % --------------------------------------------------------------------------
 % ---  Base Class management                                             ---
 % --------------------------------------------------------------------------
-\LoadClass[a4paper,11pt,twoside,openright]{report}
-\DeclareOption{web}{\PassOptionsToPackage{colorlinks,urlcolor=blue}{hyperref}}
-\DeclareOption{paper}{\PassOptionsToPackage{pdfborder=0 0 0}{hyperref}}
-\ProcessOptions
-\RequirePackage{fullpage}
+\makeatletter
+\RequirePackage{kvoptions}
+\RequirePackage{kvoptions-patch}
+\SetupKeyvalOptions{
+family=framacbook,
+prefix=framacbook@,
+}
 \RequirePackage{ifthen}
-\usepackage{lmodern}
+\DeclareVoidOption{web}{\PassOptionsToPackage{colorlinks,urlcolor=blue}{hyperref}}
+\DeclareVoidOption{paper}{\PassOptionsToPackage{pdfborder=0 0 0}{hyperref}}
+\DeclareStringOption[{version=4.0,modifier=by-sa}]{license}
+\DeclareDefaultOption{\PassOptionsToClass{\CurrentOption}{report}}
+\PassOptionsToClass{a4paper,11pt,twoside,openright}{report}
+
+\ProcessKeyvalOptions*
+
+\LoadClass{report}
+
+\ifthenelse{\equal{\framacbook@license}{no}}{\useccfalse}{}
+\ifusecc
+  \PassOptionsToPackage{\framacbook@license}{doclicense}
+\fi
+\RequirePackage{fullpage}
+\RequirePackage{lmodern}
 \RequirePackage[T1]{fontenc}
 \RequirePackage[utf8]{inputenc}
 \RequirePackage[pdftex,pdfstartview=FitH]{hyperref}
 \RequirePackage{amssymb}
 \RequirePackage{xcolor}
 \RequirePackage[pdftex]{graphicx}
+\RequirePackage{ifthen}
 \RequirePackage{xspace}
 \RequirePackage{makeidx}
 \RequirePackage[leftbars]{changebar}
-\RequirePackage[english]{babel}
 \RequirePackage{fancyhdr}
 \RequirePackage{titlesec}
 \RequirePackage{upquote}
+\ifusecc\RequirePackage{doclicense}\else\fi
 % --------------------------------------------------------------------------
 % ---  Page Layout                                                       ---
 % --------------------------------------------------------------------------
@@ -102,6 +122,7 @@
 {#1}
 
 \medskip
+\ifusecc\doclicenseThis\else\fi
 }
 % --------------------------------------------------------------------------
 % ---  Sectionning                                                       ---
@@ -339,7 +360,7 @@ basicstyle=\lp@inline,%
 {\lstinputlisting[style=why-style,basicstyle=\lp@basic]{#1}}
 \newcommand{\whyinline}[1]%
 {\lstinline[style=why-style]{#1}}
-
+\makeatother
 % --------------------------------------------------------------------------
 % ---  End.                                                              ---
 % --------------------------------------------------------------------------
