@@ -365,15 +365,8 @@ let rec inject_in_substmt env kf stmt = match stmt.skind with
     If(e, blk1, blk2, loc), env
 
   | Switch(e, blk, stmts, loc) ->
+    (* [blk] and [stmts] are visited at the same time *)
     let env = inject_in_block env kf blk in
-    let stmts, env =
-      List.fold_left
-        (fun (stmts, env) stmt ->
-           let stmt, env = inject_in_stmt env kf stmt in
-           stmt :: stmts, env)
-        ([], env)
-        stmts
-    in
     let e, env = replace_literal_string_in_exp env (Some kf) e in
     Switch(e, blk, stmts, loc), env
 
