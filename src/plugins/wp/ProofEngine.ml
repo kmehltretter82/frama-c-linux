@@ -206,33 +206,15 @@ let children n =
 (* -------------------------------------------------------------------------- *)
 
 type status = [ `Main | `Proved | `Pending of int ]
-type state = [ `Opened | `Proved | `Pending of int | `Script of int ]
 
 let status t : status =
   match t.root with
   | None ->
       if Wpo.is_proved t.main then `Proved else `Main
   | Some root ->
-      `Pending (pending root)
-
-
-let opened n = not (Wpo.is_proved n.goal)
-
-let state n =
-  if Wpo.is_proved n.goal then `Proved else
-    match n.script with
-    | Opened -> `Opened
-    | Script s ->
-        begin
-          match List.partition ProofScript.is_prover s with
-          | [] , s -> `Script (ProofScript.status s)
-          | p , [] -> `Pending (ProofScript.status p)
-          | provers , scripts ->
-              let np = ProofScript.status provers in
-              let ns = ProofScript.status scripts in
-              `Script( min ns np )
-        end
-    | Tactic _ -> `Pending (pending n)
+      match root.script with
+      | Opened | Script _ -> `Main
+      | Tactic _ -> `Pending (pending root)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Navigation                                                         --- *)

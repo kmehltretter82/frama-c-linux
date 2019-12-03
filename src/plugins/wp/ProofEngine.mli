@@ -36,7 +36,6 @@ val validate : ?incomplete:bool -> tree -> unit
 (** Leaves are numbered from 0 to n-1 *)
 
 type status = [ `Main | `Proved | `Pending of int ]
-type state = [ `Opened | `Proved | `Pending of int | `Script of int ]
 type current = [ `Main | `Internal of node | `Leaf of int * node ]
 type position = [ `Main | `Node of node | `Leaf of int ]
 
@@ -53,13 +52,11 @@ val head : tree -> Wpo.t
 val goal : node -> Wpo.t
 val tree_context : tree -> WpContext.t
 val node_context : node -> WpContext.t
-val opened : node -> bool (** not proved *)
-val proved : node -> bool (** not opened *)
 
 val title : node -> string
-val state : node -> state
+val proved : node -> bool
+val pending : node -> int (** 0 means proved *)
 val parent : node -> node option
-val pending : node -> int
 val children : node -> (string * node) list
 val tactical : node -> ProofScript.jtactic option
 val get_strategies : node -> int * Strategy.t array (* current index *)
