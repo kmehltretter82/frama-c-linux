@@ -178,6 +178,6 @@ let mk_delete_stmts stmts =
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)

@@ -138,7 +138,7 @@ let assign ?(ltype) lhs rhs loc =
      via [Cil.typeOfLval] later *)
   let ltype = match ltype with
     | Some l -> l
-    | None -> (Cil.typeOfLval lhs)
+    | None -> Cil.typeOfLval lhs
   in
   match Cil.unrollType ltype with
   | TPtr _ ->
@@ -514,14 +514,12 @@ let handle_stmt stmt env kf =
     env
 
 let generate_global_init vi off init =
-  if is_enabled () then
-    mk_global_init ~loc:vi.vdecl vi off init
-  else
-    None
+  if is_enabled () then mk_global_init ~loc:vi.vdecl vi off init
+  else None
 (* }}} *)
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)

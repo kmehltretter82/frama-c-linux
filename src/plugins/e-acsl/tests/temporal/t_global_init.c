@@ -14,7 +14,7 @@ struct tree_desc2 {
 
 typedef struct tree_desc2 tree_desc2;
 
-static int extra_lbits[] = {0};
+static int extra_lbits[] = { 0 };
 
 static tree_desc l_desc =
   /* This bit should be tracked via globals_init function */
@@ -59,6 +59,3 @@ int main(int argc, const char **argv) {
 
     return 0;
 }
-
-
-

@@ -60,11 +60,14 @@ let rec inject_in_init env kf_opt vi off = function
     let e, env = replace_literal_string_in_exp env kf_opt e in
     SingleInit e, env
   | CompoundInit(typ, l) ->
+    (* inject in all single initializers that can be built from the compound
+       version *)
     let l, env =
       List.fold_left
-        (fun (l, env) (off, i) ->
-           let i, env = inject_in_init env kf_opt vi off i in
-           (off, i) :: l, env)
+        (fun (l, env) (off', i) ->
+           let new_off = Cil.addOffset off' off in
+           let i, env = inject_in_init env kf_opt vi new_off i in
+           (off', i) :: l, env)
         ([], env)
         l
     in
@@ -588,7 +591,9 @@ let inject_in_fundec main fundec =
   List.iter (fun vi -> vi.vghost <- false) fundec.slocals;
   (* update environments *)
   Builtins.update vi.vname vi;
-  if is_main kf then Global_observer.add vi;
+  (* track function addresses but the main function that is tracked internally
+     via RTL *)
+  if not (is_main kf) then Global_observer.add vi;
   (* exit point computations *)
   if Functions.instrument kf then Exit_points.generate fundec;
   Options.feedback ~dkey ~level:2 "entering in function %a."
@@ -629,6 +634,7 @@ let inject_in_global (env, main) = function
     (* do not convert extern ghost variables, because they can't be linked,
        see bts #1392 *)
     if vi.vstorage <> Extern then vi.vghost <- false;
+    Global_observer.add vi;
     env, main
 
   (* variable definition *)
