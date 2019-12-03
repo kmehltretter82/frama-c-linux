@@ -16,6 +16,7 @@
 /inout/
 /kernel-doc.ocamldoc
 /loop_analysis/
+/markdown-report/
 /metrics/
 /nonterm/
 /obfuscator/
