@@ -397,7 +397,7 @@ let rec inject_in_substmt env kf stmt = match stmt.skind with
         ([], env)
         l
     in
-    UnspecifiedSequence l, env
+    UnspecifiedSequence (List.rev l), env
 
   | Throw(Some(e, ty), loc) ->
     let e, env = replace_literal_string_in_exp env (Some kf) e in
