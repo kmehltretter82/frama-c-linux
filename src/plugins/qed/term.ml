@@ -884,7 +884,7 @@ struct
 
   let c_record fxs =
     match fxs with
-    | [] | [_] -> insert(Rdef fxs)
+    | [] -> insert(Rdef fxs)
     | fx::gys ->
         try
           let base (f,v) =
@@ -2550,7 +2550,8 @@ struct
                | _ -> true)
             fvs
         in
-        Some ( base , fothers )
+        if fothers = [] then None (* suspiscious *)
+        else Some ( base , fothers )
 
   (* ------------------------------------------------------------------------ *)
   (* ---  Symbol                                                          --- *)
