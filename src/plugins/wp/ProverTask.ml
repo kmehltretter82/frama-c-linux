@@ -320,7 +320,7 @@ let spawn ?(monitor=silent) ?pool (jobs : ('a * bool Task.task) list) =
       let canceled = ref false in
       let callback a r =
         if r then
-          begin if not !canceled then
+          begin if not !canceled && not (Wp_parameters.RunAllProvers.get()) then
               begin
                 canceled := true ;
                 monitor (Some a) ;
