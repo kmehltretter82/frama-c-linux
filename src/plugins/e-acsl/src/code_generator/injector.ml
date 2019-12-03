@@ -59,8 +59,6 @@ let rec inject_in_init env kf_opt vi off = function
     if vi.vglob then Global_observer.add_initializer vi off init;
     let e, env = replace_literal_string_in_exp env kf_opt e in
     SingleInit e, env
-  | CompoundInit(_, []) as init ->
-    init, env
   | CompoundInit(typ, l) ->
     let l, env =
       List.fold_left
@@ -115,12 +113,12 @@ let inject_in_local_init loc env kf vi = function
 
   | ConsInit(vi, l, ck) ->
     let l, env =
-      List.fold_left
-        (fun (l, env) e ->
+      List.fold_right
+        (fun e (l, env) ->
            let e, env = replace_literal_string_in_exp env (Some kf) e in
            e :: l, env)
-        ([], env)
         l
+        ([], env)
     in
     ConsInit(vi, l, ck), env
 
@@ -768,7 +766,7 @@ let reset_all ast =
   Typing.clear ();
   Cfg.clearFileCFG ~clear_id:false ast;
   Cfg.computeFileCFG ast;
-  Kernel_function.clear_sid_info ();
+  Kernel_function.clear_sid_info (); (* [ARCHI] is it really useful? *)
   Ast.mark_as_grown ()
 
 let inject () =

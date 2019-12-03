@@ -415,7 +415,7 @@ let dup () =
   Options.feedback ~level:2 "duplicating annotated functions";
   let prj =
     File.create_project_from_visitor
-      "e_acsl_dup_functions" 
+      "e_acsl_dup_functions"
       (new dup_functions_visitor)
   in
   Queue.iter (fun f -> f ()) actions;
