@@ -559,9 +559,26 @@ let is_definition kf =
   | Definition _ -> true
   | Declaration _ -> false
 
+let is_first_stmt kf stmt =
+  try
+    let first = find_first_stmt kf in
+    Stmt.equal stmt first
+  with No_Statement ->
+    false
+
+let is_return_stmt kf stmt =
+  try
+    let return = find_return kf in
+    Stmt.equal stmt return
+  with No_Statement -> false
+
 let is_entry_point kf =
   let main, _ = Globals.entry_point () in
   equal kf main
+
+let is_main kf =
+  let name = get_name kf in
+  Datatype.String.equal name "main"
 
 let returns_void kf =
   let result_type,_,_,_ = Cil.splitFunctionType (get_type kf) in

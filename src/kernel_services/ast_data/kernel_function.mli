@@ -183,7 +183,22 @@ val is_entry_point: t -> bool
     option -main).
     @since Sodium-20150201 *)
 
+val is_main: t -> bool
+(** @return true iff the given function is the function called 'main' in the
+    program.
+    @since Frama-C+dev *)
+
 val returns_void : t -> bool
+
+val is_first_stmt: t -> stmt -> bool
+  (** @return true iff the statement is the first statement of the given
+      function.
+      @since Frama-C+dev *)
+
+val is_return_stmt: t -> stmt -> bool
+  (** @return true iff the statement is the return statement of the given
+      function.
+      @since Frama-C+dev *)
 
 (* ************************************************************************* *)
 (** {2 Getters} *)

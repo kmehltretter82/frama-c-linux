@@ -27,23 +27,6 @@ open Cil_datatype
 let dkey = Options.dkey_translation
 
 (* ************************************************************************** *)
-(* Utilities *)
-(* ************************************************************************** *)
-
-(* [TODO ARCHI] move it in another module *)
-let is_main kf =
-  Datatype.String.equal (Kernel_function.get_name kf) "main"
-
-(* [TODO ARCHI] move it *)
-let is_first_stmt kf stmt =
-  try Stmt.equal stmt (Kernel_function.find_first_stmt kf)
-  with Kernel_function.No_Statement -> assert false
-
-let is_return_stmt kf stmt =
-  try Stmt.equal stmt (Kernel_function.find_return kf)
-  with Kernel_function.No_Statement -> assert false
-
-(* ************************************************************************** *)
 (* Code *)
 (* ************************************************************************** *)
 
@@ -264,7 +247,7 @@ let add_new_block_in_stmt env kf stmt =
     (* Remove local variables which scopes ended via goto/break/continue. *)
     let del_vars = Exit_points.delete_vars stmt in
     let env = Memory_observer.delete_from_set ~before:stmt env kf del_vars in
-    if is_return_stmt kf stmt then
+    if Kernel_function.is_return_stmt kf stmt then
       let env =
         if Functions.check kf then
           (* must generate the post_block before including [stmt] (the
@@ -287,7 +270,7 @@ let add_new_block_in_stmt env kf stmt =
       let b, env =
         Env.pop_and_get env new_stmt ~global_clear:true Env.After
       in
-      if is_main kf && Mmodel_analysis.use_model () then begin
+      if Kernel_function.is_main kf && Mmodel_analysis.use_model () then begin
         let stmts = b.bstmts in
         let l = List.rev stmts in
         match l with
@@ -443,9 +426,9 @@ and inject_in_stmt env kf stmt =
   in
   (* initial environment *)
   let env =
-    if is_first_stmt kf stmt then
+    if Kernel_function.is_first_stmt kf stmt then
       let env =
-        if is_main kf then
+        if Kernel_function.is_main kf then
           env
         else
           let env =
@@ -514,7 +497,7 @@ and inject_in_block (env: Env.t) kf blk =
         (* keep the return (enclosed in a generated block) at the end;
            preceded by clean if any *)
         let init, tl =
-          if is_main kf && Mmodel_analysis.use_model () then
+          if Kernel_function.is_main kf && Mmodel_analysis.use_model () then
             free_stmts @ [ potential_clean; ret ], tl
           else
             free_stmts @ [ ret ], l
@@ -588,7 +571,7 @@ let inject_in_fundec main fundec =
   Builtins.update vi.vname vi;
   (* track function addresses but the main function that is tracked internally
      via RTL *)
-  if not (is_main kf) then Global_observer.add vi;
+  if not (Kernel_function.is_main kf) then Global_observer.add vi;
   (* exit point computations *)
   if Functions.instrument kf then Exit_points.generate fundec;
   Options.feedback ~dkey ~level:2 "entering in function %a."
@@ -599,7 +582,7 @@ let inject_in_fundec main fundec =
   add_generated_variables_in_function env fundec;
   add_malloc_and_free_stmts kf fundec;
   (* setting main if necessary *)
-  let main = if is_main kf then Some fundec else main in
+  let main = if Kernel_function.is_main kf then Some fundec else main in
   Options.feedback ~dkey ~level:2 "function %a done."
     Kernel_function.pretty kf;
   env, main

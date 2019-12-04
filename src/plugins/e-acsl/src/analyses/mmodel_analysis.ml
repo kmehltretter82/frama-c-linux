@@ -442,14 +442,8 @@ let register_predicate kf pred state =
       branch (not considering the exception handlers) *)
   let doStmt stmt =
     let _, kf = Kernel_function.find_from_sid stmt.sid in
-    let is_first =
-      try Stmt.equal stmt (Kernel_function.find_first_stmt kf)
-      with Kernel_function.No_Statement -> assert false
-    in
-    let is_last =
-      try Stmt.equal stmt (Kernel_function.find_return kf)
-      with Kernel_function.No_Statement -> assert false
-    in
+    let is_first = Kernel_function.is_first_stmt kf stmt in
+    let is_last = Kernel_function.is_return_stmt kf stmt in
     Dataflow.Post
       (fun state ->
         let state = Env.default_varinfos state in
