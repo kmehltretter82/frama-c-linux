@@ -23,22 +23,16 @@
 open Cil_types
 
 val move: kernel_function -> old:stmt -> stmt -> unit
-(** Move all labels of the [old] stmt onto the new [stmt].
-    Both stmts must be in the new project. *)
+(** Move all labels of the [old] stmt onto the new [stmt]. *)
 
 val get_stmt: kernel_function -> logic_label -> stmt
 (** @return the statement where the logic label points to. *)
-
-(* [TODO ARCHI] currently unused: *)
-val new_labeled_stmt: stmt -> stmt
-(** @return the labeled stmt to use instead of the given one (which
-    previously contained a label *)
 
 val self: State.t
 (** Internal state *)
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)

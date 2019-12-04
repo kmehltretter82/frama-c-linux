@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module E_acsl_label = Label (* [Label] is hidden by opening [Cil_datatype *)
+module E_acsl_label = Label (* [Label] is hidden when opening [Cil_datatype *)
 open Cil_types
 open Cil_datatype
 

@@ -35,8 +35,6 @@ module Labeled_stmts =
 
 let self = Labeled_stmts.self
 
-let new_labeled_stmt stmt = try Labeled_stmts.find stmt with Not_found -> stmt
-
 let move kf ~old new_stmt =
   let labels = old.labels in
   match labels with
@@ -64,19 +62,24 @@ let move kf ~old new_stmt =
     in
     List.iter mv_label f.sallstmts
 
-let get_stmt kf = function
-  | StmtLabel { contents = stmt } -> stmt
-  | BuiltinLabel Here -> Error.not_yet "Label 'Here'"
-  | BuiltinLabel(Old | Pre) ->
-    (try Kernel_function.find_first_stmt kf
-      with Kernel_function.No_Statement -> assert false)
-  | BuiltinLabel(Post) ->
-    (try Kernel_function.find_return kf
-     with Kernel_function.No_Statement -> assert false)
-  | BuiltinLabel _ | FormalLabel _ -> assert false
+let get_stmt kf llabel =
+  let stmt = match llabel with
+    | StmtLabel { contents = stmt } -> stmt
+    | BuiltinLabel Here -> Error.not_yet "Label 'Here'"
+    | BuiltinLabel(Old | Pre) ->
+      (try Kernel_function.find_first_stmt kf
+       with Kernel_function.No_Statement -> assert false)
+    | BuiltinLabel(Post) ->
+      (try Kernel_function.find_return kf
+       with Kernel_function.No_Statement -> assert false)
+    | BuiltinLabel _ | FormalLabel _ -> assert false
+  in
+  (* the pointed statement has been visited and modified by the injector:
+     get its new version. *)
+  try Labeled_stmts.find stmt with Not_found -> stmt
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)

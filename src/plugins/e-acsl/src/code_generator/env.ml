@@ -338,14 +338,13 @@ let add_stmt ?(post=false) ?before env kf stmt =
 let extend_stmt_in_place env stmt ~label block =
   let new_stmt = Cil.mkStmt ~valid_sid:true (Block block) in
   let sk = stmt.skind in
-  stmt.skind <-
-    Block (Cil.mkBlock [ new_stmt; Cil.mkStmt ~valid_sid:true sk ]);
-    let pre = match label with
+  stmt.skind <- Block (Cil.mkBlock [ new_stmt; Cil.mkStmt ~valid_sid:true sk ]);
+  let pre = match label with
     | BuiltinLabel(Here | Post) -> true
     | BuiltinLabel(Old | Pre | LoopEntry | LoopCurrent | Init)
     | FormalLabel _ | StmtLabel _ -> false
-    in
-    if pre then
+  in
+  if pre then
     let local_env, tl_env = top env in
     let b_info = local_env.block_info in
     let b_info = { b_info with pre_stmts = new_stmt :: b_info.pre_stmts } in
@@ -493,6 +492,6 @@ let pretty fmt env =
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)
