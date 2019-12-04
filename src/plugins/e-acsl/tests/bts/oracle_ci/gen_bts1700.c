@@ -12,7 +12,6 @@ int main(void)
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   __e_acsl_store_block((void *)(& p),(size_t)8);
   __e_acsl_store_block((void *)(& s),(size_t)0);
-  /*@ assert \valid(&s); */
   {
     int __gen_e_acsl_valid;
     __gen_e_acsl_valid = __e_acsl_valid((void *)(& s),sizeof(struct toto),
@@ -20,9 +19,9 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_valid,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid(&s)",9);
   }
+  /*@ assert \valid(&s); */ ;
   __e_acsl_full_init((void *)(& p));
   p = & s;
-  /*@ assert \valid(p); */
   {
     int __gen_e_acsl_initialized;
     int __gen_e_acsl_and;
@@ -38,6 +37,7 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid(p)",12);
   }
+  /*@ assert \valid(p); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(& p));
   __e_acsl_delete_block((void *)(& s));

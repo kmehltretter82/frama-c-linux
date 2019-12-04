@@ -15,11 +15,10 @@ int main(void)
     goto return_label;
   }
   int *q = arr;
+  __e_acsl_temporal_store_nblock((void *)(& q),(void *)(arr));
   __e_acsl_store_block((void *)(& q),(size_t)8);
   __e_acsl_full_init((void *)(& q));
-  __e_acsl_temporal_store_nblock((void *)(& q),(void *)(arr));
   while (i < 4) {
-    /*@ assert \valid(q); */
     {
       int __gen_e_acsl_initialized;
       int __gen_e_acsl_and;
@@ -35,14 +34,14 @@ int main(void)
       __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"main",
                       (char *)"\\valid(q)",28);
     }
+    /*@ assert \valid(q); */ ;
     __e_acsl_initialize((void *)q,sizeof(int));
     *q = 1;
     i ++;
-    __e_acsl_temporal_store_nreferent((void *)(& q),(void *)(& q));
     __e_acsl_full_init((void *)(& q));
+    __e_acsl_temporal_store_nreferent((void *)(& q),(void *)(& q));
     q ++;
   }
-  /*@ assert ¬\valid(q); */
   {
     int __gen_e_acsl_initialized_2;
     int __gen_e_acsl_and_2;
@@ -58,6 +57,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_and_2,(char *)"Assertion",(char *)"main",
                     (char *)"!\\valid(q)",36);
   }
+  /*@ assert ¬\valid(q); */ ;
   __retres = 0;
   return_label: __e_acsl_store_block_duplicate((void *)(& q),(size_t)8);
   __e_acsl_delete_block((void *)(& q));

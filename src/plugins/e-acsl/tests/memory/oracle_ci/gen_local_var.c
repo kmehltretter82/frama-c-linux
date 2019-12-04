@@ -12,7 +12,6 @@ struct list *add(struct list *l, int i)
   __e_acsl_store_block((void *)(& l),(size_t)8);
   __e_acsl_full_init((void *)(& new));
   new = (struct list *)malloc(sizeof(struct list));
-  /*@ assert \valid(new); */
   {
     int __gen_e_acsl_initialized;
     int __gen_e_acsl_and;
@@ -28,6 +27,7 @@ struct list *add(struct list *l, int i)
     __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"add",
                     (char *)"\\valid(new)",15);
   }
+  /*@ assert \valid(new); */ ;
   __e_acsl_initialize((void *)(& new->element),sizeof(int));
   new->element = i;
   __e_acsl_initialize((void *)(& new->next),sizeof(struct list *));

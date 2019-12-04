@@ -8,7 +8,6 @@ void f(void const *s, int c, unsigned long n)
   unsigned char const *p = (unsigned char const *)s;
   __e_acsl_store_block((void *)(& p),(size_t)8);
   __e_acsl_full_init((void *)(& p));
-  /*@ assert p - (unsigned char const *)s ≡ n - n; */
   {
     __e_acsl_mpz_t __gen_e_acsl_;
     __e_acsl_mpz_t __gen_e_acsl_n;
@@ -28,9 +27,10 @@ void f(void const *s, int c, unsigned long n)
     __gmpz_clear(__gen_e_acsl_n);
     __gmpz_clear(__gen_e_acsl_sub);
   }
-  /*@ assert p - (unsigned char const *)s ≡ 0; */
+  /*@ assert p - (unsigned char const *)s ≡ n - n; */ ;
   __e_acsl_assert(p - (unsigned char const *)s == 0UL,(char *)"Assertion",
                   (char *)"f",(char *)"p - (unsigned char const *)s == 0",8);
+  /*@ assert p - (unsigned char const *)s ≡ 0; */ ;
   __e_acsl_delete_block((void *)(& s));
   __e_acsl_delete_block((void *)(& p));
   return;

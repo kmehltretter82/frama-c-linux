@@ -21,18 +21,18 @@ void f(void)
        __gen_e_acsl_at_2 = A;
        A = 2;
      }
-  /*@ assert \at(A,Pre) ≡ 0; */
   __e_acsl_assert(__gen_e_acsl_at == 0,(char *)"Assertion",(char *)"f",
                   (char *)"\\at(A,Pre) == 0",11);
-  /*@ assert \at(A,F) ≡ 1; */
+  /*@ assert \at(A,Pre) ≡ 0; */ ;
   __e_acsl_assert(__gen_e_acsl_at_2 == 1,(char *)"Assertion",(char *)"f",
                   (char *)"\\at(A,F) == 1",12);
-  /*@ assert \at(A,Here) ≡ 2; */
+  /*@ assert \at(A,F) ≡ 1; */ ;
   __e_acsl_assert(A == 2,(char *)"Assertion",(char *)"f",
                   (char *)"\\at(A,Here) == 2",13);
-  /*@ assert \at(\at(A,Pre),F) ≡ 0; */
+  /*@ assert \at(A,Here) ≡ 2; */ ;
   __e_acsl_assert(__gen_e_acsl_at_4 == 0,(char *)"Assertion",(char *)"f",
                   (char *)"\\at(\\at(A,Pre),F) == 0",14);
+  /*@ assert \at(\at(A,Pre),F) ≡ 0; */ ;
   A = 3;
   return;
 }
@@ -90,11 +90,11 @@ void g(int *p, int *q)
     }
     A = 4;
   }
-  /*@ assert \at(*(p + \at(*q,L1)),L2) ≡ 2; */
   __e_acsl_assert(__gen_e_acsl_at_2 == 2,(char *)"Assertion",(char *)"g",
-                  (char *)"\\at(*(p + \\at(*q,L1)),L2) == 2",26);
+                  (char *)"\\at(*(p + \\at(*q,__invalid_label)),L2) == 2",26);
+  /*@ assert \at(*(p + \at(*q,__invalid_label)),L2) ≡ 2; */ ;
   L3:
-  /*@ assert \at(*(p + \at(*q,L1)),Here) ≡ 2; */
+  /*@ assert \at(*(p + \at(*q,__invalid_label)),Here) ≡ 2; */
   {
     int __gen_e_acsl_valid_read_4;
     __gen_e_acsl_valid_read_4 = __e_acsl_valid_read((void *)(p + __gen_e_acsl_at_3),
@@ -104,7 +104,8 @@ void g(int *p, int *q)
                     (char *)"mem_access: \\valid_read(p + __gen_e_acsl_at_3)",
                     28);
     __e_acsl_assert(*(p + __gen_e_acsl_at_3) == 2,(char *)"Assertion",
-                    (char *)"g",(char *)"\\at(*(p + \\at(*q,L1)),Here) == 2",
+                    (char *)"g",
+                    (char *)"\\at(*(p + \\at(*q,__invalid_label)),Here) == 2",
                     28);
   }
   __e_acsl_delete_block((void *)(& q));
@@ -149,15 +150,16 @@ int main(void)
   __e_acsl_full_init((void *)(& x));
   x = 2;
   __gen_e_acsl_f();
-  /*@ assert \at(x,L) ≡ 0; */
   __e_acsl_assert(__gen_e_acsl_at == 0,(char *)"Assertion",(char *)"main",
-                  (char *)"\\at(x,L) == 0",48);
-  /*@ assert \at(x + 1,L) ≡ 1; */
+                  (char *)"\\at(x,__invalid_label) == 0",48);
+  /*@ assert \at(x,__invalid_label) ≡ 0; */ ;
   __e_acsl_assert(__gen_e_acsl_at_2 == 1L,(char *)"Assertion",(char *)"main",
-                  (char *)"\\at(x + 1,L) == 1",49);
-  /*@ assert \at(x,L) + 1 ≡ 1; */
+                  (char *)"\\at(x + 1,__invalid_label) == 1",49);
+  /*@ assert \at(x + 1,__invalid_label) ≡ 1; */ ;
   __e_acsl_assert(__gen_e_acsl_at_3 + 1L == 1L,(char *)"Assertion",
-                  (char *)"main",(char *)"\\at(x,L) + 1 == 1",50);
+                  (char *)"main",(char *)"\\at(x,__invalid_label) + 1 == 1",
+                  50);
+  /*@ assert \at(x,__invalid_label) + 1 ≡ 1; */ ;
   g(t,& x);
   __retres = 0;
   __e_acsl_delete_block((void *)(t));
@@ -172,8 +174,8 @@ int __gen_e_acsl_h(int x)
   int __gen_e_acsl_at;
   int __retres;
   __e_acsl_store_block((void *)(& __retres),(size_t)4);
-  __gen_e_acsl_at = x;
   __e_acsl_store_block((void *)(& x),(size_t)4);
+  __gen_e_acsl_at = x;
   __retres = h(x);
   __e_acsl_assert(__retres == __gen_e_acsl_at,(char *)"Postcondition",
                   (char *)"h",(char *)"\\result == \\old(x)",35);

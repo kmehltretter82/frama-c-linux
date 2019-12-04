@@ -58,14 +58,14 @@ void __gen_e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
   ArrayInt *__gen_e_acsl_at_3;
   ArrayInt *__gen_e_acsl_at_2;
   int *__gen_e_acsl_at;
+  __e_acsl_store_block((void *)(& AverageAccel),(size_t)8);
+  __e_acsl_store_block((void *)(& Accel),(size_t)8);
   __gen_e_acsl_at_6 = Accel;
   __gen_e_acsl_at_5 = Accel;
   __gen_e_acsl_at_4 = Accel;
   __gen_e_acsl_at_3 = Accel;
   __gen_e_acsl_at_2 = Accel;
   __gen_e_acsl_at = AverageAccel;
-  __e_acsl_store_block((void *)(& AverageAccel),(size_t)8);
-  __e_acsl_store_block((void *)(& Accel),(size_t)8);
   atp_NORMAL_computeAverageAccel(Accel,AverageAccel);
   {
     int __gen_e_acsl_valid_read;

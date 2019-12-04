@@ -16,7 +16,6 @@ int main(void)
   __e_acsl_full_init((void *)(& state));
   __e_acsl_initialize((void *)(& state->bitsInQueue),sizeof(unsigned int));
   state->bitsInQueue = (unsigned int)16;
-  /*@ assert ¬\initialized(&state->dataQueue[state->bitsInQueue / 8]); */
   {
     int __gen_e_acsl_valid_read;
     int __gen_e_acsl_initialized;
@@ -36,6 +35,7 @@ int main(void)
                     (char *)"!\\initialized(&state->dataQueue[state->bitsInQueue / 8])",
                     19);
   }
+  /*@ assert ¬\initialized(&state->dataQueue[state->bitsInQueue / 8]); */ ;
   free((void *)state);
   __retres = 0;
   __e_acsl_delete_block((void *)(& state));

@@ -2,11 +2,6 @@
 #include "stdio.h"
 #include "stdlib.h"
 char *__gen_e_acsl_literal_string;
-/*@ assigns \result, *(x_0 + (0 ..)), *(x_1 + (0 ..));
-    assigns \result \from *(x_0 + (0 ..)), *(x_1 + (0 ..)), x_2;
-    assigns *(x_0 + (0 ..)) \from *(x_0 + (0 ..)), *(x_1 + (0 ..)), x_2;
-    assigns *(x_1 + (0 ..)) \from *(x_0 + (0 ..)), *(x_1 + (0 ..)), x_2;
- */
 extern int ( /* missing proto */ strncpy)(char *x_0, char *x_1, int x_2);
 
 void __e_acsl_globals_init(void)
@@ -38,7 +33,6 @@ int main(void)
   if (destbuf != (char *)0) {
     i = -1;
     while (i < 0) {
-      /*@ assert ¬\valid_read(srcbuf + i); */
       {
         int __gen_e_acsl_valid_read;
         __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(srcbuf + i),
@@ -49,6 +43,7 @@ int main(void)
                         (char *)"main",(char *)"!\\valid_read(srcbuf + i)",
                         16);
       }
+      /*@ assert ¬\valid_read(srcbuf + i); */ ;
       /*@ assert Eva: mem_access: \valid_read(srcbuf + i); */
       if ((int)*(srcbuf + i) == (int)ch) loc = i;
       i ++;

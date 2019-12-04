@@ -39,7 +39,6 @@ int main(void)
                     (char *)"mem_access: \\valid(P)",13);
   }
   (*P) ++;
-  /*@ assert *q ≡ G; */
   {
     int __gen_e_acsl_initialized;
     int __gen_e_acsl_and;
@@ -58,6 +57,7 @@ int main(void)
     __e_acsl_assert(*q == G,(char *)"Assertion",(char *)"main",
                     (char *)"*q == G",14);
   }
+  /*@ assert *q ≡ G; */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(& P));
   __e_acsl_delete_block((void *)(& G));

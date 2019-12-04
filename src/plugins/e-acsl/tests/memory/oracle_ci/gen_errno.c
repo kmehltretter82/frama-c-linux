@@ -21,7 +21,6 @@ int main(int argc, char const **argv)
   int *p = & errno;
   __e_acsl_store_block((void *)(& p),(size_t)8);
   __e_acsl_full_init((void *)(& p));
-  /*@ assert \valid(p); */
   {
     int __gen_e_acsl_initialized;
     int __gen_e_acsl_and;
@@ -37,6 +36,7 @@ int main(int argc, char const **argv)
     __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid(p)",11);
   }
+  /*@ assert \valid(p); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(& errno));
   __e_acsl_delete_block((void *)(& p));

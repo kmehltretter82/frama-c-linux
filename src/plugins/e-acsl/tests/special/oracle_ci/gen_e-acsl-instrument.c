@@ -95,7 +95,6 @@ int main(void)
   __gen_e_acsl_uninstrument1(& x);
   __gen_e_acsl_instrument2(& x);
   __gen_e_acsl_uninstrument2(& x);
-  /*@ assert \initialized(&x); */
   {
     int __gen_e_acsl_initialized;
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& x),
@@ -103,7 +102,7 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_initialized,(char *)"Assertion",
                     (char *)"main",(char *)"\\initialized(&x)",56);
   }
-  /*@ assert \initialized(&y); */
+  /*@ assert \initialized(&x); */ ;
   {
     int __gen_e_acsl_initialized_2;
     __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(& y),
@@ -111,6 +110,7 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_initialized_2,(char *)"Assertion",
                     (char *)"main",(char *)"\\initialized(&y)",57);
   }
+  /*@ assert \initialized(&y); */ ;
   tmp = vol(6,1);
   __e_acsl_delete_block((void *)(& y));
   __e_acsl_delete_block((void *)(& x));

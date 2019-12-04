@@ -16,20 +16,18 @@ int f(int *p)
   {
     int i = 0;
     {
-      {
-        int __gen_e_acsl_and;
-        if (0 <= i) __gen_e_acsl_and = i <= 1; else __gen_e_acsl_and = 0;
-        __e_acsl_assert(__gen_e_acsl_and,(char *)"Invariant",(char *)"f",
-                        (char *)"0 <= i <= 1",11);
-      }
-      /*@ loop invariant 0 ≤ i ≤ 1; */
-      while (i < 1) {
-        int __gen_e_acsl_and_2;
-        i ++;
-        if (0 <= i) __gen_e_acsl_and_2 = i <= 1; else __gen_e_acsl_and_2 = 0;
-        __e_acsl_assert(__gen_e_acsl_and_2,(char *)"Invariant",(char *)"f",
-                        (char *)"0 <= i <= 1",11);
-      }
+      int __gen_e_acsl_and;
+      if (0 <= i) __gen_e_acsl_and = i <= 1; else __gen_e_acsl_and = 0;
+      __e_acsl_assert(__gen_e_acsl_and,(char *)"Invariant",(char *)"f",
+                      (char *)"0 <= i <= 1",11);
+    }
+    /*@ loop invariant 0 ≤ i ≤ 1; */
+    while (i < 1) {
+      int __gen_e_acsl_and_2;
+      i ++;
+      if (0 <= i) __gen_e_acsl_and_2 = i <= 1; else __gen_e_acsl_and_2 = 0;
+      __e_acsl_assert(__gen_e_acsl_and_2,(char *)"Invariant",(char *)"f",
+                      (char *)"0 <= i <= 1",11);
     }
   }
   __retres = 0;
@@ -78,14 +76,6 @@ int __gen_e_acsl_f(int *p)
   int __gen_e_acsl_at;
   int __retres;
   {
-    int __gen_e_acsl_valid_read;
-    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)p,sizeof(int),
-                                                  (void *)p,(void *)(& p));
-    __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"f",
-                    (char *)"mem_access: \\valid_read(p)",9);
-    __gen_e_acsl_at = *p;
-  }
-  {
     int __gen_e_acsl_initialized;
     __e_acsl_store_block((void *)(& p),(size_t)8);
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)p,sizeof(int));
@@ -93,6 +83,14 @@ int __gen_e_acsl_f(int *p)
                     (char *)"f",(char *)"\\initialized(p)",7);
     __e_acsl_assert(*p == 0,(char *)"Precondition",(char *)"f",
                     (char *)"*p == 0",8);
+  }
+  {
+    int __gen_e_acsl_valid_read;
+    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)p,sizeof(int),
+                                                  (void *)p,(void *)(& p));
+    __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"f",
+                    (char *)"mem_access: \\valid_read(p)",9);
+    __gen_e_acsl_at = *p;
   }
   __retres = f(p);
   __e_acsl_assert(__retres == __gen_e_acsl_at,(char *)"Postcondition",

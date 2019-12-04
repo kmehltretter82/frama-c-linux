@@ -14,7 +14,6 @@ int f(void)
   char *s2 = (char *)__gen_e_acsl_literal_string_2;
   __e_acsl_store_block((void *)(& s2),(size_t)8);
   __e_acsl_full_init((void *)(& s2));
-  /*@ assert \valid_read(S); */
   {
     int __gen_e_acsl_valid_read;
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)S,sizeof(char),
@@ -22,7 +21,7 @@ int f(void)
     __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"Assertion",(char *)"f",
                     (char *)"\\valid_read(S)",10);
   }
-  /*@ assert \valid_read(s1); */
+  /*@ assert \valid_read(S); */ ;
   {
     int __gen_e_acsl_initialized;
     int __gen_e_acsl_and;
@@ -40,7 +39,7 @@ int f(void)
     __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"f",
                     (char *)"\\valid_read(s1)",11);
   }
-  /*@ assert \valid_read(s2); */
+  /*@ assert \valid_read(s1); */ ;
   {
     int __gen_e_acsl_initialized_2;
     int __gen_e_acsl_and_2;
@@ -58,6 +57,7 @@ int f(void)
     __e_acsl_assert(__gen_e_acsl_and_2,(char *)"Assertion",(char *)"f",
                     (char *)"\\valid_read(s2)",12);
   }
+  /*@ assert \valid_read(s2); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(& s2));
   __e_acsl_delete_block((void *)(& s1));
@@ -105,7 +105,6 @@ int main(void)
       char *s = (char *)__gen_e_acsl_literal_string_3;
       __e_acsl_store_block((void *)(& s),(size_t)8);
       __e_acsl_full_init((void *)(& s));
-      /*@ assert \valid_read(s); */
       {
         int __gen_e_acsl_initialized;
         int __gen_e_acsl_and;
@@ -123,7 +122,7 @@ int main(void)
         __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"main",
                         (char *)"\\valid_read(s)",20);
       }
-      /*@ assert ¬\valid(s); */
+      /*@ assert \valid_read(s); */ ;
       {
         int __gen_e_acsl_initialized_2;
         int __gen_e_acsl_and_2;
@@ -138,8 +137,9 @@ int main(void)
         else __gen_e_acsl_and_2 = 0;
         __e_acsl_assert(! __gen_e_acsl_and_2,(char *)"Assertion",
                         (char *)"main",(char *)"!\\valid(s)",21);
-        __e_acsl_delete_block((void *)(& s));
       }
+      /*@ assert ¬\valid(s); */ ;
+      __e_acsl_delete_block((void *)(& s));
     }
   }
   f();

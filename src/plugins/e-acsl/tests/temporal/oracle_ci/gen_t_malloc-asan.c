@@ -27,22 +27,22 @@ int main(void)
   __e_acsl_store_block((void *)(& p),(size_t)8);
   int counter = 0;
   size_t limit = (unsigned long)10000;
+  __e_acsl_full_init((void *)(& p));
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
-  __e_acsl_full_init((void *)(& p));
   p = (int *)malloc((unsigned long)(1024 * 1024));
   __e_acsl_temporal_store_nblock((void *)(& p),(void *)*(& p));
-  __e_acsl_temporal_store_nreferent((void *)(& q),(void *)(& p));
   __e_acsl_full_init((void *)(& q));
+  __e_acsl_temporal_store_nreferent((void *)(& q),(void *)(& p));
   q = p;
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
   __e_acsl_temporal_save_nreferent_parameter((void *)(& p),0U);
   free((void *)p);
   while ((size_t)counter < limit) {
+    __e_acsl_full_init((void *)(& p));
     __e_acsl_temporal_reset_parameters();
     __e_acsl_temporal_reset_return();
-    __e_acsl_full_init((void *)(& p));
     p = (int *)malloc((unsigned long)(1024 * 1024));
     __e_acsl_temporal_store_nblock((void *)(& p),(void *)*(& p));
     counter ++;
@@ -60,8 +60,8 @@ int main(void)
       printf(__gen_e_acsl_literal_string,p,counter);
       break;
     }
-    __e_acsl_temporal_store_nblock((void *)(& p),(void *)0);
     __e_acsl_full_init((void *)(& p));
+    __e_acsl_temporal_store_nblock((void *)(& p),(void *)0);
     p = (int *)0;
   }
   if (p) {

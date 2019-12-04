@@ -83,8 +83,8 @@ int __gen_e_acsl_l(void);
 
 int l(void)
 {
-  /*@ assert Y ≡ 2; */
   __e_acsl_assert(Y == 2,(char *)"Assertion",(char *)"l",(char *)"Y == 2",49);
+  /*@ assert Y ≡ 2; */ ;
   return X;
 }
 
@@ -157,12 +157,12 @@ void __gen_e_acsl_n(void)
 {
   int __gen_e_acsl_at_2;
   int __gen_e_acsl_at;
-  __gen_e_acsl_at_2 = X == 5;
-  __gen_e_acsl_at = X == 7;
   __e_acsl_assert(X > 0,(char *)"Precondition",(char *)"n",(char *)"X > 0",
                   65);
   __e_acsl_assert(X < 10,(char *)"Precondition",(char *)"n",(char *)"X < 10",
                   66);
+  __gen_e_acsl_at_2 = X == 5;
+  __gen_e_acsl_at = X == 7;
   n();
   {
     int __gen_e_acsl_implies;

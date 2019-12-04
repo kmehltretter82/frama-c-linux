@@ -8,12 +8,11 @@ int main(void)
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
   int **p = malloc(sizeof(int *) * (unsigned long)3);
+  __e_acsl_temporal_store_nblock((void *)(& p),(void *)*(& p));
   __e_acsl_store_block((void *)(& p),(size_t)8);
   __e_acsl_full_init((void *)(& p));
-  __e_acsl_temporal_store_nblock((void *)(& p),(void *)*(& p));
   int i = 0;
   while (i < 3) {
-    /*@ assert \valid(p + i); */
     {
       int __gen_e_acsl_valid;
       __gen_e_acsl_valid = __e_acsl_valid((void *)(p + i),sizeof(int *),
@@ -21,13 +20,13 @@ int main(void)
       __e_acsl_assert(__gen_e_acsl_valid,(char *)"Assertion",(char *)"main",
                       (char *)"\\valid(p + i)",12);
     }
+    /*@ assert \valid(p + i); */ ;
+    __e_acsl_initialize((void *)(p + i),sizeof(int *));
     __e_acsl_temporal_reset_parameters();
     __e_acsl_temporal_reset_return();
-    __e_acsl_initialize((void *)(p + i),sizeof(int *));
     *(p + i) = (int *)malloc(sizeof(int));
     /*@ assert Eva: initialization: \initialized(p + i); */
     __e_acsl_temporal_store_nblock((void *)(p + i),(void *)*(p + i));
-    /*@ assert \valid(*(p + i)); */
     {
       int __gen_e_acsl_initialized;
       int __gen_e_acsl_and;
@@ -52,6 +51,7 @@ int main(void)
       __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"main",
                       (char *)"\\valid(*(p + i))",14);
     }
+    /*@ assert \valid(*(p + i)); */ ;
     i ++;
   }
   __e_acsl_temporal_reset_parameters();
@@ -62,7 +62,6 @@ int main(void)
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
   malloc(sizeof(int));
-  /*@ assert ¬\valid(*(p + 2)); */
   {
     int __gen_e_acsl_initialized_2;
     int __gen_e_acsl_and_2;
@@ -87,6 +86,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_and_2,(char *)"Assertion",(char *)"main",
                     (char *)"!\\valid(*(p + 2))",20);
   }
+  /*@ assert ¬\valid(*(p + 2)); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(& p));
   __e_acsl_memory_clean();
