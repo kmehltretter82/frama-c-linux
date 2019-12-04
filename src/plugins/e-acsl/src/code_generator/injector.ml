@@ -172,9 +172,7 @@ let add_initializer loc ?vi lv ?(post=false) stmt env kf =
   else
     env
 
-let inject_in_instr env kf stmt instr =
-  (* [TODO ARCHI] recursive calls at the right places *)
-  match instr with
+let inject_in_instr env kf stmt = function
   | Set(lv, e, loc) ->
     let e, env = replace_literal_string_in_exp env (Some kf) e in
     let env = add_initializer loc lv stmt env kf in
@@ -209,14 +207,10 @@ let inject_in_instr env kf stmt instr =
   (* nothing to do: *)
   | Asm _
   | Skip _
-  | Code_annot _ ->
+  | Code_annot _ as instr ->
     instr, env
 
 let add_new_block_in_stmt env kf stmt =
-  (* be careful: since this function is called in a post action, [env] has been
-     modified from the time where pre actions have been executed.  Use
-     [function_env] to get it back. *)
-  (* [TODO ARCHI] what about the above comment? *)
   (* Add temporal analysis instrumentations *)
   let env = Temporal.handle_stmt stmt env kf in
   let new_stmt, env =
@@ -331,9 +325,6 @@ let add_new_block_in_stmt env kf stmt =
     "@[new stmt (from sid %d):@ %a@]" stmt.sid Printer.pp_stmt new_stmt;
   new_stmt, env
 
-(* [TODO ARCHI] not sure returning the stmt_kind is useful;
-   actually probably useful for printf-like functions.
-   TO BE TESTED LATER *)
 (* visit the substmts and build the new skind *)
 let rec inject_in_substmt env kf stmt = match stmt.skind with
   | Instr instr ->
@@ -624,10 +615,10 @@ let inject_in_global (env, main) = function
   | GVar(vi, { init = Some init }, _) ->
     Global_observer.add vi;
     vi.vghost <- false;
-    (* [TODO ARCHI] check that keeping changes in initializers is useless since
-       all is done in place --> document why returning an expression is useful:
-       what may change? *)
-    let _, env = inject_in_init env None vi NoOffset init in
+    let _init, env = inject_in_init env None vi NoOffset init in
+    (* ignore the new initializer that handles literal strings since they are
+       not substituted in global initializers (see
+       [replace_literal_string_in_exp]) *)
     env, main
 
   (* function definition *)
