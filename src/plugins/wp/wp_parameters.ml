@@ -568,6 +568,14 @@ module Provers = String_list
     end)
 
 let () = Parameter_customize.set_group wp_prover
+module RunAllProvers =
+  False(struct
+    let option_name = "-wp-run-all-provers"
+    let help = "Run all specified provers on each goal not proved by Qed. \
+                Do not stop when a prover succeeds. (default: no)"
+  end)
+
+let () = Parameter_customize.set_group wp_prover
 module Cache = String
     (struct
       let option_name = "-wp-cache"
