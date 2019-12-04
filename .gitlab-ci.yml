@@ -225,4 +225,3 @@ make_public:
   - nix
   only:
   - schedules
-  - master
