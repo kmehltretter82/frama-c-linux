@@ -305,7 +305,7 @@ class dup_functions_visitor prj = object (self)
         (* it is duplicable *)
         && self#is_unvariadic_function vi (* it is not a variadic function *)
         && not (Misc.is_library_loc loc) (* it is not in the E-ACSL's RTL *)
-        && not (Cil.is_builtin vi) (* it is not a Frama-C built-in *)
+        && not (Misc.is_fc_or_compiler_builtin vi) (* it is not a built-in *)
         &&
         (let kf =
            try Globals.Functions.get vi with Not_found -> assert false
@@ -387,7 +387,7 @@ if there are memory-related annotations.@]"
                     but reading some libc code *));
     Cil.JustCopy
   | GVarDecl(vi, _) | GFunDecl(_, vi, _) | GFun({ svar = vi }, _)
-      when Cil.is_builtin vi ->
+      when Misc.is_fc_or_compiler_builtin vi ->
     self#next ();
     Cil.JustCopy
   | _ ->

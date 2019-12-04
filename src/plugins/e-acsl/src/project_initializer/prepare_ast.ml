@@ -198,7 +198,7 @@ class prepare_visitor prj = object (self)
     | GVarDecl(vi, loc) | GFunDecl(_, vi, loc) | GFun({ svar = vi }, loc)
       when self#is_unvariadic_function vi
         && not (Misc.is_library_loc loc)
-        && not (Cil.is_builtin vi)
+        && not (Misc.is_fc_or_compiler_builtin vi)
       ->
       let kf = Extlib.the self#current_kf in
       let s = Annotations.funspec ~populate:false kf in

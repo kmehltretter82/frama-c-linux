@@ -593,12 +593,12 @@ let inject_in_global (env, main) = function
 
   (* Cil built-ins and other library globals: nothing to do *)
   | GVarDecl(vi, _) | GVar(vi, _, _) | GFun({ svar = vi }, _)
-    when Cil.is_builtin vi ->
+    when Misc.is_fc_or_compiler_builtin vi ->
     env, main
   | g when Misc.is_library_loc (Global.loc g) ->
     env, main
 
-  (* variables and functions declarations *)
+  (* variable declarations *)
   | GVarDecl(vi, _) | GFunDecl(_, vi, _) ->
     (* do not convert extern ghost variables, because they can't be linked,
        see bts #1392 *)

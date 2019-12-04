@@ -51,6 +51,8 @@ val is_library_loc: location -> bool
 val register_library_function: varinfo -> unit
 val reset: unit -> unit
 
+val is_fc_or_compiler_builtin: varinfo -> bool
+
 (* ************************************************************************** *)
 (** {2 Other stuff} *)
 (* ************************************************************************** *)
@@ -102,6 +104,6 @@ val finite_min_and_max: Ival.t -> Integer.t * Integer.t
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)

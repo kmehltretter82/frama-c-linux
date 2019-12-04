@@ -111,10 +111,12 @@ let mk_init_function () =
   let stmts =
     Varinfo.Hashtbl.fold_sorted
       (fun vi _ stmts ->
-         (* a global is both allocated and initialized *)
-         Constructor.mk_store_stmt vi
-         :: Constructor.mk_initialize ~loc:Location.unknown (Cil.var vi)
-         :: stmts)
+         if Misc.is_fc_or_compiler_builtin vi then stmts
+         else
+           (* a global is both allocated and initialized *)
+           Constructor.mk_store_stmt vi
+           :: Constructor.mk_initialize ~loc:Location.unknown (Cil.var vi)
+           :: stmts)
       tbl
       stmts
   in
@@ -173,7 +175,9 @@ let mk_init_function () =
 
 let mk_delete_stmts stmts =
   Varinfo.Hashtbl.fold_sorted
-    (fun vi _l acc -> Constructor.mk_delete_stmt vi :: acc)
+    (fun vi _l acc ->
+       if Misc.is_fc_or_compiler_builtin vi then acc
+       else Constructor.mk_delete_stmt vi :: acc)
     tbl
     stmts
 

@@ -46,6 +46,14 @@ let register_library_function vi =
 
 let reset () = Datatype.String.Hashtbl.clear library_functions
 
+let is_fc_or_compiler_builtin vi =
+  Cil.is_builtin vi
+  ||
+  (String.length vi.vname >= 10
+   &&
+   let prefix = String.sub vi.vname 0 10 in
+   Datatype.String.equal prefix "__builtin_")
+
 (* ************************************************************************** *)
 (** {2 Builders} *)
 (* ************************************************************************** *)
@@ -215,6 +223,6 @@ let name_of_binop = function
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)
