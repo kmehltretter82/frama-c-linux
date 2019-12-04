@@ -57,7 +57,7 @@ let rec inject_in_init env kf_opt vi off = function
     CompoundInit(typ, List.rev l), env
 
 let inject_in_local_init loc env kf vi = function
-  | ConsInit (fvi, _sz :: _, _) as init
+  | ConsInit (fvi, sz :: _, _) as init
     when Functions.Libc.is_vla_alloc_name fvi.vname ->
     (* handle variable-length array allocation via [__fc_vla_alloc].  Here each
        instance of [__fc_vla_alloc] is rewritten to [alloca] (that is used to
@@ -70,7 +70,7 @@ let inject_in_local_init loc env kf vi = function
     fvi.vname <- Functions.Libc.actual_alloca;
     (* Since we need to pass [vi] by value, cannot use [Misc.mk_store_stmt]
        here. Do it manually. *)
-    let store = Constructor.mk_store_stmt vi in
+    let store = Constructor.mk_store_stmt ~str_size:sz vi in
     let env = Env.add_stmt ~post:true env kf store in
     init, env
 

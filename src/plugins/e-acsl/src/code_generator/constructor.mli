@@ -64,6 +64,6 @@ val mk_runtime_check:
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)

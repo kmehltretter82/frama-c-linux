@@ -118,10 +118,16 @@ let mk_named_store_stmt name ?str_size vi =
   let store = mk_rtl_call ~loc name in
   match ty, str_size with
   | TArray(_, Some _,_,_), None ->
-    store [ Cil.evar ~loc vi ; Cil.sizeOf ~loc ty ]
-  | TPtr(TInt(IChar, _), _), Some size -> store [ Cil.evar ~loc vi ; size ]
-  | _, None -> store [ Cil.mkAddrOfVi vi ; Cil.sizeOf ~loc ty ]
-  | _, Some _ -> assert false
+    store [ Cil.evar ~loc vi; Cil.sizeOf ~loc ty ]
+  | TPtr(TInt(IChar, _), _), Some size ->
+    store [ Cil.evar ~loc vi ; size ]
+  | TPtr _, Some size ->
+    (* a VLA that has been converted to a pointer by the kernel *)
+    store [ Cil.evar ~loc vi; size ]
+  | _, None ->
+    store [ Cil.mkAddrOfVi vi ; Cil.sizeOf ~loc ty ]
+  | _, Some _ ->
+    assert false
 
 let mk_store_stmt ?str_size vi =
   mk_named_store_stmt "store_block" ?str_size vi
@@ -160,6 +166,6 @@ let mk_runtime_check ?(reverse=false) kind kf e p =
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)

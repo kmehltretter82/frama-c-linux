@@ -38,7 +38,7 @@ int main(int argc, char **argv)
   ;
   __lengthof_arr = (unsigned long)LEN;
   int *arr = __builtin_alloca(sizeof(int) * __lengthof_arr);
-  __e_acsl_store_block((void *)(& arr),(size_t)8);
+  __e_acsl_store_block((void *)arr,sizeof(int) * __lengthof_arr);
   __e_acsl_store_block((void *)(& arr),(size_t)8);
   __e_acsl_full_init((void *)(& arr));
   i = 0;
