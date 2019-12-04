@@ -267,7 +267,6 @@ EACSL_CONTRIB_FILES = \
 EACSL_MANUAL_FILES = doc/manuals/*.pdf
 
 EACSL_DOC_FILES = \
-	$(EACSL_MANUAL_FILES) \
 	doc/doxygen/doxygen.cfg.in \
 	doc/Changelog \
 	man/e-acsl-gcc.sh.1
