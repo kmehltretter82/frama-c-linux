@@ -94,9 +94,9 @@ depends: [
   "ocamlfind" # needed beyond build stage, used by -load-module
   "zarith"
   "conf-autoconf" { build }
-  ( ( "lablgtk" { >= "2.18.2" } & "conf-gnomecanvas" )
-  | ( "lablgtk3" { >= "3.0.beta4" & os!="macos" } & "lablgtk3-sourceview3" ))
-  "conf-gtksourceview"
+  ( ( "lablgtk" { >= "2.18.2" } & "conf-gnomecanvas" & "conf-gtksourceview" )
+    | ( "lablgtk3" { >= "3.0.beta4" & os!="macos" }
+        & "lablgtk3-sourceview3" & "conf-gtksourceview3" ) )
   ( "alt-ergo-free" | "alt-ergo" )
   "conf-graphviz" { post }
   "yojson"
