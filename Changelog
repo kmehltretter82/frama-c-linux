@@ -14,12 +14,8 @@
 ###############################################################################
 
 ##################################
-Open Source Release <next-release>
-##################################
-
-####################################
 Open Source Release 20.0 (Calcium)
-####################################
+##################################
 
 -   Eva       [2019/11/25] In the summary, fixes the number of alarms by
               category when the RTE plugin is used, and do not count logical
