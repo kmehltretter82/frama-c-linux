@@ -664,10 +664,7 @@ and at_to_exp_no_lscope env kf t_opt label e =
       Cil.ChangeTo stmt
   end
   in
-  (* [TODO ARCHI] is it still useful? *)
   ignore (Visitor.visitFramacStmt o stmt);
-  (*let _new_stmt = Visitor.visitFramacStmt o stmt in
-  Visitor_behavior.Set.stmt bhv stmt new_stmt;*)
   res, !env_ref, C_number
 
 and env_of_li li kf env loc =

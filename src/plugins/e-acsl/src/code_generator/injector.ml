@@ -422,11 +422,6 @@ let rec inject_in_substmt env kf stmt = match stmt.skind with
 
   | TryExcept(_blk1, (_instrs, _e), _blk2, _loc) ->
     Error.not_yet "try ... except ..."
-(*    let env = inject_in_block env kf blk1 in
-    let e, env = replace_literal_string_in_exp false env kf e in
-    let env = inject_in_block env kf blk2 in
-    ignore (assert false) (* TODO ARCHI: instrs *);
-      TryExcept(blk1, (instrs, e), blk2, loc), env*)
 
   (* nothing to do: *)
   | Throw(None, _)
@@ -765,7 +760,6 @@ let reset_all ast =
   Typing.clear ();
   Cfg.clearFileCFG ~clear_id:false ast;
   Cfg.computeFileCFG ast;
-  Kernel_function.clear_sid_info (); (* [ARCHI] is it really useful? *)
   Ast.mark_as_grown ()
 
 let inject () =

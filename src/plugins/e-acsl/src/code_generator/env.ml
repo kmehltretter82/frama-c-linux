@@ -318,7 +318,6 @@ let emitter =
     ~correctness:[ Options.Gmp_only.parameter ]
     ~tuning:[]
 
-(* [TODO ARCHI] to be inlined? *)
 let add_assert kf stmt annot = Annotations.add_assert emitter ~kf stmt annot
 
 let add_stmt ?(post=false) ?before env kf stmt =
@@ -432,13 +431,8 @@ let pop_and_get ?(split=false) env stmt ~global_clear where =
        add the given [stmt] afterwards. This way, we have the guarantee that
        the final block does not contain any local, so may be transient. *)
     if split then
-      match stmt.skind with
-      (* [TODO ARCHI] would result in nicer generated pieces of code, but
-       * killing statements has huge consequences on Frama-C invariants... *)
-      (*      | Instr (Skip _) -> b *)
-      | _ ->
-        let sblock = Cil.mkStmt ~valid_sid:true (Block b) in
-        Cil.transient_block (Cil.mkBlock [ sblock; stmt ])
+      let sblock = Cil.mkStmt ~valid_sid:true (Block b) in
+      Cil.transient_block (Cil.mkBlock [ sblock; stmt ])
     else
       b
   in
