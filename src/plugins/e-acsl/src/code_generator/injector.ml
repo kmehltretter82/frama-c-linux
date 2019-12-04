@@ -648,10 +648,9 @@ let inject_in_global (env, main) = function
     env, main
 
 (* TODO: what about using [file.globalinit]? *)
-let inject_global_initializer env file main =
+let inject_global_initializer file main =
   Options.feedback ~dkey ~level:2 "building global initializer.";
-  (* [TODO ARCHI] is env really useless? *)
-  let vi, fundec, _env = Global_observer.mk_init_function env in
+  let vi, fundec = Global_observer.mk_init_function () in
   let cil_fct = GFun(fundec, Location.unknown) in
   if Mmodel_analysis.use_model () then begin
     match main with
@@ -724,13 +723,13 @@ let inject_mmodel_initializer main =
   Extlib.may handle_main main
 
 let inject_in_file file =
-  let env, main =
+  let _env, main =
     List.fold_left inject_in_global (Env.empty, None) file.globals
   in
   (* post-treatment *)
   (* extend [main] with forward initialization and put it at end *)
   if not (Global_observer.is_empty () && Literal_strings.is_empty ()) then
-    inject_global_initializer env file main;
+    inject_global_initializer file main;
   file.globals <- Logic_functions.add_generated_functions file.globals;
   inject_mmodel_initializer main
 

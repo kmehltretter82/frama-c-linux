@@ -58,7 +58,7 @@ let rec literal_in_initializer env kf = function
   | CompoundInit (_, l) ->
     List.fold_left (fun env (_, i) -> literal_in_initializer env kf i) env l
 
-let mk_init_function env =
+let mk_init_function () =
   (* Create [__e_acsl_globals_init] function with definition
      for initialization of global variables *)
   let vi =
@@ -91,7 +91,7 @@ let mk_init_function env =
   (* Now generate the statements. The generation is done only now because it
      depends on the local variable [already_run] whose generation required the
      existence of [fundec] *)
-  let env = Env.push env in
+  let env = Env.push Env.empty in
   (* 2-stage observation of initializers: temporal analysis must be performed
      after generating observers of **all** globals *)
   let env, stmts =
@@ -133,10 +133,11 @@ let mk_init_function env =
       stmts
   in
   (* Create a new code block with generated statements *)
-  let (b, env), stmts = match stmts with
+  let b, stmts = match stmts with
     | [] -> assert false
     | stmt :: stmts ->
-      Env.pop_and_get env stmt ~global_clear:true Env.Before, stmts
+      let b, _env = Env.pop_and_get env stmt ~global_clear:true Env.Before in
+      b, stmts
   in
   let stmts = Cil.mkStmt ~valid_sid:true (Block b) :: stmts in
   (* Prevent multiple calls to globals_init *)
@@ -168,7 +169,7 @@ let mk_init_function env =
   let return = Cil.mkStmt ~valid_sid:true (Return (None, loc)) in
   let stmts = [ init_stmt; guard; return ] in
   blk.bstmts <- stmts;
-  vi, fundec, env
+  vi, fundec
 
 let mk_delete_stmts stmts =
   Varinfo.Hashtbl.fold_sorted

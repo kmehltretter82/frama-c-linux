@@ -36,7 +36,7 @@ val add: varinfo -> unit
 val add_initializer: varinfo -> offset -> init -> unit
 (** add the initializer for the given observed variable *)
 
-val mk_init_function: Env.t -> varinfo * fundec * Env.t
+val mk_init_function: unit -> varinfo * fundec
 (** generates a new C function containing the observers for global variable
      declaration and initialization *)
 
@@ -45,6 +45,6 @@ val mk_delete_stmts: stmt list -> stmt list
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)
