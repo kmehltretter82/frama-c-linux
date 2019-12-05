@@ -131,8 +131,8 @@ let on_context gamma f x =
   let id = S.id gamma in
   let current = Context.push context (id,gamma) in
   try
-    Context.configure () ;
     configure gamma ;
+    Context.configure () ;
     let result = f x in
     Context.pop context current ;
     rollback current ; result

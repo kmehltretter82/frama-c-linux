@@ -276,11 +276,29 @@ let configure_mheap = function
   | Region -> MemRegion.configure ()
   | Typed p -> MemTyped.configure () ; Context.set MemTyped.pointer p
 
+module PROJECT = WpContext.Static
+    (struct
+      type key = unit
+      type data = LogicBuiltins.driver
+      let name = "PROJECT"
+      let pretty fmt _ = Format.fprintf fmt "%s" name
+      let compare _ _ = 0
+    end)
+
+let configure_driver instance_driver =
+  try PROJECT.find ()
+  with Not_found ->
+    let id = "" in
+    let project_driver = LogicBuiltins.copy ~id instance_driver in
+    PROJECT.update () project_driver ;
+    project_driver
+
 let configure (s:setup) (d:driver) () =
   begin
     configure_mheap s.mheap ;
     Cint.configure s.cint ;
     Cfloat.configure s.cfloat ;
+    let d = configure_driver d in
     Context.set LogicBuiltins.driver d ;
   end
 
@@ -298,21 +316,22 @@ module COMPILERS = FCMap.Make
 
 let instances = ref (COMPILERS.empty : WpContext.model COMPILERS.t)
 
-let instance (s:setup) (d:driver) =
-  try COMPILERS.find (s,d) !instances
+let instance setup driver =
+  try COMPILERS.find (setup,driver) !instances
   with Not_found ->
-    let id,descr = describe s in
-    let module CC = (val compiler s.mheap s.mvar) in
-    let tuning = [configure s d] in
+    let id,descr = describe setup in
+    let module CC = (val compiler setup.mheap setup.mvar) in
+    let instance_driver = LogicBuiltins.copy ~id driver in
+    let tuning = [configure setup instance_driver] in
     let hypotheses = CC.M.hypotheses in
     let id,descr =
-      if LogicBuiltins.is_default d then id,descr
+      if LogicBuiltins.is_default driver then id,descr
       else
-        ( id ^ "_" ^ LogicBuiltins.id d ,
-          descr ^ " (Driver " ^ LogicBuiltins.descr d ^ ")" )
+        ( id ^ "_" ^ LogicBuiltins.id driver ,
+          descr ^ " (Driver " ^ LogicBuiltins.descr driver ^ ")" )
     in
     let model = WpContext.register ~id ~descr ~tuning ~hypotheses () in
-    instances := COMPILERS.add (s,d) model !instances ; model
+    instances := COMPILERS.add (setup,driver) model !instances ; model
 
 let ident s = fst (describe s)
 let descr s = snd (describe s)

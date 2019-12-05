@@ -339,7 +339,7 @@ and bal = parse
           | ACSLDEF -> failwith (Printf.sprintf "Symbol '%s' not found" op)
           | HACK _ -> failwith (Printf.sprintf "Symbol '%s' hacked" op)
           | LFUN lfun -> E_fun(lfun,[])
-                             
+
   let rec op_link op input =
     match token input with
       | LINK _ | RECLINK _ ->
@@ -490,16 +490,15 @@ and bal = parse
   let load_driver () =
     let drivers = Wp_parameters.Drivers.get () in
     begin try
-        let driver = Hashtbl.find loaded drivers in
-        Context.set LogicBuiltins.driver driver
+        Hashtbl.find loaded drivers
       with Not_found ->
-	let driver_basename file =
-	  let base = Filename.basename file in
-	  try Filename.chop_extension base
-	  with Invalid_argument _ -> base in
-	let drvs = List.map driver_basename drivers in
+        let driver_basename file =
+        let base = Filename.basename file in
+       try Filename.chop_extension base
+       with Invalid_argument _ -> base in
+        let drvs = List.map driver_basename drivers in
         let id = String.concat "_" drvs in
-	let descr = String.concat "," drvs in
+        let descr = String.concat "," drvs in
         let includes =
           let directories =
             try [Wp_parameters.Share.dir ~error:false ()]
@@ -513,12 +512,13 @@ and bal = parse
               );
           directories
         in
-        LogicBuiltins.init ~id ~descr ~includes () ;
-	let drivers =
-	  List.map (fun file ->
-		      if Sys.file_exists file
-		      then Filepath.normalize file
-		      else LogicBuiltins.find_lib file)
+        let driver = LogicBuiltins.init ~id ~descr ~includes () in
+        let old_driver = Context.push LogicBuiltins.driver driver in
+        let drivers =
+          List.map (fun file ->
+              if Sys.file_exists file
+              then Filepath.normalize file
+              else LogicBuiltins.find_lib file)
             drivers in
         let default = Wp_parameters.Share.file ~error:true "wp.driver" in
         let feedback = Wp_parameters.Share.Dir_name.is_set () in
@@ -526,7 +526,10 @@ and bal = parse
         load_file ~ontty default;
         List.iter load_file drivers;
         Hashtbl.add loaded drivers (Context.get LogicBuiltins.driver);
-        if Wp_parameters.has_dkey dkey_driver  then LogicBuiltins.dump ()
-    end ; Context.get LogicBuiltins.driver
+        if Wp_parameters.has_dkey dkey_driver  then LogicBuiltins.dump () ;
+        Context.pop LogicBuiltins.driver old_driver ;
+        LogicBuiltins.lock driver ;
+        driver
+    end
 
 }
