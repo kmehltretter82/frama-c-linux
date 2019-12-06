@@ -27,8 +27,8 @@ let init_set ~loc lval vi_e e =
   Cil.mkStmt
     ~valid_sid:true
     (Block (Cil.mkBlock
-      [ Gmp.init ~loc vi_e ;
-        Gmp.affect ~loc lval vi_e e ]))
+              [ Gmp.init ~loc vi_e ;
+                Gmp.affect ~loc lval vi_e e ]))
 
 let create ~loc ?name e env kf t_opt =
   let ty = Cil.typeOf e in
@@ -120,7 +120,7 @@ let decimal_to_fractional str =
   let strlen = String.length str in
   let buflen =
     (* The fractional representation is at most twice as lengthy
-      as the decimal one. *)
+       as the decimal one. *)
     2 * strlen
   in
   try pre str strlen (Bytes.create buflen) 0

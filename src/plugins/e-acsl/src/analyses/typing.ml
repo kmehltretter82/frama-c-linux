@@ -28,9 +28,9 @@ open Cil_types
 let dkey = Options.dkey_typing
 
 let compute_quantif_guards_ref
-    : (predicate -> logic_var list -> predicate ->
-       (term * relation * logic_var * relation * term) list) ref
-    = Extlib.mk_fun "compute_quantif_guards_ref"
+  : (predicate -> logic_var list -> predicate ->
+     (term * relation * logic_var * relation * term) list) ref
+  = Extlib.mk_fun "compute_quantif_guards_ref"
 
 (******************************************************************************)
 (** Datatype and constructor *)
@@ -168,11 +168,11 @@ let typ_of_lty = function
 (******************************************************************************)
 
 type computed_info =
-    { ty: D.t;  (* type required for the term *)
-      op: D.t; (* type required for the operation *)
-      cast: D.t option; (* if not [None], type of the context which the term
+  { ty: D.t;  (* type required for the term *)
+    op: D.t; (* type required for the operation *)
+    cast: D.t option; (* if not [None], type of the context which the term
                          must be casted to. If [None], no cast needed. *)
-    }
+  }
 
 (* Memoization module which retrieves the computed info of some terms. If the
    info is already computed for a term, it is never recomputed *)
@@ -183,23 +183,23 @@ module Memo: sig
 end = struct
 
   module H = Hashtbl.Make(struct
-    type t = term
-    (* the comparison over terms is the physical equality. It cannot be the
-       structural one (given by [Cil_datatype.Term.equal]) because the very
-       same term can be used in 2 different contexts which lead to different
-       casts.
+      type t = term
+      (* the comparison over terms is the physical equality. It cannot be the
+         structural one (given by [Cil_datatype.Term.equal]) because the very
+         same term can be used in 2 different contexts which lead to different
+         casts.
 
-       By construction, there are no physically equal terms in the AST
-       built by Cil. Consequently the memoisation should be fully
-       useless. However the translation of E-ACSL guarded quantification
-       generates new terms (see module {!Quantif}) which must be typed. The term
-       corresponding to the bound variable [x] is actually used twice: once in
-       the guard and once for encoding [x+1] when incrementing it. The
-       memoization is only useful here and indeed prevent the generation of
-       one extra variable in some cases. *)
-    let equal (t1:term) t2 = t1 == t2
-    let hash = Cil_datatype.Term.hash
-  end)
+         By construction, there are no physically equal terms in the AST
+         built by Cil. Consequently the memoisation should be fully
+         useless. However the translation of E-ACSL guarded quantification
+         generates new terms (see module {!Quantif}) which must be typed. The term
+         corresponding to the bound variable [x] is actually used twice: once in
+         the guard and once for encoding [x+1] when incrementing it. The
+         memoization is only useful here and indeed prevent the generation of
+         one extra variable in some cases. *)
+      let equal (t1:term) t2 = t1 == t2
+      let hash = Cil_datatype.Term.hash
+    end)
 
   let tbl = H.create 97
 
@@ -246,10 +246,10 @@ let ty_of_interv ?ctx = function
        | Some (C_float _ | Rational | Real as ty) ->
          ty)
     with Cil.Not_representable ->
-      match ctx with
-      | None | Some(C_integer _ | Gmpz | Nan) -> Gmpz
-      | Some (C_float _ | Rational) -> Rational
-      | Some Real -> Real
+    match ctx with
+    | None | Some(C_integer _ | Gmpz | Nan) -> Gmpz
+    | Some (C_float _ | Rational) -> Rational
+    | Some Real -> Real
 
 (* compute a new {!computed_info} by coercing the given type [ty] to the given
    context [ctx]. [op] is the type for the operator. *)
@@ -263,9 +263,9 @@ let coerce ~arith_operand ~ctx ~op ty =
        or if the term corresponding to [ty] is an operand of an arithmetic
        operation which must be explicitly coerced in order to force the
        operation to be of the expected type. *)
-    if (ctx = Gmpz && ty <> Gmpz) || arith_operand
-    then { ty; op; cast = Some ctx }
-    else { ty; op; cast = None }
+  if (ctx = Gmpz && ty <> Gmpz) || arith_operand
+  then { ty; op; cast = Some ctx }
+  else { ty; op; cast = None }
 
 let number_ty_of_typ ty = match Cil.unrollType ty with
   | TInt(ik, _) | TEnum({ ekind = ik }, _) -> C_integer ik
@@ -723,13 +723,13 @@ let get_integer_op_of_predicate p = (type_predicate p).op
 let extract_typ t ty =
   try typ_of_number_ty ty
   with Not_a_number ->
-    match t.term_type with
-    | Ctype _ as lty -> Logic_utils.logicCType lty
-    | Linteger | Lreal ->
-      Options.fatal "unexpected context NaN for term %a" Printer.pp_term t
-    | Ltype _ -> Error.not_yet "unsupported logic type: user-defined type"
-    | Lvar _ -> Error.not_yet "unsupported logic type: type variable"
-    | Larrow _ -> Error.not_yet "unsupported logic type: type arrow"
+  match t.term_type with
+  | Ctype _ as lty -> Logic_utils.logicCType lty
+  | Linteger | Lreal ->
+    Options.fatal "unexpected context NaN for term %a" Printer.pp_term t
+  | Ltype _ -> Error.not_yet "unsupported logic type: user-defined type"
+  | Lvar _ -> Error.not_yet "unsupported logic type: type variable"
+  | Larrow _ -> Error.not_yet "unsupported logic type: type arrow"
 
 let get_typ t =
   let info = Memo.get t in

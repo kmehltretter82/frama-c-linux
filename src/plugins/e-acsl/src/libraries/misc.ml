@@ -62,12 +62,12 @@ let is_fc_or_compiler_builtin vi =
 exception Unregistered_library_function of string
 let get_lib_fun_vi fname =
   try Datatype.String.Hashtbl.find library_functions fname
-    with Not_found ->
-      try Builtins.find fname
-      with Not_found ->
-        (* should not happen in normal mode, but could be raised when E-ACSL is
-           used as a library *)
-        raise (Unregistered_library_function fname)
+  with Not_found ->
+  try Builtins.find fname
+  with Not_found ->
+    (* should not happen in normal mode, but could be raised when E-ACSL is
+       used as a library *)
+    raise (Unregistered_library_function fname)
 
 (* ************************************************************************** *)
 (** {2 Handling \result} *)
@@ -97,7 +97,7 @@ let reorder_ast () =
   let ast = Ast.get() in
   let is_from_library = function
     | GType(ti, _) when ti.tname = "size_t" || ti.tname = "FILE"
-      || RTL.is_rtl_name ti.tname -> true
+                        || RTL.is_rtl_name ti.tname -> true
     | GCompTag (ci, _) when RTL.is_rtl_name ci.cname -> true
     | GFunDecl(_, _, loc) | GVarDecl(_, loc) when is_library_loc loc -> true
     | _ -> false in
@@ -117,14 +117,14 @@ let rec ptr_index ?(loc=Location.unknown) ?(index=(Cil.zero loc)) exp =
   match exp.enode with
   | BinOp(op, lhs, rhs, _) ->
     (match op with
-    (* Pointer arithmetic: split pointer and integer parts *)
-    | MinusPI | PlusPI | IndexPI ->
-      let index = Cil.mkBinOp exp.eloc (arith_op op) index rhs in
-      ptr_index ~index lhs
-    (* Other arithmetic: treat the whole expression as pointer address *)
-    | MinusPP | PlusA | MinusA | Mult | Div | Mod
-    | BAnd | BXor | BOr | Shiftlt | Shiftrt
-    | Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr -> (exp, index))
+     (* Pointer arithmetic: split pointer and integer parts *)
+     | MinusPI | PlusPI | IndexPI ->
+       let index = Cil.mkBinOp exp.eloc (arith_op op) index rhs in
+       ptr_index ~index lhs
+     (* Other arithmetic: treat the whole expression as pointer address *)
+     | MinusPP | PlusA | MinusA | Mult | Div | Mod
+     | BAnd | BXor | BOr | Shiftlt | Shiftrt
+     | Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr -> (exp, index))
   | CastE _ -> ptr_index ~loc ~index (Cil.stripCasts exp)
   | Info (exp, _) -> ptr_index ~loc ~index exp
   | Const _ | StartOf _ | AddrOf _ | Lval _ | UnOp _ -> (exp, index)
@@ -133,9 +133,9 @@ let rec ptr_index ?(loc=Location.unknown) ?(index=(Cil.zero loc)) exp =
 
 (* TODO: should not be in this file *)
 let term_of_li li =  match li.l_body with
-| LBterm t -> t
-| LBnone | LBreads _ | LBpred _ | LBinductive _ ->
-  Options.fatal "li.l_body does not match LBterm(t) in Misc.term_of_li"
+  | LBterm t -> t
+  | LBnone | LBreads _ | LBpred _ | LBinductive _ ->
+    Options.fatal "li.l_body does not match LBterm(t) in Misc.term_of_li"
 
 let is_set_of_ptr_or_array lty =
   if Logic_const.is_set_type lty then
@@ -149,8 +149,8 @@ let is_range_free t =
   try
     let has_range_visitor = object inherit Visitor.frama_c_inplace
       method !vterm t = match t.term_node with
-      | Trange _ -> raise Range_found_exception
-      | _ -> Cil.DoChildren
+        | Trange _ -> raise Range_found_exception
+        | _ -> Cil.DoChildren
     end
     in
     ignore (Visitor.visitFramacTerm has_range_visitor t);
@@ -181,8 +181,8 @@ let term_has_lv_from_vi t =
   try
     let o = object inherit Visitor.frama_c_inplace
       method !vlogic_var_use lv = match lv.lv_origin with
-      | None -> Cil.DoChildren
-      | Some _ -> raise Lv_from_vi_found
+        | None -> Cil.DoChildren
+        | Some _ -> raise Lv_from_vi_found
     end
     in
     ignore (Visitor.visitFramacTerm o t);

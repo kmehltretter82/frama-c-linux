@@ -24,8 +24,8 @@ open Cil_types
 
 (* store the E-ACSL built-ins by associating a varinfo to its name. *)
 let tbl
-    : varinfo ref Datatype.String.Hashtbl.t
-    = Datatype.String.Hashtbl.create 7
+  : varinfo ref Datatype.String.Hashtbl.t
+  = Datatype.String.Hashtbl.create 7
 
 let mem = Datatype.String.Hashtbl.mem tbl
 let find s = !(Datatype.String.Hashtbl.find tbl s)

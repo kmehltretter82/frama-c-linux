@@ -23,8 +23,8 @@
 open Cil_types
 
 let strings
-    : varinfo Datatype.String.Hashtbl.t
-    = Datatype.String.Hashtbl.create 16
+  : varinfo Datatype.String.Hashtbl.t
+  = Datatype.String.Hashtbl.create 16
 
 let reset () = Datatype.String.Hashtbl.clear strings
 

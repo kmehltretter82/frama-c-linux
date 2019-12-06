@@ -82,8 +82,8 @@ let unmemoized_extend_ast () =
     in
     Project.on prj
       (fun () ->
-        Kernel.Files.set [ tmpfile ];
-        extend ())
+         Kernel.Files.set [ tmpfile ];
+         extend ())
       ();
     Some prj
   end else begin
@@ -96,8 +96,8 @@ let extend_ast () = match !extended_ast_project with
     let prj = unmemoized_extend_ast () in
     extended_ast_project := Already_extended prj;
     (match prj with
-    | None -> Project.current ()
-    | Some prj -> prj)
+     | None -> Project.current ()
+     | Some prj -> prj)
   | Already_extended None ->
     Project.current ()
   | Already_extended(Some prj) ->
@@ -107,12 +107,12 @@ let apply_on_e_acsl_ast f x =
   let tmp_prj = extend_ast () in
   let res = Project.on tmp_prj f x in
   (match !extended_ast_project with
-  | To_be_extended -> assert false
-  | Already_extended None -> ()
-  | Already_extended (Some prj) ->
-    assert (Project.equal prj tmp_prj);
-    extended_ast_project := To_be_extended;
-    if Options.Debug.get () = 0 then Project.remove ~project:tmp_prj ());
+   | To_be_extended -> assert false
+   | Already_extended None -> ()
+   | Already_extended (Some prj) ->
+     assert (Project.equal prj tmp_prj);
+     extended_ast_project := To_be_extended;
+     if Options.Debug.get () = 0 then Project.remove ~project:tmp_prj ());
   res
 
 module Resulting_projects =
@@ -123,7 +123,7 @@ module Resulting_projects =
       let name = "E-ACSL resulting projects"
       let size = 7
       let dependencies = Ast.self :: Options.parameter_states
-     end)
+    end)
 
 let () =
   State_dependency_graph.add_dependencies
@@ -161,7 +161,7 @@ let generate_code =
                         in
                         Project.clear ~selection ~project:copied_prj ();
                         Resulting_projects.mark_as_computed ())
-                       ();
+                     ();
                    if Options.Debug.get () = 0 then
                      Project.remove ~project:dup_prj ();
                    copied_prj)
@@ -238,12 +238,12 @@ let main () =
     change_printer ();
     ignore (generate_code (Options.Project_name.get ()))
   end else
-    if Options.Check.get () then
-      apply_on_e_acsl_ast
-        (fun () ->
-          Gmp_types.init ();
-          ignore (check ()))
-        ()
+  if Options.Check.get () then
+    apply_on_e_acsl_ast
+      (fun () ->
+         Gmp_types.init ();
+         ignore (check ()))
+      ()
 
 let () = Db.Main.extend main
 

@@ -26,25 +26,25 @@ let untypable s = raise (Typing_error s)
 exception Not_yet of string
 let not_yet s = raise (Not_yet s)
 
-module Nb_typing = 
+module Nb_typing =
   State_builder.Ref
     (Datatype.Int)
     (struct
       let name = "E_ACSL.Error.Nb_typing"
       let default () = 0
       let dependencies = [ Ast.self ]
-     end)
+    end)
 
 let nb_untypable = Nb_typing.get
 
-module Nb_not_yet = 
+module Nb_not_yet =
   State_builder.Ref
     (Datatype.Int)
     (struct
       let name = "E_ACSL.Error.Nb_not_yet"
       let default () = 0
       let dependencies = [ Ast.self ]
-     end)
+    end)
 
 let nb_not_yet = Nb_not_yet.get
 
@@ -58,9 +58,9 @@ let generic_handle f res x =
     Nb_typing.set (Nb_typing.get () + 1);
     res
   | Not_yet s ->
-    let msg = 
+    let msg =
       Format.sprintf "@[E-ACSL construct@ `%s'@ is not yet supported.@]" s
-    in 
+    in
     Options.warning ~once:true ~current:true "@[%s@ Ignoring annotation.@]" msg;
     Nb_not_yet.set (Nb_not_yet.get () + 1);
     res

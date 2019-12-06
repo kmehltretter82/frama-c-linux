@@ -21,12 +21,12 @@
 (**************************************************************************)
 
 (** E-ACSL tracks a local variable by injecting:
-   - a call to [__e_acsl_store_block] at the beginning of its scope, and
-   - a call to [__e_acsl_delete_block] at the end of the scope.
-   This is not always sufficient to track variables because execution
-   may exit a scope early (for instance via a goto or a break statement).
-   This module computes program points at which extra `delete_block` statements
-   need to be added to handle such early scope exits. *)
+    - a call to [__e_acsl_store_block] at the beginning of its scope, and
+    - a call to [__e_acsl_delete_block] at the end of the scope.
+      This is not always sufficient to track variables because execution
+      may exit a scope early (for instance via a goto or a break statement).
+      This module computes program points at which extra `delete_block` statements
+      need to be added to handle such early scope exits. *)
 
 open Cil_types
 open Cil_datatype
@@ -39,10 +39,10 @@ val clear: unit -> unit
 
 val delete_vars: stmt -> Varinfo.Set.t
 (** Given a statement which potentially leads to an early scope exit (such as
-   goto, break or continue) return the list of local variables which
-   need to be removed from tracking before that statement is executed.
-   Before calling this function [generate] need to be executed. *)
+    goto, break or continue) return the list of local variables which
+    need to be removed from tracking before that statement is executed.
+    Before calling this function [generate] need to be executed. *)
 
 val store_vars: stmt -> Varinfo.Set.t
 (** Compute variables that should be re-recorded before a labelled statement to
-   which some goto jumps *)
+    which some goto jumps *)

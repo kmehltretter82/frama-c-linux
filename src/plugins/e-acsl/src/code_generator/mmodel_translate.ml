@@ -39,15 +39,15 @@ let term_to_exp_ref
 (*****************************************************************************)
 
 (* We call Range Elimination the operation through which ranges are
-  substituted by universally quantified logic variables.
-  Example:
+   substituted by universally quantified logic variables.
+   Example:
     [\valid(&t[(n-1)..(n+2)][1][0..1])] can be soundly transformed into
     [\forall integer q1; n-1 <= q1 <= n+2 ==>
       \forall integer q2; 0 <= q2 <= 1 ==>
         \valid(&t[q1][1][q2])]
-  However, the substitution can be unsound,
-  in which case [Range_elimination_exception] must be raised.
-  Example:
+   However, the substitution can be unsound,
+   in which case [Range_elimination_exception] must be raised.
+   Example:
     [\valid(&t[(0..2)==(0..2) ? 0 : 1])] is equivalent to [\valid(&t[0])]
       since [==] refers to set equality when applied on ranges.
     But Range Elimination will give a predicate equivalent to [\valid(&t[1])]
@@ -65,8 +65,8 @@ let rec has_set_as_index = function
     has_set_as_index toffset
 
 (* Performs Range Elimination on index [TIndex(term, offset)]. Term part.
-  Raises [Range_elimination_exception] if whether the operation is unsound or
-  if we don't support the construction yet. *)
+   Raises [Range_elimination_exception] if whether the operation is unsound or
+   if we don't support the construction yet. *)
 let eliminate_ranges_from_index_of_term ~loc t =
   match t.term_node with
   | Trange(Some n1, Some n2) ->
@@ -78,9 +78,9 @@ let eliminate_ranges_from_index_of_term ~loc t =
     raise Range_elimination_exception
 
 (* Performs Range Elimination on index [TIndex(term, offset)]. Offset part.
-  Raises [Range_elimination_exception], through [eliminate_ranges_from_
-  index_of_term], if whether the operation is unsound or
-  if we don't support the construction yet. *)
+   Raises [Range_elimination_exception], through [eliminate_ranges_from_
+   index_of_term], if whether the operation is unsound or
+   if we don't support the construction yet. *)
 let rec eliminate_ranges_from_index_of_toffset ~loc toffset quantifiers =
   match toffset with
   | TIndex(t, toffset') ->
@@ -114,7 +114,7 @@ let rec eliminate_ranges_from_index_of_toffset ~loc toffset quantifiers =
 (* \base_addr, \block_length, \offset and \freeable *)
 let call ~loc kf name ctx env t =
   assert (name = "base_addr" || name = "block_length"
-    || name = "offset" || name ="freeable");
+          || name = "offset" || name ="freeable");
   let e, env = !term_to_exp_ref kf (Env.rte env true) t in
   let _, res, env =
     Env.new_var
@@ -125,8 +125,8 @@ let call ~loc kf name ctx env t =
       None
       ctx
       (fun v _ ->
-        let name = Functions.RTL.mk_api_name name in
-        [ Constructor.mk_lib_call ~loc ~result:(Cil.var v) name [ e ] ])
+         let name = Functions.RTL.mk_api_name name in
+         [ Constructor.mk_lib_call ~loc ~result:(Cil.var v) name [ e ] ])
   in
   res, env
 
@@ -142,7 +142,7 @@ let gmp_to_sizet ~loc kf env size p =
   let sizet = Cil.(theMachine.typeOfSizeOf) in
   (* The guard *)
   let sizet_max = Logic_const.tint
-    ~loc (Cil.max_unsigned_number (Cil.bitsSizeOf sizet))
+      ~loc (Cil.max_unsigned_number (Cil.bitsSizeOf sizet))
   in
   let guard_upper = Logic_const.prel ~loc (Rlt, size, sizet_max) in
   let guard_lower = Logic_const.prel ~loc (Rle, Cil.lzero ~loc (), size) in
@@ -152,24 +152,24 @@ let gmp_to_sizet ~loc kf env size p =
   (* Translate term [size] into an exp of type [size_t] *)
   let size, env = !term_to_exp_ref kf env size in
   let  _, e, env = Env.new_var
-    ~loc
-    ~name:"size"
-    env
-    kf
-    None
-    sizet
-    (fun vi _ ->
-      [ Constructor.mk_runtime_check ~reverse:true Constructor.RTE kf guard p;
-        Constructor.mk_lib_call ~loc
-          ~result:(Cil.var vi)
-          "__gmpz_get_ui"
-          [ size ] ])
+      ~loc
+      ~name:"size"
+      env
+      kf
+      None
+      sizet
+      (fun vi _ ->
+         [ Constructor.mk_runtime_check ~reverse:true Constructor.RTE kf guard p;
+           Constructor.mk_lib_call ~loc
+             ~result:(Cil.var vi)
+             "__gmpz_get_ui"
+             [ size ] ])
   in
   e, env
 
 (* Call to [__e_acsl_<name>] for terms of the form [ptr + r]
-  when [<name> = valid or initialized or valid_read] and
-  where [ptr] is an address and [r] a range offset *)
+   when [<name> = valid or initialized or valid_read] and
+   where [ptr] is an address and [r] a range offset *)
 let call_memory_block ~loc kf name ctx env ptr r p =
   let n1, n2 = match r.term_node with
     | Trange(Some n1, Some n2) ->
@@ -188,12 +188,12 @@ let call_memory_block ~loc kf name ctx env ptr r p =
   (* ptr *)
   let typ_charptr = Cil.charPtrType in
   let ptr = Logic_const.term
-    ~loc
-    (TBinOp(
-      PlusPI,
-      Logic_utils.mk_cast ~loc ~force:false typ_charptr ptr,
-      Logic_const.term ~loc (TBinOp(Mult, s, n1)) Linteger))
-    (Ctype typ_charptr)
+      ~loc
+      (TBinOp(
+          PlusPI,
+          Logic_utils.mk_cast ~loc ~force:false typ_charptr ptr,
+          Logic_const.term ~loc (TBinOp(Mult, s, n1)) Linteger))
+      (Ctype typ_charptr)
   in
   Typing.type_term ~use_gmp_opt:false ~ctx:Typing.nan ptr;
   let term_to_exp = !term_to_exp_ref in
@@ -207,9 +207,9 @@ let call_memory_block ~loc kf name ctx env ptr r p =
     Logic_const.term
       ~loc
       (TBinOp(
-        Mult,
-        s,
-        Logic_const.term ~loc (TBinOp(MinusA, n2, n1)) Linteger))
+          Mult,
+          s,
+          Logic_const.term ~loc (TBinOp(MinusA, n2, n1)) Linteger))
       Linteger
   in
   Typing.type_term ~use_gmp_opt:false size_term;
@@ -239,18 +239,18 @@ let call_memory_block ~loc kf name ctx env ptr r p =
       None
       ctx
       (fun v _ ->
-        let fname = Functions.RTL.mk_api_name name in
-        let args = match name with
-        | "valid" | "valid_read" -> [ ptr; size; base; base_addr ]
-        | "initialized" -> [ ptr; size ]
-        | _ -> Error.not_yet ("builtin " ^ name)
-        in
-        [ Constructor.mk_lib_call ~loc ~result:(Cil.var v) fname args ])
+         let fname = Functions.RTL.mk_api_name name in
+         let args = match name with
+           | "valid" | "valid_read" -> [ ptr; size; base; base_addr ]
+           | "initialized" -> [ ptr; size ]
+           | _ -> Error.not_yet ("builtin " ^ name)
+         in
+         [ Constructor.mk_lib_call ~loc ~result:(Cil.var v) fname args ])
   in
   e, env
 
 (* [call_with_ranges] handles ranges in [t] when calling builtin [name].
-  It only supports the following cases for the time being:
+   It only supports the following cases for the time being:
     A: [\builtin(ptr+r)] where [ptr] is an address and [r] a range or
        [\builtin(t[r])] or
        [\builtin(t[i_1]...[i_n])] where [t] is dynamically allocated
@@ -263,7 +263,7 @@ let call_memory_block ~loc kf name ctx env ptr r p =
     C: Any other use of ranges/No range
        Call [call_default] which performs the translation for
        range free terms, and raises Not_yet if it ever encounters a range.
-  Example for case:
+   Example for case:
     A: [\valid(&t[3..5])]
        Contiguous locations -> a single call to [__e_acsl_valid]
     B: [\valid(&t[4][3..5][2])]
@@ -307,16 +307,16 @@ let call_with_ranges ~loc kf name ctx env t p call_default =
           | "initialized" -> call Logic_const.pinitialized
           | "valid_read" -> call Logic_const.pvalid_read
           | _ -> Options.fatal "[call_with_ranges] unexpected builtin"
-          in
-          let p_quantified = List.fold_left
+        in
+        let p_quantified = List.fold_left
             (fun p (tmin, lv, tmax) ->
-              (* \forall integer tlv; tmin <= tlv <= tmax ==> p *)
-              let tlv = Logic_const.tvar ~loc lv in
-              let lower_bound = Logic_const.prel ~loc (Rle, tmin, tlv) in
-              let upper_bound = Logic_const.prel ~loc (Rle, tlv, tmax) in
-              let bound = Logic_const.pand ~loc (lower_bound, upper_bound) in
-              let bound_imp_p = Logic_const.pimplies ~loc (bound, p) in
-              Logic_const.pforall ~loc ([lv], bound_imp_p))
+               (* \forall integer tlv; tmin <= tlv <= tmax ==> p *)
+               let tlv = Logic_const.tvar ~loc lv in
+               let lower_bound = Logic_const.prel ~loc (Rle, tmin, tlv) in
+               let upper_bound = Logic_const.prel ~loc (Rle, tlv, tmax) in
+               let bound = Logic_const.pand ~loc (lower_bound, upper_bound) in
+               let bound_imp_p = Logic_const.pimplies ~loc (bound, p) in
+               Logic_const.pforall ~loc ([lv], bound_imp_p))
             p_quantified
             quantifiers
         in
@@ -347,12 +347,12 @@ let call_with_size ~loc kf name ctx env t p =
         None
         ctx
         (fun v _ ->
-          let ty = Misc.cty t.term_type in
-          let sizeof = Misc.mk_ptr_sizeof ty loc in
-          [ Constructor.mk_rtl_call ~loc
-              ~result:(Cil.var v)
-              name
-              [ e; sizeof ] ])
+           let ty = Misc.cty t.term_type in
+           let sizeof = Misc.mk_ptr_sizeof ty loc in
+           [ Constructor.mk_rtl_call ~loc
+               ~result:(Cil.var v)
+               name
+               [ e; sizeof ] ])
     in
     res, env
   in
@@ -387,10 +387,10 @@ let call_valid ~loc kf name ctx env t p =
         None
         ctx
         (fun v _ ->
-          let ty = Misc.cty t.term_type in
-          let sizeof = Misc.mk_ptr_sizeof ty loc in
-          let args = [ e; sizeof; base; base_addr ] in
-          [ Constructor.mk_rtl_call ~loc ~result:(Cil.var v) name args ])
+           let ty = Misc.cty t.term_type in
+           let sizeof = Misc.mk_ptr_sizeof ty loc in
+           let args = [ e; sizeof; base; base_addr ] in
+           [ Constructor.mk_rtl_call ~loc ~result:(Cil.var v) name args ])
     in
     res, env
   in
