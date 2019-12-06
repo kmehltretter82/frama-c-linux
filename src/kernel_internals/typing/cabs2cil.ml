@@ -2597,12 +2597,15 @@ let rec combineTypes (what: combineWhat) (oldt: typ) (t: typ) : typ =
       | Some _, None -> oldsz
       | None, None -> sz
       | Some oldsz', Some sz' ->
-        (* They are not structurally equal. But perhaps they are equal if
-         * we evaluate them. Check first machine independent comparison  *)
+        (* They are not structurally equal. But perhaps they are equal if we
+           evaluate them. Check first machine independent comparison. *)
         let checkEqualSize (machdep: bool) =
+          let size_t = Cil.theMachine.Cil.typeOfSizeOf in
+          let size_t_oldsz' = Cil.mkCast ~force:false ~e:oldsz' ~newt:size_t in
+          let size_t_sz' = Cil.mkCast ~force:false ~e:sz' ~newt:size_t in
           ExpStructEq.equal
-            (constFold machdep oldsz')
-            (constFold machdep sz')
+            (constFold machdep size_t_oldsz')
+            (constFold machdep size_t_sz')
         in
         if checkEqualSize false then
           oldsz
@@ -2610,7 +2613,7 @@ let rec combineTypes (what: combineWhat) (oldt: typ) (t: typ) : typ =
           Kernel.warning ~current:true
             "Array type comparison succeeds only based on machine-dependent \
              constant evaluation: %a and %a\n"
-            Cil_printer.pp_exp oldsz' Cil_printer.pp_exp sz' ;
+            Cil_printer.pp_exp oldsz' Cil_printer.pp_exp sz';
           oldsz
         end else
           raise (Cannot_combine "different array lengths")
