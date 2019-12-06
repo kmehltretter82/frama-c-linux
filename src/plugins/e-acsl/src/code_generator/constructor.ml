@@ -47,11 +47,11 @@ let kind_to_string loc k =
   Cil.mkString
     ~loc
     (match k with
-    | Assertion -> "Assertion"
-    | Precondition -> "Precondition"
-    | Postcondition -> "Postcondition"
-    | Invariant -> "Invariant"
-    | RTE -> "RTE")
+     | Assertion -> "Assertion"
+     | Precondition -> "Precondition"
+     | Postcondition -> "Postcondition"
+     | Invariant -> "Invariant"
+     | RTE -> "RTE")
 
 let mk_block stmt b = match b.bstmts with
   | [] ->
@@ -72,13 +72,13 @@ let mk_lib_call ~loc ?result fname args =
   let make_args args ty_params =
     List.map2
       (fun (_, ty, _) arg ->
-        let e =
-          match ty, Cil.unrollType (Cil.typeOf arg), arg.enode with
-          | TPtr _, TArray _, Lval lv -> Cil.new_exp ~loc (StartOf lv)
-          | TPtr _, TArray _, _ -> assert false
-          | _, _, _ -> arg
-        in
-        Cil.mkCast ~force:false ~newt:ty ~e)
+         let e =
+           match ty, Cil.unrollType (Cil.typeOf arg), arg.enode with
+           | TPtr _, TArray _, Lval lv -> Cil.new_exp ~loc (StartOf lv)
+           | TPtr _, TArray _, _ -> assert false
+           | _, _, _ -> arg
+         in
+         Cil.mkCast ~force:false ~newt:ty ~e)
       ty_params
       args
   in
