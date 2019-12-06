@@ -406,7 +406,6 @@ ML_LINT_KO+=src/plugins/e-acsl/src/code_generator/temporal.ml
 ML_LINT_KO+=src/plugins/e-acsl/src/code_generator/temporal.mli
 ML_LINT_KO+=src/plugins/e-acsl/src/code_generator/translate.ml
 ML_LINT_KO+=src/plugins/e-acsl/src/code_generator/translate.mli
-ML_LINT_KO+=src/plugins/e-acsl/src/code_generator/visit.ml
 ML_LINT_KO+=src/plugins/e-acsl/src/libraries/builtins.ml
 ML_LINT_KO+=src/plugins/e-acsl/src/libraries/error.ml
 ML_LINT_KO+=src/plugins/e-acsl/src/libraries/error.mli
