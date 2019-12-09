@@ -280,27 +280,25 @@ module PROJECT = WpContext.Static
     (struct
       type key = unit
       type data = LogicBuiltins.driver
-      let name = "PROJECT"
+      let name = "Wp.Factory.PROJECT"
       let pretty fmt _ = Format.fprintf fmt "%s" name
       let compare _ _ = 0
     end)
 
-let configure_driver instance_driver =
-  try PROJECT.find ()
-  with Not_found ->
-    let id = "" in
-    let project_driver = LogicBuiltins.copy ~id instance_driver in
-    PROJECT.update () project_driver ;
-    project_driver
-
-let configure (s:setup) (d:driver) () =
-  begin
-    configure_mheap s.mheap ;
-    Cint.configure s.cint ;
-    Cfloat.configure s.cfloat ;
-    let d = configure_driver d in
-    Context.set LogicBuiltins.driver d ;
-  end
+let configure_driver setup base project_configure =
+  configure_mheap setup.mheap ;
+  Cint.configure setup.cint ;
+  Cfloat.configure setup.cfloat ;
+  let project_driver = try PROJECT.find ()
+    with Not_found ->
+      let id = "" in
+      let project_driver =
+        LogicBuiltins.new_driver ~base ~id ~configure:project_configure ()
+      in
+      PROJECT.update () project_driver ;
+      project_driver
+  in
+  Context.set LogicBuiltins.driver project_driver
 
 (* -------------------------------------------------------------------------- *)
 (* --- Access                                                             --- *)
@@ -321,8 +319,8 @@ let instance setup driver =
   with Not_found ->
     let id,descr = describe setup in
     let module CC = (val compiler setup.mheap setup.mvar) in
-    let instance_driver = LogicBuiltins.copy ~id driver in
-    let tuning = [configure setup instance_driver] in
+    let configure = configure_driver setup driver in
+    let rollback = (fun () -> Context.set LogicBuiltins.driver driver) in
     let hypotheses = CC.M.hypotheses in
     let id,descr =
       if LogicBuiltins.is_default driver then id,descr
@@ -330,7 +328,7 @@ let instance setup driver =
         ( id ^ "_" ^ LogicBuiltins.id driver ,
           descr ^ " (Driver " ^ LogicBuiltins.descr driver ^ ")" )
     in
-    let model = WpContext.register ~id ~descr ~tuning ~hypotheses () in
+    let model = WpContext.register ~id ~descr ~configure ~rollback ~hypotheses () in
     instances := COMPILERS.add (setup,driver) model !instances ; model
 
 let ident s = fst (describe s)

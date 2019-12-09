@@ -308,20 +308,21 @@ let add_builtin name kinds lfun =
   else
     Context.bind driver builtin_driver (register name kinds) phi
 
-let create_from ~id driver ?(descr=id) ?(includes=[]) () =
-  lock driver ;
-  {
+let new_driver ~id ?(base=builtin_driver)
+    ?(descr=id) ?(includes=[]) ?(configure=fun () -> ()) () =
+  lock base ;
+  let new_driver = {
     driverid = id ;
     description = descr ;
-    includes = includes @ driver.includes ;
-    hlogic = Hashtbl.copy driver.hlogic ;
-    hdeps  = Hashtbl.copy driver.hdeps ;
-    hoptions = Hashtbl.copy driver.hoptions ;
+    includes = includes @ base.includes ;
+    hlogic = Hashtbl.copy base.hlogic ;
+    hdeps  = Hashtbl.copy base.hdeps ;
+    hoptions = Hashtbl.copy base.hoptions ;
     locked = false
-  }
-
-let create_from_builtin = create_from builtin_driver
-let init ~id ?descr ?includes () = create_from_builtin ~id ?descr ?includes ()
-let copy ~id driver = create_from ~id driver ()
+  } in
+  let old = Context.push driver new_driver in
+  configure () ;
+  Context.pop driver old ;
+  new_driver
 
 (* -------------------------------------------------------------------------- *)

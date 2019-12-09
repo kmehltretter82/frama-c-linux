@@ -29,7 +29,8 @@ type model = {
   descr : string ; (* Title of the Model (for pretty) *)
   emitter : Emitter.t ;
   hypotheses : hypotheses ;
-  tuning : tuning list ;
+  configure : ((unit -> unit) -> unit) ;
+  rollback : (unit -> unit) ;
 }
 
 and tuning = unit -> unit
@@ -51,7 +52,8 @@ struct
   let repr = {
     id = "?model" ; descr = "?model" ;
     emitter = Emitter.kernel ;
-    tuning = [ fun () -> () ] ;
+    configure = (fun f -> f ()) ;
+    rollback = (fun () -> ()) ;
     hypotheses = nohyp ;
   }
 end
@@ -69,7 +71,9 @@ struct
 
 end
 
-let register ~id ?(descr=id) ?(tuning=[]) ?(hypotheses=nohyp) () =
+let register ~id ?(descr=id)
+    ?(configure=fun f -> f()) ?(rollback=fun () -> ())
+    ?(hypotheses=nohyp) () =
   if MODELS.mem id then
     Wp_parameters.fatal "Duplicate model '%s'" id ;
   let emitter =
@@ -82,7 +86,8 @@ let register ~id ?(descr=id) ?(tuning=[]) ?(hypotheses=nohyp) () =
     id = id ;
     descr ;
     emitter ;
-    tuning ;
+    configure ;
+    rollback ;
     hypotheses ;
   } in
   MODELS.add model ; model
@@ -124,21 +129,25 @@ end
 
 let context : (string * context) Context.value = Context.create "WpContext"
 
-let configure (model,_) = List.iter (fun f -> f()) model.tuning
-let rollback = function None -> () | Some (_,ctxt) -> configure ctxt
+let configure (model,_) f = model.configure f
+let rollback (model,_) = function
+  | None ->
+      model.rollback ()
+  | Some (_,ctxt) ->
+      model.rollback () ;
+      configure ctxt (fun () -> ())
 
 let on_context gamma f x =
   let id = S.id gamma in
   let current = Context.push context (id,gamma) in
   try
-    configure gamma ;
-    Context.configure () ;
+    configure gamma Context.configure ;
     let result = f x in
     Context.pop context current ;
-    rollback current ; result
+    rollback gamma current ; result
   with err ->
     Context.pop context current ;
-    rollback current ; raise err
+    rollback gamma current ; raise err
 
 let is_defined () = Context.defined context
 let get_ident () = Context.get context |> fst

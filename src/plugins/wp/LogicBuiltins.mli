@@ -44,16 +44,27 @@ val add_builtin : string -> kind list -> lfun -> unit
 type driver
 val driver: driver Context.value
 
-val init: id:string -> ?descr:string -> ?includes:string list -> unit -> driver
-(** Returns a driver from builtin WP driver (which is now locked) *)
-val copy: id:string -> driver -> driver
-(** Returns a copy of a driver, the received driver is now locked *)
+val new_driver:
+  id:string ->
+  ?base:driver ->
+  ?descr:string ->
+  ?includes:string list ->
+  ?configure:(unit -> unit) -> unit ->
+  driver
+(** Creates a configured driver from an existing one.
+    Default:
+    - base: builtin WP driver
+    - descr: id
+    - includes: []
+    - configure: No-Op
+      The configure is the only operation allowed to modify the content of the
+      newly created driver. Except during static initialization of builtin driver.
+*)
 
 val id : driver -> string
 val descr : driver -> string
 val is_default : driver -> bool
 val compare : driver -> driver -> int
-val lock : driver -> unit
 
 val find_lib: string -> string
 (** find a file in the includes of the current drivers *)

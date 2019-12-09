@@ -494,8 +494,8 @@ and bal = parse
       with Not_found ->
         let driver_basename file =
         let base = Filename.basename file in
-       try Filename.chop_extension base
-       with Invalid_argument _ -> base in
+        try Filename.chop_extension base
+        with Invalid_argument _ -> base in
         let drvs = List.map driver_basename drivers in
         let id = String.concat "_" drvs in
         let descr = String.concat "," drvs in
@@ -512,23 +512,22 @@ and bal = parse
               );
           directories
         in
-        let driver = LogicBuiltins.init ~id ~descr ~includes () in
-        let old_driver = Context.push LogicBuiltins.driver driver in
-        let drivers =
-          List.map (fun file ->
-              if Sys.file_exists file
-              then Filepath.normalize file
-              else LogicBuiltins.find_lib file)
-            drivers in
-        let default = Wp_parameters.Share.file ~error:true "wp.driver" in
-        let feedback = Wp_parameters.Share.Dir_name.is_set () in
-        let ontty = if feedback then `Message else `Transient in
-        load_file ~ontty default;
-        List.iter load_file drivers;
-        Hashtbl.add loaded drivers (Context.get LogicBuiltins.driver);
+        let configure ()=
+          let drivers =
+            List.map (fun file ->
+                if Sys.file_exists file
+                then Filepath.normalize file
+                else LogicBuiltins.find_lib file)
+              drivers in
+          let default = Wp_parameters.Share.file ~error:true "wp.driver" in
+          let feedback = Wp_parameters.Share.Dir_name.is_set () in
+          let ontty = if feedback then `Message else `Transient in
+          load_file ~ontty default;
+          List.iter load_file drivers
+        in
+        let driver = LogicBuiltins.new_driver ~id ~descr ~includes ~configure () in
+        Hashtbl.add loaded drivers driver;
         if Wp_parameters.has_dkey dkey_driver  then LogicBuiltins.dump () ;
-        Context.pop LogicBuiltins.driver old_driver ;
-        LogicBuiltins.lock driver ;
         driver
     end
 

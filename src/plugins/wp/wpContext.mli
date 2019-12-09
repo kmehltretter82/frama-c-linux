@@ -30,7 +30,8 @@ type hypotheses = unit -> MemoryContext.clause list
 val register :
   id:string ->
   ?descr:string ->
-  ?tuning:tuning list ->
+  ?configure:((unit -> unit) -> unit) ->
+  ?rollback:(unit -> unit) ->
   ?hypotheses:hypotheses ->
   unit -> model
 
