@@ -336,14 +336,16 @@ let pretty fmt stmt_zones =
 
        (*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*)
 
-let build_zones =
+let build_zones kf stmt lval =
   (* TODO: Journal.register *)
   (* (Datatype.func Kernel_type.kernel_function
                      (Datatype.func Kernel_type.stmt
                         (Datatype.func Kernel_type.lval
                            (Datatype.couple Kernel_type.stmt_set zones_ty)))))
                            *)
-  compute
+  if stmt.preds = []
+  then Stmt.Hptset.empty, Ctx.create 0
+  else compute kf stmt lval
 
 let get_zones =
   (* TODO: Journal.register *)
