@@ -1311,50 +1311,48 @@ let is_trivial (t : Why3.Task.task) =
 
 let build_proof_task ?timeout ?steplimit ~prover wpo () =
   try
-    WpContext.on_context (Wpo.get_context wpo)
-      begin fun () ->
-        (* Always generate common task *)
-        let task = task_of_wpo wpo in
-        if Wp_parameters.Check.get ()
-        then Task.return VCS.checked (* Why3 tasks are type-checked *)
-        else
-        if Wp_parameters.Generate.get ()
-        then Task.return VCS.no_result (* Only generate *)
-        else
-          let drv , config , task = prover_task prover task in
-          if is_trivial task then
-            Task.return VCS.valid
-          else
-            let mode = get_mode () in
-            match mode with
-            | NoCache ->
-                call_prover ~timeout ~steplimit drv prover config task
-            | Offline ->
-                let hash = task_hash wpo drv prover task in
-                let result = get_cache_result ~mode hash |> VCS.cached in
-                if VCS.is_verdict result then incr hits else incr miss ;
+    (* Always generate common task *)
+    let context = Wpo.get_context wpo in
+    let task = WpContext.on_context context task_of_wpo wpo in
+    if Wp_parameters.Check.get ()
+    then Task.return VCS.checked (* Why3 tasks are type-checked *)
+    else
+    if Wp_parameters.Generate.get ()
+    then Task.return VCS.no_result (* Only generate *)
+    else
+      let drv , config , task = prover_task prover task in
+      if is_trivial task then
+        Task.return VCS.valid
+      else
+        let mode = get_mode () in
+        match mode with
+        | NoCache ->
+            call_prover ~timeout ~steplimit drv prover config task
+        | Offline ->
+            let hash = task_hash wpo drv prover task in
+            let result = get_cache_result ~mode hash |> VCS.cached in
+            if VCS.is_verdict result then incr hits else incr miss ;
+            Task.return result
+        | Update | Replay | Rebuild | Cleanup ->
+            let hash = task_hash wpo drv prover task in
+            let result =
+              get_cache_result ~mode hash
+              |> promote ~timeout ~steplimit |> VCS.cached in
+            if VCS.is_verdict result
+            then
+              begin
+                incr hits ;
                 Task.return result
-            | Update | Replay | Rebuild | Cleanup ->
-                let hash = task_hash wpo drv prover task in
-                let result =
-                  get_cache_result ~mode hash
-                  |> promote ~timeout ~steplimit |> VCS.cached in
-                if VCS.is_verdict result
-                then
-                  begin
-                    incr hits ;
-                    Task.return result
-                  end
-                else
-                  Task.finally
-                    (call_prover ~timeout ~steplimit drv prover config task)
-                    begin function
-                      | Task.Result result when VCS.is_verdict result ->
-                          incr miss ;
-                          set_cache_result ~mode hash prover result
-                      | _ -> ()
-                    end
-      end ()
+              end
+            else
+              Task.finally
+                (call_prover ~timeout ~steplimit drv prover config task)
+                begin function
+                  | Task.Result result when VCS.is_verdict result ->
+                      incr miss ;
+                      set_cache_result ~mode hash prover result
+                  | _ -> ()
+                end
   with exn ->
     if Wp_parameters.has_dkey dkey_api then
       Wp_parameters.fatal "[Why3 Error] %a@\n%s"
