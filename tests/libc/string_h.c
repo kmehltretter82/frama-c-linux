@@ -107,6 +107,19 @@ void test_strtok_r() {
   }
 }
 
+void test_strncpy() {
+  char src[] = { 'a', 'b', 'c' };
+  char dst[3];
+  strncpy(dst,src,3);
+  char src2[3];
+  src2[0] = 'a';
+  src2[1] = 'b';
+  if (nondet) {
+    strncpy(dst,src2,3);
+    //@ assert unreachable: \false;
+  }
+}
+
 int main(int argc, char **argv)
 {
   test_strcmp();
@@ -125,5 +138,6 @@ int main(int argc, char **argv)
   size_t r3 = strlcat(buf2, buf, 32);
   char *strsig = strsignal(1);
   //@ assert valid_read_string(strsig);
+  test_strncpy();
   return 0;
 }

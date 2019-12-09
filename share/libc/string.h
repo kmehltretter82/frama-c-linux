@@ -354,7 +354,7 @@ extern char *strerror(int errnum);
 extern char *strcpy(char *restrict dest, const char *restrict src);
 
 /*@ 
-  @ requires valid_string_src: valid_read_string(src);
+  @ requires valid_nstring_src: valid_read_nstring(src, n);
   @ requires room_nstring: \valid(dest+(0 .. n-1));
   @ requires separation:
   @   \separated(dest+(0..n-1), src+(0..n-1));
