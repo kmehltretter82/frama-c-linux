@@ -743,6 +743,20 @@ struct
   let is_pfalse = is_false
   let is_equal a b = is_true (e_eq a b)
 
+  let is_int e =
+    try typeof e = Qed.Logic.Int with Not_found -> false
+
+  let is_real e =
+    try typeof e = Qed.Logic.Real with Not_found -> false
+
+  let is_prop e =
+    try match typeof e with Qed.Logic.Prop | Qed.Logic.Bool -> true | _ -> false
+    with Not_found -> false
+
+  let is_arith e =
+    try match typeof e with Qed.Logic.Int | Qed.Logic.Real -> true | _ -> false
+    with Not_found -> false
+
   let p_equal = e_eq
   let p_equals = List.map (fun (x,y) -> p_equal x y)
   let p_neq = e_neq
