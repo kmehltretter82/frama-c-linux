@@ -985,13 +985,13 @@ struct
     | x::[] as xs ->
         begin
           match x.repr with
-          | If(c,a,b) ->  !extern_ite c (!extern_fun f [a]) (!extern_fun f [b])
+          | If(c,a,b) ->  !extern_ite c (!extern_fun f [a] tau) (!extern_fun f [b] tau)
           | _ -> operation (FUN(f,xs,tau))
         end
     | a::b::[] as xs ->
         distribute_if_over_operation false
           (fun f xs -> operation (FUN(f,xs,tau))) f xs
-          (fun a b -> !extern_fun f [a;b]) a b
+          (fun a b -> !extern_fun f [a;b] tau) a b
     | xs -> operation (FUN(f,xs,tau))
 
   let c_builtin_fun f xs tau = distribute f tau xs
@@ -1101,12 +1101,12 @@ struct
             else modified,xs,ys
       in simpl false true xs ys
 
-  let rec element = function
+  let rec element tau = function
     | E_none -> assert false
     | E_int k -> e_int k
     | E_true -> e_true
     | E_false -> e_false
-    | E_fun (f,l) -> c_fun f (List.map element l) None
+    | E_fun (f,l) -> c_fun f (List.map (element tau) l) tau
 
   let rec is_element e x = match e , x.repr with
     | E_int k , Kint z -> Z.equal (Z.of_int k) z
@@ -1144,7 +1144,7 @@ struct
     in
     if op.absorbant <> E_none &&
        List.exists (is_element op.absorbant) xs
-    then element op.absorbant
+    then element tau op.absorbant
     else
       let xs =
         if op.neutral <> E_none
@@ -1152,7 +1152,7 @@ struct
         else xs in
       let xs = if op.idempotent then op_idempotent xs else xs in
       match xs with
-      | [] when op.neutral <> E_none -> element op.neutral
+      | [] when op.neutral <> E_none -> element tau op.neutral
       | [x] when op.associative -> x
       | _ -> c_builtin_fun f xs tau
 
@@ -1161,8 +1161,7 @@ struct
     | Logic.Operator op -> op_fun f op xs tau
     | _ -> c_builtin_fun f xs tau
 
-  let e_fun ?result f xs = e_fungen f xs result
-  let () = extern_fun := e_fun
+  let () = extern_fun := e_fungen
 
   (* -------------------------------------------------------------------------- *)
   (* --- Ground & Arithmetics                                               --- *)
@@ -1671,6 +1670,8 @@ struct
   (* --- Equality                                                           --- *)
   (* -------------------------------------------------------------------------- *)
 
+  let typeof2 x y = if x.tau = None then y.tau else x.tau
+
   let rec e_eq x y =
     if x == y then e_true else relation eq_symb EQ x y
 
@@ -1714,13 +1715,17 @@ struct
   and eq_invertible x y f xs ys =
     let modified,xs,ys = op_invertible ~ac:(is_ac f) xs ys in
     if modified
-    then eq_symb (e_fun f xs ?result:x.tau) (e_fun f ys ?result:y.tau)
+    then
+      let tr = typeof2 x y in
+      eq_symb (e_fungen f xs tr) (e_fungen f ys tr)
     else c_builtin_eq x y
 
   and eq_invertible_both x y f g xs ys =
     let modified,xs',ys' = op_invertible ~ac:(is_ac f) xs [y] in
     if modified
-    then eq_symb (e_fun f xs' ?result:x.tau) (e_fun f ys' ?result:y.tau)
+    then
+      let tr = typeof2 x y in
+      eq_symb (e_fungen f xs' tr) (e_fungen f ys' tr)
     else eq_invertible x y g [x] ys
 
   and eq_field (f,x) (g,y) =
@@ -1775,13 +1780,17 @@ struct
   and neq_invertible x y f xs ys =
     let modified,xs,ys = op_invertible ~ac:(is_ac f) xs ys in
     if modified
-    then neq_symb (e_fun f xs) (e_fun f ys)
+    then
+      let tr = typeof2 x y in
+      neq_symb (e_fungen f xs tr) (e_fungen f ys tr)
     else c_builtin_neq x y
 
   and neq_invertible_both x y f g xs ys =
     let modified,xs',ys' = op_invertible ~ac:(is_ac f) xs [y] in
     if modified
-    then neq_symb (e_fun f xs') (e_fun f ys')
+    then
+      let tr = typeof2 x y in
+      neq_symb (e_fungen f xs' tr) (e_fungen f ys' tr)
     else neq_invertible x y g [x] ys
 
   and neq_field (f,x) (g,y) =
@@ -2037,7 +2046,7 @@ struct
     | Times(z,t) -> e_times z (f t)
     | If(e,a,b) -> e_if (f e) (f a) (f b)
     | Imply(hs,p) -> e_imply (List.map f hs) (f p)
-    | Fun(g,xs) -> e_fun ?result:e0.tau g (List.map f xs)
+    | Fun(g,xs) -> e_fungen g (List.map f xs) e0.tau
     | Acst(t,v) -> e_const t v
     | Aget(x,y) -> e_get (f x) (f y)
     | Aset(x,y,z) -> e_set (f x) (f y) (f z)
@@ -2072,7 +2081,6 @@ struct
     let validate fn e =
       if not (lc_closed e) then
         begin
-          Format.eprintf "Invalid %s: %a@." fn pretty e ;
           raise (Invalid_argument (fn ^ ": non lc-closed binding"))
         end
 
@@ -2226,7 +2234,6 @@ struct
     List.iter (Subst.add_term sigma) es ;
     apply sigma Intmap.empty e es
 
-
   (* -------------------------------------------------------------------------- *)
   (* --- convert between states                                             --- *)
   (* -------------------------------------------------------------------------- *)
@@ -2259,7 +2266,7 @@ struct
           | Times(z,t) -> times z (aux t)
           | If(e,a,b) -> e_if (aux e) (aux a) (aux b)
           | Imply(hs,p) -> e_imply (List.map aux hs) (aux p)
-          | Fun(g,xs) -> e_fun ?result:e.tau g (List.map aux xs)
+          | Fun(g,xs) -> e_fungen g (List.map aux xs) e.tau
           | Acst(t,v) -> e_const t (aux v)
           | Aget(x,y) -> e_get (aux x) (aux y)
           | Aset(x,y,z) -> e_set (aux x) (aux y) (aux z)
@@ -2403,7 +2410,7 @@ struct
     | Leq(x,y) -> e_leq x y
     | If(e,a,b) -> e_if e a b
     | Imply(hs,p) -> e_imply hs p
-    | Fun(g,xs) -> e_fun ?result g xs
+    | Fun(g,xs) -> e_fungen g xs result
     | Acst(t,v) -> e_const t v
     | Aget(m,k) -> e_get m k
     | Aset(m,k,v) -> e_set m k v
@@ -2432,6 +2439,8 @@ struct
         let _,a = e_open ~pool ?forall ?exists ?lambda e in
         f a
     | _ -> repr_iter f e.repr
+
+  let e_fun ?result f xs = e_fungen f xs result
 
   (* -------------------------------------------------------------------------- *)
   (* --- Sub-terms                                                          --- *)
@@ -2506,7 +2515,7 @@ struct
           | Aset _ -> bad_position ()
           | Rdef _ | Rget _ ->
               failwith "change in place for records not yet implemented"
-          | Fun (f,ops) -> e_fun ?result:e.tau f (change_in_list ops i l)
+          | Fun (f,ops) -> e_fungen f (change_in_list ops i l) e.tau
           | Bind(q,x,t) when i = 0 -> c_bind q x (aux t l)
           | Bind _ -> bad_position ()
           | Apply(f,args) when i = 0 ->

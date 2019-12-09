@@ -111,7 +111,9 @@ sig
 
   (** {3 Application} *)
 
-  val call_fun : env -> logic_info
+  val call_fun : env
+    -> tau
+    -> logic_info
     -> logic_label list
     -> F.term list -> F.term
 
