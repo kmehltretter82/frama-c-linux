@@ -243,7 +243,7 @@
   Called from share/libc/netdb.c:147.
 [eva] using specification for function strncpy
 [eva] share/libc/netdb.c:147: 
-  function strncpy: precondition 'valid_string_src' got status valid.
+  function strncpy: precondition 'valid_nstring_src' got status valid.
 [eva] share/libc/netdb.c:147: 
   function strncpy: precondition 'room_nstring' got status valid.
 [eva] share/libc/netdb.c:147: 
