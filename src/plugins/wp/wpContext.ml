@@ -29,11 +29,11 @@ type model = {
   descr : string ; (* Title of the Model (for pretty) *)
   emitter : Emitter.t ;
   hypotheses : hypotheses ;
-  configure : ((unit -> unit) -> unit) ;
-  rollback : (unit -> unit) ;
+  configure : ((unit -> unit) -> rollback) ;
 }
 
-and tuning = unit -> unit
+and rollback = (unit -> unit)
+and tuning = unit -> rollback
 and scope = Global | Kf of Kernel_function.t
 and hypotheses = unit -> MemoryContext.clause list
 and context = model * scope
@@ -52,8 +52,7 @@ struct
   let repr = {
     id = "?model" ; descr = "?model" ;
     emitter = Emitter.kernel ;
-    configure = (fun f -> f ()) ;
-    rollback = (fun () -> ()) ;
+    configure = (fun f -> f () ; (fun () -> ())) ;
     hypotheses = nohyp ;
   }
 end
@@ -71,8 +70,7 @@ struct
 
 end
 
-let register ~id ?(descr=id)
-    ?(configure=fun f -> f()) ?(rollback=fun () -> ())
+let register ~id ?(descr=id) ?(configure=fun _ -> (fun () -> ()))
     ?(hypotheses=nohyp) () =
   if MODELS.mem id then
     Wp_parameters.fatal "Duplicate model '%s'" id ;
@@ -87,7 +85,6 @@ let register ~id ?(descr=id)
     descr ;
     emitter ;
     configure ;
-    rollback ;
     hypotheses ;
   } in
   MODELS.add model ; model
@@ -130,24 +127,23 @@ end
 let context : (string * context) Context.value = Context.create "WpContext"
 
 let configure (model,_) f = model.configure f
-let rollback (model,_) = function
-  | None ->
-      model.rollback ()
-  | Some (_,ctxt) ->
-      model.rollback () ;
-      configure ctxt (fun () -> ())
 
 let on_context gamma f x =
   let id = S.id gamma in
   let current = Context.push context (id,gamma) in
+  let rollback = try
+      configure gamma Context.configure
+    with _err -> Kernel.fatal "Model configuration failed"
+  in
   try
-    configure gamma Context.configure ;
     let result = f x in
     Context.pop context current ;
-    rollback gamma current ; result
+    rollback () ;
+    result
   with err ->
     Context.pop context current ;
-    rollback gamma current ; raise err
+    rollback () ;
+    raise err
 
 let is_defined () = Context.defined context
 let get_ident () = Context.get context |> fst

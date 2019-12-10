@@ -274,7 +274,14 @@ let configure_mheap = function
   | Hoare -> MemEmpty.configure ()
   | ZeroAlias -> MemZeroAlias.configure ()
   | Region -> MemRegion.configure ()
-  | Typed p -> MemTyped.configure () ; Context.set MemTyped.pointer p
+  | Typed p ->
+      let rollback_memtyped = MemTyped.configure () in
+      let orig_memtyped_pointer = Context.push MemTyped.pointer p in
+      let rollback () =
+        rollback_memtyped () ;
+        Context.pop MemTyped.pointer orig_memtyped_pointer
+      in
+      rollback
 
 module PROJECT = WpContext.Static
     (struct
@@ -286,19 +293,27 @@ module PROJECT = WpContext.Static
     end)
 
 let configure_driver setup base project_configure =
-  configure_mheap setup.mheap ;
-  Cint.configure setup.cint ;
-  Cfloat.configure setup.cfloat ;
+  let rollback_mheap = configure_mheap setup.mheap in
+  let rollback_cint = Cint.configure setup.cint in
+  let rollback_cfloat = Cfloat.configure setup.cfloat in
   let project_driver = try PROJECT.find ()
     with Not_found ->
-      let id = "" in
+      let (setup_id, _) = describe setup in
+      let id = LogicBuiltins.id base ^ "_" ^ setup_id in
       let project_driver =
         LogicBuiltins.new_driver ~base ~id ~configure:project_configure ()
       in
       PROJECT.update () project_driver ;
       project_driver
   in
-  Context.set LogicBuiltins.driver project_driver
+  let old_driver = Context.push LogicBuiltins.driver project_driver in
+  let rollback () =
+    Context.pop LogicBuiltins.driver old_driver ;
+    rollback_cfloat () ;
+    rollback_cint () ;
+    rollback_mheap ()
+  in
+  rollback
 
 (* -------------------------------------------------------------------------- *)
 (* --- Access                                                             --- *)
@@ -320,7 +335,6 @@ let instance setup driver =
     let id,descr = describe setup in
     let module CC = (val compiler setup.mheap setup.mvar) in
     let configure = configure_driver setup driver in
-    let rollback = (fun () -> Context.set LogicBuiltins.driver driver) in
     let hypotheses = CC.M.hypotheses in
     let id,descr =
       if LogicBuiltins.is_default driver then id,descr
@@ -328,7 +342,7 @@ let instance setup driver =
         ( id ^ "_" ^ LogicBuiltins.id driver ,
           descr ^ " (Driver " ^ LogicBuiltins.descr driver ^ ")" )
     in
-    let model = WpContext.register ~id ~descr ~configure ~rollback ~hypotheses () in
+    let model = WpContext.register ~id ~descr ~configure ~hypotheses () in
     instances := COMPILERS.add (setup,driver) model !instances ; model
 
 let ident s = fst (describe s)

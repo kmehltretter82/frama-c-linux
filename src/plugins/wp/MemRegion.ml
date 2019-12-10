@@ -428,8 +428,13 @@ let datatype = "MemRegion"
 
 let configure () =
   begin
-    Context.set Lang.pointer (fun _ -> t_index) ;
-    Context.set Cvalues.null p_inull ;
+    let orig_pointer = Context.push Lang.pointer (fun _ -> t_index) in
+    let orig_null = Context.push Cvalues.null p_inull in
+    let rollback () =
+      Context.pop Lang.pointer orig_pointer ;
+      Context.pop Cvalues.null orig_null
+    in
+    rollback
   end
 
 let configure_ia =

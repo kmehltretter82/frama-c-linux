@@ -24,14 +24,14 @@
 
 type model
 type scope = Global | Kf of Kernel_function.t
-type tuning = (unit -> unit)
+type rollback = unit -> unit
+type tuning = unit -> rollback
 type hypotheses = unit -> MemoryContext.clause list
 
 val register :
   id:string ->
   ?descr:string ->
-  ?configure:((unit -> unit) -> unit) ->
-  ?rollback:(unit -> unit) ->
+  ?configure:((unit -> unit) -> rollback) ->
   ?hypotheses:hypotheses ->
   unit -> model
 

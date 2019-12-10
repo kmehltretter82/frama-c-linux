@@ -406,7 +406,9 @@ let () =
 
 let model = Context.create "Cint.model"
 let current () = Context.get model
-let configure = Context.set model
+let configure m =
+  let orig_model = Context.push model m in
+  (fun () -> Context.pop model orig_model)
 
 let to_integer a = a
 let of_integer i a = convert i a

@@ -424,8 +424,13 @@ let fneq = fcmp p_neq flt_neq
 
 let configure m =
   begin
-    Context.set model m ;
-    Context.set Lang.floats tau_of_float ;
+    let orig_model = Context.push model m in
+    let orig_floats = Context.push Lang.floats tau_of_float in
+    let rollback () =
+      Context.pop model orig_model ;
+      Context.pop Lang.floats orig_floats
+    in
+    rollback
   end
 
 (* -------------------------------------------------------------------------- *)

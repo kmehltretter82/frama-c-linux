@@ -1008,8 +1008,7 @@ let task_of_wpo wpo =
 (* --- Prover Task                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-let prover_task prover task =
-  let env = get_why3_env () in
+let prover_task env prover task =
   let config = Why3Provers.config () in
   let prover_config = Why3.Whyconf.get_prover_config config prover in
   let drv = Why3.Whyconf.load_driver (Why3.Whyconf.get_main config)
@@ -1320,7 +1319,8 @@ let build_proof_task ?timeout ?steplimit ~prover wpo () =
     if Wp_parameters.Generate.get ()
     then Task.return VCS.no_result (* Only generate *)
     else
-      let drv , config , task = prover_task prover task in
+      let env = WpContext.on_context context get_why3_env () in
+      let drv , config , task = prover_task env prover task in
       if is_trivial task then
         Task.return VCS.valid
       else
