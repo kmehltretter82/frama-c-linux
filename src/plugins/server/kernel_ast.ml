@@ -164,3 +164,52 @@ let () = Request.register ~page
     (fun kf -> Jbuffer.to_json PP.pp_global (Kernel_function.get_global kf))
 
 (* -------------------------------------------------------------------------- *)
+(* --- Properties                                                         --- *)
+(* -------------------------------------------------------------------------- *)
+
+module Property = struct
+
+  type p
+  let signature =
+    Record.signature ~page ~name:"property"
+      ~descr:(Md.plain "logical property") ()
+
+  let name = Record.field signature ~name:"name"
+      ~descr:(Md.plain "name") (module Jstring)
+  let property = Record.field signature ~name:"property"
+      ~descr:(Md.plain "logical property") (module Jstring)
+  let status = Record.field signature ~name:"status"
+      ~descr:(Md.plain "logical status") (module Jstring)
+  let file = Record.field signature ~name:"file"
+      ~descr:(Md.plain "file") (module Jstring)
+  let kf = Record.field signature ~name:"function"
+      ~descr:(Md.plain "kernel function") (module Kf.Joption)
+  let kinstr = Record.field signature ~name:"kinstr"
+      ~descr:(Md.plain "kinstr") (module Ki)
+
+  module R = (val (Record.publish signature) : Record.S with type r = p)
+  include R
+
+  let make ip =
+    let st = Property_status.Feedback.get ip in
+    let st = Format.asprintf "%a" Property_status.Feedback.pretty st in
+    let p = Format.asprintf "%a" Property.pretty ip in
+    let loc = Property.location ip in
+    let path = Filepath.(Normalized.to_pretty_string (fst loc).pos_path) in
+    default |> set property p |> set status st
+    |> set kf (Property.get_kf ip)
+    |> set kinstr (Property.get_kinstr ip)
+    |> set name (Property.Names.get_prop_name_id ip)
+    |> set file path
+end
+
+let get_properties () =
+  Property_status.fold (fun ip acc -> Property.make ip :: acc) []
+
+let () =
+  Request.register ~page ~kind:`GET ~name:"kernel.getProperties"
+    ~descr:(Md.plain "Collect all logical properties")
+    ~input:(module Junit) ~output:(module Jlist (Property))
+    get_properties
+
+(* -------------------------------------------------------------------------- *)
