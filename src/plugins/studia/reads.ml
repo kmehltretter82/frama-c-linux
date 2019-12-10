@@ -88,7 +88,7 @@ class find_read zlval = object
         res <- (stmt, {direct = true; indirect = false}) :: res
       end;
       Cil.SkipChildren
-    | If (e, _, _, _) | Switch (e, _, _, _) ->
+    | If (e, _, _, _) | Switch (e, _, _, _) | Return (Some e, _) ->
       let z = !Db.Inputs.expr stmt e in
       if Zone.intersects z zlval then begin
         res <- (stmt, {direct = true; indirect = false}) :: res
