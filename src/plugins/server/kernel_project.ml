@@ -127,8 +127,8 @@ let () = Request.register ~page
 let () =
   Request.register
     ~kind:`GET
-    ~page ~name:"kernel.project.getSourceFiles"
-    ~descr:(Md.plain "Get the files of the current project")
+    ~page ~name:"kernel.project.getSourceFileNames"
+    ~descr:(Md.plain "Get the source file names of the current project")
     ~input:(module Junit) ~output:(module Jstring.Jlist)
     Kernel.Files.get
 
