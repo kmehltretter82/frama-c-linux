@@ -25,15 +25,23 @@
 type model
 type scope = Global | Kf of Kernel_function.t
 type rollback = unit -> unit
-type tuning = unit -> rollback
 type hypotheses = unit -> MemoryContext.clause list
 
 val register :
   id:string ->
   ?descr:string ->
-  ?configure:((unit -> unit) -> rollback) ->
+  configure:((unit -> unit) -> rollback) ->
   ?hypotheses:hypotheses ->
   unit -> model
+(** Model registration. The model is identified by [id] and described by
+    [descr] (that defaults to [id]). The [configure] function is called on
+    [WpContext.on_context] call, it must prepare and set the different
+    [Context.values] related to the model. For this, it receives in input
+    the function used to extend the driver (and that should be transmitted
+    to the [LogicBuiltins.new_driver] function if needed. In exchange, it
+    must return the function that allows to rollback on the original state.
+    The [hypotheses] function must return the hypotheses made by the model.
+*)
 
 val get_descr : model -> string
 val get_emitter : model -> Emitter.t

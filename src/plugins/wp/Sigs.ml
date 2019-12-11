@@ -277,9 +277,9 @@ sig
 
   (** {2 Model Definition} *)
 
-  val configure : WpContext.tuning
+  val configure : unit -> WpContext.rollback
   (** Initializers to be run before using the model.
-      Typically sets {!Context} values. *)
+      Typically push {!Context} values and returns a function to rollback. *)
 
   val configure_ia: automaton -> vertex binder
   (** Given an automaton, return a vertex's binder.

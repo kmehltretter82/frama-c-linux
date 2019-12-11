@@ -33,7 +33,6 @@ type model = {
 }
 
 and rollback = (unit -> unit)
-and tuning = unit -> rollback
 and scope = Global | Kf of Kernel_function.t
 and hypotheses = unit -> MemoryContext.clause list
 and context = model * scope
@@ -70,7 +69,7 @@ struct
 
 end
 
-let register ~id ?(descr=id) ?(configure=fun _ -> (fun () -> ()))
+let register ~id ?(descr=id) ~configure
     ?(hypotheses=nohyp) () =
   if MODELS.mem id then
     Wp_parameters.fatal "Duplicate model '%s'" id ;
@@ -133,7 +132,8 @@ let on_context gamma f x =
   let current = Context.push context (id,gamma) in
   let rollback = try
       configure gamma Context.configure
-    with _err -> Kernel.fatal "Model configuration failed"
+    with _ ->
+      Kernel.fatal "Model configuration failed"
   in
   try
     let result = f x in
