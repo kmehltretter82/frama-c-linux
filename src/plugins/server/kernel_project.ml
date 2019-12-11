@@ -121,3 +121,15 @@ let () = Request.register ~page
     (ProjectRequest.process `EXEC)
 
 (* -------------------------------------------------------------------------- *)
+(* --- Project Management                                                 --- *)
+(* -------------------------------------------------------------------------- *)
+
+let () =
+  Request.register
+    ~kind:`GET
+    ~page ~name:"kernel.project.getSourceFiles"
+    ~descr:(Md.plain "Get the files of the current project")
+    ~input:(module Junit) ~output:(module Jstring.Jlist)
+    Kernel.Files.get
+
+(* -------------------------------------------------------------------------- *)
