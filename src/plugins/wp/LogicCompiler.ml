@@ -840,6 +840,7 @@ struct
       ) sparam
 
   let call_fun env
+      (result:F.tau)
       (phi:logic_info)
       (labels:logic_label list)
       (parameters:F.term list) : F.term =
@@ -847,7 +848,7 @@ struct
     | CST c -> e_zint c
     | SIG sparam ->
         let es = call_params env phi labels sparam parameters in
-        F.e_fun (ACSL phi) es
+        F.e_fun ~result (ACSL phi) es
 
   let call_pred env
       (phi:logic_info)
@@ -871,11 +872,12 @@ struct
           of arity 0 are represented in the AST as a variable not
           as an application of the function with no arguments *)
       let cst = Logic_env.find_logic_cons x in
+      let result = Lang.tau_of_ltype x.lv_type in
       let v =
         match LogicBuiltins.logic cst with
-        | ACSLDEF -> call_fun env cst [] []
+        | ACSLDEF -> call_fun env result cst [] []
         | HACK phi -> phi []
-        | LFUN phi -> e_fun phi [] ~result:(Lang.tau_of_ltype x.lv_type)
+        | LFUN phi -> e_fun ~result phi []
       in Cvalues.plain x.lv_type v
     with Not_found ->
       if Logic_env.is_logic_function x.lv_name then

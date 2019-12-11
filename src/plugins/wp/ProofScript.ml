@@ -369,16 +369,18 @@ let pending = function
   | Tactic(n,_,_) -> n
   | Error _ -> 1
 
-let rec status = function
+let rec pending_any = function
   | [] -> 1
   | [a] -> pending a
   | a::s ->
       let n = pending a in
-      if n = 0 then 0 else min n (status s)
+      if n = 0 then 0 else min n (pending_any s)
 
 let rec subgoals n = function
   | [] -> n
-  | (_,a)::s -> subgoals (n + status a) s
+  | (_,js)::s -> subgoals (n + pending_any js) s
+
+let has_proof = List.exists is_tactic
 
 let a_prover p r = Prover(p,r)
 let a_tactic tac children  = Tactic(subgoals 0 children,tac,children)

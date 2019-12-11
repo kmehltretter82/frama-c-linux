@@ -192,7 +192,7 @@ class split =
                 split_cmp "Split (eq.)" x y
             | Neq(x,y) when not (is_prop x || is_prop y) ->
                 split_cmp "Split (neq.)" x y
-            | _ when F.is_prop e->
+            | _ when F.is_prop e ->
                 feedback#set_title "Split (true,false)" ;
                 feedback#set_descr "Decompose between True and False values" ;
                 let cases = ["True",F.p_bool e;"False",F.p_not (F.p_bool e)] in

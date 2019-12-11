@@ -463,6 +463,7 @@ let search
 (* -------------------------------------------------------------------------- *)
 
 let proofs = Hashtbl.create 32
+
 let has_proof wpo =
   let wid = wpo.Wpo.po_gid in
   try Hashtbl.find proofs wid
@@ -471,7 +472,7 @@ let has_proof wpo =
       let ok =
         try
           let script = ProofScript.decode (ProofSession.load wpo) in
-          ProofScript.status script = 0
+          ProofScript.has_proof script
         with _ -> false in
       (Hashtbl.add proofs wid ok ; ok)
     else false

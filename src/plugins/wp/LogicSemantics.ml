@@ -673,10 +673,11 @@ struct
 
     | Tapp(f,ls,ts) ->
         let vs = List.map (val_of_term env) ts in
+        let result = Lang.tau_of_ltype t.term_type in
         let r = match LogicBuiltins.logic f with
-          | ACSLDEF -> C.call_fun env f ls vs
+          | ACSLDEF -> C.call_fun env result f ls vs
           | HACK phi -> phi vs
-          | LFUN f -> e_fun f vs ~result:(Lang.tau_of_ltype t.term_type)
+          | LFUN f -> e_fun ~result f vs
         in Vexp r
 
     | Tlambda _ ->

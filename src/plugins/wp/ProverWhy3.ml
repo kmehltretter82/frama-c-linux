@@ -294,7 +294,11 @@ let rec of_term ~cnv expected t : Why3.Term.term =
   Wp_parameters.debug ~dkey:dkey_api
     "of_term %a %a@."
     Lang.F.Tau.pretty expected Lang.F.pp_term t;
-  let sort = Lang.F.typeof t in
+  let sort =
+    try Lang.F.typeof t
+    with Not_found ->
+      why3_failure "@[<hov 2>Untyped term: %a@]" Lang.F.pp_term t
+  in
   let ($) f x = f x in
   let r =
     try coerce ~cnv sort expected $ Lang.F.Tmap.find t cnv.subst
@@ -1041,7 +1045,8 @@ type prover_call = {
   prover : Why3Provers.t ;
   call : Why3.Call_provers.prover_call ;
   steps : int option ;
-  timeover : float option ;
+  timeout : int ;
+  mutable timeover : float option ;
   mutable interrupted : bool ;
   mutable killed : bool ;
 }
@@ -1051,7 +1056,9 @@ let ping_prover_call p =
   | NoUpdates
   | ProverStarted ->
       let () = match p.timeover with
-        | None -> ()
+        | None ->
+            let started = Unix.time () in
+            p.timeover <- Some (started +. 2.0 +. float p.timeout)
         | Some timeout ->
             let time = Unix.time () in
             if time > timeout then
@@ -1076,7 +1083,7 @@ let ping_prover_call p =
         | OutOfMemory -> VCS.failed "out of memory"
         | StepLimitExceeded -> VCS.result ?steps:p.steps VCS.Stepout
         | Unknown _ -> VCS.unknown
-        | _ when p.interrupted -> VCS.timeout (int_of_float pr.pr_time)
+        | _ when p.interrupted -> VCS.timeout p.timeout
         | Failure s -> VCS.failed s
         | HighFailure ->
             let alt_ergo_hack =
@@ -1109,15 +1116,12 @@ let call_prover ~timeout ~steplimit drv prover prover_config task =
     Why3.Whyconf.print_prover prover
     (Why3.Opt.get_def (-1) timeout)
     (Why3.Opt.get_def (-1) steps);
-  let timeover = match timeout with
-    | None -> None | Some tlimit ->
-        let started = Unix.time () in
-        Some (started +. 2.0 +. float tlimit) in
+  let timeout = match timeout with None -> 0 | Some tlimit -> tlimit in
   let pcall = {
     call ; prover ;
     killed = false ;
     interrupted = false ;
-    steps ; timeover ;
+    steps ; timeout ; timeover = None ;
   } in
   let ping = function
     | Task.Kill ->
