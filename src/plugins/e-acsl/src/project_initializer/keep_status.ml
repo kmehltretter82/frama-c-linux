@@ -68,7 +68,7 @@ let pretty_kind fmt k =
 (* information attached to every kernel_function containing an annotation *)
 type kf_info =
   { mutable cpt: int
-    (* counter building the relationship between [push] and [must_translate] *);
+  (* counter building the relationship between [push] and [must_translate] *);
     mutable statuses: (kind * bool) Datatype.Int.Map.t
     (* map associating a property as an integer to its kind and status
        ([true] = proved) *) }
