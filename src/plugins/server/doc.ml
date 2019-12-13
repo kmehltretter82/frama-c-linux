@@ -123,7 +123,26 @@ let table_of_contents () =
 let index () =
   List.map
     (fun (title,entry) -> Markdown.href ~text:(plain title) entry)
-    (List.sort (fun (a,_) (b,_) -> String.compare a b) !entries)
+    (List.sort
+       (fun (e1, _) (e2, _) ->
+          let entry_path_and_name e =
+            match String.split_on_char '.' e with
+            | category :: subcategory :: [ name ] ->
+              Some (Format.sprintf "%s.%s" category subcategory), name
+            | category :: [ name ] ->
+              Some category, name
+            | _ ->
+              None, e
+          in
+          match entry_path_and_name e1, entry_path_and_name e2 with
+          | (Some p1, n1), (Some p2, n2) ->
+            let c = String.compare p1 p2 in
+            if c = 0
+            then String.compare n1 n2
+            else c
+          | _ ->
+            String.compare e1 e2)
+       !entries)
 
 let link ~toc ~title ~href : json =
   let link = [ "title" , `String title ; "href" , `String href ] in
