@@ -65,12 +65,13 @@ let publish ~page ~name ~descr ~synopsis ?(details = []) () =
   check_page page name ;
   let id = Printf.sprintf "data-%s" name in
   let title = Printf.sprintf "`DATA` %s" name in
+  let index = [ Printf.sprintf "%s (`DATA`)" name ] in
   let dref = Doc.href page id in
   let dlink = Markdown.href ~text:(Markdown.emph name) dref in
   let syntax = Markdown.(glue [
       plain "<" ; dlink ; plain ">" ; plain ":=" ; synopsis.text ]) in
   let content = Markdown.(Block ( text descr @ text syntax ) :: details) in
-  let _href = Doc.publish ~page ~name:id ~title ~index:[name] content [] in
+  let _href = Doc.publish ~page ~name:id ~title ~index content [] in
   atom dlink
 
 let unit = atom @@ Markdown.plain "-"
