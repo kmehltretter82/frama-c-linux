@@ -82,7 +82,7 @@ let mk_lib_call ~loc ?result fname args =
       ty_params
       args
   in
-  let args = match vi.vtype with
+  let args = match Cil.unrollType vi.vtype with
     | TFun(_, Some params, _, _) -> make_args args params
     | TFun(_, None, _, _) -> []
     | _ -> assert false
@@ -122,12 +122,18 @@ let mk_named_store_stmt name ?str_size vi =
   | TPtr(TInt(IChar, _), _), Some size ->
     store [ Cil.evar ~loc vi ; size ]
   | TPtr _, Some size ->
-    (* a VLA that has been converted to a pointer by the kernel *)
+    (* a VLA that has been converted into a pointer by the kernel *)
     store [ Cil.evar ~loc vi; size ]
   | _, None ->
     store [ Cil.mkAddrOfVi vi ; Cil.sizeOf ~loc ty ]
-  | _, Some _ ->
-    assert false
+  | _, Some size ->
+    Options.fatal
+      "unexpected types for arguments of function '%s': \
+      %s got type %a, while representing a memory block of %a bytes"
+      name
+      vi.vname
+      Printer.pp_typ ty
+      Printer.pp_exp size
 
 let mk_store_stmt ?str_size vi =
   mk_named_store_stmt "store_block" ?str_size vi
@@ -154,7 +160,9 @@ let mk_runtime_check ?(reverse=false) kind kf e p =
   in
   let line = (fst loc).Filepath.pos_lnum in
   let e =
-    if reverse then e else Cil.new_exp ~loc:e.eloc (UnOp(LNot, e, Cil.intType))
+    if reverse
+    then e
+    else Cil.new_exp ~loc:e.eloc (UnOp(LNot, e, Cil.intType))
   in
   mk_rtl_call ~loc
     "assert"

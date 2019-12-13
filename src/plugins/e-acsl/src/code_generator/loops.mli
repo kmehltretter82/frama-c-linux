@@ -30,8 +30,8 @@ open Cil_types
 
 val preserve_invariant:
   Env.t -> Kernel_function.t -> stmt -> stmt * Env.t
-(** modify the given stmt loop to insert the code which preserves its loop
-    invariants. Also return the modify environment. *)
+(** Modify the given stmt loop to insert the code which preserves its loop
+    invariants. Also return the modified environment. *)
 
 (**************************************************************************)
 (**************************** Nested loops ********************************)

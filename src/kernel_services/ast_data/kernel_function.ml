@@ -570,7 +570,8 @@ let is_return_stmt kf stmt =
   try
     let return = find_return kf in
     Stmt.equal stmt return
-  with No_Statement -> false
+  with No_Statement ->
+    false
 
 let is_entry_point kf =
   let main, _ = Globals.entry_point () in

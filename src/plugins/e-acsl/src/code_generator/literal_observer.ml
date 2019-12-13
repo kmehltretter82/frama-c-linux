@@ -43,7 +43,7 @@ let literal loc env kf s =
     Literal_strings.add s vi;
     exp, env
 
-let exp_in_depth env kf e =
+let subst_all_literals_in_exp env kf e =
   let env_ref = ref env in
   let o = object
     inherit Cil.genericCilVisitor (Visitor_behavior.copy (Project.current ()))
@@ -64,6 +64,6 @@ let exp_in_depth env kf e =
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)

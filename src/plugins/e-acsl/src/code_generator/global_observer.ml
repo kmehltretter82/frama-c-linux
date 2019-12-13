@@ -54,7 +54,8 @@ let add_initializer vi offset init =
       Options.fatal "variable %a is not monitored" Printer.pp_varinfo vi
 
 let rec literal_in_initializer env kf = function
-  | SingleInit exp -> snd (Literal_observer.exp_in_depth env kf exp)
+  | SingleInit exp ->
+    snd (Literal_observer.subst_all_literals_in_exp env kf exp)
   | CompoundInit (_, l) ->
     List.fold_left (fun env (_, i) -> literal_in_initializer env kf i) env l
 
@@ -69,7 +70,7 @@ let mk_init_function () =
   vi.vdefined <- true;
   (* There is no contract associated with the function *)
   let spec = Cil.empty_funspec () in
-  (* Create function definition which no stmt yet: they will be added
+  (* Create function definition with no stmt yet: they will be added
      afterwards *)
   let blk = Cil.mkBlock [] in
   let fundec =
@@ -134,7 +135,7 @@ let mk_init_function () =
          :: stmts)
       stmts
   in
-  (* Create a new code block with generated statements *)
+  (* create a new code block with generated statements *)
   let b, stmts = match stmts with
     | [] -> assert false
     | stmt :: stmts ->
@@ -142,7 +143,7 @@ let mk_init_function () =
       b, stmts
   in
   let stmts = Cil.mkStmt ~valid_sid:true (Block b) :: stmts in
-  (* Prevent multiple calls to globals_init *)
+  (* prevent multiple calls to [__e_acsl_globals_init] *)
   let loc = Location.unknown in
   let vi_already_run =
     Cil.makeLocalVar

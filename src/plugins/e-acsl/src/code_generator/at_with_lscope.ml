@@ -263,7 +263,7 @@ let to_exp ~loc kf env pot label =
           Constructor.mk_lib_call ~loc
             ~result:(Cil.var vi)
             "malloc"
-            [e_size]
+            [ e_size ]
         in
         malloc_stmt
       | Typing.(C_integer _ | C_float _ | Gmpz) ->

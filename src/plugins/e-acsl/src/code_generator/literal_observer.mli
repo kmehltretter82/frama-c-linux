@@ -24,12 +24,12 @@
 
 open Cil_types
 
-val exp_in_depth: Env.t -> kernel_function -> exp -> exp * Env.t
-(** replace any sub-expression of the given exp that is a literal string by an
-     observed variable   *)
+val subst_all_literals_in_exp: Env.t -> kernel_function -> exp -> exp * Env.t
+(** Replace any sub-expression of the given exp that is a literal string by an
+    observed variable. *)
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)

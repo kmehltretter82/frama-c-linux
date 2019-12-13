@@ -61,8 +61,8 @@ let unmemoized_extend_ast () =
   if Ast.is_computed () then begin
     (* do not modify the existing project: work on a copy.
        Must also extend the current AST with the E-ACSL's library files. *)
-    Options.feedback ~level:2 "AST already computed: \
-E-ACSL is going to work on a copy.";
+    Options.feedback ~level:2
+      "AST already computed: E-ACSL is going to work on a copy.";
     let name = Project.get_name (Project.current ()) in
     let tmpfile =
       Extlib.temp_file_cleanup_at_exit ("e_acsl_" ^ name) ".i" in
@@ -139,7 +139,8 @@ let generate_code =
             Temporal.enable (Options.Temporal_validity.get ());
             let prepared_prj = Prepare_ast.prepare () in
             let res =
-              Project.on prepared_prj
+              Project.on
+                prepared_prj
                 (fun () ->
                    let dup_prj = Dup_functions.dup () in
                    let copied_prj =

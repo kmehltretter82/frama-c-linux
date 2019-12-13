@@ -35,7 +35,7 @@ let replace_literal_string_in_exp env kf_opt (* None for globals *) e =
      replace literal strings elsewhere *)
   match kf_opt with
   | None -> e, env
-  | Some kf -> Literal_observer.exp_in_depth env kf e
+  | Some kf -> Literal_observer.subst_all_literals_in_exp env kf e
 
 let rec inject_in_init env kf_opt vi off = function
   | SingleInit e as init ->
@@ -466,11 +466,16 @@ and inject_in_block (env: Env.t) kf blk =
       blk.bstmts
   in
   blk.bstmts <- List.rev stmts;
+  (* now inject code that de-allocate the necessary observation variables and
+     blocks of the runtime memory that have been previously allocated *)
+  (* calls to [free] for de-allocating variables observing \at(_,_) *)
   let free_stmts = At_with_lscope.Free.find_all kf in
   match blk.blocals, free_stmts with
   | [], [] ->
     env
   | [], _ :: _ | _ :: _, [] | _ :: _, _ :: _ ->
+    (* [TODO] this piece of code could be improved *)
+    (* de-allocate the memory blocks observing locals *)
     let add_locals stmts =
       if Functions.instrument kf then
         List.fold_left
@@ -483,6 +488,7 @@ and inject_in_block (env: Env.t) kf blk =
       else
         stmts
     in
+    (* select the precise location to inject these pieces of code *)
     let rec insert_in_innermost_last_block blk = function
       | { skind = Return _ } as ret :: ((potential_clean :: tl) as l) ->
         (* keep the return (enclosed in a generated block) at the end;
@@ -657,21 +663,21 @@ let inject_global_initializer file main =
          [main] *)
       main.sbody.bstmts <- stmt :: main.sbody.bstmts;
       let new_globals =
-        List.fold_right
-          (fun g acc -> match g with
+        List.fold_left
+          (fun acc g -> match g with
              | GFun({ svar = vi }, _)
                when Varinfo.equal vi main.svar ->
                acc
              | _ -> g :: acc)
-          file.globals
           [ cil_fct; GFun(main, Location.unknown) ]
+          file.globals
       in
+      let new_globals = List.rev new_globals in
       (* add the literal string varinfos as the very first
          globals *)
       let new_globals =
         Literal_strings.fold
-          (fun _ vi l ->
-             GVar(vi, { init = None }, Location.unknown) :: l)
+          (fun _ vi l -> GVar(vi, { init = None }, Location.unknown) :: l)
           new_globals
       in
       file.globals <- new_globals
@@ -691,7 +697,7 @@ let inject_mmodel_initializer main =
   let nulls = [ Cil.zero loc ; Cil.zero loc ] in
   let handle_main main =
     let args =
-      (* record arguments only if the second has a pointer type, so a argument
+      (* record arguments only if the second has a pointer type, so argument
          strings can be recorded. This is sufficient to capture C99 compliant
          arguments and GCC extensions with environ. *)
       match main.sformals with
@@ -725,14 +731,20 @@ let inject_in_file file =
   inject_mmodel_initializer main
 
 let reset_all ast =
+  (* by default, do not run E-ACSL on the generated code *)
   Options.Run.off ();
+  (* reset all the E-ACSL environments to their original states *)
   Misc.reset ();
   Logic_functions.reset ();
   Literal_strings.reset ();
   Global_observer.reset ();
   Typing.clear ();
+  (* reset some kernel states: *)
+  (* reset the CFG that has been heavily modified by the code generation step *)
   Cfg.clearFileCFG ~clear_id:false ast;
   Cfg.computeFileCFG ast;
+  (* notify the kernel that new code has been generated (but we have kept the
+     old one) *)
   Ast.mark_as_grown ()
 
 let inject () =

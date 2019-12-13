@@ -318,7 +318,8 @@ let emitter =
     ~correctness:[ Options.Gmp_only.parameter ]
     ~tuning:[]
 
-let add_assert kf stmt annot = Annotations.add_assert emitter ~kf stmt annot
+let add_assert kf stmt annot =
+  Annotations.add_assert emitter ~kf stmt annot
 
 let add_stmt ?(post=false) ?before env kf stmt =
   if not post then
