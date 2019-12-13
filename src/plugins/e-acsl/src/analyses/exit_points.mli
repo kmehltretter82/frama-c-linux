@@ -45,4 +45,4 @@ val delete_vars: stmt -> Varinfo.Set.t
 
 val store_vars: stmt -> Varinfo.Set.t
 (** Compute variables that should be re-recorded before a labelled statement to
-    which some goto jumps *)
+    which some goto jumps. *)

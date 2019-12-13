@@ -958,8 +958,9 @@ let assumes_predicate bhv =
   List.fold_left
     (fun acc p ->
        let loc = p.ip_content.pred_loc in
-       Logic_const.pand ~loc (acc,
-                              Logic_const.unamed ~loc p.ip_content.pred_content))
+       Logic_const.pand ~loc
+         (acc,
+          Logic_const.unamed ~loc p.ip_content.pred_content))
     Logic_const.ptrue
     bhv.b_assumes
 

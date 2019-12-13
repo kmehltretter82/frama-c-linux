@@ -65,8 +65,8 @@ let rec has_set_as_index = function
     has_set_as_index toffset
 
 (* Performs Range Elimination on index [TIndex(term, offset)]. Term part.
-   Raises [Range_elimination_exception] if whether the operation is unsound or
-   if we don't support the construction yet. *)
+   Raises [Range_elimination_exception] whether either the operation is unsound
+   or we don't support the construction yet. *)
 let eliminate_ranges_from_index_of_term ~loc t =
   match t.term_node with
   | Trange(Some n1, Some n2) ->
@@ -79,8 +79,8 @@ let eliminate_ranges_from_index_of_term ~loc t =
 
 (* Performs Range Elimination on index [TIndex(term, offset)]. Offset part.
    Raises [Range_elimination_exception], through [eliminate_ranges_from_
-   index_of_term], if whether the operation is unsound or
-   if we don't support the construction yet. *)
+   index_of_term], whether either the operation is unsound or we don't support
+   the construction yet. *)
 let rec eliminate_ranges_from_index_of_toffset ~loc toffset quantifiers =
   match toffset with
   | TIndex(t, toffset') ->

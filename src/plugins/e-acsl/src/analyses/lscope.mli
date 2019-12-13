@@ -24,7 +24,7 @@ open Cil_types
 
 (* Handle the logic scope of a term.
    We define the logic scope of a term [t] to be the set of PURELY logic
-   variables that are visible by [t]. *)
+   variables that are bound in [t] in case of use. *)
 
 type lscope_var =
   | Lvs_let of logic_var * term (* the expression to which the lv is binded *)

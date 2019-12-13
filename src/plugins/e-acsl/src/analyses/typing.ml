@@ -184,7 +184,7 @@ end = struct
 
   module H = Hashtbl.Make(struct
       type t = term
-      (* the comparison over terms is the physical equality. It cannot be the
+      (* The comparison over terms is the physical equality. It cannot be the
          structural one (given by [Cil_datatype.Term.equal]) because the very
          same term can be used in 2 different contexts which lead to different
          casts.

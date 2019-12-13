@@ -134,7 +134,7 @@ let generate_kf ~loc fname env ret_ty params_ty li =
            | Typing.Nan -> Typing.typ_of_lty lvi.lv_type
          in
          (* build the formals: cannot use [Cil.makeFormal] since the function
-            does not yet exist *)
+            does not exist yet *)
          let vi = Cil.makeVarinfo false true lvi.lv_name ty in
          vi :: params, (lvi.lv_name, ty, []) :: params_ty)
       li.l_profile
