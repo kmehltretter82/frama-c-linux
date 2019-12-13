@@ -129,7 +129,7 @@ let mk_named_store_stmt name ?str_size vi =
   | _, Some size ->
     Options.fatal
       "unexpected types for arguments of function '%s': \
-      %s got type %a, while representing a memory block of %a bytes"
+       %s got type %a, while representing a memory block of %a bytes"
       name
       vi.vname
       Printer.pp_typ ty
