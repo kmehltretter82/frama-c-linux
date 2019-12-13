@@ -659,22 +659,25 @@ let inject_global_initializer file main =
           (Call(None, exp, [], Location.unknown))
       in
       vi.vreferenced <- true;
-      (* insert [__e_acsl_globals_init ();] as first statement of
-         [main] *)
+      (* insert [__e_acsl_globals_init ();] as first statement of [main] *)
       main.sbody.bstmts <- stmt :: main.sbody.bstmts;
       let new_globals =
         List.fold_left
           (fun acc g -> match g with
-             | GFun({ svar = vi }, _)
-               when Varinfo.equal vi main.svar ->
-               acc
+             | GFun({ svar = vi }, _) when Varinfo.equal vi main.svar -> acc
              | _ -> g :: acc)
-          [ cil_fct; GFun(main, Location.unknown) ]
+          []
           file.globals
       in
-      let new_globals = List.rev new_globals in
-      (* add the literal string varinfos as the very first
-         globals *)
+      let new_globals =
+        let rec rev_and_extend acc = function
+          | [] -> acc
+          | f :: l -> rev_and_extend (f :: acc) l
+        in
+        (* [__e_acsl_globals_init] and [main] at the end *)
+        rev_and_extend [ cil_fct; GFun(main, Location.unknown) ] new_globals
+      in
+      (* add the literal string varinfos as the very first globals *)
       let new_globals =
         Literal_strings.fold
           (fun _ vi l -> GVar(vi, { init = None }, Location.unknown) :: l)
