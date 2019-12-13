@@ -79,9 +79,9 @@ val mk_runtime_check:
   ?reverse:bool -> annotation_kind -> kernel_function -> exp -> predicate ->
   stmt
 (** [mk_runtime_check kind kf e p] generates a runtime check for predicate [p]
-   by building a call to [__e_acsl_assert]. [e] (or [!e] if [reverse] is set to
-   [true]) is the C translation of [p], [kf] is the current kernel_function and
-   [kind] is the annotation kind of [p]. *)
+    by building a call to [__e_acsl_assert]. [e] (or [!e] if [reverse] is set to
+    [true]) is the C translation of [p], [kf] is the current kernel_function and
+    [kind] is the annotation kind of [p]. *)
 
 (*
 Local Variables:
