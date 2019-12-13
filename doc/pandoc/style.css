@@ -61,7 +61,7 @@ body {
     max-width: 8cm ;
     height: 100% ;
     padding: 0cm 0.5cm 0cm 0.5cm ;
-    background: #888 ;
+    background: #eee ;
 }
 
 #CONTENT {
@@ -85,6 +85,10 @@ body {
     font-size: smaller ;
 }
 
+#NAVIGATION a {
+    color: black ;
+}
+
 #NAVIGATION a.root {
     display: block;
     font-family: "Optima", "Verdana", "Arial", sans;
@@ -104,14 +108,6 @@ body {
     background-color: darkorange ;
 }
 
-#NAVIGATION a {
-    color: white ;
-}
-
-#NAVIGATION code {
-    color: black ;
-}
-
 #NAVIGATION ul {
     width: 6cm ;
 }
@@ -120,7 +116,6 @@ body {
     margin-left: 0px ;
     padding-top: 2px ;
     padding-bottom: 2px ;
-    background-color: darkgrey ;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -177,6 +172,8 @@ li {
     padding-left: 6px ;
     padding-right : 6px ;
 }
+
+li p { margin: 0px }
 
 pre {
     width : 15cm ;
