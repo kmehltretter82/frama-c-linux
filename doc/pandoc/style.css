@@ -138,13 +138,11 @@ h2 {
     margin-top: 5mm;
     margin-bottom: 2mm;
     border-bottom: solid thin darkred ;
-    color: darkred;
 }
 
 h3 {
     width: 17cm;
     font-family: "Optima", "Verdana", "Arial", sans;
-    color: black;
     margin-top: 5mm;
     margin-bottom: 3mm;
     border-bottom: thin solid #404040;
@@ -158,7 +156,6 @@ h4,h5,h6 {
     font-size: 10pt;
     font-style: italic;
     font-weight: bold;
-    color: darkred;
 }
 
 p { margin: 6px 0px 6px 0px; width: 15cm; }

@@ -66,7 +66,7 @@ let publish ~page ~name ~descr ~synopsis ?(details = []) () =
   let id = Printf.sprintf "data-%s" name in
   let title = Printf.sprintf "`DATA` %s" name in
   let index = [ Printf.sprintf "%s (`DATA`)" name ] in
-    let dref = Doc.href page id in
+  let dref = Doc.href page id in
   let dlink = Markdown.href ~text:(Markdown.emph name) dref in
   let syntax = Markdown.(glue [
       plain "<" ; dlink ; plain ">" ; plain ":=" ; synopsis.text ]) in
