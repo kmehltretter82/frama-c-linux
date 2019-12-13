@@ -73,6 +73,6 @@ let delete_from_set ?before env kf vars =
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)
