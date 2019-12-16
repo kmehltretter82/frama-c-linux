@@ -27,7 +27,7 @@ open Cil_datatype
 let dkey = Options.dkey_translation
 
 (* ************************************************************************** *)
-(* Expression *)
+(* Expressions *)
 (* ************************************************************************** *)
 
 let replace_literal_string_in_exp env kf_opt (* None for globals *) e =
