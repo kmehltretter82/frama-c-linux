@@ -29,7 +29,7 @@ type model = {
   descr : string ; (* Title of the Model (for pretty) *)
   emitter : Emitter.t ;
   hypotheses : hypotheses ;
-  configure : ((unit -> unit) -> rollback) ;
+  configure : (unit -> rollback) ;
 }
 
 and rollback = (unit -> unit)
@@ -51,7 +51,7 @@ struct
   let repr = {
     id = "?model" ; descr = "?model" ;
     emitter = Emitter.kernel ;
-    configure = (fun f -> f () ; (fun () -> ())) ;
+    configure = (fun () -> (fun () -> ())) ;
     hypotheses = nohyp ;
   }
 end
@@ -125,16 +125,14 @@ end
 
 let context : (string * context) Context.value = Context.create "WpContext"
 
-let configure (model,_) f = model.configure f
+let configure (model,_) = model.configure ()
 
 let on_context gamma f x =
   let id = S.id gamma in
   let current = Context.push context (id,gamma) in
-  let rollback = try
-      configure gamma Context.configure
-    with _ ->
-      Kernel.fatal "Model configuration failed"
-  in
+  let rollback = try configure gamma
+    with _ -> Kernel.fatal "Model configuration failed" in
+  Context.configure () ;
   try
     let result = f x in
     Context.pop context current ;

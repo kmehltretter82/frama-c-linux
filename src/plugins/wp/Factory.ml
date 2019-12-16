@@ -283,30 +283,11 @@ let configure_mheap = function
       in
       rollback
 
-module PROJECT = WpContext.Static
-    (struct
-      type key = unit
-      type data = LogicBuiltins.driver
-      let name = "Wp.Factory.PROJECT"
-      let pretty fmt _ = Format.fprintf fmt "%s" name
-      let compare _ _ = 0
-    end)
-
-let configure_driver setup base project_configure =
+let configure_driver setup driver () =
   let rollback_mheap = configure_mheap setup.mheap in
   let rollback_cint = Cint.configure setup.cint in
   let rollback_cfloat = Cfloat.configure setup.cfloat in
-  let project_driver = try PROJECT.find ()
-    with Not_found ->
-      let (setup_id, _) = describe setup in
-      let id = LogicBuiltins.id base ^ "_" ^ setup_id in
-      let project_driver =
-        LogicBuiltins.new_driver ~base ~id ~configure:project_configure ()
-      in
-      PROJECT.update () project_driver ;
-      project_driver
-  in
-  let old_driver = Context.push LogicBuiltins.driver project_driver in
+  let old_driver = Context.push LogicBuiltins.driver driver in
   let rollback () =
     Context.pop LogicBuiltins.driver old_driver ;
     rollback_cfloat () ;
