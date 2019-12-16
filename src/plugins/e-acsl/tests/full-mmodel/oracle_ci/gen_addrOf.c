@@ -15,13 +15,13 @@ void f(void)
   p = u;
   __e_acsl_full_init((void *)(& m));
   m = 123;
-  /*@ assert \initialized(p); */
   {
     int __gen_e_acsl_initialized;
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)p,sizeof(int));
     __e_acsl_assert(__gen_e_acsl_initialized,(char *)"Assertion",(char *)"f",
                     (char *)"\\initialized(p)",10);
   }
+  /*@ assert \initialized(p); */ ;
   __e_acsl_delete_block((void *)(& p));
   __e_acsl_delete_block((void *)(& u));
   __e_acsl_delete_block((void *)(& m));
@@ -67,9 +67,9 @@ int main(void)
   __e_acsl_store_block((void *)(& x),(size_t)4);
   __e_acsl_full_init((void *)(& x));
   f();
-  /*@ assert &x ≡ &x; */
   __e_acsl_assert(& x == & x,(char *)"Assertion",(char *)"main",
                   (char *)"&x == &x",16);
+  /*@ assert &x ≡ &x; */ ;
   __e_acsl_full_init((void *)(& __retres));
   __retres = 0;
   __e_acsl_delete_block((void *)(& f));

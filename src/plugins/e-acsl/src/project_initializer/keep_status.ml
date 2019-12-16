@@ -141,12 +141,22 @@ let must_translate kf kind =
     let kind', keep =
       try Datatype.Int.Map.find info.cpt info.statuses
       with Not_found ->
-        Options.fatal "[keep_status] unbound annotation (id %d)" info.cpt
+        Options.fatal "[keep_status] unbound annotation (id %d)@ in function %a"
+          info.cpt
+          Kernel_function.pretty kf
     in
     (* check kind consistency in order to detect more abnormal behaviors *)
     if kind <> kind' then
-      Options.fatal "[keep_status] incorrect kind '%a' (expected: '%a')"
+      Options.fatal
+        "[keep_status] incorrect kind '%a' (expected: '%a')@ in function %a"
         pretty_kind kind
-        pretty_kind kind';
+        pretty_kind kind'
+        Kernel_function.pretty kf;
     keep
     with Not_found -> true
+
+(*
+Local Variables:
+compile-command: "make -C ../../../../.."
+End:
+*)

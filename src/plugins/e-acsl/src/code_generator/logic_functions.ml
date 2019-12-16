@@ -177,9 +177,8 @@ let generate_kf ~loc fname env ret_ty params_ty li =
   in
   Cil.setMaxId fundec;
   let spec = Cil.empty_funspec () in
-  Queue.add
-    (fun () -> Globals.Functions.replace_by_definition spec fundec loc)
-    (Env.get_visitor env)#get_filling_actions;
+  (* register the definition *)
+  Globals.Functions.replace_by_definition spec fundec loc;
   (* create the kernel function itself *)
   let kf = { fundec = Definition(fundec, loc); spec } in
   (* closure generating the function's body.
@@ -187,8 +186,6 @@ let generate_kf ~loc fname env ret_ty params_ty li =
      of recursive function calls) *)
   let gen_body () =
     let env = Env.push env in
-    let old_kf = Extlib.the (Env.current_kf env) in
-    Env.set_current_kf env kf;
     (* fill the typing environment with the function's parameters
        before generating the code (code generation invokes typing) *)
     let env =
@@ -225,10 +222,7 @@ let generate_kf ~loc fname env ret_ty params_ty li =
       (fun lvi ->
          Interval.Env.remove lvi;
          ignore (Env.Logic_binding.remove env lvi))
-      li.l_profile;
-    Env.set_current_kf
-      env
-      (Visitor_behavior.Get_orig.kernel_function (Env.get_behavior env) old_kf)
+      li.l_profile
   in
   vi, kf, gen_body
 
@@ -286,7 +280,7 @@ let add_generated_functions globals =
   in
   List.rev rev_globals
 
-let tapp_to_exp ~loc fname env t li params_ty args =
+let tapp_to_exp ~loc fname env kf t li params_ty args =
   let ret_ty = Typing.get_typ t in
   let gen tbl =
     let vi, kf, gen_body = generate_kf fname ~loc env ret_ty params_ty li in
@@ -340,6 +334,7 @@ let tapp_to_exp ~loc fname env t li params_ty args =
     ~loc
     ~name:li.l_var_info.lv_name
     env
+    kf
     (Some t)
     ret_ty
     (fun vi _ -> [ Cil.mkStmtOneInstr ~valid_sid:true (mkcall vi) ])

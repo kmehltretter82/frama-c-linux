@@ -5,7 +5,6 @@ int main(void)
 {
   int __retres;
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
-  /*@ assert ∀ unsigned char c; 4 ≤ c ≤ 300 ⇒ 0 ≤ c ≤ 255; */
   {
     int __gen_e_acsl_forall;
     int __gen_e_acsl_c;
@@ -30,8 +29,8 @@ int main(void)
                     (char *)"\\forall unsigned char c; 4 <= c <= 300 ==> 0 <= c <= 255",
                     6);
   }
+  /*@ assert ∀ unsigned char c; 4 ≤ c ≤ 300 ⇒ 0 ≤ c ≤ 255; */ ;
   int n = 5;
-  /*@ assert \let m = n > 0? 4: 341; ∀ char u; 1 < u < m ⇒ u > 0; */
   {
     int __gen_e_acsl_m;
     int __gen_e_acsl_if;
@@ -62,6 +61,7 @@ int main(void)
                     (char *)"\\let m = n > 0? 4: 341;\n\\forall char u; 1 < u < m ==> u > 0",
                     10);
   }
+  /*@ assert \let m = n > 0? 4: 341; ∀ char u; 1 < u < m ⇒ u > 0; */ ;
   __retres = 0;
   return __retres;
 }

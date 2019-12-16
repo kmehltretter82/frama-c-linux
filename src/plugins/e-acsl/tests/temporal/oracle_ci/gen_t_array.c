@@ -13,13 +13,12 @@ int main(void)
   int b = 222;
   __e_acsl_store_block((void *)(& b),(size_t)4);
   __e_acsl_full_init((void *)(& b));
-  __e_acsl_temporal_store_nblock((void *)(src),(void *)(& a));
   __e_acsl_initialize((void *)(src),sizeof(int *));
+  __e_acsl_temporal_store_nblock((void *)(src),(void *)(& a));
   src[0] = & a;
-  __e_acsl_temporal_store_nblock((void *)(& src[1]),(void *)(& b));
   __e_acsl_initialize((void *)(& src[1]),sizeof(int *));
+  __e_acsl_temporal_store_nblock((void *)(& src[1]),(void *)(& b));
   src[1] = & b;
-  /*@ assert \valid(src[0]); */
   {
     int __gen_e_acsl_initialized;
     int __gen_e_acsl_and;
@@ -35,7 +34,7 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid(src[0])",13);
   }
-  /*@ assert \valid(src[1]); */
+  /*@ assert \valid(src[0]); */ ;
   {
     int __gen_e_acsl_initialized_2;
     int __gen_e_acsl_and_2;
@@ -52,7 +51,7 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_and_2,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid(src[1])",14);
   }
-  /*@ assert ¬\valid(src[2]); */
+  /*@ assert \valid(src[1]); */ ;
   {
     int __gen_e_acsl_initialized_3;
     int __gen_e_acsl_and_3;
@@ -69,6 +68,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_and_3,(char *)"Assertion",(char *)"main",
                     (char *)"!\\valid(src[2])",15);
   }
+  /*@ assert ¬\valid(src[2]); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(src));
   __e_acsl_delete_block((void *)(& b));

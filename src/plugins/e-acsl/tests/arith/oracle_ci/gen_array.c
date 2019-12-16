@@ -21,12 +21,12 @@ int main(void)
       i_0 ++;
     }
   }
-  /*@ assert T1[0] ≡ T2[0]; */
   __e_acsl_assert(T1[0] == T2[0],(char *)"Assertion",(char *)"main",
                   (char *)"T1[0] == T2[0]",13);
-  /*@ assert T1[1] ≢ T2[1]; */
+  /*@ assert T1[0] ≡ T2[0]; */ ;
   __e_acsl_assert(T1[1] != T2[1],(char *)"Assertion",(char *)"main",
                   (char *)"T1[1] != T2[1]",14);
+  /*@ assert T1[1] ≢ T2[1]; */ ;
   __retres = 0;
   return __retres;
 }

@@ -68,6 +68,7 @@ struct list *__gen_e_acsl_f(struct list *l)
   int __gen_e_acsl_at;
   struct list *__retres;
   __e_acsl_store_block((void *)(& __retres),(size_t)8);
+  __e_acsl_store_block((void *)(& l),(size_t)8);
   __gen_e_acsl_at_4 = l;
   {
     int __gen_e_acsl_valid;
@@ -102,7 +103,6 @@ struct list *__gen_e_acsl_f(struct list *l)
   }
   __gen_e_acsl_at_2 = l;
   __gen_e_acsl_at = l == (struct list *)0;
-  __e_acsl_store_block((void *)(& l),(size_t)8);
   __retres = f(l);
   {
     int __gen_e_acsl_implies;

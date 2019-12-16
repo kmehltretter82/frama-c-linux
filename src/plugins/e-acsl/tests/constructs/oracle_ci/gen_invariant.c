@@ -9,17 +9,17 @@ int main(void)
   {
     int i = 0;
     while (i < 10) {
-      /*@ invariant 0 ≤ i < 10; */
       {
         int __gen_e_acsl_and;
         if (0 <= i) __gen_e_acsl_and = i < 10; else __gen_e_acsl_and = 0;
         __e_acsl_assert(__gen_e_acsl_and,(char *)"Invariant",(char *)"main",
                         (char *)"0 <= i < 10",9);
       }
+      /*@ invariant 0 ≤ i < 10; */ ;
       x += i;
-      /*@ invariant i ≤ x; */
       __e_acsl_assert(i <= x,(char *)"Invariant",(char *)"main",
                       (char *)"i <= x",11);
+      /*@ invariant i ≤ x; */ ;
       i ++;
     }
   }

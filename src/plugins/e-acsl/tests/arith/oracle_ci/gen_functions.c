@@ -88,21 +88,20 @@ int main(void)
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   int x = 1;
   int y = 2;
-  /*@ assert p1(x, y); */
   {
     int __gen_e_acsl_p1_2;
     __gen_e_acsl_p1_2 = __gen_e_acsl_p1(x,y);
     __e_acsl_assert(__gen_e_acsl_p1_2,(char *)"Assertion",(char *)"main",
                     (char *)"p1(x, y)",42);
   }
-  /*@ assert p2(3, 4); */
+  /*@ assert p1(x, y); */ ;
   {
     int __gen_e_acsl_p2_2;
     __gen_e_acsl_p2_2 = __gen_e_acsl_p2(3,4);
     __e_acsl_assert(__gen_e_acsl_p2_2,(char *)"Assertion",(char *)"main",
                     (char *)"p2(3, 4)",43);
   }
-  /*@ assert p2(5, 99999999999999999999999999999); */
+  /*@ assert p2(3, 4); */ ;
   {
     __e_acsl_mpz_t __gen_e_acsl_;
     int __gen_e_acsl_p2_4;
@@ -113,14 +112,14 @@ int main(void)
                     (char *)"p2(5, 99999999999999999999999999999)",44);
     __gmpz_clear(__gen_e_acsl_);
   }
-  /*@ assert f1(x, y) ≡ 3; */
+  /*@ assert p2(5, 99999999999999999999999999999); */ ;
   {
     long __gen_e_acsl_f1_2;
     __gen_e_acsl_f1_2 = __gen_e_acsl_f1(x,y);
     __e_acsl_assert(__gen_e_acsl_f1_2 == 3L,(char *)"Assertion",
                     (char *)"main",(char *)"f1(x, y) == 3",46);
   }
-  /*@ assert p2(x, f1(3, 4)); */
+  /*@ assert f1(x, y) ≡ 3; */ ;
   {
     long __gen_e_acsl_f1_4;
     int __gen_e_acsl_p2_6;
@@ -129,7 +128,7 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_p2_6,(char *)"Assertion",(char *)"main",
                     (char *)"p2(x, f1(3, 4))",47);
   }
-  /*@ assert f1(9, 99999999999999999999999999999) > 0; */
+  /*@ assert p2(x, f1(3, 4)); */ ;
   {
     __e_acsl_mpz_t __gen_e_acsl__4;
     __e_acsl_mpz_t __gen_e_acsl_f1_6;
@@ -147,10 +146,7 @@ int main(void)
     __gmpz_clear(__gen_e_acsl_f1_6);
     __gmpz_clear(__gen_e_acsl__5);
   }
-  /*@ assert
-      f1(99999999999999999999999999999, 99999999999999999999999999999) ≡
-      199999999999999999999999999998;
-  */
+  /*@ assert f1(9, 99999999999999999999999999999) > 0; */ ;
   {
     __e_acsl_mpz_t __gen_e_acsl__6;
     __e_acsl_mpz_t __gen_e_acsl_f1_8;
@@ -170,32 +166,36 @@ int main(void)
     __gmpz_clear(__gen_e_acsl_f1_8);
     __gmpz_clear(__gen_e_acsl__7);
   }
-  /*@ assert g(x) ≡ x; */
+  /*@
+  assert
+  f1(99999999999999999999999999999, 99999999999999999999999999999) ≡
+  199999999999999999999999999998; */
+  ;
   {
     int __gen_e_acsl_g_2;
     __gen_e_acsl_g_2 = __gen_e_acsl_g(x);
     __e_acsl_assert(__gen_e_acsl_g_2 == x,(char *)"Assertion",(char *)"main",
                     (char *)"g(x) == x",53);
   }
+  /*@ assert g(x) ≡ x; */ ;
   char c = (char)'c';
-  /*@ assert h_char(c) ≡ c; */
   {
     int __gen_e_acsl_h_char_2;
     __gen_e_acsl_h_char_2 = __gen_e_acsl_h_char((int)c);
     __e_acsl_assert(__gen_e_acsl_h_char_2 == (int)c,(char *)"Assertion",
                     (char *)"main",(char *)"h_char(c) == c",56);
   }
+  /*@ assert h_char(c) ≡ c; */ ;
   short s = (short)1;
-  /*@ assert h_short(s) ≡ s; */
   {
     int __gen_e_acsl_h_short_2;
     __gen_e_acsl_h_short_2 = __gen_e_acsl_h_short((int)s);
     __e_acsl_assert(__gen_e_acsl_h_short_2 == (int)s,(char *)"Assertion",
                     (char *)"main",(char *)"h_short(s) == s",58);
   }
+  /*@ assert h_short(s) ≡ s; */ ;
   m.k = 8;
   m.l = 9;
-  /*@ assert t2(t1(m)) ≡ 17; */
   {
     mystruct __gen_e_acsl_t1_2;
     long __gen_e_acsl_t2_2;
@@ -204,15 +204,16 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_t2_2 == 17L,(char *)"Assertion",
                     (char *)"main",(char *)"t2(t1(m)) == 17",63);
   }
+  /*@ assert t2(t1(m)) ≡ 17; */ ;
   __gen_e_acsl_k(9);
   double d = 2.0;
-  /*@ assert f2(d) > 0; */
   {
     double __gen_e_acsl_f2_2;
     __gen_e_acsl_f2_2 = __gen_e_acsl_f2(d);
     __e_acsl_assert(__gen_e_acsl_f2_2 > 0.,(char *)"Assertion",
                     (char *)"main",(char *)"f2(d) > 0",68);
   }
+  /*@ assert f2(d) > 0; */ ;
   __retres = 0;
   return __retres;
 }

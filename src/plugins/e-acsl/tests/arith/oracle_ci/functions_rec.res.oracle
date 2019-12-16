@@ -1,14 +1,12 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] tests/arith/functions_rec.c:22: Warning: 
-  assertion got status unknown.
+  function __e_acsl_assert: precondition got status unknown.
 [eva:alarm] tests/arith/functions_rec.c:22: Warning: 
-  function __e_acsl_assert: precondition got status unknown.
-[eva:alarm] tests/arith/functions_rec.c:23: Warning: 
   assertion got status unknown.
 [eva:alarm] tests/arith/functions_rec.c:23: Warning: 
   function __e_acsl_assert: precondition got status unknown.
-[eva:alarm] tests/arith/functions_rec.c:24: Warning: 
+[eva:alarm] tests/arith/functions_rec.c:23: Warning: 
   assertion got status unknown.
 [eva] tests/arith/functions_rec.c:7: Warning: 
   recursive call during value analysis
@@ -18,7 +16,7 @@
   Assuming the call has no effect. The analysis will be unsound.
 [eva:alarm] tests/arith/functions_rec.c:24: Warning: 
   function __e_acsl_assert: precondition got status unknown.
-[eva:alarm] tests/arith/functions_rec.c:26: Warning: 
+[eva:alarm] tests/arith/functions_rec.c:24: Warning: 
   assertion got status unknown.
 [eva] tests/arith/functions_rec.c:10: Warning: 
   recursive call during value analysis
@@ -67,7 +65,7 @@
   2147483647;
 [eva:alarm] tests/arith/functions_rec.c:26: Warning: 
   function __e_acsl_assert: precondition got status unknown.
-[eva:alarm] tests/arith/functions_rec.c:28: Warning: 
+[eva:alarm] tests/arith/functions_rec.c:26: Warning: 
   assertion got status unknown.
 [eva] tests/arith/functions_rec.c:14: Warning: 
   recursive call during value analysis
@@ -75,7 +73,7 @@
                                              __gen_e_acsl_f3 :: tests/arith/functions_rec.c:28 <-
                                              main).
   Assuming the call has no effect. The analysis will be unsound.
-[eva:alarm] tests/arith/functions_rec.c:30: Warning: 
+[eva:alarm] tests/arith/functions_rec.c:28: Warning: 
   assertion got status unknown.
 [eva] tests/arith/functions_rec.c:17: Warning: 
   recursive call during value analysis
@@ -85,3 +83,5 @@
   Assuming the call has no effect. The analysis will be unsound.
 [eva:alarm] tests/arith/functions_rec.c:30: Warning: 
   function __e_acsl_assert: precondition got status unknown.
+[eva:alarm] tests/arith/functions_rec.c:30: Warning: 
+  assertion got status unknown.

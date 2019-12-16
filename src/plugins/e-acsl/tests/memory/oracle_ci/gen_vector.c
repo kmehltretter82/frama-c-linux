@@ -7,9 +7,6 @@ int *new_inversed(int len, int *v)
   int i;
   int *p;
   __e_acsl_store_block((void *)(& p),(size_t)8);
-  /*@ assert
-      \valid(v) ∧ \offset(v) + len * sizeof(int) ≤ \block_length(v);
-  */
   {
     int __gen_e_acsl_valid;
     int __gen_e_acsl_and;
@@ -48,6 +45,10 @@ int *new_inversed(int len, int *v)
                     (char *)"\\valid(v) && \\offset(v) + len * sizeof(int) <= \\block_length(v)",
                     11);
   }
+  /*@
+  assert \valid(v) ∧ \offset(v) + len * sizeof(int) ≤ \block_length(v);
+   */
+  ;
   __e_acsl_full_init((void *)(& p));
   p = (int *)malloc(sizeof(int) * (unsigned long)len);
   i = 0;
@@ -71,7 +72,6 @@ int main(void)
   int v1[3] = {1, 2, x};
   __e_acsl_store_block((void *)(v1),(size_t)12);
   __e_acsl_full_init((void *)(& v1));
-  /*@ assert \valid(&v1[2]); */
   {
     int __gen_e_acsl_valid;
     __gen_e_acsl_valid = __e_acsl_valid((void *)(& v1[2]),sizeof(int),
@@ -79,8 +79,8 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_valid,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid(&v1[2])",21);
   }
+  /*@ assert \valid(&v1[2]); */ ;
   LAST = v1[2];
-  /*@ assert \initialized(&v1[2]); */
   {
     int __gen_e_acsl_initialized;
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& v1[2]),
@@ -88,11 +88,11 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_initialized,(char *)"Assertion",
                     (char *)"main",(char *)"\\initialized(&v1[2])",23);
   }
+  /*@ assert \initialized(&v1[2]); */ ;
   __e_acsl_full_init((void *)(& v2));
   v2 = new_inversed(3,v1);
   /*@ assert Eva: initialization: \initialized(v2 + 2); */
   LAST = *(v2 + 2);
-  /*@ assert \initialized(v2 + 2); */
   {
     int __gen_e_acsl_initialized_2;
     __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(v2 + 2),
@@ -100,9 +100,10 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_initialized_2,(char *)"Assertion",
                     (char *)"main",(char *)"\\initialized(v2 + 2)",26);
   }
-  /*@ assert LAST ≡ 1; */
+  /*@ assert \initialized(v2 + 2); */ ;
   __e_acsl_assert(LAST == 1,(char *)"Assertion",(char *)"main",
                   (char *)"LAST == 1",27);
+  /*@ assert LAST ≡ 1; */ ;
   free((void *)v2);
   __retres = 0;
   __e_acsl_delete_block((void *)(& v2));

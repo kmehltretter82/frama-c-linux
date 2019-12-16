@@ -13,7 +13,6 @@ int main(void)
     __e_acsl_full_init((void *)(& a));
     __e_acsl_full_init((void *)(& p));
     p = & a;
-    /*@ assert \valid(p); */
     {
       int __gen_e_acsl_initialized;
       int __gen_e_acsl_and;
@@ -29,6 +28,7 @@ int main(void)
       __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"main",
                       (char *)"\\valid(p)",11);
     }
+    /*@ assert \valid(p); */ ;
     __e_acsl_delete_block((void *)(& a));
     goto L;
     __e_acsl_delete_block((void *)(& a));

@@ -22,7 +22,6 @@ int main(void)
   char *p = (char *)(tab);
   __e_acsl_store_block((void *)(& p),(size_t)8);
   __e_acsl_full_init((void *)(& p));
-  /*@ assert ¬\valid(p + (0 .. 9)); */
   {
     int __gen_e_acsl_valid;
     __gen_e_acsl_valid = __e_acsl_valid((void *)(p + 1 * 0),(size_t)9,
@@ -30,7 +29,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_valid,(char *)"Assertion",(char *)"main",
                     (char *)"!\\valid(p + (0 .. 9))",10);
   }
-  /*@ assert \valid(&t[0 .. 9]); */
+  /*@ assert ¬\valid(p + (0 .. 9)); */ ;
   {
     int __gen_e_acsl_valid_2;
     __gen_e_acsl_valid_2 = __e_acsl_valid((void *)(& t + 1 * 0),(size_t)9,
@@ -38,6 +37,7 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_valid_2,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid(&t[0 .. 9])",11);
   }
+  /*@ assert \valid(&t[0 .. 9]); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(t));
   __e_acsl_delete_block((void *)(& p));

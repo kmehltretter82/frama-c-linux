@@ -69,6 +69,7 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
   int __gen_e_acsl_at;
   void *__retres;
   __e_acsl_store_block((void *)(& __retres),(size_t)8);
+  __e_acsl_store_block((void *)(& buf),(size_t)8);
   {
     int __gen_e_acsl_forall_2;
     unsigned int __gen_e_acsl_k;
@@ -129,7 +130,6 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
     e_acsl_end_loop1: ;
     __gen_e_acsl_at = __gen_e_acsl_exists;
   }
-  __e_acsl_store_block((void *)(& buf),(size_t)8);
   __retres = memchr(buf,c,n);
   {
     int __gen_e_acsl_implies;

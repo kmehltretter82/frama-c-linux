@@ -5,7 +5,6 @@ int main(void)
 {
   int __retres;
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
-  /*@ assert ∀ ℤ x; 0 ≤ x ≤ 1 ⇒ x ≡ 0 ∨ x ≡ 1; */
   {
     int __gen_e_acsl_forall;
     int __gen_e_acsl_x;
@@ -30,7 +29,7 @@ int main(void)
                     (char *)"\\forall integer x; 0 <= x <= 1 ==> x == 0 || x == 1",
                     9);
   }
-  /*@ assert ∀ ℤ x; 0 < x ≤ 1 ⇒ x ≡ 1; */
+  /*@ assert ∀ ℤ x; 0 ≤ x ≤ 1 ⇒ x ≡ 0 ∨ x ≡ 1; */ ;
   {
     int __gen_e_acsl_forall_2;
     int __gen_e_acsl_x_2;
@@ -49,7 +48,7 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_forall_2,(char *)"Assertion",(char *)"main",
                     (char *)"\\forall integer x; 0 < x <= 1 ==> x == 1",10);
   }
-  /*@ assert ∀ ℤ x; 0 ≤ x < 1 ⇒ x ≡ 0; */
+  /*@ assert ∀ ℤ x; 0 < x ≤ 1 ⇒ x ≡ 1; */ ;
   {
     int __gen_e_acsl_forall_3;
     int __gen_e_acsl_x_3;
@@ -68,10 +67,7 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_forall_3,(char *)"Assertion",(char *)"main",
                     (char *)"\\forall integer x; 0 <= x < 1 ==> x == 0",11);
   }
-  /*@ assert
-      ∀ ℤ x, ℤ y, ℤ z;
-        0 ≤ x < 2 ∧ 0 ≤ y < 5 ∧ 0 ≤ z ≤ y ⇒ x + z ≤ y + 1;
-  */
+  /*@ assert ∀ ℤ x; 0 ≤ x < 1 ⇒ x ≡ 0; */ ;
   {
     int __gen_e_acsl_forall_4;
     int __gen_e_acsl_x_4;
@@ -104,7 +100,12 @@ int main(void)
                     (char *)"\\forall integer x, integer y, integer z;\n  0 <= x < 2 && 0 <= y < 5 && 0 <= z <= y ==> x + z <= y + 1",
                     15);
   }
-  /*@ assert ∃ int x; 0 ≤ x < 10 ∧ x ≡ 5; */
+  /*@
+  assert
+  ∀ ℤ x, ℤ y, ℤ z;
+    0 ≤ x < 2 ∧ 0 ≤ y < 5 ∧ 0 ≤ z ≤ y ⇒ x + z ≤ y + 1;
+   */
+  ;
   {
     int __gen_e_acsl_exists;
     int __gen_e_acsl_x_5;
@@ -123,11 +124,7 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_exists,(char *)"Assertion",(char *)"main",
                     (char *)"\\exists int x; 0 <= x < 10 && x == 5",20);
   }
-  /*@ assert
-      ∀ int x;
-        0 ≤ x < 10 ⇒
-        x % 2 ≡ 0 ⇒ (∃ ℤ y; 0 ≤ y ≤ x / 2 ∧ x ≡ 2 * y);
-  */
+  /*@ assert ∃ int x; 0 ≤ x < 10 ∧ x ≡ 5; */ ;
   {
     int __gen_e_acsl_forall_5;
     int __gen_e_acsl_x_6;
@@ -168,11 +165,17 @@ int main(void)
                     (char *)"\\forall int x;\n  0 <= x < 10 ==>\n  x % 2 == 0 ==> (\\exists integer y; 0 <= y <= x / 2 && x == 2 * y)",
                     24);
   }
+  /*@
+  assert
+  ∀ int x;
+    0 ≤ x < 10 ⇒
+    x % 2 ≡ 0 ⇒ (∃ ℤ y; 0 ≤ y ≤ x / 2 ∧ x ≡ 2 * y);
+   */
+  ;
   {
     int buf[10];
     __e_acsl_store_block((void *)(buf),(size_t)40);
     unsigned long len = (unsigned long)9;
-    /*@ assert ∀ ℤ i; 0 ≤ i < 10 ⇒ \valid(&buf[i]); */
     {
       int __gen_e_acsl_forall_6;
       int __gen_e_acsl_i;
@@ -200,7 +203,7 @@ int main(void)
                       (char *)"\\forall integer i; 0 <= i < 10 ==> \\valid(&buf[i])",
                       30);
     }
-    /*@ assert ∀ char i; 0 ≤ i < 10 ⇒ \valid(&buf[i]); */
+    /*@ assert ∀ ℤ i; 0 ≤ i < 10 ⇒ \valid(&buf[i]); */ ;
     {
       int __gen_e_acsl_forall_7;
       int __gen_e_acsl_i_2;
@@ -228,7 +231,7 @@ int main(void)
                       (char *)"\\forall char i; 0 <= i < 10 ==> \\valid(&buf[i])",
                       31);
     }
-    /*@ assert ∀ ℤ i; 0 ≤ i < len ⇒ \valid(&buf[i]); */
+    /*@ assert ∀ char i; 0 ≤ i < 10 ⇒ \valid(&buf[i]); */ ;
     {
       int __gen_e_acsl_forall_8;
       unsigned long __gen_e_acsl_i_3;
@@ -256,7 +259,7 @@ int main(void)
                       (char *)"\\forall integer i; 0 <= i < len ==> \\valid(&buf[i])",
                       32);
     }
-    /*@ assert ∀ ℤ i; 0 ≤ i ≤ len ⇒ \valid(&buf[i]); */
+    /*@ assert ∀ ℤ i; 0 ≤ i < len ⇒ \valid(&buf[i]); */ ;
     {
       int __gen_e_acsl_forall_9;
       __e_acsl_mpz_t __gen_e_acsl_i_4;
@@ -313,18 +316,16 @@ int main(void)
                       (char *)"\\forall integer i; 0 <= i <= len ==> \\valid(&buf[i])",
                       33);
       __gmpz_clear(__gen_e_acsl_i_4);
-      __e_acsl_delete_block((void *)(buf));
     }
+    /*@ assert ∀ ℤ i; 0 ≤ i ≤ len ⇒ \valid(&buf[i]); */ ;
+    __e_acsl_delete_block((void *)(buf));
   }
-  /*@ assert ∀ ℤ x; 0 < x < 1 ⇒ \false; */
   __e_acsl_assert(1,(char *)"Assertion",(char *)"main",
                   (char *)"\\forall integer x; 0 < x < 1 ==> \\false",37);
-  /*@ assert ¬(∃ char c; 10 ≤ c < 10 ∧ c ≡ 10); */
+  /*@ assert ∀ ℤ x; 0 < x < 1 ⇒ \false; */ ;
   __e_acsl_assert(! 0,(char *)"Assertion",(char *)"main",
                   (char *)"!(\\exists char c; 10 <= c < 10 && c == 10)",38);
-  /*@ assert \let u = 5;
-      ∀ ℤ x, ℤ y; 0 ≤ x < 2 ∧ 4 < y < u ⇒ \false;
-  */
+  /*@ assert ¬(∃ char c; 10 ≤ c < 10 ∧ c ≡ 10); */ ;
   {
     int __gen_e_acsl_u;
     __gen_e_acsl_u = 5;
@@ -332,6 +333,10 @@ int main(void)
                     (char *)"\\let u = 5;\n\\forall integer x, integer y; 0 <= x < 2 && 4 < y < u ==> \\false",
                     40);
   }
+  /*@
+  assert \let u = 5; ∀ ℤ x, ℤ y; 0 ≤ x < 2 ∧ 4 < y < u ⇒ \false;
+   */
+  ;
   __retres = 0;
   __e_acsl_memory_clean();
   return __retres;

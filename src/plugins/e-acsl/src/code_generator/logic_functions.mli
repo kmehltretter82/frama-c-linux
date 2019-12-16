@@ -38,7 +38,8 @@ val reset: unit -> unit
 
 val tapp_to_exp:
   loc:location ->
-  string -> Env.t -> term -> logic_info -> Typing.number_ty list -> exp list ->
+  string -> Env.t -> kernel_function ->
+  term -> logic_info -> Typing.number_ty list -> exp list ->
   varinfo * exp * Env.t
 
 val add_generated_functions: global list -> global list

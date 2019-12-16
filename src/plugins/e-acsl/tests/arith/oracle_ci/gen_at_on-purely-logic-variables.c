@@ -37,7 +37,6 @@ void g(void)
     ;
   }
   m = 10;
-  /*@ assert ∃ ℤ w; 3 ≤ w < 6 ∧ \at(m + w ≡ 12,Q); */
   {
     int __gen_e_acsl_exists;
     int __gen_e_acsl_w;
@@ -72,6 +71,7 @@ void g(void)
                     (char *)"\\exists integer w; 3 <= w < 6 && \\at(m + w == 12,Q)",
                     16);
   }
+  /*@ assert ∃ ℤ w; 3 ≤ w < 6 ∧ \at(m + w ≡ 12,Q); */ ;
   free((void *)__gen_e_acsl_at);
   return;
 }
@@ -205,7 +205,6 @@ int main(void)
   }
   __e_acsl_full_init((void *)(& n));
   n = 666;
-  /*@ assert \let i = 3; \at(n + i ≡ 10,L); */
   {
     int __gen_e_acsl_i;
     int __gen_e_acsl_valid_read;
@@ -221,7 +220,7 @@ int main(void)
                     (char *)"main",
                     (char *)"\\let i = 3; \\at(n + i == 10,L)",28);
   }
-  /*@ assert ∃ ℤ j; 2 ≤ j < 5 ∧ \at(n + j ≡ 11,L); */
+  /*@ assert \let i = 3; \at(n + i ≡ 10,L); */ ;
   {
     int __gen_e_acsl_exists;
     int __gen_e_acsl_j;
@@ -257,11 +256,7 @@ int main(void)
                     (char *)"\\exists integer j; 2 <= j < 5 && \\at(n + j == 11,L)",
                     29);
   }
-  /*@ assert \let k = -7;
-      ∃ ℤ u;
-        9 ≤ u < 21 ∧
-        (∀ ℤ v; -5 < v ≤ 6 ⇒ \at((u > 0? n + k: u + v) > 0,K));
-  */
+  /*@ assert ∃ ℤ j; 2 ≤ j < 5 ∧ \at(n + j ≡ 11,L); */ ;
   {
     int __gen_e_acsl_k;
     int __gen_e_acsl_exists_2;
@@ -323,7 +318,13 @@ int main(void)
                     (char *)"\\let k = -7;\n\\exists integer u;\n  9 <= u < 21 &&\n  (\\forall integer v; -5 < v <= 6 ==> \\at((u > 0? n + k: u + v) > 0,K))",
                     31);
   }
-  /*@ assert \let i = 3; \at(n + i,L) ≡ 10; */
+  /*@
+  assert \let k = -7;
+  ∃ ℤ u;
+    9 ≤ u < 21 ∧
+    (∀ ℤ v; -5 < v ≤ 6 ⇒ \at((u > 0? n + k: u + v) > 0,K));
+   */
+  ;
   {
     int __gen_e_acsl_i_3;
     int __gen_e_acsl_valid_read_4;
@@ -339,6 +340,7 @@ int main(void)
                     (char *)"main",
                     (char *)"\\let i = 3; \\at(n + i,L) == 10",37);
   }
+  /*@ assert \let i = 3; \at(n + i,L) ≡ 10; */ ;
   unsigned int m = (unsigned int)3;
   G:
   {
@@ -354,7 +356,6 @@ int main(void)
     ;
   }
   m = (unsigned int)(-3);
-  /*@ assert ∃ ℤ k; -9 < k < 0 ∧ \at(m + k,G) ≡ 0; */
   {
     int __gen_e_acsl_exists_3;
     int __gen_e_acsl_k_3;
@@ -392,11 +393,7 @@ int main(void)
                     (char *)"\\exists integer k; -9 < k < 0 && \\at(m + k,G) == 0",
                     41);
   }
-  /*@ assert
-      ∃ ℤ u;
-        9 ≤ u < 21 ∧
-        (∀ ℤ v; -5 < v ≤ (u < 15? u + 6: 3) ⇒ \at((n + u) + v > 0,K));
-  */
+  /*@ assert ∃ ℤ k; -9 < k < 0 ∧ \at(m + k,G) ≡ 0; */ ;
   {
     int __gen_e_acsl_exists_4;
     int __gen_e_acsl_u_3;
@@ -461,20 +458,18 @@ int main(void)
                     (char *)"\\exists integer u;\n  9 <= u < 21 &&\n  (\\forall integer v; -5 < v <= (u < 15? u + 6: 3) ==> \\at((n + u) + v > 0,K))",
                     43);
   }
+  /*@
+  assert
+  ∃ ℤ u;
+    9 ≤ u < 21 ∧
+    (∀ ℤ v; -5 < v ≤ (u < 15? u + 6: 3) ⇒ \at((n + u) + v > 0,K));
+   */
+  ;
   int t[5] = {9, 12, 12, 12, -4};
   __e_acsl_store_block((void *)(t),(size_t)20);
   __e_acsl_full_init((void *)(& t));
   __gen_e_acsl_f(t);
   g();
-  /*@ assert
-      ∃ ℤ u;
-        10 ≤ u < 20 ∧
-        (∃ ℤ v;
-           -10 < v ≤ -5 + (\let u = -2; u) ∧
-           (∃ ℤ w;
-              100 < w ≤ 200 ∧
-              \at((((n - u) + (\let u = 42; u)) + v) + w > 0,K)));
-  */
   {
     int __gen_e_acsl_exists_5;
     int __gen_e_acsl_u_5;
@@ -561,6 +556,17 @@ int main(void)
                     (char *)"\\exists integer u;\n  10 <= u < 20 &&\n  (\\exists integer v;\n     -10 < v <= -5 + (\\let u = -2; u) &&\n     (\\exists integer w;\n        100 < w <= 200 && \\at((((n - u) + (\\let u = 42; u)) + v) + w > 0,K)))",
                     54);
   }
+  /*@
+  assert
+  ∃ ℤ u;
+    10 ≤ u < 20 ∧
+    (∃ ℤ v;
+       -10 < v ≤ -5 + (\let u = -2; u) ∧
+       (∃ ℤ w;
+          100 < w ≤ 200 ∧
+          \at((((n - u) + (\let u = 42; u)) + v) + w > 0,K)));
+   */
+  ;
   /*@ assert ∃ ℤ j; 2 ≤ j < 10000000000000000 ∧ \at(n + j ≡ 11,L);
    */
   ;
@@ -594,6 +600,7 @@ void __gen_e_acsl_f(int *t)
   __gen_e_acsl_at_3 = (int *)malloc((size_t)4);
   __gen_e_acsl_at_2 = (int *)malloc((size_t)8);
   __gen_e_acsl_at = (int *)malloc((size_t)8);
+  __e_acsl_store_block((void *)(& t),(size_t)8);
   {
     int __gen_e_acsl_m_3;
     __gen_e_acsl_m_3 = 4;
@@ -622,7 +629,6 @@ void __gen_e_acsl_f(int *t)
       __gen_e_acsl_n_2 ++;
     }
   }
-  __e_acsl_store_block((void *)(& t),(size_t)8);
   f(t);
   {
     int __gen_e_acsl_forall;

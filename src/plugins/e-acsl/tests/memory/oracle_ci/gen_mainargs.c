@@ -12,7 +12,6 @@ int __gen_e_acsl_main(int argc, char **argv)
 {
   int __retres;
   int i;
-  /*@ assert ∀ int k; 0 ≤ k < argc ⇒ \valid(argv + k); */
   {
     int __gen_e_acsl_forall;
     int __gen_e_acsl_k;
@@ -39,7 +38,7 @@ int __gen_e_acsl_main(int argc, char **argv)
                     (char *)"\\forall int k; 0 <= k < argc ==> \\valid(argv + k)",
                     12);
   }
-  /*@ assert \block_length(argv) ≡ (argc + 1) * sizeof(char *); */
+  /*@ assert ∀ int k; 0 ≤ k < argc ⇒ \valid(argv + k); */ ;
   {
     unsigned long __gen_e_acsl_block_length;
     __e_acsl_mpz_t __gen_e_acsl_block_length_2;
@@ -56,7 +55,7 @@ int __gen_e_acsl_main(int argc, char **argv)
     __gmpz_clear(__gen_e_acsl_block_length_2);
     __gmpz_clear(__gen_e_acsl_);
   }
-  /*@ assert *(argv + argc) ≡ \null; */
+  /*@ assert \block_length(argv) ≡ (argc + 1) * sizeof(char *); */ ;
   {
     int __gen_e_acsl_valid_read;
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(argv + argc),
@@ -69,7 +68,7 @@ int __gen_e_acsl_main(int argc, char **argv)
     __e_acsl_assert(*(argv + argc) == (char *)0,(char *)"Assertion",
                     (char *)"main",(char *)"*(argv + argc) == \\null",15);
   }
-  /*@ assert ¬\valid(*(argv + argc)); */
+  /*@ assert *(argv + argc) ≡ \null; */ ;
   {
     int __gen_e_acsl_initialized;
     int __gen_e_acsl_and;
@@ -95,13 +94,13 @@ int __gen_e_acsl_main(int argc, char **argv)
     __e_acsl_assert(! __gen_e_acsl_and,(char *)"Assertion",(char *)"main",
                     (char *)"!\\valid(*(argv + argc))",16);
   }
+  /*@ assert ¬\valid(*(argv + argc)); */ ;
   i = 0;
   while (i < argc) {
     {
       size_t tmp;
       tmp = __gen_e_acsl_strlen((char const *)*(argv + i));
       int len = (int)tmp;
-      /*@ assert \valid(*(argv + i)); */
       {
         int __gen_e_acsl_initialized_2;
         int __gen_e_acsl_and_2;
@@ -127,7 +126,7 @@ int __gen_e_acsl_main(int argc, char **argv)
         __e_acsl_assert(__gen_e_acsl_and_2,(char *)"Assertion",
                         (char *)"main",(char *)"\\valid(*(argv + i))",19);
       }
-      /*@ assert ∀ int k; 0 ≤ k ≤ len ⇒ \valid(*(argv + i) + k); */
+      /*@ assert \valid(*(argv + i)); */ ;
       {
         int __gen_e_acsl_forall_2;
         long __gen_e_acsl_k_2;
@@ -164,6 +163,7 @@ int __gen_e_acsl_main(int argc, char **argv)
                         (char *)"\\forall int k; 0 <= k <= len ==> \\valid(*(argv + i) + k)",
                         20);
       }
+      /*@ assert ∀ int k; 0 ≤ k ≤ len ⇒ \valid(*(argv + i) + k); */ ;
     }
     i ++;
   }

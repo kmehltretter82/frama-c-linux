@@ -43,60 +43,33 @@ let term_to_exp_ref
 (************************* Loop invariants ********************************)
 (**************************************************************************)
 
-module Loop_invariants_actions = Hook.Make(struct end)
-
-let apply_after_transformation prj =
-  Project.on prj Loop_invariants_actions.apply ()
-
-let mv_invariants env ~old stmt =
-  Options.feedback ~current:true ~level:3
-    "keep loop invariants attached to its loop";
-  match Env.current_kf env with
-  | None -> assert false
-  | Some kf ->
-    let filter _ ca = match ca.annot_content with
-      | AInvariant(_, b, _) -> b
-      | _ -> false
-    in
-    let l = Annotations.code_annot_emitter ~filter stmt in
-    if l != [] then
-      Loop_invariants_actions.extend
-	(fun () ->
-	  List.iter
-	    (fun (ca, e) ->
-	      Annotations.remove_code_annot e ~kf old ca;
-	      Annotations.add_code_annot e ~kf stmt ca)
-	    l)
-
-let preserve_invariant prj env kf stmt = match stmt.skind with
+let preserve_invariant env kf stmt = match stmt.skind with
   | Loop(_, ({ bstmts = stmts } as blk), loc, cont, break) ->
-    let rec handle_invariants (stmts, env, _ as acc) = function
+    let rec handle_invariants (stmts, env as acc) = function
       | [] ->
-	(* empty loop body: no need to verify the invariant twice *)
-	acc
+        (* empty loop body: no need to verify the invariant twice *)
+        acc
       | [ last ] ->
-	let invariants, env = Env.pop_loop env in
-	let env = Env.push env in
-	let env =
-    let translate_named_predicate = !translate_named_predicate_ref in
-	  Project.on
-	    prj
-	    (List.fold_left (translate_named_predicate kf) env)
-	    invariants
-	in
-	let blk, env =
-	  Env.pop_and_get env last ~global_clear:false Env.Before
-	in
-	Misc.mk_block prj last blk :: stmts, env, invariants != []
-      | s :: tl -> handle_invariants (s :: stmts, env, false) tl
+        let invariants, env = Env.pop_loop env in
+        let env = Env.push env in
+        let env =
+          let translate_named_predicate = !translate_named_predicate_ref in
+          List.fold_left (translate_named_predicate kf) env invariants
+        in
+        let blk, env =
+          Env.pop_and_get env last ~global_clear:false Env.Before
+        in
+        Constructor.mk_block last blk :: stmts, env
+      | s :: tl ->
+        handle_invariants (s :: stmts, env) tl
     in
-    let env = Env.set_annotation_kind env Misc.Invariant in
-    let stmts, env, has_loop = handle_invariants ([], env, false) stmts in
+    let env = Env.set_annotation_kind env Constructor.Invariant in
+    let stmts, env = handle_invariants ([], env) stmts in
     let new_blk = { blk with bstmts = List.rev stmts } in
     { stmt with skind = Loop([], new_blk, loc, cont, break) },
-    env,
-    has_loop
-  | _ -> stmt, env, false
+    env
+  | _ ->
+    stmt, env
 
 (**************************************************************************)
 (**************************** Nested loops ********************************)
@@ -219,11 +192,11 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
       with Typing.Not_a_number -> assert false
     in
     (* loop counter corresponding to the quantified variable *)
-    let var_x, x, env = Env.Logic_binding.add ~ty env logic_x in
+    let var_x, x, env = Env.Logic_binding.add ~ty env kf logic_x in
     let lv_x = var var_x in
     let env = match ctx_one with
       | Typing.C_integer _ -> env
-      | Typing.Gmpz -> Env.add_stmt env (Gmp.init ~loc x)
+      | Typing.Gmpz -> Env.add_stmt env kf (Gmp.init ~loc x)
       | Typing.(C_float _ | Rational | Real | Nan) -> assert false
     in
     (* build the inner loops and loop body *)
@@ -280,7 +253,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
       | Some p ->
         let e, env = !named_predicate_ref kf (Env.push env) p in
         let stmt, env =
-          Misc.mk_e_acsl_guard ~reverse:true Misc.RTE kf e p, env
+          Constructor.mk_runtime_check ~reverse:true Constructor.RTE kf e p, env
         in
         let b, env = Env.pop_and_get env stmt ~global_clear:false Env.After in
         let guard_for_small_type = Cil.mkStmt ~valid_sid:true (Block b) in
@@ -301,7 +274,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     [ start ;  stmt ], env
   | Lscope.Lvs_let(lv, t) :: lscope_vars' ->
     let ty = Typing.get_typ t in
-    let vi_of_lv, exp_of_lv, env = Env.Logic_binding.add ~ty env lv in
+    let vi_of_lv, exp_of_lv, env = Env.Logic_binding.add ~ty env kf lv in
     let e, env = term_to_exp kf env t in
     let ty = Cil.typeOf e in
     let init_set =

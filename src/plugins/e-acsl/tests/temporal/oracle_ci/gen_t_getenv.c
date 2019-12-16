@@ -29,21 +29,20 @@ int main(int argc, char const **argv)
   __e_acsl_memory_init(& argc,(char ***)(& argv),(size_t)8);
   __e_acsl_globals_init();
   char *g1 = (char *)0;
+  __e_acsl_temporal_store_nblock((void *)(& g1),(void *)0);
   __e_acsl_store_block((void *)(& g1),(size_t)8);
   __e_acsl_full_init((void *)(& g1));
-  __e_acsl_temporal_store_nblock((void *)(& g1),(void *)0);
+  __e_acsl_full_init((void *)(& g1));
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
-  __e_acsl_full_init((void *)(& g1));
   g1 = __gen_e_acsl_getenv(__gen_e_acsl_literal_string);
   __e_acsl_temporal_pull_return((void *)(& g1));
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
   char *g2 = __gen_e_acsl_getenv(__gen_e_acsl_literal_string_2);
+  __e_acsl_temporal_pull_return((void *)(& g2));
   __e_acsl_store_block((void *)(& g2),(size_t)8);
   __e_acsl_full_init((void *)(& g2));
-  __e_acsl_temporal_pull_return((void *)(& g2));
-  /*@ assert g1 ≡ \null ∨ \valid(g1); */
   {
     int __gen_e_acsl_or;
     /*@ assert
@@ -67,7 +66,7 @@ int main(int argc, char const **argv)
     __e_acsl_assert(__gen_e_acsl_or,(char *)"Assertion",(char *)"main",
                     (char *)"g1 == \\null || \\valid(g1)",13);
   }
-  /*@ assert g2 ≡ \null ∨ \valid(g2); */
+  /*@ assert g1 ≡ \null ∨ \valid(g1); */ ;
   {
     int __gen_e_acsl_or_2;
     /*@ assert
@@ -91,6 +90,7 @@ int main(int argc, char const **argv)
     __e_acsl_assert(__gen_e_acsl_or_2,(char *)"Assertion",(char *)"main",
                     (char *)"g2 == \\null || \\valid(g2)",14);
   }
+  /*@ assert g2 ≡ \null ∨ \valid(g2); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(& g2));
   __e_acsl_delete_block((void *)(& g1));

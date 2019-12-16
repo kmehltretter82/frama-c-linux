@@ -22,12 +22,18 @@
 
 (** Generation of rational numbers. *)
 
+(* [TODO ARCHI]: change the call convention in the whole module *)
+
 open Cil_types
 
-val create: loc:location -> ?name:string -> exp -> Env.t -> term option ->
+(* TODO: change the call convention *)
+val create:
+  loc:location -> ?name:string -> exp -> Env.t -> kernel_function ->
+  term option ->
   exp * Env.t
 (** Create a real *)
 
+(* TODO: change the call convention *)
 val init_set: loc:location -> lval -> exp -> exp -> stmt
 (** [init_set lval lval_as_exp exp] sets [lval] to [exp] while guranteeing that
     [lval] is properly initialized wrt the underlying real library. *)
@@ -39,20 +45,29 @@ val normalize_str: string -> string
     decimal expansion. In order to make `libgmp` consider it to be a rational,
     it must be converted into "1/10". *)
 
+(* TODO: change the call convention *)
 val cast_to_z: loc:location -> ?name:string -> exp -> Env.t -> exp * Env.t
 (** Assumes that the given exp is of real type and casts it into Z *)
 
-val add_cast: loc:location -> ?name:string -> exp -> Env.t -> typ ->
+(* TODO: change the call convention *)
+val add_cast:
+  loc:location -> ?name:string -> exp -> Env.t -> kernel_function -> typ ->
   exp * Env.t
 (** Assumes that the given exp is of real type and casts it into
     the given typ *)
 
-val binop: loc:location -> binop -> exp -> exp -> Env.t -> term option ->
+(* TODO: change the call convention --> exp at the end *)
+val binop:
+  loc:location -> binop -> exp -> exp -> Env.t -> kernel_function ->
+  term option ->
   exp * Env.t
 (** Applies [binop] to the given expressions. The optional term
     indicates whether the comparison has a correspondance in the logic. *)
 
-val cmp: loc:location -> binop -> exp -> exp -> Env.t -> term option ->
+(* TODO: change the call convention --> exp at the end *)
+val cmp:
+  loc:location -> binop -> exp -> exp -> Env.t -> kernel_function ->
+  term option ->
   exp * Env.t
 (** Compares two expressions according to the given [binop]. The optional term
     indicates whether the comparison has a correspondance in the logic. *)

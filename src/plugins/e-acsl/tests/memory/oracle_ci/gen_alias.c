@@ -21,7 +21,6 @@ int main(void)
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   __e_acsl_store_block((void *)(& i),(size_t)4);
   f(& i,255);
-  /*@ assert \initialized(&i); */
   {
     int __gen_e_acsl_initialized;
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& i),
@@ -29,6 +28,7 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_initialized,(char *)"Assertion",
                     (char *)"main",(char *)"\\initialized(&i)",14);
   }
+  /*@ assert \initialized(&i); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(& i));
   __e_acsl_memory_clean();

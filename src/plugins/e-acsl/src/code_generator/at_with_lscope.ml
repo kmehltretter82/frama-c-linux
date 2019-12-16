@@ -203,8 +203,8 @@ let index_from_sizes_and_shifts ~loc sizes_and_shifts =
   in
   sum
 
-let put_block_at_label env block label =
-  let stmt = Label.get_stmt (Env.get_visitor env) label in
+let put_block_at_label env kf block label =
+  let stmt = Label.get_stmt kf label in
   let env_ref = ref env in
   let o = object
     inherit Visitor.frama_c_inplace
@@ -214,8 +214,7 @@ let put_block_at_label env block label =
       Cil.ChangeTo stmt
   end
   in
-  let bhv = Env.get_behavior env in
-  ignore(Visitor.visitFramacStmt o (Visitor_behavior.Get.stmt bhv stmt));
+  ignore (Visitor.visitFramacStmt o stmt);
   !env_ref
 
 let to_exp ~loc kf env pot label =
@@ -244,6 +243,7 @@ let to_exp ~loc kf env pot label =
     ~name:"at"
     ~scope:Varname.Function
     env
+    kf
     None
     ty_ptr
     (fun vi e ->
@@ -260,7 +260,10 @@ let to_exp ~loc kf env pot label =
         let e_size, _ = term_to_exp kf env t_size in
         let e_size = Cil.constFold false e_size in
         let malloc_stmt =
-          Misc.mk_call ~loc ~result:(Cil.var vi) "malloc" [e_size]
+          Constructor.mk_lib_call ~loc
+            ~result:(Cil.var vi)
+            "malloc"
+            [ e_size ]
         in
         malloc_stmt
       | Typing.(C_integer _ | C_float _ | Gmpz) ->
@@ -270,7 +273,7 @@ let to_exp ~loc kf env pot label =
       | Typing.(Rational | Real | Nan) ->
         Error.not_yet "quantification over non-integer type"
       in
-      let free_stmt = Misc.mk_call ~loc "free" [e] in
+      let free_stmt = Constructor.mk_lib_call ~loc "free" [e] in
       (* The list of stmts returned by the current closure are inserted
         LOCALLY to the block where the new var is FIRST used, whatever scope
         is indicated to [Env.new_var].
@@ -336,7 +339,7 @@ let to_exp ~loc kf env pot label =
     Env.After
   in
   (* Put at label *)
-  let env = put_block_at_label env storing_loops_block label in
+  let env = put_block_at_label env kf storing_loops_block label in
   (* Returning *)
   let lval_at_index, env = lval_at_index ~loc kf env (e_at, vi_at, t_index) in
   let e = Cil.new_exp ~loc (Lval lval_at_index) in

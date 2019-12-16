@@ -65,6 +65,7 @@ SRC_PROJECT_INITIALIZER:=\
 
 # code generator
 SRC_CODE_GENERATOR:= \
+	constructor \
 	gmp \
 	label \
 	env \
@@ -76,7 +77,10 @@ SRC_CODE_GENERATOR:= \
 	logic_functions \
 	translate \
 	temporal \
-	visit
+	memory_observer \
+	literal_observer \
+	global_observer \
+	injector
 SRC_CODE_GENERATOR:=$(addprefix src/code_generator/, $(SRC_CODE_GENERATOR))
 
 #########################
@@ -253,9 +257,9 @@ EACSL_CLEANFILES = doc/doxygen/doxygen.cfg \
 	Makefile config.log config.status configure .depend autom4te.cache/* \
 	META.frama-c-e_acsl Makefile.plugin.generated src/local_config.ml top/*
 
-e-acsl-distclean:: clean
+e-acsl-distclean: clean
 	$(PRINT_RM) generated project files
-	$(RM) $(addprefix $(E_ACSL_DIR)/, $(EACSL_CLEANFILES))
+	$(RM) $(wildcard $(addprefix $(E_ACSL_DIR)/, $(EACSL_CLEANFILES)))
 
 ################################
 # Building source distribution #
@@ -327,6 +331,13 @@ PLUGIN_HEADER_EXCEPTIONS:=
 # Files that are not listed in `DISTRIB_FILES`
 # and dedicated to distributed tests
 PLUGIN_DISTRIB_TESTS:= $(EACSL_DISTRIB_TESTS)
+
+########
+# Misc #
+########
+
+wc:
+	ocamlwc -p $(EACSL_OCAML_FILES)
 
 ##########
 # Header #

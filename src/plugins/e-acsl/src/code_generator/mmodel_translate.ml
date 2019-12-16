@@ -121,11 +121,12 @@ let call ~loc kf name ctx env t =
       ~loc
       ~name
       env
+      kf
       None
       ctx
       (fun v _ ->
         let name = Functions.RTL.mk_api_name name in
-        [ Misc.mk_call ~loc ~result:(Cil.var v) name [ e ] ])
+        [ Constructor.mk_lib_call ~loc ~result:(Cil.var v) name [ e ] ])
   in
   res, env
 
@@ -154,11 +155,15 @@ let gmp_to_sizet ~loc kf env size p =
     ~loc
     ~name:"size"
     env
+    kf
     None
     sizet
     (fun vi _ ->
-      [ Misc.mk_e_acsl_guard ~reverse:true Misc.RTE kf guard p;
-        Misc.mk_call ~loc ~result:(Cil.var vi) "__gmpz_get_ui" [ size ] ])
+      [ Constructor.mk_runtime_check ~reverse:true Constructor.RTE kf guard p;
+        Constructor.mk_lib_call ~loc
+          ~result:(Cil.var vi)
+          "__gmpz_get_ui"
+          [ size ] ])
   in
   e, env
 
@@ -230,6 +235,7 @@ let call_memory_block ~loc kf name ctx env ptr r p =
       ~loc
       ~name
       env
+      kf
       None
       ctx
       (fun v _ ->
@@ -239,7 +245,7 @@ let call_memory_block ~loc kf name ctx env ptr r p =
         | "initialized" -> [ ptr; size ]
         | _ -> Error.not_yet ("builtin " ^ name)
         in
-        [ Misc.mk_call ~loc ~result:(Cil.var v) fname args ])
+        [ Constructor.mk_lib_call ~loc ~result:(Cil.var v) fname args ])
   in
   e, env
 
@@ -337,13 +343,16 @@ let call_with_size ~loc kf name ctx env t p =
         ~loc
         ~name
         env
+        kf
         None
         ctx
         (fun v _ ->
           let ty = Misc.cty t.term_type in
           let sizeof = Misc.mk_ptr_sizeof ty loc in
-          let fname = Functions.RTL.mk_api_name name in
-          [ Misc.mk_call ~loc ~result:(Cil.var v) fname [ e; sizeof ] ])
+          [ Constructor.mk_rtl_call ~loc
+              ~result:(Cil.var v)
+              name
+              [ e; sizeof ] ])
     in
     res, env
   in
@@ -374,14 +383,14 @@ let call_valid ~loc kf name ctx env t p =
         ~loc
         ~name
         env
+        kf
         None
         ctx
         (fun v _ ->
           let ty = Misc.cty t.term_type in
           let sizeof = Misc.mk_ptr_sizeof ty loc in
-          let fname = Functions.RTL.mk_api_name name in
           let args = [ e; sizeof; base; base_addr ] in
-          [ Misc.mk_call ~loc ~result:(Cil.var v) fname args ])
+          [ Constructor.mk_rtl_call ~loc ~result:(Cil.var v) name args ])
     in
     res, env
   in
@@ -394,3 +403,9 @@ let call_valid ~loc kf name ctx env t p =
     t
     p
     call_for_unsupported_constructs
+
+(*
+Local Variables:
+compile-command: "make -C ../.."
+End:
+*)

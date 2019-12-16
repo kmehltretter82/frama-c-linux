@@ -7,8 +7,8 @@ int main(void)
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   int x = 0;
   x ++;
-  /*@ assert \true; */
   __e_acsl_assert(1,(char *)"Assertion",(char *)"main",(char *)"\\true",8);
+  /*@ assert \true; */ ;
   __retres = 0;
   return __retres;
 }
