@@ -31,7 +31,7 @@ val mk_deref: loc:Location.t -> exp -> exp
 val mk_block: stmt -> block -> stmt
 
 (* ********************************************************************** *)
-(* E-ACSL specific code: build calls to its API *)
+(* E-ACSL specific code: build calls to its RTL API *)
 (* ********************************************************************** *)
 
 val mk_lib_call: loc:Location.t -> ?result:lval -> string -> exp list -> stmt

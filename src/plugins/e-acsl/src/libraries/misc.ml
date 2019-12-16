@@ -49,10 +49,11 @@ let reset () = Datatype.String.Hashtbl.clear library_functions
 let is_fc_or_compiler_builtin vi =
   Cil.is_builtin vi
   ||
-  (String.length vi.vname > 10 (* number of characters in "__builtin_" *)
-   &&
-   let prefix = String.sub vi.vname 0 10 in
-   Datatype.String.equal prefix "__builtin_")
+  (let prefix_length = 10 (* number of characters in "__builtin_" *) in
+    String.length vi.vname > prefix_length
+    &&
+    let prefix = String.sub vi.vname 0 prefix_length in
+    Datatype.String.equal prefix "__builtin_")
 
 (* ************************************************************************** *)
 (** {2 Builders} *)

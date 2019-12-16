@@ -26,23 +26,23 @@ open Cil_types
 
 val function_name: string
 (** Name of the function in which [mk_init_function] (see below) generates the
- ** code. *)
+    code. *)
 
 val reset: unit -> unit
 val is_empty: unit -> bool
 
 val add: varinfo -> unit
-(** Observes the given variable if necessary. *)
+(** Observe the given variable if necessary. *)
 
 val add_initializer: varinfo -> offset -> init -> unit
 (** Add the initializer for the given observed variable. *)
 
 val mk_init_function: unit -> varinfo * fundec
-(** Generates a new C function containing the observers for global variable
+(** Generate a new C function containing the observers for global variable
     declarations and initializations. *)
 
 val mk_delete_stmts: stmt list -> stmt list
-(** Generates the observers for global variable de-allocations. *)
+(** Generate the observers for global variable de-allocations. *)
 
 (*
 Local Variables:

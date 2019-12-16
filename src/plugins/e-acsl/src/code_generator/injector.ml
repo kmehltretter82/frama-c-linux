@@ -27,7 +27,7 @@ open Cil_datatype
 let dkey = Options.dkey_translation
 
 (* ************************************************************************** *)
-(* Code *)
+(* Expression *)
 (* ************************************************************************** *)
 
 let replace_literal_string_in_exp env kf_opt (* None for globals *) e =
@@ -107,6 +107,10 @@ let inject_in_local_init loc env kf vi = function
         ([], env)
     in
     ConsInit(vi, l, ck), env
+
+(* ************************************************************************** *)
+(* Instructions and statements *)
+(* ************************************************************************** *)
 
 (* rewrite names of functions for which we have alternative definitions in the
    RTL. *)
@@ -466,7 +470,7 @@ and inject_in_block (env: Env.t) kf blk =
       blk.bstmts
   in
   blk.bstmts <- List.rev stmts;
-  (* now inject code that de-allocate the necessary observation variables and
+  (* now inject code that de-allocates the necessary observation variables and
      blocks of the runtime memory that have been previously allocated *)
   (* calls to [free] for de-allocating variables observing \at(_,_) *)
   let free_stmts = At_with_lscope.Free.find_all kf in

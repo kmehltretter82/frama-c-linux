@@ -69,7 +69,7 @@ let mk_lib_call ~loc ?result fname args =
   let vi = Misc.get_lib_fun_vi fname in
   let f = Cil.evar ~loc vi in
   vi.vreferenced <- true;
-  let make_args args ty_params =
+  let make_args args param_ty =
     List.map2
       (fun (_, ty, _) arg ->
          let e =
@@ -79,7 +79,7 @@ let mk_lib_call ~loc ?result fname args =
            | _, _, _ -> arg
          in
          Cil.mkCast ~force:false ~newt:ty ~e)
-      ty_params
+      param_ty
       args
   in
   let args = match Cil.unrollType vi.vtype with
