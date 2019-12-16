@@ -202,11 +202,11 @@ module Libc = struct
     let param_str =
       List.fold_right
         (fun exp acc -> match Cil.unrollType (Cil.typeOf exp) with
-        | TInt(k, _) -> get_ikind_str k ^ acc
-        | TFloat(k, _) -> get_fkind_str k ^ acc
-        | TPtr(ty, _) -> get_pkind_str exp (Cil.unrollType ty) ^ acc
-        | TVoid _ | TArray _ | TFun _ | TNamed _ | TComp _ | TEnum _
-        | TBuiltin_va_list _ -> assert false)
+           | TInt(k, _) -> get_ikind_str k ^ acc
+           | TFloat(k, _) -> get_fkind_str k ^ acc
+           | TPtr(ty, _) -> get_pkind_str exp (Cil.unrollType ty) ^ acc
+           | TVoid _ | TArray _ | TFun _ | TNamed _ | TComp _ | TEnum _
+           | TBuiltin_va_list _ -> assert false)
         exps
         ""
     in
@@ -220,13 +220,13 @@ let check kf =
   Options.Functions.is_empty ()
   || Options.Functions.mem kf
   ||
-    (* also check if [kf] is a duplicate of a monitored function *)
-    let s = RTL.get_original_name kf in
-    try
-      let gen_kf = Globals.Functions.find_by_name s in
-      Options.Functions.mem gen_kf
-    with Not_found ->
-      false
+  (* also check if [kf] is a duplicate of a monitored function *)
+  let s = RTL.get_original_name kf in
+  try
+    let gen_kf = Globals.Functions.find_by_name s in
+    Options.Functions.mem gen_kf
+  with Not_found ->
+    false
 
 let instrument kf =
   (* [kf] is monitored iff all functions must be monitored or [kf] belongs to

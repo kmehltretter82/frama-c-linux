@@ -41,9 +41,9 @@ let get_all t = List.rev t
 
 let exists lv t =
   let is_lv = function
-  | Lvs_let(lv', _) | Lvs_quantif(_, _, lv', _, _) | Lvs_formal(lv', _)
-  | Lvs_global(lv', _) ->
-    Cil_datatype.Logic_var.equal lv lv'
+    | Lvs_let(lv', _) | Lvs_quantif(_, _, lv', _, _) | Lvs_formal(lv', _)
+    | Lvs_global(lv', _) ->
+      Cil_datatype.Logic_var.equal lv lv'
   in
   List.exists is_lv t
 
@@ -51,14 +51,14 @@ exception Lscope_used
 let is_used lscope pot =
   let o = object inherit Visitor.frama_c_inplace
     method !vlogic_var_use lv = match lv.lv_origin with
-    | Some _ -> Cil.SkipChildren
-    | None -> if exists lv lscope then raise Lscope_used else Cil.SkipChildren
+      | Some _ -> Cil.SkipChildren
+      | None -> if exists lv lscope then raise Lscope_used else Cil.SkipChildren
   end
   in
   try
     (match pot with
-    | Misc.PoT_pred p -> ignore (Visitor.visitFramacPredicate o p)
-    | Misc.PoT_term t -> ignore (Visitor.visitFramacTerm o t));
+     | Misc.PoT_pred p -> ignore (Visitor.visitFramacPredicate o p)
+     | Misc.PoT_term t -> ignore (Visitor.visitFramacTerm o t));
     false
   with Lscope_used ->
     true

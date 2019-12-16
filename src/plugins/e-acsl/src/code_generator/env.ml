@@ -159,7 +159,7 @@ let do_new_var ~loc ?(scope=Varname.Block) ?(name="") env kf t ty mk_stmts =
     | Varname.Function -> LFunction kf
     | Varname.Block -> LLocal_block kf
   in
-(*  Options.feedback "new variable %a (global? %b)" Varinfo.pretty v global;*)
+  (*  Options.feedback "new variable %a (global? %b)" Varinfo.pretty v global;*)
   let e = Cil.evar v in
   let stmts = mk_stmts v e in
   let new_stmts = acc_list_rev local_block.new_stmts stmts in
@@ -172,15 +172,15 @@ let do_new_var ~loc ?(scope=Varname.Block) ?(name="") env kf t ty mk_stmts =
       new_stmts = new_stmts;
       pre_stmts = local_block.pre_stmts;
       post_stmts = local_block.post_stmts
-  }
+    }
   in
   v,
   e,
   if is_z_t || is_q_t then begin
     let extend_tbl tbl =
-(*      Options.feedback "memoizing %a for term %a"
-        Varinfo.pretty v (fun fmt t -> match t with None -> Format.fprintf fmt
-        "NONE" | Some t -> Term.pretty fmt t) t;*)
+      (*      Options.feedback "memoizing %a for term %a"
+              Varinfo.pretty v (fun fmt t -> match t with None -> Format.fprintf fmt
+              "NONE" | Some t -> Term.pretty fmt t) t;*)
       { clear_stmts = Gmp.clear ~loc e :: tbl.clear_stmts;
         new_exps = match t with
           | None -> tbl.new_exps
@@ -353,11 +353,11 @@ let extend_stmt_in_place env stmt ~label block =
     env
 
 let push env =
-(*  Options.feedback "push (was %d)" (List.length env.env_stack);*)
+  (*  Options.feedback "push (was %d)" (List.length env.env_stack);*)
   { env with env_stack = empty_local_env :: env.env_stack }
 
 let pop env =
-(*  Options.feedback "pop";*)
+  (*  Options.feedback "pop";*)
   let _, tl = top env in
   { env with env_stack = tl }
 
@@ -377,7 +377,7 @@ let transfer ~from env = match from.env_stack, env.env_stack with
 type where = Before | Middle | After
 let pop_and_get ?(split=false) env stmt ~global_clear where =
   let split = split && stmt.labels = [] in
-(*  Options.feedback "pop_and_get from %a (%b)" Printer.pp_stmt stmt split;*)
+  (*  Options.feedback "pop_and_get from %a (%b)" Printer.pp_stmt stmt split;*)
   let local_env, tl = top env in
   let clear =
     if global_clear then begin
@@ -386,8 +386,8 @@ let pop_and_get ?(split=false) env stmt ~global_clear where =
     end else
       local_env.mp_tbl.clear_stmts
   in
-(*  Options.feedback "clearing %d mpz (global_clear: %b)"
-    (List.length clear) global_clear;*)
+  (*  Options.feedback "clearing %d mpz (global_clear: %b)"
+      (List.length clear) global_clear;*)
   let block = local_env.block_info in
   let b =
     let pre_stmts, stmt =
@@ -481,9 +481,9 @@ let pretty fmt env =
   let local_env, _ = top env in
   Format.fprintf fmt "local new_stmts %t"
     (fun fmt ->
-      List.iter
-	(fun s -> Printer.pp_stmt fmt s)
-	local_env.block_info.new_stmts)
+       List.iter
+         (fun s -> Printer.pp_stmt fmt s)
+         local_env.block_info.new_stmts)
 
 (*
 Local Variables:

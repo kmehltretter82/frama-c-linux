@@ -76,18 +76,18 @@ let preserve_invariant env kf stmt = match stmt.skind with
 (**************************************************************************)
 
 (* It could happen that the bounds provided for a quantifier [lv] are bigger
-  than its type. [bounds_for_small_type] handles such cases
-  and provides smaller bounds whenever possible.
-  Let B be the inferred interval and R the range of [lv.typ]
-  - Case 1: B \subseteq R
-    Example: [\forall unsigned char c; 4 <= c <= 100 ==> 0 <= c <= 255]
-    Return: B
-  - Case 2: B \not\subseteq R and the bounds of B are inferred exactly
-    Example: [\forall unsigned char c; 4 <= c <= 300 ==> 0 <= c <= 255]
-    Return: B \intersect R
-  - Case 3: B \not\subseteq R and the bounds of B are NOT inferred exactly
-    Example: [\let m = n > 0 ? 4 : 341; \forall char u; 1 < u < m ==> u > 0]
-    Return: R with a guard guaranteeing that [lv] does not overflow *)
+   than its type. [bounds_for_small_type] handles such cases
+   and provides smaller bounds whenever possible.
+   Let B be the inferred interval and R the range of [lv.typ]
+   - Case 1: B \subseteq R
+     Example: [\forall unsigned char c; 4 <= c <= 100 ==> 0 <= c <= 255]
+     Return: B
+   - Case 2: B \not\subseteq R and the bounds of B are inferred exactly
+     Example: [\forall unsigned char c; 4 <= c <= 300 ==> 0 <= c <= 255]
+     Return: B \intersect R
+   - Case 3: B \not\subseteq R and the bounds of B are NOT inferred exactly
+     Example: [\let m = n > 0 ? 4 : 341; \forall char u; 1 < u < m ==> u > 0]
+     Return: R with a guard guaranteeing that [lv] does not overflow *)
 let bounds_for_small_type ~loc (t1, lv, t2) =
   match lv.lv_type with
   | Ltype _ | Lvar _ | Lreal | Larrow _ ->
@@ -154,9 +154,9 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
       let res = Logic_const.term ~loc (TBinOp(PlusA, t, tone)) Linteger in
       Extlib.may
         (fun ty ->
-          Typing.unsafe_set tone ~ctx:ty ctx;
-          Typing.unsafe_set t ~ctx:ty ctx;
-          Typing.unsafe_set res ty)
+           Typing.unsafe_set tone ~ctx:ty ctx;
+           Typing.unsafe_set t ~ctx:ty ctx;
+           Typing.unsafe_set res ty)
         ty;
       res
     in
@@ -169,14 +169,14 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
         t1
       | Rgt | Rge | Req | Rneq ->
         assert false
-      in
+    in
     let t2_one, bop2 = match rel2 with
       | Rlt ->
         t2, Lt
       | Rle ->
         (* we increment the loop counter one more time (at the end of the
-          loop). Thus to prevent overflow, check the type of [t2+1]
-          instead of [t2]. *)
+           loop). Thus to prevent overflow, check the type of [t2+1]
+           instead of [t2]. *)
         t_plus_one t2, Le
       | Rgt | Rge | Req | Rneq ->
         assert false
@@ -206,10 +206,10 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     (* initialize the loop counter to [t1] *)
     let e1, env = term_to_exp kf (Env.push env) t1 in
     let init_blk, env = Env.pop_and_get
-      env
-      (Gmp.affect ~loc:e1.eloc lv_x x e1)
-      ~global_clear:false
-      Env.Middle
+        env
+        (Gmp.affect ~loc:e1.eloc lv_x x e1)
+        ~global_clear:false
+        Env.Middle
     in
     (* generate the guard [x bop t2] *)
     let block_to_stmt b = mkStmt ~valid_sid:true (Block b) in
@@ -223,16 +223,16 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     let guard_exp, env = term_to_exp kf (Env.push env) guard in
     let break_stmt = mkStmt ~valid_sid:true (Break guard_exp.eloc) in
     let guard_blk, env = Env.pop_and_get
-      env
-      (mkStmt
-        ~valid_sid:true
-        (If(
-          guard_exp,
-          mkBlock [ mkEmptyStmt ~loc () ],
-          mkBlock [ break_stmt ],
-          guard_exp.eloc)))
-      ~global_clear:false
-      Env.Middle
+        env
+        (mkStmt
+           ~valid_sid:true
+           (If(
+               guard_exp,
+               mkBlock [ mkEmptyStmt ~loc () ],
+               mkBlock [ break_stmt ],
+               guard_exp.eloc)))
+        ~global_clear:false
+        Env.Middle
     in
     let guard = block_to_stmt guard_blk in
     (* increment the loop counter [x++];
@@ -240,10 +240,10 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     let tlv_one = t_plus_one ~ty:ctx_one tlv in
     let incr, env = term_to_exp kf (Env.push env) tlv_one in
     let next_blk, env = Env.pop_and_get
-      env
-      (Gmp.affect ~loc:incr.eloc lv_x x incr)
-      ~global_clear:false
-      Env.Middle
+        env
+        (Gmp.affect ~loc:incr.eloc lv_x x incr)
+        ~global_clear:false
+        Env.Middle
     in
     (* generate the whole loop *)
     let next = block_to_stmt next_blk in
@@ -261,13 +261,13 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     in
     let start = block_to_stmt init_blk in
     let stmt = mkStmt
-      ~valid_sid:true
-      (Loop(
-        [],
-        mkBlock stmts,
-        loc,
-        None,
-        Some break_stmt))
+        ~valid_sid:true
+        (Loop(
+            [],
+            mkBlock stmts,
+            loc,
+            None,
+            Some break_stmt))
     in
     (* remove logic binding before returning *)
     Env.Logic_binding.remove env logic_x;

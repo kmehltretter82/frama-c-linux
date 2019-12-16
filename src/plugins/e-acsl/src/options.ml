@@ -22,12 +22,12 @@
 
 let () = Plugin.is_share_visible ()
 module P = Plugin.Register
-  (struct
-     let name = "E-ACSL"
-     let shortname = "e-acsl"
-     let help = "Executable ANSI/ISO C Specification Language --- runtime \
-assertion checker generator"
-  end)
+    (struct
+      let name = "E-ACSL"
+      let shortname = "e-acsl"
+      let help = "Executable ANSI/ISO C Specification Language --- runtime \
+                  assertion checker generator"
+    end)
 module PP = P (* [PP] required to avoid an ocamldoc error in OCaml 4.02 *)
 include PP
 
@@ -36,75 +36,75 @@ module Check =
     (struct
       let option_name = "-e-acsl-check"
       let help = "only type check E-ACSL annotated program"
-     end)
+    end)
 
 module Run =
   False
     (struct
       let option_name = "-e-acsl"
       let help = "generate a new project where E-ACSL annotations are \
-translated to executable C code"
-     end)
+                  translated to executable C code"
+    end)
 
 module Project_name =
   String
     (struct
       let option_name = "-e-acsl-project"
       let help = "the name of the generated project is <prj> \
-(default to \"e-acsl\")"
+                  (default to \"e-acsl\")"
       let default = "e-acsl"
       let arg_name = "prj"
-     end)
+    end)
 
 module Valid =
   False
     (struct
       let option_name = "-e-acsl-valid"
       let help = "translate annotation which have been proven valid"
-     end)
+    end)
 
 module Prepare =
   False
     (struct
       let option_name = "-e-acsl-prepare"
       let help = "prepare the AST to be directly usable by E-ACSL"
-     end)
+    end)
 
 module Gmp_only =
   False
     (struct
       let option_name = "-e-acsl-gmp-only"
       let help = "always use GMP integers instead of C integral types"
-     end)
+    end)
 
 module Temporal_validity =
   False
     (struct
       let option_name = "-e-acsl-temporal-validity"
       let help = "enable temporal analysis in valid annotations"
-     end)
+    end)
 
 module Validate_format_strings =
   False
     (struct
       let option_name = "-e-acsl-validate-format-strings"
       let help = "enable runtime validation of stdio.h format functions"
-     end)
+    end)
 
 module Replace_libc_functions =
   False
     (struct
       let option_name = "-e-acsl-replace-libc-functions"
       let help = "replace some libc functions (such as strcpy) with built-in\
- RTL alternatives"
-     end)
+                  RTL alternatives"
+    end)
 
 module Full_mmodel =
   False
     (struct
       let option_name = "-e-acsl-full-mmodel"
       let help = "maximal memory-related instrumentation"
-     end)
+    end)
 
 module Builtins =
   String_set
@@ -112,7 +112,7 @@ module Builtins =
       let option_name = "-e-acsl-builtins"
       let arg_name = ""
       let help = "C functions which can be used in the E-ACSL specifications"
-     end)
+    end)
 
 module Functions =
   Kernel_function_set
@@ -120,8 +120,8 @@ module Functions =
       let option_name = "-e-acsl-functions"
       let arg_name = "f1, ..., fn"
       let help = "only annotations in functions f1, ..., fn are checked at \
-runtime"
-     end)
+                  runtime"
+    end)
 
 module Instrument =
   Kernel_function_set
@@ -129,7 +129,7 @@ module Instrument =
       let option_name = "-e-acsl-instrument"
       let arg_name = "f1, ..., fn"
       let help = "only instrument functions f1, ..., fn. \
-Be aware that runtime verdicts may become partial."
+                  Be aware that runtime verdicts may become partial."
     end)
 
 
@@ -139,16 +139,16 @@ module Version =
     (struct
       let option_name = "-e-acsl-version"
       let help = "version of plug-in E-ACSL"
-     end)
+    end)
 
 let version () =
   if Version.get () then begin
-    Log.print_on_output 
-      (fun fmt -> 
-	Format.fprintf 
-	  fmt
-	  "Version of plug-in E-ACSL: %s@?"
-	  Local_config.version);
+    Log.print_on_output
+      (fun fmt ->
+         Format.fprintf
+           fmt
+           "Version of plug-in E-ACSL: %s@?"
+           Local_config.version);
     raise Cmdline.Exit
   end
 let () = Cmdline.run_after_configuring_stage version

@@ -209,22 +209,22 @@ let conditional_to_exp ?(name="if") loc kf t_opt e1 (e2, env2) (e3, env3) =
         t_opt
         ty
         (fun v ev ->
-          let lv = Cil.var v in
-          let ty = Cil.typeOf ev in
-          let init_set =
-            assert (not (Gmp_types.Q.is_t ty));
-            Gmp.init_set
-          in
-          let affect e = init_set ~loc lv ev e in
-          let then_block, _ =
-            let s = affect e2 in
-            Env.pop_and_get env2 s ~global_clear:false Env.Middle
-          in
-          let else_block, _ =
-            let s = affect e3 in
-            Env.pop_and_get env3 s ~global_clear:false Env.Middle
-          in
-          [ Cil.mkStmt ~valid_sid:true (If(e1, then_block, else_block, loc)) ])
+           let lv = Cil.var v in
+           let ty = Cil.typeOf ev in
+           let init_set =
+             assert (not (Gmp_types.Q.is_t ty));
+             Gmp.init_set
+           in
+           let affect e = init_set ~loc lv ev e in
+           let then_block, _ =
+             let s = affect e2 in
+             Env.pop_and_get env2 s ~global_clear:false Env.Middle
+           in
+           let else_block, _ =
+             let s = affect e3 in
+             Env.pop_and_get env3 s ~global_clear:false Env.Middle
+           in
+           [ Cil.mkStmt ~valid_sid:true (If(e1, then_block, else_block, loc)) ])
     in
     e, env
 
@@ -957,9 +957,10 @@ let term_to_exp typ t =
 let assumes_predicate bhv =
   List.fold_left
     (fun acc p ->
-      let loc = p.ip_content.pred_loc in
-      Logic_const.pand ~loc (acc,
-                             Logic_const.unamed ~loc p.ip_content.pred_content))
+       let loc = p.ip_content.pred_loc in
+       Logic_const.pand ~loc
+         (acc,
+          Logic_const.unamed ~loc p.ip_content.pred_content))
     Logic_const.ptrue
     bhv.b_assumes
 
@@ -995,35 +996,35 @@ let translate_postconditions kf env behaviors =
     let env =
       handle_error
         (fun env ->
-          (* test ordering does matter for keeping statuses consistent *)
-          if b.b_assigns <> WritesAny
-            && Keep_status.must_translate kf Keep_status.K_Assigns
-          then not_yet env "assigns clause in behavior";
-          (* ignore b.b_extended since we never translate them *)
-          env)
+           (* test ordering does matter for keeping statuses consistent *)
+           if b.b_assigns <> WritesAny
+           && Keep_status.must_translate kf Keep_status.K_Assigns
+           then not_yet env "assigns clause in behavior";
+           (* ignore b.b_extended since we never translate them *)
+           env)
         env
     in
     let assumes_pred = assumes_predicate b in
     List.fold_left
       (fun env (t, p) ->
-        if Keep_status.must_translate kf Keep_status.K_Ensures then
-	  let do_it env =
-	    match t with
-	    | Normal ->
-	      let loc = p.ip_content.pred_loc in
-	      let p = p.ip_content in
-	      let p =
-		Logic_const.pimplies
-		  ~loc
-		  (Logic_const.pold ~loc assumes_pred,
-		   Logic_const.unamed ~loc p.pred_content)
-	      in
-	      translate_named_predicate kf env p
-	    | Exits | Breaks | Continues | Returns ->
-	      not_yet env "abnormal termination case in behavior"
-	  in
-	  handle_error do_it env
-	else env)
+         if Keep_status.must_translate kf Keep_status.K_Ensures then
+           let do_it env =
+             match t with
+             | Normal ->
+               let loc = p.ip_content.pred_loc in
+               let p = p.ip_content in
+               let p =
+                 Logic_const.pimplies
+                   ~loc
+                   (Logic_const.pold ~loc assumes_pred,
+                    Logic_const.unamed ~loc p.pred_content)
+               in
+               translate_named_predicate kf env p
+             | Exits | Breaks | Continues | Returns ->
+               not_yet env "abnormal termination case in behavior"
+           in
+           handle_error do_it env
+         else env)
       env
       b.b_post_cond
   in
@@ -1039,34 +1040,34 @@ let translate_pre_spec kf env spec =
     unsupported
       (Extlib.may
          (fun _ ->
-           if Keep_status.must_translate kf Keep_status.K_Decreases then
-             not_yet env "variant clause"))
+            if Keep_status.must_translate kf Keep_status.K_Decreases then
+              not_yet env "variant clause"))
       spec.spec_variant;
     (* TODO: spec.spec_terminates is not part of the E-ACSL subset *)
     unsupported
       (Extlib.may
          (fun _ ->
-           if Keep_status.must_translate kf Keep_status.K_Terminates then
-             not_yet env "terminates clause"))
+            if Keep_status.must_translate kf Keep_status.K_Terminates then
+              not_yet env "terminates clause"))
       spec.spec_terminates;
     (match spec.spec_complete_behaviors with
-    | [] -> ()
-    | l ->
-      unsupported
-        (List.iter
-           (fun _ ->
-             if Keep_status.must_translate kf Keep_status.K_Complete then
-               not_yet env "complete behaviors"))
-        l);
+     | [] -> ()
+     | l ->
+       unsupported
+         (List.iter
+            (fun _ ->
+               if Keep_status.must_translate kf Keep_status.K_Complete then
+                 not_yet env "complete behaviors"))
+         l);
     (match spec.spec_disjoint_behaviors with
-    | [] -> ()
-    | l ->
-      unsupported
-        (List.iter
-           (fun _ ->
-             if Keep_status.must_translate kf Keep_status.K_Disjoint then
-               not_yet env "disjoint behaviors"))
-        l);
+     | [] -> ()
+     | l ->
+       unsupported
+         (List.iter
+            (fun _ ->
+               if Keep_status.must_translate kf Keep_status.K_Disjoint then
+                 not_yet env "disjoint behaviors"))
+         l);
     env
   in
   let env = convert_unsupported_clauses env in

@@ -519,8 +519,8 @@ let rec infer t =
      | LBnone
      | LBreads _ ->
        (match li.l_type with
-       | None -> assert false
-       | Some ret_type -> interv_of_logic_typ ret_type)
+        | None -> assert false
+        | Some ret_type -> interv_of_logic_typ ret_type)
      | LBinductive _ ->
        Error.not_yet "logic functions inductively defined")
 

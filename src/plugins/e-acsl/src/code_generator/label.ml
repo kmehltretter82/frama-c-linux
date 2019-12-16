@@ -31,7 +31,7 @@ module Labeled_stmts =
       let size = 7
       let dependencies = [] (* delayed *)
       let name = "E-ACSL.Labels"
-     end)
+    end)
 
 let self = Labeled_stmts.self
 

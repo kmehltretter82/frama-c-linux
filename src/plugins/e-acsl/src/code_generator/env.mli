@@ -120,19 +120,19 @@ module Logic_scope: sig
 
   val extend: t -> Lscope.lscope_var -> t
   (** Add a new logic variable with its associated information in the
-    logic scope of the environment. *)
+      logic scope of the environment. *)
 
   val reset: t -> t
   (** Return a new environment in which the logic scope is reset
-    iff [set_reset _ true] has been called beforehand. Do nothing otherwise. *)
+      iff [set_reset _ true] has been called beforehand. Do nothing otherwise. *)
 
   val set_reset: t -> bool -> t
   (** Setter of the information indicating whether the logic scope should be
-    reset at next call to [reset]. *)
+      reset at next call to [reset]. *)
 
   val get_reset: t -> bool
   (** Getter of the information indicating whether the logic scope should be
-    reset at next call to [reset]. *)
+      reset at next call to [reset]. *)
 end
 
 (* ************************************************************************** *)

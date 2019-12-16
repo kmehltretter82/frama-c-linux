@@ -23,8 +23,8 @@
 open Cil_types
 
 (* Handle the logic scope of a term.
-  We define the logic scope of a term [t] to be the set of PURELY logic
-  variables that are visible by [t]. *)
+   We define the logic scope of a term [t] to be the set of PURELY logic
+   variables that are bound in [t] in case of use. *)
 
 type lscope_var =
   | Lvs_let of logic_var * term (* the expression to which the lv is binded *)
@@ -45,9 +45,9 @@ val add: lscope_var -> t -> t
 
 val get_all: t -> lscope_var list
 (* Return the list of [lscope_var] of the given logic scope.
-  The first element is the first [lscope_var] that was added to [t], the
-  second element is the second [lscope_var] that was added to [t], an so on. *)
+   The first element is the first [lscope_var] that was added to [t], the
+   second element is the second [lscope_var] that was added to [t], an so on. *)
 
 val is_used: t -> Misc.pred_or_term -> bool
 (* [is_used lscope pot] returns [true] iff [pot] uses a variable from
-  [lscope]. *)
+   [lscope]. *)

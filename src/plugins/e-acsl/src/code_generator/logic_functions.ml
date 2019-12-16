@@ -121,22 +121,22 @@ let generate_kf ~loc fname env ret_ty params_ty li =
   let params, params_ty =
     List.fold_right2
       (fun lvi pty (params, params_ty) ->
-        let ty = match pty with
-          | Typing.Gmpz ->
-            (* GMP's integer are arrays: consider them as pointers in function's
-               parameters *)
-            Gmp_types.Z.t_as_ptr ()
-          | Typing.C_integer ik -> TInt(ik, [])
-          | Typing.C_float ik -> TFloat(ik, [])
-          (* for the time being, no reals but rationals instead *)
-          | Typing.Rational -> Gmp_types.Q.t ()
-          | Typing.Real -> Error.not_yet "real number"
-          | Typing.Nan -> Typing.typ_of_lty lvi.lv_type
-        in
-        (* build the formals: cannot use [Cil.makeFormal] since the function
-           does not yet exist *)
-        let vi = Cil.makeVarinfo false true lvi.lv_name ty in
-        vi :: params, (lvi.lv_name, ty, []) :: params_ty)
+         let ty = match pty with
+           | Typing.Gmpz ->
+             (* GMP's integer are arrays: consider them as pointers in function's
+                parameters *)
+             Gmp_types.Z.t_as_ptr ()
+           | Typing.C_integer ik -> TInt(ik, [])
+           | Typing.C_float ik -> TFloat(ik, [])
+           (* for the time being, no reals but rationals instead *)
+           | Typing.Rational -> Gmp_types.Q.t ()
+           | Typing.Real -> Error.not_yet "real number"
+           | Typing.Nan -> Typing.typ_of_lty lvi.lv_type
+         in
+         (* build the formals: cannot use [Cil.makeFormal] since the function
+            does not exist yet *)
+         let vi = Cil.makeVarinfo false true lvi.lv_name ty in
+         vi :: params, (lvi.lv_name, ty, []) :: params_ty)
       li.l_profile
       params_ty
       ([], [])
@@ -208,11 +208,11 @@ let generate_kf ~loc fname env ret_ty params_ty li =
     let locals, blocks =
       List.fold_left
         (fun (local_vars, block_vars as acc) (v, scope) -> match scope with
-        | Env.LFunction kf' when Kernel_function.equal kf kf' ->
-          v :: local_vars, block_vars
-        | Env.LLocal_block kf' when Kernel_function.equal kf kf' ->
-          v :: local_vars, block_vars
-        | _ -> acc)
+           | Env.LFunction kf' when Kernel_function.equal kf kf' ->
+             v :: local_vars, block_vars
+           | Env.LLocal_block kf' when Kernel_function.equal kf kf' ->
+             v :: local_vars, block_vars
+           | _ -> acc)
         (fundec.slocals, fundec.sbody.blocals)
         vars
     in
@@ -238,7 +238,7 @@ module Params_ty =
 (* for each logic_info, associate its possible profiles, i.e. the types of its
    parameters + the generated varinfo for the function *)
 let memo_tbl:
-    kernel_function Params_ty.Hashtbl.t Logic_info.Hashtbl.t
+  kernel_function Params_ty.Hashtbl.t Logic_info.Hashtbl.t
   = Logic_info.Hashtbl.create 7
 
 let reset () = Logic_info.Hashtbl.clear memo_tbl

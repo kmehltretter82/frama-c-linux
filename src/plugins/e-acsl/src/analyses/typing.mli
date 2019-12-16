@@ -154,8 +154,8 @@ val typ_of_lty: logic_type -> typ
 (******************************************************************************)
 
 val compute_quantif_guards_ref
-    : (predicate -> logic_var list -> predicate ->
-       (term * relation * logic_var * relation * term) list) ref
+  : (predicate -> logic_var list -> predicate ->
+     (term * relation * logic_var * relation * term) list) ref
 (** Forward reference. *)
 
 (*
