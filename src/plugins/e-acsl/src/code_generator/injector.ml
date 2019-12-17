@@ -568,6 +568,11 @@ let inject_in_fundec main fundec =
   (* convert ghost variables *)
   vi.vghost <- false;
   List.iter (fun vi -> vi.vghost <- false) fundec.slocals;
+  let unghost_formal vi =
+    vi.vghost <- false ;
+    vi.vattr <- Cil.dropAttribute Cil.frama_c_ghost_formal vi.vattr
+  in
+  List.iter unghost_formal fundec.sformals;
   (* update environments *)
   Builtins.update vi.vname vi;
   (* track function addresses but the main function that is tracked internally
@@ -575,9 +580,9 @@ let inject_in_fundec main fundec =
   if not (Kernel_function.is_main kf) then Global_observer.add vi;
   (* exit point computations *)
   if Functions.instrument kf then Exit_points.generate fundec;
+  (* recursive visit *)
   Options.feedback ~dkey ~level:2 "entering in function %a."
     Kernel_function.pretty kf;
-  (* recursive visit *)
   let env = inject_in_block Env.empty kf fundec.sbody in
   Exit_points.clear ();
   add_generated_variables_in_function env fundec;
@@ -591,6 +596,18 @@ let inject_in_fundec main fundec =
 (* ************************************************************************** *)
 (* The whole AST *)
 (* ************************************************************************** *)
+
+let unghost_vi vi =
+  (* do not convert extern ghost variables, because they can't be linked,
+     see bts #1392 *)
+  if vi.vstorage <> Extern then vi.vghost <- false;
+  match Cil.unrollType vi.vtype with
+  | TFun(res, Some l, va, attr) ->
+    (* unghostify function's parameters *)
+    let retype (n, t, a) = n, t, Cil.dropAttribute Cil.frama_c_ghost_formal a in
+    vi.vtype <- TFun(res, Some (List.map retype l), va, attr)
+  | _ ->
+    ()
 
 let inject_in_global (env, main) = function
   (* library functions and built-ins *)
@@ -610,21 +627,19 @@ let inject_in_global (env, main) = function
 
   (* variable declarations *)
   | GVarDecl(vi, _) | GFunDecl(_, vi, _) ->
-    (* do not convert extern ghost variables, because they can't be linked,
-       see bts #1392 *)
-    if vi.vstorage <> Extern then vi.vghost <- false;
+    unghost_vi vi;
     Global_observer.add vi;
     env, main
 
   (* variable definition *)
   | GVar(vi, { init = None }, _) ->
     Global_observer.add vi;
-    vi.vghost <- false;
+    unghost_vi vi;
     env, main
 
   | GVar(vi, { init = Some init }, _) ->
     Global_observer.add vi;
-    vi.vghost <- false;
+    unghost_vi vi;
     let _init, env = inject_in_init env None vi NoOffset init in
     (* ignore the new initializer that handles literal strings since they are
        not substituted in global initializers (see
@@ -632,7 +647,8 @@ let inject_in_global (env, main) = function
     env, main
 
   (* function definition *)
-  | GFun(fundec, _) ->
+  | GFun({ svar = vi } as fundec, _) ->
+    unghost_vi vi;
     inject_in_fundec main fundec
 
   (* other globals: nothing to do *)
