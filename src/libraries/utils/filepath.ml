@@ -127,15 +127,36 @@ let insert base path_name =
 
 let cwd = insert dummy (Sys.getcwd())
 
-let normalize ?base_name path_name =
-  if path_name = "" then ""
-  else
-  let base =
-    match base_name with
-      | None -> cwd
-      | Some b -> insert cwd b in
-  let norm_path_name = (insert base path_name).path_name in
-  if norm_path_name = "" then "/" else norm_path_name
+
+
+type existence = Must_exist | Must_not_exist | Indifferent
+
+exception No_file
+exception File_exists
+
+let normalize ?(existence=Indifferent) ?base_name path_name =
+  let path =
+    if path_name = ""
+    then ""
+    else
+      let base =
+        match base_name with
+        | None -> cwd
+        | Some b -> insert cwd b in
+      let norm_path_name = (insert base path_name).path_name in
+      if norm_path_name = "" then "/" else norm_path_name
+  in
+  match existence with
+  | Indifferent ->
+    path
+  | Must_exist ->
+    if Sys.file_exists path
+    then path
+    else raise No_file
+  | Must_not_exist ->
+    if Sys.file_exists path
+    then raise File_exists
+    else path
 
 (* -------------------------------------------------------------------------- *)
 (* --- Symboling Names                                                    --- *)
@@ -210,7 +231,7 @@ let is_relative ?base_name file_name =
 
 module Normalized = struct
   type t = string
-  let of_string ?base_name s = normalize ?base_name s
+  let of_string ?existence ?base_name s = normalize ?existence ?base_name s
   let to_pretty_string s = pretty s
   let equal : t -> t -> bool = (=)
   let compare = String.compare

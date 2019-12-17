@@ -451,12 +451,9 @@ struct
   module Filepath
       (X: sig
          include Parameter_sig.Input_with_arg
-         val existence : Parameter_sig.existence
+         val existence : Filepath.existence
        end) =
   struct
-
-    exception No_file
-    exception File_exists
 
     include Build
         (struct
@@ -466,31 +463,20 @@ struct
           let functor_name = "Filepath"
         end)
 
-    let check_existence existence fp =
-      match existence with
-      | Parameter_sig.Indifferent -> ()
-      | Parameter_sig.Must_exist ->
-        if not (Sys.file_exists (Filepath.Normalized.to_pretty_string fp)) then
-          raise No_file
-      | Parameter_sig.Must_not_exist ->
-        if Sys.file_exists (Filepath.Normalized.to_pretty_string fp) then
-          raise File_exists
-
-    let existence = X.existence
-
     let convert f oldstr newstr =
       let oldfp = Filepath.Normalized.to_pretty_string oldstr in
       let newfp = Filepath.Normalized.to_pretty_string newstr in
       f oldfp newfp
 
-    let set fp =
-      try
-        check_existence existence fp ; set fp
-      with
-      | No_file -> P.L.abort "file not found: '%a'" Filepath.Normalized.pretty fp
-      | File_exists -> P.L.abort "file already exists: '%a'" Filepath.Normalized.pretty fp
-
-    let set_str s = set (Filepath.Normalized.of_string s)
+    let set_str s =
+      let fp =
+        try
+          Filepath.Normalized.of_string ~existence:X.existence s
+        with
+        | Filepath.No_file -> P.L.abort "file not found: '%s'" s
+        | Filepath.File_exists -> P.L.abort "file already exists: '%s'" s
+      in
+      set fp
 
     let add_option name =
       Cmdline.add_option
