@@ -1207,6 +1207,24 @@ struct
         let default = []
        end)
 
+  module Filepath_list
+      (X: sig
+         include Parameter_sig.Input_with_arg
+           val existence : Fc_Filepath.existence
+       end) =
+    Make_list
+      (struct
+        include Datatype.Filepath
+        let of_string s = Datatype.Filepath.of_string ~existence:X.existence s
+        let to_string = Fc_Filepath.Normalized.to_pretty_string
+        let of_singleton_string = no_element_of_string
+      end)
+      (struct
+        include X
+        let dependencies = []
+        let default = []
+      end)
+
   module Make_map
     (K: Parameter_sig.String_datatype_with_collections)
     (V: Parameter_sig.Value_datatype with type key = K.t)

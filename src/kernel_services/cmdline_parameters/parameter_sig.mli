@@ -448,6 +448,9 @@ end
 (** @modify Sodium-20150201 *)
 module type String_list = List with type elt = string and type t = string list
 
+module type Filepath_list =
+  List with type elt = Datatype.Filepath.t and type t = Datatype.Filepath.t list
+
 (** Signature for maps as command line parameters.
     @since Sodium-20150201 *)
 module type Map = sig
@@ -559,6 +562,12 @@ module type Builder = sig
     List with type elt = E.t and type t = E.t list
 
   module String_list(X: Input_with_arg): String_list
+
+  module Filepath_list
+      (X: sig
+         include Input_with_arg
+         val existence: Fc_Filepath.existence
+       end): Filepath_list
 
   (** Parameter is a map where multibindings are **not** allowed. *)
   module Make_map
