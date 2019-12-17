@@ -58,6 +58,12 @@ int main(void)
                     (char *)"*q == G",14);
   }
   /*@ assert *q ≡ G; */ ;
+  int x = 1;
+  if (x) x ++;
+  else {
+    G ++;
+    G ++;
+  }
   __retres = 0;
   __e_acsl_delete_block((void *)(& P));
   __e_acsl_delete_block((void *)(& G));

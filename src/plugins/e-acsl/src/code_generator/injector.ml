@@ -461,6 +461,7 @@ and inject_in_stmt env kf stmt =
   add_new_block_in_stmt env kf stmt
 
 and inject_in_block (env: Env.t) kf blk =
+  blk.battrs <- Cil.dropAttribute Cil.frama_c_ghost_else blk.battrs ;
   let stmts, env =
     List.fold_left
       (fun (stmts, env) stmt ->
