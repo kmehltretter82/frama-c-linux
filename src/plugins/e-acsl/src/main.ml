@@ -82,7 +82,7 @@ let unmemoized_extend_ast () =
     in
     Project.on prj
       (fun () ->
-         Kernel.Files.set [ tmpfile ];
+         Kernel.Files.set [ Datatype.Filepath.of_string tmpfile ];
          extend ())
       ();
     Some prj

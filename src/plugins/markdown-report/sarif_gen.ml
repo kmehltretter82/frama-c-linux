@@ -143,8 +143,11 @@ let gen_statuses () =
 
 let gen_files () =
   let add_src_file f =
-    let key = Filename.chop_extension (Filename.basename f) in
-    let fileLocation = FileLocation.create ~uri:(Filepath.normalize f) () in
+    let key =
+      let fname = Filepath.Normalized.to_pretty_string f in
+      Filename.chop_extension (Filename.basename fname)
+    in
+    let fileLocation = FileLocation.create ~uri:(f :> string) () in
     let roles = [ Role.analysisTarget ] in
     let mimeType = "text/x-csrc" in
     key, File.create ~fileLocation ~roles ~mimeType ()

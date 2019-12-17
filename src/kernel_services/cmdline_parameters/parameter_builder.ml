@@ -1210,14 +1210,21 @@ struct
   module Filepath_list
       (X: sig
          include Parameter_sig.Input_with_arg
-           val existence : Fc_Filepath.existence
+         val existence: Fc_Filepath.existence
        end) =
     Make_list
       (struct
         include Datatype.Filepath
-        let of_string s = Datatype.Filepath.of_string ~existence:X.existence s
         let to_string = Fc_Filepath.Normalized.to_pretty_string
         let of_singleton_string = no_element_of_string
+
+        let of_string s =
+          try of_string ~existence:X.existence s
+          with
+          | Fc_Filepath.No_file ->
+            cannot_build (Format.sprintf "file not found: '%s'" s)
+          | Fc_Filepath.File_exists ->
+            cannot_build (Format.sprintf "file already exists: '%s'" s)
       end)
       (struct
         include X

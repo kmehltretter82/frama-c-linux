@@ -23,9 +23,9 @@
 let add_files (host_window: Design.main_window_extension_points) =
   Gtk_helper.source_files_chooser
     (host_window :> Gtk_helper.source_files_chooser_host)
-    (Kernel.Files.get ())
+    (List.map Filepath.Normalized.to_pretty_string (Kernel.Files.get ()))
     (fun filenames ->
-       Kernel.Files.set filenames;
+       Kernel.Files.set (List.map Datatype.Filepath.of_string filenames);
        if Ast.is_computed () then
          Gui_parameters.warning "Input files unchanged. Ignored."
        else begin

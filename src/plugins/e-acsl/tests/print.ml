@@ -28,9 +28,8 @@ module Printer_extension(X:Printer.PrinterClass) = struct
     method! global fmt g =
       let loc, _ = Cil_datatype.Global.loc g in
       let file = loc.Filepath.pos_path in
-      if file = Datatype.Filepath.dummy || List.exists
-        (fun s -> Datatype.Filepath.of_string s = file)
-        (Kernel.Files.get ())
+      if file = Datatype.Filepath.dummy ||
+         List.exists (fun s -> s = file) (Kernel.Files.get ())
       then super#global fmt g
 
   end

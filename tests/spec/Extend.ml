@@ -127,7 +127,7 @@ let run () =
   File.pretty_ast ~fmt ();
   let prj = Project.create "reparsing" in
   Project.on prj add_builtin ();
-  Project.on prj Kernel.Files.add my_file;
+  Project.on prj Kernel.Files.add (Datatype.Filepath.of_string my_file);
   Kernel.feedback "Reparsing file";
   (* Avoid having a temporary name in the oracle. *)
   Kernel.Verbose.set 0;
