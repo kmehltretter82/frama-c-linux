@@ -110,7 +110,8 @@ let () = let open LogicBuiltins in add_builtin "\\bit_test" [Z;Z] f_bit_positive
 let f_bits = [ f_bit_stdlib ; f_bit_positive ; f_bit_export ]
 
 let bit_test e k =
-  F.e_fun (if k <= 0 then f_bit_positive else f_bit_stdlib) [e ; e_int k]
+  let r = F.e_fun (if k <= 0 then f_bit_positive else f_bit_stdlib) [e ; e_int k]
+  in assert (is_prop r) ; r
 
 (* -------------------------------------------------------------------------- *)
 (* --- Matching utilities for simplifications                             --- *)
@@ -483,7 +484,7 @@ let smp2 f zf = (* f(c1,c2) ~> zf(c1,c2),  f(c1,c2,...) ~> f(zf(c1,c2),...) *)
     end
   | _ -> raise Not_found
 
-let bitk_positive k e = F.e_fun f_bit_positive [e;k]
+let bitk_positive k e = let r = F.e_fun f_bit_positive [e;k] in assert (is_prop r) ; r
 let smp_mk_bit_stdlib = function
   | [ a ; k ] when is_positive_or_null k ->
       (* No need to expand the logic definition of the ACSL stdlib symbol when
@@ -767,12 +768,13 @@ let smp_leq_with_lsr a0 b0 =
       smp_cmp_with_lsr e_leq a0 b0
 
 (* Rewritting at export *)
+let bitk_export k e = let r = F.e_fun f_bit_export [e;k] in assert (is_prop r) ; r
 let export_eq_with_land a b =
   let es = match_fun f_land a in
   if b == e_zero then
     let k,_,es = match_binop_one_extraction f_lsl es in
     (* e1 & ... & en & (1 << k) = 0   <==> !bit_test(e1 & ... & en, k) *)
-    e_not (e_fun f_bit_export [e_fun f_land es ; k ])
+    e_not (bitk_export k (e_fun f_land es))
   else raise Not_found
 
 (* ACSL Semantics *)
