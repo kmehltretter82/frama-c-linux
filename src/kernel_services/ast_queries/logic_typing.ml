@@ -1447,7 +1447,13 @@ struct
       Ltype(t1,l),oterm
     | t1, Ltype ({lt_name = "set"},[t2]) ->
       let typ, term = implicit_conversion ~overloaded loc oterm t1 t2 in
-      make_set_type typ, term
+      let stype = make_set_type typ in
+      let term =
+        if not (Logic_const.is_set_type term.term_type) then
+          Logic_const.tlogic_coerce ~loc:term.term_loc term stype
+        else term
+      in
+      stype, term
     | Linteger, Linteger | Lreal, Lreal -> ot, oterm
     | Lvar s1, Lvar s2 when s1 = s2 -> ot, oterm
     | Larrow(args1,rt1), Larrow(args2,rt2)
