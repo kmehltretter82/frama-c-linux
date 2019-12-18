@@ -192,7 +192,6 @@ rec {
         caveat_importer_src = plugins.caveat-importer.src;
         acsl_importer_src = plugins.acsl-importer.src;
         volatile_src = plugins.volatile.src;
-        e_acsl_src = plugins.e-acsl.src;
         security_src = plugins.security.src;
         context_from_precondition_src = plugins.context-from-precondition.src;
         postPatch = ''
@@ -213,8 +212,6 @@ rec {
            chmod -R u+w -- "$sourceRoot/src/plugins/volatile"
            cp -r --preserve=mode "$acsl_importer_src" "$sourceRoot/src/plugins/acsl-importer"
            chmod -R u+w -- "$sourceRoot/src/plugins/acsl-importer"
-           cp -r --preserve=mode "$e_acsl_src" "$sourceRoot/src/plugins/e-acsl"
-           chmod -R u+w -- "$sourceRoot/src/plugins/e-acsl"
            echo IN_FRAMA_CI=yes > "$sourceRoot/in_frama_ci"
            cp -r --preserve=mode "$context_from_precondition_src" "$sourceRoot/src/plugins/context-from-precondition"
            chmod -R u+w -- "$sourceRoot/src/plugins/context-from-precondition"
