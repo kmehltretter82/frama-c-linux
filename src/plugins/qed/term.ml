@@ -231,6 +231,13 @@ struct
     | _ ->
         assert (hash_head a <> hash_head b) ; false
 
+  let equal_tau t1 t2 =
+    match t1, t2 with
+    | None, None -> true
+    | None, Some _ | Some _ , None -> false
+    | Some (Bool|Prop) , Some(Bool|Prop) -> true
+    | Some t1, Some t2 -> Tau.equal t1 t2
+
   let sort x = x.sort
   let vars x = x.vars
   let bvars x = x.bind
@@ -673,7 +680,9 @@ struct
       (struct
         type t = term
         let hash t = t.hash
-        let equal t1 t2 = equal_repr t1.repr t2.repr
+        let equal t1 t2 =
+          equal_tau t1.tau t2.tau &&
+          equal_repr t1.repr t2.repr
       end)
 
   (* -------------------------------------------------------------------------- *)
