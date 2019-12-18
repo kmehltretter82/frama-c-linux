@@ -1222,9 +1222,9 @@ struct
           try of_string ~existence:X.existence s
           with
           | Fc_Filepath.No_file ->
-            cannot_build (Format.sprintf "file not found: '%s'" s)
+            P.L.abort "file '%s' does not exist" s
           | Fc_Filepath.File_exists ->
-            cannot_build (Format.sprintf "file already exists: '%s'" s)
+            P.L.abort "file '%s' already exists" s
       end)
       (struct
         include X
