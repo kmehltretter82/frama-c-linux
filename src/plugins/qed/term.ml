@@ -235,6 +235,7 @@ struct
     match t1, t2 with
     | None, None -> true
     | None, Some _ | Some _ , None -> false
+    | Some (Bool|Prop) , Some(Bool|Prop) -> true
     | Some t1, Some t2 -> Tau.equal t1 t2
 
   let sort x = x.sort
