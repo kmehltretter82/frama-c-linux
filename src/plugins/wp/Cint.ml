@@ -110,7 +110,8 @@ let () = let open LogicBuiltins in add_builtin "\\bit_test" [Z;Z] f_bit_positive
 let f_bits = [ f_bit_stdlib ; f_bit_positive ; f_bit_export ]
 
 let bit_test e k =
-  let r = F.e_fun (if k <= 0 then f_bit_positive else f_bit_stdlib) [e ; e_int k]
+  let r = F.e_fun ~result:Logic.Bool
+      (if k <= 0 then f_bit_positive else f_bit_stdlib) [e ; e_int k]
   in assert (is_prop r) ; r
 
 (* -------------------------------------------------------------------------- *)
@@ -484,7 +485,7 @@ let smp2 f zf = (* f(c1,c2) ~> zf(c1,c2),  f(c1,c2,...) ~> f(zf(c1,c2),...) *)
     end
   | _ -> raise Not_found
 
-let bitk_positive k e = let r = F.e_fun f_bit_positive [e;k] in assert (is_prop r) ; r
+let bitk_positive k e = F.e_fun ~result:Logic.Bool f_bit_positive [e;k]
 let smp_mk_bit_stdlib = function
   | [ a ; k ] when is_positive_or_null k ->
       (* No need to expand the logic definition of the ACSL stdlib symbol when
@@ -768,7 +769,7 @@ let smp_leq_with_lsr a0 b0 =
       smp_cmp_with_lsr e_leq a0 b0
 
 (* Rewritting at export *)
-let bitk_export k e = let r = F.e_fun f_bit_export [e;k] in assert (is_prop r) ; r
+let bitk_export k e = F.e_fun ~result:Logic.Bool f_bit_export [e;k]
 let export_eq_with_land a b =
   let es = match_fun f_land a in
   if b == e_zero then
