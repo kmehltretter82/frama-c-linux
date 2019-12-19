@@ -29,10 +29,10 @@ type model = {
   descr : string ; (* Title of the Model (for pretty) *)
   emitter : Emitter.t ;
   hypotheses : hypotheses ;
-  tuning : tuning list ;
+  configure : (unit -> rollback) ;
 }
 
-and tuning = unit -> unit
+and rollback = (unit -> unit)
 and scope = Global | Kf of Kernel_function.t
 and hypotheses = unit -> MemoryContext.clause list
 and context = model * scope
@@ -51,7 +51,7 @@ struct
   let repr = {
     id = "?model" ; descr = "?model" ;
     emitter = Emitter.kernel ;
-    tuning = [ fun () -> () ] ;
+    configure = (fun () -> (fun () -> ())) ;
     hypotheses = nohyp ;
   }
 end
@@ -69,7 +69,8 @@ struct
 
 end
 
-let register ~id ?(descr=id) ?(tuning=[]) ?(hypotheses=nohyp) () =
+let register ~id ?(descr=id) ~configure
+    ?(hypotheses=nohyp) () =
   if MODELS.mem id then
     Wp_parameters.fatal "Duplicate model '%s'" id ;
   let emitter =
@@ -82,7 +83,7 @@ let register ~id ?(descr=id) ?(tuning=[]) ?(hypotheses=nohyp) () =
     id = id ;
     descr ;
     emitter ;
-    tuning ;
+    configure ;
     hypotheses ;
   } in
   MODELS.add model ; model
@@ -124,21 +125,23 @@ end
 
 let context : (string * context) Context.value = Context.create "WpContext"
 
-let configure (model,_) = List.iter (fun f -> f()) model.tuning
-let rollback = function None -> () | Some (_,ctxt) -> configure ctxt
+let configure (model,_) = model.configure ()
 
 let on_context gamma f x =
   let id = S.id gamma in
   let current = Context.push context (id,gamma) in
+  let rollback = try configure gamma
+    with _ -> Kernel.fatal "Model configuration failed" in
+  Context.configure () ;
   try
-    Context.configure () ;
-    configure gamma ;
     let result = f x in
     Context.pop context current ;
-    rollback current ; result
+    rollback () ;
+    result
   with err ->
     Context.pop context current ;
-    rollback current ; raise err
+    rollback () ;
+    raise err
 
 let is_defined () = Context.defined context
 let get_ident () = Context.get context |> fst

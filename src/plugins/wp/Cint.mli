@@ -38,7 +38,7 @@ val to_cint : lfun -> c_int (** Raises [Not_found] if not. *)
 val is_cint : lfun -> c_int (** Raises [Not_found] if not. *)
 
 type model = Natural | Machine
-val configure : model -> unit
+val configure : model -> WpContext.rollback
 val current : unit -> model
 
 val range : c_int -> term -> pred (** Dependent on model *)

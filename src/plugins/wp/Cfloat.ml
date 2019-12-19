@@ -71,6 +71,14 @@ let tau_of_float f =
   | Real -> Logic.Real
   | Float -> ftau f
 
+let float_name = function
+  | Float32 -> "float"
+  | Float64 -> "double"
+
+let model_name = function
+  | Float -> "Float"
+  | Real  -> "Real"
+
 (* -------------------------------------------------------------------------- *)
 (* --- Operators                                                          --- *)
 (* -------------------------------------------------------------------------- *)
@@ -90,17 +98,17 @@ type op =
 
 [@@@ warning "-32"]
 let op_name = function
-  | LT -> "flt"
-  | EQ -> "feq"
-  | LE -> "fle"
-  | NE -> "fne"
-  | NEG -> "fneg"
-  | ADD -> "fadd"
-  | MUL -> "fmul"
-  | DIV -> "fdiv"
-  | REAL -> "freal"
-  | ROUND -> "fround"
-  | EXACT -> "fexact"
+  | LT -> "lt"
+  | EQ -> "eq"
+  | LE -> "le"
+  | NE -> "ne"
+  | NEG -> "neg"
+  | ADD -> "add"
+  | MUL -> "mul"
+  | DIV -> "div"
+  | REAL -> "of"
+  | ROUND -> "to"
+  | EXACT -> "exact"
 [@@@ warning "+32"]
 
 (* -------------------------------------------------------------------------- *)
@@ -114,6 +122,7 @@ module REGISTRY = WpContext.Static
       let name = "Wp.Cfloat.REGISTRY"
       include Lang.Fun
     end)
+
 
 let find = REGISTRY.find
 
@@ -288,71 +297,84 @@ let compute_real op xs =
   | NE , [ x ; y ] -> F.e_neq x y
   | _ -> raise Not_found
 
-let compute op ulp xs =
-  match Context.get model with
-  | Real -> compute_real op xs
-  | Float -> compute_float op ulp xs
+let return_type ft = function
+  | REAL -> Logic.Real
+  | _ -> ftau ft
+
+module Compute = WpContext.StaticGenerator
+    (struct
+      type t = model * c_float * op
+
+      let compare = Pervasives.compare
+
+      let pretty fmt (m, ft, op) =
+        Format.fprintf fmt "%s_%a_%s" (model_name m) pp_suffix ft (op_name op)
+    end)
+    (struct
+      let name = "Wp.Cfloat.Compute"
+      type key = model * c_float * op
+      type data = lfun * (term list -> term)
+
+      let compile (m, ft, op) =
+        let impl = match m with
+          | Real  -> compute_real op
+          | Float -> compute_float op ft
+        in
+        let name = op_name op in
+        let phi = match op with
+          | LT | EQ | LE | NE ->
+              let prop = Pretty_utils.sfprintf "%s_%a" name pp_suffix ft in
+              let bool = Pretty_utils.sfprintf "%s_%ab" name pp_suffix ft in
+              extern_p ~library ~bool ~prop ()
+          | _ ->
+              let result = return_type ft op in
+              extern_f ~library ~result "%s_%a" name pp_suffix ft
+        in
+        Lang.F.set_builtin phi impl ;
+        REGISTRY.define phi (op, ft) ;
+        (phi, impl)
+    end)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Operations                                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
-let make_fun_float ?result name op ft =
-  let result = match result with None -> ftau ft | Some r -> r in
-  let phi = extern_f ~library ~result "%s_%a" name pp_suffix ft in
-  Lang.F.set_builtin phi (compute op ft) ;
-  REGISTRY.define phi (op,ft) ; phi
+let flt_eq ft = Compute.get (Context.get model, ft, EQ) |> fst
+let flt_neq ft = Compute.get (Context.get model, ft, NE) |> fst
+let flt_le ft = Compute.get (Context.get model, ft, LE) |> fst
+let flt_lt ft = Compute.get (Context.get model, ft, LT) |> fst
+let flt_neg ft = Compute.get (Context.get model, ft, NEG) |> fst
+let flt_add ft = Compute.get (Context.get model, ft, ADD) |> fst
+let flt_mul ft = Compute.get (Context.get model, ft, MUL) |> fst
+let flt_div ft = Compute.get (Context.get model, ft, DIV) |> fst
+let flt_of_real ft = Compute.get (Context.get model, ft, ROUND) |> fst
+let real_of_flt ft = Compute.get (Context.get model, ft, REAL) |> fst
 
-let make_pred_float name op ft =
-  let prop = Pretty_utils.sfprintf "%s_%a" name pp_suffix ft in
-  let bool = Pretty_utils.sfprintf "%s_%ab" name pp_suffix ft in
-  let phi = extern_p ~library ~bool ~prop () in
-  Lang.F.set_builtin phi (compute op ft) ;
-  REGISTRY.define phi (op,ft) ; phi
-
-let f_memo = Ctypes.f_memo
-
-let real_of_flt  = f_memo (make_fun_float ~result:Logic.Real "of" REAL)
-let flt_of_real  = f_memo (make_fun_float "to" ROUND)
-let flt_add  = f_memo (make_fun_float "add" ADD)
-let flt_mul  = f_memo (make_fun_float "mul" MUL)
-let flt_div  = f_memo (make_fun_float "div" DIV)
-let flt_neg  = f_memo (make_fun_float "neg" NEG)
-
-let flt_lt = f_memo (make_pred_float "lt" LT)
-let flt_eq = f_memo (make_pred_float "eq" EQ)
-let flt_le = f_memo (make_pred_float "le" LE)
-let flt_neq = f_memo (make_pred_float "ne" NE)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Builtins                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-let register_builtin_comparison suffix ft =
+let make_hack ?(converse=false) ft op xs =
+  let phi, impl = Compute.get ((Context.get model), ft, op) in
+  let xs = (if converse then List.rev xs else xs) in
+  try impl xs with Not_found -> F.e_fun phi xs
+
+let register_builtin ft =
   begin
-    let open Qed.Logic in
-    let params = [Sdata;Sdata] in
-    let sort = Sprop in
-    let gt = generated_f ~params ~sort "\\gt_%s" suffix in
-    let ge = generated_f ~params ~sort "\\ge_%s" suffix in
-    let open LogicBuiltins in
-    let signature = [F ft;F ft] in
-    add_builtin ("\\eq_" ^ suffix) signature (flt_eq ft) ;
-    add_builtin ("\\ne_" ^ suffix) signature (flt_neq ft) ;
-    add_builtin ("\\lt_" ^ suffix) signature (flt_lt ft) ;
-    add_builtin ("\\le_" ^ suffix) signature (flt_le ft) ;
-    add_builtin ("\\gt_" ^ suffix) signature gt ;
-    add_builtin ("\\ge_" ^ suffix) signature ge ;
-    let converse phi x y = e_fun phi [y;x] in
-    Lang.F.set_builtin_2 gt (converse (flt_lt ft)) ;
-    Lang.F.set_builtin_2 ge (converse (flt_le ft)) ;
+    let suffix = float_name ft in
+    LogicBuiltins.hack ("\\eq_" ^ suffix) (make_hack ft EQ) ;
+    LogicBuiltins.hack ("\\ne_" ^ suffix) (make_hack ft NE) ;
+    LogicBuiltins.hack ("\\lt_" ^ suffix) (make_hack ~converse:false ft LT) ;
+    LogicBuiltins.hack ("\\gt_" ^ suffix) (make_hack ~converse:true  ft LT) ;
+    LogicBuiltins.hack ("\\le_" ^ suffix) (make_hack ~converse:false ft LE) ;
+    LogicBuiltins.hack ("\\ge_" ^ suffix) (make_hack ~converse:true  ft LE)
   end
 
-let () =
-  Context.register
+let () = Context.register
     begin fun () ->
-      register_builtin_comparison "float" Float32 ;
-      register_builtin_comparison "double" Float64 ;
+      register_builtin Float32 ;
+      register_builtin Float64 ;
     end
 
 (* -------------------------------------------------------------------------- *)
@@ -360,17 +382,14 @@ let () =
 (* -------------------------------------------------------------------------- *)
 
 let () =
-  Context.register
-    begin fun () ->
-      let open LogicBuiltins in
-      let register_builtin ft =
-        add_builtin "\\model" [F ft] (f_model ft) ;
-        add_builtin "\\delta" [F ft] (f_delta ft) ;
-        add_builtin "\\epsilon" [F ft] (f_epsilon ft) ;
-      in
-      register_builtin Float32 ;
-      register_builtin Float64 ;
-    end
+  let open LogicBuiltins in
+  let register_builtin ft =
+    add_builtin "\\model" [F ft] (f_model ft) ;
+    add_builtin "\\delta" [F ft] (f_delta ft) ;
+    add_builtin "\\epsilon" [F ft] (f_epsilon ft) ;
+  in
+  register_builtin Float32 ;
+  register_builtin Float64
 
 (* -------------------------------------------------------------------------- *)
 (* --- Conversion Symbols                                                 --- *)
@@ -424,8 +443,13 @@ let fneq = fcmp p_neq flt_neq
 
 let configure m =
   begin
-    Context.set model m ;
-    Context.set Lang.floats tau_of_float ;
+    let orig_model = Context.push model m in
+    let orig_floats = Context.push Lang.floats tau_of_float in
+    let rollback () =
+      Context.pop model orig_model ;
+      Context.pop Lang.floats orig_floats
+    in
+    rollback
   end
 
 (* -------------------------------------------------------------------------- *)

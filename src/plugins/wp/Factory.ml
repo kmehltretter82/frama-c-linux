@@ -274,15 +274,27 @@ let configure_mheap = function
   | Hoare -> MemEmpty.configure ()
   | ZeroAlias -> MemZeroAlias.configure ()
   | Region -> MemRegion.configure ()
-  | Typed p -> MemTyped.configure () ; Context.set MemTyped.pointer p
+  | Typed p ->
+      let rollback_memtyped = MemTyped.configure () in
+      let orig_memtyped_pointer = Context.push MemTyped.pointer p in
+      let rollback () =
+        rollback_memtyped () ;
+        Context.pop MemTyped.pointer orig_memtyped_pointer
+      in
+      rollback
 
-let configure (s:setup) (d:driver) () =
-  begin
-    configure_mheap s.mheap ;
-    Cint.configure s.cint ;
-    Cfloat.configure s.cfloat ;
-    Context.set LogicBuiltins.driver d ;
-  end
+let configure_driver setup driver () =
+  let rollback_mheap = configure_mheap setup.mheap in
+  let rollback_cint = Cint.configure setup.cint in
+  let rollback_cfloat = Cfloat.configure setup.cfloat in
+  let old_driver = Context.push LogicBuiltins.driver driver in
+  let rollback () =
+    Context.pop LogicBuiltins.driver old_driver ;
+    rollback_cfloat () ;
+    rollback_cint () ;
+    rollback_mheap ()
+  in
+  rollback
 
 (* -------------------------------------------------------------------------- *)
 (* --- Access                                                             --- *)
@@ -298,21 +310,21 @@ module COMPILERS = FCMap.Make
 
 let instances = ref (COMPILERS.empty : WpContext.model COMPILERS.t)
 
-let instance (s:setup) (d:driver) =
-  try COMPILERS.find (s,d) !instances
+let instance setup driver =
+  try COMPILERS.find (setup,driver) !instances
   with Not_found ->
-    let id,descr = describe s in
-    let module CC = (val compiler s.mheap s.mvar) in
-    let tuning = [configure s d] in
+    let id,descr = describe setup in
+    let module CC = (val compiler setup.mheap setup.mvar) in
+    let configure = configure_driver setup driver in
     let hypotheses = CC.M.hypotheses in
     let id,descr =
-      if LogicBuiltins.is_default d then id,descr
+      if LogicBuiltins.is_default driver then id,descr
       else
-        ( id ^ "_" ^ LogicBuiltins.id d ,
-          descr ^ " (Driver " ^ LogicBuiltins.descr d ^ ")" )
+        ( id ^ "_" ^ LogicBuiltins.id driver ,
+          descr ^ " (Driver " ^ LogicBuiltins.descr driver ^ ")" )
     in
-    let model = WpContext.register ~id ~descr ~tuning ~hypotheses () in
-    instances := COMPILERS.add (s,d) model !instances ; model
+    let model = WpContext.register ~id ~descr ~configure ~hypotheses () in
+    instances := COMPILERS.add (setup,driver) model !instances ; model
 
 let ident s = fst (describe s)
 let descr s = snd (describe s)

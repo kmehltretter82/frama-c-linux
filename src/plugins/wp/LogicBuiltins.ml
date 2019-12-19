@@ -109,8 +109,11 @@ type driver = {
   hdeps : (string, string list) Hashtbl.t;
   hoptions :
     (string (* library *) * string (* group *) * string (* name *), string list)
-      Hashtbl.t
+      Hashtbl.t;
+  mutable locked: bool
 }
+
+let lock driver = driver.locked <- true
 
 let id d = d.driverid
 let descr d = d.description
@@ -118,11 +121,16 @@ let is_default d = (d.driverid = "")
 let compare d d' = String.compare d.driverid d'.driverid
 
 let driver = Context.create "driver"
-let cdriver () = Context.get driver
+let cdriver_ro () = Context.get driver
+let cdriver_rw () =
+  let driver = Context.get driver in
+  if driver.locked then
+    Wp_parameters.failure "Attempt to modify locked: %s" driver.driverid ;
+  driver
 
 let lookup_driver name kinds =
   try
-    let sigs = Hashtbl.find (cdriver ()).hlogic name in
+    let sigs = Hashtbl.find (cdriver_ro ()).hlogic name in
     try List.assoc kinds sigs
     with Not_found ->
       Wp_parameters.feedback ~once:true
@@ -152,25 +160,26 @@ let lookup name kinds =
   with Not_found -> lookup_driver name kinds
 
 let register ?source name kinds link =
-  let sigs = try Hashtbl.find (cdriver ()).hlogic name with Not_found -> [] in
+  let driver = cdriver_rw () in
+  let sigs = try Hashtbl.find driver.hlogic name with Not_found -> [] in
   if List.exists (fun (s,_) -> s = kinds) sigs then
     Wp_parameters.warning ?source "Redefinition of logic %s%a"
       name pp_kinds kinds ;
   let entry = (kinds,link) in
-  Hashtbl.add (cdriver ()).hlogic name (entry::sigs)
+  Hashtbl.add driver.hlogic name (entry::sigs)
 
 let iter_table f =
   let items = ref [] in
   Hashtbl.iter
     (fun a sigs -> List.iter (fun (ks,lnk) -> items := (a,ks,lnk)::!items) sigs)
-    (cdriver ()).hlogic ;
+    (cdriver_ro ()).hlogic ;
   List.iter f (List.sort Transitioning.Stdlib.compare !items)
 
 let iter_libs f =
   let items = ref [] in
   Hashtbl.iter
     (fun a libs -> items := (a,libs) :: !items)
-    (cdriver ()).hdeps ;
+    (cdriver_ro ()).hdeps ;
   List.iter f (List.sort Transitioning.Stdlib.compare !items)
 
 let dump () =
@@ -204,11 +213,11 @@ let constant name =
 (* -------------------------------------------------------------------------- *)
 
 let dependencies lib =
-  Hashtbl.find (cdriver ()).hdeps lib
+  Hashtbl.find (cdriver_ro ()).hdeps lib
 
 let add_library lib deps =
   let others = try dependencies lib with Not_found -> [] in
-  Hashtbl.add (cdriver ()).hdeps lib (others @ deps)
+  Hashtbl.add (cdriver_rw ()).hdeps lib (others @ deps)
 
 let add_alias ~source name kinds ~alias () =
   register ~source name kinds (lookup alias kinds)
@@ -255,17 +264,17 @@ let create_option ~sanitizer group name =
   option
 
 let get_option (group,name) ~library =
-  try Hashtbl.find (cdriver ()).hoptions (library,group,name)
+  try Hashtbl.find (cdriver_ro ()).hoptions (library,group,name)
   with Not_found -> []
 
 let set_option ~driver_dir group name ~library value =
   let value = sanitize ~driver_dir group name value in
-  Hashtbl.replace (cdriver ()).hoptions (library,group,name) [value]
+  Hashtbl.replace (cdriver_rw ()).hoptions (library,group,name) [value]
 
 let add_option ~driver_dir group name ~library value =
   let value = sanitize ~driver_dir group name value in
   let l = get_option (group,name) ~library in
-  Hashtbl.replace (cdriver ()).hoptions (library,group,name) (l @ [value])
+  Hashtbl.replace (cdriver_rw ()).hoptions (library,group,name) (l @ [value])
 
 
 (** Includes *)
@@ -278,7 +287,7 @@ let find_lib file =
           let path = Printf.sprintf "%s/%s" dir file in
           if Sys.file_exists path then path else lookup file dirs
     in
-    lookup file (cdriver ()).includes
+    lookup file (cdriver_ro ()).includes
 
 (* -------------------------------------------------------------------------- *)
 (* --- Implemented Builtins                                               --- *)
@@ -291,6 +300,7 @@ let builtin_driver = {
   hlogic = Hashtbl.create 131;
   hdeps  = Hashtbl.create 31;
   hoptions = Hashtbl.create 131;
+  locked = false
 }
 
 let add_builtin name kinds lfun =
@@ -300,17 +310,21 @@ let add_builtin name kinds lfun =
   else
     Context.bind driver builtin_driver (register name kinds) phi
 
-let create ~id ?(descr=id) ?(includes=[]) () =
-  {
+let new_driver ~id ?(base=builtin_driver)
+    ?(descr=id) ?(includes=[]) ?(configure=fun () -> ()) () =
+  lock base ;
+  let new_driver = {
     driverid = id ;
     description = descr ;
-    includes = includes @ builtin_driver.includes ;
-    hlogic = Hashtbl.copy builtin_driver.hlogic ;
-    hdeps  = Hashtbl.copy builtin_driver.hdeps ;
-    hoptions = Hashtbl.copy builtin_driver.hoptions ;
-  }
-
-let init ~id ?descr ?includes () =
-  Context.set driver (create ~id ?descr ?includes ())
+    includes = includes @ base.includes ;
+    hlogic = Hashtbl.copy base.hlogic ;
+    hdeps  = Hashtbl.copy base.hdeps ;
+    hoptions = Hashtbl.copy base.hoptions ;
+    locked = false
+  } in
+  let old = Context.push driver new_driver in
+  configure () ;
+  Context.pop driver old ;
+  new_driver
 
 (* -------------------------------------------------------------------------- *)

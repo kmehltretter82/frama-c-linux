@@ -45,8 +45,13 @@ let datatype = "MemTyped"
 let hypotheses () = []
 let configure () =
   begin
-    Context.set Lang.pointer (fun _ -> t_addr) ;
-    Context.set Cvalues.null (p_equal a_null) ;
+    let orig_pointer = Context.push Lang.pointer (fun _ -> t_addr) in
+    let orig_null    = Context.push Cvalues.null (p_equal a_null) in
+    let rollback () =
+      Context.pop Lang.pointer orig_pointer ;
+      Context.pop Cvalues.null orig_null ;
+    in
+    rollback
   end
 
 let configure_ia =

@@ -35,7 +35,7 @@ val t32 : tau
 val t64 : tau
 
 type model = Real | Float
-val configure : model -> unit
+val configure : model -> WpContext.rollback
 
 val ftau : c_float -> tau (** model independant *)
 val tau_of_float : c_float -> tau (** with respect to model *)

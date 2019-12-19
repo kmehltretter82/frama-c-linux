@@ -1012,8 +1012,7 @@ let task_of_wpo wpo =
 (* --- Prover Task                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-let prover_task prover task =
-  let env = get_why3_env () in
+let prover_task env prover task =
   let config = Why3Provers.config () in
   let prover_config = Why3.Whyconf.get_prover_config config prover in
   let drv = Why3.Whyconf.load_driver (Why3.Whyconf.get_main config)
@@ -1315,50 +1314,49 @@ let is_trivial (t : Why3.Task.task) =
 
 let build_proof_task ?timeout ?steplimit ~prover wpo () =
   try
-    WpContext.on_context (Wpo.get_context wpo)
-      begin fun () ->
-        (* Always generate common task *)
-        let task = task_of_wpo wpo in
-        if Wp_parameters.Check.get ()
-        then Task.return VCS.checked (* Why3 tasks are type-checked *)
-        else
-        if Wp_parameters.Generate.get ()
-        then Task.return VCS.no_result (* Only generate *)
-        else
-          let drv , config , task = prover_task prover task in
-          if is_trivial task then
-            Task.return VCS.valid
-          else
-            let mode = get_mode () in
-            match mode with
-            | NoCache ->
-                call_prover ~timeout ~steplimit drv prover config task
-            | Offline ->
-                let hash = task_hash wpo drv prover task in
-                let result = get_cache_result ~mode hash |> VCS.cached in
-                if VCS.is_verdict result then incr hits else incr miss ;
+    (* Always generate common task *)
+    let context = Wpo.get_context wpo in
+    let task = WpContext.on_context context task_of_wpo wpo in
+    if Wp_parameters.Check.get ()
+    then Task.return VCS.checked (* Why3 tasks are type-checked *)
+    else
+    if Wp_parameters.Generate.get ()
+    then Task.return VCS.no_result (* Only generate *)
+    else
+      let env = WpContext.on_context context get_why3_env () in
+      let drv , config , task = prover_task env prover task in
+      if is_trivial task then
+        Task.return VCS.valid
+      else
+        let mode = get_mode () in
+        match mode with
+        | NoCache ->
+            call_prover ~timeout ~steplimit drv prover config task
+        | Offline ->
+            let hash = task_hash wpo drv prover task in
+            let result = get_cache_result ~mode hash |> VCS.cached in
+            if VCS.is_verdict result then incr hits else incr miss ;
+            Task.return result
+        | Update | Replay | Rebuild | Cleanup ->
+            let hash = task_hash wpo drv prover task in
+            let result =
+              get_cache_result ~mode hash
+              |> promote ~timeout ~steplimit |> VCS.cached in
+            if VCS.is_verdict result
+            then
+              begin
+                incr hits ;
                 Task.return result
-            | Update | Replay | Rebuild | Cleanup ->
-                let hash = task_hash wpo drv prover task in
-                let result =
-                  get_cache_result ~mode hash
-                  |> promote ~timeout ~steplimit |> VCS.cached in
-                if VCS.is_verdict result
-                then
-                  begin
-                    incr hits ;
-                    Task.return result
-                  end
-                else
-                  Task.finally
-                    (call_prover ~timeout ~steplimit drv prover config task)
-                    begin function
-                      | Task.Result result when VCS.is_verdict result ->
-                          incr miss ;
-                          set_cache_result ~mode hash prover result
-                      | _ -> ()
-                    end
-      end ()
+              end
+            else
+              Task.finally
+                (call_prover ~timeout ~steplimit drv prover config task)
+                begin function
+                  | Task.Result result when VCS.is_verdict result ->
+                      incr miss ;
+                      set_cache_result ~mode hash prover result
+                  | _ -> ()
+                end
   with exn ->
     if Wp_parameters.has_dkey dkey_api then
       Wp_parameters.fatal "[Why3 Error] %a@\n%s"

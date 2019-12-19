@@ -24,15 +24,22 @@
 
 type model
 type scope = Global | Kf of Kernel_function.t
-type tuning = (unit -> unit)
+type rollback = unit -> unit
 type hypotheses = unit -> MemoryContext.clause list
 
 val register :
   id:string ->
   ?descr:string ->
-  ?tuning:tuning list ->
+  configure:(unit -> rollback) ->
   ?hypotheses:hypotheses ->
   unit -> model
+(** Model registration. The model is identified by [id] and described by
+    [descr] (that defaults to [id]). The [configure] function is called on
+    [WpContext.on_context] call, it must prepare and set the different
+    [Context.values] related to the model. It must return the function that
+    allows to rollback on the original state. The [hypotheses] function must
+    return the hypotheses made by the model.
+*)
 
 val get_descr : model -> string
 val get_emitter : model -> Emitter.t
