@@ -75,6 +75,10 @@ let float_name = function
   | Float32 -> "float"
   | Float64 -> "double"
 
+let model_name = function
+  | Float -> "Float"
+  | Real  -> "Real"
+
 (* -------------------------------------------------------------------------- *)
 (* --- Operators                                                          --- *)
 (* -------------------------------------------------------------------------- *)
@@ -94,17 +98,17 @@ type op =
 
 [@@@ warning "-32"]
 let op_name = function
-  | LT -> "flt"
-  | EQ -> "feq"
-  | LE -> "fle"
-  | NE -> "fne"
-  | NEG -> "fneg"
-  | ADD -> "fadd"
-  | MUL -> "fmul"
-  | DIV -> "fdiv"
-  | REAL -> "freal"
-  | ROUND -> "fround"
-  | EXACT -> "fexact"
+  | LT -> "lt"
+  | EQ -> "eq"
+  | LE -> "le"
+  | NE -> "ne"
+  | NEG -> "neg"
+  | ADD -> "add"
+  | MUL -> "mul"
+  | DIV -> "div"
+  | REAL -> "of"
+  | ROUND -> "to"
+  | EXACT -> "exact"
 [@@@ warning "+32"]
 
 (* -------------------------------------------------------------------------- *)
@@ -114,22 +118,18 @@ let op_name = function
 module REGISTRY = WpContext.Static
     (struct
       type key = lfun
-      type data = op * c_float * (term list -> term) option
+      type data = op * c_float
       let name = "Wp.Cfloat.REGISTRY"
       include Lang.Fun
     end)
 
-let get_impl x =
-  match REGISTRY.find x with
-  | _, _, Some impl -> impl
-  | _ -> raise Not_found
 
-let find k = let tf, phi, _ = REGISTRY.find k in tf, phi
+let find = REGISTRY.find
 
 let () = Context.register
     begin fun () ->
-      REGISTRY.define fq32 (EXACT,Float32,None) ;
-      REGISTRY.define fq64 (EXACT,Float64,None) ;
+      REGISTRY.define fq32 (EXACT,Float32) ;
+      REGISTRY.define fq64 (EXACT,Float64) ;
     end
 
 (* -------------------------------------------------------------------------- *)
@@ -297,151 +297,86 @@ let compute_real op xs =
   | NE , [ x ; y ] -> F.e_neq x y
   | _ -> raise Not_found
 
-let compute model op ulp xs =
-  match model with
-  | Real -> compute_real op xs
-  | Float -> compute_float op ulp xs
+let return_type ft = function
+  | REAL -> Logic.Real
+  | _ -> ftau ft
+
+module Compute = WpContext.StaticGenerator
+    (struct
+      type t = model * c_float * op
+
+      let compare k1 k2 =
+        let open Integer in
+        compare (of_int (Hashtbl.hash k1)) (of_int (Hashtbl.hash k2))
+
+      let pretty fmt (m, ft, op) =
+        Format.fprintf fmt "%s_%a_%s" (model_name m) pp_suffix ft (op_name op)
+    end)
+    (struct
+      let name = "Wp.Cfloat.Compute"
+      type key = model * c_float * op
+      type data = lfun * (term list -> term)
+
+      let compile (m, ft, op) =
+        let impl = match m with
+          | Real  -> compute_real op
+          | Float -> compute_float op ft
+        in
+        let name = op_name op in
+        let phi = match op with
+          | LT | EQ | LE | NE ->
+              let prop = Pretty_utils.sfprintf "%s_%a" name pp_suffix ft in
+              let bool = Pretty_utils.sfprintf "%s_%ab" name pp_suffix ft in
+              extern_p ~library ~bool ~prop ()
+          | _ ->
+              let result = return_type ft op in
+              extern_f ~library ~result "%s_%a" name pp_suffix ft
+        in
+        Lang.F.set_builtin phi impl ;
+        REGISTRY.define phi (op, ft) ;
+        (phi, impl)
+    end)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Operations                                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
-let make_fun_float ?result model name op ft =
-  let result = match result with None -> ftau ft | Some r -> r in
-  let phi = extern_f ~library ~result "%s_%a" name pp_suffix ft in
-  let impl = compute model op ft in
-  Lang.F.set_builtin phi impl ;
-  REGISTRY.define phi (op,ft, Some impl) ;
-  phi
-
-let make_pred_float model name op ft =
-  let prop = Pretty_utils.sfprintf "%s_%a" name pp_suffix ft in
-  let bool = Pretty_utils.sfprintf "%s_%ab" name pp_suffix ft in
-  let phi = extern_p ~library ~bool ~prop () in
-  let impl = compute model op ft in
-  Lang.F.set_builtin phi impl ;
-  REGISTRY.define phi (op,ft, Some impl) ;
-  phi
-
-let f_memo = Ctypes.f_memo
-
-module Model (X: sig val kind: model end) =
-struct
-  let make_fun_float ?result = make_fun_float ?result X.kind
-  let make_pred_float = make_pred_float X.kind
-
-  let real_of_flt  = f_memo (make_fun_float ~result:Logic.Real "of" REAL)
-  let flt_of_real  = f_memo (make_fun_float "to" ROUND)
-  let flt_add      = f_memo (make_fun_float "add" ADD)
-  let flt_mul      = f_memo (make_fun_float "mul" MUL)
-  let flt_div      = f_memo (make_fun_float "div" DIV)
-  let flt_neg      = f_memo (make_fun_float "neg" NEG)
-  let flt_lt       = f_memo (make_pred_float "lt" LT)
-  let flt_eq       = f_memo (make_pred_float "eq" EQ)
-  let flt_le       = f_memo (make_pred_float "le" LE)
-  let flt_neq      = f_memo (make_pred_float "ne" NE)
-end
-
-module Real_model = Model(struct let kind = Real end)
-module Float_model = Model(struct let kind = Float end)
-
-let model_flt_add = function
-  | Real -> Real_model.flt_add
-  | Float -> Float_model.flt_add
-
-let model_flt_mul = function
-  | Real -> Real_model.flt_mul
-  | Float -> Float_model.flt_mul
-
-let model_flt_div = function
-  | Real -> Real_model.flt_div
-  | Float -> Float_model.flt_div
-
-let model_flt_neg = function
-  | Real -> Real_model.flt_neg
-  | Float -> Float_model.flt_neg
-
-let model_flt_lt = function
-  | Real -> Real_model.flt_lt
-  | Float -> Float_model.flt_lt
-
-let model_flt_eq = function
-  | Real -> Real_model.flt_eq
-  | Float -> Float_model.flt_eq
-
-let model_flt_le = function
-  | Real -> Real_model.flt_le
-  | Float -> Float_model.flt_le
-
-let model_flt_neq = function
-  | Real -> Real_model.flt_neq
-  | Float -> Float_model.flt_neq
-
-let model_real_of_flt = function
-  | Real -> Real_model.real_of_flt
-  | Float -> Float_model.real_of_flt
-
-let model_flt_of_real = function
-  | Real -> Real_model.flt_of_real
-  | Float -> Float_model.flt_of_real
-
-let flt_eq ft = model_flt_eq (Context.get model) ft
-let flt_neq = model_flt_neq (Context.get model)
-let flt_le = model_flt_le (Context.get model)
-let flt_lt = model_flt_lt (Context.get model)
-let flt_neg = model_flt_neg (Context.get model)
-let flt_add ft = model_flt_add (Context.get model) ft
-let flt_mul = model_flt_mul (Context.get model)
-let flt_div = model_flt_div (Context.get model)
-let flt_of_real = model_flt_of_real (Context.get model)
-let real_of_flt = model_real_of_flt (Context.get model)
+let flt_eq ft = Compute.get (Context.get model, ft, EQ) |> fst
+let flt_neq ft = Compute.get (Context.get model, ft, NE) |> fst
+let flt_le ft = Compute.get (Context.get model, ft, LE) |> fst
+let flt_lt ft = Compute.get (Context.get model, ft, LT) |> fst
+let flt_neg ft = Compute.get (Context.get model, ft, NEG) |> fst
+let flt_add ft = Compute.get (Context.get model, ft, ADD) |> fst
+let flt_mul ft = Compute.get (Context.get model, ft, MUL) |> fst
+let flt_div ft = Compute.get (Context.get model, ft, DIV) |> fst
+let flt_of_real ft = Compute.get (Context.get model, ft, ROUND) |> fst
+let real_of_flt ft = Compute.get (Context.get model, ft, REAL) |> fst
 
 
 (* -------------------------------------------------------------------------- *)
 (* --- Builtins                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-let hack f ft xs =
-  let phi = f (Context.get model) ft in
-  try (get_impl phi) xs
-  with Not_found -> F.e_fun phi xs
+let make_hack ?(converse=false) ft op xs =
+  let phi, impl = Compute.get ((Context.get model), ft, op) in
+  let xs = (if converse then List.rev xs else xs) in
+  try impl xs with Not_found -> F.e_fun phi xs
 
-let make_converse_dispatch name dispatch ft =
-  let register model_name impl =
-    let open Qed.Logic in
-    let phi = generated_f ~params:[Sdata;Sdata] ~sort:Sprop "\\%s_%s_%s"
-        model_name name (float_name ft)
-    in
-    Lang.F.set_builtin phi impl
-  in
-  let op_r xs = (hack dispatch ft) (List.rev xs) in
-  let op_f xs = (hack dispatch ft) (List.rev xs) in
-  register "Real" op_r ;
-  register "Float" op_f ;
-  let hack params =
-    match Context.get model with
-    | Real  -> op_r params
-    | Float -> op_f params
-  in
-  hack
+let register_builtin ft =
+  begin
+    let suffix = float_name ft in
+    LogicBuiltins.hack ("\\eq_" ^ suffix) (make_hack ft EQ) ;
+    LogicBuiltins.hack ("\\ne_" ^ suffix) (make_hack ft NE) ;
+    LogicBuiltins.hack ("\\lt_" ^ suffix) (make_hack ~converse:false ft LT) ;
+    LogicBuiltins.hack ("\\gt_" ^ suffix) (make_hack ~converse:true  ft LT) ;
+    LogicBuiltins.hack ("\\le_" ^ suffix) (make_hack ~converse:false ft LE) ;
+    LogicBuiltins.hack ("\\ge_" ^ suffix) (make_hack ~converse:true  ft LE)
+  end
 
-let make_all ft =
-  let suffix = float_name ft in
-  let gt_dispatch = make_converse_dispatch "gt" model_flt_lt ft in
-  let ge_dispatch = make_converse_dispatch "ge" model_flt_le ft in
-  LogicBuiltins.hack ("\\lt_" ^ suffix) (hack model_flt_lt ft) ;
-  LogicBuiltins.hack ("\\gt_" ^ suffix) gt_dispatch ;
-  LogicBuiltins.hack ("\\le_" ^ suffix) (hack model_flt_le ft) ;
-  LogicBuiltins.hack ("\\ge_" ^ suffix) ge_dispatch ;
-  LogicBuiltins.hack ("\\eq_" ^ suffix) (hack model_flt_eq ft) ;
-  LogicBuiltins.hack ("\\ne_" ^ suffix) (hack model_flt_neq ft) ;
-  ()
-
-let () =
-  Context.register
+let () = Context.register
     begin fun () ->
-      make_all Float32 ;
-      make_all Float64
+      register_builtin Float32 ;
+      register_builtin Float64 ;
     end
 
 (* -------------------------------------------------------------------------- *)
