@@ -126,13 +126,12 @@ let () = Request.register ~page
 
 let () =
   Request.register
-    ~kind:`GET
-    ~page ~name:"kernel.project.getSourceFileNames"
-    ~descr:(Md.plain "Get the source file names of the current project")
-    ~input:(module Junit) ~output:(module Jstring.Jlist)
-    (fun () ->
-       List.map
-         (fun fname -> (Filepath.Normalized.of_string fname :> string))
-         (Kernel.Files.get ()))
+    ~page
+    ~descr:(Md.plain "Create a new project")
+    ~kind:`SET
+    ~name:"kernel.project.setCreate"
+    ~input:(module Jstring)
+    ~output:(module ProjectInfo)
+    Project.create
 
 (* -------------------------------------------------------------------------- *)
