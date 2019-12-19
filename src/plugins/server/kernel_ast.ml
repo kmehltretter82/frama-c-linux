@@ -164,3 +164,38 @@ let () = Request.register ~page
     (fun kf -> Jbuffer.to_json PP.pp_global (Kernel_function.get_global kf))
 
 (* -------------------------------------------------------------------------- *)
+(* --- Files                                                              --- *)
+(* -------------------------------------------------------------------------- *)
+
+let () =
+  Request.register
+    ~page
+    ~descr:(Md.plain "Get the currently analyzed source file names")
+    ~kind:`GET
+    ~name:"kernel.ast.getFiles"
+    ~input:(module Junit) ~output:(module Jstring.Jlist)
+    Kernel.Files.get
+
+let () =
+  Request.register
+    ~page
+    ~descr:(Md.plain "Set the source file names to analyze.")
+    ~kind:`SET
+    ~name:"kernel.ast.setFiles"
+    ~input:(module Jstring.Jlist)
+    ~output:(module Junit)
+    Kernel.Files.set
+
+let () =
+  Request.register
+    ~page
+    ~descr:(Md.plain "Compute the AST of the currently set source file names.")
+    ~kind:`EXEC
+    ~name:"kernel.ast.execCompute"
+    ~input:(module Junit)
+    ~output:(module Junit)
+    (fun () ->
+       if not (Ast.is_computed ())
+       then File.init_from_cmdline ())
+
+(* -------------------------------------------------------------------------- *)
