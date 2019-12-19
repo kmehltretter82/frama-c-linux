@@ -741,7 +741,7 @@ class visitor (ctx:context) c =
             | [ th ] -> self#add_import th
             | [ th ; was ] -> self#add_import ~was th
             | _ -> why3_failure
-                     "[driver] incorrect why3.file %S for library '%s'"
+                     "[driver] incorrect why3.import %S for library '%s'"
                      opt thy
           ) (Str.split regexp_com opt)
       in
