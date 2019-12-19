@@ -1,5 +1,5 @@
 /* run.config
-OPT: -wp-prover alt-ergo -wp-gen
+DONTRUN: only usable in qualif config
 */
  /*@
         logic boolean u8_continue_f(unsigned char b) =
@@ -8,7 +8,7 @@ OPT: -wp-prover alt-ergo -wp-gen
 
     /*@
         assigns \nothing;
-        ensures  u8_continue_f(b) == \result==1;
+        ensures  u8_continue_f(b) == \result;
     */
     int u8_is_continue(const unsigned char b)
     {
