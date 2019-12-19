@@ -364,13 +364,13 @@ let rec of_term ~cnv expected t : Why3.Term.term =
           a b
     | Leq (a,b), _, Bool ->
         int_or_real ~cnv
-          ~fint:["qed"] ~lint:"Qed" ~pint:["zleq"]
-          ~freal:["qed"] ~lreal:"Qed" ~preal:["rleq"]
+          ~fint:["frama_c_wp"; "qed"] ~lint:"Qed" ~pint:["zleq"]
+          ~freal:["frama_c_wp"; "qed"] ~lreal:"Qed" ~preal:["rleq"]
           a b
     | Lt (a,b), _, Bool ->
         int_or_real ~cnv
-          ~fint:["qed"] ~lint:"Qed" ~pint:["zlt"]
-          ~freal:["qed"] ~lreal:"Qed" ~preal:["rlt"]
+          ~fint:["frama_c_wp"; "qed"] ~lint:"Qed" ~pint:["zlt"]
+          ~freal:["frama_c_wp"; "qed"] ~lreal:"Qed" ~preal:["rlt"]
           a b
     | And l, _, Bool ->
         t_app_fold ~f:["bool"] ~l:"Bool" ~p:["andb"] ~cnv expected l
@@ -420,9 +420,9 @@ let rec of_term ~cnv expected t : Why3.Term.term =
               | _                   -> Why3.Term.t_neq (of_term' cnv a) (of_term' cnv b)
         end
     | Eq (a,b), _, Bool ->
-        t_app ~cnv ~f:["qed"] ~l:"Qed" ~p:["eqb"] [of_term' cnv a; of_term' cnv b]
+        t_app ~cnv ~f:["frama_c_wp"; "qed"] ~l:"Qed" ~p:["eqb"] [of_term' cnv a; of_term' cnv b]
     | Neq (a,b), _, Bool ->
-        t_app ~cnv ~f:["qed"] ~l:"Qed" ~p:["neqb"] [of_term' cnv a; of_term' cnv b]
+        t_app ~cnv ~f:["frama_c_wp"; "qed"] ~l:"Qed" ~p:["neqb"] [of_term' cnv a; of_term' cnv b]
     | If(a,b,c), _, _ ->
         let cnv' = {cnv with polarity = `NoPolarity} in
         Why3.Term.t_if (of_term cnv' Prop a) (of_term cnv expected b) (of_term cnv expected c)
