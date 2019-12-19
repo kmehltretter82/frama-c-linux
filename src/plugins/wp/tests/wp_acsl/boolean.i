@@ -1,6 +1,7 @@
 /* run.config
-DONTRUN: only usable in qualif config
+OPT: -wp-gen -wp-prover why3
 */
+
  /*@
         logic boolean u8_continue_f(unsigned char b) =
           0x80<=b && 0xC0 > b;
