@@ -305,9 +305,7 @@ module Compute = WpContext.StaticGenerator
     (struct
       type t = model * c_float * op
 
-      let compare k1 k2 =
-        let open Integer in
-        compare (of_int (Hashtbl.hash k1)) (of_int (Hashtbl.hash k2))
+      let compare = Pervasives.compare
 
       let pretty fmt (m, ft, op) =
         Format.fprintf fmt "%s_%a_%s" (model_name m) pp_suffix ft (op_name op)
