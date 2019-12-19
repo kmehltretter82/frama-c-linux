@@ -38,6 +38,7 @@ coq.file += "coqwp/Qedlib.v";
 coq.file += "coqwp/Qed.v";
 why3.import += "int.Abs:IAbs";
 why3.import += "frama_c_wp.qed.Qed";
+why3.qualifier := "frama_c_wp.qed";
 altergo.file += "ergo/int.Int.mlw";
 altergo.file += "ergo/int.Abs.mlw";
 altergo.file += "ergo/int.ComputerDivision.mlw";
