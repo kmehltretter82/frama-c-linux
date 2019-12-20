@@ -45,7 +45,9 @@ exception File_exists
     - non-existing directories in [realpath] may lead to ENOTDIR errors,
       but [normalize] may accept them.
 
-    @modify Aluminium-20160501 optional base_name. *)
+    @modify Aluminium-20160501 optional base_name.
+    @modify Frama-C+dev optional existence
+*)
 val normalize: ?existence:existence -> ?base_name:string -> string -> string
 
 (** [relativize base_name file_name] returns a relative path name of
@@ -56,8 +58,8 @@ val normalize: ?existence:existence -> ?base_name:string -> string -> string
 val relativize: ?base_name:string -> string -> string
 
 (** returns true if the file is relative to [base]
-    (that is, it is prefixed by [base_name]), or to the current working directory
-    if no base is specified.
+    (that is, it is prefixed by [base_name]), or to the current
+    working directory if no base is specified.
     @since Aluminium-20160501 *)
 val is_relative: ?base_name:string -> string -> bool
 
@@ -92,7 +94,9 @@ module Normalized: sig
   type t = private string
 
   (** [of_string s] converts [s] into a normalized path.
-      @raise Invalid_argument if [s] is the empty string. *)
+      @raise Invalid_argument if [s] is the empty string.
+      @modify Frama-C+dev add optional existence parameter
+ *)
   val of_string: ?existence:existence -> ?base_name:string -> string -> t
 
   (** [to_pretty_string p] returns [p] prettified,

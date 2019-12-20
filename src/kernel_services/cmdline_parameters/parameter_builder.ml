@@ -452,6 +452,7 @@ struct
       (X: sig
          include Parameter_sig.Input_with_arg
          val existence : Filepath.existence
+         val file_kind: string
        end) =
   struct
 
@@ -473,8 +474,12 @@ struct
         try
           Filepath.Normalized.of_string ~existence:X.existence s
         with
-        | Filepath.No_file -> P.L.abort "file not found: '%s'" s
-        | Filepath.File_exists -> P.L.abort "file already exists: '%s'" s
+        | Filepath.No_file ->
+            P.L.abort "%s%sfile not found: '%s'"
+              X.file_kind (if X.file_kind = "" then "" else " ") s
+        | Filepath.File_exists ->
+            P.L.abort "%s file already exists: '%s'"
+              X.file_kind (if X.file_kind = "" then "" else " ") s
       in
       set fp
 
@@ -1211,6 +1216,7 @@ struct
       (X: sig
          include Parameter_sig.Input_with_arg
          val existence: Fc_Filepath.existence
+         val file_kind: string
        end) =
     Make_list
       (struct
@@ -1222,9 +1228,11 @@ struct
           try of_string ~existence:X.existence s
           with
           | Fc_Filepath.No_file ->
-            P.L.abort "file '%s' does not exist" s
+            P.L.abort "%s%sfile '%s' does not exist"
+              X.file_kind (if X.file_kind = "" then "" else " ") s
           | Fc_Filepath.File_exists ->
-            P.L.abort "file '%s' already exists" s
+            P.L.abort "%s%sfile '%s' already exists"
+              X.file_kind (if X.file_kind = "" then "" else " ") s
       end)
       (struct
         include X

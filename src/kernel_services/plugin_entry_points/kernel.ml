@@ -251,6 +251,7 @@ module Filepath_list
     (X: sig
        include Input_with_arg
        val existence: Filepath.existence
+       val file_kind: string
      end) =
   P.Filepath_list
     (struct
@@ -732,6 +733,7 @@ module LoadState =
        let option_name = "-load"
        let arg_name = "filename"
        let existence = Filepath.Must_exist
+       let file_kind = "Frama-C state"
        let help = "load a previously-saved session from file <filename>"
      end)
 
@@ -1233,6 +1235,7 @@ module Files = struct
        let module_name = "Files"
        let arg_name = ""
        let help = ""
+       let file_kind = "source"
        let existence = Filepath.Must_exist
      end)
   let () = Cmdline.use_cmdline_files set

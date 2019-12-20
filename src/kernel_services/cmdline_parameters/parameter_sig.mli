@@ -527,6 +527,9 @@ module type Builder = sig
   module Filepath(X: sig
       include Input_with_arg
       val existence: Filepath.existence
+      val file_kind: string
+        (** used in error message if the file does not exist where it should
+           and vice-versa. *)
     end): Filepath
 
   exception Cannot_build of string
@@ -567,6 +570,8 @@ module type Builder = sig
       (X: sig
          include Input_with_arg
          val existence: Fc_Filepath.existence
+         val file_kind: string
+           (** see [Filepath] module. *)
        end): Filepath_list
 
   (** Parameter is a map where multibindings are **not** allowed. *)
