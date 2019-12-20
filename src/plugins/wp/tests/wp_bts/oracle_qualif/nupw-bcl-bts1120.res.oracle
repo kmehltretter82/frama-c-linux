@@ -20,10 +20,8 @@
 [wp] [Qed] Goal typed_unreachable_smt_with_contract_call_f_with_precond_2_requires_ok : Valid
 [wp] Proved goals:    8 / 8
   Qed:             8
-[wp] Report in:  'tests/wp_bts/oracle_qualif/nupw-bcl-bts1120.0.report.json'
-[wp] Report out: 'tests/wp_bts/result_qualif/nupw-bcl-bts1120.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-g                    6     -                 6       100%
-unreachable_smt_with_contract   2   -        2       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  g                         6        -        6       100%
+  unreachable_smt_with_contract   2   -       2       100%
+------------------------------------------------------------

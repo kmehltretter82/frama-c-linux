@@ -43,17 +43,15 @@
 [wp] Proved goals:   36 / 36
   Qed:              24 
   Alt-Ergo 2.0.0:   12
-[wp] Report in:  'tests/wp_hoare/oracle_qualif/reference_array.0.report.json'
-[wp] Report out: 'tests/wp_hoare/result_qualif/reference_array.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-reset_1_5            3      1 (12..24)       4       100%
-load_1_5             3      1 (12..24)       4       100%
-add_1_5              3      1 (12..24)       4       100%
-calls_on_array_dim_1   5    3 (8..20)        8       100%
-calls_on_array_dim_2_to_1   5    3 (4..16)   8       100%
-calls_on_array_dim_2   5    3 (4..16)        8       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  reset_1_5                 3        1        4       100%
+  load_1_5                  3        1        4       100%
+  add_1_5                   3        1        4       100%
+  calls_on_array_dim_1      5        3        8       100%
+  calls_on_array_dim_2_to_1   5      3        8       100%
+  calls_on_array_dim_2      5        3        8       100%
+------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'load_1_5':
   /*@ behavior typed_ref: requires \separated(reg_load+(..),lp+(..)); */
   void load_1_5(int (*lp)[5]);

@@ -12,11 +12,9 @@
 [wp] [Alt-Ergo 2.0.0] Goal typed_call_assigns_t4_assigns_normal : Unsuccess
 [wp] Proved goals:    0 / 6
   Alt-Ergo 2.0.0:    0  (unsuccess: 6)
-[wp] Report in:  'tests/wp_acsl/oracle_qualif/assigns_range.1.report.json'
-[wp] Report out: 'tests/wp_acsl/result_qualif/assigns_range.1.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-call_assigns_t1     -      -                 2       0.0%
-call_assigns_t2     -      -                 2       0.0%
-call_assigns_t4     -      -                 2       0.0%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  call_assigns_t1           -        -        2       0.0%
+  call_assigns_t2           -        -        2       0.0%
+  call_assigns_t4           -        -        2       0.0%
+------------------------------------------------------------

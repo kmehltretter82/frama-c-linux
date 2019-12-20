@@ -110,17 +110,15 @@
 [wp] Proved goals:  102 / 102
   Qed:              69 
   Alt-Ergo 2.0.0:   33
-[wp] Report in:  'tests/wp_gallery/oracle_qualif/frama_c_hashtbl_solved.0.report.json'
-[wp] Report out: 'tests/wp_gallery/result_qualif/frama_c_hashtbl_solved.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-eq_string           11      4 (52..64)      15       100%
-hash                 6      1 (12..24)       7       100%
-size                 2     -                 2       100%
-init                 8      5 (80..104)     13       100%
-add                 24     15 (224..272)    39       100%
-mem_binding         18      8 (800..896)    26       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  eq_string                11        4       15       100%
+  hash                      6        1        7       100%
+  size                      2        -        2       100%
+  init                      8        5       13       100%
+  add                      24       15       39       100%
+  mem_binding              18        8       26       100%
+------------------------------------------------------------
 [wp] Running WP plugin...
 [rte] annotating function add
 [rte] annotating function eq_string
@@ -275,14 +273,12 @@ mem_binding         18      8 (800..896)    26       100%
 [wp] Proved goals:   74 / 143
   Qed:              16 
   Alt-Ergo 2.0.0:   58
-[wp] Report in:  'tests/wp_gallery/oracle_qualif/frama_c_hashtbl_solved.0.report.json'
-[wp] Report out: 'tests/wp_gallery/result_qualif/frama_c_hashtbl_solved.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-eq_string           11      7 (56..80)      18       100%
-hash                 7      3 (44..56)      10       100%
-size                 2      1 (16..28)       3       100%
-init                10      8 (88..112)     18       100%
-add                 30     24 (224..272)    54       100%
-mem_binding         25     15 (800..896)    40       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  eq_string                11        7       18       100%
+  hash                      7        3       10       100%
+  size                      2        1        3       100%
+  init                     10        8       18       100%
+  add                      30       24       54       100%
+  mem_binding              25       15       40       100%
+------------------------------------------------------------

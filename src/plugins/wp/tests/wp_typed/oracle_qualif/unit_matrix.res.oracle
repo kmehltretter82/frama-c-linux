@@ -10,9 +10,7 @@
 [wp] Proved goals:    2 / 3
   Qed:               1 
   Alt-Ergo 2.0.0:    1  (unsuccess: 1)
-[wp] Report in:  'tests/wp_typed/oracle_qualif/unit_matrix.0.report.json'
-[wp] Report out: 'tests/wp_typed/result_qualif/unit_matrix.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-make                 1      1 (8..20)        3      66.7%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  make                      1        1        3      66.7%
+------------------------------------------------------------

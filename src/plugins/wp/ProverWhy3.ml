@@ -1216,12 +1216,14 @@ module MODE = WpContext.StaticGenerator(Datatype.Unit)
       let name = "Wp.Cache.mode"
       let compile () =
         try
+          if not (Wp_parameters.CacheEnv.get()) then
+            raise Not_found ;
           let origin = "FRAMAC_WP_CACHE" in
           parse_mode ~origin ~fallback:"-wp-cache" (Sys.getenv origin)
         with Not_found ->
         try
-          parse_mode ~origin:"-wp-cache" ~fallback:"none"
-            (Wp_parameters.Cache.get())
+          let mode = Wp_parameters.Cache.get() in
+          parse_mode ~origin:"-wp-cache" ~fallback:"none" mode
         with Not_found ->
           if Wp_parameters.has_session ()
           then Update else NoCache

@@ -10,9 +10,7 @@
 [wp] [Alt-Ergo 2.0.0] Goal typed_dequal_ensures : Unsuccess
 [wp] Proved goals:    0 / 1
   Alt-Ergo 2.0.0:    0  (unsuccess: 1)
-[wp] Report in:  'tests/wp_plugin/oracle_qualif/float_real.1.report.json'
-[wp] Report out: 'tests/wp_plugin/result_qualif/float_real.1.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-dequal              -      -                 1       0.0%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  dequal                    -        -        1       0.0%
+------------------------------------------------------------

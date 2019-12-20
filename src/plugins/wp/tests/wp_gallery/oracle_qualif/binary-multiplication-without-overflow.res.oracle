@@ -17,15 +17,13 @@
 [wp] Proved goals:   10 / 10
   Qed:               3 
   Alt-Ergo 2.0.0:    7
-[wp] Report in:  'tests/wp_gallery/oracle_qualif/binary-multiplication-without-overflow.0.report.json'
-[wp] Report out: 'tests/wp_gallery/result_qualif/binary-multiplication-without-overflow.0.report.json'
--------------------------------------------------------------
-Axiomatics          WP     Alt-Ergo        Total   Success
-Axiomatic mult       1     -                 1       100%
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-BinaryMultiplication   2    7 (104..128)     9       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Axiomatics                WP     Alt-Ergo  Total   Success
+  Axiomatic mult            1        -        1       100%
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  BinaryMultiplication      2        7        9       100%
+------------------------------------------------------------
 [wp] Running WP plugin...
 [rte] annotating function BinaryMultiplication
 [wp] 14 goals scheduled
@@ -46,12 +44,10 @@ BinaryMultiplication   2    7 (104..128)     9       100%
 [wp] Proved goals:   11 / 14
   Qed:               0 
   Alt-Ergo 2.0.0:   11
-[wp] Report in:  'tests/wp_gallery/oracle_qualif/binary-multiplication-without-overflow.0.report.json'
-[wp] Report out: 'tests/wp_gallery/result_qualif/binary-multiplication-without-overflow.0.report.json'
--------------------------------------------------------------
-Axiomatics          WP     Alt-Ergo        Total   Success
-Axiomatic mult       1     -                 1       100%
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-BinaryMultiplication   2   11 (104..128)    13       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Axiomatics                WP     Alt-Ergo  Total   Success
+  Axiomatic mult            1        -        1       100%
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  BinaryMultiplication      2       11       13       100%
+------------------------------------------------------------

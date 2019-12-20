@@ -95,12 +95,10 @@
 [wp] Proved goals:   52 / 52
   Qed:              51 
   Alt-Ergo 2.0.0:    1
-[wp] Report in:  'tests/wp_acsl/oracle_qualif/precedence.0.report.json'
-[wp] Report out: 'tests/wp_acsl/result_qualif/precedence.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-predicate           29      1 (4..16)       30       100%
-comparison           9     -                 9       100%
-bitwise             11     -                11       100%
-predicate_bitwise    2     -                 2       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  predicate                29        1       30       100%
+  comparison                9        -        9       100%
+  bitwise                  11        -       11       100%
+  predicate_bitwise         2        -        2       100%
+------------------------------------------------------------

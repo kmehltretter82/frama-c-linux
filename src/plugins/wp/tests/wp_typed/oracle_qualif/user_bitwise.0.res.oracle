@@ -19,14 +19,12 @@
 [wp] Proved goals:   12 / 12
   Qed:               1 
   Alt-Ergo 2.0.0:   11
-[wp] Report in:  'tests/wp_typed/oracle_qualif/user_bitwise.0.report.json'
-[wp] Report out: 'tests/wp_typed/result_qualif/user_bitwise.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-rl1                  1      1 (52..64)       2       100%
-rr1                 -       2 (52..64)       2       100%
-rln32               -       2 (64..88)       2       100%
-rrn32               -       2 (64..88)       2       100%
-rln64               -       2 (64..88)       2       100%
-rrn64               -       2 (64..88)       2       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  rl1                       1        1        2       100%
+  rr1                       -        2        2       100%
+  rln32                     -        2        2       100%
+  rrn32                     -        2        2       100%
+  rln64                     -        2        2       100%
+  rrn64                     -        2        2       100%
+------------------------------------------------------------

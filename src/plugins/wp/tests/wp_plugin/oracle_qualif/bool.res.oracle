@@ -14,12 +14,10 @@
 [wp] Proved goals:    7 / 7
   Qed:               2 
   Alt-Ergo 2.0.0:    5
-[wp] Report in:  'tests/wp_plugin/oracle_qualif/bool.0.report.json'
-[wp] Report out: 'tests/wp_plugin/result_qualif/bool.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-job                 -       1 (12..24)       1       100%
-bor_bool            -       2 (8..20)        2       100%
-band_bool            1      1 (20..32)       2       100%
-bxor_bool            1      1 (8..20)        2       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  job                       -        1        1       100%
+  bor_bool                  -        2        2       100%
+  band_bool                 1        1        2       100%
+  bxor_bool                 1        1        2       100%
+------------------------------------------------------------

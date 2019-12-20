@@ -11,9 +11,7 @@
 [wp] [Alt-Ergo (Native)] Goal typed_output_ensures_KO : Unsuccess
 [wp] Proved goals:    0 / 1
   Alt-Ergo:        0  (unsuccess: 1)
-[wp] Report in:  'tests/wp_plugin/oracle_qualif/float_format.1.report.json'
-[wp] Report out: 'tests/wp_plugin/result_qualif/float_format.1.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-output              -      -                 1       0.0%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  output                    -        -        1       0.0%
+------------------------------------------------------------

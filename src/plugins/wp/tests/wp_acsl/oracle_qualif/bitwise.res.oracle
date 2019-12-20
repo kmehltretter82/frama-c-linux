@@ -36,17 +36,15 @@
 [wp] Proved goals:   29 / 29
   Qed:              25 
   Alt-Ergo 2.0.0:    4
-[wp] Report in:  'tests/wp_acsl/oracle_qualif/bitwise.0.report.json'
-[wp] Report out: 'tests/wp_acsl/result_qualif/bitwise.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-band                 8     -                 8       100%
-bor                  5     -                 5       100%
-bxor                 3     -                 3       100%
-bnot                 1     -                 1       100%
-lshift               4     -                 4       100%
-rshift               2     -                 2       100%
-bor_bool            -       2 (8..20)        2       100%
-band_bool            1      1 (20..32)       2       100%
-bxor_bool            1      1 (8..20)        2       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  band                      8        -        8       100%
+  bor                       5        -        5       100%
+  bxor                      3        -        3       100%
+  bnot                      1        -        1       100%
+  lshift                    4        -        4       100%
+  rshift                    2        -        2       100%
+  bor_bool                  -        2        2       100%
+  band_bool                 1        1        2       100%
+  bxor_bool                 1        1        2       100%
+------------------------------------------------------------

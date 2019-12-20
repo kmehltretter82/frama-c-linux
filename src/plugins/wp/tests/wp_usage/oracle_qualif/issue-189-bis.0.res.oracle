@@ -37,10 +37,8 @@
 [wp] Proved goals:   30 / 30
   Qed:              20 
   Alt-Ergo 2.0.0:   10
-[wp] Report in:  'tests/wp_usage/oracle_qualif/issue-189-bis.0.report.json'
-[wp] Report out: 'tests/wp_usage/result_qualif/issue-189-bis.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-memcpy_alias_vars   10      5 (960..1152)   15       100%
-memcpy_context_vars  10     5 (960..1152)   15       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  memcpy_alias_vars        10        5       15       100%
+  memcpy_context_vars      10        5       15       100%
+------------------------------------------------------------

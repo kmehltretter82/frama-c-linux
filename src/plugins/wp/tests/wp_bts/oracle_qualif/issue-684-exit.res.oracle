@@ -10,9 +10,7 @@
 [wp] [Qed] Goal typed_inconditional_exit_assigns_normal : Valid
 [wp] Proved goals:    4 / 4
   Qed:             4
-[wp] Report in:  'tests/wp_bts/oracle_qualif/issue-684-exit.0.report.json'
-[wp] Report out: 'tests/wp_bts/result_qualif/issue-684-exit.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-inconditional_exit   4     -                 4       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  inconditional_exit        4        -        4       100%
+------------------------------------------------------------

@@ -37,12 +37,10 @@
 [wp] Proved goals:   30 / 30
   Qed:               5 
   Alt-Ergo 2.0.0:   25
-[wp] Report in:  'tests/wp_plugin/oracle_qualif/math.0.report.json'
-[wp] Report out: 'tests/wp_plugin/result_qualif/math.0.report.json'
--------------------------------------------------------------
-Axiomatics          WP     Alt-Ergo        Total   Success
-Lemma                3     16 (104..128)    19       100%
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-ok                   2      9 (88..112)     11       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Axiomatics                WP     Alt-Ergo  Total   Success
+  Lemma                     3       16       19       100%
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  ok                        2        9       11       100%
+------------------------------------------------------------

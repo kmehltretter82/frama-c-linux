@@ -40,23 +40,21 @@
 [wp] Proved goals:   19 / 27
   Qed:              18 
   Alt-Ergo 2.0.0:    1  (unsuccess: 8)
-[wp] Report in:  'tests/wp/oracle_qualif/stmtcompiler_test.0.report.json'
-[wp] Report out: 'tests/wp/result_qualif/stmtcompiler_test.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-empty                1     -                 1       100%
-one_assign           1     -                 1       100%
-one_if               1     -                 1       100%
-some_seq             2     -                 2       100%
-main_ensures_result   1    -                 1       100%
-main                 1     -                 1       100%
-not_main            -      -                 1       0.0%
-main_assigns_global   2    -                 3      66.7%
-zloop                4     -                 7      57.1%
-behavior2            1     -                 1       100%
-behavior3            1     -                 1       100%
-behavior4            1     -                 1       100%
-behavior5           -      -                 1       0.0%
-if_assert            1      1 (4..16)        4      50.0%
-compare              1     -                 1       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  empty                     1        -        1       100%
+  one_assign                1        -        1       100%
+  one_if                    1        -        1       100%
+  some_seq                  2        -        2       100%
+  main_ensures_result       1        -        1       100%
+  main                      1        -        1       100%
+  not_main                  -        -        1       0.0%
+  main_assigns_global       2        -        3      66.7%
+  zloop                     4        -        7      57.1%
+  behavior2                 1        -        1       100%
+  behavior3                 1        -        1       100%
+  behavior4                 1        -        1       100%
+  behavior5                 -        -        1       0.0%
+  if_assert                 1        1        4      50.0%
+  compare                   1        -        1       100%
+------------------------------------------------------------

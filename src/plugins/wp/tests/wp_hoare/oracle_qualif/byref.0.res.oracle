@@ -19,14 +19,12 @@
 [wp] Proved goals:   11 / 12
   Qed:              11 
   Alt-Ergo 2.0.0:    0  (unsuccess: 1)
-[wp] Report in:  'tests/wp_hoare/oracle_qualif/byref.0.report.json'
-[wp] Report out: 'tests/wp_hoare/result_qualif/byref.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-f                    2     -                 2       100%
-wrong_without_ref    1     -                 2      50.0%
-pointer              2     -                 2       100%
-local                2     -                 2       100%
-formal               2     -                 2       100%
-global               2     -                 2       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  f                         2        -        2       100%
+  wrong_without_ref         1        -        2      50.0%
+  pointer                   2        -        2       100%
+  local                     2        -        2       100%
+  formal                    2        -        2       100%
+  global                    2        -        2       100%
+------------------------------------------------------------

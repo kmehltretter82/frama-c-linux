@@ -10,9 +10,7 @@
 [wp] [Alt-Ergo 2.0.0] Goal typed_f_ko_1_ensures_qed_ko_3 : Unsuccess
 [wp] Proved goals:    0 / 4
   Alt-Ergo 2.0.0:    0  (unsuccess: 4)
-[wp] Report in:  'tests/wp_plugin/oracle_qualif/injector.1.report.json'
-[wp] Report out: 'tests/wp_plugin/result_qualif/injector.1.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-f                   -      -                 4       0.0%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  f                         -        -        4       0.0%
+------------------------------------------------------------

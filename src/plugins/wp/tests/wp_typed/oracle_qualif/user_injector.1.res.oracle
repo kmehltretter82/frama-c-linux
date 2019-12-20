@@ -22,12 +22,10 @@
 [wp] [Qed] Goal typed_ref_job_assigns_normal_part6 : Valid
 [wp] Proved goals:   16 / 16
   Qed:            16
-[wp] Report in:  'tests/wp_typed/oracle_qualif/user_injector.1.report.json'
-[wp] Report out: 'tests/wp_typed/result_qualif/user_injector.1.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-job                 16     -                16       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  job                      16        -       16       100%
+------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'job':
   /*@
      behavior typed_ref:

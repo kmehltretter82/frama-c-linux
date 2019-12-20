@@ -22,12 +22,10 @@
 [wp] Proved goals:   15 / 15
   Qed:              14 
   Alt-Ergo 2.0.0:    1
-[wp] Report in:  'tests/wp_acsl/oracle_qualif/unit_bool.0.report.json'
-[wp] Report out: 'tests/wp_acsl/result_qualif/unit_bool.0.report.json'
--------------------------------------------------------------
-Axiomatics          WP     Alt-Ergo        Total   Success
-Axiomatic Foo       -       1 (1..12)        1       100%
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-boolean_casts       14     -                14       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Axiomatics                WP     Alt-Ergo  Total   Success
+  Axiomatic Foo             -        1        1       100%
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  boolean_casts            14        -       14       100%
+------------------------------------------------------------

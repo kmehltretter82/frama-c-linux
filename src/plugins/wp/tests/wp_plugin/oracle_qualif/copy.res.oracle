@@ -17,9 +17,7 @@
 [wp] Proved goals:   10 / 10
   Qed:               4 
   Alt-Ergo 2.0.0:    6
-[wp] Report in:  'tests/wp_plugin/oracle_qualif/copy.0.report.json'
-[wp] Report out: 'tests/wp_plugin/result_qualif/copy.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-copy                 4      6 (136..160)    10       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  copy                      4        6       10       100%
+------------------------------------------------------------

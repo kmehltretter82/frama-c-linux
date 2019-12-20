@@ -18,12 +18,10 @@
 [wp] [Alt-Ergo 2.0.0] Goal typed_stmt_contract_assigns_ko_ensures_qed_ko : Unsuccess
 [wp] Proved goals:    0 / 8
   Alt-Ergo 2.0.0:    0  (unsuccess: 8)
-[wp] Report in:  'tests/wp/oracle_qualif/wp_behav.1.report.json'
-[wp] Report out: 'tests/wp/result_qualif/wp_behav.1.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-f                   -      -                 3       0.0%
-min                 -      -                 2       0.0%
-stmt_contract       -      -                 2       0.0%
-stmt_contract_assigns  -    -                1       0.0%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  f                         -        -        3       0.0%
+  min                       -        -        2       0.0%
+  stmt_contract             -        -        2       0.0%
+  stmt_contract_assigns     -        -        1       0.0%
+------------------------------------------------------------

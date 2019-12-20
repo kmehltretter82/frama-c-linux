@@ -10,9 +10,7 @@
 [wp] Proved goals:    1 / 1
   Qed:             0 
   Script:          1
-[wp] Report in:  'tests/wp_plugin/oracle_qualif/unroll.0.report.json'
-[wp] Report out: 'tests/wp_plugin/result_qualif/unroll.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-unrolled_loop       -      -                 1       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  unrolled_loop             -        -        1       100%
+------------------------------------------------------------

@@ -25,14 +25,12 @@
 [wp] [Qed] Goal typed_h_assert_2 : Valid
 [wp] Proved goals:   10 / 10
   Qed:            10
-[wp] Report in:  'tests/wp_plugin/oracle_qualif/stmt.0.report.json'
-[wp] Report out: 'tests/wp_plugin/result_qualif/stmt.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-f                    5     -                 5       100%
-g                    2     -                 2       100%
-h                    3     -                 3       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  f                         5        -        5       100%
+  g                         2        -        2       100%
+  h                         3        -        3       100%
+------------------------------------------------------------
 [report] Computing properties status...
 
 --------------------------------------------------------------------------------

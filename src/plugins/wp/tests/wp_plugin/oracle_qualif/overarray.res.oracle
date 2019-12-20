@@ -19,14 +19,12 @@
 [wp] Proved goals:    8 / 12
   Qed:               8 
   Alt-Ergo 2.0.0:    0  (unsuccess: 4)
-[wp] Report in:  'tests/wp_plugin/oracle_qualif/overarray.0.report.json'
-[wp] Report out: 'tests/wp_plugin/result_qualif/overarray.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-f1_ok                2     -                 2       100%
-f2_ok                2     -                 2       100%
-f3_ok                2     -                 2       100%
-f4_ok                2     -                 2       100%
-f5_ko               -      -                 2       0.0%
-f6_ko               -      -                 2       0.0%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  f1_ok                     2        -        2       100%
+  f2_ok                     2        -        2       100%
+  f3_ok                     2        -        2       100%
+  f4_ok                     2        -        2       100%
+  f5_ko                     -        -        2       0.0%
+  f6_ko                     -        -        2       0.0%
+------------------------------------------------------------

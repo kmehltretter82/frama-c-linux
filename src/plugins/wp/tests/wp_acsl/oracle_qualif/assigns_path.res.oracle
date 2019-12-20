@@ -16,12 +16,10 @@
 [wp] Proved goals:    9 / 9
   Qed:               6 
   Alt-Ergo 2.0.0:    3
-[wp] Report in:  'tests/wp_acsl/oracle_qualif/assigns_path.0.report.json'
-[wp] Report out: 'tests/wp_acsl/result_qualif/assigns_path.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-job                  6      3 (20..32)       9       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  job                       6        3        9       100%
+------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'job':
   /*@ behavior typed: requires \separated(&p,b+(..)); */
   void job(int n, int *b);

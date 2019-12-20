@@ -41,12 +41,10 @@
 [wp] Proved goals:   34 / 34
   Qed:              18 
   Alt-Ergo 2.0.0:   16
-[wp] Report in:  'tests/wp_gallery/oracle_qualif/frama_c_exo3_solved.old.0.report.json'
-[wp] Report out: 'tests/wp_gallery/result_qualif/frama_c_exo3_solved.old.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-equal_elements      18     16 (544..640)    34       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  equal_elements           18       16       34       100%
+------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'equal_elements':
   /*@
      behavior typed_ref:
@@ -111,12 +109,10 @@ equal_elements      18     16 (544..640)    34       100%
 [wp] Proved goals:   32 / 50
   Qed:              11 
   Alt-Ergo 2.0.0:   21
-[wp] Report in:  'tests/wp_gallery/oracle_qualif/frama_c_exo3_solved.old.0.report.json'
-[wp] Report out: 'tests/wp_gallery/result_qualif/frama_c_exo3_solved.old.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-equal_elements      29     21 (544..640)    50       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  equal_elements           29       21       50       100%
+------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'equal_elements':
   /*@
      behavior typed_ref:
