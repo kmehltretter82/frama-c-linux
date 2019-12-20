@@ -120,10 +120,42 @@ let table_of_contents () =
        (fun p -> table_of_chapter (`Plugin p))
        (List.sort String.compare !plugins))
 
+module Cmap = Map.Make
+    (struct
+      type t = string list
+      let compare = Pervasives.compare
+    end)
+
+let index_entry (title,href) =
+  text @@ Markdown.href ~text:(plain title) href
+
 let index () =
-  List.map
-    (fun (title,entry) -> Markdown.href ~text:(plain title) entry)
-    (List.sort (fun (a,_) (b,_) -> String.compare a b) !entries)
+  let category name =
+    match List.rev (String.split_on_char '.' name) with
+    | [] -> []
+    | _::rpath -> List.rev rpath in
+  let cmap =
+    List.fold_left
+      (fun cs entry ->
+         let c = category (fst entry) in
+         let es = try Cmap.find c cs with Not_found -> [] in
+         Cmap.add c (entry :: es) cs)
+      Cmap.empty !entries in
+  let by_name (a,_) (b,_) = String.compare a b in
+  let categories = Cmap.fold
+      (fun c es ces -> ( c , List.sort by_name es ) :: ces)
+      cmap [] in
+  begin
+    List.fold_left
+      (fun elements (c,es) ->
+         let entries = Block (list @@ List.map index_entry es) :: elements in
+         if c = [] then entries
+         else
+           let cname = String.concat "." c in
+           let title = Printf.sprintf "Index of `%s`" cname in
+           H3(plain title,None) :: entries
+      ) [] categories
+  end
 
 let link ~toc ~title ~href : json =
   let link = [ "title" , `String title ; "href" , `String href ] in
@@ -193,8 +225,9 @@ let dump ~root ?(meta=true) () =
         @
         table_of_contents ()
         @
-        [H2 (plain "Index", None);
-         Block (list (List.map text (index ())))]
+        [H2 (plain "Index", None)]
+        @
+        index ()
       in
       let title = "Documentation" in
       pp_one_page ~root ~page:"readme.md" ~title body

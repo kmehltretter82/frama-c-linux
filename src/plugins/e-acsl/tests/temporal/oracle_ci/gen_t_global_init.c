@@ -27,11 +27,10 @@ void build_tree(tree_desc *desc)
   __e_acsl_store_block((void *)(& extra),(size_t)8);
   __e_acsl_store_block((void *)(& desc),(size_t)8);
   __e_acsl_temporal_pull_parameter((void *)(& desc),0U,8UL);
+  __e_acsl_full_init((void *)(& extra));
   __e_acsl_temporal_store_nreferent((void *)(& extra),
                                     (void *)(& desc->extra_bits));
-  __e_acsl_full_init((void *)(& extra));
   extra = desc->extra_bits;
-  /*@ assert \valid(extra); */
   {
     int __gen_e_acsl_initialized;
     int __gen_e_acsl_and;
@@ -47,6 +46,7 @@ void build_tree(tree_desc *desc)
     __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",
                     (char *)"build_tree",(char *)"\\valid(extra)",39);
   }
+  /*@ assert \valid(extra); */ ;
   __e_acsl_delete_block((void *)(& desc));
   __e_acsl_delete_block((void *)(& extra));
   return;
@@ -140,10 +140,9 @@ int main(int argc, char const **argv)
   __e_acsl_temporal_save_nblock_parameter((void *)(& descs2[1].desc),0U);
   build_tree(& descs2[1].desc);
   char **p = (char **)(strings);
+  __e_acsl_temporal_store_nblock((void *)(& p),(void *)(strings));
   __e_acsl_store_block((void *)(& p),(size_t)8);
   __e_acsl_full_init((void *)(& p));
-  __e_acsl_temporal_store_nblock((void *)(& p),(void *)(strings));
-  /*@ assert \valid_read(p); */
   {
     int __gen_e_acsl_initialized;
     int __gen_e_acsl_and;
@@ -159,7 +158,7 @@ int main(int argc, char const **argv)
     __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid_read(p)",57);
   }
-  /*@ assert \valid_read(*p); */
+  /*@ assert \valid_read(p); */ ;
   {
     int __gen_e_acsl_initialized_2;
     int __gen_e_acsl_and_3;
@@ -191,6 +190,7 @@ int main(int argc, char const **argv)
     __e_acsl_assert(__gen_e_acsl_and_3,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid_read(*p)",58);
   }
+  /*@ assert \valid_read(*p); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(descs2));
   __e_acsl_delete_block((void *)(& l_desc2));

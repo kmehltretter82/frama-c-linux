@@ -220,6 +220,7 @@ class pane (gprovers : GuiConfig.provers) =
           cancel proof ;
           Task.iter Task.cancel pool ;
           state <- Proof proof ;
+          ProofEngine.forward proof ;
           printer#reset ;
           self#update
 
@@ -366,6 +367,7 @@ class pane (gprovers : GuiConfig.provers) =
               self#update_provers None ;
               self#update_tactics None ;
               state <- Proof pw ;
+              ProofEngine.forward pw ;
               self#update ;
             end
 
@@ -586,6 +588,8 @@ class pane (gprovers : GuiConfig.provers) =
               printer#reset ;
               self#update ;
             end
+          else
+            Wutil.later self#commit
 
     method private schedule pool provers goal =
       Prover.spawn goal

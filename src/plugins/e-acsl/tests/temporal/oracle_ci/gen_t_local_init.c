@@ -22,11 +22,10 @@ void build_tree(tree_desc *desc)
   __e_acsl_store_block((void *)(& extra),(size_t)8);
   __e_acsl_store_block((void *)(& desc),(size_t)8);
   __e_acsl_temporal_pull_parameter((void *)(& desc),0U,8UL);
+  __e_acsl_full_init((void *)(& extra));
   __e_acsl_temporal_store_nreferent((void *)(& extra),
                                     (void *)(& desc->extra_bits));
-  __e_acsl_full_init((void *)(& extra));
   extra = desc->extra_bits;
-  /*@ assert \valid(extra); */
   {
     int __gen_e_acsl_initialized;
     int __gen_e_acsl_and;
@@ -42,6 +41,7 @@ void build_tree(tree_desc *desc)
     __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",
                     (char *)"build_tree",(char *)"\\valid(extra)",23);
   }
+  /*@ assert \valid(extra); */ ;
   __e_acsl_delete_block((void *)(& desc));
   __e_acsl_delete_block((void *)(& extra));
   return;
@@ -116,8 +116,6 @@ int main(int argc, char const **argv)
       (char *)__gen_e_acsl_literal_string_2},
      {(char *)__gen_e_acsl_literal_string_3,
       (char *)__gen_e_acsl_literal_string_4}};
-  __e_acsl_store_block((void *)(strings),(size_t)32);
-  __e_acsl_full_init((void *)(& strings));
   __e_acsl_temporal_store_nblock((void *)(& strings[1][1]),
                                  (void *)__gen_e_acsl_literal_string_4);
   __e_acsl_temporal_store_nblock((void *)(& strings[1][0]),
@@ -126,11 +124,12 @@ int main(int argc, char const **argv)
                                  (void *)__gen_e_acsl_literal_string_2);
   __e_acsl_temporal_store_nblock((void *)(& strings[0][0]),
                                  (void *)__gen_e_acsl_literal_string);
+  __e_acsl_store_block((void *)(strings),(size_t)32);
+  __e_acsl_full_init((void *)(& strings));
   char **p = (char **)(strings);
+  __e_acsl_temporal_store_nblock((void *)(& p),(void *)(strings));
   __e_acsl_store_block((void *)(& p),(size_t)8);
   __e_acsl_full_init((void *)(& p));
-  __e_acsl_temporal_store_nblock((void *)(& p),(void *)(strings));
-  /*@ assert \valid_read(p); */
   {
     int __gen_e_acsl_initialized;
     int __gen_e_acsl_and;
@@ -146,7 +145,7 @@ int main(int argc, char const **argv)
     __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid_read(p)",41);
   }
-  /*@ assert \valid_read(*p); */
+  /*@ assert \valid_read(p); */ ;
   {
     int __gen_e_acsl_initialized_2;
     int __gen_e_acsl_and_3;
@@ -178,13 +177,12 @@ int main(int argc, char const **argv)
     __e_acsl_assert(__gen_e_acsl_and_3,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid_read(*p)",42);
   }
+  /*@ assert \valid_read(*p); */ ;
   char *str[4] =
     {(char *)__gen_e_acsl_literal_string_5,
      (char *)__gen_e_acsl_literal_string_6,
      (char *)__gen_e_acsl_literal_string_7,
      (char *)0};
-  __e_acsl_store_block((void *)(str),(size_t)32);
-  __e_acsl_full_init((void *)(& str));
   __e_acsl_temporal_store_nblock((void *)(& str[3]),(void *)0);
   __e_acsl_temporal_store_nblock((void *)(& str[2]),
                                  (void *)__gen_e_acsl_literal_string_7);
@@ -192,10 +190,11 @@ int main(int argc, char const **argv)
                                  (void *)__gen_e_acsl_literal_string_6);
   __e_acsl_temporal_store_nblock((void *)(str),
                                  (void *)__gen_e_acsl_literal_string_5);
-  __e_acsl_temporal_store_nblock((void *)(& p),(void *)(& str));
+  __e_acsl_store_block((void *)(str),(size_t)32);
+  __e_acsl_full_init((void *)(& str));
   __e_acsl_full_init((void *)(& p));
+  __e_acsl_temporal_store_nblock((void *)(& p),(void *)(& str));
   p = (char **)(& str);
-  /*@ assert \valid_read(p); */
   {
     int __gen_e_acsl_initialized_4;
     int __gen_e_acsl_and_4;
@@ -213,7 +212,7 @@ int main(int argc, char const **argv)
     __e_acsl_assert(__gen_e_acsl_and_4,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid_read(p)",48);
   }
-  /*@ assert \valid_read(*p); */
+  /*@ assert \valid_read(p); */ ;
   {
     int __gen_e_acsl_initialized_5;
     int __gen_e_acsl_and_6;
@@ -245,11 +244,11 @@ int main(int argc, char const **argv)
     __e_acsl_assert(__gen_e_acsl_and_6,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid_read(*p)",49);
   }
+  /*@ assert \valid_read(*p); */ ;
   char **P = (char **)(Strings);
+  __e_acsl_temporal_store_nblock((void *)(& P),(void *)(Strings));
   __e_acsl_store_block((void *)(& P),(size_t)8);
   __e_acsl_full_init((void *)(& P));
-  __e_acsl_temporal_store_nblock((void *)(& P),(void *)(Strings));
-  /*@ assert \valid_read(P); */
   {
     int __gen_e_acsl_initialized_7;
     int __gen_e_acsl_and_7;
@@ -267,7 +266,7 @@ int main(int argc, char const **argv)
     __e_acsl_assert(__gen_e_acsl_and_7,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid_read(P)",53);
   }
-  /*@ assert \valid_read(*P); */
+  /*@ assert \valid_read(P); */ ;
   {
     int __gen_e_acsl_initialized_8;
     int __gen_e_acsl_and_9;
@@ -299,10 +298,10 @@ int main(int argc, char const **argv)
     __e_acsl_assert(__gen_e_acsl_and_9,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid_read(*P)",54);
   }
-  __e_acsl_temporal_store_nblock((void *)(& P),(void *)(& Str));
+  /*@ assert \valid_read(*P); */ ;
   __e_acsl_full_init((void *)(& P));
+  __e_acsl_temporal_store_nblock((void *)(& P),(void *)(& Str));
   P = (char **)(& Str);
-  /*@ assert \valid_read(P); */
   {
     int __gen_e_acsl_initialized_10;
     int __gen_e_acsl_and_10;
@@ -320,7 +319,7 @@ int main(int argc, char const **argv)
     __e_acsl_assert(__gen_e_acsl_and_10,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid_read(P)",58);
   }
-  /*@ assert \valid_read(*P); */
+  /*@ assert \valid_read(P); */ ;
   {
     int __gen_e_acsl_initialized_11;
     int __gen_e_acsl_and_12;
@@ -352,36 +351,37 @@ int main(int argc, char const **argv)
     __e_acsl_assert(__gen_e_acsl_and_12,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid_read(*P)",59);
   }
+  /*@ assert \valid_read(*P); */ ;
   int extra_lbits[1] = {0};
   __e_acsl_store_block((void *)(extra_lbits),(size_t)4);
   __e_acsl_full_init((void *)(& extra_lbits));
   tree_desc l_desc = {.extra_bits = extra_lbits};
-  __e_acsl_store_block((void *)(& l_desc),(size_t)8);
-  __e_acsl_full_init((void *)(& l_desc));
   __e_acsl_temporal_store_nblock((void *)(& l_desc.extra_bits),
                                  (void *)(extra_lbits));
+  __e_acsl_store_block((void *)(& l_desc),(size_t)8);
+  __e_acsl_full_init((void *)(& l_desc));
   tree_desc descs[2] =
     {{.extra_bits = extra_lbits}, {.extra_bits = extra_lbits}};
-  __e_acsl_store_block((void *)(descs),(size_t)16);
-  __e_acsl_full_init((void *)(& descs));
   __e_acsl_temporal_store_nblock((void *)(& descs[1].extra_bits),
                                  (void *)(extra_lbits));
   __e_acsl_temporal_store_nblock((void *)(& descs[0].extra_bits),
                                  (void *)(extra_lbits));
+  __e_acsl_store_block((void *)(descs),(size_t)16);
+  __e_acsl_full_init((void *)(& descs));
   tree_desc2 l_desc2 = {.desc = {.extra_bits = extra_lbits}};
-  __e_acsl_store_block((void *)(& l_desc2),(size_t)8);
-  __e_acsl_full_init((void *)(& l_desc2));
   __e_acsl_temporal_store_nblock((void *)(& l_desc2.desc.extra_bits),
                                  (void *)(extra_lbits));
+  __e_acsl_store_block((void *)(& l_desc2),(size_t)8);
+  __e_acsl_full_init((void *)(& l_desc2));
   tree_desc2 descs2[2] =
     {{.desc = {.extra_bits = extra_lbits}},
      {.desc = {.extra_bits = extra_lbits}}};
-  __e_acsl_store_block((void *)(descs2),(size_t)16);
-  __e_acsl_full_init((void *)(& descs2));
   __e_acsl_temporal_store_nblock((void *)(& descs2[1].desc.extra_bits),
                                  (void *)(extra_lbits));
   __e_acsl_temporal_store_nblock((void *)(& descs2[0].desc.extra_bits),
                                  (void *)(extra_lbits));
+  __e_acsl_store_block((void *)(descs2),(size_t)16);
+  __e_acsl_full_init((void *)(& descs2));
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
   __e_acsl_temporal_save_nblock_parameter((void *)(& l_desc),0U);

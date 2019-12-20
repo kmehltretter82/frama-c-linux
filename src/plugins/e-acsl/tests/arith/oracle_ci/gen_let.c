@@ -15,14 +15,13 @@ int main(void)
   union __anonunion_s_2 s;
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   int n = -2;
-  /*@ assert \let u = n * n; u ≥ 0; */
   {
     long __gen_e_acsl_u;
     __gen_e_acsl_u = n * (long)n;
     __e_acsl_assert(__gen_e_acsl_u >= 0L,(char *)"Assertion",(char *)"main",
                     (char *)"\\let u = n * n; u >= 0",7);
   }
-  /*@ assert \let u = n * n; \let v = u + 1; u > 0; */
+  /*@ assert \let u = n * n; u ≥ 0; */ ;
   {
     long __gen_e_acsl_u_2;
     long __gen_e_acsl_v;
@@ -31,14 +30,14 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_u_2 > 0L,(char *)"Assertion",(char *)"main",
                     (char *)"\\let u = n * n;\n\\let v = u + 1; u > 0",9);
   }
-  /*@ assert (\let u = 1; u) + 1 ≡ 2; */
+  /*@ assert \let u = n * n; \let v = u + 1; u > 0; */ ;
   {
     int __gen_e_acsl_u_3;
     __gen_e_acsl_u_3 = 1;
     __e_acsl_assert(__gen_e_acsl_u_3 + 1 == 2,(char *)"Assertion",
                     (char *)"main",(char *)"(\\let u = 1; u) + 1 == 2",12);
   }
-  /*@ assert \let u = 1; (\let v = u + 1; v) ≡ 2; */
+  /*@ assert (\let u = 1; u) + 1 ≡ 2; */ ;
   {
     int __gen_e_acsl_u_4;
     int __gen_e_acsl_v_2;
@@ -47,7 +46,7 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_v_2 == 2,(char *)"Assertion",(char *)"main",
                     (char *)"\\let u = 1; (\\let v = u + 1; v) == 2",14);
   }
-  /*@ assert \let u = 1; (\let u = u + 1; u) ≡ 2; */
+  /*@ assert \let u = 1; (\let v = u + 1; v) ≡ 2; */ ;
   {
     int __gen_e_acsl_u_5;
     int __gen_e_acsl_u_6;
@@ -56,8 +55,8 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_u_6 == 2,(char *)"Assertion",(char *)"main",
                     (char *)"\\let u = 1; (\\let u = u + 1; u) == 2",17);
   }
+  /*@ assert \let u = 1; (\let u = u + 1; u) ≡ 2; */ ;
   long m = 0x7fffffffffffffffL;
-  /*@ assert (\let u = m; u * u) > m; */
   {
     long __gen_e_acsl_u_7;
     __e_acsl_mpz_t __gen_e_acsl_u_8;
@@ -79,43 +78,43 @@ int main(void)
     __gmpz_clear(__gen_e_acsl_mul);
     __gmpz_clear(__gen_e_acsl_m);
   }
+  /*@ assert (\let u = m; u * u) > m; */ ;
   char c = (char)'a';
-  /*@ assert \let u = 'b'; c < u; */
   {
     int __gen_e_acsl_u_9;
     __gen_e_acsl_u_9 = 'b';
     __e_acsl_assert((int)c < __gen_e_acsl_u_9,(char *)"Assertion",
                     (char *)"main",(char *)"\\let u = \'b\'; c < u",24);
   }
+  /*@ assert \let u = 'b'; c < u; */ ;
   float f = 1.0f;
   __e_acsl_store_block((void *)(& f),(size_t)4);
   __e_acsl_full_init((void *)(& f));
-  /*@ assert \let u = f; u ≡ f; */
   {
     float __gen_e_acsl_u_10;
     __gen_e_acsl_u_10 = f;
     __e_acsl_assert(__gen_e_acsl_u_10 == f,(char *)"Assertion",
                     (char *)"main",(char *)"\\let u = f; u == f",27);
   }
+  /*@ assert \let u = f; u ≡ f; */ ;
   int t[4] = {1, 2, 3, 4};
-  /*@ assert \let u = &t[1]; 1 ≡ 1; */
   {
     int * /*[4]*/ __gen_e_acsl_u_11;
     __gen_e_acsl_u_11 = & t[1];
     __e_acsl_assert(1,(char *)"Assertion",(char *)"main",
                     (char *)"\\let u = &t[1]; 1 == 1",30);
   }
-  /*@ assert (\let u = &t[1]; 1) ≡ 1; */
+  /*@ assert \let u = &t[1]; 1 ≡ 1; */ ;
   {
     int * /*[4]*/ __gen_e_acsl_u_12;
     __gen_e_acsl_u_12 = & t[1];
     __e_acsl_assert(1,(char *)"Assertion",(char *)"main",
                     (char *)"(\\let u = &t[1]; 1) == 1",32);
   }
+  /*@ assert (\let u = &t[1]; 1) ≡ 1; */ ;
   struct __anonstruct_r_1 r = {.x = 1, .y = 2};
   __e_acsl_store_block((void *)(& r),(size_t)8);
   __e_acsl_full_init((void *)(& r));
-  /*@ assert \let u = r; u.x + u.y ≡ 3; */
   {
     struct __anonstruct_r_1 __gen_e_acsl_u_13;
     __gen_e_acsl_u_13 = r;
@@ -123,14 +122,15 @@ int main(void)
                     (char *)"Assertion",(char *)"main",
                     (char *)"\\let u = r; u.x + u.y == 3",35);
   }
+  /*@ assert \let u = r; u.x + u.y ≡ 3; */ ;
   s.x = 5;
-  /*@ assert (\let u = s; u.x) > 0; */
   {
     union __anonunion_s_2 __gen_e_acsl_u_14;
     __gen_e_acsl_u_14 = s;
     __e_acsl_assert(__gen_e_acsl_u_14.x > 0,(char *)"Assertion",
                     (char *)"main",(char *)"(\\let u = s; u.x) > 0",39);
   }
+  /*@ assert (\let u = s; u.x) > 0; */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(& r));
   __e_acsl_delete_block((void *)(& f));

@@ -6,7 +6,6 @@ int main(void)
 {
   int __retres;
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
-  /*@ assert A + (long)((long)(3 * A) - 1) ≡ -1; */
   {
     __e_acsl_mpz_t __gen_e_acsl_A;
     __e_acsl_mpz_t __gen_e_acsl_;
@@ -42,6 +41,7 @@ int main(void)
     __gmpz_clear(__gen_e_acsl_add);
     __gmpz_clear(__gen_e_acsl__4);
   }
+  /*@ assert A + (long)((long)(3 * A) - 1) ≡ -1; */ ;
   __retres = 0;
   return __retres;
 }

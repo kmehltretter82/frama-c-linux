@@ -27,10 +27,10 @@ let init_set ~loc lval vi_e e =
   Cil.mkStmt
     ~valid_sid:true
     (Block (Cil.mkBlock
-      [ Gmp.init ~loc vi_e ;
-        Gmp.affect ~loc lval vi_e e ]))
+              [ Gmp.init ~loc vi_e ;
+                Gmp.affect ~loc lval vi_e e ]))
 
-let create ~loc ?name e env t_opt =
+let create ~loc ?name e env kf t_opt =
   let ty = Cil.typeOf e in
   if Gmp_types.Z.is_t ty then
     (* GMPQ has no builtin for creating Q from Z. Hence:
@@ -45,6 +45,7 @@ let create ~loc ?name e env t_opt =
         ~loc
         ?name
         env
+        kf
         t_opt
         (Gmp_types.Q.t ())
         (fun vi vi_e ->
@@ -119,7 +120,7 @@ let decimal_to_fractional str =
   let strlen = String.length str in
   let buflen =
     (* The fractional representation is at most twice as lengthy
-      as the decimal one. *)
+       as the decimal one. *)
     2 * strlen
   in
   try pre str strlen (Bytes.create buflen) 0
@@ -138,7 +139,7 @@ let cast_to_z ~loc:_ ?name:_ e _env =
   assert (Gmp_types.Q.is_t (Cil.typeOf e));
   Error.not_yet "reals: cast from R to Z"
 
-let add_cast ~loc ?name e env ty =
+let add_cast ~loc ?name e env kf ty =
   (* TODO: The best solution would actually be to directly write all the needed
      functions as C builtins then just call them here depending on the situation
      at hand. *)
@@ -149,10 +150,14 @@ let add_cast ~loc ?name e env ty =
         ~loc
         ?name
         env
+        kf
         None
         Cil.doubleType
         (fun v _ ->
-           [ Misc.mk_call ~loc ~result:(Cil.var v) "__gmpq_get_d" [ e ] ])
+           [ Constructor.mk_lib_call ~loc
+               ~result:(Cil.var v)
+               "__gmpq_get_d"
+               [ e ] ])
     in
     e, env
   in
@@ -182,28 +187,33 @@ let add_cast ~loc ?name e env ty =
   | _ ->
     Error.not_yet "R to <typ>"
 
-let cmp ~loc bop e1 e2 env t_opt =
+let cmp ~loc bop e1 e2 env kf t_opt =
   let fname = "__gmpq_cmp" in
   let name = Misc.name_of_binop bop in
-  let e1, env = create ~loc e1 env None (* TODO: t1_opt could be provided *) in
-  let e2, env = create ~loc e2 env None (* TODO: t2_opt could be provided *) in
+  (* TODO: [t1_opt] and [t2_opt] could be provided when creating [e1] and
+     [e2] *)
+  let e1, env = create ~loc e1 env kf None in
+  let e2, env = create ~loc e2 env kf None in
   let _, e, env =
     Env.new_var
       ~loc
       env
+      kf
       t_opt
       ~name
       Cil.intType
-      (fun v _ -> [ Misc.mk_call ~loc ~result:(Cil.var v) fname [ e1; e2 ] ])
+      (fun v _ ->
+         [ Constructor.mk_lib_call ~loc ~result:(Cil.var v) fname [ e1; e2 ] ])
   in
   Cil.new_exp ~loc (BinOp(bop, e, Cil.zero ~loc, Cil.intType)), env
 
-let new_var_and_init ~loc ?scope ?name env t_opt mk_stmts =
+let new_var_and_init ~loc ?scope ?name env kf t_opt mk_stmts =
   Env.new_var
     ~loc
     ?scope
     ?name
     env
+    kf
     t_opt
     (Gmp_types.Q.t ())
     (fun v e -> Gmp.init ~loc e :: mk_stmts v e)
@@ -216,13 +226,15 @@ let name_arith_bop = function
   | Mod | Lt | Gt | Le | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr
   | Shiftlt | Shiftrt | PlusPI | IndexPI | MinusPI | MinusPP -> assert false
 
-let binop ~loc bop e1 e2 env t_opt =
+let binop ~loc bop e1 e2 env kf t_opt =
   let name = name_arith_bop bop in
-  let e1, env = create ~loc e1 env None (* TODO: t1_opt could be provided *) in
-  let e2, env = create ~loc e2 env None (* TODO: t2_opt could be provided *) in
-  let mk_stmts _ e = [ Misc.mk_call ~loc name [ e; e1; e2 ] ] in
+  (* TODO: [t1_opt] and [t2_opt] could be provided when creating [e1] and
+     [e2] *)
+  let e1, env = create ~loc e1 env kf None in
+  let e2, env = create ~loc e2 env kf None in
+  let mk_stmts _ e = [ Constructor.mk_lib_call ~loc name [ e; e1; e2 ] ] in
   let name = Misc.name_of_binop bop in
-  let _, e, env = new_var_and_init ~loc ~name env t_opt mk_stmts in
+  let _, e, env = new_var_and_init ~loc ~name env kf t_opt mk_stmts in
   e, env
 
 (*

@@ -20,10 +20,9 @@ int main(void)
 {
   int __retres;
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
-  /*@ assert 3 ≢ 1.5; */
   __e_acsl_assert(3. != 1.5,(char *)"Assertion",(char *)"main",
                   (char *)"3 != 1.5",12);
-  /*@ assert 3 ≡ 1.5 + 1.5; */
+  /*@ assert 3 ≢ 1.5; */ ;
   {
     __e_acsl_mpq_t __gen_e_acsl_;
     __e_acsl_mpq_t __gen_e_acsl__2;
@@ -49,7 +48,7 @@ int main(void)
     __gmpq_clear(__gen_e_acsl__3);
     __gmpq_clear(__gen_e_acsl_add);
   }
-  /*@ assert 0.1 ≡ 0.1; */
+  /*@ assert 3 ≡ 1.5 + 1.5; */ ;
   {
     __e_acsl_mpq_t __gen_e_acsl__4;
     int __gen_e_acsl_eq_2;
@@ -61,10 +60,10 @@ int main(void)
                     (char *)"main",(char *)"0.1 == 0.1",14);
     __gmpq_clear(__gen_e_acsl__4);
   }
-  /*@ assert (double)1.0 ≡ 1.0; */
+  /*@ assert 0.1 ≡ 0.1; */ ;
   __e_acsl_assert(1. == 1.,(char *)"Assertion",(char *)"main",
                   (char *)"(double)1.0 == 1.0",15);
-  /*@ assert (double)0.1 ≢ 0.1; */
+  /*@ assert (double)1.0 ≡ 1.0; */ ;
   {
     __e_acsl_mpq_t __gen_e_acsl__5;
     double __gen_e_acsl__6;
@@ -83,7 +82,7 @@ int main(void)
     __gmpq_clear(__gen_e_acsl__5);
     __gmpq_clear(__gen_e_acsl__7);
   }
-  /*@ assert (float)0.1 ≢ (double)0.1; */
+  /*@ assert (double)0.1 ≢ 0.1; */ ;
   {
     __e_acsl_mpq_t __gen_e_acsl__8;
     double __gen_e_acsl__9;
@@ -101,7 +100,7 @@ int main(void)
                     (char *)"(float)0.1 != (double)0.1",17);
     __gmpq_clear(__gen_e_acsl__8);
   }
-  /*@ assert (double)1.1 ≢ 1 + 0.1; */
+  /*@ assert (float)0.1 ≢ (double)0.1; */ ;
   {
     __e_acsl_mpq_t __gen_e_acsl__11;
     double __gen_e_acsl__12;
@@ -134,7 +133,7 @@ int main(void)
     __gmpq_clear(__gen_e_acsl_add_2);
     __gmpq_clear(__gen_e_acsl__15);
   }
-  /*@ assert 1 + 0.1 ≡ 2 - 0.9; */
+  /*@ assert (double)1.1 ≢ 1 + 0.1; */ ;
   {
     __e_acsl_mpq_t __gen_e_acsl__16;
     __e_acsl_mpq_t __gen_e_acsl__17;
@@ -170,10 +169,10 @@ int main(void)
     __gmpq_clear(__gen_e_acsl__19);
     __gmpq_clear(__gen_e_acsl_sub);
   }
+  /*@ assert 1 + 0.1 ≡ 2 - 0.9; */ ;
   float x = 0.2f;
   float y = 0.3f;
   float sum = x + y;
-  /*@ assert sum ≢ x * y; */
   {
     __e_acsl_mpq_t __gen_e_acsl_y;
     __e_acsl_mpq_t __gen_e_acsl__20;
@@ -199,9 +198,9 @@ int main(void)
     __gmpq_clear(__gen_e_acsl_mul);
     __gmpq_clear(__gen_e_acsl__21);
   }
+  /*@ assert sum ≢ x * y; */ ;
   double d = 0.1;
   __gen_e_acsl_avg(4.3,11.7);
-  /*@ assert 1.1d ≢ 1 + 0.1; */
   {
     __e_acsl_mpq_t __gen_e_acsl__22;
     __e_acsl_mpq_t __gen_e_acsl__23;
@@ -227,6 +226,7 @@ int main(void)
     __gmpq_clear(__gen_e_acsl_add_4);
     __gmpq_clear(__gen_e_acsl__24);
   }
+  /*@ assert 1.1d ≢ 1 + 0.1; */ ;
   __retres = 0;
   return __retres;
 }

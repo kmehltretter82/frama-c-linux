@@ -34,6 +34,11 @@ let option_import = LogicBuiltins.create_option
     (fun ~driver_dir:_ x -> x)
     "why3" "import"
 
+let option_qual =
+  LogicBuiltins.create_option
+    (fun ~driver_dir:_ x -> x)
+    "why3" "qualifier"
+
 let why3_failure msg =
   Pretty_utils.ksfprintf failwith msg
 
@@ -227,6 +232,16 @@ let regexp_dot = Str.regexp_string "."
 
 let cut_path s = Str.split_delim regexp_dot s
 
+let wp_why3_lib library =
+  match LogicBuiltins.get_option option_qual ~library with
+  | [] -> [library]
+  | [ lib ] -> Str.split_delim regexp_dot lib
+  | l ->
+      let pp_sep fmt () = Format.pp_print_string fmt ", " in
+      Wp_parameters.fatal
+        "too many bindings for WP-specific Why3 theory file %s:@\n%a"
+        library Format.(pp_print_list ~pp_sep pp_print_string) l
+
 (* conversion *)
 
 let rec of_tau ~cnv (t:Lang.F.tau) =
@@ -294,7 +309,11 @@ let rec of_term ~cnv expected t : Why3.Term.term =
   Wp_parameters.debug ~dkey:dkey_api
     "of_term %a %a@."
     Lang.F.Tau.pretty expected Lang.F.pp_term t;
-  let sort = Lang.F.typeof t in
+  let sort =
+    try Lang.F.typeof t
+    with Not_found ->
+      why3_failure "@[<hov 2>Untyped term: %a@]" Lang.F.pp_term t
+  in
   let ($) f x = f x in
   let r =
     try coerce ~cnv sort expected $ Lang.F.Tmap.find t cnv.subst
@@ -360,13 +379,13 @@ let rec of_term ~cnv expected t : Why3.Term.term =
           a b
     | Leq (a,b), _, Bool ->
         int_or_real ~cnv
-          ~fint:["qed"] ~lint:"Qed" ~pint:["zleq"]
-          ~freal:["qed"] ~lreal:"Qed" ~preal:["rleq"]
+          ~fint:(wp_why3_lib "qed") ~lint:"Qed" ~pint:["zleq"]
+          ~freal:(wp_why3_lib "qed") ~lreal:"Qed" ~preal:["rleq"]
           a b
     | Lt (a,b), _, Bool ->
         int_or_real ~cnv
-          ~fint:["qed"] ~lint:"Qed" ~pint:["zlt"]
-          ~freal:["qed"] ~lreal:"Qed" ~preal:["rlt"]
+          ~fint:(wp_why3_lib "qed") ~lint:"Qed" ~pint:["zlt"]
+          ~freal:(wp_why3_lib "qed") ~lreal:"Qed" ~preal:["rlt"]
           a b
     | And l, _, Bool ->
         t_app_fold ~f:["bool"] ~l:"Bool" ~p:["andb"] ~cnv expected l
@@ -416,9 +435,9 @@ let rec of_term ~cnv expected t : Why3.Term.term =
               | _                   -> Why3.Term.t_neq (of_term' cnv a) (of_term' cnv b)
         end
     | Eq (a,b), _, Bool ->
-        t_app ~cnv ~f:["qed"] ~l:"Qed" ~p:["eqb"] [of_term' cnv a; of_term' cnv b]
+        t_app ~cnv ~f:(wp_why3_lib "qed") ~l:"Qed" ~p:["eqb"] [of_term' cnv a; of_term' cnv b]
     | Neq (a,b), _, Bool ->
-        t_app ~cnv ~f:["qed"] ~l:"Qed" ~p:["neqb"] [of_term' cnv a; of_term' cnv b]
+        t_app ~cnv ~f:(wp_why3_lib "qed") ~l:"Qed" ~p:["neqb"] [of_term' cnv a; of_term' cnv b]
     | If(a,b,c), _, _ ->
         let cnv' = {cnv with polarity = `NoPolarity} in
         Why3.Term.t_if (of_term cnv' Prop a) (of_term cnv expected b) (of_term cnv expected c)
@@ -737,7 +756,7 @@ class visitor (ctx:context) c =
             | [ th ] -> self#add_import th
             | [ th ; was ] -> self#add_import ~was th
             | _ -> why3_failure
-                     "[driver] incorrect why3.file %S for library '%s'"
+                     "[driver] incorrect why3.import %S for library '%s'"
                      opt thy
           ) (Str.split regexp_com opt)
       in
@@ -1008,8 +1027,7 @@ let task_of_wpo wpo =
 (* --- Prover Task                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-let prover_task prover task =
-  let env = get_why3_env () in
+let prover_task env prover task =
   let config = Why3Provers.config () in
   let prover_config = Why3.Whyconf.get_prover_config config prover in
   let drv = Why3.Whyconf.load_driver (Why3.Whyconf.get_main config)
@@ -1041,7 +1059,8 @@ type prover_call = {
   prover : Why3Provers.t ;
   call : Why3.Call_provers.prover_call ;
   steps : int option ;
-  timeover : float option ;
+  timeout : int ;
+  mutable timeover : float option ;
   mutable interrupted : bool ;
   mutable killed : bool ;
 }
@@ -1051,7 +1070,9 @@ let ping_prover_call p =
   | NoUpdates
   | ProverStarted ->
       let () = match p.timeover with
-        | None -> ()
+        | None ->
+            let started = Unix.time () in
+            p.timeover <- Some (started +. 2.0 +. float p.timeout)
         | Some timeout ->
             let time = Unix.time () in
             if time > timeout then
@@ -1076,7 +1097,7 @@ let ping_prover_call p =
         | OutOfMemory -> VCS.failed "out of memory"
         | StepLimitExceeded -> VCS.result ?steps:p.steps VCS.Stepout
         | Unknown _ -> VCS.unknown
-        | _ when p.interrupted -> VCS.timeout (int_of_float pr.pr_time)
+        | _ when p.interrupted -> VCS.timeout p.timeout
         | Failure s -> VCS.failed s
         | HighFailure ->
             let alt_ergo_hack =
@@ -1109,15 +1130,12 @@ let call_prover ~timeout ~steplimit drv prover prover_config task =
     Why3.Whyconf.print_prover prover
     (Why3.Opt.get_def (-1) timeout)
     (Why3.Opt.get_def (-1) steps);
-  let timeover = match timeout with
-    | None -> None | Some tlimit ->
-        let started = Unix.time () in
-        Some (started +. 2.0 +. float tlimit) in
+  let timeout = match timeout with None -> 0 | Some tlimit -> tlimit in
   let pcall = {
     call ; prover ;
     killed = false ;
     interrupted = false ;
-    steps ; timeover ;
+    steps ; timeout ; timeover = None ;
   } in
   let ping = function
     | Task.Kill ->
@@ -1311,50 +1329,49 @@ let is_trivial (t : Why3.Task.task) =
 
 let build_proof_task ?timeout ?steplimit ~prover wpo () =
   try
-    WpContext.on_context (Wpo.get_context wpo)
-      begin fun () ->
-        (* Always generate common task *)
-        let task = task_of_wpo wpo in
-        if Wp_parameters.Check.get ()
-        then Task.return VCS.checked (* Why3 tasks are type-checked *)
-        else
-        if Wp_parameters.Generate.get ()
-        then Task.return VCS.no_result (* Only generate *)
-        else
-          let drv , config , task = prover_task prover task in
-          if is_trivial task then
-            Task.return VCS.valid
-          else
-            let mode = get_mode () in
-            match mode with
-            | NoCache ->
-                call_prover ~timeout ~steplimit drv prover config task
-            | Offline ->
-                let hash = task_hash wpo drv prover task in
-                let result = get_cache_result ~mode hash |> VCS.cached in
-                if VCS.is_verdict result then incr hits else incr miss ;
+    (* Always generate common task *)
+    let context = Wpo.get_context wpo in
+    let task = WpContext.on_context context task_of_wpo wpo in
+    if Wp_parameters.Check.get ()
+    then Task.return VCS.checked (* Why3 tasks are type-checked *)
+    else
+    if Wp_parameters.Generate.get ()
+    then Task.return VCS.no_result (* Only generate *)
+    else
+      let env = WpContext.on_context context get_why3_env () in
+      let drv , config , task = prover_task env prover task in
+      if is_trivial task then
+        Task.return VCS.valid
+      else
+        let mode = get_mode () in
+        match mode with
+        | NoCache ->
+            call_prover ~timeout ~steplimit drv prover config task
+        | Offline ->
+            let hash = task_hash wpo drv prover task in
+            let result = get_cache_result ~mode hash |> VCS.cached in
+            if VCS.is_verdict result then incr hits else incr miss ;
+            Task.return result
+        | Update | Replay | Rebuild | Cleanup ->
+            let hash = task_hash wpo drv prover task in
+            let result =
+              get_cache_result ~mode hash
+              |> promote ~timeout ~steplimit |> VCS.cached in
+            if VCS.is_verdict result
+            then
+              begin
+                incr hits ;
                 Task.return result
-            | Update | Replay | Rebuild | Cleanup ->
-                let hash = task_hash wpo drv prover task in
-                let result =
-                  get_cache_result ~mode hash
-                  |> promote ~timeout ~steplimit |> VCS.cached in
-                if VCS.is_verdict result
-                then
-                  begin
-                    incr hits ;
-                    Task.return result
-                  end
-                else
-                  Task.finally
-                    (call_prover ~timeout ~steplimit drv prover config task)
-                    begin function
-                      | Task.Result result when VCS.is_verdict result ->
-                          incr miss ;
-                          set_cache_result ~mode hash prover result
-                      | _ -> ()
-                    end
-      end ()
+              end
+            else
+              Task.finally
+                (call_prover ~timeout ~steplimit drv prover config task)
+                begin function
+                  | Task.Result result when VCS.is_verdict result ->
+                      incr miss ;
+                      set_cache_result ~mode hash prover result
+                  | _ -> ()
+                end
   with exn ->
     if Wp_parameters.has_dkey dkey_api then
       Wp_parameters.fatal "[Why3 Error] %a@\n%s"

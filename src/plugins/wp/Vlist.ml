@@ -55,12 +55,9 @@ let l_repeat = Lang.(E.({
 
 let a_list = Lang.get_builtin_type ~library ~name:t_list ~link:l_list
 
-let _list_of t = L.Data(a_list,[t])
-
 let vlist_get_tau = function
   | None -> invalid_arg "a list operator without result type"
   | Some t -> t
-
 
 let ty_nil = function _ -> invalid_arg "All nil must be typed"
 

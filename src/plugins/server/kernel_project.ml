@@ -121,3 +121,17 @@ let () = Request.register ~page
     (ProjectRequest.process `EXEC)
 
 (* -------------------------------------------------------------------------- *)
+(* --- Project Management                                                 --- *)
+(* -------------------------------------------------------------------------- *)
+
+let () =
+  Request.register
+    ~page
+    ~descr:(Md.plain "Create a new project")
+    ~kind:`SET
+    ~name:"kernel.project.setCreate"
+    ~input:(module Jstring)
+    ~output:(module ProjectInfo)
+    Project.create
+
+(* -------------------------------------------------------------------------- *)

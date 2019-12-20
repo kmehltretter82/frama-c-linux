@@ -26,12 +26,10 @@ let rec rootchain node ns =
   | Some p -> rootchain p (p::ns)
 
 let pp_status fmt node =
-  match ProofEngine.state node with
-  | `Opened -> Format.fprintf fmt "@{<red>opened@}"
-  | `Proved | `Pending 0 -> Format.fprintf fmt "@{<green>proved@}"
-  | `Pending 1 -> Format.fprintf fmt "@{<orange>pending@}"
-  | `Pending n -> Format.fprintf fmt "@{<orange>pending %d@}" n
-  | `Script n -> Format.fprintf fmt "script with %d leaves" n
+  match ProofEngine.pending node with
+  | 0 -> Format.fprintf fmt "@{<green>proved@}"
+  | 1 -> Format.fprintf fmt "@{<orange>pending@}"
+  | n -> Format.fprintf fmt "@{<orange>pending %d@}" n
 
 class printer (text : Wtext.text) =
   let nodes : ProofEngine.position Wtext.marker = text#marker in
@@ -66,36 +64,25 @@ class printer (text : Wtext.text) =
                    VCS.pp_prover prv VCS.pp_result res
         ) (Wpo.get_results wpo)
 
-    method private pp_state fmt node =
-      match ProofEngine.state node with
-      | `Proved -> Format.pp_print_string fmt "proved"
-      | `Opened -> Format.pp_print_string fmt "opened"
-      | `Pending 0 -> Format.pp_print_string fmt "terminated"
-      | `Pending 1 -> Format.pp_print_string fmt "pending"
-      | `Pending n -> Format.fprintf fmt "pending(%d)" n
-      | `Script 0 -> Format.pp_print_string fmt "script"
-      | `Script n -> Format.fprintf fmt "script(%d)" n
-
     method private tactic header node =
+      text#printf "@{<bf>Tactical@}@} %s:" header ;
       match ProofEngine.children node with
       | [] ->
-          text#printf "@{<bf>Tactical@}@} %s: @{<green>proved@} (Qed).@\n" header
+          text#printf "@{<green>proved@} (Qed).@\n"
       | [_,child] ->
-          text#printf "@{<bf>Tactical@} %a: %a.@\n" self#pp_node child self#pp_state child
+          text#printf "%a (%a).@\n" pp_status child self#pp_node child
       | children ->
-          begin match ProofEngine.pending node with
-            | 0 -> text#printf "@{<green>@{<bf>Tactical@}@} %s: @{<green>proved@}.@\n" header
-            | 1 -> text#printf "@{<bf>Tactical@} %s: @{<orange>pending@}.@\n" header ;
-            | n -> text#printf "@{<bf>Tactical@} %s: @{<orange>pending(%d)@}.@\n" header n ;
-          end ;
-          List.iter
-            (fun (part,child) -> text#printf "@{<bf>SubGoal@} %s : %a.@\n"
-                part self#pp_state child)
-            children
+          begin
+            text#printf " (%a)@\n@{<bf>Sub Goals:@}" pp_status node ;
+            List.iter
+              (fun (part,child) -> text#printf "@\n - %s : %a" part pp_status child)
+              children ;
+            text#printf "@." ;
+          end
 
     method private alternative g a =
       let open ProofScript in match a with
-      | Tactic(0,{ header },_) -> text#printf "@{<bf>Script@} %s: terminating.@\n" header
+      | Tactic(0,{ header },_) -> text#printf "@{<bf>Script@} %s: finished.@\n" header
       | Tactic(n,{ header },_) -> text#printf "@{<bf>Script@} %s: pending %d.@\n" header n
       | Error(msg,_) -> text#printf "@{<bf>Script@} Error (%S).@\n" msg
       | Prover(p,r) ->

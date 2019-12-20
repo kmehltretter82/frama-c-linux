@@ -70,7 +70,6 @@ int main(int argc, char **argv)
   int __retres;
   __e_acsl_memory_init(& argc,& argv,(size_t)8);
   __e_acsl_globals_init();
-  /*@ assert \valid((char **)_A); */
   {
     int __gen_e_acsl_valid;
     __gen_e_acsl_valid = __e_acsl_valid((void *)(_A),sizeof(char *),
@@ -78,7 +77,7 @@ int main(int argc, char **argv)
     __e_acsl_assert(__gen_e_acsl_valid,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid((char **)_A)",33);
   }
-  /*@ assert \valid_read(_A[0]); */
+  /*@ assert \valid((char **)_A); */ ;
   {
     int __gen_e_acsl_initialized;
     int __gen_e_acsl_and;
@@ -96,7 +95,7 @@ int main(int argc, char **argv)
     __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid_read(_A[0])",34);
   }
-  /*@ assert \valid_read(_A[1]); */
+  /*@ assert \valid_read(_A[0]); */ ;
   {
     int __gen_e_acsl_initialized_2;
     int __gen_e_acsl_and_2;
@@ -114,7 +113,7 @@ int main(int argc, char **argv)
     __e_acsl_assert(__gen_e_acsl_and_2,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid_read(_A[1])",35);
   }
-  /*@ assert \valid_read(_B); */
+  /*@ assert \valid_read(_A[1]); */ ;
   {
     int __gen_e_acsl_valid_read_3;
     __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)_B,sizeof(char),
@@ -123,7 +122,7 @@ int main(int argc, char **argv)
     __e_acsl_assert(__gen_e_acsl_valid_read_3,(char *)"Assertion",
                     (char *)"main",(char *)"\\valid_read(_B)",36);
   }
-  /*@ assert \valid(&_C); */
+  /*@ assert \valid_read(_B); */ ;
   {
     int __gen_e_acsl_valid_2;
     __gen_e_acsl_valid_2 = __e_acsl_valid((void *)(& _C),sizeof(char *),
@@ -131,7 +130,7 @@ int main(int argc, char **argv)
     __e_acsl_assert(__gen_e_acsl_valid_2,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid(&_C)",37);
   }
-  /*@ assert \valid((int *)_D); */
+  /*@ assert \valid(&_C); */ ;
   {
     int __gen_e_acsl_valid_3;
     __gen_e_acsl_valid_3 = __e_acsl_valid((void *)(_D),sizeof(int),
@@ -139,7 +138,7 @@ int main(int argc, char **argv)
     __e_acsl_assert(__gen_e_acsl_valid_3,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid((int *)_D)",38);
   }
-  /*@ assert \valid(&_E); */
+  /*@ assert \valid((int *)_D); */ ;
   {
     int __gen_e_acsl_valid_4;
     __gen_e_acsl_valid_4 = __e_acsl_valid((void *)(& _E),sizeof(int),
@@ -147,7 +146,7 @@ int main(int argc, char **argv)
     __e_acsl_assert(__gen_e_acsl_valid_4,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid(&_E)",39);
   }
-  /*@ assert \valid(&_F); */
+  /*@ assert \valid(&_E); */ ;
   {
     int __gen_e_acsl_valid_5;
     __gen_e_acsl_valid_5 = __e_acsl_valid((void *)(& _F),sizeof(int),
@@ -155,10 +154,10 @@ int main(int argc, char **argv)
     __e_acsl_assert(__gen_e_acsl_valid_5,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid(&_F)",40);
   }
-  /*@ assert _E ≡ 44; */
+  /*@ assert \valid(&_F); */ ;
   __e_acsl_assert(_E == 44,(char *)"Assertion",(char *)"main",
                   (char *)"_E == 44",41);
-  /*@ assert \valid(&_G); */
+  /*@ assert _E ≡ 44; */ ;
   {
     int __gen_e_acsl_valid_6;
     __gen_e_acsl_valid_6 = __e_acsl_valid((void *)(& _G),
@@ -167,9 +166,10 @@ int main(int argc, char **argv)
     __e_acsl_assert(__gen_e_acsl_valid_6,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid(&_G)",42);
   }
-  /*@ assert _G[0].num ≡ 99; */
+  /*@ assert \valid(&_G); */ ;
   __e_acsl_assert(_G[0].num == 99,(char *)"Assertion",(char *)"main",
                   (char *)"_G[0].num == 99",43);
+  /*@ assert _G[0].num ≡ 99; */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(_G));
   __e_acsl_delete_block((void *)(& _E));

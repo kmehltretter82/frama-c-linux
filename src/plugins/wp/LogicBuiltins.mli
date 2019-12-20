@@ -44,11 +44,22 @@ val add_builtin : string -> kind list -> lfun -> unit
 type driver
 val driver: driver Context.value
 
-val create: id:string -> ?descr:string -> ?includes:string list -> unit -> driver
-(** Create a new driver. leave the context empty. *)
-
-val init: id:string -> ?descr:string -> ?includes:string list -> unit -> unit
-(** Reset the context to a newly created driver *)
+val new_driver:
+  id:string ->
+  ?base:driver ->
+  ?descr:string ->
+  ?includes:string list ->
+  ?configure:(unit -> unit) -> unit ->
+  driver
+(** Creates a configured driver from an existing one.
+    Default:
+    - base: builtin WP driver
+    - descr: id
+    - includes: []
+    - configure: No-Op
+      The configure is the only operation allowed to modify the content of the
+      newly created driver. Except during static initialization of builtin driver.
+*)
 
 val id : driver -> string
 val descr : driver -> string
@@ -114,5 +125,8 @@ val lookup : string -> kind list -> builtin
     The LogicSemantics compilers will replace `Pcall` and `Tcall` instances
     of this symbol with the provided Qed function on terms. *)
 val hack : string -> (F.term list -> F.term) -> unit
+
+(** Replace a logic type definition or predicate by a built-in type. *)
+val hack_type : string -> (F.tau list -> F.tau) -> unit
 
 val dump : unit -> unit

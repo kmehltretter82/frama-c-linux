@@ -61,7 +61,7 @@ body {
     max-width: 8cm ;
     height: 100% ;
     padding: 0cm 0.5cm 0cm 0.5cm ;
-    background: #888 ;
+    background: #eee ;
 }
 
 #CONTENT {
@@ -85,6 +85,10 @@ body {
     font-size: smaller ;
 }
 
+#NAVIGATION a {
+    color: black ;
+}
+
 #NAVIGATION a.root {
     display: block;
     font-family: "Optima", "Verdana", "Arial", sans;
@@ -104,14 +108,6 @@ body {
     background-color: darkorange ;
 }
 
-#NAVIGATION a {
-    color: white ;
-}
-
-#NAVIGATION code {
-    color: black ;
-}
-
 #NAVIGATION ul {
     width: 6cm ;
 }
@@ -120,7 +116,6 @@ body {
     margin-left: 0px ;
     padding-top: 2px ;
     padding-bottom: 2px ;
-    background-color: darkgrey ;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -143,13 +138,11 @@ h2 {
     margin-top: 5mm;
     margin-bottom: 2mm;
     border-bottom: solid thin darkred ;
-    color: darkred;
 }
 
 h3 {
     width: 17cm;
     font-family: "Optima", "Verdana", "Arial", sans;
-    color: black;
     margin-top: 5mm;
     margin-bottom: 3mm;
     border-bottom: thin solid #404040;
@@ -163,7 +156,6 @@ h4,h5,h6 {
     font-size: 10pt;
     font-style: italic;
     font-weight: bold;
-    color: darkred;
 }
 
 p { margin: 6px 0px 6px 0px; width: 15cm; }
@@ -177,6 +169,8 @@ li {
     padding-left: 6px ;
     padding-right : 6px ;
 }
+
+li p { margin: 0px }
 
 pre {
     width : 15cm ;

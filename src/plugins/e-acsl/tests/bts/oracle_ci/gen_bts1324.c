@@ -37,9 +37,9 @@ int main(void)
   __e_acsl_store_block((void *)(t),(size_t)28);
   __e_acsl_full_init((void *)(& t));
   int n = __gen_e_acsl_sorted(t,7);
-  /*@ assert n ≡ 1; */
   __e_acsl_assert(n == 1,(char *)"Assertion",(char *)"main",(char *)"n == 1",
                   23);
+  /*@ assert n ≡ 1; */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(t));
   __e_acsl_memory_clean();
@@ -54,6 +54,7 @@ int __gen_e_acsl_sorted(int *t, int n)
 {
   int __gen_e_acsl_at;
   int __retres;
+  __e_acsl_store_block((void *)(& t),(size_t)8);
   {
     int __gen_e_acsl_forall;
     int __gen_e_acsl_i;
@@ -91,7 +92,6 @@ int __gen_e_acsl_sorted(int *t, int n)
     e_acsl_end_loop1: ;
     __gen_e_acsl_at = __gen_e_acsl_forall;
   }
-  __e_acsl_store_block((void *)(& t),(size_t)8);
   __retres = sorted(t,n);
   {
     int __gen_e_acsl_implies;

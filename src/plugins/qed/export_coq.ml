@@ -362,7 +362,8 @@ struct
         begin
           self#declare_signature fmt f (List.map tau_of_var xs) t ;
           let fix = prefix ^ (link_name (self#link f)) in
-          self#declare_axiom fmt fix xs [] (e_eq (e_fun f (List.map e_var xs)) e) ;
+          self#declare_axiom fmt fix xs []
+            (e_eq (e_fun ~result:t f (List.map e_var xs)) e) ;
         end
 
       method declare_axiom fmt lemma xs (_:trigger list list) p =

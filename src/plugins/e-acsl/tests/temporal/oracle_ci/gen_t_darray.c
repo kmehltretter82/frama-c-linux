@@ -3,7 +3,6 @@
 #include "stdlib.h"
 void area_triangle(double (*vertices)[4])
 {
-  /*@ assert rte: mem_access: \valid_read((double *)*(vertices + 0)); */
   {
     int __gen_e_acsl_valid_read;
     __e_acsl_store_block((void *)(& vertices),(size_t)8);
@@ -17,7 +16,7 @@ void area_triangle(double (*vertices)[4])
                     (char *)"rte: mem_access: \\valid_read((double *)*(vertices + 0))",
                     6);
   }
-  /*@ assert rte: mem_access: \valid_read((double *)*(vertices + 1)); */
+  /*@ assert rte: mem_access: \valid_read((double *)*(vertices + 0)); */ ;
   {
     int __gen_e_acsl_valid_read_2;
     __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(*(vertices + 1)),
@@ -29,6 +28,7 @@ void area_triangle(double (*vertices)[4])
                     (char *)"rte: mem_access: \\valid_read((double *)*(vertices + 1))",
                     7);
   }
+  /*@ assert rte: mem_access: \valid_read((double *)*(vertices + 1)); */ ;
   __e_acsl_delete_block((void *)(& vertices));
   return;
 }

@@ -12,15 +12,13 @@
 [eva:alarm] tests/arith/at_on-purely-logic-variables.c:28: Warning: 
   assertion got status unknown.
 [eva:alarm] tests/arith/at_on-purely-logic-variables.c:29: Warning: 
-  assertion got status unknown.
-[eva:alarm] tests/arith/at_on-purely-logic-variables.c:29: Warning: 
   accessing uninitialized left-value.
   assert \initialized(__gen_e_acsl_at_2 + (__gen_e_acsl_j - 2));
 [eva:alarm] tests/arith/at_on-purely-logic-variables.c:29: Warning: 
   function __e_acsl_assert: precondition got status unknown.
 [eva:alarm] tests/arith/at_on-purely-logic-variables.c:29: Warning: 
   function __e_acsl_assert: precondition got status unknown.
-[eva:alarm] tests/arith/at_on-purely-logic-variables.c:31: Warning: 
+[eva:alarm] tests/arith/at_on-purely-logic-variables.c:29: Warning: 
   assertion got status unknown.
 [eva:alarm] tests/arith/at_on-purely-logic-variables.c:33: Warning: 
   accessing uninitialized left-value.
@@ -29,9 +27,9 @@
                ((__gen_e_acsl_u - 9) * 11 + ((__gen_e_acsl_v - -5) - 1)));
 [eva:alarm] tests/arith/at_on-purely-logic-variables.c:34: Warning: 
   function __e_acsl_assert: precondition got status unknown.
-[eva:alarm] tests/arith/at_on-purely-logic-variables.c:37: Warning: 
+[eva:alarm] tests/arith/at_on-purely-logic-variables.c:31: Warning: 
   assertion got status unknown.
-[eva:alarm] tests/arith/at_on-purely-logic-variables.c:41: Warning: 
+[eva:alarm] tests/arith/at_on-purely-logic-variables.c:37: Warning: 
   assertion got status unknown.
 [eva:alarm] tests/arith/at_on-purely-logic-variables.c:41: Warning: 
   accessing uninitialized left-value.
@@ -40,7 +38,7 @@
   function __e_acsl_assert: precondition got status unknown.
 [eva:alarm] tests/arith/at_on-purely-logic-variables.c:41: Warning: 
   function __e_acsl_assert: precondition got status unknown.
-[eva:alarm] tests/arith/at_on-purely-logic-variables.c:43: Warning: 
+[eva:alarm] tests/arith/at_on-purely-logic-variables.c:41: Warning: 
   assertion got status unknown.
 [eva:alarm] tests/arith/at_on-purely-logic-variables.c:44: Warning: 
   accessing uninitialized left-value.
@@ -49,6 +47,8 @@
                ((__gen_e_acsl_u_3 - 9) * 32 + ((__gen_e_acsl_v_3 - -5) - 1)));
 [eva:alarm] tests/arith/at_on-purely-logic-variables.c:45: Warning: 
   function __e_acsl_assert: precondition got status unknown.
+[eva:alarm] tests/arith/at_on-purely-logic-variables.c:43: Warning: 
+  assertion got status unknown.
 [eva:alarm] tests/arith/at_on-purely-logic-variables.c:7: Warning: 
   accessing uninitialized left-value.
   assert \initialized(__gen_e_acsl_at + ((__gen_e_acsl_n - 1) - 1));
@@ -64,15 +64,13 @@
 [eva:alarm] tests/arith/at_on-purely-logic-variables.c:8: Warning: 
   function __gen_e_acsl_f: postcondition got status unknown.
 [eva:alarm] tests/arith/at_on-purely-logic-variables.c:16: Warning: 
-  assertion got status unknown.
-[eva:alarm] tests/arith/at_on-purely-logic-variables.c:16: Warning: 
   accessing uninitialized left-value.
   assert \initialized(__gen_e_acsl_at + (__gen_e_acsl_w - 3));
 [eva:alarm] tests/arith/at_on-purely-logic-variables.c:16: Warning: 
   function __e_acsl_assert: precondition got status unknown.
 [eva:alarm] tests/arith/at_on-purely-logic-variables.c:16: Warning: 
   function __e_acsl_assert: precondition got status unknown.
-[eva:alarm] tests/arith/at_on-purely-logic-variables.c:54: Warning: 
+[eva:alarm] tests/arith/at_on-purely-logic-variables.c:16: Warning: 
   assertion got status unknown.
 [eva:alarm] tests/arith/at_on-purely-logic-variables.c:56: Warning: 
   accessing uninitialized left-value.
@@ -81,6 +79,8 @@
                ((__gen_e_acsl_u_5 - 10) * 300 +
                 (((__gen_e_acsl_v_5 - -10) - 1) * 100 +
                  ((__gen_e_acsl_w - 100) - 1))));
+[eva:alarm] tests/arith/at_on-purely-logic-variables.c:54: Warning: 
+  assertion got status unknown.
 [eva:alarm] tests/arith/at_on-purely-logic-variables.c:63: Warning: 
   assertion got status unknown.
 [eva:alarm] tests/arith/at_on-purely-logic-variables.c:65: Warning: 

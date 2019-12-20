@@ -183,7 +183,7 @@ class prepare_visitor prj = object (self)
          match stmt.skind with
          | Switch(_,sw_blk,_,_) ->
            let new_blk = Cil.mkBlock [ stmt ] in
-           let new_stmt = Cil.mkStmt (Block new_blk) in
+           let new_stmt = Cil.mkStmt ~valid_sid:true (Block new_blk) in
            new_blk.blocals <- sw_blk.blocals;
            sw_blk.blocals <- [];
            new_stmt
@@ -198,7 +198,7 @@ class prepare_visitor prj = object (self)
     | GVarDecl(vi, loc) | GFunDecl(_, vi, loc) | GFun({ svar = vi }, loc)
       when self#is_unvariadic_function vi
         && not (Misc.is_library_loc loc)
-        && not (Cil.is_builtin vi)
+        && not (Misc.is_fc_or_compiler_builtin vi)
       ->
       let kf = Extlib.the self#current_kf in
       let s = Annotations.funspec ~populate:false kf in
@@ -222,6 +222,6 @@ let prepare () =
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)

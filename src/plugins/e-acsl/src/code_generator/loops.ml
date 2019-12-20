@@ -43,78 +43,51 @@ let term_to_exp_ref
 (************************* Loop invariants ********************************)
 (**************************************************************************)
 
-module Loop_invariants_actions = Hook.Make(struct end)
-
-let apply_after_transformation prj =
-  Project.on prj Loop_invariants_actions.apply ()
-
-let mv_invariants env ~old stmt =
-  Options.feedback ~current:true ~level:3
-    "keep loop invariants attached to its loop";
-  match Env.current_kf env with
-  | None -> assert false
-  | Some kf ->
-    let filter _ ca = match ca.annot_content with
-      | AInvariant(_, b, _) -> b
-      | _ -> false
-    in
-    let l = Annotations.code_annot_emitter ~filter stmt in
-    if l != [] then
-      Loop_invariants_actions.extend
-	(fun () ->
-	  List.iter
-	    (fun (ca, e) ->
-	      Annotations.remove_code_annot e ~kf old ca;
-	      Annotations.add_code_annot e ~kf stmt ca)
-	    l)
-
-let preserve_invariant prj env kf stmt = match stmt.skind with
+let preserve_invariant env kf stmt = match stmt.skind with
   | Loop(_, ({ bstmts = stmts } as blk), loc, cont, break) ->
-    let rec handle_invariants (stmts, env, _ as acc) = function
+    let rec handle_invariants (stmts, env as acc) = function
       | [] ->
-	(* empty loop body: no need to verify the invariant twice *)
-	acc
+        (* empty loop body: no need to verify the invariant twice *)
+        acc
       | [ last ] ->
-	let invariants, env = Env.pop_loop env in
-	let env = Env.push env in
-	let env =
-    let translate_named_predicate = !translate_named_predicate_ref in
-	  Project.on
-	    prj
-	    (List.fold_left (translate_named_predicate kf) env)
-	    invariants
-	in
-	let blk, env =
-	  Env.pop_and_get env last ~global_clear:false Env.Before
-	in
-	Misc.mk_block prj last blk :: stmts, env, invariants != []
-      | s :: tl -> handle_invariants (s :: stmts, env, false) tl
+        let invariants, env = Env.pop_loop env in
+        let env = Env.push env in
+        let env =
+          let translate_named_predicate = !translate_named_predicate_ref in
+          List.fold_left (translate_named_predicate kf) env invariants
+        in
+        let blk, env =
+          Env.pop_and_get env last ~global_clear:false Env.Before
+        in
+        Constructor.mk_block last blk :: stmts, env
+      | s :: tl ->
+        handle_invariants (s :: stmts, env) tl
     in
-    let env = Env.set_annotation_kind env Misc.Invariant in
-    let stmts, env, has_loop = handle_invariants ([], env, false) stmts in
+    let env = Env.set_annotation_kind env Constructor.Invariant in
+    let stmts, env = handle_invariants ([], env) stmts in
     let new_blk = { blk with bstmts = List.rev stmts } in
     { stmt with skind = Loop([], new_blk, loc, cont, break) },
-    env,
-    has_loop
-  | _ -> stmt, env, false
+    env
+  | _ ->
+    stmt, env
 
 (**************************************************************************)
 (**************************** Nested loops ********************************)
 (**************************************************************************)
 
 (* It could happen that the bounds provided for a quantifier [lv] are bigger
-  than its type. [bounds_for_small_type] handles such cases
-  and provides smaller bounds whenever possible.
-  Let B be the inferred interval and R the range of [lv.typ]
-  - Case 1: B \subseteq R
-    Example: [\forall unsigned char c; 4 <= c <= 100 ==> 0 <= c <= 255]
-    Return: B
-  - Case 2: B \not\subseteq R and the bounds of B are inferred exactly
-    Example: [\forall unsigned char c; 4 <= c <= 300 ==> 0 <= c <= 255]
-    Return: B \intersect R
-  - Case 3: B \not\subseteq R and the bounds of B are NOT inferred exactly
-    Example: [\let m = n > 0 ? 4 : 341; \forall char u; 1 < u < m ==> u > 0]
-    Return: R with a guard guaranteeing that [lv] does not overflow *)
+   than its type. [bounds_for_small_type] handles such cases
+   and provides smaller bounds whenever possible.
+   Let B be the inferred interval and R the range of [lv.typ]
+   - Case 1: B \subseteq R
+     Example: [\forall unsigned char c; 4 <= c <= 100 ==> 0 <= c <= 255]
+     Return: B
+   - Case 2: B \not\subseteq R and the bounds of B are inferred exactly
+     Example: [\forall unsigned char c; 4 <= c <= 300 ==> 0 <= c <= 255]
+     Return: B \intersect R
+   - Case 3: B \not\subseteq R and the bounds of B are NOT inferred exactly
+     Example: [\let m = n > 0 ? 4 : 341; \forall char u; 1 < u < m ==> u > 0]
+     Return: R with a guard guaranteeing that [lv] does not overflow *)
 let bounds_for_small_type ~loc (t1, lv, t2) =
   match lv.lv_type with
   | Ltype _ | Lvar _ | Lreal | Larrow _ ->
@@ -181,9 +154,9 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
       let res = Logic_const.term ~loc (TBinOp(PlusA, t, tone)) Linteger in
       Extlib.may
         (fun ty ->
-          Typing.unsafe_set tone ~ctx:ty ctx;
-          Typing.unsafe_set t ~ctx:ty ctx;
-          Typing.unsafe_set res ty)
+           Typing.unsafe_set tone ~ctx:ty ctx;
+           Typing.unsafe_set t ~ctx:ty ctx;
+           Typing.unsafe_set res ty)
         ty;
       res
     in
@@ -196,14 +169,14 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
         t1
       | Rgt | Rge | Req | Rneq ->
         assert false
-      in
+    in
     let t2_one, bop2 = match rel2 with
       | Rlt ->
         t2, Lt
       | Rle ->
         (* we increment the loop counter one more time (at the end of the
-          loop). Thus to prevent overflow, check the type of [t2+1]
-          instead of [t2]. *)
+           loop). Thus to prevent overflow, check the type of [t2+1]
+           instead of [t2]. *)
         t_plus_one t2, Le
       | Rgt | Rge | Req | Rneq ->
         assert false
@@ -219,11 +192,11 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
       with Typing.Not_a_number -> assert false
     in
     (* loop counter corresponding to the quantified variable *)
-    let var_x, x, env = Env.Logic_binding.add ~ty env logic_x in
+    let var_x, x, env = Env.Logic_binding.add ~ty env kf logic_x in
     let lv_x = var var_x in
     let env = match ctx_one with
       | Typing.C_integer _ -> env
-      | Typing.Gmpz -> Env.add_stmt env (Gmp.init ~loc x)
+      | Typing.Gmpz -> Env.add_stmt env kf (Gmp.init ~loc x)
       | Typing.(C_float _ | Rational | Real | Nan) -> assert false
     in
     (* build the inner loops and loop body *)
@@ -233,10 +206,10 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     (* initialize the loop counter to [t1] *)
     let e1, env = term_to_exp kf (Env.push env) t1 in
     let init_blk, env = Env.pop_and_get
-      env
-      (Gmp.affect ~loc:e1.eloc lv_x x e1)
-      ~global_clear:false
-      Env.Middle
+        env
+        (Gmp.affect ~loc:e1.eloc lv_x x e1)
+        ~global_clear:false
+        Env.Middle
     in
     (* generate the guard [x bop t2] *)
     let block_to_stmt b = mkStmt ~valid_sid:true (Block b) in
@@ -250,16 +223,16 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     let guard_exp, env = term_to_exp kf (Env.push env) guard in
     let break_stmt = mkStmt ~valid_sid:true (Break guard_exp.eloc) in
     let guard_blk, env = Env.pop_and_get
-      env
-      (mkStmt
-        ~valid_sid:true
-        (If(
-          guard_exp,
-          mkBlock [ mkEmptyStmt ~loc () ],
-          mkBlock [ break_stmt ],
-          guard_exp.eloc)))
-      ~global_clear:false
-      Env.Middle
+        env
+        (mkStmt
+           ~valid_sid:true
+           (If(
+               guard_exp,
+               mkBlock [ mkEmptyStmt ~loc () ],
+               mkBlock [ break_stmt ],
+               guard_exp.eloc)))
+        ~global_clear:false
+        Env.Middle
     in
     let guard = block_to_stmt guard_blk in
     (* increment the loop counter [x++];
@@ -267,10 +240,10 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     let tlv_one = t_plus_one ~ty:ctx_one tlv in
     let incr, env = term_to_exp kf (Env.push env) tlv_one in
     let next_blk, env = Env.pop_and_get
-      env
-      (Gmp.affect ~loc:incr.eloc lv_x x incr)
-      ~global_clear:false
-      Env.Middle
+        env
+        (Gmp.affect ~loc:incr.eloc lv_x x incr)
+        ~global_clear:false
+        Env.Middle
     in
     (* generate the whole loop *)
     let next = block_to_stmt next_blk in
@@ -280,7 +253,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
       | Some p ->
         let e, env = !named_predicate_ref kf (Env.push env) p in
         let stmt, env =
-          Misc.mk_e_acsl_guard ~reverse:true Misc.RTE kf e p, env
+          Constructor.mk_runtime_check ~reverse:true Constructor.RTE kf e p, env
         in
         let b, env = Env.pop_and_get env stmt ~global_clear:false Env.After in
         let guard_for_small_type = Cil.mkStmt ~valid_sid:true (Block b) in
@@ -288,20 +261,20 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     in
     let start = block_to_stmt init_blk in
     let stmt = mkStmt
-      ~valid_sid:true
-      (Loop(
-        [],
-        mkBlock stmts,
-        loc,
-        None,
-        Some break_stmt))
+        ~valid_sid:true
+        (Loop(
+            [],
+            mkBlock stmts,
+            loc,
+            None,
+            Some break_stmt))
     in
     (* remove logic binding before returning *)
     Env.Logic_binding.remove env logic_x;
     [ start ;  stmt ], env
   | Lscope.Lvs_let(lv, t) :: lscope_vars' ->
     let ty = Typing.get_typ t in
-    let vi_of_lv, exp_of_lv, env = Env.Logic_binding.add ~ty env lv in
+    let vi_of_lv, exp_of_lv, env = Env.Logic_binding.add ~ty env kf lv in
     let e, env = term_to_exp kf env t in
     let ty = Cil.typeOf e in
     let init_set =

@@ -6,76 +6,76 @@ int main(int argc, char **argv)
   int __retres;
   __e_acsl_memory_init(& argc,& argv,(size_t)8);
   char *a = malloc((unsigned long)7);
-  /*@ assert __e_acsl_heap_allocation_size ≡ 7; */
   __e_acsl_assert(__e_acsl_heap_allocation_size == 7UL,(char *)"Assertion",
                   (char *)"main",
                   (char *)"__e_acsl_heap_allocation_size == 7",14);
+  /*@ assert __e_acsl_heap_allocation_size ≡ 7; */ ;
   char *b = malloc((unsigned long)14);
-  /*@ assert __e_acsl_heap_allocation_size ≡ 21; */
   __e_acsl_assert(__e_acsl_heap_allocation_size == 21UL,(char *)"Assertion",
                   (char *)"main",
                   (char *)"__e_acsl_heap_allocation_size == 21",16);
+  /*@ assert __e_acsl_heap_allocation_size ≡ 21; */ ;
   free((void *)a);
-  /*@ assert __e_acsl_heap_allocation_size ≡ 14; */
   __e_acsl_assert(__e_acsl_heap_allocation_size == 14UL,(char *)"Assertion",
                   (char *)"main",
                   (char *)"__e_acsl_heap_allocation_size == 14",20);
+  /*@ assert __e_acsl_heap_allocation_size ≡ 14; */ ;
   a = (char *)0;
   free((void *)a);
-  /*@ assert __e_acsl_heap_allocation_size ≡ 14; */
   __e_acsl_assert(__e_acsl_heap_allocation_size == 14UL,(char *)"Assertion",
                   (char *)"main",
                   (char *)"__e_acsl_heap_allocation_size == 14",25);
+  /*@ assert __e_acsl_heap_allocation_size ≡ 14; */ ;
   b = (char *)realloc((void *)b,(unsigned long)9);
-  /*@ assert __e_acsl_heap_allocation_size ≡ 9; */
   __e_acsl_assert(__e_acsl_heap_allocation_size == 9UL,(char *)"Assertion",
                   (char *)"main",
                   (char *)"__e_acsl_heap_allocation_size == 9",29);
+  /*@ assert __e_acsl_heap_allocation_size ≡ 9; */ ;
   b = (char *)realloc((void *)b,(unsigned long)18);
-  /*@ assert __e_acsl_heap_allocation_size ≡ 18; */
   __e_acsl_assert(__e_acsl_heap_allocation_size == 18UL,(char *)"Assertion",
                   (char *)"main",
                   (char *)"__e_acsl_heap_allocation_size == 18",33);
+  /*@ assert __e_acsl_heap_allocation_size ≡ 18; */ ;
   b = (char *)realloc((void *)b,(unsigned long)0);
   b = (char *)0;
-  /*@ assert __e_acsl_heap_allocation_size ≡ 0; */
   __e_acsl_assert(__e_acsl_heap_allocation_size == 0UL,(char *)"Assertion",
                   (char *)"main",
                   (char *)"__e_acsl_heap_allocation_size == 0",38);
+  /*@ assert __e_acsl_heap_allocation_size ≡ 0; */ ;
   b = (char *)realloc((void *)b,(unsigned long)8);
-  /*@ assert __e_acsl_heap_allocation_size ≡ 8; */
   __e_acsl_assert(__e_acsl_heap_allocation_size == 8UL,(char *)"Assertion",
                   (char *)"main",
                   (char *)"__e_acsl_heap_allocation_size == 8",42);
+  /*@ assert __e_acsl_heap_allocation_size ≡ 8; */ ;
   b = (char *)realloc((void *)0,(unsigned long)8);
-  /*@ assert __e_acsl_heap_allocation_size ≡ 16; */
   __e_acsl_assert(__e_acsl_heap_allocation_size == 16UL,(char *)"Assertion",
                   (char *)"main",
                   (char *)"__e_acsl_heap_allocation_size == 16",46);
+  /*@ assert __e_acsl_heap_allocation_size ≡ 16; */ ;
   b = (char *)realloc((void *)0,18446744073709551615UL);
-  /*@ assert __e_acsl_heap_allocation_size ≡ 16; */
   __e_acsl_assert(__e_acsl_heap_allocation_size == 16UL,(char *)"Assertion",
                   (char *)"main",
                   (char *)"__e_acsl_heap_allocation_size == 16",50);
-  /*@ assert b ≡ (char *)((void *)0); */
+  /*@ assert __e_acsl_heap_allocation_size ≡ 16; */ ;
   __e_acsl_assert(b == (char *)0,(char *)"Assertion",(char *)"main",
                   (char *)"b == (char *)((void *)0)",51);
+  /*@ assert b ≡ (char *)((void *)0); */ ;
   b = (char *)calloc(18446744073709551615UL,18446744073709551615UL);
-  /*@ assert __e_acsl_heap_allocation_size ≡ 16; */
   __e_acsl_assert(__e_acsl_heap_allocation_size == 16UL,(char *)"Assertion",
                   (char *)"main",
                   (char *)"__e_acsl_heap_allocation_size == 16",55);
-  /*@ assert b ≡ (char *)((void *)0); */
+  /*@ assert __e_acsl_heap_allocation_size ≡ 16; */ ;
   __e_acsl_assert(b == (char *)0,(char *)"Assertion",(char *)"main",
                   (char *)"b == (char *)((void *)0)",56);
+  /*@ assert b ≡ (char *)((void *)0); */ ;
   b = (char *)malloc(18446744073709551615UL);
-  /*@ assert __e_acsl_heap_allocation_size ≡ 16; */
   __e_acsl_assert(__e_acsl_heap_allocation_size == 16UL,(char *)"Assertion",
                   (char *)"main",
                   (char *)"__e_acsl_heap_allocation_size == 16",60);
-  /*@ assert b ≡ (char *)((void *)0); */
+  /*@ assert __e_acsl_heap_allocation_size ≡ 16; */ ;
   __e_acsl_assert(b == (char *)0,(char *)"Assertion",(char *)"main",
                   (char *)"b == (char *)((void *)0)",61);
+  /*@ assert b ≡ (char *)((void *)0); */ ;
   __retres = 0;
   __e_acsl_memory_clean();
   return __retres;

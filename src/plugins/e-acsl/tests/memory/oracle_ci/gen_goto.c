@@ -26,13 +26,13 @@ int main(void)
           b = & a;
         }
   if (a) goto _LOR;
-  /*@ assert \initialized(b); */
   {
     int __gen_e_acsl_initialized;
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)b,sizeof(char));
     __e_acsl_assert(__gen_e_acsl_initialized,(char *)"Assertion",
                     (char *)"main",(char *)"\\initialized(b)",15);
   }
+  /*@ assert \initialized(b); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(& a));
   __e_acsl_delete_block((void *)(& b));

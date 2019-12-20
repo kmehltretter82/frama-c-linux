@@ -36,8 +36,13 @@ let datatype = "MemZeroAlias"
 
 let configure () =
   begin
-    Context.set Lang.pointer (fun _typ -> Logic.Int) ;
-    Context.set Cvalues.null F.(p_equal e_zero) ;
+    let orig_pointer = Context.push Lang.pointer (fun _typ -> Logic.Int) in
+    let orig_null    = Context.push Cvalues.null (p_equal e_zero) in
+    let rollback () =
+      Context.pop Lang.pointer orig_pointer ;
+      Context.pop Cvalues.null orig_null ;
+    in
+    rollback
   end
 let no_binder = { bind = fun _ f v -> f v }
 let configure_ia _ = no_binder

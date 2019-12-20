@@ -38,7 +38,6 @@ int main(void)
     read_sensor_4((unsigned int *)(buf) + i);
     i ++;
   }
-  /*@ assert \initialized((union msg *)((unsigned char *)buf)); */
   {
     int __gen_e_acsl_initialized;
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(buf),
@@ -48,6 +47,7 @@ int main(void)
                     (char *)"\\initialized((union msg *)((unsigned char *)buf))",
                     23);
   }
+  /*@ assert \initialized((union msg *)((unsigned char *)buf)); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(buf));
   __e_acsl_memory_clean();

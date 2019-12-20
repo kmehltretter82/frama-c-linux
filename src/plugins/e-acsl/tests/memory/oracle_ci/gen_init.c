@@ -27,23 +27,23 @@ int main(void)
   int *q = & b;
   __e_acsl_store_block((void *)(& q),(size_t)8);
   __e_acsl_full_init((void *)(& q));
-  /*@ assert \initialized(&b); */
   __e_acsl_assert(1,(char *)"Assertion",(char *)"main",
                   (char *)"\\initialized(&b)",9);
-  /*@ assert \initialized(q); */
+  /*@ assert \initialized(&b); */ ;
   {
     int __gen_e_acsl_initialized;
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)q,sizeof(int));
     __e_acsl_assert(__gen_e_acsl_initialized,(char *)"Assertion",
                     (char *)"main",(char *)"\\initialized(q)",10);
   }
-  /*@ assert \initialized(p); */
+  /*@ assert \initialized(q); */ ;
   {
     int __gen_e_acsl_initialized_2;
     __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)p,sizeof(int));
     __e_acsl_assert(__gen_e_acsl_initialized_2,(char *)"Assertion",
                     (char *)"main",(char *)"\\initialized(p)",11);
   }
+  /*@ assert \initialized(p); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(& b));
   __e_acsl_delete_block((void *)(& a));

@@ -20,20 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let check () =
-  Visitor.visitFramacFileSameGlobals (Visit.do_visit false) (Ast.get ());
-  let t = Error.nb_untypable () in
-  let n = Error.nb_not_yet () in
-  let print msg n =
-    Options.result "@[%d annotation%s %s ignored,@ being %s.@]"
-      n
-      (if n > 1 then "s" else "")
-      (if n > 1 then "were" else "was")
-      msg
-  in
-  print "untypable" t;
-  print "unsupported" n;
-  n + t = 0
+let check () = assert false (* [TODO ARCHI] kill check *)
 
 let check =
   Dynamic.register
@@ -74,8 +61,8 @@ let unmemoized_extend_ast () =
   if Ast.is_computed () then begin
     (* do not modify the existing project: work on a copy.
        Must also extend the current AST with the E-ACSL's library files. *)
-    Options.feedback ~level:2 "AST already computed: \
-E-ACSL is going to work on a copy.";
+    Options.feedback ~level:2
+      "AST already computed: E-ACSL is going to work on a copy.";
     let name = Project.get_name (Project.current ()) in
     let tmpfile =
       Extlib.temp_file_cleanup_at_exit ("e_acsl_" ^ name) ".i" in
@@ -95,8 +82,8 @@ E-ACSL is going to work on a copy.";
     in
     Project.on prj
       (fun () ->
-        Kernel.Files.set [ tmpfile ];
-        extend ())
+         Kernel.Files.set [ tmpfile ];
+         extend ())
       ();
     Some prj
   end else begin
@@ -109,8 +96,8 @@ let extend_ast () = match !extended_ast_project with
     let prj = unmemoized_extend_ast () in
     extended_ast_project := Already_extended prj;
     (match prj with
-    | None -> Project.current ()
-    | Some prj -> prj)
+     | None -> Project.current ()
+     | Some prj -> prj)
   | Already_extended None ->
     Project.current ()
   | Already_extended(Some prj) ->
@@ -120,12 +107,12 @@ let apply_on_e_acsl_ast f x =
   let tmp_prj = extend_ast () in
   let res = Project.on tmp_prj f x in
   (match !extended_ast_project with
-  | To_be_extended -> assert false
-  | Already_extended None -> ()
-  | Already_extended (Some prj) ->
-    assert (Project.equal prj tmp_prj);
-    extended_ast_project := To_be_extended;
-    if Options.Debug.get () = 0 then Project.remove ~project:tmp_prj ());
+   | To_be_extended -> assert false
+   | Already_extended None -> ()
+   | Already_extended (Some prj) ->
+     assert (Project.equal prj tmp_prj);
+     extended_ast_project := To_be_extended;
+     if Options.Debug.get () = 0 then Project.remove ~project:tmp_prj ());
   res
 
 module Resulting_projects =
@@ -136,7 +123,7 @@ module Resulting_projects =
       let name = "E-ACSL resulting projects"
       let size = 7
       let dependencies = Ast.self :: Options.parameter_states
-     end)
+    end)
 
 let () =
   State_dependency_graph.add_dependencies
@@ -152,38 +139,32 @@ let generate_code =
             Temporal.enable (Options.Temporal_validity.get ());
             let prepared_prj = Prepare_ast.prepare () in
             let res =
-              Project.on prepared_prj
+              Project.on
+                prepared_prj
                 (fun () ->
                    let dup_prj = Dup_functions.dup () in
-                   let res =
-                     Project.on
-                       dup_prj
-                       (fun () ->
-                          Gmp_types.init ();
-                          Mmodel_analysis.reset ();
-                          let visit prj = Visit.do_visit ~prj true in
-                          let prj =
-                            File.create_project_from_visitor name visit
-                          in
-                          Loops.apply_after_transformation prj;
-                          (* remove the RTE's results computed from E-ACSL:
-                             their are partial and associated with the wrong
-                             kernel function (the one of the old project). *)
-                          let selection =
-                            State_selection.with_dependencies !Db.RteGen.self
-                          in
-                          Project.clear ~selection ~project:prj ();
-                          Resulting_projects.mark_as_computed ();
-                          let selection =
-                            State_selection.singleton Kernel.Files.self
-                          in
-                          Project.copy ~selection prj;
-                          prj)
-                       ()
+                   let copied_prj =
+                     Project.create_by_copy name ~last:true ~src:dup_prj
                    in
+                   Project.on
+                     copied_prj
+                     (fun () ->
+                        Gmp_types.init ();
+                        Mmodel_analysis.reset ();
+                        Injector.inject ();
+                        (* remove the RTE's results computed from E-ACSL:
+                           they are partial and associated with the wrong
+                           kernel function (the one of the old project). *)
+                        (* [TODO ARCHI] what if RTE was already computed? *)
+                        let selection =
+                          State_selection.with_dependencies !Db.RteGen.self
+                        in
+                        Project.clear ~selection ~project:copied_prj ();
+                        Resulting_projects.mark_as_computed ())
+                     ();
                    if Options.Debug.get () = 0 then
                      Project.remove ~project:dup_prj ();
-                   res)
+                   copied_prj)
                 ()
             in
             if Options.Debug.get () = 0 then begin
@@ -257,12 +238,12 @@ let main () =
     change_printer ();
     ignore (generate_code (Options.Project_name.get ()))
   end else
-    if Options.Check.get () then
-      apply_on_e_acsl_ast
-        (fun () ->
-          Gmp_types.init ();
-          ignore (check ()))
-        ()
+  if Options.Check.get () then
+    apply_on_e_acsl_ast
+      (fun () ->
+         Gmp_types.init ();
+         ignore (check ()))
+      ()
 
 let () = Db.Main.extend main
 

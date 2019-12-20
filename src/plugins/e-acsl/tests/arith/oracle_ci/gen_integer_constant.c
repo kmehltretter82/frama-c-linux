@@ -6,19 +6,15 @@ int main(void)
   int __retres;
   int x;
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
-  /*@ assert 0 ≡ 0; */
   __e_acsl_assert(1,(char *)"Assertion",(char *)"main",(char *)"0 == 0",6);
+  /*@ assert 0 ≡ 0; */ ;
   x = 0;
   x ++;
-  /*@ assert 0 ≢ 1; */
   __e_acsl_assert(1,(char *)"Assertion",(char *)"main",(char *)"0 != 1",8);
-  /*@ assert 1152921504606846975 ≡ 0xfffffffffffffff; */
+  /*@ assert 0 ≢ 1; */ ;
   __e_acsl_assert(1,(char *)"Assertion",(char *)"main",
                   (char *)"1152921504606846975 == 0xfffffffffffffff",9);
-  /*@ assert
-      0xffffffffffffffffffffffffffffffff ≡
-      0xffffffffffffffffffffffffffffffff;
-  */
+  /*@ assert 1152921504606846975 ≡ 0xfffffffffffffff; */ ;
   {
     __e_acsl_mpz_t __gen_e_acsl_;
     int __gen_e_acsl_eq;
@@ -31,6 +27,11 @@ int main(void)
                     11);
     __gmpz_clear(__gen_e_acsl_);
   }
+  /*@
+  assert
+  0xffffffffffffffffffffffffffffffff ≡ 0xffffffffffffffffffffffffffffffff;
+   */
+  ;
   __retres = 0;
   return __retres;
 }

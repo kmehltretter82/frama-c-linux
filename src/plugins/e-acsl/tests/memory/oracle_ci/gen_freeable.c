@@ -20,7 +20,6 @@ int main(void)
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   __e_acsl_globals_init();
   __e_acsl_store_block((void *)(& p),(size_t)8);
-  /*@ assert ¬\freeable(p); */
   {
     int __gen_e_acsl_freeable;
     /*@ assert Eva: initialization: \initialized(&p); */
@@ -28,51 +27,52 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_freeable,(char *)"Assertion",
                     (char *)"main",(char *)"!\\freeable(p)",14);
   }
-  /*@ assert ¬\freeable((void *)0); */
+  /*@ assert ¬\freeable(p); */ ;
   {
     int __gen_e_acsl_freeable_2;
     __gen_e_acsl_freeable_2 = __e_acsl_freeable((void *)0);
     __e_acsl_assert(! __gen_e_acsl_freeable_2,(char *)"Assertion",
                     (char *)"main",(char *)"!\\freeable((void *)0)",15);
   }
+  /*@ assert ¬\freeable((void *)0); */ ;
   __e_acsl_full_init((void *)(& p));
   p = (int *)malloc((unsigned long)4 * sizeof(int));
-  /*@ assert ¬\freeable(p + 1); */
   {
     int __gen_e_acsl_freeable_3;
     __gen_e_acsl_freeable_3 = __e_acsl_freeable((void *)(p + 1));
     __e_acsl_assert(! __gen_e_acsl_freeable_3,(char *)"Assertion",
                     (char *)"main",(char *)"!\\freeable(p + 1)",17);
   }
-  /*@ assert \freeable(p); */
+  /*@ assert ¬\freeable(p + 1); */ ;
   {
     int __gen_e_acsl_freeable_4;
     __gen_e_acsl_freeable_4 = __e_acsl_freeable((void *)p);
     __e_acsl_assert(__gen_e_acsl_freeable_4,(char *)"Assertion",
                     (char *)"main",(char *)"\\freeable(p)",18);
   }
+  /*@ assert \freeable(p); */ ;
   free((void *)p);
-  /*@ assert ¬\freeable(p); */
   {
     int __gen_e_acsl_freeable_5;
     __gen_e_acsl_freeable_5 = __e_acsl_freeable((void *)p);
     __e_acsl_assert(! __gen_e_acsl_freeable_5,(char *)"Assertion",
                     (char *)"main",(char *)"!\\freeable(p)",20);
   }
-  /*@ assert ¬\freeable((char *)array); */
+  /*@ assert ¬\freeable(p); */ ;
   {
     int __gen_e_acsl_freeable_6;
     __gen_e_acsl_freeable_6 = __e_acsl_freeable((void *)(array));
     __e_acsl_assert(! __gen_e_acsl_freeable_6,(char *)"Assertion",
                     (char *)"main",(char *)"!\\freeable((char *)array)",23);
   }
-  /*@ assert ¬\freeable(&array[5]); */
+  /*@ assert ¬\freeable((char *)array); */ ;
   {
     int __gen_e_acsl_freeable_7;
     __gen_e_acsl_freeable_7 = __e_acsl_freeable((void *)(& array[5]));
     __e_acsl_assert(! __gen_e_acsl_freeable_7,(char *)"Assertion",
                     (char *)"main",(char *)"!\\freeable(&array[5])",24);
   }
+  /*@ assert ¬\freeable(&array[5]); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(array));
   __e_acsl_delete_block((void *)(& p));

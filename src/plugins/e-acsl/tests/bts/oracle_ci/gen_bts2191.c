@@ -36,7 +36,6 @@ int main(int argc, char **argv)
   int __retres;
   __e_acsl_memory_init(& argc,& argv,(size_t)8);
   __e_acsl_globals_init();
-  /*@ assert \valid_read(_G[0].str); */
   {
     int __gen_e_acsl_initialized;
     int __gen_e_acsl_and;
@@ -54,6 +53,7 @@ int main(int argc, char **argv)
     __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid_read(_G[0].str)",22);
   }
+  /*@ assert \valid_read(_G[0].str); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(_G));
   __e_acsl_memory_clean();

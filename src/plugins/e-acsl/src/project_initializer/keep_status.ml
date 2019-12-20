@@ -52,32 +52,32 @@ type kind =
 let pretty_kind fmt k =
   Format.fprintf fmt "%s"
     (match k with
-    | K_Assert -> "assert"
-    | K_Invariant -> "invariant"
-    | K_Variant -> "variant"
-    | K_StmtSpec -> "stmtspec"
-    | K_Allocation -> "allocation"
-    | K_Assigns -> "assigns"
-    | K_Decreases -> "decreases"
-    | K_Terminates -> "terminates"
-    | K_Complete -> "complete"
-    | K_Disjoint -> "disjoint"
-    | K_Requires -> "requires"
-    | K_Ensures -> "ensures")
+     | K_Assert -> "assert"
+     | K_Invariant -> "invariant"
+     | K_Variant -> "variant"
+     | K_StmtSpec -> "stmtspec"
+     | K_Allocation -> "allocation"
+     | K_Assigns -> "assigns"
+     | K_Decreases -> "decreases"
+     | K_Terminates -> "terminates"
+     | K_Complete -> "complete"
+     | K_Disjoint -> "disjoint"
+     | K_Requires -> "requires"
+     | K_Ensures -> "ensures")
 
 (* information attached to every kernel_function containing an annotation *)
 type kf_info =
-    { mutable cpt: int; (* counter building the relationship between [push] and
-                           [must_translate *)
-      mutable statuses: (kind * bool) Datatype.Int.Map.t
-        (* map associating a property as an integer to its kind and status
-           ([true] = proved) *) }
+  { mutable cpt: int
+  (* counter building the relationship between [push] and [must_translate] *);
+    mutable statuses: (kind * bool) Datatype.Int.Map.t
+    (* map associating a property as an integer to its kind and status
+       ([true] = proved) *) }
 
 (* statuses for each function represented by its name (because the [kf] itself
    changes from a project to another). *)
 let keep_status
-    : kf_info Datatype.String.Hashtbl.t
-    = Datatype.String.Hashtbl.create 17
+  : kf_info Datatype.String.Hashtbl.t
+  = Datatype.String.Hashtbl.create 17
 
 (* will contain the value of a few options from the original project
    in order to safely use them from the final project. *)
@@ -90,9 +90,9 @@ let clear () =
   option_check := Options.Check.get ()
 
 let push kf kind ppt =
-(*  Options.feedback "PUSHING %a for %a"
-    pretty_kind kind
-    Kernel_function.pretty kf;*)
+  (*  Options.feedback "PUSHING %a for %a"
+      pretty_kind kind
+      Kernel_function.pretty kf;*)
   (* no registration when -e-acsl-check or -e-acsl-valid *)
   if not (!option_check || !option_valid) then
     let keep =
@@ -120,18 +120,18 @@ let before_translation () =
   Datatype.String.Hashtbl.iter (fun _ info -> info.cpt <- 0) keep_status
 
 let must_translate kf kind =
-(*  Options.feedback "GETTING %a for %a"
-    pretty_kind kind
-    Kernel_function.pretty kf;*)
+  (*  Options.feedback "GETTING %a for %a"
+      pretty_kind kind
+      Kernel_function.pretty kf;*)
   !option_check
   ||
-    !option_valid
+  !option_valid
   ||
-    (* function contracts have been moved from the original function to its
-       duplicate by [Dup_function] but they are still associated to the original
-       function here *)
-    let name = Functions.RTL.get_original_name kf in
-    try
+  (* function contracts have been moved from the original function to its
+     duplicate by [Dup_function] but they are still associated to the original
+     function here *)
+  let name = Functions.RTL.get_original_name kf in
+  try
     let info =
       try Datatype.String.Hashtbl.find keep_status name
       with Not_found ->
@@ -141,12 +141,22 @@ let must_translate kf kind =
     let kind', keep =
       try Datatype.Int.Map.find info.cpt info.statuses
       with Not_found ->
-        Options.fatal "[keep_status] unbound annotation (id %d)" info.cpt
+        Options.fatal "[keep_status] unbound annotation (id %d)@ in function %a"
+          info.cpt
+          Kernel_function.pretty kf
     in
     (* check kind consistency in order to detect more abnormal behaviors *)
     if kind <> kind' then
-      Options.fatal "[keep_status] incorrect kind '%a' (expected: '%a')"
+      Options.fatal
+        "[keep_status] incorrect kind '%a' (expected: '%a')@ in function %a"
         pretty_kind kind
-        pretty_kind kind';
+        pretty_kind kind'
+        Kernel_function.pretty kf;
     keep
-    with Not_found -> true
+  with Not_found -> true
+
+(*
+Local Variables:
+compile-command: "make -C ../../../../.."
+End:
+*)

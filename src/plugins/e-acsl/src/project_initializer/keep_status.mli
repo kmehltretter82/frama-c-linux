@@ -44,7 +44,7 @@ val push: Kernel_function.t -> kind -> Property.t -> unit
 (** store the given property of the given kind for the given function *)
 
 val before_translation: unit -> unit
-(** to be called just before the main translation *)
+(** to be called just before injecting the code *)
 
 val must_translate: Kernel_function.t -> kind -> bool
 (** To be called just before transforming a property of the given kind for the
@@ -52,3 +52,9 @@ val must_translate: Kernel_function.t -> kind -> bool
     VERY IMPORTANT: the property of the n-th call to this function exactly
     correspond to the n-th pushed property (see {!push}).
     @return true if and only if the translation must occur. *)
+
+(*
+Local Variables:
+compile-command: "make -C ../.."
+End:
+*)

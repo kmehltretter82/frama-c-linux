@@ -181,7 +181,7 @@ module Libc = struct
       | FLongDouble -> "E" (* [long double] *)
     in
     (* get a character representing a pointer type *)
-    let get_pkind_str ty = match ty with
+    let get_pkind_str a ty = match ty with
       | TInt(IChar,_) | TInt(ISChar,_) -> "s" (* [char*] *)
       | TInt(IUChar,_) -> "S" (* [unsigned char*] *)
       | TInt(IShort,_) -> "q" (* [short*] *)
@@ -194,18 +194,19 @@ module Libc = struct
       | TInt(IULongLong,_) -> "W" (* [unsigned long int*] *)
       | TVoid _ -> "p" (* [void*] *)
       | _ ->
-        Options.fatal "Unexpected argument type in printf: %a @."
+        Options.fatal "unexpected argument type in printf: type %a of arg %a@."
           Printer.pp_typ ty
+          Printer.pp_exp a
     in
     let exps = drop (printf_fmt_position fn) args in
     let param_str =
       List.fold_right
         (fun exp acc -> match Cil.unrollType (Cil.typeOf exp) with
-        | TInt(k, _) -> get_ikind_str k ^ acc
-        | TFloat(k, _) -> get_fkind_str k ^ acc
-        | TPtr(ty, _) -> get_pkind_str (Cil.unrollType ty) ^ acc
-        | TVoid _ | TArray _ | TFun _ | TNamed _ | TComp _ | TEnum _
-        | TBuiltin_va_list _ -> assert false)
+           | TInt(k, _) -> get_ikind_str k ^ acc
+           | TFloat(k, _) -> get_fkind_str k ^ acc
+           | TPtr(ty, _) -> get_pkind_str exp (Cil.unrollType ty) ^ acc
+           | TVoid _ | TArray _ | TFun _ | TNamed _ | TComp _ | TEnum _
+           | TBuiltin_va_list _ -> assert false)
         exps
         ""
     in
@@ -219,13 +220,13 @@ let check kf =
   Options.Functions.is_empty ()
   || Options.Functions.mem kf
   ||
-    (* also check if [kf] is a duplicate of a monitored function *)
-    let s = RTL.get_original_name kf in
-    try
-      let gen_kf = Globals.Functions.find_by_name s in
-      Options.Functions.mem gen_kf
-    with Not_found ->
-      false
+  (* also check if [kf] is a duplicate of a monitored function *)
+  let s = RTL.get_original_name kf in
+  try
+    let gen_kf = Globals.Functions.find_by_name s in
+    Options.Functions.mem gen_kf
+  with Not_found ->
+    false
 
 let instrument kf =
   (* [kf] is monitored iff all functions must be monitored or [kf] belongs to
@@ -244,3 +245,9 @@ let instrument kf =
       Options.Instrument.mem gen_kf
     with Not_found ->
       false))
+
+(*
+Local Variables:
+compile-command: "make -C ../../../../.."
+End:
+*)

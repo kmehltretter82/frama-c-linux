@@ -15,18 +15,6 @@
 [e-acsl] Warning: annotating undefined function `waitpid':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
-[kernel:annot:missing-spec] FRAMAC_SHARE/libc/stdio.h:207: Warning: 
-  Neither code nor specification for function fprintf, generating default assigns from the prototype
-[kernel:annot:missing-spec] FRAMAC_SHARE/libc/stdio.h:211: Warning: 
-  Neither code nor specification for function printf, generating default assigns from the prototype
-[kernel:annot:missing-spec] FRAMAC_SHARE/libc/stdio.h:213: Warning: 
-  Neither code nor specification for function snprintf, generating default assigns from the prototype
-[kernel:annot:missing-spec] FRAMAC_SHARE/libc/stdio.h:215: Warning: 
-  Neither code nor specification for function sprintf, generating default assigns from the prototype
-[kernel:annot:missing-spec] FRAMAC_SHARE/libc/stdio.h:521: Warning: 
-  Neither code nor specification for function dprintf, generating default assigns from the prototype
-[kernel:annot:missing-spec] tests/format/fprintf.c:16: Warning: 
-  Neither code nor specification for function fork, generating default assigns from the prototype
 [e-acsl] FRAMAC_SHARE/libc/sys/wait.h:92: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
@@ -51,6 +39,8 @@
   is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
+[kernel:annot:missing-spec] tests/format/fprintf.c:16: Warning: 
+  Neither code nor specification for function fork, generating default assigns from the prototype
 [kernel:annot:missing-spec] tests/format/fprintf.c:16: Warning: 
   Neither code nor specification for function __e_acsl_builtin_fprintf, generating default assigns from the prototype
 [eva:alarm] FRAMAC_SHARE/libc/sys/wait.h:86: Warning: 

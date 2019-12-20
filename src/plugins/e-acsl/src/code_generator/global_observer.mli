@@ -20,10 +20,32 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val do_visit: ?prj:Project.t -> bool -> Visitor.frama_c_visitor
+(** Observation of global variables. *)
+
+open Cil_types
+
+val function_name: string
+(** Name of the function in which [mk_init_function] (see below) generates the
+    code. *)
+
+val reset: unit -> unit
+val is_empty: unit -> bool
+
+val add: varinfo -> unit
+(** Observe the given variable if necessary. *)
+
+val add_initializer: varinfo -> offset -> init -> unit
+(** Add the initializer for the given observed variable. *)
+
+val mk_init_function: unit -> varinfo * fundec
+(** Generate a new C function containing the observers for global variable
+    declarations and initializations. *)
+
+val mk_delete_stmts: stmt list -> stmt list
+(** Generate the observers for global variable de-allocations. *)
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)

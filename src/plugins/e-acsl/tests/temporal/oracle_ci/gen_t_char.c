@@ -12,17 +12,16 @@ int main(int argc, char const **argv)
   __e_acsl_store_block((void *)(& b),(size_t)1);
   __e_acsl_full_init((void *)(& b));
   char *p = & a;
+  __e_acsl_temporal_store_nblock((void *)(& p),(void *)(& a));
   __e_acsl_store_block((void *)(& p),(size_t)8);
   __e_acsl_full_init((void *)(& p));
-  __e_acsl_temporal_store_nblock((void *)(& p),(void *)(& a));
   char *q = & b;
+  __e_acsl_temporal_store_nblock((void *)(& q),(void *)(& b));
   __e_acsl_store_block((void *)(& q),(size_t)8);
   __e_acsl_full_init((void *)(& q));
-  __e_acsl_temporal_store_nblock((void *)(& q),(void *)(& b));
-  __e_acsl_temporal_store_nreferent((void *)(& p),(void *)(& q));
   __e_acsl_full_init((void *)(& p));
+  __e_acsl_temporal_store_nreferent((void *)(& p),(void *)(& q));
   p = q;
-  /*@ assert \valid(p); */
   {
     int __gen_e_acsl_initialized;
     int __gen_e_acsl_and;
@@ -38,7 +37,7 @@ int main(int argc, char const **argv)
     __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid(p)",17);
   }
-  /*@ assert \valid(q); */
+  /*@ assert \valid(p); */ ;
   {
     int __gen_e_acsl_initialized_2;
     int __gen_e_acsl_and_2;
@@ -54,6 +53,7 @@ int main(int argc, char const **argv)
     __e_acsl_assert(__gen_e_acsl_and_2,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid(q)",18);
   }
+  /*@ assert \valid(q); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(& q));
   __e_acsl_delete_block((void *)(& p));

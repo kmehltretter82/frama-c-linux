@@ -442,14 +442,8 @@ let register_predicate kf pred state =
       branch (not considering the exception handlers) *)
   let doStmt stmt =
     let _, kf = Kernel_function.find_from_sid stmt.sid in
-    let is_first =
-      try Stmt.equal stmt (Kernel_function.find_first_stmt kf)
-      with Kernel_function.No_Statement -> assert false
-    in
-    let is_last =
-      try Stmt.equal stmt (Kernel_function.find_return kf)
-      with Kernel_function.No_Statement -> assert false
-    in
+    let is_first = Kernel_function.is_first_stmt kf stmt in
+    let is_last = Kernel_function.is_return_stmt kf stmt in
     Dataflow.Post
       (fun state ->
         let state = Env.default_varinfos state in
@@ -710,11 +704,7 @@ if there are memory-related annotations.@]"
     Env.consolidated_mem vi
   end
 
-let must_model_vi bhv ?kf ?stmt vi =
-  let vi = match bhv with
-    | None -> vi
-    | Some bhv -> Visitor_behavior.Get_orig.varinfo bhv vi
-  in
+let must_model_vi ?kf ?stmt vi =
   let _kf = match kf, stmt with
     | None, None | Some _, _ -> kf
     | None, Some stmt -> Some (Kernel_function.find_englobing_kf stmt)
@@ -743,19 +733,19 @@ consolidated_must_model_vi vi
       false
  *)
 
-let rec apply_on_vi_base_from_lval f bhv ?kf ?stmt = function
-  | Var vi, _ -> f bhv ?kf ?stmt vi
-  | Mem e, _ -> apply_on_vi_base_from_exp f bhv ?kf ?stmt e
+let rec apply_on_vi_base_from_lval f ?kf ?stmt = function
+  | Var vi, _ -> f ?kf ?stmt vi
+  | Mem e, _ -> apply_on_vi_base_from_exp f ?kf ?stmt e
 
-and apply_on_vi_base_from_exp f bhv ?kf ?stmt e = match e.enode with
+and apply_on_vi_base_from_exp f ?kf ?stmt e = match e.enode with
   | Lval lv | AddrOf lv | StartOf lv ->
-    apply_on_vi_base_from_lval f bhv ?kf ?stmt lv
+    apply_on_vi_base_from_lval f ?kf ?stmt lv
   | BinOp((PlusPI | IndexPI | MinusPI), e1, _, _) ->
-    apply_on_vi_base_from_exp f bhv ?kf ?stmt e1
+    apply_on_vi_base_from_exp f ?kf ?stmt e1
   | BinOp(MinusPP, e1, e2, _) ->
-    apply_on_vi_base_from_exp f bhv ?kf ?stmt e1
-    || apply_on_vi_base_from_exp f bhv ?kf ?stmt e2
-  | Info(e, _) | CastE(_, e) -> apply_on_vi_base_from_exp f bhv ?kf ?stmt e
+    apply_on_vi_base_from_exp f ?kf ?stmt e1
+    || apply_on_vi_base_from_exp f ?kf ?stmt e2
+  | Info(e, _) | CastE(_, e) -> apply_on_vi_base_from_exp f ?kf ?stmt e
   | BinOp((PlusA | MinusA | Mult | Div | Mod |Shiftlt | Shiftrt | Lt | Gt | Le
             | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr), _, _, _)
   | Const _ -> (* possible in case of static address *) false
@@ -765,18 +755,16 @@ and apply_on_vi_base_from_exp f bhv ?kf ?stmt e = match e.enode with
 let must_model_lval = apply_on_vi_base_from_lval must_model_vi
 let must_model_exp = apply_on_vi_base_from_exp must_model_vi
 
-let must_never_monitor_lval bhv ?kf ?stmt lv =
+let must_never_monitor_lval ?kf ?stmt lv =
   apply_on_vi_base_from_lval
-    (fun _bhv ?kf:_ ?stmt:_ vi -> must_never_monitor vi)
-    bhv
+    (fun ?kf:_ ?stmt:_ vi -> must_never_monitor vi)
     ?kf
     ?stmt
     lv
 
-let must_never_monitor_exp bhv ?kf ?stmt lv  =
+let must_never_monitor_exp ?kf ?stmt lv  =
   apply_on_vi_base_from_exp
-    (fun _bhv ?kf:_ ?stmt:_ vi -> must_never_monitor vi)
-    bhv
+    (fun ?kf:_ ?stmt:_ vi -> must_never_monitor vi)
     ?kf
     ?stmt
     lv
@@ -785,23 +773,23 @@ let must_never_monitor_exp bhv ?kf ?stmt lv  =
 (** {1 Public API} *)
 (* ************************************************************************** *)
 
-let must_model_vi ?bhv ?kf ?stmt vi =
+let must_model_vi ?kf ?stmt vi =
   not (must_never_monitor vi)
   &&
     (Options.Full_mmodel.get ()
-     || Error.generic_handle (must_model_vi bhv ?kf ?stmt) false vi)
+     || Error.generic_handle (must_model_vi ?kf ?stmt) false vi)
 
-let must_model_lval ?bhv ?kf ?stmt lv =
-  not (must_never_monitor_lval bhv ?kf ?stmt lv)
+let must_model_lval ?kf ?stmt lv =
+  not (must_never_monitor_lval ?kf ?stmt lv)
   &&
     (Options.Full_mmodel.get ()
-     || Error.generic_handle (must_model_lval bhv ?kf ?stmt) false lv)
+     || Error.generic_handle (must_model_lval ?kf ?stmt) false lv)
 
-let must_model_exp ?bhv ?kf ?stmt exp =
-  not (must_never_monitor_exp bhv ?kf ?stmt exp)
+let must_model_exp ?kf ?stmt exp =
+  not (must_never_monitor_exp ?kf ?stmt exp)
   &&
     (Options.Full_mmodel.get ()
-     || Error.generic_handle (must_model_exp bhv ?kf ?stmt) false exp)
+     || Error.generic_handle (must_model_exp ?kf ?stmt) false exp)
 
 let use_model () =
   not (Env.is_empty ())
@@ -810,6 +798,6 @@ let use_model () =
 
 (*
 Local Variables:
-compile-command: "make"
+compile-command: "make -C ../.."
 End:
 *)

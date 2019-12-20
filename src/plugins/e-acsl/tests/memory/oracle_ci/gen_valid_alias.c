@@ -10,7 +10,6 @@ int main(void)
   __e_acsl_store_block((void *)(& b),(size_t)8);
   __e_acsl_store_block((void *)(& a),(size_t)8);
   int n = 0;
-  /*@ assert ¬\valid(a) ∧ ¬\valid(b); */
   {
     int __gen_e_acsl_initialized;
     int __gen_e_acsl_and;
@@ -42,13 +41,13 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_and_3,(char *)"Assertion",(char *)"main",
                     (char *)"!\\valid(a) && !\\valid(b)",9);
   }
+  /*@ assert ¬\valid(a) ∧ ¬\valid(b); */ ;
   __e_acsl_full_init((void *)(& a));
   a = (int *)malloc(sizeof(int));
   __e_acsl_initialize((void *)a,sizeof(int));
   *a = n;
   __e_acsl_full_init((void *)(& b));
   b = a;
-  /*@ assert \valid(a) ∧ \valid(b); */
   {
     int __gen_e_acsl_initialized_3;
     int __gen_e_acsl_and_4;
@@ -80,7 +79,7 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_and_6,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid(a) && \\valid(b)",13);
   }
-  /*@ assert *b ≡ n; */
+  /*@ assert \valid(a) ∧ \valid(b); */ ;
   {
     int __gen_e_acsl_initialized_5;
     int __gen_e_acsl_and_7;
@@ -98,8 +97,8 @@ int main(void)
     __e_acsl_assert(*b == n,(char *)"Assertion",(char *)"main",
                     (char *)"*b == n",14);
   }
+  /*@ assert *b ≡ n; */ ;
   free((void *)b);
-  /*@ assert ¬\valid(a) ∧ ¬\valid(b); */
   {
     int __gen_e_acsl_initialized_6;
     int __gen_e_acsl_and_8;
@@ -132,6 +131,7 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_and_10,(char *)"Assertion",(char *)"main",
                     (char *)"!\\valid(a) && !\\valid(b)",16);
   }
+  /*@ assert ¬\valid(a) ∧ ¬\valid(b); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(& b));
   __e_acsl_delete_block((void *)(& a));

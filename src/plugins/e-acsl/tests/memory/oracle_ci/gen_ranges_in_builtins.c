@@ -47,7 +47,6 @@ int main(void)
   __e_acsl_store_block((void *)(& a),(size_t)8);
   __e_acsl_full_init((void *)(& a));
   a = (int *)malloc((unsigned long)10 * sizeof(int));
-  /*@ assert \valid(a + (0 .. 4)); */
   {
     int __gen_e_acsl_valid;
     __gen_e_acsl_valid = __e_acsl_valid((void *)((char *)a + 4 * 0),
@@ -55,8 +54,8 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_valid,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid(a + (0 .. 4))",19);
   }
+  /*@ assert \valid(a + (0 .. 4)); */ ;
   int j = 2;
-  /*@ assert \valid(a + (4 .. 8 + j)); */
   {
     int __gen_e_acsl_valid_2;
     __gen_e_acsl_valid_2 = __e_acsl_valid((void *)((char *)a + 4 * 4),
@@ -65,7 +64,7 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_valid_2,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid(a + (4 .. 8 + j))",21);
   }
-  /*@ assert ¬\valid(a + (10 .. 11)); */
+  /*@ assert \valid(a + (4 .. 8 + j)); */ ;
   {
     int __gen_e_acsl_valid_3;
     __gen_e_acsl_valid_3 = __e_acsl_valid((void *)((char *)a + 4 * 10),
@@ -73,10 +72,10 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_valid_3,(char *)"Assertion",
                     (char *)"main",(char *)"!\\valid(a + (10 .. 11))",22);
   }
+  /*@ assert ¬\valid(a + (10 .. 11)); */ ;
   free((void *)a);
   __e_acsl_full_init((void *)(& b));
   b = (char *)malloc((unsigned long)10 * sizeof(char));
-  /*@ assert \valid(b + (0 .. 10)); */
   {
     int __gen_e_acsl_valid_4;
     __gen_e_acsl_valid_4 = __e_acsl_valid((void *)(b + 1 * 0),(size_t)10,
@@ -84,7 +83,7 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_valid_4,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid(b + (0 .. 10))",27);
   }
-  /*@ assert ¬\valid(b + (11 .. 15)); */
+  /*@ assert \valid(b + (0 .. 10)); */ ;
   {
     int __gen_e_acsl_valid_5;
     __gen_e_acsl_valid_5 = __e_acsl_valid((void *)(b + 1 * 11),(size_t)4,
@@ -92,10 +91,10 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_valid_5,(char *)"Assertion",
                     (char *)"main",(char *)"!\\valid(b + (11 .. 15))",28);
   }
+  /*@ assert ¬\valid(b + (11 .. 15)); */ ;
   long t[3] = {7l, 8l, 9l};
   __e_acsl_store_block((void *)(t),(size_t)24);
   __e_acsl_full_init((void *)(& t));
-  /*@ assert \valid(&t[0 .. 2]); */
   {
     int __gen_e_acsl_valid_6;
     __gen_e_acsl_valid_6 = __e_acsl_valid((void *)((char *)(& t) + 8 * 0),
@@ -103,7 +102,7 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_valid_6,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid(&t[0 .. 2])",31);
   }
-  /*@ assert ¬\valid(&t[3 .. 5]); */
+  /*@ assert \valid(&t[0 .. 2]); */ ;
   {
     int __gen_e_acsl_valid_7;
     __gen_e_acsl_valid_7 = __e_acsl_valid((void *)((char *)(& t) + 8 * 3),
@@ -111,12 +110,12 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_valid_7,(char *)"Assertion",
                     (char *)"main",(char *)"!\\valid(&t[3 .. 5])",32);
   }
+  /*@ assert ¬\valid(&t[3 .. 5]); */ ;
   __gen_e_acsl_g(t,(unsigned long)3);
   __e_acsl_initialize((void *)(t2),sizeof(double));
   t2[0] = 0.5;
   __e_acsl_initialize((void *)(& t2[1]),sizeof(double));
   t2[1] = 1.5;
-  /*@ assert \initialized(&t2[0 .. 1]); */
   {
     int __gen_e_acsl_initialized;
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)((char *)(& t2) + 
@@ -125,7 +124,7 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_initialized,(char *)"Assertion",
                     (char *)"main",(char *)"\\initialized(&t2[0 .. 1])",38);
   }
-  /*@ assert ¬\initialized(&t2[2 .. 3]); */
+  /*@ assert \initialized(&t2[0 .. 1]); */ ;
   {
     int __gen_e_acsl_initialized_2;
     __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)((char *)(& t2) + 
@@ -134,7 +133,7 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_initialized_2,(char *)"Assertion",
                     (char *)"main",(char *)"!\\initialized(&t2[2 .. 3])",39);
   }
-  /*@ assert ¬\initialized(b + (0 .. 10)); */
+  /*@ assert ¬\initialized(&t2[2 .. 3]); */ ;
   {
     int __gen_e_acsl_initialized_3;
     __gen_e_acsl_initialized_3 = __e_acsl_initialized((void *)(b + 1 * 0),
@@ -143,9 +142,9 @@ int main(void)
                     (char *)"main",(char *)"!\\initialized(b + (0 .. 10))",
                     41);
   }
+  /*@ assert ¬\initialized(b + (0 .. 10)); */ ;
   free((void *)b);
   int n = 2;
-  /*@ assert ¬\initialized(&t3[n - 1 .. n + 2][1][0 .. 1]); */
   {
     int __gen_e_acsl_forall;
     int __gen_e_acsl_range_2;
@@ -186,7 +185,7 @@ int main(void)
                     (char *)"!\\initialized(&t3[n - 1 .. n + 2][1][0 .. 1])",
                     46);
   }
-  /*@ assert ¬\valid_read(&t3[6][1][0] + (2 .. 10)); */
+  /*@ assert ¬\initialized(&t3[n - 1 .. n + 2][1][0 .. 1]); */ ;
   {
     int __gen_e_acsl_valid_read;
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)((char *)(& t3[6][1][0]) + 
@@ -197,7 +196,7 @@ int main(void)
                     (char *)"main",
                     (char *)"!\\valid_read(&t3[6][1][0] + (2 .. 10))",48);
   }
-  /*@ assert \valid_read(&t3[n - 1 .. n + 2][1]); */
+  /*@ assert ¬\valid_read(&t3[6][1][0] + (2 .. 10)); */ ;
   {
     int __gen_e_acsl_forall_3;
     long __gen_e_acsl_range_3;
@@ -223,11 +222,11 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_forall_3,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid_read(&t3[n - 1 .. n + 2][1])",49);
   }
+  /*@ assert \valid_read(&t3[n - 1 .. n + 2][1]); */ ;
   __e_acsl_initialize((void *)(& s.a[0]),sizeof(int));
   s.a[0] = 7;
   __e_acsl_initialize((void *)(& s.a[1]),sizeof(int));
   s.a[1] = 8;
-  /*@ assert \initialized(&s.a[0] + (1 .. 2)); */
   {
     int __gen_e_acsl_initialized_5;
     __gen_e_acsl_initialized_5 = __e_acsl_initialized((void *)((char *)(& s.a[0]) + 
@@ -237,7 +236,7 @@ int main(void)
                     (char *)"main",
                     (char *)"\\initialized(&s.a[0] + (1 .. 2))",53);
   }
-  /*@ assert ¬\initialized(s.b + (0 .. 1)); */
+  /*@ assert \initialized(&s.a[0] + (1 .. 2)); */ ;
   {
     int __gen_e_acsl_initialized_6;
     __gen_e_acsl_initialized_6 = __e_acsl_initialized((void *)((char *)s.b + 
@@ -247,6 +246,7 @@ int main(void)
                     (char *)"main",(char *)"!\\initialized(s.b + (0 .. 1))",
                     54);
   }
+  /*@ assert ¬\initialized(s.b + (0 .. 1)); */ ;
   int size1 = 5;
   int size2 = 9;
   __e_acsl_full_init((void *)(& multi_dynamic));
@@ -258,7 +258,6 @@ int main(void)
                                          multi_dynamic + i))));
     i ++;
   }
-  /*@ assert \valid(*(multi_dynamic + 4) + (1 .. 7)); */
   {
     int __gen_e_acsl_valid_read_3;
     int __gen_e_acsl_valid_8;
@@ -275,6 +274,7 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_valid_8,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid(*(multi_dynamic + 4) + (1 .. 7))",63);
   }
+  /*@ assert \valid(*(multi_dynamic + 4) + (1 .. 7)); */ ;
   /*@ assert \valid(*(multi_dynamic + (2 .. 4)) + (1 .. 7)); */ ;
   i --;
   while (i >= 0) {
@@ -306,28 +306,6 @@ void __gen_e_acsl_g(long *ptr, size_t size)
 {
   __e_acsl_mpz_t __gen_e_acsl_at_2;
   long *__gen_e_acsl_at;
-  {
-    __e_acsl_mpz_t __gen_e_acsl_size_6;
-    __gmpz_init_set_ui(__gen_e_acsl_size_6,size);
-    __gmpz_init_set(__gen_e_acsl_at_2,
-                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_size_6));
-    __gmpz_clear(__gen_e_acsl_size_6);
-  }
-  {
-    __e_acsl_mpz_t __gen_e_acsl_size_5;
-    __gmpz_init_set_ui(__gen_e_acsl_size_5,size);
-    __gmpz_init_set(__gen_e_acsl_at_2,
-                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_size_5));
-    __gmpz_clear(__gen_e_acsl_size_5);
-  }
-  {
-    __e_acsl_mpz_t __gen_e_acsl_size_4;
-    __gmpz_init_set_ui(__gen_e_acsl_size_4,size);
-    __gmpz_init_set(__gen_e_acsl_at_2,
-                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_size_4));
-    __gmpz_clear(__gen_e_acsl_size_4);
-  }
-  __gen_e_acsl_at = ptr;
   {
     __e_acsl_mpz_t __gen_e_acsl_;
     __e_acsl_mpz_t __gen_e_acsl_sizeof;
@@ -415,6 +393,28 @@ void __gen_e_acsl_g(long *ptr, size_t size)
     __gmpz_clear(__gen_e_acsl_sub_2);
     __gmpz_clear(__gen_e_acsl_mul);
   }
+  {
+    __e_acsl_mpz_t __gen_e_acsl_size_6;
+    __gmpz_init_set_ui(__gen_e_acsl_size_6,size);
+    __gmpz_init_set(__gen_e_acsl_at_2,
+                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_size_6));
+    __gmpz_clear(__gen_e_acsl_size_6);
+  }
+  {
+    __e_acsl_mpz_t __gen_e_acsl_size_5;
+    __gmpz_init_set_ui(__gen_e_acsl_size_5,size);
+    __gmpz_init_set(__gen_e_acsl_at_2,
+                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_size_5));
+    __gmpz_clear(__gen_e_acsl_size_5);
+  }
+  {
+    __e_acsl_mpz_t __gen_e_acsl_size_4;
+    __gmpz_init_set_ui(__gen_e_acsl_size_4,size);
+    __gmpz_init_set(__gen_e_acsl_at_2,
+                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_size_4));
+    __gmpz_clear(__gen_e_acsl_size_4);
+  }
+  __gen_e_acsl_at = ptr;
   g(ptr,size);
   {
     __e_acsl_mpz_t __gen_e_acsl__6;
