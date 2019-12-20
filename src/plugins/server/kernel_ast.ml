@@ -168,7 +168,6 @@ let () = Request.register ~page
 (* -------------------------------------------------------------------------- *)
 
 module Property = struct
-
   type p
   let signature =
     Record.signature ~page ~name:"property"
@@ -207,9 +206,13 @@ let get_properties () =
   Property_status.fold (fun ip acc -> Property.make ip :: acc) []
 
 let () =
-  Request.register ~page ~kind:`GET ~name:"kernel.getProperties"
+  Request.register
+    ~page
+    ~kind:`GET
+    ~name:"kernel.ast.getProperties"
     ~descr:(Md.plain "Collect all logical properties")
-    ~input:(module Junit) ~output:(module Jlist (Property))
+    ~input:(module Junit)
+    ~output:(module Jlist (Property))
     get_properties
 
 (* -------------------------------------------------------------------------- *)
