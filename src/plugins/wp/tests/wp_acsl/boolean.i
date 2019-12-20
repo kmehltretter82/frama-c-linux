@@ -1,5 +1,5 @@
 /* run.config
-OPT: -wp-gen -wp-prover why3
+OPT: -wp-gen -wp-prover why3 -wp-msg-key success-only
 */
 
  /*@
