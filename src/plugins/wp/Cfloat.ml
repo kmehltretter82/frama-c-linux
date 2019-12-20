@@ -139,8 +139,8 @@ let () = Context.register
 let rfloat = Floating_point.round_to_single_precision_float
 
 let fmake ulp value = match ulp with
-  | Float32 -> F.e_fun fq32 [F.e_float (rfloat value)]
-  | Float64 -> F.e_fun fq64 [F.e_float value]
+  | Float32 -> F.e_fun ~result:t32 fq32 [F.e_float (rfloat value)]
+  | Float64 -> F.e_fun ~result:t64 fq64 [F.e_float value]
 
 let qmake ulp q = fmake ulp (Transitioning.Q.to_float q)
 let re_mantissa = "\\([-+]?[0-9]*\\)"
@@ -179,8 +179,8 @@ let acsl_lit l =
 
 let code_lit ulp value original =
   match Context.get model , ulp , original with
-  | Float , Float32 , _ -> F.e_fun fq32 [F.e_float value]
-  | Float , Float64 , _ -> F.e_fun fq64 [F.e_float value]
+  | Float , Float32 , _ -> F.e_fun ~result:t32 fq32 [F.e_float value]
+  | Float , Float64 , _ -> F.e_fun ~result:t64 fq64 [F.e_float value]
   | Real , _ , None -> F.e_float value
   | Real , _ , Some r -> F.e_real (parse_literal ~model:Real value r)
 
@@ -358,7 +358,7 @@ let real_of_flt ft = Compute.get (Context.get model, ft, REAL) |> fst
 let make_hack ?(converse=false) ft op xs =
   let phi, impl = Compute.get ((Context.get model), ft, op) in
   let xs = (if converse then List.rev xs else xs) in
-  try impl xs with Not_found -> F.e_fun phi xs
+  try impl xs with Not_found -> F.e_fun ~result:Logic.Bool phi xs
 
 let register_builtin ft =
   begin
@@ -398,12 +398,12 @@ let () =
 let real_of_float f a =
   match Context.get model with
   | Real -> a
-  | Float -> e_fun (real_of_flt f) [a]
+  | Float -> e_fun ~result:Logic.Real (real_of_flt f) [a]
 
 let float_of_real f a =
   match Context.get model with
   | Real -> a
-  | Float -> e_fun (flt_of_real f) [a]
+  | Float -> e_fun ~result:(ftau f) (flt_of_real f) [a]
 
 let float_of_int f a = float_of_real f (Cmath.real_of_int a)
 
@@ -414,7 +414,7 @@ let float_of_int f a = float_of_real f (Cmath.real_of_int a)
 let fbinop rop fop f x y =
   match Context.get model with
   | Real -> rop x y
-  | Float -> e_fun (fop f) [x;y]
+  | Float -> e_fun ~result:(ftau f) (fop f) [x;y]
 
 let fcmp rop fop f x y =
   match Context.get model with
@@ -428,7 +428,7 @@ let fdiv = fbinop e_div flt_div
 let fopp f x =
   match Context.get model with
   | Real -> e_opp x
-  | Float -> e_fun (flt_neg f) [x]
+  | Float -> e_fun ~result:(ftau f) (flt_neg f) [x]
 
 let fsub f x y = fadd f x (fopp f y)
 
