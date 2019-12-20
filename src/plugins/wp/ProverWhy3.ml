@@ -34,6 +34,11 @@ let option_import = LogicBuiltins.create_option
     (fun ~driver_dir:_ x -> x)
     "why3" "import"
 
+let option_qual =
+  LogicBuiltins.create_option
+    (fun ~driver_dir:_ x -> x)
+    "why3" "qualifier"
+
 let why3_failure msg =
   Pretty_utils.ksfprintf failwith msg
 
@@ -227,6 +232,16 @@ let regexp_dot = Str.regexp_string "."
 
 let cut_path s = Str.split_delim regexp_dot s
 
+let wp_why3_lib library =
+  match LogicBuiltins.get_option option_qual ~library with
+  | [] -> [library]
+  | [ lib ] -> Str.split_delim regexp_dot lib
+  | l ->
+      let pp_sep fmt () = Format.pp_print_string fmt ", " in
+      Wp_parameters.fatal
+        "too many bindings for WP-specific Why3 theory file %s:@\n%a"
+        library Format.(pp_print_list ~pp_sep pp_print_string) l
+
 (* conversion *)
 
 let rec of_tau ~cnv (t:Lang.F.tau) =
@@ -364,13 +379,13 @@ let rec of_term ~cnv expected t : Why3.Term.term =
           a b
     | Leq (a,b), _, Bool ->
         int_or_real ~cnv
-          ~fint:["qed"] ~lint:"Qed" ~pint:["zleq"]
-          ~freal:["qed"] ~lreal:"Qed" ~preal:["rleq"]
+          ~fint:(wp_why3_lib "qed") ~lint:"Qed" ~pint:["zleq"]
+          ~freal:(wp_why3_lib "qed") ~lreal:"Qed" ~preal:["rleq"]
           a b
     | Lt (a,b), _, Bool ->
         int_or_real ~cnv
-          ~fint:["qed"] ~lint:"Qed" ~pint:["zlt"]
-          ~freal:["qed"] ~lreal:"Qed" ~preal:["rlt"]
+          ~fint:(wp_why3_lib "qed") ~lint:"Qed" ~pint:["zlt"]
+          ~freal:(wp_why3_lib "qed") ~lreal:"Qed" ~preal:["rlt"]
           a b
     | And l, _, Bool ->
         t_app_fold ~f:["bool"] ~l:"Bool" ~p:["andb"] ~cnv expected l
@@ -420,9 +435,9 @@ let rec of_term ~cnv expected t : Why3.Term.term =
               | _                   -> Why3.Term.t_neq (of_term' cnv a) (of_term' cnv b)
         end
     | Eq (a,b), _, Bool ->
-        t_app ~cnv ~f:["qed"] ~l:"Qed" ~p:["eqb"] [of_term' cnv a; of_term' cnv b]
+        t_app ~cnv ~f:(wp_why3_lib "qed") ~l:"Qed" ~p:["eqb"] [of_term' cnv a; of_term' cnv b]
     | Neq (a,b), _, Bool ->
-        t_app ~cnv ~f:["qed"] ~l:"Qed" ~p:["neqb"] [of_term' cnv a; of_term' cnv b]
+        t_app ~cnv ~f:(wp_why3_lib "qed") ~l:"Qed" ~p:["neqb"] [of_term' cnv a; of_term' cnv b]
     | If(a,b,c), _, _ ->
         let cnv' = {cnv with polarity = `NoPolarity} in
         Why3.Term.t_if (of_term cnv' Prop a) (of_term cnv expected b) (of_term cnv expected c)
@@ -741,7 +756,7 @@ class visitor (ctx:context) c =
             | [ th ] -> self#add_import th
             | [ th ; was ] -> self#add_import ~was th
             | _ -> why3_failure
-                     "[driver] incorrect why3.file %S for library '%s'"
+                     "[driver] incorrect why3.import %S for library '%s'"
                      opt thy
           ) (Str.split regexp_com opt)
       in
