@@ -589,8 +589,15 @@ module Cache = String
          - 'replay': update mode with no cache update\n\
          - 'rebuild': always run provers and update cache\n\
          - 'offline': use cache but never run provers\n\
-         This option is overriden by environment variable FRAMAC_WP_CACHE.\
-        "
+         This option is overriden by environment variable FRAMAC_WP_CACHE,\
+         unless -wp-no-cache-env is used."
+    end)
+
+let () = Parameter_customize.set_group wp_prover
+module CacheEnv = True
+    (struct
+      let option_name = "-wp-cache-env"
+      let help = "Use environment variable FRAMAC_WP_CACHE to override -wp-cache"
     end)
 
 let () = Parameter_customize.set_group wp_prover
