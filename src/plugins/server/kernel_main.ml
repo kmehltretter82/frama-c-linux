@@ -57,6 +57,24 @@ let () =
     end
 
 (* -------------------------------------------------------------------------- *)
+(* --- Load saves                                                         --- *)
+(* -------------------------------------------------------------------------- *)
+
+let () =
+  let signature =
+    Request.signature ~page ~kind:`SET ~name:"kernel.load"
+      ~descr:(Md.plain "Load a save file")
+      ~input:(module Jstring)
+      ~output:(module Jstring.Joption)
+      ()
+  in
+  let load _rq file =
+    try Project.load_all file; None
+    with Project.IOError err -> Some err
+  in
+  Request.register_sig signature load
+
+(* -------------------------------------------------------------------------- *)
 (* --- File Positions                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
