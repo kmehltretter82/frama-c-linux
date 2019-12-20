@@ -31,64 +31,64 @@ module D = Datatype (* hide after applying Parameter_state.Make *)
 let empty_string = ""
 
 let find_kf_by_name
-    : (string -> kernel_function) ref
-    = Extlib.mk_fun "Parameter_builder.find_kf_by_name"
+  : (string -> kernel_function) ref
+  = Extlib.mk_fun "Parameter_builder.find_kf_by_name"
 
 let find_kf_def_by_name
-    : (string -> kernel_function) ref
-    = Extlib.mk_fun "Parameter_builder.find_kf_def_by_name"
+  : (string -> kernel_function) ref
+  = Extlib.mk_fun "Parameter_builder.find_kf_def_by_name"
 
 let find_kf_decl_by_name
-    : (string -> kernel_function) ref
-    = Extlib.mk_fun "Parameter_builder.find_kf_decl_by_name"
+  : (string -> kernel_function) ref
+  = Extlib.mk_fun "Parameter_builder.find_kf_decl_by_name"
 
 let kf_category
-    : (unit -> kernel_function Parameter_category.t) ref
-    = Extlib.mk_fun "Parameter_builder.kf_category"
+  : (unit -> kernel_function Parameter_category.t) ref
+  = Extlib.mk_fun "Parameter_builder.kf_category"
 
 let kf_def_category
-    : (unit -> kernel_function Parameter_category.t) ref
-    = Extlib.mk_fun "Parameter_builder.kf_def_category"
+  : (unit -> kernel_function Parameter_category.t) ref
+  = Extlib.mk_fun "Parameter_builder.kf_def_category"
 
 let kf_decl_category
-    : (unit -> kernel_function Parameter_category.t) ref
-    = Extlib.mk_fun "Parameter_builder.kf_decl_category"
+  : (unit -> kernel_function Parameter_category.t) ref
+  = Extlib.mk_fun "Parameter_builder.kf_decl_category"
 
 let fundec_category
-    : (unit -> fundec Parameter_category.t) ref
-    = Extlib.mk_fun "Parameter_builder.fundec_category"
+  : (unit -> fundec Parameter_category.t) ref
+  = Extlib.mk_fun "Parameter_builder.fundec_category"
 
 let kf_string_category
-    : (unit -> string Parameter_category.t) ref
-    = Extlib.mk_fun "Parameter_builder.kf_string_category"
+  : (unit -> string Parameter_category.t) ref
+  = Extlib.mk_fun "Parameter_builder.kf_string_category"
 
 let force_ast_compute
-    : (unit -> unit) ref
-    = Extlib.mk_fun "Parameter_builder.force_ast_compute"
+  : (unit -> unit) ref
+  = Extlib.mk_fun "Parameter_builder.force_ast_compute"
 
 (* ************************************************************************* *)
 (** {2 Specific functors} *)
 (* ************************************************************************* *)
 
-let iter_on_this_parameter stage = 
+let iter_on_this_parameter stage =
   match !Parameter_customize.do_iterate_ref, stage with
   | Some false, _
   | None, (Cmdline.Early | Cmdline.Extending | Cmdline.Extended
-              | Cmdline.Exiting | Cmdline.Loading) ->
+          | Cmdline.Exiting | Cmdline.Loading) ->
     false
   | Some true, _ | None, Cmdline.Configuring ->
     true
 
 module Make
-  (P: sig
-    val shortname: string
-    val parameters: (string, Typed_parameter.t list) Hashtbl.t
-    module L: sig
-      val abort: ('a,'b) Log.pretty_aborter
-      val warning: 'a Log.pretty_printer
-    end
-    val messages_group: Cmdline.Group.t
-  end) =
+    (P: sig
+       val shortname: string
+       val parameters: (string, Typed_parameter.t list) Hashtbl.t
+       module L: sig
+         val abort: ('a,'b) Log.pretty_aborter
+         val warning: 'a Log.pretty_printer
+       end
+       val messages_group: Cmdline.Group.t
+     end) =
 struct
 
   module Build = Parameter_state.Make(P)
@@ -111,30 +111,30 @@ struct
   (* ************************************************************************ *)
   (** {3 Bool} *)
   (* ************************************************************************ *)
-  
+
   module Bool(X:sig include Parameter_sig.Input val default: bool end) = struct
-    
+
     include Build
-      (struct
-	include Datatype.Bool
-	include X
-	let default () = default
-	let functor_name = "Bool"
-       end)
-      
+        (struct
+          include Datatype.Bool
+          include X
+          let default () = default
+          let functor_name = "Bool"
+        end)
+
     let on = register_dynamic "on" D.unit D.unit (fun () -> set true)
     let off = register_dynamic "off" D.unit D.unit (fun () -> set false)
-      
+
     let generic_add_option name help visible value =
       Cmdline.add_option
-	name
-	~plugin:P.shortname
-	~group
-	~help
-	~visible
-	~ext_help:!Parameter_customize.optional_help_ref
-	stage
-	(Cmdline.Unit (fun () -> set value))
+        name
+        ~plugin:P.shortname
+        ~group
+        ~help
+        ~visible
+        ~ext_help:!Parameter_customize.optional_help_ref
+        stage
+        (Cmdline.Unit (fun () -> set value))
 
     let negate_name name =
       (* do we match '-shortname-'? (one dash before, one after) *)
@@ -153,42 +153,42 @@ struct
       match s with
       | None -> negate_name name
       | Some s ->
-	assert (s <> empty_string);
-	s
+        assert (s <> empty_string);
+        s
 
     let default_message opp = Format.asprintf " (set by default%s)" opp
 
     let add_option opp name =
       let opp_msg name = "opposite option is " ^ negative_option_name name in
       let help =
-	if X.default then
+        if X.default then
           if X.help = empty_string then empty_string
           else
             X.help ^
-              if opp then default_message (", " ^ opp_msg name)
-              else default_message empty_string
-	else
-          if opp then Format.asprintf "%s (%s)" X.help (opp_msg name)
-          else X.help
+            if opp then default_message (", " ^ opp_msg name)
+            else default_message empty_string
+        else
+        if opp then Format.asprintf "%s (%s)" X.help (opp_msg name)
+        else X.help
       in
       generic_add_option name help is_visible true
 
     let add_negative_option name =
       let neg_name = negative_option_name name in
       let mk_help s =
-	if is_visible then 
-	  if X.default then s else s ^ default_message empty_string
-	else empty_string
+        if is_visible then
+          if X.default then s else s ^ default_message empty_string
+        else empty_string
       in
       let neg_help, neg_visible =
-	match
-	  !Parameter_customize.negative_option_name_ref, 
-	  !Parameter_customize.negative_option_help_ref 
-	with
-	| None, "" -> (* no user-specific config: no help *) empty_string, false
-	| Some _, "" -> 
-	  mk_help ("opposite of option \"" ^ name ^ "\""), is_visible
-	| _, s -> assert (s <> empty_string); mk_help s, is_visible
+        match
+          !Parameter_customize.negative_option_name_ref,
+          !Parameter_customize.negative_option_help_ref
+        with
+        | None, "" -> (* no user-specific config: no help *) empty_string, false
+        | Some _, "" ->
+          mk_help ("opposite of option \"" ^ name ^ "\""), is_visible
+        | _, s -> assert (s <> empty_string); mk_help s, is_visible
       in
       generic_add_option neg_name neg_help neg_visible false;
       neg_name
@@ -197,29 +197,29 @@ struct
 
     let parameter =
       let negative_option =
-	match !Parameter_customize.negative_option_name_ref, stage with
-	| Some "", _  | None, Cmdline.Exiting ->
+        match !Parameter_customize.negative_option_name_ref, stage with
+        | Some "", _  | None, Cmdline.Exiting ->
           add_option false X.option_name;
           None
-	| _ ->
+        | _ ->
           add_option true X.option_name;
           Some (add_negative_option X.option_name)
       in
       negative_option_ref := negative_option;
       let accessor =
-	Typed_parameter.Bool
+        Typed_parameter.Bool
           ({ Typed_parameter.get = get; set = set;
              add_set_hook = add_set_hook; add_update_hook = add_update_hook },
            negative_option)
       in
       let p =
-	Typed_parameter.create ~name ~help:X.help ~accessor:accessor ~is_set
+        Typed_parameter.create ~name ~help:X.help ~accessor:accessor ~is_set
       in
       add_parameter !Parameter_customize.group_ref stage p;
       Parameter_customize.reset ();
       if is_dynamic then
-	let plugin = empty_string in
-	Dynamic.register
+        let plugin = empty_string in
+        Dynamic.register
           ~plugin X.option_name Typed_parameter.ty ~journalize:false p
       else p
 
@@ -259,12 +259,12 @@ struct
 
     let () =
       Project.create_by_copy_hook
-	(fun src p ->
-          Project.copy
-            ~selection:(State_selection.singleton Is_set.self) ~src p;
-          let selection = State_selection.singleton self in
-          let opt = Project.on ~selection src get () in
-          if opt then Project.on ~selection p set true)
+        (fun src p ->
+           Project.copy
+             ~selection:(State_selection.singleton Is_set.self) ~src p;
+           let selection = State_selection.singleton self in
+           let opt = Project.on ~selection src get () in
+           if opt then Project.on ~selection p set true)
 
   end
 
@@ -276,12 +276,12 @@ struct
   struct
 
     include Build
-      (struct
-	include Datatype.Int
-	include X
-	let default () = default
-	let functor_name = "Int"
-       end)
+        (struct
+          include Datatype.Int
+          include X
+          let default () = default
+          let functor_name = "Int"
+        end)
 
     let incr =
       let incr () = set (succ (get ())) in
@@ -289,15 +289,15 @@ struct
 
     let add_option name =
       Cmdline.add_option
-	name
-	~argname:X.arg_name
-	~help:X.help
-	~visible:is_visible
-	~ext_help:!Parameter_customize.optional_help_ref
-	~plugin:P.shortname
-	~group
-	stage
-	(Cmdline.Int set)
+        name
+        ~argname:X.arg_name
+        ~help:X.help
+        ~visible:is_visible
+        ~ext_help:!Parameter_customize.optional_help_ref
+        ~plugin:P.shortname
+        ~group
+        stage
+        (Cmdline.Int set)
 
     let range = ref (min_int, max_int)
     let set_range ~min ~max = range := min, max
@@ -305,27 +305,27 @@ struct
 
     let parameter =
       add_set_hook
-	(fun _ n ->
-          let min, max = !range in
-          if n < min then
-            P.L.abort "argument of %s must be at least %d." name min;
-          if n > max then
-            P.L.abort "argument of %s must be no more than %d." name max);
+        (fun _ n ->
+           let min, max = !range in
+           if n < min then
+             P.L.abort "argument of %s must be at least %d." name min;
+           if n > max then
+             P.L.abort "argument of %s must be no more than %d." name max);
       let accessor =
-	Typed_parameter.Int
+        Typed_parameter.Int
           ({ Typed_parameter.get = get; set = set;
              add_set_hook = add_set_hook; add_update_hook = add_update_hook },
            get_range)
       in
       let p =
-	Typed_parameter.create ~name ~help:X.help ~accessor ~is_set:is_set
+        Typed_parameter.create ~name ~help:X.help ~accessor ~is_set:is_set
       in
       add_parameter !Parameter_customize.group_ref stage p;
       add_option X.option_name;
       Parameter_customize.reset ();
       if is_dynamic then
-	let plugin = empty_string in
-	Dynamic.register
+        let plugin = empty_string in
+        Dynamic.register
           ~plugin X.option_name Typed_parameter.ty ~journalize:false p
       else p
 
@@ -341,28 +341,28 @@ struct
   module Pervasives_string = String
 
   module String
-    (X: sig include Parameter_sig.Input_with_arg val default: string end) =
+      (X: sig include Parameter_sig.Input_with_arg val default: string end) =
   struct
-    
+
     include Build
-      (struct
-	include Datatype.String
-	include X
-	let default () = default
-	let functor_name = "String"
-       end)
-    
+        (struct
+          include Datatype.String
+          include X
+          let default () = default
+          let functor_name = "String"
+        end)
+
     let add_option name =
       Cmdline.add_option
-	name
-	~argname:X.arg_name
-	~help:X.help
-	~visible:is_visible
-	~ext_help:!Parameter_customize.optional_help_ref
-	~plugin:P.shortname
-	~group
-	stage
-	(Cmdline.String set)
+        name
+        ~argname:X.arg_name
+        ~help:X.help
+        ~visible:is_visible
+        ~ext_help:!Parameter_customize.optional_help_ref
+        ~plugin:P.shortname
+        ~group
+        stage
+        (Cmdline.String set)
 
     let possible_values = ref []
     let set_possible_values s = possible_values := s
@@ -381,9 +381,9 @@ struct
           else
             Cil_datatype.Kf.Set.filter
               (fun s ->
-                match s.fundec with
-                  | Definition _ -> true
-                  | Declaration _ -> false)
+                 match s.fundec with
+                 | Definition _ -> true
+                 | Declaration _ -> false)
               possible_funcs
         in
         if Cil_datatype.Kf.Set.is_empty possible_funcs then
@@ -410,33 +410,33 @@ struct
 
     let parameter =
       add_set_hook
-	(fun _ s ->
-          match !possible_values with
-          | [] -> ()
-          | v when List.mem s v -> ()
-          | v -> P.L.abort "invalid input '%s' for option %s.@ \
-                            Possible values are: %a" s name
-                   (Pretty_utils.pp_list ~sep:",@ "
-                      Format.pp_print_string) v);
+        (fun _ s ->
+           match !possible_values with
+           | [] -> ()
+           | v when List.mem s v -> ()
+           | v -> P.L.abort "invalid input '%s' for option %s.@ \
+                             Possible values are: %a" s name
+                    (Pretty_utils.pp_list ~sep:",@ "
+                       Format.pp_print_string) v);
       let accessor =
-	Typed_parameter.String
+        Typed_parameter.String
           ({ Typed_parameter.get = get_plain_string; set = set;
              add_set_hook = add_set_hook; add_update_hook = add_update_hook },
            get_possible_values)
       in
       let p =
-	Typed_parameter.create ~name ~help:X.help ~accessor ~is_set
+        Typed_parameter.create ~name ~help:X.help ~accessor ~is_set
       in
       add_parameter !Parameter_customize.group_ref stage p;
       add_option X.option_name;
       Parameter_customize.reset ();
       if is_dynamic then
-	let plugin = empty_string in
-	Dynamic.register
+        let plugin = empty_string in
+        Dynamic.register
           ~plugin X.option_name Typed_parameter.ty ~journalize:false p
       else
-	p
-	  
+        p
+
   end
 
   module Empty_string(X: Parameter_sig.Input_with_arg) =
@@ -475,11 +475,11 @@ struct
           Filepath.Normalized.of_string ~existence:X.existence s
         with
         | Filepath.No_file ->
-            P.L.abort "%s%sfile not found: '%s'"
-              X.file_kind (if X.file_kind = "" then "" else " ") s
+          P.L.abort "%s%sfile not found: '%s'"
+            X.file_kind (if X.file_kind = "" then "" else " ") s
         | Filepath.File_exists ->
-            P.L.abort "%s file already exists: '%s'"
-              X.file_kind (if X.file_kind = "" then "" else " ") s
+          P.L.abort "%s file already exists: '%s'"
+            X.file_kind (if X.file_kind = "" then "" else " ") s
       in
       set fp
 
@@ -509,17 +509,17 @@ struct
            fun () -> [])
       in
       let p =
-	Typed_parameter.create ~name ~help:X.help ~accessor ~is_set
+        Typed_parameter.create ~name ~help:X.help ~accessor ~is_set
       in
       add_parameter !Parameter_customize.group_ref stage p;
       add_option X.option_name;
       Parameter_customize.reset ();
       if is_dynamic then
-	let plugin = empty_string in
-	Dynamic.register
+        let plugin = empty_string in
+        Dynamic.register
           ~plugin X.option_name Typed_parameter.ty ~journalize:false p
       else
-	p
+        p
 
   end
 
@@ -535,43 +535,43 @@ struct
   let no_element_of_string msg = cannot_build msg
 
   module Make_collection
-    (E: sig (* element in the collection *)
-      type t
-      val ty: t Type.t
-      val of_string: string -> t (* may raise [Cannot_build] *)
-      val to_string: t -> string
-    end)
-    (C: sig (* the collection, as a persistent datastructure *)
-      type t
-      val equal: t -> t -> bool
-      val empty: t
-      val is_empty: t -> bool
-      val mem: E.t -> t -> bool
-      val add: E.t -> t -> t
-      val remove: E.t -> t -> t
-      val iter: (E.t -> unit) -> t -> unit
-      val fold: (E.t -> 'a -> 'a) -> t -> 'a -> 'a
-      val of_singleton_string: string -> t 
-      (* For specific ways to parse a collection from a single string.
-         If physically equal to [no_element_of_string], we revert back to
-         using [E.of_string]
-       *)
-      val reorder: t -> t 
-      (* Used after having parsed a comma-separated string representing 
-         parameters. The add actions are done in the reverse order with
-         respect to the list. Can be [Extlib.id] for unordered collections.
-       *)
-    end)
-    (S: sig (* the collection, as a state *)
-      include State_builder.S
-      val memo: (unit -> C.t) -> C.t
-      val clear: unit -> unit
-    end)
-    (X: (* standard option builder *) sig
-      include Parameter_sig.Input_collection
-      val default: C.t
-    end)
-    =
+      (E: sig (* element in the collection *)
+         type t
+         val ty: t Type.t
+         val of_string: string -> t (* may raise [Cannot_build] *)
+         val to_string: t -> string
+       end)
+      (C: sig (* the collection, as a persistent datastructure *)
+         type t
+         val equal: t -> t -> bool
+         val empty: t
+         val is_empty: t -> bool
+         val mem: E.t -> t -> bool
+         val add: E.t -> t -> t
+         val remove: E.t -> t -> t
+         val iter: (E.t -> unit) -> t -> unit
+         val fold: (E.t -> 'a -> 'a) -> t -> 'a -> 'a
+         val of_singleton_string: string -> t
+         (* For specific ways to parse a collection from a single string.
+            If physically equal to [no_element_of_string], we revert back to
+            using [E.of_string]
+         *)
+         val reorder: t -> t
+         (* Used after having parsed a comma-separated string representing
+            parameters. The add actions are done in the reverse order with
+            respect to the list. Can be [Extlib.id] for unordered collections.
+         *)
+       end)
+      (S: sig (* the collection, as a state *)
+         include State_builder.S
+         val memo: (unit -> C.t) -> C.t
+         val clear: unit -> unit
+       end)
+      (X: (* standard option builder *) sig
+         include Parameter_sig.Input_collection
+         val default: C.t
+       end)
+  =
   struct
 
     type t = C.t
@@ -585,31 +585,31 @@ struct
 
     (* the available custom categories for this option *)
     let available_categories
-	: category Datatype.String.Hashtbl.t
-	= Datatype.String.Hashtbl.create 7
+      : category Datatype.String.Hashtbl.t
+      = Datatype.String.Hashtbl.create 7
 
     module Category = struct
 
       type elt = E.t
       type t = category
-      
-      let check_category_name s =
-	if Datatype.String.Hashtbl.mem available_categories s
-          || Datatype.String.equal s "all"
-          || Datatype.String.equal s ""
-          || Datatype.String.equal s "default"
-	then
-	  P.L.abort "invalid category name '%s'" s
 
-      let use categories = 
-	List.iter
-	  (fun c -> 
-	    Parameter_category.use S.self c;
-	    Datatype.String.Hashtbl.add
-	      available_categories
-	      (Parameter_category.get_name c)
-	      c)
-	  categories
+      let check_category_name s =
+        if Datatype.String.Hashtbl.mem available_categories s
+        || Datatype.String.equal s "all"
+        || Datatype.String.equal s ""
+        || Datatype.String.equal s "default"
+        then
+          P.L.abort "invalid category name '%s'" s
+
+      let use categories =
+        List.iter
+          (fun c ->
+             Parameter_category.use S.self c;
+             Datatype.String.Hashtbl.add
+               available_categories
+               (Parameter_category.get_name c)
+               c)
+          categories
 
       let unsafe_add name states accessor =
         let c =
@@ -680,14 +680,14 @@ struct
     let add_char c = function
       | [] -> assert false
       | (a, f, None) :: l ->
-	(* first char of a new word *)
-	let b = Buffer.create 7 in
-	Buffer.add_char b c;
-	(a, f, Some b) :: l
+        (* first char of a new word *)
+        let b = Buffer.create 7 in
+        Buffer.add_char b c;
+        (a, f, Some b) :: l
       | ((_, _, Some b) :: _) as l ->
-	(* extend the current word *)
-	Buffer.add_char b c;
-	l
+        (* extend the current word *)
+        Buffer.add_char b c;
+        l
 
     let set_category_flag = function
       | (a, false, None) :: l -> (a, true, None) :: l
@@ -696,7 +696,7 @@ struct
     type position =
       | Start (* the very beginning or after a comma *)
       | Word of (* action already specified, word is being read *)
-	  bool (* [true] iff beginning a category with '@' is allowed *)
+          bool (* [true] iff beginning a category with '@' is allowed *)
       | Escaped (* the next char is escaped in the current word *)
 
     let parse_error msg =
@@ -704,40 +704,40 @@ struct
         X.option_name msg
 
     (* return the list of tokens, in reverse order *)
-    let parse s = 
+    let parse s =
       let len = Pervasives_string.length s in
       let rec aux acc pos i s =
-	if i = len then acc
-	else 
-	  let next = i + 1 in
-	  let read_char_in_word f_acc new_pos =
+        if i = len then acc
+        else
+          let next = i + 1 in
+          let read_char_in_word f_acc new_pos =
             (* assume 'Add' by default *)
             let acc = if pos = Start then add_action Add acc else acc in
-	    aux (f_acc acc) new_pos next s
-	  in
-	  let read_std_char_in_word c =
-	    read_char_in_word (add_char c) (Word false)
-	  in
+            aux (f_acc acc) new_pos next s
+          in
+          let read_std_char_in_word c =
+            read_char_in_word (add_char c) (Word false)
+          in
           let read_backslash_and_char c =
             (* read '\\' and [c], without considering than '\\' is the escaping
                character *)
             read_char_in_word
               (fun acc -> add_char c (add_char '\\' acc)) (Word false)
           in
-	  match Pervasives_string.get s i, pos with
+          match Pervasives_string.get s i, pos with
           | '+', Start when use_category ->
             aux (add_action Add acc) (Word true) next s
           | '-', Start when use_category ->
             aux (add_action Remove acc) (Word true) next s
           | '\\', (Start | Word _) -> read_char_in_word (fun x -> x) Escaped
-	  | ',', (Start | Word _) -> read_char_in_word (fun x -> x) Start
-	  | (' ' | '\t' | '\n' | '\r'), Start -> 
-	    (* ignore whitespace at beginning of words (must be escaped) *)
-	    aux acc pos next s
-	  | '@', (Start | Word true) when use_category ->
-	    read_char_in_word set_category_flag (Word false)
-	  | c, (Start | Word _) -> read_std_char_in_word c
-	  | (',' | '\\' as c), Escaped -> read_std_char_in_word c
+          | ',', (Start | Word _) -> read_char_in_word (fun x -> x) Start
+          | (' ' | '\t' | '\n' | '\r'), Start ->
+            (* ignore whitespace at beginning of words (must be escaped) *)
+            aux acc pos next s
+          | '@', (Start | Word true) when use_category ->
+            read_char_in_word set_category_flag (Word false)
+          | c, (Start | Word _) -> read_std_char_in_word c
+          | (',' | '\\' as c), Escaped -> read_std_char_in_word c
           | ('+' | '-' | '@' | ' ' | '\t' | '\n' | '\r' as c),
             Escaped when i = 1 ->
             if use_category then read_std_char_in_word c
@@ -758,10 +758,10 @@ struct
         let first = ref true in
         C.iter
           (fun e ->
-            let s = E.to_string e in
-            if !first then begin if s <> "" then first := false end
-            else Buffer.add_string b ",";
-            Buffer.add_string b (E.to_string e))
+             let s = E.to_string e in
+             if !first then begin if s <> "" then first := false end
+             else Buffer.add_string b ",";
+             Buffer.add_string b (E.to_string e))
           c;
         Buffer.contents b
 
@@ -769,12 +769,12 @@ struct
     module As_string = struct
 
       include String(struct
-        include X
-        let default = string_of_collection X.default
-      end)
+          include X
+          let default = string_of_collection X.default
+        end)
 
       let () = Parameter_state.collections :=
-        State.Set.add self !Parameter_state.collections
+          State.Set.add self !Parameter_state.collections
 
       let get () =
         (* the default string may have a custom interpretation when the
@@ -788,16 +788,16 @@ struct
        this way since it is very counter-intuitive from the other ways
        (i.e. programmatically or the GUI). *)
     let () =
-      Cmdline.replace_option_setting 
-	X.option_name
-	~plugin:P.shortname
-	~group:As_string.group
-	(Cmdline.String
-	   (fun s ->
-	     let old = As_string.get () in
-	     As_string.set 
-	       (if Datatype.String.equal old empty_string then s 
-		else old ^ "," ^ s)))
+      Cmdline.replace_option_setting
+        X.option_name
+        ~plugin:P.shortname
+        ~group:As_string.group
+        (Cmdline.String
+           (fun s ->
+              let old = As_string.get () in
+              As_string.set
+                (if Datatype.String.equal old empty_string then s
+                 else old ^ "," ^ s)))
 
     (* JS personal note: I'm still not fully convinced by this cumulative
        semantics. *)
@@ -822,55 +822,55 @@ struct
       let unparsable, col =
         List.fold_right
           (fun (action, is_category, word) (unparsable, col) ->
-            let extend = match action with
-              | Add -> C.add
-              | Remove -> C.remove
-            in
-            let word = match word with
-              | None -> "" 
-              | Some b -> Buffer.contents b 
-            in
-              (*              Format.printf "TOKEN %s@." word;*)
-            if is_category then
-              try
-                let c =
-                  Datatype.String.Hashtbl.find available_categories word
-                in
-                if word = "all" then
-                  match action with
-                  | Add ->
-                    unparsable, Parameter_category.get_fold c C.add C.empty
-                  | Remove ->
-                      (* -@all is always equal to the emptyset, even if there
-                         were previous elements which are now impossible *)
-                      None, C.empty
-                else
-                    unparsable, Parameter_category.get_fold c extend col
-              with Not_found ->
-                parse_error ("unknown category '" ^ word ^ "'")
-            else (* not is_category *)
-                try
-                  if C.of_singleton_string == no_element_of_string then begin
-                    let elt = E.of_string word in
-                    unparsable, extend elt col
-                  end else begin
-                    let elts = C.of_singleton_string word in
-                    unparsable, C.fold extend elts col
-                  end
-                with Cannot_build msg ->
-                  Some msg, col)
-            tokens
-            (None, C.empty)
-        in
-        let col = C.reorder col in
-        (* check each element after parsing all of them,
-           since an element may be added, then removed later (e.g +h,-@all):
-           that has to be accepted *)
-        if check then begin
-          Extlib.may parse_error unparsable;
-          C.iter check_possible_value col
-        end;
-        col
+             let extend = match action with
+               | Add -> C.add
+               | Remove -> C.remove
+             in
+             let word = match word with
+               | None -> ""
+               | Some b -> Buffer.contents b
+             in
+             (*              Format.printf "TOKEN %s@." word;*)
+             if is_category then
+               try
+                 let c =
+                   Datatype.String.Hashtbl.find available_categories word
+                 in
+                 if word = "all" then
+                   match action with
+                   | Add ->
+                     unparsable, Parameter_category.get_fold c C.add C.empty
+                   | Remove ->
+                     (* -@all is always equal to the emptyset, even if there
+                        were previous elements which are now impossible *)
+                     None, C.empty
+                 else
+                   unparsable, Parameter_category.get_fold c extend col
+               with Not_found ->
+                 parse_error ("unknown category '" ^ word ^ "'")
+             else (* not is_category *)
+               try
+                 if C.of_singleton_string == no_element_of_string then begin
+                   let elt = E.of_string word in
+                   unparsable, extend elt col
+                 end else begin
+                   let elts = C.of_singleton_string word in
+                   unparsable, C.fold extend elts col
+                 end
+               with Cannot_build msg ->
+                 Some msg, col)
+          tokens
+          (None, C.empty)
+      in
+      let col = C.reorder col in
+      (* check each element after parsing all of them,
+         since an element may be added, then removed later (e.g +h,-@all):
+         that has to be accepted *)
+      if check then begin
+        Extlib.may parse_error unparsable;
+        C.iter check_possible_value col
+      end;
+      col
 
     (* ********************************************************************** *)
     (* Memoized access to the state *)
@@ -883,8 +883,8 @@ struct
         let s = As_string.get () in
         (*let c =*) collection_of_string ~check:true s (*in*)
         (*Format.printf "GET %s@." (As_string.get ());
-        C.iter (fun s -> Format.printf "ELT %s@." (E.to_string s)) c;
-        c*)
+          C.iter (fun s -> Format.printf "ELT %s@." (E.to_string s)) c;
+          c*)
       in
       S.memo compute
 
@@ -942,21 +942,21 @@ struct
 
     (* same as above *)
     let add_hook_on_update _ =
-      P.L.abort "[add_hook_on_update] cannot be implemented for %s." 
-	X.option_name
+      P.L.abort "[add_hook_on_update] cannot be implemented for %s."
+        X.option_name
 
   end
 
   module Make_set
-    (E: Parameter_sig.String_datatype_with_collections)
-    (X: sig
-      include Parameter_sig.Input_collection
-      val default: E.Set.t
-    end):
-    sig
-      include Parameter_sig.Set with type elt = E.t and type t = E.Set.t
-      module S: sig val self: State.t end (* typed state *)
-    end =
+      (E: Parameter_sig.String_datatype_with_collections)
+      (X: sig
+         include Parameter_sig.Input_collection
+         val default: E.Set.t
+       end):
+  sig
+    include Parameter_sig.Set with type elt = E.t and type t = E.Set.t
+    module S: sig val self: State.t end (* typed state *)
+  end =
   struct
 
     module C = struct
@@ -968,11 +968,11 @@ struct
     module S = struct
 
       include State_builder.Option_ref
-        (E.Set)
-        (struct
-          let name = X.option_name ^ " set"
-          let dependencies = X.dependencies
-         end)
+          (E.Set)
+          (struct
+            let name = X.option_name ^ " set"
+            let dependencies = X.dependencies
+          end)
 
       let memo f = memo f (* ignore the optional argument *)
     end
@@ -1002,13 +1002,13 @@ struct
         include X
         let dependencies = []
         let default = Datatype.String.Set.empty
-       end)
+      end)
 
   module Filled_string_set
-    (X: sig
-      include Parameter_sig.Input_with_arg
-      val default: Datatype.String.Set.t
-    end) =
+      (X: sig
+         include Parameter_sig.Input_with_arg
+         val default: Datatype.String.Set.t
+       end) =
     Make_set
       (String_for_collection)
       (struct include X let dependencies = [] end)
@@ -1023,23 +1023,23 @@ struct
       if require_fundecl then
         error s
       else
-        if must_exist then
-          error s
-        else
-          if !Parameter_customize.is_permissive_ref then begin
-            P.L.warning "ignoring non-existing function%s '%s'."
-              specific_msg s;
-            set
-          end else
-            error s
+      if must_exist then
+        error s
+      else
+      if !Parameter_customize.is_permissive_ref then begin
+        P.L.warning "ignoring non-existing function%s '%s'."
+          specific_msg s;
+        set
+      end else
+        error s
     else
       set
 
   module Kernel_function_string(
-    A: sig val accept_fundecl: bool
-           val require_fundecl: bool
-           val must_exist: bool
-    end) =
+      A: sig val accept_fundecl: bool
+        val require_fundecl: bool
+        val must_exist: bool
+      end) =
   struct
 
     include Cil_datatype.Kf
@@ -1047,12 +1047,12 @@ struct
     let of_string s =
       try
         (if A.require_fundecl then
-            !find_kf_decl_by_name
+           !find_kf_decl_by_name
          else
-            if A.accept_fundecl then
-              !find_kf_by_name
-            else
-              !find_kf_def_by_name) s
+         if A.accept_fundecl then
+           !find_kf_by_name
+         else
+           !find_kf_def_by_name) s
       with Not_found ->
         cannot_build
           (Format.asprintf "no%s function '%s'"
@@ -1072,18 +1072,18 @@ struct
       let filter keep_def keep_decl =
         Set.filter
           (fun s ->
-            match s.fundec with
-            | Definition _ -> keep_def
-            | Declaration _ -> keep_decl)
+             match s.fundec with
+             | Definition _ -> keep_def
+             | Declaration _ -> keep_decl)
       in
       let res =
         if A.require_fundecl then
           filter false true fcts
         else
-          if A.accept_fundecl then
-            fcts
-          else
-            filter true false fcts
+        if A.accept_fundecl then
+          fcts
+        else
+          filter true false fcts
       in
       check_function s A.must_exist A.require_fundecl Set.is_empty res
 
@@ -1098,18 +1098,18 @@ struct
     end
 
     include Make_set
-    (Kernel_function_string(A))
-    (struct
-      include X
-      let dependencies = []
-      let default = Cil_datatype.Kf.Set.empty
-     end)
+        (Kernel_function_string(A))
+        (struct
+          include X
+          let dependencies = []
+          let default = Cil_datatype.Kf.Set.empty
+        end)
 
     let () =
       if A.accept_fundecl then Category.enable_all_as (!kf_category ())
       else
-        if A.require_fundecl then Category.enable_all_as (!kf_decl_category ())
-        else Category.enable_all_as (!kf_def_category ())
+      if A.require_fundecl then Category.enable_all_as (!kf_decl_category ())
+      else Category.enable_all_as (!kf_def_category ())
 
     let () = extend_ast_dependencies S.self
 
@@ -1120,37 +1120,37 @@ struct
     let require_fundecl = !Parameter_customize.argument_must_be_fundecl_ref
 
     include Make_set
-    (struct
-      include Cil_datatype.Fundec
-      let of_string s =
-        try
-          let kf = !find_kf_def_by_name s in
-          match kf.fundec with
-          | Definition (f, _) -> f
-          | Declaration _ -> assert false
-        with Not_found ->
-          cannot_build (Format.asprintf "no defined function '%s'" s)
+        (struct
+          include Cil_datatype.Fundec
+          let of_string s =
+            try
+              let kf = !find_kf_def_by_name s in
+              match kf.fundec with
+              | Definition (f, _) -> f
+              | Declaration _ -> assert false
+            with Not_found ->
+              cannot_build (Format.asprintf "no defined function '%s'" s)
 
-      let to_string f = f.svar.vname
+          let to_string f = f.svar.vname
 
-      let of_singleton_string s =
-        let fcts = Parameter_customize.get_c_ified_functions s in
-        let defs =
-          Cil_datatype.Kf.Set.fold
-            (fun s acc ->
-              match s.fundec with
-                | Definition(f,_) -> Set.add f acc
-                | Declaration _ -> acc)
-            fcts Set.empty
-        in
-        check_function s must_exist require_fundecl Set.is_empty defs
+          let of_singleton_string s =
+            let fcts = Parameter_customize.get_c_ified_functions s in
+            let defs =
+              Cil_datatype.Kf.Set.fold
+                (fun s acc ->
+                   match s.fundec with
+                   | Definition(f,_) -> Set.add f acc
+                   | Declaration _ -> acc)
+                fcts Set.empty
+            in
+            check_function s must_exist require_fundecl Set.is_empty defs
 
-     end)
-    (struct
-      include X
-      let dependencies = []
-      let default = Cil_datatype.Fundec.Set.empty
-     end)
+        end)
+        (struct
+          include X
+          let dependencies = []
+          let default = Cil_datatype.Fundec.Set.empty
+        end)
 
     let () = Category.enable_all_as (!fundec_category ())
     let () = extend_ast_dependencies S.self
@@ -1158,11 +1158,11 @@ struct
   end
 
   module Make_list
-    (E: sig
-      include Parameter_sig.String_datatype
-      val of_singleton_string: string -> t list
-    end)
-    (X: sig include Parameter_sig.Input_collection val default: E.t list end):
+      (E: sig
+         include Parameter_sig.String_datatype
+         val of_singleton_string: string -> t list
+       end)
+      (X: sig include Parameter_sig.Input_collection val default: E.t list end):
     Parameter_sig.List with type elt = E.t and type t = E.t list =
   struct
 
@@ -1182,11 +1182,11 @@ struct
     module S = struct
 
       include State_builder.Option_ref
-        (C)
-        (struct
-          let name = X.option_name ^ " list"
-          let dependencies = X.dependencies
-         end)
+          (C)
+          (struct
+            let name = X.option_name ^ " list"
+            let dependencies = X.dependencies
+          end)
 
       let memo f = memo f (* ignore the optional argument *)
 
@@ -1210,7 +1210,7 @@ struct
         include X
         let dependencies = []
         let default = []
-       end)
+      end)
 
   module Filepath_list
       (X: sig
@@ -1241,12 +1241,12 @@ struct
       end)
 
   module Make_map
-    (K: Parameter_sig.String_datatype_with_collections)
-    (V: Parameter_sig.Value_datatype with type key = K.t)
-    (X: sig
-      include Parameter_sig.Input_collection
-      val default: V.t K.Map.t
-    end) =
+      (K: Parameter_sig.String_datatype_with_collections)
+      (V: Parameter_sig.Value_datatype with type key = K.t)
+      (X: sig
+         include Parameter_sig.Input_collection
+         val default: V.t K.Map.t
+       end) =
   struct
 
     type key = K.t
@@ -1303,7 +1303,7 @@ struct
               m
             else begin
               P.L.warning "@[option %s:@ '%a' previously bound to '%a';@ \
-now bound to '%a'.@]"
+                           now bound to '%a'.@]"
                 X.option_name K.pretty k V.pretty old V.pretty v;
               K.Map.add k v m
             end
@@ -1318,15 +1318,15 @@ now bound to '%a'.@]"
 
       exception Found of V.t
       let of_singleton_string =
-	let r = Str.regexp "\\([^:]\\|^\\):\\([^:]\\|$\\)" in
+        let r = Str.regexp "\\([^:]\\|^\\):\\([^:]\\|$\\)" in
         (* delimiter is no more than 3 characters long, the first belonging to
            the element before it, the third belonging to the element after it.
            Treats :: as part of a word to be able to handle C++ function names
            in a non too awkward manner.
-         *)
+        *)
         let split_delim d = (* handle different possible length of the delimiter *)
           let rbis = Str.regexp ":" in
-	  match Str.bounded_full_split rbis d 2 with
+          match Str.bounded_full_split rbis d 2 with
           | [ Str.Delim _] -> (empty_string, empty_string)
           | [ Str.Delim _; Str.Text t2 ] -> (empty_string, t2)
           | [ Str.Text t1; Str.Delim _; ] -> (t1, empty_string)
@@ -1334,11 +1334,11 @@ now bound to '%a'.@]"
           | _ -> (* impossible case *)
             raise (Cannot_build ("delimiter="^d))
         in
-	let k_of_singleton_string = 
-	  if (K.of_singleton_string==no_element_of_string) 
-	  then (fun x -> K.Set.singleton (K.of_string x)) 
-	  else K.of_singleton_string
-	in
+        let k_of_singleton_string =
+          if (K.of_singleton_string==no_element_of_string)
+          then (fun x -> K.Set.singleton (K.of_string x))
+          else K.of_singleton_string
+        in
         fun s ->
           let (keys, value) =
             let get_pairing k v_opt =
@@ -1348,10 +1348,10 @@ now bound to '%a'.@]"
                 try
                   K.Set.iter
                     (fun k ->
-                      key := Some k;
-                    (* choose any previous value, whatever it is:
-                       don't know which clear semantics one would like *)
-                      try raise (Found (!find_ref k)) with Not_found -> ())
+                       key := Some k;
+                       (* choose any previous value, whatever it is:
+                          don't know which clear semantics one would like *)
+                       try raise (Found (!find_ref k)) with Not_found -> ())
                     keys;
                   (* assume there is always at least a key *)
                   None
@@ -1386,11 +1386,11 @@ now bound to '%a'.@]"
     module S = struct
 
       include State_builder.Option_ref
-        (K.Map.Make(V))
-        (struct
-          let name = X.option_name ^ " map"
-          let dependencies = X.dependencies
-         end)
+          (K.Map.Make(V))
+          (struct
+            let name = X.option_name ^ " map"
+            let dependencies = X.dependencies
+          end)
 
       let memo f = memo f (* ignore the optional argument *)
 
@@ -1409,22 +1409,22 @@ now bound to '%a'.@]"
   end
 
   module String_map
-    (V: Parameter_sig.Value_datatype with type key = string)
-    (X: sig
-      include Parameter_sig.Input_with_arg
-      val default: V.t Datatype.String.Map.t
-    end) =
+      (V: Parameter_sig.Value_datatype with type key = string)
+      (X: sig
+         include Parameter_sig.Input_with_arg
+         val default: V.t Datatype.String.Map.t
+       end) =
     Make_map
       (String_for_collection)
       (V)
       (struct include X let dependencies = [] end)
 
   module Kernel_function_map
-    (V: Parameter_sig.Value_datatype with type key = kernel_function)
-    (X: sig
-      include Parameter_sig.Input_with_arg
-      val default: V.t Cil_datatype.Kf.Map.t
-    end) =
+      (V: Parameter_sig.Value_datatype with type key = kernel_function)
+      (X: sig
+         include Parameter_sig.Input_with_arg
+         val default: V.t Cil_datatype.Kf.Map.t
+       end) =
   struct
 
     module A = struct
@@ -1434,21 +1434,21 @@ now bound to '%a'.@]"
     end
 
     include Make_map
-      (Kernel_function_string(A))
-      (V)
-      (struct include X let dependencies = [] end)
+        (Kernel_function_string(A))
+        (V)
+        (struct include X let dependencies = [] end)
 
     let () = extend_ast_dependencies S.self
 
   end
 
   module Make_multiple_map
-    (K: Parameter_sig.String_datatype_with_collections)
-    (V: Parameter_sig.Multiple_value_datatype with type key = K.t)
-    (X: sig
-      include Parameter_sig.Input_collection
-      val default: V.t list K.Map.t
-    end) =
+      (K: Parameter_sig.String_datatype_with_collections)
+      (V: Parameter_sig.Multiple_value_datatype with type key = K.t)
+      (X: sig
+         include Parameter_sig.Input_collection
+         val default: V.t list K.Map.t
+       end) =
   struct
 
     type key = K.t
@@ -1468,38 +1468,38 @@ now bound to '%a'.@]"
       let of_string =
         let r = Str.regexp_string ":" in
         fun s -> match Str.split_delim r s with
-        | [] -> cannot_build ("cannot interpret '" ^ s ^ "'")
-        | k :: l ->
-          let key = K.of_string k in
-          let prev = try Some (!find_ref key) with Not_found -> None in
-          let l = match l with
-            | [] ->
-              (match of_val ~key k ~prev None with
-              | None -> []
-              | Some v -> [ v ])
-            | _ :: _ ->
-              List.fold_right (* preserve order *)
-                (fun v acc -> match of_val ~key k ~prev (Some v) with
-                | None -> acc
-                | Some v -> v :: acc)
-                l
-                []
-          in
-          key, l
+          | [] -> cannot_build ("cannot interpret '" ^ s ^ "'")
+          | k :: l ->
+            let key = K.of_string k in
+            let prev = try Some (!find_ref key) with Not_found -> None in
+            let l = match l with
+              | [] ->
+                (match of_val ~key k ~prev None with
+                 | None -> []
+                 | Some v -> [ v ])
+              | _ :: _ ->
+                List.fold_right (* preserve order *)
+                  (fun v acc -> match of_val ~key k ~prev (Some v) with
+                     | None -> acc
+                     | Some v -> v :: acc)
+                  l
+                  []
+            in
+            key, l
 
       let to_string (key, l) =
         Format.asprintf "%s%t"
           (K.to_string key)
           (fun fmt ->
-            let rec pp_custom_list = function
-              | [] -> ()
-              | v :: l ->
-                Extlib.may
-                  (fun v -> Format.fprintf fmt ":%s" v)
-                  (V.to_string ~key (Some v));
-                pp_custom_list l
-            in
-            pp_custom_list l)
+             let rec pp_custom_list = function
+               | [] -> ()
+               | v :: l ->
+                 Extlib.may
+                   (fun v -> Format.fprintf fmt ":%s" v)
+                   (V.to_string ~key (Some v));
+                 pp_custom_list l
+             in
+             pp_custom_list l)
     end
 
     module C = struct
@@ -1523,8 +1523,8 @@ now bound to '%a'.@]"
 
       let of_singleton_string =
         let k_of_singleton_string =
-          if (K.of_singleton_string==no_element_of_string) 
-          then (fun x -> K.Set.singleton (K.of_string x)) 
+          if (K.of_singleton_string==no_element_of_string)
+          then (fun x -> K.Set.singleton (K.of_string x))
           else K.of_singleton_string
         in
         let r = Str.regexp "[^:]:[^:]" in
@@ -1563,10 +1563,10 @@ now bound to '%a'.@]"
                 try
                   K.Set.iter
                     (fun k ->
-                      key := Some k;
-                      (* choose any previous value, whatever it is:
-                         don't know which clear semantics one would like *)
-                      try raise (Found (!find_ref k)) with Not_found -> ())
+                       key := Some k;
+                       (* choose any previous value, whatever it is:
+                          don't know which clear semantics one would like *)
+                       try raise (Found (!find_ref k)) with Not_found -> ())
                     keys;
                   None
                 with Found v ->
@@ -1593,11 +1593,11 @@ now bound to '%a'.@]"
     module S = struct
 
       include State_builder.Option_ref
-        (K.Map.Make(Datatype.List(V)))
-        (struct
-          let name = X.option_name ^ " map"
-          let dependencies = X.dependencies
-         end)
+          (K.Map.Make(Datatype.List(V)))
+          (struct
+            let name = X.option_name ^ " map"
+            let dependencies = X.dependencies
+          end)
 
       let memo f = memo f (* ignore the optional argument *)
 
@@ -1616,22 +1616,22 @@ now bound to '%a'.@]"
   end
 
   module String_multiple_map
-    (V: Parameter_sig.Multiple_value_datatype with type key = string)
-    (X: sig
-      include Parameter_sig.Input_with_arg
-      val default: V.t list Datatype.String.Map.t
-    end) =
+      (V: Parameter_sig.Multiple_value_datatype with type key = string)
+      (X: sig
+         include Parameter_sig.Input_with_arg
+         val default: V.t list Datatype.String.Map.t
+       end) =
     Make_multiple_map
       (String_for_collection)
       (V)
       (struct include X let dependencies = [] end)
 
   module Kernel_function_multiple_map
-    (V: Parameter_sig.Multiple_value_datatype with type key = kernel_function)
-    (X: sig
-      include Parameter_sig.Input_with_arg
-      val default: V.t list Cil_datatype.Kf.Map.t
-    end) =
+      (V: Parameter_sig.Multiple_value_datatype with type key = kernel_function)
+      (X: sig
+         include Parameter_sig.Input_with_arg
+         val default: V.t list Cil_datatype.Kf.Map.t
+       end) =
   struct
 
     module A = struct
@@ -1641,9 +1641,9 @@ now bound to '%a'.@]"
     end
 
     include Make_multiple_map
-      (Kernel_function_string(A))
-      (V)
-      (struct include X let dependencies = [] end)
+        (Kernel_function_string(A))
+        (V)
+        (struct include X let dependencies = [] end)
 
     let () = extend_ast_dependencies S.self
 
@@ -1651,9 +1651,9 @@ now bound to '%a'.@]"
 
   (** Options that directly cause an output. *)
   module WithOutput
-    (X: sig include Parameter_sig.Input val output_by_default: bool end) =
+      (X: sig include Parameter_sig.Input val output_by_default: bool end) =
   struct
-    
+
     (* Requested command-line option *)
     include False(X)
 
@@ -1661,9 +1661,9 @@ now bound to '%a'.@]"
     let () = Parameter_customize.set_group P.messages_group
     module Output =
       Bool(struct
-	let default = X.output_by_default
-	let option_name = X.option_name ^ "-print"
-	let help = "print results for option " ^ X.option_name
+        let default = X.output_by_default
+        let option_name = X.option_name ^ "-print"
+        let help = "print results for option " ^ X.option_name
       end)
 
     (* Boolean that indicates whether the results have never been output
@@ -1671,9 +1671,9 @@ now bound to '%a'.@]"
        reset the value *)
     module ShouldOutput =
       State_builder.True_ref(struct
-	let dependencies = [] (* To be filled by the user when calling the
-				 output function *)
-	let name = X.option_name ^ "ShouldOutput"
+        let dependencies = [] (* To be filled by the user when calling the
+                                 output function *)
+        let name = X.option_name ^ "ShouldOutput"
       end)
 
     (* Output has been requested by the user. Set the "output should be
@@ -1686,10 +1686,10 @@ now bound to '%a'.@]"
     let output f =
       (* Output only if our two booleans are at true *)
       if Output.get () && ShouldOutput.get () then begin
-      (* One output will occur, do not output anything next time (unless
-         dependencies change, or the user requests it on the command-line) *)
-	ShouldOutput.set false;
-	f ();
+        (* One output will occur, do not output anything next time (unless
+           dependencies change, or the user requests it on the command-line) *)
+        ShouldOutput.set false;
+        f ();
       end
 
     let add_aliases list =

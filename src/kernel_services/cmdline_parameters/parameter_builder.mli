@@ -27,15 +27,15 @@
 (* ************************************************************************* *)
 
 module Make
-  (P: sig
-    val shortname: string
-    val parameters: (string, Typed_parameter.t list) Hashtbl.t
-    module L: sig 
-      val abort: ('a,'b) Log.pretty_aborter
-      val warning: 'a Log.pretty_printer
-    end
-    val messages_group: Cmdline.Group.t
-  end):
+    (P: sig
+       val shortname: string
+       val parameters: (string, Typed_parameter.t list) Hashtbl.t
+       module L: sig
+         val abort: ('a,'b) Log.pretty_aborter
+         val warning: 'a Log.pretty_printer
+       end
+       val messages_group: Cmdline.Group.t
+     end):
   Parameter_sig.Builder
 
 (* ************************************************************************* *)

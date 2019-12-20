@@ -96,7 +96,7 @@ module Normalized: sig
   (** [of_string s] converts [s] into a normalized path.
       @raise Invalid_argument if [s] is the empty string.
       @modify Frama-C+dev add optional existence parameter
- *)
+  *)
   val of_string: ?existence:existence -> ?base_name:string -> string -> t
 
   (** [to_pretty_string p] returns [p] prettified,
