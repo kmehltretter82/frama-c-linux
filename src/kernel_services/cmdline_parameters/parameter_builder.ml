@@ -414,10 +414,12 @@ struct
            match !possible_values with
            | [] -> ()
            | v when List.mem s v -> ()
-           | v -> P.L.abort "invalid input '%s' for option %s.@ \
-                             Possible values are: %a" s name
-                    (Pretty_utils.pp_list ~sep:",@ "
-                       Format.pp_print_string) v);
+           | v ->
+             P.L.abort
+               "invalid input '%s' for option %s.@ Possible values are: %a"
+               s
+               name
+               (Pretty_utils.pp_list ~sep:",@ " Format.pp_print_string) v);
       let accessor =
         Typed_parameter.String
           ({ Typed_parameter.get = get_plain_string; set = set;
@@ -476,10 +478,14 @@ struct
         with
         | Filepath.No_file ->
           P.L.abort "%s%sfile not found: '%s'"
-            X.file_kind (if X.file_kind = "" then "" else " ") s
+            X.file_kind
+            (if X.file_kind = "" then "" else " ")
+            s
         | Filepath.File_exists ->
           P.L.abort "%s file already exists: '%s'"
-            X.file_kind (if X.file_kind = "" then "" else " ") s
+            X.file_kind
+            (if X.file_kind = "" then "" else " ")
+            s
       in
       set fp
 
@@ -1229,10 +1235,14 @@ struct
           with
           | Fc_Filepath.No_file ->
             P.L.abort "%s%sfile '%s' does not exist"
-              X.file_kind (if X.file_kind = "" then "" else " ") s
+              X.file_kind
+              (if X.file_kind = "" then "" else " ")
+              s
           | Fc_Filepath.File_exists ->
             P.L.abort "%s%sfile '%s' already exists"
-              X.file_kind (if X.file_kind = "" then "" else " ") s
+              X.file_kind
+              (if X.file_kind = "" then "" else " ")
+              s
       end)
       (struct
         include X

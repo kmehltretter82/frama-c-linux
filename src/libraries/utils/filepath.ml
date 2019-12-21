@@ -127,9 +127,10 @@ let insert base path_name =
 
 let cwd = insert dummy (Sys.getcwd())
 
-
-
-type existence = Must_exist | Must_not_exist | Indifferent
+type existence =
+  | Must_exist
+  | Must_not_exist
+  | Indifferent
 
 exception No_file
 exception File_exists
@@ -142,9 +143,12 @@ let normalize ?(existence=Indifferent) ?base_name path_name =
       let base =
         match base_name with
         | None -> cwd
-        | Some b -> insert cwd b in
+        | Some b -> insert cwd b
+      in
       let norm_path_name = (insert base path_name).path_name in
-      if norm_path_name = "" then "/" else norm_path_name
+      if norm_path_name = ""
+      then "/"
+      else norm_path_name
   in
   match existence with
   | Indifferent ->

@@ -27,13 +27,17 @@
     NOTE: Prefer using the [Normalized] module whenever possible.
 *)
 
-type existence = Must_exist | Must_not_exist | Indifferent
+(** Existence requirement on a file. *)
+type existence =
+  | Must_exist      (** File must exist. *)
+  | Must_not_exist  (** File must not exist. *)
+  | Indifferent     (** No requirement. *)
 
 exception No_file
-(** raised whenever no file exists and [existence] is [Must_exist]. *)
+(** Raised whenever no file exists and [existence] is [Must_exist]. *)
 
 exception File_exists
-(** raised whenever some file exists and [existence] is [Must_not_exist]. *)
+(** Raised whenever some file exists and [existence] is [Must_not_exist]. *)
 
 (** Returns an absolute path leading to the given file.
     The result is similar to [realpath --no-symlinks].
@@ -46,7 +50,7 @@ exception File_exists
       but [normalize] may accept them.
 
     @modify Aluminium-20160501 optional base_name.
-    @modify Frama-C+dev optional existence
+    @modify Frama-C+dev optional existence.
 *)
 val normalize: ?existence:existence -> ?base_name:string -> string -> string
 
@@ -95,7 +99,7 @@ module Normalized: sig
 
   (** [of_string s] converts [s] into a normalized path.
       @raise Invalid_argument if [s] is the empty string.
-      @modify Frama-C+dev add optional existence parameter
+      @modify Frama-C+dev add optional existence parameter.
   *)
   val of_string: ?existence:existence -> ?base_name:string -> string -> t
 
