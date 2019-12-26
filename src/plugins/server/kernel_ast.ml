@@ -219,6 +219,10 @@ let () =
 (* --- Files                                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
+let get_files () =
+  let files = Kernel.Files.get () in
+  List.map (fun f -> (f:Filepath.Normalized.t:>string)) files
+
 let () =
   Request.register
     ~page
@@ -226,7 +230,11 @@ let () =
     ~kind:`GET
     ~name:"kernel.ast.getFiles"
     ~input:(module Junit) ~output:(module Jstring.Jlist)
-    Kernel.Files.get
+    get_files
+
+let set_files files =
+  let s = String.concat "," files in
+  Kernel.Files.As_string.set s
 
 let () =
   Request.register
@@ -236,7 +244,7 @@ let () =
     ~name:"kernel.ast.setFiles"
     ~input:(module Jstring.Jlist)
     ~output:(module Junit)
-    Kernel.Files.set
+    set_files
 
 let () =
   Request.register
