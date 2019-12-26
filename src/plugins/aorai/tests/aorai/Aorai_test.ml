@@ -4,17 +4,15 @@
 
 open Kernel
 
-module StdString = String
-
-include Plugin.Register
-(struct 
+module P = Plugin.Register
+(struct
   let name = "aorai testing module"
   let shortname = "aorai-test"
   let help = "utility script for aorai regtests"
  end)
 
 module TestNumber =
-  Zero
+  P.Zero
     (struct
       let option_name = "-aorai-test-number"
       let help = "test number when multiple tests are run over the same file"
@@ -22,7 +20,7 @@ module TestNumber =
      end)
 
 module InternalWpShare =
-  Empty_string(
+  P.Empty_string(
     struct
       let option_name = "-aorai-test-wp-share"
       let help = "use custom wp share dir (when in internal plugin mode)"
@@ -30,7 +28,7 @@ module InternalWpShare =
     end)
 
 module ProveAuxSpec =
-  False(
+  P.False(
     struct
       let option_name = "-aorai-test-prove-aux-spec"
       let help = "use WP + alt-ergo to prove that generated spec and body \
@@ -40,11 +38,11 @@ module ProveAuxSpec =
 let ok = ref false
 
 let is_suffix suf str =
-  let lsuf = StdString.length suf in
-  let lstr = StdString.length str in
+  let lsuf = String.length suf in
+  let lstr = String.length str in
   if lstr <= lsuf then false
   else
-    let estr = StdString.sub str (lstr - lsuf) lsuf in
+    let estr = String.sub str (lstr - lsuf) lsuf in
     estr = suf
 
 let extend () =
@@ -68,7 +66,7 @@ let extend () =
       let tmpfile =
         Filename.get_temp_dir_name () ^ "/aorai_" ^
         (Filename.chop_extension
-           (Filename.basename (List.hd (Kernel.Files.get())))) ^ "_" ^
+           (Filename.basename (List.hd (Kernel.Files.get()):>string))) ^ "_" ^
         (string_of_int (TestNumber.get ())) ^ ".i"
       in
       let () =
@@ -87,7 +85,7 @@ let extend () =
       in
       Project.copy ~selection my_project;
       Project.set_current my_project;
-      Files.append_after [ tmpfile ];
+      Files.append_after [ Filepath.Normalized.of_string tmpfile ];
       Constfold.off ();
       Ast.compute();
       if ProveAuxSpec.get () then begin

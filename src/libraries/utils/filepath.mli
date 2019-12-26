@@ -27,6 +27,18 @@
     NOTE: Prefer using the [Normalized] module whenever possible.
 *)
 
+(** Existence requirement on a file. *)
+type existence =
+  | Must_exist      (** File must exist. *)
+  | Must_not_exist  (** File must not exist. *)
+  | Indifferent     (** No requirement. *)
+
+exception No_file
+(** Raised whenever no file exists and [existence] is [Must_exist]. *)
+
+exception File_exists
+(** Raised whenever some file exists and [existence] is [Must_not_exist]. *)
+
 (** Returns an absolute path leading to the given file.
     The result is similar to [realpath --no-symlinks].
     Some special behaviors include:
@@ -37,8 +49,10 @@
     - non-existing directories in [realpath] may lead to ENOTDIR errors,
       but [normalize] may accept them.
 
-    @modify Aluminium-20160501 optional base_name. *)
-val normalize: ?base_name:string -> string -> string
+    @modify Aluminium-20160501 optional base_name.
+    @modify Frama-C+dev optional existence.
+*)
+val normalize: ?existence:existence -> ?base_name:string -> string -> string
 
 (** [relativize base_name file_name] returns a relative path name of
     [file_name] w.r.t. [base_name], if [base_name] is a prefix of [file];
@@ -48,8 +62,8 @@ val normalize: ?base_name:string -> string -> string
 val relativize: ?base_name:string -> string -> string
 
 (** returns true if the file is relative to [base]
-    (that is, it is prefixed by [base_name]), or to the current working directory
-    if no base is specified.
+    (that is, it is prefixed by [base_name]), or to the current
+    working directory if no base is specified.
     @since Aluminium-20160501 *)
 val is_relative: ?base_name:string -> string -> bool
 
@@ -84,8 +98,10 @@ module Normalized: sig
   type t = private string
 
   (** [of_string s] converts [s] into a normalized path.
-      @raise Invalid_argument if [s] is the empty string. *)
-  val of_string: ?base_name:string -> string -> t
+      @raise Invalid_argument if [s] is the empty string.
+      @modify Frama-C+dev add optional existence parameter.
+  *)
+  val of_string: ?existence:existence -> ?base_name:string -> string -> t
 
   (** [to_pretty_string p] returns [p] prettified,
       that is, a relative path-like string.

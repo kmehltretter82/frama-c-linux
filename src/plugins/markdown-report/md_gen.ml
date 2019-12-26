@@ -175,6 +175,7 @@ let section_stubs env =
 let get_files () =
   let dir_table = Datatype.String.Hashtbl.create 17 in
   let add_entry f =
+    let f = Filepath.Normalized.to_pretty_string f in
     let dir = Filename.dirname f in
     let base = Filename.basename f in
     let suf =

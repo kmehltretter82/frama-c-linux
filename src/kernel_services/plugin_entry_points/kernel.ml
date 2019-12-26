@@ -247,6 +247,18 @@ module String_list(X: Input_with_arg) =
       include X 
      end)
 
+module Filepath_list
+    (X: sig
+       include Input_with_arg
+       val existence: Filepath.existence
+       val file_kind: string
+     end) =
+  P.Filepath_list
+    (struct
+      let () = Parameter_customize.set_module_name X.module_name
+      include X
+     end)
+
 module Kernel_function_set(X: Input_with_arg) =
   P.Kernel_function_set
     (struct
@@ -720,7 +732,8 @@ module LoadState =
     (struct
        let option_name = "-load"
        let arg_name = "filename"
-       let existence = Parameter_sig.Must_exist
+       let existence = Filepath.Must_exist
+       let file_kind = "Frama-C state"
        let help = "load a previously-saved session from file <filename>"
      end)
 
@@ -1216,12 +1229,14 @@ module Files = struct
 
   let () = Parameter_customize.is_invisible ()
   let () = Parameter_customize.no_category ()
-  include String_list
+  include Filepath_list
     (struct
        let option_name = ""
        let module_name = "Files"
        let arg_name = ""
        let help = ""
+       let file_kind = "source"
+       let existence = Filepath.Must_exist
      end)
   let () = Cmdline.use_cmdline_files set
 

@@ -52,7 +52,7 @@ let new_project main_ui =
     (fun filenames ->
        let project = Project.create "interactive" in
        let init () =
-         Kernel.Files.set filenames;
+         Kernel.Files.set (List.map Datatype.Filepath.of_string filenames);
          File.init_from_cmdline ()
        in
        Project.on project init ();

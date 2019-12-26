@@ -164,7 +164,7 @@ let init_file_names () =
   c_file :=
     (match Kernel.Files.get () with
       | [] -> "dummy.i"
-      | f :: _ -> f);
+      | f :: _ -> Filepath.Normalized.to_pretty_string f);
   if (!c_file="") then dispErr ": invalid C file name" !c_file;
   if (not (Sys.file_exists !c_file)) then dispErr "not found" !c_file;
 
@@ -258,7 +258,7 @@ let output () =
   printverb "Finished.\n";
   (* Some test traces. *)
   Data_for_aorai.debug_computed_state ();
-  if !generatesCFile then Kernel.Files.set [!output_c_file]
+  if !generatesCFile then Kernel.Files.set [ Datatype.Filepath.of_string !output_c_file ]
 
 let work () =
   let file = Ast.get () in

@@ -423,7 +423,7 @@ module RemoveExn: Parameter_sig.Bool
   (** Behavior of option "-remove-exn" *)
 
 (** Analyzed files *)
-module Files: Parameter_sig.String_list
+module Files: Parameter_sig.Filepath_list
 (** List of files to analyse *)
 
 module Orig_name: Parameter_sig.Bool

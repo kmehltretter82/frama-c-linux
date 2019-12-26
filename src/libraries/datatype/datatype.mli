@@ -348,7 +348,7 @@ val integer: Integer.t Type.t
     @since 18.0-Argon *)
 module Filepath: sig
   include S_with_collections with type t = Filepath.Normalized.t
-  val of_string: ?base_name:string -> string -> t
+  val of_string: ?existence:Filepath.existence -> ?base_name:string -> string -> t
   val pp_abs: Format.formatter -> t -> unit
   val dummy: t
 end

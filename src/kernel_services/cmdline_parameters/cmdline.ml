@@ -726,7 +726,7 @@ let add_aliases orig ~plugin ~group stage aliases =
 
 let replace_option_setting = Plugin.replace_option_setting
 
-module On_Files = Hook.Build(struct type t = string list end)
+module On_Files = Hook.Build(struct type t = Filepath.Normalized.t list end)
 let use_cmdline_files = On_Files.extend
 
 let set_files used_loading l =
@@ -746,7 +746,7 @@ let set_files used_loading l =
         "ignoring source files specified on the command line \
          while loading a global initial context."
     else begin
-      On_Files.apply l;
+      On_Files.apply (List.map Filepath.Normalized.of_string l);
       After_setting.apply l
     end
 
