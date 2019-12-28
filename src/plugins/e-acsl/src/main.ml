@@ -142,15 +142,13 @@ let generate_code =
               Project.on
                 prepared_prj
                 (fun () ->
-                   let dup_prj = Dup_functions.dup () in
                    let copied_prj =
-                     Project.create_by_copy name ~last:true ~src:dup_prj
+                     Project.create_by_copy name ~last:true ~src:prepared_prj
                    in
                    Project.on
                      copied_prj
                      (fun () ->
-                        Gmp_types.init ();
-                        Mmodel_analysis.reset ();
+                        Dup_functions.dup ();
                         Injector.inject ();
                         (* remove the RTE's results computed from E-ACSL:
                            they are partial and associated with the wrong
@@ -162,8 +160,6 @@ let generate_code =
                         Project.clear ~selection ~project:copied_prj ();
                         Resulting_projects.mark_as_computed ())
                      ();
-                   if Options.Debug.get () = 0 then
-                     Project.remove ~project:dup_prj ();
                    copied_prj)
                 ()
             in
@@ -249,6 +245,6 @@ let () = Db.Main.extend main
 
 (*
 Local Variables:
-compile-command: "make -C .."
+compile-command: "make -C ../../../.."
 End:
 *)

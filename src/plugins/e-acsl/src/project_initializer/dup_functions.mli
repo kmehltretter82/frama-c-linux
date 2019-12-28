@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val dup: unit -> Project.t
+val dup: unit -> unit
 
 (*
 Local Variables:

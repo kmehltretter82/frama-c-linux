@@ -63,7 +63,7 @@ module Make(X: sig end) = struct
         ttype = TArray(
             TNamed(!t_struct_torig_ref, []),
             Some (Cil.one ~loc:Cil_datatype.Location.unknown),
-            {scache = Not_Computed},
+            { scache = Not_Computed },
             []);
         treferenced = true;
       }
@@ -112,3 +112,9 @@ let init () =
 
   end in
   try Cil.visitCilFileSameGlobals set_mp_t (Ast.get ()) with Exit -> ()
+
+(*
+Local Variables:
+compile-command: "make -C ../../../../.."
+End:
+*)

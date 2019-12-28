@@ -71,11 +71,13 @@ let dup_funspec tbl bhv spec =
 
     method !vterm_offset _ =
       Cil.DoChildrenPost
-        (function
-          (* no way to directly visit fieldinfo and model_info uses *)
-          | TField(fi, off) -> TField(Visitor_behavior.Get.fieldinfo bhv fi, off)
-          | TModel(mi, off) -> TModel(Visitor_behavior.Get.model_info bhv mi, off)
-          | off -> off)
+        (function (* no way to directly visit fieldinfo and model_info uses *)
+          | TField(fi, off) ->
+            TField(Visitor_behavior.Get.fieldinfo bhv fi, off)
+          | TModel(mi, off) ->
+            TModel(Visitor_behavior.Get.model_info bhv mi, off)
+          | off ->
+            off)
 
     method !vlogic_var_use orig_lvi =
       match orig_lvi.lv_origin with
@@ -91,9 +93,9 @@ let dup_funspec tbl bhv spec =
           Cil.ChangeDoChildrenPost
             ({ orig_lvi with lv_id = orig_lvi.lv_id } (* force a copy *),
              fun lvi ->
-               (* using [Visitor_behavior.Get.logic_var bhv lvi] is correct only because the
-                  lv_id used to compare the lvi does not change between the
-                  original one and this copy *)
+               (* using [Visitor_behavior.Get.logic_var bhv lvi] is correct only
+                  because the lv_id used to compare the lvi does not change
+                  between the original one and this copy *)
                try
                  let new_vi = Cil_datatype.Varinfo.Hashtbl.find tbl vi in
                  Cil_datatype.Logic_var.Hashtbl.add
@@ -166,14 +168,20 @@ let dup_fundec loc spec bhv sound_verdict_vi kf vi new_vi =
   let tbl = Cil_datatype.Varinfo.Hashtbl.create 7 in
   List.iter2 (Cil_datatype.Varinfo.Hashtbl.add tbl) formals new_formals;
   let new_spec = dup_funspec tbl bhv spec in
-  { svar = new_vi;
-    sformals = new_formals;
-    slocals = locals;
-    smaxid = List.length new_formals;
-    sbody = body;
-    smaxstmtid = None;
-    sallstmts = [];
-    sspec = new_spec }
+  let fundec =
+    { svar = new_vi;
+      sformals = new_formals;
+      slocals = locals;
+      smaxid = List.length new_formals;
+      sbody = body;
+      smaxstmtid = None;
+      sallstmts = [];
+      sspec = new_spec }
+  in
+  (* compute the CFG of the new [fundec] *)
+  Cfg.clearCFGinfo ~clear_id:false fundec;
+  Cfg.cfgFun fundec;
+  fundec
 
 let dup_global loc actions spec bhv sound_verdict_vi kf vi new_vi =
   let name = vi.vname in
@@ -186,7 +194,13 @@ let dup_global loc actions spec bhv sound_verdict_vi kf vi new_vi =
       Kernel_function.Hashtbl.add fct_tbl new_kf ();
       Globals.Functions.register new_kf;
       Globals.Functions.replace_by_definition new_spec fundec loc;
-      Annotations.register_funspec new_kf)
+      Annotations.register_funspec new_kf;
+      if new_vi.vname = "main" then begin
+        (* recompute the info about the old main since its name has changed;
+           see the corresponding part in the main visitor *)
+        Globals.Functions.remove vi;
+        Globals.Functions.register kf
+      end)
     actions;
   Options.feedback ~dkey ~level:2 "function %s" name;
   (* remove the specs attached to the previous kf iff it is a definition:
@@ -224,8 +238,8 @@ let dup_global loc actions spec bhv sound_verdict_vi kf vi new_vi =
 
 type position = Before_gmp | Gmpz | After_gmp | Memory_model | Code
 
-class dup_functions_visitor prj = object (self)
-  inherit Visitor.frama_c_copy prj
+class dup_functions_visitor = object (self)
+  inherit Visitor.frama_c_inplace
 
   val unduplicable_functions =
     let white_list =
@@ -247,7 +261,7 @@ class dup_functions_visitor prj = object (self)
 
   val mutable sound_verdict_vi =
     let name = Functions.RTL.mk_api_name "sound_verdict" in
-    let vi = Project.on prj (Cil.makeGlobalVar name) Cil.intType in
+    let vi = Cil.makeGlobalVar name Cil.intType in
     vi.vstorage <- Extern;
     vi.vreferenced <- true;
     vi
@@ -255,22 +269,6 @@ class dup_functions_visitor prj = object (self)
   method private before_memory_model = match before_memory_model with
     | Before_gmp | Gmpz | After_gmp -> true
     | Memory_model | Code -> false
-
-  method private insert_libc l =
-    match new_definitions with
-    | [] -> l
-    | _ :: _ ->
-      (* add the generated definitions of libc at the end of [l]. This way,
-         we are sure that they have access to all of it (in particular, the
-         memory model, GMP and the soundness variable).
-
-         Also add the [__e_acsl_sound_verdict] variable at the beginning *)
-      let res =
-        GVarDecl(sound_verdict_vi, Cil_datatype.Location.unknown)
-        :: l
-        @ new_definitions in
-      new_definitions <- [];
-      res
 
   method private next () =
     match before_memory_model with
@@ -282,19 +280,19 @@ class dup_functions_visitor prj = object (self)
 
   method !vlogic_info_decl li =
     Global.add_logic_info li;
-    Cil.JustCopy
+    Cil.SkipChildren
 
   method !vvrbl vi =
     try
       let new_vi = Cil_datatype.Varinfo.Hashtbl.find fct_tbl vi in
       Cil.ChangeTo new_vi
     with Not_found ->
-      Cil.JustCopy
+      Cil.SkipChildren
 
-  method private is_unvariadic_function vi =
+  method private is_variadic_function vi =
     match Cil.unrollType vi.vtype with
-    | TFun(_, _, variadic, _) -> not variadic
-    | _ -> false
+    | TFun(_, _, variadic, _) -> variadic
+    | _ -> true
 
   method !vglob_aux = function
     | GFunDecl(_, vi, loc) | GFun({ svar = vi }, loc)
@@ -303,7 +301,8 @@ class dup_functions_visitor prj = object (self)
         (* it is not already duplicated *)
         && not (Datatype.String.Set.mem vi.vname unduplicable_functions)
         (* it is duplicable *)
-        && self#is_unvariadic_function vi (* it is not a variadic function *)
+        && not (self#is_variadic_function vi)
+        (* it is not a variadic function *)
         && not (Misc.is_library_loc loc) (* it is not in the E-ACSL's RTL *)
         && not (Misc.is_fc_or_compiler_builtin vi) (* it is not a built-in *)
         &&
@@ -323,42 +322,51 @@ class dup_functions_visitor prj = object (self)
       ->
       self#next ();
       let name = Functions.RTL.mk_gen_name vi.vname in
-      let new_vi =
-        Project.on prj (Cil.makeGlobalVar name) vi.vtype
-      in
+      let new_vi = Cil.makeGlobalVar name vi.vtype in
       Cil_datatype.Varinfo.Hashtbl.add fct_tbl vi new_vi;
       Cil.DoChildrenPost
         (fun l -> match l with
-           | [ GVarDecl(vi, _) | GFunDecl(_, vi, _) | GFun({ svar = vi }, _) as g ]
+           | [ GVarDecl(vi, _) | GFunDecl(_, vi, _) | GFun({ svar = vi }, _)
+               as g ]
              ->
              (match g with
               | GFunDecl _ ->
-                if not (Kernel_function.is_definition (Extlib.the self#current_kf))
+                let kf = Extlib.the self#current_kf in
+                if not (Kernel_function.is_definition kf)
                 && vi.vname <> "malloc" && vi.vname <> "free"
                 then
                   Options.warning "@[annotating undefined function `%a':@ \
-                                   the generated program may miss memory instrumentation@ \
-                                   if there are memory-related annotations.@]"
+                                   the generated program may miss memory \
+                                   instrumentation@ if there are \
+                                   memory-related annotations.@]"
                     Printer.pp_varinfo vi
               | GFun _ -> ()
               | _ -> assert false);
              let tmp = vi.vname in
-             if tmp = Kernel.MainFunction.get () then begin
-               (* the new function becomes the new main: simply swap the name of both
-                  functions *)
+             if tmp = "main" then begin
+               (* the new function becomes the new main: *)
+               (* 1. swap the name of both functions *)
                vi.vname <- new_vi.vname;
-               new_vi.vname <- tmp
+               new_vi.vname <- tmp;
+               (* 2. force recomputation of the entry point if necessary *)
+               if Kernel.MainFunction.get () = tmp then begin
+                 let selection =
+                   State_selection.with_dependencies Kernel.MainFunction.self
+                 in
+                 Project.clear ~selection ()
+               end
+               (* 3. recompute what is necessary in [Globals.Functions]:
+                  done in [dup_global] *)
              end;
              let kf =
                try
-                 Globals.Functions.get (Visitor_behavior.Get_orig.varinfo self#behavior vi)
+                 Globals.Functions.get vi
                with Not_found ->
                  Options.fatal
                    "unknown function `%s' while trying to duplicate it"
                    vi.vname
              in
              let spec = Annotations.funspec ~populate:false kf in
-             let vi_bhv = Visitor_behavior.Get.varinfo self#behavior vi in
              let new_g, new_decl =
                dup_global
                  loc
@@ -367,14 +375,14 @@ class dup_functions_visitor prj = object (self)
                  self#behavior
                  sound_verdict_vi
                  kf
-                 vi_bhv
+                 vi
                  new_vi
              in
              (* postpone the introduction of the new function definition to the
                 end *)
              new_definitions <- new_g :: new_definitions;
-             (* put the declaration before the original function in order to solve
-                issue with recursive functions *)
+             (* put the declaration before the original function in order to
+                solve issue with recursive functions *)
              [ new_decl; g ]
            | _ -> assert false)
     | GVarDecl(_, loc) | GFunDecl(_, _, loc) | GFun(_, loc)
@@ -385,44 +393,46 @@ class dup_functions_visitor prj = object (self)
        | After_gmp -> before_memory_model <- Memory_model
        | Code -> () (* still processing the GMP and memory model headers,
                        but reading some libc code *));
-      Cil.JustCopy
+      Cil.DoChildren
     | GVarDecl(vi, _) | GFunDecl(_, vi, _) | GFun({ svar = vi }, _)
       when Misc.is_fc_or_compiler_builtin vi ->
       self#next ();
-      Cil.JustCopy
+      Cil.DoChildren
     | _ ->
       self#next ();
       Cil.DoChildren
 
-  method !vfile _ =
+  method !vfile f =
     Cil.DoChildrenPost
-      (fun f ->
+      (fun _ ->
          match new_definitions with
          | [] -> f
          | _ :: _ ->
-           (* required by the few cases where there is no global tagged as
-              [Code] in the file. *)
-           f.globals <- self#insert_libc f.globals;
+           (* add the generated definitions of libc at the end of [l]. This way,
+              we are sure that they have access to all of it (in particular, the
+              memory model, GMP and the soundness variable). Also add the
+              [__e_acsl_sound_verdict] variable at the beginning *)
+           let new_globals =
+             GVarDecl(sound_verdict_vi, Cil_datatype.Location.unknown)
+             :: f.globals
+             @ new_definitions
+           in
+           f.globals <- new_globals;
            f)
 
   initializer
-    Project.copy ~selection:(Parameter_state.get_selection ()) prj;
     reset ()
 
 end
 
 let dup () =
   Options.feedback ~level:2 "duplicating annotated functions";
-  let prj =
-    File.create_project_from_visitor
-      "e_acsl_dup_functions"
-      (new dup_functions_visitor)
-  in
+  Visitor.visitFramacFile (new dup_functions_visitor) (Ast.get ());
   Queue.iter (fun f -> f ()) actions;
-  prj
+  Ast.mark_as_grown ()
 
 (*
 Local Variables:
-compile-command: "make"
+compile-command: "make -C ../../../../.."
 End:
 *)

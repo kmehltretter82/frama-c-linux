@@ -757,6 +757,7 @@ let reset_all ast =
   (* by default, do not run E-ACSL on the generated code *)
   Options.Run.off ();
   (* reset all the E-ACSL environments to their original states *)
+  Mmodel_analysis.reset ();
   Misc.reset ();
   Logic_functions.reset ();
   Literal_strings.reset ();
@@ -776,6 +777,7 @@ let inject () =
     Project.pretty (Project.current ());
   Keep_status.before_translation ();
   Misc.reorder_ast ();
+  Gmp_types.init ();
   let ast = Ast.get () in
   inject_in_file ast;
   reset_all ast;
