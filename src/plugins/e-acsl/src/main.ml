@@ -137,39 +137,29 @@ let generate_code =
          (fun () ->
             Options.feedback "beginning translation.";
             Temporal.enable (Options.Temporal_validity.get ());
-            let prepared_prj = Prepare_ast.prepare () in
-            let res =
-              Project.on
-                prepared_prj
-                (fun () ->
-                   let copied_prj =
-                     Project.create_by_copy name ~last:true ~src:prepared_prj
-                   in
-                   Project.on
-                     copied_prj
-                     (fun () ->
-                        Dup_functions.dup ();
-                        Injector.inject ();
-                        (* remove the RTE's results computed from E-ACSL:
-                           they are partial and associated with the wrong
-                           kernel function (the one of the old project). *)
-                        (* [TODO ARCHI] what if RTE was already computed? *)
-                        let selection =
-                          State_selection.with_dependencies !Db.RteGen.self
-                        in
-                        Project.clear ~selection ~project:copied_prj ();
-                        Resulting_projects.mark_as_computed ())
-                     ();
-                   copied_prj)
-                ()
+            let copied_prj =
+              Project.create_by_copy name ~last:true
             in
-            if Options.Debug.get () = 0 then begin
-              Project.remove ~project:prepared_prj ();
-            end;
+            Project.on
+              copied_prj
+              (fun () ->
+                 Prepare_ast.prepare ();
+                 Dup_functions.dup ();
+                 Injector.inject ();
+                 (* remove the RTE's results computed from E-ACSL: they are
+                      partial and associated with the wrong kernel function (the
+                      one of the old project). *)
+                 (* [TODO ARCHI] what if RTE was already computed? *)
+                 let selection =
+                   State_selection.with_dependencies !Db.RteGen.self
+                 in
+                 Project.clear ~selection ~project:copied_prj ();
+                 Resulting_projects.mark_as_computed ())
+              ();
             Options.feedback "translation done in project \"%s\"."
               (Options.Project_name.get ());
-            res)
-         ())
+            copied_prj)
+())
 
 let generate_code =
   Dynamic.register

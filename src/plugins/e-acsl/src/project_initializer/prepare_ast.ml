@@ -25,54 +25,65 @@ open Cil_types
 exception Alignment_error of string
 let align_error s = raise (Alignment_error s)
 
-(* Returns true if the list of attributes [attrs] contains an [align]
- * attribute of [algn] or greater. Returns false otherwise.
- * Throws an exception if
- *  - [attrs] contains several [align] attributes specifying different
- *    alignment
- *  - [attrs] has a single align attribute with a value which is less than [algn] *)
+(* Returns true if the list of attributes [attrs] contains an [align] attribute
+   of [algn] or greater. Returns false otherwise.
+   Throws an exception if
+   - [attrs] contains several [align] attributes specifying different
+   alignments
+   - [attrs] has a single align attribute with a value which is less than
+   [algn] *)
 let sufficiently_aligned attrs algn =
-  let alignment = List.fold_left (fun acc attr ->
-      match attr with
-      | Attr("align", [AInt i]) ->
-        let alignment = Integer.to_int i in
-        if acc <> 0 && acc <> alignment then
-          (* Multiple align attributes with different values *)
-          align_error "Multiple alignment attributes"
-        else if alignment < algn then
-          (* If there is an alignment attribute it should be greater
-            * or equal to [algn] *)
-          align_error "Insufficient alignment"
-        else
-          alignment
-      | Attr("align", _) ->
-        (* Align attribute with an argument other than a single number,
-           should not happen really *)
-        assert false
-      | _ -> acc
-    ) 0 attrs in alignment > 0
+  let alignment =
+    List.fold_left
+      (fun acc attr ->
+         match attr with
+         | Attr("align", [AInt i]) ->
+           let alignment = Integer.to_int i in
+           if acc <> 0 && acc <> alignment then
+             (* multiple align attributes with different values *)
+             align_error "Multiple alignment attributes"
+           else if alignment < algn then
+             (* if there is an alignment attribute it should be greater or equal
+                to [algn] *)
+             align_error "Insufficient alignment"
+           else
+             alignment
+         | Attr("align", _) ->
+           (* align attribute with an argument other than a single number,
+              should not happen really *)
+           assert false
+         | _ -> acc)
+      0
+      attrs
+  in
+  alignment > 0
 
 (* Given the type and the list of attributes of [varinfo] ([fieldinfo]) return
- * true if that [varinfo] ([fieldinfo]) requires to be aligned at the boundary
- * of [algn] (i.e., less than [algn] bytes and has no alignment attribute *)
+   true if that [varinfo] ([fieldinfo]) requires to be aligned at the boundary
+   of [algn] (i.e., less than [algn] bytes and has no alignment attribute *)
 let require_alignment typ attrs algn =
   Cil.bitsSizeOf typ < algn*8 && not (sufficiently_aligned attrs algn)
 
-class prepare_visitor prj = object (self)
-  inherit Visitor.frama_c_copy prj
+class prepare_visitor = object (self)
+  inherit Visitor.frama_c_inplace
+
+  val mutable has_new_stmt_in_fundec = false
+  val mutable has_new_stmt = false
 
   (* Add align attributes to local variables (required by temporal analysis) *)
   method !vblock _ =
     if Options.Temporal_validity.get () then
-      Cil.DoChildrenPost (fun blk ->
-          List.iter (fun vi ->
-              (* 4 bytes alignment is required to allow sufficient space for storage
-                 of 32-bit timestamps in a 1:1 shadow. *)
-              if require_alignment vi.vtype vi.vattr 4; then begin
-                vi.vattr <- Attr("aligned",[AInt Integer.four]) :: vi.vattr
-              end)
-            blk.blocals;
-          blk)
+      Cil.DoChildrenPost
+        (fun blk ->
+           List.iter
+             (fun vi ->
+                (* 4 bytes alignment is required to allow sufficient space for
+                   storage of 32-bit timestamps in a 1:1 shadow. *)
+                if require_alignment vi.vtype vi.vattr 4 then begin
+                  vi.vattr <- Attr("aligned", [ AInt Integer.four ]) :: vi.vattr
+                end)
+             blk.blocals;
+           blk)
     else
       Cil.DoChildren
 
@@ -146,7 +157,7 @@ class prepare_visitor prj = object (self)
     | AVariant v ->
       push kf K_Variant (Property.ip_of_decreases kf (Kstmt stmt) v)
     | AAssigns _ ->
-      (* TODO: should be a postcondition, but considered as a unhandled
+      (* TODO: should be a postcondition, but considered as an unhandled
          precondition in translate.ml right now; and we need to preserve the
          same ordering *)
       Extlib.may
@@ -156,8 +167,12 @@ class prepare_visitor prj = object (self)
       Extlib.may
         (push kf K_Allocation)
         (Property.ip_of_allocation kf (Kstmt stmt) (Property.Id_loop a) alloc)
-    | APragma _ -> () (* not yet translated *)
-    | AExtended _ -> () (* never translate extensions *)
+    | APragma _ ->
+      (* not yet translated *)
+      ()
+    | AExtended _ ->
+      (* never translate extensions *)
+      ()
 
   method private push_post_code_annot a = match a.annot_content with
     | AStmtSpec(_ (* TODO *), s) -> self#push_post_spec s
@@ -169,25 +184,39 @@ class prepare_visitor prj = object (self)
     | APragma _
     | AExtended _ -> ()
 
-  (* Move variable declared in the body of a switch statement to the outer
-     scope *)
-  method !vstmt_aux init_stmt =
+  method !vstmt_aux stmt =
     Annotations.iter_code_annot
       (fun _ a -> self#push_pre_code_annot a)
-      init_stmt;
+      stmt;
     Cil.DoChildrenPost
-      (fun stmt ->
+      (fun _ ->
          Annotations.iter_code_annot
            (fun _ a -> self#push_post_code_annot a)
-           init_stmt;
+           stmt;
+         (* move variable declared in the body of a switch statement to the
+            outer scope *)
          match stmt.skind with
          | Switch(_,sw_blk,_,_) ->
            let new_blk = Cil.mkBlock [ stmt ] in
            let new_stmt = Cil.mkStmt ~valid_sid:true (Block new_blk) in
            new_blk.blocals <- sw_blk.blocals;
            sw_blk.blocals <- [];
+           has_new_stmt_in_fundec <- true;
            new_stmt
-         | _ -> stmt)
+         | _ ->
+           stmt)
+
+  method !vfunc fundec =
+    Cil.DoChildrenPost
+      (fun _ ->
+         if has_new_stmt_in_fundec then begin
+           has_new_stmt <- true;
+           has_new_stmt_in_fundec <- false;
+           (* recompute the CFG *)
+           Cfg.clearCFGinfo ~clear_id:false fundec;
+           Cfg.cfgFun fundec;
+         end;
+         fundec)
 
   method private is_unvariadic_function vi =
     match Cil.unrollType vi.vtype with
@@ -210,15 +239,17 @@ class prepare_visitor prj = object (self)
     | _ ->
       Cil.DoChildren
 
-  initializer Project.copy ~selection:(Parameter_state.get_selection ()) prj
+  method !vfile _ =
+    Cil.DoChildrenPost
+      (fun f ->
+         if has_new_stmt then Ast.mark_as_grown ();
+         f)
 
 end
 
 let prepare () =
   Options.feedback ~level:2 "prepare AST for E-ACSL transformations";
-  File.create_project_from_visitor
-    "e_acsl_prepare_ast"
-    (new prepare_visitor)
+  Visitor.visitFramacFileSameGlobals (new prepare_visitor) (Ast.get ())
 
 (*
 Local Variables:

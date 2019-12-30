@@ -192,9 +192,9 @@ end = struct
          By construction, there are no physically equal terms in the AST
          built by Cil. Consequently the memoisation should be fully
          useless. However the translation of E-ACSL guarded quantification
-         generates new terms (see module {!Quantif}) which must be typed. The term
-         corresponding to the bound variable [x] is actually used twice: once in
-         the guard and once for encoding [x+1] when incrementing it. The
+         generates new terms (see module {!Quantif}) which must be typed. The
+         term corresponding to the bound variable [x] is actually used twice:
+         once in the guard and once for encoding [x+1] when incrementing it. The
          memoization is only useful here and indeed prevent the generation of
          one extra variable in some cases. *)
       let equal (t1:term) t2 = t1 == t2
@@ -755,6 +755,6 @@ module Datatype = D
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)

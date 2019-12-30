@@ -22,15 +22,17 @@
 
 (** Prepare AST for E-ACSL generation.
 
-    So for this module performs two tasks:
+    So for this module performs the following tasks:
     - move declarations of variables declared in the bodies of switch
       statements to upper scopes;
-    - store what is necessary to translate in [Keep_status]. *)
+    - store what is necessary to translate in [Keep_status]
+    - in case of temporal validity checks, add the attribute "aligned" to
+    variables that are not sufficiently aligned. *)
 
-val prepare: unit -> Project.t
+val prepare: unit -> unit
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)
