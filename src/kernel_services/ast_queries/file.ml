@@ -1653,7 +1653,6 @@ let init_from_cmdline () =
   end;
   let files = Kernel.Files.get () in
   if files = [] && not !Config.is_gui then Kernel.warning "no input file.";
-
   let files = List.map (fun f -> from_filename f) files in
   try
     init_from_c_files files;
