@@ -144,7 +144,6 @@ let generate_code =
               copied_prj
               (fun () ->
                  Prepare_ast.prepare ();
-                 Dup_functions.dup ();
                  Injector.inject ();
                  (* remove the RTE's results computed from E-ACSL: they are
                       partial and associated with the wrong kernel function (the

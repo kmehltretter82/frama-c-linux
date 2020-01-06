@@ -58,8 +58,7 @@ SRC_ANALYSES:=$(addprefix src/analyses/, $(SRC_ANALYSES))
 # project initializer
 SRC_PROJECT_INITIALIZER:= \
 	keep_status \
-	prepare_ast \
-	dup_functions
+	prepare_ast
 SRC_PROJECT_INITIALIZER:=\
   $(addprefix src/project_initializer/, $(SRC_PROJECT_INITIALIZER))
 
