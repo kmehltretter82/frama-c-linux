@@ -69,6 +69,17 @@ class prepare_visitor = object (self)
 
   val mutable has_new_stmt_in_fundec = false
   val mutable has_new_stmt = false
+  val terms = Misc.Id_term.Hashtbl.create 7
+
+  method !vterm _t =
+    Cil.DoChildrenPost
+      (fun t ->
+         if Misc.Id_term.Hashtbl.mem terms t then
+           (* remove term sharing for soundness of E-ACSL typing
+              (see typing.ml) *)
+           { t with term_node = t.term_node }
+         else
+           t)
 
   (* Add align attributes to local variables (required by temporal analysis) *)
   method !vblock _ =

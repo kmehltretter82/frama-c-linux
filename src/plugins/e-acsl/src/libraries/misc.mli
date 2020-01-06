@@ -102,6 +102,9 @@ val name_of_binop: binop -> string
 val finite_min_and_max: Ival.t -> Integer.t * Integer.t
 (** [finite_min_and_max i] takes the finite ival [i] and returns its bounds *)
 
+module Id_term: Datatype.S_with_collections with type t = term
+(** datatype for terms that relies on physical equality *)
+
 (*
 Local Variables:
 compile-command: "make -C ../../../../.."

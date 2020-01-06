@@ -1,5 +1,5 @@
 /* run.config
-   COMMENT: Check variable-length arrays
+   COMMENT: check variable-length arrays
 */
 
 int LEN = 10;
