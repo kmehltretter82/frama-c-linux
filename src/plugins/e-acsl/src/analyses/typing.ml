@@ -191,11 +191,11 @@ end = struct
      useless. However:
      - type info of many terms are accessed several times
      - the translation of E-ACSL guarded quantifications generates
-     new terms (see module {!Quantif}) which must be typed. The term
-     corresponding to the bound variable [x] is actually used twice: once in the
-     guard and once for encoding [x+1] when incrementing it. The memoization is
-     only useful here and indeed prevent the generation of one extra variable in
-     some cases. *)
+       new terms (see module {!Quantif}) which must be typed. The term
+       corresponding to the bound variable [x] is actually used twice: once in the
+       guard and once for encoding [x+1] when incrementing it. The memoization is
+       only useful here and indeed prevent the generation of one extra variable in
+       some cases. *)
   let tbl = Misc.Id_term.Hashtbl.create 97
 
   let get t =

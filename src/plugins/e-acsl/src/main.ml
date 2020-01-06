@@ -158,7 +158,7 @@ let generate_code =
             Options.feedback "translation done in project \"%s\"."
               (Options.Project_name.get ());
             copied_prj)
-())
+         ())
 
 let generate_code =
   Dynamic.register

@@ -245,9 +245,9 @@ let align_error s = raise (Alignment_error s)
    of [algn] or greater. Returns false otherwise.
    Throws an exception if
    - [attrs] contains several [align] attributes specifying different
-   alignments
+     alignments
    - [attrs] has a single align attribute with a value which is less than
-   [algn] *)
+     [algn] *)
 let sufficiently_aligned attrs algn =
   let alignment =
     List.fold_left

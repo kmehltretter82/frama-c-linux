@@ -29,7 +29,7 @@
       statements to upper scopes;
     - storing what is necessary to translate in [Keep_status]
     - in case of temporal validity checks, adding the attribute "aligned" to
-    variables that are not sufficiently aligned. *)
+      variables that are not sufficiently aligned. *)
 
 val prepare: unit -> unit
 
