@@ -1227,7 +1227,7 @@ struct
     Make_list
       (struct
         include Datatype.Filepath
-        let to_string = Fc_Filepath.Normalized.to_pretty_string
+        let to_string s = (s : t :> string)
         let of_singleton_string = no_element_of_string
 
         let of_string s =
@@ -1237,12 +1237,12 @@ struct
             P.L.abort "%s%sfile '%s' does not exist"
               X.file_kind
               (if X.file_kind = "" then "" else " ")
-              s
+              (Fc_Filepath.Normalized.(to_pretty_string (of_string s)))
           | Fc_Filepath.File_exists ->
             P.L.abort "%s%sfile '%s' already exists"
               X.file_kind
               (if X.file_kind = "" then "" else " ")
-              s
+              (Fc_Filepath.Normalized.(to_pretty_string (of_string s)))
       end)
       (struct
         include X

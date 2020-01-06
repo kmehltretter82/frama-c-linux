@@ -30,13 +30,13 @@ type cpp_opt_kind = Gnu | Not_gnu | Unknown
     Note: [string] is used here instead of [Filepath], to preserve
           names given in the command line, without normalization. *)
 type file =
-  | NeedCPP of string * string * cpp_opt_kind
+  | NeedCPP of Filepath.Normalized.t * string * cpp_opt_kind
       (** The first string is the filename of the [.c] to preprocess.
           The second one is the preprocessor command ([filename.c -o
           tempfilname.i] will be appended at the end).*)
-  | NoCPP of string
+  | NoCPP of Filepath.Normalized.t
       (** Already pre-processed file [.i] *)
-  | External of string * string
+  | External of Filepath.Normalized.t * string
       (** file that can be translated into a Cil AST through an external
           function, together with the recognized suffix. *)
 
@@ -145,7 +145,7 @@ val pre_register: t -> unit
 val get_all: unit -> t list
   (** Return the list of toplevel files. *)
 
-val from_filename: ?cpp:string -> string -> t
+val from_filename: ?cpp:string -> Datatype.Filepath.t -> t
   (** Build a file from its name. The optional argument is the preprocessor
       command. Default is [!get_preprocessor_command ()]. *)
 

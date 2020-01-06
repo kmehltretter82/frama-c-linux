@@ -35,13 +35,14 @@ let pretty_cpp_opt_kind fmt =
 
 type file =
   | NeedCPP of
-      string (* filename of the [.c] to preprocess *)
+      Filepath.Normalized.t (* filename of the [.c] to preprocess *)
       * string (* Preprocessor command.
                   [filename.c -o tempfilname.i] will be appended at the
                     end.*)
       * cpp_opt_kind
-  | NoCPP of string (** filename of a preprocessed [.c] *)
-  | External of string * string (* file * name of plug-in that handles it *)
+  | NoCPP of Filepath.Normalized.t (** filename of a preprocessed [.c] *)
+  | External of Filepath.Normalized.t * string
+  (* file * name of plug-in that handles it *)
 
 module D =
   Datatype.Make
@@ -50,18 +51,26 @@ module D =
       type t = file
       let name = "File"
       let reprs =
-        [ NeedCPP("", "", Unknown); NoCPP ""; External("", "") ]
+        [ NeedCPP(Filepath.Normalized.unknown, "", Unknown);
+          NoCPP Filepath.Normalized.unknown;
+          External(Filepath.Normalized.unknown, "")
+        ]
       let structural_descr = Structural_descr.t_abstract
       let mem_project = Datatype.never_any_project
       let copy = Datatype.identity (* immutable strings *)
       let internal_pretty_code p_caller fmt t =
         let pp fmt = match t with
-          | NoCPP s -> Format.fprintf fmt "@[File.NoCPP %S@]" (s :> string)
+          | NoCPP s ->
+            Format.fprintf fmt "@[File.NoCPP %a@]" Filepath.Normalized.pretty s
           | External (f,p) ->
-            Format.fprintf fmt "@[File.External (%S,%S)@]" (f :> string) p
-          | NeedCPP (a,b,c) ->
+            Format.fprintf fmt "@[File.External (%a,%S)@]"
+              Filepath.Normalized.pretty f p
+          | NeedCPP (f,cmd,kind) ->
             Format.fprintf
-              fmt "@[File.NeedCPP (%S,%S,%a)@]" (a :> string) b pretty_cpp_opt_kind c
+              fmt "@[File.NeedCPP (%a,%S,%a)@]"
+              Filepath.Normalized.pretty f
+              cmd
+              pretty_cpp_opt_kind kind
         in
         Type.par p_caller Type.Call fmt pp
     end)
@@ -75,7 +84,9 @@ let get_suffixes () =
     check_suffixes
     [ ".c"; ".i"; ".h" ]
 
-let get_name = function NeedCPP (s,_,_) | NoCPP s | External (s,_) -> s
+let get_name s =
+  let file = match s with  NeedCPP (s,_,_) | NoCPP s | External (s,_) -> s in
+  Filepath.Normalized.to_pretty_string file
 
 (* ************************************************************************* *)
 (** {2 Preprocessor command} *)
@@ -107,13 +118,12 @@ let get_preprocessor_command () =
   end
 
 let from_filename ?cpp f =
-  let path = Datatype.Filepath.of_string f in
   let cpp, is_gnu_like =
     let cmdline = Kernel.CppCommand.get() in
     if cmdline <> "" then
       cmdline, cpp_opt_kind ()
     else
-      let flags = Json_compilation_database.get_flags path in
+      let flags = Json_compilation_database.get_flags f in
       let cpp, gnu =
         match cpp with
         | None -> get_preprocessor_command ()
@@ -121,13 +131,13 @@ let from_filename ?cpp f =
       in
       (if flags = [] then cpp else cpp ^ " " ^ String.concat " " flags), gnu
   in
-  if Filename.check_suffix f ".i" then begin
+  if Filename.check_suffix (f:>string) ".i" then begin
     NoCPP f
   end else
     let suf =
       try
-        let suf_idx = String.rindex f '.' in
-        String.sub f suf_idx (String.length f - suf_idx)
+        let suf_idx = String.rindex (f:>string) '.' in
+        String.sub (f:>string) suf_idx (String.length (f:>string) - suf_idx)
       with Not_found -> (* raised by String.rindex if '.' \notin f *)
         ""
     in
@@ -413,15 +423,16 @@ let build_cpp_cmd cmdl supp_args in_file out_file =
 
 let parse_cabs = function
   | NoCPP f ->
-    if not (Sys.file_exists f) then
-      Kernel.abort "preprocessed file %S does not exist" f;
-    let path = Datatype.Filepath.of_string f in
+    if not (Sys.file_exists (f:>string)) then
+      Kernel.abort "preprocessed file %a does not exist"
+        Filepath.Normalized.pretty f;
     Kernel.feedback "Parsing %a (no preprocessing)"
-      Datatype.Filepath.pretty path;
-    Frontc.parse (Datatype.Filepath.of_string f) ()
+      Datatype.Filepath.pretty f;
+    Frontc.parse f ()
   | NeedCPP (f, cmdl, is_gnu_like) ->
     if not (Sys.file_exists (f :> string)) then
-      Kernel.abort "source file %S does not exist" (f :> string);
+      Kernel.abort "source file %a does not exist"
+        Filepath.Normalized.pretty f;
     let debug = Kernel.is_debug_key_enabled Kernel.dkey_parser in
     let add_if_gnu opt =
       match is_gnu_like with
@@ -506,16 +517,18 @@ let parse_cabs = function
         include_args define_args
     in
     Kernel.feedback ~dkey:Kernel.dkey_pp
-      "@{<i>preprocessing@} with \"%s %s %s\"" cmdl supp_args f;
-    let path = Datatype.Filepath.of_string f in
+      "@{<i>preprocessing@} with \"%s %s %a\""
+      cmdl supp_args Filepath.Normalized.pretty f;
     Kernel.feedback "Parsing %a (with preprocessing)"
-      Datatype.Filepath.pretty path;
-    let cpp_command = build_cpp_cmd cmdl supp_args f (ppf :> string) in
+      Datatype.Filepath.pretty f;
+    let cpp_command = build_cpp_cmd cmdl supp_args (f:>string) (ppf:>string) in
     if Sys.command cpp_command <> 0 then begin
       safe_remove_file ppf;
-      Kernel.abort "failed to run: %s@\n\
-                    you may set the CPP environment variable to select the proper \
-                    preprocessor command or use the option \"-cpp-command\"." cpp_command
+      Kernel.abort
+        "failed to run: %s@\n\
+         you may set the CPP environment variable to select the proper \
+         preprocessor command or use the option \"-cpp-command\"."
+        cpp_command
     end;
     let ppf =
       if Kernel.ReadAnnot.get() &&
@@ -549,19 +562,21 @@ let parse_cabs = function
       end else ppf
     in
     let (cil,(_,defs)) = Frontc.parse ppf () in
-    cil.fileName <- path;
+    cil.fileName <- f;
     safe_remove_file ppf;
-    (cil,(path,defs))
+    (cil,(f,defs))
   | External (f,suf) ->
-    if not (Sys.file_exists f) then
-      Kernel.abort "file %S does not exist." f;
+    if not (Sys.file_exists (f:>string)) then
+      Kernel.abort "file %a does not exist."
+        Filepath.Normalized.pretty f;
     try
-      let path = Datatype.Filepath.of_string f in
       Kernel.feedback "Parsing %a (external front-end)"
-        Datatype.Filepath.pretty path;
-      Hashtbl.find check_suffixes suf f
+        Datatype.Filepath.pretty f;
+      Hashtbl.find check_suffixes suf (f:>string)
     with Not_found ->
-      Kernel.abort "could not find a suitable plugin for parsing %S." f
+      Kernel.abort
+        "could not find a suitable plugin for parsing %a."
+        Filepath.Normalized.pretty f
 
 let to_cil_cabs f =
   try
@@ -1638,9 +1653,8 @@ let init_from_cmdline () =
   end;
   let files = Kernel.Files.get () in
   if files = [] && not !Config.is_gui then Kernel.warning "no input file.";
-  let files =
-    List.map (fun f -> from_filename (Filepath.Normalized.to_pretty_string f)) files
-  in
+
+  let files = List.map (fun f -> from_filename f) files in
   try
     init_from_c_files files;
     if Kernel.Check.get () then begin
@@ -1710,7 +1724,7 @@ let create_rebuilt_project_from_visitor
       let ext = if preprocess then ".c" else ".i" in
       let debug = Kernel.Debug.get () > 0 in
       let tmp_fname = Extlib.temp_file_cleanup_at_exit ~debug name ext in
-      tmp_fname
+      Filepath.Normalized.of_string tmp_fname
     in
     let cout = open_out (f :> string) in
     let fmt = Format.formatter_of_out_channel cout in

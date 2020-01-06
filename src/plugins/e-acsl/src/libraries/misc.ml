@@ -30,15 +30,12 @@ open Cil_datatype
 
 let library_files () =
   List.map
-    (fun d -> Options.Share.file ~error:true d)
+    (fun d ->
+       Filepath.Normalized.of_string (Options.Share.file ~error:true d))
     [ "e_acsl_gmp_api.h";
       "e_acsl.h" ]
 
-let normalized_library_files =
-  lazy (List.map Datatype.Filepath.of_string (library_files ()))
-
-let is_library_loc (loc, _) =
-  List.mem loc.Filepath.pos_path (Lazy.force normalized_library_files)
+let is_library_loc (loc, _) = List.mem loc.Filepath.pos_path (library_files ())
 
 let library_functions = Datatype.String.Hashtbl.create 17
 let register_library_function vi =
