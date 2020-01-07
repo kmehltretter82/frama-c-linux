@@ -180,6 +180,3 @@ val complement_under: size:int -> signed:bool -> t -> t or_bottom
     by default. If [increasing] is set to false, iterate by decreasing order.
     @raise Abstract_interp.Error_Top if the abstraction is unbounded. *)
 val fold_int: ?increasing:bool -> (Integer.t -> 'a -> 'a) -> t -> 'a -> 'a
-
-(** Low-level operation for demarshalling *)
-val rehash: t -> t

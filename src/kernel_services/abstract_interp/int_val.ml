@@ -59,10 +59,6 @@ let pretty fmt = function
   | Itv i -> Int_interval.pretty fmt i
   | Set s -> Int_set.pretty fmt s
 
-let rehash = function
-  | Set s -> Set (Int_set.rehash s)
-  | x -> x
-
 include Datatype.Make_with_collections
     (struct
       type t = int_val
@@ -77,7 +73,7 @@ include Datatype.Make_with_collections
       let compare = compare
       let hash = hash
       let pretty = pretty
-      let rehash = rehash
+      let rehash x = x
       let internal_pretty_code = Datatype.pp_fail
       let mem_project = Datatype.never_any_project
       let copy = Datatype.undefined
@@ -348,9 +344,9 @@ let diff value rem =
 (* ------------------------------- Lattice ---------------------------------- *)
 
 let is_included t1 t2 =
-  (t1 == t2) ||
   match t1, t2 with
   | Itv i1, Itv i2 -> Int_interval.is_included i1 i2
+  | Set s1, Set s2 -> Int_set.is_included s1 s2
   | Itv _, Set _ -> false (* Itv _ represents more elements
                              than can be represented by Set _ *)
   | Set s, Itv i ->
@@ -359,29 +355,27 @@ let is_included t1 t2 =
     min_le_elt min (Int_set.min s) && max_ge_elt max (Int_set.max s)
     && (Int.equal Int.one modu (* Top side contains all integers, we're done *)
         || Int_set.for_all (fun x -> Int.equal (Int.e_rem x modu) rem) s)
-  | Set s1, Set s2 -> Int_set.is_included s1 s2
 
 let join v1 v2 =
-  if v1 == v2 then v1 else
-    match v1,v2 with
-    | Itv i1, Itv i2 -> Itv (Int_interval.join i1 i2)
-    | Set i1, Set i2 -> inject_set_or_top (Int_set.join i1 i2)
-    | Set s, Itv i
-    | Itv i, Set s ->
-      let min, max, r, modu = Int_interval.min_max_rem_modu i in
-      let f elt modu = Int.pgcd modu (Int.abs (Int.sub r elt)) in
-      let modu = Int_set.fold f s modu in
-      let rem = Int.e_rem r modu in
-      let min = match min with
-          None -> None
-        | Some m -> Some (Int.min m (Int_set.min s))
-      in
-      let max = match max with
-          None -> None
-        | Some m -> Some (Int.max m (Int_set.max s))
-      in
-      check ~min ~max ~rem ~modu;
-      Itv (Int_interval.make ~min ~max ~rem ~modu)
+  match v1, v2 with
+  | Itv i1, Itv i2 -> Itv (Int_interval.join i1 i2)
+  | Set s1, Set s2 -> inject_set_or_top (Int_set.join s1 s2)
+  | Set s, Itv i
+  | Itv i, Set s ->
+    let min, max, r, modu = Int_interval.min_max_rem_modu i in
+    let f elt modu = Int.pgcd modu (Int.abs (Int.sub r elt)) in
+    let modu = Int_set.fold f s modu in
+    let rem = Int.e_rem r modu in
+    let min = match min with
+        None -> None
+      | Some m -> Some (Int.min m (Int_set.min s))
+    in
+    let max = match max with
+        None -> None
+      | Some m -> Some (Int.max m (Int_set.max s))
+    in
+    check ~min ~max ~rem ~modu;
+    Itv (Int_interval.make ~min ~max ~rem ~modu)
 
 let link v1 v2 =
   match v1, v2 with
@@ -401,18 +395,14 @@ let link v1 v2 =
     check_make ~min ~max ~rem ~modu
 
 let meet v1 v2 =
-  if v1 == v2 then `Value v1 else
-    match v1, v2 with
-    | Itv i1, Itv i2 -> Int_interval.meet i1 i2 >>-: inject_itv
-    | Set s1 , Set s2 -> Int_set.meet s1 s2 >>-: inject_set
-    | Set s, Itv itv
-    | Itv itv, Set s ->
-      Int_set.filter (fun i -> Int_interval.mem i itv) s >>-: inject_set
-
-let narrow v1 v2 =
   match v1, v2 with
-  | Set s1, Set s2 -> Int_set.narrow s1 s2 >>-: inject_set
-  | (Itv _| Set _), (Itv _ | Set _) -> meet v1 v2 (* meet is exact *)
+  | Itv i1, Itv i2 -> Int_interval.meet i1 i2 >>-: inject_itv
+  | Set s1 , Set s2 -> Int_set.meet s1 s2 >>-: inject_set
+  | Set s, Itv itv
+  | Itv itv, Set s ->
+    Int_set.filter (fun i -> Int_interval.mem i itv) s >>-: inject_set
+
+let narrow = meet (* meet is exact *)
 
 let widen widen_hints t1 t2 =
   if equal t1 t2 || cardinal_zero_or_one t1 then t2
@@ -424,7 +414,6 @@ let widen widen_hints t1 t2 =
       inject_itv (Int_interval.widen widen_hints i1 i2)
 
 let intersects v1 v2 =
-  v1 == v2 ||
   match v1, v2 with
   | Itv _, Itv _ -> not (meet v1 v2 = `Bottom) (* YYY: slightly inefficient *)
   | Set s1 , Set s2 -> Int_set.intersects s1 s2

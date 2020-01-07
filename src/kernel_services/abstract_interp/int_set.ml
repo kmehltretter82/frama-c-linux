@@ -33,8 +33,6 @@ let debug_cardinal = false
 let emitter = Lattice_messages.register "Int_set";;
 let log_imprecision s = Lattice_messages.emit_imprecision emitter s
 
-let small_nums = Array.init 33 (fun i -> [| (Integer.of_int i) |])
-
 (* Small sets of integers, implemented as sorted non-empty arrays. *)
 type set = Int.t array
 
@@ -59,23 +57,12 @@ module Array = struct
   let sub a start len = assert (len > 0); sub a start len
 end
 
-let zero = small_nums.(0)
-let one = small_nums.(1)
+let zero = [| Int.zero |]
+let one = [| Int.one |]
 let minus_one = [| Int.minus_one |]
 let zero_or_one = [| Int.zero ; Int.one |]
 
-let inject_singleton e =
-  if Int.le Int.zero e && Int.le e Int.thirtytwo
-  then small_nums.(Int.to_int e)
-  else [| e |]
-
-let share_array a s =
-  let e = a.(0) in
-  if s = 1 && Int.le Int.zero e && Int.le e Int.thirtytwo
-  then small_nums.(Int.to_int e)
-  else if s = 2 && Int.is_zero e && Int.is_one a.(1)
-  then zero_or_one
-  else a
+let inject_singleton e = [| e |]
 
 let inject_periodic ~from ~period ~number =
   let l = Int.to_int number in
@@ -88,7 +75,7 @@ let inject_periodic ~from ~period ~number =
     v := Int.add period !v;
     incr i
   done;
-  share_array s l
+  s
 
 module O = FCSet.Make (Integer)
 
@@ -98,7 +85,7 @@ let inject_list list =
   let a = Array.make cardinal Int.zero in
   let i = ref 0 in
   O.iter (fun e -> a.(!i) <- e; incr i) o;
-  share_array a cardinal
+  a
 
 let to_list = Array.to_list
 
@@ -106,24 +93,21 @@ let to_list = Array.to_list
 
 let hash s = Array.fold_left (fun acc v -> 1031 * acc + (Int.hash v)) 17 s
 
-let rehash s = share_array s (Array.length s)
-
 exception Unequal of int
 
 let compare s1 s2 =
-  if s1 == s2 then 0 else
-    let l1 = Array.length s1 in
-    let l2 = Array.length s2 in
-    if l1 <> l2
-    then l1 - l2 (* no overflow here *)
-    else
-      (try
-         for i = 0 to l1 - 1 do
-           let r = Int.compare s1.(i) s2.(i) in
-           if r <> 0 then raise (Unequal r)
-         done;
-         0
-       with Unequal v -> v)
+  let l1 = Array.length s1 in
+  let l2 = Array.length s2 in
+  if l1 <> l2
+  then l1 - l2 (* no overflow here *)
+  else
+    (try
+       for i = 0 to l1 - 1 do
+         let r = Int.compare s1.(i) s2.(i) in
+         if r <> 0 then raise (Unequal r)
+       done;
+       0
+     with Unequal v -> v)
 
 let equal e1 e2 = compare e1 e2 = 0
 
@@ -145,7 +129,7 @@ include Datatype.Make_with_collections
       let compare = compare
       let hash = hash
       let pretty = pretty
-      let rehash = rehash
+      let rehash x = x
       let internal_pretty_code = Datatype.pp_fail
       let mem_project = Datatype.never_any_project
       let copy = Datatype.undefined
@@ -265,24 +249,12 @@ let add_ps ps x =
     let new_max = Int.max max x in
     Pre_top (new_min, new_max, new_modu)
 
-let o_zero = O.singleton Int.zero
-let o_one = O.singleton Int.one
-let o_zero_or_one = O.union o_zero o_one
-
 let share_set o s =
-  if s = 1
-  then begin
-    let e = O.min_elt o in
-    inject_singleton e
-  end
-  else if O.equal o o_zero_or_one
-  then zero_or_one
-  else
-    let a = Array.make s Int.zero in
-    let i = ref 0 in
-    O.iter (fun e -> a.(!i) <- e; incr i) o;
-    assert (!i = s);
-    a
+  let a = Array.make s Int.zero in
+  let i = ref 0 in
+  O.iter (fun e -> a.(!i) <- e; incr i) o;
+  assert (!i = s);
+  a
 
 let inject_ps = function
   | Pre_set (o, s) -> `Set (share_set o s)
@@ -301,7 +273,7 @@ let set_to_ival_under set =
   then
     let a = Array.make card Int.zero in
     ignore (Int.Set.fold (fun elt i -> Array.set a i elt; i + 1) set 0);
-    `Set (share_array a card)
+    `Set a
   else
     (* If by chance the set is contiguous. *)
   if (Int.equal
@@ -326,7 +298,7 @@ let apply_bin_1_strict_incr f x (s : Integer.t array) =
   let r, l = Array.zero_copy s in
   let rec c i =
     if i = l
-    then share_array r l
+    then r
     else
       let v = f x s.(i) in
       r.(i) <- v;
@@ -338,7 +310,7 @@ let apply_bin_1_strict_decr f x (s : Integer.t array) =
   let r, l = Array.zero_copy s in
   let rec c i =
     if i = l
-    then share_array r l
+    then r
     else
       let v = f x s.(i) in
       r.(l - i - 1) <- v;
@@ -396,7 +368,7 @@ let map_set_strict_decr f (s : Integer.t array) =
   let r, l = Array.zero_copy s in
   let rec c i =
     if i = l
-    then share_array r l
+    then r
     else
       let v = f s.(i) in
       r.(l - i - 1) <- v;
@@ -497,12 +469,12 @@ let join l1 s1 l2 s2 =
       if i1 = l1
       then begin
         Array.blit s2 i2 r i (l2 - i2);
-        share_array r uniq
+        r
       end
       else if i2 = l2
       then begin
         Array.blit s1 i1 r i (l1 - i1);
-        share_array r uniq
+        r
       end
       else
         let si = succ i in
@@ -583,7 +555,7 @@ let remove s v =
       let r = Array.make l Int.zero in
       Array.blit s 0 r 0 index;
       Array.blit s (succ index) r index (l-index);
-      `Value (share_array r l)
+      `Value r
   else `Value s
 
 let complement_under ~min ~max set =
@@ -672,9 +644,7 @@ let subdivide s =
   let lenhi = len - m in
   let lo = Array.sub s 0 m in
   let hi = Array.sub s m lenhi in
-  share_array lo m,
-  share_array hi lenhi
-
+  lo, hi
 
 (* -------------------------------- Export ---------------------------------- *)
 

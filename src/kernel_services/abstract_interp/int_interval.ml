@@ -102,9 +102,6 @@ include Datatype.Make_with_collections
 
 (* ------------------------------ Building ---------------------------------- *)
 
-let share_top t =
-  if equal t top then top else t
-
 let fail min max r modu =
   let bound fmt = function
     | None -> Format.fprintf fmt "--"
@@ -130,14 +127,13 @@ let check t =
 let make ~min ~max ~rem ~modu =
   let t = { min; max; rem; modu } in
   check t;
-  share_top t
+  t
 
 let inject_singleton e =
   { min = Some e; max = Some e; rem = Int.zero; modu = Int.one }
 
 let inject_range min max =
-  let t = { min; max; rem = Int.zero; modu = Int.one } in
-  share_top t
+  { min; max; rem = Int.zero; modu = Int.one }
 
 let build_interval ~min ~max ~rem:r ~modu =
   assert (is_safe_modulo r modu);
@@ -209,7 +205,6 @@ let rem_is_included r1 m1 r2 m2 =
   (Int.is_zero (Int.e_rem m1 m2)) && (Int.equal (Int.e_rem r1 m2) r2)
 
 let is_included t1 t2 =
-  (t1 == t2) ||
   (min_is_lower t2.min t1.min) &&
   (max_is_greater t2.max t1.max) &&
   rem_is_included t1.rem t1.modu t2.rem t2.modu
@@ -225,17 +220,13 @@ let max_max x y =
   | Some x, Some y -> Some (Int.max x y)
 
 let join t1 t2 =
-  if t1 == t2 then t1 else
-    begin
-      check t1;
-      check t2;
-      let modu = Int.(pgcd (pgcd t1.modu t2.modu) (abs (sub t1.rem t2.rem))) in
-      let rem = Int.e_rem t1.rem modu in
-      let min = min_min t1.min t2.min in
-      let max = max_max t1.max t2.max in
-      let r  = make ~min ~max ~rem ~modu in
-      r
-    end
+  check t1;
+  check t2;
+  let modu = Int.(pgcd (pgcd t1.modu t2.modu) (abs (sub t1.rem t2.rem))) in
+  let rem = Int.e_rem t1.rem modu in
+  let min = min_min t1.min t2.min in
+  let max = max_max t1.max t2.max in
+  make ~min ~max ~rem ~modu
 
 let link t1 t2 =
   if Int.equal t1.rem t2.rem && Int.equal t1.modu t2.modu
@@ -335,13 +326,12 @@ let compute_last_common mx1 mx2 r modu =
     Some (Int.round_down_to_r m r modu)
 
 let meet t1 t2 =
-  if t1 == t2 then `Value t1 else
-    try
-      let rem, modu = compute_r_common t1.rem t1.modu t2.rem t2.modu in
-      let min = compute_first_common t1.min t2.min rem modu in
-      let max = compute_last_common t1.max t2.max rem modu in
-      make_or_bottom ~min ~max ~rem ~modu
-    with Error_Bottom -> `Bottom
+  try
+    let rem, modu = compute_r_common t1.rem t1.modu t2.rem t2.modu in
+    let min = compute_first_common t1.min t2.min rem modu in
+    let max = compute_last_common t1.max t2.max rem modu in
+    make_or_bottom ~min ~max ~rem ~modu
+  with Error_Bottom -> `Bottom
 
 let narrow = meet
 

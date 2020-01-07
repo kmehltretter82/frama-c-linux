@@ -26,23 +26,78 @@ open Bottom.Type
 let emitter = Lattice_messages.register "Ival"
 let log_imprecision s = Lattice_messages.emit_imprecision emitter s
 
-type t =
-  | Bottom
-  | Int of Int_val.t
-  | Float of Fval.t
+module type Type = sig
   (* Binary abstract operations do not model precisely float/integer operations.
-     It is the responsibility of the callers to have two operands of the same
-     implicit type. The only exception is for [singleton_zero], which is the
-     correct representation of [0.] *)
+   It is the responsibility of the callers to have two operands of the same
+   implicit type. The only exception is for [singleton_zero], which is the
+   correct representation of [0.] *)
+  type t = private
+    | Bottom
+    | Int of Int_val.t
+    | Float of Fval.t
 
+  val bottom: t
+  val zero: t
+  val one: t
+  val top: t
+  val inject_singleton: Int.t -> t
+  val inject_int: Int_val.t -> t
+  val inject_float: Fval.t -> t
+  val inject_float_interval: float -> float -> t
+end
+
+(* This module ensures that small integer singletons (and especially zero) and
+   the top value are shared in memory. This enables some optimizations where we
+   check the physical identity instead of the equality. Outside this module,
+   values of type t can only be created by calling [inject_] constructors. *)
+module Type : Type = struct
+  type t =
+    | Bottom
+    | Int of Int_val.t
+    | Float of Fval.t
+
+  let small_nums =
+    Array.init 33 (fun i -> Int (Int_val.inject_singleton (Int.of_int i)))
+
+  let bottom = Bottom
+  let zero = small_nums.(0)
+  let one = small_nums.(1)
+  let top = Int Int_val.top
+
+  let inject_singleton e =
+    if Int.le Int.zero e && Int.le e Int.thirtytwo
+    then small_nums.(Int.to_int e)
+    else Int (Int_val.inject_singleton e)
+
+  let inject_int i =
+    try
+      let e = Int_val.project_int i in
+      if Int.le Int.zero e && Int.le e Int.thirtytwo
+      then small_nums.(Int.to_int e)
+      else Int i
+    with Int_val.Not_Singleton ->
+      if Int_val.(equal top i) then top else Int i
+
+  let inject_float f =
+    if Fval.(equal plus_zero f)
+    then zero
+    else Float f
+
+  let inject_float_interval flow fup =
+    let flow = Fval.F.of_float flow in
+    let fup = Fval.F.of_float fup in
+    (* make sure that zero float is also zero int *)
+    if Fval.F.equal Fval.F.plus_zero flow && Fval.F.equal Fval.F.plus_zero fup
+    then zero
+    else Float (Fval.inject Fval.Double flow fup)
+end
+
+include Type
 
 module Widen_Hints = Datatype.Integer.Set
 type size_widen_hint = Integer.t
 type numerical_widen_hint = Widen_Hints.t * Fc_float.Widen_Hints.t
 type widen_hint = size_widen_hint * numerical_widen_hint
-
-let bottom = Bottom
-let top = Int Int_val.top
 
 let hash = function
   | Bottom -> 311
@@ -78,41 +133,22 @@ let is_singleton_int = function
   | Float _ -> false
   | Int i -> Int_val.is_singleton i
 
-let is_bottom x = equal x bottom
+let is_bottom = (==) bottom
+let is_zero = (==) zero
+let is_one = (==) one
 
-let zero = Int Int_val.zero
-let one = Int Int_val.one
-let minus_one = Int Int_val.minus_one
-let zero_or_one = Int Int_val.zero_or_one
-let float_zeros = Float Fval.zeros
+let minus_one = inject_int Int_val.minus_one
+let zero_or_one = inject_int Int_val.zero_or_one
+let float_zeros = inject_float Fval.zeros
 
-let positive_integers = Int Int_val.positive_integers
-let negative_integers = Int Int_val.negative_integers
-
-let is_zero x = equal x zero
-
-let inject_singleton e = Int (Int_val.inject_singleton e)
-
-let inject_float f =
-  if Fval.(equal plus_zero f)
-  then zero
-  else Float f
-
-let inject_float_interval flow fup =
-  let flow = Fval.F.of_float flow in
-  let fup = Fval.F.of_float fup in
-  (* make sure that zero float is also zero int *)
-  if Fval.F.equal Fval.F.plus_zero flow && Fval.F.equal Fval.F.plus_zero fup
-  then zero
-  else Float (Fval.inject Fval.Double flow fup)
+let positive_integers = inject_int Int_val.positive_integers
+let negative_integers = inject_int Int_val.negative_integers
 
 let inject_int_or_bottom = function
   | `Bottom -> bottom
-  | `Value i -> Int i
+  | `Value i -> inject_int i
 
 (*  let minus_zero = Float (Fval.minus_zero, Fval.minus_zero) *)
-
-let is_one = equal one
 
 let project_float v =
   if is_zero v
@@ -194,13 +230,13 @@ let cardinal_is_less_than v n =
 
 let inject_top min max rem modu =
   match min, max with
-  | Some mn, Some mx when Int.gt mn mx -> Bottom
-  | _, _ -> Int (Int_val.make ~min ~max ~rem ~modu)
+  | Some mn, Some mx when Int.gt mn mx -> bottom
+  | _, _ -> inject_int (Int_val.make ~min ~max ~rem ~modu)
 
 let inject_interval ~min ~max ~rem ~modu =
   match min, max with
-  | Some mn, Some mx when Int.gt mn mx -> Bottom
-  | _, _ -> Int (Int_val.inject_interval ~min ~max ~rem ~modu)
+  | Some mn, Some mx when Int.gt mn mx -> bottom
+  | _, _ -> inject_int (Int_val.inject_interval ~min ~max ~rem ~modu)
 
 let subdivide ~size = function
   | Bottom -> raise Can_not_subdiv
@@ -212,12 +248,14 @@ let subdivide ~size = function
     in
     let f1, f2 = Fval.subdiv_float_interval fkind fval in
     inject_float f1, inject_float f2
-  | Int i -> let i1, i2 = Int_val.subdivide i in Int i1, Int i2
+  | Int i ->
+    let i1, i2 = Int_val.subdivide i in
+    inject_int i1, inject_int i2
 
 let inject_range min max = inject_top min max Int.zero Int.one
 
-let top_float = Float Fval.top
-let top_single_precision_float = Float Fval.top
+let top_float = inject_float Fval.top
+let top_single_precision_float = inject_float Fval.top
 
 
 let min_max_r_mod = function
@@ -276,14 +314,14 @@ let widen (bitsize,(wh,fh)) t1 t2 =
         then Float_sig.Long_Double
         else Float_sig.Single
       in
-      Float (Fval.widen fh prec f1 f2)
+      inject_float (Fval.widen fh prec f1 f2)
     | Int i2 ->
       let i1 = match t1 with
         | Bottom -> assert false
         | Int i1 -> i1
         | Float _ -> Int_val.top
       in
-      Int (Int_val.widen (bitsize,wh) i1 i2)
+      inject_int (Int_val.widen (bitsize,wh) i1 i2)
 
 let meet v1 v2 =
   if v1 == v2 then v1 else
@@ -291,7 +329,7 @@ let meet v1 v2 =
       match v1, v2 with
       | Bottom, _ | _, Bottom -> bottom
       | Int i1, Int i2 -> inject_int_or_bottom (Int_val.meet i1 i2)
-      | Float(f1), Float(f2) -> begin
+      | Float f1, Float f2 -> begin
           match Fval.meet f1 f2 with
           | `Value f -> inject_float f
           | `Bottom -> bottom
@@ -320,46 +358,41 @@ let intersects v1 v2 =
     equal top other || (Fval.contains_plus_zero f && contains_zero other)
 
 let narrow v1 v2 =
-  match v1, v2 with
-  | Bottom, _ | _, Bottom -> bottom
-  | Float _, Float _ -> meet v1 v2 (* meet is exact *)
-  | v, (Int _ as t) when equal t top -> v
-  | (Int _ as t), v when equal t top -> v
-  | Int i1, Int i2 -> inject_int_or_bottom (Int_val.narrow i1 i2)
-  | Float f, (Int _ as s) | (Int _ as s), Float f when is_zero s -> begin
-      match Fval.narrow f Fval.zeros with
-      | `Value f -> inject_float f
-      | `Bottom -> bottom
-    end
-  | Float _, Int _ | Int _, Float _ ->
-    (* ill-typed case. It is better to keep the operation symmetric *)
-    top
+  if v1 == v2 then v1 else
+    match v1, v2 with
+    | Bottom, _ | _, Bottom -> bottom
+    | Float _, Float _ -> meet v1 v2 (* meet is exact *)
+    | v, (Int _ as t) when equal t top -> v
+    | (Int _ as t), v when equal t top -> v
+    | Int i1, Int i2 -> inject_int_or_bottom (Int_val.narrow i1 i2)
+    | Float f, (Int _ as s) | (Int _ as s), Float f when is_zero s -> begin
+        match Fval.narrow f Fval.zeros with
+        | `Value f -> inject_float f
+        | `Bottom -> bottom
+      end
+    | Float _, Int _ | Int _, Float _ ->
+      (* ill-typed case. It is better to keep the operation symmetric *)
+      top
 
 let link v1 v2 = match v1, v2 with
-  | Int i1, Int i2 -> Int (Int_val.link i1 i2)
+  | Int i1, Int i2 -> inject_int (Int_val.link i1 i2)
   | _ -> bottom
 
 let join v1 v2 =
-  let result =
-    if v1 == v2 then v1 else
-      match v1,v2 with
-      | Bottom, t | t, Bottom -> t
-      | Int i1, Int i2 -> Int (Int_val.join i1 i2)
-      | Float(f1), Float(f2) ->
-        inject_float (Fval.join f1 f2)
-      | Float (f) as ff, other | other, (Float (f) as ff) ->
-        if is_zero other
-        then inject_float (Fval.join Fval.plus_zero f)
-        else if is_bottom other then ff
-        else top
-  in
-  (*  Format.printf "mod_join %a %a -> %a@."
-      pretty v1 pretty v2 pretty result; *)
-  result
+  if v1 == v2 then v1 else
+    match v1, v2 with
+    | Bottom, t | t, Bottom -> t
+    | Int i1, Int i2 -> inject_int (Int_val.join i1 i2)
+    | Float f1, Float f2 -> inject_float (Fval.join f1 f2)
+    | Float f as ff, other | other, (Float f as ff) ->
+      if is_zero other
+      then inject_float (Fval.join Fval.plus_zero f)
+      else if is_bottom other then ff
+      else top
 
 let complement_int_under ~size ~signed = function
   | Bottom | Float _ -> `Bottom
-  | Int i -> Int_val.complement_under ~size ~signed i >>-: fun i -> Int i
+  | Int i -> Int_val.complement_under ~size ~signed i >>-: inject_int
 
 let fold_int f v acc =
   match v with
@@ -393,13 +426,13 @@ let is_included t1 t2 =
 let add_singleton_int i = function
   | Bottom -> bottom
   | Float _ -> assert false
-  | Int itv -> Int (Int_val.add_singleton i itv)
+  | Int itv -> inject_int (Int_val.add_singleton i itv)
 
 let add_int v1 v2 =
   match v1, v2 with
   | Bottom, _ | _, Bottom -> bottom
   | Float _, _ | _, Float _ -> assert false
-  | Int i1, Int i2 -> Int (Int_val.add i1 i2)
+  | Int i1, Int i2 -> inject_int (Int_val.add i1 i2)
 
 let add_int_under v1 v2 =
   match v1, v2 with
@@ -410,7 +443,7 @@ let add_int_under v1 v2 =
 let neg_int = function
   | Bottom -> bottom
   | Float _ -> assert false
-  | Int i -> Int (Int_val.neg i)
+  | Int i -> inject_int (Int_val.neg i)
 
 let sub_int v1 v2 = add_int v1 (neg_int v2)
 let sub_int_under v1 v2 = add_int_under v1 (neg_int v2)
@@ -434,11 +467,11 @@ let scale f v =
     match v with
     | Bottom -> bottom
     | Float _ -> top
-    | Int i -> Int (Int_val.scale f i)
+    | Int i -> inject_int (Int_val.scale f i)
 
 let scale_div ~pos f = function
   | Bottom -> bottom
-  | Int i -> Int (Int_val.scale_div ~pos f i)
+  | Int i -> inject_int (Int_val.scale_div ~pos f i)
   | Float _ -> top
 
 let scale_div_under ~pos f = function
@@ -463,7 +496,7 @@ let scale_rem ~pos f v =
   else
     match v with
     | Bottom -> bottom
-    | Int i -> Int (Int_val.scale_rem ~pos f i)
+    | Int i -> inject_int (Int_val.scale_rem ~pos f i)
     | Float _ -> top
 
 let c_rem v1 v2 =
@@ -473,14 +506,14 @@ let c_rem v1 v2 =
   | Int i1, Int i2 -> inject_int_or_bottom (Int_val.c_rem i1 i2)
 
 let create_all_values ~signed ~size =
-  Int (Int_val.create_all_values ~signed ~size)
+  inject_int (Int_val.create_all_values ~signed ~size)
 
 let big_int_64 = Int.of_int 64
 let big_int_32 = Int.thirtytwo
 
 let cast_int_to_int ~size ~signed = function
   | Bottom -> bottom
-  | Int i -> Int (Int_val.cast_int_to_int ~size ~signed i)
+  | Int i -> inject_int (Int_val.cast_int_to_int ~size ~signed i)
   | Float _ -> assert false
 
 let reinterpret_float_as_int ~signed ~size f =
@@ -533,7 +566,7 @@ let mul v1 v2 =
     match v1, v2 with
     | Bottom, _ | _, Bottom -> bottom
     | Float _, _ | _, Float _ -> top
-    | Int i1, Int i2 -> Int (Int_val.mul i1 i2)
+    | Int i1, Int i2 -> inject_int (Int_val.mul i1 i2)
 
 let shift_right v1 v2 =
   match v1, v2 with
@@ -621,13 +654,13 @@ let backward_le_int max v =
   match v with
   | Bottom -> bottom
   | Float _ -> v
-  | Int _ -> narrow v (Int (Int_val.inject_range None max))
+  | Int _ -> narrow v (inject_int (Int_val.inject_range None max))
 
 let backward_ge_int min v =
   match v with
   | Bottom -> bottom
   | Float _ -> v
-  | Int _ -> narrow v (Int (Int_val.inject_range min None))
+  | Int _ -> narrow v (inject_int (Int_val.inject_range min None))
 
 let backward_lt_int max v = backward_le_int (Extlib.opt_map Int.pred max) v
 let backward_gt_int min v = backward_ge_int (Extlib.opt_map Int.succ min) v
@@ -698,7 +731,7 @@ let backward_comp_float_left_false op fkind f1 f2  =
 let rec extract_bits ~start ~stop ~size v =
   match v with
   | Bottom -> bottom
-  | Int i -> Int (Int_val.extract_bits ~start ~stop i)
+  | Int i -> inject_int (Int_val.extract_bits ~start ~stop i)
   | Float f ->
     let inject (b, e) = inject_range (Some b) (Some e) in
     let itvs =
@@ -760,8 +793,9 @@ let forward_comp_int op i1 i2 =
   | Ne -> inv_truth (forward_eq_int i1 i2)
 
 let rehash = function
-  | Int i -> Int (Int_val.rehash i)
-  | x -> x
+  | Bottom -> bottom
+  | Int i -> inject_int i
+  | Float f -> inject_float f
 
 include (
   Datatype.Make_with_collections
@@ -895,7 +929,7 @@ let cast_float_to_int_inverse ~single_precision i =
     in
     assert (Fval.F.is_finite (Fval.F.of_float minf));
     assert (Fval.F.is_finite (Fval.F.of_float maxf));
-    Float (Fval.inject fkind (Fval.F.of_float minf) (Fval.F.of_float maxf))
+    inject_float (Fval.inject fkind (Fval.F.of_float minf) (Fval.F.of_float maxf))
   | _ -> if single_precision then top_single_precision_float else top_float
 
 
@@ -1019,7 +1053,7 @@ let overlaps ~partial ~size t1 t2 =
 
 let bitwise_int f_int v1 v2 =
   match v1, v2 with
-  | Int i1, Int i2 -> Int (f_int i1 i2)
+  | Int i1, Int i2 -> inject_int (f_int i1 i2)
   | _, _ -> top
 
 let bitwise_or = bitwise_int Int_val.bitwise_or
@@ -1029,12 +1063,12 @@ let bitwise_xor = bitwise_int Int_val.bitwise_xor
 let bitwise_signed_not = function
   | Bottom -> bottom
   | Float _ -> assert false
-  | Int i -> Int (Int_val.bitwise_signed_not i)
+  | Int i -> inject_int (Int_val.bitwise_signed_not i)
 
 let bitwise_unsigned_not ~size = function
   | Bottom -> bottom
   | Float _ -> assert false
-  | Int i -> Int (Int_val.bitwise_unsigned_not ~size i)
+  | Int i -> inject_int (Int_val.bitwise_unsigned_not ~size i)
 
 let bitwise_not ~size ~signed v =
   if signed then

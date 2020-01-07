@@ -130,5 +130,3 @@ val bitwise_signed_not: t -> t
 (** {2 Misc} *)
 
 val subdivide: t -> t * t
-
-val rehash: t -> t
