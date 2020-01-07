@@ -450,6 +450,21 @@ struct
 
   module Fc_Filepath = Filepath
 
+  let normalize_filepath ~existence ~file_kind s =
+    try
+      Filepath.Normalized.of_string ~existence s
+    with
+    | Filepath.No_file ->
+      P.L.abort "%s%sfile '%s' does not exist"
+        file_kind
+        (if file_kind = "" then "" else " ")
+        (Filepath.Normalized.(to_pretty_string (of_string s)))
+    | Filepath.File_exists ->
+      P.L.abort "%s%sfile '%s' already exists"
+        file_kind
+        (if file_kind = "" then "" else " ")
+        (Filepath.Normalized.(to_pretty_string (of_string s)))
+
   module Filepath
       (X: sig
          include Parameter_sig.Input_with_arg
@@ -472,22 +487,7 @@ struct
       f oldfp newfp
 
     let set_str s =
-      let fp =
-        try
-          Filepath.Normalized.of_string ~existence:X.existence s
-        with
-        | Filepath.No_file ->
-          P.L.abort "%s%sfile not found: '%s'"
-            X.file_kind
-            (if X.file_kind = "" then "" else " ")
-            s
-        | Filepath.File_exists ->
-          P.L.abort "%s file already exists: '%s'"
-            X.file_kind
-            (if X.file_kind = "" then "" else " ")
-            s
-      in
-      set fp
+      set (normalize_filepath ~existence:X.existence ~file_kind:X.file_kind s)
 
     let add_option name =
       Cmdline.add_option
@@ -1227,22 +1227,11 @@ struct
     Make_list
       (struct
         include Datatype.Filepath
-        let to_string = Fc_Filepath.Normalized.to_pretty_string
+        let to_string s = (s : t :> string)
         let of_singleton_string = no_element_of_string
 
         let of_string s =
-          try of_string ~existence:X.existence s
-          with
-          | Fc_Filepath.No_file ->
-            P.L.abort "%s%sfile '%s' does not exist"
-              X.file_kind
-              (if X.file_kind = "" then "" else " ")
-              s
-          | Fc_Filepath.File_exists ->
-            P.L.abort "%s%sfile '%s' already exists"
-              X.file_kind
-              (if X.file_kind = "" then "" else " ")
-              s
+          normalize_filepath ~existence:X.existence ~file_kind:X.file_kind s
       end)
       (struct
         include X

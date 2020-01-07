@@ -46,7 +46,7 @@ val result_vi: kernel_function -> varinfo
 (** {2 Handling the E-ACSL's C-libraries} *)
 (* ************************************************************************** *)
 
-val library_files: unit -> string list
+val library_files: unit -> Filepath.Normalized.t list
 val is_library_loc: location -> bool
 val register_library_function: varinfo -> unit
 val reset: unit -> unit
