@@ -178,6 +178,28 @@ rec {
         '';
   };
 
+  e-acsl-tests-dev = stdenv.mkDerivation {
+        name = "frama-c-e-acsl-tests-dev";
+        buildInputs = mk_buildInputs {};
+        build_dir = main.build_dir;
+        src = main.build_dir + "/dir.tar";
+        sourceRoot = ".";
+        postUnpack = ''
+               find . \( -name "Makefile*" -or -name ".depend" -o -name "ptests_config" -o -name "config.status" \) -exec bash -c "t=\$(stat -c %y \"\$0\"); sed -i -e \"s&$(cat $build_dir/old_pwd)&$(pwd)&g\" \"\$0\"; touch -d \"\$t\" \"\$0\"" {} \;
+        '';
+        configurePhase = ''
+           true
+        '';
+        buildPhase = ''
+               make clean_share_link
+               make create_share_link
+               make E_ACSL_TESTS -j 4 PTESTS_OPTS="-error-code -j 4" DEV=yes
+        '';
+        installPhase = ''
+               true
+        '';
+  };
+
   internal = stdenv.mkDerivation {
         name = "frama-c-internal";
         inherit src;
