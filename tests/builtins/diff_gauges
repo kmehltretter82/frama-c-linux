@@ -8,7 +8,7 @@ diff tests/builtins/oracle/Longinit_sequencer.res.oracle tests/builtins/oracle_g
 ---
 >   tests/builtins/result_gauges/Longinit_sequencer.sav
 diff tests/builtins/oracle/linked_list.0.res.oracle tests/builtins/oracle_gauges/linked_list.0.res.oracle
-1094a1095,1100
+1122a1123,1128
 > [eva] computing for function printf_va_1 <- main.
 >   Called from tests/builtins/linked_list.c:51.
 > [eva] Done for function printf_va_1
@@ -16,7 +16,7 @@ diff tests/builtins/oracle/linked_list.0.res.oracle tests/builtins/oracle_gauges
 >   Called from tests/builtins/linked_list.c:51.
 > [eva] Done for function printf_va_1
 diff tests/builtins/oracle/linked_list.1.res.oracle tests/builtins/oracle_gauges/linked_list.1.res.oracle
-598a599,604
+626a627,632
 > [eva] computing for function printf_va_1 <- main.
 >   Called from tests/builtins/linked_list.c:51.
 > [eva] Done for function printf_va_1

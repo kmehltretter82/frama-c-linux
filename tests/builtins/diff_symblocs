@@ -28,13 +28,13 @@ diff tests/builtins/oracle/imprecise.res.oracle tests/builtins/oracle_symblocs/i
 < [kernel] tests/builtins/imprecise.c:114: 
 <   more than 200(300) elements to enumerate. Approximating.
 diff tests/builtins/oracle/linked_list.1.res.oracle tests/builtins/oracle_symblocs/linked_list.1.res.oracle
-506a507,508
+530a531,532
 > [kernel] tests/builtins/linked_list.c:43: 
 >   more than 100(128) elements to enumerate. Approximating.
-508a511,512
+532a535,536
 > [kernel] tests/builtins/linked_list.c:44: 
 >   more than 100(128) elements to enumerate. Approximating.
-600,603d603
+628,631d631
 < [kernel] tests/builtins/linked_list.c:43: 
 <   more than 100(128) elements to enumerate. Approximating.
 < [kernel] tests/builtins/linked_list.c:44: 

@@ -1,6 +1,81 @@
 diff tests/value/oracle/alias.5.res.oracle tests/value/oracle_gauges/alias.5.res.oracle
 59a60
 > [eva] tests/value/alias.i:260: starting to merge loop iterations
+diff tests/value/oracle/auto_loop_unroll.0.res.oracle tests/value/oracle_gauges/auto_loop_unroll.0.res.oracle
+11,13c11
+< [eva:alarm] tests/value/auto_loop_unroll.c:25: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] tests/value/auto_loop_unroll.c:27: Frama_C_show_each_auto: [0..2147483647]
+---
+> [eva] tests/value/auto_loop_unroll.c:27: Frama_C_show_each_auto: {100}
+15,18c13
+< [eva:alarm] tests/value/auto_loop_unroll.c:31: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] tests/value/auto_loop_unroll.c:33: 
+<   Frama_C_show_each_imprecise: [0..2147483647]
+---
+> [eva] tests/value/auto_loop_unroll.c:33: Frama_C_show_each_imprecise: {1000}
+20,23c15
+< [eva:alarm] tests/value/auto_loop_unroll.c:39: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] tests/value/auto_loop_unroll.c:41: 
+<   Frama_C_show_each_imprecise: [0..2147483647]
+---
+> [eva] tests/value/auto_loop_unroll.c:41: Frama_C_show_each_imprecise: {100}
+32,34c24
+< [eva:alarm] tests/value/auto_loop_unroll.c:58: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] tests/value/auto_loop_unroll.c:59: Frama_C_show_each_64: [0..2147483647]
+---
+> [eva] tests/value/auto_loop_unroll.c:59: Frama_C_show_each_64: {64}
+36,38c26
+< [eva:alarm] tests/value/auto_loop_unroll.c:63: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] tests/value/auto_loop_unroll.c:64: Frama_C_show_each_40: [0..2147483647]
+---
+> [eva] tests/value/auto_loop_unroll.c:64: Frama_C_show_each_40: {40}
+40,42c28
+< [eva:alarm] tests/value/auto_loop_unroll.c:69: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] tests/value/auto_loop_unroll.c:72: Frama_C_show_each_80: [0..2147483647]
+---
+> [eva] tests/value/auto_loop_unroll.c:72: Frama_C_show_each_80: {80}
+44,47c30
+< [eva:alarm] tests/value/auto_loop_unroll.c:76: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] tests/value/auto_loop_unroll.c:82: 
+<   Frama_C_show_each_32_80: [0..2147483647]
+---
+> [eva] tests/value/auto_loop_unroll.c:82: Frama_C_show_each_32_80: [32..83]
+49,52c32
+< [eva:alarm] tests/value/auto_loop_unroll.c:86: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] tests/value/auto_loop_unroll.c:90: 
+<   Frama_C_show_each_11_111: [0..2147483647]
+---
+> [eva] tests/value/auto_loop_unroll.c:90: Frama_C_show_each_11_111: [11..111]
+60,61d39
+< [eva:alarm] tests/value/auto_loop_unroll.c:96: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+63c41
+<   Frama_C_show_each_40_50: [0..2147483647]
+---
+>   Frama_C_show_each_40_50: [40..1073741861]
+diff tests/value/oracle/auto_loop_unroll.1.res.oracle tests/value/oracle_gauges/auto_loop_unroll.1.res.oracle
+15,18c15
+< [eva:alarm] tests/value/auto_loop_unroll.c:31: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] tests/value/auto_loop_unroll.c:33: 
+<   Frama_C_show_each_imprecise: [0..2147483647]
+---
+> [eva] tests/value/auto_loop_unroll.c:33: Frama_C_show_each_imprecise: {1000}
+20,23c17
+< [eva:alarm] tests/value/auto_loop_unroll.c:39: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] tests/value/auto_loop_unroll.c:41: 
+<   Frama_C_show_each_imprecise: [0..2147483647]
+---
+> [eva] tests/value/auto_loop_unroll.c:41: Frama_C_show_each_imprecise: {100}
 diff tests/value/oracle/bad_loop.res.oracle tests/value/oracle_gauges/bad_loop.res.oracle
 6a7
 > [eva] tests/value/bad_loop.i:12: starting to merge loop iterations

@@ -116,6 +116,21 @@ diff tests/value/oracle/alias.6.res.oracle tests/value/oracle_equalities/alias.6
 <   x ∈ {0; 4; 33}
 ---
 >   x ∈ {33}
+diff tests/value/oracle/auto_loop_unroll.0.res.oracle tests/value/oracle_equalities/auto_loop_unroll.0.res.oracle
+82c82,85
+< [eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+---
+> [eva] computing for function incr <- various_loops <- main.
+>   Called from tests/value/auto_loop_unroll.c:103.
+> [eva] Recording results for incr
+> [eva] Done for function incr
+91c94,97
+< [eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+---
+> [eva] computing for function incr <- various_loops <- main.
+>   Called from tests/value/auto_loop_unroll.c:103.
+> [eva] Recording results for incr
+> [eva] Done for function incr
 diff tests/value/oracle/backward_add_ptr.res.oracle tests/value/oracle_equalities/backward_add_ptr.res.oracle
 12c12
 <   Frama_C_show_each_only_a: {0; 1}, {{ &a }}, {0}

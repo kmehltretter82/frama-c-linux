@@ -319,16 +319,16 @@ diff tests/builtins/oracle/imprecise.res.oracle tests/builtins/oracle_equalities
 < [kernel] tests/builtins/imprecise.c:114: 
 <   more than 200(300) elements to enumerate. Approximating.
 diff tests/builtins/oracle/linked_list.1.res.oracle tests/builtins/oracle_equalities/linked_list.1.res.oracle
-455a456,457
+477a478,479
 > [kernel] tests/builtins/linked_list.c:19: 
 >   more than 100(128) elements to enumerate. Approximating.
-506a509,510
+530a533,534
 > [kernel] tests/builtins/linked_list.c:43: 
 >   more than 100(128) elements to enumerate. Approximating.
-508a513,514
+532a537,538
 > [kernel] tests/builtins/linked_list.c:44: 
 >   more than 100(128) elements to enumerate. Approximating.
-600,603d605
+628,631d633
 < [kernel] tests/builtins/linked_list.c:43: 
 <   more than 100(128) elements to enumerate. Approximating.
 < [kernel] tests/builtins/linked_list.c:44: 
