@@ -501,7 +501,7 @@ and bal = parse
         let descr = String.concat "," drvs in
         let includes =
           let directories =
-            try [Wp_parameters.Share.dir ~error:false ()]
+            try [(Wp_parameters.Share.dir ~error:false () :> string)]
             with Wp_parameters.Share.No_dir -> [] in
           if Wp_parameters.has_dkey dkey then
             Wp_parameters.debug ~dkey "Included directories:%t"
@@ -522,7 +522,7 @@ and bal = parse
           let default = Wp_parameters.Share.file ~error:true "wp.driver" in
           let feedback = Wp_parameters.Share.Dir_name.is_set () in
           let ontty = if feedback then `Message else `Transient in
-          load_file ~ontty default;
+          load_file ~ontty (default :> string);
           List.iter load_file drivers
         in
         let driver = LogicBuiltins.new_driver ~id ~descr ~includes ~configure () in

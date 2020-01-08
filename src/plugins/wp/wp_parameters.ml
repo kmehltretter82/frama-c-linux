@@ -1096,7 +1096,7 @@ let get_session ~force () =
 
 let get_session_dir ~force d =
   let base = get_session ~force () in
-  let path = Printf.sprintf "%s/%s" base d in
+  let path = Format.asprintf "%a/%s" Datatype.Filepath.pp_abs base d in
   if force then make_output_dir path ; path
 
 (* -------------------------------------------------------------------------- *)

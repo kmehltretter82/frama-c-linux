@@ -793,12 +793,12 @@ module Journal = struct
   let () = Parameter_customize.do_not_projectify ()
   module Enable = struct
     include Bool
-      (struct
-         let module_name = "Journal.Enable"
-         let default = Cmdline.journal_enable
-         let option_name = "-journal-enable"
-         let help = "dump a journal while Frama-C exit"
-       end)
+        (struct
+          let module_name = "Journal.Enable"
+          let default = Cmdline.journal_enable
+          let option_name = "-journal-enable"
+          let help = "dump a journal while Frama-C exit"
+        end)
     let is_set () = Cmdline.journal_isset
   end
   let () = Parameter_customize.set_group saveload
@@ -806,20 +806,22 @@ module Journal = struct
   module Name =
     String
       (struct
-         let module_name = "Journal.Name"
-         let option_name = "-journal-name"
-         let default = 
-	   let dir =
-	     (* duplicate code from Plugin.Session *)
-	     if Session.Dir_name.is_set () then Session.Dir_name.get ()
-	     else
-	       try Sys.getenv "FRAMAC_SESSION"
-	       with Not_found -> "./.frama-c"
-	   in
-	   dir ^ "/frama_c_journal.ml"
-         let arg_name = "s"
-         let help = "set the filename of the journal"
-       end)
+        let module_name = "Journal.Name"
+        let option_name = "-journal-name"
+        let default =
+          let dir =
+            (* duplicate code from Plugin.Session *)
+            if Session.Dir_name.is_set ()
+            then
+              (Session.Dir_name.get () :> string)
+            else
+              try Sys.getenv "FRAMAC_SESSION"
+              with Not_found -> "./.frama-c"
+          in
+          dir ^ "/frama_c_journal.ml"
+        let arg_name = "s"
+        let help = "set the filename of the journal"
+      end)
   let () = Name.add_set_hook (fun _ s -> Journal.set_name s);
 end
 

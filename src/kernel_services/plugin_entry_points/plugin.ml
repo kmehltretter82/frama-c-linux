@@ -314,11 +314,13 @@ struct
       else Parameter_customize.is_invisible ()
 
     module Dir_name =
-      Empty_string
+      Filepath
         (struct
           let option_name = prefix ^ O.option_name
           let arg_name = O.arg_name
           let help = if is_visible then O.help else empty_string
+          let existence = Fc_Filepath.Indifferent
+          let file_kind = ""
          end)
 
     exception No_dir
@@ -364,17 +366,22 @@ struct
 
     let dir ?error () =
       (* get the specified dir if any *)
-      let d = if is_visible then Dir_name.get () else empty_string in
-      if d = empty_string then
-        (* no specified dir: look for the default one. *)
-        if is_kernel then get_and_check_dirs ?error (D.dirs ())
+      let d = if is_visible then (Dir_name.get () :> string) else empty_string in
+      let dirs =
+        if d = empty_string
+        then
+          (* no specified dir: look for the default one. *)
+          if is_kernel
+          then D.dirs ()
+          else List.map (fun x -> x ^ "/" ^ plugin_subpath) (D.dirs ())
         else
-          let dirs = List.map (fun x -> x ^ "/" ^ plugin_subpath) (D.dirs ()) in
-          get_and_check_dirs ?error dirs
-      else
-        get_and_check_dirs ?error [d]
+          [d]
+      in
+      Datatype.Filepath.of_string (get_and_check_dirs ?error dirs)
 
-    let file ?error f = dir ?error () ^ "/" ^ f
+    let file ?error f =
+      let dir = dir ?error () in
+      Datatype.Filepath.of_string ((dir :> string) ^ "/" ^ f)
 
   end
 
@@ -409,7 +416,12 @@ struct
         let force_dir = true
        end)
   let () = 
-    if is_kernel () then Journal.get_session_file := Session.file ~error:false
+    if is_kernel ()
+    then
+      Journal.get_session_file :=
+        (fun s ->
+           let f = Session.file ~error:false s in
+           Format.asprintf "%a" Datatype.Filepath.pretty f)
 
   module Config = 
     Make_specific_dir

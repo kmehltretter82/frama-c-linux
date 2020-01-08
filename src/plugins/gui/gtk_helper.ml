@@ -47,7 +47,7 @@ let framac_logo, framac_icon =
 module Configuration = struct
   include Cilconfig
   let configuration_file () =
-    try Gui_parameters.Config.file ~error:false "frama-c-gui.config"
+    try (Gui_parameters.Config.file ~error:false "frama-c-gui.config" :> string)
     with Gui_parameters.Config.No_dir -> ""
   let load () = loadConfiguration (configuration_file ())
   let save () = saveConfiguration (configuration_file ())
