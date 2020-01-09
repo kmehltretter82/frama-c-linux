@@ -200,16 +200,16 @@ let dup_global loc actions spec bhv sound_verdict_vi kf vi new_vi =
   let new_kf = { fundec = fct; spec = new_spec } in
   Queue.add
     (fun () ->
-      Kernel_function.Hashtbl.add fct_tbl new_kf ();
-      Globals.Functions.register new_kf;
-      Globals.Functions.replace_by_definition new_spec fundec loc;
-      Annotations.register_funspec new_kf;
-      if new_vi.vname = "main" then begin
-        (* recompute the info about the old main since its name has changed;
-           see the corresponding part in the main visitor *)
-        Globals.Functions.remove vi;
-        Globals.Functions.register kf
-      end)
+       Kernel_function.Hashtbl.add fct_tbl new_kf ();
+       Globals.Functions.register new_kf;
+       Globals.Functions.replace_by_definition new_spec fundec loc;
+       Annotations.register_funspec new_kf;
+       if new_vi.vname = "main" then begin
+         (* recompute the info about the old main since its name has changed;
+            see the corresponding part in the main visitor *)
+         Globals.Functions.remove vi;
+         Globals.Functions.register kf
+       end)
     actions;
   Options.feedback ~dkey ~level:2 "function %s" name;
   (* remove the specs attached to the previous kf iff it is a definition:
@@ -274,7 +274,7 @@ let sufficiently_aligned vi algn =
                 Continuing with this value."
                Printer.pp_varinfo vi
                algn;
-               algn
+             algn
            end else
              alignment
          | Attr("align", _) ->
@@ -543,8 +543,8 @@ class prepare_visitor = object (self)
          (* or: *)
          ((* it has a function contract *)
            not (Cil.is_empty_funspec
-                 (Annotations.funspec ~populate:false
-                    (Extlib.the self#current_kf)))
+                  (Annotations.funspec ~populate:false
+                     (Extlib.the self#current_kf)))
            && (* its annotations must be monitored *)
            Functions.check kf))
       ->
