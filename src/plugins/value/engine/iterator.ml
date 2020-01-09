@@ -24,9 +24,6 @@ open Cil_types
 open Interpreted_automata
 open Bottom.Type
 
-[@@@warning "-42"]
-
-
 let check_signals, signal_abort =
   let signal_emitted = ref false in
   (fun () ->

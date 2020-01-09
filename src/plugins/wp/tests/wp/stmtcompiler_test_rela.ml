@@ -1,8 +1,5 @@
 (* test API of StmtCompiler for relational property verification*)
 
-[@@@ warning "-40"]
-[@@@ warning "-42"]
-
 open Wp
 open Factory
 open Sigs

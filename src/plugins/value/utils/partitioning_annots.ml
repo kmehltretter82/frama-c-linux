@@ -23,8 +23,6 @@
 open Cil_types
 open Logic_ptree
 
-[@@@ warning "-42"]
-
 type slevel_annotation =
   | SlevelMerge
   | SlevelDefault

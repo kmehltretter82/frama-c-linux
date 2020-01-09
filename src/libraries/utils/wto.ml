@@ -53,8 +53,6 @@ let flatten wto =
   in
   List.rev (f [] wto)
 
-[@@@ warning "-42"]
-
 (* Bourdoncle's WTO algorithm builds on Tarjan's SCC algorithm. In Tarjan:
 
    - We visit every node once, starting from root, by following the

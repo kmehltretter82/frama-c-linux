@@ -31,8 +31,6 @@ module Frama_c_File = File
 open Cil_types
 open Cil_datatype
 
-[@@@ warning "-40-42"]
-
 module Node : sig
   include Datatype.S_with_collections
   val id: t -> int

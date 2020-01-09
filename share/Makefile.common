@@ -69,8 +69,11 @@ ifeq ($(DEVELOPMENT),yes)
 #   refactoring before being enabled.
 # - 9 (missing field in record pattern) is much too heavy. Most of the time
 #   not all fields are relevant in pattern-matching Frama-C's AST.
-# - 41 (ambiguous constructor or label name) prevents type-based
-#   disambiguation, a feature which is seen as a good thing by many developers
+# - 40 (constructor or label name used out of scope)
+# - 41 (ambiguous constructor or label name)
+# - 42 (Disambiguated constructor or label name)
+#   these three warnings prevents type-based disambiguation,
+#   a feature which is seen as a good thing by many developers
 # - 44 (open shadows an identifier)
 # - 45 (open shadows a label or constructor): While the use of open directives
 #   is supposed to stay small, it should still be possible to open modules
@@ -81,7 +84,7 @@ ifeq ($(DEVELOPMENT),yes)
 # - 50 (warning about ambiguously placed OCamldoc comments): while it would be
 #   useful to ensure OCamldoc understands comments correctly, some clean-up
 #   is needed before enabling this warning.
-WARNINGS ?= -w +a-4-6-9-41-44-45-48-50
+WARNINGS ?= -w +a-4-6-9-40-41-42-44-45-48-50
 
 # - 3 (deprecated feature) cannot always be avoided for OCaml stdlib when
 #   supporting several OCaml versions
