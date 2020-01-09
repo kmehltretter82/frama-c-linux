@@ -146,8 +146,8 @@ let generate_code =
                  Prepare_ast.prepare ();
                  Injector.inject ();
                  (* remove the RTE's results computed from E-ACSL: they are
-                      partial and associated with the wrong kernel function (the
-                      one of the old project). *)
+                    partial and associated with the wrong kernel function (the
+                    one of the old project). *)
                  (* [TODO ARCHI] what if RTE was already computed? *)
                  let selection =
                    State_selection.with_dependencies !Db.RteGen.self

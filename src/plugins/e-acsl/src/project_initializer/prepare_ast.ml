@@ -30,6 +30,8 @@ let dkey = Options.dkey_prepare
 
 let fct_tbl: unit Kernel_function.Hashtbl.t = Kernel_function.Hashtbl.create 7
 
+(* The purpose of [actions] is similar to the Frama-C visitor's [actions] but we
+   need to fill it outside the visitor. So it is our own version. *)
 let actions = Queue.create ()
 
 (* global table for ensuring that logic info are not shared between a function
@@ -53,9 +55,10 @@ let reset () =
   Queue.clear actions
 
 (* ********************************************************************** *)
-(* Duplicating functions *)
+(* Duplicating a function *)
 (* ********************************************************************** *)
 
+(* [tbl] associates the old formals to the new ones *)
 let dup_funspec tbl bhv spec =
   (*  Options.feedback "DUP SPEC %a" Cil.d_funspec spec;*)
   let o = object
@@ -95,13 +98,12 @@ let dup_funspec tbl bhv spec =
           Cil.ChangeDoChildrenPost
             ({ orig_lvi with lv_id = orig_lvi.lv_id } (* force a copy *),
              fun lvi ->
-               (* using [Visitor_behavior.Get.logic_var bhv lvi] is correct only
-                  because the lv_id used to compare the lvi does not change
-                  between the original one and this copy *)
                try
                  let new_vi = Cil_datatype.Varinfo.Hashtbl.find tbl vi in
                  Cil_datatype.Logic_var.Hashtbl.add
                    already_visited orig_lvi lvi;
+                 (* [lvi] is the logic counterpart of a formal varinfo that has
+                    been replaced by a new one: propagate this change *)
                  lvi.lv_id <- new_vi.vid;
                  lvi.lv_name <- new_vi.vname;
                  lvi.lv_origin <- Some new_vi;
@@ -109,6 +111,9 @@ let dup_funspec tbl bhv spec =
                  lvi
                with Not_found ->
                  assert vi.vglob;
+                 (* using [Visitor_behavior.Get.logic_var bhv lvi] is correct
+                    only because the lv_id used to compare the lvi does not
+                    change between the original one and this copy *)
                  Visitor_behavior.Get.logic_var bhv lvi)
 
     method !videntified_term _ =
@@ -138,7 +143,8 @@ let dup_fundec loc spec bhv sound_verdict_vi kf vi new_vi =
   let new_formals = List.map mk_formal formals in
   let res =
     let ty = Kernel_function.get_return_type kf in
-    if Cil.isVoidType ty then None
+    if Cil.isVoidType ty
+    then None
     else Some (Cil.makeVarinfo false false ~referenced:true "__retres" ty)
   in
   let return =
@@ -157,7 +163,7 @@ let dup_fundec loc spec bhv sound_verdict_vi kf vi new_vi =
     if Functions.instrument kf then
       l
     else
-      (* set the 'unsound_verdict' variable to 'false' whenever required *)
+      (* set the 'sound_verdict' variable to 'false' whenever required *)
       let unsound =
         Cil.mkStmtOneInstr ~valid_sid:true
           (Set((Var sound_verdict_vi, NoOffset), Cil.zero ~loc, loc))
@@ -192,7 +198,8 @@ let dup_global loc actions spec bhv sound_verdict_vi kf vi new_vi =
   let fct = Definition(fundec, loc) in
   let new_spec = fundec.sspec in
   let new_kf = { fundec = fct; spec = new_spec } in
-  Queue.add (fun () ->
+  Queue.add
+    (fun () ->
       Kernel_function.Hashtbl.add fct_tbl new_kf ();
       Globals.Functions.register new_kf;
       Globals.Functions.replace_by_definition new_spec fundec loc;
@@ -238,9 +245,6 @@ let dup_global loc actions spec bhv sound_verdict_vi kf vi new_vi =
 (* Alignment *)
 (* ********************************************************************** *)
 
-exception Alignment_error of string
-let align_error s = raise (Alignment_error s)
-
 (* Returns true if the list of attributes [attrs] contains an [align] attribute
    of [algn] or greater. Returns false otherwise.
    Throws an exception if
@@ -248,21 +252,30 @@ let align_error s = raise (Alignment_error s)
      alignments
    - [attrs] has a single align attribute with a value which is less than
      [algn] *)
-let sufficiently_aligned attrs algn =
+let sufficiently_aligned vi algn =
   let alignment =
     List.fold_left
       (fun acc attr ->
          match attr with
          | Attr("align", [AInt i]) ->
            let alignment = Integer.to_int i in
-           if acc <> 0 && acc <> alignment then
+           if acc <> 0 && acc <> alignment then begin
              (* multiple align attributes with different values *)
-             align_error "Multiple alignment attributes"
-           else if alignment < algn then
+             Options.error
+               "multiple alignment attributs with different values for\
+                variable %a. Keeping the last one."
+               Printer.pp_varinfo vi;
+             alignment
+           end else if alignment < algn then begin
              (* if there is an alignment attribute it should be greater or equal
                 to [algn] *)
-             align_error "Insufficient alignment"
-           else
+             Options.error
+               "alignment of variable %a should be greater or equal to %d.@ \
+                Continuing with this value."
+               Printer.pp_varinfo vi
+               algn;
+               algn
+           end else
              alignment
          | Attr("align", _) ->
            (* align attribute with an argument other than a single number,
@@ -270,21 +283,18 @@ let sufficiently_aligned attrs algn =
            assert false
          | _ -> acc)
       0
-      attrs
+      vi.vattr
   in
   alignment > 0
 
-(* Given the type and the list of attributes of [varinfo] ([fieldinfo]) return
-   true if that [varinfo] ([fieldinfo]) requires to be aligned at the boundary
-   of [algn] (i.e., less than [algn] bytes and has no alignment attribute *)
-let require_alignment typ attrs algn =
-  Cil.bitsSizeOf typ < algn*8 && not (sufficiently_aligned attrs algn)
+(* return [true] iff the given [vi] requires to be aligned at the boundary
+   of [algn] (i.e., less than [algn] bytes and has no alignment attribute) *)
+let require_alignment vi algn =
+  Cil.bitsSizeOf vi.vtype < algn*8 && not (sufficiently_aligned vi algn)
 
 (* ********************************************************************** *)
 (* Visitor *)
 (* ********************************************************************** *)
-
-type position = Before_gmp | Gmpz | After_gmp | Memory_model | Code
 
 class prepare_visitor = object (self)
   inherit Visitor.frama_c_inplace
@@ -311,11 +321,14 @@ class prepare_visitor = object (self)
       white_list
 
   val fct_tbl = Cil_datatype.Varinfo.Hashtbl.create 7
-  val mutable before_memory_model = Before_gmp
   val mutable new_definitions: global list = []
   (* new definitions of the annotated functions which will contain the
      translation of the E-ACSL contract *)
 
+  (* the variable [sound_verdict] belongs to the E-ACSL's RTL and indicates
+     whether the verdict emitted by E-ACSL is sound. It needs to be visible at
+     that point because it is set in all function duplicates
+     (see [dup_fundec]). *)
   val mutable sound_verdict_vi =
     let name = Functions.RTL.mk_api_name "sound_verdict" in
     let vi = Cil.makeGlobalVar name Cil.intType in
@@ -331,18 +344,6 @@ class prepare_visitor = object (self)
     match Cil.unrollType vi.vtype with
     | TFun(_, _, variadic, _) -> variadic
     | _ -> true
-
-  method private before_memory_model = match before_memory_model with
-    | Before_gmp | Gmpz | After_gmp -> true
-    | Memory_model | Code -> false
-
-  method private next () =
-    match before_memory_model with
-    | Before_gmp -> ()
-    | Gmpz -> before_memory_model <- After_gmp
-    | After_gmp -> ()
-    | Memory_model -> before_memory_model <- Code
-    | Code -> ()
 
   (* IMPORTANT: for keeping property statuses, we must preserve the ordering of
      translation, see function [Translate.translate_pre_spec] and
@@ -478,9 +479,9 @@ class prepare_visitor = object (self)
              (fun vi ->
                 (* 4 bytes alignment is required to allow sufficient space for
                    storage of 32-bit timestamps in a 1:1 shadow. *)
-                if require_alignment vi.vtype vi.vattr 4 then begin
-                  vi.vattr <- Attr("aligned", [ AInt Integer.four ]) :: vi.vattr
-                end)
+                if require_alignment vi 4 then
+                  vi.vattr <-
+                    Attr("aligned", [ AInt Integer.four ]) :: vi.vattr)
              blk.blocals;
            blk)
     else
@@ -495,7 +496,7 @@ class prepare_visitor = object (self)
          Annotations.iter_code_annot
            (fun _ a -> self#push_post_code_annot a)
            stmt;
-         (* move variable declared in the body of a switch statement to the
+         (* move variables declared in the body of a switch statement to the
             outer scope *)
          match stmt.skind with
          | Switch(_,sw_blk,_,_) ->
@@ -522,30 +523,31 @@ class prepare_visitor = object (self)
   method !vglob_aux = function
     | GFunDecl(_, vi, loc) | GFun({ svar = vi }, loc)
       when (* duplicate a function iff: *)
-        not (Cil_datatype.Varinfo.Hashtbl.mem fct_tbl vi)
         (* it is not already duplicated *)
-        && not (Datatype.String.Set.mem vi.vname unduplicable_functions)
-        (* it is duplicable *)
-        && not (self#is_variadic_function vi)
-        (* it is not a variadic function *)
-        && not (Misc.is_library_loc loc) (* it is not in the E-ACSL's RTL *)
-        && not (Misc.is_fc_or_compiler_builtin vi) (* it is not a built-in *)
+        not (Cil_datatype.Varinfo.Hashtbl.mem fct_tbl vi)
+        && (* it is duplicable *)
+        not (Datatype.String.Set.mem vi.vname unduplicable_functions)
+        && (* it is not a variadic function *)
+        not (self#is_variadic_function vi)
+        && (* it is not in the E-ACSL's RTL *)
+        not (Misc.is_library_loc loc)
+        && (* it is not a built-in *)
+        not (Misc.is_fc_or_compiler_builtin vi)
         &&
         (let kf =
            try Globals.Functions.get vi with Not_found -> assert false
          in
-         not (Functions.instrument kf)
          (* either explicitely listed as to be not instrumented *)
+         not (Functions.instrument kf)
          ||
          (* or: *)
-         (not (Cil.is_empty_funspec
+         ((* it has a function contract *)
+           not (Cil.is_empty_funspec
                  (Annotations.funspec ~populate:false
                     (Extlib.the self#current_kf)))
-          (* it has a function contract *)
-          && Functions.check kf
-          (* its annotations must be monitored *)))
+           && (* its annotations must be monitored *)
+           Functions.check kf))
       ->
-      self#next ();
       let name = Functions.RTL.mk_gen_name vi.vname in
       let new_vi = Cil.makeGlobalVar name vi.vtype in
       Cil_datatype.Varinfo.Hashtbl.add fct_tbl vi new_vi;
@@ -559,10 +561,10 @@ class prepare_visitor = object (self)
                 if not (Kernel_function.is_definition kf)
                 && vi.vname <> "malloc" && vi.vname <> "free"
                 then
-                  Options.warning "@[annotating undefined function `%a':@ \
-                                   the generated program may miss memory \
-                                   instrumentation@ if there are \
-                                   memory-related annotations.@]"
+                  Options.warning
+                    "@[annotating undefined function `%a':@ \
+                     the generated program may miss memory instrumentation@ \
+                     if there are memory-related annotations.@]"
                     Printer.pp_varinfo vi
               | GFun _ -> ()
               | _ -> assert false);
@@ -604,29 +606,17 @@ class prepare_visitor = object (self)
              [ new_decl; g ]
            | _ -> assert false)
 
-    | GVarDecl(_, loc) | GFunDecl(_, _, loc) | GFun(_, loc)
-      when Misc.is_library_loc loc ->
-      (match before_memory_model with
-       | Before_gmp -> before_memory_model <- Gmpz
-       | Gmpz | Memory_model -> ()
-       | After_gmp -> before_memory_model <- Memory_model
-       | Code -> () (* still processing the GMP and memory model headers,
-                       but reading some libc code *));
-      Cil.DoChildren
-
-    | GVarDecl(vi, _) | GFunDecl(_, vi, _) | GFun({ svar = vi }, _)
-      when Misc.is_fc_or_compiler_builtin vi ->
-      self#next ();
+    | GVarDecl(vi, loc) | GFunDecl(_, vi, loc) | GFun({ svar = vi }, loc)
+      when Misc.is_library_loc loc || Misc.is_fc_or_compiler_builtin vi ->
       Cil.DoChildren
 
     | GVarDecl(vi, loc) | GFunDecl(_, vi, loc) | GFun({ svar = vi }, loc)
       when not (self#is_variadic_function vi)
       ->
-      assert (* handle by the 2 cases above *)
+      assert (* handled by the 2 cases above *)
         (not (Misc.is_library_loc loc || Misc.is_fc_or_compiler_builtin vi));
       let kf = Extlib.the self#current_kf in
       let s = Annotations.funspec ~populate:false kf in
-      self#next ();
       Cil.DoChildrenPost
         (fun f ->
            self#push_pre_spec s;
@@ -634,7 +624,6 @@ class prepare_visitor = object (self)
            f)
 
     | _ ->
-      self#next ();
       Cil.DoChildren
 
   method !vfile f =
@@ -643,10 +632,11 @@ class prepare_visitor = object (self)
          match new_definitions with
          | [] -> f
          | _ :: _ ->
-           (* add the generated definitions of libc at the end of [l]. This way,
-              we are sure that they have access to all of it (in particular, the
-              memory model, GMP and the soundness variable). Also add the
-              [__e_acsl_sound_verdict] variable at the beginning *)
+           (* add the generated definitions of libc at the end of
+              [new_definitions]. This way, we are sure that they have access to
+              all of it (in particular, the memory model, GMP and the soundness
+              variable). Also add the [__e_acsl_sound_verdict] variable at the
+              beginning *)
            let new_globals =
              GVarDecl(sound_verdict_vi, Cil_datatype.Location.unknown)
              :: f.globals
