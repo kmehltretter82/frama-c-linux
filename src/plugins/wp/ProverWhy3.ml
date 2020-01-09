@@ -20,9 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Allow type-desambiguation for symbols *)
-[@@@ warning "-40-42"]
-
 let dkey = Wp_parameters.register_category "prover"
 let dkey_api = Wp_parameters.register_category "why3_api"
 
