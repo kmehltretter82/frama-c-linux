@@ -166,7 +166,7 @@ let parameter_states =
 let must_visit () = Run.get () || Check.get ()
 
 let dkey_analysis = register_category "analysis"
-let dkey_dup = register_category "duplication"
+let dkey_prepare = register_category "preparation"
 let dkey_translation = register_category "translation"
 let dkey_typing = register_category "typing"
 

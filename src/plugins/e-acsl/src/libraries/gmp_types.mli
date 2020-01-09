@@ -53,3 +53,9 @@ module Z: S
 
 (** Representation of the rational type at runtime *)
 module Q: S
+
+(*
+Local Variables:
+compile-command: "make -C ../../../../.."
+End:
+*)

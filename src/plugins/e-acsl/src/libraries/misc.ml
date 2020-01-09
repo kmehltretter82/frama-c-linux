@@ -219,6 +219,19 @@ let name_of_binop = function
   | MinusA -> "sub"
   | MinusPP | MinusPI | IndexPI | PlusPI -> assert false
 
+module Id_term =
+  Datatype.Make_with_collections
+    (struct
+      include Cil_datatype.Term
+      let name = "E_ACSL.Id_term"
+      let compare (t1:term) t2 =
+        if t1 == t2 then 0 else Cil_datatype.Term.compare t1 t2
+      let equal (t1:term) t2 = t1 == t2
+      let structural_descr = Structural_descr.t_abstract
+      let rehash = Datatype.identity
+      let mem_project = Datatype.never_any_project
+    end)
+
 (*
 Local Variables:
 compile-command: "make -C ../../../../.."

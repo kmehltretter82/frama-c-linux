@@ -22,15 +22,19 @@
 
 (** Prepare AST for E-ACSL generation.
 
-    So for this module performs two tasks:
-    - move declarations of variables declared in the bodies of switch
+    More precisely, this module performs the following tasks:
+    - generating a new definition for functions with contract;
+    - removing term sharing;
+    - moving declarations of variables declared in the bodies of switch
       statements to upper scopes;
-    - store what is necessary to translate in [Keep_status]. *)
+    - storing what is necessary to translate in [Keep_status];
+    - in case of temporal validity checks, adding the attribute "aligned" to
+      variables that are not sufficiently aligned. *)
 
-val prepare: unit -> Project.t
+val prepare: unit -> unit
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)

@@ -182,42 +182,37 @@ module Memo: sig
   val clear: unit -> unit
 end = struct
 
-  module H = Hashtbl.Make(struct
-      type t = term
-      (* The comparison over terms is the physical equality. It cannot be the
-         structural one (given by [Cil_datatype.Term.equal]) because the very
-         same term can be used in 2 different contexts which lead to different
-         casts.
+  (* The comparison over terms is the physical equality. It cannot be the
+     structural one (given by [Cil_datatype.Term.equal]) because the very same
+     term can be used in 2 different contexts which lead to different casts.
 
-         By construction, there are no physically equal terms in the AST
-         built by Cil. Consequently the memoisation should be fully
-         useless. However the translation of E-ACSL guarded quantification
-         generates new terms (see module {!Quantif}) which must be typed. The term
-         corresponding to the bound variable [x] is actually used twice: once in
-         the guard and once for encoding [x+1] when incrementing it. The
-         memoization is only useful here and indeed prevent the generation of
-         one extra variable in some cases. *)
-      let equal (t1:term) t2 = t1 == t2
-      let hash = Cil_datatype.Term.hash
-    end)
-
-  let tbl = H.create 97
+     By construction (see prepare_ast.ml), there are no physically equal terms
+     in the E-ACSL's generated AST. Consequently the memoisation should be fully
+     useless. However:
+     - type info of many terms are accessed several times
+     - the translation of E-ACSL guarded quantifications generates
+       new terms (see module {!Quantif}) which must be typed. The term
+       corresponding to the bound variable [x] is actually used twice: once in the
+       guard and once for encoding [x+1] when incrementing it. The memoization is
+       only useful here and indeed prevent the generation of one extra variable in
+       some cases. *)
+  let tbl = Misc.Id_term.Hashtbl.create 97
 
   let get t =
-    try H.find tbl t
+    try Misc.Id_term.Hashtbl.find tbl t
     with Not_found ->
       Options.fatal
         "[typing] type of term '%a' was never computed."
         Printer.pp_term t
 
   let memo f t =
-    try H.find tbl t
+    try Misc.Id_term.Hashtbl.find tbl t
     with Not_found ->
       let x = f t in
-      H.add tbl t x;
+      Misc.Id_term.Hashtbl.add tbl t x;
       x
 
-  let clear () = H.clear tbl
+  let clear () = Misc.Id_term.Hashtbl.clear tbl
 
 end
 
@@ -755,6 +750,6 @@ module Datatype = D
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)

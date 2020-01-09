@@ -381,4 +381,4 @@ ML_LINT_KO+=src/plugins/e-acsl/src/code_generator/at_with_lscope.ml
 ML_LINT_KO+=src/plugins/e-acsl/src/code_generator/at_with_lscope.mli
 ML_LINT_KO+=src/plugins/e-acsl/src/code_generator/temporal.ml
 ML_LINT_KO+=src/plugins/e-acsl/src/code_generator/temporal.mli
-ML_LINT_KO+=src/plugins/e-acsl/src/project_initializer/dup_functions.ml
+
