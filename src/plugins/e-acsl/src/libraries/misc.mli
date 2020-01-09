@@ -30,7 +30,7 @@ open Cil_types
 
 exception Unregistered_library_function of string
 val get_lib_fun_vi: string -> varinfo
-(** Return varinfo corresponding to a name of a given library function *)
+(** @return varinfo corresponding to a name of a given library function *)
 
 (* ************************************************************************** *)
 (** {2 Handling \result} *)
@@ -80,14 +80,14 @@ val is_set_of_ptr_or_array: logic_type -> bool
 (** Checks whether the given logic type is a set of pointers. *)
 
 val is_range_free: term -> bool
-(** Returns [true] iff the given term does not contain any range. *)
+(** @return true iff the given term does not contain any range. *)
 
 val is_bitfield_pointers: logic_type -> bool
-(** Returns [true] iff the given logic type is a bitfield pointer or a
+(** @return true iff the given logic type is a bitfield pointer or a
     set of bitfield pointers. *)
 
 val term_has_lv_from_vi: term -> bool
-(** Return [true] iff the given term contains a variables that originates from
+(** @return true iff the given term contains a variables that originates from
     a C varinfo, that is a non-purely logic variable. *)
 
 type pred_or_term = PoT_pred of predicate | PoT_term of term
@@ -97,13 +97,13 @@ val mk_ptr_sizeof: typ -> location -> exp
     to a [typ] typ and returns [sizeof(typ)]. *)
 
 val name_of_binop: binop -> string
-(** Returns the name of the given binop as a string *)
+(** @return the name of the given binop as a string. *)
 
 val finite_min_and_max: Ival.t -> Integer.t * Integer.t
-(** [finite_min_and_max i] takes the finite ival [i] and returns its bounds *)
+(** [finite_min_and_max i] takes the finite ival [i] and returns its bounds. *)
 
 module Id_term: Datatype.S_with_collections with type t = term
-(** datatype for terms that relies on physical equality *)
+(** Datatype for terms that relies on physical equality. *)
 
 (*
 Local Variables:

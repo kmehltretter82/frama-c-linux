@@ -30,8 +30,9 @@ let dkey = Options.dkey_prepare
 
 let fct_tbl: unit Kernel_function.Hashtbl.t = Kernel_function.Hashtbl.create 7
 
-(* The purpose of [actions] is similar to the Frama-C visitor's [actions] but we
-   need to fill it outside the visitor. So it is our own version. *)
+(* The purpose of [actions] is similar to the Frama-C visitor's
+   [get_filling_actions] but we need to fill it outside the visitor. So it is
+   our own version. *)
 let actions = Queue.create ()
 
 (* global table for ensuring that logic info are not shared between a function
@@ -211,7 +212,6 @@ let dup_global loc actions spec bhv sound_verdict_vi kf vi new_vi =
          Globals.Functions.register kf
        end)
     actions;
-  Options.feedback ~dkey ~level:2 "function %s" name;
   (* remove the specs attached to the previous kf iff it is a definition:
      it is necessary to keep stable the number of annotations in order to get
      [Keep_status] working fine. *)
@@ -262,7 +262,7 @@ let sufficiently_aligned vi algn =
            if acc <> 0 && acc <> alignment then begin
              (* multiple align attributes with different values *)
              Options.error
-               "multiple alignment attributs with different values for\
+               "multiple alignment attributes with different values for\
                 variable %a. Keeping the last one."
                Printer.pp_varinfo vi;
              alignment
