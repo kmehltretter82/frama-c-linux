@@ -55,7 +55,7 @@ end
 module type With_Diff_One = sig
   type t
   val diff_if_one : t -> t -> t or_bottom
-  (** [diff_of_one t1 t2] is an over-approximation of [t1-t2].
+  (** [diff_if_one t1 t2] is an over-approximation of [t1-t2].
       @return [t1] if [t2] is not a singleton. *)
 end
 
