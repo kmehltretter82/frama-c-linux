@@ -665,7 +665,7 @@ module Make
     in
     cast_integer Alarms.Signed_downcast expr ~src ~dst value
 
-  let cast_int_to_int expr ~src ~dst value =
+  let cast_int_to_int expr ~ptr ~src ~dst value =
     (* Regain some precision in case a transfer function was imprecise.
        This should probably be done in the transfer function, though. *)
     let value =
@@ -675,16 +675,19 @@ module Make
     in
     if Eval_typ.range_inclusion src dst
     then return value (* Upcast, nothing to check. *)
-    else if dst.i_signed then (* Signed downcast. *)
-      if Kernel.SignedDowncast.get ()
-      then cast_integer Alarms.Signed_downcast expr ~src ~dst value
-      else if Value_parameters.WarnSignedConvertedDowncast.get ()
+    else
+      let overflow_kind, warn =
+        if ptr
+        then Alarms.Pointer_downcast, Kernel.PointerDowncast.get
+        else if dst.i_signed
+        then Alarms.Signed_downcast, Kernel.SignedDowncast.get
+        else Alarms.Unsigned_downcast, Kernel.UnsignedDowncast.get
+      in
+      if warn ()
+      then cast_integer overflow_kind expr ~src ~dst value
+      else if dst.i_signed && Value_parameters.WarnSignedConvertedDowncast.get ()
       then relaxed_signed_downcast expr ~src ~dst value
       else return (Value.rewrap_integer dst value)
-    else (* Unsigned downcast. *)
-    if Kernel.UnsignedDowncast.get ()
-    then cast_integer Alarms.Unsigned_downcast expr ~src ~dst value
-    else return (Value.rewrap_integer dst value)
 
   (* Re-export type here *)
   type scalar_typ = Eval_typ.scalar_typ =
@@ -728,15 +731,17 @@ module Make
     | Some src_type, Some dst_type ->
       let value, alarms =
         match src_type, dst_type with
-        | (TSInt src | TSPtr src), (TSInt dst | TSPtr dst) ->
-          cast_int_to_int ~src ~dst expr value
+        | TSPtr src, TSInt dst ->
+          cast_int_to_int ~ptr:true ~src ~dst expr value
+        | TSInt src, (TSInt dst | TSPtr dst) ->
+          cast_int_to_int ~ptr:false ~src ~dst expr value
         | TSFloat src, (TSInt dst | TSPtr dst)  ->
           restrict_float ~reduce:true ~assume_finite:true expr src value >>=
           truncate_float src dst expr
         | (TSInt _ | TSPtr _), TSFloat _ ->
           (* Cannot overflow with 32 bits float. *)
-          `Value value, Alarmset.none
-        | TSFloat _, TSFloat _ -> `Value value, Alarmset.none
+          return value
+        | TSFloat _, TSFloat _ | TSPtr _, TSPtr _ -> return value
       in
       value >>- Value.forward_cast ~src_type ~dst_type, alarms
 
