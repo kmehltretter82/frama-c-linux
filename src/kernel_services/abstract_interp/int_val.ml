@@ -90,29 +90,6 @@ let zero_or_one = Set Int_set.zero_or_one
 let positive_integers = Itv (Int_interval.inject_range (Some Int.zero) None)
 let negative_integers = Itv (Int_interval.inject_range None (Some Int.zero))
 
-
-let fail min max r modu =
-  let bound fmt = function
-    | None -> Format.fprintf fmt "--"
-    | Some x -> Int.pretty fmt x
-  in
-  Kernel.fatal "Int_val: broken Itv, min=%a max=%a r=%a modu=%a"
-    bound min bound max Int.pretty r Int.pretty modu
-
-let is_safe_modulo r modu =
-  (Int.ge r Int.zero ) && (Int.ge modu Int.one) && (Int.lt r modu)
-
-let is_safe_bound bound r modu = match bound with
-  | None -> true
-  | Some m -> Int.equal (Int.e_rem m modu) r
-
-(* Sanity check for Itv's arguments *)
-let check ~min ~max ~rem ~modu =
-  if not (is_safe_modulo rem modu
-          && is_safe_bound min rem modu
-          && is_safe_bound max rem modu)
-  then fail min max rem modu
-
 let inject_singleton e = Set (Int_set.inject_singleton e)
 
 let make ~min ~max ~rem ~modu =
@@ -129,11 +106,11 @@ let make ~min ~max ~rem ~modu =
   | _ -> Itv (Int_interval.make ~min ~max ~rem ~modu)
 
 let check_make ~min ~max ~rem ~modu =
-  check ~min ~max ~rem ~modu;
+  Int_interval.check ~min ~max ~rem ~modu;
   make ~min ~max ~rem ~modu
 
 let inject_interval ~min ~max ~rem:r ~modu =
-  assert (is_safe_modulo r modu);
+  assert ((Int.ge r Int.zero ) && (Int.ge modu Int.one) && (Int.lt r modu));
   let fix_bound fix bound = match bound with
     | None -> None
     | Some b -> Some (if Int.equal b (Int.e_rem r modu) then b else fix b)
@@ -374,7 +351,6 @@ let join v1 v2 =
         None -> None
       | Some m -> Some (Int.max m (Int_set.max s))
     in
-    check ~min ~max ~rem ~modu;
     Itv (Int_interval.make ~min ~max ~rem ~modu)
 
 let link v1 v2 =

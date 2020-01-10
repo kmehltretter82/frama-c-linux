@@ -118,16 +118,15 @@ let is_safe_bound bound r modu = match bound with
   | Some m -> Int.equal (Int.e_rem m modu) r
 
 (* Sanity check. *)
-let check t =
-  if not (is_safe_modulo t.rem t.modu
-          && is_safe_bound t.min t.rem t.modu
-          && is_safe_bound t.max t.rem t.modu)
-  then fail t.min t.max t.rem t.modu
+let check ~min ~max ~rem ~modu =
+  if not (is_safe_modulo rem modu
+          && is_safe_bound min rem modu
+          && is_safe_bound max rem modu)
+  then fail min max rem modu
 
 let make ~min ~max ~rem ~modu =
-  let t = { min; max; rem; modu } in
-  check t;
-  t
+  check ~min ~max ~rem ~modu;
+  { min; max; rem; modu }
 
 let inject_singleton e =
   { min = Some e; max = Some e; rem = Int.zero; modu = Int.one }
@@ -220,8 +219,6 @@ let max_max x y =
   | Some x, Some y -> Some (Int.max x y)
 
 let join t1 t2 =
-  check t1;
-  check t2;
   let modu = Int.(pgcd (pgcd t1.modu t2.modu) (abs (sub t1.rem t2.rem))) in
   let rem = Int.e_rem t1.rem modu in
   let min = min_min t1.min t2.min in
@@ -624,8 +621,6 @@ let c_rem t1 t2 =
       `Value (inject_range min max)
 
 let mul t1 t2 =
-  check t1;
-  check t2;
   let min1 = inject_min t1.min in
   let max1 = inject_max t1.max in
   let min2 = inject_min t2.min in
@@ -784,3 +779,7 @@ let reduce_bit i t b =
     | u -> u
   in
   make_or_bottom ~min ~max ~rem:r ~modu
+
+(* No check in the exported [make] function: callers are expected to perform
+   the checks when needed. Thus the function [check] is also exported. *)
+let make ~min ~max ~rem ~modu = { min; max; rem; modu }
