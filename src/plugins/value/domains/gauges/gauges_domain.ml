@@ -846,6 +846,11 @@ module G = struct
       with Cvalue.V.Not_based_on_null | Ival.Not_Singleton_Int ->
         raise Untranslatable
 
+    let has_variable_validity b =
+      match Base.validity b with
+      | Base.Variable _ -> true
+      | _ -> false
+
     (* Check that [v] is an integer, or a single pointer (invariant 2 of MV).
        Pointers to a single base with variable validity are also ruled out, as
        the base may become weak, making the pointer imprecise and thus breaking
@@ -853,11 +858,8 @@ module G = struct
     let sanitize_v v =
       try
         let b, i = Cvalue.V.find_lonely_key v in
-        let validity = Base.validity b in
-        match validity, i with
-        | Base.Variable _, _
-        | _, Ival.Float _ -> raise Untranslatable
-        | _, _ -> ()
+        if not (Ival.is_int i) || has_variable_validity b
+        then raise Untranslatable
       with Not_found -> raise Untranslatable
 
     let add (ct1, l1: t) (ct2, l2: t) : t =

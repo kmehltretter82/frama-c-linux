@@ -268,7 +268,7 @@ let float_hints stmto baseo hints =
 
 (* default set of hints. Depends on the machdep *)
 let default () =
-  let int_default = Ival.Widen_Hints.default_widen_hints in
+  let int_default = Ival.Widen_Hints.of_list (List.map Integer.of_int [-1;0;1]) in
   let float_default = Fc_float.Widen_Hints.default_widen_hints in
   join (num_hints None None int_default) (float_hints None None float_default)
 

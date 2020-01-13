@@ -119,7 +119,7 @@ module Model = struct
 
   let backward_location state _lval typ precise_loc value =
     let size = Precise_locs.loc_size precise_loc in
-    let upto = succ (Ival.get_small_cardinal()) in
+    let upto = succ (Int_set.get_small_cardinal()) in
     let loc = Precise_locs.imprecise_location precise_loc in
     let eval_one_loc single_loc =
       let v = Cvalue.Model.find state single_loc in

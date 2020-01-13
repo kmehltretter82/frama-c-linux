@@ -100,14 +100,13 @@ end
 let reduce_error cvalue error =
   try
     let ival = Cvalue.V.project_ival cvalue in
-    match ival with
-    | Ival.Float fval ->
-      begin
-        match Numerors_value.reduce fval error with
-        | `Value error -> cvalue, error
-        | `Bottom -> cvalue, error (* TODO: we should be able to reduce to bottom. *)
-      end
-    | _ -> cvalue, error
+    if Ival.is_float ival
+    then
+      let fval = Ival.project_float ival in
+      match Numerors_value.reduce fval error with
+      | `Value error -> cvalue, error
+      | `Bottom -> cvalue, error (* TODO: we should be able to reduce to bottom. *)
+    else cvalue, error
   with Cvalue.V.Not_based_on_null -> cvalue, error
 
 (* Reduction of the numerors value resulting from a cast from int to float type,

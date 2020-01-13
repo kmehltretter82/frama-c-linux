@@ -37,11 +37,11 @@ let frama_C_is_base_aligned state actuals =
     match actuals with
     | [_,x,_; _,y,_] ->
       let i = Cvalue.V.project_ival y in
-      begin match i with
-        | Ival.Set si ->
+      begin match Ival.project_small_set i with
+        | Some si ->
           Location_Bytes.fold_i
             (fun b _o () ->
-               Array.iter
+               List.iter
                  (fun int ->
                     if not (Base.is_aligned_by b int)
                     then raise Found_misaligned_base)
@@ -54,7 +54,7 @@ let frama_C_is_base_aligned state actuals =
             c_from = None;
             c_cacheable = Value_types.Cacheable;
           }
-        | _ -> raise Found_misaligned_base
+        | None -> raise Found_misaligned_base
       end
     | _ -> raise (Builtins.Invalid_nb_of_args 2)
   end
@@ -533,7 +533,7 @@ let memset_typ_offsm_int full_typ i =
 let memset_typ_offsm typ v =
   try
     let i = V.project_ival v in
-    ignore (Ival.cardinal_less_than i (Ival.get_small_cardinal ()));
+    ignore (Ival.cardinal_less_than i (Int_set.get_small_cardinal ()));
     let aux_i i offsm =
       let offsm_i = memset_typ_offsm_int typ i in
       match offsm with

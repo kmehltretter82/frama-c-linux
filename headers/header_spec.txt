@@ -412,6 +412,7 @@ src/kernel_services/abstract_interp/base.ml: CEA_LGPL
 src/kernel_services/abstract_interp/base.mli: CEA_LGPL
 src/kernel_services/abstract_interp/bottom.ml: CEA_LGPL
 src/kernel_services/abstract_interp/bottom.mli: CEA_LGPL
+src/kernel_services/abstract_interp/eva_lattice_type.mli: CEA_LGPL
 src/kernel_services/abstract_interp/fc_float.ml: CEA_LGPL
 src/kernel_services/abstract_interp/fc_float.mli: CEA_LGPL
 src/kernel_services/abstract_interp/float_sig.mli: CEA_LGPL
@@ -425,6 +426,12 @@ src/kernel_services/abstract_interp/int_Base.mli: CEA_LGPL
 src/kernel_services/abstract_interp/int_Intervals.ml: CEA_LGPL
 src/kernel_services/abstract_interp/int_Intervals.mli: CEA_LGPL
 src/kernel_services/abstract_interp/int_Intervals_sig.mli: CEA_LGPL
+src/kernel_services/abstract_interp/int_interval.ml: CEA_LGPL
+src/kernel_services/abstract_interp/int_interval.mli: CEA_LGPL
+src/kernel_services/abstract_interp/int_set.ml: CEA_LGPL
+src/kernel_services/abstract_interp/int_set.mli: CEA_LGPL
+src/kernel_services/abstract_interp/int_val.ml: CEA_LGPL
+src/kernel_services/abstract_interp/int_val.mli: CEA_LGPL
 src/kernel_services/abstract_interp/ival.ml: CEA_LGPL
 src/kernel_services/abstract_interp/ival.mli: CEA_LGPL
 src/kernel_services/abstract_interp/lattice_messages.ml: CEA_LGPL

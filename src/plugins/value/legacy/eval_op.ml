@@ -161,14 +161,17 @@ let make_loc_contiguous loc =
     let base, offset =
       Locations.Location_Bits.find_lonely_key loc.Locations.loc
     in
-    match offset, loc.Locations.size with
-    | Ival.Top (Some min, Some max, _rem, modu), Int_Base.Value size
-      when Int.equal modu size ->
-      let size' = Int.add (Int.sub max min) modu in
-      let i = Ival.inject_singleton min in
-      let loc_bits = Locations.Location_Bits.inject base i in
-      Locations.make_loc loc_bits (Int_Base.inject size')
-    | _ -> loc
+    if Ival.is_small_set offset
+    then loc
+    else
+      let min, max, _rem, modu = Ival.min_max_r_mod offset in
+      match min, max, loc.Locations.size with
+      | Some min, Some max, Int_Base.Value size when Int.equal modu size ->
+        let size' = Int.add (Int.sub max min) modu in
+        let i = Ival.inject_singleton min in
+        let loc_bits = Locations.Location_Bits.inject base i in
+        Locations.make_loc loc_bits (Int_Base.inject size')
+      | _ -> loc
   with Not_found -> loc
 
 let apply_on_all_locs f loc state =

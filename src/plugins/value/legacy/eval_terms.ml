@@ -1145,7 +1145,7 @@ and eval_toffset ~alarm_mode env typ toffset =
         (* Note: scale_int_base would overapproximate when given a
            Float.  Should never happen. *)
         | Int_Base.Value f ->
-          (match offset with | Ival.Float _ -> assert false | _ -> ());
+          assert (Ival.is_int offset);
           Ival.scale f offset
       in
       Ival.add_int_under offset offsrem.eunder

@@ -26,16 +26,7 @@
 
 open Abstract_interp
 
-type t = private
-  | Set of Int.t array
-  | Float of Fval.t
-  (** [Top(min, max, rem, modulo)] represents the interval between
-      [min] and [max], congruent to [rem] modulo [modulo]. A value of
-      [None] for [min] (resp. [max]) represents -infinity
-      (resp. +infinity). [modulo] is > 0, and [0 <= rem < modulo].
-
-      Actual [Top] is thus represented by Top(None,None,Int.zero,Int.one) *)
-  | Top of Int.t option * Int.t option * Int.t * Int.t
+type t
 
 (** {2 General guidelines of this module}
 
@@ -48,15 +39,7 @@ type t = private
     and exact operations.
 *)
 
-
-
-module Widen_Hints : sig
-  include FCSet.S with type elt = Integer.t
-  include Datatype.S with type t:=t
-
-  val default_widen_hints: t
-end
-
+module Widen_Hints = Datatype.Integer.Set
 type size_widen_hint = Integer.t
 type numerical_widen_hint = Widen_Hints.t * Fc_float.Widen_Hints.t
 
@@ -67,6 +50,9 @@ include Lattice_type.Full_AI_Lattice_with_cardinality
 
 val is_bottom : t -> bool
 val overlaps: partial:bool -> size:Integer.t -> t -> t -> bool
+
+val is_float: t -> bool
+val is_int: t -> bool
 
 val add_int : t -> t -> t
 (** Addition of two integer (ie. not [Float]) ivals. *)
@@ -175,6 +161,10 @@ val project_int : t -> Integer.t
     (** @raise Not_Singleton_Int when the cardinal of the argument is not 1,
         or if it is not an integer. *)
 
+val is_small_set: t -> bool
+
+val project_small_set: t -> Integer.t list option
+
 val cardinal: t -> Integer.t option
 (** [cardinal v] returns [n] if [v] has finite cardinal [n], or [None] if
     the cardinal is not finite. *)
@@ -212,10 +202,6 @@ val fold_int_bounds: (t -> 'a -> 'a) -> t -> 'a -> 'a
     is [i] from which [min] and [max] have been removed. If [min] and/or
     [max] are infinite, [f] is called with an argument [i'] unreduced
     in the corresponding direction(s). *)
-
-val apply_set: (Integer.t -> Integer.t -> Integer.t ) -> t -> t -> t
-val apply_set_unary: (Integer.t -> Integer.t ) -> t -> t
-
 
 (** Subdivisions into two intervals *)
 val subdivide: size:Integer.t -> t -> t * t
@@ -266,7 +252,6 @@ val interp_boolean : contains_zero:bool -> contains_non_zero:bool -> t
 (** Extract bits from [start] to [stop] from the given Ival, [start]
     and [stop] being included. [size]  is the size of the entire ival. *)
 val extract_bits: start:Integer.t -> stop:Integer.t -> size:Integer.t -> t -> t
-val create_all_values_modu: modu:Integer.t -> signed:bool -> size:int -> t
 val create_all_values: signed:bool -> size:int -> t
 
 (** [all_values ~size v] returns true iff v contains all integer values
@@ -325,13 +310,7 @@ val complement_int_under: size:int -> signed:bool -> t -> t Bottom.or_bottom
 
 val pretty_debug : Format.formatter -> t -> unit
 
-val get_small_cardinal: unit -> int
-(** Value of option -ilevel *)
-
 (**/**)
-
-(* This is used by the Value plugin. Do not use. *)
-val set_small_cardinal: int -> unit
 
 val rehash: t -> t (* Low-level operation for demarshalling *)
 (**/**)
