@@ -70,8 +70,9 @@ let arity2 fk caml_fun state actuals =
 
 let register_arity2 c_name fk f =
   let name = "Frama_C_" ^ c_name in
-  Builtins.register_builtin name ~replace:c_name (arity2 fk f);
-;;
+  let t = Cil_types.TFloat (fk, []) in
+  let typ = t, [t; t] in
+  Builtins.register_builtin name ~replace:c_name ~typ (arity2 fk f)
 
 let () =
   let open Fval in
@@ -80,9 +81,7 @@ let () =
   register_arity2 "pow" Cil_types.FDouble pow;
   register_arity2 "powf" Cil_types.FFloat pow;
   register_arity2 "fmod" Cil_types.FDouble fmod;
-  register_arity2 "fmodf" Cil_types.FFloat fmod;
-;;
-
+  register_arity2 "fmodf" Cil_types.FFloat fmod
 
 let arity1 name fk caml_fun state actuals =
   match actuals with
@@ -114,8 +113,9 @@ let arity1 name fk caml_fun state actuals =
 
 let register_arity1 c_name fk f =
   let name = "Frama_C_" ^ c_name in
-  Builtins.register_builtin name ~replace:c_name (arity1 name fk f);
-;;
+  let t = Cil_types.TFloat (fk, []) in
+  let typ = t, [t] in
+  Builtins.register_builtin name ~replace:c_name ~typ (arity1 name fk f)
 
 let () =
   let open Fval in
@@ -139,5 +139,4 @@ let () =
   register_arity1 "floorf" Cil_types.FFloat floor;
   register_arity1 "ceilf" Cil_types.FFloat ceil;
   register_arity1 "truncf" Cil_types.FFloat trunc;
-  register_arity1 "roundf" Cil_types.FFloat fround;
-;;
+  register_arity1 "roundf" Cil_types.FFloat fround

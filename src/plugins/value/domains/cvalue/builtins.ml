@@ -32,11 +32,11 @@ type use_builtin = Always | OnAuto
 
 let table = Hashtbl.create 17
 
-let register_builtin name ?replace f =
-  Hashtbl.replace table name (f, None, Always);
+let register_builtin name ?replace ?typ f =
+  Hashtbl.replace table name (f, typ, None, Always);
   match replace with
   | None -> ()
-  | Some fname -> Hashtbl.replace table fname (f, Some name, OnAuto)
+  | Some fname -> Hashtbl.replace table fname (f, typ, Some name, OnAuto)
 
 let () = Db.Value.register_builtin := register_builtin
 
@@ -45,7 +45,7 @@ let () = Db.Value.register_builtin := register_builtin
 let registered_builtins () =
   let l =
     Hashtbl.fold
-      (fun name (f, _, u) acc -> if u = Always then (name, f) :: acc else acc)
+      (fun name (f, _, _, u) acc -> if u = Always then (name, f) :: acc else acc)
       table []
   in
   List.sort (fun (name1, _) (name2, _) -> String.compare name1 name2) l
@@ -54,7 +54,7 @@ let () = Db.Value.registered_builtins := registered_builtins
 
 let builtin_names_and_replacements () =
   let stand_alone, replacements =
-    Hashtbl.fold (fun name (_, replaced_by, _) (acc1, acc2) ->
+    Hashtbl.fold (fun name (_, _, replaced_by, _) (acc1, acc2) ->
         match replaced_by with
         | None -> name :: acc1, acc2
         | Some rep_by -> acc1, (name, rep_by) :: acc2
@@ -94,7 +94,7 @@ let () =
 
 let mem_builtin name =
   try
-    let _, _, u = Hashtbl.find table name in
+    let _, _, _, u = Hashtbl.find table name in
     u = Always
   with Not_found -> false
 
@@ -109,20 +109,41 @@ let find_builtin_specification kf =
      TODO: check that the specification is the frama-c libc specification? *)
   if spec.spec_behavior <> [] then Some spec else None
 
+(* Returns [true] if the function [kf] is incompatible with the expected type
+   for a given builtin, which therefore cannot be applied. *)
+let inconsistent_builtin_typ kf = function
+  | None -> false (* No expected type provided with the builtin, no check. *)
+  | Some (expected_result, expected_args) ->
+    match Kernel_function.get_type kf with
+    | TFun (result, args, _, _) ->
+      let args = Cil.argsToList args in
+      Cil.need_cast result expected_result
+      || List.length args <> List.length expected_args
+      || List.exists2 (fun (_, t, _) u -> Cil.need_cast t u) args expected_args
+    | _ -> assert false
+
 let find_builtin_override kf =
   let name =
     try Value_parameters.BuiltinsOverrides.find kf
     with Not_found -> Kernel_function.get_name kf
   in
   try
-    let f, _, u = Hashtbl.find table name in
-    if u = Always || Value_parameters.BuiltinsAuto.get ()
+    let f, typ, _, u = Hashtbl.find table name in
+    if (u = Always || Value_parameters.BuiltinsAuto.get ())
+    && not (inconsistent_builtin_typ kf typ)
     then Extlib.opt_map (fun s -> name, f, s) (find_builtin_specification kf)
     else None
   with Not_found -> None
 
-let warn_builtin_override bname kf =
+let warn_builtin_override bname kf expected_typ =
   let source = fst (Kernel_function.get_location kf) in
+  if inconsistent_builtin_typ kf expected_typ
+  then
+    Value_parameters.warning ~source ~once:true
+      ~wkey:Value_parameters.wkey_builtins_override
+      "The builtin %s will not be used for function %a of incompatible type."
+      bname Kernel_function.pretty kf
+  else
   if find_builtin_specification kf = None
   then
     Value_parameters.warning ~source ~once:true
@@ -147,15 +168,18 @@ let warn_builtin_override bname kf =
 
 let warn_definitions_overridden_by_builtins () =
   Value_parameters.BuiltinsOverrides.iter
-    (fun (kf, name) -> warn_builtin_override (Extlib.the name) kf);
+    (fun (kf, name) ->
+       let name = Extlib.the name in
+       let (_, typ, _ , _) = Hashtbl.find table name in
+       warn_builtin_override name kf typ);
   let autobuiltins = Value_parameters.BuiltinsAuto.get () in
   Hashtbl.iter
-    (fun name (_, _, u) ->
+    (fun name (_, typ, _, u) ->
        if autobuiltins || u = Always
        then
          try
            let kf = Globals.Functions.find_by_name name in
-           warn_builtin_override name kf
+           warn_builtin_override name kf typ
          with Not_found -> ())
     table
 
@@ -182,7 +206,7 @@ let clobbered_set_from_ret state ret =
 
 type call = (Precise_locs.precise_location, Cvalue.V.t) Eval.call
 type result = Cvalue.Model.t * Locals_scoping.clobbered_set
-type builtin = Db.Value.builtin_sig
+type builtin = Db.Value.builtin
 
 open Eval
 

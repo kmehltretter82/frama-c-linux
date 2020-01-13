@@ -177,26 +177,31 @@ module Value : sig
 
   exception Outside_builtin_possibilities
 
-  (** Type for a Value builtin function *)
-  type builtin_sig =
-      (** Memory state at the beginning of the function *)
-      state ->
-      (** Args for the function: the expressions corresponding to the formals
-          of the functions at the call site, the actual value of those formals,
-          and a more precise view of those formals using offsetmaps (for eg.
-          structs)  *)
-      (Cil_types.exp * Cvalue.V.t * Cvalue.V_Offsetmap.t) list ->
+  (* Type of a C function interpreted by a builtin:
+     return type and list of argument types. *)
+  type builtin_type = typ * typ list
+
+  (** Type for an Eva builtin function *)
+  type builtin =
+    (** Memory state at the beginning of the function *)
+    state ->
+    (** Args for the function: the expressions corresponding to the formals
+        of the functions at the call site, the actual value of those formals,
+        and a more precise view of those formals using offsetmaps (for eg.
+        structs)  *)
+    (Cil_types.exp * Cvalue.V.t * Cvalue.V_Offsetmap.t) list ->
     Value_types.call_result
 
-  val register_builtin: (string -> ?replace:string -> builtin_sig -> unit) ref
-    (** [!register_builtin name ?replace f] registers an abstract function [f]
-        to use everytime a C function named [name] is called in the program.
-        If [replace] is supplied and option [-val-builtins-auto] is active,
-        calls to [replace] will also be substituted by the builtin.
-        See also option [-val-builtin] *)
+  val register_builtin:
+    (string -> ?replace:string -> ?typ:builtin_type -> builtin -> unit) ref
+  (** [!register_builtin name ?replace ?typ f] registers an abstract function
+      [f] to use everytime a C function named [name] of type [typ] is called in
+      the program.  If [replace] is supplied and option [-eva-builtins-auto] is
+      active, calls to [replace] will also be substituted by the builtin.  See
+      also option [-eva-builtin] *)
 
-  val registered_builtins: (unit -> (string * builtin_sig) list) ref
-  (** Returns a list of the pairs (name, builtin_sig) registered via
+  val registered_builtins: (unit -> (string * builtin) list) ref
+  (** Returns a list of the pairs (name, builtin) registered via
       [register_builtin].
       @since Aluminium-20160501 *)
 

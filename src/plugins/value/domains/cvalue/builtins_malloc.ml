@@ -476,7 +476,7 @@ let alloc_by_stack_aux region stack prefix sizev state =
 (* For each callstack, the first MallocPrecision.get() are precise fresh
    distinct locations. The following allocations all return the same
    base, first strong, then weak, and which is extended as needed. *)
-let alloc_by_stack ?(prefix="malloc") region ?returns_null : Db.Value.builtin_sig = fun state actuals->
+let alloc_by_stack ?(prefix="malloc") region ?returns_null : Db.Value.builtin = fun state actuals->
   let stack = call_stack_no_wrappers () in
   let sizev = match actuals with
     | [_,size,_] -> size
@@ -501,7 +501,7 @@ let () = Builtins.register_builtin
     (alloc_by_stack ~prefix:"alloca" Base.Alloca ~returns_null:false)
 
 (* Equivalent to [alloc_by_stack], but for [calloc]. *)
-let calloc_by_stack : Db.Value.builtin_sig = fun state actuals ->
+let calloc_by_stack : Db.Value.builtin = fun state actuals ->
   calloc_abstract (alloc_by_stack_aux Base.Malloc) state actuals
 
 let () = Builtins.register_builtin

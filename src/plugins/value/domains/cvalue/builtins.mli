@@ -25,9 +25,15 @@
 
 exception Invalid_nb_of_args of int
 
-(** Register the given OCaml function as a builtin, that will be used
-    instead of the Cil C function of the same name *)
-val register_builtin: string -> ?replace:string -> Db.Value.builtin_sig -> unit
+(** [register_builtin name ?replace ?typ f] registers the ocaml function [f]
+    as a builtin to be used instead of the C function of name [name].
+    If [replace] is provided, the builtin is also used instead of the C function
+    of name [replace], unless option -eva-builtin-auto is disabled.
+    If [typ] is provided, consistency between the expected [typ] and the type of
+    the C function is checked before using the builtin. *)
+val register_builtin:
+  string -> ?replace:string ->
+  ?typ:Db.Value.builtin_type -> Db.Value.builtin -> unit
 
 (** [clobbered_set_from_ret state ret] can be used for functions that return
     a pointer to where they have written some data. It returns all the bases
