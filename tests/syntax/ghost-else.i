@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -no-autoload-plugins -print
+   OPT: -no-autoload-plugins -keep-comments -print
 */
 
 void normal_only_if(int x, int y) {

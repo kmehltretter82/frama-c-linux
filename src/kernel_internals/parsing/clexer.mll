@@ -347,9 +347,29 @@ let lex_comment remainder buffer lexbuf =
   (match buffer with None -> () | Some b -> Buffer.add_string b s) ;
   remainder buffer lexbuf
 
-let error_count_lines comments =
-  let newline_if_n c = if c = '\n' then E.newline () in
-  String.iter newline_if_n comments
+let do_ghost_else_comments comments =
+  let ends_with_n =
+    let last = String.length comments in
+    (* note that comments contains at least a blank *)
+    '\n' = String.get comments (last - 1)
+  in
+  let comments = String.split_on_char '\n' comments in
+  let comments = List.map String.trim comments in
+  let process_line s =
+    E.newline () ;
+    if Kernel.PrintComments.get ()
+    && not (String.equal "" s)
+    then
+      addComment s
+  in
+  let rec iter f = function
+    | [] -> ()
+    (* We ignore the last line if it does not contain "\n" as it means that
+      it directly precedes the "else" and thus contains only whitespaces *)
+    | [ _ ] when not ends_with_n -> ()
+    | x :: l -> f x ; iter f l
+  in
+  iter process_line comments
 
 let do_lex_comment ?(first_string="") remainder lexbuf =
   let buffer =
@@ -516,7 +536,7 @@ rule initial = parse
     }
 
 | "//" ("" | "@{" | "@}" as suf) (* See comment for "/*@{" above *)
-    { 
+    {
       do_lex_comment ~first_string:suf onelinecomment lexbuf ;
       E.newline();
       if is_oneline_ghost () then begin
@@ -591,7 +611,7 @@ rule initial = parse
       CST_WSTRING(content, Cil_datatype.Location.of_lexing_loc (start,last))
     }
 |		floatnum		{CST_FLOAT (Lexing.lexeme lexbuf, currentLoc ())}
-|		binarynum               { (* GCC Extension for binary numbers *) 
+|		binarynum               { (* GCC Extension for binary numbers *)
                                           CST_INT (Lexing.lexeme lexbuf, currentLoc ())}
 |		hexnum			{CST_INT (Lexing.lexeme lexbuf, currentLoc ())}
 |		octnum			{CST_INT (Lexing.lexeme lexbuf, currentLoc ())}
@@ -818,7 +838,7 @@ and annot_first_token = parse
       if is_oneline_ghost () then E.parse_error "nested ghost code";
       Buffer.clear buf;
       let loc = currentLoc () in
-      error_count_lines comments ;
+      do_ghost_else_comments comments ;
       enter_ghost_code ();
       LGHOST_ELSE (loc)
     }
@@ -866,7 +886,7 @@ and annot_one_line_logic = parse
   (* Catch the exceptions raised by the lexer itself *)
   let initial lexbuf =
     try initial lexbuf
-    with Failure _ -> raise Parsing.Parse_error 
+    with Failure _ -> raise Parsing.Parse_error
 
 }
 
