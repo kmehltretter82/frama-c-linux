@@ -42,6 +42,7 @@ module Stdlib: sig
   val max: 'a -> 'a -> 'a
   val min_int: int
   val max_int: int
+  val flush: out_channel -> unit
 end
 
 (** 4.08 *)
