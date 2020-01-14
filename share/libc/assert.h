@@ -42,12 +42,8 @@ __POP_FC_STDLIB
 #ifdef NDEBUG 
 #define assert(ignore) ((void)0)
 #else
-#ifndef __FC_ASSERT_FILE__
+#ifndef __FRAMAC__
 #define __FC_FILENAME__ __FILE__
-#else
-#define str(a) # a
-#define xstr(a) str(a)
-#define __FC_FILENAME__ xstr(__FC_ASSERT_FILE__)
 #endif
 #define assert(e) (__FC_assert((e) != 0,__FC_FILENAME__,__LINE__,#e))
 #endif
