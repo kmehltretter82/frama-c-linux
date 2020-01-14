@@ -40,7 +40,8 @@ let flush buffer () =
     buffer.rjson <- js :: buffer.rjson ;
     FCBuffer.clear t
 
-let push_tag buffer tag =
+let push_tag buffer stag =
+  let tag = Transitioning.Format.string_of_stag stag in
   flush buffer () ;
   buffer.stack <- ( tag , buffer.rjson ) :: buffer.stack ;
   buffer.rjson <- []
@@ -83,15 +84,15 @@ let create ?indent ?margin () =
       Format.pp_set_max_indent fmt (max 0 (min k (m-10)))
   end ;
   begin
-    let open Format in
-    pp_set_formatter_tag_functions fmt {
-      print_open_tag = no_mark ;
-      print_close_tag = no_mark ;
-      mark_open_tag = mark_open_tag buffer ;
-      mark_close_tag = mark_close_tag buffer ;
+    let open Transitioning.Format in
+    pp_set_formatter_stag_functions fmt {
+      print_open_stag = no_mark ;
+      print_close_stag = no_mark ;
+      mark_open_stag = mark_open_tag buffer ;
+      mark_close_stag = mark_close_tag buffer ;
     } ;
-    pp_set_print_tags fmt false ;
-    pp_set_mark_tags fmt true ;
+    Format.pp_set_print_tags fmt false ;
+    Format.pp_set_mark_tags fmt true ;
   end ;
   buffer
 
