@@ -1,4 +1,8 @@
-/* run.config
+/* run.config_dev
+   COMMENT: issue with printf on CI
+   DONTRUN:
+*/
+/* run.config_ci
    COMMENT: Check that deleting statements before goto jumps takes into
    COMMENT: account variable declarations given via local inits
 */

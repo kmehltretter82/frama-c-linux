@@ -1,4 +1,8 @@
-/* run.config
+/* run.config_dev
+   COMMENT: issue with printf on CI
+   DONTRUN:
+*/
+/* run.config_ci
    COMMENT: bts #2405. Memory not initialized for code executed before main.
 */
 

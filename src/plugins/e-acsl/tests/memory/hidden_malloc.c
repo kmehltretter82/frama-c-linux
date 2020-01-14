@@ -1,4 +1,8 @@
-/* run.config
+/* run.config_dev
+   COMMENT: issue on CI
+   DONTRUN:
+*/
+/* run.config_ci
    COMMENT: Malloc executed by a library function
 */
 

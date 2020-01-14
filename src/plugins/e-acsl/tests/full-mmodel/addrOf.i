@@ -1,4 +1,8 @@
-/* run.config
+/* run.config_dev
+   COMMENT: issue with function pointers on CI
+   DONTRUN:
+*/
+/* run.config_ci
    COMMENT: addrOf
 */
 
