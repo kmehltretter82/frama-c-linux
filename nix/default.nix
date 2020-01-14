@@ -193,8 +193,7 @@ rec {
         buildPhase = ''
                make clean_share_link
                make create_share_link
-               bin/ptests.opt -error-code -config dev src/plugins/e-acsl/tests/gmp-only/arith.i
-               bin/ptests.opt -error-code -config dev src/plugins/e-acsl/tests
+               make E_ACSL_TESTS PTESTS_OPTS="-error-code" DEV=yes
         '';
         installPhase = ''
                true
