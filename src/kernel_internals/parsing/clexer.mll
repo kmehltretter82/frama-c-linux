@@ -742,7 +742,9 @@ and file =  parse
 |       '"' ([^ '\012' '\t' '"']* as d) "//\"" {
         E.setCurrentWorkingDirectory d;
                                  endline lexbuf }
-|	'"' ([^ '\012' '\t' '"']* as f) '"' {
+|	'"' (([^ '\012' '\t' '"']|"\\\"")* as f) '"' {
+        let unescape = Str.regexp_string "\\\"" in
+        let f = Str.global_replace unescape "\"" f in
                                  E.setCurrentFile f;
 				 endline lexbuf}
 

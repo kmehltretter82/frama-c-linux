@@ -446,14 +446,15 @@ and hash = parse
 and file =  parse
         '\n'		        { update_newline_loc lexbuf; token lexbuf}
 |	[' ''\t''\r']			{ file lexbuf}
-|	'"' [^ '\012' '\t' '"']* '"'
-            {
-              let n = Lexing.lexeme lexbuf in
-              let n1 = String.sub n 1
-                ((String.length n) - 2) in
-              update_file_loc lexbuf n1;
-	      endline lexbuf
-            }
+|	'"' ([^ '\012' '\t' '"']|"\\\"")* '"' {
+    let n = Lexing.lexeme lexbuf in
+    let n1 = String.sub n 1
+        ((String.length n) - 2) in
+    let unescape = Str.regexp_string "\\\"" in
+    let n1 = Str.global_replace unescape "\"" n1 in
+    update_file_loc lexbuf n1;
+    endline lexbuf
+  }
 
 |	_			{ endline lexbuf}
 
