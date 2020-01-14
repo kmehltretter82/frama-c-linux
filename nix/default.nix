@@ -180,7 +180,7 @@ rec {
 
   e-acsl-tests-dev = stdenv.mkDerivation {
         name = "frama-c-e-acsl-tests-dev";
-        buildInputs = mk_buildInputs {};
+        buildInputs = mk_buildInputs { nixPackages = [ pkgs.gmp pkgs.getopt ]; };
         build_dir = main.build_dir;
         src = main.build_dir + "/dir.tar";
         sourceRoot = ".";
@@ -193,7 +193,8 @@ rec {
         buildPhase = ''
                make clean_share_link
                make create_share_link
-               make E_ACSL_TESTS -j 4 PTESTS_OPTS="-error-code -j 4" DEV=yes
+               bin/ptests.opt -error-code -config dev src/plugins/e-acsl/tests/gmp-only/arith.i
+               bin/ptests.opt -error-code -config dev src/plugins/e-acsl/tests
         '';
         installPhase = ''
                true
@@ -203,7 +204,7 @@ rec {
   internal = stdenv.mkDerivation {
         name = "frama-c-internal";
         inherit src;
-        buildInputs = (mk_buildInputs { opamPackages = [ "xml-light" ];} ) ++
+        buildInputs = (mk_buildInputs { opamPackages = [ "xml-light" ]; } ) ++
                     [ pkgs.getopt pkgs.which
                       pkgs.libxslt pkgs.libxml2 pkgs.autoPatchelfHook stdenv.cc.cc.lib
         ];
