@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-eva-subdivide-non-linear 14 -eva-msg-key nonlin"
+   STDOPT: +"-eva-subdivide-non-linear 14 -eva-subdivide-non-linear-function=local_subdivide:32 -eva-msg-key nonlin"
 */
 
 #include "__fc_builtin.h"
@@ -103,10 +103,25 @@ void subdivide_reduced_value () {
   int r = t1[i] - t2[i];
 }
 
+/* Tests local subdivision via option -eva-subdivide-non-linear-function
+   and annotations subdivide. */
+void local_subdivide () {
+  int x = Frama_C_interval(-10, 10);
+  int y = Frama_C_interval(-10, 10);
+  /*@ subdivide 0; */
+  int imprecise = x*x - 2*x*y + y*y;          // No subdivision: [-400..400]
+  /*@ subdivide 14; */
+  int more_precise = x*x - 2*x*y + y*y;       // Some subdivisions: [-48..400]
+  int even_more_precise = x*x - 2*x*y + y*y;  // Local subdivision: [-16..400]
+  /*@ subdivide 100; */
+  int precise = x*x - 2*x*y + y*y;            // Maximal subdivision: [0..400]
+}
+
 void main () {
   subdivide_integer ();
   subdivide_pointer ();
   subdivide_several_variables ();
   if (v) subdivide_table ();
   subdivide_reduced_value ();
+  local_subdivide ();
 }
