@@ -76,9 +76,9 @@ module Make_Minimal
   let reduce_further _sttae _expr _value = []
 
   module Transfer
-      (Valuation: Abstract_domain.Valuation with type value = value
-                                             and type origin = origin
-                                             and type loc = location)
+      (_: Abstract_domain.Valuation with type value = value
+                                     and type origin = origin
+                                     and type loc = location)
   = struct
 
     let update _valuation state = `Value state
