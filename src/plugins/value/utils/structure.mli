@@ -41,7 +41,7 @@ module type Key = sig
   val tag: 'a key -> int
 end
 
-module Make (X : sig end) : Key
+module Make () : Key
 
 (** Keys module for the abstract values of Eva. *)
 module Key_Value : Key

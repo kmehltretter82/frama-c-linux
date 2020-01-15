@@ -42,7 +42,7 @@ module type S = sig
   val is_t: typ -> bool
 end
 
-module Make(X: sig end) = struct
+module Make() = struct
 
   let t_torig_ref = mk_dummy_type_info_ref ()
   let t_struct_torig_ref = mk_dummy_type_info_ref ()

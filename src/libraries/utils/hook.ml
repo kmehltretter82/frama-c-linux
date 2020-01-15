@@ -87,7 +87,7 @@ struct
   let length () = Queue.length hooks
 end
 
-module Make(X:sig end) = Build(struct type t = unit end)
+module Make() = Build(struct type t = unit end)
 
 module Make_graph
   (P: sig module Id:Comparable type param type result end)
