@@ -1742,8 +1742,7 @@ extern void sync(void);
     assigns \result \from (indirect: name); */
 extern long sysconf(int name);
 
-extern char volatile __fc_ttyname[32];
-
+char volatile __fc_ttyname[32];
 char volatile *__fc_p_ttyname = __fc_ttyname;
 /*@ requires valid_fildes: 0 ≤ fildes < 1024;
     ensures

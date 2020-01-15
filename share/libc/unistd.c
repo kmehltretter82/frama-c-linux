@@ -20,20 +20,9 @@
 /*                                                                        */
 /**************************************************************************/
 
-#include "__fc_builtin.c"
-#include "assert.c"
-#include "ctype.c"
-#include "errno.c"
-#include "fenv.c"
-#include "getopt.c"
-#include "glob.c"
-#include "inttypes.c"
-#include "locale.c"
-#include "math.c"
-#include "netdb.c"
-#include "signal.c"
-#include "stdio.c"
-#include "stdlib.c"
-#include "string.c"
-#include "unistd.c"
-#include "wchar.c"
+#include "unistd.h"
+#include "__fc_builtin.h"
+__PUSH_FC_STDLIB
+
+volatile char __fc_ttyname[TTY_NAME_MAX];
+__POP_FC_STDLIB
