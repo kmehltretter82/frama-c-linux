@@ -305,7 +305,7 @@ module Compute = WpContext.StaticGenerator
     (struct
       type t = model * c_float * op
 
-      let compare = Pervasives.compare
+      let compare = Transitioning.Stdlib.compare
 
       let pretty fmt (m, ft, op) =
         Format.fprintf fmt "%s_%a_%s" (model_name m) pp_suffix ft (op_name op)

@@ -234,7 +234,7 @@ struct
           Format.fprintf fmt "}@]" ;
         end
 
-  let compare = Pervasives.compare
+  let compare = Transitioning.Stdlib.compare
 
   (* Extract constant offset *)
   let offset k =
@@ -300,7 +300,7 @@ module ARRAY =
 struct
 
   type t = int * int list
-  let compare = Pervasives.compare
+  let compare = Transitioning.Stdlib.compare
   let pretty fmt (s,ds) = Format.fprintf fmt "%d%a" s Layout.Matrix.pretty ds
 
   (* Coefficient from Matrix dimensions: c_i = \Pi_{i<j} d_j *)
@@ -636,7 +636,8 @@ struct
     | Mu_alloc -> Region.noid
 
   let hash m = id m
-  let compare m m' = if m==m then 0 else Pervasives.compare (id m) (id m')
+  let compare m m' =
+    if m==m then 0 else Transitioning.Stdlib.compare (id m) (id m')
   let equal m m' = m==m' || (id m = id m')
 
   let tau_of_value = function

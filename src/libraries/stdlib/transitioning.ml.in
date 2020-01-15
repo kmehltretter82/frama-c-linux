@@ -29,6 +29,7 @@ module Stdlib = struct
   let max = max
   let min_int = min_int
   let max_int = max_int
+  let flush = flush
 end
 
 [@@@ warning "-3"]

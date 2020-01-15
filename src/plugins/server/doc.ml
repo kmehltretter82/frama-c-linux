@@ -123,7 +123,7 @@ let table_of_contents () =
 module Cmap = Map.Make
     (struct
       type t = string list
-      let compare = Pervasives.compare
+      let compare = Transitioning.Stdlib.compare
     end)
 
 let index_entry (title,href) =
