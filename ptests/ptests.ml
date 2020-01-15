@@ -58,7 +58,7 @@ module Filename = struct
     else
       fun a b -> temp_file a b
 
-  let robust f = String.escaped f
+  let sanitize f = String.escaped f
 end
 
 let string_del_suffix suffix s =
@@ -966,7 +966,7 @@ let get_macros cmd =
       "PTEST_DIR", SubDir.get cmd.directory;
       "PTEST_RESULT",
       SubDir.get cmd.directory ^ "/" ^ redefine_name "result";
-      "PTEST_FILE", Filename.robust ptest_file;
+      "PTEST_FILE", Filename.sanitize ptest_file;
       "PTEST_NAME", ptest_name;
       "PTEST_NUMBER", string_of_int cmd.n;
     ]
@@ -1000,7 +1000,7 @@ let basic_command_string =
     if has_ptest_file_t || has_ptest_file_o || command.execnow then
       toplevel ^ " " ^ options
     else begin
-      let file = Filename.robust @@ get_ptest_file command in
+      let file = Filename.sanitize @@ get_ptest_file command in
       toplevel ^ " " ^ file ^ " " ^ options
     end
 
@@ -1080,13 +1080,13 @@ let command_string command =
   in
   let command_string = basic_command_string command in
   let command_string =
-    command_string ^ " 2>" ^ (Filename.robust stderr)
+    command_string ^ " 2>" ^ (Filename.sanitize stderr)
   in
   let command_string = match filter with
     | None -> command_string
     | Some filter -> command_string ^ " | " ^ filter
   in
-  let res = Filename.robust (log_prefix ^ ".res.log") in
+  let res = Filename.sanitize (log_prefix ^ ".res.log") in
   let command_string = command_string ^ " >" ^ res in
   let command_string = match filter with
     | None -> command_string
@@ -1094,9 +1094,9 @@ let command_string command =
         Printf.sprintf "%s && %s < %s >%s && rm -f %s"
           command_string
           filter
-          (Filename.robust stderr)
-          (Filename.robust errlog)
-          (Filename.robust stderr)
+          (Filename.sanitize stderr)
+          (Filename.sanitize errlog)
+          (Filename.sanitize stderr)
   in
   command_string
 
@@ -1379,8 +1379,8 @@ let compare_one_file cmp log_prefix oracle_prefix log_kind =
     -1
   end else
     let ext = log_ext log_kind in
-    let log_file = Filename.robust (log_prefix ^ ext ^ ".log") in
-    let oracle_file = Filename.robust (oracle_prefix ^ ext ^ ".oracle") in
+    let log_file = Filename.sanitize (log_prefix ^ ext ^ ".log") in
+    let oracle_file = Filename.sanitize (oracle_prefix ^ ext ^ ".oracle") in
     if log_kind = Err && not (Sys.file_exists oracle_file) then
       check_file_is_empty_or_nonexisting (Command_error (cmp,log_kind)) ~log_file
     else begin
@@ -1403,8 +1403,8 @@ let compare_one_log_file dir file =
     Condition.signal shared.diff_available;
     unlock()
   end else
-    let log_file = Filename.robust (SubDir.make_result_file dir file) in
-    let oracle_file = Filename.robust (SubDir.make_oracle_file dir file) in
+    let log_file = Filename.sanitize (SubDir.make_result_file dir file) in
+    let oracle_file = Filename.sanitize (SubDir.make_oracle_file dir file) in
     let cmp_string = !do_cmp ^ " " ^ log_file ^ " " ^ oracle_file ^ " > /dev/null 2> /dev/null" in
     if !verbosity >= 2 then lock_printf "%% cmplog: %s / %s@." (SubDir.get dir) file;
     ignore (launch_and_check_compare_file (Log_error (dir,file))
@@ -1477,7 +1477,7 @@ let do_diff = function
     | Command_error (diff, kind) ->
       let log_prefix = log_prefix diff in
       let log_ext = log_ext kind in
-      let log_file = Filename.robust (log_prefix ^ log_ext ^ ".log") in
+      let log_file = Filename.sanitize (log_prefix ^ log_ext ^ ".log") in
       let command_string = command_string diff in
       lock_printf "%tCommand:@\n%s@." print_default_env command_string;
       if !behavior = Show
@@ -1485,7 +1485,7 @@ let do_diff = function
       else
         let oracle_prefix = oracle_prefix diff in
         let oracle_file =
-          Filename.robust (oracle_prefix ^ log_ext ^ ".oracle")
+          Filename.sanitize (oracle_prefix ^ log_ext ^ ".oracle")
         in
         let diff_string = !do_diffs ^ " " ^ oracle_file ^ " " ^ log_file in
         ignore (launch diff_string)
@@ -1493,14 +1493,14 @@ let do_diff = function
       lock_printf "Custom command failed: %s@\n" execnow.ex_cmd
   | Log_error(dir, file) ->
       let result_file =
-        Filename.robust (SubDir.make_result_file dir file)
+        Filename.sanitize (SubDir.make_result_file dir file)
       in
       lock_printf "Log of %s:@." result_file;
       if !behavior = Show
       then ignore (launch ("cat " ^ result_file))
       else
         let oracle_file =
-          Filename.robust (SubDir.make_oracle_file dir file)
+          Filename.sanitize (SubDir.make_oracle_file dir file)
         in
         let diff_string =
           !do_diffs ^ " " ^  oracle_file ^ " " ^ result_file
