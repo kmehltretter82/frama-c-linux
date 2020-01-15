@@ -5636,10 +5636,6 @@ and doExp local_env
       let res = new_exp ~loc (Const(CStr "exp_nothing")) in
       finishExp [] (unspecified_chunk empty) res (typeOf res)
     (* Do the potential lvalues first *)
-    | A.VARIABLE "__FC_FILENAME__" ->
-      let f = Filepath.Normalized.to_pretty_string (fst loc).pos_path in
-      let res = new_exp ~loc (Const(CStr f)) in
-      finishExp [] (unspecified_chunk empty) res (typeOf res)
     | A.VARIABLE n -> begin
         if is_stdlib_function_macro n then begin
           (* These must be macros. They can be implemented with a function
