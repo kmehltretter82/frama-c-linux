@@ -3,10 +3,6 @@
    COMMENT: Check behaviours of format functions
    DONTRUN:
 */
-/*
-  run.config_ci
-  STDOPT: #"@PTEST_FILE@ -cpp-extra-args='-D__FC_ASSERT_FILE__=@PTEST_FILE@'"
-*/
 
 #include <stdlib.h>
 #include <stdio.h>
