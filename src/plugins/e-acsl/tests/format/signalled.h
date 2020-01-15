@@ -4,12 +4,10 @@
 
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
-#ifdef __FC_ASSERT_FILE__
-#define __EACSL_FILENAME__ TOSTRING(__FC_ASSERT_FILE__)
-#else
-#define __EACSL_FILENAME__ __FILE__
+#ifndef __FRAMAC__
+#define __FC_FILENAME__ __FILE__
 #endif
-#define AT __EACSL_FILENAME__ ":" TOSTRING(__LINE__)
+#define AT __FC_FILENAME__ ":" TOSTRING(__LINE__)
 
 int testno = 0;
 

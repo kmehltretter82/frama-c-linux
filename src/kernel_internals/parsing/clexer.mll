@@ -196,6 +196,17 @@ let init_lexicon _ =
             THREAD loc
           else
             IDENT "__thread"));
+      ("__FC_FILENAME__",
+       (fun loc ->
+          let filename =
+            Filepath.Normalized.to_pretty_string (fst loc).pos_path
+          in
+          (* TODO: when 4.07 becomes minimal OCaml version,
+             use String.to_seq and Seq.fold_left. *)
+          let l = ref [] in
+          let convert_char c = l:=Int64.of_int (Char.code c) :: !l in
+          String.iter convert_char filename;
+          CST_STRING (List.rev !l,loc)))
     ]
 
 
@@ -742,7 +753,9 @@ and file =  parse
 |       '"' ([^ '\012' '\t' '"']* as d) "//\"" {
         E.setCurrentWorkingDirectory d;
                                  endline lexbuf }
-|	'"' ([^ '\012' '\t' '"']* as f) '"' {
+|	'"' (([^ '\012' '\t' '"']|"\\\"")* as f) '"' {
+        let unescape = Str.regexp_string "\\\"" in
+        let f = Str.global_replace unescape "\"" f in
                                  E.setCurrentFile f;
 				 endline lexbuf}
 

@@ -81,77 +81,95 @@
          if flag then Hashtbl.add c_kw i t
       )
       [
-        "allocates", ALLOCATES, false;
-        "assert", ASSERT, false;
-        "assigns", ASSIGNS, false;
-        "assumes", ASSUMES, false;
-        "at", EXT_AT, false;(* ACSL extension for external spec file *)
-        "axiom", AXIOM, false;
-        "axiomatic", AXIOMATIC, false;
-        "behavior", BEHAVIOR, false;
-        "behaviors", BEHAVIORS, false;
-        "_Bool", BOOL, true;
-        "breaks", BREAKS, false;
-	"case", CASE, true;
-        "char", CHAR, true;
-        "check", CHECK, false;
-        "complete", COMPLETE, false;
-        "const", CONST, true;
-        "continues", CONTINUES, false;
-        "contract", CONTRACT, false;(* ACSL extension for external spec file *)
-	"custom", CUSTOM, false; (* ACSL extension for custom annotations *)
-        "decreases", DECREASES, false;
-        "disjoint", DISJOINT, false;
-        "double", DOUBLE, true;
-        "else", ELSE, true;
-        "ensures", ENSURES, false ;
-        "enum", ENUM, true;
-        "exits", EXITS, false;
-        "frees", FREES, false;
-        "function", FUNCTION, false;(* ACSL extension for external spec file *)
-        "float", FLOAT, true;
-        "for", FOR, true;
-        "global",    GLOBAL, false;
-        "if", IF, true;
-	"impact", IMPACT, false;
-	"inductive", INDUCTIVE, false;
-	"include", INCLUDE, false;(* ACSL extension for external spec file *)
-        "int", INT, true;
-        "invariant", INVARIANT, false;
-        "label", LABEL, false;
-        "lemma", LEMMA, false;
-        "let", EXT_LET, false;(* ACSL extension for external spec file *)
-        "logic", LOGIC, false;
-        "long", LONG, true;
-        "loop", LOOP, false;
-        "model", MODEL, false;(* ACSL extension for model fields *)
-        "module", MODULE, false;(* ACSL extension for external spec file *)
-        "pragma", PRAGMA, false;
-        "predicate", PREDICATE, false;
-        "reads", READS, true; (* treated specifically in the parser to
-                                 avoid issue in volatile clause. *)
-        "requires", REQUIRES, false;
-        "returns", RETURNS, false;
-        "short", SHORT, true;
-        "signed", SIGNED, true;
-        "sizeof", SIZEOF, true;
-        "slice", SLICE, false;
-        "struct", STRUCT, true;
-        "terminates", TERMINATES, false;
-        "type", TYPE, false;
-        "union", UNION, true;
-        "unsigned", UNSIGNED, true;
-        "variant", VARIANT, false;
-        "void", VOID, true;
-        "volatile", VOLATILE, true;
-        "writes", WRITES, true; (* treated specifically in the parser to
-                                   avoid issue in volatile clause. *)
+        "allocates", (fun _ -> ALLOCATES), false;
+        "assert", (fun _ -> ASSERT), false;
+        "assigns", (fun _ -> ASSIGNS), false;
+        "assumes", (fun _ -> ASSUMES), false;
+        "at", (fun _ -> EXT_AT), false;
+        (* ACSL extension for external spec file *)
+        "axiom", (fun _ -> AXIOM), false;
+        "axiomatic", (fun _ -> AXIOMATIC), false;
+        "behavior", (fun _ -> BEHAVIOR), false;
+        "behaviors", (fun _ -> BEHAVIORS), false;
+        "_Bool", (fun _ -> BOOL), true;
+        "breaks", (fun _ -> BREAKS), false;
+        "case", (fun _ -> CASE), true;
+        "char", (fun _ -> CHAR), true;
+        "check", (fun _ -> CHECK), false;
+        "complete", (fun _ -> COMPLETE), false;
+        "const", (fun _ -> CONST), true;
+        "continues", (fun _ -> CONTINUES), false;
+        "contract", (fun _ -> CONTRACT), false;
+        (* ACSL extension for external spec file *)
+        "custom", (fun _ -> CUSTOM), false;
+        (* ACSL extension for custom annotations *)
+        "decreases", (fun _ -> DECREASES), false;
+        "disjoint", (fun _ -> DISJOINT), false;
+        "double", (fun _ -> DOUBLE), true;
+        "else", (fun _ -> ELSE), true;
+        "ensures", (fun _ -> ENSURES), false ;
+        "enum", (fun _ -> ENUM), true;
+        "exits", (fun _ -> EXITS), false;
+        "frees", (fun _ -> FREES), false;
+        "function", (fun _ -> FUNCTION), false;
+        (* ACSL extension for external spec file *)
+        "float", (fun _ -> FLOAT), true;
+        "for", (fun _ -> FOR), true;
+        "global", (fun _ -> GLOBAL), false;
+        "if", (fun _ -> IF), true;
+	"impact", (fun _ -> IMPACT), false;
+	"inductive", (fun _ -> INDUCTIVE), false;
+	"include", (fun _ -> INCLUDE), false;
+        (* ACSL extension for external spec file *)
+        "int", (fun _ -> INT), true;
+        "invariant", (fun _ -> INVARIANT), false;
+        "label", (fun _ -> LABEL), false;
+        "lemma", (fun _ -> LEMMA), false;
+        "let", (fun _ -> EXT_LET), false;
+        (* ACSL extension for external spec file *)
+        "logic", (fun _ -> LOGIC), false;
+        "long", (fun _ -> LONG), true;
+        "loop", (fun _ -> LOOP), false;
+        "model", (fun _ -> MODEL), false;
+        (* ACSL extension for model fields *)
+        "module", (fun _ -> MODULE), false;
+        (* ACSL extension for external spec file *)
+        "pragma", (fun _ -> PRAGMA), false;
+        "predicate", (fun _ -> PREDICATE), false;
+        "reads", (fun _ -> READS), true;
+        (* treated specifically in the parser to
+           avoid issue in volatile clause. *)
+        "requires", (fun _ -> REQUIRES), false;
+        "returns", (fun _ -> RETURNS), false;
+        "short", (fun _ -> SHORT), true;
+        "signed", (fun _ -> SIGNED), true;
+        "sizeof", (fun _ -> SIZEOF), true;
+        "slice", (fun _ -> SLICE), false;
+        "struct", (fun _ -> STRUCT), true;
+        "terminates", (fun _ -> TERMINATES), false;
+        "type", (fun _ -> TYPE), false;
+        "union", (fun _ -> UNION), true;
+        "unsigned", (fun _ -> UNSIGNED), true;
+        "variant", (fun _ -> VARIANT), false;
+        "void", (fun _ -> VOID), true;
+        "volatile", (fun _ -> VOLATILE), true;
+        "writes", (fun _ -> WRITES), true;
+        (* treated specifically in the parser to
+           avoid issue in volatile clause. *)
+        "__FC_FILENAME__",
+        (fun loc ->
+           let filename =
+             Filepath.(Normalized.to_pretty_string (fst loc).pos_path)
+           in
+           STRING_LITERAL (false,filename)),
+        true;
       ];
     List.iter (fun (x, y) -> Hashtbl.add type_kw x y)
       ["integer", INTEGER; "real", REAL; "boolean", BOOLEAN; ];
-    (fun s ->
+    (fun s loc ->
       try
-        Hashtbl.find (if Logic_utils.is_kw_c_mode () then c_kw else all_kw) s
+        (Hashtbl.find (if Logic_utils.is_kw_c_mode () then c_kw else all_kw) s)
+        loc
       with Not_found ->
         let res =
           if not (Logic_utils.is_kw_c_mode ()) then begin
@@ -292,7 +310,12 @@ rule token = parse
          }
 
   | '\\' rL (rL | rD)* { bs_identifier lexbuf }
-  | rL (rL | rD)*       { let s = lexeme lexbuf in identifier s }
+  | rL (rL | rD)*       {
+      let loc = Lexing.(lexeme_start_p lexbuf, lexeme_end_p lexbuf) in
+      let cabsloc = Cil_datatype.Location.of_lexing_loc loc in
+      let s = lexeme lexbuf in
+      identifier s cabsloc
+    }
 
   | '0'['x''X'] rH+ rIS?    { CONSTANT (IntConstant (lexeme lexbuf)) }
   | '0'['b''B'] rB+ rIS?    { CONSTANT (IntConstant (lexeme lexbuf)) }
@@ -446,14 +469,15 @@ and hash = parse
 and file =  parse
         '\n'		        { update_newline_loc lexbuf; token lexbuf}
 |	[' ''\t''\r']			{ file lexbuf}
-|	'"' [^ '\012' '\t' '"']* '"'
-            {
-              let n = Lexing.lexeme lexbuf in
-              let n1 = String.sub n 1
-                ((String.length n) - 2) in
-              update_file_loc lexbuf n1;
-	      endline lexbuf
-            }
+|	'"' ([^ '\012' '\t' '"']|"\\\"")* '"' {
+    let n = Lexing.lexeme lexbuf in
+    let n1 = String.sub n 1
+        ((String.length n) - 2) in
+    let unescape = Str.regexp_string "\\\"" in
+    let n1 = Str.global_replace unescape "\"" n1 in
+    update_file_loc lexbuf n1;
+    endline lexbuf
+  }
 
 |	_			{ endline lexbuf}
 
