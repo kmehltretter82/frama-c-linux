@@ -888,7 +888,8 @@ struct
       C.error loc "not a C type"
 
   let logic_type ctxt loc env t =
-    let module C = struct end in (* force calls to go through ctxt *)
+    (* force calls to go through ctxt *)
+    let module [@warning "-60"] C = struct end in
     let ltype t = ctxt.logic_type ctxt loc env t in
     let ctype t = ltype t |> c_type_of loc in
     match t with
@@ -2361,7 +2362,7 @@ struct
       C.error t.term_loc "expecting a term that can be coerced to a boolean"
 
   let rec normalize_update_term ctxt env loc t v =
-    let module C = struct end in
+    let module [@warning "-60"] C = struct end in
     function
     (* Transform terms like {x \with .c[idx] = v}
        into {x \with .c = {x.c \with [idx] = v}}.
@@ -2405,7 +2406,7 @@ struct
             idx_typing env loc t normalizing_cont toff
       end
   and normalize_update_cont ctxt env loc t =
-    let module C = struct end in
+    let module [@warning "-60"] C = struct end in
     function
     | [],_ -> assert false (* parsing invariant *)
     | _,[] -> assert false (* parsing invariant *)
@@ -3173,7 +3174,7 @@ struct
           (Pretty_utils.pp_list ~sep:",@ " Cil_printer.pp_logic_type) tl
 
   and type_int_term ctxt env t =
-    let module C = struct end in
+    let module [@warning "-60"] C = struct end in
     let tt = ctxt.type_term ctxt env t in
     if not (plain_integral_type tt.term_type) then
       ctxt.error t.lexpr_loc
@@ -3181,7 +3182,7 @@ struct
     tt
 
   and type_bool_term ctxt env t =
-    let module C = struct end in
+    let module [@warning "-60"] C = struct end in
     let tt = ctxt.type_term ctxt env t in
     if not (plain_boolean_type tt.term_type) then
       ctxt.error t.lexpr_loc "boolean expected but %a found"
@@ -3189,14 +3190,14 @@ struct
     mk_cast tt (Ltype (ctxt.find_logic_type Utf8_logic.boolean,[]))
 
   and type_num_term_option ctxt env t =
-    let module C = struct end in
+    let module [@warning "-60"] C = struct end in
     match t with
       None -> None, Linteger (* Warning: should be an hybrid of integer
                                 and float. *)
     | Some t -> let t = type_num_term ctxt env t in Some t, t.term_type
 
   and type_num_term ctxt env t =
-    let module C = struct end in
+    let module [@warning "-60"] C = struct end in
     let tt = ctxt.type_term ctxt env t in
     if not (is_arithmetic_type tt.term_type) then
       ctxt.error t.lexpr_loc "integer or float expected";
@@ -3245,7 +3246,7 @@ struct
     | _ -> [], ctxt.type_predicate ctxt env p0
 
   let term_lval_assignable ctxt ~accept_formal env t =
-    let module C = struct end in
+    let module [@warning "-60"] C = struct end in
     let t = ctxt.type_term ctxt env t in
     if not (check_lval_kind { lval_assignable_mode with accept_formal } t) then
       ctxt.error t.term_loc "not an assignable left value: %a"
@@ -3253,7 +3254,7 @@ struct
     lift_set (term_lval (fun _ t -> t)) t
 
   let term ctxt env t =
-    let module C = struct end in
+    let module [@warning "-60"] C = struct end in
     match t.lexpr_node with
     | PLnamed(name,t) ->
       let t = ctxt.type_term ctxt env t in
@@ -3263,7 +3264,7 @@ struct
       { term_node = t'; term_loc=t.lexpr_loc; term_type=ty; term_name = [] }
 
   let predicate ctxt env p0 =
-    let module C = struct end in
+    let module [@warning "-60"] C = struct end in
     let loc = p0.lexpr_loc in
     let predicate = ctxt.type_predicate ctxt in
     let term = ctxt.type_term ctxt in
@@ -3442,7 +3443,7 @@ struct
       ctxt.error loc "expecting a predicate and not tsets"
 
   let type_from ctxt ~accept_formal env (l,d) =
-    let module C = struct end in
+    let module [@warning "-60"] C = struct end in
     (* Yannick: [assigns *\at(\result,Post)] should be allowed *)
     let tl =
       term_lval_assignable ctxt ~accept_formal env l
@@ -3465,7 +3466,7 @@ struct
       (tl, Cil_types.From tf)
 
   let type_assign ctxt ~accept_formal env a =
-    let module C = struct end in
+    let module [@warning "-60"] C = struct end in
     match a with
       WritesAny -> Cil_types.WritesAny
     | Writes l ->
