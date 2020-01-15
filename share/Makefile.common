@@ -84,7 +84,10 @@ ifeq ($(DEVELOPMENT),yes)
 # - 50 (warning about ambiguously placed OCamldoc comments): while it would be
 #   useful to ensure OCamldoc understands comments correctly, some clean-up
 #   is needed before enabling this warning.
-WARNINGS ?= -w +a-4-6-9-40-41-42-44-45-48-50
+# - 67 (unused module parameter in functor signature): naming all parameters
+#   in functor signatures is a common practice that seems harmless. Warning 60
+#   ensures that named functor parameters are indeed used in the implementation.
+WARNINGS ?= -w +a-4-6-9-40-41-42-44-45-48-50-67
 
 # - 3 (deprecated feature) cannot always be avoided for OCaml stdlib when
 #   supporting several OCaml versions
