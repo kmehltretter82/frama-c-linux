@@ -95,7 +95,7 @@ module Make_Dataflow
 
   (* --- Abstract values storage --- *)
 
-  module Partition = Trace_partitioning.Make (Abstract) (Transfer) (AnalysisParam)
+  module Partition = Trace_partitioning.Make (Abstract) (AnalysisParam)
 
   type store = Partition.store
   type flow = Partition.flow
