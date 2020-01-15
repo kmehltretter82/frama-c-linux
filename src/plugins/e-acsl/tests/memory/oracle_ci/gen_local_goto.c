@@ -54,7 +54,7 @@ int main(int argc, char const **argv)
       __gen_e_acsl_valid = __e_acsl_valid((void *)(& a),sizeof(int),
                                           (void *)(& a),(void *)0);
       __e_acsl_assert(__gen_e_acsl_valid,(char *)"Assertion",(char *)"main",
-                      (char *)"\\valid(&a)",25);
+                      (char *)"\\valid(&a)",29);
     }
     /*@ assert \valid(&a); */ ;
     if (t == 2) {
@@ -71,7 +71,7 @@ int main(int argc, char const **argv)
       __gen_e_acsl_valid_2 = __e_acsl_valid((void *)(& b),sizeof(int),
                                             (void *)(& b),(void *)0);
       __e_acsl_assert(__gen_e_acsl_valid_2,(char *)"Assertion",
-                      (char *)"main",(char *)"\\valid(&b)",36);
+                      (char *)"main",(char *)"\\valid(&b)",40);
     }
     /*@ assert \valid(&b); */ ;
     printf(__gen_e_acsl_literal_string_2,t,__gen_e_acsl_literal_string_4);

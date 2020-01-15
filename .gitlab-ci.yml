@@ -212,7 +212,14 @@ pathcrawler:
   tags:
    - nix
 
-
+e-acsl-tests-dev:
+  stage: tests
+  variables:
+    OCAML: "4_05"
+  script:
+   - nix/frama-ci.sh build -A frama-c.e-acsl-tests-dev
+  tags:
+   - nix
 
 make_public:
   stage: make_public

@@ -178,10 +178,32 @@ rec {
         '';
   };
 
+  e-acsl-tests-dev = stdenv.mkDerivation {
+        name = "frama-c-e-acsl-tests-dev";
+        buildInputs = mk_buildInputs { nixPackages = [ pkgs.gmp pkgs.getopt ]; };
+        build_dir = main.build_dir;
+        src = main.build_dir + "/dir.tar";
+        sourceRoot = ".";
+        postUnpack = ''
+               find . \( -name "Makefile*" -or -name ".depend" -o -name "ptests_config" -o -name "config.status" \) -exec bash -c "t=\$(stat -c %y \"\$0\"); sed -i -e \"s&$(cat $build_dir/old_pwd)&$(pwd)&g\" \"\$0\"; touch -d \"\$t\" \"\$0\"" {} \;
+        '';
+        configurePhase = ''
+           true
+        '';
+        buildPhase = ''
+               make clean_share_link
+               make create_share_link
+               make E_ACSL_TESTS PTESTS_OPTS="-error-code" DEV=yes
+        '';
+        installPhase = ''
+               true
+        '';
+  };
+
   internal = stdenv.mkDerivation {
         name = "frama-c-internal";
         inherit src;
-        buildInputs = (mk_buildInputs { opamPackages = [ "xml-light" ];} ) ++
+        buildInputs = (mk_buildInputs { opamPackages = [ "xml-light" ]; } ) ++
                     [ pkgs.getopt pkgs.which
                       pkgs.libxslt pkgs.libxml2 pkgs.autoPatchelfHook stdenv.cc.cc.lib
         ];
