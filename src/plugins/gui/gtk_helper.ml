@@ -196,9 +196,9 @@ module Icon = struct
   let get k =
     try match Hashtbl.find h k with
       | Filename f' ->
-          let f = get_file_in_theme f' in
-          let p = Widget.shared_icon f in
-          Hashtbl.replace h k (Pixbuf p); p
+        let f = get_file_in_theme f' in
+        let p = Widget.shared_icon f in
+        Hashtbl.replace h k (Pixbuf p); p
       | Pixbuf p -> p
     with Not_found -> assert false
 
@@ -249,13 +249,13 @@ let make_tag (buffer:< tag_table : Gtk.text_tag_table;
   =
   match GtkText.TagTable.lookup buffer#tag_table name with
   | None ->
-      let oid = Oo.id buffer in
-      let old_set =
-        try IntHashtbl.find tag_names oid
-        with Not_found -> Datatype.String.Set.empty
-      in
-      IntHashtbl.replace tag_names oid (Datatype.String.Set.add name old_set);
-      buffer#create_tag ~name l
+    let oid = Oo.id buffer in
+    let old_set =
+      try IntHashtbl.find tag_names oid
+      with Not_found -> Datatype.String.Set.empty
+    in
+    IntHashtbl.replace tag_names oid (Datatype.String.Set.add name old_set);
+    buffer#create_tag ~name l
   | Some t -> new GText.tag t
 
 let expand_to_path (treeview:GTree.view) path = treeview#expand_to_path path
@@ -586,7 +586,7 @@ struct
         let indices: int array  = GTree.Path.get_indices path in
         match indices with
         | [||] ->
-            None
+          None
         | [|i|] -> self#find_opt i
         | _ -> failwith "Invalid Path of depth > 1 in a list"
 
@@ -681,13 +681,13 @@ let input_widget ~parent ~widget ~event ~get_text ~bind_ok ~expand
   (* the enter key is linked to the ok action *)
   (* the escape key is linked to the cancel action *)
   ignore (event#connect#key_press ~callback:
-    begin fun ev ->
-      if (GdkEvent.Key.keyval ev = GdkKeysyms._Return ||
-          GdkEvent.Key.keyval ev = GdkKeysyms._KP_Enter) && bind_ok
-      then f_ok ();
-      if GdkEvent.Key.keyval ev = GdkKeysyms._Escape then f_cancel ();
-      false
-    end);
+            begin fun ev ->
+              if (GdkEvent.Key.keyval ev = GdkKeysyms._Return ||
+                  GdkEvent.Key.keyval ev = GdkKeysyms._KP_Enter) && bind_ok
+              then f_ok ();
+              if GdkEvent.Key.keyval ev = GdkKeysyms._Escape then f_cancel ();
+              false
+            end);
   widget#misc#grab_focus ();
   window#show ();
   GMain.Main.main ();
@@ -751,9 +751,9 @@ class error_manager ?reset (o_parent:GWindow.window_skel) : host =
       let bfmt = Format.formatter_of_buffer b in
       Format.kfprintf
         (function fmt ->
-          Format.pp_print_flush fmt ();
-          let content = Buffer.contents b in
-          self#error_string ?parent ~reset content)
+           Format.pp_print_flush fmt ();
+           let content = Buffer.contents b in
+           self#error_string ?parent ~reset content)
         bfmt
         fmt
 
@@ -788,30 +788,30 @@ class error_manager ?reset (o_parent:GWindow.window_skel) : host =
         Some res
       with
       | Cmdline.Exit ->
-          if cancelable then Project.Undo.clear_breakpoint ();
-          None
+        if cancelable then Project.Undo.clear_breakpoint ();
+        None
       | Sys.Break | Db.Cancel ->
-          if cancelable then Project.Undo.restore ();
-          self#error ?parent ~reset:true
-            "Stopping current computation on user request.";
-          None
+        if cancelable then Project.Undo.restore ();
+        self#error ?parent ~reset:true
+          "Stopping current computation on user request.";
+        None
       | Globals.No_such_entry_point msg ->
-          (try Gui_parameters.abort "%s" msg
-           with
-           | Log.AbortError _ as e ->
-               self#display_toplevel_error ?parent ~cancelable e;
-               None)
+        (try Gui_parameters.abort "%s" msg
+         with
+         | Log.AbortError _ as e ->
+           self#display_toplevel_error ?parent ~cancelable e;
+           None)
       | e when Cmdline.catch_at_toplevel e ->
+        self#display_toplevel_error ?parent ~cancelable e;
+        None
+      | e ->
+        if Gui_parameters.debug_atleast 1 then begin
+          Cmdline.error_occurred e;
+          raise e
+        end else begin
           self#display_toplevel_error ?parent ~cancelable e;
           None
-      | e ->
-          if Gui_parameters.debug_atleast 1 then begin
-            Cmdline.error_occurred e;
-            raise e
-          end else begin
-            self#display_toplevel_error ?parent ~cancelable e;
-            None
-          end
+        end
 
   end
 
@@ -942,12 +942,12 @@ let source_files_chooser (main_ui: source_files_chooser_host) defaults f =
   ignore (filechooser#connect#file_activated ~callback:add_selected_files);
   let response r = (match r with
       | `OPEN ->
-          main_ui#protect
-            ~cancelable:true
-            ~parent:(dialog :> GWindow.window_skel)
-            (fun () -> f (get_all ()))
+        main_ui#protect
+          ~cancelable:true
+          ~parent:(dialog :> GWindow.window_skel)
+          (fun () -> f (get_all ()))
       | `DELETE_EVENT | `CANCEL ->
-          ());
+        ());
     Extlib.may (fun f ->
         Configuration.set "last_opened_dir"
           (Configuration.ConfString f)) filechooser#current_folder;
@@ -1004,13 +1004,13 @@ let spawn_command ?(timeout=0) ?stdout ?stderr s args f =
   let for_idle () =
     match check_result () with
     | Command.Not_ready kill ->
-        if has_timeout && Unix.time () -. starting_time >= hang_on then
-          begin
-            kill ();
-            f (Unix.WSIGNALED Sys.sigalrm);
-            false
-          end
-        else true
+      if has_timeout && Unix.time () -. starting_time >= hang_on then
+        begin
+          kill ();
+          f (Unix.WSIGNALED Sys.sigalrm);
+          false
+        end
+      else true
     | Command.Result p -> f p; false
   in
   let prio = Glib.int_of_priority `LOW in

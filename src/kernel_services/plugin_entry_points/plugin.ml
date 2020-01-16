@@ -109,10 +109,10 @@ let reset_plugin () =
 let kernel_name = "kernel"
 
 type plugin =
-    { p_name: string;
-      p_shortname: string;
-      p_help: string;
-      p_parameters: (string, Typed_parameter.t list) Hashtbl.t }
+  { p_name: string;
+    p_shortname: string;
+    p_help: string;
+    p_parameters: (string, Typed_parameter.t list) Hashtbl.t }
 
 let plugins: plugin list ref = ref []
 let iter_on_plugins f =
@@ -129,7 +129,7 @@ let iter_on_plugins f =
 let is_present s = List.exists (fun p -> p.p_shortname = s) !plugins
 let get_from_name s = List.find (fun p -> p.p_name = s) !plugins
 let get_from_shortname s = List.find (fun p -> p.p_shortname = s) !plugins
-let get s = 
+let get s =
   Cmdline.Kernel_log.deprecated
     "Plugin.get" ~now:"Plugin.get_from_name" get_from_name s
 [@@ deprecated "Use Plugin.get_from_name"]
@@ -175,25 +175,25 @@ end
 (* ************************************************************************* *)
 
 module Register
-  (P: sig
-     val name: string (* the name is "" for the kernel *)
-     val shortname: string
-     val help: string
-   end) =
+    (P: sig
+       val name: string (* the name is "" for the kernel *)
+       val shortname: string
+       val help: string
+     end) =
 struct
 
   let verbose_level = ref (fun () -> 1)
   let debug_level = ref (fun () -> 0)
 
-  (* unused by the kernel: it uses Cmdline.Kernel_log instead; 
+  (* unused by the kernel: it uses Cmdline.Kernel_log instead;
      see module [L] below *)
   module Plugin_log = Log.Register
-    (struct
-       let channel = P.shortname
-       let label = P.shortname
-       let debug_atleast level = !debug_level () >= level
-       let verbose_atleast level = !verbose_level () >= level
-     end)
+      (struct
+        let channel = P.shortname
+        let label = P.shortname
+        let debug_atleast level = !debug_level () >= level
+        let verbose_atleast level = !verbose_level () >= level
+      end)
 
   (* we can't directly make L a Log, since this would require making
      Plugin.Register a generative functor. Instead, we provide a minimal
@@ -212,34 +212,34 @@ struct
   end
 
   module Auto_log(L: Log.Messages): Log_skeleton =
-    struct
-      include L
-      let register_and_add s = add_debug_keys (register_category s)
+  struct
+    include L
+    let register_and_add s = add_debug_keys (register_category s)
 
-      let warning ?current = let wkey = None in warning ?wkey ?current
+    let warning ?current = let wkey = None in warning ?wkey ?current
 
-      let add_or_warn s =
-        match get_category s with
-        | Some c -> add_debug_keys c
-        | None -> warning "Unknown message key %s" s
-      let del_or_warn s =
-        match get_category s with
-        | Some c -> del_debug_keys c
-        | None -> warning "Unknown message key %s" s
+    let add_or_warn s =
+      match get_category s with
+      | Some c -> add_debug_keys c
+      | None -> warning "Unknown message key %s" s
+    let del_or_warn s =
+      match get_category s with
+      | Some c -> del_debug_keys c
+      | None -> warning "Unknown message key %s" s
 
-      let set_warn_status s status =
-        match get_warn_category s with
-        | Some c -> set_warn_status c status
-        | None -> warning "Unknown warning key %s" s
+    let set_warn_status s status =
+      match get_warn_category s with
+      | Some c -> set_warn_status c status
+      | None -> warning "Unknown warning key %s" s
 
-      let pp_all_categories () =
-        (* level 0 just in case user ask to display all categories
-           in an otherwise quiet run *)
-        feedback ~level:0
-          "@[<v 2>Available message categories are:@;%a@]"
-          Format.(pp_print_list ~pp_sep:pp_print_cut pp_category)
-          (get_all_categories ())
-    end
+    let pp_all_categories () =
+      (* level 0 just in case user ask to display all categories
+         in an otherwise quiet run *)
+      feedback ~level:0
+        "@[<v 2>Available message categories are:@;%a@]"
+        Format.(pp_print_list ~pp_sep:pp_print_cut pp_category)
+        (get_all_categories ())
+  end
 
   module L =
     (val if is_kernel ()
@@ -281,7 +281,7 @@ struct
         module L = L
         let messages_group = messages
         let parameters = plugin.p_parameters
-       end)
+      end)
 
   let prefix =
     if P.shortname = empty_string then "-kernel-" else "-" ^ P.shortname ^ "-"
@@ -295,22 +295,22 @@ struct
   (* ************************************************************************ *)
 
   module Make_specific_dir
-    (O: Parameter_sig.Input_with_arg)
-    (D: sig 
-      val dirs: unit -> string list
-      val visible_ref: bool 
-      val force_dir: bool 
-    end)
-    =
+      (O: Parameter_sig.Input_with_arg)
+      (D: sig
+         val dirs: unit -> string list
+         val visible_ref: bool
+         val force_dir: bool
+       end)
+  =
   struct
 
     let is_visible = D.visible_ref
     let force_dir = D.force_dir
     let is_kernel = is_kernel () (* the side effect must be applied right now *)
 
-    let () = 
+    let () =
       Parameter_customize.set_cmdline_stage Cmdline.Extended;
-      if is_visible then Parameter_customize.do_iterate () 
+      if is_visible then Parameter_customize.do_iterate ()
       else Parameter_customize.is_invisible ()
 
     module Dir_name =
@@ -321,7 +321,7 @@ struct
           let help = if is_visible then O.help else empty_string
           let existence = Fc_Filepath.Indifferent
           let file_kind = ""
-         end)
+        end)
 
     exception No_dir
 
@@ -330,7 +330,7 @@ struct
         Extlib.mkdir ~parents:true d 0o755;
         L.warning "creating %s directory `%s'" O.option_name d;
         d
-      with Unix.Unix_error _ -> 
+      with Unix.Unix_error _ ->
         L.warning "cannot create %s directory `%s'" O.option_name d;
         raise No_dir
 
@@ -353,9 +353,9 @@ struct
           get_and_check_dirs error l
         with
         | No_dir when error ->
-          L.abort "no %s directory for plug-in `%s' among %a" 
+          L.abort "no %s directory for plug-in `%s' among %a"
             O.option_name
-            P.name 
+            P.name
             Pretty_utils.(pp_list ~sep:",@ " Format.pp_print_string) l
         | No_dir when force_dir ->
           (* create the parent, if it does not exist *)
@@ -385,28 +385,28 @@ struct
 
   end
 
-  module Share = 
+  module Share =
     Make_specific_dir
       (struct
         let option_name = "share"
         let arg_name = "dir"
         let help = "set the plug-in share directory to <dir> \
-(may be used if the plug-in is not installed at the same place as Frama-C)"
-       end)
-      (struct 
+                    (may be used if the plug-in is not installed at the same place as Frama-C)"
+      end)
+      (struct
         let dirs () = Config.datadirs
-        let visible_ref = !share_visible_ref 
+        let visible_ref = !share_visible_ref
         let force_dir = false
-       end)
+      end)
 
-  module Session = 
+  module Session =
     Make_specific_dir
       (struct
         let option_name = "session"
         let arg_name = "dir"
         let help = "set the plug-in session directory to <dir>"
-       end)
-      (struct 
+      end)
+      (struct
         let dirs () = [
           if !session_is_set_ref () then !session_ref ()
           else
@@ -414,8 +414,8 @@ struct
             with Not_found -> "./.frama-c"]
         let visible_ref = !session_visible_ref
         let force_dir = true
-       end)
-  let () = 
+      end)
+  let () =
     if is_kernel ()
     then
       Journal.get_session_file :=
@@ -423,34 +423,34 @@ struct
            let f = Session.file ~error:false s in
            Format.asprintf "%a" Datatype.Filepath.pretty f)
 
-  module Config = 
+  module Config =
     Make_specific_dir
       (struct
         let option_name = "config"
         let arg_name = "dir"
         let help = "set the plug-in config directory to <dir> \
-(may be used on systems with no default user directory)"
-       end)
-      (struct 
+                    (may be used on systems with no default user directory)"
+      end)
+      (struct
         let dirs () = [
           let d, vis =
             if !config_is_set_ref () then !config_ref (), false
             else
               try Sys.getenv "FRAMAC_CONFIG", false
               with Not_found ->
-                try Sys.getenv "USERPROFILE", false (* Win32 *) 
-                with Not_found ->
-                  (* Unix like *) 
-                  try Sys.getenv "XDG_CONFIG_HOME", true
-                  with Not_found -> 
-                    try Sys.getenv "HOME" ^ "/.config", true
-                    with Not_found -> ".", false
+              try Sys.getenv "USERPROFILE", false (* Win32 *)
+              with Not_found ->
+              (* Unix like *)
+              try Sys.getenv "XDG_CONFIG_HOME", true
+              with Not_found ->
+              try Sys.getenv "HOME" ^ "/.config", true
+              with Not_found -> ".", false
           in
           d ^ if vis then "/frama-c" else "/.frama-c"
         ]
         let visible_ref = !config_visible_ref
         let force_dir = true
-       end)
+      end)
 
   let help = add_group "Getting Information"
 
@@ -464,7 +464,7 @@ struct
         let help =
           if is_kernel () then "help of the Frama-C kernel"
           else "help of plug-in " ^ P.name
-       end)
+      end)
   let () =
     Cmdline.run_after_exiting_stage
       (fun () ->
@@ -597,14 +597,14 @@ struct
   module Verbose = struct
     include
       Int(struct
-            let default = !verbose_level ()
-            let option_name = verbose_optname
-            let arg_name = "n"
-            let help =
-              (if is_kernel () then "level of verbosity for the Frama-C kernel"
-               else "level of verbosity for plug-in " ^ P.name)
-              ^ " (default to " ^ string_of_int default ^ ")"
-          end)
+        let default = !verbose_level ()
+        let option_name = verbose_optname
+        let arg_name = "n"
+        let help =
+          (if is_kernel () then "level of verbosity for the Frama-C kernel"
+           else "level of verbosity for plug-in " ^ P.name)
+          ^ " (default to " ^ string_of_int default ^ ")"
+      end)
     let get () = if is_set () then get () else Cmdline.Verbose_level.get ()
     let () =
       verbose_level := get;
@@ -622,14 +622,14 @@ struct
   module Debug = struct
     include
       Int(struct
-            let default = !debug_level ()
-            let option_name = debug_optname
-            let arg_name = "n"
-            let help =
-              (if is_kernel () then "level of debug for the Frama-C kernel"
-               else "level of debug for plug-in " ^ P.name)
-              ^ " (default to " ^ string_of_int default ^ ")"
-          end)
+        let default = !debug_level ()
+        let option_name = debug_optname
+        let arg_name = "n"
+        let help =
+          (if is_kernel () then "level of debug for the Frama-C kernel"
+           else "level of debug for plug-in " ^ P.name)
+          ^ " (default to " ^ string_of_int default ^ ")"
+      end)
     let get () = if is_set () then get () else Cmdline.Debug_level.get ()
     let () =
       debug_level := get;
@@ -637,10 +637,10 @@ struct
       set_range ~min:0 ~max:max_int;
       add_set_hook
         (fun old n ->
-          (* the level of verbose is at least the level of debug *)
-          if n > Verbose.get () then Verbose.set n;
-          if n = 0 then decr positive_debug_ref
-          else if old = 0 then Transitioning.Stdlib.incr positive_debug_ref);
+           (* the level of verbose is at least the level of debug *)
+           if n > Verbose.get () then Verbose.set n;
+           if n = 0 then decr positive_debug_ref
+           else if old = 0 then Transitioning.Stdlib.incr positive_debug_ref);
       if is_kernel () then begin
         Cmdline.kernel_debug_atleast_ref := (fun n -> get () >= n);
         match !Cmdline.Kernel_debug_level.value_if_set with
@@ -712,7 +712,7 @@ struct
         "enables message display for categories <k1>,...,<kn>. Use "
         ^ debug_category_optname
         ^ " help to get a list of available categories, and * to enable \
-              all categories"
+           all categories"
     end)
 
   let () =
