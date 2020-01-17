@@ -289,6 +289,9 @@ module type With_output = sig
       in a controlled way. See [set_output_dependencies] details. *)
 end
 
+(** signature for normalized pathnames. *)
+module type Filepath = S with type t = Filepath.Normalized.t
+
 (** signature for searching files in a specific directory. *)
 module type Specific_dir = sig
 
@@ -301,14 +304,14 @@ module type Specific_dir = sig
       false]), raise No_dir if [error] is [false].
       @since Neon-20140301 *)
 
-  val dir: ?error:bool -> unit -> string
+  val dir: ?error:bool -> unit -> Filepath.Normalized.t
   (** [dir ~error ()] returns the specific directory name, if
       any. Otherwise, Frama-C halts on an user error if [error] or if the
       behavior depends on [force_dir]. Default of [error] is [true].
       @raise No_dir if there is no share directory for this plug-in and [not
       error] and [not force_dir]. *)
 
-  val file: ?error:bool -> string -> string
+  val file: ?error:bool -> string -> Filepath.Normalized.t
   (** [file basename] returns the complete filename of a file stored in [dir
       ()]. If there is no such directory, Frama-C halts on an user error if
       [error] or if the behavior depends on [force_dir]. Default of [error] is
@@ -316,14 +319,10 @@ module type Specific_dir = sig
       @raise No_dir if there is no share directory for this plug-in and [not
       error] and [not force_dir].  *)
 
-  module Dir_name: String
+  module Dir_name: Filepath
   (** Option [-<short-name>-<specific-dir>]. *)
 
 end
-
-(** signature for normalized pathnames. *)
-module type Filepath = S with type t = Filepath.Normalized.t
-
 
 (* ************************************************************************** *)
 (** {3 Collections} *)

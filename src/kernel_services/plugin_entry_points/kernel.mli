@@ -204,32 +204,32 @@ val checks: Cmdline.Group.t
 (* ************************************************************************* *)
 
 module PrintConfig: Parameter_sig.Bool
-  (** Behavior of option "-print-config" *)
+(** Behavior of option "-print-config" *)
 
 module PrintVersion: Parameter_sig.Bool
-  (** Behavior of option "-print-version" *)
+(** Behavior of option "-print-version" *)
 
 module PrintShare: Parameter_sig.Bool
-  (** Behavior of option "-print-share-path" *)
+(** Behavior of option "-print-share-path" *)
 
 module PrintLib: Parameter_sig.Bool
-  (** Behavior of option "-print-lib-path" *)
+(** Behavior of option "-print-lib-path" *)
 
 module PrintPluginPath: Parameter_sig.Bool
-  (** Behavior of option "-print-plugin-path" *)
+(** Behavior of option "-print-plugin-path" *)
 
 (* ************************************************************************* *)
 (** {2 Output Messages} *)
 (* ************************************************************************* *)
 
 module GeneralVerbose: Parameter_sig.Int
-  (** Behavior of option "-verbose" *)
+(** Behavior of option "-verbose" *)
 
 module GeneralDebug: Parameter_sig.Int
-  (** Behavior of option "-debug" *)
+(** Behavior of option "-debug" *)
 
 module Quiet: Parameter_sig.Bool
-  (** Behavior of option "-quiet" *)
+(** Behavior of option "-quiet" *)
 
 (** @plugin development guide *)
 module Unicode: sig
@@ -241,33 +241,33 @@ end
     @plugin development guide *)
 
 module UseUnicode: Parameter_sig.Bool
-  (** Behavior of option "-unicode"
-      @deprecated since Nitrogen-20111001 use module {!Unicode} instead. *)
+(** Behavior of option "-unicode"
+    @deprecated since Nitrogen-20111001 use module {!Unicode} instead. *)
 
 module Time: Parameter_sig.String
-  (** Behavior of option "-time" *)
+(** Behavior of option "-time" *)
 
 (* ************************************************************************* *)
 (** {2 Input / Output Source Code} *)
 (* ************************************************************************* *)
 
 module PrintCode : Parameter_sig.Bool
-  (** Behavior of option "-print" *)
+(** Behavior of option "-print" *)
 
 module PrintMachdep : Parameter_sig.Bool
-  (** Behavior of option "-print-machdep"
-      @since Phosphorus-20170501-beta1 *)
+(** Behavior of option "-print-machdep"
+    @since Phosphorus-20170501-beta1 *)
 
 module PrintLibc: Parameter_sig.Bool
-  (** Behavior of option "-print-libc"
-      @since Phosphorus-20170501-beta1 *)
+(** Behavior of option "-print-libc"
+    @since Phosphorus-20170501-beta1 *)
 
 module PrintComments: Parameter_sig.Bool
-  (** Behavior of option "-keep-comments" *)
+(** Behavior of option "-keep-comments" *)
 
 module PrintReturn : Parameter_sig.Bool
-  (** Behavior of option "-print-return"
-      @since Sulfur-20171101 *)
+(** Behavior of option "-print-return"
+    @since Sulfur-20171101 *)
 
 (** Behavior of option "-ocode".
     @plugin development guide *)
@@ -281,75 +281,75 @@ end
 module SymbolicPath: Parameter_sig.String_set
 
 module FloatNormal: Parameter_sig.Bool
-  (** Behavior of option "-float-normal" *)
+(** Behavior of option "-float-normal" *)
 
 module FloatRelative: Parameter_sig.Bool
-  (** Behavior of option "-float-relative" *)
+(** Behavior of option "-float-relative" *)
 
 module FloatHex: Parameter_sig.Bool
-  (** Behavior of option "-float-hex" *)
+(** Behavior of option "-float-hex" *)
 
 module BigIntsHex: Parameter_sig.Int
-  (** Behavior of option "-hexadecimal-big-integers" *)
+(** Behavior of option "-hexadecimal-big-integers" *)
 
 (* ************************************************************************* *)
 (** {2 Save/Load} *)
 (* ************************************************************************* *)
 
 module SaveState: Parameter_sig.String
-  (** Behavior of option "-save" *)
+(** Behavior of option "-save" *)
 
 module LoadState: Parameter_sig.Filepath
-  (** Behavior of option "-load" *)
+(** Behavior of option "-load" *)
 
 module LoadModule: Parameter_sig.String_list
-  (** Behavior of option "-load-module" *)
+(** Behavior of option "-load-module" *)
 
 module AutoLoadPlugins: Parameter_sig.Bool
-  (** Behavior of option "-autoload-plugins" *)
+(** Behavior of option "-autoload-plugins" *)
 
 (** Kernel for journalization. *)
 module Journal: sig
 
   module Enable: Parameter_sig.Bool
-    (** Behavior of option "-journal-enable" *)
+  (** Behavior of option "-journal-enable" *)
 
   module Name: Parameter_sig.String
-    (** Behavior of option "-journal-name" *)
+  (** Behavior of option "-journal-name" *)
 
 end
 
 module Session_dir: Parameter_sig.String
-(** Directory in which session files are searched. 
+(** Directory in which session files are searched.
     @since Neon-20140301 *)
 
 module Config_dir: Parameter_sig.String
-(** Directory in which config files are searched. 
+(** Directory in which config files are searched.
     @since Neon-20140301 *)
 
 (* this stop special comment does not work as expected (and as explained in the
    OCamldoc manual, Section 15.2.2. It just skips all the rest of the file
    instead of skipping until the next stop comment...
-(**/**)
- *)
+   (**/**)
+*)
 
 module Set_project_as_default: Parameter_sig.Bool
 (** Undocumented. *)
 
 (* See (meta-)comment on the previous stop comment
-(**/**)
- *)
+   (**/**)
+*)
 
 (* ************************************************************************* *)
 (** {2 Customizing Normalization and parsing} *)
 (* ************************************************************************* *)
 
 module UnrollingLevel: Parameter_sig.Int
-  (** Behavior of option "-ulevel" *)
+(** Behavior of option "-ulevel" *)
 
 module UnrollingForce: Parameter_sig.Bool
-  (** Behavior of option "-ulevel-force" 
-      @since Neon-20140301 *)
+(** Behavior of option "-ulevel-force"
+    @since Neon-20140301 *)
 
 (** Behavior of option "-machdep".
     If function [set] is called, then {!File.prepare_from_c_files} must be
@@ -368,32 +368,32 @@ module LogicalOperators: Parameter_sig.Bool
 module Enums: Parameter_sig.String
 
 module CppCommand: Parameter_sig.String
-  (** Behavior of option "-cpp-command" *)
+(** Behavior of option "-cpp-command" *)
 
 module CppExtraArgs: Parameter_sig.String_list
-  (** Behavior of option "-cpp-extra-args" *)
+(** Behavior of option "-cpp-extra-args" *)
 
 module CppGnuLike: Parameter_sig.Bool
-  (** Behavior of option "-cpp-frama-c-compliant" *)
+(** Behavior of option "-cpp-frama-c-compliant" *)
 
 module FramaCStdLib: Parameter_sig.Bool
-  (** Behavior of option "-frama-c-stdlib" *)
+(** Behavior of option "-frama-c-stdlib" *)
 
 module ReadAnnot: Parameter_sig.Bool
-  (** Behavior of option "-read-annot" *)
+(** Behavior of option "-read-annot" *)
 
 module PreprocessAnnot: Parameter_sig.Bool
-  (** Behavior of option "-pp-annot" *)
+(** Behavior of option "-pp-annot" *)
 
 module ContinueOnAnnotError: Parameter_sig.Bool
-  (** Behavior of option "-continue-annot-error" *)
+(** Behavior of option "-continue-annot-error" *)
 [@@ deprecated "Use Kernel.wkey_annot_error instead"]
 
 module SimplifyCfg: Parameter_sig.Bool
-  (** Behavior of option "-simplify-cfg" *)
+(** Behavior of option "-simplify-cfg" *)
 
 module KeepSwitch: Parameter_sig.Bool
-  (** Behavior of option "-keep-switch" *)
+(** Behavior of option "-keep-switch" *)
 
 module Keep_unused_specified_functions: Parameter_sig.Bool
 (** Behavior of option "-keep-unused-specified-functions". *)
@@ -405,22 +405,22 @@ module SimplifyTrivialLoops: Parameter_sig.Bool
 (** Behavior of option "-simplify-trivial-loops". *)
 
 module Constfold: Parameter_sig.Bool
-  (** Behavior of option "-constfold" *)
+(** Behavior of option "-constfold" *)
 
 module InitializedPaddingLocals: Parameter_sig.Bool
-  (** Behavior of option "-initialized-padding-locals" *)
+(** Behavior of option "-initialized-padding-locals" *)
 
 module AggressiveMerging: Parameter_sig.Bool
-  (** Behavior of option "-aggressive-merging" *)
+(** Behavior of option "-aggressive-merging" *)
 
 module AsmContractsGenerate: Parameter_sig.Bool
-  (** Behavior of option "-asm-contracts" *)
+(** Behavior of option "-asm-contracts" *)
 
 module AsmContractsAutoValidate: Parameter_sig.Bool
-  (** Behavior of option "-asm-contracts-auto-validate." *)
+(** Behavior of option "-asm-contracts-auto-validate." *)
 
 module RemoveExn: Parameter_sig.Bool
-  (** Behavior of option "-remove-exn" *)
+(** Behavior of option "-remove-exn" *)
 
 (** Analyzed files *)
 module Files: Parameter_sig.Filepath_list
@@ -434,43 +434,43 @@ val normalization_parameters: unit -> Typed_parameter.t list
     changing one will reset the AST entirely.contents
 
     @modify Chlorine-20180501 make it non-constant
- *)
+*)
 
 module WarnDecimalFloat: Parameter_sig.String
-  (** Behavior of option "-warn-decimal-float" *)
+(** Behavior of option "-warn-decimal-float" *)
 [@@ deprecated "Uses kernel.wkey_decimal_float instead."]
 
 module ImplicitFunctionDeclaration: Parameter_sig.String
-  (** Behavior of option "-implicit-function-declaration" *)
+(** Behavior of option "-implicit-function-declaration" *)
 [@@ deprecated "Uses kernel.wkey_implicit_function_declaration instead."]
 
 module C11: Parameter_sig.Bool
-  (** Behavior of option "-c11" *)
+(** Behavior of option "-c11" *)
 
 module JsonCompilationDatabase: Parameter_sig.String
-  (** Behavior of option "-json-compilation-database" *)
+(** Behavior of option "-json-compilation-database" *)
 
 (* ************************************************************************* *)
 (** {3 Customizing cabs2cil options} *)
 (* ************************************************************************* *)
 
 module AllowDuplication: Parameter_sig.Bool
-  (** Behavior of option "-allow-duplication". *)
+(** Behavior of option "-allow-duplication". *)
 
 module DoCollapseCallCast: Parameter_sig.Bool
-  (** Behavior of option "-collapse-call-cast". 
+(** Behavior of option "-collapse-call-cast".
 
-      If false, the destination of a Call instruction should always have the
-      same type as the function's return type.  Where needed, CIL will insert a
-      temporary to make this happen.
+    If false, the destination of a Call instruction should always have the
+    same type as the function's return type.  Where needed, CIL will insert a
+    temporary to make this happen.
 
-      If true, the destination type may differ from the return type, so there
-      is an implicit cast.  This is useful for analyses involving [malloc],
-      because the instruction "T* x = malloc(...);" won't be broken into
-      two instructions, so it's easy to find the allocation type.
+    If true, the destination type may differ from the return type, so there
+    is an implicit cast.  This is useful for analyses involving [malloc],
+    because the instruction "T* x = malloc(...);" won't be broken into
+    two instructions, so it's easy to find the allocation type.
 
-      This is false by default.  Set to true to replicate the behavior
-      of CIL 1.3.5 and earlier. *)
+    This is false by default.  Set to true to replicate the behavior
+    of CIL 1.3.5 and earlier. *)
 
 (* ************************************************************************* *)
 (** {2 Analysis Behavior of options} *)
@@ -504,38 +504,38 @@ module LibEntry: sig
 end
 
 module UnspecifiedAccess: Parameter_sig.Bool
-  (** Behavior of option "-unspecified-access" *)
+(** Behavior of option "-unspecified-access" *)
 
 module SafeArrays: Parameter_sig.Bool
-  (** Behavior of option "-safe-arrays".
-      @plugin development guide *)
+(** Behavior of option "-safe-arrays".
+    @plugin development guide *)
 
 module SignedOverflow: Parameter_sig.Bool
-  (** Behavior of option "-warn-signed-overflow" *)
+(** Behavior of option "-warn-signed-overflow" *)
 
 module UnsignedOverflow: Parameter_sig.Bool
-  (** Behavior of option "-warn-unsigned-overflow" *)
+(** Behavior of option "-warn-unsigned-overflow" *)
 
 module LeftShiftNegative: Parameter_sig.Bool
-  (** Behavior of option "-warn-left-shift-negative" *)
+(** Behavior of option "-warn-left-shift-negative" *)
 
 module RightShiftNegative: Parameter_sig.Bool
-  (** Behavior of option "-warn-right-shift-negative" *)
+(** Behavior of option "-warn-right-shift-negative" *)
 
 module SignedDowncast: Parameter_sig.Bool
-  (** Behavior of option "-warn-signed-downcast" *)
+(** Behavior of option "-warn-signed-downcast" *)
 
 module UnsignedDowncast: Parameter_sig.Bool
-  (** Behavior of option "-warn-unsigned-downcast" *)
+(** Behavior of option "-warn-unsigned-downcast" *)
 
 module SpecialFloat: Parameter_sig.String
-  (** Behavior of option "-warn-special-float" *)
+(** Behavior of option "-warn-special-float" *)
 
 module InvalidBool: Parameter_sig.Bool
-  (** Behavior of option "-warn-invalid-bool" *)
+(** Behavior of option "-warn-invalid-bool" *)
 
 module AbsoluteValidRange: Parameter_sig.String
-  (** Behavior of option "-absolute-valid-range" *)
+(** Behavior of option "-absolute-valid-range" *)
 
 (*
 module FloatFlushToZero: Parameter_sig.Bool
@@ -547,13 +547,13 @@ module FloatFlushToZero: Parameter_sig.Bool
 (* ************************************************************************* *)
 
 module Check: Parameter_sig.Bool
-  (** Behavior of option "-check" *)
+(** Behavior of option "-check" *)
 
 module Copy: Parameter_sig.Bool
 (** Behavior of option "-copy" *)
 
 module TypeCheck: Parameter_sig.Bool
-  (** Behavior of option "-typecheck" *)
+(** Behavior of option "-typecheck" *)
 
 
 (*

@@ -30,8 +30,7 @@ open Cil_datatype
 
 let library_files () =
   List.map
-    (fun d ->
-       Filepath.Normalized.of_string (Options.Share.file ~error:true d))
+    (fun d -> Options.Share.file ~error:true d)
     [ "e_acsl_gmp_api.h";
       "e_acsl.h" ]
 

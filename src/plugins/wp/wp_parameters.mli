@@ -150,7 +150,7 @@ module Check: Parameter_sig.Bool
 
 val has_out : unit -> bool
 val has_session : unit -> bool
-val get_session : force:bool -> unit -> string
+val get_session : force:bool -> unit -> Datatype.Filepath.t
 val get_session_dir : force:bool -> string -> string
 val get_output : unit -> string
 val get_output_dir : string -> string

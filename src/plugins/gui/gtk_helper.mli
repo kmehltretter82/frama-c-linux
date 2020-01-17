@@ -424,8 +424,8 @@ module MAKE_CUSTOM_LIST(A : sig type t end)
 (** Copied from lablgtk [GToolbox.input_string]. See the lablgtk API for more
     details. *)
 val input_string :
-    parent: GWindow.window -> title:string ->
-    ?ok:string -> ?cancel:string -> ?text:string -> string -> string option
+  parent: GWindow.window -> title:string ->
+  ?ok:string -> ?cancel:string -> ?text:string -> string -> string option
 
 (** calls the packing function to append a new menu item
     with an icon and a label.

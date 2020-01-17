@@ -48,21 +48,21 @@ module type S_no_log = sig
       @since Oxygen-20120901 *)
   module Share: Parameter_sig.Specific_dir
 
-  (** Handle the specific `session' directory of the plug-in. 
+  (** Handle the specific `session' directory of the plug-in.
       @since Neon-20140301 *)
   module Session: Parameter_sig.Specific_dir
 
-  (** Handle the specific `config' directory of the plug-in. 
+  (** Handle the specific `config' directory of the plug-in.
       @since Neon-20140301 *)
   module Config: Parameter_sig.Specific_dir
 
   val help: Cmdline.Group.t
-    (** The group containing option -*-help.
-        @since Boron-20100401 *)
+  (** The group containing option -*-help.
+      @since Boron-20100401 *)
 
   val messages: Cmdline.Group.t
-    (** The group containing options -*-debug and -*-verbose.
-        @since Boron-20100401 *)
+  (** The group containing options -*-debug and -*-verbose.
+      @since Boron-20100401 *)
 
   val add_plugin_output_aliases: string list -> unit
   (** Adds aliases to the options -plugin-help, -plugin-verbose, -plugin-log,
@@ -78,15 +78,15 @@ end
     managing categories is now entirely done by Log.Messages
     @plugin development guide *)
 module type S = sig
-    include Log.Messages
-    include S_no_log
+  include Log.Messages
+  include S_no_log
 end
 
 type plugin = private
-    { p_name: string;
-      p_shortname: string;
-      p_help: string;
-      p_parameters: (string, Typed_parameter.t list) Hashtbl.t }
+  { p_name: string;
+    p_shortname: string;
+    p_help: string;
+    p_parameters: (string, Typed_parameter.t list) Hashtbl.t }
 (** Only iterable parameters (see {!do_iterate} and {!do_not_iterate}) are
     registered in the field [p_parameters].
     @since Beryllium-20090901 *)
@@ -108,11 +108,11 @@ val register_kernel: unit -> unit
     services.
     @plugin development guide *)
 module Register
-  (P: sig
-     val name: string (** Name of the module. Arbitrary non-empty string. *)
-     val shortname: string (** Prefix for plugin options. No space allowed. *)
-     val help: string (** description of the module. Free-form text. *)
-   end):
+    (P: sig
+       val name: string (** Name of the module. Arbitrary non-empty string. *)
+       val shortname: string (** Prefix for plugin options. No space allowed. *)
+       val help: string (** description of the module. Free-form text. *)
+     end):
   General_services
 
 val is_share_visible: unit -> unit
@@ -142,7 +142,7 @@ val default_msg_keys: string list -> unit
     @deprecated since Chlorine-20180501 use directly functions from Log
      (add_debug_keys and del_debug_keys) to manage the default status of each
      category
- *)
+*)
 
 (* ************************************************************************* *)
 (** {2 Handling plugins} *)
@@ -167,8 +167,8 @@ val get: string -> plugin
     @deprecated since Oxygen-20120901 *)
 
 val iter_on_plugins: (plugin -> unit) -> unit
-  (** Iterate on each registered plug-ins.
-      @since Beryllium-20090901 *)
+(** Iterate on each registered plug-ins.
+    @since Beryllium-20090901 *)
 
 (**/**)
 (* ************************************************************************* *)
@@ -176,7 +176,7 @@ val iter_on_plugins: (plugin -> unit) -> unit
 (* ************************************************************************* *)
 
 val positive_debug_ref: int ref
-  (** @since Boron-20100401 *)
+(** @since Boron-20100401 *)
 
 val session_is_set_ref: (unit -> bool) ref
 val session_ref: (unit -> string) ref

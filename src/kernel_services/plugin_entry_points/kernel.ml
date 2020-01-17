@@ -30,11 +30,11 @@ module Fc_config = Config
 let () = Plugin.register_kernel ()
 
 module P = Plugin.Register
-  (struct
-     let name = ""
-     let shortname = ""
-     let help = "General options provided by the Frama-C kernel"
-   end)
+    (struct
+      let name = ""
+      let shortname = ""
+      let help = "General options provided by the Frama-C kernel"
+    end)
 
 include (P: Plugin.S_no_log)
 include Cmdline.Kernel_log
@@ -192,60 +192,60 @@ end
 
 module Bool(X:sig include Input val default: bool end) =
   P.Bool
-    (struct 
-      let () = Parameter_customize.set_module_name X.module_name 
-      include X 
-     end)
+    (struct
+      let () = Parameter_customize.set_module_name X.module_name
+      include X
+    end)
 
 module False(X: Input) =
   P.False
     (struct
-      let () = Parameter_customize.set_module_name X.module_name 
-      include X 
-     end)
+      let () = Parameter_customize.set_module_name X.module_name
+      include X
+    end)
 
 module True(X: Input) =
   P.True
     (struct
-      let () = Parameter_customize.set_module_name X.module_name 
-      include X 
-     end)
+      let () = Parameter_customize.set_module_name X.module_name
+      include X
+    end)
 
 module Int (X: sig val default: int include Input_with_arg end) =
   P.Int
-    (struct 
-      let () = Parameter_customize.set_module_name X.module_name 
-      include X 
-     end)
+    (struct
+      let () = Parameter_customize.set_module_name X.module_name
+      include X
+    end)
 
 module Zero(X:Input_with_arg) =
   P.Zero
     (struct
-      let () = Parameter_customize.set_module_name X.module_name 
-      include X 
-     end)
+      let () = Parameter_customize.set_module_name X.module_name
+      include X
+    end)
 
 module String
-  (X: sig include Input_with_arg val default: string end) =
+    (X: sig include Input_with_arg val default: string end) =
   P.String
-    (struct 
-      let () = Parameter_customize.set_module_name X.module_name 
-      include X 
-     end)
+    (struct
+      let () = Parameter_customize.set_module_name X.module_name
+      include X
+    end)
 
 module String_set(X: Input_with_arg) =
   P.String_set
     (struct
-      let () = Parameter_customize.set_module_name X.module_name 
-      include X 
-     end)
+      let () = Parameter_customize.set_module_name X.module_name
+      include X
+    end)
 
 module String_list(X: Input_with_arg) =
   P.String_list
     (struct
-      let () = Parameter_customize.set_module_name X.module_name 
-      include X 
-     end)
+      let () = Parameter_customize.set_module_name X.module_name
+      include X
+    end)
 
 module Filepath_list
     (X: sig
@@ -257,7 +257,7 @@ module Filepath_list
     (struct
       let () = Parameter_customize.set_module_name X.module_name
       include X
-     end)
+    end)
 
 module Kernel_function_set(X: Input_with_arg) =
   P.Kernel_function_set
@@ -280,7 +280,7 @@ module GeneralHelp =
       let option_name = "--help"
       let help = "display a general help"
       let module_name = "GeneralHelp"
-     end)
+    end)
 let run_help () = if GeneralHelp.get () then Cmdline.help () else Cmdline.nop
 let () = Cmdline.run_after_exiting_stage run_help
 let () = GeneralHelp.add_aliases [ "-h"; "-help"]
@@ -307,20 +307,20 @@ let () = Parameter_customize.set_negative_option_name ""
 module PrintConfig =
   False
     (struct
-       let option_name = "-print-config"
-       let module_name = "PrintConfig"
-       let help = "print full config information"
-     end)
+      let option_name = "-print-config"
+      let module_name = "PrintConfig"
+      let help = "print full config information"
+    end)
 
 let () = Parameter_customize.set_group help
 let () = Parameter_customize.set_cmdline_stage Cmdline.Early
 let () = Parameter_customize.set_negative_option_name ""
 module PrintVersion =
   False(struct
-          let option_name = "-print-version"
-          let module_name = "PrintVersion"
-          let help = "print the Frama-C version"
-        end)
+    let option_name = "-print-version"
+    let module_name = "PrintVersion"
+    let help = "print the Frama-C version"
+  end)
 let () = PrintVersion.add_aliases [ "-v"; "-version" ; "--version" ]
 
 let () = Parameter_customize.set_group help
@@ -328,10 +328,10 @@ let () = Parameter_customize.set_cmdline_stage Cmdline.Early
 let () = Parameter_customize.set_negative_option_name ""
 module PrintShare =
   False(struct
-          let option_name = "-print-share-path"
-          let module_name = "PrintShare"
-          let help = "print the Frama-C share path"
-        end)
+    let option_name = "-print-share-path"
+    let module_name = "PrintShare"
+    let help = "print the Frama-C share path"
+  end)
 let () = PrintShare.add_aliases [ "-print-path" ]
 
 let () = Parameter_customize.set_group help
@@ -339,10 +339,10 @@ let () = Parameter_customize.set_cmdline_stage Cmdline.Early
 let () = Parameter_customize.set_negative_option_name ""
 module PrintLib =
   False(struct
-          let option_name = "-print-lib-path"
-          let module_name = "PrintLib"
-          let help = "print the path of the Frama-C kernel library"
-        end)
+    let option_name = "-print-lib-path"
+    let module_name = "PrintLib"
+    let help = "print the path of the Frama-C kernel library"
+  end)
 let () = PrintLib.add_aliases [ "-print-libpath" ]
 
 let () = Parameter_customize.set_group help
@@ -351,11 +351,11 @@ let () = Parameter_customize.set_negative_option_name ""
 module PrintPluginPath =
   False
     (struct
-       let option_name = "-print-plugin-path"
-       let module_name = "PrintPluginPath"
-       let help =
-         "print the path where the Frama-C dynamic plug-ins are searched into"
-     end)
+      let option_name = "-print-plugin-path"
+      let module_name = "PrintPluginPath"
+      let help =
+        "print the path where the Frama-C dynamic plug-ins are searched into"
+    end)
 
 let () = Parameter_customize.set_group help
 let () = Parameter_customize.set_cmdline_stage Cmdline.Exiting
@@ -366,17 +366,17 @@ module PrintMachdep =
       let module_name = "PrintMachdep"
       let option_name = "-print-machdep"
       let help = "pretty print selected machdep"
-     end)
+    end)
 
 let () = Parameter_customize.set_group help
 let () = Parameter_customize.set_negative_option_name ""
 module DumpDependencies =
   P.Empty_string
     (struct
-       let option_name = "-dump-dependencies"
-       let help = ""
-       let arg_name = ""
-     end)
+      let option_name = "-dump-dependencies"
+      let help = ""
+      let arg_name = ""
+    end)
 let () =
   Extlib.safe_at_exit
     (fun () ->
@@ -393,7 +393,7 @@ module AutocompleteHelp =
       let option_name = "-autocomplete"
       let help = "displays all plugin options. Used for zsh autocompletion"
       let module_name = "AutocompleteHelp"
-     end)
+    end)
 let run_list_all_plugin_options () =
   if AutocompleteHelp.get () then
     Cmdline.list_all_plugin_options ~print_invisible:true
@@ -410,14 +410,14 @@ let () = Parameter_customize.do_not_journalize ()
 let () = Parameter_customize.set_cmdline_stage Cmdline.Early
 let () = Parameter_customize.do_iterate ()
 module GeneralVerbose =
-    Int
-      (struct
-         let default = 1
-         let option_name = "-verbose"
-         let arg_name = "n"
-         let help = "general level of verbosity"
-         let module_name = "GeneralVerbose"
-       end)
+  Int
+    (struct
+      let default = 1
+      let option_name = "-verbose"
+      let arg_name = "n"
+      let help = "general level of verbosity"
+      let module_name = "GeneralVerbose"
+    end)
 let () =
   (* line order below matters *)
   GeneralVerbose.set_range ~min:0 ~max:max_int;
@@ -434,11 +434,11 @@ let () = Parameter_customize.do_iterate ()
 module GeneralDebug =
   Zero
     (struct
-       let option_name = "-debug"
-       let arg_name = "n"
-       let help = "general level of debug"
-       let module_name = "GeneralDebug"
-     end)
+      let option_name = "-debug"
+      let arg_name = "n"
+      let help = "general level of debug"
+      let module_name = "GeneralDebug"
+    end)
 let () =
   (* line order below matters *)
   GeneralDebug.set_range ~min:0 ~max:max_int;
@@ -460,11 +460,11 @@ let () = Parameter_customize.do_not_journalize ()
 module Quiet =
   Bool
     (struct
-       let default = Cmdline.quiet
-       let option_name = "-quiet"
-       let module_name = "Quiet"
-       let help = "sets -verbose and -debug to 0"
-     end)
+      let default = Cmdline.quiet
+      let option_name = "-quiet"
+      let module_name = "Quiet"
+      let help = "sets -verbose and -debug to 0"
+    end)
 let () =
   Quiet.add_set_hook
     (fun _ b -> assert b; GeneralVerbose.set 0; GeneralDebug.set 0)
@@ -476,12 +476,12 @@ let () = Parameter_customize.do_not_journalize ()
 module Permissive =
   Bool
     (struct
-        let default = !Parameter_customize.is_permissive_ref
-        let option_name = "-permissive"
-        let module_name = "Permissive"
-        let help =
-          "performs less verification on validity of command-line options"
-     end)
+      let default = !Parameter_customize.is_permissive_ref
+      let option_name = "-permissive"
+      let module_name = "Permissive"
+      let help =
+        "performs less verification on validity of command-line options"
+    end)
 let () =
   Permissive.add_set_hook
     (fun _ b -> Parameter_customize.is_permissive_ref := b)
@@ -492,11 +492,11 @@ let () = Parameter_customize.do_not_journalize ()
 let () = Parameter_customize.do_not_projectify ()
 module Unicode = struct
   include True
-    (struct
-       let option_name = "-unicode"
-       let module_name = "Unicode"
-       let help = "use utf8 in messages"
-     end)
+      (struct
+        let option_name = "-unicode"
+        let module_name = "Unicode"
+        let help = "use utf8 in messages"
+      end)
   (* This function behaves nicely with the Gui, that detects if command-line
      arguments have been set by the user at some point. One possible improvement
      would be to bypass journalization entirely, but this requires an API
@@ -534,23 +534,23 @@ let () = Parameter_customize.do_not_projectify ()
 module Time =
   P.Empty_string
     (struct
-       let option_name = "-time"
-       let arg_name = "filename"
-       let help = "append process time and timestamp to <filename> at exit"
-     end)
+      let option_name = "-time"
+      let arg_name = "filename"
+      let help = "append process time and timestamp to <filename> at exit"
+    end)
 
 let () = Parameter_customize.set_group messages
 let () = Parameter_customize.do_not_projectify ()
 module SymbolicPath =
   String_set (* TODO: to be replaced by an hashtbl *)
     (struct
-       let option_name = "-add-symbolic-path"
-       let module_name = "SymbolicPath"
-       let arg_name = "name_1:path_1,...,name_n:path_n"
-       let help =
-         "When displaying file locations, replace (absolute) path by the \
-          corresponding symbolic name"
-     end)
+      let option_name = "-add-symbolic-path"
+      let module_name = "SymbolicPath"
+      let arg_name = "name_1:path_1,...,name_n:path_n"
+      let help =
+        "When displaying file locations, replace (absolute) path by the \
+         corresponding symbolic name"
+    end)
 
 
 (* ************************************************************************* *)
@@ -566,7 +566,7 @@ module PrintCode =
       let module_name = "PrintCode"
       let option_name = "-print"
       let help = "pretty print original code with its comments"
-     end)
+    end)
 
 let () = Parameter_customize.set_group inout_source
 let () = Parameter_customize.do_not_projectify ()
@@ -576,7 +576,7 @@ module PrintComments =
       let module_name = "PrintComments"
       let option_name = "-keep-comments"
       let help = "try to keep comments in C code"
-     end)
+    end)
 
 let () = Parameter_customize.set_group inout_source
 let () = Parameter_customize.do_not_projectify ()
@@ -588,7 +588,7 @@ module PrintLibc =
       let help = "when pretty-printing C code, keep prototypes coming \
                   from Frama-C standard library"
       let default = !Fc_config.is_gui (* always print by default on the GUI *)
-     end)
+    end)
 
 let () = Parameter_customize.set_group inout_source
 module PrintReturn =
@@ -597,18 +597,18 @@ module PrintReturn =
       let module_name = "PrintReturn"
       let option_name = "-print-return"
       let help = "inline gotos to return statement"
-     end)
+    end)
 
 module CodeOutput = struct
 
   let () = Parameter_customize.set_group inout_source
   include P.Empty_string
-    (struct
-       let option_name = "-ocode"
-       let arg_name = "filename"
-       let help =
-         "when printing code, redirects the output to file <filename>"
-     end)
+      (struct
+        let option_name = "-ocode"
+        let arg_name = "filename"
+        let help =
+          "when printing code, redirects the output to file <filename>"
+      end)
 
   let streams = Hashtbl.create 7
 
@@ -629,7 +629,7 @@ module CodeOutput = struct
       with Sys_error s ->
         warning
           "Fail to open file \"%s\" for code output@\nSystem error: %s.@\n\
-             Code is output on stdout instead." file s ;
+           Code is output on stdout instead." file s ;
         Log.print_delayed job
 
   let close_all () =
@@ -659,52 +659,52 @@ let add_path s =
              It will be ignored" s
 
 let () =
-  SymbolicPath.add_set_hook 
+  SymbolicPath.add_set_hook
     (fun o n ->
-      let d = Datatype.String.Set.diff n o in
-      Datatype.String.Set.iter add_path d)
+       let d = Datatype.String.Set.diff n o in
+       Datatype.String.Set.iter add_path d)
 
 let () = Parameter_customize.set_group inout_source
 let () = Parameter_customize.do_not_projectify ()
 module FloatNormal =
   False
     (struct
-       let option_name = "-float-normal"
-       let module_name = "FloatNormal"
-       let help = "display floats with internal routine"
-     end)
+      let option_name = "-float-normal"
+      let module_name = "FloatNormal"
+      let help = "display floats with internal routine"
+    end)
 
 let () = Parameter_customize.set_group inout_source
 let () = Parameter_customize.do_not_projectify ()
 module FloatRelative =
   False
     (struct
-       let option_name = "-float-relative"
-       let module_name = "FloatRelative"
-       let help = "display float intervals as [lower_bound ++ width]"
-     end)
+      let option_name = "-float-relative"
+      let module_name = "FloatRelative"
+      let help = "display float intervals as [lower_bound ++ width]"
+    end)
 
 let () = Parameter_customize.set_group inout_source
 let () = Parameter_customize.do_not_projectify ()
 module FloatHex =
   False
     (struct
-       let option_name = "-float-hex"
-       let module_name = "FloatHex"
-       let help = "display floats as hexadecimal"
-     end)
+      let option_name = "-float-hex"
+      let module_name = "FloatHex"
+      let help = "display floats as hexadecimal"
+    end)
 
 let () = Parameter_customize.set_group inout_source
 let () = Parameter_customize.do_not_projectify ()
 module BigIntsHex =
   Int(struct
-         let module_name = "BigIntsHex"
-         let option_name = "-big-ints-hex"
-         let arg_name = "max"
-	 let help = "display integers larger than <max> using hexadecimal \
-notation"
-         let default = -1
-       end)
+    let module_name = "BigIntsHex"
+    let option_name = "-big-ints-hex"
+    let arg_name = "max"
+    let help = "display integers larger than <max> using hexadecimal \
+                notation"
+    let default = -1
+  end)
 
 (* ************************************************************************* *)
 (** {2 Save/Load} *)
@@ -717,25 +717,25 @@ let () = Parameter_customize.do_not_projectify ()
 module SaveState =
   P.Empty_string
     (struct
-       let option_name = "-save"
-       let arg_name = "filename"
-       let help = "at exit, save the session into file <filename>"
-     end)
+      let option_name = "-save"
+      let arg_name = "filename"
+      let help = "at exit, save the session into file <filename>"
+    end)
 
 let () = Parameter_customize.set_group saveload
 let () = Parameter_customize.set_cmdline_stage Cmdline.Loading
-(* must be projectified: when loading, this option will be automatically 
-   reset *) 
+(* must be projectified: when loading, this option will be automatically
+   reset *)
 (*let () = Parameter_customize.do_not_projectify ()*)
 module LoadState =
   P.Filepath
     (struct
-       let option_name = "-load"
-       let arg_name = "filename"
-       let existence = Filepath.Must_exist
-       let file_kind = "Frama-C state"
-       let help = "load a previously-saved session from file <filename>"
-     end)
+      let option_name = "-load"
+      let arg_name = "filename"
+      let existence = Filepath.Must_exist
+      let file_kind = "Frama-C state"
+      let help = "load a previously-saved session from file <filename>"
+    end)
 
 let () = Parameter_customize.set_group saveload
 let () = Parameter_customize.set_cmdline_stage Cmdline.Extending
@@ -743,11 +743,11 @@ let () = Parameter_customize.do_not_projectify ()
 module AddPath =
   String_list
     (struct
-       let option_name = "-add-path"
-       let module_name = "AddPath"
-       let arg_name = "DIR,..."
-       let help = "Prepend directories to FRAMAC_PLUGIN for loading dynamic plug-ins"
-     end)
+      let option_name = "-add-path"
+      let module_name = "AddPath"
+      let arg_name = "DIR,..."
+      let help = "Prepend directories to FRAMAC_PLUGIN for loading dynamic plug-ins"
+    end)
 
 let () = Parameter_customize.set_group saveload
 let () = Parameter_customize.set_cmdline_stage Cmdline.Extending
@@ -755,14 +755,14 @@ let () = Parameter_customize.do_not_projectify ()
 module LoadModule =
   String_list
     (struct
-       let option_name = "-load-module"
-       let module_name = "LoadModule"
-       let arg_name = "SPEC,..."
-       let help = "Dynamically load plug-ins, modules and scripts. \
-                   Each <SPEC> can be an OCaml source or object file, with \
-                   or without extension, or a Findlib package. \
-                   Loading order is preserved and \
-                   additional dependencies can be listed in *.depend files."
+      let option_name = "-load-module"
+      let module_name = "LoadModule"
+      let arg_name = "SPEC,..."
+      let help = "Dynamically load plug-ins, modules and scripts. \
+                  Each <SPEC> can be an OCaml source or object file, with \
+                  or without extension, or a Findlib package. \
+                  Loading order is preserved and \
+                  additional dependencies can be listed in *.depend files."
     end)
 let () = LoadModule.add_aliases [ "-load-script" ]
 
@@ -772,9 +772,9 @@ let () = Parameter_customize.do_not_projectify ()
 module AutoLoadPlugins =
   True
     (struct
-       let option_name = "-autoload-plugins"
-       let module_name = "AutoLoadPlugins"
-       let help = "Automatically load all plugins in FRAMAC_PLUGIN."
+      let option_name = "-autoload-plugins"
+      let module_name = "AutoLoadPlugins"
+      let help = "Automatically load all plugins in FRAMAC_PLUGIN."
     end)
 
 let bootstrap_loader () =
@@ -793,12 +793,12 @@ module Journal = struct
   let () = Parameter_customize.do_not_projectify ()
   module Enable = struct
     include Bool
-      (struct
-         let module_name = "Journal.Enable"
-         let default = Cmdline.journal_enable
-         let option_name = "-journal-enable"
-         let help = "dump a journal while Frama-C exit"
-       end)
+        (struct
+          let module_name = "Journal.Enable"
+          let default = Cmdline.journal_enable
+          let option_name = "-journal-enable"
+          let help = "dump a journal while Frama-C exit"
+        end)
     let is_set () = Cmdline.journal_isset
   end
   let () = Parameter_customize.set_group saveload
@@ -806,20 +806,22 @@ module Journal = struct
   module Name =
     String
       (struct
-         let module_name = "Journal.Name"
-         let option_name = "-journal-name"
-         let default = 
-	   let dir =
-	     (* duplicate code from Plugin.Session *)
-	     if Session.Dir_name.is_set () then Session.Dir_name.get ()
-	     else
-	       try Sys.getenv "FRAMAC_SESSION"
-	       with Not_found -> "./.frama-c"
-	   in
-	   dir ^ "/frama_c_journal.ml"
-         let arg_name = "s"
-         let help = "set the filename of the journal"
-       end)
+        let module_name = "Journal.Name"
+        let option_name = "-journal-name"
+        let default =
+          let dir =
+            (* duplicate code from Plugin.Session *)
+            if Session.Dir_name.is_set ()
+            then
+              (Session.Dir_name.get () :> string)
+            else
+              try Sys.getenv "FRAMAC_SESSION"
+              with Not_found -> "./.frama-c"
+          in
+          dir ^ "/frama_c_journal.ml"
+        let arg_name = "s"
+        let help = "set the filename of the journal"
+      end)
   let () = Name.add_set_hook (fun _ s -> Journal.set_name s);
 end
 
@@ -832,7 +834,7 @@ module Session_dir =
       let option_name = "-session"
       let arg_name = ""
       let help = "directory in which session files are searched"
-     end)
+    end)
 let () = Plugin.session_is_set_ref := Session_dir.is_set
 let () = Plugin.session_ref := Session_dir.get
 
@@ -845,7 +847,7 @@ module Config_dir =
       let option_name = "-config"
       let arg_name = ""
       let help = "directory in which configuration files are searched"
-     end)
+    end)
 let () = Plugin.config_is_set_ref := Config_dir.is_set
 let () = Plugin.config_ref := Config_dir.get
 
@@ -861,49 +863,49 @@ let () = Parameter_customize.set_cmdline_stage Cmdline.Extended
 module Machdep =
   String
     (struct
-       let module_name = "Machdep"
-       let option_name = "-machdep"
-       let default = "x86_32"
-       let arg_name = "machine"
-       let help =
-         "use <machine> as the current machine dependent configuration. \
-          See \"-machdep help\" for a list"
-     end)
+      let module_name = "Machdep"
+      let option_name = "-machdep"
+      let default = "x86_32"
+      let arg_name = "machine"
+      let help =
+        "use <machine> as the current machine dependent configuration. \
+         See \"-machdep help\" for a list"
+    end)
 
 let () = Parameter_customize.set_group parsing
 let () = Parameter_customize.do_not_reset_on_copy ()
 module ReadAnnot =
   True(struct
-         let module_name = "ReadAnnot"
-         let option_name = "-annot"
-         let help = "read and parse annotations"
-       end)
+    let module_name = "ReadAnnot"
+    let option_name = "-annot"
+    let help = "read and parse annotations"
+  end)
 
 let () = Parameter_customize.set_group parsing
 let () = Parameter_customize.do_not_reset_on_copy ()
 module PreprocessAnnot =
   False(struct
-          let module_name = "PreprocessAnnot"
-          let option_name = "-pp-annot"
-          let help =
-            "pre-process annotations (if they are read). Set by default if \
-             the pre-processor is GNU-like (see option -cpp-frama-c-compliant)"
-        end)
+    let module_name = "PreprocessAnnot"
+    let option_name = "-pp-annot"
+    let help =
+      "pre-process annotations (if they are read). Set by default if \
+       the pre-processor is GNU-like (see option -cpp-frama-c-compliant)"
+  end)
 
 let () = Parameter_customize.set_group parsing
 let () = Parameter_customize.do_not_reset_on_copy ()
 module CppCommand =
   P.Empty_string
     (struct
-       let option_name = "-cpp-command"
-       let arg_name = "cmd"
-       let help = "<cmd> is used to build the preprocessing command.\n\
-Default to $CPP environment variable or else \"gcc -C -E -I.\".\n\
-If unset, the command is built as follows:\n\
-  CPP -o <preprocessed file> <source file>\n\
-%1 and %2 can be used into CPP string to mark the position of <source file> \
-and <preprocessed file> respectively"
-     end)
+      let option_name = "-cpp-command"
+      let arg_name = "cmd"
+      let help = "<cmd> is used to build the preprocessing command.\n\
+                  Default to $CPP environment variable or else \"gcc -C -E -I.\".\n\
+                  If unset, the command is built as follows:\n\
+                  CPP -o <preprocessed file> <source file>\n\
+                  %1 and %2 can be used into CPP string to mark the position of <source file> \
+                  and <preprocessed file> respectively"
+    end)
 
 let () = Parameter_customize.set_group parsing
 let () = Parameter_customize.do_not_reset_on_copy ()
@@ -911,12 +913,12 @@ let () = Parameter_customize.no_category ()
 module CppExtraArgs =
   String_list
     (struct
-       let module_name = "CppExtraArgs"
-       let option_name = "-cpp-extra-args"
-       let arg_name = "args"
-       let help = "additional arguments passed to the preprocessor while \
-preprocessing the C code but not while preprocessing annotations"
-     end)
+      let module_name = "CppExtraArgs"
+      let option_name = "-cpp-extra-args"
+      let arg_name = "args"
+      let help = "additional arguments passed to the preprocessor while \
+                  preprocessing the C code but not while preprocessing annotations"
+    end)
 
 let () = Parameter_customize.set_group parsing
 let () = Parameter_customize.do_not_reset_on_copy ()
@@ -925,7 +927,7 @@ module CppGnuLike =
     (struct
       let module_name = "CppGnuLike"
       let option_name = "-cpp-frama-c-compliant"
-      let help = 
+      let help =
         "indicates that a custom pre-processor (see option -cpp-command) \
          accepts the same set of options as GNU cpp. Set it to false if you \
          have pre-processing issues with a custom pre-processor."
@@ -948,14 +950,14 @@ let () = Parameter_customize.set_group parsing
 let () = Parameter_customize.do_not_reset_on_copy ()
 module ContinueOnAnnotError =
   False(struct
-          let module_name = "ContinueOnAnnotError"
-          let option_name = "-continue-annot-error"
-          let help =
-            "[DEPRECATED: Use -kernel-warn-key annot-error instead] \
-             When an annotation fails to type-check, emit a warning \
-             and discard the annotation instead of generating an error \
-             (errors in C are still fatal)"
-        end)
+    let module_name = "ContinueOnAnnotError"
+    let option_name = "-continue-annot-error"
+    let help =
+      "[DEPRECATED: Use -kernel-warn-key annot-error instead] \
+       When an annotation fails to type-check, emit a warning \
+       and discard the annotation instead of generating an error \
+       (errors in C are still fatal)"
+  end)
 let () =
   ContinueOnAnnotError.add_set_hook
     (fun _ f ->
@@ -982,7 +984,7 @@ module ImplicitFunctionDeclaration =
       "[DEPRECATED: Use \
        -kernel-warn-key typing:implicit-function-declaration=error instead] \
        Warn or abort when a function is called before it has been declared \
-                (non-C99 compliant); action must be ignore, warn, or error"
+       (non-C99 compliant); action must be ignore, warn, or error"
     let default = "warn"
     let module_name = "ImplicitFunctionDeclaration"
   end)
@@ -1062,24 +1064,24 @@ let () = Parameter_customize.set_group normalisation
 module UnrollingLevel =
   Zero
     (struct
-       let module_name = "UnrollingLevel"
-       let option_name = "-ulevel"
-       let arg_name = "l"
-       let help =
-         "unroll loops n times (defaults to 0) before analyzes. \
-          A negative value hides UNROLL loop pragmas."
-     end)
+      let module_name = "UnrollingLevel"
+      let option_name = "-ulevel"
+      let arg_name = "l"
+      let help =
+        "unroll loops n times (defaults to 0) before analyzes. \
+         A negative value hides UNROLL loop pragmas."
+    end)
 
 let () = Parameter_customize.set_group normalisation
 module UnrollingForce =
   Bool
     (struct
-       let module_name = "UnrollingForce"
-       let default = false
-       let option_name = "-ulevel-force"
-       let help =
-         "ignore UNROLL loop pragmas disabling unrolling."
-     end)
+      let module_name = "UnrollingForce"
+      let default = false
+      let option_name = "-ulevel-force"
+      let help =
+        "ignore UNROLL loop pragmas disabling unrolling."
+    end)
 
 let () = Parameter_customize.set_group normalisation
 let () = Parameter_customize.do_not_reset_on_copy ()
@@ -1104,11 +1106,11 @@ module Enums =
       let option_name = "-enums"
       let arg_name = "repr"
       let default = "gcc-enums"
-      let help = 
+      let help =
         "use <repr> to decide how enumerated types should be represented. \
          -enums help gives the list of available representations (default: "
         ^ default ^ ")"
-     end)
+    end)
 let enum_reprs = ["gcc-enums"; "gcc-short-enums"; "int";]
 let () = Enums.set_possible_values ("help"::enum_reprs)
 let () =
@@ -1122,28 +1124,28 @@ let () = Parameter_customize.set_group normalisation
 module SimplifyCfg =
   False
     (struct
-       let module_name = "SimplifyCfg"
-       let option_name = "-simplify-cfg"
-       let help =
-         "remove break, continue and switch statements before analyses"
-     end)
+      let module_name = "SimplifyCfg"
+      let option_name = "-simplify-cfg"
+      let help =
+        "remove break, continue and switch statements before analyses"
+    end)
 
 let () = Parameter_customize.set_group normalisation
 module KeepSwitch =
   False(struct
-          let option_name = "-keep-switch"
-          let module_name = "KeepSwitch"
-          let help = "keep switch statements despite -simplify-cfg"
-        end)
+    let option_name = "-keep-switch"
+    let module_name = "KeepSwitch"
+    let help = "keep switch statements despite -simplify-cfg"
+  end)
 
 let () = Parameter_customize.set_group normalisation
 let () = Parameter_customize.set_negative_option_name "-remove-unused-specified-functions"
 module Keep_unused_specified_functions =
   True(struct
-          let option_name = "-keep-unused-specified-functions"
-          let module_name = "Keep_unused_specified_functions"
-          let help = "keep specified-but-unused functions"
-        end)
+    let option_name = "-keep-unused-specified-functions"
+    let module_name = "Keep_unused_specified_functions"
+    let help = "keep specified-but-unused functions"
+  end)
 
 let () = Parameter_customize.set_group normalisation
 let () = Parameter_customize.set_negative_option_name "-remove-unused-types"
@@ -1157,87 +1159,87 @@ module Keep_unused_types =
 let () = Parameter_customize.set_group normalisation
 module SimplifyTrivialLoops =
   True(struct
-          let option_name = "-simplify-trivial-loops"
-          let module_name = "SimplifyTrivialLoops"
-          let help = "simplify trivial loops, such as do ... while(0) loops"
-       end)
+    let option_name = "-simplify-trivial-loops"
+    let module_name = "SimplifyTrivialLoops"
+    let help = "simplify trivial loops, such as do ... while(0) loops"
+  end)
 
 let () = Parameter_customize.set_group normalisation
 module Constfold =
   False
     (struct
-       let option_name = "-constfold"
-       let module_name = "Constfold"
-       let help = "fold all constant expressions in the code before analysis"
-     end)
+      let option_name = "-constfold"
+      let module_name = "Constfold"
+      let help = "fold all constant expressions in the code before analysis"
+    end)
 
 let () = Parameter_customize.set_group normalisation
 let () = Parameter_customize.do_not_reset_on_copy ()
 module InitializedPaddingLocals =
   True
     (struct
-       let option_name = "-initialized-padding-locals"
-       let module_name = "InitializedPaddingLocals"
-       let help = "Implicit initialization of locals sets padding bits to 0. \
-                   If false, padding bits are left uninitialized. \
-                   Defaults to true."
-     end)
+      let option_name = "-initialized-padding-locals"
+      let module_name = "InitializedPaddingLocals"
+      let help = "Implicit initialization of locals sets padding bits to 0. \
+                  If false, padding bits are left uninitialized. \
+                  Defaults to true."
+    end)
 
 let () = Parameter_customize.set_group normalisation
 module AggressiveMerging =
   False
     (struct
-       let option_name = "-aggressive-merging"
-       let module_name = "AggressiveMerging"
-       let help = "merge function definitions modulo renaming \
-                   (defaults to false)"
-     end)
+      let option_name = "-aggressive-merging"
+      let module_name = "AggressiveMerging"
+      let help = "merge function definitions modulo renaming \
+                  (defaults to false)"
+    end)
 
 let () = Parameter_customize.set_group normalisation
 module AsmContractsGenerate =
   True
     (struct
-        let option_name = "-asm-contracts"
-        let module_name = "AsmContractsGenerate"
-        let help = "generate contracts for assembly code written according \
-                    to gcc's extended syntax"
-     end)
+      let option_name = "-asm-contracts"
+      let module_name = "AsmContractsGenerate"
+      let help = "generate contracts for assembly code written according \
+                  to gcc's extended syntax"
+    end)
 
 let () = Parameter_customize.set_group normalisation
 module AsmContractsAutoValidate =
   False
     (struct
-        let option_name = "-asm-contracts-auto-validate"
-        let module_name = "AsmContractsAutoValidate"
-        let help = "automatically mark contracts generated from asm as valid \
-                    (defaults to false)"
-     end)
+      let option_name = "-asm-contracts-auto-validate"
+      let module_name = "AsmContractsAutoValidate"
+      let help = "automatically mark contracts generated from asm as valid \
+                  (defaults to false)"
+    end)
 
 let () = Parameter_customize.set_group normalisation
 module RemoveExn =
   False
     (struct
-        let option_name = "-remove-exn"
-        let module_name = "RemoveExn"
-        let help =
-          "transforms throw and try/catch statements to normal C functions. \
-           Disabled by default, unless input source language has \
-           has an exception mechanism."
-     end)
+      let option_name = "-remove-exn"
+      let module_name = "RemoveExn"
+      let help =
+        "transforms throw and try/catch statements to normal C functions. \
+         Disabled by default, unless input source language has \
+         has an exception mechanism."
+    end)
 
 module Files = struct
 
   let () = Parameter_customize.is_invisible ()
   let () = Parameter_customize.no_category ()
   include Filepath_list
-    (struct
-       let option_name = ""
-       let module_name = "Files"
-       let arg_name = ""
-       let help = ""
-       let file_kind = "source"
-       let existence = Filepath.Must_exist
-     end)
+      (struct
+        let option_name = ""
+        let module_name = "Files"
+        let arg_name = ""
+        let help = ""
+        let file_kind = "source"
+        let existence = Filepath.Must_exist
+      end)
   let () = Cmdline.use_cmdline_files set
 
 end
@@ -1258,7 +1260,7 @@ module DoCollapseCallCast =
     let module_name = "DoCollapseCallCast"
     let help =
       "Allow some implicit casts between returned value of a function \
-                   and the lvalue it is assigned to."
+       and the lvalue it is assigned to."
   end)
 
 let normalization_parameters () =
@@ -1277,42 +1279,42 @@ let () = Parameter_customize.set_group analysis_options
 module MainFunction =
   String
     (struct
-       let module_name = "MainFunction"
-       let default = "main"
-       let option_name = "-main"
-       let arg_name = "f"
-       let help = "use <f> as entry point for analysis. See \"-lib-entry\" \
-if this is not for a complete application. Defaults to main"
-     end)
+      let module_name = "MainFunction"
+      let default = "main"
+      let option_name = "-main"
+      let arg_name = "f"
+      let help = "use <f> as entry point for analysis. See \"-lib-entry\" \
+                  if this is not for a complete application. Defaults to main"
+    end)
 
 let () = Parameter_customize.set_group analysis_options
 module LibEntry =
   False
     (struct
-       let module_name = "LibEntry"
-       let option_name = "-lib-entry"
-       let help ="run analysis for an incomplete application e.g. an API call. See the -main option to set the entry point"
-     end)
+      let module_name = "LibEntry"
+      let option_name = "-lib-entry"
+      let help ="run analysis for an incomplete application e.g. an API call. See the -main option to set the entry point"
+    end)
 
 let () = Parameter_customize.set_group analysis_options
 module UnspecifiedAccess =
   False(struct
-         let module_name = "UnspecifiedAccess"
-         let option_name = "-unspecified-access"
-         let help = "do not assume that read/write accesses occurring \
-between sequence points are separated"
-       end)
+    let module_name = "UnspecifiedAccess"
+    let option_name = "-unspecified-access"
+    let help = "do not assume that read/write accesses occurring \
+                between sequence points are separated"
+  end)
 
 let () = Parameter_customize.set_negative_option_name "-unsafe-arrays"
 let () = Parameter_customize.set_group analysis_options
 module SafeArrays =
   True
     (struct
-       let module_name = "SafeArrays"
-       let option_name = "-safe-arrays"
-       let help = "for multidimensional arrays or arrays that are fields \
-                   inside structs, assume that accesses are in bounds"
-     end)
+      let module_name = "SafeArrays"
+      let option_name = "-safe-arrays"
+      let help = "for multidimensional arrays or arrays that are fields \
+                  inside structs, assume that accesses are in bounds"
+    end)
 
 let () = Parameter_customize.set_group analysis_options
 let () = Parameter_customize.do_not_reset_on_copy ()
@@ -1336,7 +1338,7 @@ module SignedOverflow =
       let module_name = "SignedOverflow"
       let option_name = "-warn-signed-overflow"
       let help = "generate alarms for signed operations that overflow."
-     end)
+    end)
 
 (* Unsigned overflows are ok, but might not always be a behavior the programmer
    wants. *)
@@ -1381,8 +1383,8 @@ module SignedDowncast =
       let module_name = "SignedDowncast"
       let option_name = "-warn-signed-downcast"
       let help = "generate alarms when signed downcasts may exceed the \
-destination range"
-     end)
+                  destination range"
+    end)
 
 (* Unsigned downcasts are ok, but might not always be a behavior the programmer
    wants. *)
@@ -1394,8 +1396,8 @@ module UnsignedDowncast =
       let module_name = "UnsignedDowncast"
       let option_name = "-warn-unsigned-downcast"
       let help = "generate alarms when unsigned downcasts may exceed the \
-destination range"
-     end)
+                  destination range"
+    end)
 
 
 (* Not finite floats are ok, but might not always be a behavior the programmer
@@ -1438,7 +1440,7 @@ let () =
     ~plugin:""
     ~group:seq
     ~help:"parse options before `-then' and execute Frama-C \
-accordingly, then parse options after `-then' and re-execute Frama-C"
+           accordingly, then parse options after `-then' and re-execute Frama-C"
     ~visible:true
     ~ext_help:""
     ()
@@ -1449,7 +1451,7 @@ let () =
     ~plugin:""
     ~group:seq
     ~help:"like `-then', but the second group of actions is executed \
-on the last project created by a program transformer."
+           on the last project created by a program transformer."
     ~visible:true
     ~ext_help:""
     ()
@@ -1471,7 +1473,7 @@ let () =
     ~argname:"p"
     ~group:seq
     ~help:"like `-then', but the second group of actions is executed \
-on project <p>"
+           on project <p>"
     ~visible:true
     ~ext_help:""
     ()
@@ -1489,7 +1491,7 @@ module Set_project_as_default =
     let module_name = "Set_project_as_default"
     let option_name = "-set-project-as-default"
     let help = "the current project becomes the default one \
-(and so future '-then' sequences are applied on it)"
+                (and so future '-then' sequences are applied on it)"
   end)
 
 let () = Parameter_customize.set_group project
@@ -1504,15 +1506,15 @@ module Remove_projects =
         with Project.Unknown_project ->
           raise (P.Cannot_build ("no project '" ^ s ^ "'"))
       let to_string = Project.get_unique_name
-     end)
+    end)
     (struct
       let option_name = "-remove-projects"
       let arg_name = "p1, ..., pn"
       let help = "remove the given projects <p1>, ..., <pn>. \
-@all_but_current removes all projects but the current one."
+                  @all_but_current removes all projects but the current one."
       let default = Project.Datatype.Set.empty
       let dependencies = []
-     end)
+    end)
 
 let _ =
   Remove_projects.Category.enable_all
@@ -1521,7 +1523,7 @@ let _ =
       method fold: 'a. (Project.t -> 'a -> 'a) -> 'a -> 'a =
         fun f acc -> Project.fold_on_projects (fun acc p -> f p acc) acc
       method mem _p = true (* impossible to build an unregistered project *)
-     end)
+    end)
 
 let _ =
   Remove_projects.Category.add
@@ -1530,11 +1532,11 @@ let _ =
     (object
       method fold: 'a. (Project.t -> 'a -> 'a) -> 'a -> 'a =
         fun f acc ->
-          Project.fold_on_projects
-            (fun acc p -> if Project.is_current p then acc else f p acc)
-            acc
+        Project.fold_on_projects
+          (fun acc p -> if Project.is_current p then acc else f p acc)
+          acc
       method mem p = not (Project.is_current p)
-     end)
+    end)
 
 let () =
   Cmdline.run_after_configuring_stage
@@ -1560,11 +1562,11 @@ let () = Parameter_customize.is_invisible ()
 module NoType =
   Bool
     (struct
-       let module_name = "NoType"
-       let default = not Cmdline.use_type
-       let option_name = "-no-type"
-       let help = ""
-     end)
+      let module_name = "NoType"
+      let default = not Cmdline.use_type
+      let option_name = "-no-type"
+      let help = ""
+    end)
 
 let () = Parameter_customize.set_negative_option_name ""
 let () = Parameter_customize.set_cmdline_stage Cmdline.Early
@@ -1572,11 +1574,11 @@ let () = Parameter_customize.is_invisible ()
 module NoObj =
   Bool
     (struct
-       let module_name = "NoObj"
-       let default = not Cmdline.use_obj
-       let option_name = "-no-obj"
-       let help = ""
-     end)
+      let module_name = "NoObj"
+      let default = not Cmdline.use_obj
+      let option_name = "-no-obj"
+      let help = ""
+    end)
 
 let () = Parameter_customize.set_group project
 let () = Parameter_customize.set_negative_option_name ""
@@ -1584,11 +1586,11 @@ let () = Parameter_customize.set_cmdline_stage Cmdline.Early
 module Deterministic =
   Bool
     (struct
-       let module_name = "Deterministic"
-       let default = not Cmdline.deterministic
-       let option_name = "-deterministic"
-       let help = ""
-     end)
+      let module_name = "Deterministic"
+      let default = not Cmdline.deterministic
+      let option_name = "-deterministic"
+      let help = ""
+    end)
 
 [@@@warning "+60"]
 
@@ -1605,7 +1607,7 @@ module Check =
     let option_name = "-check"
     let module_name = "Check"
     let help = "performs consistency checks over the Abstract Syntax \
-                        Tree"
+                Tree"
   end)
 
 let () = Parameter_customize.set_group checks
@@ -1621,10 +1623,10 @@ let () = Parameter_customize.set_group checks
 let () = Parameter_customize.set_negative_option_name ""
 module TypeCheck =
   True(struct
-          let module_name = "TypeCheck"
-          let option_name = "-typecheck"
-          let help = "forces typechecking of the source files"
-        end)
+    let module_name = "TypeCheck"
+    let option_name = "-typecheck"
+    let help = "forces typechecking of the source files"
+  end)
 
 (*
 Local Variables:

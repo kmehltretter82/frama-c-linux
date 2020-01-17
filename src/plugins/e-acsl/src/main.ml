@@ -41,9 +41,9 @@ let unmemoized_extend_ast () =
     let share = Options.Share.dir ~error:true () in
     Options.feedback ~level:3 "setting kernel options for E-ACSL.";
     Kernel.CppExtraArgs.add
-      (Format.asprintf " -DE_ACSL_MACHDEP=%s -I%s/memory_model"
+      (Format.asprintf " -DE_ACSL_MACHDEP=%s -I%a/memory_model"
          (Kernel.Machdep.get ())
-         share);
+         Datatype.Filepath.pp_abs share);
     Kernel.Keep_unused_specified_functions.off ();
     if Plugin.is_present "variadic-translation" then
       Dynamic.Parameter.Bool.off "-variadic-translation" ();
@@ -53,7 +53,7 @@ let unmemoized_extend_ast () =
         (File.NeedCPP
            (s,
             ppc
-            ^ Format.asprintf " -I%s" share,
+            ^ Format.asprintf " -I%a" Datatype.Filepath.pp_abs share,
             ppk))
     in
     List.iter register (Misc.library_files ())
