@@ -1,5 +1,0 @@
-void swap(value_type* p, value_type* q) {
-  const value_type save = *p;
-  *p = *q;
-  *q = save;
-}    

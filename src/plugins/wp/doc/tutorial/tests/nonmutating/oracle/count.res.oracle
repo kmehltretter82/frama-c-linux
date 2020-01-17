@@ -1,9 +1,0 @@
-# frama-c -wp -wp-rte [...]
-[kernel] Parsing tests/nonmutating/count.i (no preprocessing)
-[kernel] Parsing count/count.c (with preprocessing)
-[rte] annotating function count
-------------------------------------------------
-Module               #VC   WP   Ergo   Success
-Lemma                  1    -     1      100%
-count                 16    8     8      100%
-------------------------------------------------

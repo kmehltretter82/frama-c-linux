@@ -1,2 +1,0 @@
-CMD: @frama-c@ -add-path /usr/local/lib/frama-c/plugins -add-path . -journal-disable
-OPT: -wp -wp-par 1 -wp-log shell -wp-verbose 0 -wp-rte -wp-report console.report

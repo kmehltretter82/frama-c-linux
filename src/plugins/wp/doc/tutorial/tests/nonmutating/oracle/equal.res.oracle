@@ -1,8 +1,0 @@
-# frama-c -wp [...]
-[kernel] Parsing tests/nonmutating/equal.i (no preprocessing)
-[kernel] Parsing equal/equal.c (with preprocessing)
-[wp] warning: Missing RTE guards
-------------------------------------------------
-Module               #VC   WP   Ergo   Success
-equal                 12    8     4      100%
-------------------------------------------------

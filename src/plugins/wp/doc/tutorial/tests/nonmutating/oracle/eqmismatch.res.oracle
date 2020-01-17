@@ -1,8 +1,0 @@
-# frama-c -wp -wp-rte [...]
-[kernel] Parsing tests/nonmutating/eqmismatch.i (no preprocessing)
-[kernel] Parsing mismatch/equal.c (with preprocessing)
-[rte] annotating function equal
-------------------------------------------------
-Module               #VC   WP   Ergo   Success
-equal                  7    6     1      100%
-------------------------------------------------

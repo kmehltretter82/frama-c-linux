@@ -48,8 +48,3 @@ axiom Pow_one_y : (forall y:real. (pow(1.0, y) = 1.0))
 axiom Pow_x_two : (forall x:real. ((0.0 <  x) -> (pow(x, 2.0) = sqr(x))))
 
 axiom Pow_half : (forall x:real. ((0.0 <  x) -> (pow(x, 0.5) = sqrt(x))))
-
-axiom pow_from_int :
-  (forall x:int. forall y:int. ((0 <  x) -> ((0 <= y) -> (pow(from_int(x),
-  from_int(y)) = from_int(power(x, y))))))
-

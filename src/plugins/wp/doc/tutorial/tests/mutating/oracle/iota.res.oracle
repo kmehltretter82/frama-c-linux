@@ -1,9 +1,0 @@
-# frama-c -wp [...]
-[kernel] Parsing tests/mutating/iota.i (no preprocessing)
-[kernel] Parsing iota/iota.c (with preprocessing)
-[wp] warning: Missing RTE guards
-[rte] annotating function iota
-------------------------------------------------
-Module               #VC   WP   Ergo   Success
-iota                  16    5    11      100%
-------------------------------------------------

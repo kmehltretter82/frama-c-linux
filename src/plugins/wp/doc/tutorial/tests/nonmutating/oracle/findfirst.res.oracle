@@ -1,8 +1,0 @@
-# frama-c -wp -wp-rte [...]
-[kernel] Parsing tests/nonmutating/findfirst.i (no preprocessing)
-[kernel] Parsing findfirst/findfirst.c (with preprocessing)
-[rte] annotating function find_first_of
-------------------------------------------------
-Module               #VC   WP   Ergo   Success
-find_first_of         26   16    10      100%
-------------------------------------------------
