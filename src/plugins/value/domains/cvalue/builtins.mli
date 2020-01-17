@@ -35,16 +35,16 @@ val register_builtin:
   string -> ?replace:string ->
   ?typ:Db.Value.builtin_type -> Db.Value.builtin -> unit
 
+(** Prepares the builtins to be used for an analysis. Must be called at the
+    beginning of each Eva analysis. Warns about builtins of incompatible types,
+    builtins without an available specification and builtins overriding function
+    definitions. *)
+val prepare_builtins: unit -> unit
+
 (** [clobbered_set_from_ret state ret] can be used for functions that return
     a pointer to where they have written some data. It returns all the bases
     of [ret] whose contents may contain local variables. *)
 val clobbered_set_from_ret: Cvalue.Model.t -> Cvalue.V.t -> Base.SetLattice.t
-
-(** Emits warnings for each function definition that will be overridden by an
-    Eva built-in.
-    Does not include definitions in the Frama-C stdlib.
-    @since Phosphorus-20170501-beta1 *)
-val warn_definitions_overridden_by_builtins: unit -> unit
 
 type builtin
 type call = (Precise_locs.precise_location, Cvalue.V.t) Eval.call

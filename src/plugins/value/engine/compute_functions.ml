@@ -76,8 +76,7 @@ let pre_analysis () =
   Split_return.pretty_strategies ();
   generate_specs ();
   Widen.precompute_widen_hints ();
-  if Value_parameters.WarnBuiltinOverride.get () then
-    Builtins.warn_definitions_overridden_by_builtins ();
+  Builtins.prepare_builtins ();
   Value_perf.reset ();
   (* We may be resuming Value from a previously crashed analysis. Clear
      degeneration states *)

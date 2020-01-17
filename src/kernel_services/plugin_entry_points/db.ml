@@ -618,7 +618,7 @@ module Value = struct
 
   (** Type for a Value builtin function *)
 
-  type builtin_type = typ * typ list
+  type builtin_type = unit -> typ * typ list
   type builtin =
       state ->
       (Cil_types.exp * Cvalue.V.t * Cvalue.V_Offsetmap.t) list ->

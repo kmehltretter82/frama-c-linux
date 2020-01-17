@@ -71,7 +71,7 @@ let arity2 fk caml_fun state actuals =
 let register_arity2 c_name fk f =
   let name = "Frama_C_" ^ c_name in
   let t = Cil_types.TFloat (fk, []) in
-  let typ = t, [t; t] in
+  let typ () = t, [t; t] in
   Builtins.register_builtin name ~replace:c_name ~typ (arity2 fk f)
 
 let () =
@@ -114,7 +114,7 @@ let arity1 name fk caml_fun state actuals =
 let register_arity1 c_name fk f =
   let name = "Frama_C_" ^ c_name in
   let t = Cil_types.TFloat (fk, []) in
-  let typ = t, [t] in
+  let typ () = t, [t] in
   Builtins.register_builtin name ~replace:c_name ~typ (arity1 name fk f)
 
 let () =

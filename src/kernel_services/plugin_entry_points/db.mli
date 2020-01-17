@@ -179,7 +179,7 @@ module Value : sig
 
   (* Type of a C function interpreted by a builtin:
      return type and list of argument types. *)
-  type builtin_type = typ * typ list
+  type builtin_type = unit -> typ * typ list
 
   (** Type for an Eva builtin function *)
   type builtin =
