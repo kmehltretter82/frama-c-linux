@@ -1490,7 +1490,20 @@ let do_diff = function
         let diff_string = !do_diffs ^ " " ^ oracle_file ^ " " ^ log_file in
         ignore (launch diff_string)
   | Target_error execnow ->
-      lock_printf "Custom command failed: %s@\n" execnow.ex_cmd
+    lock_printf "Custom command failed: %s@\n" execnow.ex_cmd;
+    let print_redirected out redir_str =
+      try
+        ignore (Str.search_forward (Str.regexp redir_str) execnow.ex_cmd 0);
+        let file = Str.matched_group 1 execnow.ex_cmd in
+        lock_printf "%s redirected to %s:@\n" out file;
+        if not (Sys.file_exists file) then
+          lock_printf "error: file does not exist: %s:@\n" file
+        else
+          ignore (launch ("cat " ^ file));
+      with Not_found -> ()
+    in
+    print_redirected "stdout" "[^2]> ?\\([-a-zA-Z0-9_/.]+\\)";
+    print_redirected "stderr" "2> ?\\([-a-zA-Z0-9_/.]+\\)";
   | Log_error(dir, file) ->
       let result_file =
         Filename.sanitize (SubDir.make_result_file dir file)
