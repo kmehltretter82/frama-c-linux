@@ -494,13 +494,13 @@
   function strlen: precondition 'valid_string_s' got status valid.
 [eva] Recording results for strlen
 [eva] Done for function strlen
-[eva] share/libc/string.h:405: 
+[eva] share/libc/string.h:407: 
   function strcat: postcondition 'sum_of_lengths' got status valid.
-[eva] share/libc/string.h:408: 
-  function strcat: postcondition 'initialization,dest' got status valid.
-[eva] share/libc/string.h:409: 
-  function strcat: postcondition 'dest_null_terminated' got status valid.
 [eva] share/libc/string.h:410: 
+  function strcat: postcondition 'initialization,dest' got status valid.
+[eva] share/libc/string.h:411: 
+  function strcat: postcondition 'dest_null_terminated' got status valid.
+[eva] share/libc/string.h:412: 
   function strcat: postcondition 'result_ptr' got status valid.
 [eva] Recording results for strcat
 [eva] Done for function strcat
@@ -598,7 +598,7 @@
 [eva] computing for function strncpy <- test_strncpy <- main.
   Called from tests/libc/string_c.c:154.
 [eva] tests/libc/string_c.c:154: 
-  function strncpy: precondition 'valid_string_src' got status valid.
+  function strncpy: precondition 'valid_nstring_src' got status valid.
 [eva] tests/libc/string_c.c:154: 
   function strncpy: precondition 'room_nstring' got status valid.
 [eva] tests/libc/string_c.c:154: 
@@ -618,7 +618,7 @@
 [eva] computing for function strncpy <- test_strncpy <- main.
   Called from tests/libc/string_c.c:157.
 [eva] tests/libc/string_c.c:157: 
-  function strncpy: precondition 'valid_string_src' got status valid.
+  function strncpy: precondition 'valid_nstring_src' got status valid.
 [eva] tests/libc/string_c.c:157: 
   function strncpy: precondition 'room_nstring' got status valid.
 [eva] tests/libc/string_c.c:157: 
@@ -633,7 +633,7 @@
 [eva] computing for function strncpy <- test_strncpy <- main.
   Called from tests/libc/string_c.c:159.
 [eva] tests/libc/string_c.c:159: 
-  function strncpy: precondition 'valid_string_src' got status valid.
+  function strncpy: precondition 'valid_nstring_src' got status valid.
 [eva] tests/libc/string_c.c:159: 
   function strncpy: precondition 'room_nstring' got status valid.
 [eva] tests/libc/string_c.c:159: 
@@ -644,7 +644,7 @@
 [eva] computing for function strncpy <- test_strncpy <- main.
   Called from tests/libc/string_c.c:161.
 [eva] tests/libc/string_c.c:161: 
-  function strncpy: precondition 'valid_string_src' got status valid.
+  function strncpy: precondition 'valid_nstring_src' got status valid.
 [eva] tests/libc/string_c.c:161: 
   function strncpy: precondition 'room_nstring' got status valid.
 [eva] tests/libc/string_c.c:161: 

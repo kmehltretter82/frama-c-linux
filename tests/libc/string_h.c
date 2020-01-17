@@ -107,6 +107,33 @@ void test_strtok_r() {
   }
 }
 
+void test_strncpy() {
+  char src[] = { 'a', 'b', 'c' };
+  char dst[3];
+  strncpy(dst,src,3);
+  char src2[3];
+  src2[0] = 'a';
+  src2[1] = 'b';
+  if (nondet) {
+    strncpy(dst,src2,3);
+    //@ assert unreachable: \false;
+  }
+}
+
+void test_strlcpy() {
+  char buf[16];
+  char buf2[32];
+  size_t r1 = strlcpy(buf, "longer than buffer", 16);
+  size_t r2 = strlcpy(buf2, "short", 16);
+  size_t r3 = strlcat(buf2, buf, 32);
+  char src[] = { 'a', 'b', 'c' };
+  char dst[3];
+  if (nondet) {
+    strlcpy(dst,src,3);
+    //@ assert unreachable: \false;
+  }
+}
+
 int main(int argc, char **argv)
 {
   test_strcmp();
@@ -118,12 +145,9 @@ int main(int argc, char **argv)
   test_strtok_r();
   char *a = strdup("bla"); // unsound; specification currently unsupported
   char *b = strndup("bla", 2); // unsound; specification currently unsupported
-  char buf[16];
-  char buf2[32];
-  size_t r1 = strlcpy(buf, "longer than buffer", 16);
-  size_t r2 = strlcpy(buf2, "short", 16);
-  size_t r3 = strlcat(buf2, buf, 32);
   char *strsig = strsignal(1);
   //@ assert valid_read_string(strsig);
+  test_strncpy();
+  test_strlcpy();
   return 0;
 }

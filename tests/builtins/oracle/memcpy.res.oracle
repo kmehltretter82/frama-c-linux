@@ -1575,11 +1575,11 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition 'bounded_result'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/string.h, line 380)
+[ Extern  ] Assigns (file share/libc/string.h, line 382)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 380)
+[ Extern  ] Froms (file share/libc/string.h, line 382)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 381)
+[ Extern  ] Froms (file share/libc/string.h, line 383)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1592,11 +1592,11 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition 'points_to_end'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/string.h, line 392)
+[ Extern  ] Assigns (file share/libc/string.h, line 394)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 392)
+[ Extern  ] Froms (file share/libc/string.h, line 394)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 393)
+[ Extern  ] Froms (file share/libc/string.h, line 395)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1613,11 +1613,11 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition 'result_ptr'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/string.h, line 403)
+[ Extern  ] Assigns (file share/libc/string.h, line 405)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 403)
+[ Extern  ] Froms (file share/libc/string.h, line 405)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 406)
+[ Extern  ] Froms (file share/libc/string.h, line 408)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1632,23 +1632,23 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition for 'partial' 'sum_of_bounded_lengths'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'complete' (file share/libc/string.h, line 423)
+[ Extern  ] Assigns for 'complete' (file share/libc/string.h, line 425)
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/string.h, line 417)
+[ Extern  ] Assigns (file share/libc/string.h, line 419)
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'partial' (file share/libc/string.h, line 431)
-            Unverifiable but considered Valid.
-[ Extern  ] Froms for 'complete' (file share/libc/string.h, line 423)
+[ Extern  ] Assigns for 'partial' (file share/libc/string.h, line 433)
             Unverifiable but considered Valid.
 [ Extern  ] Froms for 'complete' (file share/libc/string.h, line 425)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 417)
+[ Extern  ] Froms for 'complete' (file share/libc/string.h, line 427)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 418)
+[ Extern  ] Froms (file share/libc/string.h, line 419)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'partial' (file share/libc/string.h, line 431)
+[ Extern  ] Froms (file share/libc/string.h, line 420)
             Unverifiable but considered Valid.
 [ Extern  ] Froms for 'partial' (file share/libc/string.h, line 433)
+            Unverifiable but considered Valid.
+[ Extern  ] Froms for 'partial' (file share/libc/string.h, line 435)
             Unverifiable but considered Valid.
 [  Valid  ] Behavior 'complete'
             by Frama-C kernel.
@@ -1663,11 +1663,11 @@
 
 [ Extern  ] Post-condition 'bounded_result'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/string.h, line 443)
+[ Extern  ] Assigns (file share/libc/string.h, line 445)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 443)
+[ Extern  ] Froms (file share/libc/string.h, line 445)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 444)
+[ Extern  ] Froms (file share/libc/string.h, line 446)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1676,11 +1676,11 @@
 --- Properties of Function 'strxfrm'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/string.h, line 452)
+[ Extern  ] Assigns (file share/libc/string.h, line 454)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 452)
+[ Extern  ] Froms (file share/libc/string.h, line 454)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 453)
+[ Extern  ] Froms (file share/libc/string.h, line 455)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1695,19 +1695,19 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition for 'no_allocation' 'result_null'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'allocation' (file share/libc/string.h, line 465)
+[ Extern  ] Assigns for 'allocation' (file share/libc/string.h, line 467)
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
 [ Extern  ] Assigns for 'no_allocation' nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'allocation' (file share/libc/string.h, line 465)
+[ Extern  ] Froms for 'allocation' (file share/libc/string.h, line 467)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'allocation' (file share/libc/string.h, line 466)
+[ Extern  ] Froms for 'allocation' (file share/libc/string.h, line 468)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 462)
+[ Extern  ] Froms (file share/libc/string.h, line 464)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'no_allocation' (file share/libc/string.h, line 472)
+[ Extern  ] Froms for 'no_allocation' (file share/libc/string.h, line 474)
             Unverifiable but considered Valid.
 [  Valid  ] Behavior 'allocation'
             by Frama-C kernel.
@@ -1715,7 +1715,7 @@
             by Frama-C kernel.
 [  Valid  ] Behavior 'no_allocation'
             by Frama-C kernel.
-[ Extern  ] Frees/Allocates nothing/(file share/libc/string.h, line 461) 
+[ Extern  ] Frees/Allocates nothing/(file share/libc/string.h, line 463) 
             Unverifiable but considered Valid.
 [ Extern  ] Frees/Allocates for 'no_allocation' nothing/nothing 
             Unverifiable but considered Valid.
@@ -1730,19 +1730,19 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition for 'no_allocation' 'result_null'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'allocation' (file share/libc/string.h, line 483)
+[ Extern  ] Assigns for 'allocation' (file share/libc/string.h, line 486)
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
 [ Extern  ] Assigns for 'no_allocation' nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'allocation' (file share/libc/string.h, line 483)
+[ Extern  ] Froms for 'allocation' (file share/libc/string.h, line 486)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'allocation' (file share/libc/string.h, line 484)
+[ Extern  ] Froms for 'allocation' (file share/libc/string.h, line 487)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 479)
+[ Extern  ] Froms (file share/libc/string.h, line 482)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'no_allocation' (file share/libc/string.h, line 493)
+[ Extern  ] Froms for 'no_allocation' (file share/libc/string.h, line 496)
             Unverifiable but considered Valid.
 [  Valid  ] Behavior 'allocation'
             by Frama-C kernel.
@@ -1750,7 +1750,7 @@
             by Frama-C kernel.
 [  Valid  ] Behavior 'no_allocation'
             by Frama-C kernel.
-[ Extern  ] Frees/Allocates nothing/(file share/libc/string.h, line 478) 
+[ Extern  ] Frees/Allocates nothing/(file share/libc/string.h, line 481) 
             Unverifiable but considered Valid.
 [ Extern  ] Frees/Allocates for 'no_allocation' nothing/nothing 
             Unverifiable but considered Valid.
@@ -1767,7 +1767,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 509)
+[ Extern  ] Froms (file share/libc/string.h, line 512)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.

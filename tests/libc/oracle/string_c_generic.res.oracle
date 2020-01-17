@@ -155,7 +155,7 @@
 [eva] computing for function strncpy <- main.
   Called from tests/libc/string_c_generic.c:73.
 [eva] tests/libc/string_c_generic.c:73: 
-  function strncpy: precondition 'valid_string_src' got status valid.
+  function strncpy: precondition 'valid_nstring_src' got status valid.
 [eva] tests/libc/string_c_generic.c:73: 
   function strncpy: precondition 'room_nstring' got status valid.
 [eva] tests/libc/string_c_generic.c:73: 
@@ -194,7 +194,7 @@
 [eva] computing for function strncpy <- main.
   Called from tests/libc/string_c_generic.c:78.
 [eva] tests/libc/string_c_generic.c:78: 
-  function strncpy: precondition 'valid_string_src' got status valid.
+  function strncpy: precondition 'valid_nstring_src' got status valid.
 [eva] tests/libc/string_c_generic.c:78: 
   function strncpy: precondition 'room_nstring' got status valid.
 [eva] tests/libc/string_c_generic.c:78: 
@@ -252,9 +252,9 @@
   function strlen: postcondition 'acsl_c_equiv' got status valid.
 [eva] Recording results for strlen
 [eva] Done for function strlen
-[eva] share/libc/string.h:419: 
+[eva] share/libc/string.h:421: 
   function strncat: postcondition 'result_ptr' got status valid.
-[eva] share/libc/string.h:434: 
+[eva] share/libc/string.h:436: 
   function strncat, behavior partial: postcondition 'sum_of_bounded_lengths' got status valid.
 [eva] Recording results for strncat
 [eva] Done for function strncat

@@ -354,7 +354,7 @@ extern char *strerror(int errnum);
 extern char *strcpy(char *restrict dest, const char *restrict src);
 
 /*@ 
-  @ requires valid_string_src: valid_read_string(src);
+  @ requires valid_nstring_src: valid_read_nstring(src, n);
   @ requires room_nstring: \valid(dest+(0 .. n-1));
   @ requires separation:
   @   \separated(dest+(0..n-1), src+(0..n-1));
@@ -372,7 +372,9 @@ extern char *strcpy(char *restrict dest, const char *restrict src);
 extern char *strncpy(char *restrict dest,
 		     const char *restrict src, size_t n);
 
-/*@ // Non-POSIX, but often present
+/*@ // Non-POSIX, but often present; note that, unlike strncpy, this has no
+  @ // "official specification" other than manpages. They state that src is
+  @ // a *string*, therefore its precondition is stricter than that of strncpy.
   @ requires valid_string_src: valid_read_string(src);
   @ requires room_nstring: \valid(dest+(0..n-1));
   @ requires separation:
@@ -475,7 +477,8 @@ extern size_t strxfrm (char *restrict dest,
   @*/
 extern char *strdup (const char *s);
 
-/*@ allocates \result;
+/*@ requires valid_string_s: valid_read_string(s);
+  @ allocates \result;
   @ assigns \result \from indirect:s[0..strlen(s)], indirect:n,
   @                       indirect:__fc_heap_status;
   @ behavior allocation:
