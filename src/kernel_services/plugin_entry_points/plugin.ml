@@ -381,7 +381,7 @@ struct
 
     let file ?error f =
       let dir = dir ?error () in
-      Datatype.Filepath.of_string ((dir :> string) ^ "/" ^ f)
+      Datatype.Filepath.concat dir ("/" ^ f)
 
   end
 

@@ -1944,6 +1944,7 @@ module Filepath = struct
   let dummy = Filepath.Normalized.unknown
   let of_string ?existence ?base_name s =
     Filepath.Normalized.of_string ?existence ?base_name s
+  let concat ?existence t s = Filepath.Normalized.concat ?existence t s
   let pp_abs = Filepath.Normalized.pp_abs
 end
 

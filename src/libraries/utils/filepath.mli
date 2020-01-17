@@ -103,6 +103,10 @@ module Normalized: sig
   *)
   val of_string: ?existence:existence -> ?base_name:string -> string -> t
 
+  (** @return the normalized path resulting from the concatenation of the given
+      path and string. *)
+  val concat: ?existence:existence -> t -> string -> t
+
   (** [to_pretty_string p] returns [p] prettified,
       that is, a relative path-like string.
       Note that this prettified string may contain symbolic dirs and is thus
