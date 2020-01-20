@@ -1,7 +1,7 @@
 /* run.config*
-   STDOPT: #"-eva-malloc-functions alloc,Frama_C_malloc_by_stack -eva-mlevel 0"
+   STDOPT: #"-eva-malloc-functions alloc -eva-mlevel 0"
 */
-
+#include <stdlib.h>
 #define N 2000
 
 int t[N];
@@ -12,7 +12,7 @@ void f() {
 }
 
 int *alloc() {
-  return Frama_C_malloc_by_stack(4);
+  return malloc(4);
 }
 
 int *k() {

@@ -149,8 +149,10 @@ let prepare_builtin kf builtin_name builtin expected_typ =
   then
     Value_parameters.warning ~source ~once:true
       ~wkey:Value_parameters.wkey_builtins_override
-      "The builtin %s will not be used for function %a of incompatible type."
+      "The builtin %s will not be used for function %a of incompatible type.@ \
+       (got: %a)."
       builtin_name Kernel_function.pretty kf
+      Printer.pp_typ (Kernel_function.get_type kf)
   else
     match find_builtin_specification kf with
     | None ->

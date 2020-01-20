@@ -1,9 +1,9 @@
 /* run.config*
    STDOPT: +"-slevel 30 -eva-slevel-merge-after-loop @all -eva-malloc-functions malloc -eva-memexec"
 */
-
+#include <stddef.h>
 //@ assigns \result \from \nothing;
-void *malloc(unsigned long size);
+void *malloc(size_t size);
 
 //@ assigns \nothing; frees p;
 void free(void *p);

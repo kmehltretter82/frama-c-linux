@@ -1,12 +1,12 @@
 /* run.config*
    OPT: -eva @EVA_CONFIG@ -eva-memexec -deps -inout -eva-mlevel 0
 */
+#include <stddef.h>
+//@ assigns \result;
+void *Frama_C_malloc_fresh(size_t n);
 
 //@ assigns \result;
-void *Frama_C_malloc_fresh(unsigned long n);
-
-//@ assigns \result;
-void *Frama_C_malloc_fresh_weak(unsigned long n);
+void *Frama_C_malloc_fresh_weak(size_t n);
 
 
 void f(int *p, int i) {

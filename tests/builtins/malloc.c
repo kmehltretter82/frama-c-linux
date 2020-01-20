@@ -1,9 +1,9 @@
 /* run.config*
    OPT: -eva @EVA_CONFIG@ -slevel 10 -eva-mlevel 0
 */
-
-void *Frama_C_malloc_by_stack(unsigned long i);
-void *Frama_C_malloc_fresh(unsigned long i);
+#include <stddef.h>
+void *Frama_C_malloc_by_stack(size_t i);
+void *Frama_C_malloc_fresh(size_t i);
 
 void main(int c) {
   int x;
