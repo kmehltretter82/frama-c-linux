@@ -226,7 +226,8 @@ let classify_as_scalar typ =
 
 let need_cast t1 t2 =
   match classify_as_scalar t1, classify_as_scalar t2 with
-  | None, _ | _, None -> false
+  | None, None -> Cil.need_cast t1 t2
+  | None, _ | _, None -> true
   | Some st1, Some st2 ->
     match st1, st2 with
     | (TSInt ir1 | TSPtr ir1), (TSInt ir2 | TSPtr ir2) -> ir1 <> ir2
