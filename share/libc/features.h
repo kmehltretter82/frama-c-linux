@@ -34,7 +34,7 @@
 #define __POP_FC_STDLIB
 #endif
 
-#ifdef __clang__
+#if defined(__clang__) && defined(__cplusplus)
 # define __CLANG_IGNORE_ATTRS_PUSH__ \
 _Pragma("clang diagnostic push") \
 _Pragma("clang diagnostic ignored \"-Wunknown-attributes\"")
