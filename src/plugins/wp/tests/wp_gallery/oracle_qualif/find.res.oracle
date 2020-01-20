@@ -48,14 +48,12 @@
 [wp] Proved goals:   41 / 41
   Qed:              15 
   Alt-Ergo 2.0.0:   26
-[wp] Report in:  'tests/wp_gallery/oracle_qualif/find.0.report.json'
-[wp] Report out: 'tests/wp_gallery/result_qualif/find.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-find                 7      9 (56..80)      16       100%
-find_ptr             6     11 (192..240)    17       100%
-iter_ptr             2      6 (72..96)       8       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  find                      7        9       16       100%
+  find_ptr                  6       11       17       100%
+  iter_ptr                  2        6        8       100%
+------------------------------------------------------------
 [wp] Running WP plugin...
 [rte] annotating function find
 [rte] annotating function find_ptr
@@ -108,11 +106,9 @@ iter_ptr             2      6 (72..96)       8       100%
 [wp] Proved goals:   29 / 44
   Qed:               0 
   Alt-Ergo 2.0.0:   29
-[wp] Report in:  'tests/wp_gallery/oracle_qualif/find.0.report.json'
-[wp] Report out: 'tests/wp_gallery/result_qualif/find.0.report.json'
--------------------------------------------------------------
-Functions           WP     Alt-Ergo        Total   Success
-find                 7     11 (56..80)      18       100%
-find_ptr             6     12 (192..240)    18       100%
-iter_ptr             2      6 (72..96)       8       100%
--------------------------------------------------------------
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  find                      7       11       18       100%
+  find_ptr                  6       12       18       100%
+  iter_ptr                  2        6        8       100%
+------------------------------------------------------------
