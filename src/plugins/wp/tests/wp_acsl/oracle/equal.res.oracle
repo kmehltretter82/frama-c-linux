@@ -46,16 +46,19 @@ Prove: EqS2_St(st0_0, st1_0).
 ------------------------------------------------------------
 
 Goal Post-condition (file tests/wp_acsl/equal.i, line 47) in 'with_ptr_and_array_struct':
-Let a = q0_0.F4_Q_qs.
-Let a_1 = q1_0.F4_Q_qs.
-Let a_2 = q0_0.F4_Q_qt.
-Let a_3 = q1_0.F4_Q_qt.
+Let a = q0_0.F4_Q_qp.
+Let a_1 = q1_0.F4_Q_qp.
+Let a_2 = q0_0.F4_Q_qs.
+Let a_3 = q1_0.F4_Q_qs.
+Let a_4 = q0_0.F4_Q_qt.
+Let a_5 = q1_0.F4_Q_qt.
 Assume {
-  Type: IsS4_Q(q0_0) /\ IsS4_Q(q1_0) /\ IsArray1_sint32(a_2) /\
-      IsArray1_sint32(a_3) /\ IsS1_S(a) /\ IsS1_S(a_1).
+  Type: IsS4_Q(q0_0) /\ IsS4_Q(q1_0) /\ IsArray1_sint32(a_4) /\
+      IsArray1_sint32(a_5) /\ IsS1_S(a_2) /\ IsS1_S(a_3).
   (* Goal *)
-  When: ((q1_0.F4_Q_qp) = (q0_0.F4_Q_qp)) /\ EqS1_S(a, a_1) /\
-      EqArray1_int(2, a_2, a_3).
+  When: (a_1 = a) /\ EqS1_S(a_2, a_3) /\ EqArray1_int(2, a_4, a_5).
+  (* Heap *)
+  Have: (region(a.base) <= 0) /\ (region(a_1.base) <= 0).
 }
 Prove: EqS4_Q(q0_0, q1_0).
 
@@ -68,6 +71,9 @@ Goal Post-condition (file tests/wp_acsl/equal.i, line 40) in 'with_ptr_array':
 Assume {
   (* Goal *)
   When: forall i : Z. ((0 <= i) -> ((i <= 4) -> (tp1_0[i] = tp0_0[i]))).
+  (* Heap *)
+  Have: (forall i : Z. region(tp0_0[i].base) <= 0) /\
+      (forall i : Z. region(tp1_0[i].base) <= 0).
 }
 Prove: EqArray1_pointer(5, tp0_0, tp1_0).
 
@@ -77,7 +83,14 @@ Prove: EqArray1_pointer(5, tp0_0, tp1_0).
 ------------------------------------------------------------
 
 Goal Post-condition (file tests/wp_acsl/equal.i, line 34) in 'with_ptr_struct':
-Assume { (* Goal *) When: (sp1_0.F3_Sp_p) = (sp0_0.F3_Sp_p). }
+Let a = sp0_0.F3_Sp_p.
+Let a_1 = sp1_0.F3_Sp_p.
+Assume {
+  (* Goal *)
+  When: a_1 = a.
+  (* Heap *)
+  Have: (region(a.base) <= 0) /\ (region(a_1.base) <= 0).
+}
 Prove: EqS3_Sp(sp0_0, sp1_0).
 
 ------------------------------------------------------------

@@ -205,7 +205,7 @@ Assume {
   (* Goal *)
   When: (0 <= i) /\ (i <= 4).
   (* Heap *)
-  Have: linked(Malloc_0).
+  Have: linked(Malloc_0) /\ (forall i_1 : Z. region(tps_0[i_1].base) <= 0).
   (* Pre-condition *)
   Have: valid_rw(Malloc_0, a_1, 10).
   (* Call 'reset_5' *)
