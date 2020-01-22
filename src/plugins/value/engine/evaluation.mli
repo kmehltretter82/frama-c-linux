@@ -49,11 +49,11 @@ module type S = sig
 
       Optional arguments are:
       - [valuation] is a cache of already computed expressions; empty by default.
-      - [reduction] is true by default, but allows deactivating the backward
-        reduction performed after the forward evaluation.
+      - [reduction] allows the deactivation of the backward reduction performed
+        after the forward evaluation; true by default.
       - [subdivnb] is the maximum number of subdivisions performed on non-linear
-        expressions: if a lvalue occurs several times in an expression, its
-        value can be split up to [subdivnb] times to gain more precision.
+        sub-expressions of [expr]. If a lvalue occurs several times in [expr],
+        its value can be split up to [subdivnb] times to gain more precision.
         Set to the value of the option -eva-subdivide-non-linear by default. *)
   val evaluate :
     ?valuation:Valuation.t -> ?reduction:bool -> ?subdivnb:int ->

@@ -1003,7 +1003,7 @@ module Make
   (* Offset evaluation. Also returns a boolean which is true if the offset
      contains a volatile sub-expression. *)
   and eval_offset context ~reduce_valid_index typ = function
-    | NoOffset               -> return (Loc.no_offset, typ, false)
+    | NoOffset -> return (Loc.no_offset, typ, false)
     | Index (index_expr, remaining) ->
       let typ_pointed, array_size = match Cil.unrollType typ with
         | TArray (t, size, _, _) -> t, size
@@ -1119,7 +1119,7 @@ module Make
     { state; subdivision; remaining_fuel; oracle }
 
   (* Context for a fast forward evaluation with minimal precision:
-     no subdivisions and no call to the oracle. *)
+     no subdivisions and no calls to the oracle. *)
   let low_context state =
     let remaining_fuel = no_fuel in
     let subdivision = 0 in
@@ -1552,6 +1552,9 @@ module Make
     (* Generate [e == 0] *)
     let expr = Value_util.normalize_as_cond expr (not positive) in
     cache := valuation;
+    (* Currently, no subdivisions are performed during the forward evaluation
+       in this function, which is used to evaluate the conditions of if(…)
+       statements in the analysis. *)
     let context = root_context ~subdivnb:0 state in
     root_forward_eval context expr >>=. fun (_v, volatile) ->
     (* Reduce by [(e == 0) == 0] *)
