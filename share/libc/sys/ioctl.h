@@ -116,5 +116,9 @@
 #define SIOCPROTOPRIVATE 0x89E0 /* to 89EF */
 
 
+// Some definitions from ioctls.h
+
+#define FIONREAD 0x541B
+
 
 #endif

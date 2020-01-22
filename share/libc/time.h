@@ -258,8 +258,18 @@ extern int clock_nanosleep(clockid_t clock_id, int flags,
 extern int clock_settime(clockid_t, const struct timespec *);
 extern char *ctime_r(const time_t *timep, char *buf);
 extern struct tm *getdate(const char *string);
+
+/*@
+  requires valid_timer: \valid_read(timer);
+  requires valid_result: \valid(result);
+  assigns \result \from indirect:*timer, result;
+  assigns *result \from indirect:*timer;
+  ensures result_null_or_result:
+    \result == result || \result == \null;
+*/
 extern struct tm *gmtime_r(const time_t *restrict timer,
                            struct tm *restrict result);
+
 extern struct tm *localtime_r(const time_t *restrict timep,
                               struct tm *restrict result);
 

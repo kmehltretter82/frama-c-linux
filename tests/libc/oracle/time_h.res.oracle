@@ -118,11 +118,121 @@
   Called from tests/libc/time_h.c:43.
 [eva] Done for function ctime
 [eva:alarm] tests/libc/time_h.c:44: Warning: assertion got status unknown.
+[eva] computing for function Frama_C_interval <- main.
+  Called from tests/libc/time_h.c:48.
+[eva] using specification for function Frama_C_interval
+[eva] tests/libc/time_h.c:48: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] computing for function Frama_C_interval <- main.
+  Called from tests/libc/time_h.c:48.
+[eva] Done for function Frama_C_interval
+[eva] computing for function Frama_C_interval <- main.
+  Called from tests/libc/time_h.c:49.
+[eva] tests/libc/time_h.c:49: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] computing for function Frama_C_interval <- main.
+  Called from tests/libc/time_h.c:49.
+[eva] Done for function Frama_C_interval
+[eva] computing for function Frama_C_interval <- main.
+  Called from tests/libc/time_h.c:50.
+[eva] tests/libc/time_h.c:50: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] computing for function Frama_C_interval <- main.
+  Called from tests/libc/time_h.c:50.
+[eva] Done for function Frama_C_interval
+[eva] computing for function Frama_C_interval <- main.
+  Called from tests/libc/time_h.c:51.
+[eva] tests/libc/time_h.c:51: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] computing for function Frama_C_interval <- main.
+  Called from tests/libc/time_h.c:51.
+[eva] Done for function Frama_C_interval
+[eva] computing for function Frama_C_interval <- main.
+  Called from tests/libc/time_h.c:52.
+[eva] tests/libc/time_h.c:52: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] computing for function Frama_C_interval <- main.
+  Called from tests/libc/time_h.c:52.
+[eva] Done for function Frama_C_interval
+[eva] computing for function Frama_C_interval <- main.
+  Called from tests/libc/time_h.c:53.
+[eva] tests/libc/time_h.c:53: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] computing for function Frama_C_interval <- main.
+  Called from tests/libc/time_h.c:53.
+[eva] Done for function Frama_C_interval
+[eva] computing for function Frama_C_interval <- main.
+  Called from tests/libc/time_h.c:54.
+[eva] tests/libc/time_h.c:54: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] computing for function Frama_C_interval <- main.
+  Called from tests/libc/time_h.c:54.
+[eva] Done for function Frama_C_interval
+[eva] computing for function Frama_C_interval <- main.
+  Called from tests/libc/time_h.c:55.
+[eva] tests/libc/time_h.c:55: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] computing for function Frama_C_interval <- main.
+  Called from tests/libc/time_h.c:55.
+[eva] Done for function Frama_C_interval
+[eva] computing for function Frama_C_interval <- main.
+  Called from tests/libc/time_h.c:56.
+[eva] tests/libc/time_h.c:56: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] computing for function Frama_C_interval <- main.
+  Called from tests/libc/time_h.c:56.
+[eva] Done for function Frama_C_interval
+[eva] computing for function mktime <- main.
+  Called from tests/libc/time_h.c:58.
+[eva] using specification for function mktime
+[eva] tests/libc/time_h.c:58: 
+  function mktime: precondition 'valid_timeptr' got status valid.
+[eva] Done for function mktime
+[eva] computing for function mktime <- main.
+  Called from tests/libc/time_h.c:58.
+[eva] Done for function mktime
+[eva] computing for function gmtime <- main.
+  Called from tests/libc/time_h.c:60.
+[eva] using specification for function gmtime
+[eva] tests/libc/time_h.c:60: 
+  function gmtime: precondition 'valid_timer' got status valid.
+[eva] Done for function gmtime
+[eva] computing for function gmtime <- main.
+  Called from tests/libc/time_h.c:60.
+[eva] Done for function gmtime
+[eva] computing for function gmtime_r <- main.
+  Called from tests/libc/time_h.c:62.
+[eva] using specification for function gmtime_r
+[eva] tests/libc/time_h.c:62: 
+  function gmtime_r: precondition 'valid_timer' got status valid.
+[eva] tests/libc/time_h.c:62: 
+  function gmtime_r: precondition 'valid_result' got status valid.
+[eva] Done for function gmtime_r
+[eva] computing for function gmtime_r <- main.
+  Called from tests/libc/time_h.c:62.
+[eva] Done for function gmtime_r
+[eva] computing for function gmtime_r <- main.
+  Called from tests/libc/time_h.c:62.
+[eva] Done for function gmtime_r
+[eva] computing for function gmtime_r <- main.
+  Called from tests/libc/time_h.c:62.
+[eva] Done for function gmtime_r
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __fc_ctime[0..25] ∈ [--..--]
+  __fc_time_tm ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
   req.tv_sec ∈ [--..--]
      .tv_nsec ∈ [0..999999999]
   rem ∈ [--..--] or UNINITIALIZED
@@ -131,4 +241,8 @@
       .tv_nsec ∈ [0..999999999] or UNINITIALIZED
   tt ∈ {42}
   time_str ∈ {{ &__fc_ctime[0] }}
+  mytime ∈ [--..--]
+  t ∈ [--..--]
+  res_time ∈ {{ NULL ; &mytime2 }} or UNINITIALIZED
+  mytime2 ∈ [--..--] or UNINITIALIZED
   __retres ∈ {0; 1; 2}
