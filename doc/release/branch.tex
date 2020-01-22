@@ -21,19 +21,23 @@ $\rightarrow$ Repository $\rightarrow$ Protected Branches.
 
 \section{Creating the branch}
 
-Create the branch \texttt{stable/release} where \texttt{release} is the
-element name using \texttt{frama-ci-create-branch} tool:
+Create the branch \texttt{stable/release}, where \texttt{release} is the
+element name, using the \texttt{frama-ci} tool:
 \begin{enumerate}
 \item Install \texttt{frama-ci} tools:
 \begin{shell}
 opam pin add frama-ci-tools git@git.frama-c.com:frama-c/Frama-CI.git
 \end{shell}
-\item Create an API token for gitlab, in your gitlab profile settings
+\item Create an API token for gitlab, in your gitlab profile settings.
 \item Run the command
 \begin{shell}
 frama-ci-create-branch --token=\$TOKEN \
 --new-branch=stable/release --default-branch
 \end{shell}
+This command creates a branch \texttt{stable/release} for frama-c and for
+each plugin tested by the CI — and configures the CI to use these branches
+by default when testing fixes for the release.
+These branches are directly created on the gitlab server.
 \end{enumerate}
 What can be committed in this branch must follow the release schedule,
 and go through Merge-requests. Everything else should go in \texttt{master},
