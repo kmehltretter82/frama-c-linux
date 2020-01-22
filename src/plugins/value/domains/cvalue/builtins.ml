@@ -37,6 +37,13 @@ let table = Hashtbl.create 17
    Filled at the beginning of each analysis by [prepare_builtins]. *)
 let builtins_table = Hashtbl.create 17
 
+module Info = struct
+  let name = "Eva.Builtins.BuiltinsOverride"
+  let dependencies = [ Db.Value.self ]
+end
+(** Set of functions overridden by a builtin. *)
+module BuiltinsOverride = State_builder.Set_ref (Kernel_function.Set) (Info)
+
 let register_builtin name ?replace ?typ f =
   Hashtbl.replace table name (f, typ, None, Always);
   match replace with
@@ -163,9 +170,11 @@ let prepare_builtin kf builtin_name builtin expected_typ =
         Kernel_function.pretty kf
     | Some spec ->
       warn_builtin_override kf source builtin_name;
+      BuiltinsOverride.add kf;
       Hashtbl.replace builtins_table kf (builtin_name, builtin, spec)
 
 let prepare_builtins () =
+  BuiltinsOverride.clear ();
   Hashtbl.clear builtins_table;
   let autobuiltins = Value_parameters.BuiltinsAuto.get () in
   (* Links kernel functions to the registered builtins. *)
@@ -186,6 +195,11 @@ let prepare_builtins () =
        prepare_builtin kf builtin_name f typ)
 
 let find_builtin_override = Hashtbl.find_opt builtins_table
+
+let is_builtin_overridden =
+  if not (BuiltinsOverride.is_computed ())
+  then prepare_builtins ();
+  BuiltinsOverride.mem
 
 (* -------------------------------------------------------------------------- *)
 (* --- Returning a clobbered set                                          --- *)

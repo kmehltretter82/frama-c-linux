@@ -50,9 +50,13 @@ type builtin
 type call = (Precise_locs.precise_location, Cvalue.V.t) Eval.call
 type result = Cvalue.Model.t * Locals_scoping.clobbered_set
 
+(** Is a given function replaced by a builtin? *)
+val is_builtin_overridden: Cil_types.kernel_function -> bool
+
 (** Returns the cvalue builtin for a function, if any. Also returns the name of
     the builtin and the specification of the function; the preconditions must be
-    evaluated along with the builtin. *)
+    evaluated along with the builtin.
+    [prepare_builtins] should have been called before using this function. *)
 val find_builtin_override:
   Cil_types.kernel_function -> (string * builtin * Cil_types.funspec) option
 

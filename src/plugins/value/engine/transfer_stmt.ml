@@ -88,7 +88,7 @@ let is_determinate kf =
   warn_indeterminate kf
   || not (Kernel_function.is_definition kf (* Should we keep this? *)
           || (name >= "Frama_C" && name < "Frama_D")
-          || Builtins.find_builtin_override kf <> None)
+          || Builtins.is_builtin_overridden kf)
 
 (* Used to disambiguate files for Frama_C_dump_each_file directives. *)
 module DumpFileCounters =
