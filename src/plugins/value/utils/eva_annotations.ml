@@ -224,3 +224,30 @@ let add_unroll_annot = Unroll.add
 let add_flow_annot ~emitter ~loc stmt = function
   | FlowSplit annot -> Split.add ~emitter ~loc stmt annot
   | FlowMerge annot -> Merge.add ~emitter ~loc stmt annot
+
+
+module Subdivision = Register (struct
+    type t = int
+    let name = "subdivide"
+    let is_loop_annot = false
+
+    let parse ~typing_context:_ = function
+      | [{lexpr_node = PLconstant (IntConstant i)}] ->
+        let i =
+          try int_of_string i
+          with Failure _ -> raise Parse_error
+        in
+        if i < 0 then raise Parse_error;
+        i
+      | _ -> raise Parse_error
+
+    let export i = Ext_terms [Logic_const.tinteger i]
+    let import = function
+      | Ext_terms [{term_node = TConst (Integer (i, _))}] -> Integer.to_int i
+      | _ -> assert false
+
+    let print fmt i = Format.pp_print_int fmt i
+  end)
+
+let get_subdivision_annot = Subdivision.get
+let add_subdivision_annot = Subdivision.add

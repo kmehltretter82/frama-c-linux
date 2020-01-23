@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 open Cil_types
-open Partitioning_annots
+open Eva_annotations
 
 module G = struct
   type t = kernel_function

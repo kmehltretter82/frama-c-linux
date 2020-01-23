@@ -90,6 +90,12 @@ let is_determinate kf =
           || (name >= "Frama_C" && name < "Frama_D")
           || Builtins.is_builtin_overridden kf)
 
+let subdivide_stmt = Value_util.get_subdivision
+
+let subdivide_kinstr = function
+  | Kglobal -> Value_parameters.LinearLevel.get ()
+  | Kstmt stmt -> subdivide_stmt stmt
+
 (* Used to disambiguate files for Frama_C_dump_each_file directives. *)
 module DumpFileCounters =
   State_builder.Hashtbl (Datatype.String.Hashtbl) (Datatype.Int)
@@ -150,18 +156,18 @@ module Make (Abstract: Abstractions.Eva) = struct
   (* The three functions below call evaluation functions and notify the user
      if they lead to bottom without alarms. *)
 
-  let evaluate_and_check ?valuation state expr =
-    let res = Eval.evaluate ?valuation state expr in
+  let evaluate_and_check ?valuation ~subdivnb state expr =
+    let res = Eval.evaluate ?valuation ~subdivnb state expr in
     report_unreachability state res "the expression %a" Printer.pp_exp expr;
     res
 
-  let lvaluate_and_check ~for_writing ?valuation state lval =
-    let res = Eval.lvaluate ~for_writing ?valuation state lval in
+  let lvaluate_and_check ?valuation ~subdivnb ~for_writing state lval =
+    let res = Eval.lvaluate ?valuation ~subdivnb ~for_writing state lval in
     report_unreachability state res "the lvalue %a" Printer.pp_lval lval;
     res
 
-  let copy_lvalue_and_check ?valuation state lval =
-    let res = Eval.copy_lvalue ?valuation state lval in
+  let copy_lvalue_and_check ?valuation ~subdivnb state lval =
+    let res = Eval.copy_lvalue ?valuation ~subdivnb state lval in
     report_unreachability state res "the copy of %a" Printer.pp_lval lval;
     res
 
@@ -170,17 +176,18 @@ module Make (Abstract: Abstractions.Eva) = struct
   (* ------------------------------------------------------------------------ *)
 
   (* Default assignment: evaluates the right expression. *)
-  let assign_by_eval state valuation expr =
-    evaluate_and_check ~valuation state expr >>=: fun (valuation, value) ->
+  let assign_by_eval ~subdivnb state valuation expr =
+    evaluate_and_check ~valuation ~subdivnb state expr
+    >>=: fun (valuation, value) ->
     Assign value, valuation
 
   (* Assignment by copying the value of a right lvalue. *)
-  let assign_by_copy state valuation lval lloc ltyp =
+  let assign_by_copy ~subdivnb state valuation lval lloc ltyp =
     (* This code about garbled mix is specific to the Cvalue domain.
        Unfortunately, the current API for abstract_domain does not permit
        distinguishing between an evaluation or a copy. *)
     Locations.Location_Bytes.do_track_garbled_mix false;
-    let r = copy_lvalue_and_check ~valuation state lval in
+    let r = copy_lvalue_and_check ~valuation ~subdivnb state lval in
     Locations.Location_Bytes.do_track_garbled_mix true;
     r >>=: fun (valuation, value) ->
     Copy ({lval; lloc; ltyp}, value), valuation
@@ -223,8 +230,9 @@ module Make (Abstract: Abstractions.Eva) = struct
   (* Assignment. *)
   let assign_lv_or_ret ~is_ret state kinstr lval expr =
     let for_writing = for_writing kinstr in
-    let eval, alarms_loc = lvaluate_and_check ~for_writing state lval in
-    Alarmset.emit kinstr alarms_loc;
+    let subdivnb = subdivide_kinstr kinstr in
+    let eval, alarms = lvaluate_and_check ~for_writing ~subdivnb state lval in
+    Alarmset.emit kinstr alarms;
     match eval with
     | `Bottom ->
       Kernel.warning ~current:true ~once:true
@@ -241,17 +249,20 @@ module Make (Abstract: Abstractions.Eva) = struct
         else None
       in
       let eval, alarms = match lval_copy with
-        | None -> assert (not is_ret); assign_by_eval state valuation expr
+        | None ->
+          assert (not is_ret);
+          assign_by_eval ~subdivnb state valuation expr
         | Some right_lval ->
+          let for_writing = false in
           (* In case of a copy, checks that the left and right locations are
              compatible and that they do not overlap. *)
-          lvaluate_and_check ~for_writing:false ~valuation state right_lval
-          >>= fun (valuation, right_loc, right_typ) ->
-          check_overlap ltyp (lval, lloc) (right_lval, right_loc)
-          >>= fun (lloc, right_loc) ->
-          if are_compatible lloc right_loc
-          then assign_by_copy state valuation right_lval right_loc right_typ
-          else assign_by_eval state valuation expr
+          lvaluate_and_check ~for_writing ~subdivnb ~valuation state right_lval
+          >>= fun (valuation, rloc, rtyp) ->
+          check_overlap ltyp (lval, lloc) (right_lval, rloc)
+          >>= fun (lloc, rloc) ->
+          if are_compatible lloc rloc
+          then assign_by_copy ~subdivnb state valuation right_lval rloc rtyp
+          else assign_by_eval ~subdivnb state valuation expr
       in
       if is_ret then assert (Alarmset.is_empty alarms);
       Alarmset.emit kinstr alarms;
@@ -387,7 +398,7 @@ module Make (Abstract: Abstractions.Eva) = struct
          If the call has copied the argument, it may be uninitialized. Thus,
          we also avoid the backward propagation if the formal is uninitialized
          here. This should not happen in the Assign case above. *)
-      fst (Eval.copy_lvalue ~valuation:empty state lval)
+      fst (Eval.copy_lvalue ~valuation:empty ~subdivnb:0 state lval)
       >>- fun (_valuation, post_value) ->
       if
         Bottom.is_included Value.is_included pre_value post_value.v
@@ -491,10 +502,10 @@ module Make (Abstract: Abstractions.Eva) = struct
      evaluates the call argument [expr] in the state [state] and the valuation
      [valuation]. Returns the value assigned, and the updated valuation.
      TODO: share more code with [assign]. *)
-  let evaluate_actual ~determinate valuation state expr =
+  let evaluate_actual ~subdivnb ~determinate valuation state expr =
     match expr.enode with
     | Lval lv ->
-      lvaluate_and_check ~for_writing:false ~valuation state lv
+      lvaluate_and_check ~for_writing:false ~subdivnb ~valuation state lv
       >>= fun (valuation, loc, typ) ->
       if Int_Base.is_top (Location.size loc)
       then
@@ -502,18 +513,17 @@ module Make (Abstract: Abstractions.Eva) = struct
           "Function argument %a has unknown size. Aborting"
           Printer.pp_exp expr;
       if determinate && Cil.isArithmeticOrPointerType (Cil.typeOfLval lv)
-      then assign_by_eval state valuation expr
-      else assign_by_copy state valuation lv loc typ
-    | _ ->
-      assign_by_eval state valuation expr
+      then assign_by_eval ~subdivnb state valuation expr
+      else assign_by_copy ~subdivnb state valuation lv loc typ
+    | _ -> assign_by_eval ~subdivnb state valuation expr
 
   (* Evaluates the list of the actual arguments of a call. Returns the list
      of each argument expression associated to its assigned value, and the
      valuation resulting of the evaluations. *)
-  let compute_actuals determinate valuation state arguments =
+  let compute_actuals ~subdivnb ~determinate valuation state arguments =
     let process expr acc =
       acc >>= fun (args, valuation) ->
-      evaluate_actual ~determinate valuation state expr >>=:
+      evaluate_actual ~subdivnb ~determinate valuation state expr >>=:
       fun (assigned, valuation) ->
       (expr, assigned) :: args, valuation
     in
@@ -548,10 +558,10 @@ module Make (Abstract: Abstractions.Eva) = struct
     in
     {kf; arguments; rest; return; recursive}
 
-  let make_call kf arguments valuation state =
+  let make_call ~subdivnb kf arguments valuation state =
     (* Evaluate the arguments of the call. *)
     let determinate = is_determinate kf in
-    compute_actuals determinate valuation state arguments
+    compute_actuals ~subdivnb ~determinate valuation state arguments
     >>=: fun (args, valuation) ->
     let call = create_call kf args in
     call, valuation
@@ -589,10 +599,10 @@ module Make (Abstract: Abstractions.Eva) = struct
     else fun _ _ _ _ -> ()
 
   (* Frama_C_domain_show_each functions. *)
-  let domain_show_each name arguments state =
+  let domain_show_each ~subdivnb name arguments state =
     let pretty fmt expr =
       let pp fmt  =
-        match fst (Eval.evaluate state expr) with
+        match fst (Eval.evaluate ~subdivnb state expr) with
         | `Bottom -> Format.fprintf fmt "%s" (Unicode.bottom_string ())
         | `Value (valuation, _value) -> show_expr valuation state fmt expr
       in
@@ -607,15 +617,15 @@ module Make (Abstract: Abstractions.Eva) = struct
   let show_offsm =
     match Domain.get_cvalue, Location.get Main_locations.PLoc.key with
     | None, _ | _, None ->
-      fun fmt _ _ -> Format.fprintf fmt "%s" (Unicode.top_string ())
+      fun fmt _ _ _ -> Format.fprintf fmt "%s" (Unicode.top_string ())
     | Some get_cvalue, Some get_ploc ->
-      fun fmt expr state ->
+      fun fmt subdivnb expr state ->
         match expr.enode with
         | Lval lval ->
           begin
             try
               let offsm =
-                fst (Eval.lvaluate ~for_writing:false state lval)
+                fst (Eval.lvaluate ~for_writing:false ~subdivnb state lval)
                 >>- fun (_, loc, _) ->
                 Eval_op.offsetmap_of_loc (get_ploc loc) (get_cvalue state)
               in
@@ -629,28 +639,30 @@ module Make (Abstract: Abstractions.Eva) = struct
   (* For scalar expressions, prints the cvalue component of their values. *)
   let show_value =
     match Value.get Main_values.CVal.key with
-    | None -> fun fmt _ _ -> Format.fprintf fmt "%s" (Unicode.top_string ())
+    | None -> fun fmt _ _ _ -> Format.fprintf fmt "%s" (Unicode.top_string ())
     | Some get_cval ->
-      fun fmt expr state ->
-        let value = fst (Eval.evaluate state expr) >>-: snd >>-: get_cval in
+      fun fmt subdivnb expr state ->
+        let value =
+          fst (Eval.evaluate ~subdivnb state expr) >>-: snd >>-: get_cval
+        in
         (Bottom.pretty Cvalue.V.pretty) fmt value
 
-  let pretty_arguments state arguments =
+  let pretty_arguments ~subdivnb state arguments =
     let pretty fmt expr =
       if Cil.isArithmeticOrPointerType (Cil.typeOf expr)
-      then show_value fmt expr state
-      else show_offsm fmt expr state
+      then show_value fmt subdivnb expr state
+      else show_offsm fmt subdivnb expr state
     in
     Pretty_utils.pp_list ~pre:"@[<hv>" ~sep:",@ " ~suf:"@]" pretty arguments
 
   (* Frama_C_show_each functions. *)
-  let show_each name arguments state =
+  let show_each ~subdivnb name arguments state =
     Value_parameters.result ~current:true
       "@[<hv>%s:@ %a@]%t"
-      name (pretty_arguments state) arguments Value_util.pp_callstack
+      name (pretty_arguments ~subdivnb state) arguments Value_util.pp_callstack
 
   (* Frama_C_dump_each_file functions. *)
-  let dump_state_file_exc name arguments state =
+  let dump_state_file_exc ~subdivnb name arguments state =
     let size = String.length name in
     let name =
       if size > 23
@@ -669,29 +681,30 @@ module Make (Abstract: Abstractions.Eva) = struct
     Format.fprintf fmt "DUMPING STATE at file %a line %d@."
       Datatype.Filepath.pretty l.Filepath.pos_path
       l.Filepath.pos_lnum;
+    let pretty_args = pretty_arguments ~subdivnb state in
     if arguments <> []
-    then Format.fprintf fmt "Args: %a@." (pretty_arguments state) arguments;
+    then Format.fprintf fmt "Args: %a@." pretty_args arguments;
     Format.fprintf fmt "@[<v>%a@]@?" print_state state;
     close_out ch
 
-  let dump_state_file name arguments state =
-    try dump_state_file_exc name arguments state
+  let dump_state_file ~subdivnb name arguments state =
+    try dump_state_file_exc ~subdivnb name arguments state
     with e ->
       Value_parameters.warning ~current:true ~once:true
         "Error during, or invalid call to Frama_C_dump_each_file (%s). Ignoring"
         (Printexc.to_string e)
 
   (** Applies the show_each or dump_each directives. *)
-  let apply_special_directives kf arguments state =
+  let apply_special_directives ~subdivnb kf arguments state =
     let name = Kernel_function.get_name kf in
     if Ast_info.can_be_cea_function name
     then
       if Ast_info.is_cea_function name
-      then (show_each name arguments state; true)
+      then (show_each ~subdivnb name arguments state; true)
       else if Ast_info.is_cea_domain_function name
-      then (domain_show_each name arguments state; true)
+      then (domain_show_each ~subdivnb name arguments state; true)
       else if Ast_info.is_cea_dump_file_function name
-      then (dump_state_file name arguments state; true)
+      then (dump_state_file ~subdivnb name arguments state; true)
       else if Ast_info.is_cea_dump_function name
       then (dump_state name state; true)
       else false
@@ -719,22 +732,25 @@ module Make (Abstract: Abstractions.Eva) = struct
 
   let call stmt lval_option funcexp args state =
     let ki_call = Kstmt stmt in
+    let subdivnb = subdivide_stmt stmt in
+    (* Resolve [funcexp] into the called kernel functions. *)
+    let functions, alarms =
+      Eval.eval_function_exp ~subdivnb funcexp ~args state
+    in
+    Alarmset.emit ki_call alarms;
     let cacheable = ref Value_types.Cacheable in
     let eval =
-      (* Resolve [funcexp] into the called kernel functions. *)
-      let functions, alarms = Eval.eval_function_exp funcexp ~args state in
-      Alarmset.emit ki_call alarms;
       functions >>- fun functions ->
       let current_kf = Value_util.current_kf () in
       let process_one_function kf valuation =
         (* The special Frama_C_ functions to print states are handled here. *)
-        if apply_special_directives kf args state
+        if apply_special_directives ~subdivnb kf args state
         then
           let () = apply_cvalue_callback kf ki_call state in
           `Value ([state])
         else
           (* Create the call. *)
-          let eval, alarms = make_call kf args valuation state in
+          let eval, alarms = make_call ~subdivnb kf args valuation state in
           Alarmset.emit ki_call alarms;
           eval >>- fun (call, valuation) ->
           (* Register the call. *)
@@ -771,8 +787,11 @@ module Make (Abstract: Abstractions.Eva) = struct
     | `True | `TrueReduced _ -> Alarmset.none
 
   let check_non_overlapping state lvs1 lvs2 =
+    let lvaluate ~valuation lval =
+      fst (Eval.lvaluate ~valuation ~for_writing:false ~subdivnb:0 state lval)
+    in
     let eval_loc (acc, valuation) lval =
-      match fst (Eval.lvaluate ~valuation ~for_writing:false state lval) with
+      match lvaluate ~valuation lval with
       | `Bottom -> acc, valuation
       | `Value (valuation, loc, _) -> (lval, loc) :: acc, valuation
     in

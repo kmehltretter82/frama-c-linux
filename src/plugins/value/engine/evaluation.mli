@@ -47,12 +47,16 @@ module type S = sig
         for the expression [expr], and [valuation] contains all the intermediate
         results of the evaluation.
 
-      The [valuation] argument is a cache of already computed expressions.
-      It is empty by default.
-      The [reduction] argument allows deactivating the backward reduction
-      performed after the forward evaluation. *)
+      Optional arguments are:
+      - [valuation] is a cache of already computed expressions; empty by default.
+      - [reduction] allows the deactivation of the backward reduction performed
+        after the forward evaluation; true by default.
+      - [subdivnb] is the maximum number of subdivisions performed on non-linear
+        sub-expressions of [expr]. If a lvalue occurs several times in [expr],
+        its value can be split up to [subdivnb] times to gain more precision.
+        Set to the value of the option -eva-subdivide-non-linear by default. *)
   val evaluate :
-    ?valuation:Valuation.t -> ?reduction:bool ->
+    ?valuation:Valuation.t -> ?reduction:bool -> ?subdivnb:int ->
     state -> exp -> (Valuation.t * value) evaluated
 
   (** Computes the value of a lvalue, with possible indeterminateness: the
@@ -60,9 +64,11 @@ module type S = sig
       Also returns the alarms resulting of the evaluation of the lvalue location,
       and a valuation containing all the intermediate results of the evaluation.
       The [valuation] argument is a cache of already computed expressions.
-      It is empty by default. *)
+      It is empty by default.
+      [subdivnb] is the maximum number of subdivisions performed on non-linear
+      expressions. *)
   val copy_lvalue :
-    ?valuation:Valuation.t ->
+    ?valuation:Valuation.t -> ?subdivnb:int ->
     state -> lval -> (Valuation.t * value flagged_value) evaluated
 
   (** [lvaluate ~valuation ~for_writing state lval] evaluates the left value
@@ -70,9 +76,11 @@ module type S = sig
       but evaluates the lvalue into a location and its type.
       The boolean [for_writing] indicates whether the lvalue is evaluated to be
       read or written. It is useful for the emission of the alarms, and for the
-      reduction of the location. *)
+      reduction of the location.
+      [subdivnb] is the maximum number of subdivisions performed on non-linear
+      expressions (including the possible pointer and offset of the lvalue). *)
   val lvaluate :
-    ?valuation:Valuation.t -> for_writing:bool ->
+    ?valuation:Valuation.t -> ?subdivnb:int -> for_writing:bool ->
     state -> lval -> (Valuation.t * loc * typ) evaluated
 
   (** [reduce ~valuation state expr positive] evaluates the expression [expr]
@@ -96,7 +104,7 @@ module type S = sig
     state -> exp -> value -> Valuation.t or_bottom
 
   val eval_function_exp:
-    exp -> ?args:exp list -> state ->
+    ?subdivnb:int -> exp -> ?args:exp list -> state ->
     (Kernel_function.t * Valuation.t) list evaluated
   (** Evaluation of the function argument of a [Call] constructor *)
 

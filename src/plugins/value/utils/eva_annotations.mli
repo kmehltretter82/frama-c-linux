@@ -20,6 +20,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Registers Eva annotations:
+    - slevel annotations: "slevel default", "slevel merge" and "slevel i"
+    - loop unroll annotations: "loop unroll term"
+    - value partitioning annotations: "split term" and "merge term"
+    - subdivision annotations: "subdivide i"
+
+    Widen hints annotations are still registered in !{widen_hints_ext.ml}. *)
+
 type slevel_annotation =
   | SlevelMerge
   | SlevelDefault
@@ -34,6 +42,7 @@ type flow_annotation =
 val get_slevel_annot : Cil_types.stmt -> slevel_annotation option
 val get_unroll_annot : Cil_types.stmt -> unroll_annotation list
 val get_flow_annot : Cil_types.stmt -> flow_annotation list
+val get_subdivision_annot : Cil_types.stmt -> int list
 
 val add_slevel_annot : emitter:Emitter.t -> loc:Cil_types.location ->
   Cil_types.stmt -> slevel_annotation -> unit
@@ -41,3 +50,5 @@ val add_unroll_annot : emitter:Emitter.t -> loc:Cil_types.location ->
   Cil_types.stmt -> unroll_annotation -> unit
 val add_flow_annot : emitter:Emitter.t -> loc:Cil_types.location ->
   Cil_types.stmt -> flow_annotation -> unit
+val add_subdivision_annot : emitter:Emitter.t -> loc:Cil_types.location ->
+  Cil_types.stmt -> int -> unit

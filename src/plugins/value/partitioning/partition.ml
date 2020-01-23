@@ -229,6 +229,9 @@ struct
   (* Domains transfer functions. *)
   module TF = Abstract.Dom.Transfer (Abstract.Eval.Valuation)
 
+  (* Evaluation with no reduction and no subdivision. *)
+  let evaluate = Abstract.Eval.evaluate ~reduction:false ~subdivnb:0
+
   exception Operation_failed
 
   let fail ~exp message =
@@ -239,10 +242,10 @@ struct
     in
     Pretty_utils.ksfprintf warn_and_raise message
 
-  let evaluate_exp_to_ival ?valuation state exp =
+  let evaluate_exp_to_ival state exp =
     (* Evaluate the expression *)
     let valuation, value =
-      match Abstract.Eval.evaluate ?valuation ~reduction:false state exp with
+      match evaluate state exp with
       | `Value (valuation, value), alarms when Alarmset.is_empty alarms ->
         valuation, value
       | _ ->
@@ -336,7 +339,7 @@ struct
       let typ = Cil.typeOf expr in
       let make stamp i = stamp, i, Abstract.Val.inject_int typ i in
       let expected_values = List.mapi make expected_values in
-      match fst (Abstract.Eval.evaluate state expr) with
+      match fst (evaluate state expr) with
       | `Bottom -> None
       | `Value (_cache, value) ->
         let is_included (_, _, v) = Abstract.Val.is_included v value in

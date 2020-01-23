@@ -129,6 +129,10 @@ module SkipLibcSpecs: Parameter_sig.Bool
 module RmAssert: Parameter_sig.Bool
 
 module LinearLevel: Parameter_sig.Int
+module LinearLevelFunction:
+  Parameter_sig.Map with type key = Cil_types.kernel_function
+                     and type value = int
+
 module BuiltinsOverrides:
   Parameter_sig.Map with type key = Cil_types.kernel_function
                      and type value = string

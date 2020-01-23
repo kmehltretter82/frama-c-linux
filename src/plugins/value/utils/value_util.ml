@@ -71,6 +71,22 @@ let get_slevel kf =
   try Value_parameters.SlevelFunction.find kf
   with Not_found -> Value_parameters.SemanticUnrollingLevel.get ()
 
+let get_subdivision_option stmt =
+  try
+    let kf = Kernel_function.find_englobing_kf stmt in
+    Value_parameters.LinearLevelFunction.find kf
+  with Not_found -> Value_parameters.LinearLevel.get ()
+
+let get_subdivision stmt =
+  match Eva_annotations.get_subdivision_annot stmt with
+  | [] -> get_subdivision_option stmt
+  | [x] -> x
+  | x :: _ ->
+    Value_parameters.warning ~current:true ~once:true
+      "Several subdivision annotations at the same statement; selecting %i\
+       and ignoring the others." x;
+    x
+
 let pretty_actuals fmt actuals =
   let pp fmt (e,x,_) = Cvalue.V.pretty_typ (Some (Cil.typeOf e)) fmt x in
   Pretty_utils.pp_flowlist pp fmt actuals

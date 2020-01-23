@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 open Value_parameters
-open Partitioning_annots
+open Eva_annotations
 open Cil_types
 
 let is_return s = match s.skind with Return _ -> true | _ -> false
