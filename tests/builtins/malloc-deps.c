@@ -1,15 +1,15 @@
 /* run.config*
    OPT: -eva @EVA_CONFIG@ -deps -calldeps -inout -slevel 5 -eva-msg-key malloc
 */
+#include <stddef.h>
 //@ assigns \result \from \nothing;
-void *Frama_C_malloc_fresh(unsigned long n);
+void *Frama_C_malloc_fresh(size_t n);
 //@ assigns \result \from \nothing;
-void *Frama_C_malloc_fresh_weak(unsigned long n);
+void *Frama_C_malloc_fresh_weak(size_t n);
 //@ assigns \result \from \nothing;
-void *Frama_C_malloc_by_stack(unsigned long n);
+void *Frama_C_malloc_by_stack(size_t n);
 
 volatile int v;
-
 void g(int *p, int k) { p[k] = k; }
 
 void main(int i, int j) {

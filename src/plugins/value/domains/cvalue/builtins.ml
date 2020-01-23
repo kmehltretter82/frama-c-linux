@@ -30,13 +30,25 @@ exception Invalid_nb_of_args of int
    if -val-builtins-auto is set. *)
 type use_builtin = Always | OnAuto
 
+(* Table of all registered builtins; filled by [register_builtin] calls.  *)
 let table = Hashtbl.create 17
 
-let register_builtin name ?replace f =
-  Hashtbl.replace table name (f, None, Always);
+(* Table binding each kernel function to their builtin for a given analysis.
+   Filled at the beginning of each analysis by [prepare_builtins]. *)
+let builtins_table = Hashtbl.create 17
+
+module Info = struct
+  let name = "Eva.Builtins.BuiltinsOverride"
+  let dependencies = [ Db.Value.self ]
+end
+(** Set of functions overridden by a builtin. *)
+module BuiltinsOverride = State_builder.Set_ref (Kernel_function.Set) (Info)
+
+let register_builtin name ?replace ?typ f =
+  Hashtbl.replace table name (f, typ, None, Always);
   match replace with
   | None -> ()
-  | Some fname -> Hashtbl.replace table fname (f, Some name, OnAuto)
+  | Some fname -> Hashtbl.replace table fname (f, typ, Some name, OnAuto)
 
 let () = Db.Value.register_builtin := register_builtin
 
@@ -45,7 +57,7 @@ let () = Db.Value.register_builtin := register_builtin
 let registered_builtins () =
   let l =
     Hashtbl.fold
-      (fun name (f, _, u) acc -> if u = Always then (name, f) :: acc else acc)
+      (fun name (f, _, _, u) acc -> if u = Always then (name, f) :: acc else acc)
       table []
   in
   List.sort (fun (name1, _) (name2, _) -> String.compare name1 name2) l
@@ -54,7 +66,7 @@ let () = Db.Value.registered_builtins := registered_builtins
 
 let builtin_names_and_replacements () =
   let stand_alone, replacements =
-    Hashtbl.fold (fun name (_, replaced_by, _) (acc1, acc2) ->
+    Hashtbl.fold (fun name (_, _, replaced_by, _) (acc1, acc2) ->
         match replaced_by with
         | None -> name :: acc1, acc2
         | Some rep_by -> acc1, (name, rep_by) :: acc2
@@ -94,13 +106,13 @@ let () =
 
 let mem_builtin name =
   try
-    let _, _, u = Hashtbl.find table name in
+    let _, _, _, u = Hashtbl.find table name in
     u = Always
   with Not_found -> false
 
 let () = Db.Value.mem_builtin := mem_builtin
 
-(* Returns the builtin with its specification, used to evaluate preconditions
+(* Returns the specification of a builtin, used to evaluate preconditions
    and to transfer the states of other domains. *)
 let find_builtin_specification kf =
   let spec = Annotations.funspec kf in
@@ -109,55 +121,85 @@ let find_builtin_specification kf =
      TODO: check that the specification is the frama-c libc specification? *)
   if spec.spec_behavior <> [] then Some spec else None
 
-let find_builtin_override kf =
-  let name =
-    try Value_parameters.BuiltinsOverrides.find kf
-    with Not_found -> Kernel_function.get_name kf
-  in
-  try
-    let f, _, u = Hashtbl.find table name in
-    if u = Always || Value_parameters.BuiltinsAuto.get ()
-    then Extlib.opt_map (fun s -> name, f, s) (find_builtin_specification kf)
-    else None
-  with Not_found -> None
+(* Returns [true] if the function [kf] is incompatible with the expected type
+   for a given builtin, which therefore cannot be applied. *)
+let inconsistent_builtin_typ kf = function
+  | None -> false (* No expected type provided with the builtin, no check. *)
+  | Some typ ->
+    let expected_result, expected_args = typ () in
+    match Kernel_function.get_type kf with
+    | TFun (result, args, _, _) ->
+      let args = Cil.argsToList args in
+      Cil.need_cast result expected_result
+      || List.length args <> List.length expected_args
+      || List.exists2 (fun (_, t, _) u -> Cil.need_cast t u) args expected_args
+    | _ -> assert false
 
-let warn_builtin_override bname kf =
+(* Warns if the builtin [bname] overrides the function definition [kf]. *)
+let warn_builtin_override kf source bname =
+  let internal =
+    (* TODO: treat this 'internal' *)
+    let file = source.Filepath.pos_path in
+    Filepath.is_relative ~base_name:Config.datadir (file :> string)
+  in
+  if Kernel_function.is_definition kf && not internal
+  then
+    let fname = Kernel_function.get_name kf in
+    Value_parameters.warning ~source ~once:true
+      ~wkey:Value_parameters.wkey_builtins_override
+      "function %s: definition will be overridden by %s"
+      fname (if fname = bname then "its builtin" else "builtin " ^ bname)
+
+let prepare_builtin kf builtin_name builtin expected_typ =
   let source = fst (Kernel_function.get_location kf) in
-  if find_builtin_specification kf = None
+  if inconsistent_builtin_typ kf expected_typ
   then
     Value_parameters.warning ~source ~once:true
-      ~wkey:Value_parameters.wkey_builtins_missing_spec
-      "The builtin for function %a will not be used, as its frama-c libc \
-       specification is not available."
-      Kernel_function.pretty kf
+      ~wkey:Value_parameters.wkey_builtins_override
+      "The builtin %s will not be used for function %a of incompatible type.@ \
+       (got: %a)."
+      builtin_name Kernel_function.pretty kf
+      Printer.pp_typ (Kernel_function.get_type kf)
   else
-    let internal =
-      let pos = fst (Kernel_function.get_location kf) in
-      (*TODO: treat this 'internal'*)
-      let file = pos.Filepath.pos_path in
-      Filepath.is_relative ~base_name:Config.datadir (file :> string)
-    in
-    if Kernel_function.is_definition kf && not internal
-    then
-      let fname = Kernel_function.get_name kf in
+    match find_builtin_specification kf with
+    | None ->
       Value_parameters.warning ~source ~once:true
-        ~wkey:Value_parameters.wkey_builtins_override
-        "function %s: definition will be overridden by %s"
-        fname (if fname = bname then "its builtin" else "builtin " ^ bname)
+        ~wkey:Value_parameters.wkey_builtins_missing_spec
+        "The builtin for function %a will not be used, as its frama-c libc \
+         specification is not available."
+        Kernel_function.pretty kf
+    | Some spec ->
+      warn_builtin_override kf source builtin_name;
+      BuiltinsOverride.add kf;
+      Hashtbl.replace builtins_table kf (builtin_name, builtin, spec)
 
-let warn_definitions_overridden_by_builtins () =
-  Value_parameters.BuiltinsOverrides.iter
-    (fun (kf, name) -> warn_builtin_override (Extlib.the name) kf);
+let prepare_builtins () =
+  BuiltinsOverride.clear ();
+  Hashtbl.clear builtins_table;
   let autobuiltins = Value_parameters.BuiltinsAuto.get () in
+  (* Links kernel functions to the registered builtins. *)
   Hashtbl.iter
-    (fun name (_, _, u) ->
+    (fun name (f, typ, _bname, u) ->
        if autobuiltins || u = Always
        then
          try
            let kf = Globals.Functions.find_by_name name in
-           warn_builtin_override name kf
+           prepare_builtin kf name f typ
          with Not_found -> ())
-    table
+    table;
+  (* Overrides builtins attribution according to the -eva-builtin option. *)
+  Value_parameters.BuiltinsOverrides.iter
+    (fun (kf, name) ->
+       let builtin_name = Extlib.the name in
+       let f, typ, _, _ = Hashtbl.find table builtin_name in
+       prepare_builtin kf builtin_name f typ)
+
+let find_builtin_override = Hashtbl.find_opt builtins_table
+
+let is_builtin_overridden =
+  if not (BuiltinsOverride.is_computed ())
+  then prepare_builtins ();
+  BuiltinsOverride.mem
 
 (* -------------------------------------------------------------------------- *)
 (* --- Returning a clobbered set                                          --- *)
@@ -182,7 +224,7 @@ let clobbered_set_from_ret state ret =
 
 type call = (Precise_locs.precise_location, Cvalue.V.t) Eval.call
 type result = Cvalue.Model.t * Locals_scoping.clobbered_set
-type builtin = Db.Value.builtin_sig
+type builtin = Db.Value.builtin
 
 open Eval
 

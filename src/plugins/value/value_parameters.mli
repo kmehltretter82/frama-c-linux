@@ -148,7 +148,6 @@ module PrintCallstacks: Parameter_sig.Bool
 module AlarmsWarnings: Parameter_sig.Bool
 module ReportRedStatuses: Parameter_sig.String
 module NumerorsLogFile: Parameter_sig.String
-module WarnBuiltinOverride: Parameter_sig.Bool
 
 module MemExecAll: Parameter_sig.Bool
 

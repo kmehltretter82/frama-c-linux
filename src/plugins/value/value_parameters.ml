@@ -1313,26 +1313,6 @@ module NumerorsLogFile =
       let default = ""
     end)
 
-let () = Parameter_customize.set_group alarms
-let () = Parameter_customize.is_invisible ()
-module WarnBuiltinOverride =
-  True(struct
-    let option_name = "-val-warn-builtin-override"
-    let help = "[DEPRECATED: use warning category key '" ^
-               (wkey_name wkey_builtins_override) ^
-               "' to control] Warn when Eva built-ins will override function \
-                definitions"
-  end)
-let () = add_correctness_dep WarnBuiltinOverride.parameter
-let () = WarnBuiltinOverride.add_update_hook
-    (fun _ v ->
-       warning "Option %s is deprecated. \
-                Use warning category key '%a' instead"
-         WarnBuiltinOverride.option_name
-         pp_warn_category wkey_builtins_override;
-       set_warn_status wkey_builtins_override
-         (if v then Log.Wonce else Log.Winactive))
-
 (* ------------------------------------------------------------------------- *)
 (* --- Interpreter mode                                                  --- *)
 (* ------------------------------------------------------------------------- *)

@@ -52,7 +52,7 @@ let pp_p_kind fmt = function
   | Assumes -> Format.pp_print_string fmt "assumes"
 
 let post_kind kf =
-  if Builtins.find_builtin_override kf <> None
+  if Builtins.is_builtin_overridden kf
   then PostBuiltin
   else if !Db.Value.use_spec_instead_of_definition kf then
     if Kernel_function.is_definition kf

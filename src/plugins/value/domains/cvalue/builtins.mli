@@ -25,28 +25,38 @@
 
 exception Invalid_nb_of_args of int
 
-(** Register the given OCaml function as a builtin, that will be used
-    instead of the Cil C function of the same name *)
-val register_builtin: string -> ?replace:string -> Db.Value.builtin_sig -> unit
+(** [register_builtin name ?replace ?typ f] registers the ocaml function [f]
+    as a builtin to be used instead of the C function of name [name].
+    If [replace] is provided, the builtin is also used instead of the C function
+    of name [replace], unless option -eva-builtin-auto is disabled.
+    If [typ] is provided, consistency between the expected [typ] and the type of
+    the C function is checked before using the builtin. *)
+val register_builtin:
+  string -> ?replace:string ->
+  ?typ:Db.Value.builtin_type -> Db.Value.builtin -> unit
+
+(** Prepares the builtins to be used for an analysis. Must be called at the
+    beginning of each Eva analysis. Warns about builtins of incompatible types,
+    builtins without an available specification and builtins overriding function
+    definitions. *)
+val prepare_builtins: unit -> unit
 
 (** [clobbered_set_from_ret state ret] can be used for functions that return
     a pointer to where they have written some data. It returns all the bases
     of [ret] whose contents may contain local variables. *)
 val clobbered_set_from_ret: Cvalue.Model.t -> Cvalue.V.t -> Base.SetLattice.t
 
-(** Emits warnings for each function definition that will be overridden by an
-    Eva built-in.
-    Does not include definitions in the Frama-C stdlib.
-    @since Phosphorus-20170501-beta1 *)
-val warn_definitions_overridden_by_builtins: unit -> unit
-
 type builtin
 type call = (Precise_locs.precise_location, Cvalue.V.t) Eval.call
 type result = Cvalue.Model.t * Locals_scoping.clobbered_set
 
+(** Is a given function replaced by a builtin? *)
+val is_builtin_overridden: Cil_types.kernel_function -> bool
+
 (** Returns the cvalue builtin for a function, if any. Also returns the name of
     the builtin and the specification of the function; the preconditions must be
-    evaluated along with the builtin. *)
+    evaluated along with the builtin.
+    [prepare_builtins] should have been called before using this function. *)
 val find_builtin_override:
   Cil_types.kernel_function -> (string * builtin * Cil_types.funspec) option
 

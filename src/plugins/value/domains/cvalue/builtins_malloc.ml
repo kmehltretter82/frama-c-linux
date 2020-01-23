@@ -354,8 +354,14 @@ let alloc_fresh ?(prefix="malloc") weak region state actuals =
     }
   | _ -> raise (Builtins.Invalid_nb_of_args 1)
 
-let () = Builtins.register_builtin "Frama_C_malloc_fresh" (alloc_fresh Strong Base.Malloc)
-let () = Builtins.register_builtin "Frama_C_malloc_fresh_weak" (alloc_fresh Weak Base.Malloc)
+let () =
+  Builtins.register_builtin "Frama_C_malloc_fresh"
+    (alloc_fresh Strong Base.Malloc)
+    ~typ:(fun () -> (Cil.voidPtrType, [Cil.theMachine.Cil.typeOfSizeOf]))
+let () =
+  Builtins.register_builtin "Frama_C_malloc_fresh_weak"
+    (alloc_fresh Weak Base.Malloc)
+    ~typ:(fun () -> (Cil.voidPtrType, [Cil.theMachine.Cil.typeOfSizeOf]))
 
 let alloc_size_ok intended_size =
   try
@@ -404,8 +410,14 @@ let calloc_abstract calloc_f state actuals =
 let calloc_fresh weak state actuals =
   calloc_abstract (alloc_abstract weak Base.Malloc) state actuals
 
-let () = Builtins.register_builtin "Frama_C_calloc_fresh" (calloc_fresh Strong)
-let () = Builtins.register_builtin "Frama_C_calloc_fresh_weak" (calloc_fresh Weak)
+let () =
+  Builtins.register_builtin "Frama_C_calloc_fresh" (calloc_fresh Strong)
+    ~typ:(fun () -> (Cil.voidPtrType, [Cil.theMachine.Cil.typeOfSizeOf;
+                                       Cil.theMachine.Cil.typeOfSizeOf]))
+let () =
+  Builtins.register_builtin "Frama_C_calloc_fresh_weak" (calloc_fresh Weak)
+    ~typ:(fun () -> (Cil.voidPtrType, [Cil.theMachine.Cil.typeOfSizeOf;
+                                       Cil.theMachine.Cil.typeOfSizeOf]))
 
 (* Variables that have been returned by a call to an allocation function
    at this callstack. The first allocated variable is at the top of the
@@ -476,7 +488,7 @@ let alloc_by_stack_aux region stack prefix sizev state =
 (* For each callstack, the first MallocPrecision.get() are precise fresh
    distinct locations. The following allocations all return the same
    base, first strong, then weak, and which is extended as needed. *)
-let alloc_by_stack ?(prefix="malloc") region ?returns_null : Db.Value.builtin_sig = fun state actuals->
+let alloc_by_stack ?(prefix="malloc") region ?returns_null : Db.Value.builtin = fun state actuals->
   let stack = call_stack_no_wrappers () in
   let sizev = match actuals with
     | [_,size,_] -> size
@@ -493,19 +505,24 @@ let alloc_by_stack ?(prefix="malloc") region ?returns_null : Db.Value.builtin_si
 ;;
 let () = Builtins.register_builtin
     ~replace:"malloc" "Frama_C_malloc_by_stack" (alloc_by_stack Base.Malloc)
+    ~typ:(fun () -> (Cil.voidPtrType, [Cil.theMachine.Cil.typeOfSizeOf]))
 let () = Builtins.register_builtin
     ~replace:"__fc_vla_alloc" "Frama_C_vla_alloc_by_stack"
     (alloc_by_stack Base.VLA ~returns_null:false)
+    ~typ:(fun () -> (Cil.voidPtrType, [Cil.theMachine.Cil.typeOfSizeOf]))
 let () = Builtins.register_builtin
     ~replace:"alloca" "Frama_C_alloca"
     (alloc_by_stack ~prefix:"alloca" Base.Alloca ~returns_null:false)
+    ~typ:(fun () -> (Cil.voidPtrType, [Cil.theMachine.Cil.typeOfSizeOf]))
 
 (* Equivalent to [alloc_by_stack], but for [calloc]. *)
-let calloc_by_stack : Db.Value.builtin_sig = fun state actuals ->
+let calloc_by_stack : Db.Value.builtin = fun state actuals ->
   calloc_abstract (alloc_by_stack_aux Base.Malloc) state actuals
 
 let () = Builtins.register_builtin
     ~replace:"calloc" "Frama_C_calloc_by_stack" calloc_by_stack
+    ~typ:(fun () -> (Cil.voidPtrType, [Cil.theMachine.Cil.typeOfSizeOf;
+                                       Cil.theMachine.Cil.typeOfSizeOf]))
 
 (** {1 Free} *)
 
@@ -614,7 +631,9 @@ let frama_c_free state actuals =
       }
   | _ -> raise (Builtins.Invalid_nb_of_args 1)
 
-let () = Builtins.register_builtin ~replace:"free" "Frama_C_free" frama_c_free
+let () =
+  Builtins.register_builtin ~replace:"free" "Frama_C_free" frama_c_free
+    ~typ:(fun () -> (Cil.voidType, [Cil.voidPtrType]))
 
 (* built-in for [__fc_vla_free] function. By construction, VLA should always
    be mapped to a single base. *)
@@ -633,6 +652,7 @@ let frama_c_vla_free state actuals =
 let () =
   Builtins.register_builtin
     ~replace:"__fc_vla_free" "Frama_C_vla_free" frama_c_vla_free
+    ~typ:(fun () -> (Cil.voidType, [Cil.voidPtrType]))
 
 let free_automatic_bases stack state =
   (* free automatic bases that were allocated in the current function *)
@@ -792,9 +812,12 @@ let realloc ~multiple state args = match args with
 
 let () = Builtins.register_builtin
     ~replace:"realloc" "Frama_C_realloc" (realloc ~multiple:false)
+    ~typ:(fun () -> (Cil.voidPtrType, [Cil.voidPtrType;
+                                       Cil.theMachine.Cil.typeOfSizeOf]))
 let () = Builtins.register_builtin
     "Frama_C_realloc_multiple" (realloc ~multiple:true)
-
+    ~typ:(fun () -> (Cil.voidPtrType, [Cil.voidPtrType;
+                                       Cil.theMachine.Cil.typeOfSizeOf]))
 
 (** {1 Leak detection} *)
 

@@ -137,7 +137,7 @@ let find_deps_term_no_transitivity_state state t =
 let use_spec_instead_of_definition kf =
   not (Kernel_function.is_definition kf) ||
   Ast_info.is_frama_c_builtin (Kernel_function.get_name kf) ||
-  Builtins.find_builtin_override kf <> None ||
+  Builtins.is_builtin_overridden kf ||
   Kernel_function.Set.mem kf (Value_parameters.UsePrototype.get ()) ||
   Value_parameters.LoadFunctionState.mem kf
 

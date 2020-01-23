@@ -75,7 +75,7 @@ let mark_unreachable () =
           (* Do not mark preconditions as dead if they are not analyzed in
              non-dead code. Otherwise, the consolidation does strange things. *)
           if not (Value_util.skip_specifications kf) ||
-             Builtins.find_builtin_override kf <> None
+             Builtins.is_builtin_overridden kf
           then begin
             (* Setup all precondition statuses for [kf]: maybe it has
                never been called anywhere. *)
