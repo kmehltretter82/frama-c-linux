@@ -1120,7 +1120,7 @@ module Make
 
   (* Context for a fast forward evaluation with minimal precision:
      no subdivisions and no calls to the oracle. *)
-  let low_context state =
+  let fast_eval_context state =
     let remaining_fuel = no_fuel in
     let subdivision = 0 in
     { state; subdivision; remaining_fuel; oracle }
@@ -1160,7 +1160,7 @@ module Make
   let evaluate_for_reduction state expr =
     try `Value (Cache.find' !cache expr)
     with Not_found ->
-      fst (forward_eval (low_context state) expr) >>-: fun _ ->
+      fst (forward_eval (fast_eval_context state) expr) >>-: fun _ ->
       try Cache.find' !cache expr
       with Not_found -> assert false
 
@@ -1352,7 +1352,7 @@ module Make
       | _ ->
         let reduce_valid_index = true in
         let typ_lval = Cil.typeOf_pointed (Cil.typeOf expr) in
-        let context = low_context state in
+        let context = fast_eval_context state in
         fst (eval_offset context ~reduce_valid_index typ_lval offset)
         >>- fun (loc_offset, _, _) ->
         find_val expr >>- fun value ->
@@ -1369,7 +1369,7 @@ module Make
     | Index (exp, remaining) ->
       find_val exp >>- fun v ->
       let typ_pointed = Cil.typeOf_array_elem typ in
-      let context = low_context state in
+      let context = fast_eval_context state in
       fst (eval_offset context ~reduce_valid_index:true typ_pointed remaining)
       >>- fun (rem, _, _) ->
       Loc.backward_index typ_pointed v rem loc_offset >>- fun (v', rem') ->
@@ -1410,7 +1410,7 @@ module Make
         match expr.enode with
         | Lval lval -> second_eval_lval state lval value
         | _ ->
-          fst (internal_forward_eval (low_context state) expr)
+          fst (internal_forward_eval (fast_eval_context state) expr)
           >>-: fun (v, _, _) -> v
       in
       new_value >>- fun evaled ->
@@ -1435,7 +1435,7 @@ module Make
         then
           let for_writing = false
           and reduction = true
-          and context = low_context state in
+          and context = fast_eval_context state in
           fst (reduced_lval_to_loc context ~for_writing ~reduction lval)
           >>-: fun (loc, _, _, _) ->
           (* TODO: Loc.narrow *)
@@ -1448,7 +1448,7 @@ module Make
         else `Value ()
       in
       evaloc >>- fun () ->
-      fst (eval_lval (low_context state) lval) >>- fun (record, _, _) ->
+      fst (eval_lval (fast_eval_context state) lval) >>- fun (record, _, _) ->
       record.value.v
 
   and recursive_descent state expr =
@@ -1565,7 +1565,7 @@ module Make
       (* Avoids reduce_by_cond_enumerate on volatile expressions. *)
       if volatile then `Value !cache
       else
-        let context = low_context state in
+        let context = fast_eval_context state in
         Subdivided_Evaluation.reduce_by_enumeration context !cache expr false
 
   let assume ?valuation:(valuation=Cache.empty) state expr value =
