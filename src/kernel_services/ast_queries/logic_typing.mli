@@ -177,22 +177,26 @@ type typing_context = {
     @since Carbon-20101201
     @modify Silicon-20161101 change type of the function
     @modify 19.0-Potassium add [status] argument
+    @deprecated Frama-C+dev
 *)
 val register_behavior_extension:
   string -> bool ->
   (typing_context:typing_context -> loc:location ->
    Logic_ptree.lexpr list -> acsl_extension_kind) -> unit
+[@@ deprecated "Use Acsl_extension.register_behavior instead"]
 
 (** register an extension for global annotation.
 
     @plugin development guide
 
     @since 18.0-Argon
+    @deprecated Frama-C+dev
 *)
 val register_global_extension:
   string -> bool ->
   (typing_context:typing_context -> loc: location ->
    Logic_ptree.lexpr list -> acsl_extension_kind) -> unit
+[@@ deprecated "Use Acsl_extension.register_global instead"]
 
 (** register an extension for code annotation to be evaluated at _current_
     program point.
@@ -200,11 +204,13 @@ val register_global_extension:
     @plugin development guide
 
     @since 18.0-Argon
+    @deprecated Frama-C+dev
 *)
 val register_code_annot_extension:
   string -> bool ->
   (typing_context: typing_context -> loc: location ->
    Logic_ptree.lexpr list -> acsl_extension_kind) -> unit
+[@@ deprecated "Use Acsl_extension.register_code_annot instead"]
 
 (** register an extension for code annotation to be evaluated for the _next_
     statement.
@@ -212,22 +218,26 @@ val register_code_annot_extension:
     @plugin development guide
 
     @since 18.0-Argon
+    @deprecated Frama-C+dev
 *)
 val register_code_annot_next_stmt_extension:
   string -> bool ->
   (typing_context: typing_context -> loc: location ->
    Logic_ptree.lexpr list -> acsl_extension_kind) -> unit
+[@@ deprecated "Use Acsl_extension.register_code_annot_next_stmt instead"]
 
 (** register an extension for loop annotation.
 
     @plugin development guide
 
     @since 18.0-Argon
+    @deprecated Frama-C+dev
 *)
 val register_code_annot_next_loop_extension:
   string -> bool ->
   (typing_context: typing_context -> loc: location ->
    Logic_ptree.lexpr list -> acsl_extension_kind) -> unit
+[@@ deprecated "Use Acsl_extension.register_code_annot_next_loop instead"]
 
 
 (** register an extension both for code and loop annotations.
@@ -235,11 +245,13 @@ val register_code_annot_next_loop_extension:
     @plugin development guide
 
     @since 18.0-Argon
+    @deprecated Frama-C+dev
 *)
 val register_code_annot_next_both_extension:
   string -> bool ->
   (typing_context: typing_context -> loc: location ->
    Logic_ptree.lexpr list -> acsl_extension_kind) -> unit
+[@@ deprecated "Use Acsl_extension.register_code_annot_next_both instead"]
 
 module Make
     (C :
@@ -382,6 +394,14 @@ val set_extension_handler:
     If your name is not [Acsl_extension], do not call this
     @since Frama-C+dev
 *)
+
+(**/**)
+val set_deprecated_extension_handler:
+  handler:(string -> ext_category -> bool ->
+           (typing_context -> location -> Logic_ptree.lexpr list ->
+            acsl_extension_kind) ->
+           unit) ->
+           unit
 
 (*
 Local Variables:

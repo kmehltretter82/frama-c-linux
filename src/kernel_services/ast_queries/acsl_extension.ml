@@ -117,3 +117,48 @@ let () =
     ~visit: Extensions.visit ;
   Cil_printer.set_extension_handler
     ~print: Extensions.print
+
+(* For Deprecation: *)
+
+let deprecated_replace name ext = Hashtbl.add Extensions.ext_tbl name ext
+
+let strong_cat = Hashtbl.create 5
+
+let deprecated_find ?(strong=true) name cat op_name =
+  match Hashtbl.find_opt Extensions.ext_tbl name with
+  | None ->
+    if strong then Hashtbl.add strong_cat name cat ;
+    (cat, default)
+  | Some (found_cat, ext) ->
+    if strong && Hashtbl.mem strong_cat name then begin
+      if found_cat = cat then (cat, ext)
+      else
+        Kernel.fatal
+          "Registring %s for %s: this extension already exists for another \
+           category"
+          op_name name
+    end else if strong then begin
+      Hashtbl.add strong_cat name cat ;
+      (cat, ext)
+    end else
+      (found_cat, ext)
+
+let deprecated_register_typing name cat ext_status ext_typing =
+  let cat, ext = deprecated_find name cat "typing" in
+  let ext = { ext with ext_status ; ext_typing } in
+  deprecated_replace name (cat, ext)
+
+let deprecated_register_printing name cat ext_printing =
+  let cat, ext = deprecated_find ~strong:false name cat "printing" in
+  let ext = { ext with ext_printing } in
+  deprecated_replace name (cat, ext)
+
+let deprecated_register_visit name cat ext_visit =
+  let cat, ext = deprecated_find name cat "visit" in
+  let ext = { ext with ext_visit } in
+  deprecated_replace name (cat, ext)
+
+let () =
+  Logic_typing.set_deprecated_extension_handler deprecated_register_typing ;
+  Cil.set_deprecated_extension_handler deprecated_register_visit ;
+  Cil_printer.set_deprecated_extension_handler deprecated_register_printing

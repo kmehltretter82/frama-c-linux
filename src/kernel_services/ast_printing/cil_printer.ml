@@ -36,37 +36,30 @@ let set_extension_handler ~print =
   initialized_extensions := true ;
   ()
 
+let ref_deprecated_extension_handler = ref (fun _ _ _ -> assert false)
+let set_deprecated_extension_handler ~handler =
+  ref_deprecated_extension_handler := handler
+
 module Behavior_extensions = struct
-
-  let printer_tbl = Hashtbl.create 5
-
-  let register name printer =
-    Hashtbl.add printer_tbl name printer
-
-  let default_pp printer fmt ext =
-    match ext with
-    | Ext_id i -> Format.pp_print_int fmt i
-    | Ext_terms terms ->
-      Pretty_utils.pp_list ~sep:",@ " printer#term fmt terms
-    | Ext_preds preds ->
-      Pretty_utils.pp_list ~sep:",@ " printer#predicate fmt preds
+  let deprecated_register name =
+    !ref_deprecated_extension_handler name
 
   let pp (printer) fmt {ext_name; ext_kind} =
-    let pp =
-      try
-        Hashtbl.find printer_tbl ext_name
-      with Not_found -> default_pp
-    in
+    let pp = !ref_print_extension ext_name in
     Format.fprintf fmt "@[<hov 2>%s %a;@]" ext_name (pp printer) ext_kind
 
 end
-let register_behavior_extension = Behavior_extensions.register
+let register_behavior_extension name =
+  Behavior_extensions.deprecated_register name Ext_contract
 
-let register_code_annot_extension = Behavior_extensions.register
+let register_code_annot_extension name =
+  Behavior_extensions.deprecated_register name (Ext_code_annot Ext_here)
 
-let register_loop_annot_extension = Behavior_extensions.register
+let register_loop_annot_extension name =
+  Behavior_extensions.deprecated_register name (Ext_code_annot Ext_next_loop)
 
-let register_global_extension = Behavior_extensions.register
+let register_global_extension name =
+  Behavior_extensions.deprecated_register name Ext_global
 
 (* Internal attributes. Won't be pretty-printed *)
 let reserved_attributes = ref []

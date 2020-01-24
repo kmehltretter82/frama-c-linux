@@ -35,16 +35,8 @@ let set_extension_handler ~category ~is_extension =
   initialized_extensions := true ;
   ()
 
-
-let extensions = ref Datatype.String.Map.empty
-
-let is_extension s = Datatype.String.Map.mem s !extensions
-
-let extension_category s = Datatype.String.Map.find_opt s !extensions
-
-let register_extension s cat =
-  if not (is_extension s) then
-    extensions := Datatype.String.Map.add s cat !extensions
+let is_extension s = !ref_is_extension s
+let extension_category s = !ref_extension_category s
 
 module CurrentLoc = Cil_const.CurrentLoc
 

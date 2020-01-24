@@ -28,9 +28,6 @@ open Cil_types
 
 (** {2 registered ACSL extensions } *)
 
-(** register a given name as a clause name for extended category. *)
-val register_extension: string -> ext_category -> unit
-
 val is_extension: string -> bool
 
 val extension_category: string -> ext_category option

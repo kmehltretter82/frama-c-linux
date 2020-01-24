@@ -535,33 +535,25 @@ let set_extension_handler ~is_extension ~typer =
   initialized_extensions := true ;
   ()
 
+let ref_deprecated_extension_handler = ref (fun _ _ _ _  -> assert false)
+let set_deprecated_extension_handler ~handler =
+  ref_deprecated_extension_handler := handler
+
 module Extensions = struct
-  let typer_tbl = Hashtbl.create 5
-  let find_typer name = Hashtbl.find typer_tbl name
-  let is_extension name = Hashtbl.mem typer_tbl name
-  let register name category status typer =
-    if is_extension name then
-      Kernel.warning ~wkey:Kernel.wkey_acsl_extension
-        "Trying to register ACSL extension %s twice. Ignoring second extension"
-        name
-    else begin
-      Logic_env.register_extension name category;
-      Hashtbl.add typer_tbl name (status,typer)
-    end
+  let is_extension name = !ref_is_extension name
+
+  let deprecated_register name category status typer =
+    let typer typing_context loc = typer ~typing_context ~loc in
+    !ref_deprecated_extension_handler name category status typer
 
   let typer name ~typing_context:typing_context ~loc p =
-    let status,typer =
-      try find_typer name
-      with Not_found ->
-        Kernel.fatal ~source:(fst loc) "unsupported clause of name '%s'" name
-    in
+    let typer = !ref_type_extension name in
     let normal_error = ref false in
     let has_error () = normal_error := true in
     let wrapper =
-      typing_context.on_error (typer ~typing_context ~loc) has_error
+      typing_context.on_error (typer typing_context loc) has_error
     in
-    try
-      status, wrapper p
+    try wrapper p
     with
     | (Log.AbortError _ | Log.AbortFatal _) as exn -> raise exn
     | exn when not !normal_error ->
@@ -570,22 +562,22 @@ module Extensions = struct
 end
 
 let register_behavior_extension name f =
-  Extensions.register name Ext_contract f
+  Extensions.deprecated_register name Ext_contract f
 
 let register_global_extension name f =
-  Extensions.register name Ext_global f
+  Extensions.deprecated_register name Ext_global f
 
 let register_code_annot_extension name f =
-  Extensions.register name (Ext_code_annot Ext_here) f
+  Extensions.deprecated_register name (Ext_code_annot Ext_here) f
 
 let register_code_annot_next_stmt_extension name f =
-  Extensions.register name (Ext_code_annot Ext_next_stmt) f
+  Extensions.deprecated_register name (Ext_code_annot Ext_next_stmt) f
 
 let register_code_annot_next_loop_extension name f =
-  Extensions.register name (Ext_code_annot Ext_next_loop) f
+  Extensions.deprecated_register name (Ext_code_annot Ext_next_loop) f
 
 let register_code_annot_next_both_extension name f =
-  Extensions.register name (Ext_code_annot Ext_next_both) f
+  Extensions.deprecated_register name (Ext_code_annot Ext_next_both) f
 
 let rec arithmetic_conversion ty1 ty2 =
   match unroll_type ty1, unroll_type ty2 with

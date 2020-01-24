@@ -41,31 +41,39 @@ val register_behavior_extension:
    Cil_types.acsl_extension_kind -> unit) -> unit
 (** Register a pretty-printer used for behavior extension.
     @plugin development guide
+    @deprecated Frama-C+dev
 *)
+[@@ deprecated "Use Acsl_extension.register_behavior instead"]
 
 val register_global_extension:
   string ->
   (Printer_api.extensible_printer_type -> Format.formatter ->
    Cil_types.acsl_extension_kind -> unit) -> unit
-(** Register a pretty-printer used for behavior extension.
+(** Register a pretty-printer used for global extension.
     @plugin development guide
+    @deprecated Frama-C+dev
 *)
+[@@ deprecated "Use Acsl_extension.register_global instead"]
 
 val register_code_annot_extension:
   string ->
   (Printer_api.extensible_printer_type -> Format.formatter ->
    Cil_types.acsl_extension_kind -> unit) -> unit
-(** Register a pretty-printer used for behavior extension.
+(** Register a pretty-printer used for code annotation extension.
     @plugin development guide
+    @deprecated Frama-C+dev
 *)
+[@@ deprecated "Use Acsl_extension.register_code_annot_<kind> instead"]
 
 val register_loop_annot_extension:
   string ->
   (Printer_api.extensible_printer_type -> Format.formatter ->
    Cil_types.acsl_extension_kind -> unit) -> unit
-(** Register a pretty-printer used for behavior extension.
+(** Register a pretty-printer used for loop annotation extension.
     @plugin development guide
+    @deprecated Frama-C+dev
 *)
+[@@ deprecated "Use Acsl_extension.register_loop_annot instead"]
 
 val state: Printer_api.state
 
@@ -83,6 +91,12 @@ val set_extension_handler:
     If your name is not [Acsl_extension], do not call this
     @since Frama-C+dev
 *)
+
+val set_deprecated_extension_handler:
+  handler:(string -> Cil_types.ext_category ->
+           (Printer_api.extensible_printer_type -> Format.formatter ->
+            Cil_types.acsl_extension_kind -> unit) ->
+           unit) -> unit
 
 (*
 Local Variables:
