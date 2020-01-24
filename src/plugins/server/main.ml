@@ -297,6 +297,7 @@ let stop server =
   | Some db ->
     begin
       server.background <- None ;
+      signal false ;
       Db.progress := db ;
     end
 

@@ -32,12 +32,19 @@ module Senv = Server_parameters
 let zmq_group = Senv.add_group "Protocol ZeroMQ"
 
 let () = Parameter_customize.set_group zmq_group
-module Enabled = Senv.String
+module Socket = Senv.String
     (struct
       let option_name = "-server-zmq"
       let arg_name = "url"
       let default = ""
-      let help = "Establish a ZeroMQ server and listen for connections"
+      let help = "Setup the ZeroMQ server (in background)."
+    end)
+
+let () = Parameter_customize.set_group zmq_group
+module Run = Senv.Action
+    (struct
+      let option_name = "-server-zmq-run"
+      let help = "Launch the ZeroMQ server (until shutdown)."
     end)
 
 let _ = Doc.page `Protocol ~title:"ZeroMQ Protocol" ~filename:"server_zmq.md"
@@ -46,7 +53,7 @@ let _ = Doc.page `Protocol ~title:"ZeroMQ Protocol" ~filename:"server_zmq.md"
 (* --- ZMQ Context                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-let context =
+let zmq_context =
   let zmq = ref None in
   fun () ->
     match !zmq with
@@ -117,26 +124,43 @@ let fetch socket () =
 (* --- Establish the Server                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-let establish url =
-  if url <> "" then
-    begin
-      let context = context () in
-      let socket = Zmq.Socket.(create context rep) in
-      try
-        Zmq.Socket.bind socket url ;
-        Senv.feedback "ZeroMQ [%s]" url ;
-        Main.create ~pretty:Format.pp_print_string ~fetch:(fetch socket) ()
-        |> Main.run ;
-        Zmq.Socket.close socket ;
-      with exn ->
-        Zmq.Socket.close socket ;
-        raise exn
-    end
+let pretty = Format.pp_print_string
+let background = ref None
 
-(* -------------------------------------------------------------------------- *)
-(* --- Establish the Server from Command line                             --- *)
-(* -------------------------------------------------------------------------- *)
+let cmdline () =
+  begin
+    match !background with
+    | Some server ->
+      if Run.get () then Main.run server
+    | None ->
+      let url = Socket.get () in
+      if url <> "" then
+        let context = zmq_context () in
+        let socket = Zmq.Socket.(create context rep) in
+        try
+          Zmq.Socket.bind socket url ;
+          let server = Main.create ~pretty ~fetch:(fetch socket) () in
+          background := Some server ;
+          at_exit begin fun () ->
+            Senv.feedback "ZeroMQ [%s] stopped" url ;
+            Zmq.Socket.close socket ;
+            background := None ;
+          end ;
+          if Run.get () then
+            begin
+              Senv.feedback "ZeroMQ [%s] running" url ;
+              Main.run server
+            end
+          else
+            begin
+              Senv.feedback "ZeroMQ [%s] started" url ;
+              Main.start server
+            end
+        with exn ->
+          Zmq.Socket.close socket ;
+          raise exn
+  end
 
-let () = Db.Main.extend (fun () -> establish (Enabled.get ()))
+let () = Db.Main.extend cmdline
 
 (* -------------------------------------------------------------------------- *)
