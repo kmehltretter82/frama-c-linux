@@ -63,7 +63,7 @@ let add_sep buffer =
     else
       begin
         buffer.state <- TRUNCATE ;
-        (* TODO [OCaml 4.05] Buffer.truncate buffer.content buffer.lastsep ; *)
+        Buffer.truncate buffer.content buffer.lastsep
       end
 
 let add_char buffer = function
@@ -92,8 +92,4 @@ let rec add_list buffer = function
   | p::ps -> add_string buffer p ; add_sep buffer ; add_list buffer ps
 
 let contents buffer =
-  (* TODO [OCaml 4.05] simply buffer contents if using Buffer.truncate *)
-  let s = Buffer.contents buffer.content in
-  if buffer.state = TRUNCATE then
-    String.sub s 0 buffer.lastsep
-  else s
+  Buffer.contents buffer.content
