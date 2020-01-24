@@ -185,12 +185,8 @@ let monitoring = ref false
 let monitored = ref false
 let events : Log.event Queue.t = Queue.create ()
 
-let monitor flag =
+let set_monitoring flag =
   if flag != !monitoring then
-    ( if flag then
-        Senv.feedback "Start logs monitoring."
-      else
-        Senv.feedback "Stop logs monitoring." ) ;
   monitoring := flag ;
   if !monitoring && not !monitored then
     begin
@@ -198,14 +194,19 @@ let monitor flag =
       Log.add_listener (fun evt -> if !monitoring then Queue.add evt events)
     end
 
-let monitor_logs () = monitor (Senv.Log.get ())
-
 let monitor_server activity =
-  if activity then monitor true else monitor_logs ()
+  if not (Senv.AutoLog.get ()) then set_monitoring activity
+
+let monitor_autologs () =
+  if Senv.AutoLog.get () then
+    begin
+      Senv.feedback "Auto-log started." ;
+      set_monitoring true ;
+    end
 
 let () =
   Main.on monitor_server ;
-  Cmdline.run_after_configuring_stage monitor_logs
+  Cmdline.run_after_configuring_stage monitor_autologs
 
 (* -------------------------------------------------------------------------- *)
 (* --- Log Requests                                                       --- *)
@@ -214,7 +215,8 @@ let () =
 let () = Request.register
     ~page ~kind:`SET ~name:"kernel.setLogs"
     ~descr:(Md.plain "Turn logs monitoring on/off")
-    ~input:(module Jbool) ~output:(module Junit) monitor
+    ~input:(module Jbool) ~output:(module Junit)
+    set_monitoring
 
 let () = Request.register
     ~page ~kind:`GET ~name:"kernel.getLogs"

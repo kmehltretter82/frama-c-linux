@@ -286,8 +286,10 @@ let start server =
   | Some _db -> ()
   | None ->
     begin
+      Senv.feedback "Server enabled." ;
       let db = !Db.progress in
       server.background <- Some db ;
+      signal true ;
       Db.progress := do_yield server ;
     end
 
@@ -296,8 +298,18 @@ let stop server =
   | None -> ()
   | Some db ->
     begin
+      Senv.feedback "Server disabled." ;
       server.background <- None ;
       signal false ;
+      Db.progress := db ;
+    end
+
+let foreground server =
+  match server.background with
+  | None -> ()
+  | Some db ->
+    begin
+      server.background <- None ;
       Db.progress := db ;
     end
 
@@ -309,7 +321,7 @@ let run server =
   try
     (* TODO: remove the following line once the Why3 signal handler is not
          used anymore. *)
-    stop server ;
+    foreground server ;
     Sys.catch_break true;
     signal true ;
     Senv.feedback "Server running." ;

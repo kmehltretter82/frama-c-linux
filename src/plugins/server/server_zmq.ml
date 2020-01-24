@@ -60,7 +60,7 @@ let zmq_context =
     | Some ctxt -> ctxt
     | None ->
       let major,minor,patch = Zmq.version () in
-      Senv.feedback "ZeroMQ %d.%d.%d" major minor patch ;
+      Senv.feedback "ZeroMQ [v%d.%d.%d]" major minor patch ;
       let ctxt = Zmq.Context.create () in
       at_exit (fun () -> Zmq.Context.terminate ctxt) ;
       zmq := Some ctxt ; ctxt
@@ -139,23 +139,15 @@ let cmdline () =
         let socket = Zmq.Socket.(create context rep) in
         try
           Zmq.Socket.bind socket url ;
+          Senv.feedback "ZeroMQ [%s]" url ;
           let server = Main.create ~pretty ~fetch:(fetch socket) () in
           background := Some server ;
           at_exit begin fun () ->
-            Senv.feedback "ZeroMQ [%s] stopped" url ;
+            Main.stop server ;
             Zmq.Socket.close socket ;
             background := None ;
           end ;
-          if Run.get () then
-            begin
-              Senv.feedback "ZeroMQ [%s] running" url ;
-              Main.run server
-            end
-          else
-            begin
-              Senv.feedback "ZeroMQ [%s] started" url ;
-              Main.start server
-            end
+          if Run.get () then Main.run server else Main.start server ;
         with exn ->
           Zmq.Socket.close socket ;
           raise exn

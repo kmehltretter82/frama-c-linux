@@ -53,9 +53,9 @@ module Yield = P.Int
       let help = EXEC yield period (in milliseconds, default 50ms)"
     end)
 
-module Log = P.False
+module AutoLog = P.False
     (struct
-      let option_name = "-server-logs"
+      let option_name = "-server-auto-log"
       let help = "Start monitoring logs before server is running (default is false)"
     end)
 
