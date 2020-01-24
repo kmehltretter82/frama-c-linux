@@ -543,6 +543,7 @@ KERNEL_CMO=\
 	src/kernel_internals/parsing/logic_parser.cmo                  \
 	src/kernel_internals/parsing/logic_lexer.cmo                   \
 	src/kernel_services/ast_queries/logic_typing.cmo             \
+	src/kernel_services/ast_queries/acsl_extension.cmo				\
 	src/kernel_services/ast_queries/ast_info.cmo                 \
 	src/kernel_services/ast_data/ast.cmo                            \
 	src/kernel_services/ast_printing/cprint.cmo                     \
