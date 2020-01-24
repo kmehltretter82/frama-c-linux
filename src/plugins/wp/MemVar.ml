@@ -914,6 +914,35 @@ struct
         end
 
   (* -------------------------------------------------------------------------- *)
+  (* ---  Framing                                                           --- *)
+  (* -------------------------------------------------------------------------- *)
+
+  let rec forall_pointers phi v t =
+    match Cil.unrollType t with
+    | TInt _ | TFloat _ | TVoid _ | TEnum _ | TNamed _ | TBuiltin_va_list _
+      -> F.p_true
+    | TPtr _ | TFun _ -> phi v
+    | TComp({ cfields },_,_) ->
+        F.p_all
+          (fun fd -> forall_pointers phi (e_getfield v (Cfield fd)) fd.ftype)
+          cfields
+    | TArray(elt,_,_,_) ->
+        let k = Lang.freshvar Qed.Logic.Int in
+        F.p_forall [k] (forall_pointers phi (e_get v (e_var k)) elt)
+
+  let frame sigma =
+    let hs = ref [] in
+    SIGMA.iter
+      (fun x chunk ->
+         if (x.vglob || x.vformal) then
+           let t = VAR.typ_of_chunk x in
+           let v = e_var chunk in
+           let h = forall_pointers (M.global sigma.mem) v t in
+           if not (F.eqp h F.p_true) then hs := h :: !hs
+      ) sigma.vars ;
+    !hs @ M.frame sigma.mem
+
+  (* -------------------------------------------------------------------------- *)
   (* ---  Scope                                                             --- *)
   (* -------------------------------------------------------------------------- *)
 
@@ -925,15 +954,6 @@ struct
     match V.param x with
     | ByRef | InContext | InArray | NotUsed -> false
     | ByValue | ByShift | ByAddr -> true
-
-  let frame sigma =
-    let pool = ref [] in
-    SIGMA.iter
-      (fun x p ->
-         if (x.vglob || x.vformal) && Cil.isPointerType (VAR.typ_of_chunk x)
-         then pool := M.global sigma.mem (e_var p) :: !pool
-      ) sigma.vars ;
-    !pool @ M.frame sigma.mem
 
   let alloc sigma xs =
     let xm = List.filter is_mem xs in

@@ -26,6 +26,9 @@ Assume {
   Init: (a.F1_f) = global(G_e_22).
   (* Initializer *)
   Init: (a.F1_g) = global(G_f_23).
+  (* Heap *)
+  Have: forall i_1 : Z. let a_4 = A[i_1] in (region(a_4.F1_f.base) <= 0) /\
+      (region(a_4.F1_g.base) <= 0).
   (* Pre-condition *)
   Have: (0 <= i) /\ (i <= 2).
 }
@@ -46,6 +49,9 @@ Assume {
   Init: (A[1].F1_f) = a_1.
   (* Initializer *)
   Init: (A[2].F1_f) = a.
+  (* Heap *)
+  Have: forall i_1 : Z. let a_4 = A[i_1] in (region(a_4.F1_f.base) <= 0) /\
+      (region(a_4.F1_g.base) <= 0).
   (* Pre-condition *)
   Have: (0 <= i) /\ (i <= 2).
 }
