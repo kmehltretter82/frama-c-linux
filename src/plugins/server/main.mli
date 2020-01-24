@@ -66,6 +66,8 @@ type 'a message = {
   callback : 'a response list -> unit ;
 }
 
+type 'a server
+
 (**
    Run a server with the provided low-level network primitives to
    actually exchange data.
@@ -75,11 +77,20 @@ type 'a message = {
 
    Default equality is the standard `(=)` one.
 *)
-val run :
+val create :
   pretty:(Format.formatter -> 'a -> unit) ->
   ?equal:('a -> 'a -> bool) ->
   fetch:(unit -> 'a message option) ->
-  unit -> unit
+  unit -> 'a server
+
+(** Run the server forever *)
+val run : 'a server -> unit
+
+(** Start the server in background *)
+val start : 'a server -> unit
+
+(** Stop the server if it is running in background *)
+val stop : 'a server -> unit
 
 (** Kills the currently running request. Actually raises an exception. *)
 val kill : unit -> 'a

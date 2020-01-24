@@ -125,7 +125,8 @@ let establish url =
       try
         Zmq.Socket.bind socket url ;
         Senv.feedback "ZeroMQ [%s]" url ;
-        Main.run ~pretty:Format.pp_print_string ~fetch:(fetch socket) () ;
+        Main.create ~pretty:Format.pp_print_string ~fetch:(fetch socket) ()
+        |> Main.run ;
         Zmq.Socket.close socket ;
       with exn ->
         Zmq.Socket.close socket ;

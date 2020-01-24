@@ -93,6 +93,7 @@ type 'a server = {
   fetch : unit -> 'a message option ;
   q_in : 'a exec Queue.t ;
   q_out : 'a response Stack.t ;
+  mutable background : (unit -> unit) option ;
   mutable shutdown : bool ;
   mutable running : 'a exec option ;
 }
@@ -265,37 +266,66 @@ let on callback = demons := !demons @ [ callback ]
 let signal activity =
   List.iter (fun f -> try f activity with _ -> ()) !demons
 
-let run ~pretty ?(equal=(=)) ~fetch () =
-  begin
-    let yield = in_range ~min:1 ~max:200 (Senv.Yield.get ()) in
-    let idle_ms = in_range ~min:1 ~max:2000 (Senv.Idle.get ()) in
-    let idle = float_of_int idle_ms /. 1000.0 in
-    let server = {
-      fetch ; yield ; equal ; pretty ;
-      q_in = Queue.create () ;
-      q_out = Stack.create () ;
-      running = None ;
-      shutdown = false ;
-    } in
-    try
-      (* TODO: remove the following line once the Why3 signal handler is not
+let create ~pretty ?(equal=(=)) ~fetch () =
+  let yield = in_range ~min:1 ~max:200 (Senv.Yield.get ()) in
+  {
+    fetch ; yield ; equal ; pretty ;
+    q_in = Queue.create () ;
+    q_out = Stack.create () ;
+    background = None ;
+    running = None ;
+    shutdown = false ;
+  }
+
+(* -------------------------------------------------------------------------- *)
+(* --- Start / Stop                                                       --- *)
+(* -------------------------------------------------------------------------- *)
+
+let start server =
+  match server.background with
+  | Some _db -> ()
+  | None ->
+    begin
+      let db = !Db.progress in
+      server.background <- Some db ;
+      Db.progress := do_yield server ;
+    end
+
+let stop server =
+  match server.background with
+  | None -> ()
+  | Some db ->
+    begin
+      server.background <- None ;
+      Db.progress := db ;
+    end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Main Loop                                                          --- *)
+(* -------------------------------------------------------------------------- *)
+
+let run server =
+  try
+    (* TODO: remove the following line once the Why3 signal handler is not
          used anymore. *)
-      Sys.catch_break true;
-      signal true ;
-      Senv.feedback "Server running." ;
-      begin try
-          while not server.shutdown do
-            let activity = process server in
-            if not activity then Unix.sleepf idle ;
-          done ;
-        with Sys.Break -> () (* Ctr+C, just leave the loop normally *)
-      end;
-      Senv.feedback "Server shutdown." ;
-      signal false ;
-    with exn ->
-      Senv.feedback "Server interruped (fatal error)." ;
-      signal false ;
-      raise exn
-  end
+    stop server ;
+    Sys.catch_break true;
+    signal true ;
+    Senv.feedback "Server running." ;
+    begin try
+        let idle_ms = in_range ~min:1 ~max:2000 (Senv.Idle.get ()) in
+        let idle_s = float_of_int idle_ms /. 1000.0 in
+        while not server.shutdown do
+          let activity = process server in
+          if not activity then Unix.sleepf idle_s ;
+        done ;
+      with Sys.Break -> () (* Ctr+C, just leave the loop normally *)
+    end;
+    Senv.feedback "Server shutdown." ;
+    signal false ;
+  with exn ->
+    Senv.feedback "Server interruped (fatal error)." ;
+    signal false ;
+    raise exn
 
 (* -------------------------------------------------------------------------- *)
