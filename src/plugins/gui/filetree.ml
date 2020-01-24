@@ -452,7 +452,7 @@ module State = struct
   let cil_files () =
     let files = Globals.FileIndex.get_files () in
     let globals_of_file f =
-      let all = Globals.FileIndex.get_symbols f in
+      let all = List.rev (Globals.FileIndex.get_symbols f) in
       let is_unused = function
         | GFun ({svar = vi},_) | GFunDecl (_, vi, _)
         | GVar (vi, _, _) | GVarDecl (vi, _) ->
