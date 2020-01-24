@@ -103,3 +103,17 @@ let register_code_annot_next_loop =
   Extensions.register (Ext_code_annot Ext_next_loop)
 let register_code_annot_next_both =
   Extensions.register (Ext_code_annot Ext_next_both)
+
+(* Setup global references *)
+
+let () =
+  Logic_env.set_extension_handler
+    ~category:Extensions.category
+    ~is_extension: Extensions.is_extension ;
+  Logic_typing.set_extension_handler
+    ~is_extension: Extensions.is_extension
+    ~typer: Extensions.typing ;
+  Cil.set_extension_handler
+    ~visit: Extensions.visit ;
+  Cil_printer.set_extension_handler
+    ~print: Extensions.print

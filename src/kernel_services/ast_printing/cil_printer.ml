@@ -27,6 +27,15 @@ open Cil_datatype
 open Printer_api
 open Format
 
+let initialized_extensions = ref false
+let ref_print_extension = ref (fun _ _ _ _ -> assert false)
+
+let set_extension_handler ~print =
+  assert (not !initialized_extensions) ;
+  ref_print_extension := print ;
+  initialized_extensions := true ;
+  ()
+
 module Behavior_extensions = struct
 
   let printer_tbl = Hashtbl.create 5

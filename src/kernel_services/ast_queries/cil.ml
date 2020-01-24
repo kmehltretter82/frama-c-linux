@@ -757,6 +757,15 @@ let alphatrue _ = true
 
 let visitor_tbl = Hashtbl.create 5
 
+let initialized_extensions = ref false
+let ref_visit_extension = ref (fun _ _ _ -> assert false)
+
+let set_extension_handler ~visit =
+  assert (not !initialized_extensions) ;
+  ref_visit_extension := visit ;
+  initialized_extensions := true ;
+  ()
+
 let register_behavior_extension name ext = Hashtbl.add visitor_tbl name ext
 
 (* sm/gn: cil visitor interface for traversing Cil trees. *)

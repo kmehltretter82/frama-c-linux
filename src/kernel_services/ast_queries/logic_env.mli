@@ -204,6 +204,15 @@ val builtin_types_as_typenames: unit -> unit
 
 (** {2 Internal use} *)
 
+val set_extension_handler:
+  category:(string -> ext_category option) ->
+  is_extension:(string -> bool) ->
+  unit
+(** Used to setup references related to the handling of ACSL extensions.
+    If your name is not [Acsl_extension], do not call this
+    @since Frama-C+dev
+*)
+
 val init_dependencies: State.t -> unit
 (** Used to postpone dependency of Lenv global tables wrt Cil_state, which
     is initialized afterwards. *)

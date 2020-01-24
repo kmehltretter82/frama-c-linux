@@ -371,6 +371,18 @@ val enter_post_state: Lenv.t -> termination_kind -> Lenv.t
 val post_state_env: termination_kind -> logic_type -> Lenv.t
 
 
+(** {2 Internal use} *)
+
+val set_extension_handler:
+  is_extension:(string -> bool) ->
+  typer:(string -> typing_context -> location -> Logic_ptree.lexpr list ->
+         (bool * acsl_extension_kind)) ->
+  unit
+(** Used to setup references related to the handling of ACSL extensions.
+    If your name is not [Acsl_extension], do not call this
+    @since Frama-C+dev
+*)
+
 (*
 Local Variables:
 compile-command: "make -C ../../.."

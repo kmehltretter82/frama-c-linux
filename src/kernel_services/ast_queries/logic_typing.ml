@@ -524,6 +524,17 @@ type typing_context = {
   on_error: 'a 'b. ('a -> 'b) -> (unit -> unit) -> 'a -> 'b
 }
 
+let initialized_extensions = ref false
+let ref_is_extension = ref (fun _ -> assert false)
+let ref_type_extension = ref (fun _ _ _ _ -> assert false)
+
+let set_extension_handler ~is_extension ~typer =
+  assert (not !initialized_extensions) ;
+  ref_is_extension := is_extension ;
+  ref_type_extension := typer ;
+  initialized_extensions := true ;
+  ()
+
 module Extensions = struct
   let typer_tbl = Hashtbl.create 5
   let find_typer name = Hashtbl.find typer_tbl name

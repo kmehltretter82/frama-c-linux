@@ -73,6 +73,17 @@ val print_global: Cil_types.global -> bool
 (** Is the given global displayed by the pretty-printer.
     @since Aluminium-20160501 *)
 
+(**/**)
+
+val set_extension_handler:
+  print:(string -> Printer_api.extensible_printer_type -> Format.formatter ->
+         Cil_types.acsl_extension_kind -> unit) ->
+  unit
+(** Used to setup a reference related to the handling of ACSL extensions.
+    If your name is not [Acsl_extension], do not call this
+    @since Frama-C+dev
+*)
+
 (*
 Local Variables:
 compile-command: "make -C ../../.."

@@ -2283,6 +2283,15 @@ val pp_ikind_ref: (Format.formatter -> ikind -> unit) ref
 val pp_attribute_ref: (Format.formatter -> attribute -> unit) ref
 val pp_attributes_ref: (Format.formatter -> attribute list -> unit) ref
 
+val set_extension_handler:
+  visit:(string -> cilVisitor -> acsl_extension_kind ->
+         acsl_extension_kind visitAction) ->
+  unit
+(** Used to setup a reference related to the handling of ACSL extensions.
+    If your name is not [Acsl_extension], do not call this
+    @since Frama-C+dev
+*)
+
 (*
 Local Variables:
 compile-command: "make -C ../../.."

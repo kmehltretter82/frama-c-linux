@@ -24,6 +24,18 @@
 
 open Cil_types
 
+let initialized_extensions = ref false
+let ref_is_extension = ref (fun _ -> assert false)
+let ref_extension_category = ref (fun _ -> assert false)
+
+let set_extension_handler ~category ~is_extension =
+  assert (not !initialized_extensions) ;
+  ref_is_extension := is_extension ;
+  ref_extension_category := category ;
+  initialized_extensions := true ;
+  ()
+
+
 let extensions = ref Datatype.String.Map.empty
 
 let is_extension s = Datatype.String.Map.mem s !extensions
