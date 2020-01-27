@@ -330,13 +330,19 @@ let run server =
         let idle_s = float_of_int idle_ms /. 1000.0 in
         while not server.shutdown do
           let activity = process server in
-          if not activity then Unix.sleepf idle_s ;
+          if not activity then
+            begin
+              Unix.sleepf idle_s ;
+              !Db.progress () ;
+            end
         done ;
       with Sys.Break -> () (* Ctr+C, just leave the loop normally *)
     end;
     Senv.feedback "Server shutdown." ;
     signal false ;
-  with exn ->
+  with
+  | Killed -> ()
+  | exn ->
     Senv.feedback "Server interruped (fatal error)." ;
     signal false ;
     raise exn
