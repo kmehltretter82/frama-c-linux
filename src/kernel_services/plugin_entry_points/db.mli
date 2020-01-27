@@ -1339,6 +1339,40 @@ module Derefs : INOUT with type t = Locations.Zone.t
     @plugin development guide *)
 val progress: (unit -> unit) ref
 
+(** Registered daemon on progress. *)
+type daemon
+
+(**
+   Register a new daemon to be executed on [Db.yield()].
+   When specified, two succcessive calls to the daemon will be
+   separated by at least [~debounced] milliseconds (default is 0ms).
+*)
+val on_progress : ?debounced:int -> (unit -> unit) -> daemon
+
+(** Un-register the daemon. *)
+val off_progress : daemon -> unit
+
+(** Trigger all daemons immediately. *)
+val flush : unit -> unit
+
+(** Trigger all registered daemons (debounced). *)
+val yield : unit -> unit
+
+(** Trigger a callback once on next [yield()]. *)
+val once : (unit -> unit) -> unit
+
+(** Raises [Cancel] exception *)
+val cancel : unit -> unit
+
+(**
+   Execute the given job with a temporary registered (debounced) daemon.
+   Details: [with_progress trigger job data] runs [job data] and returns its
+   result, with [trigger] registered as a temporary (debounced) daemon.
+   The daemon is finally flushed and un-registered at the end
+   of the computation, and any exception is re-raised.
+*)
+val with_progress : ?debounced:int -> (unit -> unit) -> ('a -> 'b) -> 'a -> 'b
+
 (** This exception may be raised by {!progress} to interrupt computations. *)
 exception Cancel
 

@@ -1062,9 +1062,63 @@ end
 (** {2 GUI} *)
 (* ************************************************************************* *)
 
-let progress = ref (fun () -> ())
+type daemon = {
+  trigger : unit -> unit ;
+  debounced : float ; (* in ms *)
+  mutable next_at : float ; (* next time *)
+}
+
+let pending = ref []
+let daemons = ref []
+
+let once trigger = pending := trigger :: !pending
+
+let on_progress ?(debounced=0) trigger =
+  let d = {
+    trigger ;
+    debounced = float debounced /. 1000.0 ;
+    next_at = 0.0 ;
+  } in
+  daemons := List.append !daemons [d] ; d
+
+let off_progress d =
+  daemons := List.filter (fun d0 -> d != d0) !daemons
+
+let with_progress ?debounced trigger job data =
+  let d = on_progress ?debounced trigger in
+  try
+    let res = job data in
+    off_progress d ; trigger () ; res
+  with exn ->
+    off_progress d ; trigger () ; raise exn
+
+let yield () =
+  let jobs = List.rev !pending in
+  pending := [] ;
+  List.iter (fun f -> f()) jobs ;
+  let t = Unix.gettimeofday () in
+  List.iter (fun d ->
+      if t > d.next_at then
+        begin
+          d.next_at <- t +. d.debounced ;
+          d.trigger () ;
+        end
+    ) !daemons
+
+let flush () =
+  List.iter (fun d -> d.next_at <- 0.0) !daemons ;
+  yield ()
+
+(*
+let progress = ref (Kernel.deprecated "!Db.progress()" ~now:"Db.yield()" yield)
+*)
+
+let progress = ref yield
 
 exception Cancel
+let cancel () = raise Cancel
+
+(* ************************************************************************* *)
 
 (*
 Local Variables:
