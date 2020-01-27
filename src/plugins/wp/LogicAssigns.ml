@@ -24,7 +24,6 @@ open Sigs
 
 module Make
     ( M : Sigs.Model )
-    ( C : Sigs.CodeSemantics with module M = M )
     ( L : Sigs.LogicSemantics with module M = M ) =
 struct
 

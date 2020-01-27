@@ -36,7 +36,7 @@ module type Key = sig
   val tag: 'a key -> int
 end
 
-module Make (X : sig end) = struct
+module Make () = struct
 
   type 'a key = { tag: int;
                   name: string }
@@ -59,9 +59,9 @@ module Make (X : sig end) = struct
   let print fmt x = Format.pp_print_string fmt x.name
 end
 
-module Key_Value = Make (struct end)
-module Key_Location = Make (struct end)
-module Key_Domain = Make (struct end)
+module Key_Value = Make ()
+module Key_Location = Make ()
+module Key_Domain = Make ()
 
 module type Shape = sig
   include Key

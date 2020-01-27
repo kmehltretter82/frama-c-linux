@@ -22,6 +22,5 @@
 
 module Make
     ( M : Sigs.Model )
-    ( C : Sigs.CodeSemantics with module M = M )
     ( L : Sigs.LogicSemantics with module M = M ) :
   Sigs.LogicAssigns with module M = M and module L = L

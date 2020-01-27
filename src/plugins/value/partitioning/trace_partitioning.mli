@@ -24,7 +24,6 @@ open Bottom.Type
 
 module Make
     (Abstract : Abstractions.Eva)
-    (Transfer : Transfer_stmt.S with type state = Abstract.Dom.t)
     (Kf : sig val kf: Cil_types.kernel_function end) :
 sig
   type state = Abstract.Dom.t     (** The states being partitioned *)

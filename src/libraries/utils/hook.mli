@@ -92,7 +92,7 @@ module type Iter_hook = S with type result = unit
 module Build(P:sig type t end) : Iter_hook with type param = P.t
 
 (** Make a new empty hook from [unit]. *)
-module Make(X:sig end) : S with type param = unit and type result = unit
+module Make() : S with type param = unit and type result = unit
 
 module Fold(P: sig type t end): S with type param = P.t and type result = P.t
 

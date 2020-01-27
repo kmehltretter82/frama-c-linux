@@ -242,7 +242,7 @@ module MakeCompiler(M:Sigs.Model) = struct
   module M = M
   module C = CodeSemantics.Make(M)
   module L = LogicSemantics.Make(M)
-  module A = LogicAssigns.Make(M)(C)(L)
+  module A = LogicAssigns.Make(M)(L)
 end
 
 module Comp_Region = MakeCompiler(Register(Static)(MemRegion))

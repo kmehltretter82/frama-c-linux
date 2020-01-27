@@ -26,7 +26,6 @@ open Partition
 
 module Make
     (Abstract: Abstractions.Eva)
-    (Transfer : Transfer_stmt.S with type state = Abstract.Dom.t)
     (Kf : sig val kf: kernel_function end) =
 struct
   module Parameters = Partitioning_parameters.Make (Kf)

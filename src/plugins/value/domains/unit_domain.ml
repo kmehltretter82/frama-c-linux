@@ -62,8 +62,8 @@ module Make
   let reduce_further _ _ _  = []
 
   module Transfer
-      (Valuation: Abstract_domain.Valuation with type value = value
-                                             and type loc = location)
+      (_: Abstract_domain.Valuation with type value = value
+                                     and type loc = location)
   = struct
 
     let update _ _ = `Value ()

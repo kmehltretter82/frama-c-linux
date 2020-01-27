@@ -646,7 +646,9 @@ module Callwise = struct
             Inout_type.map (Zone.filter_base filter) with_internals
           with Not_found -> Inout_type.bottom
       end) in
-    let module Compute = Dataflows.Simple_forward(Fenv)(Computer) in
+    let module [@warning "-60"] Compute =
+      Dataflows.Simple_forward (Fenv) (Computer)
+    in
     Computer.end_dataflow ()
 
   let record_for_callwise_inout ((call_stack: Db.Value.callstack), value_res) =
@@ -715,7 +717,9 @@ module FunctionWise = struct
         call_stack;
       Stack.push kf call_stack;
 
-      let module Compute = Dataflows.Simple_forward(Fenv)(Computer) in
+      let module [@warning "-60"] Compute =
+        Dataflows.Simple_forward (Fenv) (Computer)
+      in
       let result = Computer.end_dataflow () in
       ignore (Stack.pop call_stack);
       result
