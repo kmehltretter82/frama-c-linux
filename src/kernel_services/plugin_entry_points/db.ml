@@ -1092,18 +1092,31 @@ let with_progress ?debounced trigger job data =
   with exn ->
     off_progress d ; trigger () ; raise exn
 
+let yield_once () =
+  match !pending with
+  | [] -> ()
+  | rjobs ->
+    pending := [] ;
+    List.iter (fun f -> f()) (List.rev rjobs)
+
+let yield_daemons () =
+  match !daemons with
+  | [] -> ()
+  | ds ->
+    let t = Unix.gettimeofday () in
+    List.iter (fun d ->
+        if t > d.next_at then
+          begin
+            d.next_at <- t +. d.debounced ;
+            d.trigger () ;
+          end
+      ) ds
+
 let yield () =
-  let jobs = List.rev !pending in
-  pending := [] ;
-  List.iter (fun f -> f()) jobs ;
-  let t = Unix.gettimeofday () in
-  List.iter (fun d ->
-      if t > d.next_at then
-        begin
-          d.next_at <- t +. d.debounced ;
-          d.trigger () ;
-        end
-    ) !daemons
+  begin
+    yield_once () ;
+    yield_daemons () ;
+  end
 
 let flush () =
   List.iter (fun d -> d.next_at <- 0.0) !daemons ;
