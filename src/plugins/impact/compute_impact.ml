@@ -577,7 +577,7 @@ let rec intraprocedural wl = match pick wl with
   | Some (pnode, { kf; pdg; init; zone }) ->
       let node = pnode, zone in
       add_to_result wl node kf init;
-      !Db.progress ();
+      Db.yield ();
       Options.debug ~level:2 "considering new node %a in %a:@ <%a>%t"
         PdgTypes.Node.pretty pnode Kernel_function.pretty kf
         Pdg_aux.pretty_node node

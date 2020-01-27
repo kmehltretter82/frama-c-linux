@@ -420,7 +420,7 @@ module Make_Dataflow
     let {edge_transition=transition; edge_kinstr=kinstr} = e in
     let tank,edge_info = get_edge_data e in
     let flow = Partition.drain tank in
-    !Db.progress ();
+    Db.yield ();
     check_signals ();
     current_ki := kinstr;
     Cil.CurrentLoc.set e.edge_loc;

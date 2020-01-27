@@ -118,7 +118,7 @@ struct
     let combineSuccessors = DomSet.inter
 
     let doStmt stmt =
-      !Db.progress ();
+      Db.yield ();
       Postdominators_parameters.debug ~level:2 "doStmt: %d" stmt.sid;
       match stmt.skind with
         | Return _ -> Dataflow2.Done (DomSet.Value (Stmt.Hptset.singleton stmt))

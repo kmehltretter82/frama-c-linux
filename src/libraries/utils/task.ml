@@ -108,8 +108,8 @@ struct
 
   let rec wait = function
     | UNIT a -> a
-    | YIELD f -> !Db.progress() ; wait (f Coin)
-    | WAIT(ms,f) -> !Db.progress() ; Extlib.usleep ms ; wait (f Coin)
+    | YIELD f -> Db.yield() ; wait (f Coin)
+    | WAIT(ms,f) -> Db.yield() ; Extlib.usleep ms ; wait (f Coin)
 
   let finished = function UNIT a -> Some a | YIELD _ | WAIT _ -> None
 
@@ -479,7 +479,7 @@ let rec run_server server () =
         ) server.running ;
     Array.iter (schedule server) server.queue ;
     try
-      !Db.progress () ;
+      Db.yield ();
       fire server.activity ;
       if server.running <> [] then
         begin

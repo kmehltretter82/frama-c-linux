@@ -1109,11 +1109,7 @@ let flush () =
   List.iter (fun d -> d.next_at <- 0.0) !daemons ;
   yield ()
 
-(*
 let progress = ref (Kernel.deprecated "!Db.progress()" ~now:"Db.yield()" yield)
-*)
-
-let progress = ref yield
 
 exception Cancel
 let cancel () = raise Cancel

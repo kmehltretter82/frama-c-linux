@@ -45,7 +45,7 @@ let pp_from_file fmt file =
   let cin = open_in file in
   try
     while true do
-      !Db.progress () ;
+      Db.yield () ;
       let line = input_line cin in
       Format.pp_print_string fmt line ;
       Format.pp_print_newline fmt () ;
@@ -248,7 +248,7 @@ let command ?(timeout=0) ?stdout ?stderr cmd args =
       | Not_ready terminate ->
           begin
             try
-              !Db.progress () ;
+              Db.yield () ;
               if timeout > 0 && Unix.gettimeofday () -. !start > ftimeout then
                 raise Db.Cancel ;
               true

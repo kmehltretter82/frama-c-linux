@@ -500,7 +500,7 @@ module Cfg (W : Mcfg.S) = struct
   (** @return the WP stored for edge [e]. Compute it if it is not already
    * there and store it. Also handle the Acut annotations. *)
   let rec get_wp_edge ((_kf, cfg, strategy, res, wenv) as env) e =
-    !Db.progress ();
+    Db.yield ();
     let v = Cil2cfg.edge_dst e in
     debug "[get_wp_edge] get wp before %a@." Cil2cfg.pp_node v;
     try

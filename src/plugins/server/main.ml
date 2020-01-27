@@ -132,8 +132,6 @@ let pp_response pp fmt (r : _ response) =
 (* --- Request Handling                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-let no_yield () = ()
-
 let execute exec : _ response =
   try
     let data = exec.handler exec.data in
@@ -147,38 +145,10 @@ let execute exec : _ response =
       exec.request (Cmdline.protect exn) ;
     `Error(exec.id,Printexc.to_string exn)
 
-let acceptable_between_yield = 0.25 (* seconds *)
-
-let execute_with_yield yield exec =
-  let db = !Db.progress in
-  let yield, check =
-    if Senv.debug_atleast 1 then
-      let time = ref (Unix.gettimeofday ()) in
-      let check () =
-        let time' = Unix.gettimeofday () in
-        let diff = time' -. !time in
-        if diff > acceptable_between_yield
-        then
-          Senv.debug
-            "Db.progress missing during %s request (spent %fs between calls)"
-            exec.request
-            diff
-      in
-      (fun () ->
-         check ();
-         yield ();
-         time := Unix.gettimeofday ()),
-      check
-    else
-      yield, ignore
-  in
-  Db.progress := if exec.yield then yield else no_yield;
-  Extlib.try_finally ~finally:(fun () -> Db.progress := db; check ()) execute exec
-
 let execute_debug pp yield exec =
   if Senv.debug_atleast 1 then
     Senv.debug "Trigger %s:%a" exec.request pp exec.id ;
-  execute_with_yield yield exec
+  Db.with_progress yield execute exec
 
 let reply_debug server resp =
   if Senv.debug_atleast 1 then
@@ -290,7 +260,6 @@ let process server =
 let in_range ~min:a ~max:b v = min (max a v) b
 
 let kill () = raise Killed
-let yield () = !Db.progress ()
 
 let demons = ref []
 let on callback = demons := !demons @ [ callback ]
