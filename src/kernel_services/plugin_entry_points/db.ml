@@ -1064,8 +1064,10 @@ end
 
 type daemon = {
   trigger : unit -> unit ;
+  delayed : (int -> unit) option ;
   debounced : float ; (* in ms *)
-  mutable next_at : float ; (* next time *)
+  mutable next_at : float ; (* next trigger time *)
+  mutable last_at : float ; (* next yield time *)
 }
 
 let pending = ref []
@@ -1073,10 +1075,12 @@ let daemons = ref []
 
 let once trigger = pending := trigger :: !pending
 
-let on_progress ?(debounced=0) trigger =
+let on_progress ?(debounced=0) ?delayed trigger =
   let d = {
     trigger ;
     debounced = float debounced /. 1000.0 ;
+    delayed ;
+    last_at = 0.0 ;
     next_at = 0.0 ;
   } in
   daemons := List.append !daemons [d] ; d
@@ -1084,8 +1088,8 @@ let on_progress ?(debounced=0) trigger =
 let off_progress d =
   daemons := List.filter (fun d0 -> d != d0) !daemons
 
-let with_progress ?debounced trigger job data =
-  let d = on_progress ?debounced trigger in
+let with_progress ?debounced ?delayed trigger job data =
+  let d = on_progress ?debounced ?delayed trigger in
   try
     let res = job data in
     off_progress d ; trigger () ; res
@@ -1104,13 +1108,22 @@ let yield_daemons () =
   | [] -> ()
   | ds ->
     let t = Unix.gettimeofday () in
-    List.iter (fun d ->
+    List.iter
+      begin fun d ->
+        let delta = d.debounced in
         if t > d.next_at then
           begin
-            d.next_at <- t +. d.debounced ;
+            d.next_at <- t +. delta ;
             d.trigger () ;
-          end
-      ) ds
+          end ;
+        match d.delayed with
+        | None -> ()
+        | Some warn ->
+          let period = t -. d.last_at in
+          let delay = if delta > 0.0 then delta else 0.1 in
+          if period > delay then warn (int_of_float (period *. 1000.0)) ;
+          d.last_at <- t ;
+      end ds
 
 let yield () =
   begin

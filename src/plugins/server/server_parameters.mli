@@ -25,7 +25,7 @@
 include Plugin.General_services
 
 module Idle : Parameter_sig.Int (** Idle waiting time (in ms) *)
-module Rate : Parameter_sig.Int (** Number of fetch per yield *)
+module Yield : Parameter_sig.Int (** Yield time (in ms) *)
 module Doc : Parameter_sig.String (** Generate documentation *)
 module Log : Parameter_sig.Bool (** Monitor logs *)
 

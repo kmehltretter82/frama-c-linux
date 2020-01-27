@@ -1346,8 +1346,11 @@ type daemon
    Register a new daemon to be executed on [Db.yield()].
    When specified, two succcessive calls to the daemon will be
    separated by at least [~debounced] milliseconds (default is 0ms).
+   The [~delayed d] callback is invoked when [Db.yield()] has not been called
+   since a delay [d] greater than [~debounced] or 100ms.
 *)
-val on_progress : ?debounced:int -> (unit -> unit) -> daemon
+val on_progress :
+  ?debounced:int -> ?delayed:(int -> unit) -> (unit -> unit) -> daemon
 
 (** Un-register the daemon. *)
 val off_progress : daemon -> unit
@@ -1370,8 +1373,11 @@ val cancel : unit -> unit
    result, with [trigger] registered as a temporary (debounced) daemon.
    The daemon is finally flushed and un-registered at the end
    of the computation, and any exception is re-raised.
+   The callback [~on_mute d] is triggered when the deamon has not been yielded
+   for a period [d] longer than [~debounce] or 100ms by default.
 *)
-val with_progress : ?debounced:int -> (unit -> unit) -> ('a -> 'b) -> 'a -> 'b
+val with_progress : ?debounced:int -> ?delayed:(int -> unit) ->
+  (unit -> unit) -> ('a -> 'b) -> 'a -> 'b
 
 (** This exception may be raised by {!progress} to interrupt computations. *)
 exception Cancel

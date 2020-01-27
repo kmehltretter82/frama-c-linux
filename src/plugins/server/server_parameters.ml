@@ -37,16 +37,16 @@ module Idle = P.Int
     (struct
       let option_name = "-server-idle"
       let arg_name = "ms"
-      let default = 10
+      let default = 20
       let help = "Waiting time (in milliseconds) when idle"
     end)
 
-module Rate = P.Int
+module Yield = P.Int
     (struct
-      let option_name = "-server-rate"
-      let arg_name = "n"
-      let default = 100
-      let help = "Number of analysis steps between server communications"
+      let option_name = "-server-yield"
+      let arg_name = "ms"
+      let default = 20
+      let help = "Yielding time (in milliseconds) during computations"
     end)
 
 module Doc = P.String
