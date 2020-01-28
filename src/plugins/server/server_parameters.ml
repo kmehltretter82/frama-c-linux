@@ -45,14 +45,6 @@ module Idle = P.Int
       let help = "Server polling (in milliseconds, default 50ms)"
     end)
 
-module Yield = P.Int
-    (struct
-      let option_name = "-server-yield"
-      let arg_name = "ms"
-      let default = 50
-      let help = EXEC yield period (in milliseconds, default 50ms)"
-    end)
-
 module AutoLog = P.False
     (struct
       let option_name = "-server-auto-log"

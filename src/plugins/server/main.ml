@@ -333,7 +333,7 @@ let run server =
           if not activity then
             begin
               Unix.sleepf idle_s ;
-              !Db.progress () ;
+              Db.yield () ;
             end
         done ;
       with Sys.Break -> () (* Ctr+C, just leave the loop normally *)
