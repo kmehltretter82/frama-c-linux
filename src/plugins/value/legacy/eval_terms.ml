@@ -1883,7 +1883,12 @@ let reduce_by_known_papp ~alarm_mode env positive li _labels args =
       let alarm_mode = alarm_reduce_mode () in
       let vr = (eval_term ~alarm_mode env argr).eover in
       match eval_term_as_exact_locs ~alarm_mode env argl with
-      | Logic_var _ -> env (* TODO *)
+      | Logic_var logic_var ->
+        let vl = LogicVarEnv.find logic_var env.logic_vars in
+        let reduced = Cvalue.V.narrow vl vr in
+        if V.equal V.bottom reduced then raise Reduce_to_bottom;
+        let logic_vars = LogicVarEnv.add logic_var reduced env.logic_vars in
+        { env with logic_vars }
       | Location (_typ, locsl) ->
         let aux locl env =
           let state = env_current_state env in
