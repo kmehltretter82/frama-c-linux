@@ -353,10 +353,7 @@ let infer_binop_res_type op targ =
 
 (* This function could probably be in Logic_utils. It computes [*tsets],
    assuming that [tsets] has a pointer type. *)
-let deref_tsets tsets =
-  let star_tsets = Cil.mkTermMem ~addr:tsets ~off:TNoOffset in
-  let typ = Logic_typing.type_of_pointed tsets.term_type in
-  Logic_const.term (TLval star_tsets) typ
+let deref_tsets tsets = Cil.mkTermMem ~addr:tsets ~off:TNoOffset
 
 
 type logic_deps = Zone.t Logic_label.Map.t
@@ -733,15 +730,15 @@ let rec eval_term ~alarm_mode env t =
 
   (*  | TConst ((CStr | CWstr) Missing cases *)
 
-  | TAddrOf (thost, toffs) ->
-    let r = eval_thost_toffset ~alarm_mode env thost toffs in
+  | TAddrOf tlval ->
+    let r = eval_tlval ~alarm_mode env tlval in
     { etype = TPtr (r.etype, []);
       ldeps = r.ldeps;
       eunder = loc_bits_to_loc_bytes_under r.eunder;
       eover = loc_bits_to_loc_bytes r.eover }
 
-  | TStartOf (thost, toffs) ->
-    let r = eval_thost_toffset ~alarm_mode env thost toffs in
+  | TStartOf tlval ->
+    let r = eval_tlval ~alarm_mode env tlval in
     { etype = TPtr (Cil.typeOf_array_elem r.etype, []);
       ldeps = r.ldeps;
       eunder = loc_bits_to_loc_bytes_under r.eunder;
@@ -756,8 +753,8 @@ let rec eval_term ~alarm_mode env t =
     efloat Fval.(neg_infinity Single)
   | TLval (TVar {lv_name = "\\NaN"}, _) -> efloat Fval.nan
 
-  | TLval _ ->
-    let lval = eval_tlval ~alarm_mode env t in
+  | TLval tlval ->
+    let lval = eval_tlval ~alarm_mode env tlval in
     let typ = lval.etype in
     let size = Eval_typ.sizeof_lval_typ typ in
     let state = env_current_state env in
@@ -1165,7 +1162,7 @@ and eval_toffset ~alarm_mode env typ toffset =
 
   | TModel _ -> unsupported "model fields"
 
-and eval_thost_toffset ~alarm_mode env thost toffs =
+and eval_tlval ~alarm_mode env (thost, toffs) =
   let rhost = eval_tlhost ~alarm_mode env thost in
   let roffset = eval_toffset ~alarm_mode env rhost.etype toffs in
   { etype = roffset.etype;
@@ -1174,14 +1171,14 @@ and eval_thost_toffset ~alarm_mode env thost toffs =
     eover = Location_Bits.shift roffset.eover rhost.eover;
   }
 
-and eval_tlval ~alarm_mode env t =
+and eval_term_as_lval ~alarm_mode env t =
   match t.term_node with
-  | TLval (thost, toffs) ->
-    eval_thost_toffset ~alarm_mode env thost toffs
+  | TLval tlval ->
+    eval_tlval ~alarm_mode env tlval
   | Tunion l ->
     let eunder, eover, deps = List.fold_left
         (fun (accunder, accover, accdeps) t ->
-           let r = eval_tlval ~alarm_mode env t in
+           let r = eval_term_as_lval ~alarm_mode env t in
            Location_Bits.link accunder r.eunder,
            Location_Bits.join accover r.eover,
            join_logic_deps accdeps r.ldeps
@@ -1197,13 +1194,13 @@ and eval_tlval ~alarm_mode env t =
       eover = Location_Bits.bottom }
   | Tat (t, lab) ->
     ignore (env_state env lab);
-    eval_tlval ~alarm_mode { env with e_cur = lab } t
+    eval_term_as_lval ~alarm_mode { env with e_cur = lab } t
   | TLogic_coerce (_lt, t) ->
     (* Logic coerce on locations (that are pointers) can only introduce
        sets, that do not change the abstract value. *)
-    eval_tlval ~alarm_mode env t
+    eval_term_as_lval ~alarm_mode env t
   | Tif (tcond, ttrue, tfalse) ->
-    eval_tif eval_tlval Location_Bits.join Location_Bits.meet ~alarm_mode env
+    eval_tif eval_term_as_lval Location_Bits.join Location_Bits.meet ~alarm_mode env
       tcond ttrue tfalse
   | _ -> ast_error (Format.asprintf "non-lval term %a" Printer.pp_term t)
 
@@ -1325,19 +1322,19 @@ and eval_extremum etype backward_left ~alarm_mode env t1 t2 =
 
 
 let eval_tlval_as_location ~alarm_mode env t =
-  let r = eval_tlval ~alarm_mode env t in
+  let r = eval_term_as_lval ~alarm_mode env t in
   let s = Eval_typ.sizeof_lval_typ r.etype in
   make_loc r.eover s
 
 let eval_tlval_as_location_with_deps ~alarm_mode env t =
-  let r = eval_tlval ~alarm_mode env t in
+  let r = eval_term_as_lval ~alarm_mode env t in
   let s = Eval_typ.sizeof_lval_typ r.etype in
   (make_loc r.eover s, r.ldeps)
 
 
 (* Return a pair of (under-approximating, over-approximating) zones. *)
 let eval_tlval_as_zone_under_over ~alarm_mode access env t =
-  let r = eval_tlval ~alarm_mode env t in
+  let r = eval_term_as_lval ~alarm_mode env t in
   let s = Eval_typ.sizeof_lval_typ r.etype in
   let under = enumerate_valid_bits_under access (make_loc r.eunder s) in
   let over = enumerate_valid_bits access (make_loc r.eover s) in
@@ -1383,8 +1380,8 @@ exception Not_an_exact_loc
    [Not_an_exact_loc]. *)
 let rec eval_term_as_exact_locs ~alarm_mode env t =
   match t with
-  | { term_node = TLval _ } ->
-    let loc = eval_tlval ~alarm_mode env t in
+  | { term_node = TLval tlval } ->
+    let loc = eval_tlval ~alarm_mode env tlval in
     let typ = loc.etype in
     (* eval_term_as_exact_loc is only used for reducing values, and we must
        NOT reduce volatile locations. *)
@@ -1639,10 +1636,10 @@ let reduce_by_valid env positive access (tset: term) =
   (* reduce [t], which must be valid term-lval, so that its contents are
      a valid pointer to [typ]. If [typ] is not supplied, it is inferred
      from the type of [t]. *)
-  let aux_lval ?typ t env =
+  let aux_lval ?typ tlval env =
     try
       let alarm_mode = alarm_reduce_mode () in
-      let r = eval_tlval ~alarm_mode env t in
+      let r = eval_tlval ~alarm_mode env tlval in
       let typ = match typ with None -> r.etype | Some t -> t in
       let loc = make_loc r.eunder (Eval_typ.sizeof_lval_typ typ) in
       let r = Eval_op.apply_on_all_locs (aux_one_lval typ) loc env in
@@ -1654,14 +1651,14 @@ let reduce_by_valid env positive access (tset: term) =
     | Tunion l ->
       List.fold_left do_one env l
 
-    | TLval _ -> aux_lval t env
+    | TLval tlval -> aux_lval tlval env
 
-    | TCastE (typ, ({term_node = TLval _} as t)) -> aux_lval ~typ t env
+    | TCastE (typ, {term_node = TLval tlval}) -> aux_lval ~typ tlval env
 
-    | TAddrOf (TMem ({term_node = TLval _} as t), offs) ->
+    | TAddrOf (TMem {term_node = TLval tlval}, offs) ->
       (try
          let alarm_mode = alarm_reduce_mode () in
-         let lt = eval_tlval ~alarm_mode env t in
+         let lt = eval_tlval ~alarm_mode env tlval in
          let typ = lt.etype in
          (* Compute the offsets, that depend on the type of the lval.
             The computed list is exactly what [aux] requires *)
@@ -1672,10 +1669,10 @@ let reduce_by_valid env positive access (tset: term) =
          aux_min_max_offset aux env roffs.eunder
        with LogicEvalError _ -> env)
 
-    | TBinOp ((PlusPI | MinusPI) as op, ({term_node = TLval _} as tlv), i) ->
+    | TBinOp ((PlusPI | MinusPI) as op, {term_node = TLval tlval}, i) ->
       (try
          let alarm_mode = alarm_reduce_mode () in
-         let rtlv = eval_tlval ~alarm_mode env tlv in
+         let rtlv = eval_tlval ~alarm_mode env tlval in
          let ri = eval_term ~alarm_mode env i in
          (* Convert offsets to a simpler form if [op] is [MinusPI] *)
          let li =
@@ -2402,7 +2399,7 @@ let predicate_deps env pred =
       do_eval { env with e_cur = lbl } p
 
     | Pvalid (_, tsets) | Pvalid_read (_, tsets) | Pvalid_function tsets->
-      (eval_tlval ~alarm_mode env tsets).ldeps
+      (eval_term_as_lval ~alarm_mode env tsets).ldeps
 
     | Pinitialized (lbl, tsets) | Pdangling (lbl, tsets) ->
       let loc, deploc =
@@ -2413,7 +2410,7 @@ let predicate_deps env pred =
     | Pnot p -> do_eval env p
 
     | Pseparated ltsets ->
-      let evaled = List.map (eval_tlval ~alarm_mode env) ltsets in
+      let evaled = List.map (eval_term_as_lval ~alarm_mode env) ltsets in
       List.fold_left
         (fun acc e -> join_logic_deps acc e.ldeps)
         empty_logic_deps evaled
@@ -2465,7 +2462,7 @@ let () =
     (fun ~result state t ->
        let env = env_post_f ~pre:state ~post:state ~result () in
        try
-         let r= eval_tlval ~alarm_mode:Ignore env t in
+         let r= eval_term_as_lval ~alarm_mode:Ignore env t in
          let s = Eval_typ.sizeof_lval_typ r.etype in
          make_loc r.eunder s, make_loc r.eover s, deps_at lbl_here r.ldeps
        with LogicEvalError _ -> raise Db.Properties.Interp.No_conversion
