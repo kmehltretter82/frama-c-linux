@@ -26,10 +26,13 @@ open Logic_ptree
 
 type extension_info = {
   ext_status: bool ;
+  ext_preprocess: extension_preprocessing ;
   ext_typing: extension_typing ;
   ext_visit: extension_visit ;
   ext_printing: extension_printing ;
 }
+and extension_preprocessing =
+  lexpr list -> lexpr list
 and extension_typing =
   typing_context -> location -> lexpr list -> acsl_extension_kind
 and extension_visit =

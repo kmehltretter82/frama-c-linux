@@ -26,10 +26,13 @@ open Logic_ptree
 
 type extension_info = {
   ext_status: bool ;
+  ext_preprocess: extension_preprocessing ;
   ext_typing: extension_typing ;
   ext_visit: extension_visit ;
   ext_printing: extension_printing ;
 }
+and extension_preprocessing =
+  lexpr list -> lexpr list
 and extension_typing =
   typing_context -> location -> lexpr list -> acsl_extension_kind
 and extension_visit =
@@ -39,6 +42,8 @@ and extension_printing =
   acsl_extension_kind -> unit
 
 (* Default extension *)
+
+let default_preprocessing = Extlib.id
 
 let default_typing typing_context loc l =
   let _ = loc in
@@ -54,6 +59,7 @@ let default_printing printer fmt = function
 
 let default = {
   ext_status = false ;
+  ext_preprocess = default_preprocessing ;
   ext_typing = default_typing ;
   ext_printing = default_printing ;
   ext_visit = default_visit ;
@@ -78,6 +84,8 @@ module Extensions = struct
         "Trying to register ACSL extension %s twice. Ignoring second extension"
         name
     else Hashtbl.add ext_tbl name (category, info)
+
+  let preprocess name = (find name).ext_preprocess
 
   let typing name typing_context loc es =
     let ext_info = find name in
@@ -109,7 +117,8 @@ let register_code_annot_next_both =
 let () =
   Logic_env.set_extension_handler
     ~category:Extensions.category
-    ~is_extension: Extensions.is_extension ;
+    ~is_extension: Extensions.is_extension
+    ~preprocess: Extensions.preprocess ;
   Logic_typing.set_extension_handler
     ~is_extension: Extensions.is_extension
     ~typer: Extensions.typing ;
