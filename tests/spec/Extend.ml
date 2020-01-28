@@ -105,26 +105,22 @@ let type_bla typing_context _loc l =
   Ext_preds l
 
 let () =
-  Acsl_extension.register_behavior "foo"
-    { Acsl_extension.default with ext_typing = type_foo } ;
-  Acsl_extension.register_code_annot_next_loop "lfoo"
-    { Acsl_extension.default with ext_typing = type_foo } ;
-  Acsl_extension.register_code_annot "ca_foo"
-    { Acsl_extension.default with ext_typing = type_foo } ;
-  Acsl_extension.register_code_annot_next_stmt "ns_foo"
-    { Acsl_extension.default with ext_typing = type_foo } ;
-  Acsl_extension.register_global "global_foo"
-    { Acsl_extension.default with ext_typing = type_foo } ;
-  Acsl_extension.register_behavior "bar"
-    { Acsl_extension.default with
-      ext_typing = type_bar ;
-      ext_printing = print_bar ;
-      ext_visit = visit_bar
-    } ;
-  Acsl_extension.register_behavior "bla"
-    { Acsl_extension.default with ext_typing = type_bla } ;
-  Acsl_extension.register_code_annot_next_both "baz"
-    { Acsl_extension.default with ext_typing = type_baz }
+  Acsl_extension.(register_behavior "foo"
+    (make ~typer:type_foo ())) ;
+  Acsl_extension.(register_code_annot_next_loop "lfoo"
+    (make ~typer:type_foo ())) ;
+  Acsl_extension.(register_code_annot "ca_foo"
+    (make ~typer:type_foo ())) ;
+  Acsl_extension.(register_code_annot_next_stmt "ns_foo"
+    (make ~typer:type_foo ())) ;
+  Acsl_extension.(register_global "global_foo"
+    (make ~typer:type_foo ())) ;
+  Acsl_extension.(register_behavior "bar"
+    (make ~typer:type_bar ~printer:print_bar ~visitor:visit_bar ())) ;
+  Acsl_extension.(register_behavior "bla"
+    (make ~typer:type_bla ())) ;
+  Acsl_extension.(register_code_annot_next_both "baz"
+    (make ~typer:type_baz ()))
 
 let run () =
   Ast.compute ();

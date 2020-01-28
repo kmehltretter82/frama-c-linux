@@ -137,14 +137,14 @@ let widen_hint_terms_of_terms terms =
   with
     Invalid_hint -> None
 
-let ext_typing typing_context loc args =
+let typer typing_context loc args =
   let var_term, hint_terms =
     terms_of_parsed_widen_hints typing_context loc args
   in
   let terms = var_term :: hint_terms in
   Ext_terms terms
 
-let ext_printing _pp fmt ext =
+let printer _pp fmt ext =
   match ext with
   | Ext_id _ -> assert false
   | Ext_preds _ -> assert false
@@ -160,7 +160,7 @@ let ext_printing _pp fmt ext =
 
 let () =
   Acsl_extension.register_code_annot_next_both "widen_hints"
-    { Acsl_extension.default with ext_typing ; ext_printing }
+    (Acsl_extension.make ~typer ~printer ())
 
 let get_widen_hints_annots stmt =
   Annotations.fold_code_annot

@@ -261,9 +261,7 @@ let register =
     if (not !once) &&
        Wp_parameters.DynCall.get () then begin
       once := true;
-      let ext =
-        { Acsl_extension.default with ext_status=true; ext_typing=typecheck }
-      in
+      let ext = Acsl_extension.make ~status:true ~typer:typecheck () in
       Acsl_extension.register_code_annot_next_stmt "calls" ext;
       Acsl_extension.register_behavior "instanceof" ext;
     end

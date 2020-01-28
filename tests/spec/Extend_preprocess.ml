@@ -37,11 +37,9 @@ let preprocess_foo_ptree_element kind = function
 let preprocess_foo_ptree kind = List.map (preprocess_foo_ptree_element kind)
 
 let register registration kind =
-  let ext = {
-    Acsl_extension.default with
-    ext_typing = ext_typing kind ;
-    ext_preprocess = preprocess_foo_ptree kind
-  } in
+  let typer = ext_typing kind in
+  let preprocessor = preprocess_foo_ptree kind in
+  let ext = Acsl_extension.make ~typer ~preprocessor () in
   registration (kind ^ "_foo") ext
 
 let () =

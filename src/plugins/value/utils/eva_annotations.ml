@@ -69,16 +69,16 @@ module Register (M : Annotation) =
 struct
   include M
 
-  let ext_typing typing_context loc args =
+  let typer typing_context loc args =
     try export (parse ~typing_context args)
     with Parse_error ->
       typing_context.Logic_typing.error loc "Invalid %s directive" name
 
-  let ext_printing _pp fmt lp =
+  let printer _pp fmt lp =
     print fmt (import lp)
 
   let () =
-    let ext = { Acsl_extension.default with ext_typing ; ext_printing } in
+    let ext = Acsl_extension.make ~typer ~printer () in
     if is_loop_annot then
       Acsl_extension.register_code_annot_next_loop name ext
     else

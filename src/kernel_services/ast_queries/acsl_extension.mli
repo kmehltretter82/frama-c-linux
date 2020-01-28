@@ -24,28 +24,29 @@ open Cil_types
 open Logic_typing
 open Logic_ptree
 
-type extension_info = {
-  ext_status: bool ;
-  ext_preprocess: extension_preprocessing ;
-  ext_typing: extension_typing ;
-  ext_visit: extension_visit ;
-  ext_printing: extension_printing ;
-}
-and extension_preprocessing =
+type extension
+
+type extension_preprocessor =
   lexpr list -> lexpr list
-and extension_typing =
+type extension_typer =
   typing_context -> location -> lexpr list -> acsl_extension_kind
-and extension_visit =
+type extension_visitor =
   Cil.cilVisitor -> acsl_extension_kind -> acsl_extension_kind Cil.visitAction
-and extension_printing =
+type extension_printer =
   Printer_api.extensible_printer_type -> Format.formatter ->
   acsl_extension_kind -> unit
 
-val default: extension_info
+val make:
+  ?status:bool ->
+  ?preprocessor:extension_preprocessor ->
+  ?typer:extension_typer ->
+  ?visitor:extension_visitor ->
+  ?printer:extension_printer ->
+  unit -> extension
 
-val register_behavior: string -> extension_info -> unit
-val register_global: string -> extension_info -> unit
-val register_code_annot: string -> extension_info -> unit
-val register_code_annot_next_stmt: string -> extension_info -> unit
-val register_code_annot_next_loop: string -> extension_info -> unit
-val register_code_annot_next_both: string -> extension_info -> unit
+val register_behavior: string -> extension -> unit
+val register_global: string -> extension -> unit
+val register_code_annot: string -> extension -> unit
+val register_code_annot_next_stmt: string -> extension -> unit
+val register_code_annot_next_loop: string -> extension -> unit
+val register_code_annot_next_both: string -> extension -> unit

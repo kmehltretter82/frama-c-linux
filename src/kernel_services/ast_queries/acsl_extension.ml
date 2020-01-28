@@ -24,46 +24,46 @@ open Cil_types
 open Logic_typing
 open Logic_ptree
 
-type extension_info = {
-  ext_status: bool ;
-  ext_preprocess: extension_preprocessing ;
-  ext_typing: extension_typing ;
-  ext_visit: extension_visit ;
-  ext_printing: extension_printing ;
+type extension = {
+  status: bool ;
+  preprocessor: extension_preprocessor ;
+  typer: extension_typer ;
+  visitor: extension_visitor ;
+  printer: extension_printer ;
 }
-and extension_preprocessing =
+and extension_preprocessor =
   lexpr list -> lexpr list
-and extension_typing =
+and extension_typer =
   typing_context -> location -> lexpr list -> acsl_extension_kind
-and extension_visit =
+and extension_visitor =
   Cil.cilVisitor -> acsl_extension_kind -> acsl_extension_kind Cil.visitAction
-and extension_printing =
+and extension_printer =
   Printer_api.extensible_printer_type -> Format.formatter ->
   acsl_extension_kind -> unit
 
 (* Default extension *)
 
-let default_preprocessing = Extlib.id
+let default_preprocessor = Extlib.id
 
-let default_typing typing_context loc l =
+let default_typer typing_context loc l =
   let _ = loc in
   let typing = typing_context.type_predicate typing_context (Lenv.empty ()) in
   Ext_preds (List.map typing l)
 
-let default_visit _ _ = Cil.DoChildren
+let default_visitor _ _ = Cil.DoChildren
 
-let default_printing printer fmt = function
+let default_printer printer fmt = function
   | Ext_id i -> Format.fprintf fmt "%d" i
   | Ext_terms ts -> Pretty_utils.pp_list ~sep:",@ " printer#term fmt ts
   | Ext_preds ps -> Pretty_utils.pp_list ~sep:",@ " printer#predicate fmt ps
 
-let default = {
-  ext_status = false ;
-  ext_preprocess = default_preprocessing ;
-  ext_typing = default_typing ;
-  ext_printing = default_printing ;
-  ext_visit = default_visit ;
-}
+let make
+  ?(status=false)
+  ?(preprocessor=default_preprocessor)
+  ?(typer=default_typer)
+  ?(visitor=default_visitor)
+  ?(printer=default_printer)
+  () = { status ; preprocessor ; typer ; visitor ; printer }
 
 module Extensions = struct
   let ext_tbl = Hashtbl.create 5
@@ -85,16 +85,16 @@ module Extensions = struct
         name
     else Hashtbl.add ext_tbl name (category, info)
 
-  let preprocess name = (find name).ext_preprocess
+  let preprocess name = (find name).preprocessor
 
   let typing name typing_context loc es =
     let ext_info = find name in
-    let status = ext_info.ext_status in
-    let typer =  ext_info.ext_typing in
+    let status = ext_info.status in
+    let typer =  ext_info.typer in
     status, (typer typing_context loc es)
 
-  let print name = (find name).ext_printing
-  let visit name = (find name).ext_visit
+  let print name = (find name).printer
+  let visit name = (find name).visitor
 end
 
 (* Registration *)
@@ -137,7 +137,7 @@ let deprecated_find ?(strong=true) name cat op_name =
   match Hashtbl.find_opt Extensions.ext_tbl name with
   | None ->
     if strong then Hashtbl.add strong_cat name cat ;
-    (cat, default)
+    (cat, make ())
   | Some (found_cat, ext) ->
     if strong && Hashtbl.mem strong_cat name then begin
       if found_cat = cat then (cat, ext)
@@ -152,19 +152,19 @@ let deprecated_find ?(strong=true) name cat op_name =
     end else
       (found_cat, ext)
 
-let deprecated_register_typing name cat ext_status ext_typing =
+let deprecated_register_typing name cat status typer =
   let cat, ext = deprecated_find name cat "typing" in
-  let ext = { ext with ext_status ; ext_typing } in
+  let ext = { ext with status ; typer } in
   deprecated_replace name (cat, ext)
 
-let deprecated_register_printing name cat ext_printing =
+let deprecated_register_printing name cat printer =
   let cat, ext = deprecated_find ~strong:false name cat "printing" in
-  let ext = { ext with ext_printing } in
+  let ext = { ext with printer } in
   deprecated_replace name (cat, ext)
 
-let deprecated_register_visit name cat ext_visit =
+let deprecated_register_visit name cat visitor =
   let cat, ext = deprecated_find name cat "visit" in
-  let ext = { ext with ext_visit } in
+  let ext = { ext with visitor } in
   deprecated_replace name (cat, ext)
 
 let () =
