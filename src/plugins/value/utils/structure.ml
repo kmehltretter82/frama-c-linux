@@ -140,11 +140,6 @@ module Open
 
   type 'a getter = Get : ('a, 'b) get -> 'a getter
 
-  let merge _k a b = match a, b with
-    | Some _, _ -> a
-    | _, Some _ -> b
-    | None, None -> assert false
-
   let lift_get f (Get (key, get)) = Get (key, fun t -> get (f t))
 
   let rec compute_getters : type a. a structure -> (a getter) KMap.t = function
@@ -153,7 +148,7 @@ module Open
     | Node (left, right) ->
       let l = compute_getters left and r = compute_getters right in
       let l = KMap.map (lift_get fst) l and r = KMap.map (lift_get snd) r in
-      KMap.merge merge l r
+      KMap.union (fun _k a _b -> Some a) l r
 
   let getters = compute_getters M.structure
   let get (type a) (key: a Shape.key) : (M.t -> a) option =
@@ -177,7 +172,7 @@ module Open
       let l = compute_setters left and r = compute_setters right in
       let l = KMap.map (lift_set (fun set (l, r) -> set l, r)) l
       and r = KMap.map (lift_set (fun set (l, r) -> l, set r)) r in
-      KMap.merge merge l r
+      KMap.union (fun _k a _b -> Some a) l r
 
   let setters = compute_setters M.structure
   let set (type a) (key: a Shape.key) : (a -> M.t -> M.t) =

@@ -67,16 +67,12 @@ let union expr depth map1 map2 =
   let top = ref LvalSet.empty in
   (* Lvalues such that a lvalue from [!top] appears in their subexpression. *)
   let deps = ref LvalSet.empty in
-  let merge lval a b = match a, b with
-    | None, None -> None
-    | Some x, None
-    | None, Some x -> Some x
-    | Some (_, _, deps1), Some (_, _, deps2) ->
-      top := LvalSet.add lval !top;
-      deps := LvalSet.union (LvalSet.union deps1 deps2) !deps;
-      Some (expr, depth, LvalSet.union deps1 deps2)
+  let merge lval (_, _, deps1) (_, _, deps2) =
+    top := LvalSet.add lval !top;
+    deps := LvalSet.union (LvalSet.union deps1 deps2) !deps;
+    Some (expr, depth, LvalSet.union deps1 deps2)
   in
-  let map = LvalMap.merge merge map1 map2 in
+  let map = LvalMap.union merge map1 map2 in
   LvalMap.mapi
     (fun lval (e, d, lvs) ->
        (* Alls lvalues in [expr] now appear in the subexpression of [!top]. *)

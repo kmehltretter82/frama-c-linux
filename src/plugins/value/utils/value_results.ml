@@ -319,12 +319,8 @@ let merge r1 r2 =
     | True, True -> True
   in
   let merge_callers _ m1 m2 =
-    let aux _kf s1 s2 = match s1, s2 with
-      | None, None -> None
-      | None, s | s, None -> s
-      | Some s1, Some s2 -> Some (Stmt.Set.union s1 s2)
-    in
-    Kernel_function.Map.merge aux m1 m2
+    let aux _kf s1 s2 = Some (Stmt.Set.union s1 s2) in
+    Kernel_function.Map.union aux m1 m2
   in
   let merge_s_cs = StmtH.merge merge_cs in
   let main = match r1.main, r2.main with
