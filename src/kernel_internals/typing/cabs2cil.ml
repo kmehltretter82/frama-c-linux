@@ -2704,51 +2704,92 @@ let rec combineTypes (what: combineWhat) (oldt: typ) (t: typ) : typ =
 
 let get_qualifiers t = Cil.filter_qualifier_attributes (Cil.typeAttrs t)
 
-let equal_qualifiers a1 a2 =
-  Cil_datatype.Attributes.equal
-    (Cil.filter_qualifier_attributes a1) (Cil.filter_qualifier_attributes a2)
+(* how type qualifiers must be checked *)
+type qualifier_check_context =
+  | Identical (* identical qualifiers. *)
+  | IdenticalToplevel (* ignore at toplevel, use Identical when going under a
+                         pointer. *)
+  | Covariant (* first type can have const-qualifications
+                 the second doesn't have. *)
+  | CovariantToplevel
+  (* accepts everything for current type, use Covariant when going under a
+     pointer. *)
+  | Contravariant (* second type can have const-qualifications
+                     the first doesn't have. *)
+  | ContravariantToplevel
+  (* accepts everything for current type, use Contravariant when going under
+     a pointer. *)
+
+let qualifier_context_fun_arg = function
+  | Identical | IdenticalToplevel -> IdenticalToplevel
+  | Covariant | CovariantToplevel -> ContravariantToplevel
+  | Contravariant | ContravariantToplevel -> CovariantToplevel
+
+let qualifier_context_fun_ret = function
+  | Identical | IdenticalToplevel -> IdenticalToplevel
+  | Covariant | CovariantToplevel -> CovariantToplevel
+  | Contravariant | ContravariantToplevel -> ContravariantToplevel
+
+let qualifier_context_ptr = function
+  | Identical | IdenticalToplevel -> Identical
+  | Covariant | CovariantToplevel -> Covariant
+  | Contravariant | ContravariantToplevel -> Contravariant
+
+let included_qualifiers ?(context=Identical) a1 a2 =
+  let a1 = Cil.filter_qualifier_attributes a1 in
+  let a2 = Cil.filter_qualifier_attributes a2 in
+  let a1 = Cil.dropAttribute "restrict" a1 in
+  let a2 = Cil.dropAttribute "restrict" a2 in
+  let a1_no_const = Cil.dropAttribute "const" a1 in
+  let a2_no_const = Cil.dropAttribute "const" a2 in
+  let is_equal = Cil_datatype.Attributes.equal a1 a2 in
+  if is_equal then true
+  else begin
+    match context with
+    | Identical -> false
+    | Covariant -> Cil_datatype.Attributes.equal a1_no_const a2
+    | Contravariant -> Cil_datatype.Attributes.equal a1 a2_no_const
+    | CovariantToplevel | ContravariantToplevel | IdenticalToplevel -> true
+  end
 
 (* precondition: t1 and t2 must be "compatible" as per combineTypes, i.e.
-   you must have called [combineTypes t1 t2] before calling this function.
-   When [relaxed] is true, qualifier differences are ignored; this is
-   an internal parameter used during recursive calls.
-   The qualifier compatibility algorithm is:
-   - by default, type qualifiers are ignored (e.g. for basic types);
-   - when entering a pointer type, stop ignoring type qualifiers;
-   - when entering a function type, resume ignoring type qualifiers. *)
-let rec have_compatible_qualifiers_deep ?(relaxed=false) t1 t2 =
+   you must have called [combineTypes t1 t2] before calling this function. *)
+let rec have_compatible_qualifiers_deep ?(context=Identical) t1 t2 =
   match unrollType t1, unrollType t2 with
   | TFun (tres1, Some args1, _, _), TFun (tres2, Some args2, _, _) ->
-    have_compatible_qualifiers_deep ~relaxed:true tres1 tres2 &&
+    have_compatible_qualifiers_deep
+      ~context:(qualifier_context_fun_ret context) tres1 tres2 &&
+    let context = qualifier_context_fun_arg context in
     List.for_all2 (fun (_, t1', a1) (_, t2', a2) ->
-        have_compatible_qualifiers_deep ~relaxed:true t1' t2' &&
-        equal_qualifiers a1 a2)
+        have_compatible_qualifiers_deep ~context t1' t2' &&
+        included_qualifiers ~context a1 a2)
       args1 args2
   | TPtr (t1', a1), TPtr (t2', a2)
   | TArray (t1', _, _, a1), TArray (t2', _, _, a2) ->
-    have_compatible_qualifiers_deep ~relaxed:false t1' t2' &&
-    (relaxed || equal_qualifiers a1 a2)
-  | _, _ -> relaxed || equal_qualifiers (Cil.typeAttrs t1) (Cil.typeAttrs t2)
+    (included_qualifiers ~context a1 a2) &&
+    let context = qualifier_context_ptr context in
+    have_compatible_qualifiers_deep ~context t1' t2'
+  | _, _ -> included_qualifiers ~context (Cil.typeAttrs t1) (Cil.typeAttrs t2)
 
-let compatibleTypes t1 t2 =
+let compatibleTypes ?context t1 t2 =
   try
     let r = combineTypes CombineOther t1 t2 in
     (* C99, 6.7.3 §9: "... to be compatible, both shall have the identically
        qualified version of a compatible type;" *)
-    if not (have_compatible_qualifiers_deep t1 t2) then
+    if not (have_compatible_qualifiers_deep ?context t1 t2) then
       raise (Cannot_combine "different qualifiers");
     (* Note: different non-qualifier attributes will be silently dropped. *)
     r
   with Cannot_combine _ as e ->
     raise e
 
-let areCompatibleTypes t1 t2 =
+let areCompatibleTypes ?context t1 t2 =
   try
-    ignore (compatibleTypes t1 t2); true
+    ignore (compatibleTypes ?context t1 t2); true
   with Cannot_combine _ -> false
 
 (* Specify whether the cast is from the source code *)
-let rec castTo ?(fromsource=false)
+let rec castTo ?context ?(fromsource=false)
     (ot : typ) (nt : typ) (e : exp) : (typ * exp ) =
   Kernel.debug ~dkey:Kernel.dkey_typing_cast "@[%t: castTo:%s %a->%a@\n@]"
     Cil.pp_thisloc (if fromsource then "(source)" else "")
@@ -2803,7 +2844,7 @@ let rec castTo ?(fromsource=false)
           "conversion between function types with \
            different number of arguments:@ %a@ and@ %a"
           Cil_printer.pp_typ ot Cil_printer.pp_typ nt;
-      if not (areCompatibleTypes ot nt) then
+      if not (areCompatibleTypes ?context ot nt) then
         Kernel.warning
           ~wkey:Kernel.wkey_incompatible_types_call
           ~current:true
@@ -2818,7 +2859,7 @@ let rec castTo ?(fromsource=false)
         | Lval lv ->  Cil.mkAddrOf ~loc:e.eloc lv
         | _ -> e (* function decay into pointer anyway *)
       in
-      castTo ~fromsource (TPtr (ot', [])) nt' clean_e
+      castTo ?context ~fromsource (TPtr (ot', [])) nt' clean_e
 
     (* accept converting a ptr to function to/from a ptr to void, even though
        not really accepted by the standard. gcc supports it. though
@@ -2834,10 +2875,10 @@ let rec castTo ?(fromsource=false)
        original type in the sources.
     *)
     | TPtr(TFun _,_), TPtr(TNamed(ti,nattr),pattr) ->
-      castTo
+      castTo ?context
         ~fromsource ot (TPtr (Cil.typeAddAttributes nattr ti.ttype, pattr)) e
     | TPtr(TNamed(ti,nattr),pattr), TPtr(TFun _,_) ->
-      castTo
+      castTo ?context
         ~fromsource (TPtr (Cil.typeAddAttributes nattr ti.ttype, pattr)) nt e
 
     (* No other conversion implying a pointer to function
@@ -2938,7 +2979,7 @@ let rec castTo ?(fromsource=false)
                   Cil_printer.pp_exp e
             in
             (* Continue casting *)
-            castTo ~fromsource:fromsource fstfield.ftype nt' e'
+            castTo ?context ~fromsource:fromsource fstfield.ftype nt' e'
           end
       end
     | _ ->
@@ -6603,7 +6644,9 @@ and doExp local_env
             in
             (add_reads ~ghost:local_env.is_ghost loc r c, e, t)
           in
-          let (texpected, a'') = castTo att at a' in
+          let (texpected, a'') =
+            castTo ~context:ContravariantToplevel att at a'
+          in
           (* A posteriori check that the argument type was compatible,
              to generate a warning otherwise;
              if a'' = a', no check needs to be done (no cast was introduced).
@@ -6631,11 +6674,7 @@ and doExp local_env
                  (Cil.isAnyCharPtrType texpected && Cil.isVoidPtrType att) ||
                  (* always allow null pointers *)
                  (Cil.isPointerType texpected && Ast_info.is_null_expr a') ||
-                 areCompatibleTypes texpected att ||
-                 (let texpected_no_qualif =
-                    Cil.typeRemoveAttributesDeep ["const"; "restrict"] texpected
-                  in
-                  areCompatibleTypes texpected_no_qualif att)
+                 areCompatibleTypes ~context:ContravariantToplevel att texpected
                in
                let ok =
                  if ok1 then true
@@ -10219,6 +10258,9 @@ let convFile (path, f) =
     globinit = None;
     globinitcalled = false;
   }
+
+(* export function without internal `relaxed' argument. *)
+let areCompatibleTypes t1 t2 = areCompatibleTypes t1 t2
 
 (*
 Local Variables:
