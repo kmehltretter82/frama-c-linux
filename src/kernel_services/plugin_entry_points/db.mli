@@ -1375,6 +1375,21 @@ val cancel : unit -> unit
    of the computation, and any exception is re-raised.
    The callback [~on_mute d] is triggered when the deamon has not been yielded
    for a period [d] longer than [~debounce] or 100ms by default.
+
+
+   Illustrative example, where [...] is the debounced time:
+   {[
+       job data :    |<-------------------------------------------------->|<daemon removed>
+       yields   :       x   x  x x    x             x   x    x   xxx xxx
+       trigger  :       |..........   |..........   |..........  |........|..
+       delayed  :                                   !
+       notes    :      (1)           (2)           (3)                   (4)
+   ]}
+
+   1. First yield, normal trigger
+   2. Debounced yields leads to this second trigger
+   3. Delayed warning invoked since there was no yield for more than debounced period
+   4. Final trigger, a bit before the debounced time
 *)
 val with_progress : ?debounced:int -> ?delayed:(int -> unit) ->
   (unit -> unit) -> ('a -> 'b) -> 'a -> 'b
