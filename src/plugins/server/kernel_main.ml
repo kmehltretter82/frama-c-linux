@@ -187,7 +187,7 @@ let events : Log.event Queue.t = Queue.create ()
 
 let set_monitoring flag =
   if flag != !monitoring then
-  monitoring := flag ;
+    monitoring := flag ;
   if !monitoring && not !monitored then
     begin
       monitored := true ;

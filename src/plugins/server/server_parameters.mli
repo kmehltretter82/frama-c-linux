@@ -24,9 +24,8 @@
 
 include Plugin.General_services
 
-module Idle : Parameter_sig.Int (** Idle waiting time (in ms) *)
-module Yield : Parameter_sig.Int (** Yield time (in ms) *)
 module Doc : Parameter_sig.String (** Generate documentation *)
+module Polling : Parameter_sig.Int (** Idle waiting time (in ms) *)
 module AutoLog : Parameter_sig.Bool (** Monitor logs *)
 
 val wpage : warn_category (** Inconsistent page warning *)

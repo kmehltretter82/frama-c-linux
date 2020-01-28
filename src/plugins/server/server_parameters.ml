@@ -37,9 +37,9 @@ include P
 (* --- Server General Options                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Idle = P.Int
+module Polling = P.Int
     (struct
-      let option_name = "-server-idle"
+      let option_name = "-server-polling"
       let arg_name = "ms"
       let default = 50
       let help = "Server polling (in milliseconds, default 50ms)"

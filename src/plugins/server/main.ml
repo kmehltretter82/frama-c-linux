@@ -87,13 +87,13 @@ type 'a exec = {
 }
 
 type 'a server = {
-  yield : int ;
+  polling : int ;
   pretty : Format.formatter -> 'a -> unit ;
   equal : 'a -> 'a -> bool ;
   fetch : unit -> 'a message option ;
   q_in : 'a exec Queue.t ;
   q_out : 'a response Stack.t ;
-  mutable background : (unit -> unit) option ;
+  mutable daemon : Db.daemon option ;
   mutable shutdown : bool ;
   mutable running : 'a exec option ;
 }
@@ -145,14 +145,18 @@ let execute exec : _ response =
       exec.request (Cmdline.protect exn) ;
     `Error(exec.id,Printexc.to_string exn)
 
+
+let delayed process =
+  if Senv.debug_atleast 1 then
+    Some (fun d -> Senv.debug "No yield since %dms during %s" d process)
+  else None
+
 let execute_debug server yield exec =
-  let on_delayed =
-    if Senv.debug_atleast 1 then
-      (Senv.debug "Trigger %s:%a" exec.request server.pretty exec.id ;
-       Some (fun delay -> Senv.debug
-                "No yield since %dms during %s" delay exec.request))
-    else None
-  in Db.with_progress ~debounced:server.yield ?on_delayed yield execute exec
+  Senv.debug "Trigger %s:%a" exec.request server.pretty exec.id ;
+  Db.with_progress
+    ~debounced:server.polling
+    ?on_delayed:(delayed exec.request)
+    yield execute exec
 
 let reply_debug server resp =
   if Senv.debug_atleast 1 then
@@ -267,12 +271,12 @@ let signal activity =
   List.iter (fun f -> try f activity with _ -> ()) !demons
 
 let create ~pretty ?(equal=(=)) ~fetch () =
-  let yield = in_range ~min:1 ~max:200 (Senv.Yield.get ()) in
+  let polling = in_range ~min:1 ~max:200 (Senv.Polling.get ()) in
   {
-    fetch ; yield ; equal ; pretty ;
+    fetch ; polling ; equal ; pretty ;
     q_in = Queue.create () ;
     q_out = Stack.create () ;
-    background = None ;
+    daemon = None ;
     running = None ;
     shutdown = false ;
   }
@@ -282,35 +286,37 @@ let create ~pretty ?(equal=(=)) ~fetch () =
 (* -------------------------------------------------------------------------- *)
 
 let start server =
-  match server.background with
+  match server.daemon with
   | Some _db -> ()
   | None ->
     begin
       Senv.feedback "Server enabled." ;
-      let db = !Db.progress in
-      server.background <- Some db ;
+      let db = Db.on_progress
+          ~debounced:server.polling
+          ?on_delayed:(delayed "command line")
+          (do_yield server) in
+      server.daemon <- Some db ;
       signal true ;
-      Db.progress := do_yield server ;
     end
 
 let stop server =
-  match server.background with
+  match server.daemon with
   | None -> ()
   | Some db ->
     begin
       Senv.feedback "Server disabled." ;
-      server.background <- None ;
+      server.daemon <- None ;
+      Db.off_progress db ;
       signal false ;
-      Db.progress := db ;
     end
 
 let foreground server =
-  match server.background with
+  match server.daemon with
   | None -> ()
   | Some db ->
     begin
-      server.background <- None ;
-      Db.progress := db ;
+      server.daemon <- None ;
+      Db.off_progress db ;
     end
 
 (* -------------------------------------------------------------------------- *)
@@ -319,20 +325,19 @@ let foreground server =
 
 let run server =
   try
-    (* TODO: remove the following line once the Why3 signal handler is not
-         used anymore. *)
-    foreground server ;
-    Sys.catch_break true;
-    signal true ;
+    ( (* TODO: catch-break to be removed once Why3 signal handler is fixed *)
+      Sys.catch_break true
+    ) ;
     Senv.feedback "Server running." ;
+    foreground server ;
+    signal true ;
     begin try
-        let idle_ms = in_range ~min:1 ~max:2000 (Senv.Idle.get ()) in
-        let idle_s = float_of_int idle_ms /. 1000.0 in
+        let idle = float_of_int server.polling /. 1000.0 in
         while not server.shutdown do
           let activity = process server in
           if not activity then
             begin
-              Unix.sleepf idle_s ;
+              Unix.sleepf idle ;
               Db.yield () ;
             end
         done ;
