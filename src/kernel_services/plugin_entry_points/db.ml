@@ -1067,8 +1067,10 @@ type daemon = {
   delayed : (int -> unit) option ;
   debounced : float ; (* in ms *)
   mutable next_at : float ; (* next trigger time *)
-  mutable last_at : float ; (* next yield time *)
+  mutable last_at : float ; (* last yield time *)
 }
+
+(* ---- Registry ---- *)
 
 let pending = ref []
 let daemons = ref []
@@ -1088,13 +1090,36 @@ let on_progress ?(debounced=0) ?delayed trigger =
 let off_progress d =
   daemons := List.filter (fun d0 -> d != d0) !daemons
 
+(* ---- Canceling ---- *)
+
+exception Cancel
+let cancel () = raise Cancel
+
+(* ---- Processing ---- *)
+
+let warn_error exn =
+  Kernel.failure
+    "Unexpected Db.daemon exception:@\n%s"
+    (Printexc.to_string exn)
+
 let with_progress ?debounced ?delayed trigger job data =
   let d = on_progress ?debounced ?delayed trigger in
-  try
-    let res = job data in
-    off_progress d ; trigger () ; res
-  with exn ->
-    off_progress d ; trigger () ; raise exn
+  let result = try job data with e ->
+    off_progress d ;
+    (try trigger () with
+     (* re-raise job processing exception in all case *)
+     | Cancel ->
+       (* job exception is also a canceling action *)
+       ()
+     | exn ->
+       (* job exception is more interesting to re-raise *)
+       warn_error exn) ;
+    raise e
+  in
+  (* final trigger is allowed to cancel any englobing jobs *)
+  off_progress d ; trigger () ; result
+
+(* ---- Yielding ---- *)
 
 let yield_once () =
   match !pending with
@@ -1108,13 +1133,17 @@ let yield_daemons () =
   | [] -> ()
   | ds ->
     let t = Unix.gettimeofday () in
+    let canceled = ref false in
     List.iter
       begin fun d ->
         let delta = d.debounced in
         if t > d.next_at then
           begin
-            d.next_at <- t +. delta ;
-            d.trigger () ;
+            try
+              d.next_at <- t +. delta ;
+              d.trigger () ;
+            with Cancel -> canceled := true
+               | exn -> warn_error exn ; raise exn
           end ;
         match d.delayed with
         | None -> ()
@@ -1123,7 +1152,8 @@ let yield_daemons () =
           let delay = if delta > 0.0 then delta else 0.1 in
           if period > delay then warn (int_of_float (period *. 1000.0)) ;
           d.last_at <- t ;
-      end ds
+      end ds ;
+    if !canceled then raise Cancel
 
 let yield () =
   begin
@@ -1136,9 +1166,6 @@ let flush () =
   yield ()
 
 let progress = ref (Kernel.deprecated "!Db.progress()" ~now:"Db.yield()" yield)
-
-exception Cancel
-let cancel () = raise Cancel
 
 (* ************************************************************************* *)
 
