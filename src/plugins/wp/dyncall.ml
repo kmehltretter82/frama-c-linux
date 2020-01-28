@@ -37,7 +37,7 @@ let find_call env loc f =
   with Not_found ->
     env.error loc "Unknown function '%s'" f
 
-let typecheck ~typing_context ~loc ps =
+let typecheck typing_context loc ps =
   ignore loc ;
   let fs =
     List.map
@@ -261,8 +261,11 @@ let register =
     if (not !once) &&
        Wp_parameters.DynCall.get () then begin
       once := true;
-      Logic_typing.register_code_annot_next_stmt_extension "calls" true typecheck;
-      Logic_typing.register_behavior_extension "instanceof" true typecheck ;
+      let ext =
+        { Acsl_extension.default with ext_status=true; ext_typing=typecheck }
+      in
+      Acsl_extension.register_code_annot_next_stmt "calls" ext;
+      Acsl_extension.register_behavior "instanceof" ext;
     end
 
 let () = Cmdline.run_after_configuring_stage register

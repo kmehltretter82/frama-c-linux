@@ -440,7 +440,7 @@ let rec parse_region env p =
       let path = parse_lpath env p in
       env.paths <- path :: env.paths
 
-let typecheck ~typing_context ~loc:_loc ps =
+let typecheck typing_context _loc ps =
   let env = {
     name = None ;
     declared = [] ;
@@ -482,12 +482,12 @@ let specified =
 
 let register () =
   if Wp.Region.get () || Wp.Region_annot.get () ||
-     List.exists specified (Wp.Model.get ())
+    List.exists specified (Wp.Model.get ())
   then
-    begin
-      Logic_typing.register_behavior_extension "region" true typecheck ;
-      Cil_printer.register_behavior_extension "region" pp_extension ;
-    end
+    Acsl_extension.register_behavior "region"
+      { Acsl_extension.default with ext_status=true;
+                                    ext_typing=typecheck;
+                                    ext_printing=pp_extension}
 
 let () = Cmdline.run_after_configuring_stage register
 

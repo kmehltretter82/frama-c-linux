@@ -6,7 +6,7 @@ let load_theory = function
     raise Not_found
   | _ -> assert false
 
-let typing ~typing_context ~loc lexprs =
+let ext_typing typing_context loc lexprs =
   ignore loc ;
   let type_predicate =
     typing_context.type_predicate typing_context (Lenv.empty ())
@@ -17,7 +17,7 @@ let typing ~typing_context ~loc lexprs =
 
 
 let () =
-  Logic_typing.register_global_extension "why3" false typing
+  Acsl_extension.(register_global "why3" { default with ext_typing })
 
 let main () =
   try
