@@ -8,7 +8,7 @@
 [eva:alarm] tests/value/forall.i:9: Warning: 
   function main: precondition got status unknown.
 [eva] tests/value/forall.i:11: assertion got status valid.
-[eva:alarm] tests/value/forall.i:12: Warning: assertion got status unknown.
+[eva] tests/value/forall.i:12: assertion got status valid.
 [eva] tests/value/forall.i:13: assertion got status valid.
 [eva:alarm] tests/value/forall.i:15: Warning: assertion got status unknown.
 [eva:alarm] tests/value/forall.i:16: Warning: assertion got status unknown.
