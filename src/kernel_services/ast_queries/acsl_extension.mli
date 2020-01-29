@@ -36,17 +36,38 @@ type extension_printer =
   Printer_api.extensible_printer_type -> Format.formatter ->
   acsl_extension_kind -> unit
 
-val make:
-  ?status:bool ->
-  ?preprocessor:extension_preprocessor ->
-  ?typer:extension_typer ->
+val register_behavior:
+  string -> ?preprocessor:extension_preprocessor -> extension_typer ->
   ?visitor:extension_visitor ->
-  ?printer:extension_printer ->
-  unit -> extension
+  ?printer:extension_printer -> ?short_printer:extension_printer -> bool ->
+  unit
 
-val register_behavior: string -> extension -> unit
-val register_global: string -> extension -> unit
-val register_code_annot: string -> extension -> unit
-val register_code_annot_next_stmt: string -> extension -> unit
-val register_code_annot_next_loop: string -> extension -> unit
-val register_code_annot_next_both: string -> extension -> unit
+val register_global:
+  string -> ?preprocessor:extension_preprocessor -> extension_typer ->
+  ?visitor:extension_visitor ->
+  ?printer:extension_printer -> ?short_printer:extension_printer -> bool ->
+  unit
+
+val register_code_annot:
+  string -> ?preprocessor:extension_preprocessor -> extension_typer ->
+  ?visitor:extension_visitor ->
+  ?printer:extension_printer -> ?short_printer:extension_printer -> bool ->
+  unit
+
+val register_code_annot_next_stmt:
+  string -> ?preprocessor:extension_preprocessor -> extension_typer ->
+  ?visitor:extension_visitor ->
+  ?printer:extension_printer -> ?short_printer:extension_printer -> bool ->
+  unit
+
+val register_code_annot_next_loop:
+  string -> ?preprocessor:extension_preprocessor -> extension_typer ->
+  ?visitor:extension_visitor ->
+  ?printer:extension_printer -> ?short_printer:extension_printer -> bool ->
+  unit
+
+val register_code_annot_next_both:
+  string -> ?preprocessor:extension_preprocessor -> extension_typer ->
+  ?visitor:extension_visitor ->
+  ?printer:extension_printer -> ?short_printer:extension_printer -> bool ->
+  unit

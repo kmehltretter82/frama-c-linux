@@ -25,11 +25,13 @@ open Logic_typing
 open Logic_ptree
 
 type extension = {
+  category: ext_category ;
   status: bool ;
   preprocessor: extension_preprocessor ;
   typer: extension_typer ;
   visitor: extension_visitor ;
   printer: extension_printer ;
+  short_printer: extension_printer option
 }
 and extension_preprocessor =
   lexpr list -> lexpr list
@@ -41,49 +43,42 @@ and extension_printer =
   Printer_api.extensible_printer_type -> Format.formatter ->
   acsl_extension_kind -> unit
 
-(* Default extension *)
-
-let default_preprocessor = Extlib.id
-
-let default_typer typing_context loc l =
-  let _ = loc in
-  let typing = typing_context.type_predicate typing_context (Lenv.empty ()) in
-  Ext_preds (List.map typing l)
-
-let default_visitor _ _ = Cil.DoChildren
-
 let default_printer printer fmt = function
   | Ext_id i -> Format.fprintf fmt "%d" i
   | Ext_terms ts -> Pretty_utils.pp_list ~sep:",@ " printer#term fmt ts
   | Ext_preds ps -> Pretty_utils.pp_list ~sep:",@ " printer#predicate fmt ps
 
 let make
-  ?(status=false)
-  ?(preprocessor=default_preprocessor)
-  ?(typer=default_typer)
-  ?(visitor=default_visitor)
-  ?(printer=default_printer)
-  () = { status ; preprocessor ; typer ; visitor ; printer }
+    category
+    ?(preprocessor=Extlib.id)
+    typer
+    ?(visitor=fun _ _ -> Cil.DoChildren)
+    ?(printer=default_printer) ?short_printer status =
+  { category; status; preprocessor; typer; visitor; printer; short_printer }
 
 module Extensions = struct
   let ext_tbl = Hashtbl.create 5
 
   let find name =
-    try snd (Hashtbl.find ext_tbl name)
+    try Hashtbl.find ext_tbl name
     with Not_found ->
       Kernel.fatal ~current:true "unsupported clause of name '%s'" name
 
   let category name =
-    Extlib.opt_map fst (Hashtbl.find_opt ext_tbl name)
+    Extlib.opt_map (fun e -> e.category) (Hashtbl.find_opt ext_tbl name)
 
   let is_extension = Hashtbl.mem ext_tbl
 
-  let register category name info =
+  let register
+      cat name ?preprocessor typer ?visitor ?printer ?short_printer status =
+    let info =
+      make cat ?preprocessor typer ?visitor ?printer ?short_printer status
+    in
     if is_extension name then
       Kernel.warning ~wkey:Kernel.wkey_acsl_extension
         "Trying to register ACSL extension %s twice. Ignoring second extension"
         name
-    else Hashtbl.add ext_tbl name (category, info)
+    else Hashtbl.add ext_tbl name info
 
   let preprocess name = (find name).preprocessor
 
@@ -91,13 +86,31 @@ module Extensions = struct
     let ext_info = find name in
     let status = ext_info.status in
     let typer =  ext_info.typer in
-    status, (typer typing_context loc es)
+    let normal_error = ref false in
+    let has_error () = normal_error := true in
+    let wrapper =
+      typing_context.on_error (typer typing_context loc) has_error
+    in
+    try status, wrapper es
+    with
+    | (Log.AbortError _ | Log.AbortFatal _) as exn -> raise exn
+    | exn when not !normal_error ->
+      Kernel.fatal "Typechecking ACSL extension %s raised exception %s"
+        name (Printexc.to_string exn)
 
-  let print name = (find name).printer
   let visit name = (find name).visitor
+
+  let print name printer fmt kind =
+    let pp = (find name).printer printer in
+    Format.fprintf fmt "@[<hov 2>%s %a;@]" name pp kind
+
+  let short_print name printer fmt kind =
+    match (find name).short_printer with
+    | None -> Format.fprintf fmt "%s" name
+    | Some pp -> Format.fprintf fmt "%s: %a" name (pp printer) kind
 end
 
-(* Registration *)
+(* Registration functions *)
 
 let register_behavior =
   Extensions.register Ext_contract
@@ -126,6 +139,7 @@ let () =
     ~visit: Extensions.visit ;
   Cil_printer.set_extension_handler
     ~print: Extensions.print
+    ~short_print:Extensions.short_print
 
 (* For Deprecation: *)
 
@@ -133,14 +147,17 @@ let deprecated_replace name ext = Hashtbl.add Extensions.ext_tbl name ext
 
 let strong_cat = Hashtbl.create 5
 
+let default_typer _typing_context _loc _l = assert false
+
+
 let deprecated_find ?(strong=true) name cat op_name =
   match Hashtbl.find_opt Extensions.ext_tbl name with
   | None ->
     if strong then Hashtbl.add strong_cat name cat ;
-    (cat, make ())
-  | Some (found_cat, ext) ->
+    (make cat default_typer false)
+  | Some ext ->
     if strong && Hashtbl.mem strong_cat name then begin
-      if found_cat = cat then (cat, ext)
+      if ext.category = cat then ext
       else
         Kernel.fatal
           "Registring %s for %s: this extension already exists for another \
@@ -148,24 +165,20 @@ let deprecated_find ?(strong=true) name cat op_name =
           op_name name
     end else if strong then begin
       Hashtbl.add strong_cat name cat ;
-      (cat, ext)
-    end else
-      (found_cat, ext)
+      { ext with category = cat }
+    end else ext
 
 let deprecated_register_typing name cat status typer =
-  let cat, ext = deprecated_find name cat "typing" in
-  let ext = { ext with status ; typer } in
-  deprecated_replace name (cat, ext)
+  deprecated_replace name
+    { (deprecated_find name cat "typing") with status ; typer }
 
 let deprecated_register_printing name cat printer =
-  let cat, ext = deprecated_find ~strong:false name cat "printing" in
-  let ext = { ext with printer } in
-  deprecated_replace name (cat, ext)
+  deprecated_replace name
+    { (deprecated_find ~strong:false name cat "printing") with printer }
 
 let deprecated_register_visit name cat visitor =
-  let cat, ext = deprecated_find name cat "visit" in
-  let ext = { ext with visitor } in
-  deprecated_replace name (cat, ext)
+  deprecated_replace name
+    { (deprecated_find name cat "visit") with visitor }
 
 let () =
   Logic_typing.set_deprecated_extension_handler deprecated_register_typing ;

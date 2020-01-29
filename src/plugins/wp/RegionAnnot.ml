@@ -484,8 +484,8 @@ let register () =
   if Wp.Region.get () || Wp.Region_annot.get () ||
     List.exists specified (Wp.Model.get ())
   then
-    Acsl_extension.(register_behavior "region"
-      (make ~status:true ~typer:typecheck ~printer:pp_extension ()))
+    Acsl_extension.register_behavior
+      "region" typecheck ~printer:pp_extension false
 
 let () = Cmdline.run_after_configuring_stage register
 

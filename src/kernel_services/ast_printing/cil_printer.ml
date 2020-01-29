@@ -29,10 +29,12 @@ open Format
 
 let initialized_extensions = ref false
 let ref_print_extension = ref (fun _ _ _ _ -> assert false)
+let ref_print_short_extension = ref (fun _ _ _ _ -> assert false)
 
-let set_extension_handler ~print =
+let set_extension_handler ~print ~short_print =
   assert (not !initialized_extensions) ;
   ref_print_extension := print ;
+  ref_print_short_extension := short_print ;
   initialized_extensions := true ;
   ()
 
@@ -40,26 +42,27 @@ let ref_deprecated_extension_handler = ref (fun _ _ _ -> assert false)
 let set_deprecated_extension_handler ~handler =
   ref_deprecated_extension_handler := handler
 
-module Behavior_extensions = struct
+module Acsl_extensions = struct
   let deprecated_register name =
     !ref_deprecated_extension_handler name
 
   let pp (printer) fmt {ext_name; ext_kind} =
-    let pp = !ref_print_extension ext_name in
-    Format.fprintf fmt "@[<hov 2>%s %a;@]" ext_name (pp printer) ext_kind
+    !ref_print_extension ext_name printer fmt ext_kind
 
+  let pp_short (printer) fmt {ext_name; ext_kind} =
+    !ref_print_short_extension ext_name printer fmt ext_kind
 end
 let register_behavior_extension name =
-  Behavior_extensions.deprecated_register name Ext_contract
+  Acsl_extensions.deprecated_register name Ext_contract
 
 let register_code_annot_extension name =
-  Behavior_extensions.deprecated_register name (Ext_code_annot Ext_here)
+  Acsl_extensions.deprecated_register name (Ext_code_annot Ext_here)
 
 let register_loop_annot_extension name =
-  Behavior_extensions.deprecated_register name (Ext_code_annot Ext_next_loop)
+  Acsl_extensions.deprecated_register name (Ext_code_annot Ext_next_loop)
 
 let register_global_extension name =
-  Behavior_extensions.deprecated_register name Ext_global
+  Acsl_extensions.deprecated_register name Ext_global
 
 (* Internal attributes. Won't be pretty-printed *)
 let reserved_attributes = ref []
@@ -2748,8 +2751,11 @@ class cil_printer () = object (self)
       self#pp_acsl_keyword "requires"
       self#identified_predicate p
 
-  method extended fmt (ext : acsl_extension) =
-    Behavior_extensions.pp (self :> extensible_printer_type) fmt ext
+  method extended fmt ext =
+    Acsl_extensions.pp (self :> extensible_printer_type) fmt ext
+
+  method short_extended fmt ext =
+    Acsl_extensions.pp_short (self :> extensible_printer_type) fmt ext
 
   method post_cond fmt (k,p) =
     let kw = get_termination_kind_name k in

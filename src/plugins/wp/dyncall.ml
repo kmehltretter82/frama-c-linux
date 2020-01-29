@@ -261,9 +261,8 @@ let register =
     if (not !once) &&
        Wp_parameters.DynCall.get () then begin
       once := true;
-      let ext = Acsl_extension.make ~status:true ~typer:typecheck () in
-      Acsl_extension.register_code_annot_next_stmt "calls" ext;
-      Acsl_extension.register_behavior "instanceof" ext;
+      Acsl_extension.register_code_annot_next_stmt "calls" typecheck true ;
+      Acsl_extension.register_behavior "instanceof" typecheck true ;
     end
 
 let () = Cmdline.run_after_configuring_stage register

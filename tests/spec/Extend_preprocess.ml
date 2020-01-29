@@ -2,16 +2,16 @@ open Logic_ptree
 open Logic_const
 
 (* For each kind of extension:
-    - behavior:        bhv
-    - next loop:       nl
-    - code annotation: ca
-    - next statement:  ns
-    - global:          gl
+   - behavior:        bhv
+   - next loop:       nl
+   - code annotation: ca
+   - next statement:  ns
+   - global:          gl
   replaces node "must_replace(x)" with "<kind>_ok(x)". The typing phase
   validates that we find the right "<kind>_ok" for each kind of extension:
-    - if a must_replaced is found, it fails,
-    - if the wrong kind is found, a "\false" is generated
-    - if everything is ok "\true" is generated
+   - if a must_replaced is found, it fails,
+   - if the wrong kind is found, a "\false" is generated
+   - if everything is ok "\true" is generated
 *)
 
 let validate kind call =
@@ -36,15 +36,17 @@ let preprocess_foo_ptree_element kind = function
 
 let preprocess_foo_ptree kind = List.map (preprocess_foo_ptree_element kind)
 
-let register registration kind =
-  let typer = ext_typing kind in
-  let preprocessor = preprocess_foo_ptree kind in
-  let ext = Acsl_extension.make ~typer ~preprocessor () in
-  registration (kind ^ "_foo") ext
+let register registration ?visitor ?printer ?short_printer kind =
+  let registration ?preprocessor typer =
+    registration
+      (kind ^ "_foo") ?preprocessor typer ?visitor ?printer ?short_printer false
+  in
+  registration ~preprocessor:(preprocess_foo_ptree kind) (ext_typing kind)
+
 
 let () =
   let open Acsl_extension in
-  register register_behavior "bhv" ;
+  register register_behavior "bhv";
   register register_code_annot_next_loop "nl";
   register register_code_annot "ca";
   register register_code_annot_next_stmt "ns";

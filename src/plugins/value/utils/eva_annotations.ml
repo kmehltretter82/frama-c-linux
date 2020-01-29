@@ -78,11 +78,10 @@ struct
     print fmt (import lp)
 
   let () =
-    let ext = Acsl_extension.make ~typer ~printer () in
     if is_loop_annot then
-      Acsl_extension.register_code_annot_next_loop name ext
+      Acsl_extension.register_code_annot_next_loop name typer ~printer false
     else
-      Acsl_extension.register_code_annot_next_stmt name ext
+      Acsl_extension.register_code_annot_next_stmt name typer ~printer false
 
   let get stmt =
     let filter_add _emitter annot acc =

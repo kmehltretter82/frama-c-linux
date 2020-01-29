@@ -85,6 +85,7 @@ struct
   let pp_logic_type_info fmt x = (printer ())#logic_type_info fmt x
   let pp_logic_ctor_info fmt x = (printer ())#logic_ctor_info fmt x
   let pp_extended fmt x = (printer())#extended fmt x
+  let pp_short_extended fmt x = (printer())#short_extended fmt x
   let pp_initinfo fmt x = (printer ())#initinfo fmt x
   let pp_logic_info fmt x = (printer ())#logic_info fmt x
   let pp_logic_constant fmt x = (printer ())#logic_constant fmt x

@@ -105,22 +105,15 @@ let type_bla typing_context _loc l =
   Ext_preds l
 
 let () =
-  Acsl_extension.(register_behavior "foo"
-    (make ~typer:type_foo ())) ;
-  Acsl_extension.(register_code_annot_next_loop "lfoo"
-    (make ~typer:type_foo ())) ;
-  Acsl_extension.(register_code_annot "ca_foo"
-    (make ~typer:type_foo ())) ;
-  Acsl_extension.(register_code_annot_next_stmt "ns_foo"
-    (make ~typer:type_foo ())) ;
-  Acsl_extension.(register_global "global_foo"
-    (make ~typer:type_foo ())) ;
-  Acsl_extension.(register_behavior "bar"
-    (make ~typer:type_bar ~printer:print_bar ~visitor:visit_bar ())) ;
-  Acsl_extension.(register_behavior "bla"
-    (make ~typer:type_bla ())) ;
-  Acsl_extension.(register_code_annot_next_both "baz"
-    (make ~typer:type_baz ()))
+  Acsl_extension.register_behavior "foo" type_foo false ;
+  Acsl_extension.register_code_annot_next_loop "lfoo" type_foo false ;
+  Acsl_extension.register_code_annot "ca_foo" type_foo false ;
+  Acsl_extension.register_code_annot_next_stmt "ns_foo" type_foo false ;
+  Acsl_extension.register_global "global_foo" type_foo false ;
+  Acsl_extension.register_behavior
+    "bar" type_bar ~printer:print_bar ~visitor:visit_bar false ;
+  Acsl_extension.register_behavior "bla" type_bla false ;
+  Acsl_extension.register_code_annot_next_both "baz" type_baz false
 
 let run () =
   Ast.compute ();

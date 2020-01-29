@@ -17,7 +17,7 @@ let typer typing_context loc lexprs =
 
 
 let () =
-  Acsl_extension.(register_global "why3" (make ~typer ()))
+  Acsl_extension.register_global "why3" typer false
 
 let main () =
   try

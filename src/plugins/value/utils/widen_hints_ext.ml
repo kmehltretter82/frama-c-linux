@@ -159,8 +159,8 @@ let printer _pp fmt ext =
       Format.fprintf fmt "<invalid widen_hints>"
 
 let () =
-  Acsl_extension.register_code_annot_next_both "widen_hints"
-    (Acsl_extension.make ~typer ~printer ())
+  Acsl_extension.register_code_annot_next_both
+    "widen_hints" typer ~printer false
 
 let get_widen_hints_annots stmt =
   Annotations.fold_code_annot

@@ -524,42 +524,34 @@ type typing_context = {
   on_error: 'a 'b. ('a -> 'b) -> (unit -> unit) -> 'a -> 'b
 }
 
-let initialized_extensions = ref false
-let ref_is_extension = ref (fun _ -> assert false)
-let ref_type_extension = ref (fun _ _ _ _ -> assert false)
-
-let set_extension_handler ~is_extension ~typer =
-  assert (not !initialized_extensions) ;
-  ref_is_extension := is_extension ;
-  ref_type_extension := typer ;
-  initialized_extensions := true ;
-  ()
-
-let ref_deprecated_extension_handler = ref (fun _ _ _ _  -> assert false)
-let set_deprecated_extension_handler ~handler =
-  ref_deprecated_extension_handler := handler
-
 module Extensions = struct
+  let initialized_extensions = ref false
+  let ref_is_extension = ref (fun _ -> assert false)
+  let ref_type_extension = ref (fun _ _ _ _ -> assert false)
+
   let is_extension name = !ref_is_extension name
+
+  let typer name ~typing_context:typing_context ~loc =
+    !ref_type_extension name typing_context loc
+
+  (* For deprecated functions *)
+  let ref_deprecated_extension_handler = ref (fun _ _ _ _  -> assert false)
 
   let deprecated_register name category status typer =
     let typer typing_context loc = typer ~typing_context ~loc in
     !ref_deprecated_extension_handler name category status typer
-
-  let typer name ~typing_context:typing_context ~loc p =
-    let typer = !ref_type_extension name in
-    let normal_error = ref false in
-    let has_error () = normal_error := true in
-    let wrapper =
-      typing_context.on_error (typer typing_context loc) has_error
-    in
-    try wrapper p
-    with
-    | (Log.AbortError _ | Log.AbortFatal _) as exn -> raise exn
-    | exn when not !normal_error ->
-      Kernel.fatal "Typechecking ACSL extension %s raised exception %s"
-        name (Printexc.to_string exn)
 end
+
+let set_extension_handler ~is_extension ~typer =
+  assert (not !Extensions.initialized_extensions) ;
+  Extensions.ref_is_extension := is_extension ;
+  Extensions.ref_type_extension := typer ;
+  Extensions.initialized_extensions := true ;
+  ()
+
+(* Deprecated ACSL extensions functions *)
+let set_deprecated_extension_handler ~handler =
+  Extensions.ref_deprecated_extension_handler := handler
 
 let register_behavior_extension name f =
   Extensions.deprecated_register name Ext_contract f
