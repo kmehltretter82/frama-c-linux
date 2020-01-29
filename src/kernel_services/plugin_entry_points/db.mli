@@ -1343,16 +1343,18 @@ val progress: (unit -> unit) ref
 type daemon
 
 (**
-   Register a new daemon to be executed on [Db.yield()].
-   When specified, two succcessive calls to the daemon will be
-   separated by at least [~debounced] milliseconds (default is 0ms).
-   The [~delayed d] callback is invoked when [Db.yield()] has not been called
-   since a delay [d] greater than [~debounced] or 100ms.
+
+   [on_progress ?debounced ?on_delayed trigger] registers [trigger] as new
+   daemon to be executed on each [yield].
+   @param debounced the least amount of time, in milliseconds, between two
+   successive calls to the daemon (default is 0ms).
+   @param on_delayed the callback invoked as soon as the time since the last
+   [yield] is greater than [debounced] milliseconds (or 100ms at least).
 *)
 val on_progress :
-  ?debounced:int -> ?delayed:(int -> unit) -> (unit -> unit) -> daemon
+  ?debounced:int -> ?on_delayed:(int -> unit) -> (unit -> unit) -> daemon
 
-(** Un-register the daemon. *)
+(** Unregister the [daemon]. *)
 val off_progress : daemon -> unit
 
 (** Trigger all daemons immediately. *)
@@ -1361,27 +1363,27 @@ val flush : unit -> unit
 (** Trigger all registered daemons (debounced). *)
 val yield : unit -> unit
 
-(** Trigger a callback once on next [yield()]. *)
+(** Trigger a callback once on next [yield]. *)
 val once : (unit -> unit) -> unit
 
-(** Raises [Cancel] exception *)
+(** @raise [Cancel] exception. *)
 val cancel : unit -> unit
 
 (**
-   Execute the given job with a temporary registered (debounced) daemon.
-   Details: [with_progress trigger job data] runs [job data] and returns its
-   result, with [trigger] registered as a temporary (debounced) daemon.
-   The daemon is finally flushed and un-registered at the end
-   of the computation, and any exception is re-raised.
-   The callback [~on_mute d] is triggered when the deamon has not been yielded
-   for a period [d] longer than [~debounce] or 100ms by default.
-
+   [with_progress ?debounced ?on_delayed trigger job data] executes the given
+   [job] on [data] while registering [trigger] as temporary (debounced) daemon.
+   The daemon is finally unregistered at the end of the computation.
+   @param debounced the least amount of time, in milliseconds, between two
+   successive calls to the daemon (default is 0ms).
+   @param on_delayed the callback invoked as soon as the time since the last
+   [yield] is greater than [debounced] milliseconds (or 100ms at least).
+   @raise every exception raised during the execution of [job] on [data].
 
    Illustrative example, where [...] is the debounced time:
    {[
        job data :    |<-------------------------------------------------->|<daemon removed>
        yields   :       x   x  x x    x             x   x    x   xxx xxx
-       trigger  :       |..........   |..........   |..........  |...........
+       trigger  :       |..........   |..........   |..........  |.........
        delayed  :                                   !
        notes    :      (1)           (2)           (3)
    ]}
@@ -1390,7 +1392,8 @@ val cancel : unit -> unit
    2. Debounced yields leads to this second trigger
    3. Delayed warning invoked since there was no yield for more than debounced period
 *)
-val with_progress : ?debounced:int -> ?delayed:(int -> unit) ->
+val with_progress :
+  ?debounced:int -> ?on_delayed:(int -> unit) ->
   (unit -> unit) -> ('a -> 'b) -> 'a -> 'b
 
 (** This exception may be raised by {!progress} to interrupt computations. *)

@@ -145,13 +145,13 @@ let execute exec : _ response =
     `Error(exec.id,Printexc.to_string exn)
 
 let execute_debug server yield exec =
-  let delayed =
+  let on_delayed =
     if Senv.debug_atleast 1 then
       (Senv.debug "Trigger %s:%a" exec.request server.pretty exec.id ;
        Some (fun delay -> Senv.debug
                 "No yield since %dms during %s" delay exec.request))
     else None
-  in Db.with_progress ~debounced:server.yield ?delayed yield execute exec
+  in Db.with_progress ~debounced:server.yield ?on_delayed yield execute exec
 
 let reply_debug server resp =
   if Senv.debug_atleast 1 then

@@ -1064,7 +1064,7 @@ end
 
 type daemon = {
   trigger : unit -> unit ;
-  delayed : (int -> unit) option ;
+  on_delayed : (int -> unit) option ;
   debounced : float ; (* in ms *)
   mutable next_at : float ; (* next trigger time *)
   mutable last_yield_at : float ; (* last yield time *)
@@ -1077,11 +1077,11 @@ let daemons = ref []
 
 let once trigger = pending := trigger :: !pending
 
-let on_progress ?(debounced=0) ?delayed trigger =
+let on_progress ?(debounced=0) ?on_delayed trigger =
   let d = {
     trigger ;
     debounced = float debounced /. 1000.0 ;
-    delayed ;
+    on_delayed ;
     last_yield_at = 0.0 ;
     next_at = 0.0 ;
   } in
@@ -1102,8 +1102,8 @@ let warn_error exn =
     "Unexpected Db.daemon exception:@\n%s"
     (Printexc.to_string exn)
 
-let with_progress ?debounced ?delayed trigger job data =
-  let d = on_progress ?debounced ?delayed trigger in
+let with_progress ?debounced ?on_delayed trigger job data =
+  let d = on_progress ?debounced ?on_delayed trigger in
   let result =
     try job data with e ->
       off_progress d ;
@@ -1124,35 +1124,39 @@ let yield_daemons () =
   match !daemons with
   | [] -> ()
   | ds ->
-    let t = Unix.gettimeofday () in
-    let canceled = ref false in
-    List.iter
-      begin fun d ->
-        let delta = d.debounced in
-        if t > d.next_at then
-          begin
-            try
-              d.next_at <- t +. delta ;
-              d.trigger () ;
-            with Cancel -> canceled := true
+    begin
+      let t = Unix.gettimeofday () in
+      let canceled = ref false in
+      List.iter
+        (fun d ->
+           if t > d.next_at then
+             begin
+               try
+                 d.next_at <- t +. d.debounced ;
+                 d.trigger () ;
+               with
+               | Cancel -> canceled := true
                | exn -> warn_error exn ; raise exn
-          end ;
-        match d.delayed with
-        | None -> ()
-        | Some _ when d.last_yield_at = 0. -> d.last_yield_at <- t (* first yield *)
-        | Some warn ->
-          let period = t -. d.last_yield_at in
-          let delay = if delta > 0.0 then delta else 0.1 in
-          if period > delay then warn (int_of_float (period *. 1000.0)) ;
-          d.last_yield_at <- t ;
-      end ds ;
-    if !canceled then raise Cancel
+             end ;
+           match d.on_delayed with
+           | None ->
+             ()
+           | Some _ when d.last_yield_at = 0. ->
+             (* first yield *)
+             d.last_yield_at <- t
+           | Some warn ->
+             let time_since_last_yield = t -. d.last_yield_at in
+             let delay = if d.debounced > 0.0 then d.debounced else 0.1 in
+             if time_since_last_yield > delay then
+               warn (int_of_float (time_since_last_yield *. 1000.0)) ;
+             d.last_yield_at <- t)
+        ds;
+      if !canceled then raise Cancel
+    end
 
 let yield () =
-  begin
-    yield_daemons () ;
-    yield_once () ;
-  end
+  yield_daemons () ;
+  yield_once ()
 
 let flush () =
   List.iter (fun d -> d.next_at <- 0.0) !daemons ;
