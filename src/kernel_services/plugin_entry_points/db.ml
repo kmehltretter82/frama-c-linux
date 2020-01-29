@@ -1150,8 +1150,8 @@ let yield_daemons () =
 
 let yield () =
   begin
-    yield_once () ;
     yield_daemons () ;
+    yield_once () ;
   end
 
 let flush () =
