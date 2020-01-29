@@ -1381,15 +1381,14 @@ val cancel : unit -> unit
    {[
        job data :    |<-------------------------------------------------->|<daemon removed>
        yields   :       x   x  x x    x             x   x    x   xxx xxx
-       trigger  :       |..........   |..........   |..........  |........|..
+       trigger  :       |..........   |..........   |..........  |...........
        delayed  :                                   !
-       notes    :      (1)           (2)           (3)                   (4)
+       notes    :      (1)           (2)           (3)
    ]}
 
    1. First yield, normal trigger
    2. Debounced yields leads to this second trigger
    3. Delayed warning invoked since there was no yield for more than debounced period
-   4. Final trigger, a bit before the debounced time
 *)
 val with_progress : ?debounced:int -> ?delayed:(int -> unit) ->
   (unit -> unit) -> ('a -> 'b) -> 'a -> 'b

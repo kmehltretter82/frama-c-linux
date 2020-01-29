@@ -1104,20 +1104,12 @@ let warn_error exn =
 
 let with_progress ?debounced ?delayed trigger job data =
   let d = on_progress ?debounced ?delayed trigger in
-  let result = try job data with e ->
-    off_progress d ;
-    (try trigger () with
-     (* re-raise job processing exception in all case *)
-     | Cancel ->
-       (* job exception is also a canceling action *)
-       ()
-     | exn ->
-       (* job exception is more interesting to re-raise *)
-       warn_error exn) ;
-    raise e
+  let result =
+    try job data with e ->
+      off_progress d ;
+      raise e
   in
-  (* final trigger is allowed to cancel any englobing jobs *)
-  off_progress d ; trigger () ; result
+  off_progress d ; result
 
 (* ---- Yielding ---- *)
 
