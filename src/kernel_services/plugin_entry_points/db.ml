@@ -1067,7 +1067,7 @@ type daemon = {
   delayed : (int -> unit) option ;
   debounced : float ; (* in ms *)
   mutable next_at : float ; (* next trigger time *)
-  mutable last_at : float ; (* last yield time *)
+  mutable last_yield_at : float ; (* last yield time *)
 }
 
 (* ---- Registry ---- *)
@@ -1082,7 +1082,7 @@ let on_progress ?(debounced=0) ?delayed trigger =
     trigger ;
     debounced = float debounced /. 1000.0 ;
     delayed ;
-    last_at = 0.0 ;
+    last_yield_at = 0.0 ;
     next_at = 0.0 ;
   } in
   daemons := List.append !daemons [d] ; d
@@ -1147,11 +1147,12 @@ let yield_daemons () =
           end ;
         match d.delayed with
         | None -> ()
+        | Some _ when d.last_yield_at = 0. -> d.last_yield_at <- t (* first yield *)
         | Some warn ->
-          let period = t -. d.last_at in
+          let period = t -. d.last_yield_at in
           let delay = if delta > 0.0 then delta else 0.1 in
           if period > delay then warn (int_of_float (period *. 1000.0)) ;
-          d.last_at <- t ;
+          d.last_yield_at <- t ;
       end ds ;
     if !canceled then raise Cancel
 
