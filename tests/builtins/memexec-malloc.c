@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: #"-eva-malloc-functions alloc -eva-mlevel 0"
+   STDOPT: #"-eva-alloc-functions alloc -eva-mlevel 0"
 */
 #include <stdlib.h>
 #define N 2000
