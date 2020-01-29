@@ -24,8 +24,6 @@ open Cil_types
 open Logic_typing
 open Logic_ptree
 
-type extension
-
 type extension_preprocessor =
   lexpr list -> lexpr list
 type extension_typer =

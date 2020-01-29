@@ -24,22 +24,28 @@
 
 open Cil_types
 
-let initialized_extensions = ref false
-let ref_is_extension = ref (fun _ -> assert false)
-let ref_extension_category = ref (fun _ -> assert false)
-let ref_preprocess_extension = ref (fun _ -> assert false)
+module Extensions = struct
+  let initialized = ref false
+  let ref_is_extension = ref (fun _ -> assert false)
+  let ref_category = ref (fun _ -> assert false)
+  let ref_preprocess = ref (fun _ -> assert false)
 
-let set_extension_handler ~category ~is_extension ~preprocess =
-  assert (not !initialized_extensions) ;
-  ref_is_extension := is_extension ;
-  ref_extension_category := category ;
-  ref_preprocess_extension := preprocess ;
-  initialized_extensions := true ;
-  ()
+  let set_extension_handler ~category ~is_extension ~preprocess =
+    assert (not !initialized) ;
+    ref_is_extension := is_extension ;
+    ref_category := category ;
+    ref_preprocess := preprocess ;
+    initialized := true ;
+    ()
 
-let is_extension s = !ref_is_extension s
-let extension_category s = !ref_extension_category s
-let preprocess_extension s = !ref_preprocess_extension s
+  let is_extension s = !ref_is_extension s
+  let category s = !ref_category s
+  let preprocess s = !ref_preprocess s
+end
+let set_extension_handler = Extensions.set_extension_handler
+let is_extension = Extensions.is_extension
+let extension_category = Extensions.category
+let preprocess_extension = Extensions.preprocess
 
 module CurrentLoc = Cil_const.CurrentLoc
 

@@ -525,33 +525,36 @@ type typing_context = {
 }
 
 module Extensions = struct
-  let initialized_extensions = ref false
+  let initialized = ref false
   let ref_is_extension = ref (fun _ -> assert false)
-  let ref_type_extension = ref (fun _ _ _ _ -> assert false)
+  let ref_typer = ref (fun _ _ _ _ -> assert false)
+
+  let set_handler ~is_extension ~typer =
+    assert (not !initialized) ;
+    ref_is_extension := is_extension ;
+    ref_typer := typer ;
+    initialized := true
 
   let is_extension name = !ref_is_extension name
 
   let typer name ~typing_context:typing_context ~loc =
-    !ref_type_extension name typing_context loc
+    !ref_typer name typing_context loc
 
   (* For deprecated functions *)
-  let ref_deprecated_extension_handler = ref (fun _ _ _ _  -> assert false)
+  let ref_deprecated_handler = ref (fun _ _ _ _  -> assert false)
+
+  let set_deprecated_handler ~handler =
+    ref_deprecated_handler := handler
 
   let deprecated_register name category status typer =
     let typer typing_context loc = typer ~typing_context ~loc in
-    !ref_deprecated_extension_handler name category status typer
+    !ref_deprecated_handler name category status typer
 end
-
-let set_extension_handler ~is_extension ~typer =
-  assert (not !Extensions.initialized_extensions) ;
-  Extensions.ref_is_extension := is_extension ;
-  Extensions.ref_type_extension := typer ;
-  Extensions.initialized_extensions := true ;
-  ()
+let set_extension_handler = Extensions.set_handler
 
 (* Deprecated ACSL extensions functions *)
-let set_deprecated_extension_handler ~handler =
-  Extensions.ref_deprecated_extension_handler := handler
+let set_deprecated_extension_handler =
+  Extensions.set_deprecated_handler
 
 let register_behavior_extension name f =
   Extensions.deprecated_register name Ext_contract f
