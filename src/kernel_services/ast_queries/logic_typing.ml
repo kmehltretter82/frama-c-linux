@@ -310,7 +310,7 @@ let binop_of_rel = function
 module Lenv = struct
   (* locals: logic variables (e.g. quantified variables in \forall, \exists) *)
 
-  module Smap = FCMap.Make(String)
+  module Smap = Map.Make(String)
 
   type t = {
     local_vars: Cil_types.logic_var Smap.t;

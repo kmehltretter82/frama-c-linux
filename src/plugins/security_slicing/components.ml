@@ -291,7 +291,7 @@ module Component = struct
 
   (* not optimal implementation: no memoization (bts#006) *)
 
-  module M = FCMap.Make(NodeKf)
+  module M = Map.Make(NodeKf)
 
   type fwd_kind = Impact | Security
 

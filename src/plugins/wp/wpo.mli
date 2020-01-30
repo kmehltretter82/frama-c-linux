@@ -115,7 +115,7 @@ type po = t and t = {
 
 module S : Datatype.S_with_collections with type t = po
 module Index : Map.OrderedType with type t = index
-module Gmap : FCMap.S with type key = index
+module Gmap : Map.S with type key = index
 
 (** Dynamically exported
     @since Nitrogen-20111001

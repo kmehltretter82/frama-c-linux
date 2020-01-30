@@ -143,7 +143,7 @@ module Tags = Qed.Listset.Make
       let equal x y = (compare x y = 0)
     end)
 module M = Qed.Listmap.Make(Tags)
-module I = FCMap.Make(Tags)
+module I = Map.Make(Tags)
 
 type 'a t = 'a M.t
 

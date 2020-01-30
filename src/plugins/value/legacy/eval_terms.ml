@@ -164,13 +164,9 @@ let find_or_alarm ~alarm_mode state loc =
 type labels_states = Cvalue.Model.t Logic_label.Map.t
 
 let join_label_states m1 m2 =
-  let aux _ s1 s2 = match s1, s2 with
-    | None, None -> None
-    | Some s, None | None, Some s -> Some s
-    | Some s1, Some s2 -> Some (Cvalue.Model.join s1 s2)
-  in
+  let aux _ s1 s2 = Some (Cvalue.Model.join s1 s2) in
   if m1 == m2 then m1
-  else Logic_label.Map.merge aux m1 m2
+  else Logic_label.Map.union aux m1 m2
 
 (* The logic can refer to the state at other points of the program
    using labels. [e_cur] indicates the current label (in changes when

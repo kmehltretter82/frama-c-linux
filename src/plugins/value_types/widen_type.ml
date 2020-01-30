@@ -88,40 +88,33 @@ include Datatype.Make(struct
   end)
 
 let join wh1 wh2 =
-  let map_merge s_join os1 os2 =
-    match os1, os2 with
-    | Some bs1, Some bs2 -> Some (s_join bs1 bs2)
-    | Some bs, None | None, Some bs -> Some bs
-    | None, None -> None
-  in
+  let map_union s_join _key bs1 bs2 = Some (s_join bs1 bs2) in
   { priority_bases =
-      Stmt.Map.merge (fun _key -> map_merge Base.Set.union)
+      Stmt.Map.union (map_union Base.Set.union)
         wh1.priority_bases wh2.priority_bases;
     default_hints =
       Ival.Widen_Hints.union wh1.default_hints wh2.default_hints;
     default_float_hints =
       Fc_float.Widen_Hints.union wh1.default_float_hints wh2.default_float_hints;
     default_hints_by_stmt =
-      Stmt.Map.merge (fun _key -> map_merge Ival.Widen_Hints.union)
+      Stmt.Map.union (map_union Ival.Widen_Hints.union)
         wh1.default_hints_by_stmt wh2.default_hints_by_stmt;
     default_float_hints_by_stmt =
-      Stmt.Map.merge (fun _key -> map_merge Fc_float.Widen_Hints.union)
+      Stmt.Map.union (map_union Fc_float.Widen_Hints.union)
         wh1.default_float_hints_by_stmt wh2.default_float_hints_by_stmt;
     hints_by_addr =
-      Base.Map.merge (fun _key -> map_merge Ival.Widen_Hints.union)
+      Base.Map.union (map_union Ival.Widen_Hints.union)
         wh1.hints_by_addr wh2.hints_by_addr;
     float_hints_by_addr =
-      Base.Map.merge (fun _key -> map_merge Fc_float.Widen_Hints.union)
+      Base.Map.union (map_union Fc_float.Widen_Hints.union)
         wh1.float_hints_by_addr wh2.float_hints_by_addr;
     hints_by_addr_by_stmt =
-      Stmt.Map.merge (fun _key ->
-          map_merge (Base.Map.merge
-                       (fun _key -> map_merge Ival.Widen_Hints.union)))
+      Stmt.Map.union
+        (map_union (Base.Map.union (map_union Ival.Widen_Hints.union)))
         wh1.hints_by_addr_by_stmt wh2.hints_by_addr_by_stmt;
     float_hints_by_addr_by_stmt =
-      Stmt.Map.merge (fun _key ->
-          map_merge (Base.Map.merge
-                       (fun _key -> map_merge Fc_float.Widen_Hints.union)))
+      Stmt.Map.union
+        (map_union (Base.Map.union (map_union Fc_float.Widen_Hints.union)))
         wh1.float_hints_by_addr_by_stmt wh2.float_hints_by_addr_by_stmt;
   }
 
@@ -196,23 +189,17 @@ let hints_from_keys stmt h =
   let int_hints_by_base =
     try
       let at_stmt = Stmt.Map.find stmt h.hints_by_addr_by_stmt in
-      Base.Map.merge (fun _b os1 os2 ->
-          match os1, os2 with
-          | Some s1, Some s2 -> Some (Ival.Widen_Hints.union s1 s2)
-          | Some s, None | None, Some s -> Some s
-          | None, None -> None
-        ) at_stmt h.hints_by_addr
+      Base.Map.union
+        (fun _b s1 s2 -> Some (Ival.Widen_Hints.union s1 s2))
+        at_stmt h.hints_by_addr
     with Not_found -> h.hints_by_addr
   in
   let float_hints_by_base =
     try
       let at_stmt = Stmt.Map.find stmt h.float_hints_by_addr_by_stmt in
-      Base.Map.merge (fun _b os1 os2 ->
-          match os1, os2 with
-          | Some s1, Some s2 -> Some (Fc_float.Widen_Hints.union s1 s2)
-          | Some s, None | None, Some s -> Some s
-          | None, None -> None
-        ) at_stmt h.float_hints_by_addr
+      Base.Map.union
+        (fun _b s1 s2 -> Some (Fc_float.Widen_Hints.union s1 s2))
+        at_stmt h.float_hints_by_addr
     with Not_found -> h.float_hints_by_addr
   in
   let prio =

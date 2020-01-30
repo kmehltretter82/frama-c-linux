@@ -549,7 +549,7 @@ end
 
 module WPOset = WpoType.Set
 module WPOmap = WpoType.Map
-module Gmap = FCMap.Make(Index)
+module Gmap = Map.Make(Index)
 module Fmap = Kernel_function.Map
 module Pmap = Property.Map
 

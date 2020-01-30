@@ -290,7 +290,7 @@ let decode_chapter= function
   | Axiom _ -> "axiomatic"
   | Fun _   -> "function"
 
-module Smap = FCMap.Make
+module Smap = Map.Make
     (struct
       type t = entry
       let compare s1 s2 =

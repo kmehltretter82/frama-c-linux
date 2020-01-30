@@ -300,7 +300,7 @@ let configure_driver setup driver () =
 (* --- Access                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-module COMPILERS = FCMap.Make
+module COMPILERS = Map.Make
     (struct
       type t = setup * driver
       let compare (s,d) (s',d') =

@@ -225,7 +225,7 @@ end
 
 module PMAP(X: Graph.Sig.COMPARABLE) = struct
 
-  module M = FCMap.Make(X)
+  module M = Map.Make(X)
   type 'a t = 'a M.t ref
   type key = X.t
   type 'a return = unit

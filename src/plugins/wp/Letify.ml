@@ -439,7 +439,7 @@ struct
 
   (* --- Pretty --- *)
 
-  module Xmap = FCMap.Make(Var)
+  module Xmap = Map.Make(Var)
 
   let pretty title fmt sigma =
     let def = Vmap.fold Xmap.add sigma.def Xmap.empty in

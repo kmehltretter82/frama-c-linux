@@ -269,7 +269,7 @@ module VarinfoByName = struct
 end
 
 (** Map and sets of varinfos sorted by name (and not by ids) *)
-module VInfoMap = FCMap.Make (VarinfoByName)
+module VInfoMap = Map.Make (VarinfoByName)
 module VInfoSet = FCSet.Make (VarinfoByName)
 
 

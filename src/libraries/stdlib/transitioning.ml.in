@@ -30,6 +30,7 @@ module Stdlib = struct
   let min_int = min_int
   let max_int = max_int
   let flush = flush
+  module Map = Map
 end
 
 [@@@ warning "-3"]

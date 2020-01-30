@@ -171,7 +171,7 @@ struct
   (* Find the representative for a node and compress the paths in the process *)
   module Heq = Hashtbl.Make (Elts)
 
-  module Iter_sorted = FCMap.Make(Elts)
+  module Iter_sorted = Map.Make(Elts)
 
   module Hsyn = Hashtbl.Make(H)
 

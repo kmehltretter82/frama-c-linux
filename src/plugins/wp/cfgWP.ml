@@ -1279,7 +1279,7 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   (* NOTE: bug in ocamldoc in OCaml 4.02 prevents usage of 'P' here *)
-  module PMAP = FCMap.Make(WpPropId.PropId)
+  module PMAP = Map.Make(WpPropId.PropId)
 
   type group = {
     mutable verifs : VC_Annot.t Bag.t ;

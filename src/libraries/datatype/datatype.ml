@@ -294,7 +294,7 @@ module type Set = sig
 end
 
 module type Map = sig
-  include FCMap.S
+  include Map.S
   module Key: S with type t = key
   module Make(Data: S) : S with type t = Data.t t
 end
@@ -1433,7 +1433,7 @@ end
 (* ****************************************************************************)
 
 module Map
-  (M: FCMap.S)(Key: S with type t = M.key)(Info: Functor_info) = 
+  (M: Map.S)(Key: S with type t = M.key)(Info: Functor_info) = 
 struct
 
   let () = check Key.equal "equal" Key.name Info.module_name
@@ -1677,7 +1677,7 @@ module With_collections(X: S)(Info: Functor_info) = struct
 
   module Map =
     Map
-      (FCMap.Make(D))
+      (Transitioning.Stdlib.Map.Make(D))
       (D)
       (struct let module_name = Info.module_name ^ ".Map" end)
 
