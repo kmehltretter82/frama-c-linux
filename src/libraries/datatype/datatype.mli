@@ -240,7 +240,7 @@ end
 (** A standard OCaml map signature extended with datatype operations. *)
 module type Map = sig
 
-  include FCMap.S
+  include Map.S
 
   module Key: S with type t = key
   (** Datatype for the keys of the map. *)
@@ -638,7 +638,7 @@ module Set
   Set with type t = S.t and type elt = E.t
 
 module Map
-  (M: FCMap.S)(Key: S with type t = M.key)(Info: Functor_info) :
+  (M: Map.S)(Key: S with type t = M.key)(Info: Functor_info) :
   Map with type 'a t = 'a M.t and type key = M.key and module Key = Key
 
 module Hashtbl

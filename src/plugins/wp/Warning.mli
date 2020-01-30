@@ -40,7 +40,7 @@ val compare : t -> t -> int
 val pretty : Format.formatter -> t -> unit
 
 module Set : FCSet.S with type elt = t
-module Map : FCMap.S with type key = t
+module Map : Map.S with type key = t
 
 val severe : Set.t -> bool
 

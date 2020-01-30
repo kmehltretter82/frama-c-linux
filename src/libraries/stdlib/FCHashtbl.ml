@@ -52,7 +52,7 @@ module Make(H: Hashtbl.HashedType) : S with type key = H.t  = struct
 
   let fold_sorted ?(cmp=Transitioning.Stdlib.compare) f h acc =
     let module Aux = struct type t = key let compare = cmp end in
-    let module M = FCMap.Make(Aux) in
+    let module M = Map.Make(Aux) in
     let add k v m =
       try
         let l = v :: M.find k m in

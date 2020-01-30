@@ -46,7 +46,7 @@ let compare_gui_callstack cs1 cs2 = match cs1, cs2 with
   | _, GC_Single _ -> 1
   | GC_Single _, _ -> -1
 
-module GCallstackMap = FCMap.Make(struct
+module GCallstackMap = Map.Make(struct
     type t = gui_callstack
     let compare = compare_gui_callstack
   end)

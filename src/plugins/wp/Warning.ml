@@ -53,7 +53,7 @@ struct
 end
 
 include SELF
-module Map = FCMap.Make(SELF)
+module Map = Map.Make(SELF)
 module Set = FCSet.Make(SELF)
 
 let severe s = Set.exists (fun w -> w.severe) s

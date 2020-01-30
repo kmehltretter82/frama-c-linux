@@ -58,7 +58,7 @@ module SortCalls = struct
                                             good criterion is left *)
     else r
 end
-module MapStmtCalls = FCMap.Make(SortCalls)
+module MapStmtCalls = Map.Make(SortCalls)
 
 let iter_callwise_calls_sorted f =
   let hkf = Kernel_function.Hashtbl.create 17 in  

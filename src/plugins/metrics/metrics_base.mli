@@ -96,7 +96,7 @@ end
 
 (** Local varinfo map and set where the comparison function is the
     lexicographic one on their respective names. *)
-module VInfoMap: FCMap.S with type key = Cil_types.varinfo
+module VInfoMap: Map.S with type key = Cil_types.varinfo
 module VInfoSet: FCSet.S with type elt = Cil_types.varinfo
 ;;
 

@@ -28,7 +28,7 @@ open Qed
 open Qed.Logic
 open Lang
 open Lang.F
-module FunMap = FCMap.Make(Lang.Fun)
+module FunMap = Map.Make(Lang.Fun)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Kernel Interface                                                   --- *)

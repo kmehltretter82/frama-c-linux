@@ -36,7 +36,7 @@ val mem : c_label -> c_label list -> bool
 val equal : c_label -> c_label -> bool
 
 module T : sig type t = c_label val compare : t -> t -> int end
-module LabelMap : FCMap.S with type key = c_label
+module LabelMap : Map.S with type key = c_label
 module LabelSet : FCSet.S with type elt = c_label
 
 val pre : c_label

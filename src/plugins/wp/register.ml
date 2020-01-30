@@ -195,7 +195,7 @@ let do_wpo_display goal =
   Wp_parameters.feedback "Goal %s : %s" (Wpo.get_gid goal) result
 
 module PM =
-  FCMap.Make(struct
+  Map.Make(struct
     type t = VCS.prover
     let compare = VCS.cmp_prover
   end)

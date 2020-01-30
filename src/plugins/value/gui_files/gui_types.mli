@@ -29,7 +29,7 @@ type gui_callstack =
 val hash_gui_callstack : gui_callstack -> int
 val compare_gui_callstack : gui_callstack -> gui_callstack -> int
 
-module GCallstackMap :  FCMap.S with type key = gui_callstack
+module GCallstackMap :  Map.S with type key = gui_callstack
 
 
 type gui_selection =

@@ -192,7 +192,7 @@ let freetype a =
   with Not_found ->
     Hashtbl.add types a 1 ; a
 
-module NAMES = FCMap.Make(String)
+module NAMES = Map.Make(String)
 
 module Index(E : Entries) =
 struct
@@ -203,7 +203,7 @@ struct
   type data = E.data
 
   module KEY = struct type t = E.key let compare = E.compare end
-  module MAP = FCMap.Make(KEY)
+  module MAP = Map.Make(KEY)
   module SET = FCSet.Make(KEY)
 
   let demon = ref []
@@ -338,7 +338,7 @@ struct
   type data = E.data
 
   module KEY = struct type t = E.key let compare = E.compare end
-  module MAP = FCMap.Make(KEY)
+  module MAP = Map.Make(KEY)
   module SET = FCSet.Make(KEY)
 
   let demon = ref []
