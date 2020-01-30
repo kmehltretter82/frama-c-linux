@@ -388,8 +388,7 @@ let infer_binop_res_type op targ =
   | Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr ->
     Cil.intType (* those operators always return a boolean *)
 
-(* This function could probably be in Logic_utils. It computes [*tsets],
-   assuming that [tsets] has a pointer type. *)
+(* Computes [*tsets], assuming that [tsets] has a pointer type. *)
 let deref_tsets tsets = Cil.mkTermMem ~addr:tsets ~off:TNoOffset
 
 
