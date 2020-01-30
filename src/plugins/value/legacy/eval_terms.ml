@@ -171,12 +171,10 @@ let join_label_states m1 m2 =
    maps from their int identifiers to cvalues representing an over-approximation
    of their values (either mathematical integers or mathematical reals). *)
 module LogicVarEnv = struct
-  include Datatype.Int.Map
+  include Cil_datatype.Logic_var.Map
 
-  let add logic_var cvalue map = add logic_var.lv_id cvalue map
-  let remove logic_var map = remove logic_var.lv_id map
   let find logic_var map =
-    try find logic_var.lv_id map
+    try find logic_var map
     with Not_found -> unsupported_lvar logic_var
 
   let join m1 m2 =
