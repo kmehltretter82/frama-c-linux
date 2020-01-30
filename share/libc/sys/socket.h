@@ -344,7 +344,22 @@ extern int     bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
 extern int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
 
 extern int     getpeername(int, struct sockaddr *, socklen_t *);
-extern int     getsockname(int, struct sockaddr *, socklen_t *);
+
+/*@
+  // missing: may assign to errno: EBADF, ENOTSOCK, EOPNOTSUPP, EINVAL, ENOBUFS
+  requires valid_sockfd: 0 <= socket < __FC_MAX_OPEN_SOCKETS;
+  requires valid_address_len: \valid(address_len);
+  requires initialization:address_len: \initialized(address_len);
+  requires valid_address: \valid(((char*)address)+(0 .. *address_len-1));
+  assigns *address_len \from indirect:socket, __fc_sockfds[socket];
+  assigns \result \from indirect:__fc_sockfds[socket], indirect:socket;
+  assigns ((char*)address)[0 .. (*address_len)-1] \from
+          indirect:__fc_sockfds[socket], indirect:socket;
+  ensures new_address_len: *address_len <= \old(*address_len);
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+*/
+extern int getsockname(int socket, struct sockaddr *restrict address,
+                       socklen_t *restrict address_len);
 
 // getsockopt is incrementally specified: options which are used more often
 // are gradually refined; the rest are handled by behavior "other_options".

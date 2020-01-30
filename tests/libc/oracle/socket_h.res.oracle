@@ -3,7 +3,7 @@
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
-  
+  v ∈ [--..--]
 [eva] computing for function socket <- main.
   Called from tests/libc/socket_h.c:7.
 [eva] using specification for function socket
@@ -47,6 +47,18 @@
 [eva] tests/libc/socket_h.c:18: 
   function getsockopt, behavior so_error: precondition 'valid_optval' got status valid.
 [eva] Done for function getsockopt
+[eva] computing for function getsockname <- main.
+  Called from tests/libc/socket_h.c:21.
+[eva] using specification for function getsockname
+[eva] tests/libc/socket_h.c:21: 
+  function getsockname: precondition 'valid_sockfd' got status valid.
+[eva] tests/libc/socket_h.c:21: 
+  function getsockname: precondition 'valid_address_len' got status valid.
+[eva] tests/libc/socket_h.c:21: 
+  function getsockname: precondition 'initialization,address_len' got status valid.
+[eva] tests/libc/socket_h.c:21: 
+  function getsockname: precondition 'valid_address' got status valid.
+[eva] Done for function getsockname
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -59,3 +71,5 @@
   rc ∈ {-1; 0}
   optval ∈ [--..--] or UNINITIALIZED
   optlen ∈ {4}
+  addr2 ∈ [--..--] or UNINITIALIZED
+  socklen ∈ [0..8]

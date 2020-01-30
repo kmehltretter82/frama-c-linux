@@ -3667,6 +3667,24 @@ extern int bind(int sockfd, struct sockaddr const *addr, socklen_t addrlen);
  */
 extern int connect(int sockfd, struct sockaddr const *addr, socklen_t addrlen);
 
+/*@ requires valid_sockfd: 0 ≤ socket < 1024;
+    requires valid_address_len: \valid(address_len);
+    requires initialization: address_len: \initialized(address_len);
+    requires
+      valid_address: \valid((char *)address + (0 .. *address_len - 1));
+    ensures new_address_len: *\old(address_len) ≤ \old(*address_len);
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns *address_len, \result,
+            *((char *)address + (0 .. *address_len - 1));
+    assigns *address_len \from (indirect: socket), __fc_sockfds[socket];
+    assigns \result
+      \from (indirect: __fc_sockfds[socket]), (indirect: socket);
+    assigns *((char *)address + (0 .. *address_len - 1))
+      \from (indirect: __fc_sockfds[socket]), (indirect: socket);
+ */
+extern int getsockname(int socket, struct sockaddr * __restrict address,
+                       socklen_t * __restrict address_len);
+
 /*@ requires valid_sockfd: 0 ≤ sockfd < 1024;
     requires valid_optlen: \valid(optlen);
     ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
