@@ -187,6 +187,7 @@ module Make_Internal (Info: sig val name: string end) (Value: Value) = struct
   type state = t
   type value = Value.t
   type location = Precise_locs.precise_location
+  type origin = unit
 
   let log_category = Value_parameters.register_category ("d-" ^ Info.name)
 
@@ -207,99 +208,90 @@ module Make_Internal (Info: sig val name: string end) (Value: Value) = struct
 
   let reduce_further _state _expr _value = []
 
-  type origin = unit
+  (* This function binds [loc] to [v], of type [typ], in [state].
+     [v] can be [`Bottom], which means that its contents are guaranteed
+     to be indeterminate (e.g. unitialized data). *)
+  let bind_loc loc typ v state =
+    match v with
+    (* We are adding a "good" value. Store it in the state. *)
+    | `Value v -> add loc typ v state
+    (* Indeterminate value. Drop the information known for loc. *)
+    | `Bottom -> remove loc state
 
-  module Transfer
-      (Valuation: Abstract_domain.Valuation with type value := value
-                                             and type origin := origin
-                                             and type loc := location)
-  = struct
+  (* This function updates [state] with information for [expr], only possible
+     when it is an lvalue. In this case, we can update the corresponding
+     location with the result of the evaluation of [exp]. Both the value and
+     the location are found in the [valuation]. *)
+  let assume_exp valuation expr record state =
+    match expr.enode with
+    | Lval lv -> begin
+        match valuation.Abstract_domain.find_loc lv with
+        | `Top -> state
+        | `Value {loc; typ} ->
+          if Precise_locs.cardinal_zero_or_one loc
+          then bind_loc loc typ record.value.v state
+          else state
+      end
+    | _ -> state
 
-    (* This function binds [loc] to [v], of type [typ], in [state].
-       [v] can be [`Bottom], which means that its contents are guaranteed
-       to be indeterminate (e.g. unitialized data). *)
-    let bind_loc loc typ v state =
-      match v with
-      (* We are adding a "good" value. Store it in the state. *)
-      | `Value v -> add loc typ v state
-      (* Indeterminate value. Drop the information known for loc. *)
-      | `Bottom -> remove loc state
+  (* This function fills [state] according to the information available
+     in [valuation]. This information is computed by Eva's engine for
+     all the expressions involved in the current statement. *)
+  let assume_valuation valuation state =
+    valuation.Abstract_domain.fold (assume_exp valuation) state
 
-    (* This function updates [state] with information for [expr], only possible
-       when it is an lvalue. In this case, we can update the corresponding
-       location with the result of the evaluation of [exp]. Both the value and
-       the location are found in the [valuation]. *)
-    let assume_exp valuation expr record state =
-      match expr.enode with
-      | Lval lv -> begin
-          match Valuation.find_loc valuation lv with
-          | `Top -> state
-          | `Value {loc; typ} ->
-            if Precise_locs.cardinal_zero_or_one loc
-            then bind_loc loc typ record.value.v state
-            else state
-        end
-      | _ -> state
+  (* Abstraction of an assignment. *)
+  let assign _kinstr lv _expr value valuation state =
+    (* Update the state with the information obtained from evaluating
+       [lv] and [e] *)
+    let state = assume_valuation valuation state in
+    (* Extract the abstract value *)
+    let value = Eval.value_assigned value in
+    (* Store the information [lv = e;] in the state *)
+    let state = bind_loc lv.lloc lv.ltyp value state in
+    `Value state
 
-    (* This function fills [state] according to the information available
-       in [valuation]. This information is computed by Eva's engine for
-       all the expressions involved in the current statement. *)
-    let assume_valuation valuation state =
-      Valuation.fold (assume_exp valuation) valuation state
+  let update valuation state = `Value (assume_valuation valuation state)
 
-    (* Abstraction of an assignment. *)
-    let assign _kinstr lv _expr value valuation state =
-      (* Update the state with the information obtained from evaluating
-         [lv] and [e] *)
-      let state = assume_valuation valuation state in
-      (* Extract the abstract value *)
-      let value = Eval.value_assigned value in
-      (* Store the information [lv = e;] in the state *)
-      let state = bind_loc lv.lloc lv.ltyp value state in
-      `Value state
+  (* Abstraction of a conditional. All information inferred by the engine
+     is present in the valuation, and must be stored in the memory
+     abstraction of the domain itself. *)
+  let assume _stmt _expr _pos = update
 
-    let update valuation state = `Value (assume_valuation valuation state)
+  let start_call _stmt call _valuation state =
+    let bind_argument state argument =
+      let typ = argument.formal.vtype in
+      let loc = Main_locations.PLoc.eval_varinfo argument.formal in
+      let value = Eval.value_assigned argument.avalue in
+      bind_loc loc typ value state
+    in
+    let state = List.fold_left bind_argument state call.arguments in
+    `Value state
 
-    (* Abstraction of a conditional. All information inferred by the engine
-       is present in the valuation, and must be stored in the memory
-       abstraction of the domain itself. *)
-    let assume _stmt _expr _pos = update
+  let finalize_call _stmt call ~pre:_ ~post =
+    let kf_name = Kernel_function.get_name call.kf in
+    match find_builtin kf_name, call.return with
+    | None, _ | _, None   -> `Value post
+    | Some f, Some return ->
+      let extract_value arg = Eval.value_assigned arg.avalue in
+      let args = List.map extract_value call.arguments in
+      if List.exists (function `Bottom -> true | `Value _ -> false) args
+      then `Bottom
+      else
+        let args = List.map Bottom.non_bottom args in
+        f args >>-: fun result ->
+        let return_loc = Main_locations.PLoc.eval_varinfo return in
+        bind_loc return_loc return.vtype (`Value result) post
 
-    let start_call _stmt call _valuation state =
-      let bind_argument state argument =
-        let typ = argument.formal.vtype in
-        let loc = Main_locations.PLoc.eval_varinfo argument.formal in
-        let value = Eval.value_assigned argument.avalue in
-        bind_loc loc typ value state
-      in
-      let state = List.fold_left bind_argument state call.arguments in
-      `Value state
-
-    let finalize_call _stmt call ~pre:_ ~post =
-      let kf_name = Kernel_function.get_name call.kf in
-      match find_builtin kf_name, call.return with
-      | None, _ | _, None   -> `Value post
-      | Some f, Some return ->
-        let extract_value arg = Eval.value_assigned arg.avalue in
-        let args = List.map extract_value call.arguments in
-        if List.exists (function `Bottom -> true | `Value _ -> false) args
-        then `Bottom
-        else
-          let args = List.map Bottom.non_bottom args in
-          f args >>-: fun result ->
-          let return_loc = Main_locations.PLoc.eval_varinfo return in
-          bind_loc return_loc return.vtype (`Value result) post
-
-    let show_expr valuation state fmt expr =
-      match expr.enode with
-      | Lval lval ->
-        begin
-          match Valuation.find_loc valuation lval with
-          | `Top -> ()
-          | `Value {loc; typ} -> Value.pretty fmt (find loc typ state)
-        end
-      | _ -> ()
-  end
+  let show_expr valuation state fmt expr =
+    match expr.enode with
+    | Lval lval ->
+      begin
+        match valuation.Abstract_domain.find_loc lval with
+        | `Top -> ()
+        | `Value {loc; typ} -> Value.pretty fmt (find loc typ state)
+      end
+    | _ -> ()
 
   let enter_scope _kf _vars state = state
   let leave_scope _kf vars state = remove_variables vars state

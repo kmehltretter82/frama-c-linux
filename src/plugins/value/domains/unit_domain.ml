@@ -52,7 +52,6 @@ module Make
   include Static
   type value = Value.t
   type location = Loc.location
-
   type origin = unit
 
   let eval_top = `Value (Value.top, ()), Alarmset.all
@@ -61,18 +60,12 @@ module Make
   let backward_location _ _ _ loc value = `Value (loc, value)
   let reduce_further _ _ _  = []
 
-  module Transfer
-      (_: Abstract_domain.Valuation with type value = value
-                                     and type loc = location)
-  = struct
-
-    let update _ _ = `Value ()
-    let assign _ _ _ _ _ _ = `Value ()
-    let assume _ _ _ _ _ = `Value ()
-    let start_call _ _ _ _ = `Value ()
-    let finalize_call _ _ ~pre:_ ~post:_ = `Value ()
-    let show_expr _ _ _ _ = ()
-  end
+  let update _ _ = `Value ()
+  let assign _ _ _ _ _ _ = `Value ()
+  let assume _ _ _ _ _ = `Value ()
+  let start_call _ _ _ _ = `Value ()
+  let finalize_call _ _ ~pre:_ ~post:_ = `Value ()
+  let show_expr _ _ _ _ = ()
 
   let logic_assign _ _ ~pre:_ _ = ()
   let evaluate_predicate _ _ _ = Alarmset.Unknown

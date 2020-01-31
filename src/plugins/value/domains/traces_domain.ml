@@ -848,6 +848,7 @@ module Internal = struct
   type nonrec state = state
   type value = Cvalue.V.t
   type location = Precise_locs.precise_location
+  type origin = unit
 
   include (Traces: sig
              include Datatype.S_with_collections with type t = state
@@ -856,68 +857,50 @@ module Internal = struct
 
   let log_category = Value_parameters.register_category "d-traces"
 
-  type origin = unit
+  let assign ki lv e _v _valuation state =
+    let trans = Assign (ki, lv.Eval.lval, lv.Eval.ltyp, e) in
+    `Value (Traces.add_trans state trans)
 
-  module Transfer (Valuation: Abstract_domain.Valuation
-                   with type value = value
-                    and type origin = origin
-                    and type loc = Precise_locs.precise_location)
-    : Abstract_domain.Transfer
-      with type state = state
-       and type value = Cvalue.V.t
-       and type location = Precise_locs.precise_location
-       and type valuation = Valuation.t
-  = struct
-    type value = Cvalue.V.t
-    type state = t
-    type location = Precise_locs.precise_location
-    type valuation = Valuation.t
+  let assume stmt e pos _valuation state =
+    let trans = Assume (stmt, e, pos) in
+    `Value (Traces.add_trans state trans)
 
-    let assign ki lv e _v _valuation state =
-      let trans = Assign (ki, lv.Eval.lval, lv.Eval.ltyp, e) in
-      `Value (Traces.add_trans state trans)
+  let start_call stmt call _valuation state =
+    let kf = call.Eval.kf in
+    if Kernel_function.is_definition kf then
+      let msg = Format.asprintf "start_call: %s (%b)" (Kernel_function.get_name call.Eval.kf)
+          (Kernel_function.is_definition call.Eval.kf) in
+      let state = Traces.add_trans state (Msg msg) in
+      let formals = List.map (fun arg -> arg.Eval.formal) call.Eval.arguments in
+      let state = Traces.add_trans state (EnterScope (kf, formals)) in
+      let state = List.fold_left (fun state arg ->
+          Traces.add_trans state
+            (Assign (Kstmt stmt, Cil.var arg.Eval.formal,
+                     arg.Eval.formal.Cil_types.vtype,
+                     arg.Eval.concrete))) state call.Eval.arguments in
+      `Value state
+    else
+      (** enter the scope of the dumb result variable *)
+      let var = call.Eval.return in
+      let state = match var with
+        | Some var -> Traces.add_trans state (EnterScope (kf, [var]))
+        | None -> state in
+      let exps = List.map (fun arg -> arg.Eval.concrete) call.Eval.arguments in
+      let state = Traces.add_trans state
+          (CallDeclared (call.Eval.kf, exps, Extlib.opt_map Cil.var var))
+      in `Value {state with call_declared_function = true}
 
-    let assume stmt e pos _valuation state =
-      let trans = Assume (stmt, e, pos) in
-      `Value (Traces.add_trans state trans)
+  let finalize_call _stmt call ~pre:_ ~post =
+    if post.call_declared_function
+    then `Value {post with call_declared_function = false}
+    else
+      let msg = Format.asprintf "finalize_call: %s" (Kernel_function.get_name call.Eval.kf) in
+      let state = Traces.add_trans post (Msg msg) in
+      `Value state
 
-    let start_call stmt call _valuation state =
-      let kf = call.Eval.kf in
-      if Kernel_function.is_definition kf then
-        let msg = Format.asprintf "start_call: %s (%b)" (Kernel_function.get_name call.Eval.kf)
-            (Kernel_function.is_definition call.Eval.kf) in
-        let state = Traces.add_trans state (Msg msg) in
-        let formals = List.map (fun arg -> arg.Eval.formal) call.Eval.arguments in
-        let state = Traces.add_trans state (EnterScope (kf, formals)) in
-        let state = List.fold_left (fun state arg ->
-            Traces.add_trans state
-              (Assign (Kstmt stmt, Cil.var arg.Eval.formal,
-                       arg.Eval.formal.Cil_types.vtype,
-                       arg.Eval.concrete))) state call.Eval.arguments in
-        `Value state
-      else
-        (** enter the scope of the dumb result variable *)
-        let var = call.Eval.return in
-        let state = match var with
-          | Some var -> Traces.add_trans state (EnterScope (kf, [var]))
-          | None -> state in
-        let exps = List.map (fun arg -> arg.Eval.concrete) call.Eval.arguments in
-        let state = Traces.add_trans state
-            (CallDeclared (call.Eval.kf, exps, Extlib.opt_map Cil.var var))
-        in `Value {state with call_declared_function = true}
+  let update _valuation state = `Value state
 
-    let finalize_call _stmt call ~pre:_ ~post =
-      if post.call_declared_function
-      then `Value {post with call_declared_function = false}
-      else
-        let msg = Format.asprintf "finalize_call: %s" (Kernel_function.get_name call.Eval.kf) in
-        let state = Traces.add_trans post (Msg msg) in
-        `Value state
-
-    let update _valuation state = `Value state
-
-    let show_expr _valuation state fmt _expr = Traces.pretty fmt state
-  end
+  let show_expr _valuation state fmt _expr = Traces.pretty fmt state
 
   (* Memexec *)
   (* This domains infers no relation between variables. *)

@@ -186,8 +186,6 @@ module Eva =
     (Main_locations.PLoc)
     (Cvalue_domain.State)
 
-module Transfer = Cvalue_domain.State.Transfer (Eva.Valuation)
-
 let inject_cvalue state = state, Locals_scoping.bottom ()
 
 let bot_value = function
@@ -199,7 +197,7 @@ let bot_state = function
   | `Value s -> s
 
 let update valuation state =
-  bot_state (Transfer.update valuation state >>-: fst)
+  bot_state (Cvalue_domain.State.update (Eva.record valuation) state >>-: fst)
 
 let rec eval_deps state e =
   match e.enode with

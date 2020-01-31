@@ -360,6 +360,7 @@ module Make (Man : Input) = struct
   type state = Man.t Abstract1.t
   type value = Main_values.Interval.t
   type location = Precise_locs.precise_location
+  type origin = unit
 
   let man = Man.manager
   let log_category = dkey
@@ -426,8 +427,6 @@ module Make (Man : Input) = struct
   let narrow s1 s2 =
     let s = Abstract1.meet man s1 s2 in
     if Abstract1.is_bottom man s then `Bottom else `Value s
-
-  type origin = unit
 
   let make_eval state =
     let env = Abstract1.env state in
@@ -555,130 +554,124 @@ module Make (Man : Input) = struct
   let incr_loop_counter _ state = state
   let leave_loop _ state = state
 
-  module Transfer
-      (Valuation: Abstract_domain.Valuation with type value = value
-                                             and type loc = location)
-  = struct
+  (* make an oracle for the translation Cil->Apron, using the valuation.
+     Translate integer expressions that have been evaluated (which should
+     be all of them if the translation is called on a source expression!)
+     into Apron intervals. *)
+  let make_oracle valuation =
+    fun exp exn ->
+    if Cil.isIntegralType (Cil.typeOf exp) then
+      match valuation.Abstract_domain.find exp with
+      | `Value { value = { v = `Value itv } } ->
+        let interval = ival_to_interval itv in
+        Texpr1.Cst (Coeff.Interval interval)
+      | _ -> raise exn
+    else raise exn
 
-    (* make an oracle for the translation Cil->Apron, using the valuation.
-       Translate integer expressions that have been evaluated (which should
-       be all of them if the translation is called on a source expression!)
-       into Apron intervals. *)
-    let make_oracle valuation =
-      fun exp exn ->
-        if Cil.isIntegralType (Cil.typeOf exp) then
-          match Valuation.find valuation exp with
-          | `Value { value = { v = `Value itv } } ->
-            let interval = ival_to_interval itv in
-            Texpr1.Cst (Coeff.Interval interval)
-          | _ -> raise exn
-        else raise exn
+  let update valuation state =
+    let eval = make_eval state in
+    let oracle = make_oracle valuation in
+    let env = Abstract1.env state in
+    (* Makes a list of apron constraints from a valuation:
+       for each value marked as Reduced for an expression, creates the
+       apron constraint [expression = value]. *)
+    let gather_constraints exp record acc =
+      if record.reductness = Reduced
+      then
+        try
+          let expr = translate_expr_linearize eval oracle exp in
+          let expr = coerce eval (Cil.typeOf exp) expr in
+          (* When the value is top or bottom, no constraint is expressible. *)
+          let cons = record.value.v >>- fun ival ->
+            let interval = ival_to_interval ival in
+            if Interval.is_top interval
+            then `Bottom
+            else `Value (constraint_reduction env expr interval)
+          in
+          Bottom.add_to_list cons acc
+        with Out_of_Scope _ -> acc
+      else acc
+    in
+    let constraints = valuation.Abstract_domain.fold gather_constraints [] in
+    if constraints = []
+    then `Value state
+    else meet_with_constraints env state constraints
 
-    let update valuation state =
+  let assign _stmt lvalue expr _value valuation state =
+    update valuation state >>- fun state ->
+    try
+      let state =
+        try
+          let eval = make_eval state in
+          let oracle = make_oracle valuation in
+          let var = translate_lval lvalue.lval in
+          let expr = expr in
+          let exp = translate_expr_linearize eval oracle expr in
+          let exp = coerce eval lvalue.ltyp exp in
+          let exp = Texpr1.of_expr (Abstract1.env state) exp in
+          (* TODO: currently, all variables are present in the environment
+             at all times. Change to a dynamic environment, in which new
+             variables are added here, and removed when the scope changes. *)
+          Abstract1.assign_texpr man state var exp None
+        with
+        | Out_of_Scope _ -> kill_bases lvalue.lloc state
+      in
+      maybe_bottom state
+    with Manager.Error exclog -> abort exclog
+
+
+  let assume _stmt exp bool valuation state =
+    update valuation state >>- fun state ->
+    try
+      let env = Abstract1.env state in
       let eval = make_eval state in
       let oracle = make_oracle valuation in
-      let env = Abstract1.env state in
-      (* Makes a list of apron constraints from a valuation:
-         for each value marked as Reduced for an expression, creates the
-         apron constraint [expression = value]. *)
-      let gather_constraints exp record acc =
-        if record.reductness = Reduced
-        then
-          try
-            let expr = translate_expr_linearize eval oracle exp in
-            let expr = coerce eval (Cil.typeOf exp) expr in
-            (* When the value is top or bottom, no constraint is expressible. *)
-            let cons = record.value.v >>- fun ival ->
-              let interval = ival_to_interval ival in
-              if Interval.is_top interval
-              then `Bottom
-              else `Value (constraint_reduction env expr interval)
-            in
-            Bottom.add_to_list cons acc
-          with Out_of_Scope _ -> acc
-        else acc
-      in
-      let constraints = Valuation.fold gather_constraints valuation [] in
-      if constraints = []
-      then `Value state
-      else meet_with_constraints env state constraints
+      let cons = constraint_expr eval oracle env exp bool in
+      let array = Tcons1.array_make env 1 in
+      Tcons1.array_set array 0 cons;
+      let state = Abstract1.meet_tcons_array man state array in
+      maybe_bottom state
+    with
+    | Out_of_Scope _ -> `Value state
 
-    let assign _stmt lvalue expr _value valuation state =
-      update valuation state >>- fun state ->
-      try
-        let state =
-          try
-            let eval = make_eval state in
-            let oracle = make_oracle valuation in
-            let var = translate_lval lvalue.lval in
-            let expr = expr in
-            let exp = translate_expr_linearize eval oracle expr in
-            let exp = coerce eval lvalue.ltyp exp in
-            let exp = Texpr1.of_expr (Abstract1.env state) exp in
-            (* TODO: currently, all variables are present in the environment
-               at all times. Change to a dynamic environment, in which new
-               variables are added here, and removed when the scope changes. *)
-            Abstract1.assign_texpr man state var exp None
-          with
-          | Out_of_Scope _ -> kill_bases lvalue.lloc state
-        in
-        maybe_bottom state
-      with Manager.Error exclog -> abort exclog
-
-
-    let assume _stmt exp bool valuation state =
-      update valuation state >>- fun state ->
+  let start_call _stmt call valuation state =
+    update valuation state >>- fun state ->
+    let eval = make_eval state in
+    let oracle = make_oracle valuation in
+    let process_argument (vars, acc) arg =
       try
         let env = Abstract1.env state in
-        let eval = make_eval state in
-        let oracle = make_oracle valuation in
-        let cons = constraint_expr eval oracle env exp bool in
-        let array = Tcons1.array_make env 1 in
-        Tcons1.array_set array 0 cons;
-        let state = Abstract1.meet_tcons_array man state array in
-        maybe_bottom state
+        let var = translate_varinfo arg.formal in
+        let vars = var :: vars in
+        let acc =
+          try
+            let exp = translate_expr_linearize eval oracle arg.concrete in
+            let texp = Texpr1.of_expr env exp in
+            (var, texp) :: acc
+          with Out_of_Scope _ -> acc
+        in
+        vars, acc
       with
-      | Out_of_Scope _ -> `Value state
+      | Out_of_Scope _ -> (vars, acc)
+    in
+    let vars, list = List.fold_left process_argument ([], []) call.arguments in
+    let env = Abstract1.env state in
+    let vars_array = Array.of_list vars in
+    let env = Environment.add env vars_array [||] in
+    let vars, texprs = List.split list in
+    let vars_array = Array.of_list vars
+    and texprs_array = Array.of_list texprs in
+    let state = Abstract1.change_environment man state env false in
+    let state =
+      Abstract1.assign_texpr_array man state vars_array texprs_array None
+    in
+    if Abstract1.is_bottom man state
+    then `Bottom
+    else `Value state
 
-    let start_call _stmt call valuation state =
-      update valuation state >>- fun state ->
-      let eval = make_eval state in
-      let oracle = make_oracle valuation in
-      let process_argument (vars, acc) arg =
-        try
-          let env = Abstract1.env state in
-          let var = translate_varinfo arg.formal in
-          let vars = var :: vars in
-          let acc =
-            try
-              let exp = translate_expr_linearize eval oracle arg.concrete in
-              let texp = Texpr1.of_expr env exp in
-              (var, texp) :: acc
-            with Out_of_Scope _ -> acc
-          in
-          vars, acc
-        with
-        | Out_of_Scope _ -> (vars, acc)
-      in
-      let vars, list = List.fold_left process_argument ([], []) call.arguments in
-      let env = Abstract1.env state in
-      let vars_array = Array.of_list vars in
-      let env = Environment.add env vars_array [||] in
-      let vars, texprs = List.split list in
-      let vars_array = Array.of_list vars
-      and texprs_array = Array.of_list texprs in
-      let state = Abstract1.change_environment man state env false in
-      let state =
-        Abstract1.assign_texpr_array man state vars_array texprs_array None
-      in
-      if Abstract1.is_bottom man state
-      then `Bottom
-      else `Value state
+  let finalize_call _stmt _call ~pre:_ ~post = `Value post
 
-    let finalize_call _stmt _call ~pre:_ ~post = `Value post
-
-    let show_expr _valuation _state _fmt _expr = ()
-  end
+  let show_expr _valuation _state _fmt _expr = ()
 
   let logic_assign _assigns location ~pre:_ state = kill_bases location state
   let evaluate_predicate _ _ _ = Alarmset.Unknown

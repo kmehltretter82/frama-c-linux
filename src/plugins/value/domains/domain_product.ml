@@ -111,115 +111,94 @@ module Make
       (Left.reduce_further left expr value)
       (Right.reduce_further right expr value)
 
-  module Transfer
-      (Valuation: Abstract_domain.Valuation with type value = value
-                                             and type origin = origin
-                                             and type loc = location)
-  = struct
+  let lift_record side record =
+    let origin = Extlib.opt_map side record.origin in
+    let reductness =
+      match record.reductness, origin with
+      | Unreduced, Some (reduced, _) -> reduced
+      | Unreduced, None -> Unreduced (* This case should not happen. *)
+      | Reduced, Some (Created, _) -> Created
+      | _ as x, _ -> x
+    in
+    let origin = Extlib.opt_map snd origin in
+    { record with origin; reductness }
 
-    module type Lift = sig
-      type o
-      val side : origin -> reductness * o
-    end
+  let lift_valuation side valuation =
+    let find expr =
+      match valuation.Abstract_domain.find expr with
+      | `Value record -> `Value (lift_record side record)
+      | `Top -> `Top
+    in
+    let fold f acc =
+      valuation.Abstract_domain.fold
+        (fun expr record acc -> f expr (lift_record side record) acc)
+        acc
+    in
+    Abstract_domain.{ find; fold; find_loc = valuation.find_loc }
 
-    module Lift_Valuation (Lift: Lift) = struct
-      type t = Valuation.t
-      type value = Value.t
-      type origin = Lift.o
-      type loc = Valuation.loc
+  let left_val = lift_valuation (fun o -> o.left)
+  let right_val = lift_valuation (fun o -> o.right)
 
-      let lift_record record =
-        let origin = Extlib.opt_map Lift.side record.origin in
-        let reductness =
-          match record.reductness, origin with
-          | Unreduced, Some (reduced, _) -> reduced
-          | Unreduced, None -> Unreduced (* This case should not happen. *)
-          | Reduced, Some (Created, _) -> Created
-          | _ as x, _ -> x
-        in
-        let origin = Extlib.opt_map snd origin in
-        { record with origin; reductness }
 
-      let find valuation expr = match Valuation.find valuation expr with
-        | `Value record -> `Value (lift_record record)
-        | `Top -> `Top
+  let update valuation (left, right) =
+    Left.update (left_val valuation) left >>- fun left ->
+    Right.update (right_val valuation) right >>-: fun right ->
+    left, right
 
-      let fold f valuation acc =
-        Valuation.fold
-          (fun exp record acc -> f exp (lift_record record) acc)
-          valuation acc
+  let assign stmt lv expr value valuation (left, right) =
+    Left.assign stmt lv expr value (left_val valuation) left >>- fun left ->
+    Right.assign stmt lv expr value (right_val valuation) right >>-: fun right ->
+    left, right
 
-      let find_loc = Valuation.find_loc
-    end
+  let assume stmt expr positive valuation (left, right) =
+    Left.assume stmt expr positive (left_val valuation) left >>- fun left ->
+    Right.assume stmt expr positive (right_val valuation) right >>-: fun right ->
+    left, right
 
-    module Left_Valuation =
-      Lift_Valuation (struct type o = Left.origin let side o = o.left end)
-    module Right_Valuation =
-      Lift_Valuation (struct type o = Right.origin let side o = o.right end)
+  let finalize_call stmt call ~pre ~post =
+    let pre_left, pre_right = pre
+    and left_state, right_state = post in
+    Left.finalize_call stmt call ~pre:pre_left ~post:left_state
+    >>- fun left ->
+    Right.finalize_call stmt call ~pre:pre_right ~post:right_state
+    >>-: fun right ->
+    left, right
 
-    module Left_Transfer = Left.Transfer (Left_Valuation)
-    module Right_Transfer = Right.Transfer (Right_Valuation)
+  let start_call stmt call valuation (left, right) =
+    Left.start_call stmt call (left_val valuation) left >>- fun left ->
+    Right.start_call stmt call (right_val valuation) right >>-: fun right ->
+    left, right
 
-    let update valuation (left, right) =
-      Left_Transfer.update valuation left >>- fun left ->
-      Right_Transfer.update valuation right >>-: fun right ->
-      left, right
-
-    let assign stmt lv expr value valuation (left, right) =
-      Left_Transfer.assign stmt lv expr value valuation left >>- fun left ->
-      Right_Transfer.assign stmt lv expr value valuation right >>-: fun right ->
-      left, right
-
-    let assume stmt expr positive valuation (left, right) =
-      Left_Transfer.assume stmt expr positive valuation left >>- fun left ->
-      Right_Transfer.assume stmt expr positive valuation right >>-: fun right ->
-      left, right
-
-    let finalize_call stmt call ~pre ~post =
-      let pre_left, pre_right = pre
-      and left_state, right_state = post in
-      Left_Transfer.finalize_call stmt call ~pre:pre_left ~post:left_state
-      >>- fun left ->
-      Right_Transfer.finalize_call stmt call ~pre:pre_right ~post:right_state
-      >>-: fun right ->
-      left, right
-
-    let start_call stmt call valuation (left, right) =
-      Left_Transfer.start_call stmt call valuation left >>- fun left ->
-      Right_Transfer.start_call stmt call valuation right >>-: fun right ->
-      left, right
-
-    let show_expr =
-      let (|-) f g = fun fmt exp -> f fmt exp; g fmt exp in
-      let show_expr_one_side category name show_expr = fun fmt exp ->
-        if Value_parameters.is_debug_key_enabled category
-        then Format.fprintf fmt "@,@]@[<v># %s: @[<hov>%a@]" name show_expr exp
-      in
-      let right_log = Right.log_category
-      and left_log = Left.log_category in
-      match left_log = product_category,
-            right_log = product_category with
-      | true, true ->
-        (fun valuation (left, right) ->
-           Left_Transfer.show_expr valuation left |-
-           Right_Transfer.show_expr valuation right)
-      | true, false ->
-        (fun valuation (left, right) ->
-           Left_Transfer.show_expr valuation left |-
-           show_expr_one_side right_log Right.name
-             (Right_Transfer.show_expr valuation right))
-      | false, true ->
-        (fun valuation (left, right) ->
-           show_expr_one_side left_log Left.name
-             (Left_Transfer.show_expr valuation left) |-
-           Right_Transfer.show_expr valuation right)
-      | false, false ->
-        (fun valuation (left, right) ->
-           show_expr_one_side left_log Left.name
-             (Left_Transfer.show_expr valuation left) |-
-           show_expr_one_side right_log Right.name
-             (Right_Transfer.show_expr valuation right))
-  end
+  let show_expr =
+    let (|-) f g = fun fmt exp -> f fmt exp; g fmt exp in
+    let show_expr_one_side category name show_expr = fun fmt exp ->
+      if Value_parameters.is_debug_key_enabled category
+      then Format.fprintf fmt "@,@]@[<v># %s: @[<hov>%a@]" name show_expr exp
+    in
+    let right_log = Right.log_category
+    and left_log = Left.log_category in
+    match left_log = product_category,
+          right_log = product_category with
+    | true, true ->
+      (fun valuation (left, right) ->
+         Left.show_expr (left_val valuation) left |-
+         Right.show_expr (right_val valuation) right)
+    | true, false ->
+      (fun valuation (left, right) ->
+         Left.show_expr (left_val valuation) left |-
+         show_expr_one_side right_log Right.name
+           (Right.show_expr (right_val valuation) right))
+    | false, true ->
+      (fun valuation (left, right) ->
+         show_expr_one_side left_log Left.name
+           (Left.show_expr (left_val valuation) left) |-
+         Right.show_expr (right_val valuation) right)
+    | false, false ->
+      (fun valuation (left, right) ->
+         show_expr_one_side left_log Left.name
+           (Left.show_expr (left_val valuation) left) |-
+         show_expr_one_side right_log Right.name
+           (Right.show_expr (right_val valuation) right))
 
   let pretty =
     let print_one_side fmt category name dump state =

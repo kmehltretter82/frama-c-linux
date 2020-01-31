@@ -213,6 +213,7 @@ module Internal
   type state = inout
   type value = Cvalue.V.t
   type location = Precise_locs.precise_location
+  type origin = unit
 
   include (LatticeInout: sig
              include Datatype.S_with_collections with type t = state
@@ -225,47 +226,29 @@ module Internal
   let enter_scope _kf _vars state = state
   let leave_scope _kf vars state = Transfer.remove_variables vars state
 
-  type origin = unit
+  let to_z valuation lv =
+    match valuation.Abstract_domain.find_loc lv with
+    | `Value loc -> loc.Eval.loc
+    | `Top -> Precise_locs.loc_top (* should not occur *)
 
-  module Transfer (Valuation: Abstract_domain.Valuation
-                   with type value = value
-                    and type origin = origin
-                    and type loc = Precise_locs.precise_location)
-    : Abstract_domain.Transfer
-      with type state = state
-       and type value = Cvalue.V.t
-       and type location = Precise_locs.precise_location
-       and type valuation = Valuation.t
-  = struct
-    type value = Cvalue.V.t
-    type state = inout
-    type location = Precise_locs.precise_location
-    type valuation = Valuation.t
+  let assign _ki lv e _v valuation state =
+    let to_z = to_z valuation in
+    let effects = Transfer.effects_assign to_z lv e in
+    `Value (Transfer.catenate state effects)
 
-    let to_z valuation lv =
-      match Valuation.find_loc valuation lv with
-      | `Value loc -> loc.Eval.loc
-      | `Top -> Precise_locs.loc_top (* should not occur *)
+  let assume _stmt e _pos valuation state =
+    let to_z = to_z valuation in
+    let effects = Transfer.effects_assume to_z e in
+    `Value (Transfer.catenate state effects)
 
-    let assign _ki lv e _v valuation state =
-      let to_z = to_z valuation in
-      let effects = Transfer.effects_assign to_z lv e in
-      `Value (Transfer.catenate state effects)
+  let start_call _stmt _call _valuation _state = `Value LatticeInout.empty
 
-    let assume _stmt e _pos valuation state =
-      let to_z = to_z valuation in
-      let effects = Transfer.effects_assume to_z e in
-      `Value (Transfer.catenate state effects)
+  let finalize_call _stmt _call ~pre ~post =
+    `Value (Transfer.catenate pre post)
 
-    let start_call _stmt _call _valuation _state = `Value LatticeInout.empty
+  let update _valuation state = `Value state
 
-    let finalize_call _stmt _call ~pre ~post =
-      `Value (Transfer.catenate pre post)
-
-    let update _valuation state = `Value state
-
-    let show_expr _valuation _state _fmt _expr = ()
-  end
+  let show_expr _valuation _state _fmt _expr = ()
 
   (* Memexec *)
   let relate _kf _bases _state = Base.SetLattice.empty

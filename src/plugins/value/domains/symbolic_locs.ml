@@ -466,6 +466,8 @@ module Internal : Domain_builder.InputDomain
   type state = Memory.t
   type value = V.t
   type location = Precise_locs.precise_location
+  type origin = unit
+
   include (Memory: sig
              include Datatype.S_with_collections with type t = state
              include Abstract_domain.Lattice with type state := state
@@ -485,101 +487,87 @@ module Internal : Domain_builder.InputDomain
   let incr_loop_counter _ state = state
   let leave_loop _ state = state
 
-  type origin = unit
+  (* build a [get_locs] function from a valuation *)
+  let get_locs valuation =
+    fun lv ->
+    let r =
+      match valuation.Abstract_domain.find_loc lv with
+      | `Top -> Precise_locs.loc_top
+      | `Value loc -> loc.Eval.loc
+    in
+    if Precise_locs.(equal_loc loc_top r) then
+      Value_parameters.fatal "Unknown location for %a" Printer.pp_lval lv
+    else r
 
-  module Transfer (Valuation: Abstract_domain.Valuation
-                   with type value = value
-                    and type origin = origin
-                    and type loc = Precise_locs.precise_location)
-    : Abstract_domain.Transfer
-      with type state := state
-       and type value := V.t
-       and type location := Precise_locs.precise_location
-       and type valuation := Valuation.t
-  = struct
+  (* update the state according to the information known in the valuation.
+     Important, because on statements such as [if (t[i] + j <= 3)], the
+     interesting information on [t[i]] is only in the valuation. *)
+  let update valuation state =
+    let aux e r state =
+      let v = r.value in
+      (* TODO: incorporate DB criterion: only expressions that are immediate
+         lvalues, or that embed two non-singleton lvalues for the first
+         time. *)
+      match r.reductness, v.v, v.initialized, v.escaping with
+      | (Created | Reduced), `Value v, true, false ->
+        if not (is_cond e) && multiple_loc_exp (get_locs valuation) e then
+          begin
+            let k = K.HCE.of_exp e in
+            (* remove the existing binding: the key may already be in
+               the state, and [add_exp] assumes it is not the case.
+               The new dependencies may not be the same (in rare cases
+               where one dependency has disappeared by reduction), so
+               we need to update the dependency inverse maps. *)
+            (* TODO: it would be more efficient to use a function that
+               compares the previous and current dependencies, and update
+               the inverse maps accordingly. *)
+            let state = Memory.remove_key k state in
+            Memory.add_exp state (get_locs valuation) e v
+          end
+        else
+          state
+      | _ -> state
+    in
+    `Value (valuation.Abstract_domain.fold aux state)
 
-    (* build a [get_locs] function from a valuation *)
-    let get_locs valuation =
-      fun lv ->
-        let r =
-          match Valuation.find_loc valuation lv with
-          | `Top -> Precise_locs.loc_top
-          | `Value loc -> loc.Eval.loc
-        in
-        if Precise_locs.(equal_loc loc_top r) then
-          Value_parameters.fatal "Unknown location for %a" Printer.pp_lval lv
-        else r
+  let store_value valuation lv loc state v =
+    let loc = Precise_locs.imprecise_location loc in
+    (* Remove the keys that are overwritten because [loc] is written *)
+    let state = Memory.kill loc state in
+    if Locations.cardinal_zero_or_one loc then
+      (* Stored by the standard domain. Skip *)
+      `Value state
+    else
+      (* Add the new binding *)
+      `Value (Memory.add_lv state (get_locs valuation) lv v)
 
-    (* update the state according to the information known in the valuation.
-       Important, because on statements such as [if (t[i] + j <= 3)], the
-       interesting information on [t[i]] is only in the valuation. *)
-    let update valuation state =
-      let aux e r state =
-        let v = r.value in
-        (* TODO: incorporate DB criterion: only expressions that are immediate
-           lvalues, or that embed two non-singleton lvalues for the first
-           time. *)
-        match r.reductness, v.v, v.initialized, v.escaping with
-        | (Created | Reduced), `Value v, true, false ->
-          if not (is_cond e) && multiple_loc_exp (get_locs valuation) e then
-            begin
-              let k = K.HCE.of_exp e in
-              (* remove the existing binding: the key may already be in
-                 the state, and [add_exp] assumes it is not the case.
-                 The new dependencies may not be the same (in rare cases
-                 where one dependency has disappeared by reduction), so
-                 we need to update the dependency inverse maps. *)
-              (* TODO: it would be more efficient to use a function that
-                 compares the previous and current dependencies, and update
-                 the inverse maps accordingly. *)
-              let state = Memory.remove_key k state in
-              Memory.add_exp state (get_locs valuation) e v
-            end
-          else
-            state
-        | _ -> state
-      in
-      `Value (Valuation.fold aux valuation state)
+  (* Assume we may be copying indeterminate bits. Kill existing information *)
+  let store_indeterminate state loc =
+    let loc = Precise_locs.imprecise_location loc in
+    `Value (Memory.kill loc state)
 
-    let store_value valuation lv loc state v =
-      let loc = Precise_locs.imprecise_location loc in
-      (* Remove the keys that are overwritten because [loc] is written *)
-      let state = Memory.kill loc state in
-      if Locations.cardinal_zero_or_one loc then
-        (* Stored by the standard domain. Skip *)
-        `Value state
-      else
-        (* Add the new binding *)
-        `Value (Memory.add_lv state (get_locs valuation) lv v)
+  let store_copy valuation lv loc state fv =
+    if Cil.isArithmeticOrPointerType lv.ltyp then
+      match fv.v, fv.initialized, fv.escaping with
+      | `Value v, true, false -> store_value valuation lv.lval loc state v
+      | _ -> store_indeterminate state loc
+    else
+      store_indeterminate state loc
 
-    (* Assume we may be copying indeterminate bits. Kill existing information *)
-    let store_indeterminate state loc =
-      let loc = Precise_locs.imprecise_location loc in
-      `Value (Memory.kill loc state)
+  (* perform [lv = e] in [state] *)
+  let assign _kinstr lv _e v valuation state =
+    update valuation state >>- fun state ->
+    match v with
+    | Copy (_, vc) -> store_copy valuation lv lv.lloc state vc
+    | Assign v -> store_value valuation lv.lval lv.lloc state v
 
-    let store_copy valuation lv loc state fv =
-      if Cil.isArithmeticOrPointerType lv.ltyp then
-        match fv.v, fv.initialized, fv.escaping with
-        | `Value v, true, false -> store_value valuation lv.lval loc state v
-        | _ -> store_indeterminate state loc
-      else
-        store_indeterminate state loc
+  let assume _stmt _exp _pos valuation state = update valuation state
 
-    (* perform [lv = e] in [state] *)
-    let assign _kinstr lv _e v valuation state =
-      update valuation state >>- fun state ->
-      match v with
-      | Copy (_, vc) -> store_copy valuation lv lv.lloc state vc
-      | Assign v -> store_value valuation lv.lval lv.lloc state v
+  let start_call _stmt _call valuation state = update valuation state
 
-    let assume _stmt _exp _pos valuation state = update valuation state
+  let finalize_call _stmt _call ~pre:_ ~post = `Value post
 
-    let start_call _stmt _call valuation state = update valuation state
-
-    let finalize_call _stmt _call ~pre:_ ~post = `Value post
-
-    let show_expr _valuation _state _fmt _expr = ()
-  end
+  let show_expr _valuation _state _fmt _expr = ()
 
   let top_query = `Value (V.top, ()), Alarmset.all
 

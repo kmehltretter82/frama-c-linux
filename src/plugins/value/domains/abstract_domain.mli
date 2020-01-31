@@ -164,21 +164,26 @@ module type Queries = sig
 end
 
 (** Results of an evaluation: the results of all intermediate calculation (the
-    value of each expression and the location of each lvalue) are cached in a
-    map. *)
-module type Valuation = sig
-  type t
-  type value  (** Abstract value. *)
-  type origin (** Origin of abstract values. *)
-  type loc    (** Abstract memory location. *)
-  val find : t -> exp -> (value, origin) record_val or_top
-  val fold : (exp -> (value, origin) record_val -> 'a -> 'a) -> t -> 'a -> 'a
-  val find_loc : t -> lval -> loc record_loc or_top
-end
+    value of each expression and the location of each lvalue) are available for
+    the domain. *)
+type ('value, 'location, 'origin) valuation =
+  {
+    find: exp -> ('value, 'origin) record_val or_top;
+    (** Finds the value computed for an expression. The returned record also
+        contains the origin given by the domain for this expression, the alarms
+        emitted by its evaluation, and whether its value has been reduced.
+        Returns `Top if the expression has not been evaluated. *)
+    fold: 'a. (exp -> ('value, 'origin) record_val -> 'a -> 'a) -> 'a -> 'a;
+    (** [fold f e] applies [f expr record] to any expression [expr] evaluated
+        to [record], which contains its value, reduction, origin, and alarms. *)
+    find_loc: lval -> 'location record_loc or_top
+    (** Finds the location computed for an lvalue. The returned record also
+        contains the lvalue type and the alarms emitted by its evaluation.
+        Returns `Top if the lvalue has not been evaluated. *)
+  }
 
 (** Transfer function of the domain. *)
 module type Transfer = sig
-
   type state
   type value
   type location
@@ -324,14 +329,10 @@ module type S = sig
 
   (** Transfer functions from the result of evaluations.
       See {eval.mli} for more details about valuation. *)
-  module Transfer
-      (Valuation: Valuation with type value = value
-                             and type origin = origin
-                             and type loc = location)
-    : Transfer with type state := t
-                and type value := value
-                and type location := location
-                and type valuation := Valuation.t
+  include Transfer with type state := t
+                    and type value := value
+                    and type location := location
+                    and type valuation := (value, location, origin) valuation
 
   (** {3 Logic } *)
 

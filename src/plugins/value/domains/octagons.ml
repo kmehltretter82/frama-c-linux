@@ -1037,8 +1037,8 @@ module Domain = struct
 
   type value = Cvalue.V.t
   type location = Precise_locs.precise_location
-
   type origin = unit
+
   let top_value = `Value (Cvalue.V.top, ()), Alarmset.all
 
   let extract_expr oracle state expr =
@@ -1108,138 +1108,132 @@ module Domain = struct
       let state = Zone.fold_bases kill_base zone state in
       { state with modified }
 
-  module Transfer
-      (Valuation: Abstract_domain.Valuation with type value = value
-                                             and type loc = location)
-  = struct
+  (* Evaluation function of expressions to ival, from a [valuation]. *)
+  let evaluation_function valuation = fun expr ->
+    match valuation.Abstract_domain.find expr with
+    | `Top -> `Top
+    | `Value record ->
+      match record.Eval.value.v with
+      | `Bottom -> `Top (* TODO: why this keeps happening? *)
+      | `Value cvalue ->
+        try `Value (Cvalue.V.project_ival cvalue)
+        with Cvalue.V.Not_based_on_null -> `Top
 
-    (* Evaluation function of expressions to ival, from a [valuation]. *)
-    let evaluation_function valuation = fun expr ->
-      match Valuation.find valuation expr with
-      | `Top -> `Top
-      | `Value record ->
-        match record.Eval.value.v with
-        | `Bottom -> `Top (* TODO: why this keeps happening? *)
-        | `Value cvalue ->
-          try `Value (Cvalue.V.project_ival cvalue)
-          with Cvalue.V.Not_based_on_null -> `Top
+  exception EBottom
 
-    exception EBottom
+  let infer_octagons evaluate expr ival state =
+    let octagons = Rewriting.make_octagons evaluate expr ival in
+    let add_octagon state octagon =
+      match State.add_octagon state octagon with
+      | `Bottom -> raise EBottom
+      | `Value state -> state
+    in
+    List.fold_left add_octagon state octagons
 
-    let infer_octagons evaluate expr ival state =
-      let octagons = Rewriting.make_octagons evaluate expr ival in
-      let add_octagon state octagon =
-        match State.add_octagon state octagon with
-        | `Bottom -> raise EBottom
-        | `Value state -> state
+  let infer_interval expr ival state =
+    if not infer_intervals
+    then state
+    else
+      match expr.enode with
+      | Lval (Var varinfo, NoOffset)
+        when Cil.isIntegralType varinfo.vtype ->
+        let intervals = Intervals.add varinfo ival state.intervals in
+        { state with intervals }
+      | _ -> state
+
+  let update valuation state =
+    let evaluate = evaluation_function valuation in
+    let aux expr record state =
+      let value = record.Eval.value in
+      match record.reductness, value.v, value.initialized, value.escaping with
+      | (Created | Reduced), `Value cvalue, true, false ->
+        begin
+          try
+            let ival = Cvalue.V.project_ival cvalue in
+            let state = infer_octagons evaluate expr ival state in
+            infer_interval expr ival state
+          with Cvalue.V.Not_based_on_null -> state
+        end
+      | _ -> state
+    in
+    try `Value (check "update" (valuation.Abstract_domain.fold aux state))
+    with EBottom -> `Bottom
+
+  let assign_interval varinfo assigned state =
+    if not infer_intervals
+    then state
+    else
+      match assigned with
+      | Assign v
+      | Copy (_, { v = `Value v; initialized = true; escaping = false }) ->
+        begin
+          try
+            let ival = Cvalue.V.project_ival v in
+            let intervals = Intervals.add varinfo ival state.intervals in
+            { state with intervals }
+          with Cvalue.V.Not_based_on_null -> state
+        end
+      | _ -> state
+
+  let assign_variable varinfo expr assigned valuation state =
+    let evaluate = evaluation_function valuation in
+    (* TODO: redundant with rewrite_binop below. *)
+    let vars = Rewriting.rewrite evaluate expr in
+    let equal_varinfo v = Variable.equal varinfo v.Rewriting.varinfo in
+    let state =
+      try
+        let var = List.find equal_varinfo vars in
+        let inverse = not var.Rewriting.sign in
+        State.sub_delta ~inverse state varinfo var.Rewriting.coeff
+      with Not_found -> State.remove state varinfo
+    in
+    let state = assign_interval varinfo assigned state in
+    let enode = Lval (Var varinfo, NoOffset) in
+    let left_expr = Cil.new_exp ~loc:expr.eloc enode in
+    (* On the assignment X = E; if X-E can be rewritten as ±(X±Y-v),
+       then the octagonal constraint [X±Y ∈ v] holds. *)
+    let octagons = Rewriting.rewrite_binop evaluate left_expr Sub expr in
+    let state =
+      List.fold_left
+        (fun acc (_sign, octagon) ->
+           acc >>- fun state -> State.add_octagon state octagon)
+        (`Value state) octagons
+    in
+    state >>-: check "precise assign"
+
+  let assign _kinstr left_value expr assigned valuation state =
+    update valuation state >>- fun state ->
+    match left_value.lval with
+    | Var varinfo, NoOffset when Cil.isIntegralType varinfo.vtype ->
+      assign_variable varinfo expr assigned valuation state
+    | _ ->
+      let written_loc = Precise_locs.imprecise_location left_value.lloc in
+      let written_zone =
+        Locations.(enumerate_valid_bits Write written_loc)
       in
-      List.fold_left add_octagon state octagons
+      let state = kill written_zone state in
+      `Value (check "imprecise assign" state)
 
-    let infer_interval expr ival state =
-      if not infer_intervals
-      then state
-      else
-        match expr.enode with
-        | Lval (Var varinfo, NoOffset)
-          when Cil.isIntegralType varinfo.vtype ->
-          let intervals = Intervals.add varinfo ival state.intervals in
-          { state with intervals }
-        | _ -> state
+  let assume _stmt _exp _bool = update
 
-    let update valuation state =
-      let evaluate = evaluation_function valuation in
-      let aux expr record state =
-        let value = record.Eval.value in
-        match record.reductness, value.v, value.initialized, value.escaping with
-        | (Created | Reduced), `Value cvalue, true, false ->
-          begin
-            try
-              let ival = Cvalue.V.project_ival cvalue in
-              let state = infer_octagons evaluate expr ival state in
-              infer_interval expr ival state
-            with Cvalue.V.Not_based_on_null -> state
-          end
-        | _ -> state
+  let start_call _stmt call valuation state =
+    if intraprocedural ()
+    then `Value (empty ())
+    else
+      let state = { state with modified = Locations.Zone.bottom } in
+      let assign_formal state { formal; concrete; avalue } =
+        state >>- assign_variable formal concrete avalue valuation
       in
-      try `Value (check "update" (Valuation.fold aux valuation state))
-      with EBottom -> `Bottom
+      List.fold_left assign_formal (`Value state) call.arguments
 
-    let assign_interval varinfo assigned state =
-      if not infer_intervals
-      then state
-      else
-        match assigned with
-        | Assign v
-        | Copy (_, { v = `Value v; initialized = true; escaping = false }) ->
-          begin
-            try
-              let ival = Cvalue.V.project_ival v in
-              let intervals = Intervals.add varinfo ival state.intervals in
-              { state with intervals }
-            with Cvalue.V.Not_based_on_null -> state
-          end
-        | _ -> state
+  let finalize_call _stmt _call ~pre ~post =
+    if intraprocedural ()
+    then `Value (kill post.modified pre)
+    else
+      let modified = Locations.Zone.join post.modified pre.modified in
+      `Value { post with modified }
 
-    let assign_variable varinfo expr assigned valuation state =
-      let evaluate = evaluation_function valuation in
-      (* TODO: redundant with rewrite_binop below. *)
-      let vars = Rewriting.rewrite evaluate expr in
-      let equal_varinfo v = Variable.equal varinfo v.Rewriting.varinfo in
-      let state =
-        try
-          let var = List.find equal_varinfo vars in
-          let inverse = not var.Rewriting.sign in
-          State.sub_delta ~inverse state varinfo var.Rewriting.coeff
-        with Not_found -> State.remove state varinfo
-      in
-      let state = assign_interval varinfo assigned state in
-      let enode = Lval (Var varinfo, NoOffset) in
-      let left_expr = Cil.new_exp ~loc:expr.eloc enode in
-      (* On the assignment X = E; if X-E can be rewritten as ±(X±Y-v),
-         then the octagonal constraint [X±Y ∈ v] holds. *)
-      let octagons = Rewriting.rewrite_binop evaluate left_expr Sub expr in
-      let state =
-        List.fold_left
-          (fun acc (_sign, octagon) ->
-             acc >>- fun state -> State.add_octagon state octagon)
-          (`Value state) octagons
-      in
-      state >>-: check "precise assign"
-
-    let assign _kinstr left_value expr assigned valuation state =
-      update valuation state >>- fun state ->
-      match left_value.lval with
-      | Var varinfo, NoOffset when Cil.isIntegralType varinfo.vtype ->
-        assign_variable varinfo expr assigned valuation state
-      | _ ->
-        let written_loc = Precise_locs.imprecise_location left_value.lloc in
-        let written_zone =
-          Locations.(enumerate_valid_bits Write written_loc)
-        in
-        let state = kill written_zone state in
-        `Value (check "imprecise assign" state)
-
-    let assume _stmt _exp _bool = update
-
-    let start_call _stmt call valuation state =
-      if intraprocedural ()
-      then `Value (empty ())
-      else
-        let state = { state with modified = Locations.Zone.bottom } in
-        let assign_formal state { formal; concrete; avalue } =
-          state >>- assign_variable formal concrete avalue valuation
-        in
-        List.fold_left assign_formal (`Value state) call.arguments
-
-    let finalize_call _stmt _call ~pre ~post =
-      if intraprocedural ()
-      then `Value (kill post.modified pre)
-      else
-        let modified = Locations.Zone.join post.modified pre.modified in
-        `Value { post with modified }
-
-    let show_expr _valuation _state _fmt _expr = ()
-  end
+  let show_expr _valuation _state _fmt _expr = ()
 
   let logic_assign _logic_assign location ~pre:_ state =
     let loc = Precise_locs.imprecise_location location in

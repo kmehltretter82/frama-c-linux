@@ -116,9 +116,6 @@ module Make (Abstract: Abstractions.Eva) = struct
   type value = Value.t
   type location = Location.location
 
-  (* Transfer functions. *)
-  module TF = Domain.Transfer (Eval.Valuation)
-
   (* When using a product of domains, a product of states may have no
      concretization (if the domains have inferred incompatible properties)
      without being bottom (if the inter-reduction between domains are
@@ -267,7 +264,8 @@ module Make (Abstract: Abstractions.Eva) = struct
       if is_ret then assert (Alarmset.is_empty alarms);
       Alarmset.emit kinstr alarms;
       eval >>- fun (assigned, valuation) ->
-      TF.assign kinstr {lval; ltyp; lloc} expr assigned valuation state
+      let valuation = Eval.record valuation in
+      Domain.assign kinstr {lval; ltyp; lloc} expr assigned valuation state
 
   let assign = assign_lv_or_ret ~is_ret:false
   let assign_ret = assign_lv_or_ret ~is_ret:true
@@ -282,7 +280,7 @@ module Make (Abstract: Abstractions.Eva) = struct
     (* TODO: check not comparable. *)
     Alarmset.emit (Kstmt stmt) alarms;
     eval >>- fun valuation ->
-    TF.assume stmt expr positive valuation state
+    Domain.assume stmt expr positive (Eval.record valuation) state
 
 
   (* ------------------------------------------------------------------------ *)
@@ -312,7 +310,7 @@ module Make (Abstract: Abstractions.Eva) = struct
     try
       let res =
         (* Process the call according to the domain decision. *)
-        match TF.start_call stmt call valuation state with
+        match Domain.start_call stmt call (Eval.record valuation) state with
         | `Value state ->
           Domain.Store.register_initial_state (Value_util.call_stack ()) state;
           !compute_call_ref stmt call state
@@ -418,7 +416,7 @@ module Make (Abstract: Abstractions.Eva) = struct
       Eval.assume ~valuation state argument.concrete post_value
     in
     List.fold_left reduce_one_argument valuation reductions >>- fun valuation ->
-    TF.update valuation state
+    Domain.update (Eval.record valuation) state
 
   (* -------------------- Treat the results of a call ----------------------- *)
 
@@ -474,7 +472,7 @@ module Make (Abstract: Abstractions.Eva) = struct
       let post = Domain.leave_scope kf_callee leaving_vars state in
       (* Computes the state after the call, from the post state at the end of
          the called function, and the pre state at the call site. *)
-      TF.finalize_call stmt call ~pre ~post >>- fun state ->
+      Domain.finalize_call stmt call ~pre ~post >>- fun state ->
       (* Backward propagates the [reductions] on the concrete arguments. *)
       reduce_arguments reductions state >>- fun state ->
       treat_return ~kf_callee lv call.return stmt state
@@ -483,7 +481,7 @@ module Make (Abstract: Abstractions.Eva) = struct
          domains. Do not reduce them, and more importantly, do not remove
          them from the scope. (Because the instance from the initial,
          non-recursive, call are still present.) *)
-      TF.finalize_call stmt call ~pre ~post:state >>- fun state ->
+      Domain.finalize_call stmt call ~pre ~post:state >>- fun state ->
       treat_return ~kf_callee lv call.return stmt state
     in
     let states =
@@ -590,12 +588,12 @@ module Make (Abstract: Abstractions.Eva) = struct
   (* Idem as for [print_state]. *)
   let show_expr =
     if Domain.log_category = Domain_product.product_category
-    then TF.show_expr
+    then Domain.show_expr
     else if Value_parameters.is_debug_key_enabled Domain.log_category
     then
       fun valuation state fmt exp ->
         Format.fprintf fmt "# %s: @[<hov>%a@]"
-          Domain.name (TF.show_expr valuation state) exp
+          Domain.name (Domain.show_expr valuation state) exp
     else fun _ _ _ _ -> ()
 
   (* Frama_C_domain_show_each functions. *)
@@ -603,8 +601,10 @@ module Make (Abstract: Abstractions.Eva) = struct
     let pretty fmt expr =
       let pp fmt  =
         match fst (Eval.evaluate ~subdivnb state expr) with
-        | `Bottom -> Format.fprintf fmt "%s" (Unicode.bottom_string ())
-        | `Value (valuation, _value) -> show_expr valuation state fmt expr
+        | `Bottom ->
+          Format.fprintf fmt "%s" (Unicode.bottom_string ())
+        | `Value (valuation, _v) ->
+          show_expr (Eval.record valuation) state fmt expr
       in
       Format.fprintf fmt "%a : @[<h>%t@]" Printer.pp_exp expr pp
     in

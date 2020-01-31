@@ -1130,6 +1130,7 @@ module D_Impl : Abstract_domain.S
   type value = Cvalue.V.t
   type state = G.t
   type location = Precise_locs.precise_location
+  type origin = unit
 
   include G
 
@@ -1151,8 +1152,6 @@ module D_Impl : Abstract_domain.S
     (* reverts implicitly to Top *)
     remove_variables vars state
 
-  type origin = unit
-
   let kill loc state =
     let loc = Precise_locs.imprecise_location loc in
     let loc = loc.Locations.loc in
@@ -1163,108 +1162,96 @@ module D_Impl : Abstract_domain.S
     let vars = Locations.Location_Bits.fold_topset_ok aux_base loc [] in
     remove_variables vars state
 
-  module Transfer (Valuation:
-                     Abstract_domain.Valuation with type value = value
-                                                and type origin = origin
-                                                and type loc = location)
-    : Abstract_domain.Transfer
-      with type state := state
-       and type value := value
-       and type location := location
-       and type valuation := Valuation.t
-  = struct
+  let assume_exp valuation e r state =
+    if r.reductness = Created || r.reductness = Reduced then
+      match e.enode with
+      | Lval lv -> begin
+          match valuation.Abstract_domain.find_loc lv with
+          | `Top -> `Value state
+          | `Value {loc} ->
+            let loc = Precise_locs.imprecise_location loc in
+            try
+              let b = loc_to_base loc (Cil.typeOfLval lv) in
+              match r.value.v with
+              | `Bottom -> `Value state
+              | `Value v ->
+                match backward_loop state b v with
+                | Some `Bottom -> `Bottom
+                | Some (`Value _ as s) -> s
+                | None -> `Value state
+            with Untranslatable -> `Value state
+        end
+      | _ -> `Value state
+    else `Value state
 
-    let assume_exp valuation e r state =
-      if r.reductness = Created || r.reductness = Reduced then
-        match e.enode with
-        | Lval lv -> begin
-            match Valuation.find_loc valuation lv with
-            | `Top -> `Value state
-            | `Value {loc} ->
-              let loc = Precise_locs.imprecise_location loc in
-              try
-                let b = loc_to_base loc (Cil.typeOfLval lv) in
-                match r.value.v with
-                | `Bottom -> `Value state
-                | `Value v ->
-                  match backward_loop state b v with
-                  | Some `Bottom -> `Bottom
-                  | Some (`Value _ as s) -> s
-                  | None -> `Value state
-              with Untranslatable -> `Value state
-          end
-        | _ -> `Value state
-      else `Value state
+  let assume_exp_bot valuation e r state =
+    state >>- assume_exp valuation e r
 
-    let assume_exp_bot valuation e r state =
-      state >>- assume_exp valuation e r
+  let update valuation state =
+    let assume_one = assume_exp_bot valuation in
+    valuation.Abstract_domain.fold assume_one (`Value state)
 
-    let update valuation state =
-      let assume_one = assume_exp_bot valuation in
-      Valuation.fold assume_one valuation (`Value state)
+  let assume _ _ _ = update
 
-    let assume _ _ _ = update
+  exception Unassignable
 
-    exception Unassignable
+  let assign _kinstr lv e _assignment valuation (state:state) =
+    update valuation state >>- fun state ->
+    let to_loc lv =
+      match valuation.Abstract_domain.find_loc lv with
+      | `Value r -> Precise_locs.imprecise_location r.loc
+      | `Top -> raise Unassignable
+    in
+    let to_val e =
+      match valuation.Abstract_domain.find e with
+      | `Top -> raise Unassignable
+      | `Value v ->
+        match v.value.initialized, v.value.escaping, v.value.v with
+        | true, false, `Value v -> v
+        | _ -> raise Unassignable
+    in
+    try `Value (G.assign to_loc to_val lv.lval e state)
+    with Unassignable -> `Value (kill lv.lloc state)
 
-    let assign _kinstr lv e _assignment valuation (state:state) =
-      update valuation state >>- fun state ->
-      let to_loc lv =
-        match Valuation.find_loc valuation lv with
-        | `Value r -> Precise_locs.imprecise_location r.loc
-        | `Top -> raise Unassignable
-      in
-      let to_val e =
-        match Valuation.find valuation e with
-        | `Top -> raise Unassignable
-        | `Value v ->
-          match v.value.initialized, v.value.escaping, v.value.v with
-          | true, false, `Value v -> v
-          | _ -> raise Unassignable
-      in
-      try `Value (G.assign to_loc to_val lv.lval e state)
-      with Unassignable -> `Value (kill lv.lloc state)
+  let finalize_call _stmt _call ~pre ~post =
+    let state =
+      match function_calls_handling with
+      | FullInterprocedural -> post
+      | IntraproceduralNonReferenced -> pre
+      | IntraproceduralAll -> pre (* unsound here *)
+    in
+    `Value state
 
-    let finalize_call _stmt _call ~pre ~post =
-      let state =
-        match function_calls_handling with
-        | FullInterprocedural -> post
-        | IntraproceduralNonReferenced -> pre
-        | IntraproceduralAll -> pre (* unsound here *)
-      in
-      `Value state
+  let start_call _stmt call valuation state =
+    let state =
+      match function_calls_handling with
+      | FullInterprocedural -> update valuation state
+      | IntraproceduralAll
+      | IntraproceduralNonReferenced -> `Value G.empty
+    in
+    state >>- fun state ->
+    (* track [arg.formal] into [state]. Important for functions that
+       receive a size as argument. *)
+    let aux_arg state arg =
+      try
+        let vi = arg.formal in
+        if not (tracked_variable vi) then raise Untranslatable;
+        let b = Base.of_varinfo vi in
+        let v = match arg.avalue with
+          | Assign v -> v
+          | Copy (_, v) ->
+            match v.initialized, v.escaping, v.v with
+            | true, false, `Value v -> v
+            | _ -> raise Untranslatable
+        in
+        let g = Gauge.ct v in
+        store_gauge b g state
+      with Untranslatable -> state
+    in
+    let state = List.fold_left aux_arg state call.arguments in
+    `Value state
 
-    let start_call _stmt call valuation state =
-      let state =
-        match function_calls_handling with
-        | FullInterprocedural -> update valuation state
-        | IntraproceduralAll
-        | IntraproceduralNonReferenced -> `Value G.empty
-      in
-      state >>- fun state ->
-      (* track [arg.formal] into [state]. Important for functions that
-         receive a size as argument. *)
-      let aux_arg state arg =
-        try
-          let vi = arg.formal in
-          if not (tracked_variable vi) then raise Untranslatable;
-          let b = Base.of_varinfo vi in
-          let v = match arg.avalue with
-            | Assign v -> v
-            | Copy (_, v) ->
-              match v.initialized, v.escaping, v.v with
-              | true, false, `Value v -> v
-              | _ -> raise Untranslatable
-          in
-          let g = Gauge.ct v in
-          store_gauge b g state
-        with Untranslatable -> state
-      in
-      let state = List.fold_left aux_arg state call.arguments in
-      `Value state
-
-    let show_expr _valuation _state _fmt _expr = ()
-  end
+  let show_expr _valuation _state _fmt _expr = ()
 
   let enter_loop = G.enter_loop
   let incr_loop_counter _ = G.inc

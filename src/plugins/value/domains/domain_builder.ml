@@ -75,28 +75,21 @@ module Make_Minimal
   let backward_location _state _lval _typ location value = `Value (location, value)
   let reduce_further _sttae _expr _value = []
 
-  module Transfer
-      (_: Abstract_domain.Valuation with type value = value
-                                     and type origin = origin
-                                     and type loc = location)
-  = struct
+  let update _valuation state = `Value state
 
-    let update _valuation state = `Value state
+  let assign kinstr lv expr _value _valuation state =
+    Domain.assign kinstr lv.Eval.lval expr state
 
-    let assign kinstr lv expr _value _valuation state =
-      Domain.assign kinstr lv.Eval.lval expr state
+  let assume stmt expr positive _valuation state =
+    Domain.assume stmt expr positive state
 
-    let assume stmt expr positive _valuation state =
-      Domain.assume stmt expr positive state
+  let start_call stmt call _valuation state =
+    `Value (Domain.start_call stmt (simplify_call call) state)
 
-    let start_call stmt call _valuation state =
-      `Value (Domain.start_call stmt (simplify_call call) state)
+  let finalize_call stmt call ~pre ~post =
+    Domain.finalize_call stmt (simplify_call call) ~pre ~post
 
-    let finalize_call stmt call ~pre ~post =
-      Domain.finalize_call stmt (simplify_call call) ~pre ~post
-
-    let show_expr _valuation = Domain.show_expr
-  end
+  let show_expr _valuation = Domain.show_expr
 
   let enter_loop _stmt state = state
   let incr_loop_counter _stmt state = state
@@ -209,37 +202,29 @@ module Complete_Simple_Cvalue (Domain: Simpler_domains.Simple_Cvalue)
 
     let reduce_further _state _expr _value = []
 
-    module Transfer
-        (Valuation: Abstract_domain.Valuation with type value = value
-                                               and type origin = origin
-                                               and type loc = location)
-    = struct
+    let find valuation expr =
+      match valuation.Abstract_domain.find expr with
+      | `Top -> `Top
+      | `Value record -> `Value record.value
 
-      let find valuation expr =
-        match Valuation.find valuation expr with
-        | `Top -> `Top
-        | `Value record -> `Value record.value
+    let find_loc valuation lval =
+      match valuation.Abstract_domain.find_loc lval with
+      | `Top -> `Top
+      | `Value record -> `Value record.loc
 
-      let find_loc valuation lval =
-        match Valuation.find_loc valuation lval with
-        | `Top -> `Top
-        | `Value record -> `Value record.loc
+    let record valuation = { find = find valuation;
+                             find_loc = find_loc valuation; }
 
-      let record valuation = { find = find valuation;
-                               find_loc = find_loc valuation; }
+    let update _valuation state = `Value state
+    let assign kinstr lv expr value valuation state =
+      Domain.assign kinstr lv expr value (record valuation) state
+    let assume stmt expr positive valuation state =
+      Domain.assume stmt expr positive (record valuation) state
+    let start_call stmt call valuation state =
+      `Value (Domain.start_call stmt call (record valuation) state)
+    let finalize_call = Domain.finalize_call
 
-      let update _valuation state = `Value state
-      let assign kinstr lv expr value valuation state =
-        Domain.assign kinstr lv expr value (record valuation) state
-      let assume stmt expr positive valuation state =
-        Domain.assume stmt expr positive (record valuation) state
-      let start_call stmt call valuation state =
-        `Value (Domain.start_call stmt call (record valuation) state)
-      let finalize_call = Domain.finalize_call
-
-      let show_expr _valuation = Domain.show_expr
-
-    end
+    let show_expr _valuation = Domain.show_expr
 
     let enter_loop _stmt state = state
     let incr_loop_counter _stmt state = state

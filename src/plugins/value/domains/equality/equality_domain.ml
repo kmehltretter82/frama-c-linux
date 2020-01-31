@@ -281,234 +281,227 @@ module Make
     let zone = List.fold_left aux_vi Locations.Zone.bottom vars in
     kill Hcexprs.Deleted zone state
 
-  module Transfer
-      (Valuation: Abstract_domain.Valuation
-       with type value = Value.t
-        and type loc = Precise_locs.precise_location)
-  = struct
+  let find_val valuation expr =
+    match valuation.Abstract_domain.find expr with
+    | `Top -> Value.top
+    | `Value record -> Bottom.non_bottom record.value.v
 
-    let find_val valuation expr =
-      match Valuation.find valuation expr with
-      | `Top -> Value.top
-      | `Value record -> Bottom.non_bottom record.value.v
+  let minus_zero = Cvalue.V.inject_float Fval.minus_zero
+  let plus_zero = Cvalue.V.inject_float Fval.plus_zero
 
-    let minus_zero = Cvalue.V.inject_float Fval.minus_zero
-    let plus_zero = Cvalue.V.inject_float Fval.plus_zero
+  let incompatible_zeros v1 v2 =
+    let aux v1 v2 =
+      Cvalue.V.(is_included minus_zero v1 && is_included plus_zero v2)
+    in
+    aux v1 v2 || aux v2 v1
 
-    let incompatible_zeros v1 v2 =
-      let aux v1 v2 =
-        Cvalue.V.(is_included minus_zero v1 && is_included plus_zero v2)
+  (* Does the equality between two expressions imply they have the same
+     object representation, allowing the narrow of their abstract values? *)
+  let is_safe_equality =
+    match get_cvalue with
+    | None -> fun _ _ _ -> false
+    | Some get_cvalue ->
+      fun valuation e1 e2 ->
+        let cval1 = get_cvalue (find_val valuation e1)
+        and cval2 = get_cvalue (find_val valuation e2) in
+        Cvalue_forward.are_comparable Abstract_interp.Comp.Eq cval1 cval2
+        && not (incompatible_zeros cval1 cval2)
+
+  exception Top_location
+
+  let find_loc valuation = fun lval ->
+    match valuation.Abstract_domain.find_loc lval with
+    | `Top -> raise Top_location
+    | `Value record -> record.loc
+
+  let add_one_dep valuation lval deps =
+    match HCE.get lval with
+    | E _ -> assert false
+    | LV lv ->
+      let zone =
+        match lv with
+        | Var vi, NoOffset -> Locations.zone_of_varinfo vi
+        | _ ->
+          let expr = Cil.dummy_exp (Lval lv) in
+          Value_util.zone_of_expr (find_loc valuation) expr
       in
-      aux v1 v2 || aux v2 v1
+      Deps.add lval zone deps
 
-    (* Does the equality between two expressions imply they have the same
-       object representation, allowing the narrow of their abstract values? *)
-    let is_safe_equality =
-      match get_cvalue with
-      | None -> fun _ _ _ -> false
-      | Some get_cvalue ->
-        fun valuation e1 e2 ->
-          let cval1 = get_cvalue (find_val valuation e1)
-          and cval2 = get_cvalue (find_val valuation e2) in
-          Cvalue_forward.are_comparable Abstract_interp.Comp.Eq cval1 cval2
-          && not (incompatible_zeros cval1 cval2)
+  let add_deps valuation lvalues deps =
+    let deps = HCESet.fold (add_one_dep valuation) lvalues.read deps in
+    HCESet.fold (add_one_dep valuation) lvalues.addr deps
 
-    exception Top_location
+  let update _valuation state = `Value state
 
-    let find_loc valuation = fun lval ->
-      match Valuation.find_loc valuation lval with
-      | `Top -> raise Top_location
-      | `Value record -> record.loc
+  let is_singleton = match get_cvalue with
+    | None -> fun _ -> false
+    | Some get ->
+      function
+      | `Bottom -> true
+      | `Value v -> Cvalue.V.cardinal_zero_or_one (get v)
 
-    let add_one_dep valuation lval deps =
-      match HCE.get lval with
-      | E _ -> assert false
-      | LV lv ->
-        let zone =
-          match lv with
-          | Var vi, NoOffset -> Locations.zone_of_varinfo vi
-          | _ ->
-            let expr = Cil.dummy_exp (Lval lv) in
-            Value_util.zone_of_expr (find_loc valuation) expr
-        in
-        Deps.add lval zone deps
+  let expr_cardinal_zero_or_one valuation e =
+    match valuation.Abstract_domain.find e with
+    | `Top -> false (* should not happen *)
+    | `Value { value = { v } } -> is_singleton v
 
-    let add_deps valuation lvalues deps =
-      let deps = HCESet.fold (add_one_dep valuation) lvalues.read deps in
-      HCESet.fold (add_one_dep valuation) lvalues.addr deps
-
-    let update _valuation state = `Value state
-
-    let is_singleton = match get_cvalue with
-      | None -> fun _ -> false
-      | Some get ->
-        function
-        | `Bottom -> true
-        | `Value v -> Cvalue.V.cardinal_zero_or_one (get v)
-
-    let expr_cardinal_zero_or_one valuation e =
-      match Valuation.find valuation e with
-      | `Top -> false (* should not happen *)
-      | `Value { value = { v } } -> is_singleton v
-
-    let expr_is_cardinal_zero_or_one_loc valuation e =
-      match e.enode with
-      | Lval lv -> begin
-          let loc = Valuation.find_loc valuation lv in
-          match loc with
-          | `Top -> false (* should not happen *)
-          | `Value loc -> Precise_locs.cardinal_zero_or_one loc.loc
-        end
-      | _ -> false (* TODO: handle upcasts *)
+  let expr_is_cardinal_zero_or_one_loc valuation e =
+    match e.enode with
+    | Lval lv -> begin
+        let loc = valuation.Abstract_domain.find_loc lv in
+        match loc with
+        | `Top -> false (* should not happen *)
+        | `Value loc -> Precise_locs.cardinal_zero_or_one loc.loc
+      end
+    | _ -> false (* TODO: handle upcasts *)
 
 
-    let register expr valuation deps =
-      let term = HCE.of_exp expr in
-      if HCE.is_lval term
-      then
-        let deps = add_one_dep valuation term deps in
-        term, Hcexprs.empty_lvalues, deps
+  let register expr valuation deps =
+    let term = HCE.of_exp expr in
+    if HCE.is_lval term
+    then
+      let deps = add_one_dep valuation term deps in
+      term, Hcexprs.empty_lvalues, deps
+    else
+      let lvalues = Hcexprs.syntactic_lvalues expr in
+      term, lvalues, add_deps valuation lvalues deps
+
+  let indeterminate_copy = function
+    | Assign _ -> false
+    | Copy (_loc, value) -> not value.initialized || value.escaping
+
+  (* Auxiliary function for [assign]. The equality is inferred, unless:
+     - some of the expressions involved are volatile
+     - the value has an aggregate type (as the current Eva values have no
+       meaning for such type, the equality would be useless or misleading).
+     - it is an assignment by copy, and the copied value is possibly
+       unitialized or escaping. In this case, when using the equality later,
+       the reevaluation of [right_expr] would reduce it incorrectly, by
+       removing indeterminate flags without emitting alarms. *)
+  let assign_eq left_lval right_expr value valuation state =
+    if Eval_typ.lval_contains_volatile left_lval ||
+       Eval_typ.expr_contains_volatile right_expr ||
+       not (Cil.isArithmeticOrPointerType (Cil.typeOfLval left_lval)) ||
+       indeterminate_copy value
+    then state
+    else
+      let (equalities, deps, modified_zone: t) = state in
+      let lterm = HCE.of_lval left_lval in
+      let lterm_lvals = Hcexprs.empty_lvalues in
+      let deps = add_one_dep valuation lterm deps in
+      let rterm, rterm_lvals, deps = register right_expr valuation deps in
+      let equalities =
+        Equality.Set.unite
+          (lterm, lterm_lvals) (rterm, rterm_lvals) equalities
+      in
+      (equalities, deps, modified_zone: t)
+
+  let assign _stmt left_value right_expr value valuation state =
+    let open Locations in
+    let left_loc = Precise_locs.imprecise_location left_value.lloc in
+    let direct_left_zone = Locations.(enumerate_valid_bits Write left_loc) in
+    let state = kill Hcexprs.Modified direct_left_zone state in
+    let right_expr = Cil.constFold true right_expr in
+    try
+      let indirect_left_zone =
+        Value_util.indirect_zone_of_lval (find_loc valuation) left_value.lval
+      and right_zone =
+        Value_util.zone_of_expr (find_loc valuation) right_expr
+      in
+      (* After an assignment lv = e, the equality [lv == eq] holds iff the value
+         of [e] and the location of [lv] are not modified by the assignment,
+         i.e. iff the dependencies of [e] and of the lhost and offset of [lv]
+         do not intersect the assigned location.
+         Moreover, the domain do not store the equality when the abstract
+         location of [lv] and the abstract value of [e] are singleton, as in
+         this case, the main cvalue domain is able to infer the equality. *)
+      if (Zone.intersects direct_left_zone right_zone) ||
+         (Zone.intersects direct_left_zone indirect_left_zone) ||
+         (is_singleton (Eval.value_assigned value) &&
+          Locations.cardinal_zero_or_one left_loc)
+      then `Value state
+      else `Value (assign_eq left_value.lval right_expr value valuation state)
+    with Top_location -> `Value state
+
+  (* Add the equalities between the formals of a function and the actuals
+     at the call. *)
+  let assign_formals valuation call state =
+    let assign_formal state arg =
+      if is_singleton (Eval.value_assigned arg.avalue) then
+        state
       else
-        let lvalues = Hcexprs.syntactic_lvalues expr in
-        term, lvalues, add_deps valuation lvalues deps
+        try
+          let left_value = Var arg.formal, NoOffset in
+          assign_eq left_value arg.concrete arg.avalue valuation state
+        with Top_location -> state
+    in
+    List.fold_left assign_formal state call.arguments
 
-    let indeterminate_copy = function
-      | Assign _ -> false
-      | Copy (_loc, value) -> not value.initialized || value.escaping
-
-    (* Auxiliary function for [assign]. The equality is inferred, unless:
-       - some of the expressions involved are volatile
-       - the value has an aggregate type (as the current Eva values have no
-         meaning for such type, the equality would be useless or misleading).
-       - it is an assignment by copy, and the copied value is possibly
-         unitialized or escaping. In this case, when using the equality later,
-         the reevaluation of [right_expr] would reduce it incorrectly, by
-         removing indeterminate flags without emitting alarms. *)
-    let assign_eq left_lval right_expr value valuation state =
-      if Eval_typ.lval_contains_volatile left_lval ||
-         Eval_typ.expr_contains_volatile right_expr ||
-         not (Cil.isArithmeticOrPointerType (Cil.typeOfLval left_lval)) ||
-         indeterminate_copy value
-      then state
-      else
-        let (equalities, deps, modified_zone: t) = state in
-        let lterm = HCE.of_lval left_lval in
-        let lterm_lvals = Hcexprs.empty_lvalues in
-        let deps = add_one_dep valuation lterm deps in
-        let rterm, rterm_lvals, deps = register right_expr valuation deps in
-        let equalities =
-          Equality.Set.unite
-            (lterm, lterm_lvals) (rterm, rterm_lvals) equalities
-        in
-        (equalities, deps, modified_zone: t)
-
-    let assign _stmt left_value right_expr value valuation state =
-      let open Locations in
-      let left_loc = Precise_locs.imprecise_location left_value.lloc in
-      let direct_left_zone = Locations.(enumerate_valid_bits Write left_loc) in
-      let state = kill Hcexprs.Modified direct_left_zone state in
-      let right_expr = Cil.constFold true right_expr in
-      try
-        let indirect_left_zone =
-          Value_util.indirect_zone_of_lval (find_loc valuation) left_value.lval
-        and right_zone =
-          Value_util.zone_of_expr (find_loc valuation) right_expr
-        in
-        (* After an assignment lv = e, the equality [lv == eq] holds iff the value
-           of [e] and the location of [lv] are not modified by the assignment,
-           i.e. iff the dependencies of [e] and of the lhost and offset of [lv]
-           do not intersect the assigned location.
-           Moreover, the domain do not store the equality when the abstract
-           location of [lv] and the abstract value of [e] are singleton, as in
-           this case, the main cvalue domain is able to infer the equality. *)
-        if (Zone.intersects direct_left_zone right_zone) ||
-           (Zone.intersects direct_left_zone indirect_left_zone) ||
-           (is_singleton (Eval.value_assigned value) &&
-            Locations.cardinal_zero_or_one left_loc)
+  (* The domain infers equalities [e1 = e2] stemming from assignments,
+     meaning that e1 and e2 have not only the same value, but also the same
+     object representation — their values can thus be safely narrowed,
+     which is used by the domain to regain precision when possible.
+     The domain can also infer equalities from conditions, but C values
+     with different object representations may be equal, invalidating this
+     reasoning. This is the case for equalities between 0. and -0., and
+     between non-comparable pointers, so we need to skip such equalities. *)
+  let assume _stmt expr positive valuation (eqs, deps, modified_zone as state) =
+    match positive, expr.enode with
+    | true,  BinOp (Eq, e1, e2, _)
+    | false, BinOp (Ne, e1, e2, _) ->
+      begin
+        if not (is_safe_equality valuation e1 e2)
         then `Value state
-        else `Value (assign_eq left_value.lval right_expr value valuation state)
-      with Top_location -> `Value state
-
-    (* Add the equalities between the formals of a function and the actuals
-       at the call. *)
-    let assign_formals valuation call state =
-      let assign_formal state arg =
-        if is_singleton (Eval.value_assigned arg.avalue) then
-          state
         else
-          try
-            let left_value = Var arg.formal, NoOffset in
-            assign_eq left_value arg.concrete arg.avalue valuation state
-          with Top_location -> state
-      in
-      List.fold_left assign_formal state call.arguments
-
-    (* The domain infers equalities [e1 = e2] stemming from assignments,
-       meaning that e1 and e2 have not only the same value, but also the same
-       object representation — their values can thus be safely narrowed,
-       which is used by the domain to regain precision when possible.
-       The domain can also infer equalities from conditions, but C values
-       with different object representations may be equal, invalidating this
-       reasoning. This is the case for equalities between 0. and -0., and
-       between non-comparable pointers, so we need to skip such equalities. *)
-    let assume _stmt expr positive valuation (eqs, deps, modified_zone as state) =
-      match positive, expr.enode with
-      | true,  BinOp (Eq, e1, e2, _)
-      | false, BinOp (Ne, e1, e2, _) ->
-        begin
-          if not (is_safe_equality valuation e1 e2)
+          let e1 = Cil.constFold true e1
+          and e2 = Cil.constFold true e2 in
+          if Eval_typ.expr_contains_volatile e1
+          || Eval_typ.expr_contains_volatile e2
+          || not (Cil.isArithmeticOrPointerType (Cil.typeOf e1))
+          || (expr_is_cardinal_zero_or_one_loc valuation e1 &&
+              expr_cardinal_zero_or_one valuation e2)
+          || (expr_is_cardinal_zero_or_one_loc valuation e2 &&
+              expr_cardinal_zero_or_one valuation e1)
           then `Value state
           else
-            let e1 = Cil.constFold true e1
-            and e2 = Cil.constFold true e2 in
-            if Eval_typ.expr_contains_volatile e1
-            || Eval_typ.expr_contains_volatile e2
-            || not (Cil.isArithmeticOrPointerType (Cil.typeOf e1))
-            || (expr_is_cardinal_zero_or_one_loc valuation e1 &&
-                expr_cardinal_zero_or_one valuation e2)
-            || (expr_is_cardinal_zero_or_one_loc valuation e2 &&
-                expr_cardinal_zero_or_one valuation e1)
-            then `Value state
-            else
-              try
-                let a1, a1_lvals, deps = register e1 valuation deps in
-                let a2, a2_lvals, deps = register e2 valuation deps in
-                let eqs = Equality.Set.unite (a1, a1_lvals) (a2, a2_lvals) eqs in
-                `Value (eqs, deps, modified_zone)
-              with Top_location -> `Value state
-        end
-      | _ -> `Value state
+            try
+              let a1, a1_lvals, deps = register e1 valuation deps in
+              let a2, a2_lvals, deps = register e2 valuation deps in
+              let eqs = Equality.Set.unite (a1, a1_lvals) (a2, a2_lvals) eqs in
+              `Value (eqs, deps, modified_zone)
+            with Top_location -> `Value state
+      end
+    | _ -> `Value state
 
-    let start_call _stmt call valuation state =
-      let state =
-        match call_init_state call.kf with
-        | ISCaller  -> assign_formals valuation call state
-        | ISFormals -> assign_formals valuation call empty
-        | ISEmpty   -> empty
-      in
-      `Value state
+  let start_call _stmt call valuation state =
+    let state =
+      match call_init_state call.kf with
+      | ISCaller  -> assign_formals valuation call state
+      | ISFormals -> assign_formals valuation call empty
+      | ISEmpty   -> empty
+    in
+    `Value state
 
-    let finalize_call _stmt call ~pre ~post =
-      if call_init_state call.kf = ISCaller then
-        `Value post (* [pre] was the state inferred in the caller, and it
-                       has been updated during the analysis of [kf] into
-                       [post]. Send all the equalities back to the caller. *)
-      else
-        (* [pre] contains the equalities from the caller, but [post] was
-           computed starting from an essentially empty state. We must
-           restore the equalities of [pre]. *)
-        let (_, _, modif) = post in
-        (* Invalidate the equalities that are no longer true. *)
-        let pre' = kill Hcexprs.Modified modif pre in
-        (* then merge the two sets of equalities *)
-        `Value (concat pre' post)
+  let finalize_call _stmt call ~pre ~post =
+    if call_init_state call.kf = ISCaller then
+      `Value post (* [pre] was the state inferred in the caller, and it
+                     has been updated during the analysis of [kf] into
+                     [post]. Send all the equalities back to the caller. *)
+    else
+      (* [pre] contains the equalities from the caller, but [post] was
+         computed starting from an essentially empty state. We must
+         restore the equalities of [pre]. *)
+      let (_, _, modif) = post in
+      (* Invalidate the equalities that are no longer true. *)
+      let pre' = kill Hcexprs.Modified modif pre in
+      (* then merge the two sets of equalities *)
+      `Value (concat pre' post)
 
-    let show_expr _valuation (equalities, _, _) fmt expr =
-      let atom = Hcexprs.HCE.of_exp expr in
-      match Equality.Set.find_option atom equalities with
-      | Some equality -> Equality.Equality.pretty fmt equality
-      | None -> ()
-  end
+  let show_expr _valuation (equalities, _, _) fmt expr =
+    let atom = Hcexprs.HCE.of_exp expr in
+    match Equality.Set.find_option atom equalities with
+    | Some equality -> Equality.Equality.pretty fmt equality
+    | None -> ()
 
   let logic_assign _assigns location ~pre:_ state =
     let loc = Precise_locs.imprecise_location location in
