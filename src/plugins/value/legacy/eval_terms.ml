@@ -301,7 +301,7 @@ let bind_logic_vars env lvs =
     let bind_logic_var ival =
       state, LogicVarEnv.add lv (Cvalue.V.inject_ival ival) logic_vars
     in
-    match lv.lv_type with
+    match Logic_utils.unroll_type lv.lv_type with
     | Linteger -> bind_logic_var Ival.top
     | Lreal -> bind_logic_var Ival.top_float
     | _ ->
@@ -319,7 +319,7 @@ let bind_logic_vars env lvs =
 
 let unbind_logic_vars env lvs =
   let unbind_one (state, logic_vars) lv =
-    match lv.lv_type with
+    match Logic_utils.unroll_type lv.lv_type with
     | Linteger | Lreal -> state, LogicVarEnv.remove lv logic_vars
     | _ ->
       let b, _ = c_logic_var lv in
