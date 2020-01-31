@@ -296,6 +296,12 @@ let c_logic_var lvi =
     (Base.of_c_logic_var lvi), ty
   | _ -> unsupported_lvar lvi
 
+let top_float =
+  let neg_infinity = Fval.F.of_float neg_infinity
+  and pos_infinity = Fval.F.of_float infinity in
+  let fval = Fval.inject ~nan:false Fval.Real neg_infinity pos_infinity in
+  Ival.inject_float fval
+
 let bind_logic_vars env lvs =
   let bind_one (state, logic_vars) lv =
     let bind_logic_var ival =
@@ -303,7 +309,7 @@ let bind_logic_vars env lvs =
     in
     match Logic_utils.unroll_type lv.lv_type with
     | Linteger -> bind_logic_var Ival.top
-    | Lreal -> bind_logic_var Ival.top_float
+    | Lreal -> bind_logic_var top_float
     | _ ->
       try
         let b, cty = c_logic_var lv in
