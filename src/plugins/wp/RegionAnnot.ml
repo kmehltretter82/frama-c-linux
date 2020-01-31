@@ -482,7 +482,7 @@ let specified =
 
 let register () =
   if Wp.Region.get () || Wp.Region_annot.get () ||
-    List.exists specified (Wp.Model.get ())
+     List.exists specified (Wp.Model.get ())
   then
     Acsl_extension.register_behavior
       "region" typecheck ~printer:pp_extension false

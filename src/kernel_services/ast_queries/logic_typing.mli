@@ -401,7 +401,7 @@ val set_deprecated_extension_handler:
            (typing_context -> location -> Logic_ptree.lexpr list ->
             acsl_extension_kind) ->
            unit) ->
-           unit
+  unit
 
 (*
 Local Variables:

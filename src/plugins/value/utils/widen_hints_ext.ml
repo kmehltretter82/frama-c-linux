@@ -153,7 +153,7 @@ let printer _pp fmt ext =
     | Some (hint_lval, hint_terms) ->
       Format.fprintf fmt "%a%a, %a"
         (Pretty_utils.pp_list ~sep:" " ~suf:":" Format.pp_print_string)
-         hint_lval.names pp_hvars hint_lval.vars
+        hint_lval.names pp_hvars hint_lval.vars
         (Pretty_utils.pp_list ~sep:", " Printer.pp_term) hint_terms
     | None ->
       Format.fprintf fmt "<invalid widen_hints>"
