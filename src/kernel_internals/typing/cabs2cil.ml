@@ -2772,16 +2772,13 @@ let rec have_compatible_qualifiers_deep ?(context=Identical) t1 t2 =
   | _, _ -> included_qualifiers ~context (Cil.typeAttrs t1) (Cil.typeAttrs t2)
 
 let compatibleTypes ?context t1 t2 =
-  try
-    let r = combineTypes CombineOther t1 t2 in
-    (* C99, 6.7.3 §9: "... to be compatible, both shall have the identically
-       qualified version of a compatible type;" *)
-    if not (have_compatible_qualifiers_deep ?context t1 t2) then
-      raise (Cannot_combine "different qualifiers");
-    (* Note: different non-qualifier attributes will be silently dropped. *)
-    r
-  with Cannot_combine _ as e ->
-    raise e
+  let r = combineTypes CombineOther t1 t2 in
+  (* C99, 6.7.3 §9: "... to be compatible, both shall have the identically
+     qualified version of a compatible type;" *)
+  if not (have_compatible_qualifiers_deep ?context t1 t2) then
+    raise (Cannot_combine "different qualifiers");
+  (* Note: different non-qualifier attributes will be silently dropped. *)
+  r
 
 let areCompatibleTypes ?context t1 t2 =
   try
