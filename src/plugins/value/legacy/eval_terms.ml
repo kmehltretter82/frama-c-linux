@@ -472,20 +472,21 @@ let is_noop_cast ~src_typ ~dst_typ =
   | Some (TSPtr _), Some (TSPtr _) -> true
   | _ -> false
 
-let econstant typ cvalue =
+(* Injects [cvalue] as an eval_result of type [typ] with no dependencies. *)
+let inject_no_deps typ cvalue =
   { etype = typ;
     eunder = under_from_over cvalue;
     eover = cvalue;
     ldeps = empty_logic_deps }
 
-(* Note: non-constant integers can happen e.g. for sizeof of structures of an unknown size. *)
-let einteger = econstant Cil.intType
+(* Integer result with no memory dependencies: constants, sizeof & alignof,
+   and values of logic variables.*)
+let einteger = inject_no_deps Cil.intType
 
 (* Note: some reals cannot be exactly represented as floats; in which
    case we do not know their under-approximation. *)
-let efloating_point etype fval = econstant etype (Cvalue.V.inject_float fval)
-let ereal = efloating_point Cil.doubleType
-let efloat = efloating_point Cil.floatType
+let ereal fval = inject_no_deps Cil.doubleType (Cvalue.V.inject_float fval)
+let efloat fval = inject_no_deps Cil.floatType (Cvalue.V.inject_float fval)
 
 let is_true = function
   | `True | `TrueReduced _ -> true
@@ -798,7 +799,7 @@ let rec eval_term ~alarm_mode env t =
     let cvalue = LogicVarEnv.find logic_var env.logic_vars in
     if logic_var.lv_type = Linteger
     then einteger cvalue
-    else econstant Cil.doubleType cvalue
+    else inject_no_deps Cil.doubleType cvalue
 
   | TLval tlval ->
     let lval = eval_tlval ~alarm_mode env tlval in
