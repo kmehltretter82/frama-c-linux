@@ -151,25 +151,7 @@ module type S_Basic_Compare =
 
 module type S =
   sig
-    include S_Basic_Compare
-
-    val min_elt: t -> elt
-    (** Return the smallest element of the given set
-       (with respect to the [Ord.compare] ordering), or raise
-       [Not_found] if the set is empty. *)
-
-    val max_elt: t -> elt
-    (** Same as {min_elt}, but returns the largest element of the
-       given set. *)
-
-    val split: elt -> t -> t * bool * t
-    (** [split x s] returns a triple [(l, present, r)], where
-          [l] is the set of elements of [s] that are
-          strictly less than [x];
-          [r] is the set of elements of [s] that are
-          strictly greater than [x];
-          [present] is [false] if [s] contains no element equal to [x],
-          or [true] if [s] contains an element equal to [x]. *)
+    include Set.S
 
     (* Frama-C- additions *)
 
