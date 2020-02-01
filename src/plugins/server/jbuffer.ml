@@ -23,22 +23,22 @@
 type json = Yojson.Basic.t
 
 type buffer = {
-  text : FCBuffer.t ;
+  text : Buffer.t ;
   mutable rjson : json list ; (* Current op-codes in reverse order *)
   mutable stack : ( string * json list ) list ;
   mutable fmt : Format.formatter ;
 }
 
 let append buffer s k n =
-  FCBuffer.add_substring buffer.text s k n
+  Buffer.add_substring buffer.text s k n
 
 let flush buffer () =
   let t = buffer.text in
-  let n = FCBuffer.length t in
+  let n = Buffer.length t in
   if n > 0 then
-    let js = `String (FCBuffer.contents t) in
+    let js = `String (Buffer.contents t) in
     buffer.rjson <- js :: buffer.rjson ;
-    FCBuffer.clear t
+    Buffer.clear t
 
 let push_tag buffer stag =
   let tag = Transitioning.Format.string_of_stag stag in
@@ -66,7 +66,7 @@ let mark_close_tag buffer tg = pop_tag buffer tg ; ""
 let create ?indent ?margin () =
   let buffer = {
     fmt = Format.err_formatter ;
-    text = FCBuffer.create 80 ; rjson = [] ; stack = []
+    text = Buffer.create 80 ; rjson = [] ; stack = []
   } in
   let fmt = Format.make_formatter (append buffer) (flush buffer) in
   buffer.fmt <- fmt ;

@@ -111,7 +111,7 @@ let tgr_buffer = 3145728 (* elasticity (internal overhead) *)
 
 type buffer = {
   mutable formatter : Format.formatter ; (* formatter on self (recursive) *)
-  mutable content : FCBuffer.t ;
+  mutable content : Buffer.t ;
   mutable revtags : tag list ; (* in reverse order *)
   mutable stack : (int * tag list) list ; (* opened tag positions *)
 }
@@ -122,52 +122,53 @@ let is_blank = function
 
 let trim_begin buffer =
   let rec lookup_fwd text k n =
-    if k < n && is_blank (FCBuffer.nth text k) then
+    if k < n && is_blank (Buffer.nth text k) then
       lookup_fwd text (succ k) n else k
-  in lookup_fwd buffer.content 0 (FCBuffer.length buffer.content)
+  in lookup_fwd buffer.content 0 (Buffer.length buffer.content)
 
 let trim_end buffer =
   let rec lookup_bwd text k =
-    if k >= 0 && is_blank (FCBuffer.nth text k) then
+    if k >= 0 && is_blank (Buffer.nth text k) then
       lookup_bwd text (pred k) else k
-  in lookup_bwd buffer.content (pred (FCBuffer.length buffer.content))
+  in lookup_bwd buffer.content (pred (Buffer.length buffer.content))
 
 let shrink buffer =
-  if FCBuffer.length buffer.content > min_buffer then
-    FCBuffer.reset buffer.content
+  if Buffer.length buffer.content > min_buffer then
+    Buffer.reset buffer.content
 
 let truncate_text buffer size =
-  if FCBuffer.length buffer.content > size then
+  if Buffer.length buffer.content > size then
     begin
       let p = trim_begin buffer in
       let q = trim_end buffer in
       let n = q+1-p in
-      if n <= 0 then shrink buffer else
-      if n <= size then
-        FCBuffer.blit_buffer buffer.content p buffer.content 0 n
+      if n <= 0 then
+        shrink buffer
+      else if n <= size then
+        Buffer.blit buffer.content p (Buffer.to_bytes buffer.content) 0 n
       else
         begin
           let n_left = size / 2 - 3 in
           let n_right = size - n_left - 5 in
           if p > 0 then
-            FCBuffer.blit_buffer buffer.content p buffer.content 0 n_left ;
-          FCBuffer.blit_substring "[...]" 0 buffer.content n_left 5 ;
-          FCBuffer.blit_buffer
+            Buffer.blit buffer.content p (Buffer.to_bytes buffer.content) 0 n_left;
+          Buffer.add_substring buffer.content "[...]" n_left 5 ;
+          Buffer.blit
             buffer.content (q-n_right+1)
-            buffer.content (n_left + 5)
+            (Buffer.to_bytes buffer.content) (n_left + 5)
             n_right ;
-          FCBuffer.truncate buffer.content size ;
+          Buffer.truncate buffer.content size ;
         end
     end
 
 (* All text added shall go through this function *)
 let append buffer s k n =
-  FCBuffer.add_substring buffer.content s k n ;
-  if FCBuffer.length buffer.content > tgr_buffer then
+  Buffer.add_substring buffer.content s k n ;
+  if Buffer.length buffer.content > tgr_buffer then
     truncate_text buffer max_buffer
 
 let push_tag buffer _tag =
-  let p = FCBuffer.length buffer.content in
+  let p = Buffer.length buffer.content in
   buffer.stack <- ( p , buffer.revtags ) :: buffer.stack ;
   buffer.revtags <- []
 
@@ -175,7 +176,7 @@ let pop_tag buffer tag =
   match buffer.stack with
   | [] -> ()
   | (p,tags)::stack ->
-    let q = FCBuffer.length buffer.content in
+    let q = Buffer.length buffer.content in
     buffer.stack <- stack ;
     let children = List.rev buffer.revtags in
     buffer.revtags <- { p ; q ; tag ; children } :: tags
@@ -189,7 +190,7 @@ let no_mark _tag = ""
 let create ?indent ?margin () =
   let buffer = {
     formatter = Format.err_formatter ;
-    content = FCBuffer.create min_buffer ;
+    content = Buffer.create min_buffer ;
     revtags = [] ;
     stack = [] ;
   } in
@@ -226,13 +227,13 @@ let trim buffer =
   p , q
 
 let contents buffer =
-  truncate_text buffer max_buffer ; FCBuffer.contents buffer.content
+  truncate_text buffer max_buffer ; Buffer.contents buffer.content
 
 let message buffer =
-  ( FCBuffer.contents buffer.content , List.rev buffer.revtags )
+  ( Buffer.contents buffer.content , List.rev buffer.revtags )
 
-let sub buffer p n = FCBuffer.sub buffer.content p n
-let range buffer p q = FCBuffer.sub buffer.content p (q+1-p)
+let sub buffer p n = Buffer.sub buffer.content p n
+let range buffer p q = Buffer.sub buffer.content p (q+1-p)
 
 let add_char buffer c = Format.pp_print_char buffer.formatter c
 let add_string buffer s = Format.pp_print_string buffer.formatter s
