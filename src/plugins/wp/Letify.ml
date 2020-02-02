@@ -540,7 +540,7 @@ end
 (* --- Substitution Extraction                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
-module XS = FCSet.Make(Var)
+module XS = Set.Make(Var)
 
 let elements xs = Vars.fold XS.add xs XS.empty
 let iter f xs = XS.iter f (elements xs)

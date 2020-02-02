@@ -54,7 +54,7 @@ end
 
 include SELF
 module Map = Map.Make(SELF)
-module Set = FCSet.Make(SELF)
+module Set = Set.Make(SELF)
 
 let severe s = Set.exists (fun w -> w.severe) s
 

@@ -204,7 +204,7 @@ struct
 
   module KEY = struct type t = E.key let compare = E.compare end
   module MAP = Map.Make(KEY)
-  module SET = FCSet.Make(KEY)
+  module SET = Set.Make(KEY)
 
   let demon = ref []
 
@@ -339,7 +339,7 @@ struct
 
   module KEY = struct type t = E.key let compare = E.compare end
   module MAP = Map.Make(KEY)
-  module SET = FCSet.Make(KEY)
+  module SET = Set.Make(KEY)
 
   let demon = ref []
 

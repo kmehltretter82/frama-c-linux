@@ -45,7 +45,7 @@ val same_edge : edge -> edge -> bool
 val start_edge : t -> edge
 
 (** set of edges *)
-module Eset : FCSet.S with type elt = edge
+module Eset : Set.S with type elt = edge
 
 (** node and edges relations *)
 val edge_src : edge -> node

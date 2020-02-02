@@ -71,7 +71,7 @@ end
 
 module Make_Generic_Lattice_Set
     (V: Datatype.S)
-    (Set: Lattice_type.Set with type elt = V.t)
+    (Set: Lattice_type.Hptset with type elt = V.t)
 = struct
 
   type t = Set of Set.t | Top
@@ -232,7 +232,7 @@ end
 
 module Make_Lattice_Set
     (V: Datatype.S)
-    (Set: Lattice_type.Set with type elt = V.t)
+    (Set: Lattice_type.Hptset with type elt = V.t)
   : Lattice_type.Lattice_Set with module O = Set
 = struct
   module O = Set

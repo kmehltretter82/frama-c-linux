@@ -70,7 +70,7 @@ module Make(H: Hashtbl.HashedType) : S with type key = H.t  = struct
 
   let fold_sorted_by_entry (type value) ~cmp f h acc =
     let module Aux = struct type t = (key*value) let compare = cmp end in
-    let module S = FCSet.Make(Aux) in
+    let module S = Set.Make(Aux) in
     let add k v s = S.add (k,v) s in
     let set = fold add h S.empty in
     S.fold (fun (k,v) -> f k v) set acc

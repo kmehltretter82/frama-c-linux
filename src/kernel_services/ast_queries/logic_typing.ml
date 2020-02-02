@@ -3604,7 +3604,7 @@ struct
   (* This module is used to sort the list of behaviors in [complete] and
      [disjoint] clauses, in order to remove duplicate clauses. *)
   module StringListSet =
-    FCSet.Make(
+    Set.Make(
     struct
       type t = string list
       let compare s1 s2 =

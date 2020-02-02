@@ -104,7 +104,7 @@ struct
   module W = Warning.Set
   module D = Property.Set
   module S = Stmt.Set
-  module Eset = FCSet.Make(EFFECT)
+  module Eset = Set.Make(EFFECT)
   module Gset = G.Set
   module Gmap = G.Map
 

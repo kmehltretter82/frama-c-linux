@@ -440,7 +440,6 @@ CMO	+= $(VERY_FIRST_CMO)
 
 LIB_CMO =\
         src/libraries/stdlib/transitioning \
-	src/libraries/stdlib/FCSet \
 	src/libraries/stdlib/FCHashtbl \
 	src/libraries/stdlib/extlib \
 	src/libraries/datatype/unmarshal \
