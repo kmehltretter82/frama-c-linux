@@ -43,6 +43,7 @@ module Stdlib: sig
   val min_int: int
   val max_int: int
   val flush: out_channel -> unit
+  module Set: module type of Set
   module Map: module type of Map
 end
 

@@ -1676,7 +1676,7 @@ module With_collections(X: S)(Info: Functor_info) = struct
 
   module Set =
     Set
-      (Stdlib.Set.Make(D))
+      (Transitioning.Stdlib.Set.Make(D))
       (D)
       (struct let module_name = Info.module_name ^ ".Set" end)
 
