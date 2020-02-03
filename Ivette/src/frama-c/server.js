@@ -78,537 +78,515 @@ export const RESTART = 'RESTART' ; // Restart when halt
 export const FAILED  = 'FAILED'  ; // Error issued
 
 // --------------------------------------------------------------------------
-// --- Server Class
+// --- Server Global State
+// --------------------------------------------------------------------------
+
+var status = IDLE;
+var error;     // process error
+var rqid;      // Request ID
+var pending;   // Pending promise callbacks
+var queue_cmd; // Queue of server commands to be sent
+var queue_ids; // Waiting request ids to be sent
+var polling;   // Timeout Polling timer
+var flushed;   // Immediate Flushed timer
+var config;    // Server process config
+var sent;      // Characters sent
+var recv;      // Characters received
+var started;   // Date of Server activity start
+var process;   // Cumulated Server processing time
+var socket;    // ZMQ (REQ) socket
+var busy;      // ZMQ socket is busy
+var killer;    // killer timeout
+
+// --------------------------------------------------------------------------
+// --- Server Console
+// --------------------------------------------------------------------------
+
+export const console = new Buffer({ maxlines: 200 });
+
+// --------------------------------------------------------------------------
+// --- Server Status
 // --------------------------------------------------------------------------
 
 /**
-   @summary Frama-C Server Interface.
+   @summary Current Server `STATUS`.
+   @return {STATUS} the current server status
    @description
-   This class is responsible for running a Frama-C server
-   and communicate with it.
-   The server automatically locks the module when running
-   and listen to module KILL events.
+   See [STATUS](module-frama-c_server.html#~STATUS) code definitions.
+*/
+export function getStatus() { return status; }
 
-   The server shall be property configured before being started.
-   It does _not_ use configuration from `module.config` on its own ;
-   you shall configure it by using `server.configure()`.
- */
-export class Server {
+/** Return `FAILED` status message. */
+export function getError() { return error; }
 
-  constructor() {
-    this.status = IDLE ;
-    this.console = new Buffer({ maxlines: 200 });
-    this._reset();
-    this.stop = this.stop.bind(this);
-    this.kill = this.kill.bind(this);
-    this.start = this.start.bind(this);
-    this.restart = this.restart.bind(this);
-    this.clearFailed = this.clearFailed.bind(this);
+/**
+   @summary Frama-C Server is running and ready to handle requests.
+   @return {boolean} status is `RUNNING`.
+*/
+export function isRunning() { return status === RUNNING; }
+
+/**
+   @summary Server Statistics.
+   @return {object} stats (see above)
+   @description
+   The returned object has the following properties:
+   - `pending` : number of pending requests;
+   - `requests` : number of issued requests;
+   - `time` : ellapsed time of server activity, in milliseconds.
+   - `sent` : number of UTF-8 chars sent to server;
+   - `recv` : number of UTF-8 chars received from server;
+   - `rate` : number of requests per milliseconds.
+*/
+export function getStats() {
+  const pending = _.reduce( pending , (n,_) => n+1, 0 );
+  const requests = rqid - pending ;
+  const time = process + (started ? Date.now() - started : 0 );
+  const rate = process ? requests / process : 0 ;
+  return {
+    pending, requests, sent, recv, rate, time
+  };
+}
+
+// --------------------------------------------------------------------------
+// --- Status Update
+// --------------------------------------------------------------------------
+
+function _status(s,err) {
+  if (s !== status || err) {
+    status = s;
+    error = err;
+    Dome.emit(SERVER);
   }
+}
 
-  // --------------------------------------------------------------------------
+// --------------------------------------------------------------------------
+// --- Server Control (Start)
+// --------------------------------------------------------------------------
 
-  // CLIENT STATE:
-  // this.rqid      // Request ID
-  // this.sent      // Characters sent
-  // this.recv      // Characters received
-  // this.started   // Date of Server activity start
-  // this.process   // Cumulated Server processing time
-  // this.pending   // Pending promise callbacks
-  // this.queue_cmd // Queue of server commands to be sent
-  // this.queue_ids // Waiting request ids to be sent
-  // this.polling   // Polling scheduled
+/**
+   @summary Start the Server.
+   @description
+   If the server is started or running, this is a no-op.
+   If the server is being shutdown, it will reboot.
+   Otherwise, the Frama-C Server is spawned.
 
-  // SERVER STATE:
-  // this.config: server process config
-  // this.process: dome child process
-  // this.socket: ZMQ (REQ) socket
-  // this.busy: ZMQ socket is busy
-  // this.error: process error
-  // this.killer: killer timeout
-
-  // SERVER CONFIG:
-  // See this.configure()
-
-  // --------------------------------------------------------------------------
-  // --- Server Status
-  // --------------------------------------------------------------------------
-
-  /** Return `FAILED` status message. */
-  getError() { return this.error; }
-
-  /**
-     @summary Current Server `STATUS`.
-     @return {STATUS} the current server status
-     @description
-     See [STATUS](module-frama-c_server.html#~STATUS) code definitions.
-  */
-  getStatus() { return this.status; }
-  _status(s,err) {
-    if (s !== this.status || err) {
-      this.status = s;
-      this.error = err;
-      this.module.emit(SERVER);
-    }
+   You can use `server.start` instead of `() => server.start()`.
+*/
+export function start() {
+  switch(status) {
+  case IDLE:
+  case FAILED:
+    _status(STARTED);
+    _launch()
+      .then(() => _status(RUNNING))
+      .catch((err) => _status(FAILED,err));
+    return;
+  case KILLING:
+    _status(RESTART);
+    return;
+  case STARTED:
+  case RUNNING:
+  case RESTART:
+  default:
+    return;
   }
+}
 
-  /**
-     @summary Frama-C Server is running and ready to handle requests.
-     @return {boolean} status is `RUNNING`.
-   */
-  isRunning() { return this.status === RUNNING; }
+// --------------------------------------------------------------------------
+// --- Server Control (Stop)
+// --------------------------------------------------------------------------
 
-  /**
-     @summary Server Statistics.
-     @return {object} stats (see above)
-     @description
-The returned object has the following properties:
-- `pending` : number of pending requests;
-- `requests` : number of issued requests;
-- `time` : ellapsed time of server activity, in milliseconds.
-- `sent` : number of UTF-8 chars sent to server;
-- `recv` : number of UTF-8 chars received from server;
-- `rate` : number of requests per milliseconds.
-  */
-  getStats() {
-    const pending = _.reduce( this.pending , (n,_) => n+1, 0 );
-    const requests = this.rqid - pending ;
-    const process = this.process ;
-    const started = this.started ;
-    const sent = this.sent ;
-    const recv = this.recv ;
-    const time = process + (started ? Date.now() - started : 0 );
-    const rate = process ? requests / process : 0 ;
-    return {
-      pending, requests, sent, recv, rate, time
+/**
+   @summary Stop the Server.
+   @description
+   If the server is starting, it is hard killed.
+   If the server is running, it is shutdown gracefully.
+   When the server is shutting down, restart is canceled.
+   Otherwise, this is a no-op.
+
+   You can use `server.stop` instead of `() => server.stop()`.
+*/
+export function stop() {
+  switch(status) {
+  case STARTED:
+    _kill();
+    _status(KILLING);
+    return;
+  case RUNNING:
+    _shutdown();
+    _status(KILLING);
+    return;
+  case RESTART:
+    _status(KILLING);
+    return;
+  case IDLE:
+  case FAILED:
+  case KILLING:
+  default:
+    return;
+  }
+}
+
+// --------------------------------------------------------------------------
+// --- Server Control (Kill)
+// --------------------------------------------------------------------------
+
+/**
+   @summary Terminate the Server.
+   @description
+   If the server is starting or running or shutting down,
+   it is hard killed and restart is canceled.
+   Otherwize, this is no-op.
+
+   You can use `server.kill` instead of `() => server.kill()`.
+   This function is automatically called when the `module` emits the `KILL` signal.
+*/
+export function kill() {
+  switch(status) {
+  case STARTED:
+  case RUNNING:
+  case KILLING:
+  case RESTART:
+    _kill();
+    _status(KILLING);
+    return;
+  case IDLE:
+  case FAILED:
+  default:
+    return;
+  }
+}
+
+// --------------------------------------------------------------------------
+// --- Server Control (Restart)
+// --------------------------------------------------------------------------
+
+/**
+   @summary Re-start the Server.
+   @description
+   If paused, simply start the Server.
+   When running, try to gracefully shutdown the Server,
+   and finally schedule a reboot on exit.
+*/
+export function restart() {
+  switch(status) {
+  case IDLE:
+  case FAILED:
+    start();
+    return;
+  case RUNNING:
+    _shutdown();
+    // Fall Through
+  case KILLING:
+    _status(RESTART);
+    return;
+  case STARTED:
+  case RESTART:
+  default:
+    return;
+  }
+}
+
+// --------------------------------------------------------------------------
+// --- Server Control (Reset)
+// --------------------------------------------------------------------------
+
+/**
+   @summary Acknowledge `FAILED` status.
+   @description
+   When not running, clear the console and reset any error flag.
+   Otherwised, do nothing.
+*/
+export function clear() {
+  switch(status) {
+  case FAILED:
+    _status(IDLE);
+    // Fall Through
+  case IDLE:
+    console.clear();
+    return;
+  default:
+    return;
+  }
+}
+
+// --------------------------------------------------------------------------
+// --- Server Configure
+// --------------------------------------------------------------------------
+
+/**
+   @summary Configure the Server.
+   @param {object} config - Server Configuration
+   @param {string} [config.cwd] - Working directory (default: current)
+   @param {string} [config.command] - Server command (default: `frama-c`)
+   @param {Array.<string>} [config.params] - Server arguments (default: `-server-zmq .frama-c.socket.io`)
+   @param {string} [config.sockaddr] - Server socket name (default: `.frama-c.socket.io`)
+   @param {string} [config.logout] - Process stdout log file (default: `undefined`)
+   @param {string} [config.logerr] - Process stderr log file (default: `undefined`)
+   @param {Object} [config.env] - Process environment variables (default: `undefined`)
+*/
+export function configure( cfg )
+{
+  if (!cfg)
+    config =
+    {
+      command: 'frama-c',
+      params: ['-server-zmq', '.frama-c.socket.io'],
+      sockaddr: '.frama-c.socket.io'
     };
-  }
+  else
+    config = cfg;
+}
 
-  // --------------------------------------------------------------------------
-  // --- Server Control (Start)
-  // --------------------------------------------------------------------------
+// --------------------------------------------------------------------------
+// --- Low-level Launching
+// --------------------------------------------------------------------------
 
-  /**
-      @summary Start the Server.
-      @description
-      If the server is started or running, this is a no-op.
-      If the server is being shutdown, it will reboot.
-      Otherwise, the Frama-C Server is spawned.
+async function _launch() {
+  _reset();
+  if (!config) throw('Frama-C Server not configured');
+  let { env, cwd, command, params, sockaddr, logout, logerr } = config;
+  if (!cwd) cwd = System.getWorkingDir();
+  sockaddr = System.join( cwd, sockaddr );
+  logout = logout && System.join( cwd, logout );
+  logerr = logerr && System.join( cwd, logerr );
+  let options = {
+    cwd,
+    stdout: { path: logout, pipe: true },
+    stderr: { path: logerr, pipe: true },
+    env
+  };
+  // Launch Process
+  const process = await System.spawn( command, params, options );
+  const logging = console.append ;
+  const kill = kill ;
+  console.clear();
+  process = process ;
+  process.stdout.on('data', logging );
+  process.stderr.on('data', logging );
+  process.on('close', (status) => {
+    logging('Exit',status,'\n');
+    _close(status);
+  });
+  // Connect to Server
+  socket = new Zmq.Request();
+  busy = false ;
+  await socket.bind(sockaddr).catch(kill);
+}
 
-      You can use `server.start` instead of `() => server.start()`.
-   */
-  start() {
-    switch(this.status) {
-    case IDLE:
-    case FAILED:
-      this._status(STARTED);
-      this._launch()
-        .then(() => this._status(RUNNING))
-        .catch((err) => this._status(FAILED,err));
-      return;
-    case KILLING:
-      this._status(RESTART);
-      return;
-    case STARTED:
-    case RUNNING:
-    case RESTART:
-    default:
-      return;
+// --------------------------------------------------------------------------
+// --- Low-level Killing
+// --------------------------------------------------------------------------
+
+function _reset() {
+  rqid = 0;
+  sent = 0;
+  recv = 0;
+  started = undefined;
+  process = undefined;
+  started = undefined;
+  queue_cmd = [];
+  queue_ids = [];
+  _.forEach( pending , ({ reject }) => reject('shutdown') );
+  pending = {};
+  if (flushed) clearImmediate(flushed);
+  flushed = undefined;
+  if (polling) clearTimeout(polling);
+  polling = undefined;
+}
+
+function _kill() {
+  _reset();
+  if (killer) clearTimeout(killer);
+  if (process) process.kill();
+}
+
+function _shutdown() {
+  _reset();
+  queue_cmd.push('SHUTDOWN');
+  _flush();
+  if (!killer) {
+    const process = process ;
+    if (process) {
+      const timeout = (config && config.timeout) || 300 ;
+      killer = setTimeout( () => process.kill() , timeout );
     }
   }
+}
 
-  // --------------------------------------------------------------------------
-  // --- Server Control (Stop)
-  // --------------------------------------------------------------------------
+function _close(status) {
+  _reset();
+  if (killer) {
+    clearTimeout( killer );
+    killer = undefined ;
+  }
+  if (socket) {
+    socket.close();
+    socket = undefined ;
+    busy = false ;
+  }
+  if (process) {
+    process.kill();
+    process = undefined ;
+  }
+  if (status) {
+    _status(FAILED,'Exit Status ' + status);
+  } else {
+    _status(IDLE);
+  }
+}
 
-  /**
-      @summary Stop the Server.
-      @description
-      If the server is starting, it is hard killed.
-      If the server is running, it is shutdown gracefully.
-      When the server is shutting down, restart is canceled.
-      Otherwise, this is a no-op.
+// --------------------------------------------------------------------------
+// --- Request Queue
+// --------------------------------------------------------------------------
 
-      You can use `server.stop` instead of `() => server.stop()`.
-   */
-  stop() {
-    switch(this.status) {
-    case STARTED:
-      this._kill();
-      this._status(KILLING);
-      return;
-    case RUNNING:
-      this._shutdown();
-      this._status(KILLING);
-      return;
-    case RESTART:
-      this._status(KILLING);
-      return;
-    case IDLE:
-    case FAILED:
-    case KILLING:
-    default:
-      return;
+export function sendGET( rq, params ) { return _sendRequest( 'GET' , rq , params ); }
+export function sendSET( rq, params ) { return _sendRequest( 'SET' , rq , params ); }
+export function sendEXEC( rq, params ) { return _sendRequest( 'EXEC' , rq , params ); }
+
+function _sendRequest( kind, rq , params ) {
+  if (!isRunning()) return Promise.reject('Server not running');
+  const rid = 'RQ.' + rqid++;
+  const data = JSON.stringify(params);
+  const promise = new Promise((resolve,reject) => {
+    pending[rid] = { resolve, reject };
+    queue_cmd.push(kind,rid,rq,data);
+    queue_ids.push(rid);
+  });
+  promise.kill = () => {
+    if (socket && pending[rid]) {
+      queue_cmd.push('KILL',rid);
+      _flush();
     }
+  };
+  _flush();
+  return promise;
+}
+
+function _resolve(id,result) {
+  let promise = pending[id];
+  if (promise) {
+    delete pending[id];
+    promise.resolve(result);
   }
+}
 
-  // --------------------------------------------------------------------------
-  // --- Server Control (Kill)
-  // --------------------------------------------------------------------------
-
-  /**
-     @summary Terminate the Server.
-     @description
-     If the server is starting or running or shutting down,
-     it is hard killed and restart is canceled.
-     Otherwize, this is no-op.
-
-     You can use `server.kill` instead of `() => server.kill()`.
-     This function is automatically called when the `module` emits the `KILL` signal.
-  */
-  kill() {
-    switch(this.status) {
-    case STARTED:
-    case RUNNING:
-    case KILLING:
-    case RESTART:
-      this._kill();
-      this._status(KILLING);
-      return;
-    case IDLE:
-    case FAILED:
-    default:
-      return;
-    }
+function _reject(id,error) {
+  let promise = pending[id];
+  if (promise) {
+    delete pending[id];
+    promise.reject(error);
   }
+}
 
-  // --------------------------------------------------------------------------
-  // --- Server Control (Restart)
-  // --------------------------------------------------------------------------
+function  _cancel(ids) {
+  ids.forEach((rid) => _reject(rid,'canceled'));
+}
 
-  /**
-     @summary Re-start the Server.
-     @description
-     If paused, simply start the Server.
-     When running, try to gracefully shutdown the Server,
-     and finally schedule a reboot on exit.
-   */
-  restart() {
-    switch(this.status) {
-    case IDLE:
-    case FAILED:
-      this.start();
-      return;
-    case RUNNING:
-      this._shutdown();
-      // Fall Through
-    case KILLING:
-      this._status(RESTART);
-      return;
-    case STARTED:
-    case RESTART:
-    default:
-      return;
-    }
-  }
+function _waiting() {
+  return _.find( pending , () => true ) !== undefined ;
+}
 
-  // --------------------------------------------------------------------------
-  // --- Server Control (Reset)
-  // --------------------------------------------------------------------------
+// --------------------------------------------------------------------------
+// --- Server Command Queue
+// --------------------------------------------------------------------------
 
-  /**
-     @summary Acknowledge `FAILED` status.
-     @description
-     Simply go back to `IDLE` status when `FAILED`.
-     Otherwised, do nothing.
-  */
-  clearFailed() {
-    if (this.status === FAILED)
-      this._status(IDLE);
-  }
-
-  // --------------------------------------------------------------------------
-  // --- Server Configure
-  // --------------------------------------------------------------------------
-
-  /**
-     @summary Configure the Server.
-     @param {object} config - Server Configuration
-     @param {string} [config.command] - Server command (default: `frama-c`)
-     @param {Array.<string>} [config.params] - Server arguments (default: `-server-zmq .frama-c.socket.io`)
-     @param {string} [config.sockaddr] - Server socket name (default: `.frama-c.socket.io`)
-     @param {string} [config.logout] - Process stdout log file (default: `undefined`)
-     @param {string} [config.logerr] - Process stderr log file (default: `undefined`)
-     @param {Object} [config.env] - Process environment variables (default: `undefined`)
-  */
-  configure( config )
-  {
-    if (!config)
-      this.config =
-      {
-        command: 'frama-c',
-        params: ['-server-zmq', '.frama-c.socket.io'],
-        sockaddr: '.frama-c.socket.io'
-      }
-    else
-      this.config = config;
-  }
-
-  // --------------------------------------------------------------------------
-  // --- Low-level Launching
-  // --------------------------------------------------------------------------
-
-  async _launch() {
-    this._reset();
-    if (!this.config) throw('Frama-C Server not configured');
-    let { env, command, params, sockaddr, logout, logerr } = this.config;
-    sockaddr = System.join( this.module.session, sockaddr );
-    logout = logout && System.join( this.module.session, logout );
-    logerr = logerr && System.join( this.module.session, logerr );
-    let options = {
-      cwd: this.module.session,
-      stdout: { path: logout, pipe: true },
-      stderr: { path: logerr, pipe: true },
-      env
-    };
-    // Launch Process
-    const process = await System.spawn( command, params, options );
-    const logging = this.console.append ;
-    const kill = this.kill ;
-    this.console.clear();
-    this.module.lock();
-    this.module.on(KILL,kill);
-    this.process = process ;
-    process.stdout.on('data', logging );
-    process.stderr.on('data', logging );
-    process.on('close', (status) => {
-      this.module.off(KILL,kill);
-      this.module.unlock();
-      logging('Exit',status,'\n');
-      this._close(status);
+function _flush() {
+  if (!flushed) {
+    flushed = setImmediate(() => {
+      flushed = undefined;
+      _send();
     });
-    // Connect to Server
-    this.socket = new Zmq.Request();
-    this.busy = false ;
-    await this.socket.bind(addr).catch(kill);
   }
+}
 
-  // --------------------------------------------------------------------------
-  // --- Low-level Killing
-  // --------------------------------------------------------------------------
-
-  _reset() {
-    this.rqid = 0;
-    this.sent = 0;
-    this.recv = 0;
-    this.time = 0;
-    this.process = 0;
-    this.started = undefined;
-    this.queue_cmd = [];
-    this.queue_ids = [];
-    const pending = this.pending ;
-    this.pending = {};
-    _.forEach( pending , ({ reject }) => reject('shutdown') );
-    if (this.flushed) clearImmediate(this.flushed);
-    this.flushed = undefined;
-    if (this.polling) clearTimeout(this.polling);
-    this.polling = undefined;
+function _poll() {
+  if (!polling) {
+    let timeout = (config && config.polling) || 50 ;
+    polling = setTimeout(() => {
+      polling = false;
+      _send();
+    }, timeout);
   }
+}
 
-  _kill() {
-    this._reset();
-    if (this.killer) clearTimeout(this.killer);
-    if (this.process) this.process.kill();
-  }
-
-  _shutdown() {
-    this._reset();
-    this.queue_cmd.push('SHUTDOWN');
-    this._flush();
-    if (!this.killer) {
-      const process = this.process ;
-      if (process) {
-        const timeout = (this.config && this.config.timeout) || 300 ;
-        this.killer = setTimeout( () => process.kill() , timeout );
-      }
-    }
-  }
-
-  _close(status) {
-    this._reset();
-    if (this.killer) {
-      clearTimeout( this.killer );
-      this.killer = undefined ;
-    }
-    if (this.socket) {
-      this.socket.close();
-      this.socket = undefined ;
-      this.busy = false ;
-    }
-    if (this.process) {
-      this.process.kill();
-      this.process = undefined ;
-    }
-    if (status) {
-      this._status(FAILED,'Exit Status ' + status);
-    } else {
-      this._status(IDLE);
-    }
-  }
-
-  // --------------------------------------------------------------------------
-  // --- Request Queue
-  // --------------------------------------------------------------------------
-
-  sendGET( rq, params ) { return this._sendRequest( 'GET' , rq , params ); }
-  sendSET( rq, params ) { return this._sendRequest( 'SET' , rq , params ); }
-  sendEXEC( rq, params ) { return this._sendRequest( 'EXEC' , rq , params ); }
-
-  _sendRequest( kind, rq , params ) {
-    if (!this.isRunning()) return Promise.reject('Server not running');
-    const rid = 'RQ.' + this.rqid++;
-    const data = JSON.stringify(params);
-    const promise = new Promise((resolve,reject) => {
-      this.pending[rid] = { resolve, reject };
-      this.queue_cmd.push(kind,rid,rq,data);
-      this.queue_ids.push(rid);
-    });
-    promise.kill = () => {
-      if (this.socket && this.pending[rid]) {
-        this.queue_cmd.push('KILL',rid);
-        this._flush();
-      }
-    };
-    this._flush();
-    return promise;
-  }
-
-  _resolve(id,result) {
-    let promise = this.pending[id];
-    if (promise) {
-      delete this.pending[id];
-      promise.resolve(result);
-    }
-  }
-
-  _reject(id,error) {
-    let promise = this.pending[id];
-    if (promise) {
-      delete this.pending[id];
-      promise.reject(error);
-    }
-  }
-
-  _cancel(ids) {
-    ids.forEach((rid) => this._reject(rid,'canceled'));
-  }
-
-  _waiting() {
-    return _.find( this.resolve , () => true ) !== undefined ;
-  }
-
-  // --------------------------------------------------------------------------
-  // --- Server Command Queue
-  // --------------------------------------------------------------------------
-
-  _flush() {
-    if (!this.flushed) {
-      this.flushed = setImmediate(() => {
-        this.flushed = undefined;
-        this._send();
-      });
-    }
-  }
-
-  _poll() {
-    if (!this.polling) {
-      let timeout = (this.config && this.config.polling) || 50 ;
-      this.polling = setTimeout(() => {
-        this.polling = false;
-        this._send();
-      }, timeout);
-    }
-  }
-
-  _send() {
+function _send() {
     // when busy, will be eventually re-triggered
-    if (!this.busy) {
-      const cmd = this.queue_cmd ;
-      if (!cmd.length && this._waiting()) cmd.push('POLL');
-      if (!cmd.length) {
-        const ids = this.queue_ids ;
-        this.queue_cmd = [];
-        this.queue_ids = [];
-        const socket = this.socket ;
-        if (socket) {
-          if (!this.started) this.started = Date.now() ;
-          this.busy = true ;
-          this.sent = cmd.reduce( (s,p) => s + p.length , this.sent);
-          socket.send( cmd )
-            .then(() => socket.receive().then((resp) => this._receive(resp)))
-            .catch(() => this._cancel(ids))
-            .finally(() => this.busy = false);
-        } else
-          this._cancel(ids);
-      } else {
-        const started = this.started ;
-        if (started) {
-          const stopped = Date.now();
-          this.process += stopped - started ;
-          this.started = undefined ;
-        }
+  if (!busy) {
+    const cmd = queue_cmd ;
+    if (!cmd.length && _waiting()) cmd.push('POLL');
+    if (!cmd.length) {
+      const ids = queue_ids ;
+      queue_cmd = [];
+      queue_ids = [];
+      const socket = socket ;
+      if (socket) {
+        if (!started) started = Date.now() ;
+        busy = true ;
+        sent = cmd.reduce( (s,p) => s + p.length , sent);
+        socket.send( cmd )
+          .then(() => socket.receive().then((resp) => _receive(resp)))
+          .catch(() => _cancel(ids))
+          .finally(() => busy = false);
+      } else
+        _cancel(ids);
+    } else {
+      const started = started ;
+      if (started) {
+        const stopped = Date.now();
+        process += stopped - started ;
+        started = undefined ;
       }
     }
   }
+}
 
-  _receive(resp) {
-    try {
-      this.recv = resp.reduce( (s,p) => s + p.length , this.recv);
-      var rid,data,err,cmd;
-      const shift = () => resp.shift().toString();
-      while( resp.length ) {
-        cmd = shift();
-        switch( cmd ) {
-        case 'NONE':
-          break;
-        case 'DATA':
-          rid = shift();
-          data = shift();
-          this._resolve(rid,data);
-          break;
-        case 'KILLED':
-          rid = shift();
-          this._reject(rid,'killed');
-          break;
-        case 'ERROR':
-          rid = shift();
-          err = shift();
-          this._reject(rid,err);
-          break;
-        case 'REJECTED':
-          rid = shift();
-          this._reject(rid,'rejected');
-          break;
-        case 'WRONG':
-          err = shift();
-          console.error('[Frama-C Server] ZMQ Protocol Error:',err);
-          break;
-        case 'NONE':
-          break;
-        default:
-          console.error('[Frama-C Server] Unknown Response:',cmd);
-          resp.length = 0;
-          break;
-        }
+function _receive(resp) {
+  try {
+    recv = resp.reduce( (s,p) => s + p.length , recv);
+    var rid,data,err,cmd;
+    const shift = () => resp.shift().toString();
+    while( resp.length ) {
+      cmd = shift();
+      switch( cmd ) {
+      case 'NONE':
+        break;
+      case 'DATA':
+        rid = shift();
+        data = shift();
+        _resolve(rid,data);
+        break;
+      case 'KILLED':
+        rid = shift();
+        _reject(rid,'killed');
+        break;
+      case 'ERROR':
+        rid = shift();
+        err = shift();
+        _reject(rid,err);
+        break;
+      case 'REJECTED':
+        rid = shift();
+        _reject(rid,'rejected');
+        break;
+      case 'WRONG':
+        err = shift();
+        console.error('[Frama-C Server] ZMQ Protocol Error:',err);
+        break;
+      case 'NONE':
+        break;
+      default:
+        console.error('[Frama-C Server] Unknown Response:',cmd);
+        resp.length = 0;
+        break;
       }
-    } finally {
-      if (this.queue_cmd.length)
-        this._flush();
-      else
-        this._poll();
     }
+  } finally {
+    if (queue_cmd.length)
+      _flush();
+    else
+      _poll();
   }
-
 }
 
 // --------------------------------------------------------------------------
@@ -616,7 +594,10 @@ The returned object has the following properties:
 // --------------------------------------------------------------------------
 
 export default {
-  Server,
+  configure, console,
+  getStatus, getError, getStats, isRunning,
+  start, stop, kill, restart, clear,
+  sendGET, sendSET, sendEXEC,
   IDLE,STARTED,RUNNING,KILLING,RESTART,FAILED
 };
 
