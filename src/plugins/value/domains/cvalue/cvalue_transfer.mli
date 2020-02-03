@@ -30,7 +30,7 @@ include Abstract_domain.Transfer
   with type state := Cvalue.Model.t
    and type value := value
    and type location := location
-   and type valuation := (value, location, origin) Abstract_domain.valuation
+   and type origin := origin
 
 (*
 Local Variables:

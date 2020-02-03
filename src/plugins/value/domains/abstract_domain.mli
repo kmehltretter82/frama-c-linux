@@ -187,11 +187,11 @@ module type Transfer = sig
   type state
   type value
   type location
-  type valuation
+  type origin
 
   (** [update valuation t] updates the state [t] by the values of expressions
       and the locations of lvalues stored in [valuation]. *)
-  val update : valuation -> state -> state or_bottom
+  val update : (value, location, origin) valuation -> state -> state or_bottom
 
   (** [assign kinstr lv expr v valuation state] is the transfer function for the
       assignment [lv = expr] for [state]. It must return the state where the
@@ -209,7 +209,7 @@ module type Transfer = sig
         the state. *)
   val assign :
     kinstr -> location left_value -> exp -> (location, value) assigned ->
-    valuation -> state -> state or_bottom
+    (value, location, origin) valuation -> state -> state or_bottom
 
   (** Transfer function for an assumption.
       [assume stmt expr bool valuation state] returns a state in which the
@@ -218,7 +218,9 @@ module type Transfer = sig
       - [valuation] is a cache of all sub-expressions and locations computed
         for the evaluation and the reduction of [expr]; it can also be used
         to reduce the state *)
-  val assume : stmt -> exp -> bool -> valuation -> state -> state or_bottom
+  val assume :
+    stmt -> exp -> bool ->
+    (value, location, origin) valuation -> state -> state or_bottom
 
   (** [start_call stmt call valuation state] returns an initial state
       for the analysis of a called function. In particular, this function
@@ -229,7 +231,8 @@ module type Transfer = sig
       - [valuation] is a cache for all values and locations computed during
         the evaluation of the function and its arguments. *)
   val start_call:
-    stmt -> (location, value) call -> valuation -> state -> state or_bottom
+    stmt -> (location, value) call ->
+    (value, location, origin) valuation -> state -> state or_bottom
 
   (** [finalize_call stmt call ~pre ~post] computes the state after a function
       call, given the state [pre] before the call, and the state [post] at the
@@ -245,7 +248,9 @@ module type Transfer = sig
       inferred by the domain in the [state] about the expression [exp]. Can use
       the [valuation] resulting from the cooperative evaluation of the
       expression. *)
-  val show_expr: valuation -> state -> Format.formatter -> exp -> unit
+  val show_expr:
+    (value, location, origin) valuation ->
+    state -> Format.formatter -> exp -> unit
 end
 
 
@@ -332,7 +337,7 @@ module type S = sig
   include Transfer with type state := t
                     and type value := value
                     and type location := location
-                    and type valuation := (value, location, origin) valuation
+                    and type origin := origin
 
   (** {3 Logic } *)
 
