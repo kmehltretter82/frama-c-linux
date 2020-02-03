@@ -1845,7 +1845,7 @@ let make_splash () =
 
 let toplevel play =
   Gtk_helper.Configuration.load ();
-  Db.progress := Gtk_helper.refresh_gui;
+  ignore (Db.on_progress Gtk_helper.refresh_gui) ;
   let in_idle () =
     let tid, splash_out, splash_w, reparent_console, force_s=  make_splash () in
     let error_manager =

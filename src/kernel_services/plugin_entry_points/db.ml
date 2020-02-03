@@ -1062,9 +1062,96 @@ end
 (** {2 GUI} *)
 (* ************************************************************************* *)
 
-let progress = ref (fun () -> ())
+type daemon = {
+  trigger : unit -> unit ;
+  on_delayed : (int -> unit) option ;
+  debounced : float ; (* in ms *)
+  mutable next_at : float ; (* next trigger time *)
+  mutable last_yield_at : float ; (* last yield time *)
+}
+
+(* ---- Registry ---- *)
+
+let daemons = ref []
+
+let on_progress ?(debounced=0) ?on_delayed trigger =
+  let d = {
+    trigger ;
+    debounced = float debounced /. 1000.0 ;
+    on_delayed ;
+    last_yield_at = 0.0 ;
+    next_at = 0.0 ;
+  } in
+  daemons := List.append !daemons [d] ; d
+
+let off_progress d =
+  daemons := List.filter (fun d0 -> d != d0) !daemons
+
+(* ---- Canceling ---- *)
 
 exception Cancel
+
+(* ---- Processing ---- *)
+
+let warn_error exn =
+  Kernel.failure
+    "Unexpected Db.daemon exception:@\n%s"
+    (Printexc.to_string exn)
+
+let with_progress ?debounced ?on_delayed trigger job data =
+  let d = on_progress ?debounced ?on_delayed trigger in
+  let result =
+    try job data with e ->
+      off_progress d ;
+      raise e
+  in
+  off_progress d ; result
+
+(* ---- Yielding ---- *)
+
+let canceled = ref false
+let cancel () = canceled := true
+
+let yield () =
+  match !daemons with
+  | [] -> ()
+  | ds ->
+    begin
+      let t = Unix.gettimeofday () in
+      List.iter
+        (fun d ->
+           if t > d.next_at then
+             begin
+               try
+                 d.next_at <- t +. d.debounced ;
+                 d.trigger () ;
+               with
+               | Cancel -> canceled := true
+               | exn -> warn_error exn ; raise exn
+             end ;
+           match d.on_delayed with
+           | None ->
+             ()
+           | Some _ when d.last_yield_at = 0. ->
+             (* first yield *)
+             d.last_yield_at <- t
+           | Some warn ->
+             let time_since_last_yield = t -. d.last_yield_at in
+             let delay = if d.debounced > 0.0 then d.debounced else 0.1 in
+             if time_since_last_yield > delay then
+               warn (int_of_float (time_since_last_yield *. 1000.0)) ;
+             d.last_yield_at <- t)
+        ds;
+      if !canceled then ( canceled := false ; raise Cancel )
+    end
+
+let flush () =
+  List.iter (fun d -> d.next_at <- 0.0) !daemons ;
+  yield ()
+
+let progress = ref (Kernel.deprecated "!Db.progress()" ~now:"Db.yield()" yield)
+
+(* ************************************************************************* *)
 
 (*
 Local Variables:

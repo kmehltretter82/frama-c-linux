@@ -135,7 +135,7 @@ class occurrence = object (self)
     DoChildren
 
   method! vstmt_aux s =
-    !Db.progress ();
+    Db.yield ();
     super#vstmt_aux s
 
   initializer !Db.Value.compute ()

@@ -1339,6 +1339,61 @@ module Derefs : INOUT with type t = Locations.Zone.t
     @plugin development guide *)
 val progress: (unit -> unit) ref
 
+(** Registered daemon on progress. *)
+type daemon
+
+(**
+
+   [on_progress ?debounced ?on_delayed trigger] registers [trigger] as new
+   daemon to be executed on each [yield].
+   @param debounced the least amount of time, in milliseconds, between two
+   successive calls to the daemon (default is 0ms).
+   @param on_delayed the callback invoked as soon as the time since the last
+   [yield] is greater than [debounced] milliseconds (or 100ms at least).
+*)
+val on_progress :
+  ?debounced:int -> ?on_delayed:(int -> unit) -> (unit -> unit) -> daemon
+
+(** Unregister the [daemon]. *)
+val off_progress : daemon -> unit
+
+(** Trigger all daemons immediately. *)
+val flush : unit -> unit
+
+(** Trigger all registered daemons (debounced). *)
+val yield : unit -> unit
+
+(** Interrupt the currently running job.
+    The next call to [Db.yield()] will raise a [Cancel] exception. *)
+val cancel : unit -> unit
+
+(**
+   [with_progress ?debounced ?on_delayed trigger job data] executes the given
+   [job] on [data] while registering [trigger] as temporary (debounced) daemon.
+   The daemon is finally unregistered at the end of the computation.
+   @param debounced the least amount of time, in milliseconds, between two
+   successive calls to the daemon (default is 0ms).
+   @param on_delayed the callback invoked as soon as the time since the last
+   [yield] is greater than [debounced] milliseconds (or 100ms at least).
+   @raise every exception raised during the execution of [job] on [data].
+
+   Illustrative example, where [...] is the debounced time:
+   {[
+       job data :    |<-------------------------------------------------->|<daemon removed>
+       yields   :       x   x  x x    x             x   x    x   xxx xxx
+       trigger  :       |..........   |..........   |..........  |.........
+       delayed  :                                   !
+       notes    :      (1)           (2)           (3)
+   ]}
+
+   1. First yield, normal trigger
+   2. Debounced yields leads to this second trigger
+   3. Delayed warning invoked since there was no yield for more than debounced period
+*)
+val with_progress :
+  ?debounced:int -> ?on_delayed:(int -> unit) ->
+  (unit -> unit) -> ('a -> 'b) -> 'a -> 'b
+
 (** This exception may be raised by {!progress} to interrupt computations. *)
 exception Cancel
 

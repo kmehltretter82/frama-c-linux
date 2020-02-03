@@ -87,14 +87,13 @@ type 'a exec = {
 }
 
 type 'a server = {
-  rate : int ;
+  yield : int ;
   pretty : Format.formatter -> 'a -> unit ;
   equal : 'a -> 'a -> bool ;
   fetch : unit -> 'a message option ;
   q_in : 'a exec Queue.t ;
   q_out : 'a response Stack.t ;
   mutable shutdown : bool ;
-  mutable coins : int ;
   mutable running : 'a exec option ;
 }
 
@@ -132,8 +131,6 @@ let pp_response pp fmt (r : _ response) =
 (* --- Request Handling                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-let no_yield () = ()
-
 let execute exec : _ response =
   try
     let data = exec.handler exec.data in
@@ -147,38 +144,14 @@ let execute exec : _ response =
       exec.request (Cmdline.protect exn) ;
     `Error(exec.id,Printexc.to_string exn)
 
-let acceptable_between_yield = 0.25 (* seconds *)
-
-let execute_with_yield yield exec =
-  let db = !Db.progress in
-  let yield, check =
+let execute_debug server yield exec =
+  let on_delayed =
     if Senv.debug_atleast 1 then
-      let time = ref (Unix.gettimeofday ()) in
-      let check () =
-        let time' = Unix.gettimeofday () in
-        let diff = time' -. !time in
-        if diff > acceptable_between_yield
-        then
-          Senv.debug
-            "Db.progress missing during %s request (spent %fs between calls)"
-            exec.request
-            diff
-      in
-      (fun () ->
-         check ();
-         yield ();
-         time := Unix.gettimeofday ()),
-      check
-    else
-      yield, ignore
-  in
-  Db.progress := if exec.yield then yield else no_yield;
-  Extlib.try_finally ~finally:(fun () -> Db.progress := db; check ()) execute exec
-
-let execute_debug pp yield exec =
-  if Senv.debug_atleast 1 then
-    Senv.debug "Trigger %s:%a" exec.request pp exec.id ;
-  execute_with_yield yield exec
+      (Senv.debug "Trigger %s:%a" exec.request server.pretty exec.id ;
+       Some (fun delay -> Senv.debug
+                "No yield since %dms during %s" delay exec.request))
+    else None
+  in Db.with_progress ~debounced:server.yield ?on_delayed yield execute exec
 
 let reply_debug server resp =
   if Senv.debug_atleast 1 then
@@ -253,11 +226,7 @@ let communicate server =
 let do_yield server () =
   begin
     option raise_if_killed server.running ;
-    let n = server.coins in
-    if n < server.rate then
-      server.coins <- succ n
-    else
-      ( server.coins <- 0 ; ignore ( communicate server ) ) ;
+    ignore ( communicate server );
   end
 
 (* -------------------------------------------------------------------------- *)
@@ -276,7 +245,7 @@ let process server =
   | Some exec ->
     server.running <- Some exec ;
     try
-      reply_debug server (execute_debug server.pretty (do_yield server) exec) ;
+      reply_debug server (execute_debug server (do_yield server) exec) ;
       server.running <- None ;
       true
     with exn ->
@@ -290,7 +259,6 @@ let process server =
 let in_range ~min:a ~max:b v = min (max a v) b
 
 let kill () = raise Killed
-let yield () = !Db.progress ()
 
 let demons = ref []
 let on callback = demons := !demons @ [ callback ]
@@ -299,11 +267,11 @@ let signal activity =
 
 let run ~pretty ?(equal=(=)) ~fetch () =
   begin
-    let rate = in_range ~min:1 ~max:200 (Senv.Rate.get ()) in
+    let yield = in_range ~min:1 ~max:200 (Senv.Yield.get ()) in
     let idle_ms = in_range ~min:1 ~max:2000 (Senv.Idle.get ()) in
-    let idle_s = float_of_int idle_ms /. 1000.0 in
+    let idle = float_of_int idle_ms /. 1000.0 in
     let server = {
-      fetch ; coins = 0 ; rate ; equal ; pretty ;
+      fetch ; yield ; equal ; pretty ;
       q_in = Queue.create () ;
       q_out = Stack.create () ;
       running = None ;
@@ -318,7 +286,7 @@ let run ~pretty ?(equal=(=)) ~fetch () =
       begin try
           while not server.shutdown do
             let activity = process server in
-            if not activity then Unix.sleepf idle_s ;
+            if not activity then Unix.sleepf idle ;
           done ;
         with Sys.Break -> () (* Ctr+C, just leave the loop normally *)
       end;

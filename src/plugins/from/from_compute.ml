@@ -353,7 +353,7 @@ struct
             ~exact access state.deps_table loc deps }
 
     let transfer_call stmt dest f args _loc state =
-      !Db.progress ();
+      Db.yield ();
       let value_state = To_Use.get_value_state stmt in
       let f_deps, called_vinfos =
         !Db.Value.expr_to_kernel_function_state
@@ -456,7 +456,7 @@ struct
       result
 
     let transfer_instr stmt (i: instr) (state: t) =
-      !Db.progress ();
+      Db.yield ();
       match i with
         | Set (lv, exp, _) ->
               let comp_vars = find stmt state.deps_table exp in
@@ -688,7 +688,7 @@ struct
            s := !s^" <-"^(Format.asprintf "%a" Kernel_function.pretty kf))
          call_stack;
        !s);
-    !Db.progress ();
+    Db.yield ();
     let result =
       if !Db.Value.use_spec_instead_of_definition kf
       then compute_using_prototype kf
@@ -697,7 +697,7 @@ struct
     let result = To_Use.cleanup_and_save kf result in
     From_parameters.feedback
       "Done for function %a" Kernel_function.pretty kf;
-    !Db.progress ();
+    Db.yield ();
     CurrentLoc.set call_site_loc;
     result
 

@@ -57,7 +57,6 @@ let run_module =
 
 let insert (main_ui: Design.main_window_extension_points) =
   let menu_manager = main_ui#menu_manager () in
-  let stop = ref (fun () -> assert false) (* delayed *) in
   let stop_sensitive = ref false (* can the stop button be clicked? *) in
   let default_analyses_items =
     menu_manager#add_plugin
@@ -69,31 +68,22 @@ let insert (main_ui: Design.main_window_extension_points) =
           (Menu_manager.Unit_callback (fun () -> run_module main_ui));
         Menu_manager.toolbar ~sensitive:(fun () -> !stop_sensitive) ~icon:`STOP
           ~label:"Stop" ~tooltip:"Stop currently running analyses"
-          (Menu_manager.Unit_callback (fun () -> !stop ()));
+          (Menu_manager.Unit_callback Db.cancel)
       ]
   in
   default_analyses_items.(0)#add_accelerator `CONTROL 'r';
   let stop_button = Extlib.the default_analyses_items.(2)#tool_button in
-  let old_progress = ref !Db.progress in
-  stop :=
-    (fun () ->
-       Db.progress :=
-         (fun () ->
-            Db.progress := !old_progress;
-            raise Db.Cancel));
 
   Gtk_helper.register_locking_machinery
     ~lock_last:true
     ~lock:(fun cancelable ->
         if !stop_sensitive then Gui_parameters.warning
             "Inconsistent state for stop button. Ignoring.";
-        old_progress := !Db.progress;
         menu_manager#set_sensitive false;
         if cancelable then (stop_button#misc#set_sensitive true;
                             stop_sensitive := true);
       )
     ~unlock:(fun () ->
-        Db.progress := !old_progress;
         menu_manager#set_sensitive true;
         stop_button#misc#set_sensitive false;
         stop_sensitive := false;

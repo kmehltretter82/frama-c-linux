@@ -81,10 +81,6 @@ val run :
   fetch:(unit -> 'a message option) ->
   unit -> unit
 
-(** Yield the server during the currently running request.
-    Actually, calls [!Db.progress()]. *)
-val yield : unit -> unit
-
 (** Kills the currently running request. Actually raises an exception. *)
 val kill : unit -> 'a
 

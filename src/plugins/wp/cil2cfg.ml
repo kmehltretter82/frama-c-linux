@@ -853,7 +853,7 @@ and cfg_switch env switch_stmt switch_exp blk case_stmts next =
   n_switch
 
 and cfg_stmt env s next =
-  !Db.progress ();
+  Db.yield ();
   match s.skind with
   | Instr (Call (_, f, _, _)) ->
       setup_preconditions_proxies f;
@@ -1220,11 +1220,11 @@ let cfg_from_definition kf f =
     kf_name (CFG.nb_edges graph) (CFG.nb_vertex graph);
   debug
     "start removing unreachable in %s@." kf_name;
-  !Db.progress ();
+  Db.yield ();
   let cfg = clean_graph cfg in
   debug "for function '%s': %d vertex - %d edges@."
     kf_name (CFG.nb_edges graph) (CFG.nb_vertex graph);
-  !Db.progress ();
+  Db.yield ();
   debug
     "start loop analysis for %s@." kf_name;
   let cfg = mark_loops cfg in
@@ -1249,7 +1249,7 @@ let create kf =
     with Kernel_function.No_Definition ->
       cfg_from_proto kf
   in debug "done for %s@." kf_name;
-  !Db.progress ();
+  Db.yield ();
   cfg
 
 module KfCfg =
