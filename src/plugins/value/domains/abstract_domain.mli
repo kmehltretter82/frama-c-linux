@@ -52,14 +52,18 @@
     domain.
 
     The module type {!S} requires all the functions to be implemented to define
-    the abstract semantics of a domain, divided in three categories:
-    - {!Lattice} gives a semi-lattice structure to the abstract states;
+    the abstract semantics of a domain, divided in four categories:
+    - {!Lattice} gives a semi-lattice structure to the abstract states.
     - {!Queries} extracts information from a state, by giving a value to an
-      expression.
+      expression. They are used when evaluating expressions.
     - {!Transfer} are the transfer functions of the domain for assignments,
-      assumptions and function calls. It is a functor from a {!Valuation}
-      module, which are maps containing all locations and values computed by
-      the evaluation of the expressions involved in the considered statement.
+      assumptions and function calls. These functions use the values and
+      locations computed by the evaluation of the expressions involved in
+      the considered statement. These values and locations are made available
+      through a {!valuation} record.
+    - The remaining functions are essentially dedicated to the evaluation of
+      logical predicates, to the initialization of an initial state, and to the
+      {!Mem_exec} cache.
 
     The module type {!S_with_Structure} is {!S}, plus a special OCaml value
     describing the internal structure of the domain and identifying it.
@@ -190,7 +194,7 @@ module type Transfer = sig
   type origin
 
   (** [update valuation t] updates the state [t] by the values of expressions
-      and the locations of lvalues stored in [valuation]. *)
+      and the locations of lvalues available in the [valuation] record. *)
   val update : (value, location, origin) valuation -> state -> state or_bottom
 
   (** [assign kinstr lv expr v valuation state] is the transfer function for the
