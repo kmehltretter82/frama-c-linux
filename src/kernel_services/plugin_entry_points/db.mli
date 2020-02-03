@@ -1363,10 +1363,8 @@ val flush : unit -> unit
 (** Trigger all registered daemons (debounced). *)
 val yield : unit -> unit
 
-(** Trigger a callback once on next [yield]. *)
-val once : (unit -> unit) -> unit
-
-(** @raise [Cancel] exception. *)
+(** Interrupt the currently running job.
+    The next call to [Db.yield()] will raise a [Cancel] exception. *)
 val cancel : unit -> unit
 
 (**

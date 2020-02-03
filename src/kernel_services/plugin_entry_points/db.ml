@@ -1072,10 +1072,7 @@ type daemon = {
 
 (* ---- Registry ---- *)
 
-let pending = ref []
 let daemons = ref []
-
-let once trigger = pending := trigger :: !pending
 
 let on_progress ?(debounced=0) ?on_delayed trigger =
   let d = {
@@ -1093,7 +1090,6 @@ let off_progress d =
 (* ---- Canceling ---- *)
 
 exception Cancel
-let cancel () = raise Cancel
 
 (* ---- Processing ---- *)
 
@@ -1113,20 +1109,15 @@ let with_progress ?debounced ?on_delayed trigger job data =
 
 (* ---- Yielding ---- *)
 
-let yield_once () =
-  match !pending with
-  | [] -> ()
-  | rjobs ->
-    pending := [] ;
-    List.iter (fun f -> f()) (List.rev rjobs)
+let canceled = ref false
+let cancel () = canceled := true
 
-let yield_daemons () =
+let yield () =
   match !daemons with
   | [] -> ()
   | ds ->
     begin
       let t = Unix.gettimeofday () in
-      let canceled = ref false in
       List.iter
         (fun d ->
            if t > d.next_at then
@@ -1151,12 +1142,8 @@ let yield_daemons () =
                warn (int_of_float (time_since_last_yield *. 1000.0)) ;
              d.last_yield_at <- t)
         ds;
-      if !canceled then raise Cancel
+      if !canceled then ( canceled := false ; raise Cancel )
     end
-
-let yield () =
-  yield_daemons () ;
-  yield_once ()
 
 let flush () =
   List.iter (fun d -> d.next_at <- 0.0) !daemons ;

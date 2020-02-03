@@ -57,7 +57,6 @@ let run_module =
 
 let insert (main_ui: Design.main_window_extension_points) =
   let menu_manager = main_ui#menu_manager () in
-  let stop () = Db.once Db.cancel in
   let stop_sensitive = ref false (* can the stop button be clicked? *) in
   let default_analyses_items =
     menu_manager#add_plugin
@@ -69,7 +68,7 @@ let insert (main_ui: Design.main_window_extension_points) =
           (Menu_manager.Unit_callback (fun () -> run_module main_ui));
         Menu_manager.toolbar ~sensitive:(fun () -> !stop_sensitive) ~icon:`STOP
           ~label:"Stop" ~tooltip:"Stop currently running analyses"
-          (Menu_manager.Unit_callback stop)
+          (Menu_manager.Unit_callback Db.cancel)
       ]
   in
   default_analyses_items.(0)#add_accelerator `CONTROL 'r';
