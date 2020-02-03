@@ -2,7 +2,7 @@ open Logic_ptree
 open Cil_types
 open Logic_typing
 
-let type_foo ~typing_context ~loc:_loc l =
+let type_foo typing_context _loc l =
   let type_term ctxt env expr =
     match expr.lexpr_node with
       | PLvar "\\foo" -> Logic_const.tinteger ~loc:expr.lexpr_loc 42
@@ -14,4 +14,4 @@ let type_foo ~typing_context ~loc:_loc l =
   in
   Ext_terms res
 
-let () = Logic_typing.register_behavior_extension "foo" false type_foo
+let () = Acsl_extension.register_behavior "foo" type_foo false
