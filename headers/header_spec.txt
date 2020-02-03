@@ -630,8 +630,6 @@ src/libraries/project/state_topological.ml: MODIFIED_OCAMLGRAPH
 src/libraries/project/state_topological.mli: MODIFIED_OCAMLGRAPH
 src/libraries/stdlib/FCHashtbl.ml: CEA_LGPL
 src/libraries/stdlib/FCHashtbl.mli: CEA_LGPL
-src/libraries/stdlib/FCMap.ml: OCAML_STDLIB
-src/libraries/stdlib/FCMap.mli: OCAML_STDLIB
 src/libraries/stdlib/README.md: .ignore
 src/libraries/stdlib/extlib.ml: CEA_LGPL
 src/libraries/stdlib/extlib.mli: CEA_LGPL
