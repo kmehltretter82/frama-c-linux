@@ -1297,8 +1297,9 @@ export class GridLayout extends React.Component
   }
 
   render() {
-    const { shape:setShape, dir, items, children, holding, padding, settings } = this.props ;
+    const { shape:propShape, dir, items, children, holding, padding, settings } = this.props ;
     const { shape:newShape, target, dragged, anchor, holdedShape, inserted } = this.state ;
+    const setShape = propShape === null ? {} : propShape ;
     const insert = inserted ? inserted.id : undefined ;
     const render = DRAGGABLEITEM(this.dnd,anchor,this.onSelfDrag,insert);
     const shape = holdedShape || setShape || newShape || Dome.getWindowSetting(settings) ;
