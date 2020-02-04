@@ -77,7 +77,7 @@ type 'a message = {
 
 (* Private API: *)
 
-type 'a exec = {
+type 'a process = {
   id : 'a ;
   request : string ;
   data : json ;
@@ -91,11 +91,11 @@ type 'a server = {
   pretty : Format.formatter -> 'a -> unit ;
   equal : 'a -> 'a -> bool ;
   fetch : unit -> 'a message option ;
-  q_in : 'a exec Queue.t ;
+  q_in : 'a process Queue.t ;
   q_out : 'a response Stack.t ;
   mutable daemon : Db.daemon option ;
   mutable shutdown : bool ;
-  mutable running : 'a exec option ;
+  mutable running : 'a process option ;
 }
 
 exception Killed
@@ -116,6 +116,9 @@ let pp_request pp fmt (r : _ request) =
     else
       Format.fprintf fmt "Request %s:%a" request pp id
 
+let pp_process pp fmt (p : _ process) =
+  Format.fprintf fmt "Execute %s:%a" p.request pp p.id
+
 let pp_response pp fmt (r : _ response) =
   match r with
   | `Error(id,err) -> Format.fprintf fmt "Error %a: %s" pp id err
@@ -132,35 +135,35 @@ let pp_response pp fmt (r : _ response) =
 (* --- Request Handling                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-let execute exec : _ response =
+let run proc : _ response =
   try
-    let data = exec.handler exec.data in
-    `Data(exec.id,data)
+    let data = proc.handler proc.data in
+    `Data(proc.id,data)
   with
-  | Killed -> `Killed exec.id
-  | Data.InputError msg -> `Error(exec.id,msg)
+  | Killed -> `Killed proc.id
+  | Data.InputError msg -> `Error(proc.id,msg)
   | Sys.Break as exn -> raise exn (* Silently pass the exception *)
   | exn when Cmdline.catch_at_toplevel exn ->
     Senv.warning "[%s] Uncaught exception:@\n%s"
-      exec.request (Cmdline.protect exn) ;
-    `Error(exec.id,Printexc.to_string exn)
-
+      proc.request (Cmdline.protect exn) ;
+    `Error(proc.id,Printexc.to_string exn)
 
 let delayed process =
   if Senv.debug_atleast 1 then
     Some (fun d -> Senv.debug "No yield since %dms during %s" d process)
   else None
 
-let execute_debug server yield exec =
-  Senv.debug "Trigger %s:%a" exec.request server.pretty exec.id ;
-  Db.with_progress
-    ~debounced:server.polling
-    ?on_delayed:(delayed exec.request)
-    yield execute exec
-
-let reply_debug server resp =
-  if Senv.debug_atleast 1 then
-    Senv.debug "%a" (pp_response server.pretty) resp ;
+let execute server ?yield proc =
+  Senv.debug "%a" (pp_process server.pretty) proc ;
+  let resp = match yield with
+    | Some yield when proc.yield ->
+      Db.with_progress
+        ~debounced:server.polling
+        ?on_delayed:(delayed proc.request)
+        yield run proc
+    | _ -> run proc
+  in
+  Senv.debug "%a" (pp_response server.pretty) resp ;
   Stack.push resp server.q_out
 
 (* -------------------------------------------------------------------------- *)
@@ -185,26 +188,28 @@ let process_request (server : 'a server) (request : 'a request) : unit =
     end
   | `Kill id ->
     begin
-      let kill = kill_request server.equal id in
-      Queue.iter kill server.q_in ;
-      option kill server.running ;
+      let set_killed = kill_request server.equal id in
+      Queue.iter set_killed server.q_in ;
+      option set_killed server.running ;
     end
   | `Request(id,request,data) ->
     begin
       match find request with
-      | None -> reply_debug server (`Rejected id)
+      | None ->
+        Senv.debug "Rejected %a" server.pretty id ;
+        Stack.push (`Rejected id) server.q_out
       | Some( `GET , handler ) ->
-        let exec = { id ; request ; handler ; data ;
+        let proc = { id ; request ; handler ; data ;
                      yield = false ; killed = false } in
-        reply_debug server (execute exec)
+        execute server proc ;
       | Some( `SET , handler ) ->
-        let exec = { id ; request ; handler ; data ;
+        let proc = { id ; request ; handler ; data ;
                      yield = false ; killed = false } in
-        Queue.push exec server.q_in
+        Queue.push proc server.q_in
       | Some( `EXEC , handler ) ->
-        let exec = { id ; request ; handler ; data ;
+        let proc = { id ; request ; handler ; data ;
                      yield = true ; killed = false } in
-        Queue.push exec server.q_in
+        Queue.push proc server.q_in
     end
 
 (* -------------------------------------------------------------------------- *)
@@ -238,19 +243,14 @@ let do_yield server () =
 (* --- One Step Process                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-let rec fetch_exec q =
-  if Queue.is_empty q then None
-  else
-    let e = Queue.pop q in
-    if e.killed then fetch_exec q else Some e
-
 let process server =
-  match fetch_exec server.q_in with
-  | None -> communicate server
-  | Some exec ->
-    server.running <- Some exec ;
+  if Queue.is_empty server.q_in then
+    communicate server
+  else
+    let proc = Queue.pop server.q_in in
+    server.running <- Some proc ;
     try
-      reply_debug server (execute_debug server (do_yield server) exec) ;
+      execute server ~yield:(do_yield server) proc ;
       server.running <- None ;
       true
     with exn ->
@@ -332,14 +332,9 @@ let run server =
     foreground server ;
     signal true ;
     begin try
-        let idle = float_of_int server.polling /. 1000.0 in
         while not server.shutdown do
           let activity = process server in
-          if not activity then
-            begin
-              Unix.sleepf idle ;
-              Db.yield () ;
-            end
+          if not activity then Db.sleep server.polling
         done ;
       with Sys.Break -> () (* Ctr+C, just leave the loop normally *)
     end;
