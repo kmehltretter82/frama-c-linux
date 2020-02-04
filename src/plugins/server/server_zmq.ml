@@ -37,20 +37,25 @@ module Socket = Senv.String
       let option_name = "-server-zmq"
       let arg_name = "url"
       let default = ""
-      let help = "Setup the ZeroMQ server (in background)."
+      let help =
+        "Launch the ZeroMQ server (in background).\n\
+         The server can handle GET requests during the\n\
+         execution of the frama-c command line.\n\
+         Finally, the server is executed until shutdown."
     end)
 
 let () = Parameter_customize.set_group zmq_group
-module Run = Senv.Action
-    (struct
-      let option_name = "-server-zmq-run"
-      let help = "Launch the ZeroMQ server (until shutdown)."
-    end)
-
-module Gui = Senv.Action
+module Client = Senv.String
     (struct
       let option_name = "-server-gui"
-      let help = "Launch the external GUI."
+      let arg_name = "cmd"
+      let default = ""
+      let help =
+        "Launch the ZeroMQ client (as a child process).\n\
+         If not started by -server-zmq <url>, the ZeroMQ server\n\
+         is established with a local 'ipc://<tmp>' address.\n\
+         The specified <cmd> is passed the actual server <url>\n\
+         as first and unique argument."
     end)
 
 let _ = Doc.page `Protocol ~title:"ZeroMQ Protocol" ~filename:"server_zmq.md"
@@ -139,18 +144,48 @@ let ping () =
   try Some (process ())
   with Unix.Unix_error _ -> None
 
+let launch_server url =
+  match !server with
+  | Some _ -> ()
+  | None ->
+    let context = zmq_context () in
+    let socket = Zmq.Socket.(create context rep) in
+    try
+      Zmq.Socket.bind socket url ;
+      Senv.debug "ZeroMQ [%s]" url ;
+      let srv = Main.create ~pretty ~fetch:(fetch socket) () in
+      server := Some(url,srv) ;
+      Extlib.safe_at_exit begin fun () ->
+        Main.stop srv ;
+        Zmq.Socket.close socket ;
+        server := None ;
+      end ;
+      Main.start srv ;
+      Cmdline.at_normal_exit (fun () -> Main.run srv) ;
+    with exn ->
+      Zmq.Socket.close socket ;
+      raise exn
+
 let temp_url () =
   let socket = Filename.temp_file "frama-c.socket" ".io" in
   Extlib.safe_at_exit (fun () -> Extlib.safe_remove socket) ;
   "ipc://" ^ socket
 
-let launch_client url server =
+let start_server () =
+  match !server with
+  | None ->
+    let socket = Socket.get () in
+    let url = if socket = "" then temp_url () else socket in
+    launch_server url ; url
+  | Some (url,_) -> url
+
+let launch_client cmd =
   match !client with
   | Some _ -> ()
   | None ->
     begin
-      let cmd = Filename.dirname Sys.argv.(0) ^ "/frama-c-zmq" in
-      let process = Command.command_async cmd [| "--connect" ; url |] in
+      let url = start_server () in
+      let process = Command.command_async cmd [| url |] in
       Senv.debug "%s --connect %s@." cmd url ;
       Senv.feedback "Client launched." ;
       client := Some process ;
@@ -162,39 +197,14 @@ let launch_client url server =
             kill ()
           | _ -> ()
         end ;
-      Main.start server ;
-      Cmdline.at_normal_exit (fun () -> Main.run server);
     end
-
-let establish url =
-  let context = zmq_context () in
-  let socket = Zmq.Socket.(create context rep) in
-  try
-    Zmq.Socket.bind socket url ;
-    Senv.debug "ZeroMQ [%s]" url ;
-    let srv = Main.create ~pretty ~fetch:(fetch socket) () in
-    server := Some(url,srv) ;
-    Extlib.safe_at_exit begin fun () ->
-      Main.stop srv ;
-      Zmq.Socket.close socket ;
-      server := None ;
-    end ;
-    if Gui.get () then launch_client url srv else
-    if Run.get () then Main.run srv else Main.start srv ;
-  with exn ->
-    Zmq.Socket.close socket ;
-    raise exn
 
 let cmdline () =
   begin
-    match !server with
-    | Some(url,srv) ->
-      if Gui.get () then launch_client url srv else
-      if Run.get () then Main.run srv
-    | None ->
-      let url = Socket.get () in
-      if url <> "" then establish url else
-      if Gui.get () then establish (temp_url())
+    let url = Socket.get () in
+    if url <> "" then launch_server url ;
+    let cmd = Client.get () in
+    if cmd <> "" then launch_client cmd ;
   end
 
 let () = Db.Main.extend cmdline
