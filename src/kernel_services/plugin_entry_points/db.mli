@@ -1399,6 +1399,14 @@ val with_progress :
   ?debounced:int -> ?on_delayed:(int -> unit) ->
   (unit -> unit) -> ('a -> 'b) -> 'a -> 'b
 
+
+(**
+   Pauses the currently running process for the specified time, in milli-seconds.
+   Registered daemons, if any, will be regularily triggered during this waiting
+   time at a reasonnable period with respect to their debouncing constraints.
+*)
+val sleep : int -> unit
+
 (** This exception may be raised by {!progress} to interrupt computations. *)
 exception Cancel
 
