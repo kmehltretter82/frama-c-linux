@@ -233,7 +233,9 @@ end
 
 (** A standard OCaml set signature extended with datatype operations. *)
 module type Set = sig
-  include FCSet.S
+  include Set.S
+  val nearest_elt_le: elt -> t -> elt
+  val nearest_elt_ge: elt -> t -> elt
   include S with type t := t
 end
 
@@ -634,7 +636,7 @@ val func4:
   ('a -> 'b -> 'c -> 'd -> 'e) Type.t
 
 module Set
-  (S: FCSet.S)(E: S with type t = S.elt)(Info : Functor_info):
+  (S: Set.S)(E: S with type t = S.elt)(Info : Functor_info):
   Set with type t = S.t and type elt = E.t
 
 module Map

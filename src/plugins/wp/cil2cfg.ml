@@ -287,10 +287,10 @@ struct
 end
 
 (** Set of edges. *)
-module Eset = FCSet.Make (CFG.E)
+module Eset = Set.Make (CFG.E)
 
 (** Set of nodes. *)
-module Nset = FCSet.Make (CFG.V)
+module Nset = Set.Make (CFG.V)
 
 (** Hashtbl of node *)
 module Ntbl = Hashtbl.Make (CFG.V)

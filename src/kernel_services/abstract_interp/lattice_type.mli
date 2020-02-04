@@ -205,8 +205,8 @@ module type Lattice_Base = sig
   val transform: (l -> l -> l) -> t -> t -> t
 end
 
-module type Set = sig
-  include FCSet.S_Basic_Compare
+module type Hptset = sig
+  include Hptset.S_Basic_Compare
   include Datatype.S with type t := t
 end
 
@@ -214,7 +214,7 @@ end
     (see {!Abstract_interp.Make_Lattice_Set} or
     {!Abstract_interp.Make_Hashconsed_Lattice_Set}). *)
 module type Lattice_Set = sig
-  module O: Set
+  module O: Hptset
   type t = private Set of O.t | Top
   include AI_Lattice_with_cardinal_one
   with type t := t

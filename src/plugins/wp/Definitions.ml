@@ -263,8 +263,8 @@ let call_pred lfun cc es =
 module DT = Logic_type_info.Set
 module DR = Compinfo.Set
 module DS = Datatype.String.Set
-module DF = FCSet.Make(Lang.Fun)
-module DC = FCSet.Make
+module DF = Set.Make(Lang.Fun)
+module DC = Set.Make
     (struct
       type t = cluster
       let compare = cluster_compare

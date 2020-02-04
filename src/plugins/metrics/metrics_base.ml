@@ -270,7 +270,7 @@ end
 
 (** Map and sets of varinfos sorted by name (and not by ids) *)
 module VInfoMap = Map.Make (VarinfoByName)
-module VInfoSet = FCSet.Make (VarinfoByName)
+module VInfoSet = Set.Make (VarinfoByName)
 
 
 (** Other pretty-printing and formatting utilities *)

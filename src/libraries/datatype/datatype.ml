@@ -289,7 +289,9 @@ module Make(X: Make_input) = struct
 end
 
 module type Set = sig
-  include FCSet.S
+  include Set.S
+  val nearest_elt_le: elt -> t -> elt
+  val nearest_elt_ge: elt -> t -> elt
   include S with type t := t
 end
 
@@ -1342,7 +1344,7 @@ module type Functor_info = sig val module_name: string end
 
 (* OCaml functors are generative *)
 module Set
-  (S: FCSet.S)(E: S with type t = S.elt)(Info: Functor_info) =
+  (S: Set.S)(E: S with type t = S.elt)(Info: Functor_info) =
 struct
 
   let () = check E.equal "equal" E.name Info.module_name
@@ -1408,6 +1410,9 @@ struct
         with Exit -> true
      end)
   include S
+
+  let nearest_elt_le x = S.find_last (fun y -> y <= x)
+  let nearest_elt_ge x = S.find_first (fun y -> y >= x)
 
   let () = Type.set_ml_name P.ty (Some (Info.module_name ^ ".ty"))
 
@@ -1671,7 +1676,7 @@ module With_collections(X: S)(Info: Functor_info) = struct
 
   module Set =
     Set
-      (FCSet.Make(D))
+      (Transitioning.Stdlib.Set.Make(D))
       (D)
       (struct let module_name = Info.module_name ^ ".Set" end)
 

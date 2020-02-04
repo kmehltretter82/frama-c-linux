@@ -23,15 +23,43 @@
 (** Sets over ordered types.
 
     This module implements the set data structure.
-    All operations over sets
-    are purely applicative (no side-effects). *)
+    All operations over sets are purely applicative (no side-effects). *)
 
+(** Subset of the OCaml Set.S signature. *)
+module type S_Basic_Compare =
+sig
+  type elt
+  type t
+  val empty: t
+  val is_empty: t -> bool
+  val mem: elt -> t -> bool
+  val add: elt -> t -> t
+  val singleton: elt -> t
+  val remove: elt -> t -> t
+  val union: t -> t -> t
+  val inter: t -> t -> t
+  val diff: t -> t -> t
+  val compare: t -> t -> int
+  val equal: t -> t -> bool
+  val subset: t -> t -> bool
+  val iter: (elt -> unit) -> t -> unit
+  val fold: (elt -> 'a -> 'a) -> t -> 'a -> 'a
+  val for_all: (elt -> bool) -> t -> bool
+  val exists: (elt -> bool) -> t -> bool
+  val filter: (elt -> bool) -> t -> t
+  val partition: (elt -> bool) -> t -> t * t
+  val cardinal: t -> int
+  val elements: t -> elt list
+  val choose: t -> elt
+  val find: elt -> t -> elt
+  val of_list: elt list -> t
+end
 
 (** Output signature of the functor {!Set.Make}. *)
 module type S = sig
 
     include Datatype.S_with_collections
-    include FCSet.S_Basic_Compare with type t := t
+    include S_Basic_Compare with type t := t
     (** The datatype of sets. *)
 
     val contains_single_elt: t -> elt option

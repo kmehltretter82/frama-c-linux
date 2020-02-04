@@ -36,7 +36,7 @@ let projects_list ?(filter=fun _ -> true) () =
    is not possible with an hashtbl.
    So we use a reference over a set of couple *)
 module PrjRadiosSet =
-  FCSet.Make
+  Set.Make
     (struct
       type t = (Project.t * string) * GButton.radio_button * GMenu.menu_item
       let compare (p1, _, _) (p2, _, _) = compare_prj p1 p2

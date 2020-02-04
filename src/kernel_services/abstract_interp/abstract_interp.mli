@@ -101,7 +101,7 @@ module Make_Lattice_Base (V : Lattice_Value) : Lattice_Base with type l = V.t
 
 module Make_Lattice_Set
     (V : Datatype.S)
-    (Set: Lattice_type.Set with type elt = V.t)
+    (Set: Lattice_type.Hptset with type elt = V.t)
   : Lattice_type.Lattice_Set with module O = Set
 
 module Make_Hashconsed_Lattice_Set

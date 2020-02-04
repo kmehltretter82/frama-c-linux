@@ -77,7 +77,7 @@ let inject_periodic ~from ~period ~number =
   done;
   s
 
-module O = FCSet.Make (Integer)
+module O = Set.Make (Integer)
 
 let inject_list list =
   let o = List.fold_left (fun o r -> O.add r o) O.empty list in
