@@ -1459,18 +1459,22 @@ let () = add_precision_dep ReductionDepth.parameter
 (* -------------------------------------------------------------------------- *)
 
 let () = Parameter_customize.set_group malloc
-module MallocFunctions=
+module AllocFunctions =
   Filled_string_set
     (struct
-      let option_name = "-eva-malloc-functions"
+      let option_name = "-eva-alloc-functions"
       let arg_name = "f1,...,fn"
-      let help = "The malloc builtins use the call site of malloc() to know \
+      let help = "Controls call site creation for dynamically allocated bases. \
+                  Dynamic allocation builtins use the call sites of \
+                  malloc/calloc/realloc to know \
                   where to create new bases. This detection does not work for \
-                  custom allocators or wrappers on top of malloc, unless they \
-                  are listed here. By default, only contains malloc."
-      let default = Datatype.String.Set.singleton "malloc"
+                  custom allocators or wrappers on top of them, unless they \
+                  are listed here. \
+                  By default, contains malloc, calloc and realloc."
+      let default = Datatype.String.Set.of_list ["malloc"; "calloc"; "realloc"]
     end)
-let () = MallocFunctions.add_aliases ["-val-malloc-functions"]
+let () = AllocFunctions.add_aliases ["-val-malloc-functions"]
+let () = AllocFunctions.add_aliases ["-eva-malloc-functions"]
 
 let () = Parameter_customize.set_group malloc
 module AllocReturnsNull=

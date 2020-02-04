@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-slevel 30 -eva-slevel-merge-after-loop @all -eva-malloc-functions malloc -eva-memexec"
+   STDOPT: +"-slevel 30 -eva-slevel-merge-after-loop @all -eva-memexec"
 */
 #include <stddef.h>
 //@ assigns \result \from \nothing;

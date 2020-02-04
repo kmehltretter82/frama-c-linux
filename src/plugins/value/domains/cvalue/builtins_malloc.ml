@@ -60,7 +60,7 @@ let () = Ast.add_monotonic_state Dynamic_Alloc_Bases.self
 let call_stack_no_wrappers () =
   let stack = Value_util.call_stack () in
   assert (stack != []);
-  let wrappers = Value_parameters.MallocFunctions.get() in
+  let wrappers = Value_parameters.AllocFunctions.get() in
   let rec bottom_filter = function
     | [] -> assert false
     | [_] as stack -> stack (* Do not empty the stack completely *)
