@@ -1,1 +1,0 @@
-OPT: @PTEST_FILE@ -builtin -print
