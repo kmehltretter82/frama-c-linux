@@ -1139,7 +1139,7 @@ let raise_if_canceled () =
 
 (* ---- Yielding ---- *)
 
-let trigger ~delayed ~forced () =
+let do_yield ~delayed ~forced () =
   match !daemons with
   | [] -> ()
   | ds ->
@@ -1149,8 +1149,8 @@ let trigger ~delayed ~forced () =
       raise_if_canceled () ;
     end
 
-let yield = trigger ~delayed:true ~forced:false
-let flush = trigger ~delayed:false ~forced:true
+let yield = do_yield ~delayed:true ~forced:false
+let flush = do_yield ~delayed:false ~forced:true
 
 (* ---- Sleeping ---- *)
 
@@ -1167,7 +1167,7 @@ let sleep ms =
     if period = 0 then
       begin
         Unix.sleepf delta ;
-        trigger ~delayed:false ~forced:false ()
+        do_yield ~delayed:false ~forced:false ()
       end
     else
       let delay = float period *. 0.001 in
