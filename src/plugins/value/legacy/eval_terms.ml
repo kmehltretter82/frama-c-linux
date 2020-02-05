@@ -2177,7 +2177,7 @@ and eval_predicate env pred =
       if kind = Write && Value_util.is_const_write_invalid typ_pointed
       then False
       else
-        let eover, eunder, indeterminate =
+        let eover, eunder, indeterminate, empty =
           match tsets.term_node with
           | TLval tlval ->
             (* Do not use [eval_term]: the evaluation would fail if the value of
@@ -2189,15 +2189,15 @@ and eval_predicate env pred =
             let v, indeterminate =
               Cvalue.V_Or_Uninitialized.(get_v v, is_indeterminate v)
             in
-            v, Cvalue.V.bottom, indeterminate
+            v, Cvalue.V.bottom, indeterminate, r.empty
           | _ ->
             let result = eval_term ~alarm_mode env tsets in
-            result.eover, result.eunder, false
+            result.eover, result.eunder, false, result.empty
         in
-        let set_type = Logic_typing.is_set_type tsets.term_type in
         let status =
+          (* [True] on empty sets, [False] on bottom locations otherwise. *)
           if Cvalue.V.is_bottom eover
-          then if set_type then True else False
+          then if empty then True else False
           else
             let size = Eval_typ.sizeof_lval_typ typ_pointed in
             let make_loc l = make_loc (loc_bytes_to_loc_bits l) size in
@@ -2213,7 +2213,11 @@ and eval_predicate env pred =
             else Unknown
         in
         (* False status on uninitialized or escaping pointers. *)
-        if indeterminate then join_predicate_status status False else status
+        let status =
+          if indeterminate then join_predicate_status status False else status
+        in
+        (* True status on empty sets. *)
+        if empty then join_predicate_status status True else status
 
     | Pvalid_function tsets -> begin
         let v = eval_term ~alarm_mode env tsets in
