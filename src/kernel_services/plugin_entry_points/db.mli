@@ -1344,7 +1344,6 @@ val progress: (unit -> unit) ref
 type daemon
 
 (**
-
    [on_progress ?debounced ?on_delayed trigger] registers [trigger] as new
    daemon to be executed on each [yield].
    @param debounced the least amount of time, in milliseconds, between two
@@ -1399,11 +1398,10 @@ val with_progress :
   ?debounced:int -> ?on_delayed:(int -> unit) ->
   (unit -> unit) -> ('a -> 'b) -> 'a -> 'b
 
-
 (**
-   Pauses the currently running process for the specified time, in milli-seconds.
-   Registered daemons, if any, will be regularily triggered during this waiting
-   time at a reasonnable period with respect to their debouncing constraints.
+   Pauses the currently running process for the specified time, in milliseconds.
+   Registered daemons, if any, will be regularly triggered during this waiting
+   time at a reasonable period with respect to their debouncing constraints.
 *)
 val sleep : int -> unit
 
