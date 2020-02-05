@@ -122,13 +122,20 @@ let display_evaluation_error ~loc = function
 let alarm_reduce_mode () =
   if Value_parameters.ReduceOnLogicAlarms.get () then Ignore else Fail
 
-let find_or_alarm ~alarm_mode state loc =
+let find_indeterminate ~alarm_mode state loc =
   let is_invalid = not Locations.(is_valid Read loc) in
   track_alarms is_invalid alarm_mode;
-  let v = Model.find_indeterminate ~conflate_bottom:true state loc in
+  Model.find_indeterminate ~conflate_bottom:true state loc
+
+let find_or_alarm ~alarm_mode state loc =
+  let v = find_indeterminate ~alarm_mode state loc in
   let is_indeterminate = Cvalue.V_Or_Uninitialized.is_indeterminate v in
   track_alarms is_indeterminate alarm_mode;
   V_Or_Uninitialized.get_v v
+
+let contains_invalid_loc access loc =
+  let valid_loc = Locations.valid_part access loc in
+  not (Locations.Location.equal loc valid_loc)
 
 (* Evaluation environments. Used to evaluate predicate on \at nodes *)
 
@@ -2154,63 +2161,51 @@ and eval_predicate env pred =
       ignore (env_state env lbl);
       do_eval { env with e_cur = lbl } p
 
-    | Pvalid (_label, tsets) | Pvalid_read (_label, tsets) -> begin
-        (* TODO: see same constructor in reduce_by_predicate *)
-        try
-          let access =
-            match p.pred_content with Pvalid_read _ -> Read | _ -> Write
-          in
-          let state = env_current_state env in
-          let typ_pointed = Logic_typing.ctype_of_pointed tsets.term_type in
-          (* Check if we are trying to write in a const l-value *)
-          if access = Write && Value_util.is_const_write_invalid typ_pointed then
-            raise Stop;
-          let size = Eval_typ.sizeof_lval_typ typ_pointed in
-          (* Check that the given location is valid *)
-          let valid ~over:locbytes_over ~under:locbytes_under =
-            let loc = loc_bytes_to_loc_bits locbytes_over in
-            let loc = Locations.make_loc loc size in
-            if not Locations.(is_valid access loc) then (
-              (* \valid does not hold if the over-approximation is invalid
-                 everywhere, or if a part of the under-approximation is invalid
-              *)
-              let valid = valid_part access loc in
-              if Locations.is_bottom_loc valid then raise Stop;
-              let loc_under = loc_bytes_to_loc_bits locbytes_under in
-              let loc_under = Locations.make_loc loc_under size in
-              let valid_loc_under =
-                Locations.valid_part access loc_under
-              in
-              if not (Location.equal loc_under valid_loc_under) then
-                raise Stop;
-              raise DoNotReduce (* In any case *))
-          in
-          (match tsets.term_node with
-           | TLval _ ->
-             (* Evaluate the left-value, and check that it is initialized
-                and not an escaping pointer *)
-             let loc = eval_tlval_as_location ~alarm_mode env tsets in
-             if not Locations.(is_valid Read loc) then
-               c_alarm ();
-             let v = Model.find_indeterminate state loc in
-             let v, ok = match v with
-               | Cvalue.V_Or_Uninitialized.C_uninit_esc v
-               | Cvalue.V_Or_Uninitialized.C_uninit_noesc v
-               | Cvalue.V_Or_Uninitialized.C_init_esc v -> v, false
-               | Cvalue.V_Or_Uninitialized.C_init_noesc v -> v, true
-             in
-             if Cvalue.V.is_bottom v && not ok then raise Stop;
-             valid ~over:v ~under:V.bottom (*No precise under-approximation*);
-             if not ok then raise DoNotReduce
-           | _ ->
-             let v = eval_term ~alarm_mode env tsets in
-             valid ~over:v.eover ~under:v.eunder
-          );
-          True
-        with
-        | DoNotReduce -> Unknown
-        | Stop -> False
-      end
+    | Pvalid (_label, tsets) | Pvalid_read (_label, tsets) ->
+      (* TODO: see same constructor in reduce_by_predicate *)
+      let kind = match p.pred_content with Pvalid_read _ -> Read | _ -> Write in
+      let typ_pointed = Logic_typing.ctype_of_pointed tsets.term_type in
+      (* Check if we are trying to write in a const l-value *)
+      if kind = Write && Value_util.is_const_write_invalid typ_pointed
+      then False
+      else
+        let eover, eunder, indeterminate =
+          match tsets.term_node with
+          | TLval tlval ->
+            (* Do not use [eval_term]: the evaluation would fail if the value of
+               [tlval] is uninitialized or escaping. *)
+            let r = eval_tlval ~alarm_mode env tlval in
+            let loc = make_loc r.eover (Eval_typ.sizeof_lval_typ r.etype) in
+            let state = env_current_state env in
+            let v = find_indeterminate ~alarm_mode state loc in
+            let v, indeterminate =
+              Cvalue.V_Or_Uninitialized.(get_v v, is_indeterminate v)
+            in
+            v, Cvalue.V.bottom, indeterminate
+          | _ ->
+            let result = eval_term ~alarm_mode env tsets in
+            result.eover, result.eunder, false
+        in
+        let set_type = Logic_typing.is_set_type tsets.term_type in
+        let status =
+          if Cvalue.V.is_bottom eover
+          then if set_type then True else False
+          else
+            let size = Eval_typ.sizeof_lval_typ typ_pointed in
+            let make_loc l = make_loc (loc_bytes_to_loc_bits l) size in
+            let loc_over = make_loc eover in
+            (* The predicate holds if [eover] is entirely valid. It is false if
+               [eover] is entirely invalid or if [eunder] contains an invalid
+               location. Unknown otherwise. *)
+            if Locations.is_valid kind loc_over
+            then True
+            else if Locations.is_bottom_loc (valid_part kind loc_over)
+                 || contains_invalid_loc kind (make_loc eunder)
+            then False
+            else Unknown
+        in
+        (* False status on uninitialized or escaping pointers. *)
+        if indeterminate then join_predicate_status status False else status
 
     | Pvalid_function tsets -> begin
         let v = eval_term ~alarm_mode env tsets in
