@@ -429,21 +429,31 @@ let empty_logic_deps =
 
 
 (* Type holding the result of an evaluation. Currently, 'a is either
-   [Cvalue.V.t] for [eval_term], and [Location_Bits.t] for
-   [eval_tlval_as_loc], and [Ival.t] for [eval_toffset].  [eover]
-   contains an over-approximation of the evaluation. [eunder] contains an
+   [Cvalue.V.t] for [eval_term], and [Location_Bits.t] for [eval_tlval_as_loc],
+   and [Ival.t] for [eval_toffset].
+
+   [eover] is an over-approximation of the evaluation. [eunder] is an
    under-approximation, under the hypothesis that the state in which we
    evaluate is not Bottom. (Otherwise, all under-approximations would be
-   Bottom themselves). The following two invariants should hold:
+   Bottom themselves).
+   The following two invariants should hold:
    (1) eunder \subset eover.
    (2) when evaluating something that is not a Tset, either eunder = Bottom,
       or eunder = eover, and cardinal(eover) <= 1. This is due to the fact
       that under-approximations are not propagated as an abstract domain, but
-      only created from Trange or inferred from exact over-approximations. *)
+      only created from Trange or inferred from exact over-approximations.
+
+   This type can be used for the evaluation of logical sets, in which case
+   an eval_result [r] represents all *non-empty* sets [S] such that:
+   [r.eunder ⊆ S ⊆ r.eover]. The value {V.bottom} does *not* represents empty
+   sets, as for most predicates, P(∅) ≠ P(⊥) (if the latter has a meaning).
+   The boolean [empty] indicates whether an eval_result also represents a
+   possible empty set. *)
 type 'a eval_result = {
   etype: Cil_types.typ;
   eunder: 'a;
   eover: 'a;
+  empty: bool;
   ldeps: logic_deps;
 }
 
@@ -484,6 +494,7 @@ let inject_no_deps typ cvalue =
   { etype = typ;
     eunder = under_from_over cvalue;
     eover = cvalue;
+    empty = false;
     ldeps = empty_logic_deps }
 
 (* Integer result with no memory dependencies: constants, sizeof & alignof,
@@ -572,7 +583,7 @@ let eval_logic_charlen wrapper env v ldeps =
   (* the C strlen function has type size_t, but the logic strlen function has
      type ℤ (signed) *)
   let etype = Cil.intType in
-  { etype; ldeps; eover; eunder }
+  { etype; ldeps; eover; empty = false; eunder }
 
 (* Evaluates the logical predicates strchr/wcschr. *)
 let eval_logic_charchr builtin env s c ldeps_s ldeps_c =
@@ -598,7 +609,7 @@ let eval_logic_charchr builtin env s c ldeps_s ldeps_c =
      type 𝔹 *)
   let etype = TInt (IBool, []) in
   let ldeps = join_logic_deps ldeps_s ldeps_c in
-  { etype; ldeps; eover; eunder }
+  { etype; ldeps; eover; empty = false; eunder }
 
 (* Evaluates the logical predicate is_allocable, according to the following
    logic:
@@ -655,7 +666,7 @@ let cast_to_bool r =
   let contains_zero = V.contains_zero r.eover
   and contains_non_zero = V.contains_non_zero r.eover in
   let eover = V.interp_boolean ~contains_zero ~contains_non_zero in
-  { eover; eunder = under_from_over eover;
+  { eover; eunder = under_from_over eover; empty = r.empty;
     ldeps = r.ldeps; etype = TInt (IBool, []) }
 
 (* -------------------------------------------------------------------------- *)
@@ -783,14 +794,16 @@ let rec eval_term ~alarm_mode env t =
     { etype = TPtr (r.etype, []);
       ldeps = r.ldeps;
       eunder = loc_bits_to_loc_bytes_under r.eunder;
-      eover = loc_bits_to_loc_bytes r.eover }
+      eover = loc_bits_to_loc_bytes r.eover;
+      empty = r.empty; }
 
   | TStartOf tlval ->
     let r = eval_tlval ~alarm_mode env tlval in
     { etype = TPtr (Cil.typeOf_array_elem r.etype, []);
       ldeps = r.ldeps;
       eunder = loc_bits_to_loc_bytes_under r.eunder;
-      eover = loc_bits_to_loc_bytes r.eover }
+      eover = loc_bits_to_loc_bytes r.eover;
+      empty = r.empty; }
 
   (* Special case for the constants \pi, \e, \infinity and \NaN. *)
   | TLval (TVar {lv_name = "\\pi"}, _) -> ereal Fval.pi
@@ -832,7 +845,7 @@ let rec eval_term ~alarm_mode env t =
     in
     { etype = typ;
       ldeps = join_logic_deps deps (lval.ldeps);
-      eunder; eover }
+      eunder; eover; empty = lval.empty; }
 
   (* TBinOp ((LOr | LAnd), _t1, _t2) -> TODO: a special case would be useful.
      But this requires reducing the state after having evaluated t1 by
@@ -850,7 +863,7 @@ let rec eval_term ~alarm_mode env t =
     let eover = v in
     { etype = typ';
       ldeps = r.ldeps;
-      eover; eunder = under_from_over eover }
+      eover; eunder = under_from_over eover; empty = r.empty; }
 
   | Trange(otlow, othigh) ->
     (* The overapproximation is the range [min(low.eover)..max(high.eover)].
@@ -913,9 +926,10 @@ let rec eval_term ~alarm_mode env t =
       Cvalue.V.inject_ival
         (Ival.inject_range (to_bound min_over) (to_bound max_over))
     in
+    let empty = Cvalue.V.is_bottom eunder in
     { ldeps = !deps;
       etype = Cil.intType;
-      eunder; eover }
+      eunder; eover; empty; }
 
   | TCastE (typ, t) ->
     let r = eval_term ~alarm_mode env t in
@@ -926,7 +940,8 @@ let rec eval_term ~alarm_mode env t =
     then cast_to_bool r
     else
       let eover = cast ~src_typ:r.etype ~dst_typ:typ r.eover in
-      { etype = typ; ldeps = r.ldeps; eunder = under_from_over eover; eover }
+      { etype = typ; ldeps = r.ldeps; eunder = under_from_over eover; eover;
+        empty = r.empty; }
 
   | Tif (tcond, ttrue, tfalse) ->
     eval_tif eval_term Cvalue.V.join Cvalue.V.meet ~alarm_mode env
@@ -941,28 +956,31 @@ let rec eval_term ~alarm_mode env t =
     einteger v
 
   | Tunion l ->
-    let eunder, eover, deps = List.fold_left
-        (fun (accunder, accover, accdeps) t ->
+    let eunder, eover, deps, empty = List.fold_left
+        (fun (accunder, accover, accdeps, accempty) t ->
            let r = eval_term ~alarm_mode env t in
            (Cvalue.V.link accunder r.eunder,
             Cvalue.V.join accover r.eover,
-            join_logic_deps accdeps r.ldeps))
-        (Cvalue.V.bottom, Cvalue.V.bottom, empty_logic_deps) l
+            join_logic_deps accdeps r.ldeps,
+            accempty || r.empty))
+        (Cvalue.V.bottom, Cvalue.V.bottom, empty_logic_deps, false) l
     in
     { etype = infer_type t.term_type;
-      ldeps = deps; eunder; eover }
+      ldeps = deps; eunder; eover; empty; }
 
   | Tempty_set ->
     { etype = infer_type t.term_type;
       ldeps = empty_logic_deps;
       eunder = Cvalue.V.bottom;
-      eover = Cvalue.V.bottom }
+      eover = Cvalue.V.bottom;
+      empty = true; }
 
   | Tnull ->
     { etype = Cil.voidPtrType;
       ldeps = empty_logic_deps;
       eunder = Cvalue.V.singleton_zero;
-      eover = Cvalue.V.singleton_zero }
+      eover = Cvalue.V.singleton_zero;
+      empty = false; }
 
   | TLogic_coerce(ltyp, t) ->
     let r = eval_term ~alarm_mode env t in
@@ -980,13 +998,15 @@ let rec eval_term ~alarm_mode env t =
          { etype = Cil.longDoubleType; (** hack until logic type *)
            ldeps = r.ldeps;
            eunder = under_from_over eover;
-           eover;  }
+           eover;
+           empty = r.empty; }
        else
          let eover = V.cast_float_to_float Fval.Real r.eover in
          { etype = Cil.longDoubleType; (** hack until logic type *)
            ldeps = r.ldeps;
            eunder = under_from_over eover;
-           eover;  }
+           eover;
+           empty = r.empty }
      | _ ->
        if Logic_const.is_boolean_type ltyp
        && Logic_typing.is_integral_type t.term_type
@@ -1007,7 +1027,8 @@ let rec eval_term ~alarm_mode env t =
     { etype = Cil.intType;
       ldeps = r.ldeps;
       eover;
-      eunder = under_from_over eover }
+      eunder = under_from_over eover;
+      empty = r.empty; }
 
   | Tbase_addr (_lbl, t) ->
     let r = eval_term ~alarm_mode env t in
@@ -1016,7 +1037,8 @@ let rec eval_term ~alarm_mode env t =
     { etype = Cil.charPtrType;
       ldeps = r.ldeps;
       eover;
-      eunder = under_from_over eover }
+      eunder = under_from_over eover;
+      empty = r.empty; }
 
   | Tblock_length (_lbl, t) -> (* TODO: take label into account for locals *)
     let r = eval_term ~alarm_mode env t in
@@ -1049,7 +1071,8 @@ let rec eval_term ~alarm_mode env t =
     { etype = Cil.charPtrType;
       ldeps = r.ldeps;
       eover;
-      eunder = under_from_over eover }
+      eunder = under_from_over eover;
+      empty = r.empty; }
 
   | Tapp (li, labels, args) -> begin
       if is_known_logic_fun li.l_var_info then
@@ -1123,7 +1146,7 @@ and eval_binop ~alarm_mode env op t1 t2 =
     let eunder = eunder_op r1.eunder r2.eunder in
     { etype = typ_res;
       ldeps = join_logic_deps r1.ldeps r2.ldeps;
-      eunder; eover }
+      eunder; eover; empty = r1.empty || r2.empty; }
 
 and eval_tlhost ~alarm_mode env lv =
   match lv with
@@ -1132,14 +1155,16 @@ and eval_tlhost ~alarm_mode env lv =
     { etype = v.vtype;
       ldeps = empty_logic_deps;
       eover = loc;
-      eunder = under_loc_from_over loc }
+      eunder = under_loc_from_over loc;
+      empty = false; }
   | TResult typ ->
     (match env.result with
      | Some v ->
        let loc = Location_Bits.inject (Base.of_varinfo v) Ival.zero in
        { etype = typ;
          ldeps = empty_logic_deps;
-         eunder = loc; eover = loc }
+         eunder = loc; eover = loc;
+         empty = false; }
      | None -> no_result ())
   | TVar ({ lv_origin = None } as tlv) ->
     let b, ty = c_logic_var tlv in
@@ -1147,7 +1172,8 @@ and eval_tlhost ~alarm_mode env lv =
     { etype = ty;
       ldeps = empty_logic_deps;
       eover = loc;
-      eunder = under_loc_from_over loc }
+      eunder = under_loc_from_over loc;
+      empty = false; }
   | TMem t ->
     let r = eval_term ~alarm_mode env t in
     let tres = match Cil.unrollType r.etype with
@@ -1157,7 +1183,8 @@ and eval_tlhost ~alarm_mode env lv =
     { etype = tres;
       ldeps = r.ldeps;
       eunder = loc_bytes_to_loc_bits r.eunder;
-      eover = loc_bytes_to_loc_bits r.eover }
+      eover = loc_bytes_to_loc_bits r.eover;
+      empty = r.empty; }
 
 and eval_toffset ~alarm_mode env typ toffset =
   match toffset with
@@ -1165,7 +1192,8 @@ and eval_toffset ~alarm_mode env typ toffset =
     { etype = typ;
       ldeps = empty_logic_deps;
       eunder = Ival.zero;
-      eover = Ival.zero }
+      eover = Ival.zero;
+      empty = false; }
   | TIndex (idx, remaining) ->
     let typ_e, size = match Cil.unrollType typ with
       | TArray (t, size, _, _) -> t, size
@@ -1200,7 +1228,7 @@ and eval_toffset ~alarm_mode env typ toffset =
     in
     { etype = offsrem.etype;
       ldeps = join_logic_deps idxs.ldeps offsrem.ldeps;
-      eunder; eover }
+      eunder; eover; empty = idxs.empty || offsrem.empty; }
 
   | TField (fi, remaining) ->
     let size_current default =
@@ -1213,7 +1241,8 @@ and eval_toffset ~alarm_mode env typ toffset =
     { etype = offsrem.etype;
       ldeps = offsrem.ldeps;
       eover = Ival.add_int (size_current Ival.top) offsrem.eover;
-      eunder = Ival.add_int_under (size_current Ival.bottom) offsrem.eunder }
+      eunder = Ival.add_int_under (size_current Ival.bottom) offsrem.eunder;
+      empty = offsrem.empty; }
 
   | TModel _ -> unsupported "model fields"
 
@@ -1224,6 +1253,7 @@ and eval_tlval ~alarm_mode env (thost, toffs) =
     ldeps = join_logic_deps rhost.ldeps roffset.ldeps;
     eunder = Location_Bits.shift_under roffset.eunder rhost.eunder;
     eover = Location_Bits.shift roffset.eover rhost.eover;
+    empty = rhost.empty || roffset.empty;
   }
 
 and eval_term_as_lval ~alarm_mode env t =
@@ -1231,22 +1261,24 @@ and eval_term_as_lval ~alarm_mode env t =
   | TLval tlval ->
     eval_tlval ~alarm_mode env tlval
   | Tunion l ->
-    let eunder, eover, deps = List.fold_left
-        (fun (accunder, accover, accdeps) t ->
+    let eunder, eover, deps, empty = List.fold_left
+        (fun (accunder, accover, accdeps, accempty) t ->
            let r = eval_term_as_lval ~alarm_mode env t in
            Location_Bits.link accunder r.eunder,
            Location_Bits.join accover r.eover,
-           join_logic_deps accdeps r.ldeps
-        ) (Location_Bits.top, Location_Bits.bottom, empty_logic_deps) l
+           join_logic_deps accdeps r.ldeps,
+           accempty || r.empty
+        ) (Location_Bits.top, Location_Bits.bottom, empty_logic_deps, false) l
     in
     { etype = infer_type t.term_type;
       ldeps = deps;
-      eover; eunder }
+      eover; eunder; empty }
   | Tempty_set ->
     { etype = infer_type t.term_type;
       ldeps = empty_logic_deps;
       eunder = Location_Bits.bottom;
-      eover = Location_Bits.bottom }
+      eover = Location_Bits.bottom;
+      empty = true }
   | Tat (t, lab) ->
     ignore (env_state env lab);
     eval_term_as_lval ~alarm_mode { env with e_cur = lab } t
@@ -1277,7 +1309,7 @@ and eval_tif : 'a. (alarm_mode:_ -> _ -> _ -> 'a eval_result) -> ('a -> 'a -> 'a
     let eunder = meet vtrue.eunder vfalse.eunder in
     { etype = vtrue.etype;
       ldeps = join_logic_deps vtrue.ldeps vfalse.ldeps;
-      eunder; eover }
+      eunder; eover; empty = vtrue.empty || vfalse.empty; }
   | true, false  -> eval ~alarm_mode env ttrue
   | false, true  -> eval ~alarm_mode env tfalse
   | false, false -> assert false (* a logic alarm would have been raised*)
@@ -1360,7 +1392,7 @@ and eval_float_builtin_arity2  ~alarm_mode env name arg1 arg2 =
   in
   let eunder = under_from_over v in
   let ldeps = join_logic_deps r1.ldeps r2.ldeps in
-  { etype = r1.etype; eunder; eover = v; ldeps }
+  { etype = r1.etype; eunder; eover = v; ldeps; empty = r1.empty || r2.empty; }
 
 (* Evaluates the max (resp. the min) between the terms [t1] and [t2],
    according to [backward_left v1 v2] that reduces [v1] by assuming it is
@@ -1373,7 +1405,7 @@ and eval_extremum etype backward_left ~alarm_mode env t1 t2 =
   let eover = Cvalue.V.join reduced_v1 reduced_v2 in
   let eunder = Cvalue.V.meet r1.eunder r2.eunder in
   let ldeps = join_logic_deps r1.ldeps r2.ldeps in
-  {eover; eunder; ldeps; etype}
+  {eover; eunder; ldeps; etype; empty = r1.empty || r2.empty; }
 
 
 let eval_tlval_as_location ~alarm_mode env t =

@@ -90,6 +90,7 @@ type 'a eval_result = {
   etype: Cil_types.typ;
   eunder: 'a;
   eover: 'a;
+  empty: bool;
   ldeps: logic_deps;
 }
 
