@@ -585,6 +585,9 @@ let rec unrollTypeSkel = function
   | TNamed (r, _) -> unrollTypeSkel r.ttype
   | x -> x
 
+let is_ghost_else block =
+  hasAttribute frama_c_ghost_else block.battrs
+
 let rec enforceGhostStmtCoherence ?(force_ghost=false) stmt =
   let force_ghost = force_ghost || stmt.ghost in
   stmt.ghost <- force_ghost ;
@@ -602,7 +605,7 @@ let rec enforceGhostStmtCoherence ?(force_ghost=false) stmt =
       List.iter (fun (_, b) -> enforceGhostBlockCoherence ~force_ghost b) l
   end
 and enforceGhostBlockCoherence ?(force_ghost=false) block =
-  let force_ghost = force_ghost || (hasAttribute frama_c_ghost_else block.battrs) in
+  let force_ghost = force_ghost || is_ghost_else block  in
   List.iter (enforceGhostStmtCoherence ~force_ghost) block.bstmts
 
 (* Make a varinfo. Used mostly as a helper function below  *)

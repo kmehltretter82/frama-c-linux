@@ -1161,6 +1161,12 @@ val find_def_stmt: block -> varinfo -> stmt
 *)
 val has_extern_local_init: block -> bool
 
+(** returns [true] iff the given block is a ghost else block.
+
+    @since Frama-C+dev
+*)
+val is_ghost_else: block -> bool
+
 (* ************************************************************************* *)
 (** {2 Values for manipulating attributes} *)
 (* ************************************************************************* *)
