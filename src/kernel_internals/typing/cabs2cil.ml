@@ -3360,7 +3360,7 @@ let rec collectInitializer
               (Integer.to_int ni), false
             | _ ->
               Kernel.fatal ~current:true
-                "Array length is not a constant expression %a"
+                "Array length %a is not a compile-time constant."
                 Cil_printer.pp_exp len
           end
         | _ ->
@@ -3678,7 +3678,7 @@ let integerArrayLength (leno: exp option) : int =
     try lenOfArray leno
     with LenOfArray ->
       Kernel.fatal ~current:true
-        "Initializing non-constant-length array with length=%a"
+        "Array length %a is not a compile-time constant."
         Cil_printer.pp_exp len
 
 let find_field_offset cond (fidlist: fieldinfo list) : offset =
@@ -5074,7 +5074,7 @@ and doType (ghost:bool) isFuncArg
              | Const(CInt64(i, _, _)) ->
                if Integer.lt i Integer.zero then
                  Kernel.error ~once:true ~current:true
-                   "Length of array is negative"
+                   "Array length is negative."
              | _ ->
                if isConstant cst then
                  (* e.g., there may be a float constant involved.
@@ -5086,7 +5086,7 @@ and doType (ghost:bool) isFuncArg
                    Cil_printer.pp_exp cst
                else
                  Kernel.error ~once:true ~current:true
-                   "Length of array is not a constant: %a"
+                   "Array length %a is not a compile-time constant."
                    Cil_printer.pp_exp cst)
           end;
           if Cil.isZero len' && not allowZeroSizeArrays &&
