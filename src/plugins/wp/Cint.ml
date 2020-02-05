@@ -590,6 +590,10 @@ let smp_shift zf = (* f(e1,0)~>e1, c2>0==>f(c1,c2)~>zf(c1,c2), c2>0==>f(0,c2)~>0
     end
   | _ -> raise Not_found
 
+(* -------------------------------------------------------------------------- *)
+(* --- Comparision with L-AND / L-OR / L-NOT                              --- *)
+(* -------------------------------------------------------------------------- *)
+
 let smp_leq_with_land a b =
   let es = match_fun f_land a in
   let a1,_ = match_list_head match_positive_or_null_integer es in
@@ -648,6 +652,10 @@ let smp_eq_with_lnot a b = (* b1==~e <==> ~b1==e *)
   let e = match_ufun f_lnot a in
   let k1 = Integer.lognot b1 in
   e_eq (e_zint k1) e
+
+(* -------------------------------------------------------------------------- *)
+(* --- Comparision with LSL / LSR                                         --- *)
+(* -------------------------------------------------------------------------- *)
 
 let two_power_k_minus1 k =
   try Integer.pred (Integer.two_power k)
@@ -715,28 +723,25 @@ let smp_eq_with_lsl a b =
 
 let smp_leq_with_lsl a0 b0 = smp_cmp_with_lsl e_leq a0 b0
 
-let mk_cmp_with_lsr_cst cmp e x2 x1 =
-  (* build (e&~((2**x2)-1)) cmp (x1<<x2) *)
-  cmp
-    (e_zint (Integer.shift_left x1 x2))
-    (e_fun f_land [e_zint (Integer.lognot (two_power_k_minus1 x2));e])
-
-let smp_cmp_with_lsr cmp a0 b0 =
+let smp_eq_with_lsr a0 b0 =
   try
     let b1 = match_integer b0 in
     let e,a2 = match_fun f_lsr a0 |> match_positive_or_null_integer_arg2 in
-    (* (e>>a2) cmp b1 <==> (e&~((2**a2)-1)) cmp (b1<<a2)
+    (* (e>>a2) == b1 <==> (e&~((2**a2)-1)) == (b1<<a2)
        That rule is similar to
-       e/A2 cmp b2 <==> (e/A2)*A2 cmp b2*A2) with A2==2**a2
+       e/A2 == b2 <==> (e/A2)*A2 == b2*A2) with A2==2**a2
        So, A2>0 and (e/A2)*A2 == e&~((2**a2)-1)
     *)
-    mk_cmp_with_lsr_cst cmp e a2 b1
+    (* build (e&~((2**a2)-1)) == (b1<<a2) *)
+    e_eq
+      (e_zint (Integer.shift_left b1 a2))
+      (e_fun f_land [e_zint (Integer.lognot (two_power_k_minus1 a2));e])
   with Not_found ->
     (* This rule takes into acount several cases.
        One of them is
-       (a>>p) cmp (b>>(n+p)) <==> (a&~((2**p)-1)) cmp (b>>n)&~((2**p)-1)
+       (a>>p) == (b>>(n+p)) <==> (a&~((2**p)-1)) == (b>>n)&~((2**p)-1)
        That rule is similar to
-       (a/P)cmp(b/(N*P)) <==> (a/P)*P cmp ((b/N)/P)*P
+       (a/P) == (b/(N*P)) <==> (a/P)*P == ((b/N)/P)*P
        with P==2**p, N=2**n, q=p+n.
        So, (a/P)*P==a&~((2**p)-1), b/N==b>>n,  ((b/N)/P)*P==(b>>n)&~((2**p)-1)  *)
     let a,p = match_fun f_lsr a0 |> match_positive_or_null_integer_arg2 in
@@ -745,10 +750,7 @@ let smp_cmp_with_lsr cmp a0 b0 =
     let a = if Integer.lt n p then e_fun f_lsr [a;e_zint (Z.sub p n)] else a in
     let b = if Integer.lt n q then e_fun f_lsr [b;e_zint (Z.sub q n)] else b in
     let m = F.e_zint (Integer.lognot (two_power_k_minus1 n)) in
-    cmp (e_fun f_land [a;m]) (e_fun f_land [b;m])
-
-let smp_eq_with_lsr a0 b0 =
-  smp_cmp_with_lsr e_eq a0 b0
+    e_eq (e_fun f_land [a;m]) (e_fun f_land [b;m])
 
 let smp_leq_with_lsr a0 b0 =
   try
@@ -758,17 +760,32 @@ let smp_leq_with_lsr a0 b0 =
       (* b2>= 0 ==> (0<=(e>>b2) <==> 0<=e) (note: invalid for `e_eq`) *)
       e_leq e_zero e
     else
-      let a1 = match_integer a0 in
       let e,b2 = match_positive_or_null_integer_arg2 bs in
-      (* a1 <= (e>>b2) <==> (e&~((2**b2)-1)) >= (a1<<b2) *)
-      mk_cmp_with_lsr_cst (fun a b -> e_leq b a) e b2 a1
+      let k = Integer.two_power b2 in
+      let m = e_times k a0 in
+      if is_positive_or_null e then
+        (* e >= 0 ==> a0 <= (e / 2^b2) <==> (a0 * 2^b2) <= e *)
+        e_leq m e
+      else
+        let r = e_zint (Z.sub k Z.one) in
+        (* a1 <= (e / 2^b2) <==> a0 * 2^b2 - 2^b2 + 1) <= e *)
+        e_leq (e_sub m r) e
   with Not_found ->
     if b0 == e_zero then
       let e,_ = match_fun f_lsr a0 |> match_positive_or_null_arg2 in
       (* a2>= 0 ==> ((e>>a2)<=0 <==> e<=0) (note: invalid for `e_eq`) *)
       e_leq e e_zero
     else
-      smp_cmp_with_lsr e_leq a0 b0
+      let e,a1 = match_fun f_lsr a0 |> match_positive_or_null_integer_arg2 in
+      let k = Integer.two_power a1 in
+      let m = e_times k b0 in
+      if is_negative e then
+        (* e <= 0 ==> (e / 2^a1) <= b0 <==> e <= (b0 * 2^a1) *)
+        e_leq e m
+      else
+        let r = e_zint (Z.sub k Z.one) in
+        (* (e / 2^b1) <= a1 <==> e <= (a1 * 2^b1 + 2^b1 - 1) *)
+        e_leq e (e_add m r)
 
 (* Rewritting at export *)
 let bitk_export k e = F.e_fun ~result:Logic.Bool f_bit_export [e;k]
