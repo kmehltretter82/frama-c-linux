@@ -2101,6 +2101,11 @@ and eval_predicate env pred =
   let alarm_mode = Fail in
   let loc = pred.pred_loc in
   let rec do_eval env p =
+    try do_eval_exn env p
+    with LogicEvalError ee ->
+      display_evaluation_error ~loc:p.pred_loc ee;
+      Unknown
+  and do_eval_exn env p =
     match p.pred_content with
     | Ptrue -> True
     | Pfalse -> False
@@ -2145,11 +2150,9 @@ and eval_predicate env pred =
         | Unknown, _ | _, Unknown -> Unknown
         | _ -> False
       end
-    | Pat (p, lbl) -> begin
-        ignore (env_state env lbl);
-        try do_eval { env with e_cur = lbl } p
-        with LogicEvalError ee -> display_evaluation_error ~loc:p.pred_loc ee; Unknown
-      end
+    | Pat (p, lbl) ->
+      ignore (env_state env lbl);
+      do_eval { env with e_cur = lbl } p
 
     | Pvalid (_label, tsets) | Pvalid_read (_label, tsets) -> begin
         (* TODO: see same constructor in reduce_by_predicate *)
@@ -2206,56 +2209,45 @@ and eval_predicate env pred =
           True
         with
         | DoNotReduce -> Unknown
-        | LogicEvalError ee -> display_evaluation_error ~loc:p.pred_loc ee; Unknown
         | Stop -> False
       end
 
     | Pvalid_function tsets -> begin
-        try
-          let v = eval_term ~alarm_mode env tsets in
-          let funs, warn = Main_values.CVal.resolve_functions v.eover in
-          match funs with
-          | `Top -> Unknown
-          | `Value funs ->
-            let typ = Cil.typeOf_pointed v.etype in
-            let funs, warn' = Eval_typ.compatible_functions typ funs in
-            if warn || warn' then
-              (* No function possible -> signal hard error. Otherwise, follow
-                 Eva's convention, which is not to stop on semi-ok functions. *)
-              if funs = [] then False else Unknown
-            else
-              True
-        with
-        | LogicEvalError ee -> display_evaluation_error ~loc:p.pred_loc ee; Unknown
+        let v = eval_term ~alarm_mode env tsets in
+        let funs, warn = Main_values.CVal.resolve_functions v.eover in
+        match funs with
+        | `Top -> Unknown
+        | `Value funs ->
+          let typ = Cil.typeOf_pointed v.etype in
+          let funs, warn' = Eval_typ.compatible_functions typ funs in
+          if warn || warn' then
+            (* No function possible -> signal hard error. Otherwise, follow
+               Eva's convention, which is not to stop on semi-ok functions. *)
+            if funs = [] then False else Unknown
+          else
+            True
       end
 
     | Pinitialized (label,tsets) | Pdangling (label,tsets) -> begin
-        try
-          (* Create [*tsets] and compute its location. This is important in
-             case [tsets] points to the address of a bitfield, which we
-             cannot evaluate as a pointer (indexed on bytes) *)
-          let star_tsets = deref_tsets tsets in
-          let locb = eval_tlval ~alarm_mode env star_tsets in
-          let state = env_state env label in
-          match p.pred_content with
-          | Pinitialized _ -> eval_initialized state locb
-          | Pdangling _ -> eval_dangling state locb
-          | _ -> assert false
-        with
-        | LogicEvalError ee -> display_evaluation_error ~loc:p.pred_loc ee; Unknown
+        (* Create [*tsets] and compute its location. This is important in
+           case [tsets] points to the address of a bitfield, which we
+           cannot evaluate as a pointer (indexed on bytes) *)
+        let star_tsets = deref_tsets tsets in
+        let locb = eval_tlval ~alarm_mode env star_tsets in
+        let state = env_state env label in
+        match p.pred_content with
+        | Pinitialized _ -> eval_initialized state locb
+        | Pdangling _ -> eval_dangling state locb
+        | _ -> assert false
       end
 
-    | Prel (op,t1,t2) -> begin
-        try
-          let r = eval_binop ~alarm_mode env (lop_to_cop op) t1 t2 in
-          if V.equal V.singleton_zero r.eover
-          then False
-          else if V.equal V.singleton_one r.eover
-          then True
-          else Unknown
-        with
-        | LogicEvalError ee -> display_evaluation_error ~loc:p.pred_loc ee; Unknown
-      end
+    | Prel (op,t1,t2) ->
+      let r = eval_binop ~alarm_mode env (lop_to_cop op) t1 t2 in
+      if V.equal V.singleton_zero r.eover
+      then False
+      else if V.equal V.singleton_one r.eover
+      then True
+      else Unknown
 
     | Pforall (varl, p') | Pexists (varl, p') ->
       begin
@@ -2266,8 +2258,7 @@ and eval_predicate env pred =
           | Pexists _ -> if r = False then False else Unknown
           | Pforall _ -> if r = True then True else Unknown
           | _ -> assert false
-        with
-        | LogicEvalError _ee -> (*display_evaluation_error ~loc ee;*) Unknown
+        with LogicEvalError _ee -> Unknown (* No error display? *)
       end
 
     | Pnot p ->  begin match do_eval env p with
@@ -2314,8 +2305,7 @@ and eval_predicate env pred =
          aux lz;
          if !unknown then Unknown else True
        with
-       | Exit -> False
-       | LogicEvalError ee -> display_evaluation_error ~loc:p.pred_loc ee; Unknown)
+       | Exit -> False)
 
     | Papp (li, labels, args) -> begin
         if is_known_predicate li.l_var_info then
@@ -2325,6 +2315,7 @@ and eval_predicate env pred =
           | None -> Unknown
           | Some p' -> do_eval env p'
       end
+
     | Pif (tcond, ptrue, pfalse) ->
       begin
         let r = eval_term ~alarm_mode env tcond in
@@ -2357,7 +2348,6 @@ and eval_predicate env pred =
         unary_fun (V.project_float eval_result.eover)
       with
       | V.Not_based_on_null -> Unknown
-      | LogicEvalError ee -> display_evaluation_error ~loc ee; Unknown
     in
     let fval_cmp comp arg1 arg2 =
       try
@@ -2368,7 +2358,6 @@ and eval_predicate env pred =
         Fval.forward_comp comp f1 f2
       with
       | V.Not_based_on_null -> Unknown
-      | LogicEvalError ee -> display_evaluation_error ~loc ee; Unknown
     in
     match li.l_var_info.lv_name, args with
     | "\\is_finite", [arg] -> unary_float Fval.is_finite arg
@@ -2393,59 +2382,37 @@ and eval_predicate env pred =
           Value_parameters.abort
             "Wrong argument: \\warning expects a constant string"
       end
-    | "\\subset", [argl;argr] -> begin
-        try
-          let l = eval_term ~alarm_mode env argl in
-          let r = eval_term ~alarm_mode env argr in
-          if V.is_included l.eover r.eunder then
-            True (* all elements of [l] are included in the guaranteed elements
-                    of [r] *)
-          else if not (V.is_included l.eunder r.eover) ||
-                  not (V.intersects l.eover r.eover)
-          then False (* one guaranteed element of [l] is not included in [r],
-                        or [l] and [r] are disjoint, in which case there is
-                        an element of [l] not in [r]. (Here, [l] is not bottom,
-                        as [V.is_included bottom r.eunder] holds. *)
-          else Unknown
-        with
-        | LogicEvalError ee -> display_evaluation_error ~loc ee; Unknown
-      end
-    | "valid_read_string", [arg] -> begin
-        try
-          let r = eval_term ~alarm_mode env arg in
-          eval_valid_read_str ~wide:false env r.eover
-        with LogicEvalError ee -> display_evaluation_error ~loc ee; Unknown
-      end
-    | "valid_string", [arg] -> begin
-        try
-          let r = eval_term ~alarm_mode env arg in
-          eval_valid_str ~wide:false env r.eover
-        with LogicEvalError ee -> display_evaluation_error ~loc ee; Unknown
-      end
-    | "valid_read_wstring", [arg] -> begin
-        try
-          let r = eval_term ~alarm_mode env arg in
-          eval_valid_read_str ~wide:true env r.eover
-        with LogicEvalError ee -> display_evaluation_error ~loc ee; Unknown
-      end
-    | "valid_wstring", [arg] -> begin
-        try
-          let r = eval_term ~alarm_mode env arg in
-          eval_valid_str ~wide:true env r.eover
-        with LogicEvalError ee -> display_evaluation_error ~loc ee; Unknown
-      end
-    | "is_allocable", [arg] when comes_from_fc_stdlib li.l_var_info -> begin
-        try
-          let r = eval_term ~alarm_mode env arg in
-          eval_is_allocable r.eover
-        with LogicEvalError ee -> display_evaluation_error ~loc ee; Unknown
-      end
+    | "\\subset", [argl;argr] ->
+      let l = eval_term ~alarm_mode env argl in
+      let r = eval_term ~alarm_mode env argr in
+      if V.is_included l.eover r.eunder then
+        True (* all elements of [l] are included in the guaranteed elements
+                of [r] *)
+      else if not (V.is_included l.eunder r.eover) ||
+              not (V.intersects l.eover r.eover)
+      then False (* one guaranteed element of [l] is not included in [r],
+                    or [l] and [r] are disjoint, in which case there is
+                    an element of [l] not in [r]. (Here, [l] is not bottom,
+                    as [V.is_included bottom r.eunder] holds. *)
+      else Unknown
+    | "valid_read_string", [arg] ->
+      let r = eval_term ~alarm_mode env arg in
+      eval_valid_read_str ~wide:false env r.eover
+    | "valid_string", [arg] ->
+      let r = eval_term ~alarm_mode env arg in
+      eval_valid_str ~wide:false env r.eover
+    | "valid_read_wstring", [arg] ->
+      let r = eval_term ~alarm_mode env arg in
+      eval_valid_read_str ~wide:true env r.eover
+    | "valid_wstring", [arg] ->
+      let r = eval_term ~alarm_mode env arg in
+      eval_valid_str ~wide:true env r.eover
+    | "is_allocable", [arg] when comes_from_fc_stdlib li.l_var_info ->
+      let r = eval_term ~alarm_mode env arg in
+      eval_is_allocable r.eover
     | _, _ -> assert false
   in
-  try (* Each case of the matching above should handle evaluation errors.
-         This is just an additional security. *)
-    do_eval env pred
-  with LogicEvalError ee -> display_evaluation_error ~loc ee; Unknown
+  do_eval env pred
 
 
 (* -------------------------------------------------------------------------- *)
