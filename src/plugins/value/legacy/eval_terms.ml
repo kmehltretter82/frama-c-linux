@@ -992,21 +992,15 @@ let rec eval_term ~alarm_mode env t =
                   || Logic_const.is_boolean_type t.term_type -> r
      | Ctype typ when Cil.isIntegralOrPointerType typ -> r
      | Lreal ->
-       if Logic_typing.is_integral_type t.term_type
-       then (* Needs to be converted to reals *)
-         let eover = V.cast_int_to_float Fval.Real r.eover in
-         { etype = Cil.longDoubleType; (** hack until logic type *)
-           ldeps = r.ldeps;
-           eunder = under_from_over eover;
-           eover;
-           empty = r.empty; }
-       else
-         let eover = V.cast_float_to_float Fval.Real r.eover in
-         { etype = Cil.longDoubleType; (** hack until logic type *)
-           ldeps = r.ldeps;
-           eunder = under_from_over eover;
-           eover;
-           empty = r.empty }
+       let eover =
+         if Logic_typing.is_integral_type t.term_type
+         then V.cast_int_to_float Fval.Real r.eover
+         else V.cast_float_to_float Fval.Real r.eover
+       in
+       { etype = Cil.longDoubleType; (** hack until logic type *)
+         ldeps = r.ldeps;
+         eover; eunder = under_from_over eover;
+         empty = r.empty }
      | _ ->
        if Logic_const.is_boolean_type ltyp
        && Logic_typing.is_integral_type t.term_type
