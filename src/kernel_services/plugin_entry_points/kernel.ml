@@ -132,9 +132,6 @@ let dkey_visitor = register_category "visitor"
 let wkey_annot_error = register_warn_category "annot-error"
 let () = set_warn_status wkey_annot_error Log.Wabort
 
-let wkey_ghost_bad_non_ghost = register_warn_category "ghost:bad-non-ghost"
-let () = set_warn_status wkey_ghost_bad_non_ghost Log.Werror
-
 let wkey_ghost_bad_use = register_warn_category "ghost:bad-use"
 let () = set_warn_status wkey_ghost_bad_use Log.Werror
 

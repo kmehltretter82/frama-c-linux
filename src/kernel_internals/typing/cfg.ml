@@ -163,9 +163,9 @@ and cfgStmt env (s: stmt) next break cont =
   if s.sid = -1 then s.sid <- Cil_const.Sid.next ();
   nodeList := s :: !nodeList;
   if s.succs <> [] then
-    Kernel.fatal 
+    Kernel.fatal
       "CFG must be cleared before being computed! Stmt %d '%a' \
-       has %d successors" 
+       has %d successors"
       s.sid Cil_printer.pp_stmt s (List.length s.succs);
   let addSucc (n: stmt) =
     s.succs <- n::s.succs;
@@ -228,8 +228,7 @@ and cfgStmt env (s: stmt) next break cont =
         ()
   | Return _  | Throw _ -> ()
   | Goto (p,_) when not s.ghost && !p.ghost ->
-    Kernel.warning
-      ~wkey:Kernel.wkey_ghost_bad_non_ghost
+    Kernel.error
       "%a:@ '%a' cannot see target label (ghost), removing ghost status of the label."
       Location.pretty (Stmt.loc s) Cil_printer.pp_stmt s ;
     (!p).ghost <- false ;
@@ -591,7 +590,7 @@ let xform_switch_block ?(keepSwitch=false) b =
                               (* begin replacement: *)
 	                    let pred =
 		              match ce.enode with
-		                  Const (CInt64 (z,_,_)) 
+		                  Const (CInt64 (z,_,_))
                                     when Integer.equal z Integer.zero
                                       ->
 		                    new_exp ~loc:ce.eloc (UnOp(LNot,e,intType))
