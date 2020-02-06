@@ -32,14 +32,16 @@ let error = Kernel.warning ~wkey:Kernel.wkey_ghost_bad_use
 
 let annot_attr = "has_annot"
 
-(* For no ghost project, we add an attribute each stmt that has annotations. *)
+(* During the creation of the no ghost AST, when a stmt has some annotation,
+   we add an attribute to its copy.
+*)
 let has_annot stmt =
   Annotations.code_annot stmt <> [] ||
   Cil.hasAttribute annot_attr stmt.sattr
 
-let noGhostBlock b =
-  let noGhostVisitor = object (self)
-    inherit genericCilVisitor (refresh (Project.current()))
+let noGhostFD prj fd =
+  let visitor = object (self)
+    inherit genericCilVisitor (refresh prj)
 
     method private original = Get_orig.stmt self#behavior
 
@@ -53,19 +55,19 @@ let noGhostBlock b =
         begin match s.skind with
           | Switch(e, block, cases, loc) ->
             let cases = List.filter
-              (fun s -> not (self#original s).ghost) cases
+                (fun s -> not (self#original s).ghost) cases
             in
             s.skind <- Switch(e, block, cases, loc) ;
             DoChildren
           | _ ->
-            let original = self#original s in
-            s.sattr <- if has_annot original then [AttrAnnot annot_attr] else [] ;
+            let o = self#original s in
+            s.sattr <- if has_annot o then [AttrAnnot annot_attr] else [] ;
             DoChildren
         end
 
     method getBehavior () = self#behavior
   end in
-  (visitCilBlock (noGhostVisitor :> cilVisitor) b), (noGhostVisitor#getBehavior ())
+  (visitCilFunction (visitor :> cilVisitor) fd), (visitor#getBehavior ())
 
 type follower =
   (* For a stmt, an "Infinite" follower means that following skip instructions
@@ -74,7 +76,11 @@ type follower =
 
 let sync stmt =
   match stmt.skind with
-  (* We ignore blocks: their successors are their 1st stmt so we visit them *)
+  (* We do not synchronize on a block: its successor is the first statement that
+     it contains. Thus, we will synchronize later, on the first interesting stmt
+     we can reach when we enter the block.
+  *)
+  (* Note that a stmt with an annotation is always interesting. *)
   | Instr(Skip(_)) | Block(_) | Continue(_) | Break(_) -> has_annot stmt
   | _ -> true
 
@@ -150,26 +156,21 @@ let checkGhostCFG bhv withGhostStart noGhost =
   in
   ignore (do_check StmtSet.empty withGhostStart noGhost)
 
-let checkGhostCFGInFun (fd : fundec) =
+let checkGhostCFGInFun prj fd =
   if fd.svar.vghost then ()
   else begin
-    let noGhost, bhv = noGhostBlock fd.sbody in
-    let vname = "__ghost_cfg_handler_" ^ fd.svar.vname in
-    let vi = { fd.svar with vid = -1 ; vname ; vsource = false } in
-    let noGhostFD = {
-      svar = vi ; smaxid = 0; slocals = []; sformals = [];
-      smaxstmtid = None; sallstmts = []; sspec = empty_funspec();
-      sbody = noGhost;
-    } in
+    let noGhostFD, bhv = noGhostFD prj fd in
     Cfg.clearCFGinfo ~clear_id:false noGhostFD ;
     Cfg.cfgFun noGhostFD ;
     checkGhostCFG bhv (List.hd fd.sbody.bstmts) (List.hd noGhostFD.sbody.bstmts)
   end
 
 let checkGhostCFGInFile (f : file) =
+  let project = Project.create "NO_GHOST" in
   Cil.iterGlobals f (function
-      | GFun (fd, _) -> checkGhostCFGInFun fd
-      | _ -> ())
+      | GFun (fd, _) -> checkGhostCFGInFun project fd
+      | _ -> ()) ;
+  Project.remove ~project ()
 
 let transform_category =
   File.register_code_transformation_category "Ghost CFG checking"
