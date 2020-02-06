@@ -1596,7 +1596,7 @@ let eval_forall_predicate state r test =
     let under_loc = make_loc r.eunder in
     forall_in_under_location state under_loc test
   | True -> True
-  | False -> False
+  | False -> if r.empty then Unknown else False
 
 (* Evaluation of an \initialized predicate on a location evaluated to [r]
    in the state [state]. *)
