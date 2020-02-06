@@ -209,3 +209,4 @@ hello-*.tar.gz
 /tests/crowbar/integer_bb_pretty
 /src/plugins/gui/dgraph_helper.ml
 /doc/doxygen
+/tests/crowbar/test_ghost_cfg
