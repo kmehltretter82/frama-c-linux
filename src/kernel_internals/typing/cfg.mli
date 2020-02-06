@@ -57,7 +57,7 @@ val computeFileCFG: file -> unit
 val clearFileCFG: ?clear_id:bool -> file -> unit
 
 (** Compute a control flow graph for fd.  Stmts in fd have preds and succs
-  filled in *)
+    filled in *)
 val cfgFun : fundec -> unit
 
 (** clear the sid, succs, and preds fields of each statement in a function *)
@@ -76,4 +76,3 @@ val prepareCFG: ?keepSwitch:bool -> fundec -> unit
 
 (**/**)
 val clear_sid_info_ref: (unit -> unit) ref
-
