@@ -26,7 +26,6 @@ open Visitor_behavior
 
 module Stmt = Cil_datatype.Stmt
 module StmtSet = Stmt.Hptset
-module Location = Cil_datatype.Location
 
 let error = Kernel.warning ~wkey:Kernel.wkey_ghost_bad_use
 
@@ -55,14 +54,15 @@ let noGhostBlock b =
   end in
   (visitCilBlock (noGhostVisitor :> cilVisitor) b), (noGhostVisitor#getBehavior ())
 
-let the l = match l with [ stmt ] -> stmt | _ -> assert false
-
 let isSkip stmt =
   match stmt.skind with
+  (* We ignore blocks: their successors are their 1st stmt so we visit them *)
   | Instr(Skip(_)) | Block(_) | Continue(_) | Break(_) -> true
   | _ -> false
 
 type follower =
+  (* For a stmt, an "Infinite" follower means that following skip instructions
+     we just go back to this stmt. *)
   | Infinite | Exit | Stmt of stmt
 
 let rec skipSkip ?(visited=StmtSet.empty) s =
@@ -70,14 +70,15 @@ let rec skipSkip ?(visited=StmtSet.empty) s =
   else match isSkip s with
     | false -> Stmt s
     | true when s.succs = [] -> Exit
-    | _ -> skipSkip ~visited:(StmtSet.add s visited) (the s.succs)
+    | _ ->
+      skipSkip ~visited:(StmtSet.add s visited) (Extlib.as_singleton s.succs)
 
 let firstNonSkipNonGhosts stmt =
   let rec do_find ~visited stmt =
     if List.mem stmt !visited then []
     else begin
       visited := stmt :: !visited ;
-      if isSkip stmt then do_find ~visited (the stmt.succs)
+      if isSkip stmt then do_find ~visited (Extlib.as_singleton stmt.succs)
       else if not (stmt.ghost) then [ stmt ]
       else List.flatten (List.map (do_find ~visited) stmt.succs)
     end
@@ -85,8 +86,7 @@ let firstNonSkipNonGhosts stmt =
   do_find ~visited:(ref []) stmt
 
 let alteredCFG stmt =
-  error "Ghost code breaks CFG starting at: %a@.%a"
-    Location.pretty (Stmt.loc stmt)
+  error ~source:(fst (Stmt.loc stmt)) "Ghost code breaks CFG starting at:@.%a"
     Cil_printer.pp_stmt stmt
 
 let rec checkGhostCFG bhv ?(visited=ref StmtSet.empty) withGhostStart noGhost =
@@ -97,7 +97,7 @@ let rec checkGhostCFG bhv ?(visited=ref StmtSet.empty) withGhostStart noGhost =
         visited := StmtSet.add withGhost !visited ;
         let withGhost = List.sort_uniq Stmt.compare (firstNonSkipNonGhosts withGhost) in
         match withGhost, noGhost with
-        | [ s1 ], s2 when s1.sid <> (Get_orig.stmt bhv s2).sid ->
+        | [ s1 ], s2 when not (Stmt.equal s1 (Get_orig.stmt bhv s2)) ->
           alteredCFG withGhostStart
         | [ { skind = If(_) } as s1 ], s2 ->
           checkIf bhv ~visited s1 s2
@@ -155,11 +155,7 @@ let checkGhostCFGInFun (fd : fundec) =
   end
 
 let checkGhostCFGInFile (f : file) =
-  let visitor = object
-    inherit Visitor.frama_c_inplace
-    method! vfunc f = checkGhostCFGInFun f ; SkipChildren
-  end in
-  Visitor.visitFramacFileSameGlobals visitor f
+  Cil.iterGlobals f (function GFun(fd,_) -> checkGhostCFGInFun fd | _ -> ())
 
 let transform_category =
   File.register_code_transformation_category "Ghost CFG checking"
