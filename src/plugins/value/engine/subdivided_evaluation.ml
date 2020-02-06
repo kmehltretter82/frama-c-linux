@@ -639,12 +639,14 @@ module Make
   (* Subdivision of the evaluation of the expression [expr], according to the
      values of a list of lvalues [lvals], in the state [state].
      [subexpr] is the smallest subexpression of [expr] containing all
-     occurrences of the lvalues in [lvals]. At the end of the subdivision, we
-     reduce the final value of [expr], [subexpr], and of the lvalues in [lvals].
+     occurrences of the lvalues in [lvals].
      [valuation] is the result of the evaluation of [expr] without subdivision.
-     This function returns the alarms and the valuation resulting from the
-     subdivided evaluation. *)
-  let subdivide_lvals context valuation subdivnb expr subexpr lvals =
+     The subdivision is stopped after [subdivnb] splits, or as soon as they can
+     no longer improve the precision of the value computed for [expr].
+     The function returns the alarms and the valuation resulting from the
+     subdivided evaluation. In the resulting valuation, the values of [expr],
+     [subexpr] and of the lvalues in [lvals] have been reduced. *)
+  let subdivide_lvals context valuation subdivnb ~expr ~subexpr lvals =
     let Hypotheses.L variables = Hypotheses.from_list lvals in
     (* Split function for the subvalues of [lvals]. *)
     let split = make_split valuation variables in
@@ -742,13 +744,15 @@ module Make
       (* List of non-linear subexpressions [subexpr], with the lvalues that
          appear multiple times in [subexpr], candidates for the subdivision. *)
       let vars = compute_non_linear expr in
+      (* Compute necessary information about the lvalues to be subdivided.
+         Also remove lvalues with pointer or singleton values. *)
+      let make_info = make_info_list context initial_valuation in
+      let vars_info = List.map (fun (e, lvals) -> e, make_info lvals) vars in
+      let vars_info = List.filter (fun (_, infos) -> infos <> []) vars_info in
       let rec subdivide_subexpr vars valuation result alarms =
         match vars with
         | [] -> `Value (valuation, result), alarms
-        | (subexpr, lvals) :: tail ->
-          (* Retrieve necessary information about the lvalues.
-             Also remove lvalues with pointer or singleton values. *)
-          let lvals_info = make_info_list context initial_valuation lvals in
+        | (subexpr, lvals_info) :: tail ->
           match lvals_info with
           | [] -> subdivide_subexpr tail valuation result alarms
           | _ ->
@@ -767,10 +771,26 @@ module Make
             Value_parameters.result ~current:true ~once:true ~dkey
               "subdividing on %a"
               (Pretty_utils.pp_list ~sep:", " Printer.pp_lval) lvals;
-            subdivide_lvals context valuation subdivnb expr subexpr lvals_info
-            >>> subdivide_subexpr tail
+            let subdivide =
+              subdivide_lvals context valuation subdivnb lvals_info
+            in
+            (* If there are no other variables to subdivide, stops the
+               subdivision as soon as they can no longer improve the value
+               of the final expression [expr]. *)
+            if tail = []
+            then subdivide ~expr ~subexpr
+            else
+              (* Otherwise, later subdivisions on other sub-expressions may
+                 improve the value of [expr] thanks to a reduction of [subexpr],
+                 even if this reduction has not directly improved the value of
+                 [expr]. Thus, stop the subdivisions according to [subexpr]
+                 instead of [expr]. Use [~expr:subexpr], then evaluate [expr]
+                 with the reduced valuation, then continue to subdivide. *)
+              subdivide ~expr:subexpr ~subexpr >>> fun valuation _ _ ->
+              Eva.evaluate context valuation expr >>>
+              subdivide_subexpr tail
       in
-      subdivide_subexpr vars valuation result alarms
+      subdivide_subexpr vars_info valuation result alarms
 
   let evaluate context valuation ~subdivnb expr =
     if subdivnb = 0 || not activated

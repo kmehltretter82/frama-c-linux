@@ -317,7 +317,7 @@
   v1 ∈ [-0x1.0f0cf00000000p73 .. 0x1.bc16d60000000p59]
   v2 ∈ [-0x1.0f0cf00000000p73 .. 0x1.bc16d60000000p59]
   square ∈ [0x0.0000000000000p0 .. inf] ∪ {NaN}
-  square2 ∈ [-inf .. inf] ∪ {NaN}
+  square2 ∈ [0x0.0000000000000p0 .. inf]
 [eva:final-states] Values at end of function other:
   Frama_C_entropy_source ∈ [--..--]
   i ∈ [-0x1.8effffffffff7p1 .. 0x1.8680000000000p1]
