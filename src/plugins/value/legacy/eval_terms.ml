@@ -865,7 +865,7 @@ let rec eval_term ~alarm_mode env t =
       ldeps = r.ldeps;
       eover; eunder = under_from_over eover; empty = r.empty; }
 
-  | Trange(otlow, othigh) ->
+  | Trange (opt_low, opt_high) ->
     (* The overapproximation is the range [min(low.eover)..max(high.eover)].
        The underapproximation is the range [max(low.eover)..min(high.eover)].
        Perhaps surprisingly, we do not use the under-approximations of
@@ -876,55 +876,37 @@ let rec eval_term ~alarm_mode env t =
        eunder is either Bottom, or equal to eover, both being of cardinal
        one. In both cases, using eover is more precise. *)
     let deps = ref empty_logic_deps in
-    let min v =
-      try (match Ival.min_int (Cvalue.V.project_ival v) with
-          | None -> `Approx
-          | Some(x) -> `Finite(x))
-      with Cvalue.V.Not_based_on_null -> `Approx
-    in
-    let max v =
-      try (match Ival.max_int (Cvalue.V.project_ival v) with
-          | None -> `Approx
-          | Some(x) -> `Finite(x))
-      with Cvalue.V.Not_based_on_null -> `Approx
-    in
-    (* Evaluate a bound:
-       - [sure_bound_under] is returned for the under-approximation when the
-         bound is explicitly omitted in the ACSL term
-       - [min_max_*] is the function to retrieve the bound from the
-         over_approximation, for both the underapproximation and the
-         overapproximation. *)
-    let eval_bound sure_bound_under min_max_under min_max_over = function
-      | None -> sure_bound_under, `Approx
-      | Some(result) ->
+    (* Evaluates the minimum and maximum integer value of an optional term.
+       According to the Ival convention, None stands for -∞ and ∞ for the
+       minimum and maximum respectively. *)
+    let min_max = function
+      | None -> None, None
+      | Some term ->
         try
-          let result = eval_term ~alarm_mode env result in
+          let result = eval_term ~alarm_mode env term in
           deps := join_logic_deps !deps result.ldeps;
-          let under = min_max_under result.eover in
-          let over = min_max_over result.eover in
-          under, over
-        with LogicEvalError e ->
+          let ival = Cvalue.V.project_ival result.eover in
+          Ival.min_int ival, Ival.max_int ival
+        with
+        | Cvalue.V.Not_based_on_null -> None, None
+        | LogicEvalError e ->
           if e <> CAlarm then
             Value_parameters.result ~source:(fst t.term_loc) ~once:true
               "@[<hov 0>Cannot evaluate@ range bound %a@ (%a). Approximating@]"
-              Printer.pp_term result pretty_logic_evaluation_error e;
-          `Approx, `Approx
+              Printer.pp_term term pretty_logic_evaluation_error e;
+          None, None
     in
-    let min_under, min_over = eval_bound `MinusInf max min otlow in
-    let max_under, max_over = eval_bound `PlusInf min max othigh in
-    let to_bound = function
-      | `Finite x -> Some x
-      | `PlusInf | `MinusInf | `Approx -> None
-    in
-    let eunder = match (min_under, max_under) with
-      | `Approx, _ | _, `Approx -> Cvalue.V.bottom
-      | (`MinusInf | `Finite _), (`PlusInf | `Finite _) ->
-        Cvalue.V.inject_ival
-          (Ival.inject_range (to_bound min_under) (to_bound max_under))
-    in
-    let eover =
-      Cvalue.V.inject_ival
-        (Ival.inject_range (to_bound min_over) (to_bound max_over))
+    let min_over, min_under = min_max opt_low
+    and max_under, max_over = min_max opt_high in
+    let eover = Cvalue.V.inject_ival (Ival.inject_range min_over max_over) in
+    (* Beware: [None] stands for positive infinity for [min_under] and for
+       negative infiny for [max_under] (in which case eunder must be bottom),
+       except when the bound was itself [None]. *)
+    let eunder =
+      if (opt_low <> None && min_under = None)
+      || (opt_high <> None && max_under = None)
+      then Cvalue.V.bottom
+      else Cvalue.V.inject_ival (Ival.inject_range min_under max_under)
     in
     let empty = Cvalue.V.is_bottom eunder in
     { ldeps = !deps;
