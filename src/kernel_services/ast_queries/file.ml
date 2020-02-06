@@ -1101,6 +1101,17 @@ let () =
   add_code_transformation_after_cleanup
     ~deps constfold syntactic_constant_folding
 
+let () =
+  let constglobfold = register_code_transformation_category "constglobfold" in
+  let syntactic_const_globals_substitution ast =
+    if Kernel.Constfold.get ()
+    then Cil.visitCilFileSameGlobals Cil.constGlobSubstVisitor ast
+  in
+  add_code_transformation_before_cleanup
+    ~deps:[ (module Kernel.Constfold: Parameter_sig.S) ]
+    constglobfold
+    syntactic_const_globals_substitution
+
 let prepare_cil_file ast =
   Kernel.feedback ~level:2 "preparing the AST";
   computeCFG ~clear_id:true ast;

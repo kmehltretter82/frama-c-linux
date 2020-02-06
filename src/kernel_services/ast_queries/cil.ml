@@ -4479,13 +4479,13 @@ and constFoldLval machdep (host,offset) =
     | Mem e -> Mem (constFold machdep e)
     | Var _ -> host
   in
-  let rec constFoldOffset machdep = function
-    | NoOffset -> NoOffset
-    | Field (fi,offset) -> Field (fi, constFoldOffset machdep offset)
-    | Index (exp,offset) -> Index (constFold machdep exp,
-                                   constFoldOffset machdep offset)
-  in
   (newhost, constFoldOffset machdep offset)
+
+and constFoldOffset machdep = function
+  | NoOffset -> NoOffset
+  | Field (fi,offset) -> Field (fi, constFoldOffset machdep offset)
+  | Index (exp,offset) ->
+    Index (constFold machdep exp, constFoldOffset machdep offset)
 
 and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
   let e1' = constFold machdep e1 in
@@ -6301,6 +6301,103 @@ let foldLeftCompound
       (fun acc (o, i) -> doinit o i (getTypeOffset o) acc) acc initl
 
   | _ -> Kernel.fatal ~current:true "Type of Compound is not array or struct or union"
+
+class constGlobSubstVisitorClass : cilVisitor = object
+  inherit nopCilVisitor
+
+  val vi_to_init_opt = Varinfo.Hashtbl.create 7
+
+  (* Visit globals and register only the association between globals with attribute
+     'const' and respective initializers. *)
+  method! vglob g =
+    let rec is_arithmetic_type = function
+      | TArray (typ, _, _, _) -> is_arithmetic_type typ
+      | TInt _ | TFloat _ | TEnum _ -> true
+      | _ -> false
+    in
+    let has_attribute_const typ =
+      let rec typeAttr = function
+        | TArray (typ, _, _, _) ->
+          typeAttr typ
+        | TVoid a
+        | TInt (_, a)
+        | TFloat (_, a)
+        | TNamed (_, a)
+        | TPtr (_, a)
+        | TComp (_, _, a)
+        | TEnum (_, a)
+        | TFun (_, _, _, a)
+        | TBuiltin_va_list a ->
+          a
+      in
+      hasAttribute "const" (typeAttr typ)
+    in
+    match g with
+    | GVar (vi, _, _) ->
+      (* Register in [vi_to_init_opt] the association between [vi] and its
+         initializer [init_opt]. The is assumed to be an expression of literal
+         constants only, as the lvals originally appearing in it have been
+         substituted by the respective initializers in [vexpr]. *)
+      let register = function
+        | GVar (vi, { init = init_opt }, _loc) as g ->
+          Varinfo.Hashtbl.add vi_to_init_opt vi init_opt;
+          g
+        | _ ->
+          (* Cannot happen as we treat only [GVar _] cases in the outer
+             patter matching. *)
+          assert false
+      in
+      let typ = unrollTypeDeep vi.vtype in
+      if is_arithmetic_type typ && has_attribute_const typ
+      then ChangeDoChildrenPost ([g], List.map register)
+      else DoChildren
+    | _ ->
+      DoChildren
+
+  (* Visit expressions and replace lvals, with a registered varinfo in
+     [vi_to_init_opt], with respective initializing constant expressions. *)
+  method! vexpr e =
+    match e.enode with
+    | Lval (Var vi, (NoOffset | Index _ as offset)) ->
+      (* Support for variables and array, on arithmetic types only. *)
+      begin match Varinfo.Hashtbl.find vi_to_init_opt vi with
+        | None ->
+          (* Since [vi] is a global, we replace it with the zero expression,
+             i.e. the implicit initializer for such globals. *)
+          let newexp = zero ~loc:e.eloc in
+          ChangeTo newexp
+        | Some init ->
+          let offset = constFoldOffset true offset in
+          let zero_exp = zero ~loc:e.eloc in
+          let rec find_replace current_offset current_init current_newexp =
+            match current_init with
+            | SingleInit si ->
+              if Cil_datatype.OffsetStructEq.equal offset current_offset
+              then new_exp ~loc:e.eloc si.enode
+              else current_newexp
+            | CompoundInit (ct, initl) ->
+              (* We are dealing with an array: recursively [find_replace] among
+                 its initializers. *)
+              foldLeftCompound
+                ~implicit:true
+                ~doinit:(fun coffset cinit _ acc ->
+                    find_replace
+                      (addOffset coffset current_offset)
+                      cinit
+                      acc)
+                ~ct
+                ~initl
+                ~acc:current_newexp
+          in
+          let newexp = find_replace NoOffset init zero_exp in
+          ChangeTo newexp
+        | exception Not_found ->
+          DoChildren
+      end
+    | _ ->
+      DoChildren
+end
+let constGlobSubstVisitor = new constGlobSubstVisitorClass
 
 let has_flexible_array_member t =
   let is_flexible_array t =

@@ -1968,9 +1968,12 @@ val childrenBehavior: cilVisitor -> funbehavior -> funbehavior
 val is_skip: stmtkind -> bool
 
 (** A visitor that does constant folding. Pass as argument whether you want
- * machine specific simplifications to be done, or not. *)
+    machine specific simplifications to be done, or not. *)
 val constFoldVisitor: bool -> cilVisitor
 
+(** A visitor that substitutes globals, defined with the attribute 'const', by
+    their constant initializing expressions. *)
+val constGlobSubstVisitor: cilVisitor
 
 (* ************************************************************************* *)
 (** {2 Debugging support} *)
