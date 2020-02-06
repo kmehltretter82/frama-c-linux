@@ -1443,7 +1443,7 @@ crowbar-%: tests/crowbar/%
 
 crowbar-afl-%: tests/crowbar/%
 	$(MKDIR) tests/crowbar/output-$*
-	afl-fuzz -i tests/crowbar/input -o tests/crowbar/output-$* $< @@
+	afl-fuzz $(AFL_OPTS) -i tests/crowbar/input -o tests/crowbar/output-$* $< @@
 
 ##############
 # Emacs tags #
