@@ -93,6 +93,16 @@ int ghost_goto_ghost(){
   return 0;
 }
 
+void switch_loses_assertion (int c) {
+  //@ ghost int x = 1;
+  switch (c) {
+    case 0: return;
+    //@ ghost case 1: x++; /*@ assert x == 2; */ break;
+    default: /*@ assert x == 1; */ break;
+  }
+  return;
+}
+
 #endif
 
 #ifdef CANT_CHECK

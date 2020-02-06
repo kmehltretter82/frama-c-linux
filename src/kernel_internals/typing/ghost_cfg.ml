@@ -29,6 +29,14 @@ module StmtSet = Stmt.Hptset
 
 let error = Kernel.warning ~wkey:Kernel.wkey_ghost_bad_use
 
+
+let annot_attr = "has_annot"
+
+(* For no ghost project, we add an attribute each stmt that has annotations. *)
+let has_annot stmt =
+  Annotations.code_annot stmt <> [] ||
+  Cil.hasAttribute annot_attr stmt.sattr
+
 let noGhostBlock b =
   let noGhostVisitor = object (self)
     inherit genericCilVisitor (refresh (Project.current()))
@@ -44,10 +52,15 @@ let noGhostBlock b =
       end else
         begin match s.skind with
           | Switch(e, block, cases, loc) ->
-            let cases = List.filter (fun s -> not (self#original s).ghost) cases in
+            let cases = List.filter
+              (fun s -> not (self#original s).ghost) cases
+            in
             s.skind <- Switch(e, block, cases, loc) ;
             DoChildren
-          | _ -> DoChildren
+          | _ ->
+            let original = self#original s in
+            s.sattr <- if has_annot original then [AttrAnnot annot_attr] else [] ;
+            DoChildren
         end
 
     method getBehavior () = self#behavior
@@ -62,7 +75,7 @@ type follower =
 let sync stmt =
   match stmt.skind with
   (* We ignore blocks: their successors are their 1st stmt so we visit them *)
-  | Instr(Skip(_)) | Block(_) | Continue(_) | Break(_) -> false
+  | Instr(Skip(_)) | Block(_) | Continue(_) | Break(_) -> has_annot stmt
   | _ -> true
 
 let nextSync stmt =
