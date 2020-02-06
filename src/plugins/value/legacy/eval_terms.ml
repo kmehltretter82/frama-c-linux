@@ -2250,7 +2250,11 @@ and eval_predicate env pred =
 
     | Prel (op,t1,t2) ->
       let r = eval_binop ~alarm_mode env (lop_to_cop op) t1 t2 in
-      if V.equal V.singleton_zero r.eover
+      (* [eval_binop] uses the forward semantics of [Cvalue.V], which does not
+         handle empty sets. Returns [Unknown] if empty sets are possible. *)
+      if r.empty
+      then Unknown
+      else if V.equal V.singleton_zero r.eover
       then False
       else if V.equal V.singleton_one r.eover
       then True
@@ -2392,7 +2396,11 @@ and eval_predicate env pred =
     | "\\subset", [argl;argr] ->
       let l = eval_term ~alarm_mode env argl in
       let r = eval_term ~alarm_mode env argr in
-      if V.is_included l.eover r.eunder then
+      if r.empty then
+        if V.is_bottom l.eover then True
+        else if not (V.is_bottom l.eunder || l.empty) then False
+        else Unknown
+      else if V.is_included l.eover r.eunder then
         True (* all elements of [l] are included in the guaranteed elements
                 of [r] *)
       else if not (V.is_included l.eunder r.eover) ||

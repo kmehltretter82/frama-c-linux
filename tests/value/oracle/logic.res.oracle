@@ -38,7 +38,7 @@
 [eva:alarm] tests/value/logic.c:127: Warning: assertion got status unknown.
 [eva] tests/value/logic.c:128: assertion got status valid.
 [eva] tests/value/logic.c:130: assertion got status valid.
-[eva] tests/value/logic.c:131: assertion got status valid.
+[eva:alarm] tests/value/logic.c:131: Warning: assertion got status unknown.
 [eva:alarm] tests/value/logic.c:132: Warning: assertion got status unknown.
 [eva] tests/value/logic.c:134: 
   cannot evaluate ACSL term, unsupported ACSL construct: == operation on non-supported type struct ts
