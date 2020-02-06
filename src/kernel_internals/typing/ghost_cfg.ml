@@ -54,89 +54,88 @@ let noGhostBlock b =
   end in
   (visitCilBlock (noGhostVisitor :> cilVisitor) b), (noGhostVisitor#getBehavior ())
 
-let isSkip stmt =
-  match stmt.skind with
-  (* We ignore blocks: their successors are their 1st stmt so we visit them *)
-  | Instr(Skip(_)) | Block(_) | Continue(_) | Break(_) -> true
-  | _ -> false
-
 type follower =
   (* For a stmt, an "Infinite" follower means that following skip instructions
      we just go back to this stmt. *)
   | Infinite | Exit | Stmt of stmt
 
-let rec skipSkip ?(visited=StmtSet.empty) s =
-  if StmtSet.mem s visited then Infinite
-  else match isSkip s with
-    | false -> Stmt s
-    | true when s.succs = [] -> Exit
-    | _ ->
-      skipSkip ~visited:(StmtSet.add s visited) (Extlib.as_singleton s.succs)
+let sync stmt =
+  match stmt.skind with
+  (* We ignore blocks: their successors are their 1st stmt so we visit them *)
+  | Instr(Skip(_)) | Block(_) | Continue(_) | Break(_) -> false
+  | _ -> true
 
-let firstNonSkipNonGhosts stmt =
-  let rec do_find ~visited stmt =
-    if List.mem stmt !visited then []
+let nextSync stmt =
+  let rec aux visited s =
+    if StmtSet.mem s visited then Infinite
+    else match sync s with
+      | true -> Stmt s
+      | false when s.succs = [] -> Exit
+      | _ ->
+        aux (StmtSet.add s visited) (Extlib.as_singleton s.succs)
+  in aux StmtSet.empty stmt
+
+let nextNonGhostSync stmt =
+  let rec do_find (res, visited) stmt =
+    if StmtSet.mem stmt visited then res, visited
     else begin
-      visited := stmt :: !visited ;
-      if isSkip stmt then do_find ~visited (Extlib.as_singleton stmt.succs)
-      else if not (stmt.ghost) then [ stmt ]
-      else List.flatten (List.map (do_find ~visited) stmt.succs)
+      let visited = StmtSet.add stmt visited in
+      if not (sync stmt) then
+        do_find (res, visited) (Extlib.as_singleton stmt.succs)
+      else if not (stmt.ghost) then StmtSet.add stmt res, visited
+      else List.fold_left do_find (res, visited) stmt.succs
     end
   in
-  do_find ~visited:(ref []) stmt
+  fst (do_find (StmtSet.empty, StmtSet.empty) stmt)
 
 let alteredCFG stmt =
   error ~source:(fst (Stmt.loc stmt)) "Ghost code breaks CFG starting at:@.%a"
     Cil_printer.pp_stmt stmt
 
-let rec checkGhostCFG bhv ?(visited=ref StmtSet.empty) withGhostStart noGhost =
-  match (skipSkip withGhostStart), (skipSkip noGhost) with
-  | Stmt withGhost, Stmt noGhost -> begin
-      if StmtSet.mem withGhost !visited then ()
-      else begin
-        visited := StmtSet.add withGhost !visited ;
-        let withGhost = List.sort_uniq Stmt.compare (firstNonSkipNonGhosts withGhost) in
-        match withGhost, noGhost with
-        | [ s1 ], s2 when not (Stmt.equal s1 (Get_orig.stmt bhv s2)) ->
-          alteredCFG withGhostStart
-        | [ { skind = If(_) } as s1 ], s2 ->
-          checkIf bhv ~visited s1 s2
-        | [ { skind = Switch(_) } as s1 ], s2 ->
-          checkSwitch bhv ~visited s1 s2
-        | [ { skind = Loop(_) } as s1 ], s2 ->
-          checkLoop bhv ~visited s1 s2
-        | [ { succs = [next_s1] } ], { succs = [next_s2] } ->
-          checkGhostCFG bhv ~visited next_s1 next_s2
-        | [ { succs = [] } ], { succs = [] } -> ()
-        | _, _  ->
-          alteredCFG withGhostStart
+let checkGhostCFG bhv withGhostStart noGhost =
+  let rec do_check visited withGhostStart noGhostStart =
+    match (nextSync withGhostStart), (nextSync noGhostStart) with
+    | Stmt withGhost, Stmt _ when StmtSet.mem withGhost visited -> visited
+    | Stmt withGhost, Stmt noGhost ->
+      let visited = StmtSet.add withGhost visited in
+      let withGhost =
+        StmtSet.contains_single_elt (nextNonGhostSync withGhost)
+      in
+      begin match withGhost, noGhost with
+        | Some s1, s2 when not (Stmt.equal s1 (Get_orig.stmt bhv s2)) ->
+          alteredCFG withGhostStart ; visited
+
+        | Some ({ skind = If(_) } as withGhost), noGhost ->
+          let wgThen, wgElse = Cil.separate_if_succs withGhost in
+          let ngThen, ngElse = Cil.separate_if_succs noGhost in
+          let visited = do_check visited wgThen ngThen in
+          do_check visited wgElse ngElse
+
+        | Some ({ skind = Switch(_) } as withGhost), noGhost ->
+          let ngSuccs, ngDef = Cil.separate_switch_succs noGhost in
+          let wgAllSuccs, wgDef = Cil.separate_switch_succs withGhost in
+          let wgSuccsG, wgSuccsNG =
+            List.partition (fun s -> s.ghost) wgAllSuccs
+          in
+          let mustDefault = wgDef :: wgSuccsG in
+          assert(List.length ngSuccs = List.length wgSuccsNG) ;
+          let visited = List.fold_left2 do_check visited wgSuccsNG ngSuccs in
+          List.fold_left (fun v s -> do_check v s ngDef) visited mustDefault
+
+        | Some ({ skind=Loop(_,wgb,_,_,_) }), { skind=Loop (_, ngb,_,_,_) } ->
+          begin match wgb.bstmts, ngb.bstmts with
+            | s1 :: _ , s2 :: _ -> do_check visited s1 s2
+            | _, _ -> visited
+          end
+
+        | Some { succs = [wg] }, { succs = [ng] } -> do_check visited wg ng
+        | Some { succs = [] }, { succs = [] } -> visited
+        | _, _  -> alteredCFG withGhostStart ; visited
       end
-    end ;
-  | Exit, Exit | Infinite, Infinite -> ()
-  | _ , _ -> alteredCFG withGhostStart
-and checkIf bhv ~visited withGhost noGhost =
-  let withGhostThen, withGhostElse = Cil.separate_if_succs withGhost in
-  let noGhostThen  , noGhostElse   = Cil.separate_if_succs noGhost in
-  checkGhostCFG bhv ~visited withGhostThen noGhostThen ;
-  checkGhostCFG bhv ~visited withGhostElse noGhostElse
-and checkLoop bhv ~visited withGhost noGhost =
-  let withGhostBlock, noGhostBlock = match withGhost.skind, noGhost.skind with
-    | Loop(_, b1, _, _, _), Loop(_, b2, _, _, _) -> b1, b2
-    | _ -> assert false
+    | Exit, Exit | Infinite, Infinite -> visited
+    | _ , _ -> alteredCFG withGhostStart ; visited
   in
-  match withGhostBlock.bstmts, noGhostBlock.bstmts with
-  | s1 :: _ , s2 :: _ -> checkGhostCFG bhv ~visited s1 s2
-  | _, _ -> ()
-and checkSwitch bhv ~visited withGhost noGhost =
-  let noGhostSuccs, noGhostDef = Cil.separate_switch_succs noGhost in
-  let withGhostAllSuccs, withGhostDef = Cil.separate_switch_succs withGhost in
-  let withGhostSuccsGhost, withGhostSuccsNonGhost =
-    List.partition (fun s -> s.ghost) withGhostAllSuccs
-  in
-  let mustDefault = withGhostDef :: withGhostSuccsGhost in
-  assert(List.length noGhostSuccs = List.length withGhostSuccsNonGhost) ;
-  List.iter2 (checkGhostCFG bhv ~visited) withGhostSuccsNonGhost noGhostSuccs ;
-  List.iter (fun s -> checkGhostCFG bhv ~visited s noGhostDef) mustDefault
+  ignore (do_check StmtSet.empty withGhostStart noGhost)
 
 let checkGhostCFGInFun (fd : fundec) =
   if fd.svar.vghost then ()
@@ -155,7 +154,9 @@ let checkGhostCFGInFun (fd : fundec) =
   end
 
 let checkGhostCFGInFile (f : file) =
-  Cil.iterGlobals f (function GFun(fd,_) -> checkGhostCFGInFun fd | _ -> ())
+  Cil.iterGlobals f (function
+      | GFun (fd, _) -> checkGhostCFGInFun fd
+      | _ -> ())
 
 let transform_category =
   File.register_code_transformation_category "Ghost CFG checking"
