@@ -740,10 +740,8 @@ class error_manager ?reset (o_parent:GWindow.window_skel) : host =
           ~modal:true
           ()
       in
-      w#show ();
-      w#present ();
+      ignore (w#connect#response (fun _ -> w#destroy ()));
       ignore (w#run ());
-      w#destroy ();
       if reset then f_reset ()
 
     method error ?parent ?(reset=false) fmt =
