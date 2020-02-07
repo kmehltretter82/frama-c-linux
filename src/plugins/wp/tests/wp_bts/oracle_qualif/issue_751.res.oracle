@@ -7,11 +7,11 @@
 [wp] [Alt-Ergo 2.0.0] Goal typed_acquire_loop_invariant_RANGE_preserved : Valid
 [wp] [Qed] Goal typed_acquire_loop_invariant_RANGE_established : Valid
 [wp] [Qed] Goal typed_acquire_loop_assigns_part1 : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_acquire_loop_assigns_part2 : Unsuccess
-[wp] Proved goals:    3 / 4
+[wp] [Alt-Ergo 2.0.0] Goal typed_acquire_loop_assigns_part2 : Valid
+[wp] Proved goals:    4 / 4
   Qed:               2 
-  Alt-Ergo 2.0.0:    1  (unsuccess: 1)
+  Alt-Ergo 2.0.0:    2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  acquire                   2        1        4      75.0%
+  acquire                   2        2        4       100%
 ------------------------------------------------------------
