@@ -1327,7 +1327,7 @@ struct
   and i_affine_ratio_leq c xs ys =
     try match i_ratio xs , i_ratio ys with
       | POS(a,k) , NONE ->
-        (* c + a/k <= ys <==>  a/k <= -c+ys *)
+          (* c + a/k <= ys <==>  a/k <= -c+ys *)
           i_ratio_max a k (Z.neg c,ys)
       | NEG(a,k) , NONE ->
           (* c - a/k <= ys <==> c-ys <= a/k  *)
