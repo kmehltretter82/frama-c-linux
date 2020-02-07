@@ -752,11 +752,6 @@ let smp_eq_with_lsr a0 b0 =
     let m = F.e_zint (Integer.lognot (two_power_k_minus1 n)) in
     e_eq (e_fun f_land [a;m]) (e_fun f_land [b;m])
 
-let is_kpos e = match F.repr e with Kint k -> Z.(lt zero k) | _ -> false
-let is_kneg e = match F.repr e with Kint k -> Z.(lt k zero) | _ -> false
-let is_kpos0 e = match F.repr e with Kint k -> Z.(leq zero k) | _ -> false
-let is_kneg0 e = match F.repr e with Kint k -> Z.(leq k zero) | _ -> false
-
 let smp_leq_with_lsr x y =
   try
     let a,p = match_fun f_lsr y |> match_positive_or_null_integer_arg2 in
@@ -765,18 +760,8 @@ let smp_leq_with_lsr x y =
       (* 0 <= ( a >> p ) <==> 0 <= a *)
       e_leq e_zero a
     else
-      let b = x in
       let k = Integer.two_power p in
-      (* x <= y <==> b <= a/k *)
-      if is_kpos0 a || is_kpos b then
-        (* [pos_min] (0 <= a || 0 < b) -> ( b <= a/k <-> b*k <= a ) *)
-        e_leq (e_times k b) a
-      else
-      if is_kneg0 a || is_kneg0 b then
-        (* [neg_min] (a <= 0 || b <= 0) -> ( b <= a/k <-> b*k - k < a ) *)
-        e_lt (e_sub (e_times k b) (e_zint k)) a
-      else
-        e_leq b (e_div a (e_zint k))
+      e_leq x (e_div a (e_zint k))
   with Not_found ->
     let a,p = match_fun f_lsr x |> match_positive_or_null_integer_arg2 in
     (* (a >> p) <= y *)
@@ -784,18 +769,8 @@ let smp_leq_with_lsr x y =
       (* (a >> p) <= 0 <==> a <= 0 *)
       e_leq a e_zero
     else
-      let b = y in
       let k = Integer.two_power p in
-      (* x <= y <==> a/k <= b *)
-      if is_kpos0 a || is_kpos0 b then
-        (* [pos_max] (0 <= a || 0 <= b) -> ( a/k <= b <-> a < b*k + k ) *)
-        e_lt a (e_add (e_times k b) (e_zint k))
-      else
-      if is_kneg0 a || is_kneg b then
-        (* [neg_max] (a <= 0 || b < 0) -> ( a/k <= b <-> a <= b*k ) *)
-        e_leq a (e_times k b)
-      else
-        e_leq (e_div a (e_zint k)) b
+      e_leq (e_div a (e_zint k)) y
 
 (* Rewritting at export *)
 let bitk_export k e = F.e_fun ~result:Logic.Bool f_bit_export [e;k]
