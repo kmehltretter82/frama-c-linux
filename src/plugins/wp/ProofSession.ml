@@ -29,8 +29,8 @@ type status =
 
 let files : (string,status) Hashtbl.t = Hashtbl.create 32
 
-let filename wpo =
-  let d = Wp_parameters.get_session_dir ~force:false "script" in
+let filename ~force wpo =
+  let d = Wp_parameters.get_session_dir ~force "script" in
   Printf.sprintf "%s/%s.json" d wpo.po_gid
 
 let legacies wpo =
@@ -42,7 +42,7 @@ let legacies wpo =
   ]
 
 let status wpo =
-  let f = filename wpo in
+  let f = filename ~force:false wpo in
   try Hashtbl.find files f
   with Not_found ->
     let status =
@@ -86,7 +86,7 @@ let remove wpo =
         Wp_parameters.feedback
           "Removed deprecated script for '%s'" wpo.po_sid ;
         Extlib.safe_remove f0 ;
-        Hashtbl.replace files (filename wpo) NoScript ;
+        Hashtbl.replace files (filename ~force:true wpo) NoScript ;
       end
 
 let save wpo js =
@@ -99,7 +99,7 @@ let save wpo js =
     | Script f -> Json.save_file f js
     | NoScript ->
         begin
-          let f = filename wpo in
+          let f = filename ~force:true wpo in
           Json.save_file f js ;
           Hashtbl.replace files f (Script f) ;
         end
@@ -108,7 +108,7 @@ let save wpo js =
           Wp_parameters.feedback
             "Upgraded script for '%s'" wpo.po_sid ;
           Extlib.safe_remove f0 ;
-          let f = filename wpo in
+          let f = filename ~force:true wpo in
           Json.save_file f js ;
           Hashtbl.replace files f (Script f) ;
         end
