@@ -1,0 +1,57 @@
+# frama-c -wp [...]
+[kernel] Parsing tests/wp_bts/issue_751.i (no preprocessing)
+[wp] Running WP plugin...
+[wp] Loading driver 'share/wp.driver'
+[wp] Warning: Missing RTE guards
+------------------------------------------------------------
+  Function acquire
+------------------------------------------------------------
+
+Goal Preservation of Invariant 'RANGE' (file tests/wp_bts/issue_751.i, line 7):
+Let x = land(3840, R).
+Let x_1 = lsr(x, 8).
+Assume {
+  Type: is_sint32(R) /\ is_sint32(j) /\ is_sint32(1 + j) /\ is_sint32(x_1).
+  (* Heap *)
+  Have: (region(Data_0.base) <= 0) /\ linked(Malloc_0).
+  (* Pre-condition *)
+  Have: (0 < x) /\ (2048 <= x).
+  (* Invariant 'RANGE' *)
+  Have: (0 <= j) /\ (j <= x_1).
+  (* Then *)
+  Have: j < x_1.
+}
+Prove: (-1) <= j.
+
+------------------------------------------------------------
+
+Goal Establishment of Invariant 'RANGE' (file tests/wp_bts/issue_751.i, line 7):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Loop assigns (file tests/wp_bts/issue_751.i, line 8) (1/2):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Loop assigns (file tests/wp_bts/issue_751.i, line 8) (2/2):
+Effect at line 11
+Let x = land(3840, R).
+Let x_1 = lsr(x, 8).
+Assume {
+  Type: is_sint32(R) /\ is_sint32(j) /\ is_sint32(x_1).
+  (* Goal *)
+  When: !invalid(Malloc_0, shift_sint32(Data_0, j), 1).
+  (* Heap *)
+  Have: (region(Data_0.base) <= 0) /\ linked(Malloc_0).
+  (* Pre-condition *)
+  Have: (0 < x) /\ (2048 <= x).
+  (* Invariant 'RANGE' *)
+  Have: (0 <= j) /\ (j <= x_1).
+  (* Then *)
+  Have: j < x_1.
+}
+Prove: j <= 7.
+
+------------------------------------------------------------
