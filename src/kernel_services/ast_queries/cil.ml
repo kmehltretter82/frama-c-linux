@@ -4497,12 +4497,15 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
         match e.enode with
         | Const(CChr c) -> new_exp ~loc (Const(charConstToIntConstant c))
         | Const(CEnum {eival = v}) -> mkInt v
-        | CastE(TInt (ik, ta), e) -> begin
-            let exp = mkInt e in
-            match exp.enode with
-              Const(CInt64(i, _, _)) ->
-              kinteger64 ~loc ~kind:ik i
-            | _ -> {exp with enode = CastE(TInt(ik, ta), exp)}
+        | CastE(typ, e') -> begin
+            match unrollType typ with
+            | TInt (ik, ta) -> begin
+                let e = mkInt e' in
+                match e.enode with
+                | Const(CInt64(i, _, _)) -> kinteger64 ~loc ~kind:ik i
+                | _ -> {e with enode = CastE(TInt(ik, ta), e)}
+              end
+            | _ -> e
           end
         | _ -> e
       in
