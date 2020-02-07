@@ -42,7 +42,7 @@ val wrap_float: V.t -> V_Offsetmap.t option
 val wrap_long_long: V.t -> V_Offsetmap.t option
 
 val backward_comp_left_from_type:
-  Cil_types.typ ->
+  logic_type ->
   (bool -> Abstract_interp.Comp.t -> Cvalue.V.t -> Cvalue.V.t -> Cvalue.V.t)
 (** Reduction of a {!Cvalue.V.t} by [==], [!=], [>=], [>], [<=] and [<].
     [backward_comp_left_from_type positive op l r] reduces [l]

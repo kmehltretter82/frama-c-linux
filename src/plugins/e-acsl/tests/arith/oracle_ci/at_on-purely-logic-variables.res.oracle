@@ -59,8 +59,6 @@
   function __e_acsl_assert: precondition got status unknown.
 [eva:alarm] tests/arith/at_on-purely-logic-variables.c:7: Warning: 
   function __e_acsl_assert: precondition got status unknown.
-[eva:alarm] tests/arith/at_on-purely-logic-variables.c:6: Warning: 
-  function __gen_e_acsl_f: postcondition got status unknown.
 [eva:alarm] tests/arith/at_on-purely-logic-variables.c:8: Warning: 
   function __gen_e_acsl_f: postcondition got status unknown.
 [eva:alarm] tests/arith/at_on-purely-logic-variables.c:16: Warning: 

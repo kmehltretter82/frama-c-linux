@@ -71,11 +71,15 @@ let backward_comp_float_left fkind positive comp l r =
     else V.backward_comp_float_left_false in
   back comp fkind l r
 
-let backward_comp_left_from_type t =
-  match Cil.unrollType t with
-  | TInt _ | TEnum _ | TPtr _ -> backward_comp_int_left
-  | TFloat (fk, _) ->
-    backward_comp_float_left (Fval.kind fk)
+let backward_comp_left_from_type = function
+  | Ctype typ -> begin
+      match Cil.unrollType typ with
+      | TInt _ | TEnum _ | TPtr _ -> backward_comp_int_left
+      | TFloat (fk, _) -> backward_comp_float_left (Fval.kind fk)
+      | _ -> (fun _ _ v _ -> v) (* should never occur anyway *)
+    end
+  | Linteger -> backward_comp_int_left
+  | Lreal -> backward_comp_float_left (Fval.Real)
   | _ -> (fun _ _ v _ -> v) (* should never occur anyway *)
 
 exception Unchanged

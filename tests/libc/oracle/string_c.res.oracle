@@ -769,8 +769,9 @@
   function memchr, behavior found: postcondition 'result_same_base' got status valid. (Behavior may be inactive, no reduction performed.)
 [eva] share/libc/string.h:80: 
   function memchr, behavior found: postcondition 'result_char' got status valid. (Behavior may be inactive, no reduction performed.)
-[eva:alarm] share/libc/string.h:81: Warning: 
-  function memchr, behavior found: postcondition 'result_in_str' got status unknown. (Behavior may be inactive, no reduction performed.)
+[kernel] share/libc/string.c:248: Warning: using size of 'void'
+[eva] share/libc/string.h:81: 
+  function memchr, behavior found: postcondition 'result_in_str' got status valid. (Behavior may be inactive, no reduction performed.)
 [eva:alarm] share/libc/string.h:86: Warning: 
   function memchr, behavior not_found: postcondition 'result_null' got status invalid. (Behavior may be inactive, no reduction performed.)
 [eva] Recording results for memchr
@@ -801,6 +802,8 @@
   function memchr: precondition 'initialization' got status valid.
 [eva] tests/libc/string_c.c:231: 
   function memchr: precondition 'danglingness' got status valid.
+[eva:alarm] share/libc/string.h:81: Warning: 
+  function memchr, behavior found: postcondition 'result_in_str' got status unknown. (Behavior may be inactive, no reduction performed.)
 [eva] Recording results for memchr
 [eva] Done for function memchr
 [eva] tests/libc/string_c.c:232: assertion got status valid.
