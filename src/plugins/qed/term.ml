@@ -1411,12 +1411,14 @@ struct
         let t = c_mul ts in
         if Z.equal s Z.one then t else c_times s t
 
-  (* --- Divisions --- *)
-
   let e_times k x =
-    if Z.equal k Z.zero then e_zero else
     if Z.equal k Z.one then x else
-      times k x
+    if Z.equal k Z.zero then e_zero else
+      let kts = unfold_affine1 [] k x in
+      let kts = List.sort compare_monoms kts in
+      c_add (fold_affine fold_monom [] kts)
+
+  (* --- Divisions --- *)
 
   let e_div a b =
     match a.repr , b.repr with
