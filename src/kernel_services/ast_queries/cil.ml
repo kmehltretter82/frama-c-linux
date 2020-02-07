@@ -4535,7 +4535,7 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
       match bop, e1''.enode, e2''.enode with
       | PlusA, Const(CInt64(z,_,_)), _
         when Integer.equal z Integer.zero -> e2''
-      | PlusA, _, Const(CInt64(z,_,_))
+      | (PlusA | MinusA), _, Const(CInt64(z,_,_))
         when Integer.equal z Integer.zero -> e1''
       | PlusPI, _, Const(CInt64(z,_,_))
         when Integer.equal z Integer.zero -> e1''
