@@ -133,6 +133,8 @@ let find_or_alarm ~alarm_mode state loc =
   track_alarms is_indeterminate alarm_mode;
   V_Or_Uninitialized.get_v v
 
+(* Returns true if [loc] contains a memory location definitely invalid
+   for a memory access of kind [access]. *)
 let contains_invalid_loc access loc =
   let valid_loc = Locations.valid_part access loc in
   not (Locations.Location.equal loc valid_loc)
