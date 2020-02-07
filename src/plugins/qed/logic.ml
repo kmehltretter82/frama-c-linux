@@ -163,7 +163,7 @@ type ('f,'a,'d,'x,'b,'e) term_repr =
   | Apply of 'e * 'e list (** High-Order application (Cf. binder) *)
   | Bind  of binder * ('f,'a) datatype * 'b
 
-type 'a affine = { constant : Z.t ; factors : (Z.t * 'a) list }
+type 'a affine = Z.t * (Z.t * 'a) list
 
 (** {2 Formulae} *)
 module type Term =

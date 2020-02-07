@@ -1340,15 +1340,23 @@ struct
         end
     | [] -> a
 
-  let affine a =
+  let affine a : term Logic.affine =
     let kts = unfold_affine1 [] Z.one a in
-    let fact,const = List.partition (fun (_,base) -> base.id = e_one.id) kts in
-    let base = List.fold_left (fun z (k,_) -> Z.add z k) Z.zero const in
-    { constant = base ; factors = fact }
+    let xs,cs = List.partition (fun (_,base) -> base.id = e_one.id) kts in
+    List.fold_left (fun z (k,_) -> Z.add z k) Z.zero cs , xs
+
+  (* --- Additions --- *)
 
   (* ts normalized *)
   let addition ts =
     let kts = unfold_affine [] Z.one ts in
+    let kts = List.sort compare_monoms kts in
+    c_add (fold_affine fold_monom [] kts)
+
+  (* a and b normalized *)
+  let substraction a b =
+    let kts = unfold_affine1 [] Z.one a in
+    let kts = unfold_affine1 kts Z.minus_one b in
     let kts = List.sort compare_monoms kts in
     c_add (fold_affine fold_monom [] kts)
 
@@ -1989,9 +1997,9 @@ struct
   let e_equiv = e_eq
   let e_sum = addition
   let e_prod = multiplication
-  let e_opp x = times Z.minus_one x
+  let e_opp x = e_times Z.minus_one x
   let e_add x y = addition [x;y]
-  let e_sub x y = addition [x;e_opp y]
+  let e_sub x y = substraction x y
   let e_mul x y = multiplication [x;y]
 
   (* -------------------------------------------------------------------------- *)
