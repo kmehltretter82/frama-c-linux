@@ -1173,7 +1173,17 @@ struct
   let () = extern_fun := e_fungen
 
   (* -------------------------------------------------------------------------- *)
-  (* --- Ground & Arithmetics                                               --- *)
+  (* --- Sign                                                               --- *)
+  (* -------------------------------------------------------------------------- *)
+
+  type sign = Null | Negative | Positive
+  let sign z =
+    if Z.lt z Z.zero then Negative else
+    if Z.lt Z.zero z then Positive else
+      Null
+
+  (* -------------------------------------------------------------------------- *)
+  (* --- Ground Arithmetics                                                 --- *)
   (* -------------------------------------------------------------------------- *)
 
   let rec i_ground f c xs = function
@@ -1187,11 +1197,9 @@ struct
     | x::ts -> r_ground f c (x::xs) ts
     | [] -> c , xs
 
-  type sign = Null | Negative | Positive
-  let sign z =
-    if Z.lt z Z.zero then Negative else
-    if Z.lt Z.zero z then Positive else
-      Null
+  (* -------------------------------------------------------------------------- *)
+  (* --- Affine Comparisons                                                 --- *)
+  (* -------------------------------------------------------------------------- *)
 
   let r_affine_rel fz fe c xs ys =
     let a , xs = r_ground Q.add (Q.of_bigint c) [] xs in
@@ -1221,6 +1229,35 @@ struct
         (* c+xs R ys <-> (c+xs) R ys *)
         | Positive -> fe (c_add (e_zint c :: xs)) (c_add ys)
 
+  let i_affine_leq c xs ys =
+    if Z.equal c Z.one
+    then i_affine_rel Z.lt c_builtin_lt Z.zero xs ys
+    else i_affine_rel Z.leq c_builtin_leq c xs ys
+
+  let i_affine_lt c xs ys =
+    if not (Z.equal c Z.zero)
+    then i_affine_rel Z.leq c_builtin_leq (Z.succ c) xs ys
+    else i_affine_rel Z.lt c_builtin_lt c xs ys
+
+  (* --- Affine Ratios --- *)
+
+  (*
+  let i_ratio = function
+    | [] -> ZERO
+    | [{ repr=Div(a,b) }] ->
+        begin match b.repr with
+          | Kint k when not Z.(equal k zero) -> DIV(a,k)
+          | _ -> ANY
+        end
+    | _ -> ANY
+  *)
+
+  let i_affine_ratio_leq c xs ys = i_affine_leq c xs ys
+
+  let i_affine_ratio_lt c xs ys = i_affine_lt c xs ys
+
+  (* --- Affine Dispatch --- *)
+
   let i_affine xs ys =
     not (List.exists is_real xs || List.exists is_real ys)
 
@@ -1235,17 +1272,13 @@ struct
     else r_affine_rel (fun x y -> not (Q.equal x y)) c_builtin_neq c xs ys
 
   let affine_leq c xs ys =
-    if i_affine xs ys then
-      if Z.equal c Z.one
-      then i_affine_rel Z.lt c_builtin_lt Z.zero xs ys
-      else i_affine_rel Z.leq c_builtin_leq c xs ys
+    if i_affine xs ys
+    then i_affine_ratio_leq c xs ys
     else r_affine_rel Q.leq c_builtin_leq c xs ys
 
   let affine_lt c xs ys =
-    if i_affine xs ys then
-      if not (Z.equal c Z.zero)
-      then i_affine_rel Z.leq c_builtin_leq (Z.succ c) xs ys
-      else i_affine_rel Z.lt c_builtin_lt c xs ys
+    if i_affine xs ys
+    then i_affine_ratio_lt c xs ys
     else r_affine_rel Q.lt c_builtin_lt c xs ys
 
   let affine_cmp = function
