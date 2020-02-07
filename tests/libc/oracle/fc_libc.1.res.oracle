@@ -3950,8 +3950,8 @@ int getaddrinfo(char const * __restrict nodename,
 struct hostent *gethostbyname(char const *name);
 
 /*@
-predicate non_escaping{L}(void *s, size_t n) =
-  ∀ unsigned int i; 0 ≤ i < n ⇒ ¬\dangling((char *)s + i);
+predicate non_escaping{L}(void *s, ℤ n) =
+  ∀ ℤ i; 0 ≤ i < n ⇒ ¬\dangling((char *)s + i);
  */
 /*@
 predicate empty_block{L}(void *s) =
@@ -6014,7 +6014,7 @@ char *strrchr(char const *s, int c)
           ∀ ℤ i;
             0 ≤ i < \old(n) ⇒
             *((unsigned char *)\old(s) + i) ≡ \old(c) ⇒
-            \result ≤ \old(s) + i;
+            (unsigned char *)\result ≤ (unsigned char *)\old(s) + i;
     
     behavior not_found:
       assumes char_not_found: ¬(memchr((char *)s, c, n) ≡ \true);
