@@ -1,0 +1,22 @@
+( library
+  (name metrics)
+  (public_name frama-c-metrics.core)
+  (modules metrics_parameters css_html metrics_base metrics_acsl
+    metrics_cabs metrics_cilast metrics_coverage
+    register)
+  (flags -open Frama_c_kernel)
+  (libraries frama-c.kernel frama-c-eva.core)
+)
+
+(plugin (name frama-c-plugins-metrics) (libraries frama-c-metrics.core) (site (frama-c plugins)))
+
+( library
+  (name metrics_gui)
+  (public_name frama-c-metrics.gui)
+  (optional)
+  (modules metrics_gui_panels register_gui)
+  (flags -open Frama_c_kernel -open Frama_c_gui -open Metrics)
+  (libraries metrics frama-c.kernel frama-c.gui)
+)
+
+(plugin (name frama-c-plugins-metrics) (libraries frama-c-metrics.gui) (site (frama-c plugins_gui)))

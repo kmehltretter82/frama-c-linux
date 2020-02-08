@@ -198,8 +198,10 @@ let do_cmp = ref (if Sys.os_type="Win32" then !do_diffs
 let do_make = ref "make"
 let n = ref 4    (* the level of parallelism *)
 let suites = ref []
+
 (** options appended to toplevel for all tests *)
 let additional_options = ref ""
+
 (** options prepended to toplevel for all tests *)
 let additional_options_pre = ref ""
 
@@ -474,7 +476,7 @@ end = struct
 
   let create_if_absent dir =
     if not (Sys.file_exists dir)
-    then Unix.mkdir dir 0o750 (** rwxr-w--- *)
+    then Unix.mkdir dir 0o750 (* rwxr-w--- *)
     else if not (Sys.is_directory dir)
     then fail (Printf.sprintf "the file %s exists but is not a directory" dir)
 
@@ -771,7 +773,7 @@ let config_options =
     (fun _ s current ->
        let new_top =
          List.map
-           (fun (cmd,opts, log, macros,_) ->
+           (fun (cmd,opts, log, _,_) ->
               cmd, make_custom_opts opts s, log,
               current.dc_macros, current.dc_timeout)
            !current_default_cmds
@@ -793,7 +795,7 @@ let config_options =
     (fun _ _ acc -> acc);
 
     "DONTRUN",
-    (fun _ s current -> { current with dc_dont_run = true });
+    (fun _ _ current -> { current with dc_dont_run = true });
 
     "EXECNOW", config_exec ~once:true;
     "EXEC", config_exec ~once:false;
@@ -914,11 +916,11 @@ type log = Err | Res
 type diff =
   | Command_error of toplevel_command * log
   | Target_error of execnow
-  | Log_error of SubDir.t (** directory *) * string (** file *)
+  | Log_error of SubDir.t (* directory *) * string (* file *)
 
 type cmps =
   | Cmp_Toplevel of toplevel_command
-  | Cmp_Log of SubDir.t (** directory *) * string (** file *)
+  | Cmp_Log of SubDir.t (* directory *) * string (* file *)
 
 type shared =
   { lock : Mutex.t ;
@@ -1186,13 +1188,12 @@ let remove_execnow_results execnow =
 
 module Make_Report(M:sig type t end)=struct
   module H=Hashtbl.Make
-      (struct
-        type t = toplevel_command
-        let project cmd = (cmd.directory,cmd.file,cmd.n)
-        let compare c1 c2 = compare (project c1) (project c2)
-        let equal c1 c2 =  (project c1)=(project c2)
-        let hash c = Hashtbl.hash (project c)
-      end)
+    (struct
+      type t = toplevel_command
+      let project cmd = (cmd.directory,cmd.file,cmd.n)
+      let equal c1 c2 =  (project c1)=(project c2)
+      let hash c = Hashtbl.hash (project c)
+     end)
   let tbl = H.create 774
   let m = Mutex.create ()
   let record cmd (v:M.t) =

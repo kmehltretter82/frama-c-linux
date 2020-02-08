@@ -61,9 +61,15 @@ sig
       method virtual field : Field.t -> string
       method virtual link : Fun.t -> link
 
-      method env : Env.t (** A safe copy of the environment *)
-      method set_env : Env.t -> unit (** Set the environment *)
-      method marks : Env.t * T.marks (** The current environment with empty marks *)
+      method env : Env.t
+      (** A safe copy of the environment *)
+
+      method set_env : Env.t -> unit
+      (** Set the environment *)
+
+      method marks : Env.t * T.marks
+      (** The current environment with empty marks *)
+
       method lookup : term -> scope
       method set_env : Env.t -> unit
       method scope : Env.t -> (unit -> unit) -> unit

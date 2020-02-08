@@ -1,0 +1,21 @@
+( library
+  (name studia)
+  (public_name frama-c-studia.core)
+  (modules options writes reads)
+  (flags -open Frama_c_kernel)
+  (libraries frama-c.kernel)
+)
+
+(plugin (name frama-c-plugins-studia) (libraries frama-c-studia.core) (site (frama-c plugins)))
+
+
+( library
+  (name studia_gui)
+  (public_name frama-c-studia.gui)
+  (optional)
+  (modules studia_gui)
+  (flags -open Frama_c_kernel -open Frama_c_gui -open Studia)
+  (libraries studia frama-c.kernel frama-c.gui)
+)
+
+(plugin (name frama-c-plugins-studia) (libraries frama-c-studia.gui) (site (frama-c plugins_gui)))

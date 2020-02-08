@@ -1,0 +1,7 @@
+( library
+  (name from_gui)
+  (public_name frama-c-from.gui)
+  (optional)
+  (flags -open Frama_c_kernel -open Frama_c_gui)
+  (libraries frama-c.kernel frama-c.gui frama-c-from.core)
+)

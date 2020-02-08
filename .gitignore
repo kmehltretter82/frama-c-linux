@@ -213,6 +213,12 @@ Makefile.plugin.generated
 /doc/developer/hello.tar.gz
 hello-*.tar.gz
 
+# Dune conversion
+.merlin
+_build
+*.install
+/config.sed
+
 #######################
 # should remain empty #
 #######################

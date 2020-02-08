@@ -24,6 +24,10 @@ open Eval
 open Cil_types
 
 (* The numerors values, plus some builtin functions. *)
+let value_key = Numerors_value.error_key
+
+let ok = true
+
 module Numerors_Value = struct
   include Numerors_value
 

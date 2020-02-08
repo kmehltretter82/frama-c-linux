@@ -35,7 +35,6 @@ let no_memoization_enabled () =
   not (Value_parameters.NoResultsFunctions.is_empty ())
 
 
-
 (*
 Local Variables:
 compile-command: "make -C ../../../.."

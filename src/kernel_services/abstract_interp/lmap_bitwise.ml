@@ -37,7 +37,7 @@ module type Location_map_bitwise = sig
   include Lattice_type.With_Top with type t := t
 
   module LOffset :
-    module type of Offsetmap_bitwise_sig
+    Offsetmap_bitwise_sig.S
       with type v = v
       and type intervals = Int_Intervals.t
 

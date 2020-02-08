@@ -1,0 +1,7 @@
+( library
+  (name impact_gui)
+  (public_name frama-c-impact.gui)
+  (optional)
+  (flags -open Frama_c_kernel -open Frama_c_gui -open Impact)
+  (libraries frama-c.kernel frama-c.gui frama-c-impact.core frama-c-slicing.core frama-c-callgraph.core)
+)

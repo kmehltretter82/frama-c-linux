@@ -1,0 +1,8 @@
+( library
+  (name variadic)
+  (public_name frama-c-variadic.core)
+  (flags -open Frama_c_kernel)
+  (libraries frama-c.kernel)
+)
+
+(plugin (name frama-c-plugins-variadic) (libraries frama-c-variadic.core) (site (frama-c plugins)))

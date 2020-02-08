@@ -1,0 +1,11 @@
+( library
+  (name aorai)
+  (public_name frama-c-aorai.core)
+  (flags -open Frama_c_kernel)
+  (libraries frama-c.kernel)
+)
+
+(ocamllex promelalexer_withexps promelalexer ltllexer yalexer)
+(ocamlyacc promelaparser_withexps promelaparser ltlparser yaparser)
+
+(plugin (name frama-c-plugins-aorai) (libraries frama-c-aorai.core) (site (frama-c plugins)))

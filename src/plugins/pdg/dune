@@ -1,0 +1,8 @@
+( library
+  (name pdg)
+  (public_name frama-c-pdg.core)
+  (flags -open Frama_c_kernel)
+  (libraries frama-c.kernel frama-c-callgraph.core frama-c-from.core frama-c-eva.core)
+)
+
+(plugin (name frama-c-plugins-pdg) (libraries frama-c-pdg.core) (site (frama-c plugins)))

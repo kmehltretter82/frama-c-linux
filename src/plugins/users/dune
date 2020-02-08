@@ -1,0 +1,8 @@
+(library
+  (name Users)
+  (public_name frama-c-users.core)
+  (flags -open Frama_c_kernel)
+  (libraries frama-c.kernel frama-c-callgraph.core)
+)
+
+(plugin (name frama-c-plugins-users) (libraries frama-c-users.core) (site (frama-c plugins)))

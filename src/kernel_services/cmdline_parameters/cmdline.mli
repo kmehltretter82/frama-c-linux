@@ -227,7 +227,7 @@ val nb_given_options: unit -> int
       Should not be called before the end of the command line parsing.
       @since Beryllium-20090601-beta1 *)
 
-val use_cmdline_files: (Datatype.Filepath.t list -> unit) -> unit
+val use_cmdline_files: (Filepath.Normalized.t list -> unit) -> unit
   (** What to do with the list of files put on the command lines.
       @since Beryllium-20090601-beta1 *)
 

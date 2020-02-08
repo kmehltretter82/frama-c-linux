@@ -71,7 +71,7 @@ module Kernel_log =
 let dkey = Kernel_log.register_category "cmdline"
 
 let quiet_ref = ref false
-let journal_enable_ref = ref !Fc_config.is_gui
+let journal_enable_ref = ref Fc_config.is_gui
 let journal_isset_ref = ref false
 let use_obj_ref = ref true
 let use_type_ref = ref true
@@ -87,7 +87,7 @@ let long_plugin_name s =
   if s = Log.kernel_label_name then "Frama-C" else "Plug-in " ^ s
 
 let additional_info () =
-  if !Fc_config.is_gui then
+  if Fc_config.is_gui then
     "\nReverting to previous state.\n\
      Check the Console tab for additional information."
   else

@@ -1,0 +1,8 @@
+( library
+  (name inout)
+  (public_name frama-c-inout.core)
+  (flags -open Frama_c_kernel)
+  (libraries frama-c.kernel frama-c-callgraph.core frama-c-eva.core frama-c-from.core)
+)
+
+(plugin (name frama-c-plugins-inout) (libraries frama-c-inout.core) (site (frama-c plugins)))

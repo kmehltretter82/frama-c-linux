@@ -49,7 +49,7 @@ module V : sig
     and type numerical_widen_hint = Location_Bytes.numerical_widen_hint
     and type size_widen_hint = Location_Bytes.size_widen_hint
 
-  include module type of Offsetmap_lattice_with_isotropy
+  include Offsetmap_lattice_with_isotropy.S
       with type t := t
       and type numerical_widen_hint := numerical_widen_hint
       and type size_widen_hint := size_widen_hint
@@ -172,7 +172,7 @@ module V_Or_Uninitialized : sig
     | C_init_esc of V.t
     | C_init_noesc of V.t
 
-  include module type of Offsetmap_lattice_with_isotropy
+  include Offsetmap_lattice_with_isotropy.S
     with type t := t
     and  type size_widen_hint = Location_Bytes.size_widen_hint
     and  type numerical_widen_hint = Location_Bytes.numerical_widen_hint
@@ -235,7 +235,7 @@ module V_Or_Uninitialized : sig
 (** Memory slices. They are maps from intervals to values with
     flags. All sizes and intervals are in bits. *)
 module V_Offsetmap: sig
-  include module type of Offsetmap_sig
+  include Offsetmap_sig.S
   with type v = V_Or_Uninitialized.t
   and type widen_hint = V_Or_Uninitialized.numerical_widen_hint
 
@@ -254,7 +254,7 @@ end
 module Model: sig
 
   (** Functions inherited from [Lmap_sig] interface *)
-  include module type of Lmap_sig
+  include Lmap_sig.S
     with type v = V_Or_Uninitialized.t
     and type offsetmap = V_Offsetmap.t
     and type widen_hint_base = V_Or_Uninitialized.numerical_widen_hint

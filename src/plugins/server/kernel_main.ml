@@ -40,21 +40,18 @@ let () =
   let signature = Request.signature ~input:(module Junit) () in
   let result name descr =
     Request.result signature ~name ~descr:(Md.plain descr) (module Jstring) in
+  let result_list name descr =
+    Request.result signature ~name ~descr:(Md.plain descr) (module Jlist (Jstring)) in
   let set_version = result "version" "Frama-C version" in
-  let set_datadir = result "datadir" "Shared directory (FRAMAC_SHARE)" in
-  let set_libdir = result "libdir" "Lib directory (FRAMAC_LIB)" in
-  let set_pluginpath = Request.result signature
-      ~name:"pluginpath"
-      ~descr:(Md.plain "Plugin directories (FRAMAC_PLUGIN)")
-      (module Jlist(Jstring)) in
+  let set_datadir = result_list "datadir" "Shared directory (FRAMAC_SHARE)" in
+  let set_pluginpath = result_list "pluginpath" "Plugin directories (FRAMAC_PLUGIN)" in
   Request.register_sig
     ~package ~kind:`GET ~name:"getConfig"
     ~descr:(Md.plain "Frama-C Kernel configuration")
     signature
     begin fun rq () ->
       set_version rq Fc_config.version ;
-      set_datadir rq Fc_config.datadir ;
-      set_libdir rq Fc_config.libdir ;
+      set_datadir rq Fc_config.datadirs ;
       set_pluginpath rq Fc_config.plugin_dir ;
     end
 

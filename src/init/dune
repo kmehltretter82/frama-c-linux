@@ -1,0 +1,6 @@
+(library
+  (name frama_c_very_first)
+  (public_name frama-c.init)
+  (modules frama_c_init gui_init)
+  (virtual_modules gui_init)
+)

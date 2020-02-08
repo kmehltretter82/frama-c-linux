@@ -1,0 +1,9 @@
+(library
+  (name RteGen)
+  (public_name frama-c-rtegen.core)
+  (private_modules options generator rte visit register RteGen)
+  (flags -open Frama_c_kernel)
+  (libraries frama-c.kernel)
+)
+
+(plugin (name frama-c-plugins-rtegen) (libraries frama-c-rtegen.core) (site (frama-c plugins)))

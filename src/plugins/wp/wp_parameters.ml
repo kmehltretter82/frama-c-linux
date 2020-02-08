@@ -1069,7 +1069,7 @@ let get_overflows () = Overflows.get () && active_unless_rte "-wp-overflows"
 
 let dkey = register_category "prover"
 
-let has_out () = OutputDir.get () <> ""
+let has_out () = OutputDir.get() <> ""
 
 let make_output_dir dir =
   if Sys.file_exists dir then
@@ -1124,7 +1124,7 @@ let base_output () =
   | None -> let output =
               match OutputDir.get () with
               | "" ->
-                  if !Fc_config.is_gui
+                  if Fc_config.is_gui
                   then make_gui_dir ()
                   else make_tmp_dir ()
               | dir ->

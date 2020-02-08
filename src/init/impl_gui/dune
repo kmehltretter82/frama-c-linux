@@ -1,0 +1,5 @@
+(library
+  (name frama_c_very_first_gui)
+  (public_name frama-c.init.gui)
+  (implements frama-c.init)
+)

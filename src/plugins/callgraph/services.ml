@@ -20,6 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module type S = Graph.Graphviz.GraphWithDotAttrs
+
 let initial_service_roots cg =
   let roots = Options.Service_roots.get () in
   let roots =

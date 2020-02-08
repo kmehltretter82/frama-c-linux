@@ -42,7 +42,7 @@
 #   EXE           ".exe" if OCAMLWIN32=yes, "" otherwise
 #   DLLEXT        ".dll" if OCAMLWIN32=yes, ".so" otherwise
 
-AC_INIT(src/kernel_internals/runtime/boot.ml)
+AC_INIT(src/init/boot/boot.ml)
 
 define([FRAMAC_MAIN_AUTOCONF])
 m4_include(share/configure.ac)

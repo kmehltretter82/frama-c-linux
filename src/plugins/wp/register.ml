@@ -937,7 +937,7 @@ let () = Cmdline.run_after_setting_files
 let () = Cmdline.run_after_configuring_stage Why3Provers.configure
 
 let do_prover_detect () =
-  if not !Fc_config.is_gui && Wp_parameters.Detect.get () then
+  if not Fc_config.is_gui && Wp_parameters.Detect.get () then
     let provers = Why3Provers.provers () in
     if provers = [] then
       Wp_parameters.result "No Why3 provers detected."

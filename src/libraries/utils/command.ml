@@ -238,7 +238,7 @@ let command_async ?stdout ?stderr cmd args =
   command_generic ~async:true ?stdout ?stderr cmd args
 
 let command ?(timeout=0) ?stdout ?stderr cmd args =
-  if !Fc_config.is_gui || timeout > 0 then
+  if Fc_config.is_gui || timeout > 0 then
     let f = command_generic ~async:true ?stdout ?stderr cmd args in
     let res = ref(Unix.WEXITED 99) in
     let ftimeout = float_of_int timeout in

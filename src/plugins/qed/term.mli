@@ -39,13 +39,20 @@ module Make
     (** {2 Global State}
         One given [term] has valid meaning only for one particular state. *)
 
-    type state (** Hash-consing, cache, rewriting rules, etc. *)
+    type state
+    (** Hash-consing, cache, rewriting rules, etc. *)
+
     val create : unit -> state
     (** Create a new fresh state. Local state is not modified. *)
 
-    val get_state : unit -> state (** Return local state. *)
-    val set_state : state -> unit (** Update local state. *)
-    val clr_state : state -> unit (** Clear local state. *)
+    val get_state : unit -> state
+    (** Return local state. *)
+
+    val set_state : state -> unit
+    (** Update local state. *)
+
+    val clr_state : state -> unit
+    (** Clear local state. *)
 
     val in_state : state -> ('a -> 'b) -> 'a -> 'b
     (** execute in a particular state. *)

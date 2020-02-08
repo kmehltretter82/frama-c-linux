@@ -24,14 +24,14 @@
 
 (** Maps from intervals to values. The documentation of the returned
     maps is in module {!Offsetmap_sig}. *)
-module Make (V : module type of Offsetmap_lattice_with_isotropy) :
-  module type of Offsetmap_sig
+module Make (V : Offsetmap_lattice_with_isotropy.S) :
+  Offsetmap_sig.S
   with type v = V.t
   and type widen_hint = V.numerical_widen_hint
 
 (**/**)
 (* Exported as Int_Intervals, do not use this module directly *)
-module Int_Intervals: module type of Int_Intervals_sig
+module Int_Intervals: Int_Intervals_sig.S
 (**/**)
 
 
@@ -42,7 +42,7 @@ module Make_bitwise(V: sig
   include Lattice_type.With_Narrow with type t := t
   include Lattice_type.With_Top with type t := t
 end) :
-  module type of Offsetmap_bitwise_sig
+  Offsetmap_bitwise_sig.S
     with type v = V.t
     and type intervals = Int_Intervals.t
 

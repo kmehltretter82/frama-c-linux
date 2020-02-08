@@ -1,0 +1,59 @@
+(library
+  (name frama_c_kernel)
+  (public_name frama-c.kernel)
+  (foreign_stubs (language c) (names c_bindings))
+  (flags -w -50)
+  (libraries frama-c.init str unix zarith ocamlgraph dynlink bytes yojson dune-site dune-site.plugins)
+)
+
+(ocamllex json)
+(ocamllex logic_preprocess)
+(ocamllex logic_lexer)
+(ocamlyacc logic_parser)
+(ocamllex clexer)
+(ocamlyacc cparser)
+
+(rule
+  (targets fc_config.ml)
+  (deps fc_config.ml.in ../config.sed)
+  (action (with-stdout-to fc_config.ml (run sed -f ../config.sed fc_config.ml.in)))
+)
+
+(generate_module (module config_data) (sites frama-c) (plugins (frama-c plugins) (frama-c plugins_gui)))
+
+(rule
+  (targets transitioning.ml)
+  (deps transitioning.ml.in ../config.sed)
+  (action (with-stdout-to transitioning.ml (run sed -f ../config.sed transitioning.ml.in)))
+)
+
+;(include_subdirs unqualified)
+
+(copy_files# kernel_internals/*.ml*)
+(copy_files# kernel_services/ast_transformations/*.ml*)
+(copy_files# kernel_internals/parsing/*.ml*)
+(copy_files# kernel_services/cmdline_parameters/*.ml*)
+(copy_files# kernel_internals/runtime/*.ml*)
+(copy_files# kernel_services/parsetree/*.ml*)
+(copy_files# kernel_internals/typing/*.ml*)
+(copy_files# kernel_services/plugin_entry_points/*.ml*)
+(copy_files# kernel_services/*.ml*)
+(copy_files# kernel_services/visitors/*.ml*)
+(copy_files# kernel_services/abstract_interp/*.ml*)
+(copy_files# libraries/*.ml*)
+(copy_files# kernel_services/analysis/*.ml*)
+(copy_files# libraries/datatype/*.ml*)
+(copy_files# kernel_services/ast_data/*.ml*)
+(copy_files# libraries/project/*.ml*)
+(copy_files# kernel_services/ast_printing/*.ml*)
+(copy_files# libraries/stdlib/*.ml*)
+(copy_files# kernel_services/ast_queries/*.ml*)
+(copy_files# libraries/utils/*.ml*)
+(copy_files# libraries/utils/*.c)
+(copy_files# plugins/value_types/*.ml*)
+(copy_files# plugins/pdg_types/*.ml*)
+
+(alias
+  (name all)
+  (deps (file frama_c_kernel.cma)(file frama_c_kernel.cmxa))
+)

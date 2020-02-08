@@ -54,14 +54,14 @@ module HalsteadMetricsGUI = struct
       ignore(GMisc.separator `HORIZONTAL ~packing:box#pack ());
       let metrics = Metrics_cabs.Halstead.get_metrics () in
       let table_contents = Metrics_cabs.Halstead.to_list metrics in
-      Metrics_gui.display_as_table table_contents box
+      Metrics_gui_panels.display_as_table table_contents box
     with
     | Ast.NoUntypedAst ->
       main_ui#error "Cannot compute Halstead metrics: untyped AST not present.\n\
                      It has been removed either by user request or \
                      by some AST transformation."
 
-  let register main_ui = Metrics_gui.register_metrics name (display_result main_ui)
+  let register main_ui = Metrics_gui_panels.register_metrics name (display_result main_ui)
 end
 
 module CyclomaticMetricsGUI = struct
@@ -114,7 +114,7 @@ module CyclomaticMetricsGUI = struct
 				   ["stmts analyzed";(string_of_int valeur)];
 				   ["percentage of stmts covered"; (string_of_float percent)]
 				  ] in
-	      Metrics_gui.display_as_table metrics_data vbox;
+	      Metrics_gui_panels.display_as_table metrics_data vbox;
 	      let close_button = GButton.button ~stock:`OK ~packing:vbox#pack () in
 	      close_button#set_border_width 10;
 	      ignore (close_button#connect#clicked ~callback:dialog#misc#hide);
@@ -145,7 +145,7 @@ module CyclomaticMetricsGUI = struct
                ~justify:`LEFT ~packing:vbox#pack ());
       ignore(GMisc.separator `HORIZONTAL ~packing:vbox#pack ());
       let metrics_data  = BasicMetrics.to_list self#get_data in
-      Metrics_gui.display_as_table metrics_data vbox;
+      Metrics_gui_panels.display_as_table metrics_data vbox;
       let close_button = GButton.button ~stock:`OK ~packing:vbox#pack () in
       close_button#set_border_width 10;
       ignore (close_button#connect#clicked ~callback:dialog#misc#hide);
@@ -204,11 +204,11 @@ module CyclomaticMetricsGUI = struct
     ignore(GMisc.separator `HORIZONTAL ~packing:box#pack ());
     let metrics = Metrics_cilast.get_global_metrics ~libc in
     let table_contents = BasicMetrics.to_list metrics in
-    Metrics_gui.display_as_table table_contents box
+    Metrics_gui_panels.display_as_table table_contents box
 
   let register ~libc main_ui =
     ignore (new cyclo_class ~libc main_ui);
-    Metrics_gui.register_metrics name (display_result ~libc)
+    Metrics_gui_panels.register_metrics name (display_result ~libc)
 end
 
 (** GUI hooks value coverage  *)
@@ -362,16 +362,16 @@ module ValueCoverageGUI = struct
     Design.register_reset_extension (fun _ -> result := None);
     main_ui#register_source_highlighter highlighter;
     let apply = Metrics_parameters.ValueCoverage.get () in
-    Metrics_gui.register_metrics ~apply name (display_result ~libc main_ui);
+    Metrics_gui_panels.register_metrics ~apply name (display_result ~libc main_ui);
 end
 
 let register_final ?(libc=Metrics_parameters.Libc.get ()) main_ui =
-  let box = Metrics_gui.init_panel main_ui in
-  Design.register_reset_extension Metrics_gui.reset_panel;
+  let box = Metrics_gui_panels.init_panel main_ui in
+  Design.register_reset_extension Metrics_gui_panels.reset_panel;
   HalsteadMetricsGUI.register main_ui;
   CyclomaticMetricsGUI.register ~libc main_ui;
   ValueCoverageGUI.register ~libc main_ui;
-  Metrics_gui.coerce_panel_to_ui box main_ui
+  Metrics_gui_panels.coerce_panel_to_ui box main_ui
 
 let gui (main_ui:Design.main_window_extension_points) =
   main_ui#register_panel register_final

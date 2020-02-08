@@ -3,7 +3,8 @@
 
 let mk_buildInputs = { opamPackages ? [], nixPackages ? [] } :
     [ pkgs.gnugrep pkgs.gnused  pkgs.autoconf pkgs.gnumake pkgs.gcc pkgs.ncurses pkgs.time pkgs.python3 pkgs.perl pkgs.file pkgs.which pkgs.dos2unix] ++ nixPackages ++ opam2nix.build {
-           specs = opam2nix.toSpecs ([ "ocamlfind" "zarith" "ocamlgraph" "yojson"
+           specs = opam2nix.toSpecs ([ "ocamlfind" "zarith" "ocamlgraph" "yojson" "lablgtk" "conf-gtksourceview" "conf-gnomecanvas"
+                { name = "dune"; constraint = ">=2.7"; }
                 { name = "coq"; constraint = "=8.11.1";  }
                 { name = "why3" ; constraint = "=1.3.1"; }
                 { name = "why3-coq" ; constraint = "=1.3.1"; }

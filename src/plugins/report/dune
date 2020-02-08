@@ -1,0 +1,10 @@
+( library
+  (name report)
+  (public_name frama-c-report.core)
+  (modules report_parameters scan dump csv register Report)
+  (private_modules report_parameters scan dump csv)
+  (flags -open Frama_c_kernel)
+  (libraries frama-c.kernel)
+)
+
+(plugin (name frama-c-plugins-report) (libraries frama-c-report.core) (site (frama-c plugins)))

@@ -1,0 +1,12 @@
+( library
+  (name server)
+  (public_name frama-c-server.core)
+  (flags -open Frama_c_kernel)
+ (libraries frama-c.kernel
+  (select server_zmq.ml from
+     (zmq -> server_zmq.ok.ml)
+     (    -> server_zmq.ko.ml)
+ ))
+)
+
+(plugin (name frama-c-plugins-server) (libraries frama-c-server.core) (site (frama-c plugins)))

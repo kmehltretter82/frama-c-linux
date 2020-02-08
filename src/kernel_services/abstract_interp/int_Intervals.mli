@@ -27,7 +27,7 @@
    {!Int_Intervals_sig}, and the implementation is in
    {!Offsetmap.Int_Intervals}. *)
 
-include module type of Int_Intervals_sig
+include Int_Intervals_sig.S
   with type t = Offsetmap.Int_Intervals.t
 
 

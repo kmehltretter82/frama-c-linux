@@ -22,6 +22,4 @@
 ##########################################################################
 
 
-. $(dirname $0)/local_export.sh
-
-exec $BINDIR/toplevel.opt "$@"
+dune exec --root=$(dirname $0)/.. frama-c -- "$@"

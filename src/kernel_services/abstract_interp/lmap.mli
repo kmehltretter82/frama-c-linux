@@ -34,10 +34,10 @@ type 'a default_contents =
 
 module Make_LOffset
   (V: sig
-     include module type of Offsetmap_lattice_with_isotropy
+     include Offsetmap_lattice_with_isotropy.S
      include Lattice_type.With_Top_Opt with type t := t
    end)
-  (Offsetmap: module type of Offsetmap_sig
+  (Offsetmap: Offsetmap_sig.S
               with type v = V.t
               and type widen_hint = V.numerical_widen_hint)
   (Default_offsetmap: sig
@@ -70,7 +70,7 @@ module Make_LOffset
          match [default_contents] on constant keys.
      *)
   end):
-  module type of Lmap_sig
+  Lmap_sig.S
     with type v = V.t
     and type widen_hint_base = V.numerical_widen_hint
     and type offsetmap = Offsetmap.t

@@ -1,0 +1,109 @@
+( library
+  (name eva)
+  (public_name frama-c-eva.core)
+  (modules
+   split_strategy value_parameters
+        value_perf value_util
+        mark_noresults
+        widen_hints_ext widen
+        alarmset warn eval_typ backward_formals
+        eval_op
+        locals_scoping
+        builtins
+        builtins_malloc
+        library_functions
+        builtins_string
+        builtins_misc
+        value_results
+        builtins_memory
+        builtins_print_c
+        builtins_watchpoint
+        state_import
+        function_args split_return
+        per_stmt_slevel
+        eval structure
+        powerset transfer_logic
+        value_product location_lift
+        cvalue_forward cvalue_backward
+        eval_terms eval_annots
+        main_values main_locations offsm_value
+        domain_store domain_builder
+        domain_product domain_lift unit_domain
+        gauges_domain
+        hcexprs
+        equality equality_domain
+        offsm_domain
+        symbolic_locs
+        cvalue_transfer cvalue_init
+        cvalue_specification
+        cvalue_domain builtins_float
+        evaluation subdivided_evaluation
+        recursion
+        abstract abstract_value abstract_location abstract_domain
+        red_statuses
+        cvalue_offsetmap
+        simpler_domains
+        simple_memory
+        sign_value
+        inout_domain
+        sign_domain
+        printer_domain
+        abstractions partitioning_index  trace_partitioning partition partitioning_parameters
+           transfer_stmt mem_exec iterator
+           transfer_specification initialization analysis register compute_functions
+           eva_annotations octagons traces_domain auto_loop_unroll domain_mode
+)
+;  (public_interfaces (Eva))
+  (flags -open Frama_c_kernel)
+  (libraries frama-c.kernel frama-c-callgraph.core frama-c-rtegen.core frama-c-loop-analysis.core frama-c-scope.core)
+)
+
+(plugin (name frama-c-plugins-eva) (libraries frama-c-eva.core) (site (frama-c plugins)))
+
+( library
+  (name numerors)
+  (public_name frama-c-eva.numerors)
+  (flags -open Frama_c_kernel -open Eva)
+  (modules numerors numerors_domain numerors_utils numerors_float numerors_interval numerors_arithmetics numerors_value)
+  (libraries frama-c.kernel frama-c-eva.core mlmpfr)
+  (optional)
+)
+
+;(plugin (name frama-c-plugins-eva-numerors) (libraries frama-c-eva.numerors) (site (frama-c plugins)))
+
+( library
+  (name apron_domain)
+  (public_name frama-c-eva.apron)
+  (flags -open Frama_c_kernel -open Eva)
+  (modules apron_domain)
+  (libraries frama-c.kernel frama-c-eva.core apron.octMPQ apron.boxMPQ apron.polkaMPQ apron.apron)
+  (optional)
+)
+
+
+
+( library
+  (name eva_gui)
+  (public_name frama-c-eva.gui)
+  (optional)
+  (modules gui_callstacks_filters gui_callstacks_manager gui_eval gui_types register_gui gui_red)
+;  (public_interfaces ())
+  (flags -open Frama_c_kernel -open Frama_c_gui -open Eva)
+  (libraries eva frama-c.kernel frama-c.gui)
+)
+
+(plugin (name frama-c-plugins-eva-gui) (libraries frama-c-eva.gui) (site (frama-c plugins_gui)))
+
+(copy_files# domains/*)
+(copy_files# domains/equality/*)
+(copy_files# domains/cvalue/*)
+(copy_files# domains/gauges/*)
+(copy_files# domains/apron/*)
+(copy_files# domains/numerors/*)
+(copy_files# engine/*)
+(copy_files# utils/*)
+(copy_files# legacy/*)
+(copy_files# values/*)
+(copy_files# values/numerors/*)
+(copy_files# gui_files/*)
+(copy_files# partitioning/*)

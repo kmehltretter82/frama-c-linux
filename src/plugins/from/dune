@@ -1,0 +1,8 @@
+( library
+  (name from)
+  (public_name frama-c-from.core)
+  (flags -open Frama_c_kernel)
+  (libraries frama-c.kernel frama-c-callgraph.core frama-c-eva.core frama-c-postdominators.core)
+)
+
+(plugin (name frama-c-plugins-from) (libraries frama-c-from.core) (site (frama-c plugins)))

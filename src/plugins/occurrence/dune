@@ -1,0 +1,20 @@
+( library
+  (name occurrence)
+ (public_name frama-c-occurrence.core)
+  (modules options register)
+  (flags -open Frama_c_kernel)
+  (libraries frama-c.kernel)
+)
+
+(plugin (name frama-c-plugins-occurrence) (libraries frama-c-occurrence.core) (site (frama-c plugins)))
+
+( library
+  (name occurrence_gui)
+  (public_name frama-c-occurrence.gui)
+  (optional)
+  (modules register_gui)
+  (flags -open Frama_c_kernel -open Frama_c_gui -open Occurrence)
+  (libraries occurrence frama-c.kernel frama-c.gui)
+)
+
+(plugin (name frama-c-plugins-occurrence) (libraries frama-c-occurrence.gui) (site (frama-c plugins_gui)))

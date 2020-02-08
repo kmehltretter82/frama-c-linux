@@ -104,8 +104,11 @@ module type Function =
 sig
   include Symbol
   val category : t -> t category
-  val params : t -> sort list (** params ; exceeding params use Sdata *)
-  val sort : t -> sort (** result *)
+  val params : t -> sort list
+  (** params ; exceeding params use Sdata *)
+
+  val sort : t -> sort
+  (** result *)
 end
 
 (** {2 Bound Variables} *)
@@ -225,23 +228,50 @@ sig
 
   type record = (Field.t * term) list
 
-  val decide   : term -> bool (** Return [true] if and only the term is [e_true]. Constant time. *)
-  val is_true  : term -> maybe (** Constant time. *)
-  val is_false : term -> maybe (** Constant time. *)
-  val is_prop  : term -> bool (** Boolean or Property *)
-  val is_int   : term -> bool (** Integer sort *)
-  val is_real  : term -> bool (** Real sort *)
-  val is_arith : term -> bool (** Integer or Real sort *)
+  val decide   : term -> bool
+  (** Return [true] if and only the term is [e_true]. Constant time. *)
 
-  val are_equal : term -> term -> maybe (** Computes equality *)
-  val eval_eq   : term -> term -> bool  (** Same as [are_equal] is [Yes] *)
-  val eval_neq  : term -> term -> bool  (** Same as [are_equal] is [No]  *)
-  val eval_lt   : term -> term -> bool  (** Same as [e_lt] is [e_true] *)
-  val eval_leq  : term -> term -> bool  (** Same as [e_leq] is [e_true]  *)
+  val is_true  : term -> maybe
+  (** Constant time. *)
 
-  val repr : term -> repr  (** Constant time *)
-  val sort : term -> sort   (** Constant time *)
-  val vars : term -> Vars.t (** Constant time *)
+  val is_false : term -> maybe
+  (** Constant time. *)
+
+  val is_prop  : term -> bool
+  (** Boolean or Property *)
+
+  val is_int   : term -> bool
+  (** Integer sort *)
+
+  val is_real  : term -> bool
+  (** Real sort *)
+
+  val is_arith : term -> bool
+  (** Integer or Real sort *)
+
+  val are_equal : term -> term -> maybe
+  (** Computes equality *)
+
+  val eval_eq   : term -> term -> bool
+  (** Same as [are_equal] is [Yes] *)
+
+  val eval_neq  : term -> term -> bool
+  (** Same as [are_equal] is [No]  *)
+
+  val eval_lt   : term -> term -> bool
+  (** Same as [e_lt] is [e_true] *)
+
+  val eval_leq  : term -> term -> bool
+  (** Same as [e_leq] is [e_true]  *)
+
+  val repr : term -> repr
+  (** Constant time *)
+
+  val sort : term -> sort
+  (** Constant time *)
+
+  val vars : term -> Vars.t
+  (** Constant time *)
 
   (** Path-positioning access
 
@@ -468,6 +498,7 @@ sig
 
   val consequence : term -> term -> term
   (** Knowing [h], [consequence h a] returns [b] such that [h -> (a<->b)] *)
+
   val literal : term -> bool * term
 
   val affine : term -> term affine
@@ -476,19 +507,36 @@ sig
   (** {3 Symbol} *)
 
   type t = term
-  val id : t -> int (** unique identifier (stored in t) *)
-  val hash : t -> int (** constant access (stored in t) *)
-  val equal : t -> t -> bool (** physical equality *)
-  val compare : t -> t -> int (** atoms are lower than complex terms ; otherwise, sorted by id. *)
+  val id : t -> int
+  (** unique identifier (stored in t) *)
+
+  val hash : t -> int
+  (** constant access (stored in t) *)
+
+  val equal : t -> t -> bool
+  (** physical equality *)
+
+  val compare : t -> t -> int
+  (** atoms are lower than complex terms ; otherwise, sorted by id. *)
+
   val pretty : Format.formatter -> t -> unit
-  val weigth : t -> int (** Informal size *)
+  val weigth : t -> int
+  (** Informal size *)
 
   (** {3 Utilities} *)
 
-  val is_closed : t -> bool (** No bound variables *)
-  val is_simple : t -> bool (** Constants, variables, functions of arity 0 *)
-  val is_atomic : t -> bool (** Constants and variables *)
-  val is_primitive : t -> bool (** Constants only *)
+  val is_closed : t -> bool
+  (** No bound variables *)
+
+  val is_simple : t -> bool
+  (** Constants, variables, functions of arity 0 *)
+
+  val is_atomic : t -> bool
+  (** Constants and variables *)
+
+  val is_primitive : t -> bool
+  (** Constants only *)
+
   val is_neutral : Fun.t -> t -> bool
   val is_absorbant : Fun.t -> t -> bool
 
@@ -496,9 +544,14 @@ sig
   val basename : t -> string
 
   val debug : Format.formatter -> t -> unit
-  val pp_id : Format.formatter -> t -> unit (** internal id *)
-  val pp_rid : Format.formatter -> t -> unit (** head symbol with children id's *)
-  val pp_repr : Format.formatter -> repr -> unit (** head symbol with children id's *)
+  val pp_id : Format.formatter -> t -> unit
+  (** internal id *)
+
+  val pp_rid : Format.formatter -> t -> unit
+  (** head symbol with children id's *)
+
+  val pp_repr : Format.formatter -> repr -> unit
+  (** head symbol with children id's *)
 
   (** {2 Shared sub-terms} *)
 

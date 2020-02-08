@@ -186,8 +186,7 @@ ENABLE_USERS	                  ?=@ENABLE_USERS@
 ENABLE_EVA                      ?=@ENABLE_EVA@
 
 #bytes is part of the stdlib, but is used as a transitional package.
-LIBRARY_NAMES := \
-  findlib ocamlgraph unix str dynlink bytes zarith yojson bigarray
+LIBRARY_NAMES := findlib ocamlgraph num unix str dynlink bytes zarith yojson threads threads.posix bigarray
 
 ifeq ($(HAS_LANDMARKS),yes)
 LIBRARY_NAMES += landmarks landmarks.ppx
@@ -196,7 +195,7 @@ endif
 ifneq ($(ENABLE_GUI),no)
   LIBRARY_NAMES_GUI = $(LABLGTK) $(GTKSOURCEVIEW)
   ifeq ($(HAS_GNOMECANVAS),yes)
-    LIBRARY_NAMES_GUI+=lablgtk2.gnomecanvas
+    LIBRARY_NAMES_GUI+=lablgtk2.gnomecanvas ocamlgraph.dgraph
   endif
 else
 LIBRARY_NAMES_GUI =

@@ -110,9 +110,15 @@ class type virtual ['z,'adt,'field,'logic,'tau,'var,'term,'env] engine =
 
     (** {3 Global and Local Environment} *)
 
-    method env : 'env (** Returns a fresh copy of the current environment. *)
-    method set_env : 'env -> unit (** Set environment. *)
-    method lookup : 'term -> scope (** Term scope in the current environment. *)
+    method env : 'env
+    (** Returns a fresh copy of the current environment. *)
+
+    method set_env : 'env -> unit
+    (** Set environment. *)
+
+    method lookup : 'term -> scope
+    (** Term scope in the current environment. *)
+
     method scope : 'env -> (unit -> unit) -> unit
     (** Calls the continuation in the provided environment.
         Previous environment is restored after return. *)
@@ -137,14 +143,22 @@ class type virtual ['z,'adt,'field,'logic,'tau,'var,'term,'env] engine =
     method t_prop : string
     method t_atomic : 'tau -> bool
 
-    method pp_array : 'tau printer (** For [Z->a] arrays *)
-    method pp_farray : 'tau printer2 (** For [k->a] arrays *)
+    method pp_array : 'tau printer
+    (** For [Z->a] arrays *)
 
-    method pp_tvar : int printer (** Type variables. *)
+    method pp_farray : 'tau printer2
+    (** For [k->a] arrays *)
+
+    method pp_tvar : int printer
+    (** Type variables. *)
+
     method pp_datatype : 'adt -> 'tau list printer
 
-    method pp_tau : 'tau printer (** Without parentheses. *)
-    method pp_subtau : 'tau printer (** With parentheses if non-atomic. *)
+    method pp_tau : 'tau printer
+    (** Without parentheses. *)
+
+    method pp_subtau : 'tau printer
+    (** With parentheses if non-atomic. *)
 
     (** {3 Current Mode}
 
@@ -165,8 +179,11 @@ class type virtual ['z,'adt,'field,'logic,'tau,'var,'term,'env] engine =
 
     (** {3 Primitives} *)
 
-    method e_true : cmode -> string (** ["true"] *)
-    method e_false : cmode -> string (** ["false"] *)
+    method e_true : cmode -> string
+    (** ["true"] *)
+
+    method e_false : cmode -> string
+    (** ["false"] *)
 
     method pp_int : amode -> 'z printer
     method pp_real : Q.t printer

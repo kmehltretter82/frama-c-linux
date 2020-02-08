@@ -1,0 +1,3 @@
+(lang dune 2.8)
+(name frama-c-inout)
+(using dune_site 0.1)

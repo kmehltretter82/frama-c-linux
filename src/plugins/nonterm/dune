@@ -1,0 +1,8 @@
+( library
+  (name nonterm)
+  (public_name frama-c-nonterm.core)
+  (flags -open Frama_c_kernel)
+  (libraries frama-c.kernel)
+)
+
+(plugin (name frama-c-plugins-nonterm) (libraries frama-c-nonterm.core) (site (frama-c plugins)))

@@ -32,12 +32,17 @@ type t (** An over-approximation of set of integers *)
 val empty : t
 val singleton : int -> t
 
-val order : t -> int (** Max stack of binders *)
-val bind : t -> t (** Decrease all elements in [s] after removing [0] *)
+val order : t -> int
+(** Max stack of binders *)
+
+val bind : t -> t
+(** Decrease all elements in [s] after removing [0] *)
 
 val union : t -> t -> t
 
-val closed : t -> bool (** All variables are bound *)
+val closed : t -> bool
+(** All variables are bound *)
+
 val closed_at : int -> t -> bool
 (** [closed_at n a] Does not contains variables [k<n] *)
 

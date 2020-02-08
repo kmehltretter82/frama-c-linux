@@ -265,6 +265,20 @@ type position =
 let pp_pos fmt pos =
   Format.fprintf fmt "%a:%d" Normalized.pretty pos.pos_path pos.pos_lnum
 
+(** Initialize using Config *)
+let add_symbolic_dir_list name = function
+  | [d] -> add_symbolic_dir name d
+  | ds ->
+      List.iteri
+        (fun i d ->
+           let path = Printf.sprintf "%s#%d" name (succ i) in
+           add_symbolic_dir path d)
+        ds
+
+let () = add_symbolic_dir_list "FRAMAC_SHARE" Fc_config.datadirs
+let () = add_symbolic_dir_list "FRAMAC_PLUGIN" Fc_config.plugin_dir
+
+
 (*
 Local Variables:
 compile-command: "make -C ../../.."

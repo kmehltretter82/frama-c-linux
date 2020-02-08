@@ -1,0 +1,14 @@
+( library
+  (name eacsl)
+  (public_name frama-c-e-acsl.core)
+  (flags -open Frama_c_kernel)
+  (libraries frama-c.kernel)
+)
+
+(plugin (name frama-c-plugins-e-acsl) (libraries frama-c-e-acsl.core) (site (frama-c plugins)))
+
+(copy_files# src/*.ml*)
+(copy_files# src/analyses/*.ml*)
+(copy_files# src/code_generator/*.ml*)
+(copy_files# src/libraries/*.ml*)
+(copy_files# src/project_initializer/*.ml*)

@@ -1,0 +1,38 @@
+(library
+  (name frama_c_boot)
+  (public_name frama-c.boot)
+  (modules boot)
+  (flags -open Frama_c_kernel)
+  (libraries frama_c_kernel)
+)
+
+
+(rule
+  (targets empty_file.ml)
+  (action (with-stdout-to empty_file.ml (echo "")))
+)
+
+(rule
+  (targets empty_file_gui.ml)
+  (deps empty_file.ml)
+  (action (copy# empty_file.ml empty_file_gui.ml))
+)
+
+(executable
+  (name empty_file)
+  (public_name frama-c)
+  (modules empty_file)
+  (package frama-c)
+  (flags -open Frama_c_kernel -linkall)
+  (libraries frama-c.kernel frama-c.init.cmdline frama-c.boot)
+)
+
+(executable
+  (name empty_file_gui)
+  (public_name frama-c-gui)
+  (modules empty_file_gui)
+  (package frama-c)
+  (flags -open Frama_c_kernel -linkall)
+  (libraries threads frama-c.init.gui frama-c.kernel frama-c.gui frama-c.boot)
+  (optional)
+)

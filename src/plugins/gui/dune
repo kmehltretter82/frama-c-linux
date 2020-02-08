@@ -1,0 +1,41 @@
+( library
+  (name frama_c_gui)
+  (public_name frama-c.gui)
+  (optional)
+  (modules
+        wutil wutil_once widget wbox wfile wpane wpalette wtext wtable
+        gui_parameters
+        gtk_helper gtk_form
+        source_viewer pretty_source source_manager book_manager
+        warning_manager
+        filetree
+        launcher
+        menu_manager
+        history
+        gui_printers
+        design
+        analyses_manager file_manager project_manager debug_manager
+        help_manager
+        property_navigator GSourceView gtk_compat
+        dgraph_helper
+)
+  (flags -open Frama_c_kernel -linkall)
+  (libraries frama-c.init.gui frama-c.kernel ocamlgraph.dgraph
+   (select gtk_compat.ml from
+      (lablgtk2 lablgtk2.gnomecanvas lablgtk2.sourceview2 -> gtk_compat.2.ml)
+      (lablgtk3 lablgtk3-sourceview3 -> gtk_compat.3.ml)
+   )
+   (select GSourceView.ml from
+      (lablgtk2 lablgtk2.gnomecanvas lablgtk2.sourceview2 -> GSourceView.2.ml)
+      (lablgtk3 lablgtk3-sourceview3 -> GSourceView.3.ml)
+   )
+   (select GSourceView.mli from
+      (lablgtk2 lablgtk2.gnomecanvas lablgtk2.sourceview2 -> GSourceView.2.mli)
+      (lablgtk3 lablgtk3-sourceview3 -> GSourceView.3.mli)
+   )
+   (select dgraph_helper.ml from
+      (dgraph -> dgraph_helper.yes.ml)
+      ( -> dgraph_helper.no.ml)
+   )
+)
+)

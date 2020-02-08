@@ -103,7 +103,7 @@ let get_plevel () = !plevel
 
 let debug = false
 
-module Make (V : module type of Offsetmap_lattice_with_isotropy) = struct
+module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
 
   open Format
 
@@ -3028,8 +3028,8 @@ end
    the warning about unused modules. *)
 
 module Aux
-  (V1 : module type of Offsetmap_lattice_with_isotropy)
-  (V2 : module type of Offsetmap_lattice_with_isotropy)
+  (V1 : Offsetmap_lattice_with_isotropy.S)
+  (V2 : Offsetmap_lattice_with_isotropy.S)
 = struct
 
   module M1 = Make(V1)
