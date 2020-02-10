@@ -270,7 +270,7 @@
 [eva:final-states] Values at end of function around_zeros:
   Frama_C_entropy_source ∈ [--..--]
   f1 ∈ {0x1.0000000000000p-149}
-  f ∈ [-0x0.0000000000000p-1022 .. 0x0.0000000000000p-1022]
+  f ∈ [-0x0.0000000000000p0 .. 0x0.0000000000000p0]
   res ∈ {-0x1.0000000000000p0}
 [eva:final-states] Values at end of function garbled:
   a_0 ∈
@@ -280,7 +280,7 @@
 [eva:final-states] Values at end of function nonlin_f:
   Frama_C_entropy_source ∈ [--..--]
   a ∈ [0x1.4000000000000p2 .. 0x1.c000000000000p2]
-  b ∈ [-0x0.0000000000000p-1022 .. 0x1.0000000000000p0]
+  b ∈ [-0x0.0000000000000p0 .. 0x1.0000000000000p0]
   c ∈ {0x1.c000000000000p2}
   r1 ∈ [0x1.4000000000000p2 .. 0x1.cffffffffffffp2]
   r2 ∈ [0x1.4000000000000p2 .. 0x1.c0fffffffffffp2]
@@ -288,7 +288,7 @@
 [eva:final-states] Values at end of function norm:
   v1 ∈ [-0x1.fffffe0000000p127 .. 0x1.fffffe0000000p127]
   v2 ∈ [-0x1.fffffe0000000p127 .. 0x1.fffffe0000000p127]
-  square ∈ [-0x0.0000000000000p-1022 .. 0x1.fffffc0000020p256]
+  square ∈ [-0x0.0000000000000p0 .. 0x1.fffffc0000020p256]
 [eva:final-states] Values at end of function other:
   Frama_C_entropy_source ∈ [--..--]
   i ∈ [-0x1.714fffffffff7p1 .. 0x1.71c0000000003p1]
@@ -309,7 +309,7 @@
 [eva:final-states] Values at end of function main:
   Frama_C_entropy_source ∈ [--..--]
   a ∈ [0x1.4000000000000p2 .. 0x1.c000000000000p2]
-  b ∈ [-0x0.0000000000000p-1022 .. 0x1.0000000000000p0]
+  b ∈ [-0x0.0000000000000p0 .. 0x1.0000000000000p0]
   c ∈ {0x1.c000000000000p2}
   r1 ∈ [0x1.4000000000000p2 .. 0x1.cffffffffffffp2]
   r2 ∈ [0x1.4000000000000p2 .. 0x1.c0fffffffffffp2]

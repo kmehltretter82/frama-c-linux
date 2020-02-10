@@ -295,7 +295,7 @@ let pretty_normal ~use_hex fmt f =
   let firstdigit, exp =
     if exp <> 0
     then 1, (exp - 1023)
-    else 0, -1022
+    else 0, if f = 0. then 0 else -1022
   in
   if not use_hex
   then begin
