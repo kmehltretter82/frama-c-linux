@@ -1339,17 +1339,18 @@ module Derefs : INOUT with type t = Locations.Zone.t
     @plugin development guide
     @deprecated Frama-C+dev *)
 val progress: (unit -> unit) ref
+[@@ deprecated "Use {!yield} instead"]
 
 (** Registered daemon on progress. *)
 type daemon
 
 (**
    [on_progress ?debounced ?on_delayed trigger] registers [trigger] as new
-   daemon to be executed on each [yield].
-   @param debounced the least amount of time, in milliseconds, between two
-   successive calls to the daemon (default is 0ms).
+   daemon to be executed on each {!yield}.
+   @param debounced the least amount of time between two successive calls to the
+   daemon, in milliseconds (default is 0ms).
    @param on_delayed the callback invoked as soon as the time since the last
-   [yield] is greater than [debounced] milliseconds (or 100ms at least).
+   {!yield} is greater than [debounced] milliseconds (or 100ms at least).
 *)
 val on_progress :
   ?debounced:int -> ?on_delayed:(int -> unit) -> (unit -> unit) -> daemon
@@ -1360,11 +1361,13 @@ val off_progress : daemon -> unit
 (** Trigger all daemons immediately. *)
 val flush : unit -> unit
 
-(** Trigger all registered daemons (debounced). *)
+(** Trigger all registered daemons (debounced).
+    This function should be called from time to time by all analysers taking
+    time. In GUI mode, this will make the interface reactive. *)
 val yield : unit -> unit
 
-(** Interrupt the currently running job.
-    The next call to [Db.yield()] will raise a [Cancel] exception. *)
+(** Interrupt the currently running job at the next call to {!yield} as a
+    [Cancel] exception is raised. *)
 val cancel : unit -> unit
 
 (**
@@ -1405,7 +1408,7 @@ val with_progress :
 *)
 val sleep : int -> unit
 
-(** This exception may be raised by {!progress} to interrupt computations. *)
+(** This exception may be raised by {!yield} to interrupt computations. *)
 exception Cancel
 
 (*

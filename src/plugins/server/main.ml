@@ -26,7 +26,6 @@
 
 module Senv = Server_parameters
 
-let option f = function None -> () | Some x -> f x
 
 (* -------------------------------------------------------------------------- *)
 (* --- Registry                                                           --- *)
@@ -181,7 +180,7 @@ let process_request (server : 'a server) (request : 'a request) : unit =
   | `Poll -> ()
   | `Shutdown ->
     begin
-      option kill_exec server.running ;
+      Extlib.may kill_exec server.running ;
       Queue.clear server.q_in ;
       Stack.clear server.q_out ;
       server.shutdown <- true ;
@@ -190,7 +189,7 @@ let process_request (server : 'a server) (request : 'a request) : unit =
     begin
       let set_killed = kill_request server.equal id in
       Queue.iter set_killed server.q_in ;
-      option set_killed server.running ;
+      Extlib.may set_killed server.running ;
     end
   | `Request(id,request,data) ->
     begin
@@ -227,17 +226,15 @@ let communicate server =
     Stack.iter (fun r -> pool := r :: !pool) server.q_out ;
     Stack.clear server.q_out ;
     message.callback !pool ;
-    option raise error ; true
+    Extlib.may raise error ; true
 
 (* -------------------------------------------------------------------------- *)
 (* --- Yielding                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
 let do_yield server () =
-  begin
-    option raise_if_killed server.running ;
-    ignore ( communicate server );
-  end
+  Extlib.may raise_if_killed server.running ;
+  ignore ( communicate server )
 
 (* -------------------------------------------------------------------------- *)
 (* --- One Step Process                                                   --- *)
@@ -265,10 +262,10 @@ let in_range ~min:a ~max:b v = min (max a v) b
 
 let kill () = raise Killed
 
-let demons = ref []
-let on callback = demons := !demons @ [ callback ]
+let daemons = ref []
+let on callback = daemons := !daemons @ [ callback ]
 let signal activity =
-  List.iter (fun f -> try f activity with _ -> ()) !demons
+  List.iter (fun f -> try f activity with _ -> ()) !daemons
 
 let create ~pretty ?(equal=(=)) ~fetch () =
   let polling = in_range ~min:1 ~max:200 (Senv.Polling.get ()) in
@@ -287,36 +284,38 @@ let create ~pretty ?(equal=(=)) ~fetch () =
 
 let start server =
   match server.daemon with
-  | Some _db -> ()
+  | Some _ -> ()
   | None ->
     begin
       Senv.feedback "Server enabled." ;
-      let db = Db.on_progress
+      let daemon =
+        Db.on_progress
           ~debounced:server.polling
           ?on_delayed:(delayed "command line")
-          (do_yield server) in
-      server.daemon <- Some db ;
+          (do_yield server)
+      in
+      server.daemon <- Some daemon ;
       signal true ;
     end
 
 let stop server =
   match server.daemon with
   | None -> ()
-  | Some db ->
+  | Some daemon ->
     begin
       Senv.feedback "Server disabled." ;
       server.daemon <- None ;
-      Db.off_progress db ;
+      Db.off_progress daemon ;
       signal false ;
     end
 
 let foreground server =
   match server.daemon with
   | None -> ()
-  | Some db ->
+  | Some daemon ->
     begin
       server.daemon <- None ;
-      Db.off_progress db ;
+      Db.off_progress daemon ;
     end
 
 (* -------------------------------------------------------------------------- *)
@@ -331,7 +330,8 @@ let run server =
     Senv.feedback "Server running." ;
     foreground server ;
     signal true ;
-    begin try
+    begin
+      try
         while not server.shutdown do
           let activity = process server in
           if not activity then Db.sleep server.polling

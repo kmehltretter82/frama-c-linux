@@ -42,13 +42,14 @@ module Polling = P.Int
       let option_name = "-server-polling"
       let arg_name = "ms"
       let default = 50
-      let help = "Server polling (in milliseconds, default 50ms)"
+      let help = "Server polling time period, in milliseconds (default 50ms)"
     end)
 
 module AutoLog = P.False
     (struct
       let option_name = "-server-auto-log"
-      let help = "Start monitoring logs before server is running (default is false)"
+      let help =
+        "Start monitoring logs before server is running (default is false)"
     end)
 
 (* -------------------------------------------------------------------------- *)

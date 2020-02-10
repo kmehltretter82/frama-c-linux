@@ -83,13 +83,13 @@ val create :
   fetch:(unit -> 'a message option) ->
   unit -> 'a server
 
-(** Run the server forever *)
+(** Run the server forever. *)
 val run : 'a server -> unit
 
-(** Start the server in background *)
+(** Start the server in background. *)
 val start : 'a server -> unit
 
-(** Stop the server if it is running in background *)
+(** Stop the server if it is running in background. *)
 val stop : 'a server -> unit
 
 (** Kills the currently running request. Actually raises an exception. *)

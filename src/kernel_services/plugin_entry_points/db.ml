@@ -1101,9 +1101,10 @@ let warn_error exn =
 let with_progress ?debounced ?on_delayed trigger job data =
   let d = on_progress ?debounced ?on_delayed trigger in
   let result =
-    try job data with e ->
+    try job data
+    with exn ->
       off_progress d ;
-      raise e
+      raise exn
   in
   off_progress d ; result
 
@@ -1112,7 +1113,7 @@ let with_progress ?debounced ?on_delayed trigger job data =
 let canceled = ref false
 let cancel () = canceled := true
 
-let fire ~delayed ~forced ~time d =
+let fire ~warn_on_delayed ~forced ~time d =
   if forced || time > d.next_at then
     begin
       try
@@ -1125,7 +1126,7 @@ let fire ~delayed ~forced ~time d =
   match d.on_delayed with
   | None -> ()
   | Some warn ->
-    if delayed && 0.0 < d.last_yield_at then
+    if warn_on_delayed && 0.0 < d.last_yield_at then
       begin
         let time_since_last_yield = time -. d.last_yield_at in
         let delay = if d.debounced > 0.0 then d.debounced else 0.1 in
@@ -1139,18 +1140,18 @@ let raise_if_canceled () =
 
 (* ---- Yielding ---- *)
 
-let do_yield ~delayed ~forced () =
+let do_yield ~warn_on_delayed ~forced () =
   match !daemons with
   | [] -> ()
   | ds ->
     begin
       let time = Unix.gettimeofday () in
-      List.iter (fire ~delayed ~forced ~time) ds ;
+      List.iter (fire ~warn_on_delayed ~forced ~time) ds ;
       raise_if_canceled () ;
     end
 
-let yield = do_yield ~delayed:true ~forced:false
-let flush = do_yield ~delayed:false ~forced:true
+let yield = do_yield ~warn_on_delayed:true ~forced:false
+let flush = do_yield ~warn_on_delayed:false ~forced:true
 
 (* ---- Sleeping ---- *)
 
@@ -1167,23 +1168,24 @@ let sleep ms =
     if period = 0 then
       begin
         Unix.sleepf delta ;
-        do_yield ~delayed:false ~forced:false ()
+        do_yield ~warn_on_delayed:false ~forced:false ()
       end
     else
       let delay = float period *. 0.001 in
       let finished_at = Unix.gettimeofday () +. delta in
       let rec wait_and_trigger () =
-        begin
-          Unix.sleepf delay ;
-          let time = Unix.gettimeofday () in
-          List.iter (fire ~delayed:false ~forced:false ~time) !daemons ;
-          raise_if_canceled () ;
-          if time < finished_at then
-            if time +. delay > finished_at then
-              Unix.sleepf (finished_at -. time)
-            else wait_and_trigger ()
-        end
-      in wait_and_trigger ()
+        Unix.sleepf delay ;
+        let time = Unix.gettimeofday () in
+        List.iter
+          (fire ~warn_on_delayed:false ~forced:false ~time)
+          !daemons ;
+        raise_if_canceled () ;
+        if time < finished_at then
+          if time +. delay > finished_at then
+            Unix.sleepf (finished_at -. time)
+          else wait_and_trigger ()
+      in
+      wait_and_trigger ()
 
 (* ---- Deprecated old API ---- *)
 
