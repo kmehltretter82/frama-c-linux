@@ -1173,7 +1173,17 @@ struct
   let () = extern_fun := e_fungen
 
   (* -------------------------------------------------------------------------- *)
-  (* --- Ground & Arithmetics                                               --- *)
+  (* --- Sign                                                               --- *)
+  (* -------------------------------------------------------------------------- *)
+
+  type sign = Null | Negative | Positive
+  let sign z =
+    if Z.lt z Z.zero then Negative else
+    if Z.lt Z.zero z then Positive else
+      Null
+
+  (* -------------------------------------------------------------------------- *)
+  (* --- Ground Arithmetics                                                 --- *)
   (* -------------------------------------------------------------------------- *)
 
   let rec i_ground f c xs = function
@@ -1187,11 +1197,23 @@ struct
     | x::ts -> r_ground f c (x::xs) ts
     | [] -> c , xs
 
-  type sign = Null | Negative | Positive
-  let sign z =
-    if Z.lt z Z.zero then Negative else
-    if Z.lt Z.zero z then Positive else
-      Null
+  let q_times k z =
+    if Z.equal k Z.one then z else
+    if Z.equal k Z.zero then Q.zero else
+      Q.(make (Z.mul k z.num) z.den)
+
+  let rec times z e =
+    if Z.equal z Z.one then e else
+    if Z.equal z Z.zero then e_zint Z.zero else
+      match e.repr with
+      | Kint z' -> e_zint (Z.mul z z')
+      | Kreal r -> e_real (q_times z r)
+      | Times(z',t) -> times (Z.mul z z') t
+      | _ -> c_times z e
+
+  (* -------------------------------------------------------------------------- *)
+  (* --- Affine Comparisons                                                 --- *)
+  (* -------------------------------------------------------------------------- *)
 
   let r_affine_rel fz fe c xs ys =
     let a , xs = r_ground Q.add (Q.of_bigint c) [] xs in
@@ -1221,31 +1243,150 @@ struct
         (* c+xs R ys <-> (c+xs) R ys *)
         | Positive -> fe (c_add (e_zint c :: xs)) (c_add ys)
 
-  let i_affine xs ys =
+  let i_affine_leq c xs ys =
+    if Z.equal c Z.one
+    then i_affine_rel Z.lt c_builtin_lt Z.zero xs ys
+    else i_affine_rel Z.leq c_builtin_leq c xs ys
+
+  let i_affine_lt c xs ys =
+    if not (Z.equal c Z.zero)
+    then i_affine_rel Z.leq c_builtin_leq (Z.succ c) xs ys
+    else i_affine_rel Z.lt c_builtin_lt c xs ys
+
+  (* --- Affine Ratios --- *)
+
+  type i_form = Z.t * term list
+  type ratio = POS of i_form * Z.t | NEG of i_form * Z.t | NONE
+
+  let i_form = function
+    | { repr = Kint c } -> c,[]
+    | { repr = Add es } ->
+        ( match es with
+          | x::xs ->
+              ( match x with
+                | { repr = Kint c } -> c , xs
+                | _ -> Z.zero , es )
+          | [] -> Z.zero,[] )
+    | e -> Z.zero,[e]
+
+  let i_ratio = function
+    | [{ repr=Div(a,b) }] ->
+        (match b.repr with
+         | Kint k ->
+             (match sign k with
+              | Positive -> POS(i_form a,k)
+              | Negative -> NEG(i_form a,Z.neg k)
+              | Null -> NONE)
+         | _ -> NONE)
+    | _ -> NONE
+
+  let i_opp xs = List.map (times Z.minus_one) xs
+  let i_times k xs = List.map (times k) xs
+
+  (* [LC] we can do better here *)
+  let i_pos0 = function c,[] -> Z.(leq zero c) | _ -> false
+  let i_pos1 = function c,[] -> Z.(lt zero c)  | _ -> false
+  let i_neg0 = function c,[] -> Z.(leq c zero) | _ -> false
+  let i_neg1 = function c,[] -> Z.(lt c zero)  | _ -> false
+
+  (* k < 0 *)
+  let rec i_ratio_max a k b =
+    if i_pos0 a || i_pos0 b then
+      (* [pos_max] (0 <= a || 0 <= b) -> ( a/k <= b <-> a < b*k + k ) *)
+      let x,xs = a in
+      let y,ys = b in
+      (* x+xs < k.(y+ys) + k <==> x-k.(y+1) + xs < k.ys *)
+      i_affine_ratio_lt Z.(sub x (mul k (succ y))) xs (i_times k ys)
+    else
+    if i_neg0 a || i_neg1 b then
+      (* [neg_max] (a <= 0 || b < 0) -> ( a/k <= b <-> a <= b*k ) *)
+      let x,xs = a in
+      let y,ys = b in
+      (* x+xs <= k.(y+ys) <==> x-k.y + xs <= k.ys *)
+      i_affine_ratio_leq Z.(sub x (mul k y)) xs (i_times k ys)
+    else
+      raise Not_found
+
+  and i_ratio_min b a k =
+    if i_pos0 a || i_pos1 b then
+      (* [pos_min] (0 <= a || 0 < b) -> ( b <= a/k <-> b*k <= a ) *)
+      let x,xs = a in
+      let y,ys = b in
+      (* k.(y+ys) <= x+xs <==> k.y-x + k.ys <= xs *)
+      i_affine_ratio_leq Z.(sub (mul k y) x) (i_times k ys) xs
+    else
+    if i_neg0 a || i_neg0 b then
+      (* [neg_min] (a <= 0 || b <= 0) -> ( b <= a/k <-> b*k - k < a ) *)
+      let x,xs = a in
+      let y,ys = b in
+      (* k.(y+ys)-k < x+xs <==> k.(y-1)-x + k.ys < xs *)
+      i_affine_ratio_lt Z.(sub (mul k (pred y)) x) (i_times k ys) xs
+    else
+      raise Not_found
+
+  and i_affine_ratio_leq c xs ys =
+    try match i_ratio xs , i_ratio ys with
+      | POS(a,k) , NONE ->
+          (* c + a/k <= ys <==>  a/k <= -c+ys *)
+          i_ratio_max a k (Z.neg c,ys)
+      | NEG(a,k) , NONE ->
+          (* c - a/k <= ys <==> c-ys <= a/k  *)
+          i_ratio_min (c,i_opp ys) a k
+      | NONE , POS(a,k) ->
+          (* c + xs <= a/k *)
+          i_ratio_min (c,xs) a k
+      | NONE , NEG(a,k) ->
+          (* c + xs <= -a/k <==> a/k <= -c-xs *)
+          i_ratio_max a k (Z.neg c,i_opp xs)
+      | _ ->
+          (* c+xs <= ys *)
+          i_affine_leq c xs ys
+    with Not_found ->
+      i_affine_leq c xs ys
+
+  and i_affine_ratio_lt c xs ys =
+    try match i_ratio xs , i_ratio ys with
+      | POS(a,k) , NONE ->
+          (* c + a/k < ys <==> a/k <= -c-1+ys *)
+          i_ratio_max a k (Z.pred (Z.neg c),ys)
+      | NEG(a,k) , NONE ->
+          (* c - a/k < ys <==> c+1-ys <= a/k *)
+          i_ratio_min (Z.succ c,i_opp ys) a k
+      | NONE , POS(a,k) ->
+          (* c + xs < a/k <==> c+1+xs <= a/k *)
+          i_ratio_min (Z.succ c,xs) a k
+      | NONE , NEG(a,k) ->
+          (* c + xs < -a/k <==> a/k <= -c-1-xs *)
+          i_ratio_max a k (Z.pred (Z.neg c),i_opp xs)
+      | _ ->
+          (* c+xs < ys *)
+          i_affine_lt c xs ys
+    with Not_found ->
+      i_affine_lt c xs ys
+
+  (* --- Affine Dispatch --- *)
+
+  let is_affine xs ys =
     not (List.exists is_real xs || List.exists is_real ys)
 
   let affine_eq c xs ys =
-    if i_affine xs ys
+    if is_affine xs ys
     then i_affine_rel Z.equal c_builtin_eq c xs ys
     else r_affine_rel Q.equal c_builtin_eq c xs ys
 
   let affine_neq c xs ys =
-    if i_affine xs ys
+    if is_affine xs ys
     then i_affine_rel (fun x y -> not (Z.equal x y)) c_builtin_neq c xs ys
     else r_affine_rel (fun x y -> not (Q.equal x y)) c_builtin_neq c xs ys
 
   let affine_leq c xs ys =
-    if i_affine xs ys then
-      if Z.equal c Z.one
-      then i_affine_rel Z.lt c_builtin_lt Z.zero xs ys
-      else i_affine_rel Z.leq c_builtin_leq c xs ys
+    if is_affine xs ys
+    then i_affine_ratio_leq c xs ys
     else r_affine_rel Q.leq c_builtin_leq c xs ys
 
   let affine_lt c xs ys =
-    if i_affine xs ys then
-      if not (Z.equal c Z.zero)
-      then i_affine_rel Z.leq c_builtin_leq (Z.succ c) xs ys
-      else i_affine_rel Z.lt c_builtin_lt c xs ys
+    if is_affine xs ys
+    then i_affine_ratio_lt c xs ys
     else r_affine_rel Q.lt c_builtin_lt c xs ys
 
   let affine_cmp = function
@@ -1254,23 +1395,9 @@ struct
     | NEQ -> affine_neq
     | LEQ -> affine_leq
 
-  (* --- Times --- *)
-
-  let q_times k z =
-    if Z.equal k Z.one then z else
-    if Z.equal k Z.zero then Q.zero else
-      Q.(make (Z.mul k z.num) z.den)
-
-  let rec times z e =
-    if Z.equal z Z.one then e else
-    if Z.equal z Z.zero then e_zint Z.zero else
-      match e.repr with
-      | Kint z' -> e_zint (Z.mul z z')
-      | Kreal r -> e_real (q_times z r)
-      | Times(z',t) -> times (Z.mul z z') t
-      | _ -> c_times z e
-
-  (* --- Additions --- *)
+  (* -------------------------------------------------------------------------- *)
+  (* --- Affine Form                                                        --- *)
+  (* -------------------------------------------------------------------------- *)
 
   let rec unfold_affine acc k = function
     | [] -> acc
@@ -1307,15 +1434,23 @@ struct
         end
     | [] -> a
 
-  let affine a =
+  let affine a : term Logic.affine =
     let kts = unfold_affine1 [] Z.one a in
-    let fact,const = List.partition (fun (_,base) -> base.id = e_one.id) kts in
-    let base = List.fold_left (fun z (k,_) -> Z.add z k) Z.zero const in
-    { constant = base ; factors = fact }
+    let xs,cs = List.partition (fun (_,base) -> base.id = e_one.id) kts in
+    List.fold_left (fun z (k,_) -> Z.add z k) Z.zero cs , xs
+
+  (* --- Additions --- *)
 
   (* ts normalized *)
   let addition ts =
     let kts = unfold_affine [] Z.one ts in
+    let kts = List.sort compare_monoms kts in
+    c_add (fold_affine fold_monom [] kts)
+
+  (* a and b normalized *)
+  let substraction a b =
+    let kts = unfold_affine1 [] Z.one a in
+    let kts = unfold_affine1 kts Z.minus_one b in
     let kts = List.sort compare_monoms kts in
     c_add (fold_affine fold_monom [] kts)
 
@@ -1411,12 +1546,14 @@ struct
         let t = c_mul ts in
         if Z.equal s Z.one then t else c_times s t
 
-  (* --- Divisions --- *)
-
   let e_times k x =
-    if Z.equal k Z.zero then e_zero else
     if Z.equal k Z.one then x else
-      times k x
+    if Z.equal k Z.zero then e_zero else
+      let kts = unfold_affine1 [] k x in
+      let kts = List.sort compare_monoms kts in
+      c_add (fold_affine fold_monom [] kts)
+
+  (* --- Divisions --- *)
 
   let e_div a b =
     match a.repr , b.repr with
@@ -1954,9 +2091,9 @@ struct
   let e_equiv = e_eq
   let e_sum = addition
   let e_prod = multiplication
-  let e_opp x = times Z.minus_one x
+  let e_opp x = e_times Z.minus_one x
   let e_add x y = addition [x;y]
-  let e_sub x y = addition [x;e_opp y]
+  let e_sub x y = substraction x y
   let e_mul x y = multiplication [x;y]
 
   (* -------------------------------------------------------------------------- *)
