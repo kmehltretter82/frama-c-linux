@@ -83,10 +83,15 @@ val create :
   fetch:(unit -> 'a message option) ->
   unit -> 'a server
 
-(** Run the server forever. *)
+(** Run the server forever.
+    The function will not return until the server is shut down. *)
 val run : 'a server -> unit
 
-(** Start the server in background. *)
+(** Start the server in background.
+    The function returns immediately
+    after installing a daemon that accepts GET requests received by
+    the server on calls to `Db.yield()`.
+*)
 val start : 'a server -> unit
 
 (** Stop the server if it is running in background. *)
