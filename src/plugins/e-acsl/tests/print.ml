@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Printer_extension(X:Printer.PrinterClass) = struct
+module Printer_extension(_:Printer.PrinterClass) = struct
 
   class printer = object
     inherit Printer.extensible_printer () as super
