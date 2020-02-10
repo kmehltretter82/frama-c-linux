@@ -20,10 +20,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Printer_extension(_:Printer.PrinterClass) = struct
+module Printer_extension(X: Printer.PrinterClass) = struct
 
   class printer = object
-    inherit Printer.extensible_printer () as super
+    inherit X.printer as super
 
     method! global fmt g =
       let loc, _ = Cil_datatype.Global.loc g in
