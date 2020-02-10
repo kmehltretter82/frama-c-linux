@@ -5067,28 +5067,27 @@ and doType (ghost:bool) isFuncArg
             Kernel.error ~once:true ~current:true
               "Array length %a does not have an integral type."
               Cil_printer.pp_exp len';
-          if not allowVarSizeArrays then begin
-            (* Assert that len' is a constant *)
-            let cst = constFold true len' in
-            (match cst.enode with
-             | Const(CInt64(i, _, _)) ->
-               if Integer.lt i Integer.zero then
-                 Kernel.error ~once:true ~current:true
-                   "Array length is negative."
-             | _ ->
-               if isConstant cst then
-                 (* e.g., there may be a float constant involved.
-                  * We'll leave it to the user to ensure the length is
-                  * non-negative, etc.*)
-                 Kernel.warning ~once:true ~current:true
-                   "Unable to do constant-folding on array length %a. \
-                    Some CIL operations on this array may fail."
-                   Cil_printer.pp_exp cst
-               else
-                 Kernel.error ~once:true ~current:true
-                   "Array length %a is not a compile-time constant."
-                   Cil_printer.pp_exp cst)
-          end;
+          (* Check that len' is admissible *)
+          let cst = constFold true len' in
+          (match cst.enode with
+           | Const(CInt64(i, _, _)) ->
+             if Integer.lt i Integer.zero then
+               Kernel.error ~once:true ~current:true
+                 "Array length is negative."
+           | _  when not allowVarSizeArrays ->
+             if isConstant cst then
+               (* e.g., there may be a float constant involved.
+                * We'll leave it to the user to ensure the length is
+                * non-negative, etc.*)
+               Kernel.warning ~once:true ~current:true
+                 "Unable to do constant-folding on array length %a. \
+                  Some CIL operations on this array may fail."
+                 Cil_printer.pp_exp cst
+             else
+               Kernel.error ~once:true ~current:true
+                 "Array length %a is not a compile-time constant."
+                 Cil_printer.pp_exp cst
+           | _ -> ());
           if Cil.isZero len' && not allowZeroSizeArrays &&
              not (Cil.gccMode () || Cil.msvcMode ())
           then
