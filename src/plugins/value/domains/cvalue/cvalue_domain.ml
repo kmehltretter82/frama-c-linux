@@ -38,7 +38,7 @@ module Model = struct
      lvalue can be incomparable. The origin is then used to store the value from
      the state, to later choose which value to keep. This is done by the update
      function in cvalue_transfer. *)
-  type origin = value option
+  type origin = value
 
   let extract_expr _ _ _ = `Value (Cvalue.V.top, None), Alarmset.all
 

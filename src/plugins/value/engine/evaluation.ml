@@ -258,7 +258,7 @@ let indeterminate_copy lval result alarms =
   let reductness = Unreduced in
   let v, origin = match result with
     | `Bottom -> `Bottom, None
-    | `Value (v, origin) -> `Value v, Some origin
+    | `Value (v, origin) -> `Value v, origin
   in
   let value = { v; initialized; escaping } in
   let record = { value; origin; reductness; val_alarms = alarms} in
@@ -853,7 +853,6 @@ module Make
             in
             let reduction =
               update_reduction reduction (Value.equal intern_value result)
-            and origin = Some origin
             and value = define_value result in
             (* The proper alarms will be set in the record by forward_eval. *)
             {value; origin; reductness; val_alarms = Alarmset.all},
@@ -1084,7 +1083,6 @@ module Make
       let v, alarms = assume_valid_value typ_lv lval (v, alarms) in
       (v, alarms) >>=: fun (value, origin) ->
       let value = define_value value
-      and origin = Some origin
       and reductness, reduction =
         if Alarmset.is_empty alarms then Unreduced, Neither else Reduced, Forward
       in

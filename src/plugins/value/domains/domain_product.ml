@@ -37,8 +37,8 @@ module Make
   type location = Left.location
 
   type origin = {
-    left:  reductness * Left.origin;
-    right: reductness * Right.origin;
+    left:  reductness * Left.origin option;
+    right: reductness * Right.origin option;
   }
 
   let () = incr counter
@@ -85,7 +85,7 @@ module Make
           else if Value.equal v2 Value.top then Created else Reduced
         in
         let origin = {left = left, o1; right = right, o2} in
-        value, origin
+        value, Some origin
       in
       value, alarms
 
@@ -120,7 +120,7 @@ module Make
       | Reduced, Some (Created, _) -> Created
       | _ as x, _ -> x
     in
-    let origin = Extlib.opt_map snd origin in
+    let origin = Extlib.may_map snd ~dft:None origin in
     { record with origin; reductness }
 
   let lift_valuation side valuation =

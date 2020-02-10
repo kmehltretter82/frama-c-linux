@@ -1130,7 +1130,7 @@ module D_Impl : Abstract_domain.S
   type value = Cvalue.V.t
   type state = G.t
   type location = Precise_locs.precise_location
-  type origin = unit
+  type origin
 
   include G
 
@@ -1260,7 +1260,7 @@ module D_Impl : Abstract_domain.S
   (* TODO: it would be interesting to return something here, but we
      currently need a valuation to perform the translation. *)
   let extract_expr _oracle _state _exp =
-    `Value (Cvalue.V.top, ()), Alarmset.all
+    `Value (Cvalue.V.top, None), Alarmset.all
 
   let extract_lval _oracle state _lv typ loc =
     let v =
@@ -1274,7 +1274,7 @@ module D_Impl : Abstract_domain.S
     (* We can probably return an empty set of alarms when the value is known,
        but the only possible alarms on lvalues are about indeterminateness,
        and it is not clear that we know more than the Cvalue domain. *)
-    `Value (v, ()), Alarmset.all
+    `Value (v, None), Alarmset.all
 
   let backward_location _state _lval _typ loc value = `Value (loc, value)
 

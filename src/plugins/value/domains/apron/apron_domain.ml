@@ -360,7 +360,7 @@ module Make (Man : Input) = struct
   type state = Man.t Abstract1.t
   type value = Main_values.Interval.t
   type location = Precise_locs.precise_location
-  type origin = unit
+  type origin
 
   let man = Man.manager
   let log_category = dkey
@@ -463,7 +463,7 @@ module Make (Man : Input) = struct
   let dummy_oracle _ exn = raise exn
 
   let compute state expr typ =
-    let top = `Value (None, ()), Alarmset.all in
+    let top = `Value (None, None), Alarmset.all in
     if not (is_relevant expr)
     then top
     else
@@ -476,7 +476,7 @@ module Make (Man : Input) = struct
         let value =
           if Interval.is_bottom interval
           then `Bottom
-          else `Value (interval_to_ival interval, ())
+          else `Value (interval_to_ival interval, None)
         in
         (* TODO: remove alarms if computation does not overflow *)
         value, Alarmset.all

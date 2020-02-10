@@ -52,9 +52,9 @@ module Make
   include Static
   type value = Value.t
   type location = Loc.location
-  type origin = unit
+  type origin
 
-  let eval_top = `Value (Value.top, ()), Alarmset.all
+  let eval_top = `Value (Value.top, None), Alarmset.all
   let extract_expr _ _ _ = eval_top
   let extract_lval _ _ _ _ _ = eval_top
   let backward_location _ _ _ loc value = `Value (loc, value)

@@ -65,11 +65,11 @@ module Make_Minimal
   type value = Value.t
   type location = Location.location
   type state = Domain.t
-  type origin = unit
+  type origin
 
   let narrow x _y = `Value x
 
-  let top_answer = `Value (Value.top, ()), Alarmset.all
+  let top_answer = `Value (Value.top, None), Alarmset.all
   let extract_expr _oracle _state _expr = top_answer
   let extract_lval _oracle _state _lval _typ _location = top_answer
   let backward_location _state _lval _typ location value = `Value (location, value)
@@ -184,16 +184,19 @@ module Complete_Simple_Cvalue (Domain: Simpler_domains.Simple_Cvalue)
     type value = Cvalue.V.t
     type location = Precise_locs.precise_location
     type state = Domain.t
-    type origin = unit
+    type origin
 
     let narrow x _y = `Value x
 
     let extract_expr _oracle state expr =
-      let v = Domain.extract_expr state expr >>-: fun v -> v, () in
+      let v = Domain.extract_expr state expr >>-: fun v -> v, None in
       v, Alarmset.all
 
     let extract_lval _oracle state lval typ location =
-      let v = Domain.extract_lval state lval typ location >>-: fun v -> v, () in
+      let v =
+        Domain.extract_lval state lval typ location >>-: fun v ->
+        v, None
+      in
       v, Alarmset.all
 
     let backward_location _state _lval _typ location value =
