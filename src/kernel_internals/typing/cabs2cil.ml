@@ -3360,7 +3360,8 @@ let rec collectInitializer
               (Integer.to_int ni), false
             | _ ->
               Kernel.fatal ~current:true
-                "Array length %a is not a compile-time constant."
+                "Array length %a is not a compile-time constant: \
+                 no explicit initializer allowed."
                 Cil_printer.pp_exp len
           end
         | _ ->
@@ -3678,7 +3679,8 @@ let integerArrayLength (leno: exp option) : int =
     try lenOfArray leno
     with LenOfArray ->
       Kernel.fatal ~current:true
-        "Array length %a is not a compile-time constant."
+        "Array length %a is not a compile-time constant: \
+         no explicit initializer allowed."
         Cil_printer.pp_exp len
 
 let find_field_offset cond (fidlist: fieldinfo list) : offset =
