@@ -139,14 +139,14 @@ diff tests/builtins/oracle/allocated.0.res.oracle tests/builtins/oracle_apron/al
 ---
 >   j ∈ [1..10]
 diff tests/builtins/oracle/memexec-malloc.res.oracle tests/builtins/oracle_apron/memexec-malloc.res.oracle
-20c20,23
+16c16,19
 < [eva] tests/builtins/memexec-malloc.c:25: Reusing old results for call to f
 ---
 > [eva] computing for function f <- main.
 >   Called from tests/builtins/memexec-malloc.c:25.
 > [eva] Recording results for f
 > [eva] Done for function f
-24c27,30
+20c23,26
 < [eva] tests/builtins/memexec-malloc.c:29: Reusing old results for call to f
 ---
 > [eva] computing for function f <- main.

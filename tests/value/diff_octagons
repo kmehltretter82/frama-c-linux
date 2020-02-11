@@ -248,7 +248,22 @@ diff tests/value/oracle/nonlin.res.oracle tests/value/oracle_octagons/nonlin.res
 111a117,118
 > [eva:nonlin] tests/value/nonlin.c:70: non-linear 'z * x + x * y', lv 'x'
 > [eva:nonlin] tests/value/nonlin.c:70: subdividing on x
-176,178c183,185
+149a157,158
+> [eva:nonlin] tests/value/nonlin.c:114: non-linear 'x * x', lv 'x'
+> [eva:nonlin] tests/value/nonlin.c:114: subdividing on x
+152a162
+> [eva:nonlin] tests/value/nonlin.c:115: subdividing on x
+153a164
+> [eva:nonlin] tests/value/nonlin.c:117: subdividing on x
+165,167c176,178
+<   more_precise ∈ [-48..400]
+<   even_more_precise ∈ [-16..400]
+<   precise ∈ [0..400]
+---
+>   more_precise ∈ [-200..400]
+>   even_more_precise ∈ [-200..400]
+>   precise ∈ [-200..400]
+203,205c214,216
 <   square ∈ [-48..400]
 <   square2 ∈ [-48..400]
 <   res ∈ [-144..400]
