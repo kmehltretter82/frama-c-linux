@@ -611,8 +611,9 @@ export function useUpdate(evt = 'dome.update')
 {
   const update = useForceUpdate();
   React.useEffect(() => {
-    emitter.on(evt,update);
-    return () => emitter.off(evt,update);
+    const trigger = () => setImmediate(update);
+    emitter.on(evt,trigger);
+    return () => emitter.off(evt,trigger);
   });
 }
 
