@@ -23,7 +23,7 @@ import Zmq from 'zeromq' ;
    @event
    @summary Server Status Notification Event
    @description
-   Event `'frama-c.server`.
+   Event `'frama-c.server'`.
 */
 export const SERVER = 'frama-c.server' ;
 
@@ -62,11 +62,8 @@ var queue_cmd; // Queue of server commands to be sent
 var queue_ids; // Waiting request ids to be sent
 var polling;   // Timeout Polling timer
 var flushed;   // Immediate Flushed timer
-var config;    // Server process config
-var sent;      // Characters sent
-var recv;      // Characters received
-var started;   // Date of Server activity start
-var process;   // Cumulated Server processing time
+var config;    // Server config
+var process;   // Server process
 var socket;    // ZMQ (REQ) socket
 var busy;      // ZMQ socket is busy
 var killer;    // killer timeout
@@ -99,25 +96,11 @@ export function getError() { return error; }
 export function isRunning() { return status === RUNNING; }
 
 /**
-   @summary Server Statistics.
-   @return {object} stats (see above)
-   @description
-   The returned object has the following properties:
-   - `pending` : number of pending requests;
-   - `requests` : number of issued requests;
-   - `time` : ellapsed time of server activity, in milliseconds.
-   - `sent` : number of UTF-8 chars sent to server;
-   - `recv` : number of UTF-8 chars received from server;
-   - `rate` : number of requests per milliseconds.
+   @summary Number of requests still pending.
+   @return {number} pending requests
 */
-export function getStats() {
-  const pending = _.reduce( pending , (n,_) => n+1, 0 );
-  const requests = rqid - pending ;
-  const time = process + (started ? Date.now() - started : 0 );
-  const rate = process ? requests / process : 0 ;
-  return {
-    pending, requests, sent, recv, rate, time
-  };
+export function getPending() {
+  return _.reduce( pending , (_,n) => n+1, 0 );
 }
 
 // --------------------------------------------------------------------------
@@ -356,11 +339,7 @@ async function _launch() {
 
 function _reset() {
   rqid = 0;
-  sent = 0;
-  recv = 0;
-  started = undefined;
   process = undefined;
-  started = undefined;
   queue_cmd = [];
   queue_ids = [];
   _.forEach( pending , ({ reject }) => reject('shutdown') );
@@ -491,35 +470,26 @@ function _send() {
   if (!busy) {
     const cmd = queue_cmd ;
     if (!cmd.length && _waiting()) cmd.push('POLL');
-    if (!cmd.length) {
+    if (cmd.length) {
       const ids = queue_ids ;
       queue_cmd = [];
       queue_ids = [];
       const socket = socket ;
       if (socket) {
-        if (!started) started = Date.now() ;
         busy = true ;
-        sent = cmd.reduce( (s,p) => s + p.length , sent);
         socket.send( cmd )
           .then(() => socket.receive().then((resp) => _receive(resp)))
           .catch(() => _cancel(ids))
-          .finally(() => busy = false);
+          .finally(() => { busy = false ; Dome.emit(SERVER); });
       } else
         _cancel(ids);
-    } else {
-      const started = started ;
-      if (started) {
-        const stopped = Date.now();
-        process += stopped - started ;
-        started = undefined ;
-      }
+      Dome.emit(SERVER);
     }
   }
 }
 
 function _receive(resp) {
   try {
-    recv = resp.reduce( (s,p) => s + p.length , recv);
     var rid,data,err,cmd;
     const shift = () => resp.shift().toString();
     while( resp.length ) {
@@ -571,7 +541,7 @@ function _receive(resp) {
 
 export default {
   configure, console,
-  getStatus, getError, getStats, isRunning,
+  getStatus, getError, getPending, isRunning,
   start, stop, kill, restart, clear,
   sendGET, sendSET, sendEXEC,
   IDLE,STARTED,RUNNING,KILLING,RESTART,FAILED
