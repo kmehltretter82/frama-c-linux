@@ -279,7 +279,7 @@ export function clear() {
    @param {string} [config.cwd] - Working directory (default: current)
    @param {string} [config.command] - Server command (default: `frama-c`)
    @param {Array.<string>} [config.params] - Additional server arguments (default: empty)
-   @param {string} [config.sockaddr] - Server socket (default: `ipc:///.frama-c.socket.io`)
+   @param {string} [config.sockaddr] - Server socket (default: `ipc:///.frama-c.<pid>.io`)
    @param {number} [config.timeout] - Shutdown timeout before server is hard killed, in milliseconds (default: 300ms)
    @param {number} [config.polling] - Server polling period, in milliseconds (default: 50ms)
    @param {string} [config.logout] - Process stdout log file (default: `undefined`)
@@ -298,8 +298,26 @@ async function _launch() {
   _reset();
   if (!config) throw('Frama-C Server not configured');
   let { env, cwd, command='frama-c', params=[], sockaddr, logout, logerr } = config;
+
+  buffer.clear();
+  buffer.append('$',command);
+  params.forEach((argv) => {
+    if (argv.startsWith('-') || argv.endsWith('.c') || argv.endsWith('.i') || argv.endsWith('.h'))
+      buffer.append('\n    ');
+    buffer.append(' ');
+    buffer.append(argv);
+  });
+  buffer.append('\n');
+
   if (!cwd) cwd = System.getWorkingDir();
-  if (!sockaddr) sockaddr = 'ipc://' + System.join( cwd , '.frama-c.socket.io' );
+  if (!sockaddr) {
+    let socketfile = System.join(cwd,'.frama-c.' + System.getPID() + '.io');
+    System.atExit(() => {
+      System.remove(socketfile);
+      console.log('REMOVE',socketfile);
+    });
+    sockaddr = 'ipc://' + socketfile ;
+  }
   logout = logout && System.join( cwd, logout );
   logerr = logerr && System.join( cwd, logerr );
   params = params.concat('-then','-server-zmq',sockaddr );
@@ -312,15 +330,6 @@ async function _launch() {
   // Launch Process
   const process = await System.spawn( command, params, options );
   const kill = () => process.kill() ;
-  buffer.clear();
-  buffer.append('$',command);
-  params.forEach((argv) => {
-    if (argv.startsWith('-') || argv.endsWith('.c') || argv.endsWith('.i') || argv.endsWith('.h'))
-      buffer.append('\n    ');
-    buffer.append(' ');
-    buffer.append(argv);
-  });
-  buffer.append('\n');
   const logger = (text) => {
     buffer.append(text);
     if (0 <= text.indexOf('\n'))

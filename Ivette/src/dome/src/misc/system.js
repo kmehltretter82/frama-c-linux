@@ -144,6 +144,12 @@ export function getDownloads() { return appProxy.getPath('downloads'); }
 export function getWorkingDir() { return command_wdir; }
 
 /**
+   @summary Returns the current process ID.
+   @return {number} `process.pid`
+ */
+export function getPID() { return process.pid; }
+
+/**
    @summary Command-line arguments (Application Window).
    @return {Array.<string>} command-line arguments
    @description
@@ -639,6 +645,7 @@ export default {
   getWorkingDir,
   getArguments,
   getStatic,
+  getPID,
   join, resolve, dirname, basename, extname,
   fileStat,
   isFile, readFile, writeFile, copyFile,
