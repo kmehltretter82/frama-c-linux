@@ -14,7 +14,8 @@ import './style.css' ;
 import 'dome/misc/exports' ;
 
 import { LabView, View, Group, Component } from 'frama-c/labviews' ;
-import ServerControl from './ServerControl' ;
+import { GridItem, GridHbox, GridVbox } from 'dome/layout/grids';
+import Controller from './Controller' ;
 
 // --------------------------------------------------------------------------
 // --- Main View
@@ -48,16 +49,19 @@ export default (function() {
           customize={viewbar}
           settings='frama-c.labview'
           >
-          <View id='default' label='Dashboard' defaultView />
-          <Component id='dashboard' label='Dashboard'/>
-          <Group id='plugins' label='Plugins'>
-            <Component id='plugins.eva' label='Frama-C / EVA' />
-            <Component id='plugins.wp'  label='Frama-C / WP' />
-          </Group>
+          <View id='default' label='Dashboard' defaultView>
+            <GridItem id='frama-c.console'/>
+          </View>
+
+          <Component id='frama-c.console' label='Console' >
+            <Controller.Console/>
+          </Component>
         </LabView>
       </Splitter>
       <Toolbar.ToolBar>
-        <ServerControl/>
+        <Controller.Status/>
+        <Toolbar.Filler/>
+        <Controller.Stats/>
       </Toolbar.ToolBar>
     </Vfill>
   );

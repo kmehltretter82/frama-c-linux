@@ -1,0 +1,97 @@
+// --------------------------------------------------------------------------
+// --- Console
+// --------------------------------------------------------------------------
+
+import React from 'react' ;
+import Dome from 'dome' ;
+import Server from 'frama-c/server' ;
+
+import { Filler, Button } from 'dome/layout/toolbars' ;
+import { LED } from 'dome/controls/buttons' ;
+import { Label, Code } from 'dome/controls/labels' ;
+import { Text } from 'dome/text/editors' ;
+
+import 'codemirror/theme/ambiance.css' ;
+
+// --------------------------------------------------------------------------
+// --- Configure Server
+// --------------------------------------------------------------------------
+
+Dome.onCommand(() => {
+  Server.configure();
+  Server.start();
+});
+
+// --------------------------------------------------------------------------
+// --- Server Console
+// --------------------------------------------------------------------------
+
+export const Console = () => {
+  return (
+    <Text buffer={Server.buffer}
+          mode='text'
+          theme="ambiance"
+          readOnly="nocursor" />
+  );
+};
+
+// --------------------------------------------------------------------------
+// --- Status
+// --------------------------------------------------------------------------
+
+export const Status = () => {
+  Dome.useUpdate( Server.SERVER );
+  let s = Server.getStatus();
+  let n = Server.getPending();
+  let led, blink, error ;
+  switch(s) {
+  case Server.RUNNING:
+    led = n>0 ? 'positive' : 'active' ;
+    break;
+  case Server.IDLE:
+    led = 'inactive' ;
+    break;
+  case Server.STARTED:
+    led = 'active' ;
+    blink = true ;
+    break;
+  case Server.KILLING:
+    led = 'negative' ;
+    blink = true ;
+    break;
+  case Server.RESTART:
+    led = 'warning' ;
+    blink = true ;
+    break;
+  case Server.FAILED:
+    led = 'negative' ;
+    blink = false ;
+    error = Server.getError();
+    break;
+  }
+  return (
+    <React.Fragment>
+      <LED status={led} blink={blink} />
+      <Code label={s}/>
+      { error && <Label icon='WARNING' label={error} /> }
+    </React.Fragment>
+  );
+};
+
+// --------------------------------------------------------------------------
+// --- Server Stats
+// --------------------------------------------------------------------------
+
+export const Stats = () => {
+  Dome.useUpdate( Server.SERVER );
+  let n = Server.getPending();
+  return n > 0 ? <Code>{n} rq.</Code> : null ;
+};
+
+// --------------------------------------------------------------------------
+// --- Controller Exports
+// --------------------------------------------------------------------------
+
+export default { Console, Status, Stats };
+
+// --------------------------------------------------------------------------

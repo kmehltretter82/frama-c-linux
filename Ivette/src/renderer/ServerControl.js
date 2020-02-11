@@ -10,13 +10,20 @@ import { Filler, Button } from 'dome/layout/toolbars' ;
 import { LED } from 'dome/controls/buttons' ;
 import { Label, Code } from 'dome/controls/labels' ;
 
+Dome.onCommand(() => {
+  Server.configure();
+  Server.start();
+  console.log('STARTED');
+});
+
 export default (function(props) {
   Dome.useUpdate( Server.SERVER );
-  let status = Server.getStatus();
+  let s = Server.getStatus();
+  let n = Server.getPending();
   let led, blink, error ;
-  switch(status) {
+  switch(s) {
   case Server.RUNNING:
-    led = Server.isPending() ? 'positive' : 'active' ;
+    led = n>0 ? 'positive' : 'active' ;
     break;
   case Server.IDLE:
     led = 'inactive' ;
@@ -37,13 +44,14 @@ export default (function(props) {
     led = 'negative' ;
     blink = false ;
     error = Server.getError();
+    break;
   }
   return (
     <React.Fragment>
-      <LED status={status} blink={blink} />
-      { error && <Label icon='WARNING' label={error}/> }
+      <LED status={led} blink={blink} />
+      <Code label={s}/>
       <Filler/>
-      <Code>{Server.getPending()} rq.</Code>
+      { error ? <Label icon='WARNING' label={error} /> : <Code>{n} rq.</Code> }
     </React.Fragment>
   );
 });
