@@ -64,13 +64,6 @@
     background-image: none;
 }
 
-.dome-xButton-lcd {
-    text-align: right ;
-    color: #61611a ;
-    background-color: #b2b798 ;
-    border-color: #c2c0c2 ;
-}
-
 .dome-xButton-default {
     border-color: #c2c0c2 ;
     background-color: #f4f4f4 ;
@@ -146,6 +139,51 @@
 .dome-xButton-label.dome-control-disabled {
     position: relative ; width: 100% ;
     /* font is larger than enabled => relative position */
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Styling LED & LCD                                                  --- */
+/* -------------------------------------------------------------------------- */
+
+.dome-xButton-lcd {
+    text-align: right ;
+    color: #61611a ;
+    background-color: #b2b798 ;
+    border-color: #c2c0c2 ;
+}
+
+.dome-xButton-led {
+    display: inline ;
+    position: relative ;
+    bottom: -2px ;
+    border-color: #999 ;
+    border-style: solid ;
+    border-width: 1px ;
+    border-radius: 50% ;
+    margin: 2px 4px 2px 4px ;
+    padding: 2px ;
+    width: 11px ;
+    height: 11px ;
+}
+
+.dome-xButton-led-inactive {
+    background: none ;
+}
+
+.dome-xButton-led-active {
+    background: radial-gradient( circle at center , #9fd2f9 , #81c9ff );
+}
+
+.dome-xButton-led-positive {
+    background: radial-gradient( circle at center , #00ff0091 , #00ff00 );
+}
+
+.dome-xButton-led-negative {
+    background: radial-gradient( circle at center , #ff5b56 , #f75a55c7 );
+}
+
+.dome-xButton-led-warning {
+    background: radial-gradient( circle at center , #ffc749 , #ecd44f );
 }
 
 /* -------------------------------------------------------------------------- */
@@ -252,6 +290,20 @@
     padding-bottom: 1px ;
     padding-right: 4px ;
     padding-left:  4px ;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Blinker
+/* -------------------------------------------------------------------------- */
+
+.dome-xButton-blink {
+    animation: dome-xButton-blinker 1s linear infinite;
+}
+
+@keyframes dome-xButton-blinker {
+  50% {
+    background: none;
+  }
 }
 
 /* -------------------------------------------------------------------------- */

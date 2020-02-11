@@ -25,7 +25,7 @@ const TRIGGER = (onClick) => (evt) => {
 // --- LCD
 // --------------------------------------------------------------------------
 
-const LCDCLASS = 'dome-xButton dome-text-code dome-xButton-lcd ' ;
+const LCDCLASS = 'dome-xButton dome-xBoxButton dome-text-code dome-xButton-lcd ' ;
 
 /**
    @class
@@ -37,7 +37,7 @@ const LCDCLASS = 'dome-xButton dome-text-code dome-xButton-lcd ' ;
    @property {object} [style] - Additional CSS style
 */
 export const LCD = (props) => (
-  <label className={LCDCLASS + props.className}
+  <label className={LCDCLASS + (props.className || '')}
          title={props.title}
          style={props.style} >
     {props.icon && <Icon id={props.icon}/>}
@@ -46,6 +46,34 @@ export const LCD = (props) => (
     {props.children}
   </label>
 );
+
+// --------------------------------------------------------------------------
+// --- Led
+// --------------------------------------------------------------------------
+
+/**
+   @class
+   @summary Led indicator
+   @property {string} [status] - Led status and color (default: inactive)
+   @property {boolean} [blink] - Led blinking (default: false)
+   @property {string} [title] - Led tooltip (optional)
+   @property {string} [className] - Additional class
+   @property {object} [style] - Additional CSS style
+   @description
+   LED status can be:
+   - `'inactive'`: off (or any falsy value)
+   - `'active'`: blue color
+   - `'positive'`: green color
+   - `'negative'`: red color
+   - `'warning'`: orange color
+*/
+export const LED = (props) => {
+  const classes = 'dome-xButton-led dome-xButton-led-'
+        + (props.status || 'inactive')
+        + (props.blink ? ' dome-xButton-blink' : '')
+        + (props.className ? ' ' + props.className : '') ;
+  return (<div className={classes} title={props.title} style={props.style} />);
+};
 
 // --------------------------------------------------------------------------
 // --- Button
@@ -76,6 +104,7 @@ const LABEL = ({disabled,label}) => (
    @property {boolean} [display] - Defaults to `true`
    @property {boolean} [focusable] - May gain focus
    @property {string} [kind] - Styled button (see below)
+   @property {boolean} [blink] - Blinking button
    @property {function} [onClick] - On-click callback
    @property {string} [className] - Additional class
    @property {object} [style] - Additional style
@@ -93,13 +122,15 @@ const LABEL = ({disabled,label}) => (
 export const Button = (props) => {
   const disabled = DISABLED(props);
   const { focusable=false, kind='default',
-          visible=true, display=true,
+          visible=true, display=true, blink=false,
           selected, icon, label, className='' } = props;
   const theClass = 'dome-xButton dome-xBoxButton dome-xButton-'
         + (selected ? 'selected' : kind)
+        + (!blink ? '' : ' dome-xButton-blink')
         + (visible ? '' : ' dome-control-hidden')
         + (display ? '' : ' dome-control-erased')
-        + (className ? ' ' + className : '') ;
+        + (className ? ' ' + className : '')
+  ;
   const nofocus = focusable ? undefined : true ;
   return (
     <button type='button'
@@ -516,7 +547,10 @@ export const Field = (props) => {
 // --------------------------------------------------------------------------
 
 export default {
-  Button, CircButton, IconButton, Switch, Checkbox, Radio, RadioGroup, Select
+  LCD, LED,
+  Button, CircButton, IconButton,
+  Switch, Checkbox, Radio, RadioGroup,
+  Select
 };
 
 // --------------------------------------------------------------------------
