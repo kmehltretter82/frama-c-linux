@@ -17,8 +17,24 @@ import 'codemirror/theme/ambiance.css' ;
 // --- Configure Server
 // --------------------------------------------------------------------------
 
-Dome.onCommand(() => {
-  Server.configure();
+Dome.onCommand((argv,cwd) => {
+  let params = [];
+  let command ;
+  let sockaddr ;
+  for (let k = 0 ; k < argv.length ; k++) {
+    let v = argv[k];
+    switch(v) {
+    case '--command':
+      command = argv[++k];
+      break;
+    case '--socket':
+      sockaddr = argv[++k];
+      break;
+    default:
+      params.push(v);
+    }
+  }
+  Server.configure({ cwd, command, sockaddr, params });
   Server.start();
 });
 

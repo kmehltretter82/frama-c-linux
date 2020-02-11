@@ -1,9 +1,10 @@
 # --------------------------------------------------------------------------
 APP=Ivette
 DOME=src/dome
+DOME_ARGS=--command ../bin/frama-c
 DOME_APP_CLI=bin/frama-c-gui
 DOME_APP_SRC=src/frama-c
-COPYRIGHT="CEA LIST / LSL"
+COPYRIGHT=CEA LIST / LSL
 # --------------------------------------------------------------------------
 
 .PHONY: app dev doc dist
