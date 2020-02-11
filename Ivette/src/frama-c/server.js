@@ -312,7 +312,7 @@ export function configure( cfg )
 async function _launch() {
   _reset();
   if (!config) throw('Frama-C Server not configured');
-  let { env, cwd, command='frama-c', params, sockaddr, logout, logerr } = config;
+  let { env, cwd, command='frama-c', params=[], sockaddr, logout, logerr } = config;
   if (!cwd) cwd = System.getWorkingDir();
   if (!sockaddr) sockaddr = System.join( cwd , '.frama-c.socket.io' );
   logout = logout && System.join( cwd, logout );
@@ -329,6 +329,14 @@ async function _launch() {
   const logging = console.append ;
   const kill = kill ;
   console.clear();
+  console.append('$',command);
+  params.foreach((argv) => {
+    if (argv.startsWith('-') || argv.endsWith('.c') || argv.endsWith('.i') || argv.endsWith('.h'))
+      console.append('\n    ');
+    console.append(' ');
+    console.append(argv);
+  });
+  console.append('\n');
   process = process ;
   process.stdout.on('data', logging );
   process.stderr.on('data', logging );
