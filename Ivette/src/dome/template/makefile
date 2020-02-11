@@ -5,7 +5,7 @@
 # DOMEMK_ reserved for makefile derived variables
 
 APP?=$(shell basename $(PWD))
-COPYRIGHT?="CEA Tech"
+COPYRIGHT?=CEA Tech
 
 DOME?=dome
 DOME_ARGS?=
@@ -319,7 +319,7 @@ dome-api: $(DOME_MK_BIN)/jsdoc
 	@rm -f $(DOME_APP_DOC)/*.css
 	@rm -fr $(DOME_APP_DOC)/fonts
 	@rm -fr $(DOME_APP_DOC)/styles
-	@(cd $(DOME) && DOME='.' DOME_PWD=$(PWD) APP=$(APP) COPYRIGHT=$(COPYRIGHT) \
+	@(cd $(DOME) && DOME='.' DOME_PWD=$(PWD) APP=$(APP) COPYRIGHT="$(COPYRIGHT)" \
 	  $(DOME_MK_BIN)/jsdoc -c ./doc/app.json $(DOME_MK_API_SRC) -d $(DOME_MK_API_DOC))
 	@echo "[Dome]   $(DOME_APP_DOC)/index.html"
 
