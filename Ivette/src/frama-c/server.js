@@ -28,33 +28,6 @@ import Zmq from 'zeromq' ;
 export const SERVER = 'frama-c.server' ;
 
 // --------------------------------------------------------------------------
-// --- Server Utilities
-// --------------------------------------------------------------------------
-/*
-const SERVER_LOG = '-server-log' ;
-const SERVER_NO_LOG = '-server-no-log' ;
-const SERVER_OPT = '-server-zmq' ;
-const SERVER_DEF = '-server-zmq=' ;
-const SERVER_URL = '.frama-c.socket.io' ;
-
-const getZmqLog = (params) => params.find((opt) => (
-  opt === SERVER_LOG || opt === SERVER_NO_LOG
-));
-
-const getZmqURL = (params) => {
-  let def = params.findIndex((opt) => opt.startsWith(SERVER_DEF));
-  if (def) {
-    let quote = def[ SERVER_DEF.length ];
-    return ( quote === "'" || quote === '"' )
-      ? def.slice( SERVER_DEF.length + 1 , -1 )
-      : def.slice( SERVER_DEF.length );
-  }
-  let pos = params.findIndex((opt) => opt.startsWith(SERVER_OPT));
-  if (pos) return params[pos+1];
-  return undefined ;
-};
-*/
-// --------------------------------------------------------------------------
 // --- Server Status
 // --------------------------------------------------------------------------
 
@@ -317,25 +290,19 @@ export function clear() {
 /**
    @summary Configure the Server.
    @param {object} config - Server Configuration
+   @param {Object} [config.env] - Process environment variables (default: `undefined`)
    @param {string} [config.cwd] - Working directory (default: current)
    @param {string} [config.command] - Server command (default: `frama-c`)
-   @param {Array.<string>} [config.params] - Server arguments (default: `-server-zmq .frama-c.socket.io`)
-   @param {string} [config.sockaddr] - Server socket name (default: `.frama-c.socket.io`)
+   @param {Array.<string>} [config.params] - Additional server arguments (default: empty)
+   @param {string} [config.sockaddr] - Server socket (default: `ipc:///.frama-c.socket.io`)
+   @param {number} [config.timeout] - Shutdown timeout before server is hard killed, in milliseconds (default: 300ms)
+   @param {number} [config.polling] - Server polling period, in milliseconds (default: 50ms)
    @param {string} [config.logout] - Process stdout log file (default: `undefined`)
    @param {string} [config.logerr] - Process stderr log file (default: `undefined`)
-   @param {Object} [config.env] - Process environment variables (default: `undefined`)
 */
 export function configure( cfg )
 {
-  if (!cfg)
-    config =
-    {
-      command: 'frama-c',
-      params: ['-server-zmq', '.frama-c.socket.io'],
-      sockaddr: '.frama-c.socket.io'
-    };
-  else
-    config = cfg;
+  config = cfg;
 }
 
 // --------------------------------------------------------------------------
@@ -345,11 +312,12 @@ export function configure( cfg )
 async function _launch() {
   _reset();
   if (!config) throw('Frama-C Server not configured');
-  let { env, cwd, command, params, sockaddr, logout, logerr } = config;
+  let { env, cwd, command='frama-c', params, sockaddr, logout, logerr } = config;
   if (!cwd) cwd = System.getWorkingDir();
-  sockaddr = System.join( cwd, sockaddr );
+  if (!sockaddr) sockaddr = System.join( cwd , '.frama-c.socket.io' );
   logout = logout && System.join( cwd, logout );
   logerr = logerr && System.join( cwd, logerr );
+  params = params.concat('-then','-server-zmq','ipc://' + sockaddr );
   let options = {
     cwd,
     stdout: { path: logout, pipe: true },
@@ -502,11 +470,11 @@ function _flush() {
 
 function _poll() {
   if (!polling) {
-    let timeout = (config && config.polling) || 50 ;
+    let delay = (config && config.polling) || 50 ;
     polling = setTimeout(() => {
       polling = false;
       _send();
-    }, timeout);
+    }, delay);
   }
 }
 
