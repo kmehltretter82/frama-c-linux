@@ -4019,10 +4019,10 @@ as the following type-checked AST fragment:
 
 If the extended clause is of kind \verb|Ext_preds l| or \verb|Ext_terms l|,
 and all the information of the extension is contained in the list \verb|l|,
-no other function than the typing function needs to be registered. The parsing
-will use the standard way to parse untyped predicates and terms, and after
+no function other than the typing function needs to be registered. The parsing
+will use the standard way to parse untyped predicates and terms. After
 typing, the visitor will traverse each element of \verb|l| as well as any
-predicate or term present in the AST, and the pretty-printer will output these
+predicate or term present in the AST. The pretty-printer will output these
 elements as a comma-separated list preceded by \verb|kw| (or \verb|loop kw| if
 the extension is a loop annotation).
 
@@ -4080,7 +4080,7 @@ it is in an internal table of the plugin (thus returning a \verb|SkipChildren|
 action) or, on the opposite, to give the possibility to a user defined visitor
 to get an access to this content.
 
-The following code provide a more complete extension example. It provides the
+The following code shows a more complete extension example. It provides the
 user a way to load some types (assumed to be external to Frama-C) so that they
 can be used in ACSL specification.
 
