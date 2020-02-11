@@ -100,21 +100,9 @@ module Config = struct
     create_domain rank name enable (module Main_values.CVal)
 
   let cvalue = make 9 "cvalue" CvalueDomain.get (module Cvalue_domain.State)
-  let gauges = make 6 "gauges" GaugesDomain.get (module Gauges_domain.D)
-  let octagon = make 6 "octagon" OctagonDomain.get (module Octagons)
-  let inout = make 5 "inout" InoutDomain.get (module Inout_domain.D)
-  let traces = make 2 "traces" TracesDomain.get (module Traces_domain.D)
-  let printer = make 2 "printer" PrinterDomain.get (module Printer_domain)
+
   let symbolic_locations =
-    make 7  "symbolic_locations" SymbolicLocsDomain.get (module Symbolic_locs.D)
-
-  let sign =
-    create_domain 4 "sign" SignDomain.get
-      (module Sign_value) (module Sign_domain)
-
-  let bitwise =
-    create_domain 3 "bitwise" BitwiseOffsmDomain.get
-      (module Offsm_value.Offsm) (module Offsm_domain.D)
+    make 7 "symbolic-locations" SymbolicLocsDomain.get (module Symbolic_locs.D)
 
   let equality_domain =
     { name = "equality";
@@ -122,6 +110,21 @@ module Config = struct
       values = Struct Abstract.Value.Unit;
       domain = Functor (module Equality_domain.Make); }
   let equality = create ~enable:EqualityDomain.get equality_domain
+
+  let gauges = make 6 "gauges" GaugesDomain.get (module Gauges_domain.D)
+  let octagon = make 6 "octagon" OctagonDomain.get (module Octagons)
+
+  let bitwise =
+    create_domain 3 "bitwise" BitwiseOffsmDomain.get
+      (module Offsm_value.Offsm) (module Offsm_domain.D)
+
+  let sign =
+    create_domain 4 "sign" SignDomain.get
+      (module Sign_value) (module Sign_domain)
+
+  let inout = make 5 "inout" InoutDomain.get (module Inout_domain.D)
+  let traces = make 2 "traces" TracesDomain.get (module Traces_domain.D)
+  let printer = make 2 "printer" PrinterDomain.get (module Printer_domain)
 
   (* --- Default and legacy configurations ---------------------------------- *)
 
