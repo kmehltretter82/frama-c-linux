@@ -657,6 +657,10 @@ let smp_eq_with_lnot a b = (* b1==~e <==> ~b1==e *)
 (* --- Comparision with LSL / LSR                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
+let two_power_k k =
+  try Integer.two_power k
+  with Z.Overflow -> raise Not_found
+
 let two_power_k_minus1 k =
   try Integer.pred (Integer.two_power k)
   with Z.Overflow -> raise Not_found
@@ -699,10 +703,11 @@ let smp_cmp_with_lsl cmp a0 b0 =
       (* p>=0 && q>=0 && p==q ==> ( ((a<<p)cmp(b<<q)) <==> (a cmp b) ) *)
       cmp a b
     else if a == b && (cmp==e_eq || is_positive_or_null a) then
+      (* p>=0 && q>=0 && a==b         ==> ( ((a<<p)== (b<<q)) <==> (p ==  q) ) *)
       (* p>=0 && q>=0 && a==b && a>=0 ==> ( ((a<<p)cmp(b<<q)) <==> (p cmp q) ) *)
       cmp p q
     else if a == b && is_negative a then
-      (* p>=0 && q>=0 && a==b && a<0 ==> ( ((a<<p)<=(b<<q)) <==> (q cmp p) ) *)
+      (* p>=0 && q>=0 && a==b && a<0 ==> ( ((a<<p)cmp(b<<q)) <==> (q cmp p) ) *)
       cmp q p
     else
       let p = match_integer p in
@@ -755,21 +760,23 @@ let smp_eq_with_lsr a0 b0 =
 let smp_leq_with_lsr x y =
   try
     let a,p = match_fun f_lsr y |> match_positive_or_null_integer_arg2 in
-    (* x <= (a >> p) *)
+    (* x <= (a >> p) with p >= 0 *)
     if x == e_zero then
-      (* 0 <= ( a >> p ) <==> 0 <= a *)
+      (* p >= 0 ==> ( 0 <= (a >> p) <==> 0 <= a )*)
       e_leq e_zero a
     else
-      let k = Integer.two_power p in
+      (* p >= 0 ==> ( x <= (a >> p) <= y <==> x <= a/(2**p) ) *)
+      let k = two_power_k p in
       e_leq x (e_div a (e_zint k))
   with Not_found ->
     let a,p = match_fun f_lsr x |> match_positive_or_null_integer_arg2 in
-    (* (a >> p) <= y *)
+    (* (a >> p) <= y with p >= 0 *)
     if y == e_zero then
-      (* (a >> p) <= 0 <==> a <= 0 *)
+      (* p >= 0 ==> ( (a >> p) <= 0 <==> a <= 0 ) *)
       e_leq a e_zero
     else
-      let k = Integer.two_power p in
+      (* p >= 0 ==> ( (a >> p) <= y <==> a/(2**p) <= y ) *)
+      let k = two_power_k p in
       e_leq (e_div a (e_zint k)) y
 
 (* Rewritting at export *)
