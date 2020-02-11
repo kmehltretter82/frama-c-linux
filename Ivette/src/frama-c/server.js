@@ -108,7 +108,6 @@ export function getPending() {
 // --------------------------------------------------------------------------
 
 function _status(s,err) {
-  console.log('STATUS',s,err);
   if (err) {
     status = FAILED;
     error = err.toString();
