@@ -66,14 +66,17 @@ module Config = struct
   let dynamic_abstractions : dynamic list ref = ref []
 
   let register ~enable abstraction =
+    Value_parameters.register_domain abstraction.name;
     abstractions := (enable, Flag abstraction) :: !abstractions
 
   let dynamic_register ~configure ~make =
     dynamic_abstractions := Dynamic (configure, make) :: !dynamic_abstractions
 
   let configure () =
-    let aux config (enable, flag) =
-      if enable () then add flag config else config
+    let aux config (enable, (Flag domain as flag)) =
+      if enable () || Value_parameters.Domains.mem domain.name
+      then add flag config
+      else config
     in
     let config = List.fold_left aux empty !abstractions in
     let aux config (Dynamic (configure, make)) =

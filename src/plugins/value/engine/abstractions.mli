@@ -68,8 +68,9 @@ type 'v abstraction =
     domain: 'v domain; (** The domain over the value abstraction. *)
   }
 
-(** Register an abstraction. The abstraction is used in an Eva analysis only if
-    [enable ()] returns true at the start of the analysis.  *)
+(** Register an abstraction. The abstraction is used in an Eva analysis if
+    [enable ()] returns true at the start of the analysis, or if -eva-domains
+    has been set to the name of the abstraction.  *)
 val register: enable:(unit -> bool) -> 'v abstraction -> unit
 
 (** Register a dynamic abstraction: the abstraction is built by applying

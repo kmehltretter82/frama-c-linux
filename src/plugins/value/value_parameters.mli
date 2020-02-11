@@ -28,6 +28,8 @@ module EnumerateCond: Parameter_sig.Bool
 module OracleDepth: Parameter_sig.Int
 module ReductionDepth: Parameter_sig.Int
 
+module Domains: Parameter_sig.String_set
+
 module CvalueDomain: Parameter_sig.Bool
 module EqualityDomain: Parameter_sig.Bool
 module GaugesDomain: Parameter_sig.Bool
@@ -240,6 +242,8 @@ val dkey_callbacks : category
 (** Debug category used to print the usage of widenings. *)
 val dkey_widening : category
 
+(** Registers available domain names for the -eva-domains option. *)
+val register_domain: string -> unit
 
 (** Notifies that the binding to Apron domains is available. *)
 val register_apron: unit -> unit
