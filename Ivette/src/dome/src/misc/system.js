@@ -494,7 +494,7 @@ function stdSpec( spec , isOutput ) {
   case 'pipe':
     return { io: 'pipe' };
   default:
-    const fd = fs.openSync( spec.path , spec.mode || (isOutput ? 'w' : 'r') );
+    const fd = spec.path ? fs.openSync( spec.path , spec.mode || (isOutput ? 'w' : 'r') ) : undefined ;
     return (isOutput && spec.pipe) ? { io: 'pipe', fd } : { io: fd } ;
   }
 }
