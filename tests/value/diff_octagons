@@ -255,22 +255,6 @@ diff tests/value/oracle/nonlin.res.oracle tests/value/oracle_octagons/nonlin.res
 > [eva:nonlin] tests/value/nonlin.c:115: subdividing on x
 153a164
 > [eva:nonlin] tests/value/nonlin.c:117: subdividing on x
-165,167c176,178
-<   more_precise ∈ [-48..400]
-<   even_more_precise ∈ [-16..400]
-<   precise ∈ [0..400]
----
->   more_precise ∈ [-200..400]
->   even_more_precise ∈ [-200..400]
->   precise ∈ [-200..400]
-203,205c214,216
-<   square ∈ [-48..400]
-<   square2 ∈ [-48..400]
-<   res ∈ [-144..400]
----
->   square ∈ [-200..400]
->   square2 ∈ [-200..400]
->   res ∈ [-200..400]
 diff tests/value/oracle/plevel.res.oracle tests/value/oracle_octagons/plevel.res.oracle
 12d11
 < [eva] Recording results for main
