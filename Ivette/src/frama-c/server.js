@@ -322,15 +322,20 @@ async function _launch() {
     buffer.append(argv);
   });
   buffer.append('\n');
-  process.stdout.on('data', buffer.append );
-  process.stderr.on('data', buffer.append );
+  const logger = (text) => {
+    buffer.append(text);
+    if (0 <= text.indexOf('\n'))
+      buffer.scroll();
+  };
+  process.stdout.on('data', logger );
+  process.stderr.on('data', logger );
   process.on('error', (err) => {
     buffer.append('Error:',err,'\n');
     _close(err);
   });
   process.on('exit', (status,signal) => {
-    signal && buffer.append('Signal:',signal,'\n');
-    status && buffer.append('Exit:',status,'\n');
+    signal && buffer.log('Signal:',signal);
+    status && buffer.log('Exit:',status);
     _close(signal || status);
   });
   // Connect to Server
