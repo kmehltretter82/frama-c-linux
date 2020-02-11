@@ -1731,7 +1731,7 @@ val register_behavior_extension:
   string ->
   (cilVisitor -> acsl_extension_kind -> (acsl_extension_kind) visitAction)
   -> unit
-[@@ deprecated "Use Acsl_extension.register_behavior instead"]
+[@@ deprecated "Use Acsl_extension.register_behavior instead (arg: ~visitor)"]
 
 (**/**)
 class internal_genericCilVisitor:

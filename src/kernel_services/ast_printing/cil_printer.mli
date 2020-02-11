@@ -43,7 +43,7 @@ val register_behavior_extension:
     @plugin development guide
     @deprecated Frama-C+dev
 *)
-[@@ deprecated "Use Acsl_extension.register_behavior instead"]
+[@@ deprecated "Use Acsl_extension.register_behavior (arg: ~printer) instead"]
 
 val register_global_extension:
   string ->
@@ -53,7 +53,7 @@ val register_global_extension:
     @plugin development guide
     @deprecated Frama-C+dev
 *)
-[@@ deprecated "Use Acsl_extension.register_global instead"]
+[@@ deprecated "Use Acsl_extension.register_global (arg: ~printer) instead"]
 
 val register_code_annot_extension:
   string ->
@@ -63,7 +63,7 @@ val register_code_annot_extension:
     @plugin development guide
     @deprecated Frama-C+dev
 *)
-[@@ deprecated "Use Acsl_extension.register_code_annot_<kind> instead"]
+[@@ deprecated "Use Acsl_extension.register_code_annot_<kind> (arg: ~printer) instead"]
 
 val register_loop_annot_extension:
   string ->
@@ -73,7 +73,7 @@ val register_loop_annot_extension:
     @plugin development guide
     @deprecated Frama-C+dev
 *)
-[@@ deprecated "Use Acsl_extension.register_loop_annot instead"]
+[@@ deprecated "Use Acsl_extension.register_loop_annot (arg: ~printer) instead"]
 
 val state: Printer_api.state
 
@@ -90,7 +90,7 @@ val set_extension_handler:
                Format.formatter -> Cil_types.acsl_extension_kind -> unit) ->
   unit
 (** Used to setup a reference related to the handling of ACSL extensions.
-    If your name is not [Acsl_extension], do not call this
+    If your name is not [Acsl_extension], do not call this.
     @since Frama-C+dev
 *)
 
