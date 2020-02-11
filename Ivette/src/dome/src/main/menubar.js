@@ -12,13 +12,8 @@ import System from 'dome/system' ;
 function reloadWindow(item, focusedWindow)
 {
   if (focusedWindow) {
-    // on reload, start fresh and close any old
-    // open secondary windows
-    if (focusedWindow.id === 1)
-      BrowserWindow.getAllWindows().forEach(function (win) {
-        if (win.id > 1) win.close();
-      });
     reset(); // declared below
+    focusedWindow.send('dome.ipc.closing');
     focusedWindow.reload();
   }
 }
