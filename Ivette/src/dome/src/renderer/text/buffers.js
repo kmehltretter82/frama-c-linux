@@ -143,15 +143,26 @@ export class Buffer extends Emitter {
   }
 
   /**
+     @summary Starts a new line in the buffer.
+     @description
+     If the current buffer content does not finish at the beginning of a fresh line,
+     inserts a newline character.
+  */
+  flushline() {
+    const doc = this._doc ;
+    const from = doc.posFromIndex(Infinity);
+    if (from.ch > 0) doc.replaceRange('\n',from,undefined,'flush');
+  }
+
+  /**
      @summary Appends with newline and auto-scrolling.
      @param {any} [value] - content to append in the buffer
      @description
-     This is a short-cut to `append(...value)`, followed by
-     `append('\n')` and `scroll()`.
+     This is a short-cut to `flushline()` followed by `append(...value,'\n')` and `scroll()`.
    */
   log(...value) {
-    this.append(...value);
-    this.append('\n');
+    this.flushline();
+    this.append(...value,'\n');
     this.scroll();
   }
 
