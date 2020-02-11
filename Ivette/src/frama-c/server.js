@@ -13,7 +13,7 @@ import React from 'react' ;
 import Dome from 'dome' ;
 import System from 'dome/system' ;
 import { Buffer } from 'dome/text/buffers' ;
-import Zmq from 'zeromq' ;
+import { Request } from 'zeromq' ;
 
 // --------------------------------------------------------------------------
 // --- Events
@@ -72,7 +72,7 @@ var killer;    // killer timeout
 // --- Server Console
 // --------------------------------------------------------------------------
 
-export const console = new Buffer({ maxlines: 200 });
+export const buffer = new Buffer({ maxlines: 200 });
 
 // --------------------------------------------------------------------------
 // --- Server Status
@@ -108,9 +108,16 @@ export function getPending() {
 // --------------------------------------------------------------------------
 
 function _status(s,err) {
-  if (s !== status || err) {
+  console.log('STATUS',s,err);
+  if (err) {
+    status = FAILED;
+    error = err.toString();
+    if (Dome.DEVEL) console.error('[Server]',error);
+    Dome.emit(SERVER);
+  }
+  else if (s !== status) {
     status = s;
-    error = err;
+    error = undefined;
     Dome.emit(SERVER);
   }
 }
@@ -125,8 +132,6 @@ function _status(s,err) {
    If the server is started or running, this is a no-op.
    If the server is being shutdown, it will reboot.
    Otherwise, the Frama-C Server is spawned.
-
-   You can use `server.start` instead of `() => server.start()`.
 */
 export function start() {
   switch(status) {
@@ -159,8 +164,6 @@ export function start() {
    If the server is running, it is shutdown gracefully.
    When the server is shutting down, restart is canceled.
    Otherwise, this is a no-op.
-
-   You can use `server.stop` instead of `() => server.stop()`.
 */
 export function stop() {
   switch(status) {
@@ -194,7 +197,6 @@ export function stop() {
    it is hard killed and restart is canceled.
    Otherwize, this is no-op.
 
-   You can use `server.kill` instead of `() => server.kill()`.
    This function is automatically called when the `module` emits the `KILL` signal.
 */
 export function kill() {
@@ -259,7 +261,8 @@ export function clear() {
     _status(IDLE);
     // Fall Through
   case IDLE:
-    console.clear();
+    buffer.clear();
+    Dome.emit(SERVER);
     return;
   default:
     return;
@@ -285,7 +288,7 @@ export function clear() {
 */
 export function configure( cfg )
 {
-  config = cfg;
+  config = cfg || {} ;
 }
 
 // --------------------------------------------------------------------------
@@ -297,10 +300,10 @@ async function _launch() {
   if (!config) throw('Frama-C Server not configured');
   let { env, cwd, command='frama-c', params=[], sockaddr, logout, logerr } = config;
   if (!cwd) cwd = System.getWorkingDir();
-  if (!sockaddr) sockaddr = System.join( cwd , '.frama-c.socket.io' );
+  if (!sockaddr) sockaddr = 'ipc://' + System.join( cwd , '.frama-c.socket.io' );
   logout = logout && System.join( cwd, logout );
   logerr = logerr && System.join( cwd, logerr );
-  params = params.concat('-then','-server-zmq','ipc://' + sockaddr );
+  params = params.concat('-then','-server-zmq',sockaddr );
   let options = {
     cwd,
     stdout: { path: logout, pipe: true },
@@ -309,28 +312,34 @@ async function _launch() {
   };
   // Launch Process
   const process = await System.spawn( command, params, options );
-  const logging = console.append ;
-  const kill = kill ;
-  console.clear();
-  console.append('$',command);
-  params.foreach((argv) => {
+  const kill = () => process.kill() ;
+  buffer.clear();
+  buffer.append('$',command);
+  params.forEach((argv) => {
     if (argv.startsWith('-') || argv.endsWith('.c') || argv.endsWith('.i') || argv.endsWith('.h'))
-      console.append('\n    ');
-    console.append(' ');
-    console.append(argv);
+      buffer.append('\n    ');
+    buffer.append(' ');
+    buffer.append(argv);
   });
-  console.append('\n');
-  process = process ;
-  process.stdout.on('data', logging );
-  process.stderr.on('data', logging );
-  process.on('close', (status) => {
-    logging('Exit',status,'\n');
-    _close(status);
+  buffer.append('\n');
+  process.stdout.on('data', buffer.append );
+  process.stderr.on('data', buffer.append );
+  process.on('error', (err) => {
+    buffer.append('Error:',err,'\n');
+    _close(err);
+  });
+  process.on('exit', (status,signal) => {
+    signal && buffer.append('Signal:',signal,'\n');
+    status && buffer.append('Exit:',status,'\n');
+    _close(signal || status);
   });
   // Connect to Server
-  socket = new Zmq.Request();
+  socket = new Request();
   busy = false ;
-  await socket.bind(sockaddr).catch(kill);
+  await socket.bind(sockaddr).catch((err) => {
+    console.error('[Socket]',err);
+    kill();
+  });
 }
 
 // --------------------------------------------------------------------------
@@ -369,7 +378,7 @@ function _shutdown() {
   }
 }
 
-function _close(status) {
+function _close(error) {
   _reset();
   if (killer) {
     clearTimeout( killer );
@@ -384,8 +393,8 @@ function _close(status) {
     process.kill();
     process = undefined ;
   }
-  if (status) {
-    _status(FAILED,'Exit Status ' + status);
+  if (error) {
+    _status(FAILED,error);
   } else {
     _status(IDLE);
   }
@@ -540,11 +549,11 @@ function _receive(resp) {
 // --------------------------------------------------------------------------
 
 export default {
-  configure, console,
+  configure, buffer,
   getStatus, getError, getPending, isRunning,
   start, stop, kill, restart, clear,
   sendGET, sendSET, sendEXEC,
-  IDLE,STARTED,RUNNING,KILLING,RESTART,FAILED
+  SERVER,IDLE,STARTED,RUNNING,KILLING,RESTART,FAILED
 };
 
 // --------------------------------------------------------------------------
