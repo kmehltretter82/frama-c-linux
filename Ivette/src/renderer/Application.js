@@ -14,6 +14,7 @@ import './style.css' ;
 import 'dome/misc/exports' ;
 
 import { LabView, View, Group, Component } from 'frama-c/labviews' ;
+import ServerControl from './ServerControl' ;
 
 // --------------------------------------------------------------------------
 // --- Main View
@@ -55,6 +56,9 @@ export default (function() {
           </Group>
         </LabView>
       </Splitter>
+      <Toolbar.ToolBar>
+        <ServerControl/>
+      </Toolbar.ToolBar>
     </Vfill>
   );
 
