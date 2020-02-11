@@ -754,11 +754,11 @@ let make name enable (module Man: Input) =
 
 let () =
   let open Value_parameters in
-  make "apron octagons" ApronOctagon.get (module Apron_Octagon);
-  make "apron box" ApronBox.get (module Apron_Box);
-  make "polka loose" PolkaLoose.get (module Apron_Polka_Loose);
-  make "polka strict" PolkaStrict.get (module Apron_Polka_Strict);
-  make "polka equalities" PolkaEqualities.get (module Apron_Polka_Equalities);
+  make "apron-octagon" ApronOctagon.get (module Apron_Octagon);
+  make "apron-box" ApronBox.get (module Apron_Box);
+  make "apron-polka-loose" PolkaLoose.get (module Apron_Polka_Loose);
+  make "apron-polka-strict" PolkaStrict.get (module Apron_Polka_Strict);
+  make "apron-polka-equality" PolkaEqualities.get (module Apron_Polka_Equalities);
   register_apron ()
 
 
