@@ -1,149 +1,383 @@
 open Crowbar
 open Cil_types
 
-let file = ref None
-let set_file f = file:= Some f
-let get_file () =
-  match !file with
-  | None -> bad_test ()
-  | Some file -> file
+module Loc = Cil_datatype.Location
 
-class random_ghost dec =
-  let () = assert (dec <> []) in
-  let _next = ref dec in
-  let rec next i =
-    match !_next with
-    | [] -> _next := dec; next i
-    | hd :: tl -> _next := tl; Some hd
-  in
-  let stream = Stream.from next in
-  object
-    inherit Visitor.frama_c_inplace
-    val ghost_father = Stack.create ()
-    method! vstmt_aux s =
-      let ghost =
-        if Stack.is_empty ghost_father ||
-           not (Stack.top ghost_father)
-        then begin
-          let v = Stream.next stream in v = 0
-        end else true
-      in
-      s.ghost <- ghost;
-      Stack.push ghost ghost_father;
-      Cil.DoChildrenPost (fun s -> ignore (Stack.pop ghost_father); s)
-  end
-
-let create_list length =
-  let lmax = 20000 in
-  let length = if length > lmax then lmax else length in
-  let rec aux acc l =
-    if l = 0 then acc
-    else
-      aux (map [range 10; acc] (fun v l -> v::l)) (l-1)
-  in aux (const []) length
-
-let gen_cat = File.register_code_transformation_category "ghostify"
-
-let oracle_cat = File.register_code_transformation_category "oracle"
-
-module Should_warn = State_builder.False_ref(
-  struct
-    let name = "Test_ghost_cfg.Should_warn"
-    let dependencies = [Kernel.Files.self]
-  end)
-
-class should_warn =
-  object
-    inherit Visitor.frama_c_inplace
-    method! vstmt_aux s =
-      if s.ghost then begin
-        match s.skind with
-        | Break _ | Goto _ | Continue _ ->
-          let s' = Extlib.as_singleton s.succs in
-          if not (s'.ghost) then Should_warn.set true
-        | Return _ -> Should_warn.set true
-        | _ -> ()
-      end;
-      Cil.DoChildren
-  end
-
-let should_warn file = Visitor.visitFramacFileSameGlobals (new should_warn) file
-
-let () =
-  File.add_code_transformation_after_cleanup
-    ~before:[Ghost_cfg.transform_category]
-    oracle_cat
-    should_warn
-
-let input_file = "test.c"
-
-let set_options () =
-  Kernel.Files.set [Filepath.Normalized.of_string input_file];
-  Kernel.CppExtraArgs.set ["-I/usr/include/csmith-2.3.0"];
-  Kernel.set_warn_status Kernel.wkey_ghost_bad_use Log.Wabort
-
-let ghostify file =
-  let length =
-    Cil.foldGlobals
-      file
-      (fun m g ->
-         match g with
-         | GFun (f,_) -> max m (Extlib.the f.smaxstmtid)
-         | _ -> m)
-      0
-  in
-  let make l =
-    Project.set_current (Project.create "ghost");
-    set_options ();
-    let vis = new random_ghost l in
-    let transform file =
-      Visitor.visitFramacFileSameGlobals vis file;
-      set_file file
-    in
-    let before = [oracle_cat] in
-    File.add_code_transformation_after_cleanup ~before gen_cat transform
-  in
-  map [create_list length] make
-
-let gen_file () = Sys.command ("csmith > " ^ input_file)
-
-let () = Project.set_current (Project.create "simple project")
-
-let () = set_options ()
-
-let init = if Sys.file_exists input_file then bool else const true
-
-let make gen =
-  if gen then guard (gen_file () <> 0);
-  ghostify (Ast.get ())
-
-let create_ghost = dynamic_bind init make
-
-let report s =
-  let temp_dir = "." in
-  let file_name = Filename.temp_file ~temp_dir "ghostified" ".c" in
+let report file_name s =
   let summary =
     Printf.sprintf
       "%s. Saving ghostified file in %s"
       s file_name
   in
-  let out = open_out file_name in
-  let fmt = Format.formatter_of_out_channel out in
-  Printer.pp_file fmt (get_file());
   fail summary
 
-let check_file () =
-  try
-    Ast.compute ();
-    if Should_warn.get () then
-      report "Found ghost code that should not have been accepted"
-  with
-    | Log.AbortError s ->
-      if not (Should_warn.get ()) then
-        report
-          ("Found ghost code that should have been accepted (msg: " ^ s ^ ")")
-    | _ -> bad_test ()
+type stmt_pos =
+  | Normal
+  | Case_no_default of bool (* normal case, no default clause generated. *)
+  | Case of bool (* normal case, default clause generated. *)
+  | Last_case_no_default of bool (* last case, no default clause generated. *)
+  | Last_case of bool (* last case, default clause generated. *)
+  | Default of bool
 
-let test = map [create_ghost] check_file
+type switch_or_loop = Is_switch | Is_loop
 
-let () = add_test ~name:"ghost cfg" [create_ghost] check_file
+type env = {
+    switch_or_loop: (switch_or_loop * bool) list;
+    should_fail: bool;
+    in_ghost: bool;
+    stmt_stack: stmt list;
+    stmt_pos: stmt_pos;
+}
+
+let empty_env =
+  { switch_or_loop = []; should_fail = false; in_ghost = false;
+    stmt_stack = []; stmt_pos = Normal
+  }
+
+let merge old_env new_env =
+  { old_env with
+    should_fail = old_env.should_fail || new_env.should_fail;
+    stmt_stack = new_env.stmt_stack;
+   }
+
+let () = Project.set_current (Project.create "simple project")
+
+let x = Cil.makeGlobalVar "x" Cil.intType
+
+let y = Cil.makeGlobalVar ~ghost:true "y" Cil.intType
+
+let f = Cil.makeGlobalVar "f" (Cil_types.TFun (Cil.voidType,Some [],false,[]))
+
+let return = Cil.mkStmt (Return (None, Loc.unknown))
+
+let forward_goto_target = Cil.mkStmtOneInstr (Skip Loc.unknown)
+
+let incr_stmt =
+  let loc = Loc.unknown in
+  Cil.mkStmtOneInstr (Set (Cil.var x, Cil.increm (Cil.evar ~loc x) 1,loc))
+
+let prepare () =
+  Kernel.set_warn_status Kernel.wkey_ghost_bad_use Log.Wabort;
+  return.skind <- Return (None, Loc.unknown);
+  forward_goto_target.labels <- [Label("Unreach", Loc.unknown, false)];
+  let old = Project.current () in
+  Project.set_current (Project.create "simple project");
+  Project.remove ~project:old ()
+
+let end_of_body = [ incr_stmt; return; forward_goto_target ]
+
+let ghost_status env ghost =
+  match env.stmt_pos with
+    | Normal -> env.in_ghost || ghost
+    | _ -> env.in_ghost
+
+let block env stmts = env, Cil.mkBlock stmts
+
+let gen_stmts gen_stmt =
+  fix
+    (fun gen_stmts ->
+      choose [
+          const (fun env -> env,[]);
+          map [gen_stmt; gen_stmts]
+            (fun f1 f2 env ->
+              let (env, stmt) = f1 env in
+              let (env, stmts) = f2 env in
+              env, stmt :: stmts)])
+
+let gen_inst ghost env =
+  let loc = Loc.unknown in
+  let ghost = ghost_status env ghost in
+  let v = if ghost then y else x in
+  let stmt =
+    Cil.mkStmtOneInstr
+      ~ghost
+      (Set
+         (Cil.var v,
+          Cil.new_exp ~loc
+            (BinOp (PlusA,Cil.evar v,Cil.one ~loc,Cil.intType)),loc))
+  in
+  let env = { env with stmt_stack = stmt :: env.stmt_stack } in
+  env, stmt
+
+let gen_block ghost f env =
+  let ghost = ghost_status env ghost in
+  let new_env = { env with in_ghost = ghost } in
+  let (new_env, stmts) = f new_env in
+  let env = merge env new_env in
+  env, Cil.mkStmt ~ghost (Block (Cil.mkBlock stmts))
+
+let gen_return ghost env =
+  let ghost = ghost_status env ghost in
+  let stmt = Cil.mkStmt ~ghost (Return (None, Loc.unknown)) in
+  let env = if ghost then { env with should_fail = true } else env in
+  let env = { env with stmt_stack = stmt :: env.stmt_stack } in
+  env, stmt
+
+let mk_label =
+  let nb = ref 0 in
+  fun stmt ->
+  match stmt.labels with
+    | [] ->
+        incr nb;
+        let name = "L" ^ (string_of_int !nb) in
+        stmt.labels <- [ Label (name, Loc.unknown, false) ]
+    | _ -> ()
+
+(* approximation for gotos: if all the statements we jump over are ghost, we
+   consider that we stay inside a ghost block. Might not be completely accurate.
+ *)
+let rec all_ghosts n l =
+  match l with
+    | [] -> assert false
+    | s :: _ when n = 0 -> s.ghost
+    | s :: tl -> s.ghost && all_ghosts (n-1) tl
+
+let gen_goto ghost tgt env =
+  let ghost = ghost_status env ghost in
+  let len = List.length env.stmt_stack in
+  let tgt = tgt mod (len + 1) in
+  if tgt = len then
+    begin
+      let env = { env with should_fail = env.should_fail || ghost } in
+      env, forward_goto_target
+    end
+  else
+    begin
+      let stmt = List.nth env.stmt_stack tgt in
+      mk_label stmt;
+      let should_fail = ghost && not (all_ghosts tgt env.stmt_stack) in
+      let should_fail = env.should_fail || should_fail in
+      let env = { env with should_fail } in
+      env, stmt
+    end
+
+let gen_break ghost env =
+  let ghost = ghost_status env ghost in
+  let skind, should_fail =
+    match env.switch_or_loop with
+      | [] -> Instr (Skip Loc.unknown), false
+      | (Is_loop,g) :: _ -> Break Loc.unknown, not g && ghost
+      | (Is_switch,g)::_ ->
+          (match env.stmt_pos with
+             | Normal -> Break Loc.unknown, not g && ghost
+             | Case g1 -> Break Loc.unknown, not g && (g1 || ghost)
+             | Case_no_default _ -> Break Loc.unknown, false
+             | Last_case g1 -> Break Loc.unknown, not g && (g1 || ghost)
+             | Last_case_no_default _ -> Break Loc.unknown, false
+             | Default g1 -> Break Loc.unknown, not g && not g1 && ghost)
+  in
+  let stmt = Cil.mkStmt ~ghost skind in
+  let env = { env with should_fail; stmt_stack = stmt :: env.stmt_stack } in
+  env, stmt
+
+let gen_continue ghost env =
+  let ghost = ghost_status env ghost in
+  let is_loop = function (Is_loop,_) -> true | (Is_switch,_) -> false in
+  let skind, should_fail =
+    match List.find_opt is_loop env.switch_or_loop with
+      | None -> Instr (Skip Loc.unknown), false
+      | Some (_,g) -> Continue Loc.unknown, not g && ghost
+  in
+  let stmt = Cil.mkStmt ~ghost skind in
+  let env = { env with should_fail; stmt_stack = stmt :: env.stmt_stack } in
+  env, stmt
+
+let gen_if ghost ghost_else stmt_then stmt_else env =
+  let ghost = ghost_status env ghost in
+  let loc = Loc.unknown in
+  let e =
+    Cil.new_exp ~loc (BinOp (Ne,Cil.evar ~loc x,Cil.zero ~loc,Cil.intType))
+  in
+  let new_env = { env with in_ghost = ghost } in
+  let new_env, then_s = stmt_then new_env in
+  let env = merge env new_env in
+  let ghoste = ghost_status env ghost_else in
+  let new_env = { env with in_ghost = ghoste } in
+  let new_env, else_s = stmt_else new_env in
+  let env = merge env new_env in
+  env, Cil.mkStmt (If(e,Cil.mkBlock then_s, Cil.mkBlock else_s,loc))
+
+let gen_default should_break stmts env =
+  let ghost = env.in_ghost in
+  (* default clause always has the same status as underlying switch.
+     This simplifies deciding whether the check should fail or not.
+   *)
+  let new_env = { env with stmt_pos = Default ghost } in
+  let new_env, stmts = stmts new_env in
+  let _,s1 = gen_inst ghost env in
+  let epilogue =
+    if should_break then
+      [s1; Cil.mkStmt ~ghost (Break Loc.unknown)]
+    else
+      [s1]
+  in
+  let stmts = stmts @ epilogue in
+  let h = List.hd stmts in
+  h.labels <- Default Loc.unknown :: h.labels;
+  let env = merge env new_env in
+  env, Some stmts, []
+
+let gen_case ghost should_break my_case cases env =
+  let ghost = ghost_status env ghost in
+  let (env,default,others) = cases env in
+  let stmt_pos =
+    match default, others with
+      | None, [] -> Last_case_no_default ghost
+      | Some _, [] -> Last_case ghost
+      | None, _ -> Case_no_default ghost
+      | Some _, _ -> Case ghost
+  in
+  let should_fail =
+    match stmt_pos, env.switch_or_loop with
+      | (Normal | Default _),_ -> assert false
+      | _,[] -> assert false
+      | Last_case_no_default _,_ -> false
+      | Last_case g1, (_,g2)::_ ->
+          (* if the switch is non-ghost, but the last case is, and ends with
+             a break, the default clause won't be taken. *)
+          not g2 && g1 && should_break
+      | Case_no_default g1, (_, g2)::_ ->
+          (* fails iff switch is non-ghost, current case is, and doesn't break,
+             going to the next case. *)
+          not g2 && g1 && not should_break
+      | Case g1, (_,g2) :: _ ->
+          not g2 && g1 (* prevents taking the default clause.*)
+  in
+  let new_env = { env with in_ghost = ghost; stmt_pos; should_fail } in
+  let new_env, stmts = my_case new_env in
+  let _, s1 = gen_inst ghost env in
+  let epilogue =
+    if should_break then
+      [ s1; Cil.mkStmt ~ghost (Break Loc.unknown)]
+    else [s1]
+  in
+  let stmts = stmts @ epilogue in
+  let env = merge env new_env in
+  env, default, stmts :: others
+
+let gen_cases gen_stmt =
+  fix
+    (fun gen_cases ->
+      choose [
+          const (fun env -> env,None,[]);
+          map [ bool; gen_stmts gen_stmt ] gen_default;
+          map [ bool; bool; gen_stmts gen_stmt; gen_cases ] gen_case
+        ])
+
+let gen_switch ghost cases env =
+  let loc = Loc.unknown in
+  let ghost = ghost_status env ghost in
+  let new_env =
+    { env with
+      in_ghost = ghost;
+      switch_or_loop = (Is_switch, ghost) :: env.switch_or_loop }
+  in
+  let (new_env, default, cases) = cases new_env in
+  let acc =
+    match default with
+      | None -> [],[]
+      | Some stmts -> [List.hd stmts],stmts
+  in
+  let count_case = ref 0 in
+  let mk_switch (labels, stmts) case =
+      let h = List.hd case in
+      h.labels <-
+        Cil_types.Case (Cil.integer Loc.unknown !count_case, Loc.unknown)
+        :: h.labels;
+      incr count_case;
+      (h::labels, case @ stmts)
+  in
+  let (labels, stmts) = List.fold_left mk_switch acc cases in
+  let block = Cil.mkBlock stmts in
+  let env = merge env new_env in
+  let stmt = Cil.mkStmt ~ghost (Switch (Cil.evar ~loc x,block,labels,loc)) in
+  env, stmt
+
+let gen_loop ghost stmts env =
+  let ghost = ghost_status env ghost in
+  let new_env =
+    { env with
+      in_ghost = ghost;
+      switch_or_loop = (Is_loop, ghost) :: env.switch_or_loop }
+  in
+  let (new_env, stmts) = stmts new_env in
+  let env = merge env new_env in
+  let stmt =
+    Cil.mkStmt ~ghost (Loop([],Cil.mkBlock stmts,Loc.unknown,None,None))
+  in
+  env, stmt
+
+let gen_stmt =
+  fix (fun gen_stmt ->
+      choose [
+          map [bool] gen_inst;
+          map [bool; gen_stmts gen_stmt] gen_block;
+          map [bool] gen_return;
+          map [bool; uint16] gen_goto;
+          map [bool] gen_break;
+          map [bool] gen_continue;
+          map [bool; bool; gen_stmts gen_stmt; gen_stmts gen_stmt] gen_if;
+          map [bool; gen_cases gen_stmt] gen_switch;
+          map [bool; gen_stmts gen_stmt] gen_loop;
+    ])
+
+let gen_body =
+  map [gen_stmts gen_stmt]
+    (fun f ->
+      let (env, stmts) = f empty_env in
+      let stmts = stmts @ end_of_body in
+      env, Cil.mkBlock stmts)
+
+let gen_file =
+  map [gen_body]
+    (fun (env, body) ->
+      let f = Cil.emptyFunctionFromVI f in
+      f.sbody <- body;
+      (env,
+       { fileName = Filepath.Normalized.unknown;
+         globals = [
+             GVarDecl (x,Cil_datatype.Location.unknown);
+             GVarDecl (y,Cil_datatype.Location.unknown);
+             GFun (f, Cil_datatype.Location.unknown)
+           ];
+         globinit = None;
+         globinitcalled = false
+       }))
+
+let check_file (env, file) =
+  prepare();
+  let temp_dir = Filename.dirname Sys.executable_name in
+  let temp_dir =
+    temp_dir ^ "/output-" ^ (Filename.basename Sys.executable_name) ^ "/files"
+  in
+  let () =
+    if not (Sys.file_exists temp_dir) then
+      Extlib.mkdir ~parents:true temp_dir 0o755
+  in
+  let file_name = Filename.temp_file ~temp_dir "ghostified" ".c" in
+  let out = open_out file_name in
+  let fmt = Format.formatter_of_out_channel out in
+  Printer.pp_file fmt file;
+  Format.pp_print_flush fmt ();
+  close_out out;
+  let success =
+    try
+      File.prepare_cil_file file;
+      true
+    with
+      | Log.AbortError _ -> false
+      | exn ->
+          Printf.printf
+            "Uncaught exception: %s\n%t\nFile saved in %s\n%!"
+            (Printexc.to_string exn) Printexc.print_backtrace file_name;
+          bad_test()
+  in
+  if env.should_fail && success then
+    report file_name "Found ghost code that should not have been accepted"
+  else if not (env.should_fail) && not success then
+    report file_name "Found ghost code that should have been accepted"
+  else true
+
+let () =
+  add_test ~name:"ghost cfg" [gen_file]
+    (fun res -> Crowbar.check (check_file res))
