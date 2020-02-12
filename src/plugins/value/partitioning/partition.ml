@@ -226,9 +226,6 @@ struct
 
   (* --- Evaluation and split functions ------------------------------------- *)
 
-  (* Domains transfer functions. *)
-  module TF = Abstract.Dom.Transfer (Abstract.Eval.Valuation)
-
   (* Evaluation with no reduction and no subdivision. *)
   let evaluate = Abstract.Eval.evaluate ~reduction:false ~subdivnb:0
 
@@ -278,7 +275,7 @@ struct
       let state =
         Abstract.Eval.assume ~valuation state exp value >>- fun valuation ->
         (* Check the reduction *)
-        TF.update valuation state
+        Abstract.Dom.update (Abstract.Eval.to_domain_valuation valuation) state
       in
       match state with
       | `Value state ->

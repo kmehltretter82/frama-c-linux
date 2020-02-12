@@ -97,6 +97,8 @@ module Internal  : Domain_builder.InputDomain
   type value = offsm_or_top
   type state = Memory.t
   type location = Precise_locs.precise_location
+  type origin = unit (* ???? *)
+
   include (Memory: sig
              include Datatype.S_with_collections with type t = state
              include Abstract_domain.Lattice with type state := state
@@ -115,65 +117,51 @@ module Internal  : Domain_builder.InputDomain
   let incr_loop_counter _ state = state
   let leave_loop _ state = state
 
-  type origin = unit (* ???? *)
-
   let kill loc state =
     Memory.add_binding ~exact:true state loc V_Or_Uninitialized.top
 
-  module Transfer (Valuation:
-                     Abstract_domain.Valuation with type value = value
-                                                and type origin = origin
-                                                and type loc = Precise_locs.precise_location)
-    : Abstract_domain.Transfer
-      with type state := state
-       and type value := offsm_or_top
-       and type location := Precise_locs.precise_location
-       and type valuation := Valuation.t
-  = struct
+  let update _valuation st = `Value st (* TODO? *)
 
-    let update _valuation st = `Value st (* TODO? *)
+  let store loc state v =
+    let state' =
+      match v with
+      | Top -> kill loc state
+      | O o ->
+        if not store_redundant && V_Offsetmap.is_single_interval o then
+          kill loc state
+        else
+          match loc.Locations.size with
+          | Int_Base.Top -> assert false
+          | Int_Base.Value size ->
+            Memory.paste_offsetmap
+              ~from:o ~dst_loc:loc.Locations.loc ~size ~exact:true state
+    in
+    match state' with
+    | Memory.Bottom -> `Bottom
+    | _ -> `Value state'
 
-    let store loc state v =
-      let state' =
-        match v with
-        | Top -> kill loc state
-        | O o ->
-          if not store_redundant && V_Offsetmap.is_single_interval o then
-            kill loc state
-          else
-            match loc.Locations.size with
-            | Int_Base.Top -> assert false
-            | Int_Base.Value size ->
-              Memory.paste_offsetmap
-                ~from:o ~dst_loc:loc.Locations.loc ~size ~exact:true state
-      in
-      match state' with
-      | Memory.Bottom -> `Bottom
-      | _ -> `Value state'
+  let generic_assign lv value state =
+    let loc = Precise_locs.imprecise_location lv.lloc in
+    let v = Eval.value_assigned value in
+    let v = match v with
+      | `Value v -> v
+      (* Copy of fully indeterminate bits. We could store an uninitialized
+         bottom, or something like that. Since this would be redundant
+         with the legacy domain, we just drop the value. *)
+      | `Bottom -> Top
+    in
+    store loc state v
 
-    let generic_assign lv value state =
-      let loc = Precise_locs.imprecise_location lv.lloc in
-      let v = Eval.value_assigned value in
-      let v = match v with
-        | `Value v -> v
-        (* Copy of fully indeterminate bits. We could store an uninitialized
-           bottom, or something like that. Since this would be redundant
-           with the legacy domain, we just drop the value. *)
-        | `Bottom -> Top
-      in
-      store loc state v
+  let assign _kinstr lv _e assignment _valuation state =
+    generic_assign lv assignment state
 
-    let assign _kinstr lv _e assignment _valuation state =
-      generic_assign lv assignment state
+  let assume _ _ _ _ state = `Value state
 
-    let assume _ _ _ _ state = `Value state
+  let finalize_call _stmt _call ~pre:_ ~post = `Value post
 
-    let finalize_call _stmt _call ~pre:_ ~post = `Value post
+  let start_call _stmt _call valuation state = update valuation state
 
-    let start_call _stmt _call valuation state = update valuation state
-
-    let show_expr _valuation _state _fmt _expr = ()
-  end
+  let show_expr _valuation _state _fmt _expr = ()
 
   let extract_expr _oracle _state _exp =
     `Value (Offsm_value.Offsm.top, ()), Alarmset.all

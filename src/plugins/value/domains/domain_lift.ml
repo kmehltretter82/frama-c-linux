@@ -51,7 +51,6 @@ module Make
 
   type value = Convert.extended_value
   type location = Convert.extended_location
-
   type origin = Domain.origin
 
   let extract_expr oracle state exp =
@@ -92,57 +91,37 @@ module Make
     in
     { call with arguments; rest }
 
-  module Transfer
-      (Valuation:
-         Abstract_domain.Valuation with type value = Convert.extended_value
-                                    and type origin = Domain.origin
-                                    and type loc = Convert.extended_location)
-  = struct
+  let lift_valuation valuation =
+    let (>>>) v f = match v with
+      | `Value v -> `Value (f v)
+      | `Top -> `Top
+    in
+    let lift_record r = { r with value = lift_flagged_value r.value } in
+    let lift_loc_record r = { r with loc = Convert.restrict_loc r.loc } in
+    let open Abstract_domain in
+    let find expr = valuation.find expr >>> lift_record in
+    let find_loc lval = valuation.find_loc lval >>> lift_loc_record in
+    let fold f acc =
+      valuation.fold (fun exp record acc -> f exp (lift_record record) acc) acc
+    in
+    { find; fold; find_loc; }
 
-    module Internal_Valuation = struct
-      type t = Valuation.t
-      type value = Domain.value
-      type origin = Domain.origin
-      type loc = Domain.location
+  let update valuation = Domain.update (lift_valuation valuation)
 
-      let lift_record record =
-        { record with value = lift_flagged_value record.value }
+  let assign stmt lv expr value valuation state =
+    Domain.assign stmt
+      (lift_left lv) expr (lift_assigned value) (lift_valuation valuation) state
 
-      let find valuation expr = match Valuation.find valuation expr with
-        | `Value record -> `Value (lift_record record)
-        | `Top          -> `Top
+  let assume stmt expr positive valuation state =
+    Domain.assume stmt expr positive (lift_valuation valuation) state
 
-      let fold f valuation acc =
-        Valuation.fold
-          (fun exp record acc -> f exp (lift_record record) acc)
-          valuation acc
+  let start_call stmt call valuation state =
+    Domain.start_call stmt (lift_call call) (lift_valuation valuation) state
 
-      let find_loc valuation loc = match Valuation.find_loc valuation loc with
-        | `Value r -> `Value {r with loc = Convert.restrict_loc r.loc}
-        | `Top     -> `Top
+  let finalize_call stmt call ~pre ~post =
+    Domain.finalize_call stmt (lift_call call) ~pre ~post
 
-    end
-
-    module Internal_Transfer = Domain.Transfer (Internal_Valuation)
-
-    let update = Internal_Transfer.update
-
-    let assign stmt lv expr value valuation state =
-      Internal_Transfer.assign stmt
-        (lift_left lv) expr (lift_assigned value) valuation state
-
-    let assume = Internal_Transfer.assume
-
-    let start_call stmt call valuation state =
-      let call = lift_call call in
-      Internal_Transfer.start_call stmt call valuation state
-
-    let finalize_call stmt call ~pre ~post =
-      let call = lift_call call in
-      Internal_Transfer.finalize_call stmt call ~pre ~post
-
-    let show_expr = Internal_Transfer.show_expr
-  end
+  let show_expr valuation = Domain.show_expr (lift_valuation valuation)
 
   let logic_assign assigns location ~pre state =
     Domain.logic_assign assigns (Convert.restrict_loc location) ~pre state

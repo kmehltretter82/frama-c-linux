@@ -52,14 +52,18 @@
     domain.
 
     The module type {!S} requires all the functions to be implemented to define
-    the abstract semantics of a domain, divided in three categories:
-    - {!Lattice} gives a semi-lattice structure to the abstract states;
+    the abstract semantics of a domain, divided in four categories:
+    - {!Lattice} gives a semi-lattice structure to the abstract states.
     - {!Queries} extracts information from a state, by giving a value to an
-      expression.
+      expression. They are used when evaluating expressions.
     - {!Transfer} are the transfer functions of the domain for assignments,
-      assumptions and function calls. It is a functor from a {!Valuation}
-      module, which are maps containing all locations and values computed by
-      the evaluation of the expressions involved in the considered statement.
+      assumptions and function calls. These functions use the values and
+      locations computed by the evaluation of the expressions involved in
+      a given statement. These values and locations are made available through
+      a {!valuation} record.
+    - The remaining functions are essentially dedicated to the evaluation of
+      logical predicates, to the initialization of an initial state, and to the
+      {!Mem_exec} cache.
 
     The module type {!S_with_Structure} is {!S}, plus a special OCaml value
     describing the internal structure of the domain and identifying it.
@@ -164,29 +168,38 @@ module type Queries = sig
 end
 
 (** Results of an evaluation: the results of all intermediate calculation (the
-    value of each expression and the location of each lvalue) are cached in a
-    map. *)
-module type Valuation = sig
-  type t
-  type value  (** Abstract value. *)
-  type origin (** Origin of abstract values. *)
-  type loc    (** Abstract memory location. *)
-  val find : t -> exp -> (value, origin) record_val or_top
-  val fold : (exp -> (value, origin) record_val -> 'a -> 'a) -> t -> 'a -> 'a
-  val find_loc : t -> lval -> loc record_loc or_top
-end
+    value of each (sub)expression and the location of each lvalue) are available
+    to the domain. As the evaluation results into a mapping from [exp] to
+    [record_val] and from [lval] to [record_loc], we define as {!valuation} the
+    classic functions to retrieve information from a map.*)
+type ('value, 'location, 'origin) valuation =
+  {
+    find: exp -> ('value, 'origin) record_val or_top;
+    (** Finds the value computed for an expression. The returned record also
+        contains the origin provided by the domain for the given expression, the
+        alarms emitted by its evaluation and whether its value has been reduced.
+        Returns `Top if the expression has not been evaluated. *)
+    fold: 'a. (exp -> ('value, 'origin) record_val -> 'a -> 'a) -> 'a -> 'a;
+    (** [fold f a] computes (f eN rN ... (f e1 r1 a)...), where e1 ... eN are
+        the evaluated (sub)expressions and r1 ... rN are the computed records
+        for each of these expressions. The record of an expression contains its
+        value, reduction status, origin and alarms. *)
+    find_loc: lval -> 'location record_loc or_top
+    (** Finds the location computed for an lvalue. The returned record also
+        contains the lvalue type and the alarms emitted by its evaluation.
+        Returns `Top if the lvalue has not been evaluated. *)
+  }
 
 (** Transfer function of the domain. *)
 module type Transfer = sig
-
   type state
   type value
   type location
-  type valuation
+  type origin
 
-  (** [update valuation t] updates the state [t] by the values of expressions
-      and the locations of lvalues stored in [valuation]. *)
-  val update : valuation -> state -> state or_bottom
+  (** [update valuation t] updates the state [t] with the values of expressions
+      and the locations of lvalues available in the [valuation] record. *)
+  val update : (value, location, origin) valuation -> state -> state or_bottom
 
   (** [assign kinstr lv expr v valuation state] is the transfer function for the
       assignment [lv = expr] for [state]. It must return the state where the
@@ -204,7 +217,7 @@ module type Transfer = sig
         the state. *)
   val assign :
     kinstr -> location left_value -> exp -> (location, value) assigned ->
-    valuation -> state -> state or_bottom
+    (value, location, origin) valuation -> state -> state or_bottom
 
   (** Transfer function for an assumption.
       [assume stmt expr bool valuation state] returns a state in which the
@@ -212,8 +225,10 @@ module type Transfer = sig
       - [stmt] is the statement of the assumption.
       - [valuation] is a cache of all sub-expressions and locations computed
         for the evaluation and the reduction of [expr]; it can also be used
-        to reduce the state *)
-  val assume : stmt -> exp -> bool -> valuation -> state -> state or_bottom
+        to reduce the state. *)
+  val assume :
+    stmt -> exp -> bool ->
+    (value, location, origin) valuation -> state -> state or_bottom
 
   (** [start_call stmt call valuation state] returns an initial state
       for the analysis of a called function. In particular, this function
@@ -224,7 +239,8 @@ module type Transfer = sig
       - [valuation] is a cache for all values and locations computed during
         the evaluation of the function and its arguments. *)
   val start_call:
-    stmt -> (location, value) call -> valuation -> state -> state or_bottom
+    stmt -> (location, value) call ->
+    (value, location, origin) valuation -> state -> state or_bottom
 
   (** [finalize_call stmt call ~pre ~post] computes the state after a function
       call, given the state [pre] before the call, and the state [post] at the
@@ -240,7 +256,9 @@ module type Transfer = sig
       inferred by the domain in the [state] about the expression [exp]. Can use
       the [valuation] resulting from the cooperative evaluation of the
       expression. *)
-  val show_expr: valuation -> state -> Format.formatter -> exp -> unit
+  val show_expr:
+    (value, location, origin) valuation ->
+    state -> Format.formatter -> exp -> unit
 end
 
 
@@ -324,14 +342,10 @@ module type S = sig
 
   (** Transfer functions from the result of evaluations.
       See {eval.mli} for more details about valuation. *)
-  module Transfer
-      (Valuation: Valuation with type value = value
-                             and type origin = origin
-                             and type loc = location)
-    : Transfer with type state := t
-                and type value := value
-                and type location := location
-                and type valuation := Valuation.t
+  include Transfer with type state := t
+                    and type value := value
+                    and type location := location
+                    and type origin := origin
 
   (** {3 Logic } *)
 

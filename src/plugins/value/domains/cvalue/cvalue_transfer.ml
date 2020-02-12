@@ -22,230 +22,220 @@
 
 open Cil_types
 open Eval
-
 open Cvalue.Model
 
 type value = Main_values.CVal.t
+type origin = value option
 type location = Main_locations.PLoc.location
-
 
 let unbottomize = function
   | `Bottom -> Cvalue.V.bottom
   | `Value v -> v
 
-module Transfer
-    (Valuation: Abstract_domain.Valuation with type value = value
-                                           and type origin = value option
-                                           and type loc = location)
-= struct
+(* ---------------------------------------------------------------------- *)
+(*                               Assumptions                              *)
+(* ---------------------------------------------------------------------- *)
 
-  type state = Cvalue.Model.t
+let reduce valuation lval value t =
+  let typ = Cil.typeOfLval lval in
+  if Cil.typeHasQualifier "volatile" typ
+  then t
+  else
+    match valuation.Abstract_domain.find_loc lval with
+    | `Value record ->
+      let loc = Precise_locs.imprecise_location record.loc in
+      if Locations.cardinal_zero_or_one loc
+      then reduce_indeterminate_binding t loc value
+      else t
+    | `Top -> t (* Cannot reduce without the location of the lvalue. *)
 
-  (* ---------------------------------------------------------------------- *)
-  (*                               Assumptions                              *)
-  (* ---------------------------------------------------------------------- *)
+let is_smaller_value typ v1 v2 =
+  let size = Integer.of_int (Cil.bitsSizeOf typ) in
+  let card1 = Cvalue.V.cardinal_estimate v1 ~size
+  and card2 = Cvalue.V.cardinal_estimate v2 ~size in
+  Integer.lt card1 card2
 
-  let reduce valuation lval value t =
-    let typ = Cil.typeOfLval lval in
+(* Update the state according to a Valuation. *)
+let update valuation t =
+  let process exp record t =
+    match exp.enode with
+    | Lval lv ->
+      if record.reductness = Reduced
+      then
+        let {v; initialized; escaping} = record.value in
+        let v = unbottomize v in
+        let v =
+          (* The origin contains the value already stored in the state, when
+             its type is incompatible with the lvalue [lv]. The precision of
+             this previous value and [v] are then incomparable (none is
+             included in the other). We use some notion of cardinality of
+             abstract values to choose the best value to keep. *)
+          match record.origin with
+          | Some (Some previous_v) ->
+            let typ = Cil.typeOfLval lv in
+            if is_smaller_value typ v previous_v then v else previous_v
+          | _ -> v
+        in
+        let value = Cvalue.V_Or_Uninitialized.make ~initialized ~escaping v in
+        reduce valuation lv value t
+      else t
+    | _ -> t
+  in
+  valuation.Abstract_domain.fold process t
+
+(* ---------------------------------------------------------------------- *)
+(*                              Assignments                               *)
+(* ---------------------------------------------------------------------- *)
+
+let write_abstract_value state (lval, loc, typ) assigned_value =
+  let {v; initialized; escaping} = assigned_value in
+  let value = unbottomize v in
+  Warn.warn_right_exp_imprecision lval loc value;
+  let value =
     if Cil.typeHasQualifier "volatile" typ
-    then t
-    else
-      match Valuation.find_loc valuation lval with
-      | `Value record ->
-        let loc = Precise_locs.imprecise_location record.loc in
-        if Locations.cardinal_zero_or_one loc
-        then reduce_indeterminate_binding t loc value
-        else t
-      | `Top -> t (* Cannot reduce without the location of the lvalue. *)
-
-  let is_smaller_value typ v1 v2 =
-    let size = Integer.of_int (Cil.bitsSizeOf typ) in
-    let card1 = Cvalue.V.cardinal_estimate v1 ~size
-    and card2 = Cvalue.V.cardinal_estimate v2 ~size in
-    Integer.lt card1 card2
-
-  (* Update the state according to a Valuation. *)
-  let update valuation t =
-    let process exp record t =
-      match exp.enode with
-      | Lval lv ->
-        if record.reductness = Reduced
-        then
-          let {v; initialized; escaping} = record.value in
-          let v = unbottomize v in
-          let v =
-            (* The origin contains the value already stored in the state, when
-               its type is incompatible with the lvalue [lv]. The precision of
-               this previous value and [v] are then incomparable (none is
-               included in the other). We use some notion of cardinality of
-               abstract values to choose the best value to keep. *)
-            match record.origin with
-            | Some (Some previous_v) ->
-              let typ = Cil.typeOfLval lv in
-              if is_smaller_value typ v previous_v then v else previous_v
-            | _ -> v
-          in
-          let value = Cvalue.V_Or_Uninitialized.make ~initialized ~escaping v in
-          reduce valuation lv value t
-        else t
-      | _ -> t
-    in
-    Valuation.fold process valuation t
-
-  (* ---------------------------------------------------------------------- *)
-  (*                              Assignments                               *)
-  (* ---------------------------------------------------------------------- *)
-
-  let write_abstract_value state (lval, loc, typ) assigned_value =
-    let {v; initialized; escaping} = assigned_value in
-    let value = unbottomize v in
-    Warn.warn_right_exp_imprecision lval loc value;
+    then Cvalue_forward.make_volatile value
+    else value
+  in
+  match loc.Locations.loc with
+  | Locations.Location_Bits.Top (Base.SetLattice.Top, orig) ->
+    Value_parameters.result
+      "State before degeneration:@\n======%a@\n======="
+      Cvalue.Model.pretty state;
+    Value_util.warning_once_current
+      "writing at a completely unknown address@[%a@].@\nAborting."
+      Origin.pretty_as_reason orig;
+    raise Db.Value.Aborted
+  | _ ->
+    let exact = Locations.cardinal_zero_or_one loc in
     let value =
-      if Cil.typeHasQualifier "volatile" typ
-      then Cvalue_forward.make_volatile value
-      else value
+      Cvalue.V_Or_Uninitialized.make ~initialized ~escaping value in
+    (* let value = Cvalue.V_Or_Uninitialized.initialized value in *)
+    add_indeterminate_binding ~exact state loc value
+
+exception Do_assign_imprecise_copy
+
+let copy_one_loc state left_lv right_lv =
+  let left_lval, left_loc, left_typ = left_lv
+  and right_lval, right_loc, right_typ = right_lv in
+  (* Warn if right_loc is imprecise *)
+  Warn.warn_imprecise_lval_read right_lval right_loc Cvalue.V.bottom;
+  (* top size is tested before this function is called, in which case
+     the imprecise copy mode is used. *)
+  let size = Int_Base.project right_loc.Locations.size in
+  let offsetmap = copy_offsetmap right_loc.Locations.loc size state in
+  let make_volatile =
+    Cil.typeHasQualifier "volatile" left_typ ||
+    Cil.typeHasQualifier "volatile" right_typ
+  in
+  match offsetmap with
+  | `Bottom -> `Bottom
+  | `Value offsm ->
+    (* TODO: this is the good place to handle partially volatile
+       struct, whether as source or destination *)
+    let offsetmap =
+      if make_volatile then
+        Cvalue.V_Offsetmap.map_on_values
+          (Cvalue.V_Or_Uninitialized.map Cvalue_forward.make_volatile) offsm
+      else offsm
     in
-    match loc.Locations.loc with
-    | Locations.Location_Bits.Top (Base.SetLattice.Top, orig) ->
-      Value_parameters.result
-        "State before degeneration:@\n======%a@\n======="
-        Cvalue.Model.pretty state;
-      Value_util.warning_once_current
-        "writing at a completely unknown address@[%a@].@\nAborting."
-        Origin.pretty_as_reason orig;
-      raise Db.Value.Aborted
-    | _ ->
-      let exact = Locations.cardinal_zero_or_one loc in
-      let value =
-        Cvalue.V_Or_Uninitialized.make ~initialized ~escaping value in
-      (* let value = Cvalue.V_Or_Uninitialized.initialized value in *)
-      add_indeterminate_binding ~exact state loc value
+    if not (Eval_typ.offsetmap_matches_type left_typ offsetmap) then
+      raise Do_assign_imprecise_copy;
+    Cvalue_offsetmap.warn_right_imprecision left_lval left_loc offsetmap;
+    `Value
+      (paste_offsetmap ~exact:true
+         ~from:offsetmap ~dst_loc:left_loc.Locations.loc ~size state)
 
-  exception Do_assign_imprecise_copy
+let make_determinate value =
+  { v = `Value value; initialized = true; escaping = false }
 
-  let copy_one_loc state left_lv right_lv =
-    let left_lval, left_loc, left_typ = left_lv
-    and right_lval, right_loc, right_typ = right_lv in
-    (* Warn if right_loc is imprecise *)
-    Warn.warn_imprecise_lval_read right_lval right_loc Cvalue.V.bottom;
-    (* top size is tested before this function is called, in which case
-       the imprecise copy mode is used. *)
-    let size = Int_Base.project right_loc.Locations.size in
-    let offsetmap = copy_offsetmap right_loc.Locations.loc size state in
-    let make_volatile =
-      Cil.typeHasQualifier "volatile" left_typ ||
-      Cil.typeHasQualifier "volatile" right_typ
+let copy_right_lval state left_lv right_lv copied_value =
+  let lval, loc, typ = left_lv in
+  (* Size mismatch between left and right size, or imprecise size.
+     This cannot be done by copies, but require a conversion *)
+  let right_size = Main_locations.PLoc.size right_lv.lloc
+  and left_size = Main_locations.PLoc.size loc in
+  if not (Int_Base.equal left_size right_size) || Int_Base.is_top right_size
+  then
+    fun loc -> write_abstract_value state (lval, loc, typ) copied_value
+  else
+    fun loc ->
+      try
+        let process right_loc acc =
+          let left_lv = lval, loc, typ
+          and right_lv = right_lv.lval, right_loc, right_lv.ltyp in
+          match copy_one_loc state left_lv right_lv with
+          | `Bottom -> acc
+          | `Value state -> join acc state
+        in
+        Precise_locs.fold process right_lv.lloc bottom
+      with
+        Do_assign_imprecise_copy ->
+        write_abstract_value state (lval, loc, typ) copied_value
+
+let assign _stmt { lval; ltyp; lloc } _expr assigned valuation state =
+  let state = update valuation state in
+  let assign_one_loc =
+    match assigned with
+    | Assign value ->
+      let assigned_value = make_determinate value in
+      fun loc -> write_abstract_value state (lval, loc, ltyp) assigned_value
+    | Copy (right_lv, copied_value) ->
+      copy_right_lval state (lval, lloc, ltyp) right_lv copied_value
+  in
+  let aux_loc loc acc_state =
+    let s = assign_one_loc loc in
+    join acc_state s
+  in
+  let state = Precise_locs.fold aux_loc lloc bottom in
+  if not (is_reachable state)
+  then `Bottom
+  else `Value state
+
+(* ---------------------------------------------------------------------- *)
+(*                             Function Calls                             *)
+(* ---------------------------------------------------------------------- *)
+
+let actualize_formals state arguments =
+  let treat_one_formal state arg =
+    let offsm =
+      Cvalue_offsetmap.offsetmap_of_assignment state arg.concrete arg.avalue
     in
-    match offsetmap with
-    | `Bottom -> `Bottom
-    | `Value offsm ->
-      (* TODO: this is the good place to handle partially volatile
-         struct, whether as source or destination *)
-      let offsetmap =
-        if make_volatile then
-          Cvalue.V_Offsetmap.map_on_values
-            (Cvalue.V_Or_Uninitialized.map Cvalue_forward.make_volatile) offsm
-        else offsm
-      in
-      if not (Eval_typ.offsetmap_matches_type left_typ offsetmap) then
-        raise Do_assign_imprecise_copy;
-      Cvalue_offsetmap.warn_right_imprecision left_lval left_loc offsetmap;
-      `Value
-        (paste_offsetmap ~exact:true
-           ~from:offsetmap ~dst_loc:left_loc.Locations.loc ~size state)
+    Cvalue.Model.add_base (Base.of_varinfo arg.formal) offsm state
+  in
+  List.fold_left treat_one_formal state arguments
 
-  let make_determinate value =
-    { v = `Value value; initialized = true; escaping = false }
+let start_call _stmt call valuation state =
+  let state = update valuation state in
+  let with_formals = actualize_formals state call.arguments in
+  let stack_with_call = Value_util.call_stack () in
+  Db.Value.Call_Value_Callbacks.apply (with_formals, stack_with_call);
+  `Value with_formals
 
-  let copy_right_lval state left_lv right_lv copied_value =
-    let lval, loc, typ = left_lv in
-    (* Size mismatch between left and right size, or imprecise size.
-       This cannot be done by copies, but require a conversion *)
-    let right_size = Main_locations.PLoc.size right_lv.lloc
-    and left_size = Main_locations.PLoc.size loc in
-    if not (Int_Base.equal left_size right_size) || Int_Base.is_top right_size
-    then
-      fun loc -> write_abstract_value state (lval, loc, typ) copied_value
-    else
-      fun loc ->
-        try
-          let process right_loc acc =
-            let left_lv = lval, loc, typ
-            and right_lv = right_lv.lval, right_loc, right_lv.ltyp in
-            match copy_one_loc state left_lv right_lv with
-            | `Bottom -> acc
-            | `Value state -> join acc state
-          in
-          Precise_locs.fold process right_lv.lloc bottom
-        with
-          Do_assign_imprecise_copy ->
-          write_abstract_value state (lval, loc, typ) copied_value
+let finalize_call stmt call ~pre:_ ~post:state =
+  (* Deallocate memory allocated via alloca().
+     To minimize computations, only do it for function definitions. *)
+  let state' =
+    if Kernel_function.is_definition call.kf then
+      let stack = (call.kf, Kstmt stmt) :: (Value_util.call_stack ()) in
+      Builtins_malloc.free_automatic_bases stack state
+    else state
+  in
+  `Value state'
 
-  let assign _stmt { lval; ltyp; lloc } _expr assigned valuation state =
-    let state = update valuation state in
-    let assign_one_loc =
-      match assigned with
-      | Assign value ->
-        let assigned_value = make_determinate value in
-        fun loc -> write_abstract_value state (lval, loc, ltyp) assigned_value
-      | Copy (right_lv, copied_value) ->
-        copy_right_lval state (lval, lloc, ltyp) right_lv copied_value
+let show_expr valuation state fmt expr =
+  match expr.enode with
+  | Lval lval ->
+    let record = match valuation.Abstract_domain.find_loc lval with
+      | `Value record -> record
+      | `Top -> assert false
     in
-    let aux_loc loc acc_state =
-      let s = assign_one_loc loc in
-      join acc_state s
-    in
-    let state = Precise_locs.fold aux_loc lloc bottom in
-    if not (is_reachable state)
-    then `Bottom
-    else `Value state
-
-  (* ---------------------------------------------------------------------- *)
-  (*                             Function Calls                             *)
-  (* ---------------------------------------------------------------------- *)
-
-  let actualize_formals state arguments =
-    let treat_one_formal state arg =
-      let offsm =
-        Cvalue_offsetmap.offsetmap_of_assignment state arg.concrete arg.avalue
-      in
-      Cvalue.Model.add_base (Base.of_varinfo arg.formal) offsm state
-    in
-    List.fold_left treat_one_formal state arguments
-
-  let start_call _stmt call valuation state =
-    let state = update valuation state in
-    let with_formals = actualize_formals state call.arguments in
-    let stack_with_call = Value_util.call_stack () in
-    Db.Value.Call_Value_Callbacks.apply (with_formals, stack_with_call);
-    `Value with_formals
-
-  let finalize_call stmt call ~pre:_ ~post:state =
-    (* Deallocate memory allocated via alloca().
-       To minimize computations, only do it for function definitions. *)
-    let state' =
-      if Kernel_function.is_definition call.kf then
-        let stack = (call.kf, Kstmt stmt) :: (Value_util.call_stack ()) in
-        Builtins_malloc.free_automatic_bases stack state
-      else state
-    in
-    `Value state'
-
-  let show_expr valuation state fmt expr =
-    match expr.enode with
-    | Lval lval ->
-      let record = match Valuation.find_loc valuation lval with
-        | `Value record -> record
-        | `Top -> assert false
-      in
-      let offsm = Cvalue_offsetmap.offsetmap_of_lval state lval record.loc in
-      let typ = Cil.typeOf expr in
-      Eval_op.pretty_offsetmap typ fmt offsm
-    | _ -> Format.fprintf fmt "%s" (Unicode.top_string ())
+    let offsm = Cvalue_offsetmap.offsetmap_of_lval state lval record.loc in
+    let typ = Cil.typeOf expr in
+    Eval_op.pretty_offsetmap typ fmt offsm
+  | _ -> Format.fprintf fmt "%s" (Unicode.top_string ())
 
 
-  (* ----------------- Export assumption functions -------------------------- *)
+(* ----------------- Export assumption functions -------------------------- *)
 
-  let update valuation state = `Value (update valuation state)
-  let assume _stmt _expr _positive = update
-end
+let update valuation state = `Value (update valuation state)
+let assume _stmt _expr _positive = update

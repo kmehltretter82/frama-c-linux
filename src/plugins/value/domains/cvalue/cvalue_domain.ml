@@ -208,45 +208,40 @@ module State = struct
     Model.backward_location state lval typ precise_loc value
   let reduce_further _ _ _ = []
 
+  (* ------------------------------------------------------------------------ *)
+  (*                            Transfer Functions                            *)
+  (* ------------------------------------------------------------------------ *)
 
-  module Transfer
-      (Valuation: Abstract_domain.Valuation with type value = value
-                                             and type origin = origin
-                                             and type loc = location)
-  = struct
+  let update valuation (s, clob) =
+    Cvalue_transfer.update valuation s >>-: fun s -> s, clob
 
-    module T = Cvalue_transfer.Transfer (Valuation)
+  let assign stmt lv expr assigned valuation (s, clob) =
+    Cvalue_transfer.assign stmt lv expr assigned valuation s >>-: fun s ->
+    (* TODO: use the value in assignment *)
+    let _ =
+      Eval.value_assigned assigned >>-: fun value ->
+      let location = Precise_locs.imprecise_location lv.lloc in
+      Locals_scoping.remember_if_locals_in_value clob location value
+    in
+    s, clob
 
-    let update valuation (s, clob) = T.update valuation s >>-: fun s -> s, clob
+  let assume stmt expr positive valuation (s, clob) =
+    Cvalue_transfer.assume stmt expr positive valuation s >>-: fun s ->
+    s, clob
 
-    let assign stmt lv expr assigned valuation (s, clob) =
-      T.assign stmt lv expr assigned valuation s >>-: fun s ->
-      (* TODO: use the value in assignment *)
-      let _ =
-        Eval.value_assigned assigned >>-: fun value ->
-        let location = Precise_locs.imprecise_location lv.lloc in
-        Locals_scoping.remember_if_locals_in_value clob location value
-      in
-      s, clob
+  let start_call stmt call valuation (s, _clob) =
+    Cvalue_transfer.start_call stmt call valuation s >>-: fun state ->
+    state, Locals_scoping.bottom ()
 
-    let assume stmt expr positive valuation (s, clob) =
-      T.assume stmt expr positive valuation s >>-: fun s ->
-      s, clob
+  let finalize_call stmt call ~pre ~post =
+    let (post_state, post_clob) = post
+    and pre_state, clob = pre in
+    Locals_scoping.(remember_bases_with_locals clob post_clob.clob);
+    Cvalue_transfer.finalize_call stmt call ~pre:pre_state ~post:post_state
+    >>-: fun state ->
+    state, clob
 
-    let start_call stmt call valuation (s, _clob) =
-      T.start_call stmt call valuation s >>-: fun state ->
-      state, Locals_scoping.bottom ()
-
-    let finalize_call stmt call ~pre ~post =
-      let (post_state, post_clob) = post
-      and pre_state, clob = pre in
-      Locals_scoping.(remember_bases_with_locals clob post_clob.clob);
-      T.finalize_call stmt call ~pre:pre_state ~post:post_state
-      >>-: fun state ->
-      state, clob
-
-    let show_expr valuation (state, _) = T.show_expr valuation state
-  end
+  let show_expr valuation (state, _) = Cvalue_transfer.show_expr valuation state
 
   (* ------------------------------------------------------------------------ *)
   (*                                 Mem Exec                                 *)

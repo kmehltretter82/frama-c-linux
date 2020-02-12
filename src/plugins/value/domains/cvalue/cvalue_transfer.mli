@@ -23,22 +23,14 @@
 (** Transfer functions for the main domain of the Value analysis. *)
 
 type value = Main_values.CVal.t
+type origin = value option
 type location = Main_locations.PLoc.location
 
-module Transfer
-    (Valuation: Abstract_domain.Valuation with type value = value
-                                           and type origin = value option
-                                           and type loc = location)
-  : sig
-
-    include Abstract_domain.Transfer
-      with type state = Cvalue.Model.t
-       and type value := value
-       and type location := location
-       and type valuation := Valuation.t
-
-  end
-
+include Abstract_domain.Transfer
+  with type state := Cvalue.Model.t
+   and type value := value
+   and type location := location
+   and type origin := origin
 
 (*
 Local Variables:
