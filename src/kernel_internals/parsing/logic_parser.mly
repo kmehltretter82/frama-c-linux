@@ -1392,15 +1392,18 @@ loop_grammar_extension:
 | LOOP EXT_CODE_ANNOT grammar_extension SEMICOLON {
   let open Cil_types in
   let ext = $2 in
-  match Logic_env.extension_category ext with
-  | Some (Ext_code_annot (Ext_next_loop | Ext_next_both)) ->
-    let processed = Logic_env.preprocess_extension ext $3 in
-    (ext, processed)
-  | Some (Ext_code_annot (Ext_here | Ext_next_stmt)) ->
-    raise
-      (Not_well_formed
-         (lexeme_loc 2, ext ^ " is not a loop annotation extension"))
-  | Some (Ext_contract | Ext_global) | None ->
+  try
+    begin match Logic_env.extension_category ext with
+      | Ext_code_annot (Ext_next_loop | Ext_next_both) ->
+        let processed = Logic_env.preprocess_extension ext $3 in
+        (ext, processed)
+      | Ext_code_annot (Ext_here | Ext_next_stmt) ->
+        raise
+          (Not_well_formed
+            (lexeme_loc 2, ext ^ " is not a loop annotation extension"))
+      | _ -> raise Not_found
+    end
+  with Not_found ->
     Kernel.fatal ~source:(lexeme_start 2)
       "%s is not a code annotation extension. Parser got wrong lexeme." ext
 }
@@ -1447,17 +1450,20 @@ code_annotation:
   { fun bhvs ->
     let open Cil_types in
     let ext = $1 in
-    match Logic_env.extension_category ext with
-    | Some (Ext_code_annot (Ext_here | Ext_next_stmt | Ext_next_both)) ->
-      let processed = Logic_env.preprocess_extension ext $2 in
-      Logic_ptree.AExtended(bhvs,false,(ext,processed))
-    | Some (Ext_code_annot Ext_next_loop) ->
-      raise
-        (Not_well_formed
-          (lexeme_loc 1,
-             ext ^ " is not a loop annotation extension. It can't be used as \
-                     plain code annotation extension"))
-    | Some (Ext_contract | Ext_global) | None ->
+    try
+      begin match Logic_env.extension_category ext with
+        | Ext_code_annot (Ext_here | Ext_next_stmt | Ext_next_both) ->
+          let processed = Logic_env.preprocess_extension ext $2 in
+          Logic_ptree.AExtended(bhvs,false,(ext,processed))
+        | Ext_code_annot Ext_next_loop ->
+          raise
+            (Not_well_formed
+               (lexeme_loc 1,
+                 ext ^ " is not a loop annotation extension. It can't be used \
+                         as plain code annotation extension"))
+        | _ -> raise Not_found
+      end
+    with Not_found ->
       Kernel.fatal ~source:(lexeme_start 1)
         "%s is not a code annotation extension. Parser got wrong lexeme" ext
   }

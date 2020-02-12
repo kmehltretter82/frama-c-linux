@@ -724,15 +724,17 @@ let synchronize_source_annot has_new_stmt kf =
           | AStmtSpec _ | APragma (Slice_pragma SPstmt | Impact_pragma IPstmt)
             -> true
           | AExtended(_,is_loop,{ext_name}) ->
+            let warn_not_a_code_annot () =
+              Kernel.(
+                warning ~wkey:wkey_acsl_extension
+                  "%s is not a code annotation extension" name)
+            in
             (match Logic_env.extension_category ext_name with
-             | Some (Ext_code_annot (Ext_here | Ext_next_loop)) -> false
-             | Some (Ext_code_annot Ext_next_stmt) -> true
-             | Some (Ext_code_annot Ext_next_both) -> not is_loop
-             | Some (Ext_contract | Ext_global) | None ->
-               Kernel.(
-                 warning ~wkey:wkey_acsl_extension
-                   "%s is not a code annotation extension" name);
-               false)
+             | exception Not_found -> warn_not_a_code_annot () ; false
+             | Ext_code_annot (Ext_here | Ext_next_loop)-> false
+             | Ext_code_annot Ext_next_stmt-> true
+             | Ext_code_annot Ext_next_both-> not is_loop
+             | Ext_contract | Ext_global -> warn_not_a_code_annot () ; false)
           | AAssert _ | AInvariant _ | AVariant _
           | AAssigns _ | AAllocation _
           | APragma (Slice_pragma (SPctrl | SPexpr _))

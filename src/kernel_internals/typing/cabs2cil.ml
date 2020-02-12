@@ -9625,29 +9625,35 @@ and doBody local_env (blk: A.block) : chunk =
                      (Logic_ptree.AExtended(_,is_loop,(name,_)),loc) ->
                    let source = fst loc in
                    (match Logic_env.extension_category name, is_loop with
-                    | Some (Ext_code_annot Ext_here), false -> [], false
-                    | Some (Ext_code_annot Ext_next_stmt), false -> [], true
-                    | Some (Ext_code_annot Ext_next_loop), true -> [], false
-                    | Some (Ext_code_annot Ext_next_both), _ -> [], not is_loop
-                    | Some (Ext_code_annot (Ext_here | Ext_next_stmt)), true ->
+                    | exception Not_found ->
+                      Kernel.(
+                        warning
+                          ~source ~wkey:wkey_acsl_extension
+                          "%s is not a known extension" name);
+                      [], false
+                    | Ext_code_annot Ext_here, false -> [], false
+                    | Ext_code_annot Ext_next_stmt, false -> [], true
+                    | Ext_code_annot Ext_next_loop, true -> [], false
+                    | Ext_code_annot Ext_next_both, _ -> [], not is_loop
+                    | Ext_code_annot (Ext_here | Ext_next_stmt), true ->
                       Kernel.(
                         warning
                           ~source ~wkey:wkey_acsl_extension
                           "%s is a code annotation extension, \
                            but used here as a loop annotation" name);
                       [], false
-                    | Some (Ext_code_annot Ext_next_loop), false ->
+                    | Ext_code_annot Ext_next_loop, false ->
                       Kernel.(
                         warning
                           ~source ~wkey:wkey_acsl_extension
                           "%s is a loop annotation extension, \
                            but used here as a code annotation" name);
                       [], false
-                    | (Some (Ext_global | Ext_contract) | None), _ ->
+                    | (Ext_global | Ext_contract), _ ->
                       Kernel.(
                         warning
                           ~source ~wkey:wkey_acsl_extension
-                          "%s is not a known code annotation extension" name);
+                          "%s is not a code annotation extension" name);
                       [], false)
                  | _ -> [], false
                in

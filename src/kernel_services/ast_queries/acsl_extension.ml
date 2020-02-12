@@ -64,8 +64,9 @@ module Extensions = struct
     with Not_found ->
       Kernel.fatal ~current:true "unsupported clause of name '%s'" name
 
-  let category name =
-    Extlib.opt_map (fun e -> e.category) (Hashtbl.find_opt ext_tbl name)
+  (* [Logic_lexer] can ask for something that is not a category, which is not
+     a fatal error. *)
+  let category name = (Hashtbl.find ext_tbl name).category
 
   let is_extension = Hashtbl.mem ext_tbl
 

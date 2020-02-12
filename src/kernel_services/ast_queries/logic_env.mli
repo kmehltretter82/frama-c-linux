@@ -30,7 +30,7 @@ open Cil_types
 
 val is_extension: string -> bool
 
-val extension_category: string -> ext_category option
+val extension_category: string -> ext_category
 
 val preprocess_extension:
   string -> Logic_ptree.lexpr list -> Logic_ptree.lexpr list
@@ -205,7 +205,7 @@ val builtin_types_as_typenames: unit -> unit
 (** {2 Internal use} *)
 
 val set_extension_handler:
-  category:(string -> ext_category option) ->
+  category:(string -> ext_category) ->
   is_extension:(string -> bool) ->
   preprocess:(string -> Logic_ptree.lexpr list -> Logic_ptree.lexpr list) ->
   unit

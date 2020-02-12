@@ -3819,28 +3819,34 @@ struct
         let kind = Logic_env.extension_category name in
         let pre_state, post_state =
           match kind,is_loop with
-          | Some (Ext_code_annot Ext_here), false ->
+          | exception Not_found ->
+            Kernel.(
+              warning
+                ~source ~wkey:wkey_acsl_extension
+                "%s is not an extension" name);
+            code_annot_env (), fun _ -> Lenv.empty()
+          | Ext_code_annot Ext_here, false ->
             code_annot_env (), fun _ -> Lenv.empty ()
-          | Some (Ext_code_annot (Ext_next_stmt | Ext_next_both)), false ->
+          | Ext_code_annot (Ext_next_stmt | Ext_next_both), false ->
             let env = append_old_and_post_labels (code_annot_env()) in
             (env, function [Normal] -> env | _ -> Lenv.empty ())
-          | Some (Ext_code_annot (Ext_next_loop | Ext_next_both)), true ->
+          | Ext_code_annot (Ext_next_loop | Ext_next_both), true ->
             loop_annot_env(), fun _ -> Lenv.empty ()
-          | Some (Ext_code_annot Ext_next_loop), false ->
+          | Ext_code_annot Ext_next_loop, false ->
             Kernel.(
               warning
                 ~source ~wkey:wkey_acsl_extension
                 "%s is a loop annotation extension, \
                  but used here as code annotation" name);
             code_annot_env (), fun _ -> Lenv.empty()
-          | Some (Ext_code_annot (Ext_here | Ext_next_stmt)), true ->
+          | Ext_code_annot (Ext_here | Ext_next_stmt), true ->
             Kernel.(
               warning
                 ~source ~wkey:wkey_acsl_extension
                 "%s is a code annotation extension, \
                  but used here as loop annotation" name);
             code_annot_env (), fun _ -> Lenv.empty()
-          | (Some (Ext_global | Ext_contract) | None),_ ->
+          | (Ext_global | Ext_contract),_ ->
             Kernel.(
               warning
                 ~source ~wkey:wkey_acsl_extension
