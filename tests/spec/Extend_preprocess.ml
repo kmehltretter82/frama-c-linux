@@ -9,7 +9,7 @@ open Logic_const
    - global:          gl
   replaces node "must_replace(x)" with "<kind>_ok(x)". The typing phase
   validates that we find the right "<kind>_ok" for each kind of extension:
-   - if a must_replaced is found, it fails,
+   - if a must_replace is found, it fails,
    - if the wrong kind is found, a "\false" is generated
    - if everything is ok "\true" is generated
 *)
