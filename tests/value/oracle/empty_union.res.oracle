@@ -39,8 +39,8 @@
 [eva] Done for function f
 [eva] computing for function copy_empty <- main.
   Called from tests/value/empty_union.c:81.
-[eva] tests/value/empty_union.c:37: 
-  function copy_empty: postcondition got status valid.
+[eva:alarm] tests/value/empty_union.c:37: Warning: 
+  function copy_empty: postcondition got status unknown.
 [eva] Recording results for copy_empty
 [eva] Done for function copy_empty
 [eva] tests/value/empty_union.c:83: Frama_C_show_each_res: {74}
