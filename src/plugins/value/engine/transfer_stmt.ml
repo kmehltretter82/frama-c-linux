@@ -264,8 +264,9 @@ module Make (Abstract: Abstractions.Eva) = struct
       if is_ret then assert (Alarmset.is_empty alarms);
       Alarmset.emit kinstr alarms;
       eval >>- fun (assigned, valuation) ->
-      let valuation = Eval.record valuation in
-      Domain.assign kinstr {lval; ltyp; lloc} expr assigned valuation state
+      let domain_valuation = Eval.to_domain_valuation valuation in
+      let lvalue = { lval; ltyp; lloc } in
+      Domain.assign kinstr lvalue expr assigned domain_valuation state
 
   let assign = assign_lv_or_ret ~is_ret:false
   let assign_ret = assign_lv_or_ret ~is_ret:true
@@ -280,7 +281,7 @@ module Make (Abstract: Abstractions.Eva) = struct
     (* TODO: check not comparable. *)
     Alarmset.emit (Kstmt stmt) alarms;
     eval >>- fun valuation ->
-    Domain.assume stmt expr positive (Eval.record valuation) state
+    Domain.assume stmt expr positive (Eval.to_domain_valuation valuation) state
 
 
   (* ------------------------------------------------------------------------ *)
@@ -308,9 +309,10 @@ module Make (Abstract: Abstractions.Eva) = struct
       Cil.CurrentLoc.set (Cil_datatype.Stmt.loc stmt);
     in
     try
+      let domain_valuation = Eval.to_domain_valuation valuation in
       let res =
         (* Process the call according to the domain decision. *)
-        match Domain.start_call stmt call (Eval.record valuation) state with
+        match Domain.start_call stmt call domain_valuation state with
         | `Value state ->
           Domain.Store.register_initial_state (Value_util.call_stack ()) state;
           !compute_call_ref stmt call state
@@ -416,7 +418,7 @@ module Make (Abstract: Abstractions.Eva) = struct
       Eval.assume ~valuation state argument.concrete post_value
     in
     List.fold_left reduce_one_argument valuation reductions >>- fun valuation ->
-    Domain.update (Eval.record valuation) state
+    Domain.update (Eval.to_domain_valuation valuation) state
 
   (* -------------------- Treat the results of a call ----------------------- *)
 
@@ -604,7 +606,7 @@ module Make (Abstract: Abstractions.Eva) = struct
         | `Bottom ->
           Format.fprintf fmt "%s" (Unicode.bottom_string ())
         | `Value (valuation, _v) ->
-          show_expr (Eval.record valuation) state fmt expr
+          show_expr (Eval.to_domain_valuation valuation) state fmt expr
       in
       Format.fprintf fmt "%a : @[<h>%t@]" Printer.pp_exp expr pp
     in

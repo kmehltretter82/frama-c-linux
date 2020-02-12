@@ -195,7 +195,8 @@ module type S = sig
   module Valuation : Valuation with type value = value
                                 and type origin = origin
                                 and type loc = loc
-  val record: Valuation.t -> (value, loc, origin) Abstract_domain.valuation
+  val to_domain_valuation:
+    Valuation.t -> (value, loc, origin) Abstract_domain.valuation
   val evaluate :
     ?valuation:Valuation.t -> ?reduction:bool -> ?subdivnb:int ->
     state -> exp -> (Valuation.t * value) evaluated
@@ -1484,7 +1485,7 @@ module Make
 
   module Valuation = Cache
 
-  let record valuation =
+  let to_domain_valuation valuation =
     Abstract_domain.{ find = Valuation.find valuation;
                       fold = (fun f acc -> Valuation.fold f valuation acc);
                       find_loc = Valuation.find_loc valuation; }

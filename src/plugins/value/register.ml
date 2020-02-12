@@ -197,7 +197,8 @@ let bot_state = function
   | `Value s -> s
 
 let update valuation state =
-  bot_state (Cvalue_domain.State.update (Eva.record valuation) state >>-: fst)
+  let domain_valuation = Eva.to_domain_valuation valuation in
+  bot_state (Cvalue_domain.State.update domain_valuation state >>-: fst)
 
 let rec eval_deps state e =
   match e.enode with

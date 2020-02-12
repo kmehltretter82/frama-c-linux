@@ -275,7 +275,7 @@ struct
       let state =
         Abstract.Eval.assume ~valuation state exp value >>- fun valuation ->
         (* Check the reduction *)
-        Abstract.Dom.update (Abstract.Eval.record valuation) state
+        Abstract.Dom.update (Abstract.Eval.to_domain_valuation valuation) state
       in
       match state with
       | `Value state ->
