@@ -1,0 +1,36 @@
+{
+  "name": "Ivette",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@git.frama-c.com:frama-c/Ivette.git",
+  "author": "Loïc Correnson <loic.correnson@cea.fr>",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7",
+    "@babel/plugin-proposal-object-rest-spread": "^7.7.7",
+    "@babel/preset-env": "^7.7.7",
+    "@babel/preset-react": "^7.7.4",
+    "@hot-loader/react-dom": "^16.11.0",
+    "@types/react": "^16.9.17",
+    "babel-loader": "^8.0.6",
+    "css-loader": "^3.4.0",
+    "electron": "^7",
+    "electron-builder": "^21.2.0",
+    "electron-devtools-installer": "^2.2.4",
+    "electron-webpack": "^2.7.4",
+    "jsdoc": "^3.6.3",
+    "react-hot-loader": "^4.12.18",
+    "webpack": "^4.41.4"
+  },
+  "dependencies": {
+    "codemirror": "^5.49.2",
+    "immutable": "^4.0.0-rc.12",
+    "lodash": "^4.17.15",
+    "react": "^16.8",
+    "react-dom": "^16.12.0",
+    "react-draggable": "^4.2.0",
+    "react-virtualized": "^9.21.2",
+    "source-map-support": "^0.5.16",
+    "zeromq": "^6.0.0-beta.5"
+  }
+}

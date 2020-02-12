@@ -1,0 +1,50 @@
+/* -------------------------------------------------------------------------- */
+/* --- Ivette Styling                                                     --- */
+/* -------------------------------------------------------------------------- */
+
+.ivette-dongle {
+    flex-wrap: nowrap ;
+    margin: 8px ;
+    padding: 6px ;
+    max-width: 480px ;
+    background: #ddd ;
+    border: thin solid darkgrey ;
+    border-radius: 8px ;
+}
+
+.ivette-dongle-id {
+    min-width: 80px ;
+}
+
+.ivette-project {
+    margin: 6px 6px 18px 6px ;
+    padding: 3px ;
+}
+
+.ivette-dongle-selectable:hover {
+    background: orange ;
+}
+
+.dome-window-inactive .ivette-dongle {
+    background: #eee ;
+}
+
+.dome-window-active .ivette-dongle-selected {
+    background: #ffcd00 ;
+}
+
+.ivette-plugin-item {
+    margin: 2px ;
+    padding: 0px 6px ;
+    background: lightgrey ;
+    border: thin solid darkgrey ;
+    border-radius: 10px ;
+    align-items: baseline ;
+}
+
+.ivette-dongle-cancel {
+    position: relative ;
+    visibility: hidden ;
+    top: 15px ;
+    height: 18px ;
+}

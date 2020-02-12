@@ -1,0 +1,14 @@
+{
+  "opts": {
+    "recurse": true,
+    "template": "doc/template"
+  },
+  "plugins": [ "plugins/markdown" ],
+  "templates": {
+    "default": {
+      "useLongnameInNav": true,
+      "outputSourceFiles": false,
+      "includeDate": false
+    }
+  }
+}

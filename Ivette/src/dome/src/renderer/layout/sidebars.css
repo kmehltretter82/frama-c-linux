@@ -1,0 +1,107 @@
+/* -------------------------------------------------------------------------- */
+/* --- Styling SideBars                                                   --- */
+/* -------------------------------------------------------------------------- */
+
+.dome-xSideBar {
+    width: 100% ;
+    height: 100% ;
+    overflow-x: hidden ;
+    overflow-y: auto ;
+    padding-top: 6px ;
+    padding-bottom: 6px ;
+}
+
+.dome-window-active .dome-xSideBar.dome-color-frame {
+    background: #e3e8ec ;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- SideBar Section                                                    --- */
+/* -------------------------------------------------------------------------- */
+
+.dome-xSideBarSection {
+    display: block ;
+    margin-top: 10px ;
+    margin-bottom: 10px ;
+}
+
+.dome-xSideBarSection-title {
+    padding-left: 3px ;
+    padding-right: 2px ;
+    display: flex ;
+    flew-flow: row nowrap ;
+    align-items: center ;
+}
+
+.dome-xSideBarSection-title > .dome-xLabel {
+    flex: 1 1 ;
+    overflow: hidden ;
+    text-overflow: ellipsis ;
+    font-weight: bold ;
+}
+
+.dome-xSideBarSection-title > .dome-xBadge {
+    flex: 0 0 ;
+}
+
+.dome-xSideBarSection-hideshow {
+    flex: 0 0 ;
+    margin: 1px ;
+    color: #aaa ;
+    width: 32px ;
+    font-weight: normal ;
+    display: inline ;
+    visibility: hidden ;
+}
+
+.dome-xSideBarSection-title:hover .dome-xSideBarSection-hideshow {
+    visibility: visible ;
+}
+
+.dome-xSideBarSection-content {
+    overflow: hidden ;
+    transition: max-height 250ms ease-in-out ;
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* --- SideBar Items                                                      --- */
+/* -------------------------------------------------------------------------- */
+
+.dome-xSideBarItem {
+    padding-left: 2px ;
+    padding-right: 2px ;
+    display: flex ;
+    flex-flow: row nowrap ;
+    align-items: center ;
+}
+
+.dome-window-active .dome-xSideBarItem.dome-active {
+    background: #ccc ;
+}
+
+.dome-window-inactive .dome-xSideBarItem.dome-active {
+    background: #ddd ;
+}
+
+.dome-xSideBarItem > .dome-xLabel {
+    flex: 1 1 ;
+    overflow: hidden ;
+    text-overflow: ellipsis ;
+    padding-left: 12px ;
+}
+
+.dome-xSideBarItem.dome-disabled > .dome-xLabel {
+    color: #b0b0b0 ;
+    fill:  #b0b0b0 ;
+}
+
+.dome-xSideBarItem > .dome-xLabel:last-child {
+    margin-right: 20px ;
+}
+
+.dome-xSideBarItem > .dome-xBadge {
+    flex: 0 0 ;
+}
+
+/* -------------------------------------------------------------------------- */
