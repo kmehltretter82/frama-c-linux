@@ -124,8 +124,48 @@ let malloc = add_group "Dynamic allocation"
 (* --- Eva domains                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
+let () = Parameter_customize.set_group domains
+module Domains =
+  String_set
+    (struct
+      let option_name = "-eva-domains"
+      let arg_name = "d1,...,dn"
+      let help = "Enable a list of analysis domains."
+    end)
+let () = add_precision_dep Domains.parameter
+
+(* List of available domains. *)
+let domains_ref = ref []
+
+(* Help message for the -eva-domains option, with the list of currently
+   available domains. *)
+let domains_help () =
+  let pp_str_list = Pretty_utils.pp_list ~sep:", " Format.pp_print_string in
+  Format.asprintf
+    "Enable a list of analysis domains. Available domains are: %a"
+    pp_str_list (List.rev !domains_ref)
+
+(* Registers a new domain. Updates the help message of -eva-domains. *)
+let register_domain name =
+  Cmdline.replace_option_help
+    Domains.option_name "eva" domains (domains_help ());
+  domains_ref := name :: !domains_ref
+
+(* Checks that a domain has been registered. *)
+let check_domain domain =
+  if not (List.mem domain !domains_ref)
+  then
+    let pp_str_list = Pretty_utils.pp_list ~sep:",@ " Format.pp_print_string in
+    abort "invalid domain %S for option -eva-domains.@.Possible domains are: %a"
+      domain pp_str_list (List.rev !domains_ref)
+
+let () =
+  Domains.add_set_hook
+    (fun _old domains -> Datatype.String.Set.iter check_domain domains)
+
 (* Set of parameters defining the abstractions used in an Eva analysis. *)
-let parameters_abstractions = ref Typed_parameter.Set.empty
+let parameters_abstractions =
+  ref (Typed_parameter.Set.singleton Domains.parameter)
 
 (* This functor must be used to create parameters for new domains of Eva. *)
 module Domain_Parameter

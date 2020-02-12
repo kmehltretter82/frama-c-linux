@@ -325,6 +325,11 @@ val replace_option_setting:
 (** Replace the previously registered option setting. 
     @since Sodium-20150201 *)
 
+val replace_option_help:
+  string -> plugin:string -> group:Group.t -> string -> unit
+(** Replace the previously registered option help.
+    @since Frama-C+dev *)
+
 (* ************************************************************************** *)
 (** {2 Special parameters}
 (* ************************************************************************** *)

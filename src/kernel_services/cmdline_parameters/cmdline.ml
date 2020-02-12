@@ -424,7 +424,7 @@ let deterministic = !deterministic
 type cmdline_option =
   { oname: string;
     argname: string;
-    ohelp: string;
+    mutable ohelp: string;
     ovisible: bool;
     ext_help: (unit,Format.formatter,unit) format;
     mutable setting: option_setting }
@@ -443,6 +443,8 @@ module Plugin: sig
     orig:string -> string -> group:string -> string list -> cmdline_option list
   val replace_option_setting: 
     string -> plugin:string -> group:string -> option_setting -> unit
+  val replace_option_help:
+    string -> plugin:string -> group:string -> string -> unit
   val find: string -> t
   val find_option_aliases: cmdline_option -> cmdline_option list
   val is_option_alias: cmdline_option -> bool
@@ -547,18 +549,26 @@ end = struct
 
   let is_option_alias o = Option_names.is_option_alias o.oname
 
-  let replace_option_setting option ~plugin ~group setting =
-    if option <> "" then
+  (* Applies the function [change] to the option of name [option_name]
+     from [plugin] in [group]. *)
+  let change_option option_name ~plugin ~group change =
+    if option_name <> "" then
       let options_in_group = find_group plugin group in
       let rec replace = function
         | [] ->
             Kernel_log.fatal
               "no option %s in plugin %s ((group of options %s)."
-              option plugin group
-        | o :: _ when o.oname = option -> o.setting <- setting
+              option_name plugin group
+        | o :: _ when o.oname = option_name -> change o
         | _ :: l -> replace l
       in
       replace !options_in_group
+
+  let replace_option_setting option ~plugin ~group setting =
+    change_option option ~plugin ~group (fun o -> o.setting <- setting)
+
+  let replace_option_help option ~plugin ~group help =
+    change_option option ~plugin ~group (fun o -> o.ohelp <- help)
 
 end
 
@@ -725,6 +735,7 @@ let add_aliases orig ~plugin ~group stage aliases =
   List.iter add l
 
 let replace_option_setting = Plugin.replace_option_setting
+let replace_option_help = Plugin.replace_option_help
 
 module On_Files = Hook.Build(struct type t = Filepath.Normalized.t list end)
 let use_cmdline_files = On_Files.extend
