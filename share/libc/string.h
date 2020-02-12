@@ -34,8 +34,8 @@ __BEGIN_DECLS
 
 // Query memory
 
-/*@ predicate non_escaping{L}(void *s, size_t n) =
-      \forall size_t i; 0 <= i < n ==> !\dangling((char *)s + i);
+/*@ predicate non_escaping{L}(void *s, integer n) =
+      \forall integer i; 0 <= i < n ==> !\dangling((char *)s + i);
 */
 
 /*@
@@ -80,7 +80,7 @@ extern int memcmp (const void *s1, const void *s2, size_t n);
   @   ensures result_char: *(char*)\result == c;
   @   ensures result_in_str: \forall integer i;
   @     0 <= i < n ==> *((unsigned char*)s+i) == c
-  @     ==> \result <= s+i;
+  @     ==> (unsigned char*)\result <= (unsigned char*)s+i;
   @ behavior not_found:
   @   assumes char_not_found: !memchr((char*)s,c,n);
   @   ensures result_null: \result == \null;
