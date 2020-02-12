@@ -1878,7 +1878,7 @@ install-lib-byte: clean-install
 	$(PRINT_INSTALL) kernel API
 	$(MKDIR) $(FRAMAC_LIBDIR)
 	$(CP) $(LIB_BYTE_TO_INSTALL) $(FRAMAC_LIBDIR)
-	$(CP) $(addprefix lib/fc/,dllframa-c.so libframa-c.a frama-c.cma META.frama-c) $(FRAMAC_LIBDIR)
+	$(CP) $(addprefix lib/fc/,dllframa-c$(DLLEXT) libframa-c.a frama-c.cma META.frama-c) $(FRAMAC_LIBDIR)
 
 install-lib-opt: install-lib-byte
 	$(CP) $(LIB_OPT_TO_INSTALL) $(FRAMAC_LIBDIR)
