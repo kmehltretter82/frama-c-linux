@@ -7,13 +7,15 @@
 APP?=$(shell basename $(PWD))
 COPYRIGHT?=CEA Tech
 
+DOME_MK_NAME=$(shell echo $(APP) | tr [:upper:] [:lower:])
+
 DOME?=dome
 DOME_ARGS?=
 DOME_EXPORTS?=
 DOME_PLUGINS?=
 DOME_DOC?=html/dome
-DOME_APP_CLI?=bin/$(shell echo $(APP) | tr [:upper:] [:lower:])
-DOME_APP_DOC?=html/$(shell echo $(APP) | tr [:upper:] [:lower:])
+DOME_APP_CLI?=bin/$(DOME_MK_NAME)
+DOME_APP_DOC?=html/$(DOME_MK_NAME)
 DOME_APP_SRC?=src/renderer
 
 # --------------------------------------------------------------------------
@@ -98,6 +100,28 @@ dome-pkg: .dome-pkg.stamp
 
 package.json:
 	yarn init
+
+# --------------------------------------------------------------------------
+# ---  Dome Synchronization
+# --------------------------------------------------------------------------
+
+ifneq ("$(DOME)",".")
+
+.PHONY: dome-pull dome-push
+
+dome-pull:
+	@echo "[Dome] ----------------------------------------------------------------"
+	@echo "[Dome] Synchronize with updates"
+	@echo "[Dome] ----------------------------------------------------------------"
+	@(cd $(DOME) && ./template/dome-pull.sh)
+
+dome-push:
+	@echo "[Dome] ----------------------------------------------------------------"
+	@echo "[Dome] Publishing Dome updates to feature/app/$(DOME_MK_NAME)"
+	@echo "[Dome] ----------------------------------------------------------------"
+	@(cd $(DOME) && ./template/dome-push.sh feature/app/$(DOME_MK_NAME))
+
+endif
 
 # --------------------------------------------------------------------------
 # ---  Application Templating
