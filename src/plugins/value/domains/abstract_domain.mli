@@ -59,8 +59,8 @@
     - {!Transfer} are the transfer functions of the domain for assignments,
       assumptions and function calls. These functions use the values and
       locations computed by the evaluation of the expressions involved in
-      the considered statement. These values and locations are made available
-      through a {!valuation} record.
+      a given statement. These values and locations are made available through
+      a {!valuation} record.
     - The remaining functions are essentially dedicated to the evaluation of
       logical predicates, to the initialization of an initial state, and to the
       {!Mem_exec} cache.
@@ -168,18 +168,22 @@ module type Queries = sig
 end
 
 (** Results of an evaluation: the results of all intermediate calculation (the
-    value of each expression and the location of each lvalue) are available for
-    the domain. *)
+    value of each (sub)expression and the location of each lvalue) are available
+    to the domain. As the evaluation results into a mapping from [exp] to
+    [record_val] and from [lval] to [record_loc], we define as {!valuation} the
+    classic functions to retrieve information from a map.*)
 type ('value, 'location, 'origin) valuation =
   {
     find: exp -> ('value, 'origin) record_val or_top;
     (** Finds the value computed for an expression. The returned record also
-        contains the origin given by the domain for this expression, the alarms
-        emitted by its evaluation, and whether its value has been reduced.
+        contains the origin provided by the domain for the given expression, the
+        alarms emitted by its evaluation and whether its value has been reduced.
         Returns `Top if the expression has not been evaluated. *)
     fold: 'a. (exp -> ('value, 'origin) record_val -> 'a -> 'a) -> 'a -> 'a;
-    (** [fold f e] applies [f expr record] to any expression [expr] evaluated
-        to [record], which contains its value, reduction, origin, and alarms. *)
+    (** [fold f a] computes (f eN rN ... (f e1 r1 a)...), where e1 ... eN are
+        the evaluated (sub)expressions and r1 ... rN are the computed records
+        for each of these expressions. The record of an expression contains its
+        value, reduction status, origin and alarms. *)
     find_loc: lval -> 'location record_loc or_top
     (** Finds the location computed for an lvalue. The returned record also
         contains the lvalue type and the alarms emitted by its evaluation.
@@ -193,7 +197,7 @@ module type Transfer = sig
   type location
   type origin
 
-  (** [update valuation t] updates the state [t] by the values of expressions
+  (** [update valuation t] updates the state [t] with the values of expressions
       and the locations of lvalues available in the [valuation] record. *)
   val update : (value, location, origin) valuation -> state -> state or_bottom
 
@@ -221,7 +225,7 @@ module type Transfer = sig
       - [stmt] is the statement of the assumption.
       - [valuation] is a cache of all sub-expressions and locations computed
         for the evaluation and the reduction of [expr]; it can also be used
-        to reduce the state *)
+        to reduce the state. *)
   val assume :
     stmt -> exp -> bool ->
     (value, location, origin) valuation -> state -> state or_bottom

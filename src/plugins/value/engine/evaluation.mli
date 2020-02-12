@@ -40,7 +40,7 @@ module type S = sig
                                 and type loc = loc
 
   (** Evaluation functions store the results of an evaluation into [Valuation.t]
-      maps. Abstract domains read these results in [Abstract_domain.valuation]
+      maps. Abstract domains read these results from [Abstract_domain.valuation]
       records. This function converts the former into the latter. *)
   val record: Valuation.t -> (value, loc, origin) Abstract_domain.valuation
 
