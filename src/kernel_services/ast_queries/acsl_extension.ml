@@ -31,7 +31,7 @@ type extension = {
   typer: extension_typer ;
   visitor: extension_visitor ;
   printer: extension_printer ;
-  short_printer: extension_printer option
+  short_printer: extension_printer ;
 }
 and extension_preprocessor =
   lexpr list -> lexpr list
@@ -48,12 +48,17 @@ let default_printer printer fmt = function
   | Ext_terms ts -> Pretty_utils.pp_list ~sep:",@ " printer#term fmt ts
   | Ext_preds ps -> Pretty_utils.pp_list ~sep:",@ " printer#predicate fmt ps
 
+let default_short_printer name _printer fmt _ext_kind =
+  Format.fprintf fmt "%s" name
+
 let make
-    category
+    name category
     ?(preprocessor=Extlib.id)
     typer
     ?(visitor=fun _ _ -> Cil.DoChildren)
-    ?(printer=default_printer) ?short_printer status =
+    ?(printer=default_printer)
+    ?(short_printer=default_short_printer name)
+    status =
   { category; status; preprocessor; typer; visitor; printer; short_printer }
 
 module Extensions = struct
@@ -73,7 +78,7 @@ module Extensions = struct
   let register
       cat name ?preprocessor typer ?visitor ?printer ?short_printer status =
     let info =
-      make cat ?preprocessor typer ?visitor ?printer ?short_printer status
+      make name cat ?preprocessor typer ?visitor ?printer ?short_printer status
     in
     if is_extension name then
       Kernel.warning ~wkey:Kernel.wkey_acsl_extension
@@ -106,9 +111,8 @@ module Extensions = struct
     Format.fprintf fmt "@[<hov 2>%s %a;@]" name pp kind
 
   let short_print name printer fmt kind =
-    match (find name).short_printer with
-    | None -> Format.fprintf fmt "%s" name
-    | Some pp -> Format.fprintf fmt "%s: %a" name (pp printer) kind
+    let pp = (find name).short_printer in
+    Format.fprintf fmt "%a" (pp printer) kind
 end
 
 (* Registration functions *)
@@ -155,7 +159,7 @@ let deprecated_find ?(strong=true) name cat op_name =
   match Hashtbl.find_opt Extensions.ext_tbl name with
   | None ->
     if strong then Hashtbl.add strong_cat name cat ;
-    (make cat default_typer false)
+    (make name cat default_typer false)
   | Some ext ->
     if strong && Hashtbl.mem strong_cat name then begin
       if ext.category = cat then ext

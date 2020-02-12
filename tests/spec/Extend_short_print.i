@@ -5,5 +5,5 @@ OPT: -no-autoload-plugins -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs
 
 /*@
   without_short \true ;
-  with_short \true ;
+  has_short \true ;
 */

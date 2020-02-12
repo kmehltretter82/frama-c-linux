@@ -30,7 +30,8 @@ let visitor _ _ = Cil.SkipChildren
 
 let gen_printer s _pp fmt = function
   | Ext_id i ->
-    Format.fprintf fmt "%s%s" (if s then "" else "load: ") (Ts.find i).lt_name
+    Format.fprintf fmt "%s: %s"
+      (if s then "ext_type" else "load") (Ts.find i).lt_name
   | _ -> assert false
 
 let printer = gen_printer false
