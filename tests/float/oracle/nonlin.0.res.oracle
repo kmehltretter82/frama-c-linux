@@ -36,7 +36,7 @@
   rbits2 ∈ {0}
   v ∈ [--..--]
 [eva] computing for function nonlin_f <- main.
-  Called from tests/float/nonlin.c:107.
+  Called from tests/float/nonlin.c:108.
 [eva] computing for function Frama_C_float_interval <- nonlin_f <- main.
   Called from tests/float/nonlin.c:18.
 [eva] using specification for function Frama_C_float_interval
@@ -153,7 +153,7 @@
 [eva] Recording results for nonlin_f
 [eva] Done for function nonlin_f
 [eva] computing for function other <- main.
-  Called from tests/float/nonlin.c:108.
+  Called from tests/float/nonlin.c:109.
 [eva] computing for function Frama_C_float_interval <- other <- main.
   Called from tests/float/nonlin.c:61.
 [eva] tests/float/nonlin.c:61: 
@@ -188,7 +188,7 @@
 [eva] Recording results for other
 [eva] Done for function other
 [eva] computing for function split_alarm <- main.
-  Called from tests/float/nonlin.c:109.
+  Called from tests/float/nonlin.c:110.
 [eva:alarm] tests/float/nonlin.c:76: Warning: 
   non-finite float value. assert \is_finite(v);
 [eva:alarm] tests/float/nonlin.c:77: Warning: 
@@ -199,7 +199,7 @@
 [eva] Recording results for split_alarm
 [eva] Done for function split_alarm
 [eva] computing for function norm <- main.
-  Called from tests/float/nonlin.c:110.
+  Called from tests/float/nonlin.c:111.
 [eva:alarm] tests/float/nonlin.c:81: Warning: 
   non-finite float value. assert \is_finite(v);
 [eva:alarm] tests/float/nonlin.c:82: Warning: 
@@ -207,7 +207,7 @@
 [eva] Recording results for norm
 [eva] Done for function norm
 [eva] computing for function garbled <- main.
-  Called from tests/float/nonlin.c:111.
+  Called from tests/float/nonlin.c:112.
 [eva:alarm] tests/float/nonlin.c:89: Warning: 
   non-finite float value.
   assert \is_finite((float)((int)(&x_0 + (int)(&x_0))));
@@ -224,7 +224,7 @@
 [eva] Recording results for garbled
 [eva] Done for function garbled
 [eva] computing for function around_zeros <- main.
-  Called from tests/float/nonlin.c:112.
+  Called from tests/float/nonlin.c:113.
 [eva] computing for function Frama_C_float_interval <- around_zeros <- main.
   Called from tests/float/nonlin.c:99.
 [eva] tests/float/nonlin.c:99: 
@@ -232,7 +232,7 @@
 [eva] tests/float/nonlin.c:99: 
   function Frama_C_float_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_float_interval
-[eva:alarm] tests/float/nonlin.c:103: Warning: 
+[eva:alarm] tests/float/nonlin.c:104: Warning: 
   non-finite float value.
   assert \is_finite((float)(f1 / (float)((float)((float)(f + f) - f) - f1)));
 [eva] Recording results for around_zeros

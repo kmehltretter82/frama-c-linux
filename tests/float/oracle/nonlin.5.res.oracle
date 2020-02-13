@@ -36,7 +36,7 @@
   rbits2 ∈ {0}
   v ∈ [--..--]
 [eva] computing for function nonlin_f <- main.
-  Called from tests/float/nonlin.c:107.
+  Called from tests/float/nonlin.c:108.
 [eva] computing for function Frama_C_float_interval <- nonlin_f <- main.
   Called from tests/float/nonlin.c:18.
 [eva] using specification for function Frama_C_float_interval
@@ -157,7 +157,7 @@
 [eva] Recording results for nonlin_f
 [eva] Done for function nonlin_f
 [eva] computing for function other <- main.
-  Called from tests/float/nonlin.c:108.
+  Called from tests/float/nonlin.c:109.
 [eva] computing for function Frama_C_float_interval <- other <- main.
   Called from tests/float/nonlin.c:61.
 [eva] tests/float/nonlin.c:61: 
@@ -203,14 +203,14 @@
 [eva] Recording results for other
 [eva] Done for function other
 [eva] computing for function split_alarm <- main.
-  Called from tests/float/nonlin.c:109.
+  Called from tests/float/nonlin.c:110.
 [eva:nonlin] tests/float/nonlin.c:77: 
   non-linear '(double)ff * (double)ff', lv 'ff'
 [eva:nonlin] tests/float/nonlin.c:77: subdividing on ff
 [eva] Recording results for split_alarm
 [eva] Done for function split_alarm
 [eva] computing for function norm <- main.
-  Called from tests/float/nonlin.c:110.
+  Called from tests/float/nonlin.c:111.
 [eva:nonlin] tests/float/nonlin.c:83: 
   non-linear '(double)v1 * (double)v1', lv 'v1'
 [eva:nonlin] tests/float/nonlin.c:83: 
@@ -220,7 +220,7 @@
 [eva] Recording results for norm
 [eva] Done for function norm
 [eva] computing for function garbled <- main.
-  Called from tests/float/nonlin.c:111.
+  Called from tests/float/nonlin.c:112.
 [eva] tests/float/nonlin.c:89: 
   Assigning imprecise value to a_0.
   The imprecision originates from Arithmetic {tests/float/nonlin.c:89}
@@ -230,7 +230,7 @@
 [eva] Recording results for garbled
 [eva] Done for function garbled
 [eva] computing for function around_zeros <- main.
-  Called from tests/float/nonlin.c:112.
+  Called from tests/float/nonlin.c:113.
 [eva] computing for function Frama_C_float_interval <- around_zeros <- main.
   Called from tests/float/nonlin.c:99.
 [eva] tests/float/nonlin.c:99: 
@@ -238,10 +238,10 @@
 [eva] tests/float/nonlin.c:99: 
   function Frama_C_float_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_float_interval
-[eva:nonlin] tests/float/nonlin.c:103: non-linear '(f + f) - f', lv 'f'
-[eva:nonlin] tests/float/nonlin.c:103: 
+[eva:nonlin] tests/float/nonlin.c:104: non-linear '(f + f) - f', lv 'f'
+[eva:nonlin] tests/float/nonlin.c:104: 
   non-linear 'f1 / (((f + f) - f) - f1)', lv 'f1'
-[eva:nonlin] tests/float/nonlin.c:103: subdividing on f
+[eva:nonlin] tests/float/nonlin.c:104: subdividing on f
 [eva] Recording results for around_zeros
 [eva] Done for function around_zeros
 [eva] Recording results for main

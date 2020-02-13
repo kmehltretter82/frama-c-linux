@@ -99,7 +99,8 @@ void around_zeros() {
   float f = Frama_C_float_interval(-0, f1);
   /* The +f-f is needed to activate the subdivisions.
      The [f1] value is removed from [f], which must become [-0. .. 0.]
-     and not the singleton {-0.}.  */
+     and not the singleton {-0.}.
+     No reduction when infinities are allowed (with -warn-special-float none). */
   float res = f1 / (f+f-f - f1);
 }
 
