@@ -11,6 +11,8 @@ DOME_MK_NAME=$(shell echo $(APP) | tr [:upper:] [:lower:])
 
 DOME?=dome
 DOME_ARGS?=
+DOME_DEV_ARGS?=
+DOME_APP_ARGS?=
 DOME_EXPORTS?=
 DOME_PLUGINS?=
 DOME_CLI?=bin/$(DOME_MK_NAME)
@@ -41,7 +43,8 @@ dome-help:
 	@echo "[Dome] Development:"
 	@echo "  Dome framework  DOME         = '$(DOME)'"
 	@echo "  Local command   DOME_CLI     = '$(DOME_CLI)'"
-	@echo "  Arguments (dev) DOME_ARGS    = '$(DOME_ARGS)'"
+	@echo "  Local arguments DOME_ARGS    = '$(DOME_ARGS)'"
+	@echo "  Extra arg.(dev) DOME_DEV     = '$(DOME_DEV)'"
 	@echo "  Export modules  DOME_EXPORTS = '$(DOME_EXPORTS)'"
 	@echo "  Plugin modules  DOME_PLUGINS = '$(DOME_PLUGINS)'"
 	@echo
@@ -296,7 +299,7 @@ dome-dev: dome-pkg dome-templ dome-export-dev
 	@echo 'exec $(DOME_MK_BIN)/electron-webpack dev "$$@"' >> $(DOME_CLI)
 	@chmod 555 $(DOME_CLI)
 	@echo "[Dome] running application (development)"
-	@$(DOME_CLI) $(DOME_ARGS)
+	@$(DOME_CLI) $(DOME_ARGS) $(DOME_DEV)
 
 # --------------------------------------------------------------------------
 # ---  Application Building
@@ -312,7 +315,7 @@ dome-app: dome-pkg dome-templ dome-export-app
 	@rm -f $(DOME_CLI)
 	@echo "#!/bin/sh" >> $(DOME_CLI)
 	@echo "export DOME_LOCAL=true" >> $(DOME_CLI)
-	@echo 'exec $(DOME_MK_BIN)/electron $(PWD)/dist/main/main.js "$$@"' >> $(DOME_CLI)
+	@echo 'exec $(DOME_MK_BIN)/electron $(PWD)/dist/main/main.js $(DOME_ARGS) "$$@"' >> $(DOME_CLI)
 	@chmod 555 $(DOME_CLI)
 
 # --------------------------------------------------------------------------
