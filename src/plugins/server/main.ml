@@ -110,10 +110,10 @@ let pp_request pp fmt (r : _ request) =
   | `Kill id -> Format.fprintf fmt "Kill %a" pp id
   | `Request(id,request,data) ->
     if Senv.debug_atleast 2 then
-      Format.fprintf fmt "@[<hov 2>Request %s:%a@ %a@]"
-        request pp id Data.pretty data
+      Format.fprintf fmt "@[<hov 2>Request [%a] %s@ %a@]"
+        pp id request Data.pretty data
     else
-      Format.fprintf fmt "Request %s:%a" request pp id
+      Format.fprintf fmt "Request [%a] %s" pp id request
 
 let pp_process pp fmt (p : _ process) =
   Format.fprintf fmt "Execute %s:%a" p.request pp p.id
@@ -125,10 +125,10 @@ let pp_response pp fmt (r : _ response) =
   | `Killed id -> Format.fprintf fmt "Killed %a" pp id
   | `Data(id,data) ->
     if Senv.debug_atleast 2 then
-      Format.fprintf fmt "@[<hov 2>Response %a@ %a@]"
+      Format.fprintf fmt "@[<hov 2>Replies [%a]@ %a@]"
         pp id Data.pretty data
     else
-      Format.fprintf fmt "Response %a" pp id
+      Format.fprintf fmt "Replies [%a]" pp id
 
 (* -------------------------------------------------------------------------- *)
 (* --- Request Handling                                                   --- *)
