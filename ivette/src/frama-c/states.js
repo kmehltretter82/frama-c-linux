@@ -16,17 +16,20 @@ const NONE = [ undefined, () => undefined ]; // No-state
 
 /**
    @event
+   @name 'frama-c.project'
    @summary Current Project Updates
    @description
-   Event `'frama-c.project'`.
+   Exported as `State.PROJECT` in public API.
 */
 export const PROJECT = 'frama-c.project' ;
 
 /**
    @event
-   @summary State Notification Event (prefix)
+   @name 'frama-c.state.*'
+   @summary State Notification Events.
    @description
    Event `'frama-c.state.<id>'` for project `<id>`.
+   The prefix `'frama-c-state.'` is exported as `States.STATE` in public API.
 */
 export const STATE = 'frama-c.state.' ;
 

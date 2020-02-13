@@ -21,9 +21,10 @@ import { Request } from 'zeromq' ;
 
 /**
    @event
+   @name 'frama-c.server'
    @summary Server Status Notification Event
    @description
-   Event `'frama-c.server'`.
+   Exported as `Server.SERVER' in public API.
 */
 export const SERVER = 'frama-c.server' ;
 
