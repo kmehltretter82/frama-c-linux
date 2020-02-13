@@ -17,6 +17,14 @@
 Open Source Release <next-release>
 ##################################
 
+o   ACSL      [2020/02/13] Add possibility for ACSL extensions to alter the
+              sequence of untyped terms they receive from the parser. Make also
+              possible to customize the short pretty printer of extensions.
+o   Kernel    [2020/02/13] Deprecated:
+                           - Logic_typing.register_*_extension
+                           - Cil_printer.register_*_extension
+                           - Cil.register_behavior_extension
+                           Use Acsl_extension.register_* instead
 o!  Kernel    [2020/02/04] Removed FCBuffer, FCMap and FCSet. Use directly 
               OCaml stdlib modules Buffer, Map and Set instead.
 -*  GUI       [2020/01/24] Fix order of globals in the source panel.
