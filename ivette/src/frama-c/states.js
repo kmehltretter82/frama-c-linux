@@ -11,6 +11,7 @@
 import _ from 'lodash' ;
 import React from 'react' ;
 import Dome from 'dome' ;
+import Server from './server' ;
 
 const NONE = [ undefined, () => undefined ]; // No-state
 
@@ -63,20 +64,28 @@ export function setProject(project)
 }
 
 /**
-   @summary Clear Project.
-   @param {Module} module - the Frama-C module
+   @summary Clear Project Cache.
    @param {string} [project] - the project identifier, defaults to current
    @description
    Remove all projectified values for the specified project
    Emits `PROJECT`.
  */
-export function clearProject(project)
+export function clearCache(project)
 {
   const theProject = project || currentProject ;
   if (theProject)
     _.unset( globalStates , [theProject] );
   Dome.emit(PROJECT);
 }
+
+// --------------------------------------------------------------------------
+// --- Project Synchro
+// --------------------------------------------------------------------------
+
+Server.onReady(() => {
+  Server.sendGET('kernel.project.getCurrent')
+    .then((current) => setProject(current.id));
+});
 
 // --------------------------------------------------------------------------
 // --- Projectified State
@@ -114,6 +123,6 @@ export function useState(id,project)
 
 // --------------------------------------------------------------------------
 
-export default { useProject, setProject, clearProject, useState, PROJECT };
+export default { useProject, setProject, useState, PROJECT };
 
 // --------------------------------------------------------------------------

@@ -338,21 +338,22 @@ async function _launch() {
 
   buffer.clear();
   buffer.append('$',command);
-  params.forEach((argv) => {
-    if (argv.startsWith('-') || argv.endsWith('.c') || argv.endsWith('.i') || argv.endsWith('.h'))
-      buffer.append('\n    ');
-    buffer.append(' ');
-    buffer.append(argv);
-  });
+  let size = params.reduce((n,p) => n + p.length , 0);
+  if (size < 40)
+    buffer.append('',...params);
+  else
+    params.forEach((argv) => {
+      if (argv.startsWith('-') || argv.endsWith('.c') || argv.endsWith('.i') || argv.endsWith('.h'))
+        buffer.append('\n    ');
+      buffer.append(' ');
+      buffer.append(argv);
+    });
   buffer.append('\n');
 
   if (!cwd) cwd = System.getWorkingDir();
   if (!sockaddr) {
     let socketfile = System.join(cwd,'.frama-c.' + System.getPID() + '.io');
-    System.atExit(() => {
-      System.remove(socketfile);
-      console.log('REMOVE',socketfile);
-    });
+    System.atExit(() => System.remove(socketfile));
     sockaddr = 'ipc://' + socketfile ;
   }
   logout = logout && System.join( cwd, logout );
@@ -386,10 +387,7 @@ async function _launch() {
   // Connect to Server
   socket = new Request();
   busy = false ;
-  await socket.bind(sockaddr).catch((err) => {
-    console.error('[Socket]',err);
-    kill();
-  });
+  socket.connect(sockaddr);
 }
 
 // --------------------------------------------------------------------------
@@ -420,7 +418,6 @@ function _shutdown() {
   queue_cmd.push('SHUTDOWN');
   _flush();
   if (!killer) {
-    const process = process ;
     if (process) {
       const timeout = (config && config.timeout) || 300 ;
       killer = setTimeout( () => process.kill() , timeout );
@@ -454,12 +451,46 @@ function _close(error) {
 // --- Request Queue
 // --------------------------------------------------------------------------
 
+/**
+   @summary Send a GET request to the server.
+   @param {string} rq - the request identifier
+   @param {object} params - request parameters
+   @return {Promise<object>} the promised request results
+   @description
+   You may _kill_ the request before its normal termination by
+   invoking `kill()` on the returned promised.
+ */
 export function sendGET( rq, params ) { return _sendRequest( 'GET' , rq , params ); }
+
+/**
+   @summary Send a SET request to the server.
+   @param {string} rq - the request identifier
+   @param {object} params - request parameters
+   @return {Promise<object>} the promised request results
+   @description
+   You may _kill_ the request before its normal termination by
+   invoking `kill()` on the returned promised.
+ */
 export function sendSET( rq, params ) { return _sendRequest( 'SET' , rq , params ); }
+
+/**
+   @summary Send an EXEC request to the server.
+   @param {string} rq - the request identifier
+   @param {object} params - request parameters
+   @return {Promise<object>} the promised request results
+   @description
+   You may _kill_ the request before its normal termination by
+   invoking `kill()` on the returned promised.
+ */
 export function sendEXEC( rq, params ) { return _sendRequest( 'EXEC' , rq , params ); }
 
-function _sendRequest( kind, rq , params ) {
+// --------------------------------------------------------------------------
+// --- Request Management
+// --------------------------------------------------------------------------
+
+function _sendRequest( kind, rq , params=null ) {
   if (!isRunning()) return Promise.reject('Server not running');
+  if (!rq) return Promise.reject('Undefined request');
   const rid = 'RQ.' + rqid++;
   const data = JSON.stringify(params);
   const promise = new Promise((resolve,reject) => {
@@ -493,7 +524,7 @@ function _reject(id,error) {
   }
 }
 
-function  _cancel(ids) {
+function _cancel(ids) {
   ids.forEach((rid) => _reject(rid,'canceled'));
 }
 
@@ -527,16 +558,15 @@ function _poll() {
 function _send() {
   // when busy, will be eventually re-triggered
   if (!busy) {
-    const cmd = queue_cmd ;
-    if (!cmd.length && _waiting()) cmd.push('POLL');
-    if (cmd.length) {
+    const cmds = queue_cmd ;
+    if (!cmds.length && _waiting()) cmds.push('POLL');
+    if (cmds.length) {
       const ids = queue_ids ;
       queue_cmd = [];
       queue_ids = [];
-      const socket = socket ;
       if (socket) {
         busy = true ;
-        socket.send( cmd )
+        socket.send( cmds )
           .then(() => socket.receive().then((resp) => _receive(resp)))
           .catch(() => _cancel(ids))
           .finally(() => { busy = false ; Dome.emit(STATUS); });
@@ -603,7 +633,8 @@ export default {
   getStatus, getError, getPending, isRunning,
   start, stop, kill, restart, clear,
   sendGET, sendSET, sendEXEC,
-  STATUS,
+  onReady, onShutdown,
+  STATUS,READY,SHUTDOWN,
   IDLE,STARTED,RUNNING,KILLING,RESTART,FAILED
 };
 

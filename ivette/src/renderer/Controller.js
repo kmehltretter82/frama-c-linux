@@ -5,6 +5,7 @@
 import React from 'react' ;
 import Dome from 'dome' ;
 import Server from 'frama-c/server' ;
+import States from 'frama-c/states' ;
 
 import { Filler, Button } from 'dome/layout/toolbars' ;
 import { LED } from 'dome/controls/buttons' ;
