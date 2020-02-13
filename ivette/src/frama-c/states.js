@@ -40,6 +40,18 @@ export const STATE = 'frama-c.state.' ;
 
 var currentProject = undefined ;
 
+Server.onReady(() => {
+  Server.sendGET('kernel.project.getCurrent')
+    .then((current) => {
+      currentProject = current.id ;
+      Dome.emit(PROJECT);
+    });
+});
+
+// --------------------------------------------------------------------------
+// --- Project API
+// --------------------------------------------------------------------------
+
 /**
    @summary Current Project (Custom React Hook).
    @return {string} the current project identifier, or `undefined`.
@@ -59,6 +71,7 @@ export function useProject()
  */
 export function setProject(project)
 {
+  Server.sendSET( 'kernel.project.setCurrent' , project );
   currentProject = project ;
   Dome.emit(PROJECT);
 }
@@ -77,15 +90,6 @@ export function clearCache(project)
     _.unset( globalStates , [theProject] );
   Dome.emit(PROJECT);
 }
-
-// --------------------------------------------------------------------------
-// --- Project Synchro
-// --------------------------------------------------------------------------
-
-Server.onReady(() => {
-  Server.sendGET('kernel.project.getCurrent')
-    .then((current) => setProject(current.id));
-});
 
 // --------------------------------------------------------------------------
 // --- Projectified State
