@@ -1100,10 +1100,10 @@ module Make (F: Float_sig.S) = struct
                                    Subdivision
      ------------------------------------------------------------------------ *)
 
-  (* [avg] and [split] implement two different strategies for cutting a
+  (* [avg] and [balance] implement two different strategies for cutting a
      floating-point interval in half: [avg] computes the mathematical average of
-     the two bounds, while [split] balances the number of representable values
-     of the given precision in each resulting intervals. *)
+     the two bounds, while [balance] balances the number of representable double
+     values in each resulting intervals. *)
 
   (* Computes the average between two ocaml doubles. *)
   let avg x y =
@@ -1112,20 +1112,22 @@ module Make (F: Float_sig.S) = struct
     then fy +. (fx -. fy) /. 2.
     else (fx +. fy) /. 2.
 
-  (* assumption: [0. <= x <= y]. returns the median of the range [x..y]
+  (* Assumption: [0. <= x <= y]. Returns the median of the range [x..y]
      in number of double values. *)
-  let split_positive prec x y =
+  let _balance x y =
     let ix = Int64.bits_of_float (F.to_float x) in
     let iy = Int64.bits_of_float (F.to_float y) in
-    let f = Int64.(float_of_bits (add ix (div (sub iy ix) 2L))) in
-    F.of_float Near prec f
+    Int64.(float_of_bits (add ix (div (sub iy ix) 2L)))
 
-  (* assumption: [x <= y] *)
-  let _split prec x y =
+  (* Can be [avg] or [balance]. *)
+  let split_positive = avg
+
+  (* Assumption: [x <= y]. *)
+  let split x y =
     match F.is_negative x, F.is_negative y with
-    | false, false -> split_positive prec x y
-    | true, true -> F.neg (split_positive prec (F.neg x) (F.neg y))
-    | true, false -> Cst.neg_zero prec
+    | false, false -> split_positive x y
+    | true, true -> -. (split_positive (F.neg x) (F.neg y))
+    | true, false -> -0.
     | false, true -> assert false
 
   exception Can_not_subdiv = Abstract_interp.Can_not_subdiv
@@ -1149,7 +1151,7 @@ module Make (F: Float_sig.S) = struct
           else if Cmp.equal (F.next_float prec b) e
           then b, e
           else
-            let midpoint = avg b e in
+            let midpoint = split b e in
             let midpoint = F.of_float Down prec midpoint in
             let smidpoint =
               if F.is_exact prec then F.next_float prec midpoint else midpoint

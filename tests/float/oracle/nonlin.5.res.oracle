@@ -292,7 +292,7 @@
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function access_bits:
   rbits1 ∈ {0; 1; 2}
-  x0 ∈ [0..3224938487]
+  x0 ∈ [0..3225911288]
   __retres ∈ {0; 1}
 [eva:final-states] Values at end of function around_zeros:
   Frama_C_entropy_source ∈ [--..--]
@@ -316,20 +316,20 @@
   Frama_C_entropy_source ∈ [--..--]
   v1 ∈ [-0x1.0f0cf00000000p73 .. 0x1.bc16d60000000p59]
   v2 ∈ [-0x1.0f0cf00000000p73 .. 0x1.bc16d60000000p59]
-  square ∈ [-0x0.0000000000000p0 .. inf] ∪ {NaN}
+  square ∈ [0x0.0000000000000p0 .. inf] ∪ {NaN}
   square2 ∈ [-inf .. inf] ∪ {NaN}
 [eva:final-states] Values at end of function other:
   Frama_C_entropy_source ∈ [--..--]
-  i ∈ [-0x1.714fee0000000p1 .. 0x1.71c0040000000p1]
+  i ∈ [-0x1.8efff00000000p1 .. 0x1.8680000000000p1]
   s ∈ [-0x1.0a00000000000p7 .. 0x1.1c00000000000p7]
-  zf ∈ [-0x1.12fffc0000000p4 .. 0x1.12fffc0000000p4]
+  zf ∈ [-0x1.1bfff80000000p4 .. 0x1.1bfff80000000p4]
   s2 ∈ [-0x1.0a00000000000p8 .. 0x1.1c00000000000p8]
-  sq ∈ [-0x1.b37e680000000p-7 .. 0x1.3b10000000000p14]
-  h ∈ [-0x1.38d8000000000p14 .. 0x1.3250680000000p-1]
-  r ∈ [3..11]
+  sq ∈ [0x0.0000000000000p0 .. 0x1.3b10000000000p14]
+  h ∈ [-0x1.38d8000000000p14 .. 0x1.f9dffc0000000p-2]
+  r ∈ {4; 5; 6; 7; 8; 9; 10; 11}
   x ∈ [1..42]
   y ∈ {0; 1}
-  z ∈ [-171874..171874]
+  z ∈ [-177499..177499]
   rbits1 ∈ {0; 1; 2}
   rbits2 ∈ {0; 1}
 [eva:final-states] Values at end of function split_alarm:
@@ -339,7 +339,7 @@
   Frama_C_entropy_source ∈ [--..--]
   x_0 ∈ [-0x1.3880000000000p15 .. 0x1.3880000000000p15]
   d_0 ∈ {0x1.3880000000000p13}
-  square1 ∈ [-0x1.c1e2e00000000p-13 .. 0x1.3880000000000p13]
+  square1 ∈ [0x0.0000000000000p0 .. 0x1.3880000000000p13]
   square2 ∈ [-0x1.fffffe0000000p118 .. inf] ∪ {NaN}
   square3 ∈ [-0x0.0000000000000p0 .. 0x1.2a05f20000000p31]
 [eva:final-states] Values at end of function main:
@@ -350,15 +350,15 @@
   r1 ∈ [0x1.4000000000000p2 .. 0x1.cffffe0000000p2]
   r2 ∈ [0x1.4000000000000p2 .. 0x1.c0fffe0000000p2]
   d ∈ [0x1.4000000000000p2 .. 0x1.c000000000000p2]
-  i ∈ [-0x1.714fee0000000p1 .. 0x1.71c0040000000p1]
+  i ∈ [-0x1.8efff00000000p1 .. 0x1.8680000000000p1]
   s ∈ [-0x1.0a00000000000p7 .. 0x1.1c00000000000p7]
-  zf ∈ [-0x1.12fffc0000000p4 .. 0x1.12fffc0000000p4]
+  zf ∈ [-0x1.1bfff80000000p4 .. 0x1.1bfff80000000p4]
   s2 ∈ [-0x1.0a00000000000p8 .. 0x1.1c00000000000p8]
-  sq ∈ [-0x1.b37e680000000p-7 .. 0x1.3b10000000000p14]
-  h ∈ [-0x1.38d8000000000p14 .. 0x1.3250680000000p-1]
-  r ∈ [3..11]
+  sq ∈ [0x0.0000000000000p0 .. 0x1.3b10000000000p14]
+  h ∈ [-0x1.38d8000000000p14 .. 0x1.f9dffc0000000p-2]
+  r ∈ {4; 5; 6; 7; 8; 9; 10; 11}
   x ∈ [1..42]
   y ∈ {0; 1}
-  z ∈ [-171874..171874]
+  z ∈ [-177499..177499]
   rbits1 ∈ {0; 1; 2}
   rbits2 ∈ {0; 1}
