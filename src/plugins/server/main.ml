@@ -59,6 +59,8 @@ type 'a request = [
   | `Poll
   | `Request of 'a * string * json
   | `Kill of 'a
+  | `SigOn of string
+  | `SigOff of string
   | `Shutdown
 ]
 
@@ -66,6 +68,7 @@ type 'a response = [
   | `Data of 'a * json
   | `Error of 'a * string
   | `Killed of 'a
+  | `Signal of string
   | `Rejected of 'a
 ]
 
@@ -85,6 +88,8 @@ type 'a process = {
   mutable killed : bool ;
 }
 
+module Sigs = Set.Make(String)
+
 type 'a server = {
   polling : int ;
   pretty : Format.formatter -> 'a -> unit ;
@@ -93,6 +98,8 @@ type 'a server = {
   q_in : 'a process Queue.t ;
   q_out : 'a response Stack.t ;
   mutable daemon : Db.daemon option ;
+  mutable s_active : Sigs.t ; (* active *)
+  mutable s_signal : Sigs.t ; (* signaled *)
   mutable shutdown : bool ;
   mutable running : 'a process option ;
 }
@@ -107,7 +114,9 @@ let pp_request pp fmt (r : _ request) =
   match r with
   | `Poll -> Format.fprintf fmt "Poll"
   | `Shutdown -> Format.fprintf fmt "Shutdown"
-  | `Kill id -> Format.fprintf fmt "Kill %a" pp id
+  | `SigOn sg -> Format.fprintf fmt "Signal %S : on" sg
+  | `SigOff sg -> Format.fprintf fmt "Signal %S : off" sg
+  | `Kill id -> Format.fprintf fmt "Kill [%a]" pp id
   | `Request(id,request,data) ->
     if Senv.debug_atleast 2 then
       Format.fprintf fmt "@[<hov 2>Request [%a] %s@ %a@]"
@@ -123,6 +132,7 @@ let pp_response pp fmt (r : _ response) =
   | `Error(id,err) -> Format.fprintf fmt "Error %a: %s" pp id err
   | `Rejected id -> Format.fprintf fmt "Rejected %a" pp id
   | `Killed id -> Format.fprintf fmt "Killed %a" pp id
+  | `Signal sg -> Format.fprintf fmt "Signal %S" sg
   | `Data(id,data) ->
     if Senv.debug_atleast 2 then
       Format.fprintf fmt "@[<hov 2>Replies [%a]@ %a@]"
@@ -185,6 +195,8 @@ let process_request (server : 'a server) (request : 'a request) : unit =
       Stack.clear server.q_out ;
       server.shutdown <- true ;
     end
+  | `SigOn sg -> server.s_active <- Sigs.add sg server.s_active
+  | `SigOff sg -> server.s_active <- Sigs.remove sg server.s_active
   | `Kill id ->
     begin
       let set_killed = kill_request server.equal id in
@@ -225,16 +237,28 @@ let communicate server =
     let pool = ref [] in
     Stack.iter (fun r -> pool := r :: !pool) server.q_out ;
     Stack.clear server.q_out ;
+    server.s_active <- Sigs.empty ;
     message.callback !pool ;
     Extlib.may raise error ; true
 
 (* -------------------------------------------------------------------------- *)
-(* --- Yielding                                                           --- *)
+(* --- Yielding & Signaling                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
 let do_yield server () =
   Extlib.may raise_if_killed server.running ;
   ignore ( communicate server )
+
+let do_signal server s =
+  if Sigs.mem s server.s_active && not (Sigs.mem s server.s_signal) then
+    begin
+      server.s_signal <- Sigs.add s server.s_signal ;
+      Stack.push (`Signal s) server.q_out ;
+    end
+
+let nop _s = ()
+let emitter : (string -> unit) ref = ref nop
+let signal s = !emitter s
 
 (* -------------------------------------------------------------------------- *)
 (* --- One Step Process                                                   --- *)
@@ -264,7 +288,7 @@ let kill () = raise Killed
 
 let daemons = ref []
 let on callback = daemons := !daemons @ [ callback ]
-let signal activity =
+let set_active activity =
   List.iter (fun f -> try f activity with _ -> ()) !daemons
 
 let create ~pretty ?(equal=(=)) ~fetch () =
@@ -273,6 +297,8 @@ let create ~pretty ?(equal=(=)) ~fetch () =
     fetch ; polling ; equal ; pretty ;
     q_in = Queue.create () ;
     q_out = Stack.create () ;
+    s_active = Sigs.empty ;
+    s_signal = Sigs.empty ;
     daemon = None ;
     running = None ;
     shutdown = false ;
@@ -295,7 +321,7 @@ let start server =
           (do_yield server)
       in
       server.daemon <- Some daemon ;
-      signal true ;
+      set_active true ;
     end
 
 let stop server =
@@ -306,7 +332,7 @@ let stop server =
       Senv.feedback "Server disabled." ;
       server.daemon <- None ;
       Db.off_progress daemon ;
-      signal false ;
+      set_active false ;
     end
 
 let foreground server =
@@ -327,9 +353,10 @@ let run server =
     ( (* TODO: catch-break to be removed once Why3 signal handler is fixed *)
       Sys.catch_break true
     ) ;
-    Senv.feedback "Server running." ;
     foreground server ;
-    signal true ;
+    emitter := do_signal server ;
+    set_active true ;
+    Senv.feedback "Server running." ;
     begin
       try
         while not server.shutdown do
@@ -339,12 +366,14 @@ let run server =
       with Sys.Break -> () (* Ctr+C, just leave the loop normally *)
     end;
     Senv.feedback "Server shutdown." ;
-    signal false ;
+    emitter := nop ;
+    set_active false ;
   with
   | Killed -> ()
   | exn ->
     Senv.feedback "Server interruped (fatal error)." ;
-    signal false ;
+    emitter := nop ;
+    set_active false ;
     raise exn
 
 (* -------------------------------------------------------------------------- *)

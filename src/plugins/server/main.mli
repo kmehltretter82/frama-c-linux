@@ -47,6 +47,8 @@ type 'a request = [
   | `Poll
   | `Request of 'a * string * json
   | `Kill of 'a
+  | `SigOn of string
+  | `SigOff of string
   | `Shutdown
 ]
 
@@ -57,6 +59,7 @@ type 'a response = [
   | `Error of 'a * string
   | `Killed of 'a
   | `Rejected of 'a
+  | `Signal of string
 ]
 
 (** A paired request-response message.
@@ -104,5 +107,8 @@ val kill : unit -> 'a
     All callbacks would be executed in their order of registration.
     They shall {i never} raise any exception. *)
 val on : (bool -> unit) -> unit
+
+(** Emits the server signal *)
+val signal : string -> unit
 
 (* -------------------------------------------------------------------------- *)
