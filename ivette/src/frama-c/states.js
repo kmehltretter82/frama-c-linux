@@ -72,7 +72,8 @@ export function setProject(project)
 export function clearProject(project)
 {
   const theProject = project || currentProject ;
-  _.unset( globalStates , ['states',theProject] );
+  if (theProject)
+    _.unset( globalStates , [theProject] );
   Dome.emit(PROJECT);
 }
 
@@ -101,7 +102,7 @@ export function useState(id,project)
   Dome.useUpdate(PROJECT,theEvent);
   const theProject = project || currentProject ;
   if (!theProject) return NONE;
-  const thePath = ['states',theProject,id] ;
+  const thePath = [theProject,id] ;
   const theValue = _.get( globalStates, thePath );
   const setValue = (v) => {
     Dome.emit(theEvent,v);
