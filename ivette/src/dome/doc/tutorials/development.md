@@ -175,19 +175,19 @@ $ make dome-help
   make dome-clean   Remove dome temporary files
   make dome-plugins Package plugins for distribution
 
-[Dome] Development Variables:
+[Dome] Development:
   Dome framework  DOME = '…'
-  Arguments (dev) DOME_ARGS = ''
+  Local command   DOME_CLI  = '…'
+  Arguments (dev) DOME_ARGS = '…'
   Export modules  DOME_EXPORTS = '…'
   Plugin modules  DOME_PLUGINS = '…'
-  Local (./bin/)  DOME_APP_CLI = '…'
 
-[Dome] Documentation Variables:
+[Dome] Documentation:
   Application     APP          = '…'
   Copyright       COPYRIGHT    = '…'
   Dome framework  DOME_DOC     = '…'
-  App. framework  DOME_APP_DOC = '…'
-  App. Sources    DOME_APP_SRC = '…'
+  Output dir      DOME_DOC     = '…'
+  Public API      DOME_API     = '…'
 
 ```
 

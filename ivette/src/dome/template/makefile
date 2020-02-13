@@ -13,10 +13,9 @@ DOME?=dome
 DOME_ARGS?=
 DOME_EXPORTS?=
 DOME_PLUGINS?=
-DOME_DOC?=html/dome
-DOME_APP_CLI?=bin/$(DOME_MK_NAME)
-DOME_APP_DOC?=html/$(DOME_MK_NAME)
-DOME_APP_SRC?=src/renderer
+DOME_CLI?=bin/$(DOME_MK_NAME)
+DOME_DOC?=doc/html
+DOME_API?=
 
 # --------------------------------------------------------------------------
 # ---  Makefile Help
@@ -39,19 +38,18 @@ dome-help:
 	@echo "  make dome-clean   Remove dome temporary files"
 	@echo "  make dome-plugins Package plugins for distribution"
 	@echo
-	@echo "[Dome] Development Variables:"
-	@echo "  Dome framework  DOME = '$(DOME)'"
-	@echo "  Arguments (dev) DOME_ARGS = '$(DOME_ARGS)'"
+	@echo "[Dome] Development:"
+	@echo "  Dome framework  DOME         = '$(DOME)'"
+	@echo "  Local command   DOME_CLI     = '$(DOME_CLI)'"
+	@echo "  Arguments (dev) DOME_ARGS    = '$(DOME_ARGS)'"
 	@echo "  Export modules  DOME_EXPORTS = '$(DOME_EXPORTS)'"
 	@echo "  Plugin modules  DOME_PLUGINS = '$(DOME_PLUGINS)'"
-	@echo "  Local command   DOME_APP_CLI = '$(DOME_APP_CLI)'"
 	@echo
-	@echo "[Dome] Documentation Variables:"
+	@echo "[Dome] Documentation:"
 	@echo "  Application     APP          = '$(APP)'"
 	@echo "  Copyright       COPYRIGHT    = '$(COPYRIGHT)'"
-	@echo "  Dome framework  DOME_DOC     = '$(DOME_DOC)'"
-	@echo "  App. framework  DOME_APP_DOC = '$(DOME_APP_DOC)'"
-	@echo "  App. Sources    DOME_APP_SRC = '$(DOME_APP_SRC)'"
+	@echo "  Output dir      DOME_DOC     = '$(DOME_DOC)'"
+	@echo "  Public API      DOME_API     = '$(DOME_API)'"
 	@echo
 
 # --------------------------------------------------------------------------
@@ -284,21 +282,21 @@ src/plugins/%/package.json:
 # ---  Application Development
 # --------------------------------------------------------------------------
 
-DOME_MK_CLIDIR=$(dir $(DOME_APP_CLI))
+DOME_MK_CLIDIR=$(dir $(DOME_CLI))
 
 .PHONY: dome-dev
 
 dome-dev: dome-pkg dome-templ dome-export-dev
-	@echo "[Dome] linking $(DOME_APP_CLI)"
+	@echo "[Dome] linking $(DOME_CLI)"
 	@mkdir -p $(DOME_MK_CLIDIR)
-	@rm -f $(DOME_APP_CLI)
-	@echo "#!/bin/sh" >> $(DOME_APP_CLI)
-	@echo "export DOME='$(DOME)'" >> $(DOME_APP_CLI)
-	@echo "export DOME_ENV='dev'" >> $(DOME_APP_CLI)
-	@echo 'exec $(DOME_MK_BIN)/electron-webpack dev "$$@"' >> $(DOME_APP_CLI)
-	@chmod 555 $(DOME_APP_CLI)
+	@rm -f $(DOME_CLI)
+	@echo "#!/bin/sh" >> $(DOME_CLI)
+	@echo "export DOME='$(DOME)'" >> $(DOME_CLI)
+	@echo "export DOME_ENV='dev'" >> $(DOME_CLI)
+	@echo 'exec $(DOME_MK_BIN)/electron-webpack dev "$$@"' >> $(DOME_CLI)
+	@chmod 555 $(DOME_CLI)
 	@echo "[Dome] running application (development)"
-	@$(DOME_APP_CLI) $(DOME_ARGS)
+	@$(DOME_CLI) $(DOME_ARGS)
 
 # --------------------------------------------------------------------------
 # ---  Application Building
@@ -309,13 +307,13 @@ dome-dev: dome-pkg dome-templ dome-export-dev
 dome-app: dome-pkg dome-templ dome-export-app
 	@echo "[Dome] compiling application (production)"
 	DOME=$(DOME) DOME_ENV='app' yarn run electron-webpack app
-	@echo "[Dome] linking $(DOME_APP_CLI)"
+	@echo "[Dome] linking $(DOME_CLI)"
 	@mkdir -p $(DOME_MK_CLIDIR)
-	@rm -f $(DOME_APP_CLI)
-	@echo "#!/bin/sh" >> $(DOME_APP_CLI)
-	@echo "export DOME_LOCAL=true" >> $(DOME_APP_CLI)
-	@echo 'exec $(DOME_MK_BIN)/electron $(PWD)/dist/main/main.js "$$@"' >> $(DOME_APP_CLI)
-	@chmod 555 $(DOME_APP_CLI)
+	@rm -f $(DOME_CLI)
+	@echo "#!/bin/sh" >> $(DOME_CLI)
+	@echo "export DOME_LOCAL=true" >> $(DOME_CLI)
+	@echo 'exec $(DOME_MK_BIN)/electron $(PWD)/dist/main/main.js "$$@"' >> $(DOME_CLI)
+	@chmod 555 $(DOME_CLI)
 
 # --------------------------------------------------------------------------
 # ---  Application Packaging
@@ -327,25 +325,6 @@ dome-dist: dome-app
 	@echo "[Dome] packaging application (production)"
 	DOME=$(DOME) yarn run electron-builder --dir -c.compression=store -c.mac.identity=null
 	@echo "[Dome] application packaged in ./dist"
-
-# --------------------------------------------------------------------------
-# ---  Application JSdoc
-# --------------------------------------------------------------------------
-
-DOME_MK_API_DOC=$(PWD)/$(DOME_APP_DOC)
-DOME_MK_API_SRC=$(PWD)/$(DOME_APP_SRC) $(addprefix $(PWD)/src/plugins/, $(DOME_PLUGINS))
-
-dome-api: $(DOME_MK_BIN)/jsdoc
-	@echo "[Dome] generating $(APP) documentation"
-	@mkdir -p $(DOME_APP_DOC)
-	@rm -f $(DOME_APP_DOC)/*.html
-	@rm -f $(DOME_APP_DOC)/*.png
-	@rm -f $(DOME_APP_DOC)/*.css
-	@rm -fr $(DOME_APP_DOC)/fonts
-	@rm -fr $(DOME_APP_DOC)/styles
-	@(cd $(DOME) && DOME='.' DOME_PWD=$(PWD) APP=$(APP) COPYRIGHT="$(COPYRIGHT)" \
-	  $(DOME_MK_BIN)/jsdoc -c ./doc/app.json $(DOME_MK_API_SRC) -d $(DOME_MK_API_DOC))
-	@echo "[Dome]   $(DOME_APP_DOC)/index.html"
 
 # --------------------------------------------------------------------------
 # --- Icon gallery
@@ -363,18 +342,21 @@ $(DOME_MK_ICON_HTML): $(DOME_MK_ICON_MAKE) $(DOME_MK_ICON_DATA)
 # ---  Dome Documentation
 # --------------------------------------------------------------------------
 
+DOME_MK_DOC_SRC=$(DOME_API) $(addprefix src/plugins/, $(DOME_PLUGINS))
+DOME_MK_DOC_API=$(addprefix $(PWD)/, $(DOME_MK_DOC_SRC))
 DOME_MK_DOC_OUT=$(addprefix $(PWD)/, $(DOME_DOC))
 
 dome-doc: $(DOME_MK_BIN)/jsdoc $(DOME_MK_ICON_HTML)
-	@echo "[Dome] generating Dome documentation"
+	@echo "[Dome] $(APP) documentation"
 	@mkdir -p $(DOME_DOC)
 	@rm -f $(DOME_DOC)/*.html
 	@rm -f $(DOME_DOC)/*.png
 	@rm -f $(DOME_DOC)/*.css
 	@rm -fr $(DOME_DOC)/fonts
 	@rm -fr $(DOME_DOC)/styles
-	@(cd $(DOME) && DOME="." DOME_PWD=$(PWD) COPYRIGHT='CEA Tech' \
-	  $(DOME_MK_BIN)/jsdoc -c ./doc/config.json -d $(DOME_MK_DOC_OUT))
+	@(cd $(DOME) && DOME="." DOME_PWD=$(PWD) APP=$(APP) COPYRIGHT="$(COPYRIGHT)" \
+	  $(DOME_MK_BIN)/jsdoc -c ./doc/config.json $(DOME_MK_DOC_API) \
+	  -d $(DOME_MK_DOC_OUT))
 	@cp -f $(DOME)/doc/gallery.css $(DOME_DOC)/styles/
 	@cp -f $(DOME)/doc/tutorials/*.png $(DOME_DOC)/
 	@cat \
