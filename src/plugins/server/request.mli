@@ -44,6 +44,19 @@ end
 type 'a input = (module Input with type t = 'a)
 type 'b output = (module Output with type t = 'b)
 
+(** {2 Signals} *)
+
+type signal
+
+val signal :
+  page:Doc.page ->
+  name:string ->
+  descr:Markdown.text ->
+  ?details:Markdown.block ->
+  unit -> signal
+
+val emit : signal -> unit
+
 (** {2 Simple Requests Registration} *)
 
 (** Register a simple request of type [(a -> b)].

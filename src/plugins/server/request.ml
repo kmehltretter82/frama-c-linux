@@ -82,6 +82,25 @@ let check_page page name =
       "Request '%s' shall not be published in protocol pages" name
 
 (* -------------------------------------------------------------------------- *)
+(* --- Signals                                                            --- *)
+(* -------------------------------------------------------------------------- *)
+
+type signal = Main.signal
+
+let signal ~page ~name ~descr  ?(details=[]) () =
+  let open Markdown in
+  check_name name ;
+  check_page page name ;
+  let title =  Printf.sprintf "`SIGNAL` %s" name in
+  let index = [ Printf.sprintf "%s (`SIGNAL`)" name ] in
+  let description = [ Block [Text descr] ; Block details] in
+  let _ =
+    Doc.publish ~page ~name ~title ~index description []
+  in Main.signal name
+
+let emit = Main.emit
+
+(* -------------------------------------------------------------------------- *)
 (* --- Multiple Fields Requests                                           --- *)
 (* -------------------------------------------------------------------------- *)
 

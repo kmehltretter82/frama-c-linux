@@ -256,6 +256,19 @@ let do_signal server s =
       Stack.push (`Signal s) server.q_out ;
     end
 
+(* -------------------------------------------------------------------------- *)
+(* --- Signals                                                            --- *)
+(* -------------------------------------------------------------------------- *)
+
+type signal = string
+let signals = Hashtbl.create 32
+let signal s =
+  if Hashtbl.mem signals s then
+    ( Server_parameters.failure "Signal '%s' already registered" s ; "" )
+  else
+    ( Hashtbl.add signals s () ; s )
+
+let () = Hashtbl.add signals "" ()
 let nop _s = ()
 let emitter : (string -> unit) ref = ref nop
 let signal s = !emitter s

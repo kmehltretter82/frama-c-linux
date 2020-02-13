@@ -38,6 +38,13 @@ val find : string -> (kind * (json -> json)) option
 val exec : string -> json -> json (** @raises Not_found if not registered *)
 
 (* -------------------------------------------------------------------------- *)
+(** {2 Signals Registry} *)
+(* -------------------------------------------------------------------------- *)
+
+type signal
+val signal : string -> signal
+
+(* -------------------------------------------------------------------------- *)
 (** {2 Server Main Process} *)
 (* -------------------------------------------------------------------------- *)
 
@@ -103,12 +110,12 @@ val stop : 'a server -> unit
 (** Kills the currently running request. Actually raises an exception. *)
 val kill : unit -> 'a
 
+(** Emits the server signal to the client. *)
+val emit : signal -> unit
+
 (** Register a callback to listen for server activity.
     All callbacks would be executed in their order of registration.
     They shall {i never} raise any exception. *)
 val on : (bool -> unit) -> unit
-
-(** Emits the server signal *)
-val signal : string -> unit
 
 (* -------------------------------------------------------------------------- *)
