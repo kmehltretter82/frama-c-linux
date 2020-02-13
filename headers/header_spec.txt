@@ -525,6 +525,8 @@ src/kernel_services/ast_printing/printer_builder.mli: CEA_LGPL
 src/kernel_services/ast_printing/printer_tag.ml: CEA_LGPL
 src/kernel_services/ast_printing/printer_tag.mli: CEA_LGPL
 src/kernel_services/ast_queries/README.md: .ignore
+src/kernel_services/ast_queries/acsl_extension.ml: CEA_LGPL
+src/kernel_services/ast_queries/acsl_extension.mli: CEA_LGPL
 src/kernel_services/ast_queries/ast_info.ml: CEA_LGPL
 src/kernel_services/ast_queries/ast_info.mli: CEA_LGPL
 src/kernel_services/ast_queries/cil.ml: CIL

@@ -27,37 +27,47 @@ open Cil_datatype
 open Printer_api
 open Format
 
-module Behavior_extensions = struct
+module Extensions = struct
+  let initialized = ref false
+  let ref_print = ref (fun _ _ _ _ -> assert false)
+  let ref_short_print = ref (fun _ _ _ _ -> assert false)
 
-  let printer_tbl = Hashtbl.create 5
-
-  let register name printer =
-    Hashtbl.add printer_tbl name printer
-
-  let default_pp printer fmt ext =
-    match ext with
-    | Ext_id i -> Format.pp_print_int fmt i
-    | Ext_terms terms ->
-      Pretty_utils.pp_list ~sep:",@ " printer#term fmt terms
-    | Ext_preds preds ->
-      Pretty_utils.pp_list ~sep:",@ " printer#predicate fmt preds
+  let set_handler ~print ~short_print =
+    assert (not !initialized) ;
+    ref_print := print ;
+    ref_short_print := short_print ;
+    initialized := true ;
+    ()
 
   let pp (printer) fmt {ext_name; ext_kind} =
-    let pp =
-      try
-        Hashtbl.find printer_tbl ext_name
-      with Not_found -> default_pp
-    in
-    Format.fprintf fmt "@[<hov 2>%s %a;@]" ext_name (pp printer) ext_kind
+    !ref_print ext_name printer fmt ext_kind
 
+  let pp_short (printer) fmt {ext_name; ext_kind} =
+    !ref_short_print ext_name printer fmt ext_kind
+
+  let ref_deprecated_handler = ref (fun _ _ _ -> assert false)
+  let set_deprecated_handler ~handler =
+    ref_deprecated_handler := handler
+
+  let deprecated_register name =
+    !ref_deprecated_handler name
 end
-let register_behavior_extension = Behavior_extensions.register
+let set_extension_handler = Extensions.set_handler
 
-let register_code_annot_extension = Behavior_extensions.register
+(* Deprecated functions *)
+let set_deprecated_extension_handler = Extensions.set_deprecated_handler
 
-let register_loop_annot_extension = Behavior_extensions.register
+let register_behavior_extension name =
+  Extensions.deprecated_register name Ext_contract
 
-let register_global_extension = Behavior_extensions.register
+let register_code_annot_extension name =
+  Extensions.deprecated_register name (Ext_code_annot Ext_here)
+
+let register_loop_annot_extension name =
+  Extensions.deprecated_register name (Ext_code_annot Ext_next_loop)
+
+let register_global_extension name =
+  Extensions.deprecated_register name Ext_global
 
 (* Internal attributes. Won't be pretty-printed *)
 let reserved_attributes = ref []
@@ -2746,8 +2756,11 @@ class cil_printer () = object (self)
       self#pp_acsl_keyword "requires"
       self#identified_predicate p
 
-  method extended fmt (ext : acsl_extension) =
-    Behavior_extensions.pp (self :> extensible_printer_type) fmt ext
+  method extended fmt ext =
+    Extensions.pp (self :> extensible_printer_type) fmt ext
+
+  method short_extended fmt ext =
+    Extensions.pp_short (self :> extensible_printer_type) fmt ext
 
   method post_cond fmt (k,p) =
     let kw = get_termination_kind_name k in

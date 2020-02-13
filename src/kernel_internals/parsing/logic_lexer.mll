@@ -174,10 +174,10 @@
         let res =
           if not (Logic_utils.is_kw_c_mode ()) then begin
             match Logic_env.extension_category s with
-            | None -> None
-            | Some Cil_types.Ext_contract -> Some (EXT_CONTRACT s)
-            | Some Cil_types.Ext_global -> Some (EXT_GLOBAL s)
-            | Some Cil_types.Ext_code_annot _ -> Some (EXT_CODE_ANNOT s)
+            | exception Not_found -> None
+            | Cil_types.Ext_contract -> Some (EXT_CONTRACT s)
+            | Cil_types.Ext_global -> Some (EXT_GLOBAL s)
+            | Cil_types.Ext_code_annot _ -> Some (EXT_CODE_ANNOT s)
           end
           else None
         in
@@ -241,7 +241,7 @@
       ];
     fun lexbuf ->
       let s = lexeme lexbuf in
-      try Hashtbl.find h s with Not_found ->         
+      try Hashtbl.find h s with Not_found ->
 	if Logic_env.typename_status s then TYPENAME s
         else
 	  IDENTIFIER s
@@ -495,7 +495,7 @@ and comment = parse
 {
   let set_initial_location dest_lexbuf src_loc =
     Lexing.(
-      dest_lexbuf.lex_curr_p <- 
+      dest_lexbuf.lex_curr_p <-
         { src_loc with
           pos_bol = src_loc.pos_bol - src_loc.pos_cnum;
           pos_cnum = 0; };

@@ -614,28 +614,33 @@ module Base_checker = struct
           match ca.annot_content with
           | AExtended (_, is_loop, {ext_name}) ->
             (match Logic_env.extension_category ext_name, is_loop with
-             | Some (Ext_code_annot (Ext_next_stmt | Ext_next_both)), false ->
+             | exception Not_found ->
+               Kernel.(
+                 warning ~wkey:wkey_acsl_extension
+                   "%s is not a known extension" ext_name);
+               my_labels
+             | Ext_code_annot (Ext_next_stmt | Ext_next_both), false ->
                Logic_const.post_label :: my_labels
-             | Some (Ext_code_annot Ext_here), false -> my_labels
-             | Some (Ext_code_annot (Ext_next_loop | Ext_next_both)), true ->
+             | Ext_code_annot Ext_here, false -> my_labels
+             | Ext_code_annot (Ext_next_loop | Ext_next_both), true ->
                Logic_const.loop_current_label ::
                Logic_const.loop_entry_label :: my_labels
-             | Some (Ext_code_annot (Ext_here | Ext_next_stmt)), true ->
+             | Ext_code_annot (Ext_here | Ext_next_stmt), true ->
                Kernel.(
                  warning ~wkey:wkey_acsl_extension
                    "%s is a code annotation extension, \
                     but used as a loop annotation" ext_name);
                my_labels
-             | Some (Ext_code_annot (Ext_next_loop)), false ->
+             | Ext_code_annot (Ext_next_loop), false ->
                Kernel.(
                  warning ~wkey:wkey_acsl_extension
                    "%s is a loop annotation extension, \
                     but used as a code annotation" ext_name;
                  my_labels)
-             | (Some (Ext_contract | Ext_global) | None), _ ->
+             | (Ext_contract | Ext_global), _ ->
                Kernel.(
                  warning ~wkey:wkey_acsl_extension
-                   "%s is not a known code annotation extension" ext_name);
+                   "%s is not a code annotation extension" ext_name);
                my_labels)
           | AAssert _ | AStmtSpec _ | AInvariant _ | AVariant _
           | AAssigns _ | AAllocation _ | APragma _ -> my_labels

@@ -283,6 +283,7 @@ class type extensible_printer_type = object
   method assumes: Format.formatter -> identified_predicate -> unit
 
   method extended: Format.formatter -> Cil_types.acsl_extension -> unit
+  method short_extended: Format.formatter -> Cil_types.acsl_extension -> unit
 
   method funspec: Format.formatter -> funspec -> unit
 
@@ -444,6 +445,8 @@ module type S_pp = sig
   val pp_logic_label: Format.formatter -> logic_label -> unit
   val pp_builtin_logic_info: Format.formatter -> builtin_logic_info -> unit
   val pp_extended: Format.formatter -> acsl_extension -> unit
+  val pp_short_extended: Format.formatter -> acsl_extension -> unit
+  (** @since Frama-C+dev *)
   val pp_predicate_node: Format.formatter -> predicate_node -> unit
   val pp_predicate: Format.formatter -> predicate -> unit
   val pp_identified_predicate: Format.formatter -> identified_predicate -> unit

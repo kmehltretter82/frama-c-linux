@@ -2,8 +2,7 @@ open Logic_ptree
 open Cil_types
 open Logic_typing
 
-let type_foo ~typing_context ~loc l =
-  let _loc = loc in
+let type_foo typing_context _loc l =
   let preds =
     List.map
       (typing_context.type_predicate
@@ -24,8 +23,7 @@ module Bar_table =
         let size = 3
      end)
 
-let type_bar ~typing_context ~loc l =
-  let _loc = loc in
+let type_bar typing_context _loc l =
   let i = Count.next() in
   let p =
     List.map
@@ -61,7 +59,7 @@ let visit_bar vis ext =
   | Ext_terms _ | Ext_preds _ ->
       Kernel.fatal "bar extension should have ids as arguments"
 
-let type_baz ~typing_context ~loc:_loc l =
+let type_baz typing_context _loc l =
   let t =
     List.map
       (typing_context.type_term typing_context typing_context.pre_state) l
@@ -88,7 +86,7 @@ let add_builtin () =
 
 let () = add_builtin ()
 
-let type_bla ~typing_context ~loc:_loc l =
+let type_bla typing_context _loc l =
   let type_predicate ctxt env p =
     match p.lexpr_node with
     | PLapp("\\trace", [], [pred]) ->
@@ -107,16 +105,15 @@ let type_bla ~typing_context ~loc:_loc l =
   Ext_preds l
 
 let () =
-  Logic_typing.register_behavior_extension "foo" false type_foo;
-  Logic_typing.register_behavior_extension "bar" false type_bar;
-  Logic_typing.register_behavior_extension "bla" false type_bla;
-  Cil_printer.register_behavior_extension "bar" print_bar;
-  Cil.register_behavior_extension "bar" visit_bar;
-  Logic_typing.register_code_annot_next_both_extension "baz" false type_baz;
-  Logic_typing.register_code_annot_next_loop_extension "lfoo" false type_foo;
-  Logic_typing.register_code_annot_extension "ca_foo" false type_foo;
-  Logic_typing.register_code_annot_next_stmt_extension "ns_foo" false type_foo;
-  Logic_typing.register_global_extension "global_foo" false type_foo
+  Acsl_extension.register_behavior "foo" type_foo false ;
+  Acsl_extension.register_code_annot_next_loop "lfoo" type_foo false ;
+  Acsl_extension.register_code_annot "ca_foo" type_foo false ;
+  Acsl_extension.register_code_annot_next_stmt "ns_foo" type_foo false ;
+  Acsl_extension.register_global "global_foo" type_foo false ;
+  Acsl_extension.register_behavior
+    "bar" type_bar ~printer:print_bar ~visitor:visit_bar false ;
+  Acsl_extension.register_behavior "bla" type_bla false ;
+  Acsl_extension.register_code_annot_next_both "baz" type_baz false
 
 let run () =
   Ast.compute ();

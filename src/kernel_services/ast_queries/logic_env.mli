@@ -28,12 +28,12 @@ open Cil_types
 
 (** {2 registered ACSL extensions } *)
 
-(** register a given name as a clause name for extended category. *)
-val register_extension: string -> ext_category -> unit
-
 val is_extension: string -> bool
 
-val extension_category: string -> ext_category option
+val extension_category: string -> ext_category
+
+val preprocess_extension:
+  string -> Logic_ptree.lexpr list -> Logic_ptree.lexpr list
 
 (** {2 Global Tables} *)
 module Logic_info: State_builder.Hashtbl
@@ -203,6 +203,16 @@ val typename_status: string -> bool
 val builtin_types_as_typenames: unit -> unit
 
 (** {2 Internal use} *)
+
+val set_extension_handler:
+  category:(string -> ext_category) ->
+  is_extension:(string -> bool) ->
+  preprocess:(string -> Logic_ptree.lexpr list -> Logic_ptree.lexpr list) ->
+  unit
+(** Used to setup references related to the handling of ACSL extensions.
+    If your name is not [Acsl_extension], do not call this
+    @since Frama-C+dev
+*)
 
 val init_dependencies: State.t -> unit
 (** Used to postpone dependency of Lenv global tables wrt Cil_state, which

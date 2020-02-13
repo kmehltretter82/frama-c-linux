@@ -1725,11 +1725,13 @@ end
 
     @since Sodium-20150201
     @modify Silicon-20161101
+    @deprecated Frama-C+dev
 *)
 val register_behavior_extension:
   string ->
   (cilVisitor -> acsl_extension_kind -> (acsl_extension_kind) visitAction)
   -> unit
+[@@ deprecated "Use Acsl_extension.register_behavior instead (arg: ~visitor)"]
 
 (**/**)
 class internal_genericCilVisitor:
@@ -2282,6 +2284,20 @@ val pp_lval_ref: (Format.formatter -> lval -> unit) ref
 val pp_ikind_ref: (Format.formatter -> ikind -> unit) ref
 val pp_attribute_ref: (Format.formatter -> attribute -> unit) ref
 val pp_attributes_ref: (Format.formatter -> attribute list -> unit) ref
+
+val set_extension_handler:
+  visit:(string -> cilVisitor -> acsl_extension_kind ->
+         acsl_extension_kind visitAction) ->
+  unit
+(** Used to setup a reference related to the handling of ACSL extensions.
+    If your name is not [Acsl_extension], do not call this
+    @since Frama-C+dev
+*)
+
+val set_deprecated_extension_handler:
+  handler:(string -> ext_category ->
+           (cilVisitor -> acsl_extension_kind -> acsl_extension_kind visitAction) ->
+           unit) -> unit
 
 (*
 Local Variables:

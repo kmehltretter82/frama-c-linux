@@ -69,22 +69,19 @@ module Register (M : Annotation) =
 struct
   include M
 
-  let typing_ext ~typing_context ~loc args =
+  let typer typing_context loc args =
     try export (parse ~typing_context args)
     with Parse_error ->
       typing_context.Logic_typing.error loc "Invalid %s directive" name
 
-  let printer_ext _pp fmt lp =
+  let printer _pp fmt lp =
     print fmt (import lp)
 
   let () =
-    if is_loop_annot then begin
-      Logic_typing.register_code_annot_next_loop_extension name false typing_ext;
-      Cil_printer.register_loop_annot_extension name printer_ext
-    end else begin
-      Logic_typing.register_code_annot_next_stmt_extension name false typing_ext;
-      Cil_printer.register_code_annot_extension name printer_ext
-    end
+    if is_loop_annot then
+      Acsl_extension.register_code_annot_next_loop name typer ~printer false
+    else
+      Acsl_extension.register_code_annot_next_stmt name typer ~printer false
 
   let get stmt =
     let filter_add _emitter annot acc =

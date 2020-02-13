@@ -755,9 +755,31 @@ let alphabetabeta _ x = x
 let alphabetafalse _ _ = false
 let alphatrue _ = true
 
-let visitor_tbl = Hashtbl.create 5
+module Extensions = struct
+  let initialized = ref false
+  let ref_visit = ref (fun _ _ _ -> assert false)
 
-let register_behavior_extension name ext = Hashtbl.add visitor_tbl name ext
+  let set_handler ~visit =
+    assert (not !initialized) ;
+    ref_visit := visit ;
+    initialized := true ;
+    ()
+
+  let visit name = !ref_visit name
+
+  let ref_deprecated_handler = ref (fun _ _ _ -> assert false)
+  let set_deprecated_handler ~handler =
+    ref_deprecated_handler := handler
+
+  let register_behavior name ext =
+    !ref_deprecated_handler name Ext_contract ext
+end
+let set_extension_handler = Extensions.set_handler
+
+(* Deprecated *)
+let set_deprecated_extension_handler = Extensions.set_deprecated_handler
+let register_behavior_extension = Extensions.register_behavior
+
 
 (* sm/gn: cil visitor interface for traversing Cil trees. *)
 (* Use visitCilStmt and/or visitCilFile to use this. *)
@@ -1889,10 +1911,7 @@ and childrenBehavior vis b =
   b
 
 and visitCilExtended vis orig =
-  let visit =
-    try Hashtbl.find visitor_tbl orig.ext_name
-    with Not_found -> (fun _ _ -> DoChildren)
-  in
+  let visit = Extensions.visit orig.ext_name in
   let e' = doVisitCil vis id (visit vis) childrenCilExtended orig.ext_kind in
   if Visitor_behavior.is_fresh vis#behavior then
     Logic_const.new_acsl_extension orig.ext_name orig.ext_loc

@@ -46,7 +46,8 @@ else
 		-load-script ./examples/syntactic_check \
 		-load-script ./examples/callstack \
 		-load-script ./examples/use_callstack \
-		-load-script ./examples/acsl_extension \
+		-load-script ./examples/acsl_extension_foo \
+		-load-script ./examples/acsl_extension_ext_types \
 		-load-script ./hello_world/hello_world.ml \
        | tee check.log
 	if grep -e "User Error" check.log; then \

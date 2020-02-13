@@ -3917,6 +3917,30 @@ An extension is characterized by its introducing keyword \texttt{kw}, or \texttt
 extension. It is not possible to have the same keyword for two distinct extensions, especially if
 they belong to different categories, as this would lead to ambiguities in the parser.
 
+Once an extension is registered a clause of the form \verb|kw e1,...,en;|, where each \verb|ei| can be
+any syntactically valid ACSL term or predicate, will be treated by the parser as belonging to the
+extension \verb|kw|.
+
+Contract extension clauses must occur after \verb|assumes| and \verb|requires| clauses if any, but
+can be freely mixed with other behavior clauses (post-conditions, \verb|assigns|, \verb|frees| and
+\verb|allocates|).
+
+Similarly, in a loop annotation, \verb|loop kw e1, ..., en;| will be treated as belonging to the
+\verb|kw| extension. In case the loop annotation has a \verb|loop variant|, the extension must 
+occur before. Otherwise, there is no ordering constraint with other loop annotations clauses.
+
+Global extensions can appear either alone in a global annotation, or as part of an axiomatic with
+a set of other global annotations.
+
+Finally, a code annotation extension must appear as a single code annotation, like any code annotation.
+
+Code (and loop) extensions can be made specific to a
+set of existing behaviors using the standard ACSL \verb|for| construction.
+Namely, \verb|for bhv: loop kw e1, ..., en;| will indicate that the
+(loop) extension is supposed to be considered only when behavior \verb|bhv| is
+active (although it is ultimately up to the plugin to decide what to do with
+this information).
+
 An \texttt{acsl\_extension}\scodeidx{Cil\_types}{acsl\_extension} is a triple
 \texttt{(id, kw, ext)} where \texttt{id} is its unique ID, used in annotation tables and generated
 by \scodeidx{Logic\_const}{new\_acsl\_extension}\texttt{Logic\_const.new\_acsl\_extension},
@@ -3940,75 +3964,48 @@ the corresponding list is traversed normally by the visitor
 In order for the extension to be recognized by the parser, it must be
 registered by one of the following functions, depending on its category.
 \begin{itemize}
-\item \texttt{Logic\_typing.register\_behavior\_extension}%
-\scodeidx{Logic\_typing}{register\_behavior\_extension}
-\item \texttt{Logic\_typing.register\_global\_extension}%
-\scodeidx{Logic\_typing}{register\_global\_extension}
-\item \texttt{Logic\_typing.register\_code\_annot\_extension}%
-\scodeidx{Logic\_typing}{register\_code\_annot\_extension}
-\item \texttt{Logic\_typing.register\_code\_annot\_next\_stmt\_extension}%
-\scodeidx{Logic\_typing}{register\_code\_annot\_next\_stmt\_extension}
-\item \texttt{Logic\_typing.register\_code\_annot\_next\_loop\_extension}%
-\scodeidx{Logic\_typing}{register\_code\_annot\_next\_both\_extension}
-\item \texttt{Logic\_typing.register\_code\_annot\_next\_both\_extension}%
-\scodeidx{Logic\_typing}{register\_code\_annot\_next\_loop\_extension}
+\item \texttt{Acsl\_extension.register\_behavior}%
+\scodeidx{Acsl\_extension}{register\_behavior}
+\item \texttt{Acsl\_extension.register\_global}%
+\scodeidx{Acsl\_extension}{register\_global}
+\item \texttt{Acsl\_extension.register\_code\_annot}%
+\scodeidx{Acsl\_extension}{register\_code\_annot}
+\item \texttt{Acsl\_extension.register\_code\_annot\_next\_stmt}%
+\scodeidx{Acsl\_extension}{register\_code\_annot\_next\_stmt}
+\item \texttt{Acsl\_extension.register\_code\_annot\_next\_loop}%
+\scodeidx{Acsl\_extension}{register\_code\_annot\_next\_both}
+\item \texttt{Acsl\_extension.register\_code\_annot\_next\_both}%
+\scodeidx{Acsl\_extension}{register\_code\_annot\_next\_loop}
 \end{itemize}
 
-Each function takes three arguments:
+Each function takes the following mandatory arguments:
 \begin{itemize}
 \item \texttt{kw} the name of the extension,
-\item \texttt{status}, a boolean flag indicating whether the extended annotation
-  may have a validity status, and
-\item \texttt{f} the type-checking function itself.
+\item \texttt{typer} the type-checking function itself.
+\item \texttt{status}, a boolean flag indicating whether the extended
+  annotation may have a validity status, and
+
 \end{itemize}
 
-After a call to the appropriate registration function,
-a clause of the form \verb|kw e1,...,en;|, where each \verb|ei| can be
-any syntactically valid ACSL term or predicate,
-will be treated by the parser
-as belonging to the extension \verb|kw|. Contract extension clauses must occur after
-\verb|assumes| and \verb|requires| clauses if any, but can be freely
-mixed with other behavior clauses (post-conditions, \verb|assigns|,
-\verb|frees| and \verb|allocates|).
-
-Similarly, in a loop annotation,
-\verb|loop kw e1, ..., en;| will be treated as belonging to the \verb|kw|
-extension. In case the loop annotation has a \verb|loop variant|, the
-extension must occur before. Otherwise, there is no ordering constraint with
-other loop annotations clauses.
-
-Global extensions can appear either alone in a global annotation, or as part of an axiomatic with
-a set of other global annotations.
-
-Finally, a code annotation extension must appear as a single code annotation, like any code annotation.
-
-Code (and loop) extensions can be made specific to a
-set of existing behaviors using the standard ACSL \verb|for| construction.
-Namely, \verb|for bhv: loop kw e1, ..., en;| will indicate that the
-(loop) extension is supposed to be considered only when behavior \verb|bhv| is
-active (although it is ultimately up to the plugin to decide what to do with
-this information).
-
-During type-checking,
-the list \verb|[e1;...;en]| will be given to \verb|f|, together
-with the current typing environment (which allows discriminating
+During type-checking, the list \verb|[e1;...;en]| will be given to \verb|typer|,
+together with the current typing environment (which allows discriminating
 between contract and loop extensions and will have the appropriate logic labels
-set in the local environment). \verb|f| must return the corresponding
+set in the local environment). \verb|typer| must return the corresponding
 \verb|acsl_extension_kind| (possibly adding an entry for key \verb|id|
 in an internal table if it chooses to return \verb|Ext_id id|).
 
-The first argument of \verb|f| is a \verb|Logic_typing.typing_context|%
-\scodeidx{Logic\_typing}{typing\_context}
-which provides lookup functions for the various kinds of identifiers that are
-present in the environment, as well as extensible type-checking functions for
-predicates, terms, and assigns clauses. Indeed, these functions take themselves
-as argument a \verb|typing_context| \verb|ctxt| and will use the functions
-of \verb|ctxt| to type-check the children of the current node. Extensions
-can take advantage of this open recursion to recognize only subtrees of an
-otherwise normal ACSL predicate or term. For instance, the following code will
-let extension \verb|foo| replace all occurrences of \verb|\foo| by \verb|42|.
+The first argument of \verb|typer| is a \verb|Logic_typing.typing_context|%
+\scodeidx{Logic\_typing}{typing\_context} which provides lookup functions for the
+various kinds of identifiers that are present in the environment, as well as
+extensible type-checking functions for predicates, terms, and assigns clauses.
+Indeed, these functions take themselves as argument a \verb|typing_context|
+\verb|ctxt| and will use the functions of \verb|ctxt| to type-check the children
+of the current node. Extensions can take advantage of this open recursion to
+recognize only subtrees of an otherwise normal ACSL predicate or term. For
+instance, the following code will let extension \verb|foo| replace all
+occurrences of \verb|\foo| by \verb|42|.
 
-\ocamlinput{./examples/acsl_extension.ml}
+\ocamlinput{./examples/acsl_extension_foo.ml}
 
 With this extension enabled, \framac will interpret the following clause in
 a given source file:
@@ -4020,32 +4017,93 @@ as the following type-checked AST fragment:
 /*@ foo 84 == 42 + 42; */
 \end{lstlisting}
 
-If all the information of the extended clause is contained in
-the predicate list \verb|preds|, no other registration is needed beyond
-the parsing and type-checking: the pretty-printer will output \verb|preds|
-as a comma-separated list preceded by \verb|kw| (or \verb|loop kw| if
-the extension is a loop annotation), and the visitor will traverse
-each \verb|preds| as well as any predicate present in the AST. However, if
-some information is present in the internal state of the plugin, two more
-functions may be required for pretty-printing and visiting the extending
-clause respectively.
+If the extended clause is of kind \verb|Ext_preds l| or \verb|Ext_terms l|,
+and all the information of the extension is contained in the list \verb|l|,
+no function other than the typing function needs to be registered. The parsing
+will use the standard way to parse untyped predicates and terms. After
+typing, the visitor will traverse each element of \verb|l| as well as any
+predicate or term present in the AST. The pretty-printer will output these
+elements as a comma-separated list preceded by \verb|kw| (or \verb|loop kw| if
+the extension is a loop annotation).
 
-First,
-\texttt{Cil\_printer.register\_behavior\_extension}%
-\scodeidx{Cil\_printer}{register\_behavior\_extension}
-registers a new pretty-printer \verb|pp| for a given extension \verb|kw|.
-Together with the \verb|acsl_extension_kind| of the extended clause,
-\verb|pp| is given the current pretty-printer and the formatter where to
-output the result.
+However, depending on the situation, the following optional functions can be
+provided to the registration function in order to modify how ACSL extensions
+are handled by Frama-C:
 
-Second,
-\texttt{Cil.register\_behavior\_extension}%
-\scodeidx{Cil}{register\_behavior\_extension}
-registers a custom visitor \verb|vext| for a given extension \verb|kw|.
-\verb|vext| is given the content of the extended clause and the current
-visitor, and must return a \texttt{Cil.visitAction}
-(if all the information is in the plugin's own table, it can
-return \texttt{SkipChildren}).
+\begin{itemize}
+\item \texttt{preprocessor} a transformer to apply on the untyped term or
+  predicate read during the parsing phase,
+\item \texttt{visitor} the visitor function to be applied when visiting
+  the extension,
+\item \texttt{printer} the pretty-printing function associated to the
+  extension,
+\item \texttt{short\_printer} a function used to provide a brief textual
+  representation of an extension.
+\end{itemize}
+
+The \verb|preprocessor| function is applied just after parsing the extension
+terms. It takes the list of untyped terms or predicates and can either return
+the same list (but reading it to do some stuff) or return a new list. By
+default, this function is the identity.
+
+The \verb|visitor| function is used by the Frama-C visitors. It takes the
+current visitor, together with the \verb|acsl_extension_kind| of the extended
+clause and must returns a \verb|Cil.visitAction|. By default, this function
+just returns \verb|Cil.DoChildren|.
+
+The \verb|printer| function is used by the \verb|Cil_printer.pp_extended|
+function. It takes the current pretty-printer, the formatter, together with
+the \verb|acsl_extension_kind| of the extended clause. By default, it prints
+the list of terms or predicates if the kind is \verb|Ext_preds l| or
+\verb|Ext_terms l|. If the kind is \verb|Ext_id i|, it only prints the
+integer \verb|i|.
+
+The \verb|short_printer| function is a function that can be useful for
+debugging or user-feedback. As an alternative to \verb|Cil_printer.pp_extended|,
+the \verb|Cil_printer.pp_short_extended| can be used to get brief description
+of the content of the extension. It is for example used by the GUI to get
+a more informative name for the extension in the file tree. By default, it
+does not print anything about the content of the extension, so that the
+result is \verb|"kwd"| or \verb|"loop kwd"|.
+
+When the extension kind is \verb|Ext_id|, it is common that the plugin
+defining the extension contains a table that associates some data to this
+identifier. In such a case, a \verb|printer| might be needed to reconstruct
+the source code from the data so that a pretty printed code can be parsed
+again. For the same reason, an extension that registers a \verb|preprocessor|
+that modifies the AST should probably register a \verb|printer| to recover
+the original content.
+
+It is also common, when the kind is \verb|Ext_id|, to define a particular
+visitor for the extension, either to ignore the content of the extension as
+it is in an internal table of the plugin (thus returning a \verb|SkipChildren|
+action) or, on the opposite, to give the possibility to a user defined visitor
+to get an access to this content.
+
+The following code shows a more complete extension example. It provides the
+user a way to load some types (assumed to be external to Frama-C) so that they
+can be used in ACSL specification.
+
+\ocamlinput{./examples/acsl_extension_ext_types.ml}
+
+Namely, specification:
+
+\begin{lstlisting}[language=C,alsolanguage=ACSL]
+/*@ ext_type load: foo ; */
+/*@ 
+  axiomatic Pred {
+    predicate P(foo f) reads \nothing ;
+  }
+*/
+/*@ lemma X: \forall foo f ; P(f) ; */
+\end{lstlisting}
+
+is correctly parsed and typed by Frama-C and leads to the following displayed
+version in the interface:
+
+\includegraphics[width=\textwidth]{examples/acsl_extension_ext_types}
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

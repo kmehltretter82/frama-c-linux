@@ -24,15 +24,28 @@
 
 open Cil_types
 
-let extensions = ref Datatype.String.Map.empty
+module Extensions = struct
+  let initialized = ref false
+  let ref_is_extension = ref (fun _ -> assert false)
+  let ref_category = ref (fun _ -> assert false)
+  let ref_preprocess = ref (fun _ -> assert false)
 
-let is_extension s = Datatype.String.Map.mem s !extensions
+  let set_extension_handler ~category ~is_extension ~preprocess =
+    assert (not !initialized) ;
+    ref_is_extension := is_extension ;
+    ref_category := category ;
+    ref_preprocess := preprocess ;
+    initialized := true ;
+    ()
 
-let extension_category s = Datatype.String.Map.find_opt s !extensions
-
-let register_extension s cat =
-  if not (is_extension s) then
-    extensions := Datatype.String.Map.add s cat !extensions
+  let is_extension s = !ref_is_extension s
+  let category s = !ref_category s
+  let preprocess s = !ref_preprocess s
+end
+let set_extension_handler = Extensions.set_extension_handler
+let is_extension = Extensions.is_extension
+let extension_category = Extensions.category
+let preprocess_extension = Extensions.preprocess
 
 module CurrentLoc = Cil_const.CurrentLoc
 

@@ -109,14 +109,14 @@
 
   let concat_froms a1 a2 =
     let compare_pair (b1,_) (b2,_) = is_same_lexpr b1 b2 in
-    (* NB: the following has an horrible complexity, but the order of 
+    (* NB: the following has an horrible complexity, but the order of
        clauses in the input is preserved. *)
     let concat_one acc (_,f2 as p)  =
       try
         let (_,f1) = List.find (compare_pair p) acc
         in
         match (f1, f2) with
-          | _,FromAny -> 
+          | _,FromAny ->
             (* the new fundeps does not give more information than the one
                which is already present. Just ignore it.
              *)
@@ -125,11 +125,11 @@
               (* the new fundeps is strictly more precise than the old one.
                  We replace the old dependency by the new one, but keep
                  the location at its old place in the list. This ensures
-                 that we get the exact same clause if we try to 
+                 that we get the exact same clause if we try to
                  link the original contract with its pretty-printed version. *)
               Extlib.replace compare_pair p acc
-          | From _, From _ -> 
-            (* we keep the two functional dependencies, 
+          | From _, From _ ->
+            (* we keep the two functional dependencies,
                as they have to be proved separately. *)
             acc @ [p]
       with Not_found -> acc @ [p]
@@ -140,7 +140,7 @@
       | FreeAllocAny,_ -> fa2
       | _,FreeAllocAny -> fa1
       | FreeAlloc(f1,a1),FreeAlloc(f2,a2) -> FreeAlloc(f2@f1,a2@a1)
- 
+
   (* a1 represents the assigns _after_ the current clause a2. *)
   let concat_assigns a1 a2 =
     match a1,a2 with
@@ -152,17 +152,17 @@
       | Writes a1, a2 -> Writes (concat_froms a2 a1)
 
   let concat_loop_assigns_allocation annots bhvs2 a2 fa2=
-    (* NB: this is supposed to merge assigns related to named behaviors, in 
+    (* NB: this is supposed to merge assigns related to named behaviors, in
        case of annotation like
        for a,b: assigns x,y;
        for b,c: assigns z,t;
-       DO NOT CALL this function for loop assigns not attached to specific 
-       behaviors. 
+       DO NOT CALL this function for loop assigns not attached to specific
+       behaviors.
      *)
     assert (bhvs2 <> []);
-    if fa2 == FreeAllocAny && a2 == WritesAny 
+    if fa2 == FreeAllocAny && a2 == WritesAny
     then annots
-    else 
+    else
     let split l1 l2 =
       let treat_one (only1,both,only2) x =
         if List.mem x l1 then
@@ -201,12 +201,12 @@
     let (bhvs2, annots) = List.fold_right treat_one annots (bhvs2,[]) in
     match bhvs2 with
       | [] -> annots (* Already considered all cases. *)
-      | _ -> 
-	  let annots = if a2 <> WritesAny 
+      | _ ->
+	  let annots = if a2 <> WritesAny
 	    then AAssigns (bhvs2,a2) :: annots
             else annots
-	  in  
-	  if fa2 <> FreeAllocAny 
+	  in
+	  if fa2 <> FreeAllocAny
 	    then AAllocation (bhvs2,fa2) :: annots
             else annots
 
@@ -362,9 +362,9 @@ lexpr:
     { info (PLif ($1, $3, $5)) }
 /* both terms and predicates */
 | any_identifier COLON lexpr %prec prec_named { info (PLnamed ($1, $3)) }
-| string COLON lexpr %prec prec_named 
+| string COLON lexpr %prec prec_named
       { let (iswide,str) = $1 in
-        if iswide then begin 
+        if iswide then begin
            let l = loc () in
            raise (Not_well_formed(l, "Wide strings are not allowed as labels."))
          end;
@@ -459,15 +459,15 @@ lexpr_inner:
 | VALID opt_label_1 LPAR lexpr RPAR { info (PLvalid ($2,$4)) }
 | VALID_READ opt_label_1 LPAR lexpr RPAR { info (PLvalid_read ($2,$4)) }
 | VALID_FUNCTION LPAR lexpr RPAR { info (PLvalid_function $3) }
-| VALID_INDEX opt_label_1 LPAR lexpr COMMA lexpr RPAR { 
+| VALID_INDEX opt_label_1 LPAR lexpr COMMA lexpr RPAR {
   let source = fst (loc ()) in
   obsolete ~source "\\valid_index(addr,idx)" ~now:"\\valid(addr+idx)";
   info (PLvalid ($2,info (PLbinop ($4, Badd, $6)))) }
 | VALID_RANGE opt_label_1 LPAR lexpr COMMA lexpr COMMA lexpr RPAR {
   let source = fst (loc ()) in
-  obsolete "\\valid_range(addr,min,max)" 
+  obsolete "\\valid_range(addr,min,max)"
     ~source ~now:"\\valid(addr+(min..max))";
-  info (PLvalid 
+  info (PLvalid
           ($2,info (PLbinop ($4, Badd, (info (PLrange((Some $6),Some $8)))))))
 }
 | INITIALIZED opt_label_1 LPAR lexpr RPAR { info (PLinitialized ($2,$4)) }
@@ -953,7 +953,7 @@ ext_function_specs_opt:
 ;
 
 ext_function_specs:
-| ext_at_stmt_markup  { []} 
+| ext_at_stmt_markup  { []}
 | ext_function_spec   { [$1] }
 | ext_function_spec ext_function_specs { $1::$2 }
 ;
@@ -969,7 +969,7 @@ ext_fun_specs:
 ;
 
 ext_fun_spec:
-| ext_at_stmt_markup ext_stmt_loop_spec 
+| ext_at_stmt_markup ext_stmt_loop_spec
     { Ext_stmt($1,$2,loc()) }
 | ext_contract_markup contract
     { let s,pos = $2 in Ext_spec (s,pos) }
@@ -981,7 +981,7 @@ ext_stmt_loop_spec:
 ;
 
 ext_identifier_opt:
-| /* empty*/     { "" } 
+| /* empty*/     { "" }
 | ext_identifier { $1 }
 ;
 
@@ -1030,12 +1030,12 @@ contract:
       let behaviors =
         if requires <> [] || post_cond <> [] ||
 	   allocation <> FreeAllocAny ||
-           assigns <> WritesAny || extended <> [] 
+           assigns <> WritesAny || extended <> []
         then
           (Cabshelper.mk_behavior
              ~requires ~post_cond ~assigns ~allocation ~extended ())
           :: behaviors
-        else if $2<>None || $3<>None || 
+        else if $2<>None || $3<>None ||
                 behaviors<>[] || completes<>[] ||disjoints<>[]
         then behaviors
         else raise (Not_well_formed (loc(),"Empty annotation is not allowed"))
@@ -1100,7 +1100,7 @@ clause_kw:
 | FREES {"frees"}
 | COMPLETE {"complete"}
 | DISJOINT {"disjoint"}
-/* often, we'll be in c_kw_mode, where these keywords are 
+/* often, we'll be in c_kw_mode, where these keywords are
    recognized as identifiers... */
 | IDENTIFIER { $1 }
 | EXT_CONTRACT { $1 }
@@ -1166,7 +1166,8 @@ ne_simple_clauses:
     }
 | EXT_CONTRACT grammar_extension SEMICOLON simple_clauses
     { let allocation,assigns,post_cond,extended = $4 in
-      allocation,assigns,post_cond,($1,$2)::extended
+      let processed = Logic_env.preprocess_extension $1 $2 in
+      allocation,assigns,post_cond,($1,processed)::extended
     }
 | post_cond_kind full_lexpr clause_kw { missing 2 ";" $3 }
 | allocation clause_kw { missing 1 ";" $2 }
@@ -1301,7 +1302,7 @@ loop_annotations:
       let ext = List.map (fun x -> AExtended([],true, x)) e in
       let oth = match a with
         | WritesAny -> b
-        | Writes _ -> 
+        | Writes _ ->
             (* by definition all existing AAssigns are tied to at least
                one behavior. No need to merge against them. *)
             AAssigns ([],a)::b
@@ -1338,7 +1339,7 @@ loop_annot_stack:
       check_empty
         (pos, "loop extension is not allowed after loop variant.") e;
       (match fa with
-        | FreeAlloc(f,a) -> 
+        | FreeAlloc(f,a) ->
 	    check_empty
               (pos,"loop frees is not allowed after loop variant.") f ;
 	    check_empty
@@ -1346,9 +1347,9 @@ loop_annot_stack:
         | FreeAllocAny -> ());
       (match a with
           WritesAny -> ()
-        | Writes _ -> 
-          raise 
-            (Not_well_formed 
+        | Writes _ ->
+          raise
+            (Not_well_formed
                (pos,"loop assigns is not allowed after loop variant.")));
       check_empty
         (pos,"loop behavior is not allowed after loop variant.") b ;
@@ -1391,13 +1392,18 @@ loop_grammar_extension:
 | LOOP EXT_CODE_ANNOT grammar_extension SEMICOLON {
   let open Cil_types in
   let ext = $2 in
-  match Logic_env.extension_category ext with
-  | Some (Ext_code_annot (Ext_next_loop | Ext_next_both)) -> (ext, $3)
-  | Some (Ext_code_annot (Ext_here | Ext_next_stmt)) ->
-    raise
-      (Not_well_formed
-         (lexeme_loc 2, ext ^ " is not a loop annotation extension"))
-  | Some (Ext_contract | Ext_global) | None ->
+  try
+    begin match Logic_env.extension_category ext with
+      | Ext_code_annot (Ext_next_loop | Ext_next_both) ->
+        let processed = Logic_env.preprocess_extension ext $3 in
+        (ext, processed)
+      | Ext_code_annot (Ext_here | Ext_next_stmt) ->
+        raise
+          (Not_well_formed
+            (lexeme_loc 2, ext ^ " is not a loop annotation extension"))
+      | _ -> raise Not_found
+    end
+  with Not_found ->
     Kernel.fatal ~source:(lexeme_start 2)
       "%s is not a code annotation extension. Parser got wrong lexeme." ext
 }
@@ -1444,16 +1450,20 @@ code_annotation:
   { fun bhvs ->
     let open Cil_types in
     let ext = $1 in
-    match Logic_env.extension_category ext with
-    | Some (Ext_code_annot (Ext_here | Ext_next_stmt | Ext_next_both)) ->
-      Logic_ptree.AExtended(bhvs,false,(ext,$2))
-    | Some (Ext_code_annot Ext_next_loop) ->
-      raise
-        (Not_well_formed
-          (lexeme_loc 1,
-             ext ^ " is not a loop annotation extension. It can't be used as \
-                     plain code annotation extension"))
-    | Some (Ext_contract | Ext_global) | None ->
+    try
+      begin match Logic_env.extension_category ext with
+        | Ext_code_annot (Ext_here | Ext_next_stmt | Ext_next_both) ->
+          let processed = Logic_env.preprocess_extension ext $2 in
+          Logic_ptree.AExtended(bhvs,false,(ext,processed))
+        | Ext_code_annot Ext_next_loop ->
+          raise
+            (Not_well_formed
+               (lexeme_loc 1,
+                 ext ^ " is not a loop annotation extension. It can't be used \
+                         as plain code annotation extension"))
+        | _ -> raise Not_found
+      end
+    with Not_found ->
       Kernel.fatal ~source:(lexeme_start 1)
         "%s is not a code annotation extension. Parser got wrong lexeme" ext
   }
@@ -1491,7 +1501,10 @@ decl:
 | type_annot {LDtype_annot $1}
 | model_annot {LDmodel_annot $1}
 | logic_def  { $1 }
-| EXT_GLOBAL grammar_extension SEMICOLON { LDextended ($1, $2) }
+| EXT_GLOBAL grammar_extension SEMICOLON {
+    let processed = Logic_env.preprocess_extension $1 $2 in
+	  LDextended ($1, processed)
+  }
 | deprecated_logic_decl { $1 }
 ;
 
@@ -1516,7 +1529,7 @@ volatile_opt:
 type_annot:
 | TYPE INVARIANT any_identifier LPAR full_parameter RPAR EQUAL
     full_lexpr SEMICOLON
-  { let typ,name = $5 in{ inv_name = $3; this_name = name; this_type = typ; inv = $8; } } 
+  { let typ,name = $5 in{ inv_name = $3; this_name = name; this_type = typ; inv = $8; } }
 ;
 
 opt_semicolon:
@@ -1525,8 +1538,8 @@ opt_semicolon:
 
 model_annot:
 | MODEL type_spec LBRACE full_parameter opt_semicolon RBRACE SEMICOLON
-  { let typ,name = $4 in 
-    { model_for_type = $2; model_name = name; model_type = typ; } 
+  { let typ,name = $4 in
+    { model_for_type = $2; model_name = name; model_type = typ; }
   }
 ;
 
@@ -1612,7 +1625,7 @@ deprecated_logic_decl:
       exit_type_variables_scope ();
       let source = fst (loc ()) in
       obsolete "logic type declaration" ~source ~now:"an axiomatic block";
-      LDtype(id,tvars,None) 
+      LDtype(id,tvars,None)
     }
 /* OBSOLETE: axiom */
 | AXIOM poly_id COLON full_lexpr SEMICOLON
@@ -1710,21 +1723,21 @@ ne_label_list:
 | label_name COMMA ne_label_list { $1 :: $3 }
 ;
 
-opt_label_1: 
-| opt_label_list { match $1 with 
+opt_label_1:
+| opt_label_list { match $1 with
 		     | [] -> None
 		     | l::[] -> Some l
 		     | _ -> raise (Not_well_formed (loc(),"Only one label is allowed")) }
 ;
-		       
-opt_label_2: 
-| opt_label_list { match $1 with 
+
+opt_label_2:
+| opt_label_list { match $1 with
 		     | [] -> None
 		     | l1::l2::[] -> Some (l1,l2)
 		     | _::[] -> raise (Not_well_formed (loc(),"One label is missing"))
 		     | _ -> raise (Not_well_formed (loc(),"Only two labels are allowed")) }
 ;
-		        
+
 opt_label_list:
 | /* epsilon */               { [] }
 | LBRACE ne_label_list RBRACE { $2 }
@@ -1884,7 +1897,7 @@ non_logic_keyword:
 | is_acsl_spec   { $1 }
 | is_acsl_decl_or_code_annot { $1 }
 | is_acsl_other  { $1 }
-| CUSTOM { "custom" (* token that cannot be used in C fields *) } 
+| CUSTOM { "custom" (* token that cannot be used in C fields *) }
 ;
 
 bs_keyword:

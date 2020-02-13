@@ -137,30 +137,30 @@ let widen_hint_terms_of_terms terms =
   with
     Invalid_hint -> None
 
-let () = Logic_typing.register_code_annot_next_both_extension "widen_hints" false
-    (fun ~typing_context ~loc args ->
-       let var_term, hint_terms =
-         terms_of_parsed_widen_hints typing_context loc args
-       in
-       let terms = var_term :: hint_terms in
-       Ext_terms terms
-    )
+let typer typing_context loc args =
+  let var_term, hint_terms =
+    terms_of_parsed_widen_hints typing_context loc args
+  in
+  let terms = var_term :: hint_terms in
+  Ext_terms terms
 
-let () = Cil_printer.register_code_annot_extension "widen_hints"
-    (fun _pp fmt ext ->
-       match ext with
-       | Ext_id _ -> assert false
-       | Ext_preds _ -> assert false
-       | Ext_terms terms ->
-         match widen_hint_terms_of_terms terms with
-         | Some (hint_lval, hint_terms) ->
-           Format.fprintf fmt "%a%a, %a"
-             (Pretty_utils.pp_list ~sep:" " ~suf:":" Format.pp_print_string)
-             hint_lval.names pp_hvars hint_lval.vars
-             (Pretty_utils.pp_list ~sep:", " Printer.pp_term) hint_terms
-         | None ->
-           Format.fprintf fmt "<invalid widen_hints>"
-    )
+let printer _pp fmt ext =
+  match ext with
+  | Ext_id _ -> assert false
+  | Ext_preds _ -> assert false
+  | Ext_terms terms ->
+    match widen_hint_terms_of_terms terms with
+    | Some (hint_lval, hint_terms) ->
+      Format.fprintf fmt "%a%a, %a"
+        (Pretty_utils.pp_list ~sep:" " ~suf:":" Format.pp_print_string)
+        hint_lval.names pp_hvars hint_lval.vars
+        (Pretty_utils.pp_list ~sep:", " Printer.pp_term) hint_terms
+    | None ->
+      Format.fprintf fmt "<invalid widen_hints>"
+
+let () =
+  Acsl_extension.register_code_annot_next_both
+    "widen_hints" typer ~printer false
 
 let get_widen_hints_annots stmt =
   Annotations.fold_code_annot

@@ -525,56 +525,54 @@ type typing_context = {
 }
 
 module Extensions = struct
-  let typer_tbl = Hashtbl.create 5
-  let find_typer name = Hashtbl.find typer_tbl name
-  let is_extension name = Hashtbl.mem typer_tbl name
-  let register name category status typer =
-    if is_extension name then
-      Kernel.warning ~wkey:Kernel.wkey_acsl_extension
-        "Trying to register ACSL extension %s twice. Ignoring second extension"
-        name
-    else begin
-      Logic_env.register_extension name category;
-      Hashtbl.add typer_tbl name (status,typer)
-    end
+  let initialized = ref false
+  let ref_is_extension = ref (fun _ -> assert false)
+  let ref_typer = ref (fun _ _ _ _ -> assert false)
 
-  let typer name ~typing_context:typing_context ~loc p =
-    let status,typer =
-      try find_typer name
-      with Not_found ->
-        Kernel.fatal ~source:(fst loc) "unsupported clause of name '%s'" name
-    in
-    let normal_error = ref false in
-    let has_error () = normal_error := true in
-    let wrapper =
-      typing_context.on_error (typer ~typing_context ~loc) has_error
-    in
-    try
-      status, wrapper p
-    with
-    | (Log.AbortError _ | Log.AbortFatal _) as exn -> raise exn
-    | exn when not !normal_error ->
-      Kernel.fatal "Typechecking ACSL extension %s raised exception %s"
-        name (Printexc.to_string exn)
+  let set_handler ~is_extension ~typer =
+    assert (not !initialized) ;
+    ref_is_extension := is_extension ;
+    ref_typer := typer ;
+    initialized := true
+
+  let is_extension name = !ref_is_extension name
+
+  let typer name ~typing_context:typing_context ~loc =
+    !ref_typer name typing_context loc
+
+  (* For deprecated functions *)
+  let ref_deprecated_handler = ref (fun _ _ _ _  -> assert false)
+
+  let set_deprecated_handler ~handler =
+    ref_deprecated_handler := handler
+
+  let deprecated_register name category status typer =
+    let typer typing_context loc = typer ~typing_context ~loc in
+    !ref_deprecated_handler name category status typer
 end
+let set_extension_handler = Extensions.set_handler
+
+(* Deprecated ACSL extensions functions *)
+let set_deprecated_extension_handler =
+  Extensions.set_deprecated_handler
 
 let register_behavior_extension name f =
-  Extensions.register name Ext_contract f
+  Extensions.deprecated_register name Ext_contract f
 
 let register_global_extension name f =
-  Extensions.register name Ext_global f
+  Extensions.deprecated_register name Ext_global f
 
 let register_code_annot_extension name f =
-  Extensions.register name (Ext_code_annot Ext_here) f
+  Extensions.deprecated_register name (Ext_code_annot Ext_here) f
 
 let register_code_annot_next_stmt_extension name f =
-  Extensions.register name (Ext_code_annot Ext_next_stmt) f
+  Extensions.deprecated_register name (Ext_code_annot Ext_next_stmt) f
 
 let register_code_annot_next_loop_extension name f =
-  Extensions.register name (Ext_code_annot Ext_next_loop) f
+  Extensions.deprecated_register name (Ext_code_annot Ext_next_loop) f
 
 let register_code_annot_next_both_extension name f =
-  Extensions.register name (Ext_code_annot Ext_next_both) f
+  Extensions.deprecated_register name (Ext_code_annot Ext_next_both) f
 
 let rec arithmetic_conversion ty1 ty2 =
   match unroll_type ty1, unroll_type ty2 with
@@ -3821,28 +3819,34 @@ struct
         let kind = Logic_env.extension_category name in
         let pre_state, post_state =
           match kind,is_loop with
-          | Some (Ext_code_annot Ext_here), false ->
+          | exception Not_found ->
+            Kernel.(
+              warning
+                ~source ~wkey:wkey_acsl_extension
+                "%s is not an extension" name);
+            code_annot_env (), fun _ -> Lenv.empty()
+          | Ext_code_annot Ext_here, false ->
             code_annot_env (), fun _ -> Lenv.empty ()
-          | Some (Ext_code_annot (Ext_next_stmt | Ext_next_both)), false ->
+          | Ext_code_annot (Ext_next_stmt | Ext_next_both), false ->
             let env = append_old_and_post_labels (code_annot_env()) in
             (env, function [Normal] -> env | _ -> Lenv.empty ())
-          | Some (Ext_code_annot (Ext_next_loop | Ext_next_both)), true ->
+          | Ext_code_annot (Ext_next_loop | Ext_next_both), true ->
             loop_annot_env(), fun _ -> Lenv.empty ()
-          | Some (Ext_code_annot Ext_next_loop), false ->
+          | Ext_code_annot Ext_next_loop, false ->
             Kernel.(
               warning
                 ~source ~wkey:wkey_acsl_extension
                 "%s is a loop annotation extension, \
                  but used here as code annotation" name);
             code_annot_env (), fun _ -> Lenv.empty()
-          | Some (Ext_code_annot (Ext_here | Ext_next_stmt)), true ->
+          | Ext_code_annot (Ext_here | Ext_next_stmt), true ->
             Kernel.(
               warning
                 ~source ~wkey:wkey_acsl_extension
                 "%s is a code annotation extension, \
                  but used here as loop annotation" name);
             code_annot_env (), fun _ -> Lenv.empty()
-          | (Some (Ext_global | Ext_contract) | None),_ ->
+          | (Ext_global | Ext_contract),_ ->
             Kernel.(
               warning
                 ~source ~wkey:wkey_acsl_extension
