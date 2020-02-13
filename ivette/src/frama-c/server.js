@@ -100,18 +100,30 @@ var killer;    // killer timeout
 // --------------------------------------------------------------------------
 
 export const buffer = new Buffer({ maxlines: 200 });
+export const feedback = '' ;
 
 // --------------------------------------------------------------------------
 // --- Server Status
 // --------------------------------------------------------------------------
 
 /**
-   @summary Current Server `STATUS`.
+   @summary Current Server Status.
    @return {STATUS} the current server status
    @description
    See [STATUS](module-frama-c_server.html#~STATUS) code definitions.
 */
 export function getStatus() { return status; }
+
+/**
+   @summary Hook on current server (Custom React Hook).
+   @return {STATUS} the current server status
+   @description
+   See [STATUS](module-frama-c_server.html#~STATUS) code definitions.
+*/
+export function useStatus() {
+  Dome.useUpdate(STATUS);
+  return status;
+}
 
 /** Return `FAILED` status message. */
 export function getError() { return error; }
@@ -443,6 +455,7 @@ function _close(error) {
   if (error) {
     _status(FAILED,error);
   } else {
+    if (status === RESTART) setImmediate(start);
     _status(IDLE);
   }
 }
@@ -630,7 +643,8 @@ function _receive(resp) {
 
 export default {
   configure, buffer,
-  getStatus, getError, getPending, isRunning,
+  getStatus, useStatus,
+  getError, getPending, isRunning,
   start, stop, kill, restart, clear,
   sendGET, sendSET, sendEXEC,
   onReady, onShutdown,

@@ -7,7 +7,7 @@ import Dome from 'dome' ;
 import Server from 'frama-c/server' ;
 import States from 'frama-c/states' ;
 
-import { Filler, Button } from 'dome/layout/toolbars' ;
+import { Filler, Button, ButtonGroup } from 'dome/layout/toolbars' ;
 import { LED } from 'dome/controls/buttons' ;
 import { Label, Code } from 'dome/controls/labels' ;
 import { Text } from 'dome/text/editors' ;
@@ -38,6 +38,36 @@ Dome.onCommand((argv,cwd) => {
   Server.configure({ cwd, command, sockaddr, params });
   Server.start();
 });
+
+// --------------------------------------------------------------------------
+// --- Server Control
+// --------------------------------------------------------------------------
+
+export const Control = () => {
+  let status = Server.useStatus();
+  let play = { enabled: false } ;
+  let stop = { enabled: false } ;
+  let reload = { enabled: false } ;
+  switch(status) {
+  case 'IDLE':
+    play = { enabled: true, onClick:Server.start };
+    break;
+  case 'RUNNING':
+    stop = { enabled: true, onClick:Server.stop };
+    reload = { enabled: true, onClick:Server.restart };
+    break;
+  }
+  return (
+    <ButtonGroup>
+      <Button icon='MEDIA.PLAY' {...play}
+              title='Start the server' />
+      <Button icon='RELOAD' {...reload}
+              title='Re-start the server' />
+      <Button icon='MEDIA.STOP' {...stop}
+              title='Shut down the server'/>
+    </ButtonGroup>
+  );
+};
 
 // --------------------------------------------------------------------------
 // --- Server Console
@@ -109,6 +139,6 @@ export const Stats = () => {
 // --- Controller Exports
 // --------------------------------------------------------------------------
 
-export default { Console, Status, Stats };
+export default { Control, Console, Status, Stats };
 
 // --------------------------------------------------------------------------

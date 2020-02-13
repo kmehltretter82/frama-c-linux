@@ -35,7 +35,7 @@ export const PROJECT = 'frama-c.project' ;
 export const STATE = 'frama-c.state.' ;
 
 // --------------------------------------------------------------------------
-// --- Current Project
+// --- Synchronized Current Project
 // --------------------------------------------------------------------------
 
 var currentProject = undefined ;
@@ -46,6 +46,12 @@ Server.onReady(() => {
       currentProject = current.id ;
       Dome.emit(PROJECT);
     });
+});
+
+Server.onShutdown(() => {
+  currentProject = undefined ;
+  globalStates = {} ;
+  Dome.emit(PROJECT);
 });
 
 // --------------------------------------------------------------------------

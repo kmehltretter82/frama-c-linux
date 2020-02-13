@@ -34,6 +34,7 @@ export default (function() {
           selected={sidebar}
           onClick={flipSidebar}
           />
+        <Controller.Control/>
         <Toolbar.Filler/>
         <Toolbar.Button
           icon='ITEMS.GRID'
