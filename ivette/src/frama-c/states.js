@@ -46,6 +46,7 @@ var currentProject = undefined ;
 export function useProject()
 {
   Dome.useUpdate(PROJECT);
+  return currentProject;
 }
 
 /**
@@ -99,14 +100,14 @@ var globalStates = {} ;
 export function useState(id,project)
 {
   const theEvent = STATE + id ;
-  Dome.useUpdate(PROJECT,theEvent);
+  Dome.useUpdate( PROJECT, theEvent );
   const theProject = project || currentProject ;
   if (!theProject) return NONE;
   const thePath = [theProject,id] ;
   const theValue = _.get( globalStates, thePath );
   const setValue = (v) => {
-    Dome.emit(theEvent,v);
     _.set( globalStates, thePath, v );
+    Dome.emit(theEvent,v);
   };
   return [ theValue, setValue ];
 }

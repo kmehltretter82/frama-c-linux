@@ -56,7 +56,7 @@ export const Console = () => {
 // --------------------------------------------------------------------------
 
 export const Status = () => {
-  Dome.useUpdate( Server.SERVER );
+  Dome.useUpdate( Server.STATUS );
   let s = Server.getStatus();
   let n = Server.getPending();
   let led, blink, error ;
@@ -99,7 +99,7 @@ export const Status = () => {
 // --------------------------------------------------------------------------
 
 export const Stats = () => {
-  Dome.useUpdate( Server.SERVER );
+  Dome.useUpdate( Server.STATUS );
   let n = Server.getPending();
   return n > 0 ? <Code>{n} rq.</Code> : null ;
 };

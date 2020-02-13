@@ -21,12 +21,38 @@ import { Request } from 'zeromq' ;
 
 /**
    @event
-   @name 'frama-c.server'
+   @name 'frama-c.server.status'
    @summary Server Status Notification Event
    @description
-   Exported as `Server.SERVER' in public API.
+   This event is emitted whenever the server status changes.
+
+   Exported as `Server.STATUS' in public API.
 */
-export const SERVER = 'frama-c.server' ;
+export const STATUS = 'frama-c.server.status' ;
+
+/**
+   @event
+   @name 'frama-c.server.ready'
+   @summary Server is actually started and running.
+   @description
+   This event is emitted when ther server _enters_ the `RUNNING` state.
+   It is now ready to handle requests.
+
+   Exported as `Server.READY' in public API.
+*/
+export const READY = 'frama-c.server.ready' ;
+
+/**
+   @event
+   @name 'frama-c.server.shutdown'
+   @summary Server Status Notification Event
+   @description
+   This event is emitted when ther server _leaves_ the `RUNNING` state.
+   It is no more able to handle requests until re-start.
+
+   Exported as `Server.SHUTDOWN' in public API.
+*/
+export const SHUTDOWN = 'frama-c.server.shutdown' ;
 
 // --------------------------------------------------------------------------
 // --- Server Status
@@ -104,21 +130,31 @@ export function getPending() {
   return _.reduce( pending , (_,n) => n+1, 0 );
 }
 
+/**
+   @summary Register callback on READY event.
+   @param {function} callback - invoked when the server enters RUNNING status
+ */
+export function onReady(callback) { Dome.on(READY,callback); }
+
+/**
+   @summary Register callback on SHUTDOWN event.
+   @param {function} callback - invoked when the server enters SHUTDOWN status
+ */
+export function onShutdown(callback) { Dome.on(SHUTDOWN,callback); }
+
 // --------------------------------------------------------------------------
 // --- Status Update
 // --------------------------------------------------------------------------
 
-function _status(s,err) {
-  if (err) {
-    status = FAILED;
-    error = err.toString();
-    if (Dome.DEVEL) console.error('[Server]',error);
-    Dome.emit(SERVER);
-  }
-  else if (s !== status) {
-    status = s;
-    error = undefined;
-    Dome.emit(SERVER);
+function _status(new_s,err) {
+  if (Dome.DEVEL && err) console.error('[Server]',err);
+  if (new_s !== status || err) {
+    let old_s = status ;
+    status = new_s;
+    error = err ? err.toString() : undefined ;
+    Dome.emit(STATUS);
+    if (old_s === RUNNING) Dome.emit(SHUTDOWN);
+    if (new_s === RUNNING) Dome.emit(READY);
   }
 }
 
@@ -262,7 +298,7 @@ export function clear() {
     // Fall Through
   case IDLE:
     buffer.clear();
-    Dome.emit(SERVER);
+    Dome.emit(STATUS);
     return;
   default:
     return;
@@ -489,7 +525,7 @@ function _poll() {
 }
 
 function _send() {
-    // when busy, will be eventually re-triggered
+  // when busy, will be eventually re-triggered
   if (!busy) {
     const cmd = queue_cmd ;
     if (!cmd.length && _waiting()) cmd.push('POLL');
@@ -503,10 +539,10 @@ function _send() {
         socket.send( cmd )
           .then(() => socket.receive().then((resp) => _receive(resp)))
           .catch(() => _cancel(ids))
-          .finally(() => { busy = false ; Dome.emit(SERVER); });
+          .finally(() => { busy = false ; Dome.emit(STATUS); });
       } else
         _cancel(ids);
-      Dome.emit(SERVER);
+      Dome.emit(STATUS);
     }
   }
 }
@@ -567,7 +603,8 @@ export default {
   getStatus, getError, getPending, isRunning,
   start, stop, kill, restart, clear,
   sendGET, sendSET, sendEXEC,
-  SERVER,IDLE,STARTED,RUNNING,KILLING,RESTART,FAILED
+  STATUS,
+  IDLE,STARTED,RUNNING,KILLING,RESTART,FAILED
 };
 
 // --------------------------------------------------------------------------
