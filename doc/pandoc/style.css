@@ -135,7 +135,7 @@ h1 {
 h2 {
     width: 18cm;
     font-family: "Optima", "Verdana", "Arial", sans;
-    margin-top: 5mm;
+    margin-top: 16mm;
     margin-bottom: 2mm;
     border-bottom: solid thin darkred ;
 }
@@ -158,7 +158,7 @@ h4,h5,h6 {
     font-weight: bold;
 }
 
-p { margin: 6px 0px 6px 0px; width: 15cm; }
+p { margin: 18px 0px 18px 0px; width: 15cm; }
 
 ul,ol,blockquote {
     margin-left: 24px ;
@@ -177,7 +177,7 @@ pre {
     background-color: #eef ;
 }
 
-pre,code { font-size: smaller ; color: #106000 }
+pre,code { color: #106000 }
 
 hr {
     border: none ;
