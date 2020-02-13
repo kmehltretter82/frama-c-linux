@@ -602,18 +602,19 @@ export function useForceUpdate()
 
 /**
    @summary Hook to re-render on Dome events (Custom React Hook).
-   @param {string} [event] - event name (default: `'dome.update'`)
+   @param {string} [event,...] - event names (default: `'dome.update'`)
    @tutorial hooks
    @description
    Returns nothing.
 */
-export function useUpdate(evt = 'dome.update')
+export function useUpdate(...evts)
 {
   const update = useForceUpdate();
   React.useEffect(() => {
     const trigger = () => setImmediate(update);
-    emitter.on(evt,trigger);
-    return () => emitter.off(evt,trigger);
+    if (evts.length == 0) evts.push('dome.update');
+    evts.forEach((evt) => emitter.on(evt,trigger));
+    return () => evts.forEach((evt) => emitter.off(evt,trigger));
   });
 }
 
