@@ -39,7 +39,8 @@ PLUGIN_NAME:=Server
 PLUGIN_CMO:= \
 	server_parameters \
 	jbuffer \
-	doc syntax data main request \
+	doc syntax data \
+	main request states \
 	server_batch \
 	kernel_main \
 	kernel_project \
