@@ -40,6 +40,7 @@
 #   OCAMLVERSION  the ocaml version number
 #   OCAMLWIN32    "yes"/"no" depending on Sys.os_type = "Win32"
 #   EXE           ".exe" if OCAMLWIN32=yes, "" otherwise
+#   DLLEXT        ".dll" if OCAMLWIN32=yes, ".so" otherwise
 
 AC_INIT(src/kernel_internals/runtime/boot.ml)
 
@@ -411,12 +412,14 @@ if test "$OCAML_OS_TYPE" = "Win32"; then
   PLATFORM=Win32
   OCAMLWIN32=yes
   EXE=.exe
+  DLLEXT=.dll
 else
   OCAMLWIN32=no
   if test "$OCAML_OS_TYPE" = "Cygwin"; then
     AC_MSG_RESULT(Cygwin)
     PLATFORM=Cygwin
     EXE=.exe
+    DLLEXT=.dll
   else
     if test $(uname -s) = "Darwin"; then
       AC_MSG_RESULT(MacOS)
@@ -426,6 +429,7 @@ else
       PLATFORM=Unix
     fi
     EXE=
+    DLLEXT=.so
   fi
 fi
 
@@ -989,6 +993,7 @@ AC_SUBST(OCAMLLIB)
 AC_SUBST(OCAMLWIN32)
 AC_SUBST(OCAML_ANNOT_OPTION)
 AC_SUBST(EXE)
+AC_SUBST(DLLEXT)
 
 AC_SUBST(HAVE_STDLIB_H)
 AC_SUBST(HAVE_WCHAR_H)
