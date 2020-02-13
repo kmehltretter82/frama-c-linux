@@ -24,6 +24,15 @@ open Cil_types
 open Logic_typing
 open Logic_ptree
 
+type extension_preprocessor =
+  lexpr list -> lexpr list
+type extension_typer =
+  typing_context -> location -> lexpr list -> acsl_extension_kind
+type extension_visitor =
+  Cil.cilVisitor -> acsl_extension_kind -> acsl_extension_kind Cil.visitAction
+type extension_printer =
+  Printer_api.extensible_printer_type -> Format.formatter ->
+  acsl_extension_kind -> unit
 type extension = {
   category: ext_category ;
   status: bool ;
@@ -33,15 +42,6 @@ type extension = {
   printer: extension_printer ;
   short_printer: extension_printer ;
 }
-and extension_preprocessor =
-  lexpr list -> lexpr list
-and extension_typer =
-  typing_context -> location -> lexpr list -> acsl_extension_kind
-and extension_visitor =
-  Cil.cilVisitor -> acsl_extension_kind -> acsl_extension_kind Cil.visitAction
-and extension_printer =
-  Printer_api.extensible_printer_type -> Format.formatter ->
-  acsl_extension_kind -> unit
 
 let default_printer printer fmt = function
   | Ext_id i -> Format.fprintf fmt "%d" i
