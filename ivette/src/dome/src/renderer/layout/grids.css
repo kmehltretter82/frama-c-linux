@@ -40,12 +40,12 @@
     z-index: 0 ;
     position: absolute ;
     overflow: hidden ;
-    transition: all 0.1s ease-out ;
 }
 
 .dome-xGridLayout-item.dome-dragging
 {
     z-index: +1 ;
+    transition: all 0.1s ease-out ;
 }
 
 /* -------------------------------------------------------------------------- */
