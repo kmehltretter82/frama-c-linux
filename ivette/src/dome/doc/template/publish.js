@@ -357,10 +357,18 @@ function buildNav(members) {
     return ra - rb ;
   });
 
+  const isDome = (item) =>
+        (item.name && item.name.startsWith('dome')) ||
+        (item.longname && item.longname.startsWith('dome')) ;
+  const isApp = (item) => !isDome(item);
+  const domeModules = members.modules.filter(isDome);
+  const appModules = members.modules.filter(isApp);
+
     nav += buildMemberNav(sortedTutorials, 'Tutorials', seenTutorials, linktoTutorial);
-    nav += buildMemberNav(members.modules, 'Modules', {}, linkto);
-    nav += buildMemberNav(members.classes, 'Classes', seen, linkto);
+    nav += buildMemberNav(appModules, `${title} Modules`, {}, linkto);
+    nav += buildMemberNav(domeModules, 'Dome Modules', {}, linkto);
     nav += buildMemberNav(members.events, 'Events', seen, linkto);
+    nav += buildMemberNav(members.classes, 'Classes', seen, linkto);
     nav += buildMemberNav(members.interfaces, 'Interfaces', seen, linkto);
     nav += buildMemberNav(members.mixins, 'Mixins', seen, linkto);
     nav += buildMemberNav(members.namespaces, 'Namespaces', seen, linkto);
