@@ -893,6 +893,10 @@ val constFoldTermNodeAtTop:  term_node -> term_node
     and [alignof]. *)
 val constFoldTerm: bool -> term -> term
 
+(** Do constant folding on a {!Cil_types.offset}. If the second argument is true
+    then will also compute compiler-dependent expressions such as [sizeof]. *)
+val constFoldOffset: bool -> offset -> offset
+
 (** Do constant folding on a binary operation. The bulk of the work done by
     [constFold] is done here. If the second argument is true then
     will also compute compiler-dependent expressions such as [sizeof]. *)
@@ -1970,10 +1974,6 @@ val is_skip: stmtkind -> bool
 (** A visitor that does constant folding. Pass as argument whether you want
     machine specific simplifications to be done, or not. *)
 val constFoldVisitor: bool -> cilVisitor
-
-(** A visitor that substitutes globals, defined with the attribute 'const', by
-    their constant initializing expressions. *)
-val constGlobSubstVisitor: cilVisitor
 
 (* ************************************************************************* *)
 (** {2 Debugging support} *)
