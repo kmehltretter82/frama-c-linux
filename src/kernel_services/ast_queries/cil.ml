@@ -6318,40 +6318,23 @@ class constGlobSubstVisitorClass : cilVisitor = object
       | TInt _ | TFloat _ | TEnum _ -> true
       | _ -> false
     in
-    let has_attribute_const typ =
-      let rec typeAttr = function
-        | TArray (typ, _, _, _) ->
-          typeAttr typ
-        | TVoid a
-        | TInt (_, a)
-        | TFloat (_, a)
-        | TNamed (_, a)
-        | TPtr (_, a)
-        | TComp (_, _, a)
-        | TEnum (_, a)
-        | TFun (_, _, _, a)
-        | TBuiltin_va_list a ->
-          a
-      in
-      hasAttribute "const" (typeAttr typ)
-    in
     match g with
     | GVar (vi, _, _) ->
       (* Register in [vi_to_init_opt] the association between [vi] and its
-         initializer [init_opt]. The is assumed to be an expression of literal
-         constants only, as the lvals originally appearing in it have been
-         substituted by the respective initializers in [vexpr]. *)
+         initializer [init_opt]. The latter is assumed to be an expression of
+         literal constants only, as the lvals originally appearing in it have
+         been substituted by the respective initializers in method [vexpr]. *)
       let register = function
         | GVar (vi, { init = init_opt }, _loc) as g ->
           Varinfo.Hashtbl.add vi_to_init_opt vi init_opt;
           g
         | _ ->
           (* Cannot happen as we treat only [GVar _] cases in the outer
-             patter matching. *)
+             pattern matching. *)
           assert false
       in
       let typ = unrollTypeDeep vi.vtype in
-      if is_arithmetic_type typ && has_attribute_const typ
+      if is_arithmetic_type typ && isConstType typ
       then ChangeDoChildrenPost ([g], List.map register)
       else DoChildren
     | _ ->

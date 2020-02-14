@@ -4,7 +4,9 @@
 
 #include <stddef.h>
 
-static const size_t c1 = 300;
+typedef const size_t const_size_t;
+
+static const_size_t c1 = 300;
 static const size_t c2[2] = { 5, c1 + 1 + c1 };
 static const size_t c3[3][2][4] =
 { [0][0][0] = c2[0],
