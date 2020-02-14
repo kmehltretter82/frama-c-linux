@@ -221,17 +221,17 @@ e-acsl-tests-dev:
   tags:
    - nix
 
-Ivette:
+ivette:
   stage: build
   image: node
   cache:
     paths:
-    - Ivette/node_modules/
+    - ivette/node_modules/
   script:
    - node --version
    - npm --version
    - yarn --version
-   - make -C Ivette
+   - make -C ivette
   tags:
     - docker
 
