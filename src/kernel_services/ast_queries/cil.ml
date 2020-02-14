@@ -4498,13 +4498,13 @@ and constFoldLval machdep (host,offset) =
     | Mem e -> Mem (constFold machdep e)
     | Var _ -> host
   in
-  let rec constFoldOffset machdep = function
-    | NoOffset -> NoOffset
-    | Field (fi,offset) -> Field (fi, constFoldOffset machdep offset)
-    | Index (exp,offset) -> Index (constFold machdep exp,
-                                   constFoldOffset machdep offset)
-  in
   (newhost, constFoldOffset machdep offset)
+
+and constFoldOffset machdep = function
+  | NoOffset -> NoOffset
+  | Field (fi,offset) -> Field (fi, constFoldOffset machdep offset)
+  | Index (exp,offset) ->
+    Index (constFold machdep exp, constFoldOffset machdep offset)
 
 and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
   let e1' = constFold machdep e1 in
@@ -4516,12 +4516,15 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
         match e.enode with
         | Const(CChr c) -> new_exp ~loc (Const(charConstToIntConstant c))
         | Const(CEnum {eival = v}) -> mkInt v
-        | CastE(TInt (ik, ta), e) -> begin
-            let exp = mkInt e in
-            match exp.enode with
-              Const(CInt64(i, _, _)) ->
-              kinteger64 ~loc ~kind:ik i
-            | _ -> {exp with enode = CastE(TInt(ik, ta), exp)}
+        | CastE(typ, e') -> begin
+            match unrollType typ with
+            | TInt (ik, ta) -> begin
+                let e = mkInt e' in
+                match e.enode with
+                | Const(CInt64(i, _, _)) -> kinteger64 ~loc ~kind:ik i
+                | _ -> {e with enode = CastE(TInt(ik, ta), e)}
+              end
+            | _ -> e
           end
         | _ -> e
       in
@@ -4551,7 +4554,7 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
       match bop, e1''.enode, e2''.enode with
       | PlusA, Const(CInt64(z,_,_)), _
         when Integer.equal z Integer.zero -> e2''
-      | PlusA, _, Const(CInt64(z,_,_))
+      | (PlusA | MinusA), _, Const(CInt64(z,_,_))
         when Integer.equal z Integer.zero -> e1''
       | PlusPI, _, Const(CInt64(z,_,_))
         when Integer.equal z Integer.zero -> e1''

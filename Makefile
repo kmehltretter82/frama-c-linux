@@ -566,6 +566,7 @@ KERNEL_CMO=\
 	src/kernel_internals/typing/rmtmps.cmo                        \
 	src/kernel_internals/typing/oneret.cmo                        \
 	src/kernel_internals/typing/frontc.cmo                        \
+	src/kernel_internals/typing/substitute_const_globals.cmo        \
 	src/kernel_services/analysis/ordered_stmt.cmo                   \
 	src/kernel_services/analysis/wto_statement.cmo                  \
 	src/kernel_services/analysis/dataflows.cmo                      \

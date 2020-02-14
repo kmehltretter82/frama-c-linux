@@ -405,6 +405,8 @@ src/kernel_internals/typing/translate_lightweight.ml: CEA_INRIA_LGPL
 src/kernel_internals/typing/translate_lightweight.mli: CEA_INRIA_LGPL
 src/kernel_internals/typing/unroll_loops.ml: CEA_LGPL
 src/kernel_internals/typing/unroll_loops.mli: CEA_LGPL
+src/kernel_internals/typing/substitute_const_globals.ml: CEA_LGPL
+src/kernel_internals/typing/substitute_const_globals.mli: CEA_LGPL
 src/kernel_services/README.md: .ignore
 src/kernel_services/abstract_interp/README.md: .ignore
 src/kernel_services/abstract_interp/abstract_interp.ml: CEA_LGPL
