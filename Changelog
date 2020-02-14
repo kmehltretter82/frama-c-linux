@@ -31,9 +31,26 @@ o   Kernel    [2020/02/13] Deprecated:
                            - Cil_printer.register_*_extension
                            - Cil.register_behavior_extension
                            Use Acsl_extension.register_* instead
-o!  Kernel    [2020/02/04] Removed FCBuffer, FCMap and FCSet. Use directly 
+-   Eva       [2020/02/12] New option "-eva-domains <d1>,<d2>,..." to enable
+              several domains at once. The list of available domains is given
+              in the help message of the option.
+o!  Eva       [2020/02/12] Simplifies abstract domain signature by removing the
+              Transfer functor.
+-*  Eva       [2020/02/12] Fixes the evaluation of logic predicates involving
+              empty sets.
+-   Eva       [2020/02/07] Supports the logic evaluation of quantifiers
+              introducing mathematical variables (integer or real).
+o!  Kernel    [2020/02/04] Removed FCBuffer, FCMap and FCSet. Use directly
               OCaml stdlib modules Buffer, Map and Set instead.
+-   Eva       [2020/02/04] Renamed option -eva-malloc-functions into
+              -eva-alloc-functions. Also contains calloc and realloc by default.
 -*  GUI       [2020/01/24] Fix order of globals in the source panel.
+-   Eva       [2020/01/23] Adds consistency checks on return and parameters
+              types between a builtin and the replaced C function.
+-   Eva       [2020/01/23] Subdivisions can now be enabled locally:
+              - through the new option -eva-subdivide-non-linear-function that
+                overrides the global option for the given functions;
+              - via /*@ subdivide N; */ annotations on specific statements.
 
 ##################################
 Open Source Release 20.0 (Calcium)
