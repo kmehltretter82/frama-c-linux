@@ -126,6 +126,8 @@ sig
   val logic_var : env -> logic_var -> logic
   val logic_info : env -> logic_info -> pred option
 
+  val has_ltype : logic_type -> term -> pred
+
   (** {3 Logic Lemmas} *)
 
   val lemma : logic_lemma -> dlemma

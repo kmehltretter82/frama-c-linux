@@ -69,7 +69,6 @@ val startof : shift:('a -> c_object -> term -> 'a) -> 'a -> typ -> 'a
 
 val is_object : c_object -> 'a value -> pred
 val has_ctype : typ -> term -> pred
-val has_ltype : logic_type -> term -> pred
 
 val cdomain : c_object -> (term -> pred) option
 val ldomain : logic_type -> (term -> pred) option
