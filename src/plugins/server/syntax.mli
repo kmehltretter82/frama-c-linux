@@ -49,6 +49,7 @@ val tuple : t list -> t
 val union : t list -> t
 val option : t -> t
 val record : (string * t) list -> t
+val data : string -> Markdown.href -> t
 
 type field = { name : string ; syntax : t ; descr : Markdown.text }
 

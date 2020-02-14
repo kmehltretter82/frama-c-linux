@@ -81,6 +81,7 @@ let ident = atom @@ Markdown.emph "ident"
 let string = atom @@ Markdown.emph "string"
 let number = atom @@ Markdown.emph "number"
 let boolean = atom @@ Markdown.emph "boolean"
+let data name dref = atom @@ Markdown.href ~text:(Markdown.emph name) dref
 
 let escaped name =
   Markdown.code (Printf.sprintf "'%s'" @@ String.escaped name)

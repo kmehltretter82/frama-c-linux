@@ -39,4 +39,28 @@ val register_state :
   set:('a -> unit) ->
   Request.signal
 
+type 'a signature
+
+val signature :
+  unit -> 'a signature
+
+val column :
+  'a signature -> name:string -> descr:Markdown.text ->
+  'a Request.output -> unit
+
+type 'a model
+
+val reload : 'a model -> unit
+val update : 'a model -> 'a -> unit
+val remove : 'a model -> 'a -> unit
+
+val register_model :
+  page:Doc.page ->
+  name:string ->
+  descr:Markdown.text ->
+  ?details:Markdown.block ->
+  key:('a -> string) ->
+  iter:(('a -> unit) -> unit) ->
+  'a signature -> 'a model
+
 (* -------------------------------------------------------------------------- *)
