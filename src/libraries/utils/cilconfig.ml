@@ -50,13 +50,6 @@ module H = Hashtbl
 
  ************************************************************************)
 
-let absoluteFilename (fname: string) =
-  if Filename.is_relative fname then
-    Filename.concat (Sys.getcwd ()) fname
-  else
-    fname
-
-
 (** The configuration data can be of several types **)
 type configData =
     ConfInt of int
@@ -134,7 +127,7 @@ let useConfigurationList (key: string) (f: configData list -> unit) =
   with Not_found -> ()
 
 
-let saveConfiguration (fname: string) =
+let saveConfiguration (fname : Datatype.Filepath.t) =
   (** Convert configuration data to a string, for saving externally *)
   let configToString (c: configData) : string =
     let buff = Buffer.create 80 in
@@ -171,15 +164,15 @@ let saveConfiguration (fname: string) =
     Buffer.contents buff
   in
   try
-    let oc = open_out fname in
-    Kernel.debug "Saving configuration to %s@." (absoluteFilename fname);
+    let oc = open_out (fname :> string) in
+    Kernel.debug "Saving configuration to %s@." (fname :> string);
     H.iter (fun k c ->
       output_string oc (k ^ "\n");
       output_string oc ((configToString c) ^ "\n"))
       configurationData;
     close_out oc
   with _ ->
-    Kernel.warning "Cannot open configuration file %s\n" fname
+    Kernel.warning "Cannot open configuration file %s\n" (fname :> string)
 
 
 (** Make some regular expressions early *)
@@ -188,7 +181,7 @@ let floatRegexp = Str.regexp "f\\([^;]+\\);"
 let boolRegexp = Str.regexp "b\\(\\(true\\)\\|\\(false\\)\\);"
 let stringRegexp = Str.regexp "\"\\([^\"]*\\)\""
 
-let loadConfiguration (fname: string) : unit =
+let loadConfiguration (fname : Datatype.Filepath.t) : unit =
   H.clear configurationData;
 
   let stringToConfig (s: string) : configData =
@@ -241,8 +234,8 @@ let loadConfiguration (fname: string) : unit =
     getOne ()
   in
   (try
-    let ic = open_in fname in
-    Kernel.debug "Loading configuration from %s@." (absoluteFilename fname);
+    let ic = open_in (fname :> string) in
+    Kernel.debug "Loading configuration from %s@." (fname :> string);
     (try
       while true do
         let k = input_line ic in

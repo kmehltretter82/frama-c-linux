@@ -59,10 +59,10 @@ type configData =
   | ConfList of configData list
 
 (** Load the configuration from a file *)
-val loadConfiguration: string -> unit
+val loadConfiguration: Datatype.Filepath.t -> unit
 
 (** Save the configuration in a file. Overwrites the previous values *)
-val saveConfiguration: string -> unit
+val saveConfiguration: Datatype.Filepath.t -> unit
 
 (** Clear all configuration data *)
 val clearConfiguration: unit -> unit
