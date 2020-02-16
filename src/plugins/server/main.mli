@@ -113,6 +113,13 @@ val kill : unit -> 'a
 (** Emits the server signal to the client. *)
 val emit : signal -> unit
 
+(** Register a callback on signal listening.
+
+    The callback is invoked with [true] on [SIGON] command
+    and [false] on [SIGOFF].
+*)
+val on_signal : signal -> (bool -> unit) -> unit
+
 (** Register a callback to listen for server activity.
     All callbacks would be executed in their order of registration.
     They shall {i never} raise any exception. *)

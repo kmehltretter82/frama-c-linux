@@ -99,6 +99,7 @@ let signal ~page ~name ~descr  ?(details=[]) () =
   in Main.signal name
 
 let emit = Main.emit
+let on_signal = Main.on_signal
 
 (* -------------------------------------------------------------------------- *)
 (* --- Multiple Fields Requests                                           --- *)

@@ -48,6 +48,7 @@ type 'b output = (module Output with type t = 'b)
 
 type signal
 
+(** Register a server signal. The signal [name] must be unique. *)
 val signal :
   page:Doc.page ->
   name:string ->
@@ -55,7 +56,12 @@ val signal :
   ?details:Markdown.block ->
   unit -> signal
 
+(** Emit the signal to the client. *)
 val emit : signal -> unit
+
+(** Callback invoked each time the client is starting or stopping
+    to listen to the given signal. *)
+val on_signal : signal -> (bool -> unit) -> unit
 
 (** {2 Simple Requests Registration} *)
 

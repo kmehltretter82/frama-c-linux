@@ -176,6 +176,33 @@ let execute server ?yield proc =
   Stack.push resp server.q_out
 
 (* -------------------------------------------------------------------------- *)
+(* --- Signals                                                            --- *)
+(* -------------------------------------------------------------------------- *)
+
+type signal = string
+let signals = Hashtbl.create 32
+let signal s =
+  if Hashtbl.mem signals s then
+    ( Server_parameters.failure "Signal '%s' already registered" s ; "" )
+  else
+    ( Hashtbl.add signals s [] ; s )
+
+let () = Hashtbl.add signals "" []
+
+let on_signal s callback =
+  let ds = Hashtbl.find signals s in
+  Hashtbl.replace signals s (callback :: ds)
+
+let notify s a =
+  match Hashtbl.find signals s with
+  | ds -> List.iter (fun f -> f a) ds
+  | exception Not_found -> ()
+
+let nop _s = ()
+let emitter = ref nop
+let emit s = !emitter s
+
+(* -------------------------------------------------------------------------- *)
 (* --- Processing Requests                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -195,8 +222,16 @@ let process_request (server : 'a server) (request : 'a request) : unit =
       Stack.clear server.q_out ;
       server.shutdown <- true ;
     end
-  | `SigOn sg -> server.s_active <- Sigs.add sg server.s_active
-  | `SigOff sg -> server.s_active <- Sigs.remove sg server.s_active
+  | `SigOn sg ->
+    begin
+      server.s_active <- Sigs.add sg server.s_active ;
+      notify sg true ;
+    end
+  | `SigOff sg ->
+    begin
+      server.s_active <- Sigs.remove sg server.s_active ;
+      notify sg false ;
+    end
   | `Kill id ->
     begin
       let set_killed = kill_request server.equal id in
@@ -257,31 +292,19 @@ let do_signal server s =
     end
 
 (* -------------------------------------------------------------------------- *)
-(* --- Signals                                                            --- *)
-(* -------------------------------------------------------------------------- *)
-
-type signal = string
-let signals = Hashtbl.create 32
-let signal s =
-  if Hashtbl.mem signals s then
-    ( Server_parameters.failure "Signal '%s' already registered" s ; "" )
-  else
-    ( Hashtbl.add signals s () ; s )
-
-let () = Hashtbl.add signals "" ()
-let nop _s = ()
-let emitter : (string -> unit) ref = ref nop
-let signal s = !emitter s
-
-(* -------------------------------------------------------------------------- *)
 (* --- One Step Process                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-let process server =
-  if Queue.is_empty server.q_in then
-    communicate server
+let rec fetch_exec q =
+  if Queue.is_empty q then None
   else
-    let proc = Queue.pop server.q_in in
+    let e = Queue.pop q in
+    if e.killed then fetch_exec q else Some e
+
+let process server =
+  match fetch_exec server.q_in with
+  | None -> communicate server
+  | Some proc ->
     server.running <- Some proc ;
     try
       execute server ~yield:(do_yield server) proc ;
