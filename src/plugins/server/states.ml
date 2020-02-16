@@ -109,9 +109,14 @@ let synchronize model =
       Hashtbl.remove model.projects (Project.get_unique_name p) in
     Project.register_before_remove_hook cleanup ;
     Project.register_todo_before_clear cleanup ;
+    Request.on_signal model.signal
+      (fun _ ->
+         model.current <- None ;
+         Hashtbl.clear model.projects ;
+      );
   end
 
-let current model =
+let content model =
   match model.current with
   | Some w -> w
   | None ->
@@ -127,16 +132,26 @@ let current model =
     in model.current <- Some content ; content
 
 let reload model =
-  let m = current model in
-  m.cleared <- true ; m.updates <- Kmap.empty
+  let m = content model in
+  m.cleared <- true ;
+  m.updates <- Kmap.empty ;
+  Request.emit model.signal
 
 let update model k =
-  let m = current model in
-  if not m.cleared then m.updates <- Kmap.add (model.key k) (Add k) m.updates
+  let m = content model in
+  if not m.cleared then
+    begin
+      m.updates <- Kmap.add (model.key k) (Add k) m.updates ;
+      Request.emit model.signal ;
+    end
 
 let remove model k =
-  let m = current model in
-  if not m.cleared then m.updates <- Kmap.add (model.key k) Remove m.updates
+  let m = content model in
+  if not m.cleared then
+    begin
+      m.updates <- Kmap.add (model.key k) Remove m.updates ;
+      Request.emit model.signal ;
+    end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Fetch Model Updates                                                --- *)
@@ -167,7 +182,7 @@ let update_entry buffer cols key = function
   | Add v -> add_entry buffer cols key v
 
 let fetch model n =
-  let m = current model in
+  let m = content model in
   let reload = m.cleared in
   let buffer = {
     reload ;
