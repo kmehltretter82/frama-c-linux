@@ -12,7 +12,7 @@
   i ++;
 [kernel:ghost:bad-use] tests/cil/ghost_cfg.c:60: Warning: 
   Ghost code breaks CFG starting at:
-  case 1: /*@ ghost g = 3; */
+  /*@ ghost case 1: g = 3; */
 [kernel:ghost:bad-use] tests/cil/ghost_cfg.c:79: Warning: 
   Ghost code breaks CFG starting at:
   /*@ ghost goto X; */
@@ -21,7 +21,7 @@
   /*@ ghost goto X; */
 [kernel:ghost:bad-use] tests/cil/ghost_cfg.c:100: Warning: 
   Ghost code breaks CFG starting at:
-  case 1: /*@ ghost x ++; */
+  /*@ ghost case 1: x ++; */
 [kernel:ghost:bad-use] tests/cil/ghost_cfg.c:108: Warning: 
   Ghost code breaks CFG starting at:
   /*@ ghost __retres = 1; */
