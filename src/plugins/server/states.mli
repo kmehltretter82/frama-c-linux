@@ -39,28 +39,26 @@ val register_state :
   set:('a -> unit) ->
   Request.signal
 
-type 'a signature
+type 'a model (** Columns array model *)
 
-val signature :
-  unit -> 'a signature
-
+val model : unit -> 'a model
 val column :
-  'a signature -> name:string -> descr:Markdown.text ->
+  'a model -> name:string -> descr:Markdown.text ->
   'a Request.output -> unit
 
-type 'a model
+type 'a array (** Synchronized array state *)
 
-val reload : 'a model -> unit
-val update : 'a model -> 'a -> unit
-val remove : 'a model -> 'a -> unit
+val reload : 'a array -> unit
+val update : 'a array -> 'a -> unit
+val remove : 'a array -> 'a -> unit
 
-val register_model :
+val register_array :
   page:Doc.page ->
   name:string ->
   descr:Markdown.text ->
   ?details:Markdown.block ->
   key:('a -> string) ->
   iter:(('a -> unit) -> unit) ->
-  'a signature -> 'a model
+  'a model -> 'a array
 
 (* -------------------------------------------------------------------------- *)

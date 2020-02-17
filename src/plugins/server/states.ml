@@ -67,18 +67,18 @@ let register_state (type a) ~page ~name ~descr ?(details=[])
 
 type 'a column = Syntax.field * ('a -> json)
 
-type 'a signature = 'a column list ref
+type 'a model = 'a column list ref
 
-let signature () = ref []
+let model () = ref []
 
-let column (type a) (s : a signature) ~name ~descr (output : a Request.output) =
+let column (type a) (m : a model) ~name ~descr (output : a Request.output) =
   let module D = (val output) in
   if name = "id" then
     raise (Invalid_argument "Server.States.column: invalid name") ;
-  if List.exists (fun (fd,_) -> fd.Syntax.name = name) !s then
+  if List.exists (fun (fd,_) -> fd.Syntax.name = name) !m then
     raise (Invalid_argument "Server.States.column: duplicate name") ;
   let fd = Syntax.{ name ; syntax = D.syntax ; descr } in
-  s := (fd , D.to_json) :: !s
+  m := (fd , D.to_json) :: !m
 
 module Kmap = Map.Make(String)
 
@@ -92,7 +92,7 @@ type 'a content = {
   mutable updates : 'a update Kmap.t ;
 }
 
-type 'a model = {
+type 'a array = {
   signal : Request.signal ;
   key : 'a -> string ;
   iter : ('a -> unit) -> unit ;
@@ -101,56 +101,56 @@ type 'a model = {
   projects : (string , 'a content) Hashtbl.t ; (* indexed by project *)
 }
 
-let synchronize model =
+let synchronize array =
   begin
     Project.register_after_set_current_hook
-      ~user_only:false (fun _ -> model.current <- None) ;
+      ~user_only:false (fun _ -> array.current <- None) ;
     let cleanup p =
-      Hashtbl.remove model.projects (Project.get_unique_name p) in
+      Hashtbl.remove array.projects (Project.get_unique_name p) in
     Project.register_before_remove_hook cleanup ;
     Project.register_todo_before_clear cleanup ;
-    Request.on_signal model.signal
+    Request.on_signal array.signal
       (fun _ ->
-         model.current <- None ;
-         Hashtbl.clear model.projects ;
+         array.current <- None ;
+         Hashtbl.clear array.projects ;
       );
   end
 
-let content model =
-  match model.current with
+let content array =
+  match array.current with
   | Some w -> w
   | None ->
     let prj = Project.(current () |> get_unique_name) in
     let content =
-      try Hashtbl.find model.projects prj
+      try Hashtbl.find array.projects prj
       with Not_found ->
         let w = {
           cleared = true ;
           updates = Kmap.empty ;
         } in
-        Hashtbl.add model.projects prj w ; w
-    in model.current <- Some content ; content
+        Hashtbl.add array.projects prj w ; w
+    in array.current <- Some content ; content
 
-let reload model =
-  let m = content model in
+let reload array =
+  let m = content array in
   m.cleared <- true ;
   m.updates <- Kmap.empty ;
-  Request.emit model.signal
+  Request.emit array.signal
 
-let update model k =
-  let m = content model in
+let update array k =
+  let m = content array in
   if not m.cleared then
     begin
-      m.updates <- Kmap.add (model.key k) (Add k) m.updates ;
-      Request.emit model.signal ;
+      m.updates <- Kmap.add (array.key k) (Add k) m.updates ;
+      Request.emit array.signal ;
     end
 
-let remove model k =
-  let m = content model in
+let remove array k =
+  let m = content array in
   if not m.cleared then
     begin
-      m.updates <- Kmap.add (model.key k) Remove m.updates ;
-      Request.emit model.signal ;
+      m.updates <- Kmap.add (array.key k) Remove m.updates ;
+      Request.emit array.signal ;
     end
 
 (* -------------------------------------------------------------------------- *)
@@ -181,8 +181,8 @@ let update_entry buffer cols key = function
   | Remove -> remove_entry buffer key
   | Add v -> add_entry buffer cols key v
 
-let fetch model n =
-  let m = content model in
+let fetch array n =
+  let m = content array in
   let reload = m.cleared in
   let buffer = {
     reload ;
@@ -195,11 +195,11 @@ let fetch model n =
     if reload then
       begin
         m.cleared <- false ;
-        model.iter
+        array.iter
           begin fun v ->
-          let key = model.key v in
+          let key = array.key v in
           if buffer.capacity > 0 then
-            add_entry buffer model.getter key v
+            add_entry buffer array.getter key v
           else
             ( m.updates <- Kmap.add key (Add v) m.updates ;
               buffer.pending <- succ buffer.pending ) ;
@@ -209,7 +209,7 @@ let fetch model n =
       m.updates <- Kmap.filter
           begin fun key upd ->
             if buffer.capacity > 0 then
-              ( update_entry buffer model.getter key upd ; false )
+              ( update_entry buffer array.getter key upd ; false )
             else
               ( buffer.pending <- succ buffer.pending ; true )
           end m.updates ;
@@ -220,14 +220,14 @@ let fetch model n =
 (* --- Signature Registry                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
-let register_model ~page ~name ~descr ?(details=[]) ~key ~iter s =
+let register_array ~page ~name ~descr ?(details=[]) ~key ~iter model =
   let open Markdown in
-  let title =  Printf.sprintf "`MODEL` %s" name in
-  let index = [ Printf.sprintf "%s (`MODEL`)" name ] in
-  let columns = !s in
+  let title =  Printf.sprintf "`ARRAY` %s" name in
+  let index = [ Printf.sprintf "%s (`ARRAY`)" name ] in
+  let columns = !model in
   let description = [
     Block [Text descr] ;
-    Syntax.fields ~title:(Printf.sprintf "Model %s" name)
+    Syntax.fields ~title:(Printf.sprintf "Array %s" name)
       begin
         Syntax.{
           name="key" ;
@@ -239,19 +239,19 @@ let register_model ~page ~name ~descr ?(details=[]) ~key ~iter s =
   ] in
   let mref = Doc.publish ~page:page ~name:name ~title ~index description [] in
   let signal = Request.signal ~page ~name:(name ^ ".sig")
-      ~descr:(plain "Signal for model " @ href mref) () in
+      ~descr:(plain "Signal for array " @ href mref) () in
   let getter = List.map (fun (fd,to_js) -> fd.Syntax.name , to_js) columns in
-  let model = {
+  let array = {
     key ; iter ; getter ; signal ;
     current = None ; projects = Hashtbl.create 0
   } in
   let signature =
     Request.signature ~kind:`GET ~page ~name:(name ^ ".fetch")
-      ~descr:(plain "Fetch updates for model " @ href mref)
+      ~descr:(plain "Fetch updates for array " @ href mref)
       ~input:(module Jint)
       ~details:[
         Text(plain
-               "Collect all model updates since the last fetch.\n\
+               "Collect all entry updates since the last fetch.\n\
                 The number of fetched entries is limited to the\n\
                 provided integer. When `reload:true` is returned,\n\
                 _all_ previously received entries must be removed.")]
@@ -262,7 +262,7 @@ let register_model ~page ~name ~descr ?(details=[]) ~key ~iter s =
         let syntax = Syntax.data "entry" mref
       end) in
   let set_reload = Request.result signature
-      ~name:"reload" ~descr:(plain "model fully reloaded")
+      ~name:"reload" ~descr:(plain "array fully reloaded")
       (module Jbool) in
   let set_removed = Request.result signature
       ~name:"removed" ~descr:(plain "removed entries")
@@ -275,17 +275,17 @@ let register_model ~page ~name ~descr ?(details=[]) ~key ~iter s =
       (module Jint) in
   Request.register_sig signature
     begin fun rq n ->
-      let buffer = fetch model n in
+      let buffer = fetch array n in
       set_reload rq buffer.reload ;
       set_removed rq buffer.removed ;
       set_updated rq buffer.updated ;
       set_pending rq buffer.pending ;
     end ;
   Request.register ~kind:`GET ~page ~name:(name ^ ".reload")
-    ~descr:(plain "Force full reload for model " @ href mref)
+    ~descr:(plain "Force full reload for array " @ href mref)
     ~input:(module Junit) ~output:(module Junit)
-    (fun () -> reload model) ;
-  synchronize model ;
-  model
+    (fun () -> reload array) ;
+  synchronize array ;
+  array
 
 (* -------------------------------------------------------------------------- *)
