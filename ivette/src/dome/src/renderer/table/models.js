@@ -53,7 +53,7 @@ export const DESC = SortDirection.DESC ;
 
    - `getItemCount() -> number` (the number of items)
    - `getItemAt(number) -> item` (the item at the given index)
-   - `getIndexOf(item) -> number` (the index of an item in the current orderer)
+   - `getIndexOf(item) -> number` (the index of an item in the current order)
    - `getValue(item,column) -> any` (the value associated to some item in a column)
 
 

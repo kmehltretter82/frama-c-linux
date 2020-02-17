@@ -4,6 +4,8 @@
 
 /** @module dome/table/arrays */
 
+import _ from 'lodash' ;
+import React from 'react' ;
 import { Model, ASC, DESC } from 'dome/table/models' ;
 
 // --------------------------------------------------------------------------
@@ -354,6 +356,7 @@ export class UnsortedModel extends Model {
 
 /**
    @summary A table Model based on array.
+   @extends Model
    @description
 
    This class implements a simple [Model](module-dome_table_models.Model.html)
@@ -427,16 +430,16 @@ in order to keep views in sync.
     return this.order ;
   }
 
-  /** Return a _copy_ of the visible items */
+  /** Return a _copy_ of the visible items. */
   getItems() { return this._order().slice(); }
 
-  /** Returns the number of visible items */
-  getItemCount() { return (this._order()).length; }
+  // MODEL Interface
+  getItemCount() { return this._order().length; }
 
-  /** Returns the visible item at the given index */
-  getItemAt(index) { return (this._order())[index] ; }
+  // MODEL Interface
+  getItemAt(index) { return this._order()[index] ; }
 
-  /** Returns the index of an item */
+  // MODEL Interface
   getIndexOf(item) { return item && item.index ; }
 
   /** @summary Current filtering function.
@@ -444,16 +447,22 @@ in order to keep views in sync.
   */
   getFiltering() { return this.filtering ; }
 
-  /** Current ordering (see `ComparisonRing`) */
-  getOrdering() { return this.ring.getOrdering(); }
-
-  /** Set the filtering function */
+  /** @summary Set the filtering function.
+      @param {function} [filter] - The filter function
+      @description
+      The filtering function is used to filter out items to be displayed.
+      It is invoked as `filter(item)` and shall return a truthly value when `item`
+      must be displayed.
+  */
   setFiltering(filter) {
     this.filtering = filter ;
     this.reload();
   }
 
-  /** Set ordering (see `ComparisonRing`) */
+  // MODEL Interface
+  getOrdering() { return this.ring.getOrdering(); }
+
+  // MODEL Interface
   setOrdering(order) {
     if (order === undefined || order.sortBy !== 'index')
     {
@@ -462,7 +471,7 @@ in order to keep views in sync.
     }
   }
 
-  /** Get the value of an item for the given column */
+  // MODEL Interface
   getValue( item , column ) {
     return this.ring.getValue( item , column );
   }
@@ -473,7 +482,7 @@ in order to keep views in sync.
     this.reload();
   }
 
-  /** Re-order the items collection and re-render the table */
+  // MODEL Interface
   reload() {
     this.order = undefined ;
     super.reload();
@@ -481,9 +490,39 @@ in order to keep views in sync.
 }
 
 // --------------------------------------------------------------------------
+// --- Model Hook
+// --------------------------------------------------------------------------
+
+/**
+   @summary Uses a new array model (Custom React Hook).
+   @param {Collection} [items] - the array items
+   @description
+   This hook is a convenient way to have a local array model with full featured
+   sorting and filtering fonctionnalities, which is automatically updated
+   with the provided items.
+
+   The array model is created once and updated at each render.
+   Items can be specified with a lodash collection.
+
+   @example // Array Model
+   const MyView = () => {
+      Dome.useUpdate( MyUpdateEvent );
+      const model = useArrayModel(getMyItems());
+      return (<Table model={model} … >…</Table>) ;
+   };
+
+*/
+export function useArrayModel( items )
+{
+  const model = React.useMemo( () => new ArrayModel() , [] );
+  model.setData( _.toArray(items) );
+  return model;
+}
+
+// --------------------------------------------------------------------------
 // --- Exports
 // --------------------------------------------------------------------------
 
-export default { compareWith , ComparisonRing , UnsortedModel } ;
+export default { compareWith , ComparisonRing , UnsortedModel, ArrayModel } ;
 
 // --------------------------------------------------------------------------
