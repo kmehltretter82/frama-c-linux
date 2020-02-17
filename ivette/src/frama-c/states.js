@@ -123,6 +123,40 @@ export function useState(id)
 }
 
 // --------------------------------------------------------------------------
+// --- Cached GET Requests
+// --------------------------------------------------------------------------
+
+/**
+   @summary Cached GET request (Custom React Hook).
+   @param {string} rq - GET request name
+   @param {any} [params] - GET request parameter
+   @param {boolean} [cancel] - Cancel value when updating (default is `false`)
+   @return {any} [result] GET reequest response (when available)
+   @description
+   Sends the specified GET request and returns its result.
+   The request is send asynchronously and cached until any change in
+   `rq`, `params`, current project or server activity.
+
+   The result can be `undefined` when the Server is off or until
+   the server response has been actually received
+   (first request or `cancel=true`).
+ */
+export function useRequest( rq, params, cancel=false )
+{
+  let project = useProject();
+  let [ value, setValue ] = React.useState();
+  React.useEffect( () => {
+    if (project) {
+      if (cancel) setValue(undefined);
+      Server.sendGET( rq , params ).then(setValue);
+    } else {
+      if (value !== undefined) setValue(undefined);
+    }
+  } , [ project, rq, JSON.stringify(params) ] );
+  return value;
+}
+
+// --------------------------------------------------------------------------
 // --- Synchronized States
 // --------------------------------------------------------------------------
 
