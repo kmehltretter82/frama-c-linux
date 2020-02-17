@@ -569,6 +569,8 @@ let update_deferred_exn exn =
 let warn_event_as_error event = update_deferred_exn (DWarn_as_error event)
 
 let deferred_raise ~fatal ~unreported event msg =
+  (* reset deferred flag. *)
+  let () = deferred_exn := DNo_exn in
   let channel = new_channel event.evt_plugin in
   let append =
     if unreported then None else
