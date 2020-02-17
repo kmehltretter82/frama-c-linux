@@ -77,7 +77,7 @@ include $(FRAMAC_SHARE)/Makefile.dynamic
 ##############
 
 SERVER_API= \
-	doc.mli syntax.mli data.mli request.mli
+	doc.mli syntax.mli data.mli request.mli states.mli
 
 define Capitalize
 $(shell printf "%s%s" \
