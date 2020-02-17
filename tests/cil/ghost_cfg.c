@@ -103,6 +103,12 @@ void switch_loses_assertion (int c) {
   return;
 }
 
+int ghost_return() {
+  // the following ghost statement makes the function returning 1 instead of 0
+  //@ ghost return 1;
+  return 0;
+}
+
 #endif
 
 #ifdef CANT_CHECK

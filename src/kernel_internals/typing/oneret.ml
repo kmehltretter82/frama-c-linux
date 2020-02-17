@@ -373,7 +373,7 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
          the statement contract(s) will apply.
        *)
         let sgref = ref (getRetStmt ()) in
-        let sg = mkStmt (Goto (sgref, loc)) in
+        let sg = mkStmt ~ghost:s.ghost (Goto (sgref, loc)) in
         haveGoto := true;
         let b_stmts =
           match !returns_assert with
