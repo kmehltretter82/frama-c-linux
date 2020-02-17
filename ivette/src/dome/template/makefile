@@ -4,7 +4,7 @@
 
 # DOMEMK_ reserved for makefile derived variables
 
-APP?=$(shell basename $(PWD))
+APP?=$(shell basename $(CURDIR))
 COPYRIGHT?=CEA Tech
 
 DOME_MK_NAME=$(shell echo $(APP) | tr [:upper:] [:lower:])
@@ -73,7 +73,7 @@ dome-clean:
 
 include $(DOME)/template/makefile.packages
 
-DOME_MK_BIN=$(PWD)/node_modules/.bin
+DOME_MK_BIN=$(CURDIR)/node_modules/.bin
 DOME_MK_PKG= \
 	package.json node_modules \
 	$(DOME)/template/makefile.packages \
@@ -315,7 +315,7 @@ dome-app: dome-pkg dome-templ dome-export-app
 	@rm -f $(DOME_CLI)
 	@echo "#!/bin/sh" >> $(DOME_CLI)
 	@echo "export DOME_LOCAL=true" >> $(DOME_CLI)
-	@echo 'exec $(DOME_MK_BIN)/electron $(PWD)/dist/main/main.js $(DOME_ARGS) "$$@"' >> $(DOME_CLI)
+	@echo 'exec $(DOME_MK_BIN)/electron $(CURDIR)/dist/main/main.js $(DOME_ARGS) "$$@"' >> $(DOME_CLI)
 	@chmod 555 $(DOME_CLI)
 
 # --------------------------------------------------------------------------
@@ -346,8 +346,8 @@ $(DOME_MK_ICON_HTML): $(DOME_MK_ICON_MAKE) $(DOME_MK_ICON_DATA)
 # --------------------------------------------------------------------------
 
 DOME_MK_DOC_SRC=$(DOME_API) $(addprefix src/plugins/, $(DOME_PLUGINS))
-DOME_MK_DOC_API=$(addprefix $(PWD)/, $(DOME_MK_DOC_SRC))
-DOME_MK_DOC_OUT=$(addprefix $(PWD)/, $(DOME_DOC))
+DOME_MK_DOC_API=$(addprefix $(CURDIR)/, $(DOME_MK_DOC_SRC))
+DOME_MK_DOC_OUT=$(addprefix $(CURDIR)/, $(DOME_DOC))
 
 dome-doc: $(DOME_MK_BIN)/jsdoc $(DOME_MK_ICON_HTML)
 	@echo "[Dome] $(APP) documentation"
@@ -357,7 +357,7 @@ dome-doc: $(DOME_MK_BIN)/jsdoc $(DOME_MK_ICON_HTML)
 	@rm -f $(DOME_DOC)/*.css
 	@rm -fr $(DOME_DOC)/fonts
 	@rm -fr $(DOME_DOC)/styles
-	@(cd $(DOME) && DOME="." DOME_PWD=$(PWD) APP=$(APP) COPYRIGHT="$(COPYRIGHT)" \
+	@(cd $(DOME) && DOME="." DOME_PWD=$(CURDIR) APP=$(APP) COPYRIGHT="$(COPYRIGHT)" \
 	  $(DOME_MK_BIN)/jsdoc -c ./doc/config.json $(DOME_MK_DOC_API) \
 	  -d $(DOME_MK_DOC_OUT))
 	@cp -f $(DOME)/doc/gallery.css $(DOME_DOC)/styles/
