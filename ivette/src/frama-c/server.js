@@ -54,6 +54,28 @@ export const READY = 'frama-c.server.ready' ;
 */
 export const SHUTDOWN = 'frama-c.server.shutdown' ;
 
+/**
+   @event
+   @name 'frama-c.server.signal.*'
+   @summary Server Signal Prefix
+   @description
+   Event `frama-c.server.signal.<id>'` for signal `<id>`.
+   The prefix `'frama-c.server.signal.'` is exported as `Server.SIGNAL` in public API.
+*/
+export const SIGNAL = 'frama-c.server.signal.' ;
+
+/**
+   @event
+   @name 'frama-c.server.activity.*'
+   @summary Server Signal Activity Prefix
+   @param {boolean} active - whether the server is listening or not to the signal
+   @description
+   Event `frama-c.server.activity.<id>'` for signal `<id>`.
+   The prefix `'frama-c.server.activity.'` is exported as
+   `Server.ACTIVITY` in public API.
+*/
+export const ACTIVITY = 'frama-c.server.activity.' ;
+
 // --------------------------------------------------------------------------
 // --- Server Status
 // --------------------------------------------------------------------------
@@ -153,6 +175,14 @@ export function onReady(callback) { Dome.on(READY,callback); }
    @param {function} callback - invoked when the server enters SHUTDOWN status
  */
 export function onShutdown(callback) { Dome.on(SHUTDOWN,callback); }
+
+/**
+   @summary Register callback on Signal ACTIVITY event.
+   @param {function} callback - invoked with `callback(signal,active)`
+ */
+export function onActivity(signal,callback) {
+  Dome.on(ACTIVITY + signal,callback);
+}
 
 // --------------------------------------------------------------------------
 // --- Status Update
@@ -498,7 +528,122 @@ export function sendSET( rq, params ) { return _sendRequest( 'SET' , rq , params
 export function sendEXEC( rq, params ) { return _sendRequest( 'EXEC' , rq , params ); }
 
 // --------------------------------------------------------------------------
-// --- Request Management
+// --- Signal Management
+// --------------------------------------------------------------------------
+
+class Signal {
+
+  constructor(id) {
+    this.id = id ;
+    this.event = SIGNAL + id ;
+    this.sigon = this.sigon.bind(this);
+    this.sigoff = _.debounce( this.sigoff.bind(this) , 1000 );
+  }
+
+  on(callback) {
+    let n = Dome.emitter.listenerCount( this.event );
+    Dome.on( this.event , callback );
+    if (n == 0) {
+      this.active = true ;
+      if (isRunning()) this.sigon();
+    }
+  }
+
+  off(callback) {
+    Dome.off( this.event , callback );
+    let n = Dome.emitter.listenerCount( this.event );
+    if (n == 0) {
+      this.active = false ;
+      if (isRunning()) this.sigoff();
+    }
+  }
+
+  sigon() {
+    if (this.active && !this.listening) {
+      Dome.emit( ACTIVITY + this.id, true );
+      this.listening = true ;
+      queue_cmd.push('SIGON',this.id);
+      _flush();
+    }
+  }
+
+  sigoff() {
+    if (!this.active && this.listening) {
+      Dome.emit( ACTIVITY + this.id, false );
+      if (isRunning()) {
+        this.listening = false ;
+        queue_cmd.push('SIGOFF',this.id);
+        _flush();
+      }
+    }
+  }
+
+}
+
+//--- Memo
+
+const signals = {} ;
+function _signal(id)
+{
+  let s = signals[id];
+  if (!s) s = signals[id] = new Signal(id);
+  return s ;
+}
+
+//--- External API
+
+/**
+   @summary Register a Signal callback.
+   @param {string} id - the signal event to listen to
+   @param {function} callback - the callback to call on received signal
+   @description
+   If the server is not yet listening to this signal, a `SIGON` command is sent.
+ */
+function on( id , callback )
+{
+  let s = _signal(id);
+  return s.on(callback);
+}
+
+/**
+   @summary Un-register a Signal callback.
+   @param {string} id - the signal event that was listen to
+   @param {function} callback - the callback to remove
+   @description
+   When no more callbacks are listening to this signal for a while,
+   the server will be notified with a `SIGOFF` command.
+ */
+function off( id , callback )
+{
+  let s = _signal(id);
+  return s.off(callback);
+}
+
+/**
+   @summary Hook on Signal (Custom React Hook)
+   @param {string} id - the signal event that was listen to
+   @param {function} callback - the callback to remove
+ */
+function useSignal( id , callback )
+{
+  React.useEffect( () => {
+    on( id , callback );
+    return () => { off(id,callback); };
+  });
+}
+
+//--- Server Synchro
+
+Dome.on( READY , () => {
+  _.forEach( signals , (s) => s.sigon() );
+});
+
+Dome.on( SHUTDOWN , () => {
+  _.forEach( signals , (s) => s.sigoff.cancel() );
+});
+
+// --------------------------------------------------------------------------
+// --- REQUEST Management
 // --------------------------------------------------------------------------
 
 function _sendRequest( kind, rq , params=null ) {
@@ -617,6 +762,10 @@ function _receive(resp) {
         rid = shift();
         _reject(rid,'rejected');
         break;
+      case 'SIGNAL':
+        rid = shift();
+        Dome.emit( SIGNAL + rid );
+        break;
       case 'WRONG':
         err = shift();
         console.error('[Frama-C Server] ZMQ Protocol Error:',err);
@@ -647,7 +796,8 @@ export default {
   getError, getPending, isRunning,
   start, stop, kill, restart, clear,
   sendGET, sendSET, sendEXEC,
-  onReady, onShutdown,
+  onReady, onShutdown, onActivity,
+  on, off,
   STATUS,READY,SHUTDOWN,
   IDLE,STARTED,RUNNING,KILLING,RESTART,FAILED
 };
