@@ -17,6 +17,8 @@
 Open Source Release <next-release>
 ##################################
 
+-*  Kernel    [2020/02/17] fixes issue that could prevent loading plug-ins on
+              Windows installation
 -   Kernel    [2020/02/14] -constfold now takes into account value
               of const globals
 o   ACSL      [2020/02/13] Add possibility for ACSL extensions to alter the
