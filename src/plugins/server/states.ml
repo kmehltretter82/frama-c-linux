@@ -22,12 +22,31 @@
 
 open Data
 
+type 'a callback = ('a -> unit) -> unit
+
+let install signal hook = function
+  | None -> ()
+  | Some add_hook ->
+    let once = ref false in
+    let install ok =
+      if ok && !once then
+        begin
+          once := false ;
+          add_hook hook ;
+        end
+    in Request.on_signal signal install
+
+let install_emit signal add_hook =
+  install signal (fun () -> Request.emit signal) add_hook
+
 (* -------------------------------------------------------------------------- *)
 (* --- Values                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
 let register_value (type a) ~page ~name ~descr ?(details=[])
-    ~(output : a Request.output) ~get =
+    ~(output : a Request.output) ~get
+    ?(add_hook : unit callback option) ()
+  =
   let open Markdown in
   let title =  Printf.sprintf "`VALUE` %s" name in
   let index = [ Printf.sprintf "%s (`VALUE`)" name ] in
@@ -38,6 +57,7 @@ let register_value (type a) ~page ~name ~descr ?(details=[])
   Request.register ~page ~kind:`GET ~name:(name ^ ".get")
     ~descr:(plain "Getter for value " @ href h)
     ~input:(module Junit) ~output get ;
+  install_emit signal add_hook ;
   signal
 
 (* -------------------------------------------------------------------------- *)
@@ -45,7 +65,8 @@ let register_value (type a) ~page ~name ~descr ?(details=[])
 (* -------------------------------------------------------------------------- *)
 
 let register_state (type a) ~page ~name ~descr ?(details=[])
-    ~(data : a data) ~get ~set =
+    ~(data : a data) ~get ~set
+    ?(add_hook : unit callback option) () =
   let open Markdown in
   let title =  Printf.sprintf "`STATE` %s" name in
   let index = [ Printf.sprintf "%s (`STATE`)" name ] in
@@ -59,6 +80,7 @@ let register_state (type a) ~page ~name ~descr ?(details=[])
   Request.register ~page ~kind:`SET ~name:(name ^ ".set")
     ~descr:(plain "Setter for state " @ href h)
     ~input:(module (val data)) ~output:(module Junit) set ;
+  install_emit signal add_hook ;
   signal
 
 (* -------------------------------------------------------------------------- *)
@@ -153,6 +175,8 @@ let remove array k =
       Request.emit array.signal ;
     end
 
+let signal array = array.signal
+
 (* -------------------------------------------------------------------------- *)
 (* --- Fetch Model Updates                                                --- *)
 (* -------------------------------------------------------------------------- *)
@@ -220,7 +244,12 @@ let fetch array n =
 (* --- Signature Registry                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
-let register_array ~page ~name ~descr ?(details=[]) ~key ~iter model =
+let register_array ~page ~name ~descr ?(details=[]) ~key
+    ~(iter : 'a callback)
+    ?(add_update_hook : 'a callback option)
+    ?(add_remove_hook : 'a callback option)
+    ?(add_reload_hook : unit callback option)
+    model =
   let open Markdown in
   let title =  Printf.sprintf "`ARRAY` %s" name in
   let index = [ Printf.sprintf "%s (`ARRAY`)" name ] in
@@ -286,6 +315,9 @@ let register_array ~page ~name ~descr ?(details=[]) ~key ~iter model =
     ~input:(module Junit) ~output:(module Junit)
     (fun () -> reload array) ;
   synchronize array ;
+  install signal (update array) add_update_hook ;
+  install signal (remove array) add_remove_hook ;
+  install signal (fun () -> reload array) add_reload_hook ;
   array
 
 (* -------------------------------------------------------------------------- *)

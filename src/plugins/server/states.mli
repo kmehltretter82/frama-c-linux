@@ -20,10 +20,16 @@
 (*                                                                        *)
 (**************************************************************************)
 
+type 'a callback = ('a -> unit) -> unit
+
 (** Register a (projectified) value and generates the associated signal and
     request:
     - Signal [<name>.sig] is emitted on value updates;
     - GET Request [<name>.get] returns the current value.
+
+    If provided, the [~add_hook] option is used to register a hook
+    to notify the server of value updates. The hook will be installed
+    only once the client starts to listen for value updates.
 
     Inside {b Ivette} you can use the [States.useSyncValue(id)] hook to
     synchronize with this value.
@@ -35,14 +41,18 @@ val register_value :
   ?details:Markdown.block ->
   output:'a Request.output ->
   get:(unit -> 'a) ->
-  Request.signal
-
+  ?add_hook:(unit callback) ->
+  unit -> Request.signal
 
 (** Register a (projectified) state and generates the associated signal and
     requests:
     - Signal [<name>.sig] is emitted on value updates;
     - GET Request [<name>.get] returns the current value;
     - SET Request [<name>.set] modifies the server value.
+
+    If provided, the [~add_hook] option is used to register a hook
+    to notify the server of value updates. The hook will be installed
+    only once the client starts to listen for value updates.
 
     Inside {b Ivette} you can use the [States.useSyncState(id)] hook to
     synchronize with this state.
@@ -55,7 +65,8 @@ val register_state :
   data:'a Data.data ->
   get:(unit -> 'a) ->
   set:('a -> unit) ->
-  Request.signal
+  ?add_hook:(unit callback) ->
+  unit -> Request.signal
 
 type 'a model (** Columns array model *)
 
@@ -80,6 +91,9 @@ val update : 'a array -> 'a -> unit
 (** Mark an array entry as removed. *)
 val remove : 'a array -> 'a -> unit
 
+(** Get the signal associated with the array *)
+val signal : 'a array -> Request.signal
+
 (** Register signals a requests for synchronizing
     an array with the client.
     - Signal [<name>.sig] is emitted on array updates;
@@ -92,6 +106,11 @@ val remove : 'a array -> 'a -> unit
     Columns added to the model after registration are {i not} taken
     into account.
 
+    If provided, the [~add_xxx_hook] options are used to register hooks
+    to notify the server of corresponding array updates.
+    Each hook will be installed only once the client starts to
+    listen for array updates.
+
     Inside {b Ivette} you can obtain the entries in sync by
     using the [States.useSyncArray()] hook.
 *)
@@ -101,7 +120,10 @@ val register_array :
   descr:Markdown.text ->
   ?details:Markdown.block ->
   key:('a -> string) ->
-  iter:(('a -> unit) -> unit) ->
+  iter:('a callback) ->
+  ?add_update_hook:('a callback) ->
+  ?add_remove_hook:('a callback) ->
+  ?add_reload_hook:(unit callback) ->
   'a model -> 'a array
 
 (* -------------------------------------------------------------------------- *)
