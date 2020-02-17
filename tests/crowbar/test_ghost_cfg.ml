@@ -1,6 +1,9 @@
 open Crowbar
 open Cil_types
 
+(* just here to ensure we load the corresponding transformation. *)
+let _ = Ghost_cfg.transform_category
+
 module Loc = Cil_datatype.Location
 
 let report file_name s =
@@ -370,7 +373,7 @@ let check_file (env, file) =
           Printf.printf
             "Uncaught exception: %s\n%t\nFile saved in %s\n%!"
             (Printexc.to_string exn) Printexc.print_backtrace file_name;
-          bad_test()
+          report file_name "Found code leading to an unknown exception"
   in
   if env.should_fail && success then
     report file_name "Found ghost code that should not have been accepted"
