@@ -224,6 +224,7 @@ module Internal_Value = struct
   let add_value_structure value internal =
     let rec aux: type v. (module Internal) -> v structure -> (module Internal) =
       fun value -> function
+        | Option (s, _) -> aux value s
         | Leaf (key, v) -> add_value_leaf value (V (key, v))
         | Node (s1, s2) -> aux (aux value s1) s2
         | Unit -> value
@@ -258,6 +259,7 @@ module Internal_Value = struct
         | Node (s1, s2) ->
           let set1 = set s1 and set2 = set s2 in
           fun (v1, v2) value -> set1 v1 (set2 v2 value)
+        | Option (s, default) -> fun v -> set s (Extlib.opt_conv default v)
         | Unit -> fun () value -> value
       in
       set structure
@@ -270,6 +272,7 @@ module Internal_Value = struct
         | Node (s1, s2) ->
           let get1 = get s1 and get2 = get s2 in
           fun v -> get1 v, get2 v
+        | Option (s, _) -> fun v -> Some (get s v)
         | Unit -> fun _ -> ()
       in
       get structure

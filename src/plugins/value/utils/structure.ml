@@ -71,6 +71,7 @@ module type Shape = sig
     | Unit : unit structure
     | Leaf : 'a key * 'a data -> 'a structure
     | Node : 'a structure * 'b structure -> ('a * 'b) structure
+    | Option : 'a structure * 'a -> 'a option structure
 
   val eq_structure: 'a structure -> 'b structure -> ('a, 'b) eq option
 end
@@ -83,6 +84,7 @@ module Shape (Key: Key) (Data: sig type 'a t end) = struct
     | Unit : unit structure
     | Leaf : 'a key * 'a data -> 'a structure
     | Node : 'a structure * 'b structure -> ('a * 'b) structure
+    | Option : 'a structure * 'a -> 'a option structure
 
   let rec eq_structure : type a b. a structure -> b structure -> (a, b) eq option
     = fun a b ->
@@ -93,6 +95,12 @@ module Shape (Key: Key) (Data: sig type 'a t end) = struct
           match eq_structure l1 l2, eq_structure r1 r2 with
           | Some Eq, Some Eq -> Some Eq
           | _, _ -> None
+        end
+      | Option (s1, _), Option (s2, _) ->
+        begin
+          match eq_structure s1 s2 with
+          | Some Eq -> Some Eq
+          | None -> None
         end
       | Unit, Unit -> Some Eq
       | _, _ -> None
@@ -132,6 +140,7 @@ module Open
     | Unit -> false
     | Leaf (k, _) -> Shape.equal key k
     | Node (left, right) -> mem key left || mem key right
+    | Option (s, _) -> mem key s
 
   let mem key = mem key M.structure
 
@@ -149,6 +158,9 @@ module Open
       let l = compute_getters left and r = compute_getters right in
       let l = KMap.map (lift_get fst) l and r = KMap.map (lift_get snd) r in
       KMap.union (fun _k a _b -> Some a) l r
+    | Option (s, default) ->
+      let l = compute_getters s in
+      KMap.map (lift_get (Extlib.opt_conv default)) l
 
   let getters = compute_getters M.structure
   let get (type a) (key: a Shape.key) : (M.t -> a) option =
@@ -173,6 +185,9 @@ module Open
       let l = KMap.map (lift_set (fun set (l, r) -> set l, r)) l
       and r = KMap.map (lift_set (fun set (l, r) -> l, set r)) r in
       KMap.union (fun _k a _b -> Some a) l r
+    | Option (s, _) ->
+      let l = compute_setters s in
+      KMap.map (lift_set Extlib.opt_map) l
 
   let setters = compute_setters M.structure
   let set (type a) (key: a Shape.key) : (a -> M.t -> M.t) =

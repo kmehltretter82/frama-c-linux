@@ -64,6 +64,7 @@ module type Shape = sig
     | Unit : unit structure
     | Leaf : 'a key * 'a data -> 'a structure
     | Node : 'a structure * 'b structure -> ('a * 'b) structure
+    | Option : 'a structure * 'a -> 'a option structure
 
   val eq_structure: 'a structure -> 'b structure -> ('a, 'b) eq option
 end
