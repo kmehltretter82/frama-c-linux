@@ -416,6 +416,8 @@ if test "$OCAML_OS_TYPE" = "Win32"; then
 else
   OCAMLWIN32=no
   if test "$OCAML_OS_TYPE" = "Cygwin"; then
+    AC_MSG_WARN([Compilation using Cygwin is unsupported;
+                 consider using a MinGW-based compiler.])
     AC_MSG_RESULT(Cygwin)
     PLATFORM=Cygwin
     EXE=.exe
