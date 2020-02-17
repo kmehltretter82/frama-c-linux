@@ -620,7 +620,7 @@ function off( id , callback )
 }
 
 /**
-   @summary Hook on Signal (Custom React Hook)
+   @summary Hook on Signal (Custom React Hook).
    @param {string} id - the signal event that was listen to
    @param {function} callback - the callback to remove
  */

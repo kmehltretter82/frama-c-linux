@@ -53,7 +53,6 @@ Server.onReady(() => {
 Server.onShutdown(() => {
   currentProject = undefined ;
   globalStates = {} ;
-  globalSync = {} ;
   Dome.emit(PROJECT);
 });
 
@@ -127,7 +126,8 @@ export function useState(id)
 // --- Synchronized States
 // --------------------------------------------------------------------------
 
-class Synchro {
+// shared for all projects
+class SyncState {
 
   constructor(id) {
     this.id = id ;
@@ -167,16 +167,23 @@ class Synchro {
 
 }
 
-const synchros = {} ;
-function synchro(id) {
-  let s = synchros[id] ;
-  if (!s) s = synchros[id] = new Synchro(id);
+// --------------------------------------------------------------------------
+// --- Synchronized States Registry
+// --------------------------------------------------------------------------
+
+const syncStates = {} ;
+
+function syncState(id) {
+  let s = syncStates[id] ;
+  if (!s) s = syncStates[id] = new SyncState(id);
   return s ;
 }
 
-Server.onReady(() => _.forEach( synchros , (s) => {
-  if (!s.insync) s.update();
-}));
+Server.onShutdown(() => syncStates = {});
+
+// --------------------------------------------------------------------------
+// --- Synchronized State Hooks
+// --------------------------------------------------------------------------
 
 /**
    @summary Use Synchronized State (Custom React Hook).
@@ -190,8 +197,8 @@ Server.onReady(() => _.forEach( synchros , (s) => {
  */
 export function useSyncState(id)
 {
-  let s = synchro(id) ;
-  Dome.useUpdate( s.UPDATE );
+  let s = syncState(id) ;
+  Dome.useUpdate( PROJECT, s.UPDATE );
   Server.useSignal( s.signal , s.update );
   return [ s.value() , s.setValue ];
 }
@@ -204,13 +211,114 @@ export function useSyncState(id)
    Synchronization with some (projectified) server value:
    - sends a `<id>.get` request to obtain the current value of the state;
    - listens to `<id>.sig` signal to stay in sync with server updates.
- */
+*/
 export function useSyncValue(id)
 {
-  let s = synchro(id) ;
+  let s = syncState(id) ;
   Dome.useUpdate( s.update );
-  React.useEffect( s.effect );
+  Server.useSignal( s.signal , s.update );
   return s.value();
+}
+
+// --------------------------------------------------------------------------
+// --- Synchronized Arrays
+// --------------------------------------------------------------------------
+
+// one per project
+class SyncArray
+{
+
+  constructor(id) {
+    this.UPDATE = STATE + id ;
+    this.signal = id + '.sig' ;
+    this.fetch_rq = id + '.fetch' ;
+    this.reload_rq = id + '.reload' ;
+    this.index = {} ;
+    this.insync = false ;
+    this.fetch = this.fetch.bind(this);
+    this.reload = this.reload.bind(this);
+    Dome.on( PROJECT , this.fetch );
+  }
+
+  getItems() {
+    if (!this.insync && Server.isRunning()) this.fetch();
+    return this.items;
+  }
+
+  fetch() {
+    this.insync = true ;
+    Server.sendGET( this.fetch_rq ).then(({
+      reload=false, removed=[], updated=[], pending=0
+    }) => {
+      if (reload) this.index = {};
+      removed.forEach((id) => {
+        delete this.index[id];
+      });
+      updated.forEach((item) => {
+        this.index[item.id] = item;
+      });
+      if (pending>0) this.fetch();
+      Dome.emit( this.UPDATE );
+    });
+  }
+
+  reload() {
+    Server.sendSET( this.reload_rq );
+    this.index = {};
+    this.insync = false ;
+    Dome.emit( this.UPDATE );
+  }
+
+}
+
+// --------------------------------------------------------------------------
+// --- Synchronized Arrays Registry
+// --------------------------------------------------------------------------
+
+const syncArrays = {} ; // Model by project & id
+
+function syncArray(id) {
+  const path = [ currentProject , id ] ;
+  let a = _.get( syncArray , path );
+  if (!a) {
+    a = new SyncArray(id);
+    _.set( syncArrays , path , a );
+  }
+  return a;
+}
+
+Server.onShutdown(() => syncArrays = {});
+
+// --------------------------------------------------------------------------
+// --- Synchronized Array Hooks
+// --------------------------------------------------------------------------
+
+/**
+   @summary Force a Synchronized Array to Reload.
+   @description
+   Sends the `<id>.reload` request to the server for
+   triggering a complete array reload.
+ */
+export function reloadArray(id)
+{
+  syncArray(id).reload();
+}
+
+/**
+   @summary Use Synchronized Array (Custom React Hook).
+   @parameter {string} id - name of the server array
+   @return {object} items indexed by their identifiers
+   @description
+   Synchronization with some (projectified) server array:
+   - sends `<id>.fetch` requests to obtain the updated entries;
+   - listens to `<id>.sig` signal to stay in sync with server updates.
+ */
+export function useSyncArray(id)
+{
+  let a = syncArray(id);
+  Dome.useUpdate( PROJECT , a.UPDATE );
+  Server.useSignal( a.signal , a.fetch );
+  return a.getItems() ;
 }
 
 // --------------------------------------------------------------------------
@@ -220,6 +328,8 @@ export default {
   useState,
   useSyncState,
   useSyncValue,
+  useSyncArray,
+  reloadArray,
   PROJECT, STATE
 };
 
