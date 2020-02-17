@@ -20,6 +20,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Register a (projectified) value and generates the associated signal and
+    request:
+    - Signal [<name>.sig] is emitted on value updates;
+    - GET Request [<name>.get] returns the current value.
+
+    Inside {b Ivette} you can use the [States.useSyncValue(id)] hook to
+    synchronize with this value.
+*)
 val register_value :
   page:Doc.page ->
   name:string ->
@@ -29,6 +37,16 @@ val register_value :
   get:(unit -> 'a) ->
   Request.signal
 
+
+(** Register a (projectified) state and generates the associated signal and
+    requests:
+    - Signal [<name>.sig] is emitted on value updates;
+    - GET Request [<name>.get] returns the current value;
+    - SET Request [<name>.set] modifies the server value.
+
+    Inside {b Ivette} you can use the [States.useSyncState(id)] hook to
+    synchronize with this state.
+*)
 val register_state :
   page:Doc.page ->
   name:string ->
@@ -41,17 +59,42 @@ val register_state :
 
 type 'a model (** Columns array model *)
 
+(** Creates an empty array model. *)
 val model : unit -> 'a model
+
+(** Populate an array model with a new field.
+    Columns with name `"id"` and `"_index"` are
+    reserved for internal use. *)
 val column :
   'a model -> name:string -> descr:Markdown.text ->
   'a Request.output -> unit
 
 type 'a array (** Synchronized array state *)
 
+(** Mark the array to be fully reloaded. *)
 val reload : 'a array -> unit
+
+(** Mark an array entry as updated. *)
 val update : 'a array -> 'a -> unit
+
+(** Mark an array entry as removed. *)
 val remove : 'a array -> 'a -> unit
 
+(** Register signals a requests for synchronizing
+    an array with the client.
+    - Signal [<name>.sig] is emitted on array updates;
+    - GET Request [<name>.fetch] is registered to get updates;
+    - GET Request [<name>.reload] is registered to trigger a full reload.
+
+    The [~key] parameter is used to identify array entries, and used to fill
+    the reserved column ["id"] of entries.
+
+    Columns added to the model after registration are {i not} taken
+    into account.
+
+    Inside {b Ivette} you can obtain the entries in sync by
+    using the [States.useSyncArray()] hook.
+*)
 val register_array :
   page:Doc.page ->
   name:string ->

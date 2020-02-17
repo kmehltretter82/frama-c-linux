@@ -73,7 +73,7 @@ let model () = ref []
 
 let column (type a) (m : a model) ~name ~descr (output : a Request.output) =
   let module D = (val output) in
-  if name = "id" then
+  if name = "id" || name = "_index" then
     raise (Invalid_argument "Server.States.column: invalid name") ;
   if List.exists (fun (fd,_) -> fd.Syntax.name = name) !m then
     raise (Invalid_argument "Server.States.column: duplicate name") ;
@@ -197,12 +197,12 @@ let fetch array n =
         m.cleared <- false ;
         array.iter
           begin fun v ->
-          let key = array.key v in
-          if buffer.capacity > 0 then
-            add_entry buffer array.getter key v
-          else
-            ( m.updates <- Kmap.add key (Add v) m.updates ;
-              buffer.pending <- succ buffer.pending ) ;
+            let key = array.key v in
+            if buffer.capacity > 0 then
+              add_entry buffer array.getter key v
+            else
+              ( m.updates <- Kmap.add key (Add v) m.updates ;
+                buffer.pending <- succ buffer.pending ) ;
           end ;
       end
     else
@@ -257,10 +257,10 @@ let register_array ~page ~name ~descr ?(details=[]) ~key ~iter model =
                 _all_ previously received entries must be removed.")]
       () in
   let module Jentries =
-      (struct
-        include Jany
-        let syntax = Syntax.data "entry" mref
-      end) in
+    (struct
+      include Jany
+      let syntax = Syntax.data "entry" mref
+    end) in
   let set_reload = Request.result signature
       ~name:"reload" ~descr:(plain "array fully reloaded")
       (module Jbool) in
