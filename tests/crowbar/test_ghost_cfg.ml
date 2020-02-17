@@ -383,8 +383,12 @@ let gen_file =
          globinitcalled = false
        }))
 
+let ignore_deferred_errors () =
+  try Log.treat_deferred_error () with Log.AbortError _ -> ()
+
 let check_file (env, file) =
   prepare();
+  Format.printf "new test@.";
   let temp_dir = Filename.dirname Sys.executable_name in
   let temp_dir =
     temp_dir ^ "/output-" ^ (Filename.basename Sys.executable_name) ^ "/files"
@@ -402,13 +406,18 @@ let check_file (env, file) =
   let success =
     try
       File.prepare_cil_file file;
+      Format.printf "Done@.";
+      Log.treat_deferred_error ();
       true
     with
-      | Log.AbortError _ -> false
+      | Log.AbortError _ ->
+          ignore_deferred_errors ();
+          false
       | exn ->
           Printf.printf
             "Uncaught exception: %s\n%t\nFile saved in %s\n%!"
             (Printexc.to_string exn) Printexc.print_backtrace file_name;
+          ignore_deferred_errors ();
           report file_name "Found code leading to an unknown exception"
   in
   if env.should_fail && success then
