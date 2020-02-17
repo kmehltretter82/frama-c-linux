@@ -1224,6 +1224,8 @@ src/plugins/value/domains/cvalue/locals_scoping.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/cvalue/locals_scoping.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/cvalue/warn.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/cvalue/warn.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/domains/domain_mode.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/domains/domain_mode.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/domain_builder.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/domain_builder.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/domain_lift.ml: CEA_LGPL_OR_PROPRIETARY

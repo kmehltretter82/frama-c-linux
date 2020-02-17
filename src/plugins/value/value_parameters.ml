@@ -213,9 +213,31 @@ let () =
   Domains.add_set_hook
     (fun _old domains -> Datatype.String.Set.iter check_domain domains)
 
+let () = Parameter_customize.set_group domains
+module DomainsFunction =
+  String_multiple_map
+    (struct
+      include Domain_mode.Function_Mode
+      let of_string ~key ~prev str =
+        check_domain key;
+        try of_string ~key ~prev str
+        with Invalid_argument msg -> raise (Cannot_build msg)
+    end)
+    (struct
+      let option_name = "-eva-domains-function"
+      let help = "Enables a domain only for the given functions. \
+                  <d:f+> enables the domain [d] from function [f] \
+                  (the domain is enabled in all functions called from [f]). \
+                  <d:f-> disables the domain [d] from function [f]."
+      let arg_name = "d:f"
+      let default = Datatype.String.Map.empty
+    end)
+let () = add_precision_dep DomainsFunction.parameter
+
 (* Set of parameters defining the abstractions used in an Eva analysis. *)
 let parameters_abstractions =
-  ref (Typed_parameter.Set.singleton Domains.parameter)
+  ref (Typed_parameter.Set.of_list
+         [Domains.parameter; DomainsFunction.parameter])
 
 
 let () = Parameter_customize.set_group domains

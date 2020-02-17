@@ -20,45 +20,16 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Automatic builders to complete abstract domains from different
-    simplified interfaces. *)
+type permission = { read: bool; write: bool; }
+type mode = { current: permission; calls: permission; }
 
-module type InputDomain = sig
-  include Abstract_domain.S
-  val storage: unit -> bool
+module Mode : sig
+  include Datatype.S_with_collections with type t = mode
+  val all: t
 end
 
-module Complete
-    (Domain: InputDomain)
-  : Abstract_domain.Leaf with type state = Domain.state
-                          and type value = Domain.value
-                          and type location = Domain.location
+type function_mode = Kernel_function.t * mode
 
-module Complete_Minimal
-    (Value: Abstract_value.S)
-    (Location: Abstract_location.S)
-    (Domain: Simpler_domains.Minimal)
-  : Abstract_domain.Leaf with type value = Value.t
-                          and type location = Location.location
-                          and type state = Domain.t
-
-module Complete_Minimal_with_datatype
-    (Value: Abstract_value.S)
-    (Location: Abstract_location.S)
-    (Domain: Simpler_domains.Minimal_with_datatype)
-  : Abstract_domain.Leaf with type value = Value.t
-                          and type location = Location.location
-                          and type state = Domain.t
-
-module Complete_Simple_Cvalue
-    (Domain: Simpler_domains.Simple_Cvalue)
-  : Abstract_domain.Leaf with type value = Cvalue.V.t
-                          and type location = Precise_locs.precise_location
-                          and type state = Domain.t
-
-module Restrict
-    (Value: Abstract_value.S)
-    (Domain: Abstract.Domain.Internal with type value = Value.t)
-    (Scope: sig val functions: Domain_mode.function_mode list end)
-  : Abstract.Domain.Internal with type value = Value.t
-                              and type location = Domain.location
+module Function_Mode:
+  Parameter_sig.Multiple_value_datatype with type key = string
+                                         and type t = function_mode

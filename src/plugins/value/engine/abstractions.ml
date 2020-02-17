@@ -85,12 +85,14 @@ module Config = struct
   let configure () =
     let aux config (Flag domain as flag) =
       if Value_parameters.Domains.mem domain.name
+      || Value_parameters.DomainsFunction.mem domain.name
       then add flag config
       else config
     in
     let config = List.fold_left aux empty !abstractions in
     let aux config (Dynamic { name; experimental; priority; abstraction; }) =
       if Value_parameters.Domains.mem name
+      || Value_parameters.DomainsFunction.mem name
       then
         let abstraction = abstraction () in
         let flag = Flag { name; experimental; priority; abstraction; } in
@@ -307,7 +309,7 @@ let eq_value:
       | Abstract.Value.Leaf (key, _) -> Abstract.Value.eq_type key V.key
       | _ -> None
 
-let add_domain (type v) (abstraction: v abstraction) (module Acc: Acc) =
+let add_domain (type v) name (abstraction: v abstraction) (module Acc: Acc) =
   let domain : (module internal_domain with type value = Acc.Val.t) =
     match abstraction.domain with
     | Functor make ->
@@ -326,6 +328,19 @@ let add_domain (type v) (abstraction: v abstraction) (module Acc: Acc) =
         end in
         let module Convert = Internal_Value.Convert (Acc.Val) (Struct) in
         (module Domain_lift.Make (Domain) (Convert))
+  in
+  let domain : (module internal_domain with type value = Acc.Val.t) =
+    try
+      let kf_modes = Value_parameters.DomainsFunction.find name in
+      let module Scope = struct let functions = kf_modes end in
+      let module Domain =
+        Domain_builder.Restrict
+          (Acc.Val)
+          ((val domain))
+          (Scope)
+      in
+      (module Domain)
+    with Not_found -> domain
   in
   let domain : (module internal_domain with type value = Acc.Val.t) =
     match Abstract.Domain.(eq_structure Acc.Dom.structure Unit) with
@@ -349,7 +364,7 @@ let warn_experimental flag =
 let build_domain config abstract =
   let build (Flag flag) acc =
     warn_experimental flag;
-    add_domain flag.abstraction acc
+    add_domain flag.name flag.abstraction acc
   in
   (* Domains in the [config] are sorted by increasing priority: domains with
      higher priority are added last: they will be at the top of the domains

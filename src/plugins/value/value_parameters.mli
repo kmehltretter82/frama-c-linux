@@ -29,6 +29,9 @@ module OracleDepth: Parameter_sig.Int
 module ReductionDepth: Parameter_sig.Int
 
 module Domains: Parameter_sig.String_set
+module DomainsFunction: Parameter_sig.Multiple_map
+  with type key = string
+   and type value = Domain_mode.function_mode
 
 module EqualityCall: Parameter_sig.String
 module EqualityCallFunction:

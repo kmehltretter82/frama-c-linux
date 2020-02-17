@@ -254,44 +254,28 @@ end
 
 (* -------------------------------------------------------------------------- *)
 
-type permission = { read: bool; write: bool; }
-type mode = { current: permission; calls: permission; }
-
-module Mode = struct
-
-  let all =
-    let p = { read = true; write = true } in
-    { current = p; calls = p; }
-
-
-  include Datatype.Make_with_collections
-      (struct
-        include Datatype.Serializable_undefined
-        type t = mode
-        let name = "Domain_builder.Restrict_State"
-        let reprs = [ all ]
-        let compare _ _ = 0
-        let equal _ _ = true
-        let hash _ = 0
-      end)
-
-  let merge f m1 m2 =
-    let merge_perm p1 p2 =
-      { read = f p1.read p2.read;
-        write = f p1.write p2.write; }
-    in
-    { current = merge_perm m1.current m2.current;
-      calls = merge_perm m1.calls m2.calls; }
-
-  let join = merge (&&)
-  let narrow = merge (||)
-end
-
 module Restrict
     (Value: Abstract_value.S)
     (Domain: Abstract.Domain.Internal with type value = Value.t)
-    (Scope: sig val functions: (Kernel_function.t * mode) list end)
+    (Scope: sig val functions: Domain_mode.function_mode list end)
 = struct
+
+  open Domain_mode
+
+  module Mode = struct
+    include Mode
+
+    let merge f m1 m2 =
+      let merge_perm p1 p2 =
+        { read = f p1.read p2.read;
+          write = f p1.write p2.write; }
+      in
+      { current = merge_perm m1.current m2.current;
+        calls = merge_perm m1.calls m2.calls; }
+
+    let join = merge (&&)
+    let narrow = merge (||)
+  end
 
   let functions_map =
     List.fold_left
