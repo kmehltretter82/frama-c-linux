@@ -84,7 +84,7 @@ export const ACTIVITY = 'frama-c.server.activity.' ;
    @typedef STATUS
    @summary Server Status Codes.
    @description
-- `IDLE` Server paused
+- `OFF` Server off
 - `STARTED` Frama-C command launched
 - `RUNNING` Server ready
 - `KILLING` Server shutdown, waiting for exit
@@ -92,7 +92,7 @@ export const ACTIVITY = 'frama-c.server.activity.' ;
 - `FAILED` Server halted on error
  */
 
-export const IDLE = 'IDLE' ;
+export const OFF = 'OFF' ;
 export const STARTED = 'STARTED' ; // Command started
 export const RUNNING = 'RUNNING' ; // Server connected
 export const KILLING = 'KILLING' ; // Waiting for halt
@@ -103,7 +103,7 @@ export const FAILED  = 'FAILED'  ; // Error issued
 // --- Server Global State
 // --------------------------------------------------------------------------
 
-var status = IDLE;
+var status = OFF;
 var error;     // process error
 var rqid;      // Request ID
 var pending;   // Pending promise callbacks
@@ -213,7 +213,7 @@ function _status(new_s,err) {
 */
 export function start() {
   switch(status) {
-  case IDLE:
+  case OFF:
   case FAILED:
     _status(STARTED);
     _launch()
@@ -256,7 +256,7 @@ export function stop() {
   case RESTART:
     _status(KILLING);
     return;
-  case IDLE:
+  case OFF:
   case FAILED:
   case KILLING:
   default:
@@ -286,7 +286,7 @@ export function kill() {
     _kill();
     _status(KILLING);
     return;
-  case IDLE:
+  case OFF:
   case FAILED:
   default:
     return;
@@ -306,7 +306,7 @@ export function kill() {
 */
 export function restart() {
   switch(status) {
-  case IDLE:
+  case OFF:
   case FAILED:
     start();
     return;
@@ -336,9 +336,9 @@ export function restart() {
 export function clear() {
   switch(status) {
   case FAILED:
-    _status(IDLE);
+    _status(OFF);
     // Fall Through
-  case IDLE:
+  case OFF:
     buffer.clear();
     Dome.emit(STATUS);
     return;
@@ -486,7 +486,7 @@ function _close(error) {
     _status(FAILED,error);
   } else {
     if (status === RESTART) setImmediate(start);
-    _status(IDLE);
+    _status(OFF);
   }
 }
 
@@ -730,8 +730,11 @@ function _send() {
           .finally(() => { busy = false ; Dome.emit(STATUS); });
       } else
         _cancel(ids);
-      Dome.emit(STATUS);
+    } else {
+      // No pending command nor pending response
+      rqid = 0 ;
     }
+    Dome.emit(STATUS);
   }
 }
 
@@ -799,7 +802,7 @@ export default {
   onReady, onShutdown, onActivity,
   on, off,
   STATUS,READY,SHUTDOWN,
-  IDLE,STARTED,RUNNING,KILLING,RESTART,FAILED
+  OFF,STARTED,RUNNING,KILLING,RESTART,FAILED
 };
 
 // --------------------------------------------------------------------------

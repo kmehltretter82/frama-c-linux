@@ -49,7 +49,7 @@ export const Control = () => {
   let stop = { enabled: false } ;
   let reload = { enabled: false } ;
   switch(status) {
-  case 'IDLE':
+  case 'OFF':
     play = { enabled: true, onClick:Server.start };
     break;
   case 'RUNNING':
@@ -92,15 +92,15 @@ export const Status = () => {
   let n = Server.getPending();
   let led, blink, error ;
   switch(s) {
-  case Server.RUNNING:
-    led = n>0 ? 'positive' : 'active' ;
-    break;
-  case Server.IDLE:
+  case Server.OFF:
     led = 'inactive' ;
     break;
   case Server.STARTED:
     led = 'active' ;
     blink = true ;
+    break;
+  case Server.RUNNING:
+    led = n>0 ? 'positive' : 'active' ;
     break;
   case Server.KILLING:
     led = 'negative' ;

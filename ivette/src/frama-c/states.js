@@ -13,8 +13,6 @@ import React from 'react' ;
 import Dome from 'dome' ;
 import Server from './server' ;
 
-const NONE = [ undefined, () => undefined ]; // No-state
-
 /**
    @event
    @name 'frama-c.project'
@@ -39,8 +37,7 @@ export const STATE = 'frama-c.state.' ;
 // --------------------------------------------------------------------------
 
 var currentProject = undefined ;
-var globalStates = {} ;
-var globalSync = {} ;
+var states = {} ;
 
 Server.onReady(() => {
   Server.sendGET('kernel.project.getCurrent')
@@ -52,7 +49,7 @@ Server.onReady(() => {
 
 Server.onShutdown(() => {
   currentProject = undefined ;
-  globalStates = {} ;
+  states = {} ;
   Dome.emit(PROJECT);
 });
 
@@ -92,13 +89,13 @@ export function setProject(project)
 
 function getValue(id,project) {
   if (!project) return undefined;
-  return _.get( globalStates, [project,id] );
+  return _.get( states, [project,id] );
 }
 
 function setValue(id,project,value) {
   const theProject = project || currentProject ;
   if (!theProject) return ;
-  _.set( globalStates, [project,id], value );
+  _.set( states, [project,id], value );
   Dome.emit( STATE + id , value );
 }
 
@@ -205,7 +202,7 @@ class SyncState {
 // --- Synchronized States Registry
 // --------------------------------------------------------------------------
 
-const syncStates = {} ;
+var syncStates = {} ;
 
 function syncState(id) {
   let s = syncStates[id] ;
@@ -309,7 +306,7 @@ class SyncArray
 // --- Synchronized Arrays Registry
 // --------------------------------------------------------------------------
 
-const syncArrays = {} ; // Model by project & id
+var syncArrays = {} ; // Model by project & id
 
 function syncArray(id) {
   const path = [ currentProject , id ] ;
