@@ -279,6 +279,8 @@ let ghost_case_breaks has_default other_cases =
       method! vstmt s =
         match s.skind with
           | Break _ -> raise M.Has_break
+          | Loop _ | Switch _ -> (* a break there won't break the switch *)
+              Cil.SkipChildren
           | _ -> Cil.DoChildren
     end
   in
@@ -287,6 +289,19 @@ let ghost_case_breaks has_default other_cases =
       (List.iter (fun s -> ignore (Cil.visitCilStmt vis s))) seq;
     false
   with M.Has_break -> true
+
+let rec no_ghost_case_breaks = function
+  | [] -> false (* should not happen, we have at least one non-ghost case before
+                   default. *)
+  | stmts :: others ->
+      if (List.hd stmts).ghost then
+        begin
+          match (Extlib.last stmts).skind with
+            | Break _ -> false
+            | _ -> no_ghost_case_breaks others
+        end else true
+
+
 
 let gen_case ghost should_break my_case cases env =
   let (env,default,others) = cases env in
@@ -314,7 +329,7 @@ let gen_case ghost should_break my_case cases env =
       | Case_no_default g1, (_, g2)::_ ->
           (* fails iff switch is non-ghost, current case is, and doesn't break,
              going to the next case. *)
-          not g2 && g1 && not should_break
+          not g2 && g1 && not should_break && no_ghost_case_breaks others
       | Case g1, (_,g2) :: _ ->
           not g2 && g1 (* prevents taking the default clause.*)
   in
