@@ -53,8 +53,8 @@ export default (function() {
           <View id='default' label='Dashboard' defaultView>
             <GridItem id='frama-c.console'/>
           </View>
-
-          <Component id='frama-c.console' label='Console' >
+          <Group id='frama-c' label='Frama-C' title='Frama-C Kernel Components'/>
+          <Component id='frama-c.console' group='frama-c' label='Console' >
             <Controller.Console/>
           </Component>
         </LabView>

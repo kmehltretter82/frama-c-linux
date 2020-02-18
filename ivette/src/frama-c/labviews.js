@@ -41,7 +41,7 @@ class Library {
     }
   }
 
-  useItem(id,group,path,props) {
+  useItem(id,gcontext,path,props) {
     if (!this.modified) {
       this.modified = true ;
       setImmediate(() => this.commit());
@@ -50,6 +50,7 @@ class Library {
     let order = props.rank === undefined
         ? path
         : path.slice(0,-1).concat([props.rank]);
+    let group = props.group || gcontext ;
     let collection = this.virtual ;
     collection[id] = Object.assign( { id, order, group }, props );
     return () => delete collection[id];
