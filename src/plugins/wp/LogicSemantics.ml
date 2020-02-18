@@ -623,7 +623,7 @@ struct
           let h =
             if Wp_parameters.SimplifyForall.get ()
             then F.p_true
-            else Cvalues.has_ltype v.lv_type (e_var x)
+            else C.has_ltype v.lv_type (e_var x)
           in
           let e = C.env_let env v (Vexp (e_var x)) in
           acc (x::xs) e (h::hs) vs in

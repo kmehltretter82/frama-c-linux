@@ -62,6 +62,29 @@ struct
     | Sig_chunk of chunk * c_label (* to be replaced by the chunk variable *)
 
   (* -------------------------------------------------------------------------- *)
+  (* --- Registering User-Defined Signatures                                --- *)
+  (* -------------------------------------------------------------------------- *)
+
+  module Typedefs = WpContext.Index
+      (struct
+        type key = logic_type_info
+        type data = lfun option
+        let name = "LogicCompiler." ^ M.datatype ^ ".Typedefs"
+        let compare = Logic_type_info.compare
+        let pretty = Logic_type_info.pretty
+      end)
+  let compile_logic_type = ref (fun _ -> assert false)
+
+  module Signature = WpContext.Index
+      (struct
+        type key = logic_info
+        type data = signature
+        let name = "LogicCompiler." ^ M.datatype ^ ".Signature"
+        let compare = Logic_info.compare
+        let pretty fmt l = Logic_var.pretty fmt l.l_var_info
+      end)
+
+  (* -------------------------------------------------------------------------- *)
   (* --- Utilities                                                          --- *)
   (* -------------------------------------------------------------------------- *)
 
@@ -79,10 +102,21 @@ struct
     | (label,mem) :: m -> LabelMap.add label mem (wrap_mem m)
     | [] -> LabelMap.empty
 
+  let has_ltype ltype t =
+    match Logic_utils.unroll_type ~unroll_typedef:false ltype with
+    | Ltype (lt, _) ->
+        if not (Typedefs.mem lt) then !compile_logic_type ltype ;
+        begin match Typedefs.find lt with
+          | Some lfun -> F.p_call lfun [t]
+          | None -> p_true
+        end
+    | Ctype typ -> Cvalues.has_ctype typ t
+    | _ -> p_true
+
   let fresh_lvar ?basename ltyp =
     let tau = Lang.tau_of_ltype ltyp in
     let x = Lang.freshvar ?basename tau in
-    let p = Cvalues.has_ltype ltyp (e_var x) in
+    let p = has_ltype ltyp (e_var x) in
     Lang.assume p ; x
 
   let fresh_cvar ?basename typ =
@@ -363,7 +397,7 @@ struct
     | [] -> { vars=vars ; lhere=None ; current=None } , domain , List.rev sigv
     | lv :: profile ->
         let x = param_of_lv lv in
-        let h = Cvalues.has_ltype lv.lv_type (e_var x) in
+        let h = has_ltype lv.lv_type (e_var x) in
         let v = Cvalues.plain lv.lv_type (e_var x) in
         profile_env
           (Logic_var.Map.add lv v vars)
@@ -449,28 +483,6 @@ struct
     if LogicUsage.is_recursive l then Rec else Def
 
   (* -------------------------------------------------------------------------- *)
-  (* --- Registering User-Defined Signatures                                --- *)
-  (* -------------------------------------------------------------------------- *)
-
-  module Typedefs = WpContext.Index
-      (struct
-        type key = logic_type_info
-        type data = unit
-        let name = "LogicCompiler." ^ M.datatype ^ ".Typedefs"
-        let compare = Logic_type_info.compare
-        let pretty = Logic_type_info.pretty
-      end)
-
-  module Signature = WpContext.Index
-      (struct
-        type key = logic_info
-        type data = signature
-        let name = "LogicCompiler." ^ M.datatype ^ ".Signature"
-        let compare = Logic_info.compare
-        let pretty fmt l = Logic_var.pretty fmt l.l_var_info
-      end)
-
-  (* -------------------------------------------------------------------------- *)
   (* --- Compiling Lemmas                                                   --- *)
   (* -------------------------------------------------------------------------- *)
 
@@ -509,7 +521,7 @@ struct
             let rec conditions vs sigp =
               match vs , sigp with
               | v::vs , Sig_value lv :: sigp ->
-                  let cond = Cvalues.has_ltype lv.lv_type v in
+                  let cond = has_ltype lv.lv_type v in
                   cond :: conditions vs sigp
               | _ -> [] in
             let result = F.e_fun ldef.d_lfun vs in
@@ -726,9 +738,51 @@ struct
   (* --- Retrieving Signature                                               --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let define_type c t =
-    Typedefs.update t () ;
-    Definitions.define_type c t
+  let define_type cluster lt =
+    let constrainer = match lt with
+      | { lt_def = Some(LTsum(ctors)) ; lt_name ; lt_params=[] } ->
+          let frame = logic_frame lt_name [] in
+          in_frame frame
+            begin fun () ->
+              let lfun = Lang.generated_p ("is_" ^ lt_name) in
+              let tau_lt = Lang.tau_of_ltype (Ltype(lt, [])) in
+              Typedefs.update lt (Some lfun) ;
+              let term_constraint ltyp =
+                let v = Lang.freshvar ~basename:"p" (Lang.tau_of_ltype ltyp) in
+                v, (has_ltype ltyp (Lang.F.e_var v))
+              in
+              let ctor_to_prop = function
+                | { ctor_name = l_name ; ctor_params = ts } as const ->
+                    let vs, cs = List.split (List.map term_constraint ts) in
+                    let ts = List.map Lang.F.e_var vs in
+                    let const = F.e_fun ~result:tau_lt (CTOR const) ts in
+                    let is_lt = F.p_call lfun [const] in
+                    {
+                      l_name ;
+                      l_types = 0 ;
+                      l_assumed = true ;
+                      l_triggers = [frame.triggers] ;
+                      l_forall = vs ;
+                      l_cluster = cluster ;
+                      l_lemma = p_hyps cs is_lt ;
+                    }
+              in
+              let cases = List.map ctor_to_prop ctors in
+              Definitions.define_symbol {
+                d_lfun = lfun ;
+                d_types = 0 ;
+                d_params = [ Lang.freshvar ~basename:"v" tau_lt ] ;
+                d_cluster = cluster ;
+                d_definition = Inductive cases
+              } ;
+              Some lfun
+            end ()
+      | { lt_def = Some(LTsum(_)) ; lt_params=_ } ->
+          Wp_parameters.not_yet_implemented "Type parameters for sum types"
+      | _ -> None
+    in
+    Typedefs.update lt constrainer ;
+    Definitions.define_type cluster lt
 
   let define_logic c a = Signature.compile (compile_logic c a)
 
@@ -785,7 +839,7 @@ struct
         List.iter logic_type ps ;
         if not (Typedefs.mem lt) then
           begin
-            Typedefs.update lt () ;
+            Typedefs.update lt None ;
             if not (Lang.is_builtin lt) &&
                not (Logic_const.is_boolean_type t)
             then
@@ -798,6 +852,7 @@ struct
                   (* force compilation of entire axiomatics *)
                   define_axiomatic cluster ax
           end
+  let () = compile_logic_type := logic_type
 
   let logic_profile phi =
     begin

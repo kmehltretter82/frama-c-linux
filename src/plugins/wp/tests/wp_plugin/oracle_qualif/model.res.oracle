@@ -48,6 +48,35 @@ theory Axiomatic
   
   predicate P_P int
 end
+[wp:print-generated] 
+  theory WP
+    (* use why3.BuiltIn.BuiltIn *)
+    
+    (* use bool.Bool *)
+    
+    (* use int.Int *)
+    
+    (* use int.ComputerDivision *)
+    
+    (* use real.RealInfix *)
+    
+    (* use frama_c_wp.qed.Qed *)
+    
+    (* use map.Map *)
+    
+    (* use frama_c_wp.memory.Memory *)
+    
+    (* use frama_c_wp.cint.Cint *)
+    
+    (* use Compound *)
+    
+    (* use Axiomatic *)
+    
+    goal wp_goal :
+      forall t:addr -> int, i:int, a:addr.
+       let x = get t (shift_sint32 a i) in
+       region (base a) <= 0 -> is_sint32 i -> is_sint32 x -> P_P x
+  end
 [wp] [Alt-Ergo 2.0.0] Goal typed_f_ensures : Typechecked
 [wp] Proved goals:    0 / 1
   Alt-Ergo 2.0.0:    0  (unsuccess: 1)
@@ -57,6 +86,35 @@ end
 ------------------------------------------------------------
 [wp] Running WP plugin...
 [wp] 2 goals scheduled
+[wp:print-generated] 
+  theory WP1
+    (* use why3.BuiltIn.BuiltIn *)
+    
+    (* use bool.Bool *)
+    
+    (* use int.Int *)
+    
+    (* use int.ComputerDivision *)
+    
+    (* use real.RealInfix *)
+    
+    (* use frama_c_wp.qed.Qed *)
+    
+    (* use map.Map *)
+    
+    (* use frama_c_wp.memory.Memory *)
+    
+    (* use frama_c_wp.cint.Cint *)
+    
+    (* use Compound *)
+    
+    (* use Axiomatic *)
+    
+    goal wp_goal :
+      forall t:addr -> int, i:int, a:addr.
+       let x = get t (shift_sint32 a i) in
+       region (base a) <= 0 -> is_sint32 i -> is_sint32 x -> P_P x
+  end
 [wp] [Alt-Ergo 2.0.0] Goal typed_f_ensures : Typechecked
 ---------------------------------------------
 --- Context 'typed_ref_f' Cluster 'Compound' 
@@ -100,6 +158,35 @@ theory Axiomatic1
   
   predicate P_P1 int
 end
+[wp:print-generated] 
+  theory WP2
+    (* use why3.BuiltIn.BuiltIn *)
+    
+    (* use bool.Bool1 *)
+    
+    (* use int.Int1 *)
+    
+    (* use int.ComputerDivision1 *)
+    
+    (* use real.RealInfix1 *)
+    
+    (* use frama_c_wp.qed.Qed1 *)
+    
+    (* use map.Map1 *)
+    
+    (* use frama_c_wp.memory.Memory1 *)
+    
+    (* use frama_c_wp.cint.Cint1 *)
+    
+    (* use Compound1 *)
+    
+    (* use Axiomatic1 *)
+    
+    goal wp_goal :
+      forall t:addr1 -> int, i:int, a:addr1.
+       let x = get1 t (shift_sint321 a i) in
+       region1 (base1 a) <=' 0 -> is_sint321 i -> is_sint321 x -> P_P1 x
+  end
 [wp] [Alt-Ergo 2.0.0] Goal typed_ref_f_ensures : Typechecked
 [wp] Proved goals:    0 / 2
   Alt-Ergo 2.0.0:    0  (unsuccess: 2)

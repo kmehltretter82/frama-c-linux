@@ -4,7 +4,7 @@
 */
 
 /* run.config_qualif
-   OPT: -wp-msg-key cluster -wp-model Typed -wp-check -then -wp -wp-model Typed+ref -wp-check
+   OPT: -wp-msg-key print-generated -wp-model Typed -wp-check -then -wp -wp-model Typed+ref -wp-check
 */
 
 //@ predicate P(integer a);

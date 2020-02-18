@@ -68,6 +68,8 @@ type convert = {
   pool: Lang.F.pool;
   polarity: Cvalues.polarity;
   in_goal: bool;
+  incomplete_types: (string, Why3.Ty.tysymbol) Hashtbl.t;
+  incomplete_symbols: (string, Why3.Term.lsymbol) Hashtbl.t;
   mutable convert_for_export: Lang.F.term Lang.F.Tmap.t;
 }
 
@@ -163,6 +165,8 @@ let empty_cnv ?(polarity=`NoPolarity) ?(in_goal=false) (ctx:context) : convert =
   env = ctx.env;
   polarity;
   in_goal;
+  incomplete_symbols = Hashtbl.create 3;
+  incomplete_types = Hashtbl.create 3;
   convert_for_export = Lang.F.Tmap.empty;
 }
 
@@ -252,7 +256,12 @@ let rec of_tau ~cnv (t:Lang.F.tau) =
       Some (Why3.Ty.ty_app ts [Why3.Opt.get (of_tau ~cnv k); Why3.Opt.get (of_tau ~cnv v)])
   | Data(adt,l) -> begin
       let s = name_of_adt adt in
-      match Why3.Theory.(ns_find_ts (get_namespace cnv.th) (cut_path s)) with
+      let find s =
+        try Hashtbl.find cnv.incomplete_types s
+        with Not_found ->
+          Why3.Theory.(ns_find_ts (get_namespace cnv.th) (cut_path s))
+      in
+      match find s with
       | ts -> Some (Why3.Ty.ty_app ts (List.map (fun e -> Why3.Opt.get (of_tau ~cnv e)) l))
       | exception Not_found ->
           why3_failure "Can't find type '%s' in why3 namespace" s
@@ -457,7 +466,12 @@ let rec of_term ~cnv expected t : Why3.Term.term =
           Why3.Term.t_app ls l r
         in
         let apply_from_ns s l sort =
-          match Why3.Theory.(ns_find_ls (get_namespace cnv.th) (cut_path s)), expected with
+          let find s =
+            try Hashtbl.find cnv.incomplete_symbols s
+            with Not_found ->
+              Why3.Theory.(ns_find_ls (get_namespace cnv.th) (cut_path s))
+          in
+          match find s, expected with
           | ls, (Prop | Bool) ->
               coerce ~cnv sort expected $
               t_app ls l (of_tau cnv sort)
@@ -670,7 +684,7 @@ class visitor (ctx:context) c =
           v#add_builtin_lib;
           v#vself;
           let th = Why3.Theory.close_theory ctx.th in
-          if Wp_parameters.has_dkey ProverErgo.dkey_cluster then
+          if Wp_parameters.has_print_generated () then
             Log.print_on_output
               begin fun fmt ->
                 Format.fprintf fmt "---------------------------------------------@\n" ;
@@ -784,13 +798,15 @@ class visitor (ctx:context) c =
           let decl = Why3.Decl.create_ty_decl id in
           ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
       | Tsum cases ->
-          let id = Why3.Ident.id_fresh (Lang.type_id lt) in
+          let name = Lang.type_id lt in
+          let id = Why3.Ident.id_fresh name in
           let map i _ = tvar i in
           let tv_args = List.mapi map lt.lt_params in
           let tys = Why3.Ty.create_tysymbol id tv_args NoDef in
+          let cnv = empty_cnv ctx in
+          Hashtbl.add cnv.incomplete_types name tys ;
           let tv_args = List.map Why3.Ty.ty_var tv_args in
           let return_ty = Why3.Ty.ty_app tys tv_args in
-          let cnv = empty_cnv ctx in
           let constr = List.length cases in
           let cases = List.map (fun (c,targs) ->
               let name = match c with | Lang.CTOR c -> Lang.ctor_id c | _ -> assert false in
@@ -803,13 +819,15 @@ class visitor (ctx:context) c =
           let decl = Why3.Decl.create_data_decl [tys,cases] in
           ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
       | Trec fields ->
-          let id = Why3.Ident.id_fresh (Lang.type_id lt) in
+          let name = Lang.type_id lt in
+          let id = Why3.Ident.id_fresh name in
           let map i _ = tvar i in
           let tv_args = List.mapi map lt.lt_params in
           let tys = Why3.Ty.create_tysymbol id tv_args NoDef in
+          let cnv = empty_cnv ctx in
+          Hashtbl.add cnv.incomplete_types name tys ;
           let tv_args = List.map Why3.Ty.ty_var tv_args in
           let return_ty = Why3.Ty.ty_app tys tv_args in
-          let cnv = empty_cnv ctx in
           let fields,args = List.split @@ List.map (fun (f,ty) ->
               let name = Lang.name_of_field f in
               let id = Why3.Ident.id_fresh name in
@@ -847,21 +865,23 @@ class visitor (ctx:context) c =
         ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
       end
 
+    method private make_lemma cnv (l: Definitions.dlemma) =
+      let id = Why3.Ident.id_fresh (Lang.lemma_id l.l_name) in
+      let id = Why3.Decl.create_prsymbol id in
+      List.iter (Lang.F.add_var cnv.pool) l.l_forall;
+      let cnv, vars = Lang.For_export.in_state (mk_binders cnv) l.l_forall in
+      let t = convert cnv Prop (Lang.F.e_prop l.l_lemma) in
+      let triggers = full_triggers l.l_triggers in
+      let triggers = Lang.For_export.in_state (List.map (List.map (of_trigger ~cnv))) triggers in
+      let t = Why3.Term.t_forall_close vars triggers t in
+      id, t
+
     method on_dlemma l =
-      begin
-        let kind = Why3.Decl.(if l.l_assumed then Paxiom else Plemma) in
-        let id = Why3.Ident.id_fresh (Lang.lemma_id l.l_name) in
-        let id = Why3.Decl.create_prsymbol id in
-        let cnv = empty_cnv ctx in
-        List.iter (Lang.F.add_var cnv.pool) l.l_forall;
-        let cnv, vars = Lang.For_export.in_state (mk_binders cnv) l.l_forall in
-        let t = convert cnv Prop (Lang.F.e_prop l.l_lemma) in
-        let triggers = full_triggers l.l_triggers in
-        let triggers = Lang.For_export.in_state (List.map (List.map (of_trigger ~cnv))) triggers in
-        let t = Why3.Term.t_forall_close vars triggers t in
-        let decl = Why3.Decl.create_prop_decl kind id t in
-        ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
-      end
+      let kind = Why3.Decl.(if l.l_assumed then Paxiom else Plemma) in
+      let cnv = empty_cnv ctx in
+      let id, t = self#make_lemma cnv l in
+      let decl = Why3.Decl.create_prop_decl kind id t in
+      ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl
 
     method on_dfun d =
       Wp_parameters.debug ~dkey:dkey_api "Define %a@." Lang.Fun.pretty d.d_lfun ;
@@ -952,14 +972,18 @@ class visitor (ctx:context) c =
           end
         | Inductive dl ->
             (* create predicate symbol *)
-            let id = Why3.Ident.id_fresh (Qed.Export.link_name (lfun_name d.d_lfun)) in
+            let fname = Qed.Export.link_name (lfun_name d.d_lfun) in
+            let id = Why3.Ident.id_fresh fname in
             let map e = Why3.Opt.get (of_tau ~cnv (Lang.F.tau_of_var e)) in
             let ty_args = List.map map d.d_params in
-            let id = Why3.Term.create_lsymbol id ty_args None in
-            let decl = Why3.Decl.create_param_decl id in
-            ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl ;
-            (* register axioms *)
-            List.iter (self#on_dlemma) dl
+            let fid = Why3.Term.create_lsymbol id ty_args None in
+            let make_case (l:Definitions.dlemma) =
+              let cnv = empty_cnv ctx in
+              Hashtbl.add cnv.incomplete_symbols fname fid ;
+              self#make_lemma cnv l
+            in
+            let ind_decl = (fid, List.map make_case dl) in
+            ctx.th <- Why3.Theory.add_ind_decl ctx.th Why3.Decl.Ind [ind_decl]
       end
 
   end

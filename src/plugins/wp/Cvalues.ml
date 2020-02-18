@@ -199,11 +199,6 @@ module TYPE = STRUCTURAL
 
 let has_ctype = TYPE.is_typ
 
-let has_ltype ltype e =
-  match Logic_utils.unroll_type ~unroll_typedef:false ltype with
-  | Ctype typ -> has_ctype typ e
-  | Ltype _ | Lvar _ | Linteger | Lreal | Larrow _ -> p_true
-
 let is_object obj = function
   | Loc _ -> p_true
   | Val e -> TYPE.is_obj obj e
