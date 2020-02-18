@@ -62,6 +62,7 @@ module type Shape = sig
       Used internally to automatically generate efficient accessors of its nodes. *)
   type 'a structure =
     | Unit : unit structure
+    | Void : 'a structure
     | Leaf : 'a key * 'a data -> 'a structure
     | Node : 'a structure * 'b structure -> ('a * 'b) structure
     | Option : 'a structure * 'a -> 'a option structure

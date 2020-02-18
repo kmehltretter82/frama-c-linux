@@ -31,7 +31,8 @@
 *)
 
 (** Module types of value abstractions: either a single leaf module, or
-    a compound of several modules described by a structure. *)
+    a compound of several modules described by a structure. In this last case,
+    the structure must not contain the Void constructor. *)
 type 'v value =
   | Single of (module Abstract_value.Leaf with type t = 'v)
   | Struct of 'v Abstract.Value.structure

@@ -221,6 +221,10 @@ module Internal_Value = struct
         let structure = Node (Value.structure, Leaf (key, v))
       end)
 
+  let void_value () =
+    Value_parameters.fatal
+      "Cannot register a value module from a Void structure."
+
   let add_value_structure value internal =
     let rec aux: type v. (module Internal) -> v structure -> (module Internal) =
       fun value -> function
@@ -228,6 +232,7 @@ module Internal_Value = struct
         | Leaf (key, v) -> add_value_leaf value (V (key, v))
         | Node (s1, s2) -> aux (aux value s1) s2
         | Unit -> value
+        | Void -> void_value ()
     in
     aux value internal
 
@@ -261,6 +266,7 @@ module Internal_Value = struct
           fun (v1, v2) value -> set1 v1 (set2 v2 value)
         | Option (s, default) -> fun v -> set s (Extlib.opt_conv default v)
         | Unit -> fun () value -> value
+        | Void -> void_value ()
       in
       set structure
 
@@ -274,6 +280,7 @@ module Internal_Value = struct
           fun v -> get1 v, get2 v
         | Option (s, _) -> fun v -> Some (get s v)
         | Unit -> fun _ -> ()
+        | Void -> void_value ()
       in
       get structure
 
