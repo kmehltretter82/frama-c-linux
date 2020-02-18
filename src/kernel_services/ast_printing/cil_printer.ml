@@ -1173,13 +1173,13 @@ class cil_printer () = object (self)
     (* print the statement. *)
     if Cil.is_skip s.skind && not s.ghost && s.sattr = [] then begin
       if verbose || s.labels <> [] then begin
-          self#stmt_labels fmt s;
-          fprintf fmt ";"
-        end
+        self#stmt_labels fmt s;
+        fprintf fmt ";"
+      end
     end else begin
       self#in_ghost_if_needed fmt s.ghost ~post_fmt:"%t"
         (fun () ->
-          self#stmt_labels fmt s; self#stmtkind s.sattr next fmt s.skind)
+           self#stmt_labels fmt s; self#stmtkind s.sattr next fmt s.skind)
     end;
     pp_close_box fmt ()
 
