@@ -139,7 +139,8 @@ module Open
   open Shape
 
   let rec mem : type a. 'v Shape.key -> a structure -> bool = fun key -> function
-    | Unit | Void -> false
+    | Unit -> false
+    | Void -> false
     | Leaf (k, _) -> Shape.equal key k
     | Node (left, right) -> mem key left || mem key right
     | Option (s, _) -> mem key s
@@ -154,7 +155,8 @@ module Open
   let lift_get f (Get (key, get)) = Get (key, fun t -> get (f t))
 
   let rec compute_getters : type a. a structure -> (a getter) KMap.t = function
-    | Unit | Void -> KMap.empty
+    | Unit -> KMap.empty
+    | Void -> KMap.empty
     | Leaf (key, _) ->  KMap.singleton key (Get (key, fun (t : a) -> t))
     | Node (left, right) ->
       let l = compute_getters left and r = compute_getters right in
@@ -180,7 +182,8 @@ module Open
   let lift_set f (Set (key, set)) = Set (key, fun v b -> f (fun a -> set v a) b)
 
   let rec compute_setters : type a. a structure -> (a setter) KMap.t = function
-    | Unit | Void -> KMap.empty
+    | Unit -> KMap.empty
+    | Void -> KMap.empty
     | Leaf (key, _) -> KMap.singleton key (Set (key, fun v _t -> v))
     | Node (left, right) ->
       let l = compute_setters left and r = compute_setters right in
