@@ -109,6 +109,16 @@ int ghost_return() {
   return 0;
 }
 
+void shared_cfgs(int x) {
+  switch (x) {
+    /*@ ghost case 3: ; */
+  case 2: ;
+    x = 5;
+  default: ;
+    x ++;
+  }
+}
+
 #endif
 
 #ifdef CANT_CHECK

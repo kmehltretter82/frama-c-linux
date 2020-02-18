@@ -114,8 +114,8 @@ let alteredCFG stmt =
 let checkGhostCFG bhv withGhostStart noGhost =
   let rec do_check visited withGhostStart noGhostStart =
     match (nextSync withGhostStart), (nextSync noGhostStart) with
-    | Stmt withGhost, Stmt _ when StmtSet.mem withGhost visited -> visited
     | Stmt withGhost, Stmt noGhost ->
+      let is_visited = StmtSet.mem withGhost visited in
       let visited = StmtSet.add withGhost visited in
       let withGhost =
         StmtSet.contains_single_elt (nextNonGhostSync withGhost)
@@ -123,6 +123,9 @@ let checkGhostCFG bhv withGhostStart noGhost =
       begin match withGhost, noGhost with
         | Some s1, s2 when not (Stmt.equal s1 (Get_orig.stmt bhv s2)) ->
           alteredCFG withGhostStart ; visited
+
+        (* Note: this test is deferred so that bad stmts are detected above *)
+        | Some _, _ when is_visited -> visited
 
         | Some ({ skind = If(_) } as withGhost), noGhost ->
           let wgThen, wgElse = Cil.separate_if_succs withGhost in
@@ -141,7 +144,7 @@ let checkGhostCFG bhv withGhostStart noGhost =
           let visited = List.fold_left2 do_check visited wgSuccsNG ngSuccs in
           List.fold_left (fun v s -> do_check v s ngDef) visited mustDefault
 
-        | Some ({ skind=Loop(_,wgb,_,_,_) }), { skind=Loop (_, ngb,_,_,_) } ->
+        | Some ({ skind=Loop(_,wgb,_,_,_) }), { skind=Loop (_,ngb,_,_,_) } ->
           begin match wgb.bstmts, ngb.bstmts with
             | s1 :: _ , s2 :: _ -> do_check visited s1 s2
             | _, _ -> visited

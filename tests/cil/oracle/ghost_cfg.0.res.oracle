@@ -26,5 +26,8 @@
   Ghost code breaks CFG starting at:
   /*@ ghost __retres = 1; */
   /*@ ghost goto return_label; */
+[kernel:ghost:bad-use] tests/cil/ghost_cfg.c:114: Warning: 
+  Ghost code breaks CFG starting at:
+  /*@ ghost case 3: ; */
 [kernel] Warning: warning ghost:bad-use treated as deferred error. See above messages for more information.
 [kernel] Frama-C aborted: invalid user input.
