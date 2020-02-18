@@ -43,6 +43,8 @@ let merge old_env new_env =
     stmt_stack = new_env.stmt_stack;
    }
 
+let add_stack stmt env = { env with stmt_stack = stmt :: env.stmt_stack }
+
 let () = Project.set_current (Project.create "simple project")
 
 let x = Cil.makeGlobalVar "x" Cil.intType
@@ -101,7 +103,7 @@ let gen_inst ghost env =
           Cil.new_exp ~loc
             (BinOp (PlusA,Cil.evar v,Cil.one ~loc,Cil.intType)),loc))
   in
-  let env = { env with stmt_stack = stmt :: env.stmt_stack } in
+  let env = add_stack stmt env in
   env, stmt
 
 let gen_block ghost f env =
@@ -120,7 +122,7 @@ let gen_return ghost env =
   in
   let stmt = Cil.mkStmt ~ghost (If (e,Cil.mkBlock [stmt],Cil.mkBlock[],loc)) in
   let env = if ghost then { env with should_fail = true } else env in
-  let env = { env with stmt_stack = stmt :: env.stmt_stack } in
+  let env = add_stack stmt env in
   env, stmt
 
 let mk_label =
@@ -154,6 +156,7 @@ let gen_goto ghost tgt env =
         let stmt =
           Cil.mkStmt ~ghost (Goto (ref forward_goto_target, Loc.unknown))
         in
+        let env = add_stack stmt env in
         env, stmt
       end
     else
@@ -167,6 +170,7 @@ let gen_goto ghost tgt env =
         let should_fail = env.should_fail || should_fail in
         let env = { env with should_fail } in
         let stmt = Cil.mkStmt ~ghost (Goto (ref stmt, Loc.unknown)) in
+        let env = add_stack stmt env in
         env, stmt
       end
   in
@@ -189,10 +193,12 @@ let gen_break ghost env =
              | Last_case_no_default _ -> Break Loc.unknown, false
              | Default g1 -> Break Loc.unknown, not g && not g1 && ghost)
   in
+  let should_fail = env.should_fail || should_fail in
   let stmt = Cil.mkStmt ~ghost skind in
   let e = Cil.(new_exp ~loc (BinOp (Gt,evar ~loc x,integer ~loc 75,intType))) in
   let stmt = Cil.mkStmt ~ghost (If (e,Cil.mkBlock [stmt],Cil.mkBlock [],loc)) in
-  let env = { env with should_fail; stmt_stack = stmt :: env.stmt_stack } in
+  let env = { env with should_fail } in
+  let env = add_stack stmt env in
   env, stmt
 
 let gen_continue ghost env =
@@ -204,26 +210,31 @@ let gen_continue ghost env =
       | None -> Instr (Skip Loc.unknown), false
       | Some (_,g) -> Continue Loc.unknown, not g && ghost
   in
+  let should_fail = should_fail || env.should_fail in
   let stmt = Cil.mkStmt ~ghost skind in
   let e = Cil.(new_exp ~loc (BinOp (Gt,evar ~loc x,integer ~loc 86,intType))) in
   let stmt = Cil.mkStmt ~ghost (If (e,Cil.mkBlock [stmt],Cil.mkBlock [],loc)) in
-  let env = { env with should_fail; stmt_stack = stmt :: env.stmt_stack } in
+  let env = { env with should_fail } in
+  let env = add_stack stmt env in
   env, stmt
 
 let gen_if ghost ghost_else stmt_then stmt_else env =
   let ghost = ghost_status env ghost in
   let loc = Loc.unknown in
+  let stmt = Cil.mkEmptyStmt ~ghost ~loc () in
   let e =
     Cil.new_exp ~loc (BinOp (Ne,Cil.evar ~loc x,Cil.zero ~loc,Cil.intType))
   in
-  let if_env = { env with in_ghost = ghost } in
+  let if_env = add_stack stmt env in
+  let if_env = { if_env with in_ghost = ghost } in
   let new_env, then_s = stmt_then if_env in
   let env = merge env new_env in
   let ghoste = ghost_status if_env ghost_else in
   let new_env = { if_env with in_ghost = ghoste } in
   let new_env, else_s = stmt_else new_env in
   let env = merge env new_env in
-  env, Cil.mkStmt ~ghost (If(e,Cil.mkBlock then_s, Cil.mkBlock else_s,loc))
+  stmt.skind <- If(e,Cil.mkBlock then_s, Cil.mkBlock else_s,loc);
+  env, stmt
 
 let gen_default should_break stmts env =
   let ghost = env.in_ghost in
@@ -232,6 +243,11 @@ let gen_default should_break stmts env =
    *)
   let new_env = { env with stmt_pos = Default ghost } in
   let new_env, stmts = stmts new_env in
+  (* Don't make the statements in the default branch potential goto targets:
+     they could be picked up by gotos inside case branches, which would become
+     forward gotos, complicating the should_fail oracle computation.
+   *)
+  let new_env = { new_env with stmt_stack = env.stmt_stack } in
   let _,s1 = gen_inst ghost env in
   let epilogue =
     if should_break then
@@ -240,20 +256,51 @@ let gen_default should_break stmts env =
       [s1]
   in
   let stmts = stmts @ epilogue in
-  let h = List.hd stmts in
+  let h = Cil.mkEmptyStmt ~ghost ~loc:Loc.unknown () in
   h.labels <- Default Loc.unknown :: h.labels;
+  let stmts = h :: stmts in
   let env = merge env new_env in
   env, Some stmts, []
 
+let ghost_case_breaks has_default other_cases =
+  let rec find_ghost_seq seq = function
+      (* if there's a (non-ghost by definition) default, inspect the ghost
+         cases. Otherwise, non-ghost exits the switch anyway, ghost can break
+         at any time. *)
+    | [] -> if has_default then seq else []
+    | hd :: tl ->
+        if (List.hd hd).ghost then find_ghost_seq (hd :: seq) tl else seq
+  in
+  let seq = find_ghost_seq [] other_cases in
+  let module M = struct exception Has_break end in
+  let vis =
+    object
+      inherit Cil.nopCilVisitor
+      method! vstmt s =
+        match s.skind with
+          | Break _ -> raise M.Has_break
+          | _ -> Cil.DoChildren
+    end
+  in
+  try
+    List.iter
+      (List.iter (fun s -> ignore (Cil.visitCilStmt vis s))) seq;
+    false
+  with M.Has_break -> true
+
 let gen_case ghost should_break my_case cases env =
-  let ghost = ghost_status env ghost in
   let (env,default,others) = cases env in
+  let ghost = ghost_status env ghost in
+  let non_ghost_cases =
+    if env.in_ghost then others else
+      List.filter (fun x -> not (List.hd x).ghost) others
+  in
+  let has_default = match default with None -> false | Some _ -> true in
   let stmt_pos =
-    match default, others with
-      | None, [] -> Last_case_no_default ghost
-      | Some _, [] -> Last_case ghost
-      | None, _ -> Case_no_default ghost
-      | Some _, _ -> Case ghost
+    match non_ghost_cases with
+      | [] ->
+          if has_default then Last_case ghost else Last_case_no_default ghost
+      | _ -> if has_default then Case ghost else Case_no_default ghost
   in
   let should_fail =
     match stmt_pos, env.switch_or_loop with
@@ -271,6 +318,13 @@ let gen_case ghost should_break my_case cases env =
       | Case g1, (_,g2) :: _ ->
           not g2 && g1 (* prevents taking the default clause.*)
   in
+  let should_fail =
+    should_fail ||
+      (* if non-ghost case is supposed to fall through another non-ghost case,
+         we have to inspect all ghost cases in between to search for a
+         break, which would indicate a failure. *)
+      (not ghost && not should_break && ghost_case_breaks has_default others)
+  in
   let should_fail = env.should_fail || should_fail in
   let new_env = { env with in_ghost = ghost; stmt_pos; should_fail } in
   let new_env, stmts = my_case new_env in
@@ -281,6 +335,8 @@ let gen_case ghost should_break my_case cases env =
     else [s1]
   in
   let stmts = stmts @ epilogue in
+  let lab_stmt = Cil.mkEmptyStmt ~ghost ~loc:Loc.unknown () in
+  let stmts = lab_stmt :: stmts in
   let env = merge env new_env in
   env, default, stmts :: others
 
@@ -296,10 +352,13 @@ let gen_cases gen_stmt =
 let gen_switch ghost cases env =
   let loc = Loc.unknown in
   let ghost = ghost_status env ghost in
+  let stmt = Cil.mkEmptyStmt ~ghost ~loc () in
   let new_env =
     { env with
       in_ghost = ghost;
-      switch_or_loop = (Is_switch, ghost) :: env.switch_or_loop }
+      switch_or_loop = (Is_switch, ghost) :: env.switch_or_loop;
+      stmt_stack = stmt :: env.stmt_stack;
+    }
   in
   let (new_env, default, cases) = cases new_env in
   let acc =
@@ -308,7 +367,7 @@ let gen_switch ghost cases env =
       | Some stmts -> [List.hd stmts],stmts
   in
   let count_case = ref 0 in
-  let mk_switch (labels, stmts) case =
+  let mk_switch case (labels, stmts) =
       let h = List.hd case in
       h.labels <-
         Cil_types.Case (Cil.integer Loc.unknown !count_case, Loc.unknown)
@@ -316,19 +375,22 @@ let gen_switch ghost cases env =
       incr count_case;
       (h::labels, case @ stmts)
   in
-  let (labels, stmts) = List.fold_left mk_switch acc cases in
+  let (labels, stmts) = List.fold_right mk_switch cases acc in
   let block = Cil.mkBlock stmts in
   let env = merge env new_env in
-  let stmt = Cil.mkStmt ~ghost (Switch (Cil.evar ~loc x,block,labels,loc)) in
+  stmt.skind <- Switch (Cil.evar ~loc x,block,labels,loc);
   env, stmt
 
 let gen_loop ghost stmts env =
   let loc = Loc.unknown in
   let ghost = ghost_status env ghost in
+  let stmt = Cil.mkEmptyStmt ~ghost ~loc () in
   let new_env =
     { env with
       in_ghost = ghost;
-      switch_or_loop = (Is_loop, ghost) :: env.switch_or_loop }
+      switch_or_loop = (Is_loop, ghost) :: env.switch_or_loop;
+      stmt_stack = stmt :: env.stmt_stack;
+    }
   in
   let (new_env, stmts) = stmts new_env in
   let e =
@@ -338,11 +400,11 @@ let gen_loop ghost stmts env =
     Cil.mkStmt ~ghost
       (If (e,Cil.mkBlock [Cil.mkStmt ~ghost (Break loc)],Cil.mkBlock [],loc))
   in
-  let stmts = cond_stmt :: stmts in
+  let _,inc_stmt = gen_inst ghost new_env in
+  let new_env = add_stack inc_stmt new_env in
+  let stmts = cond_stmt :: stmts @ [inc_stmt] in
   let env = merge env new_env in
-  let stmt =
-    Cil.mkStmt ~ghost (Loop([],Cil.mkBlock stmts,Loc.unknown,None,None))
-  in
+  stmt.skind <- Loop([],Cil.mkBlock stmts,Loc.unknown,None,None);
   env, stmt
 
 let gen_stmt =
@@ -388,7 +450,6 @@ let ignore_deferred_errors () =
 
 let check_file (env, file) =
   prepare();
-  Format.printf "new test@.";
   let temp_dir = Filename.dirname Sys.executable_name in
   let temp_dir =
     temp_dir ^ "/output-" ^ (Filename.basename Sys.executable_name) ^ "/files"
@@ -406,7 +467,6 @@ let check_file (env, file) =
   let success =
     try
       File.prepare_cil_file file;
-      Format.printf "Done@.";
       Log.treat_deferred_error ();
       true
     with
