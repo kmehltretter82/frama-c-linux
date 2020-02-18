@@ -1170,13 +1170,16 @@ class cil_printer () = object (self)
 
   method annotated_stmt (next: stmt) fmt (s: stmt) =
     pp_open_hvbox fmt 0;
-    self#stmt_labels fmt s;
     (* print the statement. *)
     if Cil.is_skip s.skind && not s.ghost && s.sattr = [] then begin
-      if verbose || s.labels <> [] then fprintf fmt ";"
+      if verbose || s.labels <> [] then begin
+        self#stmt_labels fmt s;
+        fprintf fmt ";"
+      end
     end else begin
       self#in_ghost_if_needed fmt s.ghost ~post_fmt:"%t"
-        (fun () -> self#stmtkind s.sattr next fmt s.skind)
+        (fun () ->
+           self#stmt_labels fmt s; self#stmtkind s.sattr next fmt s.skind)
     end;
     pp_close_box fmt ()
 

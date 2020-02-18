@@ -610,6 +610,7 @@ KERNEL_CMO=\
 	src/kernel_services/ast_queries/json_compilation_database.cmo   \
 	src/kernel_services/ast_queries/file.cmo                     \
 	src/kernel_internals/typing/translate_lightweight.cmo         \
+	src/kernel_internals/typing/ghost_cfg.cmo			\
 	src/kernel_internals/typing/allocates.cmo                     \
 	src/kernel_internals/typing/unroll_loops.cmo                  \
 	src/kernel_internals/typing/asm_contracts.cmo                 \
@@ -1442,7 +1443,7 @@ crowbar-%: tests/crowbar/%
 
 crowbar-afl-%: tests/crowbar/%
 	$(MKDIR) tests/crowbar/output-$*
-	afl-fuzz -i tests/crowbar/input -o tests/crowbar/output-$* $< @@
+	afl-fuzz $(AFL_OPTS) -i tests/crowbar/input -o tests/crowbar/output-$* $< @@
 
 ##############
 # Emacs tags #

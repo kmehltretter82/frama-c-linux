@@ -391,6 +391,8 @@ src/kernel_internals/typing/cfg.ml: CIL
 src/kernel_internals/typing/cfg.mli: CIL
 src/kernel_internals/typing/frontc.ml: CIL
 src/kernel_internals/typing/frontc.mli: CIL
+src/kernel_internals/typing/ghost_cfg.ml: CEA_LGPL
+src/kernel_internals/typing/ghost_cfg.mli: CEA_LGPL
 src/kernel_internals/typing/infer_annotations.ml: CEA_LGPL
 src/kernel_internals/typing/infer_annotations.mli: CEA_LGPL
 src/kernel_internals/typing/logic_builtin.ml: CEA_INRIA_LGPL

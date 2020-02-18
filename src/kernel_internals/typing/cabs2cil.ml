@@ -1979,7 +1979,19 @@ struct
     | [] -> (* Add a statement *)
       let n = mkEmptyStmt ~ghost ~valid_sid ~loc () in
       n, [n,[],[],[],[]]
-    | s -> let (st,_,_,_,_) = Extlib.last s in st,s
+    | s ->
+      let (st,_,_,_,_) = Extlib.last s in
+      if not ghost && st.ghost then
+        (* non-ghost label in front of a ghost statement. Keep the
+           non-ghost status with a Skip.
+           Note that the reverse case is not possible:
+           /*@ ghost L1: */ stmt; will be directly translated
+           by the parser as /*@ ghost L1: ; */ stmt;
+        *)
+        begin
+          let n = mkEmptyStmt ~ghost ~valid_sid ~loc () in
+          n, s @ [n,[],[],[],[]]
+        end else st,s
 
   (* s2c must not be used during expression translation, as it does not
      take care of the effects of the statement. Use i2c instead.

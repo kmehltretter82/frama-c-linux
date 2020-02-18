@@ -196,7 +196,6 @@ class printer_with_annot () = object (self)
        loc.Lexing.pos_lnum); *)
     Format.pp_open_hvbox fmt 0;
     (* print the labels *)
-    self#stmt_labels fmt s;
     if Kernel.PrintComments.get () then begin
       let comments = Globals.get_comments_stmt s in
       if comments <> [] then
@@ -207,30 +206,37 @@ class printer_with_annot () = object (self)
     if verbose || Kernel.is_debug_key_enabled Kernel.dkey_print_sid then
       Format.fprintf fmt "@[/* sid:%d */@]@\n" s.sid ;
     (* print the annotations *)
-    if logic_printer_enabled then begin
-      let all_annot =
-        List.sort
-          Cil_datatype.Code_annotation.compare
-          (Annotations.code_annot s)
-      in
-      self#in_ghost_if_needed fmt s.ghost ~post_fmt:"%t"
-        (fun () -> match all_annot with
-           | [] ->  self#stmtkind s.sattr next fmt s.skind;
-           | [ a ] when Cil.is_skip s.skind && not s.ghost ->
-             Format.fprintf fmt "@[<hv>@[%t@ %a@;<1 1>%t@]@ %a@]"
-               self#begin_annotation
-               self#code_annotation a
-               self#end_annotation
-               (self#stmtkind s.sattr next) s.skind;
-           | _ ->
-             let loop_annot, stmt_annot =
-               List.partition Logic_utils.is_loop_annot all_annot
-             in
-             self#annotations fmt stmt_annot;
-             self#loop_annotations fmt loop_annot;
-             self#stmtkind s.sattr next fmt s.skind) ;
-    end else
-      self#stmtkind s.sattr next fmt s.skind;
+    if logic_printer_enabled then
+      begin
+        let all_annot =
+          List.sort
+            Cil_datatype.Code_annotation.compare
+            (Annotations.code_annot s)
+        in
+        self#in_ghost_if_needed fmt s.ghost ~post_fmt:"%t"
+          (fun () ->
+             self#stmt_labels fmt s;
+             match all_annot with
+             | [] ->  self#stmtkind s.sattr next fmt s.skind;
+             | [ a ] when Cil.is_skip s.skind && not s.ghost ->
+               Format.fprintf fmt "@[<hv>@[%t@ %a@;<1 1>%t@]@ %a@]"
+                 self#begin_annotation
+                 self#code_annotation a
+                 self#end_annotation
+                 (self#stmtkind s.sattr next) s.skind;
+             | _ ->
+               let loop_annot, stmt_annot =
+                 List.partition Logic_utils.is_loop_annot all_annot
+               in
+               self#annotations fmt stmt_annot;
+               self#loop_annotations fmt loop_annot;
+               self#stmtkind s.sattr next fmt s.skind) ;
+      end
+    else
+      begin
+        self#stmt_labels fmt s;
+        self#stmtkind s.sattr next fmt s.skind;
+      end;
     Format.pp_close_box fmt ()
 
   method! stmtkind sattr (next: stmt) fmt skind =

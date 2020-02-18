@@ -7,7 +7,7 @@ let root = ref ""
 module Dep_graph = Graph.Imperative.Digraph.Concrete(
   struct
     type t = string
-    let compare = Transitioning.Stdlib.compare
+    let compare = String.compare
     let hash = Hashtbl.hash
     let equal = (=)
   end)
