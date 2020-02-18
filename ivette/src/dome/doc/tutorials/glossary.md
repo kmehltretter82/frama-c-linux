@@ -10,7 +10,7 @@
 ## Component Properties
 
 - `id` an element identifier
-- `icon` an icon identifier, as listed in the [gallery](gallery-icons.html)
+- `icon` an icon identifier, as listed in the [icon gallery](tutorial-icons.html)
 - `label` a short text used as the displayed title of a component
 - `text` textual content to be printed on screen
 - `title` a description for a component, usually provided in a tooltip box

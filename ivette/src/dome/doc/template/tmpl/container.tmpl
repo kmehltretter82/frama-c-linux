@@ -169,7 +169,8 @@
     ?>
 
         <h3 class="subsection-title">Summary</h3>
-        <table class="list-index">
+        <div class="summary">
+        <table class="summary">
         <?js hasMembers && members.forEach(function(m) { ?>
            <tr class="list-item">
              <td class="list-title">
@@ -198,6 +199,7 @@
            </tr>
         <?js }); ?>
         </table>
+        </div>
 
     <?js } ?>
 

@@ -12,15 +12,15 @@ The **Dome** framework provides you with the following facilities:
 - easy integration with any other React components from your own
 - binary distribution for all supported platform (Windows, Linux and MacOS)
 
-# Tutorials
+## To Start With
 
 - [Quick Start](tutorial-quickstart.html)
 - [Live Editing](tutorial-hotreload.html)
 - [Application Design](tutorial-application.html)
-- [Styling Components](tutorial-styling.html)
-- [System Services](tutorial-services.html)
+- [Application Development](tutorial-development.html)
 
-# References
+## References
 
-- [Icon Gallery](gallery-icons.html)
+- [Custom Hooks](tutorial-hooks.html)
+- [Icon Gallery](tutorial-icons.html)
 - [Glossary](tutorial-glossary.html)

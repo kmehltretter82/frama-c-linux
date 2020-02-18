@@ -131,11 +131,10 @@ article dl {
 }
 
 div.summary {
-    margin-top: 10px ;
-    margin-bottom: 10px ;
+    margin-top: 12px ;
+    margin-bottom: 12px ;
     padding-left: 20px ;
     padding-bottom: 10px ;
-    border-bottom: thin solid #c0c0c0 ;
 }
 
 table.summary { }
@@ -211,6 +210,7 @@ footer {
     padding: 6px;
     margin-top: 12px;
     margin-left: 20px;
+    border-top: thin solid #c0c0c0 ;
 }
 
 h1, h2, h3, h4 {

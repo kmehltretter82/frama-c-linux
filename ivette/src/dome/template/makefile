@@ -366,7 +366,7 @@ dome-doc: $(DOME_MK_BIN)/jsdoc $(DOME_MK_ICON_HTML)
 		$(DOME)/doc/template/gallery-head.html \
 		$(DOME)/doc/template/gallery-icons.html \
 		$(DOME)/doc/template/gallery-tail.html \
-		> $(DOME_DOC)/gallery-icons.html
+		> $(DOME_DOC)/tutorial-icons.html
 	@echo "[Dome]   $(DOME_DOC)/index.html"
 
 # --- Doc binaries ---------------------------------------------------------
