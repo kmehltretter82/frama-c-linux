@@ -71,7 +71,7 @@ function loadSettings() {
     s_frames = MERGE( s_frames , 'frames' );
     s_globals = MERGE( s_globals, 'globals' );
     s_application = MERGE( s_application, 'application' );
-    s_preferences = MERGE( s_application, 'preferences' );
+    s_preferences = MERGE( s_preferences, 'preferences' );
   } catch(err) {
     console.error("[Dome] Can not load application settings\n" + err);
   }
