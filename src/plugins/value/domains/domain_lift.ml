@@ -123,8 +123,8 @@ module Make
 
   let show_expr valuation = Domain.show_expr (lift_valuation valuation)
 
-  let logic_assign assigns location ~pre state =
-    Domain.logic_assign assigns (Convert.restrict_loc location) ~pre state
+  let logic_assign assigns location state =
+    Domain.logic_assign assigns (Convert.restrict_loc location) state
 
   let evaluate_predicate = Domain.evaluate_predicate
   let reduce_by_predicate = Domain.reduce_by_predicate

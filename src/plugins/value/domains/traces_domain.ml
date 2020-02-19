@@ -931,7 +931,7 @@ module Internal = struct
     Traces.add_trans state (Msg msg)
 
   (* TODO *)
-  let logic_assign _assign _location ~pre:_ state =
+  let logic_assign _assign _location state =
     Traces.add_trans state (Msg "logic assign")
 
   (* Logic *)

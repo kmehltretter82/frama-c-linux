@@ -267,7 +267,7 @@ module Make
     let env = make_env state in
     let assigns_with_locations = evaluate_locations env retres_loc assigns in
     let transfer state (logic_assign, location) =
-      Domain.logic_assign logic_assign location ~pre state
+      Domain.logic_assign (Some (logic_assign, pre)) location state
     in
     List.fold_left transfer state assigns_with_locations
 

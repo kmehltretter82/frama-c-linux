@@ -300,7 +300,7 @@ module Make_Internal (Info: sig val name: string end) (Value: Value) = struct
   let incr_loop_counter _ state = state
   let leave_loop _ state = state
 
-  let logic_assign _assign location ~pre:_ state = remove location state
+  let logic_assign _assign location state = remove location state
   let evaluate_predicate _ _ _ = Alarmset.Unknown
   let reduce_by_predicate _ state _ _ = `Value state
 

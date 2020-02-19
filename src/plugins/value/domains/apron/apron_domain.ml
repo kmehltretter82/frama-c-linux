@@ -673,7 +673,7 @@ module Make (Man : Input) = struct
 
   let show_expr _valuation _state _fmt _expr = ()
 
-  let logic_assign _assigns location ~pre:_ state = kill_bases location state
+  let logic_assign _assigns location state = kill_bases location state
   let evaluate_predicate _ _ _ = Alarmset.Unknown
   let reduce_by_predicate _ state _ _ = `Value state
 

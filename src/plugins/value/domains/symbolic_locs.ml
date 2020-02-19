@@ -631,7 +631,7 @@ module Internal : Domain_builder.InputDomain
   let initialize_variable _ _ ~initialized:_ _ state = state
 
   (* Logic *)
-  let logic_assign _assigns location ~pre:_ state =
+  let logic_assign _assigns location state =
     let loc = Precise_locs.imprecise_location location in
     Memory.kill loc state
 

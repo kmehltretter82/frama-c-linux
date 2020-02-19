@@ -1296,7 +1296,7 @@ module D_Impl : Abstract_domain.S
   let initialize_variable _ _ ~initialized:_ _ state = state
 
   (* Logic *)
-  let logic_assign _assigns location ~pre:_ state = kill location state
+  let logic_assign _assigns location state = kill location state
   let evaluate_predicate _ _ _ = Alarmset.Unknown
   let reduce_by_predicate _ state _ _ = `Value state
 

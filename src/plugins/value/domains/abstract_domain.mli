@@ -358,12 +358,13 @@ module type S = sig
   (** Logical evaluation. This API is subject to changes. *)
   (* TODO: cooperative evaluation of predicates in the engine. *)
 
-  (** [logic_assign from loc_asgn pre state] applies the effect of the
-      [assigns ... \from ...] clause [from] to [state]. [pre] is the state
-      before the assign clauses, in which the terms of the clause are evaluated.
-      [loc_asgn] is the result of the evaluation of the [assigns] part of [from]
-      in [pre]. *)
-  val logic_assign: logic_assign -> location -> pre:state -> state -> state
+  (** [logic_assign None loc state] removes from [state] all inferred properties
+      that depend on the memory location [loc].
+      If the first argument is not None, it contains the logical clause being
+      interpreted and the pre-state in which the terms of the clause are
+      evaluated. The clause can be an \assign, \allocated or \free clause.
+      [loc] is then the memory location concerned by the clause. *)
+  val logic_assign: (logic_assign * state) option -> location -> state -> state
 
   (** Evaluates a [predicate] to a logical status in the current [state].
       The [logic_environment] contains the states at some labels and the

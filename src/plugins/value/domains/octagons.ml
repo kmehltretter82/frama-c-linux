@@ -1235,7 +1235,7 @@ module Domain = struct
 
   let show_expr _valuation _state _fmt _expr = ()
 
-  let logic_assign _logic_assign location ~pre:_ state =
+  let logic_assign _logic_assign location state =
     let loc = Precise_locs.imprecise_location location in
     let zone = Locations.(enumerate_valid_bits Write loc) in
     let state = kill zone state in

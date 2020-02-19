@@ -102,7 +102,7 @@ module Make_Minimal
     let lval = Cil.var varinfo in
     Domain.initialize_variable lval ~initialized:true Abstract_domain.Top state
 
-  let logic_assign _assigns _location ~pre:_ _state = top
+  let logic_assign _assigns _location _state = top
   let evaluate_predicate _ _ _ = Alarmset.Unknown
   let reduce_by_predicate _ t _ _ = `Value t
 
@@ -239,7 +239,7 @@ module Complete_Simple_Cvalue (Domain: Simpler_domains.Simple_Cvalue)
       let lval = Cil.var varinfo in
       Domain.initialize_variable lval ~initialized:true Abstract_domain.Top state
 
-    let logic_assign _assigns _location ~pre:_ _state = top
+    let logic_assign _assigns _location _state = top
     let evaluate_predicate _ _ _ = Alarmset.Unknown
     let reduce_by_predicate _ t _ _ = `Value t
 

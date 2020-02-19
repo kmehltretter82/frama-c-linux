@@ -503,7 +503,7 @@ module Make
     | Some equality -> Equality.Equality.pretty fmt equality
     | None -> ()
 
-  let logic_assign _assigns location ~pre:_ state =
+  let logic_assign _assigns location state =
     let loc = Precise_locs.imprecise_location location in
     let zone = Locations.(enumerate_valid_bits Write loc) in
     kill Hcexprs.Modified zone state

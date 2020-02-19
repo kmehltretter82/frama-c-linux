@@ -67,7 +67,7 @@ module Make
   let finalize_call _ _ ~pre:_ ~post:_ = `Value ()
   let show_expr _ _ _ _ = ()
 
-  let logic_assign _ _ ~pre:_ _ = ()
+  let logic_assign _ _ _ = ()
   let evaluate_predicate _ _ _ = Alarmset.Unknown
   let reduce_by_predicate _ _ _ _ = `Value ()
 

@@ -227,9 +227,14 @@ module Make
          print_one_side fmt right_log Right.name Right.pretty right)
 
 
-  let logic_assign assign location ~pre:(left_pre, right_pre) (left, right) =
-    Left.logic_assign assign location ~pre:left_pre left,
-    Right.logic_assign assign location ~pre:right_pre right
+  let logic_assign assign location (left, right) =
+    let left_assign, right_assign =
+      match assign with
+      | None -> None, None
+      | Some (assign, (left, right)) -> Some (assign, left), Some (assign, right)
+    in
+    Left.logic_assign left_assign location left,
+    Right.logic_assign right_assign location right
 
   let lift_logic_env f logic_env =
     Abstract_domain.{ states = (fun label -> f (logic_env.states label));

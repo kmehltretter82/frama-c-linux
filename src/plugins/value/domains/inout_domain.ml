@@ -261,7 +261,7 @@ module Internal
   let initialize_variable_using_type _ _ state  = state
 
   (* TODO *)
-  let logic_assign _assign _location ~pre:_ _state = top
+  let logic_assign _assign _location _state = top
 
   (* Logic *)
   let evaluate_predicate _ _ _ = Alarmset.Unknown
