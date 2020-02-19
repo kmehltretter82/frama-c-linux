@@ -65,6 +65,14 @@ let noGhostFD prj fd =
             DoChildren
         end
 
+    method! vblock b =
+      if Cil.is_ghost_else b then begin
+        b.bstmts <- [] ;
+        b.battrs <- Cil.dropAttribute Cil.frama_c_ghost_else b.battrs ;
+        SkipChildren
+      end else
+        DoChildren
+
     method getBehavior () = self#behavior
   end in
   (visitCilFunction (visitor :> cilVisitor) fd), (visitor#getBehavior ())
@@ -108,7 +116,8 @@ let nextNonGhostSync stmt =
   fst (do_find (StmtSet.empty, StmtSet.empty) stmt)
 
 let alteredCFG stmt =
-  error ~source:(fst (Stmt.loc stmt)) "Ghost code breaks CFG starting at:@.%a"
+  error ~once:true ~source:(fst (Stmt.loc stmt))
+    "Ghost code breaks CFG starting at:@.%a"
     Cil_printer.pp_stmt stmt
 
 let checkGhostCFG bhv withGhostStart noGhost =
