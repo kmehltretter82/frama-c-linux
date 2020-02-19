@@ -176,17 +176,11 @@ let labels_assert_after ~kf s l_post = function
   | BuiltinLabel Here as l -> option l l_post
   | l -> labels_fct ~kf ~at:s l
 
-let labels_loop_inv ~established s = function
-  | BuiltinLabel Here -> Clabels.here
+let labels_loop s = function
+  | BuiltinLabel (Here | LoopCurrent) -> Clabels.here
   | BuiltinLabel LoopEntry -> Clabels.loop_entry s
-  | BuiltinLabel LoopCurrent ->
-      if established
-      then Clabels.loop_entry s
-      else Clabels.loop_current s
   | FormalLabel wplabel -> Clabels.formal wplabel
   | l -> labels_fct ?kf:None ?at:None l (* current loop is handled above *)
-
-let labels_loop_assigns s l = labels_loop_inv ~established:false s l
 
 (* -------------------------------------------------------------------------- *)
 (* --- User Defined Predicates                                            --- *)

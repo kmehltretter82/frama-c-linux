@@ -13,7 +13,8 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Preservation of Invariant 'A' (file tests/wp_bts/issue_801.i, line 11):
-Prove: true.
+Assume { Type: is_sint32(s). (* Then *) Have: s <= 9. }
+Prove: false.
 
 ------------------------------------------------------------
 
