@@ -243,4 +243,6 @@ let transform_category =
   File.register_code_transformation_category "Ghost Accesses checking"
 
 let () =
-  File.add_code_transformation_after_cleanup transform_category checkGhostAccesses
+  File.add_code_transformation_after_cleanup
+    ~after:[Ghost_cfg.transform_category]
+    transform_category checkGhostAccesses
