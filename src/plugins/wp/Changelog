@@ -30,7 +30,9 @@
 - WP          [2019/01/29] Emit a warning when no goal is generated
 - TIP         [2018/04/03] Create session directory only on demand
 - TIP         [2018/03/19] Specification of JSON script format
+- Wp          [2018/03/18] Additional lemma about remainder (mod)
 - TIP         [2018/03/18] Refactor structure of session directory (remove models)
+- Wp          [2018/02/18] Additional lemmas about logical shift compositions
 
 ##########################
 Plugin WP 20.0 (Calcium)

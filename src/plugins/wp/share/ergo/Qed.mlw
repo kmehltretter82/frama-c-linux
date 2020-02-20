@@ -152,3 +152,7 @@ axiom cdiv_neutral : (forall a:int [div(a, 1)]. (div(a, 1) = a))
 axiom cdiv_inv :
   (forall a:int [div(a, a)]. ((not (a = 0)) -> (div(a, a) = 1)))
 
+axiom cdiv_closed_remainder :
+  (forall a:int. forall b:int. forall n:int. ((0 <= a) -> ((0 <= b) ->
+  (((0 <= (b - a)) and ((b - a) <  n)) -> ((mod(a,n) = mod(b,n)) ->
+  (a = b))))))

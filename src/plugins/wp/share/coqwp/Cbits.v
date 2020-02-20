@@ -168,6 +168,118 @@ Proof.
   split; split; split; Zbits.auto_zbits.
 Qed.
 
+(* Why3 goal *)
+Lemma lsl_0 : forall (x:Z), ((Cint.lsl x 0%Z) = x).
+Proof.
+  intros x.
+  unfold Cint.lsl.
+  rewrite Zbits.lsl_pos ; auto with zarith.
+  unfold Zbits.lsl_def. simpl.
+  rewrite Zbits.lsl_arithmetic_shift.
+  unfold Zbits.lsl_arithmetic_def. unfold two_power_nat. simpl.
+  auto with zarith.
+Qed.
+
+(* Why3 goal *)
+Lemma lsl_1 : forall (x:Z), ((Cint.lsl x 1%Z) = (2%Z * x)%Z).
+Proof.
+  intros x.
+  unfold Cint.lsl.
+  rewrite Zbits.lsl_pos ; auto with zarith.
+  unfold Zbits.lsl_def.
+  rewrite Zbits.lsl_arithmetic_shift.
+  unfold Zbits.lsl_arithmetic_def.
+  replace (two_power_nat (Z.abs_nat 1)) with 2%Z ; auto with zarith.
+Qed.
+
+(* Why3 goal *)
+Lemma lsl_add : forall (x:Z) (p:Z) (q:Z), (0%Z <= p)%Z -> ((0%Z <= q)%Z ->
+  ((Cint.lsl (Cint.lsl x p) q) = (Cint.lsl x (p + q)%Z))).
+Proof.
+  intros x p q h1 h2.
+  repeat unfold Cint.lsl.
+  repeat (rewrite Zbits.lsl_pos ; auto with zarith).
+  repeat unfold Zbits.lsl_def.
+  repeat rewrite Zbits.lsl_arithmetic_shift.
+  repeat unfold Zbits.lsl_arithmetic_def.
+  replace (Z.abs_nat (p+q)) with (Z.abs_nat p + Z.abs_nat q).
+    - rewrite Bits.two_power_nat_plus. auto with zarith. 
+    - rewrite Zabs2Nat.inj_add ; auto with zarith.
+Qed.
+
+(* Why3 goal *)
+Lemma lsr_0 : forall (x:Z), ((Cint.lsr x 0%Z) = x).
+Proof.
+  intros x.
+  unfold Cint.lsr.
+  rewrite Zbits.lsr_pos ; auto with zarith.
+  unfold Zbits.lsr_def. simpl.
+  rewrite Zbits.lsr_arithmetic_shift.
+  unfold Zbits.lsr_arithmetic_def. unfold two_power_nat. simpl.
+  auto with zarith.
+Qed.
+
+(* Why3 goal *)
+Lemma lsr_1 : forall (x:Z), (0%Z <= x)%Z -> ((Cint.lsr x
+  1%Z) = (ZArith.BinInt.Z.quot x 2%Z)).
+Proof.
+  intros pos x.
+  unfold Cint.lsr.
+  rewrite Zbits.lsr_pos ; auto with zarith.
+  unfold Zbits.lsr_def.
+  rewrite Zbits.lsr_arithmetic_shift.
+  unfold Zbits.lsr_arithmetic_def.
+  replace (two_power_nat (Z.abs_nat 1)) with 2%Z ; auto with zarith.
+  rewrite Z.quot_div_nonneg ; auto with zarith.
+Qed.
+
+(* Why3 goal *)
+Lemma lsr_add : forall (x:Z) (p:Z) (q:Z), (0%Z <= p)%Z -> ((0%Z <= q)%Z ->
+  ((Cint.lsr (Cint.lsr x p) q) = (Cint.lsr x (p + q)%Z))).
+Proof.
+  intros x p q h1 h2.
+  repeat unfold Cint.lsr.
+  repeat (rewrite Zbits.lsr_pos ; auto with zarith).
+  repeat unfold Zbits.lsr_def.
+  repeat rewrite Zbits.lsr_arithmetic_shift.
+  repeat unfold Zbits.lsr_arithmetic_def.
+  replace (Z.abs_nat (p+q)) with (Z.abs_nat p + Z.abs_nat q).
+    - rewrite Bits.two_power_nat_plus.
+      rewrite Z.div_div ; auto with zarith.
+      generalize (Bits.two_power_nat_is_positive (Z.abs_nat p)).
+      auto with zarith. apply Bits.two_power_nat_is_positive.
+    - rewrite Zabs2Nat.inj_add ; auto with zarith.
+Qed.
+
+(* Why3 goal *)
+Lemma lsl_lsr_add : forall (x:Z) (p:Z) (q:Z), ((0%Z <= q)%Z /\ (q <= p)%Z) ->
+  ((Cint.lsr (Cint.lsl x p) q) = (Cint.lsl x (p - q)%Z)).
+Proof.
+  intros x p q (h1,h2).
+  repeat unfold Cint.lsr.
+  repeat unfold Cint.lsl.
+  repeat (rewrite Zbits.lsr_pos ; auto with zarith).
+  repeat (rewrite Zbits.lsl_pos ; auto with zarith).
+  repeat unfold Zbits.lsr_def.
+  repeat unfold Zbits.lsl_def.
+  repeat rewrite Zbits.lsr_arithmetic_shift.
+  repeat unfold Zbits.lsr_arithmetic_def.
+  repeat rewrite Zbits.lsl_arithmetic_shift.
+  repeat unfold Zbits.lsl_arithmetic_def.
+  pose ( r := (p - q)%Z ).
+  fold r.
+  replace p with (q+r)%Z by (unfold r ; auto with zarith).
+  replace (Z.abs_nat (q+r)) with (Z.abs_nat q + Z.abs_nat r).
+     * rewrite Bits.two_power_nat_plus.
+       replace (two_power_nat (Z.abs_nat q) * two_power_nat (Z.abs_nat r))%Z
+          with (two_power_nat (Z.abs_nat r) * two_power_nat (Z.abs_nat q))%Z by (apply Z.mul_comm).
+       rewrite Z.mul_assoc.
+       rewrite Z_div_mult. auto.
+       generalize (Bits.two_power_nat_is_positive (Z.abs_nat q)).
+       auto with zarith.
+     * rewrite Zabs2Nat.inj_add ; unfold r ; auto with zarith.
+Qed.
+
 Require Import Qedlib.
 Local Open Scope Z_scope.
 Require Import Zbits.

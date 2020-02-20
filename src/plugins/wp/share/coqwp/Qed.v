@@ -204,3 +204,27 @@ Proof.
   exact (Z.quot_same a h1).
 Qed.
 
+(* Why3 goal *)
+Lemma cdiv_closed_remainder : forall (a:Z) (b:Z) (n:Z), (0%Z <= a)%Z ->
+  ((0%Z <= b)%Z -> (((0%Z <= (b - a)%Z)%Z /\ ((b - a)%Z < n)%Z) ->
+  (((ZArith.BinInt.Z.rem a n) = (ZArith.BinInt.Z.rem b n)) -> (a = b)))).
+Proof.
+  intros a b n PA PB Range Rem.
+  Require Import ZArith.
+  Open Scope Z_scope.
+  pose (p := a/n).
+  pose (q := b/n).
+  replace (Z.rem a n) with (a mod n) in Rem by (rewrite Z.rem_mod_nonneg ; auto with zarith).
+  replace (Z.rem b n) with (b mod n) in Rem by (rewrite Z.rem_mod_nonneg ; auto with zarith).
+  assert (A : a = n * (a/n) + (a mod n)) by (apply Z.div_mod ; auto with zarith). fold p in A.
+  assert (B : b = n * (b/n) + (b mod n)) by (apply Z.div_mod ; auto with zarith). fold q in B.
+  assert (D : (b-a) = n * q - n * p) by (auto with zarith).
+  rewrite <- Z.mul_sub_distr_l in D.
+  assert (R : (b-a) = n * ((b-a)/n) + ((b-a) mod n)) by (apply Z.div_mod ; auto with zarith).
+  assert (Q : (q-p) = (b-a) / n) by (apply Z.div_unique_exact ; auto with zarith).
+  rewrite Q in D.
+  assert (Z : (b-a) mod n = 0) by (auto with zarith).
+  replace ((b - a) mod n) with (b-a) in Z by (symmetry ; apply Z.mod_small ; auto with zarith).
+  auto with zarith.
+Qed.
+
