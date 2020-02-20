@@ -248,14 +248,13 @@ diff tests/value/oracle/nonlin.res.oracle tests/value/oracle_octagons/nonlin.res
 111a117,118
 > [eva:nonlin] tests/value/nonlin.c:70: non-linear 'z * x + x * y', lv 'x'
 > [eva:nonlin] tests/value/nonlin.c:70: subdividing on x
-176,178c183,185
-<   square ∈ [-48..400]
-<   square2 ∈ [-48..400]
-<   res ∈ [-144..400]
----
->   square ∈ [-200..400]
->   square2 ∈ [-200..400]
->   res ∈ [-200..400]
+149a157,158
+> [eva:nonlin] tests/value/nonlin.c:114: non-linear 'x * x', lv 'x'
+> [eva:nonlin] tests/value/nonlin.c:114: subdividing on x
+152a162
+> [eva:nonlin] tests/value/nonlin.c:115: subdividing on x
+153a164
+> [eva:nonlin] tests/value/nonlin.c:117: subdividing on x
 diff tests/value/oracle/plevel.res.oracle tests/value/oracle_octagons/plevel.res.oracle
 12d11
 < [eva] Recording results for main

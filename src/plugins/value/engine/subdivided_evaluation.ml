@@ -589,6 +589,7 @@ module Make
      produced by [split]. If split produces [n] subvalues each time, then
      [compute] is applied [subdivnb * n] times. *)
   let do_subdiv subdivnb subdivision has_better_bound split compute =
+    let previous_cmp = !Subdivision.cmp_result in
     Subdivision.cmp_result := has_better_bound;
     let working_list = ref (Subdivision.reorder subdivision) in
     let min = Subdivision.min !working_list in
@@ -603,21 +604,24 @@ module Make
         bound := Bottom.join Value.join disjunct.result !bound;
       Subdivision.insert disjunct subdivision;
     in
-    try
-      for _i = 1 to subdivnb do
-        let disjunct, subdiv = Subdivision.extract_min !working_list in
-        if has_better_bound disjunct.result !bound >= 0 then
-          (* The bound of this disjunct result is already better than [!bound],
-             which must be in the final result. Thus, there is no point in
-             subdividing [disjunct]. And since [subdivision] is sorted, all the
-             other subdivisions also have a better bound. Thus, we stop. *)
-          raise Abstract_interp.Can_not_subdiv;
-        let subvalues_list = split disjunct.hypotheses in
-        let subdiv = List.fold_left compute_disjunct subdiv subvalues_list in
-        working_list := subdiv;
-      done;
-      !working_list
-    with Abstract_interp.Can_not_subdiv -> !working_list
+    begin
+      try
+        for _i = 1 to subdivnb do
+          let disjunct, subdiv = Subdivision.extract_min !working_list in
+          if has_better_bound disjunct.result !bound >= 0 then
+            (* The bound of this disjunct result is already better than [!bound],
+               which must be in the final result. Thus, there is no point in
+               subdividing [disjunct]. And since [subdivision] is sorted, all
+               the other subdivisions also have a better bound. Thus, we stop. *)
+            raise Abstract_interp.Can_not_subdiv;
+          let subvalues_list = split disjunct.hypotheses in
+          let subdiv = List.fold_left compute_disjunct subdiv subvalues_list in
+          working_list := subdiv;
+        done;
+      with Abstract_interp.Can_not_subdiv -> ()
+    end;
+    Subdivision.cmp_result := previous_cmp;
+    !working_list
 
   let better_bound compare_bound e1 e2 =
     match e1, e2 with

@@ -621,7 +621,7 @@ diff tests/value/oracle/non_natural.res.oracle tests/value/oracle_equalities/non
 > [kernel] tests/value/non_natural.i:39: 
 >   more than 200(12500) elements to enumerate. Approximating.
 diff tests/value/oracle/nonlin.res.oracle tests/value/oracle_equalities/nonlin.res.oracle
-159c159
+186c186
 <   q ∈ {{ &x + [-400..400],0%4 }}
 ---
 >   q ∈ {{ &x }}
