@@ -91,6 +91,7 @@ module Reduce: Parameter_sig.Bool
 module ExtEqual : Parameter_sig.Bool
 module UnfoldAssigns : Parameter_sig.Bool
 module Split: Parameter_sig.Bool
+module SplitMax: Parameter_sig.Int
 module SplitDepth: Parameter_sig.Int
 module DynCall : Parameter_sig.Bool
 module SimplifyIsCint : Parameter_sig.Bool

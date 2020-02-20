@@ -888,8 +888,11 @@ weakest precondition calculus.
 \item[\tt -wp-(no)-split] conjunctions in generated proof obligations are
   recursively split into sub-goals.  The generated goal names are
   suffixed by ``{\tt part<{\it n}>}'' (defaults to \texttt{no}).
-\item[\tt -wp-split-depth <d>] sets the depth of exploration for the
+\item[\tt -wp-split-depth <{\it d}>] sets the depth of exploration for the
   \texttt{-wp-split} option. ``-1'' stands for unlimited depth. Default is 0.
+\item[\tt -wp-split-max <{\it n}>] When \verb+-wp-split+ is active,
+  limit the number of generated sub-goals to \textit{n} parts on each conditional statement.
+  (defaults to \verb+1000+).
 \item[\tt -wp-(no)-callee-precond] includes preconditions of the callee
   after\footnote{Proof obligations are always generated to check preconditions.}
   a call (default is: \texttt{yes}).

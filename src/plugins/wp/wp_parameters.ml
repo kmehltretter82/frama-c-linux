@@ -389,8 +389,17 @@ module SplitDepth =
     let option_name = "-wp-split-depth"
     let default = 0
     let arg_name = "p"
-    let help = "Set depth of exploration for splitting conjunctions into sub-goals.\n\
-                Value `-1` means an unlimited depth."
+    let help = "Set depth for splitting conjunctions into sub-goals.\n\
+                Value -1 means unlimited depth (default 0)"
+  end)
+
+let () = Parameter_customize.set_group wp_strategy
+module SplitMax =
+  Int(struct
+    let option_name = "-wp-max-split"
+    let default = 1000
+    let arg_name = "n"
+    let help = "Set maximum number of splitted sub-goals (default 1000)"
   end)
 
 let () = Parameter_customize.set_group wp_strategy

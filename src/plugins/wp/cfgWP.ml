@@ -757,6 +757,9 @@ struct
     let v = Lang.freshvar ~basename:"cond" Logic.Bool in
     F.p_bool (F.e_var v)
 
+  let weight vcs =
+    Gmap.fold (fun _g s n -> n + Splitter.length s) vcs 0
+
   let test wenv stmt exp wp1 wp2 = L.in_frame wenv.frame
       (fun () ->
          let sigma,pa1,pa2 = sigma_union wp1.sigma wp2.sigma in
@@ -769,8 +772,14 @@ struct
            | Warning.Failed(warn) -> warn,random()
          in
          let effects = Eset.union wp1.effects wp2.effects in
+         let dosplit =
+           Wp_parameters.Split.get () &&
+           let n1 = weight wp1.vcs in
+           let n2 = weight wp2.vcs in
+           let nm = Wp_parameters.SplitMax.get () in
+           n1 + n2 <= nm in
          let vcs =
-           if Wp_parameters.Split.get () then
+           if dosplit then
              let cneg = p_not cond in
              let vcs1 = gmap (condition pa1 ~stmt ~warn ~descr:"Then" [cond]) wp1.vcs in
              let vcs2 = gmap (condition pa2 ~stmt ~warn ~descr:"Else" [cneg]) wp2.vcs in
