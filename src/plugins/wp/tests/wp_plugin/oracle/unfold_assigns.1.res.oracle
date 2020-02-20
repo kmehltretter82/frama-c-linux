@@ -72,10 +72,10 @@ Let a = Load_S1_S(q, Mint_0).
 Let a_1 = Load_S1_S(q, havoc(Mint_undef_0, Mint_0, p, 2)).
 Assume {
   Type: IsS1_S(a) /\ IsS1_S(a_1).
+  (* Heap *)
+  Type: (region(p.base) <= 0) /\ (region(q.base) <= 0).
   (* Goal *)
   When: separated(p, 2, q, 2).
-  (* Heap *)
-  Have: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\ linked(Malloc_0).
 }
 Prove: EqS1_S(a_1, a).
 
@@ -101,10 +101,10 @@ Let a = Load_S1_S(q, Mint_0).
 Let a_1 = Load_S1_S(q, havoc(Mint_undef_0, Mint_0, p, 2)).
 Assume {
   Type: IsS1_S(a) /\ IsS1_S(a_1).
+  (* Heap *)
+  Type: (region(p.base) <= 0) /\ (region(q.base) <= 0).
   (* Goal *)
   When: separated(p, 2, q, 2).
-  (* Heap *)
-  Have: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\ linked(Malloc_0).
 }
 Prove: EqS1_S(a_1, a).
 

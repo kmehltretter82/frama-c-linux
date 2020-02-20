@@ -11,11 +11,7 @@ Goal Post-condition 'KO' in 'alias':
 Let a = global(P_r_39).
 Let x = Mint_1[a].
 Let x_1 = Mint_0[a].
-Assume {
-  Type: is_sint32(x) /\ is_sint32(x_1).
-  (* Heap *)
-  Have: linked(Malloc_0).
-}
+Assume { Type: is_sint32(x) /\ is_sint32(x_1). }
 Prove: x_1 = x.
 
 ------------------------------------------------------------
@@ -52,7 +48,7 @@ Let x_1 = Mint_0[p].
 Assume {
   Type: is_sint32(x) /\ is_sint32(x_1).
   (* Heap *)
-  Have: region(p.base) <= 0.
+  Type: region(p.base) <= 0.
 }
 Prove: x_1 = x.
 

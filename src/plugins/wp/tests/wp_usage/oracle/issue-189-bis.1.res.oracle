@@ -12,8 +12,6 @@ Assume {
   Type: is_sint32(len_0) /\ is_sint32(len_1).
   (* Goal *)
   When: (0 <= i) /\ ((2 + i) <= len_0).
-  (* Heap *)
-  Have: linked(Malloc_0).
   (* Pre-condition *)
   Have: ((0 < len_0) -> (len_0 <= 1)).
   (* Invariant 'ok,cpy' *)
@@ -46,8 +44,6 @@ Assume {
   Type: is_sint32(len_0) /\ is_sint32(len_1) /\ is_sint32(len_1 - 1).
   (* Goal *)
   When: (0 <= i) /\ ((i + len_1) <= len_0).
-  (* Heap *)
-  Have: linked(Malloc_0).
   (* Pre-condition *)
   Have: ((0 < len_0) -> (len_0 <= 1)).
   (* Invariant 'ok,cpy' *)
@@ -86,8 +82,6 @@ Let a = global(G_src_45).
 Let a_1 = global(G_dst_46).
 Assume {
   Type: is_sint32(len_1) /\ is_sint32(len_0) /\ is_sint32(len_0 - 1).
-  (* Heap *)
-  Have: linked(Malloc_0).
   (* Pre-condition *)
   Have: ((0 < len_1) -> (len_1 <= 1)).
   (* Invariant 'ok,cpy' *)
@@ -146,10 +140,10 @@ Let a_1 = global(G_dst_46).
 Let a_2 = shift_uint8(a_1, 0).
 Assume {
   Type: is_sint32(len_0) /\ is_sint32(len_1).
+  (* Heap *)
+  Type: linked(Malloc_0).
   (* Goal *)
   When: !invalid(Malloc_0, tmp_0, 1).
-  (* Heap *)
-  Have: linked(Malloc_0).
   (* Pre-condition *)
   Have: ((0 < len_0) -> (len_0 <= 1)).
   (* Invariant 'ok,cpy' *)

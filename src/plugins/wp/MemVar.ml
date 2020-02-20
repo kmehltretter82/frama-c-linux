@@ -933,13 +933,16 @@ struct
   let frame sigma =
     let hs = ref [] in
     SIGMA.iter
-      (fun x chunk ->
-         if (x.vglob || x.vformal) then
-           let t = VAR.typ_of_chunk x in
-           let v = e_var chunk in
-           let h = forall_pointers (M.global sigma.mem) v t in
-           if not (F.eqp h F.p_true) then hs := h :: !hs
-      ) sigma.vars ;
+     begin fun x chunk ->
+       (if (x.vglob || x.vformal) then
+          let t = VAR.typ_of_chunk x in
+          let v = e_var chunk in
+          let h = forall_pointers (M.global sigma.mem) v t in
+          if not (F.eqp h F.p_true) then hs := h :: !hs ) ;
+       (if x.vglob then
+          let v = e_var chunk in
+          hs := Cvalues.has_ctype x.vtype v :: !hs ) ;
+     end sigma.vars ;
     !hs @ M.frame sigma.mem
 
   (* -------------------------------------------------------------------------- *)

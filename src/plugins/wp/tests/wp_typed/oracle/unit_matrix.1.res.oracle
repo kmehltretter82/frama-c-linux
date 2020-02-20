@@ -13,6 +13,8 @@ Let x = m[c <- m[c][d <- 2]][a][b].
 Assume {
   Type: is_sint32(a) /\ is_sint32(b) /\ is_sint32(c) /\ is_sint32(d) /\
       is_sint32(x).
+  (* Heap *)
+  Type: IsArray2_sint32(t).
   (* Goal *)
   When: c != a.
 }
@@ -31,6 +33,8 @@ Let x = m[c <- m[c][d <- 2]][a][b].
 Assume {
   Type: is_sint32(a) /\ is_sint32(b) /\ is_sint32(c) /\ is_sint32(d) /\
       is_sint32(x).
+  (* Heap *)
+  Type: IsArray2_sint32(t).
 }
 Prove: x = 1.
 

@@ -11,6 +11,8 @@ Goal Post-condition (file tests/wp_hoare/dispatch_var2.i, line 37) in 'call_glob
 Assume {
   Type: is_sint32(call_global_0) /\ is_sint32(load_0) /\ is_sint32(tmp_0) /\
       is_sint32(x).
+  (* Heap *)
+  Type: is_sint32(x_1).
   (* Block In *)
   Have: (ta_tmp_0=false).
   (* Call 'reset' *)
@@ -38,6 +40,8 @@ Goal Assigns (file tests/wp_hoare/dispatch_var2.i, line 36) in 'call_global' (2/
 Call Result at line 42
 Assume {
   Type: is_sint32(load_0) /\ is_sint32(tmp_0) /\ is_sint32(x).
+  (* Heap *)
+  Type: is_sint32(x_1).
   Have: (ta_tmp_1=true) <-> (ta_tmp_0=true).
   (* Block In *)
   Have: (ta_tmp_1=false).

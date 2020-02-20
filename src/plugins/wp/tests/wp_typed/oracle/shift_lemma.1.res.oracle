@@ -15,7 +15,7 @@ Assume {
       is_sint32(Mint_0[shiftfield_F1_t_c(shift_t(a, 0))]) /\
       is_sint32(Mint_0[shiftfield_F1_t_c(shift_t(a, 1))]).
   (* Heap *)
-  Have: region(p.base) <= 0.
+  Type: region(p.base) <= 0.
   (* Pre-condition *)
   Have: P_inv(Mint_0, p).
 }
@@ -29,10 +29,10 @@ Assume {
   Type: is_sint32(Mint_0[shiftfield_F2_s_e(p)]) /\
       is_sint32(Mint_0[shiftfield_F1_t_c(shift_t(a, 0))]) /\
       is_sint32(Mint_0[shiftfield_F1_t_c(shift_t(a, 1))]).
+  (* Heap *)
+  Type: region(p.base) <= 0.
   (* Goal *)
   When: (0 <= i) /\ (i <= 9) /\ is_sint32(i).
-  (* Heap *)
-  Have: region(p.base) <= 0.
   (* Pre-condition *)
   Have: P_inv(Mint_0, p).
   (* Assertion *)
@@ -57,7 +57,7 @@ Let x = Mint_0[shiftfield_F2_s_e(p)].
 Assume {
   Type: is_sint32(x).
   (* Heap *)
-  Have: region(p.base) <= 0.
+  Type: region(p.base) <= 0.
   (* Pre-condition *)
   Have: P_inv(Mint_0, p).
   (* Assertion *)

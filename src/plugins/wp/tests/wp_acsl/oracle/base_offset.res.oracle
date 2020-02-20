@@ -20,10 +20,10 @@ Prove: true.
 Goal Post-condition (file tests/wp_acsl/base_offset.i, line 15) in 'f':
 Let x = p.offset.
 Assume {
+  (* Heap *)
+  Type: region(p.base) <= 0.
   (* Goal *)
   When: (0 <= i) /\ (i <= i_1) /\ (i_1 <= 3).
-  (* Heap *)
-  Have: region(p.base) <= 0.
 }
 Prove: base_offset(1 + i + x) <= base_offset(1 + i_1 + x).
 

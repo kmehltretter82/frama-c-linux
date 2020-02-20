@@ -15,10 +15,10 @@ Prove: true.
 Goal Post-condition 'A' in 'job':
 Assume {
   Type: is_sint32(i_1) /\ is_sint32(n).
+  (* Heap *)
+  Type: region(b.base) <= 0.
   (* Goal *)
   When: (0 <= i) /\ (i < n).
-  (* Heap *)
-  Have: region(b.base) <= 0.
   (* Pre-condition *)
   Have: (0 <= n) /\ (n <= 3).
   (* Invariant *)
@@ -37,7 +37,7 @@ Goal Preservation of Invariant (file tests/wp_acsl/assigns_path.i, line 16):
 Assume {
   Type: is_sint32(i) /\ is_sint32(n) /\ is_sint32(1 + i).
   (* Heap *)
-  Have: region(b.base) <= 0.
+  Type: region(b.base) <= 0.
   (* Pre-condition *)
   Have: (0 <= n) /\ (n <= 3).
   (* Invariant *)
@@ -60,10 +60,10 @@ Prove: true.
 Goal Preservation of Invariant (file tests/wp_acsl/assigns_path.i, line 17):
 Assume {
   Type: is_sint32(i) /\ is_sint32(n) /\ is_sint32(1 + i).
+  (* Heap *)
+  Type: region(b.base) <= 0.
   (* Goal *)
   When: (0 <= i_1) /\ (i_1 <= i).
-  (* Heap *)
-  Have: region(b.base) <= 0.
   (* Pre-condition *)
   Have: (0 <= n) /\ (n <= 3).
   (* Invariant *)

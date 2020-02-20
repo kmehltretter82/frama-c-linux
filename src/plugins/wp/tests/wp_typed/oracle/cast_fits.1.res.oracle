@@ -22,7 +22,7 @@ Let x_1 = Mint_0[shiftfield_F1_i1(p)].
 Assume {
   Type: is_sint32(x) /\ is_sint32(x_1).
   (* Heap *)
-  Have: region(p.base) <= 0.
+  Type: region(p.base) <= 0.
 }
 Prove: x_1 = x.
 
@@ -37,7 +37,7 @@ Let x_1 = Mint_0[shiftfield_F1_i1(shiftfield_F3_ic3(p))].
 Assume {
   Type: is_sint32(x) /\ is_sint32(x_1).
   (* Heap *)
-  Have: region(p.base) <= 0.
+  Type: region(p.base) <= 0.
 }
 Prove: x_1 = x.
 
@@ -54,7 +54,7 @@ Let x_1 = Mint_0
 Assume {
   Type: is_sint32(x) /\ is_sint32(x_1).
   (* Heap *)
-  Have: region(p.base) <= 0.
+  Type: region(p.base) <= 0.
 }
 Prove: x_1 = x.
 
@@ -71,7 +71,7 @@ Let x_1 = Mchar_0
 Assume {
   Type: is_sint8(x) /\ is_sint32(x) /\ is_sint8(x_1).
   (* Heap *)
-  Have: (region(p.base) <= 0) /\ sconst(Mchar_0).
+  Type: (region(p.base) <= 0) /\ sconst(Mchar_0).
 }
 Prove: x_1 = x.
 
@@ -86,7 +86,7 @@ Let x_1 = Mint_0[shiftfield_F7_u7(p)].
 Assume {
   Type: is_sint32(x) /\ is_sint32(x_1).
   (* Heap *)
-  Have: region(p.base) <= 0.
+  Type: region(p.base) <= 0.
 }
 Prove: x_1 = x.
 
@@ -105,7 +105,7 @@ Let x_1 = Mchar_0[shiftfield_F2_c2(p)].
 Assume {
   Type: is_sint32(x) /\ is_sint8(x_1).
   (* Heap *)
-  Have: (region(p.base) <= 0) /\ sconst(Mchar_0).
+  Type: (region(p.base) <= 0) /\ sconst(Mchar_0).
 }
 Prove: x_1 = x.
 
@@ -124,7 +124,7 @@ Let x_1 = Mint_0[shiftfield_F8_i8(p)].
 Assume {
   Type: is_sint32(x) /\ is_sint32(x_1).
   (* Heap *)
-  Have: region(p.base) <= 0.
+  Type: region(p.base) <= 0.
 }
 Prove: x_1 = x.
 
@@ -143,7 +143,7 @@ Let x_1 = Mint_0[shiftfield_F8_i8(q)].
 Assume {
   Type: is_sint32(x) /\ is_sint32(x_1).
   (* Heap *)
-  Have: region(p.base) <= 0.
+  Type: region(p.base) <= 0.
 }
 Prove: x_1 = x.
 

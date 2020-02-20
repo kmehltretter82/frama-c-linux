@@ -13,8 +13,6 @@ Let x_1 = x / 256.
 Assume {
   Type: is_sint32(R) /\ is_sint32(j) /\ is_sint32(1 + j) /\
       is_sint32(lsr(x, 8)).
-  (* Heap *)
-  Have: (region(Data_0.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: (0 < x) /\ (x <= 2303).
   (* Invariant 'RANGE' *)
@@ -42,10 +40,10 @@ Let x = land(3840, R).
 Let x_1 = x / 256.
 Assume {
   Type: is_sint32(R) /\ is_sint32(j) /\ is_sint32(lsr(x, 8)).
+  (* Heap *)
+  Type: (region(Data_0.base) <= 0) /\ linked(Malloc_0).
   (* Goal *)
   When: !invalid(Malloc_0, shift_sint32(Data_0, j), 1).
-  (* Heap *)
-  Have: (region(Data_0.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: (0 < x) /\ (x <= 2303).
   (* Invariant 'RANGE' *)

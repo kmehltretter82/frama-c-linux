@@ -17,7 +17,7 @@ Prove: true.
 Goal Establishment of Invariant (file tests/wp_typed/unit_loopscope.i, line 13):
 Assume {
   (* Heap *)
-  Have: (region(written_0.base) <= 0) /\ linked(Malloc_0).
+  Type: (region(written_0.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: valid_rw(Malloc_0, written_0, 1).
 }

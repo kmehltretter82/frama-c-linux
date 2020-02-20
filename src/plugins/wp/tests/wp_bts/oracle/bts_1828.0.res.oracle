@@ -10,7 +10,7 @@
 Goal Post-condition 'sep_iff_ref' in 'global_frame':
 Assume {
   (* Heap *)
-  Have: (region(one_0.base) <= 0) /\ (region(zero_0.base) <= 0) /\
+  Type: (region(one_0.base) <= 0) /\ (region(zero_0.base) <= 0) /\
       linked(Malloc_0).
   (* Pre-condition *)
   Have: valid_rw(Malloc_0, one_0, 1) /\ valid_rw(Malloc_0, zero_0, 1).
@@ -29,7 +29,7 @@ Assume {
   Type: is_sint32(x) /\ is_sint32(x_1) /\ is_sint32(x + x_1) /\
       is_sint32(x_2) /\ is_sint32(x_4).
   (* Heap *)
-  Have: (region(one_0.base) <= 0) /\ (region(zero_0.base) <= 0) /\
+  Type: (region(one_0.base) <= 0) /\ (region(zero_0.base) <= 0) /\
       linked(Malloc_0).
   (* Pre-condition *)
   Have: valid_rw(Malloc_0, one_0, 1) /\ valid_rw(Malloc_0, zero_0, 1).
@@ -59,7 +59,7 @@ Prove: true.
 Goal Assertion 'ok' (file tests/wp_bts/bts_1828.i, line 23):
 Assume {
   (* Heap *)
-  Have: (region(one_0.base) <= 0) /\ linked(Malloc_0).
+  Type: (region(one_0.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: valid_rw(Malloc_0, one_0, 1).
 }

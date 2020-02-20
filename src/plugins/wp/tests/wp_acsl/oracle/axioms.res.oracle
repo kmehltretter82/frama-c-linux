@@ -14,7 +14,7 @@ Let a_2 = havoc(Mint_undef_0, Mint_0, a_1, i - a).
 Assume {
   Type: is_sint32(a) /\ is_sint32(b) /\ is_sint32(i).
   (* Heap *)
-  Have: (region(t.base) <= 0) /\ linked(Malloc_0).
+  Type: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: (a <= b) /\ valid_rw(Malloc_0, a_1, 1 + b - a).
   (* Invariant 'Positive' *)
@@ -36,7 +36,7 @@ Let a_2 = havoc(Mint_undef_0, Mint_0, a_1, i - a).
 Assume {
   Type: is_sint32(a) /\ is_sint32(b) /\ is_sint32(i).
   (* Heap *)
-  Have: (region(t.base) <= 0) /\ linked(Malloc_0).
+  Type: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: (a <= b) /\ valid_rw(Malloc_0, a_1, 1 + b - a).
   (* Invariant 'Positive' *)
@@ -58,7 +58,7 @@ Let x_1 = 1 + i.
 Assume {
   Type: is_sint32(a) /\ is_sint32(b) /\ is_sint32(i) /\ is_sint32(x_1).
   (* Heap *)
-  Have: (region(t.base) <= 0) /\ linked(Malloc_0).
+  Type: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: (a <= b) /\ valid_rw(Malloc_0, a_1, 1 + b - a).
   (* Invariant 'Positive' *)
@@ -77,7 +77,7 @@ Goal Establishment of Invariant 'Index' (file tests/wp_acsl/axioms.i, line 30):
 Assume {
   Type: is_sint32(a) /\ is_sint32(b).
   (* Heap *)
-  Have: (region(t.base) <= 0) /\ linked(Malloc_0).
+  Type: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: (a <= b) /\ valid_rw(Malloc_0, shift_sint32(t, a), 1 + b - a).
 }
@@ -91,10 +91,10 @@ Let x = -a.
 Let a_2 = havoc(Mint_undef_0, Mint_0, a_1, i - a).
 Assume {
   Type: is_sint32(a) /\ is_sint32(b) /\ is_sint32(i) /\ is_sint32(1 + i).
+  (* Heap *)
+  Type: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Goal *)
   When: (a <= i_1) /\ (i_1 <= i) /\ is_sint32(i_1).
-  (* Heap *)
-  Have: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: (a <= b) /\ valid_rw(Malloc_0, a_1, 1 + b - a).
   (* Invariant 'Positive' *)
@@ -132,10 +132,10 @@ Let x = -a.
 Let a_2 = shift_sint32(t, i).
 Assume {
   Type: is_sint32(a) /\ is_sint32(b) /\ is_sint32(i) /\ is_sint32(1 + i).
+  (* Heap *)
+  Type: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Goal *)
   When: !invalid(Malloc_0, a_2, 1).
-  (* Heap *)
-  Have: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: (a <= b) /\ valid_rw(Malloc_0, a_1, 1 + b - a).
   (* Invariant 'Positive' *)
@@ -159,7 +159,7 @@ Assume {
   Have: !invalid(Malloc_0, a_1, i - a).
   Type: is_sint32(a) /\ is_sint32(b) /\ is_sint32(i).
   (* Heap *)
-  Have: (region(t.base) <= 0) /\ linked(Malloc_0).
+  Type: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: (a <= b) /\ valid_rw(Malloc_0, a_1, 1 + b - a).
 }

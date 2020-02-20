@@ -13,11 +13,11 @@ Let a = shiftfield_F2_data(tbl_0).
 Let x = to_uint32(d).
 Assume {
   Type: is_sint32(d).
+  (* Heap *)
+  Type: (region(tbl_0.base) <= 0) /\ linked(Malloc_0).
   (* Goal *)
   When: !invalid(Malloc_0,
            shiftfield_F1_size(shift___anonstruct_Buckets_1(a, x)), 1).
-  (* Heap *)
-  Have: (region(tbl_0.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: (0 <= d) /\ (d <= 16) /\ valid_rw(Malloc_0, tbl_0, 35) /\
       valid_rw(Malloc_0, shift___anonstruct_Buckets_1(a, 0), 34).

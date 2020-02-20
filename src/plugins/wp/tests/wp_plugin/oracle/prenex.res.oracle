@@ -12,7 +12,7 @@ Assume {
   Type: is_sint32(diag_0) /\ is_sint32(i) /\ is_sint32(i_1) /\
       is_sint32(j) /\ is_sint32(m) /\ is_sint32(n).
   (* Heap *)
-  Have: (region(p.base) <= 0) /\ (region(q.base) <= 0).
+  Type: (region(p.base) <= 0) /\ (region(q.base) <= 0).
   (* Pre-condition *)
   Have: (0 <= m) /\ (0 <= n).
   (* Invariant 'PI' *)
@@ -52,7 +52,7 @@ Assume {
   Type: is_sint32(i) /\ is_sint32(j) /\ is_sint32(m) /\ is_sint32(n) /\
       is_sint32(1 + i).
   (* Heap *)
-  Have: (region(p.base) <= 0) /\ (region(q.base) <= 0).
+  Type: (region(p.base) <= 0) /\ (region(q.base) <= 0).
   (* Pre-condition *)
   Have: (0 <= m) /\ (0 <= n).
   (* Invariant 'PI' *)
@@ -84,10 +84,10 @@ Goal Preservation of Invariant 'PI' (file tests/wp_plugin/prenex.i, line 21):
 Assume {
   Type: is_sint32(i_2) /\ is_sint32(j) /\ is_sint32(m) /\ is_sint32(n) /\
       is_sint32(1 + i_2).
+  (* Heap *)
+  Type: (region(p.base) <= 0) /\ (region(q.base) <= 0).
   (* Goal *)
   When: (0 <= i) /\ (0 <= i_1) /\ (i_1 < m) /\ (i <= i_2).
-  (* Heap *)
-  Have: (region(p.base) <= 0) /\ (region(q.base) <= 0).
   (* Pre-condition *)
   Have: (0 <= m) /\ (0 <= n).
   (* Invariant 'PI' *)
@@ -122,7 +122,7 @@ Assume {
   Type: is_sint32(i) /\ is_sint32(j) /\ is_sint32(m) /\ is_sint32(n) /\
       is_sint32(1 + j) /\ is_sint32(x) /\ is_sint32(x_1).
   (* Heap *)
-  Have: (region(p.base) <= 0) /\ (region(q.base) <= 0).
+  Type: (region(p.base) <= 0) /\ (region(q.base) <= 0).
   (* Pre-condition *)
   Have: (0 <= m) /\ (0 <= n).
   (* Invariant 'PI' *)
@@ -158,10 +158,10 @@ Let x_1 = Mint_0[shift_sint32(q, j)].
 Assume {
   Type: is_sint32(i) /\ is_sint32(j) /\ is_sint32(m) /\ is_sint32(n) /\
       is_sint32(1 + j) /\ is_sint32(x) /\ is_sint32(x_1).
+  (* Heap *)
+  Type: (region(p.base) <= 0) /\ (region(q.base) <= 0).
   (* Goal *)
   When: (0 <= i_1) /\ (i_1 <= j).
-  (* Heap *)
-  Have: (region(p.base) <= 0) /\ (region(q.base) <= 0).
   (* Pre-condition *)
   Have: (0 <= m) /\ (0 <= n).
   (* Invariant 'PI' *)

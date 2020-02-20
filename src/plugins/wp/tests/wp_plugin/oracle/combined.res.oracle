@@ -8,11 +8,7 @@
 ------------------------------------------------------------
 
 Goal Assertion (file tests/wp_plugin/combined.c, line 27):
-Assume {
-  Type: is_sint32(A).
-  (* Heap *)
-  Have: (region(t.base) <= 0) /\ linked(Malloc_0).
-}
+Assume { Type: is_sint32(A). }
 Prove: (50 <= A) /\ (A <= 100).
 
 ------------------------------------------------------------
@@ -21,7 +17,7 @@ Goal Preservation of Invariant (file tests/wp_plugin/combined.c, line 29):
 Assume {
   Type: is_sint32(A) /\ is_sint32(i) /\ is_sint32(v) /\ is_sint32(1 + i).
   (* Heap *)
-  Have: (region(t.base) <= 0) /\ linked(Malloc_0).
+  Type: region(t.base) <= 0.
   (* Assertion *)
   Have: (50 <= A) /\ (A <= 100).
   (* Invariant *)
@@ -48,10 +44,10 @@ Goal Preservation of Invariant (file tests/wp_plugin/combined.c, line 30):
 Let a = havoc(Mint_undef_0, Mint_0, shift_sint32(t, 0), 50).
 Assume {
   Type: is_sint32(A) /\ is_sint32(i) /\ is_sint32(v) /\ is_sint32(1 + i).
+  (* Heap *)
+  Type: region(t.base) <= 0.
   (* Goal *)
   When: (0 <= i_1) /\ (i_1 <= i).
-  (* Heap *)
-  Have: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Assertion *)
   Have: (50 <= A) /\ (A <= 100).
   (* Invariant *)
@@ -78,7 +74,7 @@ Let x = 1 + j.
 Assume {
   Type: is_sint32(A) /\ is_sint32(i) /\ is_sint32(j) /\ is_sint32(x).
   (* Heap *)
-  Have: (region(t.base) <= 0) /\ linked(Malloc_0).
+  Type: region(t.base) <= 0.
   (* Assertion *)
   Have: (50 <= A) /\ (A <= 100).
   (* Invariant *)
@@ -107,10 +103,10 @@ Goal Assertion (file tests/wp_plugin/combined.c, line 40):
 Let a = havoc(Mint_undef_1, Mint_0, shift_sint32(t, 0), 50).
 Assume {
   Type: is_sint32(A) /\ is_sint32(i_1) /\ is_sint32(j).
+  (* Heap *)
+  Type: region(t.base) <= 0.
   (* Goal *)
   When: (0 <= i) /\ (i <= 49).
-  (* Heap *)
-  Have: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Assertion *)
   Have: (50 <= A) /\ (A <= 100).
   (* Invariant *)
@@ -163,10 +159,10 @@ Call Result at line 38
 Let a = shift_sint32(t, j).
 Assume {
   Type: is_sint32(A) /\ is_sint32(i) /\ is_sint32(j).
+  (* Heap *)
+  Type: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Goal *)
   When: !invalid(Malloc_0, a, 1).
-  (* Heap *)
-  Have: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Assertion *)
   Have: (50 <= A) /\ (A <= 100).
   (* Invariant *)

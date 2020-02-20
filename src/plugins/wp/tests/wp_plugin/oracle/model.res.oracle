@@ -87,7 +87,7 @@ Let x = Mint_0[shift_sint32(p, k)].
 Assume {
   Type: is_sint32(k) /\ is_sint32(x).
   (* Heap *)
-  Have: region(p.base) <= 0.
+  Type: region(p.base) <= 0.
 }
 Prove: P_P(x).
 
@@ -204,7 +204,7 @@ Let x = Mint_0[shift_sint32(p, k)].
 Assume {
   Type: is_sint32(k) /\ is_sint32(x).
   (* Heap *)
-  Have: region(p.base) <= 0.
+  Type: region(p.base) <= 0.
 }
 Prove: P_P(x).
 
@@ -215,7 +215,7 @@ Let x = Mint_0[shift_sint32(p, k)].
 Assume {
   Type: is_sint32(k) /\ is_sint32(x).
   (* Heap *)
-  Have: region(p.base) <= 0.
+  Type: region(p.base) <= 0.
 }
 Prove: P_P(x).
 

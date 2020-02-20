@@ -13,7 +13,7 @@ Let x_1 = a.base.
 Assume {
   Type: is_sint32(mem_0) /\ is_sint32(n).
   (* Heap *)
-  Have: (region(x_1) <= 0) /\ (region(x) <= 0).
+  Type: (region(x_1) <= 0) /\ (region(x) <= 0).
   (* Pre-condition *)
   Have: x = x_1.
   If addr_le(b, a)

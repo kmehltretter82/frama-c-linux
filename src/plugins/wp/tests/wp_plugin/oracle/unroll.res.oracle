@@ -13,7 +13,7 @@ Goal Post-condition 'zero' in 'unrolled_loop':
 Let a = shift_uint32(t, 0).
 Assume {
   (* Heap *)
-  Have: (region(t.base) <= 0) /\ linked(Malloc_0).
+  Type: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: valid_rw(Malloc_0, a, 16).
 }

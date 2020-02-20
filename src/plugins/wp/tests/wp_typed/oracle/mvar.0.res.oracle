@@ -12,7 +12,7 @@
 Goal Post-condition (file tests/wp_typed/mvar.i, line 12) in 'Job':
 Assume {
   (* Heap *)
-  Have: linked(Malloc_0) /\ sconst(Mchar_0).
+  Type: IsArray1_sint8(A).
   (* Call 'Write' *)
   Have: A[0] = 1.
 }

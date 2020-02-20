@@ -883,15 +883,12 @@ end
 
 
 (* -------------------------------------------------------------------------- *)
-(* --- Fresh Variables & Local Assumptions                                --- *)
+(* --- Local Assumptions                                --- *)
 (* -------------------------------------------------------------------------- *)
 
 type gamma = {
   mutable hyps : pred list ;
-  mutable vars : var list ;
 }
-
-(* -------------------------------------------------------------------------- *)
 
 let cpool = Context.create "Lang.pool"
 let cgamma = Context.create "Lang.gamma"
@@ -904,8 +901,8 @@ let new_pool ?copy ?(vars = Vars.empty) () =
   F.add_vars pool vars ; pool
 let new_gamma ?copy () =
   match copy with
-  | None -> { hyps=[] ; vars=[] }
-  | Some g -> { hyps = g.hyps ; vars = g.vars }
+  | None -> { hyps=[] }
+  | Some g -> { hyps = g.hyps }
 
 let get_pool () = Context.get cpool
 let get_gamma () = Context.get cgamma
@@ -917,7 +914,7 @@ let freshen x = F.alpha (Context.get cpool) x
 let local ?pool ?vars ?gamma f =
   let pool = match pool with None -> F.pool () | Some p -> p in
   add_vars pool vars ;
-  let gamma = match gamma with None -> { hyps=[] ; vars=[] } | Some g -> g in
+  let gamma = match gamma with None -> { hyps=[] } | Some g -> g in
   Context.bind cpool pool (Context.bind cgamma gamma f)
 
 let sigma () = F.sigma ~pool:(Context.get cpool) ()
@@ -970,19 +967,16 @@ let assume p =
     let d = Context.get cgamma in
     d.hyps <- p :: d.hyps
 
-let epsilon ?basename t phi =
-  let d = Context.get cgamma in
-  let x = freshvar ?basename t in
-  let e = e_var x in
-  d.hyps <- phi e :: d.hyps ;
-  d.vars <- x :: d.vars ;
-  e
-
 let hypotheses g = g.hyps
-let variables g = List.rev g.vars
 
 let get_hypotheses () = (Context.get cgamma).hyps
-let get_variables () = (Context.get cgamma).vars
+
+let filter_hypotheses xs =
+  let d = Context.get cgamma in
+  let vars = List.fold_right Vars.add xs Vars.empty in
+  let matches p = Vars.intersect vars (varsp p) in
+  let hs_with_vars , hs_without_vars = List.partition matches d.hyps in
+  d.hyps <- hs_without_vars ; hs_with_vars
 
 (** For why3_api but circular dependency *)
 

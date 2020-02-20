@@ -22,7 +22,7 @@ Let x_1 = Mint_0[shift_sint32(a, k) <- x][a_1].
 Assume {
   Type: is_sint32(k) /\ is_sint32(x) /\ is_sint32(x_1).
   (* Heap *)
-  Have: (region(a.base) <= 0) /\ (region(b.base) <= 0).
+  Type: (region(a.base) <= 0) /\ (region(b.base) <= 0).
 }
 Prove: x_1 = x.
 
@@ -65,7 +65,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Post-condition 'KO' in 's':
-Assume { (* Heap *) Have: (region(c.base) <= 0) /\ (region(d.base) <= 0). }
+Assume { (* Heap *) Type: (region(c.base) <= 0) /\ (region(d.base) <= 0). }
 Prove: d != c.
 
 ------------------------------------------------------------

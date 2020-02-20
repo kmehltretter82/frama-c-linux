@@ -20,7 +20,7 @@ Prove: true.
 Goal Post-condition 'INDIRP' in 'f':
 Assume {
   (* Heap *)
-  Have: (region(p.base) <= 0) /\ linked(Malloc_0).
+  Type: (region(p.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: valid_rw(Malloc_0, p, 10).
 }

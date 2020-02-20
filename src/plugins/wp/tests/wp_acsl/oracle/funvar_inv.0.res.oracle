@@ -26,6 +26,8 @@ tests/wp_acsl/funvar_inv.i:23: warning from Empty Model:
 Let x = G[0].
 Assume {
   Type: is_sint32(i) /\ is_sint32(x) /\ is_sint32(G[1]).
+  (* Heap *)
+  Type: IsArray1_sint32(G).
   If i <= 3
   Then { (* Else *) Have: G[i] = 0. }
 }
@@ -40,6 +42,8 @@ tests/wp_acsl/funvar_inv.i:24: warning from Empty Model:
 Let x = G[0].
 Assume {
   Type: is_sint32(i) /\ is_sint32(x).
+  (* Heap *)
+  Type: IsArray1_sint32(G).
   (* Goal *)
   When: (x != 0) /\ (G[1] = 0).
   If i <= 3
@@ -64,6 +68,8 @@ tests/wp_acsl/funvar_inv.i:37: warning from Empty Model:
 Let x = G[0].
 Assume {
   Type: is_sint32(i) /\ is_sint32(x) /\ is_sint32(G[1]).
+  (* Heap *)
+  Type: IsArray1_sint32(G).
   If i <= 3
   Then { (* Else *) Have: G[i] = 0. }
 }
@@ -78,6 +84,8 @@ tests/wp_acsl/funvar_inv.i:38: warning from Empty Model:
 Let x = G[0].
 Assume {
   Type: is_sint32(i) /\ is_sint32(x).
+  (* Heap *)
+  Type: IsArray1_sint32(G).
   (* Goal *)
   When: (x != 0) /\ (G[1] = 0).
   If i <= 3
@@ -102,6 +110,8 @@ tests/wp_acsl/funvar_inv.i:52: warning from Empty Model:
 Let x = G[0].
 Assume {
   Type: is_sint32(i) /\ is_sint32(x) /\ is_sint32(G[1]).
+  (* Heap *)
+  Type: IsArray1_sint32(G).
   If i <= 3
   Then { (* Else *) Have: G[i] = 0. }
 }
@@ -116,6 +126,8 @@ tests/wp_acsl/funvar_inv.i:53: warning from Empty Model:
 Let x = G[0].
 Assume {
   Type: is_sint32(i) /\ is_sint32(x).
+  (* Heap *)
+  Type: IsArray1_sint32(G).
   (* Goal *)
   When: (x != 0) /\ (G[1] = 0).
   If i <= 3

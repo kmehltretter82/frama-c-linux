@@ -21,10 +21,10 @@ Call Effect at line 16
 Let a = Mptr_0[global(G_p_18)].
 Let a_1 = shiftfield_F1_a(a).
 Assume {
+  (* Heap *)
+  Type: framed(Mptr_0) /\ linked(Malloc_0).
   (* Goal *)
   When: !invalid(Malloc_0, a_1, 1).
-  (* Heap *)
-  Have: framed(Mptr_0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: valid_rw(Malloc_0, a, 1).
 }
@@ -37,10 +37,10 @@ Call Effect at line 16
 Let a = Mptr_0[global(G_p_18)].
 Let a_1 = shiftfield_F1_a(a).
 Assume {
+  (* Heap *)
+  Type: framed(Mptr_0) /\ linked(Malloc_0).
   (* Goal *)
   When: !invalid(Malloc_0, a_1, 1).
-  (* Heap *)
-  Have: framed(Mptr_0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: valid_rw(Malloc_0, a, 1).
 }

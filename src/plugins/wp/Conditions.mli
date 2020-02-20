@@ -177,7 +177,7 @@ val merge : bundle list -> bundle
 val domain : F.pred list -> bundle -> bundle
 val intros : F.pred list -> bundle -> bundle
 val state : ?descr:string -> ?stmt:stmt -> Mstate.state -> bundle -> bundle
-val assume : (?init:bool -> F.pred -> bundle -> bundle) attributed
+val assume : (?init:bool -> ?domain:bool -> F.pred -> bundle -> bundle) attributed
 val branch : (F.pred -> bundle -> bundle -> bundle) attributed
 val either : (bundle list -> bundle) attributed
 val extract : bundle -> F.pred list

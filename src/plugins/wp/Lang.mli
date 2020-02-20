@@ -529,15 +529,13 @@ val freshvar : ?basename:string -> tau -> var
 val freshen : var -> var
 val assume : pred -> unit
 val without_assume : ('a -> 'b) -> 'a -> 'b
-val epsilon : ?basename:string -> tau -> (term -> pred) -> term
 val hypotheses : gamma -> pred list
-val variables : gamma -> var list
 
 val get_pool : unit -> pool
 val get_gamma : unit -> gamma
 val has_gamma : unit -> bool
 val get_hypotheses : unit -> pred list
-val get_variables : unit -> var list
+val filter_hypotheses : var list -> pred list
 
 (** {2 Substitutions} *)
 

@@ -130,10 +130,9 @@ end
     (* use Compound *)
     
     goal wp_goal :
-      forall t:addr -> int, t1:addr -> int, a:addr, a1:addr.
-       let a2 = Load_S2_A a t in
-       let a3 = Load_S2_A a (havoc t1 t a 1) in
-       region (base a1) <= 0 ->
-       region (base a) <= 0 -> IsS2_A a2 -> IsS2_A a3 -> EqS2_A a3 a2
+      forall t:addr -> int, t1:addr -> int, a:addr.
+       let a1 = Load_S2_A a t in
+       let a2 = Load_S2_A a (havoc t1 t a 1) in
+       region (base a) <= 0 -> IsS2_A a1 -> IsS2_A a2 -> EqS2_A a2 a1
   end
 [wp] 2 goals generated

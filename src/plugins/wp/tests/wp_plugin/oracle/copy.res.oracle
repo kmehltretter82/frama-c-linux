@@ -13,10 +13,10 @@ Let a_2 = havoc(Mint_undef_0, Mint_0, a_1, n).
 Let a_3 = havoc(Mint_undef_0, Mint_0, a_1, i).
 Assume {
   Type: is_sint32(i) /\ is_sint32(n).
+  (* Heap *)
+  Type: (region(a.base) <= 0) /\ (region(b.base) <= 0).
   (* Goal *)
   When: (0 <= i_1) /\ (i_1 < n).
-  (* Heap *)
-  Have: (region(a.base) <= 0) /\ (region(b.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: (0 <= n) /\ separated(a_1, n, shift_sint32(b, 0), n).
   (* Invariant 'Copy' *)
@@ -37,10 +37,10 @@ Let a_2 = havoc(Mint_undef_0, Mint_0, a_1, n).
 Let a_3 = a_2[shift_sint32(a, i) <- a_2[shift_sint32(b, i)]].
 Assume {
   Type: is_sint32(i) /\ is_sint32(n) /\ is_sint32(1 + i).
+  (* Heap *)
+  Type: (region(a.base) <= 0) /\ (region(b.base) <= 0).
   (* Goal *)
   When: (0 <= i_1) /\ (i_1 <= i).
-  (* Heap *)
-  Have: (region(a.base) <= 0) /\ (region(b.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: (0 <= n) /\ separated(a_1, n, shift_sint32(b, 0), n).
   (* Invariant 'Copy' *)
@@ -73,7 +73,7 @@ Let a_3 = a_2[shift_sint32(a, i) <- a_2[shift_sint32(b, i)]].
 Assume {
   Type: is_sint32(i) /\ is_sint32(n) /\ is_sint32(1 + i).
   (* Heap *)
-  Have: (region(a.base) <= 0) /\ (region(b.base) <= 0) /\ linked(Malloc_0).
+  Type: (region(a.base) <= 0) /\ (region(b.base) <= 0).
   (* Pre-condition *)
   Have: (0 <= n) /\ separated(a_1, n, shift_sint32(b, 0), n).
   (* Invariant 'Copy' *)
@@ -105,10 +105,10 @@ Let a_2 = havoc(Mint_undef_0, Mint_0, a_1, n).
 Let a_3 = shift_sint32(a, i_1).
 Assume {
   Type: is_sint32(i) /\ is_sint32(n).
+  (* Heap *)
+  Type: (region(a.base) <= 0) /\ (region(b.base) <= 0).
   (* Goal *)
   When: (0 <= i_1) /\ (i_1 < i).
-  (* Heap *)
-  Have: (region(a.base) <= 0) /\ (region(b.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: (0 <= n) /\ separated(a_1, n, shift_sint32(b, 0), n).
   (* Invariant 'Copy' *)
@@ -130,10 +130,10 @@ Let a_3 = a_2[shift_sint32(a, i) <- a_2[shift_sint32(b, i)]].
 Let a_4 = shift_sint32(b, i_1).
 Assume {
   Type: is_sint32(i) /\ is_sint32(n).
+  (* Heap *)
+  Type: (region(a.base) <= 0) /\ (region(b.base) <= 0).
   (* Goal *)
   When: (0 <= i_1) /\ (i_1 < i).
-  (* Heap *)
-  Have: (region(a.base) <= 0) /\ (region(b.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: (0 <= n) /\ separated(a_1, n, shift_sint32(b, 0), n).
   (* Invariant 'Copy' *)
@@ -164,10 +164,10 @@ Let a_3 = shift_sint32(a, i).
 Let a_4 = a_2[a_3 <- a_2[shift_sint32(b, i)]].
 Assume {
   Type: is_sint32(i) /\ is_sint32(n).
+  (* Heap *)
+  Type: (region(a.base) <= 0) /\ (region(b.base) <= 0) /\ linked(Malloc_0).
   (* Goal *)
   When: !invalid(Malloc_0, a_3, 1).
-  (* Heap *)
-  Have: (region(a.base) <= 0) /\ (region(b.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: (0 <= n) /\ separated(a_1, n, shift_sint32(b, 0), n).
   (* Invariant 'Copy' *)

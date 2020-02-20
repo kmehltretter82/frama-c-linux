@@ -13,7 +13,7 @@ Let x_1 = 1 + x.
 Assume {
   Type: is_sint32(x) /\ is_sint32(x_1).
   (* Heap *)
-  Have: region(p.base) <= 0.
+  Type: region(p.base) <= 0.
 }
 Prove: P_R(x, x_1).
 

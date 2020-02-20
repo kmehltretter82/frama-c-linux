@@ -8,25 +8,18 @@
 ------------------------------------------------------------
 
 Goal Assertion 'AB' (file tests/wp_typed/unit_string.i, line 11):
-Assume {
-  Type: is_sint8(Mchar_0[shift_sint8(global(Str_3), 3)]).
-  (* Heap *)
-  Have: linked(Malloc_0) /\ sconst(Mchar_0).
-}
 Prove: Str_4 != Str_3.
 
 ------------------------------------------------------------
 
 Goal Assertion 'B_valid' (file tests/wp_typed/unit_string.i, line 12):
-Let a = global(Str_3).
 Assume {
-  Type: is_sint8(Mchar_0[shift_sint8(a, 3)]).
   (* Heap *)
-  Have: linked(Malloc_0) /\ sconst(Mchar_0).
+  Type: linked(Malloc_0).
   (* Assertion 'AB' *)
   Have: Str_4 != Str_3.
 }
-Prove: valid_rd(Malloc_0, shift_sint8(a, 0), 3).
+Prove: valid_rd(Malloc_0, shift_sint8(global(Str_3), 0), 3).
 
 ------------------------------------------------------------
 
@@ -37,7 +30,7 @@ Let x = Mchar_0[a_1].
 Assume {
   Type: is_sint8(x).
   (* Heap *)
-  Have: linked(Malloc_0) /\ sconst(Mchar_0).
+  Type: linked(Malloc_0) /\ sconst(Mchar_0).
   (* Assertion 'AB' *)
   Have: Str_4 != Str_3.
   (* Assertion 'B_valid' *)
@@ -52,7 +45,7 @@ Let a = global(Str_3).
 Let a_1 = shift_sint8(a, 3).
 Assume {
   (* Heap *)
-  Have: linked(Malloc_0) /\ sconst(Mchar_0).
+  Type: linked(Malloc_0) /\ sconst(Mchar_0).
   (* Assertion 'AB' *)
   Have: Str_4 != Str_3.
   (* Assertion 'B_valid' *)
@@ -69,7 +62,7 @@ Let a = global(Str_3).
 Let a_1 = shift_sint8(a, 3).
 Assume {
   (* Heap *)
-  Have: linked(Malloc_0) /\ sconst(Mchar_0).
+  Type: linked(Malloc_0) /\ sconst(Mchar_0).
   (* Assertion 'AB' *)
   Have: Str_4 != Str_3.
   (* Assertion 'B_valid' *)
@@ -87,10 +80,10 @@ Goal Assertion 'VAL' (file tests/wp_typed/unit_string.i, line 16):
 Let a = global(Str_3).
 Let a_1 = shift_sint8(a, 3).
 Assume {
+  (* Heap *)
+  Type: linked(Malloc_0) /\ sconst(Mchar_0).
   (* Goal *)
   When: (0 <= i) /\ (i <= 2).
-  (* Heap *)
-  Have: linked(Malloc_0) /\ sconst(Mchar_0).
   (* Assertion 'AB' *)
   Have: Str_4 != Str_3.
   (* Assertion 'B_valid' *)

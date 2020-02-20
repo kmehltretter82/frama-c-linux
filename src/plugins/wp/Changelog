@@ -20,6 +20,9 @@
 #   <Prover>: prover
 ###############################################################################
 
+- WP	      [2020/02/10] Move frame conditions to Type section for better filtering
+- WP	      [2020/02/10] Extended frame conditions to pointers inside compound
+- WP	      [2020/02/10] Extended frame conditions with global C-types
 - WP          [2019/12/04] Added option -wp-run-all-provers
 
 ##########################

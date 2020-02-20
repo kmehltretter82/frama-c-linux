@@ -211,7 +211,9 @@ struct
     let hyps = Conditions.state ?stmt ?descr state vc.hyps in
     { vc with path ; hyps }
 
-  let assume_vc ?descr ?hpid ?stmt ?warn ?(filter=false) ?(init=false) hs vc =
+  let assume_vc ?descr ?hpid ?stmt ?warn
+      ?(filter=false) ?(domain=false) ?(init=false)
+      hs vc =
     if (hs = [] && warn = None) ||
        (filter && not (List.exists (intersect_vc vc) hs))
     then vc else
@@ -225,7 +227,7 @@ struct
         | None -> vc.warn
         | Some w -> Warning.Set.union w vc.warn in
       let hyps = Conditions.assume
-          ?descr ?stmt ?warn ~deps ~init
+          ?descr ?stmt ?warn ~deps ~init ~domain
           (F.p_conj hs) vc.hyps
       in {
         hyps = hyps ;
@@ -1164,7 +1166,7 @@ struct
         match sc with
         | Mcfg.SC_Global ->
             let hs = M.frame (L.current env) in
-            let vcs = gmap (assume_vc ~descr:"Heap" hs) wp.vcs in
+            let vcs = gmap (assume_vc ~descr:"Heap" ~domain:true hs) wp.vcs in
             { wp with vcs }
         | Mcfg.SC_Function_in -> wp
         | Mcfg.SC_Function_frame ->

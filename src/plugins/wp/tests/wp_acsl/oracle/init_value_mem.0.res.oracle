@@ -20,8 +20,6 @@ Assume {
   Init: Mint_0[shiftfield_F1_St_a(a)] = 1.
   (* Initializer *)
   Init: Mint_0[shiftfield_F1_St_b(a)] = 2.
-  (* Heap *)
-  Have: region(G_v_18) <= 0.
 }
 Prove: EqS1_St(a_1, w).
 
@@ -40,8 +38,6 @@ Assume {
   Init: Mint_0[shiftfield_F1_St_a(a)] = 1.
   (* Initializer *)
   Init: Mint_0[shiftfield_F1_St_b(a)] = 2.
-  (* Heap *)
-  Have: region(G_v_18) <= 0.
 }
 Prove: EqS1_St(a_1, w).
 
