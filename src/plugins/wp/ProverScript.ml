@@ -90,7 +90,7 @@ let jfork tree ?node jtactic =
     | Some (script,process) ->
         Some (ProofEngine.fork tree ~anchor script process)
   with
-  | Not_found ->
+  | Exit | Not_found | Invalid_argument _ ->
       console#set_error "Can not configure tactic" ; None
   | e ->
       console#set_error "Exception <%s>" (Printexc.to_string e) ;
@@ -323,7 +323,8 @@ let rec crawl env on_child node = function
       Task.return ()
 
   | Error(msg,json) :: alternative ->
-      Wp_parameters.error "@[<hov 2>Script Error %S: %a@]@." msg Json.pp json ;
+      Wp_parameters.warning "@[<hov 2>Script Error %S: %a@]@."
+        msg Json.pp json ;
       crawl env on_child node alternative
 
   | Prover( prv , res ) :: alternative ->

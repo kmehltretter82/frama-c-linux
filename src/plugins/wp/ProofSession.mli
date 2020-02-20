@@ -20,16 +20,15 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type status =
+type script =
   | NoScript
   | Script of string
   | Deprecated of string
 
-val pp_status : Format.formatter -> status -> unit
-val pp_goal : Format.formatter -> Wpo.t -> unit
+val pp_script : Format.formatter -> script -> unit
+val pp_script_for : Format.formatter -> Wpo.t -> unit
 
-val status : Wpo.t -> status
-
+val get : Wpo.t -> script
 val exists : Wpo.t -> bool
 val save : Wpo.t -> Json.t -> unit
 val load : Wpo.t -> Json.t

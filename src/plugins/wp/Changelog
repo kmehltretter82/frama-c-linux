@@ -20,12 +20,17 @@
 #   <Prover>: prover
 ###############################################################################
 
+- WP	      [2020/02/10] Specify cache mode with FRAMAC_WP_CACHE=<mode> (-wp-cache-env)
+- WP	      [2020/02/10] Update scripts with FRAMAC_WP_SCRIPT=update and -wp-prover script
 - WP	      [2020/02/10] Move frame conditions to Type section for better filtering
 - WP	      [2020/02/10] Extended frame conditions to pointers inside compound
 - WP	      [2020/02/10] Extended frame conditions with global C-types
 - WP	      [2019/17/04] Control splitting with -wp-max-split <n>
 - WP          [2019/12/04] Added option -wp-run-all-provers
 - WP          [2019/01/29] Emit a warning when no goal is generated
+- TIP         [2018/04/03] Create session directory only on demand
+- TIP         [2018/03/19] Specification of JSON script format
+- TIP         [2018/03/18] Refactor structure of session directory (remove models)
 
 ##########################
 Plugin WP 20.0 (Calcium)

@@ -50,7 +50,7 @@ let fork tree anchor strategy =
     | Some (script,process) ->
         Some (ProofEngine.fork tree ~anchor script process)
   with
-  | Not_found ->
+  | Exit | Not_found | Invalid_argument _ ->
       console#set_error "Can not configure strategy" ; None
   | e ->
       console#set_error "Exception <%s>" (Printexc.to_string e) ;

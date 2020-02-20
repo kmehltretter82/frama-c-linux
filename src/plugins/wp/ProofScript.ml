@@ -462,7 +462,7 @@ class console ~pool ~title =
       = fun msg ->
         Pretty_utils.ksfprintf
           (fun s -> errors <- true ;
-            Wp_parameters.error "[%s] %s" title s)
+            Wp_parameters.warning "[%s] %s" title s)
           msg
 
   end

@@ -563,6 +563,10 @@ let spawn_wp_proofs_iter ~mode iter_on_goals =
 let get_prover_names () =
   match Wp_parameters.Provers.get () with [] -> [ "alt-ergo" ] | pnames -> pnames
 
+let env_script_update () =
+  try Sys.getenv "FRAMAC_WP_SCRIPT" = "update"
+  with Not_found -> false
+
 let compute_provers ~mode =
   mode.provers <- List.fold_right
       (fun pname prvs ->
@@ -570,7 +574,8 @@ let compute_provers ~mode =
          | None -> prvs
          | Some VCS.Tactical ->
              mode.tactical <- true ;
-             if pname = "tip" then mode.update <- true ;
+             if pname = "tip" || env_script_update () then
+               mode.update <- true ;
              prvs
          | Some prover ->
              (VCS.mode_of_prover_name pname , prover) :: prvs)
