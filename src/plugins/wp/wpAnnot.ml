@@ -380,13 +380,13 @@ let add_prop_loop_inv ~established config acc kind s ca p =
   let id = WpPropId.mk_loop_inv_id ~established config.kf s ca in
   match kind_to_select config kind id with
   | None -> acc
-  | Some kind -> WpStrategy.add_prop_loop_inv acc kind s ~established id p
+  | Some kind -> WpStrategy.add_prop_loop_inv acc kind s id p
 
 let add_prop_inv_fixpoint config acc kind s ca p =
   let id = WpPropId.mk_inv_hyp_id config.kf s ca in
   match kind_to_select config kind id with
   | None -> acc
-  | Some kind -> WpStrategy.add_prop_loop_inv acc kind s ~established:false id p
+  | Some kind -> WpStrategy.add_prop_loop_inv acc kind s id p
 
 (*----------------------------------------------------------------------------*)
 (* Add Assigns *)
@@ -397,7 +397,7 @@ let add_loop_assigns_goal config s (ca, assigns) acc =
     None -> acc
   | Some id ->
       if goal_to_select config id then
-        let labels = NormAtLabels.labels_loop_assigns s in
+        let labels = NormAtLabels.labels_loop s in
         let assigns' = NormAtLabels.preproc_assigns labels assigns in
         let a_desc = WpPropId.mk_loop_assigns_desc s assigns' in
         WpStrategy.add_assigns acc WpStrategy.Agoal id a_desc
@@ -792,7 +792,7 @@ let add_variant_annot config s ca var_exp loop_entry loop_back =
     WpStrategy.mk_variant_properties config.kf s ca var_exp
   in
   let add_variant acc kind id p =
-    WpStrategy.add_prop_loop_inv acc kind s ~established:false id p
+    WpStrategy.add_prop_loop_inv acc kind s id p
   in
   let add_hyp acc =
     let acc = add_variant acc WpStrategy.Ahyp vdecr_id vdecr in

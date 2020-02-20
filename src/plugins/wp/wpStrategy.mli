@@ -125,7 +125,7 @@ val add_prop_assert : t_annots -> annot_kind ->
   kernel_function -> stmt -> code_annotation -> predicate -> t_annots
 
 val add_prop_loop_inv : t_annots -> annot_kind ->
-  stmt -> established:bool -> WpPropId.prop_id -> predicate -> t_annots
+  stmt -> WpPropId.prop_id -> predicate -> t_annots
 
 (** {3 Adding assigns properties} *)
 

@@ -224,8 +224,8 @@ let add_prop_assert acc kind kf s ca p =
   let p = normalize id labels p in
   add_prop acc kind id p
 
-let add_prop_loop_inv acc kind s ~established id p =
-  let labels = NormAtLabels.labels_loop_inv ~established s in
+let add_prop_loop_inv acc kind s id p =
+  let labels = NormAtLabels.labels_loop s in
   let p = normalize id labels p in
   add_prop acc kind id p
 
@@ -375,7 +375,7 @@ let add_loop_assigns_hyp acc kf s asgn_opt = match asgn_opt with
           let asgn = WpPropId.mk_loop_any_assigns_info s in
           add_assigns_any acc Ahyp asgn
       | Some id ->
-          let labels = NormAtLabels.labels_loop_assigns s in
+          let labels = NormAtLabels.labels_loop s in
           let assigns' = NormAtLabels.preproc_assigns labels assigns in
           let a_desc = WpPropId.mk_loop_assigns_desc s assigns' in
           add_assigns acc Ahyp id a_desc
