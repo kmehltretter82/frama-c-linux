@@ -230,6 +230,7 @@ wp-doc-api:
 	$(CP) $(Wp_DIR)/doc/ocamldoc.css $(Wp_DIR)/doc/html/style.css
 	$(OCAMLDOC) \
 		-package zarith \
+		-package why3 \
 		-I lib/fc -I lib/plugins -I $(Wp_DIR) -stars \
 		-html -d $(Wp_DIR)/doc/html -charset utf-8 \
 		-t "Frama-C/WP API Documentation" \
