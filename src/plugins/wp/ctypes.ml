@@ -416,6 +416,10 @@ let no_infinite_array = function
   | C_array {arr_flat = None} -> false
   | _ -> true
 
+let is_compound = function
+  | C_comp _ -> true
+  | _ -> false
+
 let is_comp obj c = match obj with
   | C_comp c0 -> Compinfo.equal c c0
   | _ -> false

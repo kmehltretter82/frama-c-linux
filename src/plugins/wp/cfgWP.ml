@@ -687,7 +687,14 @@ struct
             { sigma = Some sigma ; vcs=vcs ; effects = wp.effects }
         | Warning.Result(l_warn,(obj,dom,seq,loc)) ->
             (* L-Value has been translated *)
-            let region = [obj,Sloc loc] in
+            let unfold = Wp_parameters.UnfoldAssigns.get () in
+            let assigned,unfolded =
+              if unfold && Ctypes.is_compound obj then
+                let env_pre = L.move_at env seq.pre in
+                cc_region ~unfold (L.assigned_of_lval env_pre) lv
+              else
+                let region = [obj,Sloc loc] in region,region
+            in
             let outcome = Warning.catch
                 ~severe:false ~effect:"Havoc l-value (unknown r-value)"
                 (cc_stored lv seq loc obj) expr in
@@ -697,7 +704,7 @@ struct
                 (* R-Value is unknown or L-Value is volatile *)
                 let warn = Warning.Set.union l_warn r_warn in
                 let vcs = do_assigns ~source:FromCode
-                    ~stmt ~warn seq ~assigned:region wp.effects wp.vcs in
+                    ~stmt ~warn seq ~assigned ~unfolded wp.effects wp.vcs in
                 { sigma = Some seq.pre ; vcs=vcs ; effects = wp.effects }
             | Warning.Result(r_warn,Some stored) ->
                 (* R-Value and effects has been translated *)
@@ -713,7 +720,7 @@ struct
                   else vc in
                 let vcs = gmap update wp.vcs in
                 let vcs =
-                  check_assigns (Some stmt) FromCode region wp.effects vcs in
+                  check_assigns (Some stmt) FromCode unfolded wp.effects vcs in
                 { sigma = Some seq.pre ; vcs=vcs ; effects = wp.effects }
       end
 

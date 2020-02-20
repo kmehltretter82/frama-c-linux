@@ -35,8 +35,8 @@ void NO_UNFOLD_KO(struct S *s) {
   f(s);
 }
 
-/*@ 
-  ensures \separated(p,q) ==> (*q == \old(*q)); 
+/*@
+  ensures \separated(p,q) ==> (*q == \old(*q));
   assigns (*p) ;
 */
 void USE_ASSIGN_UNFOLD_OK(struct S *p , struct S *q)
@@ -44,11 +44,23 @@ void USE_ASSIGN_UNFOLD_OK(struct S *p , struct S *q)
   f(p);
 }
 
-/*@ 
-  ensures \separated(p,q) ==> (*q == \old(*q)); 
+/*@
+  ensures \separated(p,q) ==> (*q == \old(*q));
   assigns p->a, p->b ;
 */
 void USE_ASSIGN_UNFOLD_KO(struct S *p , struct S *q)
 {
   f(p);
+}
+
+//@ assigns *s ;
+void ASSIGN_NO_UNFOLD_OK(struct S *s) {
+  struct S p = { 0,1 };
+  *s = p ;
+}
+
+//@ assigns s->a, s->b ;
+void ASSIGN_NO_UNFOLD_KO(struct S *s) {
+  struct S p = { 0,1 };
+  *s = p ;
 }

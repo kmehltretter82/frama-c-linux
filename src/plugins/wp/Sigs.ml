@@ -754,6 +754,10 @@ sig
   val region : env -> unfold:bool -> Cil_types.term -> region
 
   (** Computes the region assigned by a list of froms. *)
+  val assigned_of_lval :
+    env -> unfold:bool -> Cil_types.lval -> region
+
+  (** Computes the region assigned by a list of froms. *)
   val assigned_of_froms :
     env -> unfold:bool -> from list -> region
 

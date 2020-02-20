@@ -4,6 +4,24 @@
 [wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
+  Function ASSIGN_NO_UNFOLD_KO
+------------------------------------------------------------
+
+Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 62) in 'ASSIGN_NO_UNFOLD_KO':
+Effect at line 65
+Prove: true.
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function ASSIGN_NO_UNFOLD_OK
+------------------------------------------------------------
+
+Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 56) in 'ASSIGN_NO_UNFOLD_OK':
+Effect at line 59
+Prove: true.
+
+------------------------------------------------------------
+------------------------------------------------------------
   Function NO_UNFOLD_KO
 ------------------------------------------------------------
 
