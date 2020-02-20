@@ -44,21 +44,29 @@ type prop_kind =
   | PKVarPos      (** computation related to a loop variant being positive *)
   | PKAFctOut     (** computation related to the function assigns on normal termination *)
   | PKAFctExit    (** computation related to the function assigns on exit termination *)
-  | PKPre of kernel_function * stmt * Property.t (** precondition for function
-                                                     at stmt, property of the require. Many information that should come
-                                                     from the p_prop part of the prop_id, but in the PKPre case,
-                                                     it seems that it is hidden in a IPBlob property ! *)
+  | PKSmoke      (** expected to fail *)
+  | PKPre of kernel_function * stmt * Property.t
+  (** precondition for function
+      at stmt, property of the require. Many information that should come
+      from the p_prop part of the prop_id, but in the PKPre case,
+      it seems that it is hidden in a IPBlob property ! *)
 
 type prop_id = {
   p_kind : prop_kind ;
   p_prop : Property.t ;
+  p_doomed : Property.t list ; (* false-if-reachable props when fired *)
+  p_unreachable : Property.other_loc ; (* false-if-reachable location *)
   p_part : (int * int) option ;
 }
+
+let unknown = Property.OLGlob Cil_datatype.Location.unknown
 
 let tactical ~gid =
   let ip = "Wp.Tactical." ^ gid in
   { p_kind = PKTactic ;
-    p_prop = Property.(ip_other ip (OLGlob Cil_datatype.Location.unknown));
+    p_prop = Property.(ip_other ip unknown);
+    p_doomed = [] ;
+    p_unreachable = unknown ;
     p_part = None }
 
 (* -------------------------------------------------------------------------- *)
@@ -68,6 +76,8 @@ let tactical ~gid =
 let kind_of_id p = p.p_kind
 let parts_of_id p = p.p_part
 let property_of_id p = p.p_prop
+let doomed_if_valid p = p.p_doomed
+let unreachable_if_valid p = p.p_unreachable
 
 let mk_part pid (k, n) = { pid with p_part = Some (k,n) }
 let source_of_id p = fst (Property.location p.p_prop)
@@ -92,9 +102,10 @@ let num_of_bhv_from bhv (out, _) =
 (* Constructors *)
 (*----------------------------------------------------------------------------*)
 
-let mk_prop kind prop = { p_kind=kind ; p_prop=prop ; p_part=None }
-let mk_check prop = { p_kind=PKCheck ; p_prop=prop ; p_part=None }
-let mk_property prop = { p_kind=PKProp ; p_prop=prop ; p_part=None }
+let mk_prop kind prop =
+  { p_kind=kind; p_prop=prop; p_unreachable=unknown; p_doomed=[]; p_part=None }
+let mk_check prop = mk_prop PKCheck prop
+let mk_property prop = mk_prop PKProp prop
 
 let mk_annot_id kf stmt ca = Property.ip_of_code_annot_single kf stmt ca
 let mk_annot_ids kf stmt ca = Property.ip_of_code_annot kf stmt ca
@@ -168,6 +179,18 @@ let mk_call_pre_id called_kf s_call called_pre called_pre_p =
   let kind = PKPre (called_kf, s_call, called_pre) in
   mk_prop kind called_pre_p
 
+let mk_smoke kf ~id ?(doomed=[]) ?unreachable () =
+  let oloc = match unreachable with
+    | None -> Property.OLContract kf
+    | Some stmt -> Property.OLStmt(kf,stmt)
+  in {
+    p_kind = PKSmoke;
+    p_prop = Property.ip_other ("smoke_" ^id) oloc ;
+    p_doomed = doomed ;
+    p_unreachable = oloc ;
+    p_part = None ;
+  }
+
 (*----------------------------------------------------------------------------*)
 
 let kind_order = function
@@ -182,6 +205,7 @@ let kind_order = function
   | PKAFctExit -> 8
   | PKCheck -> 9
   | PKTactic -> 10
+  | PKSmoke -> 11
 
 let compare_kind k1 k2 = match k1, k2 with
     PKPre (kf1, ki1, p1), PKPre (kf2, ki2, p2) ->
@@ -212,10 +236,7 @@ module PropId =
     type t = prop_id
     include Datatype.Undefined
     let name = "WpAnnot.prop_id"
-    let reprs =
-      List.map
-        (fun x -> { p_kind = PKProp; p_prop = x; p_part = None })
-        Property.reprs
+    let reprs = List.map mk_property Property.reprs
     let hash pid = Property.hash pid.p_prop
     let compare = compare_prop_id
     let equal pid1 pid2 = compare_prop_id pid1 pid2 = 0
@@ -299,7 +320,8 @@ end = struct
 
   let basename_of_prop_id p =
     match p.p_kind , p.p_prop with
-    | (PKTactic | PKCheck | PKProp | PKPropLoop) , p -> base_id_prop_txt p
+    | (PKTactic | PKCheck | PKProp | PKPropLoop | PKSmoke) , p ->
+        base_id_prop_txt p
     | PKEstablished , p -> base_id_prop_txt p ^ "_established"
     | PKPreserved , p -> base_id_prop_txt p ^ "_preserved"
     | PKVarDecr , p -> base_id_prop_txt p ^ "_decrease"
@@ -381,7 +403,7 @@ struct
 
   let get_prop_id_base p =
     match p.p_kind , p.p_prop with
-    | (PKTactic | PKCheck | PKProp | PKPropLoop) , p -> get_ip p
+    | (PKTactic | PKCheck | PKProp | PKPropLoop | PKSmoke) , p -> get_ip p
     | PKEstablished , p -> get_ip p ^ "_established"
     | PKPreserved , p -> get_ip p ^ "_preserved"
     | PKVarDecr , p -> get_ip p ^ "_decrease"
@@ -502,6 +524,7 @@ let string_of_termination_kind = function
 
 let label_of_kind = function
   | PKTactic -> "Tactic"
+  | PKSmoke -> "Smoke-test"
   | PKCheck -> "Check"
   | PKProp -> "Property"
   | PKPropLoop -> "Invariant" (* should be assert false ??? *)
@@ -527,7 +550,7 @@ struct
     | None -> ()
     | Some(k,n) -> fprintf fmt " (%d/%d)" (succ k) n
   let pp_subprop fmt p = match p.p_kind with
-    | PKProp | PKTactic | PKCheck | PKPropLoop -> ()
+    | PKProp | PKTactic | PKCheck | PKPropLoop | PKSmoke -> ()
     | PKEstablished -> pp_print_string fmt " (established)"
     | PKPreserved -> pp_print_string fmt " (preserved)"
     | PKVarDecr -> pp_print_string fmt " (decrease)"
@@ -580,6 +603,7 @@ let propid_hints hs p =
   let open Property in
   match p.p_kind , p.p_prop with
   | PKCheck , _ -> ()
+  | PKSmoke , _ -> add_required hs "smoke-test"
   | PKProp , IPAssigns {ias_kinstr=Kstmt _} ->
       add_required hs "stmt-assigns"
   | PKProp , IPAssigns {ias_kinstr=Kglobal} ->
@@ -668,12 +692,8 @@ let prop_id_keys p =
 (*----------------------------------------------------------------------------*)
 
 let pp_goal_kind fmt = function
-  | PKTactic
-  | PKCheck
-  | PKProp
-  | PKPropLoop
-  | PKAFctOut
-  | PKAFctExit
+  | PKTactic | PKSmoke | PKCheck
+  | PKProp | PKPropLoop | PKAFctOut | PKAFctExit
   | PKPre _ -> ()
   | PKEstablished -> Format.pp_print_string fmt "Establishment of "
   | PKPreserved -> Format.pp_print_string fmt "Preservation of "
@@ -704,6 +724,7 @@ let pretty_context kf fmt pid =
 
 let is_check p = p.p_kind = PKCheck
 let is_tactic p = p.p_kind = PKTactic
+let is_smoke_test p = p.p_kind = PKSmoke
 
 let is_assigns p =
   match property_of_id p with
@@ -954,14 +975,14 @@ let _split job pid goals =
 
 let subproofs id = match id.p_kind with
   | PKCheck -> 0
-  | PKProp | PKTactic | PKPre _ | PKPropLoop -> 1
+  | PKProp | PKSmoke | PKTactic | PKPre _ | PKPropLoop -> 1
   | PKEstablished | PKPreserved
   | PKVarDecr | PKVarPos
   | PKAFctExit | PKAFctOut -> 2
 
 let subproof_idx id = match id.p_kind with
   | PKCheck -> (-1) (* 0/0 *)
-  | PKProp | PKTactic | PKPre _ | PKPropLoop -> 0 (* 1/1 *)
+  | PKProp | PKTactic | PKPre _ | PKSmoke | PKPropLoop -> 0 (* 1/1 *)
   | PKPreserved  -> 0 (* 1/2 *)
   | PKEstablished-> 1 (* 2/2 *)
   | PKVarDecr    -> 0 (* 1/2 *)
@@ -1011,7 +1032,7 @@ let get_induction p =
       | IPAssigns {ias_kf; ias_kinstr=Kstmt stmt} -> Some (ias_kf, stmt)
       | _ -> None
   in match p.p_kind with
-  | PKCheck | PKAFctOut|PKAFctExit|PKPre _ | PKTactic -> None
+  | PKCheck|PKSmoke |PKAFctOut|PKAFctExit|PKPre _ | PKTactic -> None
   | PKProp ->
       let loop_stmt_opt = match get_stmt (property_of_id p) with
         | None -> None

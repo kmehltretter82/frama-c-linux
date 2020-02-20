@@ -205,12 +205,14 @@ let children n =
 (* --- State & Status                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
-type status = [ `Main | `Proved | `Pending of int ]
+type status = [ `Main | `Proved | `Invalid | `Pending of int ]
 
 let status t : status =
   match t.root with
   | None ->
-      if Wpo.is_proved t.main then `Proved else `Main
+      if Wpo.is_proved t.main
+      then if Wpo.is_smoke_test t.main then `Invalid else `Proved
+      else `Main
   | Some root ->
       match root.script with
       | Opened | Script _ -> `Main

@@ -449,6 +449,13 @@ class pane (gprovers : GuiConfig.provers) =
                 cancel#set_enabled false ;
                 forward#set_enabled false ;
                 status#set_text "Non Proved Property" ;
+            | `Invalid ->
+                icon#set_icon GuiProver.wg_status ;
+                next#set_enabled false ;
+                prev#set_enabled false ;
+                cancel#set_enabled false ;
+                forward#set_enabled false ;
+                status#set_text "Invalid Smoke-test" ;
             | `Proved ->
                 icon#set_icon GuiProver.ok_status ;
                 next#set_enabled false ;

@@ -520,9 +520,8 @@ let is_annot_for_config config ?(loopassigns=false) node s_annot bhv_name_list =
 let add_fct_pre config acc spec =
   let kf = config.kf in
   let add_bhv_pre_hyp b acc =
-    let impl_assumes = false in
     let kind = WpStrategy.Ahyp in
-    WpStrategy.add_prop_fct_bhv_pre acc kind kf b ~impl_assumes
+    WpStrategy.add_prop_fct_bhv_pre acc kind kf b
   in
   let add_def_pre_hyp acc =
     match Cil.find_default_behavior spec with
@@ -558,7 +557,13 @@ let add_fct_pre config acc spec =
             in List.fold_left add_hyp acc b.b_assumes
           else add_bhv_pre_hyp b acc
         in acc
-  in acc
+  in
+  let acc = match get_behav config Kglobal spec.spec_behavior with
+    | Some bhv when Wp_parameters.SmokeTests.get () ->
+        WpStrategy.add_prop_fct_smoke acc kf bhv
+    | _ -> acc
+  in
+  acc
 
 
 let add_variant acc spec = (* TODO *)
@@ -787,6 +792,25 @@ let get_call_annots config v s fct =
             empty calls
 
 (*----------------------------------------------------------------------------*)
+
+let is_unrolled_completely spec =
+  match spec.term_node with
+  | TConst (LStr "completely") -> true
+  | _ -> false
+
+let is_unrolled_loop stmt =
+  let exception Unrolled in
+  try
+    Annotations.iter_code_annot (fun _emitter ca ->
+        match ca.annot_content with
+        | APragma (Loop_pragma (Unroll_specs [ spec ; _ ]))
+          when is_unrolled_completely spec ->
+            raise Unrolled ;
+        | _ -> ()
+      ) stmt ;
+    false
+  with Unrolled -> true
+
 let add_variant_annot config s ca var_exp loop_entry loop_back =
   let (vpos_id, vpos), (vdecr_id, vdecr) =
     WpStrategy.mk_variant_properties config.kf s ca var_exp
@@ -876,12 +900,14 @@ let get_loop_annots config vloop s =
         in (assigns, loop_entry , loop_back , loop_core)
     | _ -> acc (* see get_stmt_annots *)
   in
-  let acc =
-    ((None,None),
-     WpStrategy.empty_acc, WpStrategy.empty_acc, WpStrategy.empty_acc)
-  in
+  let loop_core =
+    if Wp_parameters.SmokeTests.get () && cur_fct_default_bhv config
+       && not (is_unrolled_loop s)
+    then WpStrategy.add_prop_loop_smoke WpStrategy.empty_acc config.kf s
+    else WpStrategy.empty_acc in
   let (h_assigns, g_assigns), loop_entry , loop_back , loop_core =
-    Annotations.fold_code_annot do_annot s acc
+    Annotations.fold_code_annot do_annot s
+      ((None,None), WpStrategy.empty_acc, WpStrategy.empty_acc, loop_core)
   in
   let loop_back = match g_assigns with
     | None -> loop_back

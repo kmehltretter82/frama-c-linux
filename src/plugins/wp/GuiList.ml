@@ -70,7 +70,9 @@ let render_prover_result p =
           | `Proof -> icn_stock "gtk-edit"
           | `Saved -> icn_stock "gtk-file"
         end
-    | { verdict=r } , _ -> icon_of_verdict r
+    | result , _ ->
+        let smoke = Wpo.is_smoke_test w in
+        icon_of_verdict (VCS.verdict ~smoke result)
 
 class pane (gprovers:GuiConfig.provers) =
   let model = new model in

@@ -34,7 +34,7 @@ open GuiSource
 (* -------------------------------------------------------------------------- *)
 
 type scope = [ `All | `Module | `Select ]
-type filter = [ `ToProve | `Scripts | `All ]
+type filter = [ `ToProve | `Scripts | `Smoke | `All ]
 type card = [ `List | `Goal ]
 type focus =
   [ `All
@@ -105,7 +105,9 @@ class behavior
           ~values:[`All,"all" ; `Module,"module" ; `Select,"select"]
           ~default:`Module scope ;
         Cfg.config_values ~key:"wp.navigator.filter"
-          ~values:[`All,"all" ; `Scripts,"scripts" ;
+          ~values:[`All,"all" ;
+                   `Smoke,"smoketests" ;
+                   `Scripts,"scripts" ;
                    `ToProve,"toprove"]
           ~default:`ToProve filter ;
         filter#on_event self#reload ;
@@ -124,7 +126,9 @@ class behavior
     method reload () =
       begin
         list#reload ;
-        let to_prove g = not (Wpo.is_proved g || Wpo.reduce g) in
+        let to_prove g =
+          not (Wpo.is_smoke_test g) &&
+          not (Wpo.is_proved g || Wpo.reduce g) in
         let has_proof g =
           match ProofEngine.get g with
           | `None -> false
@@ -133,6 +137,7 @@ class behavior
           let ok =
             match filter#get with
             | `All -> true
+            | `Smoke -> Wpo.is_smoke_test g
             | `Scripts -> has_proof g
             | `ToProve -> to_prove g && (Wpo.is_unknown g || has_proof g)
           in if ok then list#add g
@@ -444,6 +449,7 @@ let make (main : main_window_extension_points) =
     let filter = new Widget.menu ~default:`ToProve ~options:[
       `ToProve , "Not Proved (yet)" ;
       `Scripts , "All Scripts" ;
+      `Smoke , "Smoke Tests" ;
       `All , "All Goals" ;
     ] () in
     let prev = new Widget.button ~icon:`GO_BACK ~tooltip:"Previous goal" () in
@@ -464,18 +470,6 @@ let make (main : main_window_extension_points) =
       focusbar#pack ~from:`END ~expand:false clear#coerce ;
       focusbar#pack ~from:`END ~expand:false pvrs#coerce ;
       pvrs#connect dp_chooser#run ;
-    end ;
-
-    (* -------------------------------------------------------------------------- *)
-    (* --- Filter Popup                                                       --- *)
-    (* -------------------------------------------------------------------------- *)
-
-    begin
-      filter#set_render (function
-          | `All -> "All Results"
-          | `Scripts -> "All Scripts"
-          | `ToProve -> "Not Proved") ;
-      filter#set_items [ `ToProve ; `Scripts ; `All ] ;
     end ;
 
     (* -------------------------------------------------------------------------- *)

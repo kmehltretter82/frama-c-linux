@@ -156,6 +156,7 @@ val has_verdict : t -> prover -> bool
 val get_result : t -> prover -> result
 val get_results : t -> (prover * result) list
 val get_proof : t -> bool * Property.t
+val get_target : t -> Property.t
 val is_trivial : t -> bool (** do not tries simplification, do not check prover results *)
 val is_proved : t -> bool (** do not tries simplification, check prover results *)
 val is_unknown : t -> bool
@@ -170,6 +171,7 @@ val get_time: result -> float
 val get_steps: result -> int
 
 val is_tactic : t -> bool
+val is_smoke_test : t -> bool
 
 val iter :
   ?ip:Property.t ->

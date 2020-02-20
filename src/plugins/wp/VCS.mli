@@ -68,7 +68,7 @@ type config = {
 val current : unit -> config (** Current parameters *)
 val default : config (** all None *)
 
-val get_timeout : config -> int (** 0 means no-timeout *)
+val get_timeout : smoke:bool -> config -> int (** 0 means no-timeout *)
 val get_stepout : config -> int (** 0 means no-stepout *)
 
 (** {2 Results} *)
@@ -112,6 +112,10 @@ val is_auto : prover -> bool
 val is_verdict : result -> bool
 val is_valid: result -> bool
 val is_computing: result -> bool
+val is_proved: smoke:bool -> result -> bool
+
+val verdict: smoke:bool -> result -> verdict
+
 val configure : result -> config
 val autofit : result -> bool (** Result that fits the default configuration *)
 

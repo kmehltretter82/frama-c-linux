@@ -90,7 +90,8 @@ let rank n =
 
 type res = VALID | UNSUCCESS | INCONCLUSIVE | NORESULT
 
-let result (r:VCS.result) = match r.VCS.verdict with
+let result ~smoke (r:VCS.result) =
+  match VCS.verdict ~smoke r with
   | VCS.NoResult | VCS.Checked | VCS.Computing _ -> NORESULT
   | VCS.Failed -> INCONCLUSIVE
   | VCS.Invalid | VCS.Unknown | VCS.Timeout | VCS.Stepout -> UNSUCCESS
@@ -209,7 +210,8 @@ let add_results (plist:pstats list) (wpo:Wpo.t) =
   let sm = ref 0 in
   List.iter
     (fun (p,r) ->
-       let re = result r in
+       let smoke = Wpo.is_smoke_test wpo in
+       let re = result ~smoke r in
        let st = Wpo.get_steps r in
        let tc = Wpo.get_time r in
        let ts = r.VCS.solver_time in

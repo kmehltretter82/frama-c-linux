@@ -370,6 +370,13 @@ module RTE =
   end)
 
 let () = Parameter_customize.set_group wp_strategy
+module SmokeTests =
+  False(struct
+    let option_name = "-wp-smoke-tests"
+    let help = "Smoke-tests : look for inconsistent contracts (best effort)"
+  end)
+
+let () = Parameter_customize.set_group wp_strategy
 module Split =
   False(struct
     let option_name = "-wp-split"
@@ -648,6 +655,17 @@ module Timeout =
   Int(struct
     let option_name = "-wp-timeout"
     let default = 10
+    let arg_name = "n"
+    let help =
+      Printf.sprintf
+        "Set the timeout (in seconds) for provers (default: %d)." default
+  end)
+
+let () = Parameter_customize.set_group wp_prover
+module SmokeTimeout =
+  Int(struct
+    let option_name = "-wp-smoke-timeout"
+    let default = 2
     let arg_name = "n"
     let help =
       Printf.sprintf

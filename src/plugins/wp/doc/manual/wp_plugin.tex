@@ -913,6 +913,38 @@ weakest precondition calculus.
   (default is: \texttt{yes}).
 \end{description}
 
+\subsection{Smoke Tests}
+
+During modular deductive verification, inconsistencies in function requirements
+can be difficult to detect untill you actually call it.
+Although, such inconsistencies make its post-conditions provable, while its pre-conditions
+would never be provable.
+
+The \textsf{WP} plug-in can generate smoke-tests to detect such inconsistencies.
+Basically, it consists in checking if \verb+\false+ is provable under the requirements
+or assumptions of a behavior, or under the invariants of a loop.
+
+This is best-effort verification : if at least one prover succeed in proving \verb+\false+,
+an inconsistency is detected. Otherwized, the test is not conclusive, and you can never be sure
+that your annotations are free of inconsistencies.
+
+In case any smoke-test fails, a ``\textit{False if reachable}'' status is put on the
+inconsistent requirements, or on the loop with inconsistent invariants, and finally,
+\textsf{WP} generates a user error.
+
+\begin{description}
+\item[\tt -wp-(no)-smoke-tests] generates checks to detect inconsistent
+  annotations.
+\item[\tt -wp-(no)-smoke-timeout] timeout to be used for trying to prove \verb+\false+
+  on smoke-tests (default is \verb+2+ seconds).
+\end{description}
+
+When reporting prover results for smoke-tests, the \textsf{WP} displays
+``Failed'' when some prover succeed in discharing the \verb+\false+ proof-obligation
+and ``Passed'' when all the provers result are unknown or interrupted.
+In the final prover statistics, the interrupted smoke tests are \emph{not} reported, since
+they are considered valid tests.
+
 \subsection{Trigger Generation}
 \label{triggers}
 
@@ -1016,6 +1048,8 @@ Support for \textsf{Why-3 IDE} is no longer provided.
   on proved goals when available (default is: \texttt{no}).
 \item[\tt -wp-timeout <n>] sets the timeout (in seconds) for the calls
   to the decision prover (defaults to 10 seconds).
+\item[\tt -wp-smoke-timeout <n>] sets the timeout (in seconds) for smoke tests
+  (see \verb+-wp-smoke-tests+, defaults to 5 seconds).
 \item[\tt -wp-time-extra <n>] additional time allocated to provers when
   replaying a script. This is used to cope with variable machine load.
   Default is \verb+5s+.

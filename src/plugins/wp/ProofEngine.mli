@@ -35,7 +35,7 @@ val validate : ?incomplete:bool -> tree -> unit
 
 (** Leaves are numbered from 0 to n-1 *)
 
-type status = [ `Main | `Proved | `Pending of int ]
+type status = [ `Main | `Invalid | `Proved | `Pending of int ]
 type current = [ `Main | `Internal of node | `Leaf of int * node ]
 type position = [ `Main | `Node of node | `Leaf of int ]
 

@@ -28,6 +28,7 @@
 - WP	      [2019/17/04] Control splitting with -wp-max-split <n>
 - WP          [2019/12/04] Added option -wp-run-all-provers
 - WP          [2019/01/29] Emit a warning when no goal is generated
+- Wp          [2019/06/04] Checks for inconsistent requires (-wp-smoke-tests)
 - TIP         [2018/04/03] Create session directory only on demand
 - TIP         [2018/03/19] Specification of JSON script format
 - Wp          [2018/03/18] Additional lemma about remainder (mod)

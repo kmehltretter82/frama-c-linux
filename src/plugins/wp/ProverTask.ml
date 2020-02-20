@@ -133,8 +133,11 @@ let location file line = {
   Lexing.pos_cnum = 0 ;
 }
 
-let timeout = function
-  | None -> Wp_parameters.Timeout.get ()
+let timeout ~smoke = function
+  | None ->
+      if smoke
+      then Wp_parameters.SmokeTimeout.get ()
+      else Wp_parameters.Timeout.get ()
   | Some t -> t
 
 let stepout = function

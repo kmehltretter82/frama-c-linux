@@ -113,6 +113,7 @@ module Drivers: Parameter_sig.String_list
 module Script: Parameter_sig.String
 module UpdateScript: Parameter_sig.Bool
 module Timeout: Parameter_sig.Int
+module SmokeTimeout: Parameter_sig.Int
 module TimeExtra: Parameter_sig.Int
 module TimeMargin: Parameter_sig.Int
 module CoqTimeout: Parameter_sig.Int
@@ -146,6 +147,7 @@ module ReportJson: Parameter_sig.String
 module ReportName: Parameter_sig.String
 module MemoryContext: Parameter_sig.Bool
 module Check: Parameter_sig.Bool
+module SmokeTests: Parameter_sig.Bool
 
 (** {2 Getters} *)
 

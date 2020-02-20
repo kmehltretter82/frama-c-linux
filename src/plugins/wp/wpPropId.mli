@@ -32,10 +32,14 @@ open LogicUsage
 (** Property.t information and kind of PO (establishment, preservation, etc) *)
 type prop_id
 
-(** returns the annotation which lead to the given PO.
-    Dynamically exported.
-*)
+(** returns the annotation which lead to the given PO. *)
 val property_of_id : prop_id -> Property.t
+
+(** Properties that are False-if-unreachable in case the PO is valid. *)
+val doomed_if_valid : prop_id -> Property.t list
+
+(** Stmt that is unreachable in case the PO is valid. *)
+val unreachable_if_valid : prop_id -> Property.other_loc
 
 val source_of_id : prop_id -> Filepath.position
 
@@ -53,6 +57,7 @@ val is_tactic : prop_id -> bool
 val is_assigns : prop_id -> bool
 val is_requires : Property.t -> bool
 val is_loop_preservation : prop_id -> stmt option
+val is_smoke_test : prop_id -> bool
 
 (** test if the prop_id does not have a [no_wp:] in its name(s). *)
 val select_default : prop_id -> bool
@@ -86,6 +91,7 @@ type prop_kind =
   | PKVarPos      (** computation related to a loop variant being positive *)
   | PKAFctOut     (** computation related to the function assigns on normal termination *)
   | PKAFctExit    (** computation related to the function assigns on exit termination *)
+  | PKSmoke      (** smoke property *)
   | PKPre of kernel_function * stmt * Property.t (** precondition for function
                                                      at stmt, property of the require. Many information that should come
                                                      from the p_prop part of the prop_id, but in the PKPre case,
@@ -103,6 +109,11 @@ val string_of_termination_kind : termination_kind -> string
 
 val num_of_bhv_from : funbehavior -> from -> int
 (*----------------------------------------------------------------------------*)
+
+val mk_smoke : kernel_function -> id:string ->
+  ?doomed:Property.t list ->
+  ?unreachable:stmt ->
+  unit -> prop_id
 
 val mk_code_annot_ids : kernel_function -> stmt -> code_annotation -> prop_id list
 

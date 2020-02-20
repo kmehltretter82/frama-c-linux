@@ -35,10 +35,12 @@ let dispatch ?(config=VCS.default) mode prover wpo =
     | Qed | Tactical -> Task.return VCS.no_result
     | NativeAltErgo -> ProverErgo.prove ~config ~mode wpo
     | NativeCoq -> ProverCoq.prove mode wpo
-    | Why3 prover -> ProverWhy3.prove
-                       ~timeout:(VCS.get_timeout config)
-                       ~steplimit:(VCS.get_stepout config)
-                       ~prover wpo
+    | Why3 prover ->
+        let smoke = Wpo.is_smoke_test wpo in
+        ProverWhy3.prove
+          ~timeout:(VCS.get_timeout ~smoke config)
+          ~steplimit:(VCS.get_stepout config)
+          ~prover wpo
   end
 
 let started ?start wpo =

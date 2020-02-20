@@ -167,7 +167,7 @@ struct
 
   let pending env =
     match ProofEngine.status env.tree with
-    | `Main | `Proved -> 0 | `Pending n -> n
+    | `Main | `Invalid | `Proved -> 0 | `Pending n -> n
 
   let setup_backtrack env node depth =
     if env.backtrack > 0 then
