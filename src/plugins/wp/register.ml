@@ -272,10 +272,10 @@ let do_list_scheduled iter_on_goals =
              incr scheduled ;
              if !spy then session := GOALS.add goal !session ;
            end) ;
-      let n = !scheduled in
-      if n > 1
-      then Wp_parameters.feedback "%d goals scheduled" n
-      else Wp_parameters.feedback "%d goal scheduled" n ;
+      match !scheduled with
+      | 0 -> Wp_parameters.warning ~current:false "No goal generated"
+      | 1 -> Wp_parameters.feedback "1 goal scheduled"
+      | n -> Wp_parameters.feedback "%d goals scheduled" n
     end
 
 let dkey_prover = Wp_parameters.register_category "prover"
@@ -487,19 +487,22 @@ let do_report_scheduled () =
       let plural = if !exercised > 1 then "s" else "" in
       Wp_parameters.result "%d goal%s generated" !exercised plural
     else
-      let proved = GOALS.cardinal !proved in
-      let mode = ProverWhy3.get_mode () in
-      if mode <> ProverWhy3.NoCache then do_report_cache_usage mode ;
-      Wp_parameters.result "%t"
-        begin fun fmt ->
-          Format.fprintf fmt "Proved goals: %4d / %d@\n" proved !scheduled ;
-          Pretty_utils.pp_items
-            ~min:12 ~align:`Left
-            ~title:(fun (prover,_) -> VCS.title_of_prover prover)
-            ~iter:(fun f -> PM.iter (fun p s -> f (p,s)) !provers)
-            ~pp_title:(fun fmt a -> Format.fprintf fmt "%s:" a)
-            ~pp_item:do_report_prover_stats fmt ;
-        end
+    if !scheduled > 0 then
+      begin
+        let proved = GOALS.cardinal !proved in
+        let mode = ProverWhy3.get_mode () in
+        if mode <> ProverWhy3.NoCache then do_report_cache_usage mode ;
+        Wp_parameters.result "%t"
+          begin fun fmt ->
+            Format.fprintf fmt "Proved goals: %4d / %d@\n" proved !scheduled ;
+            Pretty_utils.pp_items
+              ~min:12 ~align:`Left
+              ~title:(fun (prover,_) -> VCS.title_of_prover prover)
+              ~iter:(fun f -> PM.iter (fun p s -> f (p,s)) !provers)
+              ~pp_title:(fun fmt a -> Format.fprintf fmt "%s:" a)
+              ~pp_item:do_report_prover_stats fmt ;
+          end ;
+      end
 
 let do_list_scheduled_result () =
   begin

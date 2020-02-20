@@ -25,6 +25,7 @@
 - WP	      [2020/02/10] Extended frame conditions with global C-types
 - WP	      [2019/17/04] Control splitting with -wp-max-split <n>
 - WP          [2019/12/04] Added option -wp-run-all-provers
+- WP          [2019/01/29] Emit a warning when no goal is generated
 
 ##########################
 Plugin WP 20.0 (Calcium)

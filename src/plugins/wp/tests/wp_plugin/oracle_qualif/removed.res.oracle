@@ -18,5 +18,4 @@
 [wp] Proved goals:    0 / 1
   Alt-Ergo 2.0.0:    0  (unsuccess: 1)
 [wp] Running WP plugin...
-[wp] 0 goal scheduled
-[wp] Proved goals:    0 / 0
+[wp] Warning: No goal generated
