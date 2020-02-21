@@ -264,8 +264,10 @@ module Make
         Value_parameters.abort "Entry point %a has arguments"
           Kernel_function.pretty kf
       else
-        let kind = Abstract_domain.Main_Formal in
-        List.fold_right (Domain.initialize_variable_using_type kind) l state
+        let var_kind = Abstract_domain.Formal kf in
+        let state = Domain.enter_scope var_kind l state in
+        let init_kind = Abstract_domain.Main_Formal in
+        List.fold_right (Domain.initialize_variable_using_type init_kind) l state
 
   (* Use the values supplied in [actuals] for the formals of [kf], and
      bind them in [state] *)
@@ -305,7 +307,7 @@ module Make
 
   let initialize_global_variable ~lib_entry vi init state =
     Cil.CurrentLoc.set vi.vdecl;
-    let state = Domain.introduce_globals [vi] state in
+    let state = Domain.enter_scope Abstract_domain.Global [vi] state in
     if vi.vsource then
       let initialize =
         if lib_entry || (vi.vstorage = Extern)

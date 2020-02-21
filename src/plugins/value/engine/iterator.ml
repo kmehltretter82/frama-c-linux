@@ -281,18 +281,20 @@ module Make_Dataflow
   let transfer_instr (stmt : stmt) (instr : instr) : transfer_function =
     match instr with
     | Local_init (vi, AssignInit exp, _loc) ->
+      let kind = Abstract_domain.Local kf in
       let transfer state =
-        let state = Domain.enter_scope kf [vi] state in
+        let state = Domain.enter_scope kind [vi] state in
         Init.initialize_local_variable stmt vi exp state
       in
       lift' transfer
     | Local_init (vi, ConsInit (f, args, k), loc) ->
+      let kind = Abstract_domain.Local kf in
       let as_func dest callee args _loc state =
         (* This variable enters the scope too early, as it should
            be introduced after the call to [f] but before the assignment
            to [v]. This is currently not possible, at least without
            splitting Transfer.call in two. *)
-        let state = Domain.enter_scope kf [vi] state in
+        let state = Domain.enter_scope kind [vi] state in
         transfer_call stmt dest callee args state
       in
       Cil.treat_constructor_as_func as_func vi f args k loc
@@ -335,7 +337,8 @@ module Make_Dataflow
         let return_lval = Var vi_ret, NoOffset in
         let kstmt = Kstmt stmt in
         fun state ->
-          let state = Domain.enter_scope kf [vi_ret] state in
+          let kind = Abstract_domain.Local kf in
+          let state = Domain.enter_scope kind [vi_ret] state in
           let state' = Transfer.assign state kstmt return_lval return_exp in
           Bottom.to_list state'
     in

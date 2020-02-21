@@ -1244,7 +1244,7 @@ module Domain = struct
   let evaluate_predicate _env _state _pred = Alarmset.Unknown
   let reduce_by_predicate _env state _pred _positive = `Value state
 
-  let enter_scope _kf _varinfos state = state
+  let enter_scope _kind _varinfos state = state
   let leave_scope _kf varinfos state =
     let state = List.fold_left State.remove state varinfos in
     check "leave_scope" state
@@ -1253,7 +1253,6 @@ module Domain = struct
   let incr_loop_counter _stmt state = state
   let leave_loop _stmt state = state
 
-  let introduce_globals _varinfos state = state
   let initialize_variable _lval _location ~initialized:_ _value state = state
   let initialize_variable_using_type _kind _varinfo state = state
 

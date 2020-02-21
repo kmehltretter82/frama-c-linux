@@ -70,11 +70,10 @@ module type Minimal = sig
   (** Initialization of variables. *)
 
   val empty: unit -> t
-  val introduce_globals: varinfo list -> t -> t
   val initialize_variable:
     lval -> initialized:bool -> Abstract_domain.init_value -> t -> t
 
-  val enter_scope: kernel_function -> varinfo list -> t -> t
+  val enter_scope: Abstract_domain.variable_kind -> varinfo list -> t -> t
   val leave_scope: kernel_function -> varinfo list -> t -> t
 
   (** Pretty printers. *)
@@ -138,11 +137,10 @@ module type Simple_Cvalue = sig
   (** Initialization of variables. *)
 
   val empty: unit -> t
-  val introduce_globals: varinfo list -> t -> t
   val initialize_variable:
     lval -> initialized:bool -> Abstract_domain.init_value -> t -> t
 
-  val enter_scope: kernel_function -> varinfo list -> t -> t
+  val enter_scope: Abstract_domain.variable_kind -> varinfo list -> t -> t
   val leave_scope: kernel_function -> varinfo list -> t -> t
 
   (** Pretty printer. *)

@@ -914,16 +914,9 @@ module Internal = struct
   let reuse _kf _bases ~current_input:_ ~previous_output:state = state
 
   let empty () = Traces.empty
-  let introduce_globals vars state =
-    {state with globals = vars @ state.globals}
   let initialize_variable lv _ ~initialized:_ _ state =
     Traces.add_trans state (Msg(Format.asprintf "initialize variable: %a" Printer.pp_lval lv ))
   let initialize_variable_using_type init_kind varinfo state =
-    let state =
-      match init_kind with
-      | Abstract_domain.Main_Formal -> {state with main_formals = varinfo::state.main_formals}
-      | _ -> state
-    in
     let msg = Format.asprintf "initialize@ variable@ using@ type@ %a@ %a"
         (fun fmt init_kind ->
            match init_kind with
@@ -1000,8 +993,19 @@ module Internal = struct
       Traces.add_trans state (Msg "leave_loop")
 
 
-  let enter_scope kf vars state = Traces.add_trans state (EnterScope (kf, vars))
-  let leave_scope kf vars state = Traces.add_trans state (LeaveScope (kf, vars))
+  let enter_scope kind vars state =
+    match kind with
+    | Abstract_domain.Global ->
+      { state with globals = vars @ state.globals }
+    | Abstract_domain.Formal kf ->
+      if Kernel_function.equal kf (fst (Globals.entry_point ()))
+      then { state with main_formals = vars @ state.main_formals }
+      else state
+    | Abstract_domain.Local kf ->
+      Traces.add_trans state (EnterScope (kf, vars))
+
+  let leave_scope kf vars state =
+    Traces.add_trans state (LeaveScope (kf, vars))
 
   let reduce_further _state _expr _value = [] (*Nothing intelligent to suggest*)
 

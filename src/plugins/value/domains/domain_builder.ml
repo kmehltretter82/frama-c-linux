@@ -73,7 +73,7 @@ module Make_Minimal
   let extract_expr _oracle _state _expr = top_answer
   let extract_lval _oracle _state _lval _typ _location = top_answer
   let backward_location _state _lval _typ location value = `Value (location, value)
-  let reduce_further _sttae _expr _value = []
+  let reduce_further _state _expr _value = []
 
   let update _valuation state = `Value state
 
@@ -100,7 +100,6 @@ module Make_Minimal
 
   let initialize_variable_using_type _kind varinfo state =
     let lval = Cil.var varinfo in
-    let state = introduce_globals [varinfo] state in
     Domain.initialize_variable lval ~initialized:true Abstract_domain.Top state
 
   let logic_assign _assigns _location ~pre:_ _state = top
@@ -235,7 +234,6 @@ module Complete_Simple_Cvalue (Domain: Simpler_domains.Simple_Cvalue)
 
     let initialize_variable_using_type _kind varinfo state =
       let lval = Cil.var varinfo in
-      let state = introduce_globals [varinfo] state in
       Domain.initialize_variable lval ~initialized:true Abstract_domain.Top state
 
     let logic_assign _assigns _location ~pre:_ _state = top

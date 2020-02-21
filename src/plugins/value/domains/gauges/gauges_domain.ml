@@ -1141,7 +1141,7 @@ module D_Impl : Abstract_domain.S
 
   let pretty = G.pretty
 
-  let enter_scope _kf _vars state =
+  let enter_scope _kind _vars state =
     state (* default is Top, nothing to do *)
 
   let remove_variables vars (state:state) =
@@ -1292,7 +1292,6 @@ module D_Impl : Abstract_domain.S
   let reuse _kf _bases ~current_input:_ ~previous_output = previous_output
 
   (* Initial state *)
-  let introduce_globals _ state = state
   let initialize_variable_using_type _ _ state = state
   let initialize_variable _ _ ~initialized:_ _ state = state
 

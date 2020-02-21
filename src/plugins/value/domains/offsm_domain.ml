@@ -109,7 +109,7 @@ module Internal  : Domain_builder.InputDomain
 
   let empty _ = Memory.empty_map
 
-  let enter_scope _kf _vars state = state (* default is Top, nothing to do *)
+  let enter_scope _kind _vars state = state (* default is Top, nothing to do *)
   let leave_scope _kf vars state =
     Memory.remove_variables vars state
 
@@ -212,7 +212,6 @@ module Internal  : Domain_builder.InputDomain
     state
 
   (* Initial state *)
-  let introduce_globals _ state = state
   let initialize_variable_using_type _ _ state = state
   let initialize_variable _ _ ~initialized:_ _ state = state
 

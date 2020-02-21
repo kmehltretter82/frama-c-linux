@@ -79,7 +79,6 @@ module Make
   let leave_loop _ _ = ()
 
   let empty () = ()
-  let introduce_globals _ () = ()
   let initialize_variable _ _ ~initialized:_ _ _ = ()
   let initialize_variable_using_type _ _ _  = ()
 

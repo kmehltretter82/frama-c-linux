@@ -272,6 +272,11 @@ type 'state logic_environment = {
   result: varinfo option;
 }
 
+type variable_kind =
+  | Global
+  | Formal of kernel_function
+  | Local of kernel_function
+
 (** Value for the initialization of variables. Can be either zero or top. *)
 type init_value = Zero | Top
 
@@ -374,12 +379,20 @@ module type S = sig
   (** {3 Miscellaneous } *)
 
   (** Scoping: abstract transformers for entering and exiting blocks.
-      [kf] is the englobing function, and the variables of the list [vars]
-      should be added or removed from the abstract state here.
-      Note that the formals of a function enter the scope through the transfer
-      function {!Transfer.start_call}, but leave it through a
-      call to {!leave_scope}. *)
-  val enter_scope: kernel_function -> varinfo list -> t -> t
+      The variables should be added or removed from the abstract state here.
+      Note that the formals of a function called enter the scope through the
+      transfer function {!start_call}, but leave it through a call to
+      {!leave_scope}. *)
+
+  (** Introduces a list of variables in the state. At this point, the variables
+      are uninitialized. Globals and formals of the 'main' will be initialized
+      by {!initialize_variable} and {!initialize_variable_using_type}. Local
+      variables remain uninitialized until an assignment through {!assign}.
+      The formal parameters of a call enter the scope through {!start_call}. *)
+  val enter_scope: variable_kind -> varinfo list -> t -> t
+
+  (** Removes a list of local and formal variables from the state.
+      The first argument is the englobing function. *)
   val leave_scope: kernel_function -> varinfo list -> t -> t
 
   val enter_loop: stmt -> state -> state
@@ -390,11 +403,6 @@ module type S = sig
 
   (** The initial state with which the analysis start. *)
   val empty: unit -> t
-
-  (** Introduces the list of global variables in the state.  At this point,
-      these variables are uninitialized: they will be initialized through the
-      two functions below.*)
-  val introduce_globals: varinfo list -> t -> t
 
   (** [initialize_variable lval loc ~initialized init_value state] initializes
       the value of the location [loc] of lvalue [lval] in [state] with:

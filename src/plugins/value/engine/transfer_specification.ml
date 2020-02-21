@@ -546,7 +546,8 @@ module Make
         | Some retres_vi ->
           (* Notify the user about missing assigns \result. *)
           if warn then warn_on_missing_result_assigns kinstr call.kf spec;
-          let state = Domain.enter_scope call.kf [retres_vi] state in
+          let kind = Abstract_domain.Local call.kf in
+          let state = Domain.enter_scope kind [retres_vi] state in
           let init_kind = Abstract_domain.Spec_Return call.kf  in
           Domain.initialize_variable_using_type init_kind retres_vi state
       in

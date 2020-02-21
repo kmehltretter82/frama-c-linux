@@ -322,15 +322,6 @@ module State = struct
   (*                             Initialization                               *)
   (* ------------------------------------------------------------------------ *)
 
-  let introduce_globals vars (state, clob) =
-    let introduce state varinfo =
-      let base = Base.of_varinfo varinfo in
-      let loc = Locations.loc_of_base base in
-      let value = Cvalue.V_Or_Uninitialized.uninitialized in
-      Model.add_indeterminate_binding ~exact:true state loc value
-    in
-    List.fold_left introduce state vars, clob
-
   let initialize_variable  _lval loc ~initialized init_value (state, clob) =
     let value = match init_value with
       | Abstract_domain.Top  -> Cvalue.V.top_int
@@ -383,21 +374,33 @@ module State = struct
   (*                                  Misc                                    *)
   (* ------------------------------------------------------------------------ *)
 
-  let enter_scope _kf vars (state, clob) =
-    let bind_local state vi =
-      let b = Base.of_varinfo vi in
-      let offsm =
-        if Value_parameters.InitializedLocals.get () then
-          let v = Cvalue.(V_Or_Uninitialized.initialized V.top_int) in
-          match Cvalue.V_Offsetmap.size_from_validity (Base.validity b) with
-          | `Bottom -> assert false
-          | `Value size -> Cvalue.V_Offsetmap.create_isotropic ~size v
-        else
-          Bottom.non_bottom (Cvalue.Default_offsetmap.default_offsetmap b)
-      in
-      Model.add_base b offsm state
+  let bind_local state vi =
+    let b = Base.of_varinfo vi in
+    let offsm =
+      if Value_parameters.InitializedLocals.get () then
+        let v = Cvalue.(V_Or_Uninitialized.initialized V.top_int) in
+        match Cvalue.V_Offsetmap.size_from_validity (Base.validity b) with
+        | `Bottom -> assert false
+        | `Value size -> Cvalue.V_Offsetmap.create_isotropic ~size v
+      else
+        Bottom.non_bottom (Cvalue.Default_offsetmap.default_offsetmap b)
     in
-    List.fold_left bind_local state vars, clob
+    Model.add_base b offsm state
+
+  let bind_global state varinfo =
+    let base = Base.of_varinfo varinfo in
+    let loc = Locations.loc_of_base base in
+    let value = Cvalue.V_Or_Uninitialized.uninitialized in
+    Model.add_indeterminate_binding ~exact:true state loc value
+
+  let enter_scope kind vars (state, clob) =
+    let bind =
+      match kind with
+      | Abstract_domain.Local _kf  -> bind_local
+      | Abstract_domain.Formal _kf -> bind_local
+      | Abstract_domain.Global     -> bind_global
+    in
+    List.fold_left bind state vars, clob
 
   let leave_scope kf vars (state, clob) =
     let state = Model.remove_variables vars state in

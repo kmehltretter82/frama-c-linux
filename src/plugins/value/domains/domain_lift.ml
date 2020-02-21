@@ -137,11 +137,9 @@ module Make
   let leave_loop = Domain.leave_loop
 
   let empty = Domain.empty
-  let introduce_globals = Domain.introduce_globals
   let initialize_variable lval loc ~initialized init_value state =
     let loc = Convert.restrict_loc loc in
     Domain.initialize_variable lval loc ~initialized init_value state
-
   let initialize_variable_using_type = Domain.initialize_variable_using_type
 
   let relate = Domain.relate

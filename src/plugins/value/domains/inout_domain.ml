@@ -223,7 +223,7 @@ module Internal
   let name = "inout"
   let log_category = Value_parameters.register_category "d-inout"
 
-  let enter_scope _kf _vars state = state
+  let enter_scope _kind _vars state = state
   let leave_scope _kf vars state = Transfer.remove_variables vars state
 
   let to_z valuation lv =
@@ -257,7 +257,6 @@ module Internal
 
   (* Initial state. Initializers are singletons, so we store nothing. *)
   let empty () = LatticeInout.empty
-  let introduce_globals _vars state = state
   let initialize_variable _ _ ~initialized:_ _ state = state
   let initialize_variable_using_type _ _ state  = state
 
