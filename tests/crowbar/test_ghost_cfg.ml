@@ -233,6 +233,11 @@ let gen_if ghost ghost_else stmt_then stmt_else env =
   let new_env = { if_env with in_ghost = ghoste } in
   let new_env, else_s = stmt_else new_env in
   let env = merge env new_env in
+  let else_b = Cil.mkBlock else_s in
+  if (not ghost) && ghoste then begin
+      let attr = Attr (Cil.frama_c_ghost_else,[]) in
+      else_b.battrs <- Cil.addAttribute attr else_b.battrs;
+    end;
   stmt.skind <- If(e,Cil.mkBlock then_s, Cil.mkBlock else_s,loc);
   env, stmt
 
