@@ -288,7 +288,7 @@ type init_kind =
     It avoids repeating the analysis of a function in equivalent entry states.
     It uses an over-approximation of the locations possibly read and written
     by a function, and compare the entry states for these locations. *)
-module type Recycle = sig
+module type Reuse = sig
   type t (** Type of states. *)
 
   (** [relate kf bases state] returns the set of bases [bases] in relation with
@@ -376,7 +376,7 @@ module type S = sig
   val reduce_by_predicate:
     state logic_environment -> state -> predicate -> bool -> state or_bottom
 
-  (** {3 Miscellaneous } *)
+  (** {3 Scoping and initialization } *)
 
   (** Scoping: abstract transformers for entering and exiting blocks.
       The variables should be added or removed from the abstract state here.
@@ -395,12 +395,6 @@ module type S = sig
       The first argument is the englobing function. *)
   val leave_scope: kernel_function -> varinfo list -> t -> t
 
-  val enter_loop: stmt -> state -> state
-  val incr_loop_counter: stmt -> state -> state
-  val leave_loop: stmt -> state -> state
-
-  (** Initialization *)
-
   (** The initial state with which the analysis start. *)
   val empty: unit -> t
 
@@ -417,7 +411,13 @@ module type S = sig
       of the cvalue implementation of this function in the generic engine. *)
   val initialize_variable_using_type: init_kind -> varinfo -> t -> t
 
-  include Recycle with type t := t
+  (** {3 Miscellaneous } *)
+
+  val enter_loop: stmt -> state -> state
+  val incr_loop_counter: stmt -> state -> state
+  val leave_loop: stmt -> state -> state
+
+  include Reuse with type t := t
 
   (** Category for the messages about the domain.
       Must be created through {!Value_parameters.register_category}. *)
