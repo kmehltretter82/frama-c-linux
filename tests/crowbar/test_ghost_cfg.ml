@@ -63,6 +63,7 @@ let incr_stmt =
 
 let prepare () =
   Kernel.set_warn_status Kernel.wkey_ghost_bad_use Log.Wabort;
+  Messages.reset_once_flag ();
   return.skind <- Return (None, Loc.unknown);
   forward_goto_target.labels <- [Label("Unreach", Loc.unknown, false)];
   let old = Project.current () in
