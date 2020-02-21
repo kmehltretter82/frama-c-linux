@@ -234,7 +234,7 @@ module Make
             initialize_var_padding vi ~local:false ~lib_entry:true state
           in
           (* Then initialize non-padding bits according to the type. *)
-          let kind = Abstract_domain.Library_Global in
+          let kind = Abstract_domain.Global in
           Domain.initialize_variable_using_type kind vi state
       in
       (* If needed, initializes const fields according to the initializer
@@ -266,8 +266,7 @@ module Make
       else
         let var_kind = Abstract_domain.Formal kf in
         let state = Domain.enter_scope var_kind l state in
-        let init_kind = Abstract_domain.Main_Formal in
-        List.fold_right (Domain.initialize_variable_using_type init_kind) l state
+        List.fold_right (Domain.initialize_variable_using_type var_kind) l state
 
   (* Use the values supplied in [actuals] for the formals of [kf], and
      bind them in [state] *)

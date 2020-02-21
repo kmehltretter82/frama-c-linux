@@ -362,10 +362,9 @@ module State = struct
 
   let initialize_variable_using_type kind varinfo (state, clob) =
     match kind with
-    | Abstract_domain.Main_Formal
-    | Abstract_domain.Library_Global ->
+    | Abstract_domain.(Global | Formal _ | Local _) ->
       Cvalue_init.initialize_var_using_type varinfo state, clob
-    | Abstract_domain.Spec_Return kf ->
+    | Abstract_domain.Return kf ->
       let value = Library_functions.returned_value kf in
       let loc = Locations.loc_of_varinfo varinfo in
       Model.add_binding ~exact:true state loc value, clob
@@ -396,9 +395,8 @@ module State = struct
   let enter_scope kind vars (state, clob) =
     let bind =
       match kind with
-      | Abstract_domain.Local _kf  -> bind_local
-      | Abstract_domain.Formal _kf -> bind_local
-      | Abstract_domain.Global     -> bind_global
+      | Abstract_domain.Global -> bind_global
+      | Abstract_domain.(Local _ | Formal _ | Return _)  -> bind_local
     in
     List.fold_left bind state vars, clob
 

@@ -273,16 +273,15 @@ type 'state logic_environment = {
 }
 
 type variable_kind =
-  | Global
-  | Formal of kernel_function
-  | Local of kernel_function
+  | Global                     (** Global variable *)
+  | Formal of kernel_function  (** Formal parameter of a function. *)
+  | Local of kernel_function   (** Local variable of a function. *)
+  | Return of kernel_function  (** Special variable that stores the return value
+                                   of a call from the end of the function called
+                                   back to the call site. *)
 
 (** Value for the initialization of variables. Can be either zero or top. *)
 type init_value = Zero | Top
-
-(* Kind of variable being initialized by initialize_variable_using_type. *)
-type init_kind =
-    Main_Formal | Library_Global | Spec_Return of kernel_function
 
 (** MemExec is a global cache for the complete analysis of functions.
     It avoids repeating the analysis of a function in equivalent entry states.
@@ -407,9 +406,13 @@ module type S = sig
   val initialize_variable:
     lval -> location -> initialized:bool -> init_value -> t -> t
 
-  (** Initializes a variable according to its type. TODO: move some parts
-      of the cvalue implementation of this function in the generic engine. *)
-  val initialize_variable_using_type: init_kind -> varinfo -> t -> t
+  (** Initializes a variable according to its type. TODO: move some parts of the
+      cvalue implementation of this function in the generic engine.
+      The variable can be:
+      - a global variable on lib-entry mode.
+      - a formal parameter of the 'main' function.
+      - the return variable of a function specification. *)
+  val initialize_variable_using_type: variable_kind -> varinfo -> t -> t
 
   (** {3 Miscellaneous } *)
 

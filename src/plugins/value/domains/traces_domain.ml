@@ -916,14 +916,15 @@ module Internal = struct
   let empty () = Traces.empty
   let initialize_variable lv _ ~initialized:_ _ state =
     Traces.add_trans state (Msg(Format.asprintf "initialize variable: %a" Printer.pp_lval lv ))
-  let initialize_variable_using_type init_kind varinfo state =
+  let initialize_variable_using_type var_kind varinfo state =
     let msg = Format.asprintf "initialize@ variable@ using@ type@ %a@ %a"
-        (fun fmt init_kind ->
-           match init_kind with
-           | Abstract_domain.Main_Formal -> Format.pp_print_string fmt "Main_Formal"
-           | Abstract_domain.Library_Global -> Format.pp_print_string fmt "Library_Global"
-           | Abstract_domain.Spec_Return kf -> Format.fprintf fmt "Spec_Return(%s)" (Kernel_function.get_name kf))
-        init_kind
+        (fun fmt var_kind ->
+           match var_kind with
+           | Abstract_domain.Local _   -> Format.pp_print_string fmt "Local"
+           | Abstract_domain.Formal _  -> Format.pp_print_string fmt "Formal"
+           | Abstract_domain.Global    -> Format.pp_print_string fmt "Global"
+           | Abstract_domain.Return kf -> Format.fprintf fmt "Return(%s)" (Kernel_function.get_name kf))
+        var_kind
         Varinfo.pretty varinfo
     in
     Traces.add_trans state (Msg msg)
@@ -1001,7 +1002,7 @@ module Internal = struct
       if Kernel_function.equal kf (fst (Globals.entry_point ()))
       then { state with main_formals = vars @ state.main_formals }
       else state
-    | Abstract_domain.Local kf ->
+    | Abstract_domain.(Local kf | Return kf) ->
       Traces.add_trans state (EnterScope (kf, vars))
 
   let leave_scope kf vars state =
