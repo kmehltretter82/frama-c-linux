@@ -14,11 +14,11 @@
 [eva:d-traces] Trace domains:
  start: 0; globals = g, entropy_source; main_formals = c;
  {[ 0 -> initialize variable: entropy_source -> 1
-    1 -> initialize variable using type Library_Global
+    1 -> initialize global variable using type
 entropy_source -> 2
     2 -> initialize variable: g -> 3
     3 -> Assign: g = 42 -> 4
-    4 -> initialize variable using type Main_Formal
+    4 -> initialize formal variable using type
 c -> 5
     5 -> EnterScope: tmp -> 6
     6 -> Assign: tmp = 0 -> 7

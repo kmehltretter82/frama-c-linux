@@ -14,7 +14,7 @@
 [eva:d-traces] Trace domains:
  start: 0; globals = g; main_formals = c;
  {[ 0 -> initialize variable: g -> 1
-    1 -> initialize variable using type Main_Formal
+    1 -> initialize formal variable using type
 c -> 2
     2 -> EnterScope: __retres -> 3
     3 -> EnterScope: tmp -> 4

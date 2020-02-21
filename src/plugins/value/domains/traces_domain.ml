@@ -917,15 +917,16 @@ module Internal = struct
   let initialize_variable lv _ ~initialized:_ _ state =
     Traces.add_trans state (Msg(Format.asprintf "initialize variable: %a" Printer.pp_lval lv ))
   let initialize_variable_using_type var_kind varinfo state =
-    let msg = Format.asprintf "initialize@ variable@ using@ type@ %a@ %a"
-        (fun fmt var_kind ->
-           match var_kind with
-           | Abstract_domain.Local _   -> Format.pp_print_string fmt "Local"
-           | Abstract_domain.Formal _  -> Format.pp_print_string fmt "Formal"
-           | Abstract_domain.Global    -> Format.pp_print_string fmt "Global"
-           | Abstract_domain.Return kf -> Format.fprintf fmt "Return(%s)" (Kernel_function.get_name kf))
-        var_kind
-        Varinfo.pretty varinfo
+    let kind_str =
+      match var_kind with
+      | Abstract_domain.Global   -> "global"
+      | Abstract_domain.Local _  -> "local"
+      | Abstract_domain.Formal _ -> "formal"
+      | Abstract_domain.Return _ -> "return"
+    in
+    let msg =
+      Format.asprintf "initialize@ %s variable@ using@ type@ %a"
+        kind_str Varinfo.pretty varinfo
     in
     Traces.add_trans state (Msg msg)
 
