@@ -919,10 +919,10 @@ let do_prover_detect () =
           shortcuts in
       List.iter
         (fun p ->
-           Wp_parameters.result "Prover %10s %-6s [%a%a]"
+           Wp_parameters.result "Prover %10s %-6s [%a%s]"
              p.prover_name p.prover_version
              print_prover_shortcuts_for p
-             print_prover_parseable_format p
+             (Why3Provers.print_wp p)
         ) provers
 
 (* ------------------------------------------------------------------------ *)

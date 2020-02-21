@@ -1032,24 +1032,25 @@ Support for \textsf{Why-3 IDE} is no longer provided.
 Suppose you have the following configuration:
 
 \begin{logs}
-# frama-c -wp-detect
-[wp] Why3 provers detected:
-   - Alt-Ergo 2.0.0 [alt-ergo,altergo]
-   - CVC4 1.6 [cvc4]
-   - CVC4 1.6 (counterexamples) [cvc4-ce]
-   - Coq 8.9.0 [coq]
-   - Z3 4.6.0 [z3]
-   - Z3 4.6.0 (counterexamples) [z3-ce]
-   - Z3 4.6.0 (noBV) [z3-nobv]
+$ ./bin/frama-c -wp-detect
+[wp] Prover   Alt-Ergo 2.0.0  [alt-ergo|altergo|Alt-Ergo:2.0.0]
+[wp] Prover       CVC4 1.6    [cvc4|CVC4:1.6]
+[wp] Prover       CVC4 1.6    [cvc4-ce|CVC4:1.6,counterexamples]
+[wp] Prover    Eprover 2.4    [eprover|Eprover:2.4]
+[wp] Prover         Z3 4.8.7  [z3-ce|Z3:4.8.7:counterexamples]
 \end{logs}
 
 Then, to use (for instance) \textsf{CVC4 1.6},
-you can use \verb+-wp-prover cvc4+.
+you can use \verb+-wp-prover cvc4+ or \verb+-wp-prover CVC4:1.6.
 Similarly, if you want to use \textsf{Z3 4.6.0} without bitvectors, you can use \verb+-wp-prover z3-nobv+.
 Finally, since \textsf{Why-3} also provides the alias
 \verb+altergo+ for this prover, \verb+-wp-prover altergo+ will also run it \emph{via} \textsf{Why-3}.
 
-Notice that \textsf{Why-3} provers benefit from a cache management when used in combination with a \textsf{WP}-session, see Section~\ref{wp-cache} for more details.
+If you require a specific version of a prover which is not installed,
+\textsf{WP} will fallback to the default version available to \textsf{Why-3} for this prover, if any.
+
+Notice that \textsf{Why-3} provers benefit from a cache management when used in combination
+with a \textsf{WP}-session, see Section~\ref{wp-cache} for more details.
 
 %% \paragraph{Sessions.}
 %% Your \textsf{Why3} session is saved in the \texttt{"project.session"}

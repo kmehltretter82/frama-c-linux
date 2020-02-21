@@ -15,7 +15,7 @@
 [wp] [Alt-Ergo (Native)] Goal typed_ko_ensures_ko_exp_log_add_mul : Unsuccess
 [wp] [Alt-Ergo (Native)] Goal typed_ko_ensures_ko_sqrt_pos : Unsuccess
 [wp] Proved goals:    0 / 9
-  Alt-Ergo:        0  (unsuccess: 9)
+  Alt-Ergo (native):    0  (unsuccess: 9)
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   ko                        -        -        9       0.0%

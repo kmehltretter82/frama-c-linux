@@ -1264,7 +1264,7 @@ let task_hash wpo drv prover task =
       let _ = Command.print_file file
           begin fun fmt ->
             Format.fprintf fmt "(* WP Task for Prover %s *)@\n"
-              (Why3Provers.print prover) ;
+              (Why3Provers.print_why3 prover) ;
             Why3.Driver.print_task_prepared drv fmt task ;
           end
       in Digest.file file |> Digest.to_hex

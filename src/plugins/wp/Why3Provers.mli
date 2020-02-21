@@ -28,9 +28,12 @@ val set_procs : int -> unit
 type t = Why3.Whyconf.prover
 
 val find_opt : string -> t option
-val find : ?donotfail:unit -> string -> t
 
-val print : t -> string
+type fallback = Exact of t | Fallback of t | NotFound
+val find_fallback : string -> fallback
+
+val print_why3 : t -> string
+val print_wp : t -> string
 val title : t -> string
 val compare : t -> t -> int
 

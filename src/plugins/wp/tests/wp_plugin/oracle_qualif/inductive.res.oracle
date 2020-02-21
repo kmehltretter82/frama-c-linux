@@ -10,7 +10,7 @@
 [wp] [Coq (Native)] Goal typed_lemma_test : Valid
 [wp] Proved goals:    2 / 2
   Qed:             0 
-  Coq:             2
+  Coq (native):    2
 ------------------------------------------------------------
  Axiomatics                WP     Alt-Ergo  Total   Success
   Lemma                     -        -        2       100%

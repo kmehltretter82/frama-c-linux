@@ -20,7 +20,9 @@
 #   <Prover>: prover
 ###############################################################################
 
--* WP         [2020/02/20] Fixes handling of LoopCurrent in loop invariants 
+- WP          [2020/02/21] Why3 prover version fallback
+- WP          [2020/02/21] Why3 prover full-names use ':' instead of ','
+-* WP         [2020/02/20] Fixes handling of LoopCurrent in loop invariants
 - WP          [2019/12/04] Added option -wp-run-all-provers
 
 ##########################
