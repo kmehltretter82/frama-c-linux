@@ -65,7 +65,7 @@ let prepare () =
   Kernel.set_warn_status Kernel.wkey_ghost_bad_use Log.Wabort;
   Messages.reset_once_flag ();
   return.skind <- Return (None, Loc.unknown);
-  forward_goto_target.labels <- [Label("Unreach", Loc.unknown, false)];
+  forward_goto_target.labels <- [Label("Unreach", Loc.unknown, true)];
   let old = Project.current () in
   Project.set_current (Project.create "simple project");
   Project.remove ~project:old ()
@@ -133,7 +133,7 @@ let mk_label =
     | [] ->
         incr nb;
         let name = "L" ^ (string_of_int !nb) in
-        stmt.labels <- [ Label (name, Loc.unknown, false) ]
+        stmt.labels <- [ Label (name, Loc.unknown, true) ]
     | _ -> ()
 
 (* approximation for gotos: if all the statements we jump over are ghost, we
@@ -503,8 +503,35 @@ let check_file (env, file) =
   in
   if env.should_fail && success then
     report file_name "Found ghost code that should not have been accepted"
-  else if not (env.should_fail) && not success then
-    report file_name "Found ghost code that should have been accepted"
+  else if not (env.should_fail) then begin
+      if success then begin
+          let norm_buf = Buffer.create 150 in
+          let fmt = Format.formatter_of_buffer norm_buf in
+          let f = Globals.Functions.find_by_name "f" in
+          Kernel_function.pretty fmt f;
+          let prj2 = Project.create "copy" in
+          Project.set_current prj2;
+          Kernel.Files.set [ Filepath.Normalized.of_string file_name ];
+          File.init_from_cmdline ();
+          let copy_buf = Buffer.create 150 in
+          let fmt = Format.formatter_of_buffer copy_buf in
+          let f = Globals.Functions.find_by_name "f" in
+          Kernel_function.pretty fmt f;
+          if Buffer.contents norm_buf <> Buffer.contents copy_buf then begin
+              let norm = open_out (file_name ^ ".norm.c") in
+              Buffer.output_buffer norm norm_buf;
+              flush norm;
+              close_out norm;
+              let copy = open_out (file_name ^ ".copy.c") in
+              Buffer.output_buffer copy copy_buf;
+              flush copy;
+              close_out copy;
+              report file_name "Found ghost code not well pretty-printed"
+            end else true
+        end
+      else
+        report file_name "Found ghost code that should have been accepted"
+    end
   else true
 
 let () =
