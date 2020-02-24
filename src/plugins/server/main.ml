@@ -26,7 +26,6 @@
 
 module Senv = Server_parameters
 
-let option f = function None -> () | Some x -> f x
 
 (* -------------------------------------------------------------------------- *)
 (* --- Registry                                                           --- *)
@@ -77,7 +76,7 @@ type 'a message = {
 
 (* Private API: *)
 
-type 'a exec = {
+type 'a process = {
   id : 'a ;
   request : string ;
   data : json ;
@@ -87,14 +86,15 @@ type 'a exec = {
 }
 
 type 'a server = {
-  yield : int ;
+  polling : int ;
   pretty : Format.formatter -> 'a -> unit ;
   equal : 'a -> 'a -> bool ;
   fetch : unit -> 'a message option ;
-  q_in : 'a exec Queue.t ;
+  q_in : 'a process Queue.t ;
   q_out : 'a response Stack.t ;
+  mutable daemon : Db.daemon option ;
   mutable shutdown : bool ;
-  mutable running : 'a exec option ;
+  mutable running : 'a process option ;
 }
 
 exception Killed
@@ -115,6 +115,9 @@ let pp_request pp fmt (r : _ request) =
     else
       Format.fprintf fmt "Request %s:%a" request pp id
 
+let pp_process pp fmt (p : _ process) =
+  Format.fprintf fmt "Execute %s:%a" p.request pp p.id
+
 let pp_response pp fmt (r : _ response) =
   match r with
   | `Error(id,err) -> Format.fprintf fmt "Error %a: %s" pp id err
@@ -131,31 +134,35 @@ let pp_response pp fmt (r : _ response) =
 (* --- Request Handling                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-let execute exec : _ response =
+let run proc : _ response =
   try
-    let data = exec.handler exec.data in
-    `Data(exec.id,data)
+    let data = proc.handler proc.data in
+    `Data(proc.id,data)
   with
-  | Killed -> `Killed exec.id
-  | Data.InputError msg -> `Error(exec.id,msg)
+  | Killed -> `Killed proc.id
+  | Data.InputError msg -> `Error(proc.id,msg)
   | Sys.Break as exn -> raise exn (* Silently pass the exception *)
   | exn when Cmdline.catch_at_toplevel exn ->
     Senv.warning "[%s] Uncaught exception:@\n%s"
-      exec.request (Cmdline.protect exn) ;
-    `Error(exec.id,Printexc.to_string exn)
+      proc.request (Cmdline.protect exn) ;
+    `Error(proc.id,Printexc.to_string exn)
 
-let execute_debug server yield exec =
-  let on_delayed =
-    if Senv.debug_atleast 1 then
-      (Senv.debug "Trigger %s:%a" exec.request server.pretty exec.id ;
-       Some (fun delay -> Senv.debug
-                "No yield since %dms during %s" delay exec.request))
-    else None
-  in Db.with_progress ~debounced:server.yield ?on_delayed yield execute exec
-
-let reply_debug server resp =
+let delayed process =
   if Senv.debug_atleast 1 then
-    Senv.debug "%a" (pp_response server.pretty) resp ;
+    Some (fun d -> Senv.debug "No yield since %dms during %s" d process)
+  else None
+
+let execute server ?yield proc =
+  Senv.debug "%a" (pp_process server.pretty) proc ;
+  let resp = match yield with
+    | Some yield when proc.yield ->
+      Db.with_progress
+        ~debounced:server.polling
+        ?on_delayed:(delayed proc.request)
+        yield run proc
+    | _ -> run proc
+  in
+  Senv.debug "%a" (pp_response server.pretty) resp ;
   Stack.push resp server.q_out
 
 (* -------------------------------------------------------------------------- *)
@@ -173,33 +180,35 @@ let process_request (server : 'a server) (request : 'a request) : unit =
   | `Poll -> ()
   | `Shutdown ->
     begin
-      option kill_exec server.running ;
+      Extlib.may kill_exec server.running ;
       Queue.clear server.q_in ;
       Stack.clear server.q_out ;
       server.shutdown <- true ;
     end
   | `Kill id ->
     begin
-      let kill = kill_request server.equal id in
-      Queue.iter kill server.q_in ;
-      option kill server.running ;
+      let set_killed = kill_request server.equal id in
+      Queue.iter set_killed server.q_in ;
+      Extlib.may set_killed server.running ;
     end
   | `Request(id,request,data) ->
     begin
       match find request with
-      | None -> reply_debug server (`Rejected id)
+      | None ->
+        Senv.debug "Rejected %a" server.pretty id ;
+        Stack.push (`Rejected id) server.q_out
       | Some( `GET , handler ) ->
-        let exec = { id ; request ; handler ; data ;
+        let proc = { id ; request ; handler ; data ;
                      yield = false ; killed = false } in
-        reply_debug server (execute exec)
+        execute server proc ;
       | Some( `SET , handler ) ->
-        let exec = { id ; request ; handler ; data ;
+        let proc = { id ; request ; handler ; data ;
                      yield = false ; killed = false } in
-        Queue.push exec server.q_in
+        Queue.push proc server.q_in
       | Some( `EXEC , handler ) ->
-        let exec = { id ; request ; handler ; data ;
+        let proc = { id ; request ; handler ; data ;
                      yield = true ; killed = false } in
-        Queue.push exec server.q_in
+        Queue.push proc server.q_in
     end
 
 (* -------------------------------------------------------------------------- *)
@@ -217,35 +226,28 @@ let communicate server =
     Stack.iter (fun r -> pool := r :: !pool) server.q_out ;
     Stack.clear server.q_out ;
     message.callback !pool ;
-    option raise error ; true
+    Extlib.may raise error ; true
 
 (* -------------------------------------------------------------------------- *)
 (* --- Yielding                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
 let do_yield server () =
-  begin
-    option raise_if_killed server.running ;
-    ignore ( communicate server );
-  end
+  Extlib.may raise_if_killed server.running ;
+  ignore ( communicate server )
 
 (* -------------------------------------------------------------------------- *)
 (* --- One Step Process                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-let rec fetch_exec q =
-  if Queue.is_empty q then None
-  else
-    let e = Queue.pop q in
-    if e.killed then fetch_exec q else Some e
-
 let process server =
-  match fetch_exec server.q_in with
-  | None -> communicate server
-  | Some exec ->
-    server.running <- Some exec ;
+  if Queue.is_empty server.q_in then
+    communicate server
+  else
+    let proc = Queue.pop server.q_in in
+    server.running <- Some proc ;
     try
-      reply_debug server (execute_debug server (do_yield server) exec) ;
+      execute server ~yield:(do_yield server) proc ;
       server.running <- None ;
       true
     with exn ->
@@ -260,42 +262,89 @@ let in_range ~min:a ~max:b v = min (max a v) b
 
 let kill () = raise Killed
 
-let demons = ref []
-let on callback = demons := !demons @ [ callback ]
+let daemons = ref []
+let on callback = daemons := !daemons @ [ callback ]
 let signal activity =
-  List.iter (fun f -> try f activity with _ -> ()) !demons
+  List.iter (fun f -> try f activity with _ -> ()) !daemons
 
-let run ~pretty ?(equal=(=)) ~fetch () =
-  begin
-    let yield = in_range ~min:1 ~max:200 (Senv.Yield.get ()) in
-    let idle_ms = in_range ~min:1 ~max:2000 (Senv.Idle.get ()) in
-    let idle = float_of_int idle_ms /. 1000.0 in
-    let server = {
-      fetch ; yield ; equal ; pretty ;
-      q_in = Queue.create () ;
-      q_out = Stack.create () ;
-      running = None ;
-      shutdown = false ;
-    } in
-    try
-      (* TODO: remove the following line once the Why3 signal handler is not
-         used anymore. *)
-      Sys.catch_break true;
+let create ~pretty ?(equal=(=)) ~fetch () =
+  let polling = in_range ~min:1 ~max:200 (Senv.Polling.get ()) in
+  {
+    fetch ; polling ; equal ; pretty ;
+    q_in = Queue.create () ;
+    q_out = Stack.create () ;
+    daemon = None ;
+    running = None ;
+    shutdown = false ;
+  }
+
+(* -------------------------------------------------------------------------- *)
+(* --- Start / Stop                                                       --- *)
+(* -------------------------------------------------------------------------- *)
+
+let start server =
+  match server.daemon with
+  | Some _ -> ()
+  | None ->
+    begin
+      Senv.feedback "Server enabled." ;
+      let daemon =
+        Db.on_progress
+          ~debounced:server.polling
+          ?on_delayed:(delayed "command line")
+          (do_yield server)
+      in
+      server.daemon <- Some daemon ;
       signal true ;
-      Senv.feedback "Server running." ;
-      begin try
-          while not server.shutdown do
-            let activity = process server in
-            if not activity then Unix.sleepf idle ;
-          done ;
-        with Sys.Break -> () (* Ctr+C, just leave the loop normally *)
-      end;
-      Senv.feedback "Server shutdown." ;
+    end
+
+let stop server =
+  match server.daemon with
+  | None -> ()
+  | Some daemon ->
+    begin
+      Senv.feedback "Server disabled." ;
+      server.daemon <- None ;
+      Db.off_progress daemon ;
       signal false ;
-    with exn ->
-      Senv.feedback "Server interruped (fatal error)." ;
-      signal false ;
-      raise exn
-  end
+    end
+
+let foreground server =
+  match server.daemon with
+  | None -> ()
+  | Some daemon ->
+    begin
+      server.daemon <- None ;
+      Db.off_progress daemon ;
+    end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Main Loop                                                          --- *)
+(* -------------------------------------------------------------------------- *)
+
+let run server =
+  try
+    ( (* TODO: catch-break to be removed once Why3 signal handler is fixed *)
+      Sys.catch_break true
+    ) ;
+    Senv.feedback "Server running." ;
+    foreground server ;
+    signal true ;
+    begin
+      try
+        while not server.shutdown do
+          let activity = process server in
+          if not activity then Db.sleep server.polling
+        done ;
+      with Sys.Break -> () (* Ctr+C, just leave the loop normally *)
+    end;
+    Senv.feedback "Server shutdown." ;
+    signal false ;
+  with
+  | Killed -> ()
+  | exn ->
+    Senv.feedback "Server interruped (fatal error)." ;
+    signal false ;
+    raise exn
 
 (* -------------------------------------------------------------------------- *)

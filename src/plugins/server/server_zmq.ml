@@ -32,12 +32,30 @@ module Senv = Server_parameters
 let zmq_group = Senv.add_group "Protocol ZeroMQ"
 
 let () = Parameter_customize.set_group zmq_group
-module Enabled = Senv.String
+module Socket = Senv.String
     (struct
       let option_name = "-server-zmq"
       let arg_name = "url"
       let default = ""
-      let help = "Establish a ZeroMQ server and listen for connections"
+      let help =
+        "Launch the ZeroMQ server (in background).\n\
+         The server can handle GET requests during the\n\
+         execution of the frama-c command line.\n\
+         Finally, the server is executed until shutdown."
+    end)
+
+let () = Parameter_customize.set_group zmq_group
+module Client = Senv.String
+    (struct
+      let option_name = "-server-gui"
+      let arg_name = "cmd"
+      let default = ""
+      let help =
+        "Launch the ZeroMQ client (as a child process).\n\
+         If not started by -server-zmq <url>, the ZeroMQ server\n\
+         is established with a local 'ipc://<tmp>' address.\n\
+         The specified <cmd> is passed the actual server <url>\n\
+         as first and unique argument."
     end)
 
 let _ = Doc.page `Protocol ~title:"ZeroMQ Protocol" ~filename:"server_zmq.md"
@@ -46,14 +64,14 @@ let _ = Doc.page `Protocol ~title:"ZeroMQ Protocol" ~filename:"server_zmq.md"
 (* --- ZMQ Context                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-let context =
+let zmq_context =
   let zmq = ref None in
   fun () ->
     match !zmq with
     | Some ctxt -> ctxt
     | None ->
       let major,minor,patch = Zmq.version () in
-      Senv.feedback "ZeroMQ %d.%d.%d" major minor patch ;
+      Senv.debug "ZeroMQ [v%d.%d.%d]" major minor patch ;
       let ctxt = Zmq.Context.create () in
       at_exit (fun () -> Zmq.Context.terminate ctxt) ;
       zmq := Some ctxt ; ctxt
@@ -117,25 +135,78 @@ let fetch socket () =
 (* --- Establish the Server                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-let establish url =
-  if url <> "" then
+let pretty = Format.pp_print_string
+let server = ref None
+let client = ref None
+
+let ping () =
+  match !client with None -> None | Some process ->
+  try Some (process ())
+  with Unix.Unix_error _ -> None
+
+let launch_server url =
+  match !server with
+  | Some _ -> ()
+  | None ->
+    let context = zmq_context () in
+    let socket = Zmq.Socket.(create context rep) in
+    try
+      Zmq.Socket.bind socket url ;
+      Senv.debug "ZeroMQ [%s]" url ;
+      let srv = Main.create ~pretty ~fetch:(fetch socket) () in
+      server := Some(url,srv) ;
+      Extlib.safe_at_exit begin fun () ->
+        Main.stop srv ;
+        Zmq.Socket.close socket ;
+        server := None ;
+      end ;
+      Main.start srv ;
+      Cmdline.at_normal_exit (fun () -> Main.run srv) ;
+    with exn ->
+      Zmq.Socket.close socket ;
+      raise exn
+
+let temp_url () =
+  let socket = Filename.temp_file "frama-c.socket" ".io" in
+  Extlib.safe_at_exit (fun () -> Extlib.safe_remove socket) ;
+  "ipc://" ^ socket
+
+let start_server () =
+  match !server with
+  | None ->
+    let socket = Socket.get () in
+    let url = if socket = "" then temp_url () else socket in
+    launch_server url ; url
+  | Some (url,_) -> url
+
+let launch_client cmd =
+  match !client with
+  | Some _ -> ()
+  | None ->
     begin
-      let context = context () in
-      let socket = Zmq.Socket.(create context rep) in
-      try
-        Zmq.Socket.bind socket url ;
-        Senv.feedback "ZeroMQ [%s]" url ;
-        Main.run ~pretty:Format.pp_print_string ~fetch:(fetch socket) () ;
-        Zmq.Socket.close socket ;
-      with exn ->
-        Zmq.Socket.close socket ;
-        raise exn
+      let url = start_server () in
+      let process = Command.command_async cmd [| url |] in
+      Senv.debug "%s --connect %s@." cmd url ;
+      Senv.feedback "Client launched." ;
+      client := Some process ;
+      Extlib.safe_at_exit
+        begin fun () ->
+          match ping () with
+          | Some (Not_ready kill) ->
+            Senv.feedback "Client interrupted." ;
+            kill ()
+          | _ -> ()
+        end ;
     end
 
-(* -------------------------------------------------------------------------- *)
-(* --- Establish the Server from Command line                             --- *)
-(* -------------------------------------------------------------------------- *)
+let cmdline () =
+  begin
+    let url = Socket.get () in
+    if url <> "" then launch_server url ;
+    let cmd = Client.get () in
+    if cmd <> "" then launch_client cmd ;
+  end
 
-let () = Db.Main.extend (fun () -> establish (Enabled.get ()))
+let () = Db.Main.extend cmdline
 
 (* -------------------------------------------------------------------------- *)

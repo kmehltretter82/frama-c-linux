@@ -33,21 +33,32 @@ module P = Plugin.Register
 
 include P
 
-module Idle = P.Int
+(* -------------------------------------------------------------------------- *)
+(* --- Server General Options                                             --- *)
+(* -------------------------------------------------------------------------- *)
+
+module Polling = P.Int
     (struct
-      let option_name = "-server-idle"
+      let option_name = "-server-polling"
       let arg_name = "ms"
-      let default = 20
-      let help = "Waiting time (in milliseconds) when idle"
+      let default = 50
+      let help = "Server polling time period, in milliseconds (default 50ms)"
     end)
 
-module Yield = P.Int
+module AutoLog = P.False
     (struct
-      let option_name = "-server-yield"
-      let arg_name = "ms"
-      let default = 20
-      let help = "Yielding time (in milliseconds) during computations"
+      let option_name = "-server-auto-log"
+      let help =
+        "Start monitoring logs before server is running (default is false)"
     end)
+
+(* -------------------------------------------------------------------------- *)
+(* --- Doc Options                                                        --- *)
+(* -------------------------------------------------------------------------- *)
+
+let server_doc = add_group "Server Doc Generation"
+let () = Parameter_customize.set_group server_doc
+let () = Parameter_customize.do_not_save ()
 
 module Doc = P.String
     (struct
@@ -55,12 +66,6 @@ module Doc = P.String
       let arg_name = "dir"
       let default = ""
       let help = "Output a markdown documentation of the server in <dir>"
-    end)
-
-module Log = P.False
-    (struct
-      let option_name = "-server-logs"
-      let help = "Start (or stop) monitoring logs"
     end)
 
 let wpage = register_warn_category "inconsistent-page"
