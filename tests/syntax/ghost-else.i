@@ -30,6 +30,13 @@ void if_ghost_else_one_line(int x) /*@ ghost(int y)*/ {
   } //@ ghost else y ++ ;
 }
 
+void if_ghost_else_one_line_escaped(int x) /*@ ghost(int y)*/ {
+  if (x) {
+    x++;
+  } //@ ghost \
+        else y ++ ;
+}
+
 void if_ghost_else_block(int x) /*@ ghost(int y)*/ {
   if (x) {
     x++;
@@ -54,6 +61,17 @@ void if_ghost_else_block_comments(int x) /*@ ghost(int y)*/ {
   } /*@ ghost
     // comment 1
     // comment 2
+  else {
+    y ++ ;
+  } */
+}
+
+void if_ghost_else_block_comments_escaped(int x) /*@ ghost(int y)*/ {
+  if (x) {
+    x++;
+  } /*@ ghost
+    // comment 1\
+       continued
   else {
     y ++ ;
   } */

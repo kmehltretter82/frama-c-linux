@@ -347,7 +347,7 @@ let lex_comment remainder buffer lexbuf =
   (match buffer with None -> () | Some b -> Buffer.add_string b s) ;
   remainder buffer lexbuf
 
-let do_ghost_else_comments comments =
+let do_ghost_else_comments register comments =
   let ends_with_n =
     let last = String.length comments in
     (* note that comments contains at least a blank *)
@@ -357,7 +357,8 @@ let do_ghost_else_comments comments =
   let comments = List.map String.trim comments in
   let process_line s =
     E.newline () ;
-    if Kernel.PrintComments.get ()
+    if register
+    && Kernel.PrintComments.get ()
     && not (String.equal "" s)
     then
       addComment s
@@ -515,7 +516,8 @@ let no_parse_pragma =
                  (* Embedded world *)
              | "global_register" | "location"
 
-let ghost_comments = "//\n" | ("//" [^'\n''@'] [^'\n']* '\n')
+let ghost_comments = "//\n"
+                   | ("//" [^'\n''@'] ([^'\n']*("\\\n")?)* '\n')
 
 rule initial = parse
 | "/*" ("" | "@{" | "@}" as suf) (* Skip special doxygen comments. Use of '@'
@@ -834,11 +836,11 @@ and msasmnobrace = parse
                           cur ^ (msasmnobrace lexbuf) }
 
 and annot_first_token = parse
-  | "ghost" ((blank| '\n' | ghost_comments)* as comments) "else" {
+  | "ghost" ((blank| '\\'?'\n' | ghost_comments)* as comments) "else" {
       if is_oneline_ghost () then E.parse_error "nested ghost code";
       Buffer.clear buf;
       let loc = currentLoc () in
-      do_ghost_else_comments comments ;
+      do_ghost_else_comments true comments ;
       enter_ghost_code ();
       LGHOST_ELSE (loc)
     }
@@ -867,7 +869,8 @@ and might_end_ghost_annot = parse
           make_annot ~one_line:false initial lexbuf s }
   | "" { Buffer.add_char buf !annot_char; annot_token lexbuf }
 and annot_one_line = parse
-  | "ghost" blank+ "else" {
+  | "ghost" ((blank|"\\\n")+ as comments) "else" {
+      do_ghost_else_comments false comments ;
       if is_oneline_ghost () then E.parse_error "nested ghost code";
       enter_oneline_ghost (); LGHOST_ELSE (currentLoc ())
   }
