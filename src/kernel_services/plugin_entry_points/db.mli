@@ -1339,7 +1339,7 @@ module Derefs : INOUT with type t = Locations.Zone.t
     @plugin development guide
     @deprecated Frama-C+dev *)
 val progress: (unit -> unit) ref
-[@@ deprecated "Use {!yield} instead"]
+[@@ deprecated "Use Db.yield instead."]
 
 (** Registered daemon on progress. *)
 type daemon
@@ -1391,11 +1391,9 @@ val cancel : unit -> unit
        notes    :      (1)           (2)           (3)
    ]}
 
-   1. First yield, normal trigger.
-
-   2. Debounced yields leads to this second trigger.
-
-   3. Delayed warning invoked since there was no yield for more than debounced period.
+   {ol {li First yield, normal trigger.}
+   {li Debounced yields leads to this second trigger.}
+   {li Delayed warning invoked since there was no yield for more than debounced period.}}
 *)
 val with_progress :
   ?debounced:int -> ?on_delayed:(int -> unit) ->
