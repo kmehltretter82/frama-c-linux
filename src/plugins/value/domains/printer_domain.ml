@@ -117,7 +117,7 @@ module Simple : Simpler_domains.Simple_Cvalue = struct
     state
 
   let enter_scope _kind vi_list state =
-    feedback  "enter_scope %a" pp_vi_list vi_list;
+    feedback "enter_scope %a" pp_vi_list vi_list;
     state
 
   let leave_scope _kf vi_list state =

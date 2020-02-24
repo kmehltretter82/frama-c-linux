@@ -273,12 +273,13 @@ type 'state logic_environment = {
 }
 
 type variable_kind =
-  | Global                     (** Global variable *)
+  | Global                     (** Global variable. *)
   | Formal of kernel_function  (** Formal parameter of a function. *)
   | Local of kernel_function   (** Local variable of a function. *)
-  | Return of kernel_function  (** Special variable that stores the return value
-                                   of a call from the end of the function called
-                                   back to the call site. *)
+  | Result of kernel_function  (** Special variable storing the return value
+                                   of a call. Assigned at the end of the called
+                                   function, and used at the call site. Also
+                                   used to model the ACSL \result construct. *)
 
 (** Value for the initialization of variables. Can be either zero or top. *)
 type init_value = Zero | Top
@@ -379,8 +380,8 @@ module type S = sig
 
   (** Scoping: abstract transformers for entering and exiting blocks.
       The variables should be added or removed from the abstract state here.
-      Note that the formals of a function called enter the scope through the
-      transfer function {!start_call}, but leave it through a call to
+      Note that the formals of a called function enter the scope through the
+      transfer function {!start_call}, and leave it through a call to
       {!leave_scope}. *)
 
   (** Introduces a list of variables in the state. At this point, the variables
@@ -406,12 +407,13 @@ module type S = sig
   val initialize_variable:
     lval -> location -> initialized:bool -> init_value -> t -> t
 
-  (** Initializes a variable according to its type. TODO: move some parts of the
-      cvalue implementation of this function in the generic engine.
+  (** Initializes a variable according to its type.
       The variable can be:
       - a global variable on lib-entry mode.
       - a formal parameter of the 'main' function.
       - the return variable of a function specification. *)
+  (* TODO: move some parts of the cvalue implementation of this function
+     in the generic engine. *)
   val initialize_variable_using_type: variable_kind -> varinfo -> t -> t
 
   (** {3 Miscellaneous } *)

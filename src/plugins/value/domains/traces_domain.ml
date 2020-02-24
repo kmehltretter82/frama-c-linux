@@ -922,7 +922,7 @@ module Internal = struct
       | Abstract_domain.Global   -> "global"
       | Abstract_domain.Local _  -> "local"
       | Abstract_domain.Formal _ -> "formal"
-      | Abstract_domain.Return _ -> "return"
+      | Abstract_domain.Result _ -> "result"
     in
     let msg =
       Format.asprintf "initialize@ %s variable@ using@ type@ %a"
@@ -1003,7 +1003,7 @@ module Internal = struct
       if Kernel_function.equal kf (fst (Globals.entry_point ()))
       then { state with main_formals = vars @ state.main_formals }
       else state
-    | Abstract_domain.(Local kf | Return kf) ->
+    | Abstract_domain.(Local kf | Result kf) ->
       Traces.add_trans state (EnterScope (kf, vars))
 
   let leave_scope kf vars state =

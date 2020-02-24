@@ -337,7 +337,7 @@ module Make_Dataflow
         let return_lval = Var vi_ret, NoOffset in
         let kstmt = Kstmt stmt in
         fun state ->
-          let kind = Abstract_domain.Return kf in
+          let kind = Abstract_domain.Result kf in
           let state = Domain.enter_scope kind [vi_ret] state in
           let state' = Transfer.assign state kstmt return_lval return_exp in
           Bottom.to_list state'

@@ -684,7 +684,7 @@ module Make (Man : Input) = struct
   let initialize_variable _lval _loc ~initialized:_ _init_value state = state
 
   (* TODO: use constraint_to_type? *)
-  let initialize_variable_using_type _kind _varinfo state =  state
+  let initialize_variable_using_type _kind _varinfo state = state
 
   let relate _ _ _ = Base.SetLattice.top
   let filter _ _ _ state = state
