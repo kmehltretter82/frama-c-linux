@@ -110,12 +110,12 @@ var pending;   // Pending promise callbacks
 var queue_cmd; // Queue of server commands to be sent
 var queue_ids; // Waiting request ids to be sent
 var polling;   // Timeout Polling timer
-var flushed;   // Immediate Flushed timer
+var flushing;   // Immediate Flushing timer
 var config;    // Server config
 var process;   // Server process
 var socket;    // ZMQ (REQ) socket
 var busy;      // ZMQ socket is busy
-var killer;    // killer timeout
+var killing;    // killing timeout
 
 // --------------------------------------------------------------------------
 // --- Server Console
@@ -443,15 +443,15 @@ function _reset() {
   queue_ids = [];
   _.forEach( pending , ({ reject }) => reject('shutdown') );
   pending = {};
-  if (flushed) clearImmediate(flushed);
-  flushed = undefined;
+  if (flushing) clearImmediate(flushing);
+  flushing = undefined;
   if (polling) clearTimeout(polling);
   polling = undefined;
 }
 
 function _kill() {
   _reset();
-  if (killer) clearTimeout(killer);
+  if (killing) clearTimeout(killing);
   if (process) process.kill();
 }
 
@@ -459,19 +459,19 @@ function _shutdown() {
   _reset();
   queue_cmd.push('SHUTDOWN');
   _flush();
-  if (!killer) {
+  if (!killing) {
     if (process) {
       const timeout = (config && config.timeout) || 300 ;
-      killer = setTimeout( () => process.kill() , timeout );
+      killing = setTimeout( () => process.kill() , timeout );
     }
   }
 }
 
 function _close(error) {
   _reset();
-  if (killer) {
-    clearTimeout( killer );
-    killer = undefined ;
+  if (killing) {
+    clearTimeout( killing );
+    killing = undefined ;
   }
   if (socket) {
     socket.close();
@@ -536,6 +536,8 @@ class Signal {
   constructor(id) {
     this.id = id ;
     this.event = SIGNAL + id ;
+    this.active = false ;
+    this.listen = false ;
     this.sigon = this.sigon.bind(this);
     this.sigoff = _.debounce( this.sigoff.bind(this) , 1000 );
   }
@@ -559,19 +561,19 @@ class Signal {
   }
 
   sigon() {
-    if (this.active && !this.listening) {
+    if (this.active && !this.listen) {
       Dome.emit( ACTIVITY + this.id, true );
-      this.listening = true ;
+      this.listen = true ;
       queue_cmd.push('SIGON',this.id);
       _flush();
     }
   }
 
   sigoff() {
-    if (!this.active && this.listening) {
+    if (!this.active && this.listen) {
       Dome.emit( ACTIVITY + this.id, false );
       if (isRunning()) {
-        this.listening = false ;
+        this.listen = false ;
         queue_cmd.push('SIGOFF',this.id);
         _flush();
       }
@@ -599,7 +601,7 @@ function _signal(id)
    @description
    If the server is not yet listening to this signal, a `SIGON` command is sent.
  */
-function on( id , callback )
+export function on( id , callback )
 {
   let s = _signal(id);
   return s.on(callback);
@@ -613,7 +615,7 @@ function on( id , callback )
    When no more callbacks are listening to this signal for a while,
    the server will be notified with a `SIGOFF` command.
  */
-function off( id , callback )
+export function off( id , callback )
 {
   let s = _signal(id);
   return s.off(callback);
@@ -624,7 +626,7 @@ function off( id , callback )
    @param {string} id - the signal event that was listen to
    @param {function} callback - the callback to remove
  */
-function useSignal( id , callback )
+export function useSignal( id , callback )
 {
   React.useEffect( () => {
     on( id , callback );
@@ -653,8 +655,6 @@ function _sendRequest( kind, rq , params=null ) {
   const data = JSON.stringify(params);
   const promise = new Promise((resolve,reject) => {
     pending[rid] = { resolve, reject };
-    queue_cmd.push(kind,rid,rq,data);
-    queue_ids.push(rid);
   });
   promise.kill = () => {
     if (socket && pending[rid]) {
@@ -662,15 +662,17 @@ function _sendRequest( kind, rq , params=null ) {
       _flush();
     }
   };
+  queue_cmd.push(kind,rid,rq,data);
+  queue_ids.push(rid);
   _flush();
   return promise;
 }
 
-function _resolve(id,result) {
+function _resolve(id,data) {
   let promise = pending[id];
   if (promise) {
     delete pending[id];
-    promise.resolve(result);
+    promise.resolve(JSON.parse(data));
   }
 }
 
@@ -695,9 +697,9 @@ function _waiting() {
 // --------------------------------------------------------------------------
 
 function _flush() {
-  if (!flushed) {
-    flushed = setImmediate(() => {
-      flushed = undefined;
+  if (!flushing) {
+    flushing = setImmediate(() => {
+      flushing = undefined;
       _send();
     });
   }
@@ -707,7 +709,7 @@ function _poll() {
   if (!polling) {
     let delay = (config && config.polling) || 50 ;
     polling = setTimeout(() => {
-      polling = false;
+      polling = undefined;
       _send();
     }, delay);
   }
@@ -800,7 +802,7 @@ export default {
   start, stop, kill, restart, clear,
   sendGET, sendSET, sendEXEC,
   onReady, onShutdown, onActivity,
-  on, off,
+  on, off, useSignal,
   STATUS,READY,SHUTDOWN,
   OFF,STARTED,RUNNING,KILLING,RESTART,FAILED
 };

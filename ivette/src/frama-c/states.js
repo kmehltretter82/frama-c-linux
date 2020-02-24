@@ -204,7 +204,7 @@ class SyncState {
 
 var syncStates = {} ;
 
-function syncState(id) {
+function getSyncState(id) {
   let s = syncStates[id] ;
   if (!s) s = syncStates[id] = new SyncState(id);
   return s ;
@@ -228,7 +228,7 @@ Server.onShutdown(() => syncStates = {});
  */
 export function useSyncState(id)
 {
-  let s = syncState(id) ;
+  let s = getSyncState(id) ;
   Dome.useUpdate( PROJECT, s.UPDATE );
   Server.useSignal( s.signal , s.update );
   return [ s.value() , s.setValue ];
@@ -245,7 +245,7 @@ export function useSyncState(id)
 */
 export function useSyncValue(id)
 {
-  let s = syncState(id) ;
+  let s = getSyncState(id) ;
   Dome.useUpdate( s.update );
   Server.useSignal( s.signal , s.update );
   return s.value();
@@ -268,7 +268,6 @@ class SyncArray
     this.insync = false ;
     this.fetch = this.fetch.bind(this);
     this.reload = this.reload.bind(this);
-    Dome.on( PROJECT , this.fetch );
   }
 
   getItems() {
@@ -276,21 +275,34 @@ class SyncArray
     return this.items;
   }
 
+  isEmpty() {
+    return _.find( this.index , () => true ) !== undefined ;
+  }
+
   fetch() {
     this.insync = true ;
-    Server.sendGET( this.fetch_rq ).then(({
-      reload=false, removed=[], updated=[], pending=0
-    }) => {
-      if (reload) this.index = {};
-      removed.forEach((id) => {
-        delete this.index[id];
+    Server.sendGET( this.fetch_rq, 50 )
+      .then(({
+        reload=false, removed=[], updated=[], pending=0
+      }) => {
+        let reloaded = false ;
+        if (reload) {
+          reloaded = this.isEmpty();
+          this.index = {};
+        }
+        removed.forEach((id) => {
+          delete this.index[id];
+        });
+        updated.forEach((item) => {
+          this.index[item.id] = item;
+        });
+        if (reloaded || removed.length || updated.length)
+          Dome.emit( this.UPDATE );
+        if (pending>0) {
+          console.log('PENDING');
+          this.fetch();
+        }
       });
-      updated.forEach((item) => {
-        this.index[item.id] = item;
-      });
-      if (pending>0) this.fetch();
-      Dome.emit( this.UPDATE );
-    });
   }
 
   reload() {
@@ -308,9 +320,9 @@ class SyncArray
 
 var syncArrays = {} ; // Model by project & id
 
-function syncArray(id) {
-  const path = [ currentProject , id ] ;
-  let a = _.get( syncArray , path );
+function getSyncArray(id) {
+  const path = [ currentProject || '' , id ] ;
+  let a = _.get( syncArrays , path );
   if (!a) {
     a = new SyncArray(id);
     _.set( syncArrays , path , a );
@@ -332,7 +344,7 @@ Server.onShutdown(() => syncArrays = {});
  */
 export function reloadArray(id)
 {
-  syncArray(id).reload();
+  getSyncArray(id).reload();
 }
 
 /**
@@ -346,9 +358,9 @@ export function reloadArray(id)
  */
 export function useSyncArray(id)
 {
-  let a = syncArray(id);
-  Dome.useUpdate( PROJECT , a.UPDATE );
-  Server.useSignal( a.signal , a.fetch );
+  let a = getSyncArray(id);
+  Dome.useUpdate( PROJECT, a.UPDATE );
+  Server.useSignal( a.signal, a.fetch );
   return a.getItems() ;
 }
 
