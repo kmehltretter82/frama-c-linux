@@ -28,11 +28,56 @@ open Data
 open Kernel_main
 open Kernel_ast
 
+let page = Doc.page `Kernel ~title:"Property Services" ~filename:"properties.md"
+
 (* -------------------------------------------------------------------------- *)
-(* --- Properties                                                         --- *)
+(* --- Property Kind                                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
-let page = Doc.page `Kernel ~title:"Property Services" ~filename:"properties.md"
+module PropKind =
+struct
+  type t = string
+  let syntax = Sy.publish ~page
+      ~name:"propkind"
+      ~descr:(Md.plain "Property Kind")
+      ~synopsis:Sy.string ()
+  open Property
+  let kind = function
+    | IPPredicate _ -> "predicate"
+    | IPExtended { ie_ext={ ext_name } } -> ext_name
+    | IPAxiomatic _ -> "axiomatic"
+    | IPAxiom _ -> "axiom"
+    | IPLemma _ -> "lemma"
+    | IPBehavior _ -> "behavior"
+    | IPComplete _ -> "complete"
+    | IPDisjoint _ -> "disjoint"
+    | IPCodeAnnot { ica_ca={ annot_content } } ->
+      begin match annot_content with
+        | AAssert _ -> "assert"
+        | AStmtSpec _ -> "stmt-contract"
+        | AInvariant(_,false,_) -> "code-invariant"
+        | AInvariant(_,true,_) -> "loop-invariant"
+        | AVariant _ -> "loop-variant"
+        | AAssigns _ -> "loop-assigns"
+        | AAllocation _ -> "loop-allocatation"
+        | APragma _ -> "loop-pragma"
+        | AExtended(_,_,{ext_name}) -> "loop-" ^ ext_name
+      end
+    | IPAllocation _ -> "allocation"
+    | IPAssigns _ -> "assigns"
+    | IPFrom _ -> "froms"
+    | IPDecrease _ -> "decrease"
+    | IPReachable _ -> "reachable"
+    | IPPropertyInstance _ -> "instance"
+    | IPTypeInvariant _ -> "type-invariant"
+    | IPGlobalInvariant _ -> "invariant"
+    | IPOther { io_name } -> io_name
+  let to_json = Jstring.to_json
+end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Property Model                                                     --- *)
+(* -------------------------------------------------------------------------- *)
 
 let model = States.model ()
 
@@ -40,6 +85,11 @@ let () = States.column ~model ~name:"descr"
     ~descr:(Md.plain "Description")
     ~data:(module Jstring)
     ~get:(fun ip -> Format.asprintf "%a" Property.pretty ip) ()
+
+let () = States.column ~model ~name:"kind"
+    ~descr:(Md.plain "Kind")
+    ~data:(module PropKind)
+    ~get:(PropKind.kind) ()
 
 let () = States.column ~model ~name:"status"
     ~descr:(Md.plain "Status")
