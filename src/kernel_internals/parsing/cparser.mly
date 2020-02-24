@@ -382,8 +382,8 @@ let in_ghost_block ?(battrs=[]) l =
 %token<Cabs.cabsloc> LGHOST_ELSE
 
 /* operator precedence */
-%nonassoc   IF_NO_ELSE
-%nonassoc   GHOST_ELSE_NO_ELSE
+%nonassoc   if_no_else
+%nonassoc   ghost_else_no_else
 %nonassoc   ELSE LGHOST_ELSE
 
 %right  NAMED_TYPE /* We'll use this to handle redefinitions of NAMED_TYPE as variables */
@@ -911,12 +911,12 @@ else_part:
       let loc = Cil_datatype.Location.of_lexing_loc (Parsing.symbol_start_pos (), Parsing.symbol_end_pos ()) in
       no_ghost_stmt (NOP loc)
     }
-    %prec IF_NO_ELSE /* To attach the next else to the current if */
+    %prec if_no_else /* To attach the next else to the current if */
 |   ELSE annotated_statement
     { in_block $2 }
 |   LGHOST_ELSE annotated_statement RGHOST
     { in_ghost_block ~battrs:[ (Cil.frama_c_ghost_else , []) ] $2 }
-    %prec GHOST_ELSE_NO_ELSE /* To force the non ghost else to be attached to the current if */
+    %prec ghost_else_no_else /* To force the non ghost else to be attached to the current if */
 |   LGHOST_ELSE annotated_statement RGHOST ELSE annotated_statement
     {
       Format.eprintf "Warning: %a: Invalid ghost else ignored@." Cil_datatype.Location.pretty $1 ;
