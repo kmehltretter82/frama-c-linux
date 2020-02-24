@@ -43,12 +43,12 @@
 
 (*
  *
- * Copyright (c) 2001-2002, 
+ * Copyright (c) 2001-2002,
  *  George C. Necula    <necula@cs.berkeley.edu>
  *  Scott McPeak        <smcpeak@cs.berkeley.edu>
  *  Wes Weimer          <weimer@cs.berkeley.edu>
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
  * met:
@@ -102,12 +102,11 @@ type callback = returns_clause -> goto_annot list -> unit
 *)
 val encapsulate_local_vars: Cil_types.fundec -> unit
 
-(** Make sure that there is only one Return statement in the whole body. 
-    Replace all the other returns with Goto. Make sure that there is a return 
-    if the function is supposed to return something, and it is not declared to 
-    not return. 
+(** Make sure that there is only one Return statement in the whole body.
+    Replace all the other returns with Goto. Make sure that there is a return
+    if the function is supposed to return something, and it is not declared to
+    not return.
     @modify Sulfur-20171101 The [~callback], when provided,
-    is invoked with all the original returns clauses and their associated 
+    is invoked with all the original returns clauses and their associated
     annotation on inserted gotos. *)
 val oneret: ?callback:callback -> Cil_types.fundec -> unit
-
