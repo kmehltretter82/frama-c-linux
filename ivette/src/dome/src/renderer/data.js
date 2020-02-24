@@ -112,15 +112,17 @@ class Library extends EventEmitter
   constructor() {
     super();
     this.items = {};
+    this.lastItems = {};
+    this._trigger = _.debounce(this._trigger,10);
   }
 
   _trigger() {
-    if (!this.triggered) {
+    if (!_.isEqual( this.items , this.lastItems )) {
+      this.lastItems = this.items ;
       this.sorted = undefined ;
-      this.triggered = true ;
-      setImmediate(() => this.emit('trigger'));
+      this.emit('trigger');
     }
-  }
+  };
 
   /**
      @summary Register Item.
