@@ -6,9 +6,26 @@
     @description
 
 This module allows to integrate data definitions within React elements.
+Typically, you can use it to define your own structure of logical elements
+and display them at different places in the GUI. For instance, you may
+want to define a custom list of elements, where each element
+will be rendered twice: locally with the currenly selected item, and in a side-bar
+or in the menu-bar, or for any other purpose than rendering. You want to declare
+your list like this:
+
+```{jsx}
+    <MyList>
+       <MyItem id={A} ... >...</MyItem>
+       <MyItem id={B} ... >...</MyItem>
+       <MyItem id={C} ... >...</MyItem>
+    </MyList>
+```
+
+Dome data libraries, as provided by this module, allows you to define such
+collection of data mixed with rendered elements.
 
 Data are collected through libraries.
-You create libraries with `createLibrary()` or `useNewLibrary()` and
+You create libraries with `createLibrary()` or `useLocalLibrary()` and
 then provide them to `<Data.Item>`, `<Data.Component>`, `<Data.Node>` or
 `<Data.Fragment>` elements.
 
@@ -37,6 +54,37 @@ rendered differenly with this respect:
 - `<Data.Fragment>` renders its children within a React fragment, with optional context library and specified order.
 
 See each component for more details.
+
+As an example of use, the introductory example can be implemented as follows:
+
+
+```{jsx}
+    const lib = createLibrary();
+
+    // To be used at any (possibly repeated) place in the hierarchy of react elements
+    // Children items are only added to the library when the list is mounted
+    const MyList = ({ children }) => {
+       // Actually renders nothing if children only contains items.
+       // The fragment makes items keep their declaration ordering.
+       return (
+          <Data.Fragment lib={lib}>{children}</Data.Fragment>
+       );
+    };
+
+    // To be used also at any (possibly repeated) place in the hierarchy
+    const MyItem = (props) => <Data.Item lib={lib} {...props} /> ;
+
+    // To be used for instance at top-level inside a side-bar
+    const MyListIndex = () => {
+       let items = Data.useLibrary(lib);
+       return (
+         <ul>
+           { items.map(({id,label}) => (<li key={id}>{label}</li>)) }
+         </ul>
+       );
+    };
+```
+
 */
 
 import _ from 'lodash' ;
@@ -150,7 +198,7 @@ export function useLibrary(library) {
    const items = useLibrary( library );
    ```
  */
-export function useNewLibrary() {
+export function useLocalLibrary() {
   const library = React.useMemo( createLibrary , [] );
   const items = useLibrary( library );
   return { library , items };
@@ -311,7 +359,7 @@ export const Component = ( { children, ...props} ) => {
    defined `<Node/>` item.
 */
 export const Node = ({ children, ...props }) => {
-  let { library, items } = useNewLibrary();
+  let { library, items } = useLocalLibrary();
   let path = useLocalItem( props , items );
   return (
     <CurrentLib.Provider value={library}>
@@ -356,7 +404,7 @@ export const Fragment = ({lib:localLib, order, enabled=true, disabled=false, chi
 export default {
   Library,
   createLibrary, useLibrary,
-  useCurrentLibrary, useNewLibrary,
+  useCurrentLibrary, useLocalLibrary,
   Item, Component, Node, Fragment
 };
 
