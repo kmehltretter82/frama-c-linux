@@ -16,6 +16,7 @@ import 'dome/misc/exports' ;
 import { LabView, View, Group, Component } from 'frama-c/labviews' ;
 import { GridItem, GridHbox, GridVbox } from 'dome/layout/grids';
 import Controller from './Controller' ;
+import Properties from './Properties' ;
 
 // --------------------------------------------------------------------------
 // --- Main View
@@ -50,13 +51,17 @@ export default (function() {
           customize={viewbar}
           settings='frama-c.labview'
           >
-          <View id='default' label='Dashboard' defaultView>
+          <View id='dashboard' label='Dashboard' defaultView>
             <GridItem id='frama-c.console'/>
           </View>
-          <Group id='frama-c' label='Frama-C' title='Frama-C Kernel Components'/>
-          <Component id='frama-c.console' group='frama-c' label='Console' >
-            <Controller.Console/>
-          </Component>
+          <Group id='frama-c' label='Frama-C' title='Frama-C Kernel Components'>
+            <Component id='frama-c.console' label='Console' >
+              <Controller.Console/>
+            </Component>
+            <Component id='frama-c.properties' label='Properties' >
+              <Properties.Table/>
+            </Component>
+          </Group>
         </LabView>
       </Splitter>
       <Toolbar.ToolBar>

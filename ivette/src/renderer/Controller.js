@@ -50,6 +50,7 @@ export const Control = () => {
   let reload = { enabled: false } ;
   switch(status) {
   case 'OFF':
+  case 'FAILED':
     play = { enabled: true, onClick:Server.start };
     break;
   case 'RUNNING':
