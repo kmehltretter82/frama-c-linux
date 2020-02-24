@@ -549,25 +549,25 @@ let partitionAttributes
   in
   loop ([], [], []) attrs
 
+let frama_c_ghost_else = "__fc_ghost_else"
+let () = registerAttribute frama_c_ghost_else (AttrName false)
+let () =
+  registerAttribute (Extlib.strip_underscore frama_c_ghost_else) (AttrName false)
+
 let frama_c_ghost_formal = "__fc_ghost_formal"
 let () = registerAttribute frama_c_ghost_formal (AttrName false)
 let () =
   registerAttribute (Extlib.strip_underscore frama_c_ghost_formal) (AttrName false)
-
-let frama_c_mutable = "__fc_mutable"
-let () = registerAttribute frama_c_mutable (AttrName false)
-let () =
-  registerAttribute (Extlib.strip_underscore frama_c_mutable) (AttrName false)
 
 let frama_c_init_obj = "__fc_initialized_object"
 let () = registerAttribute frama_c_init_obj (AttrName false)
 let () =
   registerAttribute (Extlib.strip_underscore frama_c_init_obj) (AttrName false)
 
-let frama_c_ghost_else = "__fc_ghost_else"
-let () = registerAttribute frama_c_ghost_else (AttrName false)
+let frama_c_mutable = "__fc_mutable"
+let () = registerAttribute frama_c_mutable (AttrName false)
 let () =
-  registerAttribute (Extlib.strip_underscore frama_c_ghost_else) (AttrName false)
+  registerAttribute (Extlib.strip_underscore frama_c_mutable) (AttrName false)
 
 let unrollType (t: typ) : typ =
   let rec withAttrs (al: attributes) (t: typ) : typ =
