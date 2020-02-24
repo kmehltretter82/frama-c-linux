@@ -93,14 +93,15 @@ type 'a model = 'a column list ref
 
 let model () = ref []
 
-let column (type a) (m : a model) ~name ~descr (output : a Request.output) =
-  let module D = (val output) in
+let column (type a b) ~(model : a model) ~name ~descr
+    ~(data: b Request.output) ~(get : a -> b) () =
+  let module D = (val data) in
   if name = "id" || name = "_index" then
     raise (Invalid_argument "Server.States.column: invalid name") ;
-  if List.exists (fun (fd,_) -> fd.Syntax.name = name) !m then
+  if List.exists (fun (fd,_) -> fd.Syntax.name = name) !model then
     raise (Invalid_argument "Server.States.column: duplicate name") ;
   let fd = Syntax.{ name ; syntax = D.syntax ; descr } in
-  m := (fd , D.to_json) :: !m
+  model := (fd , fun a -> D.to_json (get a)) :: !model
 
 module Kmap = Map.Make(String)
 

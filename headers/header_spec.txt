@@ -1097,6 +1097,8 @@ src/plugins/server/kernel_main.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/kernel_main.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/kernel_project.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/kernel_project.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/server/kernel_properties.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/server/kernel_properties.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/main.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/main.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/request.ml: CEA_LGPL_OR_PROPRIETARY

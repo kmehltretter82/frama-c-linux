@@ -77,8 +77,12 @@ val model : unit -> 'a model
     Columns with name `"id"` and `"_index"` are
     reserved for internal use. *)
 val column :
-  'a model -> name:string -> descr:Markdown.text ->
-  'a Request.output -> unit
+  model:'a model ->
+  name:string ->
+  descr:Markdown.text ->
+  data:('b Request.output) ->
+  get:('a -> 'b) ->
+  unit -> unit
 
 type 'a array (** Synchronized array state *)
 

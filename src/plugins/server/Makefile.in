@@ -44,7 +44,9 @@ PLUGIN_CMO:= \
 	server_batch \
 	kernel_main \
 	kernel_project \
-	kernel_ast
+	kernel_ast \
+	kernel_properties
+
 PLUGIN_DISTRIBUTED:=$(PLUGIN_ENABLE)
 PLUGIN_DISTRIB_EXTERNAL:= Makefile.in configure.ac configure
 PLUGIN_TESTS_DIRS := batch
