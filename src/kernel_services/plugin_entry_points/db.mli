@@ -1336,7 +1336,8 @@ module Derefs : INOUT with type t = Locations.Zone.t
 
 (** This function should be called from time to time by all analysers taking
     time. In GUI mode, this will make the interface reactive.
-    @plugin development guide *)
+    @plugin development guide
+    @deprecated Frama-C+dev *)
 val progress: (unit -> unit) ref
 
 (** Registered daemon on progress. *)
@@ -1371,11 +1372,13 @@ val cancel : unit -> unit
    [with_progress ?debounced ?on_delayed trigger job data] executes the given
    [job] on [data] while registering [trigger] as temporary (debounced) daemon.
    The daemon is finally unregistered at the end of the computation.
+
+   {b Raises} every exception raised during the execution of [job] on [data].
+
    @param debounced the least amount of time, in milliseconds, between two
    successive calls to the daemon (default is 0ms).
    @param on_delayed the callback invoked as soon as the time since the last
    [yield] is greater than [debounced] milliseconds (or 100ms at least).
-   @raise every exception raised during the execution of [job] on [data].
 
    Illustrative example, where [...] is the debounced time:
    {[
@@ -1386,9 +1389,11 @@ val cancel : unit -> unit
        notes    :      (1)           (2)           (3)
    ]}
 
-   1. First yield, normal trigger
-   2. Debounced yields leads to this second trigger
-   3. Delayed warning invoked since there was no yield for more than debounced period
+   1. First yield, normal trigger.
+
+   2. Debounced yields leads to this second trigger.
+
+   3. Delayed warning invoked since there was no yield for more than debounced period.
 *)
 val with_progress :
   ?debounced:int -> ?on_delayed:(int -> unit) ->

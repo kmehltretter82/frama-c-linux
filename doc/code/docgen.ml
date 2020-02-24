@@ -30,7 +30,7 @@ let lib_files = ref []
 let add_libfiles analyse s =
   let f = Odoc_global.Intf_file s in
   lib_files :=
-    (String.capitalize (Filename.chop_extension (Filename.basename s))) ::
+    (String.capitalize_ascii (Filename.chop_extension (Filename.basename s))) ::
       !lib_files;
   if analyse then Odoc_global.files := f :: !Odoc_global.files
 
@@ -178,7 +178,7 @@ struct
 	  let n = Str.search_forward (Str.regexp dir) f 0 in
 	  let f = String.sub f n (String.length f - n) in
 	  let d = Filename.dirname f in
-	  String.capitalize (Filename.basename d)
+	  String.capitalize_ascii (Filename.basename d)
         in
         try
           Chapter(1,"Kernel Services","src/kernel_services"),
@@ -192,7 +192,7 @@ struct
             with Not_found ->
               let d = Filename.dirname f in
               Directory (Filename.basename (Filename.dirname d)) ,
-              String.capitalize (Filename.basename d)
+              String.capitalize_ascii (Filename.basename d)
       in
       let structured_modules (* chapter, section, module *) =
         (List.map
@@ -217,7 +217,7 @@ struct
 	  List.iter
 	    (fun (subdir,modules) ->
 	      bp b "<h2 class=\"section\">Section %s <span class=\"directory\">(in %s/%s)</span></h2>\n"
-		subdir dir (String.lowercase subdir) ;
+		subdir dir (String.lowercase_ascii subdir) ;
 	      bs b "<br>\n<table class=\"indextable\">\n";
 	      List.iter
 		(fun m ->
