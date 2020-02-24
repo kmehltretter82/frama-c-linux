@@ -1225,6 +1225,8 @@ class cil_printer () = object (self)
      | [ { skind = Block b } ], [], [], _ -> self#require_braces ctxt b
      | [ { skind = UnspecifiedSequence s } ], [], [], _ ->
        self#require_braces ctxt (Cil.block_from_unspecified_sequence s)
+     | [s],[],[], (Then_with_else | Other)
+       when (not is_ghost) && s.ghost -> true
      | [_],[],[], Then_with_else -> self#block_has_dangling_else blk
      | [ _ ], [], [], _ -> false
      | [],[],[],_ -> false)

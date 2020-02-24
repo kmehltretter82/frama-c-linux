@@ -92,3 +92,10 @@ void ghost_else_plus_else_association(int x) /*@ ghost(int y)*/ {
     //@ ghost else y-- ;
   } else x ++ ;
 }
+
+void non_ghost_if_with_ghost_body(int x)  /*@ ghost(int y)*/ {
+  // pretty-printer must take care of keeping the braces around the
+  // single-(ghost)-statement blocks. Otherwise, the code is syntactically
+  // invalid (empty, from a non-ghost point-of-view, then clause)
+  if (x) { /*@ ghost y++; */ } else { /*@ ghost y--; */ }
+}

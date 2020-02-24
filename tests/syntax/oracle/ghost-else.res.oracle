@@ -24,19 +24,22 @@ void normal_if_else_intricated(int x, int y)
 
 void if_ghost_else_one_line(int x) /*@ ghost (int y) */
 {
-  if (x) x ++; /*@ ghost else y ++;*/
+  if (x) x ++;
+  /*@ ghost else y ++;*/
   return;
 }
 
 void if_ghost_else_one_line_escaped(int x) /*@ ghost (int y) */
 {
-  if (x) x ++; /*@ ghost else y ++;*/
+  if (x) x ++;
+  /*@ ghost else y ++;*/
   return;
 }
 
 void if_ghost_else_block(int x) /*@ ghost (int y) */
 {
-  if (x) x ++; /*@ ghost else y ++;*/
+  if (x) x ++;
+  /*@ ghost else y ++;*/
   return;
 }
 
@@ -53,7 +56,8 @@ void if_ghost_else_multi_line_block(int x) /*@ ghost (int y) */
 
 void if_ghost_else_block_comments(int x) /*@ ghost (int y) */
 {
-  if (x) x ++; /*@ ghost else y ++;*/
+  if (x) x ++;
+  /*@ ghost else y ++;*/
   /* // comment 1 */
   /* // comment 2 */
   return;
@@ -61,7 +65,8 @@ void if_ghost_else_block_comments(int x) /*@ ghost (int y) */
 
 void if_ghost_else_block_comments_escaped(int x) /*@ ghost (int y) */
 {
-  if (x) x ++; /*@ ghost else y ++;*/
+  if (x) x ++;
+  /*@ ghost else y ++;*/
   /* // comment 1\ */
   /* continued */
   return;
@@ -70,7 +75,8 @@ void if_ghost_else_block_comments_escaped(int x) /*@ ghost (int y) */
 void normal_if_ghost_else_intricated(int x) /*@ ghost (int y) */
 {
   if (x) 
-    if (x) x ++; /*@ ghost else y ++;*/
+    if (x) x ++;
+    /*@ ghost else y ++;*/
   return;
 }
 
@@ -79,9 +85,24 @@ void normal_if_ghost_else_intricated(int x) /*@ ghost (int y) */
 void ghost_else_plus_else_association(int x) /*@ ghost (int y) */
 {
   if (x) {
-    if (x) x ++; /*@ ghost else y --;*/
+    if (x) x ++;
+    /*@ ghost else y --;*/
   }
   else x ++;
+  return;
+}
+
+/*  pretty-printer must take care of keeping the braces around the */
+/*  single-(ghost)-statement blocks. Otherwise, the code is syntactically */
+/*  invalid (empty, from a non-ghost point-of-view, then clause) */
+void non_ghost_if_with_ghost_body(int x) /*@ ghost (int y) */
+{
+  if (x) {
+    /*@ ghost y ++; */
+  }
+  else {
+    /*@ ghost y --; */
+  }
   return;
 }
 
