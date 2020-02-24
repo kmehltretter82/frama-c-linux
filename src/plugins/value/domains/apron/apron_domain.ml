@@ -679,24 +679,12 @@ module Make (Man : Input) = struct
 
   let empty () = top
 
-  let introduce_globals vars state = enter_scope vars state
-
-  let enter_scope _kf vars state = enter_scope vars state
+  let enter_scope _kind vars state = enter_scope vars state
 
   let initialize_variable _lval _loc ~initialized:_ _init_value state = state
 
-  let initialize_variable_using_type _kind varinfo state =
-    try
-      let var = translate_varinfo varinfo in
-      let env = Abstract1.env state in
-      if Environment.mem_var env var
-      then state
-      else
-        let env = Environment.add env [|var|] [||] in
-        let state = Abstract1.change_environment man state env false in
-        constraint_to_typ env state [(var, varinfo)]
-    with
-    | Out_of_Scope _ -> state
+  (* TODO: use constraint_to_type? *)
+  let initialize_variable_using_type _kind _varinfo state = state
 
   let relate _ _ _ = Base.SetLattice.top
   let filter _ _ _ state = state

@@ -846,7 +846,8 @@ module Make (Abstract: Abstractions.Eva) = struct
   (* Makes the local variables [variables] enter the scope in [state].
      Also initializes volatile variable to top. *)
   let enter_scope kf variables state =
-    let state = Domain.enter_scope kf variables state in
+    let kind = Abstract_domain.Local kf in
+    let state = Domain.enter_scope kind variables state in
     let is_volatile varinfo =
       Cil.typeHasQualifier "volatile" varinfo.vtype
     in

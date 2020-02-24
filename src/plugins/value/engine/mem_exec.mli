@@ -25,7 +25,7 @@ open Eval
 
 module type Domain = sig
   include Datatype.S_with_collections
-  include Abstract_domain.Recycle with type t := t
+  include Abstract_domain.Reuse with type t := t
 end
 
 (** Counter that must be used each time a new call is analyzed, in order

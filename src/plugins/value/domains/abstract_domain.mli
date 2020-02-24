@@ -272,18 +272,23 @@ type 'state logic_environment = {
   result: varinfo option;
 }
 
+type variable_kind =
+  | Global                     (** Global variable. *)
+  | Formal of kernel_function  (** Formal parameter of a function. *)
+  | Local of kernel_function   (** Local variable of a function. *)
+  | Result of kernel_function  (** Special variable storing the return value
+                                   of a call. Assigned at the end of the called
+                                   function, and used at the call site. Also
+                                   used to model the ACSL \result construct. *)
+
 (** Value for the initialization of variables. Can be either zero or top. *)
 type init_value = Zero | Top
-
-(* Kind of variable being initialized by initialize_variable_using_type. *)
-type init_kind =
-    Main_Formal | Library_Global | Spec_Return of kernel_function
 
 (** MemExec is a global cache for the complete analysis of functions.
     It avoids repeating the analysis of a function in equivalent entry states.
     It uses an over-approximation of the locations possibly read and written
     by a function, and compare the entry states for these locations. *)
-module type Recycle = sig
+module type Reuse = sig
   type t (** Type of states. *)
 
   (** [relate kf bases state] returns the set of bases [bases] in relation with
@@ -371,30 +376,27 @@ module type S = sig
   val reduce_by_predicate:
     state logic_environment -> state -> predicate -> bool -> state or_bottom
 
-  (** {3 Miscellaneous } *)
+  (** {3 Scoping and initialization } *)
 
   (** Scoping: abstract transformers for entering and exiting blocks.
-      [kf] is the englobing function, and the variables of the list [vars]
-      should be added or removed from the abstract state here.
-      Note that the formals of a function enter the scope through the transfer
-      function {!Transfer.start_call}, but leave it through a
-      call to {!leave_scope}. *)
-  val enter_scope: kernel_function -> varinfo list -> t -> t
+      The variables should be added or removed from the abstract state here.
+      Note that the formals of a called function enter the scope through the
+      transfer function {!start_call}, and leave it through a call to
+      {!leave_scope}. *)
+
+  (** Introduces a list of variables in the state. At this point, the variables
+      are uninitialized. Globals and formals of the 'main' will be initialized
+      by {!initialize_variable} and {!initialize_variable_using_type}. Local
+      variables remain uninitialized until an assignment through {!assign}.
+      The formal parameters of a call enter the scope through {!start_call}. *)
+  val enter_scope: variable_kind -> varinfo list -> t -> t
+
+  (** Removes a list of local and formal variables from the state.
+      The first argument is the englobing function. *)
   val leave_scope: kernel_function -> varinfo list -> t -> t
-
-  val enter_loop: stmt -> state -> state
-  val incr_loop_counter: stmt -> state -> state
-  val leave_loop: stmt -> state -> state
-
-  (** Initialization *)
 
   (** The initial state with which the analysis start. *)
   val empty: unit -> t
-
-  (** Introduces the list of global variables in the state.  At this point,
-      these variables are uninitialized: they will be initialized through the
-      two functions below.*)
-  val introduce_globals: varinfo list -> t -> t
 
   (** [initialize_variable lval loc ~initialized init_value state] initializes
       the value of the location [loc] of lvalue [lval] in [state] with:
@@ -405,11 +407,22 @@ module type S = sig
   val initialize_variable:
     lval -> location -> initialized:bool -> init_value -> t -> t
 
-  (** Initializes a variable according to its type. TODO: move some parts
-      of the cvalue implementation of this function in the generic engine. *)
-  val initialize_variable_using_type: init_kind -> varinfo -> t -> t
+  (** Initializes a variable according to its type.
+      The variable can be:
+      - a global variable on lib-entry mode.
+      - a formal parameter of the 'main' function.
+      - the return variable of a function specification. *)
+  (* TODO: move some parts of the cvalue implementation of this function
+     in the generic engine. *)
+  val initialize_variable_using_type: variable_kind -> varinfo -> t -> t
 
-  include Recycle with type t := t
+  (** {3 Miscellaneous } *)
+
+  val enter_loop: stmt -> state -> state
+  val incr_loop_counter: stmt -> state -> state
+  val leave_loop: stmt -> state -> state
+
+  include Reuse with type t := t
 
   (** Category for the messages about the domain.
       Must be created through {!Value_parameters.register_category}. *)

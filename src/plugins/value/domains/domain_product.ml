@@ -256,8 +256,8 @@ module Make
     Right.reduce_by_predicate right_env right pred positive >>-: fun right ->
     left, right
 
-  let enter_scope kf vars (left, right) =
-    Left.enter_scope kf vars left, Right.enter_scope kf vars right
+  let enter_scope kind vars (left, right) =
+    Left.enter_scope kind vars left, Right.enter_scope kind vars right
   let leave_scope kf vars (left, right) =
     Left.leave_scope kf vars left, Right.leave_scope kf vars right
 
@@ -269,8 +269,6 @@ module Make
     Left.leave_loop stmt left, Right.leave_loop stmt right
 
   let empty () = Left.empty (), Right.empty ()
-  let introduce_globals vars (left, right) =
-    Left.introduce_globals vars left, Right.introduce_globals vars right
   let initialize_variable lval loc ~initialized init_value (left, right) =
     Left.initialize_variable lval loc ~initialized init_value left,
     Right.initialize_variable lval loc ~initialized init_value right

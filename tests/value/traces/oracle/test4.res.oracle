@@ -24,7 +24,7 @@
   tmp ∈ [46..2147483647]
 [eva:d-traces] Trace domains:
  start: 0; globals = ; main_formals = c;
- {[ 0 -> initialize variable using type Main_Formal
+ {[ 0 -> initialize formal variable using type
 c -> 1
     1 -> EnterScope: tmp -> 2
     2 -> initialize variable: tmp -> 3

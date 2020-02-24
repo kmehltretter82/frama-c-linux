@@ -293,7 +293,7 @@ module Make_Internal (Info: sig val name: string end) (Value: Value) = struct
       end
     | _ -> ()
 
-  let enter_scope _kf _vars state = state
+  let enter_scope _kind _vars state = state
   let leave_scope _kf vars state = remove_variables vars state
 
   let enter_loop _ state = state
@@ -305,7 +305,6 @@ module Make_Internal (Info: sig val name: string end) (Value: Value) = struct
   let reduce_by_predicate _ state _ _ = `Value state
 
   let empty () = top
-  let introduce_globals _varinfos state = state
   let initialize_variable _lval _location ~initialized:_ _value state = state
   let initialize_variable_using_type _kind _varinfo state = state
 

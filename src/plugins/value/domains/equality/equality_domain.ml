@@ -511,7 +511,7 @@ module Make
   let evaluate_predicate _ _ _ = Alarmset.Unknown
   let reduce_by_predicate _ state _ _ = `Value state
 
-  let enter_scope _kf _vars state = state
+  let enter_scope _kind _vars state = state
   let leave_scope _kf vars state = unscope state vars
 
   let enter_loop _ state = state
@@ -519,7 +519,6 @@ module Make
   let leave_loop _ state = state
 
   let empty () = empty
-  let introduce_globals _vars state = state
   let initialize_variable _ _ ~initialized:_ _ state = state
   let initialize_variable_using_type _ _ state  = state
 

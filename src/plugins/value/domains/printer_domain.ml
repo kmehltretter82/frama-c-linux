@@ -110,18 +110,14 @@ module Simple : Simpler_domains.Simple_Cvalue = struct
     feedback "empty";
     ()
 
-  let introduce_globals vi_list state =
-    feedback "introduce_globals %a" pp_vi_list vi_list;
-    state
-
   let initialize_variable lval ~initialized:_ init state =
     feedback "initialize_variable %a with %a"
       Printer.pp_lval lval
       pp_init_val init;
     state
 
-  let enter_scope _kf vi_list state =
-    feedback  "enter_scope %a" pp_vi_list vi_list;
+  let enter_scope _kind vi_list state =
+    feedback "enter_scope %a" pp_vi_list vi_list;
     state
 
   let leave_scope _kf vi_list state =

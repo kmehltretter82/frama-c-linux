@@ -23,7 +23,7 @@
 
 module type Domain = sig
   include Datatype.S_with_collections
-  include Abstract_domain.Recycle with type t := t
+  include Abstract_domain.Reuse with type t := t
 end
 
 
