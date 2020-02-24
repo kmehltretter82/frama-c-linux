@@ -262,6 +262,7 @@ module Restrict
 
   open Domain_mode
 
+  (* Defines the join and the narrow of different modes. *)
   module Mode = struct
     include Mode
 
@@ -277,10 +278,18 @@ module Restrict
     let narrow = merge (||)
   end
 
+  (* Map that binds functions to their analysis mode. *)
   let functions_map =
     List.fold_left
       (fun map (kf, mode) -> Kernel_function.Map.add kf mode map)
       Kernel_function.Map.empty Scope.functions
+
+  (* This module propagates states of type [(state * mode) option]:
+     - None is propagated as long as no functions from [Scope.functions]
+       is analyzed.
+     - then the current [mode] is propagated alongside the state. Queries and
+       transfer functions are applied accordingly. The current mode is replaced
+       at function calls by [mode.calls]. *)
 
   module Info = struct let module_name = Domain.name ^ " restricted" end
   module D = Datatype.Pair_with_collections (Domain) (Mode) (Info)
@@ -301,6 +310,9 @@ module Restrict
     | None -> Domain.top
     | Some (state, _mode) -> state
 
+  (* When the first function from [Scope.functions] is encountered, starts the
+     analysis with the state computed by this function. It is an empty state in
+     which the global variables exist and may have any values. *)
   let compute_starting_state () =
     let empty = Domain.empty () in
     let var_kind = Abstract_domain.Global in
@@ -310,6 +322,8 @@ module Restrict
     in
     Globals.Vars.fold init empty
 
+  (* Do not recompute each time the starting state. Do not compute the starting
+     state too early either, in case it depends on analysis options. *)
   let get_starting_state =
     let starting_state = ref None in
     fun () ->
@@ -347,14 +361,16 @@ module Restrict
 
   (* ----- Queries ---------------------------------------------------------- *)
 
-  let default_query = `Value (Value.top, None), Alarmset.all
-
+  (* Applies the [query] only if the current mode allows the domain to read.
+     Otherwise, returns [default]. *)
   let make_query default query = function
     | None -> default
     | Some (state, mode) ->
       if mode.current.read
       then query state
       else default
+
+  let default_query = `Value (Value.top, None), Alarmset.all
 
   let extract_expr oracle state expr =
     make_query default_query (fun s -> Domain.extract_expr oracle s expr) state
@@ -376,6 +392,8 @@ module Restrict
 
   (* ----- Transfer functions ----------------------------------------------- *)
 
+  (* Applies the transfer function [f] only if the current mode allows the
+     domain to write. Otherwise, returns the state unchanged. *)
   let make_transfer f = function
     | None -> `Value None
     | Some (state, mode) ->
@@ -387,6 +405,9 @@ module Restrict
   let assume stmt expr positive valuation =
     make_transfer (Domain.assume stmt expr positive valuation)
 
+  (* Applies the [assign] transfer function according to the current mode.
+     In any case, removes from the state the properties depending on the memory
+     location modified by the assignment. *)
   let assign kinstr lvalue expr assigned valuation = function
     | None -> `Value None
     | Some (state, mode) ->
@@ -398,6 +419,10 @@ module Restrict
         let state = Domain.logic_assign None lvalue.lloc state in
         `Value (Some (state, mode))
 
+  (* Starts an analysis at call [call] with state [state]. The domain was not
+     enabled before this call: the concrete arguments may contain variables that
+     have never been introduced into the state, so we should not use them. This
+     function only introduce the formal parameters in the state. *)
   let start_analysis call state =
     let formals = List.map (fun argument -> argument.formal) call.arguments in
     let kind = Abstract_domain.Formal call.kf in
@@ -406,7 +431,16 @@ module Restrict
     let state = List.fold_left initialize state formals in
     state
 
+  (* When interpreting a function call:
+     - if the mode of the function called allows the domain to infer properties,
+       use [start_call] and [finalize_call] as normal. If the current mode did
+       not allow the domain to infer properties, use [start_analysis] instead.
+     - otherwise, only propagate the state from the call site to kill the
+       properties that depend on locations written in the called functions. *)
+
   let start_call stmt call valuation state =
+    (* Starts the call with mode [new_mode]. [previous_mode] is the current mode
+       of the caller. *)
     let start_call_with_mode ?previous_mode ~new_mode state =
       if new_mode.current.write
       then
@@ -418,6 +452,9 @@ module Restrict
           `Value (Some (start_analysis call state, new_mode))
       else `Value (Some (state, new_mode))
     in
+    (* If an analysis mode is defined for the called function in [Scope],
+       then this mode becomes the new current mode. Otherwise, use the [calls]
+       field of the previous mode. *)
     let called_mode = Kernel_function.Map.find_opt call.kf functions_map in
     match state, called_mode with
     | Some (state, previous_mode), Some new_mode ->
@@ -483,6 +520,7 @@ module Restrict
   let enter_scope kind varinfos = lift (Domain.enter_scope kind varinfos)
   let leave_scope kf varinfos = lift (Domain.leave_scope kf varinfos)
 
+  (* Uses the mode of the 'main' function to start the analysis. *)
   let empty () =
     let main_kf = fst (Globals.entry_point ()) in
     match Kernel_function.Map.find_opt main_kf functions_map with
