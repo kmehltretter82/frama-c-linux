@@ -91,7 +91,7 @@ let signal ~page ~name ~descr  ?(details=[]) () =
   let open Markdown in
   check_name name ;
   check_page page name ;
-  let title =  Printf.sprintf "`SIGNAL` %s" name in
+  let title =  Printf.sprintf "`SIG` %s" name in
   let index = [ Printf.sprintf "%s (`SIGNAL`)" name ] in
   let description = [ Block [Text descr] ; Block details] in
   let _ =
