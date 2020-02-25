@@ -14,17 +14,15 @@ import { Table, Column, DefineColumn } from 'dome/table/views' ;
 // --------------------------------------------------------------------------
 
 const PropTable = () => {
-  const model = React.useMemo( () => new ArrayModel() );
-  const items = _.toArray( States.useSyncArray('kernel.properties') );
-  console.log(items);
-  if (items)
-    return (
-      <ul>
-        {items.map((item) => (<li key={item.key}><tt>{item.key}</tt></li>))}
-      </ul>
-    );
-  else
-    return "Empty" ;
+  const model = React.useMemo( () => new ArrayModel() , [] );
+  const items = States.useSyncArray('kernel.properties');
+  model.setData( _.toArray( items ) );
+  return (
+    <Table model={model}>
+      <Column id='descr' label='Description' fill />
+      <Column id='status' label='Status' align='center' />
+    </Table>
+  );
 };
 
 // --------------------------------------------------------------------------
