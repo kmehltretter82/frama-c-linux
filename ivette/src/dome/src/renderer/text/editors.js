@@ -23,8 +23,12 @@ const CSS_SELECTED = 'dome-xText-select' ;
    @summary Rich Text Editor.
    @property {Buffer} buffer -
       associated [Buffer](module-dome_text_buffers.Buffer.html) holding the text content
+   @property {string} className - additional class name(s)
+   @property {object} style - additional CSS style
+   @property {number} fontSize - editor font-size
    @property {string} selection - currently selected markder identifier
    @property {function} onSelection - callback used when an identified marker is clicked
+   @property {function} onContextMenu - selection callback on right-click
    @property {object} [...options] - additional CodeMirror
       [configuration](https://codemirror.net/doc/manual.html#config) properties
    @description
@@ -78,6 +82,7 @@ export class Text extends React.Component {
     this.onFocus = this.onFocus.bind(this);
     this.onScroll = this.onScroll.bind(this);
     this.onClick = this.onClick.bind(this);
+    this.onContextMenu = this.onContextMenu.bind(this);
     this.onMouseMove = this.onMouseMove.bind(this);
     this.handleKey = this.handleKey.bind(this);
     this.handleUpdate = this.handleUpdate.bind(this);
@@ -96,7 +101,14 @@ export class Text extends React.Component {
     this.rootElement = elt ;
     if (elt) {
       // Mounting...
-      const { buffer , ...config } = this.props ;
+      const { buffer,
+              selection,     /* ignored */
+              onSelection,   /* ignored */
+              onContextMenu, /* ignored */
+              fontSize,      /* ignored */
+              className,     /* ignored */
+              style,         /* ignored */
+              ...config } = this.props ;
       const value = buffer ? buffer.linkedDoc() : "" ;
       const cm = this.codeMirror = new CodeMirror(elt, { value });
       // Passing all options to constructor does not work (Cf. CodeMirror's BTS)
@@ -262,16 +274,18 @@ export class Text extends React.Component {
     this.handleHover( evt.target );
   }
 
-  onClick(evt) {
+  onMouseClick(evt,callback) {
     // No need for throttling
     const target = evt.target ;
-    const onSelection = this.props.onSelection ;
-    if ( target && onSelection ) {
+    if ( target && callback ) {
       const hover = this._findHover(target);
-      if ( hover && hover.id ) onSelection( hover.id );
+      if ( hover && hover.id ) callback( hover.id );
     }
     this.props.buffer.setFocused(true);
   }
+
+  onClick(evt) { this.onMouseClick(evt,this.props.onSelection); }
+  onContextMenu(evt) { this.onMouseClick(evt,this.props.onContextMenu); }
 
   // --------------------------------------------------------------------------
   // --- Scrolling
@@ -355,10 +369,15 @@ export class Text extends React.Component {
   }
 
   render() {
+    const { className, fontSize, style } = this.props ;
+    const theStyle = Object.assign( {} , style );
+    if (fontSize) theStyle.fontSize = fontSize ;
     return (
-      <div className='dome-xText'
+      <div className={'dome-xText ' + className}
+           style={theStyle}
            ref={this.mountPoint}
            onClick={this.onClick}
+           onContextMenu={this.onContextMenu}
            onBlur={this.onBlur}
            onFocus={this.onFocus}
            onScroll={this.onScroll}
