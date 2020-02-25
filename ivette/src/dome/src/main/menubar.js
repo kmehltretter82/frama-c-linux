@@ -263,10 +263,6 @@ export function addMenu( label )
   requestUpdate();
 }
 
-function updateItem( entry, options )
-{
-}
-
 export function addMenuItem( { menu , key, ...spec } )
 {
   var submenu = findMenu( menu );

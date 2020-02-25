@@ -737,7 +737,7 @@ export function useState( settings, defaultValue ) {
     - `flipValue()` change the value to its opposite;
     - `flipValue(v)` change the value to `v`.
 */
-export function useSwitch( settings, defaultValue ) {
+export function useSwitch( settings, defaultValue=false ) {
   let [ value, update ] = useSettings( true, settings, defaultValue );
   return [ value, v => update(v===undefined ? !value : v) ];
 }
