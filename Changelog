@@ -17,6 +17,7 @@
 Open Source Release <next-release>
 ##################################
 
+-   Kernel    [2020/02/25] support for ghost else blocks
 -   Kernel    [2020/02/18] checks that ghost code does not modify the normal
               control flow of the non-ghost program
 -*  Kernel    [2020/02/17] fixes issue that could prevent loading plug-ins on
