@@ -99,3 +99,10 @@ void non_ghost_if_with_ghost_body(int x)  /*@ ghost(int y)*/ {
   // invalid (empty, from a non-ghost point-of-view, then clause)
   if (x) { /*@ ghost y++; */ } else { /*@ ghost y--; */ }
 }
+
+void non_ghost_if_with_nop_ghost_body(int x)  /*@ ghost(int y)*/ {
+  // pretty-printer must take care of keeping the braces around the
+  // single-(ghost)-statement blocks. Even if the ghost statement is an
+  // empty block!
+  if (x) { /*@ ghost { } */ } else { /*@ ghost y++; */ }
+}
