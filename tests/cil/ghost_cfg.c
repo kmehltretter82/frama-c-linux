@@ -119,6 +119,32 @@ void shared_cfgs(int x) {
   }
 }
 
+void ghost_else(int x) /*@ ghost(int y) */ {
+  if(x){
+    x++;
+  } /*@ ghost else {
+    y++;
+  } */
+
+  if(x){
+    goto X ;
+  } /*@ ghost else {
+    goto X ; // breaks CFG
+  } */
+
+  x++;
+ X:
+  x++;
+
+  if(x){
+    x++;
+  } /*@ ghost else {
+    return; // breaks CFG
+  } */
+
+  x++;
+}
+
 #endif
 
 #ifdef CANT_CHECK

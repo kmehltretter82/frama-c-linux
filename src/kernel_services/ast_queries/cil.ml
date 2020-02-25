@@ -260,25 +260,6 @@ let mkBlock (slst: stmt list) : block =
 
 let mkBlockNonScoping l = let b = mkBlock l in b.bscoping <- false; b
 
-let rec enforceGhostStmtCoherence ?(force_ghost=false) stmt =
-  let force_ghost = force_ghost || stmt.ghost in
-  stmt.ghost <- force_ghost ;
-  begin match stmt.skind with
-    | Break(_) | Continue(_) | Goto(_) | Throw(_)
-    | Instr(_) | Return(_) -> ()
-    | UnspecifiedSequence(_) -> ()
-    | If(_, b1, b2, _) | TryFinally(b1, b2, _) | TryExcept(b1, _, b2, _) ->
-      enforceGhostBlockCoherence ~force_ghost b1 ;
-      enforceGhostBlockCoherence ~force_ghost b2
-    | Switch(_, b, _, _) | Loop(_, b, _, _, _) | Block(b) ->
-      enforceGhostBlockCoherence ~force_ghost b
-    | TryCatch(b, l, _) ->
-      enforceGhostBlockCoherence ~force_ghost b ;
-      List.iter (fun (_, b) -> enforceGhostBlockCoherence ~force_ghost b) l
-  end
-and enforceGhostBlockCoherence ?force_ghost block =
-  List.iter (enforceGhostStmtCoherence ?force_ghost) block.bstmts
-
 let mkStmt ?(ghost=false) ?(valid_sid=false) ?(sattr=[]) (sk: stmtkind) : stmt =
   { skind = sk;
     labels = [];
@@ -568,20 +549,25 @@ let partitionAttributes
   in
   loop ([], [], []) attrs
 
+let frama_c_ghost_else = "__fc_ghost_else"
+let () = registerAttribute frama_c_ghost_else (AttrName false)
+let () =
+  registerAttribute (Extlib.strip_underscore frama_c_ghost_else) (AttrName false)
+
 let frama_c_ghost_formal = "__fc_ghost_formal"
 let () = registerAttribute frama_c_ghost_formal (AttrName false)
 let () =
   registerAttribute (Extlib.strip_underscore frama_c_ghost_formal) (AttrName false)
 
-let frama_c_mutable = "__fc_mutable"
-let () = registerAttribute frama_c_mutable (AttrName false)
-let () =
-  registerAttribute (Extlib.strip_underscore frama_c_mutable) (AttrName false)
-
 let frama_c_init_obj = "__fc_initialized_object"
 let () = registerAttribute frama_c_init_obj (AttrName false)
 let () =
   registerAttribute (Extlib.strip_underscore frama_c_init_obj) (AttrName false)
+
+let frama_c_mutable = "__fc_mutable"
+let () = registerAttribute frama_c_mutable (AttrName false)
+let () =
+  registerAttribute (Extlib.strip_underscore frama_c_mutable) (AttrName false)
 
 let unrollType (t: typ) : typ =
   let rec withAttrs (al: attributes) (t: typ) : typ =
@@ -598,6 +584,29 @@ let () = punrollType := unrollType
 let rec unrollTypeSkel = function
   | TNamed (r, _) -> unrollTypeSkel r.ttype
   | x -> x
+
+let is_ghost_else block =
+  hasAttribute frama_c_ghost_else block.battrs
+
+let rec enforceGhostStmtCoherence ?(force_ghost=false) stmt =
+  let force_ghost = force_ghost || stmt.ghost in
+  stmt.ghost <- force_ghost ;
+  begin match stmt.skind with
+    | Break(_) | Continue(_) | Goto(_) | Throw(_)
+    | Instr(_) | Return(_) -> ()
+    | UnspecifiedSequence(_) -> ()
+    | If(_, b1, b2, _) | TryFinally(b1, b2, _) | TryExcept(b1, _, b2, _) ->
+      enforceGhostBlockCoherence ~force_ghost b1 ;
+      enforceGhostBlockCoherence ~force_ghost b2
+    | Switch(_, b, _, _) | Loop(_, b, _, _, _) | Block(b) ->
+      enforceGhostBlockCoherence ~force_ghost b
+    | TryCatch(b, l, _) ->
+      enforceGhostBlockCoherence ~force_ghost b ;
+      List.iter (fun (_, b) -> enforceGhostBlockCoherence ~force_ghost b) l
+  end
+and enforceGhostBlockCoherence ?(force_ghost=false) block =
+  let force_ghost = force_ghost || is_ghost_else block  in
+  List.iter (enforceGhostStmtCoherence ~force_ghost) block.bstmts
 
 (* Make a varinfo. Used mostly as a helper function below  *)
 let makeVarinfo

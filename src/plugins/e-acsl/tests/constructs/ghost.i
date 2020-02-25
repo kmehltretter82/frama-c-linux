@@ -14,4 +14,12 @@ int main(void) {
   /*@ assert *q == G; */
   //  /*@ ghost G = foo(&G); */
   //  /*@ assert G == 2; */
+
+  int x = 1 ;
+  if(x){
+    x++ ;
+  } /*@ ghost else {
+    G++ ;
+    G++ ;
+  }*/
 }

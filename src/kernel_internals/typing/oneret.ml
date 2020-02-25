@@ -79,23 +79,23 @@ let adjust_assigns_clause loc var code_annot =
   in
   let adjust_clause b =
     match b.b_assigns with
-      | WritesAny -> ()
-      | Writes l ->
-          if not (contains_var l) then begin
-            let (changed, a) = List.fold_left adjust_lval (false,l) l in
-            let a =
-              if changed then a 
-              else 
-                (Logic_const.new_identified_term (Logic_const.tvar ~loc var),
-                 FromAny)
-                :: a
-            in
-            b.b_assigns <- Writes a
-          end
+    | WritesAny -> ()
+    | Writes l ->
+      if not (contains_var l) then begin
+        let (changed, a) = List.fold_left adjust_lval (false,l) l in
+        let a =
+          if changed then a
+          else
+            (Logic_const.new_identified_term (Logic_const.tvar ~loc var),
+             FromAny)
+            :: a
+        in
+        b.b_assigns <- Writes a
+      end
   in
   match code_annot with
-    | AStmtSpec (_,s) -> List.iter adjust_clause s.spec_behavior
-    | _ -> ()
+  | AStmtSpec (_,s) -> List.iter adjust_clause s.spec_behavior
+  | _ -> ()
 
 type returns_clause =
   Cil_types.stmt * Cil_types.behavior * Cil_types.identified_predicate
@@ -188,7 +188,7 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
     match f.svar.vtype with
       TFun(rt, _, _, _) -> rt
     | _ ->
-	Kernel.fatal "Function %s does not have a function type" f.svar.vname
+      Kernel.fatal "Function %s does not have a function type" f.svar.vname
   in
   (* Does it return anything ? *)
   let hasRet = match unrollType retTyp with TVoid _ -> false | _ -> true in
@@ -221,31 +221,31 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
   in
   let assert_of_returns ca =
     match ca.annot_content with
-      | AAssert _ | AInvariant _ | AVariant _
-      | AAssigns _ | AAllocation _ | APragma _ | AExtended _ -> ptrue
-      | AStmtSpec (_bhvs,s) ->
-        let res =
-          List.fold_left
-            (fun acc bhv ->
-              pand
-                (acc,
-                 pimplies
-                   (pands
-                      (List.map
-                         (fun p ->
+    | AAssert _ | AInvariant _ | AVariant _
+    | AAssigns _ | AAllocation _ | APragma _ | AExtended _ -> ptrue
+    | AStmtSpec (_bhvs,s) ->
+      let res =
+        List.fold_left
+          (fun acc bhv ->
+             pand
+               (acc,
+                pimplies
+                  (pands
+                     (List.map
+                        (fun p ->
                            pold ~loc:p.ip_content.pred_loc
                              (Logic_const.pred_of_id_pred p))
-                         bhv.b_assumes),
-                    pands
-                      (List.fold_left
-                         (fun acc (kind,p) ->
+                        bhv.b_assumes),
+                   pands
+                     (List.fold_left
+                        (fun acc (kind,p) ->
                            match kind with
-                               Returns -> Logic_const.pred_of_id_pred p :: acc
-                             | Normal | Exits | Breaks | Continues -> acc)
-                         [ptrue] bhv.b_post_cond)
-                   )))
-            ptrue s.spec_behavior
-        in convert_result res
+                             Returns -> Logic_const.pred_of_id_pred p :: acc
+                           | Normal | Exits | Breaks | Continues -> acc)
+                        [ptrue] bhv.b_post_cond)
+                  )))
+          ptrue s.spec_behavior
+      in convert_result res
   in
   (* Remember if we have introduced goto's *)
   let haveGoto = ref false in
@@ -259,22 +259,22 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
             | [] -> ()
             | {skind=Block b} :: [] -> setLastLoc b.bstmts
             | {skind=UnspecifiedSequence seq}::[] ->
-                setLastLoc (List.map (fun (x,_,_,_,_) -> x) seq)
+              setLastLoc (List.map (fun (x,_,_,_,_) -> x) seq)
             | {skind= _} as s :: [] -> lastloc := Cil_datatype.Stmt.loc s
             | {skind=_s} :: l -> setLastLoc l
           in
           setLastLoc f.sbody.bstmts; !lastloc
         in
         let loc = getLastLoc () in
-      (* Must create a statement *)
+        (* Must create a statement *)
         let rv =
           if hasRet then
             Some (new_exp ~loc (Lval(Var (getRetVar loc), NoOffset)))
           else None
-      in
+        in
         mkStmt (Return (rv, loc))
       in retStmt := sr;
-        sr
+      sr
     end else
       !retStmt
   in
@@ -282,7 +282,7 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
      (returns clause with \old transformed into \at(,L) for a suitable L).
      TODO: split that into behaviors and generates for foo,bar: assert instead
      of plain assert.
-   *)
+  *)
   let returns_stack :
     (Cil_types.predicate * Cil_types.stmt * Cil_types.code_annotation) Stack.t
     = Stack.create () in
@@ -303,7 +303,7 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
      current statement. It is an int since nothing in ACSL prevents from having
      multiple statement contracts on top of each other before finding an
      actual statement...
-   *)
+  *)
   let rec scanStmts acc (mainbody: bool) popstack = function
     | [] when mainbody -> (* We are at the end of the function. Now it is
                            * time to add the return statement *)
@@ -315,15 +315,15 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
     | [] -> List.rev acc
 
     | [{skind=Return (Some ({enode = Lval(Var _,NoOffset)}), _l)} as s]
-        when mainbody && not !haveGoto ->
+      when mainbody && not !haveGoto ->
       (* We're not changing the return into goto, so returns clause will still
          have effect.
-       *)
+      *)
       popn popstack;
       List.rev (s::acc)
 
     | ({skind=Return (retval, loc)} as s) :: rests ->
-        Cil.CurrentLoc.set loc;
+      Cil.CurrentLoc.set loc;
     (*
       ignore (E.log "Fixing return(%a) at %a\n"
       insert
@@ -333,15 +333,15 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
      *)
       if hasRet && retval = None then
         Kernel.fatal ~current:true
-	  "Found return without value in function %s" fname;
+          "Found return without value in function %s" fname;
       if not hasRet && retval <> None then
         Kernel.fatal ~current:true "Found return in subroutine %s" fname;
-    (* Keep this statement because it might have labels. But change it to
-     * an instruction that sets the return value (if any). *)
+      (* Keep this statement because it might have labels. But change it to
+       * an instruction that sets the return value (if any). *)
       s.skind <- begin
         match retval with
-            Some rval -> Instr (Set((Var (getRetVar loc), NoOffset), rval, loc))
-          | None -> Instr (Skip loc)
+          Some rval -> Instr (Set((Var (getRetVar loc), NoOffset), rval, loc))
+        | None -> Instr (Skip loc)
       end;
       let returns_assert = ref ptrue in
       Stack.iter
@@ -369,9 +369,9 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
         (* last statement, no contract, we can just fall through. *)
         scanStmts (s :: acc) mainbody 0 rests
       end else begin
-      (* Add a Goto and put everything into a block on which
-         the statement contract(s) will apply.
-       *)
+        (* Add a Goto and put everything into a block on which
+           the statement contract(s) will apply.
+        *)
         let sgref = ref (getRetStmt ()) in
         let sg = mkStmt ~ghost:s.ghost (Goto (sgref, loc)) in
         haveGoto := true;
@@ -397,17 +397,17 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
       end
 
     | ({skind=If(eb,t,e,l)} as s) :: rests ->
-    (*CEA currentLoc := l;*)
+      (*CEA currentLoc := l;*)
       s.skind <- If(eb, scanBlock false t, scanBlock false e, l);
       popn popstack;
       scanStmts (s::acc) mainbody 0 rests
     | ({skind=Loop(a,b,l,lb1,lb2)} as s) :: rests ->
-    (*CEA currentLoc := l;*)
+      (*CEA currentLoc := l;*)
       s.skind <- Loop(a,scanBlock false b, l,lb1,lb2);
       popn popstack;
       scanStmts (s::acc) mainbody 0 rests
     | ({skind=Switch(e, b, cases, l)} as s) :: rests ->
-    (*CEA currentLoc := l;*)
+      (*CEA currentLoc := l;*)
       s.skind <- Switch(e, scanBlock false b, cases, l);
       popn popstack;
       scanStmts (s::acc) mainbody 0 rests
@@ -430,23 +430,23 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
       (* see above. *)
       s.skind <-
         UnspecifiedSequence
-        (List.concat
-           (List.map (fun (s,m,w,r,c) ->
-             let res = scanStmts [] mainbody 0 [s] in
-             (List.hd res,m,w,r,c)::
-               (List.map (fun x -> x,[],[],[],[]) (List.tl res)))
-              seq));
+          (List.concat
+             (List.map (fun (s,m,w,r,c) ->
+                  let res = scanStmts [] mainbody 0 [s] in
+                  (List.hd res,m,w,r,c)::
+                  (List.map (fun x -> x,[],[],[],[]) (List.tl res)))
+                 seq));
       popn popstack;
       List.rev (s::acc)
     | ({skind = UnspecifiedSequence seq} as s) :: rests ->
       s.skind <-
         UnspecifiedSequence
-        (List.concat
-           (List.map (fun (s,m,w,r,c) ->
-             let res = scanStmts [] false 0 [s] in
-             (List.hd res,m,w,r,c)::
-               (List.map (fun x -> x,[],[],[],[]) (List.tl res)))
-              seq));
+          (List.concat
+             (List.map (fun (s,m,w,r,c) ->
+                  let res = scanStmts [] false 0 [s] in
+                  (List.hd res,m,w,r,c)::
+                  (List.map (fun x -> x,[],[],[],[]) (List.tl res)))
+                 seq));
       popn popstack;
       scanStmts (s::acc) mainbody 0 rests
     | {skind=Instr(Code_annot ({ annot_content = AStmtSpec _ } as ca,_))} as s
@@ -465,7 +465,7 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
       popn popstack;
       scanStmts (s::acc) mainbody 0 rests
     | ({skind=(Goto _ | Instr _ | Continue _ | Break _
-                  | TryExcept _ | TryFinally _ | Throw _)} as s)
+              | TryExcept _ | TryFinally _ | Throw _)} as s)
       :: rests ->
       popn popstack;
       scanStmts (s::acc) mainbody 0 rests

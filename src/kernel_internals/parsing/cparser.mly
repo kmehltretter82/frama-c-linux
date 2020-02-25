@@ -289,6 +289,7 @@ let transformOffsetOf (speclist, dtype) member =
   { addrExpr with expr_node = CAST (sizeofType, SINGLE_INIT addrExpr)}
 
 let no_ghost_stmt s = {stmt_ghost = false ; stmt_node = s}
+let ghost_stmt s = {stmt_ghost = true ; stmt_node = s}
 
 let no_ghost = List.map no_ghost_stmt
 
@@ -300,6 +301,12 @@ let in_block l =
         no_ghost_stmt (BLOCK ({ blabels = []; battrs = []; bstmts = l},
                               get_statementloc (List.hd l),
                               get_statementloc (Extlib.last l)))
+
+let in_ghost_block ?(battrs=[]) l =
+  let l = in_ghost l in
+  ghost_stmt (BLOCK ({ blabels = []; battrs ; bstmts = l},
+                       get_statementloc (List.hd l),
+                       get_statementloc (Extlib.last l)))
 
 %}
 
@@ -372,10 +379,12 @@ let in_block l =
 
 /*Frama-C: ghost bracketing */
 %token LGHOST RGHOST
+%token<Cabs.cabsloc> LGHOST_ELSE
 
 /* operator precedence */
-%nonassoc 	IF
-%nonassoc 	ELSE
+%nonassoc   if_no_else
+%nonassoc   ghost_else_no_else
+%nonassoc   ELSE LGHOST_ELSE
 
 %right  NAMED_TYPE /* We'll use this to handle redefinitions of NAMED_TYPE as variables */
 %left   IDENT
@@ -866,7 +875,7 @@ block_element_list:
             { $1 @ $2 @ $3 }
 |   annot_list_opt pragma block_element_list            { $1 @ $3 }
 /*(* GCC accepts a label at the end of a block *)*/
-|   annot_list_opt id_or_typename_as_id COLON 
+|   annot_list_opt id_or_typename_as_id COLON
     { let loc = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 2, Parsing.rhs_end_pos 3) in
       $1 @ no_ghost [LABEL ($2, no_ghost_stmt (NOP loc), loc)] }
 ;
@@ -897,6 +906,23 @@ annotated_statement:
 |   annot_list statement { $1 @ $2 }
 ;
 
+else_part:
+/* empty */ {
+      let loc = Cil_datatype.Location.of_lexing_loc (Parsing.symbol_start_pos (), Parsing.symbol_end_pos ()) in
+      no_ghost_stmt (NOP loc)
+    }
+    %prec if_no_else /* To attach the next else to the current if */
+|   ELSE annotated_statement
+    { in_block $2 }
+|   LGHOST_ELSE annotated_statement RGHOST
+    { in_ghost_block ~battrs:[ (Cil.frama_c_ghost_else , []) ] $2 }
+    %prec ghost_else_no_else /* To force the non ghost else to be attached to the current if */
+|   LGHOST_ELSE annotated_statement RGHOST ELSE annotated_statement
+    {
+      Format.eprintf "Warning: %a: Invalid ghost else ignored@." Cil_datatype.Location.pretty $1 ;
+      in_block $5
+    }
+
 statement:
     SEMICOLON		{ no_ghost [NOP $1] }
 |   SPEC annotated_statement
@@ -912,14 +938,10 @@ statement:
 	  { let loc = Cil_datatype.Location.of_lexing_loc (Parsing.symbol_start_pos (), Parsing.symbol_end_pos ()) in
             no_ghost [COMPUTATION (smooth_expression $1,loc)]}
 |   block { let (x,y,z) = $1 in no_ghost [BLOCK (x, y, z)]}
-|   IF paren_comma_expression annotated_statement
+|   IF paren_comma_expression annotated_statement else_part
         { let loc = Cil_datatype.Location.of_lexing_loc (Parsing.symbol_start_pos (), Parsing.symbol_end_pos ()) in
           no_ghost [IF (smooth_expression $2,
-                       in_block $3, no_ghost_stmt (NOP loc), loc)]}
-|   IF paren_comma_expression annotated_statement ELSE annotated_statement
-	{ let loc = Cil_datatype.Location.of_lexing_loc (Parsing.symbol_start_pos (), Parsing.symbol_end_pos ()) in
-          no_ghost
-            [IF (smooth_expression $2, in_block $3, in_block $5, loc)]}
+                       in_block $3, $4, loc)]}
 |   SWITCH paren_comma_expression annotated_statement
         { let loc = Cil_datatype.Location.of_lexing_loc (Parsing.symbol_start_pos (), Parsing.symbol_end_pos ()) in
           no_ghost [SWITCH (smooth_expression $2, in_block $3, loc)]}
@@ -955,7 +977,7 @@ statement:
               no_ghost [CASERANGE ($2, $4, in_block $6, loc)]}
 |   DEFAULT COLON annotated_statement
         { let loc = Cil_datatype.Location.of_lexing_loc (Parsing.symbol_start_pos(), Parsing.symbol_end_pos ()) in
-              no_ghost [DEFAULT (in_block $3, loc)]}	      
+              no_ghost [DEFAULT (in_block $3, loc)]}
 |   RETURN SEMICOLON {
       let loc = Cil_datatype.Location.of_lexing_loc (Parsing.symbol_start_pos (), Parsing.symbol_end_pos ()) in
       no_ghost [RETURN ({ expr_loc = loc; expr_node = NOTHING}, loc)]
@@ -1750,5 +1772,5 @@ asmcloberlst_ne:
 ;
 asmlabels:
 | /* empty */                          { [] }
-| COLON local_label_names              { $2 } 
+| COLON local_label_names              { $2 }
 %%

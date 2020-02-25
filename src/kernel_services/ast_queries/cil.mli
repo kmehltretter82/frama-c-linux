@@ -1161,6 +1161,12 @@ val find_def_stmt: block -> varinfo -> stmt
 *)
 val has_extern_local_init: block -> bool
 
+(** returns [true] iff the given block is a ghost else block.
+
+    @since Frama-C+dev
+*)
+val is_ghost_else: block -> bool
+
 (* ************************************************************************* *)
 (** {2 Values for manipulating attributes} *)
 (* ************************************************************************* *)
@@ -1208,18 +1214,17 @@ val dropAttribute: string -> attributes -> attributes
  *  Maintains the attributes in sorted order *)
 val dropAttributes: string list -> attributes -> attributes
 
+(** A block marked with this attribute is known to be a ghost else.
+
+    @since 19.0-Potassium+dev
+*)
+val frama_c_ghost_else: string
+
 (** A varinfo marked with this attribute is known to be a ghost formal.
 
     @since 20.0-Calcium
 *)
 val frama_c_ghost_formal: string
-
-(** a field struct marked with this attribute is known to be mutable, i.e.
-    it can be modified even on a const object.
-
-    @since 18.0-Argon
-*)
-val frama_c_mutable: string
 
 (** a formal marked with this attribute is known to be a pointer to an
     object being initialized by the current function, which can thus assign
@@ -1228,6 +1233,13 @@ val frama_c_mutable: string
     @since 18.0-Argon
  *)
 val frama_c_init_obj: string
+
+(** a field struct marked with this attribute is known to be mutable, i.e.
+    it can be modified even on a const object.
+
+    @since 18.0-Argon
+*)
+val frama_c_mutable: string
 
 (** [true] if the given lval is allowed to be assigned to thanks to
     a [frama_c_init_obj] or a [frama_c_mutable] attribute.

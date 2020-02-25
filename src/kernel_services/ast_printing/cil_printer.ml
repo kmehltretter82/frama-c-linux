@@ -75,6 +75,7 @@ let register_shallow_attribute s =
   reserved_attributes:=
     (Extlib.strip_underscore s)::!reserved_attributes
 
+let () = register_shallow_attribute Cil.frama_c_ghost_else
 let () = register_shallow_attribute Cil.frama_c_ghost_formal
 let () = register_shallow_attribute Cil.frama_c_mutable
 let () = register_shallow_attribute Cil.frama_c_init_obj
@@ -509,13 +510,14 @@ class cil_printer () = object (self)
   val mutable is_ghost = false
   method private display_comment () = not is_ghost || verbose
 
-  method private in_ghost_if_needed fmt ghost_flag ~post_fmt ?block do_it =
+  method private in_ghost_if_needed fmt ghost_flag
+      ?(break_ghost=true) ~post_fmt ?block do_it =
     let display_ghost = ghost_flag && not is_ghost in
     if display_ghost then begin
       is_ghost <- true ;
-      Format.fprintf fmt "%t %a@ "
-        (fun fmt -> self#pp_open_annotation ?block fmt)
-        self#pp_acsl_keyword "ghost"
+      Format.fprintf fmt "%t " (fun fmt -> self#pp_open_annotation ?block fmt) ;
+      Format.fprintf fmt
+        (if break_ghost then "%a@ " else "%a ") self#pp_acsl_keyword "ghost"
     end ;
     do_it () ;
     if display_ghost then begin
@@ -1213,6 +1215,8 @@ class cil_printer () = object (self)
         gives us at least a correct, compilable, C code.
      *)
      | _::_::_,[],[],_ -> is_cfg_block ctxt
+     | [s],[],[], (Then_with_else | Other)
+       when (not is_ghost) && s.ghost -> true
      | [ { skind = Block b } as s' ], [], [], Stmt_block s ->
        (b.bscoping ||
         (not (Cil.has_extern_local_init b) && self#stmt_has_annot s))
@@ -1243,6 +1247,7 @@ class cil_printer () = object (self)
     | _ -> false
 
   method private block_has_dangling_else blk = match blk.bstmts with
+    | [ { skind = If(_, _, e, _) }] when Cil.is_ghost_else e -> true
     | [ { skind = If(_, { bstmts=[]; battrs=[] }, _, _)
                 | If(_, {bstmts=[{skind=Goto _; labels=[]}]; battrs=[]}, _, _)
                 | If(_, _, { bstmts=[]; battrs=[] }, _)
@@ -1424,7 +1429,7 @@ class cil_printer () = object (self)
         (self#unboxed_block Other) t
 
     | If(be,{bstmts=[];battrs=[]},e,l)
-      when not state.print_cil_as_is ->
+      when not (Cil.is_ghost_else e) && not state.print_cil_as_is ->
       fprintf fmt "@[<hv>%a@[<v 2>%a (%a) %a@]@]"
         (fun fmt -> self#line_directive ~forcefile:false fmt) l
         self#pp_keyword "if"
@@ -1432,7 +1437,7 @@ class cil_printer () = object (self)
         (self#unboxed_block Other) e
 
     | If(be,{bstmts=[{skind=Goto(gref,_);labels=[]}]; battrs=[]},e,l)
-      when !gref == next && not state.print_cil_as_is ->
+      when not (Cil.is_ghost_else e) && !gref == next && not state.print_cil_as_is ->
       fprintf fmt "@[<hv>%a@[<v 2>%a (%a) %a@]@]"
         (fun fmt -> self#line_directive ~forcefile:false fmt) l
         self#pp_keyword "if"
@@ -1454,9 +1459,16 @@ class cil_printer () = object (self)
         self#exp be
         (self#unboxed_block Then_with_else) t;
       if else_at_newline then fprintf fmt "@\n" else fprintf fmt "@ ";
-      fprintf fmt "@[<v 2>%a %a@]"
-        self#pp_keyword "else"
-        (self#unboxed_block Other) e;
+      let do_print () =
+        fprintf fmt "%a %a"
+          self#pp_keyword "else"
+          (self#unboxed_block Other) e;
+      in
+      fprintf fmt "@[<v 2>" ;
+      self#in_ghost_if_needed
+        fmt (Cil.is_ghost_else e) ~block:false
+        ~break_ghost:false ~post_fmt:"%t" do_print ;
+      fprintf fmt "@]" ;
       pp_close_box fmt ()
 
     | Switch(e,b,_,l) ->

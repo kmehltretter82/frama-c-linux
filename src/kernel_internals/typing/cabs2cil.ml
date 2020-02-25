@@ -1608,7 +1608,8 @@ struct
     end else
       match c.stmts with
       | [{ skind = Block b } as s,_,_,_,_] when
-          collapse_block && s.labels = [] ->
+          collapse_block && s.labels = []
+          && (ghost = s.ghost || Cil.is_ghost_else b) ->
         b.blocals <- vars @ b.blocals;
         b.bstatics <- c.statics @ b.bstatics;
         b.bscoping <- b.bscoping || declares_var || not force_non_scoping;

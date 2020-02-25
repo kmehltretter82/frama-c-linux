@@ -1445,6 +1445,11 @@ crowbar-afl-%: tests/crowbar/%
 	$(MKDIR) tests/crowbar/output-$*
 	afl-fuzz $(AFL_OPTS) -i tests/crowbar/input -o tests/crowbar/output-$* $< @@
 
+crowbar-afl-check-%: tests/crowbar/%
+	$(foreach file,$(wildcard tests/crowbar/output-$*/crashes/id*), \
+          $< $(file) >/dev/null 2>&1 || \
+          echo "$(file) leads to a real test failure";)
+
 ##############
 # Emacs tags #
 ##############
