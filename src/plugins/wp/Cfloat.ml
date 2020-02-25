@@ -275,7 +275,11 @@ let compute_float op ulp xs =
   | NEG , [ x ] -> qmake ulp (Q.neg (exact x))
   | ADD , [ x ; y ] -> qmake ulp (Q.add (exact x) (exact y))
   | MUL , [ x ; y ] -> qmake ulp (Q.mul (exact x) (exact y))
-  | DIV , [ x ; y ] -> qmake ulp (Q.div (exact x) (exact y))
+  | DIV , [ x ; y ] ->
+      let res = match Q.div (exact x) (exact y) with
+        | x when Q.classify x = Q.NZERO -> x
+        | _ -> raise Not_found (* let Why3 take care of the division*)
+      in qmake ulp res
   | ROUND , [ x ] -> round ulp x
   | REAL , [ x ] -> F.e_real (exact x)
   | LE , [ x ; y ] -> F.e_bool (Q.leq (exact x) (exact y))
