@@ -317,14 +317,15 @@ function CustomViews( { settings, shape, setShape, views:libViews } )
   const [ local, setLocal ] = Dome.useState( settings, {} );
   const [ customs, setCustoms ] = Dome.useGlobalSetting( settings, {} );
   const [ edited, setEdited ] = React.useState();
+  const triggerDefault = React.useRef();
   const { current , shapes={} } = local ;
 
   let theViews = {};
 
   _.forEach( libViews, (view) => {
-    const { id: origin, order, label='(Stock View)', title } = view ;
+    const { id: origin, order, label='(Stock View)', title, defaultView } = view ;
     const id = 'builtin.' + origin ;
-    theViews[ id ] = { id, order, label, title, builtin: true, origin };
+    theViews[ id ] = { id, order, label, title, builtin: true, defaultView, origin };
   });
 
   _.forEach( customs, (view) => {
@@ -447,6 +448,15 @@ function CustomViews( { settings, shape, setShape, views:libViews } )
     }
   };
 
+  if (!current && !triggerDefault.current) {
+    const theDefault = _.find( theViews, (item) => item.defaultView );
+    triggerDefault.current = theDefault ;
+    if (theDefault) setTimeout(() => {
+      console.log('TRIGGER',theDefault.id);
+      SELECT(theDefault.id);
+    });
+  }
+
   return (
     <Section label='Views'>
       {_.sortBy(theViews,['order','id']).map(makeViewItem)}
@@ -490,6 +500,7 @@ function CustomGroup( { dnd, shape, setDragging, id, title, label, components } 
 function CustomizePanel({ dnd, settings, library, shape, setShape, setDragging })
 {
 
+  Dome.useUpdate( 'labview.library' );
   const items = library.items ;
   const views = getItems(items,'views');
   const groups = getItems(items,'groups');
