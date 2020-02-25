@@ -28,11 +28,19 @@ open Cil_types
 open Lang
 open Lang.F
 
-(** Predicates *)
+(** {2 Predicate Introduction} *)
+
+
+(** Introduce universally quantified formulae: head forall quantifiers
+    are instanciated to fresh variables in current pool and left-implies are
+    extracted, recursively. *)
 val forall_intro: Lang.F.pred -> Lang.F.pred list * Lang.F.pred
+
+(** Introduce existential quantified formulae: head exist quantifiers
+    are instanciated to fresh variables, recursively. *)
 val exist_intro: Lang.F.pred -> Lang.F.pred
 
-(** Sequent *)
+(** {2 Sequent} *)
 
 type step = private {
   mutable id : int ; (** See [index] *)
@@ -46,14 +54,14 @@ type step = private {
 }
 
 and condition =
-  | Type of pred
-  | Have of pred
-  | When of pred
-  | Core of pred
-  | Init of pred
-  | Branch of pred * sequence * sequence
-  | Either of sequence list
-  | State of Mstate.state
+  | Type of pred (** Type section, not constraining for filtering *)
+  | Have of pred (** Normal assumptions section *)
+  | When of pred (** Assumptions introduced after simplifications *)
+  | Core of pred (** Common hypotheses gather from parallel branches *)
+  | Init of pred (** Initializers assumptions *)
+  | Branch of pred * sequence * sequence (** If-Then-Else *)
+  | Either of sequence list (** Disjunction *)
+  | State of Mstate.state (** Memory Model snapshot *)
 
 and sequence (** List of steps *)
 
@@ -61,6 +69,7 @@ type sequent = sequence * F.pred
 
 val pretty : (Format.formatter -> sequent -> unit) ref
 
+(** Creates a single step *)
 val step :
   ?descr:string ->
   ?stmt:stmt ->
@@ -76,29 +85,36 @@ val update_cond :
   step ->
   condition -> step
 
-val is_true : sequence -> bool (** Only true or empty steps *)
+val is_true : sequence -> bool (** Contains only true or empty steps *)
 val is_empty : sequence -> bool (** No step at all *)
-val vars_hyp : sequence -> Vars.t
-val vars_seq : sequent -> Vars.t
+val vars_hyp : sequence -> Vars.t (** Pre-computed and available in constant time. *)
+val vars_seq : sequent -> Vars.t (** At the cost of the union of hypotheses and goal. *)
 
-val empty : sequence
-val trivial : sequent
+val empty : sequence (** empty sequence, equivalent to true assumption *)
+val trivial : sequent (** empty implies true *)
 val sequence : step list -> sequence
+
 val seq_branch : ?stmt:stmt -> F.pred -> sequence -> sequence -> sequence
+(** Creates an If-Then-Else branch located at the provided stmt, if any. *)
 
-val append : sequence -> sequence -> sequence
-val concat : sequence list -> sequence
+val append : sequence -> sequence -> sequence (** Conjunction *)
+val concat : sequence list -> sequence (** List conjunction *)
 
-(** Iterate only over the head steps of the sequence *)
+(** Iterate only over the head steps of the sequence.
+    Does not go deeper inside branches and disjunctions. *)
 val iter : (step -> unit) -> sequence -> unit
 
-(** The internal list of steps *)
+(** Same domain than [iter]. *)
 val list : sequence -> step list
 
+(** Compute the {i total} number of steps in the sequence, including
+    nested sequences from branches and disjunctions.
+    Pre-computed and available in constant time. *)
 val size : sequence -> int
 
 val steps : sequence -> int
-(** Attributes unique indices to every [step.id] in the sequence, starting from zero.
+(** Attributes unique indices to every [step.id] in the sequence,
+    starting from zero. Recursively
     Returns the number of steps in the sequence. *)
 
 val index : sequent -> unit
@@ -112,13 +128,21 @@ val step_at : sequence -> int -> step
     @raise Not_found if the index is out of bounds. *)
 
 val is_trivial : sequent -> bool
+(** Goal is true or hypotheses contains false. *)
 
 (** {2 Transformations} *)
 
 val map_condition : (pred -> pred) -> condition -> condition
+(** Rewrite all root predicates in condition *)
+
 val map_step : (pred -> pred) -> step -> step
+(** Rewrite all root predicates in step *)
+
 val map_sequence : (pred -> pred) -> sequence -> sequence
+(** Rewrite all root predicates in sequence *)
+
 val map_sequent : (pred -> pred) -> sequent -> sequent
+(** Rewrite all root predocates in hypotheses and goal *)
 
 val insert : ?at:int -> step -> sequent -> sequent
 (** Insert a step in the sequent immediately [at] the specified position.
@@ -159,6 +183,9 @@ val at_closure : (sequent -> sequent ) -> unit (** register a transformation app
     Bundles are {i mergeable} pre-sequences.
     This the key structure for merging hypotheses with linear complexity
     during backward weakest pre-condition calculus.
+
+    Bundle are constructed in backward order with respect to program
+    control-flow, as driven by the wp calculus.
 *)
 
 type bundle
@@ -170,20 +197,45 @@ type 'a attributed =
     ?warn:Warning.Set.t ->
     'a )
 
-val nil : bundle
+val nil : bundle (** Same as empty *)
 val occurs : F.var -> bundle -> bool
 val intersect : F.pred -> bundle -> bool
+(** Variables of predicate and the bundle intersects *)
+
 val merge : bundle list -> bundle
+(** Performs a diff-based disjunction, introducing If-Then-Else or Either
+    branches when possible.
+    Linear complexity is achieved by assuming bundle ordering is consistent
+    over the list. *)
+
+(** Assumes a list of predicates in a [Type] section on top of the bundle. *)
 val domain : F.pred list -> bundle -> bundle
+
+(** Assumes a list of predicates in a [Have] section on top of the bundle. *)
 val intros : F.pred list -> bundle -> bundle
+
+(** Stack a memory model state on top of the bundle. *)
 val state : ?descr:string -> ?stmt:stmt -> Mstate.state -> bundle -> bundle
+
+(** Assumes a predicate in the specified section,
+    with the specified decorations. On [~init:true], the predicate is placed
+    in an [Init] section. On [~domain:true], the predicate is placed in a [Type]
+    section. Otherwized, it is placed in a standard [Have] section. *)
 val assume : (?init:bool -> ?domain:bool -> F.pred -> bundle -> bundle) attributed
+
+(** Construct a branch bundle, with merging of all common parts. *)
 val branch : (F.pred -> bundle -> bundle -> bundle) attributed
+
+(** Construct a disjunction bundle, with merging of all common parts. *)
 val either : (bundle list -> bundle) attributed
+
+(** Computes a formulae equivalent to the bundle. For debugging purpose only. *)
 val extract : bundle -> F.pred list
+
+(** Closes the bundle and promote it into a well-formed sequence. *)
 val bundle : bundle -> sequence
 
-(** {2 Simplifier} *)
+(** {2 Simplifiers} *)
 
 val clean : sequent -> sequent
 val filter : sequent -> sequent
