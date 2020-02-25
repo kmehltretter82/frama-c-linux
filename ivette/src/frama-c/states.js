@@ -272,7 +272,7 @@ class SyncArray
 
   getItems() {
     if (!this.insync && Server.isRunning()) this.fetch();
-    return this.items;
+    return this.index;
   }
 
   isEmpty() {
@@ -290,16 +290,15 @@ class SyncArray
           reloaded = this.isEmpty();
           this.index = {};
         }
-        removed.forEach((id) => {
-          delete this.index[id];
+        removed.forEach((key) => {
+          delete this.index[key];
         });
         updated.forEach((item) => {
-          this.index[item.id] = item;
+          this.index[item.key] = item;
         });
         if (reloaded || removed.length || updated.length)
           Dome.emit( this.UPDATE );
         if (pending>0) {
-          console.log('PENDING');
           this.fetch();
         }
       });

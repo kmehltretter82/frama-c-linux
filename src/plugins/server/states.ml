@@ -96,7 +96,7 @@ let model () = ref []
 let column (type a b) ~(model : a model) ~name ~descr
     ~(data: b Request.output) ~(get : a -> b) () =
   let module D = (val data) in
-  if name = "id" || name = "_index" then
+  if name = "key" || name = "index" then
     raise (Invalid_argument "Server.States.column: invalid name") ;
   if List.exists (fun (fd,_) -> fd.Syntax.name = name) !model then
     raise (Invalid_argument "Server.States.column: duplicate name") ;
