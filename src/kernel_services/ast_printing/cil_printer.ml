@@ -1215,6 +1215,8 @@ class cil_printer () = object (self)
         gives us at least a correct, compilable, C code.
      *)
      | _::_::_,[],[],_ -> is_cfg_block ctxt
+     | [s],[],[], (Then_with_else | Other)
+       when (not is_ghost) && s.ghost -> true
      | [ { skind = Block b } as s' ], [], [], Stmt_block s ->
        (b.bscoping ||
         (not (Cil.has_extern_local_init b) && self#stmt_has_annot s))
@@ -1225,8 +1227,6 @@ class cil_printer () = object (self)
      | [ { skind = Block b } ], [], [], _ -> self#require_braces ctxt b
      | [ { skind = UnspecifiedSequence s } ], [], [], _ ->
        self#require_braces ctxt (Cil.block_from_unspecified_sequence s)
-     | [s],[],[], (Then_with_else | Other)
-       when (not is_ghost) && s.ghost -> true
      | [_],[],[], Then_with_else -> self#block_has_dangling_else blk
      | [ _ ], [], [], _ -> false
      | [],[],[],_ -> false)
