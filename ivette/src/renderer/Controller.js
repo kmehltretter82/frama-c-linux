@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------
-// --- Console
+// --- Server Controller
 // --------------------------------------------------------------------------
 
 import React from 'react' ;
@@ -7,9 +7,12 @@ import Dome from 'dome' ;
 import Server from 'frama-c/server' ;
 import States from 'frama-c/states' ;
 
-import { Filler, Button, ButtonGroup } from 'dome/layout/toolbars' ;
-import { LED } from 'dome/controls/buttons' ;
+import { Vfill } from 'dome/layout/boxes' ;
+import { Title } from 'frama-c/labviews' ;
+import { Button as ToolButton, ButtonGroup, Filler  } from 'dome/layout/toolbars' ;
+import { LED, IconButton } from 'dome/controls/buttons' ;
 import { Label, Code } from 'dome/controls/labels' ;
+import { Buffer } from 'dome/text/buffers' ;
 import { Text } from 'dome/text/editors' ;
 
 import 'codemirror/theme/ambiance.css' ;
@@ -18,13 +21,38 @@ import 'codemirror/theme/ambiance.css' ;
 // --- Configure Server
 // --------------------------------------------------------------------------
 
-Dome.onCommand((argv,cwd) => {
+var cmdConfig ;
+const cmdLine = new Buffer();
+
+function dumpCmdLine({ cwd, command, sockaddr, params })
+{
+  cmdLine.clear();
+  if (cwd) cmdLine.log('--cwd',cwd);
+  if (command) cmdLine.log('--command',command);
+  if (sockaddr) cmdLine.log('--socket',sockaddr);
+  params.forEach((v,i) => {
+    if (i>0) {
+      if (v.startsWith('-') || v.endsWith('.c') || v.endsWith('.h') || v.endsWith('.i'))
+        cmdLine.append('\n');
+      else
+        cmdLine.append(' ');
+    }
+    cmdLine.append(v);
+  });
+  cmdLine.append('\n');
+};
+
+function configOfParams(argv,cwd) {
   let params = [];
   let command ;
   let sockaddr ;
+  let working = cwd ;
   for (let k = 0 ; k < argv.length ; k++) {
     let v = argv[k];
     switch(v) {
+    case '--cwd':
+      working = argv[++k];
+      break;
     case '--command':
       command = argv[++k];
       break;
@@ -35,7 +63,13 @@ Dome.onCommand((argv,cwd) => {
       params.push(v);
     }
   }
-  Server.configure({ cwd, command, sockaddr, params });
+  return { cwd:working, command, sockaddr, params };
+}
+
+Dome.onCommand((argv,cwd) => {
+  cmdConfig = configOfParams(argv,cwd);
+  dumpCmdLine(cmdConfig);
+  Server.configure(cmdConfig);
   Server.start();
 });
 
@@ -60,11 +94,11 @@ export const Control = () => {
   }
   return (
     <ButtonGroup>
-      <Button icon='MEDIA.PLAY' {...play}
+      <ToolButton icon='MEDIA.PLAY' {...play}
               title='Start the server' />
-      <Button icon='RELOAD' {...reload}
+      <ToolButton icon='RELOAD' {...reload}
               title='Re-start the server' />
-      <Button icon='MEDIA.STOP' {...stop}
+      <ToolButton icon='MEDIA.STOP' {...stop}
               title='Shut down the server'/>
     </ButtonGroup>
   );
@@ -74,12 +108,36 @@ export const Control = () => {
 // --- Server Console
 // --------------------------------------------------------------------------
 
+function resetCmdLine() {
+  dumpCmdLine( cmdConfig );
+}
+
+function execCmdLine() {
+  let cmd = cmdLine.getDoc().getValue();
+  let argv = cmd.trim().split(/[ \t\n]+/);
+  let cfg = configOfParams(argv);
+  Server.configure(cfg);
+  Server.restart();
+}
+
 export const Console = () => {
+  const [ cmd , switchCmd ] = Dome.useSwitch();
+  const doExec = () => {
+    switchCmd();
+    execCmdLine();
+  };
   return (
-    <Text buffer={Server.buffer}
-          mode='text'
-          theme="ambiance"
-          readOnly="nocursor" />
+    <Vfill>
+      <Title>
+        <IconButton icon='RELOAD' display={cmd} onClick={resetCmdLine} title='Reset Command Line'/>
+        <IconButton icon='MEDIA.PLAY' display={cmd} onClick={doExec} title='Execute Command Line'/>
+        <IconButton icon='EDIT' selected={cmd} onClick={switchCmd} title='Edit Command Line'/>
+      </Title>
+      <Text buffer={cmd ? cmdLine : Server.buffer}
+            mode='text'
+            readOnly={!cmd}
+            theme='ambiance' />
+    </Vfill>
   );
 };
 

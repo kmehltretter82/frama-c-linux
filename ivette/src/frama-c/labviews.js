@@ -290,7 +290,7 @@ const makeGridItem = (customize,onClose) => comp => {
     <GridItem id={id} {...properties}>
       <Vfill className='labview-content'>
         <Hbox className='labview-titlebar'>
-          <Hfill className='labview-handle'>
+          <Hfill>
             <Catch title={id}>
               <Render id={ 'labview.title.' + id }>
                 <Label className='labview-handle'
@@ -452,7 +452,6 @@ function CustomViews( { settings, shape, setShape, views:libViews } )
     const theDefault = _.find( theViews, (item) => item.defaultView );
     triggerDefault.current = theDefault ;
     if (theDefault) setTimeout(() => {
-      console.log('TRIGGER',theDefault.id);
       SELECT(theDefault.id);
     });
   }

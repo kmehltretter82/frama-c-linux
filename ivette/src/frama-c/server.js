@@ -369,6 +369,17 @@ export function configure( cfg )
   config = cfg || {} ;
 }
 
+/**
+   @summary Configure the Server.
+   @return {object} server configuration
+   @description
+   See `configure()` method.
+*/
+export function getConfig() {
+  return config;
+}
+
+
 // --------------------------------------------------------------------------
 // --- Low-level Launching
 // --------------------------------------------------------------------------
@@ -796,8 +807,8 @@ function _receive(resp) {
 // --------------------------------------------------------------------------
 
 export default {
-  configure, buffer,
-  getStatus, useStatus,
+  configure, getConfig,
+  getStatus, useStatus, buffer,
   getError, getPending, isRunning,
   start, stop, kill, restart, clear,
   sendGET, sendSET, sendEXEC,

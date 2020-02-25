@@ -59,7 +59,7 @@ export default (function() {
               <Controller.Console/>
             </Component>
             <Component id='frama-c.properties' label='Properties' >
-              <Properties.Table/>
+              <Properties.PropTable/>
             </Component>
           </Group>
         </LabView>
