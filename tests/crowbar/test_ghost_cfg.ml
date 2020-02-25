@@ -399,6 +399,10 @@ let gen_switch ghost cases env =
   let (labels, stmts) = List.fold_right mk_switch cases acc in
   let block = Cil.mkBlock stmts in
   let env = merge env new_env in
+  let env = match default with
+    | None | Some [] -> env
+    | Some (s :: _) -> add_stack s env
+  in
   stmt.skind <- Switch (Cil.evar ~loc x,block,labels,loc);
   env, stmt
 
