@@ -16,7 +16,8 @@ import { Hbox, Hfill, Vfill, Filler } from 'dome/layout/boxes' ;
 import { IconButton, Field } from 'dome/controls/buttons' ;
 import { Label } from 'dome/controls/labels' ;
 import { Icon } from 'dome/controls/icons' ;
-import { Item as RenderItem, Render } from 'dome/layout/dispatch' ;
+import { Item as ItemToRender,
+         Render as RenderItem } from 'dome/layout/dispatch' ;
 import './labviews.css' ;
 
 // --------------------------------------------------------------------------
@@ -225,15 +226,15 @@ const TitleContext = React.createContext();
    If specified, the icon, label and title properties are rendered in an `<Label/>` component.
    By default, the component title bar is labelled according to the component properties.
  */
-export const Title = ({icon,label,title,children}) => {
+export const TitleBar = ({icon,label,title,children}) => {
   let context = React.useContext(TitleContext);
   return (
-    <RenderItem id={'labview.title.'+context.id}>
+    <ItemToRender id={'labview.title.'+context.id}>
       <Label className='labview-handle' icon={icon}
              label={label || context.label}
              title={title || context.title}/>
       {children}
-    </RenderItem>
+    </ItemToRender>
   );
 };
 
@@ -292,10 +293,10 @@ const makeGridItem = (customize,onClose) => comp => {
         <Hbox className='labview-titlebar'>
           <Hfill>
             <Catch title={id}>
-              <Render id={ 'labview.title.' + id }>
+              <RenderItem id={ 'labview.title.' + id }>
                 <Label className='labview-handle'
                        label={label} title={title} />
-              </Render>
+              </RenderItem>
             </Catch>
           </Hfill>
           { CLOSING }
@@ -603,6 +604,6 @@ export function LabView(props)
 
 // --------------------------------------------------------------------------
 
-export default { LabView, View, Group, Component, Title } ;
+export default { LabView, View, Group, Component, TitleBar } ;
 
 // --------------------------------------------------------------------------

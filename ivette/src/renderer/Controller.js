@@ -8,7 +8,7 @@ import Server from 'frama-c/server' ;
 import States from 'frama-c/states' ;
 
 import { Vfill } from 'dome/layout/boxes' ;
-import { Title } from 'frama-c/labviews' ;
+import { Component, TitleBar } from 'frama-c/labviews' ;
 import { Button as ToolButton, ButtonGroup, Filler  } from 'dome/layout/toolbars' ;
 import { LED, IconButton } from 'dome/controls/buttons' ;
 import { Label, Code } from 'dome/controls/labels' ;
@@ -120,26 +120,34 @@ function execCmdLine() {
   Server.restart();
 }
 
-export const Console = () => {
+const RenderConsole = () => {
   const [ cmd , switchCmd ] = Dome.useSwitch();
   const doExec = () => {
     switchCmd();
     execCmdLine();
   };
   return (
-    <Vfill>
-      <Title>
+    <React.Fragment>
+      <TitleBar label={cmd ? 'Command Line' : 'Console'}>
         <IconButton icon='RELOAD' display={cmd} onClick={resetCmdLine} title='Reset Command Line'/>
         <IconButton icon='MEDIA.PLAY' display={cmd} onClick={doExec} title='Execute Command Line'/>
         <IconButton icon='EDIT' selected={cmd} onClick={switchCmd} title='Edit Command Line'/>
-      </Title>
+      </TitleBar>
       <Text buffer={cmd ? cmdLine : Server.buffer}
             mode='text'
             readOnly={!cmd}
             theme='ambiance' />
-    </Vfill>
+    </React.Fragment>
   );
 };
+
+export const Console = () => (
+  <Component id='frama-c.console'
+             label='Console'
+             title='Frama-C Server Output & Command Line'>
+    <RenderConsole/>
+  </Component>
+);
 
 // --------------------------------------------------------------------------
 // --- Status

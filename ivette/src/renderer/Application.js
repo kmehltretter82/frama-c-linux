@@ -55,12 +55,8 @@ export default (function() {
             <GridItem id='frama-c.console'/>
           </View>
           <Group id='frama-c' label='Frama-C' title='Frama-C Kernel Components'>
-            <Component id='frama-c.console' label='Console' >
-              <Controller.Console/>
-            </Component>
-            <Component id='frama-c.properties' label='Properties' >
-              <Properties.PropTable/>
-            </Component>
+            <Controller.Console/>
+            <Properties.PropTable/>
           </Group>
         </LabView>
       </Splitter>
