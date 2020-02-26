@@ -73,7 +73,7 @@ struct
 
   let nullable = try ignore (A.of_json `Null) ; true with _ -> false
   let syntax =
-    Syntax.option (if nullable then A.syntax else Syntax.tuple [A.syntax])
+    Syntax.option (if not nullable then A.syntax else Syntax.tuple [A.syntax])
 
   let to_json = function
     | None -> `Null
@@ -234,25 +234,25 @@ end
 
 module Fmap = Map.Make(String)
 
-type 'a record = json Fmap.t
-
-type ('r,'a) field = {
-  member : 'r record -> bool ;
-  getter : 'r record -> 'a ;
-  setter : 'r record -> 'a -> 'r record ;
-}
-
-type 'a signature = {
-  page : Doc.page ;
-  name : string ;
-  descr : Markdown.text ;
-  mutable fields : Syntax.field list ;
-  mutable default : 'a record ;
-  mutable published : bool ;
-}
-
 module Record =
 struct
+
+  type 'a record = json Fmap.t
+
+  type ('r,'a) field = {
+    member : 'r record -> bool ;
+    getter : 'r record -> 'a ;
+    setter : 'r record -> 'a -> 'r record ;
+  }
+
+  type 'a signature = {
+    page : Doc.page ;
+    name : string ;
+    descr : Markdown.text ;
+    mutable fields : Syntax.field list ;
+    mutable default : 'a record ;
+    mutable published : bool ;
+  }
 
   module type S =
   sig
@@ -271,16 +271,24 @@ struct
     default = Fmap.empty ;
   }
 
+  let invalid name reason =
+    let msg = Printf.sprintf "Server.Data.Record.%s: %s" name reason in
+    raise (Invalid_argument msg)
+
   let field (type a r) (s : r signature)
       ~name ~descr ?default (d : a data) : (r,a) field =
     if s.published then
-      raise (Invalid_argument "Server.Data.Record.field") ;
+      invalid s.name (Printf.sprintf "published record (%s)" name) ;
     let module D = (val d) in
     begin match default with
       | None -> ()
       | Some v -> s.default <- Fmap.add name (D.to_json v) s.default
     end ;
-    let field = Syntax.{ name ; syntax = D.syntax ; descr } in
+    let field = Syntax.{
+        fd_name = name ;
+        fd_syntax = D.syntax ;
+        fd_descr = descr ;
+      } in
     s.fields <- field :: s.fields ;
     let member r = Fmap.mem name r in
     let getter r = D.of_json (Fmap.find name r) in
@@ -290,9 +298,13 @@ struct
   let option (type a r) (s : r signature)
       ~name ~descr (d : a data) : (r,a option) field =
     if s.published then
-      raise (Invalid_argument "Server.Data.Record.option") ;
+      invalid s.name (Printf.sprintf "published record (%s)" name) ;
     let module D = (val d) in
-    let field = Syntax.{ name ; syntax = option D.syntax ; descr } in
+    let field = Syntax.{
+        fd_name = name ;
+        fd_syntax = option D.syntax ;
+        fd_descr = descr ;
+      } in
     s.fields <- field :: s.fields ;
     let member r = Fmap.mem name r in
     let getter r =
@@ -304,7 +316,7 @@ struct
 
   let publish (type r) (s : r signature) =
     if s.published then
-      raise (Invalid_argument "Server.Data.Record.publish") ;
+      invalid s.name "already published record" ;
     let module M =
     struct
       type nonrec r = r
@@ -331,6 +343,103 @@ struct
       s.fields <- [] ;
       s.published <- true ;
       (module M : S with type r = r)
+    end
+
+end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Enums                                                              --- *)
+(* -------------------------------------------------------------------------- *)
+
+module Enum =
+struct
+
+  type 'a dictionary = {
+    page : Doc.page ;
+    name : string ;
+    descr : Markdown.text ;
+    values : (string,'a option) Hashtbl.t ;
+    vindex : ('a,string) Hashtbl.t ;
+    mutable published : bool ;
+    mutable tags : Syntax.tag list ;
+  }
+
+  type 'a tag = string
+  type 'a prefix = string -> 'a tag
+
+  let name tg = tg
+
+  let dictionary ~page ~name ~descr () = {
+    page ; name ; descr ;
+    published = false ;
+    values = Hashtbl.create 0 ;
+    vindex = Hashtbl.create 0 ;
+    tags = [] ;
+  }
+
+  let invalid name reason =
+    let msg = Printf.sprintf "Server.Data.Enum.%s: %s" name reason in
+    raise (Invalid_argument msg)
+
+  let tag (d : 'a dictionary) ~name ~descr ?value () : 'a tag =
+    if d.published then
+      invalid d.name (Printf.sprintf "published enum (%s)" name) ;
+    if Hashtbl.mem d.values name then
+      invalid d.name (Printf.sprintf "duplicate tag (%s)" name) ;
+    let tg = Syntax.{ tag_name = name ; tag_descr = descr } in
+    d.tags <- tg :: d.tags ;
+    Hashtbl.add d.values name value ;
+    begin match value with
+      | None -> ()
+      | Some v -> Hashtbl.add d.vindex v name
+    end ; name
+
+  let prefix (d : 'a dictionary) ~prefix ?(var="*") ~descr
+      () : string -> 'a tag =
+    if d.published then
+      invalid d.name (Printf.sprintf "published enum (%s:*)" prefix) ;
+    let make = Printf.sprintf "%s:%s" prefix in
+    let tg = Syntax.{
+        tag_name = make var ;
+        tag_descr = descr ;
+      } in
+    d.tags <- tg :: d.tags ; make
+
+  let to_json name vindex v =
+    try `String (Hashtbl.find vindex v)
+    with Not_found ->
+      failure "[%s] Value not found" name
+
+  let of_json name values js =
+    let tag = Ju.to_string js in
+    match Hashtbl.find values tag with
+    | Some v -> v
+    | None ->
+      failure "[%s] No registered value for tag '%s" name tag
+    | exception Not_found ->
+      failure "[%s] Not registered tag '%s" name tag
+
+  let publish (type a) (d : a dictionary) ?tag () =
+    if d.published then
+      invalid d.name "already published" ;
+    let module M =
+    struct
+      type t = a
+      let descr = d.descr
+      let syntax =
+        let tags = Syntax.tags ~title:"Tag" (List.rev d.tags) in
+        Syntax.publish ~page:d.page ~name:d.name ~descr
+          ~synopsis:(Syntax.string)
+          ~details:[tags] ()
+      let of_json = of_json d.name d.values
+      let to_json =
+        match tag with
+        | None -> to_json d.name d.vindex
+        | Some to_tag -> fun x -> `String (to_tag x)
+    end in
+    begin
+      d.published <- true ;
+      (module M : S with type t = a)
     end
 
 end
@@ -507,81 +616,6 @@ struct
           let k = Ju.to_int js in
           try find k
           with Not_found -> failure "[%s] No registered id #%d" A.name k
-      end)
-
-end
-
-(* -------------------------------------------------------------------------- *)
-(* --- Dictionnary                                                        --- *)
-(* -------------------------------------------------------------------------- *)
-
-module type Enum =
-sig
-  type t
-  val values : (t * string * Markdown.text) list
-  include Info
-end
-
-module Dictionary(E : Enum) =
-struct
-
-  let registered = ref false
-  let index = Hashtbl.create 0
-  let lookup = Hashtbl.create 0
-
-  let register () =
-    if not !registered then
-      begin
-        registered := true ;
-        let invalid msg tag =
-          let msg = Printf.sprintf "Server.Data.Enum.%s: duplicate %s (%S)"
-              E.name msg tag in
-          raise (Invalid_argument msg)
-        in
-        List.iter
-          (fun (value,tag,_) ->
-             if Hashtbl.mem index value then invalid "value" tag ;
-             Hashtbl.add index value tag ;
-             if Hashtbl.mem lookup tag then invalid "tag" tag ;
-             Hashtbl.add lookup tag value ;
-          ) E.values
-      end
-
-  let values =
-    let open Markdown in
-    let caption = Some (plain "Values description") in
-    let header = [ plain E.name, Left; plain "Description", Left ] in
-    let content =
-      List.map
-        (fun (_,tag,descr) -> [ format "`%S`" tag ; descr ])
-        E.values
-    in
-    Table { caption; header; content }
-
-  include Collection
-      (struct
-        type t = E.t
-
-        let syntax = Syntax.publish
-            ~page:E.page ~name:E.name
-            ~synopsis:Syntax.ident
-            ~descr:E.descr ~details:[values] ()
-
-        let to_json value =
-          register () ;
-          try `String (Hashtbl.find index value)
-          with Not_found ->
-            raise (Invalid_argument
-                     (Printf.sprintf "[%s] Unregistered value" E.name))
-
-        let of_json js =
-          register () ;
-          let tag = Ju.to_string js in
-          try Hashtbl.find lookup tag
-          with Not_found ->
-            let msg = Printf.sprintf "[%s] Unregistered tag %S" E.name tag in
-            raise (Ju.Type_error(msg,js))
-
       end)
 
 end
