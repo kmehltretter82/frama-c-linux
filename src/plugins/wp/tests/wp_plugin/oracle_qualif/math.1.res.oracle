@@ -36,8 +36,8 @@
 [wp] [Alt-Ergo (Native)] Goal typed_ok_ensures_sqrt_pos : Valid
 [wp] [Alt-Ergo (Native)] Goal typed_ok_ensures_sqrt_pos0 : Valid
 [wp] Proved goals:   30 / 30
-  Qed:             5 
-  Alt-Ergo:       25
+  Qed:                  5 
+  Alt-Ergo (native):   25
 ------------------------------------------------------------
  Axiomatics                WP     Alt-Ergo  Total   Success
   Lemma                     3        -       19       100%

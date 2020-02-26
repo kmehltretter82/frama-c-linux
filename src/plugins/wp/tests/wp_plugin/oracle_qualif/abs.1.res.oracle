@@ -9,7 +9,7 @@
 [wp] [Coq (Native)] Goal typed_abs_abs_ensures : Valid
 [wp] Proved goals:    1 / 1
   Qed:             0 
-  Coq:             1
+  Coq (native):    1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   abs                       -        -        1       100%

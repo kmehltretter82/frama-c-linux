@@ -63,10 +63,19 @@ let prover_of_name = function
                            Why3.Whyconf.prover_version = "";
                            Why3.Whyconf.prover_altern = "generate only" })
   | s ->
-      match Extlib.string_del_prefix "why3:" s with
-      | Some "" -> None
-      | Some s' -> Some (Why3 (Why3Provers.find s'))
-      | None -> Some (Why3 (Why3Provers.find s))
+      let prv = String.split_on_char ':' s in
+      let prv = match prv with "why3"::prv -> prv | _ -> prv in
+      let name = String.concat "," prv in
+      match Why3Provers.find_fallback name with
+      | Exact p -> Some (Why3 p)
+      | Fallback p ->
+          Wp_parameters.warning ~current:false
+            "Prover '%s' not found, fallback to '%s'"
+            (String.concat ":" prv) (Why3Provers.print_wp p) ;
+          Some (Why3 p)
+      | NotFound ->
+          Wp_parameters.error "Prover '%s' not found in why3.conf" name ;
+          None
 
 let mode_of_prover_name = function
   | "native:coqedit" -> EditMode
@@ -74,16 +83,16 @@ let mode_of_prover_name = function
   | _ -> BatchMode
 
 let name_of_prover = function
-  | Why3 s -> "why3:" ^ (Why3Provers.print s)
-  | NativeAltErgo -> "alt-ergo"
-  | NativeCoq -> "coq"
+  | Why3 s -> Why3Provers.print_wp s
+  | NativeAltErgo -> "native:alt-ergo"
+  | NativeCoq -> "native:coq"
   | Qed -> "qed"
   | Tactical -> "script"
 
 let title_of_prover = function
   | Why3 s -> Why3Provers.title s
-  | NativeAltErgo -> "Alt-Ergo"
-  | NativeCoq -> "Coq"
+  | NativeAltErgo -> "Alt-Ergo (native)"
+  | NativeCoq -> "Coq (native)"
   | Qed -> "Qed"
   | Tactical -> "Script"
 
@@ -107,7 +116,7 @@ let sanitize_why3 s =
   Buffer.contents buffer
 
 let filename_for_prover = function
-  | Why3 s -> sanitize_why3 (Why3Provers.print s)
+  | Why3 s -> sanitize_why3 (Why3Provers.print_wp s)
   | NativeAltErgo -> "Alt-Ergo"
   | NativeCoq -> "Coq"
   | Qed -> "Qed"
@@ -136,11 +145,7 @@ let cmp_prover p q =
 let pp_prover fmt = function
   | NativeAltErgo -> Format.pp_print_string fmt "Alt-Ergo (Native)"
   | NativeCoq -> Format.pp_print_string fmt "Coq (Native)"
-  | Why3 smt ->
-      if Wp_parameters.debug_atleast 1 then
-        Format.fprintf fmt "Why:%s" (Why3Provers.print smt)
-      else
-        Format.pp_print_string fmt (Why3Provers.title smt)
+  | Why3 smt -> Format.pp_print_string fmt (Why3Provers.title smt)
   | Qed -> Format.fprintf fmt "Qed"
   | Tactical -> Format.pp_print_string fmt "Tactical"
 

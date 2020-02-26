@@ -12,7 +12,7 @@
 [wp] [Coq (Native)] Goal typed_lemma_NaN_not_finite : Valid
 [wp] Proved goals:    3 / 3
   Qed:             0 
-  Coq:             3
+  Coq (native):    3
 ------------------------------------------------------------
  Axiomatics                WP     Alt-Ergo  Total   Success
   Lemma                     -        -        3       100%

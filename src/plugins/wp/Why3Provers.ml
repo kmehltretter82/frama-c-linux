@@ -70,33 +70,27 @@ let find_opt s =
   | Why3.Whyconf.ProverAmbiguity _  ->
       None
 
-let find ?donotfail s =
-  try
-    try
-      let config = Lazy.force cfg in
-      let filter = Why3.Whyconf.parse_filter_prover s in
-      let filter = Why3.Whyconf.filter_prover_with_shortcut config filter in
-      (Why3.Whyconf.filter_one_prover config filter).Why3.Whyconf.prover
-    with
-    | Why3.Whyconf.ProverNotFound _ as exn when donotfail <> None ->
-        Wp_parameters.warning ~once:true "%a" Why3.Exn_printer.exn_printer exn;
-        (** from Why3.Whyconf.parse_filter_prover *)
-        let sl = Why3.Strings.rev_split ',' s in
-        (* reverse order *)
-        let prover_name, prover_version, prover_altern =
-          match sl with
-          | [name] -> name,"",""
-          | [version;name] -> name,version,""
-          | [altern;version;name] -> name,version,altern
-          | _ -> raise (Why3.Whyconf.ParseFilterProver s) in
-        { Why3.Whyconf.prover_name; Why3.Whyconf.prover_version; Why3.Whyconf.prover_altern }
-  with
-  | ( Why3.Whyconf.ProverNotFound _
-    | Why3.Whyconf.ParseFilterProver _
-    | Why3.Whyconf.ProverAmbiguity _ ) as exn ->
-      Wp_parameters.abort "%a" Why3.Exn_printer.exn_printer exn
+type fallback = Exact of t | Fallback of t | NotFound
 
-let print = Why3.Whyconf.prover_parseable_format
+let find_fallback name =
+  match find_opt name with
+  | Some prv -> Exact prv
+  | None ->
+      match String.split_on_char ',' name with
+      | shortname :: _ :: _ ->
+          begin
+            match find_opt (String.lowercase_ascii shortname) with
+            | Some prv -> Fallback prv
+            | None -> NotFound
+          end
+      | _ -> NotFound
+
+let print_why3 = Why3.Whyconf.prover_parseable_format
+let print_wp s =
+  let name = Why3.Whyconf.prover_parseable_format s in
+  let prv = String.split_on_char ',' name in
+  String.concat ":" prv
+
 let title p = Pretty_utils.sfprintf "%a" Why3.Whyconf.print_prover p
 let compare = Why3.Whyconf.Prover.compare
 
