@@ -36,43 +36,159 @@ let page = Doc.page `Kernel ~title:"Property Services" ~filename:"properties.md"
 
 module PropKind =
 struct
-  type t = string
-  let syntax = Sy.publish ~page
+  let kinds = Enum.dictionary ~page
       ~name:"propkind"
       ~descr:(Md.plain "Property Kind")
-      ~synopsis:Sy.string ()
+      ()
+
+  let t_kind name descr = Enum.tag kinds ~name ~descr:(Md.plain descr) ()
+  let t_clause name = t_kind name (Printf.sprintf "Clause `@%s`" name)
+  let t_loop name =
+    t_kind ("loop-" ^ name) (Printf.sprintf "Clause `@loop %s`" name)
+
+  let t_behavior = t_kind "behavior" "Contract behavior"
+  let t_complete = t_kind "complete" "Complete behaviors clause"
+  let t_disjoint = t_kind "disjoint" "Disjoint behaviors clause"
+
+  let t_assumes = t_clause "assumes"
+  let t_requires = t_clause "requires"
+  let t_breaks = t_clause "breaks"
+  let t_continues = t_clause "continues"
+  let t_returns = t_clause "returns"
+  let t_exits = t_clause "exits"
+  let t_ensures = t_clause "ensures"
+  let t_terminates = t_clause "terminates"
+  let t_allocates = t_clause "allocates"
+  let t_decreases = t_clause "decreases"
+  let t_assigns = t_clause "assigns"
+  let t_froms = t_kind "froms" "Clause `@assigns … \\from …`"
+  let t_ext = Enum.prefix kinds ~prefix:"ext" ~var:"<clause>"
+      ~descr:(Md.plain "ACSL extension `<clause>`") ()
+
+  let t_assert = t_clause "assert"
+  let t_loop_invariant = t_loop "invariant"
+  let t_loop_assigns = t_loop "assigns"
+  let t_loop_variant = t_loop "variant"
+  let t_loop_allocates = t_loop "allocates"
+  let t_loop_pragma = t_loop "pragma"
+  let t_loop_ext = Enum.prefix kinds ~prefix:"loop-ext" ~var:"<clause>"
+      ~descr:(Md.plain "ACSL loop extension `loop <clause>`") ()
+
+  let t_reachable = t_kind "reachable" "Reachable statement"
+  let t_code_contract = t_kind "code-contract" "Statement Contract"
+  let t_code_invariant = t_kind "code-invariant" "Generalized loop invariant"
+  let t_type_invariant = t_kind "type-invariant" "Type invariant"
+  let t_global_invariant = t_kind "global-invariant" "Global invariant"
+
+  let t_axiomatic = t_kind "axiomatic" "Axiomatic definitions"
+  let t_axiom = t_kind "axiom" "Logical axiom"
+  let t_lemma = t_kind "lemma" "Logical lemma"
+  let t_other = Enum.prefix kinds ~prefix:"prop" ~var:"<prop>"
+      ~descr:(Md.plain "Plugin Specific properties") ()
+
   open Property
-  let kind = function
-    | IPPredicate _ -> "predicate"
-    | IPExtended { ie_ext={ ext_name } } -> ext_name
-    | IPAxiomatic _ -> "axiomatic"
-    | IPAxiom _ -> "axiom"
-    | IPLemma _ -> "lemma"
-    | IPBehavior _ -> "behavior"
-    | IPComplete _ -> "complete"
-    | IPDisjoint _ -> "disjoint"
+
+  let rec tag = function
+    | IPPredicate { ip_kind } ->
+      begin match ip_kind with
+        | PKRequires _ -> t_requires
+        | PKAssumes _ -> t_assumes
+        | PKEnsures(_,Normal) -> t_ensures
+        | PKEnsures(_,Exits) -> t_exits
+        | PKEnsures(_,Breaks) -> t_breaks
+        | PKEnsures(_,Continues) -> t_continues
+        | PKEnsures(_,Returns) -> t_returns
+        | PKTerminates -> t_terminates
+      end
+    | IPExtended { ie_ext={ ext_name } } -> t_ext ext_name
+    | IPAxiomatic _ -> t_axiomatic
+    | IPAxiom _ -> t_axiom
+    | IPLemma _ -> t_lemma
+    | IPBehavior _ -> t_behavior
+    | IPComplete _ -> t_complete
+    | IPDisjoint _ -> t_disjoint
     | IPCodeAnnot { ica_ca={ annot_content } } ->
       begin match annot_content with
-        | AAssert _ -> "assert"
-        | AStmtSpec _ -> "stmt-contract"
-        | AInvariant(_,false,_) -> "code-invariant"
-        | AInvariant(_,true,_) -> "loop-invariant"
-        | AVariant _ -> "loop-variant"
-        | AAssigns _ -> "loop-assigns"
-        | AAllocation _ -> "loop-allocatation"
-        | APragma _ -> "loop-pragma"
-        | AExtended(_,_,{ext_name}) -> "loop-" ^ ext_name
+        | AAssert _ -> t_assert
+        | AStmtSpec _ -> t_code_contract
+        | AInvariant(_,false,_) -> t_code_invariant
+        | AInvariant(_,true,_) -> t_loop_invariant
+        | AVariant _ -> t_loop_variant
+        | AAssigns _ -> t_loop_assigns
+        | AAllocation _ -> t_loop_allocates
+        | APragma _ -> t_loop_pragma
+        | AExtended(_,_,{ext_name}) -> t_loop_ext ext_name
       end
-    | IPAllocation _ -> "allocation"
-    | IPAssigns _ -> "assigns"
-    | IPFrom _ -> "froms"
-    | IPDecrease _ -> "decrease"
-    | IPReachable _ -> "reachable"
-    | IPPropertyInstance _ -> "instance"
-    | IPTypeInvariant _ -> "type-invariant"
-    | IPGlobalInvariant _ -> "invariant"
-    | IPOther { io_name } -> io_name
-  let to_json = Jstring.to_json
+    | IPAllocation _ -> t_allocates
+    | IPAssigns _ -> t_assigns
+    | IPFrom _ -> t_froms
+    | IPDecrease _ -> t_decreases
+    | IPReachable _ -> t_reachable
+    | IPPropertyInstance { ii_ip } -> tag ii_ip
+    | IPTypeInvariant _ -> t_type_invariant
+    | IPGlobalInvariant _ -> t_global_invariant
+    | IPOther { io_name } -> t_other io_name
+
+
+  let data = Enum.publish kinds ~tag ()
+
+  include (val data : S with type t = Property.t)
+end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Property Status                                                    --- *)
+(* -------------------------------------------------------------------------- *)
+
+module PropStatus =
+struct
+
+  let status = Enum.dictionary ~page ~name:"status"
+      ~descr:(Md.plain "Property Status (consolidated)") ()
+
+  let t_status value name descr =
+    Enum.tag status ~name ~descr:(Md.plain descr) ~value ()
+
+  open Property_status.Feedback
+
+  let t_unknown =
+    t_status Unknown "unknown" "Unknown status"
+  let t_never_tried =
+    t_status Never_tried "never-tried" "Unknown status (never tried)"
+  let t_inconsistent =
+    t_status Inconsistent "inconsistent" "Inconsistent status"
+  let t_valid =
+    t_status Valid "valid" "Valid property"
+  let t_valid_under_hyp =
+    t_status Valid_under_hyp "valid_under_hyp" "Valid (under hypotheses)"
+  let t_considered_valid =
+    t_status Considered_valid "considered_valid" "Valid (external assumption)"
+  let t_invalid =
+    t_status Invalid "invalid" "Invalid property (counter example found)"
+  let t_invalid_under_hyp =
+    t_status Invalid_under_hyp "invalid_under_hyp" "Invalid property (under hypotheses)"
+  let t_invalid_but_dead =
+    t_status Invalid_but_dead "invalid_but_dead" "Dead property (but invalid)"
+  let t_valid_but_dead =
+    t_status Valid_but_dead "valid_but_dead" "Dead property (but valid)"
+  let t_unknown_but_dead =
+    t_status Unknown_but_dead "unknown_but_dead" "Dead property (but unknown)"
+
+  let tag = function
+    | Valid -> t_valid
+    | Invalid -> t_invalid
+    | Unknown -> t_unknown
+    | Never_tried -> t_never_tried
+    | Valid_under_hyp -> t_valid_under_hyp
+    | Valid_but_dead -> t_valid_but_dead
+    | Considered_valid -> t_considered_valid
+    | Invalid_under_hyp -> t_invalid_under_hyp
+    | Invalid_but_dead -> t_invalid_but_dead
+    | Unknown_but_dead -> t_unknown_but_dead
+    | Inconsistent -> t_inconsistent
+
+  let data = Enum.publish status ~tag ()
+
+  include (val data : S with type t = Property_status.Feedback.t)
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -89,14 +205,12 @@ let () = States.column ~model ~name:"descr"
 let () = States.column ~model ~name:"kind"
     ~descr:(Md.plain "Kind")
     ~data:(module PropKind)
-    ~get:(PropKind.kind) ()
+    ~get:(fun ip -> ip) ()
 
 let () = States.column ~model ~name:"status"
     ~descr:(Md.plain "Status")
-    ~data:(module Jstring)
-    ~get:(fun ip ->
-        let st = Property_status.Feedback.get ip
-        in Format.asprintf "%a" Property_status.Feedback.pretty st) ()
+    ~data:(module PropStatus)
+    ~get:(Property_status.Feedback.get) ()
 
 let () = States.column ~model ~name:"function"
     ~descr:(Md.plain "Function")

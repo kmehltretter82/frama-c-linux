@@ -110,21 +110,35 @@ module LogSource = Collection(RawSource)
 
 module RawKind =
 struct
-  type t = Log.kind
-  let page = page
-  let name = "kind"
-  let descr = Md.plain "Frama-C message category."
-  let values = [
-    Log.Error,    "ERROR",    Md.plain "User Error" ;
-    Log.Warning,  "WARNING",  Md.plain "User Warning" ;
-    Log.Feedback, "FEEDBACK", Md.plain "Analyzer Feedback" ;
-    Log.Result,   "RESULT",   Md.plain "Analyzer Result" ;
-    Log.Failure,  "FAILURE",  Md.plain "Analyzer Failure" ;
-    Log.Debug,    "DEBUG",    Md.plain "Analyser Debug" ;
-  ]
+  let kinds = Enum.dictionary ~page
+      ~name:"kind"
+      ~descr:(Md.plain "Frama-C message category.")
+      ()
+
+  let t_kind value name descr =
+    Enum.tag kinds ~name ~descr:(Md.plain descr) ~value ()
+
+  let t_error = t_kind Log.Error "ERROR" "User Error"
+  let t_warning = t_kind Log.Warning "WARNING" "User Warning"
+  let t_feedback = t_kind Log.Feedback "FEEDBACK" "Plugin Feedback"
+  let t_result = t_kind Log.Result "RESULT" "Plugin Result"
+  let t_failure = t_kind Log.Failure "FAILURE" "Plugin Failure"
+  let t_debug = t_kind Log.Debug "DEBUG" "Analyser Debug"
+
+  let tag = function
+    | Log.Error -> t_error
+    | Log.Warning -> t_warning
+    | Log.Feedback -> t_feedback
+    | Log.Result -> t_result
+    | Log.Failure -> t_failure
+    | Log.Debug -> t_debug
+
+  let data = Enum.publish kinds ~tag ()
+
+  include (val data : S with type t = Log.kind)
 end
 
-module LogKind = Dictionary(RawKind)
+module LogKind = Collection(RawKind)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Log Events                                                         --- *)
@@ -135,7 +149,7 @@ struct
 
   type rlog
 
-  let jlog : rlog signature = Record.signature ~page
+  let jlog : rlog Record.signature = Record.signature ~page
       ~name:"log" ~descr:(Md.plain "Message event record.") ()
 
   let kind = Record.field jlog ~name:"kind"

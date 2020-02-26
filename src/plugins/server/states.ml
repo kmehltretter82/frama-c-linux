@@ -98,9 +98,13 @@ let column (type a b) ~(model : a model) ~name ~descr
   let module D = (val data) in
   if name = "key" || name = "index" then
     raise (Invalid_argument "Server.States.column: invalid name") ;
-  if List.exists (fun (fd,_) -> fd.Syntax.name = name) !model then
+  if List.exists (fun (fd,_) -> fd.Syntax.fd_name = name) !model then
     raise (Invalid_argument "Server.States.column: duplicate name") ;
-  let fd = Syntax.{ name ; syntax = D.syntax ; descr } in
+  let fd = Syntax.{
+      fd_name = name ;
+      fd_syntax = D.syntax ;
+      fd_descr = descr ;
+    } in
   model := (fd , fun a -> D.to_json (get a)) :: !model
 
 module Kmap = Map.Make(String)
@@ -257,12 +261,12 @@ let register_array ~page ~name ~descr ?(details=[]) ~key
   let columns = !model in
   let description = [
     Block [Text descr] ;
-    Syntax.fields ~title:(Printf.sprintf "Array %s" name)
+    Syntax.fields ~title:"Columns"
       begin
         Syntax.{
-          name="key" ;
-          syntax=Syntax.ident ;
-          descr=plain "entry identifier" ;
+          fd_name = "key" ;
+          fd_syntax = Syntax.ident ;
+          fd_descr = plain "entry identifier" ;
         } :: List.rev (List.map fst columns)
       end ;
     Block details
@@ -270,7 +274,7 @@ let register_array ~page ~name ~descr ?(details=[]) ~key
   let mref = Doc.publish ~page:page ~name:name ~title ~index description [] in
   let signal = Request.signal ~page ~name:(name ^ ".sig")
       ~descr:(plain "Signal for array " @ href mref) () in
-  let getter = List.map (fun (fd,to_js) -> fd.Syntax.name , to_js) columns in
+  let getter = List.map Syntax.(fun (fd,to_js) -> fd.fd_name , to_js) columns in
   let array = {
     key ; iter ; getter ; signal ;
     current = None ; projects = Hashtbl.create 0

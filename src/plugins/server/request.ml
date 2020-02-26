@@ -205,7 +205,11 @@ let param (type a b) (s : (unit,b) signature) ~name ~descr
     ?default (input : a input) : a param =
   let module D = (val input) in
   let syntax = if default = None then D.syntax else Syntax.option D.syntax in
-  let fd = Syntax.{ name ; syntax ; descr } in
+  let fd = Syntax.{
+      fd_name = name ;
+      fd_syntax = syntax ;
+      fd_descr = descr ;
+    } in
   s.input <- Pfields (fd :: fds_input s) ;
   fun rq ->
     try D.of_json (Fmap.find name rq.param)
@@ -217,7 +221,11 @@ let param (type a b) (s : (unit,b) signature) ~name ~descr
 let param_opt (type a b) (s : (unit,b) signature) ~name ~descr
     (input : a input) : a option param =
   let module D = (val input) in
-  let fd = Syntax.{ name ; syntax = Syntax.option D.syntax ; descr } in
+  let fd = Syntax.{
+      fd_name = name ;
+      fd_syntax = Syntax.option D.syntax ;
+      fd_descr = descr ;
+    } in
   s.input <- Pfields (fd :: fds_input s) ;
   fun rq ->
     try Some(D.of_json (Fmap.find name rq.param))
@@ -238,7 +246,11 @@ let fds_output s : Syntax.field list =
 let result (type a b) (s : (a,unit) signature) ~name ~descr
     ?default (output : b output) : b result =
   let module D = (val output) in
-  let fd = Syntax.{ name ; syntax = D.syntax ; descr } in
+  let fd = Syntax.{
+      fd_name = name ;
+      fd_syntax = D.syntax ;
+      fd_descr = descr ;
+    } in
   s.output <- Rfields (fd :: fds_output s) ;
   begin
     match default with
@@ -250,7 +262,11 @@ let result (type a b) (s : (a,unit) signature) ~name ~descr
 let result_opt (type a b) (s : (a,unit) signature) ~name ~descr
     (output : b output) : b option result =
   let module D = (val output) in
-  let fd = Syntax.{ name ; syntax = option D.syntax ; descr } in
+  let fd = Syntax.{
+      fd_name = name ;
+      fd_syntax = option D.syntax ;
+      fd_descr = descr ;
+    } in
   s.output <- Rfields (fd :: fds_output s) ;
   fun rq opt ->
     match opt with None -> () | Some v ->

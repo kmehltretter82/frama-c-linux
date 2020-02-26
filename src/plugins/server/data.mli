@@ -94,10 +94,6 @@ module Jtext : S with type t = json (** Rich text encoding, see [Jbuffer] *)
 (** {2 Records} *)
 (* -------------------------------------------------------------------------- *)
 
-type 'a record (** Records of type 'a *)
-type 'a signature  (** Opened signature for record of type ['a] *)
-type ('a,'b) field (** Field of type ['b] for a record of type ['a] *)
-
 (** Record factory.
 
     You shall start by declaring a (ghost) type [r] and call
@@ -121,6 +117,10 @@ type ('a,'b) field (** Field of type ['b] for a record of type ['a] *)
 *)
 module Record :
 sig
+
+  type 'a record (** Records of type 'a *)
+  type 'a signature  (** Opened signature for record of type ['a] *)
+  type ('a,'b) field (** Field of type ['b] for a record of type ['a] *)
 
   (** Data with [type t = r record].
       Also contains getters and setters for fields. *)
@@ -149,7 +149,72 @@ sig
     ('r,'a option) field
 
   (** Publish and close an opened record *)
-  val publish : 'a signature -> (module S with type r = 'a)
+  val publish : 'a signature ->
+    (module S with type r = 'a)
+
+end
+
+(* -------------------------------------------------------------------------- *)
+(** {2 Enums} *)
+(* -------------------------------------------------------------------------- *)
+
+(** Enum factory.
+
+    You shall start by declaring a dictionnary with
+    [Enum.dictionary] for your values.
+    Then, populate the dictionary with [Enum.tag] values.
+    Finally, you shall call [Enum.publish] to obtain a new data module
+    for your type.
+
+    You have two options for computing tags: either you provide values
+    when declaring tags, and these tags will be associated to registered
+    values for both directions;
+    alternatively you might provide a [~tag] function to [Enum.publish].
+
+    The difficulty when providing values only at tag definition is to ensure
+    that all possible value has been registered.
+
+    The conversion values from and to json may fail when no value has been
+    registered with tags.
+*)
+
+module Enum :
+sig
+
+  type 'a dictionary
+  type 'a tag
+  type 'a prefix = string -> 'a tag
+
+  val name : 'a tag -> string
+
+  (** Creates an opened, empty dictionnary. *)
+  val dictionary :
+    page:Doc.page -> name:string -> descr:Markdown.text ->
+    unit -> 'a dictionary
+
+  (** Register a new tag in the dictionnary.
+      The provided value, if any, will be used for decoding json tags.
+      If would be used also for encoding values to json tags if no [~tag]
+      function is provided when publishing the dictionnary.
+      Registered values must be hashable with [Hashtbl.hash] function. *)
+  val tag : 'a dictionary ->
+    name:string -> descr:Markdown.text -> ?value:'a ->
+    unit -> 'a tag
+
+  (** Register a new prefix tag in the dictionnary.
+      To decoding from json is provided to prefix tags.
+      Encoding is done by emitting tags with form ['prefix:*'].
+      The variable part of the prefix is documented as ['prefix:xxx']
+      when [~var:"xxx"] is provided. *)
+  val prefix : 'a dictionary ->
+    prefix:string -> ?var:string -> descr:Markdown.text -> unit -> 'a prefix
+
+  (** Publish the dictionnary. To more tag nor prefix can be added after.
+      If no [~tag] function is provided, registered values with tags
+      are used. *)
+  val publish : 'a dictionary ->
+    ?tag:('a -> 'a tag) ->
+    unit -> (module S with type t = 'a)
 
 end
 
@@ -195,19 +260,6 @@ end
 
 (** Builds a {i projectified} index on types with {i unique} identifiers *)
 module Identified(A : IdentifiedType) : Index with type t = A.t
-
-(* -------------------------------------------------------------------------- *)
-(** {2 Dictionary} *)
-(* -------------------------------------------------------------------------- *)
-
-module type Enum =
-sig
-  type t
-  val values : (t * string * Markdown.text) list
-  include Info
-end
-
-module Dictionary(E : Enum) : S_collection with type t = E.t
 
 (* -------------------------------------------------------------------------- *)
 (** {2 Error handling} *)

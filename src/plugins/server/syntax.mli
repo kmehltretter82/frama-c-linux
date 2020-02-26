@@ -51,10 +51,18 @@ val option : t -> t
 val record : (string * t) list -> t
 val data : string -> Markdown.href -> t
 
-type field = { name : string ; syntax : t ; descr : Markdown.text }
+type tag = { tag_name : string ; tag_descr : Markdown.text }
 
-(** Builds a table with fields column named with [~title]
-    (shall be capitalized) *)
-val fields : title:string -> field list -> Markdown.element
+(** Builds a table with tags description.
+    The [~title] is applied to the tag name column
+    (shall be capitalized, defaults to ["Tag"]). *)
+val tags : ?title:string -> tag list -> Markdown.element
+
+type field = { fd_name : string ; fd_syntax : t ; fd_descr : Markdown.text }
+
+(** Builds a table with fields description.
+    The [~title] is applied to the field name column
+    (shall be capitalized, defaults to ["Field"]). *)
+val fields : ?title:string -> field list -> Markdown.element
 
 (* -------------------------------------------------------------------------- *)

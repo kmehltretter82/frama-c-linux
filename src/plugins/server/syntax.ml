@@ -74,6 +74,8 @@ let publish ~page ~name ~descr ~synopsis ?(details = []) () =
   let _href = Doc.publish ~page ~name:id ~title ~index content [] in
   atom dlink
 
+(* -------------------------------------------------------------------------- *)
+
 let unit = atom @@ Markdown.plain "-"
 let any = atom @@ Markdown.emph "any"
 let int = atom @@ Markdown.emph "int"
@@ -101,30 +103,50 @@ let union ts = flow @@ Markdown.(glue ~sep:(plain "|") (List.map protect ts))
 
 let option t = atom @@ Markdown.(protect t @ code "?")
 
-let field (a,t) = Markdown.( escaped a @ code ":" @ t.text )
+(* -------------------------------------------------------------------------- *)
+
+type tag = {
+  tag_name : string ;
+  tag_descr : Markdown.text ;
+}
+
+let tags ?(title="Tag") (tgs : tag list) =
+  let open Markdown in
+  let header = [
+    plain title, Left;
+    plain "Description", Left
+  ] in
+  let row tg = [ escaped tg.tag_name ; tg.tag_descr ] in
+  Markdown.Table {
+    caption = None ; header ; content = List.map row tgs ;
+  }
+
+(* -------------------------------------------------------------------------- *)
+
+let mfield (a,t) = Markdown.( escaped a @ code ":" @ t.text )
 
 let record fds =
   let fields =
     if fds = [] then Markdown.plain "…" else
-      Markdown.(glue ~sep:(code ";") (List.map field fds))
+      Markdown.(glue ~sep:(code ";") (List.map mfield fds))
   in atom @@ Markdown.(code "{" @ fields @ code "}")
 
 type field = {
-  name : string ;
-  syntax : t ;
-  descr : Markdown.text ;
+  fd_name : string ;
+  fd_syntax : t ;
+  fd_descr : Markdown.text ;
 }
 
-let fields ~title (fds : field list) =
+let fields ?(title="Field") (fds : field list) =
   let open Markdown in
   let header = [
     plain title, Left;
     plain "Format", Center;
     plain "Description", Left
   ] in
-  let column f = [ code f.name ; f.syntax.text ; f.descr ] in
+  let row f = [ code f.fd_name ; f.fd_syntax.text ; f.fd_descr ] in
   Markdown.Table {
-    caption = None ; header ; content = List.map column fds ;
+    caption = None ; header ; content = List.map row fds ;
   }
 
 (* -------------------------------------------------------------------------- *)
