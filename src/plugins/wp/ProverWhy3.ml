@@ -258,16 +258,20 @@ module Literal = struct
   let const_int (z:Z.t) =
     Why3.(Term.t_const Number.(const_of_big_int (BigInt.of_string (Z.to_string z)))) Why3.Ty.ty_int
 
-  let why3_real ty sign integer decimal exp =
+  let why3_real ty ~use_hex sign integer decimal exp =
     let rc = Why3.Number.ConstReal {
         rc_negative = sign ;
-        rc_abs = Why3.Number.real_const_dec integer decimal exp ;
+        rc_abs =
+          if use_hex then Why3.Number.real_const_hex integer decimal exp
+          else Why3.Number.real_const_dec integer decimal exp
       } in
     Why3.Term.t_const rc ty
 
   let const_real ~cnv (q:Q.t) =
     let mk_real_int z =
-      why3_real Why3.Ty.ty_real (Z.sign z < 0) (Z.to_string (Z.abs z)) "" None
+      let use_hex = false in
+      let str = Z.to_string (Z.abs z) in
+      why3_real Why3.Ty.ty_real ~use_hex (Z.sign z < 0) str "" None
     in
     if Z.equal Z.one q.den
     then mk_real_int q.num
@@ -280,19 +284,22 @@ module Literal = struct
     else raise Not_found
 
   let float_literal_from_q ~cnv tau q =
-    (* Note that we assume Cfloat.float_lit returns a well formed float *)
+    let use_hex = true in
+    let f = Q.to_float q in
+    let s = Format.asprintf "%a" (Floating_point.pretty_normal ~use_hex) f in
+    let s = match cfloat_of_tau tau with Float32 -> s^"F" | Float64 -> s^"D" in
+    let _, { Floating_point.f_nearest = f } = Floating_point.parse s in
+    let s = Format.asprintf "%a" (Floating_point.pretty_normal ~use_hex) f in
     let re_float =
-      Str.regexp "-?\\([0-9]+\\).?\\([0-9]+\\)?e?\\([+-]?[0-9]+\\)?$"
+      Str.regexp "-?0x\\([0-9a-f]+\\).\\([0-9a-f]+\\)?p?\\([+-]?[0-9a-f]+\\)?$"
     in
-    let s = Cfloat.float_lit (cfloat_of_tau tau) q in
     if Str.string_match re_float s 0 then
       let group n r = try Str.matched_group n r with Not_found -> "" in
       let (i,d,e) = (group 1 s), (group 2 s), (group 3 s) in
       let e = if String.equal e "" then None else Some e in
       let t = Extlib.the (of_tau ~cnv tau) in
-      why3_real t (Q.sign q < 0) i d e
-    else
-      raise Not_found
+      why3_real t ~use_hex (Q.sign q < 0) i d e
+    else raise Not_found
 
   let const_float ~cnv tau (repr:Lang.F.QED.repr) =
     match repr with
