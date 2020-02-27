@@ -492,28 +492,25 @@ module Make
     | Some (Eval_typ.TSPtr _)
     | None -> return value
 
-  (* Removes NaN and infinite floats from the value read from a lvalue. *)
-  let remove_special_float_lvalue typ lval res =
+  (* Assumes that [res] is a valid result for the lvalue [lval] of type [typ].
+     Removes NaN and infinite floats and trap representations of bool values. *)
+  let assume_valid_value typ lval res =
     match typ with
     | TFloat (fkind, _) ->
       res >>= fun (value, origin) ->
       let expr = Value_util.lval_to_exp lval in
       remove_special_float expr fkind value >>=: fun new_value ->
       new_value, origin
-    | _ -> res
-
-  (* Removes invalid bool values from a lvalue. *)
-  let assume_valid_bool typ lval res =
-    if not (Kernel.InvalidBool.get ()) then res else
-      match typ with
-      | TInt (IBool, _) ->
+    | TInt (IBool, _) ->
+      if Kernel.InvalidBool.get () then
         res >>= fun (value, origin) ->
         let one = Abstract_value.Int Integer.one in
         let truth = Value.assume_bounded Alarms.Upper_bound one value in
         let alarm () = Alarms.Invalid_bool lval in
         interpret_truth ~alarm value truth >>=: fun new_value ->
         new_value, origin
-      | _ -> res
+      else res
+    | _ -> res
 
   (* Reduce the rhs argument of a shift so that it fits inside [size] bits. *)
   let reduce_shift_rhs typ expr value =
@@ -1068,8 +1065,7 @@ module Make
       let record, alarms = indeterminate_copy lval v alarms in
       `Value (record, Neither, volatile), alarms
     else
-      let v, alarms = remove_special_float_lvalue typ_lv lval (v, alarms) in
-      let v, alarms = assume_valid_bool typ_lv lval (v, alarms) in
+      let v, alarms = assume_valid_value typ_lv lval (v, alarms) in
       (v, alarms) >>=: fun (value, origin) ->
       let value = define_value value
       and origin = Some origin
