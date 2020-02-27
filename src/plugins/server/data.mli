@@ -26,6 +26,7 @@
 
 type json = Json.t
 
+val page : Doc.page (** Page for builtin kernel data types *)
 val pretty : Format.formatter -> json -> unit
 
 module type S =
@@ -89,6 +90,7 @@ module Jfloat : S_collection with type t = float
 module Jstring : S_collection with type t = string
 module Jident : S_collection with type t = string (** Syntax is {i ident}. *)
 module Jtext : S with type t = json (** Rich text encoding, see [Jbuffer] *)
+module Jmarkdown : S with type t = Markdown.text
 
 (* -------------------------------------------------------------------------- *)
 (** {2 Records} *)
@@ -158,6 +160,8 @@ end
 (** {2 Enums} *)
 (* -------------------------------------------------------------------------- *)
 
+module Tag : S_collection with type t = Syntax.tag
+
 (** Enum factory.
 
     You shall start by declaring a dictionnary with
@@ -185,29 +189,42 @@ sig
   type 'a tag
   type 'a prefix = string -> 'a tag
 
-  val name : 'a tag -> string
+  val tag_name : 'a tag -> string
 
   (** Creates an opened, empty dictionnary. *)
   val dictionary :
-    page:Doc.page -> name:string -> descr:Markdown.text ->
+    page:Doc.page -> name:string -> title:string -> descr:Markdown.text ->
     unit -> 'a dictionary
 
   (** Register a new tag in the dictionnary.
+      The default label is the capitalized name.
       The provided value, if any, will be used for decoding json tags.
       If would be used also for encoding values to json tags if no [~tag]
       function is provided when publishing the dictionnary.
       Registered values must be hashable with [Hashtbl.hash] function. *)
   val tag : 'a dictionary ->
-    name:string -> descr:Markdown.text -> ?value:'a ->
+    name:string ->
+    ?label:Markdown.text -> descr:Markdown.text ->
+    ?value:'a ->
     unit -> 'a tag
 
   (** Register a new prefix tag in the dictionnary.
+      The default label is the capitalized prefix.
       To decoding from json is provided to prefix tags.
       Encoding is done by emitting tags with form ['prefix:*'].
       The variable part of the prefix is documented as ['prefix:xxx']
       when [~var:"xxx"] is provided. *)
   val prefix : 'a dictionary ->
-    prefix:string -> ?var:string -> descr:Markdown.text -> unit -> 'a prefix
+    prefix:string -> ?var:string ->
+    ?label:Markdown.text -> descr:Markdown.text ->
+    unit -> 'a prefix
+
+  (** Obtain all the tags from the dictionnary. *)
+  val tags : 'a dictionary -> Tag.t list
+
+  val page : 'a dictionary -> Doc.page
+  val name : 'a dictionary -> string
+  val syntax : 'a dictionary -> Markdown.text
 
   (** Publish the dictionnary. To more tag nor prefix can be added after.
       If no [~tag] function is provided, registered values with tags

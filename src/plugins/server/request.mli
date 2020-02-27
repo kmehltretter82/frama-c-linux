@@ -211,4 +211,10 @@ val result_opt : ('a,unit) signature ->
   descr:Markdown.text ->
   'b output -> 'b option result
 
+(** {2 Exporting Dictionaries} *)
+
+(** Register a [GET] request [dictionary.<name>] to retrieve all tags
+    registered in the dictionary. *)
+val dictionary : 'a Data.Enum.dictionary -> unit
+
 (* -------------------------------------------------------------------------- *)

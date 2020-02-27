@@ -81,6 +81,12 @@ let check_page page name =
     Senv.warning ~wkey:wkind
       "Request '%s' shall not be published in protocol pages" name
 
+let page_prefix page =
+  match Doc.chapter page with
+  | `Kernel -> "kernel"
+  | `Plugin plugin -> plugin
+  | `Protocol -> "protocol"
+
 (* -------------------------------------------------------------------------- *)
 (* --- Signals                                                            --- *)
 (* -------------------------------------------------------------------------- *)
@@ -358,5 +364,16 @@ let register ~page ~kind ~name ~descr ?details ~input ~output process =
   register_sig
     (signature ~page ~kind ~name ~descr ?details ~input ~output ())
     (fun _rq v -> process v)
+
+let dictionary (d : 'a Data.Enum.dictionary) =
+  let name = Data.Enum.name d in
+  let page = Data.Enum.page d in
+  let descr = Markdown.plain "Returns all tags registered for" @
+              Data.Enum.syntax d in
+  register ~kind:`GET ~page
+    ~name:(Printf.sprintf "%s.dictionary.%s" (page_prefix page) name) ~descr
+    ~input:(module Data.Junit)
+    ~output:(module Data.Tag.Jlist)
+    (fun () -> Data.Enum.tags d)
 
 (* -------------------------------------------------------------------------- *)

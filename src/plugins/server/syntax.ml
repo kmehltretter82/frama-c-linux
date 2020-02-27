@@ -107,6 +107,7 @@ let option t = atom @@ Markdown.(protect t @ code "?")
 
 type tag = {
   tag_name : string ;
+  tag_label : Markdown.text ;
   tag_descr : Markdown.text ;
 }
 
@@ -114,9 +115,10 @@ let tags ?(title="Tag") (tgs : tag list) =
   let open Markdown in
   let header = [
     plain title, Left;
+    plain "Value", Left;
     plain "Description", Left
   ] in
-  let row tg = [ escaped tg.tag_name ; tg.tag_descr ] in
+  let row tg = [ tg.tag_label ; escaped tg.tag_name ; tg.tag_descr ] in
   Markdown.Table {
     caption = None ; header ; content = List.map row tgs ;
   }

@@ -63,6 +63,8 @@ let failure ?json msg =
 let failure_from_type_error msg json =
   failure ~json "%s" msg
 
+let page = Doc.page `Kernel ~title:"Kernel Types" ~filename:"data.md"
+
 (* -------------------------------------------------------------------------- *)
 (* --- Option                                                             --- *)
 (* -------------------------------------------------------------------------- *)
@@ -347,9 +349,47 @@ struct
 
 end
 
+module Jmarkdown : S with type t = Markdown.text =
+struct
+
+  type t = Markdown.text
+  let syntax = Syntax.publish ~page
+      ~name:"markdown" ~descr:(Markdown.plain "Markdown (inlined text)")
+      ~synopsis:Syntax.string ()
+  let of_json js = Markdown.plain (Ju.to_string js)
+  let to_json txt =
+    `String (Pretty_utils.to_string (Markdown.pp_text ?page:None) txt)
+
+end
+
 (* -------------------------------------------------------------------------- *)
 (* --- Enums                                                              --- *)
 (* -------------------------------------------------------------------------- *)
+
+module Tag = Collection
+    (struct
+      type t = Syntax.tag
+
+      let syntax = Syntax.publish ~page ~name:"tag"
+          ~descr:(Markdown.plain "Tag description")
+          ~synopsis:(Syntax.record [
+              "name",Syntax.string ;
+              "label",Jmarkdown.syntax ;
+              "descr",Jmarkdown.syntax ;
+            ]) ()
+
+      let to_json tg = `Assoc [
+          "name", `String tg.Syntax.tag_name ;
+          "label", Jmarkdown.to_json tg.tag_label ;
+          "descr" , Jmarkdown.to_json tg.tag_descr ;
+        ]
+
+      let of_json js = Syntax.{
+          tag_name = Ju.member "name" js |> Ju.to_string ;
+          tag_label = Ju.member "label" js |> Jmarkdown.of_json ;
+          tag_descr = Ju.member "descr" js |> Jmarkdown.of_json ;
+        }
+    end)
 
 module Enum =
 struct
@@ -357,9 +397,11 @@ struct
   type 'a dictionary = {
     page : Doc.page ;
     name : string ;
+    title : string ;
     descr : Markdown.text ;
     values : (string,'a option) Hashtbl.t ;
     vindex : ('a,string) Hashtbl.t ;
+    mutable syntax : Markdown.text ;
     mutable published : bool ;
     mutable tags : Syntax.tag list ;
   }
@@ -367,13 +409,17 @@ struct
   type 'a tag = string
   type 'a prefix = string -> 'a tag
 
-  let name tg = tg
+  let tag_name tg = tg
+  let tag_label a = function
+    | None -> Markdown.plain (String.(capitalize_ascii (lowercase_ascii a)))
+    | Some lbl -> lbl
 
-  let dictionary ~page ~name ~descr () = {
-    page ; name ; descr ;
+  let dictionary ~page ~name ~title ~descr () = {
+    page ; name ; descr ; title ;
     published = false ;
     values = Hashtbl.create 0 ;
     vindex = Hashtbl.create 0 ;
+    syntax = [] ;
     tags = [] ;
   }
 
@@ -381,12 +427,20 @@ struct
     let msg = Printf.sprintf "Server.Data.Enum.%s: %s" name reason in
     raise (Invalid_argument msg)
 
-  let tag (d : 'a dictionary) ~name ~descr ?value () : 'a tag =
+  let page (d : 'a dictionary) = d.page
+  let name (d : 'a dictionary) = d.name
+  let syntax (d : 'a dictionary) = d.syntax
+
+  let tag (d : 'a dictionary) ~name ?label ~descr ?value () : 'a tag =
     if d.published then
       invalid d.name (Printf.sprintf "published enum (%s)" name) ;
     if Hashtbl.mem d.values name then
       invalid d.name (Printf.sprintf "duplicate tag (%s)" name) ;
-    let tg = Syntax.{ tag_name = name ; tag_descr = descr } in
+    let tg = Syntax.{
+        tag_name = name ;
+        tag_label = tag_label name label ;
+        tag_descr = descr ;
+      } in
     d.tags <- tg :: d.tags ;
     Hashtbl.add d.values name value ;
     begin match value with
@@ -394,13 +448,14 @@ struct
       | Some v -> Hashtbl.add d.vindex v name
     end ; name
 
-  let prefix (d : 'a dictionary) ~prefix ?(var="*") ~descr
+  let prefix (d : 'a dictionary) ~prefix ?(var="*") ?label ~descr
       () : string -> 'a tag =
     if d.published then
       invalid d.name (Printf.sprintf "published enum (%s:*)" prefix) ;
     let make = Printf.sprintf "%s:%s" prefix in
     let tg = Syntax.{
         tag_name = make var ;
+        tag_label = tag_label (prefix ^ ".") label ;
         tag_descr = descr ;
       } in
     d.tags <- tg :: d.tags ; make
@@ -419,6 +474,8 @@ struct
     | exception Not_found ->
       failure "[%s] Not registered tag '%s" name tag
 
+  let tags d = List.rev d.tags
+
   let publish (type a) (d : a dictionary) ?tag () =
     if d.published then
       invalid d.name "already published" ;
@@ -427,7 +484,7 @@ struct
       type t = a
       let descr = d.descr
       let syntax =
-        let tags = Syntax.tags ~title:"Tag" (List.rev d.tags) in
+        let tags = Syntax.tags ~title:d.title (List.rev d.tags) in
         Syntax.publish ~page:d.page ~name:d.name ~descr
           ~synopsis:(Syntax.string)
           ~details:[tags] ()
@@ -439,6 +496,7 @@ struct
     end in
     begin
       d.published <- true ;
+      d.syntax <- Syntax.text M.syntax ;
       (module M : S with type t = a)
     end
 

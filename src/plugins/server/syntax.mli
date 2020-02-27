@@ -51,7 +51,11 @@ val option : t -> t
 val record : (string * t) list -> t
 val data : string -> Markdown.href -> t
 
-type tag = { tag_name : string ; tag_descr : Markdown.text }
+type tag = {
+  tag_name : string ;
+  tag_label : Markdown.text ;
+  tag_descr : Markdown.text ;
+}
 
 (** Builds a table with tags description.
     The [~title] is applied to the tag name column

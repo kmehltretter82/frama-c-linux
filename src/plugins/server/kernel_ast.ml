@@ -102,7 +102,7 @@ module PP = Printer_tag.Make(Tag)
 module Stmt = Data.Collection
     (struct
       type t = stmt
-      let syntax = Sy.publish ~page ~name:"stmt"
+      let syntax = Sy.publish ~page:Data.page ~name:"stmt"
           ~synopsis:Sy.ident
           ~descr:(Md.plain "Code statement identifier") ()
       let to_json st = `String (Tag.of_stmt st)
@@ -132,7 +132,7 @@ module Ki = Data.Collection
 module Kf = Data.Collection
     (struct
       type t = kernel_function
-      let syntax = Sy.publish ~page ~name:"fct-id"
+      let syntax = Sy.publish ~page:Data.page ~name:"fct-id"
           ~synopsis:Sy.ident
           ~descr:(Md.plain "Function identified by its global name.") ()
       let to_json kf =

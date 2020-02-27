@@ -37,7 +37,7 @@ let page = Doc.page `Kernel ~title:"Property Services" ~filename:"properties.md"
 module PropKind =
 struct
   let kinds = Enum.dictionary ~page
-      ~name:"propkind"
+      ~name:"propkind" ~title:"Kind"
       ~descr:(Md.plain "Property Kind")
       ()
 
@@ -129,8 +129,8 @@ struct
     | IPGlobalInvariant _ -> t_global_invariant
     | IPOther { io_name } -> t_other io_name
 
-
   let data = Enum.publish kinds ~tag ()
+  let () = Request.dictionary kinds
 
   include (val data : S with type t = Property.t)
 end
@@ -142,36 +142,46 @@ end
 module PropStatus =
 struct
 
-  let status = Enum.dictionary ~page ~name:"status"
+  let status = Enum.dictionary ~page
+      ~name:"propstatus" ~title:"Status"
       ~descr:(Md.plain "Property Status (consolidated)") ()
 
-  let t_status value name descr =
-    Enum.tag status ~name ~descr:(Md.plain descr) ~value ()
+  let t_status value name ?label descr =
+    Enum.tag status ~name
+      ?label:(Extlib.opt_map Md.plain label)
+      ~descr:(Md.plain descr) ~value ()
 
   open Property_status.Feedback
 
   let t_unknown =
     t_status Unknown "unknown" "Unknown status"
   let t_never_tried =
-    t_status Never_tried "never-tried" "Unknown status (never tried)"
+    t_status Never_tried "never_tried"
+      ~label:"Never tried" "Unknown status (never tried)"
   let t_inconsistent =
     t_status Inconsistent "inconsistent" "Inconsistent status"
   let t_valid =
     t_status Valid "valid" "Valid property"
   let t_valid_under_hyp =
-    t_status Valid_under_hyp "valid_under_hyp" "Valid (under hypotheses)"
+    t_status Valid_under_hyp "valid_under_hyp"
+      ~label:"Valid(?)" "Valid (under hypotheses)"
   let t_considered_valid =
-    t_status Considered_valid "considered_valid" "Valid (external assumption)"
+    t_status Considered_valid "considered_valid"
+      ~label:"Valid(!)" "Valid (external assumption)"
   let t_invalid =
     t_status Invalid "invalid" "Invalid property (counter example found)"
   let t_invalid_under_hyp =
-    t_status Invalid_under_hyp "invalid_under_hyp" "Invalid property (under hypotheses)"
+    t_status Invalid_under_hyp "invalid_under_hyp"
+      ~label:"Invalid(?)" "Invalid property (under hypotheses)"
   let t_invalid_but_dead =
-    t_status Invalid_but_dead "invalid_but_dead" "Dead property (but invalid)"
+    t_status Invalid_but_dead "invalid_but_dead"
+      ~label:"Invalid(✝)" "Dead property (but invalid)"
   let t_valid_but_dead =
-    t_status Valid_but_dead "valid_but_dead" "Dead property (but valid)"
+    t_status Valid_but_dead "valid_but_dead"
+      ~label:"Valid(✝)" "Dead property (but valid)"
   let t_unknown_but_dead =
-    t_status Unknown_but_dead "unknown_but_dead" "Dead property (but unknown)"
+    t_status Unknown_but_dead "unknown_but_dead"
+      ~label:"Unknown(✝)" "Dead property (but unknown)"
 
   let tag = function
     | Valid -> t_valid
@@ -187,6 +197,7 @@ struct
     | Inconsistent -> t_inconsistent
 
   let data = Enum.publish status ~tag ()
+  let () = Request.dictionary status
 
   include (val data : S with type t = Property_status.Feedback.t)
 end
