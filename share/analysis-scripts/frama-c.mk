@@ -92,8 +92,8 @@ define display_command =
   $(info )
 endef
 
-space :=
-space +=
+empty :=
+space := $(empty) $(empty)
 comma := ,
 
 fc_list = $(subst $(space),$(comma),$(strip $1))
