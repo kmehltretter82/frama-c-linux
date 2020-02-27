@@ -549,6 +549,9 @@ module SpecialFloat: Parameter_sig.String
 module InvalidBool: Parameter_sig.Bool
 (** Behavior of option "-warn-invalid-bool" *)
 
+module InvalidPointer: Parameter_sig.Bool
+(** Behavior of option "-warn-invalid-pointer" *)
+
 module AbsoluteValidRange: Parameter_sig.String
 (** Behavior of option "-absolute-valid-range" *)
 
