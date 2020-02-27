@@ -1868,6 +1868,10 @@ and childrenPredicateNode vis p =
     let s' = visitCilLogicLabel vis s in
     let t' = vTerm t in
     if t' != t || s != s' then Pvalid_read (s',t') else p
+  | Pobject_pointer (s,t) ->
+    let s' = visitCilLogicLabel vis s in
+    let t' = vTerm t in
+    if t' != t || s != s' then Pobject_pointer (s',t') else p
   | Pvalid_function t ->
     let t' = vTerm t in
     if t' != t then Pvalid_function t' else p
@@ -6945,7 +6949,7 @@ and free_vars_predicate bound_vars p = match p.pred_content with
          Logic_var.Set.union (free_vars_term bound_vars t) acc)
       Logic_var.Set.empty tl
   | Pallocable (_,t) | Pfreeable (_,t)
-  | Pvalid (_,t) | Pvalid_read (_,t) | Pvalid_function t
+  | Pvalid (_,t) | Pvalid_read (_,t) | Pobject_pointer (_, t) | Pvalid_function t
   | Pinitialized (_,t) | Pdangling (_,t) ->
     free_vars_term bound_vars t
   | Pseparated seps ->

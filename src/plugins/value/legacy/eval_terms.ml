@@ -2144,6 +2144,7 @@ let rec reduce_by_predicate ~alarm_mode env positive p =
     | _,Pvalid_read (_label,tsets) ->
       reduce_by_valid env positive Read tsets
 
+    | _,Pobject_pointer (_label, _tsets) -> env (* TODO *)
     | _,Pvalid_function _tsets -> env (* TODO *)
 
     | _,(Pinitialized (lbl_initialized,tsets)
@@ -2290,6 +2291,8 @@ and eval_predicate env pred =
     | Pat (p, lbl) ->
       ignore (env_state env lbl);
       do_eval { env with e_cur = lbl } p
+
+    | Pobject_pointer (_label, _tsets) -> Unknown (* TODO *)
 
     | Pvalid (_label, tsets) | Pvalid_read (_label, tsets) ->
       (* TODO: see same constructor in reduce_by_predicate *)
@@ -2579,7 +2582,8 @@ let predicate_deps env pred =
     | Pat (p, lbl) ->
       do_eval { env with e_cur = lbl } p
 
-    | Pvalid (_, tsets) | Pvalid_read (_, tsets) | Pvalid_function tsets->
+    | Pvalid (_, tsets) | Pvalid_read (_, tsets)
+    | Pobject_pointer (_, tsets) | Pvalid_function tsets ->
       (eval_term_as_lval ~alarm_mode env tsets).ldeps
 
     | Pinitialized (lbl, tsets) | Pdangling (lbl, tsets) ->

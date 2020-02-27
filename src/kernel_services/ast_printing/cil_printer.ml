@@ -231,6 +231,7 @@ module Precedence = struct
     | Pfreeable _
     | Pvalid _
     | Pvalid_read _
+    | Pobject_pointer _
     | Pvalid_function _
     | Pinitialized _
     | Pdangling _
@@ -2726,6 +2727,10 @@ class cil_printer () = object (self)
     | Pvalid_read (l,p) ->
       fprintf fmt "@[%a%a(@[%a@])@]"
         self#pp_acsl_keyword "\\valid_read"
+        self#labels [l] self#term p
+    | Pobject_pointer (l,p) ->
+      fprintf fmt "@[%a%a(@[%a@])@]"
+        self#pp_acsl_keyword "\\object_pointer"
         self#labels [l] self#term p
     | Pvalid_function p ->
       fprintf fmt "@[%a(@[%a@])@]"

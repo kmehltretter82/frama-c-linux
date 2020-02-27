@@ -369,7 +369,7 @@ and cc_pred (map:map) (p:predicate) =
   | Pforall(_,p) | Pexists(_,p) -> cc_pred map p
 
   | Pseparated ts -> List.iter (cc_term map) ts
-  | Pvalid(_,t) | Pvalid_read(_,t) | Pvalid_function t
+  | Pvalid(_,t) | Pvalid_read(_,t) | Pobject_pointer(_,t) | Pvalid_function t
   | Pinitialized(_,t) | Pdangling(_,t) | Pallocable(_,t)
   | Pfreeable(_,t) -> cc_term map t
   | Pfresh(_,_,ptr,n) -> cc_term map ptr ; cc_term map n

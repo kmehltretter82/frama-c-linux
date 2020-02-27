@@ -859,6 +859,8 @@ and pp_predicate_node fmt = function
     Format.fprintf fmt "Pexists(%a,%a)"  pp_quantifiers quantifiers  pp_predicate predicate
   | Pat(predicate,logic_label) ->
     Format.fprintf fmt "Pat(%a,%a)"  pp_predicate predicate  pp_logic_label logic_label
+  | Pobject_pointer(logic_label,term) ->
+    Format.fprintf fmt "Pobject_pointer(%a,%a)"  pp_logic_label logic_label  pp_term term
   | Pvalid_read(logic_label,term) ->
     Format.fprintf fmt "Pvalid_read(%a,%a)"  pp_logic_label logic_label  pp_term term
   | Pvalid(logic_label,term) ->

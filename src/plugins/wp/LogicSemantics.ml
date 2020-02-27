@@ -872,6 +872,11 @@ struct
     | Pvalid(label,t) -> valid env RW label t
     | Pvalid_read(label,t) -> valid env RD label t
 
+    | Pobject_pointer(_label,_t) ->
+        Warning.error
+          "\\object_pointer not yet implemented@\n\
+           @[<hov 0>(%a)@]" Printer.pp_predicate p
+
     | Pvalid_function _t ->
         Warning.error
           "\\valid_function not yet implemented@\n\

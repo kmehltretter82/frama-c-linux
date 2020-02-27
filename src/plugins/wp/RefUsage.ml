@@ -535,7 +535,8 @@ and pred (env:ctx) p : value = match p.pred_content with
   (* No escape *)
   | Pinitialized(_, t) | Pdangling(_,t)
   | Pallocable(_, t) | Pfreeable(_, t)
-  | Pvalid(_,t) | Pvalid_read (_,t) | Pvalid_function t ->
+  | Pvalid(_,t) | Pvalid_read (_,t)
+  | Pobject_pointer (_,t) | Pvalid_function t ->
       unescape ((term env) t)
   | Pseparated ts ->
       E.fcup (fun t -> unescape ((term env) t)) ts
