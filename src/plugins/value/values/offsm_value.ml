@@ -423,6 +423,7 @@ module Offsm : Abstract_value.Leaf with type t = offsm_or_top = struct
   let assume_non_zero v = `Unknown v
   let assume_bounded _ _ v = `Unknown v
   let assume_not_nan ~assume_finite:_ _ v = `Unknown v
+  let assume_pointer v = `Unknown v
   let assume_comparable _ v1 v2 = `Unknown (v1, v2)
 
   let constant e _c =
