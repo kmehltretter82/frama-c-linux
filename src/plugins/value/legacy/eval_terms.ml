@@ -2143,8 +2143,9 @@ let rec reduce_by_predicate ~alarm_mode env positive p =
       reduce_by_valid env positive Write tsets
     | _,Pvalid_read (_label,tsets) ->
       reduce_by_valid env positive Read tsets
+    | _,Pobject_pointer (_label, tsets) ->
+      reduce_by_valid env positive No_access tsets
 
-    | _,Pobject_pointer (_label, _tsets) -> env (* TODO *)
     | _,Pvalid_function _tsets -> env (* TODO *)
 
     | _,(Pinitialized (lbl_initialized,tsets)
@@ -2292,11 +2293,17 @@ and eval_predicate env pred =
       ignore (env_state env lbl);
       do_eval { env with e_cur = lbl } p
 
-    | Pobject_pointer (_label, _tsets) -> Unknown (* TODO *)
-
-    | Pvalid (_label, tsets) | Pvalid_read (_label, tsets) ->
+    | Pvalid (_, tsets)
+    | Pvalid_read (_, tsets)
+    | Pobject_pointer (_, tsets) ->
       (* TODO: see same constructor in reduce_by_predicate *)
-      let kind = match p.pred_content with Pvalid_read _ -> Read | _ -> Write in
+      let kind =
+        match p.pred_content with
+        | Pvalid_read _ -> Read
+        | Pvalid _ -> Write
+        | Pobject_pointer _ -> No_access
+        | _ -> assert false
+      in
       let typ_pointed = Logic_typing.ctype_of_pointed tsets.term_type in
       (* Check if we are trying to write in a const l-value *)
       if kind = Write && Value_util.is_const_write_invalid typ_pointed
