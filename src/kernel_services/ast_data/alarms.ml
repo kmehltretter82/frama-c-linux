@@ -41,6 +41,7 @@ type alarm =
   | Index_out_of_bound of
       exp (* index *)
       * exp option (* None = lower bound is zero; Some up = upper bound *)
+  | Invalid_pointer of exp
   | Invalid_shift of exp * int option (* strict upper bound, if any *)
   | Pointer_comparison of
       exp option (* [None] when implicit comparison to 0 *)
@@ -67,7 +68,7 @@ type alarm =
 
 (* If you add one constructor to this type, make sure to add a dummy value
    in the 'reprs' value below, and increase 'nb_alarms' *)
-let nb_alarm_constructors = 17
+let nb_alarm_constructors = 18
 
 module D =
   Datatype.Make_with_collections
@@ -82,6 +83,7 @@ module D =
         [ Division_by_zero e;
           Memory_access (lv, For_reading);
           Index_out_of_bound (e, None);
+          Invalid_pointer e;
           Invalid_shift (e, None);
           Pointer_comparison (None, e);
           Differing_blocks (e, e);
@@ -102,20 +104,21 @@ module D =
         | Division_by_zero _ -> 0
         | Memory_access _ -> 1
         | Index_out_of_bound _ -> 2
-        | Invalid_shift _ -> 3
-        | Pointer_comparison _ -> 4
-        | Overflow _ -> 5
-        | Not_separated _ -> 6
-        | Overlap _ -> 7
-        | Uninitialized _ -> 8
-        | Is_nan_or_infinite _ -> 9
-        | Is_nan _ -> 10
-        | Float_to_int _ -> 11
-        | Differing_blocks _ -> 12
-        | Dangling _ -> 13
-        | Function_pointer _ -> 14
-        | Uninitialized_union _ -> 15
-        | Invalid_bool _ -> 16
+        | Invalid_pointer _ -> 3
+        | Invalid_shift _ -> 4
+        | Pointer_comparison _ -> 5
+        | Overflow _ -> 6
+        | Not_separated _ -> 7
+        | Overlap _ -> 8
+        | Uninitialized _ -> 9
+        | Is_nan_or_infinite _ -> 10
+        | Is_nan _ -> 11
+        | Float_to_int _ -> 12
+        | Differing_blocks _ -> 13
+        | Dangling _ -> 14
+        | Function_pointer _ -> 15
+        | Uninitialized_union _ -> 16
+        | Invalid_bool _ -> 17
 
       let () = (* Lightweight checks *)
         for i = 0 to nb_alarm_constructors - 1 do
@@ -136,6 +139,7 @@ module D =
         | Index_out_of_bound(e11, e12), Index_out_of_bound(e21, e22) ->
           let n = Exp.compare e11 e21 in
           if n = 0 then Extlib.opt_compare Exp.compare e12 e22 else n
+        | Invalid_pointer e1, Invalid_pointer e2 -> Exp.compare e1 e2
         | Invalid_shift(e1, n1), Invalid_shift(e2, n2) ->
           let n = Exp.compare e1 e2 in
           if n = 0 then Extlib.opt_compare Datatype.Int.compare n1 n2 else n
@@ -187,7 +191,8 @@ module D =
           else Extlib.opt_compare (Extlib.list_compare Exp.compare) l1 l2
         | Invalid_bool lv1, Invalid_bool lv2 -> Lval.compare lv1 lv2
         | _, (Division_by_zero _ | Memory_access _ |
-              Index_out_of_bound _ | Invalid_shift _ | Pointer_comparison _ |
+              Index_out_of_bound _ | Invalid_pointer _ |
+              Invalid_shift _ | Pointer_comparison _ |
               Overflow _ | Not_separated _ | Overlap _ | Uninitialized _ |
               Dangling _ | Is_nan_or_infinite _ | Is_nan _ | Float_to_int _ |
               Differing_blocks _ | Function_pointer _ |
@@ -211,6 +216,7 @@ module D =
             (nb a,
              Exp.hash e1,
              match e2 with None -> 0 | Some e -> 17 + Exp.hash e)
+        | Invalid_pointer e -> Hashtbl.hash (nb a, Exp.hash e)
         | Invalid_shift(e, n) -> Hashtbl.hash (nb a, Exp.hash e, n)
         | Pointer_comparison(e1, e2) ->
           Hashtbl.hash
@@ -255,6 +261,8 @@ module D =
             (match e2 with None -> ">=" | Some _ -> "<")
             Printer.pp_exp
             (match e2 with None -> Cil.zero e1.eloc | Some e -> e)
+        | Invalid_pointer e ->
+          Format.fprintf fmt "Invalid_pointer(@[%a@])" Exp.pretty e
         | Invalid_shift(e, n) ->
           Format.fprintf fmt "Invalid_shift(@[%a@]@ %s)"
             Printer.pp_exp e
@@ -393,6 +401,7 @@ let get_name = function
   | Division_by_zero _ -> "division_by_zero"
   | Memory_access _ -> "mem_access"
   | Index_out_of_bound _ -> "index_bound"
+  | Invalid_pointer _ -> "pointer_value"
   | Invalid_shift _ -> "shift"
   | Pointer_comparison _ -> "ptr_comparison"
   | Differing_blocks _ -> "differing_blocks"
@@ -416,6 +425,7 @@ let get_description = function
   | Division_by_zero _ -> "Integer division by zero"
   | Memory_access _ -> "Invalid pointer dereferencing"
   | Index_out_of_bound _ -> "Array access out of bounds"
+  | Invalid_pointer _ -> "Invalid pointer computation"
   | Invalid_shift _ -> "Invalid shift"
   | Pointer_comparison _ -> "Invalid pointer comparison"
   | Differing_blocks _ -> "Operation on pointers within different blocks"
@@ -502,6 +512,13 @@ let create_predicate ?(loc=Location.unknown) alarm =
        | Some e2 ->
          let t2 = Logic_utils.expr_to_term ~cast:true e2 in
          Logic_const.prel ~loc (Rlt, t1, t2))
+
+    | Invalid_pointer e ->
+      let loc = best_loc ~loc e.eloc in
+      let t = Logic_utils.expr_to_term ~cast:true e in
+      if Cil.isFunPtrType (Cil.typeOf e)
+      then Logic_const.pvalid_function ~loc t
+      else Logic_const.pobject_pointer ~loc (Logic_const.here_label, t)
 
     | Invalid_shift(e, n) ->
       (* 0 <= e < n *)

@@ -332,6 +332,9 @@ let emit_alarm kinstr alarm (status:status) =
   | Alarms.Index_out_of_bound _ ->
     register_alarm "accessing out of bounds index"
 
+  | Alarms.Invalid_pointer _ ->
+    register_alarm "invalid pointer creation"
+
   | Alarms.Differing_blocks _ ->
     register_alarm "pointer subtraction"
 
@@ -367,6 +370,7 @@ let emit_alarm kinstr alarm (status:status) =
 let height_alarm = let open Value_util in function
     | Alarms.Division_by_zero e
     | Alarms.Index_out_of_bound (e,_)
+    | Alarms.Invalid_pointer e
     | Alarms.Invalid_shift (e,_)
     | Alarms.Overflow (_,e,_,_)
     | Alarms.Float_to_int (e,_,_)
@@ -426,6 +430,7 @@ let warn_alarm warn_mode = function
   | Alarms.Invalid_shift _
   | Alarms.Memory_access _
   | Alarms.Index_out_of_bound _
+  | Alarms.Invalid_pointer _
   | Alarms.Is_nan_or_infinite _
   | Alarms.Is_nan _
   | Alarms.Not_separated _
