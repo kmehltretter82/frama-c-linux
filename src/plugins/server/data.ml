@@ -63,7 +63,7 @@ let failure ?json msg =
 let failure_from_type_error msg json =
   failure ~json "%s" msg
 
-let page = Doc.page `Kernel ~title:"Kernel Types" ~filename:"data.md"
+let page = Doc.page `Kernel ~title:"Basic Types" ~filename:"data.md"
 
 (* -------------------------------------------------------------------------- *)
 (* --- Option                                                             --- *)

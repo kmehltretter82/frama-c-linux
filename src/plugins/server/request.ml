@@ -162,14 +162,14 @@ let doc_input (type a) (input : a rq_input) =
   match input with
   | Pnone -> assert false
   | Pdata _ -> []
-  | Pfields fs -> [Syntax.fields ~title:"Input" (List.rev fs)]
+  | Pfields fs -> [Syntax.fields ~title:"Input Params" (List.rev fs)]
 
 (* json output syntax *)
 let doc_output (type b) (output : b rq_output) =
   match output with
   | Rnone -> assert false
   | Rdata _ -> []
-  | Rfields fs -> [Syntax.fields ~title:"Output" (List.rev fs)]
+  | Rfields fs -> [Syntax.fields ~title:"Output Params" (List.rev fs)]
 
 (* -------------------------------------------------------------------------- *)
 (* --- Multi-Parameters Requests                                          --- *)
@@ -339,16 +339,13 @@ let register_sig (type a b) (s : (a,b) signature) (process : rq -> a -> b) =
   let skind = Main.string_of_kind s.kind in
   let title =  Printf.sprintf "`%s` %s" skind s.name in
   let index = [ Printf.sprintf "%s (`%s`)" s.name skind ] in
-  let header = [ plain "Input", Center; plain "Output", Center] in
-  let content =
-    [[ Syntax.text @@ sy_input s.input ;
-       Syntax.text @@ sy_output s.output ]]
-  in
-  let synopsis = Table { caption=None ; header; content } in
+  let input =
+    Syntax.define (plain "Input") (Syntax.text @@ sy_input s.input) in
+  let output =
+    Syntax.define (plain "Output") (Syntax.text @@ sy_output s.output) in
   let description =
-    [ Block [Text s.descr ] ; synopsis ; Block s.details] @
-    doc_input s.input @
-    doc_output s.output
+    Block ( Text s.descr :: input :: output :: s.details ) ::
+    ( doc_input s.input @ doc_output s.output )
   in
   let _ =
     Doc.publish ~page:s.page ~name:s.name ~title ~index description []

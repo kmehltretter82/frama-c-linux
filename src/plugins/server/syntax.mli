@@ -57,6 +57,9 @@ type tag = {
   tag_descr : Markdown.text ;
 }
 
+(** Syntactic definition: LEFT := RIGHT *)
+val define : Markdown.text -> Markdown.text -> Markdown.block_element
+
 (** Builds a table with tags description.
     The [~title] is applied to the tag name column
     (shall be capitalized, defaults to ["Tag"]). *)

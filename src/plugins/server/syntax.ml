@@ -60,6 +60,9 @@ let text { text } = text
 let protect a =
   if a.atomic then a.text else Markdown.(plain "(" @ a.text @ plain ")")
 
+let define left right =
+  Markdown.(Block_quote [Block[Text ( left @ plain ":=" @ right )]])
+
 let publish ~page ~name ~descr ~synopsis ?(details = []) () =
   check_name name ;
   check_page page name ;
@@ -68,15 +71,16 @@ let publish ~page ~name ~descr ~synopsis ?(details = []) () =
   let index = [ Printf.sprintf "%s (`DATA`)" name ] in
   let dref = Doc.href page id in
   let dlink = Markdown.href ~text:(Markdown.emph name) dref in
-  let syntax = Markdown.(glue [
-      plain "<" ; dlink ; plain ">" ; plain ":=" ; synopsis.text ]) in
-  let content = Markdown.(Block ( text descr @ text syntax ) :: details) in
+  let data = Markdown.(plain "<" @ dlink @ plain ">") in
+  let content = Markdown.(Block(
+      [ Text descr ; define data synopsis.text ]
+    )) :: details in
   let _href = Doc.publish ~page ~name:id ~title ~index content [] in
   atom dlink
 
 (* -------------------------------------------------------------------------- *)
 
-let unit = atom @@ Markdown.plain "-"
+let unit = atom @@ Markdown.code "null"
 let any = atom @@ Markdown.emph "any"
 let int = atom @@ Markdown.emph "int"
 let ident = atom @@ Markdown.emph "ident"
@@ -86,7 +90,7 @@ let boolean = atom @@ Markdown.emph "boolean"
 let data name dref = atom @@ Markdown.href ~text:(Markdown.emph name) dref
 
 let escaped name =
-  Markdown.code (Printf.sprintf "'%s'" @@ String.escaped name)
+  Markdown.code (Printf.sprintf "\"%s\"" @@ String.escaped name)
 
 let tag name = atom @@ escaped name
 let array a = atom @@ Markdown.(code "[" @ protect a @ code  ", … ]")
@@ -146,7 +150,7 @@ let fields ?(title="Field") (fds : field list) =
     plain "Format", Center;
     plain "Description", Left
   ] in
-  let row f = [ code f.fd_name ; f.fd_syntax.text ; f.fd_descr ] in
+  let row f = [ escaped f.fd_name ; f.fd_syntax.text ; f.fd_descr ] in
   Markdown.Table {
     caption = None ; header ; content = List.map row fds ;
   }
