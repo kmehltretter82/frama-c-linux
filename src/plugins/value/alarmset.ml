@@ -399,7 +399,25 @@ let height_alarm = let open Value_util in function
 let cmp a1 a2 =
   Datatype.Int.compare (height_alarm (fst a1)) (height_alarm (fst a2))
 
+let remove_redundant_alarms map =
+  let filter alarm status =
+    match alarm with
+    | Alarms.Invalid_pointer expr ->
+      let lval = Mem expr, NoOffset in
+      let implies alarm s =
+        status = s &&
+        match alarm with
+        | Alarms.Memory_access (lv, _access_kind) ->
+          Cil_datatype.LvalStructEq.equal lv lval
+        | _ -> false
+      in
+      not (M.exists implies map)
+    | _ -> true
+  in
+  M.filter filter map
+
 let emit_alarms kinstr map =
+  let map = remove_redundant_alarms map in
   let list = M.bindings map in
   let sorted_list = List.sort cmp list in
   List.iter (fun (alarm, status) -> emit_alarm kinstr alarm status) sorted_list;
