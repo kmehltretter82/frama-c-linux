@@ -3509,6 +3509,11 @@ let isArithmeticType t =
     (TInt _ | TEnum _ | TFloat _) -> true
   | _ -> false
 
+let isLongDoubleType t =
+  match unrollTypeSkel t with
+  | TFloat(FLongDouble,_) -> true
+  | _ -> false
+
 let isArithmeticOrPointerType t=
   match unrollTypeSkel t with
   | TInt _ | TEnum _ | TFloat _ | TPtr _ -> true
@@ -4494,6 +4499,20 @@ and constFold (machdep: bool) (e: exp) : exp =
           with Floating_point.Float_Non_representable_as_Int64 _ -> (* too big*)
             new_exp ~loc (CastE (t, e))
         end
+      | Const (CReal(f,_,_)), TFloat (FFloat,a) when a = [] ->
+        let f = Floating_point.round_to_single_precision_float f in
+        new_exp ~loc (Const (CReal (f,FFloat,None)))
+      | Const (CReal(f,_,_)), TFloat (FDouble,a) when a = [] ->
+        new_exp ~loc (Const (CReal (f,FDouble,None)))
+      (* We don't treat cast to long double, as we don't really know
+         how to handle this type anyway. *)
+      | Const (CInt64(i,_,_)), (TFloat(FFloat,a)) when a = [] ->
+        let f = Integer.to_float i in
+        let f = Floating_point.round_to_single_precision_float f in
+        new_exp ~loc (Const (CReal (f,FFloat,None)))
+      | Const (CInt64(i,_,_)), (TFloat(FDouble,a)) when a = [] ->
+        let f = Integer.to_float i in
+        new_exp ~loc (Const (CReal (f,FDouble,None)))
       | _, _ -> new_exp ~loc (CastE (t, e))
     end
   | Lval lv -> new_exp ~loc (Lval (constFoldLval machdep lv))
@@ -4651,6 +4670,18 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
       | Gt, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_)) ->
         let i1', i2', _ = convertInts i1 ik1 i2 ik2 in
         if Integer.gt i1' i2' then one ~loc else zero ~loc
+      | Eq, Const(CReal(f1,fk1,_)),Const(CReal(f2,fk2,_)) when fk1 = fk2 ->
+        if f1 = f2 then one ~loc else zero ~loc
+      | Ne, Const(CReal(f1,fk1,_)),Const(CReal(f2,fk2,_)) when fk1 = fk2 ->
+        if f1 = f2 then zero ~loc else one ~loc
+      | Le, Const(CReal(f1,fk1,_)),Const(CReal(f2,fk2,_)) when fk1 = fk2 ->
+        if f1 <= f2 then one ~loc else zero ~loc
+      | Ge, Const(CReal(f1,fk1,_)),Const(CReal(f2,fk2,_)) when fk1 = fk2 ->
+        if f1 >= f2 then one ~loc else zero ~loc
+      | Lt, Const(CReal(f1,fk1,_)),Const(CReal(f2,fk2,_)) when fk1 = fk2 ->
+        if f1 < f2 then one ~loc else zero ~loc
+      | Gt, Const(CReal(f1,fk1,_)),Const(CReal(f2,fk2,_)) when fk1 = fk2 ->
+        if f1 > f2 then one ~loc else zero ~loc
 
       (* We rely on the fact that LAnd/LOr appear in global initializers
          and should not have side effects. *)
@@ -4669,6 +4700,35 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
         !pp_exp_ref (new_exp ~loc (BinOp(bop, e1', e2', tres)))
         !pp_exp_ref newe;
     newe
+  end else if isArithmeticType tres && not (isLongDoubleType tres) then begin
+    let tk =
+      match unrollTypeSkel tres with
+      | TFloat(fk,_) -> fk
+      | _ -> Kernel.fatal "constFoldBinOp: not a floating type"
+    in
+    let is_single_precision =
+      match tk with
+      | FFloat -> true
+      | FDouble | FLongDouble -> false
+    in
+    let mkFloat f =
+      let f =
+        if is_single_precision then
+          Floating_point.round_to_single_precision_float f
+        else f
+      in
+      new_exp ~loc (Const (CReal(f,tk,None)))
+    in
+    match bop, e1'.enode, e2'.enode with
+    | PlusA, Const(CReal(f1,fk1,_)), Const(CReal(f2,fk2,_)) when fk1 = fk2 ->
+      mkFloat (f1 +. f2)
+    | MinusA, Const(CReal(f1,fk1,_)), Const(CReal(f2,fk2,_)) when fk1 = fk2 ->
+      mkFloat (f1 -. f2)
+    | Mult, Const(CReal(f1,fk1,_)), Const(CReal(f2,fk2,_)) when fk1 = fk2 ->
+      mkFloat (f1 *. f2)
+    | Div, Const(CReal(f1,fk1,_)), Const(CReal(f2,fk2,_)) when fk1 = fk2 ->
+      mkFloat (f1 /. f2) (*might be infinity or NaN, but that's still a float*)
+    | _ -> new_exp ~loc (BinOp(bop,e1',e2',tres))
   end else
     new_exp ~loc (BinOp(bop, e1', e2', tres))
 
