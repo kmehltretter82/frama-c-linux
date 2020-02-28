@@ -20,8 +20,7 @@ int main(void)
 {
   int __retres;
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
-  __e_acsl_assert(3. != 1.5,(char *)"Assertion",(char *)"main",
-                  (char *)"3 != 1.5",12);
+  __e_acsl_assert(1,(char *)"Assertion",(char *)"main",(char *)"3 != 1.5",12);
   /*@ assert 3 ≢ 1.5; */ ;
   {
     __e_acsl_mpq_t __gen_e_acsl_;
@@ -61,7 +60,7 @@ int main(void)
     __gmpq_clear(__gen_e_acsl__4);
   }
   /*@ assert 0.1 ≡ 0.1; */ ;
-  __e_acsl_assert(1. == 1.,(char *)"Assertion",(char *)"main",
+  __e_acsl_assert(1,(char *)"Assertion",(char *)"main",
                   (char *)"(double)1.0 == 1.0",15);
   /*@ assert (double)1.0 ≡ 1.0; */ ;
   {
