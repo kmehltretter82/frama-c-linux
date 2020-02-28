@@ -285,10 +285,10 @@ module Literal = struct
 
   let float_literal_from_q ~cnv tau q =
     let use_hex = true in
-    let f = Q.to_float q in
-    let s = Format.asprintf "%a" (Floating_point.pretty_normal ~use_hex) f in
-    let s = match cfloat_of_tau tau with Float32 -> s^"F" | Float64 -> s^"D" in
-    let _, { Floating_point.f_nearest = f } = Floating_point.parse s in
+    let f = match cfloat_of_tau tau with
+      | Float32 -> Floating_point.round_to_single_precision_float (Q.to_float q)
+      | Float64 -> Q.to_float q
+    in
     let s = Format.asprintf "%a" (Floating_point.pretty_normal ~use_hex) f in
     let re_float =
       Str.regexp "-?0x\\([0-9a-f]+\\).\\([0-9a-f]+\\)?p?\\([+-]?[0-9a-f]+\\)?$"

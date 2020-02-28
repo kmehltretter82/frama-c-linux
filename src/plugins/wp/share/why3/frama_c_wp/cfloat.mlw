@@ -30,6 +30,7 @@ theory Cfloat
   use ieee_float.RoundingMode as Rounding
   use ieee_float.Float32 as F32
   use ieee_float.Float64 as F64
+  use ieee_float.FloatConverter as Cnv
   use real.RealInfix
 
   (* -------------------------------------------------------------------------- *)
@@ -81,6 +82,12 @@ theory Cfloat
 
   lemma real_0_is_zero_f32: forall f:f32. 0.0 = of_f32 f -> F32.is_zero f
   lemma real_0_is_zero_f64: forall f:f64. 0.0 = of_f64 f -> F64.is_zero f
+
+  (* Conversions *)
+  axiom f32_to_f64:
+    forall f:f32 [to_f64 (of_f32 f)]. to_f64 (of_f32 f) = Cnv.to_float64 Rounding.RNE f
+  axiom f64_to_f32:
+    forall f:f64 [to_f32 (of_f64 f)]. to_f32 (of_f64 f) = Cnv.to_float32 Rounding.RNE f
 
   (* Finite Constants *)
 
