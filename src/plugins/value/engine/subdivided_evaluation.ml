@@ -787,6 +787,9 @@ module Make
                  instead of [expr]. Use [~expr:subexpr], then evaluate [expr]
                  with the reduced valuation, then continue to subdivide. *)
               subdivide ~expr:subexpr ~subexpr >>> fun valuation _ _ ->
+              let valuation =
+                Clear.clear_englobing_exprs valuation ~expr ~subexpr
+              in
               Eva.evaluate context valuation expr >>>
               subdivide_subexpr tail
       in
