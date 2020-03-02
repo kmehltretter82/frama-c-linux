@@ -1438,6 +1438,10 @@ tests/crowbar/%: tests/crowbar/%.ml tests/crowbar/.%.depend .depend \
              -deps tests/crowbar/.$*.depend -deps .depend) \
         $<
 
+tests/crowbar/full-link-%: tests/crowbar/%.ml lib/fc/frama-c.cmxa
+	$(OCAMLOPT) $(OLINKFLAGS) -ccopt "-Llib/fc" -w -42 -package crowbar -o $@ \
+	lib/fc/frama-c.cmxa $<
+
 crowbar-%: tests/crowbar/%
 	$<
 
