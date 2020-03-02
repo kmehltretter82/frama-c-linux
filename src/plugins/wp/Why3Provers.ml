@@ -92,6 +92,7 @@ let print_wp s =
   String.concat ":" prv
 
 let title p = Pretty_utils.sfprintf "%a" Why3.Whyconf.print_prover p
+let name p = p.Why3.Whyconf.prover_name
 let compare = Why3.Whyconf.Prover.compare
 
 let provers () =

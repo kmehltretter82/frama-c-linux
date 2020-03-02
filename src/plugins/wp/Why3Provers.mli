@@ -35,6 +35,7 @@ val find_fallback : string -> fallback
 val print_why3 : t -> string
 val print_wp : t -> string
 val title : t -> string
+val name : t -> string
 val compare : t -> t -> int
 
 val provers : unit -> t list
