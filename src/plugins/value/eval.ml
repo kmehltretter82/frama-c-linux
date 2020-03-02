@@ -142,8 +142,8 @@ end
 let compute_englobing_subexpr ~subexpr ~expr =
   let merge = Extlib.merge_opt (fun _ -> (@)) () in
   (* Returns [Some] of the list of subexpressions of [expr] that contain
-     [subexpr], apart from [expr] and [subexpr] themselves, or [None] if [subexpr]
-     does not appear in [expr]. *)
+     [subexpr], apart [subexpr] itself, or [None] if [subexpr] does not appear
+     in [expr]. *)
   let rec compute expr =
     if Cil_datatype.ExpStructEq.equal expr subexpr
     then Some []
