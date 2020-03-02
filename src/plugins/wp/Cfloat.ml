@@ -57,6 +57,7 @@ let fq64 = extern_f ~library ~result:t64 ~link:(link "to_f64") "q64"
 let f_model ft = extern_f ~library ~result:(ftau ft) "model_%a" pp_suffix ft
 let f_delta ft = extern_f ~library ~result:(ftau ft) "delta_%a" pp_suffix ft
 let f_epsilon ft = extern_f ~library ~result:(ftau ft) "epsilon_%a" pp_suffix ft
+let f_sqrt ft = extern_f ~library ~result:(ftau ft) "sqrt_%a" pp_suffix ft
 
 (* -------------------------------------------------------------------------- *)
 (* --- Model Setting                                                      --- *)
@@ -385,12 +386,20 @@ let () = Context.register
 (* --- Models                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
+let register_c_acsl_builtin name lfun ft =
+  let name = match ft with
+    | Float32 -> name ^ "f"
+    | Float64 -> name
+  in
+  LogicBuiltins.add_builtin name [F ft] (lfun ft)
+
 let () =
   let open LogicBuiltins in
   let register_builtin ft =
     add_builtin "\\model" [F ft] (f_model ft) ;
     add_builtin "\\delta" [F ft] (f_delta ft) ;
     add_builtin "\\epsilon" [F ft] (f_epsilon ft) ;
+    register_c_acsl_builtin "sqrt" f_sqrt ft
   in
   register_builtin Float32 ;
   register_builtin Float64
