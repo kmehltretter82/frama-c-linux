@@ -83,7 +83,14 @@ let protected_cast t e =
         mk_exp(BINARY(GE,e,mk_exp (CONSTANT(CONST_INT("0"))))),
         e,
         mk_exp(CONSTANT(CONST_INT("0")))))
-  | _ -> e
+  | _ ->
+    let max = mk_exp (CONSTANT(CONST_INT("255"))) in
+    let min = mk_exp (UNARY(MINUS,max)) in
+    mk_exp(
+      QUESTION(
+        mk_exp(BINARY(GE,e,min)),
+        mk_exp(QUESTION(mk_exp(BINARY(LE,e,max)),e,max)),
+        min))
 
 let gen_expr =
   fix
@@ -165,10 +172,7 @@ let () = Dynamic.set_module_load_path [ "lib/plugins" ]
 
 let () = Dynamic.load_module "frama-c-eva"
 
-let on_from_name s f =
-  Project.on (Project.from_unique_name s) f ()
-let () =
-Cmdline.run_after_extended_stage (fun () -> Format.printf  "Extended stage@.")
+let on_from_name s f = Project.on (Project.from_unique_name s) f ()
 
 let () =
   Cmdline.(
@@ -185,11 +189,11 @@ let run typ expr =
   Kernel.SignedDowncast.off ();
   Kernel.UnsignedOverflow.off ();
   Kernel.UnsignedDowncast.off ();
+  Kernel.add_debug_keys Kernel.dkey_constfold;
   (* otherwise, we must load scope in addition to eva. *)
   Dynamic.Parameter.Bool.off "-eva-remove-redundant-alarms" ();
   Errorloc.clear_errors ();
-  Format.printf "This is the cabs:@\n%a@."
-    Cprint.printFile cabs;
+  Format.printf "Cabs is@\n%a@." Cprint.printFile cabs;
   let cil =
     try Cabs2cil.convFile cabs
     with exn ->
