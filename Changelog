@@ -18,8 +18,9 @@ Open Source Release <next-release>
 ##################################
 
 -   Instantiate [2020/03/02] New plug-in Instantiate, to create function
-              specializations for specific plug-ins and functions, to overcome
-              limitations due to their specifications.
+              specializations for specific plug-ins and functions (e.g. malloc,
+              memcpy, memset), to overcome limitations due to their
+              specifications.
 -   Kernel    [2020/02/25] support for ghost else blocks
 -   Kernel    [2020/02/18] checks that ghost code does not modify the normal
               control flow of the non-ghost program
