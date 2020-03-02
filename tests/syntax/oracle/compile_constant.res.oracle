@@ -3,4 +3,6 @@
 char pixels[3] = {(char)0.0, (char)0.0, (char)1.0};
 char test_neg = (char)2.;
 char test_ge = (char)2.;
+char test_cast = (char)2.;
+char no_call[2] = {(char)1, (char)2};
 
