@@ -19,42 +19,109 @@ let gen_type =
 
 let mk_exp expr_node = { expr_loc = loc; expr_node }
 
-let force_int gen_expr =
-  map [gen_int_type; gen_expr]
-    (fun x e -> mk_exp (CAST (([SpecType x],JUSTBASE), SINGLE_INIT e)))
+let force_int typ e =
+  mk_exp (CAST (([SpecType typ],JUSTBASE), SINGLE_INIT e))
 
-let gen_int_unary =
-  choose [
-    const NOT;
-    const BNOT;
-  ]
+let needs_int_unary = function
+  | NOT | BNOT -> true
+  | _ -> false
 
 let gen_unary =
   choose [
+    const NOT;
+    const BNOT;
     const MINUS;
     const PLUS;
   ]
 
+(* NB: we don't generate shifts and division/modulo operands to avoid
+   undefined operations. Overflows alarms are deactivated as well. *)
+
+let needs_int_binary = function
+  | AND | OR | BAND | BOR | XOR -> true
+  | _ -> false
+
+let gen_binary =
+  choose [
+    const AND;
+    const OR;
+    const BAND;
+    const BOR;
+    const XOR;
+    const ADD;
+    const SUB;
+    const MUL;
+    const EQ;
+    const NE;
+    const LT;
+    const GT;
+    const LE;
+    const GE;
+  ]
+
+(* int32 generator as the default machdep is 32 bit.
+   Moreover, we only generate positive integers here, as negative ones are
+   supposed to be given by unary -
+*)
 let gen_constant =
   choose [
-    map [ int64 ] (fun i -> CONST_INT (Int64.to_string i));
-    map [ float ] (fun f -> CONST_FLOAT (string_of_float f))
+    map [ int32 ]
+      (fun i ->
+         if Int32.compare i Int32.zero < 0 then
+          mk_exp (
+            UNARY (
+              MINUS,
+              mk_exp (CONSTANT (CONST_INT (Int32.to_string (Int32.neg i))))))
+         else
+           mk_exp (CONSTANT (CONST_INT (Int32.to_string i))));
+    map [ float ]
+      (fun f ->
+         let up = Int32.to_float Int32.max_int in
+         let f = if f < 0.0 then 0. else f in
+         let f = if f > up then up else f in
+         mk_exp (CONSTANT (CONST_FLOAT (string_of_float f))))
   ]
 
 let gen_expr =
   fix
     (fun gen_expr ->
        choose [
-         map [ gen_int_unary; force_int gen_expr ]
-           (fun u e -> mk_exp (UNARY(u,e)));
-         map [ gen_constant ]
-           (fun c -> mk_exp (CONSTANT c))
+         gen_constant;
+         map [ gen_int_type; gen_unary; gen_expr]
+           (fun t u e ->
+              let e = if needs_int_unary u then force_int t e else e in
+              mk_exp (UNARY(u,e)));
+         map [ gen_int_type; gen_binary; gen_expr; gen_expr ]
+           (fun t b e1 e2 ->
+              let e1,e2 =
+                if needs_int_binary b then
+                  force_int t e1, force_int t e2
+                else e1,e2
+              in
+              mk_exp (BINARY (b,e1,e2)));
+         map [ gen_int_type; gen_expr; gen_expr; gen_expr ]
+           (fun t c et ef ->
+              let c = force_int t c in
+              mk_exp (QUESTION (c,et,ef)));
+         map [ gen_type; gen_expr ]
+           (fun t e ->
+              mk_exp (CAST (([SpecType t],JUSTBASE), SINGLE_INIT e)));
        ])
 
 let gen_cabs typ expr =
   (Datatype.Filepath.dummy,
-   [false,
-    FUNDEF(
+   [ false,
+     DECDEF(
+       None,
+       ([SpecType typ],
+        [("a",
+          ARRAY(JUSTBASE,[],{ expr_loc = loc; expr_node = NOTHING}),[],loc),
+         COMPOUND_INIT [NEXT_INIT, SINGLE_INIT expr]]),
+       loc);
+     false,
+     DECDEF(None,([SpecType Tint],[("result", JUSTBASE,[],loc),NO_INIT]),loc);
+     false,
+     FUNDEF(
       None,([SpecType Tvoid],("f", PROTO(JUSTBASE,[],[],false),[],loc)),
       { blabels = [];
         battrs = [];
@@ -65,36 +132,83 @@ let gen_cabs typ expr =
                 DECDEF(
                   None,
                   ([SpecType typ], [("x",JUSTBASE,[],loc),SINGLE_INIT expr]),
-                  loc))}
+                  loc))};
+          { stmt_ghost = false;
+            stmt_node =
+              COMPUTATION(
+                mk_exp(
+                  BINARY(
+                    ASSIGN,
+                    mk_exp (VARIABLE "result"),
+                    mk_exp (
+                      BINARY(
+                        EQ,
+                        mk_exp (VARIABLE "x"),
+                        mk_exp(
+                          INDEX(
+                            mk_exp (VARIABLE "a"),
+                            mk_exp (CONSTANT (CONST_INT "0")))))))), loc)}
           ]
       },
     loc,loc)])
 
+let () = Kernel.AutoLoadPlugins.off()
+
+let () = Project.set_current (Project.create "my_project")
+
+let () = Dynamic.set_module_load_path [ "lib/plugins" ]
+
+let () = Dynamic.load_module "frama-c-eva"
+
+let on_from_name s f =
+  Project.on (Project.from_unique_name s) f ()
+let () =
+Cmdline.run_after_extended_stage (fun () -> Format.printf  "Extended stage@.")
+
+let () =
+  Cmdline.(
+    parse_and_boot
+      ~on_from_name:{ on_from_name }
+      ~get_toplevel:(fun () f -> f ())
+      ~play_analysis:(fun _ -> ()))
+
 let run typ expr =
+  Project.clear ();
   let loc = Cil_datatype.Location.unknown in
   let cabs = gen_cabs typ expr in
-  Project.set_current (Project.create "my_project");
-  let cil = Cabs2cil.convFile cabs in
+  Kernel.SignedOverflow.off ();
+  Kernel.SignedDowncast.off ();
+  Kernel.UnsignedOverflow.off ();
+  Kernel.UnsignedDowncast.off ();
+  (* otherwise, we must load scope in addition to eva. *)
+  Dynamic.Parameter.Bool.off "-eva-remove-redundant-alarms" ();
+  Errorloc.clear_errors ();
+  let cil =
+    try Cabs2cil.convFile cabs
+    with exn ->
+      failf "Failed to typecheck cabs: %s@\n%a@."
+        (Printexc.to_string exn)
+        Cprint.printFile cabs
+  in
+  if Errorloc.had_errors () then begin
+    failf "Failed to typecheck cabs (had errors)@\n%a@."
+      Cprint.printFile cabs
+  end;
   File.prepare_cil_file cil;
   Kernel.MainFunction.set "f";
   !Db.Value.compute ();
   let kf = Globals.Functions.find_by_name "f" in
-  let x = Globals.Vars.find_from_astinfo "x" (Cil_types.VLocal kf) in
+  let r = Globals.Vars.find_from_astinfo "result" Cil_types.VGlobal in
   let ret = Kernel_function.find_return kf in
-  let state = Db.Value.get_stmt_state ~after:true ret in
+  let state = Db.Value.get_stmt_state ret in
   let v1 =
     !Db.Value.eval_expr
-      ~with_alarms:CilE.warn_none_mode state (Cil.evar ~loc x)
+      ~with_alarms:CilE.warn_none_mode state (Cil.evar ~loc r)
   in
-  Kernel.Constfold.on ();
-  !Db.Value.compute ();
-  let state = Db.Value.get_stmt_state ~after:true ret in
-  let v2 =
-    !Db.Value.eval_expr
-      ~with_alarms:CilE.warn_none_mode state (Cil.evar ~loc x)
-  in
-  let eq = Cvalue.V.equal in
-  let pp = Cvalue.V.pretty in
-  check_eq ~pp ~eq v1 v2
+  let itv = Cvalue.V.project_ival v1 in
+  if not (Ival.is_one itv) then begin
+    failf "const fold did not reduce to identical value:@\n%t@."
+      (fun fmt -> File.pretty_ast ~fmt ())
+  end
 
 let () = add_test ~name:"constfold" [gen_type; gen_expr] run
