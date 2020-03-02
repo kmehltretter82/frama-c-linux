@@ -3256,6 +3256,7 @@ extern float powf(float x, float y);
     requires arg_positive: x ≥ -0.;
     ensures finite_result: \is_finite(\result);
     ensures positive_result: \result ≥ -0.;
+    ensures result_value: \result ≡ sqrt(\old(x));
     assigns \result;
     assigns \result \from x;
  */
@@ -3265,6 +3266,7 @@ extern double sqrt(double x);
     requires arg_positive: x ≥ -0.;
     ensures finite_result: \is_finite(\result);
     ensures positive_result: \result ≥ -0.;
+    ensures result_value: \result ≡ sqrtf(\old(x));
     assigns \result;
     assigns \result \from x;
  */
