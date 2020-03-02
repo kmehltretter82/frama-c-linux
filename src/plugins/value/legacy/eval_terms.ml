@@ -715,6 +715,8 @@ let known_logic_funs = [
   "powf", ACSL;
   "fmod", ACSL;
   "fmodf", ACSL;
+  "sqrt", ACSL;
+  "sqrtf", ACSL;
   "\\sign", ACSL;
   "\\min", ACSL;
   "\\max", ACSL;
@@ -1356,6 +1358,9 @@ and eval_known_logic_function ~alarm_mode env li labels args =
     _, _, [arg1; arg2] ->
     eval_float_builtin_arity2 ~alarm_mode env lvi.lv_name arg1 arg2
 
+  | ("sqrt" | "sqrtf"),_,_, [arg] ->
+    eval_float_builtin_arity1 ~alarm_mode env lvi.lv_name arg
+
   | "\\sign", _, _, [arg] ->
     begin
       let r = eval_term ~alarm_mode env arg in
@@ -1423,6 +1428,23 @@ and eval_float_builtin_arity2  ~alarm_mode env name arg1 arg2 =
   let ldeps = join_logic_deps r1.ldeps r2.ldeps in
   { etype = r1.etype; eunder; eover = v; ldeps; empty = r1.empty || r2.empty; }
 
+and eval_float_builtin_arity1  ~alarm_mode env name arg =
+  let fcaml = match name with
+    | "sqrt" ->   Fval.sqrt  Fval.Double
+    | "sqrtf" ->  Fval.sqrt  Fval.Single
+    | _ -> assert false
+  in
+  let r = eval_term ~alarm_mode env arg in
+  let v =
+    try
+      let i = Cvalue.V.project_ival r.eover in
+      let f = Ival.project_float i in
+      Cvalue.V.inject_float (fcaml f)
+    with Cvalue.V.Not_based_on_null ->
+      Cvalue.V.topify_arith_origin r.eover
+  in
+  let eunder = under_from_over v in
+  { etype = r.etype; eunder; eover = v; ldeps=r.ldeps; empty = r.empty; }
 
 (* Computes the max (resp. the min) between the evaluation results [r1] and [r2]
    according to [backward_left v1 v2] that reduces [v1] by assuming it is
