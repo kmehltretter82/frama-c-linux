@@ -18,10 +18,10 @@ Let x_5 = m[q <- x_4][p].
 Assume {
   Type: is_sint32(x) /\ is_sint32(x_1) /\ is_sint32(x_3) /\ is_sint32(x_4) /\
       is_sint32(x_5).
+  (* Heap *)
+  Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\ linked(Malloc_0).
   (* Goal *)
   When: q != p.
-  (* Heap *)
-  Have: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: (0 <= x) /\ (0 <= x_1) /\ (x <= 199) /\ (x_1 <= 199) /\
       valid_rw(Malloc_0, p, 1) /\ valid_rw(Malloc_0, q, 1).
@@ -39,10 +39,10 @@ Let x_3 = 1 + x_2.
 Assume {
   Type: is_sint32(x) /\ is_sint32(x_1) /\ is_sint32(x_2) /\ is_sint32(x_3) /\
       is_sint32(m[q <- x_3][p]).
+  (* Heap *)
+  Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\ linked(Malloc_0).
   (* Goal *)
   When: q != p.
-  (* Heap *)
-  Have: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: (0 <= x) /\ (0 <= x_1) /\ (x <= 199) /\ (x_1 <= 199) /\
       valid_rw(Malloc_0, p, 1) /\ valid_rw(Malloc_0, q, 1).
@@ -63,7 +63,7 @@ Assume {
   Type: is_sint32(x) /\ is_sint32(x_1) /\ is_sint32(x_3) /\ is_sint32(x_4) /\
       is_sint32(x_5).
   (* Heap *)
-  Have: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\ linked(Malloc_0).
+  Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: (0 <= x) /\ (0 <= x_1) /\ (x <= 199) /\ (x_1 <= 199) /\
       valid_rw(Malloc_0, p, 1) /\ valid_rw(Malloc_0, q, 1).
@@ -82,7 +82,7 @@ Assume {
   Type: is_sint32(x) /\ is_sint32(x_1) /\ is_sint32(x_2) /\ is_sint32(x_3) /\
       is_sint32(m[q <- x_3][p]).
   (* Heap *)
-  Have: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\ linked(Malloc_0).
+  Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: (0 <= x) /\ (0 <= x_1) /\ (x <= 199) /\ (x_1 <= 199) /\
       valid_rw(Malloc_0, p, 1) /\ valid_rw(Malloc_0, q, 1).

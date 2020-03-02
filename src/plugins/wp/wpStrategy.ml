@@ -166,14 +166,11 @@ let add_prop_fct_post acc kind kf  bhv tkind post =
   let p = normalize id labels p in
   add_prop acc kind id p
 
-let add_prop_fct_bhv_pre acc kind kf bhv ~impl_assumes =
-  let assumes =
-    if impl_assumes then Some (Ast_info.behavior_assumes bhv) else None
-  in
+let add_prop_fct_bhv_pre acc kind kf bhv =
+  let assumes = None in
   let add acc p = add_prop_fct_pre acc kind kf bhv ~assumes p in
   let acc = List.fold_left add acc bhv.b_requires in
-  if impl_assumes then acc
-  else List.fold_left add acc bhv.b_assumes
+  List.fold_left add acc bhv.b_assumes
 
 let add_prop_stmt_pre acc kind kf s bhv ~assumes pre =
   let id = WpPropId.mk_pre_id kf (Kstmt s) bhv pre in
@@ -246,6 +243,27 @@ let fold_bhv_post_cond ~warn f_normal f_exits acc b =
           p_acc, e_acc
         end
   in List.fold_left add acc b.b_post_cond
+
+(* -------------------------------------------------------------------------- *)
+(* --- Smoke                                                             --- *)
+(* -------------------------------------------------------------------------- *)
+
+let add_smoke acc kf ~id ?doomed ?unreachable () =
+  let id = WpPropId.mk_smoke kf ~id ?doomed ?unreachable () in
+  add_prop acc Agoal id (Some Logic_const.pfalse)
+
+let add_prop_fct_smoke acc kf bhv =
+  if bhv.b_requires = [] then acc else
+    let bname =
+      if Cil.is_default_behavior bhv then "default" else bhv.b_name in
+    let id = bname ^ "_requires" in
+    let doomed = Property.ip_requires_of_behavior kf Kglobal bhv in
+    add_smoke acc kf ~id ~doomed ()
+
+let add_prop_loop_smoke acc kf stmt =
+  if not (Wp_parameters.Split.get()) then
+    add_smoke acc kf ~id:"loop_invariant" ~unreachable:stmt ()
+  else acc
 
 (* -------------------------------------------------------------------------- *)
 

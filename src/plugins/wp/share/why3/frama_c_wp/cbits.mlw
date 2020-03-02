@@ -85,6 +85,22 @@ theory Cbits
         (lxor 0 0) = 0 /\  (lxor 0 1) = 1 /\ (lxor 1 0) = 1 /\ (lxor 1 1) = 0
   meta "remove_for_" axiom lxor_bool
 
+(** ** lsl identities *)
+
+  axiom lsl_0: forall x:int. lsl x 0 = x
+  axiom lsl_1: forall x:int. lsl x 1 = 2 * x
+  axiom lsl_add: forall x p q:int. 0 <= p -> 0 <= q -> lsl (lsl x p) q = lsl x (p+q)
+
+(** ** lsr identities *)
+
+  axiom lsr_0: forall x:int. lsr x 0 = x
+  axiom lsr_1: forall x:int. 0 <= x -> lsr x 1 = CD.div x 2
+  axiom lsr_add: forall x p q :int. 0 <= p -> 0 <= q -> lsr (lsr x p) q = lsr x (p+q)
+
+(** ** lsl+lsr combination *)
+
+  axiom lsl_lsr_add: forall x p q:int. 0 <= q <= p -> lsr (lsl x p) q = lsl x (p-q)
+
 (** * Bit extraction *)
 (** ** Definition of bit_test predicate *)
 

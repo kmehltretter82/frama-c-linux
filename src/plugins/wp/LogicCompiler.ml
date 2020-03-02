@@ -431,8 +431,9 @@ struct
         let env,domain,sigv = profile_env Logic_var.Map.empty [] [] profile in
         let env = default_label env labels in
         let result = cc env data in
+        let types = Lang.get_hypotheses () in
         let used_domain p = occurs_pvars (filter result) p in
-        let domain = List.filter used_domain domain in
+        let domain = List.filter used_domain (domain @ types) in
         let used_var (_,x) = filter result x || occurs_ps x domain in
         let used = List.filter used_var sigv in
         let parp = List.map snd used in

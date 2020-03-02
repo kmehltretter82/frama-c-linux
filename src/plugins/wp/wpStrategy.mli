@@ -80,11 +80,15 @@ val add_prop_fct_pre : t_annots -> annot_kind ->
   kernel_function -> funbehavior ->
   assumes: predicate option -> identified_predicate -> t_annots
 
-(** Add the preconditions of the behavior :
- * if [impl_assumes], add [b_assumes => b_requires]
- * else add both the [b_requires] and the [b_assumes] *)
+(** Add the preconditions of the behavior *)
 val add_prop_fct_bhv_pre : t_annots -> annot_kind ->
-  kernel_function -> funbehavior -> impl_assumes:bool -> t_annots
+  kernel_function -> funbehavior -> t_annots
+
+(** Add Smoke Test behavior *)
+val add_prop_fct_smoke : t_annots -> kernel_function -> funbehavior -> t_annots
+
+(** Add Smoke Test behavior for loop *)
+val add_prop_loop_smoke : t_annots -> kernel_function -> stmt -> t_annots
 
 val add_prop_fct_post : t_annots -> annot_kind ->
   kernel_function -> funbehavior -> termination_kind -> identified_predicate

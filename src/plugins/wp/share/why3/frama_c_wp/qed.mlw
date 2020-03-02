@@ -77,4 +77,9 @@ theory Qed
   lemma cdiv_neutral : forall a:int [CD.div a 1]. CD.div a 1 = a
   lemma cdiv_inv : forall a:int [CD.div a a]. a<>0 -> CD.div a a = 1
 
+  lemma cdiv_closed_remainder :
+    forall a,b,n:int.
+    0 <= a -> 0 <= b -> 0 <= b-a < n ->
+    CD.mod a n = CD.mod b n -> a = b
+
 end

@@ -10,7 +10,8 @@
 ------------------------------------------------------------
 
 Goal Post-condition 'KO' in 'extra':
-Let x = A[2]. Assume { Type: is_sint32(x). }
+Let x = A[2].
+Assume { Type: is_sint32(x). (* Heap *) Type: IsArray1_sint32(A). }
 Prove: x = 12.
 
 ------------------------------------------------------------

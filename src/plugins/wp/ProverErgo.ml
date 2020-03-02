@@ -341,8 +341,6 @@ let re_unsat = Str.regexp p_unsat
 class altergo ~config ~pid ~gui ~file ~lines ~logout ~logerr =
   object(ergo)
 
-    initializer ignore pid
-
     inherit ProverTask.command (Wp_parameters.AltErgo.get ())
 
     val mutable files = []
@@ -437,7 +435,8 @@ class altergo ~config ~pid ~gui ~file ~lines ~logout ~logerr =
       if not gui then begin
         ergo#add_positive
           ~name:"-steps-bound" ~value:(VCS.get_stepout config) ;
-        ergo#timeout (VCS.get_timeout config) ;
+        let smoke = WpPropId.is_smoke_test pid in
+        ergo#timeout (VCS.get_timeout ~smoke config) ;
       end ;
       ergo#validate_time ergo#time ;
       ergo#validate_pattern ~logs:`ERR re_error ergo#error ;

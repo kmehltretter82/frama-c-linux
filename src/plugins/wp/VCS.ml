@@ -175,8 +175,11 @@ let current () = {
 
 let default = { valid = false ; timeout = None ; stepout = None }
 
-let get_timeout = function
-  | { timeout = None } -> Wp_parameters.Timeout.get ()
+let get_timeout ~smoke = function
+  | { timeout = None } ->
+      if smoke
+      then Wp_parameters.SmokeTimeout.get ()
+      else Wp_parameters.Timeout.get ()
   | { timeout = Some t } -> t
 
 let get_stepout = function
@@ -214,6 +217,16 @@ let is_verdict r = match r.verdict with
 
 let is_valid = function { verdict = Valid } -> true | _ -> false
 let is_computing = function { verdict=Computing _ } -> true | _ -> false
+
+let verdict ~smoke r =
+  if smoke then
+    match r.verdict with
+    | (Failed | NoResult | Checked | Computing _) as r -> r
+    | Valid -> Invalid
+    | Invalid | Unknown | Timeout | Stepout -> Valid
+  else r.verdict
+
+let is_proved ~smoke r = (verdict ~smoke r = Valid)
 
 let configure r =
   let valid = (r.verdict = Valid) in

@@ -84,7 +84,7 @@ Prove: true.
 
 Goal Instance of 'Pre-condition (file tests/wp_hoare/byref.i, line 11) in 'f'' in 'wrong_without_ref' at call 'f' (file tests/wp_hoare/byref.i, line 22)
 :
-Assume { (* Heap *) Have: (region(q.base) <= 0) /\ linked(Malloc_0). }
+Assume { (* Heap *) Type: (region(q.base) <= 0) /\ linked(Malloc_0). }
 Prove: valid_rw(Malloc_0, q, 1).
 
 ------------------------------------------------------------

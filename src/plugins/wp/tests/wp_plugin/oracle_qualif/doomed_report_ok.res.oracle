@@ -1,0 +1,33 @@
+# frama-c -wp [...]
+[kernel] Parsing tests/wp_plugin/doomed_report_ok.i (no preprocessing)
+[wp] Running WP plugin...
+[wp] Loading driver 'share/wp.driver'
+[wp] Warning: Missing RTE guards
+[wp] 8 goals scheduled
+[wp] Smoke-test typed_foo_smoke_loop_invariant_s2 : Passed (Alt-Ergo 2.0.0)
+[wp] [Alt-Ergo 2.0.0] Goal typed_foo_loop_invariant_A_preserved : Valid
+[wp] [Alt-Ergo 2.0.0] Goal typed_foo_loop_invariant_A_established : Valid
+[wp] [Alt-Ergo 2.0.0] Goal typed_foo_loop_invariant_B_preserved : Valid
+[wp] [Alt-Ergo 2.0.0] Goal typed_foo_loop_invariant_B_established : Valid
+[wp] [Alt-Ergo 2.0.0] Goal typed_foo_loop_invariant_C_preserved : Valid
+[wp] [Alt-Ergo 2.0.0] Goal typed_foo_loop_invariant_C_established : Valid
+[wp] [Qed] Goal typed_foo_loop_assigns : Valid
+[wp] Proved goals:    8 / 8
+  Qed:               1 
+  Alt-Ergo 2.0.0:    7
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  foo                       1        7        8       100%
+------------------------------------------------------------
+                                 Qed Ergo Failed
+  foo_loop_assigns                1    -    -
+  foo_loop_invariant_A            -    2    -
+  foo_loop_invariant_B            -    2    -
+  foo_loop_invariant_C            -    2    -
+  foo_smoke_loop_invariant_s2     -    1    -
+-------------------------------------------------------------
+Success:   100%
+   Total  :     5 properties
+   Valid  :     5
+   Failed :     -
+-------------------------------------------------------------

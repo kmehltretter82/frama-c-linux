@@ -81,10 +81,10 @@ Let m_2 = m_1[shift_sint32(t, 2) <- m_1[a_1]].
 Let m_3 = m_2[shift_sint32(t, 3) <- m_2[a_1]].
 Assume {
   Type: is_sint32(x).
+  (* Heap *)
+  Type: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Goal *)
   When: (0 <= i) /\ (i <= 9).
-  (* Heap *)
-  Have: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: (0 <= x) /\ (x <= 9) /\ valid_rw(Malloc_0, a, 10) /\
       (forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 9) ->

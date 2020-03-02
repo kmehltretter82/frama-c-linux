@@ -16,7 +16,7 @@ Goal Assertion (file tests/wp_hoare/logicref.i, line 14):
 Assume {
   Type: is_sint32(i) /\ is_sint32(k).
   (* Heap *)
-  Have: (region(a.base) <= 0) /\ linked(Malloc_0).
+  Type: (region(a.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: (0 <= i) /\ (i < k) /\ P_vrange(Malloc_0, a, k).
 }

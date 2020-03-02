@@ -365,7 +365,7 @@ class tactic
     initializer
       begin
         form#add_row ~xpadding:4 ~ypadding:2 ~field:`Compact descr#coerce ;
-        self#set_action ~tooltip:"Apply Tactic" ~icon:`MEDIA_PLAY () ;
+        self#set_action () ;
         wfields <- List.map (wfield tac form pp) tac#params ;
         List.iter (fun fd -> fd#connect self#updated) wfields ;
         List.iter (fun fd -> fd#compose_with self#compose) wfields ;

@@ -18,6 +18,8 @@ Let a_1 = [ x ] ^ a ^ [ z ].
 Assume {
   Type: is_sint32(i) /\ is_sint32(n) /\ is_sint32(x) /\ is_sint32(y) /\
       is_sint32(z).
+  (* Heap *)
+  Type: is_sint32(call_seq_0).
   (* Pre-condition *)
   Have: L_call_obs(call_seq_0) = nil.
   (* Call 'f' *)
@@ -42,6 +44,8 @@ Let a = ([ y ] *^ i).
 Assume {
   Type: is_sint32(i) /\ is_sint32(n) /\ is_sint32(x) /\ is_sint32(y) /\
       is_sint32(1 + i).
+  (* Heap *)
+  Type: is_sint32(call_seq_0).
   (* Pre-condition *)
   Have: L_call_obs(call_seq_0) = nil.
   (* Call 'f' *)
@@ -71,6 +75,8 @@ Let a = ([ y ] *^ i).
 Assume {
   Type: is_sint32(i) /\ is_sint32(n) /\ is_sint32(x) /\ is_sint32(y) /\
       is_sint32(1 + i).
+  (* Heap *)
+  Type: is_sint32(call_seq_0).
   (* Pre-condition *)
   Have: L_call_obs(call_seq_0) = nil.
   (* Call 'f' *)
@@ -101,6 +107,8 @@ Let x_1 = 1 + i.
 Assume {
   Type: is_sint32(i) /\ is_sint32(n) /\ is_sint32(x) /\ is_sint32(y) /\
       is_sint32(x_1).
+  (* Heap *)
+  Type: is_sint32(call_seq_0).
   (* Pre-condition *)
   Have: L_call_obs(call_seq_0) = nil.
   (* Call 'f' *)
@@ -172,6 +180,8 @@ Let a = ([ y ] *^ i).
 Assume {
   Type: is_sint32(i) /\ is_sint32(n) /\ is_sint32(x) /\ is_sint32(y) /\
       is_sint32(z).
+  (* Heap *)
+  Type: is_sint32(call_seq_0).
   (* Pre-condition *)
   Have: L_call_obs(call_seq_0) = nil.
   (* Pre-condition for 'g_called' *)
@@ -206,6 +216,8 @@ Let a = ([ y ] *^ i).
 Assume {
   Type: is_sint32(i) /\ is_sint32(n) /\ is_sint32(x) /\ is_sint32(y) /\
       is_sint32(z).
+  (* Heap *)
+  Type: is_sint32(call_seq_0).
   (* Pre-condition *)
   Have: L_call_obs(call_seq_0) = nil.
   (* Pre-condition for 'g_not_called' *)
@@ -232,6 +244,8 @@ Let a = ([ y ] *^ i).
 Assume {
   Type: is_sint32(i) /\ is_sint32(n) /\ is_sint32(x) /\ is_sint32(y) /\
       is_sint32(z).
+  (* Heap *)
+  Type: is_sint32(call_seq_0).
   (* Pre-condition *)
   Have: L_call_obs(call_seq_0) = nil.
   (* Pre-condition for 'g_not_called' *)
@@ -262,7 +276,12 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Post-condition 'ok,m2' in 'no_calls':
-Assume { (* Pre-condition *) Have: L_call_obs(call_seq_0) = nil. }
+Assume {
+  (* Heap *)
+  Type: is_sint32(call_seq_0).
+  (* Pre-condition *)
+  Have: L_call_obs(call_seq_0) = nil.
+}
 Prove: length(L_call_nil) = 0.
 
 ------------------------------------------------------------
@@ -273,13 +292,23 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Post-condition 'ok,n2' in 'no_calls':
-Assume { (* Pre-condition *) Have: L_call_obs(call_seq_0) = nil. }
+Assume {
+  (* Heap *)
+  Type: is_sint32(call_seq_0).
+  (* Pre-condition *)
+  Have: L_call_obs(call_seq_0) = nil.
+}
 Prove: L_call_nil = nil.
 
 ------------------------------------------------------------
 
 Goal Post-condition 'ok,n3' in 'no_calls':
-Assume { (* Pre-condition *) Have: L_call_obs(call_seq_0) = nil. }
+Assume {
+  (* Heap *)
+  Type: is_sint32(call_seq_0).
+  (* Pre-condition *)
+  Have: L_call_obs(call_seq_0) = nil.
+}
 Prove: L_call_nil = nil.
 
 ------------------------------------------------------------
@@ -287,6 +316,8 @@ Prove: L_call_nil = nil.
 Goal Post-condition 'ok,bug_why3,n5' in 'no_calls':
 Assume {
   Type: is_sint32(a).
+  (* Heap *)
+  Type: is_sint32(call_seq_0).
   (* Goal *)
   When: 0 <= a.
   (* Pre-condition *)
@@ -304,6 +335,8 @@ Prove: true.
 Goal Post-condition 'ok,bug_why3,n5_ok' in 'no_calls':
 Assume {
   Type: is_sint32(a).
+  (* Heap *)
+  Type: is_sint32(call_seq_0).
   (* Pre-condition *)
   Have: L_call_obs(call_seq_0) = nil.
 }
@@ -355,6 +388,8 @@ Prove: true.
 Goal Post-condition for 'g_called' 'ok,p3' in 'sequence':
 Assume {
   Type: is_sint32(c) /\ is_sint32(x) /\ is_sint32(y) /\ is_sint32(z).
+  (* Heap *)
+  Type: is_sint32(call_seq_0).
   (* Pre-condition *)
   Have: L_call_obs(call_seq_0) = nil.
   (* Pre-condition for 'g_called' *)
@@ -391,6 +426,8 @@ Prove: true.
 Goal Post-condition for 'g_not_called' 'ok,q3' in 'sequence':
 Assume {
   Type: is_sint32(x) /\ is_sint32(z).
+  (* Heap *)
+  Type: is_sint32(call_seq_0).
   (* Pre-condition *)
   Have: L_call_obs(call_seq_0) = nil.
   (* Call 'f' *)

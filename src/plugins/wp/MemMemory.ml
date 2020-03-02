@@ -292,8 +292,8 @@ let r_havoc = function
   | _ -> raise Not_found
 
 (* havoc(undef,m,p,a)[k] =
-   - undef[k]      WHEN separated (p,a,k,1)
-   - m[k]  WHEN NOT separated (p,a,k,1)
+   - m[k]     WHEN separated (p,a,k,1)
+   - undef[k] WHEN NOT separated (p,a,k,1)
 *)
 let r_get_havoc = function
   | [undef;m;p;a] ->

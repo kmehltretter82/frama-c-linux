@@ -38,7 +38,7 @@ Prove: true.
 Goal Assertion 'ok' (file tests/wp_bts/bts_1828.i, line 23):
 Assume {
   (* Heap *)
-  Have: (region(one_0.base) <= 0) /\ linked(Malloc_0).
+  Type: (region(one_0.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: valid_rw(Malloc_0, one_0, 1).
 }

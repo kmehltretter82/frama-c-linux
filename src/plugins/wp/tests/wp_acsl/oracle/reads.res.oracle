@@ -28,7 +28,7 @@ Let x_2 = m[v].
 Assume {
   Type: is_sint32(x) /\ is_sint32(x_1) /\ is_sint32(x_2).
   (* Heap *)
-  Have: (region(u.base) <= 0) /\ (region(v.base) <= 0).
+  Type: (region(u.base) <= 0) /\ (region(v.base) <= 0).
   (* Pre-condition *)
   Have: (0 <= x) /\ (0 <= x_1) /\ (x <= 10) /\ (x_1 <= 10) /\
       P_P(Mint_0, u, v).
@@ -48,6 +48,8 @@ Prove: true.
 Goal Post-condition 'qed_ko,G_KO' in 'modifies_x':
 Assume {
   Type: is_sint32(x).
+  (* Heap *)
+  Type: is_sint32(y).
   (* Pre-condition *)
   Have: P_f /\ P_g(x) /\ P_h(y, x) /\ P_w(y, x).
 }
@@ -58,6 +60,8 @@ Prove: P_g(1 + x).
 Goal Post-condition 'qed_ko,H_KO' in 'modifies_x':
 Assume {
   Type: is_sint32(x).
+  (* Heap *)
+  Type: is_sint32(y).
   (* Pre-condition *)
   Have: P_f /\ P_g(x) /\ P_h(y, x) /\ P_w(y, x).
 }
@@ -68,6 +72,8 @@ Prove: P_h(y, 1 + x).
 Goal Post-condition 'qed_ok,W_OK,todo' in 'modifies_x':
 Assume {
   Type: is_sint32(x).
+  (* Heap *)
+  Type: is_sint32(y).
   (* Pre-condition *)
   Have: P_f /\ P_g(x) /\ P_h(y, x) /\ P_w(y, x).
 }
@@ -91,6 +97,8 @@ Prove: true.
 Goal Post-condition 'qed_ko,H_KO' in 'modifies_y':
 Assume {
   Type: is_sint32(y).
+  (* Heap *)
+  Type: is_sint32(x).
   (* Pre-condition *)
   Have: P_f /\ P_g(x) /\ P_h(y, x) /\ P_w(y, x).
 }
@@ -101,6 +109,8 @@ Prove: P_h(1 + y, x).
 Goal Post-condition 'qed_ok,W_OK,todo' in 'modifies_y':
 Assume {
   Type: is_sint32(y).
+  (* Heap *)
+  Type: is_sint32(x).
   (* Pre-condition *)
   Have: P_f /\ P_g(x) /\ P_h(y, x) /\ P_w(y, x).
 }

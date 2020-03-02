@@ -121,6 +121,7 @@ val field_offset : fieldinfo -> int
 
 val no_infinite_array : c_object -> bool
 
+val is_compound : c_object -> bool
 val is_comp : c_object -> compinfo -> bool
 val is_array : c_object -> elt:c_object -> bool
 val get_array : c_object -> ( c_object * int option ) option

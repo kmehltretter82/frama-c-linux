@@ -39,6 +39,8 @@ Prove: true.
 Goal Post-condition 'Pload' in 'call_on_array_in_struct_global':
 Let a = s.F2_S_tab.
 Assume {
+  (* Heap *)
+  Type: IsS2_S(s).
   (* Goal *)
   When: (0 <= i) /\ (i <= 4).
   (* Call 'load_5' *)
@@ -131,6 +133,8 @@ Prove: true.
 
 Goal Post-condition 'Preset_5' in 'call_reset_5':
 Assume {
+  (* Heap *)
+  Type: IsArray1S1_T(ts_1).
   (* Goal *)
   When: (0 <= i) /\ (i <= 4).
   (* Call 'reset_5' *)
@@ -166,6 +170,8 @@ Prove: true.
 Goal Post-condition 'Presset_mat' in 'call_reset_5_dim2':
 Let m = smatrix_0[1].
 Assume {
+  (* Heap *)
+  Type: IsArray2S1_T(smatrix_1).
   (* Goal *)
   When: (0 <= i) /\ (i <= 4).
   (* Call 'reset_5' *)
@@ -202,10 +208,10 @@ Let a = tps_0[9].
 Let a_1 = shift_T(a, 0).
 Let a_2 = havoc(Mint_undef_0, Mint_0, a_1, 10).
 Assume {
+  (* Heap *)
+  Type: linked(Malloc_0) /\ (forall i_1 : Z. region(tps_0[i_1].base) <= 0).
   (* Goal *)
   When: (0 <= i) /\ (i <= 4).
-  (* Heap *)
-  Have: linked(Malloc_0) /\ (forall i_1 : Z. region(tps_0[i_1].base) <= 0).
   (* Pre-condition *)
   Have: valid_rw(Malloc_0, a_1, 10).
   (* Call 'reset_5' *)

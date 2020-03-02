@@ -18,6 +18,8 @@ Goal Preservation of Invariant (file tests/wp_plugin/repeat.c, line 61):
 Let a = L_sequence(calls_1).
 Assume {
   Type: is_sint32(i) /\ is_sint32(n) /\ is_sint32(1 + i).
+  (* Heap *)
+  Type: is_sint32(calls_0).
   (* Pre-condition *)
   Have: (L_sequence(calls_0) = nil) /\ (0 <= n).
   (* Invariant *)
@@ -47,6 +49,8 @@ Let a_2 = [ 1, 2 ].
 Let x = 1 + i.
 Assume {
   Type: is_sint32(i) /\ is_sint32(n) /\ is_sint32(x).
+  (* Heap *)
+  Type: is_sint32(calls_1).
   (* Pre-condition *)
   Have: (L_sequence(calls_1) = nil) /\ (0 <= n).
   (* Invariant *)
@@ -118,6 +122,8 @@ Let a_1 = (a *^ i).
 Let a_2 = a_1 ^ [ 1, 2 ].
 Assume {
   Type: is_sint32(i) /\ is_sint32(n).
+  (* Heap *)
+  Type: is_sint32(calls_0).
   (* Pre-condition *)
   Have: (L_sequence(calls_0) = nil) /\ (0 <= n).
   (* Call 'f' *)
@@ -139,6 +145,8 @@ Goal Preservation of Invariant (file tests/wp_plugin/repeat.c, line 81):
 Let a = ([ 1, 2 ] *^ i).
 Assume {
   Type: is_sint32(i) /\ is_sint32(n) /\ is_sint32(1 + i).
+  (* Heap *)
+  Type: is_sint32(calls_0).
   (* Pre-condition *)
   Have: (L_sequence(calls_0) = nil) /\ (0 <= n).
   (* Call 'f' *)
@@ -170,6 +178,8 @@ Let a_2 = a_1 ^ [ 1, 2 ].
 Let x = 1 + i.
 Assume {
   Type: is_sint32(i) /\ is_sint32(n) /\ is_sint32(x).
+  (* Heap *)
+  Type: is_sint32(calls_0).
   (* Pre-condition *)
   Have: (L_sequence(calls_0) = nil) /\ (0 <= n).
   (* Call 'f' *)

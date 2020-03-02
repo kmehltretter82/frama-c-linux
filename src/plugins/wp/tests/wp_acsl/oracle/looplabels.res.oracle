@@ -13,7 +13,7 @@ Let a_2 = shift_sint32(a, 0).
 Assume {
   Type: is_sint32(i) /\ is_sint32(n).
   (* Heap *)
-  Have: (region(a.base) <= 0) /\ (region(b.base) <= 0) /\ linked(Malloc_0).
+  Type: (region(a.base) <= 0) /\ (region(b.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: (0 < n) /\ valid_rw(Malloc_0, a_2, n) /\
       valid_rw(Malloc_0, a_1, n) /\ separated(a_2, n, a_1, n).
@@ -34,7 +34,7 @@ Let a_2 = shift_sint32(a, 0).
 Assume {
   Type: is_sint32(i) /\ is_sint32(n) /\ is_sint32(1 + i).
   (* Heap *)
-  Have: (region(a.base) <= 0) /\ (region(b.base) <= 0) /\ linked(Malloc_0).
+  Type: (region(a.base) <= 0) /\ (region(b.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: (0 < n) /\ valid_rw(Malloc_0, a_2, n) /\
       valid_rw(Malloc_0, a_1, n) /\ separated(a_2, n, a_1, n).
@@ -62,7 +62,7 @@ Let x = 1 + i.
 Assume {
   Type: is_sint32(i) /\ is_sint32(n) /\ is_sint32(x).
   (* Heap *)
-  Have: (region(a.base) <= 0) /\ (region(b.base) <= 0) /\ linked(Malloc_0).
+  Type: (region(a.base) <= 0) /\ (region(b.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: (0 < n) /\ valid_rw(Malloc_0, a_3, n) /\
       valid_rw(Malloc_0, a_1, n) /\ separated(a_3, n, a_1, n).
@@ -83,7 +83,7 @@ Let a_2 = shift_sint32(b, 0).
 Assume {
   Type: is_sint32(n).
   (* Heap *)
-  Have: (region(a.base) <= 0) /\ (region(b.base) <= 0) /\ linked(Malloc_0).
+  Type: (region(a.base) <= 0) /\ (region(b.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: (0 < n) /\ valid_rw(Malloc_0, a_1, n) /\
       valid_rw(Malloc_0, a_2, n) /\ separated(a_1, n, a_2, n).
@@ -104,10 +104,10 @@ Let a_2 = shift_sint32(a, 0).
 Let a_3 = shift_sint32(b, i).
 Assume {
   Type: is_sint32(i) /\ is_sint32(n).
+  (* Heap *)
+  Type: (region(a.base) <= 0) /\ (region(b.base) <= 0) /\ linked(Malloc_0).
   (* Goal *)
   When: !invalid(Malloc_0, a_3, 1).
-  (* Heap *)
-  Have: (region(a.base) <= 0) /\ (region(b.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: (0 < n) /\ valid_rw(Malloc_0, a_2, n) /\
       valid_rw(Malloc_0, a_1, n) /\ separated(a_2, n, a_1, n).

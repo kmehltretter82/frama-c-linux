@@ -512,11 +512,11 @@ let state ?descr ?stmt state hs =
   let s = step ?descr ?stmt cond in
   Bundle.add s hs
 
-let assume ?descr ?stmt ?deps ?warn ?(init=false) p hs =
+let assume ?descr ?stmt ?deps ?warn ?(init=false) ?(domain=false) p hs =
   match F.is_ptrue p with
   | Yes -> hs
   | No ->
-      let cond = if init then Init p else Have p in
+      let cond = if init then Init p else if domain then Type p else Have p in
       let s = step ?descr ?stmt ?deps ?warn cond in
       Bundle.add s Bundle.empty
   | Maybe ->
@@ -524,7 +524,8 @@ let assume ?descr ?stmt ?deps ?warn ?(init=false) p hs =
         match Bundle.category hs with
         | MAYBE | TRUE | EMPTY ->
             let p = exist_intro p in
-            let cond = if init then Init p else Have p in
+            let cond =
+              if init then Init p else if domain then Type p else Have p in
             let s = step ?descr ?stmt ?deps ?warn cond in
             Bundle.add s hs
         | FALSE -> hs
@@ -1714,13 +1715,13 @@ let insert ?at step sequent =
   let at = match at with None -> seq.seq_size | Some k -> k in
   if 0 <= at && at <= seq.seq_size
   then in_sequence ~replace:false at step seq , goal
-  else raise (Invalid_argument "Conditions.insert")
+  else raise Not_found
 
 let replace ~at step sequent =
   let seq,goal = sequent in
   if 0 <= at && at <= seq.seq_size
   then in_sequence ~replace:true at step seq , goal
-  else raise (Invalid_argument "Conditions.insert")
+  else raise Not_found
 
 (* -------------------------------------------------------------------------- *)
 (* --- Replace                                                            --- *)

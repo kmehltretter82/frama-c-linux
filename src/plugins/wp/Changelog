@@ -23,7 +23,20 @@
 - WP          [2020/02/21] Why3 prover version fallback
 - WP          [2020/02/21] Why3 prover full-names use ':' instead of ','
 -* WP         [2020/02/20] Fixes handling of LoopCurrent in loop invariants
+- WP	      [2020/02/10] Specify cache mode with FRAMAC_WP_CACHE=<mode> (-wp-cache-env)
+- WP	      [2020/02/10] Update scripts with FRAMAC_WP_SCRIPT=update and -wp-prover script
+- WP	      [2020/02/10] Move frame conditions to Type section for better filtering
+- WP	      [2020/02/10] Extended frame conditions to pointers inside compound
+- WP	      [2020/02/10] Extended frame conditions with global C-types
+- WP	      [2019/17/04] Control splitting with -wp-max-split <n>
 - WP          [2019/12/04] Added option -wp-run-all-provers
+- WP          [2019/01/29] Emit a warning when no goal is generated
+- Wp          [2019/06/04] Checks for inconsistent requires (-wp-smoke-tests)
+- TIP         [2018/04/03] Create session directory only on demand
+- TIP         [2018/03/19] Specification of JSON script format
+- Wp          [2018/03/18] Additional lemma about remainder (mod)
+- TIP         [2018/03/18] Refactor structure of session directory (remove models)
+- Wp          [2018/02/18] Additional lemmas about logical shift compositions
 
 ##########################
 Plugin WP 20.0 (Calcium)

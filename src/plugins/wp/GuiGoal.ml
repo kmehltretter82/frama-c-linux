@@ -449,6 +449,13 @@ class pane (gprovers : GuiConfig.provers) =
                 cancel#set_enabled false ;
                 forward#set_enabled false ;
                 status#set_text "Non Proved Property" ;
+            | `Invalid ->
+                icon#set_icon GuiProver.wg_status ;
+                next#set_enabled false ;
+                prev#set_enabled false ;
+                cancel#set_enabled false ;
+                forward#set_enabled false ;
+                status#set_text "Invalid Smoke-test" ;
             | `Proved ->
                 icon#set_icon GuiProver.ok_status ;
                 next#set_enabled false ;
@@ -493,18 +500,12 @@ class pane (gprovers : GuiConfig.provers) =
           self#update_tactics None ;
       | Proof proof ->
           let wpo = ProofEngine.head proof in
-          if Wpo.is_proved wpo then
-            begin
-              self#update_provers None ;
-              self#update_tactics None ;
-            end
-          else
-            begin
-              self#update_provers (Some wpo) ;
-              let sequent = printer#sequent in
-              let select = printer#selection in
-              self#update_tactics (Some(proof,sequent,select)) ;
-            end
+          begin
+            self#update_provers (Some wpo) ;
+            let sequent = printer#sequent in
+            let select = printer#selection in
+            self#update_tactics (Some(proof,sequent,select)) ;
+          end
       | Composer _ | Browser _ -> ()
 
     method private update_proofview =
@@ -626,9 +627,12 @@ class pane (gprovers : GuiConfig.provers) =
           Wutil.later
             begin fun () ->
               let title = tactic#title in
-              let tactic = ProofScript.jtactic ~title tactic selection in
-              let anchor = ProofEngine.anchor proof () in
-              self#fork proof (ProofEngine.fork proof ~anchor tactic process)
+              try
+                let tactic = ProofScript.jtactic ~title tactic selection in
+                let anchor = ProofEngine.anchor proof () in
+                self#fork proof (ProofEngine.fork proof ~anchor tactic process)
+              with Exit | Not_found | Invalid_argument _ ->
+                text#printf "Application of tactic '%s' failed." title
             end
 
     method private search proof = function

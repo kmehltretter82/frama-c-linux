@@ -25,7 +25,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Post-condition (file tests/wp_typed/unit_alloc.i, line 33) in 'h':
-Assume { (* Heap *) Have: linked(Malloc_0). }
+Assume { (* Heap *) Type: linked(Malloc_0). }
 Prove: !valid_rw(Malloc_0[P_x_38 <- 0], global(P_x_38), 1).
 
 ------------------------------------------------------------
@@ -39,7 +39,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Assertion (file tests/wp_typed/unit_alloc.i, line 21):
-Assume { (* Heap *) Have: (region(p.base) <= 0) /\ linked(Malloc_0). }
+Assume { (* Heap *) Type: linked(Malloc_0). }
 Prove: valid_rw(Malloc_0[L_y_23 <- 1], global(L_y_23), 1).
 
 ------------------------------------------------------------
@@ -53,7 +53,7 @@ Goal Assertion (file tests/wp_typed/unit_alloc.i, line 24):
 Let a = global(L_y_23).
 Assume {
   (* Heap *)
-  Have: (region(p.base) <= 0) /\ linked(Malloc_0).
+  Type: linked(Malloc_0).
   (* Assertion *)
   Have: valid_rw(Malloc_0[L_y_23 <- 1], a, 1).
 }

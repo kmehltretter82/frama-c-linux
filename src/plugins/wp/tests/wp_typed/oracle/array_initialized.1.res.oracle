@@ -256,13 +256,13 @@ Prove: true.
 Goal Assertion (file tests/wp_typed/array_initialized.c, line 283):
 Let a = global(K_p_32).
 Assume {
+  (* Heap *)
+  Type: framed(Mptr_0) /\ linked(Malloc_0).
   (* Goal *)
   When: (0 <= i) /\ (i <= 499).
   (* Initializer *)
   Init: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 499) ->
       (Mptr_0[shift_PTR(a, i_1)] = global(G_p0_31)))).
-  (* Heap *)
-  Have: framed(Mptr_0) /\ linked(Malloc_0).
 }
 Prove: valid_rw(Malloc_0, Mptr_0[shift_PTR(a, i)], 1).
 
@@ -275,10 +275,10 @@ Goal Post-condition (file tests/wp_typed/array_initialized.c, line 288) in 'simp
 Let x = Mint_0[shift_sint32(t, 0)].
 Assume {
   Type: is_sint32(x).
+  (* Heap *)
+  Type: region(t.base) <= 0.
   (* Goal *)
   When: (0 <= i) /\ (i <= 49).
-  (* Heap *)
-  Have: region(t.base) <= 0.
   (* Pre-condition *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 49) ->
       (Mint_0[shift_sint32(t, i_1)] = x))).

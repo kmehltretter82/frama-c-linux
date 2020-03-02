@@ -22,59 +22,63 @@
 
 open Wpo
 
-type status =
+type script =
   | NoScript
   | Script of string
   | Deprecated of string
 
-let files : (string,status) Hashtbl.t = Hashtbl.create 32
+let files : (string,script) Hashtbl.t = Hashtbl.create 32
+
+let jsonfile = Printf.sprintf "%s/%s.json"
 
 let filename ~force wpo =
-  let d = Wp_parameters.get_session_dir ~force "script" in
-  Printf.sprintf "%s/%s.json" d wpo.po_gid
+  let dscript = Wp_parameters.get_session_dir ~force "script" in
+  jsonfile dscript wpo.po_sid (* no model in name *)
 
 let legacies wpo =
-  let m = WpContext.MODEL.id wpo.po_model in
-  let d = Wp_parameters.get_session_dir ~force:false m in
-  List.map (Printf.sprintf "%s/%s.json" d) [
-    wpo.po_gid ;
-    wpo.po_leg ;
+  let mid = WpContext.MODEL.id wpo.po_model in
+  let dscript = Wp_parameters.get_session_dir ~force:false "script" in
+  let dmodel = Wp_parameters.get_session_dir ~force:false mid in
+  [
+    jsonfile dscript wpo.po_gid ;
+    jsonfile dmodel wpo.po_gid ;
+    jsonfile dmodel wpo.po_leg ;
   ]
 
-let status wpo =
+let get wpo =
   let f = filename ~force:false wpo in
   try Hashtbl.find files f
   with Not_found ->
-    let status =
+    let script =
       if Sys.file_exists f then Script f else
         try
           let f' = List.find Sys.file_exists (legacies wpo) in
           Wp_parameters.warning ~current:false
-            "Deprecated script for '%s' (use prover tip to upgrade)" wpo.po_sid ;
+            "Deprecated script for '%s'" wpo.po_sid ;
           Deprecated f'
         with Not_found -> NoScript
-    in Hashtbl.add files f status ; status
+    in Hashtbl.add files f script ; script
 
 let pp_file fmt s = Filepath.Normalized.(pretty fmt (of_string s))
 
-let pp_status fmt = function
+let pp_script fmt = function
   | NoScript -> Format.pp_print_string fmt "no script file"
   | Script f -> Format.fprintf fmt "script '%a'" pp_file f
   | Deprecated f -> Format.fprintf fmt "script '%a' (deprecated)" pp_file f
 
-let pp_goal fmt wpo = pp_status fmt (status wpo)
+let pp_script_for fmt wpo = pp_script fmt (get wpo)
 
 let exists wpo =
-  match status wpo with NoScript -> false | Script _ | Deprecated _ -> true
+  match get wpo with NoScript -> false | Script _ | Deprecated _ -> true
 
 let load wpo =
-  match status wpo with
+  match get wpo with
   | NoScript -> `Null
   | Script f | Deprecated f ->
       if Sys.file_exists f then Json.load_file f else `Null
 
 let remove wpo =
-  match status wpo with
+  match get wpo with
   | NoScript -> ()
   | Script f ->
       begin
@@ -86,7 +90,8 @@ let remove wpo =
         Wp_parameters.feedback
           "Removed deprecated script for '%s'" wpo.po_sid ;
         Extlib.safe_remove f0 ;
-        Hashtbl.replace files (filename ~force:true wpo) NoScript ;
+        let f = filename ~force:false wpo in
+        Hashtbl.replace files f NoScript ;
       end
 
 let save wpo js =
@@ -95,8 +100,9 @@ let save wpo js =
     | `Null | `List [] | `Assoc [] -> true
     | _ -> false in
   if empty then remove wpo else
-    match status wpo with
-    | Script f -> Json.save_file f js
+    match get wpo with
+    | Script f ->
+        Json.save_file f js
     | NoScript ->
         begin
           let f = filename ~force:true wpo in

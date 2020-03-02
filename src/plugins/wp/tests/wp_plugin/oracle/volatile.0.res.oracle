@@ -33,7 +33,6 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Assertion 'KO_WHEN_VOLATILE' (file tests/wp_plugin/volatile.i, line 35):
-Assume { (* Heap *) Have: region(p.base) <= 0. }
 Prove: EqS1_st_v(w, w_1).
 
 ------------------------------------------------------------

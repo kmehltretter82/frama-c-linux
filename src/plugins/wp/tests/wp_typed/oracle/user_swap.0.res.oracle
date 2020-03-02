@@ -34,7 +34,7 @@ Let x_2 = Mint_0[a <- x_1][b <- x][a].
 Assume {
   Type: is_sint32(x) /\ is_sint32(x_1) /\ is_sint32(x_2).
   (* Heap *)
-  Have: (region(a.base) <= 0) /\ (region(b.base) <= 0) /\ linked(Malloc_0).
+  Type: (region(a.base) <= 0) /\ (region(b.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: valid_rw(Malloc_0, a, 1) /\ valid_rw(Malloc_0, b, 1).
 }

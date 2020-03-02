@@ -13,7 +13,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Post-condition 'Pointed_Valid' in 'f':
-Assume { (* Heap *) Have: (region(G_x_18) <= 0) /\ linked(Malloc_0). }
+Assume { (* Heap *) Type: linked(Malloc_0). }
 Prove: valid_rw(Malloc_0, global(G_x_18), 1).
 
 ------------------------------------------------------------
@@ -37,7 +37,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Assertion 'Read' (file tests/wp_plugin/init_const_guard.i, line 31):
-Assume { (* Heap *) Have: (region(p.base) <= 0) /\ linked(Malloc_0). }
+Assume { (* Heap *) Type: linked(Malloc_0). }
 Prove: valid_rd(Malloc_0, global(G_x_18), 1).
 
 ------------------------------------------------------------
@@ -46,7 +46,7 @@ Goal Assertion 'Guard_against_Const' (file tests/wp_plugin/init_const_guard.i, l
 Let a = global(G_x_18).
 Assume {
   (* Heap *)
-  Have: (region(p.base) <= 0) /\ linked(Malloc_0).
+  Type: linked(Malloc_0).
   (* Assertion 'Read' *)
   Have: valid_rd(Malloc_0, a, 1).
 }

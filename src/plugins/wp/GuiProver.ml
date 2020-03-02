@@ -23,7 +23,7 @@
 let no_status = `Share "theme/default/never_tried.png"
 let ok_status = `Share "theme/default/surely_valid.png"
 let ko_status = `Share "theme/default/unknown.png"
-let wg_status = `Share "theme/default/invalid.png"
+let wg_status = `Share "theme/default/surely_invalid.png"
 
 let filter = function
   | VCS.Qed | VCS.Tactical | VCS.NativeCoq -> false

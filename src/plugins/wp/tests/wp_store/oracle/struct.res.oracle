@@ -17,7 +17,7 @@ Goal Instance of 'Pre-condition (file tests/wp_store/struct.i, line 10) in 'g'' 
 Let a_1 = shift_sint32(shiftfield_F1_t_tab(a), 0).
 Assume {
   (* Heap *)
-  Have: (region(a.base) <= 0) /\ linked(Malloc_0).
+  Type: (region(a.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: valid_rw(Malloc_0, a, 5) /\ valid_rw(Malloc_0, a_1, 5).
 }
@@ -55,8 +55,6 @@ Assume {
   Init: Mint_0[shiftfield_F2_St_a(a)] = 1.
   (* Initializer *)
   Init: Mint_0[shiftfield_F2_St_b(a)] = 2.
-  (* Heap *)
-  Have: region(G_v_28) <= 0.
 }
 Prove: EqS2_St(a_1, w).
 
@@ -75,8 +73,6 @@ Assume {
   Init: Mint_0[shiftfield_F2_St_a(a)] = 1.
   (* Initializer *)
   Init: Mint_0[shiftfield_F2_St_b(a)] = 2.
-  (* Heap *)
-  Have: region(G_v_28) <= 0.
 }
 Prove: EqS2_St(a_1, w).
 

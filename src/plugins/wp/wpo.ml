@@ -505,6 +505,7 @@ let qed_time wpo =
 (* -------------------------------------------------------------------------- *)
 
 let is_tactic t = WpPropId.is_tactic t.po_pid
+let is_smoke_test t = WpPropId.is_smoke_test t.po_pid
 
 module Hproof = Hashtbl.Make(Datatype.Pair(Datatype.String)(Property))
 (* Table indexed by ( Model name , Property proved ) *)
@@ -689,16 +690,27 @@ let warnings = function
 
 let get_time = function { prover_time=t } -> t
 let get_steps= function { prover_steps=n } -> n
-
+let get_target g = WpPropId.property_of_id g.po_pid
 let get_proof g =
   let system = SYSTEM.get () in
-  let target = WpPropId.property_of_id g.po_pid in
+  let target = get_target g in
   let status =
     try
       let proof = Hproof.find system.proofs (proof g target) in
       WpAnnot.is_proved proof
     with Not_found -> false
   in status , target
+
+let doomed_unreachable emitter pid =
+  match WpPropId.unreachable_if_valid pid with
+  | Property.OLStmt(kf,stmt) ->
+      let pred_loc = Stmt.loc stmt in
+      let pred_name = [ "Wp" ; "SmokeTest" ] in
+      let pf = { Logic_const.pfalse with pred_loc ; pred_name } in
+      let ca = Logic_const.new_code_annotation (AAssert ([],Assert,pf)) in
+      Annotations.add_code_annot emitter ~kf stmt ca ;
+      Property.ip_of_code_annot kf stmt ca
+  | Property.OLGlob _ | Property.OLContract _ -> []
 
 let update_property_status g r =
   let system = SYSTEM.get () in
@@ -710,14 +722,30 @@ let update_property_status g r =
         let proof = WpAnnot.create_proof g.po_pid in
         Hproof.add system.proofs pi proof ; proof
     in
-    if is_valid r then WpAnnot.add_proof proof g.po_pid (get_depend g) ;
+    let emitter = WpContext.get_emitter g.po_model in
+    let smoke = is_smoke_test g in
     let status =
-      if WpAnnot.is_proved proof then Property_status.True
-      else Property_status.Dont_know
+      match VCS.verdict ~smoke r with
+      | Valid ->
+          WpAnnot.add_proof proof g.po_pid (get_depend g) ;
+          if WpAnnot.is_proved proof then Property_status.True
+          else Property_status.Dont_know
+      | Invalid when smoke ->
+          let status = Property_status.False_if_reachable in
+          List.iter
+            (fun tgt -> Property_status.emit emitter ~hyps:[] tgt status)
+            (WpPropId.doomed_if_valid g.po_pid) ;
+          let status = Property_status.True in
+          List.iter
+            (fun tgt -> Property_status.emit emitter ~hyps:[] tgt status)
+            (doomed_unreachable emitter g.po_pid) ;
+          Property_status.False_if_reachable
+      | _ ->
+          if WpAnnot.is_proved proof then Property_status.True
+          else Property_status.Dont_know
     in
     let target = WpAnnot.target proof in
     let depends = WpAnnot.dependencies proof in
-    let emitter = WpContext.get_emitter g.po_model in
     Property_status.emit emitter ~hyps:depends target status ;
   with err ->
     Wp_parameters.failure "Update-status failed (%s)" (Printexc.to_string err) ;

@@ -24,7 +24,7 @@ Assume {
       is_sint32(x_4) /\ is_sint32(x_5) /\
       is_sint32(m[a_1 <- x_4][a_2 <- x_5][r]).
   (* Heap *)
-  Have: (region(a.base) <= 0) /\ (region(r.base) <= 0).
+  Type: (region(a.base) <= 0) /\ (region(r.base) <= 0).
   (* Pre-condition *)
   Have: separated(a, 2, r, 1).
 }
@@ -47,7 +47,7 @@ Assume {
       is_sint32(x_4) /\ is_sint32(x_5) /\
       is_sint32(m[a_1 <- x_4][a_2 <- x_5][r]).
   (* Heap *)
-  Have: (region(a.base) <= 0) /\ (region(r.base) <= 0).
+  Type: (region(a.base) <= 0) /\ (region(r.base) <= 0).
   (* Pre-condition *)
   Have: separated(a, 2, r, 1).
 }
@@ -71,7 +71,7 @@ Assume {
   Type: is_sint32(x) /\ is_sint32(x_1) /\ is_sint32(x_3) /\ is_sint32(x_4) /\
       is_sint32(x_5) /\ is_sint32(x_6) /\ is_sint32(x_7).
   (* Heap *)
-  Have: (region(a.base) <= 0) /\ (region(r.base) <= 0).
+  Type: (region(a.base) <= 0) /\ (region(r.base) <= 0).
   (* Pre-condition *)
   Have: separated(a, 2, r, 1).
 }
@@ -97,7 +97,7 @@ Assume {
       is_sint32(x_4) /\ is_sint32(x_5) /\
       is_sint32(m[a_1 <- x_4][a_2 <- x_5][r]).
   (* Heap *)
-  Have: (region(a.base) <= 0) /\ (region(r.base) <= 0).
+  Type: (region(a.base) <= 0) /\ (region(r.base) <= 0).
 }
 Prove: x_2 = x.
 
@@ -118,7 +118,7 @@ Assume {
       is_sint32(x_4) /\ is_sint32(x_5) /\
       is_sint32(m[a_1 <- x_4][a_2 <- x_5][r]).
   (* Heap *)
-  Have: (region(a.base) <= 0) /\ (region(r.base) <= 0).
+  Type: (region(a.base) <= 0) /\ (region(r.base) <= 0).
 }
 Prove: x_3 = x_1.
 
@@ -140,7 +140,7 @@ Assume {
   Type: is_sint32(x) /\ is_sint32(x_1) /\ is_sint32(x_3) /\ is_sint32(x_4) /\
       is_sint32(x_5) /\ is_sint32(x_6) /\ is_sint32(x_7).
   (* Heap *)
-  Have: (region(a.base) <= 0) /\ (region(r.base) <= 0).
+  Type: (region(a.base) <= 0) /\ (region(r.base) <= 0).
 }
 Prove: x_7 = x_2.
 
@@ -165,7 +165,7 @@ Assume {
   Type: is_sint32(x_2) /\ is_sint32(x) /\ is_sint32(x_1) /\ is_sint32(x_3) /\
       is_sint32(x_4) /\ is_sint32(x_5) /\ is_sint32(x_6) /\ is_sint32(x_7).
   (* Heap *)
-  Have: (region(a.base) <= 0) /\ (region(r.base) <= 0).
+  Type: (region(a.base) <= 0) /\ (region(r.base) <= 0).
   (* Pre-condition *)
   Have: P_OBS(x, x_1, x_2).
 }

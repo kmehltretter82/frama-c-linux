@@ -11,7 +11,7 @@ Goal Post-condition (file tests/wp_typed/unit_labels.i, line 5) in 'duplet':
 Assume {
   Type: is_sint32(pi_0) /\ is_sint32(pj_0).
   (* Heap *)
-  Have: region(a.base) <= 0.
+  Type: region(a.base) <= 0.
 }
 Prove: P_is_duplet(Mint_0[shift_sint32(a, pi_0)
                      <- Mint_0[shift_sint32(a, pj_0)]], a, pi_0, pj_0).

@@ -14,8 +14,6 @@ Assume {
   Type: is_sint32(v) /\ is_sint32(Mint_0[shift_sint32(a, 1)]).
   (* Goal *)
   When: Mint_0[a_1] = 0.
-  (* Heap *)
-  Have: linked(Malloc_0).
   (* Initializer *)
   Init: Mint_0[global(L_i_25)] = 0.
   If v <= 3
@@ -34,8 +32,6 @@ Assume {
   Type: is_sint32(v) /\ is_sint32(x).
   (* Goal *)
   When: (x != 0) /\ (Mint_0[a_1] = 0).
-  (* Heap *)
-  Have: linked(Malloc_0).
   (* Initializer *)
   Init: Mint_0[global(L_i_25)] = 0.
   If v <= 3
@@ -61,8 +57,6 @@ Assume {
   Type: is_sint32(v) /\ is_sint32(Mint_0[shift_sint32(a, 1)]).
   (* Goal *)
   When: Mint_0[a_1] = 0.
-  (* Heap *)
-  Have: linked(Malloc_0).
   (* Initializer *)
   Init: Mint_0[global(L_i_30)] = 0.
   If v <= 3
@@ -82,8 +76,6 @@ Assume {
   Type: is_sint32(v) /\ is_sint32(x).
   (* Goal *)
   When: (x != 0) /\ (Mint_0[a_1] = 0).
-  (* Heap *)
-  Have: linked(Malloc_0).
   (* Initializer *)
   Init: Mint_0[global(L_i_30)] = 0.
   If v <= 3
@@ -110,8 +102,6 @@ Assume {
   Type: is_sint32(v) /\ is_sint32(Mint_0[shift_sint32(a, 1)]).
   (* Goal *)
   When: Mint_0[a_1] = 0.
-  (* Heap *)
-  Have: linked(Malloc_0).
   (* Initializer *)
   Init: Mint_0[global(L_i_35)] = 0.
   If v <= 3
@@ -130,8 +120,6 @@ Assume {
   Type: is_sint32(v) /\ is_sint32(x).
   (* Goal *)
   When: (x != 0) /\ (Mint_0[a_1] = 0).
-  (* Heap *)
-  Have: linked(Malloc_0).
   (* Initializer *)
   Init: Mint_0[global(L_i_35)] = 0.
   If v <= 3

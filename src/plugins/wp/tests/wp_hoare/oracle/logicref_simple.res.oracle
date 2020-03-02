@@ -21,7 +21,7 @@ Let x = Mint_0[c].
 Assume {
   Type: is_sint32(x) /\ is_sint32(1 + x).
   (* Heap *)
-  Have: region(c.base) <= 0.
+  Type: region(c.base) <= 0.
   (* Pre-condition *)
   Have: P_simple(Mint_0, c).
 }
@@ -64,7 +64,7 @@ Let x = Mint_0[Mptr_0[d]].
 Assume {
   Type: is_sint32(x) /\ is_sint32(1 + x).
   (* Heap *)
-  Have: (region(d.base) <= 0) /\ framed(Mptr_0).
+  Type: (region(d.base) <= 0) /\ framed(Mptr_0).
   (* Pre-condition *)
   Have: P_two_star(Mptr_0, Mint_0, d).
 }
@@ -89,7 +89,7 @@ Prove: true.
 Goal Assertion 'OK' (file tests/wp_hoare/logicref_simple.i, line 30):
 Assume {
   (* Heap *)
-  Have: (region(b.base) <= 0) /\ linked(Malloc_0).
+  Type: (region(b.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: P_vpositive(Malloc_0, Mint_0, b).
 }

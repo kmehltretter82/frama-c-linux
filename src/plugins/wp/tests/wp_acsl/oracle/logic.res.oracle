@@ -95,8 +95,6 @@ Assume {
   Init: Mint_0[shiftfield_F1_x(a_1)] = 30.
   (* Initializer *)
   Init: Mint_0[shiftfield_F1_y(a_1)] = 31.
-  (* Heap *)
-  Have: region(G_tr_33) <= 0.
 }
 Prove: P_P(m).
 
@@ -131,8 +129,6 @@ Assume {
   Init: Mint_0[shiftfield_F1_x(a_1)] = 30.
   (* Initializer *)
   Init: Mint_0[shiftfield_F1_y(a_1)] = 31.
-  (* Heap *)
-  Have: region(G_tr_33) <= 0.
 }
 Prove: P_P(m).
 
@@ -167,8 +163,6 @@ Assume {
   Init: Mint_0[shiftfield_F1_x(a_1)] = 30.
   (* Initializer *)
   Init: Mint_0[shiftfield_F1_y(a_1)] = 31.
-  (* Heap *)
-  Have: region(G_tr_33) <= 0.
 }
 Prove: P_P(m).
 
@@ -178,7 +172,6 @@ Goal Pre-condition 'qed_ok' in 'main':
 tests/wp_acsl/logic.i:49: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast from struct (Tint2) not implemented yet
-Assume { (* Heap *) Have: region(G_tr_33) <= 0. }
 Prove: (w.F1_y) = 11.
 
 ------------------------------------------------------------
@@ -187,7 +180,6 @@ Goal Pre-condition 'qed_ok' in 'main':
 tests/wp_acsl/logic.i:50: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast from struct (Point) not implemented yet
-Assume { (* Heap *) Have: region(G_tr_33) <= 0. }
 Prove: (w.F3_tab)[1] = 11.
 
 ------------------------------------------------------------
@@ -196,7 +188,6 @@ Goal Pre-condition 'qed_ok' in 'main':
 tests/wp_acsl/logic.i:51: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast to struct (Point) from (int [2]) not implemented yet
-Assume { (* Heap *) Have: region(G_tr_33) <= 0. }
 Prove: (w.F1_y) = 11.
 
 ------------------------------------------------------------
@@ -205,7 +196,6 @@ Goal Pre-condition 'qed_ok' in 'main':
 tests/wp_acsl/logic.i:52: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast from struct (Point) not implemented yet
-Assume { (* Heap *) Have: region(G_tr_33) <= 0. }
 Prove: w[1] = 11.
 
 ------------------------------------------------------------
@@ -214,7 +204,6 @@ Goal Pre-condition 'qed_ok' in 'main':
 tests/wp_acsl/logic.i:53: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast from struct (Tint2) not implemented yet
-Assume { (* Heap *) Have: region(G_tr_33) <= 0. }
 Prove: w[1] = 11.
 
 ------------------------------------------------------------
@@ -223,7 +212,6 @@ Goal Pre-condition 'qed_ok' in 'main':
 tests/wp_acsl/logic.i:54: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast from struct (Buint) not implemented yet
-Assume { (* Heap *) Have: region(G_tr_33) <= 0. }
 Prove: w = 134480385.
 
 ------------------------------------------------------------
@@ -261,8 +249,6 @@ Assume {
   Init: Mint_0[shiftfield_F1_x(a_1)] = 30.
   (* Initializer *)
   Init: Mint_0[shiftfield_F1_y(a_1)] = 31.
-  (* Heap *)
-  Have: region(G_tr_33) <= 0.
 }
 Prove: EqS4(a_6, w).
 
@@ -272,7 +258,6 @@ Goal Pre-condition 'qed_ok' in 'main':
 tests/wp_acsl/logic.i:56: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast from struct (Tint6) not implemented yet
-Assume { (* Heap *) Have: region(G_tr_33) <= 0. }
 Prove: (w[1].F1_y) = 21.
 
 ------------------------------------------------------------
@@ -281,7 +266,6 @@ Goal Pre-condition 'qed_ok' in 'main':
 tests/wp_acsl/logic.i:57: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast to sized array (Triangle) from (int [6]) not implemented yet
-Assume { (* Heap *) Have: region(G_tr_33) <= 0. }
 Prove: (w[1].F1_y) = 21.
 
 ------------------------------------------------------------
@@ -290,7 +274,6 @@ Goal Pre-condition 'qed_ok' in 'main':
 tests/wp_acsl/logic.i:58: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast from struct (Tint6) not implemented yet
-Assume { (* Heap *) Have: region(G_tr_33) <= 0. }
 Prove: w[4] = 30.
 
 ------------------------------------------------------------
@@ -299,7 +282,6 @@ Goal Pre-condition 'qed_ok' in 'main':
 tests/wp_acsl/logic.i:59: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast from struct (Tint6) not implemented yet
-Assume { (* Heap *) Have: region(G_tr_33) <= 0. }
 Prove: w[1] = 11.
 
 ------------------------------------------------------------
@@ -308,7 +290,6 @@ Goal Pre-condition 'qed_ok' in 'main':
 tests/wp_acsl/logic.i:60: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast to sized array (int [2]) from (int [6]) not implemented yet
-Assume { (* Heap *) Have: region(G_tr_33) <= 0. }
 Prove: w[1] = 11.
 
 ------------------------------------------------------------
@@ -317,7 +298,6 @@ Goal Pre-condition 'qed_ok' in 'main':
 tests/wp_acsl/logic.i:61: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast from struct (Tint6) not implemented yet
-Assume { (* Heap *) Have: region(G_tr_33) <= 0. }
 Prove: (w.F3_tab)[1] = 11.
 
 ------------------------------------------------------------
@@ -326,7 +306,6 @@ Goal Pre-condition 'qed_ok' in 'main':
 tests/wp_acsl/logic.i:62: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast to struct (Tint2) from (int [6]) not implemented yet
-Assume { (* Heap *) Have: region(G_tr_33) <= 0. }
 Prove: (w.F3_tab)[1] = 11.
 
 ------------------------------------------------------------

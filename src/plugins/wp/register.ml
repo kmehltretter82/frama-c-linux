@@ -25,6 +25,7 @@ open Factory
 let dkey_main = Wp_parameters.register_category "main"
 let dkey_raised = Wp_parameters.register_category "raised"
 let dkey_shell = Wp_parameters.register_category "shell"
+let wkey_smoke = Wp_parameters.register_warn_category "smoke"
 
 (* --------- Command Line ------------------- *)
 
@@ -272,10 +273,10 @@ let do_list_scheduled iter_on_goals =
              incr scheduled ;
              if !spy then session := GOALS.add goal !session ;
            end) ;
-      let n = !scheduled in
-      if n > 1
-      then Wp_parameters.feedback "%d goals scheduled" n
-      else Wp_parameters.feedback "%d goal scheduled" n ;
+      match !scheduled with
+      | 0 -> Wp_parameters.warning ~current:false "No goal generated"
+      | 1 -> Wp_parameters.feedback "1 goal scheduled"
+      | n -> Wp_parameters.feedback "%d goals scheduled" n
     end
 
 let dkey_prover = Wp_parameters.register_category "prover"
@@ -347,12 +348,14 @@ let do_wpo_stat goal prover res =
   let s = get_pstat prover in
   let open VCS in
   if res.cached then s.incache <- succ s.incache ;
-  match res.verdict with
-  | Checked | NoResult | Computing _ | Invalid | Unknown ->
+  let smoke = Wpo.is_smoke_test goal in
+  let verdict = VCS.verdict ~smoke res in
+  match verdict with
+  | Checked | NoResult | Computing _ | Unknown ->
       s.unknown <- succ s.unknown
   | Stepout | Timeout ->
       s.interrupted <- succ s.interrupted
-  | Failed ->
+  | Failed | Invalid ->
       s.failed <- succ s.failed
   | Valid ->
       if not (Wpo.is_tactic goal) then
@@ -379,6 +382,49 @@ let do_wpo_result goal prover res =
       do_wpo_stat goal prover res ;
     end
 
+let do_wpo_failed goal =
+  match Wpo.get_results goal with
+  | [p,r] ->
+      Wp_parameters.result "[%a] Goal %s : %a%a"
+        VCS.pp_prover p (Wpo.get_gid goal)
+        VCS.pp_result r pp_warnings goal
+  | pres ->
+      Wp_parameters.result "[Failed] Goal %s%t" (Wpo.get_gid goal)
+        begin fun fmt ->
+          pp_warnings fmt goal ;
+          List.iter
+            (fun (p,r) ->
+               Format.fprintf fmt "@\n%8s: @[<hv>%a@]"
+                 (VCS.title_of_prover p) VCS.pp_result r
+            ) pres ;
+        end
+
+let do_wpo_smoke goal =
+  let results = Wpo.get_results goal in
+  let verdicts = List.filter (fun (_,r) -> VCS.is_verdict r) results in
+  let proved,unproved = List.partition (fun (_,r) -> VCS.is_valid r) verdicts in
+  let pp_provers fmt = function
+    | [] -> ()
+    | (p,_)::prs ->
+        VCS.pp_prover fmt p ;
+        List.iter (fun (p,_) -> Format.fprintf fmt ", %a" VCS.pp_prover p) prs
+  in
+  if proved <> [] then
+    let loc = Property.location (Wpo.get_target goal) in
+    Wp_parameters.warning ~wkey:wkey_smoke ~source:(fst loc)
+      "Smoke-test %s : Failed (%a)"
+      (Wpo.get_gid goal) pp_provers proved
+  else
+  if unproved <> [] then
+    Wp_parameters.feedback ~ontty:`Silent
+      "Smoke-test %s : Passed (%a)"
+      (Wpo.get_gid goal) pp_provers unproved
+  else
+    let loc = Property.location (Wpo.get_target goal) in
+    Wp_parameters.warning ~source:(fst loc)
+      "Smoke-test %s : Non-conclusive (no-result)"
+      (Wpo.get_gid goal)
+
 let do_wpo_success goal s =
   if not (Wp_parameters.Check.get ()) then
     if Wp_parameters.Generate.get () then
@@ -388,35 +434,21 @@ let do_wpo_success goal s =
           Wp_parameters.feedback ~ontty:`Silent
             "[%a] Goal %s : Valid" VCS.pp_prover prover (Wpo.get_gid goal)
     else
+    if Wpo.is_smoke_test goal then
+      do_wpo_smoke goal
+    else
       match s with
-      | None ->
-          begin
-            match Wpo.get_results goal with
-            | [p,r] ->
-                Wp_parameters.result "[%a] Goal %s : %a%a"
-                  VCS.pp_prover p (Wpo.get_gid goal)
-                  VCS.pp_result r pp_warnings goal
-            | pres ->
-                Wp_parameters.result "[Failed] Goal %s%t" (Wpo.get_gid goal)
-                  begin fun fmt ->
-                    pp_warnings fmt goal ;
-                    List.iter
-                      (fun (p,r) ->
-                         Format.fprintf fmt "@\n%8s: @[<hv>%a@]"
-                           (VCS.title_of_prover p) VCS.pp_result r
-                      ) pres ;
-                  end
-          end
-      | Some (VCS.Tactical as p) ->
+      | None -> do_wpo_failed goal
+      | Some (VCS.Tactical as script) ->
           Wp_parameters.feedback ~ontty:`Silent
             "[%a] Goal %s : Valid"
-            VCS.pp_prover p (Wpo.get_gid goal)
-      | Some p ->
-          let r = Wpo.get_result goal p in
+            VCS.pp_prover script (Wpo.get_gid goal)
+      | Some prover ->
+          let result = Wpo.get_result goal prover in
           Wp_parameters.feedback ~ontty:`Silent
             "[%a] Goal %s : %a"
-            VCS.pp_prover p (Wpo.get_gid goal)
-            VCS.pp_result r
+            VCS.pp_prover prover (Wpo.get_gid goal)
+            VCS.pp_result result
 
 let do_report_time fmt s =
   begin
@@ -487,19 +519,22 @@ let do_report_scheduled () =
       let plural = if !exercised > 1 then "s" else "" in
       Wp_parameters.result "%d goal%s generated" !exercised plural
     else
-      let proved = GOALS.cardinal !proved in
-      let mode = ProverWhy3.get_mode () in
-      if mode <> ProverWhy3.NoCache then do_report_cache_usage mode ;
-      Wp_parameters.result "%t"
-        begin fun fmt ->
-          Format.fprintf fmt "Proved goals: %4d / %d@\n" proved !scheduled ;
-          Pretty_utils.pp_items
-            ~min:12 ~align:`Left
-            ~title:(fun (prover,_) -> VCS.title_of_prover prover)
-            ~iter:(fun f -> PM.iter (fun p s -> f (p,s)) !provers)
-            ~pp_title:(fun fmt a -> Format.fprintf fmt "%s:" a)
-            ~pp_item:do_report_prover_stats fmt ;
-        end
+    if !scheduled > 0 then
+      begin
+        let proved = GOALS.cardinal !proved in
+        let mode = ProverWhy3.get_mode () in
+        if mode <> ProverWhy3.NoCache then do_report_cache_usage mode ;
+        Wp_parameters.result "%t"
+          begin fun fmt ->
+            Format.fprintf fmt "Proved goals: %4d / %d@\n" proved !scheduled ;
+            Pretty_utils.pp_items
+              ~min:12 ~align:`Left
+              ~title:(fun (prover,_) -> VCS.title_of_prover prover)
+              ~iter:(fun f -> PM.iter (fun p s -> f (p,s)) !provers)
+              ~pp_title:(fun fmt a -> Format.fprintf fmt "%s:" a)
+              ~pp_item:do_report_prover_stats fmt ;
+          end ;
+      end
 
 let do_list_scheduled_result () =
   begin
@@ -560,6 +595,10 @@ let spawn_wp_proofs_iter ~mode iter_on_goals =
 let get_prover_names () =
   match Wp_parameters.Provers.get () with [] -> [ "alt-ergo" ] | pnames -> pnames
 
+let env_script_update () =
+  try Sys.getenv "FRAMAC_WP_SCRIPT" = "update"
+  with Not_found -> false
+
 let compute_provers ~mode =
   mode.provers <- List.fold_right
       (fun pname prvs ->
@@ -567,7 +606,8 @@ let compute_provers ~mode =
          | None -> prvs
          | Some VCS.Tactical ->
              mode.tactical <- true ;
-             if pname = "tip" then mode.update <- true ;
+             if pname = "tip" || env_script_update () then
+               mode.update <- true ;
              prvs
          | Some prover ->
              (VCS.mode_of_prover_name pname , prover) :: prvs)

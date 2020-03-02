@@ -1,0 +1,24 @@
+# frama-c -wp [...]
+[kernel] Parsing tests/wp_plugin/doomed.i (no preprocessing)
+[wp] Running WP plugin...
+[wp] Loading driver 'share/wp.driver'
+[wp] Warning: Missing RTE guards
+[wp] 7 goals scheduled
+[wp] Smoke-test typed_bar_smoke_default_requires : Passed (Alt-Ergo 2.0.0)
+[wp] [Qed] Goal typed_bar_ensures : Valid
+[wp:smoke] tests/wp_plugin/doomed.i:41: Warning: 
+  Smoke-test typed_buzz_smoke_default_requires : Failed (Qed)
+[wp] [Qed] Goal typed_buzz_ensures : Valid
+[wp] Smoke-test typed_foo_smoke_default_requires : Passed (Alt-Ergo 2.0.0)
+[wp:smoke] tests/wp_plugin/doomed.i:27: Warning: 
+  Smoke-test typed_foo_smoke_A_requires : Failed (Qed)
+[wp] Smoke-test typed_foo_smoke_B_requires : Passed (Alt-Ergo 2.0.0)
+[wp] Proved goals:    5 / 7
+  Qed:               2  (failed: 2)
+  Alt-Ergo 2.0.0:    3
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  foo                       -        2        3      66.7%
+  bar                       1        1        2       100%
+  buzz                      1        -        2      50.0%
+------------------------------------------------------------

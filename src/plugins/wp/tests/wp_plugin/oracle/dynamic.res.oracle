@@ -83,7 +83,7 @@ Let x = Mint_0[shiftfield_F1_S_param(closure_0)].
 Assume {
   Type: is_sint32(x).
   (* Heap *)
-  Have: (region(closure_0.base) <= 0) /\ framed(Mptr_0).
+  Type: (region(closure_0.base) <= 0) /\ framed(Mptr_0).
   (* Pre-condition *)
   Have: (a = a_1) \/ ((a = a_2) /\ (abs_int(x) <= 5)).
 }
@@ -110,7 +110,7 @@ Let x = Mint_0[shiftfield_F1_S_param(closure_0)].
 Assume {
   Type: is_sint32(x).
   (* Heap *)
-  Have: (region(closure_0.base) <= 0) /\ framed(Mptr_0).
+  Type: (region(closure_0.base) <= 0) /\ framed(Mptr_0).
   (* Pre-condition *)
   Have: abs_int(x) <= 5.
   (* Instance of 'f1' *)
@@ -132,10 +132,10 @@ Prove: true.
 Goal Post-condition (file tests/wp_plugin/dynamic.i, line 38) in 'guarded_call' (1/2):
 Assume {
   Type: is_sint32(X).
+  (* Heap *)
+  Type: (region(p.base) <= 0) /\ framed(Mptr_0).
   (* Goal *)
   When: Mptr_0[shiftfield_F1_S_f(p)] = global(0).
-  (* Heap *)
-  Have: (region(p.base) <= 0) /\ framed(Mptr_0).
   (* Else *)
   Have: G_g_46 = 0.
 }
@@ -164,7 +164,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Call point h1 in 'missing_context' at instruction (file tests/wp_plugin/dynamic.i, line 87):
-Assume { (* Heap *) Have: region(p.base) <= 0. }
+Assume { (* Heap *) Type: region(p.base) <= 0. }
 Prove: global(G_h1_59) = p.
 
 ------------------------------------------------------------

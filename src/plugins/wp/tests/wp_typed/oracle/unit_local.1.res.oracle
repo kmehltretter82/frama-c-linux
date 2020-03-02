@@ -9,7 +9,7 @@
 
 Goal Assigns nothing in 'bar':
 Effect at line 28
-Assume { (* Heap *) Have: linked(Malloc_0). }
+Assume { (* Heap *) Type: linked(Malloc_0). }
 Prove: invalid(Malloc_0, global(L_a_26), 1).
 
 ------------------------------------------------------------
@@ -19,14 +19,14 @@ Prove: invalid(Malloc_0, global(L_a_26), 1).
 
 Goal Assigns nothing in 'foo' (1/2):
 Effect at line 18
-Assume { (* Heap *) Have: framed(Mptr_0) /\ linked(Malloc_0). }
+Assume { (* Heap *) Type: linked(Malloc_0). }
 Prove: invalid(Malloc_0, global(L_pa_22), 1).
 
 ------------------------------------------------------------
 
 Goal Assigns nothing in 'foo' (2/2):
 Effect at line 19
-Assume { (* Heap *) Have: framed(Mptr_0) /\ linked(Malloc_0). }
+Assume { (* Heap *) Type: linked(Malloc_0). }
 Prove: invalid(Malloc_0, global(L_a_21), 1).
 
 ------------------------------------------------------------

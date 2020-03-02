@@ -35,8 +35,8 @@ let lookup_havoc e =
   | L.Aget( m , p ) ->
       begin
         match F.repr m with
-        | L.Fun( f , [mr;m0;a;n] ) when f == MemMemory.f_havoc ->
-            Some( mr , m0 , a , n , p )
+        | L.Fun( f , [m_undef;m_sep;a;n] ) when f == MemMemory.f_havoc ->
+            Some( m_undef , m_sep , a , n , p )
         | _ -> None
       end
   | _ -> None

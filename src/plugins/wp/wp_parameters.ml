@@ -370,6 +370,13 @@ module RTE =
   end)
 
 let () = Parameter_customize.set_group wp_strategy
+module SmokeTests =
+  False(struct
+    let option_name = "-wp-smoke-tests"
+    let help = "Smoke-tests : look for inconsistent contracts (best effort)"
+  end)
+
+let () = Parameter_customize.set_group wp_strategy
 module Split =
   False(struct
     let option_name = "-wp-split"
@@ -389,8 +396,17 @@ module SplitDepth =
     let option_name = "-wp-split-depth"
     let default = 0
     let arg_name = "p"
-    let help = "Set depth of exploration for splitting conjunctions into sub-goals.\n\
-                Value `-1` means an unlimited depth."
+    let help = "Set depth for splitting conjunctions into sub-goals.\n\
+                Value -1 means unlimited depth (default 0)"
+  end)
+
+let () = Parameter_customize.set_group wp_strategy
+module SplitMax =
+  Int(struct
+    let option_name = "-wp-max-split"
+    let default = 1000
+    let arg_name = "n"
+    let help = "Set maximum number of splitted sub-goals (default 1000)"
   end)
 
 let () = Parameter_customize.set_group wp_strategy
@@ -639,6 +655,17 @@ module Timeout =
   Int(struct
     let option_name = "-wp-timeout"
     let default = 10
+    let arg_name = "n"
+    let help =
+      Printf.sprintf
+        "Set the timeout (in seconds) for provers (default: %d)." default
+  end)
+
+let () = Parameter_customize.set_group wp_prover
+module SmokeTimeout =
+  Int(struct
+    let option_name = "-wp-smoke-timeout"
+    let default = 2
     let arg_name = "n"
     let help =
       Printf.sprintf

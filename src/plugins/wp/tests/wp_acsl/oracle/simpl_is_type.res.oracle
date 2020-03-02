@@ -205,10 +205,10 @@ Let a = shift_sint32(t, 0).
 Let a_1 = havoc(Mint_undef_0, Mint_0, a, size_0).
 Assume {
   Type: is_sint32(i) /\ is_sint32(size_0).
+  (* Heap *)
+  Type: region(t.base) <= 0.
   (* Goal *)
   When: (0 <= i_1) /\ (i_1 < size_0) /\ is_sint32(i_1).
-  (* Heap *)
-  Have: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: (0 < size_0) /\
       (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < size_0) ->
@@ -233,7 +233,7 @@ Let a = havoc(Mint_undef_0, Mint_0, shift_sint32(t, 0), size_0).
 Assume {
   Type: is_sint32(i) /\ is_sint32(size_0) /\ is_sint32(1 + i).
   (* Heap *)
-  Have: (region(t.base) <= 0) /\ linked(Malloc_0).
+  Type: region(t.base) <= 0.
   (* Pre-condition *)
   Have: (0 < size_0) /\
       (forall i_1 : Z. ((0 <= i_1) -> ((i_1 < size_0) ->
@@ -265,10 +265,10 @@ Let a_2 = a[a_1].
 Assume {
   Type: is_sint32(i) /\ is_sint32(size_0) /\ is_sint32(1 + i) /\
       is_sint32(a_2).
+  (* Heap *)
+  Type: region(t.base) <= 0.
   (* Goal *)
   When: (0 <= i_1) /\ (i_1 <= i) /\ is_sint32(i_1).
-  (* Heap *)
-  Have: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: (0 < size_0) /\
       (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < size_0) ->
@@ -300,10 +300,10 @@ Let a_2 = a[a_1].
 Assume {
   Type: is_sint32(i) /\ is_sint32(size_0) /\ is_sint32(1 + i) /\
       is_sint32(a_2).
+  (* Heap *)
+  Type: region(t.base) <= 0.
   (* Goal *)
   When: (i_1 < size_0) /\ (i < i_1) /\ is_sint32(i_1).
-  (* Heap *)
-  Have: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: (0 < size_0) /\
       (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < size_0) ->
@@ -326,10 +326,10 @@ Prove: a[a_1 <- -a_2][shift_sint32(t, i_1)] < 0.
 Goal Establishment of Invariant (file tests/wp_acsl/simpl_is_type.i, line 24):
 Assume {
   Type: is_sint32(size_0).
+  (* Heap *)
+  Type: region(t.base) <= 0.
   (* Goal *)
   When: (0 <= i) /\ (i < size_0) /\ is_sint32(i).
-  (* Heap *)
-  Have: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: (0 < size_0) /\
       (forall i_1 : Z. ((0 <= i_1) -> ((i_1 < size_0) ->
@@ -351,10 +351,10 @@ Let a_1 = havoc(Mint_undef_0, Mint_0, a, size_0).
 Let a_2 = shift_sint32(t, i).
 Assume {
   Type: is_sint32(i) /\ is_sint32(size_0).
+  (* Heap *)
+  Type: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Goal *)
   When: !invalid(Malloc_0, a_2, 1).
-  (* Heap *)
-  Have: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
   Have: (0 < size_0) /\
       (forall i_1 : Z. ((0 <= i_1) -> ((i_1 < size_0) ->
@@ -382,7 +382,7 @@ Let x = Mint_0[shift_sint32(t, i)].
 Assume {
   Type: is_sint32(i) /\ is_sint32(size_0) /\ is_sint32(x).
   (* Heap *)
-  Have: region(t.base) <= 0.
+  Type: region(t.base) <= 0.
   (* Pre-condition *)
   Have: 0 < size_0.
   (* Invariant *)
@@ -405,7 +405,7 @@ Assume {
   Type: is_sint32(i) /\ is_sint32(size_0) /\ is_sint32(x) /\
       is_sint32(1 + i) /\ is_sint32(x_1).
   (* Heap *)
-  Have: region(t.base) <= 0.
+  Type: region(t.base) <= 0.
   (* Pre-condition *)
   Have: 0 < size_0.
   (* Invariant *)
@@ -432,10 +432,10 @@ Let x_1 = Mint_0[shift_sint32(t, i_1)].
 Assume {
   Type: is_sint32(i_1) /\ is_sint32(size_0) /\ is_sint32(x) /\
       is_sint32(1 + i_1) /\ is_sint32(x_1).
+  (* Heap *)
+  Type: region(t.base) <= 0.
   (* Goal *)
   When: (0 <= i) /\ (i <= i_1) /\ is_sint32(i).
-  (* Heap *)
-  Have: region(t.base) <= 0.
   (* Pre-condition *)
   Have: 0 < size_0.
   (* Invariant *)

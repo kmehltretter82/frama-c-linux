@@ -211,7 +211,9 @@ struct
     let hyps = Conditions.state ?stmt ?descr state vc.hyps in
     { vc with path ; hyps }
 
-  let assume_vc ?descr ?hpid ?stmt ?warn ?(filter=false) ?(init=false) hs vc =
+  let assume_vc ?descr ?hpid ?stmt ?warn
+      ?(filter=false) ?(domain=false) ?(init=false)
+      hs vc =
     if (hs = [] && warn = None) ||
        (filter && not (List.exists (intersect_vc vc) hs))
     then vc else
@@ -225,7 +227,7 @@ struct
         | None -> vc.warn
         | Some w -> Warning.Set.union w vc.warn in
       let hyps = Conditions.assume
-          ?descr ?stmt ?warn ~deps ~init
+          ?descr ?stmt ?warn ~deps ~init ~domain
           (F.p_conj hs) vc.hyps
       in {
         hyps = hyps ;
@@ -685,7 +687,14 @@ struct
             { sigma = Some sigma ; vcs=vcs ; effects = wp.effects }
         | Warning.Result(l_warn,(obj,dom,seq,loc)) ->
             (* L-Value has been translated *)
-            let region = [obj,Sloc loc] in
+            let unfold = Wp_parameters.UnfoldAssigns.get () in
+            let assigned,unfolded =
+              if unfold && Ctypes.is_compound obj then
+                let env_pre = L.move_at env seq.pre in
+                cc_region ~unfold (L.assigned_of_lval env_pre) lv
+              else
+                let region = [obj,Sloc loc] in region,region
+            in
             let outcome = Warning.catch
                 ~severe:false ~effect:"Havoc l-value (unknown r-value)"
                 (cc_stored lv seq loc obj) expr in
@@ -695,7 +704,7 @@ struct
                 (* R-Value is unknown or L-Value is volatile *)
                 let warn = Warning.Set.union l_warn r_warn in
                 let vcs = do_assigns ~source:FromCode
-                    ~stmt ~warn seq ~assigned:region wp.effects wp.vcs in
+                    ~stmt ~warn seq ~assigned ~unfolded wp.effects wp.vcs in
                 { sigma = Some seq.pre ; vcs=vcs ; effects = wp.effects }
             | Warning.Result(r_warn,Some stored) ->
                 (* R-Value and effects has been translated *)
@@ -711,7 +720,7 @@ struct
                   else vc in
                 let vcs = gmap update wp.vcs in
                 let vcs =
-                  check_assigns (Some stmt) FromCode region wp.effects vcs in
+                  check_assigns (Some stmt) FromCode unfolded wp.effects vcs in
                 { sigma = Some seq.pre ; vcs=vcs ; effects = wp.effects }
       end
 
@@ -748,6 +757,9 @@ struct
     let v = Lang.freshvar ~basename:"cond" Logic.Bool in
     F.p_bool (F.e_var v)
 
+  let weight vcs =
+    Gmap.fold (fun _g s n -> n + Splitter.length s) vcs 0
+
   let test wenv stmt exp wp1 wp2 = L.in_frame wenv.frame
       (fun () ->
          let sigma,pa1,pa2 = sigma_union wp1.sigma wp2.sigma in
@@ -760,8 +772,14 @@ struct
            | Warning.Failed(warn) -> warn,random()
          in
          let effects = Eset.union wp1.effects wp2.effects in
+         let dosplit =
+           Wp_parameters.Split.get () &&
+           let n1 = weight wp1.vcs in
+           let n2 = weight wp2.vcs in
+           let nm = Wp_parameters.SplitMax.get () in
+           n1 + n2 <= nm in
          let vcs =
-           if Wp_parameters.Split.get () then
+           if dosplit then
              let cneg = p_not cond in
              let vcs1 = gmap (condition pa1 ~stmt ~warn ~descr:"Then" [cond]) wp1.vcs in
              let vcs2 = gmap (condition pa2 ~stmt ~warn ~descr:"Else" [cneg]) wp2.vcs in
@@ -1164,7 +1182,7 @@ struct
         match sc with
         | Mcfg.SC_Global ->
             let hs = M.frame (L.current env) in
-            let vcs = gmap (assume_vc ~descr:"Heap" hs) wp.vcs in
+            let vcs = gmap (assume_vc ~descr:"Heap" ~domain:true hs) wp.vcs in
             { wp with vcs }
         | Mcfg.SC_Function_in -> wp
         | Mcfg.SC_Function_frame ->
