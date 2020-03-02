@@ -1,1 +1,0 @@
-OPT: @PTEST_FILE@ -builtin -print -check -then -ocode @PTEST_DIR@/result/@PTEST_NAME@.c -print -then -no-builtin @PTEST_DIR@/result/@PTEST_NAME@.c @PTEST_FILE@ -ocode="" -print
