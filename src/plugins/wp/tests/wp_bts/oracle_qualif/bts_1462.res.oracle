@@ -8,18 +8,18 @@
 [wp] [Qed] Goal typed_local_loop_invariant_established : Valid
 [wp] [Qed] Goal typed_local_loop_assigns_part1 : Valid
 [wp] [Qed] Goal typed_local_loop_assigns_part2 : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_wrong_assert_for_value : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_wrong_loop_invariant_A_KO_preserved : Unsuccess
+[wp] [Alt-Ergo] Goal typed_wrong_assert_for_value : Valid
+[wp] [Alt-Ergo] Goal typed_wrong_loop_invariant_A_KO_preserved : Unsuccess
 [wp] [Qed] Goal typed_wrong_loop_invariant_A_KO_established : Valid
 [wp] [Qed] Goal typed_wrong_loop_invariant_B_preserved : Valid
 [wp] [Qed] Goal typed_wrong_loop_invariant_B_established : Valid
 [wp] [Qed] Goal typed_wrong_loop_invariant_C_preserved : Valid
 [wp] [Qed] Goal typed_wrong_loop_invariant_C_established : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_wrong_assert_consequence_of_false_invariant : Valid
+[wp] [Alt-Ergo] Goal typed_wrong_assert_consequence_of_false_invariant : Valid
 [wp] [Qed] Goal typed_wrong_loop_assigns : Valid
 [wp] Proved goals:   12 / 13
-  Qed:              10 
-  Alt-Ergo 2.0.0:    2  (unsuccess: 1)
+  Qed:            10 
+  Alt-Ergo:        2  (unsuccess: 1)
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   wrong                     6        2        9      88.9%

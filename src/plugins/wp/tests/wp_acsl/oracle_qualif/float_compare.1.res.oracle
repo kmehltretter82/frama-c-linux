@@ -6,10 +6,10 @@
 [wp] 19 goals scheduled
 [wp] [Qed] Goal typed_real_lemma_finite_32_64 : Valid
 [wp] [Qed] Goal typed_real_lemma_finite_32_64_real : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_real_lemma_test_double_compare : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_real_lemma_test_double_compare_greater : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_real_lemma_test_float_compare : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_real_lemma_test_float_compare_greater : Valid
+[wp] [Alt-Ergo] Goal typed_real_lemma_test_double_compare : Valid
+[wp] [Alt-Ergo] Goal typed_real_lemma_test_double_compare_greater : Valid
+[wp] [Alt-Ergo] Goal typed_real_lemma_test_float_compare : Valid
+[wp] [Alt-Ergo] Goal typed_real_lemma_test_float_compare_greater : Valid
 [wp] [Qed] Goal typed_real_cmp_dd_ensures_DEF : Valid
 [wp] [Qed] Goal typed_real_cmp_dd_ensures_REL1 : Valid
 [wp] [Qed] Goal typed_real_cmp_dd_ensures_REL2 : Valid
@@ -24,8 +24,8 @@
 [wp] [Qed] Goal typed_real_cmp_fnan_ensures_POS : Valid
 [wp] [Qed] Goal typed_real_cmp_fnan_ensures_NEG : Valid
 [wp] Proved goals:   19 / 19
-  Qed:              15 
-  Alt-Ergo 2.0.0:    4
+  Qed:            15 
+  Alt-Ergo:        4
 ------------------------------------------------------------
  Axiomatics                WP     Alt-Ergo  Total   Success
   Lemma                     2        4        6       100%

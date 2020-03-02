@@ -14,16 +14,16 @@
 [wp] [Qed] Goal typed_behavior_bhv1_assigns_normal_part2 : Valid
 [wp] [Qed] Goal typed_behavior_bhv1_assigns_normal_part3 : Valid
 [wp] [Qed] Goal typed_behavior_bhv1_assigns_normal_part4 : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_call_call_point_f1_f2_s3 : Valid
+[wp] [Alt-Ergo] Goal typed_call_call_point_f1_f2_s3 : Valid
 [wp] [Qed] Goal typed_call_ensures_part1 : Valid
 [wp] [Qed] Goal typed_call_ensures_part2 : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_call_call_f1_requires : Valid
+[wp] [Alt-Ergo] Goal typed_call_call_f1_requires : Valid
 [wp] [Qed] Goal typed_guarded_call_call_point_g_s9 : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_guarded_call_ensures_part1 : Valid
+[wp] [Alt-Ergo] Goal typed_guarded_call_ensures_part1 : Valid
 [wp] [Qed] Goal typed_guarded_call_ensures_part2 : Valid
 [wp] [Qed] Goal typed_guarded_call_ensures_2_part1 : Valid
 [wp] [Qed] Goal typed_guarded_call_ensures_2_part2 : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_missing_context_call_point_h1_s25 : Unsuccess
+[wp] [Alt-Ergo] Goal typed_missing_context_call_point_h1_s25 : Unsuccess
 [wp] [Qed] Goal typed_missing_context_ensures : Valid
 [wp] [Qed] Goal typed_missing_context_assigns_exit : Valid
 [wp] [Qed] Goal typed_missing_context_assigns_normal_part1 : Valid
@@ -57,8 +57,8 @@
 [wp] [Qed] Goal typed_some_behaviors_bhv1_assigns_normal_part4 : Valid
 [wp] [Qed] Goal typed_some_behaviors_bhv1_assigns_normal_part5 : Valid
 [wp] Proved goals:   50 / 51
-  Qed:              47 
-  Alt-Ergo 2.0.0:    3  (unsuccess: 1)
+  Qed:            47 
+  Alt-Ergo:        3  (unsuccess: 1)
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   call                      2        2        4       100%

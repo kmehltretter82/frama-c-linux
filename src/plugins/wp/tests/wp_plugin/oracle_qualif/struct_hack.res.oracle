@@ -10,19 +10,19 @@
 [wp] tests/wp_plugin/struct_hack.i:53: Warning: 
   Missing assigns clause (assigns 'everything' instead)
 [wp] 10 goals scheduled
-[wp] [Alt-Ergo 2.0.0] Goal typed_f0_loop_invariant_qed_ok_preserved : Valid
+[wp] [Alt-Ergo] Goal typed_f0_loop_invariant_qed_ok_preserved : Valid
 [wp] [Qed] Goal typed_f0_loop_invariant_qed_ok_established : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_f0_assert_qed_ok : Valid
+[wp] [Alt-Ergo] Goal typed_f0_assert_qed_ok : Valid
 [wp] [Qed] Goal typed_f0_loop_variant_decrease : Valid
 [wp] [Qed] Goal typed_f0_loop_variant_positive : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_f1_loop_invariant_qed_ok_preserved : Valid
+[wp] [Alt-Ergo] Goal typed_f1_loop_invariant_qed_ok_preserved : Valid
 [wp] [Qed] Goal typed_f1_loop_invariant_qed_ok_established : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_f1_assert_qed_ok : Valid
+[wp] [Alt-Ergo] Goal typed_f1_assert_qed_ok : Valid
 [wp] [Qed] Goal typed_f1_loop_variant_decrease : Valid
 [wp] [Qed] Goal typed_f1_loop_variant_positive : Valid
 [wp] Proved goals:   10 / 10
-  Qed:               6 
-  Alt-Ergo 2.0.0:    4
+  Qed:             6 
+  Alt-Ergo:        4
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   f0                        3        2        5       100%

@@ -7,14 +7,14 @@
 [wp] Warning: Missing RTE guards
 [wp] 6 goals scheduled
 [wp] [Qed] Goal typed_flash_flash-ergo_job_ensures_Events : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_flash_flash-ergo_job_ensures_A_reads : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_flash_flash-ergo_job_ensures_B_reads : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_flash_flash-ergo_job_ensures_B_writes : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_flash_flash-ergo_job_ensures_ReadValues : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_flash_flash-ergo_job_ensures_WriteValues : Valid
+[wp] [Alt-Ergo] Goal typed_flash_flash-ergo_job_ensures_A_reads : Valid
+[wp] [Alt-Ergo] Goal typed_flash_flash-ergo_job_ensures_B_reads : Valid
+[wp] [Alt-Ergo] Goal typed_flash_flash-ergo_job_ensures_B_writes : Valid
+[wp] [Alt-Ergo] Goal typed_flash_flash-ergo_job_ensures_ReadValues : Valid
+[wp] [Alt-Ergo] Goal typed_flash_flash-ergo_job_ensures_WriteValues : Valid
 [wp] Proved goals:    6 / 6
-  Qed:               1 
-  Alt-Ergo 2.0.0:    5
+  Qed:             1 
+  Alt-Ergo:        5
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   job                       1        5        6       100%

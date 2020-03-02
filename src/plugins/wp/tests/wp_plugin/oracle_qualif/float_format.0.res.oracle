@@ -9,7 +9,7 @@
 [wp] Warning: native support for coq is deprecated, use tip instead
 [wp] 1 goal scheduled
 [wp] [Coq] Goal typed_output_ensures_KO : Default tactic
-[wp] [Coq (Native)] Goal typed_output_ensures_KO : Unsuccess
+[wp] [Coq (native)] Goal typed_output_ensures_KO : Unsuccess
 [wp] Proved goals:    0 / 1
   Coq (native):    0  (unsuccess: 1)
 ------------------------------------------------------------

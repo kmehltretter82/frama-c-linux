@@ -5,11 +5,11 @@
 [wp] Warning: Missing RTE guards
 [wp] 3 goals scheduled
 [wp] [Qed] Goal typed_ref_main_ensures_I0 : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_ref_main_ensures_I1 : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_ref_main_ensures_I2 : Valid
+[wp] [Alt-Ergo] Goal typed_ref_main_ensures_I1 : Valid
+[wp] [Alt-Ergo] Goal typed_ref_main_ensures_I2 : Valid
 [wp] Proved goals:    3 / 3
-  Qed:               1 
-  Alt-Ergo 2.0.0:    2
+  Qed:             1 
+  Alt-Ergo:        2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   main                      1        2        3       100%

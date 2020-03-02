@@ -7,9 +7,9 @@
   Allocation, initialization and danglingness not yet implemented
   (\initialized(\at(p,wp:pre)))
 [wp] 1 goal scheduled
-[wp] [Alt-Ergo 2.0.0] Goal typed_f_assert : Unsuccess (Stronger)
+[wp] [Alt-Ergo] Goal typed_f_assert : Unsuccess (Stronger)
 [wp] Proved goals:    0 / 1
-  Alt-Ergo 2.0.0:    0  (unsuccess: 1)
+  Alt-Ergo:        0  (unsuccess: 1)
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   f                         -        -        1       0.0%

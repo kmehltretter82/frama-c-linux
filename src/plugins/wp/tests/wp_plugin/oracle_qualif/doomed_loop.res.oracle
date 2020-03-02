@@ -7,13 +7,13 @@
 [wp:smoke] tests/wp_plugin/doomed_loop.i:22: Warning: 
   Smoke-test typed_foo_smoke_loop_invariant_s2 : Failed (Qed)
 [wp] [Qed] Goal typed_foo_loop_invariant_A_preserved : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_foo_loop_invariant_A_established : Unsuccess
+[wp] [Alt-Ergo] Goal typed_foo_loop_invariant_A_established : Unsuccess
 [wp] [Qed] Goal typed_foo_loop_invariant_B_preserved : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_foo_loop_invariant_B_established : Unsuccess
+[wp] [Alt-Ergo] Goal typed_foo_loop_invariant_B_established : Unsuccess
 [wp] [Qed] Goal typed_foo_loop_assigns : Valid
 [wp] Proved goals:    3 / 6
-  Qed:               3  (failed: 1)
-  Alt-Ergo 2.0.0:    0  (unsuccess: 2)
+  Qed:             3  (failed: 1)
+  Alt-Ergo:        0  (unsuccess: 2)
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   foo                       3        -        6      50.0%
