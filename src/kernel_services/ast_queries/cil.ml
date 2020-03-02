@@ -208,8 +208,6 @@ let () =
 
 let selfMachine_is_computed = TheMachine.is_computed
 
-let debugConstFold = false
-
 let new_exp ~loc e = { eloc = loc; eid = Cil_const.Eid.next (); enode = e }
 
 let dummy_exp e = { eid = -1; enode = e; eloc = Cil_datatype.Location.unknown }
@@ -4412,7 +4410,8 @@ and bitsOffset (baset: typ) (off: offset) : int * int =
     See also {!Cil.constFoldVisitor}, which will run constFold on all
     expressions in a given AST node.*)
 and constFold (machdep: bool) (e: exp) : exp =
-  if debugConstFold then Kernel.debug "ConstFold to %a@." !pp_exp_ref e;
+  let dkey = Kernel.dkey_constfold in
+  Kernel.debug ~dkey "ConstFold %a@." !pp_exp_ref e;
   let loc = e.eloc in
   match e.enode with
     BinOp(bop, e1, e2, tres) -> constFoldBinOp ~loc machdep bop e1 e2 tres
@@ -4496,15 +4495,13 @@ and constFold (machdep: bool) (e: exp) : exp =
     end
 
   | CastE (t, e) -> begin
-      if debugConstFold then
-        Kernel.debug "ConstFold CAST to to %a@." !pp_typ_ref t ;
+      Kernel.debug ~dkey "ConstFold CAST to %a@." !pp_typ_ref t ;
       let e = constFold machdep e in
       match e.enode, unrollType t with
       | Const(CInt64(i,_k,_)),(TInt(nk,a)|TEnum({ekind = nk},a)) when a = [] ->
         begin
           (* If the cast has attributes, leave it alone. *)
-          if debugConstFold then
-            Kernel.debug "ConstFold to %a : %a@."
+          Kernel.debug ~dkey "ConstFold to %a : %a@."
               !pp_ikind_ref nk Datatype.Integer.pretty i;
           (* Downcasts might truncate silently *)
           kinteger64 ~loc ~kind:nk i
@@ -4718,10 +4715,9 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
         one ~loc
       | _ -> new_exp ~loc (BinOp(bop, e1', e2', tres))
     in
-    if debugConstFold then
-      Format.printf "Folded %a to %a@."
-        !pp_exp_ref (new_exp ~loc (BinOp(bop, e1', e2', tres)))
-        !pp_exp_ref newe;
+    Kernel.debug ~dkey:Kernel.dkey_constfold "Folded %a to %a@."
+      !pp_exp_ref (new_exp ~loc (BinOp(bop, e1', e2', tres)))
+      !pp_exp_ref newe;
     newe
   end else if isArithmeticType tres && not (isLongDoubleType tres) then begin
     let tk =
