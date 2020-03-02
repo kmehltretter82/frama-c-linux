@@ -3051,7 +3051,16 @@ let integer_constant i = CInt64(Integer.of_int i, IInt, None)
 (* Construct an integer. Use only for values that fit on 31 bits *)
 let integer ~loc (i: int) = new_exp ~loc (Const (integer_constant i))
 
-let kfloat ~loc k f = new_exp ~loc (Const (CReal(f,k,None)))
+let kfloat ~loc k f =
+  let is_single_precision =
+    match k with FFloat -> true | FDouble | FLongDouble -> false
+  in
+  let f =
+    if is_single_precision then
+      Floating_point.round_to_single_precision_float f
+    else f
+  in
+  new_exp ~loc (Const (CReal(f,k,None)))
 
 let zero      ~loc = integer ~loc 0
 let one       ~loc = integer ~loc 1
@@ -4407,29 +4416,43 @@ and constFold (machdep: bool) (e: exp) : exp =
   let loc = e.eloc in
   match e.enode with
     BinOp(bop, e1, e2, tres) -> constFoldBinOp ~loc machdep bop e1 e2 tres
-  | UnOp(unop, e1, tres) -> begin
-      try
-        let tk =
-          match unrollTypeSkel tres with
-          | TInt(ik, _) -> ik
-          | TEnum (ei,_) -> ei.ekind
-          | _ -> raise Not_found (* probably a float *)
-        in
-        let e1c = constFold machdep e1 in
-        match e1c.enode with
-          Const(CInt64(i,_ik,repr)) -> begin
-            match unop with
-              Neg ->
-              let repr = Extlib.opt_map (fun s -> "-" ^ s) repr in
-              kinteger64 ~loc ?repr ~kind:tk (Integer.neg i)
-            | BNot -> kinteger64 ~loc ~kind:tk (Integer.lognot i)
-            | LNot ->
-              if Integer.equal i Integer.zero then one ~loc
-              else zero ~loc
-          end
-        | _ -> if e1 == e1c then e else new_exp ~loc (UnOp(unop, e1c, tres))
-      with Not_found -> e
+  | UnOp(unop, e1, tres) when isIntegralType tres -> begin
+      let tk =
+        match unrollTypeSkel tres with
+        | TInt(ik, _) -> ik
+        | TEnum (ei,_) -> ei.ekind
+        | _ -> assert false (* tres is an integral type *)
+      in
+      let e1c = constFold machdep e1 in
+      match e1c.enode with
+        Const(CInt64(i,_ik,repr)) -> begin
+          match unop with
+            Neg ->
+            let repr = Extlib.opt_map (fun s -> "-" ^ s) repr in
+            kinteger64 ~loc ?repr ~kind:tk (Integer.neg i)
+          | BNot -> kinteger64 ~loc ~kind:tk (Integer.lognot i)
+          | LNot ->
+            if Integer.equal i Integer.zero then one ~loc
+            else zero ~loc
+        end
+      | _ -> if e1 == e1c then e else new_exp ~loc (UnOp(unop, e1c, tres))
     end
+  | UnOp(unop, e1, tres) when isArithmeticType tres -> begin
+      let tk =
+        match unrollTypeSkel tres with
+        | TFloat(fk,_) -> fk
+        | _ -> assert false (*tres is arithmetic but not integral, i.e. Float *)
+      in
+      let e1c = constFold machdep e1 in
+      match e1c.enode with
+      | Const (CReal(f,_,_)) -> begin
+          match unop with
+          | Neg -> kfloat ~loc tk (-. f)
+          | _ -> if e1 == e1c then e else new_exp ~loc (UnOp(unop,e1c,tres))
+        end
+      | _ -> if e1 == e1c then e else new_exp ~loc (UnOp(unop,e1c,tres))
+    end
+  | UnOp _ -> e
   (* Characters are integers *)
   | Const(CChr c) -> new_exp ~loc (Const(charConstToIntConstant c))
   | Const(CEnum {eival = v}) -> constFold machdep v
@@ -4706,28 +4729,16 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
       | TFloat(fk,_) -> fk
       | _ -> Kernel.fatal "constFoldBinOp: not a floating type"
     in
-    let is_single_precision =
-      match tk with
-      | FFloat -> true
-      | FDouble | FLongDouble -> false
-    in
-    let mkFloat f =
-      let f =
-        if is_single_precision then
-          Floating_point.round_to_single_precision_float f
-        else f
-      in
-      new_exp ~loc (Const (CReal(f,tk,None)))
-    in
     match bop, e1'.enode, e2'.enode with
     | PlusA, Const(CReal(f1,fk1,_)), Const(CReal(f2,fk2,_)) when fk1 = fk2 ->
-      mkFloat (f1 +. f2)
+      kfloat ~loc tk (f1 +. f2)
     | MinusA, Const(CReal(f1,fk1,_)), Const(CReal(f2,fk2,_)) when fk1 = fk2 ->
-      mkFloat (f1 -. f2)
+      kfloat ~loc tk (f1 -. f2)
     | Mult, Const(CReal(f1,fk1,_)), Const(CReal(f2,fk2,_)) when fk1 = fk2 ->
-      mkFloat (f1 *. f2)
+      kfloat ~loc tk (f1 *. f2)
     | Div, Const(CReal(f1,fk1,_)), Const(CReal(f2,fk2,_)) when fk1 = fk2 ->
-      mkFloat (f1 /. f2) (*might be infinity or NaN, but that's still a float*)
+      (*might be infinity or NaN, but that's still a float*)
+      kfloat ~loc tk (f1 /. f2)
     | _ -> new_exp ~loc (BinOp(bop,e1',e2',tres))
   end else
     new_exp ~loc (BinOp(bop, e1', e2', tres))
