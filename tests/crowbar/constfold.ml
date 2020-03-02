@@ -65,22 +65,25 @@ let gen_binary =
 *)
 let gen_constant =
   choose [
-    map [ int32 ]
-      (fun i ->
-         if Int32.compare i Int32.zero < 0 then
-          mk_exp (
-            UNARY (
-              MINUS,
-              mk_exp (CONSTANT (CONST_INT (Int32.to_string (Int32.neg i))))))
-         else
-           mk_exp (CONSTANT (CONST_INT (Int32.to_string i))));
+    map [ range 4 ]
+      (fun i -> mk_exp (CONSTANT (CONST_INT (string_of_int i))));
     map [ float ]
       (fun f ->
-         let up = Int32.to_float Int32.max_int in
+         let up = 4.0 in
          let f = if f < 0.0 then 0. else f in
          let f = if f > up then up else f in
          mk_exp (CONSTANT (CONST_FLOAT (string_of_float f))))
   ]
+
+let protected_cast t e =
+  match t with
+  | Tunsigned ->
+    mk_exp (
+      QUESTION (
+        mk_exp(BINARY(GE,e,mk_exp (CONSTANT(CONST_INT("0"))))),
+        e,
+        mk_exp(CONSTANT(CONST_INT("0")))))
+  | _ -> e
 
 let gen_expr =
   fix
@@ -105,10 +108,12 @@ let gen_expr =
               mk_exp (QUESTION (c,et,ef)));
          map [ gen_type; gen_expr ]
            (fun t e ->
+              let e = protected_cast t e in
               mk_exp (CAST (([SpecType t],JUSTBASE), SINGLE_INIT e)));
        ])
 
 let gen_cabs typ expr =
+  let expr = protected_cast typ expr in
   (Datatype.Filepath.dummy,
    [ false,
      DECDEF(
@@ -183,6 +188,8 @@ let run typ expr =
   (* otherwise, we must load scope in addition to eva. *)
   Dynamic.Parameter.Bool.off "-eva-remove-redundant-alarms" ();
   Errorloc.clear_errors ();
+  Format.printf "This is the cabs:@\n%a@."
+    Cprint.printFile cabs;
   let cil =
     try Cabs2cil.convFile cabs
     with exn ->
@@ -205,7 +212,13 @@ let run typ expr =
     !Db.Value.eval_expr
       ~with_alarms:CilE.warn_none_mode state (Cil.evar ~loc r)
   in
-  let itv = Cvalue.V.project_ival v1 in
+  let itv =
+    try Cvalue.V.project_ival v1
+    with exn ->
+      failf "Eva analysis did not reduce to a constant: %s@\n%t@."
+        (Printexc.to_string exn)
+        (fun fmt -> File.pretty_ast ~fmt ())
+  in
   if not (Ival.is_one itv) then begin
     failf "const fold did not reduce to identical value:@\n%t@."
       (fun fmt -> File.pretty_ast ~fmt ())
