@@ -1414,8 +1414,8 @@ module SpecialFloat =
       let option_name = "-warn-special-float"
       let default = "non-finite"
       let arg_name = "none|nan|non-finite"
-      let help = "generate alarms when special floats are produced: \
-                  infinite floats or NaN (by default), only on NaN or never."
+      let help = "generate alarms when special floats are produced: never, \
+                  only on NaN, or on infinite floats and NaN (by default)."
     end)
 let () = SpecialFloat.set_possible_values ["none"; "nan"; "non-finite"]
 
