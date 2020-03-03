@@ -17,6 +17,8 @@
 Open Source Release <next-release>
 ##################################
 
+-   Eva       [2020/03/03] Slightly better heuristics for the subdivision of
+              evaluations (option -eva-subdivide-non-linear).
 -   Instantiate [2020/03/02] New plug-in Instantiate, to create function
               specializations for specific plug-ins and functions (e.g. malloc,
               memcpy, memset), to overcome limitations due to their
