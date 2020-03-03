@@ -557,12 +557,13 @@ let constraint_trange idx size_arr =
 
 (* Note: "charlen" stands for either strlen or wcslen *)
 
-(* Applies a cvalue builtin. Returns [v, alarms], where [v] is the resulting
+(* Applies a cvalue [builtin] to the list of arguments [args_list] in the
+   current state of [env]. Returns [v, alarms], where [v] is the resulting
    cvalue, or [None] if the builtin leads to [bottom]. *)
-let apply_logic_builtin builtin env list =
+let apply_logic_builtin builtin env args_list =
   (* the call below could in theory return Builtins.Invalid_nb_of_args,
      but logic typing constraints prevent that. *)
-  let res, alarms = builtin (env_current_state env) list in
+  let res, alarms = builtin (env_current_state env) args_list in
   match res with
   | None -> None
   | Some offsm ->
