@@ -5,6 +5,7 @@
 /** @module dome/table/views */
 
 import React from 'react' ;
+import Dome from 'dome' ;
 import { DraggableCore } from 'react-draggable';
 import { SVG } from 'dome/controls/icons' ;
 import {
@@ -21,7 +22,6 @@ import './tables.css' ;
 // --------------------------------------------------------------------------
 
 const headerRowRenderer =
-      (onDoubleClick) =>
       // Borrowed from react-virtualized Table.defaultHeaderRowRenderer
       ({
         className,
@@ -30,8 +30,7 @@ const headerRowRenderer =
       }) => (
         <div role="row"
              className={className}
-             style={style}
-             onDoubleClick={onDoubleClick} >
+             style={style} >
           {columns}
         </div>
       );
@@ -41,9 +40,10 @@ const headerIcon = (icon) => (
 );
 
 const headerLabel = (label) => (
-  label && <label className='dome-xTable-header-label dome-text-label'>
-    {label}
-  </label>
+  label &&
+    (<label className='dome-xTable-header-label dome-text-label'>
+     {label}
+     </label>)
 );
 
 const makeSorter = (id) => (
@@ -57,21 +57,23 @@ headerSorter[ SortDirection.ASC ] = makeSorter('ANGLE.UP');
 headerSorter[ SortDirection.DESC ] = makeSorter('ANGLE.DOWN');
 
 const headerRenderer =
+      (onContextMenu) =>
       ({
         columnData: { label, icon, title, headerRef },
         dataKey,
         sortBy,
         sortDirection
       }) => {
-        const sorting = dataKey === sortBy ;
         const tooltip = title || label ;
         const onRef = (elt) => headerRef(dataKey,elt) ;
+        const sorter = dataKey == sortBy ? headerSorter[sortDirection] : undefined ;
         return (
           <div className='dome-xTable-header' title={tooltip} ref={onRef}
+               onContextMenu={onContextMenu}
             >
             { headerIcon(icon) }
             { headerLabel(label) }
-            { sorting && headerSorter[sortDirection] }
+            { sorter }
           </div>
         );
       };
@@ -172,19 +174,24 @@ const computeWidth = (elt) => {
 export const Column = () => null;
 // Fake component only used to store props.
 // Virtualized column is rendered with function below:
-const vColumn = (columnResize,headerRef,hasFill,lastElt) => (elt) => {
+const vColumn = ({
+  headerRef,
+  columnResize,hasFill,lastElt,
+  contextMenu
+}) => (elt) => {
   const defaults = elt.type._DOME_COLUMN_DEFAULTS || {} ;
   const forcers = !hasFill && elt == lastElt ? { fill:true } : {} ;
   const { id,label,title,icon,align,width,fill,disableSort,getValue,renderValue }
         = Object.assign( defaults , elt.props , forcers ) ;
   return (
     <VColumn
+      key={id}
       displayName='React-Virtualized-Column'
       width={columnResize[id] || width || 60}
       flexGrow={ fill ? 1 : 0 }
       dataKey={id}
       columnData={{label,title,icon,headerRef}}
-      headerRenderer={headerRenderer}
+      headerRenderer={headerRenderer(contextMenu)}
       cellRenderer={cellRenderer(renderValue)}
       cellDataGetter={cellDataGetter(getValue)}
       headerStyle={{ textAlign: align }}
@@ -192,6 +199,19 @@ const vColumn = (columnResize,headerRef,hasFill,lastElt) => (elt) => {
       style={{ textAlign: align }}
       />
   );
+};
+
+const defaultVisible = (visible) => {
+  switch(visible) {
+  case 'always':
+  case undefined:
+    return true;
+  case 'never':
+  case null:
+    return false;
+  default:
+    return visible;
+  }
 };
 
 // --------------------------------------------------------------------------
@@ -326,14 +346,20 @@ export class Table extends React.Component {
       this.props.model._watch( this.client , startIndex , stopIndex );
     };
 
-    // Header Double Click
+    // Default Context Menu
     this.resetOrdering = () => this.props.model.setOrdering() ;
+
+    // Header Reset Resizing
+    this.resetResizing = () => {
+      this.columnSize = {};
+      this.columnResize = {};
+      this.forceUpdate();
+    };
 
     // Header Column References
     this.columnSize = {} ;
     this.headerRef = (id,elt) => {
       const old = this.columnSize[id];
-      const fixed = this.columnResize[id];
       const width = computeWidth(elt);
       if (elt && old !== width) {
         this.columnSize[id] = width ;
@@ -355,6 +381,7 @@ export class Table extends React.Component {
 
     // Selection
     this.selectRow = this.selectRow.bind(this);
+    this.contextMenu = this.contextMenu.bind(this);
 
   }
 
@@ -372,10 +399,9 @@ export class Table extends React.Component {
 
   // --- Column Resizers
 
-  computeResizers() {
+  computeResizers(columns) {
     // Insert a resizer on each side of non-fixed columns,
     // provided there also exists some non-fixed column on both side.
-    const columns = React.Children.toArray(this.props.children);
     if (columns.length < 2) return null;
     const resizing = columns.map( ({props:{id,fixed}}) => ({id,fixed}) );
     var k, cid ;
@@ -415,6 +441,16 @@ export class Table extends React.Component {
       }
     }
     return resizers ;
+  }
+
+  // --- Context Menu
+
+  contextMenu() {
+    const items = [
+      { label: 'Reset Ordering', onClick:this.resetOrdering },
+      { label: 'Reset Column widths', onClick:this.resetResizing },
+    ];
+    Dome.popupMenu(items);
   }
 
   // --- Row Selection
@@ -475,7 +511,7 @@ export class Table extends React.Component {
   render() {
 
     const {
-      model, children, renderEmpty,
+      model, renderEmpty,
       multipleSelection, selection, onSelection,
       scrollToItem
     } = this.props ;
@@ -496,9 +532,10 @@ export class Table extends React.Component {
       model , item: (index < itemCount ? model.getItemAt(index) : undefined)
     }) ;
 
+    const columns = React.Children.toArray(this.props.children);
     var hasFill = false ;
     var lastElt = undefined ;
-    React.Children.forEach(this.props.children,(elt) => {
+    React.Children.forEach(columns,(elt) => {
       if (elt.props.fill) hasFill = true ; else lastElt = elt ;
     });
     const SizedTable = ({ height, width }) => {
@@ -510,7 +547,13 @@ export class Table extends React.Component {
       const scrollToIndex =
             scrollToItem ? model.getIndexOf(scrollToItem) :
             reloaded && this.focus ? model.getIndexOf(this.focus) : undefined ;
-      const resizers = this.computeResizers();
+      const resizers = this.computeResizers(columns);
+      const renderColumn = vColumn({
+        headerRef: this.headerRef,
+        hasFill, lastElt,
+        columnResize:this.columnResize,
+        contextMenu:this.contextMenu
+      });
       return (
         <React.Fragment>
           <VTable
@@ -524,7 +567,7 @@ export class Table extends React.Component {
             rowClassName={rowClassName(multipleSelection,selected)}
             rowHeight={CSS_ROW_HEIGHT}
             headerHeight={CSS_HEADER_HEIGHT}
-            headerRowRenderer={headerRowRenderer(this.resetOrdering)}
+            headerRowRenderer={headerRowRenderer}
             onRowsRendered={this.watchModel}
             onRowClick={onSelection && this.selectRow}
             sortBy={ordering && ordering.sortBy}
@@ -533,7 +576,7 @@ export class Table extends React.Component {
             scrollToIndex={ scrollToIndex }
             scrollToAlignment='center'
             >
-            {React.Children.map(children,vColumn(this.columnResize,this.headerRef,hasFill,lastElt))}
+            {React.Children.map(columns,renderColumn)}
           </VTable>
           {resizers}
         </React.Fragment>
