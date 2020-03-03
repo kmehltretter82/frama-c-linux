@@ -339,12 +339,13 @@ Each menu item is specified by an object with the following fields:
  - `label` (`string`, _optional_) : the item label.
  - `enabled` (`boolean`, _optional_, default is `true`).
  - `display` (`boolean`, _optional_, default is `true`).
+ - `checked` (`boolean`, _optional_, default is `undefined`).
  - `onClick` (`function`, _optional_) : callback on item selection.
 
 Items can be separated by inserting a `'separator'` constant string
 in the array. Item identifier and label default to each others. Alternatively,
 an item can be specified by a single string that will be used for both
-its label and identifier.
+its label and identifier. Undefined or null items are allowed (and skipped).
 
 The menu is displayed at the current mouse location.
 The callback is called with the selected item identifier or label.
@@ -360,21 +361,22 @@ export function popupMenu( items, callback )
   const { Menu , MenuItem } = remote ;
   const menu = new Menu();
   var selected = undefined ;
-  items.forEach((item,kid) => {
+  var kid = 0 ;
+  items.forEach((item) => {
     if (item === 'separator')
       menu.append(new MenuItem({ type:'separator' }));
-    else
+    else if (item)
     {
-      const { display=true } = item ;
+      const { display=true, enabled, checked } = item ;
       if (display) {
-        const label = item.label || '#'+(kid+1) ;
+        const label = item.label || '#'+(++kid) ;
         const id = item.id || label ;
-        const enabled = item.enabled ;
         const click = () => {
           selected = id ;
           item.onClick && item.onClick();
         };
-        menu.append(new MenuItem({ label, enabled, click }));
+        const type = checked !== undefined ? 'checkbox' : 'normal' ;
+        menu.append(new MenuItem({ label, enabled, type, checked, click }));
       }
     }
   });
