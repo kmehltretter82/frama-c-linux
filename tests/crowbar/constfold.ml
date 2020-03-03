@@ -19,9 +19,6 @@ let gen_type =
 
 let mk_exp expr_node = { expr_loc = loc; expr_node }
 
-let force_int typ e =
-  mk_exp (CAST (([SpecType typ],JUSTBASE), SINGLE_INIT e))
-
 let needs_int_unary = function
   | NOT | BNOT -> true
   | _ -> false
@@ -75,22 +72,26 @@ let gen_constant =
          mk_exp (CONSTANT (CONST_FLOAT (string_of_float f))))
   ]
 
+let mk_cast t e = mk_exp (CAST (([SpecType t],JUSTBASE), SINGLE_INIT e))
+
 let protected_cast t e =
-  match t with
-  | Tunsigned ->
-    mk_exp (
-      QUESTION (
-        mk_exp(BINARY(GE,e,mk_exp (CONSTANT(CONST_INT("0"))))),
-        e,
-        mk_exp(CONSTANT(CONST_INT("0")))))
-  | _ ->
-    let max = mk_exp (CONSTANT(CONST_INT("255"))) in
-    let min = mk_exp (UNARY(MINUS,max)) in
-    mk_exp(
-      QUESTION(
-        mk_exp(BINARY(GE,e,min)),
-        mk_exp(QUESTION(mk_exp(BINARY(LE,e,max)),e,max)),
-        min))
+  let max = mk_exp (CONSTANT(CONST_INT("255"))) in
+  let min =
+    match t with
+    | Tunsigned -> mk_exp(CONSTANT(CONST_INT("0")))
+    | _ ->  mk_exp (UNARY(MINUS,max))
+  in
+  let maxr = mk_cast t max in
+  let minr = mk_cast t min in
+  mk_exp(
+    QUESTION(
+      mk_exp(BINARY(GE,e,min)),
+      mk_exp(QUESTION(mk_exp(BINARY(LE,e,max)),e,maxr)),
+      minr))
+
+let force_int typ e =
+  let e = protected_cast typ e in
+  mk_exp (CAST (([SpecType typ],JUSTBASE), SINGLE_INIT e))
 
 let gen_expr =
   fix
@@ -109,10 +110,8 @@ let gen_expr =
                 else e1,e2
               in
               mk_exp (BINARY (b,e1,e2)));
-         map [ gen_int_type; gen_expr; gen_expr; gen_expr ]
-           (fun t c et ef ->
-              let c = force_int t c in
-              mk_exp (QUESTION (c,et,ef)));
+         map [ gen_expr; gen_expr; gen_expr ]
+           (fun c et ef -> mk_exp (QUESTION (c,et,ef)));
          map [ gen_type; gen_expr ]
            (fun t e ->
               let e = protected_cast t e in
