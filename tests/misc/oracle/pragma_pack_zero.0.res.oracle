@@ -1,6 +1,8 @@
 [kernel] Parsing tests/misc/pragma_pack_zero.c (with preprocessing)
 [kernel] tests/misc/pragma_pack_zero.c:35: Warning: 
   GCC accepts pack(0) but does not specify its behavior; considering it equivalent to pack()
+[kernel:typing:implicit-function-declaration] tests/misc/pragma_pack_zero.c:47: Warning: 
+  Calling undeclared function __builtin_offsetof. Old style K&R code?
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed

@@ -4509,19 +4509,6 @@ and constFold (machdep: bool) (e: exp) : exp =
   | AlignOfE _ | AlignOf _ | SizeOfStr _ | SizeOfE _ | SizeOf _ ->
     e (* Depends on machdep. Do not evaluate in this case*)
 
-  (* Special case to handle the C macro 'offsetof' *)
-  | CastE(it,
-          { enode = AddrOf (Mem ({enode = CastE(TPtr(bt, _), z)}), off)})
-    when machdep && isZero z -> begin
-      try
-        let start, _width = bitsOffset bt off in
-        if start mod 8 <> 0 then
-          Kernel.error ~current:true "Using offset of bitfield" ;
-        constFold machdep
-          (new_exp ~loc (CastE(it, (integer ~loc (start / 8)))))
-      with SizeOfError _ -> e
-    end
-
   | CastE (t, e) -> begin
       Kernel.debug ~dkey "ConstFold CAST to %a@." !pp_typ_ref t ;
       let e = constFold machdep e in

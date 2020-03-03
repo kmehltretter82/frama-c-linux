@@ -566,7 +566,14 @@ postfix_expression:                     /*(* 6.5.2 *)*/
                 { expr_loc = loc2; expr_node = TYPE_SIZEOF(b2,d2)}],[]))
       }
 | BUILTIN_OFFSETOF LPAREN type_name COMMA offsetof_member_designator RPAREN
-      { transformOffsetOf $3 $5 }
+    {
+      let loc_f = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 1, Parsing.rhs_end_pos 1) in
+      let arg = transformOffsetOf $3 $5 in
+      let builtin = { expr_loc = loc_f;
+                      expr_node = VARIABLE "__builtin_offsetof" }
+      in
+      make_expr (CALL (builtin, [ arg ], []))
+    }
 | postfix_expression DOT id_or_typename { make_expr (MEMBEROF ($1, $3))}
 | postfix_expression ARROW id_or_typename { make_expr (MEMBEROFPTR ($1, $3)) }
 | postfix_expression PLUS_PLUS { make_expr (UNARY (POSINCR, $1)) }

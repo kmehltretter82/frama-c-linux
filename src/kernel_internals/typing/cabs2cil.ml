@@ -7026,6 +7026,28 @@ and doExp local_env
                   Kernel.warning ~current:true
                     "Invalid call to builtin_constant_p")
              end
+           | "__builtin_offsetof" ->
+             begin
+               match !pargs with
+               | [{ enode = CastE (_, {enode = AddrOf (host, offset)}) } as e] ->
+                 begin
+                   piscall := false;
+                   prestype := Cil.theMachine.Cil.typeOfSizeOf;
+                   try
+                     let typ = Cil.typeOfLhost host in
+                     let start, _width = Cil.bitsOffset typ offset in
+                     if start mod 8 <> 0 then
+                       Kernel.error ~current:true "Using offset of bitfield";
+                     let kind = Cil.theMachine.kindOfSizeOf in
+                     pres := Cil.kinteger ~loc:e.eloc kind (start / 8);
+                   with SizeOfError _ ->
+                     pres := e;
+                     Kernel.warning ~once:true ~current:true
+                       "Invalid call to builtin_offsetof";
+                 end
+               | _ ->
+                 Kernel.abort ~current:true "Invalid call to builtin_offsetof";
+             end
            | "__builtin_types_compatible_p" ->
              begin
                (* Constant-fold the argument and see if it is a constant *)

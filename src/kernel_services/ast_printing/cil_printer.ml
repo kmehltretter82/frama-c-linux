@@ -1047,6 +1047,23 @@ class cil_printer () = object (self)
         "__builtin_types_compatible_p: cabs2cil should have added sizeof to \
          the arguments."
 
+    | Call(dest, {enode = Lval (Var vi, NoOffset)}, [ arg ], (l, _))
+      when vi.vname = "__builtin_offsetof"
+        && not state.print_cil_as_is ->
+      begin
+        match arg.enode with
+        | CastE (_, { enode = AddrOf (host, offset) }) ->
+          (* Print the destination *)
+          Extlib.may (fprintf fmt "%a = " self#lval) dest;
+          (* Now the call itself *)
+          fprintf fmt "%a(%a, %a)%s"
+            self#varname vi.vname
+            (self#typ None) (Cil.typeOfLhost host)
+            self#offset offset
+            instr_terminator
+        | _ -> Kernel.fatal ~source:l "__builtin_offsetof: invalid argument."
+      end
+
     | Call(dest,e,args,_) -> pp_call dest e fmt args
 
     | Asm(attrs, tmpls, ext_asm, l) ->
