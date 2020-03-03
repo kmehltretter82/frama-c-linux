@@ -7216,7 +7216,7 @@ and doExp local_env
                we won't evaluate it. Hence, it can contain
                non-const constructions *)
             let asconst =
-              if is_true_cond = `CFalse then CNoConst else asconst
+              if is_true_cond = `CFalse then CMayConst else asconst
             in
             let r2, se2, e2', t2 =
               doExp (no_paren_local_env local_env) asconst e2 what'
@@ -7224,18 +7224,20 @@ and doExp local_env
             r2, se2, Some e2', t2
         in
         (* Do e3 for real. See above for the value of asconst *)
-        let asconst' = if is_true_cond = `CTrue then CNoConst else asconst in
+        let asconst' = if is_true_cond = `CTrue then CMayConst else asconst in
         let r3, se3, e3', t3 =
           doExp (no_paren_local_env local_env) asconst' e3 what'
         in
         let tresult = conditionalConversion t2 t3 in
         if asconst <> CNoConst && is_true_cond = `CTrue then begin
           clean_up_chunk_locals se2;
+          clean_up_chunk_locals se3;
           let loc = e2.expr_loc in
           let e2' = match e2'o with None -> Cil.one ~loc | Some e -> e in
           let _,e2' = castTo t2 tresult e2' in
           finishExp [] empty e2' tresult;
         end else if asconst <> CNoConst && is_true_cond = `CFalse then begin
+          clean_up_chunk_locals se2;
           clean_up_chunk_locals se3;
           let _,e3' = castTo t3 tresult e3' in
           finishExp [] empty e3' tresult
