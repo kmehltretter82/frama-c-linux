@@ -7233,9 +7233,11 @@ and doExp local_env
           clean_up_chunk_locals se2;
           let loc = e2.expr_loc in
           let e2' = match e2'o with None -> Cil.one ~loc | Some e -> e in
+          let _,e2' = castTo t2 tresult e2' in
           finishExp [] empty e2' tresult;
         end else if asconst <> CNoConst && is_true_cond = `CFalse then begin
           clean_up_chunk_locals se3;
+          let _,e3' = castTo t3 tresult e3' in
           finishExp [] empty e3' tresult
         end else begin
           if not (isEmpty se2) then
