@@ -69,7 +69,7 @@ let prover_of_name = function
       match Why3Provers.find_fallback name with
       | Exact p -> Some (Why3 p)
       | Fallback p ->
-          Wp_parameters.warning ~current:false
+          Wp_parameters.warning ~current:false ~once:true
             "Prover '%s' not found, fallback to '%s'"
             (String.concat ":" prv) (Why3Provers.print_wp p) ;
           Some (Why3 p)

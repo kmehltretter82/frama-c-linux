@@ -3,7 +3,7 @@
 */
 
 /* run.config_qualif
-   OPT: -wp-prop=-left_unproved -then -wp-rte -wp -wp-prop=-left_unproved
+   OPT: -wp-prover=script,alt-ergo -wp-prop=-left_unproved -then -wp-rte -wp -wp-prop=-left_unproved
 */
 
 /* ******************************* */

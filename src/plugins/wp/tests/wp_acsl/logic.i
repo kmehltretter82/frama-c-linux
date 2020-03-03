@@ -2,7 +2,7 @@
    OPT: -wp-model Typed
 */
 /* run.config_qualif
-   OPT: -wp -wp-model Typed -wp-steps 50
+   OPT: -wp -wp-model Typed
 */
 // Test logic types defined from C types
 //--------------------------------------

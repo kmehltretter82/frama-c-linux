@@ -1,8 +1,8 @@
 /* run.config_qualif
    EXECNOW: rm -rf @PTEST_DIR@/oracle@PTEST_CONFIG@/@PTEST_NAME@.1.session/script
    OPT: -wp-prop=-lack,-tactic
-   OPT: -wp-prop=tactic -wp-auto=wp:split
-   OPT: -wp-prop=lack -wp-steps 300
+   OPT: -wp-prop=tactic -wp-auto=wp:split,wp:range -wp-prover=tip,alt-ergo
+   OPT: -wp-prop=lack
  */
 /*@ requires \valid(a+(0..n-1)) ;
   @ requires n >= 0 ;
