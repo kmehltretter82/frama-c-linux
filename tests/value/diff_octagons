@@ -239,22 +239,22 @@ diff tests/value/oracle/non_natural.res.oracle tests/value/oracle_octagons/non_n
 >   more than 200(12500) elements to enumerate. Approximating.
 diff tests/value/oracle/nonlin.res.oracle tests/value/oracle_octagons/nonlin.res.oracle
 105a106,107
-> [eva:nonlin] tests/value/nonlin.c:67: non-linear 'x * x', lv 'x'
-> [eva:nonlin] tests/value/nonlin.c:67: subdividing on x
+> [eva:nonlin] tests/value/nonlin.c:65: non-linear 'x * x', lv 'x'
+> [eva:nonlin] tests/value/nonlin.c:65: subdividing on x
 108a111,113
-> [eva:nonlin] tests/value/nonlin.c:68: subdividing on x
-> [eva:nonlin] tests/value/nonlin.c:68: non-linear 'y * y', lv 'y'
-> [eva:nonlin] tests/value/nonlin.c:68: subdividing on y
+> [eva:nonlin] tests/value/nonlin.c:66: subdividing on x
+> [eva:nonlin] tests/value/nonlin.c:66: non-linear 'y * y', lv 'y'
+> [eva:nonlin] tests/value/nonlin.c:66: subdividing on y
 111a117,118
-> [eva:nonlin] tests/value/nonlin.c:70: non-linear 'z * x + x * y', lv 'x'
-> [eva:nonlin] tests/value/nonlin.c:70: subdividing on x
+> [eva:nonlin] tests/value/nonlin.c:68: non-linear 'z * x + x * y', lv 'x'
+> [eva:nonlin] tests/value/nonlin.c:68: subdividing on x
 149a157,158
-> [eva:nonlin] tests/value/nonlin.c:114: non-linear 'x * x', lv 'x'
-> [eva:nonlin] tests/value/nonlin.c:114: subdividing on x
+> [eva:nonlin] tests/value/nonlin.c:112: non-linear 'x * x', lv 'x'
+> [eva:nonlin] tests/value/nonlin.c:112: subdividing on x
 152a162
-> [eva:nonlin] tests/value/nonlin.c:115: subdividing on x
+> [eva:nonlin] tests/value/nonlin.c:113: subdividing on x
 153a164
-> [eva:nonlin] tests/value/nonlin.c:117: subdividing on x
+> [eva:nonlin] tests/value/nonlin.c:115: subdividing on x
 diff tests/value/oracle/plevel.res.oracle tests/value/oracle_octagons/plevel.res.oracle
 12d11
 < [eva] Recording results for main

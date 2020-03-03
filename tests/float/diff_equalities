@@ -27,11 +27,17 @@ diff tests/float/oracle/cond.res.oracle tests/float/oracle_equalities/cond.res.o
 >   dt ∈ [-0x1.4000000000000p3 .. 0x1.fffffe0000000p-1]
 Only in tests/float/oracle: fval_test.res.oracle
 diff tests/float/oracle/nonlin.1.res.oracle tests/float/oracle_equalities/nonlin.1.res.oracle
-60a61
-> [eva:nonlin] tests/float/nonlin.c:42: subdividing on a
-diff tests/float/oracle/nonlin.3.res.oracle tests/float/oracle_equalities/nonlin.3.res.oracle
-60a61
-> [eva:nonlin] tests/float/nonlin.c:42: subdividing on a
+61a62
+> [eva:nonlin] tests/float/nonlin.c:44: subdividing on a
+diff tests/float/oracle/nonlin.2.res.oracle tests/float/oracle_equalities/nonlin.2.res.oracle
+61a62
+> [eva:nonlin] tests/float/nonlin.c:44: subdividing on a
+diff tests/float/oracle/nonlin.4.res.oracle tests/float/oracle_equalities/nonlin.4.res.oracle
+61a62
+> [eva:nonlin] tests/float/nonlin.c:44: subdividing on a
+diff tests/float/oracle/nonlin.5.res.oracle tests/float/oracle_equalities/nonlin.5.res.oracle
+61a62
+> [eva:nonlin] tests/float/nonlin.c:44: subdividing on a
 diff tests/float/oracle/parse.res.oracle tests/float/oracle_equalities/parse.res.oracle
 21a22,23
 > [eva] tests/float/parse.i:37: Warning: 

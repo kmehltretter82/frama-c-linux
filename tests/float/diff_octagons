@@ -5,14 +5,26 @@ Only in tests/float/oracle: absorb_sav2.err
 Only in tests/float/oracle: absorb_sav2.res
 Only in tests/float/oracle: fval_test.res.oracle
 diff tests/float/oracle/nonlin.1.res.oracle tests/float/oracle_octagons/nonlin.1.res.oracle
-253a254,255
-> [eva:nonlin] tests/float/nonlin.c:101: non-linear 'f + f', lv 'f'
-> [eva:nonlin] tests/float/nonlin.c:101: subdividing on f
-257d258
-< [eva:nonlin] tests/float/nonlin.c:101: subdividing on f
-diff tests/float/oracle/nonlin.3.res.oracle tests/float/oracle_octagons/nonlin.3.res.oracle
-253a254,255
-> [eva:nonlin] tests/float/nonlin.c:101: non-linear 'f + f', lv 'f'
-> [eva:nonlin] tests/float/nonlin.c:101: subdividing on f
-257d258
-< [eva:nonlin] tests/float/nonlin.c:101: subdividing on f
+279a280,281
+> [eva:nonlin] tests/float/nonlin.c:113: non-linear 'f + f', lv 'f'
+> [eva:nonlin] tests/float/nonlin.c:113: subdividing on f
+283d284
+< [eva:nonlin] tests/float/nonlin.c:113: subdividing on f
+diff tests/float/oracle/nonlin.2.res.oracle tests/float/oracle_octagons/nonlin.2.res.oracle
+259a260,261
+> [eva:nonlin] tests/float/nonlin.c:113: non-linear 'f + f', lv 'f'
+> [eva:nonlin] tests/float/nonlin.c:113: subdividing on f
+263d264
+< [eva:nonlin] tests/float/nonlin.c:113: subdividing on f
+diff tests/float/oracle/nonlin.4.res.oracle tests/float/oracle_octagons/nonlin.4.res.oracle
+279a280,281
+> [eva:nonlin] tests/float/nonlin.c:113: non-linear 'f + f', lv 'f'
+> [eva:nonlin] tests/float/nonlin.c:113: subdividing on f
+283d284
+< [eva:nonlin] tests/float/nonlin.c:113: subdividing on f
+diff tests/float/oracle/nonlin.5.res.oracle tests/float/oracle_octagons/nonlin.5.res.oracle
+259a260,261
+> [eva:nonlin] tests/float/nonlin.c:113: non-linear 'f + f', lv 'f'
+> [eva:nonlin] tests/float/nonlin.c:113: subdividing on f
+263d264
+< [eva:nonlin] tests/float/nonlin.c:113: subdividing on f
