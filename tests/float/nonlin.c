@@ -1,8 +1,10 @@
 /* run.config*
    OPT: -eva-msg-key nonlin -slevel 30 -eva @EVA_CONFIG@ -cpp-extra-args="-DFLOAT=double" -float-hex -journal-disable -eva-subdivide-non-linear 0
    OPT: -eva-msg-key nonlin -slevel 30 -eva @EVA_CONFIG@ -cpp-extra-args="-DFLOAT=double" -float-hex -journal-disable -eva-subdivide-non-linear 10
+   OPT: -eva-msg-key nonlin -slevel 30 -eva @EVA_CONFIG@ -cpp-extra-args="-DFLOAT=double" -float-hex -journal-disable -eva-subdivide-non-linear 10 -warn-special-float none
    OPT: -eva-msg-key nonlin -slevel 30 -eva @EVA_CONFIG@ -cpp-extra-args="-DFLOAT=float" -float-hex -journal-disable -eva-subdivide-non-linear 0
    OPT: -eva-msg-key nonlin -slevel 30 -eva @EVA_CONFIG@ -cpp-extra-args="-DFLOAT=float" -float-hex -journal-disable -eva-subdivide-non-linear 10
+   OPT: -eva-msg-key nonlin -slevel 30 -eva @EVA_CONFIG@ -cpp-extra-args="-DFLOAT=float" -float-hex -journal-disable -eva-subdivide-non-linear 10 -warn-special-float none
 */
 
 #include "__fc_builtin.h"
@@ -79,6 +81,15 @@ void norm() {
   float v1 = v;
   float v2 = v;
   double square = (double)v1*v1+(double)v2*v2;
+  v1 = Frama_C_float_interval(-1e22, 1e18);
+  v2 = Frama_C_float_interval(-1e22, 1e18);
+  /* Without subdivision, v1*v1 = v2*v2 = [-∞..∞]. Thus the subdivision of [v1]
+     only (or [v2] only) cannot improve the precision of the final expression,
+     while the subdivision of both variables leads to a positive interval.
+     To be precise here, the subdivision should not be stopped when it does not
+     improve the final interval but other subdivisions might. Note that a single
+     split of each variable at 0 is enough to achieve maximal precision here. */
+  float square2 = v1*v1 + v2*v2;
 }
 
 // a bug resulted in an invalid interval due to the presence of garbled mix
@@ -97,8 +108,36 @@ void around_zeros() {
   float f = Frama_C_float_interval(-0, f1);
   /* The +f-f is needed to activate the subdivisions.
      The [f1] value is removed from [f], which must become [-0. .. 0.]
-     and not the singleton {-0.}.  */
+     and not the singleton {-0.}.
+     No reduction when infinities are allowed (with -warn-special-float none). */
   float res = f1 / (f+f-f - f1);
+}
+
+volatile FLOAT nondet;
+
+/* This function is carefully designed to illustrate the difference between
+   several strategies to subdivide a floating-point interval. In particular,
+   float_interval provides two implementations to cut in half an interval:
+   1. cut the interval at the mathematical average between its two bounds.
+   2. balance the number of representable floating-point values in both
+      resulting intervals. */
+void subdivide_strategy () {
+  FLOAT x, d;
+  x = Frama_C_float_interval(-0.1, 100);
+  /* Square of an interval not centered at 0: starting the subdivisions by
+     splitting the interval between negative and positive values greatly
+     improves the precision on such code. */
+  FLOAT square1 = x * x;
+  x = nondet;
+  d = 0.125;
+  /* Here the optimal subdivision is to cut the interval at [d]. As [d] is close
+     to 0, the "balance" split is better as it splits intervals closer to 0. */
+  FLOAT square2 = (x - d) * (x - d);
+  x = Frama_C_float_interval(-4e4, 4e4);
+  d = 1e4;
+  /* Here the optimal subdivision is to cut the interval at [d]. As [d] is close
+     to the average between 0 and max(x), the "average" split is better. */
+  FLOAT square3 = (x - d) * (x - d);
 }
 
 void main() {
@@ -108,4 +147,5 @@ void main() {
   norm();
   garbled();
   around_zeros();
+  subdivide_strategy();
 }

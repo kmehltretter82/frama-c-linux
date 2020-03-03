@@ -64,97 +64,97 @@
   {{ "a" }},
   [0x1.4000000000000p2 .. 0x1.4800000000000p2],
   {{ "r2" }},
-  [0x1.4000000000000p2 .. 0x1.c0fffffffffffp2]
+  [0x1.4000000000000p2 .. 0x1.c0fffe0000000p2]
 [eva] tests/float/nonlin.c:44: 
   Frama_C_show_each_a_r2:
   {{ "a" }},
   [0x1.4800000000000p2 .. 0x1.5000000000000p2],
   {{ "r2" }},
-  [0x1.4800000000000p2 .. 0x1.c0fffffffffffp2]
+  [0x1.4800000000000p2 .. 0x1.c0fffe0000000p2]
 [eva] tests/float/nonlin.c:44: 
   Frama_C_show_each_a_r2:
   {{ "a" }},
   [0x1.5000000000000p2 .. 0x1.5800000000000p2],
   {{ "r2" }},
-  [0x1.5000000000000p2 .. 0x1.c0fffffffffffp2]
+  [0x1.5000000000000p2 .. 0x1.c0fffe0000000p2]
 [eva] tests/float/nonlin.c:44: 
   Frama_C_show_each_a_r2:
   {{ "a" }},
   [0x1.5800000000000p2 .. 0x1.6000000000000p2],
   {{ "r2" }},
-  [0x1.5800000000000p2 .. 0x1.c0fffffffffffp2]
+  [0x1.5800000000000p2 .. 0x1.c0fffe0000000p2]
 [eva] tests/float/nonlin.c:44: 
   Frama_C_show_each_a_r2:
   {{ "a" }},
   [0x1.6000000000000p2 .. 0x1.6800000000000p2],
   {{ "r2" }},
-  [0x1.6000000000000p2 .. 0x1.c0fffffffffffp2]
+  [0x1.6000000000000p2 .. 0x1.c0fffe0000000p2]
 [eva] tests/float/nonlin.c:44: 
   Frama_C_show_each_a_r2:
   {{ "a" }},
   [0x1.6800000000000p2 .. 0x1.7000000000000p2],
   {{ "r2" }},
-  [0x1.6800000000000p2 .. 0x1.c0fffffffffffp2]
+  [0x1.6800000000000p2 .. 0x1.c0fffe0000000p2]
 [eva] tests/float/nonlin.c:44: 
   Frama_C_show_each_a_r2:
   {{ "a" }},
   [0x1.7000000000000p2 .. 0x1.7800000000000p2],
   {{ "r2" }},
-  [0x1.7000000000000p2 .. 0x1.c0fffffffffffp2]
+  [0x1.7000000000000p2 .. 0x1.c0fffe0000000p2]
 [eva] tests/float/nonlin.c:44: 
   Frama_C_show_each_a_r2:
   {{ "a" }},
   [0x1.7800000000000p2 .. 0x1.8000000000000p2],
   {{ "r2" }},
-  [0x1.7800000000000p2 .. 0x1.c0fffffffffffp2]
+  [0x1.7800000000000p2 .. 0x1.c0fffe0000000p2]
 [eva] tests/float/nonlin.c:44: 
   Frama_C_show_each_a_r2:
   {{ "a" }},
   [0x1.8000000000000p2 .. 0x1.8800000000000p2],
   {{ "r2" }},
-  [0x1.8000000000000p2 .. 0x1.c0fffffffffffp2]
+  [0x1.8000000000000p2 .. 0x1.c0fffe0000000p2]
 [eva] tests/float/nonlin.c:44: 
   Frama_C_show_each_a_r2:
   {{ "a" }},
   [0x1.8800000000000p2 .. 0x1.9000000000000p2],
   {{ "r2" }},
-  [0x1.8800000000000p2 .. 0x1.c0fffffffffffp2]
+  [0x1.8800000000000p2 .. 0x1.c0fffe0000000p2]
 [eva] tests/float/nonlin.c:44: 
   Frama_C_show_each_a_r2:
   {{ "a" }},
   [0x1.9000000000000p2 .. 0x1.9800000000000p2],
   {{ "r2" }},
-  [0x1.9000000000000p2 .. 0x1.c0fffffffffffp2]
+  [0x1.9000000000000p2 .. 0x1.c0fffe0000000p2]
 [eva] tests/float/nonlin.c:44: 
   Frama_C_show_each_a_r2:
   {{ "a" }},
   [0x1.9800000000000p2 .. 0x1.a000000000000p2],
   {{ "r2" }},
-  [0x1.9800000000000p2 .. 0x1.c0fffffffffffp2]
+  [0x1.9800000000000p2 .. 0x1.c0fffe0000000p2]
 [eva] tests/float/nonlin.c:44: 
   Frama_C_show_each_a_r2:
   {{ "a" }},
   [0x1.a000000000000p2 .. 0x1.a800000000000p2],
   {{ "r2" }},
-  [0x1.a000000000000p2 .. 0x1.c0fffffffffffp2]
+  [0x1.a000000000000p2 .. 0x1.c0fffe0000000p2]
 [eva] tests/float/nonlin.c:44: 
   Frama_C_show_each_a_r2:
   {{ "a" }},
   [0x1.a800000000000p2 .. 0x1.b000000000000p2],
   {{ "r2" }},
-  [0x1.a800000000000p2 .. 0x1.c0fffffffffffp2]
+  [0x1.a800000000000p2 .. 0x1.c0fffe0000000p2]
 [eva] tests/float/nonlin.c:44: 
   Frama_C_show_each_a_r2:
   {{ "a" }},
   [0x1.b000000000000p2 .. 0x1.b800000000000p2],
   {{ "r2" }},
-  [0x1.b000000000000p2 .. 0x1.c0fffffffffffp2]
+  [0x1.b000000000000p2 .. 0x1.c0fffe0000000p2]
 [eva] tests/float/nonlin.c:44: 
   Frama_C_show_each_a_r2:
   {{ "a" }},
   [0x1.b800000000000p2 .. 0x1.c000000000000p2],
   {{ "r2" }},
-  [0x1.b800000000000p2 .. 0x1.c0fffffffffffp2]
+  [0x1.b800000000000p2 .. 0x1.c0fffe0000000p2]
 [eva] Recording results for nonlin_f
 [eva] Done for function nonlin_f
 [eva] computing for function other <- main.
@@ -177,7 +177,7 @@
 [eva:nonlin] tests/float/nonlin.c:63: subdividing on i
 [eva:alarm] tests/float/nonlin.c:63: Warning: 
   accessing out of bounds index.
-  assert (int)((double)((double)(i * i) + 2.0)) < 10;
+  assert (int)((double)((double)((float)(i * i)) + 2.0)) < 10;
 [eva:nonlin] tests/float/nonlin.c:64: non-linear 's - s', lv 's'
 [eva:nonlin] tests/float/nonlin.c:64: subdividing on s
 [eva:nonlin] tests/float/nonlin.c:65: non-linear 's - s', lv 's'
@@ -186,7 +186,7 @@
 [eva:nonlin] tests/float/nonlin.c:66: subdividing on s
 [eva:nonlin] tests/float/nonlin.c:67: non-linear 's * s', lv 's'
 [eva:nonlin] tests/float/nonlin.c:67: subdividing on s
-[eva:nonlin] tests/float/nonlin.c:68: non-linear 's * ((double)1 - s)', lv 's'
+[eva:nonlin] tests/float/nonlin.c:68: non-linear 's * ((float)1 - s)', lv 's'
 [eva:nonlin] tests/float/nonlin.c:68: subdividing on s
 [eva] computing for function access_bits <- other <- main.
   Called from tests/float/nonlin.c:69.
@@ -298,13 +298,13 @@
 [eva:nonlin] tests/float/nonlin.c:130: non-linear 'x_0 * x_0', lv 'x_0'
 [eva:nonlin] tests/float/nonlin.c:130: subdividing on x_0
 [eva:alarm] tests/float/nonlin.c:131: Warning: 
-  non-finite double value. assert \is_finite(nondet);
+  non-finite float value. assert \is_finite(nondet);
 [eva:nonlin] tests/float/nonlin.c:135: 
   non-linear '(x_0 - d_0) * (x_0 - d_0)', lv 'd_0, x_0'
 [eva:nonlin] tests/float/nonlin.c:135: subdividing on x_0
 [eva:alarm] tests/float/nonlin.c:135: Warning: 
-  non-finite double value.
-  assert \is_finite((double)((double)(x_0 - d_0) * (double)(x_0 - d_0)));
+  non-finite float value.
+  assert \is_finite((float)((float)(x_0 - d_0) * (float)(x_0 - d_0)));
 [eva] computing for function Frama_C_float_interval <- subdivide_strategy <- main.
   Called from tests/float/nonlin.c:136.
 [eva] tests/float/nonlin.c:136: 
@@ -320,7 +320,7 @@
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function access_bits:
   rbits1 ∈ {0; 1; 2}
-  x0 ∈ [--..--]
+  x0 ∈ [0..3225911288]
   __retres ∈ {0; 1}
 [eva:final-states] Values at end of function around_zeros:
   Frama_C_entropy_source ∈ [--..--]
@@ -337,8 +337,8 @@
   a ∈ [0x1.4000000000000p2 .. 0x1.c000000000000p2]
   b ∈ [-0x0.0000000000000p0 .. 0x1.0000000000000p0]
   c ∈ {0x1.c000000000000p2}
-  r1 ∈ [0x1.4000000000000p2 .. 0x1.cffffffffffffp2]
-  r2 ∈ [0x1.4000000000000p2 .. 0x1.c0fffffffffffp2]
+  r1 ∈ [0x1.4000000000000p2 .. 0x1.cffffe0000000p2]
+  r2 ∈ [0x1.4000000000000p2 .. 0x1.c0fffe0000000p2]
   d ∈ [0x1.4000000000000p2 .. 0x1.c000000000000p2]
 [eva:final-states] Values at end of function norm:
   Frama_C_entropy_source ∈ [--..--]
@@ -348,12 +348,12 @@
   square2 ∈ [0x0.0000000000000p0 .. 0x1.fffffe0000000p127]
 [eva:final-states] Values at end of function other:
   Frama_C_entropy_source ∈ [--..--]
-  i ∈ [-0x1.8effffffffff7p1 .. 0x1.8680000000000p1]
+  i ∈ [-0x1.8efff00000000p1 .. 0x1.8680000000000p1]
   s ∈ [-0x1.0a00000000000p7 .. 0x1.1c00000000000p7]
-  zf ∈ [-0x1.1bffffffffffcp4 .. 0x1.1bffffffffffcp4]
+  zf ∈ [-0x1.1bfff80000000p4 .. 0x1.1bfff80000000p4]
   s2 ∈ [-0x1.0a00000000000p8 .. 0x1.1c00000000000p8]
   sq ∈ [0x0.0000000000000p0 .. 0x1.3b10000000000p14]
-  h ∈ [-0x1.38d8000000000p14 .. 0x1.f9dfffffffffep-2]
+  h ∈ [-0x1.38d8000000000p14 .. 0x1.f9dffc0000000p-2]
   r ∈ {4; 5; 6; 7; 8; 9; 10; 11}
   x ∈ [1..42]
   y ∈ {0; 1}
@@ -368,22 +368,22 @@
   x_0 ∈ [-0x1.3880000000000p15 .. 0x1.3880000000000p15]
   d_0 ∈ {0x1.3880000000000p13}
   square1 ∈ [0x0.0000000000000p0 .. 0x1.3880000000000p13]
-  square2 ∈ [-0x1.fffffffffffffp1001 .. 0x1.fffffffffffffp1023]
+  square2 ∈ [-0x1.fffffe0000000p105 .. 0x1.fffffe0000000p127]
   square3 ∈ [-0x0.0000000000000p0 .. 0x1.2a05f20000000p31]
 [eva:final-states] Values at end of function main:
   Frama_C_entropy_source ∈ [--..--]
   a ∈ [0x1.4000000000000p2 .. 0x1.c000000000000p2]
   b ∈ [-0x0.0000000000000p0 .. 0x1.0000000000000p0]
   c ∈ {0x1.c000000000000p2}
-  r1 ∈ [0x1.4000000000000p2 .. 0x1.cffffffffffffp2]
-  r2 ∈ [0x1.4000000000000p2 .. 0x1.c0fffffffffffp2]
+  r1 ∈ [0x1.4000000000000p2 .. 0x1.cffffe0000000p2]
+  r2 ∈ [0x1.4000000000000p2 .. 0x1.c0fffe0000000p2]
   d ∈ [0x1.4000000000000p2 .. 0x1.c000000000000p2]
-  i ∈ [-0x1.8effffffffff7p1 .. 0x1.8680000000000p1]
+  i ∈ [-0x1.8efff00000000p1 .. 0x1.8680000000000p1]
   s ∈ [-0x1.0a00000000000p7 .. 0x1.1c00000000000p7]
-  zf ∈ [-0x1.1bffffffffffcp4 .. 0x1.1bffffffffffcp4]
+  zf ∈ [-0x1.1bfff80000000p4 .. 0x1.1bfff80000000p4]
   s2 ∈ [-0x1.0a00000000000p8 .. 0x1.1c00000000000p8]
   sq ∈ [0x0.0000000000000p0 .. 0x1.3b10000000000p14]
-  h ∈ [-0x1.38d8000000000p14 .. 0x1.f9dfffffffffep-2]
+  h ∈ [-0x1.38d8000000000p14 .. 0x1.f9dffc0000000p-2]
   r ∈ {4; 5; 6; 7; 8; 9; 10; 11}
   x ∈ [1..42]
   y ∈ {0; 1}

@@ -24,7 +24,7 @@
        [31] ∈ {5}
        [32..35] ∈ {0}
 [eva] computing for function subdivide_integer <- main.
-  Called from tests/value/nonlin.c:121.
+  Called from tests/value/nonlin.c:119.
 [eva:nonlin] tests/value/nonlin.c:31: 
   non-linear '((int)z + 675) * ((int)z + 675)', lv 'z'
 [eva:nonlin] tests/value/nonlin.c:31: subdividing on z
@@ -45,7 +45,7 @@
 [eva] Recording results for subdivide_integer
 [eva] Done for function subdivide_integer
 [eva] computing for function subdivide_pointer <- main.
-  Called from tests/value/nonlin.c:122.
+  Called from tests/value/nonlin.c:120.
 [eva] computing for function Frama_C_interval <- subdivide_pointer <- main.
   Called from tests/value/nonlin.c:12.
 [eva] using specification for function Frama_C_interval
@@ -68,7 +68,7 @@
 [eva] Recording results for subdivide_pointer
 [eva] Done for function subdivide_pointer
 [eva] computing for function subdivide_several_variables <- main.
-  Called from tests/value/nonlin.c:123.
+  Called from tests/value/nonlin.c:121.
 [eva] computing for function Frama_C_interval <- subdivide_several_variables <- 
                           main.
   Called from tests/value/nonlin.c:51.
@@ -97,61 +97,61 @@
 [eva:nonlin] tests/value/nonlin.c:56: non-linear 'y * y', lv 'y'
 [eva:nonlin] tests/value/nonlin.c:56: subdividing on x
 [eva:nonlin] tests/value/nonlin.c:56: subdividing on y
-[eva:nonlin] tests/value/nonlin.c:62: non-linear 'x * x', lv 'x'
-[eva:nonlin] tests/value/nonlin.c:62: non-linear '((x * x) * y) * y', lv 'y'
-[eva:nonlin] tests/value/nonlin.c:62: subdividing on x
-[eva:nonlin] tests/value/nonlin.c:62: subdividing on y
-[eva:nonlin] tests/value/nonlin.c:64: non-linear 'x * y - y * x', lv 'y, x'
-[eva:nonlin] tests/value/nonlin.c:64: subdividing on x, y
-[eva:nonlin] tests/value/nonlin.c:67: 
+[eva:nonlin] tests/value/nonlin.c:60: non-linear 'x * x', lv 'x'
+[eva:nonlin] tests/value/nonlin.c:60: non-linear '((x * x) * y) * y', lv 'y'
+[eva:nonlin] tests/value/nonlin.c:60: subdividing on x
+[eva:nonlin] tests/value/nonlin.c:60: subdividing on y
+[eva:nonlin] tests/value/nonlin.c:62: non-linear 'x * y - y * x', lv 'y, x'
+[eva:nonlin] tests/value/nonlin.c:62: subdividing on x, y
+[eva:nonlin] tests/value/nonlin.c:65: 
   non-linear '(x * x - (2 * x) * y) + y * y', lv 'y, x'
-[eva:nonlin] tests/value/nonlin.c:67: subdividing on x, y
-[eva:nonlin] tests/value/nonlin.c:68: 
+[eva:nonlin] tests/value/nonlin.c:65: subdividing on x, y
+[eva:nonlin] tests/value/nonlin.c:66: 
   non-linear '(x * x + y * y) - (2 * x) * y', lv 'y, x'
-[eva:nonlin] tests/value/nonlin.c:68: subdividing on x, y
-[eva:nonlin] tests/value/nonlin.c:70: 
+[eva:nonlin] tests/value/nonlin.c:66: subdividing on x, y
+[eva:nonlin] tests/value/nonlin.c:68: 
   non-linear '(z * x + x * y) + y * z', lv 'z, y, x'
-[eva:nonlin] tests/value/nonlin.c:70: non-linear 'w * w', lv 'w'
-[eva:nonlin] tests/value/nonlin.c:70: subdividing on x, y, z
-[eva:nonlin] tests/value/nonlin.c:70: subdividing on w
+[eva:nonlin] tests/value/nonlin.c:68: non-linear 'w * w', lv 'w'
+[eva:nonlin] tests/value/nonlin.c:68: subdividing on x, y, z
+[eva:nonlin] tests/value/nonlin.c:68: subdividing on w
 [eva] Recording results for subdivide_several_variables
 [eva] Done for function subdivide_several_variables
 [eva] computing for function subdivide_table <- main.
-  Called from tests/value/nonlin.c:124.
-[eva] tests/value/nonlin.c:89: loop invariant got status valid.
-[eva] tests/value/nonlin.c:90: starting to merge loop iterations
-[eva:nonlin] tests/value/nonlin.c:91: 
+  Called from tests/value/nonlin.c:122.
+[eva] tests/value/nonlin.c:87: loop invariant got status valid.
+[eva] tests/value/nonlin.c:88: starting to merge loop iterations
+[eva:nonlin] tests/value/nonlin.c:89: 
   non-linear '(4 + ((x >> 2) * 3 << 2)) + x % 4', lv 'x'
-[eva:nonlin] tests/value/nonlin.c:91: subdividing on x
+[eva:nonlin] tests/value/nonlin.c:89: subdividing on x
 [eva] Recording results for subdivide_table
 [eva] Done for function subdivide_table
 [eva] computing for function subdivide_reduced_value <- main.
-  Called from tests/value/nonlin.c:125.
-[eva:nonlin] tests/value/nonlin.c:103: non-linear 't1[i] - t2[i]', lv 'i'
-[eva:nonlin] tests/value/nonlin.c:103: subdividing on i
-[eva:alarm] tests/value/nonlin.c:103: Warning: 
+  Called from tests/value/nonlin.c:123.
+[eva:nonlin] tests/value/nonlin.c:101: non-linear 't1[i] - t2[i]', lv 'i'
+[eva:nonlin] tests/value/nonlin.c:101: subdividing on i
+[eva:alarm] tests/value/nonlin.c:101: Warning: 
   accessing out of bounds index. assert 0 ≤ i;
-[eva:alarm] tests/value/nonlin.c:103: Warning: 
+[eva:alarm] tests/value/nonlin.c:101: Warning: 
   accessing out of bounds index. assert i < 2;
 [eva] Recording results for subdivide_reduced_value
 [eva] Done for function subdivide_reduced_value
 [eva] computing for function local_subdivide <- main.
-  Called from tests/value/nonlin.c:126.
+  Called from tests/value/nonlin.c:124.
 [eva] computing for function Frama_C_interval <- local_subdivide <- main.
-  Called from tests/value/nonlin.c:109.
-[eva] tests/value/nonlin.c:109: 
+  Called from tests/value/nonlin.c:107.
+[eva] tests/value/nonlin.c:107: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- local_subdivide <- main.
-  Called from tests/value/nonlin.c:110.
-[eva] tests/value/nonlin.c:110: 
+  Called from tests/value/nonlin.c:108.
+[eva] tests/value/nonlin.c:108: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva:nonlin] tests/value/nonlin.c:114: 
+[eva:nonlin] tests/value/nonlin.c:112: 
   non-linear '(x * x - (2 * x) * y) + y * y', lv 'y, x'
-[eva:nonlin] tests/value/nonlin.c:114: subdividing on x, y
+[eva:nonlin] tests/value/nonlin.c:112: subdividing on x, y
+[eva:nonlin] tests/value/nonlin.c:113: subdividing on x, y
 [eva:nonlin] tests/value/nonlin.c:115: subdividing on x, y
-[eva:nonlin] tests/value/nonlin.c:117: subdividing on x, y
 [eva] Recording results for local_subdivide
 [eva] Done for function local_subdivide
 [eva] Recording results for main
@@ -198,7 +198,7 @@
   y ∈ [-10..10]
   z ∈ [-10..10]
   norm ∈ [0..200]
-  mult ∈ [-10000..10000]
+  mult ∈ [0..10000]
   zero ∈ [-26..26]
   square ∈ [-48..400]
   square2 ∈ [-48..400]

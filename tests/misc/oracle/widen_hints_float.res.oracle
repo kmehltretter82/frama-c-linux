@@ -145,7 +145,7 @@
   Frama_C_entropy_source ∈ [--..--]
   f1 ∈ [-0. .. 71.]
   f2 ∈ [-80. .. 0.]
-  f3 ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+  f3 ∈ [-1.79769313486e+308 .. 10000000000.]
 [eva:final-states] Values at end of function trigo:
   Frama_C_entropy_source ∈ [--..--]
   f1 ∈ [-1. .. 1.]

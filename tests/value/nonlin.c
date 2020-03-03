@@ -54,11 +54,9 @@ void subdivide_several_variables () {
   int z = Frama_C_interval(-10, 10);
   /* A subdivision on each variable separately is more efficient here. */
   int norm = x * x + y * y;
-  /* Subdivide on x, then on y.
-     This evaluation is currently imprecise as the subdivision is stopped when
-     it seems not to improve the bounds of the result. Here however, the
-     subdivision on x would improve the value of x*x, and the subdivision on y
-     would then improve the value of the expression. */
+  /* Subdivide on x, then on y. Note that the subdivision on x does not improve
+     the result but only the value of x*x, while the later subdivision on y
+     improve the value of the result thanks to the reduced value of x*x. */
   int mult = ((x*x)*y)*y;
   /* A subdivision on both variables is more efficient here. */
   int zero = x * y - y * x;
