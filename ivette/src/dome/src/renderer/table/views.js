@@ -314,9 +314,11 @@ export class Table extends React.Component {
     this.setTableRef = (ref) => this.tableRef = ref ;
     this.reloadTable = () => {
       this.reloaded = true ;
-      this.forceUpdate();
-      const ref = this.tableRef ;
-      ref && ref.forceUpdateGrid();
+      setImmediate(() => {
+        this.forceUpdate();
+        const ref = this.tableRef ;
+        ref && ref.forceUpdateGrid();
+      });
     };
 
     // Model Watching
