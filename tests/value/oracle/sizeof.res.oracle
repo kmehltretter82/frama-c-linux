@@ -18,6 +18,8 @@
 [eva] Done for function main1
 [eva] computing for function main2 <- main.
   Called from tests/value/sizeof.i:41.
+[eva:alarm] tests/value/sizeof.i:32: Warning: 
+  pointer downcast. assert (unsigned int)&s1 ≤ 2147483647;
 [eva] tests/value/sizeof.i:32: 
   Assigning imprecise value to p.
   The imprecision originates from Arithmetic {tests/value/sizeof.i:32}
@@ -124,6 +126,7 @@ struct s s1;
 int volatile i;
 void main2(void)
 {
+  /*@ assert Eva: pointer_downcast: (unsigned int)&s1 ≤ 2147483647; */
   struct s *p = (& s1 + (int)(& s1)) - (int)(& s1);
   /*@ assert
       Eva: index_bound: (unsigned int)(sizeof(s1.t) - (unsigned int)i) < 10;

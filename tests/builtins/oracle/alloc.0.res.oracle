@@ -35,6 +35,8 @@
 [eva] tests/builtins/alloc.c:25: Call to builtin Frama_C_malloc_fresh
 [eva] tests/builtins/alloc.c:25: allocating variable __malloc_main_l25
 [eva:alarm] tests/builtins/alloc.c:26: Warning: 
+  pointer downcast. assert (unsigned int)q ≤ 2147483647;
+[eva:alarm] tests/builtins/alloc.c:26: Warning: 
   signed overflow. assert -2147483648 ≤ -((int)q);
 [eva:alarm] tests/builtins/alloc.c:26: Warning: 
   signed overflow. assert -((int)q) ≤ 2147483647;

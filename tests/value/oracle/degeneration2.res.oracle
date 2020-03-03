@@ -7,6 +7,8 @@
 [eva:alarm] tests/value/degeneration2.i:14: Warning: 
   accessing uninitialized left-value. assert \initialized(&A);
 [eva:alarm] tests/value/degeneration2.i:14: Warning: 
+  pointer downcast. assert (unsigned int)A ≤ 2147483647;
+[eva:alarm] tests/value/degeneration2.i:14: Warning: 
   signed overflow. assert -2147483648 ≤ -((int)A);
 [eva:alarm] tests/value/degeneration2.i:14: Warning: 
   signed overflow. assert -((int)A) ≤ 2147483647;

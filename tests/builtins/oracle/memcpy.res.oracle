@@ -128,6 +128,8 @@
   function memcpy: precondition 'valid_src' got status valid.
 [eva] tests/builtins/memcpy.c:85: 
   function memcpy: precondition 'separation' got status valid.
+[eva:alarm] tests/builtins/memcpy.c:87: Warning: 
+  pointer downcast. assert (unsigned int)(struct t1 *)t ≤ 2147483647;
 [eva] tests/builtins/memcpy.c:87: Call to builtin memcpy
 [eva] tests/builtins/memcpy.c:87: 
   function memcpy: precondition 'valid_dest' got status valid.
@@ -135,6 +137,8 @@
   function memcpy: precondition 'valid_src' got status unknown.
 [eva] tests/builtins/memcpy.c:87: 
   function memcpy: precondition 'separation' got status valid.
+[eva:alarm] tests/builtins/memcpy.c:89: Warning: 
+  pointer downcast. assert (unsigned int)&v4 ≤ 2147483647;
 [eva] tests/builtins/memcpy.c:89: Call to builtin memcpy
 [eva:alarm] tests/builtins/memcpy.c:89: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
@@ -145,6 +149,10 @@
 [kernel] tests/builtins/memcpy.c:89: 
   writing somewhere in {NULL; v4} because of Arithmetic
                                  {tests/builtins/memcpy.c:89}.
+[eva:alarm] tests/builtins/memcpy.c:90: Warning: 
+  pointer downcast. assert (unsigned int)(struct t1 *)t ≤ 2147483647;
+[eva:alarm] tests/builtins/memcpy.c:91: Warning: 
+  pointer downcast. assert (unsigned int)&v5 ≤ 2147483647;
 [eva] tests/builtins/memcpy.c:91: Call to builtin memcpy
 [eva:alarm] tests/builtins/memcpy.c:91: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
@@ -452,6 +460,7 @@
 [from] Non-terminating function main_all (no dependencies)
 [from] Done for function main_all
 [eva] done for function main_all
+[scope:rm_asserts] removing 1 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function init:
   src[0] ∈ {1}
@@ -1871,6 +1880,15 @@
             tried with Eva.
 [    -    ] Assertion (file tests/builtins/memcpy.c, line 152)
             tried with Eva.
+[    -    ] Assertion 'Eva,pointer_downcast' (file tests/builtins/memcpy.c, line 87)
+            tried with Eva.
+[    -    ] Assertion 'Eva,pointer_downcast' (file tests/builtins/memcpy.c, line 89)
+            tried with Eva.
+[ Partial ] Assertion 'Eva,pointer_downcast' (file tests/builtins/memcpy.c, line 90)
+            By RedundantAlarms, with pending:
+             - Assertion 'Eva,pointer_downcast' (file tests/builtins/memcpy.c, line 87)
+[    -    ] Assertion 'Eva,pointer_downcast' (file tests/builtins/memcpy.c, line 91)
+            tried with Eva.
 [  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file tests/builtins/memcpy.c, line 68)
 
             by Eva.
@@ -2221,8 +2239,9 @@
 --- Status Report Summary
 --------------------------------------------------------------------------------
    162 Completely validated
+     1 Locally validated
    239 Considered valid
-    29 To be validated
+    32 To be validated
      4 Alarms emitted
-   434 Total
+   438 Total
 --------------------------------------------------------------------------------

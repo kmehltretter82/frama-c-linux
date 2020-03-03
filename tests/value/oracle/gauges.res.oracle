@@ -241,6 +241,10 @@
   Called from tests/value/gauges.c:361.
 [eva] tests/value/gauges.c:186: starting to merge loop iterations
 [eva:alarm] tests/value/gauges.c:188: Warning: 
+  pointer downcast. assert (unsigned int)p ≤ 2147483647;
+[eva:alarm] tests/value/gauges.c:188: Warning: 
+  pointer downcast. assert (unsigned int)q ≤ 2147483647;
+[eva:alarm] tests/value/gauges.c:188: Warning: 
   signed overflow. assert -2147483648 ≤ (int)p + (int)q;
 [eva:alarm] tests/value/gauges.c:188: Warning: 
   signed overflow. assert (int)p + (int)q ≤ 2147483647;
