@@ -22,6 +22,7 @@ import './tables.css' ;
 // --------------------------------------------------------------------------
 
 const headerRowRenderer =
+      (contextMenu) =>
       // Borrowed from react-virtualized Table.defaultHeaderRowRenderer
       ({
         className,
@@ -30,7 +31,8 @@ const headerRowRenderer =
       }) => (
         <div role="row"
              className={className}
-             style={style} >
+             style={style}
+             onContextMenu={contextMenu} >
           {columns}
         </div>
       );
@@ -57,7 +59,6 @@ headerSorter[ SortDirection.ASC ] = makeSorter('ANGLE.UP');
 headerSorter[ SortDirection.DESC ] = makeSorter('ANGLE.DOWN');
 
 const headerRenderer =
-      (onContextMenu) =>
       ({
         columnData: { label, icon, title, headerRef },
         dataKey,
@@ -66,11 +67,9 @@ const headerRenderer =
       }) => {
         const tooltip = title || label ;
         const onRef = (elt) => headerRef(dataKey,elt) ;
-        const sorter = dataKey == sortBy ? headerSorter[sortDirection] : undefined ;
+        const sorter = dataKey === sortBy ? headerSorter[sortDirection] : undefined ;
         return (
-          <div className='dome-xTable-header' title={tooltip} ref={onRef}
-               onContextMenu={onContextMenu}
-            >
+          <div className='dome-xTable-header' title={tooltip} ref={onRef} >
             { headerIcon(icon) }
             { headerLabel(label) }
             { sorter }
@@ -140,6 +139,7 @@ const computeWidth = (elt) => {
    @property {boolean} [fill] - Extensible column (not by default)
    @property {boolean} [fixed] - Non-resizable column (not by default)
    @property {boolean} [disableSort] - Do not trigger sorting callback for this column
+   @property {boolean|string} [visible] - Default column visibility
    @property {function} [getValue] - Obtain an item's value for this column
    @property {function} [renderValue] - Render item's value in each table cell
    @description
@@ -170,6 +170,10 @@ const computeWidth = (elt) => {
    If no column in the table is explicitely declared to be extensible, the last
    one would be implicitely set to fill.
 
+   Default visiblity can be set to a boolean value ; alternatively, you may specify
+   `visible='never'` to make the column invisible to the user, or `visible='always'`
+   to force the column to be visible.
+
 */
 export const Column = () => null;
 // Fake component only used to store props.
@@ -191,7 +195,7 @@ const vColumn = ({
       flexGrow={ fill ? 1 : 0 }
       dataKey={id}
       columnData={{label,title,icon,headerRef}}
-      headerRenderer={headerRenderer(contextMenu)}
+      headerRenderer={headerRenderer}
       cellRenderer={cellRenderer(renderValue)}
       cellDataGetter={cellDataGetter(getValue)}
       headerStyle={{ textAlign: align }}
@@ -268,12 +272,14 @@ const rowClassName =
 // Must be kept in sync with table.css
 const CSS_HEADER_HEIGHT = 22 ;
 const CSS_ROW_HEIGHT = 20 ;
+const DEFAULT_STATE = { width:{}, resize:{}, visible:{} };
 
 /**
    @class
    @summary Table View.
    @property {Model} model - table data proxy (required)
    @property {Column[]} children - one or more table columns (required)
+   @property {string} [settings] - window settings for column size & visibility (optional)
    @property {any} [selection] - current selection (depends on `multipleSelection`)
    @property {function} [onSelection] - callback to selection changes (depends on `multipleSelection`)
    @property {boolean} [multipleSelection] - select single or multiple selection
@@ -297,8 +303,10 @@ const CSS_ROW_HEIGHT = 20 ;
    expected column and direction, unless disabled _via_ the column
    specification. However, actual sorting (and corresponding feedback on table
    headers) would only take place if the model supports re-ordering and
-   eventually triggers a reload.  Double clicking the table headers resets
-   re-ordering to natural order, with the same considerations.
+   eventually triggers a reload.
+
+   Right-clicking the table headers displays a popup-menu with actions to reset natural ordering,
+   reset column widths and select column visibility.
 
    Tables do not control item selection state. Instead, you shall supply the selection
    state and callback _via_ properties, like any other controlled React components.
@@ -335,9 +343,11 @@ export class Table extends React.Component {
     this.reloadTable = () => {
       this.reloaded = true ;
       setImmediate(() => {
-        this.forceUpdate();
         const ref = this.tableRef ;
-        ref && ref.forceUpdateGrid();
+        if (ref) {
+          this.forceUpdate();
+          ref.forceUpdateGrid();
+        }
       });
     };
 
@@ -349,33 +359,55 @@ export class Table extends React.Component {
     // Default Context Menu
     this.resetOrdering = () => this.props.model.setOrdering() ;
 
+    // Column States
+    this.state = Object.assign(
+      DEFAULT_STATE,
+      Dome.getWindowSetting( this.props.settings )
+    );
+    this.restoreDefaults = () => this.setState( DEFAULT_STATE );
+
     // Header Reset Resizing
-    this.resetResizing = () => {
-      this.columnSize = {};
-      this.columnResize = {};
-      this.forceUpdate();
-    };
+    this.resetResizing = () => this.setState({ width:{}, resize:{} });
 
     // Header Column References
-    this.columnSize = {} ;
     this.headerRef = (id,elt) => {
-      const old = this.columnSize[id];
-      const width = computeWidth(elt);
-      if (elt && old !== width) {
-        this.columnSize[id] = width ;
-        this.forceUpdate();
+      const old = this.state.width[id] ;
+      const current = computeWidth(elt);
+      if (elt && old !== current) {
+        const columns = Object.assign( {}, this.state.width );
+        columns[id] = current ;
+        this.setState({ width: columns });
       }
     };
 
     // Column Resizing
-    this.columnResize = {} ;
     this.resizeColumns = (lcol,rcol,delta) => {
-      const wl = this.columnSize[lcol] + delta ;
-      const wr = this.columnSize[rcol] - delta ;
+      const columnSize = this.state.width ;
+      const wl = columnSize[lcol] + delta ;
+      const wr = columnSize[rcol] - delta ;
       if (wl > 40 && wr > 40) {
-        this.columnResize[lcol] = wl ;
-        this.columnResize[rcol] = wr ;
-        this.forceUpdate();
+        const resize = Object.assign( {}, this.state.resize );
+        resize[lcol] = wl ;
+        resize[rcol] = wr ;
+        this.setState({ resize });
+      }
+    };
+
+    // Column Visibility
+    this.isVisible = (visible) => (elt) => {
+      const props = elt.props ;
+      const v = visible[props.id] ;
+      if (v !== undefined) return v;
+      const p = props.visible ;
+      switch( p ) {
+      case 'never':
+      case null:
+        return false;
+      case 'always':
+      case undefined:
+        return true;
+      default:
+        return p;
       }
     };
 
@@ -389,12 +421,20 @@ export class Table extends React.Component {
 
   componentDidMount()
   {
+    Dome.on('dome.defaults',this.restoreDefaults );
     this.client = this.props.model._bind(this.reloadTable);
   }
 
   componentWillUnmont()
   {
+    Dome.off('dome.defaults',this.restoreDefaults );
     this.props.model._remove(this.client);
+    this.tableRef = undefined ;
+  }
+
+  componentDidUpdate()
+  {
+    Dome.setWindowSetting( this.props.settings, this.state );
   }
 
   // --- Column Resizers
@@ -416,8 +456,9 @@ export class Table extends React.Component {
       if (!r.fixed) cid = r.id ;
     }
     var offset = 0 , resizers = [] ;
+    const columnSize = this.state.width ;
     for (k = 0; k < columns.length - 1 ; k++) {
-      const width = this.columnSize[resizing[k].id] ;
+      const width = columnSize[resizing[k].id] ;
       if (!width) return null;
       offset += width ;
       const a = resizing[k];
@@ -446,10 +487,46 @@ export class Table extends React.Component {
   // --- Context Menu
 
   contextMenu() {
+    var has_order ;
+    var has_width ;
+    var has_default ;
+    const children = this.props.children ;
+    React.Children.forEach(children, (elt) => {
+      if (elt) {
+        const { fixed, disableSort, visible } = elt.props ;
+        if (!disableSort) has_order = true ;
+        if (!fixed) has_width = true ;
+        if (visible!=='always' && visible!=='never')
+          has_default = true ;
+      }
+    });
     const items = [
-      { label: 'Reset Ordering', onClick:this.resetOrdering },
-      { label: 'Reset Column widths', onClick:this.resetResizing },
+      { label: 'Reset Ordering',
+        display:has_order, onClick:this.resetOrdering },
+      { label: 'Reset Column widths',
+        display:has_width, onClick:this.resetResizing },
+      { label: 'Restore Columns defaults',
+        display:has_default, onClick:this.restoreDefaults },
+      'separator'
     ];
+    const visible = Object.assign( {}, this.state.visible );
+    React.Children.forEach(children, (elt) => {
+      if (elt) {
+        switch(elt.props.visible) {
+        case 'never':
+        case 'always':
+          break;
+        default:
+          const { id, label, title } = elt.props ;
+          const checked = this.isVisible(visible)(elt);
+          const onClick = () => {
+            visible[id] = !checked ;
+            this.setState({ visible });
+          };
+          items.push({ label: label || title, checked, onClick });
+        }
+      }
+    });
     Dome.popupMenu(items);
   }
 
@@ -532,7 +609,8 @@ export class Table extends React.Component {
       model , item: (index < itemCount ? model.getItemAt(index) : undefined)
     }) ;
 
-    const columns = React.Children.toArray(this.props.children);
+    const isVisible = this.isVisible(this.state.visible);
+    const columns = React.Children.toArray(this.props.children).filter(isVisible);
     var hasFill = false ;
     var lastElt = undefined ;
     React.Children.forEach(columns,(elt) => {
@@ -551,12 +629,12 @@ export class Table extends React.Component {
       const renderColumn = vColumn({
         headerRef: this.headerRef,
         hasFill, lastElt,
-        columnResize:this.columnResize,
-        contextMenu:this.contextMenu
+        columnResize:this.state.resize
       });
       return (
         <React.Fragment>
           <VTable
+            ref={this.setTableRef}
             key='table'
             displayName='React-Virtualized-Table'
             width={width}
@@ -567,7 +645,7 @@ export class Table extends React.Component {
             rowClassName={rowClassName(multipleSelection,selected)}
             rowHeight={CSS_ROW_HEIGHT}
             headerHeight={CSS_HEADER_HEIGHT}
-            headerRowRenderer={headerRowRenderer}
+            headerRowRenderer={headerRowRenderer(this.contextMenu)}
             onRowsRendered={this.watchModel}
             onRowClick={onSelection && this.selectRow}
             sortBy={ordering && ordering.sortBy}
