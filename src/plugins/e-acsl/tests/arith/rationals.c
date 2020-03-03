@@ -9,7 +9,6 @@ double avg(double a, double b) {
 }
 
 int main(void) {
-  /*@ assert 3 != 1.5; */ ;
   /*@ assert 3 == 1.5 + 1.5; */ ;
   /*@ assert 0.1 == 0.1; */ ;
   /*@ assert (double)1.0 == 1.0; */ ;
