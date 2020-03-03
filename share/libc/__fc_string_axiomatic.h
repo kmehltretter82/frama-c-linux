@@ -44,7 +44,6 @@ __BEGIN_DECLS
   @ }
   @*/
 
-
 /*@ axiomatic MemChr {
   @ logic 𝔹 memchr{L}(char *s, ℤ c, ℤ n)
   @   reads s[0..n - 1];
@@ -52,7 +51,8 @@ __BEGIN_DECLS
   @
   @ logic ℤ memchr_off{L}(char *s, ℤ c, ℤ n)
   @   reads s[0..n - 1];
-  @ // Returns the offset at which [c] appears in [s]. // TODO: is n useful?
+  @ // Returns the offset at which [c] appears in [s], or [n-1] otherwise.
+  @ // It represents the largest searched index when looking for [c] in [s].
   @
   @ axiom memchr_def{L}:
   @   \forall char *s; \forall ℤ c; \forall ℤ n;

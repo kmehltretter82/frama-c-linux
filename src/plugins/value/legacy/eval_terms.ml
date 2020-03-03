@@ -557,29 +557,30 @@ let constraint_trange idx size_arr =
 
 (* Note: "charlen" stands for either strlen or wcslen *)
 
-(* Evaluates the logical predicates [strlen/wcslen] using str* builtins.
-   Returns [res, alarms], where [res] is the return value of [strlen]
-   ([None] the evaluation results in [bottom]). *)
-let logic_charlen_builtin wrapper state v =
+(* Applies a cvalue [builtin] to the list of arguments [args_list] in the
+   current state of [env]. Returns [v, alarms], where [v] is the resulting
+   cvalue, or [None] if the builtin leads to [bottom]. *)
+let apply_logic_builtin builtin env args_list =
   (* the call below could in theory return Builtins.Invalid_nb_of_args,
      but logic typing constraints prevent that. *)
-  let res, alarms = wrapper state [v] in
+  let res, alarms = builtin (env_current_state env) args_list in
   match res with
   | None -> None
-  | Some offsm -> Some (offsm, alarms)
+  | Some offsm ->
+    let v = Extlib.the (Cvalue.V_Offsetmap.single_interval_value offsm) in
+    let v = Cvalue.V_Or_Uninitialized.get_v v in
+    Some (v, alarms)
 
 (* Never raises exceptions; instead, returns [-1,+oo] in case of alarms
    (most imprecise result possible for the logic strlen/wcslen predicates). *)
 let eval_logic_charlen wrapper env v ldeps =
   let eover =
-    match logic_charlen_builtin wrapper (env_current_state env) v with
+    match apply_logic_builtin wrapper env [v] with
     | None -> Cvalue.V.bottom
-    | Some (offsm, alarms) ->
+    | Some (v, alarms) ->
       if alarms
       then Cvalue.V.inject_ival (Ival.inject_range (Some Int.minus_one) None)
-      else
-        let v = Extlib.the (Cvalue.V_Offsetmap.single_interval_value offsm) in
-        Cvalue.V_Or_Uninitialized.get_v v
+      else v
   in
   let eunder = under_from_over eover in
   (* the C strlen function has type size_t, but the logic strlen function has
@@ -590,14 +591,12 @@ let eval_logic_charlen wrapper env v ldeps =
 (* Evaluates the logical predicates strchr/wcschr. *)
 let eval_logic_charchr builtin env s c ldeps_s ldeps_c =
   let eover =
-    match builtin (env_current_state env) [s; c] with
-    | None, _ -> Cvalue.V.bottom
-    | Some offsm, alarms ->
+    match apply_logic_builtin builtin env [s; c] with
+    | None -> Cvalue.V.bottom
+    | Some (r, alarms) ->
       if alarms
       then Cvalue.V.zero_or_one
       else
-        let v = Extlib.the (Cvalue.V_Offsetmap.single_interval_value offsm) in
-        let r = Cvalue.V_Or_Uninitialized.get_v v in
         let ctrue = Cvalue.V.contains_non_zero r
         and cfalse = Cvalue.V.contains_zero r in
         match ctrue, cfalse with
@@ -612,6 +611,23 @@ let eval_logic_charchr builtin env s c ldeps_s ldeps_c =
   let etype = TInt (IBool, []) in
   let ldeps = join_logic_deps ldeps_s ldeps_c in
   { etype; ldeps; eover; empty = false; eunder }
+
+(* Evaluates the logical functions memchr_off/wmemchr_off. *)
+let eval_logic_memchr_off builtin env s c n =
+  let minus_one = Cvalue.V.inject_int Integer.minus_one in
+  let positive = Cvalue.V.inject_ival Ival.positive_integers in
+  let pred_n = Cvalue.V.add_untyped Int_Base.one n.eover minus_one in
+  let n_pos = Cvalue.V.narrow positive pred_n in
+  let eover =
+    if Cvalue.V.is_bottom n_pos then minus_one else
+      match apply_logic_builtin builtin env [s.eover; c.eover; n_pos] with
+      | None -> pred_n
+      | Some (v, alarms) ->
+        if alarms then Cvalue.V.join pred_n v else
+        if Cvalue.V.equal n_pos pred_n then v else Cvalue.V.join minus_one v
+  in
+  let ldeps = join_logic_deps s.ldeps (join_logic_deps c.ldeps n.ldeps) in
+  { (einteger eover) with ldeps }
 
 (* Evaluates the logical predicate is_allocable, according to the following
    logic:
@@ -682,6 +698,8 @@ let known_logic_funs = [
   "wcslen", Libc;
   "strchr", Libc;
   "wcschr", Libc;
+  "memchr_off", Libc;
+  "wmemchr_off", Libc;
   "atan2", ACSL;
   "atan2f", ACSL;
   "pow", ACSL;
@@ -1304,6 +1322,17 @@ and eval_known_logic_function ~alarm_mode env li labels args =
     in
     eval_logic_charlen builtin { env with e_cur = lbl } r.eover r.ldeps
 
+  | ("memchr_off" | "wmemchr_off") as b,  _, [lbl], [arg_s; arg_c; arg_n] ->
+    let s = eval_term ~alarm_mode env arg_s in
+    let c = eval_term ~alarm_mode env arg_c in
+    let n = eval_term ~alarm_mode env arg_n in
+    let builtin =
+      if b = "memchr_off"
+      then Builtins_string.frama_c_memchr_off_wrapper
+      else Builtins_string.frama_c_wmemchr_off_wrapper
+    in
+    eval_logic_memchr_off builtin { env with e_cur = lbl } s c n
+
   | ("strchr" | "wcschr") as b,  _, [lbl], [arg_s; arg_c] ->
     let s = eval_term ~alarm_mode env arg_s in
     let c = eval_term ~alarm_mode env arg_c in
@@ -1526,7 +1555,7 @@ let eval_valid_read_str ~wide env v =
     if wide then Builtins_string.frama_c_wcslen_wrapper
     else Builtins_string.frama_c_strlen_wrapper
   in
-  match logic_charlen_builtin wrapper (env_current_state env) v with
+  match apply_logic_builtin wrapper env [v] with
   | None -> (* bottom state => string always invalid *) False
   | Some (_res, alarms) ->
     if alarms

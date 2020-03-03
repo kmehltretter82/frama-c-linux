@@ -19,14 +19,8 @@
 [eva:alarm] tests/builtins/str_allocated.c:14: Warning: 
   accessing uninitialized left-value. assert \initialized(&b);
 [eva] tests/builtins/str_allocated.c:14: Call to builtin memchr
-[eva] share/libc/string.h:69: 
-  Cannot evaluate range bound memchr_off((char *)s, c, n)
-  (unsupported ACSL construct: logic function memchr_off). Approximating
 [eva:alarm] tests/builtins/str_allocated.c:14: Warning: 
   function memchr: precondition 'valid' got status unknown.
-[eva] share/libc/string.h:72: 
-  Cannot evaluate range bound memchr_off((char *)s, c, n)
-  (unsupported ACSL construct: logic function memchr_off). Approximating
 [eva:alarm] tests/builtins/str_allocated.c:14: Warning: 
   function memchr: precondition 'initialization' got status unknown.
 [eva:alarm] tests/builtins/str_allocated.c:14: Warning: 

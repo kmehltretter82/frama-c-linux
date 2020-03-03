@@ -30,3 +30,5 @@ val frama_c_strlen_wrapper: str_builtin_sig
 val frama_c_wcslen_wrapper: str_builtin_sig
 val frama_c_strchr_wrapper: str_builtin_sig
 val frama_c_wcschr_wrapper: str_builtin_sig
+val frama_c_memchr_off_wrapper: str_builtin_sig
+val frama_c_wmemchr_off_wrapper: str_builtin_sig

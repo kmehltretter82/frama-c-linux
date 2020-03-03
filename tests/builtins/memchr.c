@@ -202,17 +202,17 @@ void memchr_large() {
   a[20] = 0;
   a[75] = 0;
   Ival offset = RANGE(3, 30);
-  MEMCHR(RES, z1, a, offset, c, 100); // alarm from precondition
+  MEMCHR(RES, z1, a, offset, c, 100);
   //@ assert (z1 >= -1 && z1 <= 75);
   //@ assert refined: (z1 == 20 || z1 == 75);
 
   offset = RANGE(5, 17);
-  MEMCHR(RES, z2, a, offset, c, 100); // alarm from precondition
+  MEMCHR(RES, z2, a, offset, c, 100);
   //@ assert (z2 >= -1 && z2 <= 20);
   //@ assert refined: (z2 == 20);
 
   offset = RANGE(60, 74);
-  MEMCHR(RES, z3, a, offset, c, 100); // alarm from precondition
+  MEMCHR(RES, z3, a, offset, c, 100);
   //@ assert (z3 >= -1 && z3 <= 75);
   //@ assert refined: (z3 == 75);
 
@@ -313,14 +313,14 @@ void memchr_misc() {
   MEMCHR2(RES, sz2, str, 0, 3, c, 12); // alarm in precondition
   //@ assert (sz2 == 0); // alarm
   loc_char_array[3] = '\0';
-  MEMCHR_bottom(loc_char_array, 0, c, 5); // alarm in precondition
-  MEMCHR(RES, sz4a, zero_str, 0, c, 9); // no alarm
+  MEMCHR_bottom(loc_char_array, 0, c, 5); // red alarm in precondition
+  MEMCHR(RES, sz4a, zero_str, 0, c, 9);
   //@ assert (sz4a == 3);
-  MEMCHR(RES, sz4b, zero_str, 4, c, 9); // alarm in precondition
+  MEMCHR(RES, sz4b, zero_str, 4, c, 9);
   //@ assert (sz4b == 4);
-  MEMCHR(RES, sz4c, zero_str, 5, c, 9); // alarm in precondition
+  MEMCHR(RES, sz4c, zero_str, 5, c, 9);
   //@ assert (sz4c == 5);
-  MEMCHR(RES, sz4d, zero_str, 6, c, 9); // alarm in precondition
+  MEMCHR(RES, sz4d, zero_str, 6, c, 9);
   //@ assert (sz4d == 9);
 }
 
@@ -498,13 +498,13 @@ void memchr_unbounded_n() {
   if (n < 0) n = 0;
   CHAR_PTR(s);
   STRING(s,"abc");
-  MEMCHR(RES, zu1, s, 0, c, n); // warning from precondition
+  MEMCHR(RES, zu1, s, 0, c, n);
   //@ assert (zu1 == -1 || zu1 == 3);
   Ival o = NONDET(0,1);
   MEMCHR(RES, zu2, s, o, c, n); // warning from precondition
   //@ assert (zu2 == -1 || zu2 == 2 || zu2 == 3);
   STRING(s,"bcd\0eg");
-  MEMCHR(RES, zu3, s, 0, c, n); // warning from precondition
+  MEMCHR(RES, zu3, s, 0, c, n);
   //@ assert (zu3 == -1 || zu3 == 3);
 }
 

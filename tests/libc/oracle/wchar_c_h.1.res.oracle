@@ -10,9 +10,6 @@
 [eva] tests/libc/wchar_c_h.c:31: Call to builtin wmemchr
 [eva] tests/libc/wchar_c_h.c:31: 
   function wmemchr: precondition 'valid' got status valid.
-[eva] share/libc/wchar.h:58: 
-  Cannot evaluate range bound wmemchr_off(s, c, n)
-  (unsupported ACSL construct: logic function wmemchr_off). Approximating
 [eva] tests/libc/wchar_c_h.c:31: 
   function wmemchr: precondition 'initialization' got status valid.
 [eva] tests/libc/wchar_c_h.c:31: 
