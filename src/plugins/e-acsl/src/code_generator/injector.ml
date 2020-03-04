@@ -329,6 +329,40 @@ let add_new_block_in_stmt env kf stmt =
     "@[new stmt (from sid %d):@ %a@]" stmt.sid Printer.pp_stmt new_stmt;
   new_stmt, env
 
+(** In the block [outer_block] in the function [kf], this function finds the
+    innermost last statement and insert the list of statements returned by
+    [last_stmts].
+    The function [last_stmts] receives an optional argument [?return_stmt] with
+    the innermost return statement if it exists. In that case the function needs
+    to return this statement as the last statement. *)
+let insert_as_last_stmts_in_innermost_block ~last_stmts kf outer_block =
+  (* Retrieve the last innermost block *)
+  let rec retrieve_innermost_last_return block =
+    let l = List.rev block.bstmts in
+    match l with
+    | [] -> block, [], None
+    | { skind = Return _ } as ret :: rest -> block, rest, Some ret
+    | { skind = Block b } :: _ -> retrieve_innermost_last_return b
+    | _ :: _ -> block, l, None
+  in
+  let inner_block, rev_content, return_stmt =
+    retrieve_innermost_last_return outer_block
+  in
+  (* Create the statements to insert *)
+  let new_stmts = last_stmts ?return_stmt () in
+  (* Move the labels from the return stmt to the stmts to insert *)
+  let new_stmts =
+    match return_stmt with
+    | Some return_stmt ->
+      let b = Cil.mkBlock new_stmts in
+      let new_stmt = Constructor.mk_block return_stmt b in
+      E_acsl_label.move kf return_stmt new_stmt;
+      [ new_stmt ]
+    | None -> new_stmts
+  in
+  (* Insert the statements as the last statements of the innermost block *)
+  inner_block.bstmts <- List.rev_append rev_content new_stmts
+
 (* visit the substmts and build the new skind *)
 let rec inject_in_substmt env kf stmt = match stmt.skind with
   | Instr instr ->
@@ -670,27 +704,59 @@ let inject_in_global (env, main) = function
     ->
     env, main
 
+(* Insert [stmt_begin] as the first statement of [fundec] and insert [stmt_end] as
+   the last before [return] *)
+let surround_function_with kf fundec stmt_begin stmt_end =
+  let body = fundec.sbody in
+  (* Insert last statement *)
+  Extlib.may
+    (fun stmt_end ->
+       let last_stmts ?return_stmt () =
+         match return_stmt with
+         | Some return_stmt -> [ stmt_end; return_stmt ]
+         | None -> [ stmt_end]
+       in
+       insert_as_last_stmts_in_innermost_block ~last_stmts kf body)
+    stmt_end;
+  (* Insert first statement *)
+  body.bstmts <- stmt_begin :: body.bstmts
+
 (* TODO: what about using [file.globalinit]? *)
 let inject_global_initializer file main =
   Options.feedback ~dkey ~level:2 "building global initializer.";
-  let vi, fundec = Global_observer.mk_init_function () in
-  let cil_fct = GFun(fundec, Location.unknown) in
-  if Mmodel_analysis.use_model () then begin
+  if Mmodel_analysis.use_model () then
+    (* Create [__e_acsl_globals_init] function *)
+    let vi_init, fundec_init = Global_observer.mk_init_function () in
+    let cil_fct_init = GFun(fundec_init, Location.unknown) in
+    (* Create [__e_acsl_globals_delete] function *)
+    let vi_delete, fundec_delete = Global_observer.mk_delete_function () in
+    let cil_fct_delete = GFun(fundec_delete, Location.unknown) in
     match main with
     | Some main ->
-      let exp = Cil.evar ~loc:Location.unknown vi in
-      (* Create [__e_acsl_globals_init();] call *)
-      let stmt =
-        Cil.mkStmtOneInstr ~valid_sid:true
-          (Call(None, exp, [], Location.unknown))
+      let mk_fct_call vi =
+        let exp = Cil.evar ~loc:Location.unknown vi in
+        let stmt =
+          Cil.mkStmtOneInstr ~valid_sid:true
+            (Call(None, exp, [], Location.unknown))
+        in
+        vi.vreferenced <- true;
+        stmt
       in
-      vi.vreferenced <- true;
-      (* insert [__e_acsl_globals_init ();] as first statement of [main] *)
-      let main_fundec = try
-          Kernel_function.get_definition main
+      let main_fundec =
+        try Kernel_function.get_definition main
         with _ -> assert false (* by construction, the main kf has a fundec *)
       in
-      main_fundec.sbody.bstmts <- stmt :: main_fundec.sbody.bstmts;
+      (* Create [__e_acsl_globals_init();] call *)
+      let stmt_init = mk_fct_call vi_init in
+      (* Create [__e_acsl_globals_delete();] call *)
+      let stmt_delete =
+        match fundec_delete.sbody.bstmts with
+        | [] -> None
+        | _ -> Some (mk_fct_call vi_delete)
+      in
+      (* Surround the content of main with the calls to
+         [__e_acsl_globals_init();] and [__e_acsl_globals_delete();] *)
+      surround_function_with main main_fundec stmt_init stmt_delete;
       (* Retrieve all globals except main *)
       let main_vi = Globals.Functions.get_vi main in
       let new_globals =
@@ -701,13 +767,24 @@ let inject_global_initializer file main =
           []
           file.globals
       in
+      (* Add the globals functions and re-add main at the end *)
       let new_globals =
         let rec rev_and_extend acc = function
           | [] -> acc
           | f :: l -> rev_and_extend (f :: acc) l
         in
-        (* [__e_acsl_globals_init] and [main] at the end *)
-        rev_and_extend [ cil_fct; GFun(main_fundec, Location.unknown) ] new_globals
+        (* [main] at the end *)
+        let globals_to_add = [ GFun(main_fundec, Location.unknown) ] in
+        (* Prepend [__e_acsl_globals_delete] if not empty *)
+        let globals_to_add =
+          match fundec_delete.sbody.bstmts with
+          | [] -> globals_to_add
+          | _ -> cil_fct_delete :: globals_to_add
+        in
+        (* Prepend [__e_acsl_globals_init] *)
+        let globals_to_add = cil_fct_init :: globals_to_add in
+        (* Add these functions to the globals *)
+        rev_and_extend globals_to_add new_globals
       in
       (* add the literal string varinfos as the very first globals *)
       let new_globals =
@@ -718,10 +795,17 @@ let inject_global_initializer file main =
       file.globals <- new_globals
     | None ->
       Kernel.warning "@[no entry point specified:@ \
-                      you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
-        Global_observer.function_init_name;
-      file.globals <- file.globals @ [ cil_fct ]
-  end
+                      you must call functions `%s', `%s', \
+                      `__e_acsl_memory_init' and `__e_acsl_memory_clean' \
+                      by yourself.@]"
+        Global_observer.function_init_name
+        Global_observer.function_delete_name;
+      let globals_func =
+        match fundec_delete.sbody.bstmts with
+        | [] -> [ cil_fct_init ]
+        | _ -> [ cil_fct_init; cil_fct_delete ]
+      in
+      file.globals <- file.globals @ globals_func
 
 (* Add a call to [__e_acsl_memory_init] that initializes memory storage and
    potentially records program arguments. Parameters to [__e_acsl_memory_init]
