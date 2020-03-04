@@ -12,6 +12,8 @@ to ease your developpement process. Here is a summary of them.
   similar to `React.useState()` for boolean values with _window_ settings;
 - [`useGlobalSetting(settings,defaultValue)`](dome_.html#.useGlobalSetting)
   similar to `React.useState()` with optional persistent _global_ settings;
+- [`useHistory(settings,defaultValue)`](dome_.html#.useHistory)
+  for managing histories
 - [`useClock(period,initStart)`](dome_.html#.useClock)
 returns start/stop clocks synchronized on period.
 - [`useCommand()`](dome_.html#.useCommand) for working with different application instances.

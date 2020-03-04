@@ -675,8 +675,8 @@ const NULL = {}; // Dummy initial value
 */
 export function useCommand() {
   useUpdate('dome.command');
-  let wdir = System.getWorkingDir();
-  let argv = System.getArguments();
+  const wdir = System.getWorkingDir();
+  const argv = System.getArguments();
   return [ argv , wdir ];
 }
 
@@ -686,7 +686,7 @@ export function useCommand() {
 
 function useSettings( local, settings, defaultValue )
 {
-  let [ value, setValue ] = React.useState(() => readSetting( local, settings, defaultValue ));
+  const [ value, setValue ] = React.useState(() => readSetting( local, settings, defaultValue ));
   React.useEffect(() => {
     if (settings) {
       let callback = () => {
@@ -701,7 +701,7 @@ function useSettings( local, settings, defaultValue )
       return () => emitter.off( 'dome.defaults', callback );
     }
   });
-  let doUpdate = (upd) => {
+  const doUpdate = (upd) => {
     const theValue = typeof(upd)==='function' ? upd(value) : upd ;
     if (settings) writeSetting( local, settings, theValue );
     else setValue(theValue);
@@ -724,7 +724,8 @@ function useSettings( local, settings, defaultValue )
    The `setValue` callback accepts either a value, or a function to be applied
    on current value.
 */
-export function useState( settings, defaultValue ) {
+export function useState( settings, defaultValue )
+{
   return useSettings( true, settings, defaultValue );
 }
 
@@ -739,9 +740,78 @@ export function useState( settings, defaultValue ) {
     - `flipValue()` change the value to its opposite;
     - `flipValue(v)` change the value to `v`.
 */
-export function useSwitch( settings, defaultValue=false ) {
-  let [ value, update ] = useSettings( true, settings, defaultValue );
+export function useSwitch( settings, defaultValue=false )
+{
+  const [ value, update ] = useSettings( true, settings, defaultValue );
   return [ value, v => update(v===undefined ? !value : v) ];
+}
+
+/**
+   @summary Local state for managing history.
+   @param {string} [settings] - global window settings to store the history
+   @param {any} [defaultValue] - default current value
+   @return {object} for managing the history
+   @description
+The returned object contains the following properties:
+
+- `current` the current value in the history
+- `prev:()=>value` optional function for shifting to the next item (if any)
+- `next:()=>value` optional function for shifting to the previous item (if any)
+- `length:number` history size
+- `index:number` position in the history (starting from `0`)
+- `insert:(v)=>value` insert value `v` as the new current value
+- `fork:(v)=>value` insert value `v` but clear next items (if any)
+- `add:(v)=>value` insert value `v` in front of the history
+- `update:(v)=>value` only change the current value
+- `clear:()=>void` clear the history
+
+When inserting a value, previous and current values are kept in the history.
+When updating or insering a falsy value, the history is shifted to the next
+or previous element available in the history. You can drop the current value from the history
+with `update(undefined)`.
+All updating functions return the new current value.
+*/
+
+export function useHistory( settings, defaultValue )
+{
+  const [ { next,prev,current } , setHistory ] =
+        useSettings( true, settings, { next:[], prev:[], current:defaultValue } );
+  const setState = ({ next, prev, current }) => {
+    while( !current && next.length ) current = next.shift();
+    while( !current && prev.length ) current = prev.shift();
+    setHistory({next: next.slice(), prev: prev.slice(), current });
+    return current ;
+  };
+  const insert = (v) => {
+    if (current) prev.unshift(current);
+    return setState({ next, prev, current:v });
+  };
+  const fork = (v) => {
+    if (current) prev.unshift(current);
+    return setState({ next:[], prev, current:v });
+  };
+  const append = (v) => {
+    return setState({next:[], prev: next.reverse().append(current || [],next), current:v });
+  };
+  const move = ( src , tgt ) => src.length ? (() => {
+    let v = src.shift();
+    if (current) tgt.unshift(current);
+    return setState({ current:v, prev, next });
+  }) : undefined;
+  const update = (v) => setState({ next, prev, current:v });
+  const clear = (next.length || prev.length || current) && (() => setState({ next:[], prev:[] }));
+  return {
+    length:next.length + prev.length + (current ? 1 : 0),
+    index:next.length,
+    current,
+    insert,
+    fork,
+    append,
+    update,
+    next:move(next,prev),
+    prev:move(prev,next),
+    clear
+  };
 }
 
 /**
@@ -985,6 +1055,7 @@ export default {
   useUpdate, useEvent, useEmitter,
   useCommand, useClock,
   useState, useSwitch,
+  useHistory,
   useGlobalSetting
 } ;
 

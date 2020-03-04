@@ -249,7 +249,7 @@ export const IconButton = (props) => {
       style={props.style}
       offset={props.offset}
       className={className}
-      onClick={TRIGGER(props.onClick)}
+      onClick={TRIGGER(disabled ? undefined : props.onClick)}
       />
   );
 };
