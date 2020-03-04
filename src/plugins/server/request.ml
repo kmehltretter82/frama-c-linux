@@ -99,10 +99,9 @@ let signal ~page ~name ~descr  ?(details=[]) () =
   check_page page name ;
   let title =  Printf.sprintf "`SIG` %s" name in
   let index = [ Printf.sprintf "%s (`SIGNAL`)" name ] in
-  let description = [ Block [Text descr] ; Block details] in
-  let _ =
-    Doc.publish ~page ~name ~title ~index description []
-  in Main.signal name
+  let contents = [ Block [Text descr] ; Block details] in
+  let _ = Doc.publish ~page ~name ~title ~index ~contents () in
+  Main.signal name
 
 let emit = Main.emit
 let on_signal = Main.on_signal
@@ -343,13 +342,11 @@ let register_sig (type a b) (s : (a,b) signature) (process : rq -> a -> b) =
     Syntax.define (plain "Input") (Syntax.text @@ sy_input s.input) in
   let output =
     Syntax.define (plain "Output") (Syntax.text @@ sy_output s.output) in
-  let description =
+  let contents =
     Block ( Text s.descr :: input :: output :: s.details ) ::
     ( doc_input s.input @ doc_output s.output )
   in
-  let _ =
-    Doc.publish ~page:s.page ~name:s.name ~title ~index description []
-  in
+  let _ = Doc.publish ~page:s.page ~name:s.name ~title ~index ~contents () in
   Main.register s.kind s.name processor ;
   s.defined <- true
 

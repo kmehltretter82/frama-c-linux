@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -20,49 +20,15 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* -------------------------------------------------------------------------- *)
-(** Server Documentation *)
-(* -------------------------------------------------------------------------- *)
+(** Documentation of ACSL extensions for [propkind] server data. *)
+val register_propkind :
+  name:string ->
+  kind:[`Clause | `Loop | `Other] ->
+  ?label:Markdown.text ->
+  descr:Markdown.text ->
+  unit -> unit
 
-open Markdown
-
-(** The main chapters of the documentation. *)
-type chapter = [ `Protocol | `Kernel | `Plugin of string ]
-
-(** A page of the server documentation. *)
-type page
-
-val path : page -> string
-val href : page -> string -> href
-val chapter : page -> chapter
-
-(** Obtain the given page in the server documentation.
-
-    The page initially contains an introductory section
-    read from the share directory:
-    - [frama-c/share/protocol/<filename>] for protocol pages,
-    - [frama-c/share/server/kernel/<filename>] for kernel pages,
-    - [frama-c/share/<plugin>/server/<filename>] for plugin's pages.
-*)
-val page : chapter -> title:string -> filename:string -> page
-
-(** Adds a section in the corresponding page.
-    Returns an href to the published section.
-    If index items are provided, they are added
-    to the server documentation index.
-*)
-val publish :
-  page:page ->
-  ?name:string ->
-  ?index:string list ->
-  title:string ->
-  ?contents:Markdown.elements ->
-  ?generated:(unit -> Markdown.elements) ->
-  unit -> Markdown.href
-
-(** Dumps all published pages of documentations. Unless [~meta:false],
-    also generates METADATA for each page in
-    [<filename>.json] for each page. *)
-val dump : root:string -> ?meta:bool -> unit -> unit
+(** Trigger a full reload for the table of property status. *)
+val reload : unit -> unit
 
 (* -------------------------------------------------------------------------- *)

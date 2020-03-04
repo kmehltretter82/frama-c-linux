@@ -20,9 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Sy = Syntax
 module Md = Markdown
-module Js = Yojson.Basic.Util
 
 open Data
 open Kernel_main
@@ -62,8 +60,6 @@ struct
   let t_decreases = t_clause "decreases"
   let t_assigns = t_clause "assigns"
   let t_froms = t_kind "froms" "Clause `@assigns … \\from …`"
-  let t_ext = Enum.prefix kinds ~prefix:"ext" ~var:"<clause>"
-      ~descr:(Md.plain "ACSL extension `<clause>`") ()
 
   let t_assert = t_clause "assert"
   let t_loop_invariant = t_loop "invariant"
@@ -71,8 +67,6 @@ struct
   let t_loop_variant = t_loop "variant"
   let t_loop_allocates = t_loop "allocates"
   let t_loop_pragma = t_loop "pragma"
-  let t_loop_ext = Enum.prefix kinds ~prefix:"loop-ext" ~var:"<clause>"
-      ~descr:(Md.plain "ACSL loop extension `loop <clause>`") ()
 
   let t_reachable = t_kind "reachable" "Reachable statement"
   let t_code_contract = t_kind "code-contract" "Statement Contract"
@@ -83,7 +77,14 @@ struct
   let t_axiomatic = t_kind "axiomatic" "Axiomatic definitions"
   let t_axiom = t_kind "axiom" "Logical axiom"
   let t_lemma = t_kind "lemma" "Logical lemma"
-  let t_other = Enum.prefix kinds ~prefix:"prop" ~var:"<prop>"
+
+  let p_ext = Enum.prefix kinds ~prefix:"ext" ~var:"<clause>"
+      ~descr:(Md.plain "ACSL extension `<clause>`") ()
+
+  let p_loop_ext = Enum.prefix kinds ~prefix:"loop-ext" ~var:"<clause>"
+      ~descr:(Md.plain "ACSL loop extension `loop <clause>`") ()
+
+  let p_other = Enum.prefix kinds ~prefix:"prop" ~var:"<prop>"
       ~descr:(Md.plain "Plugin Specific properties") ()
 
   open Property
@@ -100,7 +101,7 @@ struct
         | PKEnsures(_,Returns) -> t_returns
         | PKTerminates -> t_terminates
       end
-    | IPExtended { ie_ext={ ext_name } } -> t_ext ext_name
+    | IPExtended { ie_ext={ ext_name } } -> Enum.instance p_ext ext_name
     | IPAxiomatic _ -> t_axiomatic
     | IPAxiom _ -> t_axiom
     | IPLemma _ -> t_lemma
@@ -117,7 +118,7 @@ struct
         | AAssigns _ -> t_loop_assigns
         | AAllocation _ -> t_loop_allocates
         | APragma _ -> t_loop_pragma
-        | AExtended(_,_,{ext_name}) -> t_loop_ext ext_name
+        | AExtended(_,_,{ext_name}) -> Enum.instance p_loop_ext ext_name
       end
     | IPAllocation _ -> t_allocates
     | IPAssigns _ -> t_assigns
@@ -127,13 +128,21 @@ struct
     | IPPropertyInstance { ii_ip } -> tag ii_ip
     | IPTypeInvariant _ -> t_type_invariant
     | IPGlobalInvariant _ -> t_global_invariant
-    | IPOther { io_name } -> t_other io_name
+    | IPOther { io_name } -> Enum.instance p_other io_name
 
   let data = Enum.publish kinds ~tag ()
   let () = Request.dictionary kinds
 
   include (val data : S with type t = Property.t)
 end
+
+let register_propkind ~name ~kind ?label ~descr () =
+  let open PropKind in
+  let prefix = match kind with
+    | `Clause -> p_ext
+    | `Loop -> p_loop_ext
+    | `Other -> p_other
+  in ignore @@ Enum.extends kinds prefix ~name ?label ~descr ()
 
 (* -------------------------------------------------------------------------- *)
 (* --- Property Status                                                    --- *)
@@ -246,5 +255,7 @@ let array =
     ~add_update_hook:Property_status.register_property_add_hook
     ~add_remove_hook:Property_status.register_property_remove_hook
     model
+
+let reload () = States.reload array
 
 (* -------------------------------------------------------------------------- *)

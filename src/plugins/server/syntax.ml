@@ -63,7 +63,7 @@ let protect a =
 let define left right =
   Markdown.(Block_quote [Block[Text ( left @ plain ":=" @ right )]])
 
-let publish ~page ~name ~descr ~synopsis ?(details = []) () =
+let publish ~page ~name ~descr ~synopsis ?(details = []) ?generated () =
   check_name name ;
   check_page page name ;
   let id = Printf.sprintf "data-%s" name in
@@ -72,11 +72,11 @@ let publish ~page ~name ~descr ~synopsis ?(details = []) () =
   let dref = Doc.href page id in
   let dlink = Markdown.href ~text:(Markdown.emph name) dref in
   let data = Markdown.(plain "<" @ dlink @ plain ">") in
-  let content = Markdown.(Block(
+  let contents = Markdown.(Block(
       [ Text descr ; define data synopsis.text ]
     )) :: details in
-  let _href = Doc.publish ~page ~name:id ~title ~index content [] in
-  atom dlink
+  let _href = Doc.publish ~page ~name:id ~title ~index ~contents ?generated ()
+  in atom dlink
 
 (* -------------------------------------------------------------------------- *)
 

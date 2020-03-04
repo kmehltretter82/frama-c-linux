@@ -50,8 +50,8 @@ let register_value (type a) ~page ~name ~descr ?(details=[])
   let open Markdown in
   let title =  Printf.sprintf "`VALUE` %s" name in
   let index = [ Printf.sprintf "%s (`VALUE`)" name ] in
-  let description = [ Block [Text descr] ; Block details] in
-  let h = Doc.publish ~page ~name ~title ~index description [] in
+  let contents = [ Block [Text descr] ; Block details] in
+  let h = Doc.publish ~page ~name ~title ~index ~contents () in
   let signal = Request.signal ~page ~name:(name ^ ".sig")
       ~descr:(plain "Signal for value " @ href h) () in
   Request.register ~page ~kind:`GET ~name:(name ^ ".get")
@@ -70,8 +70,8 @@ let register_state (type a) ~page ~name ~descr ?(details=[])
   let open Markdown in
   let title =  Printf.sprintf "`STATE` %s" name in
   let index = [ Printf.sprintf "%s (`STATE`)" name ] in
-  let description = [ Block [Text descr] ; Block details] in
-  let h = Doc.publish ~page ~name ~title ~index description [] in
+  let contents = [ Block [Text descr] ; Block details] in
+  let h = Doc.publish ~page ~name ~title ~index ~contents () in
   let signal = Request.signal ~page ~name:(name ^ ".sig")
       ~descr:(plain "Signal for state " @ href h) () in
   Request.register ~page ~kind:`GET ~name:(name ^ ".get")
@@ -259,7 +259,7 @@ let register_array ~page ~name ~descr ?(details=[]) ~key
   let title =  Printf.sprintf "`ARRAY` %s" name in
   let index = [ Printf.sprintf "%s (`ARRAY`)" name ] in
   let columns = !model in
-  let description = [
+  let contents = [
     Block [Text descr] ;
     Syntax.fields ~title:"Columns"
       begin
@@ -271,7 +271,7 @@ let register_array ~page ~name ~descr ?(details=[]) ~key
       end ;
     Block details
   ] in
-  let mref = Doc.publish ~page:page ~name:name ~title ~index description [] in
+  let mref = Doc.publish ~page:page ~name:name ~title ~index ~contents () in
   let signal = Request.signal ~page ~name:(name ^ ".sig")
       ~descr:(plain "Signal for array " @ href mref) () in
   let getter = List.map Syntax.(fun (fd,to_js) -> fd.fd_name , to_js) columns in

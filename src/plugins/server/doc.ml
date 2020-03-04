@@ -31,6 +31,8 @@ module Pages = Map.Make(String)
 
 type chapter = [ `Protocol | `Kernel | `Plugin of string ]
 
+type section = (unit -> Markdown.elements)
+
 type page = {
   path : string ;
   rootdir : string ; (* path to document root *)
@@ -38,7 +40,7 @@ type page = {
   title : string ;
   order : int ;
   intro : Markdown.elements ;
-  mutable sections : Markdown.elements list ;
+  mutable sections : section list ;
 }
 
 let order = ref 0
@@ -82,10 +84,15 @@ let page chapter ~title ~filename =
                  sections=[] } in
     pages := Pages.add path page !pages ; page
 
-let publish ~page ?name ?(index=[]) ~title content sections =
+let static () = []
+
+let publish ~page ?name ?(index=[]) ~title
+    ?(contents=[])
+    ?(generated=static)
+    () =
   let id = match name with Some id -> id | None -> title in
   let href = Section( page.path , id ) in
-  let section = Markdown.section ?name ~title (content @ sections) in
+  let section () = Markdown.section ?name ~title (contents @ generated ()) in
   List.iter (fun entry -> entries := (entry , href) :: !entries) index ;
   page.sections <- section :: page.sections ; href
 
@@ -203,12 +210,16 @@ let pp_one_page ~root ~page ~title body =
   with Sys_error e ->
     Senv.fatal "Could not open file %s for writing: %s" full_path e
 
+let rec build contents = function
+  | [] -> contents
+  | s::sections -> build (s () :: contents) sections
+
 let dump ~root ?(meta=true) () =
   begin
     Pages.iter
       (fun path page ->
          Senv.feedback "[doc] Page: '%s'" path ;
-         let body = Markdown.subsections page.intro (List.rev page.sections) in
+         let body = Markdown.subsections page.intro (build [] page.sections) in
          let title = page.title in
          pp_one_page ~root ~page:path ~title body ;
          if meta then

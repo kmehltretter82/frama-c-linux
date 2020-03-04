@@ -187,7 +187,7 @@ sig
 
   type 'a dictionary
   type 'a tag
-  type 'a prefix = string -> 'a tag
+  type 'a prefix
 
   val tag_name : 'a tag -> string
 
@@ -201,7 +201,9 @@ sig
       The provided value, if any, will be used for decoding json tags.
       If would be used also for encoding values to json tags if no [~tag]
       function is provided when publishing the dictionnary.
-      Registered values must be hashable with [Hashtbl.hash] function. *)
+      Registered values must be hashable with [Hashtbl.hash] function.
+
+      You may register a new tag {i after} the dictionary has been published. *)
   val tag : 'a dictionary ->
     name:string ->
     ?label:Markdown.text -> descr:Markdown.text ->
@@ -213,13 +215,26 @@ sig
       To decoding from json is provided to prefix tags.
       Encoding is done by emitting tags with form ['prefix:*'].
       The variable part of the prefix is documented as ['prefix:xxx']
-      when [~var:"xxx"] is provided. *)
+      when [~var:"xxx"] is provided.
+
+      You may register a new prefix-tag {i after} the dictionary has
+      been published. *)
   val prefix : 'a dictionary ->
     prefix:string -> ?var:string ->
     ?label:Markdown.text -> descr:Markdown.text ->
     unit -> 'a prefix
 
-  (** Obtain all the tags from the dictionnary. *)
+  (** Returns the tag for a value associated with the given prefix. *)
+  val instance : 'a prefix -> string -> 'a tag
+
+  (** Publish a new instance in the documentation. *)
+  val extends : 'a dictionary -> 'a prefix ->
+    name:string ->
+    ?label:Markdown.text -> descr:Markdown.text ->
+    ?value:'a ->
+    unit -> 'a tag
+
+  (** Obtain all the tags registered in the dictionnary so far. *)
   val tags : 'a dictionary -> Tag.t list
 
   val page : 'a dictionary -> Doc.page

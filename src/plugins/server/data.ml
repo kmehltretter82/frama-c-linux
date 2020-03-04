@@ -407,7 +407,7 @@ struct
   }
 
   type 'a tag = string
-  type 'a prefix = string -> 'a tag
+  type 'a prefix = string
 
   let tag_name tg = tg
   let tag_label a = function
@@ -432,8 +432,6 @@ struct
   let syntax (d : 'a dictionary) = d.syntax
 
   let tag (d : 'a dictionary) ~name ?label ~descr ?value () : 'a tag =
-    if d.published then
-      invalid d.name (Printf.sprintf "published enum (%s)" name) ;
     if Hashtbl.mem d.values name then
       invalid d.name (Printf.sprintf "duplicate tag (%s)" name) ;
     let tg = Syntax.{
@@ -448,17 +446,18 @@ struct
       | Some v -> Hashtbl.add d.vindex v name
     end ; name
 
-  let prefix (d : 'a dictionary) ~prefix ?(var="*") ?label ~descr
-      () : string -> 'a tag =
-    if d.published then
-      invalid d.name (Printf.sprintf "published enum (%s:*)" prefix) ;
-    let make = Printf.sprintf "%s:%s" prefix in
+  let instance = Printf.sprintf "%s:%s"
+
+  let prefix (d : 'a dictionary) ~prefix ?(var="*") ?label ~descr () =
     let tg = Syntax.{
-        tag_name = make var ;
+        tag_name = instance prefix var ;
         tag_label = tag_label (prefix ^ ".") label ;
         tag_descr = descr ;
       } in
-    d.tags <- tg :: d.tags ; make
+    d.tags <- tg :: d.tags ; prefix
+
+  let extends d prefix ~name ?label ~descr ?value () =
+    tag d ~name:(instance prefix name) ?label ~descr ?value ()
 
   let to_json name vindex v =
     try `String (Hashtbl.find vindex v)
@@ -484,10 +483,9 @@ struct
       type t = a
       let descr = d.descr
       let syntax =
-        let tags = Syntax.tags ~title:d.title (List.rev d.tags) in
+        let tags () = [Syntax.tags ~title:d.title (List.rev d.tags)] in
         Syntax.publish ~page:d.page ~name:d.name ~descr
-          ~synopsis:(Syntax.string)
-          ~details:[tags] ()
+          ~synopsis:(Syntax.string) ~generated:tags ()
       let of_json = of_json d.name d.values
       let to_json =
         match tag with

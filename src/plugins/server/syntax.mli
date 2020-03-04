@@ -33,7 +33,10 @@ val text : t -> Markdown.text
     the description block. *)
 val publish :
   page:Doc.page -> name:string -> descr:Markdown.text ->
-  synopsis:t -> ?details:Markdown.elements -> unit -> t
+  synopsis:t ->
+  ?details:Markdown.elements ->
+  ?generated:(unit -> Markdown.elements) ->
+  unit -> t
 
 val unit : t
 val any : t
