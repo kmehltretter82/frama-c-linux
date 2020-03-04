@@ -24,6 +24,7 @@ open Cil_types
 open Cil_datatype
 
 let function_init_name = Functions.RTL.mk_api_name "globals_init"
+let function_delete_name = Functions.RTL.mk_api_name "globals_delete"
 
 (* Hashtable mapping global variables (as Cil_type.varinfo) to their
    initializers (if any).
@@ -188,6 +189,22 @@ let mk_delete_stmts stmts =
        else Constructor.mk_delete_stmt vi :: acc)
     tbl
     stmts
+
+let mk_delete_function () =
+  (* Create and register [__e_acsl_globals_delete] function with definition
+     for de-allocation of global variables *)
+  let vi, fundec, _kf = mk_function function_delete_name in
+  (* Generate delete statements and add them to the function body *)
+  let stmts =
+    Varinfo.Hashtbl.fold_sorted
+      (fun vi _l acc ->
+         if Misc.is_fc_or_compiler_builtin vi then acc
+         else Constructor.mk_delete_stmt vi :: acc)
+      tbl
+      []
+  in
+  fundec.sbody.bstmts <- stmts;
+  vi, fundec
 
 (*
 Local Variables:
