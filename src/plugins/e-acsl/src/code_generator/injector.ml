@@ -268,19 +268,6 @@ let add_new_block_in_stmt env kf stmt =
       let b, env =
         Env.pop_and_get env new_stmt ~global_clear:true Env.After
       in
-      if Kernel_function.is_main kf && Mmodel_analysis.use_model () then begin
-        let stmts = b.bstmts in
-        let l = List.rev stmts in
-        match l with
-        | [] -> assert false (* at least the 'return' stmt *)
-        | ret :: l ->
-          let loc = Stmt.loc stmt in
-          let delete_stmts =
-            Global_observer.mk_delete_stmts
-              [ Constructor.mk_rtl_call ~loc "memory_clean" []; ret ]
-          in
-          b.bstmts <- List.rev l @ delete_stmts
-      end;
       let new_stmt = Constructor.mk_block stmt b in
       if not (Cil_datatype.Stmt.equal stmt new_stmt) then begin
         (* move the labels of the return to the new block in order to

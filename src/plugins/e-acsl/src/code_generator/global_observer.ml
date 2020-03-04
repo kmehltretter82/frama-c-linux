@@ -182,14 +182,6 @@ let mk_init_function () =
   fundec.sbody.bstmts <- stmts;
   vi, fundec
 
-let mk_delete_stmts stmts =
-  Varinfo.Hashtbl.fold_sorted
-    (fun vi _l acc ->
-       if Misc.is_fc_or_compiler_builtin vi then acc
-       else Constructor.mk_delete_stmt vi :: acc)
-    tbl
-    stmts
-
 let mk_delete_function () =
   (* Create and register [__e_acsl_globals_delete] function with definition
      for de-allocation of global variables *)
