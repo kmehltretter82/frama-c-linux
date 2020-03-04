@@ -4502,7 +4502,7 @@ and constFold (machdep: bool) (e: exp) : exp =
         begin
           (* If the cast has attributes, leave it alone. *)
           Kernel.debug ~dkey "ConstFold to %a : %a@."
-              !pp_ikind_ref nk Datatype.Integer.pretty i;
+            !pp_ikind_ref nk Datatype.Integer.pretty i;
           (* Downcasts might truncate silently *)
           kinteger64 ~loc ~kind:nk i
         end
