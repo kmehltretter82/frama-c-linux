@@ -713,7 +713,7 @@ let inject_global_initializer file main =
     | None ->
       Kernel.warning "@[no entry point specified:@ \
                       you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
-        Global_observer.function_name;
+        Global_observer.function_init_name;
       file.globals <- file.globals @ [ cil_fct ]
   end
 

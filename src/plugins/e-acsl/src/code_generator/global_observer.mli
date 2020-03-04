@@ -24,7 +24,7 @@
 
 open Cil_types
 
-val function_name: string
+val function_init_name: string
 (** Name of the function in which [mk_init_function] (see below) generates the
     code. *)
 
