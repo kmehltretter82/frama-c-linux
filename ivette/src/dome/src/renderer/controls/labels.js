@@ -14,16 +14,23 @@ import { Icon } from './icons' ;
 
 const addClass = (a,b) => b ? a + ' ' + b : a ;
 
-const makeLabel = (classes,props) => (
-  <label className={addClass(classes,props.className)}
-         title={props.title}
-         style={props.style} >
-    {props.icon && <Icon title={props.title} id={props.icon}/>}
-    {props.label}
-    {props.text}
-    {props.children}
-  </label>
-);
+const makeLabel = (className,props) => {
+  const { display=true } = props ;
+  const allClasses =
+        className +
+        (display ? ' ' : ' dome-control-erased ') +
+        props.className ;
+  return (
+    <label className={allClasses}
+           title={props.title}
+           style={props.style} >
+      {props.icon && <Icon title={props.title} id={props.icon}/>}
+      {props.label}
+      {props.text}
+      {props.children}
+    </label>
+  );
+};
 
 // --------------------------------------------------------------------------
 // --- CSS Classes
