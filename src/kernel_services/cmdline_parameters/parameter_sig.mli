@@ -482,6 +482,9 @@ module type Multiple_map = sig
   val mem: key -> bool
 end
 
+module type Filepath_map =
+  Map with type key = Datatype.Filepath.t
+
 (* ************************************************************************** *)
 (** {2 All the different kinds of command line options as functors} *)
 (* ************************************************************************** *)
@@ -572,6 +575,19 @@ module type Builder = sig
          val file_kind: string
          (** see [Filepath] module. *)
        end): Filepath_list
+
+  module Filepath_map
+      (V: Value_datatype with type key = Fc_Filepath.Normalized.t)
+      (X: sig
+         include Input_with_arg
+         val default: V.t Datatype.Filepath.Map.t
+         val existence: Fc_Filepath.existence
+         val file_kind: string
+       end):
+    Map
+    with type key = Fc_Filepath.Normalized.t
+     and type value = V.t
+     and type t = V.t Datatype.Filepath.Map.t
 
   (** Parameter is a map where multibindings are **not** allowed. *)
   module Make_map

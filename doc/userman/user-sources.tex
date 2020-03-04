@@ -59,6 +59,8 @@ allows the user to extend the pre-processing command,
 typically via the inclusion of defines (\texttt{-D} switches) and header
 directories (\texttt{-I} switches), as in
 \texttt{-cpp-extra-args="-DDEBUG -DARCH=ia32 -I./headers"}.
+You can also add arguments on a per-file basis, using option
+\optiondef{-}{cpp-extra-args-per-file}.
 
 If you have a JSON compilation database file\footnote{%
   \url{http://clang.llvm.org/docs/JSONCompilationDatabase.html}}, you can use

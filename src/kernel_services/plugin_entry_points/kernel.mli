@@ -378,6 +378,9 @@ module CppCommand: Parameter_sig.String
 module CppExtraArgs: Parameter_sig.String_list
 (** Behavior of option "-cpp-extra-args" *)
 
+module CppExtraArgsPerFile: Parameter_sig.Filepath_map with type value = string
+(** Behavior of option "-cpp-extra-args-per-file" *)
+
 module CppGnuLike: Parameter_sig.Bool
 (** Behavior of option "-cpp-frama-c-compliant" *)
 

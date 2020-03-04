@@ -1418,6 +1418,30 @@ struct
       (V)
       (struct include X let dependencies = [] end)
 
+  module Filepath_map
+      (V: Parameter_sig.Value_datatype with type key = Fc_Filepath.Normalized.t)
+      (X: sig
+         include Parameter_sig.Input_with_arg
+         val existence: Fc_Filepath.existence
+         val default: V.t Datatype.Filepath.Map.t
+       end) =
+    Make_map
+      (struct
+        include Datatype.Filepath
+        let of_string s =
+          try
+            Fc_Filepath.Normalized.of_string ~existence:X.existence s
+          with
+          | Fc_Filepath.No_file ->
+            P.L.abort "file '%s' not found" s
+          | Fc_Filepath.File_exists ->
+            P.L.abort "file '%s' already exists" s
+        let to_string = Fc_Filepath.Normalized.to_pretty_string
+        let of_singleton_string = no_element_of_string
+      end)
+      (V)
+      (struct include X let dependencies = [] end)
+
   module Kernel_function_map
       (V: Parameter_sig.Value_datatype with type key = kernel_function)
       (X: sig
