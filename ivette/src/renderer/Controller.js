@@ -9,7 +9,7 @@ import States from 'frama-c/states' ;
 
 import { Vfill } from 'dome/layout/boxes' ;
 import { Component, TitleBar } from 'frama-c/labviews' ;
-import { Button as ToolButton, ButtonGroup, Filler  } from 'dome/layout/toolbars' ;
+import { Button as ToolButton, ButtonGroup, Space } from 'dome/layout/toolbars' ;
 import { LED, IconButton } from 'dome/controls/buttons' ;
 import { Label, Code } from 'dome/controls/labels' ;
 import { Buffer } from 'dome/text/buffers' ;
@@ -24,13 +24,14 @@ import 'codemirror/theme/ambiance.css' ;
 var cmdConfig ;
 const cmdLine = new Buffer();
 
-function dumpCmdLine({ cwd, command, sockaddr, params })
+function dumpCmdLine(config={})
 {
+  const { cwd, command, sockaddr, params } = config ;
   cmdLine.clear();
   if (cwd) cmdLine.log('--cwd',cwd);
   if (command) cmdLine.log('--command',command);
   if (sockaddr) cmdLine.log('--socket',sockaddr);
-  params.forEach((v,i) => {
+  if (params) params.forEach((v,i) => {
     if (i>0) {
       if (v.startsWith('-') || v.endsWith('.c') || v.endsWith('.h') || v.endsWith('.i'))
         cmdLine.append('\n');
@@ -108,13 +109,12 @@ export const Control = () => {
 // --- Server Console
 // --------------------------------------------------------------------------
 
-function resetCmdLine() {
-  dumpCmdLine( cmdConfig );
+function getCmdLine() {
+  return cmdLine.getDoc().getValue().trim();
 }
 
-function execCmdLine() {
-  let cmd = cmdLine.getDoc().getValue();
-  let argv = cmd.trim().split(/[ \t\n]+/);
+function execCmdLine(cmd) {
+  let argv = cmd.split(/[ \t\n]+/);
   let cfg = configOfParams(argv);
   Server.configure(cfg);
   Server.restart();
@@ -122,14 +122,38 @@ function execCmdLine() {
 
 const RenderConsole = () => {
   const [ cmd , switchCmd ] = Dome.useSwitch();
+  const { current, next, prev, index, length, update, insert, clear } = Dome.useHistory( 'frama-c.command.history' );
   const doExec = () => {
+    let cmd = getCmdLine();
+    if (cmd != current) insert(cmd);
+    execCmdLine(cmd);
     switchCmd();
-    execCmdLine();
   };
+  const doNext = () => { cmdLine.getDoc().setValue(next() || ''); };
+  const doPrev = () => { cmdLine.getDoc().setValue(prev() || ''); };
+  const doReload = () => {
+    console.log('CMD',cmdConfig);
+    dumpCmdLine( cmdConfig );
+  };
+  const doDrop = () => {
+    cmdLine.clear();
+    cmdLine.getDoc().setValue(update(undefined) || '');
+  };
+  console.log('HISTORY',Dome.getWindowSetting('frama-c.command.history'));
   return (
     <React.Fragment>
       <TitleBar label={cmd ? 'Command Line' : 'Console'}>
-        <IconButton icon='RELOAD' display={cmd} onClick={resetCmdLine} title='Reset Command Line'/>
+        <Label className='dimmed' display={cmd && length>0}>
+          {1+index}/{length}
+        </Label>
+        <Space/>
+        <IconButton icon='TRASH' display={cmd && clear} disabled={!clear} onClick={clear} title='Clear History'/>
+        <IconButton icon='CROSS' display={cmd && clear} disabled={!current} onClick={doDrop} title='Remove Command'/>
+        <Space/>
+        <IconButton icon='MEDIA.PREV' display={cmd} disabled={!prev} onClick={doPrev} title='Previous Command'/>
+        <IconButton icon='RELOAD' display={cmd} onClick={doReload} title='Reset Command Line'/>
+        <IconButton icon='MEDIA.NEXT' display={cmd} disabled={!next} onClick={doNext} title='Previous Command'/>
+        <Space/>
         <IconButton icon='MEDIA.PLAY' display={cmd} onClick={doExec} title='Execute Command Line'/>
         <IconButton icon='EDIT' selected={cmd} onClick={switchCmd} title='Edit Command Line'/>
       </TitleBar>
