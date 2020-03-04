@@ -17,6 +17,7 @@
 Open Source Release <next-release>
 ##################################
 
+-   ACSL      [2020/03/04] Make conversion from C ptr to logic array explicit
 -   Eva       [2020/03/03] Evaluates the logic predicate memchr_off, used in
               Frama-C libc specifications.
 -   Eva       [2020/03/03] Slightly better heuristics for the subdivision of
