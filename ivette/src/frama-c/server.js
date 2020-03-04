@@ -411,7 +411,7 @@ async function _launch() {
   }
   logout = logout && System.join( cwd, logout );
   logerr = logerr && System.join( cwd, logerr );
-  params = params.concat('-then','-server-zmq',sockaddr );
+  params = ['-server-zmq',sockaddr,'-then'].concat(params);
   let options = {
     cwd,
     stdout: { path: logout, pipe: true },
