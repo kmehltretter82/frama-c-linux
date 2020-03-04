@@ -1098,7 +1098,11 @@ struct
         (* we have converted from array to ptr, but the pointed type might
            differ. Just do another round of conversion. *)
         c_mk_cast e oldt newt
-      end else begin
+      end else if isPointerType oldt && isArrayType newt then
+        (* transforms '(T[size])ptr' into an equivalent '*(T( * )[size])ptr'
+           to get an explicit access to the memory *)
+        mk_mem (c_mk_cast ~force e oldt (TPtr(newt,[]))) TNoOffset
+      else begin
         match Cil.unrollType newt, e.term_node with
         | TEnum (ei,[]), TConst (LEnum { eihost = ei'})
           when ei.ename = ei'.ename && not force -> e

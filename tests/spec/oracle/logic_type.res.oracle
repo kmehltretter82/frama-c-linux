@@ -39,7 +39,7 @@ axiomatic A {
   }
  */
 /*@ ensures Q(\old(q));
-    ensures P((Point [3])\old(q)); */
+    ensures P(*((Point (*)[3])\old(q))); */
 void f(Point *q);
 
 Point tab[3];

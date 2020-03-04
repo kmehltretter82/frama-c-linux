@@ -26,7 +26,7 @@ axiomatic IsMax {
         0 ≤ \result < \old(n) ∧
         (∀ int i;
            0 ≤ i < \old(n) ⇒ *(\old(t) + \result) ≥ *(\old(t) + i)) ∧
-        is_max(*(\old(t) + \result), (int [])\old(t), \old(n));
+        is_max(*(\old(t) + \result), *((int (*)[])\old(t)), \old(n));
     
     behavior empty:
       assumes n ≤ 0;
@@ -46,7 +46,7 @@ int max(int *t, int n)
   i = 1;
   /*@ loop invariant
         (∀ int j; 0 ≤ j < i ⇒ *(t + imax) ≥ *(t + j)) ∧
-        is_max(max_0, (int [])t, i - 1);
+        is_max(max_0, *((int (*)[])t), i - 1);
   */
   while (i < n) {
     if (*(t + i) > *(t + imax)) {

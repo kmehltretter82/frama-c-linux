@@ -9,7 +9,7 @@ predicate sorted{L}(int t[], ℤ n) =
   ∀ ℤ i, ℤ j; 0 ≤ i ≤ j ≤ n ⇒ t[i] ≤ t[j];
  */
 /*@ requires
-      n ≥ 0 ∧ \valid(t + (0 .. n - 1)) ∧ sorted((int [])t, n - 1);
+      n ≥ 0 ∧ \valid(t + (0 .. n - 1)) ∧ sorted(*((int (*)[])t), n - 1);
     
     behavior search_success:
       ensures \result ≥ 0 ⇒ *(\old(t) + \result) ≡ \old(v);
