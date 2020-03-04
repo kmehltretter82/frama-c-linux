@@ -812,35 +812,40 @@ let inject_global_initializer file main =
    are addresses of program arguments or NULLs if [main] is declared without
    arguments. *)
 let inject_mmodel_initializer main =
-  let loc = Location.unknown in
-  let nulls = [ Cil.zero loc ; Cil.zero loc ] in
-  let handle_main main =
-    let fundec =
-      try Kernel_function.get_definition main
-      with _ -> assert false (* by construction, the main kf has a fundec *)
+  (* Only inject memory init and memory clean if the memory model analysis is
+     running *)
+  if Mmodel_analysis.use_model () then begin
+    let loc = Location.unknown in
+    let nulls = [ Cil.zero loc ; Cil.zero loc ] in
+    let handle_main main =
+      let fundec =
+        try Kernel_function.get_definition main
+        with _ -> assert false (* by construction, the main kf has a fundec *)
+      in
+      let args =
+        (* record arguments only if the second has a pointer type, so argument
+           strings can be recorded. This is sufficient to capture C99 compliant
+           arguments and GCC extensions with environ. *)
+        match fundec.sformals with
+        | [] ->
+          (* no arguments to main given *)
+          nulls
+        | _argc :: argv :: _ when Cil.isPointerType argv.vtype ->
+          (* grab addresses of arguments for a call to the main initialization
+             function, i.e., [__e_acsl_memory_init] *)
+          List.map Cil.mkAddrOfVi fundec.sformals;
+        | _ :: _ ->
+          (* some non-standard arguments. *)
+          nulls
+      in
+      let ptr_size = Cil.sizeOf loc Cil.voidPtrType in
+      let args = args @ [ ptr_size ] in
+      let init = Constructor.mk_rtl_call loc "memory_init" args in
+      let clean = Constructor.mk_rtl_call loc "memory_clean" [] in
+      surround_function_with main fundec init (Some clean)
     in
-    let args =
-      (* record arguments only if the second has a pointer type, so argument
-         strings can be recorded. This is sufficient to capture C99 compliant
-         arguments and GCC extensions with environ. *)
-      match fundec.sformals with
-      | [] ->
-        (* no arguments to main given *)
-        nulls
-      | _argc :: argv :: _ when Cil.isPointerType argv.vtype ->
-        (* grab addresses of arguments for a call to the main initialization
-           function, i.e., [__e_acsl_memory_init] *)
-        List.map Cil.mkAddrOfVi fundec.sformals;
-      | _ :: _ ->
-        (* some non-standard arguments. *)
-        nulls
-    in
-    let ptr_size = Cil.sizeOf loc Cil.voidPtrType in
-    let args = args @ [ ptr_size ] in
-    let init = Constructor.mk_rtl_call loc "memory_init" args in
-    fundec.sbody.bstmts <- init :: fundec.sbody.bstmts
-  in
-  Extlib.may handle_main main
+    Extlib.may handle_main main
+  end
 
 let inject_in_file file =
   let _env, main =
