@@ -19,7 +19,7 @@ const makeLabel = (className,props) => {
   const allClasses =
         className +
         (display ? ' ' : ' dome-control-erased ') +
-        props.className ;
+        (props.className || '');
   return (
     <label className={allClasses}
            title={props.title}
@@ -92,7 +92,7 @@ export const Data = (props) => makeLabel(TDATA,props);
 
 /**
    @class
-   @summary Selectable source-code content.
+   @summary Selectable inlined source-code content.
    @property {string} [text] - Textual content (prepend to children components, if any)
    @property {string} [icon] - Label icon (optional, on left side)
    @property {string} [title] - Label tooltip (optional)

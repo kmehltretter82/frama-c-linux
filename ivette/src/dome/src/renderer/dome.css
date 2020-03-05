@@ -124,7 +124,7 @@ div.dome-dragged {
     user-select: text ;
     font-family: 'Andale mono', monospace ;
     font-size: 9pt ;
-    white-space: pre ;
+    white-space: nowrap ;
     text-overflow: clip ;
 }
 
