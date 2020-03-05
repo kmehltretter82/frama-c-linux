@@ -15,8 +15,8 @@ DOME_DEV_ARGS?=
 DOME_APP_ARGS?=
 DOME_EXPORTS?=
 DOME_PLUGINS?=
-DOME_CLI?=bin/$(DOME_MK_NAME)
-DOME_DOC?=doc/html
+DOME_CLI?=./bin/$(DOME_MK_NAME)
+DOME_DOC?=./doc/html
 DOME_API?=
 
 # --------------------------------------------------------------------------
