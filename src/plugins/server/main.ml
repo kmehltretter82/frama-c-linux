@@ -134,11 +134,7 @@ let pp_response pp fmt (r : _ response) =
   | `Killed id -> Format.fprintf fmt "Killed %a" pp id
   | `Signal sg -> Format.fprintf fmt "Signal %S" sg
   | `Data(id,data) ->
-    if Senv.debug_atleast 2 then
-      Format.fprintf fmt "@[<hov 2>Replies [%a]@ %a@]"
-        pp id Data.pretty data
-    else
-      Format.fprintf fmt "Replies [%a]" pp id
+    Format.fprintf fmt "@[<hov 2>Replies [%a]@ %a@]" pp id Data.pretty data
 
 (* -------------------------------------------------------------------------- *)
 (* --- Request Handling                                                   --- *)
@@ -163,7 +159,7 @@ let delayed process =
   else None
 
 let execute server ?yield proc =
-  Senv.debug "%a" (pp_process server.pretty) proc ;
+  Senv.debug ~level:2 "%a" (pp_process server.pretty) proc ;
   let resp = match yield with
     | Some yield when proc.yield ->
       Db.with_progress
@@ -172,7 +168,7 @@ let execute server ?yield proc =
         yield run proc
     | _ -> run proc
   in
-  Senv.debug "%a" (pp_response server.pretty) resp ;
+  Senv.debug ~level:2 "%a" (pp_response server.pretty) resp ;
   Stack.push resp server.q_out
 
 (* -------------------------------------------------------------------------- *)
