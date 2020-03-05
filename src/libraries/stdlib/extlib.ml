@@ -440,8 +440,12 @@ let temp_dir_cleanup_at_exit ?(debug=false) base =
 (** Strings *)
 (* ************************************************************************* *)
 
-external compare_strings: string -> string -> int -> bool =
-  "compare_strings" [@@noalloc]
+let compare_strings s1 s2 len =
+  try
+    for i = 0 to len - 1 do if s1.[i] <> s2.[i] then raise Exit; done;
+    true
+  with Exit -> false
+     | Invalid_argument _ -> raise (Invalid_argument "Extlib.compare_strings")
 
 let string_prefix ?(strict=false) prefix s =
   let add = if strict then 1 else 0 in
