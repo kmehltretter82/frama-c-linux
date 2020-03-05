@@ -176,13 +176,13 @@ src/libraries/stdlib/transitioning.ml: \
 # Frama-C-config #
 ##################
 
-src/kernel_internals/runtime/frama_c_config.ml: src/kernel_internals/runtime/config.ml \
+src/kernel_internals/runtime/frama_c_config.ml: src/kernel_internals/runtime/fc_config.ml \
 	src/kernel_internals/runtime/frama_c_config.ml.in Makefile.generating
 	$(PRINT_MAKING) $@
 	$(RM) $@
 	$(ECHO) "module Filepath = struct let add_symbolic_dir _ _ = () end" >> $@
-	$(ECHO) "module Config = struct" >> $@
-	$(CAT) src/kernel_internals/runtime/config.ml >> $@
+	$(ECHO) "module Fc_config = struct" >> $@
+	$(CAT) src/kernel_internals/runtime/fc_config.ml >> $@
 	$(ECHO) "end" >> $@
 	$(CAT) src/kernel_internals/runtime/frama_c_config.ml.in >> $@
 	$(CHMOD_RO) $@

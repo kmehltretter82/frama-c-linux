@@ -92,7 +92,7 @@ let () =
         let vis = new stdlib_visitor in
         ignore (Visitor.visitFramacFile (vis :> Visitor.frama_c_visitor) (Ast.get ()));
         let fc_stdlib_idents = vis#get_idents in
-        let dir = Filename.concat Config.datadir "compliance" in
+        let dir = Filename.concat Fc_config.datadir "compliance" in
         let c11_idents = get_ident_headers dir "c11_functions.json" in
         let glibc_idents = get_idents dir "glibc_functions.json" in
         let posix_idents = get_ident_headers_and_extensions dir "posix_identifiers.json" in

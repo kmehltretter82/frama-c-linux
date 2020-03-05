@@ -38,12 +38,12 @@ let print_config () =
            FRAMAC_SHARE  = %S@\n  \
            FRAMAC_LIB    = %S@\n  \
            FRAMAC_PLUGIN = %S%t@."
-          Config.version_and_codename
-          Config.datadir Config.libdir Config.plugin_path
+          Fc_config.version_and_codename
+          Fc_config.datadir Fc_config.libdir Fc_config.plugin_path
         (fun fmt ->
-          if Config.preprocessor = "" then
+          if Fc_config.preprocessor = "" then
             Format.fprintf fmt "@\nWarning: no default pre-processor"
-          else if not Config.preprocessor_keep_comments then
+          else if not Fc_config.preprocessor_keep_comments then
             Format.fprintf fmt
               "@\nWarning: default pre-processor is not able to keep comments \
                (hence ACSL annotations) in its output")
@@ -59,17 +59,17 @@ let print_config get value () =
     raise Cmdline.Exit
   end
 
-let print_version = print_config Kernel.PrintVersion.get Config.version_and_codename
+let print_version = print_config Kernel.PrintVersion.get Fc_config.version_and_codename
 let () = Cmdline.run_after_early_stage print_version
 
-let print_sharepath = print_config Kernel.PrintShare.get Config.datadir
+let print_sharepath = print_config Kernel.PrintShare.get Fc_config.datadir
 let () = Cmdline.run_after_early_stage print_sharepath
 
-let print_libpath = print_config Kernel.PrintLib.get Config.libdir
+let print_libpath = print_config Kernel.PrintLib.get Fc_config.libdir
 let () = Cmdline.run_after_early_stage print_libpath
 
 let print_pluginpath =
-  print_config Kernel.PrintPluginPath.get Config.plugin_path
+  print_config Kernel.PrintPluginPath.get Fc_config.plugin_path
 let () = Cmdline.run_after_early_stage print_pluginpath
 
 let print_machdep () =

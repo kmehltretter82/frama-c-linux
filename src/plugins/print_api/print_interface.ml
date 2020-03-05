@@ -58,7 +58,7 @@ let type_to_add: (string, string * string) Hashtbl.t = Hashtbl.create 97
 
 let clash_with_compilation_unit = 
   let h = Hashtbl.create 97 in
-  List.iter (fun s -> Hashtbl.add h s ()) Config.compilation_unit_names;
+  List.iter (fun s -> Hashtbl.add h s ()) Fc_config.compilation_unit_names;
   fun s ->
     Hashtbl.mem h s || Hashtbl.mem h (String.lowercase_ascii s)
 

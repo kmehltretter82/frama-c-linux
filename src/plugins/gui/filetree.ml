@@ -294,7 +294,7 @@ module MYTREE = struct
     Cil.hasAttribute "FC_BUILTIN" (Cil_datatype.Global.attr g)
 
   let comes_from_share filename =
-    Filepath.is_relative ~base_name:Config.datadir filename
+    Filepath.is_relative ~base_name:Fc_config.datadir filename
 
   let is_stdlib_global g =
     Cil.hasAttribute "fc_stdlib" (Cil_datatype.Global.attr g) ||

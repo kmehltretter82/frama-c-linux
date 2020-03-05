@@ -125,7 +125,7 @@ let is_object base =
 
 let packages = Hashtbl.create 64
 
-let () = List.iter (fun p -> Hashtbl.add packages p ()) ("frama-c.kernel"::Config.library_names)
+let () = List.iter (fun p -> Hashtbl.add packages p ()) ("frama-c.kernel"::Fc_config.library_names)
 
 let missing pkg = not (Hashtbl.mem packages pkg)
 
@@ -172,7 +172,7 @@ let load_packages pkgs =
               - plugin(byte)
               - plugin(native)
           *)
-          let gui = if !Config.is_gui then ["gui"] else [] in
+          let gui = if !Fc_config.is_gui then ["gui"] else [] in
           let predicates =
             (** The order is important for the archive cases *)
             if Dynlink.is_native then
@@ -241,11 +241,11 @@ let load_script base =
   let fmt = Format.formatter_of_buffer cmd in
   begin
     if Dynlink.is_native then
-      Format.fprintf fmt "%s -shared -o %s.cmxs" Config.ocamlopt base
+      Format.fprintf fmt "%s -shared -o %s.cmxs" Fc_config.ocamlopt base
     else
-      Format.fprintf fmt "%s -c" Config.ocamlc ;
-    Format.fprintf fmt " -g %s -warn-error a -I %s" Config.ocaml_wflags Config.libdir ;
-    if !Config.is_gui then Format.pp_print_string fmt " -package lablgtk2" ;
+      Format.fprintf fmt "%s -c" Fc_config.ocamlc ;
+    Format.fprintf fmt " -g %s -warn-error a -I %s" Fc_config.ocaml_wflags Fc_config.libdir ;
+    if !Fc_config.is_gui then Format.pp_print_string fmt " -package lablgtk2" ;
     List.iter (fun p -> Format.fprintf fmt " -I %s" p) !load_path ;
     Format.fprintf fmt " %s.ml" base ;
     Format.pp_print_flush fmt () ;
@@ -283,10 +283,10 @@ let set_module_load_path path =
       ( if user then Klog.warning "cannot load '%s' (not a directory)" d
       ; ps ) in
   Klog.debug ~dkey "plugin_dir: %s"
-    (String.concat ocamlfind_path_separator Config.plugin_dir);
+    (String.concat ocamlfind_path_separator Fc_config.plugin_dir);
   load_path :=
     List.fold_right (add_dir ~user:true) path
-      (List.fold_right (add_dir ~user:false) (Config.libdir::Config.plugin_dir) []);
+      (List.fold_right (add_dir ~user:false) (Fc_config.libdir::Fc_config.plugin_dir) []);
   let env_ocamlpath =
     try Str.split (Str.regexp ocamlfind_path_separator) (Sys.getenv "OCAMLPATH")
     with Not_found -> []

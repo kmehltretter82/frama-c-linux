@@ -24,8 +24,8 @@ open Sarif
 
 let frama_c_sarif =
   let name = "frama-c" in
-  let version = Config.version_and_codename in
-  let semanticVersion = Config.version in
+  let version = Fc_config.version_and_codename in
+  let semanticVersion = Fc_config.version in
   let fullName = name ^ "-" ^ version in
   let downloadUri = "https://frama-c.com/download.html" in
   Tool.create

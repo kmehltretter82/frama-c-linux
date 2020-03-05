@@ -286,7 +286,7 @@ DISTRIB_FILES:=\
       share/Makefile.dynamic_config.external				\
       share/Makefile.dynamic_config.internal				\
       share/META.frama-c                                                \
-      $(filter-out src/kernel_internals/runtime/config.ml,              \
+      $(filter-out src/kernel_internals/runtime/fc_config.ml,              \
 	  $(wildcard src/kernel_internals/runtime/*.ml*))               \
       $(wildcard src/kernel_services/abstract_interp/*.ml*)             \
       $(wildcard src/plugins/gui/*.ml*)                                 \
@@ -474,7 +474,7 @@ CMO	+= $(LIB_CMO)
 # Very first files to be linked (most modules use them)
 ###############################
 
-FIRST_CMO= src/kernel_internals/runtime/config \
+FIRST_CMO= src/kernel_internals/runtime/fc_config \
 	src/kernel_internals/runtime/gui_init \
 	src/kernel_services/plugin_entry_points/log \
 	src/kernel_services/cmdline_parameters/cmdline \
@@ -1324,8 +1324,8 @@ endif
 #####################
 
 CONFIG_DIR=src/kernel_internals/runtime
-CONFIG_FILE=$(CONFIG_DIR)/config.ml
-CONFIG_CMO=$(CONFIG_DIR)/config.cmo
+CONFIG_FILE=$(CONFIG_DIR)/fc_config.ml
+CONFIG_CMO=$(CONFIG_DIR)/fc_config.cmo
 GENERATED +=$(CONFIG_FILE)
 #Generated in Makefile.generating
 

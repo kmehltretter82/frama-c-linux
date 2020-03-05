@@ -50,10 +50,10 @@ let () =
       (module Jstring.Jlist) in
   Request.register_sig get_config
     begin fun rq () ->
-      set_version rq Config.version ;
-      set_datadir rq Config.datadir ;
-      set_libdir rq Config.libdir ;
-      set_pluginpath rq Config.plugin_dir ;
+      set_version rq Fc_config.version ;
+      set_datadir rq Fc_config.datadir ;
+      set_libdir rq Fc_config.libdir ;
+      set_pluginpath rq Fc_config.plugin_dir ;
     end
 
 (* -------------------------------------------------------------------------- *)

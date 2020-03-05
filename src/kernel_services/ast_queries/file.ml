@@ -103,18 +103,18 @@ let cpp_opt_kind () =
    If the program has an explicit argument -cpp-command "XX -Y"
    (quotes are required by the shell)
    then XX -Y
-   else use the command in [Config.preprocessor].*)
+   else use the command in [Fc_config.preprocessor].*)
 let get_preprocessor_command () =
   let cmdline = Kernel.CppCommand.get() in
   if cmdline <> "" then begin
     (cmdline, cpp_opt_kind ())
   end else begin
     let gnu =
-      if Config.using_default_cpp then
-        if Config.preprocessor_is_gnu_like then Gnu else Not_gnu
+      if Fc_config.using_default_cpp then
+        if Fc_config.preprocessor_is_gnu_like then Gnu else Not_gnu
       else cpp_opt_kind ()
     in
-    Config.preprocessor, gnu
+    Fc_config.preprocessor, gnu
   end
 
 let from_filename ?cpp f =
@@ -144,7 +144,7 @@ let from_filename ?cpp f =
     if Hashtbl.mem check_suffixes suf then
       External (f, suf)
     else if cpp <> "" then begin
-      if not Config.preprocessor_keep_comments then
+      if not Fc_config.preprocessor_keep_comments then
         Kernel.warning ~once:true
           "Default pre-processor does not keep comments. Any ACSL annotation \
            on non-pre-processed file will be discarded.";
@@ -460,7 +460,7 @@ let parse_cabs = function
     (* Hypothesis: the preprocessor is POSIX compliant,
        hence understands -I and -D. *)
     let include_args =
-      if Kernel.FramaCStdLib.get () then [Config.framac_libc]
+      if Kernel.FramaCStdLib.get () then [Fc_config.framac_libc]
       else []
     in
     let define_args =
@@ -478,7 +478,7 @@ let parse_cabs = function
     let required_cpp_arch_args = (get_machdep ()).cpp_arch_flags in
     let supported_cpp_arch_args, unsupported_cpp_arch_args =
       List.partition (fun arg ->
-          List.mem arg Config.preprocessor_supported_arch_options)
+          List.mem arg Fc_config.preprocessor_supported_arch_options)
         required_cpp_arch_args
     in
     if is_gnu_like = Unknown && not (Kernel.CppCommand.is_set ())
@@ -492,7 +492,7 @@ let parse_cabs = function
         (Pretty_utils.pp_list ~sep:" " Format.pp_print_string)
         unsupported_cpp_arch_args (Kernel.Machdep.get ())
         (Pretty_utils.pp_list ~sep:" " Format.pp_print_string)
-        Config.preprocessor_supported_arch_options;
+        Fc_config.preprocessor_supported_arch_options;
     let extra_args =
       if Kernel.ReadAnnot.get () then
         if Kernel.PreprocessAnnot.is_set () then
@@ -1668,7 +1668,7 @@ let init_from_cmdline () =
     Project.set_current prj2;
   end;
   let files = Kernel.Files.get () in
-  if files = [] && not !Config.is_gui then Kernel.warning "no input file.";
+  if files = [] && not !Fc_config.is_gui then Kernel.warning "no input file.";
   let files = List.map (fun f -> from_filename f) files in
   try
     init_from_c_files files;

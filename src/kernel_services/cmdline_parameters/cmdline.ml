@@ -71,7 +71,7 @@ module Kernel_log =
 let dkey = Kernel_log.register_category "cmdline"
 
 let quiet_ref = ref false
-let journal_enable_ref = ref !Config.is_gui
+let journal_enable_ref = ref !Fc_config.is_gui
 let journal_isset_ref = ref false
 let use_obj_ref = ref true
 let use_type_ref = ref true
@@ -87,7 +87,7 @@ let long_plugin_name s =
   if s = Log.kernel_label_name then "Frama-C" else "Plug-in " ^ s
 
 let additional_info () =
-  if !Config.is_gui then
+  if !Fc_config.is_gui then
     "\nReverting to previous state.\n\
      Check the Console tab for additional information."
   else
@@ -111,7 +111,7 @@ let request_crash_report =
      Note that a version and a backtrace alone often do not contain enough\n\
      information to understand the bug. Guidelines for reporting bugs are at:\n\
      http://bts.frama-c.com/dokuwiki/doku.php?id=mantis:frama-c:bug_reporting_guidelines\n"
-    Config.version_and_codename
+    Fc_config.version_and_codename
 
 let protect = function
   | Sys.Break -> 
@@ -993,7 +993,7 @@ let plugin_help shortname =
 let help () =
   Log.print_on_output
     begin fun fmt ->
-      Format.fprintf fmt "\nThis is Frama-C %s\n" Config.version_and_codename ;
+      Format.fprintf fmt "\nThis is Frama-C %s\n" Fc_config.version_and_codename ;
       Format.fprintf fmt "\nUsage:\n    %s [options files ...]\n" Sys.argv.(0) ;
       let print_line fmt s =
         Format.(pp_print_string fmt s ; pp_print_newline fmt ()) in

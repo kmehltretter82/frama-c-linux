@@ -20,8 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Fc_Config = Config
-
 let () = Plugin.is_share_visible ()
 let () = Plugin.is_session_visible ()
 include Plugin.Register
@@ -1078,7 +1076,7 @@ let base_output () =
   | None -> let output =
               match OutputDir.get () with
               | "" ->
-                  if !Fc_Config.is_gui
+                  if !Fc_config.is_gui
                   then make_gui_dir ()
                   else make_tmp_dir ()
               | dir ->
