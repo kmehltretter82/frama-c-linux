@@ -173,24 +173,24 @@ struct
     t_status Valid "valid" "Valid property"
   let t_valid_under_hyp =
     t_status Valid_under_hyp "valid_under_hyp"
-      ~label:"Valid(?)" "Valid (under hypotheses)"
+      ~label:"Valid (?)" "Valid (under hypotheses)"
   let t_considered_valid =
     t_status Considered_valid "considered_valid"
-      ~label:"Valid(!)" "Valid (external assumption)"
+      ~label:"Valid (!)" "Valid (external assumption)"
   let t_invalid =
     t_status Invalid "invalid" "Invalid property (counter example found)"
   let t_invalid_under_hyp =
     t_status Invalid_under_hyp "invalid_under_hyp"
-      ~label:"Invalid(?)" "Invalid property (under hypotheses)"
+      ~label:"Invalid (?)" "Invalid property (under hypotheses)"
   let t_invalid_but_dead =
     t_status Invalid_but_dead "invalid_but_dead"
-      ~label:"Invalid(✝)" "Dead property (but invalid)"
+      ~label:"Invalid (✝)" "Dead property (but invalid)"
   let t_valid_but_dead =
     t_status Valid_but_dead "valid_but_dead"
-      ~label:"Valid(✝)" "Dead property (but valid)"
+      ~label:"Valid (✝)" "Dead property (but valid)"
   let t_unknown_but_dead =
     t_status Unknown_but_dead "unknown_but_dead"
-      ~label:"Unknown(✝)" "Dead property (but unknown)"
+      ~label:"Unknown (✝)" "Dead property (but unknown)"
 
   let tag = function
     | Valid -> t_valid

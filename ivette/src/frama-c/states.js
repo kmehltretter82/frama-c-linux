@@ -127,30 +127,80 @@ export function useState(id)
    @summary Cached GET request (Custom React Hook).
    @param {string} rq - GET request name
    @param {any} [params] - GET request parameter
-   @param {boolean} [cancel] - Cancel value when updating (default is `false`)
-   @return {any} [result] GET reequest response (when available)
+   @param {object) [options] - Special values
+   @param {any} [options.offline] - Returned value when off-line
+   @param {any} [options.pending] - Returned value when pending response
+   @param {any} [options.error] - Returned value on request error
+   @return {any} [result] GET request response (when available)
    @description
    Sends the specified GET request and returns its result.
    The request is send asynchronously and cached until any change in
    `rq`, `params`, current project or server activity.
 
-   The result can be `undefined` when the Server is off or until
-   the server response has been actually received
-   (first request or `cancel=true`).
+   Default values for various situations can be defined in the options parameter,
+   which is `undefined` unless specified, or `null` to keep the current value.
+   For instance `{ pending: null }` will return `undefined` when off-line and in case of errors,
+   but will keep the last received value until a new one is actually received.
  */
-export function useRequest( rq, params, cancel=false )
+export function useRequest( rq, params, options={} )
 {
-  let project = useProject();
-  let [ value, setValue ] = React.useState();
+  const project = useProject();
+  const [ value, setValue ] = React.useState( options.offline );
   React.useEffect( () => {
     if (project) {
-      if (cancel) setValue(undefined);
-      Server.sendGET( rq , params ).then(setValue);
+      const pending = options.prending ;
+      if (pending !== null) setValue(pending);
+      Server.sendGET( rq , params )
+        .then(setValue)
+        .catch(err => {
+          if (Dome.DEVEL) console.warn(`[Server] use request '${rq}':`,err);
+          const error = options.error ;
+          if (error !== null) setValue(error);
+        });
     } else {
-      if (value !== undefined) setValue(undefined);
+      const v = options.offline ;
+      if (value !== v) setValue(v);
     }
   } , [ project, rq, JSON.stringify(params) ] );
   return value;
+}
+
+// --------------------------------------------------------------------------
+// --- Dictionaries
+// --------------------------------------------------------------------------
+
+/**
+   @summary Cached GET request (Custom React Hook).
+   @param {string} rq - GET request name
+   @param {any} [params] - GET request parameter (default `'null'`)
+   @param {object} [options] - Dictionary options
+   @param {boolean} [options.key] - The property to index an item (default `'name'`)
+   @param {boolean} [options.offline] - Keep the dictionary when offline (default `true`)
+   @param {boolean} [options.pending] - Keep the dictionary when pending (default `true`)
+   @param {boolean} [options.error] - Keep the dictionary on error (default `false`)
+   @param {function} [options.filter] - Only index items satisfying the filter (default `undefined`)
+   @return {object} [result] GET request response indexed by key
+   @description
+   Sends the specified GET request and returns its returned collection indexed by the provided key.
+   Items in the collection that do have the key are not indexed.
+*/
+export function useDictionary( rq, params=null, options={} )
+{
+  const { offline=true, pending=true, error=false, key='name', filter } = options ;
+  const tags = useRequest( rq, params, {
+    offline: offline ? null : undefined,
+    pending: pending ? null : undefined,
+    error: error ? null : undefined
+  });
+  const dict = React.useMemo( () => {
+    const d = {};
+    _.forEach( tags, tg => {
+      let k = tg[key];
+      if (k && (!filter || filter(tg))) d[k] = tg;
+    });
+    return d;
+  } , [ tags, filter ]);
+  return dict;
 }
 
 // --------------------------------------------------------------------------
@@ -366,12 +416,15 @@ export function useSyncArray(id)
 // --------------------------------------------------------------------------
 
 export default {
-  useProject, setProject,
+  useProject,
+  setProject,
   useState,
   useSyncState,
   useSyncValue,
   useSyncArray,
   reloadArray,
+  useRequest,
+  useDictionary,
   PROJECT, STATE
 };
 

@@ -131,15 +131,11 @@ const RenderConsole = () => {
   };
   const doNext = () => { cmdLine.getDoc().setValue(next() || ''); };
   const doPrev = () => { cmdLine.getDoc().setValue(prev() || ''); };
-  const doReload = () => {
-    console.log('CMD',cmdConfig);
-    dumpCmdLine( cmdConfig );
-  };
+  const doReload = () => { dumpCmdLine( cmdConfig ); };
   const doDrop = () => {
     cmdLine.clear();
     cmdLine.getDoc().setValue(update(undefined) || '');
   };
-  console.log('HISTORY',Dome.getWindowSetting('frama-c.command.history'));
   return (
     <React.Fragment>
       <TitleBar label={cmd ? 'Command Line' : 'Console'}>

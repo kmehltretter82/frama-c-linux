@@ -186,7 +186,7 @@ const vColumn = ({
   const defaults = elt.type._DOME_COLUMN_DEFAULTS || {} ;
   const forcers = !hasFill && elt == lastElt ? { fill:true } : {} ;
   const { id,label,title,icon,align,width,fill,disableSort,getValue,renderValue }
-        = Object.assign( defaults , elt.props , forcers ) ;
+        = Object.assign( {}, defaults , elt.props , forcers ) ;
   return (
     <VColumn
       key={id}
@@ -247,7 +247,7 @@ const defaultVisible = (visible) => {
 
  */
 export const DefineColumn = (DEFAULTS) => {
-  const Component = () => null;
+  function Component() { return null; };
   Component._DOME_COLUMN_DEFAULTS = DEFAULTS ;
   return Component ;
 };
