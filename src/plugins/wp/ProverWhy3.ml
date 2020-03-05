@@ -115,22 +115,21 @@ let t_app' ~cnv ~f ~l ~p tl ty =
 
 (** Conversion *)
 
-(** why3 1.3
-    let const_int (z:Z.t) =
-    Why3.(Term.t_const Number.(int_const (BigInt.of_string (Z.to_string z)))) Why3.Ty.ty_int
+(* why3 1.3 *)
+let const_int (z:Z.t) =
+  Why3.(Term.t_const Constant.(int_const (BigInt.of_string (Z.to_string z)))) Why3.Ty.ty_int
 
-    let const_real ~cnv (q:Q.t) =
-    let mk_real_int z =
-    let c = Why3.Number.real_const (Why3.BigInt.of_string (Z.to_string z)) in
+let const_real ~cnv (q:Q.t) =
+  let mk_real_int z =
+    let c = Why3.Constant.real_const (Why3.BigInt.of_string (Z.to_string z)) in
     Why3.(Term.t_const c) Why3.Ty.ty_real
-    in
-    if Z.equal Z.one q.den
-    then mk_real_int q.num
-    else
+  in
+  if Z.equal Z.one q.den
+  then mk_real_int q.num
+  else
     t_app ~cnv ~f:["real"] ~l:"Real" ~p:["infix /"] [mk_real_int q.num;mk_real_int q.den]
 
-*)
-
+    (*
 let const_int (z:Z.t) =
   Why3.(Term.t_const Number.(const_of_big_int (BigInt.of_string (Z.to_string z)))) Why3.Ty.ty_int
 
@@ -146,7 +145,7 @@ let const_real ~cnv (q:Q.t) =
   then mk_real_int q.num
   else
     t_app ~cnv ~f:["real"] ~l:"Real" ~p:["infix /"] [mk_real_int q.num;mk_real_int q.den]
-
+    *)
 (** fold map list of at least one element *)
 let fold_map map fold = function
   | [] -> assert false (** absurd: forbidden by qed  *)
@@ -1132,7 +1131,7 @@ let ping_prover_call p =
       Wp_parameters.debug ~dkey
         "@[@[Why3 result for %a:@] @[%a@] and @[%a@]@."
         Why3.Whyconf.print_prover p.prover
-        (Why3.Call_provers.print_prover_result) pr
+        (Why3.Call_provers.print_prover_result ~json_model:false) pr
         VCS.pp_result r;
       Task.Return (Task.Result r)
 
