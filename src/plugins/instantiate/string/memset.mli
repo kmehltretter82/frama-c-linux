@@ -19,3 +19,5 @@
 (*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
 (*                                                                        *)
 (**************************************************************************)
+
+(* register instantiation for memset. Don't export anything *)
