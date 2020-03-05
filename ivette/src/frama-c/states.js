@@ -127,7 +127,7 @@ export function useState(id)
    @summary Cached GET request (Custom React Hook).
    @param {string} rq - GET request name
    @param {any} [params] - GET request parameter
-   @param {object) [options] - Special values
+   @param {object} [options] - Special values
    @param {any} [options.offline] - Returned value when off-line
    @param {any} [options.pending] - Returned value when pending response
    @param {any} [options.error] - Returned value on request error

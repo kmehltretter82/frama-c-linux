@@ -354,7 +354,7 @@ export function clear() {
 /**
    @summary Configure the Server.
    @param {object} config - Server Configuration
-   @param {Object} [config.env] - Process environment variables (default: `undefined`)
+   @param {object} [config.env] - Process environment variables (default: `undefined`)
    @param {string} [config.cwd] - Working directory (default: current)
    @param {string} [config.command] - Server command (default: `frama-c`)
    @param {Array.<string>} [config.params] - Additional server arguments (default: empty)
@@ -571,6 +571,7 @@ class Signal {
     }
   }
 
+  /* Bound to this */
   sigon() {
     if (this.active && !this.listen) {
       Dome.emit( ACTIVITY + this.id, true );
@@ -580,6 +581,7 @@ class Signal {
     }
   }
 
+  /* Bound to this, Debounced */
   sigoff() {
     if (!this.active && this.listen) {
       Dome.emit( ACTIVITY + this.id, false );
@@ -612,10 +614,9 @@ function _signal(id)
    @description
    If the server is not yet listening to this signal, a `SIGON` command is sent.
  */
-export function on( id , callback )
+export function onSignal( id , callback )
 {
-  let s = _signal(id);
-  return s.on(callback);
+  _signal(id).on(callback);
 }
 
 /**
@@ -626,22 +627,21 @@ export function on( id , callback )
    When no more callbacks are listening to this signal for a while,
    the server will be notified with a `SIGOFF` command.
  */
-export function off( id , callback )
+export function offSignal( id , callback )
 {
-  let s = _signal(id);
-  return s.off(callback);
+  _signal(id).off(callback);
 }
 
 /**
    @summary Hook on Signal (Custom React Hook).
-   @param {string} id - the signal event that was listen to
-   @param {function} callback - the callback to remove
+   @param {string} id - the signal event to listen to
+   @param {function} callback - the callback to be called on signal
  */
 export function useSignal( id , callback )
 {
   React.useEffect( () => {
-    on( id , callback );
-    return () => { off(id,callback); };
+    onSignal( id , callback );
+    return () => { offSignal(id,callback); };
   });
 }
 
@@ -813,7 +813,7 @@ export default {
   start, stop, kill, restart, clear,
   sendGET, sendSET, sendEXEC,
   onReady, onShutdown, onActivity,
-  on, off, useSignal,
+  onSignal, offSignal, useSignal,
   STATUS,READY,SHUTDOWN,
   OFF,STARTED,RUNNING,KILLING,RESTART,FAILED
 };
