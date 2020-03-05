@@ -250,17 +250,17 @@ and pp_raw_stmt fmt = function
       pp_block bl1 pp_block bl2 pp_cabsloc loc
   |     THROW(e,loc) ->
     fprintf fmt "@[<hov 2>THROW %a, loc(%a)@]"
-      (Pretty_utils.pp_opt pp_exp) e pp_cabsloc loc
+      (Transitioning.Format.pp_print_option pp_exp) e pp_cabsloc loc
   |     TRY_CATCH(s,l,loc) ->
     let print_one_catch fmt (v,s) =
       fprintf fmt "@[<v 2>@[CATCH %a {@]@;%a@]@;}"
-        (Pretty_utils.pp_opt pp_single_name) v
+        (Transitioning.Format.pp_print_option pp_single_name) v
         pp_stmt s
     in
     fprintf fmt "@[<v 2>@[TRY %a (loc %a) {@]@;%a@]@;}"
       pp_stmt s
       pp_cabsloc loc
-      (Pretty_utils.pp_list ~sep:"@;" print_one_catch) l
+      (Format.pp_print_list ~pp_sep:Format.pp_print_cut print_one_catch) l
   |     CODE_ANNOT (_,_) -> fprintf fmt "CODE_ANNOT"
   |     CODE_SPEC _ -> fprintf fmt "CODE_SPEC"
 
