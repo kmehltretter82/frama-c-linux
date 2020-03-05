@@ -253,9 +253,3 @@ value single_precision_of_string(value str)
   double d = f;
   return caml_copy_double(d);
 }
-
-value ml_usleep(value v)
-{
-  usleep( Int_val(v) );
-  return Val_unit ;
-}

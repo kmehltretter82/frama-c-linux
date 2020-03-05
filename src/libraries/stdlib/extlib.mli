@@ -382,11 +382,6 @@ val safe_remove: string -> unit
 
 val safe_remove_dir: string -> unit
 
-val usleep: int -> unit
-  (** Unix function that sleep for [n] microseconds.
-      See [man usleep] for details.
-      Should not be used under Win32. *)
-
 (* ************************************************************************* *)
 (** Comparison functions *)
 (* ************************************************************************* *)

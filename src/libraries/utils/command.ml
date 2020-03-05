@@ -259,7 +259,7 @@ let command ?(timeout=0) ?stdout ?stderr cmd args =
       | Result r ->
           res := r;
           false
-    in while running () do Extlib.usleep 100000 (* 0.1s *) done ; !res
+    in while running () do Unix.sleepf 0.1 done ; !res
   else
     let f = command_generic ~async:false ?stdout ?stderr cmd args in
     match f () with
