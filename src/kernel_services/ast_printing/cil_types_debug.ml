@@ -93,10 +93,10 @@ and pp_deps fmt = function
 
 and pp_from fmt = pp_pair pp_identified_term pp_deps fmt
 
-and pp_assigns pp_locs fmt = function
+and pp_assigns fmt = function
   | WritesAny -> Format.fprintf fmt "WritesAny"
   | Writes(from_list) ->
-    Format.fprintf fmt "Writes(%a)" (pp_list pp_locs) from_list
+    Format.fprintf fmt "Writes(%a)" (pp_list pp_from) from_list
 
 
 and pp_file fmt file = Format.fprintf fmt "{fileName=%a;globals=%a;globinit=%a;globinitcalled=%a}"
@@ -922,7 +922,7 @@ and pp_behavior fmt behavior =
     (pp_list pp_identified_predicate) behavior.b_requires
     (pp_list pp_identified_predicate) behavior.b_assumes
     (pp_list (pp_pair pp_termination_kind pp_identified_predicate)) behavior.b_post_cond
-    (pp_assigns pp_from) behavior.b_assigns
+    pp_assigns behavior.b_assigns
     pp_allocation behavior.b_allocation
     (pp_list pp_acsl_extension) behavior.b_extended
 
@@ -933,24 +933,30 @@ and pp_termination_kind fmt = function
   | Continues -> Format.fprintf fmt "Continues"
   | Returns -> Format.fprintf fmt "Returns"
 
-and pp_loop_pragma pp_term fmt = function
-  | Unroll_specs(term_list) -> Format.fprintf fmt "Unroll_specs(%a)" (pp_list pp_term) term_list
-  | Widen_hints(term_list) -> Format.fprintf fmt "Widen_hints(%a)" (pp_list pp_term) term_list
-  | Widen_variables(term_list) -> Format.fprintf fmt "Widen_variables(%a)" (pp_list pp_term) term_list
+and pp_loop_pragma fmt = function
+  | Unroll_specs(term_list) ->
+    Format.fprintf fmt "Unroll_specs(%a)" (pp_list pp_term) term_list
+  | Widen_hints(term_list) ->
+    Format.fprintf fmt "Widen_hints(%a)" (pp_list pp_term) term_list
+  | Widen_variables(term_list) ->
+    Format.fprintf fmt "Widen_variables(%a)" (pp_list pp_term) term_list
 
-and pp_slice_pragma pp_term fmt = function
+and pp_slice_pragma fmt = function
   | SPexpr(term) -> Format.fprintf fmt "SPexpr(%a)" pp_term term
   | SPctrl -> Format.fprintf fmt "SPctrl"
   | SPstmt -> Format.fprintf fmt "SPstmt"
 
-and pp_impact_pragma pp_term fmt = function
+and pp_impact_pragma fmt = function
   | IPexpr(term) -> Format.fprintf fmt "IPexpr(%a)" pp_term term
   | IPstmt -> Format.fprintf fmt "IPstmt"
 
-and pp_pragma pp_term fmt = function
-  | Loop_pragma(term) -> Format.fprintf fmt "Loop_pragma(%a)" (pp_loop_pragma pp_term) term
-  | Slice_pragma(term) -> Format.fprintf fmt "Slice_pragma(%a)" (pp_slice_pragma pp_term) term
-  | Impact_pragma(term) -> Format.fprintf fmt "Impact_pragma(%a)" (pp_impact_pragma pp_term) term
+and pp_pragma fmt = function
+  | Loop_pragma(term) ->
+    Format.fprintf fmt "Loop_pragma(%a)" pp_loop_pragma term
+  | Slice_pragma(term) ->
+    Format.fprintf fmt "Slice_pragma(%a)" pp_slice_pragma term
+  | Impact_pragma(term) ->
+    Format.fprintf fmt "Impact_pragma(%a)" pp_impact_pragma term
 
 and pp_assertion_kind fmt = function
   | Assert -> Format.pp_print_string fmt "Assert"
@@ -967,12 +973,12 @@ and pp_code_annotation_node fmt = function
     Format.fprintf fmt "AVariant(%a)" pp_variant term_variant
   | AAssigns(string_list,assigns) ->
     Format.fprintf fmt "AAssigns(%a,%a)"  (pp_list pp_string) string_list
-      (pp_assigns pp_from) assigns
+      pp_assigns assigns
   | AAllocation(string_list,allocation) ->
     Format.fprintf fmt "AAllocation(%a,%a)"  (pp_list pp_string) string_list
       pp_allocation allocation
   | APragma(pragma) ->
-    Format.fprintf fmt "APragma(%a)" (pp_pragma pp_term) pragma
+    Format.fprintf fmt "APragma(%a)" pp_pragma pragma
   | AExtended(string_list,is_loop,acsl_extension) ->
     Format.fprintf fmt "AExtended(%a,%B,%a)"
       (pp_list pp_string) string_list  is_loop pp_acsl_extension acsl_extension
