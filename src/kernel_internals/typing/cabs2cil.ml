@@ -7199,58 +7199,49 @@ and doExp local_env
           | ADrop -> ADrop
           | _ -> AExp None
         in
-        (* if we are evaluating a constant expression, e1 is supposed to
-           evaluate to either true or false statically, and we can type-check
-           only the appropriate branch. In fact, 6.6§3 seems to indicate that
-           the dead branch can contain sub-expressions that are normally
-           forbidden in a constant expression context, such as function calls.
-        *)
         let is_true_cond = evaluate_cond_exp ce1 in
-        if asconst <> CNoConst && is_true_cond = `CTrue then begin
+        (* Now we must find the type of both branches, in order to compute
+         * the type of the result *)
+        let r2, se2, e2'o (* is an option. None means use e1 *), t2 =
           match e2.expr_node with
-          | A.NOTHING ->
-            (match ce1 with
-             | CEExp (_,e) -> finishExp [] empty e (Cil.typeOf e)
-             | _ ->
-               finishExp
-                 [] empty (Cil.one ~loc:e2.expr_loc) Cil.intType
-                 (* e1 is the result of logic operations that by
-                    definition of this branch evaluate to one. *))
+          | A.NOTHING -> begin (* The same as the type of e1 *)
+              match ce1 with
+              | CEExp (_, e1') ->
+                [], unspecified_chunk empty, None, typeOf e1'
+              (* Do not promote to bool *)
+              | _ -> [], unspecified_chunk empty, None, intType
+            end
           | _ ->
-            let _,c2,e2,t2 =
+            (* if e1 is false, e2 is only interesting for its type, but
+               we won't evaluate it. Hence, it can contain
+               non-const constructions *)
+            let asconst =
+              if is_true_cond = `CFalse then CMayConst else asconst
+            in
+            let r2, se2, e2', t2 =
               doExp (no_paren_local_env local_env) asconst e2 what'
             in
-            clean_up_chunk_locals c2;
-            finishExp [] empty e2 t2
+            r2, se2, Some e2', t2
+        in
+        (* Do e3 for real. See above for the value of asconst *)
+        let asconst' = if is_true_cond = `CTrue then CMayConst else asconst in
+        let r3, se3, e3', t3 =
+          doExp (no_paren_local_env local_env) asconst' e3 what'
+        in
+        let tresult = conditionalConversion t2 t3 in
+        if asconst <> CNoConst && is_true_cond = `CTrue then begin
+          clean_up_chunk_locals se2;
+          clean_up_chunk_locals se3;
+          let loc = e2.expr_loc in
+          let e2' = match e2'o with None -> Cil.one ~loc | Some e -> e in
+          let _,e2' = castTo t2 tresult e2' in
+          finishExp [] empty e2' tresult;
         end else if asconst <> CNoConst && is_true_cond = `CFalse then begin
-          let _,c3,e3,t3 =
-            doExp (no_paren_local_env local_env) asconst e3 what'
-          in
-          clean_up_chunk_locals c3;
-          finishExp [] empty e3 t3
+          clean_up_chunk_locals se2;
+          clean_up_chunk_locals se3;
+          let _,e3' = castTo t3 tresult e3' in
+          finishExp [] empty e3' tresult
         end else begin
-          (* Now we must find the type of both branches, in order to compute
-           * the type of the result *)
-          let r2, se2, e2'o (* is an option. None means use e1 *), t2 =
-            match e2.expr_node with
-            | A.NOTHING -> begin (* The same as the type of e1 *)
-                match ce1 with
-                | CEExp (_, e1') ->
-                  [], unspecified_chunk empty, None, typeOf e1'
-                (* Do not promote to bool *)
-                | _ -> [], unspecified_chunk empty, None, intType
-              end
-            | _ ->
-              let r2, se2, e2', t2 =
-                doExp (no_paren_local_env local_env) asconst e2 what'
-              in
-              r2, se2, Some e2', t2
-          in
-          (* Do e3 for real *)
-          let r3, se3, e3', t3 =
-            doExp (no_paren_local_env local_env) asconst e3 what'
-          in
-          let tresult = conditionalConversion t2 t3 in
           if not (isEmpty se2) then
             ConditionalSideEffectHook.apply (e,e2);
           if not (isEmpty se3) then

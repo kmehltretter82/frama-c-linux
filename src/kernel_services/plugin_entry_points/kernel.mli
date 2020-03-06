@@ -43,6 +43,8 @@ val dkey_ast: category
 
 val dkey_check: category
 
+val dkey_constfold: category
+
 val dkey_comments: category
 
 val dkey_compilation_db: category

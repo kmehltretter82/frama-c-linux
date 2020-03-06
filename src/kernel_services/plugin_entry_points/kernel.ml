@@ -49,6 +49,8 @@ let dkey_ast = register_category "ast"
 
 let dkey_check = register_category "check"
 
+let dkey_constfold = register_category "constfold"
+
 let dkey_comments = register_category "parser:comments"
 
 let dkey_dataflow = register_category "dataflow"

@@ -208,8 +208,6 @@ let () =
 
 let selfMachine_is_computed = TheMachine.is_computed
 
-let debugConstFold = false
-
 let new_exp ~loc e = { eloc = loc; eid = Cil_const.Eid.next (); enode = e }
 
 let dummy_exp e = { eid = -1; enode = e; eloc = Cil_datatype.Location.unknown }
@@ -3051,7 +3049,16 @@ let integer_constant i = CInt64(Integer.of_int i, IInt, None)
 (* Construct an integer. Use only for values that fit on 31 bits *)
 let integer ~loc (i: int) = new_exp ~loc (Const (integer_constant i))
 
-let kfloat ~loc k f = new_exp ~loc (Const (CReal(f,k,None)))
+let kfloat ~loc k f =
+  let is_single_precision =
+    match k with FFloat -> true | FDouble | FLongDouble -> false
+  in
+  let f =
+    if is_single_precision then
+      Floating_point.round_to_single_precision_float f
+    else f
+  in
+  new_exp ~loc (Const (CReal(f,k,None)))
 
 let zero      ~loc = integer ~loc 0
 let one       ~loc = integer ~loc 1
@@ -3507,6 +3514,11 @@ let rec isLogicRealType t =
 let isArithmeticType t =
   match unrollTypeSkel t with
     (TInt _ | TEnum _ | TFloat _) -> true
+  | _ -> false
+
+let isLongDoubleType t =
+  match unrollTypeSkel t with
+  | TFloat(FLongDouble,_) -> true
   | _ -> false
 
 let isArithmeticOrPointerType t=
@@ -4398,33 +4410,48 @@ and bitsOffset (baset: typ) (off: offset) : int * int =
     See also {!Cil.constFoldVisitor}, which will run constFold on all
     expressions in a given AST node.*)
 and constFold (machdep: bool) (e: exp) : exp =
-  if debugConstFold then Kernel.debug "ConstFold to %a@." !pp_exp_ref e;
+  let dkey = Kernel.dkey_constfold in
+  Kernel.debug ~dkey "ConstFold %a@." !pp_exp_ref e;
   let loc = e.eloc in
   match e.enode with
     BinOp(bop, e1, e2, tres) -> constFoldBinOp ~loc machdep bop e1 e2 tres
-  | UnOp(unop, e1, tres) -> begin
-      try
-        let tk =
-          match unrollTypeSkel tres with
-          | TInt(ik, _) -> ik
-          | TEnum (ei,_) -> ei.ekind
-          | _ -> raise Not_found (* probably a float *)
-        in
-        let e1c = constFold machdep e1 in
-        match e1c.enode with
-          Const(CInt64(i,_ik,repr)) -> begin
-            match unop with
-              Neg ->
-              let repr = Extlib.opt_map (fun s -> "-" ^ s) repr in
-              kinteger64 ~loc ?repr ~kind:tk (Integer.neg i)
-            | BNot -> kinteger64 ~loc ~kind:tk (Integer.lognot i)
-            | LNot ->
-              if Integer.equal i Integer.zero then one ~loc
-              else zero ~loc
-          end
-        | _ -> if e1 == e1c then e else new_exp ~loc (UnOp(unop, e1c, tres))
-      with Not_found -> e
+  | UnOp(unop, e1, tres) when isIntegralType tres -> begin
+      let tk =
+        match unrollTypeSkel tres with
+        | TInt(ik, _) -> ik
+        | TEnum (ei,_) -> ei.ekind
+        | _ -> assert false (* tres is an integral type *)
+      in
+      let e1c = constFold machdep e1 in
+      match e1c.enode with
+        Const(CInt64(i,_ik,repr)) -> begin
+          match unop with
+            Neg ->
+            let repr = Extlib.opt_map (fun s -> "-" ^ s) repr in
+            kinteger64 ~loc ?repr ~kind:tk (Integer.neg i)
+          | BNot -> kinteger64 ~loc ~kind:tk (Integer.lognot i)
+          | LNot ->
+            if Integer.equal i Integer.zero then one ~loc
+            else zero ~loc
+        end
+      | _ -> if e1 == e1c then e else new_exp ~loc (UnOp(unop, e1c, tres))
     end
+  | UnOp(unop, e1, tres) when isArithmeticType tres -> begin
+      let tk =
+        match unrollTypeSkel tres with
+        | TFloat(fk,_) -> fk
+        | _ -> assert false (*tres is arithmetic but not integral, i.e. Float *)
+      in
+      let e1c = constFold machdep e1 in
+      match e1c.enode with
+      | Const (CReal(f,_,_)) -> begin
+          match unop with
+          | Neg -> kfloat ~loc tk (-. f)
+          | _ -> if e1 == e1c then e else new_exp ~loc (UnOp(unop,e1c,tres))
+        end
+      | _ -> if e1 == e1c then e else new_exp ~loc (UnOp(unop,e1c,tres))
+    end
+  | UnOp _ -> e
   (* Characters are integers *)
   | Const(CChr c) -> new_exp ~loc (Const(charConstToIntConstant c))
   | Const(CEnum {eival = v}) -> constFold machdep v
@@ -4468,16 +4495,14 @@ and constFold (machdep: bool) (e: exp) : exp =
     end
 
   | CastE (t, e) -> begin
-      if debugConstFold then
-        Kernel.debug "ConstFold CAST to to %a@." !pp_typ_ref t ;
+      Kernel.debug ~dkey "ConstFold CAST to %a@." !pp_typ_ref t ;
       let e = constFold machdep e in
       match e.enode, unrollType t with
       | Const(CInt64(i,_k,_)),(TInt(nk,a)|TEnum({ekind = nk},a)) when a = [] ->
         begin
           (* If the cast has attributes, leave it alone. *)
-          if debugConstFold then
-            Kernel.debug "ConstFold to %a : %a@."
-              !pp_ikind_ref nk Datatype.Integer.pretty i;
+          Kernel.debug ~dkey "ConstFold to %a : %a@."
+            !pp_ikind_ref nk Datatype.Integer.pretty i;
           (* Downcasts might truncate silently *)
           kinteger64 ~loc ~kind:nk i
         end
@@ -4494,6 +4519,20 @@ and constFold (machdep: bool) (e: exp) : exp =
           with Floating_point.Float_Non_representable_as_Int64 _ -> (* too big*)
             new_exp ~loc (CastE (t, e))
         end
+      | Const (CReal(f,_,_)), TFloat (FFloat,a) when a = [] ->
+        let f = Floating_point.round_to_single_precision_float f in
+        new_exp ~loc (Const (CReal (f,FFloat,None)))
+      | Const (CReal(f,_,_)), TFloat (FDouble,a) when a = [] ->
+        new_exp ~loc (Const (CReal (f,FDouble,None)))
+      (* We don't treat cast to long double, as we don't really know
+         how to handle this type anyway. *)
+      | Const (CInt64(i,_,_)), (TFloat(FFloat,a)) when a = [] ->
+        let f = Integer.to_float i in
+        let f = Floating_point.round_to_single_precision_float f in
+        new_exp ~loc (Const (CReal (f,FFloat,None)))
+      | Const (CInt64(i,_,_)), (TFloat(FDouble,a)) when a = [] ->
+        let f = Integer.to_float i in
+        new_exp ~loc (Const (CReal (f,FDouble,None)))
       | _, _ -> new_exp ~loc (CastE (t, e))
     end
   | Lval lv -> new_exp ~loc (Lval (constFoldLval machdep lv))
@@ -4651,6 +4690,18 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
       | Gt, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_)) ->
         let i1', i2', _ = convertInts i1 ik1 i2 ik2 in
         if Integer.gt i1' i2' then one ~loc else zero ~loc
+      | Eq, Const(CReal(f1,fk1,_)),Const(CReal(f2,fk2,_)) when fk1 = fk2 ->
+        if f1 = f2 then one ~loc else zero ~loc
+      | Ne, Const(CReal(f1,fk1,_)),Const(CReal(f2,fk2,_)) when fk1 = fk2 ->
+        if f1 = f2 then zero ~loc else one ~loc
+      | Le, Const(CReal(f1,fk1,_)),Const(CReal(f2,fk2,_)) when fk1 = fk2 ->
+        if f1 <= f2 then one ~loc else zero ~loc
+      | Ge, Const(CReal(f1,fk1,_)),Const(CReal(f2,fk2,_)) when fk1 = fk2 ->
+        if f1 >= f2 then one ~loc else zero ~loc
+      | Lt, Const(CReal(f1,fk1,_)),Const(CReal(f2,fk2,_)) when fk1 = fk2 ->
+        if f1 < f2 then one ~loc else zero ~loc
+      | Gt, Const(CReal(f1,fk1,_)),Const(CReal(f2,fk2,_)) when fk1 = fk2 ->
+        if f1 > f2 then one ~loc else zero ~loc
 
       (* We rely on the fact that LAnd/LOr appear in global initializers
          and should not have side effects. *)
@@ -4664,11 +4715,27 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
         one ~loc
       | _ -> new_exp ~loc (BinOp(bop, e1', e2', tres))
     in
-    if debugConstFold then
-      Format.printf "Folded %a to %a@."
-        !pp_exp_ref (new_exp ~loc (BinOp(bop, e1', e2', tres)))
-        !pp_exp_ref newe;
+    Kernel.debug ~dkey:Kernel.dkey_constfold "Folded %a to %a@."
+      !pp_exp_ref (new_exp ~loc (BinOp(bop, e1', e2', tres)))
+      !pp_exp_ref newe;
     newe
+  end else if isArithmeticType tres && not (isLongDoubleType tres) then begin
+    let tk =
+      match unrollTypeSkel tres with
+      | TFloat(fk,_) -> fk
+      | _ -> Kernel.fatal "constFoldBinOp: not a floating type"
+    in
+    match bop, e1'.enode, e2'.enode with
+    | PlusA, Const(CReal(f1,fk1,_)), Const(CReal(f2,fk2,_)) when fk1 = fk2 ->
+      kfloat ~loc tk (f1 +. f2)
+    | MinusA, Const(CReal(f1,fk1,_)), Const(CReal(f2,fk2,_)) when fk1 = fk2 ->
+      kfloat ~loc tk (f1 -. f2)
+    | Mult, Const(CReal(f1,fk1,_)), Const(CReal(f2,fk2,_)) when fk1 = fk2 ->
+      kfloat ~loc tk (f1 *. f2)
+    | Div, Const(CReal(f1,fk1,_)), Const(CReal(f2,fk2,_)) when fk1 = fk2 ->
+      (*might be infinity or NaN, but that's still a float*)
+      kfloat ~loc tk (f1 /. f2)
+    | _ -> new_exp ~loc (BinOp(bop,e1',e2',tres))
   end else
     new_exp ~loc (BinOp(bop, e1', e2', tres))
 
