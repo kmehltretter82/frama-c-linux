@@ -26,7 +26,6 @@ unsigned long long my_pow(unsigned int x, unsigned int n)
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   unsigned long long x = my_pow((unsigned int)2,(unsigned int)63);
   {
     __e_acsl_mpz_t __gen_e_acsl_;

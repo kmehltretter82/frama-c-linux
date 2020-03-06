@@ -53,6 +53,12 @@ void __e_acsl_globals_init(void)
   return;
 }
 
+void __e_acsl_globals_delete(void)
+{
+  __e_acsl_delete_block((void *)(& global_i_ptr));
+  __e_acsl_delete_block((void *)(& global_i));
+}
+
 int main(void)
 {
   int __retres;
@@ -60,8 +66,7 @@ int main(void)
   __e_acsl_globals_init();
   __gen_e_acsl_loop();
   __retres = 0;
-  __e_acsl_delete_block((void *)(& global_i_ptr));
-  __e_acsl_delete_block((void *)(& global_i));
+  __e_acsl_globals_delete();
   __e_acsl_memory_clean();
   return __retres;
 }

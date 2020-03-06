@@ -24,7 +24,6 @@ int incr(int x)
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   int i = __gen_e_acsl_f(2);
   __retres = 0;
   return __retres;

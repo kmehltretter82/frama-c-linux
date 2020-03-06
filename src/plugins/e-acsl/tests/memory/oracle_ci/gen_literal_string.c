@@ -82,6 +82,15 @@ void __e_acsl_globals_init(void)
   return;
 }
 
+void __e_acsl_globals_delete(void)
+{
+  __e_acsl_delete_block((void *)(& l_str));
+  __e_acsl_delete_block((void *)(& s_str));
+  __e_acsl_delete_block((void *)(& S2));
+  __e_acsl_delete_block((void *)(& S));
+  __e_acsl_delete_block((void *)(& T));
+}
+
 int main(void)
 {
   int __retres;
@@ -138,12 +147,8 @@ int main(void)
   s_str ++;
   l_str ++;
   __retres = 0;
-  __e_acsl_delete_block((void *)(& l_str));
-  __e_acsl_delete_block((void *)(& s_str));
-  __e_acsl_delete_block((void *)(& S2));
-  __e_acsl_delete_block((void *)(& S));
-  __e_acsl_delete_block((void *)(& T));
   __e_acsl_delete_block((void *)(& SS));
+  __e_acsl_globals_delete();
   __e_acsl_memory_clean();
   return __retres;
 }
