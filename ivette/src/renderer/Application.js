@@ -17,6 +17,7 @@ import { LabView, View, Group, Component } from 'frama-c/labviews' ;
 import { GridItem, GridHbox, GridVbox } from 'dome/layout/grids';
 import Controller from './Controller' ;
 import Properties from './Properties' ;
+import ASTview from './ASTview' ;
 
 // --------------------------------------------------------------------------
 // --- Main View
@@ -56,8 +57,8 @@ export default (function() {
           </View>
           <Group id='frama-c' label='Frama-C' title='Frama-C Kernel Components'>
             <Controller.Console/>
-            <Properties.PropTable/>
             <Properties/>
+            <ASTview/>
           </Group>
         </LabView>
       </Splitter>
