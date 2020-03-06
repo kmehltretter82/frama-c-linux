@@ -703,8 +703,11 @@ let surround_function_with kf fundec stmt_begin stmt_end =
   body.bstmts <- stmt_begin :: body.bstmts
 
 (* TODO: what about using [file.globalinit]? *)
-let inject_global_initializer file main =
-  Options.feedback ~dkey ~level:2 "building global initializer.";
+(** Add a call to [__e_acsl_globals_init] and [__e_acsl_globals_delete] if the
+    memory model analysis is running.
+    These functions track the usage of globals if the program being analyzed. *)
+let inject_global_handler file main =
+  Options.feedback ~dkey ~level:2 "building global handler.";
   if Mmodel_analysis.use_model () then
     (* Create [__e_acsl_globals_init] function *)
     let vi_init, fundec_init = Global_observer.mk_init_function () in
@@ -788,11 +791,14 @@ let inject_global_initializer file main =
       in
       file.globals <- file.globals @ globals_func
 
-(* Add a call to [__e_acsl_memory_init] that initializes memory storage and
-   potentially records program arguments. Parameters to [__e_acsl_memory_init]
-   are addresses of program arguments or NULLs if [main] is declared without
-   arguments. *)
-let inject_mmodel_initializer main =
+(** Add a call to [__e_acsl_memory_init] and [__e_acsl_memory_clean] if the
+    memory model analysis is running.
+    [__e_acsl_memory_init] initializes memory storage and potentially records
+    program arguments. Parameters to [__e_acsl_memory_init] are addresses of
+    program arguments or NULLs if [main] is declared without arguments.
+    [__e_acsl_memory_clean] clean the memory allocated by
+    [__e_acsl_memory_init]. *)
+let inject_mmodel_handler main =
   (* Only inject memory init and memory clean if the memory model analysis is
      running *)
   if Mmodel_analysis.use_model () then begin
@@ -835,9 +841,9 @@ let inject_in_file file =
   (* post-treatment *)
   (* extend [main] with forward initialization and put it at end *)
   if not (Global_observer.is_empty () && Literal_strings.is_empty ()) then
-    inject_global_initializer file main;
+    inject_global_handler file main;
   file.globals <- Logic_functions.add_generated_functions file.globals;
-  inject_mmodel_initializer main
+  inject_mmodel_handler main
 
 let reset_all ast =
   (* by default, do not run E-ACSL on the generated code *)
