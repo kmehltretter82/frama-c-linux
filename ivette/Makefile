@@ -2,7 +2,7 @@
 APP=Ivette
 DOME=./src/dome
 DOME_ARGS=--command ./$$(dirname $$0)/../../bin/frama-c
-DOME_DEV=-server-debug 2
+DOME_DEV=-server-debug 1
 DOME_CLI=./bin/frama-c-gui
 DOME_API=./src/frama-c
 COPYRIGHT=CEA LIST / LSL
