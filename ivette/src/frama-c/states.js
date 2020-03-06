@@ -356,8 +356,10 @@ class SyncArray
         updated.forEach((item) => {
           this.index[item.key] = item;
         });
-        if (reloaded || removed.length || updated.length)
+        if (reloaded || removed.length || updated.length) {
+          this.index = Object.assign( {}, this.index );
           Dome.emit( this.UPDATE );
+        }
         if (pending>0) {
           this.fetch();
         }

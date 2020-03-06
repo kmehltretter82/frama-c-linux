@@ -78,7 +78,7 @@ const chainableOrder = ( order ) => {
   const compare = (a,b) => {
     for (var k = 0; k < order.length ; k++) {
       const cmp = (order[k])(a,b);
-      if (cmp) return cmp;
+      if (cmp !==0 ) return cmp;
     }
     return 0;
   };
