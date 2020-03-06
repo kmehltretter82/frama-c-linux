@@ -593,7 +593,7 @@ let inject_in_fundec main fundec =
   add_generated_variables_in_function env fundec;
   add_malloc_and_free_stmts kf fundec;
   (* setting main if necessary *)
-  let main = if Kernel_function.is_main kf then Some fundec else main in
+  let main = if Kernel_function.is_main kf then Some kf else main in
   Options.feedback ~dkey ~level:2 "function %a done."
     Kernel_function.pretty kf;
   env, main
@@ -686,11 +686,17 @@ let inject_global_initializer file main =
       in
       vi.vreferenced <- true;
       (* insert [__e_acsl_globals_init ();] as first statement of [main] *)
-      main.sbody.bstmts <- stmt :: main.sbody.bstmts;
+      let main_fundec = try
+          Kernel_function.get_definition main
+        with _ -> assert false (* by construction, the main kf has a fundec *)
+      in
+      main_fundec.sbody.bstmts <- stmt :: main_fundec.sbody.bstmts;
+      (* Retrieve all globals except main *)
+      let main_vi = Globals.Functions.get_vi main in
       let new_globals =
         List.fold_left
           (fun acc g -> match g with
-             | GFun({ svar = vi }, _) when Varinfo.equal vi main.svar -> acc
+             | GFun({ svar = vi }, _) when Varinfo.equal vi main_vi -> acc
              | _ -> g :: acc)
           []
           file.globals
@@ -701,7 +707,7 @@ let inject_global_initializer file main =
           | f :: l -> rev_and_extend (f :: acc) l
         in
         (* [__e_acsl_globals_init] and [main] at the end *)
-        rev_and_extend [ cil_fct; GFun(main, Location.unknown) ] new_globals
+        rev_and_extend [ cil_fct; GFun(main_fundec, Location.unknown) ] new_globals
       in
       (* add the literal string varinfos as the very first globals *)
       let new_globals =
@@ -725,18 +731,22 @@ let inject_mmodel_initializer main =
   let loc = Location.unknown in
   let nulls = [ Cil.zero loc ; Cil.zero loc ] in
   let handle_main main =
+    let fundec =
+      try Kernel_function.get_definition main
+      with _ -> assert false (* by construction, the main kf has a fundec *)
+    in
     let args =
       (* record arguments only if the second has a pointer type, so argument
          strings can be recorded. This is sufficient to capture C99 compliant
          arguments and GCC extensions with environ. *)
-      match main.sformals with
+      match fundec.sformals with
       | [] ->
         (* no arguments to main given *)
         nulls
       | _argc :: argv :: _ when Cil.isPointerType argv.vtype ->
         (* grab addresses of arguments for a call to the main initialization
            function, i.e., [__e_acsl_memory_init] *)
-        List.map Cil.mkAddrOfVi main.sformals;
+        List.map Cil.mkAddrOfVi fundec.sformals;
       | _ :: _ ->
         (* some non-standard arguments. *)
         nulls
@@ -744,7 +754,7 @@ let inject_mmodel_initializer main =
     let ptr_size = Cil.sizeOf loc Cil.voidPtrType in
     let args = args @ [ ptr_size ] in
     let init = Constructor.mk_rtl_call loc "memory_init" args in
-    main.sbody.bstmts <- init :: main.sbody.bstmts
+    fundec.sbody.bstmts <- init :: fundec.sbody.bstmts
   in
   Extlib.may handle_main main
 
