@@ -194,7 +194,6 @@ Makefile.plugin.generated
 /src/kernel_internals/parsing/clexer.ml
 /src/kernel_internals/parsing/cparser.ml
 /src/kernel_internals/parsing/cparser.mli
-/src/kernel_services/ast_queries/json_compilation_database.ml
 /src/libraries/stdlib/transitioning.ml
 /src/plugins/gui/dgraph.ml
 /src/plugins/gui/dgraph.mli
@@ -204,8 +203,6 @@ Makefile.plugin.generated
 /src/plugins/gui/GSourceView2.ml
 /src/plugins/gui/GSourceView2.mli
 /src/plugins/gui/gtk_compat.ml
-/src/plugins/value/domains/apron/apron_domain.ml
-/src/plugins/value/domains/numerors/numerors_domain.ml
 
 # generated tar.gz files
 
