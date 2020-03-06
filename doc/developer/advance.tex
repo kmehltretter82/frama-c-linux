@@ -1023,7 +1023,7 @@ the sequence above is read in order and defines a configuration level
     STDOPT: [[+#-]"opt" ...]
   \end{code}
 options are always given between quotes. An option following a \texttt{+}
-(resp. \texttt{\#} is added to the end (resp. start) of current set of options
+(resp. \texttt{\#}) is added to the end (resp. start) of current set of options
 while an option following a \texttt{-} is removed from it. The directive can be
 empty (meaning that the corresponding test will use the standard set of
 options). As with \texttt{OPT}, each \texttt{STDOPT} corresponds to a different
@@ -2938,9 +2938,9 @@ module Print =
 \end{ocamlcode}
 So it is a boolean parameter initialized by default to
 \texttt{false}. The declared interface for this module is simply
-\scodeidx{Parameter\_sig}{Int}
+\scodeidx{Parameter\_sig}{Bool}
 \begin{ocamlcode}
-module Print: Parameter_sig.Int
+module Print: Parameter_sig.Bool
 \end{ocamlcode}
 
 Another example is the parameter corresponding to the option
