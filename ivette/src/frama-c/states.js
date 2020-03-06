@@ -37,7 +37,8 @@ export const STATE = 'frama-c.state.' ;
 // --------------------------------------------------------------------------
 
 var currentProject = undefined ;
-var states = {} ;
+var states = {};
+var stateDefaults = {};
 
 Server.onReady(() => {
   Server.sendGET('kernel.project.getCurrent')
@@ -89,14 +90,23 @@ export function setProject(project)
 
 function getValue(id,project) {
   if (!project) return undefined;
-  return _.get( states, [project,id] );
+  return _.get( states, [project,id], stateDefaults[id] );
 }
 
 function setValue(id,project,value) {
-  const theProject = project || currentProject ;
-  if (!theProject) return ;
+  if (!project) return ;
   _.set( states, [project,id], value );
   Dome.emit( STATE + id , value );
+}
+
+/**
+   @summary Define the default state value.
+   @param {string} id - the state identifier (mandatory)
+   @param {any} value - the new default state
+ */
+export function setStateDefault(id,value)
+{
+  stateDefaults[id] = value;
 }
 
 /**
@@ -414,10 +424,33 @@ export function useSyncArray(id)
 }
 
 // --------------------------------------------------------------------------
+// --- Selection
+// --------------------------------------------------------------------------
+
+const SELECTION = 'kernel.selection' ;
+
+setStateDefault( SELECTION , {} );
+
+/**
+   @sumamry Current selection state.
+   @return {array} `[selection,update]` for the current selection
+   @description
+   The selection is an object with many independant fields.
+   You update it by providing only some fields, the other ones being kept unchanged,
+   like the `setState()` behaviour of React components.
+ */
+export function useSelection()
+{
+  const [ state, setState ] = useState( SELECTION );
+  return [ state, (upd) => setState(Object.assign( {}, state, upd )) ];
+}
+
+// --------------------------------------------------------------------------
 
 export default {
   useProject,
   setProject,
+  setStateDefault,
   useState,
   useSyncState,
   useSyncValue,
@@ -425,6 +458,7 @@ export default {
   reloadArray,
   useRequest,
   useDictionary,
+  useSelection,
   PROJECT, STATE
 };
 

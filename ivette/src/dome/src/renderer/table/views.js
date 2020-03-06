@@ -534,7 +534,6 @@ export class Table extends React.Component {
 
   selectRow({event, index, rowData:{item}}) {
     this.focus = item ;
-    window.getSelection().empty();
     if (item) {
       const { model, multipleSelection , selection, onSelection } = this.props ;
       if (multipleSelection) {

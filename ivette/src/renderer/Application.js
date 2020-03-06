@@ -57,6 +57,7 @@ export default (function() {
           <Group id='frama-c' label='Frama-C' title='Frama-C Kernel Components'>
             <Controller.Console/>
             <Properties.PropTable/>
+            <Properties/>
           </Group>
         </LabView>
       </Splitter>
