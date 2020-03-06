@@ -236,7 +236,11 @@ export const CircButton = (props) => {
 
 export const IconButton = (props) => {
   const disabled = DISABLED(props);
-  const { icon, size, visible=true, display=true, selected, kind='default' } = props ;
+  const {
+    icon, size, title,
+    visible=true, display=true, selected,
+    kind='default'
+  } = props ;
   const className = 'dome-xIconButton'
         + ' dome-xIconButton-' + (selected ? 'selected' : kind)
         + (disabled ? ' dome-control-disabled' : ' dome-control-enabled')
@@ -245,7 +249,7 @@ export const IconButton = (props) => {
         + (props.className ? ' ' + props.className : '') ;
   return (
     <Icon
-      size={size} id={icon}
+      size={size} id={icon} title={title}
       style={props.style}
       offset={props.offset}
       className={className}
