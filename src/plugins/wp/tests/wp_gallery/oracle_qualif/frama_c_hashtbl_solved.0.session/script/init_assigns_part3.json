@@ -1,6 +1,4 @@
-[ { "prover": "Alt-Ergo:2.0.0", "verdict": "timeout", "time": 20. },
-  { "prover": "script", "verdict": "valid" },
-  { "header": "Range", "tactic": "Wp.range",
+[ { "header": "Range", "tactic": "Wp.range",
     "params": { "inf": 0, "sup": 16 },
     "select": { "select": "inside-goal", "occur": 0, "target": "i_112",
                 "pattern": "$i" },
