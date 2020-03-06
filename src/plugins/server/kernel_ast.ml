@@ -20,7 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-
 open Data
 module Sy = Syntax
 module Md = Markdown
@@ -42,16 +41,17 @@ let () = Request.register ~page
 (* ---  Printers                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Tag =
+module Marker =
 struct
 
   open Printer_tag
+  module Hmap = Hashtbl.Make(Localizable)
 
-  type index = (string,localizable) Hashtbl.t
+  type index = string Hmap.t * (string,localizable) Hashtbl.t
 
   let kid = ref 0
 
-  let index () = Hashtbl.create 0
+  let index () = Hmap.create 0, Hashtbl.create 0
 
   module TYPE : Datatype.S with type t = index =
     Datatype.Make
@@ -70,30 +70,41 @@ struct
         let default = index
       end)
 
-  let of_stmt s = Printf.sprintf "#s%d" s.sid
-  let of_start s = Printf.sprintf "#k%d" s.sid
-  let of_varinfo v = Printf.sprintf "#v%d" v.vid
-
   let create_tag = function
-    | PStmt(_,st) -> of_stmt st
-    | PStmtStart(_,st) -> of_start st
-    | PVDecl(_,_,vi) -> of_varinfo vi
+    | PStmt(_,s) -> Printf.sprintf "#s%d" s.sid
+    | PStmtStart(_,s) -> Printf.sprintf "#k%d" s.sid
+    | PVDecl(_,_,v) -> Printf.sprintf "#v%d" v.vid
     | PLval _ -> Printf.sprintf "#l%d" (incr kid ; !kid)
-    | PExp _ -> Printf.sprintf "#e%d" (incr kid ; !kid)
+    | PExp(_,_,e) -> Printf.sprintf "#e%d" e.eid
     | PTermLval _ -> Printf.sprintf "#t%d" (incr kid ; !kid)
     | PGlobal _ -> Printf.sprintf "#g%d" (incr kid ; !kid)
     | PIP _ -> Printf.sprintf "#p%d" (incr kid ; !kid)
 
-  let create item =
-    let tag = create_tag item in
-    let index = STATE.get () in
-    Hashtbl.add index tag item ; tag
+  let create loc =
+    let (tags,index) = STATE.get () in
+    try Hmap.find tags loc
+    with Not_found ->
+      let tag = create_tag loc in
+      Hmap.add tags loc tag ;
+      Hashtbl.add index tag loc ;
+      tag
 
-  let lookup = Hashtbl.find (STATE.get())
+  let lookup = Hashtbl.find (STATE.get() |> snd)
+
+  type t = localizable
+  let syntax = Sy.publish ~page:Data.page ~name:"marker"
+      ~synopsis:Sy.ident
+      ~descr:(Md.plain "Localizable AST marker \
+                        (function, globals, statements, properties, etc.)") ()
+
+  let to_json loc = `String (create loc)
+  let of_json js =
+    try lookup (Js.to_string js)
+    with Not_found -> Data.failure "not a localizable marker"
 
 end
 
-module PP = Printer_tag.Make(Tag)
+module Printer = Printer_tag.Make(Marker)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Ast Data                                                           --- *)
@@ -105,16 +116,14 @@ module Stmt = Data.Collection
       let syntax = Sy.publish ~page:Data.page ~name:"stmt"
           ~synopsis:Sy.ident
           ~descr:(Md.plain "Code statement identifier") ()
-      let to_json st = `String (Tag.of_stmt st)
+      let to_json st =
+        let kf = Kernel_function.find_englobing_kf st in
+        Marker.to_json (PStmt(kf,st))
       let of_json js =
-        let id = Js.to_string js in
-        try
-          let open Printer_tag in
-          match Tag.lookup id with
-          | PStmt(_,st) -> st
-          | _ -> raise Not_found
-        with Not_found ->
-          Data.failure "Unknown stmt id: '%s'" id
+        let open Printer_tag in
+        match Marker.of_json js with
+        | PStmt(_,st) | PStmtStart(_,st) -> st
+        | _ -> Data.failure "not a stmt marker"
     end)
 
 module Ki = Data.Collection
@@ -123,7 +132,7 @@ module Ki = Data.Collection
       let syntax = Sy.union [ Sy.tag "global" ; Stmt.syntax ]
       let to_json = function
         | Kglobal -> `String "global"
-        | Kstmt st -> `String (Tag.of_stmt st)
+        | Kstmt st -> Stmt.to_json st
       let of_json = function
         | `String "global" -> Kglobal
         | js -> Kstmt (Stmt.of_json js)
@@ -161,7 +170,7 @@ let () = Request.register ~page
     ~kind:`GET ~name:"kernel.ast.printFunction"
     ~descr:(Md.plain "Print the AST of a function")
     ~input:(module Kf) ~output:(module Jtext)
-    (fun kf -> Jbuffer.to_json PP.pp_global (Kernel_function.get_global kf))
+    (fun kf -> Jbuffer.to_json Printer.pp_global (Kernel_function.get_global kf))
 
 (* -------------------------------------------------------------------------- *)
 (* --- Files                                                              --- *)

@@ -250,7 +250,7 @@ let array =
     ~page
     ~name:"kernel.properties"
     ~descr:(Md.plain "Registered Properties")
-    ~key:(Property.Names.get_prop_name_id)
+    ~key:(fun ip -> Kernel_ast.Marker.create (PIP ip))
     ~iter:(Property_status.iter)
     ~add_update_hook:Property_status.register_property_add_hook
     ~add_remove_hook:Property_status.register_property_remove_hook
