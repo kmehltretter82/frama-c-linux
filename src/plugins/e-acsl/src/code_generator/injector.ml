@@ -502,7 +502,21 @@ and inject_in_block (env: Env.t) kf blk =
   | [], _ :: _ | _ :: _, [] | _ :: _, _ :: _ ->
     (* [TODO] this piece of code could be improved *)
     (* de-allocate the memory blocks observing locals *)
-    let add_locals stmts =
+    let last_stmts ?return_stmt () =
+      let stmts =
+        match return_stmt with
+        | Some return_stmt ->
+          (* now that [free] stmts for [kf] have been inserted,
+             there is no more need to keep the corresponding entries in the
+             table managing them. *)
+          At_with_lscope.Free.remove_all kf;
+          (* The free statements are passed in the same order than the malloc
+             ones. In order to free the variable in the reverse order, the list
+             is reversed before appending the return statement. Moreover,
+             `rev_append` is tail recursive contrary to `append` *)
+          List.rev_append free_stmts [ return_stmt ]
+        | None -> []
+      in
       if Functions.instrument kf then
         List.fold_left
           (fun acc vi ->
@@ -515,28 +529,8 @@ and inject_in_block (env: Env.t) kf blk =
         stmts
     in
     (* select the precise location to inject these pieces of code *)
-    let rec insert_in_innermost_last_block blk = function
-      | { skind = Return _ } as ret :: ((potential_clean :: tl) as l) ->
-        (* keep the return (enclosed in a generated block) at the end;
-           preceded by clean if any *)
-        let init, tl =
-          if Kernel_function.is_main kf && Mmodel_analysis.use_model () then
-            free_stmts @ [ potential_clean; ret ], tl
-          else
-            free_stmts @ [ ret ], l
-        in
-        (* now that [free] stmts for [kf] have been inserted,
-           there is no more need to keep the corresponding entries in the
-           table managing them. *)
-        At_with_lscope.Free.remove_all kf;
-        blk.bstmts <-
-          List.fold_left (fun acc v -> v :: acc) (add_locals init) tl
-      | { skind = Block b } :: _ ->
-        insert_in_innermost_last_block b (List.rev b.bstmts)
-      | l ->
-        blk.bstmts <- List.fold_left (fun acc v -> v :: acc) (add_locals []) l
-    in
-    insert_in_innermost_last_block blk (List.rev blk.bstmts);
+    insert_as_last_stmts_in_innermost_block ~last_stmts kf blk ;
+    (* allocate the memory blocks observing locals *)
     if Functions.instrument kf then
       blk.bstmts <-
         List.fold_left
