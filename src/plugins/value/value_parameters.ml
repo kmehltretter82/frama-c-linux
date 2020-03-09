@@ -159,9 +159,9 @@ let domains_list () =
 
 (* Registers a new domain. Updates the help message of -eva-domains. *)
 let register_domain ~name ~descr =
+  domains_ref := (name, descr) :: !domains_ref;
   Cmdline.replace_option_help
-    Domains.option_name "eva" domains (domains_help ());
-  domains_ref := (name, descr) :: !domains_ref
+    Domains.option_name "eva" domains (domains_help ())
 
 (* Checks that a domain has been registered. *)
 let check_domain domain =
