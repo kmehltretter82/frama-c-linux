@@ -243,7 +243,7 @@ val dkey_callbacks : category
 val dkey_widening : category
 
 (** Registers available domain names for the -eva-domains option. *)
-val register_domain: string -> unit
+val register_domain: name:string -> descr:string -> unit
 
 (** Notifies that the binding to Apron domains is available. *)
 val register_apron: unit -> unit

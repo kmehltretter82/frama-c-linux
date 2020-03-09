@@ -729,17 +729,23 @@ let () = Floating_point.set_round_nearest_even ()
 let make name enable (module Man: Input) =
   let module Domain = Domain_builder.Complete (Make (Man)) in
   let open Abstractions in
-  register ~enable { name; priority = 1;
+  let descr =
+    "Experimental binding to the " ^ name ^
+    " domain of the Apron library. \
+     See http://apron.cri.ensmp.fr/library for more details."
+  in
+  let name = "apron-" ^ name in
+  register ~enable { name; descr; priority = 1;
                      values = Single (module Main_values.Interval);
                      domain = Domain (module Domain); }
 
 let () =
   let open Value_parameters in
-  make "apron-octagon" ApronOctagon.get (module Apron_Octagon);
-  make "apron-box" ApronBox.get (module Apron_Box);
-  make "apron-polka-loose" PolkaLoose.get (module Apron_Polka_Loose);
-  make "apron-polka-strict" PolkaStrict.get (module Apron_Polka_Strict);
-  make "apron-polka-equality" PolkaEqualities.get (module Apron_Polka_Equalities);
+  make "octagon" ApronOctagon.get (module Apron_Octagon);
+  make "box" ApronBox.get (module Apron_Box);
+  make "polka-loose" PolkaLoose.get (module Apron_Polka_Loose);
+  make "polka-strict" PolkaStrict.get (module Apron_Polka_Strict);
+  make "polka-equality" PolkaEqualities.get (module Apron_Polka_Equalities);
   register_apron ()
 
 

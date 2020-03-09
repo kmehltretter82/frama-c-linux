@@ -155,6 +155,8 @@ let () =
   let open Abstractions in
   let domain =
     { name = "numerors";
+      descr = "Experimental. Infers ranges for the absolute and relative errors \
+               in floating-point computations. No support of loops.";
       priority = 0;
       values = Single (module Numerors_value);
       domain = Domain (module Domain); }
