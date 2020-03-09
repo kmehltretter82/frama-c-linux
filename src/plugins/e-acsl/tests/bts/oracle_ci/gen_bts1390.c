@@ -84,10 +84,9 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
                                                         sizeof(char),
                                                         (void *)buf,
                                                         (void *)(& buf));
-        __e_acsl_assert(__gen_e_acsl_valid_read_3,(char *)"RTE",
-                        (char *)"memchr",
-                        (char *)"mem_access: \\valid_read((char *)buf + __gen_e_acsl_k)",
-                        11);
+        __e_acsl_assert(__gen_e_acsl_valid_read_3,"RTE","memchr",
+                        "mem_access: \\valid_read((char *)buf + __gen_e_acsl_k)",
+                        "tests/bts/bts1390.c",11);
         if ((int)*((char *)buf + __gen_e_acsl_k) != c) ;
         else {
           __gen_e_acsl_forall_2 = 0;
@@ -115,10 +114,9 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
                                                       sizeof(char),
                                                       (void *)buf,
                                                       (void *)(& buf));
-        __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",
-                        (char *)"memchr",
-                        (char *)"mem_access: \\valid_read((char *)buf + __gen_e_acsl_i)",
-                        8);
+        __e_acsl_assert(__gen_e_acsl_valid_read,"RTE","memchr",
+                        "mem_access: \\valid_read((char *)buf + __gen_e_acsl_i)",
+                        "tests/bts/bts1390.c",8);
         if (! ((int)*((char *)buf + __gen_e_acsl_i) == c)) ;
         else {
           __gen_e_acsl_exists = 1;
@@ -154,10 +152,9 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
                                                           sizeof(char),
                                                           (void *)__gen_e_acsl_at_2,
                                                           (void *)(& __gen_e_acsl_at_2));
-          __e_acsl_assert(__gen_e_acsl_valid_read_2,(char *)"RTE",
-                          (char *)"memchr",
-                          (char *)"mem_access: \\valid_read((char *)__gen_e_acsl_at_2 + __gen_e_acsl_j)",
-                          9);
+          __e_acsl_assert(__gen_e_acsl_valid_read_2,"RTE","memchr",
+                          "mem_access: \\valid_read((char *)__gen_e_acsl_at_2 + __gen_e_acsl_j)",
+                          "tests/bts/bts1390.c",9);
           if ((int)*((char *)__gen_e_acsl_at_2 + __gen_e_acsl_j) != __gen_e_acsl_at_3) 
             ;
           else {
@@ -170,16 +167,14 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
       e_acsl_end_loop2: ;
       __gen_e_acsl_implies = __gen_e_acsl_forall;
     }
-    __e_acsl_assert(__gen_e_acsl_implies,(char *)"Postcondition",
-                    (char *)"memchr",
-                    (char *)"\\old(\\exists integer i; 0 <= i < (int)n && (int)*((char *)buf + i) == c) ==>\n(\\forall int j;\n   0 <= j < (int)\\offset((char *)\\result) ==>\n   (int)*((char *)\\old(buf) + j) != \\old(c))",
-                    9);
+    __e_acsl_assert(__gen_e_acsl_implies,"Postcondition","memchr",
+                    "\\old(\\exists integer i; 0 <= i < (int)n && (int)*((char *)buf + i) == c) ==>\n(\\forall int j;\n   0 <= j < (int)\\offset((char *)\\result) ==>\n   (int)*((char *)\\old(buf) + j) != \\old(c))",
+                    "tests/bts/bts1390.c",9);
     if (! __gen_e_acsl_at_4) __gen_e_acsl_implies_2 = 1;
     else __gen_e_acsl_implies_2 = __retres == (void *)0;
-    __e_acsl_assert(__gen_e_acsl_implies_2,(char *)"Postcondition",
-                    (char *)"memchr",
-                    (char *)"\\old(\\forall integer k; 0 <= k < (int)n ==> (int)*((char *)buf + k) != c) ==>\n\\result == (void *)0",
-                    12);
+    __e_acsl_assert(__gen_e_acsl_implies_2,"Postcondition","memchr",
+                    "\\old(\\forall integer k; 0 <= k < (int)n ==> (int)*((char *)buf + k) != c) ==>\n\\result == (void *)0",
+                    "tests/bts/bts1390.c",12);
     __e_acsl_delete_block((void *)(& buf));
     __e_acsl_delete_block((void *)(& __retres));
     return __retres;

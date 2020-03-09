@@ -158,6 +158,7 @@ let mk_runtime_check ?(reverse=false) kind kf e p =
     Kernel.Unicode.without_unicode
       (Format.asprintf "%a@?" Printer.pp_predicate) p
   in
+  let file = (fst loc).Filepath.pos_path in
   let line = (fst loc).Filepath.pos_lnum in
   let e =
     if reverse
@@ -170,6 +171,7 @@ let mk_runtime_check ?(reverse=false) kind kf e p =
       kind_to_string loc kind;
       Cil.mkString ~loc (Functions.RTL.get_original_name kf);
       Cil.mkString ~loc msg;
+      Cil.mkString ~loc (Filepath.Normalized.to_pretty_string file);
       Cil.integer loc line ]
 
 (*

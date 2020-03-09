@@ -25,9 +25,9 @@ int main(void)
       __gen_e_acsl_x ++;
     }
     e_acsl_end_loop1: ;
-    __e_acsl_assert(__gen_e_acsl_forall,(char *)"Assertion",(char *)"main",
-                    (char *)"\\forall integer x; 0 <= x <= 1 ==> x == 0 || x == 1",
-                    9);
+    __e_acsl_assert(__gen_e_acsl_forall,"Assertion","main",
+                    "\\forall integer x; 0 <= x <= 1 ==> x == 0 || x == 1",
+                    "tests/arith/quantif.i",9);
   }
   /*@ assert ∀ ℤ x; 0 ≤ x ≤ 1 ⇒ x ≡ 0 ∨ x ≡ 1; */ ;
   {
@@ -45,8 +45,9 @@ int main(void)
       __gen_e_acsl_x_2 ++;
     }
     e_acsl_end_loop2: ;
-    __e_acsl_assert(__gen_e_acsl_forall_2,(char *)"Assertion",(char *)"main",
-                    (char *)"\\forall integer x; 0 < x <= 1 ==> x == 1",10);
+    __e_acsl_assert(__gen_e_acsl_forall_2,"Assertion","main",
+                    "\\forall integer x; 0 < x <= 1 ==> x == 1",
+                    "tests/arith/quantif.i",10);
   }
   /*@ assert ∀ ℤ x; 0 < x ≤ 1 ⇒ x ≡ 1; */ ;
   {
@@ -64,8 +65,9 @@ int main(void)
       __gen_e_acsl_x_3 ++;
     }
     e_acsl_end_loop3: ;
-    __e_acsl_assert(__gen_e_acsl_forall_3,(char *)"Assertion",(char *)"main",
-                    (char *)"\\forall integer x; 0 <= x < 1 ==> x == 0",11);
+    __e_acsl_assert(__gen_e_acsl_forall_3,"Assertion","main",
+                    "\\forall integer x; 0 <= x < 1 ==> x == 0",
+                    "tests/arith/quantif.i",11);
   }
   /*@ assert ∀ ℤ x; 0 ≤ x < 1 ⇒ x ≡ 0; */ ;
   {
@@ -96,9 +98,9 @@ int main(void)
       __gen_e_acsl_x_4 ++;
     }
     e_acsl_end_loop4: ;
-    __e_acsl_assert(__gen_e_acsl_forall_4,(char *)"Assertion",(char *)"main",
-                    (char *)"\\forall integer x, integer y, integer z;\n  0 <= x < 2 && 0 <= y < 5 && 0 <= z <= y ==> x + z <= y + 1",
-                    15);
+    __e_acsl_assert(__gen_e_acsl_forall_4,"Assertion","main",
+                    "\\forall integer x, integer y, integer z;\n  0 <= x < 2 && 0 <= y < 5 && 0 <= z <= y ==> x + z <= y + 1",
+                    "tests/arith/quantif.i",15);
   }
   /*@
   assert
@@ -121,8 +123,9 @@ int main(void)
       __gen_e_acsl_x_5 ++;
     }
     e_acsl_end_loop5: ;
-    __e_acsl_assert(__gen_e_acsl_exists,(char *)"Assertion",(char *)"main",
-                    (char *)"\\exists int x; 0 <= x < 10 && x == 5",20);
+    __e_acsl_assert(__gen_e_acsl_exists,"Assertion","main",
+                    "\\exists int x; 0 <= x < 10 && x == 5",
+                    "tests/arith/quantif.i",20);
   }
   /*@ assert ∃ int x; 0 ≤ x < 10 ∧ x ≡ 5; */ ;
   {
@@ -161,9 +164,9 @@ int main(void)
       __gen_e_acsl_x_6 ++;
     }
     e_acsl_end_loop7: ;
-    __e_acsl_assert(__gen_e_acsl_forall_5,(char *)"Assertion",(char *)"main",
-                    (char *)"\\forall int x;\n  0 <= x < 10 ==>\n  x % 2 == 0 ==> (\\exists integer y; 0 <= y <= x / 2 && x == 2 * y)",
-                    24);
+    __e_acsl_assert(__gen_e_acsl_forall_5,"Assertion","main",
+                    "\\forall int x;\n  0 <= x < 10 ==>\n  x % 2 == 0 ==> (\\exists integer y; 0 <= y <= x / 2 && x == 2 * y)",
+                    "tests/arith/quantif.i",24);
   }
   /*@
   assert
@@ -198,10 +201,9 @@ int main(void)
         __gen_e_acsl_i ++;
       }
       e_acsl_end_loop8: ;
-      __e_acsl_assert(__gen_e_acsl_forall_6,(char *)"Assertion",
-                      (char *)"main",
-                      (char *)"\\forall integer i; 0 <= i < 10 ==> \\valid(&buf[i])",
-                      30);
+      __e_acsl_assert(__gen_e_acsl_forall_6,"Assertion","main",
+                      "\\forall integer i; 0 <= i < 10 ==> \\valid(&buf[i])",
+                      "tests/arith/quantif.i",30);
     }
     /*@ assert ∀ ℤ i; 0 ≤ i < 10 ⇒ \valid(&buf[i]); */ ;
     {
@@ -226,10 +228,9 @@ int main(void)
         __gen_e_acsl_i_2 ++;
       }
       e_acsl_end_loop9: ;
-      __e_acsl_assert(__gen_e_acsl_forall_7,(char *)"Assertion",
-                      (char *)"main",
-                      (char *)"\\forall char i; 0 <= i < 10 ==> \\valid(&buf[i])",
-                      31);
+      __e_acsl_assert(__gen_e_acsl_forall_7,"Assertion","main",
+                      "\\forall char i; 0 <= i < 10 ==> \\valid(&buf[i])",
+                      "tests/arith/quantif.i",31);
     }
     /*@ assert ∀ char i; 0 ≤ i < 10 ⇒ \valid(&buf[i]); */ ;
     {
@@ -254,10 +255,9 @@ int main(void)
         __gen_e_acsl_i_3 ++;
       }
       e_acsl_end_loop10: ;
-      __e_acsl_assert(__gen_e_acsl_forall_8,(char *)"Assertion",
-                      (char *)"main",
-                      (char *)"\\forall integer i; 0 <= i < len ==> \\valid(&buf[i])",
-                      32);
+      __e_acsl_assert(__gen_e_acsl_forall_8,"Assertion","main",
+                      "\\forall integer i; 0 <= i < len ==> \\valid(&buf[i])",
+                      "tests/arith/quantif.i",32);
     }
     /*@ assert ∀ ℤ i; 0 ≤ i < len ⇒ \valid(&buf[i]); */ ;
     {
@@ -311,27 +311,28 @@ int main(void)
         }
       }
       e_acsl_end_loop11: ;
-      __e_acsl_assert(__gen_e_acsl_forall_9,(char *)"Assertion",
-                      (char *)"main",
-                      (char *)"\\forall integer i; 0 <= i <= len ==> \\valid(&buf[i])",
-                      33);
+      __e_acsl_assert(__gen_e_acsl_forall_9,"Assertion","main",
+                      "\\forall integer i; 0 <= i <= len ==> \\valid(&buf[i])",
+                      "tests/arith/quantif.i",33);
       __gmpz_clear(__gen_e_acsl_i_4);
     }
     /*@ assert ∀ ℤ i; 0 ≤ i ≤ len ⇒ \valid(&buf[i]); */ ;
     __e_acsl_delete_block((void *)(buf));
   }
-  __e_acsl_assert(1,(char *)"Assertion",(char *)"main",
-                  (char *)"\\forall integer x; 0 < x < 1 ==> \\false",37);
+  __e_acsl_assert(1,"Assertion","main",
+                  "\\forall integer x; 0 < x < 1 ==> \\false",
+                  "tests/arith/quantif.i",37);
   /*@ assert ∀ ℤ x; 0 < x < 1 ⇒ \false; */ ;
-  __e_acsl_assert(! 0,(char *)"Assertion",(char *)"main",
-                  (char *)"!(\\exists char c; 10 <= c < 10 && c == 10)",38);
+  __e_acsl_assert(! 0,"Assertion","main",
+                  "!(\\exists char c; 10 <= c < 10 && c == 10)",
+                  "tests/arith/quantif.i",38);
   /*@ assert ¬(∃ char c; 10 ≤ c < 10 ∧ c ≡ 10); */ ;
   {
     int __gen_e_acsl_u;
     __gen_e_acsl_u = 5;
-    __e_acsl_assert(1,(char *)"Assertion",(char *)"main",
-                    (char *)"\\let u = 5;\n\\forall integer x, integer y; 0 <= x < 2 && 4 < y < u ==> \\false",
-                    40);
+    __e_acsl_assert(1,"Assertion","main",
+                    "\\let u = 5;\n\\forall integer x, integer y; 0 <= x < 2 && 4 < y < u ==> \\false",
+                    "tests/arith/quantif.i",40);
   }
   /*@
   assert \let u = 5; ∀ ℤ x, ℤ y; 0 ≤ x < 2 ∧ 4 < y < u ⇒ \false;

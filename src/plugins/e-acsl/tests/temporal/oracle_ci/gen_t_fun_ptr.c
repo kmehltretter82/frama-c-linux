@@ -47,8 +47,8 @@ int main(int argc, char const **argv)
       __gen_e_acsl_and = __gen_e_acsl_valid;
     }
     else __gen_e_acsl_and = 0;
-    __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"main",
-                    (char *)"\\valid(p)",28);
+    __e_acsl_assert(__gen_e_acsl_and,"Assertion","main","\\valid(p)",
+                    "tests/temporal/t_fun_ptr.c",28);
   }
   /*@ assert \valid(p); */ ;
   __retres = 0;

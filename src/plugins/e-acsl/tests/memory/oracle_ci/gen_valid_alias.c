@@ -38,8 +38,9 @@ int main(void)
       __gen_e_acsl_and_3 = ! __gen_e_acsl_and_2;
     }
     else __gen_e_acsl_and_3 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_3,(char *)"Assertion",(char *)"main",
-                    (char *)"!\\valid(a) && !\\valid(b)",9);
+    __e_acsl_assert(__gen_e_acsl_and_3,"Assertion","main",
+                    "!\\valid(a) && !\\valid(b)",
+                    "tests/memory/valid_alias.c",9);
   }
   /*@ assert ¬\valid(a) ∧ ¬\valid(b); */ ;
   __e_acsl_full_init((void *)(& a));
@@ -76,8 +77,9 @@ int main(void)
       __gen_e_acsl_and_6 = __gen_e_acsl_and_5;
     }
     else __gen_e_acsl_and_6 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_6,(char *)"Assertion",(char *)"main",
-                    (char *)"\\valid(a) && \\valid(b)",13);
+    __e_acsl_assert(__gen_e_acsl_and_6,"Assertion","main",
+                    "\\valid(a) && \\valid(b)","tests/memory/valid_alias.c",
+                    13);
   }
   /*@ assert \valid(a) ∧ \valid(b); */ ;
   {
@@ -92,10 +94,11 @@ int main(void)
       __gen_e_acsl_and_7 = __gen_e_acsl_valid_read;
     }
     else __gen_e_acsl_and_7 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_7,(char *)"RTE",(char *)"main",
-                    (char *)"mem_access: \\valid_read(b)",14);
-    __e_acsl_assert(*b == n,(char *)"Assertion",(char *)"main",
-                    (char *)"*b == n",14);
+    __e_acsl_assert(__gen_e_acsl_and_7,"RTE","main",
+                    "mem_access: \\valid_read(b)",
+                    "tests/memory/valid_alias.c",14);
+    __e_acsl_assert(*b == n,"Assertion","main","*b == n",
+                    "tests/memory/valid_alias.c",14);
   }
   /*@ assert *b ≡ n; */ ;
   free((void *)b);
@@ -128,8 +131,9 @@ int main(void)
       __gen_e_acsl_and_10 = ! __gen_e_acsl_and_9;
     }
     else __gen_e_acsl_and_10 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_10,(char *)"Assertion",(char *)"main",
-                    (char *)"!\\valid(a) && !\\valid(b)",16);
+    __e_acsl_assert(__gen_e_acsl_and_10,"Assertion","main",
+                    "!\\valid(a) && !\\valid(b)",
+                    "tests/memory/valid_alias.c",16);
   }
   /*@ assert ¬\valid(a) ∧ ¬\valid(b); */ ;
   __retres = 0;

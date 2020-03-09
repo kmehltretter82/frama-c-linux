@@ -21,15 +21,17 @@ void f(void const *s, int c, unsigned long n)
                (__e_acsl_mpz_struct const *)(__gen_e_acsl_n));
     __gen_e_acsl_eq = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_),
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_sub));
-    __e_acsl_assert(__gen_e_acsl_eq == 0,(char *)"Assertion",(char *)"f",
-                    (char *)"p - (unsigned char const *)s == n - n",7);
+    __e_acsl_assert(__gen_e_acsl_eq == 0,"Assertion","f",
+                    "p - (unsigned char const *)s == n - n",
+                    "tests/bts/bts2386.c",7);
     __gmpz_clear(__gen_e_acsl_);
     __gmpz_clear(__gen_e_acsl_n);
     __gmpz_clear(__gen_e_acsl_sub);
   }
   /*@ assert p - (unsigned char const *)s ≡ n - n; */ ;
-  __e_acsl_assert(p - (unsigned char const *)s == 0UL,(char *)"Assertion",
-                  (char *)"f",(char *)"p - (unsigned char const *)s == 0",8);
+  __e_acsl_assert(p - (unsigned char const *)s == 0UL,"Assertion","f",
+                  "p - (unsigned char const *)s == 0","tests/bts/bts2386.c",
+                  8);
   /*@ assert p - (unsigned char const *)s ≡ 0; */ ;
   __e_acsl_delete_block((void *)(& s));
   __e_acsl_delete_block((void *)(& p));

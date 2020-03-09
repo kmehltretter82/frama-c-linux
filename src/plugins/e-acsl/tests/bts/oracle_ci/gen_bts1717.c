@@ -25,8 +25,8 @@ int main(void)
       __gen_e_acsl_and = __gen_e_acsl_valid;
     }
     else __gen_e_acsl_and = 0;
-    __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"main",
-                    (char *)"\\valid(p)",10);
+    __e_acsl_assert(__gen_e_acsl_and,"Assertion","main","\\valid(p)",
+                    "tests/bts/bts1717.i",10);
   }
   __retres = 0;
   goto return_label;

@@ -42,10 +42,9 @@ int main(void)
     int __gen_e_acsl_initialized;
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(buf),
                                                     sizeof(union msg));
-    __e_acsl_assert(__gen_e_acsl_initialized,(char *)"Assertion",
-                    (char *)"main",
-                    (char *)"\\initialized((union msg *)((unsigned char *)buf))",
-                    23);
+    __e_acsl_assert(__gen_e_acsl_initialized,"Assertion","main",
+                    "\\initialized((union msg *)((unsigned char *)buf))",
+                    "tests/bts/bts1304.i",23);
   }
   /*@ assert \initialized((union msg *)((unsigned char *)buf)); */ ;
   __retres = 0;

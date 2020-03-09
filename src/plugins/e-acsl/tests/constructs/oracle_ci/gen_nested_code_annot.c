@@ -7,42 +7,43 @@ int main(void)
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   int x = 0;
   int y = 1;
-  __e_acsl_assert(x < y,(char *)"Assertion",(char *)"main",(char *)"x < y",7);
+  __e_acsl_assert(x < y,"Assertion","main","x < y",
+                  "tests/constructs/nested_code_annot.i",7);
   /*@ assert x < y; */ ;
-  __e_acsl_assert(x == 0,(char *)"Precondition",(char *)"main",
-                  (char *)"x == 0",8);
+  __e_acsl_assert(x == 0,"Precondition","main","x == 0",
+                  "tests/constructs/nested_code_annot.i",8);
   /*@ requires x ≡ 0;
       ensures x ≥ 1; */
   if (x) {
-    __e_acsl_assert(0,(char *)"Assertion",(char *)"main",(char *)"\\false",
-                    11);
+    __e_acsl_assert(0,"Assertion","main","\\false",
+                    "tests/constructs/nested_code_annot.i",11);
     /*@ assert \false; */ ;
   }
   else {
-    __e_acsl_assert(x == 0,(char *)"Precondition",(char *)"main",
-                    (char *)"x == 0",13);
+    __e_acsl_assert(x == 0,"Precondition","main","x == 0",
+                    "tests/constructs/nested_code_annot.i",13);
     /*@ requires x ≡ 0;
         ensures x ≡ 1; */
     x ++;
-    __e_acsl_assert(x == 1,(char *)"Postcondition",(char *)"main",
-                    (char *)"x == 1",14);
+    __e_acsl_assert(x == 1,"Postcondition","main","x == 1",
+                    "tests/constructs/nested_code_annot.i",14);
     if (x) {
-      __e_acsl_assert(x == 1,(char *)"Precondition",(char *)"main",
-                      (char *)"x == 1",17);
+      __e_acsl_assert(x == 1,"Precondition","main","x == 1",
+                      "tests/constructs/nested_code_annot.i",17);
       /*@ requires x ≡ 1;
           ensures x ≡ 2; */
       x ++;
-      __e_acsl_assert(x == 2,(char *)"Postcondition",(char *)"main",
-                      (char *)"x == 2",18);
+      __e_acsl_assert(x == 2,"Postcondition","main","x == 2",
+                      "tests/constructs/nested_code_annot.i",18);
     }
     else {
-      __e_acsl_assert(0,(char *)"Assertion",(char *)"main",(char *)"\\false",
-                      21);
+      __e_acsl_assert(0,"Assertion","main","\\false",
+                      "tests/constructs/nested_code_annot.i",21);
       /*@ assert \false; */ ;
     }
   }
-  __e_acsl_assert(x >= 1,(char *)"Postcondition",(char *)"main",
-                  (char *)"x >= 1",9);
+  __e_acsl_assert(x >= 1,"Postcondition","main","x >= 1",
+                  "tests/constructs/nested_code_annot.i",9);
   __retres = 0;
   return __retres;
 }

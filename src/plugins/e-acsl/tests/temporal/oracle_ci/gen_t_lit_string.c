@@ -62,8 +62,9 @@ int main(void)
       __gen_e_acsl_and_3 = ! __gen_e_acsl_and_2;
     }
     else __gen_e_acsl_and_3 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_3,(char *)"Assertion",(char *)"main",
-                    (char *)"\\valid_read(f) && !\\valid(f)",9);
+    __e_acsl_assert(__gen_e_acsl_and_3,"Assertion","main",
+                    "\\valid_read(f) && !\\valid(f)",
+                    "tests/temporal/t_lit_string.c",9);
   }
   /*@ assert \valid_read(f) ∧ ¬\valid(f); */ ;
   __e_acsl_full_init((void *)(& g));
@@ -99,8 +100,9 @@ int main(void)
       __gen_e_acsl_and_6 = ! __gen_e_acsl_and_5;
     }
     else __gen_e_acsl_and_6 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_6,(char *)"Assertion",(char *)"main",
-                    (char *)"\\valid_read(g) && !\\valid(g)",12);
+    __e_acsl_assert(__gen_e_acsl_and_6,"Assertion","main",
+                    "\\valid_read(g) && !\\valid(g)",
+                    "tests/temporal/t_lit_string.c",12);
   }
   /*@ assert \valid_read(g) ∧ ¬\valid(g); */ ;
   char *p = f;
@@ -136,8 +138,9 @@ int main(void)
       __gen_e_acsl_and_9 = ! __gen_e_acsl_and_8;
     }
     else __gen_e_acsl_and_9 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_9,(char *)"Assertion",(char *)"main",
-                    (char *)"\\valid_read(p) && !\\valid(p)",15);
+    __e_acsl_assert(__gen_e_acsl_and_9,"Assertion","main",
+                    "\\valid_read(p) && !\\valid(p)",
+                    "tests/temporal/t_lit_string.c",15);
   }
   /*@ assert \valid_read(p) ∧ ¬\valid(p); */ ;
   __e_acsl_full_init((void *)(& q));
@@ -172,8 +175,9 @@ int main(void)
       __gen_e_acsl_and_12 = ! __gen_e_acsl_and_11;
     }
     else __gen_e_acsl_and_12 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_12,(char *)"Assertion",(char *)"main",
-                    (char *)"\\valid_read(q) && !\\valid(q)",18);
+    __e_acsl_assert(__gen_e_acsl_and_12,"Assertion","main",
+                    "\\valid_read(q) && !\\valid(q)",
+                    "tests/temporal/t_lit_string.c",18);
   }
   /*@ assert \valid_read(q) ∧ ¬\valid(q); */ ;
   __retres = 0;

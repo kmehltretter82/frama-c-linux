@@ -10,80 +10,80 @@ int main(void)
   {
     int __gen_e_acsl_and;
     if (x == 0) __gen_e_acsl_and = y == 1; else __gen_e_acsl_and = 0;
-    __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"main",
-                    (char *)"x == 0 && y == 1",9);
+    __e_acsl_assert(__gen_e_acsl_and,"Assertion","main","x == 0 && y == 1",
+                    "tests/constructs/lazy.i",9);
   }
   /*@ assert x ≡ 0 ∧ y ≡ 1; */ ;
   {
     int __gen_e_acsl_and_2;
     if (x != 0) {
-      __e_acsl_assert(0,(char *)"RTE",(char *)"main",
-                      (char *)"division_by_zero: 0 != 0",10);
+      __e_acsl_assert(0,"RTE","main","division_by_zero: 0 != 0",
+                      "tests/constructs/lazy.i",10);
       __gen_e_acsl_and_2 = y == 1 / 0;
     }
     else __gen_e_acsl_and_2 = 0;
-    __e_acsl_assert(! __gen_e_acsl_and_2,(char *)"Assertion",(char *)"main",
-                    (char *)"!(x != 0 && y == 1 / 0)",10);
+    __e_acsl_assert(! __gen_e_acsl_and_2,"Assertion","main",
+                    "!(x != 0 && y == 1 / 0)","tests/constructs/lazy.i",10);
   }
   /*@ assert ¬(x ≢ 0 ∧ y ≡ 1 / 0); */ ;
   {
     int __gen_e_acsl_or;
     if (y == 1) __gen_e_acsl_or = 1; else __gen_e_acsl_or = x == 1;
-    __e_acsl_assert(__gen_e_acsl_or,(char *)"Assertion",(char *)"main",
-                    (char *)"y == 1 || x == 1",11);
+    __e_acsl_assert(__gen_e_acsl_or,"Assertion","main","y == 1 || x == 1",
+                    "tests/constructs/lazy.i",11);
   }
   /*@ assert y ≡ 1 ∨ x ≡ 1; */ ;
   {
     int __gen_e_acsl_or_2;
     if (x == 0) __gen_e_acsl_or_2 = 1;
     else {
-      __e_acsl_assert(0,(char *)"RTE",(char *)"main",
-                      (char *)"division_by_zero: 0 != 0",12);
+      __e_acsl_assert(0,"RTE","main","division_by_zero: 0 != 0",
+                      "tests/constructs/lazy.i",12);
       __gen_e_acsl_or_2 = y == 1 / 0;
     }
-    __e_acsl_assert(__gen_e_acsl_or_2,(char *)"Assertion",(char *)"main",
-                    (char *)"x == 0 || y == 1 / 0",12);
+    __e_acsl_assert(__gen_e_acsl_or_2,"Assertion","main",
+                    "x == 0 || y == 1 / 0","tests/constructs/lazy.i",12);
   }
   /*@ assert x ≡ 0 ∨ y ≡ 1 / 0; */ ;
   {
     int __gen_e_acsl_implies;
     if (! (x == 0)) __gen_e_acsl_implies = 1;
     else __gen_e_acsl_implies = y == 1;
-    __e_acsl_assert(__gen_e_acsl_implies,(char *)"Assertion",(char *)"main",
-                    (char *)"x == 0 ==> y == 1",13);
+    __e_acsl_assert(__gen_e_acsl_implies,"Assertion","main",
+                    "x == 0 ==> y == 1","tests/constructs/lazy.i",13);
   }
   /*@ assert x ≡ 0 ⇒ y ≡ 1; */ ;
   {
     int __gen_e_acsl_implies_2;
     if (! (x == 1)) __gen_e_acsl_implies_2 = 1;
     else {
-      __e_acsl_assert(0,(char *)"RTE",(char *)"main",
-                      (char *)"division_by_zero: 0 != 0",14);
+      __e_acsl_assert(0,"RTE","main","division_by_zero: 0 != 0",
+                      "tests/constructs/lazy.i",14);
       __gen_e_acsl_implies_2 = y == 1 / 0;
     }
-    __e_acsl_assert(__gen_e_acsl_implies_2,(char *)"Assertion",
-                    (char *)"main",(char *)"x == 1 ==> y == 1 / 0",14);
+    __e_acsl_assert(__gen_e_acsl_implies_2,"Assertion","main",
+                    "x == 1 ==> y == 1 / 0","tests/constructs/lazy.i",14);
   }
   /*@ assert x ≡ 1 ⇒ y ≡ 1 / 0; */ ;
   {
     int __gen_e_acsl_if;
     if (x != 0) __gen_e_acsl_if = x != 0; else __gen_e_acsl_if = y != 0;
-    __e_acsl_assert(__gen_e_acsl_if,(char *)"Assertion",(char *)"main",
-                    (char *)"x != 0? x != 0: y != 0",15);
+    __e_acsl_assert(__gen_e_acsl_if,"Assertion","main",
+                    "x != 0? x != 0: y != 0","tests/constructs/lazy.i",15);
   }
   /*@ assert x ≢ 0? x ≢ 0: y ≢ 0; */ ;
   {
     int __gen_e_acsl_if_2;
     if (y != 0) __gen_e_acsl_if_2 = y != 0; else __gen_e_acsl_if_2 = x != 0;
-    __e_acsl_assert(__gen_e_acsl_if_2,(char *)"Assertion",(char *)"main",
-                    (char *)"y != 0? y != 0: x != 0",16);
+    __e_acsl_assert(__gen_e_acsl_if_2,"Assertion","main",
+                    "y != 0? y != 0: x != 0","tests/constructs/lazy.i",16);
   }
   /*@ assert y ≢ 0? y ≢ 0: x ≢ 0; */ ;
   {
     int __gen_e_acsl_if_3;
     if (x == 1) __gen_e_acsl_if_3 = x == 18; else __gen_e_acsl_if_3 = x == 0;
-    __e_acsl_assert(__gen_e_acsl_if_3,(char *)"Assertion",(char *)"main",
-                    (char *)"x == 1? x == 18: x == 0",17);
+    __e_acsl_assert(__gen_e_acsl_if_3,"Assertion","main",
+                    "x == 1? x == 18: x == 0","tests/constructs/lazy.i",17);
   }
   /*@ assert x ≡ 1? x ≡ 18: x ≡ 0; */ ;
   {
@@ -98,8 +98,8 @@ int main(void)
       __gen_e_acsl_equiv = __gen_e_acsl_implies_4;
     }
     else __gen_e_acsl_equiv = 0;
-    __e_acsl_assert(__gen_e_acsl_equiv,(char *)"Assertion",(char *)"main",
-                    (char *)"x == 2 <==> y == 3",20);
+    __e_acsl_assert(__gen_e_acsl_equiv,"Assertion","main",
+                    "x == 2 <==> y == 3","tests/constructs/lazy.i",20);
   }
   /*@ assert x ≡ 2 ⇔ y ≡ 3; */ ;
   {
@@ -114,16 +114,16 @@ int main(void)
       __gen_e_acsl_equiv_2 = __gen_e_acsl_implies_6;
     }
     else __gen_e_acsl_equiv_2 = 0;
-    __e_acsl_assert(__gen_e_acsl_equiv_2,(char *)"Assertion",(char *)"main",
-                    (char *)"x == 0 <==> y == 1",21);
+    __e_acsl_assert(__gen_e_acsl_equiv_2,"Assertion","main",
+                    "x == 0 <==> y == 1","tests/constructs/lazy.i",21);
   }
   /*@ assert x ≡ 0 ⇔ y ≡ 1; */ ;
   {
     int __gen_e_acsl_if_4;
     if (x != 0) __gen_e_acsl_if_4 = x; else __gen_e_acsl_if_4 = y;
-    __e_acsl_assert((__gen_e_acsl_if_4 != 0) == (x == 0),(char *)"Assertion",
-                    (char *)"main",
-                    (char *)"((x != 0? x: y) != 0) == (x == 0)",24);
+    __e_acsl_assert((__gen_e_acsl_if_4 != 0) == (x == 0),"Assertion","main",
+                    "((x != 0? x: y) != 0) == (x == 0)",
+                    "tests/constructs/lazy.i",24);
   }
   /*@ assert ((x ≢ 0? x: y) ≢ 0) ≡ (x ≡ 0); */ ;
   {
@@ -132,8 +132,9 @@ int main(void)
     if (x != 0) __gen_e_acsl_and_3 = y != 0; else __gen_e_acsl_and_3 = 0;
     if (__gen_e_acsl_and_3) __gen_e_acsl_or_3 = 1;
     else __gen_e_acsl_or_3 = y != 0;
-    __e_acsl_assert(__gen_e_acsl_or_3,(char *)"Assertion",(char *)"main",
-                    (char *)"(x != 0 && y != 0) || y != 0",25);
+    __e_acsl_assert(__gen_e_acsl_or_3,"Assertion","main",
+                    "(x != 0 && y != 0) || y != 0","tests/constructs/lazy.i",
+                    25);
   }
   /*@ assert (x ≢ 0 ∧ y ≢ 0) ∨ y ≢ 0; */ ;
   {
@@ -142,24 +143,25 @@ int main(void)
     if (x != 0) __gen_e_acsl_or_4 = 1; else __gen_e_acsl_or_4 = y != 0;
     if (__gen_e_acsl_or_4) __gen_e_acsl_and_4 = y == 1;
     else __gen_e_acsl_and_4 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_4,(char *)"Assertion",(char *)"main",
-                    (char *)"(x != 0 || y != 0) && y == 1",26);
+    __e_acsl_assert(__gen_e_acsl_and_4,"Assertion","main",
+                    "(x != 0 || y != 0) && y == 1","tests/constructs/lazy.i",
+                    26);
   }
   /*@ assert (x ≢ 0 ∨ y ≢ 0) ∧ y ≡ 1; */ ;
   {
     int __gen_e_acsl_or_5;
     if (x != 0) __gen_e_acsl_or_5 = 1; else __gen_e_acsl_or_5 = y != 0;
-    __e_acsl_assert(__gen_e_acsl_or_5 == (y != 0),(char *)"Assertion",
-                    (char *)"main",(char *)"(x != 0 || y != 0) == (y != 0)",
-                    27);
+    __e_acsl_assert(__gen_e_acsl_or_5 == (y != 0),"Assertion","main",
+                    "(x != 0 || y != 0) == (y != 0)",
+                    "tests/constructs/lazy.i",27);
   }
   /*@ assert (x ≢ 0 ∨ y ≢ 0) ≡ (y ≢ 0); */ ;
   {
     int __gen_e_acsl_and_5;
     if (x != 0) __gen_e_acsl_and_5 = y != 0; else __gen_e_acsl_and_5 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_5 == (x != 0),(char *)"Assertion",
-                    (char *)"main",(char *)"(x != 0 && y != 0) == (x != 0)",
-                    28);
+    __e_acsl_assert(__gen_e_acsl_and_5 == (x != 0),"Assertion","main",
+                    "(x != 0 && y != 0) == (x != 0)",
+                    "tests/constructs/lazy.i",28);
   }
   /*@ assert (x ≢ 0 ∧ y ≢ 0) ≡ (x ≢ 0); */ ;
   __retres = 0;

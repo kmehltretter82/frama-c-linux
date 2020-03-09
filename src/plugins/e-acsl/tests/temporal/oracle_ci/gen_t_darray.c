@@ -11,10 +11,9 @@ void area_triangle(double (*vertices)[4])
                                                   sizeof(double),
                                                   (void *)(*(vertices + 0)),
                                                   (void *)(*(vertices + 0)));
-    __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"Assertion",
-                    (char *)"area_triangle",
-                    (char *)"rte: mem_access: \\valid_read((double *)*(vertices + 0))",
-                    6);
+    __e_acsl_assert(__gen_e_acsl_valid_read,"Assertion","area_triangle",
+                    "rte: mem_access: \\valid_read((double *)*(vertices + 0))",
+                    "tests/temporal/t_darray.c",6);
   }
   /*@ assert rte: mem_access: \valid_read((double *)*(vertices + 0)); */ ;
   {
@@ -23,10 +22,9 @@ void area_triangle(double (*vertices)[4])
                                                     sizeof(double),
                                                     (void *)(*(vertices + 1)),
                                                     (void *)(*(vertices + 1)));
-    __e_acsl_assert(__gen_e_acsl_valid_read_2,(char *)"Assertion",
-                    (char *)"area_triangle",
-                    (char *)"rte: mem_access: \\valid_read((double *)*(vertices + 1))",
-                    7);
+    __e_acsl_assert(__gen_e_acsl_valid_read_2,"Assertion","area_triangle",
+                    "rte: mem_access: \\valid_read((double *)*(vertices + 1))",
+                    "tests/temporal/t_darray.c",7);
   }
   /*@ assert rte: mem_access: \valid_read((double *)*(vertices + 1)); */ ;
   __e_acsl_delete_block((void *)(& vertices));

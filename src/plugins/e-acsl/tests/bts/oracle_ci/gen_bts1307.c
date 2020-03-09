@@ -106,17 +106,17 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
     __gen_e_acsl_valid = __e_acsl_valid((void *)Mtmin_in,sizeof(float),
                                         (void *)Mtmin_in,
                                         (void *)(& Mtmin_in));
-    __e_acsl_assert(__gen_e_acsl_valid,(char *)"Precondition",(char *)"bar",
-                    (char *)"\\valid(Mtmin_in)",20);
+    __e_acsl_assert(__gen_e_acsl_valid,"Precondition","bar",
+                    "\\valid(Mtmin_in)","tests/bts/bts1307.i",20);
     __gen_e_acsl_valid_2 = __e_acsl_valid((void *)Mwmin,sizeof(float),
                                           (void *)Mwmin,(void *)(& Mwmin));
-    __e_acsl_assert(__gen_e_acsl_valid_2,(char *)"Precondition",
-                    (char *)"bar",(char *)"\\valid(Mwmin)",21);
+    __e_acsl_assert(__gen_e_acsl_valid_2,"Precondition","bar",
+                    "\\valid(Mwmin)","tests/bts/bts1307.i",21);
     __gen_e_acsl_valid_3 = __e_acsl_valid((void *)Mtmin_out,sizeof(float),
                                           (void *)Mtmin_out,
                                           (void *)(& Mtmin_out));
-    __e_acsl_assert(__gen_e_acsl_valid_3,(char *)"Precondition",
-                    (char *)"bar",(char *)"\\valid(Mtmin_out)",22);
+    __e_acsl_assert(__gen_e_acsl_valid_3,"Precondition","bar",
+                    "\\valid(Mtmin_out)","tests/bts/bts1307.i",22);
   }
   __gen_e_acsl_at_6 = Mwmin;
   __gen_e_acsl_at_5 = Mtmin_in;
@@ -134,14 +134,16 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
                                                   sizeof(float),
                                                   (void *)__gen_e_acsl_at_2,
                                                   (void *)(& __gen_e_acsl_at_2));
-    __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"bar",
-                    (char *)"mem_access: \\valid_read(__gen_e_acsl_at_2)",26);
+    __e_acsl_assert(__gen_e_acsl_valid_read,"RTE","bar",
+                    "mem_access: \\valid_read(__gen_e_acsl_at_2)",
+                    "tests/bts/bts1307.i",26);
     __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)__gen_e_acsl_at,
                                                     sizeof(float),
                                                     (void *)__gen_e_acsl_at,
                                                     (void *)(& __gen_e_acsl_at));
-    __e_acsl_assert(__gen_e_acsl_valid_read_2,(char *)"RTE",(char *)"bar",
-                    (char *)"mem_access: \\valid_read(__gen_e_acsl_at)",26);
+    __e_acsl_assert(__gen_e_acsl_valid_read_2,"RTE","bar",
+                    "mem_access: \\valid_read(__gen_e_acsl_at)",
+                    "tests/bts/bts1307.i",26);
     if (*__gen_e_acsl_at == *__gen_e_acsl_at_2) {
       __e_acsl_mpq_t __gen_e_acsl_;
       __e_acsl_mpq_t __gen_e_acsl__2;
@@ -173,9 +175,9 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
                                                       sizeof(float),
                                                       (void *)__gen_e_acsl_at_5,
                                                       (void *)(& __gen_e_acsl_at_5));
-      __e_acsl_assert(__gen_e_acsl_valid_read_3,(char *)"RTE",(char *)"bar",
-                      (char *)"mem_access: \\valid_read(__gen_e_acsl_at_5)",
-                      26);
+      __e_acsl_assert(__gen_e_acsl_valid_read_3,"RTE","bar",
+                      "mem_access: \\valid_read(__gen_e_acsl_at_5)",
+                      "tests/bts/bts1307.i",26);
       __gen_e_acsl_if = (double)*__gen_e_acsl_at_5 != 0.;
     }
     else {
@@ -202,9 +204,9 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
       __gmpq_clear(__gen_e_acsl_mul_2);
       __gmpq_clear(__gen_e_acsl__6);
     }
-    __e_acsl_assert(__gen_e_acsl_if,(char *)"Postcondition",(char *)"bar",
-                    (char *)"*\\old(Mtmin_out) == *\\old(Mtmin_in) < 0.85 * *\\old(Mwmin)?\n  *\\old(Mtmin_in) != 0.:\n  0.85 * *\\old(Mwmin) != 0.",
-                    26);
+    __e_acsl_assert(__gen_e_acsl_if,"Postcondition","bar",
+                    "*\\old(Mtmin_out) == *\\old(Mtmin_in) < 0.85 * *\\old(Mwmin)?\n  *\\old(Mtmin_in) != 0.:\n  0.85 * *\\old(Mwmin) != 0.",
+                    "tests/bts/bts1307.i",26);
     __e_acsl_delete_block((void *)(& Mtmin_out));
     __e_acsl_delete_block((void *)(& Mwmin));
     __e_acsl_delete_block((void *)(& Mtmin_in));
@@ -237,17 +239,17 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
     __gen_e_acsl_valid = __e_acsl_valid((void *)Mtmax_in,sizeof(float),
                                         (void *)Mtmax_in,
                                         (void *)(& Mtmax_in));
-    __e_acsl_assert(__gen_e_acsl_valid,(char *)"Precondition",(char *)"foo",
-                    (char *)"\\valid(Mtmax_in)",5);
+    __e_acsl_assert(__gen_e_acsl_valid,"Precondition","foo",
+                    "\\valid(Mtmax_in)","tests/bts/bts1307.i",5);
     __gen_e_acsl_valid_2 = __e_acsl_valid((void *)Mwmax,sizeof(float),
                                           (void *)Mwmax,(void *)(& Mwmax));
-    __e_acsl_assert(__gen_e_acsl_valid_2,(char *)"Precondition",
-                    (char *)"foo",(char *)"\\valid(Mwmax)",6);
+    __e_acsl_assert(__gen_e_acsl_valid_2,"Precondition","foo",
+                    "\\valid(Mwmax)","tests/bts/bts1307.i",6);
     __gen_e_acsl_valid_3 = __e_acsl_valid((void *)Mtmax_out,sizeof(float),
                                           (void *)Mtmax_out,
                                           (void *)(& Mtmax_out));
-    __e_acsl_assert(__gen_e_acsl_valid_3,(char *)"Precondition",
-                    (char *)"foo",(char *)"\\valid(Mtmax_out)",7);
+    __e_acsl_assert(__gen_e_acsl_valid_3,"Precondition","foo",
+                    "\\valid(Mtmax_out)","tests/bts/bts1307.i",7);
   }
   __gen_e_acsl_at_3 = Mwmax;
   __gen_e_acsl_at_2 = Mtmax_in;
@@ -302,10 +304,9 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
     __gmpq_set_d(__gen_e_acsl__7,(double)*__gen_e_acsl_at);
     __gen_e_acsl_ne = __gmpq_cmp((__e_acsl_mpq_struct const *)(__gen_e_acsl__7),
                                  (__e_acsl_mpq_struct const *)(__gen_e_acsl_add));
-    __e_acsl_assert(__gen_e_acsl_ne != 0,(char *)"Postcondition",
-                    (char *)"foo",
-                    (char *)"*\\old(Mtmax_out) != *\\old(Mtmax_in) + (5 - ((5 / 80) * *\\old(Mwmax)) * 0.4)",
-                    11);
+    __e_acsl_assert(__gen_e_acsl_ne != 0,"Postcondition","foo",
+                    "*\\old(Mtmax_out) != *\\old(Mtmax_in) + (5 - ((5 / 80) * *\\old(Mwmax)) * 0.4)",
+                    "tests/bts/bts1307.i",11);
     __e_acsl_delete_block((void *)(& Mtmax_out));
     __e_acsl_delete_block((void *)(& Mwmax));
     __e_acsl_delete_block((void *)(& Mtmax_in));

@@ -7,25 +7,25 @@ int main(void)
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   long x = (long)0;
   int y = 0;
-  __e_acsl_assert((int)x == y,(char *)"Assertion",(char *)"main",
-                  (char *)"(int)x == y",9);
+  __e_acsl_assert((int)x == y,"Assertion","main","(int)x == y",
+                  "tests/arith/cast.i",9);
   /*@ assert (int)x ≡ y; */ ;
-  __e_acsl_assert(x == (long)y,(char *)"Assertion",(char *)"main",
-                  (char *)"x == (long)y",10);
+  __e_acsl_assert(x == (long)y,"Assertion","main","x == (long)y",
+                  "tests/arith/cast.i",10);
   /*@ assert x ≡ (long)y; */ ;
-  __e_acsl_assert(y == 0,(char *)"Assertion",(char *)"main",
-                  (char *)"y == (int)0",12);
+  __e_acsl_assert(y == 0,"Assertion","main","y == (int)0",
+                  "tests/arith/cast.i",12);
   /*@ assert y ≡ (int)0; */ ;
-  __e_acsl_assert((unsigned int)y == 0U,(char *)"Assertion",(char *)"main",
-                  (char *)"(unsigned int)y == (unsigned int)0",13);
+  __e_acsl_assert((unsigned int)y == 0U,"Assertion","main",
+                  "(unsigned int)y == (unsigned int)0","tests/arith/cast.i",
+                  13);
   /*@ assert (unsigned int)y ≡ (unsigned int)0; */ ;
-  __e_acsl_assert(y != -1,(char *)"Assertion",(char *)"main",
-                  (char *)"y != (int)0xfffffffffffffff",16);
+  __e_acsl_assert(y != -1,"Assertion","main","y != (int)0xfffffffffffffff",
+                  "tests/arith/cast.i",16);
   /*@ assert y ≢ (int)0xfffffffffffffff; */ ;
-  __e_acsl_assert((unsigned int)y != 4294967295U,(char *)"Assertion",
-                  (char *)"main",
-                  (char *)"(unsigned int)y != (unsigned int)0xfffffffffffffff",
-                  17);
+  __e_acsl_assert((unsigned int)y != 4294967295U,"Assertion","main",
+                  "(unsigned int)y != (unsigned int)0xfffffffffffffff",
+                  "tests/arith/cast.i",17);
   /*@ assert (unsigned int)y ≢ (unsigned int)0xfffffffffffffff; */ ;
   int t[2] = {0, 1};
   /*@ assert (float)x ≡ t[(int)0.1]; */ ;

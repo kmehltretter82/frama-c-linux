@@ -31,8 +31,8 @@ int main(void)
       __gen_e_acsl_and = __gen_e_acsl_valid;
     }
     else __gen_e_acsl_and = 0;
-    __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"main",
-                    (char *)"\\valid(src[0])",13);
+    __e_acsl_assert(__gen_e_acsl_and,"Assertion","main","\\valid(src[0])",
+                    "tests/temporal/t_array.c",13);
   }
   /*@ assert \valid(src[0]); */ ;
   {
@@ -48,8 +48,8 @@ int main(void)
       __gen_e_acsl_and_2 = __gen_e_acsl_valid_2;
     }
     else __gen_e_acsl_and_2 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_2,(char *)"Assertion",(char *)"main",
-                    (char *)"\\valid(src[1])",14);
+    __e_acsl_assert(__gen_e_acsl_and_2,"Assertion","main","\\valid(src[1])",
+                    "tests/temporal/t_array.c",14);
   }
   /*@ assert \valid(src[1]); */ ;
   {
@@ -65,8 +65,8 @@ int main(void)
       __gen_e_acsl_and_3 = __gen_e_acsl_valid_3;
     }
     else __gen_e_acsl_and_3 = 0;
-    __e_acsl_assert(! __gen_e_acsl_and_3,(char *)"Assertion",(char *)"main",
-                    (char *)"!\\valid(src[2])",15);
+    __e_acsl_assert(! __gen_e_acsl_and_3,"Assertion","main",
+                    "!\\valid(src[2])","tests/temporal/t_array.c",15);
   }
   /*@ assert ¬\valid(src[2]); */ ;
   __retres = 0;

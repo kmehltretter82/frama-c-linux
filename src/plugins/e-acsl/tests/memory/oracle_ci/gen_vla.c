@@ -29,9 +29,9 @@ int main(int argc, char **argv)
       __gmpz_clear(__gen_e_acsl__2);
     }
     else __gen_e_acsl_and = 0;
-    __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"main",
-                    (char *)"alloca_bounds: 0 < sizeof(int) * LEN <= 18446744073709551615",
-                    8);
+    __e_acsl_assert(__gen_e_acsl_and,"Assertion","main",
+                    "alloca_bounds: 0 < sizeof(int) * LEN <= 18446744073709551615",
+                    "tests/memory/vla.c",8);
   }
   /*@ assert alloca_bounds: 0 < sizeof(int) * LEN ≤ 18446744073709551615;
    */
@@ -48,8 +48,8 @@ int main(int argc, char **argv)
         int __gen_e_acsl_valid;
         __gen_e_acsl_valid = __e_acsl_valid((void *)(arr + i),sizeof(int),
                                             (void *)arr,(void *)(& arr));
-        __e_acsl_assert(__gen_e_acsl_valid,(char *)"Assertion",
-                        (char *)"main",(char *)"\\valid(arr + i)",12);
+        __e_acsl_assert(__gen_e_acsl_valid,"Assertion","main",
+                        "\\valid(arr + i)","tests/memory/vla.c",12);
       }
       /*@ assert \valid(arr + i); */ ;
     }
@@ -58,8 +58,8 @@ int main(int argc, char **argv)
         int __gen_e_acsl_valid_2;
         __gen_e_acsl_valid_2 = __e_acsl_valid((void *)(arr + i),sizeof(int),
                                               (void *)arr,(void *)(& arr));
-        __e_acsl_assert(! __gen_e_acsl_valid_2,(char *)"Assertion",
-                        (char *)"main",(char *)"!\\valid(arr + i)",14);
+        __e_acsl_assert(! __gen_e_acsl_valid_2,"Assertion","main",
+                        "!\\valid(arr + i)","tests/memory/vla.c",14);
       }
       /*@ assert ¬\valid(arr + i); */ ;
     }

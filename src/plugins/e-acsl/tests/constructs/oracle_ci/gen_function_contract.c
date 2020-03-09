@@ -83,7 +83,8 @@ int __gen_e_acsl_l(void);
 
 int l(void)
 {
-  __e_acsl_assert(Y == 2,(char *)"Assertion",(char *)"l",(char *)"Y == 2",49);
+  __e_acsl_assert(Y == 2,"Assertion","l","Y == 2",
+                  "tests/constructs/function_contract.i",49);
   /*@ assert Y ≡ 2; */ ;
   return X;
 }
@@ -157,10 +158,10 @@ void __gen_e_acsl_n(void)
 {
   int __gen_e_acsl_at_2;
   int __gen_e_acsl_at;
-  __e_acsl_assert(X > 0,(char *)"Precondition",(char *)"n",(char *)"X > 0",
-                  65);
-  __e_acsl_assert(X < 10,(char *)"Precondition",(char *)"n",(char *)"X < 10",
-                  66);
+  __e_acsl_assert(X > 0,"Precondition","n","X > 0",
+                  "tests/constructs/function_contract.i",65);
+  __e_acsl_assert(X < 10,"Precondition","n","X < 10",
+                  "tests/constructs/function_contract.i",66);
   __gen_e_acsl_at_2 = X == 5;
   __gen_e_acsl_at = X == 7;
   n();
@@ -169,12 +170,14 @@ void __gen_e_acsl_n(void)
     int __gen_e_acsl_implies_2;
     if (! __gen_e_acsl_at) __gen_e_acsl_implies = 1;
     else __gen_e_acsl_implies = X == 8;
-    __e_acsl_assert(__gen_e_acsl_implies,(char *)"Postcondition",(char *)"n",
-                    (char *)"\\old(X == 7) ==> X == 8",69);
+    __e_acsl_assert(__gen_e_acsl_implies,"Postcondition","n",
+                    "\\old(X == 7) ==> X == 8",
+                    "tests/constructs/function_contract.i",69);
     if (! __gen_e_acsl_at_2) __gen_e_acsl_implies_2 = 1;
     else __gen_e_acsl_implies_2 = X == 98;
-    __e_acsl_assert(__gen_e_acsl_implies_2,(char *)"Postcondition",
-                    (char *)"n",(char *)"\\old(X == 5) ==> X == 98",72);
+    __e_acsl_assert(__gen_e_acsl_implies_2,"Postcondition","n",
+                    "\\old(X == 5) ==> X == 98",
+                    "tests/constructs/function_contract.i",72);
     return;
   }
 }
@@ -214,19 +217,19 @@ void __gen_e_acsl_m(void)
     int __gen_e_acsl_implies_3;
     if (! __gen_e_acsl_at) __gen_e_acsl_implies = 1;
     else __gen_e_acsl_implies = X == 95;
-    __e_acsl_assert(__gen_e_acsl_implies,(char *)"Postcondition",(char *)"m",
-                    (char *)"\\old(X == 7) ==> X == 95",56);
+    __e_acsl_assert(__gen_e_acsl_implies,"Postcondition","m",
+                    "\\old(X == 7) ==> X == 95",
+                    "tests/constructs/function_contract.i",56);
     if (! __gen_e_acsl_at_2) __gen_e_acsl_implies_2 = 1;
     else __gen_e_acsl_implies_2 = X == 7;
-    __e_acsl_assert(__gen_e_acsl_implies_2,(char *)"Postcondition",
-                    (char *)"m",(char *)"\\old(X == 5 && Y == 2) ==> X == 7",
-                    60);
+    __e_acsl_assert(__gen_e_acsl_implies_2,"Postcondition","m",
+                    "\\old(X == 5 && Y == 2) ==> X == 7",
+                    "tests/constructs/function_contract.i",60);
     if (! __gen_e_acsl_at_3) __gen_e_acsl_implies_3 = 1;
     else __gen_e_acsl_implies_3 = (long)X == __gen_e_acsl_at_4 + Y;
-    __e_acsl_assert(__gen_e_acsl_implies_3,(char *)"Postcondition",
-                    (char *)"m",
-                    (char *)"\\old(X == 5 && Y == 2) ==> X == \\old(X) + Y",
-                    61);
+    __e_acsl_assert(__gen_e_acsl_implies_3,"Postcondition","m",
+                    "\\old(X == 5 && Y == 2) ==> X == \\old(X) + Y",
+                    "tests/constructs/function_contract.i",61);
     return;
   }
 }
@@ -236,8 +239,8 @@ int __gen_e_acsl_l(void)
 {
   int __retres;
   __retres = l();
-  __e_acsl_assert(X == 5,(char *)"Postcondition",(char *)"l",
-                  (char *)"X == 5",47);
+  __e_acsl_assert(X == 5,"Postcondition","l","X == 5",
+                  "tests/constructs/function_contract.i",47);
   return __retres;
 }
 
@@ -261,18 +264,21 @@ void __gen_e_acsl_k(void)
     int __gen_e_acsl_implies_3;
     if (! (X == 1)) __gen_e_acsl_implies = 1;
     else __gen_e_acsl_implies = X == 0;
-    __e_acsl_assert(__gen_e_acsl_implies,(char *)"Precondition",(char *)"k",
-                    (char *)"X == 1 ==> X == 0",38);
+    __e_acsl_assert(__gen_e_acsl_implies,"Precondition","k",
+                    "X == 1 ==> X == 0",
+                    "tests/constructs/function_contract.i",38);
     if (X == 3) __gen_e_acsl_and = Y == 2; else __gen_e_acsl_and = 0;
     if (! __gen_e_acsl_and) __gen_e_acsl_implies_2 = 1;
     else __gen_e_acsl_implies_2 = X == 3;
-    __e_acsl_assert(__gen_e_acsl_implies_2,(char *)"Precondition",
-                    (char *)"k",(char *)"X == 3 && Y == 2 ==> X == 3",42);
+    __e_acsl_assert(__gen_e_acsl_implies_2,"Precondition","k",
+                    "X == 3 && Y == 2 ==> X == 3",
+                    "tests/constructs/function_contract.i",42);
     if (X == 3) __gen_e_acsl_and_2 = Y == 2; else __gen_e_acsl_and_2 = 0;
     if (! __gen_e_acsl_and_2) __gen_e_acsl_implies_3 = 1;
     else __gen_e_acsl_implies_3 = X + (long)Y == 5L;
-    __e_acsl_assert(__gen_e_acsl_implies_3,(char *)"Precondition",
-                    (char *)"k",(char *)"X == 3 && Y == 2 ==> X + Y == 5",43);
+    __e_acsl_assert(__gen_e_acsl_implies_3,"Precondition","k",
+                    "X == 3 && Y == 2 ==> X + Y == 5",
+                    "tests/constructs/function_contract.i",43);
   }
   k();
   return;
@@ -289,17 +295,17 @@ void __gen_e_acsl_k(void)
  */
 void __gen_e_acsl_j(void)
 {
-  __e_acsl_assert(X == 5,(char *)"Precondition",(char *)"j",(char *)"X == 5",
-                  27);
-  __e_acsl_assert((long)X == 3L + Y,(char *)"Precondition",(char *)"j",
-                  (char *)"X == 3 + Y",30);
-  __e_acsl_assert(Y == 2,(char *)"Precondition",(char *)"j",(char *)"Y == 2",
-                  31);
+  __e_acsl_assert(X == 5,"Precondition","j","X == 5",
+                  "tests/constructs/function_contract.i",27);
+  __e_acsl_assert((long)X == 3L + Y,"Precondition","j","X == 3 + Y",
+                  "tests/constructs/function_contract.i",30);
+  __e_acsl_assert(Y == 2,"Precondition","j","Y == 2",
+                  "tests/constructs/function_contract.i",31);
   j();
-  __e_acsl_assert(X == 3,(char *)"Postcondition",(char *)"j",
-                  (char *)"X == 3",28);
-  __e_acsl_assert((long)X == Y + 1L,(char *)"Postcondition",(char *)"j",
-                  (char *)"X == Y + 1",32);
+  __e_acsl_assert(X == 3,"Postcondition","j","X == 3",
+                  "tests/constructs/function_contract.i",28);
+  __e_acsl_assert((long)X == Y + 1L,"Postcondition","j","X == Y + 1",
+                  "tests/constructs/function_contract.i",32);
   return;
 }
 
@@ -307,10 +313,10 @@ void __gen_e_acsl_j(void)
     requires Y ≡ 2; */
 void __gen_e_acsl_i(void)
 {
-  __e_acsl_assert(X == 3,(char *)"Precondition",(char *)"i",(char *)"X == 3",
-                  21);
-  __e_acsl_assert(Y == 2,(char *)"Precondition",(char *)"i",(char *)"Y == 2",
-                  22);
+  __e_acsl_assert(X == 3,"Precondition","i","X == 3",
+                  "tests/constructs/function_contract.i",21);
+  __e_acsl_assert(Y == 2,"Precondition","i","Y == 2",
+                  "tests/constructs/function_contract.i",22);
   i();
   return;
 }
@@ -318,8 +324,8 @@ void __gen_e_acsl_i(void)
 /*@ requires X ≡ 2; */
 void __gen_e_acsl_h(void)
 {
-  __e_acsl_assert(X == 2,(char *)"Precondition",(char *)"h",(char *)"X == 2",
-                  17);
+  __e_acsl_assert(X == 2,"Precondition","h","X == 2",
+                  "tests/constructs/function_contract.i",17);
   h();
   return;
 }
@@ -329,10 +335,10 @@ void __gen_e_acsl_h(void)
 void __gen_e_acsl_g(void)
 {
   g();
-  __e_acsl_assert(X == 2,(char *)"Postcondition",(char *)"g",
-                  (char *)"X == 2",12);
-  __e_acsl_assert(Y == 2,(char *)"Postcondition",(char *)"g",
-                  (char *)"Y == 2",13);
+  __e_acsl_assert(X == 2,"Postcondition","g","X == 2",
+                  "tests/constructs/function_contract.i",12);
+  __e_acsl_assert(Y == 2,"Postcondition","g","Y == 2",
+                  "tests/constructs/function_contract.i",13);
   return;
 }
 
@@ -340,8 +346,8 @@ void __gen_e_acsl_g(void)
 void __gen_e_acsl_f(void)
 {
   f();
-  __e_acsl_assert(X == 1,(char *)"Postcondition",(char *)"f",
-                  (char *)"X == 1",8);
+  __e_acsl_assert(X == 1,"Postcondition","f","X == 1",
+                  "tests/constructs/function_contract.i",8);
   return;
 }
 

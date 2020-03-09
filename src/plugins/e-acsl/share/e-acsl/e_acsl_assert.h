@@ -105,11 +105,15 @@ int runtime_sound_verdict = 1;
 
 #ifndef E_ACSL_EXTERNAL_ASSERT
 /*! \brief Default implementation of E-ACSL runtime assertions */
-void runtime_assert(int predicate, char *kind, char *fct, char *pred_txt, int line) {
+void runtime_assert(int predicate, const char *kind, const char *fct,
+    const char *pred_txt, const char * file, int line) {
   if (runtime_sound_verdict) {
     if (! predicate) {
-      STDERR("%s failed at line %d (function %s).\n"
-             "The failing predicate is:\n%s.\n", kind, line, fct, pred_txt);
+      STDERR("%s: In function '%s'\n"
+             "%s:%d: Error: %s failed:\n"
+             "\tThe failing predicate is:\n"
+             "\t%s.\n",
+             file, fct, file, line, kind, pred_txt);
 #ifndef E_ACSL_NO_ASSERT_FAIL /* Do fail on assertions */
 #ifdef E_ACSL_FAIL_EXITCODE /* Fail by exit with a given code */
       exit(E_ACSL_FAIL_EXITCODE);
@@ -119,10 +123,11 @@ void runtime_assert(int predicate, char *kind, char *fct, char *pred_txt, int li
 #endif
     }
   } else
-    STDERR("warning: no sound verdict (guess: %s) at line %d "
-           "(function %s).\nThe considered predicate is:\n%s.\n",
-           predicate ? "ok" : "FAIL",
-           line, fct, pred_txt);
+    STDERR("%s: In function '%s'\n"
+           "%s:%d: Warning: no sound verdict for %s (guess: %s).\n"
+           "\tthe considered predicate is:\n"
+           "\t%s\n",
+           file, fct, file, line, kind, predicate ? "ok": "FAIL", pred_txt);
 }
 #endif
 

@@ -23,17 +23,16 @@ int main(void)
                                                   sizeof(unsigned int),
                                                   (void *)(& state->bitsInQueue),
                                                   (void *)0);
-    __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"main",
-                    (char *)"mem_access: \\valid_read(&state->bitsInQueue)",
-                    19);
+    __e_acsl_assert(__gen_e_acsl_valid_read,"RTE","main",
+                    "mem_access: \\valid_read(&state->bitsInQueue)",
+                    "tests/bts/bts1399.c",19);
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& state->dataQueue[
                                                     state->bitsInQueue / 8U]),
                                                     sizeof(unsigned char __attribute__((
                                                     __aligned__(32)))));
-    __e_acsl_assert(! __gen_e_acsl_initialized,(char *)"Assertion",
-                    (char *)"main",
-                    (char *)"!\\initialized(&state->dataQueue[state->bitsInQueue / 8])",
-                    19);
+    __e_acsl_assert(! __gen_e_acsl_initialized,"Assertion","main",
+                    "!\\initialized(&state->dataQueue[state->bitsInQueue / 8])",
+                    "tests/bts/bts1399.c",19);
   }
   /*@ assert ¬\initialized(&state->dataQueue[state->bitsInQueue / 8]); */ ;
   free((void *)state);

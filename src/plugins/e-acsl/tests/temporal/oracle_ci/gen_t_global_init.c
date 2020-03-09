@@ -43,8 +43,8 @@ void build_tree(tree_desc *desc)
       __gen_e_acsl_and = __gen_e_acsl_valid;
     }
     else __gen_e_acsl_and = 0;
-    __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",
-                    (char *)"build_tree",(char *)"\\valid(extra)",39);
+    __e_acsl_assert(__gen_e_acsl_and,"Assertion","build_tree",
+                    "\\valid(extra)","tests/temporal/t_global_init.c",39);
   }
   /*@ assert \valid(extra); */ ;
   __e_acsl_delete_block((void *)(& desc));
@@ -155,8 +155,8 @@ int main(int argc, char const **argv)
       __gen_e_acsl_and = __gen_e_acsl_valid_read;
     }
     else __gen_e_acsl_and = 0;
-    __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"main",
-                    (char *)"\\valid_read(p)",57);
+    __e_acsl_assert(__gen_e_acsl_and,"Assertion","main","\\valid_read(p)",
+                    "tests/temporal/t_global_init.c",57);
   }
   /*@ assert \valid_read(p); */ ;
   {
@@ -179,16 +179,17 @@ int main(int argc, char const **argv)
         __gen_e_acsl_and_2 = __gen_e_acsl_valid_read_2;
       }
       else __gen_e_acsl_and_2 = 0;
-      __e_acsl_assert(__gen_e_acsl_and_2,(char *)"RTE",(char *)"main",
-                      (char *)"mem_access: \\valid_read(p)",58);
+      __e_acsl_assert(__gen_e_acsl_and_2,"RTE","main",
+                      "mem_access: \\valid_read(p)",
+                      "tests/temporal/t_global_init.c",58);
       __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)*p,
                                                       sizeof(char),
                                                       (void *)*p,(void *)p);
       __gen_e_acsl_and_3 = __gen_e_acsl_valid_read_3;
     }
     else __gen_e_acsl_and_3 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_3,(char *)"Assertion",(char *)"main",
-                    (char *)"\\valid_read(*p)",58);
+    __e_acsl_assert(__gen_e_acsl_and_3,"Assertion","main","\\valid_read(*p)",
+                    "tests/temporal/t_global_init.c",58);
   }
   /*@ assert \valid_read(*p); */ ;
   __retres = 0;
