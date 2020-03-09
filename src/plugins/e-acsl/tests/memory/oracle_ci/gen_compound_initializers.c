@@ -74,8 +74,9 @@ int main(int argc, char **argv)
     int __gen_e_acsl_valid;
     __gen_e_acsl_valid = __e_acsl_valid((void *)(_A),sizeof(char *),
                                         (void *)(_A),(void *)(_A));
-    __e_acsl_assert(__gen_e_acsl_valid,(char *)"Assertion",(char *)"main",
-                    (char *)"\\valid((char **)_A)",33);
+    __e_acsl_assert(__gen_e_acsl_valid,"Assertion","main",
+                    "\\valid((char **)_A)",
+                    "tests/memory/compound_initializers.c",33);
   }
   /*@ assert \valid((char **)_A); */ ;
   {
@@ -92,8 +93,9 @@ int main(int argc, char **argv)
       __gen_e_acsl_and = __gen_e_acsl_valid_read;
     }
     else __gen_e_acsl_and = 0;
-    __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"main",
-                    (char *)"\\valid_read(_A[0])",34);
+    __e_acsl_assert(__gen_e_acsl_and,"Assertion","main",
+                    "\\valid_read(_A[0])",
+                    "tests/memory/compound_initializers.c",34);
   }
   /*@ assert \valid_read(_A[0]); */ ;
   {
@@ -110,8 +112,9 @@ int main(int argc, char **argv)
       __gen_e_acsl_and_2 = __gen_e_acsl_valid_read_2;
     }
     else __gen_e_acsl_and_2 = 0;
-    __e_acsl_assert(__gen_e_acsl_and_2,(char *)"Assertion",(char *)"main",
-                    (char *)"\\valid_read(_A[1])",35);
+    __e_acsl_assert(__gen_e_acsl_and_2,"Assertion","main",
+                    "\\valid_read(_A[1])",
+                    "tests/memory/compound_initializers.c",35);
   }
   /*@ assert \valid_read(_A[1]); */ ;
   {
@@ -119,56 +122,58 @@ int main(int argc, char **argv)
     __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)_B,sizeof(char),
                                                     (void *)_B,
                                                     (void *)(& _B));
-    __e_acsl_assert(__gen_e_acsl_valid_read_3,(char *)"Assertion",
-                    (char *)"main",(char *)"\\valid_read(_B)",36);
+    __e_acsl_assert(__gen_e_acsl_valid_read_3,"Assertion","main",
+                    "\\valid_read(_B)",
+                    "tests/memory/compound_initializers.c",36);
   }
   /*@ assert \valid_read(_B); */ ;
   {
     int __gen_e_acsl_valid_2;
     __gen_e_acsl_valid_2 = __e_acsl_valid((void *)(& _C),sizeof(char *),
                                           (void *)(& _C),(void *)0);
-    __e_acsl_assert(__gen_e_acsl_valid_2,(char *)"Assertion",(char *)"main",
-                    (char *)"\\valid(&_C)",37);
+    __e_acsl_assert(__gen_e_acsl_valid_2,"Assertion","main","\\valid(&_C)",
+                    "tests/memory/compound_initializers.c",37);
   }
   /*@ assert \valid(&_C); */ ;
   {
     int __gen_e_acsl_valid_3;
     __gen_e_acsl_valid_3 = __e_acsl_valid((void *)(_D),sizeof(int),
                                           (void *)(_D),(void *)(_D));
-    __e_acsl_assert(__gen_e_acsl_valid_3,(char *)"Assertion",(char *)"main",
-                    (char *)"\\valid((int *)_D)",38);
+    __e_acsl_assert(__gen_e_acsl_valid_3,"Assertion","main",
+                    "\\valid((int *)_D)",
+                    "tests/memory/compound_initializers.c",38);
   }
   /*@ assert \valid((int *)_D); */ ;
   {
     int __gen_e_acsl_valid_4;
     __gen_e_acsl_valid_4 = __e_acsl_valid((void *)(& _E),sizeof(int),
                                           (void *)(& _E),(void *)0);
-    __e_acsl_assert(__gen_e_acsl_valid_4,(char *)"Assertion",(char *)"main",
-                    (char *)"\\valid(&_E)",39);
+    __e_acsl_assert(__gen_e_acsl_valid_4,"Assertion","main","\\valid(&_E)",
+                    "tests/memory/compound_initializers.c",39);
   }
   /*@ assert \valid(&_E); */ ;
   {
     int __gen_e_acsl_valid_5;
     __gen_e_acsl_valid_5 = __e_acsl_valid((void *)(& _F),sizeof(int),
                                           (void *)(& _F),(void *)0);
-    __e_acsl_assert(__gen_e_acsl_valid_5,(char *)"Assertion",(char *)"main",
-                    (char *)"\\valid(&_F)",40);
+    __e_acsl_assert(__gen_e_acsl_valid_5,"Assertion","main","\\valid(&_F)",
+                    "tests/memory/compound_initializers.c",40);
   }
   /*@ assert \valid(&_F); */ ;
-  __e_acsl_assert(_E == 44,(char *)"Assertion",(char *)"main",
-                  (char *)"_E == 44",41);
+  __e_acsl_assert(_E == 44,"Assertion","main","_E == 44",
+                  "tests/memory/compound_initializers.c",41);
   /*@ assert _E ≡ 44; */ ;
   {
     int __gen_e_acsl_valid_6;
     __gen_e_acsl_valid_6 = __e_acsl_valid((void *)(& _G),
                                           sizeof(struct ST [2]),
                                           (void *)(& _G),(void *)0);
-    __e_acsl_assert(__gen_e_acsl_valid_6,(char *)"Assertion",(char *)"main",
-                    (char *)"\\valid(&_G)",42);
+    __e_acsl_assert(__gen_e_acsl_valid_6,"Assertion","main","\\valid(&_G)",
+                    "tests/memory/compound_initializers.c",42);
   }
   /*@ assert \valid(&_G); */ ;
-  __e_acsl_assert(_G[0].num == 99,(char *)"Assertion",(char *)"main",
-                  (char *)"_G[0].num == 99",43);
+  __e_acsl_assert(_G[0].num == 99,"Assertion","main","_G[0].num == 99",
+                  "tests/memory/compound_initializers.c",43);
   /*@ assert _G[0].num ≡ 99; */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(_G));

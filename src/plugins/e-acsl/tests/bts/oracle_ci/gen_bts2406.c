@@ -26,16 +26,16 @@ int main(void)
     int __gen_e_acsl_valid;
     __gen_e_acsl_valid = __e_acsl_valid((void *)(p + 1 * 0),(size_t)9,
                                         (void *)p,(void *)(& p));
-    __e_acsl_assert(! __gen_e_acsl_valid,(char *)"Assertion",(char *)"main",
-                    (char *)"!\\valid(p + (0 .. 9))",10);
+    __e_acsl_assert(! __gen_e_acsl_valid,"Assertion","main",
+                    "!\\valid(p + (0 .. 9))","tests/bts/bts2406.c",10);
   }
   /*@ assert ¬\valid(p + (0 .. 9)); */ ;
   {
     int __gen_e_acsl_valid_2;
     __gen_e_acsl_valid_2 = __e_acsl_valid((void *)(& t + 1 * 0),(size_t)9,
                                           (void *)(& t),(void *)0);
-    __e_acsl_assert(__gen_e_acsl_valid_2,(char *)"Assertion",(char *)"main",
-                    (char *)"\\valid(&t[0 .. 9])",11);
+    __e_acsl_assert(__gen_e_acsl_valid_2,"Assertion","main",
+                    "\\valid(&t[0 .. 9])","tests/bts/bts2406.c",11);
   }
   /*@ assert \valid(&t[0 .. 9]); */ ;
   __retres = 0;

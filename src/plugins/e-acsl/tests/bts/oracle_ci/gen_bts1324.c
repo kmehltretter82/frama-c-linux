@@ -37,7 +37,7 @@ int main(void)
   __e_acsl_store_block((void *)(t),(size_t)28);
   __e_acsl_full_init((void *)(& t));
   int n = __gen_e_acsl_sorted(t,7);
-  __e_acsl_assert(n == 1,(char *)"Assertion",(char *)"main",(char *)"n == 1",
+  __e_acsl_assert(n == 1,"Assertion","main","n == 1","tests/bts/bts1324.i",
                   23);
   /*@ assert n ≡ 1; */ ;
   __retres = 0;
@@ -68,19 +68,17 @@ int __gen_e_acsl_sorted(int *t, int n)
         __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(t + __gen_e_acsl_i),
                                                       sizeof(int),(void *)t,
                                                       (void *)(& t));
-        __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",
-                        (char *)"sorted",
-                        (char *)"mem_access: \\valid_read(t + __gen_e_acsl_i)",
-                        6);
+        __e_acsl_assert(__gen_e_acsl_valid_read,"RTE","sorted",
+                        "mem_access: \\valid_read(t + __gen_e_acsl_i)",
+                        "tests/bts/bts1324.i",6);
         __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(t + (
                                                                  __gen_e_acsl_i - 1L)),
                                                         sizeof(int),
                                                         (void *)t,
                                                         (void *)(& t));
-        __e_acsl_assert(__gen_e_acsl_valid_read_2,(char *)"RTE",
-                        (char *)"sorted",
-                        (char *)"mem_access: \\valid_read(t + (long)(__gen_e_acsl_i - 1))",
-                        6);
+        __e_acsl_assert(__gen_e_acsl_valid_read_2,"RTE","sorted",
+                        "mem_access: \\valid_read(t + (long)(__gen_e_acsl_i - 1))",
+                        "tests/bts/bts1324.i",6);
         if (*(t + (__gen_e_acsl_i - 1L)) <= *(t + __gen_e_acsl_i)) ;
         else {
           __gen_e_acsl_forall = 0;
@@ -97,10 +95,9 @@ int __gen_e_acsl_sorted(int *t, int n)
     int __gen_e_acsl_implies;
     if (! __gen_e_acsl_at) __gen_e_acsl_implies = 1;
     else __gen_e_acsl_implies = __retres == 1;
-    __e_acsl_assert(__gen_e_acsl_implies,(char *)"Postcondition",
-                    (char *)"sorted",
-                    (char *)"\\old(\\forall int i; 0 < i < n ==> *(t + (i - 1)) <= *(t + i)) ==>\n\\result == 1",
-                    7);
+    __e_acsl_assert(__gen_e_acsl_implies,"Postcondition","sorted",
+                    "\\old(\\forall int i; 0 < i < n ==> *(t + (i - 1)) <= *(t + i)) ==>\n\\result == 1",
+                    "tests/bts/bts1324.i",7);
     __e_acsl_delete_block((void *)(& t));
     return __retres;
   }

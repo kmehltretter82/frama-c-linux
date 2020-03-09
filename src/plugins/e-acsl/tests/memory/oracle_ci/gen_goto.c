@@ -29,8 +29,8 @@ int main(void)
   {
     int __gen_e_acsl_initialized;
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)b,sizeof(char));
-    __e_acsl_assert(__gen_e_acsl_initialized,(char *)"Assertion",
-                    (char *)"main",(char *)"\\initialized(b)",15);
+    __e_acsl_assert(__gen_e_acsl_initialized,"Assertion","main",
+                    "\\initialized(b)","tests/memory/goto.c",15);
   }
   /*@ assert \initialized(b); */ ;
   __retres = 0;

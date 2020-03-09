@@ -25,8 +25,8 @@ int main(void)
     int __gen_e_acsl_initialized;
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& i),
                                                     sizeof(int));
-    __e_acsl_assert(__gen_e_acsl_initialized,(char *)"Assertion",
-                    (char *)"main",(char *)"\\initialized(&i)",14);
+    __e_acsl_assert(__gen_e_acsl_initialized,"Assertion","main",
+                    "\\initialized(&i)","tests/memory/alias.i",14);
   }
   /*@ assert \initialized(&i); */ ;
   __retres = 0;

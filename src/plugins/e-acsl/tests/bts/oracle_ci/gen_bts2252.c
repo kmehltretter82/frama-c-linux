@@ -39,9 +39,8 @@ int main(void)
                                                       sizeof(char),
                                                       (void *)srcbuf,
                                                       (void *)(& srcbuf));
-        __e_acsl_assert(! __gen_e_acsl_valid_read,(char *)"Assertion",
-                        (char *)"main",(char *)"!\\valid_read(srcbuf + i)",
-                        16);
+        __e_acsl_assert(! __gen_e_acsl_valid_read,"Assertion","main",
+                        "!\\valid_read(srcbuf + i)","tests/bts/bts2252.c",16);
       }
       /*@ assert ¬\valid_read(srcbuf + i); */ ;
       /*@ assert Eva: mem_access: \valid_read(srcbuf + i); */

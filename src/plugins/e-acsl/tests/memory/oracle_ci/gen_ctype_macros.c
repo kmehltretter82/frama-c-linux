@@ -28,8 +28,8 @@ int main(int argc, char const **argv)
       __gen_e_acsl_and = __gen_e_acsl_valid;
     }
     else __gen_e_acsl_and = 0;
-    __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"main",
-                    (char *)"\\valid(d)",39);
+    __e_acsl_assert(__gen_e_acsl_and,"Assertion","main","\\valid(d)",
+                    "tests/memory/ctype_macros.c",39);
   }
   /*@ assert \valid(d); */ ;
   __retres = 0;

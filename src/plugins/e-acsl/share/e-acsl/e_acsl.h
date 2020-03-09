@@ -124,10 +124,12 @@
  *  \param kind  C string representing a kind an annotation (e.g., "Assertion")
  *  \param fct
  *  \param pred_txt  stringified predicate
+ *  \param file un-instrumented file of predicate placement
  *  \param line line of predicate placement in the un-instrumented file */
 /*@ requires pred != 0;
   @ assigns \nothing; */
-void assert(int pred, char *kind, char *fct, char *pred_txt, int line)
+void assert(int pred, const char *kind, const char *fct, const char *pred_txt,
+    const char * file, int line)
   __attribute__((FC_BUILTIN));
 /* }}} */
 

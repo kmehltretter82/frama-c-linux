@@ -63,8 +63,9 @@ int main(int argc, char const **argv)
       else __gen_e_acsl_and = 0;
       __gen_e_acsl_or = __gen_e_acsl_and;
     }
-    __e_acsl_assert(__gen_e_acsl_or,(char *)"Assertion",(char *)"main",
-                    (char *)"g1 == \\null || \\valid(g1)",13);
+    __e_acsl_assert(__gen_e_acsl_or,"Assertion","main",
+                    "g1 == \\null || \\valid(g1)",
+                    "tests/temporal/t_getenv.c",13);
   }
   /*@ assert g1 ≡ \null ∨ \valid(g1); */ ;
   {
@@ -87,8 +88,9 @@ int main(int argc, char const **argv)
       else __gen_e_acsl_and_2 = 0;
       __gen_e_acsl_or_2 = __gen_e_acsl_and_2;
     }
-    __e_acsl_assert(__gen_e_acsl_or_2,(char *)"Assertion",(char *)"main",
-                    (char *)"g2 == \\null || \\valid(g2)",14);
+    __e_acsl_assert(__gen_e_acsl_or_2,"Assertion","main",
+                    "g2 == \\null || \\valid(g2)",
+                    "tests/temporal/t_getenv.c",14);
   }
   /*@ assert g2 ≡ \null ∨ \valid(g2); */ ;
   __retres = 0;

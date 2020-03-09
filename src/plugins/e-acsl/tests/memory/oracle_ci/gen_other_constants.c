@@ -9,11 +9,11 @@ int main(void)
 {
   int __retres;
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
-  __e_acsl_assert(1,(char *)"Assertion",(char *)"main",
-                  (char *)"\'c\' == \'c\'",10);
+  __e_acsl_assert(1,"Assertion","main","\'c\' == \'c\'",
+                  "tests/memory/other_constants.i",10);
   /*@ assert 'c' ≡ 'c'; */ ;
-  __e_acsl_assert(1,(char *)"Assertion",(char *)"main",
-                  (char *)"false != true",11);
+  __e_acsl_assert(1,"Assertion","main","false != true",
+                  "tests/memory/other_constants.i",11);
   /*@ assert false ≢ true; */ ;
   __retres = 0;
   return __retres;

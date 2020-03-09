@@ -17,8 +17,8 @@ int main(void)
       int __gen_e_acsl_valid;
       __gen_e_acsl_valid = __e_acsl_valid((void *)(p + i),sizeof(int *),
                                           (void *)p,(void *)(& p));
-      __e_acsl_assert(__gen_e_acsl_valid,(char *)"Assertion",(char *)"main",
-                      (char *)"\\valid(p + i)",12);
+      __e_acsl_assert(__gen_e_acsl_valid,"Assertion","main","\\valid(p + i)",
+                      "tests/temporal/t_dpointer.c",12);
     }
     /*@ assert \valid(p + i); */ ;
     __e_acsl_initialize((void *)(p + i),sizeof(int *));
@@ -39,8 +39,9 @@ int main(void)
                                                       sizeof(int *),
                                                       (void *)p,
                                                       (void *)(& p));
-        __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"main",
-                        (char *)"mem_access: \\valid_read(p + i)",14);
+        __e_acsl_assert(__gen_e_acsl_valid_read,"RTE","main",
+                        "mem_access: \\valid_read(p + i)",
+                        "tests/temporal/t_dpointer.c",14);
         /*@ assert Eva: initialization: \initialized(p + i); */
         __gen_e_acsl_valid_2 = __e_acsl_valid((void *)*(p + i),sizeof(int),
                                               (void *)*(p + i),
@@ -48,8 +49,8 @@ int main(void)
         __gen_e_acsl_and = __gen_e_acsl_valid_2;
       }
       else __gen_e_acsl_and = 0;
-      __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"main",
-                      (char *)"\\valid(*(p + i))",14);
+      __e_acsl_assert(__gen_e_acsl_and,"Assertion","main",
+                      "\\valid(*(p + i))","tests/temporal/t_dpointer.c",14);
     }
     /*@ assert \valid(*(p + i)); */ ;
     i ++;
@@ -74,8 +75,9 @@ int main(void)
                                                       sizeof(int *),
                                                       (void *)p,
                                                       (void *)(& p));
-      __e_acsl_assert(__gen_e_acsl_valid_read_2,(char *)"RTE",(char *)"main",
-                      (char *)"mem_access: \\valid_read(p + 2)",20);
+      __e_acsl_assert(__gen_e_acsl_valid_read_2,"RTE","main",
+                      "mem_access: \\valid_read(p + 2)",
+                      "tests/temporal/t_dpointer.c",20);
       /*@ assert Eva: dangling_pointer: ¬\dangling(p + 2); */
       __gen_e_acsl_valid_3 = __e_acsl_valid((void *)*(p + 2),sizeof(int),
                                             (void *)*(p + 2),(void *)(
@@ -83,8 +85,8 @@ int main(void)
       __gen_e_acsl_and_2 = __gen_e_acsl_valid_3;
     }
     else __gen_e_acsl_and_2 = 0;
-    __e_acsl_assert(! __gen_e_acsl_and_2,(char *)"Assertion",(char *)"main",
-                    (char *)"!\\valid(*(p + 2))",20);
+    __e_acsl_assert(! __gen_e_acsl_and_2,"Assertion","main",
+                    "!\\valid(*(p + 2))","tests/temporal/t_dpointer.c",20);
   }
   /*@ assert ¬\valid(*(p + 2)); */ ;
   __retres = 0;

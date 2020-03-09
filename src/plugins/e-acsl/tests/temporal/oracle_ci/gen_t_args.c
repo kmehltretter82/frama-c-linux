@@ -9,16 +9,16 @@ int main(int argc, char const **argv)
     int __gen_e_acsl_valid;
     __gen_e_acsl_valid = __e_acsl_valid((void *)(& argc),sizeof(int),
                                         (void *)(& argc),(void *)0);
-    __e_acsl_assert(__gen_e_acsl_valid,(char *)"Assertion",(char *)"main",
-                    (char *)"\\valid(&argc)",8);
+    __e_acsl_assert(__gen_e_acsl_valid,"Assertion","main","\\valid(&argc)",
+                    "tests/temporal/t_args.c",8);
   }
   /*@ assert \valid(&argc); */ ;
   {
     int __gen_e_acsl_valid_2;
     __gen_e_acsl_valid_2 = __e_acsl_valid((void *)argv,sizeof(char const *),
                                           (void *)argv,(void *)(& argv));
-    __e_acsl_assert(__gen_e_acsl_valid_2,(char *)"Assertion",(char *)"main",
-                    (char *)"\\valid(argv)",9);
+    __e_acsl_assert(__gen_e_acsl_valid_2,"Assertion","main","\\valid(argv)",
+                    "tests/temporal/t_args.c",9);
   }
   /*@ assert \valid(argv); */ ;
   {
@@ -33,15 +33,16 @@ int main(int argc, char const **argv)
                                                     sizeof(char const *),
                                                     (void *)argv,
                                                     (void *)(& argv));
-      __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"main",
-                      (char *)"mem_access: \\valid_read(argv)",10);
+      __e_acsl_assert(__gen_e_acsl_valid_read,"RTE","main",
+                      "mem_access: \\valid_read(argv)",
+                      "tests/temporal/t_args.c",10);
       __gen_e_acsl_valid_3 = __e_acsl_valid((void *)*argv,sizeof(char const),
                                             (void *)*argv,(void *)argv);
       __gen_e_acsl_and = __gen_e_acsl_valid_3;
     }
     else __gen_e_acsl_and = 0;
-    __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"main",
-                    (char *)"\\valid(*argv)",10);
+    __e_acsl_assert(__gen_e_acsl_and,"Assertion","main","\\valid(*argv)",
+                    "tests/temporal/t_args.c",10);
   }
   /*@ assert \valid(*argv); */ ;
   __retres = 0;

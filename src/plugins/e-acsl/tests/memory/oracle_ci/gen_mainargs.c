@@ -34,9 +34,9 @@ int __gen_e_acsl_main(int argc, char **argv)
       __gen_e_acsl_k ++;
     }
     e_acsl_end_loop1: ;
-    __e_acsl_assert(__gen_e_acsl_forall,(char *)"Assertion",(char *)"main",
-                    (char *)"\\forall int k; 0 <= k < argc ==> \\valid(argv + k)",
-                    12);
+    __e_acsl_assert(__gen_e_acsl_forall,"Assertion","main",
+                    "\\forall int k; 0 <= k < argc ==> \\valid(argv + k)",
+                    "tests/memory/mainargs.c",12);
   }
   /*@ assert ∀ int k; 0 ≤ k < argc ⇒ \valid(argv + k); */ ;
   {
@@ -49,9 +49,9 @@ int __gen_e_acsl_main(int argc, char **argv)
     __gmpz_init_set_si(__gen_e_acsl_,(argc + 1L) * 8);
     __gen_e_acsl_eq = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_block_length_2),
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_));
-    __e_acsl_assert(__gen_e_acsl_eq == 0,(char *)"Assertion",(char *)"main",
-                    (char *)"\\block_length(argv) == (argc + 1) * sizeof(char *)",
-                    13);
+    __e_acsl_assert(__gen_e_acsl_eq == 0,"Assertion","main",
+                    "\\block_length(argv) == (argc + 1) * sizeof(char *)",
+                    "tests/memory/mainargs.c",13);
     __gmpz_clear(__gen_e_acsl_block_length_2);
     __gmpz_clear(__gen_e_acsl_);
   }
@@ -62,11 +62,12 @@ int __gen_e_acsl_main(int argc, char **argv)
                                                   sizeof(char *),
                                                   (void *)argv,
                                                   (void *)(& argv));
-    __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"main",
-                    (char *)"mem_access: \\valid_read(argv + argc)",15);
+    __e_acsl_assert(__gen_e_acsl_valid_read,"RTE","main",
+                    "mem_access: \\valid_read(argv + argc)",
+                    "tests/memory/mainargs.c",15);
     /*@ assert Eva: mem_access: \valid_read(argv + argc); */
-    __e_acsl_assert(*(argv + argc) == (char *)0,(char *)"Assertion",
-                    (char *)"main",(char *)"*(argv + argc) == \\null",15);
+    __e_acsl_assert(*(argv + argc) == (char *)0,"Assertion","main",
+                    "*(argv + argc) == \\null","tests/memory/mainargs.c",15);
   }
   /*@ assert *(argv + argc) ≡ \null; */ ;
   {
@@ -81,8 +82,9 @@ int __gen_e_acsl_main(int argc, char **argv)
                                                       sizeof(char *),
                                                       (void *)argv,
                                                       (void *)(& argv));
-      __e_acsl_assert(__gen_e_acsl_valid_read_2,(char *)"RTE",(char *)"main",
-                      (char *)"mem_access: \\valid_read(argv + argc)",16);
+      __e_acsl_assert(__gen_e_acsl_valid_read_2,"RTE","main",
+                      "mem_access: \\valid_read(argv + argc)",
+                      "tests/memory/mainargs.c",16);
       /*@ assert Eva: mem_access: \valid_read(argv + argc); */
       __gen_e_acsl_valid_2 = __e_acsl_valid((void *)*(argv + argc),
                                             sizeof(char),
@@ -91,8 +93,8 @@ int __gen_e_acsl_main(int argc, char **argv)
       __gen_e_acsl_and = __gen_e_acsl_valid_2;
     }
     else __gen_e_acsl_and = 0;
-    __e_acsl_assert(! __gen_e_acsl_and,(char *)"Assertion",(char *)"main",
-                    (char *)"!\\valid(*(argv + argc))",16);
+    __e_acsl_assert(! __gen_e_acsl_and,"Assertion","main",
+                    "!\\valid(*(argv + argc))","tests/memory/mainargs.c",16);
   }
   /*@ assert ¬\valid(*(argv + argc)); */ ;
   i = 0;
@@ -113,9 +115,9 @@ int __gen_e_acsl_main(int argc, char **argv)
                                                           sizeof(char *),
                                                           (void *)argv,
                                                           (void *)(& argv));
-          __e_acsl_assert(__gen_e_acsl_valid_read_3,(char *)"RTE",
-                          (char *)"main",
-                          (char *)"mem_access: \\valid_read(argv + i)",19);
+          __e_acsl_assert(__gen_e_acsl_valid_read_3,"RTE","main",
+                          "mem_access: \\valid_read(argv + i)",
+                          "tests/memory/mainargs.c",19);
           __gen_e_acsl_valid_3 = __e_acsl_valid((void *)*(argv + i),
                                                 sizeof(char),
                                                 (void *)*(argv + i),
@@ -123,8 +125,8 @@ int __gen_e_acsl_main(int argc, char **argv)
           __gen_e_acsl_and_2 = __gen_e_acsl_valid_3;
         }
         else __gen_e_acsl_and_2 = 0;
-        __e_acsl_assert(__gen_e_acsl_and_2,(char *)"Assertion",
-                        (char *)"main",(char *)"\\valid(*(argv + i))",19);
+        __e_acsl_assert(__gen_e_acsl_and_2,"Assertion","main",
+                        "\\valid(*(argv + i))","tests/memory/mainargs.c",19);
       }
       /*@ assert \valid(*(argv + i)); */ ;
       {
@@ -142,9 +144,9 @@ int __gen_e_acsl_main(int argc, char **argv)
                                                             sizeof(char *),
                                                             (void *)argv,
                                                             (void *)(& argv));
-            __e_acsl_assert(__gen_e_acsl_valid_read_4,(char *)"RTE",
-                            (char *)"main",
-                            (char *)"mem_access: \\valid_read(argv + i)",20);
+            __e_acsl_assert(__gen_e_acsl_valid_read_4,"RTE","main",
+                            "mem_access: \\valid_read(argv + i)",
+                            "tests/memory/mainargs.c",20);
             __gen_e_acsl_valid_4 = __e_acsl_valid((void *)(*(argv + i) + __gen_e_acsl_k_2),
                                                   sizeof(char),
                                                   (void *)*(argv + i),
@@ -158,10 +160,9 @@ int __gen_e_acsl_main(int argc, char **argv)
           __gen_e_acsl_k_2 ++;
         }
         e_acsl_end_loop2: ;
-        __e_acsl_assert(__gen_e_acsl_forall_2,(char *)"Assertion",
-                        (char *)"main",
-                        (char *)"\\forall int k; 0 <= k <= len ==> \\valid(*(argv + i) + k)",
-                        20);
+        __e_acsl_assert(__gen_e_acsl_forall_2,"Assertion","main",
+                        "\\forall int k; 0 <= k <= len ==> \\valid(*(argv + i) + k)",
+                        "tests/memory/mainargs.c",20);
       }
       /*@ assert ∀ int k; 0 ≤ k ≤ len ⇒ \valid(*(argv + i) + k); */ ;
     }
@@ -183,12 +184,12 @@ int main(int argc, char **argv)
     int __gen_e_acsl_valid_2;
     __gen_e_acsl_valid = __e_acsl_valid((void *)(& argc),sizeof(int),
                                         (void *)(& argc),(void *)0);
-    __e_acsl_assert(__gen_e_acsl_valid,(char *)"Precondition",(char *)"main",
-                    (char *)"\\valid(&argc)",7);
+    __e_acsl_assert(__gen_e_acsl_valid,"Precondition","main",
+                    "\\valid(&argc)","tests/memory/mainargs.c",7);
     __gen_e_acsl_valid_2 = __e_acsl_valid((void *)(& argv),sizeof(char **),
                                           (void *)(& argv),(void *)0);
-    __e_acsl_assert(__gen_e_acsl_valid_2,(char *)"Precondition",
-                    (char *)"main",(char *)"\\valid(&argv)",8);
+    __e_acsl_assert(__gen_e_acsl_valid_2,"Precondition","main",
+                    "\\valid(&argv)","tests/memory/mainargs.c",8);
   }
   __retres = __gen_e_acsl_main(argc,argv);
   __e_acsl_delete_block((void *)(& argv));

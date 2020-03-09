@@ -7,8 +7,8 @@ int main(void)
   int __retres;
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   uint8 x = (unsigned char)0;
-  __e_acsl_assert((int)x == 0,(char *)"Assertion",(char *)"main",
-                  (char *)"x == 0",9);
+  __e_acsl_assert((int)x == 0,"Assertion","main","x == 0",
+                  "tests/constructs/typedef.i",9);
   /*@ assert x ≡ 0; */ ;
   __retres = 0;
   return __retres;

@@ -88,8 +88,9 @@ struct list *__gen_e_acsl_f(struct list *l)
                                                       sizeof(struct list *),
                                                       (void *)(& l->next),
                                                       (void *)0);
-        __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"f",
-                        (char *)"mem_access: \\valid_read(&l->next)",17);
+        __e_acsl_assert(__gen_e_acsl_valid_read,"RTE","f",
+                        "mem_access: \\valid_read(&l->next)",
+                        "tests/memory/valid_in_contract.c",17);
         __gen_e_acsl_valid_2 = __e_acsl_valid((void *)l->next,
                                               sizeof(struct list),
                                               (void *)l->next,
@@ -109,14 +110,14 @@ struct list *__gen_e_acsl_f(struct list *l)
     int __gen_e_acsl_implies_2;
     if (! __gen_e_acsl_at) __gen_e_acsl_implies = 1;
     else __gen_e_acsl_implies = __retres == __gen_e_acsl_at_2;
-    __e_acsl_assert(__gen_e_acsl_implies,(char *)"Postcondition",(char *)"f",
-                    (char *)"\\old(l == \\null) ==> \\result == \\old(l)",15);
+    __e_acsl_assert(__gen_e_acsl_implies,"Postcondition","f",
+                    "\\old(l == \\null) ==> \\result == \\old(l)",
+                    "tests/memory/valid_in_contract.c",15);
     if (! __gen_e_acsl_at_3) __gen_e_acsl_implies_2 = 1;
     else __gen_e_acsl_implies_2 = __retres == __gen_e_acsl_at_4;
-    __e_acsl_assert(__gen_e_acsl_implies_2,(char *)"Postcondition",
-                    (char *)"f",
-                    (char *)"\\old(!\\valid{Here}(l) || !\\valid{Here}(l->next)) ==> \\result == \\old(l)",
-                    18);
+    __e_acsl_assert(__gen_e_acsl_implies_2,"Postcondition","f",
+                    "\\old(!\\valid{Here}(l) || !\\valid{Here}(l->next)) ==> \\result == \\old(l)",
+                    "tests/memory/valid_in_contract.c",18);
     __e_acsl_delete_block((void *)(& l));
     __e_acsl_delete_block((void *)(& __retres));
     return __retres;

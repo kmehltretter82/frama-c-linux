@@ -32,8 +32,9 @@ int main(void)
     __gmpz_init_set_si(__gen_e_acsl__4,(long)(-1));
     __gen_e_acsl_eq = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_add),
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__4));
-    __e_acsl_assert(__gen_e_acsl_eq == 0,(char *)"Assertion",(char *)"main",
-                    (char *)"A + (long)((long)(3 * A) - 1) == -1",8);
+    __e_acsl_assert(__gen_e_acsl_eq == 0,"Assertion","main",
+                    "A + (long)((long)(3 * A) - 1) == -1",
+                    "tests/bts/bts2231.i",8);
     __gmpz_clear(__gen_e_acsl_A);
     __gmpz_clear(__gen_e_acsl_);
     __gmpz_clear(__gen_e_acsl_mul);
