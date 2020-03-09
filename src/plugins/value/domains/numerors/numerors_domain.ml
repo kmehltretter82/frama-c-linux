@@ -162,7 +162,6 @@ let () =
       domain = Domain (module Domain); }
   in
   let reduced_product = Main_values.CVal.key, Numerors_value.key, reduce_error in
-  register ~enable:Value_parameters.NumerorsDomain.get domain;
+  register domain;
   register_value_reduction reduced_product;
-  register_hook reduce_cast;
-  Value_parameters.register_numerors ()
+  register_hook reduce_cast

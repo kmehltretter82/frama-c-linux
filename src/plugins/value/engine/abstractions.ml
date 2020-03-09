@@ -66,17 +66,17 @@ module Config = struct
   let abstractions = ref []
   let dynamic_abstractions : dynamic list ref = ref []
 
-  let register ~enable abstraction =
+  let register abstraction =
     let { name; descr; } = abstraction in
     Value_parameters.register_domain ~name ~descr;
-    abstractions := (enable, Flag abstraction) :: !abstractions
+    abstractions := (Flag abstraction) :: !abstractions
 
   let dynamic_register ~configure ~make =
     dynamic_abstractions := Dynamic (configure, make) :: !dynamic_abstractions
 
   let configure () =
-    let aux config (enable, (Flag domain as flag)) =
-      if enable () || Value_parameters.Domains.mem domain.name
+    let aux config (Flag domain as flag) =
+      if Value_parameters.Domains.mem domain.name
       then add flag config
       else config
     in
@@ -90,27 +90,25 @@ module Config = struct
 
   (* --- Register default abstractions -------------------------------------- *)
 
-  let create ~enable abstract = register ~enable abstract; Flag abstract
-  let create_domain priority name descr enable values domain =
-    create ~enable
+  let create abstract = register abstract; Flag abstract
+  let create_domain priority name descr values domain =
+    create
       { name; descr; priority; values = Single values; domain = Domain domain }
 
-  open Value_parameters
-
   (* Register standard domains over cvalues. *)
-  let make rank name descr enable =
-    create_domain rank name descr enable (module Main_values.CVal)
+  let make rank name descr =
+    create_domain rank name descr (module Main_values.CVal)
 
   let cvalue =
     make 9 "cvalue"
       "Main analysis domain, enabled by default. Should not be disabled."
-      CvalueDomain.get (module Cvalue_domain.State)
+      (module Cvalue_domain.State)
 
   let symbolic_locations =
     make 7 "symbolic-locations"
       "Infers values of symbolic locations represented by imprecise lvalues, \
        such as t[i] or *p when the possible values of [i] or [p] are imprecise."
-      SymbolicLocsDomain.get (module Symbolic_locs.D)
+      (module Symbolic_locs.D)
 
   let equality_domain =
     { name = "equality";
@@ -120,45 +118,45 @@ module Config = struct
       priority = 8;
       values = Struct Abstract.Value.Unit;
       domain = Functor (module Equality_domain.Make); }
-  let equality = create ~enable:EqualityDomain.get equality_domain
+  let equality = create equality_domain
 
   let gauges =
     make 6 "gauges"
       "Infers linear inequalities between the variables modified within a loop \
        and a special loop counter."
-      GaugesDomain.get (module Gauges_domain.D)
+      (module Gauges_domain.D)
 
   let octagon =
     make 6 "octagon"
       "Infers relations between scalar variables of the form b ≤ ±X ± Y ≤ e, \
        where X, Y are program variables and b, e are constants."
-      OctagonDomain.get (module Octagons)
+      (module Octagons)
 
   let bitwise =
     create_domain 3 "bitwise"
       "Infers bitwise information to interpret more precisely bitwise operators."
-      BitwiseOffsmDomain.get (module Offsm_value.Offsm) (module Offsm_domain.D)
+      (module Offsm_value.Offsm) (module Offsm_domain.D)
 
   let sign =
     create_domain 4 "sign"
       "Infers the sign of program variables."
-      SignDomain.get (module Sign_value) (module Sign_domain)
+      (module Sign_value) (module Sign_domain)
 
   let inout = make 5 "inout"
       "Experimental. Infers the inputs and outputs of each function."
-      InoutDomain.get (module Inout_domain.D)
+      (module Inout_domain.D)
 
   let traces =
     make 2 "traces"
       "Experimental. Builds an over-approximation of all the traces that lead \
        to a statement."
-      TracesDomain.get (module Traces_domain.D)
+      (module Traces_domain.D)
 
   let printer =
     make 2 "printer"
       "Debug domain, only useful for developers. Prints the transfer functions \
        used during the analysis."
-      PrinterDomain.get (module Printer_domain)
+      (module Printer_domain)
 
   (* --- Default and legacy configurations ---------------------------------- *)
 

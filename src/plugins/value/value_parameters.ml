@@ -126,13 +126,43 @@ let malloc = add_group "Dynamic allocation"
 
 let () = Parameter_customize.set_group domains
 module Domains =
-  String_set
+  Filled_string_set
     (struct
       let option_name = "-eva-domains"
       let arg_name = "d1,...,dn"
       let help = "Enable a list of analysis domains."
+      let default = Datatype.String.Set.singleton "cvalue"
     end)
 let () = add_precision_dep Domains.parameter
+
+let remove_domain name =
+  Domains.set (Datatype.String.Set.filter ((!=) name) (Domains.get ()))
+
+(* For backward compatibility, creates an invisible option for the domain [name]
+   that sets up -eva-domains with [name]. To be removed one day. *)
+let create_domain_option name =
+  let option_name =
+    match name with
+    | "apron-box" -> "-eva-apron-box"
+    | "apron-octagon" -> "-eva-apron-oct"
+    | "apron-polka-loose" -> "-eva-polka-loose"
+    | "apron-polka-strict" -> "-eva-polka-strict"
+    | "apron-polka-equality" -> "-eva-polka-equalities"
+    | _ -> "-eva-" ^ name ^ "-domain"
+  in
+  let module Input = struct
+    let option_name = option_name
+    let help = "Use the " ^ name ^ " domain of eva."
+    let default = name = "cvalue"
+  end in
+  Parameter_customize.set_group domains;
+  Parameter_customize.is_invisible ();
+  let module Parameter = Bool (Input) in
+  Parameter.add_set_hook
+    (fun _old _new ->
+       warning "Option %s is deprecated. Use -eva-domains %s%s instead."
+         option_name (if _new then "" else "-") name;
+       if _new then Domains.add name else remove_domain name)
 
 (* List (name, descr) of available domains. *)
 let domains_ref = ref []
@@ -159,6 +189,7 @@ let domains_list () =
 
 (* Registers a new domain. Updates the help message of -eva-domains. *)
 let register_domain ~name ~descr =
+  create_domain_option name;
   domains_ref := (name, descr) :: !domains_ref;
   Cmdline.replace_option_help
     Domains.option_name "eva" domains (domains_help ())
@@ -181,164 +212,6 @@ let () =
 let parameters_abstractions =
   ref (Typed_parameter.Set.singleton Domains.parameter)
 
-(* This functor must be used to create parameters for new domains of Eva. *)
-module Domain_Parameter
-    (X:sig include Parameter_sig.Input val default: bool end)
-= struct
-  Parameter_customize.set_group domains;
-  module Parameter = Bool (X);;
-  add_precision_dep Parameter.parameter;
-  parameters_abstractions :=
-    Typed_parameter.Set.add Parameter.parameter !parameters_abstractions;
-  include Parameter
-end
-
-module CvalueDomain = Domain_Parameter
-    (struct
-      let option_name = "-eva-cvalue-domain"
-      let help = "Use the default domain of eva."
-      let default = true
-    end)
-
-module EqualityDomain = Domain_Parameter
-    (struct
-      let option_name = "-eva-equality-domain"
-      let help = "Use the equality domain of Eva."
-      let default = false
-    end)
-
-module GaugesDomain = Domain_Parameter
-    (struct
-      let option_name = "-eva-gauges-domain"
-      let help = "Use the gauges domain of Eva."
-      let default = false
-    end)
-
-module SymbolicLocsDomain = Domain_Parameter
-    (struct
-      let option_name = "-eva-symbolic-locations-domain"
-      let help = "Use a dedicated domain for symbolic equalities."
-      let default = false
-    end)
-
-module OctagonDomain = Domain_Parameter
-    (struct
-      let option_name = "-eva-octagon-domain"
-      let help = "Use the octagon domain of Eva."
-      let default = false
-    end)
-
-module BitwiseOffsmDomain = Domain_Parameter
-    (struct
-      let option_name = "-eva-bitwise-domain"
-      let help = "Use the bitwise abstractions of Eva."
-      let default = false
-    end)
-
-let numerors_available = ref false
-let register_numerors () = numerors_available := true
-
-let numerors_hook _ _ =
-  if not !numerors_available
-  then
-    abort
-      "The numerors domain has been requested but is not available,@ \
-       as Frama-C did not found the MPFR library. The analysis is aborted."
-  else if not (is_debug_key_enabled dkey_experimental) then
-    warning  "The numerors domain is experimental.";
-
-module NumerorsDomain = Domain_Parameter
-    (struct
-      let option_name = "-eva-numerors-domain"
-      let help = "Experimental. Use the numerors domain of Eva. This domain \
-                  computes rounding error bounds for the floating point \
-                  computations"
-      let default = false
-    end)
-let () = NumerorsDomain.add_set_hook numerors_hook
-
-let apron_help = "Experimental binding of the numerical domains provided \
-                  by the APRON library: http://apron.cri.ensmp.fr/library \n"
-
-let apron_available = ref false
-let register_apron () = apron_available := true
-
-let apron_hook _ _ =
-  if not !apron_available
-  then
-    abort "an Apron domain is requested but the apron binding is not available."
-  else if not (is_debug_key_enabled dkey_experimental) then
-    warning  "The Apron domains binding is experimental.";
-
-module ApronOctagon = Domain_Parameter
-    (struct
-      let option_name = "-eva-apron-oct"
-      let help = apron_help ^ "Use the octagon domain of apron."
-      let default = false
-    end)
-let () = ApronOctagon.add_set_hook apron_hook
-
-module ApronBox = Domain_Parameter
-    (struct
-      let option_name = "-eva-apron-box"
-      let help = apron_help ^ "Use the box domain of apron."
-      let default = false
-    end)
-let () = ApronBox.add_set_hook apron_hook
-
-module PolkaLoose = Domain_Parameter
-    (struct
-      let option_name = "-eva-polka-loose"
-      let help = apron_help ^ "Use the loose polyhedra domain of apron."
-      let default = false
-    end)
-let () = PolkaLoose.add_set_hook apron_hook
-
-module PolkaStrict = Domain_Parameter
-    (struct
-      let option_name = "-eva-polka-strict"
-      let help = apron_help ^ "Use the strict polyhedra domain of apron."
-      let default = false
-    end)
-let () = PolkaStrict.add_set_hook apron_hook
-
-module PolkaEqualities = Domain_Parameter
-    (struct
-      let option_name = "-eva-polka-equalities"
-      let help = apron_help ^ "Use the linear equalities domain of apron."
-      let default = false
-    end)
-let () = PolkaEqualities.add_set_hook apron_hook
-
-module InoutDomain = Domain_Parameter
-    (struct
-      let option_name = "-eva-inout-domain"
-      let help = "Compute inputs and outputs within Eva. Experimental."
-      let default = false
-    end)
-
-module SignDomain = Domain_Parameter
-    (struct
-      let option_name = "-eva-sign-domain"
-      let help = "Use the sign domain of Eva. For demonstration purposes only."
-      let default = false
-    end)
-
-module TracesDomain = Domain_Parameter
-    (struct
-      let option_name = "-eva-traces-domain"
-      let help = "Use a domain to record traces of Eva. Experimental."
-      let default = false
-    end)
-
-module PrinterDomain = Domain_Parameter
-    (struct
-      let option_name = "-eva-printer-domain"
-      let help = "Use the printer domain of eva. Useful for the developpers \
-                  of new abstract domains, as it prints the domain functions \
-                  that are called by Eva during an analysis."
-      let default = false
-    end)
 
 let () = Parameter_customize.set_group domains
 module EqualityCall =
@@ -1599,6 +1472,14 @@ let bind (type t) (module P: Parameter_sig.S with type t = t) f =
   let set = set (module P) in
   configures := (fun n -> set ~default:(n < 0) (f n)) :: !configures
 
+let domains n =
+  let (<+>) domains (x, name) = if n >= x then name :: domains else domains in
+  [ "cvalue" ]
+  <+> (1, "symbolic-locations")
+  <+> (2, "equality")
+  <+> (3, "gauges")
+  <+> (5, "octagon")
+
 (*  power             0    1   2   3    4    5    6    7    8     9    10    11 *)
 let slevel_power = [| 0;  10; 20; 35;  60; 100; 160; 250; 500; 1000; 2000; 5000 |]
 let ilevel_power = [| 8;  12; 16; 24;  32;  48;  64; 128; 192;  256;  256;  256 |]
@@ -1617,11 +1498,8 @@ let () =
   bind (module ArrayPrecisionLevel) (get plevel_power);
   bind (module LinearLevel) (fun n -> n * 20);
   bind (module RmAssert) (fun n -> n > 0);
-  bind (module SymbolicLocsDomain) (fun n -> n > 0);
-  bind (module EqualityDomain) (fun n -> n > 1);
-  bind (module GaugesDomain) (fun n -> n > 2);
+  bind (module Domains) (fun n -> Datatype.String.Set.of_list (domains n));
   bind (module SplitReturn) (fun n -> if n > 3 then "auto" else "");
-  bind (module OctagonDomain) (fun n -> n > 4);
   bind (module EqualityCall) (fun n -> if n > 4 then "formals" else "none");
   bind (module OctagonCall) (fun n -> n > 6);
   ()

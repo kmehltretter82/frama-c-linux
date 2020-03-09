@@ -71,9 +71,8 @@ type 'v abstraction =
   }
 
 (** Register an abstraction. The abstraction is used in an Eva analysis if
-    [enable ()] returns true at the start of the analysis, or if -eva-domains
-    has been set to the name of the abstraction.  *)
-val register: enable:(unit -> bool) -> 'v abstraction -> unit
+    -eva-domains has been set to the name of the abstraction. *)
+val register: 'v abstraction -> unit
 
 (** Register a dynamic abstraction: the abstraction is built by applying
     [make (configure ())] at the start of each analysis. *)

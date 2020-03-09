@@ -23,4 +23,4 @@
 (** Numerors domain: computes over-approximations of the rounding errors bounds
     of floating-point computations.
     Nothing is exported: the domain is registered as an analysis abstraction
-    in the Eva engine, enabled by the -eva-numerors-domain option. *)
+    in the Eva engine, enabled by the -eva-domains numerors option. *)
