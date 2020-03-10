@@ -77,8 +77,6 @@ let dkey_incompatible_states = register_category "incompatible-states"
 let dkey_iterator = register_category "iterator"
 let dkey_callbacks = register_category "callbacks"
 let dkey_widening = register_category "widening"
-let dkey_experimental = register_category "experimental-ok"
-
 
 let () =
   let activate dkey = add_debug_keys dkey in
@@ -102,6 +100,7 @@ let () = set_warn_status wkey_missing_loop_unroll_for Log.Winactive
 let wkey_signed_overflow = register_warn_category "signed-overflow"
 let wkey_invalid_assigns = register_warn_category "invalid-assigns"
 let () = set_warn_status wkey_invalid_assigns Log.Wfeedback
+let wkey_experimental = register_warn_category "experimental"
 
 module ForceValues =
   WithOutput

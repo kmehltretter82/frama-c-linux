@@ -58,16 +58,18 @@ type 'v domain =
 
 (** Abstraction to be registered. The name of each abstraction must be unique.
     The description is printed in the help message of the -eva-domains option.
+    An abstraction marked as experimental emits a warning when enabled.
     The priority can be any integer; domains with higher priority are always
     processed first. The domains currently provided by Eva have priority ranging
     between 1 and 19, so a priority of 0 (respectively 20) ensures that a new
     domain is processed after (respectively before) the classic Eva domains. *)
 type 'v abstraction =
-  { name: string;      (** Name of the abstraction. Must be unique. *)
-    descr: string;     (** Short description of the abstraction. *)
-    priority: int;     (** Domains with higher priority are processed first. *)
-    values: 'v value;  (** The value abstraction. *)
-    domain: 'v domain; (** The domain over the value abstraction. *)
+  { name: string;       (** Name of the abstraction. Must be unique. *)
+    descr: string;      (** Short description of the abstraction. *)
+    experimental: bool; (** Is the domain experimental? *)
+    priority: int;      (** Domains with higher priority are processed first. *)
+    values: 'v value;   (** The value abstraction. *)
+    domain: 'v domain ; (** The domain over the value abstraction. *)
   }
 
 (** Register an abstraction. The abstraction is used in an Eva analysis if

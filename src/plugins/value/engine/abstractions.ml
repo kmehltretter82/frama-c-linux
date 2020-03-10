@@ -41,6 +41,7 @@ type 'v domain =
 type 'v abstraction =
   { name: string;
     descr: string;
+    experimental: bool;
     priority: int;
     values: 'v value;
     domain: 'v domain; }
@@ -67,6 +68,11 @@ module Config = struct
   let dynamic_abstractions : dynamic list ref = ref []
 
   let register abstraction =
+    let abstraction =
+      if abstraction.experimental
+      then { abstraction with descr = "Experimental. " ^ abstraction.descr }
+      else abstraction
+    in
     let { name; descr; } = abstraction in
     Value_parameters.register_domain ~name ~descr;
     abstractions := (Flag abstraction) :: !abstractions
@@ -91,13 +97,14 @@ module Config = struct
   (* --- Register default abstractions -------------------------------------- *)
 
   let create abstract = register abstract; Flag abstract
-  let create_domain priority name descr values domain =
+  let create_domain ?(experimental=false) priority name descr values domain =
     create
-      { name; descr; priority; values = Single values; domain = Domain domain }
+      { name; descr; experimental; priority;
+        values = Single values; domain = Domain domain }
 
   (* Register standard domains over cvalues. *)
-  let make rank name descr =
-    create_domain rank name descr (module Main_values.CVal)
+  let make ?experimental rank name descr =
+    create_domain ?experimental rank name descr (module Main_values.CVal)
 
   let cvalue =
     make 9 "cvalue"
@@ -115,6 +122,7 @@ module Config = struct
       descr = "Infers equalities between syntactic C expressions. \
                Makes the analysis less dependent on temporary variables and \
                intermediate computations.";
+      experimental = false;
       priority = 8;
       values = Struct Abstract.Value.Unit;
       domain = Functor (module Equality_domain.Make); }
@@ -142,13 +150,13 @@ module Config = struct
       "Infers the sign of program variables."
       (module Sign_value) (module Sign_domain)
 
-  let inout = make 5 "inout"
-      "Experimental. Infers the inputs and outputs of each function."
+  let inout = make 5 "inout" ~experimental:true
+      "Infers the inputs and outputs of each function."
       (module Inout_domain.D)
 
   let traces =
-    make 2 "traces"
-      "Experimental. Builds an over-approximation of all the traces that lead \
+    make 2 "traces" ~experimental:true
+      "Builds an over-approximation of all the traces that lead \
        to a statement."
       (module Traces_domain.D)
 
@@ -321,8 +329,16 @@ let add_domain (type v) (abstraction: v abstraction) (module Acc: Acc) =
     module Dom = (val domain)
   end : Acc)
 
+let warn_experimental abstraction =
+  if abstraction.experimental then
+    Value_parameters.(warning ~wkey:wkey_experimental
+                        "The %s domain is experimental." abstraction.name)
+
 let build_domain config abstract =
-  let build (Config.Flag abstraction) acc = add_domain abstraction acc in
+  let build (Config.Flag abstraction) acc =
+    warn_experimental abstraction;
+    add_domain abstraction acc
+  in
   (* Domains in the [config] are sorted by increasing priority: domains with
      higher priority are added last: they will be at the top of the domains
      tree, and thus will be processed first during the analysis. *)

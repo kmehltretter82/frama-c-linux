@@ -730,12 +730,11 @@ let make name (module Man: Input) =
   let module Domain = Domain_builder.Complete (Make (Man)) in
   let open Abstractions in
   let descr =
-    "Experimental binding to the " ^ name ^
-    " domain of the Apron library. \
-     See http://apron.cri.ensmp.fr/library for more details."
+    "Binding to the " ^ name ^ " domain of the Apron library. " ^
+    "See http://apron.cri.ensmp.fr/library for more details."
   in
   let name = "apron-" ^ name in
-  register { name; descr; priority = 1;
+  register { name; descr; experimental = true; priority = 1;
              values = Single (module Main_values.Interval);
              domain = Domain (module Domain); }
 
