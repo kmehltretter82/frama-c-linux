@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: #"-eva-sign-domain -eva-equality-domain -eva-bitwise-domain -eva-symbolic-locations-domain -eva-gauges-domain -slevel 2"
+   STDOPT: #"-eva-domains sign,equality,bitwise,symbolic-locations,gauges -slevel 2"
 */
 
 /*  Tests five domains together. */

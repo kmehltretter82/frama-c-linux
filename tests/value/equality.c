@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-eva-equality-domain -eva-warn-copy-indeterminate=-assign_by_copy"
+   STDOPT: +"-eva-domains equality -eva-warn-copy-indeterminate=-assign_by_copy"
 */
 
 /* Tests for the equality domain. */
