@@ -3740,7 +3740,7 @@ comparison like in the following example.
 \lstinputlisting{examples/parametrizing/split-fabs.c}
 
 This example requires the equality domain (enabled with option
-\lstinline|-eva-equality-domain|, see section \ref{sec:symbolic-equalities}) to
+\lstinline|-eva-domains equality|, see section \ref{sec:symbolic-equalities}) to
 be analyzed precisely, as we need the equality relations between the input and
 the output of the function \lstinline|fabs|, i.e. the relations
 \lstinline|x == \result| or \lstinline|x == -\result|.
@@ -3849,6 +3849,10 @@ available to improve the precision on specific code constructs.
 They can (and probably should) be enabled at the beginning of the analysis.
 Their only downside is that they increase the analysis time.
 
+These analysis domains are enabled by the option \texttt{-eva-domains}, followed
+by a list of domain names. A list of the available domains, and a short
+description of each one, can be displayed with \texttt{-eva-domains help}.
+
 \emph{Restrictions:}
 \begin{itemize}
 \item adding a new domain may interact with the \lstinline+slevel+ partitioning
@@ -3867,7 +3871,7 @@ categories are described in Section~\ref{buitins_observation}.
 \subsection{Symbolic equalities}
 \label{sec:symbolic-equalities}
 
-Activating option \texttt{-eva-equality-domain} instructs
+Activating option \texttt{-eva-domains equality} instructs
 \Eva{} to perform a special analysis that stores information
 about equalities found in the code. Those equalities may stem either
 from conditions (e.g. \texttt{if (x == y+1)}), or assignments
@@ -3910,7 +3914,7 @@ Three global modes are available:
 \subsection{Reused left-values}
 \label{sec:reuse}
 
-Activating option \texttt{-eva-symbolic-locations-domain} instructs
+Activating option \texttt{-eva-domains symbolic-locations} instructs
 \Eva{} to perform a special analysis for \emph{reused left-values}.
 
 \begin{lstlisting}
@@ -3943,7 +3947,7 @@ in the caller is not propagated in the callee.
 \subsection{Gauges}
 \label{sec:gauges}
 
-Activating option \texttt{-eva-gauges-domain} instructs \Eva{} to
+Activating option \texttt{-eva-domains gauges} instructs \Eva{} to
 store relations between integer (or pointer) variables modified by a
 loop, and the number of elapsed loop iterations. It is based on the
 paper \emph{``The Gauge Domain: Scalable Analysis of Linear
@@ -4009,7 +4013,7 @@ and \texttt{y} is not affine.
 \subsection{Octagons}
 \label{sec:octagons}
 
-Activating option \texttt{-eva-octagon-domain} instructs Eva to infer relations
+Activating option \texttt{-eva-domains octagon} instructs Eva to infer relations
 between variables as numerical constraints of the form $l \leq \pm X \pm Y \leq
 u$, where $X$ and $Y$ are program variables, and $l$ and $u$ are constants.
 
@@ -4059,7 +4063,7 @@ and at the end, the inferred relations are propagated back to the caller.
 
 \emph{This analysis is experimental.}
 
-Activating option \texttt{-eva-bitwise-domain} instructs \Eva{} to store
+Activating option \texttt{-eva-domains bitwise} instructs \Eva{} to store
 bitwise information in complement to the usual, interval-based, information.
 This is mostly useful for programs that use bitwise operators: \verb+&+,
 \verb+|+, \verb+^+ and \verb+~+, especially with bit-masks constants.
@@ -4123,7 +4127,7 @@ in very long analyses and/or massive memory usage.
 
 \Eva{} provides a domain inferring ranges for the absolute and relative errors
 stemming from floating-point computations. This domain can be enabled by the
-option \texttt{-eva-numerors-domain}. The theory and core principles underlying
+option \texttt{-eva-domains numerors}. The theory and core principles underlying
 this domain are described in \cite{DBLP:conf/sas/JacqueminPV18}.
 
 The errors inferred by the domain can be seen in the GUI, alongside the other

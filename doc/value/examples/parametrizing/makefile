@@ -38,4 +38,4 @@ context-depth.3.log: FCFLAGS += -context-width 1 -context-depth 1 -context-valid
 slevel.1.log: FCFLAGS += -slevel 55
 slevel.2.log: FCFLAGS += -slevel 28
 ilevel.2.log: FCFLAGS += -val-ilevel 16
-split-fabs.log: FCFLAGS += -eva-equality-domain
+split-fabs.log: FCFLAGS += -eva-domains equality
