@@ -56,33 +56,47 @@ type 'v domain =
   | Domain: (module leaf_domain with type value = 'v) -> 'v domain
   | Functor: (module domain_functor) -> _ domain
 
-(** Abstraction to be registered. The name of each abstraction must be unique.
-    The description is printed in the help message of the -eva-domains option.
-    An abstraction marked as experimental emits a warning when enabled.
-    The priority can be any integer; domains with higher priority are always
-    processed first. The domains currently provided by Eva have priority ranging
-    between 1 and 19, so a priority of 0 (respectively 20) ensures that a new
-    domain is processed after (respectively before) the classic Eva domains. *)
+(** Abstraction to be registered. *)
 type 'v abstraction =
-  { name: string;       (** Name of the abstraction. Must be unique. *)
-    descr: string;      (** Short description of the abstraction. *)
-    experimental: bool; (** Is the domain experimental? *)
-    priority: int;      (** Domains with higher priority are processed first. *)
-    values: 'v value;   (** The value abstraction. *)
+  { values: 'v value;   (** The value abstraction. *)
     domain: 'v domain ; (** The domain over the value abstraction. *)
   }
 
-(** Register an abstraction. The abstraction is used in an Eva analysis if
-    -eva-domains has been set to the name of the abstraction. *)
-val register: 'v abstraction -> unit
+(** Information about a registered abstraction. *)
+type 't with_info =
+  { name: string;       (** Name of the domain. Must be unique. *)
+    experimental: bool; (** Is the domain experimental? *)
+    priority: int;      (** Domains with higher priority are processed first. *)
+    abstraction: 't;    (** The abstract value and the domain. *)
+  }
+
+(** Flag for an abstract domain. A domain can be programmatically enabled via
+    its flag. See module {!Config} for more details. *)
+type flag = Flag: 'v abstraction with_info -> flag
+
+(** Registers an abstract domain. Returns a flag for the given domain.
+    - [name] must be unique. The domain is used if the -eva-domains option
+      has been set to [name].
+    - [descr] is a description printed in the help message of -eva-domains.
+    - [experimental] is false by default. If set to true, a warning is emitted
+      when the domain is enabled.
+    - [priority] can be any integer; domains with higher priority are always
+      processed first. The domains currently provided by Eva have priority
+      ranging between 1 and 19, so a priority of 0 (respectively 20) ensures
+      that a new domain is processed after (respectively before) the classic
+      Eva domains. The default priority is 0. *)
+val register:
+  name:string -> descr:string -> ?experimental:bool -> ?priority:int ->
+  'v abstraction -> flag
 
 (** Register a dynamic abstraction: the abstraction is built by applying
-    [make (configure ())] at the start of each analysis. *)
+    the last argument when starting an analysis, if the -eva-domains option
+    has been set to [name]. See function {!register} for more details. *)
 val dynamic_register:
-  configure:(unit -> 'a option) -> make:('a -> 'v abstraction) -> unit
+  name:string -> descr:string -> ?experimental:bool -> ?priority:int ->
+  (unit -> 'v abstraction) -> unit
 
-(** Value reduced product between two value abstractions, identified by their
-    keys. *)
+(** Reduced product between two value abstractions, identified by their keys. *)
 type ('a, 'b) value_reduced_product =
   'a Abstract.Value.key * 'b Abstract.Value.key * ('a -> 'b -> 'a * 'b)
 
@@ -122,12 +136,9 @@ val register_hook: ((module S) -> (module S)) -> unit
 
 (** {2 Configuration of an analysis.} *)
 
-(** Configuration defining the abstractions to be used in an analysis. *)
+(** Configuration defining the abstractions to be used in an analysis.
+    A configuration is a set of flags, i.e. a set of enabled abstractions. *)
 module Config : sig
-  (** Flag for an abstraction. *)
-  type flag = Flag: 'v abstraction -> flag
-
-  (** A configuration is a set of flags, i.e. a set of enabled abstractions. *)
   include Set.S with type elt = flag
 
   (** Flags for the standard domains currently provided in Eva. *)

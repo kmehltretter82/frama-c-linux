@@ -39,18 +39,20 @@ type 'v domain =
   | Functor: (module domain_functor) -> _ domain
 
 type 'v abstraction =
+  { values: 'v value;
+    domain: 'v domain; }
+
+type 't with_info =
   { name: string;
-    descr: string;
     experimental: bool;
     priority: int;
-    values: 'v value;
-    domain: 'v domain; }
+    abstraction: 't; }
+
+type flag = Flag: 'v abstraction with_info -> flag
 
 (* --- Config and registration ---------------------------------------------- *)
 
 module Config = struct
-  type flag = Flag: 'v abstraction -> flag
-
   module Flag = struct
     type t = flag
 
@@ -62,23 +64,23 @@ module Config = struct
 
   include Set.Make (Flag)
 
-  type dynamic = Dynamic: (unit -> 'a option) * ('a -> 'v abstraction) -> dynamic
+  type dynamic = Dynamic: (unit -> 'v abstraction) with_info -> dynamic
 
   let abstractions = ref []
   let dynamic_abstractions : dynamic list ref = ref []
 
-  let register abstraction =
-    let abstraction =
-      if abstraction.experimental
-      then { abstraction with descr = "Experimental. " ^ abstraction.descr }
-      else abstraction
-    in
-    let { name; descr; } = abstraction in
+  let register ~name ~descr ?(experimental=false) ?(priority=0) abstraction =
+    let descr = if experimental then "Experimental. " ^ descr else descr in
     Value_parameters.register_domain ~name ~descr;
-    abstractions := (Flag abstraction) :: !abstractions
+    let flag = Flag { name; experimental; priority; abstraction } in
+    abstractions := flag :: !abstractions;
+    flag
 
-  let dynamic_register ~configure ~make =
-    dynamic_abstractions := Dynamic (configure, make) :: !dynamic_abstractions
+  let dynamic_register ~name ~descr ?(experimental=false) ?(priority=0) make =
+    let descr = if experimental then "Experimental. " ^ descr else descr in
+    Value_parameters.register_domain ~name ~descr;
+    let dynamic = Dynamic { name; experimental; priority; abstraction=make; } in
+    dynamic_abstractions := dynamic :: !dynamic_abstractions
 
   let configure () =
     let aux config (Flag domain as flag) =
@@ -87,20 +89,21 @@ module Config = struct
       else config
     in
     let config = List.fold_left aux empty !abstractions in
-    let aux config (Dynamic (configure, make)) =
-      match configure () with
-      | None -> config
-      | Some c -> add (Flag (make c)) config
+    let aux config (Dynamic { name; experimental; priority; abstraction; }) =
+      if Value_parameters.Domains.mem name
+      then
+        let abstraction = abstraction () in
+        let flag = Flag { name; experimental; priority; abstraction; } in
+        add flag config
+      else config
     in
     List.fold_left aux config !dynamic_abstractions
 
   (* --- Register default abstractions -------------------------------------- *)
 
-  let create abstract = register abstract; Flag abstract
-  let create_domain ?(experimental=false) priority name descr values domain =
-    create
-      { name; descr; experimental; priority;
-        values = Single values; domain = Domain domain }
+  let create_domain ?experimental priority name descr values domain =
+    let abstraction = { values = Single values; domain = Domain domain } in
+    register ~name ~descr ~priority ?experimental abstraction
 
   (* Register standard domains over cvalues. *)
   let make ?experimental rank name descr =
@@ -117,16 +120,15 @@ module Config = struct
        such as t[i] or *p when the possible values of [i] or [p] are imprecise."
       (module Symbolic_locs.D)
 
-  let equality_domain =
-    { name = "equality";
-      descr = "Infers equalities between syntactic C expressions. \
-               Makes the analysis less dependent on temporary variables and \
-               intermediate computations.";
-      experimental = false;
-      priority = 8;
-      values = Struct Abstract.Value.Unit;
-      domain = Functor (module Equality_domain.Make); }
-  let equality = create equality_domain
+  let equality =
+    let descr = "Infers equalities between syntactic C expressions. \
+                 Makes the analysis less dependent on temporary variables and \
+                 intermediate computations."
+    and abstraction =
+      { values = Struct Abstract.Value.Unit;
+        domain = Functor (module Equality_domain.Make); }
+    in
+    register ~name:"equality" ~descr ~priority:8 abstraction
 
   let gauges =
     make 6 "gauges"
@@ -229,8 +231,8 @@ module Internal_Value = struct
     aux value internal
 
   let build_values config initial_value =
-    let build (Config.Flag abstraction) acc =
-      match abstraction.values with
+    let build (Flag flag) acc =
+      match flag.abstraction.values with
       | Struct structure -> add_value_structure acc structure
       | Single (module V) -> add_value_leaf acc (V (V.key, (module V)))
     in
@@ -329,15 +331,15 @@ let add_domain (type v) (abstraction: v abstraction) (module Acc: Acc) =
     module Dom = (val domain)
   end : Acc)
 
-let warn_experimental abstraction =
-  if abstraction.experimental then
+let warn_experimental flag =
+  if flag.experimental then
     Value_parameters.(warning ~wkey:wkey_experimental
-                        "The %s domain is experimental." abstraction.name)
+                        "The %s domain is experimental." flag.name)
 
 let build_domain config abstract =
-  let build (Config.Flag abstraction) acc =
-    warn_experimental abstraction;
-    add_domain abstraction acc
+  let build (Flag flag) acc =
+    warn_experimental flag;
+    add_domain flag.abstraction acc
   in
   (* Domains in the [config] are sorted by increasing priority: domains with
      higher priority are added last: they will be at the top of the domains
