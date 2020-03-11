@@ -22,6 +22,24 @@
 
 open Bottom.Type
 
+(* --- Tagging --- *)
+
+(* Tags are stored in keys to track states through the propagation *)
+
+module Tag =
+struct
+  include Datatype.Int64
+
+  let fresh : unit -> t =
+    let last = ref Int64.zero in
+    fun () ->
+      last := Int64.succ !last;
+      !last
+end
+
+type tag = Tag.t
+
+
 (* --- Split monitors --- *)
 
 type split_monitor = {
@@ -80,13 +98,17 @@ type branch = int
      the split creates states in which the expression evalutates to a
      singleton, the values of the map are integers.
      Static splits are only evaluated when the annotation is encountered
-     whereas dynamic splits are reevaluated regularly. *)
+     whereas dynamic splits are reevaluated regularly.
+  Additionnaly, the key store a tag that is used to track the state it is
+  associated with. This tag is not used during the indexing process and thus
+  cannot differentiate keys. *) 
 type key = {
   ration_stamp : stamp;
   branches : branch list;
   loops : (int * int) list; (* current iteration / max unrolling *)
   static_split : (Integer.t*split_monitor) ExpMap.t; (* exp->value*monitor *)
   dynamic_split : (Integer.t*split_monitor) ExpMap.t; (* exp->value*monitor *)
+  tag : tag;
 }
 
 module Key =

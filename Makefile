@@ -905,6 +905,7 @@ PLUGIN_CMO:= partitioning/split_strategy value_parameters \
 	engine/recursion engine/transfer_stmt engine/transfer_specification \
 	partitioning/auto_loop_unroll \
 	partitioning/partition partitioning/partitioning_parameters \
+	partitioning/join_cache \
 	partitioning/partitioning_index partitioning/trace_partitioning \
 	engine/mem_exec engine/iterator engine/initialization \
 	engine/compute_functions engine/analysis register \
