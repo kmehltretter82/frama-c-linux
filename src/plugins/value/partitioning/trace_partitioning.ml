@@ -37,7 +37,6 @@ struct
 
   module Index = Partitioning_index.Make (Domain)
   module Flow = Partition.MakeFlow (Abstract)
-  module JoinCache = Join_cache.Make (Domain) (Partition.Tag)
 
   type state = Domain.t
 
