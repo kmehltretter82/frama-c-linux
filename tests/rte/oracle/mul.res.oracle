@@ -36,7 +36,8 @@ int main(void)
   z = x * 1;
   z = 1 * y;
   /*@ assert
-      rte: signed_downcast: (unsigned int)x * 0xffffffff ≤ 2147483647;
+      rte: signed_downcast:
+        (unsigned int)((unsigned int)x * 0xffffffff) ≤ 2147483647;
   */
   z = (int)((unsigned int)x * 0xffffffff);
   /*@ assert rte: signed_overflow: 0xffff * 0xffff ≤ 2147483647; */

@@ -20,7 +20,7 @@
 [eva:alarm] tests/value/downcast.i:19: Warning: 
   signed downcast. assert (int)sx + (int)sy ≤ 127;
 [eva:alarm] tests/value/downcast.i:22: Warning: 
-  signed downcast. assert uy + uz ≤ 2147483647;
+  signed downcast. assert (unsigned int)(uy + uz) ≤ 2147483647;
 [eva] Recording results for main1
 [eva] Done for function main1
 [eva] computing for function main2_bitfield <- main.
@@ -445,7 +445,7 @@ void main1(void)
   sz = (signed char)((int)sx + (int)sy);
   uc = (unsigned char)((int)sx + (int)sy);
   uc = (unsigned char)x;
-  /*@ assert Eva: signed_downcast: uy + uz ≤ 2147483647; */
+  /*@ assert Eva: signed_downcast: (unsigned int)(uy + uz) ≤ 2147483647; */
   x = (int)(uy + uz);
   ux = uy + uz;
   s = (unsigned short)(uy + uz);
@@ -648,7 +648,7 @@ void main(void)
 [eva:alarm] tests/value/downcast.i:21: Warning: 
   unsigned downcast. assert x ≤ 255;
 [eva:alarm] tests/value/downcast.i:24: Warning: 
-  unsigned downcast. assert uy + uz ≤ 65535;
+  unsigned downcast. assert (unsigned int)(uy + uz) ≤ 65535;
 [eva] Recording results for main1
 [eva] Done for function main1
 [eva] computing for function main2_bitfield <- main.
@@ -1004,7 +1004,7 @@ void main1(void)
   uc = (unsigned char)x;
   x = (int)(uy + uz);
   ux = uy + uz;
-  /*@ assert Eva: unsigned_downcast: uy + uz ≤ 65535; */
+  /*@ assert Eva: unsigned_downcast: (unsigned int)(uy + uz) ≤ 65535; */
   s = (unsigned short)(uy + uz);
   return;
 }

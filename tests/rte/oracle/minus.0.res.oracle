@@ -28,7 +28,7 @@ int main(void)
   z = - x;
   /*@ assert rte: signed_overflow: -2147483647 ≤ (int)(-0x7fffffff) - 1; */
   z = - (-0x7fffffff - 1);
-  /*@ assert rte: signed_downcast: -ux ≤ 2147483647; */
+  /*@ assert rte: signed_downcast: (unsigned int)(-ux) ≤ 2147483647; */
   z = (int)(- ux);
   /*@ assert
       rte: signed_overflow:

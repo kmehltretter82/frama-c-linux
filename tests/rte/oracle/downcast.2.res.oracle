@@ -26,10 +26,10 @@ int main(void)
   /*@ assert rte: unsigned_downcast: x ≤ 255; */
   /*@ assert rte: unsigned_downcast: 0 ≤ x; */
   uc = (unsigned char)x;
-  /*@ assert rte: signed_downcast: uy + uz ≤ 2147483647; */
+  /*@ assert rte: signed_downcast: (unsigned int)(uy + uz) ≤ 2147483647; */
   x = (int)(uy + uz);
   ux = uy + uz;
-  /*@ assert rte: unsigned_downcast: uy + uz ≤ 65535; */
+  /*@ assert rte: unsigned_downcast: (unsigned int)(uy + uz) ≤ 65535; */
   s = (unsigned short)(uy + uz);
   __retres = 0;
   return __retres;
