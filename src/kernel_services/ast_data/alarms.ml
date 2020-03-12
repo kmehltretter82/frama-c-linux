@@ -550,8 +550,7 @@ let create_predicate ?(loc=Location.unknown) alarm =
       let loc = best_loc ~loc e.eloc in
       let exp_type = Cil.typeOf e in
       let t = match kind with
-        | Signed_downcast | Unsigned_downcast
-          when Cil.isUnsignedInteger exp_type ->
+        | Signed_downcast | Unsigned_downcast ->
           let t = overflowed_expr_to_term ~loc e in
           (* Without this cast, the alarm is:
              - Signed_downcast: unsound ->
