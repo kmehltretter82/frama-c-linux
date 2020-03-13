@@ -308,6 +308,52 @@ void check_and_assert () {
   }
 }
 
+/* Tests the ACSL extended quantifiers \min and \max. */
+void min_max_quantifier () {
+  int i, j, t[64];
+  /*@ loop unroll 32; */
+  for (i = 0; i < 32; i++)
+    t[i] = i;
+  t[32] = 0;
+  /*@ loop unroll 32; */
+  for (i = 33; i < 64; i++)
+    t[i] = 64-i;
+  /*@ check valid: \max(12, 12, \lambda integer i; t[i]) == 12; */
+  /*@ check valid: \min(12, 12, \lambda integer i; t[i]) == 12; */
+  /*@ check valid: \max(28, 36, \lambda integer i; t[i]) == 31; */
+  /*@ check valid: \min(28, 36, \lambda integer i; t[i]) == 0; */
+  /*@ check valid: \max(2, 30, \lambda integer i; t[i]) == 30; */
+  /*@ check valid: \min(2, 30, \lambda integer i; t[i]) == 2; */
+  /*@ check valid: \max(16, 48, \lambda integer i; t[i]) == 31; */
+  /*@ check valid: \min(16, 48, \lambda integer i; t[i]) == 0; */
+  /*@ check unknown: \max(11, 10, \lambda integer i; t[i]) >= 0; */
+  /*@ check unknown: \min(11, 10, \lambda integer i; t[i]) >= 0; */
+  i = Frama_C_interval(2,5);
+  j = Frama_C_interval(10, 12);
+  /*@ check valid: \max(i, j, \lambda integer i; t[i]) >= 10; */
+  /*@ check valid: \max(i, j, \lambda integer i; t[i]) <= 12; */
+  /*@ check valid: \min(i, j, \lambda integer i; t[i]) >= 2; */
+  /*@ check valid: \min(i, j, \lambda integer i; t[i]) <= 5; */
+  /*@ check unknown: \max(i, j, \lambda integer i; t[i]) > 10; */
+  /*@ check unknown: \max(i, j, \lambda integer i; t[i]) < 12; */
+  /*@ check unknown: \min(i, j, \lambda integer i; t[i]) > 2; */
+  /*@ check unknown: \min(i, j, \lambda integer i; t[i]) < 5; */
+  i = Frama_C_interval(2,8);
+  j = Frama_C_interval(16, 30);
+  /*@ check valid: \max(i, j, \lambda integer i; t[i]) >= 16; */
+  /*@ check valid: \max(i, j, \lambda integer i; t[i]) <= 30; */
+  /*@ check valid: \min(i, j, \lambda integer i; t[i]) >= 2; */
+  /*@ check valid: \min(i, j, \lambda integer i; t[i]) <= 8; */
+  /*@ check unknown: \max(i, j, \lambda integer i; t[i]) > 16; */
+  /*@ check unknown: \max(i, j, \lambda integer i; t[i]) < 30; */
+  /*@ check unknown: \min(i, j, \lambda integer i; t[i]) > 2; */
+  /*@ check unknown: \min(i, j, \lambda integer i; t[i]) < 8; */
+  i = Frama_C_interval(4,16);
+  j = Frama_C_interval(12, 24);
+  /*@ check unknown: \max(i, j, \lambda integer i; t[i]) >= 0; */
+  /*@ check unknown: \min(i, j, \lambda integer i; t[i]) >= 0; */
+}
+
 void main () {
   eq_tsets();
   eq_char();
@@ -321,4 +367,5 @@ void main () {
   min_max();
   assign_tsets();
   check_and_assert ();
+  min_max_quantifier ();
 }
