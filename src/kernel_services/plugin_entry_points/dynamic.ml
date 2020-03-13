@@ -241,13 +241,13 @@ let load_script base =
   let fmt = Format.formatter_of_buffer cmd in
   begin
     if Dynlink.is_native then
-      Format.fprintf fmt "%s -shared -o %s.cmxs" Fc_config.ocamlopt base
+      Format.fprintf fmt "%s -shared -o %S.cmxs" Fc_config.ocamlopt base
     else
       Format.fprintf fmt "%s -c" Fc_config.ocamlc ;
     Format.fprintf fmt " -g %s -warn-error a -I %s" Fc_config.ocaml_wflags Fc_config.libdir ;
     if !Fc_config.is_gui then Format.pp_print_string fmt " -package lablgtk2" ;
     List.iter (fun p -> Format.fprintf fmt " -I %s" p) !load_path ;
-    Format.fprintf fmt " %s.ml" base ;
+    Format.fprintf fmt " %S.ml" base ;
     Format.pp_print_flush fmt () ;
     let cmd = Buffer.contents cmd in
     Klog.feedback ~dkey "running '%s'" cmd ;
