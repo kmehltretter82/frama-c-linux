@@ -46,6 +46,7 @@ class browser ?on_cluster f cluster =
     method on_library _ = ()
     method on_type _ _ = ()
     method on_comp _ _ = ()
+    method on_comp_init _ _ = ()
     method on_dfun _ = ()
     method! vtypes = ()
     method! vsymbols = ()

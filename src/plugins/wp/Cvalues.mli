@@ -158,5 +158,6 @@ sig
   val included : segment -> segment -> pred
   val valid : Sigma.t -> acs -> segment -> pred
   val invalid : Sigma.t -> segment -> pred
+  val initialized : Sigma.t -> segment -> pred
 
 end

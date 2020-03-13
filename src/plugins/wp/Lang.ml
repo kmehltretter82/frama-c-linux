@@ -86,6 +86,10 @@ let field_id f =
   else
     Printf.sprintf "F%d_%s_%s" c.ckey c.corig_name f.fname
 
+let init_id (f: 'a -> string) (x: 'a) = "Init_" ^ (f x)
+let comp_init_id = init_id comp_id
+let field_init_id = init_id field_id
+
 let type_id l =
   Printf.sprintf "A_%s" l.lt_name
 
@@ -123,11 +127,13 @@ let map_infoprover f i = {
 
 type library = string
 
+type datakind = KValue | KInit
+
 type adt =
   | Mtype of mdt (* Model type *)
   | Mrecord of mdt * fields (* Model record-type *)
   | Atype of logic_type_info (* Logic Type *)
-  | Comp of compinfo (* C-code struct or union *)
+  | Comp of (compinfo * datakind) (* C-code struct or union *)
 and mdt = string extern (** name to print to the provers *)
 and 'a extern = {
   ext_id      : int;
@@ -138,7 +144,7 @@ and 'a extern = {
 and fields = { mutable fields : field list }
 and field =
   | Mfield of mdt * fields * string * tau
-  | Cfield of fieldinfo
+  | Cfield of (fieldinfo * datakind)
 and tau = (field,adt) Logic.datatype
 
 let pointer = Context.create "Lang.pointer"
@@ -170,7 +176,7 @@ let sort_of_ltype t = match Logic_utils.unroll_type ~unroll_typedef:false t with
   | Linteger -> Logic.Sint
   | Lreal -> Logic.Sreal
 
-let tau_of_comp c = Logic.Data(Comp c,[])
+let tau_of_comp c = Logic.Data(Comp (c, KValue),[])
 
 let t_int = Logic.Int
 let t_bool = Logic.Bool
@@ -190,7 +196,17 @@ let rec tau_of_object = function
 
 and tau_of_ctype typ = tau_of_object (Ctypes.object_of typ)
 
+let init_of_comp c = Logic.Data(Comp (c, KInit), [])
+
 let poly = Context.create "Wp.Lang.poly"
+
+let rec init_of_object = function
+  | C_int _ | C_float _ | C_pointer _ -> Logic.Bool
+  | C_comp c -> init_of_comp c
+  | C_array { arr_element = typ } -> t_array (init_of_ctype typ)
+
+and init_of_ctype typ = init_of_object (Ctypes.object_of typ)
+
 
 let rec varpoly k x = function
   | [] -> Warning.error "Unbound type parameter <%s>" x
@@ -242,18 +258,21 @@ struct
   let basename = function
     | Mtype a -> basename "M" a.ext_link.altergo
     | Mrecord(r,_) -> basename "R" r.ext_link.altergo
-    | Comp c -> basename (if c.cstruct then "S" else "U") c.corig_name
+    | Comp (c,KValue) -> basename (if c.cstruct then "S" else "U") c.corig_name
+    | Comp (c,KInit) -> basename (if c.cstruct then "IS" else "IU") c.corig_name
     | Atype lt -> basename "A" lt.lt_name
 
   let debug = function
     | Mtype a -> a.ext_debug
     | Mrecord(a,_) -> a.ext_debug
-    | Comp c -> comp_id c
+    | Comp (c, KValue) -> comp_id c
+    | Comp (c, KInit) -> comp_init_id c
     | Atype lt -> type_id lt
 
   let hash = function
     | Mtype a | Mrecord(a,_) -> FCHashtbl.hash a
-    | Comp c -> Compinfo.hash c
+    | Comp (c, KValue) -> Compinfo.hash c
+    | Comp (c, KInit) -> 13 * Compinfo.hash c
     | Atype lt -> Logic_type_info.hash lt
 
   let compare a b =
@@ -265,7 +284,10 @@ struct
       | Mrecord(a,_) , Mrecord(b,_) -> ext_compare a b
       | Mrecord _ , _ -> (-1)
       | _ , Mrecord _ -> 1
-      | Comp a , Comp b -> Compinfo.compare a b
+      | Comp (a, KValue) , Comp (b, KValue)
+      | Comp (a, KInit)  , Comp (b, KInit) -> Compinfo.compare a b
+      | Comp (_, KValue) , Comp (_, KInit) -> (-1)
+      | Comp (_, KInit)  , Comp (_, KValue) -> 1
       | Comp _ , _ -> (-1)
       | _ , Comp _ -> 1
       | Atype a , Atype b -> Logic_type_info.compare a b
@@ -320,11 +342,12 @@ let field t f =
       end
   | _ -> Wp_parameters.fatal "No field <%s> in type '%a'" f ADT.pretty t
 
-let comp c = Comp c
+let comp c = Comp (c, KValue)
+let comp_init c = Comp (c, KInit)
 
 let fields_of_adt = function
   | Mrecord(_,r) -> r.fields
-  | Comp c -> List.map (fun f -> Cfield f) c.cfields
+  | Comp (c, k) -> List.map (fun f -> Cfield (f, k)) c.cfields
   | _ -> []
 
 let fields_of_tau = function
@@ -334,15 +357,17 @@ let fields_of_tau = function
 
 let fields_of_field = function
   | Mfield(_,r,_,_) -> r.fields
-  | Cfield f -> List.map (fun f -> Cfield f) f.fcomp.cfields
+  | Cfield(f, k) -> List.map (fun f -> Cfield (f, k)) f.fcomp.cfields
 
 let tau_of_field = function
   | Mfield(_,_,_,t) -> t
-  | Cfield f -> tau_of_ctype f.ftype
+  | Cfield(f, KValue) -> tau_of_ctype f.ftype
+  | Cfield(f, KInit) -> init_of_ctype f.ftype
 
 let tau_of_record = function
   | Mfield(mdt,fs,_,_) -> Logic.Data(Mrecord(mdt,fs),[])
-  | Cfield f -> tau_of_comp f.fcomp
+  | Cfield(f, KValue) -> tau_of_comp f.fcomp
+  | Cfield(f, KInit) -> init_of_comp f.fcomp
 
 module Field =
 struct
@@ -351,11 +376,13 @@ struct
 
   let debug = function
     | Mfield(_,_,f,_) -> f
-    | Cfield f -> field_id f
+    | Cfield(f, KValue) -> field_id f
+    | Cfield(f, KInit) -> field_init_id f
 
   let hash = function
     | Mfield(_,_,f,_) -> FCHashtbl.hash f
-    | Cfield f -> Fieldinfo.hash f
+    | Cfield(f, KValue) -> Fieldinfo.hash f
+    | Cfield(f, KInit) -> 13 * Fieldinfo.hash f
 
   let compare f g =
     if f==g then 0 else
@@ -363,7 +390,11 @@ struct
       | Mfield(_,_,f,_) , Mfield(_,_,g,_) -> String.compare f g
       | Mfield _ , Cfield _ -> (-1)
       | Cfield _ , Mfield _ -> 1
-      | Cfield f , Cfield g -> Fieldinfo.compare f g
+      | Cfield(f, KValue) , Cfield(g, KValue)
+      | Cfield(f, KInit) , Cfield(g, KInit) ->
+        Fieldinfo.compare f g
+      | Cfield(_, KInit), Cfield(_, KValue) -> (-1)
+      | Cfield(_, KValue), Cfield(_, KInit) -> 1
 
   let equal f g = (compare f g = 0)
 
@@ -371,7 +402,7 @@ struct
 
   let sort = function
     | Mfield(_,_,_,s) -> Qed.Kind.of_tau s
-    | Cfield f -> sort_of_object (Ctypes.object_of f.ftype)
+    | Cfield(f, _) -> sort_of_object (Ctypes.object_of f.ftype)
 
 end
 
@@ -605,11 +636,13 @@ class virtual idprinting =
     method datatype = function
       | Mtype a -> self#infoprover a.ext_link
       | Mrecord(a,_) -> self#infoprover a.ext_link
-      | Comp c -> self#sanitize_type (comp_id c)
+      | Comp(c, KValue) -> self#sanitize_type (comp_id c)
+      | Comp(c, KInit) -> self#sanitize_type (comp_init_id c)
       | Atype lt -> self#sanitize_type (type_id lt)
     method field = function
       | Mfield(_,_,f,_) -> self#sanitize_field f
-      | Cfield f -> self#sanitize_field (field_id f)
+      | Cfield(f, KValue) -> self#sanitize_field (field_id f)
+      | Cfield(f, KInit) -> self#sanitize_field (field_init_id f)
     method link = function
       | ACSL f -> Engine.F_call (self#sanitize_fun (logic_id f))
       | CTOR c -> Engine.F_call (self#sanitize_fun (ctor_id c))
@@ -625,7 +658,8 @@ let name_of_lfun = function
 
 let name_of_field = function
   | Mfield(_,_,f,_) -> f
-  | Cfield f -> field_id f
+  | Cfield(f, KValue) -> field_id f
+  | Cfield(f, KInit) -> field_init_id f
 
 (* -------------------------------------------------------------------------- *)
 (* --- Terms                                                              --- *)

@@ -473,6 +473,12 @@ sig
   val alloc : sigma -> varinfo list -> sigma
   (** Allocates new chunk for the validity of variables. *)
 
+  val initialized : sigma -> segment -> pred
+  (** Return the formula that tests if a memory state is initialized
+      (according to {!acs}) in the given memory state at the given
+      segment.
+  *)
+
   val invalid : sigma -> segment -> pred
   (** Returns the formula that tests if the entire memory is invalid
       for write access. *)

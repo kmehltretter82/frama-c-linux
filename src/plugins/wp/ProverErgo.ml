@@ -187,6 +187,12 @@ class visitor fmt c =
         engine#declare_type fmt (Lang.comp c) 0 (Qed.Engine.Trec fts) ;
       end
 
+    method on_comp_init c fts =
+      begin
+        self#lines ;
+        engine#declare_type fmt (Lang.comp_init c) 0 (Qed.Engine.Trec fts) ;
+      end
+
     method on_dlemma l =
       begin
         self#paragraph ;

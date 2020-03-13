@@ -330,19 +330,25 @@ class virtual visitor main =
               let fts = List.map
                   (fun f ->
                      let t = Lang.tau_of_ctype f.ftype in
-                     self#vtau t ; Cfield f , t
+                     self#vtau t ; Cfield (f, KValue) , t
                   ) r.cfields
               in self#on_comp r fts ;
+              let fts = List.map
+                  (fun f ->
+                     let t = Lang.init_of_ctype f.ftype in
+                     self#vtau t ; Cfield (f, KInit) , t
+                  ) r.cfields
+              in self#on_comp_init r fts ;
             end
         end
 
     method vfield = function
       | Mfield(a,_,_,_) -> self#vlibrary a.ext_library
-      | Cfield f -> self#vcomp f.fcomp
+      | Cfield(f, _) -> self#vcomp f.fcomp
 
     method vadt = function
       | Mtype a | Mrecord(a,_) -> self#vlibrary a.ext_library
-      | Comp r -> self#vcomp r
+      | Comp(r, _) -> self#vcomp r
       | Atype t -> self#vtype t
 
     method vtau = function
@@ -535,6 +541,7 @@ class virtual visitor main =
     method virtual on_cluster : cluster -> unit
     method virtual on_type : logic_type_info -> typedef -> unit
     method virtual on_comp : compinfo -> (field * tau) list -> unit
+    method virtual on_comp_init : compinfo -> (field * tau) list -> unit
     method virtual on_dlemma : dlemma -> unit
     method virtual on_dfun : dfun -> unit
 

@@ -123,6 +123,7 @@ type chunk =
   | M_f64
   | M_pointer
   | T_alloc
+  | T_init
 
 module Chunk =
 struct
@@ -146,6 +147,7 @@ struct
     | M_f64 -> 10
     | M_pointer -> 11
     | T_alloc -> 12
+    | T_init -> 13
   let hash = rank
   let name = function
     | M_int _ -> "Mint"
@@ -154,6 +156,7 @@ struct
     | M_f64 -> "Mf64"
     | M_pointer -> "Mptr"
     | T_alloc -> "Malloc"
+    | T_init -> "Init"
   let compare a b = rank a - rank b
   let equal = (=)
   let pretty fmt c = Format.pp_print_string fmt (name c)
@@ -163,12 +166,14 @@ struct
     | M_f64 -> Cfloat.tau_of_float Ctypes.Float64
     | M_pointer -> t_addr
     | T_alloc -> L.Int
+    | T_init -> L.Bool
   let tau_of_chunk = function
     | M_int _ | M_char -> L.Array(t_addr,L.Int)
     | M_pointer -> L.Array(t_addr,t_addr)
     | M_f32 -> L.Array(t_addr,Cfloat.tau_of_float Ctypes.Float32)
     | M_f64 -> L.Array(t_addr,Cfloat.tau_of_float Ctypes.Float64)
     | T_alloc -> L.Array(L.Int,L.Int)
+    | T_init -> L.Array(t_addr,L.Bool)
   let basename_of_chunk = name
   let is_framed _ = false
 end
@@ -1020,6 +1025,11 @@ let s_valid sigma acs p n =
 let s_invalid sigma p n =
   p_call p_invalid [Sigma.value sigma T_alloc;p;n]
 
+let s_initialized sigma p n =
+  let x = Sigma.value sigma T_init in
+  let addr = a_shift p n in
+  F.p_bool (F.e_get x addr)
+
 let segment phi = function
   | Rloc(obj,l) ->
       phi l (e_int (length_of_object obj))
@@ -1034,6 +1044,7 @@ let segment phi = function
 
 let valid sigma acs = segment (s_valid sigma acs)
 let invalid sigma = segment (s_invalid sigma)
+let initialized sigma = segment (s_initialized sigma)
 
 let frame sigma =
   let wellformed_frame phi chunk =

@@ -61,6 +61,7 @@ struct
   type chunk =
     | Var of varinfo
     | Alloc of varinfo
+    | Init of varinfo
     | Mem of M.Chunk.t
 
   let is_framed_var x = not x.vglob && not x.vaddrof
@@ -102,6 +103,23 @@ struct
     let is_framed = is_framed_var
   end
 
+  module VINIT =
+  struct
+    type t = varinfo
+    let self = "init"
+    let hash = Varinfo.hash
+    let compare = Varinfo.compare
+    let equal = Varinfo.equal
+    let pretty = Varinfo.pretty
+    let typ_of_chunk x =
+      match V.param x with
+      | ByRef -> Cil.typeOf_pointed x.vtype
+      | _ -> x.vtype
+    let tau_of_chunk x = Lang.init_of_ctype (typ_of_chunk x)
+    let is_framed = is_framed_var
+    let basename_of_chunk x = "Init_" ^ (LogicUsage.basename x)
+  end
+
   module Chunk =
   struct
     type t = chunk
@@ -110,32 +128,40 @@ struct
       | Var x -> 3 * Varinfo.hash x
       | Alloc x -> 5 * Varinfo.hash x
       | Mem m -> 7 * M.Chunk.hash m
+      | Init x -> 11 * Varinfo.hash x
     let compare c1 c2 =
       if c1 == c2 then 0 else
         match c1 , c2 with
         | Var x , Var y
-        | Alloc x , Alloc y -> Varinfo.compare x y
+        | Alloc x , Alloc y
+        | Init x, Init y -> Varinfo.compare x y
         | Mem p , Mem q -> M.Chunk.compare p q
         | Var _ , _ -> (-1)
         | _ , Var _ -> 1
+        | Init _, _ -> (-1)
+        | _, Init _ -> 1
         | Alloc _  , _ -> (-1)
         | _ , Alloc _ -> 1
     let equal c1 c2 = (compare c1 c2 = 0)
     let pretty fmt = function
       | Var x -> Varinfo.pretty fmt x
       | Alloc x -> Format.fprintf fmt "alloc(%a)" Varinfo.pretty x
+      | Init x -> Format.fprintf fmt "init(%a)" Varinfo.pretty x
       | Mem m -> M.Chunk.pretty fmt m
     let tau_of_chunk = function
       | Var x -> VAR.tau_of_chunk x
       | Alloc x -> VALLOC.tau_of_chunk x
+      | Init _ -> Qed.Logic.Bool
       | Mem m -> M.Chunk.tau_of_chunk m
     let basename_of_chunk = function
       | Var x -> VAR.basename_of_chunk x
       | Alloc x -> VALLOC.basename_of_chunk x
+      | Init _ -> "VInit"
       | Mem m -> M.Chunk.basename_of_chunk m
     let is_framed = function
       | Var x -> VAR.is_framed x
       | Alloc x -> VALLOC.is_framed x
+      | Init x -> VAR.is_framed x
       | Mem m -> M.Chunk.is_framed m
   end
 
@@ -145,13 +171,16 @@ struct
 
   module HEAP = Qed.Collection.Make(VAR)
   module TALLOC = Qed.Collection.Make(VALLOC)
+  module TINIT = Qed.Collection.Make(VINIT)
   module SIGMA = Sigma.Make(VAR)(HEAP)
   module ALLOC = Sigma.Make(VALLOC)(TALLOC)
+  module INIT = Sigma.Make(VINIT)(TINIT)
   module Heap = Qed.Collection.Make(Chunk)
 
   type sigma = {
     mem : M.Sigma.t ;
     vars : SIGMA.t ;
+    init : INIT.t ;
     alloc : ALLOC.t ;
   }
 
@@ -166,51 +195,60 @@ struct
 
     let create () = {
       vars = SIGMA.create () ;
+      init = INIT.create () ;
       alloc = ALLOC.create () ;
       mem = M.Sigma.create () ;
     }
     let copy s = {
       vars = SIGMA.copy s.vars ;
+      init = INIT.copy s.init ;
       alloc = ALLOC.copy s.alloc ;
       mem = M.Sigma.copy s.mem ;
     }
 
     let choose s1 s2 =
       let s = SIGMA.choose s1.vars s2.vars in
+      let i = INIT.choose s1.init s2.init in
       let a = ALLOC.choose s1.alloc s2.alloc in
       let m = M.Sigma.choose s1.mem s2.mem in
-      { vars = s ; alloc = a ; mem = m }
+      { vars = s ; alloc = a ; mem = m ; init = i }
 
     let merge s1 s2 =
       let s,pa1,pa2 = SIGMA.merge s1.vars s2.vars in
+      let i,ia1,ia2 = INIT.merge s1.init s2.init in
       let a,ta1,ta2 = ALLOC.merge s1.alloc s2.alloc in
       let m,qa1,qa2 = M.Sigma.merge s1.mem s2.mem in
-      { vars = s ; alloc = a ; mem = m } ,
-      Passive.union (Passive.union pa1 ta1) qa1 ,
-      Passive.union (Passive.union pa2 ta2) qa2
+      { vars = s ; alloc = a ; mem = m ; init = i } ,
+      Passive.union (Passive.union (Passive.union pa1 ta1) qa1) ia1 ,
+      Passive.union (Passive.union (Passive.union pa2 ta2) qa2) ia2
 
     let merge_list l =
       let s,pa = SIGMA.merge_list (List.map (fun s -> s.vars) l) in
+      let i,ia = INIT.merge_list (List.map (fun s -> s.init) l) in
       let a,ta = ALLOC.merge_list (List.map (fun s -> s.alloc) l) in
       let m,qa = M.Sigma.merge_list (List.map (fun s -> s.mem) l) in
-      { vars = s ; alloc = a ; mem = m } ,
+      { vars = s ; alloc = a ; mem = m ; init = i } ,
       let union = List.map2 Passive.union in
-      union (union pa ta) qa
+      union (union (union pa ta) qa) ia
 
     let join s1 s2 =
       Passive.union
         (Passive.union
-           (SIGMA.join s1.vars s2.vars)
-           (ALLOC.join s1.alloc s2.alloc))
-        (M.Sigma.join s1.mem s2.mem)
+          (Passive.union
+             (SIGMA.join s1.vars s2.vars)
+             (ALLOC.join s1.alloc s2.alloc))
+          (M.Sigma.join s1.mem s2.mem))
+        (INIT.join s1.init s2.init)
 
     let get s = function
       | Var x -> SIGMA.get s.vars x
+      | Init x -> INIT.get s.init x
       | Alloc x -> ALLOC.get s.alloc x
       | Mem m -> M.Sigma.get s.mem m
 
     let mem s = function
       | Var x -> SIGMA.mem s.vars x
+      | Init x -> INIT.mem s.init x
       | Alloc x -> ALLOC.mem s.alloc x
       | Mem m -> M.Sigma.mem s.mem m
 
@@ -219,6 +257,7 @@ struct
     let iter f s =
       begin
         SIGMA.iter (fun x -> f (Var x)) s.vars ;
+        INIT.iter (fun x -> f (Init x)) s.init ;
         ALLOC.iter (fun x -> f (Alloc x)) s.alloc ;
         M.Sigma.iter (fun m -> f (Mem m)) s.mem ;
       end
@@ -226,6 +265,7 @@ struct
     let iter2 f s t =
       begin
         SIGMA.iter2 (fun x a b -> f (Var x) a b) s.vars t.vars ;
+        INIT.iter2 (fun x a b -> f (Init x) a b) s.init t.init ;
         ALLOC.iter2 (fun x a b -> f (Alloc x) a b) s.alloc t.alloc ;
         M.Sigma.iter2 (fun m p q -> f (Mem m) p q) s.mem t.mem ;
       end
@@ -233,19 +273,24 @@ struct
     let domain_partition r =
       begin
         let xs = ref HEAP.Set.empty in
+        let is = ref TINIT.Set.empty in
         let ts = ref TALLOC.Set.empty in
         let ms = ref M.Heap.Set.empty in
         Heap.Set.iter
           (function
             | Var x -> xs := HEAP.Set.add x !xs
+            | Init x -> is := TINIT.Set.add x !is
             | Alloc x -> ts := TALLOC.Set.add x !ts
             | Mem c -> ms := M.Heap.Set.add c !ms
           ) r ;
-        !xs , !ts , !ms
+        !xs , !is, !ts , !ms
       end
 
     let domain_var xs =
       HEAP.Set.fold (fun x s -> Heap.Set.add (Var x) s) xs Heap.Set.empty
+
+    let domain_init xs =
+      TINIT.Set.fold (fun x s -> Heap.Set.add (Init x) s) xs Heap.Set.empty
 
     let domain_alloc ts =
       TALLOC.Set.fold (fun x s -> Heap.Set.add (Alloc x) s) ts Heap.Set.empty
@@ -254,57 +299,66 @@ struct
       M.Heap.Set.fold (fun m s -> Heap.Set.add (Mem m) s) ms Heap.Set.empty
 
     let assigned ~pre ~post w =
-      let w_vars , w_alloc , w_mem = domain_partition w in
+      let w_vars , w_init, w_alloc , w_mem = domain_partition w in
       let h_vars = SIGMA.assigned ~pre:pre.vars ~post:post.vars w_vars in
+      let h_init = INIT.assigned ~pre:pre.init ~post:post.init w_init in
       let h_alloc = ALLOC.assigned ~pre:pre.alloc ~post:post.alloc w_alloc in
       let h_mem = M.Sigma.assigned ~pre:pre.mem ~post:post.mem w_mem in
-      Bag.ulist [h_vars;h_alloc;h_mem]
+      Bag.ulist [h_vars;h_init;h_alloc;h_mem]
 
     let havoc s r =
-      let rvar , ralloc , rmem = domain_partition r
+      let rvar , rinit, ralloc , rmem = domain_partition r
       in {
         vars = SIGMA.havoc s.vars rvar ;
+        init = INIT.havoc s.init rinit ;
         alloc = ALLOC.havoc s.alloc ralloc ;
         mem = M.Sigma.havoc s.mem rmem ;
       }
 
     let havoc_chunk s = function
       | Var x -> { s with vars = SIGMA.havoc_chunk s.vars x }
+      | Init x -> { s with init = INIT.havoc_chunk s.init x }
       | Alloc x -> { s with alloc = ALLOC.havoc_chunk s.alloc x }
       | Mem m -> { s with mem = M.Sigma.havoc_chunk s.mem m }
 
     let havoc_any ~call s = {
       alloc = s.alloc ;
       vars = SIGMA.havoc_any ~call s.vars ;
+      init = INIT.havoc_any ~call s.init ;
       mem = M.Sigma.havoc_any ~call s.mem ;
     }
 
     let remove_chunks s r =
-      let rvar , ralloc , rmem = domain_partition r
+      let rvar , rinit, ralloc , rmem = domain_partition r
       in {
         vars = SIGMA.remove_chunks s.vars rvar ;
+        init = INIT.remove_chunks s.init rinit ;
         alloc = ALLOC.remove_chunks s.alloc ralloc ;
         mem = M.Sigma.remove_chunks s.mem rmem ;
       }
 
-
     let domain s =
       Heap.Set.union
         (Heap.Set.union
-           (domain_var (SIGMA.domain s.vars))
-           (domain_alloc (ALLOC.domain s.alloc)))
-        (domain_mem (M.Sigma.domain s.mem))
+          (Heap.Set.union
+             (domain_var (SIGMA.domain s.vars))
+             (domain_alloc (ALLOC.domain s.alloc)))
+          (domain_mem (M.Sigma.domain s.mem)))
+        (domain_init (INIT.domain s.init))
 
     let writes s =
       Heap.Set.union
         (Heap.Set.union
-           (domain_var (SIGMA.writes {pre=s.pre.vars;post=s.post.vars}))
-           (domain_alloc (ALLOC.writes {pre=s.pre.alloc;post=s.post.alloc})))
-        (domain_mem (M.Sigma.writes {pre=s.pre.mem;post=s.post.mem}))
+          (Heap.Set.union
+             (domain_var (SIGMA.writes {pre=s.pre.vars;post=s.post.vars}))
+             (domain_alloc (ALLOC.writes {pre=s.pre.alloc;post=s.post.alloc})))
+          (domain_mem (M.Sigma.writes {pre=s.pre.mem;post=s.post.mem})))
+        (domain_init (INIT.writes {pre=s.pre.init;post=s.post.init}))
 
     let pretty fmt s =
-      Format.fprintf fmt "@[<hov 2>{X:@[%a@]@ T:@[%a@]@ M:@[%a@]}@]"
+      Format.fprintf fmt "@[<hov 2>{X:@[%a@]@ I:@[%a@]@ T:@[%a@]@ M:@[%a@]}@]"
         SIGMA.pretty s.vars
+        INIT.pretty s.init
         ALLOC.pretty s.alloc
         M.Sigma.pretty s.mem
 
@@ -315,6 +369,8 @@ struct
   let get_var s x = SIGMA.get s.vars x
   let get_term s x = e_var (get_var s x)
 
+  let get_init s x = INIT.get s.init x
+  let get_init_term s x = e_var (get_init s x)
   (* -------------------------------------------------------------------------- *)
   (* ---  State Pretty Printer                                              --- *)
   (* -------------------------------------------------------------------------- *)
@@ -368,6 +424,10 @@ struct
         let c = match V.param x with ByRef -> Iref x | _ -> Ivar x in
         m := set_chunk (e_var v) c !m
       ) s.vars ;
+    INIT.iter (fun x v ->
+        let c = match V.param x with ByRef -> Iref x | _ -> Ivar x in
+        m := set_chunk (e_var v) c !m
+      ) s.init ;
     { svar = !m ; smem = M.state s.mem }
 
   let ilval = function
@@ -410,12 +470,14 @@ struct
           Bag.elt (Mstore(lv,v2))
 
   and rdiff lv v1 v2 = function
-    | (Lang.Cfield fi as fd ,f2) :: fvs ->
+    | (Lang.Cfield (fi, KValue) as fd ,f2) :: fvs ->
         let f1 = F.e_getfield v1 fd in
         if f1 == f2 then rdiff lv v1 v2 fvs else
           let upd = diff (Mstate.field lv fi) f1 f2 in
           let m = F.e_setfield v2 fd f1 in
           Bag.concat upd (diff lv v1 m)
+    | (Lang.Cfield (_fi, KInit) as _fd ,_f2) :: _fvs ->
+      assert false (* TODO *)
     | (Lang.Mfield _,_)::_ -> Bag.elt (Mstore(lv,v2))
     | [] -> Bag.empty
 
@@ -624,22 +686,28 @@ struct
   (* ---  Memory Load                                                       --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let rec access a = function
+  let rec access_gen kind a = function
     | [] -> a
-    | Field f :: ofs -> access (e_getfield a (Cfield f)) ofs
-    | Shift(_,k) :: ofs -> access (e_get a k) ofs
+    | Field f :: ofs -> access_gen kind (e_getfield a (Cfield (f, kind))) ofs
+    | Shift(_,k) :: ofs -> access_gen kind (e_get a k) ofs
 
-  let rec update a ofs v = match ofs with
+  let access = access_gen KValue
+  let access_init = access_gen KInit
+
+  let rec update_gen kind a ofs v = match ofs with
     | [] -> v
     | Field f :: ofs ->
-        let phi = Cfield f in
+        let phi = Cfield (f, kind) in
         let a_f = F.e_getfield a phi in
-        let a_f_v = update a_f ofs v in
+        let a_f_v = update_gen kind a_f ofs v in
         F.e_setfield a phi a_f_v
     | Shift(_,k) :: ofs ->
         let a_k = F.e_get a k in
-        let a_k_v = update a_k ofs v in
+        let a_k_v = update_gen kind a_k ofs v in
         F.e_set a k a_k_v
+
+  let update = update_gen KValue
+  let update_init = update_gen KInit
 
   let load sigma obj = function
     | Ref x ->
@@ -669,7 +737,15 @@ struct
     | Val((CREF|CVAL),x,ofs) ->
         let v1 = get_term seq.pre x in
         let v2 = get_term seq.post x in
-        [Set( v2 , update v1 ofs v )]
+        let init =
+          if not (x.vformal || x.vglob) then
+            let i1 = get_init_term seq.pre x in
+            let i2 = get_init_term seq.post x in
+            [ Set( i2 , update_init i1 ofs F.e_true ) ]
+          else
+            []
+        in
+        Set( v2 , update v1 ofs v ) :: init
     | Val((CTXT|CARR|HEAP) as m,x,ofs) ->
         M.stored (mseq_of_seq seq) obj (mloc_of_path m x ofs) v
     | Loc l ->
@@ -938,6 +1014,75 @@ struct
         end
 
   (* -------------------------------------------------------------------------- *)
+  (* ---  Initialized                                                       --- *)
+  (* -------------------------------------------------------------------------- *)
+
+  let rec make_initialized_value value sigma obj x ofs =
+    match obj with
+    | C_int _ | C_float _ | C_pointer _ ->
+      e_eq value (access_init (get_init_term sigma x) ofs)
+    | C_array { arr_element=t ; arr_flat=flat } ->
+      let v = Lang.freshvar ~basename:"i" Lang.t_int in
+      let hyp = match flat with
+        | None -> e_true
+        | Some { arr_size=size } ->
+          let open Lang.F in
+          e_and [ (e_leq e_zero (e_var v)) ; (e_leq (e_var v) (e_int size)) ]
+      in
+      let hyp = p_bool hyp in
+      let obj = Ctypes.object_of t in
+      let ofs = ofs @ [ Shift(obj, e_var v) ] in
+      let sub = p_bool (make_initialized_value value sigma obj x ofs) in
+      e_prop (p_forall [v] (p_imply hyp sub))
+    | C_comp ci ->
+      let mk_pred f =
+        let obj = Ctypes.object_of f.ftype in
+        let ofs = ofs @ [Field f] in
+        make_initialized_value value sigma obj x ofs
+      in
+      Lang.F.e_and (List.map mk_pred ci.cfields)
+
+  let make_initialized = make_initialized_value e_true
+  let make_uninitialized = make_initialized_value e_false
+
+  let initialized sigma l =
+    match l with
+    | Rloc(obj,l) ->
+        begin match l with
+          | Ref _ -> p_true
+          | Loc l -> M.initialized sigma.mem (Rloc(obj,l))
+          | Val(m,x,p) ->
+            if (x.vformal || x.vglob) then
+              p_true
+            else if is_heap_allocated m then
+              M.initialized sigma.mem (Rloc(obj,mloc_of_loc l))
+            else
+              p_bool (make_initialized sigma obj x p)
+        end
+    | Rrange(l,elt,a,b) ->
+        begin match l with
+          | Ref x -> noref ~op:"valid sub-range of" x
+          | Loc l -> M.initialized sigma.mem (Rrange(l,elt,a,b))
+          | Val(_m,_x,_p) -> p_false
+              (*match a,b with
+              | Some ka,Some kb ->
+                  begin
+                    try
+                      F.p_imply (F.p_leq ka kb)
+                        (valid_range_path sigma acs m x p (elt,ka,kb))
+                    with ShiftMismatch ->
+                      if is_heap_allocated m then
+                        let l = mloc_of_loc l in
+                        M.valid sigma.mem acs (Rrange(l,elt,a,b))
+                      else shift_mismatch l
+                  end
+              | _ ->
+                  Warning.error "Validity of infinite range @[%a.(%a..%a)@]"
+                    pretty l Vset.pp_bound a Vset.pp_bound b*)
+        end
+
+
+  (* -------------------------------------------------------------------------- *)
   (* ---  Framing                                                           --- *)
   (* -------------------------------------------------------------------------- *)
 
@@ -948,7 +1093,8 @@ struct
     | TPtr _ | TFun _ -> phi v
     | TComp({ cfields },_,_) ->
         F.p_all
-          (fun fd -> forall_pointers phi (e_getfield v (Cfield fd)) fd.ftype)
+          (fun fd ->
+            forall_pointers phi (e_getfield v (Cfield (fd, KValue))) fd.ftype)
           cfields
     | TArray(elt,_,_,_) ->
         let k = Lang.freshvar Qed.Logic.Int in
@@ -1005,12 +1151,25 @@ struct
              (F.p_equal (ALLOC.value t_out x) v_out)
         ) xs
 
+  let scope_init seq scope xs =
+    match scope with
+    | Leave -> []
+    | Enter ->
+      let xs = List.filter (fun v -> not v.vformal && not v.vglob) xs in
+      let i_out = seq.post in
+      let uninitialized v =
+        Lang.F.p_bool (make_uninitialized i_out (Ctypes.object_of v.vtype) v [])
+      in
+      List.map uninitialized xs
+
+
   let scope seq scope xs =
     let xm = List.filter is_mem xs in
     let smem = { pre = seq.pre.mem ; post = seq.post.mem } in
     let hmem = M.scope smem scope xm in
     let hvars = scope_vars seq scope xs in
-    hvars @ hmem
+    let hinit = scope_init seq scope xs in
+    hvars @ hinit @ hmem
 
   let global sigma p = M.global sigma.mem p
 
@@ -1030,14 +1189,14 @@ struct
       (*TODO: optimized version for terminal [Field _] and [Index _] *)
 
       | Field f :: ofs ->
-          let cf = Cfield f in
+          let cf = Cfield (f, KValue) in
           let af = e_getfield a cf in
           let bf = e_getfield b cf in
           let hs = assigned_path hs xs ys af bf ofs in
           List.fold_left
             (fun hs g ->
                if Fieldinfo.equal f g then hs else
-                 let cg = Cfield g in
+                 let cg = Cfield (g, KValue) in
                  let ag = e_getfield a cg in
                  let bg = e_getfield b cg in
                  let eqg = p_forall ys (p_equal ag bg) in
@@ -1261,7 +1420,11 @@ struct
   let domain obj l =
     match l with
     | Ref x | Val((CVAL|CREF),x,_) ->
-        Heap.Set.singleton (Var x)
+        let init =
+          if not (x.vformal || x.vglob) then [ Init x ]
+          else []
+        in
+        Heap.Set.of_list ((Var x) :: init)
     | Loc _ | Val((CTXT|CARR|HEAP),_,_) ->
         M.Heap.Set.fold
           (fun m s -> Heap.Set.add (Mem m) s)

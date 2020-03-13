@@ -882,5 +882,6 @@ let frame _sigma = []
 let alloc sigma _xs = sigma
 let scope _seq _s _xs = []
 let valid _sigma _acs _l = error "Validity not yet implemented"
+let initialized _sigma _l = error "Initialization not yet implemented"
 let invalid _sigma _l = error "Validity not yet implemented"
 let global _sigma _p = F.p_true

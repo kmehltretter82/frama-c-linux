@@ -181,7 +181,8 @@ struct
           let xms,chunks,sigma = signature domain in
           let def = List.map
               (fun f ->
-                 Cfield f , !loadrec sigma (object_of f.ftype) (M.field loc f)
+                 Cfield (f, KValue) ,
+                 !loadrec sigma (object_of f.ftype) (M.field loc f)
               ) c.cfields in
           let dfun = Definitions.Function( result , Def , e_record def ) in
           Definitions.define_symbol {

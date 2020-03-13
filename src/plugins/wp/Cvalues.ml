@@ -146,7 +146,8 @@ struct
          let basename = if c.cstruct then "S" else "U" in
          let s = Lang.freshvar ~basename (Lang.tau_of_comp c) in
          let def = p_all
-             (fun f -> is_typ f.ftype (e_getfield (e_var s) (Lang.Cfield f)))
+             (fun f ->
+                is_typ f.ftype (e_getfield (e_var s) (Lang.Cfield (f, KValue))))
              c.cfields
          in {
            d_lfun = lfun ; d_types = 0 ; d_params = [s] ;
@@ -293,7 +294,7 @@ module EQCOMP = WpContext.Generator(Cil_datatype.Compinfo)
         let rb = e_var xb in
         let def = p_all
             (fun f ->
-               let fd = Cfield f in
+               let fd = Cfield (f, KValue) in
                !equal_rec (Ctypes.object_of f.ftype)
                  (e_getfield ra fd) (e_getfield rb fd))
             c.cfields
@@ -755,6 +756,7 @@ struct
 
   let valid sigma acs sloc = on_sloc (M.valid sigma acs) sloc
   let invalid sigma sloc = on_sloc (M.invalid sigma) sloc
+  let initialized sigma sloc = on_sloc (M.initialized sigma) sloc
 
   (* -------------------------------------------------------------------------- *)
   (* --- Subset                                                             --- *)
