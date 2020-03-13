@@ -134,7 +134,7 @@ module Domains =
     end)
 let () = add_precision_dep Domains.parameter
 
-(* List of available domains. *)
+(* List (name, descr) of available domains. *)
 let domains_ref = ref []
 
 (* Help message for the -eva-domains option, with the list of currently
@@ -142,22 +142,36 @@ let domains_ref = ref []
 let domains_help () =
   let pp_str_list = Pretty_utils.pp_list ~sep:", " Format.pp_print_string in
   Format.asprintf
-    "Enable a list of analysis domains. Available domains are: %a"
-    pp_str_list (List.rev !domains_ref)
+    "Enable a list of analysis domains. Available domains are: %a. \
+     Use -eva-domains help to print a short description of each domain."
+    pp_str_list (List.rev_map fst !domains_ref)
+
+(* Prints the list of available domains with their description. *)
+let domains_list () =
+  let pp_dom fmt (name, descr) =
+    Format.fprintf fmt "%-20s @[%t@]" name
+      (fun fmt -> Format.pp_print_text fmt descr)
+  in
+  feedback ~level:0
+    "List of available domains:@. %a@."
+    (Pretty_utils.pp_list ~sep:"@," pp_dom) (List.rev !domains_ref);
+  raise Cmdline.Exit
 
 (* Registers a new domain. Updates the help message of -eva-domains. *)
-let register_domain name =
+let register_domain ~name ~descr =
+  domains_ref := (name, descr) :: !domains_ref;
   Cmdline.replace_option_help
-    Domains.option_name "eva" domains (domains_help ());
-  domains_ref := name :: !domains_ref
+    Domains.option_name "eva" domains (domains_help ())
 
 (* Checks that a domain has been registered. *)
 let check_domain domain =
-  if not (List.mem domain !domains_ref)
+  if domain = "help" || domain = "list"
+  then domains_list ()
+  else if not (List.exists (fun (name, _) -> name = domain) !domains_ref)
   then
     let pp_str_list = Pretty_utils.pp_list ~sep:",@ " Format.pp_print_string in
     abort "invalid domain %S for option -eva-domains.@.Possible domains are: %a"
-      domain pp_str_list (List.rev !domains_ref)
+      domain pp_str_list (List.rev_map fst !domains_ref)
 
 let () =
   Domains.add_set_hook
