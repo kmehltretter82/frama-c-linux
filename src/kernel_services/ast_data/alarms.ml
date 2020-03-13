@@ -548,18 +548,12 @@ let create_predicate ?(loc=Location.unknown) alarm =
     | Overflow(kind, e, n, bound) ->
       (* n <= e or e <= n according to bound *)
       let loc = best_loc ~loc e.eloc in
-      let exp_type = Cil.typeOf e in
       let t = match kind with
         | Signed_downcast | Unsigned_downcast ->
-          let t = overflowed_expr_to_term ~loc e in
-          (* Without this cast, the alarm is:
-             - Signed_downcast: unsound ->
-               uint x=0; int i=(x-1u); // 0u-1u < INT_MAX: OK
-             - Unsigned_downcast: too restrictive ->
-               uint x=UINT_MAX; uchar i=(x+1u); // UINT_MAX+1 < UCHAR_MAX : NOK
-          *)
-          Logic_utils.mk_cast exp_type t
+          Logic_utils.expr_to_term ~cast:true e
         | _ ->
+          (* For overflows, the computation must be done on mathematical types,
+             else the value is necessarily in bounds. *)
           overflowed_expr_to_term ~loc e
       in
       let tn = Logic_const.tint ~loc n in
