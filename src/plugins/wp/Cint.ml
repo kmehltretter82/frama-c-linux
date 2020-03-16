@@ -897,9 +897,12 @@ module Dom = struct
                            if Ival.equal v old then old'
                            else Some v) t v dom
 
+  let add_with_bot t v dom =
+    if is_top_ival v then dom else Tmap.add t v dom
+
   let add t v dom =
     if Ival.is_bottom v then raise Lang.Contradiction;
-    if is_top_ival v then dom else Tmap.add t v dom
+    add_with_bot t v dom
 
   let remove t dom = Tmap.remove t dom
 
@@ -1114,7 +1117,7 @@ let is_cint_simplifier =
                       if quant = Forall
                       then reduce_on_pos tvar var_domain t
                       else reduce_on_neg tvar var_domain t;
-                      domain <- Dom.add tvar !var_domain domain;
+                      domain <- Dom.add_with_bot tvar !var_domain domain;
                       qv, Some (tvar, var_domain)
                   | _ -> qv, None) ctx
             in

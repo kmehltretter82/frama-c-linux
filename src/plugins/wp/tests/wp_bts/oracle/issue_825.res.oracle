@@ -8,7 +8,8 @@
 ------------------------------------------------------------
 
 Goal Post-condition (file tests/wp_bts/issue_825.i, line 2) in 'job':
-Prove: true.
+Assume { Type: is_sint32(i). (* Else *) Have: 10 <= i. }
+Prove: false.
 
 ------------------------------------------------------------
 
@@ -29,7 +30,8 @@ Prove: true.
 
 Goal Loop assigns (file tests/wp_bts/issue_825.i, line 10) (2/2):
 Effect at line 13
-Prove: true.
+Assume { Type: is_sint32(i). (* Then *) Have: i <= 9. }
+Prove: false.
 
 ------------------------------------------------------------
 
