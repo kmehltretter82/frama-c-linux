@@ -19,6 +19,8 @@
 #   configure	configure
 ###############################################################################
 
+-* E-ACSL       [2020/03/16] Fix #?1386 and frama-c/e-acsl#91 about the tracking
+                of variables declared inside the body of switches.
 -  E-ACSL       [2020/02/09] Improve verdict messages emitted by e_acsl_assert.
 -* E-ACSL       [2020/01/06] Fix typing bug in presence of variable-length
 	        arrays that may lead to incorrect generated code.
