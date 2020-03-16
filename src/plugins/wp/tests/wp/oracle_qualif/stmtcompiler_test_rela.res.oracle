@@ -89,5 +89,5 @@ Sequent: Assume {
          }
 Prove: ((c < c_1) -> (result_0 < result_1)).
 #######################################################################
-[Alt-Ergo 2.0.0] Valid
+[Alt-Ergo] Valid
 

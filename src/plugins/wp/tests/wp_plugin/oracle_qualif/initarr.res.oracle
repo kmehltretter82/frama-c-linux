@@ -4,11 +4,11 @@
 [wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 [wp] 2 goals scheduled
-[wp] [Alt-Ergo 2.0.0] Goal typed_job_ensures_SEP : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_job_ensures_ALT : Valid
+[wp] [Alt-Ergo] Goal typed_job_ensures_SEP : Valid
+[wp] [Alt-Ergo] Goal typed_job_ensures_ALT : Valid
 [wp] Proved goals:    2 / 2
-  Qed:               0 
-  Alt-Ergo 2.0.0:    2
+  Qed:             0 
+  Alt-Ergo:        2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   job                       -        2        2       100%

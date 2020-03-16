@@ -6,7 +6,7 @@
 [wp] Warning: native support for coq is deprecated, use tip instead
 [wp] 1 goal scheduled
 [wp] [Coq] Goal typed_abs_abs_ensures : Saved script
-[wp] [Coq (Native)] Goal typed_abs_abs_ensures : Valid
+[wp] [Coq (native)] Goal typed_abs_abs_ensures : Valid
 [wp] Proved goals:    1 / 1
   Qed:             0 
   Coq (native):    1

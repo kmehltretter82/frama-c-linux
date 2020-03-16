@@ -6,7 +6,7 @@
 [wp] Warning: native support for coq is deprecated, use tip instead
 [wp] 1 goal scheduled
 [wp] [Coq] Goal typed_real_job_assert_qed_ok : Saved script
-[wp] [Coq (Native)] Goal typed_real_job_assert_qed_ok : Valid
+[wp] [Coq (native)] Goal typed_real_job_assert_qed_ok : Valid
 [wp] Proved goals:    1 / 1
   Qed:             0 
   Coq (native):    1

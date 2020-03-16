@@ -90,7 +90,10 @@ let name_of_prover = function
   | Tactical -> "script"
 
 let title_of_prover = function
-  | Why3 s -> Why3Provers.title s
+  | Why3 s ->
+      if Wp_parameters.has_dkey dkey_success_only
+      then Why3Provers.name s
+      else Why3Provers.title s
   | NativeAltErgo -> "Alt-Ergo (native)"
   | NativeCoq -> "Coq (native)"
   | Qed -> "Qed"
@@ -142,13 +145,7 @@ let cmp_prover p q =
   | _ , NativeCoq -> 1
   | Why3 p , Why3 q -> Why3Provers.compare p q
 
-let pp_prover fmt = function
-  | NativeAltErgo -> Format.pp_print_string fmt "Alt-Ergo (Native)"
-  | NativeCoq -> Format.pp_print_string fmt "Coq (Native)"
-  | Why3 smt -> Format.pp_print_string fmt (Why3Provers.title smt)
-  | Qed -> Format.fprintf fmt "Qed"
-  | Tactical -> Format.pp_print_string fmt "Tactical"
-
+let pp_prover fmt p = Format.pp_print_string fmt (title_of_prover p)
 let pp_mode fmt m = Format.pp_print_string fmt (title_of_mode m)
 
 module P = struct type t = prover let compare = cmp_prover end

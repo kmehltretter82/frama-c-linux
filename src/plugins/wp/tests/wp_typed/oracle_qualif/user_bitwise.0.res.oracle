@@ -5,20 +5,20 @@
 [wp] Warning: Missing RTE guards
 [wp] 12 goals scheduled
 [wp] [Qed] Goal typed_ref_rl1_ensures_b0 : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_ref_rl1_ensures_bk : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_ref_rln32_ensures_b1 : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_ref_rln32_ensures_b2 : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_ref_rln64_ensures_b1 : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_ref_rln64_ensures_b2 : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_ref_rr1_ensures_b0 : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_ref_rr1_ensures_bk : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_ref_rrn32_ensures_b1 : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_ref_rrn32_ensures_b2 : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_ref_rrn64_ensures_b1 : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_ref_rrn64_ensures_b2 : Valid
+[wp] [Alt-Ergo] Goal typed_ref_rl1_ensures_bk : Valid
+[wp] [Alt-Ergo] Goal typed_ref_rln32_ensures_b1 : Valid
+[wp] [Alt-Ergo] Goal typed_ref_rln32_ensures_b2 : Valid
+[wp] [Alt-Ergo] Goal typed_ref_rln64_ensures_b1 : Valid
+[wp] [Alt-Ergo] Goal typed_ref_rln64_ensures_b2 : Valid
+[wp] [Alt-Ergo] Goal typed_ref_rr1_ensures_b0 : Valid
+[wp] [Alt-Ergo] Goal typed_ref_rr1_ensures_bk : Valid
+[wp] [Alt-Ergo] Goal typed_ref_rrn32_ensures_b1 : Valid
+[wp] [Alt-Ergo] Goal typed_ref_rrn32_ensures_b2 : Valid
+[wp] [Alt-Ergo] Goal typed_ref_rrn64_ensures_b1 : Valid
+[wp] [Alt-Ergo] Goal typed_ref_rrn64_ensures_b2 : Valid
 [wp] Proved goals:   12 / 12
-  Qed:               1 
-  Alt-Ergo 2.0.0:   11
+  Qed:             1 
+  Alt-Ergo:       11
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   rl1                       1        1        2       100%

@@ -6,10 +6,10 @@
 [wp] 3 goals scheduled
 [wp] [Qed] Goal typed_f_ensures : Valid
 [wp] [Qed] Goal typed_f_ensures_2 : Valid
-[wp] [Alt-Ergo 2.0.0] Goal typed_f_ensures_3 : Unsuccess
+[wp] [Alt-Ergo] Goal typed_f_ensures_3 : Unsuccess
 [wp] Proved goals:    2 / 3
-  Qed:               2 
-  Alt-Ergo 2.0.0:    0  (unsuccess: 1)
+  Qed:             2 
+  Alt-Ergo:        0  (unsuccess: 1)
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   f                         2        -        3      66.7%
