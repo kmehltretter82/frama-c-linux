@@ -89,7 +89,7 @@ let show main_ui =
       ~license
       ~website:"http://frama-c.com"
       ~website_label:"Questions and support"
-      ~version:Config.version_and_codename
+      ~version:Fc_config.version_and_codename
       ~comments:"Frama-C is a suite of tools dedicated to the analysis of the \
                  source code of software written in C."
       ()

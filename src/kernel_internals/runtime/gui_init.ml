@@ -22,7 +22,7 @@
 
 (** Frama-C GUI early initialization. *)
 
-let () = Config.is_gui := true
+let () = Fc_config.is_gui := true
 
 let () = Unix.putenv "UBUNTU_MENUPROXY" "0"
 

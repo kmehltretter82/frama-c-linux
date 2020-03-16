@@ -22,10 +22,12 @@ bin/frama-c-script: CEA_LGPL
 bin/frama-c-gui: CEA_LGPL
 bin/frama-c-gui.byte: CEA_LGPL
 bin/frama-c.byte: CEA_LGPL
+bin/frama-c.debug: CEA_LGPL
 bin/frama-c.top: CEA_LGPL
 bin/local_export.sh: CEA_LGPL
 bin/migration_scripts/aluminium2silicon.sh: CEA_LGPL
 bin/migration_scripts/boron2carbon.sh: CEA_LGPL
+bin/migration_scripts/calcium2scandium.sh: CEA_LGPL
 bin/migration_scripts/carbon2nitrogen.sh: CEA_LGPL
 bin/migration_scripts/fluorine2neon.sh: CEA_LGPL
 bin/migration_scripts/lithium2beryllium.sh: CEA_LGPL
@@ -364,8 +366,8 @@ src/kernel_internals/parsing/logic_preprocess.mli: CEA_INRIA_LGPL
 src/kernel_internals/parsing/logic_preprocess.mll: CEA_INRIA_LGPL
 src/kernel_internals/runtime/README.md: .ignore
 src/kernel_internals/runtime/boot.ml: CEA_LGPL
-src/kernel_internals/runtime/config.ml.in: CEA_LGPL
-src/kernel_internals/runtime/config.mli: CEA_LGPL
+src/kernel_internals/runtime/fc_config.ml.in: CEA_LGPL
+src/kernel_internals/runtime/fc_config.mli: CEA_LGPL
 src/kernel_internals/runtime/frama_c_config.ml.in: CEA_LGPL
 src/kernel_internals/runtime/frama_c_init.ml: CEA_LGPL
 src/kernel_internals/runtime/frama_c_init.mli: CEA_LGPL

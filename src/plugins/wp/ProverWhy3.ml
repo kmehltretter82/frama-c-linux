@@ -1185,7 +1185,7 @@ let get_miss () = !miss
 let get_removed () = !removed
 
 let mark_cache ~mode hash =
-  if mode = Cleanup || !Config.is_gui then Hashtbl.replace cleanup hash ()
+  if mode = Cleanup || !Fc_config.is_gui then Hashtbl.replace cleanup hash ()
 
 let cleanup_cache ~mode =
   if mode = Cleanup && (!hits > 0 || !miss > 0) then

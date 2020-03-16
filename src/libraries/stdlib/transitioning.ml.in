@@ -78,6 +78,8 @@ module Format = struct
     Format.pp_open_@FORMAT_STAG@ fmt s
   let pp_close_stag fmt () =
     Format.pp_close_@FORMAT_STAG@ fmt ()
+
+  let pp_print_option = @FORMAT_PP_OPT@
 end
 
 module Q = struct

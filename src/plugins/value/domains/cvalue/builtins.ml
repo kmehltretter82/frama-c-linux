@@ -140,7 +140,7 @@ let warn_builtin_override kf source bname =
   let internal =
     (* TODO: treat this 'internal' *)
     let file = source.Filepath.pos_path in
-    Filepath.is_relative ~base_name:Config.datadir (file :> string)
+    Filepath.is_relative ~base_name:Fc_config.datadir (file :> string)
   in
   if Kernel_function.is_definition kf && not internal
   then

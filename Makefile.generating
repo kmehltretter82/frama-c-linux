@@ -133,6 +133,7 @@ ifeq ($(HAS_OCAML408),yes)
         Format.String_tag str -> str \
       | _ -> raise (Invalid_argument "unsupported tag extension")
   FORMAT_STAG_OF_STRING=Format.String_tag s
+  FORMAT_PP_OPT=Format.pp_print_option
   HAS_OCAML407_OR_408=yes
 else
   DYNLINK_INIT=Dynlink.init
@@ -144,6 +145,10 @@ else
   else
     HAS_OCAML407_OR_408=no
   endif
+  FORMAT_PP_OPT=fun ?(none=(fun _ () -> ())) pp fmt o -> \
+    match o with \
+    | None -> none fmt () \
+    | Some v -> pp fmt v
 endif
 
 ifeq ($(HAS_OCAML407_OR_408),yes)
@@ -169,6 +174,7 @@ src/libraries/stdlib/transitioning.ml: \
          -e 's/@FORMAT_STAG@/$(FORMAT_STAG)/g' \
          -e 's/@FORMAT_STRING_OF_STAG@/$(FORMAT_STRING_OF_STAG)/g' \
          -e 's/@FORMAT_STAG_OF_STRING@/$(FORMAT_STAG_OF_STRING)/g' \
+         -e 's/@FORMAT_PP_OPT@/$(FORMAT_PP_OPT)/g' \
         $< > $@
 	$(CHMOD_RO) $@
 
@@ -176,13 +182,13 @@ src/libraries/stdlib/transitioning.ml: \
 # Frama-C-config #
 ##################
 
-src/kernel_internals/runtime/frama_c_config.ml: src/kernel_internals/runtime/config.ml \
+src/kernel_internals/runtime/frama_c_config.ml: src/kernel_internals/runtime/fc_config.ml \
 	src/kernel_internals/runtime/frama_c_config.ml.in Makefile.generating
 	$(PRINT_MAKING) $@
 	$(RM) $@
 	$(ECHO) "module Filepath = struct let add_symbolic_dir _ _ = () end" >> $@
-	$(ECHO) "module Config = struct" >> $@
-	$(CAT) src/kernel_internals/runtime/config.ml >> $@
+	$(ECHO) "module Fc_config = struct" >> $@
+	$(CAT) src/kernel_internals/runtime/fc_config.ml >> $@
 	$(ECHO) "end" >> $@
 	$(CAT) src/kernel_internals/runtime/frama_c_config.ml.in >> $@
 	$(CHMOD_RO) $@

@@ -74,6 +74,8 @@ module Format: sig
     Format.formatter -> unit -> formatter_stag_functions
   val pp_open_stag : Format.formatter -> stag -> unit
   val pp_close_stag : Format.formatter -> unit -> unit
+  val pp_print_option: ?none:(Format.formatter -> unit -> unit) ->
+    (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a option -> unit
 end
 
 (** {1 Zarith} *)

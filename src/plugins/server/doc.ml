@@ -66,12 +66,12 @@ let page chapter ~title ~filename =
   with Not_found ->
     let intro = match chapter with
       | `Protocol ->
-        Printf.sprintf "%s/server/protocol/%s" Config.datadir filename
+        Printf.sprintf "%s/server/protocol/%s" Fc_config.datadir filename
       | `Kernel ->
-        Printf.sprintf "%s/server/kernel/%s" Config.datadir filename
+        Printf.sprintf "%s/server/kernel/%s" Fc_config.datadir filename
       | `Plugin name ->
         if not (List.mem name !plugins) then plugins := name :: !plugins ;
-        Printf.sprintf "%s/%s/server/%s" Config.datadir name filename in
+        Printf.sprintf "%s/%s/server/%s" Fc_config.datadir name filename in
     let intro =
       if Sys.file_exists intro
       then Markdown.rawfile intro
@@ -221,7 +221,7 @@ let dump ~root ?(meta=true) () =
       Yojson.Basic.to_file path maindata ;
       let body =
         [ H1 (plain "Documentation", None);
-          Block (text (format "Version %s" Config.version))]
+          Block (text (format "Version %s" Fc_config.version))]
         @
         table_of_contents ()
         @

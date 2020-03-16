@@ -142,13 +142,6 @@ value c_atan2f(value x, value y)
   return caml_copy_double(res);
 }
 
-value compare_strings(value v1, value v2, value vlen) {
-  if (memcmp(String_val(v1), String_val(v2), Long_val(vlen)) == 0)
-    return Val_true;
-  else
-    return Val_false;
-}
-
 value address_of_value(value v)
 {
   return (Val_long(((unsigned long)v)/sizeof(long)));
@@ -252,10 +245,4 @@ value single_precision_of_string(value str)
   }
   double d = f;
   return caml_copy_double(d);
-}
-
-value ml_usleep(value v)
-{
-  usleep( Int_val(v) );
-  return Val_unit ;
 }

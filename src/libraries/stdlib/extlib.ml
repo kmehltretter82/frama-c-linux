@@ -436,17 +436,16 @@ let temp_dir_cleanup_at_exit ?(debug=false) base =
   in
   try_dir_cleanup_at_exit 10 base
 
-(* replace "noalloc" with [@@noalloc] for OCaml version >= 4.03.0 *)
-[@@@ warning "-3"]
-external usleep: int -> unit = "ml_usleep" "noalloc"
-  (* In ../utils/c_bindings.c ; man usleep for details. *)
-
 (* ************************************************************************* *)
 (** Strings *)
 (* ************************************************************************* *)
 
-external compare_strings: string -> string -> int -> bool = "compare_strings" "noalloc"
-[@@@ warning "+3"]
+let compare_strings s1 s2 len =
+  try
+    for i = 0 to len - 1 do if s1.[i] <> s2.[i] then raise Exit; done;
+    true
+  with Exit -> false
+     | Invalid_argument _ -> raise (Invalid_argument "Extlib.compare_strings")
 
 let string_prefix ?(strict=false) prefix s =
   let add = if strict then 1 else 0 in

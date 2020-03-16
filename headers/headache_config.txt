@@ -53,6 +53,8 @@
 | ".*frama-c.byte" -> skip match:"#!.*"
 | "frama-c.top" -> frame open:"#"  line:"#" close:"#"
 | ".*frama-c.top" -> skip match:"#!.*"
+| "frama-c.debug" -> frame open:"#"  line:"#" close:"#"
+| ".*frama-c.debug" -> skip match:"#!.*"
 
 ################
 # Perl scripts #

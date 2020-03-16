@@ -25,7 +25,6 @@
 (* ************************************************************************* *)
 
 module CamlString = String
-module Fc_config = Config
 
 let () = Plugin.register_kernel ()
 

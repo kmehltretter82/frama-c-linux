@@ -43,88 +43,88 @@ val minor_version: int
     @since 19.0-Potassium *)
 
 val is_gui: bool ref
-  (** Is the Frama-C GUI running?
-      @since Beryllium-20090601-beta1 *)
+(** Is the Frama-C GUI running?
+    @since Beryllium-20090601-beta1 *)
 
 val ocamlc: string
-  (** Name of the bytecode compiler.
-      @since Boron-20100401 *)
+(** Name of the bytecode compiler.
+    @since Boron-20100401 *)
 
 val ocamlopt: string
-  (** Name of the native compiler.
-      @since Boron-20100401 *)
+(** Name of the native compiler.
+    @since Boron-20100401 *)
 
 val ocaml_wflags: string
-  (** Warning flags used when compiling Frama-C.
-      @since Chlorine-20180501 *)
+(** Warning flags used when compiling Frama-C.
+    @since Chlorine-20180501 *)
 
 val datadir: string
-  (** Directory where architecture independent files are.
-      Main directory, use {!datadirs} for the others *)
+(** Directory where architecture independent files are.
+    Main directory, use {!datadirs} for the others *)
 
 val datadirs: string list
-  (** Directories where architecture independent files are in order of
-      priority.
-      @since 19.0-Potassium *)
+(** Directories where architecture independent files are in order of
+    priority.
+    @since 19.0-Potassium *)
 
 val framac_libc: string
-  (** Directory where Frama-C libc headers are.
-      @since 19.0-Potassium *)
+(** Directory where Frama-C libc headers are.
+    @since 19.0-Potassium *)
 
 val libdir: string
-  (** Directory where the Frama-C kernel library is.
-      @since Beryllium-20090601-beta1 *)
+(** Directory where the Frama-C kernel library is.
+    @since Beryllium-20090601-beta1 *)
 
 val plugin_dir: string list
-  (** Directory where the Frama-C dynamic plug-ins are.
-      @modify Magnesium-20151001 *)
+(** Directory where the Frama-C dynamic plug-ins are.
+    @modify Magnesium-20151001 *)
 
 val plugin_path: string
-  (** The coma-separated concatenation of [plugin_dir].
-      @since Magnesium-20151001 *)
+(** The coma-separated concatenation of [plugin_dir].
+    @since Magnesium-20151001 *)
 
 val compilation_unit_names: string list
-  (** List of names of all kernel compilation units.
-      @since Boron-20100401 *)
+(** List of names of all kernel compilation units.
+    @since Boron-20100401 *)
 
 val library_names: string list
-  (** List of linked libraries.
-      @since Magnesium-20151001 *)
+(** List of linked libraries.
+    @since Magnesium-20151001 *)
 
 val preprocessor: string
-  (** Name of the default command to call the preprocessor.
-      If the CPP environment variable is set, use it
-      else use the built-in default from autoconf. Usually this is
-      "gcc -C -E -I."
-      @since Oxygen-20120901 *)
+(** Name of the default command to call the preprocessor.
+    If the CPP environment variable is set, use it
+    else use the built-in default from autoconf. Usually this is
+    "gcc -C -E -I."
+    @since Oxygen-20120901 *)
 
 val using_default_cpp: bool
-  (** whether the preprocessor command is the one defined at configure time
-      or the result of taking a CPP environment variable, in case it differs
-      from the configure-time command.
+(** whether the preprocessor command is the one defined at configure time
+    or the result of taking a CPP environment variable, in case it differs
+    from the configure-time command.
 
-      @since Phosphorus-20170501-beta1 *)
+    @since Phosphorus-20170501-beta1 *)
 
 val preprocessor_is_gnu_like: bool
-  (** whether the default preprocessor accepts the same options as gcc
-      (i.e. is either gcc or clang), when this is the case, the default
-      command line for pre-processing contains more options.
-      @since Sodium-20150201
-   *)
+(** whether the default preprocessor accepts the same options as gcc
+    (i.e. is either gcc or clang), when this is the case, the default
+    command line for pre-processing contains more options.
+    @since Sodium-20150201
+*)
 
 val preprocessor_supported_arch_options: string list
-  (** architecture-related options (e.g. -m32) known to be supported by
-      the default preprocessor. Used to match preprocessor commands to
-      selected machdeps.
-      @since Phosphorus-20170501-beta1
-   *)
+(** architecture-related options (e.g. -m32) known to be supported by
+    the default preprocessor. Used to match preprocessor commands to
+    selected machdeps.
+    @since Phosphorus-20170501-beta1
+*)
 
 val preprocessor_keep_comments: bool
-  (** [true] if the default preprocessor selected during compilation is
-      able to keep comments (hence ACSL annotations) in its output.
-      @since Neon-rc3 
-   *)
-  
+(** [true] if the default preprocessor selected during compilation is
+    able to keep comments (hence ACSL annotations) in its output.
+    @since Neon-rc3
+*)
+
 val dot: string option
 (** Dot command name.
     @return [None] if `dot' is not installed.

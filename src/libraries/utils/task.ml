@@ -109,7 +109,8 @@ struct
   let rec wait = function
     | UNIT a -> a
     | YIELD f -> Db.yield() ; wait (f Coin)
-    | WAIT(ms,f) -> Db.yield() ; Extlib.usleep ms ; wait (f Coin)
+    | WAIT(ms,f) ->
+      Db.yield() ; Unix.sleepf (float_of_int ms /. 1_000_000.); wait (f Coin)
 
   let finished = function UNIT a -> Some a | YIELD _ | WAIT _ -> None
 
@@ -341,7 +342,7 @@ let share sh = todo
 
 let on_idle = ref
     (fun f -> try
-        while f () do Extlib.usleep 50000 (* wait for 50ms *) done
+        while f () do Unix.sleepf 0.05 (* wait for 50ms *) done
       with Db.Cancel -> ())
 
 (* -------------------------------------------------------------------------- *)
