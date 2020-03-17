@@ -53,16 +53,23 @@ type flag = Flag: 'v abstraction with_info -> flag
 (* --- Config and registration ---------------------------------------------- *)
 
 module Config = struct
-  module Flag = struct
-    type t = flag
+  module OptMode = Datatype.Option (Domain_mode)
+  module Element = struct
+    type t = flag * Domain_mode.t option
 
     (* Flags are sorted by increasing priority order, and then by name. *)
-    let compare (Flag f1) (Flag f2) =
+    let compare (Flag f1, mode1) (Flag f2, mode2) =
       let c = Datatype.Int.compare f1.priority f2.priority in
-      if c <> 0 then c else Datatype.String.compare f1.name f2.name
+      if c <> 0 then c else
+        let c = Datatype.String.compare f1.name f2.name in
+        if c <> 0 then c else
+          OptMode.compare mode1 mode2
   end
 
-  include Set.Make (Flag)
+  include Set.Make (Element)
+
+  let mem (Flag domain) =
+    exists (fun (Flag flag, _mode) -> flag.name = domain.name)
 
   type dynamic = Dynamic: (unit -> 'v abstraction) with_info -> dynamic
 
@@ -83,21 +90,26 @@ module Config = struct
     dynamic_abstractions := dynamic :: !dynamic_abstractions
 
   let configure () =
-    let aux config (Flag domain as flag) =
-      if Value_parameters.Domains.mem domain.name
-      || Value_parameters.DomainsFunction.mem domain.name
-      then add flag config
+    let add config name make =
+      let enabled = Value_parameters.Domains.mem name
+      and mode =
+        try Some (Value_parameters.DomainsFunction.find name)
+        with Not_found -> None
+      in
+      if enabled || mode <> None
+      then add (make (), mode) config
       else config
+    in
+    let aux config (Flag domain as flag) =
+      add config domain.name (fun () -> flag)
     in
     let config = List.fold_left aux empty !abstractions in
     let aux config (Dynamic { name; experimental; priority; abstraction; }) =
-      if Value_parameters.Domains.mem name
-      || Value_parameters.DomainsFunction.mem name
-      then
+      let make () =
         let abstraction = abstraction () in
-        let flag = Flag { name; experimental; priority; abstraction; } in
-        add flag config
-      else config
+        Flag { name; experimental; priority; abstraction; }
+      in
+      add config name make
     in
     List.fold_left aux config !dynamic_abstractions
 
@@ -173,7 +185,7 @@ module Config = struct
   (* --- Default and legacy configurations ---------------------------------- *)
 
   let default = configure ()
-  let legacy = singleton cvalue
+  let legacy = singleton (cvalue, None)
 end
 
 let register = Config.register
@@ -239,7 +251,7 @@ module Internal_Value = struct
     aux value internal
 
   let build_values config initial_value =
-    let build (Flag flag) acc =
+    let build (Flag flag, _) acc =
       match flag.abstraction.values with
       | Struct structure -> add_value_structure acc structure
       | Single (module V) -> add_value_leaf acc (V (V.key, (module V)))
@@ -309,7 +321,7 @@ let eq_value:
       | Abstract.Value.Leaf (key, _) -> Abstract.Value.eq_type key V.key
       | _ -> None
 
-let add_domain (type v) name (abstraction: v abstraction) (module Acc: Acc) =
+let add_domain (type v) mode (abstraction: v abstraction) (module Acc: Acc) =
   let domain : (module internal_domain with type value = Acc.Val.t) =
     match abstraction.domain with
     | Functor make ->
@@ -330,8 +342,9 @@ let add_domain (type v) name (abstraction: v abstraction) (module Acc: Acc) =
         (module Domain_lift.Make (Domain) (Convert))
   in
   let domain : (module internal_domain with type value = Acc.Val.t) =
-    try
-      let kf_modes = Value_parameters.DomainsFunction.find name in
+    match mode with
+    | None -> domain
+    | Some kf_modes ->
       let module Scope = struct let functions = kf_modes end in
       let module Domain =
         Domain_builder.Restrict
@@ -340,7 +353,6 @@ let add_domain (type v) name (abstraction: v abstraction) (module Acc: Acc) =
           (Scope)
       in
       (module Domain)
-    with Not_found -> domain
   in
   let domain : (module internal_domain with type value = Acc.Val.t) =
     match Abstract.Domain.(eq_structure Acc.Dom.structure Unit) with
@@ -362,9 +374,9 @@ let warn_experimental flag =
                         "The %s domain is experimental." flag.name)
 
 let build_domain config abstract =
-  let build (Flag flag) acc =
+  let build (Flag flag, mode) acc =
     warn_experimental flag;
-    add_domain flag.name flag.abstraction acc
+    add_domain mode flag.abstraction acc
   in
   (* Domains in the [config] are sorted by increasing priority: domains with
      higher priority are added last: they will be at the top of the domains

@@ -94,3 +94,5 @@ module Function_Mode = struct
     | Some (kf, mode) ->
       Some (Kernel_function.get_name kf ^ "+" ^ Mode.to_string mode)
 end
+
+include Datatype.List (Function_Mode)

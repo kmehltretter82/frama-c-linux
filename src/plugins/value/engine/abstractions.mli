@@ -138,9 +138,14 @@ val register_hook: ((module S) -> (module S)) -> unit
 (** {2 Configuration of an analysis.} *)
 
 (** Configuration defining the abstractions to be used in an analysis.
-    A configuration is a set of flags, i.e. a set of enabled abstractions. *)
+    A configuration is a set of flags, i.e. a set of abstract domain. Each flag
+    comes with an optional mode. None is the default mode: the given domain is
+    enabled for the whole analysis. See {!Domain_mode} for more details. *)
 module Config : sig
-  include Set.S with type elt = flag
+  include Set.S with type elt = flag * Domain_mode.t option
+
+  (** Returns true if the given flag is in the configuration. *)
+  val mem: flag -> t -> bool
 
   (** Flags for the standard domains currently provided in Eva. *)
 

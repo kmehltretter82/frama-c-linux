@@ -33,3 +33,6 @@ type function_mode = Kernel_function.t * mode
 module Function_Mode:
   Parameter_sig.Multiple_value_datatype with type key = string
                                          and type t = function_mode
+
+(** Analysis mode for a domain. *)
+include Datatype.S with type t = function_mode list
