@@ -644,6 +644,15 @@ module CacheEnv = True
     end)
 
 let () = Parameter_customize.set_group wp_prover
+module CacheDir = String
+    (struct
+      let option_name = "-wp-cache-dir"
+      let arg_name = "dir"
+      let default = ""
+      let help = "Specify global cache directory (no cleanup mode)."
+    end)
+
+let () = Parameter_customize.set_group wp_prover
 module Generate = False
     (struct
       let option_name = "-wp-gen"

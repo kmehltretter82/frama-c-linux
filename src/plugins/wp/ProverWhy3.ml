@@ -1221,25 +1221,37 @@ let get_removed () = !removed
 let mark_cache ~mode hash =
   if mode = Cleanup || !Fc_config.is_gui then Hashtbl.replace cleanup hash ()
 
+let get_cache_dir () =
+  let gdir = Wp_parameters.CacheDir.get () in
+  if gdir <> "" then
+    Filepath.Normalized.of_string gdir
+  else
+    Wp_parameters.get_session_dir ~force:false "cache"
+
+let is_global_cache () = Wp_parameters.CacheDir.get () <> ""
+
 let cleanup_cache ~mode =
   if mode = Cleanup && (!hits > 0 || !miss > 0) then
-    let dir = Wp_parameters.get_session_dir ~force:false "cache" in
-    let dir = (dir :> string) in
-    try
-      if Sys.file_exists dir && Sys.is_directory dir then
-        Array.iter
-          (fun f ->
-             if Filename.check_suffix f ".json" then
-               let hash = Filename.chop_suffix f ".json" in
-               if not (Hashtbl.mem cleanup hash) then
-                 begin
-                   incr removed ;
-                   Extlib.safe_remove (Printf.sprintf "%s/%s" dir f) ;
-                 end
-          ) (Sys.readdir dir) ;
-    with Unix.Unix_error _ as exn ->
-      Wp_parameters.warning ~current:false
-        "Can not cleanup cache (%s)" (Printexc.to_string exn)
+    let dir = (get_cache_dir () :> string) in
+    if is_global_cache () then
+      Wp_parameters.warning ~current:false ~once:true
+        "Cleanup mode deactivated with global cache."
+    else
+      try
+        if Sys.file_exists dir && Sys.is_directory dir then
+          Array.iter
+            (fun f ->
+               if Filename.check_suffix f ".json" then
+                 let hash = Filename.chop_suffix f ".json" in
+                 if not (Hashtbl.mem cleanup hash) then
+                   begin
+                     incr removed ;
+                     Extlib.safe_remove (Printf.sprintf "%s/%s" dir f) ;
+                   end
+            ) (Sys.readdir dir) ;
+      with Unix.Unix_error _ as exn ->
+        Wp_parameters.warning ~current:false
+          "Can not cleanup cache (%s)" (Printexc.to_string exn)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Cache Management                                                   --- *)
@@ -1347,8 +1359,7 @@ let get_cache_result ~mode hash =
   match mode with
   | NoCache | Rebuild -> VCS.no_result
   | Update | Cleanup | Replay | Offline ->
-      let dir = Wp_parameters.get_session_dir ~force:false "cache" in
-      let dir = (dir :> string) in
+      let dir = (get_cache_dir () :> string) in
       if not (Sys.file_exists dir && Sys.is_directory dir) then
         VCS.no_result
       else
@@ -1368,13 +1379,13 @@ let set_cache_result ~mode hash prover result =
   match mode with
   | NoCache | Replay | Offline -> ()
   | Rebuild | Update | Cleanup ->
-      let dir = Wp_parameters.get_session_dir ~force:true "cache" in
+      let dir = get_cache_dir () in
       let hash = Lazy.force hash in
-      let file = Format.sprintf "%s/%s.json" (dir :> string) hash in
+      let file = Printf.sprintf "%s/%s.json" (dir :> string) hash in
       try
         mark_cache ~mode hash ;
         ProofScript.json_of_result (VCS.Why3 prover) result
-        |> Json.save_file (file :> string)
+        |> Json.save_file file
       with err ->
         Wp_parameters.warning ~current:false ~once:true
           "can not update cache (%s)" (Printexc.to_string err)
