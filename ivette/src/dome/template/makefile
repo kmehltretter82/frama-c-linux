@@ -296,10 +296,10 @@ dome-dev: dome-pkg dome-templ dome-export-dev
 	@echo "#!/bin/sh" >> $(DOME_CLI)
 	@echo "export DOME='$(DOME)'" >> $(DOME_CLI)
 	@echo "export DOME_ENV='dev'" >> $(DOME_CLI)
-	@echo 'exec $(DOME_MK_BIN)/electron-webpack dev "$$@"' >> $(DOME_CLI)
+	@echo 'exec $(DOME_MK_BIN)/electron-webpack dev $(DOME_ARGS) $(DOME_DEV) "$$@"' >> $(DOME_CLI)
 	@chmod 555 $(DOME_CLI)
 	@echo "[Dome] running application (development)"
-	@$(DOME_CLI) $(DOME_ARGS) $(DOME_DEV)
+	@$(DOME_CLI)
 
 # --------------------------------------------------------------------------
 # ---  Application Building
