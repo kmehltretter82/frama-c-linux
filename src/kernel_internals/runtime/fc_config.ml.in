@@ -32,6 +32,8 @@ let minor_version = @MINOR_VERSION@
 
 let is_gui = ref false
 
+let lablgtk = "@LABLGTK@"
+
 let ocamlc = "@OCAMLC@"
 let ocamlopt = "@OCAMLOPT@"
 let ocaml_wflags = "@WARNINGS@"
