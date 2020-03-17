@@ -240,6 +240,9 @@ let add_old = add_logic Logic_const.old_label
 let add_init state =
   add_logic Logic_const.init_label (Db.Value.globals_state ()) state
 
+let add_logic_var env lv cvalue =
+  { env with logic_vars = LogicVarEnv.add lv cvalue env.logic_vars }
+
 let make_env logic_env state =
   let transfer label map =
     Logic_label.Map.add label (logic_env.Abstract_domain.states label) map
@@ -458,6 +461,12 @@ type 'a eval_result = {
   empty: bool;
   ldeps: logic_deps;
 }
+
+let join_eval_result r1 r2 =
+  let eover = Cvalue.V.join r2.eover r1.eover in
+  let eunder = Cvalue.V.meet r1.eunder r2.eunder in
+  let ldeps = join_logic_deps r1.ldeps r2.ldeps in
+  { eover; eunder; ldeps; etype = r1.etype; empty = r1.empty || r2.empty; }
 
 (* When computing an under-approximation, we make the hypothesis that the state
    is not Bottom. Hence, over-approximations of cardinal <= 1 are actually of
@@ -1361,18 +1370,31 @@ and eval_known_logic_function ~alarm_mode env li labels args =
       with Cvalue.V.Not_based_on_null -> c_alarm ()
     end
 
-  | "\\min", Some Linteger, _, [t1; t2] ->
-    let backward = Cvalue.V.backward_comp_int_left Comp.Le in
-    eval_extremum Cil.intType backward ~alarm_mode env t1 t2
-  | "\\max", Some Linteger, _, [t1; t2] ->
-    let backward = Cvalue.V.backward_comp_int_left Comp.Ge in
-    eval_extremum Cil.intType backward ~alarm_mode env t1 t2
-  | "\\min", Some Lreal, _, [t1; t2] ->
-    let backward = Cvalue.V.backward_comp_float_left_true Comp.Le Fval.Real in
-    eval_extremum Cil.floatType backward ~alarm_mode env t1 t2
-  | "\\max", Some Lreal, _, [t1; t2] ->
-    let backward = Cvalue.V.backward_comp_float_left_true Comp.Ge Fval.Real in
-    eval_extremum Cil.doubleType backward ~alarm_mode env t1 t2
+  | ("\\min" | "\\max"), Some typ, _, t1 :: t2 :: tail_args ->
+    begin
+      let comp = if lvi.lv_name = "\\min" then Comp.Le else Comp.Ge in
+      let backward =
+        match typ with
+        | Linteger -> Cvalue.V.backward_comp_int_left comp
+        | Lreal -> Cvalue.V.backward_comp_float_left_true comp Fval.Real
+        | _ -> assert false
+      in
+      let r1 = eval_term ~alarm_mode env t1
+      and r2 = eval_term ~alarm_mode env t2 in
+      (* If there are 2 arguments, it is the mathematical function \min or \max.
+         If there are 3, it is the ACSL extended quantifiers \min or \max. *)
+      match tail_args with
+      | [] -> compute_extremum backward r1 r2
+      | [ { term_node = Tlambda ([lv], term) } ] ->
+        (* Evaluation of [term] when the logic variable [lv] is in [cvalue]. *)
+        let eval_term cvalue =
+          let env = add_logic_var env lv cvalue in
+          eval_term ~alarm_mode env term
+        in
+        eval_quantifier_extremum backward ~min:r1 ~max:r2 eval_term
+      | _ -> assert false
+    end
+
   | _ -> assert false
 
 and eval_float_builtin_arity2  ~alarm_mode env name arg1 arg2 =
@@ -1401,19 +1423,68 @@ and eval_float_builtin_arity2  ~alarm_mode env name arg1 arg2 =
   let ldeps = join_logic_deps r1.ldeps r2.ldeps in
   { etype = r1.etype; eunder; eover = v; ldeps; empty = r1.empty || r2.empty; }
 
-(* Evaluates the max (resp. the min) between the terms [t1] and [t2],
+
+(* Computes the max (resp. the min) between the evaluation results [r1] and [r2]
    according to [backward_left v1 v2] that reduces [v1] by assuming it is
    greater than (resp. lower than) [v2]. *)
-and eval_extremum etype backward_left ~alarm_mode env t1 t2 =
-  let r1 = eval_term ~alarm_mode env t1
-  and r2 = eval_term ~alarm_mode env t2 in
-  let reduced_v1 = backward_left r1.eover r2.eover
-  and reduced_v2 = backward_left r2.eover r1.eover in
-  let eover = Cvalue.V.join reduced_v1 reduced_v2 in
-  let eunder = Cvalue.V.meet r1.eunder r2.eunder in
-  let ldeps = join_logic_deps r1.ldeps r2.ldeps in
-  {eover; eunder; ldeps; etype; empty = r1.empty || r2.empty; }
+and compute_extremum backward_left r1 r2 =
+  let r1 = { r1 with eover = backward_left r1.eover r2.eover }
+  and r2 = { r2 with eover = backward_left r2.eover r1.eover } in
+  join_eval_result r1 r2
 
+(* Evaluates ACSL extended quantifiers \max or \min: computes (an approximation
+   of) the max (resp. the min) of [eval_term i] when [i] ranges between [min]
+   and [max], according to [backward_left v1 v2] that reduces [v1] by assuming
+   it is greater (resp. lower) than [v2]. *)
+and eval_quantifier_extremum backward_left ~min ~max eval_term =
+  (* Returns [r] as the result, with updated [empty] and [ldeps] fields. *)
+  let return r =
+    let ldeps = join_logic_deps r.ldeps (join_logic_deps min.ldeps max.ldeps) in
+    let empty = min.empty || max.empty || r.empty in
+    { r with ldeps; empty; }
+  in
+  let eval_ival ival = eval_term (Cvalue.V.inject_ival ival) in
+  let project r = Cvalue.V.project_ival r.eover in
+  match Ival.min_and_max (project min),
+        Ival.min_and_max (project max) with
+  | (min, Some b), (Some e, max) when Integer.le b e ->
+    (* All integers between [b] and [e] are necessarily in the range to be
+       considered. If [e-b] is small enough, evaluate [eval_term i] for each [i]
+       between [b] and [e]. Otherwise, evaluate [eval_term] for the bound [b]
+       and [e], and for the interval [b+1..e-1]. We could be more precise by
+       subdividing the interval. *)
+    let r =
+      if Integer.equal e b
+      then eval_term (Cvalue.V.inject_int b)
+      else
+        let fold =
+          if Integer.(le (sub e b) (of_int 10))
+          then Ival.fold_enum
+          else Ival.fold_int_bounds
+        in
+        let ival = Ival.inject_range (Some b) (Some e) in
+        let list = fold (fun i acc -> eval_ival i :: acc) ival [] in
+        (* Reduce each result to only keep the possible extrema. *)
+        let hd, tl = List.hd list, List.tl list in
+        List.fold_left (compute_extremum backward_left) hd tl
+    in
+    (* Integers below [b] and above [e] may not be in the range to be considered,
+       so we can't reduce [r] according to them. However, we must join to [r]
+       the evaluation of [eval_term] for these integers, and we can reduce
+       these evaluations to only keep results greater (or lower, according to
+       [backward_left]) than [r]. *)
+    let below = eval_ival (Ival.inject_range min (Some (Integer.pred b)))
+    and above = eval_ival (Ival.inject_range (Some (Integer.succ e)) max) in
+    let below = { below with eover = backward_left below.eover r.eover }
+    and above = { above with eover = backward_left above.eover r.eover } in
+    join_eval_result r (join_eval_result below above)
+  | (b, _), (_, e) ->
+    (* If [min] can be greater than [max], the result is unspecified. *)
+    let r = eval_ival (Ival.inject_range b e) in
+    return { r with eover = Cvalue.V.top; eunder = Cvalue.V.bottom }
+  | exception Cvalue.V.Not_based_on_null ->
+    let r = eval_term (Cvalue.V.join min.eover max.eover) in
+    return { r with eover = Cvalue.V.top; eunder = Cvalue.V.bottom }
 
 let eval_tlval_as_location ~alarm_mode env t =
   let r = eval_term_as_lval ~alarm_mode env t in
@@ -1814,8 +1885,7 @@ let reduce_by_left_relation ~alarm_mode env positive tl rel tr =
       let reduce = Eval_op.backward_comp_left_from_type logic_var.lv_type in
       let cvalue = reduce positive comp cvalue cond_v in
       if V.is_bottom cvalue then raise Reduce_to_bottom;
-      let logic_vars = LogicVarEnv.add logic_var cvalue env.logic_vars in
-      { env with logic_vars }
+      add_logic_var env logic_var cvalue
     | Location (typ_loc, locs) ->
       let reduce = Eval_op.backward_comp_left_from_type (Ctype typ_loc) in
       if debug then Format.printf "#Val right term %a@." V.pretty cond_v;
@@ -1937,8 +2007,7 @@ let reduce_by_known_papp ~alarm_mode env positive li _labels args =
         let vl = LogicVarEnv.find logic_var env.logic_vars in
         let reduced = Cvalue.V.narrow vl vr in
         if V.equal V.bottom reduced then raise Reduce_to_bottom;
-        let logic_vars = LogicVarEnv.add logic_var reduced env.logic_vars in
-        { env with logic_vars }
+        add_logic_var env logic_var reduced
       | Location (_typ, locsl) ->
         let aux locl env =
           let state = env_current_state env in

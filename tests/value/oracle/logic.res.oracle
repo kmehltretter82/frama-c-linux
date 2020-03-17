@@ -14,7 +14,7 @@
   arr_ptr[0..2] ∈ {0}
   arr_ptr_arr[0..5] ∈ {0}
 [eva] computing for function eq_tsets <- main.
-  Called from tests/value/logic.c:312.
+  Called from tests/value/logic.c:358.
 [eva] tests/value/logic.c:103: 
   cannot evaluate ACSL term, unsupported ACSL construct: == operation on non-supported type set<_#8>
 [eva:alarm] tests/value/logic.c:103: Warning: assertion got status unknown.
@@ -56,20 +56,20 @@
 [eva] Recording results for eq_tsets
 [eva] Done for function eq_tsets
 [eva] computing for function eq_char <- main.
-  Called from tests/value/logic.c:313.
+  Called from tests/value/logic.c:359.
 [eva] tests/value/logic.c:149: Frama_C_show_each: {-126}
 [eva] tests/value/logic.c:150: assertion got status valid.
 [eva] tests/value/logic.c:151: assertion got status valid.
 [eva] Recording results for eq_char
 [eva] Done for function eq_char
 [eva] computing for function casts <- main.
-  Called from tests/value/logic.c:314.
+  Called from tests/value/logic.c:360.
 [eva] tests/value/logic.c:155: assertion got status valid.
 [eva] tests/value/logic.c:156: assertion got status valid.
 [eva] Recording results for casts
 [eva] Done for function casts
 [eva] computing for function empty_tset <- main.
-  Called from tests/value/logic.c:315.
+  Called from tests/value/logic.c:361.
 [eva] computing for function f_empty_tset <- empty_tset <- main.
   Called from tests/value/logic.c:166.
 [eva] using specification for function f_empty_tset
@@ -82,7 +82,7 @@
 [eva] Recording results for empty_tset
 [eva] Done for function empty_tset
 [eva] computing for function reduce_by_equal <- main.
-  Called from tests/value/logic.c:316.
+  Called from tests/value/logic.c:362.
 [eva:alarm] tests/value/logic.c:172: Warning: 
   accessing out of bounds index. assert 0 ≤ v;
 [eva:alarm] tests/value/logic.c:172: Warning: 
@@ -92,7 +92,7 @@
 [eva] Recording results for reduce_by_equal
 [eva] Done for function reduce_by_equal
 [eva] computing for function alarms <- main.
-  Called from tests/value/logic.c:317.
+  Called from tests/value/logic.c:363.
 [eva:alarm] tests/value/logic.c:182: Warning: 
   assertion 'ASSUME' got status unknown.
 [eva:alarm] tests/value/logic.c:184: Warning: 
@@ -124,7 +124,7 @@
 [eva] Recording results for alarms
 [eva] Done for function alarms
 [eva] computing for function cond_in_lval <- main.
-  Called from tests/value/logic.c:318.
+  Called from tests/value/logic.c:364.
 [eva] computing for function select_like <- cond_in_lval <- main.
   Called from tests/value/logic.c:228.
 [eva] using specification for function select_like
@@ -152,7 +152,7 @@
 [eva] Recording results for cond_in_lval
 [eva] Done for function cond_in_lval
 [eva] computing for function pred <- main.
-  Called from tests/value/logic.c:319.
+  Called from tests/value/logic.c:365.
 [eva] tests/value/logic.c:90: assertion got status valid.
 [eva] tests/value/logic.c:91: assertion got status valid.
 [eva] tests/value/logic.c:31: 
@@ -201,7 +201,7 @@
 [eva] Recording results for pred
 [eva] Done for function pred
 [eva] computing for function float_sign <- main.
-  Called from tests/value/logic.c:320.
+  Called from tests/value/logic.c:366.
 [eva] tests/value/logic.c:251: assertion got status valid.
 [eva] tests/value/logic.c:252: assertion got status valid.
 [eva] tests/value/logic.c:253: assertion got status valid.
@@ -210,7 +210,7 @@
 [eva] Recording results for float_sign
 [eva] Done for function float_sign
 [eva] computing for function min_max <- main.
-  Called from tests/value/logic.c:321.
+  Called from tests/value/logic.c:367.
 [eva] computing for function Frama_C_interval <- min_max <- main.
   Called from tests/value/logic.c:274.
 [eva] using specification for function Frama_C_interval
@@ -235,7 +235,7 @@
 [eva] Recording results for min_max
 [eva] Done for function min_max
 [eva] computing for function assign_tsets <- main.
-  Called from tests/value/logic.c:322.
+  Called from tests/value/logic.c:368.
 [eva] computing for function assign_tsets_aux <- assign_tsets <- main.
   Called from tests/value/logic.c:269.
 [eva] using specification for function assign_tsets_aux
@@ -243,7 +243,7 @@
 [eva] Recording results for assign_tsets
 [eva] Done for function assign_tsets
 [eva] computing for function check_and_assert <- main.
-  Called from tests/value/logic.c:323.
+  Called from tests/value/logic.c:369.
 [eva:alarm] tests/value/logic.c:295: Warning: assertion got status unknown.
 [eva] tests/value/logic.c:296: Frama_C_show_each_42: {42}
 [eva] tests/value/logic.c:297: check got status valid.
@@ -257,6 +257,80 @@
 [eva] tests/value/logic.c:307: Frama_C_show_each_reachable: {42}
 [eva] Recording results for check_and_assert
 [eva] Done for function check_and_assert
+[eva] computing for function min_max_quantifier <- main.
+  Called from tests/value/logic.c:370.
+[eva] tests/value/logic.c:321: check 'valid' got status valid.
+[eva] tests/value/logic.c:322: check 'valid' got status valid.
+[eva] tests/value/logic.c:323: check 'valid' got status valid.
+[eva] tests/value/logic.c:324: check 'valid' got status valid.
+[eva] tests/value/logic.c:325: check 'valid' got status valid.
+[eva] tests/value/logic.c:326: check 'valid' got status valid.
+[eva:alarm] tests/value/logic.c:327: Warning: check 'valid' got status unknown.
+[eva:alarm] tests/value/logic.c:328: Warning: check 'valid' got status unknown.
+[eva:alarm] tests/value/logic.c:329: Warning: 
+  check 'unknown' got status unknown.
+[eva:alarm] tests/value/logic.c:330: Warning: 
+  check 'unknown' got status unknown.
+[eva] computing for function Frama_C_interval <- min_max_quantifier <- main.
+  Called from tests/value/logic.c:331.
+[eva] tests/value/logic.c:331: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] computing for function Frama_C_interval <- min_max_quantifier <- main.
+  Called from tests/value/logic.c:332.
+[eva] tests/value/logic.c:332: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] tests/value/logic.c:333: check 'valid' got status valid.
+[eva] tests/value/logic.c:334: check 'valid' got status valid.
+[eva] tests/value/logic.c:335: check 'valid' got status valid.
+[eva] tests/value/logic.c:336: check 'valid' got status valid.
+[eva:alarm] tests/value/logic.c:337: Warning: 
+  check 'unknown' got status unknown.
+[eva:alarm] tests/value/logic.c:338: Warning: 
+  check 'unknown' got status unknown.
+[eva:alarm] tests/value/logic.c:339: Warning: 
+  check 'unknown' got status unknown.
+[eva:alarm] tests/value/logic.c:340: Warning: 
+  check 'unknown' got status unknown.
+[eva] computing for function Frama_C_interval <- min_max_quantifier <- main.
+  Called from tests/value/logic.c:341.
+[eva] tests/value/logic.c:341: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] computing for function Frama_C_interval <- min_max_quantifier <- main.
+  Called from tests/value/logic.c:342.
+[eva] tests/value/logic.c:342: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] tests/value/logic.c:343: check 'valid' got status valid.
+[eva] tests/value/logic.c:344: check 'valid' got status valid.
+[eva] tests/value/logic.c:345: check 'valid' got status valid.
+[eva] tests/value/logic.c:346: check 'valid' got status valid.
+[eva:alarm] tests/value/logic.c:347: Warning: 
+  check 'unknown' got status unknown.
+[eva:alarm] tests/value/logic.c:348: Warning: 
+  check 'unknown' got status unknown.
+[eva:alarm] tests/value/logic.c:349: Warning: 
+  check 'unknown' got status unknown.
+[eva:alarm] tests/value/logic.c:350: Warning: 
+  check 'unknown' got status unknown.
+[eva] computing for function Frama_C_interval <- min_max_quantifier <- main.
+  Called from tests/value/logic.c:351.
+[eva] tests/value/logic.c:351: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] computing for function Frama_C_interval <- min_max_quantifier <- main.
+  Called from tests/value/logic.c:352.
+[eva] tests/value/logic.c:352: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva:alarm] tests/value/logic.c:353: Warning: 
+  check 'unknown' got status unknown.
+[eva:alarm] tests/value/logic.c:354: Warning: 
+  check 'unknown' got status unknown.
+[eva] Recording results for min_max_quantifier
+[eva] Done for function min_max_quantifier
 [eva] Recording results for main
 [eva] done for function main
 [scope:rm_asserts] removing 5 assertion(s)
@@ -310,6 +384,74 @@
   a ∈ {0}
   b ∈ {-0.}
   d ∈ [-0. .. 0.]
+[eva:final-states] Values at end of function min_max_quantifier:
+  Frama_C_entropy_source ∈ [--..--]
+  i ∈ [4..16]
+  j ∈ [12..24]
+  t_0[0] ∈ {0}
+     [1] ∈ {1}
+     [2] ∈ {2}
+     [3] ∈ {3}
+     [4] ∈ {4}
+     [5] ∈ {5}
+     [6] ∈ {6}
+     [7] ∈ {7}
+     [8] ∈ {8}
+     [9] ∈ {9}
+     [10] ∈ {10}
+     [11] ∈ {11}
+     [12] ∈ {12}
+     [13] ∈ {13}
+     [14] ∈ {14}
+     [15] ∈ {15}
+     [16] ∈ {16}
+     [17] ∈ {17}
+     [18] ∈ {18}
+     [19] ∈ {19}
+     [20] ∈ {20}
+     [21] ∈ {21}
+     [22] ∈ {22}
+     [23] ∈ {23}
+     [24] ∈ {24}
+     [25] ∈ {25}
+     [26] ∈ {26}
+     [27] ∈ {27}
+     [28] ∈ {28}
+     [29] ∈ {29}
+     [30] ∈ {30}
+     [31] ∈ {31}
+     [32] ∈ {0}
+     [33] ∈ {31}
+     [34] ∈ {30}
+     [35] ∈ {29}
+     [36] ∈ {28}
+     [37] ∈ {27}
+     [38] ∈ {26}
+     [39] ∈ {25}
+     [40] ∈ {24}
+     [41] ∈ {23}
+     [42] ∈ {22}
+     [43] ∈ {21}
+     [44] ∈ {20}
+     [45] ∈ {19}
+     [46] ∈ {18}
+     [47] ∈ {17}
+     [48] ∈ {16}
+     [49] ∈ {15}
+     [50] ∈ {14}
+     [51] ∈ {13}
+     [52] ∈ {12}
+     [53] ∈ {11}
+     [54] ∈ {10}
+     [55] ∈ {9}
+     [56] ∈ {8}
+     [57] ∈ {7}
+     [58] ∈ {6}
+     [59] ∈ {5}
+     [60] ∈ {4}
+     [61] ∈ {3}
+     [62] ∈ {2}
+     [63] ∈ {1}
 [eva:final-states] Values at end of function reduce_by_equal:
   a[0..8] ∈ {1}
    [9] ∈ [--..--]
@@ -369,6 +511,8 @@
 [from] Computing for function Frama_C_interval <-min_max
 [from] Done for function Frama_C_interval
 [from] Done for function min_max
+[from] Computing for function min_max_quantifier
+[from] Done for function min_max_quantifier
 [from] Computing for function reduce_by_equal
 [from] Done for function reduce_by_equal
 [from] Computing for function cond_in_lval
@@ -414,6 +558,8 @@
 [from] Function h:
   s1.f1 FROM \nothing
 [from] Function min_max:
+  Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
+[from] Function min_max_quantifier:
   Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
 [from] Function reduce_by_equal:
   NO EFFECTS
@@ -483,6 +629,10 @@
     Frama_C_entropy_source; x_0; y; z; r1; r2; r3; r4; a; b; d
 [inout] Inputs for function min_max:
     Frama_C_entropy_source; v
+[inout] Out (internal) for function min_max_quantifier:
+    Frama_C_entropy_source; i; j; t_0[0..63]
+[inout] Inputs for function min_max_quantifier:
+    Frama_C_entropy_source
 [inout] Out (internal) for function reduce_by_equal:
     a[0..9]
 [inout] Inputs for function reduce_by_equal:
