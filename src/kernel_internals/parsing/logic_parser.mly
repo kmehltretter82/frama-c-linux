@@ -812,6 +812,9 @@ type_spec:
 | SHORT          { LTint IShort }      /** [short] */
 | SIGNED SHORT   { LTint IShort }      /** [short] */
 | UNSIGNED SHORT { LTint IUShort }     /** [unsigned short] */
+| SHORT INT          { LTint IShort }      /** [short] */
+| SIGNED SHORT INT   { LTint IShort }      /** [short] */
+| UNSIGNED SHORT INT { LTint IUShort }     /** [unsigned short] */
 | LONG           { LTint ILong }       /** [long] */
 | SIGNED LONG    { LTint ILong }       /** [long] */
 | UNSIGNED LONG  { LTint IULong }      /** [unsigned long] */
