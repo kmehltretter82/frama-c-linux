@@ -14,3 +14,8 @@ void job(void)
     i ++;
   }
 }
+void issue(int a) {
+  //@ check ko:  \exists integer j; 0 < j < 0;
+  //@ check ko: (\forall integer j; 0 < j < 0 ==> \false) ==> (a == 0);
+  ;
+}
