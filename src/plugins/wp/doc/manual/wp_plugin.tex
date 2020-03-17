@@ -1069,7 +1069,7 @@ Support for \textsf{Why-3 IDE} is no longer provided.
 Suppose you have the following configuration:
 
 \begin{logs}
-$ ./bin/frama-c -wp-detect
+# ./bin/frama-c -wp-detect
 [wp] Prover   Alt-Ergo 2.0.0  [alt-ergo|altergo|Alt-Ergo:2.0.0]
 [wp] Prover       CVC4 1.6    [cvc4|CVC4:1.6]
 [wp] Prover       CVC4 1.6    [cvc4-ce|CVC4:1.6,counterexamples]
@@ -1078,7 +1078,7 @@ $ ./bin/frama-c -wp-detect
 \end{logs}
 
 Then, to use (for instance) \textsf{CVC4 1.6},
-you can use \verb+-wp-prover cvc4+ or \verb+-wp-prover CVC4:1.6.
+you can use \verb+-wp-prover cvc4+ or \verb+-wp-prover CVC4:1.6+
 Similarly, if you want to use \textsf{Z3 4.6.0} without bitvectors, you can use \verb+-wp-prover z3-nobv+.
 Finally, since \textsf{Why-3} also provides the alias
 \verb+altergo+ for this prover, \verb+-wp-prover altergo+ will also run it \emph{via} \textsf{Why-3}.
