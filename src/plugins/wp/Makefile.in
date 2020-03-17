@@ -188,6 +188,7 @@ wp-qualif-push:
 	git -C $(WP_CACHE_DIR) push -f
 
 wp-qualif-cleanup: wp-qualif-update
+	find $(WP_CACHE_DIR) -atime 2h -delete
 
 $(WP_CACHE_DIR):
 	git clone "git@git.frama-c.com:frama-c/wp-cache.git" $(WP_CACHE_DIR)

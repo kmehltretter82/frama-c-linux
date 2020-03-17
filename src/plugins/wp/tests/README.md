@@ -21,22 +21,29 @@ git add tests/wp_gallery/oracle/find.*
 
 ## Update oracle for 'qualif' configuration (if there is such)
 
-1. generate oracle files and updated cache files
+1. update the cache
+```
+git -C src/plugins/wp/cache pull --rebase --prune
+```
+
+2. generate oracle files and updated cache files
 ```
 FRAMAC_WP_CACHE=update ptests.opt -config qualif tests/wp_gallery/find.i -show
 ptests.opt -config qualif tests/wp_gallery/find.i -update
 ```
 
-Note: cleaning the cache is _not_ recommanded when updating or modifying an
-existing test; actually it might introduce git merge conflicts that are
-annoying to resolve. But the cleaning can be usefull when adding a new test.
-It can be done using the command (before those of the step 1):
+3. publish the new cache
 ```
-rm -rf tests/wp_gallery/oracle_qualif/find.[0-9]*.session/cache/
+git -C src/plugins/wp/cache add -A
+git -C src/plugins/wp/cache commit -m "[wp] cache updates"
+git -C src/plugins/wp/cache push -f
 ```
 
-2. check again (for a final validation) before adding the oracle and cache files
+## Using Makefile
+
 ```
-ptests.opt -config qualif tests/wp_gallery/find.i
-git add tests/wp_gallery/oracle_qualif/find.*
+make wp-qualif           # Run qualif tests (clone cache if necessary)
+make wp-qualif-update    # Run with cache updates (git access)
+make wp-qualif-push      # Push cache updates (git access)
+make wp-qualif-cleanup   # Remove old cache entries (no access since 2h)
 ```
