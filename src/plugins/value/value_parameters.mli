@@ -30,24 +30,6 @@ module ReductionDepth: Parameter_sig.Int
 
 module Domains: Parameter_sig.String_set
 
-module CvalueDomain: Parameter_sig.Bool
-module EqualityDomain: Parameter_sig.Bool
-module GaugesDomain: Parameter_sig.Bool
-module SymbolicLocsDomain: Parameter_sig.Bool
-module OctagonDomain: Parameter_sig.Bool
-module BitwiseOffsmDomain: Parameter_sig.Bool
-module InoutDomain: Parameter_sig.Bool
-module SignDomain: Parameter_sig.Bool
-module PrinterDomain: Parameter_sig.Bool
-module NumerorsDomain: Parameter_sig.Bool
-module TracesDomain: Parameter_sig.Bool
-
-module ApronOctagon: Parameter_sig.Bool
-module ApronBox: Parameter_sig.Bool
-module PolkaLoose: Parameter_sig.Bool
-module PolkaStrict: Parameter_sig.Bool
-module PolkaEqualities: Parameter_sig.Bool
-
 module EqualityCall: Parameter_sig.String
 module EqualityCallFunction:
   Parameter_sig.Map with type key = Cil_types.kernel_function
@@ -221,6 +203,9 @@ val wkey_signed_overflow : warn_category
 (** Warning category for 'completely invalid' assigns clause *)
 val wkey_invalid_assigns : warn_category
 
+(** Warning category for experimental domains or features. *)
+val wkey_experimental : warn_category
+
 (** Debug category used to print information about invalid pointer comparisons*)
 val dkey_pointer_comparison: category
 
@@ -244,12 +229,6 @@ val dkey_widening : category
 
 (** Registers available domain names for the -eva-domains option. *)
 val register_domain: name:string -> descr:string -> unit
-
-(** Notifies that the binding to Apron domains is available. *)
-val register_apron: unit -> unit
-
-(** Notifies that the numerors domain is available. *)
-val register_numerors: unit -> unit
 
 (*
 Local Variables:

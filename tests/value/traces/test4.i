@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: #"-eva-traces-domain -value-msg-key d-traces -slevel 10"
+   STDOPT: #"-eva-domains traces -value-msg-key d-traces -slevel 10"
 */
 
 /* Test of join inside a loop */

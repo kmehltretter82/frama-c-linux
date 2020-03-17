@@ -39,17 +39,20 @@ type 'v domain =
   | Functor: (module domain_functor) -> _ domain
 
 type 'v abstraction =
-  { name: string;
-    descr: string;
-    priority: int;
-    values: 'v value;
+  { values: 'v value;
     domain: 'v domain; }
+
+type 't with_info =
+  { name: string;
+    experimental: bool;
+    priority: int;
+    abstraction: 't; }
+
+type flag = Flag: 'v abstraction with_info -> flag
 
 (* --- Config and registration ---------------------------------------------- *)
 
 module Config = struct
-  type flag = Flag: 'v abstraction -> flag
-
   module Flag = struct
     type t = flag
 
@@ -61,104 +64,109 @@ module Config = struct
 
   include Set.Make (Flag)
 
-  type dynamic = Dynamic: (unit -> 'a option) * ('a -> 'v abstraction) -> dynamic
+  type dynamic = Dynamic: (unit -> 'v abstraction) with_info -> dynamic
 
   let abstractions = ref []
   let dynamic_abstractions : dynamic list ref = ref []
 
-  let register ~enable abstraction =
-    let { name; descr; } = abstraction in
+  let register ~name ~descr ?(experimental=false) ?(priority=0) abstraction =
+    let descr = if experimental then "Experimental. " ^ descr else descr in
     Value_parameters.register_domain ~name ~descr;
-    abstractions := (enable, Flag abstraction) :: !abstractions
+    let flag = Flag { name; experimental; priority; abstraction } in
+    abstractions := flag :: !abstractions;
+    flag
 
-  let dynamic_register ~configure ~make =
-    dynamic_abstractions := Dynamic (configure, make) :: !dynamic_abstractions
+  let dynamic_register ~name ~descr ?(experimental=false) ?(priority=0) make =
+    let descr = if experimental then "Experimental. " ^ descr else descr in
+    Value_parameters.register_domain ~name ~descr;
+    let dynamic = Dynamic { name; experimental; priority; abstraction=make; } in
+    dynamic_abstractions := dynamic :: !dynamic_abstractions
 
   let configure () =
-    let aux config (enable, (Flag domain as flag)) =
-      if enable () || Value_parameters.Domains.mem domain.name
+    let aux config (Flag domain as flag) =
+      if Value_parameters.Domains.mem domain.name
       then add flag config
       else config
     in
     let config = List.fold_left aux empty !abstractions in
-    let aux config (Dynamic (configure, make)) =
-      match configure () with
-      | None -> config
-      | Some c -> add (Flag (make c)) config
+    let aux config (Dynamic { name; experimental; priority; abstraction; }) =
+      if Value_parameters.Domains.mem name
+      then
+        let abstraction = abstraction () in
+        let flag = Flag { name; experimental; priority; abstraction; } in
+        add flag config
+      else config
     in
     List.fold_left aux config !dynamic_abstractions
 
   (* --- Register default abstractions -------------------------------------- *)
 
-  let create ~enable abstract = register ~enable abstract; Flag abstract
-  let create_domain priority name descr enable values domain =
-    create ~enable
-      { name; descr; priority; values = Single values; domain = Domain domain }
-
-  open Value_parameters
+  let create_domain ?experimental priority name descr values domain =
+    let abstraction = { values = Single values; domain = Domain domain } in
+    register ~name ~descr ~priority ?experimental abstraction
 
   (* Register standard domains over cvalues. *)
-  let make rank name descr enable =
-    create_domain rank name descr enable (module Main_values.CVal)
+  let make ?experimental rank name descr =
+    create_domain ?experimental rank name descr (module Main_values.CVal)
 
   let cvalue =
     make 9 "cvalue"
       "Main analysis domain, enabled by default. Should not be disabled."
-      CvalueDomain.get (module Cvalue_domain.State)
+      (module Cvalue_domain.State)
 
   let symbolic_locations =
     make 7 "symbolic-locations"
       "Infers values of symbolic locations represented by imprecise lvalues, \
        such as t[i] or *p when the possible values of [i] or [p] are imprecise."
-      SymbolicLocsDomain.get (module Symbolic_locs.D)
+      (module Symbolic_locs.D)
 
-  let equality_domain =
-    { name = "equality";
-      descr = "Infers equalities between syntactic C expressions. \
-               Makes the analysis less dependent on temporary variables and \
-               intermediate computations.";
-      priority = 8;
-      values = Struct Abstract.Value.Unit;
-      domain = Functor (module Equality_domain.Make); }
-  let equality = create ~enable:EqualityDomain.get equality_domain
+  let equality =
+    let descr = "Infers equalities between syntactic C expressions. \
+                 Makes the analysis less dependent on temporary variables and \
+                 intermediate computations."
+    and abstraction =
+      { values = Struct Abstract.Value.Unit;
+        domain = Functor (module Equality_domain.Make); }
+    in
+    register ~name:"equality" ~descr ~priority:8 abstraction
 
   let gauges =
     make 6 "gauges"
       "Infers linear inequalities between the variables modified within a loop \
        and a special loop counter."
-      GaugesDomain.get (module Gauges_domain.D)
+      (module Gauges_domain.D)
 
   let octagon =
     make 6 "octagon"
       "Infers relations between scalar variables of the form b ≤ ±X ± Y ≤ e, \
        where X, Y are program variables and b, e are constants."
-      OctagonDomain.get (module Octagons)
+      (module Octagons)
 
   let bitwise =
     create_domain 3 "bitwise"
       "Infers bitwise information to interpret more precisely bitwise operators."
-      BitwiseOffsmDomain.get (module Offsm_value.Offsm) (module Offsm_domain.D)
+      (module Offsm_value.Offsm) (module Offsm_domain.D)
 
   let sign =
     create_domain 4 "sign"
       "Infers the sign of program variables."
-      SignDomain.get (module Sign_value) (module Sign_domain)
+      (module Sign_value) (module Sign_domain)
 
-  let inout = make 5 "inout"
-      "Experimental. Infers the inputs and outputs of each function."
-      InoutDomain.get (module Inout_domain.D)
+  let inout = make 5 "inout" ~experimental:true
+      "Infers the inputs and outputs of each function."
+      (module Inout_domain.D)
 
   let traces =
-    make 2 "traces"
-      "Experimental. Builds an over-approximation of all the traces that lead \
+    make 2 "traces" ~experimental:true
+      "Builds an over-approximation of all the traces that lead \
        to a statement."
-      TracesDomain.get (module Traces_domain.D)
+      (module Traces_domain.D)
 
   let printer =
     make 2 "printer"
       "Debug domain, only useful for developers. Prints the transfer functions \
        used during the analysis."
-      PrinterDomain.get (module Printer_domain)
+      (module Printer_domain)
 
   (* --- Default and legacy configurations ---------------------------------- *)
 
@@ -223,8 +231,8 @@ module Internal_Value = struct
     aux value internal
 
   let build_values config initial_value =
-    let build (Config.Flag abstraction) acc =
-      match abstraction.values with
+    let build (Flag flag) acc =
+      match flag.abstraction.values with
       | Struct structure -> add_value_structure acc structure
       | Single (module V) -> add_value_leaf acc (V (V.key, (module V)))
     in
@@ -323,8 +331,16 @@ let add_domain (type v) (abstraction: v abstraction) (module Acc: Acc) =
     module Dom = (val domain)
   end : Acc)
 
+let warn_experimental flag =
+  if flag.experimental then
+    Value_parameters.(warning ~wkey:wkey_experimental
+                        "The %s domain is experimental." flag.name)
+
 let build_domain config abstract =
-  let build (Config.Flag abstraction) acc = add_domain abstraction acc in
+  let build (Flag flag) acc =
+    warn_experimental flag;
+    add_domain flag.abstraction acc
+  in
   (* Domains in the [config] are sorted by increasing priority: domains with
      higher priority are added last: they will be at the top of the domains
      tree, and thus will be processed first during the analysis. *)

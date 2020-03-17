@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -eva -eva-numerors-domain -eva-msg-key=d-numerors
+   OPT: -eva -eva-domains numerors -eva-msg-key=d-numerors
 */
 
 /* Tests for the numerors domain, that computes absolute and relative errors

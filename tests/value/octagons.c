@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +" -eva-octagon-domain -eva-octagon-through-calls -eva-msg-key=d-octagon,-d-cvalue"
+   STDOPT: +" -eva-domains octagon -eva-octagon-through-calls -eva-msg-key=d-octagon,-d-cvalue"
 */
 
 #include <__fc_builtin.h>
