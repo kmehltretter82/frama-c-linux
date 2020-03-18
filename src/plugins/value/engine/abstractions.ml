@@ -90,15 +90,18 @@ module Config = struct
     dynamic_abstractions := dynamic :: !dynamic_abstractions
 
   let configure () =
+    let add_main_mode mode =
+      let main, _ = Globals.entry_point () in
+      (main, Domain_mode.Mode.all) :: mode
+    in
     let add config name make =
-      let enabled = Value_parameters.Domains.mem name
-      and mode =
-        try Some (Value_parameters.DomainsFunction.find name)
-        with Not_found -> None
-      in
-      if enabled || mode <> None
-      then add (make (), mode) config
-      else config
+      let enabled = Value_parameters.Domains.mem name in
+      try
+        let mode = Value_parameters.DomainsFunction.find name in
+        let mode = if enabled then add_main_mode mode else mode in
+        add (make (), Some mode) config
+      with Not_found ->
+        if enabled then add (make (), None) config else config
     in
     let aux config (Flag domain as flag) =
       add config domain.name (fun () -> flag)
