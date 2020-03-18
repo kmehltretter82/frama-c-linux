@@ -28,8 +28,8 @@
 (* ************************************************************************* *)
 
 val register:
-  ?comment:string -> 
-  plugin:string -> 
+  ?comment:string ->
+  plugin:string ->
   string -> 'a Type.t -> journalize:bool -> 'a -> 'a
 (** [register ~plugin name ty v] registers [v] with the name
     [name], the type [ty] and the plug-in [plugin].
@@ -71,7 +71,7 @@ val iter_comment : (string -> string -> unit) -> unit
 (* ************************************************************************* *)
 
 (** Module to use for accessing parameters of plug-ins.
-    Assume that the plug-in is already loaded. 
+    Assume that the plug-in is already loaded.
     @plugin development guide *)
 module Parameter : sig
 
@@ -99,7 +99,7 @@ module Parameter : sig
   (** Not for casual users *)
   (**/**)
 
-  (** Boolean parameters. 
+  (** Boolean parameters.
       @plugin development guide *)
   module Bool: sig
     include Common with type t = bool

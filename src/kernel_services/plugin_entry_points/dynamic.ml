@@ -55,24 +55,24 @@ exception Unbound_value = Tbl.Unbound_value
 
 let dynlib_error name = function
   | Dynlink.Error e ->
-      error ~name ~message:"cannot load module" ~details:(Dynlink.error_message e) ;
+    error ~name ~message:"cannot load module" ~details:(Dynlink.error_message e) ;
   | Sys_error _ as e ->
-      error ~name ~message:"system error" ~details:(Printexc.to_string e)
+    error ~name ~message:"system error" ~details:(Printexc.to_string e)
   | Unloadable details ->
-      error ~name ~message:"incompatible with current set-up" ~details
+    error ~name ~message:"incompatible with current set-up" ~details
   (* the three next errors may be raised in case of incompatibilities with
      another plug-in *)
   | Incompatible_type s ->
-      error ~name ~message:"code incompatibility" ~details:s
+    error ~name ~message:"code incompatibility" ~details:s
   | Unbound_value s ->
-      error ~name ~message:"code incompatibility" ~details:("unbound value " ^ s)
+    error ~name ~message:"code incompatibility" ~details:("unbound value " ^ s)
   | Type.No_abstract_type s ->
-      error ~name ~message:"code incompatibility" ~details:("unbound abstract type " ^ s)
+    error ~name ~message:"code incompatibility" ~details:("unbound abstract type " ^ s)
   | Log.AbortError _ | Log.AbortFatal _ | Log.FeatureRequest _ as e ->
-      raise e
+    raise e
   | e ->
-      error ~name ~message:("unexpected exception: " ^ Printexc.to_string e)
-        ~details:(Printexc.get_backtrace ())
+    error ~name ~message:("unexpected exception: " ^ Printexc.to_string e)
+      ~details:(Printexc.get_backtrace ())
 
 let dynlib_module name file =
   Klog.feedback ~dkey "Loading module '%s' from '%s'." name file ;
@@ -241,13 +241,15 @@ let load_script base =
   let fmt = Format.formatter_of_buffer cmd in
   begin
     if Dynlink.is_native then
-      Format.fprintf fmt "%s -shared -o %s.cmxs" Fc_config.ocamlopt base
+      Format.fprintf fmt "%s -shared -o %S.cmxs" Fc_config.ocamlopt base
     else
       Format.fprintf fmt "%s -c" Fc_config.ocamlc ;
-    Format.fprintf fmt " -g %s -warn-error a -I %s" Fc_config.ocaml_wflags Fc_config.libdir ;
-    if !Fc_config.is_gui then Format.pp_print_string fmt " -package lablgtk2" ;
+    Format.fprintf fmt
+      " -g %s -warn-error a -I %s" Fc_config.ocaml_wflags Fc_config.libdir ;
+    if !Fc_config.is_gui && Fc_config.lablgtk <> "" then
+      Format.fprintf fmt " -package %s" Fc_config.lablgtk;
     List.iter (fun p -> Format.fprintf fmt " -I %s" p) !load_path ;
-    Format.fprintf fmt " %s.ml" base ;
+    Format.fprintf fmt " %S.ml" base ;
     Format.pp_print_flush fmt () ;
     let cmd = Buffer.contents cmd in
     Klog.feedback ~dkey "running '%s'" cmd ;
@@ -321,31 +323,31 @@ let load_module m =
   let base,ext = split_ext m in
   match ext with
   | ".ml" ->
-      begin
-        (* force script compilation *)
+    begin
+      (* force script compilation *)
+      match is_file base ".ml" with
+      | Some _ -> load_script base
+      | None -> Klog.error "Missing source file '%s'" m
+    end
+  | "" | "." | ".cmo" | ".cma" | ".cmxs" ->
+    begin
+      (* load object or compile script or find package *)
+      match is_object base with
+      | Some file -> dynlib_module (Filename.basename base) file
+      | None ->
         match is_file base ".ml" with
         | Some _ -> load_script base
-        | None -> Klog.error "Missing source file '%s'" m
-      end
-  | "" | "." | ".cmo" | ".cma" | ".cmxs" ->
-      begin
-        (* load object or compile script or find package *)
-        match is_object base with
-        | Some file -> dynlib_module (Filename.basename base) file
         | None ->
-            match is_file base ".ml" with
-            | Some _ -> load_script base
-            | None ->
-                if is_package m && mem_package m then load_packages [m]
-                else
-                  let fc =
-                    "frama-c-" ^ String.lowercase_ascii m
-                  in
-                  if mem_package fc then load_packages [fc]
-                  else Klog.error "package or module '%s' not found" m
-      end
+          if is_package m && mem_package m then load_packages [m]
+          else
+            let fc =
+              "frama-c-" ^ String.lowercase_ascii m
+            in
+            if mem_package fc then load_packages [fc]
+            else Klog.error "package or module '%s' not found" m
+    end
   | _ ->
-      Klog.error "don't know what to do with '%s' (unexpected %s)" m ext
+    Klog.error "don't know what to do with '%s' (unexpected %s)" m ext
 
 (* ************************************************************************* *)
 (** {2 Registering and accessing dynamic values} *)
