@@ -163,7 +163,6 @@ val configure_precision: unit -> unit
 
 val parameters_correctness: Typed_parameter.t list
 val parameters_tuning: Typed_parameter.t list
-val parameters_abstractions: Typed_parameter.t list
 
 (** Debug categories responsible for printing initial and final states of Value.
     Enabled by default, but can be disabled via the command-line:

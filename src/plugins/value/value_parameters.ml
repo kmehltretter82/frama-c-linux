@@ -234,11 +234,6 @@ module DomainsFunction =
     end)
 let () = add_precision_dep DomainsFunction.parameter
 
-(* Set of parameters defining the abstractions used in an Eva analysis. *)
-let parameters_abstractions =
-  ref (Typed_parameter.Set.of_list
-         [Domains.parameter; DomainsFunction.parameter])
-
 
 let () = Parameter_customize.set_group domains
 module EqualityCall =
@@ -1547,8 +1542,6 @@ let parameters_correctness =
   Typed_parameter.Set.elements !parameters_correctness
 let parameters_tuning =
   Typed_parameter.Set.elements !parameters_tuning
-let parameters_abstractions =
-  Typed_parameter.Set.elements !parameters_abstractions
 
 
 
