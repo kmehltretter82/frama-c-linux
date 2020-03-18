@@ -319,7 +319,7 @@ view, eg. mouse-scrolling, edition, cursor move, etc.  The escape key `ESC`
 explicitly relax the _focused_ state, although the editor view might actually
 keep the _focus_.
 
-When a buffer is _focused_, shrinking and scrolling are temporarily deactivated
+When a buffer is _focused_, shrinking and auto-scrolling are temporarily deactivated
 to avoid confusing user's experience.
 
 The method fires `'focused'` events on modifications. This method is bound to
@@ -395,17 +395,18 @@ Typical usage:
  - `scroll(p,q)` a range of two positions (like above);
  - `scroll({from,to})` an object range of two positions (like above).
 
-When the buffer is _focused_, programmatic scrolling is blocked.
+When the buffer is _focused_, programmatic auto-scrolling with `scroll()`
+is blocked.
    */
   scroll(a,b) {
-    if (this._focused) return;
     switch(typeof(a)) {
     case 'undefined':
+      if (this._focused) return;
       this.emit('scroll',{line:this._doc.lastLine(),ch:0});
       break;
     case 'string':
       const tm = this.findTextMarker(a);
-      const rg = tm.find();
+      const rg = tm && tm.find();
       if (rg) this.emit('scroll',rg);
       break;
     default:
