@@ -28,7 +28,7 @@ int main(void)
   z = - x;
   /*@ assert rte: signed_overflow: -2147483647 ≤ (int)(-0x7fffffff) - 1; */
   z = - (-0x7fffffff - 1);
-  /*@ assert rte: signed_downcast: -ux ≤ 2147483647; */
+  /*@ assert rte: signed_downcast: (unsigned int)(-ux) ≤ 2147483647; */
   z = (int)(- ux);
   /*@ assert
       rte: signed_overflow:
@@ -36,11 +36,11 @@ int main(void)
   */
   /*@ assert
       rte: signed_downcast:
-        (int)((unsigned short)((int)(65535 + 3))) + x ≤ 32767;
+        (int)((int)((unsigned short)((int)(65535 + 3))) + x) ≤ 32767;
   */
   /*@ assert
       rte: signed_downcast:
-        -32768 ≤ (int)((unsigned short)((int)(65535 + 3))) + x;
+        -32768 ≤ (int)((int)((unsigned short)((int)(65535 + 3))) + x);
   */
   sz = (short)((int)((unsigned short)(65535 + 3)) + x);
   z = (int)(-0x80000000 - (unsigned int)1);

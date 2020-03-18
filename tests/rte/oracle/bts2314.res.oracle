@@ -12,8 +12,8 @@ void foo(int a, long b)
   s.num = (int)b;
   /*@ assert rte: signed_overflow: -2147483648 ≤ (int)s.num + a; */
   /*@ assert rte: signed_overflow: (int)s.num + a ≤ 2147483647; */
-  /*@ assert rte: signed_downcast: (int)s.num + a ≤ 63; */
-  /*@ assert rte: signed_downcast: -64 ≤ (int)s.num + a; */
+  /*@ assert rte: signed_downcast: (int)((int)s.num + a) ≤ 63; */
+  /*@ assert rte: signed_downcast: -64 ≤ (int)((int)s.num + a); */
   s.num = (int)((int)s.num + a);
   return;
 }
