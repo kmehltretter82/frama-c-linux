@@ -164,24 +164,20 @@ module Tag : S_collection with type t = Syntax.tag
 
 (** Enum factory.
 
-    You shall start by declaring a dictionnary with
-    [Enum.dictionary] for your values.
-    Then, populate the dictionary with [Enum.tag] values.
-    Finally, you shall call [Enum.publish] to obtain a new data module
-    for your type.
+    You shall start by declaring a dictionary with [Enum.dictionary] for your
+    values. Then, populate the dictionary with [Enum.tag] values. Finally, you
+    shall call [Enum.publish] to obtain a new data module for your type.
 
-    You have two options for computing tags: either you provide values
-    when declaring tags, and these tags will be associated to registered
-    values for both directions;
-    alternatively you might provide a [~tag] function to [Enum.publish].
+    You have two options for computing tags: either you provide values when
+    declaring tags, and these tags will be associated to registered values for
+    both directions; alternatively you might provide a [~tag] function to
+    [Enum.publish].
 
     The difficulty when providing values only at tag definition is to ensure
     that all possible value has been registered.
 
     The conversion values from and to json may fail when no value has been
-    registered with tags.
-*)
-
+    registered with tags. *)
 module Enum :
 sig
 
@@ -191,12 +187,12 @@ sig
 
   val tag_name : 'a tag -> string
 
-  (** Creates an opened, empty dictionnary. *)
+  (** Creates an opened, empty dictionary. *)
   val dictionary :
     page:Doc.page -> name:string -> title:string -> descr:Markdown.text ->
     unit -> 'a dictionary
 
-  (** Register a new tag in the dictionnary.
+  (** Register a new tag in the dictionary.
       The default label is the capitalized name.
       The provided value, if any, will be used for decoding json tags.
       If would be used also for encoding values to json tags if no [~tag]
@@ -234,19 +230,17 @@ sig
     ?value:'a ->
     unit -> 'a tag
 
-  (** Obtain all the tags registered in the dictionnary so far. *)
+  (** Obtain all the tags registered in the dictionary so far. *)
   val tags : 'a dictionary -> Tag.t list
 
   val page : 'a dictionary -> Doc.page
   val name : 'a dictionary -> string
   val syntax : 'a dictionary -> Markdown.text
 
-  (** Publish the dictionnary. To more tag nor prefix can be added after.
-      If no [~tag] function is provided, registered values with tags
-      are used. *)
-  val publish : 'a dictionary ->
-    ?tag:('a -> 'a tag) ->
-    unit -> (module S with type t = 'a)
+  (** Publish the dictionary. No more tag nor prefix can be added afterwards. If
+      no [~tag] function is provided, registered values with tags are used. *)
+  val publish :
+    'a dictionary -> ?tag:('a -> 'a tag) -> unit -> (module S with type t = 'a)
 
 end
 
