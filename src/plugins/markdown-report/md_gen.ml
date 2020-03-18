@@ -40,23 +40,22 @@ let sanitize_anchor s =
   else s
 
 let all_eva_domains =
-  [ "-eva-apron-box", "box domain of the Apron library";
-    "-eva-apron-oct", "octagon domain of the Apron library";
-    "-eva-bitwise-domain", "domain for bitwise computations";
-    "-eva-equality-domain",
-    "domain for storing equalities between memory locations";
-    "-eva-gauges-domain",
-    "gauges domain for relations between memory locations and loop counter";
-    "-eva-inout-domain",
-    "domain for input and output memory locations";
-    "-eva-polka-equalities",
-    "linear equalities domain of the Apron library";
-    "-eva-polka-loose",
-    "loose polyhedra domain of the Apron library";
-    "-eva-polka-strict",
-    "strict polyhedra domain of the Apron library";
-    "-eva-sign-domain", "sign domain (useful only for demos)";
-    "-eva-symbolic-locations-domain",
+  [ "apron-box", "box domain of the Apron library";
+    "apron-oct", "octagon domain of the Apron library";
+    "apron-polka-equalities", "linear equalities domain of the Apron library";
+    "apron-polka-loose", "loose polyhedra domain of the Apron library";
+    "apron-polka-strict", "strict polyhedra domain of the Apron library";
+    "bitwise", "domain for bitwise computations";
+    "equality", "domain for storing equalities between memory locations";
+    "gauges", "gauges domain for relations between memory locations \
+               and loop counter";
+    "inout", "domain for input and output memory locations";
+    "octagon", "domain inferring relations b ≤ ±X ± Y ≤ e between pairs of \
+                integer variables X and Y.";
+    "numerors", "domain computing absolute and relative errors \
+                 of floating-point computations";
+    "sign", "sign domain (useful only for demos)";
+    "symbolic-locations",
     "domain computing ranges of variation for symbolic locations \
      (e.g. `a[i]` when `i` is not precisely known by `Cvalue`)"
   ]
@@ -72,10 +71,17 @@ let plural l s =
   | _::_::_ -> s ^ "s"
 
 let get_eva_domains () =
-  Extlib.filter_map
-    (fun (x,_) -> Dynamic.Parameter.Bool.get x ())
-    (fun (x,y) -> (plain "option" @ bold x), plain y)
-    all_eva_domains
+  let eva_domains = Dynamic.Parameter.String.get "-eva-domains" () in
+  let domains_list = String.split_on_char ',' eva_domains in
+  let alternative_domains = List.filter ((<>) "cvalue") domains_list in
+  let aux domain =
+    let descr =
+      try List.assoc domain all_eva_domains
+      with Not_found -> ""
+    in
+    (plain "domain" @ bold domain), plain descr
+  in
+  List.map aux alternative_domains
 
 let section_domains env =
   let anchor = "domains" in
@@ -92,12 +98,12 @@ let section_domains env =
        | [] ->
          [Text
             (plain
-               "Only the base domain (`Cvalue`) \
+               "Only the base domain (`cvalue`) \
                 has been used for the analysis")]
        | _ ->
          [Text
             (plain
-               "In addition to the base domain (`Cvalue`), additional \
+               "In addition to the base domain (`cvalue`), additional \
                 domains have been used by EVA");
           DL l]
       )
