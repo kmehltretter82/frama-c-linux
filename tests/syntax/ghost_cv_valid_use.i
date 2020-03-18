@@ -88,6 +88,9 @@ void assigns_clause(void){
   }
 */
 
+// Note: this should be accepted as the pointer might point to a
+// memory location which is indeed assigned by the actual code.
+
 /*@ assigns *p ; */
 void ng_decl_star(void) /*@ ghost (int \ghost *p) */ ;
 
@@ -95,9 +98,6 @@ void ng_decl_star(void) /*@ ghost (int \ghost *p) */ ;
 void ng_def_star(void) /*@ ghost (int \ghost *p) */ {
 
 }
-
-// Note: this should be accepted as the pointer might point to a
-// memory location which is indeed assigned by the actual code.
 
 /*@ assigns *p ; */
 void ng_decl_star_ng(void) /*@ ghost (int *p) */ ;
