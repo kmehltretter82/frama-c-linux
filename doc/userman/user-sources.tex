@@ -55,7 +55,7 @@ Here are some examples for using this option.
 \$ frama-c -cpp-command 'CL.exe /C /E %args %i > %o' file1.c file2.i
 \end{shell}
 
-When using the above option, you may add \optiondef{-}{cpp-frama-c-compliant}
+When using \optionuse{-}{cpp-command}, you may add \optiondef{-}{cpp-frama-c-compliant}
 to indicate that the custom preprocessor accepts the same set of options as GNU
 \texttt{cpp}.
 \optionuse{-}{cpp-frama-c-compliant} also implies some extra
@@ -71,6 +71,9 @@ file named \texttt{compile\_commands.json}. With this option set,
 \FramaC will parse
 the compilation database and include associated preprocessing flags,
 as if they had been manually added via \texttt{-cpp-extra-args-per-file}.
+Note: if both \texttt{-cpp-extra-args-per-file} and the JSON compilation
+database specify options for a given file, the former are used and the latter
+are ignored.
 
 In all of the above cases,
 \acsl annotations are pre-processed by default (option \optiondef{-}{pp-annot}

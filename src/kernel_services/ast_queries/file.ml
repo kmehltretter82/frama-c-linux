@@ -123,22 +123,22 @@ let from_filename ?cpp f =
     if cmdline <> "" then
       cmdline, cpp_opt_kind ()
     else
+      let extra_flags =
+        try Kernel.CppExtraArgsPerFile.find f
+        with Not_found -> ""
+      in
       let jcdb_flags = Json_compilation_database.get_flags f in
+      if extra_flags <> "" && jcdb_flags <> [] then
+        Kernel.warning ~wkey:Kernel.wkey_jcdb
+          "found flags for file %a@ both in -cpp-extra-args-per-file and@ \
+           in the json compilation database;@ the latter will be ignored"
+          Filepath.Normalized.pretty f;
       let cpp, gnu =
         match cpp with
         | None -> get_preprocessor_command ()
         | Some cpp -> cpp, cpp_opt_kind ()
       in
-      let extra_flags =
-        try Kernel.CppExtraArgsPerFile.find f
-        with Not_found -> ""
-      in
-      if jcdb_flags <> [] && extra_flags <> "" then
-        Kernel.warning ~once:true
-          "found flags for file %a both in json compilation database and \
-           -cpp-extra-args-per-file; this is unsupported and non-deterministic \
-           behavior may happen" Filepath.Normalized.pretty f;
-      let flags = extra_flags :: jcdb_flags in
+      let flags = if extra_flags <> "" then [extra_flags] else jcdb_flags in
       (if flags = [] then cpp else cpp ^ " " ^ String.concat " " flags), gnu
   in
   if Filename.check_suffix (f:>string) ".i" then begin
