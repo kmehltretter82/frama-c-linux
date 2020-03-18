@@ -17,6 +17,7 @@
 Open Source Release <next-release>
 ##################################
 
+-*  Kernel    [2020/03/18] Fixes #@818 (term generated for downcast alarms) 
 -   Eva       [2020/03/17] Supports the ACSL extended quantifiers \min and \max.
 -   Eva       [2020/03/17] deprecate options -eva-*-domain in favor of
               -eva-domains
