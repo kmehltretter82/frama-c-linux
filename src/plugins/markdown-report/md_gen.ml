@@ -39,28 +39,6 @@ let sanitize_anchor s =
   else if s.[0] = '_' then "a" ^ s
   else s
 
-let all_eva_domains =
-  [ "-eva-apron-box", "box domain of the Apron library";
-    "-eva-apron-oct", "octagon domain of the Apron library";
-    "-eva-bitwise-domain", "domain for bitwise computations";
-    "-eva-equality-domain",
-    "domain for storing equalities between memory locations";
-    "-eva-gauges-domain",
-    "gauges domain for relations between memory locations and loop counter";
-    "-eva-inout-domain",
-    "domain for input and output memory locations";
-    "-eva-polka-equalities",
-    "linear equalities domain of the Apron library";
-    "-eva-polka-loose",
-    "loose polyhedra domain of the Apron library";
-    "-eva-polka-strict",
-    "strict polyhedra domain of the Apron library";
-    "-eva-sign-domain", "sign domain (useful only for demos)";
-    "-eva-symbolic-locations-domain",
-    "domain computing ranges of variation for symbolic locations \
-     (e.g. `a[i]` when `i` is not precisely known by `Cvalue`)"
-  ]
-
 let insert_marks env anchor =
   Comment "BEGIN_REMARK"
   :: insert_remark env anchor
@@ -72,10 +50,10 @@ let plural l s =
   | _::_::_ -> s ^ "s"
 
 let get_eva_domains () =
-  Extlib.filter_map
-    (fun (x,_) -> Dynamic.Parameter.Bool.get x ())
-    (fun (x,y) -> (plain "option" @ bold x), plain y)
-    all_eva_domains
+  let eva_domains = Eva.Value_parameters.enabled_domains () in
+  let domains = List.filter (fun (name, _) -> name <> "cvalue") eva_domains in
+  let aux (name, descr) = (plain "domain" @ bold name), plain descr in
+  List.map aux domains
 
 let section_domains env =
   let anchor = "domains" in
@@ -92,12 +70,12 @@ let section_domains env =
        | [] ->
          [Text
             (plain
-               "Only the base domain (`Cvalue`) \
+               "Only the base domain (`cvalue`) \
                 has been used for the analysis")]
        | _ ->
          [Text
             (plain
-               "In addition to the base domain (`Cvalue`), additional \
+               "In addition to the base domain (`cvalue`), additional \
                 domains have been used by EVA");
           DL l]
       )

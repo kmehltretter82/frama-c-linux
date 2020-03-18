@@ -230,6 +230,9 @@ val dkey_widening : category
 (** Registers available domain names for the -eva-domains option. *)
 val register_domain: name:string -> descr:string -> unit
 
+(** Returns the list (name, descr) of currently enabled domains. *)
+val enabled_domains: unit -> (string * string) list
+
 (*
 Local Variables:
 compile-command: "make -C ../../.."
