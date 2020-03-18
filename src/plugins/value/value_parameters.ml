@@ -193,12 +193,6 @@ let register_domain ~name ~descr =
   Cmdline.replace_option_help
     Domains.option_name "eva" domains (domains_help ())
 
-let enabled_domains () =
-  let domains = Domains.get () in
-  List.filter
-    (fun (name, _) -> Datatype.String.Set.mem name domains)
-    !domains_ref
-
 (* Checks that a domain has been registered. *)
 let check_domain domain =
   if domain = "help" || domain = "list"
@@ -234,6 +228,13 @@ module DomainsFunction =
     end)
 let () = add_precision_dep DomainsFunction.parameter
 
+let enabled_domains () =
+  let domains = Domains.get () in
+  let domains_by_fct = DomainsFunction.get () in
+  List.filter
+    (fun (name, _) -> Datatype.String.Set.mem name domains
+                      || Datatype.String.Map.mem name domains_by_fct)
+    !domains_ref
 
 let () = Parameter_customize.set_group domains
 module EqualityCall =
