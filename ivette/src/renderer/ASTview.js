@@ -20,13 +20,12 @@ import 'codemirror/theme/ambiance.css' ;
 // --- Rich Text Printer
 // --------------------------------------------------------------------------
 
-const print = async (buffer, text) => {
+const print = (buffer, text) => {
   if (Array.isArray(text)) {
     const tag = text.shift();
     if (tag !== '')
       buffer.openTextMarker( { id:tag } );
-    for (const k in text)
-      await print(buffer, text[k]);
+    text.forEach(txt => print(buffer, txt));
     if (tag !== '')
       buffer.closeTextMarker();
   } else if (typeof(text)==='string')
@@ -51,15 +50,21 @@ const ASTview = () => {
     if (theFunction) {
       buffer.log('// Loading',theFunction,'…');
       Server
-      .sendGET("kernel.ast.printFunction", theFunction)
-      .then(data => {
-        buffer.clear();
-        if (!data)
-          buffer.log('// No code for function ', theFunction);
-        return print(buffer,data);
+        .sendGET("kernel.ast.printFunction", theFunction)
+        .then(data => {
+          buffer.clear();
+          if (!data)
+            buffer.log('// No code for function ', theFunction);
+          print(buffer,data);
+          if (theMarker) buffer.scroll( theMarker );
       });
     }
   }, [ theFunction ] );
+
+  // Hook: scrolling
+  React.useEffect( () => {
+    if (theMarker) buffer.scroll( theMarker );
+  }, [ theMarker ] );
 
   // Callbacks
   const onSelection = marker => setSelect({ marker });
