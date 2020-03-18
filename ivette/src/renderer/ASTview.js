@@ -43,26 +43,35 @@ const ASTview = () => {
   const buffer = React.useMemo( () => new Buffer(), []);
   const [ select, setSelect ] = States.useSelection();
   const theFunction = select && select.function ;
+  const theMarker = select && select.marker ;
+
+  // Hook: async loading
   React.useEffect( () => {
     buffer.clear();
     if (theFunction) {
-      buffer.log('Loading',theFunction,'…');
+      buffer.log('// Loading',theFunction,'…');
       Server
       .sendGET("kernel.ast.printFunction", theFunction)
       .then(data => {
         buffer.clear();
+        if (!data)
+          buffer.log('// No code for function ', theFunction);
         return print(buffer,data);
       });
     }
   }, [ theFunction ] );
 
+  // Callbacks
+  const onSelection = marker => setSelect({ marker });
+
+  // Component
   return (
     <Vfill>
-      <div>Function: {select && select.function}</div>
-      <div>Marker: {select && select.marker}</div>
       <Text buffer={buffer}
             mode='text/x-csrc'
             theme='ambiance'
+            selection={theMarker}
+            onSelection={onSelection}
             readOnly />
     </Vfill>
   );

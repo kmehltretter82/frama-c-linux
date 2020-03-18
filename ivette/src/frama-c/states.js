@@ -434,7 +434,7 @@ const SELECTION = 'kernel.selection' ;
 setStateDefault( SELECTION , {} );
 
 /**
-   @sumamry Current selection state.
+   @summary Current selection state.
    @return {array} `[selection,update]` for the current selection
    @description
    The selection is an object with many independant fields.
