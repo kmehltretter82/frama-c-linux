@@ -49,7 +49,7 @@ const RenderTable = () => {
       <Table model={model}
              selection={selection}
              onSelection={onSelection}
-             scrollTo={selection}
+             scrollToItem={selection}
              >
         <ColumnCode id='function' label='Function' width={120} />
         <ColumnCode id='descr' label='Description' fill />
