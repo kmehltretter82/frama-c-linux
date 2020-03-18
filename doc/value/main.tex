@@ -3904,7 +3904,7 @@ with large arrays and matrices, it is worth considering its usage.
 \label{sec:eva}
 
 
-Starting from \FramaC Silicon, new analysis \emph{domains} are
+This section presents the analysis \emph{domains}
 available to improve the precision on specific code constructs.
 They can (and probably should) be enabled at the beginning of the analysis.
 Their only downside is that they increase the analysis time.
@@ -3913,7 +3913,21 @@ These analysis domains are enabled by the option \texttt{-eva-domains}, followed
 by a list of domain names. A list of the available domains, and a short
 description of each one, can be displayed with \texttt{-eva-domains help}.
 
-\emph{Restrictions:}
+Domains can also be enabled for specific functions through option
+\texttt{-eva-domains-function}:
+\begin{itemize}
+\item \texttt{-eva-domains-function d1:f,d1:g,d2:h} enables the domain
+  \texttt{d1} on functions \lstinline+f+ and \lstinline+g+, and the domain
+  \texttt{d2} on function \lstinline+h+.
+\item \texttt{-eva-domains-function d:f+} enables the domain
+  \texttt{d} on function \lstinline+f+ and on any function called
+  from \lstinline+f+.
+\item \texttt{-eva-domains-function d:f-} disables the domain
+  \texttt{d} on function \lstinline+f+ and on any function called
+  from \lstinline+f+.
+\end{itemize}
+
+These analysis domains currently have some restrictions:
 \begin{itemize}
 \item adding a new domain may interact with the \lstinline+slevel+ partitioning
   in unpredictable ways, and new alarms may sometimes appear;
