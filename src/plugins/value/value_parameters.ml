@@ -193,6 +193,12 @@ let register_domain ~name ~descr =
   Cmdline.replace_option_help
     Domains.option_name "eva" domains (domains_help ())
 
+let enabled_domains () =
+  let domains = Domains.get () in
+  List.filter
+    (fun (name, _) -> Datatype.String.Set.mem name domains)
+    !domains_ref
+
 (* Checks that a domain has been registered. *)
 let check_domain domain =
   if domain = "help" || domain = "list"

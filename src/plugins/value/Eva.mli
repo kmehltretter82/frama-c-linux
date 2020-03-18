@@ -22,8 +22,6 @@
 
 (** Analysis for values and pointers *)
 
-(** No function is directly exported: they are registered in {!Db.Value}. *)
-
 module Value_results: sig
   type results
 
@@ -32,4 +30,9 @@ module Value_results: sig
   val merge: results -> results -> results
   val change_callstacks:
     (Value_types.callstack -> Value_types.callstack) -> results -> results
+end
+
+module Value_parameters: sig
+  (** Returns the list (name, descr) of currently enabled abstract domains. *)
+  val enabled_domains: unit -> (string * string) list
 end
