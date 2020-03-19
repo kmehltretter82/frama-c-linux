@@ -45,13 +45,18 @@ module Marker =
 struct
 
   open Printer_tag
-  module Hmap = Hashtbl.Make(Localizable)
 
-  type index = string Hmap.t * (string,localizable) Hashtbl.t
+  type index = {
+    tags : string Localizable.Hashtbl.t ;
+    locs : (string,localizable) Hashtbl.t ;
+  }
 
   let kid = ref 0
 
-  let index () = Hmap.create 0, Hashtbl.create 0
+  let index () = {
+    tags = Localizable.Hashtbl.create 0 ;
+    locs = Hashtbl.create 0 ;
+  }
 
   module TYPE : Datatype.S with type t = index =
     Datatype.Make
@@ -81,15 +86,15 @@ struct
     | PIP _ -> Printf.sprintf "#p%d" (incr kid ; !kid)
 
   let create loc =
-    let (tags,index) = STATE.get () in
-    try Hmap.find tags loc
+    let { tags ; locs } = STATE.get () in
+    try Localizable.Hashtbl.find tags loc
     with Not_found ->
       let tag = create_tag loc in
-      Hmap.add tags loc tag ;
-      Hashtbl.add index tag loc ;
+      Localizable.Hashtbl.add tags loc tag ;
+      Hashtbl.add locs tag loc ;
       tag
 
-  let lookup = Hashtbl.find (STATE.get() |> snd)
+  let lookup = Hashtbl.find (STATE.get()).locs
 
   type t = localizable
   let syntax = Sy.publish ~page:Data.page ~name:"marker"

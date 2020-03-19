@@ -38,7 +38,7 @@ type localizable =
   | PIP of Property.t
 
 module Localizable =
-  Datatype.Make
+  Datatype.Make_with_collections
     (struct
       include Datatype.Undefined
       type t = localizable
