@@ -21,30 +21,50 @@
 (**************************************************************************)
 
 (* -------------------------------------------------------------------------- *)
-(** Data Encoding *)
+(** {2 Data Encoding}
+
+    This module is responsible for marshaling and demarshaling data
+    to handle communications between the server and the client in both
+    directions.
+
+    Each datatype must be equipped with function to
+    encode and decode values to/from JSON format.
+    Moreover, data types shall be also properly documented and registered
+    in the generated documentation of the Frama-C server.
+
+    Generally speaking, we will have a module with signature [Data.D] for
+    every datatype to be exchanged with the server. For simple values,
+    predefined modules are already provided. More complex datatypes can be
+    build with some functors, typically for options, lists or arrays.
+
+    Records and enumarated types are typical in JSON formatting, but difficult
+    to build from OCaml records and abstract datatypes. For those kinds of data,
+    we provide an API based on the following general scheme:
+    - you first create a empty container with its name, documentation and such;
+    - then you add each field or constructor to the container;
+    - finally you pack the container, which actually registers its complete
+       documentation and returns an OCaml value containing the resulting
+       datatype module.
+
+    The same mechanism is used in modules [States] and [Request].
+*)
 (* -------------------------------------------------------------------------- *)
 
 type json = Json.t
 
-val page : Doc.page (** Page for general purpose data types *)
+val page : Doc.page (** Documentation page for general purpose data types *)
 val pretty : Format.formatter -> json -> unit
 
 module type S =
 sig
   type t
-  val syntax : Syntax.t
+  val syntax : Syntax.t (** readable description of the JSON format *)
   val of_json : json -> t
   val to_json : t -> json
 end
 
 
-(** Datatype registration.
-
-    Name and page must be consistent with each other:
-    - The name must be lowercase, dash-separated list of identifiers
-    - Protocol data must start with ["<server>-*"]
-    - Plugin data must start with ["<plugin>-*"]
-*)
+(** Datatype informations. *)
 module type Info =
 sig
   val page : Doc.page
@@ -69,16 +89,6 @@ end
 module Collection(A : S) : S_collection with type t = A.t
 
 (* -------------------------------------------------------------------------- *)
-(** {2 Constructors} *)
-(* -------------------------------------------------------------------------- *)
-
-module Joption(A : S) : S with type t = A.t option
-module Jpair(A : S)(B : S) : S with type t = A.t * B.t
-module Jtriple(A : S)(B : S)(C : S) : S with type t = A.t * B.t * C.t
-module Jlist(A : S) : S with type t = A.t list
-module Jarray(A : S) : S with type t = A.t array
-
-(* -------------------------------------------------------------------------- *)
 (** {2 Atomic Data} *)
 (* -------------------------------------------------------------------------- *)
 
@@ -93,16 +103,29 @@ module Jtext : S with type t = json (** Rich text encoding, see [Jbuffer] *)
 module Jmarkdown : S with type t = Markdown.text
 
 (* -------------------------------------------------------------------------- *)
+(** {2 Constructors} *)
+(* -------------------------------------------------------------------------- *)
+
+module Joption(A : S) : S with type t = A.t option
+module Jpair(A : S)(B : S) : S with type t = A.t * B.t
+module Jtriple(A : S)(B : S)(C : S) : S with type t = A.t * B.t * C.t
+module Jlist(A : S) : S with type t = A.t list
+module Jarray(A : S) : S with type t = A.t array
+
+(* -------------------------------------------------------------------------- *)
 (** {2 Records} *)
 (* -------------------------------------------------------------------------- *)
 
 (** Record factory.
 
     You shall start by declaring a (ghost) type [r] and call
-    [Record.signature] to create a signature of type [r].
-    Then, populate the record with [Record.field] or [Record.option].
-    Finally, you shall call [Record.publish] to obtain a new data module
-    of type [Record with type r = r], which gives you a [Data] with an opaque
+    [Record.signature] to create a signature of type [r], which will be
+    your container to register your record fields.
+
+    Then, populate the signature with [Record.field] or [Record.option].
+    Finally, you shall call [Record.publish] to pack the record signature and
+    obtain a new data module of type [Record with type r = r],
+    which gives you a [Data] with an opaque
     type [t = r record] with fields of type [(r,a) field].
 
     {[
@@ -245,7 +268,19 @@ sig
 end
 
 (* -------------------------------------------------------------------------- *)
-(** {2 Indexed Values} *)
+(** {2 Indexed Values}
+
+    These datatypes automatically index complex values with
+    unique identifiers. This avoids to encode the internal OCaml
+    representation of each value, by only providing to the server
+    a unique identifier for each value.
+
+    These datatype functors come into three flavors:
+    - [Index()] for projectified datatypes,
+    - [Static()] for project independant datatypes,
+    - [Identified()] for projectified values already identified by integers.
+
+*)
 (* -------------------------------------------------------------------------- *)
 
 (** Simplified [Map.S] *)
@@ -258,6 +293,7 @@ sig
   val find : key -> 'a t -> 'a
 end
 
+(** Datatype extended with access to value identifiers. *)
 module type Index =
 sig
   include S_collection
@@ -273,10 +309,7 @@ module Static(M : Map)(I : Info) : Index with type t = M.key
 (** Builds a {i projectified} index. *)
 module Index(M : Map)(I : Info) : Index with type t = M.key
 
-(* -------------------------------------------------------------------------- *)
-(** {2 Identified Types} *)
-(* -------------------------------------------------------------------------- *)
-
+(** Datatype already identified by unique integers. *)
 module type IdentifiedType =
 sig
   type t
@@ -288,7 +321,11 @@ end
 module Identified(A : IdentifiedType) : Index with type t = A.t
 
 (* -------------------------------------------------------------------------- *)
-(** {2 Error handling} *)
+(** {2 Error handling}
+
+    These utilities shall be used when writing your own encoding and decoding
+    values to JSON format.
+*)
 (* -------------------------------------------------------------------------- *)
 
 (** Exception thrown during the decoding of a request's inputs *)
