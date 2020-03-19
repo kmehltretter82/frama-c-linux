@@ -44,8 +44,19 @@ end
 type 'a input = (module Input with type t = 'a)
 type 'b output = (module Output with type t = 'b)
 
-(** {2 Signals} *)
+(** {2 Signals}
 
+    A signal is a one-way message from server to client for indicating that
+    something happened. To avoid unecessary noise, the client must be registered
+    on each of signal it is interested in. The client will then send a proper get
+    requests to the server to retrieve the updated data.
+
+    As a matter of fact, update events are much more frequent than what a
+    typical GUI client can handle. Hence, signal emissions can not carry data
+    and are grouped (or « debounced ») until the next server
+    response to client. *)
+
+(** The type of registered signals. *)
 type signal
 
 (** Register a server signal. The signal [name] must be unique. *)
