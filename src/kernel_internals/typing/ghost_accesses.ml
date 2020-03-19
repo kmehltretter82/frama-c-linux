@@ -73,7 +73,7 @@ module Error = struct
       "Call via a function pointer cannot be checked" ;
 end
 
-let is_ret_var vi =
+let is_generated_ret_var vi =
   String.equal vi.vorig_name "__retres"
 
 let get_lvalue = function
@@ -81,7 +81,8 @@ let get_lvalue = function
   | Local_init(vi, _, _) -> Some (Cil.var vi)
   | _ -> None
 
-let rec ghost_term_type = function
+let rec ghost_term_type t =
+  match (Logic_utils.unroll_type t) with
   | Ctype t -> isGhostType t
   | t when Logic_const.is_set_type t ->
     ghost_term_type (Logic_const.type_of_element t)
@@ -128,7 +129,8 @@ class visitor = object(self)
       if vi.vghost && vi.vreferenced
          && not (Kernel_function.has_definition kf)
       then begin
-        let spec = try Annotations.funspec ~populate:false kf
+        let spec =
+          try Annotations.funspec ~populate:false kf
           with _ -> empty_funspec ()
         in
         if is_empty_funspec spec then self#bad_ghost_function kf
@@ -137,11 +139,12 @@ class visitor = object(self)
     | _ -> Cil.DoChildren
 
   method! vvdec v =
-    let current, source = match prefered_loc with
+    let current, source =
+      match prefered_loc with
       | Some l -> false, l
       | None -> true, (Log.get_current_source ())
     in
-    if not(is_ret_var v) && not (isWFGhostType v.vtype) then
+    if not(is_generated_ret_var v) && not (isWFGhostType v.vtype) then
       Error.invalid_ghost_type_for_varinfo ~once:true ~current ~source v ;
     if isFunctionType (unrollType v.vtype) then begin
       let ftype = getReturnType (unrollType v.vtype) in
