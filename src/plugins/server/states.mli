@@ -98,8 +98,8 @@ val remove : 'a array -> 'a -> unit
 (** Get the signal associated with the array *)
 val signal : 'a array -> Request.signal
 
-(** Register signals a requests for synchronizing
-    an array with the client.
+(** Register everything necessary to synchronize an array with
+    the client:
     - Signal [<name>.sig] is emitted on array updates;
     - GET Request [<name>.fetch] is registered to get updates;
     - GET Request [<name>.reload] is registered to trigger a full reload.

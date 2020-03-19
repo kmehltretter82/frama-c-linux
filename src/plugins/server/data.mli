@@ -26,7 +26,7 @@
 
 type json = Json.t
 
-val page : Doc.page (** Page for builtin kernel data types *)
+val page : Doc.page (** Page for general purpose data types *)
 val pretty : Format.formatter -> json -> unit
 
 module type S =
@@ -196,7 +196,7 @@ sig
       The default label is the capitalized name.
       The provided value, if any, will be used for decoding json tags.
       If would be used also for encoding values to json tags if no [~tag]
-      function is provided when publishing the dictionnary.
+      function is provided when publishing the dictionary.
       Registered values must be hashable with [Hashtbl.hash] function.
 
       You may register a new tag {i after} the dictionary has been published. *)
@@ -206,7 +206,7 @@ sig
     ?value:'a ->
     unit -> 'a tag
 
-  (** Register a new prefix tag in the dictionnary.
+  (** Register a new prefix tag in the dictionary.
       The default label is the capitalized prefix.
       To decoding from json is provided to prefix tags.
       Encoding is done by emitting tags with form ['prefix:*'].

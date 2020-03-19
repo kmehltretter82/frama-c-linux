@@ -80,10 +80,8 @@ type 'a server
 
 (**
    Run a server with the provided low-level network primitives to
-   actually exchange data.
-
-   The function does not return until the server is explicitely
-   Shutdown. Logs are monitored unless [~logs:false] is specified.
+   actually exchange data. Logs are monitored unless [~logs:false]
+   is specified.
 
    Default equality is the standard `(=)` one.
 *)
@@ -94,7 +92,8 @@ val create :
   unit -> 'a server
 
 (** Run the server forever.
-    The function will not return until the server is shut down. *)
+    The function will {i not} return until the server is actually
+    shut down. *)
 val run : 'a server -> unit
 
 (** Start the server in background.
