@@ -95,7 +95,6 @@ ML_LINT_KO+=src/kernel_services/cmdline_parameters/parameter_state.ml
 ML_LINT_KO+=src/kernel_services/cmdline_parameters/parameter_state.mli
 ML_LINT_KO+=src/kernel_services/cmdline_parameters/typed_parameter.ml
 ML_LINT_KO+=src/kernel_services/cmdline_parameters/typed_parameter.mli
-ML_LINT_KO+=src/kernel_services/parsetree/cabs.ml
 ML_LINT_KO+=src/kernel_services/parsetree/cabshelper.ml
 ML_LINT_KO+=src/kernel_services/parsetree/cabshelper.mli
 ML_LINT_KO+=src/kernel_services/parsetree/logic_ptree.mli
