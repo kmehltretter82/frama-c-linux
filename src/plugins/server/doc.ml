@@ -214,9 +214,8 @@ let pp_one_page ~root ~page ~title body =
   with Sys_error e ->
     Senv.fatal "Could not open file %s for writing: %s" full_path e
 
-let rec build contents = function
-  | [] -> contents
-  | s::sections -> build (s () :: contents) sections
+(* Build section contents in reverse order *)
+let build d s = List.fold_left (fun d s -> s() :: d) d s
 
 let dump ~root ?(meta=true) () =
   begin
