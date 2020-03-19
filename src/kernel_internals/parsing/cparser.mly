@@ -1471,7 +1471,7 @@ cvspec:
       if String.compare annot "\\ghost" = 0 then begin
         let start = Parsing.symbol_start_pos () in
         let source = Cil_datatype.Position.of_lexing_pos start in
-        Kernel.abort ~source "Use of \\ghost out of ghost code"
+        Errorloc.parse_error ~source "Use of \\ghost out of ghost code"
       end else
         SpecCV(CV_ATTRIBUTE_ANNOT annot), loc
     }

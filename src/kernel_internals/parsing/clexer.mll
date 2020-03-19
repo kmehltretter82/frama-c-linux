@@ -573,7 +573,7 @@ rule initial = parse
       end else begin
         let start = Lexing.lexeme_start_p lexbuf in
         let source = Cil_datatype.Position.of_lexing_pos start in
-        Kernel.abort ~source "Use of \\ghost out of ghost code"
+        E.parse_error ~source "Use of \\ghost out of ghost code"
       end
     }
 
