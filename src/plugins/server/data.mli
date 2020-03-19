@@ -49,7 +49,12 @@
        documentation and returns an OCaml value containing the resulting
        datatype module.
 
-    The same mechanism is used in modules [States] and [Request].
+    Hence, in addition to module signature [Data.S] for values,
+    there is also a polymorphic type ['a Data.data] for module
+    values carrying a data module with type [t = 'a].
+
+    The same mechanism is used throughout modules [States] and [Request]
+    each time a JSON record or tag is needed.
 *)
 (* -------------------------------------------------------------------------- *)
 
@@ -58,6 +63,7 @@ type json = Json.t
 val page : Doc.page (** Documentation page for general purpose data types *)
 val pretty : Format.formatter -> json -> unit
 
+(** Datatype module signature *)
 module type S =
 sig
   type t
@@ -75,6 +81,7 @@ sig
   val descr : Markdown.text
 end
 
+(** Polymorphic data value *)
 type 'a data = (module S with type t = 'a)
 
 (* -------------------------------------------------------------------------- *)
