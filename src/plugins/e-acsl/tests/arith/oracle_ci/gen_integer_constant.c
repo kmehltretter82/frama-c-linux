@@ -5,7 +5,6 @@ int main(void)
 {
   int __retres;
   int x;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   __e_acsl_assert(1,"Assertion","main","0 == 0",
                   "tests/arith/integer_constant.i",6);
   /*@ assert 0 ≡ 0; */ ;

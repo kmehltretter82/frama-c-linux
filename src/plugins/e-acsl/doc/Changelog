@@ -19,7 +19,13 @@
 #   configure	configure
 ###############################################################################
 
--  E-ACSL       [2020/02/09] Improve verdict messages emitted by e_acsl_assert.
+-  E-ACSL       [2020/03/10] Call E-ACSL's free functions for globals in a
+                separate function at the end of main.
+-  E-ACSL       [2020/03/10] Call `__e_acsl_memory_init` only if the memory
+                model analysis is running.
+-* E-ACSL       [2020/03/10] Fix frama-c/e-acsl#105 about misplaced
+                `__e_acsl_delete_block` in presence of gotos to return statements.
+-  E-ACSL       [2020/03/09] Improve verdict messages emitted by e_acsl_assert.
 -* E-ACSL       [2020/01/06] Fix typing bug in presence of variable-length
 	        arrays that may lead to incorrect generated code.
 -* E-ACSL       [2019/12/04] Fix bug with compiler built-ins.

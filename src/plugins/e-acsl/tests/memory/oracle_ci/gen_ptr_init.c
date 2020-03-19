@@ -32,6 +32,12 @@ void __e_acsl_globals_init(void)
   return;
 }
 
+void __e_acsl_globals_delete(void)
+{
+  __e_acsl_delete_block((void *)(& B));
+  __e_acsl_delete_block((void *)(& A));
+}
+
 int main(void)
 {
   int __retres;
@@ -60,10 +66,9 @@ int main(void)
   /*@ assert \initialized(&x); */ ;
   g(x,y);
   __retres = 0;
-  __e_acsl_delete_block((void *)(& B));
-  __e_acsl_delete_block((void *)(& A));
   __e_acsl_delete_block((void *)(& y));
   __e_acsl_delete_block((void *)(& x));
+  __e_acsl_globals_delete();
   __e_acsl_memory_clean();
   return __retres;
 }

@@ -570,13 +570,13 @@ int main(void)
   __retres = 0;
   __e_acsl_delete_block((void *)(t));
   __e_acsl_delete_block((void *)(& n));
-  free((void *)__gen_e_acsl_at_7);
-  free((void *)__gen_e_acsl_at_6);
-  free((void *)__gen_e_acsl_at_5);
-  free((void *)__gen_e_acsl_at_4);
-  free((void *)__gen_e_acsl_at_3);
-  free((void *)__gen_e_acsl_at_2);
   free((void *)__gen_e_acsl_at);
+  free((void *)__gen_e_acsl_at_2);
+  free((void *)__gen_e_acsl_at_3);
+  free((void *)__gen_e_acsl_at_4);
+  free((void *)__gen_e_acsl_at_5);
+  free((void *)__gen_e_acsl_at_6);
+  free((void *)__gen_e_acsl_at_7);
   __e_acsl_memory_clean();
   return __retres;
 }
@@ -706,10 +706,10 @@ void __gen_e_acsl_f(int *t)
                     "\\let m = 4; \\old(*(t + m) == -4) && \\old(*(t + (m - 4))) == 9",
                     "tests/arith/at_on-purely-logic-variables.c",8);
     __e_acsl_delete_block((void *)(& t));
-    free((void *)__gen_e_acsl_at_4);
-    free((void *)__gen_e_acsl_at_3);
-    free((void *)__gen_e_acsl_at_2);
     free((void *)__gen_e_acsl_at);
+    free((void *)__gen_e_acsl_at_2);
+    free((void *)__gen_e_acsl_at_3);
+    free((void *)__gen_e_acsl_at_4);
     return;
   }
 }

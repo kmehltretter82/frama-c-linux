@@ -85,7 +85,6 @@ int main(void)
 {
   int __retres;
   mystruct m;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   int x = 1;
   int y = 2;
   {

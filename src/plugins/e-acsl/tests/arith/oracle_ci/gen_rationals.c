@@ -19,7 +19,6 @@ double avg(double a, double b)
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   {
     __e_acsl_mpq_t __gen_e_acsl_;
     __e_acsl_mpq_t __gen_e_acsl__2;

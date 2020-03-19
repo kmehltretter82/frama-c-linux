@@ -40,7 +40,6 @@ int __gen_e_acsl_main(void)
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   __retres = __gen_e_acsl_main();
   __e_acsl_assert(X == 3,"Postcondition","main","X == 3",
                   "tests/constructs/labeled_stmt.i",7);
