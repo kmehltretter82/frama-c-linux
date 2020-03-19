@@ -33,8 +33,8 @@ module Stmt : Data.S_collection with type t = stmt
 module Marker :
 sig
   include Data.S with type t = Printer_tag.localizable
-  val create : t -> string (** memoized unique identifier *)
-  val lookup : string -> t (** get back the localizable, if any *)
+  val create : t -> string (** Memoized unique identifier. *)
+  val lookup : string -> t (** Get back the localizable, if any. *)
 end
 
 (* -------------------------------------------------------------------------- *)

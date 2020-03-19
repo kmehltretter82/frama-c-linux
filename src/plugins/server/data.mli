@@ -26,44 +26,41 @@
 (* -------------------------------------------------------------------------- *)
 (** {2 Datatypes}
 
-    This module is responsible for marshaling and demarshaling data
-    to handle communications between the server and the client in both
-    directions.
+    This module is responsible for marshaling and demarshaling data to handle
+    communications between the server and the client in both directions.
 
-    Each datatype must be equipped with function to
-    encode and decode values to/from JSON format.
-    Moreover, data types shall be also properly documented and registered
-    in the generated documentation of the Frama-C server.
+    Each datatype must be equipped with functions to encode and decode values
+    to/from JSON format. Moreover, data types shall be also properly documented
+    and registered in the generated documentation of the Frama-C server.
 
-    Generally speaking, we will have a module with signature [Data.D] for
-    every datatype to be exchanged with the server. For simple values,
-    predefined modules are already provided. More complex datatypes can be
-    built with some functors, typically for options, lists or arrays.
+    Generally speaking, we will have a module with signature [Data.D] for every
+    datatype to be exchanged with the server. For simple values, predefined
+    modules are already provided. More complex datatypes can be built with some
+    functors, typically for options, lists or arrays.
 
     Records and enumerated types are typical in JSON formatting, but difficult
     to build from OCaml records and abstract datatypes. For those kinds of data,
     we provide an API based on the following general scheme:
-    - you first create a empty container with its name, documentation and such;
-    - then you add each field or constructor to the container;
-    - finally you pack the container, which actually registers its complete
-       documentation and returns an OCaml value containing the resulting
-       datatype module.
+    - First create an empty container with its name, documentation and such;
+    - Then add each field or constructor to the container;
+    - Finally pack the container, which actually registers its complete
+      documentation and returns an OCaml value containing the resulting datatype
+      module.
 
-    Hence, in addition to module signature [Data.S] for values,
-    there is also a polymorphic type ['a Data.data] for module
-    values carrying a data module with type [t = 'a].
+    Hence, in addition to module signature [Data.S] for values, there is also a
+    polymorphic type ['a Data.data] for module values carrying a data module with
+    type [t = 'a].
 
-    The same mechanism is used throughout modules [States] and [Request]
-    each time a JSON record or tag is needed.
-*)
+    The same mechanism is used throughout modules [States] and [Request] each
+    time a JSON record or tag is needed. *)
 (* -------------------------------------------------------------------------- *)
 
 type json = Json.t
 
-val page : Doc.page (** Documentation page for general purpose data types *)
+val page : Doc.page (** Documentation page for general purpose data types. *)
 val pretty : Format.formatter -> json -> unit
 
-(** Datatype module signature *)
+(** Datatype module signature. *)
 module type S =
 sig
   type t
@@ -81,7 +78,7 @@ sig
   val descr : Markdown.text
 end
 
-(** Polymorphic data value *)
+(** Polymorphic data value. *)
 type 'a data = (module S with type t = 'a)
 
 (* -------------------------------------------------------------------------- *)
@@ -109,7 +106,7 @@ module Jint : S_collection with type t = int
 module Jfloat : S_collection with type t = float
 module Jstring : S_collection with type t = string
 module Jident : S_collection with type t = string (** Syntax is {i ident}. *)
-module Jtext : S with type t = json (** Rich text encoding, see [Jbuffer] *)
+module Jtext : S with type t = json (** Rich text encoding, see [Jbuffer]. *)
 module Jmarkdown : S with type t = Markdown.text
 
 (* -------------------------------------------------------------------------- *)
@@ -153,9 +150,9 @@ module Jarray(A : S) : S with type t = A.t array
 module Record :
 sig
 
-  type 'a record (** Records of type 'a *)
-  type 'a signature  (** Opened signature for record of type ['a] *)
-  type ('a,'b) field (** Field of type ['b] for a record of type ['a] *)
+  type 'a record (** Records of type ['a]. *)
+  type 'a signature  (** Opened signature for record of type ['a]. *)
+  type ('a,'b) field (** Field of type ['b] for a record of type ['a]. *)
 
   (** Data with [type t = r record].
       Also contains getters and setters for fields. *)
@@ -169,21 +166,21 @@ sig
     val set : (r,'a) field -> 'a -> t -> t
   end
 
-  (** Create a new, opened record type *)
+  (** Create a new, opened record type. *)
   val signature : page:Doc.page -> name:string -> descr:Markdown.text ->
     unit -> 'a signature
 
-  (** Adds a field to an opened record *)
+  (** Adds a field to an opened record. *)
   val field : 'r signature ->
     name:string -> descr:Markdown.text -> ?default:'a -> 'a data ->
     ('r,'a) field
 
-  (** Adds a optional field to an opened record *)
+  (** Adds a optional field to an opened record. *)
   val option : 'r signature ->
     name:string -> descr:Markdown.text -> 'a data ->
     ('r,'a option) field
 
-  (** Publish and close an opened record *)
+  (** Publish and close an opened record. *)
   val publish : 'a signature ->
     (module S with type r = 'a)
 
@@ -293,7 +290,7 @@ end
 *)
 (* -------------------------------------------------------------------------- *)
 
-(** Simplified [Map.S] *)
+(** Simplified [Map.S]. *)
 module type Map =
 sig
   type 'a t
@@ -308,7 +305,7 @@ module type Index =
 sig
   include S_collection
   val get : t -> int
-  val find : int -> t (** @raise Not_found if not registered *)
+  val find : int -> t (** @raise Not_found if not registered. *)
   val clear : unit -> unit
   (** Clear index tables. Use with extreme care. *)
 end
@@ -327,7 +324,7 @@ sig
   include Info
 end
 
-(** Builds a {i projectified} index on types with {i unique} identifiers *)
+(** Builds a {i projectified} index on types with {i unique} identifiers. *)
 module Identified(A : IdentifiedType) : Index with type t = A.t
 
 (* -------------------------------------------------------------------------- *)
@@ -338,13 +335,13 @@ module Identified(A : IdentifiedType) : Index with type t = A.t
 *)
 (* -------------------------------------------------------------------------- *)
 
-(** Exception thrown during the decoding of a request's inputs *)
+(** Exception thrown during the decoding of a request's inputs. *)
 exception InputError of string
 
 val failure : ?json:json -> ('a, Format.formatter, unit, 'b) format4 -> 'a
-(** @raise InputError with provided message *)
+(** @raise InputError with provided message. *)
 
 val failure_from_type_error : string -> json -> 'a
-(** @raise InputError from Yojson.Basic.Util.Type_error arguments *)
+(** @raise InputError from [Yojson.Basic.Util.Type_error] arguments. *)
 
 (* -------------------------------------------------------------------------- *)

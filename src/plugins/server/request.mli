@@ -48,13 +48,12 @@ type 'b output = (module Output with type t = 'b)
 
     A signal is a one-way message from server to client for indicating that
     something happened. To avoid unecessary noise, the client must be registered
-    on each of signal it is interested in. The client will then send a proper get
+    on each signal it is interested in. The client will then send a proper get
     requests to the server to retrieve the updated data.
 
     As a matter of fact, update events are much more frequent than what a
-    typical GUI client can handle. Hence, signal emissions can not carry data
-    and are grouped (or « debounced ») until the next server
-    response to client. *)
+    typical GUI client can handle. Hence, signal emissions can not carry data and
+    are grouped (or « debounced ») until the next server response to client. *)
 
 (** The type of registered signals. *)
 type signal
@@ -192,8 +191,8 @@ val register_sig : ('a,'b) signature -> (rq -> 'a -> 'b) -> unit
 *)
 
 
-(** Named input parameter. If a default value is provided,
-    the JSON input field becomes optional. Otherwized, it is required. *)
+(** Named input parameter. If a default value is provided, the JSON input field
+    becomes optional. Otherwized, it is required. *)
 val param : (unit,'b) signature ->
   name:string ->
   descr:Markdown.text ->
@@ -206,10 +205,9 @@ val param_opt : (unit,'b) signature ->
   descr:Markdown.text ->
   'a input -> 'a option param
 
-(** Named output parameter. If a default value is provided,
-    the JSON output field is initialized with it.
-    Otherwized, it shall be set at each invocation of the request processing
-    funciton. *)
+(** Named output parameter. If a default value is provided, the JSON output
+    field is initialized with it. Otherwise, it shall be set at each invocation
+    of the request processing funciton. *)
 val result : ('a,unit) signature ->
   name:string ->
   descr:Markdown.text ->
@@ -224,8 +222,8 @@ val result_opt : ('a,unit) signature ->
 
 (** {2 Exporting Dictionaries} *)
 
-(** Register a [GET] request [dictionary.<name>] to retrieve all tags
-    registered in the dictionary. *)
+(** Register a [GET] request [dictionary.<name>] to retrieve all tags registered
+    in the dictionary. *)
 val dictionary : 'a Data.Enum.dictionary -> unit
 
 (* -------------------------------------------------------------------------- *)

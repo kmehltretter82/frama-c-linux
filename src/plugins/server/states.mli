@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Synchronized values between Server & Client *)
+(** Synchronized values between Server and Client *)
 
 type 'a callback = ('a -> unit) -> unit
 
@@ -29,9 +29,9 @@ type 'a callback = ('a -> unit) -> unit
     - Signal [<name>.sig] is emitted on value updates;
     - GET Request [<name>.get] returns the current value.
 
-    If provided, the [~add_hook] option is used to register a hook
-    to notify the server of value updates. The hook will be installed
-    only once the client starts to listen for value updates.
+    If provided, the [~add_hook] option is used to register a hook to notify the
+    server of value updates. The hook will be installed only once the client
+    starts to listen for value updates.
 
     Inside {b Ivette} you can use the [States.useSyncValue(id)] hook to
     synchronize with this value.
@@ -52,9 +52,9 @@ val register_value :
     - GET Request [<name>.get] returns the current value;
     - SET Request [<name>.set] modifies the server value.
 
-    If provided, the [~add_hook] option is used to register a hook
-    to notify the server of value updates. The hook will be installed
-    only once the client starts to listen for value updates.
+    If provided, the [~add_hook] option is used to register a hook to notify the
+    server of value updates. The hook will be installed only once the client
+    starts to listen for value updates.
 
     Inside {b Ivette} you can use the [States.useSyncState(id)] hook to
     synchronize with this state.
@@ -76,8 +76,7 @@ type 'a model (** Columns array model *)
 val model : unit -> 'a model
 
 (** Populate an array model with a new field.
-    Columns with name `"id"` and `"_index"` are
-    reserved for internal use. *)
+    Columns with name `"id"` and `"_index"` are reserved for internal use. *)
 val column :
   model:'a model ->
   name:string ->
@@ -86,7 +85,8 @@ val column :
   get:('a -> 'b) ->
   unit -> unit
 
-type 'a array (** Synchronized array state *)
+(** Synchronized array state. *)
+type 'a array
 
 (** Mark the array to be fully reloaded. *)
 val reload : 'a array -> unit
@@ -97,7 +97,7 @@ val update : 'a array -> 'a -> unit
 (** Mark an array entry as removed. *)
 val remove : 'a array -> 'a -> unit
 
-(** Get the signal associated with the array *)
+(** Get the signal associated with the array. *)
 val signal : 'a array -> Request.signal
 
 (** Register everything necessary to synchronize an array with
@@ -109,16 +109,16 @@ val signal : 'a array -> Request.signal
     The [~key] parameter is used to identify array entries, and used to fill
     the reserved column ["id"] of entries.
 
-    Columns added to the model after registration are {i not} taken
-    into account.
+    Columns added to the model after registration are {i not} taken into
+    account.
 
     If provided, the [~add_xxx_hook] options are used to register hooks
     to notify the server of corresponding array updates.
-    Each hook will be installed only once the client starts to
-    listen for array updates.
+    Each hook will be installed only once the client starts to listen for array
+    updates.
 
-    Inside {b Ivette} you can obtain the entries in sync by
-    using the [States.useSyncArray()] hook.
+    Inside {b Ivette} you can obtain the entries in sync by using the
+    [States.useSyncArray()] hook.
 *)
 val register_array :
   page:Doc.page ->
