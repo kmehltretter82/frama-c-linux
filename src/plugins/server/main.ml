@@ -402,9 +402,7 @@ let run server =
     Senv.feedback "Server shutdown." ;
     emitter := nop ;
     set_active false ;
-  with
-  | Killed -> ()
-  | exn ->
+  with exn ->
     Senv.feedback "Server interruped (fatal error)." ;
     emitter := nop ;
     set_active false ;
