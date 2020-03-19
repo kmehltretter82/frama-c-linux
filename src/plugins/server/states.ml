@@ -124,7 +124,10 @@ type 'a array = {
   key : 'a -> string ;
   iter : ('a -> unit) -> unit ;
   getter : (string * ('a -> json)) list ;
-  mutable current : 'a content option ; (* fast access *)
+  (* [LC+JS]
+     The two following fields allow to keep an array in sync
+     with the current project and still have a polymorphic data type. *)
+  mutable current : 'a content option ; (* fast access to current project *)
   projects : (string , 'a content) Hashtbl.t ; (* indexed by project *)
 }
 
