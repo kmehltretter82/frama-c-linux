@@ -4780,6 +4780,7 @@ and convertCVtoAttr (src: A.cvspec list) : A.attribute list =
   | CV_VOLATILE :: tl -> ("volatile",[]) :: (convertCVtoAttr tl)
   | CV_RESTRICT :: tl -> ("restrict",[]) :: (convertCVtoAttr tl)
   | CV_ATTRIBUTE_ANNOT a :: tl -> (mkAttrAnnot a, []) :: convertCVtoAttr tl
+  | CV_GHOST    :: tl -> ("ghost",[]) :: (convertCVtoAttr tl)
 
 and makeVarInfoCabs
     ~(ghost:bool)
@@ -4798,6 +4799,17 @@ and makeVarInfoCabs
                                        we do it afterwards *)
       bt (A.PARENTYPE(attrs, ndt, a)) in
   (*Format.printf "Got yp:%a->%a(%a)@." d_type bt d_type vtype d_attrlist nattr;*)
+  if not isgenerated && ghost then begin
+    if hasAttribute "ghost" (Cil.typeAttrs vtype) then
+      Kernel.warning
+        ~wkey:Kernel.wkey_ghost_already_ghost ~once:true ~current:true
+        "'%s' is already ghost" n;
+    if isArrayType vtype then
+      if hasAttribute "ghost" (Cil.typeAttrs (typeOf_array_elem vtype)) then
+        Kernel.warning
+          ~wkey:Kernel.wkey_ghost_already_ghost ~once:true ~current:true
+          "'%s' elements are already ghost" n;
+  end ;
 
   if inline && not (isFunctionType vtype) then
     Kernel.error ~once:true ~current:true "inline for a non-function: %s" n;
@@ -6672,6 +6684,9 @@ and doExp local_env
                   if expected pointer and got null pointer constant => ok *)
                not (Cil.isPointerType texpected && Ast_info.is_null_expr a')
              | false, false ->
+               (* Ghost compatibility is considered 'after_cleanup' *)
+               let texpected = Cil.typeRemoveAttributesDeep [ "ghost" ] texpected in
+               let att = Cil.typeRemoveAttributesDeep [ "ghost" ] att in
                (* pointers: check compatible modulo void ptr and modulo
                   literal strings (too many warnings otherwise) *)
                let ok1 =

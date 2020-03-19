@@ -72,6 +72,10 @@ let get_definition kf = match kf.fundec with
   | Definition (f,_) -> f
   | Declaration _ -> raise No_Definition
 
+let has_definition kf = match kf.fundec with
+  | Definition  _ -> true
+  | Declaration _ -> false
+
 (* ************************************************************************* *)
 (** {2 Kernel functions are comparable} *)
 (* ************************************************************************* *)
@@ -308,7 +312,7 @@ let stmt_in_loop kf stmt =
     val is_in_loop = Stack.create ()
     method! vstmt s =
       match s.skind with
-        | Loop _ -> 
+        | Loop _ ->
           Stack.push true is_in_loop;
           if Cil_datatype.Stmt.equal s stmt then raise (Res.Found true);
           Cil.DoChildrenPost (fun s -> ignore (Stack.pop is_in_loop); s)
@@ -442,7 +446,7 @@ let find_label kf label =
   Datatype.String.Map.find label labels
 
 let get_called fct = match fct.enode with
-  | Lval (Var vkf, NoOffset) -> 
+  | Lval (Var vkf, NoOffset) ->
       (try Some (Globals.Functions.get vkf)
        with Not_found -> None)
   | _ -> None

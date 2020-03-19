@@ -335,6 +335,7 @@ let in_ghost_block ?(battrs=[]) l =
 %token<Cabs.cabsloc> SIGNED UNSIGNED LONG SHORT
 %token<Cabs.cabsloc> VOLATILE EXTERN STATIC CONST RESTRICT AUTO REGISTER
 %token<Cabs.cabsloc> THREAD
+%token<Cabs.cabsloc> GHOST
 
 %token<Cabs.cabsloc> SIZEOF ALIGNOF
 
@@ -1463,8 +1464,17 @@ cvspec:
   | CONST                    { SpecCV(CV_CONST), $1 }
   | VOLATILE                 { SpecCV(CV_VOLATILE), $1 }
   | RESTRICT                 { SpecCV(CV_RESTRICT), $1 }
-  | ATTRIBUTE_ANNOT          { let annot, loc = $1 in
-			       SpecCV(CV_ATTRIBUTE_ANNOT annot), loc }
+  | GHOST                    { SpecCV(CV_GHOST), $1 }
+  | ATTRIBUTE_ANNOT
+    {
+      let annot, loc = $1 in
+      if String.compare annot "\\ghost" = 0 then begin
+        let start = Parsing.symbol_start_pos () in
+        let source = Cil_datatype.Position.of_lexing_pos start in
+        Errorloc.parse_error ~source "Use of \\ghost out of ghost code"
+      end else
+        SpecCV(CV_ATTRIBUTE_ANNOT annot), loc
+    }
 ;
 
 /*** GCC attributes ***/
@@ -1507,6 +1517,7 @@ attribute:
 |   CONST                 { ("const", []), $1 }
 |   RESTRICT              { ("restrict",[]), $1 }
 |   VOLATILE              { ("volatile",[]), $1 }
+|   GHOST                 { ("ghost",[]), $1 }
 |   ATTRIBUTE_ANNOT       { let annot, loc = $1 in
 			    ("$annot:" ^ annot, []), loc }
 ;
