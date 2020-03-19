@@ -90,18 +90,19 @@ type 'a process = {
 
 module Sigs = Set.Make(String)
 
+(* Server with request identifier (RqId) of type ['a] *)
 type 'a server = {
-  polling : int ;
-  pretty : Format.formatter -> 'a -> unit ;
-  equal : 'a -> 'a -> bool ;
-  fetch : unit -> 'a message option ;
-  q_in : 'a process Queue.t ;
-  q_out : 'a response Stack.t ;
-  mutable daemon : Db.daemon option ;
-  mutable s_active : Sigs.t ; (* active *)
-  mutable s_signal : Sigs.t ; (* signaled *)
-  mutable shutdown : bool ;
-  mutable running : 'a process option ;
+  pretty : Format.formatter -> 'a -> unit ; (* RqId printer *)
+  equal : 'a -> 'a -> bool ; (* RqId equality *)
+  polling : int ; (* server polling, in milliseconds *)
+  fetch : unit -> 'a message option ; (* fetch some client message *)
+  q_in : 'a process Queue.t ; (* queue of pending jobs *)
+  q_out : 'a response Queue.t ; (* queue of pending responses *)
+  mutable daemon : Db.daemon option ; (* Db.yield daemon *)
+  mutable s_active : Sigs.t ; (* signals the client is listening to *)
+  mutable s_signal : Sigs.t ; (* emitted signals since last synchro *)
+  mutable shutdown : bool ; (* server has been asked to shut down *)
+  mutable running : 'a process option ; (* currently running EXEC request *)
 }
 
 exception Killed
@@ -169,7 +170,7 @@ let execute server ?yield proc =
     | _ -> run proc
   in
   Senv.debug ~level:2 "%a" (pp_response server.pretty) resp ;
-  Stack.push resp server.q_out
+  Queue.push resp server.q_out
 
 (* -------------------------------------------------------------------------- *)
 (* --- Signals                                                            --- *)
@@ -215,7 +216,7 @@ let process_request (server : 'a server) (request : 'a request) : unit =
     begin
       Extlib.may kill_exec server.running ;
       Queue.clear server.q_in ;
-      Stack.clear server.q_out ;
+      Queue.clear server.q_out ;
       server.shutdown <- true ;
     end
   | `SigOn sg ->
@@ -239,7 +240,7 @@ let process_request (server : 'a server) (request : 'a request) : unit =
       match find request with
       | None ->
         Senv.debug "Rejected %a" server.pretty id ;
-        Stack.push (`Rejected id) server.q_out
+        Queue.push (`Rejected id) server.q_out
       | Some( `GET , handler ) ->
         let proc = { id ; request ; handler ; data ;
                      yield = false ; killed = false } in
@@ -266,8 +267,8 @@ let communicate server =
       try List.iter (process_request server) message.requests ; None
       with exn -> Some exn in (* re-raised after message reply *)
     let pool = ref [] in
-    Stack.iter (fun r -> pool := r :: !pool) server.q_out ;
-    Stack.clear server.q_out ;
+    Queue.iter (fun r -> pool := r :: !pool) server.q_out ;
+    Queue.clear server.q_out ;
     server.s_active <- Sigs.empty ;
     message.callback !pool ;
     Extlib.may raise error ; true
@@ -284,7 +285,7 @@ let do_signal server s =
   if Sigs.mem s server.s_active && not (Sigs.mem s server.s_signal) then
     begin
       server.s_signal <- Sigs.add s server.s_signal ;
-      Stack.push (`Signal s) server.q_out ;
+      Queue.push (`Signal s) server.q_out ;
     end
 
 (* -------------------------------------------------------------------------- *)
@@ -328,7 +329,7 @@ let create ~pretty ?(equal=(=)) ~fetch () =
   {
     fetch ; polling ; equal ; pretty ;
     q_in = Queue.create () ;
-    q_out = Stack.create () ;
+    q_out = Queue.create () ;
     s_active = Sigs.empty ;
     s_signal = Sigs.empty ;
     daemon = None ;
