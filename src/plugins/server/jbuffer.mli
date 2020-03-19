@@ -20,6 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Rich text buffers with JSON marshalling. *)
+
 type json = Json.t
 
 (** All-in-one formatter. Return the JSON encoding of formatted text. *)
@@ -41,7 +43,7 @@ val create : ?indent:int -> ?margin:int -> unit -> buffer
 (** The underlying formatter of a buffer. *)
 val formatter : buffer -> Format.formatter
 
-(** Prints into the buffer's formatter. *)
+(** Prints into the buffer formatter. *)
 val bprintf : buffer -> ('a,Format.formatter,unit) format -> 'a
 
 val append : buffer -> string -> int -> int -> unit
@@ -53,7 +55,7 @@ val pop_tag : buffer -> Transitioning.Format.stag -> unit
     tags. *)
 val contents : buffer -> json
 
-(** Prints back a JSON encoding onto the provided formatter.
+(** Prints back a JSON encoding into the provided formatter.
     @raise Yojson.Basic.Util.Type_error in case of ill formatted buffer. *)
 val fprintf : Format.formatter -> json -> unit
 

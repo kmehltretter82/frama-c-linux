@@ -1,0 +1,53 @@
+/* -------------------------------------------------------------------------- */
+/* --- Styling LabViews                                                   --- */
+/* -------------------------------------------------------------------------- */
+
+.dome-window-active .labview-icon {
+    fill: #7d7d7d ;
+}
+
+.labview-field {
+    position: relative ;
+    left: -8px ;
+}
+
+.labview-stock:hover {
+    background: #ccc ;
+}
+
+.labview-stock:hover * {
+    cursor: move ;
+}
+
+.labview-stock.dome-dragging
+{
+    border-radius: 4px ;
+    background: #ccc ;
+    border: thin solid black ;
+}
+
+.labview-content
+{
+    background: #e6e6e6 ;
+}
+
+.labview-titlebar
+{
+    background: #ccc ;
+}
+
+.labview-titlebar .dome-xLabel
+{
+    padding-top: 3px ;
+}
+
+.labview-handle
+{
+    flex: 1 1 auto ;
+    cursor: move ;
+}
+
+.labview-close:hover
+{
+    fill: red ;
+}

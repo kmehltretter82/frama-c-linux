@@ -38,7 +38,7 @@ type localizable =
   | PIP of Property.t
 
 module Localizable =
-  Datatype.Make
+  Datatype.Make_with_collections
     (struct
       include Datatype.Undefined
       type t = localizable
@@ -69,11 +69,12 @@ module Localizable =
         | PStmt (_,ki1), PStmt (_,ki2) -> ki1.sid = ki2.sid
         | PStmtStart (_,ki1), PStmtStart (_,ki2) -> ki1.sid = ki2.sid
         | PLval (_,ki1,lv1), PLval (_,ki2,lv2) ->
-          Kinstr.equal ki1 ki2 && lv1 == lv2
+          Kinstr.equal ki1 ki2 &&
+          Lval.equal lv1 lv2
         | PTermLval (_,ki1,pi1,lv1), PTermLval (_,ki2,pi2,lv2) ->
-          Kinstr.equal ki1 ki2 && Property.equal pi1 pi2 &&
-          Logic_utils.is_same_tlval lv1 lv2
-        (* [JS 2008/01/21] term_lval are not shared: cannot use == *)
+          Kinstr.equal ki1 ki2 &&
+          Property.equal pi1 pi2 &&
+          Term_lval.equal lv1 lv2
         | PVDecl (_,_,v1), PVDecl (_,_,v2) -> Varinfo.equal v1 v2
         | PExp (_,_,e1), PExp(_,_,e2) -> Exp.equal e1 e2
         | PIP ip1, PIP ip2 -> Property.equal ip1 ip2
@@ -81,6 +82,37 @@ module Localizable =
         | (PStmt _ | PStmtStart _ | PLval _ | PExp _ | PTermLval _ | PVDecl _
           | PIP _ | PGlobal _), _
           ->  false
+
+      let compare l1 l2 = match l1,l2 with
+        | PStmt(_,s1) , PStmt(_,s2) -> Stmt.compare s1 s2
+        | PStmt _ , _ -> (-1)
+        | _ , PStmt _ -> 1
+        | PStmtStart(_,s1) , PStmtStart(_,s2) -> Stmt.compare s1 s2
+        | PStmtStart _ , _ -> (-1)
+        | _ , PStmtStart _ -> 1
+        | PLval (_,k1,lv1), PLval(_,k2,lv2) ->
+          let cmp = Kinstr.compare k1 k2 in
+          if cmp<>0 then cmp else Lval.compare lv1 lv2
+        | PLval _ , _ -> (-1)
+        | _ , PLval _ -> 1
+        | PTermLval(_,k1,p1,lv1) , PTermLval(_,k2,p2,lv2) ->
+          let cmp = Kinstr.compare k1 k2 in
+          if cmp<>0 then cmp else
+            let cmp = Property.compare p1 p2 in
+            if cmp<>0 then cmp else
+              Term_lval.compare lv1 lv2
+        | PTermLval _ , _ -> (-1)
+        | _ , PTermLval _ -> 1
+        | PVDecl(_,_,v1) , PVDecl(_,_,v2) -> Varinfo.compare v1 v2
+        | PVDecl _ , _ -> (-1)
+        | _ , PVDecl _ -> 1
+        | PExp(_,_,e1) , PExp(_,_,e2) -> Exp.compare e1 e2
+        | PExp _ , _ -> (-1)
+        | _ , PExp _ -> 1
+        | PIP p1 , PIP p2 -> Property.compare p1 p2
+        | PIP _ , _ -> (-1)
+        | _ , PIP _ -> 1
+        | PGlobal g1 , PGlobal g2 -> Global.compare g1 g2
 
       let pp_ki_loc fmt ki =
         match ki with

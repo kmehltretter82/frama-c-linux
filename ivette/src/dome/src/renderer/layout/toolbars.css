@@ -1,0 +1,235 @@
+/* -------------------------------------------------------------------------- */
+/* --- Styling ToolBars                                                   --- */
+/* -------------------------------------------------------------------------- */
+
+.dome-xToolBar {
+    flex: 0 0 auto ;
+    width: 100% ;
+    min-height: 24px ;
+    display: flex ;
+    flex-direction: row ;
+    flex-wrap: wrap ;
+    align-items: baseline ;
+    border-width: 1px ;
+    border-bottom-style: solid ;
+}
+
+.dome-xToolBar:last-child {
+    border-top-style: solid ;
+    border-bottom-style: none ;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Styling ToolBar Spaces                                             --- */
+/* -------------------------------------------------------------------------- */
+
+.dome-xToolBar-inset {
+    flex: 0 1 5px ;
+}
+
+.dome-xToolBar-space {
+    flex: 0 1 20px ;
+}
+
+.dome-xToolBar-filler {
+    flex: 1 1 20px ;
+}
+
+.dome-xToolBar-separator + .dome-xToolBar-separator {
+    display: none ;
+}
+
+.dome-xToolBar-separator {
+    flex: 0 0 10px ;
+    align-self: center ;
+}
+
+.dome-xToolBar-vrule {
+    width: 2px ;
+    position: relative ;
+    left: 4px ;
+    height: 18px ;
+}
+
+.dome-window-active .dome-xToolBar-vrule {
+    background: #aaa ;
+}
+
+.dome-window-inactive .dome-xToolBar-vrule {
+    background: #ddd ;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Styling ToolBar Buttons                                            --- */
+/* -------------------------------------------------------------------------- */
+
+/* Layout */
+
+.dome-xToolBar-Control {
+    flex: 0 0 auto ;
+    height: 21px ;
+    margin: 6px 5px 6px 5px ;
+    padding: 0px 4px 2px 4px ;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, .06);
+    border: 1px solid transparent;
+    border-radius: 4px;
+    outline: none ;
+}
+
+.dome-xToolBar-Control svg {
+    height: 10px ;
+    position: relative ;
+}
+
+.dome-xToolBar-Control svg + label {
+    margin-left: 4px ;
+}
+
+/* Background */
+
+.dome-window-active .dome-xToolBar-Control {
+    background-image: linear-gradient(to bottom, #e8e8e8 0, #f1f1f1 100%);
+}
+
+.dome-window-active .dome-xToolBar-Control:hover:not(:disabled) {
+    background-color: #ffffff ;
+    background-image: none ;
+}
+
+.dome-window-active .dome-xToolBar-Control.dome-xToolBar-positive:not(:disabled) {
+    background-image: linear-gradient(to bottom, #34ff52 0%, #48fd64 100%);
+}
+
+.dome-window-active .dome-xToolBar-Control.dome-xToolBar-positive:hover:not(:disabled) {
+    background-color: #00ff00 ;
+    background-image: none ;
+}
+
+.dome-window-active .dome-xToolBar-Control.dome-xToolBar-negative:not(:disabled) {
+    color: #ccc ;
+    fill: #ccc ;
+    background-image: linear-gradient(to bottom, #ec453e 0%, #ff4c47 100%);
+}
+
+.dome-window-active .dome-xToolBar-Control.dome-xToolBar-negative:hover:not(:disabled) {
+    background-color: red ;
+    background-image: none ;
+}
+
+.dome-window-active .dome-xToolBar-Control.dome-xToolBar-warning:not(:disabled) {
+    background-image: linear-gradient(to bottom, #fece72 0%, #fcaa0e 100%);
+}
+
+.dome-window-active .dome-xToolBar-Control.dome-xToolBar-warning:hover:not(:disabled) {
+    background-color: orange ;
+    background-image: none ;
+}
+
+.dome-window-active .dome-xToolBar-Control.dome-xToolBar-cancel:not(:disabled) {
+    background-color: #c2c0c2 ;
+    background-image: none ;
+}
+
+.dome-window-active .dome-xToolBar-Control.dome-xToolBar-cancel:hover:not(:disabled) {
+    background-image: linear-gradient(to bottom, #e8e8e8 0, #f1f1f1 100%);
+}
+
+.dome-window-inactive .dome-xToolBar-Control {
+    box-shadow: none ;
+    background-image: none ;
+}
+
+/* Activated */
+
+.dome-window-active .dome-xToolBar-Control:active:not(:disabled) {
+    fill: #ddd ;
+    color: #ddd ;
+    background-color: gray ;
+    background-image: none ;
+}
+
+/* Disabled */
+
+.dome-window-active .dome-xToolBar-Control:disabled {
+    fill: #ccc ;
+    color: #ccc ;
+    box-shadow: none ;
+    border-color: #bbb ;
+}
+
+.dome-window-inactive .dome-xToolBar-Control:disabled {
+    fill: #ccc ;
+    color: #ccc ;
+}
+
+/* Selected */
+
+.dome-window-active .dome-xToolBar-Control.dome-selected {
+    fill:  #fff;
+    color: #fff;
+    border: 1px solid transparent ;
+    background-color: #7f7f7f ;
+    background-image: none ;
+}
+
+.dome-window-active .dome-xToolBar-Control.dome-selected:hover {
+    background-color: #888 ;
+    background-image: none ;
+}
+
+.dome-window-inactive .dome-xToolBar-Control.dome-selected {
+    fill:  #eee;
+    color: #eee;
+    background-color: #ccc ;
+}
+
+/* Selected & Disabled */
+
+.dome-window-active .dome-xToolBar-Control.dome-selected:disabled {
+    fill: #ccc ;
+    color: #ccc ;
+    border: 1px solid #bbb ;
+    background-color: #eee ;
+}
+
+.dome-window-inactive .dome-xToolBar-Control.dome-selected:disabled {
+    fill: #ccc ;
+    color: #ccc ;
+    border-color: #ddd ;
+    background-color: #eee ;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Styling ToolBar Button Group                                       --- */
+/* -------------------------------------------------------------------------- */
+
+.dome-xToolBar-Group {
+    display: flex ;
+    flex-direction: row ;
+    flex-wrap: nowrap ;
+    margin: 6px 5px 6px 5px ;
+}
+
+.dome-xToolBar-Group .dome-xToolBar-Control {
+    margin: 0 ;
+}
+
+.dome-xToolBar-Group .dome-xToolBar-Control:not(:first-child) {
+    border-left: 0 ;
+}
+
+.dome-xToolBar-Group > .dome-xToolBar-Control:first-child {
+    border-top-right-radius: 0 ;
+    border-bottom-right-radius: 0 ;
+}
+
+.dome-xToolBar-Group > .dome-xToolBar-Control:last-child {
+    border-top-left-radius: 0 ;
+    border-bottom-left-radius: 0 ;
+}
+
+.dome-xToolBar-Group > .dome-xToolBar-Control:not(:first-child):not(:last-child) {
+    border-radius: 0 ;
+}
+
+/* -------------------------------------------------------------------------- */

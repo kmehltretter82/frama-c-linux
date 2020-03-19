@@ -21,29 +21,56 @@
 (**************************************************************************)
 
 (* -------------------------------------------------------------------------- *)
-(** Data Encoding *)
+(** Data Encoding. *)
+
+(* -------------------------------------------------------------------------- *)
+(** {2 Datatypes}
+
+    This module is responsible for marshaling and demarshaling data to handle
+    communications between the server and the client in both directions.
+
+    Each datatype must be equipped with functions to encode and decode values
+    to/from JSON format. Moreover, data types shall be also properly documented
+    and registered in the generated documentation of the Frama-C server.
+
+    Generally speaking, we will have a module with signature [Data.D] for every
+    datatype to be exchanged with the server. For simple values, predefined
+    modules are already provided. More complex datatypes can be built with some
+    functors, typically for options, lists or arrays.
+
+    Records and enumerated types are typical in JSON formatting, but difficult
+    to build from OCaml records and abstract datatypes. For those kinds of data,
+    we provide an API based on the following general scheme:
+    - First create an empty container with its name, documentation and such;
+    - Then add each field or constructor to the container;
+    - Finally pack the container, which actually registers its complete
+      documentation and returns an OCaml value containing the resulting datatype
+      module.
+
+    Hence, in addition to module signature [Data.S] for values, there is also a
+    polymorphic type ['a Data.data] for module values carrying a data module with
+    type [t = 'a].
+
+    The same mechanism is used throughout modules [States] and [Request] each
+    time a JSON record or tag is needed. *)
 (* -------------------------------------------------------------------------- *)
 
 type json = Json.t
 
+val page : Doc.page (** Documentation page for general purpose data types. *)
 val pretty : Format.formatter -> json -> unit
 
+(** Datatype module signature. *)
 module type S =
 sig
   type t
-  val syntax : Syntax.t
+  val syntax : Syntax.t (** readable description of the JSON format *)
   val of_json : json -> t
   val to_json : t -> json
 end
 
 
-(** Datatype registration.
-
-    Name and page must be consistent with each other:
-    - The name must be lowercase, dash-separated list of identifiers
-    - Protocol data must start with ["<server>-*"]
-    - Plugin data must start with ["<plugin>-*"]
-*)
+(** Datatype informations. *)
 module type Info =
 sig
   val page : Doc.page
@@ -51,6 +78,7 @@ sig
   val descr : Markdown.text
 end
 
+(** Polymorphic data value. *)
 type 'a data = (module S with type t = 'a)
 
 (* -------------------------------------------------------------------------- *)
@@ -68,16 +96,6 @@ end
 module Collection(A : S) : S_collection with type t = A.t
 
 (* -------------------------------------------------------------------------- *)
-(** {2 Constructors} *)
-(* -------------------------------------------------------------------------- *)
-
-module Joption(A : S) : S with type t = A.t option
-module Jpair(A : S)(B : S) : S with type t = A.t * B.t
-module Jtriple(A : S)(B : S)(C : S) : S with type t = A.t * B.t * C.t
-module Jlist(A : S) : S with type t = A.t list
-module Jarray(A : S) : S with type t = A.t array
-
-(* -------------------------------------------------------------------------- *)
 (** {2 Atomic Data} *)
 (* -------------------------------------------------------------------------- *)
 
@@ -88,23 +106,33 @@ module Jint : S_collection with type t = int
 module Jfloat : S_collection with type t = float
 module Jstring : S_collection with type t = string
 module Jident : S_collection with type t = string (** Syntax is {i ident}. *)
-module Jtext : S with type t = json (** Rich text encoding, see [Jbuffer] *)
+module Jtext : S with type t = json (** Rich text encoding, see [Jbuffer]. *)
+module Jmarkdown : S with type t = Markdown.text
+
+(* -------------------------------------------------------------------------- *)
+(** {2 Constructors} *)
+(* -------------------------------------------------------------------------- *)
+
+module Joption(A : S) : S with type t = A.t option
+module Jpair(A : S)(B : S) : S with type t = A.t * B.t
+module Jtriple(A : S)(B : S)(C : S) : S with type t = A.t * B.t * C.t
+module Jlist(A : S) : S with type t = A.t list
+module Jarray(A : S) : S with type t = A.t array
 
 (* -------------------------------------------------------------------------- *)
 (** {2 Records} *)
 (* -------------------------------------------------------------------------- *)
 
-type 'a record (** Records of type 'a *)
-type 'a signature  (** Opened signature for record of type ['a] *)
-type ('a,'b) field (** Field of type ['b] for a record of type ['a] *)
-
 (** Record factory.
 
     You shall start by declaring a (ghost) type [r] and call
-    [Record.signature] to create a signature of type [r].
-    Then, populate the record with [Record.field] or [Record.option].
-    Finally, you shall call [Record.publish] to obtain a new data module
-    of type [Record with type r = r], which gives you a [Data] with an opaque
+    [Record.signature] to create a signature of type [r], which will be
+    your container to register your record fields.
+
+    Then, populate the signature with [Record.field] or [Record.option].
+    Finally, you shall call [Record.publish] to pack the record signature and
+    obtain a new data module of type [Record with type r = r],
+    which gives you a [Data] with an opaque
     type [t = r record] with fields of type [(r,a) field].
 
     {[
@@ -122,6 +150,10 @@ type ('a,'b) field (** Field of type ['b] for a record of type ['a] *)
 module Record :
 sig
 
+  type 'a record (** Records of type ['a]. *)
+  type 'a signature  (** Opened signature for record of type ['a]. *)
+  type ('a,'b) field (** Field of type ['b] for a record of type ['a]. *)
+
   (** Data with [type t = r record].
       Also contains getters and setters for fields. *)
   module type S =
@@ -134,30 +166,131 @@ sig
     val set : (r,'a) field -> 'a -> t -> t
   end
 
-  (** Create a new, opened record type *)
+  (** Create a new, opened record type. *)
   val signature : page:Doc.page -> name:string -> descr:Markdown.text ->
     unit -> 'a signature
 
-  (** Adds a field to an opened record *)
+  (** Adds a field to an opened record. *)
   val field : 'r signature ->
     name:string -> descr:Markdown.text -> ?default:'a -> 'a data ->
     ('r,'a) field
 
-  (** Adds a optional field to an opened record *)
+  (** Adds a optional field to an opened record. *)
   val option : 'r signature ->
     name:string -> descr:Markdown.text -> 'a data ->
     ('r,'a option) field
 
-  (** Publish and close an opened record *)
-  val publish : 'a signature -> (module S with type r = 'a)
+  (** Publish and close an opened record. *)
+  val publish : 'a signature ->
+    (module S with type r = 'a)
 
 end
 
 (* -------------------------------------------------------------------------- *)
-(** {2 Indexed Values} *)
+(** {2 Enums} *)
 (* -------------------------------------------------------------------------- *)
 
-(** Simplified [Map.S] *)
+module Tag : S_collection with type t = Syntax.tag
+
+(** Enum factory.
+
+    You shall start by declaring a dictionary with [Enum.dictionary] for your
+    values. Then, populate the dictionary with [Enum.tag] values. Finally, you
+    shall call [Enum.publish] to obtain a new data module for your type.
+
+    You have two options for computing tags: either you provide values when
+    declaring tags, and these tags will be associated to registered values for
+    both directions; alternatively you might provide a [~tag] function to
+    [Enum.publish].
+
+    The difficulty when providing values only at tag definition is to ensure
+    that all possible value has been registered.
+
+    The conversion values from and to json may fail when no value has been
+    registered with tags. *)
+module Enum :
+sig
+
+  type 'a dictionary
+  type 'a tag
+  type 'a prefix
+
+  val tag_name : 'a tag -> string
+
+  (** Creates an opened, empty dictionary. *)
+  val dictionary :
+    page:Doc.page -> name:string -> title:string -> descr:Markdown.text ->
+    unit -> 'a dictionary
+
+  (** Register a new tag in the dictionary.
+      The default label is the capitalized name.
+      The provided value, if any, will be used for decoding json tags.
+      If would be used also for encoding values to json tags if no [~tag]
+      function is provided when publishing the dictionary.
+      Registered values must be hashable with [Hashtbl.hash] function.
+
+      You may register a new tag {i after} the dictionary has been published. *)
+  val tag : 'a dictionary ->
+    name:string ->
+    ?label:Markdown.text -> descr:Markdown.text ->
+    ?value:'a ->
+    unit -> 'a tag
+
+  (** Register a new prefix tag in the dictionary.
+      The default label is the capitalized prefix.
+      To decoding from json is provided to prefix tags.
+      Encoding is done by emitting tags with form ['prefix:*'].
+      The variable part of the prefix is documented as ['prefix:xxx']
+      when [~var:"xxx"] is provided.
+
+      You may register a new prefix-tag {i after} the dictionary has
+      been published. *)
+  val prefix : 'a dictionary ->
+    prefix:string -> ?var:string ->
+    ?label:Markdown.text -> descr:Markdown.text ->
+    unit -> 'a prefix
+
+  (** Returns the tag for a value associated with the given prefix. *)
+  val instance : 'a prefix -> string -> 'a tag
+
+  (** Publish a new instance in the documentation. *)
+  val extends : 'a dictionary -> 'a prefix ->
+    name:string ->
+    ?label:Markdown.text -> descr:Markdown.text ->
+    ?value:'a ->
+    unit -> 'a tag
+
+  (** Obtain all the tags registered in the dictionary so far. *)
+  val tags : 'a dictionary -> Tag.t list
+
+  val page : 'a dictionary -> Doc.page
+  val name : 'a dictionary -> string
+  val syntax : 'a dictionary -> Markdown.text
+
+  (** Publish the dictionary. No more tag nor prefix can be added afterwards. If
+      no [~tag] function is provided, registered values with tags are used. *)
+  val publish :
+    'a dictionary -> ?tag:('a -> 'a tag) -> unit -> (module S with type t = 'a)
+
+end
+
+(* -------------------------------------------------------------------------- *)
+(** {2 Indexed Values}
+
+    These datatypes automatically index complex values with
+    unique identifiers. This avoids to encode the internal OCaml
+    representation of each value, by only providing to the server
+    a unique identifier for each value.
+
+    These datatype functors come into three flavors:
+    - [Index()] for projectified datatypes,
+    - [Static()] for project independant datatypes,
+    - [Identified()] for projectified values already identified by integers.
+
+*)
+(* -------------------------------------------------------------------------- *)
+
+(** Simplified [Map.S]. *)
 module type Map =
 sig
   type 'a t
@@ -167,11 +300,12 @@ sig
   val find : key -> 'a t -> 'a
 end
 
+(** Datatype extended with access to value identifiers. *)
 module type Index =
 sig
   include S_collection
   val get : t -> int
-  val find : int -> t (** @raise Not_found if not registered *)
+  val find : int -> t (** @raise Not_found if not registered. *)
   val clear : unit -> unit
   (** Clear index tables. Use with extreme care. *)
 end
@@ -182,10 +316,7 @@ module Static(M : Map)(I : Info) : Index with type t = M.key
 (** Builds a {i projectified} index. *)
 module Index(M : Map)(I : Info) : Index with type t = M.key
 
-(* -------------------------------------------------------------------------- *)
-(** {2 Identified Types} *)
-(* -------------------------------------------------------------------------- *)
-
+(** Datatype already identified by unique integers. *)
 module type IdentifiedType =
 sig
   type t
@@ -193,33 +324,24 @@ sig
   include Info
 end
 
-(** Builds a {i projectified} index on types with {i unique} identifiers *)
+(** Builds a {i projectified} index on types with {i unique} identifiers. *)
 module Identified(A : IdentifiedType) : Index with type t = A.t
 
 (* -------------------------------------------------------------------------- *)
-(** {2 Dictionary} *)
+(** {2 Error handling}
+
+    These utilities shall be used when writing your own encoding and decoding
+    values to JSON format.
+*)
 (* -------------------------------------------------------------------------- *)
 
-module type Enum =
-sig
-  type t
-  val values : (t * string * Markdown.text) list
-  include Info
-end
-
-module Dictionary(E : Enum) : S_collection with type t = E.t
-
-(* -------------------------------------------------------------------------- *)
-(** {2 Error handling} *)
-(* -------------------------------------------------------------------------- *)
-
-(** Exception thrown during the decoding of a request's inputs *)
+(** Exception thrown during the decoding of a request's inputs. *)
 exception InputError of string
 
 val failure : ?json:json -> ('a, Format.formatter, unit, 'b) format4 -> 'a
-(** @raise InputError with provided message *)
+(** @raise InputError with provided message. *)
 
 val failure_from_type_error : string -> json -> 'a
-(** @raise InputError from Yojson.Basic.Util.Type_error arguments *)
+(** @raise InputError from [Yojson.Basic.Util.Type_error] arguments. *)
 
 (* -------------------------------------------------------------------------- *)

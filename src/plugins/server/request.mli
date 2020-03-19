@@ -44,6 +44,35 @@ end
 type 'a input = (module Input with type t = 'a)
 type 'b output = (module Output with type t = 'b)
 
+(** {2 Signals}
+
+    A signal is a one-way message from server to client for indicating that
+    something happened. To avoid unecessary noise, the client must be registered
+    on each signal it is interested in. The client will then send a proper get
+    requests to the server to retrieve the updated data.
+
+    As a matter of fact, update events are much more frequent than what a
+    typical GUI client can handle. Hence, signal emissions can not carry data and
+    are grouped (or « debounced ») until the next server response to client. *)
+
+(** The type of registered signals. *)
+type signal
+
+(** Register a server signal. The signal [name] must be unique. *)
+val signal :
+  page:Doc.page ->
+  name:string ->
+  descr:Markdown.text ->
+  ?details:Markdown.block ->
+  unit -> signal
+
+(** Emit the signal to the client. *)
+val emit : signal -> unit
+
+(** Callback invoked each time the client is starting or stopping
+    to listen to the given signal. *)
+val on_signal : signal -> (bool -> unit) -> unit
+
 (** {2 Simple Requests Registration} *)
 
 (** Register a simple request of type [(a -> b)].
@@ -162,8 +191,8 @@ val register_sig : ('a,'b) signature -> (rq -> 'a -> 'b) -> unit
 *)
 
 
-(** Named input parameter. If a default value is provided,
-    the JSON input field becomes optional. Otherwized, it is required. *)
+(** Named input parameter. If a default value is provided, the JSON input field
+    becomes optional. Otherwized, it is required. *)
 val param : (unit,'b) signature ->
   name:string ->
   descr:Markdown.text ->
@@ -176,10 +205,9 @@ val param_opt : (unit,'b) signature ->
   descr:Markdown.text ->
   'a input -> 'a option param
 
-(** Named output parameter. If a default value is provided,
-    the JSON output field is initialized with it.
-    Otherwized, it shall be set at each invocation of the request processing
-    funciton. *)
+(** Named output parameter. If a default value is provided, the JSON output
+    field is initialized with it. Otherwise, it shall be set at each invocation
+    of the request processing funciton. *)
 val result : ('a,unit) signature ->
   name:string ->
   descr:Markdown.text ->
@@ -191,5 +219,11 @@ val result_opt : ('a,unit) signature ->
   name:string ->
   descr:Markdown.text ->
   'b output -> 'b option result
+
+(** {2 Exporting Dictionaries} *)
+
+(** Register a [GET] request [dictionary.<name>] to retrieve all tags registered
+    in the dictionary. *)
+val dictionary : 'a Data.Enum.dictionary -> unit
 
 (* -------------------------------------------------------------------------- *)

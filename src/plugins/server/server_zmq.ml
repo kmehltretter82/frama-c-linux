@@ -98,6 +98,8 @@ let rec decode = function
   | ("GET"|"SET"|"EXEC")::id::request::data :: w ->
     `Request(id,request,jdecode data) :: decode w
   | "KILL"::id:: w -> `Kill id :: decode w
+  | "SIGON" :: sg :: w -> `SigOn sg :: decode w
+  | "SIGOFF" :: sg :: w -> `SigOff sg :: decode w
   | "POLL" :: w -> `Poll :: decode w
   | "SHUTDOWN" :: _ -> [`Shutdown]
   | cmd::_ -> raise (WrongEncoding cmd)
@@ -108,6 +110,7 @@ let rec encode = function
   | `Error(id,msg) :: w -> "ERROR" :: id :: msg :: encode w
   | `Killed id :: w -> "KILLED" :: id :: encode w
   | `Rejected id :: w -> "REJECTED" :: id :: encode w
+  | `Signal sg :: w -> "SIGNAL" :: sg :: encode w
   | [] -> []
 
 (* -------------------------------------------------------------------------- *)

@@ -1,0 +1,1 @@
+@babel/core@^7 @babel/preset-env @babel/preset-react @babel/plugin-proposal-object-rest-spread electron@^7 electron-builder electron-webpack electron-devtools-installer webpack babel-loader css-loader react-hot-loader @hot-loader/react-dom @types/react
