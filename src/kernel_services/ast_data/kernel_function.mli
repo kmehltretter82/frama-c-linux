@@ -227,6 +227,7 @@ exception No_Definition
 val get_definition : t -> fundec
   (** @raise No_Definition if the given function is not a definition.
       @plugin development guide *)
+
 val has_definition : t -> bool
   (** @return [true] iff the given kernel function has a defintion.
       @since Frama-C+dev *)

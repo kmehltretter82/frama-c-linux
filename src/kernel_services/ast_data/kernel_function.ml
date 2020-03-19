@@ -71,6 +71,7 @@ exception No_Definition
 let get_definition kf = match kf.fundec with
   | Definition (f,_) -> f
   | Declaration _ -> raise No_Definition
+
 let has_definition kf = match kf.fundec with
   | Definition  _ -> true
   | Declaration _ -> false
