@@ -35,9 +35,9 @@
     Generally speaking, we will have a module with signature [Data.D] for
     every datatype to be exchanged with the server. For simple values,
     predefined modules are already provided. More complex datatypes can be
-    build with some functors, typically for options, lists or arrays.
+    built with some functors, typically for options, lists or arrays.
 
-    Records and enumarated types are typical in JSON formatting, but difficult
+    Records and enumerated types are typical in JSON formatting, but difficult
     to build from OCaml records and abstract datatypes. For those kinds of data,
     we provide an API based on the following general scheme:
     - you first create a empty container with its name, documentation and such;
