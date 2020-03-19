@@ -341,6 +341,7 @@ let create ~pretty ?(equal=(=)) ~fetch () =
 (* -------------------------------------------------------------------------- *)
 
 let start server =
+  emitter := do_signal server ;
   match server.daemon with
   | Some _ -> ()
   | None ->
@@ -357,6 +358,7 @@ let start server =
     end
 
 let stop server =
+  emitter := nop ;
   match server.daemon with
   | None -> ()
   | Some daemon ->
@@ -368,6 +370,7 @@ let stop server =
     end
 
 let foreground server =
+  emitter := do_signal server ;
   match server.daemon with
   | None -> ()
   | Some daemon ->
@@ -386,7 +389,6 @@ let run server =
       Sys.catch_break true
     ) ;
     foreground server ;
-    emitter := do_signal server ;
     set_active true ;
     Senv.feedback "Server running." ;
     begin

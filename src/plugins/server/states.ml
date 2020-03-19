@@ -27,7 +27,7 @@ type 'a callback = ('a -> unit) -> unit
 let install signal hook = function
   | None -> ()
   | Some add_hook ->
-    let once = ref false in
+    let once = ref true in
     let install ok =
       if ok && !once then
         begin
