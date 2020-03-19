@@ -20,6 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Rich text buffers with JSON marshalling. *)
+
 type json = Json.t
 
 (** All-in-one formatter. Return the JSON encoding of formatted text. *)

@@ -21,7 +21,10 @@
 (**************************************************************************)
 
 (* -------------------------------------------------------------------------- *)
-(** {2 Data Encoding}
+(** Data Encoding. *)
+
+(* -------------------------------------------------------------------------- *)
+(** {2 Datatypes}
 
     This module is responsible for marshaling and demarshaling data
     to handle communications between the server and the client in both

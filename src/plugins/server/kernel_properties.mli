@@ -20,6 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Kernel Property Status *)
+
 (** Documentation of ACSL extensions for [propkind] server data. *)
 val register_propkind :
   name:string ->

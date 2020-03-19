@@ -20,6 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Synchronized values between Server & Client *)
+
 type 'a callback = ('a -> unit) -> unit
 
 (** Register a (projectified) value and generates the associated signal and

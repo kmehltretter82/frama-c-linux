@@ -31,6 +31,10 @@ module Pages = Map.Make(String)
 
 type chapter = [ `Protocol | `Kernel | `Plugin of string ]
 
+(* Section contents can be generated statically or dynamically.
+   Typically, general kernel dictionary entries can be extended by plugins.
+   The general case is to have a function that builds the (final) content
+   on demand. *)
 type section = (unit -> Markdown.elements)
 
 type page = {
