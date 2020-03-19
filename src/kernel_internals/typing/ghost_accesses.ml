@@ -73,10 +73,6 @@ module Error = struct
       "Call via a function pointer cannot be checked" ;
 end
 
-let has_definition kf =
-  try ignore (Kernel_function.get_definition kf) ; true
-  with Kernel_function.No_Definition -> false
-
 let is_ret_var vi =
   String.equal vi.vorig_name "__retres"
 
@@ -129,7 +125,9 @@ class visitor = object(self)
       let post g = self#reset_loc() ; g in
 
       let kf = Globals.Functions.get vi in
-      if vi.vghost && vi.vreferenced && not (has_definition kf) then begin
+      if vi.vghost && vi.vreferenced
+         && not (Kernel_function.has_definition kf)
+      then begin
         let spec = try Annotations.funspec ~populate:false kf
           with _ -> empty_funspec ()
         in
@@ -227,7 +225,8 @@ class visitor = object(self)
       let kf = Extlib.the (self#current_kf) in
       match assigns with
       | Writes froms -> List.iter check_assign froms
-      | WritesAny when not (has_definition kf) -> self#bad_ghost_function kf
+      | WritesAny when not (Kernel_function.has_definition kf) ->
+        self#bad_ghost_function kf
       | WritesAny ->
         (* Even without assigns, a definition is enough to check that the
            function does not assigns non-ghost locations. *)
