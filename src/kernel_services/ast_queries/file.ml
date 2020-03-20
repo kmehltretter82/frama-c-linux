@@ -123,12 +123,22 @@ let from_filename ?cpp f =
     if cmdline <> "" then
       cmdline, cpp_opt_kind ()
     else
-      let flags = Json_compilation_database.get_flags f in
+      let extra_flags =
+        try Kernel.CppExtraArgsPerFile.find f
+        with Not_found -> ""
+      in
+      let jcdb_flags = Json_compilation_database.get_flags f in
+      if extra_flags <> "" && jcdb_flags <> [] then
+        Kernel.warning ~wkey:Kernel.wkey_jcdb
+          "found flags for file %a@ both in -cpp-extra-args-per-file and@ \
+           in the json compilation database;@ the latter will be ignored"
+          Filepath.Normalized.pretty f;
       let cpp, gnu =
         match cpp with
         | None -> get_preprocessor_command ()
         | Some cpp -> cpp, cpp_opt_kind ()
       in
+      let flags = if extra_flags <> "" then [extra_flags] else jcdb_flags in
       (if flags = [] then cpp else cpp ^ " " ^ String.concat " " flags), gnu
   in
   if Filename.check_suffix (f:>string) ".i" then begin
@@ -173,6 +183,7 @@ end = struct
         let dependencies =
           [ Kernel.CppCommand.self;
             Kernel.CppExtraArgs.self;
+            Kernel.CppExtraArgsPerFile.self;
             Kernel.JsonCompilationDatabase.self;
             Kernel.Files.self ]
         let name = "Files for preprocessing"

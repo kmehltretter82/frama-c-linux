@@ -266,6 +266,25 @@ module Filepath_list
       include X
     end)
 
+module Filepath_map
+    (X: sig
+       include Input_with_arg
+       val existence: Filepath.existence
+       val file_kind: string
+     end) =
+  P.Filepath_map
+    (struct
+      include Datatype.String
+      type key = Filepath.Normalized.t
+      let of_string ~key:_ ~prev:_ s = s
+      let to_string ~key:_ s = s
+    end)
+    (struct
+      let () = Parameter_customize.set_module_name X.module_name
+      include X
+      let default = Datatype.Filepath.Map.empty
+    end)
+
 module Kernel_function_set(X: Input_with_arg) =
   P.Kernel_function_set
     (struct
@@ -925,6 +944,21 @@ module CppExtraArgs =
       let arg_name = "args"
       let help = "additional arguments passed to the preprocessor while \
                   preprocessing the C code but not while preprocessing annotations"
+    end)
+
+let () = Parameter_customize.set_group parsing
+let () = Parameter_customize.do_not_reset_on_copy ()
+module CppExtraArgsPerFile =
+  Filepath_map
+    (struct
+      let module_name = "CppExtraArgsPerFile"
+      let option_name = "-cpp-extra-args-per-file"
+      let arg_name = "file:flags"
+      let existence = Filepath.Must_exist
+      let file_kind = "source"
+      let help =
+        "when set, adds preprocessing arguments for each specified file. \
+         To add arguments for all files, use -cpp-extra-args."
     end)
 
 let () = Parameter_customize.set_group parsing

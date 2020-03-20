@@ -156,6 +156,10 @@ pre-processed. *args* are used only for the first pass, so that arguments that
 should not be used twice (such as additional include directives or macro
 definitions) must thus go there instead of **-cpp-command**.
 
+-cpp-extra-args-per-file *file1:args1,...,filen:argsn*
+: like **-cpp-extra-args**, but the arguments only apply to the specified
+files.
+
 [-no]-cpp-frama-c-compliant
 : indicates that the chosen preprocessor complies to some Frama-C requirements,
 such as accepting the same set of options as GNU cpp, and accepting
