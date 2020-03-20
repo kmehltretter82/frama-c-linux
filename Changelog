@@ -17,6 +17,7 @@
 Open Source Release <next-release>
 ##################################
 
+-   Kernel    [2020/02/20] Add option -cpp-extra-args-per-file
 -*  Kernel    [2020/03/18] Fixes #@823 (-load-module/-load-script now accept
               spaces in filename)
 -*  Kernel    [2020/03/18] Fixes #@818 (term generated for downcast alarms) 
