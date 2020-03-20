@@ -209,11 +209,16 @@ let () =
 
 let () = Parameter_customize.set_group domains
 module DomainsFunction =
-  String_multiple_map
+  Make_multiple_map
+    (struct
+      include Datatype.String
+      let of_string str = check_domain str; str
+      let of_singleton_string = no_element_of_string
+      let to_string str = str
+    end)
     (struct
       include Domain_mode.Function_Mode
       let of_string ~key ~prev str =
-        check_domain key;
         try of_string ~key ~prev str
         with Invalid_argument msg -> raise (Cannot_build msg)
     end)
@@ -225,6 +230,7 @@ module DomainsFunction =
                   <d:f-> disables the domain [d] from function [f]."
       let arg_name = "d:f"
       let default = Datatype.String.Map.empty
+      let dependencies = []
     end)
 let () = add_precision_dep DomainsFunction.parameter
 
