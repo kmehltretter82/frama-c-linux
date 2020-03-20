@@ -40,6 +40,7 @@ type t = {
   float_to_int: bool;
   finite_float: bool;
   pointer_call: bool;
+  pointer_value: bool;
   bool_value: bool;
 }
 
@@ -59,6 +60,7 @@ let all = {
   float_to_int = true;
   finite_float = true;
   pointer_call = true;
+  pointer_value = true;
   bool_value = true;
 }
 
@@ -78,6 +80,7 @@ let none = {
   float_to_int = false;
   finite_float = false;
   pointer_call = false;
+  pointer_value = false;
   bool_value = false;
 }
 
@@ -102,6 +105,7 @@ let default
     ?float_to_int
     ?finite_float
     ?pointer_call
+    ?pointer_value
     ?bool_value
     () =
   {
@@ -120,6 +124,7 @@ let default
     float_to_int = option Options.DoFloatToInt.get float_to_int ;
     finite_float = option (fun () -> Kernel.SpecialFloat.get () <> "none") finite_float ;
     pointer_call = option Options.DoPointerCall.get pointer_call ;
+    pointer_value = option Kernel.InvalidPointer.get pointer_value;
     bool_value = option Kernel.InvalidBool.get bool_value ;
   }
 

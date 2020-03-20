@@ -143,6 +143,7 @@ int main(void)
 [kernel] - shift_value_out_of_bounds = true
 [kernel] - division_by_zero = true
 [kernel] - pointer_call = true
+[kernel] - pointer_value = false
 [kernel] - mem_access = true
 [kernel] - initialized = false
 [kernel] kf = main
@@ -159,6 +160,7 @@ int main(void)
 [kernel] - shift_value_out_of_bounds = true
 [kernel] - division_by_zero = true
 [kernel] - pointer_call = true
+[kernel] - pointer_value = false
 [kernel] - mem_access = true
 [kernel] - initialized = false
 [kernel] ================================
@@ -237,6 +239,7 @@ int main(void)
 [kernel] - shift_value_out_of_bounds = true
 [kernel] - division_by_zero = true
 [kernel] - pointer_call = true
+[kernel] - pointer_value = false
 [kernel] - mem_access = true
 [kernel] - initialized = false
 [kernel] kf = main
@@ -253,6 +256,7 @@ int main(void)
 [kernel] - shift_value_out_of_bounds = true
 [kernel] - division_by_zero = true
 [kernel] - pointer_call = true
+[kernel] - pointer_value = false
 [kernel] - mem_access = true
 [kernel] - initialized = false
 [kernel] ================================

@@ -451,6 +451,24 @@ let finite_float_assertion ~remove_trivial:_ ~on_alarm (fkind, exp) =
 let pointer_call ~remove_trivial:_ ~on_alarm (e, args) =
   on_alarm ~invalid:false (Alarms.Function_pointer (e, Some args))
 
+let is_safe_pointer_value = function
+  | Lval (Var vi, offset) ->
+    (* Reading a pointer variable must emit an alarm if an invalid pointer value
+       could have been written without previous alarm, through:
+       - an union type, in which case [offset] is not NoOffset;
+       - an untyped write, in which case the address of [vi] is taken. *)
+    not vi.vaddrof && offset = NoOffset
+  | AddrOf (_, NoOffset) | StartOf (_, NoOffset) -> true
+  | CastE (_typ, e) ->
+    (* 0 can always be converted into a NULL pointer. *)
+    let v = get_expr_val e in
+    Extlib.may_map ~dft:false Integer.(equal zero) v
+  | _ -> false
+
+let pointer_value ~remove_trivial ~on_alarm expr =
+  if not (remove_trivial && is_safe_pointer_value expr.enode)
+  then on_alarm ~invalid:false (Alarms.Invalid_pointer expr)
+
 let bool_value ~remove_trivial ~on_alarm lv =
   match remove_trivial, lv with
   | true, (Var vi, NoOffset)

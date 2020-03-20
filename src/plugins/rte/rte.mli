@@ -44,6 +44,7 @@ val downcast_assertion: (typ * exp) alarm_gen
 val float_to_int_assertion: (typ * exp) alarm_gen
 val finite_float_assertion: (fkind * exp) alarm_gen
 val pointer_call: (exp * exp list) alarm_gen
+val pointer_value: exp alarm_gen
 val bool_value: lval alarm_gen
 
 (*
