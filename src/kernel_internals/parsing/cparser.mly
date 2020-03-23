@@ -226,11 +226,6 @@ let trd3 (_, _, result) = result
 
 let fourth4 (_,_,_,result) = result
 
-(*
-   transform:  __builtin_offsetof(type, member)
-   into     :  (size_t) (&(type * ) 0)->member
- *)
-
 let sizeofType () =
   let findSpecifier name =
     let convert_one_specifier s =
@@ -252,6 +247,11 @@ let sizeofType () =
   in
   findSpecifier Cil.theMachine.Cil.theMachine.Cil_types.size_t
 
+
+(*
+   transform:  offsetof(type, member)
+   into     :  (size_t) (&(type * ) 0)->member
+ *)
 
 let transformOffsetOf (speclist, dtype) member =
   let mk_expr e = { expr_loc = member.expr_loc; expr_node = e } in
@@ -280,7 +280,7 @@ let transformOffsetOf (speclist, dtype) member =
       | INDEX (base, index) ->
 	  INDEX (replaceBase base, index)
       | _ ->
-	Errorloc.parse_error "malformed offset expression in __builtin_offsetof"
+	Errorloc.parse_error "malformed offset expression in offsetof macro"
     in { e with expr_node = node }
   in
   let memberExpr = replaceBase member in

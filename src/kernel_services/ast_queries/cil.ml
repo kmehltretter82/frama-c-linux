@@ -5199,13 +5199,20 @@ let initVABuiltins () =
 let initMsvcBuiltins () : unit =
   (** Take a number of wide string literals *)
   Builtin_functions.add "__annotation" (voidType, [ ], true)
-;;
+
+let init_common_builtins () =
+  add_builtin
+    "offsetof"
+    theMachine.typeOfSizeOf
+    [ theMachine.typeOfSizeOf ]
+    false
 
 let init_builtins () =
   if not (TheMachine.is_computed ()) then
     Kernel.fatal ~current:true "You must call initCIL before init_builtins" ;
   if Builtin_functions.length () <> 0 then
     Kernel.fatal ~current:true "Cil builtins already initialized." ;
+  init_common_builtins ();
   if msvcMode () then
     initMsvcBuiltins ()
   else begin

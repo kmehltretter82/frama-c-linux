@@ -8,7 +8,7 @@
 ------------------------------------------------------------
 
 Goal Post-condition (file tests/wp_usage/caveat_range.i, line 12) in 'reset':
-Let a = global(G_p_20).
+Let a = global(G_p_22).
 Let a_1 = havoc(Mint_undef_0, Mint_0, shift_S(a, 0), 20).
 Assume {
   Type: is_sint32(i_1).
@@ -30,7 +30,7 @@ Prove: a_1[shiftfield_F1_S_f(shift_S(a, i))] = 1.
 ------------------------------------------------------------
 
 Goal Post-condition (file tests/wp_usage/caveat_range.i, line 13) in 'reset':
-Let a = global(G_p_20).
+Let a = global(G_p_22).
 Let a_1 = havoc(Mint_undef_0, Mint_0, shift_S(a, 0), 20).
 Assume {
   Type: is_sint32(i_1).
@@ -52,7 +52,7 @@ Prove: a_1[shiftfield_F1_S_g(shift_S(a, i))] = 2.
 ------------------------------------------------------------
 
 Goal Preservation of Invariant (file tests/wp_usage/caveat_range.i, line 19):
-Let a = global(G_p_20).
+Let a = global(G_p_22).
 Let a_1 = havoc(Mint_undef_0, Mint_0, shift_S(a, 0), 20).
 Assume {
   Type: is_sint32(i) /\ is_sint32(1 + i).
@@ -77,7 +77,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Preservation of Invariant (file tests/wp_usage/caveat_range.i, line 20):
-Let a = global(G_p_20).
+Let a = global(G_p_22).
 Let a_1 = havoc(Mint_undef_0, Mint_0, shift_S(a, 0), 20).
 Assume {
   Type: is_sint32(i) /\ is_sint32(1 + i).
@@ -105,7 +105,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Preservation of Invariant (file tests/wp_usage/caveat_range.i, line 21):
-Let a = global(G_p_20).
+Let a = global(G_p_22).
 Let a_1 = havoc(Mint_undef_0, Mint_0, shift_S(a, 0), 20).
 Let a_2 = shift_S(a, i).
 Assume {

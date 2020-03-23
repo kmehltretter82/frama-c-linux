@@ -8,6 +8,8 @@
   /* compiler builtin: 
      __builtin_va_list __builtin_next_arg(void);   */
   /* compiler builtin: 
+     unsigned int __builtin_offsetof(unsigned int);   */
+  /* compiler builtin: 
      void __builtin_stdarg_start(__builtin_va_list);   */
   /* compiler builtin: 
      void __builtin_va_arg(__builtin_va_list, unsigned int, void *);   */
@@ -40,6 +42,8 @@
   };
   /* compiler builtin: 
      __builtin_va_list __builtin_next_arg(void);   */
+  /* compiler builtin: 
+     unsigned int __builtin_offsetof(unsigned int);   */
   /* compiler builtin: 
      void __builtin_stdarg_start(__builtin_va_list);   */
   /* compiler builtin: 

@@ -1057,7 +1057,7 @@ class cil_printer () = object (self)
           Extlib.may (fprintf fmt "%a = " self#lval) dest;
           (* Now the call itself *)
           fprintf fmt "%a(%a, %a)%s"
-            self#varname vi.vname
+            self#varname "offsetof"
             (self#typ None) (Cil.typeOfLhost host)
             self#offset offset
             instr_terminator

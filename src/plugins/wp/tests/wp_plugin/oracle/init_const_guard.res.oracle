@@ -14,7 +14,7 @@ Prove: true.
 
 Goal Post-condition 'Pointed_Valid' in 'f':
 Assume { (* Heap *) Type: linked(Malloc_0). }
-Prove: valid_rw(Malloc_0, global(G_x_18), 1).
+Prove: valid_rw(Malloc_0, global(G_x_20), 1).
 
 ------------------------------------------------------------
 
@@ -38,12 +38,12 @@ Prove: true.
 
 Goal Assertion 'Read' (file tests/wp_plugin/init_const_guard.i, line 31):
 Assume { (* Heap *) Type: linked(Malloc_0). }
-Prove: valid_rd(Malloc_0, global(G_x_18), 1).
+Prove: valid_rd(Malloc_0, global(G_x_20), 1).
 
 ------------------------------------------------------------
 
 Goal Assertion 'Guard_against_Const' (file tests/wp_plugin/init_const_guard.i, line 32):
-Let a = global(G_x_18).
+Let a = global(G_x_20).
 Assume {
   (* Heap *)
   Type: linked(Malloc_0).

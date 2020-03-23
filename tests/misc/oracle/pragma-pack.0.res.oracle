@@ -87,8 +87,6 @@
   adding aligned(1) attribute to field 'PACKOVERPOP.j' due to packing pragma
 [kernel:typing:pragma] tests/misc/pragma-pack.c:88: 
   adding aligned(1) attribute to comp 'PACKOVERPOP' due to packing pragma
-[kernel:typing:implicit-function-declaration] tests/misc/pragma-pack.c:104: Warning: 
-  Calling undeclared function __builtin_offsetof. Old style K&R code?
 [kernel:typing:pragma] tests/misc/pragma-pack.c:133: 
   packing pragma: restoring alignment to default (16)
 [kernel:typing:pragma] tests/misc/pragma-pack.c:135: 

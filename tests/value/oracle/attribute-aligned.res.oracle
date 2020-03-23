@@ -1,6 +1,4 @@
 [kernel] Parsing tests/value/attribute-aligned.c (with preprocessing)
-[kernel:typing:implicit-function-declaration] tests/value/attribute-aligned.c:17: Warning: 
-  Calling undeclared function __builtin_offsetof. Old style K&R code?
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
