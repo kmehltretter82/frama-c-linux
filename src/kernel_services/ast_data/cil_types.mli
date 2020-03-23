@@ -360,9 +360,9 @@ and compinfo = {
       of a comp (along with the struct or union) *)
 
   mutable ckey: int;
-  (** A unique integer. This is assigned by {!Cil.mkCompInfo} using a global
+  (** A unique integer. This is assigned by {!Cil_const.mkCompInfo} using a global
       variable in the Cil module. Thus two identical structs in two different
-      files might have different keys. Use {!Cil.copyCompInfo} to copy
+      files might have different keys. Use {!Cil_const.copyCompInfo} to copy
       structures so that a new key is assigned. *)
 
   mutable cfields: fieldinfo list;
