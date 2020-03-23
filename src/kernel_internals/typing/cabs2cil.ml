@@ -2100,82 +2100,89 @@ struct
         Cil_printer.pp_stmt s l;
     with Found -> ()
 
-  class cleanUnspecified = object(self)
-    inherit nopCilVisitor
-    val unspecified_stack = Stack.create ()
+  class cleanUnspecified =
+    let is_annot_next_stmt = function
+      | [] -> false
+      | { skind = Instr (Code_annot (c,_)) } :: _ ->
+        Logic_utils.is_annot_next_stmt c
+      | _ -> false
+    in
+    object(self)
+      inherit nopCilVisitor
+      val unspecified_stack = Stack.create ()
 
-    val mutable replace_table = []
+      val mutable replace_table = []
 
-    (* we start in a deterministic block. *)
-    initializer Stack.push false unspecified_stack
+      (* we start in a deterministic block. *)
+      initializer Stack.push false unspecified_stack
 
-    method private push: 'a.bool->'a->'a visitAction =
-      fun flag x ->
-      Stack.push flag unspecified_stack;
-      ChangeDoChildrenPost
-        (x,fun x -> ignore(Stack.pop unspecified_stack); x)
+      method private push: 'a.bool->'a->'a visitAction =
+        fun flag x ->
+        Stack.push flag unspecified_stack;
+        ChangeDoChildrenPost
+          (x,fun x -> ignore(Stack.pop unspecified_stack); x)
 
 
-    method! vblock b =
-      b.bstmts <-
-        List.rev
-          (List.fold_left(
-              fun res s ->
-                match s.skind with
-                | Block b when
-                    (not (Stack.top unspecified_stack)) &&
-                    b.battrs = [] && b.blocals = [] &&
-                    s.labels = []
-                  -> List.rev_append b.bstmts res
-                | _ -> s ::res)
-              [] b.bstmts);
-      DoChildren
+      method! vblock b =
+        b.bstmts <-
+          List.rev
+            (List.fold_left(
+                fun res s ->
+                  match s.skind with
+                  | Block b when
+                      (not (Stack.top unspecified_stack)) &&
+                      b.battrs = [] && b.blocals = [] &&
+                      s.labels = [] && not (is_annot_next_stmt res)
+                    -> List.rev_append b.bstmts res
+                  | _ -> s ::res)
+                [] b.bstmts);
+        DoChildren
 
-    method! vstmt s =
-      let ghost = s.ghost in
-      let change_label_stmt s s' =
-        List.iter
-          (function
-            | Label (x,_,_) -> H.replace labelStmt x s'
-            | Case _ | Default _ -> replace_table <- (s, s') :: replace_table
-          ) s.labels;
-        s'.labels <- s.labels @ s'.labels
-      in
-      match s.skind with
-      | UnspecifiedSequence [s',_,_,_,_] ->
-        change_label_stmt s s';
-        ChangeDoChildrenPost(s', fun x -> x)
-      | UnspecifiedSequence [] ->
-        let s' = mkEmptyStmt ~ghost ~valid_sid ~loc:(cabslu "_useq") () in
-        change_label_stmt s s';
-        ChangeTo s';
-      | UnspecifiedSequence _ -> self#push true s
-      | Block { battrs = []; blocals = []; bstmts = [s']} ->
-        change_label_stmt s s';
-        ChangeDoChildrenPost (s', fun x -> x)
-      | Block _ | If _ | Loop _
-      | TryFinally _ | TryExcept _ | Throw _ | TryCatch _ ->
-        self#push false s
-      | Switch _ ->
-        let change_cases stmt =
-          match stmt.skind with
-          | Switch(e,body,cases,loc) ->
-            let newcases =
-              List.map
-                (fun s ->
-                   try List.assq s replace_table
-                   with Not_found -> s)
-                cases
-            in
-            stmt.skind <- Switch(e,body,newcases,loc);
-            ignore (Stack.pop unspecified_stack);
-            stmt
-          | _ -> assert false
-        in Stack.push false unspecified_stack;
-        ChangeDoChildrenPost(s,change_cases)
-      | Instr _ | Return _ | Goto _ | Break _
-      | Continue _ -> DoChildren
-  end
+      method! vstmt s =
+        let ghost = s.ghost in
+        let change_label_stmt s s' =
+          List.iter
+            (function
+              | Label (x,_,_) -> H.replace labelStmt x s'
+              | Case _ | Default _ -> replace_table <- (s, s') :: replace_table
+            ) s.labels;
+          s'.labels <- s.labels @ s'.labels
+        in
+        match s.skind with
+        | UnspecifiedSequence [s',_,_,_,_] ->
+          change_label_stmt s s';
+          ChangeDoChildrenPost(s', fun x -> x)
+        | UnspecifiedSequence [] ->
+          let s' = mkEmptyStmt ~ghost ~valid_sid ~loc:(cabslu "_useq") () in
+          change_label_stmt s s';
+          ChangeTo s';
+        | UnspecifiedSequence _ -> self#push true s
+        | Block { battrs = []; blocals = []; bstmts = [s']} ->
+          change_label_stmt s s';
+          ChangeDoChildrenPost (s', fun x -> x)
+        | Block _ | If _ | Loop _
+        | TryFinally _ | TryExcept _ | Throw _ | TryCatch _ ->
+          self#push false s
+        | Switch _ ->
+          let change_cases stmt =
+            match stmt.skind with
+            | Switch(e,body,cases,loc) ->
+              let newcases =
+                List.map
+                  (fun s ->
+                     try List.assq s replace_table
+                     with Not_found -> s)
+                  cases
+              in
+              stmt.skind <- Switch(e,body,newcases,loc);
+              ignore (Stack.pop unspecified_stack);
+              stmt
+            | _ -> assert false
+          in Stack.push false unspecified_stack;
+          ChangeDoChildrenPost(s,change_cases)
+        | Instr _ | Return _ | Goto _ | Break _
+        | Continue _ -> DoChildren
+    end
 
   let mkFunctionBody ~ghost (c: chunk) : block =
     if c.cases <> [] then
