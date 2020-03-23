@@ -565,13 +565,17 @@ module Cfg (W : Mcfg.S) = struct
       | Cil2cfg.VblkIn (Cil2cfg.Bfct, b) ->
           let obj = get_only_succ env cfg v in
           let obj = wp_scope wenv b.blocals Mcfg.SC_Block_in obj in
-          wp_scope wenv formals Mcfg.SC_Function_frame obj
+          let obj = wp_scope wenv formals Mcfg.SC_Function_frame obj in
+          obj
+      | Cil2cfg.VblkOut (Cil2cfg.Bfct, b) ->
+          let obj = get_only_succ env cfg v in
+          let obj = wp_scope wenv b.blocals Mcfg.SC_Block_out obj in
+          obj
+      | Cil2cfg.VblkOut _ ->
+          get_only_succ env cfg v
       | Cil2cfg.VblkIn (_, b) ->
           let obj = get_only_succ env cfg v in
           wp_scope wenv b.blocals Mcfg.SC_Block_in obj
-      | Cil2cfg.VblkOut (_, _b) ->
-          let obj = get_only_succ env cfg v in
-          obj (* cf. blocks_closed_by_edge below *)
       | Cil2cfg.Vstmt s ->
           let obj = get_only_succ env cfg v in
           wp_stmt wenv s obj
