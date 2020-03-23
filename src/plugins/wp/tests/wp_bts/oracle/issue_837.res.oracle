@@ -60,7 +60,6 @@ Prove: true.
 
 Goal Assigns nothing in 'foo' (4/4):
 Effect at line 6
-Assume { Type: is_sint32(a). (* Residual *) When: a != 0. }
-Prove: (ta_tmp_0=false).
+Prove: true.
 
 ------------------------------------------------------------
