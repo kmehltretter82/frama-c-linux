@@ -571,11 +571,8 @@ module Cfg (W : Mcfg.S) = struct
           let obj = get_only_succ env cfg v in
           let obj = wp_scope wenv b.blocals Mcfg.SC_Block_out obj in
           obj
-      | Cil2cfg.VblkOut _ ->
+      | Cil2cfg.VblkOut _ | Cil2cfg.VblkIn _ ->
           get_only_succ env cfg v
-      | Cil2cfg.VblkIn (_, b) ->
-          let obj = get_only_succ env cfg v in
-          wp_scope wenv b.blocals Mcfg.SC_Block_in obj
       | Cil2cfg.Vstmt s ->
           let obj = get_only_succ env cfg v in
           wp_stmt wenv s obj

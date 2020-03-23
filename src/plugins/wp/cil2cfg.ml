@@ -653,7 +653,11 @@ let block_scope_for_edge cfg e =
             | None -> no_scope
             | Some s' -> block_scope s s'
       end
-  | _ -> (* TODO ? *) no_scope
+  | VblkIn(Bstmt _,b) -> { b_opened=[b] ; b_closed=[] }
+  | Vcall _
+  | VblkIn _ | VblkOut _ | Vtest(false,_,_)
+  | VfctIn | VfctOut | Vstart | Vend | Vexit | Vloop2 _ ->
+      no_scope
 
 let has_exit cfg =
   try
