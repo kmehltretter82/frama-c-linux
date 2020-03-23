@@ -494,8 +494,9 @@ module Cfg (W : Mcfg.S) = struct
        | Mcfg.SC_Function_frame -> "function frame"
        | Mcfg.SC_Function_out -> "function out" )
       (Pretty_utils.pp_list  ~sep:", " Printer.pp_varinfo) vars;
-    W.scope wenv vars scope obj
-
+    match scope with
+    | Mcfg.(SC_Block_in | SC_Block_out) when vars = [] -> obj
+    | _ -> W.scope wenv vars scope obj
 
   (** @return the WP stored for edge [e]. Compute it if it is not already
    * there and store it. Also handle the Acut annotations. *)
