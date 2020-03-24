@@ -173,6 +173,7 @@ wp-qualif-update: ./bin/toplevel.opt ./bin/ptests.opt $(WP_CACHE_DIR)
 	git -C $(WP_CACHE_DIR) pull --rebase --prune
 	FRAMAC_WP_CACHE=update \
 	./bin/ptests.opt src/plugins/wp/tests -config qualif -error-code
+	git -C $(WP_CACHE_DIR) status -s -b
 
 wp-qualif-upgrade: ./bin/toplevel.opt ./bin/ptests.opt
 	git -C $(WP_CACHE_DIR) pull --rebase --prune
