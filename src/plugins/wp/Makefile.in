@@ -166,8 +166,6 @@ $(Wp_DIR)/Makefile: $(WP_CONFIGURE_MAKEFILE)
 
 .PHONY: wp-qualif wp-qualif-update wp-qualif-cleanup
 
-WP_CACHE_DIR?=$(Wp_DIR)/cache
-
 wp-qualif: ./bin/toplevel.opt ./bin/ptests.opt $(WP_CACHE_DIR)
 	./bin/ptests.opt src/plugins/wp/tests -config qualif -error-code
 
@@ -188,7 +186,6 @@ wp-qualif-push:
 	git -C $(WP_CACHE_DIR) push -f
 
 wp-qualif-cleanup: wp-qualif-update
-	find $(WP_CACHE_DIR) -atime 2h -delete
 
 $(WP_CACHE_DIR):
 	git clone "git@git.frama-c.com:frama-c/wp-cache.git" $(WP_CACHE_DIR)

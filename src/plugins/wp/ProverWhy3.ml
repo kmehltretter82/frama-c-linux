@@ -1221,18 +1221,41 @@ let get_removed () = !removed
 let mark_cache ~mode hash =
   if mode = Cleanup || !Fc_config.is_gui then Hashtbl.replace cleanup hash ()
 
-let get_cache_dir () =
-  let gdir = Wp_parameters.CacheDir.get () in
-  if gdir <> "" then
-    Filepath.Normalized.of_string gdir
-  else
-    Wp_parameters.get_session_dir ~force:false "cache"
+module CACHEDIR = WpContext.StaticGenerator(Datatype.Unit)
+    (struct
+      type key = unit
+      type data = Filepath.Normalized.t
+      let name = "Wp.Cache.dir"
+      let compile () =
+        try
+          if not (Wp_parameters.CacheEnv.get()) then
+            raise Not_found ;
+          let gdir = Sys.getenv "FRAMAC_WP_CACHEDIR" in
+          if gdir = "" then raise Not_found ;
+          Filepath.Normalized.of_string gdir
+        with Not_found ->
+        try
+          let gdir = Wp_parameters.CacheDir.get() in
+          if gdir = "" then raise Not_found ;
+          Filepath.Normalized.of_string gdir
+        with Not_found ->
+          Wp_parameters.get_session_dir ~force:false "cache"
+    end)
+
+let get_cache_dir () = (CACHEDIR.get () :> string)
+
+let has_cache_dir () =
+  try
+    if not (Wp_parameters.CacheEnv.get()) then
+      raise Not_found ;
+    Sys.getenv "FRAMAC_WP_CACHEDIR" <> ""
+  with Not_found -> Wp_parameters.CacheDir.get () <> ""
 
 let is_global_cache () = Wp_parameters.CacheDir.get () <> ""
 
 let cleanup_cache ~mode =
   if mode = Cleanup && (!hits > 0 || !miss > 0) then
-    let dir = (get_cache_dir () :> string) in
+    let dir = get_cache_dir () in
     if is_global_cache () then
       Wp_parameters.warning ~current:false ~once:true
         "Cleanup mode deactivated with global cache."
@@ -1294,7 +1317,7 @@ module MODE = WpContext.StaticGenerator(Datatype.Unit)
           let mode = Wp_parameters.Cache.get() in
           parse_mode ~origin:"-wp-cache" ~fallback:"none" mode
         with Not_found ->
-          if Wp_parameters.has_session ()
+          if Wp_parameters.has_session () || has_cache_dir ()
           then Update else NoCache
     end)
 
@@ -1359,7 +1382,7 @@ let get_cache_result ~mode hash =
   match mode with
   | NoCache | Rebuild -> VCS.no_result
   | Update | Cleanup | Replay | Offline ->
-      let dir = (get_cache_dir () :> string) in
+      let dir = get_cache_dir () in
       if not (Sys.file_exists dir && Sys.is_directory dir) then
         VCS.no_result
       else
@@ -1379,7 +1402,7 @@ let set_cache_result ~mode hash prover result =
   match mode with
   | NoCache | Replay | Offline -> ()
   | Rebuild | Update | Cleanup ->
-      let dir = get_cache_dir () in
+      let dir = CACHEDIR.get () in
       let hash = Lazy.force hash in
       let file = Printf.sprintf "%s/%s.json" (dir :> string) hash in
       try
