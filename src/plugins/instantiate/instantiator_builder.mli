@@ -123,10 +123,9 @@ module type Instantiator = sig
   *)
   val get_kfs: unit -> kernel_function list
 
-  (** [mark_as_computed ?project ()] applies the [mark_as_computed] on the
-      internal table.
+  (** [clear ()] clears the internal table of the instantiator.
   *)
-  val mark_as_computed:  ?project:Project.t -> unit -> unit
+  val clear: unit -> unit
 end
 
 (** Generates a [Instantiator] from a [Generator_sig] adding all necessary stuff for

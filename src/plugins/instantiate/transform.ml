@@ -29,12 +29,6 @@ let register (module G: Generator_sig) =
   let module Instantiator = Make_instantiator(G) in
   Hashtbl.add base G.function_name (module Instantiator)
 
-let mark_as_computed () =
-  let mark_as_computed _ instantiator =
-    let module I = (val instantiator: Instantiator) in I.mark_as_computed ()
-  in
-  Hashtbl.iter mark_as_computed base
-
 let get_kfs () =
   let get_kfs _ instantiator =
     let module I = (val instantiator: Instantiator) in
@@ -42,6 +36,13 @@ let get_kfs () =
     res
   in
   Hashtbl.fold (fun k v l -> (get_kfs k v) @ l) base []
+
+let clear () =
+  let clear _ instantiator =
+    let module I = (val instantiator: Instantiator) in
+    I.clear ()
+  in
+  Hashtbl.iter clear base
 
 module VISet = Cil_datatype.Varinfo.Hptset
 
@@ -55,7 +56,6 @@ class transformer = object(self)
     let post f =
       Ast.mark_as_changed () ;
       Ast.mark_as_grown () ;
-      mark_as_computed () ;
       f
     in
     Cil.DoChildrenPost post
@@ -158,5 +158,6 @@ let compute_statuses_all_kfs () =
   List.iter compute_comp_disj_statuses kfs
 
 let transform file =
+  clear () ;
   Visitor.visitFramacFile (new transformer) file ;
   compute_statuses_all_kfs ()
