@@ -34,6 +34,9 @@ val f64 : adt
 val t32 : tau
 val t64 : tau
 
+val fq32 : lfun
+val fq64 : lfun
+
 type model = Real | Float
 val configure : model -> WpContext.rollback
 

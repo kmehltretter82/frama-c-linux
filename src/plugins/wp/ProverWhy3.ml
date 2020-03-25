@@ -113,39 +113,6 @@ let t_app ~cnv ~f ~l ~p tl =
 let t_app' ~cnv ~f ~l ~p tl ty =
   Why3.Term.t_app (get_ls ~cnv ~f ~l ~p) tl ty
 
-(** Conversion *)
-
-(* why3 1.3 *)
-let const_int (z:Z.t) =
-  Why3.(Term.t_const Constant.(int_const (BigInt.of_string (Z.to_string z)))) Why3.Ty.ty_int
-
-let const_real ~cnv (q:Q.t) =
-  let mk_real_int z =
-    let c = Why3.Constant.real_const (Why3.BigInt.of_string (Z.to_string z)) in
-    Why3.(Term.t_const c) Why3.Ty.ty_real
-  in
-  if Z.equal Z.one q.den
-  then mk_real_int q.num
-  else
-    t_app ~cnv ~f:["real"] ~l:"Real" ~p:["infix /"] [mk_real_int q.num;mk_real_int q.den]
-
-    (*
-let const_int (z:Z.t) =
-  Why3.(Term.t_const Number.(const_of_big_int (BigInt.of_string (Z.to_string z)))) Why3.Ty.ty_int
-
-let const_real ~cnv (q:Q.t) =
-  let mk_real_int z =
-    let rc_negative = Z.sign z < 0 in
-    let z = Z.abs z in
-    let rc_abs = Why3.Number.real_const_dec (Z.to_string z) "" None in
-    let c = Why3.Number.ConstReal { Why3.Number.rc_negative; rc_abs } in
-    Why3.(Term.t_const c) Why3.Ty.ty_real
-  in
-  if Z.equal Z.one q.den
-  then mk_real_int q.num
-  else
-    t_app ~cnv ~f:["real"] ~l:"Real" ~p:["infix /"] [mk_real_int q.num;mk_real_int q.den]
-    *)
 (** fold map list of at least one element *)
 let fold_map map fold = function
   | [] -> assert false (** absurd: forbidden by qed  *)
@@ -269,6 +236,68 @@ let rec of_tau ~cnv (t:Lang.F.tau) =
   | Record _ ->
       why3_failure "Type %a not (yet) convertible" Lang.F.pp_tau t
 
+module Literal = struct
+  let const_int (z:Z.t) =
+    Why3.(Term.t_const Constant.(const_of_big_int (BigInt.of_string (Z.to_string z)))) Why3.Ty.ty_int
+
+  let why3_real ty ~use_hex sign integer decimal exp =
+    let rc = Why3.Number.ConstReal {
+        rc_negative = sign ;
+        rc_abs =
+          if use_hex then Why3.Number.real_const_hex integer decimal exp
+          else Why3.Number.real_const_dec integer decimal exp
+      } in
+    Why3.Term.t_const rc ty
+
+  let const_real ~cnv (q:Q.t) =
+    let mk_real_int z =
+      let use_hex = false in
+      let str = Z.to_string (Z.abs z) in
+      why3_real Why3.Ty.ty_real ~use_hex (Z.sign z < 0) str "" None
+    in
+    if Z.equal Z.one q.den
+    then mk_real_int q.num
+    else
+      t_app ~cnv ~f:["real"] ~l:"Real" ~p:["infix /"] [mk_real_int q.num;mk_real_int q.den]
+
+  let cfloat_of_tau tau =
+    if      Lang.F.Tau.equal tau Cfloat.t32 then Ctypes.Float32
+    else if Lang.F.Tau.equal tau Cfloat.t64 then Ctypes.Float64
+    else raise Not_found
+
+  let float_literal_from_q ~cnv tau q =
+    let use_hex = true in
+    let f = match cfloat_of_tau tau with
+      | Float32 -> Floating_point.round_to_single_precision_float (Q.to_float q)
+      | Float64 -> Q.to_float q
+    in
+    let s = Format.asprintf "%a" (Floating_point.pretty_normal ~use_hex) f in
+    let re_float =
+      Str.regexp "-?0x\\([0-9a-f]+\\).\\([0-9a-f]+\\)?p?\\([+-]?[0-9a-f]+\\)?$"
+    in
+    if Str.string_match re_float s 0 then
+      let group n r = try Str.matched_group n r with Not_found -> "" in
+      let (i,d,e) = (group 1 s), (group 2 s), (group 3 s) in
+      let e = if String.equal e "" then None else Some e in
+      let t = Extlib.the (of_tau ~cnv tau) in
+      why3_real t ~use_hex (Q.sign q < 0) i d e
+    else raise Not_found
+
+  let const_float ~cnv tau (repr:Lang.F.QED.repr) =
+    match repr with
+    | Fun(f, [x]) when Lang.Fun.(equal f Cfloat.fq32 || equal f Cfloat.fq64) ->
+        begin match Lang.F.repr x with
+          | Kreal q -> float_literal_from_q ~cnv tau q
+          | _ -> raise Not_found
+        end
+    | _ -> raise Not_found
+
+  let is_float_literal ~cnv tau repr =
+    try (ignore (const_float ~cnv tau repr) ; true)
+    with Not_found | Why3.Number.NonRepresentableFloat _ -> false
+
+end
+
 let rec full_trigger = function
   | Qed.Engine.TgAny -> false
   | TgVar _ -> true
@@ -339,15 +368,17 @@ let rec of_term ~cnv expected t : Why3.Term.term =
     | True, _, Bool -> Why3.Term.t_bool_true
     | False, _, Prop -> Why3.Term.t_false
     | False, _, Bool -> Why3.Term.t_bool_false
-    | Kint z, Int, _ -> coerce ~cnv sort expected $ const_int z
-    | Kreal q, Real, _ -> coerce ~cnv sort expected $ const_real ~cnv q
+    | Kint z, Int, _ -> coerce ~cnv sort expected $ Literal.const_int z
+    | Kreal q, Real, _ -> coerce ~cnv sort expected $ Literal.const_real ~cnv q
+    | repr, t, _ when Literal.is_float_literal ~cnv t repr ->
+        coerce ~cnv sort expected $ Literal.const_float ~cnv t repr
     | Times(z,t), Int, _ ->
         coerce ~cnv sort expected $
-        t_app ~cnv ~f:["int"] ~l:"Int" ~p:["infix *"] [const_int z; of_term cnv sort t]
+        t_app ~cnv ~f:["int"] ~l:"Int" ~p:["infix *"] [Literal.const_int z; of_term cnv sort t]
     | Times(z,t), Real, _ ->
         coerce ~cnv sort expected $
         t_app ~cnv ~f:["real"] ~l:"Real" ~p:["infix *"]
-          [const_real ~cnv (Q.of_bigint z); of_term cnv sort t]
+          [Literal.const_real ~cnv (Q.of_bigint z); of_term cnv sort t]
     | Add l, Int, _ ->
         coerce ~cnv sort expected $
         t_app_fold ~f:["int"] ~l:"Int" ~p:["infix +"] ~cnv sort l

@@ -106,6 +106,7 @@ type driver = {
   description : string;
   includes : string list;
   hlogic : (string , sigfun list) Hashtbl.t;
+  htypes : (string , t_builtin) Hashtbl.t;
   hdeps : (string, string list) Hashtbl.t;
   hoptions :
     (string (* library *) * string (* group *) * string (* name *), string list)
@@ -140,7 +141,9 @@ let lookup_driver name kinds =
       else Warning.error "Builtin %s undefined with signature %a" name
           pp_kinds kinds
   with Not_found ->
-    if name.[0] == '\\' then
+    if Logic_env.is_builtin_logic_function name
+    || Logic_env.is_builtin_logic_ctor name
+    then
       Warning.error "Builtin %s%a not defined" name pp_kinds kinds
     else
       ACSLDEF
@@ -167,6 +170,12 @@ let register ?source name kinds link =
       name pp_kinds kinds ;
   let entry = (kinds,link) in
   Hashtbl.add driver.hlogic name (entry::sigs)
+
+let register_type ?source name builtin =
+  let driver = cdriver_rw () in
+  if Hashtbl.mem driver.htypes name then
+    Wp_parameters.warning ?source "Redifinition of type %s" name ;
+  Hashtbl.add driver.htypes name builtin
 
 let iter_table f =
   let items = ref [] in
@@ -239,12 +248,12 @@ let add_ctor ~source name kinds ~library ~link () =
   let lfun = Lang.extern_s ~library ~category ~params ~link name in
   register ~source name kinds (LFUN lfun)
 
-let add_type ~source name ~library ?(link=Lang.infoprover name) () =
-  if Lang.mem_builtin_type ~name then
-    Wp_parameters.warning ~source "Redefinition of type '%s'" name ;
-  Lang.set_builtin_type ~name ~library ~link
+let add_type ?source name ~library ?(link=Lang.infoprover name) () =
+  let mdt = Lang.extern_t name ~link ~library in
+  register_type ?source name (E_mdt mdt)
 
-let hack_type name poly = Lang.set_builtin_poly ~name poly
+let hack_type name poly =
+  register_type name (E_poly poly)
 
 type sanitizer = driver_dir:string -> string -> string
 let sanitizers : ( string * string , sanitizer ) Hashtbl.t = Hashtbl.create 10
@@ -298,6 +307,7 @@ let builtin_driver = {
   description = "builtin driver";
   includes = [];
   hlogic = Hashtbl.create 131;
+  htypes = Hashtbl.create 131;
   hdeps  = Hashtbl.create 31;
   hoptions = Hashtbl.create 131;
   locked = false
@@ -310,6 +320,25 @@ let add_builtin name kinds lfun =
   else
     Context.bind driver builtin_driver (register name kinds) phi
 
+let add_type ?source name ~library ?link () =
+  if Context.defined driver then
+    add_type ?source name ~library ?link ()
+  else
+    Context.bind driver builtin_driver
+      (add_type ?source name ~library ?link) ()
+
+let hack_type name poly =
+  if Context.defined driver then hack_type name poly
+  else Context.bind driver builtin_driver hack_type name poly
+
+let find_type name =
+  Hashtbl.find (cdriver_ro ()).htypes name
+let find_type name =
+  if Context.defined driver then find_type name
+  else Context.bind driver builtin_driver find_type name
+
+let () = Context.set Lang.builtin_types find_type
+
 let new_driver ~id ?(base=builtin_driver)
     ?(descr=id) ?(includes=[]) ?(configure=fun () -> ()) () =
   lock base ;
@@ -318,6 +347,7 @@ let new_driver ~id ?(base=builtin_driver)
     description = descr ;
     includes = includes @ base.includes ;
     hlogic = Hashtbl.copy base.hlogic ;
+    htypes = Hashtbl.copy base.htypes ;
     hdeps  = Hashtbl.copy base.hdeps ;
     hoptions = Hashtbl.copy base.hoptions ;
     locked = false

@@ -77,7 +77,7 @@ val add_library : string -> string list -> unit
 
 val add_alias : source:Filepath.position -> string -> kind list -> alias:string -> unit -> unit
 
-val add_type : source:Filepath.position -> string -> library:string ->
+val add_type : ?source:Filepath.position -> string -> library:string ->
   ?link:string infoprover -> unit -> unit
 
 val add_ctor : source:Filepath.position -> string -> kind list ->
