@@ -539,6 +539,7 @@ extern long double powl(long double x, long double y);
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
     ensures positive_result: \result >= -0.;
+    ensures result_value: \result == sqrt(x);
 */
 extern double sqrt(double x);
 
@@ -547,6 +548,7 @@ extern double sqrt(double x);
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
     ensures positive_result: \result >= -0.;
+    ensures result_value: \result == sqrtf(x);
 */
 extern float sqrtf(float x);
 

@@ -141,7 +141,9 @@ let lookup_driver name kinds =
       else Warning.error "Builtin %s undefined with signature %a" name
           pp_kinds kinds
   with Not_found ->
-    if name.[0] == '\\' then
+    if Logic_env.is_builtin_logic_function name
+    || Logic_env.is_builtin_logic_ctor name
+    then
       Warning.error "Builtin %s%a not defined" name pp_kinds kinds
     else
       ACSLDEF
