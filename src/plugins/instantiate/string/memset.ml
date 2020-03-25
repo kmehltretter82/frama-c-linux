@@ -183,13 +183,19 @@ let memset_value e =
   | Const(CInt64(ni, _, _)) when Integer.equal ni ff -> Some 255
   | _ -> None
 
-let is_union_type = function
-  | TComp({ cstruct = false }, _, _) -> true
+let rec contains_union_type t =
+  match Cil.unrollType t with
+  | TComp({ cstruct = false }, _, _) ->
+    true
+  | TComp({ cfields = fields }, _, _) ->
+    List.exists contains_union_type (List.map (fun f -> f.ftype) fields)
+  | TArray(t, _, _, _) ->
+    contains_union_type t
   | _ -> false
 
 let well_typed_call _ret = function
   | [ ptr ; _ ; _ ] when any_char_composed_type (type_from_arg ptr) -> true
-  | [ ptr ; _ ; _ ] when is_union_type (type_from_arg ptr) -> false
+  | [ ptr ; _ ; _ ] when contains_union_type (type_from_arg ptr) -> false
   | [ ptr ; _ ; _ ] when Cil.isVoidType (type_from_arg ptr) -> false
   | [ _ ; value ; _ ] ->
     begin match memset_value value with
@@ -201,7 +207,7 @@ let well_typed_call _ret = function
 let key_from_call _ret = function
   | [ ptr ; _ ; _ ] when any_char_composed_type (type_from_arg ptr) ->
     (type_from_arg ptr), None
-  | [ ptr ; value ; _ ] when not (is_union_type (type_from_arg ptr)) ->
+  | [ ptr ; value ; _ ] when not (contains_union_type (type_from_arg ptr)) ->
     (type_from_arg ptr), (memset_value value)
   | _ -> failwith "Call to Memset.key_from_call on an ill-typed call"
 
@@ -226,7 +232,7 @@ let generate_prototype = function
     let name = function_name ^ "_" ^ (string_of_typ t) in
     let fun_type = char_prototype t in
     name, fun_type
-  | t, Some x when not (is_union_type t) && (x = 0 || x = 255) ->
+  | t, Some x when not (contains_union_type t) && (x = 0 || x = 255) ->
     let ext = if x = 0 then "_0" else if x = 255 then "_FF" else assert false in
     let name = function_name ^ "_" ^ (string_of_typ t) ^ ext in
     let fun_type = non_char_prototype t in
