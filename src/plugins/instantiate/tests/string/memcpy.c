@@ -36,3 +36,9 @@ void with_void(void *src, void *dest, int n){
   void *res = memcpy(dest, src, n);
   memcpy(src, res, n);
 }
+
+struct incomplete ;
+void with_incomplete(struct incomplete* src, struct incomplete* dest, int n){
+  struct incomplete* res = memcpy(dest, src, n);
+  memcpy(src, res, n);
+}

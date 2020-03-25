@@ -36,3 +36,9 @@ void with_void(void *src, void *dest, int n){
   void *res = memmove(dest, src, n);
   memmove(src, res, n);
 }
+
+struct incomplete ;
+void with_incomplete(struct incomplete *src, struct incomplete *dest, int n){
+  struct incomplete *res = memmove(dest, src, n);
+  memmove(src, res, n);
+}

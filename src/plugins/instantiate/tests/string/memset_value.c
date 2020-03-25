@@ -51,3 +51,8 @@ void with_void(void* dest, int value){
   void* res = memset(dest, value, 10);
   memset(res, value, 10);
 }
+
+void with_incomplete(struct incomplete* dest, int value){
+  struct incomplete * res = memset(dest, value, 10);
+  memset(res, value, 10);
+}
