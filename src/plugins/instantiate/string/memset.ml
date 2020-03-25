@@ -63,7 +63,7 @@ let pset_len_bytes_to_value ?loc ptr value bytes_len =
 
 let pset_len_bytes_to_zero ?loc ptr bytes_len =
   let eq_value ?loc t =
-    let value = match t.term_type with
+    let value = match Logic_utils.unroll_type t.term_type with
       | Ctype(TPtr(_)) -> term Tnull t.term_type
       | Ctype(TFloat(_)) -> treal ?loc 0.
       | Ctype(TInt(_)) -> tinteger ?loc 0
