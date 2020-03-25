@@ -46,9 +46,13 @@ typedef void (*__fc_sighandler_t) (int);
 /* for BSD 4.4 */
 typedef __fc_sighandler_t sig_t;
 
-#define SIG_DFL ((__fc_sighandler_t)0)     /* default signal handling */
-#define SIG_IGN ((__fc_sighandler_t)1)     /* ignore signal */
-#define SIG_ERR ((__fc_sighandler_t)-1)    /* error return from signal */
+extern sig_t __fc_sig_dfl;
+extern sig_t __fc_sig_ign;
+extern sig_t __fc_sig_err;
+
+#define SIG_DFL __fc_sig_dfl     /* default signal handling */
+#define SIG_IGN __fc_sig_ign     /* ignore signal */
+#define SIG_ERR __fc_sig_err    /* error return from signal */
 
 #define SIG_BLOCK 0
 #define SIG_UNBLOCK 1

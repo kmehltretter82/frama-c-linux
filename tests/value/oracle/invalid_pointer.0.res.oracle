@@ -1,5 +1,5 @@
 [kernel] Parsing tests/value/invalid_pointer.c (with preprocessing)
-[kernel:typing:int-conversion] tests/value/invalid_pointer.c:111: Warning: 
+[kernel:typing:int-conversion] tests/value/invalid_pointer.c:112: Warning: 
   Conversion from a pointer to an integer without an explicit cast
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
@@ -8,173 +8,183 @@
   NULL[rbits 80 to 247] ∈ [--..--]
   undet ∈ [--..--]
 [eva] computing for function pointer_computation <- main.
-  Called from tests/value/invalid_pointer.c:171.
-[eva:alarm] tests/value/invalid_pointer.c:19: Warning: 
+  Called from tests/value/invalid_pointer.c:172.
+[eva:alarm] tests/value/invalid_pointer.c:20: Warning: 
   invalid pointer creation. assert \object_pointer(p - 1);
-[eva:alarm] tests/value/invalid_pointer.c:22: Warning: 
+[eva:alarm] tests/value/invalid_pointer.c:23: Warning: 
   invalid pointer creation. assert \object_pointer(p + 1);
-[eva:alarm] tests/value/invalid_pointer.c:24: Warning: 
+[eva:alarm] tests/value/invalid_pointer.c:25: Warning: 
   invalid pointer creation. assert \object_pointer(p + i);
-[eva:alarm] tests/value/invalid_pointer.c:26: Warning: 
-  invalid pointer creation. assert \object_pointer(p - j);
 [eva:alarm] tests/value/invalid_pointer.c:27: Warning: 
+  invalid pointer creation. assert \object_pointer(p - j);
+[eva:alarm] tests/value/invalid_pointer.c:28: Warning: 
   invalid pointer creation. assert \object_pointer(p - 1);
 [eva] computing for function Frama_C_interval <- pointer_computation <- main.
-  Called from tests/value/invalid_pointer.c:30.
+  Called from tests/value/invalid_pointer.c:31.
 [eva] using specification for function Frama_C_interval
-[eva] tests/value/invalid_pointer.c:30: 
+[eva] tests/value/invalid_pointer.c:31: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva:alarm] tests/value/invalid_pointer.c:31: Warning: 
+[eva:alarm] tests/value/invalid_pointer.c:32: Warning: 
   invalid pointer creation. assert \object_pointer(q + offset1);
 [eva] computing for function Frama_C_interval <- pointer_computation <- main.
-  Called from tests/value/invalid_pointer.c:32.
-[eva] tests/value/invalid_pointer.c:32: 
+  Called from tests/value/invalid_pointer.c:33.
+[eva] tests/value/invalid_pointer.c:33: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva:alarm] tests/value/invalid_pointer.c:33: Warning: 
+[eva:alarm] tests/value/invalid_pointer.c:34: Warning: 
   invalid pointer creation. assert \object_pointer(q + offset2);
 [eva] Recording results for pointer_computation
 [eva] Done for function pointer_computation
 [eva] computing for function pointer_in_loops <- main.
-  Called from tests/value/invalid_pointer.c:172.
-[eva] tests/value/invalid_pointer.c:42: 
+  Called from tests/value/invalid_pointer.c:173.
+[eva] tests/value/invalid_pointer.c:43: 
   Trace partitioning superposing up to 100 states
-[eva:alarm] tests/value/invalid_pointer.c:51: Warning: 
+[eva:alarm] tests/value/invalid_pointer.c:52: Warning: 
   invalid pointer creation. assert \object_pointer(q - 1);
 [eva] Recording results for pointer_in_loops
 [eva] Done for function pointer_in_loops
 [eva] computing for function int_conversion <- main.
-  Called from tests/value/invalid_pointer.c:173.
-[eva:alarm] tests/value/invalid_pointer.c:63: Warning: 
+  Called from tests/value/invalid_pointer.c:174.
+[eva:alarm] tests/value/invalid_pointer.c:64: Warning: 
   invalid pointer creation. assert \object_pointer((int *)42);
 [eva] computing for function Frama_C_interval <- int_conversion <- main.
-  Called from tests/value/invalid_pointer.c:65.
-[eva] tests/value/invalid_pointer.c:65: 
+  Called from tests/value/invalid_pointer.c:66.
+[eva] tests/value/invalid_pointer.c:66: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- int_conversion <- main.
-  Called from tests/value/invalid_pointer.c:67.
-[eva] tests/value/invalid_pointer.c:67: 
+  Called from tests/value/invalid_pointer.c:68.
+[eva] tests/value/invalid_pointer.c:68: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva:alarm] tests/value/invalid_pointer.c:69: Warning: 
+[eva:alarm] tests/value/invalid_pointer.c:70: Warning: 
   invalid pointer creation. assert \object_pointer((int *)x);
 [eva] computing for function Frama_C_interval <- int_conversion <- main.
-  Called from tests/value/invalid_pointer.c:71.
-[eva] tests/value/invalid_pointer.c:71: 
+  Called from tests/value/invalid_pointer.c:72.
+[eva] tests/value/invalid_pointer.c:72: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva:alarm] tests/value/invalid_pointer.c:72: Warning: 
-  invalid pointer creation. assert \object_pointer((int *)x);
 [eva:alarm] tests/value/invalid_pointer.c:73: Warning: 
+  invalid pointer creation. assert \object_pointer((int *)x);
+[eva:alarm] tests/value/invalid_pointer.c:74: Warning: 
   invalid pointer creation. assert \object_pointer((int *)undet);
 [eva] Recording results for int_conversion
 [eva] Done for function int_conversion
 [eva] computing for function addrof <- main.
-  Called from tests/value/invalid_pointer.c:174.
-[eva:alarm] tests/value/invalid_pointer.c:81: Warning: 
+  Called from tests/value/invalid_pointer.c:175.
+[eva:alarm] tests/value/invalid_pointer.c:82: Warning: 
   invalid pointer creation. assert \object_pointer(&a[11]);
-[eva:alarm] tests/value/invalid_pointer.c:83: Warning: 
+[eva:alarm] tests/value/invalid_pointer.c:84: Warning: 
   invalid pointer creation. assert \object_pointer(&a[(int)(-1)]);
-[eva:alarm] tests/value/invalid_pointer.c:85: Warning: 
+[eva:alarm] tests/value/invalid_pointer.c:86: Warning: 
   invalid pointer creation. assert \object_pointer(&a[offset]);
 [eva] Recording results for addrof
 [eva] Done for function addrof
 [eva] computing for function union_pointer <- main.
-  Called from tests/value/invalid_pointer.c:175.
-[eva:alarm] tests/value/invalid_pointer.c:101: Warning: 
+  Called from tests/value/invalid_pointer.c:176.
+[eva:alarm] tests/value/invalid_pointer.c:102: Warning: 
   invalid pointer creation. assert \object_pointer(u.pointer);
-[eva:alarm] tests/value/invalid_pointer.c:104: Warning: 
+[eva:alarm] tests/value/invalid_pointer.c:105: Warning: 
   invalid pointer creation. assert \object_pointer(u.pointer);
 [eva] Recording results for union_pointer
 [eva] Done for function union_pointer
 [eva] computing for function write_pointer <- main.
-  Called from tests/value/invalid_pointer.c:176.
-[eva:alarm] tests/value/invalid_pointer.c:114: Warning: 
+  Called from tests/value/invalid_pointer.c:177.
+[eva:alarm] tests/value/invalid_pointer.c:115: Warning: 
   invalid pointer creation. assert \object_pointer(p);
-[eva:alarm] tests/value/invalid_pointer.c:117: Warning: 
+[eva:alarm] tests/value/invalid_pointer.c:118: Warning: 
   invalid pointer creation. assert \object_pointer(p);
 [eva] Recording results for write_pointer
 [eva] Done for function write_pointer
 [eva] computing for function object_pointer_predicate <- main.
-  Called from tests/value/invalid_pointer.c:177.
-[eva] tests/value/invalid_pointer.c:126: assertion got status valid.
-[eva:alarm] tests/value/invalid_pointer.c:128: Warning: 
+  Called from tests/value/invalid_pointer.c:178.
+[eva] tests/value/invalid_pointer.c:127: assertion got status valid.
+[eva:alarm] tests/value/invalid_pointer.c:129: Warning: 
   invalid pointer creation. assert \object_pointer(p - 1);
-[eva] tests/value/invalid_pointer.c:132: assertion got status valid.
-[eva:alarm] tests/value/invalid_pointer.c:134: Warning: 
+[eva] tests/value/invalid_pointer.c:133: assertion got status valid.
+[eva:alarm] tests/value/invalid_pointer.c:135: Warning: 
   invalid pointer creation. assert \object_pointer(p + 1);
-[eva:alarm] tests/value/invalid_pointer.c:137: Warning: 
+[eva:alarm] tests/value/invalid_pointer.c:138: Warning: 
   invalid pointer creation. assert \object_pointer(p + undet);
-[eva] tests/value/invalid_pointer.c:138: assertion got status valid.
 [eva] tests/value/invalid_pointer.c:139: assertion got status valid.
-[eva] tests/value/invalid_pointer.c:140: 
+[eva] tests/value/invalid_pointer.c:140: assertion got status valid.
+[eva] tests/value/invalid_pointer.c:141: 
   Frama_C_show_each_object_pointer: {{ &x + {0; 4} }}
-[eva:alarm] tests/value/invalid_pointer.c:141: Warning: 
+[eva:alarm] tests/value/invalid_pointer.c:142: Warning: 
   invalid pointer creation.
   assert
   \object_pointer((int *)((unsigned int)((unsigned int)(&x) +
                                          (unsigned int)undet)));
-[eva] tests/value/invalid_pointer.c:142: assertion got status valid.
 [eva] tests/value/invalid_pointer.c:143: assertion got status valid.
-[eva] tests/value/invalid_pointer.c:144: 
+[eva] tests/value/invalid_pointer.c:144: assertion got status valid.
+[eva] tests/value/invalid_pointer.c:145: 
   Frama_C_show_each_object_pointer_char: {{ &x + {0; 1; 2; 3; 4} }}
 [eva] computing for function Frama_C_interval <- object_pointer_predicate <- main.
-  Called from tests/value/invalid_pointer.c:145.
-[eva] tests/value/invalid_pointer.c:145: 
+  Called from tests/value/invalid_pointer.c:146.
+[eva] tests/value/invalid_pointer.c:146: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/value/invalid_pointer.c:147: assertion got status valid.
-[eva:alarm] tests/value/invalid_pointer.c:148: Warning: 
+[eva] tests/value/invalid_pointer.c:148: assertion got status valid.
+[eva:alarm] tests/value/invalid_pointer.c:149: Warning: 
   invalid pointer creation. assert \object_pointer(p + i);
-[eva] tests/value/invalid_pointer.c:149: assertion got status valid.
-[eva:alarm] tests/value/invalid_pointer.c:150: Warning: 
+[eva] tests/value/invalid_pointer.c:150: assertion got status valid.
+[eva:alarm] tests/value/invalid_pointer.c:151: Warning: 
   invalid pointer creation. assert \object_pointer(p + undet);
-[eva] tests/value/invalid_pointer.c:151: assertion got status valid.
-[eva] tests/value/invalid_pointer.c:152: 
+[eva] tests/value/invalid_pointer.c:152: assertion got status valid.
+[eva] tests/value/invalid_pointer.c:153: 
   Frama_C_show_each_object_pointer_array:
   {{ &x + {0; 4} ; &array + [0..256],0%4 }}
-[eva] tests/value/invalid_pointer.c:154: assertion got status valid.
-[eva:alarm] tests/value/invalid_pointer.c:157: Warning: 
+[eva] tests/value/invalid_pointer.c:155: assertion got status valid.
+[eva:alarm] tests/value/invalid_pointer.c:158: Warning: 
   assertion got status unknown.
-[eva:alarm] tests/value/invalid_pointer.c:159: Warning: 
-  invalid pointer creation. assert \object_pointer((int *)50);
 [eva:alarm] tests/value/invalid_pointer.c:160: Warning: 
-  assertion got status unknown.
+  invalid pointer creation. assert \object_pointer((int *)50);
 [eva:alarm] tests/value/invalid_pointer.c:161: Warning: 
-  invalid pointer creation. assert \object_pointer((int *)undet);
-[eva:alarm] tests/value/invalid_pointer.c:162: Warning: 
   assertion got status unknown.
-[eva:alarm] tests/value/invalid_pointer.c:164: Warning: 
+[eva:alarm] tests/value/invalid_pointer.c:162: Warning: 
+  invalid pointer creation. assert \object_pointer((int *)undet);
+[eva:alarm] tests/value/invalid_pointer.c:163: Warning: 
+  assertion got status unknown.
+[eva:alarm] tests/value/invalid_pointer.c:165: Warning: 
   invalid pointer creation. assert \object_pointer((int *)100);
 [eva] Recording results for object_pointer_predicate
 [eva] Done for function object_pointer_predicate
+[eva] computing for function signal <- main.
+  Called from tests/value/invalid_pointer.c:180.
+[eva] using specification for function signal
+[eva] Done for function signal
+[eva] computing for function signal <- main.
+  Called from tests/value/invalid_pointer.c:181.
+[eva] Done for function signal
+[eva] computing for function signal <- main.
+  Called from tests/value/invalid_pointer.c:182.
+[eva] Done for function signal
 [eva] Recording results for main
 [eva] done for function main
-[eva] tests/value/invalid_pointer.c:19: 
+[eva] tests/value/invalid_pointer.c:20: 
   assertion 'Eva,pointer_value' got final status invalid.
-[eva] tests/value/invalid_pointer.c:22: 
+[eva] tests/value/invalid_pointer.c:23: 
   assertion 'Eva,pointer_value' got final status invalid.
-[eva] tests/value/invalid_pointer.c:63: 
+[eva] tests/value/invalid_pointer.c:64: 
   assertion 'Eva,pointer_value' got final status invalid.
-[eva] tests/value/invalid_pointer.c:69: 
+[eva] tests/value/invalid_pointer.c:70: 
   assertion 'Eva,pointer_value' got final status invalid.
-[eva] tests/value/invalid_pointer.c:81: 
+[eva] tests/value/invalid_pointer.c:82: 
   assertion 'Eva,pointer_value' got final status invalid.
-[eva] tests/value/invalid_pointer.c:83: 
+[eva] tests/value/invalid_pointer.c:84: 
   assertion 'Eva,pointer_value' got final status invalid.
-[eva] tests/value/invalid_pointer.c:101: 
+[eva] tests/value/invalid_pointer.c:102: 
   assertion 'Eva,pointer_value' got final status invalid.
-[eva] tests/value/invalid_pointer.c:117: 
+[eva] tests/value/invalid_pointer.c:118: 
   assertion 'Eva,pointer_value' got final status invalid.
-[eva] tests/value/invalid_pointer.c:128: 
+[eva] tests/value/invalid_pointer.c:129: 
   assertion 'Eva,pointer_value' got final status invalid.
-[eva] tests/value/invalid_pointer.c:134: 
+[eva] tests/value/invalid_pointer.c:135: 
   assertion 'Eva,pointer_value' got final status invalid.
-[eva] tests/value/invalid_pointer.c:159: 
+[eva] tests/value/invalid_pointer.c:160: 
   assertion 'Eva,pointer_value' got final status invalid.
-[eva] tests/value/invalid_pointer.c:164: 
+[eva] tests/value/invalid_pointer.c:165: 
   assertion 'Eva,pointer_value' got final status invalid.
 [scope:rm_asserts] removing 2 assertion(s)
 [eva] ====== VALUES COMPUTED ======
@@ -352,6 +362,8 @@
 [from] Computing for function write_pointer
 [from] Done for function write_pointer
 [from] Computing for function main
+[from] Computing for function signal <-main
+[from] Done for function signal
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
   These dependencies hold at termination for the executions that terminate:
@@ -368,6 +380,8 @@
   Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
 [from] Function pointer_in_loops:
   NO EFFECTS
+[from] Function signal:
+  \result FROM ANYTHING(origin:Unknown)
 [from] Function union_pointer:
   NO EFFECTS
 [from] Function write_pointer:
@@ -406,4 +420,4 @@
 [inout] Out (internal) for function main:
     Frama_C_entropy_source
 [inout] Inputs for function main:
-    Frama_C_entropy_source; undet
+    Frama_C_entropy_source; SIG_DFL; SIG_IGN; SIG_ERR; undet

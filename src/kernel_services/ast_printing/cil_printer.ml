@@ -54,6 +54,16 @@ module Extensions = struct
 end
 let set_extension_handler = Extensions.set_handler
 
+let rename_builtins = Datatype.String.Hashtbl.create 17
+
+let () =
+  List.iter (fun (x,y) -> Datatype.String.Hashtbl.add rename_builtins x y)
+    [
+      "__fc_sig_dfl", "SIG_DFL";
+      "__fc_sig_ign", "SIG_IGN";
+      "__fc_sig_err", "SIG_ERR";
+    ]
+
 (* Deprecated functions *)
 let set_deprecated_extension_handler = Extensions.set_deprecated_handler
 
@@ -642,7 +652,15 @@ class cil_printer () = object (self)
     | CEnum {einame = s} -> self#varname fmt s
 
   (*** VARIABLES ***)
-  method varname fmt v = pp_print_string fmt v
+  method varname fmt v =
+    let v =
+      if not (Kernel.PrintLibc.get ()) &&
+         Datatype.String.Hashtbl.mem rename_builtins v
+      then
+        Datatype.String.Hashtbl.find rename_builtins v
+      else v
+    in
+    pp_print_string fmt v
 
   (* variable use *)
   method varinfo fmt v =

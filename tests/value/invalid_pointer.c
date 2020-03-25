@@ -5,6 +5,7 @@
 
 #include <__fc_builtin.h>
 #include <stdint.h>
+#include <signal.h>
 
 /* Tests the emission of \object_pointer alarms when -warn-invalid-pointer
    is enabled. The second run should emit no alarm. */
@@ -175,4 +176,8 @@ void main () {
   union_pointer ();
   write_pointer ();
   object_pointer_predicate ();
+   // should not emit an alarm
+  signal (SIGUSR1, SIG_IGN);
+  signal (SIGUSR2, SIG_ERR);
+  signal (SIGUNUSED, SIG_DFL);
 }
