@@ -104,7 +104,8 @@ class transformer = object(self)
     | Not_found -> (fct, args)
 
   method! vinst = function
-    | Call(_) | Local_init(_, ConsInit(_, _, Plain_func), _) ->
+    | Call(_, { enode = Lval((Var _), NoOffset)} , _, _)
+    | Local_init(_, ConsInit(_ , _, Plain_func), _) ->
       let change = function
         | [ Call(r, ({ enode = Lval((Var f), NoOffset) } as e), args, loc) ] ->
           let f, args = self#replace_call (r, f, args) in
