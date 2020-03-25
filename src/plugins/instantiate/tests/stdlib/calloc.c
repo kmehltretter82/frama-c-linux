@@ -19,4 +19,5 @@ int main(void){
   int (*pa) [10] = calloc(10, sizeof(int[10])) ;
   struct Flex* f = calloc(1, sizeof(struct Flex) + 3 * sizeof(int)) ;
   void *v = calloc(10, sizeof(char));
+  struct incomplete* inc = calloc(10, 10);
 }

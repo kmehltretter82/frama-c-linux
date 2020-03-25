@@ -72,7 +72,8 @@ let well_typed_call ret args =
   match ret, args with
   | Some ret, [ _ ] ->
     let t = Cil.typeOfLval ret in
-    Cil.isPointerType t && not (Cil.isVoidPtrType t)
+    Cil.isPointerType t && not (Cil.isVoidPtrType t) &&
+    Cil.isCompleteType (Cil.typeOf_pointed t)
   | _ -> false
 
 let key_from_call ret _ =

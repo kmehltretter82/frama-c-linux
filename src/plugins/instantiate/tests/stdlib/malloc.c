@@ -11,6 +11,8 @@ struct Flex {
   int f[] ;
 } ;
 
+struct incomplete ;
+
 int main(void){
   int* pi = malloc(sizeof(int) * 10) ;
   float* pf = malloc(sizeof(float) * 10) ;
@@ -19,4 +21,5 @@ int main(void){
   int (*pa) [10] = malloc(sizeof(int[10]) * 10) ;
   struct Flex* f = malloc(sizeof(struct Flex) + 3 * sizeof(int)) ;
   void *v = malloc(sizeof(char) * 10);
+  struct incomplete* inc = malloc(10);
 }
