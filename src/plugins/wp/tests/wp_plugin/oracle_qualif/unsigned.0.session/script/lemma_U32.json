@@ -10,8 +10,8 @@
                                            "pattern": "&<=<=<=0$x0land$x42949672954294967295" },
                                "children": { "Goal 1/3": [ { "prover": "Alt-Ergo:2.3.0",
                                                              "verdict": "valid",
-                                                             "time": 0.0205,
-                                                             "steps": 14 } ],
+                                                             "time": 0.021,
+                                                             "steps": 12 } ],
                                              "Goal 2/3": [ { "header": "Bit Range",
                                                              "tactic": "Wp.bitrange",
                                                              "params": 
@@ -27,6 +27,6 @@
                                                                     "verdict": "valid" } ] } } ],
                                              "Goal 3/3": [ { "prover": "Alt-Ergo:2.3.0",
                                                              "verdict": "valid",
-                                                             "time": 0.0201,
-                                                             "steps": 14 } ] } } ],
+                                                             "time": 0.0189,
+                                                             "steps": 12 } ] } } ],
                   "bitwise": [ { "prover": "qed", "verdict": "valid" } ] } } ]
