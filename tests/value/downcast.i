@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-load-module report -report -warn-signed-downcast -lib-entry -print -then -no-warn-signed-downcast -warn-unsigned-downcast -then -no-warn-unsigned-downcast -eva-warn-signed-converted-downcast -then -main main5_wrap_signed -slevel 2 -no-print"
+   STDOPT: +"-warn-signed-downcast -lib-entry -then -no-warn-signed-downcast -warn-unsigned-downcast -then -no-warn-unsigned-downcast -eva-warn-signed-converted-downcast -then -main main5_wrap_signed -slevel 2"
 */
 
 signed char sx,sy,sz;
