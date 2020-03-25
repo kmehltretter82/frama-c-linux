@@ -1440,6 +1440,17 @@ module UnsignedDowncast =
                   destination range"
     end)
 
+(* Pointer downcasts are undefined behaviors. *)
+let () = Parameter_customize.set_group analysis_options
+let () = Parameter_customize.do_not_reset_on_copy ()
+module PointerDowncast =
+  True
+    (struct
+      let module_name = "PointerDowncast"
+      let option_name = "-warn-pointer-downcast"
+      let help = "generate alarms when a pointer is converted into an integer \
+                  but may not be in the range of the destination type."
+    end)
 
 (* Not finite floats are ok, but might not always be a behavior the programmer
    wants. *)
