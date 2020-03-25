@@ -372,7 +372,11 @@ let downcast_assertion ~remove_trivial ~on_alarm (dst_type, exp) =
       else Integer.zero, Cil.max_unsigned_number dst_size
     in
     let overflow_kind =
-      if dst_signed then Alarms.Signed_downcast else Alarms.Unsigned_downcast
+      if Cil.isPointerType src_type
+      then Alarms.Pointer_downcast
+      else if dst_signed
+      then Alarms.Signed_downcast
+      else Alarms.Unsigned_downcast
     in
     let alarm ?(invalid=false) bound bound_kind =
       let a = Alarms.Overflow (overflow_kind, exp, bound, bound_kind) in

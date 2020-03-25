@@ -86,6 +86,10 @@ class annot_visitor kf flags on_alarm = object (self)
     flags.Flags.unsigned_downcast
     && not (Generator.Unsigned_downcast.is_computed kf)
 
+  method private do_pointer_downcast () =
+    flags.Flags.pointer_downcast
+    && not (Generator.Pointer_downcast.is_computed kf)
+
   method private do_float_to_int () =
     flags.Flags.float_to_int && not (Generator.Float_to_int.is_computed kf)
 
@@ -307,6 +311,9 @@ class annot_visitor kf flags on_alarm = object (self)
         | CastE (ty, e) ->
           (match Cil.unrollType ty, Cil.unrollType (Cil.typeOf e) with
            (* to , from *)
+           | TInt _, TPtr _ when self#do_pointer_downcast () ->
+             self#generate_assertion Rte.downcast_assertion (ty, e)
+
            | TInt(kind,_), TInt (_, _) ->
              let signed = Cil.isSigned kind in
              if signed && self#do_signed_downcast ()
@@ -453,6 +460,7 @@ let annotate ?flags kf =
        comp Signed_downcast.accessor flags.signed_downcast |||
        comp Unsigned_overflow.accessor flags.unsigned_overflow |||
        comp Unsigned_downcast.accessor flags.unsigned_downcast |||
+       comp Pointer_downcast.accessor flags.pointer_downcast |||
        comp Float_to_int.accessor flags.float_to_int |||
        comp Finite_float.accessor flags.finite_float |||
        comp Bool_value.accessor flags.bool_value

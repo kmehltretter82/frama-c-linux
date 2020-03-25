@@ -36,6 +36,7 @@ type t = {
   unsigned_overflow: bool;
   signed_downcast: bool;
   unsigned_downcast: bool;
+  pointer_downcast: bool;
   float_to_int: bool;
   finite_float: bool;
   pointer_call: bool;
@@ -54,6 +55,7 @@ let all = {
   unsigned_overflow = true;
   signed_downcast = true;
   unsigned_downcast = true;
+  pointer_downcast = true;
   float_to_int = true;
   finite_float = true;
   pointer_call = true;
@@ -72,6 +74,7 @@ let none = {
   unsigned_overflow = false;
   signed_downcast = false;
   unsigned_downcast = false;
+  pointer_downcast = false;
   float_to_int = false;
   finite_float = false;
   pointer_call = false;
@@ -95,6 +98,7 @@ let default
     ?unsigned_overflow
     ?signed_downcast
     ?unsigned_downcast
+    ?pointer_downcast
     ?float_to_int
     ?finite_float
     ?pointer_call
@@ -112,6 +116,7 @@ let default
     unsigned_overflow = option Kernel.UnsignedOverflow.get unsigned_overflow ;
     signed_downcast = option Kernel.SignedDowncast.get signed_downcast ;
     unsigned_downcast = option Kernel.UnsignedDowncast.get unsigned_downcast ;
+    pointer_downcast = option Kernel.PointerDowncast.get pointer_downcast ;
     float_to_int = option Options.DoFloatToInt.get float_to_int ;
     finite_float = option (fun () -> Kernel.SpecialFloat.get () <> "none") finite_float ;
     pointer_call = option Options.DoPointerCall.get pointer_call ;

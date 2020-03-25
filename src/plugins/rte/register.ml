@@ -93,6 +93,7 @@ let () =
   nojournal_register get_pointerCall_status Pointer_call.accessor;
   nojournal_register get_unsignedOv_status Unsigned_overflow.accessor;
   nojournal_register get_unsignedDownCast_status Unsigned_downcast.accessor;
+  nojournal_register get_pointer_downcast_status Pointer_downcast.accessor;
   nojournal_register get_float_to_int_status Float_to_int.accessor;
   nojournal_register get_finite_float_status Finite_float.accessor;
   nojournal_register get_bool_value_status Bool_value.accessor ;
