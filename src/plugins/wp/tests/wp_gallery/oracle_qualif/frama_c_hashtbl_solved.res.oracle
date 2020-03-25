@@ -109,7 +109,7 @@
 [wp] [Qed] Goal typed_size_assigns : Valid
 [wp] Proved goals:  102 / 102
   Qed:            69 
-  Script:          1
+  Script:          1 
   Alt-Ergo:       32
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
@@ -273,7 +273,7 @@
 [wp] [Qed] Goal typed_size_assigns : Valid
 [wp] Proved goals:   74 / 143
   Qed:            16 
-  Script:          1
+  Script:          1 
   Alt-Ergo:       57
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
