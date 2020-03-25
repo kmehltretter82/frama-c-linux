@@ -1,4 +1,4 @@
-*.vo
+*.vo*
 *.glob
 *.aux
 /instwp

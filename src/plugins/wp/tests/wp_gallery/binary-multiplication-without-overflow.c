@@ -1,9 +1,9 @@
 /* run.config
-   OPT: -warn-unsigned-overflow -wp-no-print -wp-rte
+   OPT: -warn-unsigned-overflow -wp-rte -wp-no-print
 */
 
 /* run.config_qualif
-   OPT: -wp-prover why3:alt-ergo -warn-unsigned-overflow -wp-prop=-lack -then -warn-unsigned-overflow -wp-rte -wp -wp-prop=-lack
+   OPT: -warn-unsigned-overflow -wp-rte
 */
 
 typedef unsigned uint32_t ;
@@ -12,7 +12,6 @@ typedef unsigned long long uint64_t ;
 /*@ axiomatic mult {
 
   @ lemma sizeof_ok:       ok: sizeof(uint64_t) == 2 * sizeof(uint32_t);
-
   @ lemma ax1:           lack: \forall integer x, y; 0<x && 0<y ==> 0 <= 2*x*(y/2) <= x*y;
   @ }
   @ */
@@ -29,6 +28,7 @@ uint64_t BinaryMultiplication (uint32_t a, uint32_t b) {
       @ loop variant ok: b ;
       @*/
     while (1) {
+      //@ assert b == (b/2) * 2 + b%2 ;
       if (b%2) r=r+x;
       b=b/2;
       if (b==0) break;

@@ -4,9 +4,9 @@
 let mk_buildInputs = { opamPackages ? [], nixPackages ? [] } :
     [ pkgs.gnugrep pkgs.gnused  pkgs.autoconf pkgs.gnumake pkgs.gcc pkgs.ncurses pkgs.time pkgs.python3 pkgs.perl pkgs.file] ++ nixPackages ++ opam2nix.build {
            specs = opam2nix.toSpecs ([ "ocamlfind" "zarith" "ocamlgraph" "yojson"
-                { name = "coq"; constraint = "=8.7.2";  }
-                { name = "why3" ; constraint = "=1.2.0"; }
-                { name = "why3-coq" ; constraint = "=1.2.0"; }
+                { name = "coq"; constraint = "=8.11.0";  }
+                { name = "why3" ; constraint = "=1.3.1"; }
+                { name = "why3-coq" ; constraint = "=1.3.1"; }
                 { name = "menhir"; constraint = "=20181113"; }
                 "camlzip" #so that why3 is always compiled with it
                 ] ++ opamPackages ++
@@ -154,7 +154,7 @@ rec {
   wp-qualif = stdenv.mkDerivation {
         name = "frama-c-wp-qualif";
         buildInputs = mk_buildInputs { opamPackages = [
-                    { name = "alt-ergo"; constraint = "=2.0.0"; }
+                    { name = "alt-ergo"; constraint = "=2.3.0"; }
                ]; };
         build_dir = main.build_dir;
         src = main.build_dir + "/dir.tar";
@@ -170,7 +170,7 @@ rec {
                make create_share_link
                mkdir home
                HOME=$(pwd)/home
-               why3 config
+               why3 config --full-config
                bin/ptests.opt -error-code -config qualif src/plugins/wp/tests
         '';
         installPhase = ''

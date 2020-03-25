@@ -23,14 +23,13 @@
     
     predicate P_RP int
     
-    axiom P_RP_def :
-      forall i:int. i <= 0 \/ P_P i /\ P_RP ((- 1) + i) <-> P_RP i
+    P_RP_def : forall i:int. i <= 0 \/ P_P i /\ P_RP ((- 1) + i) <-> P_RP i
     
     function L_F (i:int) : int = 2 * i
     
     function L_RF int : int
     
-    axiom L_RF_def :
+    L_RF_def :
       forall i:int. L_RF i = (if i <= 0 then 0 else L_F i + L_RF ((- 1) + i))
     
     goal wp_goal : forall i:int. 0 < i -> P_RP (L_RF i)
