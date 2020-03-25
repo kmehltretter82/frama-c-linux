@@ -69,21 +69,30 @@ let mk_lib_call ~loc ?result fname args =
   let vi = Misc.get_lib_fun_vi fname in
   let f = Cil.evar ~loc vi in
   vi.vreferenced <- true;
-  let make_args args param_ty =
-    List.map2
-      (fun (_, ty, _) arg ->
-         let e =
-           match ty, Cil.unrollType (Cil.typeOf arg), arg.enode with
-           | TPtr _, TArray _, Lval lv -> Cil.new_exp ~loc (StartOf lv)
-           | TPtr _, TArray _, _ -> assert false
-           | _, _, _ -> arg
-         in
-         Cil.mkCast ~force:false ~newt:ty ~e)
-      param_ty
-      args
+  let make_args ~variadic args param_ty =
+    let rec make_rev_args res args param_ty =
+      match args, param_ty with
+      | arg :: args_tl, (_, ty, _) :: param_ty_tl ->
+        let e =
+          match ty, Cil.unrollType (Cil.typeOf arg), arg.enode with
+          | TPtr _, TArray _, Lval lv -> Cil.new_exp ~loc (StartOf lv)
+          | TPtr _, TArray _, _ -> assert false
+          | _, _, _ -> arg
+        in
+        let e = Cil.mkCast ~force:false ~newt:ty ~e in
+        make_rev_args (e :: res) args_tl param_ty_tl
+      | arg :: args_tl, [] when variadic -> make_rev_args (arg :: res) args_tl []
+      | [], [] -> res
+      | _, _ ->
+        Options.fatal
+          "Mismatch between the number of expressions given and the number \
+           of arguments in the signature when calling function '%s'"
+          fname
+    in
+    List.rev (make_rev_args [] args param_ty)
   in
   let args = match Cil.unrollType vi.vtype with
-    | TFun(_, Some params, _, _) -> make_args args params
+    | TFun(_, Some params, variadic, _) -> make_args ~variadic args params
     | TFun(_, None, _, _) -> []
     | _ -> assert false
   in
