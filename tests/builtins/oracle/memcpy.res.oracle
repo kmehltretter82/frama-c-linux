@@ -129,7 +129,7 @@
 [eva] tests/builtins/memcpy.c:85: 
   function memcpy: precondition 'separation' got status valid.
 [eva:alarm] tests/builtins/memcpy.c:87: Warning: 
-  pointer downcast. assert (unsigned int)(struct t1 *)t ≤ 2147483647;
+  pointer downcast. assert (unsigned int)((struct t1 *)t) ≤ 2147483647;
 [eva] tests/builtins/memcpy.c:87: Call to builtin memcpy
 [eva] tests/builtins/memcpy.c:87: 
   function memcpy: precondition 'valid_dest' got status valid.
@@ -138,7 +138,7 @@
 [eva] tests/builtins/memcpy.c:87: 
   function memcpy: precondition 'separation' got status valid.
 [eva:alarm] tests/builtins/memcpy.c:89: Warning: 
-  pointer downcast. assert (unsigned int)&v4 ≤ 2147483647;
+  pointer downcast. assert (unsigned int)(&v4) ≤ 2147483647;
 [eva] tests/builtins/memcpy.c:89: Call to builtin memcpy
 [eva:alarm] tests/builtins/memcpy.c:89: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
@@ -150,9 +150,9 @@
   writing somewhere in {NULL; v4} because of Arithmetic
                                  {tests/builtins/memcpy.c:89}.
 [eva:alarm] tests/builtins/memcpy.c:90: Warning: 
-  pointer downcast. assert (unsigned int)(struct t1 *)t ≤ 2147483647;
+  pointer downcast. assert (unsigned int)((struct t1 *)t) ≤ 2147483647;
 [eva:alarm] tests/builtins/memcpy.c:91: Warning: 
-  pointer downcast. assert (unsigned int)&v5 ≤ 2147483647;
+  pointer downcast. assert (unsigned int)(&v5) ≤ 2147483647;
 [eva] tests/builtins/memcpy.c:91: Call to builtin memcpy
 [eva:alarm] tests/builtins/memcpy.c:91: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.

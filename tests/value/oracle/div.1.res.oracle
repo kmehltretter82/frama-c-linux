@@ -58,7 +58,7 @@
   assertion 'rte,signed_overflow' got status unknown.
 [eva:alarm] tests/value/div.i:33: Warning: division by zero. assert Z2 ≢ 0;
 [eva:alarm] tests/value/div.i:33: Warning: 
-  pointer downcast. assert (unsigned int)&Z2 ≤ 2147483647;
+  pointer downcast. assert (unsigned int)(&Z2) ≤ 2147483647;
 [eva:alarm] tests/value/div.i:33: Warning: 
   signed overflow. assert -2147483648 ≤ (int)(&Z2) / Z2;
 [eva:alarm] tests/value/div.i:33: Warning: 
@@ -71,7 +71,7 @@
 [eva:alarm] tests/value/div.i:34: Warning: 
   assertion 'rte,division_by_zero' got status unknown.
 [eva:alarm] tests/value/div.i:34: Warning: 
-  pointer downcast. assert (unsigned int)&X + 2 ≤ 2147483647;
+  pointer downcast. assert (unsigned int)(&X + 2) ≤ 2147483647;
 [eva:alarm] tests/value/div.i:34: Warning: 
   division by zero. assert (int)(&X + 2) ≢ 0;
 [eva:alarm] tests/value/div.i:34: Warning: 
@@ -85,7 +85,7 @@
   assertion 'rte,pointer_downcast' got status unknown.
 [eva] tests/value/div.i:35: assertion 'rte,division_by_zero' got status valid.
 [eva:alarm] tests/value/div.i:35: Warning: 
-  pointer downcast. assert (unsigned int)&X + 1 ≤ 2147483647;
+  pointer downcast. assert (unsigned int)(&X + 1) ≤ 2147483647;
 [eva:alarm] tests/value/div.i:35: Warning: 
   signed overflow. assert -2147483648 ≤ 100 / (int)(&X + 1);
 [eva:alarm] tests/value/div.i:35: Warning: 
@@ -97,7 +97,7 @@
   assertion 'rte,pointer_downcast' got status unknown.
 [eva] tests/value/div.i:36: assertion 'rte,division_by_zero' got status valid.
 [eva:alarm] tests/value/div.i:36: Warning: 
-  pointer downcast. assert (unsigned int)&X ≤ 2147483647;
+  pointer downcast. assert (unsigned int)(&X) ≤ 2147483647;
 [eva:alarm] tests/value/div.i:36: Warning: 
   signed overflow. assert -2147483648 ≤ 100 / (int)(&X);
 [eva:alarm] tests/value/div.i:36: Warning: 
@@ -110,7 +110,7 @@
 [eva:alarm] tests/value/div.i:37: Warning: 
   assertion 'rte,signed_overflow' got status unknown.
 [eva:alarm] tests/value/div.i:37: Warning: 
-  pointer downcast. assert (unsigned int)&X ≤ 2147483647;
+  pointer downcast. assert (unsigned int)(&X) ≤ 2147483647;
 [eva:alarm] tests/value/div.i:37: Warning: 
   signed overflow. assert -2147483648 ≤ -((int)(&X));
 [eva:alarm] tests/value/div.i:37: Warning: 

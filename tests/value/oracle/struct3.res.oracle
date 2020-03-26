@@ -22,7 +22,7 @@
 [eva:alarm] tests/value/struct3.i:46: Warning: 
   pointer downcast. assert (unsigned int)s2.c ≤ 2147483647;
 [eva:alarm] tests/value/struct3.i:46: Warning: 
-  pointer downcast. assert (unsigned int)s2.c + (int)s2.c ≤ 2147483647;
+  pointer downcast. assert (unsigned int)(s2.c + (int)s2.c) ≤ 2147483647;
 [eva] tests/value/struct3.i:46: 
   Assigning imprecise value to s2.a.
   The imprecision originates from Arithmetic {tests/value/struct3.i:46}

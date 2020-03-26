@@ -102,7 +102,7 @@
 [eva:alarm] tests/value/context_free.i:61: Warning: 
   out of bounds write. assert \valid(pvoid);
 [eva:alarm] tests/value/context_free.i:61: Warning: 
-  pointer downcast. assert (unsigned int)&pvoid ≤ 127;
+  pointer downcast. assert (unsigned int)(&pvoid) ≤ 127;
 [eva:alarm] tests/value/context_free.i:62: Warning: 
   pointer to function with incompatible type. assert \valid_function(g);
 [eva] Recording results for f

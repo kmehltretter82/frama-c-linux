@@ -55,7 +55,7 @@
 [eva] computing for function origin_arithmetic_1 <- main.
   Called from tests/value/origin.i:94.
 [eva:alarm] tests/value/origin.i:14: Warning: 
-  pointer downcast. assert (unsigned int)(int *)ta1 ≤ 2147483647;
+  pointer downcast. assert (unsigned int)((int *)ta1) ≤ 2147483647;
 [eva:alarm] tests/value/origin.i:14: Warning: 
   signed overflow. assert -2147483648 ≤ -((int)((int *)ta1));
 [eva:alarm] tests/value/origin.i:14: Warning: 
@@ -70,7 +70,7 @@
 [eva] computing for function origin_arithmetic_2 <- main.
   Called from tests/value/origin.i:95.
 [eva:alarm] tests/value/origin.i:19: Warning: 
-  pointer downcast. assert (unsigned int)(int *)ta2 ≤ 2147483647;
+  pointer downcast. assert (unsigned int)((int *)ta2) ≤ 2147483647;
 [eva:alarm] tests/value/origin.i:19: Warning: 
   signed overflow. assert -2147483648 ≤ -((int)((int *)ta2));
 [eva:alarm] tests/value/origin.i:19: Warning: 
@@ -82,7 +82,7 @@
   Assigning imprecise value to qa2.
   The imprecision originates from Arithmetic {tests/value/origin.i:19}
 [eva:alarm] tests/value/origin.i:20: Warning: 
-  pointer downcast. assert (unsigned int)(int *)tta2 ≤ 2147483647;
+  pointer downcast. assert (unsigned int)((int *)tta2) ≤ 2147483647;
 [eva:alarm] tests/value/origin.i:20: Warning: 
   signed overflow. assert -2147483648 ≤ -((int)((int *)tta2));
 [eva:alarm] tests/value/origin.i:20: Warning: 
@@ -93,13 +93,13 @@
 [eva:alarm] tests/value/origin.i:21: Warning: 
   out of bounds write. assert \valid(qa2);
 [eva:alarm] tests/value/origin.i:21: Warning: 
-  pointer downcast. assert (unsigned int)&aa2 ≤ 2147483647;
+  pointer downcast. assert (unsigned int)(&aa2) ≤ 2147483647;
 [eva] Recording results for origin_arithmetic_2
 [eva] Done for function origin_arithmetic_2
 [eva] computing for function origin_arithmetic_3 <- main.
   Called from tests/value/origin.i:96.
 [eva:alarm] tests/value/origin.i:25: Warning: 
-  pointer downcast. assert (unsigned int)(int *)ta3 ≤ 2147483647;
+  pointer downcast. assert (unsigned int)((int *)ta3) ≤ 2147483647;
 [eva:alarm] tests/value/origin.i:25: Warning: 
   signed overflow. assert -2147483648 ≤ -((int)((int *)ta3));
 [eva:alarm] tests/value/origin.i:25: Warning: 
@@ -159,7 +159,7 @@
 [eva:alarm] tests/value/origin.i:56: Warning: 
   out of bounds write. assert \valid(qm2);
 [eva:alarm] tests/value/origin.i:56: Warning: 
-  pointer downcast. assert (unsigned int)&a ≤ 2147483647;
+  pointer downcast. assert (unsigned int)(&a) ≤ 2147483647;
 [eva] Recording results for origin_misalign_2
 [eva] Done for function origin_misalign_2
 [eva] computing for function origin_uninitialized_1 <- main.
@@ -179,11 +179,11 @@
 [eva] computing for function local_escape_1 <- main.
   Called from tests/value/origin.i:108.
 [eva:alarm] tests/value/origin.i:83: Warning: 
-  pointer downcast. assert (unsigned int)&arg ≤ 2147483647;
+  pointer downcast. assert (unsigned int)(&arg) ≤ 2147483647;
 [eva:alarm] tests/value/origin.i:84: Warning: 
-  pointer downcast. assert (unsigned int)&local1 ≤ 2147483647;
+  pointer downcast. assert (unsigned int)(&local1) ≤ 2147483647;
 [eva:alarm] tests/value/origin.i:85: Warning: 
-  pointer downcast. assert (unsigned int)&arg ≤ 2147483647;
+  pointer downcast. assert (unsigned int)(&arg) ≤ 2147483647;
 [eva:alarm] tests/value/origin.i:85: Warning: 
   signed overflow. assert -2147483648 ≤ -((int)(&arg));
 [eva:alarm] tests/value/origin.i:85: Warning: 
@@ -192,9 +192,9 @@
   Assigning imprecise value to esc3.
   The imprecision originates from Arithmetic {tests/value/origin.i:85}
 [eva:alarm] tests/value/origin.i:87: Warning: 
-  pointer downcast. assert (unsigned int)&local1 ≤ 2147483647;
+  pointer downcast. assert (unsigned int)(&local1) ≤ 2147483647;
 [eva:alarm] tests/value/origin.i:88: Warning: 
-  pointer downcast. assert (unsigned int)&esc1 ≤ 2147483647;
+  pointer downcast. assert (unsigned int)(&esc1) ≤ 2147483647;
 [eva] Recording results for local_escape_1
 [eva] Done for function local_escape_1
 [eva:locals-escaping] tests/value/origin.i:108: Warning: 

@@ -553,8 +553,7 @@ let create_predicate ?(loc=Location.unknown) alarm =
       let t = match kind with
         | Pointer_downcast ->
           let t = Logic_utils.expr_to_term ~cast:true e in
-          let typ = Cil.theMachine.upointType in
-          Logic_const.tlogic_coerce ~loc t (Ctype typ)
+          Logic_const.tcast ~loc t Cil.theMachine.upointType
         | Signed_downcast | Unsigned_downcast ->
           Logic_utils.expr_to_term ~cast:true e
         | _ ->

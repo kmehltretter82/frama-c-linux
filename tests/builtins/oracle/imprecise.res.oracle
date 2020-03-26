@@ -49,7 +49,7 @@
 [eva] computing for function write_garbled <- main.
   Called from tests/builtins/imprecise.c:145.
 [eva:alarm] tests/builtins/imprecise.c:19: Warning: 
-  pointer downcast. assert (unsigned int)&k ≤ 2147483647;
+  pointer downcast. assert (unsigned int)(&k) ≤ 2147483647;
 [eva] tests/builtins/imprecise.c:19: 
   Assigning imprecise value to p.
   The imprecision originates from Arithmetic {tests/builtins/imprecise.c:19}
@@ -110,7 +110,7 @@
 [eva:alarm] tests/builtins/imprecise.c:53: Warning: 
   out of bounds write. assert \valid(p2);
 [eva:alarm] tests/builtins/imprecise.c:53: Warning: 
-  pointer downcast. assert (unsigned int)&addr ≤ 2147483647;
+  pointer downcast. assert (unsigned int)(&addr) ≤ 2147483647;
 [eva:alarm] tests/builtins/imprecise.c:56: Warning: 
   out of bounds write. assert \valid(p4);
 [eva:alarm] tests/builtins/imprecise.c:58: Warning: 
@@ -625,7 +625,7 @@
 [eva] computing for function write_garbled <- main.
   Called from tests/builtins/imprecise.c:145.
 [eva:alarm] tests/builtins/imprecise.c:19: Warning: 
-  pointer downcast. assert (unsigned int)&k ≤ 2147483647;
+  pointer downcast. assert (unsigned int)(&k) ≤ 2147483647;
 [eva:alarm] tests/builtins/imprecise.c:20: Warning: 
   out of bounds write. assert \valid(p);
 [eva] tests/builtins/imprecise.c:21: 
@@ -686,7 +686,7 @@
 [eva:alarm] tests/builtins/imprecise.c:53: Warning: 
   out of bounds write. assert \valid(p2);
 [eva:alarm] tests/builtins/imprecise.c:53: Warning: 
-  pointer downcast. assert (unsigned int)&addr ≤ 2147483647;
+  pointer downcast. assert (unsigned int)(&addr) ≤ 2147483647;
 [eva:alarm] tests/builtins/imprecise.c:56: Warning: 
   out of bounds write. assert \valid(p4);
 [eva:alarm] tests/builtins/imprecise.c:58: Warning: 

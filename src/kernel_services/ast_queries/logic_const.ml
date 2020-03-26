@@ -305,6 +305,9 @@ let tat ?(loc=Cil_datatype.Location.unknown) (t,label) =
 
 let told ?(loc=Cil_datatype.Location.unknown) t = tat ~loc (t,old_label)
 
+let tcast ?(loc=Cil_datatype.Location.unknown) t ct =
+  term ~loc (TCastE (ct, t)) (Ctype ct)
+
 let tlogic_coerce ?(loc=Cil_datatype.Location.unknown) t lt =
   term ~loc (TLogic_coerce (lt, t)) lt
 
