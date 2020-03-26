@@ -420,4 +420,4 @@
 [inout] Out (internal) for function main:
     Frama_C_entropy_source
 [inout] Inputs for function main:
-    Frama_C_entropy_source; SIG_DFL; SIG_IGN; SIG_ERR; undet
+    Frama_C_entropy_source; undet

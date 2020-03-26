@@ -54,6 +54,10 @@ module Extensions = struct
 end
 let set_extension_handler = Extensions.set_handler
 
+(* for specific builtin functions that act as placeholder for C macros.
+   For each name f below, pretty-printer will replace f and &f with the
+   corresponding name. Be sure to keep the list in sync with share/libc.
+*)
 let rename_builtins = Datatype.String.Hashtbl.create 17
 
 let () =
@@ -781,6 +785,9 @@ class cil_printer () = object (self)
        Neither cookie nor keyword for you. *)
     | AlignOf t -> fprintf fmt "__alignof__(%a)" (self#typ None) t
     | AlignOfE e -> fprintf fmt "__alignof__(%a)" self#exp_non_decay e
+    | AddrOf ((Var v, NoOffset))
+      when Datatype.String.Hashtbl.mem rename_builtins v.vname ->
+      self#varinfo fmt v
     | AddrOf lv -> fprintf fmt "& %a" (self#lval_prec Precedence.addrOfLevel) lv
     | StartOf(lv) ->
       if state.print_cil_as_is || non_decay then
