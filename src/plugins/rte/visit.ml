@@ -308,14 +308,12 @@ class annot_visitor kf flags on_alarm = object (self)
           (match Cil.unrollType ty, Cil.unrollType (Cil.typeOf e) with
            (* to , from *)
            | TInt(kind,_), TInt (_, _) ->
-             if Cil.isSigned kind then begin
-               if self#do_signed_downcast () then begin
-                 self#generate_assertion Rte.signed_downcast_assertion (ty, e);
-                 self#mark_to_skip e;
-               end
-             end
-             else if self#do_unsigned_downcast () then
-               self#generate_assertion Rte.unsigned_downcast_assertion (ty, e)
+             let signed = Cil.isSigned kind in
+             if signed && self#do_signed_downcast ()
+             || not signed && self#do_unsigned_downcast ()
+             then self#generate_assertion Rte.downcast_assertion (ty, e);
+             if signed && self#do_signed_downcast ()
+             then self#mark_to_skip e;
 
            | TInt _, TFloat _ ->
              if self#do_float_to_int () then
