@@ -157,8 +157,9 @@ val pointer_comparable: ?loc:location -> term -> term -> predicate
 (** \pointer_comparable
     @since Fluorine-20130401 *)
 
-(** {3 Conversion from exp to term}*)
-(** translates a C expression into an "equivalent" logical term.
+(** {2 Conversion from exp to term}
+
+    translates a C expression into an "equivalent" logical term.
     [cast] specifies how C arithmetic operators are translated.
     When [cast] is [true], the translation returns a logic [term] having the
     same semantics of the C [expr] by introducing casts (i.e. the C expr [a+b]
@@ -169,19 +170,13 @@ val pointer_comparable: ?loc:location -> term -> term -> predicate
     addition is translated into an addition of [real] numbers).
     @plugin development guide *)
 val expr_to_term : cast:bool -> exp -> term
+
 (** same as {!expr_to_term}, except that if the new term has an arithmetic
     type, it is automatically coerced into real (or integer for integral types).
 
     @since Magnesium-20151001
 *)
 val expr_to_term_coerce: cast:bool -> exp -> term
-
-val is_zero_comparable: term -> bool
-(** [true] if the given term has a type for which a comparison to 0 exists
-    (i.e. scalar C types, logic integers and reals).
-
-    @since Sulfur-20171101
-*)
 
 val expr_to_predicate: cast:bool -> exp -> identified_predicate
 (** same as {expr_to_term}, but the result is a predicate. Expressions starting
@@ -192,6 +187,21 @@ val expr_to_predicate: cast:bool -> exp -> identified_predicate
     @raise Fatal error if the expression is not a comparison and cannot be
            compared to zero.
     @since Sulfur-20171101
+*)
+
+val is_zero_comparable: term -> bool
+(** [true] if the given term has a type for which a comparison to 0 exists
+    (i.e. scalar C types, logic integers and reals).
+
+    @since Sulfur-20171101
+*)
+
+val scalar_term_to_boolean: term -> term
+(** Compare the given term with the constant 0 (of the appropriate type)
+    to return the result of the comparison [e <> 0] as a boolean term.
+
+    @raise Fatal error if the argument cannot be compared to 0
+    @since Frama-C+dev
 *)
 
 val scalar_term_to_predicate: term -> predicate
@@ -216,6 +226,8 @@ val lconstant_to_constant: logic_constant-> constant
     by the parser as valid floats *)
 val string_to_float_lconstant: string -> logic_constant
 
+(** {2 Various Utilities} *)
+
 (** [remove_term_offset o] returns [o] without its last offset and
     this last offset. *)
 val remove_term_offset :
@@ -239,8 +251,6 @@ val get_pred_body :
 val is_result : term -> bool
 
 val lhost_c_type : term_lhost -> typ
-
-(** {2 Predicates} *)
 
 (** [true] if the predicate is Ptrue.
     @since Nitrogen-20111001 *)

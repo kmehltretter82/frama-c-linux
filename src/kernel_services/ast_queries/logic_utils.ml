@@ -263,6 +263,10 @@ let mk_cast ?(loc=Cil_datatype.Location.unknown) ?(force=false) newt t =
     | _ -> mk_cast t
   in aux1 t.term_type t
 
+(* -------------------------------------------------------------------------- *)
+(* --- Constant Conversions                                               --- *)
+(* -------------------------------------------------------------------------- *)
+
 let real_of_float s f =
   { r_literal = s ; r_nearest = f ; r_upper = f ; r_lower = f }
 
@@ -329,8 +333,7 @@ let numeric_coerce ltyp t =
     | _ -> coerce t
 
 (* Don't forget to keep is_zero_comparable
-   and scalar_term_to_predicate in sync.
-*)
+   and scalar_term_to_predicate in sync. *)
 
 let is_zero_comparable t =
   match unroll_type t.term_type with
@@ -379,9 +382,13 @@ let scalar_term_to_boolean =
   in
   scalar_term_conversion conversion
 
+(* -------------------------------------------------------------------------- *)
+(* --- Expr Conversion                                                    --- *)
+(* -------------------------------------------------------------------------- *)
+
 let rec expr_to_term ~cast e =
-  let e_typ = unrollType (Cil.typeOf e) in
   let loc = e.eloc in
+  let typ = unrollType (Cil.typeOf e) in
   let result = match e.enode with
     | Const c -> TConst (constant_to_lconstant c)
     | SizeOf t -> TSizeOf t
@@ -400,7 +407,7 @@ let rec expr_to_term ~cast e =
         | ( Cil_types.Lt | Cil_types.Gt | Cil_types.Le | Cil_types.Ge
           | Cil_types.Eq | Cil_types.Ne| Cil_types.LAnd | Cil_types.LOr),
           _ -> Some Logic_const.boolean_type
-        | _, true -> Some (typ_to_logic_type e_typ)
+        | _, true -> Some (typ_to_logic_type typ)
         | _, false -> None
       in
       let tnode = TBinOp (op,l',r') in
@@ -410,7 +417,7 @@ let rec expr_to_term ~cast e =
          integer/float/pointer here, and (2) there is no implicit conversion
          Boolean -> integer. *)
       begin match tcast with
-        | Some lt -> (mk_cast e_typ (Logic_const.term tnode lt)).term_node
+        | Some lt -> (mk_cast typ (Logic_const.term tnode lt)).term_node
         | None -> tnode
       end
     | UnOp (op, u, _) ->
@@ -433,12 +440,12 @@ let rec expr_to_term ~cast e =
       (* See comments for binop case above. *)
       let tcast = match op, cast with
         | Cil_types.LNot, _ -> Some Logic_const.boolean_type
-        | _, true -> Some (typ_to_logic_type e_typ)
+        | _, true -> Some (typ_to_logic_type typ)
         | _, false -> None
       in
       let tnode = TUnOp (op, u') in
       begin match tcast with
-        | Some lt -> (mk_cast e_typ (Logic_const.term tnode lt)).term_node
+        | Some lt -> (mk_cast typ (Logic_const.term tnode lt)).term_node
         | None -> tnode
       end
     | AlignOfE e -> TAlignOfE (expr_to_term ~cast e)
@@ -446,14 +453,14 @@ let rec expr_to_term ~cast e =
     | Lval lv -> TLval (lval_to_term_lval ~cast lv)
     | Info (e,_) -> (expr_to_term ~cast e).term_node
   in
-  let tres = Logic_const.term ~loc result (Ctype e_typ) in
+  let tres = Logic_const.term ~loc result (Ctype typ) in
   if cast then tres
   else
     match e.enode with
     (* all immediate values keep their C type by default, and are only lifted
        to integer/real if needed. *)
     | Const _ | Lval _ | CastE _ -> tres
-    | _ -> numeric_coerce (typ_to_logic_type e_typ) tres
+    | _ -> numeric_coerce (typ_to_logic_type typ) tres
 
 and expr_to_term_coerce ~cast e =
   let t = expr_to_term ~cast e in
@@ -497,6 +504,10 @@ and expr_to_predicate ~cast e =
         "Cannot convert into predicate the C expression %a"
         Cil_printer.pp_exp e
 
+(* ************************************************************************* *)
+(** {1 Various utilities} *)
+(* ************************************************************************* *)
+
 let array_with_range arr size =
   let loc = arr.eloc in
   let arr = Cil.stripCasts arr in
@@ -520,10 +531,6 @@ let remove_logic_coerce t =
   match t.term_node with
   | TLogic_coerce(_,t) -> t
   | _ -> t
-
-(* ************************************************************************* *)
-(** {1 Various utilities} *)
-(* ************************************************************************* *)
 
 let rec remove_term_offset o =
   match o with
