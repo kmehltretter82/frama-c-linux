@@ -23,7 +23,8 @@
 open Cil_types
 open Cil_datatype
 
-type overflow_kind = Signed | Unsigned | Signed_downcast | Unsigned_downcast
+type overflow_kind =
+    Signed | Unsigned | Signed_downcast | Unsigned_downcast | Pointer_downcast
 type access_kind = For_reading | For_writing
 type bound_kind = Lower_bound | Upper_bound
 
@@ -32,6 +33,7 @@ let string_of_overflow_kind = function
   | Unsigned -> "unsigned_overflow"
   | Signed_downcast -> "signed_downcast"
   | Unsigned_downcast -> "unsigned_downcast"
+  | Pointer_downcast -> "pointer_downcast"
 
 type alarm =
   | Division_by_zero of exp
@@ -549,6 +551,10 @@ let create_predicate ?(loc=Location.unknown) alarm =
       (* n <= e or e <= n according to bound *)
       let loc = best_loc ~loc e.eloc in
       let t = match kind with
+        | Pointer_downcast ->
+          let t = Logic_utils.expr_to_term ~cast:true e in
+          let typ = Cil.theMachine.upointType in
+          Logic_const.tlogic_coerce ~loc t (Ctype typ)
         | Signed_downcast | Unsigned_downcast ->
           Logic_utils.expr_to_term ~cast:true e
         | _ ->

@@ -309,6 +309,7 @@ let emit_alarm kinstr alarm (status:status) =
       | Alarms.Unsigned -> "unsigned overflow"
       | Alarms.Signed_downcast -> "signed downcast"
       | Alarms.Unsigned_downcast -> "unsigned downcast"
+      | Alarms.Pointer_downcast -> "pointer downcast"
     in
     register_alarm str
 
