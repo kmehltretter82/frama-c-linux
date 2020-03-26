@@ -91,6 +91,7 @@ type op =
   | NE
   | NEG
   | ADD
+  | SUB
   | MUL
   | DIV
   | REAL
@@ -105,6 +106,7 @@ let op_name = function
   | NE -> "ne"
   | NEG -> "neg"
   | ADD -> "add"
+  | SUB -> "sub"
   | MUL -> "mul"
   | DIV -> "div"
   | REAL -> "of"
@@ -275,6 +277,7 @@ let compute_float op ulp xs =
   match op , xs with
   | NEG , [ x ] -> qmake ulp (Q.neg (exact x))
   | ADD , [ x ; y ] -> qmake ulp (Q.add (exact x) (exact y))
+  | SUB , [ x ; y ] -> qmake ulp (Q.sub (exact x) (exact y))
   | MUL , [ x ; y ] -> qmake ulp (Q.mul (exact x) (exact y))
   | DIV , [ x ; y ] ->
       let res = match Q.div (exact x) (exact y) with
@@ -293,6 +296,7 @@ let compute_real op xs =
   match op , xs with
   | NEG , [ x ] -> F.e_opp x
   | ADD , [ x ; y ] -> F.e_add x y
+  | SUB , [ x ; y ] -> F.e_sub x y
   | MUL , [ x ; y ] -> F.e_mul x y
   | DIV , [ x ; y ] -> F.e_div x y
   | (ROUND|REAL) , [ x ] -> x
@@ -350,6 +354,7 @@ let flt_le ft = Compute.get (Context.get model, ft, LE) |> fst
 let flt_lt ft = Compute.get (Context.get model, ft, LT) |> fst
 let flt_neg ft = Compute.get (Context.get model, ft, NEG) |> fst
 let flt_add ft = Compute.get (Context.get model, ft, ADD) |> fst
+let flt_sub ft = Compute.get (Context.get model, ft, SUB) |> fst
 let flt_mul ft = Compute.get (Context.get model, ft, MUL) |> fst
 let flt_div ft = Compute.get (Context.get model, ft, DIV) |> fst
 let flt_of_real ft = Compute.get (Context.get model, ft, ROUND) |> fst
@@ -435,15 +440,13 @@ let fcmp rop fop f x y =
   | Float -> p_call (fop f) [x;y]
 
 let fadd = fbinop e_add flt_add
+let fsub = fbinop e_sub flt_sub
 let fmul = fbinop e_mul flt_mul
 let fdiv = fbinop e_div flt_div
-
 let fopp f x =
   match Context.get model with
   | Real -> e_opp x
   | Float -> e_fun ~result:(ftau f) (flt_neg f) [x]
-
-let fsub f x y = fadd f x (fopp f y)
 
 let flt = fcmp p_lt flt_lt
 let fle = fcmp p_leq flt_le
