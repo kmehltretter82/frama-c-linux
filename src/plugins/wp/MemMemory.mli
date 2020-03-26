@@ -62,6 +62,7 @@ val p_separated : lfun
 val p_included : lfun
 val p_valid_rd : lfun
 val p_valid_rw : lfun
+val p_valid_obj : lfun
 val p_invalid : lfun
 val p_eqmem : lfun
 

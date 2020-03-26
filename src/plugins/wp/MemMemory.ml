@@ -62,6 +62,7 @@ let l_havoc = Qed.Engine.{
 
 let p_valid_rd = Lang.extern_fp ~library "valid_rd"
 let p_valid_rw = Lang.extern_fp ~library "valid_rw"
+let p_valid_obj = Lang.extern_fp ~library "valid_obj"
 let p_invalid = Lang.extern_fp ~library "invalid"
 let p_separated = Lang.extern_fp ~library "separated"
 let p_included = Lang.extern_fp ~library "included"
