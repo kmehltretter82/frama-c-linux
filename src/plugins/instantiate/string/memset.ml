@@ -68,7 +68,7 @@ let pset_len_bytes_to_zero ?loc ptr bytes_len =
     let value = match Logic_utils.unroll_type t.term_type with
       | Ctype(TPtr(_)) -> term Tnull t.term_type
       | Ctype(TFloat(_)) -> treal ?loc 0.
-      | Ctype(TInt(_)) -> tinteger ?loc 0
+      | Ctype(TInt(_) | TEnum (_)) -> tinteger ?loc 0
       | _ -> unexpected "non atomic type during equality generation"
     in
     prel ?loc (Req, t, value)
