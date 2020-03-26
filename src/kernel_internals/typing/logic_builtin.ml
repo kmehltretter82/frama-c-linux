@@ -293,6 +293,18 @@ let init =
             (*"\\round_quad", [],
                ["m",  rounding_mode; "x", Lreal], long_double_type;*)
 
+            "\\neg_float",[],["x",float_type], float_type;
+            "\\add_float",[],["x",float_type;"y",float_type], float_type;
+            "\\sub_float",[],["x",float_type;"y",float_type], float_type;
+            "\\mul_float",[],["x",float_type;"y",float_type], float_type;
+            "\\div_float",[],["x",float_type;"y",float_type], float_type;
+
+            "\\neg_double",[],["x",double_type], double_type;
+            "\\add_double",[],["x",double_type;"y",double_type], double_type;
+            "\\sub_double",[],["x",double_type;"y",double_type], double_type;
+            "\\mul_double",[],["x",double_type;"y",double_type], double_type;
+            "\\div_double",[],["x",double_type;"y",double_type], double_type;
+
             "\\min", [], ["s", set_of_integer], Linteger;
             "\\max", [], ["s", set_of_integer], Linteger;
 
