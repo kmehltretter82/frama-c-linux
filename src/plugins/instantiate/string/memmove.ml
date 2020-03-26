@@ -26,6 +26,8 @@ open Basic_blocks
 
 let function_name = "memmove"
 
+let unexpected = Options.fatal "String.Memmove: unexpected: %s"
+
 let pmoved_len_bytes ?loc dest src bytes_len =
   plet_len_div_size ?loc dest.term_type bytes_len
     (punfold_all_elems_eq ?loc dest src)
@@ -61,7 +63,7 @@ let generate_ensures loc t dest src len =
 let generate_spec _t { svar = vi } loc =
   let (cdest, csrc, clen) = match Cil.getFormalsDecl vi with
     | [ dest ; src ; len ] -> dest, src, len
-    | _ -> assert false
+    | _ -> unexpected "ill-formed fundec in specification generation"
   in
   let t = cdest.vtype in
   let dest = cvar_to_tvar cdest in
@@ -97,12 +99,13 @@ let well_typed_call _ret = function
   | [ dest ; src ; len ] ->
     (Cil.isIntegralType (Cil.typeOf len)) &&
     (Cil_datatype.Typ.equal (type_from_arg dest) (type_from_arg src)) &&
-    (not (Cil.isVoidType (type_from_arg dest)))
+    (not (Cil.isVoidType (type_from_arg dest))) &&
+    (Cil.isCompleteType (type_from_arg dest))
   | _ -> false
 
 let key_from_call _ret = function
   | [ dest ; _ ; _ ] -> type_from_arg dest
-  | _ -> failwith "Call to Memmove.key_from_call on an ill-typed call"
+  | _ -> unexpected "trying to generate a key on an ill-typed call"
 
 let retype_args override_key = function
   | [ dest ; src ; len ] ->
@@ -113,7 +116,7 @@ let retype_args override_key = function
       Cil_datatype.Typ.equal (type_from_arg src) override_key
     ) ;
     [ dest ; src ; len ]
-  | _ -> failwith "Call to Memmove.retype_args on an ill-typed call"
+  | _ -> unexpected "trying to retype arguments on an ill-typed call"
 
 let args_for_original _t args = args
 

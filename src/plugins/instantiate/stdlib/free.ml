@@ -25,6 +25,8 @@ open Basic_alloc
 open Cil_types
 open Logic_const
 
+let unexpected = Options.fatal "Stdlib.Free: unexpected: %s"
+
 let function_name = "free"
 
 let null_pointer ?loc ptr =
@@ -63,7 +65,7 @@ let make_behavior_no_deallocation loc ptr =
 let generate_spec _typ { svar = vi } loc =
   let ptr = match Cil.getFormalsDecl vi with
     | [ ptr ] -> cvar_to_tvar ptr
-    | _ -> assert false
+    | _ -> unexpected "ill-formed fundec in specification generation"
   in
   let requires = generate_requires loc ptr in
   let assigns = generate_global_assigns ptr in
@@ -95,7 +97,7 @@ let key_from_call _ret args =
     let ptr_t = Cil.unrollTypeDeep (Cil.typeOf ptr) in
     let ptr_t = Cil.type_remove_qualifier_attributes_deep ptr_t in
     Cil.typeOf_pointed ptr_t
-  | _ -> assert false
+  | _ -> unexpected "trying to generate a key on an ill-typed call"
 
 let retype_args _typ args = List.map Cil.stripCasts args
 let args_for_original _typ args = args

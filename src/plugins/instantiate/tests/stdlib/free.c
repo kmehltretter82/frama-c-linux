@@ -12,3 +12,6 @@ void baz(int (*x) [10]){
 void with_void(void * x){
   free(x);
 }
+void with_incomplete(struct incomplete* t){
+  free(t);
+}
