@@ -2,8 +2,10 @@
   statement ::= "/*@" statement-contract "*/" statement
   \
   [ statement-contract ] ::= {("for" id ("," id)* ":")?} requires-clause* ;
-    simple-clause* named-behavior-stmt* ;
+    simple-clause-stmt* named-behavior-stmt* ;
     completeness-clause*
+  \
+  simple-clause-stmt ::= simple-clause | { abrupt-clause-stmt }
   \
   named-behavior-stmt ::= "behavior" id ":" behavior-body-stmt
   \
