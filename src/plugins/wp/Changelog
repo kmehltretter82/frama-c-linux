@@ -20,6 +20,7 @@
 #   <Prover>: prover
 ###############################################################################
 
+- WP          [2020/03/26] Added support for invalid-pointer predicate
 - WP          [2020/02/21] Why3 prover version fallback
 - WP          [2020/02/21] Why3 prover full-names use ':' instead of ','
 -* WP         [2020/02/20] Fixes handling of LoopCurrent in loop invariants
