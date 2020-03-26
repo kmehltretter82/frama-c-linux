@@ -27,6 +27,8 @@ open Logic_const
 
 let function_name = "malloc"
 
+let unexpected = Options.fatal "Stdlib.Malloc: unexpected: %s"
+
 let generate_global_assigns loc ptr_type size =
   let assigns_result = assigns_result ~loc ptr_type [ size ] in
   let assigns_heap = assigns_heap [ size ] in
@@ -49,7 +51,7 @@ let make_behavior_no_allocation loc ptr_type size =
 let generate_spec alloc_typ { svar = vi } loc =
   let (csize) = match Cil.getFormalsDecl vi with
     | [ size ] -> size
-    | _ -> assert false
+    | _ -> unexpected "ill-formed fundec in specification generation"
   in
   let size = tlogic_coerce ~loc (cvar_to_tvar csize) Linteger in
   let requires = [ valid_size ~loc alloc_typ size ] in
@@ -82,7 +84,7 @@ let key_from_call ret _ =
     let ret_t = Cil.unrollTypeDeep (Cil.typeOfLval ret) in
     let ret_t = Cil.type_remove_qualifier_attributes_deep ret_t in
     Cil.typeOf_pointed ret_t
-  | None -> assert false
+  | None -> unexpected "trying to generate a key on an ill-typed call"
 
 let retype_args _typ args = args
 let args_for_original _typ args = args

@@ -26,6 +26,8 @@ open Basic_blocks
 
 let function_name = "memcmp"
 
+let unexpected = Options.fatal "String.Memcmp: unexpected: %s"
+
 let generate_requires loc s1 s2 len =
   List.map new_predicate [
     { (pcorrect_len_bytes ~loc s1.term_type len)
@@ -63,7 +65,7 @@ let generate_ensures loc s1 s2 len =
 let generate_spec _t { svar = vi } loc =
   let (c_s1, c_s2, clen) = match Cil.getFormalsDecl vi with
     | [ s1 ; s2 ; len ] -> s1, s2, len
-    | _ -> assert false
+    | _ -> unexpected "ill-formed fundec in specification generation"
   in
   let s1 = cvar_to_tvar c_s1 in
   let s2 = cvar_to_tvar c_s2 in
@@ -103,7 +105,7 @@ let well_typed_call _ret = function
 
 let key_from_call _ret = function
   | [ s1 ; _ ; _ ] -> type_from_arg s1
-  | _ -> failwith "Call to Memmove.key_from_call on an ill-typed call"
+  | _ -> unexpected "trying to generate a key on an ill-typed call"
 
 let retype_args override_key = function
   | [ s1 ; s2 ; len ] ->
@@ -114,7 +116,7 @@ let retype_args override_key = function
       Cil_datatype.Typ.equal (type_from_arg s2) override_key
     ) ;
     [ s1 ; s2 ; len ]
-  | _ -> failwith "Call to Memmove.retype_args on an ill-typed call"
+  | _ -> unexpected "trying to retype arguments on an ill-typed call"
 
 let args_for_original _t args = args
 

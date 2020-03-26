@@ -25,12 +25,14 @@ open Basic_blocks
 open Cil_types
 open Extlib
 
+let unexpected = Options.fatal "Stdlib.Basic_alloc: unexpected: %s"
+
 let valid_size ?loc typ size =
   let p = match typ with
     | TComp (ci, _, _) when Cil.has_flexible_array_member typ ->
       let elem = match (last ci.cfields).ftype with
         | TArray(t, _ , _, _) -> tinteger ?loc (Cil.bytesSizeOf t)
-        | _ -> assert false
+        | _ -> unexpected "non array last field on flexible structure"
       in
       let base = tinteger ?loc (Cil.bytesSizeOf typ) in
       let flex = tminus ?loc size base in

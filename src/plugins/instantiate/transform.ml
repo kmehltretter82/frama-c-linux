@@ -126,6 +126,7 @@ let compute_call_preconditions_statuses kf =
   let stmt = Kernel_function.find_first_stmt kf in
   let _ = Kernel_function.find_all_enclosing_blocks stmt in
   match stmt.skind with
+  | Instr (Local_init(_, ConsInit(fct, _, Plain_func), _))
   | Instr (Call(_, { enode = Lval ((Var fct), NoOffset) }, _, _)) ->
     let called_kf = Globals.Functions.get fct in
     Statuses_by_call.setup_all_preconditions_proxies called_kf ;
@@ -133,7 +134,8 @@ let compute_call_preconditions_statuses kf =
         ~warn_missing:true called_kf stmt
     in
     List.iter (fun (_, p) -> validate_property p) reqs ;
-  | _ -> assert false
+  | _ ->
+    Options.fatal "Transformation: unexpected instruction kind on precondition"
 
 let compute_postconditions_statuses kf =
   let posts bhv =

@@ -26,6 +26,8 @@ open Basic_blocks
 
 let function_name = "memcpy"
 
+let unexpected = Options.fatal "String.Memcpy: unexpected: %s"
+
 let pseparated_memcpy_len_bytes ?loc p1 p2 bytes_len =
   let generate len = pseparated_memories ?loc p1 len p2 len in
   plet_len_div_size ?loc p1.term_type bytes_len generate
@@ -67,7 +69,7 @@ let generate_ensures loc t dest src len =
 let generate_spec _t { svar = vi } loc =
   let (cdest, csrc, clen) = match Cil.getFormalsDecl vi with
     | [ dest ; src ; len ] -> dest, src, len
-    | _ -> assert false
+    | _ -> unexpected "ill-formed fundec in specification generation"
   in
   let t = cdest.vtype in
   let dest = cvar_to_tvar cdest in
@@ -109,7 +111,7 @@ let well_typed_call _ret = function
 
 let key_from_call _ret = function
   | [ dest ; _ ; _ ] -> type_from_arg dest
-  | _ -> failwith "Call to Memcpy.key_from_call on an ill-typed call"
+  | _ -> unexpected "trying to generate a key on an ill-typed call"
 
 let retype_args override_key = function
   | [ dest ; src ; len ] ->
@@ -120,7 +122,7 @@ let retype_args override_key = function
       Cil_datatype.Typ.equal (type_from_arg src) override_key
     ) ;
     [ dest ; src ; len ]
-  | _ -> failwith "Call to Memcpy.retype_args on an ill-typed call"
+  | _ -> unexpected "trying to retype arguments on an ill-typed call"
 
 let args_for_original _t args = args
 
