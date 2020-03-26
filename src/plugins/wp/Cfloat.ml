@@ -360,31 +360,45 @@ let flt_div ft = Compute.get (Context.get model, ft, DIV) |> fst
 let flt_of_real ft = Compute.get (Context.get model, ft, ROUND) |> fst
 let real_of_flt ft = Compute.get (Context.get model, ft, REAL) |> fst
 
-
 (* -------------------------------------------------------------------------- *)
 (* --- Builtins                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-let make_hack ?(converse=false) ft op xs =
+let builtin kind ft op xs =
   let phi, impl = Compute.get ((Context.get model), ft, op) in
-  let xs = (if converse then List.rev xs else xs) in
-  try impl xs with Not_found -> F.e_fun ~result:Logic.Bool phi xs
+  let xs = (if kind=`ReV then List.rev xs else xs) in
+  try impl xs with Not_found ->
+    let result = match kind with
+      | `Binop | `Unop -> ftau ft
+      | `Rel | `ReV -> Logic.Bool
+    in F.e_fun ~result phi xs
 
-let register_builtin ft =
+let register_builtins ft =
   begin
     let suffix = float_name ft in
-    LogicBuiltins.hack ("\\eq_" ^ suffix) (make_hack ft EQ) ;
-    LogicBuiltins.hack ("\\ne_" ^ suffix) (make_hack ft NE) ;
-    LogicBuiltins.hack ("\\lt_" ^ suffix) (make_hack ~converse:false ft LT) ;
-    LogicBuiltins.hack ("\\gt_" ^ suffix) (make_hack ~converse:true  ft LT) ;
-    LogicBuiltins.hack ("\\le_" ^ suffix) (make_hack ~converse:false ft LE) ;
-    LogicBuiltins.hack ("\\ge_" ^ suffix) (make_hack ~converse:true  ft LE)
+    let register (prefix,kind,op) =
+      LogicBuiltins.hack
+        (Printf.sprintf "\\%s_%s" prefix suffix)
+        (builtin kind ft op)
+    in List.iter register [
+      "eq",`Rel,EQ ;
+      "ne",`Rel,NE ;
+      "lt",`Rel,LT ;
+      "gt",`ReV,LT ;
+      "le",`Rel,LE ;
+      "ge",`ReV,LE ;
+      "neg",`Unop,NEG ;
+      "add",`Binop,ADD ;
+      "sub",`Binop,SUB ;
+      "mul",`Binop,MUL ;
+      "div",`Binop,DIV ;
+    ] ;
   end
 
 let () = Context.register
     begin fun () ->
-      register_builtin Float32 ;
-      register_builtin Float64 ;
+      register_builtins Float32 ;
+      register_builtins Float64 ;
     end
 
 (* -------------------------------------------------------------------------- *)
