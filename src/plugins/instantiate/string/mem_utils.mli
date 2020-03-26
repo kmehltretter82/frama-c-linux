@@ -21,32 +21,40 @@
 (**************************************************************************)
 
 open Cil_types
-open Mem_utils
 
-let function_name = "memmove"
+type kind = CPtr | Ptr | Len | Int
+type action = Strip | Id
+type param = string * kind * action
+type proto = kind * param list
 
-let requires = memcpy_memmove_common_requires
-let assigns = memcpy_memmove_common_assigns
-let ensures = memcpy_memmove_common_ensures "moved"
-let generate_spec = mem2s_spec ~requires ~assigns ~ensures
-
-module Function =
-struct
-  let name = function_name
-  let prototype = Ptr, [("dest",Ptr,Strip);("src",CPtr,Strip);("len",Len,Id)]
-  let well_typed = Mem_utils.mem2s_typing
+module type Function = sig
+  val name: string
+  val prototype: proto
+  val well_typed: typ option -> typ list -> bool
 end
-module Memmove_base = Mem_utils.Make(Function)
 
-let () = Transform.register (module struct
-    module Hashtbl = Cil_datatype.Typ.Hashtbl
-    type override_key = typ
+module Make (F: Function) : sig
+  val generate_function_type : typ -> typ
+  val generate_prototype : typ -> string * typ
+  val well_typed_call : lval option -> exp list -> bool
+  val retype_args : 'a -> exp list -> exp list
+  val key_from_call : 'a -> exp list -> typ
+end
 
-    let function_name = function_name
-    let well_typed_call = Memmove_base.well_typed_call
-    let key_from_call = Memmove_base.key_from_call
-    let retype_args = Memmove_base.retype_args
-    let generate_prototype = Memmove_base.generate_prototype
-    let generate_spec = generate_spec
-    let args_for_original _ = Extlib.id
-  end)
+(** location -> key -> s1 -> s2 -> len -> spec_result *)
+type 'a spec_gen = location -> typ -> term -> term -> term -> 'a
+
+val mem2s_spec:
+  requires: (identified_predicate list) spec_gen ->
+  assigns: assigns spec_gen ->
+  ensures: (termination_kind * identified_predicate) list spec_gen ->
+  typ -> fundec -> location -> funspec
+
+val mem2s_typing: typ option -> typ list -> bool
+
+val memcpy_memmove_common_requires: (identified_predicate list) spec_gen
+
+val memcpy_memmove_common_assigns: assigns spec_gen
+
+val memcpy_memmove_common_ensures:
+  string -> (termination_kind * identified_predicate) list spec_gen

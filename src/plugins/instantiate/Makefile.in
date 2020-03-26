@@ -30,6 +30,7 @@ FRAMAC_LIBDIR :=$(shell frama-c-config -print-libpath)
 endif
 
 SRC_STRING:= \
+	mem_utils \
 	memcmp \
 	memcpy \
 	memmove \
