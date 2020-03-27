@@ -90,8 +90,8 @@ class transformer = object(self)
   method private replace_call (lval, fct, args) =
     try
       let module I = (val (self#find_enabled_instantiator fct): Instantiator) in
-      if I.well_typed_call lval args then
-        let key = I.key_from_call lval args in
+      if I.well_typed_call lval fct args then
+        let key = I.key_from_call lval fct args in
         let fundec = I.get_override key in
         let new_args = I.retype_args key args in
         Queue.add fundec used_instantiator_last_kf ;

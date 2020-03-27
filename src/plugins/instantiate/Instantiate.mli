@@ -41,19 +41,20 @@ module Instantiator_builder: sig
     (** Name of the implemented instantiator function *)
     val function_name: string
 
-    (** [well_typed_call ret args] must return true if and only if the
+    (** [well_typed_call ret fct args] must return true if and only if the
         corresponding call is well typed in the sens that the generator can
         produce a function override for the corresponding return value and
         parameters, according to their types and/or values.
     *)
-    val well_typed_call: lval option -> exp list -> bool
+    val well_typed_call: lval option -> varinfo -> exp list -> bool
 
-    (** [key_from_call ret args] must return an identifier for the corresponding
-        call. [key_from_call ret1 args1] and [key_from_call ret2 args2] must equal
-        if and only if the same override function can be used for both call. Any
-        call for which [well_typed_call] returns true must be able to give a key.
+    (** [key_from_call ret fct args] must return an identifier for the
+        corresponding call. [key_from_call ret1 fct1 args1] and
+        [key_from_call ret2 fct2 args2] must equal if and only if the same
+        override function can be used for both call. Any call for which
+        [well_typed_call] returns true must be able to give a key.
     *)
-    val key_from_call: lval option -> exp list -> override_key
+    val key_from_call: lval option -> varinfo -> exp list -> override_key
 
     (** [retype_args key args] must returns a new argument list compatible with
         the function identified by [override_key]. [args] is the list of arguments

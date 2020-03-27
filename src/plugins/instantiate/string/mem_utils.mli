@@ -44,9 +44,9 @@ end
 module Make (F: Function) : sig
   val generate_function_type : typ -> typ
   val generate_prototype : typ -> string * typ
-  val well_typed_call : lval option -> exp list -> bool
-  val retype_args : 'a -> exp list -> exp list
-  val key_from_call : 'a -> exp list -> typ
+  val well_typed_call : lval option -> varinfo -> exp list -> bool
+  val retype_args : typ -> exp list -> exp list
+  val key_from_call : lval option -> varinfo -> exp list ->  typ
 end
 
 (** location -> key -> s1 -> s2 -> len -> spec_result *)

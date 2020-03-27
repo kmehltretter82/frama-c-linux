@@ -1,12 +1,12 @@
 let function_name = "mine"
 
-let well_typed_call _ = function
+let well_typed_call _ _ = function
   | [ e ] ->
     let t = Cil.typeOf(Cil.stripCasts e) in
     not (Cil.isVoidPtrType t) && Cil.isPointerType t
   | _ -> false
 
-let key_from_call _ = function
+let key_from_call _ _ = function
   | [ e ] ->
     let t = Cil.typeOf(Cil.stripCasts e) in
     Cil.typeOf_pointed t

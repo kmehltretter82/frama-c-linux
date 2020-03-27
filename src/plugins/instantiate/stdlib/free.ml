@@ -83,16 +83,16 @@ let generate_prototype alloc_t =
   ] in
   name, (TFun(Cil.voidType, Some params, false, []))
 
-let well_typed_call _ret args =
+let well_typed_call _ret fct args =
   match args with
-  | [ ptr ] ->
+  | [ ptr ] when Cil.hasAttribute "fc_stdlib" fct.vattr ->
     let t = Cil.typeOf (Cil.stripCasts ptr) in
     Cil.isPointerType t && not (Cil.isVoidPtrType t)
   | _ -> false
 
-let key_from_call _ret args =
+let key_from_call _ret fct args =
   match args with
-  | [ ptr ] ->
+  | [ ptr ] when Cil.hasAttribute "fc_stdlib" fct.vattr ->
     let ptr = Cil.stripCasts ptr in
     let ptr_t = Cil.unrollTypeDeep (Cil.typeOf ptr) in
     let ptr_t = Cil.type_remove_qualifier_attributes_deep ptr_t in
