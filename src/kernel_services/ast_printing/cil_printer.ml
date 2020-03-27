@@ -658,7 +658,7 @@ class cil_printer () = object (self)
   (*** VARIABLES ***)
   method varname fmt v =
     let v =
-      if not (Kernel.PrintLibc.get ()) &&
+      if not state.print_cil_as_is &&
          Datatype.String.Hashtbl.mem rename_builtins v
       then
         Datatype.String.Hashtbl.find rename_builtins v
