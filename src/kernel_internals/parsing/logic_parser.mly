@@ -720,9 +720,12 @@ cv:
 ;
 
 type_spec_cv:
-     type_spec { $1 }
+     type_spec cv_after { $2 $1 }
 |    cv type_spec_cv { LTattribute ($2, $1) }
-|    type_spec_cv cv { LTattribute ($1, $2) }
+
+cv_after:
+  /* empty */ { fun t -> t }
+| cv cv_after { fun t -> $2 (LTattribute (t,$1)) }
 
 cast_logic_type:
  | type_spec_cv abs_spec_cv_option { $2 $1 }
