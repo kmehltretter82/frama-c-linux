@@ -945,6 +945,8 @@ src/plugins/occurrence/register_gui.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/occurrence/register_gui.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/instantiate/basic_blocks.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/instantiate/basic_blocks.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/instantiate/global_vars.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/instantiate/global_vars.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/instantiate/Instantiate.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/instantiate/instantiator_builder.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/instantiate/instantiator_builder.mli: CEA_LGPL_OR_PROPRIETARY
@@ -958,6 +960,8 @@ src/plugins/instantiate/stdlib/free.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/instantiate/stdlib/free.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/instantiate/stdlib/malloc.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/instantiate/stdlib/malloc.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/instantiate/string/mem_utils.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/instantiate/string/mem_utils.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/instantiate/string/memcmp.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/instantiate/string/memcmp.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/instantiate/string/memcpy.ml: CEA_LGPL_OR_PROPRIETARY
