@@ -1460,6 +1460,58 @@ to the attitude described in \ref{norme_pratique}. An option
 to warn about these lines could happen if there was demand for
 this feature.
 
+\subsubsection{Invalid pointer arithmetic}
+
+By default, \Eva{} does \emph{not} emit alarms on invalid pointer arithmetic:
+alarms are only emitted when an invalid pointer is dereferenced or wrongly used
+in a comparison, not at the creation of such pointers.
+
+However, if the \lstinline|-warn-invalid-pointer| option is enabled,
+\Eva{} emits an alarm when an operation may create a pointer that does
+not point inside an object or one past an object,
+even if this pointer is not used afterward.
+
+This may happen on:
+\begin{itemize}
+\item addition (or subtraction) of an integer from a pointer, when the analysis
+  is unable to prove that the resulting pointer points inside, or one past,
+  the same object pointed to by the initial pointer.
+  In this case, the emitted alarm reports a possible undefined behavior.
+\item conversion of an integer into a pointer. Except for the constant~0,
+  such a conversion is always an implementation-defined behavior
+  according to the ISO C99 standard. However, a footnote also explains that
+  conversion between pointers and integers is ``\emph{intended to
+  be consistent with the addressing structure of the execution environment}''.
+  This is why Eva also also authorizes conversion of integers:
+  \begin{itemize}
+  \item in the range of valid absolute addresses
+    (according to \texttt{absolute-valid-range})
+  \item computed from the address of an object \lstinline|o| such that the
+    resulting pointer points inside or one past the object \lstinline|o|.
+  \end{itemize}
+  In all other cases, an alarm is emitted, which reports the possible
+  implementation-defined behavior mentionned above.
+\end{itemize}
+
+In the example below, the first increment of the pointer \lstinline|p| is valid,
+although the resulting pointer should not be dereferenced. The second increment
+leads to an invalid alarm when option \lstinline|-warn-invalid-pointer| is on.
+\listinginput{1}{examples/alarms/pointer_arith.c}
+\begin{logs}
+  [eva:alarm] pointer_arith.c:4: Warning:
+    invalid pointer creation. assert \object_pointer(p + 1);
+\end{logs}
+
+In the same way, in the example below, the first conversion at line~5
+does not generate an alarm, but the second conversion leads to an invalid alarm
+with option \lstinline|-warn-invalid-pointer|.
+
+\listinginput{1}{examples/alarms/pointer_conversion.c}
+\begin{logs}
+  [eva:alarm] pointer_arith.c:6: Warning:
+    invalid pointer creation. assert \object_pointer((char *)(a + 2));
+\end{logs}
+
 
 \subsubsection{Division by zero}
 When dividing by an expression that the analysis
@@ -1539,6 +1591,12 @@ for which an overflow may happen, since such operations have
 defined semantics according to the ISO/IEC 9899:1999 standard.
 If one wishes to signal and prevent such unsigned overflows,
 option \verb+-warn-unsigned-overflow+ can be used.
+
+By default, Eva emits alarms for downcasts of pointer values to (signed
+or unsigned) integer types. Such downcasts are indeed  undefined behavior
+according to section 6.3.2.3, §6 of the ISO/IE 9899:1999 standard.
+However, option \lstinline|-no-warn-pointer-downcast| can be used to disable
+these alarms.
 
 Finally, by default, no alarm is emitted for downcasts to signed or unsigned
 integers. In the signed case, the least significant bits
