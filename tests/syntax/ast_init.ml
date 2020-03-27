@@ -8,6 +8,7 @@ let apply _ =
     (fun b -> b.bstmts <-
         Cil.mkStmtOneInstr (Skip (Cil_datatype.Stmt.loc s)) :: b.bstmts)
     l;
+  File.must_recompute_cfg (Kernel_function.get_definition f) ;
   Ast.mark_as_grown ()
 
 let () = Ast.apply_after_computed apply
