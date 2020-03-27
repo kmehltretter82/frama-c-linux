@@ -89,15 +89,18 @@ let pset_len_bytes_all_bits_to_one ?loc ptr bytes_len =
       papp ?loc ((find_nan_for_type t.term_type), [], [t])
     | Ctype(TPtr(_)) ->
       pnot ?loc (pvalid_read ?loc (here_label, t))
-    | Ctype(TInt(kind, _)) | Ctype(TEnum({ ekind = kind }, _)) ->
+    | Ctype((TInt(kind, _) | TEnum({ ekind = kind }, _)) as typ) ->
       let is_signed = Cil.isSigned kind in
       let bits = Cil.bitsSizeOfInt kind in
-      let value = if is_signed then
-          Cil.min_signed_number bits
+      let value =
+        if is_signed then
+          let zero = tinteger ?loc 0 in
+          let zero = Logic_utils.mk_cast ?loc typ zero in
+          term (TUnOp(BNot, zero)) t.term_type
         else
-          Cil.max_unsigned_number bits
+          let value = Cil.max_unsigned_number bits in
+          term ?loc (TConst (Integer (value,None))) Linteger
       in
-      let value = term ?loc (TConst (Integer (value,None))) Linteger in
       prel ?loc (Req, t, value)
     | _ ->
       unexpected "non atomic type during equality generation"

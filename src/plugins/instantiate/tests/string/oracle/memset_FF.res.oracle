@@ -97,7 +97,7 @@ void nested_chars(char (* /*[10]*/ dest)[10])
     ensures
       set_content:
         \let __fc_len = len / 4;
-        ∀ ℤ j0; 0 ≤ j0 < __fc_len ⇒ *(ptr + j0) ≡ -2147483648;
+        ∀ ℤ j0; 0 ≤ j0 < __fc_len ⇒ *(ptr + j0) ≡ ~((int)0);
     ensures result: \result ≡ ptr;
     assigns *(ptr + (0 .. len / 4 - 1)), \result;
     assigns *(ptr + (0 .. len / 4 - 1)) \from \nothing;
@@ -176,7 +176,7 @@ void unsigned_integer(unsigned int * /*[10]*/ dest)
     ensures
       set_content:
         \let __fc_len = len / 4;
-        ∀ ℤ j0; 0 ≤ j0 < __fc_len ⇒ *(ptr + j0) ≡ -2147483648;
+        ∀ ℤ j0; 0 ≤ j0 < __fc_len ⇒ *(ptr + j0) ≡ ~((long)0);
     ensures result: \result ≡ ptr;
     assigns *(ptr + (0 .. len / 4 - 1)), \result;
     assigns *(ptr + (0 .. len / 4 - 1)) \from \nothing;
@@ -229,8 +229,7 @@ void unsigned_long_integer(unsigned long * /*[10]*/ dest)
     ensures
       set_content:
         \let __fc_len = len / 8;
-        ∀ ℤ j0;
-          0 ≤ j0 < __fc_len ⇒ *(ptr + j0) ≡ -9223372036854775808;
+        ∀ ℤ j0; 0 ≤ j0 < __fc_len ⇒ *(ptr + j0) ≡ ~((long long)0);
     ensures result: \result ≡ ptr;
     assigns *(ptr + (0 .. len / 8 - 1)), \result;
     assigns *(ptr + (0 .. len / 8 - 1)) \from \nothing;
@@ -320,7 +319,7 @@ void with_named(named * /*[10]*/ dest)
         \let __fc_len = len / 8;
         ∀ ℤ j0;
           0 ≤ j0 < __fc_len ⇒
-          (ptr + j0)->x ≡ -2147483648 ∧ (ptr + j0)->y ≡ -2147483648;
+          (ptr + j0)->x ≡ ~((int)0) ∧ (ptr + j0)->y ≡ ~((int)0);
     ensures result: \result ≡ ptr;
     assigns *(ptr + (0 .. len / 8 - 1)), \result;
     assigns *(ptr + (0 .. len / 8 - 1)) \from \nothing;
@@ -374,7 +373,7 @@ void pointers(int ** /*[10]*/ dest)
         \let __fc_len = len / 40;
         ∀ ℤ j0;
           0 ≤ j0 < __fc_len ⇒
-          (∀ ℤ j1; 0 ≤ j1 < 10 ⇒ (*(ptr + j0))[j1] ≡ -2147483648);
+          (∀ ℤ j1; 0 ≤ j1 < 10 ⇒ (*(ptr + j0))[j1] ≡ ~((int)0));
     ensures result: \result ≡ ptr;
     assigns (*(ptr + (0 .. len / 40 - 1)))[0 .. 10 - 1], \result;
     assigns (*(ptr + (0 .. len / 40 - 1)))[0 .. 10 - 1] \from \nothing;
@@ -505,7 +504,7 @@ void nested_chars(char (*dest)[10])
     ensures
       set_content:
         \let __fc_len = \old(len) / 4;
-        ∀ ℤ j0; 0 ≤ j0 < __fc_len ⇒ *(\old(ptr) + j0) ≡ -2147483648;
+        ∀ ℤ j0; 0 ≤ j0 < __fc_len ⇒ *(\old(ptr) + j0) ≡ ~((int)0);
     ensures result: \result ≡ \old(ptr);
     assigns *(ptr + (0 .. len / 4 - 1)), \result;
     assigns *(ptr + (0 .. len / 4 - 1)) \from \nothing;
@@ -584,7 +583,7 @@ void unsigned_integer(unsigned int *dest)
     ensures
       set_content:
         \let __fc_len = \old(len) / 4;
-        ∀ ℤ j0; 0 ≤ j0 < __fc_len ⇒ *(\old(ptr) + j0) ≡ -2147483648;
+        ∀ ℤ j0; 0 ≤ j0 < __fc_len ⇒ *(\old(ptr) + j0) ≡ ~((long)0);
     ensures result: \result ≡ \old(ptr);
     assigns *(ptr + (0 .. len / 4 - 1)), \result;
     assigns *(ptr + (0 .. len / 4 - 1)) \from \nothing;
@@ -638,7 +637,7 @@ void unsigned_long_integer(unsigned long *dest)
       set_content:
         \let __fc_len = \old(len) / 8;
         ∀ ℤ j0;
-          0 ≤ j0 < __fc_len ⇒ *(\old(ptr) + j0) ≡ -9223372036854775808;
+          0 ≤ j0 < __fc_len ⇒ *(\old(ptr) + j0) ≡ ~((long long)0);
     ensures result: \result ≡ \old(ptr);
     assigns *(ptr + (0 .. len / 8 - 1)), \result;
     assigns *(ptr + (0 .. len / 8 - 1)) \from \nothing;
@@ -728,8 +727,8 @@ void with_named(named *dest)
         \let __fc_len = \old(len) / 8;
         ∀ ℤ j0;
           0 ≤ j0 < __fc_len ⇒
-          (\old(ptr) + j0)->x ≡ -2147483648 ∧
-          (\old(ptr) + j0)->y ≡ -2147483648;
+          (\old(ptr) + j0)->x ≡ ~((int)0) ∧
+          (\old(ptr) + j0)->y ≡ ~((int)0);
     ensures result: \result ≡ \old(ptr);
     assigns *(ptr + (0 .. len / 8 - 1)), \result;
     assigns *(ptr + (0 .. len / 8 - 1)) \from \nothing;
@@ -784,7 +783,7 @@ void pointers(int **dest)
         ∀ ℤ j0;
           0 ≤ j0 < __fc_len ⇒
           (∀ ℤ j1;
-             0 ≤ j1 < 10 ⇒ (*(\old(ptr) + j0))[j1] ≡ -2147483648);
+             0 ≤ j1 < 10 ⇒ (*(\old(ptr) + j0))[j1] ≡ ~((int)0));
     ensures result: \result ≡ \old(ptr);
     assigns (*(ptr + (0 .. len / 40 - 1)))[0 .. 10 - 1], \result;
     assigns (*(ptr + (0 .. len / 40 - 1)))[0 .. 10 - 1] \from \nothing;
