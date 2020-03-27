@@ -730,28 +730,6 @@ let synchronize_source_annot has_new_stmt kf =
           | Some block, Some stmt_father when block == stmt_father -> true
           | _, _ -> false
         in
-        let is_annot_next annot =
-          match annot.annot_content with
-          | AStmtSpec _ | APragma (Slice_pragma SPstmt | Impact_pragma IPstmt)
-            -> true
-          | AExtended(_,is_loop,{ext_name}) ->
-            let warn_not_a_code_annot () =
-              Kernel.(
-                warning ~wkey:wkey_acsl_extension
-                  "%s is not a code annotation extension" name)
-            in
-            (match Logic_env.extension_category ext_name with
-             | exception Not_found -> warn_not_a_code_annot () ; false
-             | Ext_code_annot (Ext_here | Ext_next_loop)-> false
-             | Ext_code_annot Ext_next_stmt-> true
-             | Ext_code_annot Ext_next_both-> not is_loop
-             | Ext_contract | Ext_global -> warn_not_a_code_annot () ; false)
-          | AAssert _ | AInvariant _ | AVariant _
-          | AAssigns _ | AAllocation _
-          | APragma (Slice_pragma (SPctrl | SPexpr _))
-          | APragma (Impact_pragma (IPexpr _))
-          | APragma (Loop_pragma _) -> false
-        in
         let synchronize_user_annot a = add_annotation kf st a in
         let synchronize_previous_user_annots () =
           if !user_annots_for_next_stmt <> [] then begin
@@ -759,7 +737,7 @@ let synchronize_source_annot has_new_stmt kf =
               let my_annots = !user_annots_for_next_stmt in
               let post_action st =
                 let treat_annot (has_annot,st) (st_ann, annot) =
-                  if is_annot_next annot then begin
+                  if Logic_utils.is_annot_next_stmt annot then begin
                     if has_annot || st.labels <> [] || st_ann.labels <> []
                     then begin
                       st_ann.skind <- (Block (Cil.mkBlockNonScoping [st]));
@@ -822,7 +800,7 @@ let synchronize_source_annot has_new_stmt kf =
           (* Code annotation isn't considered as a real stmt.
              So, previous annotations should be relative to the next stmt.
              Only this [annot] may be synchronised to that stmt *)
-          if is_annot_next annot then
+          if Logic_utils.is_annot_next_stmt annot then
             (* Annotation relative to the effect of next statement *)
             add_user_annot_for_next_stmt st annot
           else

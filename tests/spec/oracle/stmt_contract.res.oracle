@@ -38,6 +38,8 @@ int main(int c)
   /*@ requires before_label: \true; */
   label: /*@ requires after_label: \true; */
   y = 8;
+  /*@ ensures x ≡ 0 ∨ x ≡ 7; */
+  if (c >= 3) x = 0; else x = 7;
   /*@ requires x ≡ 7; */
   /*@ ensures x ≡ 7; */
   {

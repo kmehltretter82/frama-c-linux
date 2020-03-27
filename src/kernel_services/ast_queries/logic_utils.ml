@@ -573,6 +573,27 @@ let is_trivially_true p =
     Ptrue -> true
   | _ -> false
 
+let is_annot_next_stmt c =
+  match c.annot_content with
+  | AStmtSpec _ | APragma (Slice_pragma SPstmt | Impact_pragma IPstmt) -> true
+  | AExtended(_,is_loop,{ext_name}) ->
+    let warn_not_a_code_annot () =
+      Kernel.(
+        warning ~wkey:wkey_acsl_extension
+          "%s is not a code annotation extension" ext_name)
+    in
+    (match Logic_env.extension_category ext_name with
+     | exception Not_found -> warn_not_a_code_annot () ; false
+     | Ext_code_annot (Ext_here | Ext_next_loop)-> false
+     | Ext_code_annot Ext_next_stmt-> true
+     | Ext_code_annot Ext_next_both-> not is_loop
+     | Ext_contract | Ext_global -> warn_not_a_code_annot () ; false)
+  | AAssert _ | AInvariant _ | AVariant _
+  | AAssigns _ | AAllocation _
+  | APragma (Slice_pragma (SPctrl | SPexpr _))
+  | APragma (Impact_pragma (IPexpr _))
+  | APragma (Loop_pragma _) -> false
+
 let rec add_attribute_glob_annot a g =
   match g with
   | Dfun_or_pred ({ l_var_info },_) | Dinvariant({ l_var_info }, _)

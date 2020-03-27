@@ -1180,6 +1180,9 @@ class cil_printer () = object (self)
 
   method annotated_stmt (next: stmt) fmt (s: stmt) =
     pp_open_hvbox fmt 0;
+    if Kernel.is_debug_key_enabled Kernel.dkey_print_sid then begin
+      Format.fprintf fmt "/* sid:%d */@\n" s.sid;
+    end;
     (* print the statement. *)
     if Cil.is_skip s.skind && not s.ghost && s.sattr = [] then begin
       if verbose || s.labels <> [] then begin

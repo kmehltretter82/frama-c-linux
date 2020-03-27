@@ -250,6 +250,15 @@ val is_trivially_true: predicate -> bool
     @since Nitrogen-20111001 *)
 val is_trivially_false: predicate -> bool
 
+(** {2 Code annotations} *)
+
+(** Does the annotation apply to the next statement (e.g. a statement
+    contract). Also false for loop-related annotations.
+
+    @since Frama-C+dev
+*)
+val is_annot_next_stmt: code_annotation -> bool
+
 (** {2 Global annotations} *)
 
 (** add an attribute to a global annotation
