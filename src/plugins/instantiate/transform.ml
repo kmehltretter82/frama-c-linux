@@ -99,7 +99,8 @@ class transformer = object(self)
         Queue.add fundec used_instantiator_last_kf ;
         (fundec.svar), new_args
       else begin
-        Options.warning ~current:true "Ignore call: not well typed" ;
+        Options.warning
+          ~current:true "%s instantiator cannot replace call" fct.vname ;
         (fct, args)
       end
     with
