@@ -128,10 +128,9 @@ struct
     let name = F.name ^ "_" ^ (string_of_typ t) in
     name, ftype
 
-  let well_typed_call lval fct args =
+  let well_typed_call lval _fct args =
     let _, ps = F.prototype () in
     if List.length args <> List.length ps then false
-    else if not (Cil.hasAttribute "fc_stdlib" fct.vattr) then false
     else
       let extract e = function
         | _, (CPtr | Ptr), _ -> exp_type_of_pointed e
@@ -158,12 +157,11 @@ struct
       in
       List.map2 retype args ps
 
-  let key_from_call _ret fct args =
+  let key_from_call _ret _fct args =
     let _, ps = F.prototype () in
     match ps, args with
     | (_, (Ptr|CPtr), _) :: ps, fst :: args
-      when List.(length ps = length args)
-        && Cil.hasAttribute "fc_stdlib" fct.vattr ->
+      when List.(length ps = length args) ->
       begin match exp_type_of_pointed fst with
         | Value_of t -> t
         | _ ->

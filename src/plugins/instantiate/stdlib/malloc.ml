@@ -70,17 +70,17 @@ let generate_prototype alloc_t =
   ] in
   name, (TFun((ptr_of alloc_t), Some params, false, []))
 
-let well_typed_call ret fct args =
+let well_typed_call ret _fct args =
   match ret, args with
-  | Some ret, [ _ ] when Cil.hasAttribute "fc_stdlib" fct.vattr ->
+  | Some ret, [ _ ] ->
     let t = Cil.typeOfLval ret in
     Cil.isPointerType t && not (Cil.isVoidPtrType t) &&
     Cil.isCompleteType (Cil.typeOf_pointed t)
   | _ -> false
 
-let key_from_call ret fct _ =
+let key_from_call ret _fct _ =
   match ret with
-  | Some ret when Cil.hasAttribute "fc_stdlib" fct.vattr ->
+  | Some ret ->
     let ret_t = Cil.unrollTypeDeep (Cil.typeOfLval ret) in
     let ret_t = Cil.type_remove_qualifier_attributes_deep ret_t in
     Cil.typeOf_pointed ret_t

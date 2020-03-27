@@ -195,8 +195,8 @@ let rec contains_union_type t =
     contains_union_type t
   | _ -> false
 
-let well_typed_call _ret fct = function
-  | [ ptr ; value ; _ ] when Cil.hasAttribute "fc_stdlib" fct.vattr ->
+let well_typed_call _ret _fct = function
+  | [ ptr ; value ; _ ] ->
     begin match Mem_utils.exp_type_of_pointed ptr, memset_value value with
       | (No_pointed | Of_null _) , _ -> false
       | Value_of t , _ when any_char_composed_type t -> true
@@ -208,8 +208,8 @@ let well_typed_call _ret fct = function
     end
   | _ -> false
 
-let key_from_call _ret fct = function
-  | [ ptr ; value ; _ ] when Cil.hasAttribute "fc_stdlib" fct.vattr ->
+let key_from_call _ret _fct = function
+  | [ ptr ; value ; _ ] ->
     begin match Mem_utils.exp_type_of_pointed ptr, memset_value value with
       | Value_of t, _ when any_char_composed_type t -> t, None
       | Value_of t, value when not (contains_union_type t) -> t, value
