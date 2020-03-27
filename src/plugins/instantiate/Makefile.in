@@ -56,7 +56,9 @@ PLUGIN_EXTRA_DIRS:=\
 	stdlib
 PLUGIN_CMI :=
 PLUGIN_CMO := \
-	options basic_blocks instantiator_builder transform register \
+	options basic_blocks \
+	global_vars instantiator_builder \
+	transform register \
 	$(SRC_STRING) \
 	$(SRC_STDLIB)
 

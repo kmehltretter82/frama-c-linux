@@ -100,3 +100,14 @@ module Transform: sig
   *)
   val register: (module Instantiator_builder.Generator_sig) -> unit
 end
+
+module Global_vars:sig
+  (** [get t ghost storage name] searches for an existing variable [name]. If this
+      variable does not exists, it is created with the specified type [t], [ghost]
+      status and [storage].
+
+      The obtained varinfo does not need to be registered, it will be done by the
+      transformation.
+  *)
+  val get: typ -> bool -> storage -> string -> varinfo
+end

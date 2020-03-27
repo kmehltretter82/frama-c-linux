@@ -38,6 +38,7 @@ let get_kfs () =
   Hashtbl.fold (fun k v l -> (get_kfs k v) @ l) base []
 
 let clear () =
+  Global_vars.clear () ;
   let clear _ instantiator =
     let module I = (val instantiator: Instantiator) in
     I.clear ()
@@ -54,6 +55,7 @@ class transformer = object(self)
 
   method! vfile _ =
     let post f =
+      f.globals <- (Global_vars.globals (Cil.CurrentLoc.get())) @ f.globals ;
       Ast.mark_as_changed () ;
       Ast.mark_as_grown () ;
       f

@@ -61,8 +61,8 @@ let isnt_allocable ?loc size =
   new_predicate { p with pred_name = [ "allocable" ]}
 
 let heap_status () =
-  let heap_status = Globals.Vars.find_from_astinfo "__fc_heap_status" VGlobal in
-  Basic_blocks.cvar_to_tvar (heap_status)
+  let vi = Global_vars.get Cil.intType true Extern "__fc_heap_status" in
+  Basic_blocks.cvar_to_tvar vi
 
 let assigns_result ?loc typ deps =
   let heap_status = new_identified_term (heap_status ()) in
