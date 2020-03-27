@@ -42,11 +42,6 @@ val ttype_of_pointed: logic_type -> logic_type
 
 (** {2 C} *)
 
-(** For an expression, return the type of the pointed data.
-    If the expression is not a pointer, returns None.
-*)
-val exp_type_of_pointed: exp -> typ option
-
 (** For a type [T], returns [T*] *)
 val ptr_of: typ -> typ
 

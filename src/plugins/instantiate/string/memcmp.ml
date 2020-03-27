@@ -66,7 +66,13 @@ module Function =
 struct
   open Mem_utils
   let name = function_name
-  let prototype = Int, [ ("s1",CPtr,Strip);("s2",CPtr,Strip);("len",Len,Id)]
+  let prototype () =
+    Data Cil.intType,
+    [
+      ("s1" , CPtr,Strip) ;
+      ("s2" , CPtr,Strip) ;
+      ("len", Data (size_t ()) ,Id)
+    ]
   let well_typed = Mem_utils.mem2s_typing
 end
 module Memcmp_base = Mem_utils.Make(Function)

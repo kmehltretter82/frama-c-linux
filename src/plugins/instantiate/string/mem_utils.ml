@@ -24,11 +24,29 @@ open Basic_blocks
 open Cil_types
 open Logic_const
 
-type kind = CPtr | Ptr | Len | Int
+type kind = CPtr | Ptr | Data of typ
 type action = Strip | Id
 type param = string * kind * action
 type proto = kind * param list
 type 'a spec_gen = location -> typ -> term -> term -> term -> 'a
+
+type pointed_expr_type =
+  | Of_null of typ
+  | Value_of of typ
+  | No_pointed
+
+let exp_type_of_pointed x =
+  let no_cast = Cil.stripCasts x in
+  if not (Cil.isPointerType (Cil.typeOf no_cast)) then
+    match Cil.constFoldToInt x with
+    | Some t when Integer.(equal t (of_int 0)) ->
+      Of_null (Cil.typeOf_pointed (Cil.typeOf x))
+    | _ ->
+      No_pointed
+  else
+    let xt = Cil.unrollTypeDeep (Cil.typeOf no_cast) in
+    let xt = Cil.type_remove_qualifier_attributes_deep xt in
+    Value_of (Cil.typeOf_pointed xt)
 
 let unexpected = Options.fatal "Mem_utils: %s"
 
@@ -88,7 +106,7 @@ let memcpy_memmove_common_ensures name loc t dest src len =
 
 module type Function = sig
   val name: string
-  val prototype: proto
+  val prototype: unit -> proto
   val well_typed: typ option -> typ list -> bool
 end
 
@@ -98,10 +116,9 @@ struct
     let to_type = function
       | CPtr -> ptr_of (const_of t)
       | Ptr ->  ptr_of t
-      | Len ->  size_t()
-      | Int ->  Cil.intType
+      | Data t -> t
     in
-    let ret, ps = F.prototype in
+    let ret, ps = F.prototype () in
     let ret = to_type ret in
     let ps = List.map (fun (name, kind, _) -> name, (to_type kind), []) ps in
     TFun(ret, Some ps, false, [])
@@ -112,21 +129,25 @@ struct
     name, ftype
 
   let well_typed_call lval args =
-    let _, ps = F.prototype in
+    let _, ps = F.prototype () in
     if List.length args <> List.length ps then false
     else
       let extract e = function
         | _, (CPtr | Ptr), _ -> exp_type_of_pointed e
-        | _, (Len | Int), _ -> Some (Cil.typeOf e)
+        | _, Data _ , _ -> Value_of (Cil.typeOf e)
       in
       let lvt = Extlib.opt_map Cil.typeOfLval lval in
       let pts = List.map2 extract args ps in
-      let is_none = function None -> true | _ -> false in
-      if List.exists is_none pts then false
-      else F.well_typed lvt (List.map (fun x -> Extlib.the x) pts)
+      let is_no_pointed = function No_pointed -> true | _ -> false in
+      let the_typ = function
+        | No_pointed -> assert false
+        | Value_of t | Of_null t -> t
+      in
+      if List.exists is_no_pointed pts then false
+      else F.well_typed lvt (List.map the_typ pts)
 
   let retype_args _ args =
-    let _, ps = F.prototype in
+    let _, ps = F.prototype () in
     if List.length args <> List.length ps then
       unexpected "trying to retype arguments on an ill-typed call"
     else
@@ -137,12 +158,12 @@ struct
       List.map2 retype args ps
 
   let key_from_call _ret args =
-    let _, ps = F.prototype in
+    let _, ps = F.prototype () in
     match ps, args with
     | (_, (Ptr|CPtr), _)::ps, fst::args when List.(length ps = length args) ->
       begin match exp_type_of_pointed fst with
-        | Some t -> t
-        | None ->
+        | Value_of t -> t
+        | _ ->
           unexpected "Mem_utils: trying to get key on an ill-typed call"
       end
     | _ ->

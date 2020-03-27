@@ -50,18 +50,6 @@ let call_function lval vi args =
   let args = List.map2 gen_arg args typs in
   Call(lval, (Cil.evar vi), args, loc)
 
-let exp_type_of_pointed x =
-  let no_cast = Cil.stripCasts x in
-  if not (Cil.isPointerType (Cil.typeOf no_cast)) then
-    match Cil.constFoldToInt x with
-    | Some t when Integer.(equal t (of_int 0)) ->
-      Some (Cil.typeOf_pointed (Cil.typeOf x))
-    | _ -> None
-  else
-    let xt = Cil.unrollTypeDeep (Cil.typeOf no_cast) in
-    let xt = Cil.type_remove_qualifier_attributes_deep xt in
-    Some (Cil.typeOf_pointed xt)
-
 let rec string_of_typ_aux = function
   | TVoid(_) -> "void"
   | TInt(IBool, _) -> "bool"

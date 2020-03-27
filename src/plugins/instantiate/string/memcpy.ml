@@ -45,7 +45,13 @@ let generate_spec = mem2s_spec ~requires ~assigns ~ensures
 module Function =
 struct
   let name = function_name
-  let prototype = Ptr, [("dest",Ptr,Strip);("src",CPtr,Strip);("len",Len,Id)]
+  let prototype () =
+    Ptr,
+    [
+      ("dest", Ptr, Strip) ;
+      ("src",  CPtr, Strip) ;
+      ("len",  Data (size_t()), Id)
+    ]
   let well_typed = Mem_utils.mem2s_typing
 end
 module Memcpy_base = Mem_utils.Make(Function)

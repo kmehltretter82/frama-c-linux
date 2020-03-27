@@ -194,12 +194,12 @@ let rec contains_union_type t =
 
 let well_typed_call _ret = function
   | [ ptr ; value ; _ ] ->
-    begin match exp_type_of_pointed ptr, memset_value value with
-      | None , _ -> false
-      | Some t, _ when any_char_composed_type t -> true
-      | Some t, _ when contains_union_type t -> false
-      | Some t, _ when Cil.isVoidType t -> false
-      | Some t, _ when not (Cil.isCompleteType t) -> false
+    begin match Mem_utils.exp_type_of_pointed ptr, memset_value value with
+      | (No_pointed | Of_null _) , _ -> false
+      | Value_of t , _ when any_char_composed_type t -> true
+      | Value_of t , _ when contains_union_type t -> false
+      | Value_of t , _ when Cil.isVoidType t -> false
+      | Value_of t , _ when not (Cil.isCompleteType t) -> false
       | _, None -> false
       | _, Some _ -> true
     end
@@ -207,9 +207,9 @@ let well_typed_call _ret = function
 
 let key_from_call _ret = function
   | [ ptr ; value ; _ ] ->
-    begin match exp_type_of_pointed ptr, memset_value value with
-      | Some t, _ when any_char_composed_type t -> t, None
-      | Some t, value when not (contains_union_type t) -> t, value
+    begin match Mem_utils.exp_type_of_pointed ptr, memset_value value with
+      | Value_of t, _ when any_char_composed_type t -> t, None
+      | Value_of t, value when not (contains_union_type t) -> t, value
       | _ , _ -> unexpected "trying to generate a key on an ill-typed call"
     end
   | _ -> unexpected "trying to generate a key on an ill-typed call"
@@ -247,9 +247,9 @@ let retype_args (_t, e) args =
   match e, args with
   | None, [ ptr ; v ; n ] ->
     let ptr = Cil.stripCasts ptr in
-    let base_type = match exp_type_of_pointed ptr with
-      | Some t -> base_char_type t
-      | None -> unexpected "trying to retype arguments on an ill-typed call"
+    let base_type = match Mem_utils.exp_type_of_pointed ptr with
+      | Value_of t -> base_char_type t
+      | _ -> unexpected "trying to retype arguments on an ill-typed call"
     in
     let v = Cil.mkCast (Cil.stripCasts v) base_type in
     [ ptr ; v ; n ]

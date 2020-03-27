@@ -22,14 +22,22 @@
 
 open Cil_types
 
-type kind = CPtr | Ptr | Len | Int
+type kind = CPtr | Ptr | Data of typ
 type action = Strip | Id
 type param = string * kind * action
 type proto = kind * param list
 
 module type Function = sig
   val name: string
-  val prototype: proto
+
+  val prototype: unit -> proto
+
+  (** receives the type of the lvalue and the types of the arguments recieved
+      for a call to the function and returns [true] iff they are correct.
+      The received types depend on the [prototype] of the module.
+      - if the kind is [Data t] -> it is the exact type of the expr/lvalue
+      - it the kind is [(C)Ptr] -> it is the pointed type of the expr/lvalue
+  *)
   val well_typed: typ option -> typ list -> bool
 end
 
@@ -58,3 +66,10 @@ val memcpy_memmove_common_assigns: assigns spec_gen
 
 val memcpy_memmove_common_ensures:
   string -> (termination_kind * identified_predicate) list spec_gen
+
+type pointed_expr_type =
+  | Of_null of typ
+  | Value_of of typ
+  | No_pointed
+
+val exp_type_of_pointed: exp -> pointed_expr_type
