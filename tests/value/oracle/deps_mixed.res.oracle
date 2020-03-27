@@ -13,6 +13,8 @@
   t[0] ∈ {{ &f }}
    [1] ∈ {{ &g }}
 [eva:alarm] tests/value/deps_mixed.i:20: Warning: 
+  pointer downcast. assert (unsigned int)q ≤ 2147483647;
+[eva:alarm] tests/value/deps_mixed.i:20: Warning: 
   out of bounds read. assert \valid_read(p + (int)q);
 [eva:alarm] tests/value/deps_mixed.i:22: Warning: 
   accessing out of bounds index. assert 0 ≤ i0;
@@ -26,6 +28,10 @@
   Called from tests/value/deps_mixed.i:22.
 [eva] Recording results for f
 [eva] Done for function f
+[eva:alarm] tests/value/deps_mixed.i:24: Warning: 
+  pointer downcast. assert (unsigned int)q ≤ 2147483647;
+[eva:alarm] tests/value/deps_mixed.i:24: Warning: 
+  pointer downcast. assert (unsigned int)(p + (int)q) ≤ 2147483647;
 [eva] tests/value/deps_mixed.i:24: 
   Assigning imprecise value to __retres.
   The imprecision originates from Arithmetic {tests/value/deps_mixed.i:24}

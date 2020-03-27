@@ -316,6 +316,8 @@
 [eva] Done for function strchr_bitfields2
 [eva] computing for function strchr_escaping <- main.
   Called from tests/builtins/strchr.c:556.
+[eva:alarm] tests/builtins/strchr.c:258: Warning: 
+  pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
 [eva:locals-escaping] tests/builtins/strchr.c:258: Warning: 
   locals {x} escaping the scope of a block of strchr_escaping through s
 [eva] tests/builtins/strchr.c:261: Call to builtin strchr
@@ -669,9 +671,13 @@
 [eva] Done for function strchr_invalid
 [eva] computing for function strchr_garbled_mix_in_char <- main.
   Called from tests/builtins/strchr.c:562.
+[eva:alarm] tests/builtins/strchr.c:541: Warning: 
+  pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
 [eva] tests/builtins/strchr.c:541: 
   Assigning imprecise value to garbled.
   The imprecision originates from Arithmetic {tests/builtins/strchr.c:541}
+[eva:alarm] tests/builtins/strchr.c:542: Warning: 
+  pointer downcast. assert (unsigned int)garbled ≤ 2147483647;
 [eva] tests/builtins/strchr.c:542: Call to builtin strchr
 [eva:alarm] tests/builtins/strchr.c:542: Warning: 
   function strchr: precondition 'valid_string_s' got status invalid.

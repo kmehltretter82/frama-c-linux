@@ -11,6 +11,8 @@
   accessing out of bounds index. assert 0 ≤ c1;
 [eva:alarm] tests/value/mini_pointrer.i:6: Warning: 
   accessing out of bounds index. assert c1 < 2;
+[eva:alarm] tests/value/mini_pointrer.i:6: Warning: 
+  pointer downcast. assert (unsigned int)(&T[c1]) ≤ 2147483647;
 [eva:alarm] tests/value/mini_pointrer.i:8: Warning: 
   out of bounds read. assert \valid_read(ppp);
 [eva:alarm] tests/value/mini_pointrer.i:8: Warning: 

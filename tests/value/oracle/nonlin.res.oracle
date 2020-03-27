@@ -63,6 +63,8 @@
 [eva:nonlin] tests/value/nonlin.c:21: subdividing on i
 [eva:alarm] tests/value/nonlin.c:21: Warning: 
   out of bounds read. assert \valid_read((p + i) - i);
+[eva:alarm] tests/value/nonlin.c:23: Warning: 
+  pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
 [eva:alarm] tests/value/nonlin.c:24: Warning: 
   out of bounds read. assert \valid_read((p + i) - i);
 [eva] Recording results for subdivide_pointer

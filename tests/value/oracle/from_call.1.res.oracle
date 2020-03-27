@@ -1,6 +1,10 @@
 [kernel] Parsing tests/value/from_call.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
+[eva:alarm] tests/value/from_call.i:70: Warning: 
+  pointer downcast. assert (unsigned int)(&AA) ≤ 2147483647;
+[eva:alarm] tests/value/from_call.i:71: Warning: 
+  pointer downcast. assert (unsigned int)(&AA) ≤ 2147483647;
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   a ∈ {0}

@@ -24,5 +24,5 @@ int h (void) {
   G = f (4);
   if (G > 0)
     G = g (c);
-  return (int)g;
+  return G;
 }

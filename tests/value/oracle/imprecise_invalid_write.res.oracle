@@ -21,6 +21,8 @@
 [eva] Done for function main1
 [eva] computing for function main2 <- main.
   Called from tests/value/imprecise_invalid_write.i:25.
+[eva:alarm] tests/value/imprecise_invalid_write.i:9: Warning: 
+  pointer downcast. assert (unsigned int)(&main1) ≤ 2147483647;
 [eva] tests/value/imprecise_invalid_write.i:9: 
   Assigning imprecise value to p.
   The imprecision originates from Arithmetic
@@ -33,6 +35,8 @@
 [eva] Done for function main2
 [eva] computing for function main3 <- main.
   Called from tests/value/imprecise_invalid_write.i:28.
+[eva:alarm] tests/value/imprecise_invalid_write.i:16: Warning: 
+  pointer downcast. assert (unsigned int)s ≤ 2147483647;
 [eva] tests/value/imprecise_invalid_write.i:16: 
   Assigning imprecise value to p.
   The imprecision originates from Arithmetic

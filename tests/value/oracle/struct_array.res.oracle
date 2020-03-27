@@ -1,6 +1,12 @@
 [kernel] Parsing tests/value/struct_array.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
+[eva:alarm] tests/value/struct_array.i:15: Warning: 
+  pointer downcast. assert (unsigned int)(&z1) ≤ 2147483647;
+[eva:alarm] tests/value/struct_array.i:15: Warning: 
+  pointer downcast. assert (unsigned int)(&z2) ≤ 2147483647;
+[eva:alarm] tests/value/struct_array.i:15: Warning: 
+  pointer downcast. assert (unsigned int)(&z4) ≤ 2147483647;
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
@@ -234,6 +240,12 @@
       [19].p; [20].p; [21].p}; s; s1; s2; s3
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
+[eva:alarm] tests/value/struct_array.i:15: Warning: 
+  pointer downcast. assert (unsigned int)(&z1) ≤ 2147483647;
+[eva:alarm] tests/value/struct_array.i:15: Warning: 
+  pointer downcast. assert (unsigned int)(&z2) ≤ 2147483647;
+[eva:alarm] tests/value/struct_array.i:15: Warning: 
+  pointer downcast. assert (unsigned int)(&z4) ≤ 2147483647;
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]

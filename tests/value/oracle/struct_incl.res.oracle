@@ -22,6 +22,12 @@
   z ∈ {0}
   t ∈ {0}
   v ∈ [--..--]
+[eva:alarm] tests/value/struct_incl.i:28: Warning: 
+  pointer downcast. assert (unsigned int)(&s1.d[9]) ≤ 2147483647;
+[eva:alarm] tests/value/struct_incl.i:29: Warning: 
+  pointer downcast. assert (unsigned int)(&s1.d[10]) ≤ 2147483647;
+[eva:alarm] tests/value/struct_incl.i:30: Warning: 
+  pointer downcast. assert (unsigned int)(&s1.b) ≤ 2147483647;
 [eva:alarm] tests/value/struct_incl.i:48: Warning: 
   accessing out of bounds index. assert 10 < 10;
 [kernel] tests/value/struct_incl.i:48: Warning: 

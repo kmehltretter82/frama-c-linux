@@ -29,11 +29,15 @@
     [10..99] ∈ {0}
   p1 ∈ {0}
   x1 ∈ {0}
+[eva:alarm] tests/value/bitwise_pointer.i:18: Warning: 
+  pointer downcast. assert (unsigned int)(&t[7]) ≤ 2147483647;
 [eva] tests/value/bitwise_pointer.i:18: 
   Assigning imprecise value to p.
   The imprecision originates from Arithmetic {tests/value/bitwise_pointer.i:18}
 [eva:alarm] tests/value/bitwise_pointer.i:19: Warning: 
   out of bounds write. assert \valid(p);
+[eva:alarm] tests/value/bitwise_pointer.i:22: Warning: 
+  pointer downcast. assert (unsigned int)(&t1[mask]) ≤ 2147483647;
 [eva] tests/value/bitwise_pointer.i:22: 
   Assigning imprecise value to p1.
   The imprecision originates from Arithmetic {tests/value/bitwise_pointer.i:22}

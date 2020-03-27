@@ -24,6 +24,8 @@
   ==END OF DUMP==
 [eva:alarm] tests/value/not_ct_array_arg.i:12: Warning: 
   out of bounds write. assert \valid(&(*(tb + 9))[100]);
+[eva:alarm] tests/value/not_ct_array_arg.i:12: Warning: 
+  pointer downcast. assert (unsigned int)(&tb) ≤ 2147483647;
 [eva] tests/value/not_ct_array_arg.i:13: 
   Frama_C_dump_each:
   # Cvalue domain:

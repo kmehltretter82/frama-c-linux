@@ -27,6 +27,8 @@
   Called from tests/value/offsetmap.i:75.
 [eva] tests/value/offsetmap.i:19: starting to merge loop iterations
 [eva] tests/value/offsetmap.i:29: starting to merge loop iterations
+[eva:alarm] tests/value/offsetmap.i:51: Warning: 
+  pointer downcast. assert (unsigned int)(&x2) ≤ 2147483647;
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function g <- main.

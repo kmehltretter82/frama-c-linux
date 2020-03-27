@@ -540,6 +540,9 @@ module SignedDowncast: Parameter_sig.Bool
 module UnsignedDowncast: Parameter_sig.Bool
 (** Behavior of option "-warn-unsigned-downcast" *)
 
+module PointerDowncast: Parameter_sig.Bool
+(** Behavior of option "-warn-pointer-downcast" *)
+
 module SpecialFloat: Parameter_sig.String
 (** Behavior of option "-warn-special-float" *)
 

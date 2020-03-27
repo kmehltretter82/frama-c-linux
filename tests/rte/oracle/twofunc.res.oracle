@@ -133,6 +133,7 @@ int main(void)
 [kernel] - bool_value = true
 [kernel] - finite_float = true
 [kernel] - float_to_int = true
+[kernel] - pointer_downcast = true
 [kernel] - unsigned_downcast = false
 [kernel] - unsigned_overflow = false
 [kernel] - downcast = true
@@ -148,6 +149,7 @@ int main(void)
 [kernel] - bool_value = true
 [kernel] - finite_float = true
 [kernel] - float_to_int = true
+[kernel] - pointer_downcast = true
 [kernel] - unsigned_downcast = false
 [kernel] - unsigned_overflow = false
 [kernel] - downcast = true
@@ -225,6 +227,7 @@ int main(void)
 [kernel] - bool_value = true
 [kernel] - finite_float = true
 [kernel] - float_to_int = true
+[kernel] - pointer_downcast = true
 [kernel] - unsigned_downcast = false
 [kernel] - unsigned_overflow = false
 [kernel] - downcast = true
@@ -240,6 +243,7 @@ int main(void)
 [kernel] - bool_value = true
 [kernel] - finite_float = true
 [kernel] - float_to_int = true
+[kernel] - pointer_downcast = true
 [kernel] - unsigned_downcast = false
 [kernel] - unsigned_overflow = false
 [kernel] - downcast = true

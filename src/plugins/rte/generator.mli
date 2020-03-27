@@ -39,6 +39,7 @@ module Signed_overflow: S
 module Signed_downcast: S
 module Unsigned_overflow: S
 module Unsigned_downcast: S
+module Pointer_downcast: S
 module Float_to_int: S
 module Finite_float: S
 module Bool_value: S

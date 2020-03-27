@@ -155,6 +155,14 @@ module Unsigned_downcast =
       let additional_parameters = []
     end)
 
+module Pointer_downcast =
+  Make
+    (struct
+      let name = "pointer_downcast"
+      let parameter = Kernel.PointerDowncast.parameter
+      let additional_parameters = []
+    end)
+
 module Float_to_int =
   Make
     (struct

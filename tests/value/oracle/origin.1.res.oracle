@@ -65,6 +65,8 @@
   Assigning imprecise value to r.t[0].
   The imprecision originates from Merge {tests/value/origin.i:129}
 [eva:alarm] tests/value/origin.i:130: Warning: 
+  pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
+[eva:alarm] tests/value/origin.i:130: Warning: 
   signed overflow. assert -2147483648 ≤ -((int)(&x));
 [eva:alarm] tests/value/origin.i:130: Warning: 
   signed overflow. assert -((int)(&x)) ≤ 2147483647;

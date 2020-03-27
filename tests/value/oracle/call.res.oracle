@@ -10,6 +10,8 @@
   x ∈ {0}
 [eva:alarm] tests/value/call.i:19: Warning: 
   out of bounds read. assert \valid_read(v + 1);
+[eva:alarm] tests/value/call.i:19: Warning: 
+  pointer downcast. assert (unsigned int)*(v + 1) ≤ 2147483647;
 [eva] computing for function leaf_fun_int <- main.
   Called from tests/value/call.i:19.
 [kernel:annot:missing-spec] tests/value/call.i:19: Warning: 

@@ -48,6 +48,8 @@
 [eva] Done for function invalid_assigns_imprecise
 [eva] computing for function write_garbled <- main.
   Called from tests/builtins/imprecise.c:145.
+[eva:alarm] tests/builtins/imprecise.c:19: Warning: 
+  pointer downcast. assert (unsigned int)(&k) ≤ 2147483647;
 [eva] tests/builtins/imprecise.c:19: 
   Assigning imprecise value to p.
   The imprecision originates from Arithmetic {tests/builtins/imprecise.c:19}
@@ -78,6 +80,8 @@
   s1.[bits 0 to ..] ∈ {0} or UNINITIALIZED
   s2.[bits 0 to ..] ∈ {0} or UNINITIALIZED
   ==END OF DUMP==
+[eva:alarm] tests/builtins/imprecise.c:22: Warning: 
+  pointer downcast. assert (unsigned int)p ≤ 2147483647;
 [eva] Recording results for write_garbled
 [from] Computing for function write_garbled
 [from] Done for function write_garbled
@@ -105,6 +109,8 @@
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva:alarm] tests/builtins/imprecise.c:53: Warning: 
   out of bounds write. assert \valid(p2);
+[eva:alarm] tests/builtins/imprecise.c:53: Warning: 
+  pointer downcast. assert (unsigned int)(&addr) ≤ 2147483647;
 [eva:alarm] tests/builtins/imprecise.c:56: Warning: 
   out of bounds write. assert \valid(p4);
 [eva:alarm] tests/builtins/imprecise.c:58: Warning: 
@@ -117,9 +123,8 @@
 [eva] Done for function abstract_structs
 [eva] computing for function cast_address <- main.
   Called from tests/builtins/imprecise.c:147.
-[eva] tests/builtins/imprecise.c:66: 
-  Assigning imprecise value to c1.
-  The imprecision originates from Arithmetic {tests/builtins/imprecise.c:66}
+[eva:alarm] tests/builtins/imprecise.c:66: Warning: 
+  pointer downcast. assert (unsigned int)p ≤ 127;
 [eva:alarm] tests/builtins/imprecise.c:68: Warning: 
   signed overflow. assert -2147483648 ≤ (int)*((char *)(&p)) + 0;
 [eva:alarm] tests/builtins/imprecise.c:68: Warning: 
@@ -276,9 +281,7 @@
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function cast_address:
   p ∈ {{ &x }}
-  c1 ∈
-    {{ garbled mix of &{x}
-     (origin: Arithmetic {tests/builtins/imprecise.c:66}) }}
+  c1 ∈ {{ (char)&x }}
   c2# ∈ {{ (? *)&x }}%32, bits 0 to 7 
   c3 ∈
     {{ garbled mix of &{x}
@@ -621,6 +624,8 @@
 [eva] Done for function invalid_assigns_imprecise
 [eva] computing for function write_garbled <- main.
   Called from tests/builtins/imprecise.c:145.
+[eva:alarm] tests/builtins/imprecise.c:19: Warning: 
+  pointer downcast. assert (unsigned int)(&k) ≤ 2147483647;
 [eva:alarm] tests/builtins/imprecise.c:20: Warning: 
   out of bounds write. assert \valid(p);
 [eva] tests/builtins/imprecise.c:21: 
@@ -657,6 +662,8 @@
   S_0_S_p_gm_null[0..1] ∈ [--..--]
   S_1_S_p_gm_null[0..1] ∈ [--..--]
   ==END OF DUMP==
+[eva:alarm] tests/builtins/imprecise.c:22: Warning: 
+  pointer downcast. assert (unsigned int)p ≤ 2147483647;
 [eva] Recording results for write_garbled
 [from] Computing for function write_garbled
 [from] Done for function write_garbled
@@ -678,6 +685,8 @@
 [eva] tests/builtins/imprecise.c:51: Call to builtin memset
 [eva:alarm] tests/builtins/imprecise.c:53: Warning: 
   out of bounds write. assert \valid(p2);
+[eva:alarm] tests/builtins/imprecise.c:53: Warning: 
+  pointer downcast. assert (unsigned int)(&addr) ≤ 2147483647;
 [eva:alarm] tests/builtins/imprecise.c:56: Warning: 
   out of bounds write. assert \valid(p4);
 [eva:alarm] tests/builtins/imprecise.c:58: Warning: 
@@ -690,6 +699,8 @@
 [eva] Done for function abstract_structs
 [eva] computing for function cast_address <- main.
   Called from tests/builtins/imprecise.c:147.
+[eva:alarm] tests/builtins/imprecise.c:66: Warning: 
+  pointer downcast. assert (unsigned int)p ≤ 127;
 [eva:alarm] tests/builtins/imprecise.c:68: Warning: 
   signed overflow. assert -2147483648 ≤ (int)*((char *)(&p)) + 0;
 [eva:alarm] tests/builtins/imprecise.c:68: Warning: 
@@ -826,9 +837,7 @@
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function cast_address:
   p ∈ {{ &x }}
-  c1 ∈
-    {{ garbled mix of &{x}
-     (origin: Arithmetic {tests/builtins/imprecise.c:66}) }}
+  c1 ∈ {{ (char)&x }}
   c2# ∈ {{ (? *)&x }}%32, bits 0 to 7 
   c3 ∈
     {{ garbled mix of &{x}

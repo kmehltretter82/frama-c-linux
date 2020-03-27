@@ -6,6 +6,8 @@
   G ∈ {1}
   l[0] ∈ {1}
    [1..19] ∈ {0}
+[eva:alarm] tests/value/array_ptr.i:14: Warning: 
+  pointer downcast. assert (unsigned int)(&l) ≤ 2147483647;
 [eva] computing for function f <- main.
   Called from tests/value/array_ptr.i:15.
 [eva] Recording results for f
