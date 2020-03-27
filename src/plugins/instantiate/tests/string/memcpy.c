@@ -42,3 +42,10 @@ void with_incomplete(struct incomplete* src, struct incomplete* dest, int n){
   struct incomplete* res = memcpy(dest, src, n);
   memcpy(src, res, n);
 }
+
+void with_null_or_int(int p[10]){
+  memcpy(NULL, p, 10 * sizeof(int));
+  memcpy(p, NULL, 10 * sizeof(int));
+  memcpy((int*)42, p, 10 * sizeof(int));
+  memcpy(p, (int*)42, 10 * sizeof(int));
+}

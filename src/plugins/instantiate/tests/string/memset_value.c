@@ -62,3 +62,8 @@ void with_incomplete(struct incomplete* dest, int value){
   struct incomplete * res = memset(dest, value, 10);
   memset(res, value, 10);
 }
+
+void with_null_or_int(int value){
+  memset(NULL, value, 10);
+  memset((int*) 42, value, 10);
+}

@@ -62,3 +62,8 @@ void with_void(void* dest){
   void* res = memset(dest, 0, 10);
   memset(res, 0, 10);
 }
+
+void with_null_or_int(void){
+  memset(NULL, 0, 10);
+  memset((int*) 42, 0, 10);
+}
