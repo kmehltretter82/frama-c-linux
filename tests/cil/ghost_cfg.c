@@ -89,7 +89,7 @@ int ghost_goto_ghost(){
   //@ ghost goto X ; // reaches return without executing "x = 2"
   x = 2;
 
-  //@ ghost X:
+  //@ ghost X:;
   return 0;
 }
 
@@ -154,7 +154,7 @@ int main(){
 
   int x = 4 ;
 
-  //@ ghost X:
+  //@ ghost X:;
 
   x = 2 ;
 }

@@ -16,7 +16,7 @@ void test2(int x) {
 }
 
 void f() {
-  /*@ ghost L: */ G++;
+  /*@ ghost L:; */ G++;
   /*@ assert \at(G,L) + 1 == G; */
   L1: /*@ ghost H=G; */ G++;
   if (G < 30) goto L1;
