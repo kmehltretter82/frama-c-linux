@@ -17,6 +17,11 @@
 Open Source Release <next-release>
 ##################################
 
+-   RTE       [2020/03/30] Emits alarm on invalid pointers when option is on
+-   Eva       [2020/03/30] Emits alarm on invalid pointers when option is on
+-   Kernel    [2020/03/30] New option -warn-invalid-pointer (disabled by
+              default) to warn on invalid pointer arithmetics resulting in a
+              pointer that does not point to an object or one past an object.
 -   RTE       [2020/03/27] Emits alarm on pointer downcast when option is on
 -   Eva       [2020/03/27] Emits alarm on pointer downcast when option is on
 -   Kernel    [2020/03/27] New option -warn-pointer-downcast (activated by
