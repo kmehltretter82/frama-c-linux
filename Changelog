@@ -17,6 +17,7 @@
 Open Source Release <next-release>
 ##################################
 
+*!  Kernel    [2020/03/30] Reject labels at end of blocks.
 -   RTE       [2020/03/30] Emits alarm on invalid pointers when option is on
 -   Eva       [2020/03/30] Emits alarm on invalid pointers when option is on
 -   Kernel    [2020/03/30] New option -warn-invalid-pointer (disabled by
