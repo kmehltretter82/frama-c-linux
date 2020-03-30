@@ -14,7 +14,7 @@ let check_expr_term check fct s e =
       | (_, { ip_content = { pred_content = Papp(_,_,[l;_]) } }) -> l
       | _ -> Kernel.fatal "Unexpected ensures %a" Printer.pp_post_cond e
   in
-  let term' = Logic_utils.expr_to_term ~cast:false exp in
+  let term' = Logic_utils.expr_to_term ~coerce:true exp in
   let term' = Logic_utils.mk_cast Cil.intType term' in
   if check && not (Cil_datatype.Term.equal term term') then
     Kernel.fatal
@@ -29,7 +29,7 @@ let treat_fct check fct =
   let stmts = (Kernel_function.get_definition fct).sbody.bstmts in
   let stmts =
     List.filter
-      (function 
+      (function
         { skind = Instr (Set (lv,_,_)) } ->
           (match lv with (Var v,_) -> v.vglob | _ -> true)
         | { skind = If _ } -> true
@@ -41,7 +41,7 @@ let treat_fct check fct =
   (* A bit fragile, but should do the trick as long as the test itself does
      not get too complicated (regarding the C code at least). *)
   if not (List.length stmts = List.length ensures) then
-    Kernel.fatal 
+    Kernel.fatal
       "Stmts:@\n%a@\nPreds:@\n%a@\n"
       (Pretty_utils.pp_list ~sep:"@\n@\n" Printer.pp_stmt) stmts
       (Pretty_utils.pp_list ~sep:"@\n@\n" Printer.pp_post_cond) ensures;

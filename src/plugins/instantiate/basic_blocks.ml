@@ -131,7 +131,7 @@ let rec tunref_range ?loc ptr len =
 and tunref_range_unfold ?loc lval typ =
   match typ with
   | Ctype(TArray(typ, Some e, _, _)) ->
-    let len = Logic_utils.expr_to_term ~cast:false e in
+    let len = Logic_utils.expr_to_term ~coerce:true e in
     let last = tminus ?loc len (tinteger ?loc 1) in
     let range = trange ?loc (Some (tinteger ?loc 0), Some last) in
     let lval = addTermOffsetLval (TIndex(range, TNoOffset)) lval in
@@ -218,7 +218,7 @@ and pall_elems_eq ?loc depth t1 t2 len =
 and peq_unfold ?loc depth t1 t2 =
   match Logic_utils.unroll_type t1.term_type with
   | Ctype(TArray(_, Some len, _, _)) ->
-    let len = Logic_utils.expr_to_term ~cast:false len in
+    let len = Logic_utils.expr_to_term ~coerce:true len in
     pall_elems_eq ?loc depth t1 t2 len
   | _ -> prel ?loc (Req, t1, t2)
 
@@ -236,7 +236,7 @@ and punfold_pred ?loc ?(dyn_len = None) depth t1 pred =
   | Ctype(TArray(_, opt_len, _, _)) ->
     let len =
       match opt_len, dyn_len with
-      | Some len, None -> Logic_utils.expr_to_term ~cast:false len
+      | Some len, None -> Logic_utils.expr_to_term ~coerce:true len
       | _   , Some len -> len
       | None, None ->
         Options.fatal "Unfolding array: cannot find a length"

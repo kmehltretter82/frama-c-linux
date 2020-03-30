@@ -1080,10 +1080,12 @@ let rec stmts_of_cfg cfg current var_map locals return_exp acc =
 
       | Assume (_, exp,b) ->
         let exp = subst_in_exp var_map exp in
-        let predicate = (Logic_utils.expr_to_predicate ~cast:true exp).Cil_types.ip_content in
+        let predicate = Logic_utils.expr_to_predicate exp in
         let predicate = if b then predicate else Logic_const.pnot predicate in
-        let code_annot = Logic_const.new_code_annotation(Cil_types.AAssert([],Assert,predicate)) in
-        let stmt = Cil.mkStmtOneInstr ~valid_sid (Cil_types.Code_annot(code_annot,dummy_loc)) in
+        let code_node = Cil_types.AAssert([],Assert,predicate) in
+        let code_annot = Logic_const.new_code_annotation code_node in
+        let stmt_kind = Cil_types.Code_annot(code_annot,exp.eloc) in
+        let stmt = Cil.mkStmtOneInstr ~valid_sid stmt_kind in
         stmts_of_cfg cfg n var_map locals return_exp (stmt::acc)
 
       | EnterScope (_, vs) ->

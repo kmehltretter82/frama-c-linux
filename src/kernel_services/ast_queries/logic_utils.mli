@@ -86,7 +86,7 @@ val logicCType : logic_type -> typ
 val array_to_ptr : logic_type -> logic_type
 
 (** C type to logic type, with implicit conversion for arithmetic types. *)
-val typ_to_logic_type : typ -> logic_type
+val coerced : typ -> logic_type
 
 (** {2 Predicates} *)
 
@@ -157,36 +157,62 @@ val pointer_comparable: ?loc:location -> term -> term -> predicate
 (** \pointer_comparable
     @since Fluorine-20130401 *)
 
-(** {2 Conversion from exp to term}
+(** {2 Conversion from exp to term} *)
 
-    translates a C expression into an "equivalent" logical term.
-    [cast] specifies how C arithmetic operators are translated.
-    When [cast] is [true], the translation returns a logic [term] having the
-    same semantics of the C [expr] by introducing casts (i.e. the C expr [a+b]
-    can be translated as [(char)(((char)a)+(char)b)] to preserve the modulo
-    feature of the C addition).
-    Otherwise, no such casts are introduced and the C arithmetic operators are
-    translated into perfect mathematical operators (i.e. a floating point
-    addition is translated into an addition of [real] numbers).
-    @plugin development guide *)
-val expr_to_term : cast:bool -> exp -> term
+val expr_to_term : ?coerce:bool -> exp -> term
+(** Returns a logic term that has exactly the same semantics than the
+    original C-expression. The type of the resulting term is determined
+    by the [~coerce] flag as follows:
+    - when [~coerce:false] is given (the default) the term has the same
+      c-type than the original expression.
+    - when [~coerce:true] is given, if the original expression has an int or
+      float type, then the returned term is coerced into the integer or real
+      logic type, respectively.
 
-(** same as {!expr_to_term}, except that if the new term has an arithmetic
-    type, it is automatically coerced into real (or integer for integral types).
+    Remark: when the original expression is a comparison, it is evaluated as
+    a [_Bool] or [integer] depending on the [~coerce] flag.
+    To obtain a boolean or predicate, use [expr_to_boolean] or
+    [expr_to_predicate] instead.
 
-    @since Magnesium-20151001
+    @modify Frama-C+dev
 *)
-val expr_to_term_coerce: cast:bool -> exp -> term
 
-val expr_to_predicate: cast:bool -> exp -> identified_predicate
-(** same as {expr_to_term}, but the result is a predicate. Expressions starting
-    with relational operators ([==], [<=], etc) are translated directly.
-    Otherwise, the result of [expr_to_predicate e] is the predicate
-    [e <> 0].
+val expr_to_predicate: exp -> predicate
+(** Returns a predicate semantically equivalent to the condition
+    of the original C-expression.
+
+    This is different than [expr_to_term e |> scalar_term_to_predicate]
+    since it directly translate C-relations into logic ones.
 
     @raise Fatal error if the expression is not a comparison and cannot be
            compared to zero.
     @since Sulfur-20171101
+    @modify Frama-C+dev
+*)
+
+val expr_to_ipredicate: exp -> identified_predicate
+(** Returns a predicate semantically equivalent to the condition
+    of the original C-expression.
+
+    Identical to [expr_to_predicate e |> Logic_const.new_predicate].
+
+    @raise Fatal error if the expression is not a comparison and cannot be
+           compared to zero.
+    @since Sulfur-20171101
+    @modify Frama-C+dev
+*)
+
+val expr_to_boolean: exp -> term
+(** Returns a boolean term semantically equivalent to the condition
+    of the original C-expression.
+
+    This is different than [expr_to_term e |> scalar_term_to_predicate]
+    since it directly translate C-relations into logic ones.
+
+    @raise Fatal error if the expression is not a comparison and cannot be
+           compared to zero.
+    @since Sulfur-20171101
+    @modify Frama-C+dev
 *)
 
 val is_zero_comparable: term -> bool
@@ -212,10 +238,9 @@ val scalar_term_to_predicate: term -> predicate
     @since Sulfur-20171101
 *)
 
-val lval_to_term_lval : cast:bool -> lval -> term_lval
-val host_to_term_host : cast:bool -> lhost -> term_lhost
-val offset_to_term_offset :
-  cast:bool -> offset -> term_offset
+val lval_to_term_lval : lval -> term_lval
+val host_to_term_lhost : lhost -> term_lhost
+val offset_to_term_offset : offset -> term_offset
 
 val constant_to_lconstant: constant -> logic_constant
 val lconstant_to_constant: logic_constant-> constant

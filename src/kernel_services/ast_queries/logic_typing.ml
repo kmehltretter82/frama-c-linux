@@ -801,7 +801,7 @@ struct
          let attrs = Cil.filter_qualifier_attributes attrs in
          let field = C.find_comp_field comp f in
          let typ = Cil.typeOffset ty field in
-         Logic_utils.offset_to_term_offset ~cast:false field,
+         Logic_utils.offset_to_term_offset field,
          Ctype (Cil.typeAddAttributes attrs typ)
        with Not_found -> C.error loc "cannot find field %s" f)
     | _ ->
