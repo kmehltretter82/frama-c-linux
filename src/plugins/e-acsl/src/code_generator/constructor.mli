@@ -85,6 +85,15 @@ val mk_runtime_check:
     [true]) is the C translation of [p], [kf] is the current kernel_function and
     [kind] is the annotation kind of [p]. *)
 
+val mk_runtime_check_with_msg:
+  ?reverse:bool -> loc:location -> string -> annotation_kind ->
+  kernel_function -> exp -> stmt
+(** [mk_runtime_check_with_msg kind kf e msg] generates a runtime check for [e]
+    (or [!e] if [reverse] is [true]) by building a call to [__e_acsl_assert].
+    [msg] is the message printed if the runtime check fails. [loc] is the
+    location printed in the message if the runtime check fails. [kf] is the
+    current kernel_function and [kind] is the annotation kind of [p]. *)
+
 (*
 Local Variables:
 compile-command: "make -C ../../../../.."
