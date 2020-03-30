@@ -392,7 +392,7 @@ struct
       | Cfield _ , Mfield _ -> 1
       | Cfield(f, KValue) , Cfield(g, KValue)
       | Cfield(f, KInit) , Cfield(g, KInit) ->
-        Fieldinfo.compare f g
+          Fieldinfo.compare f g
       | Cfield(_, KInit), Cfield(_, KValue) -> (-1)
       | Cfield(_, KValue), Cfield(_, KInit) -> 1
 

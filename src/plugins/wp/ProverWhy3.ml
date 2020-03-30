@@ -557,14 +557,14 @@ let rec of_term ~cnv expected t : Why3.Term.term =
         let s = Lang.name_of_field f in
         match Why3.Theory.(ns_find_ls (get_namespace cnv.th) (cut_path s)) with
         | ls ->
-          begin match tau with
-          | Prop ->
-            Why3.Term.t_equ
-              (Why3.Term.t_app ls [of_term' cnv a] (Some Why3.Ty.ty_bool))
-              (Why3.Term.t_bool_true)
-          | _ ->
-            Why3.Term.t_app ls [of_term' cnv a] (of_tau ~cnv tau)
-          end
+            begin match tau with
+              | Prop ->
+                  Why3.Term.t_equ
+                    (Why3.Term.t_app ls [of_term' cnv a] (Some Why3.Ty.ty_bool))
+                    (Why3.Term.t_bool_true)
+              | _ ->
+                  Why3.Term.t_app ls [of_term' cnv a] (of_tau ~cnv tau)
+            end
         | exception Not_found -> why3_failure "Can't find '%s' in why3 namespace" s
       end
 
@@ -931,10 +931,7 @@ class visitor (ctx:context) c =
         let id = Why3.Ident.id_fresh (Lang.comp_init_id c) in
         let cnv = empty_cnv ctx in
         let map (f,tau) =
-          let ty_ctr = match of_tau ~cnv tau with
-            | None -> Some Why3.Ty.ty_bool
-            | t -> t
-          in
+          let ty_ctr = of_tau ~cnv tau in
           let id = Why3.Ident.id_fresh (Lang.name_of_field f) in
           let ls = Why3.Term.create_lsymbol id [ty] ty_ctr in
           (Some ls,Why3.Opt.get ty_ctr)

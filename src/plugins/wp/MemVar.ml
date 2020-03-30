@@ -151,17 +151,17 @@ struct
     let tau_of_chunk = function
       | Var x -> VAR.tau_of_chunk x
       | Alloc x -> VALLOC.tau_of_chunk x
-      | Init _ -> Qed.Logic.Bool
+      | Init x -> VINIT.tau_of_chunk x
       | Mem m -> M.Chunk.tau_of_chunk m
     let basename_of_chunk = function
       | Var x -> VAR.basename_of_chunk x
       | Alloc x -> VALLOC.basename_of_chunk x
-      | Init _ -> "VInit"
+      | Init x -> VINIT.basename_of_chunk x
       | Mem m -> M.Chunk.basename_of_chunk m
     let is_framed = function
       | Var x -> VAR.is_framed x
       | Alloc x -> VALLOC.is_framed x
-      | Init x -> VAR.is_framed x
+      | Init x -> VINIT.is_framed x
       | Mem m -> M.Chunk.is_framed m
   end
 
@@ -234,10 +234,10 @@ struct
     let join s1 s2 =
       Passive.union
         (Passive.union
-          (Passive.union
-             (SIGMA.join s1.vars s2.vars)
-             (ALLOC.join s1.alloc s2.alloc))
-          (M.Sigma.join s1.mem s2.mem))
+           (Passive.union
+              (SIGMA.join s1.vars s2.vars)
+              (ALLOC.join s1.alloc s2.alloc))
+           (M.Sigma.join s1.mem s2.mem))
         (INIT.join s1.init s2.init)
 
     let get s = function
@@ -340,19 +340,19 @@ struct
     let domain s =
       Heap.Set.union
         (Heap.Set.union
-          (Heap.Set.union
-             (domain_var (SIGMA.domain s.vars))
-             (domain_alloc (ALLOC.domain s.alloc)))
-          (domain_mem (M.Sigma.domain s.mem)))
+           (Heap.Set.union
+              (domain_var (SIGMA.domain s.vars))
+              (domain_alloc (ALLOC.domain s.alloc)))
+           (domain_mem (M.Sigma.domain s.mem)))
         (domain_init (INIT.domain s.init))
 
     let writes s =
       Heap.Set.union
         (Heap.Set.union
-          (Heap.Set.union
-             (domain_var (SIGMA.writes {pre=s.pre.vars;post=s.post.vars}))
-             (domain_alloc (ALLOC.writes {pre=s.pre.alloc;post=s.post.alloc})))
-          (domain_mem (M.Sigma.writes {pre=s.pre.mem;post=s.post.mem})))
+           (Heap.Set.union
+              (domain_var (SIGMA.writes {pre=s.pre.vars;post=s.post.vars}))
+              (domain_alloc (ALLOC.writes {pre=s.pre.alloc;post=s.post.alloc})))
+           (domain_mem (M.Sigma.writes {pre=s.pre.mem;post=s.post.mem})))
         (domain_init (INIT.writes {pre=s.pre.init;post=s.post.init}))
 
     let pretty fmt s =
@@ -424,10 +424,6 @@ struct
         let c = match V.param x with ByRef -> Iref x | _ -> Ivar x in
         m := set_chunk (e_var v) c !m
       ) s.vars ;
-    INIT.iter (fun x v ->
-        let c = match V.param x with ByRef -> Iref x | _ -> Ivar x in
-        m := set_chunk (e_var v) c !m
-      ) s.init ;
     { svar = !m ; smem = M.state s.mem }
 
   let ilval = function
@@ -477,7 +473,7 @@ struct
           let m = F.e_setfield v2 fd f1 in
           Bag.concat upd (diff lv v1 m)
     | (Lang.Cfield (_fi, KInit) as _fd ,_f2) :: _fvs ->
-      assert false (* TODO *)
+        assert false (* TODO *)
     | (Lang.Mfield _,_)::_ -> Bag.elt (Mstore(lv,v2))
     | [] -> Bag.empty
 
@@ -732,6 +728,24 @@ struct
   (* ---  Memory Store                                                      --- *)
   (* -------------------------------------------------------------------------- *)
 
+  let rec initialized_value value obj =
+    match obj with
+    | C_int _ | C_float _ | C_pointer _ -> value
+    | C_comp ci ->
+        let make_initialized_term f =
+          let obj = Ctypes.object_of f.ftype in
+          Cfield (f, KInit), initialized_value value obj
+        in
+        let ts = List.map make_initialized_term ci.cfields in
+        Lang.F.e_record ts
+    | C_array _ as arr ->
+        let obj = Ctypes.object_of_array_elem arr in
+        let t = initialized_value value obj in
+        Lang.F.e_const Lang.t_int t
+
+  let initialized_obj = initialized_value e_true
+  let uninitialized_obj = initialized_value e_false
+
   let stored seq obj l v = match l with
     | Ref x -> noref ~op:"write to" x
     | Val((CREF|CVAL),x,ofs) ->
@@ -741,7 +755,8 @@ struct
           if not (x.vformal || x.vglob) then
             let i1 = get_init_term seq.pre x in
             let i2 = get_init_term seq.post x in
-            [ Set( i2 , update_init i1 ofs F.e_true ) ]
+            let init = initialized_obj obj in
+            [ Set( i2 , update_init i1 ofs init ) ]
           else
             []
         in
@@ -1017,33 +1032,31 @@ struct
   (* ---  Initialized                                                       --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let rec make_initialized_value value sigma obj x ofs =
+  let rec initialized_loc sigma obj x ofs =
     match obj with
     | C_int _ | C_float _ | C_pointer _ ->
-      e_eq value (access_init (get_init_term sigma x) ofs)
+        e_eq e_true (access_init (get_init_term sigma x) ofs)
     | C_array { arr_element=t ; arr_flat=flat } ->
-      let v = Lang.freshvar ~basename:"i" Lang.t_int in
-      let hyp = match flat with
-        | None -> e_true
-        | Some { arr_size=size } ->
-          let open Lang.F in
-          e_and [ (e_leq e_zero (e_var v)) ; (e_leq (e_var v) (e_int size)) ]
-      in
-      let hyp = p_bool hyp in
-      let obj = Ctypes.object_of t in
-      let ofs = ofs @ [ Shift(obj, e_var v) ] in
-      let sub = p_bool (make_initialized_value value sigma obj x ofs) in
-      e_prop (p_forall [v] (p_imply hyp sub))
+        let v = Lang.freshvar ~basename:"i" Lang.t_int in
+        let hyp = match flat with
+          | None -> e_true
+          | Some { arr_size=size } ->
+              let open Lang.F in
+              e_and [ (e_leq e_zero (e_var v)) ;
+                      (e_leq (e_var v) (e_int (size-1))) ]
+        in
+        let hyp = p_bool hyp in
+        let obj = Ctypes.object_of t in
+        let ofs = ofs @ [ Shift(obj, e_var v) ] in
+        let sub = p_bool (initialized_loc sigma obj x ofs) in
+        e_prop (p_forall [v] (p_imply hyp sub))
     | C_comp ci ->
-      let mk_pred f =
-        let obj = Ctypes.object_of f.ftype in
-        let ofs = ofs @ [Field f] in
-        make_initialized_value value sigma obj x ofs
-      in
-      Lang.F.e_and (List.map mk_pred ci.cfields)
-
-  let make_initialized = make_initialized_value e_true
-  let make_uninitialized = make_initialized_value e_false
+        let mk_pred f =
+          let obj = Ctypes.object_of f.ftype in
+          let ofs = ofs @ [Field f] in
+          initialized_loc sigma obj x ofs
+        in
+        Lang.F.e_and (List.map mk_pred ci.cfields)
 
   let initialized sigma l =
     match l with
@@ -1052,33 +1065,33 @@ struct
           | Ref _ -> p_true
           | Loc l -> M.initialized sigma.mem (Rloc(obj,l))
           | Val(m,x,p) ->
-            if (x.vformal || x.vglob) then
-              p_true
-            else if is_heap_allocated m then
-              M.initialized sigma.mem (Rloc(obj,mloc_of_loc l))
-            else
-              p_bool (make_initialized sigma obj x p)
+              if (x.vformal || x.vglob) then
+                p_true
+              else if is_heap_allocated m then
+                M.initialized sigma.mem (Rloc(obj,mloc_of_loc l))
+              else
+                p_bool (initialized_loc sigma obj x p)
         end
     | Rrange(l,elt,a,b) ->
         begin match l with
           | Ref x -> noref ~op:"valid sub-range of" x
           | Loc l -> M.initialized sigma.mem (Rrange(l,elt,a,b))
           | Val(_m,_x,_p) -> p_false
-              (*match a,b with
-              | Some ka,Some kb ->
-                  begin
-                    try
-                      F.p_imply (F.p_leq ka kb)
-                        (valid_range_path sigma acs m x p (elt,ka,kb))
-                    with ShiftMismatch ->
-                      if is_heap_allocated m then
-                        let l = mloc_of_loc l in
-                        M.valid sigma.mem acs (Rrange(l,elt,a,b))
-                      else shift_mismatch l
-                  end
-              | _ ->
-                  Warning.error "Validity of infinite range @[%a.(%a..%a)@]"
-                    pretty l Vset.pp_bound a Vset.pp_bound b*)
+          (*match a,b with
+            | Some ka,Some kb ->
+              begin
+                try
+                  F.p_imply (F.p_leq ka kb)
+                    (valid_range_path sigma acs m x p (elt,ka,kb))
+                with ShiftMismatch ->
+                  if is_heap_allocated m then
+                    let l = mloc_of_loc l in
+                    M.valid sigma.mem acs (Rrange(l,elt,a,b))
+                  else shift_mismatch l
+              end
+            | _ ->
+              Warning.error "Validity of infinite range @[%a.(%a..%a)@]"
+                pretty l Vset.pp_bound a Vset.pp_bound b*)
         end
 
 
@@ -1094,7 +1107,7 @@ struct
     | TComp({ cfields },_,_) ->
         F.p_all
           (fun fd ->
-            forall_pointers phi (e_getfield v (Cfield (fd, KValue))) fd.ftype)
+             forall_pointers phi (e_getfield v (Cfield (fd, KValue))) fd.ftype)
           cfields
     | TArray(elt,_,_,_) ->
         let k = Lang.freshvar Qed.Logic.Int in
@@ -1155,12 +1168,12 @@ struct
     match scope with
     | Leave -> []
     | Enter ->
-      let xs = List.filter (fun v -> not v.vformal && not v.vglob) xs in
-      let i_out = seq.post in
-      let uninitialized v =
-        Lang.F.p_bool (make_uninitialized i_out (Ctypes.object_of v.vtype) v [])
-      in
-      List.map uninitialized xs
+        let xs = List.filter (fun v -> not v.vformal && not v.vglob) xs in
+        let uninitialized v =
+          let uninit_value = uninitialized_obj (Ctypes.object_of v.vtype) in
+          Lang.F.p_equal (access_init (get_init_term seq.post v) []) uninit_value
+        in
+        List.map uninitialized xs
 
 
   let scope seq scope xs =
