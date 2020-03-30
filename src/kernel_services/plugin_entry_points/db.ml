@@ -1021,6 +1021,7 @@ module RteGen = struct
   let get_pointer_downcast_status = mk_fun "RteGen.get_pointer_downcast_status"
   let get_float_to_int_status = mk_fun "RteGen.get_float_to_int_status"
   let get_finite_float_status = mk_fun "RteGen.get_finite_float_status"
+  let get_pointer_value_status = mk_fun "RteGen.get_pointer_value_status"
   let get_bool_value_status = mk_fun "RteGen.get_bool_value_status"
 end
 

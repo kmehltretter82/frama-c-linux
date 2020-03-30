@@ -306,7 +306,14 @@ let offset_for_validity ~bitfield access base =
 let valid_offset ?(bitfield=true) access base =
   if for_writing access && is_read_only base
   then Ival.bottom
-  else offset_for_validity ~bitfield access base
+  else
+    let offset = offset_for_validity ~bitfield access base in
+    (* When -absolute-valid-range is enabled, the Null base has a Known validity
+       that does not include 0. In this case, adds 0 as possible offset for a
+       pointer without memory access. *)
+    if access = No_access && is_null base
+    then Ival.(join zero offset)
+    else offset
 
 let offset_is_in_validity access base ival =
   let is_valid_for_bounds min_bound max_bound =
@@ -327,7 +334,8 @@ let offset_is_in_validity access base ival =
 let is_valid_offset access base offset =
   Ival.is_bottom offset
   || not (for_writing access && (is_read_only base))
-     && offset_is_in_validity access base offset
+     && (offset_is_in_validity access base offset
+         || access = No_access && is_null base && Ival.(equal zero offset))
 
 let is_function base =
   match base with

@@ -129,7 +129,7 @@ let getParenthLevel e =
   | PLapp _ | PLold _ | PLat _
   | PLoffset _ | PLbase_addr _ | PLblock_length _
   | PLupdate _  | PLinitField _ | PLinitIndex _
-  | PLvalid _ | PLvalid_read _ | PLvalid_function _
+  | PLvalid _ | PLvalid_read _ | PLobject_pointer _ | PLvalid_function _
   | PLinitialized _ | PLdangling _
   | PLallocable _ | PLfreeable _ | PLfresh _
   | PLseparated _ | PLunion _ | PLinter _ -> 10
@@ -249,8 +249,12 @@ and print_lexpr_level n fmt e =
     | PLexists(q,e) ->
       fprintf fmt "@[\\exists@ @[%a@];@ %a@]"
         print_quantifiers q print_lexpr e
-    | PLvalid (l,e) -> fprintf fmt "\\valid%a(@;@[%a@]@;)" print_label_1 l print_lexpr_plain e
-    | PLvalid_read (l,e) -> fprintf fmt "\\valid_read%a(@;@[%a@]@;)" print_label_1 l print_lexpr_plain e
+    | PLvalid (l,e) ->
+      fprintf fmt "\\valid%a(@;@[%a@]@;)" print_label_1 l print_lexpr_plain e
+    | PLvalid_read (l,e) ->
+      fprintf fmt "\\valid_read%a(@;@[%a@]@;)" print_label_1 l print_lexpr_plain e
+    | PLobject_pointer (l,e) ->
+      fprintf fmt "\\object_pointer%a(@;@[%a@]@;)" print_label_1 l print_lexpr_plain e
     | PLvalid_function e ->
       fprintf fmt "\\valid_function(@;@[%a@]@;)" print_lexpr_plain e
     | PLinitialized (l,e) ->

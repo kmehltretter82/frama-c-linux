@@ -46,6 +46,7 @@ module CVal = struct
   let assume_non_zero = Cvalue_forward.assume_non_zero
   let assume_bounded = Cvalue_forward.assume_bounded
   let assume_not_nan = Cvalue_forward.assume_not_nan
+  let assume_pointer = Cvalue_forward.assume_pointer
   let assume_comparable = Cvalue_forward.assume_comparable
 
   let constant exp = function
@@ -165,6 +166,7 @@ module Interval = struct
   let assume_non_zero v = `Unknown v
   let assume_bounded _ _ v = `Unknown v
   let assume_not_nan ~assume_finite:_ _ v = `Unknown v
+  let assume_pointer v = `Unknown v
   let assume_comparable _ v1 v2 = `Unknown (v1, v2)
 
   let constant _ _ = top

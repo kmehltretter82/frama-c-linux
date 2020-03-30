@@ -800,7 +800,7 @@ to function contracts."
              taken into account by the functions [from_...] below *)
           DoChildren
 
-      | Pvalid_function _ ->
+      | Pobject_pointer _ | Pvalid_function _ ->
           DoChildren
 
       | Papp _ | Pallocable _ | Pfreeable _ | Pfresh _

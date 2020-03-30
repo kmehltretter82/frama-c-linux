@@ -26,7 +26,7 @@ Assume {
   (* Goal *)
   When: q.offset < p.offset.
   (* Pre-condition *)
-  Have: p.base = G_t_19.
+  Have: p.base = G_t_21.
 }
 Prove: addr_lt(q, p).
 
@@ -37,7 +37,7 @@ Assume {
   (* Goal *)
   When: i_1 <= i.
   (* Pre-condition *)
-  Have: p.base = G_t_19.
+  Have: p.base = G_t_21.
 }
 Prove: i <= i_1.
 
@@ -116,8 +116,8 @@ Goal Post-condition 'qed_ok,Lt' in 'mixed_array_pointer':
 tests/wp_acsl/pointer.i:45: warning from Reference Variable Model:
  - Warning: Hide sub-term definition
    Reason: Uncomparable locations p_0 and mem:t.(0)
-Assume { (* Goal *) When: 0 < w. (* Pre-condition *) Have: p.base = G_t_19. }
-Prove: addr_lt(shift_sint32(global(G_t_19), 0), p).
+Assume { (* Goal *) When: 0 < w. (* Pre-condition *) Have: p.base = G_t_21. }
+Prove: addr_lt(shift_sint32(global(G_t_21), 0), p).
 
 ------------------------------------------------------------
 
@@ -125,9 +125,9 @@ Goal Post-condition 'qed_ok,Le' in 'mixed_array_pointer':
 tests/wp_acsl/pointer.i:46: warning from Reference Variable Model:
  - Warning: Hide sub-term definition
    Reason: Uncomparable locations p_0 and mem:t.(0)
-Assume { (* Goal *) When: 0 <= w. (* Pre-condition *) Have: p.base = G_t_19.
+Assume { (* Goal *) When: 0 <= w. (* Pre-condition *) Have: p.base = G_t_21.
 }
-Prove: addr_le(shift_sint32(global(G_t_19), 0), p).
+Prove: addr_le(shift_sint32(global(G_t_21), 0), p).
 
 ------------------------------------------------------------
 
@@ -135,8 +135,8 @@ Goal Post-condition 'qed_ok,Eq' in 'mixed_array_pointer':
 tests/wp_acsl/pointer.i:47: warning from Reference Variable Model:
  - Warning: Hide sub-term definition
    Reason: Uncomparable locations p_0 and mem:t.(0)
-Assume { (* Pre-condition *) Have: p.base = G_t_19. }
-Prove: shift_sint32(global(G_t_19), 0) = p.
+Assume { (* Pre-condition *) Have: p.base = G_t_21. }
+Prove: shift_sint32(global(G_t_21), 0) = p.
 
 ------------------------------------------------------------
 
@@ -144,9 +144,9 @@ Goal Post-condition 'qed_ok,Ne' in 'mixed_array_pointer':
 tests/wp_acsl/pointer.i:48: warning from Reference Variable Model:
  - Warning: Hide sub-term definition
    Reason: Uncomparable locations p_0 and mem:t.(0)
-Assume { (* Goal *) When: w != 0. (* Pre-condition *) Have: p.base = G_t_19.
+Assume { (* Goal *) When: w != 0. (* Pre-condition *) Have: p.base = G_t_21.
 }
-Prove: shift_sint32(global(G_t_19), 0) != p.
+Prove: shift_sint32(global(G_t_21), 0) != p.
 
 ------------------------------------------------------------
 
@@ -154,9 +154,9 @@ Goal Post-condition 'qed_ko,Le_oracle_ko' in 'mixed_array_pointer':
 tests/wp_acsl/pointer.i:49: warning from Reference Variable Model:
  - Warning: Hide sub-term definition
    Reason: Uncomparable locations p_0 and mem:t.(0)
-Assume { (* Goal *) When: 0 <= w. (* Pre-condition *) Have: p.base = G_t_19.
+Assume { (* Goal *) When: 0 <= w. (* Pre-condition *) Have: p.base = G_t_21.
 }
-Prove: addr_lt(shift_sint32(global(G_t_19), 0), p).
+Prove: addr_lt(shift_sint32(global(G_t_21), 0), p).
 
 ------------------------------------------------------------
 
@@ -164,8 +164,8 @@ Goal Post-condition 'qed_ko,Lt_oracle_ko' in 'mixed_array_pointer':
 tests/wp_acsl/pointer.i:50: warning from Reference Variable Model:
  - Warning: Hide sub-term definition
    Reason: Uncomparable locations p_0 and mem:t.(0)
-Assume { (* Goal *) When: 0 < w. (* Pre-condition *) Have: p.base = G_t_19. }
-Prove: addr_le(p, shift_sint32(global(G_t_19), 0)).
+Assume { (* Goal *) When: 0 < w. (* Pre-condition *) Have: p.base = G_t_21. }
+Prove: addr_le(p, shift_sint32(global(G_t_21), 0)).
 
 ------------------------------------------------------------
 ------------------------------------------------------------

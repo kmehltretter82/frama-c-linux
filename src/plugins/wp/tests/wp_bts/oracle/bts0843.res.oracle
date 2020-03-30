@@ -18,7 +18,7 @@ Prove: true.
 
 Goal Assigns (file tests/wp_bts/bts0843.i, line 14) in 'g3':
 Call Effect at line 16
-Let a = Mptr_0[global(G_p_18)].
+Let a = Mptr_0[global(G_p_20)].
 Let a_1 = shiftfield_F1_a(a).
 Assume {
   (* Heap *)
@@ -34,7 +34,7 @@ Prove: a_1 = shiftfield_F1_a(Mptr_0[L_p_ref]).
 
 Goal Assigns (file tests/wp_bts/bts0843.i, line 14) in 'g3':
 Call Effect at line 16
-Let a = Mptr_0[global(G_p_18)].
+Let a = Mptr_0[global(G_p_20)].
 Let a_1 = shiftfield_F1_a(a).
 Assume {
   (* Heap *)

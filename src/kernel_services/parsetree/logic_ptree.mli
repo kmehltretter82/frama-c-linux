@@ -132,6 +132,7 @@ and lexpr_node =
                                 expression. *)
   | PLvalid of string option * lexpr (** pointer is valid. *)
   | PLvalid_read of string option * lexpr (** pointer is valid for reading. *)
+  | PLobject_pointer of string option * lexpr (** object pointer can be created. *)
   | PLvalid_function of lexpr (** function pointer is compatible with pointed type. *)
   | PLallocable of string option * lexpr (** pointer is valid for malloc. *)
   | PLfreeable of string option * lexpr (** pointer is valid for free. *)

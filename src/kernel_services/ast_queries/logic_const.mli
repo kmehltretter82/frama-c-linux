@@ -170,6 +170,9 @@ val pvalid_read: ?loc:location -> logic_label * term -> predicate
 (** \valid *)
 val pvalid: ?loc:location -> logic_label * term -> predicate
 
+(** \object_pointer *)
+val pobject_pointer: ?loc:location -> logic_label * term -> predicate
+
 (** \valid_function *)
 val pvalid_function: ?loc:location -> term -> predicate
 

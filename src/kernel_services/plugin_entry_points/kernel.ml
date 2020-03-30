@@ -1479,6 +1479,15 @@ module InvalidBool =
                   _Bool lvalues."
     end)
 
+let () = Parameter_customize.set_group analysis_options
+let () = Parameter_customize.do_not_reset_on_copy ()
+module InvalidPointer =
+  False
+    (struct
+      let module_name = "InvalidPointer"
+      let option_name = "-warn-invalid-pointer"
+      let help = "generate alarms when invalid pointers are created."
+    end)
 
 (* ************************************************************************* *)
 (** {2 Sequencing options} *)

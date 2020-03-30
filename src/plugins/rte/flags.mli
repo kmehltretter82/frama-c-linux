@@ -42,6 +42,7 @@ type t = {
   float_to_int: bool;
   finite_float: bool;
   pointer_call: bool;
+  pointer_value: bool;
   bool_value: bool;
 }
 
@@ -62,6 +63,7 @@ val default :
   ?float_to_int:bool ->
   ?finite_float:bool ->
   ?pointer_call:bool ->
+  ?pointer_value:bool ->
   ?bool_value:bool ->
   unit -> t
 

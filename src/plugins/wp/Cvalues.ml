@@ -357,6 +357,11 @@ let plain lt e =
 
 type 'a printer = Format.formatter -> 'a -> unit
 
+let pp_acs fmt = function
+  | RW -> Format.pp_print_string fmt "RW"
+  | RD -> Format.pp_print_string fmt "RD"
+  | OBJ -> Format.pp_print_string fmt "OBJ"
+
 let pp_bound fmt = function None -> () | Some p -> F.pp_term fmt p
 
 let pp_value pp fmt = function

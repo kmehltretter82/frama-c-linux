@@ -30,6 +30,7 @@ end
 
 module Initialized: S
 module Mem_access: S
+module Pointer_value: S
 module Pointer_call: S
 module Div_mod: S
 module Shift: S

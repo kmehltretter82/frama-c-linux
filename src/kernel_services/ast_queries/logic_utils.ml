@@ -935,6 +935,7 @@ and is_same_predicate_node p1 p2 =
   | Pfreeable (l1,t1), Pfreeable (l2,t2)
   | Pvalid (l1,t1), Pvalid (l2,t2)
   | Pvalid_read (l1,t1), Pvalid_read (l2,t2)
+  | Pobject_pointer (l1,t1), Pobject_pointer (l2,t2)
   | Pinitialized (l1,t1), Pinitialized (l2,t2) ->
     is_same_logic_label l1 l2 && is_same_term t1 t2
   | Pvalid_function t1, Pvalid_function t2 ->
@@ -949,7 +950,7 @@ and is_same_predicate_node p1 p2 =
      with Invalid_argument _ -> false)
   | (Pfalse | Ptrue | Papp _ | Prel _ | Pand _ | Por _ | Pimplies _
     | Piff _ | Pnot _ | Pif _ | Plet _ | Pforall _ | Pexists _
-    | Pat _ | Pvalid _ | Pvalid_read _ | Pvalid_function _
+    | Pat _ | Pvalid _ | Pvalid_read _ | Pobject_pointer _ | Pvalid_function _
     | Pinitialized _ | Pdangling _
     | Pfresh _ | Pallocable _ | Pfreeable _ | Pxor _ | Pseparated _
     ), _ -> false
@@ -1288,6 +1289,7 @@ and is_same_lexpr l1 l2 =
   | PLfreeable (l1,e1), PLfreeable (l2,e2)
   | PLvalid (l1,e1), PLvalid (l2,e2)
   | PLvalid_read (l1,e1), PLvalid_read (l2,e2)
+  | PLobject_pointer (l1,e1), PLobject_pointer (l2,e2)
   | PLbase_addr (l1,e1), PLbase_addr (l2,e2)
   | PLoffset (l1,e1), PLoffset (l2,e2)
   | PLblock_length (l1,e1), PLblock_length (l2,e2)
@@ -1316,7 +1318,8 @@ and is_same_lexpr l1 l2 =
     | PLupdate _ | PLinitIndex _ | PLtype _ | PLfalse
     | PLtrue | PLinitField _ | PLrel _ | PLand _ | PLor _ | PLxor _
     | PLimplies _ | PLiff _ | PLnot _ | PLif _ | PLforall _
-    | PLexists _ | PLvalid _ | PLvalid_read _ | PLvalid_function _
+    | PLexists _ | PLvalid _ | PLvalid_read _
+    | PLobject_pointer _ | PLvalid_function _
     | PLfreeable _ | PLallocable _
     | PLinitialized _ | PLdangling _ | PLseparated _ | PLfresh _ | PLnamed _
     | PLcomprehension _ | PLunion _ | PLinter _
@@ -1523,6 +1526,8 @@ and hash_predicate (acc,depth,tot) p =
       hash_predicate (acc + 173 + hash_label l, depth - 1, tot - 1) p
     | Pvalid_read (l, t) ->
       hash_term (acc + 187 + hash_label l, depth - 1, tot - 1) t
+    | Pobject_pointer (l, t) ->
+      hash_term (acc + 181 + hash_label l, depth - 1, tot - 1) t
     | Pvalid (l, t) ->
       hash_term (acc + 193 + hash_label l, depth - 1, tot - 1) t
     | Pvalid_function t -> hash_term (acc + 203, depth - 1, tot - 1) t
@@ -1823,6 +1828,7 @@ and compare_predicate_node p1 p2 =
   | Pfreeable (l1,t1), Pfreeable (l2,t2)
   | Pvalid (l1,t1), Pvalid (l2,t2)
   | Pvalid_read (l1,t1), Pvalid_read (l2,t2)
+  | Pobject_pointer (l1,t1), Pobject_pointer (l2,t2)
   | Pinitialized (l1,t1), Pinitialized (l2,t2)
   | Pdangling (l1,t1), Pdangling (l2,t2) ->
     let res = compare_logic_label l1 l2 in
@@ -1835,6 +1841,8 @@ and compare_predicate_node p1 p2 =
   | _, Pvalid _ -> -1
   | Pvalid_read _, _ -> 1
   | _, Pvalid_read _ -> -1
+  | Pobject_pointer _, _ -> 1
+  | _, Pobject_pointer _ -> -1
   | Pinitialized _, _ -> 1
   | _, Pinitialized _ -> -1
   | Pdangling _, _ -> 1

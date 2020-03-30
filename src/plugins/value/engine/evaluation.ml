@@ -477,6 +477,14 @@ module Make
     | "non-finite" -> restrict_float ~assume_finite:true expr fk value
     | _            -> assert false
 
+  let assume_pointer expr value =
+    if Kernel.InvalidPointer.get ()
+    then
+      let truth = Value.assume_pointer value in
+      let alarm () = Alarms.Invalid_pointer expr in
+      interpret_truth ~alarm value truth
+    else return value
+
   let handle_overflow ~may_overflow expr typ value =
     match Eval_typ.classify_as_scalar typ with
     | Some (Eval_typ.TSInt range) ->
@@ -489,31 +497,33 @@ module Make
       then fst (truncate_integer Alarms.Signed expr range value), Alarmset.none
       else handle_integer_overflow expr range value
     | Some (Eval_typ.TSFloat fk) -> remove_special_float expr fk value
-    | Some (Eval_typ.TSPtr _)
+    | Some (Eval_typ.TSPtr _) -> assume_pointer expr value
     | None -> return value
 
-  (* Removes NaN and infinite floats from the value read from a lvalue. *)
-  let remove_special_float_lvalue typ lval res =
+  (* Assumes that [res] is a valid result for the lvalue [lval] of type [typ].
+     Removes NaN and infinite floats and trap representations of bool values. *)
+  let assume_valid_value typ lval res =
     match typ with
     | TFloat (fkind, _) ->
       res >>= fun (value, origin) ->
       let expr = Value_util.lval_to_exp lval in
       remove_special_float expr fkind value >>=: fun new_value ->
       new_value, origin
-    | _ -> res
-
-  (* Removes invalid bool values from a lvalue. *)
-  let assume_valid_bool typ lval res =
-    if not (Kernel.InvalidBool.get ()) then res else
-      match typ with
-      | TInt (IBool, _) ->
+    | TInt (IBool, _) ->
+      if Kernel.InvalidBool.get () then
         res >>= fun (value, origin) ->
         let one = Abstract_value.Int Integer.one in
         let truth = Value.assume_bounded Alarms.Upper_bound one value in
         let alarm () = Alarms.Invalid_bool lval in
         interpret_truth ~alarm value truth >>=: fun new_value ->
         new_value, origin
-      | _ -> res
+      else res
+    | TPtr _ ->
+      res >>= fun (value, origin) ->
+      let expr = Value_util.lval_to_exp lval in
+      assume_pointer expr value >>=: fun new_value ->
+      new_value, origin
+    | _ -> res
 
   (* Reduce the rhs argument of a shift so that it fits inside [size] bits. *)
   let reduce_shift_rhs typ expr value =
@@ -874,8 +884,10 @@ module Make
 
     | AddrOf v | StartOf v ->
       lval_to_loc context ~for_writing:false ~reduction:false v
-      >>=: fun (loc, _, _) ->
-      Loc.to_value loc, Neither, false
+      >>= fun (loc, _, _) ->
+      let value = Loc.to_value loc in
+      let v = assume_pointer expr value in
+      compute_reduction v false
 
     | UnOp (op, e, typ) ->
       root_forward_eval context e >>= fun (v, volatile) ->
@@ -897,6 +909,7 @@ module Make
       let v = forward_cast ~dst e value in
       let v = match Cil.unrollType dst with
         | TFloat (fkind, _) -> v >>= remove_special_float expr fkind
+        | TPtr _ -> v >>= assume_pointer expr
         | _ -> v
       in
       compute_reduction v volatile
@@ -1068,8 +1081,7 @@ module Make
       let record, alarms = indeterminate_copy lval v alarms in
       `Value (record, Neither, volatile), alarms
     else
-      let v, alarms = remove_special_float_lvalue typ_lv lval (v, alarms) in
-      let v, alarms = assume_valid_bool typ_lv lval (v, alarms) in
+      let v, alarms = assume_valid_value typ_lv lval (v, alarms) in
       (v, alarms) >>=: fun (value, origin) ->
       let value = define_value value
       and origin = Some origin

@@ -871,6 +871,7 @@ struct
 
     | Pvalid(label,t) -> valid env RW label t
     | Pvalid_read(label,t) -> valid env RD label t
+    | Pobject_pointer(label,t) -> valid env OBJ label t
 
     | Pvalid_function _t ->
         Warning.error

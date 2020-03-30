@@ -1868,6 +1868,10 @@ and childrenPredicateNode vis p =
     let s' = visitCilLogicLabel vis s in
     let t' = vTerm t in
     if t' != t || s != s' then Pvalid_read (s',t') else p
+  | Pobject_pointer (s,t) ->
+    let s' = visitCilLogicLabel vis s in
+    let t' = vTerm t in
+    if t' != t || s != s' then Pobject_pointer (s',t') else p
   | Pvalid_function t ->
     let t' = vTerm t in
     if t' != t then Pvalid_function t' else p
@@ -4505,19 +4509,6 @@ and constFold (machdep: bool) (e: exp) : exp =
   | AlignOfE _ | AlignOf _ | SizeOfStr _ | SizeOfE _ | SizeOf _ ->
     e (* Depends on machdep. Do not evaluate in this case*)
 
-  (* Special case to handle the C macro 'offsetof' *)
-  | CastE(it,
-          { enode = AddrOf (Mem ({enode = CastE(TPtr(bt, _), z)}), off)})
-    when machdep && isZero z -> begin
-      try
-        let start, _width = bitsOffset bt off in
-        if start mod 8 <> 0 then
-          Kernel.error ~current:true "Using offset of bitfield" ;
-        constFold machdep
-          (new_exp ~loc (CastE(it, (integer ~loc (start / 8)))))
-      with SizeOfError _ -> e
-    end
-
   | CastE (t, e) -> begin
       Kernel.debug ~dkey "ConstFold CAST to %a@." !pp_typ_ref t ;
       let e = constFold machdep e in
@@ -5208,13 +5199,20 @@ let initVABuiltins () =
 let initMsvcBuiltins () : unit =
   (** Take a number of wide string literals *)
   Builtin_functions.add "__annotation" (voidType, [ ], true)
-;;
+
+let init_common_builtins () =
+  add_builtin
+    "offsetof"
+    theMachine.typeOfSizeOf
+    [ theMachine.typeOfSizeOf ]
+    false
 
 let init_builtins () =
   if not (TheMachine.is_computed ()) then
     Kernel.fatal ~current:true "You must call initCIL before init_builtins" ;
   if Builtin_functions.length () <> 0 then
     Kernel.fatal ~current:true "Cil builtins already initialized." ;
+  init_common_builtins ();
   if msvcMode () then
     initMsvcBuiltins ()
   else begin
@@ -6945,7 +6943,7 @@ and free_vars_predicate bound_vars p = match p.pred_content with
          Logic_var.Set.union (free_vars_term bound_vars t) acc)
       Logic_var.Set.empty tl
   | Pallocable (_,t) | Pfreeable (_,t)
-  | Pvalid (_,t) | Pvalid_read (_,t) | Pvalid_function t
+  | Pvalid (_,t) | Pvalid_read (_,t) | Pobject_pointer (_, t) | Pvalid_function t
   | Pinitialized (_,t) | Pdangling (_,t) ->
     free_vars_term bound_vars t
   | Pseparated seps ->

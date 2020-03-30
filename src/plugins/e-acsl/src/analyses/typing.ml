@@ -676,6 +676,7 @@ let rec type_predicate p =
     | Pallocable(_, t)
     | Pvalid(_, t)
     | Pvalid_read(_, t)
+    | Pobject_pointer(_,t)
     | Pvalid_function t ->
       ignore (type_term ~use_gmp_opt:false ~ctx:Nan t);
       c_int

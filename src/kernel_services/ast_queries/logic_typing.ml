@@ -1049,7 +1049,8 @@ struct
       | Pimplies(p1,p2) | Piff(p1,p2) -> needs_at_pred p1 || needs_at_pred p2
       | Pnot p | Plet (_,p) | Pforall(_,p) | Pexists(_,p) -> needs_at_pred p
       | Pif(t,p1,p2) -> needs_at t || needs_at_pred p1 || needs_at_pred p2
-      | Pvalid (_,t) | Pvalid_read (_,t) | Pvalid_function t
+      | Pvalid (_,t) | Pvalid_read (_,t)
+      | Pobject_pointer (_,t) | Pvalid_function t
       | Pinitialized (_,t) | Pdangling (_, t)
       | Pallocable(_,t) | Pfreeable(_,t)-> needs_at t
       | Pfresh (_,_,t,n) -> (needs_at t) && (needs_at n)
@@ -3003,7 +3004,7 @@ struct
       let t2,ty2 = type_num_term_option ctxt env t2 in
       (Trange(t1,t2),
        Ltype(ctxt.find_logic_type "set", [arithmetic_conversion ty1 ty2]))
-    | PLvalid _ | PLvalid_read _ | PLvalid_function _
+    | PLvalid _ | PLvalid_read _ | PLobject_pointer _ | PLvalid_function _
     | PLfresh _ | PLallocable _ | PLfreeable _
     | PLinitialized _ | PLdangling _ | PLexists _ | PLforall _
     | PLimplies _ | PLiff _
@@ -3357,6 +3358,8 @@ struct
       predicate_label_ptr ~check_non_void:true pvalid_read l t
     | PLvalid (l,t) ->
       predicate_label_ptr ~check_non_void:true pvalid l t
+    | PLobject_pointer (l,t) ->
+      predicate_label_ptr ~check_non_void:false pobject_pointer l t
     | PLvalid_function t ->
       let t = term env t in
       if isLogicPointer t then begin

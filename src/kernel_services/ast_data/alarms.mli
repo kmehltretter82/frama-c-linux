@@ -40,6 +40,7 @@ type alarm =
   | Index_out_of_bound of
       exp (** index *)
       * exp option (** None = lower bound is zero; Some up = upper bound *)
+  | Invalid_pointer of exp
   | Invalid_shift of exp * int option (** strict upper bound, if any *)
   | Pointer_comparison of
       exp option (** [None] when implicit comparison to NULL pointer *)

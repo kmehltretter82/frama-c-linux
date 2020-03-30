@@ -1569,6 +1569,8 @@ and predicate_node =
   | Pexists of quantifiers * predicate (** existential quantification. *)
   | Pat of predicate * logic_label
   (** predicate refers to a particular program point. *)
+  | Pobject_pointer of logic_label * term
+  (** the given locations can be pointed to. *)
   | Pvalid_read of logic_label * term   (** the given locations are valid for reading. *)
   | Pvalid of logic_label * term   (** the given locations are valid. *)
   | Pvalid_function of term

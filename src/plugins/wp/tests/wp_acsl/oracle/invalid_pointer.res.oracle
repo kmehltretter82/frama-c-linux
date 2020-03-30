@@ -1,0 +1,126 @@
+# frama-c -wp [...]
+[kernel] Parsing tests/wp_acsl/invalid_pointer.c (with preprocessing)
+[wp] Running WP plugin...
+[wp] Loading driver 'share/wp.driver'
+[wp] Warning: Missing RTE guards
+[wp] tests/wp_acsl/invalid_pointer.c:21: Warning: void object
+------------------------------------------------------------
+  Function array
+------------------------------------------------------------
+
+Goal Check 'ARR' (file tests/wp_acsl/invalid_pointer.c, line 29):
+Assume { Type: is_sint32(k). (* Heap *) Type: linked(Malloc_0). }
+Prove: ((0 <= k) /\ (k <= 25)) <->
+    valid_obj(Malloc_0[L_a_32 <- 25], shift_sint32(global(L_a_32), k), 1).
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function compound
+------------------------------------------------------------
+
+Goal Check 'M1' (file tests/wp_acsl/invalid_pointer.c, line 44):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'P0' (file tests/wp_acsl/invalid_pointer.c, line 45):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'P1' (file tests/wp_acsl/invalid_pointer.c, line 46):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'P2' (file tests/wp_acsl/invalid_pointer.c, line 47):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'F' (file tests/wp_acsl/invalid_pointer.c, line 50):
+Assume { (* Heap *) Type: linked(Malloc_0). }
+Prove: valid_obj(Malloc_0[L_s_37 <- 2], shiftfield_F1_S_f(global(L_s_37)), 1).
+
+------------------------------------------------------------
+
+Goal Check 'G' (file tests/wp_acsl/invalid_pointer.c, line 51):
+Assume { (* Heap *) Type: linked(Malloc_0). }
+Prove: valid_obj(Malloc_0[L_s_37 <- 2], shiftfield_F1_S_g(global(L_s_37)), 1).
+
+------------------------------------------------------------
+
+Goal Check 'F2' (file tests/wp_acsl/invalid_pointer.c, line 52):
+Assume { (* Heap *) Type: linked(Malloc_0). }
+Prove: valid_obj(Malloc_0[L_s_37 <- 2],
+         shift_sint32(shiftfield_F1_S_f(global(L_s_37)), 2), 1).
+
+------------------------------------------------------------
+
+Goal Check 'G2' (file tests/wp_acsl/invalid_pointer.c, line 53):
+Assume { (* Heap *) Type: linked(Malloc_0). }
+Prove: !valid_obj(Malloc_0[L_s_37 <- 2],
+          shift_sint32(shiftfield_F1_S_g(global(L_s_37)), 2), 1).
+
+------------------------------------------------------------
+
+Goal Check 'AM' (file tests/wp_acsl/invalid_pointer.c, line 56):
+Prove: true.
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function memvar
+------------------------------------------------------------
+
+Goal Check 'M1' (file tests/wp_acsl/invalid_pointer.c, line 6):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'P0' (file tests/wp_acsl/invalid_pointer.c, line 7):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'P1' (file tests/wp_acsl/invalid_pointer.c, line 8):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'P2' (file tests/wp_acsl/invalid_pointer.c, line 9):
+Prove: true.
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function pointer
+------------------------------------------------------------
+
+Goal Check 'M1' (file tests/wp_acsl/invalid_pointer.c, line 17):
+Assume { (* Heap *) Type: linked(Malloc_0). }
+Prove: !valid_obj(Malloc_0[L_x_27 <- 1], shift_sint32(global(L_x_27), -1), 1).
+
+------------------------------------------------------------
+
+Goal Check 'P0' (file tests/wp_acsl/invalid_pointer.c, line 18):
+Assume { (* Heap *) Type: linked(Malloc_0). }
+Prove: valid_obj(Malloc_0[L_x_27 <- 1], global(L_x_27), 1).
+
+------------------------------------------------------------
+
+Goal Check 'P1' (file tests/wp_acsl/invalid_pointer.c, line 19):
+Assume { (* Heap *) Type: linked(Malloc_0). }
+Prove: valid_obj(Malloc_0[L_x_27 <- 1], shift_sint32(global(L_x_27), 1), 1).
+
+------------------------------------------------------------
+
+Goal Check 'P2' (file tests/wp_acsl/invalid_pointer.c, line 20):
+Assume { (* Heap *) Type: linked(Malloc_0). }
+Prove: !valid_obj(Malloc_0[L_x_27 <- 1], shift_sint32(global(L_x_27), 2), 1).
+
+------------------------------------------------------------
+
+Goal Check 'NULL' (file tests/wp_acsl/invalid_pointer.c, line 21):
+Assume { (* Heap *) Type: linked(Malloc_0). }
+Prove: valid_obj(Malloc_0[L_x_27 <- 1], null, 1).
+
+------------------------------------------------------------

@@ -77,8 +77,8 @@ Prove: true.
 
 Goal Call point f1 f2 in 'call' at instruction (file tests/wp_plugin/dynamic.i, line 30):
 Let a = Mptr_0[shiftfield_F1_S_f(closure_0)].
-Let a_1 = global(G_f2_28).
-Let a_2 = global(G_f1_20).
+Let a_1 = global(G_f2_30).
+Let a_2 = global(G_f1_22).
 Let x = Mint_0[shiftfield_F1_S_param(closure_0)].
 Assume {
   Type: is_sint32(x).
@@ -115,7 +115,7 @@ Assume {
   Have: abs_int(x) <= 5.
   (* Instance of 'f1' *)
   (* Call point f1 f2 *)
-  Have: Mptr_0[shiftfield_F1_S_f(closure_0)] = global(G_f1_20).
+  Have: Mptr_0[shiftfield_F1_S_f(closure_0)] = global(G_f1_22).
 }
 Prove: ((-10) <= x) /\ (x <= 10).
 
@@ -137,7 +137,7 @@ Assume {
   (* Goal *)
   When: Mptr_0[shiftfield_F1_S_f(p)] = global(0).
   (* Else *)
-  Have: G_g_46 = 0.
+  Have: G_g_48 = 0.
 }
 Prove: X = 1.
 
@@ -165,7 +165,7 @@ Prove: true.
 
 Goal Call point h1 in 'missing_context' at instruction (file tests/wp_plugin/dynamic.i, line 87):
 Assume { (* Heap *) Type: region(p.base) <= 0. }
-Prove: global(G_h1_59) = p.
+Prove: global(G_h1_61) = p.
 
 ------------------------------------------------------------
 

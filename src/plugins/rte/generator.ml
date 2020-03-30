@@ -83,6 +83,14 @@ module Mem_access =
       let additional_parameters = [ Kernel.SafeArrays.parameter ]
     end)
 
+module Pointer_value =
+  Make
+    (struct
+      let name = "pointer_value"
+      let parameter = Kernel.InvalidPointer.parameter
+      let additional_parameters = []
+    end)
+
 module Pointer_call =
   Make
     (struct

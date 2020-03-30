@@ -46,6 +46,7 @@ type equation =
 type acs =
   | RW (** Read-Write Access *)
   | RD (** Read-Only Access *)
+  | OBJ (** Valid Object Pointer *)
 
 (** Abstract location or concrete value *)
 type 'a value =

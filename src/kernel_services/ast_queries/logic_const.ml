@@ -425,6 +425,7 @@ let pallocable ?(loc=Cil_datatype.Location.unknown) (l,p) = unamed ~loc (Palloca
 let pfreeable ?(loc=Cil_datatype.Location.unknown) (l,p) = unamed ~loc (Pfreeable (l,p))
 let pvalid ?(loc=Cil_datatype.Location.unknown) (l,p) = unamed ~loc (Pvalid (l,p))
 let pvalid_read ?(loc=Cil_datatype.Location.unknown) (l,p) = unamed ~loc (Pvalid_read (l,p))
+let pobject_pointer ?(loc=Cil_datatype.Location.unknown) (l,p) = unamed ~loc (Pobject_pointer (l,p))
 let pvalid_function ?(loc=Cil_datatype.Location.unknown) p = unamed ~loc (Pvalid_function p)
 
 (* the index should be an integer or a range of integers *)

@@ -99,6 +99,9 @@ class annot_visitor kf flags on_alarm = object (self)
   method private do_pointer_call () =
     flags.Flags.pointer_call && not (Generator.Pointer_call.is_computed kf)
 
+  method private do_pointer_value () =
+    flags.Flags.pointer_value && not (Generator.Pointer_value.is_computed kf)
+
   method private do_bool_value () =
     flags.Flags.bool_value && not (Generator.Bool_value.is_computed kf)
 
@@ -275,6 +278,9 @@ class annot_visitor kf flags on_alarm = object (self)
              self#generate_assertion Rte.finite_float_assertion (fkind,exp)
            | _ -> ())
 
+        | BinOp((PlusPI | MinusPI), _, _, _) when self#do_pointer_value () ->
+          self#generate_assertion Rte.pointer_value exp
+
         | UnOp(Neg, exp, ty) ->
           (* Note: if unary minus on unsigned integer is to be understood as
              "subtracting the promoted value from the largest value
@@ -290,6 +296,8 @@ class annot_visitor kf flags on_alarm = object (self)
 
         | Lval lval ->
           (match Cil.(unrollType (typeOfLval lval)) with
+           | TPtr _ when self#do_pointer_value () ->
+             self#generate_assertion Rte.pointer_value exp
            | TInt (IBool,_) when self#do_bool_value () ->
              self#generate_assertion Rte.bool_value lval
            | _ -> ());
@@ -313,6 +321,8 @@ class annot_visitor kf flags on_alarm = object (self)
            (* to , from *)
            | TInt _, TPtr _ when self#do_pointer_downcast () ->
              self#generate_assertion Rte.downcast_assertion (ty, e)
+           | TPtr _, TInt _ when self#do_pointer_value () ->
+             self#generate_assertion Rte.pointer_value exp
 
            | TInt(kind,_), TInt (_, _) ->
              let signed = Cil.isSigned kind in
@@ -339,8 +349,9 @@ class annot_visitor kf flags on_alarm = object (self)
             | FP_nan ->
               self#generate_assertion Rte.finite_float_assertion (fkind,exp)
           end
-        | StartOf _
-        | AddrOf _
+        | StartOf _ | AddrOf _ ->
+          if self#do_pointer_value ()
+          then self#generate_assertion Rte.pointer_value exp
         | Info _
         | UnOp _
         | Const _
@@ -451,6 +462,7 @@ let annotate ?flags kf =
     let open Flags in
     if comp Initialized.accessor flags.initialized |||
        comp Mem_access.accessor flags.mem_access |||
+       comp Pointer_value.accessor flags.pointer_value |||
        comp Pointer_call.accessor flags.pointer_call |||
        comp Div_mod.accessor flags.div_mod |||
        comp Shift.accessor flags.shift |||
