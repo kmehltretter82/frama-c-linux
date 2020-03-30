@@ -882,10 +882,6 @@ block_element_list:
 |   annot_list_opt statement block_element_list
             { $1 @ $2 @ $3 }
 |   annot_list_opt pragma block_element_list            { $1 @ $3 }
-/*(* GCC accepts a label at the end of a block *)*/
-|   annot_list_opt id_or_typename_as_id COLON
-    { let loc = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 2, Parsing.rhs_end_pos 3) in
-      $1 @ no_ghost [LABEL ($2, no_ghost_stmt (NOP loc), loc)] }
 ;
 
 annot_list_opt:
