@@ -5,6 +5,7 @@
         {"ident":"facilitynames", "header":"syslog.h"},
         {"ident":"getresgid", "header":"unistd.h"},
         {"ident":"getresuid", "header":"unistd.h"},
+        {"ident":"makedev", "header":"sys/types.h"},
         {"ident":"option", "header":"getopt.h"},
         {"ident":"prioritynames", "header":"syslog.h"},
         {"ident":"setresgid", "header":"unistd.h"},

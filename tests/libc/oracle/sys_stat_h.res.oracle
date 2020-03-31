@@ -28,12 +28,12 @@
   Called from tests/libc/sys_stat_h.c:17.
 [eva] using specification for function mkdir
 [eva] tests/libc/sys_stat_h.c:17: 
-  function mkdir: precondition 'valid_string_path' got status valid.
+  function mkdir: precondition 'valid_path' got status valid.
 [eva] Done for function mkdir
 [eva] computing for function mkdir <- main.
   Called from tests/libc/sys_stat_h.c:20.
 [eva:alarm] tests/libc/sys_stat_h.c:20: Warning: 
-  function mkdir: precondition 'valid_string_path' got status invalid.
+  function mkdir: precondition 'valid_path' got status invalid.
 [eva] Done for function mkdir
 [eva] computing for function mkdir <- main.
   Called from tests/libc/sys_stat_h.c:20.
@@ -45,6 +45,32 @@
 [eva] computing for function umask <- main.
   Called from tests/libc/sys_stat_h.c:22.
 [eva] Done for function umask
+[eva] computing for function lstat <- main.
+  Called from tests/libc/sys_stat_h.c:23.
+[eva] using specification for function lstat
+[eva] tests/libc/sys_stat_h.c:23: 
+  function lstat: precondition 'valid_path' got status valid.
+[eva] tests/libc/sys_stat_h.c:23: 
+  function lstat: precondition 'valid_buf' got status valid.
+[eva] Done for function lstat
+[eva] computing for function lstat <- main.
+  Called from tests/libc/sys_stat_h.c:23.
+[eva] Done for function lstat
+[eva] computing for function mkfifo <- main.
+  Called from tests/libc/sys_stat_h.c:24.
+[eva] using specification for function mkfifo
+[eva] tests/libc/sys_stat_h.c:24: 
+  function mkfifo: precondition 'valid_path' got status valid.
+[eva] Done for function mkfifo
+[eva] computing for function mknod <- main.
+  Called from tests/libc/sys_stat_h.c:25.
+[eva] using specification for function mknod
+[eva] tests/libc/sys_stat_h.c:25: 
+  function mknod: precondition 'valid_path' got status valid.
+[eva] Done for function mknod
+[eva] computing for function mknod <- main.
+  Called from tests/libc/sys_stat_h.c:25.
+[eva] Done for function mknod
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -55,4 +81,7 @@
   r ∈ {-1; 0}
   r_mkdir ∈ {-1; 0}
   old_mask ∈ [--..--]
+  r2 ∈ {-1; 0}
+  r3 ∈ {-1; 0}
+  r4 ∈ {-1; 0}
   __retres ∈ {-1; 0; 1; 2; 3}

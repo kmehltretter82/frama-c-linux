@@ -20,5 +20,8 @@ int main() {
     mkdir(non_terminated, 0422);
   }
   mode_t old_mask = umask(0644);
+  int r2 = lstat("/tmp/bla", &st);
+  int r3 = mkfifo("/tmp/fifo", 0644);
+  int r4 = mknod("/tmp/fifo2", 0644, 42);
   return 0;
 }
