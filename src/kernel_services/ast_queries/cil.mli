@@ -2136,6 +2136,9 @@ val max_unsigned_number: int -> Integer.t
 (** True if the integer fits within the kind's range *)
 val fitsInInt: ikind -> Integer.t -> bool
 
+(** True if the float is finite for the kind's range *)
+val isFiniteFloat: fkind -> float -> bool
+
 exception Not_representable
 (** raised by {!intKindForValue}. *)
 

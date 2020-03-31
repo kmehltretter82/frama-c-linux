@@ -3063,6 +3063,13 @@ let intKindForValue i (unsigned: bool) =
   else if fitsInInt ILongLong i then ILongLong
   else raise Not_representable
 
+(* True is an double constant is finite for a kind *)
+let isFiniteFloat fk v =
+  Floating_point.isfinite @@
+  match fk with
+  | FFloat -> Floating_point.round_to_single_precision_float v
+  | _ -> v
+
 (* Construct an integer constant with possible truncation if the kind is not
    specified  *)
 let kinteger64 ~loc ?repr ?kind i =
@@ -3631,7 +3638,7 @@ let typeOf_array_elem t =
 
 let no_op_coerce typ t =
   match typ with
-  | Lreal -> true
+  | Lreal -> isLogicRealOrFloatType t.term_type
   | Linteger -> isLogicIntegralType t.term_type
   | Ltype _ when Logic_const.is_boolean_type typ ->
     isLogicPureBooleanType t.term_type

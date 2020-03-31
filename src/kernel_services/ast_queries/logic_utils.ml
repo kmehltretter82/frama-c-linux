@@ -307,29 +307,25 @@ let string_to_float_lconstant string =
     LReal { r_nearest = f.f_nearest; r_upper = f.f_upper; r_lower = f.f_lower;
             r_literal = string }
 
+let mk_coerce ltyp t =
+  Logic_const.term ~loc:t.term_loc (TLogic_coerce(ltyp, t)) ltyp
+
 let numeric_coerce ltyp t =
-  let coerce t =
-    Logic_const.term ~loc:t.term_loc (TLogic_coerce(ltyp, t)) ltyp
-  in
   let oldt = unroll_type t.term_type in
   if Cil_datatype.Logic_type.equal oldt ltyp then t
   else match t.term_node with
-    | TLogic_coerce(t,e) when Cil.no_op_coerce t e -> coerce e
-    | TConst(Integer(i,_)) ->
-      (match oldt, ltyp with
-       | Ctype (TInt(ikind,_)), Linteger when Cil.fitsInInt ikind i ->
-         { t with term_type = Linteger }
-       | _ -> coerce t)
-    | TCastE(typ, ({ term_node = TConst(Integer(i,_))} as t')) ->
-      (match unrollType typ with
-       | TInt (ikind,_) when Cil.fitsInInt ikind i ->
-         (match unroll_type t'.term_type with
-          | Linteger -> t'
-          | Ctype (TInt (ikind,_)) when Cil.fitsInInt ikind i ->
-            { t' with term_type = Linteger }
-          | _ -> coerce t')
-       | _ -> coerce t)
-    | _ -> coerce t
+    | TLogic_coerce(lt,e) when Cil.no_op_coerce lt e -> mk_coerce ltyp e
+    | TConst(Integer _) when ltyp = Linteger -> { t with term_type = Linteger }
+    | TConst(LReal _ ) when ltyp = Lreal -> { t with term_type = Lreal }
+    | TCastE(ty,e) ->
+      begin match ltyp, Cil.unrollType ty, e.term_node with
+        | Linteger, TInt(ik,_), TConst(Integer(v,_))
+          when Cil.fitsInInt ik v -> { e with term_type = Linteger }
+        | Lreal, TFloat(fk,_), TConst(LReal r)
+          when Cil.isFiniteFloat fk r.r_nearest -> { e with term_type = Lreal }
+        | _ -> mk_coerce ltyp t
+      end
+    | _ -> mk_coerce ltyp t
 
 (* Don't forget to keep is_zero_comparable
    and scalar_term_to_predicate in sync. *)
