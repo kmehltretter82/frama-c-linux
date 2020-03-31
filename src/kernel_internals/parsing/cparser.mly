@@ -923,7 +923,9 @@ else_part:
     %prec ghost_else_no_else /* To force the non ghost else to be attached to the current if */
 |   LGHOST_ELSE annotated_statement RGHOST ELSE annotated_statement
     {
-      Format.eprintf "Warning: %a: Invalid ghost else ignored@." Cil_datatype.Location.pretty $1 ;
+      let loc = Cil_datatype.Location.of_lexing_loc (Parsing.symbol_start_pos (), Parsing.symbol_end_pos ()) in
+      Kernel.warning ~wkey:Kernel.wkey_ghost_bad_use ~source:(fst loc)
+        "Invalid ghost else ignored@." ;
       in_block $5
     }
 
