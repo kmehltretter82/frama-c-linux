@@ -394,7 +394,8 @@ let is_boolean_binop op =
 let float_builtin prefix fkind =
   let name = match fkind with
     | FFloat -> Printf.sprintf "\\%s_float" prefix
-    | FDouble | FLongDouble -> Printf.sprintf "\\%s_double" prefix
+    | FDouble -> Printf.sprintf "\\%s_double" prefix
+    | FLongDouble -> Kernel.not_yet_implemented "Builtins for long double type"
   in match Logic_env.find_all_logic_functions name with
   | [ lf ] -> Some lf
   | _ -> Kernel.fatal "Missing or ambiguous builtin %S" name
