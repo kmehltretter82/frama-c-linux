@@ -644,6 +644,14 @@ and enforceGhostBlockCoherence ?(force_ghost=false) block =
   let force_ghost = force_ghost || is_ghost_else block  in
   List.iter (enforceGhostStmtCoherence ~force_ghost) block.bstmts
 
+(* makes sure that the type of a C variable and the type of its associated
+   logic variable -if any- stay synchronized. See bts 1538 *)
+let update_var_type v t =
+  v.vtype <- if v.vghost then typeAddGhost t else t;
+  match v.vlogic_var_assoc with
+  | None -> ()
+  | Some lv -> lv.lv_type <- Ctype t
+
 (* Make a varinfo. Used mostly as a helper function below  *)
 let makeVarinfo
     ?(source=true) ?(temp=false) ?(referenced=false) ?(ghost=false) ?(loc=Location.unknown)
@@ -728,10 +736,10 @@ let setFormals (f: fundec) (forms: varinfo list) =
   assert (getFormalsDecl f.svar == f.sformals);
   match unrollType f.svar.vtype with
     TFun(rt, _, isva, fa) ->
-    f.svar.vtype <-
-      TFun(rt,
-           Some (List.map (fun a -> (a.vname, a.vtype, a.vattr)) forms),
-           isva, fa)
+    update_var_type f.svar
+      (TFun(rt,
+            Some (List.map (fun a -> (a.vname, a.vtype, a.vattr)) forms),
+            isva, fa));
   | _ ->
     Kernel.fatal "Set formals. %s does not have function type" f.svar.vname
 
@@ -2649,9 +2657,10 @@ and childrenVarDecl (vis : cilVisitor) (v : varinfo) : varinfo =
     let o = Visitor_behavior.Get_orig.logic_var vis#behavior lv in
     visitCilLogicVarDecl vis o
   in
-  v.vtype <- visitCilType vis v.vtype;
+  let typ = visitCilType vis v.vtype in
   v.vattr <- visitCilAttributes vis v.vattr;
   v.vlogic_var_assoc <- optMapNoCopy visit_orig_var_assoc v.vlogic_var_assoc;
+  update_var_type v typ;
   v
 
 and visitCilVarUse vis v =
@@ -3610,7 +3619,7 @@ let getReturnType t =
 let setReturnTypeVI (v: varinfo) (t: typ) =
   match unrollType v.vtype with
   | TFun (_, args, va, a) ->
-    v.vtype <- TFun (t, args, va, a)
+    update_var_type v (TFun (t, args, va, a));
   | _ -> Kernel.fatal "setReturnType: not a function type"
 
 let setReturnType (f:fundec) (t:typ) =
@@ -5383,12 +5392,11 @@ let setFunctionType (f: fundec) (t: typ) =
     if List.length f.sformals <> List.length args then
       Kernel.fatal ~current:true "setFunctionType: number of arguments differs from the number of formals" ;
     (* Change the function type. *)
-    f.svar.vtype <- t;
+    update_var_type f.svar t;
     (* Change the sformals and we know that indirectly we'll change the
      * function type *)
     List.iter2
-      (fun (_an,at,aa) f ->
-         f.vtype <- at; f.vattr <- aa)
+      (fun (_an,at,aa) f -> update_var_type f at; f.vattr <- aa)
       args f.sformals
 
   | _ -> Kernel.fatal ~current:true "setFunctionType: not a function type"
@@ -5402,7 +5410,7 @@ let setFunctionTypeMakeFormals (f: fundec) (t: typ) =
       Kernel.fatal ~current:true "setFunctionTypMakeFormals called on function %s with some formals already"
         f.svar.vname ;
     (* Change the function type. *)
-    f.svar.vtype <- t;
+    update_var_type f.svar t;
     f.sformals <-
       List.map (fun (n,t,_a) -> makeLocal ~formal:true f n t) args;
     setFunctionType f t
@@ -6504,14 +6512,6 @@ let is_modifiable_lval lv =
   | TFun _ -> false
   | _ -> (not (isConstType t)
           || is_mutable_or_initialized lv) && isCompleteType t
-
-(* makes sure that the type of a C variable and the type of its associated
-   logic variable -if any- stay synchronized. See bts 1538 *)
-let update_var_type v t =
-  v.vtype <- if v.vghost then typeAddGhost t else t;
-  match v.vlogic_var_assoc with
-  | None -> ()
-  | Some lv -> lv.lv_type <- Ctype t
 
 (** Uniquefy the variable names *)
 let uniqueVarNames (f: file) : unit =

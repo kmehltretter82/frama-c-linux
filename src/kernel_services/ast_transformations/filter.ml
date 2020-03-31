@@ -820,7 +820,7 @@ end = struct
           let mytype = TFun(rt,Some args,va,attrs) in
           let new_formals = List.map makeFormalsVarDecl args in
           self#add_formals_bindings new_var new_formals;
-          new_var.vtype <- mytype;
+          Cil.update_var_type new_var mytype;
           List.iter2
             (fun x y ->
               Visitor_behavior.Set.varinfo self#behavior x y;

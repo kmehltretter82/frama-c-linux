@@ -584,7 +584,7 @@ let inject_in_fundec main fundec =
   (* convert ghost variables *)
   vi.vghost <- false;
   let unghost_local vi =
-    vi.vtype <- Cil.typeRemoveAttributesDeep ["ghost"] vi.vtype ;
+    Cil.update_var_type vi (Cil.typeRemoveAttributesDeep ["ghost"] vi.vtype);
     vi.vghost <- false
   in
   List.iter unghost_local fundec.slocals;
@@ -621,12 +621,12 @@ let unghost_vi vi =
   (* do not convert extern ghost variables, because they can't be linked,
      see bts #1392 *)
   if vi.vstorage <> Extern then vi.vghost <- false;
-  vi.vtype <- Cil.typeRemoveAttributesDeep ["ghost"] vi.vtype ;
+  Cil.update_var_type vi (Cil.typeRemoveAttributesDeep ["ghost"] vi.vtype);
   match Cil.unrollType vi.vtype with
   | TFun(res, Some l, va, attr) ->
     (* unghostify function's parameters *)
     let retype (n, t, a) = n, t, Cil.dropAttribute Cil.frama_c_ghost_formal a in
-    vi.vtype <- TFun(res, Some (List.map retype l), va, attr)
+    Cil.update_var_type vi (TFun(res, Some (List.map retype l), va, attr))
   | _ ->
     ()
 
