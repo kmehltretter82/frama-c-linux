@@ -38,9 +38,9 @@
 [eva] computing for function main4_pointer <- main.
   Called from tests/value/downcast.i:159.
 [eva:alarm] tests/value/downcast.i:54: Warning: 
-  signed overflow. assert -9223372036854775808 ≤ p + (long long)100;
+  signed overflow. assert -9223372036854775808 ≤ p + 100;
 [eva:alarm] tests/value/downcast.i:54: Warning: 
-  signed overflow. assert p + (long long)100 ≤ 9223372036854775807;
+  signed overflow. assert p + 100 ≤ 9223372036854775807;
 [eva:alarm] tests/value/downcast.i:56: Warning: 
   signed downcast. assert -2147483648 ≤ p;
 [eva:alarm] tests/value/downcast.i:56: Warning: 
