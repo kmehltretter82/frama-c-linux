@@ -1480,12 +1480,12 @@ let diff_check_exist old_file new_file =
     if Sys.file_exists new_file then begin
       !do_diffs ^ " " ^ old_file ^ " " ^ new_file
     end else begin
-      "echo \"" ^ new_file ^ " does not exist. Showing " ^ old_file ^ "\";" ^
-      " cat " ^ old_file
+      "echo \"+++ " ^ new_file ^ " does not exist. Showing " ^
+      old_file ^ "\";" ^ " cat " ^ old_file
     end
   end else begin
-      "echo \"" ^ old_file ^ " does not exist. Showing " ^ new_file ^ "\";" ^
-      " cat " ^ new_file
+      "echo \"--- " ^ old_file ^ " does not exist. Showing " ^
+      new_file ^ "\";" ^ " cat " ^ new_file
   end
 
 let do_diff = function
