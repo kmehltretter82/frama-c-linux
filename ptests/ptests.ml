@@ -1363,6 +1363,8 @@ let check_file_is_empty_or_nonexisting diff ~log_file =
     0
   else begin
     lock();
+    (* signal that there's a problem. *)
+    shared.summary_log <- shared.summary_log + 1;
     Queue.push diff shared.diffs;
     Condition.signal shared.diff_available;
     unlock();
@@ -1530,7 +1532,6 @@ let do_diff = function
         in
         let diff_string = diff_check_exist oracle_file result_file in
         ignore (launch diff_string)
-
 
 let diff_thread () =
   lock () ;
