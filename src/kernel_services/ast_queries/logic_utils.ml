@@ -221,47 +221,36 @@ let mk_logic_pointer_or_StartOf t =
     Kernel.fatal ~source:(fst t.term_loc)
       "%a is neither a pointer nor a C array" Cil_printer.pp_term t
 
-let need_logic_cast oldt newt =
-  not (Cil_datatype.Logic_type.equal (Ctype oldt) (Ctype newt))
+let equal_ltype = Cil_datatype.Logic_type.equal
 
 (* Does the same kind of optimization than [Cil.mkCastT] for [Ctype]. *)
-let mk_cast ?(loc=Cil_datatype.Location.unknown) ?(force=false) newt t =
-  let mk_cast t = (* to new type [newt] *)
-    let typ = Cil.type_remove_attributes_for_logic_type newt
-    in term ~loc (TCastE (typ, t)) (Ctype typ)
-  in
-  let rec aux1 typ t =
-    match typ with
-    | Ctype oldt ->
-      if not (need_logic_cast oldt newt) && not force then t
-      else begin
-        match Cil.unrollType newt, t.term_node with
-        | TPtr _, TCastE (_, t') ->
-          let rec aux2 = function
-            | Ctype typ' ->
-              (match unrollType typ', t'.term_node with
-               | (TPtr _ as typ''), _ ->
-                 (* Old cast can be removed...*)
-                 if need_logic_cast newt typ'' then mk_cast t'
-                 else (* In fact, both casts can be removed. *) t'
-               | _, TConst (Integer (i,_)) when Integer.is_zero i -> mk_cast t'
-               | _ -> mk_cast t
-              )
-            | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
-              aux2 (unroll_ltdef ty)
-            | _ -> mk_cast t
-          in aux2 t'.term_type
-        | _ -> (* Do not remove old cast because they are conversions !!! *)
-          mk_cast t
-      end
-    | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
-      aux1 (unroll_ltdef ty) t
-    | Linteger | Lreal ->
-      (match t.term_node with
-       | TLogic_coerce (_,t') -> aux1 t'.term_type t'
-       | _ -> mk_cast t)
-    | _ -> mk_cast t
-  in aux1 t.term_type t
+let mk_cast ?loc ?(force=false) newt t =
+  let newt = Cil.type_remove_attributes_for_logic_type newt in
+  if equal_ltype (Ctype newt) t.term_type then t else
+    (*
+    let rec is_iconst e = match e.term_node with
+      | TCastE(ty,e) when Cil.isArithmeticOrPointerType ty -> is_iconst e
+      | TLogic_coerce(Linteger,e) -> is_iconst e
+      | TConst(Integer _) -> true
+      | _ -> false in
+    *)
+    let rec unroll_cast e = match e.term_node with
+      | TCastE(oldt,e)
+        when (Cil.isPointerType newt && Cil.isPointerType oldt)
+          || equal_ltype (Ctype oldt) (Ctype newt)
+        -> unroll_cast e
+      | TLogic_coerce(Linteger,e)
+        when Cil.isArithmeticOrPointerType newt
+        -> unroll_cast e
+      | TLogic_coerce(Lreal,e)
+        when Cil.isFloatingType newt
+        -> unroll_cast e
+      | _ -> e
+    in
+    let tres = if force then t else unroll_cast t in
+  let loc = match loc with None -> t.term_loc | Some loc -> loc in
+  Logic_const.term ~loc (TCastE (newt, tres)) (Ctype newt)
+
 
 (* -------------------------------------------------------------------------- *)
 (* --- Constant Conversions                                               --- *)
@@ -472,6 +461,7 @@ let rec expr_to_term ?(coerce=false) e =
     | AlignOfE e -> TAlignOf (Cil.typeOf e), ctyp
     | Lval lv -> TLval (lval_to_term_lval lv), ctyp
     | CastE (ty,e) ->
+      let coerce = Cil.isIntegralType (Cil.typeOf e) in
       let t = mk_cast ~loc ty (expr_to_term ~coerce e) in
       t.term_node , t.term_type
     | Info (e,_) ->
