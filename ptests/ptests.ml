@@ -1363,6 +1363,8 @@ let check_file_is_empty_or_nonexisting diff ~log_file =
     0
   else begin
     lock();
+    (* signal that there's a problem. *)
+    shared.summary_log <- shared.summary_log + 1;
     Queue.push diff shared.diffs;
     Condition.signal shared.diff_available;
     unlock();
@@ -1473,6 +1475,19 @@ let worker_thread () =
         unlock ();
   done
 
+let diff_check_exist old_file new_file =
+  if Sys.file_exists old_file then begin
+    if Sys.file_exists new_file then begin
+      !do_diffs ^ " " ^ old_file ^ " " ^ new_file
+    end else begin
+      "echo \"+++ " ^ new_file ^ " does not exist. Showing " ^
+      old_file ^ "\";" ^ " cat " ^ old_file
+    end
+  end else begin
+      "echo \"--- " ^ old_file ^ " does not exist. Showing " ^
+      new_file ^ "\";" ^ " cat " ^ new_file
+  end
+
 let do_diff = function
     | Command_error (diff, kind) ->
       let log_prefix = log_prefix diff in
@@ -1487,7 +1502,7 @@ let do_diff = function
         let oracle_file =
           Filename.sanitize (oracle_prefix ^ log_ext ^ ".oracle")
         in
-        let diff_string = !do_diffs ^ " " ^ oracle_file ^ " " ^ log_file in
+        let diff_string = diff_check_exist oracle_file log_file in
         ignore (launch diff_string)
   | Target_error execnow ->
     lock_printf "Custom command failed: %s@\n" execnow.ex_cmd;
@@ -1515,11 +1530,8 @@ let do_diff = function
         let oracle_file =
           Filename.sanitize (SubDir.make_oracle_file dir file)
         in
-        let diff_string =
-          !do_diffs ^ " " ^  oracle_file ^ " " ^ result_file
-        in
+        let diff_string = diff_check_exist oracle_file result_file in
         ignore (launch diff_string)
-
 
 let diff_thread () =
   lock () ;
