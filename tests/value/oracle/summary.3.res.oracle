@@ -30,7 +30,7 @@
 [eva:alarm] tests/value/summary.i:34: Warning: 
   non-finite double value. assert \is_finite(volatile_d);
 [eva:alarm] tests/value/summary.i:35: Warning: 
-  non-finite double value. assert \is_finite((double)(d - d));
+  non-finite double value. assert \is_finite(\sub_double(d, d));
 [eva:alarm] tests/value/summary.i:36: Warning: 
   overflow in conversion from floating-point to integer.
   assert -2147483649 < d;

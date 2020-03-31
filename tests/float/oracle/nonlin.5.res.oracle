@@ -177,7 +177,7 @@
 [eva:nonlin] tests/float/nonlin.c:63: subdividing on i
 [eva:alarm] tests/float/nonlin.c:63: Warning: 
   accessing out of bounds index.
-  assert (int)((double)((double)((float)(i * i)) + 2.0)) < 10;
+  assert (int)\add_double((double)\mul_float(i, i), (double)2.0) < 10;
 [eva:nonlin] tests/float/nonlin.c:64: non-linear 's - s', lv 's'
 [eva:nonlin] tests/float/nonlin.c:64: subdividing on s
 [eva:nonlin] tests/float/nonlin.c:65: non-linear 's - s', lv 's'
