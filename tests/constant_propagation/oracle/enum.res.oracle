@@ -14,7 +14,7 @@
 [eva] Recording results for f
 [eva] Done for function f
 [eva:alarm] tests/constant_propagation/enum.i:13: Warning: 
-  signed overflow. assert B + c ≤ 2147483647;
+  signed overflow. assert (int)B + c ≤ 2147483647;
 [eva:alarm] tests/constant_propagation/enum.i:15: Warning: 
   signed overflow. assert (int)(y + z) + t ≤ 2147483647;
 [eva:alarm] tests/constant_propagation/enum.i:15: Warning: 
@@ -43,7 +43,7 @@ int main(int c, unsigned int u)
   enum E x = A;
   int y = f(0U);
   int z = f(D);
-  /*@ assert Eva: signed_overflow: B + c ≤ 2147483647; */
+  /*@ assert Eva: signed_overflow: (int)B + c ≤ 2147483647; */
   int t = B + c;
   int v = (int)(2U + u);
   /*@ assert Eva: signed_overflow: (int)(y + z) + t ≤ 2147483647; */

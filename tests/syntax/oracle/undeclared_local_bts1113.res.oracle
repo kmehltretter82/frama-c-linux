@@ -16,19 +16,25 @@ void funk(int rounds)
   int i;
   unsigned int __lengthof_k_long_long_size;
   int k_positive_size[4 - 2];
-  /*@ assert alloca_bounds: 0 < sizeof(int) * (2 * rounds) ≤ 4294967295; */
+  /*@
+  assert alloca_bounds: 0 < sizeof(int) * (int)(2 * rounds) ≤ 4294967295;
+   */
   ;
   __lengthof_k = (unsigned int)(2 * rounds);
   int *k = __fc_vla_alloc(sizeof(int) * __lengthof_k);
   /*@
   assert
-  alloca_bounds: 0 < sizeof(int) * (unsigned int)(2 * rounds) ≤ 4294967295;
+  alloca_bounds:
+    0 < sizeof(int) * (unsigned int)((int)(2 * rounds)) ≤ 4294967295;
    */
   ;
   __lengthof_kk = (unsigned int)(2 * rounds);
   int *kk = __fc_vla_alloc(sizeof(int) * __lengthof_kk);
   long long j = (long long)(rounds * rounds);
-  /*@ assert alloca_bounds: 0 < sizeof(int) * (j * 2) ≤ 4294967295; */ ;
+  /*@
+  assert alloca_bounds: 0 < sizeof(int) * (long long)(j * 2) ≤ 4294967295;
+   */
+  ;
   __lengthof_k_long_long_size = (unsigned int)(j * (long long)2);
   int *k_long_long_size =
     __fc_vla_alloc(sizeof(int) * __lengthof_k_long_long_size);

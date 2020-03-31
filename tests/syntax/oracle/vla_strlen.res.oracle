@@ -17,7 +17,11 @@ void f(char *s)
   unsigned int __lengthof_t;
   size_t tmp;
   tmp = strlen((char const *)s);
-  /*@ assert alloca_bounds: 0 < sizeof(char) * (tmp + 1) ≤ 4294967295; */ ;
+  /*@
+  assert
+  alloca_bounds: 0 < sizeof(char) * (unsigned int)(tmp + 1) ≤ 4294967295;
+   */
+  ;
   __lengthof_t = tmp + (size_t)1;
   char *t = __fc_vla_alloc(sizeof(char) * __lengthof_t);
   char *p = t;

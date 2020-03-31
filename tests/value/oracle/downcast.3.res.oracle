@@ -61,7 +61,7 @@
 [eva] computing for function main6_val_warn_converted_signed <- main.
   Called from tests/value/downcast.i:161.
 [eva:alarm] tests/value/downcast.i:75: Warning: 
-  signed downcast. assert (int)65300u ≤ 32767;
+  signed downcast. assert 65300u ≤ 32767;
 [eva:alarm] tests/value/downcast.i:91: Warning: 
   signed downcast. assert -32768 ≤ (int)e_1;
 [eva:alarm] tests/value/downcast.i:95: Warning: 
