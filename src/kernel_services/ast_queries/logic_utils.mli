@@ -86,7 +86,7 @@ val logicCType : logic_type -> typ
 val array_to_ptr : logic_type -> logic_type
 
 (** C type to logic type, with implicit conversion for arithmetic types. *)
-val coerced : typ -> logic_type
+val coerce_type : typ -> logic_type
 
 (** {2 Predicates} *)
 
@@ -160,17 +160,17 @@ val pointer_comparable: ?loc:location -> term -> term -> predicate
 (** {2 Conversion from exp to term} *)
 
 val expr_to_term : ?coerce:bool -> exp -> term
-(** Returns a logic term that has exactly the same semantics than the
+(** Returns a logic term that has exactly the same semantics as the
     original C-expression. The type of the resulting term is determined
     by the [~coerce] flag as follows:
     - when [~coerce:false] is given (the default) the term has the same
-      c-type than the original expression.
+      c-type as the original expression.
     - when [~coerce:true] is given, if the original expression has an int or
       float type, then the returned term is coerced into the integer or real
       logic type, respectively.
 
     Remark: when the original expression is a comparison, it is evaluated as
-    a [_Bool] or [integer] depending on the [~coerce] flag.
+    an [int] or an [integer] depending on the [~coerce] flag.
     To obtain a boolean or predicate, use [expr_to_boolean] or
     [expr_to_predicate] instead.
 
@@ -181,7 +181,7 @@ val expr_to_predicate: exp -> predicate
 (** Returns a predicate semantically equivalent to the condition
     of the original C-expression.
 
-    This is different than [expr_to_term e |> scalar_term_to_predicate]
+    This is different from [expr_to_term e |> scalar_term_to_predicate]
     since it directly translate C-relations into logic ones.
 
     @raise Fatal error if the expression is not a comparison and cannot be
@@ -206,7 +206,7 @@ val expr_to_boolean: exp -> term
 (** Returns a boolean term semantically equivalent to the condition
     of the original C-expression.
 
-    This is different than [expr_to_term e |> scalar_term_to_predicate]
+    This is different from [expr_to_term e |> scalar_term_to_predicate]
     since it directly translate C-relations into logic ones.
 
     @raise Fatal error if the expression is not a comparison and cannot be

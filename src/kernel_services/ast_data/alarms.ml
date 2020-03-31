@@ -452,13 +452,13 @@ let overflowed_expr_to_term ~loc e =
   match e.enode with
   | UnOp(op, e, ty) ->
     let t = Logic_utils.expr_to_term ~coerce:true e in
-    let ty = Logic_utils.coerced ty in
-    Logic_const.term ~loc (TUnOp(op, t)) ty
+    let lty = Logic_utils.coerce_type ty in
+    Logic_const.term ~loc (TUnOp(op, t)) lty
   | BinOp(op, e1, e2, ty) ->
     let t1 = Logic_utils.expr_to_term ~coerce:true e1 in
     let t2 = Logic_utils.expr_to_term ~coerce:true e2 in
-    let ty = Logic_utils.coerced ty in
-    Logic_const.term ~loc (TBinOp(op, t1, t2)) ty
+    let lty = Logic_utils.coerce_type ty in
+    Logic_const.term ~loc (TBinOp(op, t1, t2)) lty
   | _ -> Logic_utils.expr_to_term ~coerce:true e
 
 (* Creates \is_finite((fkind)e) or \is_nan((fkind)e) according to

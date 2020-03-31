@@ -123,7 +123,7 @@ let plain_array_to_ptr ty =
 
 let array_to_ptr = plain_or_set plain_array_to_ptr
 
-let coerced typ =
+let coerce_type typ =
   let ty = Cil.unrollType typ in
   if Cil.isIntegralType ty then Linteger
   else if Cil.isFloatingType ty then Lreal
@@ -341,7 +341,7 @@ let is_zero_comparable t =
 
 let scalar_term_conversion conversion t =
   let loc = t.term_loc in
-  let arith_conversion t =
+  let int_conversion t =
     conversion ~loc false t (Cil.lzero ~loc ()) in
   let real_conversion ?ltyp t =
     conversion ~loc false t (Logic_const.treal_zero ~loc ?ltyp ()) in
@@ -351,14 +351,14 @@ let scalar_term_conversion conversion t =
     let ctrue = Logic_env.Logic_ctor_info.find "\\true" in
     conversion ~loc true t (term ~loc (TDataCons(ctrue,[])) boolean_type) in
   match unroll_type t.term_type with
-  | Ctype (TInt _) -> arith_conversion t
+  | Ctype (TInt _) -> int_conversion t
   | Ctype (TFloat _) as ltyp -> real_conversion ~ltyp t
   | Ctype (TPtr _) -> ptr_conversion t
   | Ctype (TArray _) -> ptr_conversion t
   (* Could be transformed to \true: an array is never \null *)
   | Ctype (TFun _) -> ptr_conversion t
   (* decay as pointer *)
-  | Linteger -> arith_conversion t
+  | Linteger -> int_conversion t
   | Lreal -> real_conversion t
   | Ltype ({lt_name = name},[]) when name = Utf8_logic.boolean ->
     bool_conversion t
@@ -400,7 +400,7 @@ let float_builtin prefix fkind =
   | [ lf ] -> Some lf
   | _ -> Kernel.fatal "Missing or ambiguous builtin %S" name
 
-let is_float_binop op typ =
+let get_float_binop op typ =
   match typ, op with
   | TFloat(fkind,_) , PlusA  -> float_builtin "add" fkind
   | TFloat(fkind,_) , MinusA -> float_builtin "sub" fkind
@@ -408,7 +408,7 @@ let is_float_binop op typ =
   | TFloat(fkind,_) , Div    -> float_builtin "div" fkind
   | _ -> None
 
-let is_float_unop op typ =
+let get_float_unop op typ =
   match typ, op with
   | TFloat(fkind,_) , Neg  -> float_builtin "neg" fkind
   | _ -> None
@@ -419,7 +419,7 @@ let rec expr_to_term ?(coerce=false) e =
   let ctyp = Ctype typ in
   let node,ltyp =
     match e.enode with
-    | Const c -> TConst (constant_to_lconstant c) , coerced typ
+    | Const c -> TConst (constant_to_lconstant c) , coerce_type typ
     | StartOf lv -> TStartOf (lval_to_term_lval lv) , ctyp
     | AddrOf lv -> TAddrOf (lval_to_term_lval lv) , ctyp
     | BinOp (op, a, b, _) ->
@@ -427,7 +427,7 @@ let rec expr_to_term ?(coerce=false) e =
         let tc = expr_to_boolean e in
         Tif( tc , Cil.lone ~loc () , Cil.lzero ~loc () ),
         Linteger
-      else begin match is_float_binop op typ with
+      else begin match get_float_binop op typ with
         | Some phi ->
           let va = expr_to_term a in
           let vb = expr_to_term b in
@@ -435,20 +435,20 @@ let rec expr_to_term ?(coerce=false) e =
         | None ->
           let va = expr_to_term ~coerce:true a in
           let vb = expr_to_term ~coerce:true b in
-          TBinOp(op,va,vb) , coerced typ
+          TBinOp(op,va,vb) , coerce_type typ
       end
     | UnOp (LNot, c, _) ->
       let tc = expr_to_boolean c in
       Tif( tc , Cil.lzero ~loc () , Cil.lone ~loc () ),
       Linteger
     | UnOp(op, a, _) ->
-      begin match is_float_unop op typ with
+      begin match get_float_unop op typ with
         | Some phi ->
           let va = expr_to_term ~coerce:true a in
           Tapp(phi,[],[va]) , ctyp
         | None ->
           let va = expr_to_term ~coerce:true a in
-          TUnOp(op,va) , coerced typ
+          TUnOp(op,va) , coerce_type typ
       end
     | SizeOf t -> TSizeOf t, ctyp
     | SizeOfE e -> TSizeOf (Cil.typeOf e), ctyp
