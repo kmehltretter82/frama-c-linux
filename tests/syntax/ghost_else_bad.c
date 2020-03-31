@@ -1,6 +1,6 @@
 /* run.config
    OPT: -no-autoload-plugins -cpp-extra-args="-DERROR_LOC_WITH_COMMENTS"
-   OPT: -no-autoload-plugins -cpp-extra-args="-DALREADY_HAS_ELSE" -print
+   OPT: -no-autoload-plugins -cpp-extra-args="-DALREADY_HAS_ELSE" -print -kernel-warn-key ghost:bad-use=feedback
    OPT: -no-autoload-plugins -cpp-extra-args="-DBAD_ANNOT_POSITION"
 */
 
@@ -22,7 +22,7 @@ void if_ghost_else_block_comments_then_error(int x, int y) {
 
 #endif
 
-#ifdef ALREADY_HAS_ELSE 
+#ifdef ALREADY_HAS_ELSE
 // Must warn that the ghost else cannot appear since there is already a else
 // Thus the ghost else is ignored and the resulting code does not comprise it
 
