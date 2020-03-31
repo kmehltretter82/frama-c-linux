@@ -270,13 +270,21 @@ let mk_cast ?(loc=Cil_datatype.Location.unknown) ?(force=false) newt t =
 let real_of_float s f =
   { r_literal = s ; r_nearest = f ; r_upper = f ; r_lower = f }
 
+let real_of_parsed s p =
+  let open Floating_point in
+  {
+    r_literal = s ; r_nearest = p.f_nearest ;
+    r_upper = p.f_upper ;
+    r_lower = p.f_lower ;
+  }
+
 let constant_to_lconstant c = match c with
   | CInt64(i,_,s) -> Integer (i,s)
   | CStr s -> LStr s
   | CWStr s -> LWStr s
   | CChr s -> LChr s
-  | CReal (f,_,Some s) -> LReal (real_of_float s f)
   | CEnum e -> LEnum e
+  | CReal (f,_,Some s) -> LReal (real_of_float s f)
   | CReal (f,fkind,None) ->
     let s = match fkind with
       | FFloat -> Format.sprintf "%.8ef" f
@@ -292,20 +300,25 @@ let lconstant_to_constant c = match c with
   | LReal r -> CReal (r.r_nearest,FDouble,Some r.r_literal)
   | LEnum e -> CEnum e
 
-let string_to_float_lconstant string =
-  let f = snd (Floating_point.parse string) in
+let parse_float ?loc literal =
+  let fk,v = Floating_point.parse literal in
   (* If the string has suffix 'F' or 'D', then it represents a single or double
      constant and the nearest parsed float is exact. Otherwise, use the upper
      and lower float computed by [parse]. *)
-  let l = String.length string - 1 in
-  let last = Char.uppercase_ascii string.[l] in
-  let exact = last = 'F' || last = 'D' in
-  if exact
-  then LReal (real_of_float string f.Floating_point.f_nearest)
-  else
-    let open Floating_point in
-    LReal { r_nearest = f.f_nearest; r_upper = f.f_upper; r_lower = f.f_lower;
-            r_literal = string }
+  let is_flt =
+    let len = String.length literal in
+    let last = Char.uppercase_ascii literal.[len-1] in
+    last = 'F' || last = 'D'
+  in
+  let creal =
+    if is_flt
+    then real_of_float literal v.Floating_point.f_nearest
+    else real_of_parsed literal v in
+  let vreal = Logic_const.term ?loc (TConst(LReal creal)) Lreal in
+  if is_flt then
+    let ty = TFloat(fk,[]) in
+    Logic_const.term ?loc (TCastE(ty,vreal)) (Ctype ty)
+  else vreal
 
 let mk_coerce ltyp t =
   Logic_const.term ~loc:t.term_loc (TLogic_coerce(ltyp, t)) ltyp
@@ -314,7 +327,9 @@ let numeric_coerce ltyp t =
   let oldt = unroll_type t.term_type in
   if Cil_datatype.Logic_type.equal oldt ltyp then t
   else match t.term_node with
-    | TLogic_coerce(lt,e) when Cil.no_op_coerce lt e -> mk_coerce ltyp e
+    | TLogic_coerce(lt,e) when Cil.no_op_coerce lt e ->
+      (* coercion hidden by the printer, but still present *)
+      mk_coerce ltyp e
     | TConst(Integer _) when ltyp = Linteger -> { t with term_type = Linteger }
     | TConst(LReal _ ) when ltyp = Lreal -> { t with term_type = Lreal }
     | TCastE(ty,e) ->

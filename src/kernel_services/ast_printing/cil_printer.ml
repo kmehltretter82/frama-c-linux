@@ -2432,7 +2432,13 @@ class cil_printer () = object (self)
     | TBinOp (op,l,r) ->
       fprintf fmt "@[%a@ %a@ %a@]" term l self#term_binop op term r
     | TCastE (ty,e) ->
-      fprintf fmt "(%a)%a" (self#typ None) ty term e
+      begin match ty, t.term_node with
+        | TFloat(fk,_) , TConst(LReal r as cst) when
+            r.r_upper = r.r_lower && Cil.isFiniteFloat fk r.r_nearest ->
+          self#logic_constant fmt cst
+        | _ ->
+          fprintf fmt "(%a)%a" (self#typ None) ty term e
+      end
     | TAddrOf lv ->
       fprintf fmt "&%a" (self#term_lval_prec Precedence.addrOfLevel) lv
     | TStartOf lv -> fprintf fmt "(%a)%a"

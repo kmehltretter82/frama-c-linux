@@ -29,7 +29,7 @@ open Cil_types
 
 (** exception raised when a parsed logic expression is
     syntactically not well-formed. *)
-exception Not_well_formed of Cil_types.location * string
+exception Not_well_formed of location * string
 
 (** basic utilities for logic terms and predicates. See also {! Logic_const}
     to build terms and predicates.
@@ -109,7 +109,7 @@ val mk_logic_StartOf : term -> term
 (** creates an AddrOf from a TLval. The given logic type is the
     type of the lval.
     @since Neon-20140301 *)
-val mk_logic_AddrOf: ?loc:Cil_types.location -> term_lval -> logic_type -> term
+val mk_logic_AddrOf: ?loc:location -> term_lval -> logic_type -> term
 
 (** [true] if the term is a pointer. *)
 val isLogicPointer : term -> bool
@@ -245,11 +245,16 @@ val offset_to_term_offset : offset -> term_offset
 val constant_to_lconstant: constant -> logic_constant
 val lconstant_to_constant: logic_constant-> constant
 
-(** Parse the given string as a float logic constant, taking into account
-    the fact that the constant may not be exactly representable. This
-    function should only be called on strings that have been recognized
-    by the parser as valid floats *)
-val string_to_float_lconstant: string -> logic_constant
+(** Parse the given string as a float or real logic constant.
+
+    The parsed literal is always kept as it is in the resulting term.
+    The returned term is either a real constant or
+    real constant casted into a C-float type.
+
+    Unsuffised constants are considered as real numbers.
+    Literals suffixed by ['f'] or ['d'] are
+    considered as float constants. *)
+val parse_float : ?loc:location -> string -> term
 
 (** {2 Various Utilities} *)
 
@@ -406,7 +411,7 @@ val concat_allocation: allocation -> allocation -> allocation
 val merge_allocation : allocation -> allocation -> allocation
 
 val merge_behaviors :
-  ?oldloc:Cil_types.location -> silent:bool -> funbehavior list -> funbehavior list -> funbehavior list
+  ?oldloc:location -> silent:bool -> funbehavior list -> funbehavior list -> funbehavior list
 
 (** [merge_funspec ?oldloc oldspec newspec] merges [newspec] into [oldspec].
     If the funspec belongs to a kernel function, do not forget to call
@@ -414,7 +419,7 @@ val merge_behaviors :
     @modify 20.0-Calcium add optional parameter [oldloc].
 *)
 val merge_funspec :
-  ?oldloc:Cil_types.location -> ?silent_about_merging_behav:bool ->
+  ?oldloc:location -> ?silent_about_merging_behav:bool ->
   funspec -> funspec -> unit
 
 (** Reset the given funspec to empty.

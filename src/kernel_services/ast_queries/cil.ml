@@ -3638,7 +3638,7 @@ let typeOf_array_elem t =
 
 let no_op_coerce typ t =
   match typ with
-  | Lreal -> isLogicRealOrFloatType t.term_type
+  | Lreal -> isLogicArithmeticType t.term_type
   | Linteger -> isLogicIntegralType t.term_type
   | Ltype _ when Logic_const.is_boolean_type typ ->
     isLogicPureBooleanType t.term_type
