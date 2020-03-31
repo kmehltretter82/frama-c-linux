@@ -366,10 +366,12 @@ let () =
     (alloc_fresh Weak Base.Malloc)
     ~typ:(fun () -> (Cil.voidPtrType, [Cil.theMachine.Cil.typeOfSizeOf]))
 
+module Base_with_Size = Datatype.Pair (Base.Base) (Datatype.Integer)
+
 (* Extremely aggressive and imprecise allocation: a single weak base for each
    region. *)
 module MallocedSingleMalloc =
-  State_builder.Option_ref(Base.Base)
+  State_builder.Option_ref (Base_with_Size)
     (struct
       let name = "Value.Builtins_malloc.MallocedSingleMalloc"
       let dependencies = [Ast.self]
@@ -377,7 +379,7 @@ module MallocedSingleMalloc =
 let () = Ast.add_monotonic_state MallocedSingleMalloc.self
 
 module MallocedSingleVLA =
-  State_builder.Option_ref(Base.Base)
+  State_builder.Option_ref (Base_with_Size)
     (struct
       let name = "Value.Builtins_malloc.MallocedSingleVLA"
       let dependencies = [Ast.self]
@@ -385,7 +387,7 @@ module MallocedSingleVLA =
 let () = Ast.add_monotonic_state MallocedSingleVLA.self
 
 module MallocedSingleAlloca =
-  State_builder.Option_ref(Base.Base)
+  State_builder.Option_ref (Base_with_Size)
     (struct
       let name = "Value.Builtins_malloc.MallocedSingleAlloca"
       let dependencies = [Ast.self]
@@ -398,7 +400,7 @@ let string_of_region = function
   | Base.Alloca -> "via alloca"
 
 (* Only called when the 'weakest base' needs to be allocated. *)
-let alloc_imprecise_weakest_alloc region _stack _prefix _sizev _state =
+let alloc_imprecise_weakest_alloc region =
   let stack = [ fst (Globals.entry_point ()), Kglobal ] in
   let type_base =
     TArray (Cil.charType, None, Cil.empty_size_cache (), [])
@@ -407,34 +409,28 @@ let alloc_imprecise_weakest_alloc region _stack _prefix _sizev _state =
   Value_parameters.warning ~wkey:wkey_imprecise_alloc ~current:true ~once:true
     "allocating a single weak variable for ALL dynamic allocations %s: %a"
     (string_of_region region) Printer.pp_varinfo var;
-  let variable_v = Base.create_variable_validity ~weak:true
-      ~min_alloc:Int.minus_one ~max_alloc:(Bit_utils.max_bit_address ())  in
+  let min_alloc = Int.minus_one in
+  let max_alloc = Bit_utils.max_bit_address () in
+  let variable_v =
+    Base.create_variable_validity ~weak:true ~min_alloc ~max_alloc
+  in
   let new_base = Base.register_allocated_var var region (Base.Variable variable_v) in
   register_malloced_base ~stack new_base;
-  new_base, Bit_utils.max_bit_address ()
+  new_base, max_alloc
 
 (* used by calloc_abstract *)
-let alloc_imprecise_weakest_abstract region _stack _prefix _sizev state =
-  let datatype_get_option, datatype_set =
+let alloc_imprecise_weakest_abstract region =
+  let memo =
     match region with
-    | Base.Malloc -> MallocedSingleMalloc.get_option, MallocedSingleMalloc.set
-    | Base.VLA -> MallocedSingleVLA.get_option, MallocedSingleVLA.set
-    | Base.Alloca -> MallocedSingleAlloca.get_option, MallocedSingleAlloca.set
+    | Base.Malloc -> MallocedSingleMalloc.memo
+    | Base.VLA -> MallocedSingleVLA.memo
+    | Base.Alloca -> MallocedSingleAlloca.memo
   in
-  match datatype_get_option () with
-  | None ->
-    let new_base, _ as r =
-      alloc_imprecise_weakest_alloc region _stack _prefix _sizev state
-    in
-    datatype_set new_base;
-    r
-  | Some base -> base, Bit_utils.max_bit_address ()
+  memo (fun () -> alloc_imprecise_weakest_alloc region)
 
 let alloc_imprecise_weakest_aux region _stack _prefix _sizev state =
-  let new_base, _ = alloc_imprecise_weakest_abstract region _stack _prefix _sizev state in
-  let new_state =
-    add_uninitialized state new_base (Bit_utils.max_bit_address ())
-  in
+  let new_base, max_alloc = alloc_imprecise_weakest_abstract region in
+  let new_state = add_uninitialized state new_base max_alloc in
   let ret = V.inject new_base Ival.zero in
   ret, new_state
 
@@ -516,7 +512,7 @@ let () =
 (* Variables that have been returned by a call to an allocation function
    at this callstack. The first allocated variable is at the top of the
    stack. Currently, the callstacks are truncated according to
-   [-val-malloc-functions]. *)
+   [-eva-alloc-functions]. *)
 module MallocedByStack = (* varinfo list Callstack.hashtbl *)
   State_builder.Hashtbl(Value_types.Callstack.Hashtbl)
     (Datatype.List(Base))
@@ -628,7 +624,10 @@ let () = Builtins.register_builtin
 
 (* Equivalent to [malloc_imprecise_weakest], but for [calloc]. *)
 let calloc_imprecise_weakest : Db.Value.builtin = fun state actuals ->
-  calloc_abstract (alloc_imprecise_weakest_abstract Base.Malloc) state actuals
+  let calloc_f _stack _prefix _sizev _state =
+    alloc_imprecise_weakest_abstract Base.Malloc
+  in
+  calloc_abstract calloc_f state actuals
 
 let () = Builtins.register_builtin
     "Frama_C_calloc_imprecise_weakest" calloc_imprecise_weakest
