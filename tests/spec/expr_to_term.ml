@@ -2,7 +2,7 @@ open Cil_types
 
 let emitter = Emitter.(create "Test" [Funspec] ~correctness:[] ~tuning:[])
 
-let check_expr_term check fct s e =
+let check_expr_term check fct s post =
   let exp =
     match s.skind with
       | Instr (Set (lv,_,loc)) -> Cil.new_exp ~loc (Lval lv)
@@ -10,12 +10,11 @@ let check_expr_term check fct s e =
       | _ -> Kernel.fatal "Unexpected statement %a" Printer.pp_stmt s
   in
   let term =
-    match e with
+    match post with
       | (_, { ip_content = { pred_content = Papp(_,_,[l;_]) } }) -> l
-      | _ -> Kernel.fatal "Unexpected ensures %a" Printer.pp_post_cond e
+      | _ -> Kernel.fatal "Unexpected ensures %a" Printer.pp_post_cond post
   in
-  let term' = Logic_utils.expr_to_term ~coerce:true exp in
-  let term' = Logic_utils.mk_cast Cil.intType term' in
+  let term' = Logic_utils.expr_to_term ~coerce:false exp in
   if check && not (Cil_datatype.Term.equal term term') then
     Kernel.fatal
       "translation of C expression %a is %a, inconsistent with logic term %a"
@@ -52,9 +51,12 @@ let compute () =
   let main = Globals.Functions.find_by_name "main" in
   let f = Globals.Functions.find_by_name "f" in
   let g = Globals.Functions.find_by_name "g" in
-  treat_fct true main;
-  treat_fct false f;
-  treat_fct true g
-
+  let h = Globals.Functions.find_by_name "h" in
+  begin
+    treat_fct true main;
+    treat_fct false f;
+    treat_fct true g;
+    treat_fct true h;
+  end
 
 let () = Db.Main.extend compute
