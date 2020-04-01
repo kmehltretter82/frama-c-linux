@@ -81,7 +81,8 @@ let call_stack_no_wrappers () =
 
 let register_malloced_base ?(stack=call_stack_no_wrappers ()) b =
   let stack_without_top = List.tl stack in
-  Dynamic_Alloc_Bases.set (Base_hptmap.add b stack_without_top (Dynamic_Alloc_Bases.get ()))
+  Dynamic_Alloc_Bases.set
+    (Base_hptmap.add b stack_without_top (Dynamic_Alloc_Bases.get ()))
 
 let fold_dynamic_bases (f: Base.t -> Value_types.Callstack.t -> 'a -> 'a) init =
   Base_hptmap.fold f (Dynamic_Alloc_Bases.get ()) init
@@ -314,12 +315,12 @@ let pp_validity fmt (v1, v2) =
 
 (** {1 Malloc} *)
 
-(* Create a new variable of size [sizev] with deallocation type [deallocation],
-   using [stack] to infer a type.
+(* Create a new variable of size [sizev] with deallocation type [deallocation].
    Returns the new base, and its maximum validity.
    Note that [_state] is not used, but it is present to ensure a compatible
    signature with [alloc_by_stack]. *)
-let alloc_abstract weak deallocation stack prefix sizev _state =
+let alloc_abstract weak deallocation prefix sizev _state =
+  let stack = call_stack_no_wrappers () in
   let tsize = guess_intended_malloc_type stack sizev (weak = Strong) in
   let type_base = type_from_nb_elems tsize in
   let var = create_new_var stack prefix type_base weak in
@@ -345,8 +346,7 @@ let alloc_abstract weak deallocation stack prefix sizev _state =
 let alloc_fresh ?(prefix="malloc") weak region state actuals =
   match actuals with
   | [_, size, _] ->
-    let stack = call_stack_no_wrappers () in
-    let base, max_valid = alloc_abstract weak region stack prefix size state in
+    let base, max_valid = alloc_abstract weak region prefix size state in
     let new_state = add_uninitialized state base max_valid in
     let ret = V.inject base Ival.zero in
     let c_values = wrap_fallible_alloc ret state new_state in
@@ -467,7 +467,6 @@ let alloc_size_ok intended_size =
 (* Generic function used both by [calloc_size] and [calloc_by_stack].
    [calloc_f] is the actual function used (calloc_size or calloc_by_stack). *)
 let calloc_abstract calloc_f state actuals =
-  let stack = call_stack_no_wrappers () in
   let nmemb, sizev =
     match actuals with
     | [(_exp, nmemb, _); (_, size, _)] -> nmemb, size
@@ -485,7 +484,7 @@ let calloc_abstract calloc_f state actuals =
       c_from = None;
     }
   else
-    let base, max_valid = calloc_f stack "calloc" alloc_size state in
+    let base, max_valid = calloc_f "calloc" alloc_size state in
     let new_state = add_zeroes state base max_valid in
     let returns_null = if size_ok = Alarmset.Unknown then Some true else None in
     let ret = V.inject base Ival.zero in
@@ -551,7 +550,8 @@ let update_variable_validity ?(make_weak=false) base sizev =
     base, max_valid_bits
   | _ -> Value_parameters.fatal "base is not Allocated: %a" Base.pretty base
 
-let alloc_by_stack_aux region stack prefix sizev state =
+let alloc_by_stack_aux region prefix sizev state =
+  let stack = call_stack_no_wrappers () in
   let max_level = Value_parameters.MallocLevel.get () in
   let all_vars =
     try MallocedByStack.find stack
@@ -560,7 +560,7 @@ let alloc_by_stack_aux region stack prefix sizev state =
   let rec aux nb vars =
     match vars with
     | [] -> (* must allocate a new variable *)
-      let b, _ as r = alloc_abstract Strong region stack prefix sizev state in
+      let b, _ as r = alloc_abstract Strong region prefix sizev state in
       MallocedByStack.replace stack (all_vars @ [b]);
       r
     | b :: q ->
@@ -579,12 +579,11 @@ let alloc_by_stack_aux region stack prefix sizev state =
    distinct locations. The following allocations all return the same
    base, first strong, then weak, and which is extended as needed. *)
 let alloc_by_stack ?(prefix="malloc") region ?returns_null : Db.Value.builtin = fun state actuals->
-  let stack = call_stack_no_wrappers () in
   let sizev = match actuals with
     | [_,size,_] -> size
     | _ -> raise (Builtins.Invalid_nb_of_args 1)
   in
-  let base, max_valid = alloc_by_stack_aux region stack prefix sizev state in
+  let base, max_valid = alloc_by_stack_aux region prefix sizev state in
   let new_state = add_uninitialized state base max_valid in
   let ret = V.inject base Ival.zero in
   let c_values = wrap_fallible_alloc ?returns_null ret state new_state in
@@ -624,7 +623,7 @@ let () = Builtins.register_builtin
 
 (* Equivalent to [malloc_imprecise_weakest], but for [calloc]. *)
 let calloc_imprecise_weakest : Db.Value.builtin = fun state actuals ->
-  let calloc_f _stack _prefix _sizev _state =
+  let calloc_f _prefix _sizev _state =
     alloc_imprecise_weakest_abstract Base.Malloc
   in
   calloc_abstract calloc_f state actuals
@@ -826,12 +825,11 @@ let realloc_alloc_copy weak bases_to_realloc null_in_arg sizev state =
     Base.Hptset.pretty bases_to_realloc;
   assert (not (Model.(equal state bottom || equal state top)));
   let _size_valid, size_max = extract_size sizev in (* bytes everywhere *)
-  let stack = call_stack_no_wrappers () in
   let base, max_valid =
     let prefix = "realloc" in
     match weak with
-    | Strong -> alloc_abstract Strong Base.Malloc stack prefix sizev state
-    | Weak -> alloc_by_stack_aux Base.Malloc stack prefix sizev state
+    | Strong -> alloc_abstract Strong Base.Malloc prefix sizev state
+    | Weak -> alloc_by_stack_aux Base.Malloc prefix sizev state
   in
   (* Make sure that [ret] will be present in the result: we bind it at least
      to bottom everywhere *)
