@@ -1,5 +1,5 @@
 /* run.config*
-OPT: -slice-pragma main
+OPT: -slice-pragma main -then-last -print
 */
 int g(int x) { return x; }
 
