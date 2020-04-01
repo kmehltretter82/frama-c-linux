@@ -404,7 +404,7 @@ let float_builtin prefix fkind =
   | _ -> Kernel.fatal "Missing or ambiguous builtin %S" name
 
 let get_float_binop op typ =
-  match typ, op with
+  match Cil.unrollType typ, op with
   | TFloat(fkind,_) , PlusA  -> float_builtin "add" fkind
   | TFloat(fkind,_) , MinusA -> float_builtin "sub" fkind
   | TFloat(fkind,_) , Mult   -> float_builtin "mul" fkind
@@ -412,13 +412,13 @@ let get_float_binop op typ =
   | _ -> None
 
 let get_float_unop op typ =
-  match typ, op with
+  match Cil.unrollType typ, op with
   | TFloat(fkind,_) , Neg  -> float_builtin "neg" fkind
   | _ -> None
 
 let rec expr_to_term ?(coerce=false) e =
   let loc = e.eloc in
-  let typ = Cil.unrollType (Cil.typeOf e) in
+  let typ = Cil.typeOf e in
   let ctyp = Ctype typ in
   let node,ltyp =
     match e.enode with
@@ -468,10 +468,12 @@ let rec expr_to_term ?(coerce=false) e =
       t.term_node , t.term_type
   in
   let v = mk_cast ~loc typ @@ Logic_const.term ~loc node ltyp in
-  match typ with
-  | TInt _ when coerce -> numeric_coerce Linteger v
-  | TFloat _ when coerce -> numeric_coerce Lreal v
-  | _ -> v
+  if coerce then
+    match Cil.unrollType typ with
+    | TInt _ -> numeric_coerce Linteger v
+    | TFloat _ -> numeric_coerce Lreal v
+    | _ -> v
+  else v
 
 and lval_to_term_lval (host,offset) =
   host_to_term_lhost host, offset_to_term_offset offset
