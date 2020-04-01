@@ -581,24 +581,26 @@ int g(int y)
       ensures
         \at(aorai_CurStates ≡ init,Pre) ∧
         aorai_CurStates ≡ aorai_reject ⇒
-        aorai_x_0 ≡ \at(1,Pre) + 0 ∨ aorai_x_0 ≡ \at(aorai_x_0,Pre) + 0;
+        aorai_x_0 ≡ \at(aorai_x_0,Pre) + 0 ∨
+        aorai_x_0 ≡ \at((int)1,Pre) + 0;
       ensures
         \at(aorai_CurStates ≡ init,Pre) ∧
         aorai_CurStates ≡ aorai_reject ⇒
-        aorai_y ≡ \at(2,Pre) + 0 ∨ aorai_y ≡ \at(aorai_y,Pre) + 0;
+        aorai_y ≡ \at(aorai_y,Pre) + 0 ∨ aorai_y ≡ \at((int)2,Pre) + 0;
       ensures
         \at(aorai_CurStates ≡ init,Pre) ∧
         aorai_CurStates ≡ aorai_reject ⇒
-        aorai_x ≡ \at(1,Pre) + 0 ∨ aorai_x ≡ \at(aorai_x,Pre) + 0;
+        aorai_x ≡ \at(aorai_x,Pre) + 0 ∨ aorai_x ≡ \at((int)1,Pre) + 0;
       ensures
         \at(aorai_CurStates ≡ init,Pre) ∧ aorai_CurStates ≡ OK ⇒
-        aorai_x_0 ≡ \at(1,Pre) + 0 ∨ aorai_x_0 ≡ \at(aorai_x_0,Pre) + 0;
+        aorai_x_0 ≡ \at(aorai_x_0,Pre) + 0 ∨
+        aorai_x_0 ≡ \at((int)1,Pre) + 0;
       ensures
         \at(aorai_CurStates ≡ init,Pre) ∧ aorai_CurStates ≡ OK ⇒
-        aorai_y ≡ \at(2,Pre) + 0 ∨ aorai_y ≡ \at(aorai_y,Pre) + 0;
+        aorai_y ≡ \at(aorai_y,Pre) + 0 ∨ aorai_y ≡ \at((int)2,Pre) + 0;
       ensures
         \at(aorai_CurStates ≡ init,Pre) ∧ aorai_CurStates ≡ OK ⇒
-        aorai_x ≡ \at(1,Pre) + 0 ∨ aorai_x ≡ \at(aorai_x,Pre) + 0;
+        aorai_x ≡ \at(aorai_x,Pre) + 0 ∨ aorai_x ≡ \at((int)1,Pre) + 0;
  */
 int main(void)
 {

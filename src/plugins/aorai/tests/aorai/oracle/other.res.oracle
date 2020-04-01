@@ -525,7 +525,12 @@ void g(void)
      behavior buch_state_last_out:
        ensures 0 ≡ last;
      
+     behavior buch_state_step1_in:
+       assumes 1 ≡ init ∧ x ≡ 3;
+       ensures 1 ≡ step1;
+     
      behavior buch_state_step1_out:
+       assumes 0 ≡ init ∨ ¬(x ≡ 3);
        ensures 0 ≡ step1;
    @/
   void main_pre_func(void)
@@ -538,7 +543,9 @@ void g(void)
     init_tmp = init;
     last_tmp = last;
     step1_tmp = step1;
-    step1_tmp = 0;
+    if (init == 1) 
+      if (x == 3) step1_tmp = 1; else step1_tmp = 0;
+    else step1_tmp = 0;
     last_tmp = 0;
     if (init == 1) 
       if (x != 3) init_tmp = 1; else init_tmp = 0;
@@ -644,7 +651,6 @@ void g(void)
 */
 
 /*@ requires 1 ≡ init ∧ 0 ≡ last ∧ 0 ≡ step1;
-    requires 1 ≡ init ⇒ x ≢ 3;
     
     behavior aorai_acceptance:
       ensures 1 ≡ last;
