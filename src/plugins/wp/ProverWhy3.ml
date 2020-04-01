@@ -574,9 +574,12 @@ let rec of_term ~cnv expected t : Why3.Term.term =
         | ls -> Why3.Term.t_app ls [of_term' cnv a] (of_tau cnv expected)
         | exception Not_found -> why3_failure "Can't find '%s' in why3 namespace" s
       end
-    | Rdef(l), Data(Comp (c, _),_) , _ -> begin
+    | Rdef(l), Data(Comp (c, k),_) , _ -> begin
         (* l is already sorted by field *)
-        let s = Lang.comp_id c in
+        let s = match k with
+          | KValue -> Lang.comp_id c
+          | KInit -> Lang.comp_init_id c
+        in
         match Why3.Theory.(ns_find_ls (get_namespace cnv.th) (cut_path s)) with
         | ls ->
             let l = List.map (fun (_,t) -> of_term' cnv t) l in

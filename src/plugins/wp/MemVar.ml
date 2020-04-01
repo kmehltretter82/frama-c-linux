@@ -726,20 +726,20 @@ struct
   (* ---  Memory Store                                                      --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let rec initialization_value value obj =
+  let rec init_value value obj =
     match obj with
     | C_int _ | C_float _ | C_pointer _ -> value
     | C_comp ci ->
         let make_term f =
-          Cfield (f, KInit), initialization_value value (object_of f.ftype)
+          Cfield (f, KInit), init_value value (object_of f.ftype)
         in
         Lang.F.e_record (List.map make_term ci.cfields)
     | C_array _ as arr ->
         Lang.F.e_const Lang.t_int
-          (initialization_value value (object_of_array_elem arr))
+          (init_value value (object_of_array_elem arr))
 
-  let initialized_obj = initialization_value e_true
-  let uninitialized_obj = initialization_value e_false
+  let initialized_obj = init_value e_true
+  let uninitialized_obj = init_value e_false
 
   let stored seq obj l v = match l with
     | Ref x -> noref ~op:"write to" x
@@ -1030,7 +1030,7 @@ struct
   let rec initialized_loc sigma obj x ofs =
     match obj with
     | C_int _ | C_float _ | C_pointer _ ->
-        e_eq e_true (access_init (get_init_term sigma x) ofs)
+        p_bool (access_init (get_init_term sigma x) ofs)
     | C_array { arr_flat=flat } ->
         let size = match flat with
           | None -> unsized_array ()
@@ -1043,30 +1043,27 @@ struct
           let ofs = ofs @ [Field f] in
           initialized_loc sigma obj x ofs
         in
-        Lang.F.e_and (List.map mk_pred ci.cfields)
+        Lang.F.p_conj (List.map mk_pred ci.cfields)
   and initialized_range sigma obj x ofs low up =
     match obj with
     | C_array { arr_element=t } ->
         let v = Lang.freshvar ~basename:"i" Lang.t_int in
-        let hyp = p_bool (e_and [ (e_leq low (e_var v)) ;
-                                  (e_leq (e_var v) up) ])
-        in
+        let hyp = p_and (p_leq low (e_var v)) (p_leq (e_var v) up) in
         let obj = Ctypes.object_of t in
         let ofs = ofs @ [ Shift(obj, e_var v) ] in
-        let sub = p_bool (initialized_loc sigma obj x ofs) in
-        e_prop (p_forall [v] (p_imply hyp sub))
-    | _ -> raise ShiftMismatch
-
-  let insert_in_array_bounds obj low up p =
-    match obj with
-    | C_array { arr_flat = Some { arr_size } } ->
-      let hyp =
-        e_and [ (e_leq (e_int 0) low) ;
-                (e_leq up (e_int (arr_size - 1))) ]
-      in p_imply (p_bool hyp) p
-    | C_array { arr_flat = None } ->
-      unsized_array ()
-    | _ -> raise ShiftMismatch
+        let sub = initialized_loc sigma obj x ofs in
+        Lang.F.p_forall [v] (p_imply hyp sub)
+    | C_comp _ ->
+        let leaf = match Extlib.last ofs with
+          | Field f -> Ctypes.object_of f.ftype
+          | Shift(obj, _) -> obj
+        in
+        begin match leaf with
+          | C_array _ -> initialized_range sigma leaf x ofs low up
+          | _ -> raise ShiftMismatch
+        end
+    | _ ->
+        raise ShiftMismatch
 
   let initialized sigma l =
     match l with
@@ -1076,11 +1073,12 @@ struct
           | Loc l -> M.initialized sigma.mem (Rloc(obj,l))
           | Val(m,x,p) ->
               if (x.vformal || x.vglob) then
-                p_true
+                try valid_offset RW (vobject m x) p
+                with ShiftMismatch -> shift_mismatch l
               else if is_heap_allocated m then
                 M.initialized sigma.mem (Rloc(obj,mloc_of_loc l))
               else
-                p_bool (initialized_loc sigma obj x p)
+                initialized_loc sigma obj x p
         end
     | Rrange(l,elt, Some a, Some b) ->
         begin match l with
@@ -1088,12 +1086,12 @@ struct
           | Loc l -> M.initialized sigma.mem (Rrange(l,elt,Some a, Some b))
           | Val(m,x,p) ->
               try
-                let guard = insert_in_array_bounds (vobject m x) a b in
-                let p =
+                let in_array = valid_range RW (vobject m x) p (elt, a, b) in
+                let initialized =
                   if x.vformal || x.vglob then p_true
-                  else p_bool (initialized_range sigma (vobject m x) x p a b)
+                  else initialized_range sigma (vobject m x) x p a b
                 in
-                F.p_imply (F.p_leq a b) (guard p)
+                F.p_imply (F.p_leq a b) (p_and in_array initialized)
               with ShiftMismatch ->
                 if is_heap_allocated m then
                   let l = mloc_of_loc l in
