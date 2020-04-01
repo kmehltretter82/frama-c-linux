@@ -37,7 +37,7 @@
 [eva] tests/builtins/malloc.c:33: 
   Call to builtin Frama_C_malloc_imprecise_weakest
 [eva:malloc:imprecise] tests/builtins/malloc.c:33: Warning: 
-  warning: allocating a single weak variable for ALL dynamic allocations via malloc/calloc/realloc: __alloc_w_main
+  allocating a single weak variable for ALL dynamic allocations via malloc/calloc/realloc: __alloc_w_main
 [eva] tests/builtins/malloc.c:33: 
   Call to builtin Frama_C_malloc_imprecise_weakest
 [eva:alarm] tests/builtins/malloc.c:34: Warning: 

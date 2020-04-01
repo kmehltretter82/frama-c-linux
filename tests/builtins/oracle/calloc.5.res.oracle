@@ -7,7 +7,7 @@
 [eva] tests/builtins/calloc.c:14: 
   Call to builtin Frama_C_calloc_imprecise_weakest for function calloc
 [eva:malloc:imprecise] tests/builtins/calloc.c:14: Warning: 
-  warning: allocating a single weak variable for ALL dynamic allocations via malloc/calloc/realloc: __alloc_w_main
+  allocating a single weak variable for ALL dynamic allocations via malloc/calloc/realloc: __alloc_w_main
 [eva] tests/builtins/calloc.c:17: 
   Call to builtin Frama_C_calloc_imprecise_weakest for function calloc
 [eva] tests/builtins/calloc.c:20: 

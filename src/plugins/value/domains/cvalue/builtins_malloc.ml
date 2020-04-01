@@ -405,7 +405,7 @@ let alloc_imprecise_weakest_alloc region _stack _prefix _sizev _state =
   in
   let var = create_new_var stack "alloc" type_base Weak in
   Value_parameters.warning ~wkey:wkey_imprecise_alloc ~current:true ~once:true
-    "@[warning: allocating a single weak variable for ALL dynamic allocations %s: %a@]"
+    "allocating a single weak variable for ALL dynamic allocations %s: %a"
     (string_of_region region) Printer.pp_varinfo var;
   let variable_v = Base.create_variable_validity ~weak:true
       ~min_alloc:Int.minus_one ~max_alloc:(Bit_utils.max_bit_address ())  in
