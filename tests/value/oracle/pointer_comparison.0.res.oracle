@@ -194,7 +194,8 @@
 [eva:alarm] tests/value/pointer_comparison.c:16: Warning: 
   pointer downcast. assert (unsigned int)(&y) ≤ 2147483647;
 [eva:alarm] tests/value/pointer_comparison.c:16: Warning: 
-  pointer comparison. assert \pointer_comparable((void *)p, (void *)(&y));
+  pointer comparison.
+  assert \pointer_comparable((void *)((int)p), (void *)((int)(&y)));
 [eva] tests/value/pointer_comparison.c:16: Frama_C_show_each_5: {{ &x + {16} }}
 [eva] tests/value/pointer_comparison.c:17: Frama_C_show_each_5e: {{ &x + {16} }}
 [eva:alarm] tests/value/pointer_comparison.c:18: Warning: 
@@ -254,7 +255,8 @@
             tried with Eva.
 [    -    ] Assertion 'Eva,ptr_comparison' (file tests/value/pointer_comparison.c, line 16)
             assert
-            Eva: ptr_comparison: \pointer_comparable((void *)p, (void *)(&y));
+            Eva: ptr_comparison:
+              \pointer_comparable((void *)((int)p), (void *)((int)(&y)));
             tried with Eva.
 [    -    ] Assertion 'Eva,ptr_comparison' (file tests/value/pointer_comparison.c, line 18)
             assert
