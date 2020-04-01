@@ -2139,6 +2139,9 @@ val fitsInInt: ikind -> Integer.t -> bool
 (** True if the float is finite for the kind's range *)
 val isFiniteFloat: fkind -> float -> bool
 
+(** True if the real constant is an exact float for the given type *)
+val isExactFloat: fkind -> logic_real -> bool
+
 exception Not_representable
 (** raised by {!intKindForValue}. *)
 

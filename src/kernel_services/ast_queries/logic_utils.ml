@@ -321,7 +321,7 @@ let numeric_coerce ltyp t =
         | Linteger, TInt(ik,_), TConst(Integer(v,_))
           when Cil.fitsInInt ik v -> { e with term_type = Linteger }
         | Lreal, TFloat(fk,_), TConst(LReal r)
-          when Cil.isFiniteFloat fk r.r_nearest -> { e with term_type = Lreal }
+          when Cil.isExactFloat fk r -> { e with term_type = Lreal }
         | Linteger, TInt(ik,_), TConst(LEnum { eival }) ->
           ( match Cil.constFoldToInt eival with
             | Some i when Cil.fitsInInt ik i -> { e with term_type = Linteger }

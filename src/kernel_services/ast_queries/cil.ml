@@ -3070,6 +3070,10 @@ let isFiniteFloat fk v =
   | FFloat -> Floating_point.round_to_single_precision_float v
   | _ -> v
 
+
+let isExactFloat fk r =
+  r.r_upper = r.r_lower && isFiniteFloat fk r.r_nearest
+
 (* Construct an integer constant with possible truncation if the kind is not
    specified  *)
 let kinteger64 ~loc ?repr ?kind i =
