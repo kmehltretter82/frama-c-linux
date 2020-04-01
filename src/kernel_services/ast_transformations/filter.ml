@@ -799,7 +799,7 @@ end = struct
                       variables (both pure C and logical ones)
                    *)
 
-    method private build_proto finfo loc =
+    method private build_proto is_first finfo loc =
       let kf = Extlib.the self#current_kf in
       fi <- Some finfo;
       let new_var = ff_var fun_vars kf finfo in
@@ -855,15 +855,12 @@ end = struct
           action
         in
         let orig_var = Ast_info.Function.get_vi kf.fundec in
-        (* The first copy is also the default one for varinfo that are not handled
-           by ff_var but directly by the visitor *)
-        if (Visitor_behavior.Get.varinfo self#behavior orig_var) == orig_var
-        then
+        (* The first copy is also the default one for varinfo
+           that are not handled by ff_var but directly by the visitor *)
+        if is_first then
           Visitor_behavior.Set.varinfo self#behavior orig_var new_var;
-
-        (* Set the new_var as an already known one, coming from the vi associated
-           to the current kf.
-        *)
+        (* Set the new_var as an already known one,
+           coming from the vi associated to the current kf. *)
         Visitor_behavior.Set.varinfo self#behavior new_var new_var;
         Visitor_behavior.Set_orig.varinfo self#behavior new_var orig_var;
         Visitor_behavior.Set.kernel_function self#behavior kf new_kf;
@@ -887,8 +884,15 @@ end = struct
       debug "@[[compute_fct_prototypes] for %a (x%d)@\n@]@."
         Kernel_function.pretty (Extlib.the self#current_kf)
         (List.length finfo_list);
-      let build_cil_proto finfo = self#build_proto finfo loc
-      in List.map build_cil_proto finfo_list
+      let build_cil_proto is_first finfo =
+        self#build_proto is_first finfo loc
+      in
+      match finfo_list with
+      | [] -> []
+      | hd :: tl ->
+        let hd = build_cil_proto true hd in
+        let tl = List.map (build_cil_proto false) tl in
+        hd :: tl
 
     method private compute_fct_definitions f loc =
       let fvar = f.Cil_types.svar in
@@ -896,9 +900,9 @@ end = struct
       let finfo_list = Info.fct_info pinfo kf in
       debug "@[[compute_fct_definitions] for %a (x%d)@\n@]@."
         Kernel_function.pretty kf (List.length finfo_list);
-      let do_f finfo =
+      let do_f is_first finfo =
         if not (Info.body_visible finfo) then
-          self#build_proto finfo loc
+          self#build_proto is_first finfo loc
         else begin
           let new_fct_var = ff_var fun_vars kf finfo in
           new_fct_var.vdefined <- true;
@@ -937,7 +941,12 @@ end = struct
        | [] | _ :: _ :: _ ->
          let vars = static_from_kf kf in
          List.iter self#remove_local_static_attr vars);
-      List.map do_f finfo_list
+      match finfo_list with
+      | [] -> []
+      | hd :: tl ->
+        let hd = do_f true hd in
+        let tl = List.map (do_f false) tl in
+        hd :: tl
 
     method! vglob_aux g =
       let post action g =
