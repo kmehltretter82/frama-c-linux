@@ -17,6 +17,9 @@
 Open Source Release <next-release>
 ##################################
 
+-   Kernel    [2020/04/01] Report user errors when keys are not bound to a
+              value for command-line options that require pairs of key:value
+              as arguments. Such keys were silently ignored.
 *!  Kernel    [2020/03/30] Reject labels at end of blocks.
 -   RTE       [2020/03/30] Emits alarm on invalid pointers when option is on
 -   Eva       [2020/03/30] Emits alarm on invalid pointers when option is on
@@ -31,7 +34,7 @@ Open Source Release <next-release>
 -   Kernel    [2020/03/20] Add option -cpp-extra-args-per-file
 -*  Kernel    [2020/03/18] Fixes #@823 (-load-module/-load-script now accept
               spaces in filename)
--*  Kernel    [2020/03/18] Fixes #@818 (term generated for downcast alarms) 
+-*  Kernel    [2020/03/18] Fixes #@818 (term generated for downcast alarms)
 -   Eva       [2020/03/17] Supports the ACSL extended quantifiers \min and \max.
 -   Eva       [2020/03/17] deprecate options -eva-*-domain in favor of
               -eva-domains
