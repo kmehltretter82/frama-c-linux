@@ -386,12 +386,11 @@ let index_typ = function
   | TEnum _ -> 8
   | TBuiltin_va_list _ -> 9
 
-let constfoldtoint = ref (fun _ -> failwith "constfoldtoint not yet defined")
-let punrollType =
-  ref (fun _ -> failwith "punrollType not yet defined")
+let constfoldtoint = Extlib.mk_fun "constfoldtoint"
+let punrollType = Extlib.mk_fun "punrollType"
+let punrollLogicType = Extlib.mk_fun "punrollLogicType"
 let drop_non_logic_attributes = ref (fun a -> a)
-let compare_exp_struct_eq =
-  ref (fun _ -> failwith "compare_exp_struct_eq not yet defined")
+let compare_exp_struct_eq = Extlib.mk_fun "compare_exp_struct_eq"
 
 type type_compare_config =
   { by_name : bool;
@@ -1320,12 +1319,8 @@ let rec compare_logic_type config v1 v2 =
     | Ltype _ -> 4
     | Larrow _ -> 5
   in
-  let rec unroll = function
-    | Ltype({lt_def = Some (LTsyn t)},[]) -> unroll t
-    (*TODO: instanciate polymorphic types *)
-    | t -> t in
-  let v1 = if config.unroll then unroll v1 else v1 in
-  let v2 = if config.unroll then unroll v2 else v2 in
+  let v1 = if config.unroll then !punrollLogicType v1 else v1 in
+  let v2 = if config.unroll then !punrollLogicType v2 else v2 in
   let k1 = rank v1 in
   let k2 = rank v2 in
   if k1 <> k2 then

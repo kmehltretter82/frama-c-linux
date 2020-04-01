@@ -2637,6 +2637,8 @@ class simplify_const_lval global_find_init = object (self)
     | _ -> Cil.DoChildren
 end
 
+let () = Cil_datatype.punrollLogicType := unroll_type
+
 (* ************************************************************************** *)
 (** {1 Deprecated} *)
 let instantiate = Logic_const.instantiate
