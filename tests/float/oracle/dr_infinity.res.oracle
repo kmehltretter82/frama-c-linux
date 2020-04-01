@@ -27,10 +27,9 @@
 [eva:alarm] tests/float/dr_infinity.i:16: Warning: 
   non-finite float value. assert \is_finite(\mul_float(x, x));
 [eva:alarm] tests/float/dr_infinity.i:21: Warning: 
-  non-finite double value.
-  assert \is_finite(\mul_double(d, (double)((int)10)));
+  non-finite double value. assert \is_finite(\mul_double(d, (double)10));
 [eva:alarm] tests/float/dr_infinity.i:26: Warning: 
-  non-finite double value. assert \is_finite(\div_double((double)((int)2), d));
+  non-finite double value. assert \is_finite(\div_double((double)2, d));
 [eva:alarm] tests/float/dr_infinity.i:31: Warning: 
   non-finite double value. assert \is_finite(\div_double(d, (double)0.01));
 [eva:alarm] tests/float/dr_infinity.i:36: Warning: 

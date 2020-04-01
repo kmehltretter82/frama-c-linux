@@ -195,7 +195,7 @@
 [eva:alarm] tests/float/nonlin.c:77: Warning: 
   non-finite double value.
   assert
-  \is_finite(\div_double((double)((int)1),
+  \is_finite(\div_double((double)1,
                         \add_double(\mul_double((double)ff, (double)ff),
                                    (double)0.000000001)));
 [eva] Recording results for split_alarm
