@@ -39,7 +39,7 @@ enum e f(enum e x)
   return __retres;
 }
 
-/*@ ensures P: \result ≡ (unsigned int)E0; */
+/*@ ensures P: \result ≡ E0; */
 enum e g(enum e x)
 {
   enum e __retres;

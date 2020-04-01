@@ -227,13 +227,6 @@ let equal_ltype = Cil_datatype.Logic_type.equal
 let mk_cast ?loc ?(force=false) newt t =
   let newt = Cil.type_remove_attributes_for_logic_type newt in
   if equal_ltype (Ctype newt) t.term_type then t else
-    (*
-    let rec is_iconst e = match e.term_node with
-      | TCastE(ty,e) when Cil.isArithmeticOrPointerType ty -> is_iconst e
-      | TLogic_coerce(Linteger,e) -> is_iconst e
-      | TConst(Integer _) -> true
-      | _ -> false in
-    *)
     let rec unroll_cast e = match e.term_node with
       | TCastE(oldt,e)
         when (Cil.isPointerType newt && Cil.isPointerType oldt)
@@ -248,8 +241,8 @@ let mk_cast ?loc ?(force=false) newt t =
       | _ -> e
     in
     let tres = if force then t else unroll_cast t in
-  let loc = match loc with None -> t.term_loc | Some loc -> loc in
-  Logic_const.term ~loc (TCastE (newt, tres)) (Ctype newt)
+    let loc = match loc with None -> t.term_loc | Some loc -> loc in
+    Logic_const.term ~loc (TCastE (newt, tres)) (Ctype newt)
 
 
 (* -------------------------------------------------------------------------- *)
@@ -319,14 +312,20 @@ let numeric_coerce ltyp t =
     | TLogic_coerce(lt,e) when Cil.no_op_coerce lt e ->
       (* coercion hidden by the printer, but still present *)
       mk_coerce ltyp e
-    | TConst(Integer _) when ltyp = Linteger -> { t with term_type = Linteger }
-    | TConst(LReal _ ) when ltyp = Lreal -> { t with term_type = Lreal }
+    | TConst(LEnum _) | TConst(Integer _) when ltyp = Linteger
+      -> { t with term_type = Linteger }
+    | TConst(LReal _ ) when ltyp = Lreal ->
+      { t with term_type = Lreal }
     | TCastE(ty,e) ->
       begin match ltyp, Cil.unrollType ty, e.term_node with
         | Linteger, TInt(ik,_), TConst(Integer(v,_))
           when Cil.fitsInInt ik v -> { e with term_type = Linteger }
         | Lreal, TFloat(fk,_), TConst(LReal r)
           when Cil.isFiniteFloat fk r.r_nearest -> { e with term_type = Lreal }
+        | Linteger, TInt(ik,_), TConst(LEnum { eival }) ->
+          ( match Cil.constFoldToInt eival with
+            | Some i when Cil.fitsInInt ik i -> { e with term_type = Linteger }
+            | _ -> mk_coerce ltyp t )
         | _ -> mk_coerce ltyp t
       end
     | _ -> mk_coerce ltyp t
