@@ -1320,17 +1320,19 @@ let rec compare_logic_type config v1 v2 =
     | Ltype _ -> 4
     | Larrow _ -> 5
   in
+  let rec unroll = function
+    | Ltype({lt_def = Some (LTsyn t)},[]) -> unroll t
+    (*TODO: instanciate polymorphic types *)
+    | t -> t in
+  let v1 = if config.unroll then unroll v1 else v1 in
+  let v2 = if config.unroll then unroll v2 else v2 in
   let k1 = rank v1 in
   let k2 = rank v2 in
-  if k1 <> k2 then k1-k2
+  if k1 <> k2 then
+    k1-k2
   else
     match v1,v2 with
     | Ctype t1 , Ctype t2 -> compare_type config t1 t2
-    | Ltype ({lt_def = Some (LTsyn t1)},ts1),
-      Ltype ({lt_def = Some (LTsyn t2)},ts2) when config.unroll ->
-      let c = compare_logic_type config t1 t2 in
-      if c <> 0 then c
-      else compare_list (compare_logic_type config) ts1 ts2
     | Ltype(a,ts1), Ltype(b,ts2) ->
       let c = Logic_type_info.compare a b in
       if c <> 0 then c
