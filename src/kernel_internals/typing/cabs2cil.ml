@@ -1585,7 +1585,9 @@ struct
           end else SkipChildren
       end
     in
-    let cleanup_var vi = vi.vtype <- Cil.visitCilType cleanup_types vi.vtype in
+    let cleanup_var vi =
+      Cil.update_var_type vi (Cil.visitCilType cleanup_types vi.vtype)
+    in
     List.iter cleanup_var c.locals;
     !currentFunctionFDEC.slocals <- !currentFunctionFDEC.slocals @ !vars;
     let vars = !vars @ c.locals in
@@ -4332,7 +4334,7 @@ let fixFormalsType formals =
     end
   in
   let treat_one_formal v =
-    v.vtype <- Cil.visitCilType vis v.vtype;
+    Cil.update_var_type v (Cil.visitCilType vis v.vtype);
     Hashtbl.add table v.vname v;
   in
   List.iter treat_one_formal formals

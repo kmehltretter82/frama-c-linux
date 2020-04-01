@@ -40,7 +40,7 @@ class transform prj = object(_self)
 		    typ, Some (vtype @ [ "ok", Cil.intType, [] ]),
 		    varity, attr)
 		  in
-                  vi.vtype <- new_fun_typ;
+                  Cil.update_var_type vi new_fun_typ;
 		  Project.on
 		    prj
 		    (fun () -> Cil.setFormalsDecl vi new_fun_typ;) ();

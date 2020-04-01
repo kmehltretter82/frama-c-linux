@@ -540,7 +540,9 @@ and varinfo = {
   (** the original name of the variable. Need not be unique. *)
 
   mutable vtype: typ;
-  (** The declared type of the variable. *)
+  (** The declared type of the variable. For modifications of the field,
+      {!Cil.update_var_type} helps in synchronizing the type of the C
+      variable and the one of the associated logic variable. *)
 
   mutable vattr: attributes;
   (** A list of attributes associated with the variable.*)

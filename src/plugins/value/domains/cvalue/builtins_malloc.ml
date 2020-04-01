@@ -454,7 +454,7 @@ let update_variable_validity ?(make_weak=false) base sizev =
       (* Mutating the type of a varinfo is not exactly a good idea. This is
          probably fine here, because the type of a malloced variable is
          almost never used. *)
-      vi.vtype <- weaken_type vi.vtype;
+      Cil.update_var_type vi (weaken_type vi.vtype);
     end;
     Base.update_variable_validity variable_v
       ~weak:make_weak ~min_alloc:min_sure_bits ~max_alloc:max_valid_bits;
