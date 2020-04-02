@@ -72,5 +72,5 @@
                      [1] ∈ UNINITIALIZED
                      [2] ∈ {3}
                      [3..24] ∈ UNINITIALIZED
-  __alloc_w_main[bits 0 to 31] ∈ {1} or UNINITIALIZED
+  __alloc_w_main[bits 0 to 31] ∈ {1; 2} or UNINITIALIZED
                 [4..4294967295] ∈ UNINITIALIZED

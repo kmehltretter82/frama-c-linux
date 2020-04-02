@@ -33,7 +33,7 @@ void main(int c) {
   int *mw = Frama_C_malloc_imprecise(42);
   *mw = 1;
   int *mw2 = Frama_C_malloc_imprecise(42);
-  *mw2 = 1;
+  *mw2 = 2;
 
   //  *s = 1;
 }
