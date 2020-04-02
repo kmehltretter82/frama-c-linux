@@ -156,12 +156,12 @@ regardless of the value of the option.)
   does not perform illegal pointer arithmetics, creating pointers that do not
   point inside an object or one past an object.
   This option is disabled by default, allowing the creation of such invalid
-  pointers without alarm — but the dereference of an invalid pointer
-  \emph{always} generate an alarm.
+  pointers without alarm — but the dereferencing of an invalid pointer
+  \emph{always} generates an alarm.
 
   For instance, no error is detected by default in the following example, as
-  the dereference is correct. However, if option \texttt{-warn-invalid-pointer}
-  is enabled, an error is detected at line 4.
+  the dereferencing is correct. However, if option
+  \texttt{-warn-invalid-pointer} is enabled, an error is detected at line 4.
   \begin{ccode}
     int x;
     int *p = &x;
