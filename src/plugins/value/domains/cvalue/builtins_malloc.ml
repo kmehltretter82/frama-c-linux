@@ -434,12 +434,12 @@ let alloc_imprecise_weakest_aux region _stack _prefix _sizev state =
   let ret = V.inject new_base Ival.zero in
   ret, new_state
 
-let alloc_imprecise_weakest region state actuals =
+let alloc_imprecise_weakest ?returns_null region state actuals =
   match actuals with
   | [_, _size, _] ->
     begin
       let ret, new_state = alloc_imprecise_weakest_aux region [] "" _size state in
-      let c_values = wrap_fallible_alloc ret state new_state in
+      let c_values = wrap_fallible_alloc ?returns_null ret state new_state in
       { Value_types.c_values = c_values ;
         c_clobbered = Base.SetLattice.bottom;
         c_cacheable = Value_types.NoCacheCallers;
@@ -602,7 +602,7 @@ let () = Builtins.register_builtin
     ~typ:(fun () -> (Cil.voidPtrType, [Cil.theMachine.Cil.typeOfSizeOf]))
 let () = Builtins.register_builtin
     "Frama_C_vla_alloc_imprecise_weakest"
-    (alloc_imprecise_weakest Base.VLA)
+    (alloc_imprecise_weakest Base.VLA ~returns_null:false)
     ~typ:(fun () -> (Cil.voidPtrType, [Cil.theMachine.Cil.typeOfSizeOf]))
 let () = Builtins.register_builtin
     ~replace:"alloca" "Frama_C_alloca"
@@ -610,7 +610,7 @@ let () = Builtins.register_builtin
     ~typ:(fun () -> (Cil.voidPtrType, [Cil.theMachine.Cil.typeOfSizeOf]))
 let () = Builtins.register_builtin
     "Frama_C_alloca_imprecise_weakest"
-    (alloc_imprecise_weakest Base.Alloca)
+    (alloc_imprecise_weakest Base.Alloca ~returns_null:false)
     ~typ:(fun () -> (Cil.voidPtrType, [Cil.theMachine.Cil.typeOfSizeOf]))
 
 (* Equivalent to [alloc_by_stack], but for [calloc]. *)
