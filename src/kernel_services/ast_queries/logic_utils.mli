@@ -85,7 +85,9 @@ val logicCType : logic_type -> typ
 (** transforms an array into pointer. *)
 val array_to_ptr : logic_type -> logic_type
 
-(** C type to logic type, with implicit conversion for arithmetic types. *)
+(** C type to logic type, with implicit conversion for arithmetic types.
+    @since Frama-C+dev
+*)
 val coerce_type : typ -> logic_type
 
 (** {2 Predicates} *)
@@ -122,9 +124,7 @@ val mk_logic_pointer_or_StartOf : term -> term
     be inserted. Otherwise (which is the default), [mk_cast typ t] will return
     [t] if it is already of type [typ]
 
-    @modify Aluminium-20160501 added [force] optional argument
-
-*)
+    @modify Aluminium-20160501 added [force] optional argument *)
 val mk_cast: ?loc:location -> ?force:bool -> typ -> term -> term
 
 
@@ -141,7 +141,12 @@ val remove_logic_coerce: term -> term
     in [t]. In particular, [numeric_coerce (int)cst Linteger], where [cst]
     fits in int will be directly [cst], without any coercion.
 
+    Also coerce recursively the sub-terms of t-set expressions
+    (range, union, inter and comprehension) and lift the associated
+    set type.
+
     @since Magnesium-20151001
+    @modify Frama-C+dev
 *)
 val numeric_coerce: logic_type -> term -> term
 

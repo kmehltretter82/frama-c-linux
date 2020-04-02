@@ -305,30 +305,49 @@ let parse_float ?loc literal =
 let mk_coerce ltyp t =
   Logic_const.term ~loc:t.term_loc (TLogic_coerce(ltyp, t)) ltyp
 
-let numeric_coerce ltyp t =
+let rec numeric_coerce ltyp t =
   let oldt = unroll_type t.term_type in
-  if Cil_datatype.Logic_type.equal oldt ltyp then t
-  else match t.term_node with
-    | TLogic_coerce(lt,e) when Cil.no_op_coerce lt e ->
-      (* coercion hidden by the printer, but still present *)
-      mk_coerce ltyp e
-    | TConst(LEnum _) | TConst(Integer _) when ltyp = Linteger
-      -> { t with term_type = Linteger }
-    | TConst(LReal _ ) when ltyp = Lreal ->
-      { t with term_type = Lreal }
-    | TCastE(ty,e) ->
-      begin match ltyp, Cil.unrollType ty, e.term_node with
-        | Linteger, TInt(ik,_), TConst(Integer(v,_))
-          when Cil.fitsInInt ik v -> { e with term_type = Linteger }
-        | Lreal, TFloat(fk,_), TConst(LReal r)
-          when Cil.isExactFloat fk r -> { e with term_type = Lreal }
-        | Linteger, TInt(ik,_), TConst(LEnum { eival }) ->
-          ( match Cil.constFoldToInt eival with
-            | Some i when Cil.fitsInInt ik i -> { e with term_type = Linteger }
-            | _ -> mk_coerce ltyp t )
-        | _ -> mk_coerce ltyp t
-      end
-    | _ -> mk_coerce ltyp t
+  match t.term_node with
+  | TLogic_coerce(lt,e) when Cil.no_op_coerce lt e ->
+    (* coercion hidden by the printer, but still present *)
+    numeric_coerce ltyp e
+  | TConst(LEnum _) | TConst(Integer _) when ltyp = Linteger
+    -> { t with term_type = Linteger }
+  | TConst(LReal _ ) when ltyp = Lreal ->
+    { t with term_type = Lreal }
+  | TCastE(ty,e) ->
+    begin match ltyp, Cil.unrollType ty, e.term_node with
+      | Linteger, TInt(ik,_), TConst(Integer(v,_))
+        when Cil.fitsInInt ik v -> { e with term_type = Linteger }
+      | Lreal, TFloat(fk,_), TConst(LReal r)
+        when Cil.isExactFloat fk r -> { e with term_type = Lreal }
+      | Linteger, TInt(ik,_), TConst(LEnum { eival }) ->
+        ( match Cil.constFoldToInt eival with
+          | Some i when Cil.fitsInInt ik i -> { e with term_type = Linteger }
+          | _ -> mk_coerce ltyp t )
+      | _ -> mk_coerce ltyp t
+    end
+  | Trange(a,b) ->
+    let ra = numeric_bound ltyp a in
+    let rb = numeric_bound ltyp b in
+    { t with term_node = Trange(ra,rb) ;
+             term_type = Logic_const.make_set_type ltyp }
+  | Tunion ts ->
+    { t with term_node = Tunion (List.map (numeric_coerce ltyp) ts) ;
+             term_type = Logic_const.make_set_type ltyp }
+  | Tinter ts ->
+    { t with term_node = Tinter (List.map (numeric_coerce ltyp) ts) ;
+             term_type = Logic_const.make_set_type ltyp }
+  | Tcomprehension(t,qs,cond) ->
+    { t with term_node = Tcomprehension (numeric_coerce ltyp t,qs,cond) ;
+             term_type = Logic_const.make_set_type ltyp }
+  | _ ->
+    if Cil_datatype.Logic_type.equal oldt ltyp then t
+    else mk_coerce ltyp t
+
+and numeric_bound ltyp = function
+  | None -> None
+  | Some a -> Some (numeric_coerce ltyp a)
 
 (* Don't forget to keep is_zero_comparable
    and scalar_term_to_predicate in sync. *)
