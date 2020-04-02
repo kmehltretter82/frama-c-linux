@@ -24,12 +24,29 @@
 
 . $(dirname $0)/local_export.sh
 
+if ! command -v ocamlc > /dev/null; then
+    echo "ocamlc not found" && exit 1;
+fi
+if ! command -v ocamldebug > /dev/null; then
+    echo "ocamldebug not found" && exit 1;
+fi
+
+OCAML_VERSION=$(ocamlc -version)
+case $OCAML_VERSION in
+4.05*|4.06*|4.07*) DYNLINK='load_printer "dynlink.cma"';;
+4.08*)
+    echo "impossible to load dynlink in ocamldebug for version $OCAML_VERSION";
+    echo "pretty-printers will not be loaded";
+    if test ! -e .ocamldebug; then GEN_OCAMLDEBUG=yes; touch .ocamldebug; fi;;
+*) DYNLINK=;;
+esac
+
 if test ! -e .ocamldebug; then
     GEN_OCAMLDEBUG=yes;
     cat <<EOF > .ocamldebug;
 load_printer "str.cma"
 load_printer "zarith.cma"
-load_printer "dynlink.cma"
+$DYNLINK
 load_printer "extlib.cmo"
 load_printer "filepath.cmo"
 load_printer "integer.cmo"
@@ -161,10 +178,11 @@ install_printer Cabs_debug.pp_attrs
 install_printer Cabs_debug.pp_file
 EOF
 else
-GEN_OCAMLDEBUG=no;
+GEN_OCAMLDEBUG=${GEN_OCAMLDEBUG:-no};
 fi
 
 ocamldebug -I $(ocamlfind query zarith) -I $(ocamlfind query ocamlgraph) \
+           -I $(ocamlfind query compiler-libs) \
            -I $FRAMAC_LIB $BINDIR/toplevel.byte "$@"
 
 if test "$GEN_OCAMLDEBUG" = "yes"; then
