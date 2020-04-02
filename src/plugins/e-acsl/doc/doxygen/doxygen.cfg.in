@@ -423,7 +423,7 @@ WARN_FORMAT            =
 # and error messages should be written. If left blank the output is written
 # to stderr.
 
-WARN_LOGFILE           = @abs_top_srcdir@/doc/doxygen/warn.log
+WARN_LOGFILE           = @abs_top_builddir@/doc/doxygen/warn.log
 
 #---------------------------------------------------------------------------
 # configuration options related to the input files
@@ -434,9 +434,10 @@ WARN_LOGFILE           = @abs_top_srcdir@/doc/doxygen/warn.log
 # directories like "/usr/src/myproject". Separate the files or directories
 # with spaces.
 
-INPUT                  = @abs_top_srcdir@/share/e-acsl \
-                         @abs_top_srcdir@/share/e-acsl/segment_model \
-                         @abs_top_srcdir@/share/e-acsl/bittree_model
+INPUT                  = @abs_top_srcdir@/src/plugins/e-acsl/share/e-acsl \
+                         @abs_top_srcdir@/src/plugins/e-acsl/share/e-acsl/segment_model \
+                         @abs_top_srcdir@/src/plugins/e-acsl/share/e-acsl/bittree_model \
+                         @abs_top_srcdir@/src/plugins/e-acsl/share/e-acsl/instrumentation_model
 
 # If the value of the INPUT tag contains directories, you can use the
 # FILE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp
