@@ -1628,30 +1628,31 @@ uninitialized.c:13: ... accessing left-value that contains escaping addresses.
                   assert !\dangling(&p);
 \end{logs}
 
-By default, \Eva{} does not emit an alarm for a copy from memory
-to memory when the copied values include dangling addresses or uninitialized
-contents. This behavior is safe because \Eva{} warns later, as soon
-as an unsafe value is used in a computation --either directly or
-after having been copied from another location.
-The copy operations for which alarms are not emitted are assignments
-from lvalues to lvalues (\lstinline|lv1 = lv2;|), passing lvalues
+By default, \Eva{} emits an alarm as soon as a value that may be uninitialized
+or a dangling address is read, even if this value is not used in any computation.
+
+However, it may be normal for some fields in a struct or union to contain
+such dangerous contents in some cases.
+Thus, \Eva{} \emph{never} emits an alarm for a copy from memory to memory
+of a struct or an union containing dangling addresses or uninitialized contents.
+This behavior is safe because \Eva{} warns later, as soon as an unsafe value is
+used in a computation --either directly or after having been copied from another
+location.
+
+This relaxed behavior on structs and unions can be extended to scalar variables
+with the option \lstinline|-eva-warn-copy-indeterminate|.
+Specifying \lstinline|-eva-warn-copy-indeterminate=-f| on the command-line
+will cause the analyzer to not emit alarms on copy operations occurring in
+function \lstinline|f|. The syntax \lstinline|-@all| can also be used to
+activate this behavior for all functions.
+In this mode, the copy operations for which alarms are not emitted are
+assignments from lvalues to lvalues (\lstinline|lv1 = lv2;|), passing lvalues
 as arguments to functions (\lstinline|f(lv1);|), and returning
 lvalues (\lstinline|return lv1;|). An exception is made
 for lvalues passed as arguments to library functions: in this case,
 because the function's code is missing, there is no chance to catch
 the undefined access later; the analyzer emits an alarm at the point
 of the call.
-
-The behavior documented above was implemented to avoid spurious warnings where
-the copied lvalues are structs or unions. In some cases, it may be normal
-for some fields in a struct or union to contain such dangerous contents.
-
-Option \lstinline|-eva-warn-copy-indeterminate| can be used to obtain a
-more aggressive behavior on scalar variables. Specifying \lstinline|-eva-warn-copy-indeterminate f|
-on the command-line will cause the analyzer to also emit an alarm on 
-all dangerous copy operations occurring in function \lstinline|f|, as long as
-the copied lvalues are not structs or unions. The syntax \lstinline|@all|
-can also be used to activate this behavior for all functions.
 
 \subsubsection{Trap representations of \_Bool values}
 
