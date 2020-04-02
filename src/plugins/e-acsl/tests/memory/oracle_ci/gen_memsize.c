@@ -57,25 +57,25 @@ int main(int argc, char **argv)
                   "__e_acsl_heap_allocation_size == 16",
                   "tests/memory/memsize.c",50);
   /*@ assert __e_acsl_heap_allocation_size ≡ 16; */ ;
-  __e_acsl_assert(b == (char *)0,"Assertion","main",
-                  "b == (char *)((void *)0)","tests/memory/memsize.c",51);
-  /*@ assert b ≡ (char *)((void *)0); */ ;
+  __e_acsl_assert(b == (char *)0,"Assertion","main","b == (char *)0",
+                  "tests/memory/memsize.c",51);
+  /*@ assert b ≡ (char *)0; */ ;
   b = (char *)calloc(18446744073709551615UL,18446744073709551615UL);
   __e_acsl_assert(__e_acsl_heap_allocation_size == 16UL,"Assertion","main",
                   "__e_acsl_heap_allocation_size == 16",
                   "tests/memory/memsize.c",55);
   /*@ assert __e_acsl_heap_allocation_size ≡ 16; */ ;
-  __e_acsl_assert(b == (char *)0,"Assertion","main",
-                  "b == (char *)((void *)0)","tests/memory/memsize.c",56);
-  /*@ assert b ≡ (char *)((void *)0); */ ;
+  __e_acsl_assert(b == (char *)0,"Assertion","main","b == (char *)0",
+                  "tests/memory/memsize.c",56);
+  /*@ assert b ≡ (char *)0; */ ;
   b = (char *)malloc(18446744073709551615UL);
   __e_acsl_assert(__e_acsl_heap_allocation_size == 16UL,"Assertion","main",
                   "__e_acsl_heap_allocation_size == 16",
                   "tests/memory/memsize.c",60);
   /*@ assert __e_acsl_heap_allocation_size ≡ 16; */ ;
-  __e_acsl_assert(b == (char *)0,"Assertion","main",
-                  "b == (char *)((void *)0)","tests/memory/memsize.c",61);
-  /*@ assert b ≡ (char *)((void *)0); */ ;
+  __e_acsl_assert(b == (char *)0,"Assertion","main","b == (char *)0",
+                  "tests/memory/memsize.c",61);
+  /*@ assert b ≡ (char *)0; */ ;
   __retres = 0;
   __e_acsl_memory_clean();
   return __retres;

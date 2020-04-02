@@ -57,9 +57,9 @@ int main(void)
     __gmpq_clear(__gen_e_acsl__4);
   }
   /*@ assert 0.1 ≡ 0.1; */ ;
-  __e_acsl_assert(1,"Assertion","main","(double)1.0 == 1.0",
+  __e_acsl_assert(1,"Assertion","main","1.0 == 1.0",
                   "tests/arith/rationals.c",14);
-  /*@ assert (double)1.0 ≡ 1.0; */ ;
+  /*@ assert 1.0 ≡ 1.0; */ ;
   {
     __e_acsl_mpq_t __gen_e_acsl__5;
     double __gen_e_acsl__6;

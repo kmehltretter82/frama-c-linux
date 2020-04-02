@@ -8,7 +8,7 @@ struct list {
 /*@
 logic ℤ length_aux{L}(struct list *l, ℤ n) =
   \at(n < 0? -1:
-        (l ≡ (struct list *)((void *)0)? n:
+        (l ≡ (struct list *)0? n:
            (n < 2147483647? length_aux(l->next, n + 1): -1)),
       L);
  */
