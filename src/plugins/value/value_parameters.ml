@@ -941,6 +941,8 @@ module BuiltinsOverrides =
     end)
 let () = add_precision_dep BuiltinsOverrides.parameter
 let () = BuiltinsOverrides.add_aliases ["-val-builtin"]
+let use_builtin key value =
+  BuiltinsOverrides.add (key, Some value)
 
 let () = Parameter_customize.set_group precision_tuning
 module BuiltinsAuto =
