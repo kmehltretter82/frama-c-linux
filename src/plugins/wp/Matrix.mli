@@ -52,3 +52,4 @@ type denv = {
 val denv : dim list -> denv
 val size : matrix -> term list
 val tau : c_object -> dim list -> tau
+val init : c_object -> dim list -> tau

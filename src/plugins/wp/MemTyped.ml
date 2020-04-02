@@ -203,7 +203,8 @@ and footprint_comp c =
        Heap.Set.union ft (footprint (object_of f.ftype))
     ) Heap.Set.empty c.cfields
 
-let domain obj _l = footprint obj
+let init_footprint _ _ = Heap.Set.singleton T_init
+let value_footprint obj _l = footprint obj
 
 let rec length_of_object = function
   | C_int _ | C_float _ | C_pointer _ -> 1
@@ -945,7 +946,8 @@ struct
   let field = field
   let shift = shift
   let sizeof = length_of_object
-  let domain = domain
+  let init_footprint = init_footprint
+  let value_footprint = value_footprint
   let frames = frames
   let to_addr l = l
   let to_region_pointer l = 0,l
@@ -982,6 +984,9 @@ struct
   let store_float sigma f l v = updated sigma (m_float f) l v
   let store_pointer sigma _ty l v = updated sigma M_pointer l v
 
+  let init_atom sigma l = updated sigma T_init l e_true
+  let is_init_atom sigma l = F.e_get (Sigma.value sigma T_init) l
+
 end
 
 module LOADER = MemLoader.Make(MODEL)
@@ -990,6 +995,8 @@ let load = LOADER.load
 let stored = LOADER.stored
 let copied = LOADER.copied
 let assigned = LOADER.assigned
+let initialized_loc = LOADER.initialized_loc
+let domain = LOADER.domain
 
 (* -------------------------------------------------------------------------- *)
 (* --- Loc Comparison                                                     --- *)
@@ -1025,11 +1032,6 @@ let s_valid sigma acs p n =
 let s_invalid sigma p n =
   p_call p_invalid [Sigma.value sigma T_alloc;p;n]
 
-let s_initialized sigma p n =
-  let x = Sigma.value sigma T_init in
-  let addr = a_shift p n in
-  F.p_bool (F.e_get x addr)
-
 let segment phi = function
   | Rloc(obj,l) ->
       phi l (e_int (length_of_object obj))
@@ -1044,7 +1046,10 @@ let segment phi = function
 
 let valid sigma acs = segment (s_valid sigma acs)
 let invalid sigma = segment (s_invalid sigma)
-let initialized sigma = segment (s_initialized sigma)
+
+let initialized sigma = function
+  | Rloc(obj, loc) -> initialized_loc sigma obj loc
+  | Rrange _ -> p_false
 
 let frame sigma =
   let wellformed_frame phi chunk =

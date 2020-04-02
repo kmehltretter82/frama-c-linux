@@ -56,7 +56,9 @@ sig
   val to_region_pointer : loc -> int * term
   val of_region_pointer : int -> c_object -> term -> loc
 
-  val domain : c_object -> loc -> Sigma.domain
+  val value_footprint: c_object -> loc -> Sigma.domain
+  val init_footprint: c_object -> loc -> Sigma.domain
+
   val frames : c_object -> loc -> Chunk.t -> frame list
 
   val last : Sigma.t -> c_object -> loc -> term
@@ -76,6 +78,9 @@ sig
   val store_int : Sigma.t -> c_int -> loc -> term -> Chunk.t * term
   val store_float : Sigma.t -> c_float -> loc -> term -> Chunk.t * term
   val store_pointer : Sigma.t -> typ -> loc -> term -> Chunk.t * term
+
+  val init_atom : Sigma.t -> loc -> Chunk.t * term
+  val is_init_atom : Sigma.t -> loc -> term
 
 end
 
@@ -102,6 +107,7 @@ struct
   let pp_rid fmt r = if r <> 0 then Format.fprintf fmt "_R%03d" r
 
   let loadrec = ref (fun _ _ _ -> assert false)
+  let initrec = ref (fun _ _ _ -> assert false)
 
   (* -------------------------------------------------------------------------- *)
   (* --- Frame Lemmas for Compound Access                                   --- *)
@@ -163,9 +169,18 @@ struct
     let pretty fmt (r,c) = Format.fprintf fmt "%d:%a" r Compinfo.pretty c
   end
 
-  module COMP = WpContext.Generator(COMP_KEY)
+  module type COMP_CONFIG = sig
+    val name: string
+    val footprint: c_object -> M.loc -> M.Sigma.domain
+    val tau_of: compinfo -> tau
+    val id_of: compinfo -> string
+    val kind: datakind
+    val load: Sigma.t -> c_object -> M.loc -> term
+  end
+
+  module COMPGEN(C: COMP_CONFIG) = WpContext.Generator(COMP_KEY)
       (struct
-        let name = M.name ^ ".COMP"
+        let name = M.name ^ "." ^ C.name
         type key = int * compinfo
         type data = lfun * chunk list
 
@@ -174,15 +189,15 @@ struct
           let v = e_var x in
           let obj = C_comp c in
           let loc = M.of_region_pointer r obj v in (* t_pointer -> loc *)
-          let domain = M.domain obj loc in
-          let result = Lang.tau_of_comp c in
-          let lfun = Lang.generated_f ~result "Load%a_%s" pp_rid r (Lang.comp_id c) in
+          let domain = C.footprint obj loc in
+          let result = C.tau_of c in
+          let lfun = Lang.generated_f ~result "Load%a_%s" pp_rid r (C.id_of c) in
           (* Since its a generated it is the unique name given *)
           let xms,chunks,sigma = signature domain in
           let def = List.map
               (fun f ->
-                 Cfield (f, KValue) ,
-                 !loadrec sigma (object_of f.ftype) (M.field loc f)
+                 Cfield (f, C.kind) ,
+                 C.load sigma (object_of f.ftype) (M.field loc f)
               ) c.cfields in
           let dfun = Definitions.Function( result , Def , e_record def ) in
           Definitions.define_symbol {
@@ -195,6 +210,25 @@ struct
           lfun , chunks
 
         let compile = Lang.local generate
+      end)
+
+  module COMP = COMPGEN
+      (struct
+        let name = "COMP"
+        let footprint = M.value_footprint
+        let tau_of = Lang.tau_of_comp
+        let id_of = Lang.comp_id
+        let kind = KValue
+        let load sigma = !loadrec sigma
+      end)
+  module COMPINIT = COMPGEN
+      (struct
+        let name = "COMPINIT"
+        let footprint = M.init_footprint
+        let tau_of = Lang.init_of_comp
+        let id_of = Lang.comp_init_id
+        let kind = KInit
+        let load sigma = !initrec sigma
       end)
 
   (* -------------------------------------------------------------------------- *)
@@ -210,10 +244,18 @@ struct
       if r1 = r2 then Matrix.NATURAL.compare m1 m2 else r1-r2
   end
 
-  module ARRAY = WpContext.Generator(ARRAY_KEY)
+  module type ARRAY_CONFIG = sig
+    val name: string
+    val footprint: c_object -> M.loc -> M.Sigma.domain
+    val tau_of_matrix: c_object -> Matrix.dim list -> tau
+    val fun_ext: string
+    val load: Sigma.t -> c_object -> M.loc -> term
+  end
+
+  module ARRAYGEN(C: ARRAY_CONFIG) = WpContext.Generator(ARRAY_KEY)
       (struct
         open Matrix
-        let name = M.name ^ ".ARRAY"
+        let name = M.name ^ "." ^ C.name
         type key = int * arrayinfo * Matrix.matrix
         type data = lfun * chunk list
 
@@ -222,10 +264,13 @@ struct
           let v = e_var x in
           let obj_a = C_array ainfo in
           let loc = M.of_region_pointer r obj_a v in (* t_pointer -> loc *)
-          let domain = M.domain obj_a loc in
-          let result = Matrix.tau obj_e ds in
-          let lfun = Lang.generated_f ~result "Array%a%s_%s" pp_rid r
-              (Matrix.id ds) (Matrix.natural_id obj_e) in
+          let domain = C.footprint obj_a loc in
+          let result = C.tau_of_matrix obj_e ds in
+          let lfun =
+            Lang.generated_f ~result "Array%s%a%s_%s"
+              C.fun_ext pp_rid r
+              (Matrix.id ds) (Matrix.natural_id obj_e)
+          in
           let prefix = Lang.Fun.debug lfun in
           let axiom = prefix ^ "_access" in
           let xmem,chunks,sigma = signature domain in
@@ -233,7 +278,7 @@ struct
           let phi = e_fun lfun (v :: denv.size_val @ List.map e_var xmem) in
           let va = List.fold_left e_get phi denv.index_val in
           let ofs = e_sum denv.index_offset in
-          let vm = !loadrec sigma obj_e (M.shift loc obj_e ofs) in
+          let vm = C.load sigma obj_e (M.shift loc obj_e ofs) in
           let lemma = p_hyps denv.index_range (p_equal va vm) in
           let cluster = cluster () in
           Definitions.define_symbol {
@@ -259,6 +304,25 @@ struct
 
         let compile = Lang.local generate
       end)
+
+  module ARRAY = ARRAYGEN
+      (struct
+        let name = "ARRAY"
+        let footprint = M.value_footprint
+        let tau_of_matrix = Matrix.tau
+        let fun_ext = ""
+        let load sigma = !loadrec sigma
+      end)
+
+  module ARRAYINIT = ARRAYGEN
+      (struct
+        let name = "ARRAYINIT"
+        let footprint = M.init_footprint
+        let tau_of_matrix = Matrix.init
+        let fun_ext = "Init"
+        let load sigma = !initrec sigma
+      end)
+
 
   (* -------------------------------------------------------------------------- *)
   (* --- Loader                                                             --- *)
@@ -294,6 +358,25 @@ struct
 
   let () = loadrec := loadvalue
 
+  let initvalue_comp sigma comp loc =
+    let r , p = M.to_region_pointer loc in
+    let f , m = COMPINIT.get (r,comp) in
+    F.e_fun f (p :: memories sigma m)
+
+  let initvalue_array sigma a loc =
+    let d = Matrix.of_array a in
+    let r , p = M.to_region_pointer loc in
+    let f , m = ARRAYINIT.get (r,a,d) in
+    F.e_fun f (p :: Matrix.size d @ memories sigma m)
+
+  let initvalue sigma obj loc =
+    match obj with
+    | C_int _ | C_float _ | C_pointer _ ->  M.is_init_atom sigma loc
+    | C_comp ci -> initvalue_comp sigma ci loc
+    | C_array a -> initvalue_array sigma a loc
+
+  let () = initrec := initvalue
+
   (* -------------------------------------------------------------------------- *)
   (* --- Havocs                                                             --- *)
   (* -------------------------------------------------------------------------- *)
@@ -309,7 +392,7 @@ struct
          let fresh = F.e_var (Lang.freshvar ~basename tau) in
          let havoc = M.havoc obj loc ~length chunk ~fresh ~current:pre in
          ps := Set(post,havoc) :: !ps
-      ) (M.domain obj loc) ; !ps
+      ) (M.value_footprint obj loc) ; !ps
 
   let havoc seq obj loc = havoc_length seq obj loc F.e_one
 
@@ -317,9 +400,11 @@ struct
   (* --- Stored & Copied                                                    --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let updated seq phi alpha loc value =
-    let chunk,mem = phi seq.pre alpha loc value in
-    [Set(Sigma.value seq.post chunk,mem)]
+  let updated seq phi_store alpha loc value =
+    let chunk_store,mem_store = phi_store seq.pre alpha loc value in
+    let chunk_init,mem_init = M.init_atom seq.pre loc in
+    [Set(Sigma.value seq.post chunk_store,mem_store) ;
+     Set(Sigma.value seq.post chunk_init,mem_init)]
 
   let stored seq obj loc value =
     match obj with
@@ -330,6 +415,35 @@ struct
         Set(loadvalue seq.post obj loc, value) :: havoc seq obj loc
 
   let copied s obj p q = stored s obj p (loadvalue s.pre obj q)
+
+  (* -------------------------------------------------------------------------- *)
+  (* --- Initialized                                                        --- *)
+  (* -------------------------------------------------------------------------- *)
+
+  let rec initialized_term obj term =
+    match obj with
+    | C_int _ | C_float _ | C_pointer _ -> p_bool term
+    | C_comp ci ->
+        let initialized_field f =
+          initialized_term
+            (object_of f.ftype)
+            (e_getfield term (Cfield (f, KInit)))
+        in
+        p_conj (List.map initialized_field ci.cfields)
+    | C_array ai ->
+        let obj_e, ds = Matrix.of_array ai in
+        let denv = Matrix.denv ds in
+        let values = List.fold_left e_get term denv.index_val in
+        let size_eq size value =
+          match value with
+          | None -> p_true
+          | Some i -> p_equal size (e_int i)
+        in
+        let sizes = List.map2 size_eq denv.size_val ds in
+        p_hyps (denv.index_range @ sizes) (initialized_term obj_e values)
+
+  let initialized_loc sigma obj loc =
+    initialized_term obj (initvalue sigma obj loc)
 
   (* -------------------------------------------------------------------------- *)
   (* --- Assigned                                                           --- *)
@@ -358,13 +472,22 @@ struct
              let sep_from_all = F.p_forall xs (F.p_imply condition separated) in
              let phi = F.p_forall p (F.p_imply sep_from_all equal) in
              ps := Assert phi :: !ps
-          ) (M.domain obj loc) ; !ps
+          ) (M.value_footprint obj loc) ; !ps
     | Sarray(loc,obj,n) ->
         assigned_range seq obj loc e_zero (e_int (n-1))
     | Srange(loc,obj,u,v) ->
         let a = match u with Some a -> a | None -> e_zero in
         let b = match v with Some b -> b | None -> M.last seq.pre obj loc in
         assigned_range seq obj loc a b
+
+  (* -------------------------------------------------------------------------- *)
+  (* --- Domain                                                           --- *)
+  (* -------------------------------------------------------------------------- *)
+
+  let domain obj loc =
+    M.Sigma.Chunk.Set.union
+      (M.value_footprint obj loc)
+      (M.init_footprint obj loc)
 
   (* -------------------------------------------------------------------------- *)
 

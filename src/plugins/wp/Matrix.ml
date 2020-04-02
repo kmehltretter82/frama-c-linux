@@ -145,14 +145,19 @@ let rec collect rank = function
           }
 
 let denv = collect 0
+
 let rec dval = function
   | [] -> []
   | None :: ds -> dval ds
   | Some n :: ds -> e_int n :: dval ds
 let size (_,ds) = dval ds
-let rec tau obj = function
-  | [] -> Lang.tau_of_object obj
-  | _ :: ds -> Qed.Logic.Array( Qed.Logic.Int , tau obj ds )
+
+let rec kind on_leaf obj = function
+  | [] -> on_leaf obj
+  | _ :: ds -> Qed.Logic.Array( Qed.Logic.Int , kind on_leaf obj ds )
+
+let tau = kind Lang.tau_of_object
+let init = kind Lang.init_of_object
 
 let rec do_merge ds1 ds2 =
   match ds1 , ds2 with
