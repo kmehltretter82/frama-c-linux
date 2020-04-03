@@ -3,6 +3,8 @@
   Neither code nor specification for function Frama_C_malloc_fresh, generating default assigns from the prototype
 [kernel:annot:missing-spec] tests/builtins/malloc.c:8: Warning: 
   Neither code nor specification for function Frama_C_malloc_by_stack, generating default assigns from the prototype
+[kernel:annot:missing-spec] tests/builtins/malloc.c:8: Warning: 
+  Neither code nor specification for function Frama_C_malloc_imprecise, generating default assigns from the prototype
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -32,6 +34,16 @@
   Frama_C_show_each: {{ &__malloc_main_l20 + {8} }}
 [eva] tests/builtins/malloc.c:27: 
   Frama_C_show_each: {{ &__malloc_main_l20 + {8} }}
+[eva] tests/builtins/malloc.c:33: Call to builtin Frama_C_malloc_imprecise
+[eva:malloc:imprecise] tests/builtins/malloc.c:33: Warning: 
+  allocating a single weak variable for ALL dynamic allocations via malloc/calloc/realloc: __alloc_w_main
+[eva] tests/builtins/malloc.c:33: Call to builtin Frama_C_malloc_imprecise
+[eva:alarm] tests/builtins/malloc.c:34: Warning: 
+  out of bounds write. assert \valid(mw);
+[eva] tests/builtins/malloc.c:35: Call to builtin Frama_C_malloc_imprecise
+[eva] tests/builtins/malloc.c:35: Call to builtin Frama_C_malloc_imprecise
+[eva:alarm] tests/builtins/malloc.c:36: Warning: 
+  out of bounds write. assert \valid(mw2);
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -41,6 +53,8 @@
   p ∈ {{ (int *)&__malloc_main_l19 }}
   q ∈ {{ &__malloc_main_l20[0] }}
   r ∈ {{ &__malloc_main_l21[0] ; &__malloc_main_l21_0[0] }}
+  mw ∈ {{ (int *)&__alloc_w_main }}
+  mw2 ∈ {{ (int *)&__alloc_w_main }}
   __malloc_main_l19[bits 0 to 31] ∈ {1}
                    [4..7] ∈ UNINITIALIZED
                    [bits 64 to 95] ∈ {3}
@@ -58,3 +72,5 @@
                      [1] ∈ UNINITIALIZED
                      [2] ∈ {3}
                      [3..24] ∈ UNINITIALIZED
+  __alloc_w_main[bits 0 to 31] ∈ {1; 2} or UNINITIALIZED
+                [4..4294967295] ∈ UNINITIALIZED
