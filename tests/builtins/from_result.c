@@ -1,7 +1,7 @@
 /* run.config*
-   OPT:  @EVA_CONFIG@ -eva-no-builtins-auto -deps -journal-disable
+   OPT:  @EVA_CONFIG@ -eva-alloc-builtin fresh -deps -journal-disable
 */
-#define malloc(n) Frama_C_malloc_fresh(n)
+
 #include "../../share/libc/stdlib.c"
 
 struct T { int a; int b; };

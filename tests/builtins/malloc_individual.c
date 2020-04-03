@@ -1,7 +1,7 @@
 /* run.config*
-   STDOPT: #"-eva-no-builtins-auto"
+   STDOPT: #"-eva-alloc-builtin fresh"
 */
-#define malloc(n) Frama_C_malloc_fresh(n)
+
 #include "share/libc/stdlib.c"
 
 int *p;

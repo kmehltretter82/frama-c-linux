@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-slevel 10 -eva-builtin malloc:Frama_C_malloc_fresh -eva-warn-copy-indeterminate @all"
+   STDOPT: +"-slevel 10 -eva-alloc-builtin fresh -eva-warn-copy-indeterminate @all"
 */
 
 #include <stdlib.h>

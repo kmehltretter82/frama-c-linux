@@ -35,7 +35,7 @@ let main () =
   let display_results state = Format.fprintf fmt "@[%a@]@\n" !Db.Value.display state in
   Dynamic.Parameter.String.set "" "tests/builtins/long_init.c";
   Dynamic.Parameter.String.set "-eva-save-fun-state" ("init_inner:" ^ tmpfile);
-  Dynamic.Parameter.String.set "-eva-builtin" "malloc:Frama_C_malloc_fresh";
+  Dynamic.Parameter.String.set "-eva-alloc-builtin" "fresh";
   Dynamic.Parameter.Bool.set "-eva-alloc-returns-null" false;
   Dynamic.Parameter.String.set "-eva-warn-key" "builtins:override=inactive";
   !Db.Value.compute ();
@@ -49,7 +49,7 @@ let main () =
   Dynamic.Parameter.String.set "-eva-load-fun-state" ("init_inner:" ^ tmpfile);
   (* set builtins in a different order to force kernel to recompute
      kernel function IDs *)
-  Dynamic.Parameter.String.set "-eva-builtin" "malloc:Frama_C_malloc_fresh";
+  Dynamic.Parameter.String.set "-eva-alloc-builtin" "fresh";
   !Db.Value.compute ();
   Callgraph.Uses.iter_in_rev_order display_results;
   Files.clear ();
@@ -59,7 +59,7 @@ let main () =
   Dynamic.Parameter.String.set "-eva-load-fun-state" ("init_outer:" ^ tmpfile);
   (* set builtins in a different order to force kernel to recompute
      kernel function IDs *)
-  Dynamic.Parameter.String.set "-eva-builtin" "malloc:Frama_C_malloc_fresh";
+  Dynamic.Parameter.String.set "-eva-alloc-builtin" "fresh";
   !Db.Value.compute ();
   Callgraph.Uses.iter_in_rev_order display_results;
   ok:=true (* no error, we can erase the file *)
