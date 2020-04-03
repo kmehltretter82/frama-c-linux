@@ -402,12 +402,6 @@ let alloc_imprecise_weakest_abstract region =
   in
   memo (fun () -> alloc_imprecise_weakest_alloc region)
 
-let alloc_imprecise_weakest_aux region _stack _prefix _sizev state =
-  let new_base, max_alloc = alloc_imprecise_weakest_abstract region in
-  let new_state = add_uninitialized state new_base max_alloc in
-  let ret = V.inject new_base Ival.zero in
-  ret, new_state
-
 (* Variables that have been returned by a call to an allocation function
    at this callstack. The first allocated variable is at the top of the
    stack. Currently, the callstacks are truncated according to
@@ -810,7 +804,7 @@ let realloc_alloc_copy weak bases_to_realloc null_in_arg sizev state =
 (* Auxiliary function for [realloc]. All the bases in [bases] are realloced
    one by one, plus NULL if [null] holds. This function acts as if we had
    first made a disjunction on the pointer passed to [realloc]. *)
-let realloc_multiple state size bases null =
+let realloc_multiple bases null size state =
   (* this function should never be used with weak allocs *)
   let aux_bases b acc = Base.Hptset.singleton b :: acc in
   let lbases = Base.Hptset.fold aux_bases bases [] in
@@ -826,73 +820,46 @@ let realloc_multiple state size bases null =
     join res (realloc_alloc_copy Strong Base.Hptset.empty true size state)
   else res
 
-(* Multiple indicates that existing bases are reallocated into as many new
-   bases. *)
-let realloc ~multiple state args = match args with
-  | [ (_,ptr,_); (_,size,_) ] ->
-    let (bases, card_ok, null) = resolve_bases_to_free ptr in
+let realloc_imprecise_weakest _bases _null _size state =
+  let new_base, max_alloc = alloc_imprecise_weakest_abstract Base.Malloc in
+  let state = add_uninitialized state new_base max_alloc in
+  let ret = V.inject new_base Ival.zero in
+  ret, state
+
+let register_realloc ?replace name realloc =
+  let builtin state args =
+    let ptr, size =
+      match args with
+      | [ (_, ptr, _); (_, size, _) ] -> ptr, size
+      | _ -> raise (Builtins.Invalid_nb_of_args 2)
+    in
+    let bases, card_ok, null = resolve_bases_to_free ptr in
     if card_ok > 0 then
-      let orig_state = state in
-      let ret, state =
-        if multiple
-        then realloc_multiple state size bases null
-        else realloc_alloc_copy Weak bases null size state
-      in
+      let ret, new_state = realloc bases null size state in
       (* Maybe the calls above made [ret] weak, and it
          was among the arguments. In this case, do not free it entirely! *)
-      let weak = Base.Hptset.exists Base.is_weak bases in
-      let strong = card_ok <= 1 && not weak in
+      let strong = card_ok <= 1 && not Base.(Hptset.exists is_weak bases) in
       (* free old bases. *)
-      let state, changed = free_aux state ~strong bases in
-      let c_values = wrap_fallible_alloc ret orig_state state in
+      let new_state, changed = free_aux new_state ~strong bases in
+      let c_values = wrap_fallible_alloc ret state new_state in
       { Value_types.c_values;
-        c_clobbered = Builtins.clobbered_set_from_ret state ret;
+        c_clobbered = Builtins.clobbered_set_from_ret new_state ret;
         c_cacheable = Value_types.NoCacheCallers;
-        c_from = Some changed;
-      }
+        c_from = Some changed; }
     else (* Invalid call. *)
       { Value_types.c_values = [] ;
         c_clobbered = Base.SetLattice.bottom;
         c_cacheable = Value_types.NoCacheCallers;
-        c_from = None;
-      }
-  | _ -> raise (Builtins.Invalid_nb_of_args 2)
+        c_from = None; }
+  in
+  let name = "Frama_C_" ^ name in
+  let typ () = Cil.(voidPtrType, [voidPtrType; theMachine.typeOfSizeOf]) in
+  Builtins.register_builtin ?replace name builtin ~typ
 
-let () = Builtins.register_builtin
-    ~replace:"realloc" "Frama_C_realloc" (realloc ~multiple:false)
-    ~typ:(fun () -> (Cil.voidPtrType, [Cil.voidPtrType;
-                                       Cil.theMachine.Cil.typeOfSizeOf]))
-let () = Builtins.register_builtin
-    "Frama_C_realloc_multiple" (realloc ~multiple:true)
-    ~typ:(fun () -> (Cil.voidPtrType, [Cil.voidPtrType;
-                                       Cil.theMachine.Cil.typeOfSizeOf]))
-
-let realloc_imprecise_weakest state args = match args with
-  | [ (_,ptr,_); (_,_size,_) ] ->
-    let (bases, card_ok, _null) = resolve_bases_to_free ptr in
-    if card_ok > 0 then
-      let orig_state = state in
-      let ret, state = alloc_imprecise_weakest_aux Base.Malloc [] "" _size state in
-      (* free old bases. *)
-      let state, changed = free_aux state ~strong:false bases in
-      let c_values = wrap_fallible_alloc ret orig_state state in
-      { Value_types.c_values;
-        c_clobbered = Builtins.clobbered_set_from_ret state ret;
-        c_cacheable = Value_types.NoCacheCallers;
-        c_from = Some changed;
-      }
-    else (* Invalid call. *)
-      { Value_types.c_values = [] ;
-        c_clobbered = Base.SetLattice.bottom;
-        c_cacheable = Value_types.NoCacheCallers;
-        c_from = None;
-      }
-  | _ -> raise (Builtins.Invalid_nb_of_args 2)
-
-let () = Builtins.register_builtin
-    "Frama_C_realloc_imprecise" realloc_imprecise_weakest
-    ~typ:(fun () -> (Cil.voidPtrType, [Cil.voidPtrType;
-                                       Cil.theMachine.Cil.typeOfSizeOf]))
+let () =
+  register_realloc ~replace:"realloc" "realloc" (realloc_alloc_copy Weak);
+  register_realloc "realloc_multiple" realloc_multiple;
+  register_realloc "realloc_imprecise" realloc_imprecise_weakest
 
 (* ----------------------------- Leak detection ----------------------------- *)
 
