@@ -466,7 +466,8 @@ let alloc_size_ok intended_size =
 
 (* Generic function used both by [calloc_size] and [calloc_by_stack].
    [calloc_f] is the actual function used (calloc_size or calloc_by_stack). *)
-let calloc_abstract calloc_f ?(stack=call_stack_no_wrappers ()) ?(override_size=false) state actuals =
+let calloc_abstract calloc_f state actuals =
+  let stack = call_stack_no_wrappers () in
   let nmemb, sizev =
     match actuals with
     | [(_exp, nmemb, _); (_, size, _)] -> nmemb, size
@@ -484,7 +485,6 @@ let calloc_abstract calloc_f ?(stack=call_stack_no_wrappers ()) ?(override_size=
       c_from = None;
     }
   else
-    let alloc_size = if override_size then Cvalue.V.inject_ival (zero_to_max_bytes ()) else alloc_size in
     let base, max_valid = calloc_f stack "calloc" alloc_size state in
     let new_state = add_zeroes state base max_valid in
     let returns_null = if size_ok = Alarmset.Unknown then Some true else None in
