@@ -32,7 +32,7 @@ module type Function = sig
 
   val prototype: unit -> proto
 
-  (** receives the type of the lvalue and the types of the arguments recieved
+  (** receives the type of the lvalue and the types of the arguments received
       for a call to the function and returns [true] iff they are correct.
       The received types depend on the [prototype] of the module.
       - if the kind is [Data t] -> it is the exact type of the expr/lvalue
