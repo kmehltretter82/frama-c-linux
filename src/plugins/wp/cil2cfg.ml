@@ -626,36 +626,38 @@ let get_post_label cfg v =
       | None -> None
       | Some s -> Some (Clabels.stmt s)
 
-let blocks_closed_by_edge cfg e =
+type block_scope = { b_opened : block list ; b_closed : block list }
+
+let no_scope = { b_opened = [] ; b_closed = [] }
+
+let block_scope s s' =
+  try
+    {
+      b_opened = Kernel_function.blocks_opened_by_edge s s' ;
+      b_closed = Kernel_function.blocks_closed_by_edge s s' ;
+    }
+  with Not_found | Invalid_argument _ ->
+    debug "[blocks_closed_by_edge] not found sid:%d -> sid:%d@." s.sid s'.sid;
+    no_scope
+
+let block_scope_for_edge cfg e =
   debug "[blocks_closed_by_edge] for %a...@." pp_edge e;
   let v_before = edge_src e in
-  let blocks = match node_type v_before with
-    | Vstmt s | Vtest (true, s, _) | Vloop (_, s) | Vswitch (s,_) ->
-        ignore (Ast.get ()); (* Since CIL Cfg computation is required and
-                                                                Ast.get () have to do this well. *)
-        begin match s.succs with
-          | [s'] -> (try Kernel_function.blocks_closed_by_edge s s'
-                     with Not_found as e -> debug "[blocks_closed_by_edge] not found sid:%d -> sid:%d@."
-                                              s.sid s'.sid;
-                       raise e)
-          | [] | _ :: _ ->
-              let s' = get_edge_next_stmt cfg e in
-              match s' with
-              | None -> []
-              | Some s' ->
-                  debug
-                    "[blocks_closed_by_edge] found sid:%d -> sid:%d@."
-                    s.sid s'.sid;
-                  try Kernel_function.blocks_closed_by_edge s s'
-                  with Invalid_argument _ -> []
-        end
-    | _ -> (* TODO ? *) []
-  in
-  let v_after = edge_dst e in
-  let blocks = match node_type v_after with
-    | VblkOut (Bfct, b) -> b::blocks
-    | _ -> blocks
-  in blocks
+  match node_type v_before with
+  | Vstmt s | Vtest (true, s, _) | Vloop (_, s) | Vswitch (s,_) ->
+      begin match s.succs with
+        | [s'] -> block_scope s s'
+        | [] | _ :: _ ->
+            let s' = get_edge_next_stmt cfg e in
+            match s' with
+            | None -> no_scope
+            | Some s' -> block_scope s s'
+      end
+  | VblkIn(Bstmt _,b) -> { b_opened=[b] ; b_closed=[] }
+  | Vcall _
+  | VblkIn _ | VblkOut _ | Vtest(false,_,_)
+  | VfctIn | VfctOut | Vstart | Vend | Vexit | Vloop2 _ ->
+      no_scope
 
 let has_exit cfg =
   try
