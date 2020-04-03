@@ -77,7 +77,6 @@ let call_stack_no_wrappers () =
         stack
   in
   bottom_filter stack
-;;
 
 let register_malloced_base ?(stack=call_stack_no_wrappers ()) b =
   let stack_without_top = List.tl stack in
@@ -145,7 +144,6 @@ let base_name prefix stack =
       prefix
       (if full_name then loop_full qstack else caller qstack)
       (stmt_line callsite)
-;;
 
 type var = Weak | Strong
 
@@ -253,7 +251,6 @@ let size_sure_valid b = match Base.validity b with
   | Base.Invalid | Base.Empty | Base.Unknown (_, None, _) -> Integer.zero
   | Base.Known (_, up) | Base.Unknown (_, Some up, _)
   | Base.Variable { Base.min_alloc = up } -> Integer.succ up
-;;
 
 (* Create a new offsetmap initialized to [bottom] on the entire allocable
    range, with the first [max_alloc] bits set to [v].
@@ -294,9 +291,8 @@ let add_zeroes = add_v (V_Or_Uninitialized.initialized Cvalue.V.singleton_zero)
    [ret]: result in case of success (e.g. a new base in case of malloc);
    [orig_state]: state before any allocation, returned in case of failure;
    [state_after_alloc]: state in case the allocation is successful;
-   [returns_null]: if given, forces the result to consider/ignore the possibility
-   of failure, despite -val-alloc-returns-null.
-*)
+   [returns_null]: if given, forces the result to consider/ignore the
+   possibility of failure, despite -val-alloc-returns-null. *)
 let wrap_fallible_alloc ?returns_null ret orig_state state_after_alloc =
   let default_returns_null = Value_parameters.AllocReturnsNull.get () in
   let returns_null = Extlib.opt_conv default_returns_null returns_null in
@@ -338,7 +334,8 @@ let alloc_abstract weak deallocation prefix sizev _state =
   (* note that min_alloc may be negative (-1) if the allocated size is 0 *)
   let weak = match weak with Weak -> true | Strong -> false in
   let variable_v = Base.create_variable_validity ~weak ~min_alloc ~max_alloc in
-  let new_base = Base.register_allocated_var var deallocation (Base.Variable variable_v) in
+  let validity = Base.Variable variable_v in
+  let new_base = Base.register_allocated_var var deallocation validity in
   register_malloced_base ~stack new_base;
   new_base, max_alloc
 
@@ -414,7 +411,8 @@ let alloc_imprecise_weakest_alloc region =
   let variable_v =
     Base.create_variable_validity ~weak:true ~min_alloc ~max_alloc
   in
-  let new_base = Base.register_allocated_var var region (Base.Variable variable_v) in
+  let validity = Base.Variable variable_v in
+  let new_base = Base.register_allocated_var var region validity in
   register_malloced_base ~stack new_base;
   new_base, max_alloc
 
@@ -535,7 +533,7 @@ let alloc_by_stack ?(prefix="malloc") region ?returns_null : Db.Value.builtin = 
     c_clobbered = Base.SetLattice.bottom;
     c_from = None;
     c_cacheable = Value_types.NoCacheCallers }
-;;
+
 let () = Builtins.register_builtin
     ~replace:"malloc" "Frama_C_malloc_by_stack" (alloc_by_stack Base.Malloc)
     ~typ:(fun () -> (Cil.voidPtrType, [Cil.theMachine.Cil.typeOfSizeOf]))
@@ -842,7 +840,8 @@ let realloc_alloc_copy weak bases_to_realloc null_in_arg sizev state =
   let lbases = Base.Hptset.elements bases_to_realloc in
   let dst_state =
     (* uninitialized on all reallocated valid bits *)
-    let offsm = offsm_with_v V_Or_Uninitialized.uninitialized (Base.validity base) max_valid in
+    let uninit = V_Or_Uninitialized.uninitialized in
+    let offsm = offsm_with_v uninit (Base.validity base) max_valid in
     let offsm =
       if null_in_arg then offsm (* In this case, realloc may copy nothing *)
       else
