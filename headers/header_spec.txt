@@ -945,8 +945,8 @@ src/plugins/occurrence/register_gui.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/occurrence/register_gui.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/instantiate/basic_blocks.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/instantiate/basic_blocks.mli: CEA_LGPL_OR_PROPRIETARY
-src/plugins/instantiate/global_vars.ml: CEA_LGPL_OR_PROPRIETARY
-src/plugins/instantiate/global_vars.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/instantiate/global_context.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/instantiate/global_context.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/instantiate/Instantiate.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/instantiate/instantiator_builder.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/instantiate/instantiator_builder.mli: CEA_LGPL_OR_PROPRIETARY

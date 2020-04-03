@@ -20,23 +20,20 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
+module Table = Datatype.String.Hashtbl
+let table = Table.create 13
 
-(** The purpose of this module is to create global variables when it is needed
-    by instantiation modules.
-*)
+let get_variable name make =
+  if Table.mem table name then Table.find table name
+  else begin
+    try Globals.Vars.find_from_astinfo name VGlobal
+    with Not_found ->
+      let vi = make () in
+      Table.add table name vi ;
+      vi
+  end
 
-(** [get t ghost storage name] searches for an existing variable [name]. If this
-    variable does not exists, it is created with the specified type [t], [ghost]
-    status and [storage].
+let clear () = Table.clear table
 
-    The obtained varinfo does not need to be registered, it will be done by the
-    transformation.
-*)
-val get: typ -> bool -> storage -> string -> varinfo
-
-(** Clears internal tables *)
-val clear: unit -> unit
-
-(** Creates a list of global for the variables that have been created *)
-val globals: location -> global list
+let globals loc =
+  Table.fold (fun _ x l -> Cil_types.GVarDecl(x, loc) :: l) table []

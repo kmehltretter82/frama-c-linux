@@ -61,7 +61,13 @@ let isnt_allocable ?loc size =
   new_predicate { p with pred_name = [ "allocable" ]}
 
 let heap_status () =
-  let vi = Global_vars.get Cil.intType true Extern "__fc_heap_status" in
+  let name = "__fc_heap_status" in
+  let make () =
+    let vi = Cil.makeVarinfo ~ghost:true true false name Cil.intType in
+    vi.vstorage <- Extern ;
+    vi
+  in
+  let vi = Global_context.get_variable name make in
   Basic_blocks.cvar_to_tvar vi
 
 let assigns_result ?loc typ deps =

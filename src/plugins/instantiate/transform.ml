@@ -38,7 +38,7 @@ let get_kfs () =
   Hashtbl.fold (fun k v l -> (get_kfs k v) @ l) base []
 
 let clear () =
-  Global_vars.clear () ;
+  Global_context.clear () ;
   let clear _ instantiator =
     let module I = (val instantiator: Instantiator) in
     I.clear ()
@@ -55,7 +55,7 @@ class transformer = object(self)
 
   method! vfile _ =
     let post f =
-      f.globals <- (Global_vars.globals (Cil.CurrentLoc.get())) @ f.globals ;
+      f.globals <- (Global_context.globals (Cil.CurrentLoc.get())) @ f.globals ;
       Ast.mark_as_changed () ;
       Ast.mark_as_grown () ;
       f
@@ -163,4 +163,5 @@ let compute_statuses_all_kfs () =
 let transform file =
   clear () ;
   Visitor.visitFramacFile (new transformer) file ;
+  File.reorder_ast () ;
   compute_statuses_all_kfs ()

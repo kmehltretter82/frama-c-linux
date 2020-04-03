@@ -27,8 +27,13 @@ let generate_prototype function_name t =
 let generate_spec needed _ _ _ =
   let open Cil_types in
   let open Logic_const in
-  let open Instantiate.Global_vars in
-  let vi = get Cil.floatType true Cil_types.Extern needed in
+  let open Instantiate.Global_context in
+  let make () =
+    let vi = Cil.makeVarinfo ~ghost:true true false needed Cil.floatType in
+    vi.vstorage <- Extern ;
+    vi
+  in
+  let vi = get_variable needed make in
   let t = tvar (Cil.cvar_to_lvar vi) in
   let assigns =
     Cil_types.Writes [ Logic_const.new_identified_term t, From [] ]
