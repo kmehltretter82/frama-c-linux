@@ -149,6 +149,7 @@ module StopAtNthAlarm: Parameter_sig.Int
 
 (** Dynamic allocation *)
 
+module AllocBuiltin: Parameter_sig.String
 module AllocFunctions: Parameter_sig.String_set
 module AllocReturnsNull: Parameter_sig.Bool
 module MallocLevel: Parameter_sig.Int
