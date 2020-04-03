@@ -315,7 +315,7 @@ let pp_validity fmt (v1, v2) =
    Returns the new base, and its maximum validity.
    Note that [_state] is not used, but it is present to ensure a compatible
    signature with [alloc_by_stack]. *)
-let alloc_abstract weak deallocation prefix sizev _state =
+let alloc_fresh weak deallocation prefix sizev _state =
   let stack = call_stack_no_wrappers () in
   let tsize = guess_intended_malloc_type stack sizev (weak = Strong) in
   let type_base = type_from_nb_elems tsize in
@@ -373,7 +373,7 @@ let string_of_region = function
   | Base.Alloca -> "via alloca"
 
 (* Only called when the 'weakest base' needs to be allocated. *)
-let alloc_imprecise_weakest_alloc region =
+let create_weakest_base region =
   let stack = [ fst (Globals.entry_point ()), Kglobal ] in
   let type_base =
     TArray (Cil.charType, None, Cil.empty_size_cache (), [])
@@ -393,14 +393,14 @@ let alloc_imprecise_weakest_alloc region =
   new_base, max_alloc
 
 (* used by calloc_abstract *)
-let alloc_imprecise_weakest_abstract region =
+let alloc_weakest_base region =
   let memo =
     match region with
     | Base.Malloc -> MallocedSingleMalloc.memo
     | Base.VLA -> MallocedSingleVLA.memo
     | Base.Alloca -> MallocedSingleAlloca.memo
   in
-  memo (fun () -> alloc_imprecise_weakest_alloc region)
+  memo (fun () -> create_weakest_base region)
 
 (* Variables that have been returned by a call to an allocation function
    at this callstack. The first allocated variable is at the top of the
@@ -444,7 +444,7 @@ let update_variable_validity ?(make_weak=false) base sizev =
     base, max_valid_bits
   | _ -> Value_parameters.fatal "base is not Allocated: %a" Base.pretty base
 
-let alloc_by_stack_aux region prefix sizev state =
+let alloc_by_stack region prefix sizev state =
   let stack = call_stack_no_wrappers () in
   let max_level = Value_parameters.MallocLevel.get () in
   let all_vars =
@@ -454,7 +454,7 @@ let alloc_by_stack_aux region prefix sizev state =
   let rec aux nb vars =
     match vars with
     | [] -> (* must allocate a new variable *)
-      let b, _ as r = alloc_abstract Strong region prefix sizev state in
+      let b, _ as r = alloc_fresh Strong region prefix sizev state in
       MallocedByStack.replace stack (all_vars @ [b]);
       r
     | b :: q ->
@@ -490,21 +490,21 @@ let register_malloc ?replace name ?returns_null allocate_base =
 
 let () =
   register_malloc "malloc_fresh"
-    (alloc_abstract Strong Base.Malloc "malloc");
+    (alloc_fresh Strong Base.Malloc "malloc");
   register_malloc "malloc_fresh_weak"
-    (alloc_abstract Weak Base.Malloc "malloc");
+    (alloc_fresh Weak Base.Malloc "malloc");
   register_malloc ~replace:"malloc" "malloc_by_stack"
-    (alloc_by_stack_aux Base.Malloc "malloc");
+    (alloc_by_stack Base.Malloc "malloc");
   register_malloc ~replace:"__fc_vla_alloc" "vla_alloc_by_stack"
-    (alloc_by_stack_aux Base.VLA "malloc") ~returns_null:false;
+    (alloc_by_stack Base.VLA "malloc") ~returns_null:false;
   register_malloc ~replace:"alloca" "alloca"
-    (alloc_by_stack_aux Base.Alloca "alloca") ~returns_null:false;
+    (alloc_by_stack Base.Alloca "alloca") ~returns_null:false;
   register_malloc "malloc_imprecise"
-    (fun _ _ -> alloc_imprecise_weakest_abstract Base.Malloc);
+    (fun _ _ -> alloc_weakest_base Base.Malloc);
   register_malloc "vla_alloc_imprecise"
-    (fun _ _ -> alloc_imprecise_weakest_abstract Base.VLA);
+    (fun _ _ -> alloc_weakest_base Base.VLA);
   register_malloc "alloca_imprecise"
-    (fun _ _ -> alloc_imprecise_weakest_abstract Base.Alloca)
+    (fun _ _ -> alloc_weakest_base Base.Alloca)
 
 (* --------------------------------- Calloc --------------------------------- *)
 
@@ -559,12 +559,12 @@ let register_calloc ?replace name allocate_base =
   Builtins.register_builtin ?replace name builtin ~typ
 
 let () =
-  register_calloc "calloc_fresh" (alloc_abstract Strong Base.Malloc);
-  register_calloc "calloc_fresh_weak" (alloc_abstract Weak Base.Malloc);
+  register_calloc "calloc_fresh" (alloc_fresh Strong Base.Malloc);
+  register_calloc "calloc_fresh_weak" (alloc_fresh Weak Base.Malloc);
   register_calloc ~replace:"calloc" "calloc_by_stack"
-    (alloc_by_stack_aux Base.Malloc);
+    (alloc_by_stack Base.Malloc);
   register_calloc "calloc_imprecise"
-    (fun _ _ _ -> alloc_imprecise_weakest_abstract Base.Malloc)
+    (fun _ _ _ -> alloc_weakest_base Base.Malloc)
 
 (* ---------------------------------- Free ---------------------------------- *)
 
@@ -761,8 +761,8 @@ let realloc_alloc_copy weak bases_to_realloc null_in_arg sizev state =
   let base, max_valid =
     let prefix = "realloc" in
     match weak with
-    | Strong -> alloc_abstract Strong Base.Malloc prefix sizev state
-    | Weak -> alloc_by_stack_aux Base.Malloc prefix sizev state
+    | Strong -> alloc_fresh Strong Base.Malloc prefix sizev state
+    | Weak -> alloc_by_stack Base.Malloc prefix sizev state
   in
   (* Make sure that [ret] will be present in the result: we bind it at least
      to bottom everywhere *)
@@ -821,7 +821,7 @@ let realloc_multiple bases null size state =
   else res
 
 let realloc_imprecise_weakest _bases _null _size state =
-  let new_base, max_alloc = alloc_imprecise_weakest_abstract Base.Malloc in
+  let new_base, max_alloc = alloc_weakest_base Base.Malloc in
   let state = add_uninitialized state new_base max_alloc in
   let ret = V.inject new_base Ival.zero in
   ret, state
