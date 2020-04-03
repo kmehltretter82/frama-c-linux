@@ -54,9 +54,9 @@ val get_logic_function: string -> (unit -> logic_info) -> logic_info
     Note that function overloading is not supported.
 *)
 val get_logic_function_in_axiomatic:
-    string ->
-    (unit -> (string * global_annotation list) * logic_info list) ->
-    logic_info
+  string ->
+  (unit -> (string * global_annotation list) * logic_info list) ->
+  logic_info
 
 (** Clears internal tables *)
 val clear: unit -> unit

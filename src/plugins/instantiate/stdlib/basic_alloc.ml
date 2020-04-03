@@ -76,7 +76,7 @@ let make_axiomatic_is_allocable loc () =
   let max =
     tinteger
       (Integer.to_int
-        (Cil.max_unsigned_number (Cil.bitsSizeOf (size_t ()))))
+         (Cil.max_unsigned_number (Cil.bitsSizeOf (size_t ()))))
   in
   let label = FormalLabel("L") in
   let cond = pand (prel (Rlt, t_i, zero), prel (Rgt, t_i, max)) in
