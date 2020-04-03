@@ -449,7 +449,7 @@ let alloc_imprecise_weakest ?returns_null region state actuals =
   | _ -> raise (Builtins.Invalid_nb_of_args 1)
 
 let () = Builtins.register_builtin
-    "Frama_C_malloc_imprecise_weakest" (alloc_imprecise_weakest Base.Malloc)
+    "Frama_C_malloc_imprecise" (alloc_imprecise_weakest Base.Malloc)
     ~typ:(fun () -> (Cil.voidPtrType, [Cil.theMachine.Cil.typeOfSizeOf]))
 
 let zero_to_max_bytes () = Ival.inject_range
@@ -601,7 +601,7 @@ let () = Builtins.register_builtin
     (alloc_by_stack Base.VLA ~returns_null:false)
     ~typ:(fun () -> (Cil.voidPtrType, [Cil.theMachine.Cil.typeOfSizeOf]))
 let () = Builtins.register_builtin
-    "Frama_C_vla_alloc_imprecise_weakest"
+    "Frama_C_vla_alloc_imprecise"
     (alloc_imprecise_weakest Base.VLA ~returns_null:false)
     ~typ:(fun () -> (Cil.voidPtrType, [Cil.theMachine.Cil.typeOfSizeOf]))
 let () = Builtins.register_builtin
@@ -609,7 +609,7 @@ let () = Builtins.register_builtin
     (alloc_by_stack ~prefix:"alloca" Base.Alloca ~returns_null:false)
     ~typ:(fun () -> (Cil.voidPtrType, [Cil.theMachine.Cil.typeOfSizeOf]))
 let () = Builtins.register_builtin
-    "Frama_C_alloca_imprecise_weakest"
+    "Frama_C_alloca_imprecise"
     (alloc_imprecise_weakest Base.Alloca ~returns_null:false)
     ~typ:(fun () -> (Cil.voidPtrType, [Cil.theMachine.Cil.typeOfSizeOf]))
 
@@ -630,7 +630,7 @@ let calloc_imprecise_weakest : Db.Value.builtin = fun state actuals ->
   calloc_abstract calloc_f state actuals
 
 let () = Builtins.register_builtin
-    "Frama_C_calloc_imprecise_weakest" calloc_imprecise_weakest
+    "Frama_C_calloc_imprecise" calloc_imprecise_weakest
     ~typ:(fun () -> (Cil.voidPtrType, [Cil.theMachine.Cil.typeOfSizeOf;
                                        Cil.theMachine.Cil.typeOfSizeOf]))
 
@@ -952,7 +952,7 @@ let realloc_imprecise_weakest state args = match args with
   | _ -> raise (Builtins.Invalid_nb_of_args 2)
 
 let () = Builtins.register_builtin
-    "Frama_C_realloc_imprecise_weakest" realloc_imprecise_weakest
+    "Frama_C_realloc_imprecise" realloc_imprecise_weakest
     ~typ:(fun () -> (Cil.voidPtrType, [Cil.voidPtrType;
                                        Cil.theMachine.Cil.typeOfSizeOf]))
 

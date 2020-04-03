@@ -4,7 +4,7 @@
 #include <stddef.h>
 void *Frama_C_malloc_by_stack(size_t i);
 void *Frama_C_malloc_fresh(size_t i);
-void *Frama_C_malloc_imprecise_weakest(size_t i);
+void *Frama_C_malloc_imprecise(size_t i);
 void main(int c) {
   int x;
   int *s;
@@ -30,9 +30,9 @@ void main(int c) {
   *r = 1;
   *(r+2) = 3;
 
-  int *mw = Frama_C_malloc_imprecise_weakest(42);
+  int *mw = Frama_C_malloc_imprecise(42);
   *mw = 1;
-  int *mw2 = Frama_C_malloc_imprecise_weakest(42);
+  int *mw2 = Frama_C_malloc_imprecise(42);
   *mw2 = 1;
 
   //  *s = 1;

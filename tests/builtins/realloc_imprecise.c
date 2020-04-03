@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-eva-builtin malloc:Frama_C_malloc_imprecise_weakest,realloc:Frama_C_realloc_imprecise_weakest"
+   STDOPT: +"-eva-builtin malloc:Frama_C_malloc_imprecise,realloc:Frama_C_realloc_imprecise"
 */
 
 #include <stdlib.h>
