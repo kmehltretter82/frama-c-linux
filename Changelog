@@ -17,6 +17,8 @@
 Open Source Release <next-release>
 ##################################
 
+-   Eva       [2020/04/03] New experimental builtins for dynamic allocation
+              Frama_C_*alloc_imprecise: faster convergence, but very imprecise.
 -   Kernel    [2020/04/01] Report user errors when keys are not bound to a
               value for command-line options that require pairs of key:value
               as arguments. Such keys were silently ignored.
