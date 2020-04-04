@@ -1,5 +1,5 @@
 {
-  "name": "Ivette",
+  "name": "ivette",
   "version": "1.0.0",
   "main": "index.js",
   "repository": "git@git.frama-c.com:frama-c/Ivette.git",
@@ -22,10 +22,10 @@
     "@hot-loader/react-dom": "^16.13.0",
     "@types/codemirror": "^0.0.89",
     "@types/lodash": "^4.14.149",
-    "@types/react": "^16.9.32",
+    "@types/react": "^16.9.17",
     "@types/react-dom": "^16.9.6",
-    "babel-loader": "^8.1.0",
-    "css-loader": "^3.4.2",
+    "babel-loader": "^8.0.6",
+    "css-loader": "^3.4.0",
     "electron": "^7",
     "electron-builder": "^22.4.1",
     "electron-devtools-installer": "^2.2.4",
@@ -34,7 +34,7 @@
     "jsdoc": "^3.6.3",
     "react-hot-loader": "^4.12.20",
     "typescript": "^3.8.3",
-    "webpack": "^4.42.1"
+    "webpack": "^4.41.4"
   },
   "dependencies": {
     "@babel/runtime": "^7.9.2",

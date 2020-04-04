@@ -2,33 +2,32 @@
 // --- AST Source Code
 // --------------------------------------------------------------------------
 
-import _ from 'lodash' ;
-import React from 'react' ;
-import Dome from 'dome' ;
-import Server from 'frama-c/server' ;
-import States from 'frama-c/states' ;
+import _ from 'lodash';
+import React from 'react';
+import Server from 'frama-c/server';
+import States from 'frama-c/states';
 
-import { Vfill } from 'dome/layout/boxes' ;
-import { Buffer } from 'dome/text/buffers' ;
-import { Text } from 'dome/text/editors' ;
-import { Component } from 'frama-c/labviews' ;
+import { Vfill } from 'dome/layout/boxes';
+import { Buffer } from 'dome/text/buffers';
+import { Text } from 'dome/text/editors';
+import { Component } from 'frama-c/labviews';
 
 import 'codemirror/mode/clike/clike.js';
-import 'codemirror/theme/ambiance.css' ;
+import 'codemirror/theme/ambiance.css';
 
 // --------------------------------------------------------------------------
 // --- Rich Text Printer
 // --------------------------------------------------------------------------
 
-const print = (buffer, text) => {
+const print = (buffer: any, text: string) => {
   if (Array.isArray(text)) {
     const tag = text.shift();
     if (tag !== '')
-      buffer.openTextMarker( { id:tag } );
+      buffer.openTextMarker({ id: tag });
     text.forEach(txt => print(buffer, txt));
     if (tag !== '')
       buffer.closeTextMarker();
-  } else if (typeof(text)==='string')
+  } else if (typeof (text) === 'string')
     buffer.append(text);
 };
 
@@ -39,45 +38,45 @@ const print = (buffer, text) => {
 const ASTview = () => {
 
   // Hooks
-  const buffer = React.useMemo( () => new Buffer(), []);
-  const [ select, setSelect ] = States.useSelection();
-  const theFunction = select && select.function ;
-  const theMarker = select && select.marker ;
+  const buffer = React.useMemo(() => new Buffer(), []);
+  const [select, setSelect] = States.useSelection();
+  const theFunction = select && select.function;
+  const theMarker = select && select.marker;
 
   // Hook: async loading
-  React.useEffect( () => {
+  React.useEffect(() => {
     buffer.clear();
     if (theFunction) {
-      buffer.log('// Loading',theFunction,'…');
+      buffer.log('// Loading', theFunction, '…');
       Server
         .sendGET("kernel.ast.printFunction", theFunction)
-        .then(data => {
+        .then((data: string) => {
           buffer.clear();
           if (!data)
             buffer.log('// No code for function ', theFunction);
-          print(buffer,data);
-          if (theMarker) buffer.scroll( theMarker );
-      });
+          print(buffer, data);
+          if (theMarker) buffer.scroll(theMarker);
+        });
     }
-  }, [ theFunction ] );
+  }, [theFunction]);
 
   // Hook: scrolling
-  React.useEffect( () => {
-    if (theMarker) buffer.scroll( theMarker );
-  }, [ theMarker ] );
+  React.useEffect(() => {
+    if (theMarker) buffer.scroll(theMarker);
+  }, [theMarker]);
 
   // Callbacks
-  const onSelection = marker => setSelect({ marker });
+  const onSelection = (marker: any) => setSelect({ marker });
 
   // Component
   return (
     <Vfill>
       <Text buffer={buffer}
-            mode='text/x-csrc'
-            theme='ambiance'
-            selection={theMarker}
-            onSelection={onSelection}
-            readOnly />
+        mode='text/x-csrc'
+        theme='ambiance'
+        selection={theMarker}
+        onSelection={onSelection}
+        readOnly />
     </Vfill>
   );
 };
@@ -88,10 +87,10 @@ const ASTview = () => {
 
 export default () => (
   <Component id='frama-c.astview'
-             label='AST'
-             title='Normalized source code representation.'
-             >
-    <ASTview/>
+    label='AST'
+    title='Normalized source code representation.'
+  >
+    <ASTview />
   </Component>
 );
 
