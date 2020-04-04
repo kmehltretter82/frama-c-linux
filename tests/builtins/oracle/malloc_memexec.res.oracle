@@ -4,67 +4,65 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
-[eva] tests/builtins/malloc_memexec.c:19: Call to builtin Frama_C_malloc_fresh
-[eva] tests/builtins/malloc_memexec.c:19: allocating variable __malloc_main_l19
+[eva] tests/builtins/malloc_memexec.c:14: Call to builtin malloc
+[eva] tests/builtins/malloc_memexec.c:14: allocating variable __malloc_main_l14
 [eva] computing for function f <- main.
-  Called from tests/builtins/malloc_memexec.c:21.
+  Called from tests/builtins/malloc_memexec.c:16.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function f <- main.
-  Called from tests/builtins/malloc_memexec.c:22.
+  Called from tests/builtins/malloc_memexec.c:17.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function f <- main.
-  Called from tests/builtins/malloc_memexec.c:24.
+  Called from tests/builtins/malloc_memexec.c:19.
 [eva] Recording results for f
 [eva] Done for function f
-[eva] tests/builtins/malloc_memexec.c:27: 
-  Call to builtin Frama_C_malloc_fresh_weak
-[eva] tests/builtins/malloc_memexec.c:27: 
-  allocating weak variable __malloc_w_main_l27
+[eva] tests/builtins/malloc_memexec.c:23: Call to builtin malloc
+[eva] tests/builtins/malloc_memexec.c:23: 
+  allocating weak variable __malloc_w_main_l23
 [eva] computing for function f <- main.
-  Called from tests/builtins/malloc_memexec.c:29.
-[eva] Recording results for f
-[eva] Done for function f
-[eva] computing for function f <- main.
-  Called from tests/builtins/malloc_memexec.c:30.
+  Called from tests/builtins/malloc_memexec.c:25.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function f <- main.
-  Called from tests/builtins/malloc_memexec.c:32.
+  Called from tests/builtins/malloc_memexec.c:26.
+[eva] Recording results for f
+[eva] Done for function f
+[eva] computing for function f <- main.
+  Called from tests/builtins/malloc_memexec.c:28.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
-  __malloc_main_l19 ∈ {1; 2}
-  __malloc_w_main_l27[0] ∈ {1; 2} or UNINITIALIZED
+  __malloc_main_l14 ∈ {1; 2}
+  __malloc_w_main_l23[0] ∈ {1; 2} or UNINITIALIZED
 [eva:final-states] Values at end of function main:
-  p ∈ {{ &__malloc_main_l19 }}
-  q ∈ {{ &__malloc_w_main_l27[0] }}
-  __malloc_main_l19 ∈ {1}
-  __malloc_w_main_l27[0] ∈ {1; 2} or UNINITIALIZED
+  __fc_heap_status ∈ [--..--]
+  p ∈ {{ &__malloc_main_l14 }}
+  q ∈ {{ &__malloc_w_main_l23[0] }}
+  __malloc_main_l14 ∈ {1}
+  __malloc_w_main_l23[0] ∈ {1; 2} or UNINITIALIZED
 [from] Computing for function f
 [from] Done for function f
 [from] Computing for function main
-[from] Computing for function Frama_C_malloc_fresh <-main
-[from] Done for function Frama_C_malloc_fresh
-[from] Computing for function Frama_C_malloc_fresh_weak <-main
-[from] Done for function Frama_C_malloc_fresh_weak
+[from] Computing for function malloc <-main
+[from] Done for function malloc
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
   These dependencies hold at termination for the executions that terminate:
-[from] Function Frama_C_malloc_fresh:
-  \result FROM ANYTHING(origin:Unknown)
-[from] Function Frama_C_malloc_fresh_weak:
-  \result FROM ANYTHING(origin:Unknown)
 [from] Function f:
-  __malloc_main_l19 FROM p; i (and SELF)
-  __malloc_w_main_l27[0] FROM p; i (and SELF)
+  __malloc_main_l14 FROM p; i (and SELF)
+  __malloc_w_main_l23[0] FROM p; i (and SELF)
+[from] Function malloc:
+  __fc_heap_status FROM __fc_heap_status; size (and SELF)
+  \result FROM __fc_heap_status; size
 [from] Function main:
-  __malloc_main_l19 FROM ANYTHING(origin:Unknown) (and SELF)
-  __malloc_w_main_l27[0] FROM ANYTHING(origin:Unknown) (and SELF)
+  __fc_heap_status FROM __fc_heap_status (and SELF)
+  __malloc_main_l14 FROM __fc_heap_status; v (and SELF)
+  __malloc_w_main_l23[0] FROM __fc_heap_status; v (and SELF)
 [from] ====== END OF DEPENDENCIES ======
 [inout] InOut (internal) for function f:
   Operational inputs:
@@ -75,8 +73,8 @@
     \nothing
 [inout] InOut (internal) for function main:
   Operational inputs:
-    v
+    __fc_heap_status; v
   Operational inputs on termination:
-    v
+    __fc_heap_status; v
   Sure outputs:
-    p; q; __malloc_main_l19
+    p; q; __malloc_main_l14

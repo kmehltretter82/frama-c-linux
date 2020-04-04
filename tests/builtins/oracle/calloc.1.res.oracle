@@ -4,28 +4,22 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
-[eva] tests/builtins/calloc.c:14: 
-  Call to builtin Frama_C_calloc_fresh for function calloc
+[eva] tests/builtins/calloc.c:14: Call to builtin calloc
 [eva] tests/builtins/calloc.c:14: allocating variable __calloc_main_l14
-[eva] tests/builtins/calloc.c:17: 
-  Call to builtin Frama_C_calloc_fresh for function calloc
+[eva] tests/builtins/calloc.c:17: Call to builtin calloc
 [eva] tests/builtins/calloc.c:17: allocating variable __calloc_main_l17
-[eva] tests/builtins/calloc.c:20: 
-  Call to builtin Frama_C_calloc_fresh for function calloc
+[eva] tests/builtins/calloc.c:20: Call to builtin calloc
 [eva] tests/builtins/calloc.c:20: allocating variable __calloc_main_l20
-[eva] tests/builtins/calloc.c:23: 
-  Call to builtin Frama_C_calloc_fresh for function calloc
+[eva] tests/builtins/calloc.c:23: Call to builtin calloc
 [eva] tests/builtins/calloc.c:23: allocating variable __calloc_main_l23
 [eva] tests/builtins/calloc.c:26: assertion got status valid.
 [eva] tests/builtins/calloc.c:27: assertion got status valid.
-[eva] tests/builtins/calloc.c:30: 
-  Call to builtin Frama_C_calloc_fresh for function calloc
+[eva] tests/builtins/calloc.c:30: Call to builtin calloc
 [eva] tests/builtins/calloc.c:30: allocating variable __calloc_main_l30
 [eva] tests/builtins/calloc.c:33: assertion got status valid.
 [eva] tests/builtins/calloc.c:34: assertion got status valid.
 [eva] tests/builtins/calloc.c:35: assertion got status valid.
-[eva] tests/builtins/calloc.c:38: 
-  Call to builtin Frama_C_calloc_fresh for function calloc
+[eva] tests/builtins/calloc.c:38: Call to builtin calloc
 [eva] tests/builtins/calloc.c:38: Warning: 
   calloc out of bounds: assert(nmemb * size <= SIZE_MAX)
 [eva] tests/builtins/calloc.c:40: assertion got status valid.

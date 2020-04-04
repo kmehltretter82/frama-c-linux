@@ -6,7 +6,7 @@
   
 [eva] computing for function calloc <- main.
   Called from tests/libc/stdlib_c.c:14.
-[eva] share/libc/stdlib.c:72: Call to builtin Frama_C_malloc_by_stack
+[eva] share/libc/stdlib.c:72: Call to builtin Frama_C_malloc
 [eva] share/libc/stdlib.c:72: allocating variable __malloc_calloc_l72
 [eva] computing for function memset <- calloc <- main.
   Called from share/libc/stdlib.c:73.
@@ -27,7 +27,7 @@
 [eva] Done for function Frama_C_size_t_interval
 [eva] computing for function calloc <- main.
   Called from tests/libc/stdlib_c.c:21.
-[eva] share/libc/stdlib.c:72: Call to builtin Frama_C_malloc_by_stack
+[eva] share/libc/stdlib.c:72: Call to builtin Frama_C_malloc
 [eva] share/libc/stdlib.c:72: allocating variable __malloc_calloc_l72_0
 [eva] computing for function memset <- calloc <- main.
   Called from share/libc/stdlib.c:73.
@@ -44,7 +44,7 @@
 [eva] tests/libc/stdlib_c.c:28: assertion got status valid.
 [eva] computing for function calloc <- main.
   Called from tests/libc/stdlib_c.c:32.
-[eva] share/libc/stdlib.c:72: Call to builtin Frama_C_malloc_by_stack
+[eva] share/libc/stdlib.c:72: Call to builtin Frama_C_malloc
 [eva] share/libc/stdlib.c:72: allocating variable __malloc_calloc_l72_1
 [eva] computing for function memset <- calloc <- main.
   Called from share/libc/stdlib.c:73.
@@ -54,7 +54,7 @@
 [eva] tests/libc/stdlib_c.c:31: starting to merge loop iterations
 [eva] computing for function calloc <- main.
   Called from tests/libc/stdlib_c.c:32.
-[eva] share/libc/stdlib.c:72: Call to builtin Frama_C_malloc_by_stack
+[eva] share/libc/stdlib.c:72: Call to builtin Frama_C_malloc
 [eva] computing for function memset <- calloc <- main.
   Called from share/libc/stdlib.c:73.
 [eva] Done for function memset
@@ -64,7 +64,7 @@
   out of bounds write. assert \valid(s + (unsigned int)(i - 1));
 [eva] computing for function calloc <- main.
   Called from tests/libc/stdlib_c.c:32.
-[eva] share/libc/stdlib.c:72: Call to builtin Frama_C_malloc_by_stack
+[eva] share/libc/stdlib.c:72: Call to builtin Frama_C_malloc
 [eva] computing for function memset <- calloc <- main.
   Called from share/libc/stdlib.c:73.
 [eva] Done for function memset
@@ -72,7 +72,7 @@
 [eva] Done for function calloc
 [eva] computing for function calloc <- main.
   Called from tests/libc/stdlib_c.c:32.
-[eva] share/libc/stdlib.c:72: Call to builtin Frama_C_malloc_by_stack
+[eva] share/libc/stdlib.c:72: Call to builtin Frama_C_malloc
 [eva] computing for function memset <- calloc <- main.
   Called from share/libc/stdlib.c:73.
 [eva] Done for function memset
@@ -80,7 +80,7 @@
 [eva] Done for function calloc
 [eva] computing for function calloc <- main.
   Called from tests/libc/stdlib_c.c:32.
-[eva] share/libc/stdlib.c:72: Call to builtin Frama_C_malloc_by_stack
+[eva] share/libc/stdlib.c:72: Call to builtin Frama_C_malloc
 [eva] computing for function memset <- calloc <- main.
   Called from share/libc/stdlib.c:73.
 [eva] Done for function memset
@@ -88,7 +88,7 @@
 [eva] Done for function calloc
 [eva] computing for function calloc <- main.
   Called from tests/libc/stdlib_c.c:32.
-[eva] share/libc/stdlib.c:72: Call to builtin Frama_C_malloc_by_stack
+[eva] share/libc/stdlib.c:72: Call to builtin Frama_C_malloc
 [eva] computing for function memset <- calloc <- main.
   Called from share/libc/stdlib.c:73.
 [eva] Done for function memset
@@ -98,7 +98,7 @@
   Called from tests/libc/stdlib_c.c:37.
 [eva] share/libc/stdlib.c:196: 
   assertion 'alignment_is_a_suitable_power_of_two' got status valid.
-[eva] share/libc/stdlib.c:199: Call to builtin Frama_C_malloc_by_stack
+[eva] share/libc/stdlib.c:199: Call to builtin Frama_C_malloc
 [eva] share/libc/stdlib.c:199: allocating variable __malloc_posix_memalign_l199
 [eva] Recording results for posix_memalign
 [eva] Done for function posix_memalign
@@ -111,7 +111,7 @@
 [eva] Done for function free
 [eva] computing for function posix_memalign <- main.
   Called from tests/libc/stdlib_c.c:39.
-[eva] share/libc/stdlib.c:199: Call to builtin Frama_C_malloc_by_stack
+[eva] share/libc/stdlib.c:199: Call to builtin Frama_C_malloc
 [eva] share/libc/stdlib.c:199: 
   allocating variable __malloc_posix_memalign_l199_0
 [eva] Recording results for posix_memalign

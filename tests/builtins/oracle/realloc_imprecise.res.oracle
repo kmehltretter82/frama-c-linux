@@ -4,8 +4,7 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
-[eva] tests/builtins/realloc_imprecise.c:10: 
-  Call to builtin Frama_C_malloc_imprecise for function malloc
+[eva] tests/builtins/realloc_imprecise.c:10: Call to builtin malloc
 [eva:malloc:imprecise] tests/builtins/realloc_imprecise.c:10: Warning: 
   allocating a single weak variable for ALL dynamic allocations via malloc/calloc/realloc: __alloc_w_main
 [eva:alarm] tests/builtins/realloc_imprecise.c:11: Warning: 

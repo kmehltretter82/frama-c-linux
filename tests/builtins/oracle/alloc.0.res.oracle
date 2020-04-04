@@ -12,9 +12,9 @@
   u ∈ {0}
   v ∈ {0}
   ch ∈ {44}
-[eva] tests/builtins/alloc.c:16: Call to builtin Frama_C_malloc_fresh
+[eva] tests/builtins/alloc.c:16: Call to builtin malloc
 [eva] tests/builtins/alloc.c:16: allocating variable __malloc_main_l16
-[eva] tests/builtins/alloc.c:17: Call to builtin Frama_C_malloc_fresh
+[eva] tests/builtins/alloc.c:17: Call to builtin malloc
 [eva] tests/builtins/alloc.c:17: allocating variable __malloc_main_l17
 [eva:alarm] tests/builtins/alloc.c:18: Warning: 
   out of bounds write. assert \valid(p + (int)(-1));
@@ -32,7 +32,7 @@
   out of bounds write. assert \valid(t + 10);
 [kernel] tests/builtins/alloc.c:21: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
-[eva] tests/builtins/alloc.c:25: Call to builtin Frama_C_malloc_fresh
+[eva] tests/builtins/alloc.c:25: Call to builtin malloc
 [eva] tests/builtins/alloc.c:25: allocating variable __malloc_main_l25
 [eva:alarm] tests/builtins/alloc.c:26: Warning: 
   pointer downcast. assert (unsigned int)q ≤ 2147483647;
@@ -47,9 +47,9 @@
   out of bounds write. assert \valid(r);
 [eva:alarm] tests/builtins/alloc.c:27: Warning: 
   out of bounds read. assert \valid_read(r + 1);
-[eva] tests/builtins/alloc.c:32: Call to builtin Frama_C_malloc_fresh
+[eva] tests/builtins/alloc.c:32: Call to builtin malloc
 [eva] tests/builtins/alloc.c:32: allocating variable __malloc_main_l32
-[eva] tests/builtins/alloc.c:33: Call to builtin Frama_C_malloc_fresh
+[eva] tests/builtins/alloc.c:33: Call to builtin malloc
 [eva] tests/builtins/alloc.c:33: allocating variable __malloc_main_l33
 [eva:alarm] tests/builtins/alloc.c:34: Warning: 
   out of bounds write. assert \valid(u);
@@ -116,12 +116,12 @@
   __malloc_main_l33[0] ∈ {35}
                    [1] ∈ {36}
 [from] Computing for function main
-[from] Computing for function Frama_C_malloc_fresh <-main
-[from] Done for function Frama_C_malloc_fresh
+[from] Computing for function malloc <-main
+[from] Done for function malloc
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
   These dependencies hold at termination for the executions that terminate:
-[from] Function Frama_C_malloc_fresh:
+[from] Function malloc:
   __fc_heap_status FROM __fc_heap_status; size (and SELF)
   \result FROM __fc_heap_status; size
 [from] Function main:

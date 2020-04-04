@@ -13,7 +13,7 @@
   u ∈ {0}
   v ∈ {0}
   ch ∈ {44}
-[eva] tests/builtins/alloc.c:50: Call to builtin Frama_C_malloc_fresh
+[eva] tests/builtins/alloc.c:50: Call to builtin malloc
 [eva] tests/builtins/alloc.c:50: allocating variable __malloc_main_abs_l50
 [eva:alarm] tests/builtins/alloc.c:51: Warning: 
   pointer downcast. assert (unsigned int)q ≤ 2147483647;
@@ -46,12 +46,12 @@
   __malloc_main_abs_l50 ∈
                        {{ NULL + [1..510] ; &__malloc_main_abs_l50 + {1} }}
 [from] Computing for function main_abs
-[from] Computing for function Frama_C_malloc_fresh <-main_abs
-[from] Done for function Frama_C_malloc_fresh
+[from] Computing for function malloc <-main_abs
+[from] Done for function malloc
 [from] Done for function main_abs
 [from] ====== DEPENDENCIES COMPUTED ======
   These dependencies hold at termination for the executions that terminate:
-[from] Function Frama_C_malloc_fresh:
+[from] Function malloc:
   __fc_heap_status FROM __fc_heap_status; size (and SELF)
   \result FROM __fc_heap_status; size
 [from] Function main_abs:

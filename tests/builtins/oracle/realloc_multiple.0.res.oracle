@@ -6,11 +6,9 @@
   
 [eva] computing for function main1 <- main.
   Called from tests/builtins/realloc_multiple.c:75.
-[eva] tests/builtins/realloc_multiple.c:9: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/realloc_multiple.c:9: Call to builtin malloc
 [eva] tests/builtins/realloc_multiple.c:9: allocating variable __malloc_main1_l9
-[eva] tests/builtins/realloc_multiple.c:12: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/realloc_multiple.c:12: Call to builtin malloc
 [eva] tests/builtins/realloc_multiple.c:12: 
   allocating variable __malloc_main1_l12
 [eva] computing for function Frama_C_interval <- main1 <- main.
@@ -97,12 +95,10 @@
 [eva] Done for function main1
 [eva] computing for function main2 <- main.
   Called from tests/builtins/realloc_multiple.c:76.
-[eva] tests/builtins/realloc_multiple.c:30: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/realloc_multiple.c:30: Call to builtin malloc
 [eva] tests/builtins/realloc_multiple.c:30: 
   allocating variable __malloc_main2_l30
-[eva] tests/builtins/realloc_multiple.c:33: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/realloc_multiple.c:33: Call to builtin malloc
 [eva] tests/builtins/realloc_multiple.c:33: 
   allocating variable __malloc_main2_l33
 [eva] computing for function Frama_C_interval <- main2 <- main.
@@ -196,12 +192,10 @@
 [eva] Done for function main2
 [eva] computing for function main3 <- main.
   Called from tests/builtins/realloc_multiple.c:77.
-[eva] tests/builtins/realloc_multiple.c:52: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/realloc_multiple.c:52: Call to builtin malloc
 [eva] tests/builtins/realloc_multiple.c:52: 
   allocating variable __malloc_main3_l52
-[eva] tests/builtins/realloc_multiple.c:53: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/realloc_multiple.c:53: Call to builtin malloc
 [eva] tests/builtins/realloc_multiple.c:53: 
   allocating variable __malloc_main3_l53
 [eva] computing for function Frama_C_interval <- main3 <- main.

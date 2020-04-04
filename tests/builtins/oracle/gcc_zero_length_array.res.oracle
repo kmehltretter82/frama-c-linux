@@ -6,8 +6,7 @@
   
 [eva] computing for function make_fam <- main.
   Called from tests/builtins/gcc_zero_length_array.c:24.
-[eva] tests/builtins/gcc_zero_length_array.c:15: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/gcc_zero_length_array.c:15: Call to builtin malloc
 [eva] tests/builtins/gcc_zero_length_array.c:15: 
   allocating variable __malloc_make_fam_l15
 [eva] Recording results for make_fam
