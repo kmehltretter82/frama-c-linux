@@ -30,6 +30,7 @@ FRAMAC_LIBDIR :=$(shell frama-c-config -print-libpath)
 endif
 
 SRC_STRING:= \
+	mem_utils \
 	memcmp \
 	memcpy \
 	memmove \
@@ -55,7 +56,9 @@ PLUGIN_EXTRA_DIRS:=\
 	stdlib
 PLUGIN_CMI :=
 PLUGIN_CMO := \
-	options basic_blocks instantiator_builder transform register \
+	options basic_blocks \
+	global_context instantiator_builder \
+	transform register \
 	$(SRC_STRING) \
 	$(SRC_STDLIB)
 

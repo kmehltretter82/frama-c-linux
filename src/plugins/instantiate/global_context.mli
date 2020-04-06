@@ -21,38 +21,45 @@
 (**************************************************************************)
 
 open Cil_types
-open Mem_utils
 
-let function_name = "memmove"
+(** The purpose of this module global definitions when it is needed by
+    instantiation modules.
+*)
 
-let requires = memcpy_memmove_common_requires
-let assigns = memcpy_memmove_common_assigns
-let ensures = memcpy_memmove_common_ensures "moved"
-let generate_spec = mem2s_spec ~requires ~assigns ~ensures
+(** [get_variable name f] searches for an existing variable [name]. If this
+    variable does not exists, it is created using [f].
 
-module Function =
-struct
-  let name = function_name
-  let prototype () =
-    Ptr,
-    [
-      ("dest", Ptr, Strip);
-      ("src" , CPtr, Strip);
-      ("len",  Data (Basic_blocks.size_t()), Id)
-    ]
-  let well_typed = Mem_utils.mem2s_typing
-end
-module Memmove_base = Mem_utils.Make(Function)
+    The obtained varinfo does not need to be registered, nor [f] needs to
+    perform the registration, it will be done by the transformation.
+*)
+val get_variable: string -> (unit -> varinfo) -> varinfo
 
-let () = Transform.register (module struct
-    module Hashtbl = Cil_datatype.Typ.Hashtbl
-    type override_key = typ
+(** [get_logic_function name f] searches for an existing logic function [name].
+    If this function does not exists, it is created using [f]. If the logic
+    function must be part of an axiomatic block **DO NOT** use this function,
+    use [get_logic_function_in_axiomatic].
 
-    let function_name = function_name
-    let well_typed_call = Memmove_base.well_typed_call
-    let key_from_call = Memmove_base.key_from_call
-    let retype_args = Memmove_base.retype_args
-    let generate_prototype = Memmove_base.generate_prototype
-    let generate_spec = generate_spec
-    let args_for_original _ = Extlib.id
-  end)
+    Note that function overloading is not supported.
+*)
+val get_logic_function: string -> (unit -> logic_info) -> logic_info
+
+(** [get_logic_function_in_axiomatic name f] searches for an existing logic
+    function [name]. If this function does not exists, an axiomatic definition
+    is created using [f].
+
+    [f] must return:
+    - the axiomatic in a form [name, list of the defintions (incl. functions)]
+    - all functions that are part of the axiomatic definition
+
+    Note that function overloading is not supported.
+*)
+val get_logic_function_in_axiomatic:
+  string ->
+  (unit -> (string * global_annotation list) * logic_info list) ->
+  logic_info
+
+(** Clears internal tables *)
+val clear: unit -> unit
+
+(** Creates a list of global for the elements that have been created *)
+val globals: location -> global list

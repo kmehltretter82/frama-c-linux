@@ -83,14 +83,14 @@ let generate_prototype alloc_t =
   ] in
   name, (TFun(Cil.voidType, Some params, false, []))
 
-let well_typed_call _ret args =
+let well_typed_call _ret _fct args =
   match args with
   | [ ptr ] ->
     let t = Cil.typeOf (Cil.stripCasts ptr) in
     Cil.isPointerType t && not (Cil.isVoidPtrType t)
   | _ -> false
 
-let key_from_call _ret args =
+let key_from_call _ret _fct args =
   match args with
   | [ ptr ] ->
     let ptr = Cil.stripCasts ptr in

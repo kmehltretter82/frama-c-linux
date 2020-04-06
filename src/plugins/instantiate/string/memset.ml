@@ -68,7 +68,7 @@ let pset_len_bytes_to_zero ?loc ptr bytes_len =
     let value = match Logic_utils.unroll_type t.term_type with
       | Ctype(TPtr(_)) -> term Tnull t.term_type
       | Ctype(TFloat(_)) -> treal ?loc 0.
-      | Ctype(TInt(_)) -> tinteger ?loc 0
+      | Ctype(TInt(_) | TEnum (_)) -> tinteger ?loc 0
       | _ -> unexpected "non atomic type during equality generation"
     in
     prel ?loc (Req, t, value)
@@ -89,15 +89,18 @@ let pset_len_bytes_all_bits_to_one ?loc ptr bytes_len =
       papp ?loc ((find_nan_for_type t.term_type), [], [t])
     | Ctype(TPtr(_)) ->
       pnot ?loc (pvalid_read ?loc (here_label, t))
-    | Ctype(TInt(kind, _)) | Ctype(TEnum({ ekind = kind }, _)) ->
+    | Ctype((TInt(kind, _) | TEnum({ ekind = kind }, _)) as typ) ->
       let is_signed = Cil.isSigned kind in
       let bits = Cil.bitsSizeOfInt kind in
-      let value = if is_signed then
-          Cil.min_signed_number bits
+      let value =
+        if is_signed then
+          let zero = tinteger ?loc 0 in
+          let zero = Logic_utils.mk_cast ?loc typ zero in
+          term (TUnOp(BNot, zero)) t.term_type
         else
-          Cil.max_unsigned_number bits
+          let value = Cil.max_unsigned_number bits in
+          term ?loc (TConst (Integer (value,None))) Linteger
       in
-      let value = term ?loc (TConst (Integer (value,None))) Linteger in
       prel ?loc (Req, t, value)
     | _ ->
       unexpected "non atomic type during equality generation"
@@ -175,12 +178,6 @@ let generate_spec (_t, e) { svar = vi } loc =
   let ensures  = generate_ensures e loc t ptr value len in
   make_funspec [make_behavior ~requires ~assigns ~ensures ()] ()
 
-let type_from_arg x =
-  let x = Cil.stripCasts x in
-  let xt = Cil.unrollTypeDeep (Cil.typeOf x) in
-  let xt = Cil.type_remove_qualifier_attributes_deep xt in
-  Cil.typeOf_pointed xt
-
 let memset_value e =
   let ff = Integer.of_int 255 in
   match (Cil.constFold false e).enode with
@@ -198,23 +195,26 @@ let rec contains_union_type t =
     contains_union_type t
   | _ -> false
 
-let well_typed_call _ret = function
-  | [ ptr ; _ ; _ ] when any_char_composed_type (type_from_arg ptr) -> true
-  | [ ptr ; _ ; _ ] when contains_union_type (type_from_arg ptr) -> false
-  | [ ptr ; _ ; _ ] when Cil.isVoidType (type_from_arg ptr) -> false
-  | [ ptr ; _ ; _ ] when not (Cil.isCompleteType (type_from_arg ptr)) -> false
-  | [ _ ; value ; _ ] ->
-    begin match memset_value value with
-      | None -> false
-      | Some _ -> true
+let well_typed_call _ret _fct = function
+  | [ ptr ; value ; _ ] ->
+    begin match Mem_utils.exp_type_of_pointed ptr, memset_value value with
+      | (No_pointed | Of_null _) , _ -> false
+      | Value_of t , _ when any_char_composed_type t -> true
+      | Value_of t , _ when contains_union_type t -> false
+      | Value_of t , _ when Cil.isVoidType t -> false
+      | Value_of t , _ when not (Cil.isCompleteType t) -> false
+      | _, None -> false
+      | _, Some _ -> true
     end
   | _ -> false
 
-let key_from_call _ret = function
-  | [ ptr ; _ ; _ ] when any_char_composed_type (type_from_arg ptr) ->
-    (type_from_arg ptr), None
-  | [ ptr ; value ; _ ] when not (contains_union_type (type_from_arg ptr)) ->
-    (type_from_arg ptr), (memset_value value)
+let key_from_call _ret _fct = function
+  | [ ptr ; value ; _ ] ->
+    begin match Mem_utils.exp_type_of_pointed ptr, memset_value value with
+      | Value_of t, _ when any_char_composed_type t -> t, None
+      | Value_of t, value when not (contains_union_type t) -> t, value
+      | _ , _ -> unexpected "trying to generate a key on an ill-typed call"
+    end
   | _ -> unexpected "trying to generate a key on an ill-typed call"
 
 let char_prototype t =
@@ -246,17 +246,18 @@ let generate_prototype = function
   | _, _ ->
     unexpected "trying to generate a prototype on an ill-typed call"
 
-let retype_args (t, e) args =
+let retype_args (_t, e) args =
   match e, args with
   | None, [ ptr ; v ; n ] ->
     let ptr = Cil.stripCasts ptr in
-    assert (any_char_composed_type (type_from_arg ptr)) ;
-    let base_type = base_char_type (type_from_arg ptr) in
+    let base_type = match Mem_utils.exp_type_of_pointed ptr with
+      | Value_of t -> base_char_type t
+      | _ -> unexpected "trying to retype arguments on an ill-typed call"
+    in
     let v = Cil.mkCast (Cil.stripCasts v) base_type in
     [ ptr ; v ; n ]
   | Some fv, [ ptr ; v ; n ] ->
     let ptr = Cil.stripCasts ptr in
-    assert (Cil_datatype.Typ.equal (type_from_arg ptr) t) ;
     assert (match memset_value v with Some x when x = fv -> true | _ -> false) ;
     [ ptr ; n ]
   | _ ->

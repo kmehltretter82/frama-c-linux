@@ -70,7 +70,7 @@ let generate_prototype alloc_t =
   ] in
   name, (TFun((ptr_of alloc_t), Some params, false, []))
 
-let well_typed_call ret args =
+let well_typed_call ret _fct args =
   match ret, args with
   | Some ret, [ _ ] ->
     let t = Cil.typeOfLval ret in
@@ -78,13 +78,13 @@ let well_typed_call ret args =
     Cil.isCompleteType (Cil.typeOf_pointed t)
   | _ -> false
 
-let key_from_call ret _ =
+let key_from_call ret _fct _ =
   match ret with
   | Some ret ->
     let ret_t = Cil.unrollTypeDeep (Cil.typeOfLval ret) in
     let ret_t = Cil.type_remove_qualifier_attributes_deep ret_t in
     Cil.typeOf_pointed ret_t
-  | None -> unexpected "trying to generate a key on an ill-typed call"
+  | _ -> unexpected "trying to generate a key on an ill-typed call"
 
 let retype_args _typ args = args
 let args_for_original _typ args = args

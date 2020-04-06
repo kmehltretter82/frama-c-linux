@@ -29,12 +29,6 @@ let register (module G: Generator_sig) =
   let module Instantiator = Make_instantiator(G) in
   Hashtbl.add base G.function_name (module Instantiator)
 
-let mark_as_computed () =
-  let mark_as_computed _ instantiator =
-    let module I = (val instantiator: Instantiator) in I.mark_as_computed ()
-  in
-  Hashtbl.iter mark_as_computed base
-
 let get_kfs () =
   let get_kfs _ instantiator =
     let module I = (val instantiator: Instantiator) in
@@ -42,6 +36,14 @@ let get_kfs () =
     res
   in
   Hashtbl.fold (fun k v l -> (get_kfs k v) @ l) base []
+
+let clear () =
+  Global_context.clear () ;
+  let clear _ instantiator =
+    let module I = (val instantiator: Instantiator) in
+    I.clear ()
+  in
+  Hashtbl.iter clear base
 
 module VISet = Cil_datatype.Varinfo.Hptset
 
@@ -53,9 +55,9 @@ class transformer = object(self)
 
   method! vfile _ =
     let post f =
+      f.globals <- (Global_context.globals (Cil.CurrentLoc.get())) @ f.globals ;
       Ast.mark_as_changed () ;
       Ast.mark_as_grown () ;
-      mark_as_computed () ;
       f
     in
     Cil.DoChildrenPost post
@@ -90,14 +92,15 @@ class transformer = object(self)
   method private replace_call (lval, fct, args) =
     try
       let module I = (val (self#find_enabled_instantiator fct): Instantiator) in
-      if I.well_typed_call lval args then
-        let key = I.key_from_call lval args in
+      if I.well_typed_call lval fct args then
+        let key = I.key_from_call lval fct args in
         let fundec = I.get_override key in
         let new_args = I.retype_args key args in
         Queue.add fundec used_instantiator_last_kf ;
         (fundec.svar), new_args
       else begin
-        Options.warning ~current:true "Ignore call: not well typed" ;
+        Options.warning
+          ~current:true "%s instantiator cannot replace call" fct.vname ;
         (fct, args)
       end
     with
@@ -158,5 +161,7 @@ let compute_statuses_all_kfs () =
   List.iter compute_comp_disj_statuses kfs
 
 let transform file =
+  clear () ;
   Visitor.visitFramacFile (new transformer) file ;
+  File.reorder_ast () ;
   compute_statuses_all_kfs ()
