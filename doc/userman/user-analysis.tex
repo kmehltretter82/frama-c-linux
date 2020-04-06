@@ -152,6 +152,23 @@ With \texttt{-safe-arrays}, the two accesses to \lstinline|v| are considered
 invalid. (Accessing \lstinline|v.b[-2]| or \lstinline|v.b[3]| remains incorrect,
 regardless of the value of the option.)
 
+\item \optiondef{-}{warn-invalid-pointer} may be used to check that the code
+  does not perform illegal pointer arithmetics, creating pointers that do not
+  point inside an object or one past an object.
+  This option is disabled by default, allowing the creation of such invalid
+  pointers without alarm — but the dereferencing of an invalid pointer
+  \emph{always} generates an alarm.
+
+  For instance, no error is detected by default in the following example, as
+  the dereferencing is correct. However, if option
+  \texttt{-warn-invalid-pointer} is enabled, an error is detected at line 4.
+  \begin{ccode}
+    int x;
+    int *p = &x;
+    p++;  // valid
+    p++;  // undefined behavior
+    *(p-2) = 1;
+  \end{ccode}
 
 \item \optiondef{-}{unspecified-access} may be used to check when the
   evaluation of an expression depends on the order in which its sub-expressions
@@ -178,6 +195,16 @@ int g() { return f() + x++; }
 Here, the \texttt{x} might be incremented by \texttt{g} before or after the
 call to \texttt{f}, but since the two write accesses occur in different
 functions, \texttt{-unspecified-access} does not detect that.
+
+\item \optiondef{-}{warn-pointer-downcast} may be used to check that the code
+  does not downcast a pointer to an integer type. This option is set by default.
+  In the following example, analyzers report by default an error on the third
+  line. Disabling the option removes this verification.
+  \begin{ccode}
+    int x;
+    uintptr_t addr = &x;
+    int a = &x;
+  \end{ccode}
 
 \item \optiondef{-}{warn-signed-downcast} may be used to check that the analyzed
   code does not downcast an integer to a signed integer type. This option is
