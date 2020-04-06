@@ -397,26 +397,6 @@ struct
   let havoc seq obj loc = havoc_length seq obj loc F.e_one
 
   (* -------------------------------------------------------------------------- *)
-  (* --- Stored & Copied                                                    --- *)
-  (* -------------------------------------------------------------------------- *)
-
-  let updated seq phi_store alpha loc value =
-    let chunk_store,mem_store = phi_store seq.pre alpha loc value in
-    let chunk_init,mem_init = M.init_atom seq.pre loc in
-    [Set(Sigma.value seq.post chunk_store,mem_store) ;
-     Set(Sigma.value seq.post chunk_init,mem_init)]
-
-  let stored seq obj loc value =
-    match obj with
-    | C_int i -> updated seq M.store_int i loc value
-    | C_float f -> updated seq M.store_float f loc value
-    | C_pointer ty -> updated seq M.store_pointer ty loc value
-    | C_comp _ | C_array _ ->
-        Set(loadvalue seq.post obj loc, value) :: havoc seq obj loc
-
-  let copied s obj p q = stored s obj p (loadvalue s.pre obj q)
-
-  (* -------------------------------------------------------------------------- *)
   (* --- Initialized                                                        --- *)
   (* -------------------------------------------------------------------------- *)
 
@@ -434,16 +414,40 @@ struct
         let obj_e, ds = Matrix.of_array ai in
         let denv = Matrix.denv ds in
         let values = List.fold_left e_get term denv.index_val in
-        let size_eq size value =
+        let make_subst var value p =
           match value with
-          | None -> p_true
-          | Some i -> p_equal size (e_int i)
+          | None -> p
+          | Some i -> p_subst_var var (e_int i) p
         in
-        let sizes = List.map2 size_eq denv.size_val ds in
-        p_hyps (denv.index_range @ sizes) (initialized_term obj_e values)
+        let substs = List.map2 make_subst denv.size_var ds in
+        let conj =
+          List.fold_left (fun p f -> f p) (p_conj denv.index_range) substs
+        in
+        p_imply conj (initialized_term obj_e values)
 
   let initialized_loc sigma obj loc =
     initialized_term obj (initvalue sigma obj loc)
+
+  (* -------------------------------------------------------------------------- *)
+  (* --- Stored & Copied                                                    --- *)
+  (* -------------------------------------------------------------------------- *)
+
+  let updated seq phi_store alpha loc value =
+    let chunk_store,mem_store = phi_store seq.pre alpha loc value in
+    let chunk_init,mem_init = M.init_atom seq.pre loc in
+    [Set(Sigma.value seq.post chunk_store,mem_store) ;
+     Set(Sigma.value seq.post chunk_init,mem_init)]
+
+  let stored seq obj loc value =
+    match obj with
+    | C_int i -> updated seq M.store_int i loc value
+    | C_float f -> updated seq M.store_float f loc value
+    | C_pointer ty -> updated seq M.store_pointer ty loc value
+    | C_comp _ | C_array _ ->
+        Assert(p_close (initialized_loc seq.post obj loc)) ::
+        Set(loadvalue seq.post obj loc, value) :: havoc seq obj loc
+
+  let copied s obj p q = stored s obj p (loadvalue s.pre obj q)
 
   (* -------------------------------------------------------------------------- *)
   (* --- Assigned                                                           --- *)
@@ -481,7 +485,7 @@ struct
         assigned_range seq obj loc a b
 
   (* -------------------------------------------------------------------------- *)
-  (* --- Domain                                                           --- *)
+  (* --- Domain                                                             --- *)
   (* -------------------------------------------------------------------------- *)
 
   let domain obj loc =
