@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** This module defines the mode to restrict an abstract domains on specific
+(** This module defines the mode to restrict an abstract domain on specific
     functions. *)
 
 (** Permission for an abstract domain to read/write its state.

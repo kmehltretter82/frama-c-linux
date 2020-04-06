@@ -286,7 +286,7 @@ module Restrict
 
   (* This module propagates states of type [(state * mode) option]:
      - None is propagated as long as no functions from [Scope.functions]
-       is analyzed.
+       are analyzed.
      - then the current [mode] is propagated alongside the state. Queries and
        transfer functions are applied accordingly. The current mode is replaced
        at function calls by [mode.calls]. *)
@@ -422,7 +422,7 @@ module Restrict
   (* Starts an analysis at call [call] with state [state]. The domain was not
      enabled before this call: the concrete arguments may contain variables that
      have never been introduced into the state, so we should not use them. This
-     function only introduce the formal parameters in the state. *)
+     function only introduces the formal parameters in the state. *)
   let start_analysis call state =
     let formals = List.map (fun argument -> argument.formal) call.arguments in
     let kind = Abstract_domain.Formal call.kf in

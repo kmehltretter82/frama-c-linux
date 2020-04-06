@@ -25,9 +25,9 @@
 (** {2 Registration of abstractions.} *)
 
 (** Dynamic registration of the abstractions to be used in an Eva analysis:
-    - value abstractions, detailled in the {Abstract_value} signature;
-    - location abstractions, detailled in the {Abstract_location} signature;
-    - state abstractions, or abstract domains, detailled in {Abstract_domain}.
+    - value abstractions, detailed in the {Abstract_value} signature;
+    - location abstractions, detailed in the {Abstract_location} signature;
+    - state abstractions, or abstract domains, detailed in {Abstract_domain}.
 *)
 
 (** Module types of value abstractions: either a single leaf module, or
@@ -138,7 +138,7 @@ val register_hook: ((module S) -> (module S)) -> unit
 (** {2 Configuration of an analysis.} *)
 
 (** Configuration defining the abstractions to be used in an analysis.
-    A configuration is a set of flags, i.e. a set of abstract domain. Each flag
+    A configuration is a set of flags, i.e. a set of abstract domains. Each flag
     comes with an optional mode. None is the default mode: the given domain is
     enabled for the whole analysis. See {!Domain_mode} for more details. *)
 module Config : sig

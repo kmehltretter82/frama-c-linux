@@ -362,7 +362,7 @@ module type S = sig
       that depend on the memory location [loc].
       If the first argument is not None, it contains the logical clause being
       interpreted and the pre-state in which the terms of the clause are
-      evaluated. The clause can be an \assign, \allocated or \free clause.
+      evaluated. The clause can be an assigns, allocates or frees clause.
       [loc] is then the memory location concerned by the clause. *)
   val logic_assign: (logic_assign * state) option -> location -> state -> state
 
