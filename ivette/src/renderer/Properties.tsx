@@ -8,7 +8,7 @@ import States from 'frama-c/states';
 import { Label, Code } from 'dome/controls/labels';
 import { ArrayModel } from 'dome/table/arrays';
 import { Table, DefineColumn } from 'dome/table/views';
-import { Component } from 'frama-c/labviews';
+import { Component } from 'frama-c/LabViews';
 
 // --------------------------------------------------------------------------
 // --- Property Columns

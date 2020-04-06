@@ -10,7 +10,7 @@ import States from 'frama-c/states';
 import { Vfill } from 'dome/layout/boxes';
 import { Buffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
-import { Component } from 'frama-c/labviews';
+import { Component } from 'frama-c/LabViews';
 
 import 'codemirror/mode/clike/clike.js';
 import 'codemirror/theme/ambiance.css';

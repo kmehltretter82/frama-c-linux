@@ -6,7 +6,7 @@ import React from 'react';
 import Dome from 'dome';
 import Server from 'frama-c/server';
 
-import { Component, TitleBar } from 'frama-c/labviews';
+import { Component, TitleBar } from 'frama-c/LabViews';
 import { Button as ToolButton, ButtonGroup, Space } from 'dome/layout/toolbars';
 import { LED, IconButton } from 'dome/controls/buttons';
 import { Label, Code } from 'dome/controls/labels';

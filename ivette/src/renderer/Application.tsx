@@ -11,7 +11,7 @@ import Sidebar from 'dome/layout/sidebars';
 
 import './style.css';
 
-import { LabView, View, Group } from 'frama-c/labviews';
+import { LabView, View, Group } from 'frama-c/LabViews';
 import { GridItem } from 'dome/layout/grids';
 import Controller from './Controller';
 import Properties from './Properties';
