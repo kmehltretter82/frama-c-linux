@@ -1049,7 +1049,15 @@ let invalid sigma = segment (s_invalid sigma)
 
 let initialized sigma = function
   | Rloc(obj, loc) -> initialized_loc sigma obj loc
-  | Rrange _ -> p_false
+  | Rrange(loc, obj, Some low, Some up) ->
+      let v = e_var (Lang.freshvar ~basename:"i" Lang.t_int) in
+      let hyps = [ p_leq low v ; p_leq v up] in
+      let loc = shift loc obj v in
+      p_hyps hyps (initialized_loc sigma obj loc)
+  | Rrange(l, _, low, up) ->
+      Wp_parameters.abort ~current:true
+        "Invalid infinite range @[<hov 2>%a+@,(%a@,..%a)@]"
+        F.pp_term l Vset.pp_bound low Vset.pp_bound up
 
 let frame sigma =
   let wellformed_frame phi chunk =
