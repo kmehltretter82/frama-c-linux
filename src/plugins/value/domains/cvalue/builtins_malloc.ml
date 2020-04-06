@@ -820,40 +820,43 @@ let realloc_imprecise_weakest _bases _null _size state =
   let ret = V.inject new_base Ival.zero in
   ret, state
 
-let register_realloc ?replace name realloc =
-  let builtin state args =
-    let ptr, size =
-      match args with
-      | [ (_, ptr, _); (_, size, _) ] -> ptr, size
-      | _ -> raise (Builtins.Invalid_nb_of_args 2)
-    in
-    let bases, card_ok, null = resolve_bases_to_free ptr in
-    if card_ok > 0 then
-      let ret, new_state = realloc bases null size state in
-      (* Maybe the calls above made [ret] weak, and it
-         was among the arguments. In this case, do not free it entirely! *)
-      let strong = card_ok <= 1 && not Base.(Hptset.exists is_weak bases) in
-      (* free old bases. *)
-      let new_state, changed = free_aux new_state ~strong bases in
-      let c_values = wrap_fallible_alloc ret state new_state in
-      { Value_types.c_values;
-        c_clobbered = Builtins.clobbered_set_from_ret new_state ret;
-        c_cacheable = Value_types.NoCacheCallers;
-        c_from = Some changed; }
-    else (* Invalid call. *)
-      { Value_types.c_values = [] ;
-        c_clobbered = Base.SetLattice.bottom;
-        c_cacheable = Value_types.NoCacheCallers;
-        c_from = None; }
+let choose_bases_reallocation () =
+  let open Eva_annotations in
+  match get_allocation (current_call_site ()) with
+  | Fresh | Fresh_weak -> realloc_multiple
+  | By_stack -> realloc_alloc_copy Weak
+  | Imprecise -> realloc_imprecise_weakest
+
+let realloc_builtin state args =
+  let ptr, size =
+    match args with
+    | [ (_, ptr, _); (_, size, _) ] -> ptr, size
+    | _ -> raise (Builtins.Invalid_nb_of_args 2)
   in
-  let name = "Frama_C_" ^ name in
-  let typ () = Cil.(voidPtrType, [voidPtrType; theMachine.typeOfSizeOf]) in
-  Builtins.register_builtin ?replace name builtin ~typ
+  let bases, card_ok, null = resolve_bases_to_free ptr in
+  if card_ok > 0 then
+    let realloc = choose_bases_reallocation () in
+    let ret, new_state = realloc bases null size state in
+    (* Maybe the calls above made [ret] weak, and it
+       was among the arguments. In this case, do not free it entirely! *)
+    let strong = card_ok <= 1 && not Base.(Hptset.exists is_weak bases) in
+    (* free old bases. *)
+    let new_state, changed = free_aux new_state ~strong bases in
+    let c_values = wrap_fallible_alloc ret state new_state in
+    { Value_types.c_values;
+      c_clobbered = Builtins.clobbered_set_from_ret new_state ret;
+      c_cacheable = Value_types.NoCacheCallers;
+      c_from = Some changed; }
+  else (* Invalid call. *)
+    { Value_types.c_values = [] ;
+      c_clobbered = Base.SetLattice.bottom;
+      c_cacheable = Value_types.NoCacheCallers;
+      c_from = None; }
 
 let () =
-  register_realloc ~replace:"realloc" "realloc" (realloc_alloc_copy Weak);
-  register_realloc "realloc_multiple" realloc_multiple;
-  register_realloc "realloc_imprecise" realloc_imprecise_weakest
+  let name = "Frama_C_realloc" in
+  let typ () = Cil.(voidPtrType, [voidPtrType; theMachine.typeOfSizeOf]) in
+  Builtins.register_builtin ~replace:"realloc" name realloc_builtin ~typ
 
 (* ----------------------------- Leak detection ----------------------------- *)
 
