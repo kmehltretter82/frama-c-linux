@@ -274,6 +274,14 @@ let parse string =
       Kernel.fatal ~current:true
         "Unexpected error parsing floating-point constant: %s." string
 
+let has_suffix fk lit =
+  let s = match fk with
+    | Cil_types.FFloat -> 'F'
+    | Cil_types.FDouble -> 'D'
+    | Cil_types.FLongDouble -> 'L' in
+  let ln = String.length lit in
+  ln > 0 && Char.uppercase_ascii lit.[ln-1] = s
+
 let pretty_normal ~use_hex fmt f =
   let double_norm = Int64.shift_left 1L 52 in
   let double_mask = Int64.pred double_norm in

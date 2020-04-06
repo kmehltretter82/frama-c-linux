@@ -2435,7 +2435,7 @@ class cil_printer () = object (self)
       begin match ty, t.term_node with
         | TFloat(fk,_) , TConst(LReal r as cst) when
             not Kernel.(is_debug_key_enabled dkey_print_logic_coercions) &&
-            Cil.isExactFloat fk r ->
+            Floating_point.has_suffix fk r.r_literal ->
           self#logic_constant fmt cst
         | _ ->
           fprintf fmt "(%a)%a" (self#typ None) ty term e
