@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-eva-alloc-builtin imprecise -eva-builtin realloc:Frama_C_realloc_imprecise"
+   STDOPT: +"-eva-alloc-builtin imprecise"
 */
 
 #include <stdlib.h>

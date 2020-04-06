@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-slevel 10 -eva-alloc-builtin fresh -eva-warn-copy-indeterminate @all"
+   STDOPT: +"-slevel 10 -eva-alloc-builtin by_stack -eva-warn-copy-indeterminate @all"
 */
 
 #include <stdlib.h>

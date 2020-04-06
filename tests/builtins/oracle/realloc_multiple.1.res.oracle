@@ -51,8 +51,7 @@
   __malloc_main1_l9[0..4] ∈ {5}
   __malloc_main1_l12[0..5] ∈ {6}
   ==END OF DUMP==
-[eva] tests/builtins/realloc_multiple.c:23: 
-  Call to builtin Frama_C_realloc_multiple for function realloc
+[eva] tests/builtins/realloc_multiple.c:23: Call to builtin realloc
 [eva] tests/builtins/realloc_multiple.c:23: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {__malloc_main1_l12}
@@ -177,8 +176,7 @@
   __malloc_main2_l30[0..4] ∈ {7}
   __malloc_main2_l33[0..5] ∈ {8}
   ==END OF DUMP==
-[eva] tests/builtins/realloc_multiple.c:45: 
-  Call to builtin Frama_C_realloc_multiple for function realloc
+[eva] tests/builtins/realloc_multiple.c:45: Call to builtin realloc
 [eva] tests/builtins/realloc_multiple.c:45: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {__malloc_main2_l33}
@@ -317,8 +315,7 @@
   __malloc_main3_l52 ∈ {{ &x }}
   __malloc_main3_l53 ∈ {{ &y }}
   ==END OF DUMP==
-[eva] tests/builtins/realloc_multiple.c:65: 
-  Call to builtin Frama_C_realloc_multiple for function realloc
+[eva] tests/builtins/realloc_multiple.c:65: Call to builtin realloc
 [eva] tests/builtins/realloc_multiple.c:65: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {__malloc_main3_l53}

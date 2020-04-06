@@ -1,6 +1,6 @@
 /* run.config*
-   STDOPT: +"-slevel 10 -eva-alloc-builtin fresh -eva-builtin realloc:Frama_C_realloc_multiple -eva-malloc-functions malloc,realloc"
-   STDOPT: +"-slevel 10 -eva-alloc-builtin fresh -eva-builtin realloc:Frama_C_realloc_multiple -eva-malloc-functions malloc,realloc -eva-alloc-returns-null"
+   STDOPT: +"-slevel 10 -eva-alloc-builtin fresh -eva-malloc-functions malloc,realloc"
+   STDOPT: +"-slevel 10 -eva-alloc-builtin fresh -eva-malloc-functions malloc,realloc -eva-alloc-returns-null"
 */
 #include <stdlib.h>
 #include "__fc_builtin.h"
