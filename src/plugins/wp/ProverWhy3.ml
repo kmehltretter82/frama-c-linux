@@ -895,18 +895,22 @@ class visitor (ctx:context) c =
           let decl = Why3.Decl.create_data_decl [tys,[cstr,fields]] in
           ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
 
-    method on_comp c (fts:(Lang.field * Lang.tau) list) =
+    method private on_comp_gen kind c (fts:(Lang.field * Lang.tau) list) =
       begin
+        let make_id = match kind with
+          | Lang.KValue -> Lang.comp_id
+          | Lang.KInit -> Lang.comp_init_id
+        in
         let compare_field (f,_) (g,_) =
           let cmp = Lang.Field.compare f g in
           if cmp = 0 then assert false (* by definition *) else cmp
         in
         let fts = List.sort compare_field fts in
         (*TODO:NUPW: manage UNIONS *)
-        let id = Why3.Ident.id_fresh (Lang.comp_id c) in
+        let id = Why3.Ident.id_fresh (make_id c) in
         let ts = Why3.Ty.create_tysymbol id [] Why3.Ty.NoDef in
         let ty = Why3.Ty.ty_app ts [] in
-        let id = Why3.Ident.id_fresh (Lang.comp_id c) in
+        let id = Why3.Ident.id_fresh (make_id c) in
         let cnv = empty_cnv ctx in
         let map (f,tau) =
           let ty_ctr = of_tau ~cnv tau in
@@ -920,30 +924,8 @@ class visitor (ctx:context) c =
         ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
       end
 
-    method on_comp_init c (fts:(Lang.field * Lang.tau) list) =
-      begin
-        let compare_field (f,_) (g,_) =
-          let cmp = Lang.Field.compare f g in
-          if cmp = 0 then assert false (* by definition *) else cmp
-        in
-        let fts = List.sort compare_field fts in
-        (*TODO:NUPW: manage UNIONS *)
-        let id = Why3.Ident.id_fresh (Lang.comp_init_id c) in
-        let ts = Why3.Ty.create_tysymbol id [] Why3.Ty.NoDef in
-        let ty = Why3.Ty.ty_app ts [] in
-        let id = Why3.Ident.id_fresh (Lang.comp_init_id c) in
-        let cnv = empty_cnv ctx in
-        let map (f,tau) =
-          let ty_ctr = of_tau ~cnv tau in
-          let id = Why3.Ident.id_fresh (Lang.name_of_field f) in
-          let ls = Why3.Term.create_lsymbol id [ty] ty_ctr in
-          (Some ls,Why3.Opt.get ty_ctr)
-        in
-        let fields = List.map map fts in
-        let constr = Why3.Term.create_fsymbol ~constr:1 id (List.map snd fields) ty in
-        let decl = Why3.Decl.create_data_decl [ts,[constr,List.map fst fields]] in
-        ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
-      end
+    method on_comp = self#on_comp_gen KValue
+    method on_comp_init = self#on_comp_gen KInit
 
     method private make_lemma cnv (l: Definitions.dlemma) =
       let id = Why3.Ident.id_fresh (Lang.lemma_id l.l_name) in
