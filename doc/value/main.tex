@@ -31,6 +31,7 @@
 
 \newcommand{\framacversion}%
            {\input{../../VERSION} (\input{../../VERSION_CODENAME}\unskip)}
+\newcommand{\isoc}{\textsf{C99}}
 
 \newcommand{\Eva}{\textsf{Eva}}
 
@@ -630,7 +631,7 @@ no run-time error could happen when running the program.
 The alarm means that \Eva{} could not prove that the value \verb|ks[i]|
 accessed in \verb|skein_block.c:69| was definitely initialized before being
 read. Reading an initialized value is an undefined behavior according to the
-ISO C99 standard (and can even lead to security vulnerabilities).
+\isoc{} standard (and can even lead to security vulnerabilities).
 
 As is often the case, this alarm is related to the approximation introduced
 in \verb|skein_block.c:56|, which is the loop responsible for initializing
@@ -1479,7 +1480,7 @@ This may happen on:
   In this case, the emitted alarm reports a possible undefined behavior.
 \item conversion of an integer into a pointer. Except for the constant~0,
   such a conversion is always an implementation-defined behavior
-  according to the ISO C99 standard. However, a footnote also explains that
+  according to the \isoc{} standard. However, a footnote also explains that
   conversion between pointers and integers is ``\emph{intended to
   be consistent with the addressing structure of the execution environment}''.
   This is why Eva also also authorizes conversion of integers:
@@ -1546,7 +1547,7 @@ simpler than this one. Do not be surprised by them.
 Another arithmetic alarm is the alarm emitted for logical
 shift operations on integers where the second operand may be
 larger than the size in bits of the first operand's type. 
-Such an operation is left undefined by the ISO/IEC 9899:1999 standard, and
+Such an operation is left undefined by the \isoc{} standard, and
 indeed, processors are often built in a way that such an
 operation does not produce the \lstinline|0| or \lstinline|-1|
 result that could have been expected. Here is an example
@@ -1558,7 +1559,7 @@ shift.c:4: ... invalid RHS operand for shift. assert 0 <= c < 32;
 
 \Eva{} also detects shifts on negative integers.
 Left-shifting a negative integer is an undefined behavior according to the
-ISO C99 standard, and leads to an alarm by default.
+\isoc{} standard, and leads to an alarm by default.
 These alarms can be disabled by using the option
 \lstinline|-no-warn-left-shift-negative|.
 Right-shifting a negative integer is an implementation-defined operation,
@@ -1577,7 +1578,7 @@ By default, \Eva{} emits alarms for --- and reduces the
 sets of possible results of --- signed arithmetic computations where
 the possibility of an overflow exists. Indeed,
 such overflows have an undefined behavior according to
-paragraph 6.5.5 of the ISO/IEC 9899:1999 standard.
+paragraph 6.5.5 of the \isoc{} standard.
 %
 If useful, it is also possible to assume that signed integers overflow
 according to a 2's complement representation. The option
@@ -1588,13 +1589,13 @@ as potentially overflowing. This warning can also be disabled by option
 
 By default, no alarm is emitted for arithmetic operations on unsigned integers
 for which an overflow may happen, since such operations have
-defined semantics according to the ISO/IEC 9899:1999 standard.
+defined semantics according to the \isoc{} standard.
 If one wishes to signal and prevent such unsigned overflows,
 option \verb+-warn-unsigned-overflow+ can be used.
 
 By default, Eva emits alarms for downcasts of pointer values to (signed
 or unsigned) integer types. Such downcasts are indeed  undefined behavior
-according to section 6.3.2.3, §6 of the ISO/IEC 9899:1999 standard.
+according to section 6.3.2.3, §6 of the \isoc{} standard.
 However, option \lstinline|-no-warn-pointer-downcast| can be used to disable
 these alarms.
 
@@ -1715,7 +1716,7 @@ can also be used to activate this behavior for all functions.
 
 By default, \Eva{} emits an alarm whenever a trap representation might be read
 from an lvalue of type \texttt{\_Bool}.
-According to the ISO/IEC 9899:1999 standard, the \texttt{\_Bool} type contains
+According to the \isoc{} standard, the \texttt{\_Bool} type contains
 the values 0 and 1, but any other value might be a trap representation, that is,
 an object representation that does not represent a valid value of the type.
 Trap representations can be created through unions or pointer casts.
@@ -1867,7 +1868,7 @@ compiler, if we may ask such a rhetorical
 question, is right? They all are, because the program is undefined.
 When function \lstinline|copy()| is called from \lstinline|main()|,
 the assignment \lstinline|*p = *q;| breaks
-C99's 6.5.16.1:3 rule. This rule states that 
+\isoc{}'s 6.5.16.1:3 rule. This rule states that 
 in an assignment from lvalue to lvalue,
 the left and right lvalues must overlap either exactly or not at all.
 
@@ -2173,7 +2174,7 @@ limited form, but imprecisions may accumulate quickly
 
 \Eva{} does not check all the properties that could be
 expected of it\footnote{There are 245 unspecified or undefined
-  behaviors in Annex J of the ISO C99 standard.}. Support for each of
+  behaviors in Annex J of the \isoc{} standard.}. Support for each of
 these missing features could arrive if the need was expressed. Below
 are some of the existing limitations.
 
