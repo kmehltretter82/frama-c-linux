@@ -187,7 +187,7 @@ val expr_to_predicate: exp -> predicate
     of the original C-expression.
 
     This is different from [expr_to_term e |> scalar_term_to_predicate]
-    since it directly translate C-relations into logic ones.
+    since C-relations are translated into logic ones.
 
     @raise Fatal error if the expression is not a comparison and cannot be
            compared to zero.
@@ -212,7 +212,7 @@ val expr_to_boolean: exp -> term
     of the original C-expression.
 
     This is different from [expr_to_term e |> scalar_term_to_predicate]
-    since it directly translate C-relations into logic ones.
+    since C-relations are translated into logic ones.
 
     @raise Fatal error if the expression is not a comparison and cannot be
            compared to zero.
@@ -256,9 +256,9 @@ val lconstant_to_constant: logic_constant-> constant
     The returned term is either a real constant or
     real constant casted into a C-float type.
 
-    Unsuffised constants are considered as real numbers.
-    Literals suffixed by ['f'] or ['d'] are
-    considered as float constants. *)
+    Unsuffixed literals are considered as real numbers.
+    Literals suffixed by [f|d|l] or [F|D|L] are considered
+    as float constants of the associated kind. *)
 val parse_float : ?loc:location -> string -> term
 
 (** {2 Various Utilities} *)

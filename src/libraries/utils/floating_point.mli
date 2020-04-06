@@ -69,7 +69,7 @@ type parsed_float = {
     with no suffix are parsed as double. *)
 val parse: string -> Cil_types.fkind * parsed_float
 
-(** Checks if the (uppercased) string ends with an explicit `F|D|L`
+(** Checks if the (uppercased) string ends with an explicit [F|D|L]
     suffix for the given float kind. *)
 val has_suffix: Cil_types.fkind -> string -> bool
 
