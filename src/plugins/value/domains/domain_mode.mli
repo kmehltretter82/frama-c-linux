@@ -20,20 +20,35 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Transfer functions for the main domain of the Value analysis. *)
+(** This module defines the mode to restrict an abstract domain on specific
+    functions. *)
 
-type value = Main_values.CVal.t
-type origin = value
-type location = Main_locations.PLoc.location
+(** Permission for an abstract domain to read/write its state.
+    If [write] is true, the domain infers new properties when interpreting
+    assignments, assumptions, and logical assertions. Otherwise, it only
+    propagates already known properties as long as they hold.
+    If [read] is true, the domain uses its inferred properties to improve
+    the evaluation of expressions by extracting information from its state.
+    It can also evaluate logical assertions. *)
+type permission = { read: bool; write: bool; }
 
-include Abstract_domain.Transfer
-  with type state := Cvalue.Model.t
-   and type value := value
-   and type location := location
-   and type origin := origin
+(** Mode for the analysis of a function [f]:
+    - [current] is the read/write permission for [f].
+    - [calls] is the read/write permission for all functions called from [f]. *)
+type mode = { current: permission; calls: permission; }
 
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)
+(** Datatype for modes. *)
+module Mode : sig
+  include Datatype.S_with_collections with type t = mode
+  val all: t (** Default mode: all permissions are granted. *)
+end
+
+(** A function associated with an analysis mode. *)
+type function_mode = Kernel_function.t * mode
+
+module Function_Mode:
+  Parameter_sig.Multiple_value_datatype with type key = string
+                                         and type t = function_mode
+
+(** Analysis mode for a domain. *)
+include Datatype.S with type t = function_mode list

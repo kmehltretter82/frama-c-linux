@@ -189,7 +189,7 @@ module Make
 
   type value = Value.t
   type location = Precise_locs.precise_location
-  type origin = unit
+  type origin
 
   let reduce_further (equalities, _, _) expr value =
     let atom = HCE.of_exp expr in
@@ -232,12 +232,12 @@ module Make
       in
       let v = Equality.Equality.fold aux_eq equality (`Value Value.top) in
       (* Remove the 'origin' information of garbled mixes. *)
-      let v = v >>-: fun v -> imprecise_origin v, () in
+      let v = v >>-: fun v -> imprecise_origin v, None in
       (* All expressions used by the equality domain have already been evaluated
          before during the analysis; alarms about those expressions have already
          been emitted. *)
       v, Alarmset.none
-    | None -> `Value (Value.top, ()), Alarmset.all
+    | None -> `Value (Value.top, None), Alarmset.all
 
   let extract_expr (oracle: exp -> Value.t evaluated) (equalities, _, _) expr =
     let expr = Cil.constFold true expr in
@@ -503,7 +503,7 @@ module Make
     | Some equality -> Equality.Equality.pretty fmt equality
     | None -> ()
 
-  let logic_assign _assigns location ~pre:_ state =
+  let logic_assign _assigns location state =
     let loc = Precise_locs.imprecise_location location in
     let zone = Locations.(enumerate_valid_bits Write loc) in
     kill Hcexprs.Modified zone state

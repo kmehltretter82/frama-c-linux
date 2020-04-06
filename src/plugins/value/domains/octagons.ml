@@ -1037,9 +1037,9 @@ module Domain = struct
 
   type value = Cvalue.V.t
   type location = Precise_locs.precise_location
-  type origin = unit
+  type origin
 
-  let top_value = `Value (Cvalue.V.top, ()), Alarmset.all
+  let top_value = `Value (Cvalue.V.top, None), Alarmset.all
 
   let extract_expr oracle state expr =
     let evaluate_expr expr =
@@ -1057,7 +1057,7 @@ module Domain = struct
     then top_value
     else if Ival.is_bottom ival
     then `Bottom, Alarmset.all
-    else `Value (Cvalue.V.inject_ival ival, ()), alarms
+    else `Value (Cvalue.V.inject_ival ival, None), alarms
 
   let extract_lval _oracle _t _lval _typ _loc = top_value
 
@@ -1235,7 +1235,7 @@ module Domain = struct
 
   let show_expr _valuation _state _fmt _expr = ()
 
-  let logic_assign _logic_assign location ~pre:_ state =
+  let logic_assign _logic_assign location state =
     let loc = Precise_locs.imprecise_location location in
     let zone = Locations.(enumerate_valid_bits Write loc) in
     let state = kill zone state in

@@ -848,7 +848,7 @@ module Internal = struct
   type nonrec state = state
   type value = Cvalue.V.t
   type location = Precise_locs.precise_location
-  type origin = unit
+  type origin
 
   include (Traces: sig
              include Datatype.S_with_collections with type t = state
@@ -931,7 +931,7 @@ module Internal = struct
     Traces.add_trans state (Msg msg)
 
   (* TODO *)
-  let logic_assign _assign _location ~pre:_ state =
+  let logic_assign _assign _location state =
     Traces.add_trans state (Msg "logic assign")
 
   (* Logic *)
@@ -940,7 +940,7 @@ module Internal = struct
 
   let storage () = true
 
-  let top_query = `Value (Cvalue.V.top, ()), Alarmset.all
+  let top_query = `Value (Cvalue.V.top, None), Alarmset.all
 
   let extract_expr _oracle _state _expr = top_query
   let extract_lval _oracle _state _lv _typ _locs = top_query

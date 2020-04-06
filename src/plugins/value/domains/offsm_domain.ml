@@ -97,7 +97,7 @@ module Internal  : Domain_builder.InputDomain
   type value = offsm_or_top
   type state = Memory.t
   type location = Precise_locs.precise_location
-  type origin = unit (* ???? *)
+  type origin
 
   include (Memory: sig
              include Datatype.S_with_collections with type t = state
@@ -164,7 +164,7 @@ module Internal  : Domain_builder.InputDomain
   let show_expr _valuation _state _fmt _expr = ()
 
   let extract_expr _oracle _state _exp =
-    `Value (Offsm_value.Offsm.top, ()), Alarmset.all
+    `Value (Offsm_value.Offsm.top, None), Alarmset.all
 
   (* Basic 'find' on a location *)
   let find_loc state loc =
@@ -181,7 +181,7 @@ module Internal  : Domain_builder.InputDomain
       if Cil.typeHasQualifier "volatile" typ ||
          not (Cil.isArithmeticOrPointerType typ)
       then
-        `Value (Top, ())
+        `Value (Top, None)
       else
         try
           let aux_loc loc o =
@@ -189,8 +189,8 @@ module Internal  : Domain_builder.InputDomain
             Bottom.join Offsm_value.Offsm.join o o'
           in
           Precise_locs.fold aux_loc locs `Bottom >>-: fun v ->
-          v, ()
-        with Abstract_interp.Error_Top -> `Value (Top, ())
+          v, None
+        with Abstract_interp.Error_Top -> `Value (Top, None)
     in
     o, Alarmset.all
 
@@ -216,7 +216,7 @@ module Internal  : Domain_builder.InputDomain
   let initialize_variable _ _ ~initialized:_ _ state = state
 
   (* Logic *)
-  let logic_assign _assign location ~pre:_ state =
+  let logic_assign _assign location state =
     let loc = Precise_locs.imprecise_location location in
     kill loc state
 

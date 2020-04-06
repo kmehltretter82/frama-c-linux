@@ -466,7 +466,7 @@ module Internal : Domain_builder.InputDomain
   type state = Memory.t
   type value = V.t
   type location = Precise_locs.precise_location
-  type origin = unit
+  type origin
 
   include (Memory: sig
              include Datatype.S_with_collections with type t = state
@@ -569,7 +569,7 @@ module Internal : Domain_builder.InputDomain
 
   let show_expr _valuation _state _fmt _expr = ()
 
-  let top_query = `Value (V.top, ()), Alarmset.all
+  let top_query = `Value (V.top, None), Alarmset.all
 
   (* For extraction functions, if we have an information about the value,
      this means that the key has been evaluated in all the paths that reach
@@ -579,12 +579,12 @@ module Internal : Domain_builder.InputDomain
   let extract_expr _oracle state expr =
     match Memory.find_expr expr state with
     | None -> top_query
-    | Some v -> `Value (v, ()), Alarmset.none
+    | Some v -> `Value (v, None), Alarmset.none
 
   let extract_lval _oracle state lv _typ _locs =
     match Memory.find_lval lv state with
     | None -> top_query
-    | Some v -> `Value (v, ()), Alarmset.none
+    | Some v -> `Value (v, None), Alarmset.none
 
   let backward_location _state _lval _typ loc value =
     (* Nothing to do. We could check if [[lval]] intersects [value] and
@@ -631,7 +631,7 @@ module Internal : Domain_builder.InputDomain
   let initialize_variable _ _ ~initialized:_ _ state = state
 
   (* Logic *)
-  let logic_assign _assigns location ~pre:_ state =
+  let logic_assign _assigns location state =
     let loc = Precise_locs.imprecise_location location in
     Memory.kill loc state
 

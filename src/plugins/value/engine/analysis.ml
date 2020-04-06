@@ -165,17 +165,8 @@ let force_compute () =
   let module Analyzer = (val snd !ref_analyzer) in
   Analyzer.compute_from_entry_point ~lib_entry kf
 
-let set_hook_on_parameter parameter =
-  let open Typed_parameter in
-  match parameter.accessor with
-  | Bool (accessor, _)   -> accessor.add_set_hook (fun _ _ -> reset_analyzer ())
-  | Int (accessor, _)    -> accessor.add_set_hook (fun _ _ -> reset_analyzer ())
-  | String (accessor, _) -> accessor.add_set_hook (fun _ _ -> reset_analyzer ())
-
-(* Resets the Analyzer whenever an abstraction parameter or the current project
-   is changed. This maintains the analyzer consistent with the Eva parameters. *)
+(* Resets the Analyzer when the current project is changed. *)
 let () =
-  List.iter set_hook_on_parameter Value_parameters.parameters_abstractions;
   Project.register_after_set_current_hook
     ~user_only:true (fun _ -> reset_analyzer ());
   Project.register_after_global_load_hook reset_analyzer
