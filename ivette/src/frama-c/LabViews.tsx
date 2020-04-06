@@ -4,56 +4,62 @@
 
 /** @module frama-c/labviews */
 
-import _ from 'lodash' ;
-import React from 'react' ;
-import Dome from 'dome' ;
-import { Catch } from 'dome/errors' ;
-import { DnD, DragSource } from 'dome/dnd' ;
-import { SideBar, Section, Item } from 'dome/layout/sidebars' ;
-import { Splitter } from 'dome/layout/splitters' ;
-import Grids, { GridLayout, GridItem } from 'dome/layout/grids' ;
-import { Hbox, Hfill, Vfill, Filler } from 'dome/layout/boxes' ;
-import { IconButton, Field } from 'dome/controls/buttons' ;
-import { Label } from 'dome/controls/labels' ;
-import { Icon } from 'dome/controls/icons' ;
-import { Item as ItemToRender,
-         Render as RenderItem } from 'dome/layout/dispatch' ;
-import './labviews.css' ;
+import _ from 'lodash';
+import React from 'react';
+import Dome from 'dome';
+import { Catch } from 'dome/errors';
+import { DnD, DragSource } from 'dome/dnd';
+import { SideBar, Section, Item } from 'dome/layout/sidebars';
+import { Splitter } from 'dome/layout/splitters';
+import Grids, { GridLayout, GridItem } from 'dome/layout/grids';
+import { Hbox, Hfill, Vfill } from 'dome/layout/boxes';
+import { IconButton, Field } from 'dome/controls/buttons';
+import { Label } from 'dome/controls/labels';
+import { Icon } from 'dome/controls/icons';
+import {
+  Item as ItemToRender,
+  Render as RenderItem
+} from 'dome/layout/dispatch';
+import './labviews.css';
 
 // --------------------------------------------------------------------------
 // --- Library
 // --------------------------------------------------------------------------
 
 class Library {
+  modified: boolean;
+  virtual: {};
+  collection: {};
+  items: any[];
 
   constructor() {
-    this.modified = false ;
-    this.virtual = {} ;
-    this.collection = {} ;
-    this.items = [] ;
+    this.modified = false;
+    this.virtual = {};
+    this.collection = {};
+    this.items = [];
   }
 
   commit() {
-    if (!_.isEqual(this.collection,this.virtual)) {
-      this.collection = Object.assign({},this.virtual) ;
-      this.items = _.sortBy(this.collection , [ 'order', 'id' ]);
-      this.modified = false ;
+    if (!_.isEqual(this.collection, this.virtual)) {
+      this.collection = Object.assign({}, this.virtual);
+      this.items = _.sortBy(this.collection, ['order', 'id']);
+      this.modified = false;
       Dome.emit('labview.library');
     }
   }
 
-  useItem(id,gcontext,path,props) {
+  useItem(id: string, gcontext: any, path: any[], props: { rank: undefined; group: any; }) {
     if (!this.modified) {
-      this.modified = true ;
+      this.modified = true;
       setImmediate(() => this.commit());
     }
     if (!id) return undefined;
     let order = props.rank === undefined
-        ? path
-        : path.slice(0,-1).concat([props.rank]);
-    let group = props.group || gcontext ;
-    let collection = this.virtual ;
-    collection[id] = Object.assign( { id, order, group }, props );
+      ? path
+      : path.slice(0, -1).concat([props.rank]);
+    let group = props.group || gcontext;
+    let collection: any = this.virtual;
+    collection[id] = Object.assign({ id, order, group }, props);
     return () => delete collection[id];
   }
 
@@ -63,30 +69,29 @@ class Library {
 // --- Library Components
 // --------------------------------------------------------------------------
 
-const isItemId = (fd,id) => id.startsWith(fd) && id[fd.length] === '.' ;
-const getItemId = (fd,id) => isItemId(fd,id) ? id.substring(fd.length+1) : undefined ;
-const getItems = (items,fd) => items.filter((item) => isItemId(fd,item.id));
+const isItemId = (fd: string, id: string) => id.startsWith(fd) && id[fd.length] === '.';
+const getItemId = (fd: string, id: string) => isItemId(fd, id) ? id.substring(fd.length + 1) : undefined;
+const getItems = (items: any[], fd: string) => items.filter((item) => isItemId(fd, item.id));
 
-const LibraryManager = React.createContext();
+const LibraryManager = React.createContext(undefined);
 
-const useLibraryItem = (fd,{id, ...props}) => {
+const useLibraryItem = (fd: string, { id, ...props }: any) => {
   let context = React.useContext(LibraryManager);
   React.useEffect(() => {
     if (context) {
-      let { group, order, library } = context ;
-      let itemId = fd + '.' + id ;
-      return library.useItem(itemId,group,order,props);
+      let { group, order, library }: any = context;
+      let itemId = fd + '.' + id;
+      return library.useItem(itemId, group, order, props);
     } else
-      return undefined ;
+      return undefined;
   });
-  return context ;
+  return context;
 };
 
-
-const Rankify = ({ library, group, order, children }) => {
+const Rankify = ({ library, group, order, children }: any) => {
   let rank = 0;
-  let rankify = (elt) => {
-    let context = { group, order:order.concat([rank++]), library };
+  let rankify = (elt: any) => {
+    let context: any = { group, order: order.concat([rank++]), library };
     return (
       <LibraryManager.Provider value={context}>
         {elt}
@@ -95,14 +100,14 @@ const Rankify = ({ library, group, order, children }) => {
   };
   return (
     <React.Fragment>
-      {React.Children.map( children, rankify )}
+      {React.Children.map(children, rankify)}
     </React.Fragment>
   );
 };
 
 const HIDDEN = { display: 'none' };
 
-const UseLibrary = ( { library, children } ) => (
+const UseLibrary = ({ library, children }: any) => (
   <div style={HIDDEN}>
     <Rankify library={library} order={[]}>
       {children}
@@ -117,8 +122,8 @@ const UseLibrary = ( { library, children } ) => (
    Renderers its children in the specified order.
    Otherwized, elements are ordered by `rank` and `id`.
  */
-export const Fragment = ({ group, children }) => {
-  let context = React.useContext(LibraryManager);
+export const Fragment = ({ group, children }: any) => {
+  let context: any = React.useContext(LibraryManager);
   if (!context)
     return null;
   else {
@@ -147,8 +152,8 @@ export const Fragment = ({ group, children }) => {
    in their specified order. For nested collections of components,
    use `<Fragment/>` instead of `<React.Fragment/>` to specify order.
  */
-export const Group = ({ children,...props}) => {
-  let context = useLibraryItem('groups',props);
+export const Group = ({ children, ...props }: any) => {
+  let context: any = useLibraryItem('groups', props);
   return (
     <Rankify
       group={props.id}
@@ -183,8 +188,8 @@ export const Group = ({ children,...props}) => {
    import { GridItem, GridHbox, GridVbox } from 'dome/layout/grids';
    ```
  */
-export const View = (props) => {
-  useLibraryItem('views',props);
+export const View = (props: any) => {
+  useLibraryItem('views', props);
   return null;
 };
 
@@ -207,12 +212,12 @@ export const View = (props) => {
    to the current enclosing group. The `rank` property can be used
    for adjusting component ordering (see also `<Fragment/>` and `<Group/>`).
  */
-export const Component = (props) => {
-  useLibraryItem('components',props);
+export const Component = (props: any) => {
+  useLibraryItem('components', props);
   return null;
 };
 
-const TitleContext = React.createContext();
+const TitleContext: any = React.createContext(undefined);
 
 /**
    @class
@@ -226,13 +231,13 @@ const TitleContext = React.createContext();
    If specified, the icon, label and title properties are rendered in an `<Label/>` component.
    By default, the component title bar is labelled according to the component properties.
  */
-export const TitleBar = ({icon,label,title,children}) => {
-  let context = React.useContext(TitleContext);
+export const TitleBar = ({ icon, label, title, children }: any) => {
+  let context: any = React.useContext(TitleContext);
   return (
-    <ItemToRender id={'labview.title.'+context.id}>
+    <ItemToRender id={'labview.title.' + context.id}>
       <Label className='labview-handle' icon={icon}
-             label={label || context.label}
-             title={title || context.title}/>
+        label={label || context.label}
+        title={title || context.title} />
       {children}
     </ItemToRender>
   );
@@ -258,34 +263,34 @@ const GRIDITEM_PLAIN = { fill: 'both' };
 const GRIDITEM_HPANE = { fill: 'horizontal' };
 const GRIDITEM_VPANE = { fill: 'vertical' };
 
-const makeGridItem = (customize,onClose) => comp => {
-  let { id:libId, label, title, layout='PLAIN', children } = comp ;
-  let id = getItemId('components',libId);
-  let properties = Object.assign( {}, GRIDITEM );
-  switch( layout ) {
-  case 'PLAIN':
-    Object.assign( properties, GRIDITEM_PLAIN );
-    break;
-  case 'HPANE':
-    Object.assign( properties, GRIDITEM_HPANE );
-    break;
-  case 'VPANE':
-    Object.assign( properties, GRIDITEM_VPANE );
-    break;
-  default:
-    console.warn(`[labviews] unexpected layout for ${id} component`,layout);
-    break;
+const makeGridItem = (customize: any, onClose: any) => (comp: any) => {
+  let { id: libId, label, title, layout = 'PLAIN', children } = comp;
+  let id = getItemId('components', libId);
+  let properties: any = Object.assign({}, GRIDITEM);
+  switch (layout) {
+    case 'PLAIN':
+      Object.assign(properties, GRIDITEM_PLAIN);
+      break;
+    case 'HPANE':
+      Object.assign(properties, GRIDITEM_HPANE);
+      break;
+    case 'VPANE':
+      Object.assign(properties, GRIDITEM_VPANE);
+      break;
+    default:
+      console.warn(`[labviews] unexpected layout for ${id} component`, layout);
+      break;
   }
   for (let fd in properties) {
-    let prop = comp[fd] ;
-    if (prop) properties[fd] = prop ;
+    let prop = comp[fd];
+    if (prop) properties[fd] = prop;
   }
-  let CLOSING ;
+  let CLOSING;
   if (customize) CLOSING = (
     <IconButton
       className='labview-close'
       offset={-1} icon='CROSS'
-      onClick={() => onClose(id)}/>
+      onClick={() => onClose(id)} />
   );
   return (
     <GridItem id={id} {...properties}>
@@ -293,15 +298,15 @@ const makeGridItem = (customize,onClose) => comp => {
         <Hbox className='labview-titlebar'>
           <Hfill>
             <Catch title={id}>
-              <RenderItem id={ 'labview.title.' + id }>
+              <RenderItem id={'labview.title.' + id}>
                 <Label className='labview-handle'
-                       label={label} title={title} />
+                  label={label} title={title} />
               </RenderItem>
             </Catch>
           </Hfill>
-          { CLOSING }
+          {CLOSING}
         </Hbox>
-        <TitleContext.Provider value={{id,label,title}}>
+        <TitleContext.Provider value={{ id, label, title }}>
           <Catch title={id}>{children}</Catch>
         </TitleContext.Provider>
       </Vfill>
@@ -313,82 +318,81 @@ const makeGridItem = (customize,onClose) => comp => {
 // --- Customization Views
 // --------------------------------------------------------------------------
 
-function CustomViews( { settings, shape, setShape, views:libViews } )
-{
-  const [ local, setLocal ] = Dome.useState( settings, {} );
-  const [ customs, setCustoms ] = Dome.useGlobalSetting( settings, {} );
-  const [ edited, setEdited ] = React.useState();
+function CustomViews({ settings, shape, setShape, views: libViews }: any) {
+  const [local, setLocal] = Dome.useState(settings, {});
+  const [customs, setCustoms] = Dome.useGlobalSetting(settings, {});
+  const [edited, setEdited]: any = React.useState();
   const triggerDefault = React.useRef();
-  const { current , shapes={} } = local ;
+  const { current, shapes = {} } = local;
 
-  let theViews = {};
+  let theViews: any = {};
 
-  _.forEach( libViews, (view) => {
-    const { id: origin, order, label='(Stock View)', title, defaultView } = view ;
-    const id = 'builtin.' + origin ;
-    theViews[ id ] = { id, order, label, title, builtin: true, defaultView, origin };
+  _.forEach(libViews, (view) => {
+    const { id: origin, order, label = '(Stock View)', title, defaultView } = view;
+    const id = 'builtin.' + origin;
+    theViews[id] = { id, order, label, title, builtin: true, defaultView, origin };
   });
 
-  _.forEach( customs, (view) => {
-    const { id, order, label='(Custom View)', title, origin } = view ;
+  _.forEach(customs, (view) => {
+    const { id, order, label = '(Custom View)', title, origin } = view;
     if (id && !theViews[id])
       theViews[id] = { id, order, label, title, builtin: false, origin };
   });
 
-  const getStock = (origin) => (
+  const getStock = (origin: any) => (
     (origin
-     && _.find( libViews, (v) => v.id === origin ))
-      || _.find( libViews, (v) => v.defaultView )
-      || libViews[0]
+      && _.find(libViews, (v) => v.id === origin))
+    || _.find(libViews, (v) => v.defaultView)
+    || libViews[0]
   );
 
-  const getDefaultShape = ( view ) => {
-    let stock = getStock( view && view.origin );
+  const getDefaultShape = (view: any) => {
+    let stock = getStock(view && view.origin);
     return stock && Grids.makeChildrenShape(stock.children);
   };
 
-  const SELECT = (id) => {
+  const SELECT = (id: string) => {
     if (id && current !== id) {
-      if (current) shapes[current] = shape ;
+      if (current) shapes[current] = shape;
       setLocal({ current: id, shapes });
-      setShape( shapes[id] || getDefaultShape(theViews[id]) );
+      setShape(shapes[id] || getDefaultShape(theViews[id]));
     }
   };
 
-  const POPUP = (id) => {
+  const POPUP = (id: string) => {
     let view = theViews[id];
     if (!view) return;
-    let isCurrent = current === id ;
-    let isCustom = !view.builtin ;
+    let isCurrent = current === id;
+    let isCustom = !view.builtin;
 
     const DEFAULT = () => {
       shapes[id] = undefined;
-      setLocal({ current:id, shapes });
-      setShape( getDefaultShape(view) );
+      setLocal({ current: id, shapes });
+      setShape(getDefaultShape(view));
     };
 
     const RENAME = () => setEdited(id);
 
     const DUPLICATE = () => {
-      let base = 'custom.' + view.origin ;
+      let base = 'custom.' + view.origin;
       let stock = getStock(view.origin);
-      let k = 1, newId = base ;
-      while (theViews[newId]) newId = base + '~' + (++k) ;
-      let newOrder = view.order ;
+      let k = 1, newId = base;
+      while (theViews[newId]) newId = base + '~' + (++k);
+      let newOrder = view.order;
       if (newOrder && newOrder.concat) newOrder = newOrder.concat([k]);
-      let newLabel = 'Custom ' + stock.label ;
-      if (k>1) newLabel += '~' + k ;
+      let newLabel = 'Custom ' + stock.label;
+      if (k > 1) newLabel += '~' + k;
       customs[newId] = {
         id: newId,
         label: newLabel,
         order: newOrder,
-        title:'Derived from ' + stock.label,
+        title: 'Derived from ' + stock.label,
         origin: view.origin,
         builtin: false
       };
       setCustoms(customs);
       if (current) shapes[current] = shape;
-      setLocal({ current:newId, shapes });
+      setLocal({ current: newId, shapes });
       setEdited(newId);
     };
 
@@ -396,40 +400,40 @@ function CustomViews( { settings, shape, setShape, views:libViews } )
       delete customs[id];
       delete shapes[id];
       setCustoms(customs);
-      let newCurrent = current === id ? undefined : current ;
+      let newCurrent = current === id ? undefined : current;
       setLocal({ current: newCurrent, shapes });
     };
 
     Dome.popupMenu([
-      { label: "Rename View", display:(!edited && isCustom), onClick: RENAME },
-      { label: "Restore Default", display:isCurrent, onClick: DEFAULT },
-      { label: "Duplicate View",onClick: DUPLICATE },
+      { label: "Rename View", display: (!edited && isCustom), onClick: RENAME },
+      { label: "Restore Default", display: isCurrent, onClick: DEFAULT },
+      { label: "Duplicate View", onClick: DUPLICATE },
       'separator',
-      { label: "Remove View", display:isCustom, onClick: REMOVE }
+      { label: "Remove View", display: isCustom, onClick: REMOVE }
     ]);
   };
 
-  const makeViewItem = ({ id, label, title, builtin, origin }) => {
+  const makeViewItem = ({ id, label, title, builtin }: any) => {
     if (edited === id) {
-      const RENAMED = (newLabel) => {
+      const RENAMED = (newLabel: string) => {
         if (newLabel) {
-          let custom = customs[id] ;
-          if (custom) custom.label = newLabel ;
-          setCustoms( customs );
+          let custom = customs[id];
+          if (custom) custom.label = newLabel;
+          setCustoms(customs);
         }
-        setEdited( undefined );
+        setEdited(undefined);
       };
-      const FIELD=(
+      const FIELD = (
         <Field className='labview-field'
-               placeholder='View Name'
-               autoFocus value={label}
-               onEnter={RENAMED} />
+          placeholder='View Name'
+          autoFocus value={label}
+          onEnter={RENAMED} />
       );
       return (
-        <Item key={id} id={id} icon='DISPLAY' title={title} label={FIELD}/>
+        <Item key={id} id={id} icon='DISPLAY' title={title} label={FIELD} />
       );
     } else {
-      const FLAGS=[] ;
+      const FLAGS = [];
       if (builtin) FLAGS.push('LOCK');
       return (
         <Item
@@ -440,7 +444,7 @@ function CustomViews( { settings, shape, setShape, views:libViews } )
           selected={id && current === id}
           onSelection={SELECT}
           onContextMenu={POPUP}
-          >
+        >
           {FLAGS.map((icn) => (
             <Icon key={icn} className='labview-icon' size={9} offset={1} id={icn} />
           ))}
@@ -450,8 +454,8 @@ function CustomViews( { settings, shape, setShape, views:libViews } )
   };
 
   if (!current && !triggerDefault.current) {
-    const theDefault = _.find( theViews, (item) => item.defaultView );
-    triggerDefault.current = theDefault ;
+    const theDefault = _.find(theViews, (item) => item.defaultView);
+    triggerDefault.current = theDefault;
     if (theDefault) setTimeout(() => {
       SELECT(theDefault.id);
     });
@@ -459,7 +463,7 @@ function CustomViews( { settings, shape, setShape, views:libViews } )
 
   return (
     <Section label='Views'>
-      {_.sortBy(theViews,['order','id']).map(makeViewItem)}
+      {_.sortBy(theViews, ['order', 'id']).map(makeViewItem)}
     </Section>
   );
 }
@@ -470,25 +474,24 @@ function CustomViews( { settings, shape, setShape, views:libViews } )
 
 const DRAGOVERLAY = { className: 'labview-stock' };
 
-function CustomGroup( { dnd, shape, setDragging, id, title, label, components } )
-{
+function CustomGroup({ dnd, shape, setDragging, id, title, label, components }: any) {
 
-  const makeComponent = ({ id, label, title }) => {
-    let itemId = getItemId('components',id);
-    let disabled = Grids.getShapeItem(shape,itemId) !== undefined ;
+  const makeComponent = ({ id, label, title }: any) => {
+    let itemId = getItemId('components', id);
+    let disabled = Grids.getShapeItem(shape, itemId) !== undefined;
     return (
       <DragSource key={id} dnd={dnd}
-                  disabled={ disabled }
-                  overlay={ disabled ? undefined : DRAGOVERLAY }
-                  onStart={() => setDragging(itemId)} >
-        <Item icon='COMPONENT' disabled={ disabled } label={label} title={title} />
+        disabled={disabled}
+        overlay={disabled ? undefined : DRAGOVERLAY}
+        onStart={() => setDragging(itemId)} >
+        <Item icon='COMPONENT' disabled={disabled} label={label} title={title} />
       </DragSource>
     );
   };
 
   return (
     <Section id={id} label={label} title={title}>
-      { components.map(makeComponent) }
+      {components.map(makeComponent)}
     </Section>
   );
 }
@@ -497,25 +500,24 @@ function CustomGroup( { dnd, shape, setDragging, id, title, label, components } 
 // --- Customization Panel
 // --------------------------------------------------------------------------
 
-function CustomizePanel({ dnd, settings, library, shape, setShape, setDragging })
-{
+function CustomizePanel({ dnd, settings, library, shape, setShape, setDragging }: any) {
 
-  Dome.useUpdate( 'labview.library' );
-  const items = library.items ;
-  const views = getItems(items,'views');
-  const groups = getItems(items,'groups');
-  const components = getItems(items,'components');
-  const setting_folds = settings && settings + '.folds' ;
-  const setting_views = settings && settings + '.views' ;
-  const contents = {} ;
+  Dome.useUpdate('labview.library');
+  const items = library.items;
+  const views = getItems(items, 'views');
+  const groups = getItems(items, 'groups');
+  const components = getItems(items, 'components');
+  const setting_folds = settings && settings + '.folds';
+  const setting_views = settings && settings + '.views';
+  const contents: any = {};
 
-  groups.unshift({ id:'nogroup', label:'Components' });
+  groups.unshift({ id: 'nogroup', label: 'Components' });
   groups.forEach((g) => contents[g.id] = []);
 
   components.forEach((c) => {
-    let gid = c.group ? 'groups.' + c.group : 'nogroup' ;
-    let content = contents[gid] ;
-    if (content === undefined) content = contents.nogroup ;
+    let gid = c.group ? 'groups.' + c.group : 'nogroup';
+    let content = contents[gid];
+    if (content === undefined) content = contents.nogroup;
     content.push(c);
   });
 
@@ -556,24 +558,23 @@ function CustomizePanel({ dnd, settings, library, shape, setShape, setDragging }
    Content may also contains `<View/>` and `<Group/>` definitions, and the content
    can be defined through any kind of React components.
 */
-export function LabView(props)
-{
+export function LabView(props: any) {
   // Parameters
-  const { settings, customize=false, children } = props ;
-  const setting_split = settings && settings + '.split' ;
-  const setting_shape = settings && settings + '.shape' ;
-  const setting_panel = settings && settings + '.panel' ;
+  const { settings, customize = false, children } = props;
+  const setting_split = settings && settings + '.split';
+  const setting_shape = settings && settings + '.shape';
+  const setting_panel = settings && settings + '.panel';
   // Hooks & State
-  Dome.useUpdate('labview.library','dome.defaults');
-  const dnd = React.useMemo(() => new DnD(),[]);
-  const lib = React.useMemo(() => new Library(),[]);
-  const [ shape, setShape ] = Dome.useState(setting_shape);
-  const [ dragging, setDragging ] = React.useState();
+  Dome.useUpdate('labview.library', 'dome.defaults');
+  const dnd = React.useMemo(() => new DnD(), []);
+  const lib = React.useMemo(() => new Library(), []);
+  const [shape, setShape] = Dome.useState(setting_shape);
+  const [dragging, setDragging] = React.useState();
   // Preparation
-  const onClose = (id) => setShape(Grids.removeShapeItem(shape,id));
-  const components = _.filter( lib.collection, (item) => isItemId('components',item.id) );
-  const gridItems = components.map(makeGridItem(customize,onClose));
-  const holding = dragging ? gridItems.find((elt) => elt.props.id === dragging) : undefined ;
+  const onClose = (id: string) => setShape(Grids.removeShapeItem(shape, id));
+  const components = _.filter(lib.collection, (item: any) => isItemId('components', item.id));
+  const gridItems = components.map(makeGridItem(customize, onClose));
+  const holding = dragging ? gridItems.find((elt) => elt.props.id === dragging) : undefined;
   // Make view
   return (
     <React.Fragment>
@@ -604,6 +605,6 @@ export function LabView(props)
 
 // --------------------------------------------------------------------------
 
-export default { LabView, View, Group, Component, TitleBar } ;
+export default { LabView, View, Group, Component, TitleBar };
 
 // --------------------------------------------------------------------------

@@ -113,14 +113,14 @@ function getCmdLine() {
 
 function execCmdLine(cmd: string) {
   let argv = cmd.split(/[ \t\n]+/);
-  let cfg = configOfParams(argv, null);
+  let cfg: any = configOfParams(argv, null);
   Server.configure(cfg);
   Server.restart();
 }
 
 const RenderConsole = () => {
   const [cmd, switchCmd] = Dome.useSwitch();
-  const { current, next, prev, index, length, update, insert, clear } = Dome.useHistory('frama-c.command.history');
+  const { current, next, prev, index, length, update, insert, clear }: any = Dome.useHistory('frama-c.command.history');
   const doExec = () => {
     let cmd = getCmdLine();
     if (cmd != current) insert(cmd);

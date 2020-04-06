@@ -55,14 +55,14 @@ const ASTview = () => {
           if (!data)
             buffer.log('// No code for function ', theFunction);
           print(buffer, data);
-          if (theMarker) buffer.scroll(theMarker);
+          if (theMarker) buffer.scroll(theMarker, undefined);
         });
     }
   }, [theFunction]);
 
   // Hook: scrolling
   React.useEffect(() => {
-    if (theMarker) buffer.scroll(theMarker);
+    if (theMarker) buffer.scroll(theMarker, undefined);
   }, [theMarker]);
 
   // Callbacks
