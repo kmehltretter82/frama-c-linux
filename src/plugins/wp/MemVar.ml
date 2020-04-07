@@ -1067,7 +1067,7 @@ struct
         end
     | Rrange(l,elt, Some a, Some b) ->
         begin match l with
-          | Ref x -> noref ~op:"initialized sub-range of" x
+          | Ref _ -> p_true
           | Loc l -> M.initialized sigma.mem (Rrange(l,elt,Some a, Some b))
           | Val(m,x,p) ->
               try
