@@ -407,6 +407,18 @@ module Make (Abstract: Abstractions.Eva) = struct
       final_delta delta >> fun d -> Some d
     with NoIncrement -> None
 
+  (* If [lval] is a varinfo out-of-scope at statement [stmt] of function [kf],
+     introduces it to the [state]. *)
+  let enter_scope state kf stmt lval =
+    match lval with
+    | Var vi, _ when not (vi.vglob || vi.vformal
+                          || Kernel_function.var_is_in_scope stmt vi) ->
+      let kind = Abstract_domain.Local kf in
+      let state = Abstract.Dom.enter_scope kind [vi] state in
+      let location = Abstract.Loc.eval_varinfo vi in
+      Abstract.Dom.logic_assign None location state
+    | _ -> state
+
   (* Evaluates the lvalue [lval] in the state [state]. Returns None if the value
      may be undeterminate. *)
   let evaluate_lvalue state lval =
@@ -417,7 +429,7 @@ module Make (Abstract: Abstractions.Eva) = struct
 
   (* Is the number of iterations of a loop bounded by [limit]?
      [state] is the loop entry state, and [loop_block] the block of the loop. *)
-  let is_bounded_loop state limit loop_block =
+  let is_bounded_loop kf stmt state limit loop_block =
     (* Computes the effect of the loop. Stops if it contains assembly code. *)
     loop_effect_visitor#compute_effect loop_block >>= fun loop_effect ->
     (* Finds the first loop exit condition, or stops. *)
@@ -425,6 +437,9 @@ module Make (Abstract: Abstractions.Eva) = struct
     (* Finds the unique integer lvalue modified within the loop in [condition].
        Stops if it does not exist is not a good candidate for the heuristic. *)
     find_lonely_candidate loop_effect condition >>= fun lval ->
+    (* If [lval] is not in scope at [stmt], introduces it into [state] so that
+       [lval] can be properly evaluated in [state]. *)
+    let state = enter_scope state kf stmt lval in
     (* Reduce [condition] to a sufficient hypothesis over the [lval] value:
        if [lval] ∈ [v_exit] then [condition = positive]. *)
     reduce_to_lval_from_state state lval condition positive >>= fun v_exit ->
@@ -457,7 +472,7 @@ module Make (Abstract: Abstractions.Eva) = struct
       let loop_stmt = Kernel_function.find_enclosing_loop kf stmt in
       match loop_stmt.skind with
       | Loop (_code_annot, block, _loc, _, _) ->
-        is_bounded_loop state max_unroll block >>= fun bounded ->
+        is_bounded_loop kf stmt state max_unroll block >>= fun bounded ->
         if bounded then Some max_unroll else None
       | _ -> None
     with Not_found -> None
