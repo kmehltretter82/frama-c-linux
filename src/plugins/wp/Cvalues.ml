@@ -70,6 +70,21 @@ and constant_term t =
   | TConst c -> logic_constant c
   | _ -> Warning.error "constant(%a)" Printer.pp_term t
 
+let rec init_value value obj =
+  match obj with
+  | C_int _ | C_float _ | C_pointer _ -> value
+  | C_comp ci ->
+      let make_term f =
+        Cfield (f, KInit), init_value value (object_of f.ftype)
+      in
+      Lang.F.e_record (List.map make_term ci.cfields)
+  | C_array _ as arr ->
+      Lang.F.e_const Lang.t_int
+        (init_value value (object_of_array_elem arr))
+
+let initialized_obj = init_value e_true
+let uninitialized_obj = init_value e_false
+
 (* -------------------------------------------------------------------------- *)
 
 (* The type contains C-integers *)

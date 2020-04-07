@@ -104,6 +104,11 @@ struct
       ) ft ;
     List.rev !xs , List.rev !cs , s
 
+  let domain obj loc =
+    M.Sigma.Chunk.Set.union
+      (M.value_footprint obj loc)
+      (M.init_footprint obj loc)
+
   let pp_rid fmt r = if r <> 0 then Format.fprintf fmt "_R%03d" r
 
   let loadrec = ref (fun _ _ _ -> assert false)
@@ -392,7 +397,7 @@ struct
          let fresh = F.e_var (Lang.freshvar ~basename tau) in
          let havoc = M.havoc obj loc ~length chunk ~fresh ~current:pre in
          ps := Set(post,havoc) :: !ps
-      ) (M.value_footprint obj loc) ; !ps
+      ) (domain obj loc) ; !ps
 
   let havoc seq obj loc = havoc_length seq obj loc F.e_one
 
@@ -444,7 +449,8 @@ struct
     | C_float f -> updated seq M.store_float f loc value
     | C_pointer ty -> updated seq M.store_pointer ty loc value
     | C_comp _ | C_array _ ->
-        Assert(p_close (initialized_loc seq.post obj loc)) ::
+        let init = Cvalues.initialized_obj obj in
+        Set(initvalue seq.post obj loc, init) ::
         Set(loadvalue seq.post obj loc, value) :: havoc seq obj loc
 
   let copied s obj p q = stored s obj p (loadvalue s.pre obj q)
@@ -483,15 +489,6 @@ struct
         let a = match u with Some a -> a | None -> e_zero in
         let b = match v with Some b -> b | None -> M.last seq.pre obj loc in
         assigned_range seq obj loc a b
-
-  (* -------------------------------------------------------------------------- *)
-  (* --- Domain                                                             --- *)
-  (* -------------------------------------------------------------------------- *)
-
-  let domain obj loc =
-    M.Sigma.Chunk.Set.union
-      (M.value_footprint obj loc)
-      (M.init_footprint obj loc)
 
   (* -------------------------------------------------------------------------- *)
 

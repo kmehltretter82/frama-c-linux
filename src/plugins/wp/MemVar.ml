@@ -726,21 +726,6 @@ struct
   (* ---  Memory Store                                                      --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let rec init_value value obj =
-    match obj with
-    | C_int _ | C_float _ | C_pointer _ -> value
-    | C_comp ci ->
-        let make_term f =
-          Cfield (f, KInit), init_value value (object_of f.ftype)
-        in
-        Lang.F.e_record (List.map make_term ci.cfields)
-    | C_array _ as arr ->
-        Lang.F.e_const Lang.t_int
-          (init_value value (object_of_array_elem arr))
-
-  let initialized_obj = init_value e_true
-  let uninitialized_obj = init_value e_false
-
   let stored seq obj l v = match l with
     | Ref x -> noref ~op:"write to" x
     | Val((CREF|CVAL),x,ofs) ->
@@ -750,7 +735,7 @@ struct
           if not (x.vformal || x.vglob) then
             let i1 = get_init_term seq.pre x in
             let i2 = get_init_term seq.post x in
-            let init = initialized_obj obj in
+            let init = Cvalues.initialized_obj obj in
             [ Set( i2 , update_init i1 ofs init ) ]
           else
             []
@@ -1179,8 +1164,8 @@ struct
     | Enter ->
         let xs = List.filter (fun v -> not v.vformal && not v.vglob) xs in
         let uninitialized v =
-          let uninit_value = uninitialized_obj (Ctypes.object_of v.vtype) in
-          Lang.F.p_equal (access_init (get_init_term seq.post v) []) uninit_value
+          let value = Cvalues.uninitialized_obj (Ctypes.object_of v.vtype) in
+          Lang.F.p_equal (access_init (get_init_term seq.post v) []) value
         in
         List.map uninitialized xs
 
