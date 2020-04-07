@@ -70,7 +70,7 @@ type parsed_float = {
 val parse: string -> Cil_types.fkind * parsed_float
 
 (** Checks if the (uppercased) string ends with an explicit [F|D|L]
-    suffix for the given float kind. *)
+    suffix corresponding to the given float kind. *)
 val has_suffix: Cil_types.fkind -> string -> bool
 
 val pretty_normal : use_hex : bool -> Format.formatter -> float -> unit
