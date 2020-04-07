@@ -97,7 +97,7 @@ sig
 
   val assigned : M.Sigma.t sequence -> c_object -> M.loc sloc -> equation list
 
-  val initialized_loc : M.Sigma.t -> c_object -> M.loc -> pred
+  val initialized : M.Sigma.t -> M.loc rloc -> pred
 
 end
 

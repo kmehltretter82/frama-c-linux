@@ -433,6 +433,19 @@ struct
   let initialized_loc sigma obj loc =
     initialized_term obj (initvalue sigma obj loc)
 
+  let initialized sigma = function
+    | Rloc(obj, loc) -> initialized_loc sigma obj loc
+    | Rrange(loc, obj, Some low, Some up) ->
+        let x = Lang.freshvar ~basename:"i" Lang.t_int in
+        let v = e_var x in
+        let hyps = [ p_leq low v ; p_leq v up] in
+        let loc = M.shift loc obj v in
+        p_forall [x] (p_hyps hyps (initialized_loc sigma obj loc))
+    | Rrange(_l, _, low, up) ->
+        Wp_parameters.abort ~current:true
+          "Invalid infinite range @[<hov 2>+@,(%a@,..%a)@]"
+          Vset.pp_bound low Vset.pp_bound up
+
   (* -------------------------------------------------------------------------- *)
   (* --- Stored & Copied                                                    --- *)
   (* -------------------------------------------------------------------------- *)

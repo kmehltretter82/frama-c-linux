@@ -826,7 +826,7 @@ let loadvalue = LOADER.loadvalue
 let stored = LOADER.stored
 let copied = LOADER.copied
 let assigned = LOADER.assigned
-let initialized_loc = LOADER.initialized_loc
+let initialized = LOADER.initialized
 
 let domain = LOADER.domain
 
@@ -891,6 +891,5 @@ let frame _sigma = []
 let alloc sigma _xs = sigma
 let scope _seq _s _xs = []
 let valid _sigma _acs _l = error "Validity not yet implemented"
-let initialized _sigma _l = error "Initialization not yet implemented"
 let invalid _sigma _l = error "Validity not yet implemented"
 let global _sigma _p = F.p_true
