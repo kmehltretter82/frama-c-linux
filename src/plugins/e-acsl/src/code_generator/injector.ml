@@ -232,7 +232,7 @@ let add_new_block_in_stmt env kf stmt =
   in
   let mk_post_env env stmt =
     Annotations.fold_code_annot
-      (fun _ a env -> Translate.translate_post_code_annotation kf env a)
+      (fun _ a env -> Translate.translate_post_code_annotation kf stmt env a)
       stmt
       env
   in
@@ -252,7 +252,7 @@ let add_new_block_in_stmt env kf stmt =
           let env = mk_post_env env stmt in
           (* also handle the postcondition of the function and clear the
              env *)
-          Translate.translate_post_spec kf env (Annotations.funspec kf)
+          Translate.translate_post_spec kf Kglobal env (Annotations.funspec kf)
         else
           env
       in
@@ -450,7 +450,7 @@ and inject_in_stmt env kf stmt =
       (* translate the precondition of the function *)
       if Functions.check kf then
         let funspec = Annotations.funspec kf in
-        Translate.translate_pre_spec kf env funspec
+        Translate.translate_pre_spec kf Kglobal env funspec
       else env
     else
       env
@@ -459,7 +459,7 @@ and inject_in_stmt env kf stmt =
   let env =
     if Functions.check kf then
       Annotations.fold_code_annot
-        (fun _ a env -> Translate.translate_pre_code_annotation kf env a)
+        (fun _ a env -> Translate.translate_pre_code_annotation kf stmt env a)
         stmt
         env
     else
@@ -862,7 +862,6 @@ let inject () =
   Options.feedback ~level:2
     "injecting annotations as code in project %a"
     Project.pretty (Project.current ());
-  Keep_status.before_translation ();
   Misc.reorder_ast ();
   Gmp_types.init ();
   let ast = Ast.get () in

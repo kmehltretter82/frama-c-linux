@@ -345,103 +345,6 @@ class prepare_visitor = object (self)
     | TFun(_, _, variadic, _) -> variadic
     | _ -> true
 
-  (* IMPORTANT: for keeping property statuses, we must preserve the ordering of
-     translation, see function [Translate.translate_pre_spec] and
-     [Translate.translate_post_spec]: be careful when modifying it. *)
-
-  method private push_pre_spec s =
-    let kf = Extlib.the self#current_kf in
-    let kinstr = self#current_kinstr in
-    let open Keep_status in
-    Extlib.may
-      (fun v -> push kf K_Decreases (Property.ip_of_decreases kf kinstr v))
-      s.spec_variant;
-    Extlib.may
-      (fun t -> push kf K_Terminates (Property.ip_of_terminates kf kinstr t))
-      s.spec_terminates;
-    List.iter
-      (fun l ->
-         push kf K_Complete (Property.ip_of_complete kf kinstr ~active:[] l))
-      s.spec_complete_behaviors;
-    List.iter
-      (fun l ->
-         push kf K_Disjoint (Property.ip_of_disjoint kf kinstr ~active:[] l))
-      s.spec_disjoint_behaviors;
-    List.iter
-      (fun b ->
-         List.iter
-           (fun p -> push kf K_Requires (Property.ip_of_requires kf kinstr b p))
-           b.b_requires)
-      s.spec_behavior
-
-  method private push_post_spec spec =
-    let do_behavior b =
-      let kf = Extlib.the self#current_kf in
-      let ki = match self#current_stmt with
-        | None -> Kglobal
-        | Some stmt -> Kstmt stmt
-      in
-      let open Keep_status in
-      Extlib.may
-        (push kf K_Assigns)
-        (Property.ip_of_assigns
-           kf
-           ki
-           (Property.Id_contract (Datatype.String.Set.empty (* TODO *), b))
-           b.b_assigns);
-      List.iter
-        (fun p -> push kf K_Ensures (Property.ip_of_ensures kf ki b p))
-        b.b_post_cond
-    in
-    (* fix ordering of behaviors' iterations *)
-    let bhvs =
-      List.sort
-        (fun b1 b2 -> String.compare b1.b_name b2.b_name)
-        spec.spec_behavior
-    in
-    List.iter do_behavior bhvs
-
-  method private push_pre_code_annot a =
-    let kf = Extlib.the self#current_kf in
-    let stmt = Extlib.the self#current_stmt in
-    let push_single k a =
-      Keep_status.push kf k (Property.ip_of_code_annot_single kf stmt a)
-    in
-    let open Keep_status in
-    match a.annot_content with
-    | AAssert _ -> push_single K_Assert a
-    | AStmtSpec(_ (* TODO *), s) -> self#push_pre_spec s
-    | AInvariant _ -> push_single K_Invariant a
-    | AVariant v ->
-      push kf K_Variant (Property.ip_of_decreases kf (Kstmt stmt) v)
-    | AAssigns _ ->
-      (* TODO: should be a postcondition, but considered as an unhandled
-         precondition in translate.ml right now; and we need to preserve the
-         same ordering *)
-      Extlib.may
-        (push kf K_Assigns)
-        (Property.ip_assigns_of_code_annot kf (Kstmt stmt) a)
-    | AAllocation(_ (* TODO *), alloc) ->
-      Extlib.may
-        (push kf K_Allocation)
-        (Property.ip_of_allocation kf (Kstmt stmt) (Property.Id_loop a) alloc)
-    | APragma _ ->
-      (* not yet translated *)
-      ()
-    | AExtended _ ->
-      (* never translate extensions *)
-      ()
-
-  method private push_post_code_annot a = match a.annot_content with
-    | AStmtSpec(_ (* TODO *), s) -> self#push_post_spec s
-    | AAssert _
-    | AInvariant _
-    | AVariant _
-    | AAssigns _
-    | AAllocation _
-    | APragma _
-    | AExtended _ -> ()
-
   (* ---------------------------------------------------------------------- *)
   (* visitor's method overloading *)
   (* ---------------------------------------------------------------------- *)
@@ -486,17 +389,6 @@ class prepare_visitor = object (self)
            blk)
     else
       Cil.DoChildren
-
-  method !vstmt_aux stmt =
-    Annotations.iter_code_annot
-      (fun _ a -> self#push_pre_code_annot a)
-      stmt;
-    Cil.DoChildrenPost
-      (fun _ ->
-         Annotations.iter_code_annot
-           (fun _ a -> self#push_post_code_annot a)
-           stmt;
-         stmt)
 
   method !vfunc fundec =
     Cil.DoChildrenPost
@@ -557,9 +449,6 @@ class prepare_visitor = object (self)
                     Printer.pp_varinfo vi
               | GFun _ -> ()
               | _ -> assert false);
-             let spec = Annotations.funspec ~populate:false kf in
-             self#push_pre_spec spec;
-             self#push_post_spec spec;
              let tmp = vi.vname in
              if tmp = "main" then begin
                (* the new function becomes the new main: *)
@@ -580,7 +469,7 @@ class prepare_visitor = object (self)
                dup_global
                  loc
                  self#get_filling_actions
-                 spec
+                 (Annotations.funspec ~populate:false kf)
                  self#behavior
                  sound_verdict_vi
                  kf
@@ -598,19 +487,6 @@ class prepare_visitor = object (self)
     | GVarDecl(vi, loc) | GFunDecl(_, vi, loc) | GFun({ svar = vi }, loc)
       when Misc.is_library_loc loc || Misc.is_fc_or_compiler_builtin vi ->
       Cil.DoChildren
-
-    | GVarDecl(vi, loc) | GFunDecl(_, vi, loc) | GFun({ svar = vi }, loc)
-      when not (self#is_variadic_function vi)
-      ->
-      assert (* handled by the 2 cases above *)
-        (not (Misc.is_library_loc loc || Misc.is_fc_or_compiler_builtin vi));
-      let kf = Extlib.the self#current_kf in
-      let s = Annotations.funspec ~populate:false kf in
-      Cil.DoChildrenPost
-        (fun f ->
-           self#push_pre_spec s;
-           self#push_post_spec s;
-           f)
 
     | _ ->
       Cil.DoChildren

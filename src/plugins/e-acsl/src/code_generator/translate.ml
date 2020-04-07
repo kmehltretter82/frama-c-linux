@@ -1135,11 +1135,26 @@ let term_to_exp typ t =
 
 (* ************************************************************************** *)
 (* [translate_*] translates a given ACSL annotation into the corresponding C
-   statement (if any) for runtime assertion checking.
-
-   IMPORTANT: the order of translation of pre-/post-spec must be consistent with
-   the pushes done in [Keep_status] *)
+   statement (if any) for runtime assertion checking. *)
 (* ************************************************************************** *)
+
+let must_translate ppt =
+  Options.Valid.get ()
+  || match Property_status.get ppt with
+  | Never_tried
+  | Inconsistent _
+  | Best ((False_if_reachable | False_and_reachable | Dont_know), _) ->
+    true
+  | Best (True, _) ->
+    (* [TODO] generating code for "valid under hypotheses" properties could be
+       useful for some use cases (in particular, when E-ACSL does not stop on
+       the very first error).
+       ==> introduce a new option or modify the behavior of -e-acsl-valid *)
+    false
+
+let must_translate_opt = function
+  | None -> false
+  | Some ppt -> must_translate ppt
 
 let assumes_predicate bhv =
   List.fold_left
@@ -1151,14 +1166,14 @@ let assumes_predicate bhv =
     Logic_const.ptrue
     bhv.b_assumes
 
-let translate_preconditions kf env behaviors =
+let translate_preconditions kf kinstr env behaviors =
   let env = Env.set_annotation_kind env Constructor.Precondition in
   let do_behavior env b =
     let assumes_pred = assumes_predicate b in
     List.fold_left
       (fun env p ->
          let do_it env =
-           if Keep_status.must_translate kf Keep_status.K_Requires then
+           if must_translate (Property.ip_of_requires kf kinstr b p) then
              let loc = p.ip_content.pred_loc in
              let p =
                Logic_const.pimplies
@@ -1176,16 +1191,16 @@ let translate_preconditions kf env behaviors =
   in
   List.fold_left do_behavior env behaviors
 
-let translate_postconditions kf env behaviors =
+let translate_postconditions kf kinstr env behaviors =
   let env = Env.set_annotation_kind env Constructor.Postcondition in
   (* generate one guard by postcondition of each behavior *)
   let do_behavior env b =
     let env =
       handle_error
         (fun env ->
-           (* test ordering does matter for keeping statuses consistent *)
-           if b.b_assigns <> WritesAny
-           && Keep_status.must_translate kf Keep_status.K_Assigns
+           let active = [] in (* TODO: 'for' behaviors *)
+           let ppt = Property.ip_assigns_of_behavior kf kinstr ~active b in
+           if b.b_assigns <> WritesAny && must_translate_opt ppt
            then not_yet env "assigns clause in behavior";
            (* ignore b.b_extended since we never translate them *)
            env)
@@ -1193,8 +1208,8 @@ let translate_postconditions kf env behaviors =
     in
     let assumes_pred = assumes_predicate b in
     List.fold_left
-      (fun env (t, p) ->
-         if Keep_status.must_translate kf Keep_status.K_Ensures then
+      (fun env ((t, p) as tp) ->
+         if must_translate (Property.ip_of_ensures kf kinstr b tp) then
            let do_it env =
              match t with
              | Normal ->
@@ -1221,56 +1236,53 @@ let translate_postconditions kf env behaviors =
   in
   List.fold_left do_behavior env bhvs
 
-let translate_pre_spec kf env spec =
+let translate_pre_spec kf kinstr env spec =
   let unsupported f x = ignore (handle_error (fun env -> f x; env) env) in
   let convert_unsupported_clauses env =
     unsupported
-      (Extlib.may
-         (fun _ ->
-            if Keep_status.must_translate kf Keep_status.K_Decreases then
-              not_yet env "variant clause"))
-      spec.spec_variant;
+      (fun spec ->
+         let ppt = Property.ip_decreases_of_spec kf kinstr spec in
+         if must_translate_opt ppt then not_yet env "variant clause")
+      spec;
     (* TODO: spec.spec_terminates is not part of the E-ACSL subset *)
     unsupported
-      (Extlib.may
-         (fun _ ->
-            if Keep_status.must_translate kf Keep_status.K_Terminates then
-              not_yet env "terminates clause"))
-      spec.spec_terminates;
-    (match spec.spec_complete_behaviors with
-     | [] -> ()
-     | l ->
-       unsupported
-         (List.iter
-            (fun _ ->
-               if Keep_status.must_translate kf Keep_status.K_Complete then
-                 not_yet env "complete behaviors"))
-         l);
-    (match spec.spec_disjoint_behaviors with
-     | [] -> ()
-     | l ->
-       unsupported
-         (List.iter
-            (fun _ ->
-               if Keep_status.must_translate kf Keep_status.K_Disjoint then
-                 not_yet env "disjoint behaviors"))
-         l);
+      (fun spec ->
+         let ppt = Property.ip_terminates_of_spec kf kinstr spec in
+         if must_translate_opt ppt then not_yet env "terminates clause")
+      spec;
+    let active = [] in (* TODO: 'for' behaviors *)
+    let ppts = Property.ip_complete_of_spec kf kinstr ~active spec in
+    unsupported
+      (fun ppts ->
+         List.iter
+           (fun ppt ->
+              if must_translate ppt then not_yet env "complete behaviors")
+           ppts)
+      ppts;
+    let ppts = Property.ip_disjoint_of_spec kf kinstr ~active spec in
+    unsupported
+      (fun ppts ->
+         List.iter
+           (fun ppt ->
+              if must_translate ppt then not_yet env "disjoint behaviors")
+           ppts)
+      ppts;
     env
   in
   let env = convert_unsupported_clauses env in
   handle_error
-    (fun env -> translate_preconditions kf env spec.spec_behavior)
+    (fun env -> translate_preconditions kf kinstr env spec.spec_behavior)
     env
 
-let translate_post_spec kf env spec =
+let translate_post_spec kf kinstr env spec =
   handle_error
-    (fun env -> translate_postconditions kf env spec.spec_behavior)
+    (fun env -> translate_postconditions kf kinstr env spec.spec_behavior)
     env
 
-let translate_pre_code_annotation kf env annot =
+let translate_pre_code_annotation kf stmt env annot =
   let convert env = match annot.annot_content with
     | AAssert(l, _, p) ->
-      if Keep_status.must_translate kf Keep_status.K_Assert then
+      if must_translate (Property.ip_of_code_annot_single kf stmt annot) then
         let env = Env.set_annotation_kind env Constructor.Assertion in
         if l <> [] then
           not_yet env "@[assertion applied only on some behaviors@]";
@@ -1280,9 +1292,9 @@ let translate_pre_code_annotation kf env annot =
     | AStmtSpec(l, spec) ->
       if l <> [] then
         not_yet env "@[statement contract applied only on some behaviors@]";
-      translate_pre_spec kf env spec ;
+      translate_pre_spec kf (Kstmt stmt) env spec ;
     | AInvariant(l, loop_invariant, p) ->
-      if Keep_status.must_translate kf Keep_status.K_Invariant then
+      if must_translate (Property.ip_of_code_annot_single kf stmt annot) then
         let env = Env.set_annotation_kind env Constructor.Invariant in
         if l <> [] then
           not_yet env "@[invariant applied only on some behaviors@]";
@@ -1291,26 +1303,30 @@ let translate_pre_code_annotation kf env annot =
       else
         env
     | AVariant _ ->
-      if Keep_status.must_translate kf Keep_status.K_Variant
+      if must_translate (Property.ip_of_code_annot_single kf stmt annot)
       then not_yet env "variant"
       else env
     | AAssigns _ ->
       (* TODO: it is not a precondition *)
-      if Keep_status.must_translate kf Keep_status.K_Assigns
-      then not_yet env "assigns"
-      else env
+      let ppts = Property.ip_of_code_annot kf stmt annot in
+      List.iter
+        (fun ppt -> if must_translate ppt then not_yet env "assigns")
+        ppts;
+      env
     | AAllocation _ ->
-      if Keep_status.must_translate kf Keep_status.K_Allocation
-      then not_yet env "allocation"
-      else env
+      let ppts = Property.ip_of_code_annot kf stmt annot in
+      List.iter
+        (fun ppt -> if must_translate ppt then not_yet env "allocation")
+        ppts;
+      env
     | APragma _ -> not_yet env "pragma"
     | AExtended _ -> env (* never translate extensions. *)
   in
   handle_error convert env
 
-let translate_post_code_annotation kf env annot =
+let translate_post_code_annotation kf stmt env annot =
   let convert env = match annot.annot_content with
-    | AStmtSpec(_, spec) -> translate_post_spec kf env spec
+    | AStmtSpec(_, spec) -> translate_post_spec kf (Kstmt stmt) env spec
     | AAssert _
     | AInvariant _
     | AVariant _

@@ -57,7 +57,6 @@ SRC_ANALYSES:=$(addprefix src/analyses/, $(SRC_ANALYSES))
 
 # project initializer
 SRC_PROJECT_INITIALIZER:= \
-	keep_status \
 	rtl \
 	prepare_ast
 SRC_PROJECT_INITIALIZER:=\

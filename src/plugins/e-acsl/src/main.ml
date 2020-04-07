@@ -168,7 +168,6 @@ let change_printer =
     end
 
 let main () =
-  Keep_status.clear ();
   if Options.Run.get () then begin
     change_printer ();
     ignore (generate_code (Options.Project_name.get ()));
