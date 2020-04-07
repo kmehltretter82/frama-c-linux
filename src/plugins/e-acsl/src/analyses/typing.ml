@@ -512,7 +512,7 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
         | LBreads _ ->
           Error.not_yet "logic functions performing read accesses"
         | LBinductive _ ->
-          Error.not_yet "logic functions inductively defined"
+          Error.not_yet "inductive logic functions"
       end
 
     | Tunion _ -> Error.not_yet "tset union"
@@ -585,8 +585,13 @@ let rec type_predicate p =
           c_int
         | LBnone -> (* Eg: \is_finite *)
           Error.not_yet "predicate with no definition nor reads clause"
-        | LBreads _ | LBterm _ | LBinductive _ ->
+        | LBreads _ ->
+          Error.not_yet "predicate performing read accesses"
+        | LBinductive _ ->
+          Error.not_yet "inductive predicate"
+        | LBterm _ ->
           Options.fatal "unexpected logic definition"
+            Printer.pp_predicate p
       end
     | Pseparated _ -> Error.not_yet "\\separated"
     | Pdangling _ -> Error.not_yet "\\dangling"
