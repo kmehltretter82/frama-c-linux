@@ -51,6 +51,10 @@
 
 open Cil_types
 
+let is_true = function
+  | `True | `TrueReduced _ -> true
+  | _ -> false
+
 (* Is a statement a loop exit condition? If so, returns the condition and
    whether the condition must hold to exit the loop. Otherwise, returns None. *)
 let is_conditional_break stmt =
@@ -262,9 +266,23 @@ module Make (Abstract: Abstractions.Eva) = struct
       (* If the new value of [expr] is top, no reduction has been performed. *)
       if Val.(equal top value) then None else Some (value, record)
     in
-    (* Different strategies whether cvalue is present. *)
-    match Val.get Main_values.CVal.key with
-    | Some get_cvalue ->
+    (* Assumes that [condition] is [positive]. Returns an over-approximation
+       of the values for which [condition] is [positive]. *)
+    reduce positive >>= fun (value, record) ->
+    (* Evaluates [condition] with the hypothesis [expr] ∈ [value], to check
+       whether [expr] ∈ [value] ⇒ [condition] = [positive]. *)
+    let valuation = Valuation.add valuation expr record in
+    fst (Eval.evaluate ~valuation ~reduction:false state condition)
+    >> fun (_valuation, v) ->
+    let satisfied =
+      if positive
+      then not Val.(is_included zero v)
+      else Val.(equal zero v)
+    in
+    (* If the condition is satisfied, returns [value]. Otherwise, uses a
+       specific feature to cvalue (if possible) to compute a better value. *)
+    if satisfied then Some value else
+      Val.get Main_values.CVal.key >>= fun get_cvalue ->
       (* Assumes that [condition] is NOT [positive]. *)
       reduce (not positive) >>= fun (value, _record) ->
       (* [value] is an over-approximation of the values of [expr] for which
@@ -273,21 +291,6 @@ module Make (Abstract: Abstractions.Eva) = struct
       let cvalue = get_cvalue value in
       cvalue_complement (Cil.typeOf expr) cvalue >>= fun cvalue ->
       Some (Val.set Main_values.CVal.key cvalue Val.top)
-    | None ->
-      (* Assumes that [condition] is [positive]. Returns an over-approximation
-         of the values for which [condition] is [positive]. *)
-      reduce positive >>= fun (value, record) ->
-      (* Evaluates [condition] with the hypothesis [expr] ∈ [value], to check
-         whether [expr] ∈ [value] ⇒ [condition] = [positive]. *)
-      let valuation = Valuation.add valuation expr record in
-      fst (Eval.evaluate ~valuation ~reduction:false state condition)
-      >> fun (_valuation, v) ->
-      let satisfied =
-        if positive
-        then not Val.(is_included zero v)
-        else Val.(equal zero v)
-      in
-      if satisfied then Some value else None
 
   (* Same as [reduce_to_expr] above, but builds the proper valuation from the
      [state]. [state] is the entry state of the loop, and [expr] is the only
@@ -431,9 +434,18 @@ module Make (Abstract: Abstractions.Eva) = struct
        in one iteration of the loop. *)
     compute_delta lval loop_block >>= fun v_delta ->
     let typ = Cil.typeOfLval lval in
-    let limit = Val.inject_int typ (Integer.of_int limit) in
-    (* Checks whether [v_init] + [limit] × [v_delta] ⊂ [v_exit]. *)
     let binop op v1 v2 = Bottom.non_bottom (Val.forward_binop typ op v1 v2) in
+    (* Possible iterations numbers to exit the loop. *)
+    let iter_nb = binop Div (binop MinusA v_exit v_init) v_delta in
+    let bound = Abstract_value.Int (Integer.of_int limit) in
+    (* Use the iteration number if it is always smaller than the [limit].
+       Otherwise use [limit]. *)
+    let limit =
+      if is_true (Val.assume_bounded Alarms.Upper_bound bound iter_nb)
+      then iter_nb
+      else Val.inject_int typ (Integer.of_int limit)
+    in
+    (* Checks whether [v_init] + [limit] × [v_delta] ⊂ [v_exit]. *)
     let value = binop PlusA v_init (binop Mult limit v_delta) in
     Some (Val.is_included value v_exit)
 

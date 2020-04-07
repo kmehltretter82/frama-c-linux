@@ -341,14 +341,10 @@
 [eva] Done for function complex_loops
 [eva] computing for function various_conditions <- main.
   Called from tests/value/auto_loop_unroll.c:251.
-[eva] tests/value/auto_loop_unroll.c:192: starting to merge loop iterations
-[eva:alarm] tests/value/auto_loop_unroll.c:193: Warning: 
-  signed overflow. assert res + 1 ≤ 2147483647;
-[eva] tests/value/auto_loop_unroll.c:195: Frama_C_show_each_11: [0..2147483647]
-[eva] tests/value/auto_loop_unroll.c:197: starting to merge loop iterations
-[eva:alarm] tests/value/auto_loop_unroll.c:198: Warning: 
-  signed overflow. assert res + 1 ≤ 2147483647;
-[eva] tests/value/auto_loop_unroll.c:200: Frama_C_show_each_12: [0..2147483647]
+[eva:loop-unroll] tests/value/auto_loop_unroll.c:192: Automatic loop unrolling.
+[eva] tests/value/auto_loop_unroll.c:195: Frama_C_show_each_11: {11}
+[eva:loop-unroll] tests/value/auto_loop_unroll.c:197: Automatic loop unrolling.
+[eva] tests/value/auto_loop_unroll.c:200: Frama_C_show_each_12: {12}
 [eva] tests/value/auto_loop_unroll.c:203: starting to merge loop iterations
 [eva:alarm] tests/value/auto_loop_unroll.c:204: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
