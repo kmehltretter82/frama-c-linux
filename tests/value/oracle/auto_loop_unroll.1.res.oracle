@@ -345,13 +345,8 @@
 [eva] tests/value/auto_loop_unroll.c:195: Frama_C_show_each_11: {11}
 [eva:loop-unroll] tests/value/auto_loop_unroll.c:197: Automatic loop unrolling.
 [eva] tests/value/auto_loop_unroll.c:200: Frama_C_show_each_12: {12}
-[eva] tests/value/auto_loop_unroll.c:203: starting to merge loop iterations
-[eva:alarm] tests/value/auto_loop_unroll.c:204: Warning: 
-  signed overflow. assert res + 1 ≤ 2147483647;
-[eva:alarm] tests/value/auto_loop_unroll.c:203: Warning: 
-  signed overflow. assert -2147483648 ≤ i_0 - 1;
-[eva] tests/value/auto_loop_unroll.c:206: 
-  Frama_C_show_each_0_13: [0..2147483647]
+[eva:loop-unroll] tests/value/auto_loop_unroll.c:203: Automatic loop unrolling.
+[eva] tests/value/auto_loop_unroll.c:206: Frama_C_show_each_0_13: [0..13]
 [eva] tests/value/auto_loop_unroll.c:208: starting to merge loop iterations
 [eva:alarm] tests/value/auto_loop_unroll.c:209: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
@@ -372,18 +367,10 @@
 [eva] Done for function various_conditions
 [eva] computing for function temporary_variables <- main.
   Called from tests/value/auto_loop_unroll.c:252.
-[eva] tests/value/auto_loop_unroll.c:235: starting to merge loop iterations
-[eva:alarm] tests/value/auto_loop_unroll.c:235: Warning: 
-  signed overflow. assert i + 1 ≤ 2147483647;
-[eva:alarm] tests/value/auto_loop_unroll.c:236: Warning: 
-  signed overflow. assert res + 1 ≤ 2147483647;
-[eva] tests/value/auto_loop_unroll.c:238: Frama_C_show_each_20: [0..2147483647]
-[eva] tests/value/auto_loop_unroll.c:240: starting to merge loop iterations
-[eva:alarm] tests/value/auto_loop_unroll.c:241: Warning: 
-  signed overflow. assert res + 1 ≤ 2147483647;
-[eva:alarm] tests/value/auto_loop_unroll.c:240: Warning: 
-  signed overflow. assert -2147483648 ≤ i - 1;
-[eva] tests/value/auto_loop_unroll.c:243: Frama_C_show_each_21: [0..2147483647]
+[eva:loop-unroll] tests/value/auto_loop_unroll.c:235: Automatic loop unrolling.
+[eva] tests/value/auto_loop_unroll.c:238: Frama_C_show_each_20: {20}
+[eva:loop-unroll] tests/value/auto_loop_unroll.c:240: Automatic loop unrolling.
+[eva] tests/value/auto_loop_unroll.c:243: Frama_C_show_each_21: {21}
 [eva] Recording results for temporary_variables
 [eva] Done for function temporary_variables
 [eva] Recording results for main
@@ -412,8 +399,8 @@
 [eva:final-states] Values at end of function simple_loops:
   res ∈ {100}
 [eva:final-states] Values at end of function temporary_variables:
-  i ∈ [-2147483648..20]
-  res ∈ [0..2147483647]
+  i ∈ {-1}
+  res ∈ {21}
 [eva:final-states] Values at end of function various_conditions:
   i ∈ {12}
   res ∈ {0}

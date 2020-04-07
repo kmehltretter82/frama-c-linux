@@ -395,6 +395,8 @@ module Make (Abstract: Abstractions.Eva) = struct
       | If (_e, b1, b2, _loc) ->
         join_delta (delta_block acc b1) (delta_block acc b2)
       | Block b -> delta_block acc b
+      | UnspecifiedSequence list ->
+        List.fold_left (fun acc (s, _, _, _, _) -> delta_stmt acc s) acc list
       | _ ->
         (* For other statements, we only check that they do not modify [lval]. *)
         if is_safe lval ~loop stmt then acc else raise NoIncrement
@@ -406,6 +408,43 @@ module Make (Abstract: Abstractions.Eva) = struct
       let delta = delta_block zero_delta loop in
       final_delta delta >> fun d -> Some d
     with NoIncrement -> None
+
+  (* If in the block [loop], [lval] is assigned once to the value of another
+     lvalue, returns this new lvalue. Otherwise, returns [lval]. *)
+  let cross_equality lval loop =
+    (* If no such single equality can be found, return [lval] unchanged. *)
+    let exception No_equality in
+    let rec find_lval acc expr =
+      if acc <> None then raise No_equality else
+        match expr.enode with
+        | Lval lval -> Some lval
+        | Info (e, _) -> find_lval acc e
+        | _ -> raise No_equality
+    in
+    let cross_instr acc = function
+      | Set (lv, expr, _loc) when Cil_datatype.LvalStructEq.equal lv lval ->
+        find_lval acc expr
+      | Local_init (varinfo, AssignInit (SingleInit expr), _loc)
+        when Cil_datatype.LvalStructEq.equal (Cil.var varinfo) lval ->
+        find_lval acc expr
+      | Call (Some lv, _, _, _) when Cil_datatype.LvalStructEq.equal lval lv ->
+        raise No_equality
+      | _ -> acc
+    in
+    let rec cross_stmt acc stmt =
+      match stmt.skind with
+      | Instr instr -> cross_instr acc instr
+      | Block block -> cross_block acc block
+      | UnspecifiedSequence list ->
+        List.fold_left (fun acc (s, _, _, _, _) -> cross_stmt acc s) acc list
+      | _ -> acc
+    and cross_block acc block =
+      List.fold_left cross_stmt acc block.bstmts
+    in
+    match cross_block None loop with
+    | None -> lval
+    | Some lval -> lval
+    | exception No_equality -> lval
 
   (* If [lval] is a varinfo out-of-scope at statement [stmt] of function [kf],
      introduces it to the [state]. *)
@@ -443,6 +482,10 @@ module Make (Abstract: Abstractions.Eva) = struct
     (* Reduce [condition] to a sufficient hypothesis over the [lval] value:
        if [lval] ∈ [v_exit] then [condition = positive]. *)
     reduce_to_lval_from_state state lval condition positive >>= fun v_exit ->
+    (* If [lval] is only assigned to the value of another lvalue, uses it
+       instead. This is especially useful to deal with temporary variables
+       introduced by the Frama-C normalization. *)
+    let lval = cross_equality lval loop_block in
     (* Evaluates the initial value [v_init] of [lval] in the loop entry state. *)
     evaluate_lvalue state lval >>= fun v_init ->
     (* Computes an over-approximation [v_delta] of the increment of [lval]
