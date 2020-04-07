@@ -172,10 +172,6 @@ let main () =
   if Options.Run.get () then begin
     change_printer ();
     ignore (generate_code (Options.Project_name.get ()));
-  end else
-  if Options.Check.get () then begin
-    Gmp_types.init ();
-    ignore (check ())
   end
 
 let () = Db.Main.extend main

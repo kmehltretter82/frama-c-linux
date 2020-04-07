@@ -22,7 +22,6 @@
 
 include Plugin.S (** implementation of Log.S for E-ACSL *)
 
-module Check: Parameter_sig.Bool
 module Run: Parameter_sig.Bool
 module Valid: Parameter_sig.Bool
 module Gmp_only: Parameter_sig.Bool

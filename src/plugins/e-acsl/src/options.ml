@@ -31,13 +31,6 @@ module P = Plugin.Register
 module PP = P (* [PP] required to avoid an ocamldoc error in OCaml 4.02 *)
 include PP
 
-module Check =
-  False
-    (struct
-      let option_name = "-e-acsl-check"
-      let help = "only type check E-ACSL annotated program"
-    end)
-
 module Run =
   False
     (struct

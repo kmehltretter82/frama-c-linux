@@ -86,8 +86,7 @@ let option_check = ref false
 
 let clear () =
   Datatype.String.Hashtbl.clear keep_status;
-  option_valid := Options.Valid.get ();
-  option_check := Options.Check.get ()
+  option_valid := Options.Valid.get ()
 
 let push kf kind ppt =
   (*  Options.feedback "PUSHING %a for %a"
