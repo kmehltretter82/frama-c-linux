@@ -925,7 +925,7 @@ class visitor (ctx:context) c =
       end
 
     method on_comp = self#on_comp_gen KValue
-    method on_comp_init = self#on_comp_gen KInit
+    method on_icomp = self#on_comp_gen KInit
 
     method private make_lemma cnv (l: Definitions.dlemma) =
       let id = Why3.Ident.id_fresh (Lang.lemma_id l.l_name) in

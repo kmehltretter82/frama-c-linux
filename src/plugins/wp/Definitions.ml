@@ -45,6 +45,7 @@ type cluster = {
   c_position : Filepath.position option ;
   mutable c_age : int ;
   mutable c_records : compinfo list ;
+  mutable c_irecords : compinfo list ;
   mutable c_types : logic_type_info list ;
   mutable c_symbols : dfun list ;
   mutable c_lemmas : dlemma list ;
@@ -205,6 +206,7 @@ let newcluster ~id ?title ?position () =
     c_age = 0 ;
     c_types = [] ;
     c_records = [] ;
+    c_irecords = [] ;
     c_symbols = [] ;
     c_lemmas = [] ;
   }
@@ -241,6 +243,17 @@ let compinfo c =
        let cluster = newcluster ~id ~title ()
        in cluster.c_records <- [c] ; cluster)
     (Lang.comp_id c)
+
+let icompinfo c =
+  Cluster.memoize
+    (fun id ->
+       let title =
+         if c.cstruct
+         then Printf.sprintf "Init Struct '%s'" c.cname
+         else Printf.sprintf "Init Union '%s'" c.cname in
+       let cluster = newcluster ~id ~title ()
+       in cluster.c_irecords <- [c] ; cluster)
+    (Lang.comp_init_id c)
 
 let matrix = function
   | C_array _ -> assert false
@@ -282,6 +295,7 @@ class virtual visitor main =
     val mutable terms    = Tset.empty
     val mutable types    = DT.empty
     val mutable comps    = DR.empty
+    val mutable icomps   = DR.empty
     val mutable symbols  = DF.empty
     val mutable dlemmas  = DS.empty
     val mutable lemmas   = DS.empty
@@ -333,22 +347,34 @@ class virtual visitor main =
                      self#vtau t ; Cfield (f, KValue) , t
                   ) r.cfields
               in self#on_comp r fts ;
+            end
+        end
+
+    method vicomp r =
+      if not (DR.mem r icomps) then
+        begin
+          icomps <- DR.add r icomps ;
+          let c = icompinfo r in
+          if self#do_local c then
+            begin
               let fts = List.map
                   (fun f ->
                      let t = Lang.init_of_ctype f.ftype in
                      self#vtau t ; Cfield (f, KInit) , t
                   ) r.cfields
-              in self#on_comp_init r fts ;
+              in self#on_icomp r fts ;
             end
         end
 
     method vfield = function
       | Mfield(a,_,_,_) -> self#vlibrary a.ext_library
-      | Cfield(f, _) -> self#vcomp f.fcomp
+      | Cfield(f, KValue) -> self#vcomp f.fcomp
+      | Cfield(f, KInit) -> self#vicomp f.fcomp
 
     method vadt = function
       | Mtype a | Mrecord(a,_) -> self#vlibrary a.ext_library
-      | Comp(r, _) -> self#vcomp r
+      | Comp(r, KValue) -> self#vcomp r
+      | Comp(r, KInit) -> self#vicomp r
       | Atype t -> self#vtype t
 
     method vtau = function
@@ -521,6 +547,7 @@ class virtual visitor main =
 
     method vtypes = (* Visit the types *)
       rev_iter self#vcomp main.c_records ;
+      rev_iter self#vicomp main.c_irecords ;
       rev_iter self#vtype main.c_types
 
     method vsymbols = (* Visit the definitions *)
@@ -541,7 +568,7 @@ class virtual visitor main =
     method virtual on_cluster : cluster -> unit
     method virtual on_type : logic_type_info -> typedef -> unit
     method virtual on_comp : compinfo -> (field * tau) list -> unit
-    method virtual on_comp_init : compinfo -> (field * tau) list -> unit
+    method virtual on_icomp : compinfo -> (field * tau) list -> unit
     method virtual on_dlemma : dlemma -> unit
     method virtual on_dfun : dfun -> unit
 

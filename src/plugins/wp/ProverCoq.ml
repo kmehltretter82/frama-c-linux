@@ -182,7 +182,7 @@ class visitor fmt c =
         engine#declare_type fmt (Lang.comp c) 0 (Qed.Engine.Trec fts) ;
       end
 
-    method on_comp_init c fts =
+    method on_icomp c fts =
       begin
         self#paragraph ;
         engine#declare_type fmt (Lang.comp_init c) 0 (Qed.Engine.Trec fts) ;
