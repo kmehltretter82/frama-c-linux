@@ -27,7 +27,7 @@ module Dataflow = Dataflow2
 
 let must_never_monitor vi =
   (* E-ACSL, please do not monitor yourself! *)
-  Functions.RTL.is_rtl_name vi.vname
+  Rtl.Symbols.mem_vi vi.vname
   ||
   (* extern ghost variables are usually used (by the Frama-C libc) to
        represent some internal invisible states in ACSL specifications. They do

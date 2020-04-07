@@ -68,9 +68,9 @@ let inject_in_local_init loc env kf vi = function
     when Options.Validate_format_strings.get ()
       && Functions.Libc.is_printf_name fvi.vname
     ->
-    (* rewrite format functions (e.g., [printf]). *)
-    let name = Functions.RTL.get_rtl_replacement_name fvi.vname in
-    let new_vi = Misc.get_lib_fun_vi name in
+    (* rewrite libc function names (e.g., [printf]). *)
+    let name = Functions.RTL.libc_replacement_name fvi.vname in
+    let new_vi = try Builtins.find name with Not_found -> assert false in
     let fmt = Functions.Libc.get_printf_argument_str ~loc fvi.vname args in
     ConsInit(new_vi, fmt :: args, kind), env
 
@@ -80,7 +80,7 @@ let inject_in_local_init loc env kf vi = function
     ->
     (* rewrite names of functions for which we have alternative definitions in
        the RTL. *)
-    fvi.vname <- Functions.RTL.get_rtl_replacement_name fvi.vname;
+    fvi.vname <- Functions.RTL.libc_replacement_name fvi.vname;
     init, env
 
   | AssignInit init ->
@@ -109,7 +109,7 @@ let rename_caller loc args exp = match exp.enode with
     when Options.Replace_libc_functions.get ()
       && Functions.RTL.has_rtl_replacement vi.vname
     ->
-    vi.vname <- Functions.RTL.get_rtl_replacement_name vi.vname;
+    vi.vname <- Functions.RTL.libc_replacement_name vi.vname;
     exp, args
 
   | Lval(Var vi, _)
@@ -120,7 +120,7 @@ let rename_caller loc args exp = match exp.enode with
        from the above because argument list of format functions is extended with
        an argument describing actual variadic arguments *)
     (* replacement name, e.g., [printf] -> [__e_acsl_builtin_printf] *)
-    let name = Functions.RTL.get_rtl_replacement_name vi.vname in
+    let name = Functions.RTL.libc_replacement_name vi.vname in
     (* variadic arguments descriptor *)
     let fmt = Functions.Libc.get_printf_argument_str ~loc vi.vname args in
     (* get the name of the library function we need. Cannot just rewrite the

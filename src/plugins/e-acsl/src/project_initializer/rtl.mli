@@ -20,35 +20,29 @@
 (*                                                                        *)
 (**************************************************************************)
 
-include Plugin.S (** implementation of Log.S for E-ACSL *)
+(** This module links the E-ACSL's RTL to the user source code. *)
 
-module Check: Parameter_sig.Bool
-module Run: Parameter_sig.Bool
-module Valid: Parameter_sig.Bool
-module Prepare: Parameter_sig.Bool
-module Gmp_only: Parameter_sig.Bool
-module Full_mmodel: Parameter_sig.Bool
-module Project_name: Parameter_sig.String
-module Builtins: Parameter_sig.String_set
-module Temporal_validity: Parameter_sig.Bool
-module Validate_format_strings: Parameter_sig.Bool
-module Replace_libc_functions: Parameter_sig.Bool
+val link: Project.t -> unit
+(** [link prj] links the RTL's AST contained in [prj] to the AST of the current
+    project. *)
 
-module Functions: Parameter_sig.Kernel_function_set
-module Instrument: Parameter_sig.Kernel_function_set
+(** Tables that contain RTL's symbols. Useful to know whether some symbols is
+    part of the RTL. *)
+module Symbols: sig
+  open Cil_types
 
-val parameter_states: State.t list
-val emitter: Emitter.t
+  val mem_global: global -> bool
+  val mem_kf: kernel_function -> bool
 
-val must_visit: unit -> bool
+  val mem_vi: string -> bool
+  exception Unregistered of string
+  val find_vi: string -> varinfo
+  (** @raise Unregistered if the given name is not part of the RTL. *)
 
-val dkey_analysis: category
-val dkey_prepare: category
-val dkey_translation: category
-val dkey_typing: category
+end
 
 (*
 Local Variables:
-compile-command: "make"
+compile-command: "make -C ../../../../.."
 End:
 *)

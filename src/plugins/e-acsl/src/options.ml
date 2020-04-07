@@ -163,7 +163,9 @@ let parameter_states =
     Functions.self;
     Instrument.self ]
 
-let must_visit () = Run.get () || Check.get ()
+let emitter = Emitter.create "E-ACSL" [ Funspec ] ~correctness:[] ~tuning:[]
+
+let must_visit () = Run.get ()
 
 let dkey_analysis = register_category "analysis"
 let dkey_prepare = register_category "preparation"
