@@ -6,7 +6,7 @@
   undet ∈ [--..--]
   g ∈ {0}
 [eva] computing for function simple_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:189.
+  Called from tests/value/auto_loop_unroll.c:248.
 [eva] tests/value/auto_loop_unroll.c:24: starting to merge loop iterations
 [eva:alarm] tests/value/auto_loop_unroll.c:25: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
@@ -27,7 +27,7 @@
 [eva] Recording results for simple_loops
 [eva] Done for function simple_loops
 [eva] computing for function various_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:190.
+  Called from tests/value/auto_loop_unroll.c:249.
 [eva] tests/value/auto_loop_unroll.c:57: starting to merge loop iterations
 [eva:alarm] tests/value/auto_loop_unroll.c:58: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
@@ -45,164 +45,208 @@
   signed overflow. assert res + 1 ≤ 2147483647;
 [eva] tests/value/auto_loop_unroll.c:82: 
   Frama_C_show_each_32_80: [0..2147483647]
-[eva] tests/value/auto_loop_unroll.c:85: starting to merge loop iterations
-[eva:alarm] tests/value/auto_loop_unroll.c:86: Warning: 
-  signed overflow. assert res + 1 ≤ 2147483647;
-[eva] tests/value/auto_loop_unroll.c:90: 
-  Frama_C_show_each_11_111: [0..2147483647]
 [eva] computing for function Frama_C_interval <- various_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:94.
+  Called from tests/value/auto_loop_unroll.c:86.
 [eva] using specification for function Frama_C_interval
-[eva] tests/value/auto_loop_unroll.c:94: 
+[eva] tests/value/auto_loop_unroll.c:86: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/value/auto_loop_unroll.c:95: starting to merge loop iterations
-[eva:alarm] tests/value/auto_loop_unroll.c:96: Warning: 
+[eva] tests/value/auto_loop_unroll.c:87: starting to merge loop iterations
+[eva:alarm] tests/value/auto_loop_unroll.c:88: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
-[eva] tests/value/auto_loop_unroll.c:97: 
+[eva] tests/value/auto_loop_unroll.c:89: 
   Frama_C_show_each_40_50: [0..2147483647]
+[eva] tests/value/auto_loop_unroll.c:92: starting to merge loop iterations
+[eva:alarm] tests/value/auto_loop_unroll.c:93: Warning: 
+  signed overflow. assert res + 1 ≤ 2147483647;
+[eva] tests/value/auto_loop_unroll.c:95: Frama_C_show_each_101: [0..2147483647]
 [eva] computing for function incr_g <- various_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:101.
+  Called from tests/value/auto_loop_unroll.c:99.
 [eva] Recording results for incr_g
 [eva] Done for function incr_g
 [eva] computing for function incr <- various_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:102.
+  Called from tests/value/auto_loop_unroll.c:100.
 [eva] Recording results for incr
 [eva] Done for function incr
-[eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
-[eva] tests/value/auto_loop_unroll.c:100: starting to merge loop iterations
+[eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr
+[eva] tests/value/auto_loop_unroll.c:98: starting to merge loop iterations
 [eva] computing for function incr_g <- various_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:101.
+  Called from tests/value/auto_loop_unroll.c:99.
 [eva] Recording results for incr_g
 [eva] Done for function incr_g
 [eva] computing for function incr <- various_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:102.
+  Called from tests/value/auto_loop_unroll.c:100.
 [eva] Recording results for incr
 [eva] Done for function incr
-[eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+[eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr
 [eva] computing for function incr_g <- various_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:101.
+  Called from tests/value/auto_loop_unroll.c:99.
 [eva] Recording results for incr_g
 [eva] Done for function incr_g
 [eva] computing for function incr <- various_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:102.
+  Called from tests/value/auto_loop_unroll.c:100.
 [eva] Recording results for incr
 [eva] Done for function incr
-[eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+[eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr
 [eva] computing for function incr_g <- various_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:101.
+  Called from tests/value/auto_loop_unroll.c:99.
 [eva] Recording results for incr_g
 [eva] Done for function incr_g
 [eva] computing for function incr <- various_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:102.
+  Called from tests/value/auto_loop_unroll.c:100.
 [eva] Recording results for incr
 [eva] Done for function incr
 [eva] computing for function incr <- various_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:103.
+  Called from tests/value/auto_loop_unroll.c:101.
 [eva] Recording results for incr
 [eva] Done for function incr
 [eva] computing for function incr_g <- various_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:101.
+  Called from tests/value/auto_loop_unroll.c:99.
 [eva] Recording results for incr_g
 [eva] Done for function incr_g
-[eva] tests/value/auto_loop_unroll.c:102: Reusing old results for call to incr
+[eva] tests/value/auto_loop_unroll.c:100: Reusing old results for call to incr
 [eva] computing for function incr <- various_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:103.
+  Called from tests/value/auto_loop_unroll.c:101.
 [eva] Recording results for incr
 [eva] Done for function incr
 [eva] computing for function incr_g <- various_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:101.
+  Called from tests/value/auto_loop_unroll.c:99.
 [eva:alarm] tests/value/auto_loop_unroll.c:14: Warning: 
   signed overflow. assert g + 1 ≤ 2147483647;
 [eva] Recording results for incr_g
 [eva] Done for function incr_g
-[eva] tests/value/auto_loop_unroll.c:102: Reusing old results for call to incr
+[eva] tests/value/auto_loop_unroll.c:100: Reusing old results for call to incr
 [eva] computing for function incr <- various_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:103.
-[eva] Recording results for incr
-[eva] Done for function incr
-[eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr_g
-[eva] tests/value/auto_loop_unroll.c:102: Reusing old results for call to incr
-[eva] computing for function incr <- various_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:103.
-[eva] Recording results for incr
-[eva] Done for function incr
-[eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr_g
-[eva] tests/value/auto_loop_unroll.c:102: Reusing old results for call to incr
-[eva] computing for function incr <- various_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:103.
+  Called from tests/value/auto_loop_unroll.c:101.
 [eva:alarm] tests/value/auto_loop_unroll.c:18: Warning: 
   signed overflow. assert i + 1 ≤ 2147483647;
 [eva] Recording results for incr
 [eva] Done for function incr
-[eva] tests/value/auto_loop_unroll.c:105: Frama_C_show_each_25: [0..2147483647]
-[eva:loop-unroll] tests/value/auto_loop_unroll.c:110: Automatic loop unrolling.
-[eva] tests/value/auto_loop_unroll.c:109: starting to merge loop iterations
-[eva] tests/value/auto_loop_unroll.c:110: starting to merge loop iterations
-[eva:alarm] tests/value/auto_loop_unroll.c:111: Warning: 
+[eva] tests/value/auto_loop_unroll.c:103: Frama_C_show_each_25: [0..2147483647]
+[eva:loop-unroll] tests/value/auto_loop_unroll.c:108: Automatic loop unrolling.
+[eva] tests/value/auto_loop_unroll.c:107: starting to merge loop iterations
+[eva] tests/value/auto_loop_unroll.c:108: starting to merge loop iterations
+[eva:alarm] tests/value/auto_loop_unroll.c:109: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
-[eva] tests/value/auto_loop_unroll.c:114: Frama_C_show_each_120: [0..2147483647]
+[eva] tests/value/auto_loop_unroll.c:112: Frama_C_show_each_120: [0..2147483647]
+[eva] tests/value/auto_loop_unroll.c:115: starting to merge loop iterations
+[eva:alarm] tests/value/auto_loop_unroll.c:120: Warning: 
+  signed overflow. assert res + 1 ≤ 2147483647;
+[eva] tests/value/auto_loop_unroll.c:122: 
+  Frama_C_show_each_32_64: [0..2147483647]
 [eva] Recording results for various_loops
 [eva] Done for function various_loops
 [eva] computing for function complex_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:191.
-[eva] tests/value/auto_loop_unroll.c:124: starting to merge loop iterations
-[eva:alarm] tests/value/auto_loop_unroll.c:126: Warning: 
-  signed overflow. assert res + 1 ≤ 2147483647;
-[eva] tests/value/auto_loop_unroll.c:128: 
-  Frama_C_show_each_imprecise: [0..2147483647]
-[eva] tests/value/auto_loop_unroll.c:132: starting to merge loop iterations
+  Called from tests/value/auto_loop_unroll.c:250.
 [eva] tests/value/auto_loop_unroll.c:133: starting to merge loop iterations
-[eva:alarm] tests/value/auto_loop_unroll.c:134: Warning: 
-  signed overflow. assert i + 1 ≤ 2147483647;
-[eva:alarm] tests/value/auto_loop_unroll.c:137: Warning: 
-  signed overflow. assert i + 1 ≤ 2147483647;
-[eva:alarm] tests/value/auto_loop_unroll.c:136: Warning: 
+[eva:alarm] tests/value/auto_loop_unroll.c:135: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
-[eva] tests/value/auto_loop_unroll.c:139: 
+[eva] tests/value/auto_loop_unroll.c:137: 
   Frama_C_show_each_imprecise: [0..2147483647]
-[eva] tests/value/auto_loop_unroll.c:143: starting to merge loop iterations
+[eva] tests/value/auto_loop_unroll.c:141: starting to merge loop iterations
+[eva] tests/value/auto_loop_unroll.c:142: starting to merge loop iterations
+[eva:alarm] tests/value/auto_loop_unroll.c:143: Warning: 
+  signed overflow. assert i + 1 ≤ 2147483647;
 [eva:alarm] tests/value/auto_loop_unroll.c:146: Warning: 
+  signed overflow. assert i + 1 ≤ 2147483647;
+[eva:alarm] tests/value/auto_loop_unroll.c:145: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
 [eva] tests/value/auto_loop_unroll.c:148: 
   Frama_C_show_each_imprecise: [0..2147483647]
-[eva] tests/value/auto_loop_unroll.c:151: starting to merge loop iterations
-[eva:alarm] tests/value/auto_loop_unroll.c:156: Warning: 
+[eva] tests/value/auto_loop_unroll.c:152: starting to merge loop iterations
+[eva:alarm] tests/value/auto_loop_unroll.c:155: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
-[eva] tests/value/auto_loop_unroll.c:158: 
+[eva] tests/value/auto_loop_unroll.c:157: 
   Frama_C_show_each_imprecise: [0..2147483647]
-[eva] tests/value/auto_loop_unroll.c:163: Reusing old results for call to incr_g
-[eva] tests/value/auto_loop_unroll.c:162: starting to merge loop iterations
 [eva] computing for function incr_g <- complex_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:163.
+  Called from tests/value/auto_loop_unroll.c:162.
+[eva] Recording results for incr_g
+[eva] Done for function incr_g
+[eva] tests/value/auto_loop_unroll.c:161: starting to merge loop iterations
+[eva] computing for function incr_g <- complex_loops <- main.
+  Called from tests/value/auto_loop_unroll.c:162.
 [eva] Recording results for incr_g
 [eva] Done for function incr_g
 [eva] computing for function incr_g <- complex_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:163.
+  Called from tests/value/auto_loop_unroll.c:162.
 [eva] Recording results for incr_g
 [eva] Done for function incr_g
 [eva] computing for function incr_g <- complex_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:163.
+  Called from tests/value/auto_loop_unroll.c:162.
 [eva] Recording results for incr_g
 [eva] Done for function incr_g
-[eva] tests/value/auto_loop_unroll.c:163: Reusing old results for call to incr_g
-[eva] tests/value/auto_loop_unroll.c:163: Reusing old results for call to incr_g
-[eva:alarm] tests/value/auto_loop_unroll.c:165: Warning: 
+[eva] tests/value/auto_loop_unroll.c:162: Reusing old results for call to incr_g
+[eva] tests/value/auto_loop_unroll.c:162: Reusing old results for call to incr_g
+[eva:alarm] tests/value/auto_loop_unroll.c:164: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
-[eva] tests/value/auto_loop_unroll.c:167: 
+[eva] tests/value/auto_loop_unroll.c:166: 
   Frama_C_show_each_imprecise: [0..2147483647]
-[eva] tests/value/auto_loop_unroll.c:172: starting to merge loop iterations
-[eva:alarm] tests/value/auto_loop_unroll.c:174: Warning: 
+[eva] tests/value/auto_loop_unroll.c:171: starting to merge loop iterations
+[eva:alarm] tests/value/auto_loop_unroll.c:173: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
-[eva] tests/value/auto_loop_unroll.c:176: 
+[eva] tests/value/auto_loop_unroll.c:175: 
   Frama_C_show_each_imprecise: [0..2147483647]
-[eva] tests/value/auto_loop_unroll.c:180: starting to merge loop iterations
-[eva:alarm] tests/value/auto_loop_unroll.c:182: Warning: 
+[eva] tests/value/auto_loop_unroll.c:179: starting to merge loop iterations
+[eva:alarm] tests/value/auto_loop_unroll.c:181: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
-[eva] tests/value/auto_loop_unroll.c:184: 
+[eva:alarm] tests/value/auto_loop_unroll.c:180: Warning: 
+  signed overflow. assert i + 1 ≤ 2147483647;
+[eva] tests/value/auto_loop_unroll.c:183: 
   Frama_C_show_each_imprecise: [0..2147483647]
 [eva] Recording results for complex_loops
 [eva] Done for function complex_loops
+[eva] computing for function various_conditions <- main.
+  Called from tests/value/auto_loop_unroll.c:251.
+[eva] tests/value/auto_loop_unroll.c:192: starting to merge loop iterations
+[eva:alarm] tests/value/auto_loop_unroll.c:193: Warning: 
+  signed overflow. assert res + 1 ≤ 2147483647;
+[eva] tests/value/auto_loop_unroll.c:195: Frama_C_show_each_11: [0..2147483647]
+[eva] tests/value/auto_loop_unroll.c:197: starting to merge loop iterations
+[eva:alarm] tests/value/auto_loop_unroll.c:198: Warning: 
+  signed overflow. assert res + 1 ≤ 2147483647;
+[eva] tests/value/auto_loop_unroll.c:200: Frama_C_show_each_12: [0..2147483647]
+[eva] tests/value/auto_loop_unroll.c:203: starting to merge loop iterations
+[eva:alarm] tests/value/auto_loop_unroll.c:204: Warning: 
+  signed overflow. assert res + 1 ≤ 2147483647;
+[eva:alarm] tests/value/auto_loop_unroll.c:203: Warning: 
+  signed overflow. assert -2147483648 ≤ i_0 - 1;
+[eva] tests/value/auto_loop_unroll.c:206: 
+  Frama_C_show_each_0_13: [0..2147483647]
+[eva] tests/value/auto_loop_unroll.c:208: starting to merge loop iterations
+[eva:alarm] tests/value/auto_loop_unroll.c:209: Warning: 
+  signed overflow. assert res + 1 ≤ 2147483647;
+[eva:alarm] tests/value/auto_loop_unroll.c:208: Warning: 
+  signed overflow. assert -2147483648 ≤ i_1 - 1;
+[eva] tests/value/auto_loop_unroll.c:211: 
+  Frama_C_show_each_0_14: [0..2147483647]
+[eva] tests/value/auto_loop_unroll.c:214: starting to merge loop iterations
+[eva:alarm] tests/value/auto_loop_unroll.c:217: Warning: 
+  signed overflow. assert res + 1 ≤ 2147483647;
+[eva] tests/value/auto_loop_unroll.c:219: 
+  Frama_C_show_each_0_15: [0..2147483647]
+[eva] tests/value/auto_loop_unroll.c:221: starting to merge loop iterations
+[eva:alarm] tests/value/auto_loop_unroll.c:222: Warning: 
+  signed overflow. assert res + 1 ≤ 2147483647;
+[eva] tests/value/auto_loop_unroll.c:226: 
+  Frama_C_show_each_11_111: [0..2147483647]
+[eva] Recording results for various_conditions
+[eva] Done for function various_conditions
+[eva] computing for function temporary_variables <- main.
+  Called from tests/value/auto_loop_unroll.c:252.
+[eva] tests/value/auto_loop_unroll.c:235: starting to merge loop iterations
+[eva:alarm] tests/value/auto_loop_unroll.c:235: Warning: 
+  signed overflow. assert i + 1 ≤ 2147483647;
+[eva:alarm] tests/value/auto_loop_unroll.c:236: Warning: 
+  signed overflow. assert res + 1 ≤ 2147483647;
+[eva] tests/value/auto_loop_unroll.c:238: Frama_C_show_each_20: [0..2147483647]
+[eva] tests/value/auto_loop_unroll.c:240: starting to merge loop iterations
+[eva:alarm] tests/value/auto_loop_unroll.c:241: Warning: 
+  signed overflow. assert res + 1 ≤ 2147483647;
+[eva:alarm] tests/value/auto_loop_unroll.c:240: Warning: 
+  signed overflow. assert -2147483648 ≤ i - 1;
+[eva] tests/value/auto_loop_unroll.c:243: Frama_C_show_each_21: [0..2147483647]
+[eva] Recording results for temporary_variables
+[eva] Done for function temporary_variables
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -213,8 +257,9 @@
 [eva:final-states] Values at end of function complex_loops:
   g ∈ {64}
   res ∈ [0..2147483647]
-  i ∈ [0..64]
-  p ∈ {{ &i }}
+  i ∈ [64..2147483647]
+  j ∈ {64}
+  p ∈ {{ &j }}
   t[0] ∈ {0}
    [1] ∈ {1}
    [2] ∈ {2}
@@ -227,9 +272,15 @@
    [9] ∈ {9}
 [eva:final-states] Values at end of function simple_loops:
   res ∈ {100}
+[eva:final-states] Values at end of function temporary_variables:
+  i ∈ [-2147483648..20]
+  res ∈ [0..2147483647]
+[eva:final-states] Values at end of function various_conditions:
+  i ∈ {12}
+  res ∈ {0}
 [eva:final-states] Values at end of function various_loops:
   Frama_C_entropy_source ∈ [--..--]
-  g ∈ [0..2147483647]
+  g ∈ [101..2147483647]
   res ∈ {0}
   x ∈ {24}
   k ∈ [0..10]
@@ -244,6 +295,10 @@
 [from] Done for function complex_loops
 [from] Computing for function simple_loops
 [from] Done for function simple_loops
+[from] Computing for function temporary_variables
+[from] Done for function temporary_variables
+[from] Computing for function various_conditions
+[from] Done for function various_conditions
 [from] Computing for function various_loops
 [from] Computing for function Frama_C_interval <-various_loops
 [from] Done for function Frama_C_interval
@@ -263,9 +318,13 @@
   g FROM \nothing
 [from] Function simple_loops:
   NO EFFECTS
+[from] Function temporary_variables:
+  NO EFFECTS
+[from] Function various_conditions:
+  NO EFFECTS
 [from] Function various_loops:
   Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
-  g FROM g (and SELF)
+  g FROM \nothing
 [from] Function main:
   Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
   g FROM \nothing
@@ -279,16 +338,24 @@
 [inout] Inputs for function incr_g:
     g
 [inout] Out (internal) for function complex_loops:
-    g; res; i; p; j; t[0..9]
+    g; res; i; j; p; j_0; t[0..9]
 [inout] Inputs for function complex_loops:
     undet; g
 [inout] Out (internal) for function simple_loops:
     res; i; i_0; i_1; i_2
 [inout] Inputs for function simple_loops:
     \nothing
+[inout] Out (internal) for function temporary_variables:
+    i; res; tmp; tmp_0
+[inout] Inputs for function temporary_variables:
+    \nothing
+[inout] Out (internal) for function various_conditions:
+    i; res; i_0; tmp; i_1; tmp_0; i_2; i_3
+[inout] Inputs for function various_conditions:
+    undet
 [inout] Out (internal) for function various_loops:
-    Frama_C_entropy_source; g; res; i; i_0; i_1; i_2; i_3; x; k; i_4; i_5; 
-    t; i_6; j
+    Frama_C_entropy_source; g; res; i; i_0; i_1; i_2; x; k; i_3; i_4; t; 
+    i_5; j; i_6
 [inout] Inputs for function various_loops:
     Frama_C_entropy_source; undet; g
 [inout] Out (internal) for function main:
