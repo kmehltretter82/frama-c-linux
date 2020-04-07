@@ -96,7 +96,7 @@ let inline_call loc caller callee return args =
     method! vterm_lval (host,offset) =
       match host, return with
       | TResult _, Some lv ->
-        let tlv = Logic_utils.lval_to_term_lval ~cast:false lv in
+        let tlv = Logic_utils.lval_to_term_lval lv in
         let offset = Visitor.visitFramacTermOffset self offset in
         Cil.ChangeToPost
           (Logic_const.addTermOffsetLval offset tlv, Extlib.id)

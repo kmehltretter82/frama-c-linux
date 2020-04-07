@@ -720,6 +720,16 @@ let known_logic_funs = [
   "\\sign", ACSL;
   "\\min", ACSL;
   "\\max", ACSL;
+  "\\neg_float",ACSL;
+  "\\add_float",ACSL;
+  "\\sub_float",ACSL;
+  "\\mul_float",ACSL;
+  "\\div_float",ACSL;
+  "\\neg_double",ACSL;
+  "\\add_double",ACSL;
+  "\\sub_double",ACSL;
+  "\\mul_double",ACSL;
+  "\\div_double",ACSL;
 ]
 let known_predicates = [
   "\\warning", ACSL;
@@ -1354,11 +1364,13 @@ and eval_known_logic_function ~alarm_mode env li labels args =
     eval_logic_charchr builtin
       { env with e_cur = lbl } s.eover c.eover s.ldeps c.ldeps
 
-  | ("atan2" | "atan2f" | "fmod" | "fmodf" | "pow" | "powf"),
+  | ( "atan2" | "atan2f" | "fmod" | "fmodf" | "pow" | "powf"
+    | "\\add_float" | "\\sub_float" | "\\mul_float" | "\\div_float"
+    | "\\add_double" | "\\sub_double" | "\\mul_double" | "\\div_double" ),
     _, _, [arg1; arg2] ->
     eval_float_builtin_arity2 ~alarm_mode env lvi.lv_name arg1 arg2
 
-  | ("sqrt" | "sqrtf"),_,_, [arg] ->
+  | ( "sqrt" | "sqrtf" | "\\neg_float" | "\\neg_double" ),_,_, [arg] ->
     eval_float_builtin_arity1 ~alarm_mode env lvi.lv_name arg
 
   | "\\sign", _, _, [arg] ->
@@ -1410,6 +1422,14 @@ and eval_float_builtin_arity2  ~alarm_mode env name arg1 arg2 =
     | "fmodf" ->  Fval.fmod  Fval.Single
     | "pow" ->    Fval.pow   Fval.Double
     | "powf" ->   Fval.pow   Fval.Single
+    | "\\add_float" -> Fval.add Fval.Single
+    | "\\sub_float" -> Fval.sub Fval.Single
+    | "\\mul_float" -> Fval.mul Fval.Single
+    | "\\div_float" -> Fval.div Fval.Single
+    | "\\add_double" -> Fval.add Fval.Double
+    | "\\sub_double" -> Fval.sub Fval.Double
+    | "\\mul_double" -> Fval.mul Fval.Double
+    | "\\div_double" -> Fval.div Fval.Double
     | _ -> assert false
   in
   let r1 = eval_term ~alarm_mode env arg1 in
@@ -1432,6 +1452,7 @@ and eval_float_builtin_arity1  ~alarm_mode env name arg =
   let fcaml = match name with
     | "sqrt" ->   Fval.sqrt  Fval.Double
     | "sqrtf" ->  Fval.sqrt  Fval.Single
+    | "\\neg_float" | "\\neg_double" ->  Fval.neg
     | _ -> assert false
   in
   let r = eval_term ~alarm_mode env arg in

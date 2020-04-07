@@ -2,13 +2,18 @@
 MODULE: @PTEST_DIR@/@PTEST_NAME@.cmxs
 OPT: -print
 */
+
+
+// This predicate is modified by expr_to_term.ml plugin to compare
+// the assigned l-value or condition at provided stmt id with the logical term
+
+/*@ predicate int_eq(int logical, int from_stmt_id) = logical == from_stmt_id; */
+
 int x[10];
 
 struct S { int y; int z; } s;
 
 int t;
-
-/*@ predicate int_eq(int logical, int from_c) = logical == from_c; */
 
 /*@ ensures int_eq(*(int*)((unsigned)0x1 + 0x2),(int)0); */
 int f() {
@@ -29,7 +34,12 @@ int main() {
   t = 4;
 }
 
-/*@ ensures int_eq((int)!t,(int)5); */
+/*@ ensures int_eq((int)(t!=0 ? 0 : 1),(int)5); */
 int g() {
   if (!t) return 2; else return 3;
+}
+
+/*@ ensures int_eq((int)(t<5 ? 1 : 0),(int)6); */
+int h() {
+  if (t<5) return 2; else return 3;
 }

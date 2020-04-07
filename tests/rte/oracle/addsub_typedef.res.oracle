@@ -41,7 +41,8 @@ int main(void)
   /*@ assert rte: signed_overflow: -2147483648 ≤ (int)(-0x7ffffffc) - y; */
   z = -0x7ffffffc - y;
   /*@ assert rte: signed_overflow: -2147483647 ≤ x; */
-  /*@ assert rte: signed_overflow: -2147483648 ≤ (int)(-x) - 0x7ffffffc; */
+  /*@ assert rte: signed_overflow: -2147483648 ≤ (tint)(-x) - 0x7ffffffc;
+  */
   z = - x - 0x7ffffffc;
   /*@ assert rte: signed_overflow: 0x7ffffffc + y ≤ 2147483647; */
   z = 0x7ffffffc + y;

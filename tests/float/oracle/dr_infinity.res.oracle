@@ -22,27 +22,32 @@
   v ∈ [--..--]
 [eva] tests/float/dr_infinity.i:9: Frama_C_show_each: {0x1.fffffe0000000p127}
 [eva:alarm] tests/float/dr_infinity.i:11: Warning: 
-  non-finite float value. assert \is_finite((float)3.402823567797366e+38);
+  non-finite float value.
+  assert \is_finite((float)((double)3.402823567797366e+38));
 [eva:alarm] tests/float/dr_infinity.i:16: Warning: 
-  non-finite float value. assert \is_finite((float)(x * x));
+  non-finite float value. assert \is_finite(\mul_float(x, x));
 [eva:alarm] tests/float/dr_infinity.i:21: Warning: 
-  non-finite double value. assert \is_finite((double)(d * (double)10));
+  non-finite double value. assert \is_finite(\mul_double(d, (double)10));
 [eva:alarm] tests/float/dr_infinity.i:26: Warning: 
-  non-finite double value. assert \is_finite((double)((double)2 / d));
+  non-finite double value. assert \is_finite(\div_double((double)2, d));
 [eva:alarm] tests/float/dr_infinity.i:31: Warning: 
-  non-finite double value. assert \is_finite((double)(d / 0.01));
+  non-finite double value. assert \is_finite(\div_double(d, (double)0.01));
 [eva:alarm] tests/float/dr_infinity.i:36: Warning: 
   non-finite float value.
-  assert \is_finite((float)((double)((double)x / 0.001)));
+  assert \is_finite((float)\div_double((double)x, (double)0.001));
 [eva:alarm] tests/float/dr_infinity.i:41: Warning: 
-  non-finite double value. assert \is_finite((double)(d / 0.));
+  non-finite double value. assert \is_finite(\div_double(d, (double)0.));
 [eva] Recording results for main
 [eva] done for function main
 [eva] tests/float/dr_infinity.i:11: 
   assertion 'Eva,is_nan_or_infinite' got final status invalid.
 [eva] tests/float/dr_infinity.i:16: 
   assertion 'Eva,is_nan_or_infinite' got final status invalid.
+[eva] tests/float/dr_infinity.i:21: 
+  assertion 'Eva,is_nan_or_infinite' got final status invalid.
 [eva] tests/float/dr_infinity.i:26: 
+  assertion 'Eva,is_nan_or_infinite' got final status invalid.
+[eva] tests/float/dr_infinity.i:31: 
   assertion 'Eva,is_nan_or_infinite' got final status invalid.
 [eva] tests/float/dr_infinity.i:36: 
   assertion 'Eva,is_nan_or_infinite' got final status invalid.

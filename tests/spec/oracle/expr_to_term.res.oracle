@@ -4,12 +4,14 @@ struct S {
    int y ;
    int z ;
 };
+/*@
+predicate int_eq(int logical, int from_stmt_id) = logical ≡ from_stmt_id;
+ */
 int x[10];
 struct S s;
 int t;
-/*@ predicate int_eq(int logical, int from_c) = logical ≡ from_c;
- */
-/*@ ensures int_eq(*((int *)(0x1 + 0x2)), *((int *)(0x1 + 0x2)));
+/*@ ensures
+      int_eq(*((int *)(0x1 + 0x2)), *((int *)((unsigned int)(0x1 + 0x2))));
     ensures int_eq(*((int *)(0x1 + 0x2)), (int)0);
  */
 int f(void)
@@ -40,13 +42,30 @@ int main(void)
   return __retres;
 }
 
-/*@ ensures int_eq((int)(!(t ≢ 0)), (int)(!(t ≢ 0)));
-    ensures int_eq((int)(!(t ≢ 0)), (int)5);
+/*@ ensures int_eq((int)(t ≢ 0? 0: 1), (int)(t ≢ 0? 0: 1));
+    ensures int_eq((int)(t ≢ 0? 0: 1), (int)5);
  */
 int g(void)
 {
   int __retres;
   if (! t) {
+    __retres = 2;
+    goto return_label;
+  }
+  else {
+    __retres = 3;
+    goto return_label;
+  }
+  return_label: return __retres;
+}
+
+/*@ ensures int_eq((int)(t < 5? 1: 0), (int)(t < 5? 1: 0));
+    ensures int_eq((int)(t < 5? 1: 0), (int)6);
+ */
+int h(void)
+{
+  int __retres;
+  if (t < 5) {
     __retres = 2;
     goto return_label;
   }

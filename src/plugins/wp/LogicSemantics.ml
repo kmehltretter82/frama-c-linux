@@ -1027,7 +1027,7 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   let assigned_of_lval env ~unfold (lv : Cil_types.lval) =
-    assignable_lval env ~unfold (Logic_utils.lval_to_term_lval ~cast:false lv)
+    assignable_lval env ~unfold (Logic_utils.lval_to_term_lval lv)
 
   let assigned_of_froms env ~unfold froms =
     List.concat

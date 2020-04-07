@@ -14,7 +14,7 @@
 [eva:alarm] tests/value/descending.i:13: Warning: 
   accessing out of bounds index. assert (int)(i - 1) < 10;
 [eva:alarm] tests/value/descending.i:13: Warning: 
-  accessing uninitialized left-value. assert \initialized(&A[i - 1]);
+  accessing uninitialized left-value. assert \initialized(&A[(int)(i - 1)]);
 [eva] Recording results for test1
 [eva] Done for function test1
 [eva] computing for function test2 <- main.

@@ -801,7 +801,7 @@ struct
          let attrs = Cil.filter_qualifier_attributes attrs in
          let field = C.find_comp_field comp f in
          let typ = Cil.typeOffset ty field in
-         Logic_utils.offset_to_term_offset ~cast:false field,
+         Logic_utils.offset_to_term_offset field,
          Ctype (Cil.typeAddAttributes attrs typ)
        with Not_found -> C.error loc "cannot find field %s" f)
     | _ ->
@@ -2537,8 +2537,9 @@ struct
           TConst c, Linteger
         | _ -> assert false
       end
-    | PLconstant (FloatConstant str) ->
-      TConst (Logic_utils.string_to_float_lconstant str), Lreal
+    | PLconstant (FloatConstant s) ->
+      let t = Logic_utils.parse_float ~loc s in
+      t.term_node , t.term_type
     | PLconstant (StringConstant s) ->
       TConst (LStr (unescape s)), Ctype Cil.charPtrType
     | PLconstant (WStringConstant s) ->

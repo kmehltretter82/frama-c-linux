@@ -91,6 +91,7 @@ type op =
   | NE
   | NEG
   | ADD
+  | SUB
   | MUL
   | DIV
   | REAL
@@ -105,6 +106,7 @@ let op_name = function
   | NE -> "ne"
   | NEG -> "neg"
   | ADD -> "add"
+  | SUB -> "sub"
   | MUL -> "mul"
   | DIV -> "div"
   | REAL -> "of"
@@ -275,6 +277,7 @@ let compute_float op ulp xs =
   match op , xs with
   | NEG , [ x ] -> qmake ulp (Q.neg (exact x))
   | ADD , [ x ; y ] -> qmake ulp (Q.add (exact x) (exact y))
+  | SUB , [ x ; y ] -> qmake ulp (Q.sub (exact x) (exact y))
   | MUL , [ x ; y ] -> qmake ulp (Q.mul (exact x) (exact y))
   | DIV , [ x ; y ] ->
       let res = match Q.div (exact x) (exact y) with
@@ -293,6 +296,7 @@ let compute_real op xs =
   match op , xs with
   | NEG , [ x ] -> F.e_opp x
   | ADD , [ x ; y ] -> F.e_add x y
+  | SUB , [ x ; y ] -> F.e_sub x y
   | MUL , [ x ; y ] -> F.e_mul x y
   | DIV , [ x ; y ] -> F.e_div x y
   | (ROUND|REAL) , [ x ] -> x
@@ -350,36 +354,51 @@ let flt_le ft = Compute.get (Context.get model, ft, LE) |> fst
 let flt_lt ft = Compute.get (Context.get model, ft, LT) |> fst
 let flt_neg ft = Compute.get (Context.get model, ft, NEG) |> fst
 let flt_add ft = Compute.get (Context.get model, ft, ADD) |> fst
+let flt_sub ft = Compute.get (Context.get model, ft, SUB) |> fst
 let flt_mul ft = Compute.get (Context.get model, ft, MUL) |> fst
 let flt_div ft = Compute.get (Context.get model, ft, DIV) |> fst
 let flt_of_real ft = Compute.get (Context.get model, ft, ROUND) |> fst
 let real_of_flt ft = Compute.get (Context.get model, ft, REAL) |> fst
 
-
 (* -------------------------------------------------------------------------- *)
 (* --- Builtins                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-let make_hack ?(converse=false) ft op xs =
+let builtin kind ft op xs =
   let phi, impl = Compute.get ((Context.get model), ft, op) in
-  let xs = (if converse then List.rev xs else xs) in
-  try impl xs with Not_found -> F.e_fun ~result:Logic.Bool phi xs
+  let xs = (if kind=`ReV then List.rev xs else xs) in
+  try impl xs with Not_found ->
+    let result = match kind with
+      | `Binop | `Unop -> ftau ft
+      | `Rel | `ReV -> Logic.Bool
+    in F.e_fun ~result phi xs
 
-let register_builtin ft =
+let register_builtins ft =
   begin
     let suffix = float_name ft in
-    LogicBuiltins.hack ("\\eq_" ^ suffix) (make_hack ft EQ) ;
-    LogicBuiltins.hack ("\\ne_" ^ suffix) (make_hack ft NE) ;
-    LogicBuiltins.hack ("\\lt_" ^ suffix) (make_hack ~converse:false ft LT) ;
-    LogicBuiltins.hack ("\\gt_" ^ suffix) (make_hack ~converse:true  ft LT) ;
-    LogicBuiltins.hack ("\\le_" ^ suffix) (make_hack ~converse:false ft LE) ;
-    LogicBuiltins.hack ("\\ge_" ^ suffix) (make_hack ~converse:true  ft LE)
+    let register (prefix,kind,op) =
+      LogicBuiltins.hack
+        (Printf.sprintf "\\%s_%s" prefix suffix)
+        (builtin kind ft op)
+    in List.iter register [
+      "eq",`Rel,EQ ;
+      "ne",`Rel,NE ;
+      "lt",`Rel,LT ;
+      "gt",`ReV,LT ;
+      "le",`Rel,LE ;
+      "ge",`ReV,LE ;
+      "neg",`Unop,NEG ;
+      "add",`Binop,ADD ;
+      "sub",`Binop,SUB ;
+      "mul",`Binop,MUL ;
+      "div",`Binop,DIV ;
+    ] ;
   end
 
 let () = Context.register
     begin fun () ->
-      register_builtin Float32 ;
-      register_builtin Float64 ;
+      register_builtins Float32 ;
+      register_builtins Float64 ;
     end
 
 (* -------------------------------------------------------------------------- *)
@@ -435,15 +454,13 @@ let fcmp rop fop f x y =
   | Float -> p_call (fop f) [x;y]
 
 let fadd = fbinop e_add flt_add
+let fsub = fbinop e_sub flt_sub
 let fmul = fbinop e_mul flt_mul
 let fdiv = fbinop e_div flt_div
-
 let fopp f x =
   match Context.get model with
   | Real -> e_opp x
   | Float -> e_fun ~result:(ftau f) (flt_neg f) [x]
-
-let fsub f x y = fadd f x (fopp f y)
 
 let flt = fcmp p_lt flt_lt
 let fle = fcmp p_leq flt_le

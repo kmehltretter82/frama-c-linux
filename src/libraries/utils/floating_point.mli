@@ -30,8 +30,8 @@ val string_of_c_rounding_mode : c_rounding_mode -> string
 
 external set_round_downward : unit -> unit = "set_round_downward" [@@noalloc]
 external set_round_upward : unit -> unit = "set_round_upward" [@@noalloc]
-external set_round_nearest_even : unit -> unit = 
-    "set_round_nearest_even" [@@noalloc]
+external set_round_nearest_even : unit -> unit =
+  "set_round_nearest_even" [@@noalloc]
 external set_round_toward_zero : unit -> unit =
   "set_round_toward_zero" [@@noalloc]
 external get_rounding_mode: unit -> c_rounding_mode =
@@ -49,8 +49,8 @@ val neg_min_denormal: float
 val min_single_precision_denormal: float
 val neg_min_single_precision_denormal: float
 
-external sys_single_precision_of_string: string -> float = 
-    "single_precision_of_string"
+external sys_single_precision_of_string: string -> float =
+  "single_precision_of_string"
 
 
 (** If [s] is parsed as [(n, l, u)], then [n] is the nearest approximation of
@@ -68,6 +68,10 @@ type parsed_float = {
     double or long double precision) according to its suffix, if any. Strings
     with no suffix are parsed as double. *)
 val parse: string -> Cil_types.fkind * parsed_float
+
+(** Checks if the (uppercased) string ends with an explicit [F|D|L]
+    suffix corresponding to the given float kind. *)
+val has_suffix: Cil_types.fkind -> string -> bool
 
 val pretty_normal : use_hex : bool -> Format.formatter -> float -> unit
 val pretty : Format.formatter -> float -> unit

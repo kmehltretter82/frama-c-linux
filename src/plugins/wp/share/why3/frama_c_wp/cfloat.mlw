@@ -145,10 +145,15 @@ theory Cfloat
   function add_f32 (x:f32) (y:f32) : f32 = F32.(.+) x y
   function add_f64 (x:f64) (y:f64) : f64 = F64.(.+) x y
 
+  (* Substraction *)
+
+  function sub_f32 (x:f32) (y:f32) : f32 = F32.(.-) x y
+  function sub_f64 (x:f64) (y:f64) : f64 = F64.(.-) x y
+
   (* Multiplication *)
 
-  function mul_f32 (x:f32) (y:f32) : f32 = F32.(.-) x y
-  function mul_f64 (x:f64) (y:f64) : f64 = F64.(.-) x y
+  function mul_f32 (x:f32) (y:f32) : f32 = F32.(.*) x y
+  function mul_f64 (x:f64) (y:f64) : f64 = F64.(.*) x y
 
   (* Division *)
 

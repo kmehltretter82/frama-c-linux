@@ -8858,9 +8858,9 @@ and createLocal ghost ((_, sto, _, _) as specs)
           (se0 +++ (
               let castloc = CurrentLoc.get () in
               let talloca_size =
-                let telt_size = Logic_utils.expr_to_term ~cast:false elt_size in
-                let tlen = Logic_utils.expr_to_term ~cast:false len in
-                Logic_const.term (TBinOp (Mult,telt_size,tlen)) telt_size.term_type
+                let size = Logic_utils.expr_to_term ~coerce:true elt_size in
+                let tlen = Logic_utils.expr_to_term ~coerce:true len in
+                Logic_const.term (TBinOp (Mult,size,tlen)) Linteger
               in
               let pos_size =
                 let zero =  Logic_const.tinteger ~loc:castloc 0 in

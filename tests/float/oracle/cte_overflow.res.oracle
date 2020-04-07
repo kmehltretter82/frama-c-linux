@@ -13,9 +13,9 @@
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
 [eva:alarm] tests/float/cte_overflow.i:12: Warning: 
-  non-finite double value. assert \is_finite(1e500);
+  non-finite double value. assert \is_finite((double)1e500);
 [eva:alarm] tests/float/cte_overflow.i:17: Warning: 
-  non-finite float value. assert \is_finite(1e80f);
+  non-finite float value. assert \is_finite((float)1e80f);
 [eva] Recording results for main
 [eva] done for function main
 [eva] tests/float/cte_overflow.i:12: 

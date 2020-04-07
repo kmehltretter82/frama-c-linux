@@ -54,7 +54,7 @@ let get_lval_opt main_ui kf localizable =
   match localizable with
   | Pretty_source.PLval (Some _kf, (Kstmt _stmt), lv) ->
     let lv_txt = Pretty_utils.to_string Printer.pp_lval lv in
-    let tlv = Logic_utils.lval_to_term_lval ~cast:false lv in
+    let tlv = Logic_utils.lval_to_term_lval lv in
     Some (lv_txt, tlv)
   | Pretty_source.PTermLval (Some _kf, (Kstmt _stmt), _, tlv) ->
     let tlv_txt = Pretty_utils.to_string Printer.pp_term_lval tlv in

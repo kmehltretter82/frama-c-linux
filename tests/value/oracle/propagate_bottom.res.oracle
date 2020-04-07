@@ -17,17 +17,23 @@
 [eva:alarm] tests/value/propagate_bottom.i:20: Warning: 
   division by zero. assert 0 ≢ 0;
 [eva:alarm] tests/value/propagate_bottom.i:25: Warning: 
-  non-finite double value. assert \is_finite((double)(1. / (double)0));
+  non-finite double value.
+  assert \is_finite(\div_double((double)1., (double)0));
 [eva:alarm] tests/value/propagate_bottom.i:28: Warning: 
-  non-finite double value. assert \is_finite((double)(1. / (double)0));
+  non-finite double value.
+  assert \is_finite(\div_double((double)1., (double)0));
 [eva:alarm] tests/value/propagate_bottom.i:31: Warning: 
-  non-finite double value. assert \is_finite((double)(1. / (double)0));
+  non-finite double value.
+  assert \is_finite(\div_double((double)1., (double)0));
 [eva:alarm] tests/value/propagate_bottom.i:34: Warning: 
-  non-finite double value. assert \is_finite((double)(1. / 0.));
+  non-finite double value.
+  assert \is_finite(\div_double((double)1., (double)0.));
 [eva:alarm] tests/value/propagate_bottom.i:37: Warning: 
-  non-finite double value. assert \is_finite((double)(1. / 0.));
+  non-finite double value.
+  assert \is_finite(\div_double((double)1., (double)0.));
 [eva:alarm] tests/value/propagate_bottom.i:40: Warning: 
-  non-finite double value. assert \is_finite((double)(1. / 0.));
+  non-finite double value.
+  assert \is_finite(\div_double((double)1., (double)0.));
 [eva] Recording results for main
 [eva] done for function main
 [eva] tests/value/propagate_bottom.i:5: 
