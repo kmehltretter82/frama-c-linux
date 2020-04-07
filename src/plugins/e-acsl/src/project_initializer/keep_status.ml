@@ -49,7 +49,7 @@ type kind =
   | K_Requires
   | K_Ensures
 
-let pretty_kind fmt k =
+let _pretty_kind fmt k =
   Format.fprintf fmt "%s"
     (match k with
      | K_Assert -> "assert"
@@ -119,11 +119,11 @@ let before_translation () =
   (* reset all counters *)
   Datatype.String.Hashtbl.iter (fun _ info -> info.cpt <- 0) keep_status
 
-let must_translate kf kind =
+let must_translate _kf _kind = true
   (*  Options.feedback "GETTING %a for %a"
       pretty_kind kind
       Kernel_function.pretty kf;*)
-  !option_check
+(*  !option_check
   ||
   !option_valid
   ||
@@ -154,7 +154,7 @@ let must_translate kf kind =
         Kernel_function.pretty kf;
     keep
   with Not_found -> true
-
+*)
 (*
 Local Variables:
 compile-command: "make -C ../../../../.."

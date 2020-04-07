@@ -63,13 +63,6 @@ module Valid =
       let help = "translate annotation which have been proven valid"
     end)
 
-module Prepare =
-  False
-    (struct
-      let option_name = "-e-acsl-prepare"
-      let help = "prepare the AST to be directly usable by E-ACSL"
-    end)
-
 module Gmp_only =
   False
     (struct
@@ -174,6 +167,6 @@ let dkey_typing = register_category "typing"
 
 (*
 Local Variables:
-compile-command: "make"
+compile-command: "make -C ../../../.."
 End:
 *)
