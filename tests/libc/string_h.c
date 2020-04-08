@@ -149,5 +149,12 @@ int main(int argc, char **argv)
   //@ assert valid_read_string(strsig);
   test_strncpy();
   test_strlcpy();
+  char *c = "haystack";
+  char d = nondet ? 'y' : 'k';
+  char *chr1 = strchr(c, d);
+  char *nul1 = strchrnul(c, d);
+  d = nondet ? 'a' : 'n';
+  char *chr2 = strchr(c, d);
+  char *nul2 = strchrnul(c, d);
   return 0;
 }

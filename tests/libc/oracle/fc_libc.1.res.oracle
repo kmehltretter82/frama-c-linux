@@ -3999,6 +3999,15 @@ extern int strcoll(char const *s1, char const *s2);
 
 char *strchr(char const *s, int c);
 
+/*@ requires valid_string_s: valid_read_string(s);
+    ensures
+      result_same_base: \subset(\result, \old(s) + (0 .. strlen(\old(s))));
+    assigns \result;
+    assigns \result
+      \from s, (indirect: *(s + (0 .. strlen{Old}(s)))), (indirect: c);
+ */
+extern char *strchrnul(char const *s, int c);
+
 char *strrchr(char const *s, int c);
 
 /*@ requires valid_string_s: valid_read_string(s);
@@ -5919,7 +5928,8 @@ char *strncpy(char *dest, char const *src, size_t n)
 
 /*@ requires valid_string_s: valid_read_string(s);
     assigns \result;
-    assigns \result \from s, *(s + (0 ..)), c;
+    assigns \result
+      \from s, (indirect: *(s + (0 .. strlen{Old}(s)))), (indirect: c);
     
     behavior found:
       assumes char_found: strchr(s, c) ≡ \true;
