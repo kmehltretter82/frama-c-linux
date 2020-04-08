@@ -83,7 +83,7 @@ end
 (** {2 Journal management} *)
 (* ****************************************************************************)
 
-val get_name: unit -> string
+val get_name: unit -> Datatype.Filepath.t
   (** @return the filename which the journal will be written into. *)
 
 val set_name: string -> unit
@@ -110,7 +110,7 @@ val keep_file: string -> unit
   (** This function has not to be used explicitly. Only offers functions
       retrieving when running a journal file. *)
 
-val get_session_file: (string -> string) ref
+val get_session_file: (string -> Datatype.Filepath.t) ref
 
 (*
 Local Variables:

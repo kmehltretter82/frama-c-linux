@@ -417,11 +417,7 @@ struct
       end)
   let () =
     if is_kernel ()
-    then
-      Journal.get_session_file :=
-        (fun s ->
-           let f = Session.file ~error:false s in
-           Format.asprintf "%a" Datatype.Filepath.pretty f)
+    then Journal.get_session_file := (fun s -> Session.file ~error:false s)
 
   module Config =
     Make_specific_dir
