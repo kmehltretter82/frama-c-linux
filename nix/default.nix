@@ -16,13 +16,20 @@ let mk_buildInputs = { opamPackages ? [], nixPackages ? [] } :
            ocamlAttr = ocaml_version;
         };
 
+    # Extends the call to stdenv.mkDerivation with parameters common for all
+    # frama-c derivations
+    mk_deriv = args:
+        stdenv.mkDerivation ({
+            # Disable Nix's GCC hardening
+            hardeningDisable = [ "all" ];
+        } // args);
 in
 
 rec {
   inherit src mk_buildInputs;
   buildInputs = mk_buildInputs {};
   installed = main.out;
-  main = stdenv.mkDerivation {
+  main = mk_deriv {
         name = "frama-c";
         inherit src buildInputs;
         outputs = [ "out" "build_dir" ];
@@ -64,7 +71,7 @@ rec {
         '';
   };
 
-  lint = stdenv.mkDerivation {
+  lint = mk_deriv {
         name = "frama-c-lint";
         inherit src;
         buildInputs = (mk_buildInputs { opamPackages = [ { name = "ocp-indent"; constraint = "=1.7.0"; } ];} )
@@ -88,7 +95,7 @@ rec {
         '';
   };
 
-  tests = stdenv.mkDerivation {
+  tests = mk_deriv {
         name = "frama-c-test";
         inherit buildInputs;
         build_dir = main.build_dir;
@@ -110,7 +117,7 @@ rec {
         '';
   };
 
-  build-distrib-tarball = stdenv.mkDerivation {
+  build-distrib-tarball = mk_deriv {
         name = "frama-c-build-distrib-tarball";
         inherit src;
         buildInputs = buildInputs ++ [ plugins.headache.installed ];
@@ -133,7 +140,7 @@ rec {
         '';
   };
 
-  build-from-distrib-tarball = stdenv.mkDerivation {
+  build-from-distrib-tarball = mk_deriv {
         name = "frama-c-build-from-distrib-tarball";
         inherit buildInputs;
         src = build-distrib-tarball.out ;
@@ -151,7 +158,7 @@ rec {
         '';
   };
 
-  wp-qualif = stdenv.mkDerivation {
+  wp-qualif = mk_deriv {
         name = "frama-c-wp-qualif";
         buildInputs = mk_buildInputs { opamPackages = [
                     { name = "alt-ergo"; constraint = "=2.0.0"; }
@@ -178,7 +185,7 @@ rec {
         '';
   };
 
-  e-acsl-tests-dev = stdenv.mkDerivation {
+  e-acsl-tests-dev = mk_deriv {
         name = "frama-c-e-acsl-tests-dev";
         buildInputs = mk_buildInputs { nixPackages = [ pkgs.gmp pkgs.getopt ]; };
         build_dir = main.build_dir;
@@ -200,7 +207,7 @@ rec {
         '';
   };
 
-  internal = stdenv.mkDerivation {
+  internal = mk_deriv {
         name = "frama-c-internal";
         inherit src;
         buildInputs = (mk_buildInputs { opamPackages = [ "xml-light" ]; } ) ++
