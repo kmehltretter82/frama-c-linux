@@ -1258,9 +1258,15 @@ struct
     match l with
     | Ref x -> noref ~op:"assigns to" x
     | Val((CVAL|CREF),_,[]) -> [] (* full update *)
-    | Val((CVAL|CREF),_,_) as vloc ->
+    | Val((CVAL|CREF),x,ofs) as vloc ->
         let te = Lang.tau_of_object elt in
         let v = Lang.freshvar ~basename:"v" Qed.Logic.(Array(Int,te)) in
+        let rec get_obj obj = function
+          | [] -> obj
+          | Field(fi) :: l -> get_obj (Ctypes.object_of fi.ftype) l
+          | Shift(obj, _) :: l -> get_obj obj l
+        in
+        let obj = get_obj (Ctypes.object_of x.vtype) ofs in
         stored seq obj vloc (e_var v)
     | Val((HEAP|CTXT|CARR) as m,x,ofs) ->
         let l = mloc_of_path m x ofs in
