@@ -1349,15 +1349,19 @@ let makeCastT ~(e: exp) ~(oldt: typ) ~(newt: typ) =
 let makeCast ~(e: exp) ~(newt: typ) =
   makeCastT e (typeOf e) newt
 
-(* A cast that is used for conditional expressions. Pointers are Ok.
-   Abort if invalid *)
-let checkBool (ot : typ) (_ : exp) =
-  match unrollType ot with
+let is_scalar_type t =
+  match unrollType t with
   | TInt _
   | TPtr _
   | TEnum _
-  | TFloat _ -> ()
-  |  _ -> Kernel.fatal ~current:true "castToBool %a" Cil_printer.pp_typ ot
+  | TFloat _ -> true
+  | _ -> false
+
+(* A cast that is used for conditional expressions. Pointers are Ok.
+   Abort if invalid *)
+let checkBool (ot : typ) (_ : exp) =
+  if not (is_scalar_type ot) then
+    Kernel.fatal ~current:true "castToBool %a" Cil_printer.pp_typ ot
 
 (* Evaluate constants to CTrue (non-zero) or CFalse (zero) *)
 let rec isConstTrueFalse c: [ `CTrue | `CFalse ] =
@@ -2838,7 +2842,7 @@ let rec castTo ?context ?(fromsource=false)
     match ot', nt' with
     | TNamed _, _
     | _, TNamed _ -> Kernel.fatal ~current:true "unrollType failed in castTo"
-    | _, TInt(IBool,_) ->
+    | t, TInt(IBool,_) when is_scalar_type t ->
       if is_boolean_result e then result
       else
         nt,
