@@ -726,21 +726,36 @@ struct
   (* ---  Memory Store                                                      --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let stored seq obj l v = match l with
+  (* Note that this function purposely does not update init state *)
+  let memvar_stored seq _obj l v =
+    match l with
     | Ref x -> noref ~op:"write to" x
     | Val((CREF|CVAL),x,ofs) ->
         let v1 = get_term seq.pre x in
         let v2 = get_term seq.post x in
+        Set( v2 , update v1 ofs v )
+    | _ -> failwith "MemVar stored on a non MemVar location"
+
+  let memvar_set_init seq l v =
+    match l with
+    | Ref x -> noref ~op:"write to" x
+    | Val((CREF|CVAL),x,ofs) ->
+        let v1 = get_init_term seq.pre x in
+        let v2 = get_init_term seq.post x in
+        Set( v2 , update_init v1 ofs v )
+    | _ -> failwith "MemVar initialize on a non MemVar location"
+
+
+  let stored seq obj l v = match l with
+    | Ref x -> noref ~op:"write to" x
+    | Val((CREF|CVAL),x,_) ->
         let init =
           if not (x.vformal || x.vglob) then
-            let i1 = get_init_term seq.pre x in
-            let i2 = get_init_term seq.post x in
-            let init = Cvalues.initialized_obj obj in
-            [ Set( i2 , update_init i1 ofs init ) ]
+            [ memvar_set_init seq l (Cvalues.initialized_obj obj) ]
           else
             []
         in
-        Set( v2 , update v1 ofs v ) :: init
+        (memvar_stored seq obj l v) :: init
     | Val((CTXT|CARR|HEAP) as m,x,ofs) ->
         M.stored (mseq_of_seq seq) obj (mloc_of_path m x ofs) v
     | Loc l ->
@@ -1243,12 +1258,49 @@ struct
   (* ---  Assigned                                                          --- *)
   (* -------------------------------------------------------------------------- *)
 
+  let rec monotonic_initialized seq obj x ofs =
+    match obj with
+    | C_int _ | C_float _ | C_pointer _ ->
+        p_imply
+          (p_bool (access_init (get_init_term seq.pre x) ofs))
+          (p_bool (access_init (get_init_term seq.post x) ofs))
+    | C_array { arr_flat=flat ; arr_element=t } ->
+        let size = match flat with
+          | None -> unsized_array ()
+          | Some { arr_size } -> arr_size
+        in
+        let low = (e_int 0) in
+        let up = (e_int (size-1)) in
+        let v = Lang.freshvar ~basename:"i" Lang.t_int in
+        let hyp = p_and (p_leq low (e_var v)) (p_leq (e_var v) up) in
+        let obj = Ctypes.object_of t in
+        let ofs = ofs @ [ Shift(obj, e_var v) ] in
+        let sub = monotonic_initialized seq obj x ofs in
+        Lang.F.p_forall [v] (p_imply hyp sub)
+    | C_comp ci ->
+        let mk_pred f =
+          let obj = Ctypes.object_of f.ftype in
+          let ofs = ofs @ [Field f] in
+          monotonic_initialized seq obj x ofs
+        in
+        Lang.F.p_conj (List.map mk_pred ci.cfields)
+
+  let memvar_assigned seq obj loc v =
+    match loc with
+    | Ref x -> noref ~op:"write to" x
+    | Val((CREF|CVAL),x,ofs) ->
+        let init = e_var (Lang.freshvar ~basename:"v" (init_of_object obj)) in
+        (memvar_set_init seq loc init) ::
+        Assert(monotonic_initialized seq obj x ofs) ::
+        [ memvar_stored seq obj loc v ]
+    | _ -> failwith "MemVar assigned on a non MemVar location"
+
   let assigned_loc seq obj = function
     | Ref x -> noref ~op:"assigns to" x
     | Val((CVAL|CREF),_,[]) -> [] (* full update *)
     | Val((CVAL|CREF),_,_) as vloc ->
         let v = Lang.freshvar ~basename:"v" (Lang.tau_of_object obj) in
-        stored seq obj vloc (e_var v)
+        memvar_assigned seq obj vloc (e_var v)
     | Val((HEAP|CTXT|CARR) as m,x,ofs) ->
         M.assigned (mseq_of_seq seq) obj (Sloc (mloc_of_path m x ofs))
     | Loc l ->
@@ -1267,7 +1319,7 @@ struct
           | Shift(obj, _) :: l -> get_obj obj l
         in
         let obj = get_obj (Ctypes.object_of x.vtype) ofs in
-        stored seq obj vloc (e_var v)
+        memvar_assigned seq obj vloc (e_var v)
     | Val((HEAP|CTXT|CARR) as m,x,ofs) ->
         let l = mloc_of_path m x ofs in
         M.assigned (mseq_of_seq seq) obj (Sarray(l,elt,n))
@@ -1285,7 +1337,9 @@ struct
         let k = Lang.freshvar ~basename:"k" Qed.Logic.Int in
         let p = Vset.in_range (e_var k) a b in
         let ofs = ofs_shift elt (e_var k) ofs in
-        assigned_genset seq [k] m x ofs p
+        let obj_x = Ctypes.object_of x.vtype in
+        Assert(monotonic_initialized seq obj_x x []) ::
+        (assigned_genset seq [k] m x ofs p)
 
   let assigned_descr seq obj xs l p =
     match l with
@@ -1295,7 +1349,9 @@ struct
     | Val((HEAP|CTXT|CARR) as m,x,ofs) ->
         M.assigned (mseq_of_seq seq) obj (Sdescr(xs,mloc_of_path m x ofs,p))
     | Val((CVAL|CREF) as m,x,ofs) ->
-        assigned_genset seq xs m x ofs p
+        let obj_x = Ctypes.object_of x.vtype in
+        Assert(monotonic_initialized seq obj_x x []) ::
+        (assigned_genset seq xs m x ofs p)
 
   let assigned seq obj = function
     | Sloc l -> assigned_loc seq obj l
