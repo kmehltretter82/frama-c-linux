@@ -147,7 +147,7 @@ let classify loop_effect lval =
       else
         (* If the address of the variable is taken, it could be modified within
            the loop. We suppose here that this is not the case, but this could
-           lead to some loop unrolling. *)
+           lead to some untimely loop unrolling. *)
         Constant
     | Mem _, _ -> Unsuitable (* Pointers are not supported by the heuristic. *)
   and is_const_offset = function
