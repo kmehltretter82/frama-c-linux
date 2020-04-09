@@ -182,8 +182,9 @@ let domains_list () =
       (fun fmt -> Format.pp_print_text fmt descr)
   in
   feedback ~level:0
-    "List of available domains:@. %a@."
-    (Pretty_utils.pp_list ~sep:"@," pp_dom) (List.rev !domains_ref);
+    "List of available domains:@,%a"
+    (Pretty_utils.pp_list ~pre:"@[<v>" ~sep:"@," ~suf:"@]" pp_dom)
+    (List.rev !domains_ref);
   raise Cmdline.Exit
 
 (* Registers a new domain. Updates the help message of -eva-domains. *)
