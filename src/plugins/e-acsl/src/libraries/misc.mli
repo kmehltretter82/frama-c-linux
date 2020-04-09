@@ -35,14 +35,10 @@ val result_vi: kernel_function -> varinfo
 (** @return the varinfo corresponding to \result in the given function *)
 
 (* ************************************************************************** *)
-(** {2 Handling the E-ACSL's C-libraries} *)
+(** {2 Other stuff} *)
 (* ************************************************************************** *)
 
 val is_fc_or_compiler_builtin: varinfo -> bool
-
-(* ************************************************************************** *)
-(** {2 Other stuff} *)
-(* ************************************************************************** *)
 
 val term_addr_of: loc:location -> term_lval -> typ -> term
 
@@ -71,8 +67,6 @@ val is_bitfield_pointers: logic_type -> bool
 val term_has_lv_from_vi: term -> bool
 (** @return true iff the given term contains a variables that originates from
     a C varinfo, that is a non-purely logic variable. *)
-
-type pred_or_term = PoT_pred of predicate | PoT_term of term
 
 val mk_ptr_sizeof: typ -> location -> exp
 (** [mk_ptr_sizeof ptr_typ loc] takes the pointer typ [ptr_typ] that points

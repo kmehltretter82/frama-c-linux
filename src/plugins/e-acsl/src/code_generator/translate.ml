@@ -686,7 +686,7 @@ and context_insensitive_term_to_exp kf env t =
     e, env, C_number, ""
   | Tat(t', label) ->
     let lscope = Env.Logic_scope.get env in
-    let pot = Misc.PoT_term t' in
+    let pot = Lscope.PoT_term t' in
     if Lscope.is_used lscope pot then
       let e, env = At_with_lscope.to_exp ~loc kf env pot label in
       e, env, C_number, ""
@@ -947,7 +947,7 @@ and named_predicate_content_to_exp ?name kf env p =
     named_predicate_to_exp kf env p
   | Pat(p', label) ->
     let lscope = Env.Logic_scope.get env in
-    let pot = Misc.PoT_pred p' in
+    let pot = Lscope.PoT_pred p' in
     if Lscope.is_used lscope pot then
       At_with_lscope.to_exp ~loc kf env pot label
     else begin

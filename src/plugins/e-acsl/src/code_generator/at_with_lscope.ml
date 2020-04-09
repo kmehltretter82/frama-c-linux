@@ -225,9 +225,9 @@ let to_exp ~loc kf env pot label =
   in
   (* Creating the pointer *)
   let ty = match pot with
-  | Misc.PoT_pred _ ->
+  | Lscope.PoT_pred _ ->
     Cil.intType
-  | Misc.PoT_term t ->
+  | Lscope.PoT_term t ->
     begin match Typing.get_number_ty t with
     | Typing.(C_integer _ | C_float _ | Nan) ->
       Typing.get_typ t
@@ -289,7 +289,7 @@ let to_exp ~loc kf env pot label =
     let term_to_exp = !term_to_exp_ref in
     let named_predicate_to_exp = !predicate_to_exp_ref in
     match pot with
-    | Misc.PoT_pred p ->
+    | Lscope.PoT_pred p ->
       let env = Env.push env in
       let lval, env = lval_at_index ~loc kf env (e_at, vi_at, t_index) in
       let e, env = named_predicate_to_exp kf env p in
@@ -303,7 +303,7 @@ let to_exp ~loc kf env pot label =
       (* We CANNOT return [block.bstmts] because it does NOT contain
         variable declarations. *)
       [ Constructor.mk_block_stmt block ], env
-    | Misc.PoT_term t ->
+    | Lscope.PoT_term t ->
       begin match Typing.get_number_ty t with
       | Typing.(C_integer _ | C_float _ | Nan) ->
         let env = Env.push env in
@@ -347,6 +347,6 @@ let to_exp ~loc kf env pot label =
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)

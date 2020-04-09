@@ -48,6 +48,13 @@ val get_all: t -> lscope_var list
    The first element is the first [lscope_var] that was added to [t], the
    second element is the second [lscope_var] that was added to [t], an so on. *)
 
-val is_used: t -> Misc.pred_or_term -> bool
+type pred_or_term = PoT_pred of predicate | PoT_term of term
+val is_used: t -> pred_or_term -> bool
 (* [is_used lscope pot] returns [true] iff [pot] uses a variable from
    [lscope]. *)
+
+(*
+Local Variables:
+compile-command: "make -C ../../../../.."
+End:
+*)
