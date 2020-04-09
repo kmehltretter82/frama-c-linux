@@ -620,7 +620,7 @@ end = struct
   let compute init_set kf =
     Options.feedback ~dkey ~level:2 "entering in function %a."
       Kernel_function.pretty kf;
-    assert (not (Misc.is_library_loc (Kernel_function.get_location kf)));
+    assert (not (Rtl.Symbols.mem_kf kf));
     let tbl, is_init =
       try Env.find kf, true
       with Not_found -> Stmt.Hashtbl.create 17, false
@@ -660,7 +660,7 @@ end = struct
     tbl
 
   let get ?init kf =
-    if Misc.is_library_loc (Kernel_function.get_location kf) then
+    if Rtl.Symbols.mem_kf kf then
       Varinfo.Hptset.empty
     else
       try
@@ -799,6 +799,6 @@ let use_model () =
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)

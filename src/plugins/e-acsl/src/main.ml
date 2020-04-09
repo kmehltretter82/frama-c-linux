@@ -71,7 +71,8 @@ let generate_code =
        Project.on
          copied_prj
          (fun () ->
-            (* preparation of the AST does not concern the E-ACSL RTL *)
+            (* preparation of the AST does not concern the E-ACSL RTL:
+               do it first *)
             Prepare_ast.prepare ();
             Rtl.link rtl_prj;
             (* the E-ACSL type system ensures the soundness of the generated

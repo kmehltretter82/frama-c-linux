@@ -44,6 +44,6 @@ val must_model_exp: ?kf:kernel_function -> ?stmt:stmt -> exp -> bool
 
 (*
   Local Variables:
-  compile-command: "make"
+  compile-command: "make -C ../../../../.."
   End:
  *)

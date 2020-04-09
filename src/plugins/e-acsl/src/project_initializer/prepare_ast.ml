@@ -410,8 +410,6 @@ class prepare_visitor = object (self)
         not (Datatype.String.Set.mem vi.vname unduplicable_functions)
         && (* it is not a variadic function *)
         not (self#is_variadic_function vi)
-        && (* it is not in the E-ACSL's RTL *)
-        not (Misc.is_library_loc loc)
         && (* it is not a built-in *)
         not (Misc.is_fc_or_compiler_builtin vi)
         &&
@@ -484,8 +482,8 @@ class prepare_visitor = object (self)
              [ new_decl; g ]
            | _ -> assert false)
 
-    | GVarDecl(vi, loc) | GFunDecl(_, vi, loc) | GFun({ svar = vi }, loc)
-      when Misc.is_library_loc loc || Misc.is_fc_or_compiler_builtin vi ->
+    | GVarDecl(vi, _loc) | GFunDecl(_, vi, _loc) | GFun({ svar = vi }, _loc)
+      when Misc.is_fc_or_compiler_builtin vi ->
       Cil.DoChildren
 
     | _ ->

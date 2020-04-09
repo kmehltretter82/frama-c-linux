@@ -20,27 +20,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module RTL = Functions.RTL
 open Cil_types
 open Cil_datatype
 
 (* ************************************************************************** *)
 (** {2 Handling the E-ACSL's C-libraries, part I} *)
 (* ************************************************************************** *)
-
-let library_files () =
-  List.map
-    (fun d -> Options.Share.get_file ~mode:`Must_exist d)
-    [ "e_acsl_gmp_api.h";
-      "e_acsl.h" ]
-
-let is_library_loc (loc, _) = List.mem loc.Filepath.pos_path (library_files ())
-
-let library_functions = Datatype.String.Hashtbl.create 17
-let register_library_function vi =
-  Datatype.String.Hashtbl.add library_functions vi.vname vi
-
-let reset () = Datatype.String.Hashtbl.clear library_functions
 
 let is_fc_or_compiler_builtin vi =
   Cil.is_builtin vi
@@ -50,20 +35,6 @@ let is_fc_or_compiler_builtin vi =
    &&
    let prefix = String.sub vi.vname 0 prefix_length in
    Datatype.String.equal prefix "__builtin_")
-
-(* ************************************************************************** *)
-(** {2 Builders} *)
-(* ************************************************************************** *)
-
-exception Unregistered_library_function of string
-let get_lib_fun_vi fname =
-  try Datatype.String.Hashtbl.find library_functions fname
-  with Not_found ->
-  try Builtins.find fname
-  with Not_found ->
-    (* should not happen in normal mode, but could be raised when E-ACSL is
-       used as a library *)
-    raise (Unregistered_library_function fname)
 
 (* ************************************************************************** *)
 (** {2 Handling \result} *)
@@ -88,17 +59,6 @@ let result_vi kf = match result_lhost kf with
 
 let term_addr_of ~loc tlv ty =
   Logic_const.taddrof ~loc tlv (Ctype (TPtr(ty, [])))
-
-let reorder_ast () =
-  let ast = Ast.get() in
-  let is_from_library = function
-    | GType(ti, _) when ti.tname = "size_t" || ti.tname = "FILE"
-                        || RTL.is_rtl_name ti.tname -> true
-    | GCompTag (ci, _) when RTL.is_rtl_name ci.cname -> true
-    | GFunDecl(_, _, loc) | GVarDecl(_, loc) when is_library_loc loc -> true
-    | _ -> false in
-  let rtl, other = List.partition is_from_library ast.globals in
-  ast.globals <- rtl @ other
 
 let cty = function
   | Ctype ty -> ty

@@ -123,9 +123,9 @@ let rename_caller loc args exp = match exp.enode with
     let name = Functions.RTL.libc_replacement_name vi.vname in
     (* variadic arguments descriptor *)
     let fmt = Functions.Libc.get_printf_argument_str ~loc vi.vname args in
-    (* get the name of the library function we need. Cannot just rewrite the
-       name as AST check will then fail *)
-    let vi = Misc.get_lib_fun_vi name in
+    (* get the library function we need. Cannot just rewrite the name as AST
+       check will then fail *)
+    let vi = try Rtl.Symbols.find_vi name with Not_found -> assert false in
     Cil.evar vi, fmt :: args
 
   | _ ->
@@ -589,6 +589,7 @@ let inject_in_fundec main fundec =
   in
   List.iter unghost_formal fundec.sformals;
   (* update environments *)
+  (* TODO: do it only for built-ins *)
   Builtins.update vi.vname vi;
   (* track function addresses but the main function that is tracked internally
      via RTL *)
@@ -628,17 +629,15 @@ let unghost_vi vi =
 let inject_in_global (env, main) = function
   (* library functions and built-ins *)
   | GVarDecl(vi, _) | GVar(vi, _, _)
-  | GFunDecl(_, vi, _) | GFun({ svar = vi }, _)
-    when Misc.is_library_loc vi.vdecl || Builtins.mem vi.vname ->
-    Misc.register_library_function vi;
-    if Builtins.mem vi.vname then Builtins.update vi.vname vi;
+  | GFunDecl(_, vi, _) | GFun({ svar = vi }, _) when Builtins.mem vi.vname ->
+    Builtins.update vi.vname vi;
     env, main
 
   (* Cil built-ins and other library globals: nothing to do *)
   | GVarDecl(vi, _) | GVar(vi, _, _) | GFun({ svar = vi }, _)
     when Misc.is_fc_or_compiler_builtin vi ->
     env, main
-  | g when Misc.is_library_loc (Global.loc g) ->
+  | g when Rtl.Symbols.mem_global g ->
     env, main
 
   (* variable declarations *)
@@ -845,7 +844,6 @@ let reset_all ast =
   Options.Run.off ();
   (* reset all the E-ACSL environments to their original states *)
   Mmodel_analysis.reset ();
-  Misc.reset ();
   Logic_functions.reset ();
   Literal_strings.reset ();
   Global_observer.reset ();
@@ -862,7 +860,6 @@ let inject () =
   Options.feedback ~level:2
     "injecting annotations as code in project %a"
     Project.pretty (Project.current ());
-  Misc.reorder_ast ();
   Gmp_types.init ();
   let ast = Ast.get () in
   inject_in_file ast;

@@ -44,6 +44,13 @@ SRC_LIBRARIES:= \
 	varname
 SRC_LIBRARIES:=$(addprefix src/libraries/, $(SRC_LIBRARIES))
 
+# project initializer
+SRC_PROJECT_INITIALIZER:= \
+	rtl \
+	prepare_ast
+SRC_PROJECT_INITIALIZER:=\
+  $(addprefix src/project_initializer/, $(SRC_PROJECT_INITIALIZER))
+
 # analyses
 SRC_ANALYSES:= \
 	rte \
@@ -54,13 +61,6 @@ SRC_ANALYSES:= \
 	interval \
 	typing
 SRC_ANALYSES:=$(addprefix src/analyses/, $(SRC_ANALYSES))
-
-# project initializer
-SRC_PROJECT_INITIALIZER:= \
-	rtl \
-	prepare_ast
-SRC_PROJECT_INITIALIZER:=\
-  $(addprefix src/project_initializer/, $(SRC_PROJECT_INITIALIZER))
 
 # code generator
 SRC_CODE_GENERATOR:= \
@@ -100,8 +100,8 @@ PLUGIN_NAME:=E_ACSL
 PLUGIN_CMO:= src/local_config \
 	src/options \
 	$(SRC_LIBRARIES) \
-	$(SRC_ANALYSES) \
 	$(SRC_PROJECT_INITIALIZER) \
+	$(SRC_ANALYSES) \
 	$(SRC_CODE_GENERATOR) \
 	src/main
 

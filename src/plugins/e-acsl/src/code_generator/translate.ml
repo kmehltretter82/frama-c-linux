@@ -1128,7 +1128,7 @@ let term_to_exp typ t =
   let env = Env.rte env false in
   let e, env =
     try term_to_exp (Kernel_function.dummy ()) env t
-    with Misc.Unregistered_library_function _ -> raise (No_simple_translation t)
+    with Rtl.Symbols.Unregistered _ -> raise (No_simple_translation t)
   in
   if not (Env.has_no_new_stmt env) then raise (No_simple_translation t);
   e

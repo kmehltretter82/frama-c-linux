@@ -25,14 +25,6 @@
 open Cil_types
 
 (* ************************************************************************** *)
-(** {2 Builders} *)
-(* ************************************************************************** *)
-
-exception Unregistered_library_function of string
-val get_lib_fun_vi: string -> varinfo
-(** @return varinfo corresponding to a name of a given library function *)
-
-(* ************************************************************************** *)
 (** {2 Handling \result} *)
 (* ************************************************************************** *)
 
@@ -46,11 +38,6 @@ val result_vi: kernel_function -> varinfo
 (** {2 Handling the E-ACSL's C-libraries} *)
 (* ************************************************************************** *)
 
-val library_files: unit -> Datatype.Filepath.t list
-val is_library_loc: location -> bool
-val register_library_function: varinfo -> unit
-val reset: unit -> unit
-
 val is_fc_or_compiler_builtin: varinfo -> bool
 
 (* ************************************************************************** *)
@@ -58,11 +45,6 @@ val is_fc_or_compiler_builtin: varinfo -> bool
 (* ************************************************************************** *)
 
 val term_addr_of: loc:location -> term_lval -> typ -> term
-
-val reorder_ast: unit -> unit
-(* Reorder current AST by bringing all global declarations belonging to the
- * E-ACSL runtime library and their dependencies (e.g., typedef size_t) to
- * the very top of the file. *)
 
 val cty: logic_type -> typ
 (** Assume that the logic type is indeed a C type. Just return it. *)
