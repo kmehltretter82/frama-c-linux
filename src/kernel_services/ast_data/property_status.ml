@@ -168,6 +168,7 @@ module Status =
     end)
 
 let self = Status.self
+let () = Ast.add_monotonic_state self
 
 let iter_on_statuses f ip =
   try
@@ -231,6 +232,7 @@ end = struct
       end)
 
   let self = S.self
+  let () = Ast.add_monotonic_state self
 
   let _mem e path =
     try
