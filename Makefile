@@ -319,7 +319,7 @@ DISTRIB_TESTS=$(shell git ls-files \
                   tests \
                   src/plugins/aorai/tests \
                   src/plugins/report/tests \
-                  src/plugins/wp/tests)
+                  src/plugins/wp/tests | $(SED) 's/ /@/g')
 
 
 # files that are needed to compile API documentation of external plugins
@@ -2437,7 +2437,7 @@ endif
 	@#although it seems to segfault in 4.0 (but not in 4.1)
 	$(RM) file_list_to_archive.tmp
 	@$(foreach file,$(DISTRIB_FILES) $(DISTRIB_TESTS),\
-			echo $(file) >> file_list_to_archive.tmp$(NEWLINE))
+			echo $(file) | $(SED) 's/@/ /g' >> file_list_to_archive.tmp$(NEWLINE))
 	$(TAR) -cf - --files-from file_list_to_archive.tmp | $(TAR) -C $(CLIENT_DIR) -xf -
 	$(RM) file_list_to_archive.tmp
 	$(PRINT_MAKING) files
