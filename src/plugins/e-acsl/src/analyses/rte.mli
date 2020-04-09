@@ -32,6 +32,6 @@ val exp: ?warn:bool -> kernel_function -> stmt -> exp -> code_annotation list
 
 (*
 Local Variables:
-compile-command: "make"
+compile-command: "make -C ../../../../.."
 End:
 *)

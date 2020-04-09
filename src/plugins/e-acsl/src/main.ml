@@ -50,9 +50,6 @@ let generate_code =
     (fun name ->
        Options.feedback "beginning translation.";
        Temporal.enable (Options.Temporal_validity.get ());
-       let rtl_prj =
-         Project.create_by_copy ~last:false "E_ACSL RTL"
-       in
        if Plugin.is_present "variadic" then begin
          let opt_name = "-variadic-translation" in
          if Dynamic.Parameter.Bool.get opt_name () then begin
@@ -64,6 +61,11 @@ let generate_code =
            Dynamic.Parameter.Bool.off opt_name ();
          end
        end;
+       (* slightly more efficient to copy the project before computing the AST
+          if it is not yet computed *)
+       let rtl_prj = Project.create_by_copy ~last:false "E_ACSL RTL" in
+       (* TODO: remove [rtl_prj] after use if no debug mode *)
+       (* force AST computation before copying the project it belongs to *)
        Ast.compute ();
        let copied_prj = Project.create_by_copy ~last:true name in
        Project.on
@@ -72,7 +74,21 @@ let generate_code =
             (* preparation of the AST does not concern the E-ACSL RTL *)
             Prepare_ast.prepare ();
             Rtl.link rtl_prj;
-            Injector.inject ();
+            (* the E-ACSL type system ensures the soundness of the generated
+               arithmetic operations. Therefore, deactivate the corresponding
+               options in order to prevent RTE to generate spurious alarms. *)
+            let signed = Kernel.SignedOverflow.get () in
+            let unsigned = Kernel.UnsignedOverflow.get () in
+            (* we do know that setting these flags does not modify the program's
+               semantics: using their unsafe variants is thus safe and preserve
+               all emitted property statuses. *)
+            Kernel.SignedOverflow.unsafe_set false;
+            Kernel.UnsignedOverflow.unsafe_set false;
+            let finally () =
+              Kernel.SignedOverflow.unsafe_set signed;
+              Kernel.UnsignedOverflow.unsafe_set unsigned
+            in
+            Extlib.try_finally ~finally Injector.inject ();
             (* remove the RTE's results computed from E-ACSL: they are partial
                and associated with the wrong kernel function (the one of the old
                project). *)

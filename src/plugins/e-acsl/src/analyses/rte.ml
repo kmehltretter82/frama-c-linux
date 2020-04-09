@@ -24,17 +24,6 @@
 (** {2 Generic code} *)
 (* ************************************************************************** *)
 
-let apply_rte f x =
-  let signed = Kernel.SignedOverflow.get () in
-  let unsigned = Kernel.UnsignedOverflow.get () in
-  Kernel.SignedOverflow.off ();
-  Kernel.UnsignedOverflow.off ();
-  let finally () =
-    Kernel.SignedOverflow.set signed;
-    Kernel.UnsignedOverflow.set unsigned
-  in
-  Extlib.try_finally ~finally f x
-
 let warn_rte warn exn =
   if warn then
     Options.warning "@[@[cannot run RTE:@ %s.@]@ \
@@ -48,30 +37,24 @@ Ignoring potential runtime errors in annotations."
 open Cil_datatype
 
 let stmt ?(warn=true) =
-  try 
-    let f = 
-      Dynamic.get
-	~plugin:"RteGen" 
-	"stmt_annotations" 
-	(Datatype.func2 Kernel_function.ty Stmt.ty 
-	   (let module L = Datatype.List(Code_annotation) in L.ty))
-    in
-    (fun x y -> apply_rte (f x) y)
+  try
+    Dynamic.get
+      ~plugin:"RteGen"
+      "stmt_annotations"
+      (Datatype.func2 Kernel_function.ty Stmt.ty
+         (let module L = Datatype.List(Code_annotation) in L.ty))
   with Failure _ | Dynamic.Unbound_value _ | Dynamic.Incompatible_type _ as exn
     ->
       warn_rte warn exn;
       fun _ _ -> []
 
 let exp ?(warn=true) =
-  try 
-    let f = 
-      Dynamic.get
-	~plugin:"RteGen" 
-	"exp_annotations" 
-	(Datatype.func3 Kernel_function.ty Stmt.ty Exp.ty 
-	   (let module L = Datatype.List(Code_annotation) in L.ty))
-    in
-    (fun x y z -> apply_rte (f x y) z)
+  try
+    Dynamic.get
+      ~plugin:"RteGen"
+      "exp_annotations"
+      (Datatype.func3 Kernel_function.ty Stmt.ty Exp.ty
+         (let module L = Datatype.List(Code_annotation) in L.ty))
   with Failure _ | Dynamic.Unbound_value _ | Dynamic.Incompatible_type _ as exn
     ->
       warn_rte warn exn;
@@ -79,6 +62,6 @@ let exp ?(warn=true) =
 
 (*
 Local Variables:
-compile-command: "make"
+compile-command: "make -C ../../../../.."
 End:
 *)
