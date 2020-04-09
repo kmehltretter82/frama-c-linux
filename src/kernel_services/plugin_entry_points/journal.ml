@@ -113,9 +113,11 @@ let now () = Unix.localtime (Unix.time ())
 let default_filename = "frama_c_journal.ml"
 let filename = ref default_filename
 let get_session_file = ref (fun _ -> assert false)
-let get_name () = 
+let get_name () =
   let f = !filename in
-  if f == default_filename then !get_session_file f else f
+  if f == default_filename
+  then !get_session_file f
+  else Datatype.Filepath.of_string f
 
 let set_name s = filename := s
 
@@ -136,11 +138,12 @@ let print_header fmt =
     "(* Run the user commands *)@;@[<hv 2>let run () =@;@[<hv 0>"
 
 let print_trailer fmt =
+  let name = Format.asprintf "%a" Datatype.Filepath.pretty (get_name ()) in
   Format.fprintf fmt "@[(* Main *)@]@\n";
   Format.fprintf fmt "@[<hv 2>let main () =@;";
   Format.fprintf fmt
     "@[<hv 0>@[<hv 2>Journal.keep_file@;\"%s\";@]@;"
-    (get_name  ());
+    name;
   Format.fprintf fmt "try run ()@;";
   Format.fprintf fmt "@[<v>with@;@[<hv 2>| Unreachable ->@ ";
   Format.fprintf fmt
@@ -155,7 +158,7 @@ let print_trailer fmt =
   Format.fprintf fmt "@[(* Registering *)@]@\n";
   Format.fprintf fmt
     "@[<hv 2>let main : unit -> unit =@;@[<hv 2>Dynamic.register@;~plugin:%S@;\"main\"@;"
-    (String.capitalize_ascii (Filename.basename (get_name ())));
+    (String.capitalize_ascii (Filename.basename name));
   Format.fprintf fmt
     "@[<hv 2>(Datatype.func@;Datatype.unit@;Datatype.unit)@]@;";
   Format.fprintf fmt "~journalize:false@;main@]@]@\n@\n";
@@ -173,7 +176,7 @@ let keep_file s = preserved_files := s :: !preserved_files
 let get_filename =
   let cpt = ref 0 in
   let rec get_filename first =
-    let name = get_name () in
+    let name = Format.asprintf "%a" Datatype.Filepath.pretty (get_name ()) in
     if (not first && Sys.file_exists name) || List.mem name !preserved_files
     then begin
       incr cpt;
