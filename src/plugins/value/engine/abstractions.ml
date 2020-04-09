@@ -71,10 +71,8 @@ module Config = struct
   let mem (Flag domain) =
     exists (fun (Flag flag, _mode) -> flag.name = domain.name)
 
-  type dynamic = Dynamic: (unit -> 'v abstraction) with_info -> dynamic
-
   let abstractions = ref []
-  let dynamic_abstractions : dynamic list ref = ref []
+  let dynamic_abstractions = ref []
 
   let register ~name ~descr ?(experimental=false) ?(priority=0) abstraction =
     let descr = if experimental then "Experimental. " ^ descr else descr in
@@ -83,18 +81,16 @@ module Config = struct
     abstractions := flag :: !abstractions;
     flag
 
-  let dynamic_register ~name ~descr ?(experimental=false) ?(priority=0) make =
-    let descr = if experimental then "Experimental. " ^ descr else descr in
+  let dynamic_register ~name ~descr make =
     Value_parameters.register_domain ~name ~descr;
-    let dynamic = Dynamic { name; experimental; priority; abstraction=make; } in
-    dynamic_abstractions := dynamic :: !dynamic_abstractions
+    dynamic_abstractions := (name, make) :: !dynamic_abstractions
 
   let configure () =
     let add_main_mode mode =
       let main, _ = Globals.entry_point () in
       (main, Domain_mode.Mode.all) :: mode
     in
-    let add config name make =
+    let add config (name, make) =
       let enabled = Value_parameters.Domains.mem name in
       try
         let mode = Value_parameters.DomainsFunction.find name in
@@ -104,17 +100,10 @@ module Config = struct
         if enabled then add (make (), None) config else config
     in
     let aux config (Flag domain as flag) =
-      add config domain.name (fun () -> flag)
+      add config (domain.name, (fun () -> flag))
     in
     let config = List.fold_left aux empty !abstractions in
-    let aux config (Dynamic { name; experimental; priority; abstraction; }) =
-      let make () =
-        let abstraction = abstraction () in
-        Flag { name; experimental; priority; abstraction; }
-      in
-      add config name make
-    in
-    List.fold_left aux config !dynamic_abstractions
+    List.fold_left add config !dynamic_abstractions
 
   (* --- Register default abstractions -------------------------------------- *)
 

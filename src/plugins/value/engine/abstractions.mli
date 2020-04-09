@@ -94,8 +94,7 @@ val register:
     the last argument when starting an analysis, if the -eva-domains option
     has been set to [name]. See function {!register} for more details. *)
 val dynamic_register:
-  name:string -> descr:string -> ?experimental:bool -> ?priority:int ->
-  (unit -> 'v abstraction) -> unit
+  name:string -> descr:string -> (unit -> flag) -> unit
 
 (** Reduced product between two value abstractions, identified by their keys. *)
 type ('a, 'b) value_reduced_product =
