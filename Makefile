@@ -1705,6 +1705,7 @@ check-devguide: $(CHECK_CODE) $(DOC_DEPEND) $(DOC_DIR)/kernel-doc.ocamldoc
 # Note: the find command below is *very* ugly, but it should be POSIX-compliant.
 
 ALL_ML_FILES:=$(shell find src -name '*.ml' -print -o -name '*.mli' -print -o -path '*/tests' -prune '!' -name '*')
+ALL_ML_FILES+=ptests/ptests.ml
 MANUAL_ML_FILES:=$(filter-out $(GENERATED) $(PLUGIN_GENERATED_LIST), $(ALL_ML_FILES))
 
 # Allow control of files to be linted/fixed by external sources
