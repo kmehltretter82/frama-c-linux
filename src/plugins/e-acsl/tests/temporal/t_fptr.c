@@ -1,4 +1,4 @@
-/* run.config
+/* run.config_ci, run.config_dev
    COMMENT: Check simple case of calling functions via pointer derefernce
 */
 
