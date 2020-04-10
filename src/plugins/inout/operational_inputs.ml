@@ -31,6 +31,9 @@ open Locations
 type t = Inout_type.t = {
   over_inputs: Locations.Zone.t;
   over_inputs_if_termination: Locations.Zone.t;
+  over_logic_inputs: Locations.Zone.t;
+  (* [over_logic_inputs] is used internally by Eva to make memexec consider also
+     the logic inputs of the function. Computed in [transfer_annotations]. *)
   under_outputs_if_termination: Locations.Zone.t;
   over_outputs: Locations.Zone.t;
   over_outputs_if_termination: Locations.Zone.t;
@@ -39,6 +42,7 @@ type t = Inout_type.t = {
 let top = {
   over_inputs = Zone.top;
   over_inputs_if_termination = Zone.top;
+  over_logic_inputs = Zone.top;
   under_outputs_if_termination = Zone.bottom;
   over_outputs = Zone.top;
   over_outputs_if_termination = Zone.top;
@@ -79,9 +83,9 @@ let join c1 c2 = {
 }
 
 let is_included c1 c2 =
-  Zone.is_included c1.over_inputs_d   c2.over_inputs_d &&
+  Zone.is_included c1.over_inputs_d c2.over_inputs_d &&
   Zone.is_included c2.under_outputs_d c1.under_outputs_d &&
-  Zone.is_included c1.over_outputs_d  c2.over_outputs_d
+  Zone.is_included c1.over_outputs_d c2.over_outputs_d
 
 let join_and_is_included smaller larger =
   let join = join smaller larger in
@@ -178,6 +182,7 @@ let eval_assigns kf state assigns =
         let init = { bottom with under_outputs_d = Zone.bottom } in
         let r = List.fold_left treat_one_zone init l in {
           over_inputs = r.over_inputs_d;
+          over_logic_inputs = r.over_inputs_d;
           over_inputs_if_termination = r.over_inputs_d;
           under_outputs_if_termination = r.under_outputs_d;
           over_outputs = r.over_outputs_d;
@@ -209,7 +214,7 @@ module Internals =
 
 module CallsiteHash = Value_types.Callsite.Hashtbl
 
-(* Results of an an entire call, represented by a pair (stmt, kernel_function]).
+(* Results of an an entire call, represented by a pair (stmt, kernel_function).
    This table is filled by the [-inout-callwise] option, or for functions for
    which only the specification is used. *)
 module CallwiseResults =
@@ -226,6 +231,7 @@ module CallwiseResults =
 module Computer(Fenv:Dataflows.FUNCTION_ENV)(X:sig
   val _version: string (* Debug: Callwise or functionwise *)
   val _kf: kernel_function (* Debug: Function being analyzed *)
+  val kf_pre_state: Db.Value.state (* Memory pre-state of the function. *)
   val stmt_state: stmt -> Db.Value.state (* Memory state at the given stmt *)
   val at_call: stmt -> kernel_function -> Inout_type.t (* Results of the
       analysis for the given call. Must not contain locals or formals *)
@@ -239,10 +245,15 @@ end) = struct
      all partial results. *)
   let non_terminating_inputs = ref Zone.bottom
   let non_terminating_outputs = ref Zone.bottom
+  let non_terminating_logic_inputs = ref Zone.bottom
 
   let store_non_terminating_inputs inputs =
     non_terminating_inputs := Zone.join !non_terminating_inputs inputs;
   ;;
+
+  let store_non_terminating_logic_inputs logic_inputs =
+    non_terminating_logic_inputs :=
+      Zone.join !non_terminating_logic_inputs logic_inputs
 
   let store_non_terminating_outputs outputs =
     non_terminating_outputs := Zone.join !non_terminating_outputs outputs;
@@ -355,6 +366,40 @@ end) = struct
        | Some lv -> add_out ~for_writing state lv Zone.bottom result)
     in result
 
+  (* Propagate all zones in predicates for the given statement, only in the case
+     of assertions and loop-invariants. For the time being, we do not treat
+     terminating and non-terminating points of the function differently. *)
+  let transfer_annotations stmt =
+    Annotations.iter_code_annot
+      (fun _ ca ->
+         match ca.annot_content with
+         | AAssert (_, _, p)
+         | AInvariant (_, true, p) ->
+           begin
+             let env =
+               Eva.Eval_terms.env_annot
+                 ~pre:X.kf_pre_state
+                 ~here:(X.stmt_state stmt)
+                 ()
+             in
+             match Eva.Eval_terms.predicate_deps env p with
+             | None ->
+               (* To be sound, we should perform a join with the top zone here.
+                  We do nothing instead because the latter behavior would
+                  directly disable memexec. *)
+               ()
+             | Some logic_deps ->
+               let p_zone =
+                 Cil_datatype.Logic_label.Map.fold
+                   (fun _ -> Zone.join)
+                   logic_deps
+                   Zone.bottom
+               in
+               store_non_terminating_logic_inputs p_zone
+           end
+         | _ -> ())
+      stmt
+
   (* Transfer function on instructions. *)
   let transfer_instr stmt (i: instr) (data: t) =
     match i with
@@ -436,12 +481,12 @@ end) = struct
       -> map_on_all_succs data
   ;;
 
-  (* Note: Not sure this adds anything to the precision (or
-     efficiency) once we have tested the guards. The difference does
-     not show up in the tests. *)
   let transfer_stmt s data =
     if Db.Value.is_reachable (X.stmt_state s)
-    then transfer_stmt s data
+    then begin
+      transfer_annotations s;
+      transfer_stmt s data
+    end
     else []
   ;;
 
@@ -454,6 +499,7 @@ end) = struct
       over_outputs_if_termination = res_if_termination.over_outputs_d;
       over_inputs =
         Zone.join !non_terminating_inputs res_if_termination.over_inputs_d;
+      over_logic_inputs = !non_terminating_logic_inputs;
       over_outputs =
         Zone.join !non_terminating_outputs res_if_termination.over_outputs_d;
     }
@@ -572,6 +618,7 @@ module Callwise = struct
          let inout = {
            over_inputs_if_termination = in_;
            over_inputs = in_;
+           over_logic_inputs = Zone.bottom;
            over_outputs_if_termination = out_ ;
            over_outputs = out_;
            under_outputs_if_termination = sure_out;
@@ -620,12 +667,24 @@ module Callwise = struct
           call_inout_stack := [];
           CallwiseResults.mark_as_computed ()
 
-  let compute_call_from_value_states kf states =
+  let compute_call_from_value_states kf call_stack states =
     let module Fenv = (val Dataflows.function_env kf: Dataflows.FUNCTION_ENV) in
     let module Computer = Computer(Fenv)(
       struct
         let _version = "callwise"
         let _kf = kf
+
+        (* Returns the [kf] pre-state with respect to the single [call_stack]. *)
+        let kf_pre_state =
+          match Db.Value.get_initial_state_callstack kf with
+          | None ->
+            Cvalue.Model.bottom
+          | Some cs ->
+            begin
+              match Value_types.Callstack.Hashtbl.find_opt cs call_stack with
+              | None -> Cvalue.Model.bottom
+              | Some state -> state
+            end
 
         let stmt_state stmt =
           try Cil_datatype.Stmt.Hashtbl.find states stmt
@@ -656,13 +715,13 @@ module Callwise = struct
       let inout = match value_res with
         | Value_types.Normal (states, _after_states)
         | Value_types.NormalStore ((states, _after_states), _) ->
-            let kf = fst (List.hd call_stack) in
+            let kf, _ = List.hd call_stack in
             let inout =
               try
                 if !Db.Value.no_results (Kernel_function.get_definition kf) then
                   top
               else
-                compute_call_from_value_states kf (Lazy.force states)
+                compute_call_from_value_states kf call_stack (Lazy.force states)
               with Kernel_function.No_Definition -> top
             in
             (match value_res with
@@ -702,6 +761,7 @@ module FunctionWise = struct
       let module Computer = Computer(Fenv)(struct
         let _version = "functionwise"
         let _kf = kf
+        let kf_pre_state = Db.Value.get_initial_state kf
         let stmt_state s = Db.Value.get_stmt_state s
         let at_call stmt kf = get_external_aux ~stmt kf
       end) in
