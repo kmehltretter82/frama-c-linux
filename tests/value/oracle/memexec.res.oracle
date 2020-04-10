@@ -103,8 +103,7 @@
   Frama_C_show_each_f5: [9..2147483647], [-2147483648..6], [-2147483648..7]
 [eva] tests/value/memexec.c:113: Reusing old results for call to f5_aux
 [eva] tests/value/memexec.c:114: 
-  Frama_C_show_each_f5:
-  [9..2147483647], [-2147483648..2147483647], [-2147483648..7]
+  Frama_C_show_each_f5: [9..2147483647], [-2147483648..6], [-2147483648..7]
 [eva] Recording results for f5
 [eva] Done for function f5
 [eva] computing for function f6 <- main.
@@ -192,7 +191,7 @@
 [eva:final-states] Values at end of function f5_aux:
   v ∈ [--..--]
 [eva:final-states] Values at end of function f5:
-  g_f5_1 ∈ [--..--]
+  g_f5_1 ∈ [-2147483648..6]
   g_f5_2 ∈ [-2147483648..7]
   arg ∈ [9..2147483647]
 [eva:final-states] Values at end of function f6_1:
@@ -228,7 +227,7 @@
   S[0..7] ∈ {0}
    [8].i ∈ {0; 6}
    [9] ∈ {0}
-  g_f5_1 ∈ [--..--]
+  g_f5_1 ∈ [-2147483648..6]
   g_f5_2 ∈ [-2147483648..7]
   two_fields.x ∈ {1}
             .y ∈ {3}
