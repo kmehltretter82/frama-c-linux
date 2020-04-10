@@ -23,7 +23,6 @@
 open Cil_types
 
 type tag =
-  | MARK of stmt
   | THEN of stmt
   | ELSE of stmt
   | CALL of stmt * kernel_function
@@ -34,7 +33,6 @@ type tag =
 val loc : tag -> location
 val pretty : Format.formatter -> tag -> unit
 
-val mark : stmt -> tag
 val if_then : stmt -> tag
 val if_else : stmt -> tag
 val switch_cases : stmt -> int64 list -> tag
@@ -56,6 +54,7 @@ val merge :
   'a t -> 'b t -> 'c t
 
 val merge_all : ('a list -> 'a) -> 'a t list -> 'a t
+val unmark : ('a list -> 'a) -> 'a t -> 'a t (** erase all tags *)
 
 val length : 'a t -> int
 

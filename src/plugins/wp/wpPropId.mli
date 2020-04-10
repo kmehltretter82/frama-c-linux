@@ -250,6 +250,9 @@ val pp_pred_info : Format.formatter -> pred_info -> unit
 
 (*----------------------------------------------------------------------------*)
 
+val split_bag : (prop_id -> 'a -> unit) -> prop_id -> 'a Bag.t -> unit
+val split_map : (prop_id -> 'a -> 'b) -> prop_id -> 'a list -> 'b list
+
 (** [mk_part pid (k, n)] build the identification for the [k/n] part of [pid].*)
 val mk_part : prop_id -> (int * int) -> prop_id
 

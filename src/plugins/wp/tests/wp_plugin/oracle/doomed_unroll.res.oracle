@@ -9,6 +9,21 @@
   Function foo
 ------------------------------------------------------------
 
+Goal Wp_smoke_dead_code in 'foo' at instruction (file tests/wp_plugin/doomed_unroll.i, line 15):
+Prove: false.
+
+------------------------------------------------------------
+
+Goal Wp_smoke_dead_code in 'foo' at instruction (file tests/wp_plugin/doomed_unroll.i, line 15):
+Prove: false.
+
+------------------------------------------------------------
+
+Goal Wp_smoke_dead_code in 'foo' at instruction (file tests/wp_plugin/doomed_unroll.i, line 15):
+Prove: false.
+
+------------------------------------------------------------
+
 Goal Preservation of Invariant (generated):
 Prove: true.
 

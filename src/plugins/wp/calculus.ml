@@ -420,6 +420,9 @@ module Cfg (W : Mcfg.S) = struct
     | Some _ -> obj
     | None -> assert false
 
+  let add_call_post wenv annots kf obj =
+    List.fold_left (add_goal wenv) obj (WpStrategy.get_call_post annots kf)
+
   let wp_call_kf wenv cenv stmt lval kf args precond ~p_post ~p_exit =
     let call_asgn = WpStrategy.get_call_asgn cenv.post_annots (Some kf) in
     let assigns = match call_asgn with
@@ -428,6 +431,8 @@ module Cfg (W : Mcfg.S) = struct
       | WpPropId.AssignsAny _ -> WritesAny
       | WpPropId.NoAssignsInfo -> assert false (* see above *)
     in
+    let p_post = add_call_post wenv cenv.post_annots kf p_post in
+    let p_exit = add_call_post wenv cenv.exit_annots kf p_exit in
     let pre_hyp, pre_goals = WpStrategy.get_call_pre cenv.pre_annots kf in
     let obj = W.call wenv stmt lval kf args
         ~pre:(pre_hyp)

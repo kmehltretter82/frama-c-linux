@@ -7,7 +7,7 @@
   Function bar
 ------------------------------------------------------------
 
-Goal Smoke_default_requires in 'bar':
+Goal Wp_smoke_default_requires in 'bar':
 Assume { Type: is_sint32(x). (* Pre-condition *) Have: 0 < x. }
 Prove: false.
 
@@ -21,7 +21,7 @@ Prove: true.
   Function buzz
 ------------------------------------------------------------
 
-Goal Smoke_default_requires in 'buzz':
+Goal Wp_smoke_default_requires in 'buzz':
 Prove: true.
 
 ------------------------------------------------------------
@@ -34,7 +34,7 @@ Prove: true.
   Function foo
 ------------------------------------------------------------
 
-Goal Smoke_default_requires in 'foo':
+Goal Wp_smoke_default_requires in 'foo':
 Assume {
   Type: is_sint32(x).
   (* Pre-condition *)
@@ -51,7 +51,7 @@ Prove: false.
   Function foo with behavior A
 ------------------------------------------------------------
 
-Goal Smoke_A_requires in 'foo':
+Goal Wp_smoke_A_requires in 'foo':
 Prove: true.
 
 ------------------------------------------------------------
@@ -59,7 +59,7 @@ Prove: true.
   Function foo with behavior B
 ------------------------------------------------------------
 
-Goal Smoke_B_requires in 'foo':
+Goal Wp_smoke_B_requires in 'foo':
 Assume {
   Type: is_sint32(x).
   (* Pre-condition *)

@@ -81,7 +81,7 @@ PLUGIN_CMO:= \
 	Sigma MemLoader \
 	MemEmpty MemZeroAlias MemVar \
 	MemMemory MemTyped MemRegion \
-	wpStrategy wpRTE wpAnnot \
+	wpReached wpStrategy wpRTE wpAnnot \
 	CfgCompiler StmtSemantics \
 	VCS script proof wpo wpReport \
 	Footprint Tactical Strategy \

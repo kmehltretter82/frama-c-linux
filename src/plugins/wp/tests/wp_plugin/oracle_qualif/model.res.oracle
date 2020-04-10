@@ -77,7 +77,7 @@ end
        let x = get t (shift_sint32 a i) in
        region (base a) <= 0 -> is_sint32 i -> is_sint32 x -> P_P x
   end
-[wp] [Alt-Ergo] Goal typed_f_ensures : Typechecked
+[wp] [Alt-Ergo] Goal typed_f_ensures : Unsuccess
 [wp] Proved goals:    0 / 1
   Alt-Ergo:        0  (unsuccess: 1)
 ------------------------------------------------------------
@@ -115,7 +115,7 @@ end
        let x = get t (shift_sint32 a i) in
        region (base a) <= 0 -> is_sint32 i -> is_sint32 x -> P_P x
   end
-[wp] [Alt-Ergo] Goal typed_f_ensures : Typechecked
+[wp] [Alt-Ergo] Goal typed_f_ensures : Unsuccess
 ---------------------------------------------
 --- Context 'typed_ref_f' Cluster 'Compound' 
 ---------------------------------------------
@@ -187,7 +187,7 @@ end
        let x = get1 t (shift_sint321 a i) in
        region1 (base1 a) <=' 0 -> is_sint321 i -> is_sint321 x -> P_P1 x
   end
-[wp] [Alt-Ergo] Goal typed_ref_f_ensures : Typechecked
+[wp] [Alt-Ergo] Goal typed_ref_f_ensures : Unsuccess
 [wp] Proved goals:    0 / 2
   Alt-Ergo:        0  (unsuccess: 2)
 ------------------------------------------------------------

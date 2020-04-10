@@ -375,6 +375,27 @@ module SmokeTests =
   end)
 
 let () = Parameter_customize.set_group wp_strategy
+module SmokeDeadcode =
+  True(struct
+    let option_name = "-wp-smoke-dead-code"
+    let help = "When generating smoke tests, look for unreachable code"
+  end)
+
+let () = Parameter_customize.set_group wp_strategy
+module SmokeDeadcall =
+  True(struct
+    let option_name = "-wp-smoke-dead-call"
+    let help = "When generating smoke tests, look for non-terminating calls"
+  end)
+
+let () = Parameter_customize.set_group wp_strategy
+module SmokeDeadloop =
+  True(struct
+    let option_name = "-wp-smoke-dead-loop"
+    let help = "When generating smoke tests, look for inconsistent loop invairants"
+  end)
+
+let () = Parameter_customize.set_group wp_strategy
 module Split =
   False(struct
     let option_name = "-wp-split"
@@ -991,16 +1012,6 @@ module OutputDir =
     let help = "Set working directory for generated files.\n\
                 Defaults to some temporary directory."
   end)
-
-let () = Parameter_customize.set_group wp_po
-let () = Parameter_customize.do_not_save ()
-module Check =
-  Action(struct
-    let option_name = "-wp-check"
-    let help =
-      "Check the syntax and type of the produced file, instead of proving."
-  end)
-let () = on_reset Print.clear
 
 (* -------------------------------------------------------------------------- *)
 (* --- Overflows                                                          --- *)

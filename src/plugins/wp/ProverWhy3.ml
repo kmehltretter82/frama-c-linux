@@ -1338,7 +1338,7 @@ let steps_seized steps steplimit =
 
 let promote ~timeout ~steplimit (res : VCS.result) =
   match res.verdict with
-  | VCS.NoResult | VCS.Computing _ | VCS.Checked -> VCS.no_result
+  | VCS.NoResult | VCS.Computing _ -> VCS.no_result
   | VCS.Failed -> res
   | VCS.Invalid | VCS.Valid | VCS.Unknown ->
       if not (steps_fits res.prover_steps steplimit) then
@@ -1404,9 +1404,6 @@ let build_proof_task ?timeout ?steplimit ~prover wpo () =
     (* Always generate common task *)
     let context = Wpo.get_context wpo in
     let task = WpContext.on_context context task_of_wpo wpo in
-    if Wp_parameters.Check.get ()
-    then Task.return VCS.checked (* Why3 tasks are type-checked *)
-    else
     if Wp_parameters.Generate.get ()
     then Task.return VCS.no_result (* Only generate *)
     else
