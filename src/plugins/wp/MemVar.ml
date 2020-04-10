@@ -1338,6 +1338,8 @@ struct
         let p = Vset.in_range (e_var k) a b in
         let ofs = ofs_shift elt (e_var k) ofs in
         let obj_x = Ctypes.object_of x.vtype in
+        let init = e_var (Lang.freshvar ~basename:"v" (init_of_object obj_x)) in
+        (memvar_set_init seq (Val(m,x,[])) init) ::
         Assert(monotonic_initialized seq obj_x x []) ::
         (assigned_genset seq [k] m x ofs p)
 
@@ -1350,6 +1352,8 @@ struct
         M.assigned (mseq_of_seq seq) obj (Sdescr(xs,mloc_of_path m x ofs,p))
     | Val((CVAL|CREF) as m,x,ofs) ->
         let obj_x = Ctypes.object_of x.vtype in
+        let init = e_var (Lang.freshvar ~basename:"v" (init_of_object obj_x)) in
+        (memvar_set_init seq (Val(m,x,[])) init) ::
         Assert(monotonic_initialized seq obj_x x []) ::
         (assigned_genset seq xs m x ofs p)
 

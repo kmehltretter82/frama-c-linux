@@ -168,6 +168,10 @@ let sort_of_object = function
   | C_float _ -> Logic.Sreal
   | C_pointer _ | C_comp _ | C_array _ -> Logic.Sdata
 
+let init_sort_of_object = function
+  | C_int _ | C_float _ | C_pointer _ -> Logic.Sbool
+  | C_comp _ | C_array _ -> Logic.Sdata
+
 let sort_of_ctype t = sort_of_object (Ctypes.object_of t)
 
 let sort_of_ltype t = match Logic_utils.unroll_type ~unroll_typedef:false t with
@@ -402,7 +406,8 @@ struct
 
   let sort = function
     | Mfield(_,_,_,s) -> Qed.Kind.of_tau s
-    | Cfield(f, _) -> sort_of_object (Ctypes.object_of f.ftype)
+    | Cfield(f, KValue) -> sort_of_object (Ctypes.object_of f.ftype)
+    | Cfield(f, KInit) -> init_sort_of_object (Ctypes.object_of f.ftype)
 
 end
 
