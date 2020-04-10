@@ -1534,12 +1534,6 @@ let eval_tlval_as_location ~alarm_mode env t =
   let s = Eval_typ.sizeof_lval_typ r.etype in
   make_loc r.eover s
 
-let eval_tlval_as_location_with_deps ~alarm_mode env t =
-  let r = eval_term_as_lval ~alarm_mode env t in
-  let s = Eval_typ.sizeof_lval_typ r.etype in
-  (make_loc r.eover s, r.ldeps)
-
-
 (* Return a pair of (under-approximating, over-approximating) zones. *)
 let eval_tlval_as_zone_under_over ~alarm_mode access env t =
   let r = eval_term_as_lval ~alarm_mode env t in
@@ -2587,11 +2581,19 @@ and eval_predicate env pred =
 (* --- Dependencies of predicates                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
-(* Currently unused (and untested *)
+let eval_tsets_deps ~alarm_mode env lbl tsets =
+  let star_tsets = deref_tsets tsets in
+  let r = eval_tlval ~alarm_mode env star_tsets in
+  let size_bits = Eval_typ.sizeof_lval_typ r.etype in
+  let loc = make_loc r.eover size_bits in
+  let zone = enumerate_valid_bits Locations.Read loc in
+  Logic_label.Map.add lbl zone r.ldeps
 
 let predicate_deps env pred =
   let alarm_mode = Ignore in
   let rec do_eval env p =
+    let term_deps term = (eval_term ~alarm_mode env term).ldeps in
+    let tsets_deps lbl tsets = eval_tsets_deps ~alarm_mode env lbl tsets in
     match p.pred_content with
     | Ptrue | Pfalse -> empty_logic_deps
 
@@ -2600,11 +2602,10 @@ let predicate_deps env pred =
       join_logic_deps (do_eval env p1) (do_eval env p2)
 
     | Prel (_, t1, t2) ->
-      join_logic_deps (eval_term ~alarm_mode env t1).ldeps
-        (eval_term ~alarm_mode env t2).ldeps
+      join_logic_deps (term_deps t1) (term_deps t2)
 
     | Pif (c, p1, p2) ->
-      join_logic_deps (eval_term ~alarm_mode env c).ldeps
+      join_logic_deps (term_deps c)
         (join_logic_deps (do_eval env p1) (do_eval env p2))
 
     | Pat (p, lbl) ->
@@ -2612,21 +2613,17 @@ let predicate_deps env pred =
 
     | Pvalid (_, tsets) | Pvalid_read (_, tsets)
     | Pobject_pointer (_, tsets) | Pvalid_function tsets ->
-      (eval_term_as_lval ~alarm_mode env tsets).ldeps
+      term_deps tsets
 
     | Pinitialized (lbl, tsets) | Pdangling (lbl, tsets) ->
-      let loc, deploc =
-        eval_tlval_as_location_with_deps ~alarm_mode env tsets in
-      let zone = enumerate_valid_bits Locations.Read loc in
-      Logic_label.Map.add lbl zone deploc
+      tsets_deps lbl tsets
 
     | Pnot p -> do_eval env p
 
     | Pseparated ltsets ->
-      let evaled = List.map (eval_term_as_lval ~alarm_mode env) ltsets in
       List.fold_left
-        (fun acc e -> join_logic_deps acc e.ldeps)
-        empty_logic_deps evaled
+        (fun acc tsets -> join_logic_deps acc (tsets_deps lbl_here tsets))
+        empty_logic_deps ltsets
 
     | Pexists (l, p) | Pforall (l, p) ->
       let env = bind_logic_vars env l in
@@ -2637,20 +2634,22 @@ let predicate_deps env pred =
     | Plet (_v, p) -> do_eval env p (* will this work when when we need [_v]
                                        to evaluate [p] ?.. *)
 
-    | Papp (li, _labels, _args) -> begin
+    | Papp (li, _labels, args) -> begin
         if is_known_predicate li.l_var_info then
-          assert false (* TODO! Must evaluate the arguments, plus the
-                          dependencies of the predicate itself. *)
+          List.fold_left
+            (fun acc arg -> join_logic_deps acc (term_deps arg))
+            empty_logic_deps args
         else
           match Inline.inline_predicate ~inline ~current:env.e_cur p with
-          | None -> assert false
+          | None -> unsupported (Format.asprintf "%a" Predicate.pretty p)
           | Some p' -> do_eval env p'
       end
 
     | Pfresh _ | Pallocable _ | Pfreeable _
-      -> assert false
+      -> unsupported (Format.asprintf "%a" Predicate.pretty p)
   in
-  do_eval env pred
+  try Some (do_eval env pred)
+  with LogicEvalError _ -> None
 
 
 (* -------------------------------------------------------------------------- *)

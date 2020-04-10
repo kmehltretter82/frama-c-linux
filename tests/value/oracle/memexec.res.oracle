@@ -7,7 +7,9 @@
   x1 ∈ {0}
   y1 ∈ {0}
   z1 ∈ {0}
+  z2 ∈ {0}
   c ∈ [--..--]
+  nondet ∈ [--..--]
   p ∈ {0}
   i ∈ {0}
   t[0..9] ∈ {0}
@@ -17,7 +19,7 @@
   g_f5_2 ∈ {0}
   two_fields ∈ {0}
 [eva] computing for function f1 <- main.
-  Called from tests/value/memexec.c:154.
+  Called from tests/value/memexec.c:189.
 [eva] computing for function f11 <- f1 <- main.
   Called from tests/value/memexec.c:12.
 [eva] Recording results for f11
@@ -31,15 +33,15 @@
 [eva] Recording results for f1
 [eva] Done for function f1
 [eva] computing for function f2 <- main.
-  Called from tests/value/memexec.c:155.
+  Called from tests/value/memexec.c:190.
 [eva] Recording results for f2
 [eva] Done for function f2
 [eva] computing for function f3 <- main.
-  Called from tests/value/memexec.c:156.
+  Called from tests/value/memexec.c:191.
 [eva] Recording results for f3
 [eva] Done for function f3
 [eva] computing for function bug <- main.
-  Called from tests/value/memexec.c:157.
+  Called from tests/value/memexec.c:192.
 [eva] computing for function fbug <- bug <- main.
   Called from tests/value/memexec.c:40.
 [eva:alarm] tests/value/memexec.c:33: Warning: 
@@ -53,10 +55,10 @@
 [eva] Done for function fbug
 [eva] Recording results for bug
 [eva] Done for function bug
-[eva:locals-escaping] tests/value/memexec.c:157: Warning: 
+[eva:locals-escaping] tests/value/memexec.c:192: Warning: 
   locals {x} escaping the scope of bug through p
 [eva] computing for function f4 <- main.
-  Called from tests/value/memexec.c:158.
+  Called from tests/value/memexec.c:193.
 [eva] computing for function f4_2 <- f4 <- main.
   Called from tests/value/memexec.c:84.
 [eva] computing for function f4_11 <- f4_2 <- f4 <- main.
@@ -92,7 +94,7 @@
 [eva] Recording results for f4
 [eva] Done for function f4
 [eva] computing for function f5 <- main.
-  Called from tests/value/memexec.c:159.
+  Called from tests/value/memexec.c:194.
 [eva] computing for function f5_aux <- f5 <- main.
   Called from tests/value/memexec.c:107.
 [eva:alarm] tests/value/memexec.c:94: Warning: assertion got status unknown.
@@ -103,12 +105,11 @@
   Frama_C_show_each_f5: [9..2147483647], [-2147483648..6], [-2147483648..7]
 [eva] tests/value/memexec.c:113: Reusing old results for call to f5_aux
 [eva] tests/value/memexec.c:114: 
-  Frama_C_show_each_f5:
-  [9..2147483647], [-2147483648..2147483647], [-2147483648..7]
+  Frama_C_show_each_f5: [9..2147483647], [-2147483648..6], [-2147483648..7]
 [eva] Recording results for f5
 [eva] Done for function f5
 [eva] computing for function f6 <- main.
-  Called from tests/value/memexec.c:160.
+  Called from tests/value/memexec.c:195.
 [eva] computing for function f6_1 <- f6 <- main.
   Called from tests/value/memexec.c:123.
 [eva] Recording results for f6_1
@@ -120,7 +121,7 @@
 [eva] Recording results for f6
 [eva] Done for function f6
 [eva] computing for function f7 <- main.
-  Called from tests/value/memexec.c:161.
+  Called from tests/value/memexec.c:196.
 [eva] computing for function f7_1 <- f7 <- main.
   Called from tests/value/memexec.c:136.
 [eva] Recording results for f7_1
@@ -129,7 +130,7 @@
 [eva] Recording results for f7
 [eva] Done for function f7
 [eva] computing for function f8 <- main.
-  Called from tests/value/memexec.c:162.
+  Called from tests/value/memexec.c:197.
 [eva] computing for function f8_1 <- f8 <- main.
   Called from tests/value/memexec.c:147.
 [eva:alarm] tests/value/memexec.c:141: Warning: 
@@ -143,6 +144,56 @@
 [eva] tests/value/memexec.c:150: Reusing old results for call to f8_1
 [eva] Recording results for f8
 [eva] Done for function f8
+[eva] computing for function f9 <- main.
+  Called from tests/value/memexec.c:198.
+[eva] computing for function f9_1 <- f9 <- main.
+  Called from tests/value/memexec.c:171.
+[eva:alarm] tests/value/memexec.c:154: Warning: 
+  assertion got status invalid (stopping propagation).
+[eva] Recording results for f9_1
+[eva] Done for function f9_1
+[eva] computing for function f9_1 <- f9 <- main.
+  Called from tests/value/memexec.c:173.
+[eva] tests/value/memexec.c:154: assertion got status valid.
+[eva] Recording results for f9_1
+[eva] Done for function f9_1
+[eva] computing for function f9_2 <- f9 <- main.
+  Called from tests/value/memexec.c:176.
+[eva:alarm] tests/value/memexec.c:158: Warning: 
+  assertion got status invalid (stopping propagation).
+[eva] Recording results for f9_2
+[eva] Done for function f9_2
+[eva] computing for function f9_2 <- f9 <- main.
+  Called from tests/value/memexec.c:178.
+[eva] tests/value/memexec.c:158: assertion got status valid.
+[eva] Recording results for f9_2
+[eva] Done for function f9_2
+[eva] computing for function f9_3 <- f9 <- main.
+  Called from tests/value/memexec.c:179.
+[eva:alarm] tests/value/memexec.c:162: Warning: 
+  assertion got status invalid (stopping propagation).
+[eva] Recording results for f9_3
+[eva] Done for function f9_3
+[eva] computing for function f9_3 <- f9 <- main.
+  Called from tests/value/memexec.c:181.
+[eva] tests/value/memexec.c:162: assertion got status valid.
+[eva] Recording results for f9_3
+[eva] Done for function f9_3
+[eva] computing for function f9_4 <- f9 <- main.
+  Called from tests/value/memexec.c:183.
+[eva:alarm] tests/value/memexec.c:166: Warning: 
+  assertion got status invalid (stopping propagation).
+[eva] Recording results for f9_4
+[eva] Done for function f9_4
+[eva] computing for function f9_4 <- f9 <- main.
+  Called from tests/value/memexec.c:185.
+[eva] tests/value/memexec.c:166: assertion got status valid.
+[eva] Recording results for f9_4
+[eva] Done for function f9_4
+[eva] Recording results for f9
+[eva] Done for function f9
+[eva:locals-escaping] tests/value/memexec.c:198: Warning: 
+  locals {x} escaping the scope of f9 through p
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -192,7 +243,7 @@
 [eva:final-states] Values at end of function f5_aux:
   v ∈ [--..--]
 [eva:final-states] Values at end of function f5:
-  g_f5_1 ∈ [--..--]
+  g_f5_1 ∈ [-2147483648..6]
   g_f5_2 ∈ [-2147483648..7]
   arg ∈ [9..2147483647]
 [eva:final-states] Values at end of function f6_1:
@@ -209,6 +260,18 @@
   q ∈ {0}
 [eva:final-states] Values at end of function f8:
   x ∈ {1}
+[eva:final-states] Values at end of function f9_1:
+  
+[eva:final-states] Values at end of function f9_2:
+  
+[eva:final-states] Values at end of function f9_3:
+  
+[eva:final-states] Values at end of function f9_4:
+  
+[eva:final-states] Values at end of function f9:
+  z2 ∈ {1}
+  p ∈ {{ &x }}
+  x ∈ {1}
 [eva:final-states] Values at end of function fbug:
   __retres ∈ {1}
 [eva:final-states] Values at end of function bug:
@@ -216,6 +279,7 @@
   x ∈ {1}
 [eva:final-states] Values at end of function main:
   x1 ∈ {1}
+  z2 ∈ {1}
   p ∈ ESCAPINGADDR
   i ∈ {0; 5}
   t[0..1] ∈ {0}
@@ -228,7 +292,7 @@
   S[0..7] ∈ {0}
    [8].i ∈ {0; 6}
    [9] ∈ {0}
-  g_f5_1 ∈ [--..--]
+  g_f5_1 ∈ [-2147483648..6]
   g_f5_2 ∈ [-2147483648..7]
   two_fields.x ∈ {1}
             .y ∈ {3}
@@ -264,6 +328,16 @@
 [from] Done for function f8_1
 [from] Computing for function f8
 [from] Done for function f8
+[from] Computing for function f9_1
+[from] Done for function f9_1
+[from] Computing for function f9_2
+[from] Done for function f9_2
+[from] Computing for function f9_3
+[from] Done for function f9_3
+[from] Computing for function f9_4
+[from] Done for function f9_4
+[from] Computing for function f9
+[from] Done for function f9
 [from] Computing for function fbug
 [from] Done for function fbug
 [from] Computing for function bug
@@ -311,12 +385,24 @@
   NO EFFECTS
 [from] Function f8:
   NO EFFECTS
+[from] Function f9_1:
+  NO EFFECTS
+[from] Function f9_2:
+  NO EFFECTS
+[from] Function f9_3:
+  NO EFFECTS
+[from] Function f9_4:
+  NO EFFECTS
+[from] Function f9:
+  z2 FROM \nothing
+  p FROM \nothing
 [from] Function fbug:
   \result FROM p; x
 [from] Function bug:
   p FROM \nothing
 [from] Function main:
   x1 FROM \nothing
+  z2 FROM \nothing
   p FROM \nothing
   i FROM c (and SELF)
   t{[2]; [5..6]} FROM c (and SELF)
@@ -390,6 +476,26 @@
     x
 [inout] Inputs for function f8:
     c
+[inout] Out (internal) for function f9_1:
+    \nothing
+[inout] Inputs for function f9_1:
+    \nothing
+[inout] Out (internal) for function f9_2:
+    \nothing
+[inout] Inputs for function f9_2:
+    \nothing
+[inout] Out (internal) for function f9_3:
+    \nothing
+[inout] Inputs for function f9_3:
+    \nothing
+[inout] Out (internal) for function f9_4:
+    \nothing
+[inout] Inputs for function f9_4:
+    \nothing
+[inout] Out (internal) for function f9:
+    z2; p; x
+[inout] Inputs for function f9:
+    nondet
 [inout] Out (internal) for function fbug:
     __retres
 [inout] Inputs for function fbug:
@@ -399,6 +505,6 @@
 [inout] Inputs for function bug:
     c; p
 [inout] Out (internal) for function main:
-    x1; p; i; t{[2]; [5..6]}; ps; S[8]; g_f5_1; g_f5_2; two_fields
+    x1; z2; p; i; t{[2]; [5..6]}; ps; S[8]; g_f5_1; g_f5_2; two_fields
 [inout] Inputs for function main:
-    c; p; i; ps; S[8]; g_f5_1; g_f5_2
+    c; nondet; p; i; ps; S[8]; g_f5_1; g_f5_2

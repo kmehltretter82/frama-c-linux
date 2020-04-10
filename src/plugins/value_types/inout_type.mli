@@ -23,6 +23,7 @@
 type t = {
   over_inputs: Locations.Zone.t;
   over_inputs_if_termination: Locations.Zone.t;
+  over_logic_inputs: Locations.Zone.t;
   under_outputs_if_termination: Locations.Zone.t;
   over_outputs: Locations.Zone.t;
   over_outputs_if_termination: Locations.Zone.t;
