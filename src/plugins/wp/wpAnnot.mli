@@ -28,10 +28,6 @@ open Cil_types
 
 (*----------------------------------------------------------------------------*)
 
-(** splits a prop_id goals into prop_id parts for each sub-goals *)
-val split : ( WpPropId.prop_id -> 'a -> unit ) -> WpPropId.prop_id ->
-  'a Bag.t -> unit
-
 (** A proof accumulator for a set of related prop_id *)
 type proof
 
@@ -41,11 +37,19 @@ val create_proof : WpPropId.prop_id -> proof
 val add_proof : proof -> WpPropId.prop_id -> Property.t list -> unit
 (** accumulate in the proof the partial proof for this prop_id *)
 
+val add_invalid_proof : proof -> unit
+(** add an invalid proof result ; can not revert a complete proof *)
+
 val is_composed : proof -> bool
 (** whether a proof needs several lemma to be complete *)
 
 val is_proved : proof -> bool
 (** whether all partial proofs have been accumulated or not *)
+
+val is_invalid : proof -> bool
+(** whether an invalid proof result has been registered or not *)
+
+val status : proof -> [ `Proved | `Invalid | `Partial ]
 
 val target : proof -> Property.t
 val dependencies : proof -> Property.t list

@@ -7,7 +7,7 @@
   Function foo
 ------------------------------------------------------------
 
-Goal Smoke_loop_invariant in 'foo' at loop (file tests/wp_plugin/doomed_axioms.i, line 29):
+Goal Wp_smoke_dead_loop in 'foo' at loop (file tests/wp_plugin/doomed_axioms.i, line 29):
 Assume {
   Type: is_sint32(n).
   (* Invariant 'C' *)
@@ -16,6 +16,38 @@ Assume {
   Have: P_Q(n).
   (* Invariant 'A' *)
   Have: P_P(n).
+}
+Prove: false.
+
+------------------------------------------------------------
+
+Goal Wp_smoke_dead_code in 'foo' at instruction (file tests/wp_plugin/doomed_axioms.i, line 30):
+Assume {
+  Type: is_sint32(n) /\ is_sint32(x).
+  (* Invariant 'C' *)
+  Have: P_R(n).
+  (* Invariant 'B' *)
+  Have: P_Q(n).
+  (* Invariant 'A' *)
+  Have: P_P(n).
+  (* Then *)
+  Have: 0 < x.
+}
+Prove: false.
+
+------------------------------------------------------------
+
+Goal Wp_smoke_dead_code in 'foo' at return (file tests/wp_plugin/doomed_axioms.i, line 32):
+Assume {
+  Type: is_sint32(n) /\ is_sint32(x).
+  (* Invariant 'C' *)
+  Have: P_R(n).
+  (* Invariant 'B' *)
+  Have: P_Q(n).
+  (* Invariant 'A' *)
+  Have: P_P(n).
+  (* Else *)
+  Have: x <= 0.
 }
 Prove: false.
 

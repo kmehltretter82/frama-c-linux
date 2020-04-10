@@ -916,27 +916,30 @@ weakest precondition calculus.
 \subsection{Smoke Tests}
 
 During modular deductive verification, inconsistencies in function requirements
-can be difficult to detect untill you actually call it.
+can be difficult to detect until you actually call it.
 Although, such inconsistencies make its post-conditions provable, while its pre-conditions
 would never be provable.
 
 The \textsf{WP} plug-in can generate smoke-tests to detect such inconsistencies.
 Basically, it consists in checking if \verb+\false+ is provable under the requirements
-or assumptions of a behavior, or under the invariants of a loop.
+or assumptions of a behaviour, or under the invariants of a loop. Also, a simple reachability
+analysis is performed to track dead-code statements and calls that neither terminates nor exits.
 
 This is best-effort verification : if at least one prover succeed in proving \verb+\false+,
-an inconsistency is detected. Otherwized, the test is not conclusive, and you can never be sure
-that your annotations are free of inconsistencies.
+an inconsistency is detected. Otherwise, the test is not conclusive, and you can never be sure
+that the ACSL annotations are free of inconsistencies.
 
 In case any smoke-test fails, a ``\textit{False if reachable}'' status is put on the
-inconsistent requirements, or on the loop with inconsistent invariants, and finally,
-\textsf{WP} generates a user error.
+inconsistent requirements, or on the loop with inconsistent invariants, and
+\textsf{WP} generates a user warning.
 
 \begin{description}
-\item[\tt -wp-(no)-smoke-tests] generates checks to detect inconsistent
-  annotations.
+\item[\tt -wp-(no)-smoke-tests] generates checks to detect inconsistencies.
 \item[\tt -wp-(no)-smoke-timeout] timeout to be used for trying to prove \verb+\false+
   on smoke-tests (default is \verb+2+ seconds).
+\item[\tt -wp-no-smoke-dead-code] exclude smoke tests for dead code.
+\item[\tt -wp-no-smoke-dead-loop] exclude smoke tests for inconsistent loop invariants.
+\item[\tt -wp-no-smoke-dead-call] exclude smoke tests for non-terminating calls.
 \end{description}
 
 When reporting prover results for smoke-tests, the \textsf{WP} displays
@@ -1078,7 +1081,7 @@ Suppose you have the following configuration:
 \end{logs}
 
 Then, to use (for instance) \textsf{CVC4 1.6},
-you can use \verb+-wp-prover cvc4+ or \verb+-wp-prover CVC4:1.6+
+you can use \verb+-wp-prover cvc4+ or \verb+-wp-prover CVC4:1.6+.
 Similarly, if you want to use \textsf{Z3 4.6.0} without bitvectors, you can use \verb+-wp-prover z3-nobv+.
 Finally, since \textsf{Why-3} also provides the alias
 \verb+altergo+ for this prover, \verb+-wp-prover altergo+ will also run it \emph{via} \textsf{Why-3}.

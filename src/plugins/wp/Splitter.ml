@@ -28,7 +28,6 @@ open Cil_types
 open Cil_datatype
 
 type tag =
-  | MARK of stmt
   | THEN of stmt
   | ELSE of stmt
   | CALL of stmt * kernel_function
@@ -37,7 +36,6 @@ type tag =
   | ASSERT of identified_predicate * int * int (* part *)
 
 let pretty fmt = function
-  | MARK _ -> Format.fprintf fmt "Stmt"
   | THEN _ -> Format.fprintf fmt "Then"
   | ELSE _ -> Format.fprintf fmt "Else"
   | CASE(_,[]) -> Format.fprintf fmt "Case(s)"
@@ -51,15 +49,12 @@ let pretty fmt = function
   | ASSERT(_,k,n) -> Format.fprintf fmt "Disjunction (%d/%d)" k n
 
 let loc = function
-  | THEN s | ELSE s | MARK s | CASE(s,_) | CALL(s,_) | DEFAULT s -> Stmt.loc s
+  | THEN s | ELSE s | CASE(s,_) | CALL(s,_) | DEFAULT s -> Stmt.loc s
   | ASSERT(p,_,_) -> p.ip_content.pred_loc
 
 let compare p q =
   if p == q then 0 else
     match p,q with
-    | MARK s , MARK t -> Stmt.compare s t
-    | MARK _ , _ -> (-1)
-    | _ , MARK _ -> 1
     | THEN s , THEN t -> Stmt.compare s t
     | THEN _ , _ -> (-1)
     | _ , THEN _ -> 1
@@ -129,7 +124,6 @@ let switch_cases stmt ks = CASE(stmt,ks)
 let switch_default stmt = DEFAULT stmt
 let if_then stmt = THEN stmt
 let if_else stmt = ELSE stmt
-let mark stmt = MARK stmt
 let call stmt kf = CALL(stmt,kf)
 
 (* -------------------------------------------------------------------------- *)
@@ -178,6 +172,7 @@ let group tag merge m =
 let length = List.length
 let empty = []
 let singleton e = [[],e]
+let unmark merge m = [[] , merge (List.map snd m)]
 let union merge m1 m2 = M.union (fun _ -> merge) m1 m2
 
 let rec merge ~left ~both ~right m1 m2 =

@@ -105,6 +105,7 @@ let set_unreachable pid =
 type proof = {
   target : Property.t ;
   proved : proofpart array ;
+  mutable invalid : bool ;
   mutable dependencies : Property.Set.t ;
 } and proofpart =
     | Noproof
@@ -112,27 +113,29 @@ type proof = {
     | Parts of Bitvector.t
 
 let target p = p.target
-let dependencies p = Property.Set.elements (Property.Set.remove p.target p.dependencies)
+let dependencies p =
+  Property.Set.elements (Property.Set.remove p.target p.dependencies)
 
-let create_proof p =
-  let n = WpPropId.subproofs p in
+let create_proof ip =
+  let n = WpPropId.subproofs ip in
   {
-    target = WpPropId.property_of_id p ;
+    target = WpPropId.property_of_id ip ;
     proved = Array.make n Noproof ;
     dependencies = Property.Set.empty ;
+    invalid = false ;
   }
 
-let add_proof pf p hs =
+let add_proof pf ip hs =
   begin
-    if not (Property.equal (WpPropId.property_of_id p) pf.target)
+    if not (Property.equal (WpPropId.property_of_id ip) pf.target)
     then Wp_parameters.fatal "Partial proof inconsistency" ;
     List.iter
       (fun iph ->
          if not (WpPropId.is_requires iph) then
            pf.dependencies <- Property.Set.add iph pf.dependencies
       ) hs ;
-    let k = WpPropId.subproof_idx p in
-    match WpPropId.parts_of_id p with
+    let k = WpPropId.subproof_idx ip in
+    match WpPropId.parts_of_id ip with
     | None -> pf.proved.(k) <- Complete
     | Some(p,n) ->
         match pf.proved.(k) with
@@ -148,12 +151,23 @@ let add_proof pf p hs =
             then pf.proved.(k) <- Complete
   end
 
+let add_invalid_proof pf = pf.invalid <- true
+
 let is_composed pf =
   Array.length pf.proved > 1
 
 let is_proved pf =
-  try Array.iter (fun r -> if r<>Complete then raise Exit) pf.proved ; true
-  with Exit -> false
+  Array.for_all (function Complete -> true | _ -> false) pf.proved
+
+let is_invalid pf =
+  pf.invalid && not (is_proved pf)
+
+let status pf =
+  try
+    Array.iter (function Complete -> raise Exit | _ -> ()) pf.proved ;
+    `Proved
+  with Exit ->
+    if pf.invalid then `Invalid else `Partial
 
 (* -------------------------------------------------------------------------- *)
 (* --- PID for Functions                                                  --- *)
@@ -184,22 +198,6 @@ let preconditions_at_call s = function
 
 let get_called_preconditions_at kf stmt =
   List.map snd (call_preconditions kf stmt)
-
-(* -------------------------------------------------------------------------- *)
-(* --- Prop Splitter                                                      --- *)
-(* -------------------------------------------------------------------------- *)
-
-(* prop-id splitter *)
-
-let split job pid goals =
-  let n = Bag.length goals in
-  if n <= 1 then Bag.iter (job pid) goals else
-    let k = ref 0 in
-    Bag.iter
-      (fun g ->
-         let pid_k = WpPropId.mk_part pid (!k,n) in
-         incr k ; job pid_k g)
-      goals
 
 (*----------------------------------------------------------------------------*)
 (* Strategy and annotations                                                   *)
@@ -247,6 +245,7 @@ module HdefAnnotBhv = Cil2cfg.HE (struct type t = (stmt * int) end)
 type strategy_info = {
   kf : Kernel_function.t;
   cfg : Cil2cfg.t;
+  reached : WpReached.reached option ;
   cur_bhv : asked_bhv;
   asked_bhvs : asked_bhv list;
   asked_prop : asked_prop;
@@ -374,6 +373,8 @@ let kind_to_select config kind id = match kind with
   | WpStrategy.AcallPre(goal,fct) ->
       let goal = goal && goal_to_select config id in
       Some (WpStrategy.AcallPre(goal,fct))
+  | WpStrategy.AcallPost _ ->
+      if goal_to_select config id then Some kind else None
   | WpStrategy.Ahyp | WpStrategy.AcallHyp _ -> Some kind
 
 let add_prop_loop_inv ~established config acc kind s ca p =
@@ -759,6 +760,15 @@ let add_called_post called_kf termination_kind acc =
   in
   List.fold_left add_behav acc spec.spec_behavior
 
+let add_call_checks config s kf posts exits =
+  if cur_fct_default_bhv config
+  && Wp_parameters.SmokeTests.get ()
+  && Wp_parameters.SmokeDeadcode.get ()
+  then
+    WpStrategy.add_prop_dead_call kf s posts exits
+  else
+    posts , exits
+
 let add_call_annots config s kf l_post (before,(posts,exits)) =
   let spec = Annotations.funspec kf in
   let before = add_called_pre config kf s spec before in
@@ -766,7 +776,7 @@ let add_call_annots config s kf l_post (before,(posts,exits)) =
   let posts = WpStrategy.add_call_assigns_hyp posts config.kf s
       ~called_kf:kf l_post (Some spec) in
   let exits = add_called_post kf Exits exits in
-  before , ( posts , exits )
+  before , add_call_checks config s kf posts exits
 
 let get_call_annots config v s fct =
   let l_post = Cil2cfg.get_post_label config.cfg v in
@@ -792,24 +802,6 @@ let get_call_annots config v s fct =
             empty calls
 
 (*----------------------------------------------------------------------------*)
-
-let is_unrolled_completely spec =
-  match spec.term_node with
-  | TConst (LStr "completely") -> true
-  | _ -> false
-
-let is_unrolled_loop stmt =
-  let exception Unrolled in
-  try
-    Annotations.iter_code_annot (fun _emitter ca ->
-        match ca.annot_content with
-        | APragma (Loop_pragma (Unroll_specs [ spec ; _ ]))
-          when is_unrolled_completely spec ->
-            raise Unrolled ;
-        | _ -> ()
-      ) stmt ;
-    false
-  with Unrolled -> true
 
 let add_variant_annot config s ca var_exp loop_entry loop_back =
   let (vpos_id, vpos), (vdecr_id, vdecr) =
@@ -901,9 +893,11 @@ let get_loop_annots config vloop s =
     | _ -> acc (* see get_stmt_annots *)
   in
   let loop_core =
-    if Wp_parameters.SmokeTests.get () && cur_fct_default_bhv config
-       && not (is_unrolled_loop s)
-    then WpStrategy.add_prop_loop_smoke WpStrategy.empty_acc config.kf s
+    if cur_fct_default_bhv config
+    && Wp_parameters.SmokeTests.get ()
+    && Wp_parameters.SmokeDeadloop.get ()
+    && not (WpReached.is_dead_code s)
+    then WpStrategy.add_prop_dead_loop WpStrategy.empty_acc config.kf s
     else WpStrategy.empty_acc in
   let (h_assigns, g_assigns), loop_entry , loop_back , loop_core =
     Annotations.fold_code_annot do_annot s
@@ -916,6 +910,16 @@ let get_loop_annots config vloop s =
   let loop_core =
     WpStrategy.add_loop_assigns_hyp loop_core config.kf s h_assigns
   in (loop_entry , loop_back , loop_core)
+
+let add_stmt_deadcode_smoke config acc s =
+  if cur_fct_default_bhv config
+  then
+    match config.reached with
+    | Some r when WpReached.smoking r s ->
+        WpStrategy.add_prop_dead_code acc config.kf s
+    | _ -> acc
+  else
+    acc
 
 let get_stmt_annots config v s =
   let do_annot _ a ((b_acc, (a_acc, e_acc)) as acc) =
@@ -965,7 +969,8 @@ let get_stmt_annots config v s =
         add_stmt_spec_annots config v s b_list spec acc
     | AExtended _ -> acc
   in
-  let before_acc = WpStrategy.empty_acc in
+  let before_acc =
+    add_stmt_deadcode_smoke config WpStrategy.empty_acc s in
   let after_acc = WpStrategy.empty_acc in
   let exits_acc = WpStrategy.empty_acc in
   let acc = before_acc, (after_acc, exits_acc) in
@@ -1338,16 +1343,21 @@ let build_configs assigns kf model behaviors ki property =
           "[get_strategies] select stmt %d properties@." s.sid
   in
   let cfg = get_cfg kf model in
+  let reached =
+    if Wp_parameters.SmokeTests.get ()
+    && Wp_parameters.SmokeDeadcode.get ()
+    then Some (WpReached.reached kf)
+    else None in
   let def_annot_bhv, bhvs = find_behaviors kf cfg ki behaviors in
   if bhvs <> [] then debug "[get_strategies] %d behaviors" (List.length bhvs);
-  let mk_bhv_config bhv = { kf = kf;
-                            cfg = cfg;
-                            cur_bhv = bhv;
-                            asked_prop = property;
-                            asked_bhvs = bhvs;
-                            assigns_filter = assigns;
-                            def_annots_info = def_annot_bhv }
-  in List.map mk_bhv_config bhvs
+  let mk_bhv_config bhv = {
+    kf; reached; cfg;
+    cur_bhv = bhv;
+    asked_prop = property;
+    asked_bhvs = bhvs;
+    assigns_filter = assigns;
+    def_annots_info = def_annot_bhv;
+  } in List.map mk_bhv_config bhvs
 
 let get_strategies assigns kf model behaviors ki property =
   let configs = build_configs assigns kf model behaviors ki property in

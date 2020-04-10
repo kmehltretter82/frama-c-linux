@@ -1775,6 +1775,8 @@ src/plugins/wp/wpContext.ml: CEA_WP
 src/plugins/wp/wpContext.mli: CEA_WP
 src/plugins/wp/wpPropId.ml: CEA_WP
 src/plugins/wp/wpPropId.mli: CEA_WP
+src/plugins/wp/wpReached.ml: CEA_WP
+src/plugins/wp/wpReached.mli: CEA_WP
 src/plugins/wp/wpReport.ml: CEA_WP
 src/plugins/wp/wpReport.mli: CEA_WP
 src/plugins/wp/wpRTE.ml: CEA_WP

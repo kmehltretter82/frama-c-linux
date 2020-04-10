@@ -90,12 +90,15 @@ let rank n =
 
 type res = VALID | UNSUCCESS | INCONCLUSIVE | NORESULT
 
-let result ~smoke (r:VCS.result) =
-  match VCS.verdict ~smoke r with
-  | VCS.NoResult | VCS.Checked | VCS.Computing _ -> NORESULT
-  | VCS.Failed -> INCONCLUSIVE
-  | VCS.Invalid | VCS.Unknown | VCS.Timeout | VCS.Stepout -> UNSUCCESS
-  | VCS.Valid -> VALID
+let result ~status ~smoke (r:VCS.result) =
+  match status with
+  | `Passed when smoke -> VALID
+  | _ ->
+      match VCS.verdict ~smoke r with
+      | VCS.NoResult | VCS.Computing _ -> NORESULT
+      | VCS.Failed -> INCONCLUSIVE
+      | VCS.Invalid | VCS.Unknown | VCS.Timeout | VCS.Stepout -> UNSUCCESS
+      | VCS.Valid -> VALID
 
 let best_result a b = match a,b with
   | NORESULT,c | c,NORESULT -> c
@@ -204,14 +207,14 @@ let get_prover fs prover =
     let s = stats () in
     Hashtbl.add fs.prover prover s ; s
 
-let add_results (plist:pstats list) (wpo:Wpo.t) =
-  let ok = ref NORESULT in
+let add_results ~status (plist:pstats list) (wpo:Wpo.t) =
+  let res = ref NORESULT in
   let tm = ref 0.0 in
   let sm = ref 0 in
+  let smoke = Wpo.is_smoke_test wpo in
   List.iter
     (fun (p,r) ->
-       let smoke = Wpo.is_smoke_test wpo in
-       let re = result ~smoke r in
+       let re = result ~status ~smoke r in
        let st = Wpo.get_steps r in
        let tc = Wpo.get_time r in
        let ts = r.VCS.solver_time in
@@ -225,11 +228,11 @@ let add_results (plist:pstats list) (wpo:Wpo.t) =
                (fun fs -> add_qedstat ts (get_prover fs VCS.Qed))
                plist ;
          end ;
-       ok := best_result !ok re ;
+       res := best_result !res re ;
        if tc > !tm then tm := tc ;
        if st > !sm then sm := st ;
     ) (Wpo.get_results wpo) ;
-  List.iter (fun fs -> add_stat !ok !sm !tm fs.main) plist
+  List.iter (fun fs -> add_stat !res !sm !tm fs.main) plist
 
 (* -------------------------------------------------------------------------- *)
 (* --- Stats by Section                                                   --- *)
@@ -366,9 +369,10 @@ let add_goal (gs:fcstat) wpo =
       | Wpo.Function(kf,_) -> Fun kf
     in
     let ds : dstats = get_section gs section in
-    let (ok,prop) = Wpo.get_proof wpo in
+    let status,prop = Wpo.get_proof wpo in
     let ps : pstats = get_property ds prop in
-    add_results [gs.global ; ds.dstats ; ps] wpo ;
+    add_results status [gs.global ; ds.dstats ; ps] wpo ;
+    let ok = (status = `Passed) in
     add_cover gs.gcoverage ok prop ;
     add_cover ds.dcoverage ok prop ;
   end

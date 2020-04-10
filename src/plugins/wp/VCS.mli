@@ -112,6 +112,7 @@ val is_valid: result -> bool
 val is_computing: result -> bool
 val is_proved: smoke:bool -> result -> bool
 
+val smoked : verdict -> verdict
 val verdict: smoke:bool -> result -> verdict
 
 val configure : result -> config

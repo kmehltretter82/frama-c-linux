@@ -1,0 +1,299 @@
+(**************************************************************************)
+(*                                                                        *)
+(*  This file is part of WP plug-in of Frama-C.                           *)
+(*                                                                        *)
+(*  Copyright (C) 2007-2020                                               *)
+(*    CEA (Commissariat a l'energie atomique et aux energies              *)
+(*         alternatives)                                                  *)
+(*                                                                        *)
+(*  you can redistribute it and/or modify it under the terms of the GNU   *)
+(*  Lesser General Public License as published by the Free Software       *)
+(*  Foundation, version 2.1.                                              *)
+(*                                                                        *)
+(*  It is distributed in the hope that it will be useful,                 *)
+(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
+(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *)
+(*  GNU Lesser General Public License for more details.                   *)
+(*                                                                        *)
+(*  See the GNU Lesser General Public License version 2.1                 *)
+(*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
+(*                                                                        *)
+(**************************************************************************)
+
+open Cil_types
+open Cil_datatype
+
+(* -------------------------------------------------------------------------- *)
+(* --- Compute Reachability for Smoke Tests                               --- *)
+(* -------------------------------------------------------------------------- *)
+
+type flow =
+  | F_goto    (* single successor for node *)
+  | F_effect  (* single successor with must-be-reach effect *)
+  | F_call    (* multiple successors with must-be-reach effect *)
+  | F_branch  (* branching node *)
+  | F_return  (* return node *)
+  | F_entry   (* function or loop entry node *)
+  | F_dead    (* truly dead code *)
+
+type node = {
+  id : int ;
+  mutable flow : flow ;
+  mutable prev : node list ;
+  mutable reached : bool option ;
+}
+
+let kid = ref 0
+
+let node () =
+  incr kid ;
+  { id = !kid ; prev = [] ; reached = None ; flow = F_goto }
+
+(* -------------------------------------------------------------------------- *)
+(* --- Unrolled Loop                                                      --- *)
+(* -------------------------------------------------------------------------- *)
+
+let is_unrolled_completely spec =
+  match spec.term_node with
+  | TConst (LStr "completely") -> true
+  | _ -> false
+
+let rec is_predicate cond p =
+  match p.pred_content with
+  | Pfalse -> not cond
+  | Ptrue -> cond
+  | Pnot p -> is_predicate (not cond) p
+  | Pforall(_,p) | Pexists(_,p) | Plet(_,p) -> is_predicate cond p
+  | Pif(_,p,q) -> is_predicate cond p && is_predicate cond q
+  | Pat(p,_) -> is_predicate cond p
+  | Pand(p,q) ->
+      if cond
+      then is_predicate true p && is_predicate true q
+      else is_predicate false p || is_predicate false q
+  | Por(p,q) ->
+      if cond
+      then is_predicate true p && is_predicate true q
+      else is_predicate false p && is_predicate false q
+  | Pimplies(p,q) ->
+      if cond
+      then is_predicate false p || is_predicate true q
+      else is_predicate true p && is_predicate false q
+  | _ -> false
+
+let is_dead_annot ca =
+  match ca.annot_content with
+  | APragma (Loop_pragma (Unroll_specs [ spec ; _ ])) ->
+      false && is_unrolled_completely spec
+  | AAssert([],Assert,p) -> is_predicate false p
+  | AInvariant([],_,p) -> is_predicate false p
+  | _ -> false
+
+let is_dead_code stmt =
+  let exception Deadcode in
+  try
+    Annotations.iter_code_annot (fun _emitter ca ->
+        if is_dead_annot ca then raise Deadcode
+      ) stmt ;
+    false
+  with Deadcode -> true
+
+(* -------------------------------------------------------------------------- *)
+(* --- Compute CFG                                                        --- *)
+(* -------------------------------------------------------------------------- *)
+
+type reached = node Stmt.Map.t
+type cfg = reached ref
+
+let of_stmt cfg s =
+  try Stmt.Map.find s !cfg with Not_found ->
+    let n = node () in
+    cfg := Stmt.Map.add s n !cfg ; n
+
+let goto a b =
+  b.prev <- a :: b.prev ;
+  if b.flow = F_dead then F_dead else F_goto
+
+let flow i f =
+  if f = F_dead then F_dead else
+    match i with
+    | Asm _ | Set _ -> F_effect
+    | Call _ -> F_call
+    | Local_init _ | Skip _ | Code_annot _ -> F_goto
+
+let merge a b = match a,b with
+  | F_dead , F_dead -> F_dead
+  | _ -> F_branch
+
+type env = {
+  cfg: cfg ;
+  break: node ;
+  continue: node ;
+}
+
+let rec stmt env s b =
+  let a = of_stmt env.cfg s in
+  if is_dead_code s then
+    a.flow <- F_dead
+  else
+    a.flow <- skind env a b s.skind ;
+  a
+
+and skind env a b = function
+  | Instr i -> flow i (goto a b)
+  | Return (None,_) -> F_goto
+  | Return (Some _,_) -> F_return
+  | Goto (lbl,_) -> goto a (of_stmt env.cfg !lbl)
+  | Break _ -> goto a env.break
+  | Continue _ -> goto a env.continue
+  | If(_,bthen,belse,_) ->
+      let ft = goto a (block env bthen b) in
+      let fe = goto a (block env belse b) in
+      merge ft fe
+  | Switch(_,body,cases,_) ->
+      ignore (block { env with break = b } body b) ;
+      List.fold_left
+        (fun f s -> merge f (goto a (of_stmt env.cfg s)))
+        F_dead cases
+  | Loop(_,body,_,_,_) ->
+      let continue = node () in
+      let lenv = { env with continue ; break = b }  in
+      let flow = goto a (block lenv body continue) in
+      if flow = F_dead then F_dead else F_entry
+  | Block body ->
+      goto a (block env body b)
+  | UnspecifiedSequence s ->
+      let body = Cil.block_from_unspecified_sequence s in
+      goto a (block env body b)
+  | Throw _ | TryCatch _ | TryFinally _ | TryExcept _ ->
+      Wp_parameters.not_yet_implemented "try-catch blocks"
+
+and block env blk b = sequence env blk.bstmts b
+and sequence env seq b = match seq with
+  | [] -> b
+  | s :: seq -> stmt env s (sequence env seq b)
+
+(* -------------------------------------------------------------------------- *)
+(* --- Compute Reachability                                               --- *)
+(* -------------------------------------------------------------------------- *)
+
+let rec reached node =
+  match node.reached with
+  | Some r -> r
+  | None ->
+      node.reached <- Some true ; (* cut loops *)
+      let r = List.for_all reached_after node.prev in
+      node.reached <- Some r ; r
+
+and reached_after node =
+  match node.flow with
+  | F_goto -> reached node
+  | F_effect | F_entry | F_dead -> true
+  | F_return | F_branch | F_call -> false
+
+let smoking_node n =
+  match n.flow with
+  | F_effect | F_call | F_return -> not (reached n)
+  | F_goto | F_branch | F_entry | F_dead -> false
+
+(* returns true if the stmt requires a reachability smoke test *)
+let smoking nodes stmt =
+  try Stmt.Map.find stmt nodes |> smoking_node
+  with Not_found -> false
+
+let compute kf =
+  try
+    let f = Kernel_function.get_definition kf in
+    let cfg = ref Stmt.Map.empty in
+    let returned = node () in
+    let continue = node () in
+    let break = node () in
+    let entry = node () in
+    let body = block { cfg ; break ; continue } f.sbody returned in
+    let _ = goto entry body in
+    entry.flow <- F_entry ; !cfg
+  with Kernel_function.No_Definition ->
+    Stmt.Map.empty
+
+(* ---------------------------------------------------------------------- *)
+(* --- Dump for debugging                                             --- *)
+(* ---------------------------------------------------------------------- *)
+
+module G = Dotgraph
+module Nmap = Map.Make(struct type t = node let compare a b = a.id - b.id end)
+module N = Dotgraph.Node(Nmap)
+
+let dump ~dir kf reached =
+  let name = Kernel_function.get_name kf in
+  let file = Printf.sprintf "%s/%s.dot" dir name in
+  let dot = G.open_dot ~file ~name () in
+  N.define dot
+    (fun a na ->
+       let attr =
+         if smoking_node a
+         then [`Filled;`Fillcolor "orange"]
+         else
+           match a.flow with
+           | F_entry | F_effect | F_return | F_call ->
+               [`Filled;`Fillcolor "green"]
+           | F_dead -> [`Filled;`Fillcolor "red"]
+           | F_branch | F_goto -> []
+       in G.node dot na attr ;
+       List.iter
+         (fun b ->
+            let attr = match b.flow with
+              | F_call | F_branch | F_return | F_dead -> [`Dotted;`ArrowForward]
+              | F_effect | F_entry | F_goto -> [`ArrowForward]
+            in G.edge dot (N.get b) na attr)
+         a.prev
+    ) ;
+  Stmt.Map.iter
+    (fun s n ->
+       let label =
+         let module Pu = Pretty_utils in
+         let module Pr = Printer in
+         match s.skind with
+         | Instr _ | Return _ | Break _ | Continue _ | Goto _ ->
+             Pu.to_string Pr.pp_stmt s
+         | If(e,_,_,_) -> Pu.sfprintf "@[<hov 2>if (%a)@]" Pr.pp_exp e
+         | Switch(e,_,_,_) -> Pu.sfprintf "@[<hov 2>switch (%a)@]" Pr.pp_exp e
+         | Loop _ -> Printf.sprintf "Loop s%d" s.sid
+         | Block  _ -> Printf.sprintf "Block s%d" s.sid
+         | UnspecifiedSequence  _ -> Printf.sprintf "Seq. s%d" s.sid
+         | Throw _ | TryExcept _ | TryCatch _ | TryFinally _ ->
+             Printf.sprintf "Exn. s%d" s.sid
+       in G.node dot (N.get n) [`Box;`Label label])
+    reached ;
+  G.run dot ;
+  G.close dot ;
+  let out = G.layout dot in
+  Wp_parameters.result "Reached Graph: %s" out
+
+(* ---------------------------------------------------------------------- *)
+(* --- Projectified Analysis Result                                   --- *)
+(* ---------------------------------------------------------------------- *)
+
+module FRmap = Kernel_function.Make_Table
+    (Datatype.Make
+       (struct
+         type t = reached
+         include Datatype.Serializable_undefined
+         let reprs = [Stmt.Map.empty]
+         let name = "WpReachable.reached"
+       end))
+    (struct
+      let name = "WpReachable.compute"
+      let dependencies = [Ast.self]
+      let size = 17
+    end)
+
+let dkey = Wp_parameters.register_category "reached"
+
+let reached = FRmap.memo
+    begin fun kf ->
+      let r = compute kf in
+      (if Wp_parameters.has_dkey dkey then
+         let dir = Wp_parameters.get_session_dir ~force:true "reach" in
+         dump ~dir kf r ) ; r
+    end
+
+(* -------------------------------------------------------------------------- *)

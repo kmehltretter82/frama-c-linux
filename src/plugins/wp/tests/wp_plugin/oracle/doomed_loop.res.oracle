@@ -7,7 +7,17 @@
   Function foo
 ------------------------------------------------------------
 
-Goal Smoke_loop_invariant in 'foo' at loop (file tests/wp_plugin/doomed_loop.i, line 22):
+Goal Wp_smoke_dead_loop in 'foo' at loop (file tests/wp_plugin/doomed_loop.i, line 22):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Wp_smoke_dead_code in 'foo' at instruction (file tests/wp_plugin/doomed_loop.i, line 23):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Wp_smoke_dead_code in 'foo' at return (file tests/wp_plugin/doomed_loop.i, line 25):
 Prove: true.
 
 ------------------------------------------------------------

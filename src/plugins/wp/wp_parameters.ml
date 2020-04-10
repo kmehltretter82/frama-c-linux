@@ -375,6 +375,27 @@ module SmokeTests =
   end)
 
 let () = Parameter_customize.set_group wp_strategy
+module SmokeDeadcode =
+  True(struct
+    let option_name = "-wp-smoke-dead-code"
+    let help = "When generating smoke tests, look for unreachable code"
+  end)
+
+let () = Parameter_customize.set_group wp_strategy
+module SmokeDeadcall =
+  True(struct
+    let option_name = "-wp-smoke-dead-call"
+    let help = "When generating smoke tests, look for non-terminating calls"
+  end)
+
+let () = Parameter_customize.set_group wp_strategy
+module SmokeDeadloop =
+  True(struct
+    let option_name = "-wp-smoke-dead-loop"
+    let help = "When generating smoke tests, look for inconsistent loop invairants"
+  end)
+
+let () = Parameter_customize.set_group wp_strategy
 module Split =
   False(struct
     let option_name = "-wp-split"

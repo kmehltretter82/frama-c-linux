@@ -214,13 +214,12 @@ let is_verdict r = match r.verdict with
 let is_valid = function { verdict = Valid } -> true | _ -> false
 let is_computing = function { verdict=Computing _ } -> true | _ -> false
 
-let verdict ~smoke r =
-  if smoke then
-    match r.verdict with
-    | (Failed | NoResult | Checked | Computing _) as r -> r
-    | Valid -> Invalid
-    | Invalid | Unknown | Timeout | Stepout -> Valid
-  else r.verdict
+let smoked = function
+  | (Failed | NoResult | Computing _) as r -> r
+  | Valid -> Invalid
+  | Invalid | Unknown | Timeout | Stepout -> Valid
+
+let verdict ~smoke r = if smoke then smoked r.verdict else r.verdict
 
 let is_proved ~smoke r = (verdict ~smoke r = Valid)
 

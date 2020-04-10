@@ -155,7 +155,7 @@ val compute : t -> Definitions.axioms option * Conditions.sequent
 val has_verdict : t -> prover -> bool
 val get_result : t -> prover -> result
 val get_results : t -> (prover * result) list
-val get_proof : t -> bool * Property.t
+val get_proof : t -> [`Passed|`Failed|`Unknown] * Property.t
 val get_target : t -> Property.t
 val is_trivial : t -> bool (** do not tries simplification, do not check prover results *)
 val is_proved : t -> bool (** do not tries simplification, check prover results *)
