@@ -736,26 +736,18 @@ struct
         Set( v2 , update v1 ofs v )
     | _ -> failwith "MemVar stored on a non MemVar location"
 
-  let memvar_set_init seq l v =
-    match l with
-    | Ref x -> noref ~op:"write to" x
-    | Val((CREF|CVAL),x,ofs) ->
-        let v1 = get_init_term seq.pre x in
-        let v2 = get_init_term seq.post x in
-        Set( v2 , update_init v1 ofs v )
-    | _ -> failwith "MemVar initialize on a non MemVar location"
-
+  let memvar_set_init seq x ofs v =
+    if x.vformal || x.vglob then []
+    else
+      let v1 = get_init_term seq.pre x in
+      let v2 = get_init_term seq.post x in
+      [ Set( v2 , update_init v1 ofs v ) ]
 
   let stored seq obj l v = match l with
     | Ref x -> noref ~op:"write to" x
-    | Val((CREF|CVAL),x,_) ->
-        let init =
-          if not (x.vformal || x.vglob) then
-            [ memvar_set_init seq l (Cvalues.initialized_obj obj) ]
-          else
-            []
-        in
-        (memvar_stored seq obj l v) :: init
+    | Val((CREF|CVAL),x,ofs) ->
+        let init = Cvalues.initialized_obj obj in
+        (memvar_stored seq obj l v) :: (memvar_set_init seq x ofs init)
     | Val((CTXT|CARR|HEAP) as m,x,ofs) ->
         M.stored (mseq_of_seq seq) obj (mloc_of_path m x ofs) v
     | Loc l ->
@@ -1259,40 +1251,42 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   let rec monotonic_initialized seq obj x ofs =
-    match obj with
-    | C_int _ | C_float _ | C_pointer _ ->
-        p_imply
-          (p_bool (access_init (get_init_term seq.pre x) ofs))
-          (p_bool (access_init (get_init_term seq.post x) ofs))
-    | C_array { arr_flat=flat ; arr_element=t } ->
-        let size = match flat with
-          | None -> unsized_array ()
-          | Some { arr_size } -> arr_size
-        in
-        let low = (e_int 0) in
-        let up = (e_int (size-1)) in
-        let v = Lang.freshvar ~basename:"i" Lang.t_int in
-        let hyp = p_and (p_leq low (e_var v)) (p_leq (e_var v) up) in
-        let obj = Ctypes.object_of t in
-        let ofs = ofs @ [ Shift(obj, e_var v) ] in
-        let sub = monotonic_initialized seq obj x ofs in
-        Lang.F.p_forall [v] (p_imply hyp sub)
-    | C_comp ci ->
-        let mk_pred f =
-          let obj = Ctypes.object_of f.ftype in
-          let ofs = ofs @ [Field f] in
-          monotonic_initialized seq obj x ofs
-        in
-        Lang.F.p_conj (List.map mk_pred ci.cfields)
+    if x.vformal || x.vglob then p_true
+    else
+      match obj with
+      | C_int _ | C_float _ | C_pointer _ ->
+          p_imply
+            (p_bool (access_init (get_init_term seq.pre x) ofs))
+            (p_bool (access_init (get_init_term seq.post x) ofs))
+      | C_array { arr_flat=flat ; arr_element=t } ->
+          let size = match flat with
+            | None -> unsized_array ()
+            | Some { arr_size } -> arr_size
+          in
+          let low = (e_int 0) in
+          let up = (e_int (size-1)) in
+          let v = Lang.freshvar ~basename:"i" Lang.t_int in
+          let hyp = p_and (p_leq low (e_var v)) (p_leq (e_var v) up) in
+          let obj = Ctypes.object_of t in
+          let ofs = ofs @ [ Shift(obj, e_var v) ] in
+          let sub = monotonic_initialized seq obj x ofs in
+          Lang.F.p_forall [v] (p_imply hyp sub)
+      | C_comp ci ->
+          let mk_pred f =
+            let obj = Ctypes.object_of f.ftype in
+            let ofs = ofs @ [Field f] in
+            monotonic_initialized seq obj x ofs
+          in
+          Lang.F.p_conj (List.map mk_pred ci.cfields)
 
   let memvar_assigned seq obj loc v =
     match loc with
     | Ref x -> noref ~op:"write to" x
     | Val((CREF|CVAL),x,ofs) ->
         let init = e_var (Lang.freshvar ~basename:"v" (init_of_object obj)) in
-        (memvar_set_init seq loc init) ::
+        (memvar_stored seq obj loc v) ::
         Assert(monotonic_initialized seq obj x ofs) ::
-        [ memvar_stored seq obj loc v ]
+        (memvar_set_init seq x ofs init)
     | _ -> failwith "MemVar assigned on a non MemVar location"
 
   let assigned_loc seq obj = function
@@ -1339,8 +1333,8 @@ struct
         let ofs = ofs_shift elt (e_var k) ofs in
         let obj_x = Ctypes.object_of x.vtype in
         let init = e_var (Lang.freshvar ~basename:"v" (init_of_object obj_x)) in
-        (memvar_set_init seq (Val(m,x,[])) init) ::
         Assert(monotonic_initialized seq obj_x x []) ::
+        (memvar_set_init seq x [] init) @
         (assigned_genset seq [k] m x ofs p)
 
   let assigned_descr seq obj xs l p =
@@ -1353,8 +1347,8 @@ struct
     | Val((CVAL|CREF) as m,x,ofs) ->
         let obj_x = Ctypes.object_of x.vtype in
         let init = e_var (Lang.freshvar ~basename:"v" (init_of_object obj_x)) in
-        (memvar_set_init seq (Val(m,x,[])) init) ::
         Assert(monotonic_initialized seq obj_x x []) ::
+        (memvar_set_init seq x [] init) @
         (assigned_genset seq xs m x ofs p)
 
   let assigned seq obj = function
