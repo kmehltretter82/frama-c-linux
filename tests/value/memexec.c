@@ -154,11 +154,35 @@ void f9_1() {
   /*@ assert z2 == 0; */
 }
 
+void f9_2() {
+  /*@ assert \valid(p); */
+}
+
+void f9_3() {
+  /*@ assert \initialized(p); */
+}
+
+void f9_4() {
+  /*@ assert \at(z2, Pre) > 0; */
+}
+
 void f9() {
   z2 = 1;
-  if (nondet) f9_1();
+  if (nondet) f9_1(); // Non terminating.
   z2 = 0;
-  f9_1();
+  f9_1(); // This call must be terminating.
+  int x;
+  p = 0;
+  if (nondet) f9_2(); // Non terminating.
+  p = &x;
+  f9_2(); // This call must be terminating.
+  if (nondet) f9_3(); // Non terminating.
+  x = 1;
+  f9_3(); // This call must be terminating.
+  z2 = 0;
+  if (nondet) f9_4(); // Non terminating.
+  z2 = 1;
+  f9_4(); // This call must be terminating.
 }
 
 void main () {
