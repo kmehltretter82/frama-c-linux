@@ -1568,6 +1568,13 @@ let default_config () =
   end
   else default_config ()
 
+(* if we have some references to directories in the default config, they
+   need to be adapted to the actual test directory. *)
+let update_dir_ref dir config =
+  let update_execnow e = { e with ex_dir = dir } in
+  let dc_execnow = List.map update_execnow config.dc_execnow in
+  { config with dc_execnow }
+
 let () =
   (* enqueue the test files *)
   let default_suites () =
@@ -1612,13 +1619,15 @@ let () =
                           suite)
        in
        let config = SubDir.make_file directory dir_config_file in
+       let default = default_config () in
+       let default = update_dir_ref directory default in
        let dir_config =
          if Sys.file_exists config
          then begin
            let scan_buffer = Scanf.Scanning.from_file config in
-           scan_options directory scan_buffer (default_config ())
+           scan_options directory scan_buffer default
          end
-         else default_config ()
+         else default
        in
        if interpret_as_file
        then begin
