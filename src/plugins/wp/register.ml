@@ -351,7 +351,7 @@ let do_wpo_stat goal prover res =
   let smoke = Wpo.is_smoke_test goal in
   let verdict = VCS.verdict ~smoke res in
   match verdict with
-  | Checked | NoResult | Computing _ | Unknown ->
+  | NoResult | Computing _ | Unknown ->
       s.unknown <- succ s.unknown
   | Stepout | Timeout ->
       s.interrupted <- succ s.interrupted
@@ -369,15 +369,6 @@ let do_wpo_stat goal prover res =
 let do_wpo_result goal prover res =
   if VCS.is_verdict res then
     begin
-      if Wp_parameters.Check.get () then
-        begin
-          let open VCS in
-          let ontty = if res.verdict = Checked then `Feedback else `Message in
-          Wp_parameters.feedback ~ontty
-            "[%a] Goal %s : %a"
-            VCS.pp_prover prover (Wpo.get_gid goal)
-            VCS.pp_result res ;
-        end ;
       if prover = VCS.Qed then do_progress goal "Qed" ;
       do_wpo_stat goal prover res ;
     end

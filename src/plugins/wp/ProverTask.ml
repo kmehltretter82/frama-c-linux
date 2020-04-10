@@ -28,7 +28,6 @@ open Task
 
 let dkey_prover = Wp_parameters.register_category "prover"
 
-
 (* -------------------------------------------------------------------------- *)
 (* --- Export Printer                                                     --- *)
 (* -------------------------------------------------------------------------- *)
@@ -315,7 +314,8 @@ let schedule task =
   Task.spawn server (Task.thread task)
 
 let silent _ = ()
-let spawn ?(monitor=silent) ?pool (jobs : ('a * bool Task.task) list) =
+let spawn ?(monitor=silent) ?pool ~all
+    (jobs : ('a * bool Task.task) list) =
   if jobs <> [] then
     begin
       let step = ref 0 in
@@ -323,7 +323,7 @@ let spawn ?(monitor=silent) ?pool (jobs : ('a * bool Task.task) list) =
       let canceled = ref false in
       let callback a r =
         if r then
-          begin if not !canceled && not (Wp_parameters.RunAllProvers.get()) then
+          begin if not all && not !canceled then
               begin
                 canceled := true ;
                 monitor (Some a) ;

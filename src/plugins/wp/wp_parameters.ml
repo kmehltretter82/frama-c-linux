@@ -992,16 +992,6 @@ module OutputDir =
                 Defaults to some temporary directory."
   end)
 
-let () = Parameter_customize.set_group wp_po
-let () = Parameter_customize.do_not_save ()
-module Check =
-  Action(struct
-    let option_name = "-wp-check"
-    let help =
-      "Check the syntax and type of the produced file, instead of proving."
-  end)
-let () = on_reset Print.clear
-
 (* -------------------------------------------------------------------------- *)
 (* --- Overflows                                                          --- *)
 (* -------------------------------------------------------------------------- *)

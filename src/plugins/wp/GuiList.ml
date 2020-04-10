@@ -52,7 +52,7 @@ let render_prover_result p =
   let icn_running = icn_stock "gtk-execute" in
   let open VCS in
   let icon_of_verdict = function
-    | Checked | NoResult -> icn_none
+    | NoResult -> icn_none
     | Valid    -> icn_valid
     | Invalid  -> icn_invalid
     | Unknown  -> icn_unknown
