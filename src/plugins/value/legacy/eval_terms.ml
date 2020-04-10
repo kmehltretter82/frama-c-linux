@@ -2587,8 +2587,6 @@ and eval_predicate env pred =
 (* --- Dependencies of predicates                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
-(* Currently unused (and untested *)
-
 let predicate_deps env pred =
   let alarm_mode = Ignore in
   let rec do_eval env p =
@@ -2639,18 +2637,20 @@ let predicate_deps env pred =
 
     | Papp (li, _labels, _args) -> begin
         if is_known_predicate li.l_var_info then
-          assert false (* TODO! Must evaluate the arguments, plus the
-                          dependencies of the predicate itself. *)
+          (* TODO! Must evaluate the arguments, plus the dependencies of the
+             predicate itself. *)
+          unsupported (Format.asprintf "%a" Cil_datatype.Predicate.pretty p)
         else
           match Inline.inline_predicate ~inline ~current:env.e_cur p with
-          | None -> assert false
+          | None -> unsupported (Format.asprintf "%a" Cil_datatype.Predicate.pretty p)
           | Some p' -> do_eval env p'
       end
 
     | Pfresh _ | Pallocable _ | Pfreeable _
-      -> assert false
+      -> unsupported (Format.asprintf "%a" Cil_datatype.Predicate.pretty p)
   in
-  do_eval env pred
+  try Some (do_eval env pred)
+  with LogicEvalError _ -> None
 
 
 (* -------------------------------------------------------------------------- *)
