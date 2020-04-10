@@ -1,1 +1,5 @@
+[kernel] Parsing share/e-acsl/e_acsl_gmp_api.h (with preprocessing)
+[kernel] Parsing share/e-acsl/e_acsl.h (with preprocessing)
 [kernel] Parsing tests/special/e-acsl-valid.c (with preprocessing)
+[eva:alarm] tests/special/e-acsl-valid.c:37: Warning: 
+  function f: precondition \valid(y) got status unknown.
