@@ -40,18 +40,15 @@
       begin
         let dot = G.open_dot ~name:"mygraph" () in
         (* For each generated node, declare it and link to its children. *)
-        N.push dot
-          (fun a ->
-             let na = N.inode dot a in
+        N.define dot
+          (fun a na ->
              try
                List.iter
-                 (fun b -> G.link dot na (N.get b))
+                 (fun b -> G.edge dot na (N.get b) [])
                  (M.find a graph)
              with Not_found -> ()) ;
-        (* Starts by emitting roots *)
-        List.iter
-          (fun r -> ignore (N.get r))
-          roots ;
+        (* Starts by emitting some roots, or all nodes *)
+        List.iter N.add roots ;
         (* Proceeds to the traversal *)
         G.pop_all dot ;
         (* You may then complete your graph
@@ -214,6 +211,7 @@ end
 module Node(M : Map) :
 sig
   type t = M.key
+  val add : t -> unit
   val get : t -> node
   val node : dot -> t -> attr list -> unit
   val inode : dot -> t -> attr list -> node
@@ -221,22 +219,12 @@ sig
   val irecord : dot -> t -> ?rounded:bool -> ?attr:attr list -> record -> node
   val clear : unit -> unit
 
-  (** Executes the callback {i once} for all created nodes.
-      Any previously registered callback by [once] or [push] is replaced
-      by the new one.
-
-      {b Warning:} the callback is executed as soon as [get] is called
-      for the first time, possibly interfering with your current output
-      on a [dot] buffer. To insert additional Dot material with a callback,
-      use [push] instead.
-  *)
-  val once : (t -> node -> unit) -> unit
-
-  (** Pushes the callback {i once} for all created nodes.
-      You must call [pop_call] at some point to flush them.
-      Any previsously registred callback by [once] or [push] is replaced
+  (** Pushes the callback which will be executed {i once}
+      for all created nodes.
+      You must call [run dot] at some point to flush them.
+      Any previsously registred callback is replaced
       by the new one. *)
-  val push : dot -> (t -> node -> unit) -> unit
+  val define : dot -> (t -> node -> unit) -> unit
 
   (** Set node prefix.
       Otherwize, some default one is created for each functor application. *)
@@ -247,7 +235,7 @@ end
 val push : dot -> (unit -> unit) -> unit
 
 (** Flushes all pending continuations. *)
-val pop_all : dot -> unit
+val run : dot -> unit
 
 (** {1 Decorator} *)
 
