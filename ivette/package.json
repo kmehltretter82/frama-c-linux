@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "lint": "eslint --ext .ts,.tsx --format=stylish ./src",
-    "typecheck": "tsc",
+    "typecheck": "tsc --noEmit",
     "typecheck:watch": "yarn run typecheck -- --watch"
   },
   "devDependencies": {
