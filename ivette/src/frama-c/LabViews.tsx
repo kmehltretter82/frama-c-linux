@@ -48,19 +48,19 @@ class Library {
     }
   }
 
-  useItem(id: string, gcontext: any, path: any[], props: { rank: undefined; group: any; }) {
+  useItem(id: string, gcontext: any, path: any[], props: { rank: undefined; group: any }) {
     if (!this.modified) {
       this.modified = true;
       setImmediate(() => this.commit());
     }
     if (!id) return undefined;
-    let order = props.rank === undefined
+    const order = props.rank === undefined
       ? path
       : path.slice(0, -1).concat([props.rank]);
-    let group = props.group || gcontext;
-    let collection: any = this.virtual;
+    const group = props.group || gcontext;
+    const collection: any = this.virtual;
     collection[id] = Object.assign({ id, order, group }, props);
-    return () => delete collection[id];
+    return (): boolean => delete collection[id];
   }
 
 }
@@ -76,11 +76,11 @@ const getItems = (items: any[], fd: string) => items.filter((item) => isItemId(f
 const LibraryManager = React.createContext(undefined);
 
 const useLibraryItem = (fd: string, { id, ...props }: any) => {
-  let context = React.useContext(LibraryManager);
+  const context = React.useContext(LibraryManager);
   React.useEffect(() => {
     if (context) {
-      let { group, order, library }: any = context;
-      let itemId = fd + '.' + id;
+      const { group, order, library }: any = context;
+      const itemId = fd + '.' + id;
       return library.useItem(itemId, group, order, props);
     } else
       return undefined;
@@ -90,8 +90,9 @@ const useLibraryItem = (fd: string, { id, ...props }: any) => {
 
 const Rankify = ({ library, group, order, children }: any) => {
   let rank = 0;
-  let rankify = (elt: any) => {
-    let context: any = { group, order: order.concat([rank++]), library };
+  const rankify = (elt: any) => {
+    const context: any = { group, order, library };
+    context.order.concat([rank++])
     return (
       <LibraryManager.Provider value={context}>
         {elt}
@@ -123,7 +124,7 @@ const UseLibrary = ({ library, children }: any) => (
    Otherwized, elements are ordered by `rank` and `id`.
  */
 export const Fragment = ({ group, children }: any) => {
-  let context: any = React.useContext(LibraryManager);
+  const context: any = React.useContext(LibraryManager);
   if (!context)
     return null;
   else {
@@ -153,7 +154,7 @@ export const Fragment = ({ group, children }: any) => {
    use `<Fragment/>` instead of `<React.Fragment/>` to specify order.
  */
 export const Group = ({ children, ...props }: any) => {
-  let context: any = useLibraryItem('groups', props);
+  const context: any = useLibraryItem('groups', props);
   return (
     <Rankify
       group={props.id}
@@ -232,7 +233,7 @@ const TitleContext: any = React.createContext(undefined);
    By default, the component title bar is labelled according to the component properties.
  */
 export const TitleBar = ({ icon, label, title, children }: any) => {
-  let context: any = React.useContext(TitleContext);
+  const context: any = React.useContext(TitleContext);
   return (
     <ItemToRender id={'labview.title.' + context.id}>
       <Label className='labview-handle' icon={icon}
@@ -264,9 +265,9 @@ const GRIDITEM_HPANE = { fill: 'horizontal' };
 const GRIDITEM_VPANE = { fill: 'vertical' };
 
 const makeGridItem = (customize: any, onClose: any) => (comp: any) => {
-  let { id: libId, label, title, layout = 'PLAIN', children } = comp;
-  let id = getItemId('components', libId);
-  let properties: any = Object.assign({}, GRIDITEM);
+  const { id: libId, label, title, layout = 'PLAIN', children } = comp;
+  const id = getItemId('components', libId);
+  const properties: any = Object.assign({}, GRIDITEM);
   switch (layout) {
     case 'PLAIN':
       Object.assign(properties, GRIDITEM_PLAIN);
@@ -281,8 +282,8 @@ const makeGridItem = (customize: any, onClose: any) => (comp: any) => {
       console.warn(`[labviews] unexpected layout for ${id} component`, layout);
       break;
   }
-  for (let fd in properties) {
-    let prop = comp[fd];
+  for (const fd in properties) {
+    const prop = comp[fd];
     if (prop) properties[fd] = prop;
   }
   let CLOSING;
@@ -325,7 +326,7 @@ function CustomViews({ settings, shape, setShape, views: libViews }: any) {
   const triggerDefault = React.useRef();
   const { current, shapes = {} } = local;
 
-  let theViews: any = {};
+  const theViews: any = {};
 
   _.forEach(libViews, (view) => {
     const { id: origin, order, label = '(Stock View)', title, defaultView } = view;
@@ -347,7 +348,7 @@ function CustomViews({ settings, shape, setShape, views: libViews }: any) {
   );
 
   const getDefaultShape = (view: any) => {
-    let stock = getStock(view && view.origin);
+    const stock = getStock(view && view.origin);
     return stock && Grids.makeChildrenShape(stock.children);
   };
 
@@ -360,10 +361,10 @@ function CustomViews({ settings, shape, setShape, views: libViews }: any) {
   };
 
   const POPUP = (id: string) => {
-    let view = theViews[id];
+    const view = theViews[id];
     if (!view) return;
-    let isCurrent = current === id;
-    let isCustom = !view.builtin;
+    const isCurrent = current === id;
+    const isCustom = !view.builtin;
 
     const DEFAULT = () => {
       shapes[id] = undefined;
@@ -374,8 +375,8 @@ function CustomViews({ settings, shape, setShape, views: libViews }: any) {
     const RENAME = () => setEdited(id);
 
     const DUPLICATE = () => {
-      let base = 'custom.' + view.origin;
-      let stock = getStock(view.origin);
+      const base = 'custom.' + view.origin;
+      const stock = getStock(view.origin);
       let k = 1, newId = base;
       while (theViews[newId]) newId = base + '~' + (++k);
       let newOrder = view.order;
@@ -400,7 +401,7 @@ function CustomViews({ settings, shape, setShape, views: libViews }: any) {
       delete customs[id];
       delete shapes[id];
       setCustoms(customs);
-      let newCurrent = current === id ? undefined : current;
+      const newCurrent = current === id ? undefined : current;
       setLocal({ current: newCurrent, shapes });
     };
 
@@ -417,7 +418,7 @@ function CustomViews({ settings, shape, setShape, views: libViews }: any) {
     if (edited === id) {
       const RENAMED = (newLabel: string) => {
         if (newLabel) {
-          let custom = customs[id];
+          const custom = customs[id];
           if (custom) custom.label = newLabel;
           setCustoms(customs);
         }
@@ -477,8 +478,8 @@ const DRAGOVERLAY = { className: 'labview-stock' };
 function CustomGroup({ dnd, shape, setDragging, id, title, label, components }: any) {
 
   const makeComponent = ({ id, label, title }: any) => {
-    let itemId = getItemId('components', id);
-    let disabled = Grids.getShapeItem(shape, itemId) !== undefined;
+    const itemId = getItemId('components', id);
+    const disabled = Grids.getShapeItem(shape, itemId) !== undefined;
     return (
       <DragSource key={id} dnd={dnd}
         disabled={disabled}
@@ -507,25 +508,25 @@ function CustomizePanel({ dnd, settings, library, shape, setShape, setDragging }
   const views = getItems(items, 'views');
   const groups = getItems(items, 'groups');
   const components = getItems(items, 'components');
-  const setting_folds = settings && settings + '.folds';
-  const setting_views = settings && settings + '.views';
+  const settingFolds = settings && settings + '.folds';
+  const settingViews = settings && settings + '.views';
   const contents: any = {};
 
   groups.unshift({ id: 'nogroup', label: 'Components' });
   groups.forEach((g) => contents[g.id] = []);
 
   components.forEach((c) => {
-    let gid = c.group ? 'groups.' + c.group : 'nogroup';
+    const gid = c.group ? 'groups.' + c.group : 'nogroup';
     let content = contents[gid];
     if (content === undefined) content = contents.nogroup;
     content.push(c);
   });
 
   return (
-    <SideBar settings={setting_folds}>
+    <SideBar settings={settingFolds}>
       <CustomViews
         key='views'
-        settings={setting_views}
+        settings={settingViews}
         shape={shape}
         setShape={setShape}
         views={views} />
@@ -561,14 +562,14 @@ function CustomizePanel({ dnd, settings, library, shape, setShape, setDragging }
 export function LabView(props: any) {
   // Parameters
   const { settings, customize = false, children } = props;
-  const setting_split = settings && settings + '.split';
-  const setting_shape = settings && settings + '.shape';
-  const setting_panel = settings && settings + '.panel';
+  const settingSplit = settings && settings + '.split';
+  const settingShape = settings && settings + '.shape';
+  const settingPanel = settings && settings + '.panel';
   // Hooks & State
   Dome.useUpdate('labview.library', 'dome.defaults');
   const dnd = React.useMemo(() => new DnD(), []);
   const lib = React.useMemo(() => new Library(), []);
-  const [shape, setShape] = Dome.useState(setting_shape);
+  const [shape, setShape] = Dome.useState(settingShape);
   const [dragging, setDragging] = React.useState();
   // Preparation
   const onClose = (id: string) => setShape(Grids.removeShapeItem(shape, id));
@@ -581,7 +582,7 @@ export function LabView(props: any) {
       <UseLibrary library={lib}>
         {children}
       </UseLibrary>
-      <Splitter settings={setting_split} unfold={customize} dir='RIGHT'>
+      <Splitter settings={settingSplit} unfold={customize} dir='RIGHT'>
         <GridLayout
           dnd={dnd}
           padding={2}
@@ -592,7 +593,7 @@ export function LabView(props: any) {
           holding={holding} />
         <CustomizePanel
           dnd={dnd}
-          settings={setting_panel}
+          settings={settingPanel}
           shape={shape}
           setShape={setShape}
           setDragging={setDragging}

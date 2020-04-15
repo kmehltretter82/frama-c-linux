@@ -6,9 +6,9 @@
   "author": "Loïc Correnson <loic.correnson@cea.fr>",
   "license": "MIT",
   "scripts": {
-    "lint": "eslint --ext .ts,.tsx --format=stylish .",
+    "lint": "eslint --ext .ts,.tsx --format=stylish ./src",
     "typecheck": "tsc",
-    "typecheck:watch": "yarn run type-check -- --watch"
+    "typecheck:watch": "yarn run typecheck -- --watch"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
@@ -25,12 +25,17 @@
     "@types/node": "12.12.21",
     "@types/react": "^16.9.17",
     "@types/react-dom": "^16.9.6",
+    "@typescript-eslint/eslint-plugin": "^2.28.0",
+    "@typescript-eslint/parser": "^2.28.0",
     "babel-loader": "^8.0.6",
     "css-loader": "^3.4.0",
     "electron": "^7",
     "electron-builder": "^22.4.1",
     "electron-devtools-installer": "^2.2.4",
     "electron-webpack": "^2.8.2",
+    "eslint": "^6.8.0",
+    "eslint-plugin-react": "^7.19.0",
+    "eslint-plugin-react-hooks": "^3.0.0",
     "html-loader": "1.0.0-alpha.0",
     "jsdoc": "^3.6.3",
     "react-hot-loader": "^4.12.20",

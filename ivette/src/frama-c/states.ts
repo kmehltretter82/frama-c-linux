@@ -36,13 +36,13 @@ export const STATE = 'frama-c.state.';
 // --- Synchronized Current Project
 // --------------------------------------------------------------------------
 
-var currentProject: string = '<None>';
-var states: any = {};
-var stateDefaults: any = {};
+let currentProject = '<None>';
+let states: any = {};
+const stateDefaults: any = {};
 
 Server.onReady(() => {
   Server.sendGET('kernel.project.getCurrent', null)
-    .then((current: { id: string; }) => {
+    .then((current: { id: string }) => {
       currentProject = current.id;
       Dome.emit(PROJECT);
     });
@@ -199,7 +199,7 @@ export function useDictionary(rq: string, params: any = null, options: any = {})
   const dict = React.useMemo(() => {
     const d: any = {};
     _.forEach(tags, tg => {
-      let k: any = tg[key];
+      const k: any = tg[key];
       if (k && (!filter || filter(tg))) d[k] = tg;
     });
     return d;
@@ -216,8 +216,8 @@ class SyncState {
   id: any;
   UPDATE: string;
   signal: string;
-  get_rq: string;
-  set_rq: string;
+  getRq: string;
+  setRq: string;
   insync: boolean;
   effect: any;
   value: undefined;
@@ -226,8 +226,8 @@ class SyncState {
     this.id = id;
     this.UPDATE = STATE + id;
     this.signal = id + '.sig';
-    this.get_rq = id + '.get';
-    this.set_rq = id + '.set';
+    this.getRq = id + '.get';
+    this.setRq = id + '.set';
     this.insync = false;
     this.value = undefined;
     this.update = this.update.bind(this);
@@ -245,13 +245,13 @@ class SyncState {
   setValue(v: any) {
     this.insync = true;
     this.value = v;
-    Server.sendSET(this.set_rq, v);
+    Server.sendSET(this.setRq, v);
     Dome.emit(this.UPDATE);
   }
 
   update() {
     this.insync = true;
-    Server.sendGET(this.get_rq, null).then((v: any) => {
+    Server.sendGET(this.getRq, null).then((v: any) => {
       this.value = v;
       Dome.emit(this.UPDATE);
     });
@@ -263,7 +263,7 @@ class SyncState {
 // --- Synchronized States Registry
 // --------------------------------------------------------------------------
 
-var syncStates: any = {};
+let syncStates: any = {};
 
 function getSyncState(id: any) {
   let s: any = syncStates[id];
@@ -288,7 +288,7 @@ Server.onShutdown(() => syncStates = {});
  *  - listens to `<id>.sig` signal to stay in sync with server updates.
  */
 export function useSyncState(id: string) {
-  let s = getSyncState(id);
+  const s = getSyncState(id);
   Dome.useUpdate(PROJECT, s.UPDATE);
   Server.useSignal(s.signal, s.update);
   return [s.value(), s.setValue];
@@ -304,7 +304,7 @@ export function useSyncState(id: string) {
  *  - listens to `<id>.sig` signal to stay in sync with server updates.
  */
 export function useSyncValue(id: string) {
-  let s = getSyncState(id);
+  const s = getSyncState(id);
   Dome.useUpdate(s.update);
   Server.useSignal(s.signal, s.update);
   return s.value();
@@ -318,16 +318,16 @@ export function useSyncValue(id: string) {
 class SyncArray {
   UPDATE: string;
   signal: string;
-  fetch_rq: string;
-  reload_rq: string;
+  fetchRq: string;
+  reloadRq: string;
   index: any;
   insync: boolean;
 
   constructor(id: string) {
     this.UPDATE = STATE + id;
     this.signal = id + '.sig';
-    this.fetch_rq = id + '.fetch';
-    this.reload_rq = id + '.reload';
+    this.fetchRq = id + '.fetch';
+    this.reloadRq = id + '.reload';
     this.index = {};
     this.insync = false;
     this.fetch = this.fetch.bind(this);
@@ -345,7 +345,7 @@ class SyncArray {
 
   fetch() {
     this.insync = true;
-    Server.sendGET(this.fetch_rq, 50)
+    Server.sendGET(this.fetchRq, 50)
       .then(({
         reload = false, removed = [], updated = [], pending = 0
       }) => {
@@ -371,7 +371,7 @@ class SyncArray {
   }
 
   reload() {
-    Server.sendSET(this.reload_rq, null);
+    Server.sendSET(this.reloadRq, null);
     this.index = {};
     this.insync = false;
     Dome.emit(this.UPDATE);
@@ -383,7 +383,7 @@ class SyncArray {
 // --- Synchronized Arrays Registry
 // --------------------------------------------------------------------------
 
-var syncArrays = {}; // Model by project & id
+let syncArrays = {}; // Model by project & id
 
 function getSyncArray(id: string) {
   const path = [currentProject || '', id];
@@ -421,7 +421,7 @@ export function reloadArray(id: string) {
  *  - listens to `<id>.sig` signal to stay in sync with server updates.
  */
 export function useSyncArray(id: string) {
-  let a = getSyncArray(id);
+  const a = getSyncArray(id);
   Dome.useUpdate(PROJECT, a.UPDATE);
   Server.useSignal(a.signal, a.fetch);
   return a.getItems();

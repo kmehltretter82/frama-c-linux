@@ -16,7 +16,7 @@ import { Component } from 'frama-c/LabViews';
 
 const ColumnCode = DefineColumn({ renderValue: (text: string) => <Code>{text}</Code> });
 const ColumnTag = DefineColumn({
-  renderValue: (l: { label: string, descr: string }) =>
+  renderValue: (l: { label: string; descr: string }) =>
     (<Label label={l.label} title={l.descr} />)
 });
 

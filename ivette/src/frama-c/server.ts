@@ -94,30 +94,30 @@ export const ACTIVITY = 'frama-c.server.activity.';
  */
 export enum STATUS_CODE {
   OFF = 'OFF',
-  STARTED = 'STARTED', // Command started
-  RUNNING = 'RUNNING', // Server connected
-  KILLING = 'KILLING', // Waiting for halt
-  RESTART = 'RESTART', // Restart when halt
-  FAILED = 'FAILED'    // Error issued
+  STARTED = 'STARTED',
+  RUNNING = 'RUNNING',
+  KILLING = 'KILLING',
+  RESTART = 'RESTART',
+  FAILED = 'FAILED'
 }
 
 // --------------------------------------------------------------------------
 // --- Server Global State
 // --------------------------------------------------------------------------
 
-var status = STATUS_CODE.OFF;
-var error: any;     // process error
-var rqid: any;      // Request ID
-var pending: any;   // Pending promise callbacks
-var queue_cmd: any; // Queue of server commands to be sent
-var queue_ids: any; // Waiting request ids to be sent
-var polling: any;   // Timeout Polling timer
-var flushing: any;  // Immediate Flushing timer
-var config: any;    // Server config
-var process: any;   // Server process
-var socket: any;    // ZMQ (REQ) socket
-var busy: any;      // ZMQ socket is busy
-var killing: any;   // killing timeout
+let status = STATUS_CODE.OFF;
+let error: any;     // process error
+let rqid: any;      // Request ID
+let pending: any;   // Pending promise callbacks
+let queueCmd: any; // Queue of server commands to be sent
+let queueIds: any; // Waiting request ids to be sent
+let polling: any;   // Timeout Polling timer
+let flushing: any;  // Immediate Flushing timer
+let config: any;    // Server config
+let process: any;   // Server process
+let socket: any;    // ZMQ (REQ) socket
+let busy: any;      // ZMQ socket is busy
+let killing: any;   // killing timeout
 
 // --------------------------------------------------------------------------
 // --- Server Console
@@ -191,15 +191,15 @@ export function onActivity(signal: string, callback: any) {
 // --- Status Update
 // --------------------------------------------------------------------------
 
-function _status(new_s: STATUS_CODE, err: string | null) {
+function _status(newStatus: STATUS_CODE, err: string | null) {
   if (Dome.DEVEL && err) console.error('[Server]', err);
-  if (new_s !== status || err) {
-    let old_s = status;
-    status = new_s;
+  if (newStatus !== status || err) {
+    const oldStatus = status;
+    status = newStatus;
     error = err ? err.toString() : undefined;
     Dome.emit(STATUS);
-    if (old_s === STATUS_CODE.RUNNING) Dome.emit(SHUTDOWN);
-    if (new_s === STATUS_CODE.RUNNING) Dome.emit(READY);
+    if (oldStatus === STATUS_CODE.RUNNING) Dome.emit(SHUTDOWN);
+    if (newStatus === STATUS_CODE.RUNNING) Dome.emit(READY);
   }
 }
 
@@ -407,7 +407,7 @@ async function _launch() {
 
   buffer.clear();
   buffer.append('$', command);
-  let size = params.reduce((n: any, p: any) => n + p.length, 0);
+  const size = params.reduce((n: any, p: any) => n + p.length, 0);
   if (size < 40)
     buffer.append('', ...params);
   else
@@ -421,14 +421,14 @@ async function _launch() {
 
   if (!cwd) cwd = System.getWorkingDir();
   if (!sockaddr) {
-    let socketfile = System.join(cwd, '.frama-c.' + System.getPID() + '.io');
+    const socketfile = System.join(cwd, '.frama-c.' + System.getPID() + '.io');
     System.atExit(() => System.remove(socketfile));
     sockaddr = 'ipc://' + socketfile;
   }
   logout = logout && System.join(cwd, logout);
   logerr = logerr && System.join(cwd, logerr);
   params = ['-server-zmq', sockaddr, '-then'].concat(params);
-  let options = {
+  const options = {
     cwd,
     stdout: { path: logout, pipe: true },
     stderr: { path: logerr, pipe: true },
@@ -465,8 +465,8 @@ async function _launch() {
 function _reset() {
   rqid = 0;
   process = undefined;
-  queue_cmd = [];
-  queue_ids = [];
+  queueCmd = [];
+  queueIds = [];
   _.forEach(pending, ({ reject }) => reject('shutdown'));
   pending = {};
   if (flushing) clearImmediate(flushing);
@@ -483,7 +483,7 @@ function _kill() {
 
 function _shutdown() {
   _reset();
-  queue_cmd.push('SHUTDOWN');
+  queueCmd.push('SHUTDOWN');
   _flush();
   if (!killing) {
     if (process) {
@@ -573,7 +573,7 @@ class Signal {
   }
 
   on(callback: any) {
-    let n = Dome.emitter.listenerCount(this.event);
+    const n = Dome.emitter.listenerCount(this.event);
     Dome.on(this.event, callback);
     if (n === 0) {
       this.active = true;
@@ -583,7 +583,7 @@ class Signal {
 
   off(callback: any) {
     Dome.off(this.event, callback);
-    let n = Dome.emitter.listenerCount(this.event);
+    const n = Dome.emitter.listenerCount(this.event);
     if (n === 0) {
       this.active = false;
       if (isRunning()) this.sigoff();
@@ -595,7 +595,7 @@ class Signal {
     if (this.active && !this.listen) {
       Dome.emit(ACTIVITY + this.id, true);
       this.listen = true;
-      queue_cmd.push('SIGON', this.id);
+      queueCmd.push('SIGON', this.id);
       _flush();
     }
   }
@@ -606,7 +606,7 @@ class Signal {
       Dome.emit(ACTIVITY + this.id, false);
       if (isRunning()) {
         this.listen = false;
-        queue_cmd.push('SIGOFF', this.id);
+        queueCmd.push('SIGOFF', this.id);
         _flush();
       }
     }
@@ -684,18 +684,18 @@ function _sendRequest(kind: string, rq: any, params: null | string = null) {
   });
   promise.kill = () => {
     if (socket && pending[rid]) {
-      queue_cmd.push('KILL', rid);
+      queueCmd.push('KILL', rid);
       _flush();
     }
   };
-  queue_cmd.push(kind, rid, rq, data);
-  queue_ids.push(rid);
+  queueCmd.push(kind, rid, rq, data);
+  queueIds.push(rid);
   _flush();
   return promise;
 }
 
 function _resolve(id: string | number, data: string) {
-  let promise = pending[id];
+  const promise = pending[id];
   if (promise) {
     delete pending[id];
     promise.resolve(JSON.parse(data));
@@ -703,7 +703,7 @@ function _resolve(id: string | number, data: string) {
 }
 
 function _reject(id: string | number, error: string) {
-  let promise = pending[id];
+  const promise = pending[id];
   if (promise) {
     delete pending[id];
     promise.reject(error);
@@ -733,7 +733,7 @@ function _flush() {
 
 function _poll() {
   if (!polling) {
-    let delay = (config && config.polling) || 50;
+    const delay = (config && config.polling) || 50;
     polling = setTimeout(() => {
       polling = undefined;
       _send();
@@ -744,12 +744,12 @@ function _poll() {
 function _send() {
   // when busy, will be eventually re-triggered
   if (!busy) {
-    const cmds = queue_cmd;
+    const cmds = queueCmd;
     if (!cmds.length && _waiting()) cmds.push('POLL');
     if (cmds.length) {
-      const ids = queue_ids;
-      queue_cmd = [];
-      queue_ids = [];
+      const ids = queueIds;
+      queueCmd = [];
+      queueIds = [];
       if (socket) {
         busy = true;
         socket.send(cmds)
@@ -802,8 +802,6 @@ function _receive(resp: any) {
           err = shift();
           console.error('[Frama-C Server] ZMQ Protocol Error:', err);
           break;
-        case 'NONE':
-          break;
         default:
           console.error('[Frama-C Server] Unknown Response:', cmd);
           resp.length = 0;
@@ -811,7 +809,7 @@ function _receive(resp: any) {
       }
     }
   } finally {
-    if (queue_cmd.length)
+    if (queueCmd.length)
       _flush();
     else
       _poll();

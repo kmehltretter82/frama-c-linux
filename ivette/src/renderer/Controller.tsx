@@ -4,23 +4,23 @@
 
 import React from 'react';
 import Dome from 'dome';
-import Server from 'frama-c/server';
 
-import { Component, TitleBar } from 'frama-c/LabViews';
 import { Button as ToolButton, ButtonGroup, Space } from 'dome/layout/toolbars';
 import { LED, IconButton } from 'dome/controls/buttons';
 import { Label, Code } from 'dome/controls/labels';
 import { Buffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
 
+import Server, { STATUS_CODE } from 'frama-c/server';
+import { Component, TitleBar } from 'frama-c/LabViews';
+
 import 'codemirror/theme/ambiance.css';
-import { STATUS_CODE } from 'frama-c/server';
 
 // --------------------------------------------------------------------------
 // --- Configure Server
 // --------------------------------------------------------------------------
 
-var cmdConfig: any;
+let cmdConfig: any;
 const cmdLine = new Buffer();
 
 function dumpCmdLine(config: any = {}) {
@@ -39,15 +39,15 @@ function dumpCmdLine(config: any = {}) {
     cmdLine.append(v);
   });
   cmdLine.append('\n');
-};
+}
 
-function configOfParams(argv: string[], cwd: string | null) {
-  let params = [];
+function configOfParams(argv: string[], cwd?: string) {
+  const params = [];
   let command;
   let sockaddr;
   let working = cwd;
   for (let k = 0; k < argv.length; k++) {
-    let v = argv[k];
+    const v = argv[k];
     switch (v) {
       case '--cwd':
         working = argv[++k];
@@ -77,10 +77,10 @@ Dome.onCommand((argv: string[], cwd: string) => {
 // --------------------------------------------------------------------------
 
 export const Control = () => {
-  let status: STATUS_CODE = Server.useStatus();
-  let play: { enabled: boolean, onClick: any } = { enabled: false, onClick: null };
-  let stop: { enabled: boolean, onClick: any } = { enabled: false, onClick: null };
-  let reload: { enabled: boolean, onClick: any } = { enabled: false, onClick: null };
+  const status = Server.useStatus();
+  let play: { enabled: boolean; onClick: any } = { enabled: false, onClick: null };
+  let stop: { enabled: boolean; onClick: any } = { enabled: false, onClick: null };
+  let reload: { enabled: boolean; onClick: any } = { enabled: false, onClick: null };
   switch (status) {
     case STATUS_CODE.OFF:
     case STATUS_CODE.FAILED:
@@ -112,8 +112,8 @@ function getCmdLine() {
 }
 
 function execCmdLine(cmd: string) {
-  let argv = cmd.split(/[ \t\n]+/);
-  let cfg: any = configOfParams(argv, null);
+  const argv = cmd.split(/[ \t\n]+/);
+  const cfg: any = configOfParams(argv);
   Server.configure(cfg);
   Server.restart();
 }
@@ -122,7 +122,7 @@ const RenderConsole = () => {
   const [cmd, switchCmd] = Dome.useSwitch();
   const { current, next, prev, index, length, update, insert, clear }: any = Dome.useHistory('frama-c.command.history');
   const doExec = () => {
-    let cmd = getCmdLine();
+    const cmd = getCmdLine();
     if (cmd != current) insert(cmd);
     execCmdLine(cmd);
     switchCmd();
@@ -173,8 +173,8 @@ export const Console = () => (
 
 export const Status = () => {
   Dome.useUpdate(Server.STATUS);
-  let s = Server.getStatus();
-  let n = Server.getPending();
+  const s = Server.getStatus();
+  const n = Server.getPending();
   let led, blink, error;
   switch (s) {
     case STATUS_CODE.OFF:
@@ -216,7 +216,7 @@ export const Status = () => {
 
 export const Stats = () => {
   Dome.useUpdate(Server.STATUS);
-  let n = Server.getPending();
+  const n = Server.getPending();
   return n > 0 ? <Code>{n} rq.</Code> : null;
 };
 

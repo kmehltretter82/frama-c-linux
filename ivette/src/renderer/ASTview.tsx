@@ -2,7 +2,6 @@
 // --- AST Source Code
 // --------------------------------------------------------------------------
 
-import _ from 'lodash';
 import React from 'react';
 import Server from 'frama-c/server';
 import States from 'frama-c/states';
