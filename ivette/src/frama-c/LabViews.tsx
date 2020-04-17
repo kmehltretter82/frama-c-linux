@@ -117,7 +117,6 @@ const UseLibrary = ({ library, children }: any) => (
 );
 
 /**
-   @class
    @summary Ordered collection of LabView Components.
    @description
    Renderers its children in the specified order.
@@ -140,7 +139,6 @@ export const Fragment = ({ group, children }: any) => {
 };
 
 /**
-   @class
    @summary Group of LabView Components.
    @property {string} id - group identifier
    @property {string} label - displayed name
@@ -170,7 +168,6 @@ export const Group = ({ children, ...props }: any) => {
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Layout of LabView Components.
    @property {string} id - view identifier
    @property {string} label - displayed name
@@ -199,7 +196,6 @@ export const View = (props: any) => {
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary LabView Component.
    @property {string} id - component identifier
    @property {string} label - displayed name
@@ -221,7 +217,6 @@ export const Component = (props: any) => {
 const TitleContext: any = React.createContext(undefined);
 
 /**
-   @class
    @summary LabView Component's title bar.
    @property {string} [icon] - displayed icon
    @property {string} [label] - displayed name

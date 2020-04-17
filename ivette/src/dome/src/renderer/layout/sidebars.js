@@ -17,7 +17,6 @@ const SideBarContext = React.createContext();
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Container for sidebar items
    @property {Elements} [children] - Side bar items
    @property {string} [settings] - Side bar items settings
@@ -83,7 +82,6 @@ const disableAll = (children) =>
       React.Children.map( children , (elt) => React.cloneElement( elt , { disabled: true } ) );
 
 /**
-   @class
    @summary Sidebar Section.
    @property {string} [id] - Section identifier (used for derived settings)
    @property {string} label - **Section label**
@@ -142,7 +140,6 @@ export function Section(props) {
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @property {string} [id] - Item identifier
    @property {string} [label] - **Item label**
    @property {string} [icon] - Item icon

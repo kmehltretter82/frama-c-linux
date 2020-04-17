@@ -745,7 +745,6 @@ function orderElements( e1 , e2 )
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Elementary GridLayout Component
    @property {string} id - Component identifier
    @property {boolean} display - Whether to mount the component
@@ -769,19 +768,18 @@ function orderElements( e1 , e2 )
    Direction properties (with type `directions`) can take the following values:
    `'none'`, `'horizontal'`, `'vertical'` or `'both'`.
  */
-export const GridItem = () => null;
+export const GridItem = (props) => null;
 
 // --------------------------------------------------------------------------
 // --- Grid H/V Boxes
 // --------------------------------------------------------------------------
 
 /**
-    @class
-    @property {ident} [id] - the box identifier
-    @property {direction} dir - either `'horizontal'` or `'vertical'`
-    @property {GridContent} [children] - internal grid contents
-    @summary Layout its content in an horizontal or vertical box.
-    @description
+   @property {ident} [id] - the box identifier
+   @property {direction} dir - either `'horizontal'` or `'vertical'`
+   @property {GridContent} [children] - internal grid contents
+   @summary Layout its content in an horizontal or vertical box.
+   @description
 
 This container is a _fake_ component thats simply groups several
 `GridItem`s or `GridBox`es horizontally or vertically.
@@ -795,25 +793,23 @@ See also:
   - [GridHbox](module-dome_layout_grids.GridHbox.html) horizontal box
   - [GridVbox](module-dome_layout_grids.GridVbox.html) vertical box
 */
-export const GridBox = () => null ;
+export const GridBox = (props) => null ;
 
 /**
-    @class
-    @summary Layout its content in an horizontal box.
-    @property {ident} [id] - the box identifier
-    @description
-    See [GridBox](module-dome_layout_grids.GridBox.html)
+   @summary Layout its content in an horizontal box.
+   @property {ident} [id] - the box identifier
+   @description
+   See [GridBox](module-dome_layout_grids.GridBox.html)
 */
-export const GridHbox = () => null ;
+export const GridHbox = (props) => null ;
 
 /**
-    @class
-    @summary Layout its content in a vertical box.
-    @property {ident} [id] - the box identifier
-    @description
-    See [GridBox](module-dome_layout_grids.GridBox.html)
+   @summary Layout its content in a vertical box.
+   @property {ident} [id] - the box identifier
+   @description
+   See [GridBox](module-dome_layout_grids.GridBox.html)
 */
-export const GridVbox = () => null ;
+export const GridVbox = (props) => null ;
 
 // --------------------------------------------------------------------------
 // --- User Grid & Components Extraction

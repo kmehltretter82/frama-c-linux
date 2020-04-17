@@ -20,7 +20,6 @@ import _ from 'lodash' ;
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @property {string} id - icon's identifier (mandatory)
    @property {string} [title] - icon's tool-tip (optional)
    @property {number} [size] - icon's dimension in pixels (default: `12`)
@@ -52,7 +51,6 @@ export function SVG( { id , title, size, offset } )
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Icon Component.
    @property {string} id - icon's identifier (mandatory)
    @property {string} [title] - icon's tool-tip (optional)
@@ -65,8 +63,9 @@ export function SVG( { id , title, size, offset } )
    @description
    Consult the [Icon Gallery](gallery-icons.html) for default icons.
 */
-export function Icon( { id, title, onClick, fill, size, className='', offset, style } )
+export function Icon(props)
 {
+  const { id, title, onClick, fill, size, className='', offset, style } = props;
   const divClass = 'dome-xIcon ' + className  ;
   const divStyle = fill ? Object.assign({fill},style) : style ;
   return (
@@ -83,7 +82,6 @@ export function Icon( { id, title, onClick, fill, size, className='', offset, st
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Rounded icon, number or letter.
    @property {icon|number|string} [value] - badge content
    @property {string} [title] - badge tool-tip (optional)

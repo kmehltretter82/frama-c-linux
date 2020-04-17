@@ -14,11 +14,14 @@ import { Component } from 'frama-c/LabViews';
 // --- Property Columns
 // --------------------------------------------------------------------------
 
-const ColumnCode = DefineColumn({ renderValue: (text: string) => <Code>{text}</Code> });
-const ColumnTag = DefineColumn({
-  renderValue: (l: { label: string; descr: string }) =>
-    (<Label label={l.label} title={l.descr} />)
-});
+const ColumnCode: any =
+  DefineColumn({ renderValue: (text: string) => <Code>{text}</Code> });
+
+const ColumnTag: any =
+  DefineColumn({
+    renderValue: (l: { label: string; descr: string }) =>
+      (<Label label={l.label} title={l.descr} />)
+  });
 
 // --------------------------------------------------------------------------
 // --- Properties Table

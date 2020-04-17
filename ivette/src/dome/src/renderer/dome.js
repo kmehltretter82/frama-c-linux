@@ -566,7 +566,6 @@ ipcRenderer.on('dome.ipc.href',(href) => emitter.emit('dome.href',href));
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Inlined Function React Component
    @property {function} children - render function as children
    @description

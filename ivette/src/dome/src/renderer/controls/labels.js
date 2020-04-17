@@ -47,7 +47,6 @@ const TCODE = "dome-xLabel dome-text-code" ;
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Component labels.
    @property {string} [label] - Textual content (prepend to children components, if any)
    @property {string} [icon] - Label icon (optional, on left side)
@@ -58,7 +57,6 @@ const TCODE = "dome-xLabel dome-text-code" ;
 export const Label = (props) => makeLabel(LABEL,props);
 
 /**
-   @class
    @summary Title and headings.
    @property {string} [label] - Textual content (prepend to children components, if any)
    @property {string} [icon] - Label icon (optional, on left side)
@@ -69,7 +67,6 @@ export const Label = (props) => makeLabel(LABEL,props);
 export const Title = (props) => makeLabel(TITLE,props);
 
 /**
-   @class
    @summary Description, textbook content.
    @property {string} [label] - Textual content (prepend to children components, if any)
    @property {string} [icon] - Label icon (optional, on left side)
@@ -80,7 +77,6 @@ export const Title = (props) => makeLabel(TITLE,props);
 export const Descr = (props) => makeLabel(DESCR,props);
 
 /**
-   @class
    @summary Selectable textual information.
    @property {string} [label] - Textual content (prepend to children components, if any)
    @property {string} [icon] - Label icon (optional, on left side)
@@ -91,7 +87,6 @@ export const Descr = (props) => makeLabel(DESCR,props);
 export const Data = (props) => makeLabel(TDATA,props);
 
 /**
-   @class
    @summary Selectable inlined source-code content.
    @property {string} [text] - Textual content (prepend to children components, if any)
    @property {string} [icon] - Label icon (optional, on left side)

@@ -64,7 +64,6 @@ const makeBox = ( boxClasses, props, morestyle ) => {
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Horizontal box (extends horizontally, no overflow)
    @property {object} [...props] - Extra properties passed to the `<div>` container
    @description
@@ -73,7 +72,6 @@ const makeBox = ( boxClasses, props, morestyle ) => {
 export const Hbox = (props) => makeBox( 'dome-xBoxes-hbox dome-xBoxes-box' , props );
 
 /**
-   @class
    @summary Vertical box (extends vertically, no overflow)
    @property {object} [...props] - Extra properties passed to the `<div>` container
    @description
@@ -82,7 +80,6 @@ export const Hbox = (props) => makeBox( 'dome-xBoxes-hbox dome-xBoxes-box' , pro
 export const Vbox = (props) => makeBox( 'dome-xBoxes-vbox dome-xBoxes-box' , props );
 
 /**
-   @class
    @summary Compact Horizontal box (fixed dimensions, no overflow)
    @property {object} [...props] - Extra properties passed to the `<div>` container
    @description
@@ -91,7 +88,6 @@ export const Vbox = (props) => makeBox( 'dome-xBoxes-vbox dome-xBoxes-box' , pro
 export const Hpack = (props) => makeBox( 'dome-xBoxes-hbox dome-xBoxes-pack' , props );
 
 /**
-   @class
    @summary Compact Vertical box (fixed dimensions, no overflow)
    @property {object} [...props] - Extra properties passed to the `<div>` container
    @description
@@ -100,7 +96,6 @@ export const Hpack = (props) => makeBox( 'dome-xBoxes-hbox dome-xBoxes-pack' , p
 export const Vpack = (props) => makeBox( 'dome-xBoxes-vbox dome-xBoxes-pack' , props );
 
 /**
-   @class
    @summary Horizontally filled box (fixed height, maximal width, no overflow)
    @property {object} [...props] - Extra properties passed to the `<div>` container
    @description
@@ -109,7 +104,6 @@ export const Vpack = (props) => makeBox( 'dome-xBoxes-vbox dome-xBoxes-pack' , p
 export const Hfill = (props) => makeBox( 'dome-xBoxes-hbox dome-xBoxes-fill' , props );
 
 /**
-   @class
    @summary Vertically filled box (fixed width, maximal height, no overflow)
    @property {object} [...props] - Extra properties passed to the `<div>` container
    @description
@@ -122,21 +116,18 @@ export const Vfill = (props) => makeBox( 'dome-xBoxes-vbox dome-xBoxes-fill' , p
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Scrolling container
    @property {object} [...props] - Extra properties passed to the `<div>` container
 */
 export const Scroll = (props) => makeBox( 'dome-xBoxes-scroll dome-container' , props );
 
 /**
-   @class
    @summary rigid space between items in a box
    @property {object} [...props] - Extra properties passed to the `<div>` separator
 */
 export const Space = (props) => makeBox( 'dome-xBoxes-space' , props );
 
 /**
-   @class
    @summary extensible space between items in a box
    @property {object} [...props] - Extra properties passed to the `<div>` separator
 */
@@ -147,7 +138,6 @@ export const Filler = (props) => makeBox( 'dome-xBoxes-filler' , props );
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Grid box container
    @property {string} [columns] - Grid column specifications
    @property {object} [...props] - Extra properties passed to the `<div>` container
@@ -168,7 +158,6 @@ export const Grid = ({columns='auto',...props}) =>
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Foldable Vpack box
    @property {string} label - box label
    @property {string} [title] - box label tooltip

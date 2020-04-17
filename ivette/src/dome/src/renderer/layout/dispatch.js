@@ -58,7 +58,6 @@ const removeItem = (id) => {
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Define dispatched item
    @property {string} id - the item _global_ unique identifier
    @property {React.Children} {children} - item contents
@@ -82,7 +81,6 @@ export function Item({ id, children })
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Render dispatched item
    @property {string} id - the item _global_ unique identifier to render
    @property {function|React.Children} {children} - conditional or alternative content (default: `null`)

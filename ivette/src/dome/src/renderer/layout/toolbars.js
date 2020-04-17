@@ -41,25 +41,21 @@ export class ToolBar extends React.Component {
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Fixed (tiny) space
 */
 export const Inset = (() => <div className='dome-xToolBar-inset'/>);
 
 /**
-   @class
    @summary Fixed space
 */
 export const Space = (() => <div className='dome-xToolBar-space'/>);
 
 /**
-   @class
    @summary Extensible space (can be used to right-align controls)
 */
 export const Filler = (() => <div className='dome-xToolBar-filler'/>);
 
 /**
-   @class
    @summary Vertical rule
 */
 export const Separator = () => (
@@ -86,7 +82,6 @@ const isDisabled = ( { enabled=true, disabled=false } ) => (disabled || !enabled
 const onClick = ( { onClick , value } ) => onClick ? (() => onClick(value)) : undefined ;
 
 /**
-   @class
    @property {string} [icon] - Button icon name (See [gallery](gallery-icons.html))
    @property {string} [label] - Button label
    @property {string} [title] - Button tooltip
@@ -130,31 +125,28 @@ export const Button = ( props ) => (
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @property {Button[]} children - Buttons in the group
    @property {any} [value] - Passed to children as `selection` property
    @property {any} [onChange] - Passed to children as `onClick` property
    @property {any} [...props] - Properties passed to all children
    @summary toolbar button group
 */
-export const ButtonGroup =
-  ({ children, value, onChange, ...props }) =>
-  {
-    if (value !== undefined ) props.selection = value ;
-    if (onChange !== undefined ) props.onClick = onChange ;
-    return (
-      <div className='dome-xToolBar-Group'>
-        {React.Children.map(children,(elt) => React.cloneElement(elt,props))}
-      </div>
-    );
-  };
+export const ButtonGroup = (props) => {
+  const { children, value, onChange, ...otherProps } = props;
+  if (value !== undefined) otherProps.selection = value;
+  if (onChange !== undefined) otherProps.onClick = onChange;
+  return (
+    <div className='dome-xToolBar-Group'>
+      {React.Children.map(children, (elt) => React.cloneElement(elt, otherProps))}
+    </div>
+  );
+};
 
 // --------------------------------------------------------------------------
 // --- ToolBar Menu
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @property {any} [value] - selected option's value
    @property {function} [onChange] - selection callback (receives option value)
    @property {boolean} [disabled] - disable the selector (default: `false`)

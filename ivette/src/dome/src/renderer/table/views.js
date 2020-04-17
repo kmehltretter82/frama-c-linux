@@ -175,7 +175,7 @@ const computeWidth = (elt) => {
    to force the column to be visible.
 
 */
-export const Column = () => null;
+export const Column = (props) => null;
 // Fake component only used to store props.
 // Virtualized column is rendered with function below:
 const vColumn = ({
@@ -223,7 +223,6 @@ const defaultVisible = (visible) => {
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Define specific Column instances.
    @param {Object} properties - default Column properties
    @return {Column} a new Column class of Component
