@@ -11,7 +11,7 @@ import { Label, Code } from 'dome/controls/labels';
 import { Buffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
 
-import Server, { STATUS_CODE } from 'frama-c/server';
+import Server, { StatusCode, ServerConfiguration } from 'frama-c/server';
 import { Component, TitleBar } from 'frama-c/LabViews';
 
 import 'codemirror/theme/ambiance.css';
@@ -20,18 +20,19 @@ import 'codemirror/theme/ambiance.css';
 // --- Configure Server
 // --------------------------------------------------------------------------
 
-let cmdConfig: any;
+let cmdConfig: ServerConfiguration;
 const cmdLine = new Buffer();
 
-function dumpCmdLine(config: any = {}) {
-  const { cwd, command, sockaddr, params } = config;
+function dumpCmdLine(sc: ServerConfiguration): void {
+  const { cwd, command, sockaddr, params } = sc;
   cmdLine.clear();
   if (cwd) cmdLine.log('--cwd', cwd);
   if (command) cmdLine.log('--command', command);
   if (sockaddr) cmdLine.log('--socket', sockaddr);
   if (params) params.forEach((v: string, i: number) => {
     if (i > 0) {
-      if (v.startsWith('-') || v.endsWith('.c') || v.endsWith('.h') || v.endsWith('.i'))
+      if (v.startsWith('-') || v.endsWith('.c')
+        || v.endsWith('.h') || v.endsWith('.i'))
         cmdLine.append('\n');
       else
         cmdLine.append(' ');
@@ -41,16 +42,16 @@ function dumpCmdLine(config: any = {}) {
   cmdLine.append('\n');
 }
 
-function configOfParams(argv: string[], cwd?: string) {
+function buildServerConfiguration(argv: string[], cwd?: string) {
   const params = [];
   let command;
   let sockaddr;
-  let working = cwd;
+  let cwdir = cwd;
   for (let k = 0; k < argv.length; k++) {
     const v = argv[k];
     switch (v) {
       case '--cwd':
-        working = argv[++k];
+        cwdir = argv[++k];
         break;
       case '--command':
         command = argv[++k];
@@ -62,11 +63,11 @@ function configOfParams(argv: string[], cwd?: string) {
         params.push(v);
     }
   }
-  return { cwd: working, command, sockaddr, params };
+  return { cwd: cwdir, command, sockaddr, params };
 }
 
 Dome.onCommand((argv: string[], cwd: string) => {
-  cmdConfig = configOfParams(argv, cwd);
+  cmdConfig = buildServerConfiguration(argv, cwd);
   dumpCmdLine(cmdConfig);
   Server.configure(cmdConfig);
   Server.start();
@@ -82,11 +83,11 @@ export const Control = () => {
   let stop: { enabled: boolean; onClick: any } = { enabled: false, onClick: null };
   let reload: { enabled: boolean; onClick: any } = { enabled: false, onClick: null };
   switch (status) {
-    case STATUS_CODE.OFF:
-    case STATUS_CODE.FAILED:
+    case StatusCode.OFF:
+    case StatusCode.FAILED:
       play = { enabled: true, onClick: Server.start };
       break;
-    case STATUS_CODE.RUNNING:
+    case StatusCode.RUNNING:
       stop = { enabled: true, onClick: Server.stop };
       reload = { enabled: true, onClick: Server.restart };
       break;
@@ -113,7 +114,7 @@ function getCmdLine() {
 
 function execCmdLine(cmd: string) {
   const argv = cmd.split(/[ \t\n]+/);
-  const cfg: any = configOfParams(argv);
+  const cfg = buildServerConfiguration(argv);
   Server.configure(cfg);
   Server.restart();
 }
@@ -177,25 +178,25 @@ export const Status = () => {
   const n = Server.getPending();
   let led, blink, error;
   switch (s) {
-    case STATUS_CODE.OFF:
+    case StatusCode.OFF:
       led = 'inactive';
       break;
-    case STATUS_CODE.STARTED:
+    case StatusCode.STARTED:
       led = 'active';
       blink = true;
       break;
-    case STATUS_CODE.RUNNING:
+    case StatusCode.RUNNING:
       led = n > 0 ? 'positive' : 'active';
       break;
-    case STATUS_CODE.KILLING:
+    case StatusCode.KILLING:
       led = 'negative';
       blink = true;
       break;
-    case STATUS_CODE.RESTART:
+    case StatusCode.RESTART:
       led = 'warning';
       blink = true;
       break;
-    case STATUS_CODE.FAILED:
+    case StatusCode.FAILED:
       led = 'negative';
       blink = false;
       error = Server.getError();

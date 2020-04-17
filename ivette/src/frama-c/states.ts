@@ -11,7 +11,7 @@
 import _ from 'lodash';
 import React from 'react';
 import Dome from 'dome';
-import Server from './server';
+import Server, { RqKind } from './server';
 
 /**
  *  @event
@@ -41,7 +41,7 @@ let states: any = {};
 const stateDefaults: any = {};
 
 Server.onReady(() => {
-  Server.sendGET('kernel.project.getCurrent', null)
+  Server.send(RqKind.GET, 'kernel.project.getCurrent', null)
     .then((current: { id: string }) => {
       currentProject = current.id;
       Dome.emit(PROJECT);
@@ -76,7 +76,7 @@ export function useProject() {
  */
 export function setProject(project: string) {
   if (Server.isRunning()) {
-    Server.sendSET('kernel.project.setCurrent', project);
+    Server.send(RqKind.SET, 'kernel.project.setCurrent', project);
     currentProject = project;
     Dome.emit(PROJECT);
   }
@@ -155,7 +155,7 @@ export function useRequest(rq: string, params: any, options: any = {}) {
     if (project) {
       const pending = options.prending;
       if (pending !== null) setValue(pending);
-      Server.sendGET(rq, params)
+      Server.send(RqKind.GET, rq, params)
         .then(setValue)
         .catch((err: string) => {
           if (Dome.DEVEL) console.warn(`[Server] use request '${rq}':`, err);
@@ -245,13 +245,13 @@ class SyncState {
   setValue(v: any) {
     this.insync = true;
     this.value = v;
-    Server.sendSET(this.setRq, v);
+    Server.send(RqKind.SET, this.setRq, v);
     Dome.emit(this.UPDATE);
   }
 
   update() {
     this.insync = true;
-    Server.sendGET(this.getRq, null).then((v: any) => {
+    Server.send(RqKind.GET, this.getRq, null).then((v: any) => {
       this.value = v;
       Dome.emit(this.UPDATE);
     });
@@ -345,7 +345,7 @@ class SyncArray {
 
   fetch() {
     this.insync = true;
-    Server.sendGET(this.fetchRq, 50)
+    Server.send(RqKind.GET, this.fetchRq, 50)
       .then(({
         reload = false, removed = [], updated = [], pending = 0
       }) => {
@@ -371,7 +371,7 @@ class SyncArray {
   }
 
   reload() {
-    Server.sendSET(this.reloadRq, null);
+    Server.send(RqKind.SET, this.reloadRq, null);
     this.index = {};
     this.insync = false;
     Dome.emit(this.UPDATE);

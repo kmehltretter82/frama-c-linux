@@ -59,10 +59,8 @@ export const SHUTDOWN = 'frama-c.server.shutdown';
  *  @summary Server Signal Prefix
  *  @description
  *  Event `frama-c.server.signal.<id>'` for signal `<id>`.
- *  The prefix `'frama-c.server.signal.'` is exported as `Server.SIGNAL` in
- *  public API.
  */
-export const SIGNAL = 'frama-c.server.signal.';
+const SIGNAL = 'frama-c.server.signal.';
 
 /**
  *  @event
@@ -72,17 +70,15 @@ export const SIGNAL = 'frama-c.server.signal.';
  *  signal.
  *  @description
  *  Event `frama-c.server.activity.<id>'` for signal `<id>`.
- *  The prefix `'frama-c.server.activity.'` is exported as
- *  `Server.ACTIVITY` in public API.
  */
-export const ACTIVITY = 'frama-c.server.activity.';
+const ACTIVITY = 'frama-c.server.activity.';
 
 // --------------------------------------------------------------------------
 // --- Server Status
 // --------------------------------------------------------------------------
 
 /**
- *  @typedef STATUS_CODE
+ *  @typedef StatusCode
  *  @summary Server Status Codes.
  *  @description
  *   - `OFF` Server off
@@ -92,7 +88,7 @@ export const ACTIVITY = 'frama-c.server.activity.';
  *   - `RESTART` Server shutdown, will reboot on exit
  *   - `FAILED` Server halted on error
  */
-export enum STATUS_CODE {
+export enum StatusCode {
   OFF = 'OFF',
   STARTED = 'STARTED',
   RUNNING = 'RUNNING',
@@ -105,19 +101,19 @@ export enum STATUS_CODE {
 // --- Server Global State
 // --------------------------------------------------------------------------
 
-let status = STATUS_CODE.OFF;
-let error: any;     // process error
-let rqid: any;      // Request ID
-let pending: any;   // Pending promise callbacks
-let queueCmd: any; // Queue of server commands to be sent
-let queueIds: any; // Waiting request ids to be sent
-let polling: any;   // Timeout Polling timer
-let flushing: any;  // Immediate Flushing timer
-let config: any;    // Server config
-let process: any;   // Server process
-let socket: any;    // ZMQ (REQ) socket
-let busy: any;      // ZMQ socket is busy
-let killing: any;   // killing timeout
+let status = StatusCode.OFF;
+let error: string | undefined;     // process error
+let rqid: number;                  // Request ID
+let pending: any;                  // Pending promise callbacks
+let queueCmd: any;                 // Queue of server commands to be sent
+let queueIds: any;                 // Waiting request ids to be sent
+let polling: any;                  // Timeout Polling timer
+let flushing: any;                 // Immediate Flushing timer
+let config: ServerConfiguration;
+let process: any;                  // Server process
+let socket: any;                   // ZMQ (REQ) socket
+let busy: boolean;                 // ZMQ socket is busy
+let killing: any;                  // killing timeout
 
 // --------------------------------------------------------------------------
 // --- Server Console
@@ -132,19 +128,19 @@ export const feedback = '';
 
 /**
  *  @summary Current Server Status.
- *  @return {STATUS_CODE} the current server status
+ *  @return {StatusCode} the current server status
  *  @description
  *  See [STATUS](module-frama-c_server.html#~STATUS) code definitions.
  */
-export function getStatus(): STATUS_CODE { return status }
+export function getStatus(): StatusCode { return status }
 
 /**
  *  @summary Hook on current server (Custom React Hook).
- *  @return {STATUS_CODE} the current server status
+ *  @return {StatusCode} the current server status
  *  @description
  *  See [STATUS](module-frama-c_server.html#~STATUS) code definitions.
  */
-export function useStatus(): STATUS_CODE {
+export function useStatus(): StatusCode {
   Dome.useUpdate(STATUS);
   return status;
 }
@@ -156,7 +152,7 @@ export function getError() { return error; }
  *  @summary Frama-C Server is running and ready to handle requests.
  *  @return {boolean} status is `RUNNING`.
  */
-export function isRunning(): boolean { return status === STATUS_CODE.RUNNING }
+export function isRunning(): boolean { return status === StatusCode.RUNNING }
 
 /**
  *  @summary Number of requests still pending.
@@ -191,15 +187,15 @@ export function onActivity(signal: string, callback: any) {
 // --- Status Update
 // --------------------------------------------------------------------------
 
-function _status(newStatus: STATUS_CODE, err: string | null) {
+function _status(newStatus: StatusCode, err?: string) {
   if (Dome.DEVEL && err) console.error('[Server]', err);
   if (newStatus !== status || err) {
     const oldStatus = status;
     status = newStatus;
     error = err ? err.toString() : undefined;
     Dome.emit(STATUS);
-    if (oldStatus === STATUS_CODE.RUNNING) Dome.emit(SHUTDOWN);
-    if (newStatus === STATUS_CODE.RUNNING) Dome.emit(READY);
+    if (oldStatus === StatusCode.RUNNING) Dome.emit(SHUTDOWN);
+    if (newStatus === StatusCode.RUNNING) Dome.emit(READY);
   }
 }
 
@@ -216,19 +212,19 @@ function _status(newStatus: STATUS_CODE, err: string | null) {
  */
 export function start() {
   switch (status) {
-    case STATUS_CODE.OFF:
-    case STATUS_CODE.FAILED:
-      _status(STATUS_CODE.STARTED, null);
+    case StatusCode.OFF:
+    case StatusCode.FAILED:
+      _status(StatusCode.STARTED);
       _launch()
-        .then(() => _status(STATUS_CODE.RUNNING, null))
-        .catch((err) => _status(STATUS_CODE.FAILED, err));
+        .then(() => _status(StatusCode.RUNNING))
+        .catch((error) => _status(StatusCode.FAILED, error));
       return;
-    case STATUS_CODE.KILLING:
-      _status(STATUS_CODE.RESTART, null);
+    case StatusCode.KILLING:
+      _status(StatusCode.RESTART);
       return;
-    case STATUS_CODE.STARTED:
-    case STATUS_CODE.RUNNING:
-    case STATUS_CODE.RESTART:
+    case StatusCode.STARTED:
+    case StatusCode.RUNNING:
+    case StatusCode.RESTART:
     default:
       return;
   }
@@ -248,20 +244,20 @@ export function start() {
  */
 export function stop() {
   switch (status) {
-    case STATUS_CODE.STARTED:
+    case StatusCode.STARTED:
       _kill();
-      _status(STATUS_CODE.KILLING, null);
+      _status(StatusCode.KILLING);
       return;
-    case STATUS_CODE.RUNNING:
+    case StatusCode.RUNNING:
       _shutdown();
-      _status(STATUS_CODE.KILLING, null);
+      _status(StatusCode.KILLING);
       return;
-    case STATUS_CODE.RESTART:
-      _status(STATUS_CODE.KILLING, null);
+    case StatusCode.RESTART:
+      _status(StatusCode.KILLING);
       return;
-    case STATUS_CODE.OFF:
-    case STATUS_CODE.FAILED:
-    case STATUS_CODE.KILLING:
+    case StatusCode.OFF:
+    case StatusCode.FAILED:
+    case StatusCode.KILLING:
     default:
       return;
   }
@@ -282,15 +278,15 @@ export function stop() {
  */
 export function kill() {
   switch (status) {
-    case STATUS_CODE.STARTED:
-    case STATUS_CODE.RUNNING:
-    case STATUS_CODE.KILLING:
-    case STATUS_CODE.RESTART:
+    case StatusCode.STARTED:
+    case StatusCode.RUNNING:
+    case StatusCode.KILLING:
+    case StatusCode.RESTART:
       _kill();
-      _status(STATUS_CODE.KILLING, null);
+      _status(StatusCode.KILLING);
       return;
-    case STATUS_CODE.OFF:
-    case STATUS_CODE.FAILED:
+    case StatusCode.OFF:
+    case StatusCode.FAILED:
     default:
       return;
   }
@@ -309,19 +305,19 @@ export function kill() {
  */
 export function restart() {
   switch (status) {
-    case STATUS_CODE.OFF:
-    case STATUS_CODE.FAILED:
+    case StatusCode.OFF:
+    case StatusCode.FAILED:
       start();
       return;
-    case STATUS_CODE.RUNNING:
+    case StatusCode.RUNNING:
       _shutdown();
-      _status(STATUS_CODE.RESTART, null);
+      _status(StatusCode.RESTART);
       return;
-    case STATUS_CODE.KILLING:
-      _status(STATUS_CODE.RESTART, null);
+    case StatusCode.KILLING:
+      _status(StatusCode.RESTART);
       return;
-    case STATUS_CODE.STARTED:
-    case STATUS_CODE.RESTART:
+    case StatusCode.STARTED:
+    case StatusCode.RESTART:
     default:
       return;
   }
@@ -339,12 +335,12 @@ export function restart() {
  */
 export function clear() {
   switch (status) {
-    case STATUS_CODE.FAILED:
-      _status(STATUS_CODE.OFF, null);
+    case StatusCode.FAILED:
+      _status(StatusCode.OFF);
       buffer.clear();
       Dome.emit(STATUS);
       return;
-    case STATUS_CODE.OFF:
+    case StatusCode.OFF:
       buffer.clear();
       Dome.emit(STATUS);
       return;
@@ -357,33 +353,24 @@ export function clear() {
 // --- Server Configure
 // --------------------------------------------------------------------------
 
-interface ServerConfiguration {
-  env: any;         // Process environment variables (default: `undefined`)
-  cwd: string;      // Working directory (default: current)
-  command: string;  // Server command (default: `frama-c`)
-  params: string[]; // Additional server arguments (default: empty)
-  sockaddr: string; // Server socket (default: `ipc:///.frama-c.<pid>.io`)
-  timeout: number;  // Shutdown timeout before server is hard killed, in milliseconds (default: 300ms)
-  polling: number;  // Server polling period, in milliseconds (default: 50ms)
-  logout: string;   // Process stdout log file (default: `undefined`)
-  logerr: string;   // Process stderr log file (default: `undefined`)
+export interface ServerConfiguration {
+  env?: any;            // Process environment variables (default: `undefined`)
+  cwd?: string;        // Working directory (default: current)
+  command?: string;    // Server command (default: `frama-c`)
+  params: string[];    // Additional server arguments (default: empty)
+  sockaddr?: string;   // Server socket (default: `ipc:///.frama-c.<pid>.io`)
+  timeout?: number;    // Shutdown timeout before server is hard killed, in milliseconds (default: 300ms)
+  polling?: number;    // Server polling period, in milliseconds (default: 50ms)
+  logout?: string;     // Process stdout log file (default: `undefined`)
+  logerr?: string;     // Process stderr log file (default: `undefined`)
 }
 
 /**
  *  @summary Configure the Server.
- *  @param {object} config - Server Configuration
- *  @param {object} [config.env]
- *  @param {string} [config.cwd]
- *  @param {string} [config.command]
- *  @param {Array.<string>} [config.params]
- *  @param {string} [config.sockaddr]
- *  @param {number} [config.timeout]
- *  @param {number} [config.polling]
- *  @param {string} [config.logout]
- *  @param {string} [config.logerr]
+ *  @param {ServerConfiguration} sc - Server Configuration
  */
-export function configure(cfg: ServerConfiguration) {
-  config = cfg || {};
+export function configure(sc: ServerConfiguration) {
+  config = sc || {};
 }
 
 /**
@@ -447,7 +434,7 @@ async function _launch() {
     buffer.append('Error:', err, '\n');
     _close(err);
   });
-  process.on('exit', (status: STATUS_CODE, signal: string) => {
+  process.on('exit', (status: StatusCode, signal: string) => {
     signal && buffer.log('Signal:', signal);
     status && buffer.log('Exit:', status);
     _close(signal || status);
@@ -509,49 +496,12 @@ function _close(error: string) {
     process = undefined;
   }
   if (error) {
-    _status(STATUS_CODE.FAILED, error);
+    _status(StatusCode.FAILED, error);
   } else {
-    if (status === STATUS_CODE.RESTART) setImmediate(start);
-    _status(STATUS_CODE.OFF, null);
+    if (status === StatusCode.RESTART) setImmediate(start);
+    _status(StatusCode.OFF);
   }
 }
-
-// --------------------------------------------------------------------------
-// --- Request Queue
-// --------------------------------------------------------------------------
-
-/**
- *  @summary Send a GET request to the server.
- *  @param {string} rq - the request identifier
- *  @param {object} params - request parameters
- *  @return {Promise<object>} the promised request results
- *  @description
- *  You may _kill_ the request before its normal termination by
- *  invoking `kill()` on the returned promised.
- */
-export function sendGET(rq: string, params: null | any) { return _sendRequest('GET', rq, params) }
-
-/**
- *  @summary Send a SET request to the server.
- *  @param {string} rq - the request identifier
- *  @param {object} params - request parameters
- *  @return {Promise<object>} the promised request results
- *  @description
- *  You may _kill_ the request before its normal termination by
- *  invoking `kill()` on the returned promised.
- */
-export function sendSET(rq: string, params: null | any) { return _sendRequest('SET', rq, params) }
-
-/**
- *  @summary Send an EXEC request to the server.
- *  @param {string} rq - the request identifier
- *  @param {object} params - request parameters
- *  @return {Promise<object>} the promised request results
- *  @description
- *  You may _kill_ the request before its normal termination by
- *  invoking `kill()` on the returned promised.
- */
-export function sendEXEC(rq: string, params: null | any) { return _sendRequest('EXEC', rq, params) }
 
 // --------------------------------------------------------------------------
 // --- Signal Management
@@ -674,7 +624,31 @@ Dome.on(SHUTDOWN, () => {
 // --- REQUEST Management
 // --------------------------------------------------------------------------
 
-function _sendRequest(kind: string, rq: any, params: null | string = null) {
+/**
+ *  @typedef RqKind
+ *  @summary Request kind.
+ *  @description
+ *   - `GET` Used to read data from the server 
+ *   - `SET` Used to write data into the server
+ *   - `EXEC` Used to make the server execute a task
+ */
+export enum RqKind {
+  GET = "GET",
+  SET = "SET",
+  EXEC = "EXEC"
+}
+
+/**
+ *  @summary Send request to the server.
+ *  @param {RqKind} kind - the request kind
+ *  @param {string} rq - the request identifier
+ *  @param {object} params - request parameters
+ *  @return {Promise<object>} the promised request results
+ *  @description
+ *  You may _kill_ the request before its normal termination by
+ *  invoking `kill()` on the returned promised.
+ */
+export function send(kind: RqKind, rq: string, params: any) {
   if (!isRunning()) return Promise.reject('Server not running');
   if (!rq) return Promise.reject('Undefined request');
   const rid = 'RQ.' + rqid++;
@@ -825,10 +799,10 @@ export default {
   getStatus, useStatus, buffer,
   getError, getPending, isRunning,
   start, stop, kill, restart, clear,
-  sendGET, sendSET, sendEXEC,
+  send,
   onReady, onShutdown, onActivity,
   onSignal, offSignal, useSignal,
-  STATUS, READY, SHUTDOWN, STATUS_CODE
+  STATUS, READY, SHUTDOWN, StatusCode
 };
 
 // --------------------------------------------------------------------------

@@ -3,7 +3,7 @@
 // --------------------------------------------------------------------------
 
 import React from 'react';
-import Server from 'frama-c/server';
+import Server, { RqKind } from 'frama-c/server';
 import States from 'frama-c/states';
 
 import { Vfill } from 'dome/layout/boxes';
@@ -47,8 +47,7 @@ const ASTview = () => {
     buffer.clear();
     if (theFunction) {
       buffer.log('// Loading', theFunction, '…');
-      Server
-        .sendGET("kernel.ast.printFunction", theFunction)
+      Server.send(RqKind.GET, "kernel.ast.printFunction", theFunction)
         .then((data: string) => {
           buffer.clear();
           if (!data)
