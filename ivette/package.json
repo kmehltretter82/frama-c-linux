@@ -8,7 +8,8 @@
   "scripts": {
     "lint": "eslint --ext .ts,.tsx --format=stylish ./src",
     "typecheck": "tsc --noEmit",
-    "typecheck:watch": "yarn run typecheck -- --watch"
+    "typecheck:watch": "yarn run typecheck -- --watch",
+    "build": "tsc"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
