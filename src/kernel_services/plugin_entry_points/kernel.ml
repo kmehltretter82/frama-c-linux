@@ -837,9 +837,9 @@ module Journal = struct
         let default =
           let dir =
             (* duplicate code from Plugin.Session *)
-            if Session.Dir_name.is_set ()
+            if Session.is_set ()
             then
-              (Session.Dir_name.get () :> string)
+              (Session.get () :> string)
             else
               try Sys.getenv "FRAMAC_SESSION"
               with Not_found -> "./.frama-c"

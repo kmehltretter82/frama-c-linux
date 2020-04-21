@@ -557,7 +557,7 @@ let spawn_wp_proofs_iter ~mode iter_on_goals =
   if mode.tactical || mode.provers<>[] then
     begin
       let server = ProverTask.server () in
-      ignore (Wp_parameters.Share.dir ()); (* To prevent further errors *)
+      ignore (Wp_parameters.Share.get_dir "."); (* To prevent further errors *)
       iter_on_goals
         (fun goal ->
            if  mode.tactical

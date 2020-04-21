@@ -1118,21 +1118,21 @@ let get_output_dir d =
 let default = Sys.getcwd () ^ "/.frama-c"
 
 let has_session () =
-  Session.Dir_name.is_set () ||
+  Session.is_set () ||
   ( Sys.file_exists default && Sys.is_directory default )
 
 let get_session ~force () =
   if force then
-    Session.dir ~error:false ()
+    Session.get_dir "."
   else
-  if Session.Dir_name.is_set () then
-    Session.Dir_name.get ()
+  if Session.is_set () then
+    Session.get ()
   else
-    Session.dir ~error:false ()
+    Session.get_dir "."
 
 let get_session_dir ~force d =
   let base = get_session ~force () in
-  let path = Format.asprintf "%a/%s" Datatype.Filepath.pp_abs base d in
+  let path = Format.asprintf "%s/%s" (base :> string) d in
   if force then make_output_dir path ; path
 
 (* -------------------------------------------------------------------------- *)

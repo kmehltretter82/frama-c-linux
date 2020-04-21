@@ -51,7 +51,7 @@ let get_why3_env = Env.memoize
       let main = Why3.Whyconf.get_main config in
       let ld =
         (WpContext.directory ())::
-        ((Wp_parameters.Share.file "why3") :> string)::
+        ((Wp_parameters.Share.get_file "why3") :> string)::
         (Why3.Whyconf.loadpath main) in
       Why3.Env.create_env ld
     end
@@ -786,7 +786,7 @@ class visitor (ctx:context) c =
       let copy_file source =
         if not (Datatype.Filepath.equal
                   (Datatype.Filepath.of_string (Filename.dirname source))
-                  (Wp_parameters.Share.dir ()))
+                  (Wp_parameters.Share.get_dir "."))
         then
           let tgtdir = WpContext.directory () in
           let why3src = Filename.basename source in

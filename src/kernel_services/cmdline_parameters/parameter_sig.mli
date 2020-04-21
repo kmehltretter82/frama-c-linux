@@ -295,33 +295,19 @@ module type Filepath = S with type t = Filepath.Normalized.t
 (** signature for searching files in a specific directory. *)
 module type Specific_dir = sig
 
-  exception No_dir
+  val set: Filepath.Normalized.t -> unit
+  val get: unit -> Filepath.Normalized.t
+  val is_set: unit -> bool
 
-  val force_dir: bool
-  (** For functions below: if [force_dir] is true: if [error] is [false], then
-      creates the directory if it does not exist (or raises No_dir if the
-      directory cannot be created). Otherwise ([force_dir =
-      false]), raise No_dir if [error] is [false].
-      @since Neon-20140301 *)
+  val get_dir:
+    ?mode:[`Create_path | `Normalize_only | `Must_exist ] ->
+    string ->
+    Filepath.Normalized.t
 
-  val dir: ?error:bool -> unit -> Filepath.Normalized.t
-  (** [dir ~error ()] returns the specific directory name, if
-      any. Otherwise, Frama-C halts on an user error if [error] or if the
-      behavior depends on [force_dir]. Default of [error] is [true].
-      @raise No_dir if there is no share directory for this plug-in and [not
-      error] and [not force_dir]. *)
-
-  val file: ?error:bool -> string -> Filepath.Normalized.t
-  (** [file basename] returns the complete filename of a file stored in [dir
-      ()]. If there is no such directory, Frama-C halts on an user error if
-      [error] or if the behavior depends on [force_dir]. Default of [error] is
-      [true].
-      @raise No_dir if there is no share directory for this plug-in and [not
-      error] and [not force_dir].  *)
-
-  module Dir_name: Filepath
-  (** Option [-<short-name>-<specific-dir>]. *)
-
+  val get_file:
+    ?mode:[`Create_path | `Normalize_only | `Must_exist ] ->
+    string ->
+    Filepath.Normalized.t
 end
 
 (* ************************************************************************** *)
