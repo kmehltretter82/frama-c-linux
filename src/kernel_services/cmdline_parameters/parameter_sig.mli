@@ -308,27 +308,25 @@ module type Specific_dir = sig
     ?mode:[`Create_path | `Normalize_only | `Must_exist ] ->
     string ->
     Filepath.Normalized.t
-  (**[get_dir ?mode p] returns a local-path [p], relative to the plugin
-     <specific-dir> directory, to a sub-directory of the plugin <specific-dir>
-     directory.
-     @param mode determines how to handle the resulting path:
-     + [Create_path] creates the resulting path, if does not exist.
-     + [Normalize_only] just normalizes the resulting path.
-     + [Must_exist] aborts if the resulting path does not exist.
-  *)
+  (** [get_dir ?mode p] returns a local-path [p], relative to the plugin
+      <specific-dir> directory, to a sub-directory of the plugin <specific-dir>
+      directory.
+      @param mode determines how to handle the resulting path:
+      + [Create_path] creates the resulting path, if does not exist.
+      + [Normalize_only] just normalizes the resulting path.
+      + [Must_exist] aborts if the resulting path does not exist. *)
 
   val get_file:
     ?mode:[`Create_path | `Normalize_only | `Must_exist ] ->
     string ->
     Filepath.Normalized.t
-  (**[get_file ?mode p] returns a local-path [p], relative to the plugin
-     <specific-dir> directory, to a file in the plugin <specific-dir>
-     directory.
-     @param mode determines how to handle the resulting path:
-     + [Create_path] creates the dirname of resulting path, if does not exist.
-     + [Normalize_only] just normalizes the resulting path.
-     + [Must_exist] aborts if the resulting path does not exist.
-  *)
+    (** [get_file ?mode p] returns a local-path [p], relative to the plugin
+        <specific-dir> directory, to a file in the plugin <specific-dir>
+        directory.
+        @param mode determines how to handle the resulting path:
+        + [Create_path] creates the dirname of resulting path, if does not exist.
+        + [Normalize_only] just normalizes the resulting path.
+        + [Must_exist] aborts if the resulting path does not exist. *)
 end
 
 (* ************************************************************************** *)
