@@ -343,7 +343,8 @@ struct
       if not (plugin_base_dir = Datatype.Filepath.dummy)
       then [plugin_base_dir]
       else begin
-        (* No specified dir: look for the default one. *)
+        (* No specified dir: look for the default ones.
+           At least one default value must be in place. *)
         let dirs = D.dirs () in
         assert (dirs <> []);
         if is_kernel
@@ -380,6 +381,8 @@ struct
         end
       | _ ->
         begin
+          (* In presence of more than one base directory, consider the first to
+             form the resulting [filepath]. *)
           let filepath =
             match base_dirs () with
             | [] -> assert false
@@ -409,6 +412,8 @@ struct
       | `Normalize_only ->
         filepath
       | `Create_path ->
+        (* No need to create anything here, as the path of sub-directories has
+           been already created by [get_dir] for computing [base_dir]. *)
         filepath
 
   end

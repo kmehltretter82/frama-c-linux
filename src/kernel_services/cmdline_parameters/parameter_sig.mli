@@ -296,18 +296,39 @@ module type Filepath = S with type t = Filepath.Normalized.t
 module type Specific_dir = sig
 
   val set: Filepath.Normalized.t -> unit
+  (** Sets the plugin <specific-dir> directory (without creating it). *)
+
   val get: unit -> Filepath.Normalized.t
+  (** @return the plugin <specific-dir> directory (without creating it). *)
+
   val is_set: unit -> bool
+  (** @return whether the plugin <specific-dir> has been set. *)
 
   val get_dir:
     ?mode:[`Create_path | `Normalize_only | `Must_exist ] ->
     string ->
     Filepath.Normalized.t
+  (**[get_dir ?mode p] returns a local-path [p], relative to the plugin
+     <specific-dir> directory, to a sub-directory of the plugin <specific-dir>
+     directory.
+     @param mode determines how to handle the resulting path:
+     + [Create_path] creates the resulting path, if does not exist.
+     + [Normalize_only] just normalizes the resulting path.
+     + [Must_exist] aborts if the resulting path does not exist.
+  *)
 
   val get_file:
     ?mode:[`Create_path | `Normalize_only | `Must_exist ] ->
     string ->
     Filepath.Normalized.t
+  (**[get_file ?mode p] returns a local-path [p], relative to the plugin
+     <specific-dir> directory, to a file in the plugin <specific-dir>
+     directory.
+     @param mode determines how to handle the resulting path:
+     + [Create_path] creates the dirname of resulting path, if does not exist.
+     + [Normalize_only] just normalizes the resulting path.
+     + [Must_exist] aborts if the resulting path does not exist.
+  *)
 end
 
 (* ************************************************************************** *)
