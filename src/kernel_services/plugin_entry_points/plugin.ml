@@ -395,8 +395,19 @@ struct
           | `Normalize_only ->
             filepath
           | `Create_path ->
-            ignore (mk_dir (filepath :> string));
-            filepath
+            begin
+              (try
+                 if not (Sys.is_directory (filepath :> string))
+                 then
+                   (* [filepath] already exists, and it is a file. *)
+                   L.abort
+                     "cannot create directory as file %a already exists"
+                     Datatype.Filepath.pretty filepath
+               with Sys_error _ ->
+                 (* [filepath] does not exist: create the directory path. *)
+                 ignore (mk_dir (filepath :> string)));
+              filepath
+            end
         end
 
     let get_file ?(mode=`Normalize_only) s =
@@ -448,7 +459,9 @@ struct
       end)
   let () =
     if is_kernel ()
-    then Journal.get_session_file := (fun s -> Session.get_file s)
+    then
+      Journal.get_session_file :=
+        (fun s -> Session.get_file ~mode:`Create_path s)
 
   module Config =
     Make_specific_dir
