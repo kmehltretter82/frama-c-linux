@@ -93,8 +93,8 @@ _frama-c ()
   elif [[ "${COMP_WORDS[COMP_CWORD -1]}" == "-wp-prover" ]]
   then
       local prefix=; [[ $cur == *,* ]] && prefix="${cur%,*},"
-      advance_options="$(frama-c -wp-detect | grep -E -o " \[.*" | grep -E -o "[^]\[-\|]*")"
-      advance_options+=" none script tip native:alt-ergo native:coq native:coqide"
+      advance_options="$(frama-c -wp-detect | grep -E -o " \[.*" | grep -E -o "[^][|]*")"
+      advance_options+="none script tip native:alt-ergo native:coq native:coqide"
       local ambigous="$(bind -v | grep show-all-if-ambiguous)"
       ambigous="${ambigous##* }"
       if [[ "$ambigous" == "on" ]]
