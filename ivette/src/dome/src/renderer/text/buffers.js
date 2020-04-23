@@ -68,7 +68,7 @@ class Proxy {
 
  */
 
-export class Buffer extends Emitter {
+export class RichTextBuffer extends Emitter {
 
   /**
      @param {object} [props] - Constructor properties (see below)
@@ -453,6 +453,6 @@ is blocked.
 
 // --------------------------------------------------------------------------
 
-export default { Buffer };
+export default { RichTextBuffer };
 
 // --------------------------------------------------------------------------

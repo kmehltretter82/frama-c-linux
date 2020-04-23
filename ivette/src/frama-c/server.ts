@@ -7,12 +7,12 @@
  *  @description Manage the current Frama-C server/client interface
  */
 
-import _ from 'lodash'
-import React from 'react'
-import Dome from 'dome'
-import System from 'dome/system'
-import { Buffer } from 'dome/text/buffers'
-import { Request } from 'zeromq'
+import _ from 'lodash';
+import React from 'react';
+import Dome from 'dome';
+import System from 'dome/system';
+import { RichTextBuffer } from 'dome/text/buffers';
+import { Request } from 'zeromq';
 
 // --------------------------------------------------------------------------
 // --- Events
@@ -102,25 +102,24 @@ export enum StatusCode {
 // --------------------------------------------------------------------------
 
 let status = StatusCode.OFF;
-let error: string | undefined;     // process error
-let rqid: number;                  // Request ID
-let pending: any;                  // Pending promise callbacks
-let queueCmd: any;                 // Queue of server commands to be sent
-let queueIds: any;                 // Waiting request ids to be sent
-let polling: any;                  // Timeout Polling timer
-let flushing: any;                 // Immediate Flushing timer
+let error: string | undefined; // process error
+let rqid: number; // Request ID
+let pending: any; // Pending promise callbacks
+let queueCmd: any; // Queue of server commands to be sent
+let queueIds: any; // Waiting request ids to be sent
+let polling: any; // Timeout Polling timer
+let flushing: any; // Immediate Flushing timer
 let config: ServerConfiguration;
-let process: any;                  // Server process
-let socket: any;                   // ZMQ (REQ) socket
-let busy: boolean;                 // ZMQ socket is busy
-let killing: any;                  // killing timeout
+let process: any; // Server process
+let socket: any; // ZMQ (REQ) socket
+let busy: boolean; // ZMQ socket is busy
+let killing: any; // killing timeout
 
 // --------------------------------------------------------------------------
 // --- Server Console
 // --------------------------------------------------------------------------
 
-export const buffer = new Buffer({ maxlines: 200 });
-export const feedback = '';
+const buffer = new RichTextBuffer({ maxlines: 200 });
 
 // --------------------------------------------------------------------------
 // --- Server Status
@@ -132,7 +131,7 @@ export const feedback = '';
  *  @description
  *  See [STATUS](module-frama-c_server.html#~STATUS) code definitions.
  */
-export function getStatus(): StatusCode { return status }
+function getStatus(): StatusCode { return status; }
 
 /**
  *  @summary Hook on current server (Custom React Hook).
@@ -140,47 +139,47 @@ export function getStatus(): StatusCode { return status }
  *  @description
  *  See [STATUS](module-frama-c_server.html#~STATUS) code definitions.
  */
-export function useStatus(): StatusCode {
+function useStatus(): StatusCode {
   Dome.useUpdate(STATUS);
   return status;
 }
 
 /** Return `FAILED` status message. */
-export function getError() { return error; }
+function getError() { return error; }
 
 /**
  *  @summary Frama-C Server is running and ready to handle requests.
  *  @return {boolean} status is `RUNNING`.
  */
-export function isRunning(): boolean { return status === StatusCode.RUNNING }
+function isRunning(): boolean { return status === StatusCode.RUNNING; }
 
 /**
  *  @summary Number of requests still pending.
  *  @return {number} pending requests
  */
-export function getPending(): number {
-  return _.reduce(pending, (_, n) => n + 1, 0)
+function getPending(): number {
+  return _.reduce(pending, (_, n) => n + 1, 0);
 }
 
 /**
  *  @summary Register callback on READY event.
  *  @param {function} callback - invoked when the server enters RUNNING status
  */
-export function onReady(callback: any) { Dome.on(READY, callback) }
+function onReady(callback: any) { Dome.on(READY, callback); }
 
 /**
  *  @summary Register callback on SHUTDOWN event.
  *  @param {function} callback - invoked when the server enters SHUTDOWN status
  */
-export function onShutdown(callback: any) { Dome.on(SHUTDOWN, callback) }
+function onShutdown(callback: any) { Dome.on(SHUTDOWN, callback); }
 
 /**
  *  @summary Register callback on Signal ACTIVITY event.
  *  @*param {string} id - the signal event to listen to
  *  @*param {function} callback - invoked with `callback(signal,active)`
  */
-export function onActivity(signal: string, callback: any) {
-  Dome.on(ACTIVITY + signal, callback)
+function onActivity(signal: string, callback: any) {
+  Dome.on(ACTIVITY + signal, callback);
 }
 
 // --------------------------------------------------------------------------
@@ -188,7 +187,9 @@ export function onActivity(signal: string, callback: any) {
 // --------------------------------------------------------------------------
 
 function _status(newStatus: StatusCode, err?: string) {
-  if (Dome.DEVEL && err) console.error('[Server]', err);
+  if (Dome.DEVEL && err) {
+    console.error('[Server]', err);
+  }
   if (newStatus !== status || err) {
     const oldStatus = status;
     status = newStatus;
@@ -210,7 +211,7 @@ function _status(newStatus: StatusCode, err?: string) {
  *  If the server is being shutdown, it will reboot.
  *  Otherwise, the Frama-C Server is spawned.
  */
-export function start() {
+function start() {
   switch (status) {
     case StatusCode.OFF:
     case StatusCode.FAILED:
@@ -242,7 +243,7 @@ export function start() {
  *  When the server is shutting down, restart is canceled.
  *  Otherwise, this is a no-op.
  */
-export function stop() {
+function stop() {
   switch (status) {
     case StatusCode.STARTED:
       _kill();
@@ -274,9 +275,10 @@ export function stop() {
  *  it is hard killed and restart is canceled.
  *  Otherwize, this is no-op.
  *
- *  This function is automatically called when the `module` emits the `KILL` signal.
+ *  This function is automatically called when the `module` emits the `KILL`
+ *  signal.
  */
-export function kill() {
+function kill() {
   switch (status) {
     case StatusCode.STARTED:
     case StatusCode.RUNNING:
@@ -303,7 +305,7 @@ export function kill() {
  *  When running, try to gracefully shutdown the Server,
  *  and finally schedule a reboot on exit.
  */
-export function restart() {
+function restart() {
   switch (status) {
     case StatusCode.OFF:
     case StatusCode.FAILED:
@@ -333,7 +335,7 @@ export function restart() {
  *  When not running, clear the console and reset any error flag.
  *  Otherwised, do nothing.
  */
-export function clear() {
+function clear() {
   switch (status) {
     case StatusCode.FAILED:
       _status(StatusCode.OFF);
@@ -354,22 +356,22 @@ export function clear() {
 // --------------------------------------------------------------------------
 
 export interface ServerConfiguration {
-  env?: any;            // Process environment variables (default: `undefined`)
-  cwd?: string;        // Working directory (default: current)
-  command?: string;    // Server command (default: `frama-c`)
-  params: string[];    // Additional server arguments (default: empty)
-  sockaddr?: string;   // Server socket (default: `ipc:///.frama-c.<pid>.io`)
-  timeout?: number;    // Shutdown timeout before server is hard killed, in milliseconds (default: 300ms)
-  polling?: number;    // Server polling period, in milliseconds (default: 50ms)
-  logout?: string;     // Process stdout log file (default: `undefined`)
-  logerr?: string;     // Process stderr log file (default: `undefined`)
+  env?: any; // Process environment variables (default: `undefined`)
+  cwd?: string; // Working directory (default: current)
+  command?: string; // Server command (default: `frama-c`)
+  params: string[]; // Additional server arguments (default: empty)
+  sockaddr?: string; // Server socket (default: `ipc:///.frama-c.<pid>.io`)
+  timeout?: number; // Shutdown timeout before server is hard killed, in milliseconds (default: 300ms)
+  polling?: number; // Server polling period, in milliseconds (default: 50ms)
+  logout?: string; // Process stdout log file (default: `undefined`)
+  logerr?: string; // Process stderr log file (default: `undefined`)
 }
 
 /**
  *  @summary Configure the Server.
  *  @param {ServerConfiguration} sc - Server Configuration
  */
-export function configure(sc: ServerConfiguration) {
+function configure(sc: ServerConfiguration) {
   config = sc || {};
 }
 
@@ -379,7 +381,7 @@ export function configure(sc: ServerConfiguration) {
  *  @description
  *  See `configure()` method.
  */
-export function getConfig(): ServerConfiguration {
+function getConfig(): ServerConfiguration {
   return config;
 }
 
@@ -389,28 +391,41 @@ export function getConfig(): ServerConfiguration {
 
 async function _launch() {
   _reset();
-  if (!config) throw ('Frama-C Server not configured');
-  let { env, cwd, command = 'frama-c', params = [], sockaddr, logout, logerr } = config;
+  if (!config) {
+    throw new Error('Frama-C Server not configured');
+  }
+  let {
+    env,
+    cwd,
+    command = 'frama-c',
+    params = [],
+    sockaddr,
+    logout,
+    logerr,
+  } = config;
 
   buffer.clear();
   buffer.append('$', command);
   const size = params.reduce((n: any, p: any) => n + p.length, 0);
-  if (size < 40)
+  if (size < 40) {
     buffer.append('', ...params);
-  else
+  } else {
     params.forEach((argv: string) => {
-      if (argv.startsWith('-') || argv.endsWith('.c') || argv.endsWith('.i') || argv.endsWith('.h'))
+      if (argv.startsWith('-') || argv.endsWith('.c')
+        || argv.endsWith('.i') || argv.endsWith('.h')) {
         buffer.append('\n    ');
+      }
       buffer.append(' ');
       buffer.append(argv);
     });
+  }
   buffer.append('\n');
 
   if (!cwd) cwd = System.getWorkingDir();
   if (!sockaddr) {
-    const socketfile = System.join(cwd, '.frama-c.' + System.getPID() + '.io');
+    const socketfile = System.join(cwd, `.frama-c.${System.getPID()}.io`);
     System.atExit(() => System.remove(socketfile));
-    sockaddr = 'ipc://' + socketfile;
+    sockaddr = `ipc://${socketfile}`;
   }
   logout = logout && System.join(cwd, logout);
   logerr = logerr && System.join(cwd, logerr);
@@ -419,14 +434,15 @@ async function _launch() {
     cwd,
     stdout: { path: logout, pipe: true },
     stderr: { path: logerr, pipe: true },
-    env
+    env,
   };
   // Launch Process
   const process = await System.spawn(command, params, options);
   const logger = (text: string | string[]) => {
     buffer.append(text);
-    if (0 <= text.indexOf('\n'))
+    if (text.indexOf('\n') >= 0) {
       buffer.scroll(undefined, undefined);
+    }
   };
   process.stdout.on('data', logger);
   process.stderr.on('data', logger);
@@ -435,8 +451,8 @@ async function _launch() {
     _close(err);
   });
   process.on('exit', (status: StatusCode, signal: string) => {
-    signal && buffer.log('Signal:', signal);
-    status && buffer.log('Exit:', status);
+    if (signal) buffer.log('Signal:', signal);
+    if (status) buffer.log('Exit:', status);
     _close(signal || status);
   });
   // Connect to Server
@@ -561,28 +577,31 @@ class Signal {
       }
     }
   }
-
 }
 
-//--- Memo
+// --- Memo
 
 const signals: any[] = [];
 function _signal(id: any) {
   let s = signals[id];
-  if (!s) s = signals[id] = new Signal(id);
+  if (!s) {
+    signals[id] = new Signal(id);
+    s = signals[id];
+  }
   return s;
 }
 
-//--- External API
+// --- External API
 
 /**
  *  @summary Register a Signal callback.
  *  @param {string} id - the signal event to listen to
  *  @param {function} callback - the callback to call on received signal
  *  @description
- *  If the server is not yet listening to this signal, a `SIGON` command is sent.
+ *  If the server is not yet listening to this signal, a `SIGON` command is
+ *  sent.
  */
-export function onSignal(id: string, callback: any) {
+function onSignal(id: string, callback: any) {
   _signal(id).on(callback);
 }
 
@@ -594,7 +613,7 @@ export function onSignal(id: string, callback: any) {
  *  When no more callbacks are listening to this signal for a while,
  *  the server will be notified with a `SIGOFF` command.
  */
-export function offSignal(id: string, callback: any) {
+function offSignal(id: string, callback: any) {
   _signal(id).off(callback);
 }
 
@@ -603,14 +622,14 @@ export function offSignal(id: string, callback: any) {
  *  @param {string} id - the signal event to listen to
  *  @param {function} callback - the callback to be called on signal
  */
-export function useSignal(id: string, callback: any) {
+function useSignal(id: string, callback: any) {
   React.useEffect(() => {
     onSignal(id, callback);
     return () => { offSignal(id, callback); };
-  })
+  });
 }
 
-//--- Server Synchro
+// --- Server Synchro
 
 Dome.on(READY, () => {
   _.forEach(signals, (s) => s.sigon());
@@ -628,14 +647,14 @@ Dome.on(SHUTDOWN, () => {
  *  @typedef RqKind
  *  @summary Request kind.
  *  @description
- *   - `GET` Used to read data from the server 
+ *   - `GET` Used to read data from the server
  *   - `SET` Used to write data into the server
  *   - `EXEC` Used to make the server execute a task
  */
 export enum RqKind {
-  GET = "GET",
-  SET = "SET",
-  EXEC = "EXEC"
+  GET = 'GET',
+  SET = 'SET',
+  EXEC = 'EXEC'
 }
 
 /**
@@ -648,10 +667,11 @@ export enum RqKind {
  *  You may _kill_ the request before its normal termination by
  *  invoking `kill()` on the returned promised.
  */
-export function send(kind: RqKind, rq: string, params: any) {
+function send(kind: RqKind, rq: string, params: any) {
   if (!isRunning()) return Promise.reject('Server not running');
   if (!rq) return Promise.reject('Undefined request');
-  const rid = 'RQ.' + rqid++;
+  const rid = `RQ.${rqid}`;
+  rqid += 1;
   const data = JSON.stringify(params);
   const promise: any = new Promise((resolve, reject) => {
     pending[rid] = { resolve, reject };
@@ -731,7 +751,7 @@ function _send() {
           .catch(() => _cancel(ids))
           .finally(() => { busy = false; Dome.emit(STATUS); });
       } else {
-        _cancel(ids)
+        _cancel(ids);
       }
     } else {
       // No pending command nor pending response
@@ -743,9 +763,13 @@ function _send() {
 
 function _receive(resp: any) {
   try {
-    let rid, data, err, cmd;
+    let rid;
+    let data;
+    let err;
+    let cmd;
     const shift = () => resp.shift().toString();
-    while (resp.length) {
+    let unknownResponse = false;
+    while (resp.length && !unknownResponse) {
       cmd = shift();
       switch (cmd) {
         case 'NONE':
@@ -778,15 +802,13 @@ function _receive(resp: any) {
           break;
         default:
           console.error('[Frama-C Server] Unknown Response:', cmd);
-          resp.length = 0;
+          unknownResponse = true;
           break;
       }
     }
   } finally {
-    if (queueCmd.length)
-      _flush();
-    else
-      _poll();
+    if (queueCmd.length) _flush();
+    else _poll();
   }
 }
 
@@ -795,14 +817,30 @@ function _receive(resp: any) {
 // --------------------------------------------------------------------------
 
 export default {
-  configure, getConfig,
-  getStatus, useStatus, buffer,
-  getError, getPending, isRunning,
-  start, stop, kill, restart, clear,
+  configure,
+  getConfig,
+  getStatus,
+  useStatus,
+  buffer,
+  getError,
+  getPending,
+  isRunning,
+  start,
+  stop,
+  kill,
+  restart,
+  clear,
   send,
-  onReady, onShutdown, onActivity,
-  onSignal, offSignal, useSignal,
-  STATUS, READY, SHUTDOWN, StatusCode
+  onReady,
+  onShutdown,
+  onActivity,
+  onSignal,
+  offSignal,
+  useSignal,
+  STATUS,
+  READY,
+  SHUTDOWN,
+  StatusCode,
 };
 
 // --------------------------------------------------------------------------

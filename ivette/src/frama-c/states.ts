@@ -143,10 +143,12 @@ export function useState(id: string) {
  *  The request is send asynchronously and cached until any change in
  *  `rq`, `params`, current project or server activity.
  *
- *  Default values for various situations can be defined in the options parameter,
- *  which is `undefined` unless specified, or `null` to keep the current value.
- *  For instance `{ pending: null }` will return `undefined` when off-line and in case of errors,
- *  but will keep the last received value until a new one is actually received.
+ *  Default values for various situations can be defined in the options
+ *  parameter, which is `undefined` unless specified, or `null` to keep the
+ *  current value.
+ *  For instance `{ pending: null }` will return `undefined` when off-line and
+ *  in case of errors, but will keep the last received value until a new one is
+ *  actually received.
  */
 export function useRequest(rq: string, params: any, options: any = {}) {
   const project = useProject();
@@ -159,7 +161,7 @@ export function useRequest(rq: string, params: any, options: any = {}) {
         .then(setValue)
         .catch((err: string) => {
           if (Dome.DEVEL) console.warn(`[Server] use request '${rq}':`, err);
-          const error = options.error;
+          const { error } = options;
           if (error !== null) setValue(error);
         });
     } else {
@@ -179,26 +181,38 @@ export function useRequest(rq: string, params: any, options: any = {}) {
  *  @param {string} rq - GET request name
  *  @param {any} [params] - GET request parameter (default `'null'`)
  *  @param {object} [options] - Dictionary options
- *  @param {boolean} [options.key] - The property to index an item (default `'name'`)
- *  @param {boolean} [options.offline] - Keep the dictionary when offline (default `true`)
- *  @param {boolean} [options.pending] - Keep the dictionary when pending (default `true`)
- *  @param {boolean} [options.error] - Keep the dictionary on error (default `false`)
- *  @param {function} [options.filter] - Only index items satisfying the filter (default `undefined`)
+ *  @param {boolean} [options.key] - The property to index an item
+ *         (default `'name'`)
+ *  @param {boolean} [options.offline] - Keep the dictionary when offline
+ *         (default `true`)
+ *  @param {boolean} [options.pending] - Keep the dictionary when pending
+ *         (default `true`)
+ *  @param {boolean} [options.error] - Keep the dictionary on error
+ *         (default `false`)
+ *  @param {function} [options.filter] - Only index items satisfying the filter
+ *         (default `undefined`)
  *  @return {object} [result] GET request response indexed by key
  *  @description
- *  Sends the specified GET request and returns its returned collection indexed by the provided key.
+ *  Sends the specified GET request and returns its returned collection indexed
+ *  by the provided key.
  *  Items in the collection that do have the key are not indexed.
  */
-export function useDictionary(rq: string, params: any = null, options: any = {}) {
-  const { offline = true, pending = true, error = false, key = 'name', filter } = options;
+function useDictionary(rq: string, params: any = null, options: any = {}) {
+  const {
+    offline = true,
+    pending = true,
+    error = false,
+    key = 'name',
+    filter,
+  } = options;
   const tags = useRequest(rq, params, {
     offline: offline ? null : undefined,
     pending: pending ? null : undefined,
-    error: error ? null : undefined
+    error: error ? null : undefined,
   });
   const dict = React.useMemo(() => {
     const d: any = {};
-    _.forEach(tags, tg => {
+    _.forEach(tags, (tg) => {
       const k: any = tg[key];
       if (k && (!filter || filter(tg))) d[k] = tg;
     });
@@ -225,9 +239,9 @@ class SyncState {
   constructor(id: any) {
     this.id = id;
     this.UPDATE = STATE + id;
-    this.signal = id + '.sig';
-    this.getRq = id + '.get';
-    this.setRq = id + '.set';
+    this.signal = `${id}.sig`;
+    this.getRq = `${id}.get`;
+    this.setRq = `${id}.set`;
     this.insync = false;
     this.value = undefined;
     this.update = this.update.bind(this);
@@ -237,8 +251,9 @@ class SyncState {
   }
 
   getValue() {
-    if (!this.insync && Server.isRunning())
+    if (!this.insync && Server.isRunning()) {
       this.update();
+    }
     return this.value;
   }
 
@@ -256,7 +271,6 @@ class SyncState {
       Dome.emit(this.UPDATE);
     });
   }
-
 }
 
 // --------------------------------------------------------------------------
@@ -267,11 +281,14 @@ let syncStates: any = {};
 
 function getSyncState(id: any) {
   let s: any = syncStates[id];
-  if (!s) s = syncStates[id] = new SyncState(id);
+  if (!s) {
+    syncStates[id] = new SyncState(id);
+    s = syncStates[id];
+  }
   return s;
 }
 
-Server.onShutdown(() => syncStates = {});
+Server.onShutdown(() => (syncStates = {}));
 
 // --------------------------------------------------------------------------
 // --- Synchronized State Hooks
@@ -287,7 +304,7 @@ Server.onShutdown(() => syncStates = {});
  *  - sends a `<id>.set` request to update the value of the state;
  *  - listens to `<id>.sig` signal to stay in sync with server updates.
  */
-export function useSyncState(id: string) {
+function useSyncState(id: string) {
   const s = getSyncState(id);
   Dome.useUpdate(PROJECT, s.UPDATE);
   Server.useSignal(s.signal, s.update);
@@ -303,7 +320,7 @@ export function useSyncState(id: string) {
  *  - sends a `<id>.get` request to obtain the current value of the state;
  *  - listens to `<id>.sig` signal to stay in sync with server updates.
  */
-export function useSyncValue(id: string) {
+function useSyncValue(id: string) {
   const s = getSyncState(id);
   Dome.useUpdate(s.update);
   Server.useSignal(s.signal, s.update);
@@ -325,9 +342,9 @@ class SyncArray {
 
   constructor(id: string) {
     this.UPDATE = STATE + id;
-    this.signal = id + '.sig';
-    this.fetchRq = id + '.fetch';
-    this.reloadRq = id + '.reload';
+    this.signal = `${id}.sig`;
+    this.fetchRq = `${id}.fetch`;
+    this.reloadRq = `${id}.reload`;
     this.index = {};
     this.insync = false;
     this.fetch = this.fetch.bind(this);
@@ -346,9 +363,7 @@ class SyncArray {
   fetch() {
     this.insync = true;
     Server.send(RqKind.GET, this.fetchRq, 50)
-      .then(({
-        reload = false, removed = [], updated = [], pending = 0
-      }) => {
+      .then(({ reload = false, removed = [], updated = [], pending = 0 }) => {
         let reloaded = false;
         if (reload) {
           reloaded = this.isEmpty();
@@ -361,7 +376,7 @@ class SyncArray {
           this.index[item.key] = item;
         });
         if (reloaded || removed.length || updated.length) {
-          this.index = Object.assign({}, this.index);
+          this.index = { ...this.index };
           Dome.emit(this.UPDATE);
         }
         if (pending > 0) {
@@ -376,7 +391,6 @@ class SyncArray {
     this.insync = false;
     Dome.emit(this.UPDATE);
   }
-
 }
 
 // --------------------------------------------------------------------------
@@ -395,7 +409,7 @@ function getSyncArray(id: string) {
   return a;
 }
 
-Server.onShutdown(() => syncArrays = {});
+Server.onShutdown(() => (syncArrays = {}));
 
 // --------------------------------------------------------------------------
 // --- Synchronized Array Hooks
@@ -440,12 +454,12 @@ setStateDefault(SELECTION, {});
  *  @return {array} `[selection,update]` for the current selection
  *  @description
  *  The selection is an object with many independant fields.
- *  You update it by providing only some fields, the other ones being kept unchanged,
- *  like the `setState()` behaviour of React components.
+ *  You update it by providing only some fields, the other ones being kept
+ *  unchanged, like the `setState()` behaviour of React components.
  */
 export function useSelection() {
   const [state, setState] = useState(SELECTION);
-  return [state, (upd: any) => setState(Object.assign({}, state, upd))];
+  return [state, (upd: any) => setState({ ...state, ...upd })];
 }
 
 // --------------------------------------------------------------------------
@@ -462,7 +476,8 @@ export default {
   useRequest,
   useDictionary,
   useSelection,
-  PROJECT, STATE
+  PROJECT,
+  STATE,
 };
 
 // --------------------------------------------------------------------------

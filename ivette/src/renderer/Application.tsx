@@ -21,39 +21,46 @@ import ASTview from './ASTview';
 // --- Main View
 // --------------------------------------------------------------------------
 
-export default (function () {
-
-  const [sidebar, flipSidebar] = Dome.useSwitch('frama-c.sidebar.unfold', false);
-  const [viewbar, flipViewbar] = Dome.useSwitch('frama-c.viewbar.unfold', false);
+export default (() => {
+  const [sidebar, flipSidebar] = Dome.useSwitch(
+    'frama-c.sidebar.unfold',
+    false,
+  );
+  const [viewbar, flipViewbar] = Dome.useSwitch(
+    'frama-c.viewbar.unfold',
+    false,
+  );
 
   return (
     <Vfill>
       <Toolbar.ToolBar>
         <Toolbar.Button
-          icon='SIDEBAR' title='Show/Hide side bar'
+          icon="SIDEBAR"
+          title="Show/Hide side bar"
           selected={sidebar}
           onClick={flipSidebar}
         />
         <Controller.Control />
         <Toolbar.Filler />
         <Toolbar.Button
-          icon='ITEMS.GRID'
-          title='Customize Main View'
+          icon="ITEMS.GRID"
+          title="Customize Main View"
           selected={viewbar}
-          onClick={flipViewbar} />
+          onClick={flipViewbar}
+        />
       </Toolbar.ToolBar>
-      <Splitter dir='LEFT' settings='frame-c.sidebar.position' unfold={sidebar}>
+      <Splitter dir="LEFT" settings="frame-c.sidebar.position" unfold={sidebar}>
         <Sidebar.SideBar>
           <div>(Empty)</div>
         </Sidebar.SideBar>
         <LabView
           customize={viewbar}
-          settings='frama-c.labview'
+          settings="frama-c.labview"
         >
-          <View id='dashboard' label='Dashboard' defaultView>
-            <GridItem id='frama-c.console' />
+          <View id="dashboard" label="Dashboard" defaultView>
+            <GridItem id="frama-c.console" />
           </View>
-          <Group id='frama-c' label='Frama-C' title='Frama-C Kernel Components'>
+          <Group id="frama-c" label="Frama-C" title="Frama-C Kernel Components">
             <Controller.Console />
             <Properties />
             <ASTview />
@@ -67,7 +74,6 @@ export default (function () {
       </Toolbar.ToolBar>
     </Vfill>
   );
-
 });
 
 // --------------------------------------------------------------------------

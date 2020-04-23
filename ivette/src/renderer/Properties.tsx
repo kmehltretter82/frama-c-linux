@@ -19,8 +19,9 @@ const ColumnCode: any =
 
 const ColumnTag: any =
   DefineColumn({
-    renderValue: (l: { label: string; descr: string }) =>
-      (<Label label={l.label} title={l.descr} />)
+    renderValue: (l: { label: string; descr: string }) => (
+      <Label label={l.label} title={l.descr} />
+    ),
   });
 
 // --------------------------------------------------------------------------
@@ -28,7 +29,6 @@ const ColumnTag: any =
 // -------------------------------------------------------------------------
 
 const RenderTable = () => {
-
   // Hooks
   const model = React.useMemo(() => new ArrayModel(), []);
   const items = States.useSyncArray('kernel.properties');
@@ -43,24 +43,30 @@ const RenderTable = () => {
   const selection = select ? items[select.marker] : undefined;
   const onSelection = (item: any) => item && setSelect({
     marker: item.key,
-    function: item.function
+    function: item.function,
   });
 
   // Rendering
   return (
-    <React.Fragment>
-      <Table model={model}
+    <>
+      <Table
+        model={model}
         selection={selection}
         onSelection={onSelection}
         scrollToItem={selection}
       >
-        <ColumnCode id='function' label='Function' width={120} />
-        <ColumnCode id='descr' label='Description' fill />
-        <ColumnTag id='status' label='Status'
-          fixed width={80} align='center'
-          getValue={getStatus} />
+        <ColumnCode id="function" label="Function" width={120} />
+        <ColumnCode id="descr" label="Description" fill />
+        <ColumnTag
+          id="status"
+          label="Status"
+          fixed
+          width={80}
+          align="center"
+          getValue={getStatus}
+        />
       </Table>
-    </React.Fragment>
+    </>
   );
 };
 
@@ -69,9 +75,11 @@ const RenderTable = () => {
 // -------------------------------------------------------------------------
 
 export default () => (
-  <Component id='frama-c.properties'
-    label='Properties'
-    title='Registered ACSL properties status' >
+  <Component
+    id="frama-c.properties"
+    label="Properties"
+    title="Registered ACSL properties status"
+  >
     <RenderTable />
   </Component>
 );

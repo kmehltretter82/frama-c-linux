@@ -7,11 +7,11 @@ import Server, { RqKind } from 'frama-c/server';
 import States from 'frama-c/states';
 
 import { Vfill } from 'dome/layout/boxes';
-import { Buffer } from 'dome/text/buffers';
+import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
 import { Component } from 'frama-c/LabViews';
 
-import 'codemirror/mode/clike/clike.js';
+import 'codemirror/mode/clike/clike';
 import 'codemirror/theme/ambiance.css';
 
 // --------------------------------------------------------------------------
@@ -21,13 +21,16 @@ import 'codemirror/theme/ambiance.css';
 const print = (buffer: any, text: string) => {
   if (Array.isArray(text)) {
     const tag = text.shift();
-    if (tag !== '')
+    if (tag !== '') {
       buffer.openTextMarker({ id: tag });
-    text.forEach(txt => print(buffer, txt));
-    if (tag !== '')
+    }
+    text.forEach((txt) => print(buffer, txt));
+    if (tag !== '') {
       buffer.closeTextMarker();
-  } else if (typeof (text) === 'string')
+    }
+  } else if (typeof (text) === 'string') {
     buffer.append(text);
+  }
 };
 
 // --------------------------------------------------------------------------
@@ -35,9 +38,8 @@ const print = (buffer: any, text: string) => {
 // --------------------------------------------------------------------------
 
 const ASTview = () => {
-
   // Hooks
-  const buffer = React.useMemo(() => new Buffer(), []);
+  const buffer = React.useMemo(() => new RichTextBuffer(), []);
   const [select, setSelect] = States.useSelection();
   const theFunction = select && select.function;
   const theMarker = select && select.marker;
@@ -47,11 +49,12 @@ const ASTview = () => {
     buffer.clear();
     if (theFunction) {
       buffer.log('// Loading', theFunction, '…');
-      Server.send(RqKind.GET, "kernel.ast.printFunction", theFunction)
+      Server.send(RqKind.GET, 'kernel.ast.printFunction', theFunction)
         .then((data: string) => {
           buffer.clear();
-          if (!data)
+          if (!data) {
             buffer.log('// No code for function ', theFunction);
+          }
           print(buffer, data);
           if (theMarker) buffer.scroll(theMarker, undefined);
         });
@@ -69,12 +72,14 @@ const ASTview = () => {
   // Component
   return (
     <Vfill>
-      <Text buffer={buffer}
-        mode='text/x-csrc'
-        theme='ambiance'
+      <Text
+        buffer={buffer}
+        mode="text/x-csrc"
+        theme="ambiance"
         selection={theMarker}
         onSelection={onSelection}
-        readOnly />
+        readOnly
+      />
     </Vfill>
   );
 };
@@ -84,9 +89,10 @@ const ASTview = () => {
 // --------------------------------------------------------------------------
 
 export default () => (
-  <Component id='frama-c.astview'
-    label='AST'
-    title='Normalized source code representation.'
+  <Component
+    id="frama-c.astview"
+    label="AST"
+    title="Normalized source code representation."
   >
     <ASTview />
   </Component>

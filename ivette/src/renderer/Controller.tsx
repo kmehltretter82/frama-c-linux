@@ -8,7 +8,7 @@ import Dome from 'dome';
 import { Button as ToolButton, ButtonGroup, Space } from 'dome/layout/toolbars';
 import { LED, IconButton } from 'dome/controls/buttons';
 import { Label, Code } from 'dome/controls/labels';
-import { Buffer } from 'dome/text/buffers';
+import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
 
 import Server, { StatusCode, ServerConfiguration } from 'frama-c/server';
@@ -21,7 +21,7 @@ import 'codemirror/theme/ambiance.css';
 // --------------------------------------------------------------------------
 
 let cmdConfig: ServerConfiguration;
-const cmdLine = new Buffer();
+const cmdLine = new RichTextBuffer();
 
 function dumpCmdLine(sc: ServerConfiguration): void {
   const { cwd, command, sockaddr, params } = sc;
@@ -29,16 +29,19 @@ function dumpCmdLine(sc: ServerConfiguration): void {
   if (cwd) cmdLine.log('--cwd', cwd);
   if (command) cmdLine.log('--command', command);
   if (sockaddr) cmdLine.log('--socket', sockaddr);
-  if (params) params.forEach((v: string, i: number) => {
-    if (i > 0) {
-      if (v.startsWith('-') || v.endsWith('.c')
-        || v.endsWith('.h') || v.endsWith('.i'))
-        cmdLine.append('\n');
-      else
-        cmdLine.append(' ');
-    }
-    cmdLine.append(v);
-  });
+  if (params) {
+    params.forEach((v: string, i: number) => {
+      if (i > 0) {
+        if (v.startsWith('-') || v.endsWith('.c')
+          || v.endsWith('.h') || v.endsWith('.i')) {
+          cmdLine.append('\n');
+        } else {
+          cmdLine.append(' ');
+        }
+      }
+      cmdLine.append(v);
+    });
+  }
   cmdLine.append('\n');
 }
 
@@ -51,19 +54,27 @@ function buildServerConfiguration(argv: string[], cwd?: string) {
     const v = argv[k];
     switch (v) {
       case '--cwd':
-        cwdir = argv[++k];
+        k += 1;
+        cwdir = argv[k];
         break;
       case '--command':
-        command = argv[++k];
+        k += 1;
+        command = argv[k];
         break;
       case '--socket':
-        sockaddr = argv[++k];
+        k += 1;
+        sockaddr = argv[k];
         break;
       default:
         params.push(v);
     }
   }
-  return { cwd: cwdir, command, sockaddr, params };
+  return {
+    cwd: cwdir,
+    command,
+    sockaddr,
+    params,
+  };
 }
 
 Dome.onCommand((argv: string[], cwd: string) => {
@@ -79,9 +90,14 @@ Dome.onCommand((argv: string[], cwd: string) => {
 
 export const Control = () => {
   const status = Server.useStatus();
-  let play: { enabled: boolean; onClick: any } = { enabled: false, onClick: null };
-  let stop: { enabled: boolean; onClick: any } = { enabled: false, onClick: null };
-  let reload: { enabled: boolean; onClick: any } = { enabled: false, onClick: null };
+
+  let play: { enabled: boolean; onClick: any } =
+    { enabled: false, onClick: null };
+  let stop: { enabled: boolean; onClick: any } =
+    { enabled: false, onClick: null };
+  let reload: { enabled: boolean; onClick: any } =
+    { enabled: false, onClick: null };
+
   switch (status) {
     case StatusCode.OFF:
     case StatusCode.FAILED:
@@ -91,15 +107,29 @@ export const Control = () => {
       stop = { enabled: true, onClick: Server.stop };
       reload = { enabled: true, onClick: Server.restart };
       break;
+    default:
+      break;
   }
   return (
     <ButtonGroup>
-      <ToolButton icon='MEDIA.PLAY' {...play}
-        title='Start the server' />
-      <ToolButton icon='RELOAD' {...reload}
-        title='Re-start the server' />
-      <ToolButton icon='MEDIA.STOP' {...stop}
-        title='Shut down the server' />
+      <ToolButton
+        icon="MEDIA.PLAY"
+        enabled={play.enabled}
+        onClick={play.onClick}
+        title="Start the server"
+      />
+      <ToolButton
+        icon="RELOAD"
+        enabled={reload.enabled}
+        onClick={reload.onClick}
+        title="Re-start the server"
+      />
+      <ToolButton
+        icon="MEDIA.STOP"
+        enabled={stop.enabled}
+        onClick={stop.onClick}
+        title="Shut down the server"
+      />
     </ButtonGroup>
   );
 };
@@ -121,10 +151,12 @@ function execCmdLine(cmd: string) {
 
 const RenderConsole = () => {
   const [cmd, switchCmd] = Dome.useSwitch();
-  const { current, next, prev, index, length, update, insert, clear }: any = Dome.useHistory('frama-c.command.history');
+  const { current, next, prev, index, length, update, insert, clear }: any =
+    Dome.useHistory('frama-c.command.history');
+
   const doExec = () => {
     const cmd = getCmdLine();
-    if (cmd != current) insert(cmd);
+    if (cmd !== current) insert(cmd);
     execCmdLine(cmd);
     switchCmd();
   };
@@ -136,34 +168,77 @@ const RenderConsole = () => {
     cmdLine.getDoc().setValue(update(undefined) || '');
   };
   return (
-    <React.Fragment>
+    <>
       <TitleBar label={cmd ? 'Command Line' : 'Console'}>
-        <Label className='dimmed' display={cmd && length > 0}>
+        <Label className="dimmed" display={cmd && length > 0}>
           {1 + index}/{length}
         </Label>
         <Space />
-        <IconButton icon='TRASH' display={cmd && clear} disabled={!clear} onClick={clear} title='Clear History' />
-        <IconButton icon='CROSS' display={cmd && clear} disabled={!current} onClick={doDrop} title='Remove Command' />
+        <IconButton
+          icon="TRASH"
+          display={cmd && clear}
+          disabled={!clear}
+          onClick={clear}
+          title="Clear History"
+        />
+        <IconButton
+          icon="CROSS"
+          display={cmd && clear}
+          disabled={!current}
+          onClick={doDrop}
+          title="Remove Command"
+        />
         <Space />
-        <IconButton icon='MEDIA.PREV' display={cmd} disabled={!prev} onClick={doPrev} title='Previous Command' />
-        <IconButton icon='RELOAD' display={cmd} onClick={doReload} title='Reset Command Line' />
-        <IconButton icon='MEDIA.NEXT' display={cmd} disabled={!next} onClick={doNext} title='Previous Command' />
+        <IconButton
+          icon="MEDIA.PREV"
+          display={cmd}
+          disabled={!prev}
+          onClick={doPrev}
+          title="Previous Command"
+        />
+        <IconButton
+          icon="RELOAD"
+          display={cmd}
+          onClick={doReload}
+          title="Reset Command Line"
+        />
+        <IconButton
+          icon="MEDIA.NEXT"
+          display={cmd}
+          disabled={!next}
+          onClick={doNext}
+          title="Previous Command"
+        />
         <Space />
-        <IconButton icon='MEDIA.PLAY' display={cmd} onClick={doExec} title='Execute Command Line' />
-        <IconButton icon='EDIT' selected={cmd} onClick={switchCmd} title='Edit Command Line' />
+        <IconButton
+          icon="MEDIA.PLAY"
+          display={cmd}
+          onClick={doExec}
+          title="Execute Command Line"
+        />
+        <IconButton
+          icon="EDIT"
+          selected={cmd}
+          onClick={switchCmd}
+          title="Edit Command Line"
+        />
       </TitleBar>
-      <Text buffer={cmd ? cmdLine : Server.buffer}
-        mode='text'
+      <Text
+        buffer={cmd ? cmdLine : Server.buffer}
+        mode="text"
         readOnly={!cmd}
-        theme='ambiance' />
-    </React.Fragment>
+        theme="ambiance"
+      />
+    </>
   );
 };
 
 export const Console = () => (
-  <Component id='frama-c.console'
-    label='Console'
-    title='Frama-C Server Output & Command Line'>
+  <Component
+    id="frama-c.console"
+    label="Console"
+    title="Frama-C Server Output & Command Line"
+  >
     <RenderConsole />
   </Component>
 );
@@ -176,7 +251,9 @@ export const Status = () => {
   Dome.useUpdate(Server.STATUS);
   const s = Server.getStatus();
   const n = Server.getPending();
-  let led, blink, error;
+  let led;
+  let blink;
+  let error;
   switch (s) {
     case StatusCode.OFF:
       led = 'inactive';
@@ -201,13 +278,15 @@ export const Status = () => {
       blink = false;
       error = Server.getError();
       break;
+    default:
+      break;
   }
   return (
-    <React.Fragment>
+    <>
       <LED status={led} blink={blink} />
       <Code label={s} />
-      {error && <Label icon='WARNING' label={error} />}
-    </React.Fragment>
+      {error && <Label icon="WARNING" label={error} />}
+    </>
   );
 };
 
@@ -225,6 +304,11 @@ export const Stats = () => {
 // --- Controller Exports
 // --------------------------------------------------------------------------
 
-export default { Control, Console, Status, Stats };
+export default {
+  Control,
+  Console,
+  Status,
+  Stats,
+};
 
 // --------------------------------------------------------------------------
