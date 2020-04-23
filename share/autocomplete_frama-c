@@ -94,12 +94,12 @@ _frama-c ()
   then
       local prefix=; [[ $cur == *,* ]] && prefix="${cur%,*},"
       advance_options="$(frama-c -wp-detect | grep -E -o " \[.*" | grep -E -o "[^\[-\|]*")"
+      advance_options+="none script tip native:alt-ergo native:coq native:coqide"
       local ambigous="$(bind -v | grep show-all-if-ambiguous)"
       ambigous="${ambigous##* }"
       if [[ "$ambigous" == "on" ]]
       then
 	  COMPREPLY=( $( compgen -W "${advance_options}" -- "${cur##*,}" ) )
-	  COMPREPLY+=( $( compgen -W "none script tip native:alt-ergo native:coq native:coqide" -- "${cur##*,}" ) )
 	  [[ ${#COMPREPLY[@]} -eq 1 ]] && COMPREPLY=( ${COMPREPLY/#/$prefix} )
       else
 	  COMPREPLY=( $( compgen -P "$prefix" -W "${advance_options}" -- "${cur##*,}" ) )
