@@ -501,7 +501,7 @@ and bal = parse
         let descr = String.concat "," drvs in
         let includes =
           let directories =
-            [(Wp_parameters.Share.get_dir "." :> string)]
+            [(Wp_parameters.Share.get_dir ~mode:`Must_exist "." :> string)]
           in
           if Wp_parameters.has_dkey dkey then
             Wp_parameters.debug ~dkey "Included directories:%t"
