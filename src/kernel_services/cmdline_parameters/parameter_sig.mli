@@ -308,8 +308,8 @@ module type Specific_dir = sig
     ?mode:[`Normalize_only | `Create_path |  `Must_exist ] ->
     string ->
     Filepath.Normalized.t
-  (** [get_dir ?mode p] returns a local-path [p], relative to the plugin
-      <specific-dir> directory, to a sub-directory of the plugin <specific-dir>
+  (** [get_dir ?mode p] returns a (local) path [p], i.e. relative to the plugin
+      <specific-dir> directory, of a sub-directory of the plugin <specific-dir>
       directory.
       @param mode determines how to handle the resulting path:
       + [Normalize_only] just normalizes the resulting path (default).
@@ -320,8 +320,8 @@ module type Specific_dir = sig
     ?mode:[`Normalize_only | `Create_path |  `Must_exist ] ->
     string ->
     Filepath.Normalized.t
-    (** [get_file ?mode p] returns a local-path [p], relative to the plugin
-        <specific-dir> directory, to a file in the plugin <specific-dir>
+    (** [get_file ?mode p] returns a (local) path [p], i.e. relative to the
+        plugin <specific-dir> directory, of a file in the plugin <specific-dir>
         directory.
         @param mode determines how to handle the resulting path:
         + [Normalize_only] just normalizes the resulting path (default).
