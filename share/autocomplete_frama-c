@@ -31,7 +31,7 @@
 # If you want to enable Frama-C completion only for your account, append
 # this file to ~/.bash_completion.
 #
-# For a less verbose completition for options with comma-separated values,
+# For a less verbose completion for options with comma-separated values,
 # put "set show-all-if-ambiguous on" in your "~/.inputrc".
 #
 # Assuming frama-c is in your PATH,
@@ -93,14 +93,13 @@ _frama-c ()
   elif [[ "${COMP_WORDS[COMP_CWORD -1]}" == "-wp-prover" ]]
   then
       local prefix=; [[ $cur == *,* ]] && prefix="${cur%,*},"
-      # The current output of -wp-detect is not suitable for an easy grep using regular expressions,
-      # so the possible completions are not added to $COMPREPLY.
-      advance_options="none scritp tip alt-ergo altgr-ergo coq native:alt-ergo native:coq native:coqide"
+      advance_options="$(frama-c -wp-detect | grep -E -o " \[.*" | grep -E -o "[^\[-\|]*")"
       local ambigous="$(bind -v | grep show-all-if-ambiguous)"
       ambigous="${ambigous##* }"
       if [[ "$ambigous" == "on" ]]
       then
 	  COMPREPLY=( $( compgen -W "${advance_options}" -- "${cur##*,}" ) )
+	  COMPREPLY+=( $( compgen -W "none script tip native:alt-ergo native:coq native:coqide" -- "${cur##*,}" ) )
 	  [[ ${#COMPREPLY[@]} -eq 1 ]] && COMPREPLY=( ${COMPREPLY/#/$prefix} )
       else
 	  COMPREPLY=( $( compgen -P "$prefix" -W "${advance_options}" -- "${cur##*,}" ) )
