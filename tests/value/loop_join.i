@@ -12,5 +12,5 @@ void main () {
       if (i == 400)
         goto l_end_loop;
       }
- l_end_loop:
+ l_end_loop:;
 }

@@ -4,7 +4,6 @@
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   int x = 0;
   x ++;
   __e_acsl_assert(1,"Assertion","main","sizeof(int) == sizeof(x)",

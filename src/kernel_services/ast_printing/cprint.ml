@@ -193,6 +193,7 @@ let rec print_specifiers fmt (specs: spec_elem list) =
     | SpecCV CV_VOLATILE -> fprintf fmt "volatile"
     | SpecCV CV_RESTRICT -> fprintf fmt "restrict"
     | SpecCV (CV_ATTRIBUTE_ANNOT a) -> fprintf fmt "/*@@ %s */" a
+    | SpecCV CV_GHOST -> fprintf fmt "\\ghost"
     | SpecAttr al -> print_attribute fmt al
     | SpecType bt -> print_type_spec fmt bt
     | SpecPattern name -> fprintf fmt "@@specifier(%s)" name

@@ -449,7 +449,7 @@ module Computer(I: Init) = struct
             "too few arguments in call to %a" Printer.pp_varinfo f
         | p::prms, a::args ->
           let lv = Logic_const.tvar (Cil.cvar_to_lvar p) in
-          let la = Logic_utils.expr_to_term ~cast:false a in
+          let la = Logic_utils.expr_to_term a in
           let value =
             Cil_datatype.Term.Map.add
               la (Fixed 0) Cil_datatype.Term.Map.empty

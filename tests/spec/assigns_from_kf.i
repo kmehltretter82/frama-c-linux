@@ -1,7 +1,9 @@
 /* run.config
   MODULE: @PTEST_DIR@/@PTEST_NAME@.cmxs
-  OPT: -print
+  OPT: -kernel-warn-key ghost:bad-use=inactive -print
 */
+// Note: we deactivate "ghost:bad-use" because the typing phase checks on call
+// that ghost functions that are only declared have a contract.
 
 void nothing(void);
 int nothing_r(void);

@@ -35,6 +35,7 @@ val equation : Sigs.equation -> pred
 
 type 'a printer = Format.formatter -> 'a -> unit
 
+val pp_acs : acs printer
 val pp_bound : term option printer
 val pp_value : 'a printer -> 'a value printer
 val pp_logic : 'a printer -> 'a logic printer

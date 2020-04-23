@@ -603,10 +603,13 @@ object(self)
       (match v with
         | Catch_all -> b
         | Catch_exn (v,[]) ->
-          v.vtype <- purify v.vtype; update_locals v b;assign_catched_obj v b; b
+          Cil.update_var_type v (purify v.vtype);
+          update_locals v b;
+          assign_catched_obj v b; b
         | Catch_exn(v,aux) ->
           let add_one_aux stmts (v,b) =
-            v.vtype <- purify v.vtype; update_locals v b;
+            Cil.update_var_type v (purify v.vtype);
+            update_locals v b;
             assign_catched_obj v b;
             add_unreachable_block b :: stmts
           in
@@ -615,7 +618,7 @@ object(self)
             List.fold_left add_one_aux [Cil.mkStmt (Block b)] aux
           in
           let main_block = Cil.mkBlock aux_blocks in
-          v.vtype <- purify v.vtype;
+          Cil.update_var_type v (purify v.vtype);
           update_locals v main_block;
           main_block)
     in

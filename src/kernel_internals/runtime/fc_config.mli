@@ -46,6 +46,10 @@ val is_gui: bool ref
 (** Is the Frama-C GUI running?
     @since Beryllium-20090601-beta1 *)
 
+val lablgtk: string
+(** Name of the lablgtk version against which Frama-C has been compiled.
+    blank if only command-line mode is available. *)
+
 val ocamlc: string
 (** Name of the bytecode compiler.
     @since Boron-20100401 *)

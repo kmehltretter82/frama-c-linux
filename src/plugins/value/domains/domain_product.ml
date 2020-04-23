@@ -37,8 +37,8 @@ module Make
   type location = Left.location
 
   type origin = {
-    left:  reductness * Left.origin;
-    right: reductness * Right.origin;
+    left:  reductness * Left.origin option;
+    right: reductness * Right.origin option;
   }
 
   let () = incr counter
@@ -85,7 +85,7 @@ module Make
           else if Value.equal v2 Value.top then Created else Reduced
         in
         let origin = {left = left, o1; right = right, o2} in
-        value, origin
+        value, Some origin
       in
       value, alarms
 
@@ -120,7 +120,7 @@ module Make
       | Reduced, Some (Created, _) -> Created
       | _ as x, _ -> x
     in
-    let origin = Extlib.opt_map snd origin in
+    let origin = Extlib.may_map snd ~dft:None origin in
     { record with origin; reductness }
 
   let lift_valuation side valuation =
@@ -227,9 +227,14 @@ module Make
          print_one_side fmt right_log Right.name Right.pretty right)
 
 
-  let logic_assign assign location ~pre:(left_pre, right_pre) (left, right) =
-    Left.logic_assign assign location ~pre:left_pre left,
-    Right.logic_assign assign location ~pre:right_pre right
+  let logic_assign assign location (left, right) =
+    let left_assign, right_assign =
+      match assign with
+      | None -> None, None
+      | Some (assign, (left, right)) -> Some (assign, left), Some (assign, right)
+    in
+    Left.logic_assign left_assign location left,
+    Right.logic_assign right_assign location right
 
   let lift_logic_env f logic_env =
     Abstract_domain.{ states = (fun label -> f (logic_env.states label));

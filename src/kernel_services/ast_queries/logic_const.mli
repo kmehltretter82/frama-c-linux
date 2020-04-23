@@ -170,6 +170,9 @@ val pvalid_read: ?loc:location -> logic_label * term -> predicate
 (** \valid *)
 val pvalid: ?loc:location -> logic_label * term -> predicate
 
+(** \object_pointer *)
+val pobject_pointer: ?loc:location -> logic_label * term -> predicate
+
 (** \valid_function *)
 val pvalid_function: ?loc:location -> term -> predicate
 
@@ -320,6 +323,9 @@ val tvar: ?loc:Location.t -> logic_var -> term
 
 (** \result *)
 val tresult: ?loc:Location.t -> typ -> term
+
+(** cast to the given C type *)
+val tcast: ?loc:Location.t -> term -> typ -> term
 
 (** coercion to the given logic type *)
 val tlogic_coerce: ?loc:Location.t -> term -> logic_type -> term

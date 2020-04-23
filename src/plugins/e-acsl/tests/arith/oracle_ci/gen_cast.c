@@ -4,7 +4,6 @@
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   long x = (long)0;
   int y = 0;
   __e_acsl_assert((int)x == y,"Assertion","main","(int)x == y",

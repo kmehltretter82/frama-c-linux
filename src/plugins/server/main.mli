@@ -35,7 +35,14 @@ val pp_kind : Format.formatter -> kind -> unit
 
 val register : kind -> string -> (json -> json) -> unit
 val find : string -> (kind * (json -> json)) option
-val exec : string -> json -> json (** @raises Not_found if not registered *)
+val exec : string -> json -> json (** @raises Not_found if not registered. *)
+
+(* -------------------------------------------------------------------------- *)
+(** {2 Signals Registry} *)
+(* -------------------------------------------------------------------------- *)
+
+type signal
+val signal : string -> signal
 
 (* -------------------------------------------------------------------------- *)
 (** {2 Server Main Process} *)
@@ -47,6 +54,8 @@ type 'a request = [
   | `Poll
   | `Request of 'a * string * json
   | `Kill of 'a
+  | `SigOn of string
+  | `SigOff of string
   | `Shutdown
 ]
 
@@ -57,6 +66,7 @@ type 'a response = [
   | `Error of 'a * string
   | `Killed of 'a
   | `Rejected of 'a
+  | `Signal of string
 ]
 
 (** A paired request-response message.
@@ -68,15 +78,10 @@ type 'a message = {
 
 type 'a server
 
-(**
-   Run a server with the provided low-level network primitives to
-   actually exchange data.
+(** Run a server with the provided low-level network primitives to actually
+    exchange data. Logs are monitored unless [~logs:false] is specified.
 
-   The function does not return until the server is explicitely
-   Shutdown. Logs are monitored unless [~logs:false] is specified.
-
-   Default equality is the standard `(=)` one.
-*)
+    Default equality is the standard `(=)` one. *)
 val create :
   pretty:(Format.formatter -> 'a -> unit) ->
   ?equal:('a -> 'a -> bool) ->
@@ -84,25 +89,34 @@ val create :
   unit -> 'a server
 
 (** Run the server forever.
-    The function will not return until the server is shut down. *)
+    The function will {i not} return until the server is actually shut down. *)
 val run : 'a server -> unit
 
 (** Start the server in background.
-    The function returns immediately
-    after installing a daemon that accepts GET requests received by
-    the server on calls to `Db.yield()`.
-*)
+
+    The function returns immediately after installing a daemon that accepts GET
+    requests received by the server on calls to [Db.yield()]. *)
 val start : 'a server -> unit
 
 (** Stop the server if it is running in background. *)
 val stop : 'a server -> unit
 
-(** Kills the currently running request. Actually raises an exception. *)
+(** Kill the currently running request by raising an exception. *)
 val kill : unit -> 'a
 
+(** Emit the server signal to the client. *)
+val emit : signal -> unit
+
+(** Register a callback on signal listening.
+
+    The callback is invoked with [true] on [SIGON] command
+    and [false] on [SIGOFF].
+*)
+val on_signal : signal -> (bool -> unit) -> unit
+
 (** Register a callback to listen for server activity.
-    All callbacks would be executed in their order of registration.
-    They shall {i never} raise any exception. *)
+    All callbacks are executed in their order of registration.
+    Callbacks shall {i never} raise any exception. *)
 val on : (bool -> unit) -> unit
 
 (* -------------------------------------------------------------------------- *)

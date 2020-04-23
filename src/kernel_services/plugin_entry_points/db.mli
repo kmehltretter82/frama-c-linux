@@ -900,8 +900,10 @@ module RteGen : sig
   val get_signed_downCast_status : (unit -> status_accessor) ref
   val get_unsignedOv_status : (unit -> status_accessor) ref
   val get_unsignedDownCast_status : (unit -> status_accessor) ref
+  val get_pointer_downcast_status : (unit -> status_accessor) ref
   val get_float_to_int_status : (unit -> status_accessor) ref
   val get_finite_float_status : (unit -> status_accessor) ref
+  val get_pointer_value_status : (unit -> status_accessor) ref
   val get_bool_value_status : (unit -> status_accessor) ref
 end
 
@@ -1375,13 +1377,6 @@ val cancel : unit -> unit
    [job] on [data] while registering [trigger] as temporary (debounced) daemon.
    The daemon is finally unregistered at the end of the computation.
 
-   {b Raises} every exception raised during the execution of [job] on [data].
-
-   @param debounced the least amount of time, in milliseconds, between two
-   successive calls to the daemon (default is 0ms).
-   @param on_delayed the callback invoked as soon as the time since the last
-   [yield] is greater than [debounced] milliseconds (or 100ms at least).
-
    Illustrative example, where [...] is the debounced time:
    {[
        job data :    |<-------------------------------------------------->|<daemon removed>
@@ -1391,9 +1386,16 @@ val cancel : unit -> unit
        notes    :      (1)           (2)           (3)
    ]}
 
-   {ol {li First yield, normal trigger.}
-   {li Debounced yields leads to this second trigger.}
-   {li Delayed warning invoked since there was no yield for more than debounced period.}}
+   + First yield, normal trigger.
+   + Debounced yields leads to this second trigger.
+   + Delayed warning invoked since there was no yield for more than debounced period.
+
+   Raises every exception raised during the execution of [job] on [data].
+
+   @param debounced the least amount of time, in milliseconds, between two
+   successive calls to the daemon (default is 0ms).
+   @param on_delayed the callback invoked as soon as the time since the last
+   [yield] is greater than [debounced] milliseconds (or 100ms at least).
 *)
 val with_progress :
   ?debounced:int -> ?on_delayed:(int -> unit) ->

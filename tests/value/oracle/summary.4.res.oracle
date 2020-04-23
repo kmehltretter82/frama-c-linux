@@ -52,7 +52,7 @@
 [eva:alarm] tests/value/summary.i:35: Warning: 
   assertion 'rte,is_nan_or_infinite' got status unknown.
 [eva:alarm] tests/value/summary.i:35: Warning: 
-  non-finite double value. assert \is_finite((double)(d - d));
+  non-finite double value. assert \is_finite(\sub_double(d, d));
 [eva:alarm] tests/value/summary.i:36: Warning: 
   assertion 'rte,float_to_int' got status unknown.
 [eva:alarm] tests/value/summary.i:39: Warning: 

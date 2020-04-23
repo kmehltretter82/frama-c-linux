@@ -28,8 +28,8 @@ module type Generator_sig = sig
   type override_key = Hashtbl.key
 
   val function_name: string
-  val well_typed_call: lval option -> exp list -> bool
-  val key_from_call: lval option -> exp list -> override_key
+  val well_typed_call: lval option -> varinfo -> exp list -> bool
+  val key_from_call: lval option -> varinfo -> exp list -> override_key
   val retype_args: override_key -> exp list -> exp list
   val args_for_original: override_key -> exp list -> exp list
   val generate_prototype: override_key -> (string * typ)
@@ -41,14 +41,13 @@ module type Instantiator = sig
   type override_key
 
   val function_name: string
-  val well_typed_call: lval option -> exp list -> bool
-  val key_from_call: lval option -> exp list -> override_key
+  val well_typed_call: lval option -> varinfo -> exp list -> bool
+  val key_from_call: lval option -> varinfo -> exp list -> override_key
   val retype_args: override_key -> exp list -> exp list
   val get_override: override_key -> fundec
   val get_kfs: unit -> kernel_function list
-  val mark_as_computed:  ?project:Project.t -> unit -> unit
+  val clear: unit -> unit
 end
-
 
 let build_body caller callee args_generator =
   let open Extlib in
@@ -68,12 +67,13 @@ let build_body caller callee args_generator =
 module Make_instantiator (G: Generator_sig) = struct
   include G
   module Enabled = Options.NewInstantiator (G)
-  module Cache = State_builder.Hashtbl (G.Hashtbl) (Cil_datatype.Fundec)
-      (struct
-        let size = 5
-        let dependencies = []
-        let name = "Instantiator." ^ G.function_name
-      end)
+  module Cache = struct
+    let tbl = G.Hashtbl.create 13
+    let find = G.Hashtbl.find tbl
+    let add = G.Hashtbl.add tbl
+    let fold f = G.Hashtbl.fold f tbl
+    let clear () = G.Hashtbl.clear tbl
+  end
 
   let make_fundec key =
     let open Globals.Functions in
@@ -113,5 +113,6 @@ module Make_instantiator (G: Generator_sig) = struct
   let get_kfs () =
     Cache.fold (fun _ fd l -> Globals.Functions.get fd.svar :: l) []
 
-  let mark_as_computed = Cache.mark_as_computed
+  let clear () =
+    Cache.clear ()
 end

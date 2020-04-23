@@ -52,6 +52,26 @@ To summarize:
 | `SET`   | - | - | fast, side-effects |
 | `EXEC`  | - | ✓ | resource demanding |
 
+## Server Signals
+
+In response to a logical requests, the server might also emit _signals_
+to the client. However, since a lot of signals might be emitted, the server
+must be aware of which signals the client is listening to.
+Signal are identified by unique strings.
+
+The server and client can exchange two special commands to manage signals:
+
+| Command | Issued by | Effect                      |
+|:--------|:---------:|:----------------------------|
+| `SIGON s` | client | start listening to signal `<s>` |
+| `SIGOFF s` | client | stop listening to signal `<s>` |
+| `SIGNAL s` | server | signal `<s>` has been emitted  |
+
+When one or many requests emit some signal `<s>` several times,
+the client would be notified only once per cycle of data exchange.
+Signals will be notified in addition to responses or logical requests
+or server polling.
+
 ## Transport Messages
 
 From the entry points layer, the asynchronous behavior of the Server makes
@@ -70,10 +90,12 @@ a list of _commands_:
 
 | Commands | Parameters | Description |
 |:--------:|:----------:|:------------|
-| `POLL` | - | Ask for pending responses, if any |
+| `POLL` | - | Ask for pending responses and signals, if any |
 | `GET` | `id,request,data` | En-queue the given GET request |
 | `SET` | `id,request,data` | En-queue the given SET request |
 | `EXEC` | `id,request,data` | En-queue the given EXEC request |
+| `SIGON` | `id` | Start listening to the given signal |
+| `SIGOFF` | `id` | Stop listening to the given signal |
 | `KILL` | `id` | Cancel the given request or interrupt its execution |
 | `SHUTDOWN` | - | Makes the server to stop running |
 
@@ -84,6 +106,7 @@ of _replies_, listed in table below:
 |:--------:|:----------:|:------------|
 | `DATA` | `id,data` | Response data from the identified request |
 | `ERROR` | `id,message` | Error message from the identified request |
+| `SIGNAL` | `id` | The identified signal has been emitted since last exchange |
 | `KILLED` | `id` | The identified request has been killed or interrupted |
 | `REJECTED` | `id` | The identified request was not registered on the Server |
 

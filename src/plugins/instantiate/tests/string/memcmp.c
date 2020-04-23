@@ -30,3 +30,15 @@ int nested(int (*s1)[10], int (*s2)[10], int n){
 int with_void(void *s1, void *s2, int n){
   return memcmp(s1, s2, 10) ;
 }
+
+struct incomplete ;
+int with_incomplete(struct incomplete* s1, struct incomplete* s2, int n){
+  return memcmp(s1, s2, n);
+}
+
+void with_null_or_int(int p[10]){
+  memcmp(NULL, p, 10 * sizeof(int));
+  memcmp(p, NULL, 10 * sizeof(int));
+  memcmp((int const*)42, p, 10 * sizeof(int));
+  memcmp(p, (int const*)42, 10 * sizeof(int));
+}

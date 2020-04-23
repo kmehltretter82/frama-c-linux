@@ -197,17 +197,18 @@ let rec varpoly k x = function
   | y::ys -> if x = y then k else varpoly (succ k) x ys
 
 type t_builtin = E_mdt of mdt | E_poly of (tau list -> tau)
+let builtin_types = Context.create "Wp.Lang.builtin_types"
 
-let builtins = Hashtbl.create 131
+let find_builtin name = Context.get builtin_types name
 
 let adt lt =
-  try match Hashtbl.find builtins lt.lt_name with
+  try match find_builtin lt.lt_name with
     | E_mdt m -> Mtype m
     | E_poly _ -> assert false
   with Not_found -> Atype lt
 
 let atype lt ts =
-  try match Hashtbl.find builtins lt.lt_name with
+  try match find_builtin lt.lt_name with
     | E_mdt m -> Logic.Data(Mtype m,ts)
     | E_poly ftau -> ftau ts
   with Not_found -> Logic.Data(Atype lt,ts)
@@ -279,30 +280,21 @@ end
 (* --- Datatypes                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-let get_builtin_type ~name ~link ~library =
-  try match Hashtbl.find builtins name with
-    | E_mdt m -> Mtype m
-    | E_poly _ -> assert false
-  with Not_found ->
-    let m = new_extern ~link ~library ~debug:name in
-    Hashtbl.add builtins name (E_mdt m) ; Mtype m
-
-let set_builtin_type ~name ~link ~library =
-  let m = new_extern ~link ~library ~debug:name in
-  Hashtbl.add builtins name (E_mdt m)
-
-let set_builtin_poly ~name f =
-  Hashtbl.add builtins name (E_poly f)
+let get_builtin_type ~name =
+  match find_builtin name with
+  | E_mdt m -> Mtype m
+  | E_poly _ -> assert false
 
 let mem_builtin_type ~name =
-  Hashtbl.mem builtins name
+  try ignore (find_builtin name) ; true
+  with Not_found -> false
 
-let is_builtin lt = Hashtbl.mem builtins lt.lt_name
+let is_builtin lt = mem_builtin_type lt.lt_name
 
 let is_builtin_type ~name = function
   | Data(Mtype m,_) ->
       begin
-        try match Hashtbl.find builtins name with
+        try match find_builtin name with
           | E_mdt m0 -> m == m0
           | _ -> false
         with Not_found -> false
@@ -526,6 +518,9 @@ let generated_p ?context name =
     m_typeof = not_found;
     m_source = generated ?context name
   }
+
+let extern_t name ~link ~library =
+  new_extern ~link ~library ~debug:name
 
 module Fun =
 struct

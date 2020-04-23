@@ -53,7 +53,8 @@ let l_repeat = Lang.(E.({
 
 (*--- Typechecking ---*)
 
-let a_list = Lang.get_builtin_type ~library ~name:t_list ~link:l_list
+let () = LogicBuiltins.add_type t_list ~library ~link:l_list ()
+let a_list = Lang.get_builtin_type t_list
 
 let vlist_get_tau = function
   | None -> invalid_arg "a list operator without result type"

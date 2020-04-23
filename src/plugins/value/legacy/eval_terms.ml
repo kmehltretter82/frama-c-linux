@@ -715,9 +715,21 @@ let known_logic_funs = [
   "powf", ACSL;
   "fmod", ACSL;
   "fmodf", ACSL;
+  "sqrt", ACSL;
+  "sqrtf", ACSL;
   "\\sign", ACSL;
   "\\min", ACSL;
   "\\max", ACSL;
+  "\\neg_float",ACSL;
+  "\\add_float",ACSL;
+  "\\sub_float",ACSL;
+  "\\mul_float",ACSL;
+  "\\div_float",ACSL;
+  "\\neg_double",ACSL;
+  "\\add_double",ACSL;
+  "\\sub_double",ACSL;
+  "\\mul_double",ACSL;
+  "\\div_double",ACSL;
 ]
 let known_predicates = [
   "\\warning", ACSL;
@@ -1352,9 +1364,14 @@ and eval_known_logic_function ~alarm_mode env li labels args =
     eval_logic_charchr builtin
       { env with e_cur = lbl } s.eover c.eover s.ldeps c.ldeps
 
-  | ("atan2" | "atan2f" | "fmod" | "fmodf" | "pow" | "powf"),
+  | ( "atan2" | "atan2f" | "fmod" | "fmodf" | "pow" | "powf"
+    | "\\add_float" | "\\sub_float" | "\\mul_float" | "\\div_float"
+    | "\\add_double" | "\\sub_double" | "\\mul_double" | "\\div_double" ),
     _, _, [arg1; arg2] ->
     eval_float_builtin_arity2 ~alarm_mode env lvi.lv_name arg1 arg2
+
+  | ( "sqrt" | "sqrtf" | "\\neg_float" | "\\neg_double" ),_,_, [arg] ->
+    eval_float_builtin_arity1 ~alarm_mode env lvi.lv_name arg
 
   | "\\sign", _, _, [arg] ->
     begin
@@ -1405,6 +1422,14 @@ and eval_float_builtin_arity2  ~alarm_mode env name arg1 arg2 =
     | "fmodf" ->  Fval.fmod  Fval.Single
     | "pow" ->    Fval.pow   Fval.Double
     | "powf" ->   Fval.pow   Fval.Single
+    | "\\add_float" -> Fval.add Fval.Single
+    | "\\sub_float" -> Fval.sub Fval.Single
+    | "\\mul_float" -> Fval.mul Fval.Single
+    | "\\div_float" -> Fval.div Fval.Single
+    | "\\add_double" -> Fval.add Fval.Double
+    | "\\sub_double" -> Fval.sub Fval.Double
+    | "\\mul_double" -> Fval.mul Fval.Double
+    | "\\div_double" -> Fval.div Fval.Double
     | _ -> assert false
   in
   let r1 = eval_term ~alarm_mode env arg1 in
@@ -1423,6 +1448,24 @@ and eval_float_builtin_arity2  ~alarm_mode env name arg1 arg2 =
   let ldeps = join_logic_deps r1.ldeps r2.ldeps in
   { etype = r1.etype; eunder; eover = v; ldeps; empty = r1.empty || r2.empty; }
 
+and eval_float_builtin_arity1  ~alarm_mode env name arg =
+  let fcaml = match name with
+    | "sqrt" ->   Fval.sqrt  Fval.Double
+    | "sqrtf" ->  Fval.sqrt  Fval.Single
+    | "\\neg_float" | "\\neg_double" ->  Fval.neg
+    | _ -> assert false
+  in
+  let r = eval_term ~alarm_mode env arg in
+  let v =
+    try
+      let i = Cvalue.V.project_ival r.eover in
+      let f = Ival.project_float i in
+      Cvalue.V.inject_float (fcaml f)
+    with Cvalue.V.Not_based_on_null ->
+      Cvalue.V.topify_arith_origin r.eover
+  in
+  let eunder = under_from_over v in
+  { etype = r.etype; eunder; eover = v; ldeps=r.ldeps; empty = r.empty; }
 
 (* Computes the max (resp. the min) between the evaluation results [r1] and [r2]
    according to [backward_left v1 v2] that reduces [v1] by assuming it is
@@ -1490,12 +1533,6 @@ let eval_tlval_as_location ~alarm_mode env t =
   let r = eval_term_as_lval ~alarm_mode env t in
   let s = Eval_typ.sizeof_lval_typ r.etype in
   make_loc r.eover s
-
-let eval_tlval_as_location_with_deps ~alarm_mode env t =
-  let r = eval_term_as_lval ~alarm_mode env t in
-  let s = Eval_typ.sizeof_lval_typ r.etype in
-  (make_loc r.eover s, r.ldeps)
-
 
 (* Return a pair of (under-approximating, over-approximating) zones. *)
 let eval_tlval_as_zone_under_over ~alarm_mode access env t =
@@ -2121,6 +2158,8 @@ let rec reduce_by_predicate ~alarm_mode env positive p =
       reduce_by_valid env positive Write tsets
     | _,Pvalid_read (_label,tsets) ->
       reduce_by_valid env positive Read tsets
+    | _,Pobject_pointer (_label, tsets) ->
+      reduce_by_valid env positive No_access tsets
 
     | _,Pvalid_function _tsets -> env (* TODO *)
 
@@ -2269,9 +2308,17 @@ and eval_predicate env pred =
       ignore (env_state env lbl);
       do_eval { env with e_cur = lbl } p
 
-    | Pvalid (_label, tsets) | Pvalid_read (_label, tsets) ->
+    | Pvalid (_, tsets)
+    | Pvalid_read (_, tsets)
+    | Pobject_pointer (_, tsets) ->
       (* TODO: see same constructor in reduce_by_predicate *)
-      let kind = match p.pred_content with Pvalid_read _ -> Read | _ -> Write in
+      let kind =
+        match p.pred_content with
+        | Pvalid_read _ -> Read
+        | Pvalid _ -> Write
+        | Pobject_pointer _ -> No_access
+        | _ -> assert false
+      in
       let typ_pointed = Logic_typing.ctype_of_pointed tsets.term_type in
       (* Check if we are trying to write in a const l-value *)
       if kind = Write && Value_util.is_const_write_invalid typ_pointed
@@ -2534,11 +2581,19 @@ and eval_predicate env pred =
 (* --- Dependencies of predicates                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
-(* Currently unused (and untested *)
+let eval_tsets_deps ~alarm_mode env lbl tsets =
+  let star_tsets = deref_tsets tsets in
+  let r = eval_tlval ~alarm_mode env star_tsets in
+  let size_bits = Eval_typ.sizeof_lval_typ r.etype in
+  let loc = make_loc r.eover size_bits in
+  let zone = enumerate_valid_bits Locations.Read loc in
+  Logic_label.Map.add lbl zone r.ldeps
 
 let predicate_deps env pred =
   let alarm_mode = Ignore in
   let rec do_eval env p =
+    let term_deps term = (eval_term ~alarm_mode env term).ldeps in
+    let tsets_deps lbl tsets = eval_tsets_deps ~alarm_mode env lbl tsets in
     match p.pred_content with
     | Ptrue | Pfalse -> empty_logic_deps
 
@@ -2547,32 +2602,28 @@ let predicate_deps env pred =
       join_logic_deps (do_eval env p1) (do_eval env p2)
 
     | Prel (_, t1, t2) ->
-      join_logic_deps (eval_term ~alarm_mode env t1).ldeps
-        (eval_term ~alarm_mode env t2).ldeps
+      join_logic_deps (term_deps t1) (term_deps t2)
 
     | Pif (c, p1, p2) ->
-      join_logic_deps (eval_term ~alarm_mode env c).ldeps
+      join_logic_deps (term_deps c)
         (join_logic_deps (do_eval env p1) (do_eval env p2))
 
     | Pat (p, lbl) ->
       do_eval { env with e_cur = lbl } p
 
-    | Pvalid (_, tsets) | Pvalid_read (_, tsets) | Pvalid_function tsets->
-      (eval_term_as_lval ~alarm_mode env tsets).ldeps
+    | Pvalid (_, tsets) | Pvalid_read (_, tsets)
+    | Pobject_pointer (_, tsets) | Pvalid_function tsets ->
+      term_deps tsets
 
     | Pinitialized (lbl, tsets) | Pdangling (lbl, tsets) ->
-      let loc, deploc =
-        eval_tlval_as_location_with_deps ~alarm_mode env tsets in
-      let zone = enumerate_valid_bits Locations.Read loc in
-      Logic_label.Map.add lbl zone deploc
+      tsets_deps lbl tsets
 
     | Pnot p -> do_eval env p
 
     | Pseparated ltsets ->
-      let evaled = List.map (eval_term_as_lval ~alarm_mode env) ltsets in
       List.fold_left
-        (fun acc e -> join_logic_deps acc e.ldeps)
-        empty_logic_deps evaled
+        (fun acc tsets -> join_logic_deps acc (tsets_deps lbl_here tsets))
+        empty_logic_deps ltsets
 
     | Pexists (l, p) | Pforall (l, p) ->
       let env = bind_logic_vars env l in
@@ -2583,20 +2634,22 @@ let predicate_deps env pred =
     | Plet (_v, p) -> do_eval env p (* will this work when when we need [_v]
                                        to evaluate [p] ?.. *)
 
-    | Papp (li, _labels, _args) -> begin
+    | Papp (li, _labels, args) -> begin
         if is_known_predicate li.l_var_info then
-          assert false (* TODO! Must evaluate the arguments, plus the
-                          dependencies of the predicate itself. *)
+          List.fold_left
+            (fun acc arg -> join_logic_deps acc (term_deps arg))
+            empty_logic_deps args
         else
           match Inline.inline_predicate ~inline ~current:env.e_cur p with
-          | None -> assert false
+          | None -> unsupported (Format.asprintf "%a" Predicate.pretty p)
           | Some p' -> do_eval env p'
       end
 
     | Pfresh _ | Pallocable _ | Pfreeable _
-      -> assert false
+      -> unsupported (Format.asprintf "%a" Predicate.pretty p)
   in
-  do_eval env pred
+  try Some (do_eval env pred)
+  with LogicEvalError _ -> None
 
 
 (* -------------------------------------------------------------------------- *)

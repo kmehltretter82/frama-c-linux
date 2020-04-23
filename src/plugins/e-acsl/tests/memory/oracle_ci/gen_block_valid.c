@@ -15,6 +15,11 @@ void __e_acsl_globals_init(void)
   return;
 }
 
+void __e_acsl_globals_delete(void)
+{
+  __e_acsl_delete_block((void *)(& B));
+}
+
 int main(int argc, char **argv)
 {
   int __retres;
@@ -151,11 +156,11 @@ int main(int argc, char **argv)
   }
   /*@ assert ¬\valid(pmax - diff); */ ;
   __retres = 0;
-  __e_acsl_delete_block((void *)(& B));
   __e_acsl_delete_block((void *)(& pmax));
   __e_acsl_delete_block((void *)(& pmin));
   __e_acsl_delete_block((void *)(& b));
   __e_acsl_delete_block((void *)(& p));
+  __e_acsl_globals_delete();
   __e_acsl_memory_clean();
   return __retres;
 }

@@ -209,6 +209,8 @@
   
   unsigned int __builtin_object_size(void *, int);
   
+  unsigned int __builtin_offsetof(unsigned int);
+  
   int __builtin_parity(unsigned int);
   
   int __builtin_parityl(unsigned long);

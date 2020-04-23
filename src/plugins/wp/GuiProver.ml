@@ -125,7 +125,7 @@ class prover ~(console:Wtext.text) ~prover =
             self#set_status `EXECUTE ;
             self#set_action ~tooltip:"Interrrupt Prover" ~icon:`STOP ~callback () ;
             Pretty_utils.ksfprintf self#set_label "%a (...)" VCS.pp_prover prover ;
-        | VCS.Valid | VCS.Checked ->
+        | VCS.Valid ->
             let callback () = self#run wpo in
             self#set_status ok_status ;
             self#set_action ~tooltip:"Run Prover" ~icon:`MEDIA_PLAY ~callback () ;

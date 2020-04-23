@@ -44,6 +44,7 @@ let pp_cvspec  fmt = function
   |     CV_VOLATILE -> fprintf fmt "CV_VOLATILE"
   |     CV_RESTRICT -> fprintf fmt "CV_RESTRICT"
   |     CV_ATTRIBUTE_ANNOT s -> fprintf fmt "CV_ATTRIBUTE_ANNOT %s" s
+  |     CV_GHOST -> fprintf fmt "CV_GHOST"
 
 let pp_const fmt = function
   |     CONST_INT s -> fprintf fmt "CONST_INT %s" s

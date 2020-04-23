@@ -133,6 +133,9 @@ let dkey_visitor = register_category "visitor"
 let wkey_annot_error = register_warn_category "annot-error"
 let () = set_warn_status wkey_annot_error Log.Wabort
 
+let wkey_ghost_already_ghost = register_warn_category "ghost:already-ghost"
+let () = set_warn_status wkey_ghost_already_ghost Log.Wfeedback
+
 let wkey_ghost_bad_use = register_warn_category "ghost:bad-use"
 let () = set_warn_status wkey_ghost_bad_use Log.Werror
 
@@ -261,6 +264,25 @@ module Filepath_list
     (struct
       let () = Parameter_customize.set_module_name X.module_name
       include X
+    end)
+
+module Filepath_map
+    (X: sig
+       include Input_with_arg
+       val existence: Filepath.existence
+       val file_kind: string
+     end) =
+  P.Filepath_map
+    (struct
+      include Datatype.String
+      type key = Filepath.Normalized.t
+      let of_string ~key:_ ~prev:_ s = s
+      let to_string ~key:_ s = s
+    end)
+    (struct
+      let () = Parameter_customize.set_module_name X.module_name
+      include X
+      let default = Datatype.Filepath.Map.empty
     end)
 
 module Kernel_function_set(X: Input_with_arg) =
@@ -926,6 +948,21 @@ module CppExtraArgs =
 
 let () = Parameter_customize.set_group parsing
 let () = Parameter_customize.do_not_reset_on_copy ()
+module CppExtraArgsPerFile =
+  Filepath_map
+    (struct
+      let module_name = "CppExtraArgsPerFile"
+      let option_name = "-cpp-extra-args-per-file"
+      let arg_name = "file:flags"
+      let existence = Filepath.Must_exist
+      let file_kind = "source"
+      let help =
+        "when set, adds preprocessing arguments for each specified file. \
+         To add arguments for all files, use -cpp-extra-args."
+    end)
+
+let () = Parameter_customize.set_group parsing
+let () = Parameter_customize.do_not_reset_on_copy ()
 module CppGnuLike =
   True
     (struct
@@ -1403,6 +1440,17 @@ module UnsignedDowncast =
                   destination range"
     end)
 
+(* Pointer downcasts are undefined behaviors. *)
+let () = Parameter_customize.set_group analysis_options
+let () = Parameter_customize.do_not_reset_on_copy ()
+module PointerDowncast =
+  True
+    (struct
+      let module_name = "PointerDowncast"
+      let option_name = "-warn-pointer-downcast"
+      let help = "generate alarms when a pointer is converted into an integer \
+                  but may not be in the range of the destination type."
+    end)
 
 (* Not finite floats are ok, but might not always be a behavior the programmer
    wants. *)
@@ -1431,6 +1479,15 @@ module InvalidBool =
                   _Bool lvalues."
     end)
 
+let () = Parameter_customize.set_group analysis_options
+let () = Parameter_customize.do_not_reset_on_copy ()
+module InvalidPointer =
+  False
+    (struct
+      let module_name = "InvalidPointer"
+      let option_name = "-warn-invalid-pointer"
+      let help = "generate alarms when invalid pointers are created."
+    end)
 
 (* ************************************************************************* *)
 (** {2 Sequencing options} *)

@@ -29,7 +29,7 @@ open Cil_types
 
 (** exception raised when a parsed logic expression is
     syntactically not well-formed. *)
-exception Not_well_formed of Cil_types.location * string
+exception Not_well_formed of location * string
 
 (** basic utilities for logic terms and predicates. See also {! Logic_const}
     to build terms and predicates.
@@ -85,8 +85,10 @@ val logicCType : logic_type -> typ
 (** transforms an array into pointer. *)
 val array_to_ptr : logic_type -> logic_type
 
-(** C type to logic type, with implicit conversion for arithmetic types. *)
-val typ_to_logic_type : typ -> logic_type
+(** C type to logic type, with implicit conversion for arithmetic types.
+    @since Frama-C+dev
+*)
+val coerce_type : typ -> logic_type
 
 (** {2 Predicates} *)
 
@@ -109,7 +111,7 @@ val mk_logic_StartOf : term -> term
 (** creates an AddrOf from a TLval. The given logic type is the
     type of the lval.
     @since Neon-20140301 *)
-val mk_logic_AddrOf: ?loc:Cil_types.location -> term_lval -> logic_type -> term
+val mk_logic_AddrOf: ?loc:location -> term_lval -> logic_type -> term
 
 (** [true] if the term is a pointer. *)
 val isLogicPointer : term -> bool
@@ -122,9 +124,7 @@ val mk_logic_pointer_or_StartOf : term -> term
     be inserted. Otherwise (which is the default), [mk_cast typ t] will return
     [t] if it is already of type [typ]
 
-    @modify Aluminium-20160501 added [force] optional argument
-
-*)
+    @modify Aluminium-20160501 added [force] optional argument *)
 val mk_cast: ?loc:location -> ?force:bool -> typ -> term -> term
 
 
@@ -141,7 +141,12 @@ val remove_logic_coerce: term -> term
     in [t]. In particular, [numeric_coerce (int)cst Linteger], where [cst]
     fits in int will be directly [cst], without any coercion.
 
+    Also coerce recursively the sub-terms of t-set expressions
+    (range, union, inter and comprehension) and lift the associated
+    set type.
+
     @since Magnesium-20151001
+    @modify Frama-C+dev
 *)
 val numeric_coerce: logic_type -> term -> term
 
@@ -157,24 +162,63 @@ val pointer_comparable: ?loc:location -> term -> term -> predicate
 (** \pointer_comparable
     @since Fluorine-20130401 *)
 
-(** {3 Conversion from exp to term}*)
-(** translates a C expression into an "equivalent" logical term.
-    [cast] specifies how C arithmetic operators are translated.
-    When [cast] is [true], the translation returns a logic [term] having the
-    same semantics of the C [expr] by introducing casts (i.e. the C expr [a+b]
-    can be translated as [(char)(((char)a)+(char)b)] to preserve the modulo
-    feature of the C addition).
-    Otherwise, no such casts are introduced and the C arithmetic operators are
-    translated into perfect mathematical operators (i.e. a floating point
-    addition is translated into an addition of [real] numbers).
-    @plugin development guide *)
-val expr_to_term : cast:bool -> exp -> term
-(** same as {!expr_to_term}, except that if the new term has an arithmetic
-    type, it is automatically coerced into real (or integer for integral types).
+(** {2 Conversion from exp to term} *)
 
-    @since Magnesium-20151001
+val expr_to_term : ?coerce:bool -> exp -> term
+(** Returns a logic term that has exactly the same semantics as the
+    original C-expression. The type of the resulting term is determined
+    by the [~coerce] flag as follows:
+    - when [~coerce:false] is given (the default) the term has the same
+      c-type as the original expression.
+    - when [~coerce:true] is given, if the original expression has an int or
+      float type, then the returned term is coerced into the integer or real
+      logic type, respectively.
+
+    Remark: when the original expression is a comparison, it is evaluated as
+    an [int] or an [integer] depending on the [~coerce] flag.
+    To obtain a boolean or predicate, use [expr_to_boolean] or
+    [expr_to_predicate] instead.
+
+    @modify Frama-C+dev
 *)
-val expr_to_term_coerce: cast:bool -> exp -> term
+
+val expr_to_predicate: exp -> predicate
+(** Returns a predicate semantically equivalent to the condition
+    of the original C-expression.
+
+    This is different from [expr_to_term e |> scalar_term_to_predicate]
+    since C-relations are translated into logic ones.
+
+    @raise Fatal error if the expression is not a comparison and cannot be
+           compared to zero.
+    @since Sulfur-20171101
+    @modify Frama-C+dev
+*)
+
+val expr_to_ipredicate: exp -> identified_predicate
+(** Returns a predicate semantically equivalent to the condition
+    of the original C-expression.
+
+    Identical to [expr_to_predicate e |> Logic_const.new_predicate].
+
+    @raise Fatal error if the expression is not a comparison and cannot be
+           compared to zero.
+    @since Sulfur-20171101
+    @modify Frama-C+dev
+*)
+
+val expr_to_boolean: exp -> term
+(** Returns a boolean term semantically equivalent to the condition
+    of the original C-expression.
+
+    This is different from [expr_to_term e |> scalar_term_to_predicate]
+    since C-relations are translated into logic ones.
+
+    @raise Fatal error if the expression is not a comparison and cannot be
+           compared to zero.
+    @since Sulfur-20171101
+    @modify Frama-C+dev
+*)
 
 val is_zero_comparable: term -> bool
 (** [true] if the given term has a type for which a comparison to 0 exists
@@ -183,15 +227,12 @@ val is_zero_comparable: term -> bool
     @since Sulfur-20171101
 *)
 
-val expr_to_predicate: cast:bool -> exp -> identified_predicate
-(** same as {expr_to_term}, but the result is a predicate. Expressions starting
-    with relational operators ([==], [<=], etc) are translated directly.
-    Otherwise, the result of [expr_to_predicate e] is the predicate
-    [e <> 0].
+val scalar_term_to_boolean: term -> term
+(** Compare the given term with the constant 0 (of the appropriate type)
+    to return the result of the comparison [e <> 0] as a boolean term.
 
-    @raise Fatal error if the expression is not a comparison and cannot be
-           compared to zero.
-    @since Sulfur-20171101
+    @raise Fatal error if the argument cannot be compared to 0
+    @since Frama-C+dev
 *)
 
 val scalar_term_to_predicate: term -> predicate
@@ -202,19 +243,25 @@ val scalar_term_to_predicate: term -> predicate
     @since Sulfur-20171101
 *)
 
-val lval_to_term_lval : cast:bool -> lval -> term_lval
-val host_to_term_host : cast:bool -> lhost -> term_lhost
-val offset_to_term_offset :
-  cast:bool -> offset -> term_offset
+val lval_to_term_lval : lval -> term_lval
+val host_to_term_lhost : lhost -> term_lhost
+val offset_to_term_offset : offset -> term_offset
 
 val constant_to_lconstant: constant -> logic_constant
 val lconstant_to_constant: logic_constant-> constant
 
-(** Parse the given string as a float logic constant, taking into account
-    the fact that the constant may not be exactly representable. This
-    function should only be called on strings that have been recognized
-    by the parser as valid floats *)
-val string_to_float_lconstant: string -> logic_constant
+(** Parse the given string as a float or real logic constant.
+
+    The parsed literal is always kept as it is in the resulting term.
+    The returned term is either a real constant or
+    real constant casted into a C-float type.
+
+    Unsuffixed literals are considered as real numbers.
+    Literals suffixed by [f|d|l] or [F|D|L] are considered
+    as float constants of the associated kind. *)
+val parse_float : ?loc:location -> string -> term
+
+(** {2 Various Utilities} *)
 
 (** [remove_term_offset o] returns [o] without its last offset and
     this last offset. *)
@@ -240,8 +287,6 @@ val is_result : term -> bool
 
 val lhost_c_type : term_lhost -> typ
 
-(** {2 Predicates} *)
-
 (** [true] if the predicate is Ptrue.
     @since Nitrogen-20111001 *)
 val is_trivially_true: predicate -> bool
@@ -249,6 +294,15 @@ val is_trivially_true: predicate -> bool
 (** [true] if the predicate is Pfalse
     @since Nitrogen-20111001 *)
 val is_trivially_false: predicate -> bool
+
+(** {2 Code annotations} *)
+
+(** Does the annotation apply to the next statement (e.g. a statement
+    contract). Also false for loop-related annotations.
+
+    @since Frama-C+dev
+*)
+val is_annot_next_stmt: code_annotation -> bool
 
 (** {2 Global annotations} *)
 
@@ -362,7 +416,7 @@ val concat_allocation: allocation -> allocation -> allocation
 val merge_allocation : allocation -> allocation -> allocation
 
 val merge_behaviors :
-  ?oldloc:Cil_types.location -> silent:bool -> funbehavior list -> funbehavior list -> funbehavior list
+  ?oldloc:location -> silent:bool -> funbehavior list -> funbehavior list -> funbehavior list
 
 (** [merge_funspec ?oldloc oldspec newspec] merges [newspec] into [oldspec].
     If the funspec belongs to a kernel function, do not forget to call
@@ -370,7 +424,7 @@ val merge_behaviors :
     @modify 20.0-Calcium add optional parameter [oldloc].
 *)
 val merge_funspec :
-  ?oldloc:Cil_types.location -> ?silent_about_merging_behav:bool ->
+  ?oldloc:location -> ?silent_about_merging_behav:bool ->
   funspec -> funspec -> unit
 
 (** Reset the given funspec to empty.

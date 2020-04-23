@@ -8,7 +8,6 @@ enum bool {
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   __e_acsl_assert(1,"Assertion","main","\'c\' == \'c\'",
                   "tests/memory/other_constants.i",10);
   /*@ assert 'c' ≡ 'c'; */ ;

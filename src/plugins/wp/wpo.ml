@@ -691,65 +691,49 @@ let warnings = function
 let get_time = function { prover_time=t } -> t
 let get_steps= function { prover_steps=n } -> n
 let get_target g = WpPropId.property_of_id g.po_pid
+
 let get_proof g =
   let system = SYSTEM.get () in
   let target = get_target g in
   let status =
     try
       let proof = Hproof.find system.proofs (proof g target) in
-      WpAnnot.is_proved proof
-    with Not_found -> false
+      if is_smoke_test g then
+        if WpAnnot.is_proved proof then `Failed else
+        if WpAnnot.is_invalid proof then `Passed else
+          `Unknown
+      else
+      if WpAnnot.is_proved proof then `Passed else `Unknown
+    with Not_found -> `Unknown
   in status , target
 
-let doomed_unreachable emitter pid =
+let set_invalid emitter tgt =
+  Property_status.emit emitter ~hyps:[] tgt Property_status.False_if_reachable
+
+let set_doomed emitter pid =
+  List.iter (set_invalid emitter) (WpPropId.doomed_if_valid pid) ;
   match WpPropId.unreachable_if_valid pid with
   | Property.OLStmt(kf,stmt) ->
-      let pred_loc = Stmt.loc stmt in
-      let pred_name = [ "Wp" ; "SmokeTest" ] in
-      let pf = { Logic_const.pfalse with pred_loc ; pred_name } in
-      let ca = Logic_const.new_code_annotation (AAssert ([],Assert,pf)) in
-      Annotations.add_code_annot emitter ~kf stmt ca ;
-      Property.ip_of_code_annot kf stmt ca
-  | Property.OLGlob _ | Property.OLContract _ -> []
+      let ca =
+        let filter = WpReached.is_dead_annot in
+        match Annotations.code_annot ~emitter ~filter stmt with
+        | ca::_ -> ca
+        | [] ->
+            let pred_loc = Stmt.loc stmt in
+            let pred_name = [ "Wp" ; "SmokeTest" ] in
+            let pf = { Logic_const.pfalse with pred_loc ; pred_name } in
+            let ca = Logic_const.new_code_annotation (AAssert ([],Assert,pf)) in
+            Annotations.add_code_annot emitter ~kf stmt ca ; ca
+      in
+      List.iter (set_invalid emitter) (Property.ip_of_code_annot kf stmt ca)
+  | Property.OLGlob _ | Property.OLContract _ -> ()
 
-let update_property_status g r =
-  let system = SYSTEM.get () in
-  try
-    let pi = proof g (WpPropId.property_of_id g.po_pid) in
-    let proof =
-      try Hproof.find system.proofs pi
-      with Not_found ->
-        let proof = WpAnnot.create_proof g.po_pid in
-        Hproof.add system.proofs pi proof ; proof
-    in
-    let emitter = WpContext.get_emitter g.po_model in
-    let smoke = is_smoke_test g in
-    let status =
-      match VCS.verdict ~smoke r with
-      | Valid ->
-          WpAnnot.add_proof proof g.po_pid (get_depend g) ;
-          if WpAnnot.is_proved proof then Property_status.True
-          else Property_status.Dont_know
-      | Invalid when smoke ->
-          let status = Property_status.False_if_reachable in
-          List.iter
-            (fun tgt -> Property_status.emit emitter ~hyps:[] tgt status)
-            (WpPropId.doomed_if_valid g.po_pid) ;
-          let status = Property_status.True in
-          List.iter
-            (fun tgt -> Property_status.emit emitter ~hyps:[] tgt status)
-            (doomed_unreachable emitter g.po_pid) ;
-          Property_status.False_if_reachable
-      | _ ->
-          if WpAnnot.is_proved proof then Property_status.True
-          else Property_status.Dont_know
-    in
-    let target = WpAnnot.target proof in
-    let depends = WpAnnot.dependencies proof in
-    Property_status.emit emitter ~hyps:depends target status ;
-  with err ->
-    Wp_parameters.failure "Update-status failed (%s)" (Printexc.to_string err) ;
-    raise err
+let find_proof system g =
+  let pi = proof g (WpPropId.property_of_id g.po_pid) in
+  try Hproof.find system.proofs pi
+  with Not_found ->
+    let proof = WpAnnot.create_proof g.po_pid in
+    Hproof.add system.proofs pi proof ; proof
 
 let clear_results g =
   let system = SYSTEM.get () in
@@ -769,9 +753,34 @@ let set_result g p r =
     in
     Results.replace rs p r ;
     if not (WpPropId.is_check g.po_pid) &&
-       not (WpPropId.is_tactic g.po_pid)
+       not (WpPropId.is_tactic g.po_pid) &&
+       VCS.is_verdict r
     then
-      update_property_status g r ;
+      let smoke = is_smoke_test g in
+      let proof = find_proof system g in
+      let emitter = WpContext.get_emitter g.po_model in
+      let target = WpAnnot.target proof in
+      let unproved = not (WpAnnot.is_proved proof) in
+      if VCS.is_valid r then
+        WpAnnot.add_proof proof g.po_pid (get_depend g)
+      else if smoke then
+        WpAnnot.add_invalid_proof proof ;
+      let proved = WpAnnot.is_proved proof in
+      let status =
+        if smoke then
+          if proved
+          then Property_status.False_if_reachable (* All goals SAT *)
+          else if WpAnnot.is_invalid proof
+          then Property_status.True (* Some goal is UNSAT *)
+          else Property_status.Dont_know (* Not finished yet *)
+        else
+        if proved
+        then Property_status.True
+        else Property_status.Dont_know
+      in
+      let hyps = if smoke then [] else WpAnnot.dependencies proof in
+      Property_status.emit emitter ~hyps target status ;
+      if smoke && unproved && proved then set_doomed emitter g.po_pid ;
   end
 
 let has_verdict g p =
@@ -803,9 +812,10 @@ let reduce g =
 let resolve g =
   let valid = reduce g in
   if valid then
-    ( let solver = qed_time g in
-      set_result g VCS.Qed (VCS.result ~solver VCS.Valid) ) ;
-  valid
+    let result = VCS.result ~solver:(qed_time g) VCS.Valid in
+    ignore (set_result g VCS.Qed result) ;
+    true
+  else false
 
 let compute g =
   let ctxt = get_context g in

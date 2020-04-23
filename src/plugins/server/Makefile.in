@@ -39,11 +39,14 @@ PLUGIN_NAME:=Server
 PLUGIN_CMO:= \
 	server_parameters \
 	jbuffer \
-	doc syntax data main request \
+	doc syntax data \
+	main request states \
 	server_batch \
 	kernel_main \
 	kernel_project \
-	kernel_ast
+	kernel_ast \
+	kernel_properties
+
 PLUGIN_DISTRIBUTED:=$(PLUGIN_ENABLE)
 PLUGIN_DISTRIB_EXTERNAL:= Makefile.in configure.ac configure
 PLUGIN_TESTS_DIRS := batch
@@ -76,7 +79,10 @@ include $(FRAMAC_SHARE)/Makefile.dynamic
 ##############
 
 SERVER_API= \
-	doc.mli syntax.mli data.mli request.mli
+	doc.mli syntax.mli data.mli request.mli states.mli \
+	kernel_main.mli \
+	kernel_ast.mli \
+	kernel_properties.mli
 
 define Capitalize
 $(shell printf "%s%s" \

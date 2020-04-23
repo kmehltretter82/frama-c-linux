@@ -62,7 +62,7 @@ void main2 () {
       i += 1;
       goto foo;
       i += 1;
-    foo:
+    foo:;
     }
   }
 }
@@ -76,7 +76,7 @@ void main2_done () {
       i += 1;
       goto foo;
       i += 1;
-    foo:
+    foo:;
     }
   }
 }
@@ -99,7 +99,7 @@ void main3 (int c) {
     foo:
       i += 1;
     }
-  up:
+  up:;
   }
 }
 

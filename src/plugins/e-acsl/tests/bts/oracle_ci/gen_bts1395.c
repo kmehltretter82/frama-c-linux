@@ -25,7 +25,6 @@ int fact(int n)
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   int x = __gen_e_acsl_fact(5);
   __e_acsl_assert(x == 120,"Assertion","main","x == 120",
                   "tests/bts/bts1395.i",14);

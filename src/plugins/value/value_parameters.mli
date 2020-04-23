@@ -29,6 +29,9 @@ module OracleDepth: Parameter_sig.Int
 module ReductionDepth: Parameter_sig.Int
 
 module Domains: Parameter_sig.String_set
+module DomainsFunction: Parameter_sig.Multiple_map
+  with type key = string
+   and type value = Domain_mode.function_mode
 
 module EqualityCall: Parameter_sig.String
 module EqualityCallFunction:
@@ -160,7 +163,6 @@ val configure_precision: unit -> unit
 
 val parameters_correctness: Typed_parameter.t list
 val parameters_tuning: Typed_parameter.t list
-val parameters_abstractions: Typed_parameter.t list
 
 (** Debug categories responsible for printing initial and final states of Value.
     Enabled by default, but can be disabled via the command-line:
@@ -229,6 +231,9 @@ val dkey_widening : category
 
 (** Registers available domain names for the -eva-domains option. *)
 val register_domain: name:string -> descr:string -> unit
+
+(** Returns the list (name, descr) of currently enabled domains. *)
+val enabled_domains: unit -> (string * string) list
 
 (*
 Local Variables:

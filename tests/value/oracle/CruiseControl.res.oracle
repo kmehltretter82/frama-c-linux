@@ -37,17 +37,19 @@
   Called from tests/value/CruiseControl.c:242.
 [eva:alarm] tests/value/CruiseControl.c:172: Warning: 
   non-finite float value.
-  assert \is_finite((float)(_C_->_L1_CruiseControl - _C_->_L2_CruiseControl));
+  assert
+  \is_finite(\sub_float(_C_->_L1_CruiseControl, _C_->_L2_CruiseControl));
 [eva:alarm] tests/value/CruiseControl.c:175: Warning: 
   non-finite float value.
-  assert \is_finite((float)(_C_->_L3_CruiseControl * _C_->_L6_CruiseControl));
+  assert
+  \is_finite(\mul_float(_C_->_L3_CruiseControl, _C_->_L6_CruiseControl));
 [eva:alarm] tests/value/CruiseControl.c:194: Warning: 
   non-finite float value.
   assert
-  \is_finite((float)(_C_->_L16_CruiseControl + _C_->_L18_CruiseControl));
+  \is_finite(\add_float(_C_->_L16_CruiseControl, _C_->_L18_CruiseControl));
 [eva:alarm] tests/value/CruiseControl.c:199: Warning: 
   non-finite float value.
-  assert \is_finite((float)(_C_->ProportionnalAction + _C_->IntegralAction));
+  assert \is_finite(\add_float(_C_->ProportionnalAction, _C_->IntegralAction));
 [eva] computing for function SaturateThrottle <- ThrottleRegulation <- 
                           ThrottleCmd <- CruiseControl.
   Called from tests/value/CruiseControl.c:202.

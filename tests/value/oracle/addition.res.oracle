@@ -59,21 +59,48 @@
 [eva] tests/value/addition.i:34: 
   Assigning imprecise value to p1.
   The imprecision originates from Arithmetic {tests/value/addition.i:34}
+[eva:alarm] tests/value/addition.i:36: Warning: 
+  pointer downcast. assert (unsigned int)(&p1) ≤ 2147483647;
 [eva] tests/value/addition.i:36: 
   Assigning imprecise value to p2.
   The imprecision originates from Arithmetic {tests/value/addition.i:36}
+[eva:alarm] tests/value/addition.i:38: Warning: 
+  pointer downcast. assert (unsigned int)(&p1) ≤ 127;
+[eva:alarm] tests/value/addition.i:38: Warning: 
+  pointer downcast. assert (unsigned int)(&t[(char)(&p1)]) ≤ 2147483647;
 [eva] tests/value/addition.i:38: 
   Assigning imprecise value to p3.
   The imprecision originates from Arithmetic {tests/value/addition.i:38}
+[eva:alarm] tests/value/addition.i:40: Warning: 
+  pointer downcast. assert (unsigned int)(&p1) ≤ 127;
+[eva:alarm] tests/value/addition.i:40: Warning: 
+  pointer downcast. assert (unsigned int)(&tt[(char)(&p1)].a) ≤ 2147483647;
 [eva] tests/value/addition.i:40: 
   Assigning imprecise value to p4.
   The imprecision originates from Arithmetic {tests/value/addition.i:40}
+[eva:alarm] tests/value/addition.i:42: Warning: 
+  pointer downcast. assert (unsigned int)(&p1) ≤ 127;
+[eva:alarm] tests/value/addition.i:42: Warning: 
+  pointer downcast. assert (unsigned int)(&p2) ≤ 127;
+[eva:alarm] tests/value/addition.i:42: Warning: 
+  pointer downcast.
+  assert (unsigned int)(&ttt[(char)(&p1)][(char)(&p2)]) ≤ 2147483647;
 [eva] tests/value/addition.i:42: 
   Assigning imprecise value to p5.
   The imprecision originates from Arithmetic {tests/value/addition.i:42}
+[eva:alarm] tests/value/addition.i:44: Warning: 
+  pointer downcast. assert (unsigned int)(&p1) ≤ 127;
+[eva:alarm] tests/value/addition.i:44: Warning: 
+  pointer downcast.
+  assert (unsigned int)(&ttt[(char)(&p1)][u2]) ≤ 2147483647;
 [eva] tests/value/addition.i:44: 
   Assigning imprecise value to p6.
   The imprecision originates from Arithmetic {tests/value/addition.i:44}
+[eva:alarm] tests/value/addition.i:46: Warning: 
+  pointer downcast. assert (unsigned int)(&p2) ≤ 127;
+[eva:alarm] tests/value/addition.i:46: Warning: 
+  pointer downcast.
+  assert (unsigned int)(&ttt[u2][(char)(&p2)]) ≤ 2147483647;
 [eva] tests/value/addition.i:46: 
   Assigning imprecise value to p7.
   The imprecision originates from Arithmetic {tests/value/addition.i:46}
@@ -81,15 +108,23 @@
   pointer comparison.
   assert \pointer_comparable((void *)(&p1 + 1), (void *)(&p2));
 [eva:alarm] tests/value/addition.i:50: Warning: 
+  pointer downcast. assert (unsigned int)(&p1) ≤ 2147483647;
+[eva:alarm] tests/value/addition.i:50: Warning: 
   signed overflow. assert -2147483648 ≤ (int)(&p1) / 2;
 [eva:alarm] tests/value/addition.i:50: Warning: 
   signed overflow. assert (int)(&p1) / 2 ≤ 2147483647;
 [eva] tests/value/addition.i:50: 
   Assigning imprecise value to p9.
   The imprecision originates from Arithmetic {tests/value/addition.i:50}
+[eva:alarm] tests/value/addition.i:52: Warning: 
+  pointer downcast. assert (unsigned int)(&p1) ≤ 2147483647;
 [eva] tests/value/addition.i:52: 
   Assigning imprecise value to p10.
   The imprecision originates from Arithmetic {tests/value/addition.i:52}
+[eva:alarm] tests/value/addition.i:56: Warning: 
+  pointer downcast. assert (unsigned int)(&p1) ≤ 2147483647;
+[eva:alarm] tests/value/addition.i:56: Warning: 
+  pointer downcast. assert (unsigned int)(&p2) ≤ 2147483647;
 [eva] tests/value/addition.i:56: 
   Assigning imprecise value to p12.
   The imprecision originates from Arithmetic {tests/value/addition.i:56}
@@ -130,7 +165,7 @@
   {{ garbled mix of &{p1} (origin: Arithmetic {tests/value/addition.i:56}) }}
   {{ garbled mix of &{p1} (origin: Misaligned {tests/value/addition.i:59}) }}
   {{ garbled mix of &{p1} (origin: Misaligned {tests/value/addition.i:61}) }}
-[scope:rm_asserts] removing 2 assertion(s)
+[scope:rm_asserts] removing 9 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   t[0] ∈ {0}
@@ -323,13 +358,48 @@
   signed overflow. assert -2147483648 ≤ &p2 - &p3;
 [eva:alarm] tests/value/addition.i:34: Warning: 
   signed overflow. assert &p2 - &p3 ≤ 2147483647;
+[eva:alarm] tests/value/addition.i:36: Warning: 
+  pointer downcast. assert (unsigned int)(&p1) ≤ 2147483647;
+[eva:alarm] tests/value/addition.i:38: Warning: 
+  pointer downcast. assert (unsigned int)(&p1) ≤ 127;
+[eva:alarm] tests/value/addition.i:38: Warning: 
+  pointer downcast. assert (unsigned int)(&t[(char)(&p1)]) ≤ 2147483647;
+[eva:alarm] tests/value/addition.i:40: Warning: 
+  pointer downcast. assert (unsigned int)(&p1) ≤ 127;
+[eva:alarm] tests/value/addition.i:40: Warning: 
+  pointer downcast. assert (unsigned int)(&tt[(char)(&p1)].a) ≤ 2147483647;
+[eva:alarm] tests/value/addition.i:42: Warning: 
+  pointer downcast. assert (unsigned int)(&p1) ≤ 127;
+[eva:alarm] tests/value/addition.i:42: Warning: 
+  pointer downcast. assert (unsigned int)(&p2) ≤ 127;
+[eva:alarm] tests/value/addition.i:42: Warning: 
+  pointer downcast.
+  assert (unsigned int)(&ttt[(char)(&p1)][(char)(&p2)]) ≤ 2147483647;
+[eva:alarm] tests/value/addition.i:44: Warning: 
+  pointer downcast. assert (unsigned int)(&p1) ≤ 127;
+[eva:alarm] tests/value/addition.i:44: Warning: 
+  pointer downcast.
+  assert (unsigned int)(&ttt[(char)(&p1)][u2]) ≤ 2147483647;
+[eva:alarm] tests/value/addition.i:46: Warning: 
+  pointer downcast. assert (unsigned int)(&p2) ≤ 127;
+[eva:alarm] tests/value/addition.i:46: Warning: 
+  pointer downcast.
+  assert (unsigned int)(&ttt[u2][(char)(&p2)]) ≤ 2147483647;
 [eva:alarm] tests/value/addition.i:48: Warning: 
   pointer comparison.
   assert \pointer_comparable((void *)(&p1 + 1), (void *)(&p2));
 [eva:alarm] tests/value/addition.i:50: Warning: 
+  pointer downcast. assert (unsigned int)(&p1) ≤ 2147483647;
+[eva:alarm] tests/value/addition.i:50: Warning: 
   signed overflow. assert -2147483648 ≤ (int)(&p1) / 2;
 [eva:alarm] tests/value/addition.i:50: Warning: 
   signed overflow. assert (int)(&p1) / 2 ≤ 2147483647;
+[eva:alarm] tests/value/addition.i:52: Warning: 
+  pointer downcast. assert (unsigned int)(&p1) ≤ 2147483647;
+[eva:alarm] tests/value/addition.i:56: Warning: 
+  pointer downcast. assert (unsigned int)(&p1) ≤ 2147483647;
+[eva:alarm] tests/value/addition.i:56: Warning: 
+  pointer downcast. assert (unsigned int)(&p2) ≤ 2147483647;
 [eva:alarm] tests/value/addition.i:59: Warning: 
   signed overflow. assert -2147483648 ≤ (int)*((char *)(&q1)) + 2;
 [eva:alarm] tests/value/addition.i:59: Warning: 
@@ -360,7 +430,7 @@
   {{ garbled mix of &{p1} (origin: Arithmetic {tests/value/addition.i:56}) }}
   {{ garbled mix of &{p1} (origin: Misaligned {tests/value/addition.i:59}) }}
   {{ garbled mix of &{p1} (origin: Misaligned {tests/value/addition.i:61}) }}
-[scope:rm_asserts] removing 2 assertion(s)
+[scope:rm_asserts] removing 9 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   t[0] ∈ {0}

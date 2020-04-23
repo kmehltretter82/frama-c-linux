@@ -38,7 +38,7 @@ module Model = struct
      lvalue can be incomparable. The origin is then used to store the value from
      the state, to later choose which value to keep. This is done by the update
      function in cvalue_transfer. *)
-  type origin = value option
+  type origin = value
 
   let extract_expr _ _ _ = `Value (Cvalue.V.top, None), Alarmset.all
 
@@ -308,15 +308,19 @@ module State = struct
           Printer.pp_from assign pp_eval_error e;
         Cvalue.V.top
 
-  let logic_assign logic_assign location ~pre:(pre_state, _) (state, sclob) =
+  let logic_assign logic_assign location (state, sclob) =
     match logic_assign with
-    | Assigns assign ->
+    | None ->
+      let location = Precise_locs.imprecise_location location
+      and value = Cvalue.V.top in
+      Cvalue.Model.add_binding ~exact:false state location value, sclob
+    | Some (Assigns assign, (pre_state, _)) ->
       let location = Precise_locs.imprecise_location location in
       let env = Eval_terms.env_assigns pre_state in
       let value = evaluate_from_clause env assign in
       Locals_scoping.remember_if_locals_in_value sclob location value;
       Cvalue.Model.add_binding ~exact:false state location value, sclob
-    | Frees _ | Allocates _ -> state, sclob
+    | Some ((Frees _ | Allocates _), _) -> state, sclob
 
   (* ------------------------------------------------------------------------ *)
   (*                             Initialization                               *)

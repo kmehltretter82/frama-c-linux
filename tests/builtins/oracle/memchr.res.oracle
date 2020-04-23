@@ -477,6 +477,8 @@
 [eva] Done for function memchr_bitfields2
 [eva] computing for function memchr_escaping <- main.
   Called from tests/builtins/memchr.c:662.
+[eva:alarm] tests/builtins/memchr.c:264: Warning: 
+  pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
 [eva:locals-escaping] tests/builtins/memchr.c:264: Warning: 
   locals {x} escaping the scope of a block of memchr_escaping through s
 [eva] tests/builtins/memchr.c:267: Call to builtin memchr

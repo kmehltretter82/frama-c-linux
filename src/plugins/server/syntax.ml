@@ -60,7 +60,10 @@ let text { text } = text
 let protect a =
   if a.atomic then a.text else Markdown.(plain "(" @ a.text @ plain ")")
 
-let publish ~page ~name ~descr ~synopsis ?(details = []) () =
+let define left right =
+  Markdown.(Block_quote [Block[Text ( left @ plain ":=" @ right )]])
+
+let publish ~page ~name ~descr ~synopsis ?(details = []) ?generated () =
   check_name name ;
   check_page page name ;
   let id = Printf.sprintf "data-%s" name in
@@ -68,22 +71,26 @@ let publish ~page ~name ~descr ~synopsis ?(details = []) () =
   let index = [ Printf.sprintf "%s (`DATA`)" name ] in
   let dref = Doc.href page id in
   let dlink = Markdown.href ~text:(Markdown.emph name) dref in
-  let syntax = Markdown.(glue [
-      plain "<" ; dlink ; plain ">" ; plain ":=" ; synopsis.text ]) in
-  let content = Markdown.(Block ( text descr @ text syntax ) :: details) in
-  let _href = Doc.publish ~page ~name:id ~title ~index content [] in
-  atom dlink
+  let data = Markdown.(plain "<" @ dlink @ plain ">") in
+  let contents = Markdown.(Block(
+      [ Text descr ; define data synopsis.text ]
+    )) :: details in
+  let _href = Doc.publish ~page ~name:id ~title ~index ~contents ?generated ()
+  in atom dlink
 
-let unit = atom @@ Markdown.plain "-"
+(* -------------------------------------------------------------------------- *)
+
+let unit = atom @@ Markdown.code "null"
 let any = atom @@ Markdown.emph "any"
 let int = atom @@ Markdown.emph "int"
 let ident = atom @@ Markdown.emph "ident"
 let string = atom @@ Markdown.emph "string"
 let number = atom @@ Markdown.emph "number"
 let boolean = atom @@ Markdown.emph "boolean"
+let data name dref = atom @@ Markdown.href ~text:(Markdown.emph name) dref
 
 let escaped name =
-  Markdown.code (Printf.sprintf "'%s'" @@ String.escaped name)
+  Markdown.code (Printf.sprintf "\"%s\"" @@ String.escaped name)
 
 let tag name = atom @@ escaped name
 let array a = atom @@ Markdown.(code "[" @ protect a @ code  ", … ]")
@@ -100,30 +107,52 @@ let union ts = flow @@ Markdown.(glue ~sep:(plain "|") (List.map protect ts))
 
 let option t = atom @@ Markdown.(protect t @ code "?")
 
-let field (a,t) = Markdown.( escaped a @ code ":" @ t.text )
+(* -------------------------------------------------------------------------- *)
+
+type tag = {
+  tag_name : string ;
+  tag_label : Markdown.text ;
+  tag_descr : Markdown.text ;
+}
+
+let tags ?(title="Tag") (tgs : tag list) =
+  let open Markdown in
+  let header = [
+    plain title, Left;
+    plain "Value", Left;
+    plain "Description", Left
+  ] in
+  let row tg = [ tg.tag_label ; escaped tg.tag_name ; tg.tag_descr ] in
+  Markdown.Table {
+    caption = None ; header ; content = List.map row tgs ;
+  }
+
+(* -------------------------------------------------------------------------- *)
+
+let mfield (a,t) = Markdown.( escaped a @ code ":" @ t.text )
 
 let record fds =
   let fields =
     if fds = [] then Markdown.plain "…" else
-      Markdown.(glue ~sep:(code ";") (List.map field fds))
+      Markdown.(glue ~sep:(code ";") (List.map mfield fds))
   in atom @@ Markdown.(code "{" @ fields @ code "}")
 
 type field = {
-  name : string ;
-  syntax : t ;
-  descr : Markdown.text ;
+  fd_name : string ;
+  fd_syntax : t ;
+  fd_descr : Markdown.text ;
 }
 
-let fields ~title (fds : field list) =
+let fields ?(title="Field") (fds : field list) =
   let open Markdown in
   let header = [
     plain title, Left;
     plain "Format", Center;
     plain "Description", Left
   ] in
-  let column f = [ code f.name ; f.syntax.text ; f.descr ] in
+  let row f = [ escaped f.fd_name ; f.fd_syntax.text ; f.fd_descr ] in
   Markdown.Table {
-    caption = None ; header ; content = List.map column fds ;
+    caption = None ; header ; content = List.map row fds ;
   }
 
 (* -------------------------------------------------------------------------- *)

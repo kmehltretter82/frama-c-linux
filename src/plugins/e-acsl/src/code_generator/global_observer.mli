@@ -24,8 +24,11 @@
 
 open Cil_types
 
-val function_name: string
+val function_init_name: string
 (** Name of the function in which [mk_init_function] (see below) generates the
+    code. *)
+val function_delete_name: string
+(** Name of the function in which [mk_delete_function] (see below) generates the
     code. *)
 
 val reset: unit -> unit
@@ -41,8 +44,9 @@ val mk_init_function: unit -> varinfo * fundec
 (** Generate a new C function containing the observers for global variable
     declarations and initializations. *)
 
-val mk_delete_stmts: stmt list -> stmt list
-(** Generate the observers for global variable de-allocations. *)
+val mk_delete_function: unit -> varinfo * fundec
+(** Generate a new C function containing the observers for global variable
+    de-allocations. *)
 
 (*
 Local Variables:

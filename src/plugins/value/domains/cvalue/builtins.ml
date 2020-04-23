@@ -129,10 +129,15 @@ let inconsistent_builtin_typ kf = function
     let expected_result, expected_args = typ () in
     match Kernel_function.get_type kf with
     | TFun (result, args, _, _) ->
+      (* If a builtin expects a void pointer, then accept all pointer types. *)
+      let need_cast typ expected =
+        Cil.need_cast typ expected
+        && not (Cil.isVoidPtrType expected && Cil.isPointerType typ)
+      in
       let args = Cil.argsToList args in
-      Cil.need_cast result expected_result
+      need_cast result expected_result
       || List.length args <> List.length expected_args
-      || List.exists2 (fun (_, t, _) u -> Cil.need_cast t u) args expected_args
+      || List.exists2 (fun (_, t, _) u -> need_cast t u) args expected_args
     | _ -> assert false
 
 (* Warns if the builtin [bname] overrides the function definition [kf]. *)

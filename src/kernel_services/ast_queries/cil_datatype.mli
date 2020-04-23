@@ -310,11 +310,11 @@ module Lexpr: S with type t = Logic_ptree.lexpr
 (** {2 Internal API} *)
 (* ****************************************************************************)
 
-(* Forward declarations from Cil *)
+(* Forward declarations from Cil et al. *)
 val drop_non_logic_attributes : (attributes -> attributes) ref
 val constfoldtoint : (exp -> Integer.t option) ref
 val punrollType: (typ -> typ) ref
-
+val punrollLogicType: (logic_type -> logic_type) ref
 val clear_caches: unit -> unit
 
 (**/**)

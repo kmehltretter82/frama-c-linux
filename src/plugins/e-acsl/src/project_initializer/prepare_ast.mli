@@ -25,8 +25,6 @@
     More precisely, this module performs the following tasks:
     - generating a new definition for functions with contract;
     - removing term sharing;
-    - moving declarations of variables declared in the bodies of switch
-      statements to upper scopes;
     - storing what is necessary to translate in [Keep_status];
     - in case of temporal validity checks, adding the attribute "aligned" to
       variables that are not sufficiently aligned. *)

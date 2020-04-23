@@ -9,6 +9,6 @@ struct A { int x; };
 int main() {
   /*@ ghost struct B b; */
   struct A a;
-  /*@ ghost b.y = 0; a.x = b.y; */
+  /*@ ghost b.y = 0; b.y += a.x ; */
   return 0;
 }

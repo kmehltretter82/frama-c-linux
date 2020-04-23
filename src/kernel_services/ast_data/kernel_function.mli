@@ -86,7 +86,7 @@ val find_from_sid : int -> stmt * t
 
 val find_englobing_kf : stmt -> t
   (** @return the function to which the statement belongs. Same
-      complexity as [find_from_sid] 
+      complexity as [find_from_sid]
       @raise Not_found if the given statement is not correctly registered *)
 
 val find_enclosing_block: stmt -> block
@@ -227,6 +227,10 @@ exception No_Definition
 val get_definition : t -> fundec
   (** @raise No_Definition if the given function is not a definition.
       @plugin development guide *)
+
+val has_definition : t -> bool
+  (** @return [true] iff the given kernel function has a defintion.
+      @since Frama-C+dev *)
 
 (* ************************************************************************* *)
 (** {2 Membership of variables} *)

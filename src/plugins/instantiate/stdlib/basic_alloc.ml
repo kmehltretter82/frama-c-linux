@@ -25,12 +25,14 @@ open Basic_blocks
 open Cil_types
 open Extlib
 
+let unexpected = Options.fatal "Stdlib.Basic_alloc: unexpected: %s"
+
 let valid_size ?loc typ size =
   let p = match typ with
     | TComp (ci, _, _) when Cil.has_flexible_array_member typ ->
       let elem = match (last ci.cfields).ftype with
         | TArray(t, _ , _, _) -> tinteger ?loc (Cil.bytesSizeOf t)
-        | _ -> assert false
+        | _ -> unexpected "non array last field on flexible structure"
       in
       let base = tinteger ?loc (Cil.bytesSizeOf typ) in
       let flex = tminus ?loc size base in
@@ -45,10 +47,56 @@ let valid_size ?loc typ size =
   in
   new_predicate { p with pred_name = ["correct_size"] }
 
+let heap_status () =
+  let name = "__fc_heap_status" in
+  let make () =
+    let vi = Cil.makeVarinfo ~ghost:true true false name Cil.intType in
+    vi.vstorage <- Extern ;
+    vi
+  in
+  let vi = Global_context.get_variable name make in
+  Basic_blocks.cvar_to_tvar vi
+
+let make_is_allocable () =
+  let name = "is_allocable" in
+  {
+    l_var_info = Cil_const.make_logic_var_global name (Ctype Cil.voidType) ;
+    l_type = None ;
+    l_tparams = [];
+    l_labels = [FormalLabel("L")];
+    l_profile = [Cil_const.make_logic_var_formal "i" Linteger] ;
+    l_body = LBreads [new_identified_term (heap_status())];
+  }
+
+let make_axiomatic_is_allocable loc () =
+  let is_allocable = make_is_allocable () in
+  let lv_i = Cil_const.make_logic_var_quant "i" Linteger in
+  let t_i = tvar lv_i in
+  let zero = tinteger 0 in
+  let max =
+    tinteger
+      (Integer.to_int
+         (Cil.max_unsigned_number (Cil.bitsSizeOf (size_t ()))))
+  in
+  let label = FormalLabel("L") in
+  let cond = pand (prel (Rlt, t_i, zero), prel (Rgt, t_i, max)) in
+  let app = pnot (papp (is_allocable,[label],[t_i])) in
+  let prop = pforall ([lv_i], pimplies (cond, app)) in
+  let gfun = Dfun_or_pred(is_allocable, loc) in
+  let axiom = Dlemma("never_allocable", true, [label],[],prop,[], loc) in
+  ("dynamic_allocation", [gfun ; axiom]), [is_allocable]
+
+let get_is_allocable loc =
+  Global_context.get_logic_function_in_axiomatic
+    "is_allocable" (make_axiomatic_is_allocable loc)
+
 let pis_allocable ?loc size =
-  let is_allocable = Logic_env.find_all_logic_functions "is_allocable" in
-  let is_allocable = as_singleton is_allocable in
-  papp ?loc (is_allocable, [here_label], [size])
+  let loc = match loc with
+    | None -> Cil_datatype.Location.unknown
+    | Some l -> l
+  in
+  let is_allocable = get_is_allocable loc in
+  papp ~loc (is_allocable, [here_label], [size])
 
 let is_allocable ?loc size =
   let p = pis_allocable ?loc size in
@@ -57,10 +105,6 @@ let is_allocable ?loc size =
 let isnt_allocable ?loc size =
   let p = pnot ?loc (pis_allocable ?loc size) in
   new_predicate { p with pred_name = [ "allocable" ]}
-
-let heap_status () =
-  let heap_status = Globals.Vars.find_from_astinfo "__fc_heap_status" VGlobal in
-  Basic_blocks.cvar_to_tvar (heap_status)
 
 let assigns_result ?loc typ deps =
   let heap_status = new_identified_term (heap_status ()) in

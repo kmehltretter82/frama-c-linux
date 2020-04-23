@@ -309,6 +309,7 @@ let emit_alarm kinstr alarm (status:status) =
       | Alarms.Unsigned -> "unsigned overflow"
       | Alarms.Signed_downcast -> "signed downcast"
       | Alarms.Unsigned_downcast -> "unsigned downcast"
+      | Alarms.Pointer_downcast -> "pointer downcast"
     in
     register_alarm str
 
@@ -330,6 +331,9 @@ let emit_alarm kinstr alarm (status:status) =
 
   | Alarms.Index_out_of_bound _ ->
     register_alarm "accessing out of bounds index"
+
+  | Alarms.Invalid_pointer _ ->
+    register_alarm "invalid pointer creation"
 
   | Alarms.Differing_blocks _ ->
     register_alarm "pointer subtraction"
@@ -366,6 +370,7 @@ let emit_alarm kinstr alarm (status:status) =
 let height_alarm = let open Value_util in function
     | Alarms.Division_by_zero e
     | Alarms.Index_out_of_bound (e,_)
+    | Alarms.Invalid_pointer e
     | Alarms.Invalid_shift (e,_)
     | Alarms.Overflow (_,e,_,_)
     | Alarms.Float_to_int (e,_,_)
@@ -394,7 +399,25 @@ let height_alarm = let open Value_util in function
 let cmp a1 a2 =
   Datatype.Int.compare (height_alarm (fst a1)) (height_alarm (fst a2))
 
+let remove_redundant_alarms map =
+  let filter alarm status =
+    match alarm with
+    | Alarms.Invalid_pointer expr ->
+      let lval = Mem expr, NoOffset in
+      let implies alarm s =
+        status = s &&
+        match alarm with
+        | Alarms.Memory_access (lv, _access_kind) ->
+          Cil_datatype.LvalStructEq.equal lv lval
+        | _ -> false
+      in
+      not (M.exists implies map)
+    | _ -> true
+  in
+  M.filter filter map
+
 let emit_alarms kinstr map =
+  let map = remove_redundant_alarms map in
   let list = M.bindings map in
   let sorted_list = List.sort cmp list in
   List.iter (fun (alarm, status) -> emit_alarm kinstr alarm status) sorted_list;
@@ -425,6 +448,7 @@ let warn_alarm warn_mode = function
   | Alarms.Invalid_shift _
   | Alarms.Memory_access _
   | Alarms.Index_out_of_bound _
+  | Alarms.Invalid_pointer _
   | Alarms.Is_nan_or_infinite _
   | Alarms.Is_nan _
   | Alarms.Not_separated _

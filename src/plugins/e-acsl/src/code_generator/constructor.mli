@@ -29,6 +29,8 @@ val mk_deref: loc:Location.t -> exp -> exp
 (** Construct a dereference of an expression. *)
 
 val mk_block: stmt -> block -> stmt
+(** Create a block statement from a block to replace a given statement.
+    Requires that (1) the block is not empty, or (2) the statement is a skip. *)
 
 (* ********************************************************************** *)
 (* E-ACSL specific code: build calls to its RTL API *)

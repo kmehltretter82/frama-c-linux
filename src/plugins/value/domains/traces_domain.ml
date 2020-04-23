@@ -848,7 +848,7 @@ module Internal = struct
   type nonrec state = state
   type value = Cvalue.V.t
   type location = Precise_locs.precise_location
-  type origin = unit
+  type origin
 
   include (Traces: sig
              include Datatype.S_with_collections with type t = state
@@ -931,7 +931,7 @@ module Internal = struct
     Traces.add_trans state (Msg msg)
 
   (* TODO *)
-  let logic_assign _assign _location ~pre:_ state =
+  let logic_assign _assign _location state =
     Traces.add_trans state (Msg "logic assign")
 
   (* Logic *)
@@ -940,7 +940,7 @@ module Internal = struct
 
   let storage () = true
 
-  let top_query = `Value (Cvalue.V.top, ()), Alarmset.all
+  let top_query = `Value (Cvalue.V.top, None), Alarmset.all
 
   let extract_expr _oracle _state _expr = top_query
   let extract_lval _oracle _state _lv _typ _locs = top_query
@@ -1080,10 +1080,12 @@ let rec stmts_of_cfg cfg current var_map locals return_exp acc =
 
       | Assume (_, exp,b) ->
         let exp = subst_in_exp var_map exp in
-        let predicate = (Logic_utils.expr_to_predicate ~cast:true exp).Cil_types.ip_content in
+        let predicate = Logic_utils.expr_to_predicate exp in
         let predicate = if b then predicate else Logic_const.pnot predicate in
-        let code_annot = Logic_const.new_code_annotation(Cil_types.AAssert([],Assert,predicate)) in
-        let stmt = Cil.mkStmtOneInstr ~valid_sid (Cil_types.Code_annot(code_annot,dummy_loc)) in
+        let code_node = Cil_types.AAssert([],Assert,predicate) in
+        let code_annot = Logic_const.new_code_annotation code_node in
+        let stmt_kind = Cil_types.Code_annot(code_annot,exp.eloc) in
+        let stmt = Cil.mkStmtOneInstr ~valid_sid stmt_kind in
         stmts_of_cfg cfg n var_map locals return_exp (stmt::acc)
 
       | EnterScope (_, vs) ->

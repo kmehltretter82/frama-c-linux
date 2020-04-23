@@ -156,6 +156,10 @@ pre-processed. *args* are used only for the first pass, so that arguments that
 should not be used twice (such as additional include directives or macro
 definitions) must thus go there instead of **-cpp-command**.
 
+-cpp-extra-args-per-file *file1:args1,...,filen:argsn*
+: like **-cpp-extra-args**, but the arguments only apply to the specified
+files.
+
 [-no]-cpp-frama-c-compliant
 : indicates that the chosen preprocessor complies to some Frama-C requirements,
 such as accepting the same set of options as GNU cpp, and accepting
@@ -446,11 +450,18 @@ the case (this is the default).
 **Deprecated**: use **-kernel-warn-key parser:decimal-float=once**
 (and variants) instead.
 
+[-no]-warn-invalid-pointer
+: generate alarms for invalid pointer arithmetic. Defaults to no.
+
 [-no]-warn-left-shift-negative
 : generate alarms for signed left shifts on negative values. Defaults to yes.
 
 [-no]-warn-right-shift-negative
 : generate alarms for signed right shifts on negative values. Defaults to no.
+
+[-no]-warn-pointer-downcast
+: generates alarms when the downcast of a pointer may exceed the destination
+range. Defaults to yes.
 
 [-no]-warn-signed-downcast
 : generates alarms when signed downcasts may exceed the destination range.

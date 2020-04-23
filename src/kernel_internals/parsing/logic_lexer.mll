@@ -232,6 +232,7 @@
         "\\typeof", TYPEOF;
         "\\unallocated", UNALLOCATED;
         "\\union", BSUNION;
+        "\\object_pointer", OBJECT_POINTER;
         "\\valid", VALID;
         "\\valid_read", VALID_READ;
         "\\valid_index", VALID_INDEX;

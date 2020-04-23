@@ -496,18 +496,7 @@ class prepare_visitor = object (self)
          Annotations.iter_code_annot
            (fun _ a -> self#push_post_code_annot a)
            stmt;
-         (* move variables declared in the body of a switch statement to the
-            outer scope *)
-         match stmt.skind with
-         | Switch(_,sw_blk,_,_) ->
-           let new_blk = Cil.mkBlock [ stmt ] in
-           let new_stmt = Cil.mkStmt ~valid_sid:true (Block new_blk) in
-           new_blk.blocals <- sw_blk.blocals;
-           sw_blk.blocals <- [];
-           has_new_stmt_in_fundec <- true;
-           new_stmt
-         | _ ->
-           stmt)
+         stmt)
 
   method !vfunc fundec =
     Cil.DoChildrenPost

@@ -33,7 +33,10 @@ val text : t -> Markdown.text
     the description block. *)
 val publish :
   page:Doc.page -> name:string -> descr:Markdown.text ->
-  synopsis:t -> ?details:Markdown.elements -> unit -> t
+  synopsis:t ->
+  ?details:Markdown.elements ->
+  ?generated:(unit -> Markdown.elements) ->
+  unit -> t
 
 val unit : t
 val any : t
@@ -49,11 +52,27 @@ val tuple : t list -> t
 val union : t list -> t
 val option : t -> t
 val record : (string * t) list -> t
+val data : string -> Markdown.href -> t
 
-type field = { name : string ; syntax : t ; descr : Markdown.text }
+type tag = {
+  tag_name : string ;
+  tag_label : Markdown.text ;
+  tag_descr : Markdown.text ;
+}
 
-(** Builds a table with fields column named with [~title]
-    (shall be capitalized) *)
-val fields : title:string -> field list -> Markdown.element
+(** Syntactic definition: LEFT := RIGHT *)
+val define : Markdown.text -> Markdown.text -> Markdown.block_element
+
+(** Builds a table with tags description.
+    The [~title] is applied to the tag name column
+    (shall be capitalized, defaults to ["Tag"]). *)
+val tags : ?title:string -> tag list -> Markdown.element
+
+type field = { fd_name : string ; fd_syntax : t ; fd_descr : Markdown.text }
+
+(** Builds a table with fields description.
+    The [~title] is applied to the field name column
+    (shall be capitalized, defaults to ["Field"]). *)
+val fields : ?title:string -> field list -> Markdown.element
 
 (* -------------------------------------------------------------------------- *)

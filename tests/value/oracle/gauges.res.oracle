@@ -241,6 +241,10 @@
   Called from tests/value/gauges.c:361.
 [eva] tests/value/gauges.c:186: starting to merge loop iterations
 [eva:alarm] tests/value/gauges.c:188: Warning: 
+  pointer downcast. assert (unsigned int)p ≤ 2147483647;
+[eva:alarm] tests/value/gauges.c:188: Warning: 
+  pointer downcast. assert (unsigned int)q ≤ 2147483647;
+[eva:alarm] tests/value/gauges.c:188: Warning: 
   signed overflow. assert -2147483648 ≤ (int)p + (int)q;
 [eva:alarm] tests/value/gauges.c:188: Warning: 
   signed overflow. assert (int)p + (int)q ≤ 2147483647;
@@ -273,7 +277,7 @@
   signed overflow. assert -2147483648 ≤ numNonZero - 1;
 [eva:alarm] tests/value/gauges.c:202: Warning: 
   non-finite float value.
-  assert \is_finite((float)(*p * (float)(*tmp * *tmp_0)));
+  assert \is_finite(\mul_float(*p, \mul_float(*tmp, *tmp_0)));
   (tmp from A++, tmp_0 from B++)
 [eva] Recording results for main10_aux
 [eva] Done for function main10_aux

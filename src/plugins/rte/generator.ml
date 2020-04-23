@@ -83,6 +83,14 @@ module Mem_access =
       let additional_parameters = [ Kernel.SafeArrays.parameter ]
     end)
 
+module Pointer_value =
+  Make
+    (struct
+      let name = "pointer_value"
+      let parameter = Kernel.InvalidPointer.parameter
+      let additional_parameters = []
+    end)
+
 module Pointer_call =
   Make
     (struct
@@ -152,6 +160,14 @@ module Unsigned_downcast =
     (struct
       let name = "unsigned_downcast"
       let parameter = Kernel.UnsignedDowncast.parameter
+      let additional_parameters = []
+    end)
+
+module Pointer_downcast =
+  Make
+    (struct
+      let name = "pointer_downcast"
+      let parameter = Kernel.PointerDowncast.parameter
       let additional_parameters = []
     end)
 

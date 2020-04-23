@@ -58,7 +58,8 @@ module SLocals = Build_env(struct type t = Varinfo.Set.t end)
    done for consistency, so all required information is stored uniformly. *)
 module Exits = Build_env(struct type t = stmt end)
 
-(* Map labelled statements back to gotos which lead to them *)
+(* Map labelled statements back to gotos which lead to them and case statements
+   back to the corresponding switch *)
 module LJumps = Build_env(struct type t = stmt end)
 
 let clear () =
@@ -117,11 +118,17 @@ class jump_context = object (_)
       | [] -> ()
       | _ :: _ -> SLocals.add stmt (unify_sets locals)
     in
-    match stmt.skind with
-    | Loop _ | Switch _ ->
+    let handle_jumps stmt =
       SLocals.add stmt (unify_sets locals);
       Stack.push stmt jumps;
       Cil.DoChildrenPost (fun st -> ignore(Stack.pop jumps); st)
+    in
+    match stmt.skind with
+    | Loop _ ->
+      handle_jumps stmt
+    | Switch (_, _, case_stmts, _) ->
+      List.iter (fun s -> LJumps.add s stmt) case_stmts;
+      handle_jumps stmt
     | Break _ | Continue _ ->
       Exits.add stmt (Stack.top jumps);
       SLocals.add stmt (unify_sets locals);

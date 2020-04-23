@@ -59,7 +59,8 @@
 [eva:alarm] tests/float/logic.i:42: Warning: check got status invalid.
 [eva:alarm] tests/float/logic.i:43: Warning: check got status invalid.
 [eva:alarm] tests/float/logic.i:45: Warning: 
-  non-finite double value. assert \is_finite((double)(1. / 0.));
+  non-finite double value.
+  assert \is_finite(\div_double((double)1., (double)0.));
 [eva:alarm] tests/float/logic.i:64: Warning: check got status unknown.
 [eva:alarm] tests/float/logic.i:65: Warning: check got status unknown.
 [eva:alarm] tests/float/logic.i:66: Warning: check got status unknown.
@@ -314,7 +315,8 @@
 [eva] Recording results for test_comparison_reduction
 [eva] Done for function test_comparison_reduction
 [eva:alarm] tests/float/logic.i:133: Warning: 
-  non-finite double value. assert \is_finite((double)(1. / 0.));
+  non-finite double value.
+  assert \is_finite(\div_double((double)1., (double)0.));
 [eva] Recording results for test_builtin_comparisons
 [eva] Done for function test_builtin_comparisons
 [eva] computing for function test_is_finite <- main.

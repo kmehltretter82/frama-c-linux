@@ -38,9 +38,11 @@ type t = {
   unsigned_overflow: bool;
   signed_downcast: bool;
   unsigned_downcast: bool;
+  pointer_downcast: bool;
   float_to_int: bool;
   finite_float: bool;
   pointer_call: bool;
+  pointer_value: bool;
   bool_value: bool;
 }
 
@@ -57,9 +59,11 @@ val default :
   ?unsigned_overflow:bool ->
   ?signed_downcast:bool ->
   ?unsigned_downcast:bool ->
+  ?pointer_downcast:bool ->
   ?float_to_int:bool ->
   ?finite_float:bool ->
   ?pointer_call:bool ->
+  ?pointer_value:bool ->
   ?bool_value:bool ->
   unit -> t
 

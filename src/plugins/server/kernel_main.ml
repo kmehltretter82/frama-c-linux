@@ -78,104 +78,114 @@ let () =
 (* --- File Positions                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
-module RawSource =
-struct
-  type t = Filepath.position
+module LogSource = Collection
+    (struct
+      type t = Filepath.position
 
-  let syntax = Sy.publish ~page ~name:"source"
-      ~synopsis:(Sy.record [ "file" , Sy.string ; "line" , Sy.int ])
-      ~descr:(Md.plain "Source file positions.")
-      ~details:Md.([Block [Text (plain "The file path is normalized, \
-                                        and the line number starts at one.")]])
-      ()
+      let syntax = Sy.publish ~page:Data.page ~name:"source"
+          ~synopsis:(Sy.record [ "file" , Sy.string ; "line" , Sy.int ])
+          ~descr:(Md.plain "Source file positions.")
+          ~details:Md.([Block [Text (plain "The file path is normalized, \
+                                            and the line number starts at one.")]])
+          ()
 
-  let to_json p = `Assoc [
-      "file" , `String (p.Filepath.pos_path :> string) ;
-      "line" , `Int p.Filepath.pos_lnum ;
-    ]
+      let to_json p = `Assoc [
+          "file" , `String (p.Filepath.pos_path :> string) ;
+          "line" , `Int p.Filepath.pos_lnum ;
+        ]
 
-  let of_json = function
-    | `Assoc [ "file" , `String path ; "line" , `Int line ]
-    | `Assoc [ "line" , `Int line ; "file" , `String path ]
-      -> Log.source ~file:(Filepath.Normalized.of_string path) ~line
-    | js -> failure_from_type_error "Invalid source format" js
+      let of_json = function
+        | `Assoc [ "file" , `String path ; "line" , `Int line ]
+        | `Assoc [ "line" , `Int line ; "file" , `String path ]
+          -> Log.source ~file:(Filepath.Normalized.of_string path) ~line
+        | js -> failure_from_type_error "Invalid source format" js
 
-end
-
-module LogSource = Collection(RawSource)
+    end)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Log Lind                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-module RawKind =
-struct
-  type t = Log.kind
-  let page = page
-  let name = "kind"
-  let descr = Md.plain "Frama-C message category."
-  let values = [
-    Log.Error,    "ERROR",    Md.plain "User Error" ;
-    Log.Warning,  "WARNING",  Md.plain "User Warning" ;
-    Log.Feedback, "FEEDBACK", Md.plain "Analyzer Feedback" ;
-    Log.Result,   "RESULT",   Md.plain "Analyzer Result" ;
-    Log.Failure,  "FAILURE",  Md.plain "Analyzer Failure" ;
-    Log.Debug,    "DEBUG",    Md.plain "Analyser Debug" ;
-  ]
-end
+module LogKind = Collection
+    (struct
 
-module LogKind = Dictionary(RawKind)
+      let kinds = Enum.dictionary ~page
+          ~name:"logkind" ~title:"Log Kind"
+          ~descr:(Md.plain "Frama-C message category.")
+          ()
+
+      let t_kind value name descr =
+        Enum.tag kinds ~name ~descr:(Md.plain descr) ~value ()
+
+      let t_error = t_kind Log.Error "ERROR" "User Error"
+      let t_warning = t_kind Log.Warning "WARNING" "User Warning"
+      let t_feedback = t_kind Log.Feedback "FEEDBACK" "Plugin Feedback"
+      let t_result = t_kind Log.Result "RESULT" "Plugin Result"
+      let t_failure = t_kind Log.Failure "FAILURE" "Plugin Failure"
+      let t_debug = t_kind Log.Debug "DEBUG" "Analyser Debug"
+
+      let tag = function
+        | Log.Error -> t_error
+        | Log.Warning -> t_warning
+        | Log.Feedback -> t_feedback
+        | Log.Result -> t_result
+        | Log.Failure -> t_failure
+        | Log.Debug -> t_debug
+
+      let data = Enum.publish kinds ~tag ()
+      let () = Request.dictionary kinds
+
+      include (val data : S with type t = Log.kind)
+    end)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Log Events                                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
-module RawEvent =
-struct
+module LogEvent = Collection
+    (struct
 
-  type rlog
+      type rlog
 
-  let jlog : rlog signature = Record.signature ~page
-      ~name:"log" ~descr:(Md.plain "Message event record.") ()
+      let jlog : rlog Record.signature = Record.signature ~page
+          ~name:"log" ~descr:(Md.plain "Message event record.") ()
 
-  let kind = Record.field jlog ~name:"kind"
-      ~descr:(Md.plain "Message kind") (module LogKind)
-  let plugin = Record.field jlog ~name:"plugin"
-      ~descr:(Md.plain "Emitter plugin") (module Jstring)
-  let message = Record.field jlog ~name:"message"
-      ~descr:(Md.plain "Message text") (module Jstring)
-  let category = Record.option jlog ~name:"category"
-      ~descr:(Md.plain "Message category (DEBUG or WARNING)") (module Jstring)
-  let source = Record.option jlog ~name:"source"
-      ~descr:(Md.plain "Source file position") (module LogSource)
+      let kind = Record.field jlog ~name:"kind"
+          ~descr:(Md.plain "Message kind") (module LogKind)
+      let plugin = Record.field jlog ~name:"plugin"
+          ~descr:(Md.plain "Emitter plugin") (module Jstring)
+      let message = Record.field jlog ~name:"message"
+          ~descr:(Md.plain "Message text") (module Jstring)
+      let category = Record.option jlog ~name:"category"
+          ~descr:(Md.plain "Message category (DEBUG or WARNING)") (module Jstring)
+      let source = Record.option jlog ~name:"source"
+          ~descr:(Md.plain "Source file position") (module LogSource)
 
-  module R = (val (Record.publish jlog) : Record.S with type r = rlog)
+      module R = (val (Record.publish jlog) : Record.S with type r = rlog)
 
-  type t = Log.event
-  let syntax = R.syntax
+      type t = Log.event
+      let syntax = R.syntax
 
-  let to_json evt =
-    R.default |>
-    R.set plugin evt.Log.evt_plugin |>
-    R.set kind evt.Log.evt_kind |>
-    R.set category evt.Log.evt_category |>
-    R.set source evt.Log.evt_source |>
-    R.set message evt.Log.evt_message |>
-    R.to_json
+      let to_json evt =
+        R.default |>
+        R.set plugin evt.Log.evt_plugin |>
+        R.set kind evt.Log.evt_kind |>
+        R.set category evt.Log.evt_category |>
+        R.set source evt.Log.evt_source |>
+        R.set message evt.Log.evt_message |>
+        R.to_json
 
-  let of_json js =
-    let r = R.of_json js in
-    {
-      Log.evt_plugin = R.get plugin r ;
-      Log.evt_kind = R.get kind r ;
-      Log.evt_category = R.get category r ;
-      Log.evt_source = R.get source r ;
-      Log.evt_message = R.get message r ;
-    }
+      let of_json js =
+        let r = R.of_json js in
+        {
+          Log.evt_plugin = R.get plugin r ;
+          Log.evt_kind = R.get kind r ;
+          Log.evt_category = R.get category r ;
+          Log.evt_source = R.get source r ;
+          Log.evt_message = R.get message r ;
+        }
 
-end
-
-module LogEvent = Collection(RawEvent)
+    end)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Log Monitoring                                                     --- *)

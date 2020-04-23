@@ -73,7 +73,8 @@ let rec string_of_typ_aux = function
   | TComp (ci, _, _) -> "un_" ^ ci.cname
   | TArray (t, Some e, _, _) ->
     "arr" ^ (string_of_exp e) ^ "_" ^ string_of_typ t
-  | _ -> assert false
+  | t ->
+    Options.fatal "unsupported type %a" Cil_printer.pp_typ t
 and string_of_typ t = string_of_typ_aux (Cil.unrollType t)
 and string_of_exp e = Format.asprintf "%a" Cil_printer.pp_exp e
 
@@ -111,9 +112,10 @@ let tplus ?loc t1 t2 =
 let tdivide ?loc t1 t2 =
   term ?loc (TBinOp(Div, t1, t2)) t1.term_type
 
-let ttype_of_pointed = function
+let ttype_of_pointed t =
+  match Logic_utils.unroll_type t with
   | Ctype(TPtr(t, _)) | Ctype(TArray(t, _, _, _)) -> Ctype t
-  | _ -> assert false
+  | _ -> Options.fatal "ttype_of_pointed on a non pointer type"
 
 let tbuffer_range ?loc ptr len =
   let last = tminus ?loc len (tinteger ?loc 1) in
@@ -129,7 +131,7 @@ let rec tunref_range ?loc ptr len =
 and tunref_range_unfold ?loc lval typ =
   match typ with
   | Ctype(TArray(typ, Some e, _, _)) ->
-    let len = Logic_utils.expr_to_term ~cast:false e in
+    let len = Logic_utils.expr_to_term ~coerce:true e in
     let last = tminus ?loc len (tinteger ?loc 1) in
     let range = trange ?loc (Some (tinteger ?loc 0), Some last) in
     let lval = addTermOffsetLval (TIndex(range, TNoOffset)) lval in
@@ -139,9 +141,9 @@ and tunref_range_unfold ?loc lval typ =
 let taccess ?loc ptr offset =
   let get_lval = function
     | TLval(lval) -> lval
-    | _ -> assert false
+    | _ -> Options.fatal "unexpected non-lvalue on call to taccess"
   in
-  match ptr.term_type with
+  match Logic_utils.unroll_type ptr.term_type with
   | Ctype(TPtr(_)) ->
     let address = tplus ?loc ptr offset in
     let lval = TLval(TMem(address), TNoOffset) in
@@ -150,19 +152,15 @@ let taccess ?loc ptr offset =
     let lval = get_lval ptr.term_node in
     let lval = addTermOffsetLval (TIndex(offset, TNoOffset)) lval in
     term ?loc (TLval lval) (ttype_of_pointed ptr.term_type)
-  | _ -> assert false
+  | _ -> Options.fatal "taccess on a non pointer type"
 
 let sizeofpointed = function
   | Ctype(TPtr(t, _)) | Ctype(TArray(t, _, _, _)) -> Cil.bytesSizeOf t
-  | _ -> assert false
+  | _ -> Options.fatal "size_of_pointed on a non pointer type"
 
 let sizeof = function
   | Ctype t -> Cil.bytesSizeOf t
-  | _ -> assert false
-
-let unroll_logic_type = function
-  | Ctype t -> Ctype (Cil.unrollType t)
-  | t -> t
+  | _ -> Options.fatal "sizeof on a non C type"
 
 let tunref_range_bytes_len ?loc ptr bytes_len =
   let sizeof = sizeofpointed ptr.term_type in
@@ -218,9 +216,9 @@ and pall_elems_eq ?loc depth t1 t2 len =
   let eq = peq_unfold ?loc (depth+1) t1_acc t2_acc in
   pforall ?loc ([ind], (pimplies ?loc (bounds, eq)))
 and peq_unfold ?loc depth t1 t2 =
-  match unroll_logic_type t1.term_type with
+  match Logic_utils.unroll_type t1.term_type with
   | Ctype(TArray(_, Some len, _, _)) ->
-    let len = Logic_utils.expr_to_term ~cast:false len in
+    let len = Logic_utils.expr_to_term ~coerce:true len in
     pall_elems_eq ?loc depth t1 t2 len
   | _ -> prel ?loc (Req, t1, t2)
 
@@ -234,12 +232,14 @@ and pall_elems_pred ?loc depth t1 len pred =
   let eq = punfold_pred ?loc depth t1_acc pred in
   pforall ?loc ([ind], (pimplies ?loc (bounds, eq)))
 and punfold_pred ?loc ?(dyn_len = None) depth t1 pred =
-  match unroll_logic_type t1.term_type with
+  match Logic_utils.unroll_type t1.term_type with
   | Ctype(TArray(_, opt_len, _, _)) ->
-    let len = match opt_len, dyn_len with
-      | Some len, None -> Logic_utils.expr_to_term ~cast:false len
+    let len =
+      match opt_len, dyn_len with
+      | Some len, None -> Logic_utils.expr_to_term ~coerce:true len
       | _   , Some len -> len
-      | None, None -> assert false
+      | None, None ->
+        Options.fatal "Unfolding array: cannot find a length"
     in
     pall_elems_pred ?loc (depth+1) t1 len pred
   | Ctype(TComp(ci, _, _)) ->
@@ -253,9 +253,9 @@ and pall_fields_pred ?loc ?(flex_mem_len=None) depth t1 ci pred =
     punfold_pred ?loc ~dyn_len depth term pred
   in
   let rec eqs_fields = function
+    | [] -> []
     | [ x ] -> [ eq flex_mem_len x ]
     | x :: l -> let x' = eq None x in x' :: (eqs_fields l)
-    | _ -> assert false
   in
   pands (eqs_fields ci.cfields)
 
@@ -263,7 +263,7 @@ let punfold_flexible_struct_pred ?loc the_struct bytes_len pred =
   let struct_len = tinteger ?loc (sizeof the_struct.term_type) in
   let ci = match the_struct.term_type with
     | Ctype(TComp(ci, _, _) as t) when Cil.has_flexible_array_member t -> ci
-    | _ -> assert false
+    | _ -> Options.fatal "Unfolding flexible on a non flexible structure"
   in
   let flex_type = Ctype (Extlib.last ci.cfields).ftype in
   let flex_len = tminus bytes_len struct_len in

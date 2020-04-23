@@ -170,13 +170,51 @@ struct termios {
   cc_t     c_cc[NCCS]; /* special characters */
 };
 
-extern speed_t cfgetispeed(const struct termios *);
-extern speed_t cfgetospeed(const struct termios *);
-extern int     cfsetispeed(struct termios *, speed_t);
-extern int     cfsetospeed(struct termios *, speed_t);
+/*@
+  requires valid_termios_p: \valid_read(termios_p);
+  assigns \result \from indirect:termios_p, *termios_p;
+  // missing ensures result_is_valid_speed: speed \in {valid baud rates};
+*/
+extern speed_t cfgetispeed(const struct termios *termios_p);
+
+/*@
+  requires valid_termios_p: \valid_read(termios_p);
+  assigns \result \from indirect:termios_p, *termios_p;
+  // missing ensures result_is_valid_speed: speed \in {valid baud rates};
+*/
+extern speed_t cfgetospeed(const struct termios *termios_p);
+
+/*@
+  // missing requires valid_speed: speed \in {valid baud rates};
+  requires valid_termios_p: \valid(termios_p);
+  assigns \result, *termios_p \from indirect:termios_p, speed;
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+ */
+extern int     cfsetispeed(struct termios *termios_p, speed_t speed);
+
+/*@
+  // missing requires valid_speed: speed \in {valid baud rates};
+  requires valid_termios_p: \valid(termios_p);
+  assigns \result, *termios_p \from indirect:termios_p, speed;
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+ */
+extern int     cfsetospeed(struct termios *termios_p, speed_t speed);
+
 extern int     tcdrain(int);
 extern int     tcflow(int, int);
-extern int     tcflush(int, int);
+
+/*@
+  // missing requires valid_fd: {fd is an open file descriptor
+  //                             associated with a terminal};
+  requires valid_queue_selector: queue_selector == TCIFLUSH
+                              || queue_selector == TCOFLUSH
+                              || queue_selector == TCIOFLUSH;
+  assigns \result \from indirect:fd, indirect:queue_selector,
+                        indirect:Frama_C_entropy_source;
+  assigns Frama_C_entropy_source \from Frama_C_entropy_source;
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+ */
+extern int     tcflush(int fd, int queue_selector);
 
 /*@ requires valid_termios_p: \valid(termios_p);
     assigns \result, *termios_p \from indirect:fd,

@@ -47,8 +47,9 @@ MINOR_VERSION=$(shell $(SED) -E 's/^[0-9]+\.([0-9]+).*/\1/' VERSION)
 $(CONFIG_FILE): $(CONFIG_FILE).in VERSION VERSION_CODENAME share/Makefile.config Makefile.generating configure.in
 	$(SED) \
 	  -e "s|@VERSION@|$(VERSION)|" \
-         -e "s|@VERSION_CODENAME@|$(VERSION_CODENAME)|" \
+          -e "s|@VERSION_CODENAME@|$(VERSION_CODENAME)|" \
           -e "s|@CURR_DATE@|$$(LC_ALL=C date)|" \
+          -e "s|@LABLGTK@|$(LABLGTK)|" \
 	  -e "s|@OCAMLC@|$(OCAMLC)|" \
           -e "s|@OCAMLOPT@|$(OCAMLOPT)|" \
 	  -e "s|@WARNINGS@|$(WARNINGS)|" \

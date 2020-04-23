@@ -55,3 +55,15 @@ module Complete_Simple_Cvalue
   : Abstract_domain.Leaf with type value = Cvalue.V.t
                           and type location = Precise_locs.precise_location
                           and type state = Domain.t
+
+(* Restricts an abstract domain on specific functions. The domain will only be
+   enabled on the given functions. Moreover, a mode is associated to each of
+   these functions, allowing (or not) the domain to infer or use properties
+   in the current function and in all functions called from it.
+   See {!Domain_mode} for more details. *)
+module Restrict
+    (Value: Abstract_value.S)
+    (Domain: Abstract.Domain.Internal with type value = Value.t)
+    (Scope: sig val functions: Domain_mode.function_mode list end)
+  : Abstract.Domain.Internal with type value = Value.t
+                              and type location = Domain.location

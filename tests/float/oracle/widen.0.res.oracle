@@ -8,7 +8,7 @@
   Called from tests/float/widen.c:50.
 [eva] tests/float/widen.c:13: starting to merge loop iterations
 [eva:alarm] tests/float/widen.c:14: Warning: 
-  non-finite double value. assert \is_finite((double)(max * 2.));
+  non-finite double value. assert \is_finite(\mul_double(max, (double)2.));
 [eva] tests/float/widen.c:16: starting to merge loop iterations
 [eva] tests/float/widen.c:24: 
   Frama_C_show_each_double_inf: [1. .. 1.79769313486e+308]

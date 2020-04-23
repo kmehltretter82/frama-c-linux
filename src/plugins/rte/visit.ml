@@ -86,6 +86,10 @@ class annot_visitor kf flags on_alarm = object (self)
     flags.Flags.unsigned_downcast
     && not (Generator.Unsigned_downcast.is_computed kf)
 
+  method private do_pointer_downcast () =
+    flags.Flags.pointer_downcast
+    && not (Generator.Pointer_downcast.is_computed kf)
+
   method private do_float_to_int () =
     flags.Flags.float_to_int && not (Generator.Float_to_int.is_computed kf)
 
@@ -94,6 +98,9 @@ class annot_visitor kf flags on_alarm = object (self)
 
   method private do_pointer_call () =
     flags.Flags.pointer_call && not (Generator.Pointer_call.is_computed kf)
+
+  method private do_pointer_value () =
+    flags.Flags.pointer_value && not (Generator.Pointer_value.is_computed kf)
 
   method private do_bool_value () =
     flags.Flags.bool_value && not (Generator.Bool_value.is_computed kf)
@@ -271,6 +278,9 @@ class annot_visitor kf flags on_alarm = object (self)
              self#generate_assertion Rte.finite_float_assertion (fkind,exp)
            | _ -> ())
 
+        | BinOp((PlusPI | MinusPI), _, _, _) when self#do_pointer_value () ->
+          self#generate_assertion Rte.pointer_value exp
+
         | UnOp(Neg, exp, ty) ->
           (* Note: if unary minus on unsigned integer is to be understood as
              "subtracting the promoted value from the largest value
@@ -286,6 +296,8 @@ class annot_visitor kf flags on_alarm = object (self)
 
         | Lval lval ->
           (match Cil.(unrollType (typeOfLval lval)) with
+           | TPtr _ when self#do_pointer_value () ->
+             self#generate_assertion Rte.pointer_value exp
            | TInt (IBool,_) when self#do_bool_value () ->
              self#generate_assertion Rte.bool_value lval
            | _ -> ());
@@ -307,15 +319,18 @@ class annot_visitor kf flags on_alarm = object (self)
         | CastE (ty, e) ->
           (match Cil.unrollType ty, Cil.unrollType (Cil.typeOf e) with
            (* to , from *)
+           | TInt _, TPtr _ when self#do_pointer_downcast () ->
+             self#generate_assertion Rte.downcast_assertion (ty, e)
+           | TPtr _, TInt _ when self#do_pointer_value () ->
+             self#generate_assertion Rte.pointer_value exp
+
            | TInt(kind,_), TInt (_, _) ->
-             if Cil.isSigned kind then begin
-               if self#do_signed_downcast () then begin
-                 self#generate_assertion Rte.signed_downcast_assertion (ty, e);
-                 self#mark_to_skip e;
-               end
-             end
-             else if self#do_unsigned_downcast () then
-               self#generate_assertion Rte.unsigned_downcast_assertion (ty, e)
+             let signed = Cil.isSigned kind in
+             if signed && self#do_signed_downcast ()
+             || not signed && self#do_unsigned_downcast ()
+             then self#generate_assertion Rte.downcast_assertion (ty, e);
+             if signed && self#do_signed_downcast ()
+             then self#mark_to_skip e;
 
            | TInt _, TFloat _ ->
              if self#do_float_to_int () then
@@ -334,8 +349,9 @@ class annot_visitor kf flags on_alarm = object (self)
             | FP_nan ->
               self#generate_assertion Rte.finite_float_assertion (fkind,exp)
           end
-        | StartOf _
-        | AddrOf _
+        | StartOf _ | AddrOf _ ->
+          if self#do_pointer_value ()
+          then self#generate_assertion Rte.pointer_value exp
         | Info _
         | UnOp _
         | Const _
@@ -446,6 +462,7 @@ let annotate ?flags kf =
     let open Flags in
     if comp Initialized.accessor flags.initialized |||
        comp Mem_access.accessor flags.mem_access |||
+       comp Pointer_value.accessor flags.pointer_value |||
        comp Pointer_call.accessor flags.pointer_call |||
        comp Div_mod.accessor flags.div_mod |||
        comp Shift.accessor flags.shift |||
@@ -455,6 +472,7 @@ let annotate ?flags kf =
        comp Signed_downcast.accessor flags.signed_downcast |||
        comp Unsigned_overflow.accessor flags.unsigned_overflow |||
        comp Unsigned_downcast.accessor flags.unsigned_downcast |||
+       comp Pointer_downcast.accessor flags.pointer_downcast |||
        comp Float_to_int.accessor flags.float_to_int |||
        comp Finite_float.accessor flags.finite_float |||
        comp Bool_value.accessor flags.bool_value

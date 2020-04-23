@@ -1733,7 +1733,7 @@ let oneFilePass1 (f:file) : unit =
                 "%s@\nOld declaration is unused, silently removing it"
                 msg;
               ignore_vi oldvi;
-              vi.vtype <- update_type_repr vi.vtype;
+              Cil.update_var_type vi (update_type_repr vi.vtype);
               H.replace vEnv vi.vname vinode;
               vinode.nrep <- vinode;
               oldvinode.nrep <- vinode;

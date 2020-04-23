@@ -46,7 +46,7 @@ struct sockaddr_storage {
   sa_family_t   ss_family;
 };
 
-#include "sys/uio.h"
+#include "./uio.h"
 
 struct cmsghdr {
   socklen_t  cmsg_len;

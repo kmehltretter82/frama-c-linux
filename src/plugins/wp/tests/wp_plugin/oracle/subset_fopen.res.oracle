@@ -38,7 +38,7 @@ Assume {
   (* Assertion 'Ok_A' *)
   Have: (0 <= i) /\ (i <= 9).
   (* Call 'fopen' *)
-  Have: included(p, 2, shift___fc_FILE(global(G___fc_fopen_19), 0), 1024).
+  Have: included(p, 2, shift___fc_FILE(global(G___fc_fopen_21), 0), 1024).
 }
 Prove: valid_rw(Malloc_0, p, 2).
 

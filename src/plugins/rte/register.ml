@@ -93,8 +93,10 @@ let () =
   nojournal_register get_pointerCall_status Pointer_call.accessor;
   nojournal_register get_unsignedOv_status Unsigned_overflow.accessor;
   nojournal_register get_unsignedDownCast_status Unsigned_downcast.accessor;
+  nojournal_register get_pointer_downcast_status Pointer_downcast.accessor;
   nojournal_register get_float_to_int_status Float_to_int.accessor;
   nojournal_register get_finite_float_status Finite_float.accessor;
+  nojournal_register get_pointer_value_status Pointer_value.accessor;
   nojournal_register get_bool_value_status Bool_value.accessor ;
   nojournal_register get_all_status all_statuses;
 ;;
@@ -110,8 +112,7 @@ let _ =
     ~journalize:false
     Generator.emitter
 
-(* retrieve list of generated rte annotations (not precond) for
-   a given stmt *)
+(* retrieve list of generated rte annotations for a given stmt *)
 let _ignore =
   Dynamic.register
     ~comment:"Get the list of annotations previously emitted by RTE for the \
@@ -147,8 +148,7 @@ let _ignore =
     Visit.get_annotations_exp
 
 let main () =
-  (* reset "rte generated"/"called precond generated" properties for all
-     functions *)
+  (* reset "rte generated" properties for all functions *)
   if Options.Enabled.get () then begin
     Options.feedback ~level:2 "generating annotations";
     !Db.RteGen.compute ();

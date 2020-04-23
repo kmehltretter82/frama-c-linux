@@ -360,9 +360,9 @@ and compinfo = {
       of a comp (along with the struct or union) *)
 
   mutable ckey: int;
-  (** A unique integer. This is assigned by {!Cil.mkCompInfo} using a global
+  (** A unique integer. This is assigned by {!Cil_const.mkCompInfo} using a global
       variable in the Cil module. Thus two identical structs in two different
-      files might have different keys. Use {!Cil.copyCompInfo} to copy
+      files might have different keys. Use {!Cil_const.copyCompInfo} to copy
       structures so that a new key is assigned. *)
 
   mutable cfields: fieldinfo list;
@@ -540,7 +540,9 @@ and varinfo = {
   (** the original name of the variable. Need not be unique. *)
 
   mutable vtype: typ;
-  (** The declared type of the variable. *)
+  (** The declared type of the variable. For modifications of the field,
+      {!Cil.update_var_type} helps in synchronizing the type of the C
+      variable and the one of the associated logic variable. *)
 
   mutable vattr: attributes;
   (** A list of attributes associated with the variable.*)
@@ -1569,6 +1571,8 @@ and predicate_node =
   | Pexists of quantifiers * predicate (** existential quantification. *)
   | Pat of predicate * logic_label
   (** predicate refers to a particular program point. *)
+  | Pobject_pointer of logic_label * term
+  (** the given locations can be pointed to. *)
   | Pvalid_read of logic_label * term   (** the given locations are valid for reading. *)
   | Pvalid of logic_label * term   (** the given locations are valid. *)
   | Pvalid_function of term

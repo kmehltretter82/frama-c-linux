@@ -14,8 +14,9 @@
 [eva:alarm] tests/slicing/keep_annot.i:41: Warning: 
   non-finite float value.
   assert
-  \is_finite((float)((double)((double)u -
-                              (double)((double)*(dabs + (int)(ii + 1)) * 2.0))));
+  \is_finite((float)\sub_double((double)u,
+                               \mul_double((double)*(dabs + (int)(ii + 1)),
+                                          (double)2.0)));
 [eva:alarm] tests/slicing/keep_annot.i:42: Warning: 
   assertion got status unknown.
 [eva] Recording results for L

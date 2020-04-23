@@ -129,7 +129,7 @@
 [eva:alarm] tests/value/library.i:44: Warning: 
   non-finite float value. assert \is_finite(*pf);
 [eva:alarm] tests/value/library.i:44: Warning: 
-  non-finite float value. assert \is_finite((float)(*pf + *pf));
+  non-finite float value. assert \is_finite(\add_float(*pf, *pf));
 [eva] computing for function k <- main.
   Called from tests/value/library.i:45.
 [eva] using specification for function k

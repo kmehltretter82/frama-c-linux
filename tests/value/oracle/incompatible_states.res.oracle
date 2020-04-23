@@ -22,9 +22,11 @@
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva:alarm] tests/value/incompatible_states.c:38: Warning: 
-  accessing uninitialized left-value. assert \initialized(&t[(2 * i) / 2]);
+  accessing uninitialized left-value.
+  assert \initialized(&t[(int)((int)(2 * i) / 2)]);
 [eva:alarm] tests/value/incompatible_states.c:41: Warning: 
-  accessing uninitialized left-value. assert \initialized(&t[(2 * i) / 2]);
+  accessing uninitialized left-value.
+  assert \initialized(&t[(int)((int)(2 * i) / 2)]);
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] computing for function main3 <- main.

@@ -102,7 +102,6 @@ int main(void)
 {
   int __retres;
   int found;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   {
     int i = 0;
     while (i < 10) {

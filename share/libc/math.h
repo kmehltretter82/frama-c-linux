@@ -61,6 +61,9 @@ typedef double double_t;
 #define FP_SUBNORMAL 3
 #define FP_NORMAL 4
 
+#define FP_ILOGB0 __FC_INT_MIN
+#define FP_ILOGBNAN __FC_INT_MIN
+
 #include "float.h" // for DBL_MIN and FLT_MIN
 
 /*@
@@ -539,6 +542,7 @@ extern long double powl(long double x, long double y);
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
     ensures positive_result: \result >= -0.;
+    ensures result_value: \result == sqrt(x);
 */
 extern double sqrt(double x);
 
@@ -547,6 +551,7 @@ extern double sqrt(double x);
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
     ensures positive_result: \result >= -0.;
+    ensures result_value: \result == sqrtf(x);
 */
 extern float sqrtf(float x);
 

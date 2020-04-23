@@ -14,7 +14,7 @@ int main(void)
   /*@ ghost struct B b; */
   struct A a;
   /*@ ghost b.y = 0; */
-  /*@ ghost a.x = b.y; */
+  /*@ ghost b.y += a.x; */
   __retres = 0;
   return __retres;
 }

@@ -59,12 +59,18 @@
   evaluating condition to {0; 1} instead of {0} because of UPCPA
 [eva:alarm] tests/value/cmp_ptr.i:22: Warning: 
   pointer comparison. assert \pointer_comparable((void *)0, (void *)(&y + 2));
+[eva:alarm] tests/value/cmp_ptr.i:23: Warning: 
+  pointer downcast. assert (unsigned int)(&y + 2) ≤ 2147483647;
 [eva:pointer-comparison] tests/value/cmp_ptr.i:24: 
   invalid pointer comparison: invalid pointer(s)
 [eva:alarm] tests/value/cmp_ptr.i:24: Warning: 
   non-finite float value. assert \is_finite(ff);
 [eva:pointer-comparison] tests/value/cmp_ptr.i:28: 
   invalid pointer comparison: invalid pointer(s)
+[eva:alarm] tests/value/cmp_ptr.i:28: Warning: 
+  pointer downcast.
+  assert (unsigned int)tmp_0 ≤ 2147483647;
+  (tmp_0 from u?& f:& g)
 [eva:alarm] tests/value/cmp_ptr.i:28: Warning: 
   signed overflow.
   assert -2147483648 ≤ 1 + (int)tmp_0;

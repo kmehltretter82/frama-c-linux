@@ -365,6 +365,7 @@ struct tms {
 };
 typedef unsigned int tcflag_t;
 typedef unsigned char cc_t;
+typedef unsigned int speed_t;
 struct termios {
    tcflag_t c_iflag ;
    tcflag_t c_oflag ;
@@ -3255,6 +3256,7 @@ extern float powf(float x, float y);
     requires arg_positive: x ≥ -0.;
     ensures finite_result: \is_finite(\result);
     ensures positive_result: \result ≥ -0.;
+    ensures result_value: \result ≡ sqrt(\old(x));
     assigns \result;
     assigns \result \from x;
  */
@@ -3264,6 +3266,7 @@ extern double sqrt(double x);
     requires arg_positive: x ≥ -0.;
     ensures finite_result: \is_finite(\result);
     ensures positive_result: \result ≥ -0.;
+    ensures result_value: \result ≡ sqrtf(\old(x));
     assigns \result;
     assigns \result \from x;
  */
@@ -3995,6 +3998,15 @@ int strncmp(char const *s1, char const *s2, size_t n);
 extern int strcoll(char const *s1, char const *s2);
 
 char *strchr(char const *s, int c);
+
+/*@ requires valid_string_s: valid_read_string(s);
+    ensures
+      result_same_base: \subset(\result, \old(s) + (0 .. strlen(\old(s))));
+    assigns \result;
+    assigns \result
+      \from s, (indirect: *(s + (0 .. strlen{Old}(s)))), (indirect: c);
+ */
+extern char *strchrnul(char const *s, int c);
 
 char *strrchr(char const *s, int c);
 
@@ -4950,6 +4962,10 @@ extern FILE *popen(char const *command, char const *type);
 extern int pclose(FILE *stream);
 
 ssize_t getline(char **lineptr, size_t *n, FILE *stream);
+
+/*@ assigns \result;
+    assigns \result \from maj, min; */
+extern dev_t makedev(int maj, int min);
 
 FILE __fc_initial_stdout =
   {.__fc_FILE_id = (unsigned int)1, .__fc_FILE_data = 0U};
@@ -5912,7 +5928,8 @@ char *strncpy(char *dest, char const *src, size_t n)
 
 /*@ requires valid_string_s: valid_read_string(s);
     assigns \result;
-    assigns \result \from s, *(s + (0 ..)), c;
+    assigns \result
+      \from s, (indirect: *(s + (0 .. strlen{Old}(s)))), (indirect: c);
     
     behavior found:
       assumes char_found: strchr(s, c) ≡ \true;
@@ -7528,13 +7545,43 @@ extern int setitimer(int which,
 extern int select(int nfds, fd_set *readfds, fd_set *writefds,
                   fd_set *errorfds, struct timeval *timeout);
 
-/*@ requires valid_string_path: valid_read_string(path);
+/*@ requires valid_path: valid_read_string(path);
+    requires valid_buf: \valid(buf);
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result, *buf;
+    assigns \result
+      \from (indirect: path), (indirect: *(path + (0 .. strlen{Old}(path))));
+    assigns *buf
+      \from (indirect: path), (indirect: *(path + (0 .. strlen{Old}(path))));
+ */
+extern int lstat(char const *path, struct stat *buf);
+
+/*@ requires valid_path: valid_read_string(path);
     ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
     assigns \result;
     assigns \result
-      \from (indirect: path), (indirect: *(path + (0 ..))), (indirect: mode);
+      \from (indirect: path), (indirect: *(path + (0 .. strlen{Old}(path)))),
+            (indirect: mode);
  */
 extern int mkdir(char const *path, mode_t mode);
+
+/*@ requires valid_path: valid_read_string(path);
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result
+      \from (indirect: path), (indirect: *(path + (0 .. strlen{Old}(path)))),
+            (indirect: mode);
+ */
+extern int mkfifo(char const *path, mode_t mode);
+
+/*@ requires valid_path: valid_read_string(path);
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result
+      \from (indirect: path), (indirect: *(path + (0 .. strlen{Old}(path)))),
+            (indirect: mode), (indirect: dev);
+ */
+extern int mknod(char const *path, mode_t mode, dev_t dev);
 
 /*@ requires valid_pathname: valid_read_string(pathname);
     requires valid_buf: \valid(buf);
@@ -7543,8 +7590,8 @@ extern int mkdir(char const *path, mode_t mode);
       init_on_success: initialization: buf:
         \result ≡ 0 ⇒ \initialized(\old(buf));
     assigns \result, *buf;
-    assigns \result \from *(pathname + (0 ..));
-    assigns *buf \from *(pathname + (0 ..));
+    assigns \result \from *(pathname + (0 .. strlen{Old}(pathname)));
+    assigns *buf \from *(pathname + (0 .. strlen{Old}(pathname)));
  */
 extern int stat(char const *pathname, struct stat *buf);
 
@@ -7934,6 +7981,47 @@ extern pid_t wait(int *stat_loc);
       requires valid_stat_loc: \valid(stat_loc);
  */
 extern pid_t waitpid(pid_t pid, int *stat_loc, int options);
+
+/*@ requires valid_termios_p: \valid_read(termios_p);
+    assigns \result;
+    assigns \result \from (indirect: termios_p), *termios_p;
+ */
+extern speed_t cfgetispeed(struct termios const *termios_p);
+
+/*@ requires valid_termios_p: \valid_read(termios_p);
+    assigns \result;
+    assigns \result \from (indirect: termios_p), *termios_p;
+ */
+extern speed_t cfgetospeed(struct termios const *termios_p);
+
+/*@ requires valid_termios_p: \valid(termios_p);
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result, *termios_p;
+    assigns \result \from (indirect: termios_p), speed;
+    assigns *termios_p \from (indirect: termios_p), speed;
+ */
+extern int cfsetispeed(struct termios *termios_p, speed_t speed);
+
+/*@ requires valid_termios_p: \valid(termios_p);
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result, *termios_p;
+    assigns \result \from (indirect: termios_p), speed;
+    assigns *termios_p \from (indirect: termios_p), speed;
+ */
+extern int cfsetospeed(struct termios *termios_p, speed_t speed);
+
+/*@ requires
+      valid_queue_selector:
+        queue_selector ≡ 0 ∨ queue_selector ≡ 1 ∨
+        queue_selector ≡ 2;
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result, Frama_C_entropy_source;
+    assigns \result
+      \from (indirect: fd), (indirect: queue_selector),
+            (indirect: Frama_C_entropy_source);
+    assigns Frama_C_entropy_source \from Frama_C_entropy_source;
+ */
+extern int tcflush(int fd, int queue_selector);
 
 /*@ requires valid_termios_p: \valid(termios_p);
     assigns \result, *termios_p, Frama_C_entropy_source;

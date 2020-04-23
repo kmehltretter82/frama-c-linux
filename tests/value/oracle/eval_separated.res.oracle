@@ -12,12 +12,16 @@
 [eva] tests/value/eval_separated.c:8: assertion got status valid.
 [eva] tests/value/eval_separated.c:9: assertion got status valid.
 [eva:alarm] tests/value/eval_separated.c:11: Warning: 
+  pointer downcast. assert (unsigned int)(&q) ≤ 2147483647;
+[eva:alarm] tests/value/eval_separated.c:11: Warning: 
   signed overflow. assert -2147483648 ≤ (int)(&q) + (int)(&q);
 [eva:alarm] tests/value/eval_separated.c:11: Warning: 
   signed overflow. assert (int)(&q) + (int)(&q) ≤ 2147483647;
 [eva] tests/value/eval_separated.c:11: 
   Assigning imprecise value to q.
   The imprecision originates from Arithmetic {tests/value/eval_separated.c:11}
+[eva:alarm] tests/value/eval_separated.c:12: Warning: 
+  pointer downcast. assert (unsigned int)(&r) ≤ 2147483647;
 [eva:alarm] tests/value/eval_separated.c:12: Warning: 
   signed overflow. assert -2147483648 ≤ (int)(&r) + (int)(&r);
 [eva:alarm] tests/value/eval_separated.c:12: Warning: 

@@ -39,6 +39,8 @@
   Assigning imprecise value to r.
   The imprecision originates from Arithmetic {tests/value/shift.i:52}
 [eva:alarm] tests/value/shift.i:53: Warning: 
+  pointer downcast. assert (unsigned int)((char *)t) ≤ 2147483647;
+[eva:alarm] tests/value/shift.i:53: Warning: 
   signed overflow. assert -2147483648 ≤ (long)((char *)t) << 8;
 [eva:alarm] tests/value/shift.i:53: Warning: 
   signed overflow. assert (long)((char *)t) << 8 ≤ 2147483647;

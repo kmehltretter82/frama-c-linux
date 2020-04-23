@@ -58,6 +58,12 @@ void __e_acsl_globals_init(void)
   return;
 }
 
+void __e_acsl_globals_delete(void)
+{
+  __e_acsl_delete_block((void *)(Vertices2));
+  __e_acsl_delete_block((void *)(Vertices));
+}
+
 int main(int argc, char const **argv)
 {
   int __retres;
@@ -105,13 +111,12 @@ int main(int argc, char const **argv)
   __e_acsl_temporal_save_nblock_parameter((void *)(triple_vertices2[0]),0U);
   abe_matrix(triple_vertices2[0]);
   __retres = 0;
-  __e_acsl_delete_block((void *)(Vertices2));
-  __e_acsl_delete_block((void *)(Vertices));
   __e_acsl_delete_block((void *)(triple_vertices2));
   __e_acsl_delete_block((void *)(triple_vertices));
   __e_acsl_delete_block((void *)(vertices3));
   __e_acsl_delete_block((void *)(vertices2));
   __e_acsl_delete_block((void *)(vertices));
+  __e_acsl_globals_delete();
   __e_acsl_memory_clean();
   return __retres;
 }

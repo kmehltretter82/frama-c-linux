@@ -160,7 +160,7 @@ let rec associate acc ~formals ~concretes =
   | [], _ -> acc
   | _, [] -> raise Non_Transposable
   | formal :: formals, concrete :: concretes ->
-    let term = Logic_utils.expr_to_term ~cast:true concrete in
+    let term = Logic_utils.expr_to_term concrete in
     associate ((formal, term) :: acc) ~formals ~concretes
 
 let transpose_pred_at_callsite ~formals ~concretes pred =

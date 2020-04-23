@@ -58,6 +58,9 @@ type annot_kind =
   | AcallPre of bool * kernel_function
   (** annotation is a called function precondition :
       to be considered as hyp, and goal if bool=true *)
+  | AcallPost of kernel_function
+  (** annotation is a called function post check :
+      to be considered as goal only (no hyp) *)
 
 (** {3 Adding properties (predicates)} *)
 
@@ -87,8 +90,15 @@ val add_prop_fct_bhv_pre : t_annots -> annot_kind ->
 (** Add Smoke Test behavior *)
 val add_prop_fct_smoke : t_annots -> kernel_function -> funbehavior -> t_annots
 
-(** Add Smoke Test behavior for loop *)
-val add_prop_loop_smoke : t_annots -> kernel_function -> stmt -> t_annots
+(** Add Smoke Test for loop *)
+val add_prop_dead_loop : t_annots -> kernel_function -> stmt -> t_annots
+
+(** Add Smoke Test for possibly dead code *)
+val add_prop_dead_code : t_annots -> kernel_function -> stmt -> t_annots
+
+(** Add Smoke Test for possibly dead call : (posts,exits) *)
+val add_prop_dead_call : kernel_function -> stmt -> t_annots -> t_annots ->
+  t_annots * t_annots
 
 val add_prop_fct_post : t_annots -> annot_kind ->
   kernel_function -> funbehavior -> termination_kind -> identified_predicate
@@ -181,6 +191,9 @@ val get_call_hyp : t_annots -> kernel_function -> WpPropId.pred_info list
 (** Preconditions of a called function to be considered as hyp and goal
  * (similar to [get_both_hyp_goals]). *)
 val get_call_pre : t_annots -> kernel_function -> WpPropId.pred_info list * WpPropId.pred_info list
+
+(** Post-checks of a called function to be considered as goal only *)
+val get_call_post : t_annots -> kernel_function -> WpPropId.pred_info list
 
 val get_call_asgn : t_annots -> kernel_function option -> WpPropId.assigns_full_info
 

@@ -30,6 +30,7 @@ FRAMAC_LIBDIR :=$(shell frama-c-config -print-libpath)
 endif
 
 SRC_STRING:= \
+	mem_utils \
 	memcmp \
 	memcpy \
 	memmove \
@@ -55,14 +56,16 @@ PLUGIN_EXTRA_DIRS:=\
 	stdlib
 PLUGIN_CMI :=
 PLUGIN_CMO := \
-	basic_blocks options instantiator_builder transform register \
+	options basic_blocks \
+	global_context instantiator_builder \
+	transform register \
 	$(SRC_STRING) \
 	$(SRC_STDLIB)
 
 PLUGIN_DISTRIBUTED := $(PLUGIN_ENABLE)
 PLUGIN_DISTRIB_EXTERNAL:= Makefile.in configure.ac configure
 #PLUGIN_NO_DEFAULT_TEST := no
-PLUGIN_TESTS_DIRS := string stdlib options api
+PLUGIN_TESTS_DIRS := string stdlib options api plugin
 
 ################
 # Generic part #

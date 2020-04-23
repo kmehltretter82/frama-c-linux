@@ -21,6 +21,7 @@
   \return(memmove) == 0 (auto)
   \return(memset) == 0 (auto)
   \return(strchr) == 0 (auto)
+  \return(strchrnul) == 0 (auto)
   \return(strrchr) == 0 (auto)
   \return(strpbrk) == 0 (auto)
   \return(strstr) == 0 (auto)
@@ -248,7 +249,7 @@
   function strncpy: precondition 'room_nstring' got status valid.
 [eva] share/libc/netdb.c:147: 
   function strncpy: precondition 'separation' got status valid.
-[eva] share/libc/string.h:367: 
+[eva] share/libc/string.h:373: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strcmp
 [eva] Done for function strncpy
 [eva] Recording results for gethostbyname

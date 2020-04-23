@@ -4,6 +4,10 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   i ∈ [--..--]
+[eva:alarm] tests/builtins/imprecise-malloc-free.c:12: Warning: 
+  pointer downcast. assert (unsigned int)(&size1 + i) ≤ 2147483647;
+[eva:alarm] tests/builtins/imprecise-malloc-free.c:13: Warning: 
+  pointer downcast. assert (unsigned int)(&size2) ≤ 2147483647;
 [eva:alarm] tests/builtins/imprecise-malloc-free.c:13: Warning: 
   signed overflow. assert -2147483648 ≤ i + (int)((int)(&size2) >> 1);
 [eva:alarm] tests/builtins/imprecise-malloc-free.c:13: Warning: 
@@ -12,6 +16,8 @@
   Assigning imprecise value to size2.
   The imprecision originates from Arithmetic
   {tests/builtins/imprecise-malloc-free.c:13}
+[eva:alarm] tests/builtins/imprecise-malloc-free.c:14: Warning: 
+  pointer downcast. assert (unsigned int)(&i) ≤ 2147483647;
 [eva] tests/builtins/imprecise-malloc-free.c:14: Call to builtin malloc
 [eva] tests/builtins/imprecise-malloc-free.c:14: 
   allocating variable __malloc_main_l14
@@ -30,15 +36,25 @@
   (origin: Arithmetic {tests/builtins/imprecise-malloc-free.c:19}) }}
 [eva:alarm] tests/builtins/imprecise-malloc-free.c:21: Warning: 
   out of bounds write. assert \valid(p);
+[eva:alarm] tests/builtins/imprecise-malloc-free.c:21: Warning: 
+  pointer downcast. assert (unsigned int)(p + 1) ≤ 2147483647;
 [eva:alarm] tests/builtins/imprecise-malloc-free.c:22: Warning: 
   out of bounds write. assert \valid(q);
+[eva:alarm] tests/builtins/imprecise-malloc-free.c:22: Warning: 
+  pointer downcast. assert (unsigned int)(q + 2) ≤ 2147483647;
 [eva:alarm] tests/builtins/imprecise-malloc-free.c:23: Warning: 
   out of bounds write. assert \valid(r);
+[eva:alarm] tests/builtins/imprecise-malloc-free.c:23: Warning: 
+  pointer downcast. assert (unsigned int)(r + 3) ≤ 2147483647;
+[eva:alarm] tests/builtins/imprecise-malloc-free.c:25: Warning: 
+  pointer downcast. assert (unsigned int)p ≤ 2147483647;
 [eva] tests/builtins/imprecise-malloc-free.c:25: Call to builtin free
 [eva:alarm] tests/builtins/imprecise-malloc-free.c:25: Warning: 
   function free: precondition 'freeable' got status unknown.
 [eva:malloc] tests/builtins/imprecise-malloc-free.c:25: 
   weak free on bases: {__malloc_main_l14}
+[eva:alarm] tests/builtins/imprecise-malloc-free.c:26: Warning: 
+  pointer downcast. assert (unsigned int)r ≤ 2147483647;
 [eva] tests/builtins/imprecise-malloc-free.c:26: Call to builtin free
 [eva:alarm] tests/builtins/imprecise-malloc-free.c:26: Warning: 
   function free: precondition 'freeable' got status unknown.

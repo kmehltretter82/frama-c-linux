@@ -1,0 +1,53 @@
+#########################################
+# Makefile
+#########################################
+
+.dome-*.stamp
+.dome-*.back
+.dome-*.orig
+.dome-*.lock
+
+#########################################
+# Dome Repository
+#########################################
+
+/.gitdome
+
+#########################################
+# JavaScript
+#########################################
+
+node_modules
+yarn.lock
+/package.json
+
+#########################################
+# Example Application
+#########################################
+
+/.babelrc
+/webpack.main.js
+/webpack.renderer.js
+/webpack.plugin.js
+/electron-webpack.json
+/dist
+/bin
+/src/main/index.js
+/src/misc/exports.js
+/src/renderer/index.js
+/src/renderer/Application.js
+/src/renderer/Preferences.js
+/src/renderer/styles.css
+/src/renderer/demo
+/src/plugins
+
+#########################################
+# Documentation
+#########################################
+
+/html
+/doc/template/gallery-icons.html
+/doc/template/gallery-styles.js
+/doc/template/gallery-styles.html
+
+#########################################

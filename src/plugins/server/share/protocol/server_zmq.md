@@ -24,11 +24,13 @@ of each command is a single string identifying the command:
 | Commands | Parts | Part 1 | Part 2 | Part 3 | Part 4 |
 |:--------|:-----:|:-------|:-------|:-------|:-------|
 | `POLL()` | 1    | `"POLL"` | | | |
-| `GET(id,request,data)` | 4 | `"GET"` | id | request | data |
-| `SET(id,request,data)` | 4 | `"SET"` | id | request | data |
+| `GET(id,request,data)`  | 4 | `"GET"` | id | request | data |
+| `SET(id,request,data)`  | 4 | `"SET"` | id | request | data |
 | `EXEC(id,request,data)` | 4 | `"EXEC"` | id | request | data |
-| `KILL(id)` | 2 | `"KILL"` | id | | |
-| `SHUTDOWN` | 1 | `"SHUTDOWN"` | | | |
+| `SIGON(id)`  | 2 | `"SIGON"`  | id | | |
+| `SIGOFF(id)` | 2 | `"SIGOFF"` | id | | |
+| `KILL(id)`   | 2 | `"KILL"`   | id | | |
+| `SHUTDOWN`   | 1 | `"SHUTDOWN"` | | | |
 
 ## Output Message Format
 
@@ -42,6 +44,7 @@ of each reply is a finel string identifying the reply:
 | `ERROR(id,message)` | 4 | `"ERROR"` | id | message |
 | `KILLED(id)` | 2 | `"KILLED"` | id | |
 | `REJECTED(id)` | 2 | `"REJECTED"` | id | |
+| `SIGNAL(id)`   | 2 | `"SIGNAL"` | id | |
 | (special) | 2 | `"WRONG"` | message | |
 | (special) | 1 | `"NONE"` | | |
 

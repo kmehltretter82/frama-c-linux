@@ -4,6 +4,31 @@ ojson\chapter{Preparing the Sources}
 This chapter explains how to specify the source files that form the
 basis of an analysis project, and describes options that influence parsing.
 
+\section{Overview of source processing in \FramaC}\label{sec:overview}
+
+For small projects and tests, processing the sources in \FramaC is as simple
+as running \texttt{frama-c *.c}. For more complex projects, however,
+some problems may arise when using this command, and the user must be aware
+of the several steps involved in \FramaC source processing to fix them.
+
+The diagram in Figure~\ref{fig:source-preparation} presents an overview
+of the steps described in this chapter. For comparison purposes, we add
+the equivalent process performed by a compiler such as GCC.
+
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=\textwidth]{source-preparation.pdf}
+    \caption{Overview of source preparation steps: as performed by GCC
+      (top) and as performed by \FramaC (bottom).}
+    \label{fig:source-preparation}
+  \end{center}
+\end{figure}
+
+The following sections describe various options related to the steps shown
+in the figure. Note that some plug-ins, such as \textsf{Variadic}
+(described in chapter~\ref{user-variadic}), perform further AST
+transformations before most analyses are run.
+
 \section{Pre-processing the Source Files}\label{sec:preprocessing}
 
 The list of files to analyze must be provided on the command line, or
@@ -14,8 +39,15 @@ pre-processes the other files with the following command.
 \$ gcc -C -E -I .
 \end{shell}
 
-The option \optiondef{-}{cpp-command} may be used to change
-the default pre-processing command. Placeholders (see below)
+Option \optiondef{-}{cpp-extra-args} can be used to add arguments to the
+default pre-processing command, typically via the inclusion of defines
+(\texttt{-D} switches) and header directories (\texttt{-I} switches), as in
+\texttt{-cpp-extra-args="-DDEBUG -DARCH=ia32 -I./headers"}.
+You can also add arguments on a per-file basis, using option
+\optiondef{-}{cpp-extra-args-per-file}.
+
+If you need to, you can also {\em replace} the pre-processing command
+entirely with option \optiondef{-}{cpp-command}. Placeholders (see below)
 can be used for advanced commands.
 If no placeholders are used, the pre-processor is invoked in the
 following way.
@@ -48,17 +80,11 @@ Here are some examples for using this option.
 \$ frama-c -cpp-command 'CL.exe /C /E %args %i > %o' file1.c file2.i
 \end{shell}
 
-If you use the above option, you may use the option \optiondef{-}{cpp-frama-c-compliant}
+When using \optionuse{-}{cpp-command}, you may add \optiondef{-}{cpp-frama-c-compliant}
 to indicate that the custom preprocessor accepts the same set of options as GNU
 \texttt{cpp}.
-Note that \optionuse{-}{cpp-frama-c-compliant} also implies some extra
+\optionuse{-}{cpp-frama-c-compliant} also implies some extra
 constraints, such as accepting architecture-specific flags, e.g. \texttt{-m32}.
-
-Additionally, option \optiondef{-}{cpp-extra-args}
-allows the user to extend the pre-processing command,
-typically via the inclusion of defines (\texttt{-D} switches) and header
-directories (\texttt{-I} switches), as in
-\texttt{-cpp-extra-args="-DDEBUG -DARCH=ia32 -I./headers"}.
 
 If you have a JSON compilation database file\footnote{%
   \url{http://clang.llvm.org/docs/JSONCompilationDatabase.html}}, you can use
@@ -68,9 +94,14 @@ for each file in the database, via option
 is the path to the JSON file or to a directory containing a
 file named \texttt{compile\_commands.json}. With this option set,
 \FramaC will parse
-the compilation database and include associated preprocessing flags.
+the compilation database and include associated preprocessing flags,
+as if they had been manually added via \texttt{-cpp-extra-args-per-file}.
+Note: if both \texttt{-cpp-extra-args-per-file} and the JSON compilation
+database specify options for a given file, the former are used and the latter
+are ignored.
 
-By default, \acsl annotations are pre-processed (option \optiondef{-}{pp-annot}
+In all of the above cases,
+\acsl annotations are pre-processed by default (option \optiondef{-}{pp-annot}
 is set by default). Unless a custom pre-processor is specified
 (via \optionuse{-}{cpp-frama-c-compliant}), \FramaC considers that \gcc is
 installed and uses it as pre-processor.
@@ -79,7 +110,7 @@ option \texttt{-no-pp-annot} to \FramaC. Note that some headers in the
 standard C library provided with \FramaC (described below) use such annotations,
 therefore it might be necessary to disable inclusion of such headers.
 
-Note that ACSL annotations are pre-processed separately from the C
+Also note that ACSL annotations are pre-processed separately from the C
 code in a second pass, and that arguments given as \texttt{-cpp-extra-args} are
 \emph{not} given to the second pass of pre-processing. Instead,
 \texttt{-pp-annot} relies on the ability of \gcc to output all
@@ -88,14 +119,14 @@ pre-processed file. In particular, \texttt{-cpp-extra-args} must be
 used if you are including header files who behave differently
 depending on the number of times they are included.
 
-In addition, Files having the suffix \texttt{.ci} will be considered as needing
+In addition, files having the suffix \texttt{.ci} will be considered as needing
 preprocessing for ACSL annotations only. Those files may contain
 \texttt{\#define} directives and annotations are pre-processed as explained in
 the previous paragraph. This allows to have macros in ACSL annotations while
 using a non-GNU-like pre-processor.
 
 \begin{important}
-  An experimental incomplete specific C standard library is bundled with \FramaC and installed
+  An experimental, incomplete, C standard library is bundled with \FramaC and installed
   in the sub-directory \texttt{libc} of the directory printed by
   \texttt{frama-c -print-share-path}. It contains standard \C headers,
   some \acsl specifications and definitions for some library functions.
@@ -103,6 +134,9 @@ using a non-GNU-like pre-processor.
   option \optiondef{-}{frama-c-stdlib} (set by default) adds
   \texttt{-I\$FRAMAC\_SHARE/libc} to the preprocessor command, and also
   \texttt{-nostdinc} if \optionuse{-}{cpp-frama-c-compliant} is set.
+  Note that this library is provided on a best-effort basis, but it is part
+  of the {\em trusted computing base}: the specifications must be proofread
+  for correctness.
 \end{important}
 
 \section{Merging the Source Code files}

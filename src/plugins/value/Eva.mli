@@ -22,8 +22,6 @@
 
 (** Analysis for values and pointers *)
 
-(** No function is directly exported: they are registered in {!Db.Value}. *)
-
 module Value_results: sig
   type results
 
@@ -32,4 +30,28 @@ module Value_results: sig
   val merge: results -> results -> results
   val change_callstacks:
     (Value_types.callstack -> Value_types.callstack) -> results -> results
+end
+
+module Value_parameters: sig
+  (** Returns the list (name, descr) of currently enabled abstract domains. *)
+  val enabled_domains: unit -> (string * string) list
+end
+
+module Eval_terms: sig
+  (** Evaluation environment, built by [env_annot]. *)
+  type eval_env
+
+  (** Dependencies needed to evaluate a term or a predicate. *)
+  type logic_deps = Locations.Zone.t Cil_datatype.Logic_label.Map.t
+
+  type labels_states = Db.Value.state Cil_datatype.Logic_label.Map.t
+
+  val env_annot :
+    ?c_labels:labels_states -> pre:Db.Value.state -> here:Db.Value.state ->
+    unit -> eval_env
+
+  (** [predicate_deps env p] computes the logic dependencies needed to evaluate
+      [p] in the given evaluation environment [env].
+      @return None on either an evaluation error or on unsupported construct. *)
+  val predicate_deps: eval_env -> Cil_types.predicate -> logic_deps option
 end

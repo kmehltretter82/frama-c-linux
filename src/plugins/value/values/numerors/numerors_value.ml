@@ -312,6 +312,7 @@ let backward_binop ~input_type:_ ~resulting_type:_ op ~left ~right ~result =
 let assume_non_zero v = `Unknown v
 let assume_bounded _kind _bound v = `Unknown v
 let assume_not_nan ~assume_finite:_ _fkind v = `Unknown v
+let assume_pointer v = `Unknown v
 let assume_comparable _cmp v1 v2 = `Unknown (v1, v2)
 
 let rewrap_integer _ _ = top

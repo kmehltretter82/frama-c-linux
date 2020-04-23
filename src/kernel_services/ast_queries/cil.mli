@@ -61,7 +61,7 @@ open Cil_datatype
     before processing the actual list of files provided on the command line (see
     {!File.init_from_c_files}).  Actual list of such built-ins is managed in
     {!Cabs2cil}. *)
-module Frama_c_builtins: 
+module Frama_c_builtins:
   State_builder.Hashtbl with type key = string and type data = Cil_types.varinfo
 
 val is_builtin: Cil_types.varinfo -> bool
@@ -102,39 +102,39 @@ val initCIL: initLogicBuiltins:(unit -> unit) -> Cil_types.mach -> unit
 (* ************************************************************************* *)
 
 type theMachine = private
-    { mutable useLogicalOperators: bool;
-      (** Whether to use the logical operands LAnd and LOr. By default, do not
-	  use them because they are unlike other expressions and do not
-	  evaluate both of their operands *)
-      mutable theMachine: mach;
-      mutable lowerConstants: bool; (** Do lower constants (default true) *)
-      mutable insertImplicitCasts: bool;
-      (** Do insert implicit casts (default true) *)
-      mutable underscore_name: bool;
-      (** Whether the compiler generates assembly labels by prepending "_" to
-	  the identifier. That is, will function foo() have the label "foo", or
-	  "_foo"? *)
-      mutable stringLiteralType: typ;
-      mutable upointKind: ikind
-      (** An unsigned integer type that fits pointers. *);
-      mutable upointType: typ;
-      mutable wcharKind: ikind; (** An integer type that fits wchar_t. *)
-      mutable wcharType: typ;
-      mutable ptrdiffKind: ikind; (** An integer type that fits ptrdiff_t. *)
-      mutable ptrdiffType: typ;
-      mutable typeOfSizeOf: typ;
-      (** An integer type that is the type of sizeof. *)
-      mutable kindOfSizeOf: ikind;
-      (** The integer kind of {!Cil.typeOfSizeOf}. *)
-    }
+  { mutable useLogicalOperators: bool;
+    (** Whether to use the logical operands LAnd and LOr. By default, do not
+        use them because they are unlike other expressions and do not
+        evaluate both of their operands *)
+    mutable theMachine: mach;
+    mutable lowerConstants: bool; (** Do lower constants (default true) *)
+    mutable insertImplicitCasts: bool;
+    (** Do insert implicit casts (default true) *)
+    mutable underscore_name: bool;
+    (** Whether the compiler generates assembly labels by prepending "_" to
+        the identifier. That is, will function foo() have the label "foo", or
+        "_foo"? *)
+    mutable stringLiteralType: typ;
+    mutable upointKind: ikind
+  (** An unsigned integer type that fits pointers. *);
+    mutable upointType: typ;
+    mutable wcharKind: ikind; (** An integer type that fits wchar_t. *)
+    mutable wcharType: typ;
+    mutable ptrdiffKind: ikind; (** An integer type that fits ptrdiff_t. *)
+    mutable ptrdiffType: typ;
+    mutable typeOfSizeOf: typ;
+    (** An integer type that is the type of sizeof. *)
+    mutable kindOfSizeOf: ikind;
+    (** The integer kind of {!Cil.typeOfSizeOf}. *)
+  }
 
 val theMachine : theMachine
-  (** Current machine description *)
+(** Current machine description *)
 
 val selfMachine: State.t
 
 val selfMachine_is_computed: ?project:Project.project -> unit -> bool
-  (** whether current project has set its machine description. *)
+(** whether current project has set its machine description. *)
 
 val msvcMode: unit -> bool
 val gccMode: unit -> bool
@@ -178,19 +178,19 @@ val setFunctionTypeMakeFormals: fundec -> typ -> unit
 val setMaxId: fundec -> unit
 
 val selfFormalsDecl: State.t
-  (** state of the table associating formals to each prototype. *)
+(** state of the table associating formals to each prototype. *)
 
 val makeFormalsVarDecl: ?ghost:bool -> (string * typ * attributes) -> varinfo
-  (** creates a new varinfo for the parameter of a prototype.
-      By default, this formal variable is not ghost.
-      @modify 20.0-Calcium adds a parameter for ghost status
-  *)
+(** creates a new varinfo for the parameter of a prototype.
+    By default, this formal variable is not ghost.
+    @modify 20.0-Calcium adds a parameter for ghost status
+*)
 
 (** Update the formals of a function declaration from its identifier and its
     type. For a function definition, use {!Cil.setFormals}.
     Do nothing if the type is not a function type or if the list of
     argument is empty.
- *)
+*)
 val setFormalsDecl: varinfo -> typ -> unit
 
 (** remove a binding from the table.
@@ -203,7 +203,7 @@ val removeFormalsDecl: varinfo -> unit
 val unsafeSetFormalsDecl: varinfo -> varinfo list -> unit
 
 (** iterate the given function on declared prototypes.
-    @since Oxygen-20120901 
+    @since Oxygen-20120901
 *)
 val iterFormalsDecl: (varinfo -> varinfo list -> unit) -> unit
 
@@ -261,7 +261,7 @@ val is_case_label: label -> bool
  * sizeof in an array length) then it will also add declarations for the
  * variables to the types stack *)
 val pushGlobal: global -> types: global list ref
-                       -> variables: global list ref -> unit
+  -> variables: global list ref -> unit
 
 (** An empty statement. Used in pretty printing *)
 val invalidStmt: stmt
@@ -275,7 +275,7 @@ val invalidStmt: stmt
   * versions of CIL.*)
 module Builtin_functions :
   State_builder.Hashtbl with type key = string
-			and type data = typ * typ list * bool
+                         and type data = typ * typ list * bool
 
 (** This is used as the location of the prototypes of builtin functions. *)
 val builtinLoc: location
@@ -300,7 +300,7 @@ val makeZeroInit: loc:location -> typ -> init
  * [List.fold_left] except we also pass the type of the initializer.
 
  * This is a good way to use it to scan even nested initializers :
-{v
+    {v
   let rec myInit (lv: lval) (i: init) (acc: 'a) : 'a =
     match i with
       | SingleInit e -> (* ... do something with [lv] and [e] and [acc] ... *)
@@ -314,11 +314,11 @@ val makeZeroInit: loc:location -> typ -> init
 v}
 *)
 val foldLeftCompound:
-    implicit:bool ->
-    doinit: (offset -> init -> typ -> 'a -> 'a) ->
-    ct: typ ->
-    initl: (offset * init) list ->
-    acc: 'a -> 'a
+  implicit:bool ->
+  doinit: (offset -> init -> typ -> 'a -> 'a) ->
+  ct: typ ->
+  initl: (offset * init) list ->
+  acc: 'a -> 'a
 
 (* ************************************************************************* *)
 (** {2 Values for manipulating types} *)
@@ -352,24 +352,24 @@ val ulongType: typ
 val ulongLongType: typ
 
 (** Any unsigned integer type of size 16 bits.
-    It is equivalent to the ISO C uint16_t type but without using the 
-    corresponding header. 
+    It is equivalent to the ISO C uint16_t type but without using the
+    corresponding header.
     Shall not be called if not such type exists in the current architecture.
     @since Nitrogen-20111001
 *)
 val uint16_t: unit -> typ
 
 (** Any unsigned integer type of size 32 bits.
-    It is equivalent to the ISO C uint32_t type but without using the 
-    corresponding header. 
+    It is equivalent to the ISO C uint32_t type but without using the
+    corresponding header.
     Shall not be called if not such type exists in the current architecture.
     @since Nitrogen-20111001
 *)
 val uint32_t: unit -> typ
 
 (** Any unsigned integer type of size 64 bits.
-    It is equivalent to the ISO C uint64_t type but without using the 
-    corresponding header. 
+    It is equivalent to the ISO C uint64_t type but without using the
+    corresponding header.
     Shall not be called if no such type exists in the current architecture.
     @since Nitrogen-20111001
 *)
@@ -424,12 +424,12 @@ val missingFieldName: string
 val compFullName: compinfo -> string
 
 (** Returns true if this is a complete type.
-   This means that sizeof(t) makes sense.
-   Incomplete types are not yet defined
-   structures and empty arrays.
-   @param allowZeroSizeArrays indicates whether arrays of
-   size 0 (a gcc extension) are considered as complete. Default value
-   depends on the current machdep.
+    This means that sizeof(t) makes sense.
+    Incomplete types are not yet defined
+    structures and empty arrays.
+    @param allowZeroSizeArrays indicates whether arrays of
+    size 0 (a gcc extension) are considered as complete. Default value
+    depends on the current machdep.
 *)
 val isCompleteType: ?allowZeroSizeArrays:bool -> typ -> bool
 
@@ -511,7 +511,7 @@ val isBoolType: typ -> bool
 
 (** True if the argument is [_Bool] or [boolean].
     @since 19.0-Potassium
- *)
+*)
 val isLogicPureBooleanType: logic_type -> bool
 
 (** True if the argument is an integral or pointer type. *)
@@ -589,7 +589,7 @@ val argsToList:
   (string * typ * attributes) list option -> (string * typ * attributes) list
 
 (** @since 20.0-Calcium
-   Obtain the argument lists (non-ghost, ghosts) ([], [] if None) *)
+    Obtain the argument lists (non-ghost, ghosts) ([], [] if None) *)
 val argsToPairOfLists:
   (string * typ * attributes) list option ->
   (string * typ * attributes) list * (string * typ * attributes) list
@@ -637,7 +637,7 @@ val existsType: (typ -> existsAction) -> typ -> bool
  * arguments, is_vararg and attributes. An error is raised if the type is not
  * a function type *)
 val splitFunctionType:
-    typ -> typ * (string * typ * attributes) list option * bool * attributes
+  typ -> typ * (string * typ * attributes) list option * bool * attributes
 (** Same as {!Cil.splitFunctionType} but takes a varinfo. Prints a nicer
  * error message if the varinfo is not for a function *)
 val splitFunctionTypeVI:
@@ -649,22 +649,22 @@ val splitFunctionTypeVI:
 (**  LVALUES *)
 
 (** Make a varinfo. Use this (rarely) to make a raw varinfo. Use other
-  functions to make locals ({!Cil.makeLocalVar} or {!Cil.makeFormalVar} or
-  {!Cil.makeTempVar}) and globals ({!Cil.makeGlobalVar}). Note that this
-  function will assign a new identifier.
-  The [temp] argument defaults to [false], and corresponds to the
-  [vtemp] field in type {!Cil_types.varinfo}.
-  The [source] argument defaults to [true], and corresponds to the field
-  [vsource] .
-  The [referenced] argument defaults to [false], and corresponds to the field
-  [vreferenced] .
-  The [ghost] argument defaults to [false], and corresponds to the field
-  [vghost] .
-  The [loc] argument defaults to [Location.unknown], and corresponds to the field
-  [vdecl] .
-  The first unnamed argument specifies whether the varinfo is for a global and
-  the second is for formals.
-  @modify 19.0-Potassium adds an optional ghost parameter
+    functions to make locals ({!Cil.makeLocalVar} or {!Cil.makeFormalVar} or
+    {!Cil.makeTempVar}) and globals ({!Cil.makeGlobalVar}). Note that this
+    function will assign a new identifier.
+    The [temp] argument defaults to [false], and corresponds to the
+    [vtemp] field in type {!Cil_types.varinfo}.
+    The [source] argument defaults to [true], and corresponds to the field
+    [vsource] .
+    The [referenced] argument defaults to [false], and corresponds to the field
+    [vreferenced] .
+    The [ghost] argument defaults to [false], and corresponds to the field
+    [vghost] .
+    The [loc] argument defaults to [Location.unknown], and corresponds to the field
+    [vdecl] .
+    The first unnamed argument specifies whether the varinfo is for a global and
+    the second is for formals.
+    @modify 19.0-Potassium adds an optional ghost parameter
 *)
 val makeVarinfo:
   ?source:bool -> ?temp:bool -> ?referenced:bool -> ?ghost:bool -> ?loc:Location.t -> bool -> bool
@@ -721,7 +721,7 @@ val refresh_local_name: fundec -> varinfo -> unit
     only be changed if you are completely sure this is not useful.
 
     @modify 20.0-Calcium add ghost optional argument
- *)
+*)
 val makeTempVar: fundec -> ?insert:bool -> ?ghost:bool -> ?name:string ->
   ?descr:string -> ?descrpure:bool -> ?loc:Location.t -> typ -> varinfo
 
@@ -736,7 +736,7 @@ val makeGlobalVar: ?source:bool -> ?temp:bool -> ?referenced:bool ->
 (** Make a shallow copy of a [varinfo] and assign a new identifier.
     If the original varinfo has an associated logic var, it is copied too and
     associated to the copied varinfo
- *)
+*)
 val copyVarinfo: varinfo -> string -> varinfo
 
 (** Changes the type of a varinfo and of its associated logic var if any.
@@ -822,7 +822,7 @@ val kinteger: loc:location -> ikind -> int -> exp
 val integer: loc:location -> int -> exp
 
 (** Constructs a floating point constant.
-    @since Oxygen-20120901 
+    @since Oxygen-20120901
 *)
 val kfloat: loc:location -> fkind -> float -> exp
 
@@ -864,9 +864,9 @@ val interpret_character_constant:
   int64 list -> Cil_types.constant * Cil_types.typ
 
 (** Given the character c in a (CChr c), sign-extend it to 32 bits.
-  (This is the official way of interpreting character constants, according to
-  ISO C 6.4.4.4.10, which says that character constants are chars cast to ints)
-  Returns CInt64(sign-extended c, IInt, None) *)
+    (This is the official way of interpreting character constants, according to
+    ISO C 6.4.4.4.10, which says that character constants are chars cast to ints)
+    Returns CInt64(sign-extended c, IInt, None) *)
 val charConstToInt: char -> Integer.t
 val charConstToIntConstant: char -> constant
 
@@ -916,9 +916,9 @@ val increm64: exp -> Integer.t -> exp
 (** Makes an lvalue out of a given variable *)
 val var: varinfo -> lval
 
-(** Creates an expr representing the variable. 
+(** Creates an expr representing the variable.
     @since Nitrogen-20111001
- *)
+*)
 val evar: ?loc:location -> varinfo -> exp
 
 (** Make an AddrOf. Given an lvalue of type T will give back an expression of
@@ -955,7 +955,7 @@ val mkBinOp: loc:location -> binop -> exp -> exp -> exp
     the same base. This was the behavior of {!mkBinOp} prior to the
     introduction of this function.
     @since Chlorine-20180501
- *)
+*)
 val mkBinOp_safe_ptr_cmp: loc:location -> binop -> exp -> exp -> exp
 
 (** Equivalent to [mkMem] for terms. *)
@@ -964,7 +964,7 @@ val mkTermMem: addr:term -> off:term_offset -> term_lval
 (** Make an expression that is a string constant (of pointer type) *)
 val mkString: loc:location -> string -> exp
 
-(** [true] if both types are not equivalent. 
+(** [true] if both types are not equivalent.
     if [force] is [true], returns [true] whenever both types are not equal
     (modulo typedefs). If [force] is [false] (the default), other equivalences
     are considered, in particular between an enum and its representative
@@ -977,7 +977,7 @@ val need_cast: ?force:bool -> typ -> typ -> bool
     type is the same as the old type, then no cast is added, unless [force]
     is [true] (default is [false])
     @modify Fluorine-20130401 add [force] argument
- *)
+*)
 val mkCastT: ?force:bool -> e:exp -> oldt:typ -> newt:typ -> exp
 
 (** Like {!Cil.mkCastT} but uses typeOf to get [oldt] *)
@@ -987,8 +987,8 @@ val mkCast: ?force:bool -> e:exp -> newt:typ -> exp
 val stripTermCasts: term -> term
 
 (** Removes casts from this expression, but ignores casts within
-  other expression constructs.  So we delete the (A) and (B) casts from
-  "(A)(B)(x + (C)y)", but leave the (C) cast. *)
+    other expression constructs.  So we delete the (A) and (B) casts from
+    "(A)(B)(x + (C)y)", but leave the (C) cast. *)
 val stripCasts: exp -> exp
 
 (** Removes info wrappers and return underlying expression *)
@@ -1024,7 +1024,7 @@ val typeOf_array_elem : typ -> typ
     Asserts it is an array type. *)
 
 val is_fully_arithmetic: typ -> bool
-  (** Returns [true] whenever the type contains only arithmetic types *)
+(** Returns [true] whenever the type contains only arithmetic types *)
 
 (** Convert a string representing a C integer literal to an expression.
     Handles the prefixes 0x and 0 and the suffixes L, U, UL, LL, ULL.
@@ -1070,7 +1070,7 @@ val mkStmtCfgBlock: stmt list -> stmt
 
 (** Construct a statement consisting of just one instruction
     See {!Cil.mkStmt} for the signification of the optional args.
- *)
+*)
 val mkStmtOneInstr: ?ghost:bool -> ?valid_sid:bool -> ?sattr:attributes ->
   instr -> stmt
 
@@ -1124,12 +1124,12 @@ val mkLoop: ?sattr:attributes -> guard:exp -> body:stmt list -> stmt list
     or an integer. Start and done must have the same type but incr
     must be an integer *)
 val mkForIncr:  iter:varinfo -> first:exp -> stopat:exp -> incr:exp
-                 -> body:stmt list -> stmt list
+  -> body:stmt list -> stmt list
 
 (** Make a for loop for(start; guard; next) \{ ... \}. The body can
     contain Break but not Continue !!! *)
 val mkFor: start:stmt list -> guard:exp -> next: stmt list ->
-                                       body: stmt list -> stmt list
+  body: stmt list -> stmt list
 
 (** creates a block with empty attributes from an unspecified sequence. *)
 val block_from_unspecified_sequence:
@@ -1174,29 +1174,29 @@ val is_ghost_else: block -> bool
 (** Various classes of attributes *)
 type attributeClass =
     AttrName of bool
-        (** Attribute of a name. If argument is true and we are on MSVC then
-            the attribute is printed using __declspec as part of the storage
-            specifier  *)
+  (** Attribute of a name. If argument is true and we are on MSVC then
+      the attribute is printed using __declspec as part of the storage
+      specifier  *)
   | AttrFunType of bool
-        (** Attribute of a function type. If argument is true and we are on
-            MSVC then the attribute is printed just before the function name *)
+  (** Attribute of a function type. If argument is true and we are on
+      MSVC then the attribute is printed just before the function name *)
   | AttrType  (** Attribute of a type *)
 
 val registerAttribute: string -> attributeClass -> unit
-  (** Add a new attribute with a specified class *)
+(** Add a new attribute with a specified class *)
 
 val removeAttribute: string -> unit
-  (** Remove an attribute previously registered. *)
+(** Remove an attribute previously registered. *)
 
 val attributeClass: string -> attributeClass
-  (** Return the class of an attributes. *)
+(** Return the class of an attributes. *)
 
 (** Partition the attributes into classes:name attributes, function type,
     and type attributes *)
 val partitionAttributes:  default:attributeClass ->
-                         attributes -> attribute list * (* AttrName *)
-                                       attribute list * (* AttrFunType *)
-                                           attribute list   (* AttrType *)
+  attributes -> attribute list * (* AttrName *)
+                attribute list * (* AttrFunType *)
+                attribute list   (* AttrType *)
 
 (** Add an attribute. Maintains the attributes in sorted order of the second
     argument *)
@@ -1231,7 +1231,7 @@ val frama_c_ghost_formal: string
     any sub-object regardless of const status.
 
     @since 18.0-Argon
- *)
+*)
 val frama_c_init_obj: string
 
 (** a field struct marked with this attribute is known to be mutable, i.e.
@@ -1267,11 +1267,11 @@ val isGhostFormalVarDecl: (string * typ * attributes) -> bool
     type, without any attributes.
 *)
 val typeDeepDropAttributes: string list -> typ -> typ
-  [@@ ocaml.deprecated "Use Cil.typeRemoveAttributesDeep"]
+[@@ ocaml.deprecated "Use Cil.typeRemoveAttributesDeep"]
 
-(** Remove any attribute appearing somewhere in the fully expanded 
+(** Remove any attribute appearing somewhere in the fully expanded
     version of the type.
-    @since Oxygen-20120901 
+    @since Oxygen-20120901
 *)
 val typeDeepDropAllAttributes: typ -> typ
 
@@ -1314,9 +1314,9 @@ val typeAddAttributes: attribute list -> typ -> typ
 *)
 val typeRemoveAttributes: string list -> typ -> typ
 
-(** same as above, but remove any existing attribute from the type. 
+(** same as above, but remove any existing attribute from the type.
 
- @since Magnesium-20151001
+    @since Magnesium-20151001
 *)
 val typeRemoveAllAttributes: typ -> typ
 
@@ -1346,7 +1346,7 @@ val typeHasAttributeDeep: string -> typ -> bool
     not recurse through pointer types, nor inside function prototypes.
     @since Oxygen-20120901
     @deprecated Chlorine-20180501 see {!Cil.typeHasAttributeMemoryBlock}
- *)
+*)
 [@@ deprecated "Use Cil.typeHasAttributeMemoryBlock instead"]
 
 val typeHasAttributeMemoryBlock: string -> typ -> bool
@@ -1360,25 +1360,25 @@ val typeHasAttributeMemoryBlock: string -> typ -> bool
 
 (** Remove all attributes relative to const, volatile and restrict attributes
     @since Nitrogen-20111001
- *)
+*)
 val type_remove_qualifier_attributes: typ -> typ
 
 (**
-  remove also qualifiers under Ptr and Arrays
-  @since Sodium-20150201
+   remove also qualifiers under Ptr and Arrays
+   @since Sodium-20150201
 *)
 val type_remove_qualifier_attributes_deep: typ -> typ
 
 (** Remove all attributes relative to const, volatile and restrict attributes
     when building a C cast
     @since Oxygen-20120901
- *)
+*)
 val type_remove_attributes_for_c_cast: typ -> typ
 
 (** Remove all attributes relative to const, volatile and restrict attributes
     when building a logic cast
     @since Oxygen-20120901
- *)
+*)
 val type_remove_attributes_for_logic_type: typ -> typ
 
 (** retains attributes corresponding to type qualifiers (6.7.3) *)
@@ -1443,6 +1443,21 @@ val isVolatileTermLval : term_lval -> bool
     @since Sulfur-20171101 *)
 
 (* ************************************************************************* *)
+(** {2 Ghost Attribute} *)
+(* ************************************************************************* *)
+
+val isGhostType : typ -> bool
+(** Check for ["ghost"] qualifier from the type of an l-value (do not follow pointer)
+    @return true iff a part of the related l-value has ["ghost"] qualifier
+    @since Frama-C+dev *)
+
+val isWFGhostType : typ -> bool
+(** Check if the received type is well-formed according to \ghost semantics, that is
+    once the type is not ghost anymore, \ghost cannot appear again.
+    @return true iff the type is well formed
+    @since Frama-C+dev *)
+
+(* ************************************************************************* *)
 (** {2 The visitor} *)
 (* ************************************************************************* *)
 
@@ -1450,31 +1465,31 @@ val isVolatileTermLval : term_lval -> bool
     etc.
     @plugin development guide *)
 type 'a visitAction =
-  | SkipChildren (** Do not visit the children. Return the node as it is. 
-		     @plugin development guide *)
+  | SkipChildren (** Do not visit the children. Return the node as it is.
+                     @plugin development guide *)
   | DoChildren (** Continue with the children of this node. Rebuild the node on
-		   return if any of the children changes (use == test).
-		   @plugin development guide *)
+                   return if any of the children changes (use == test).
+                   @plugin development guide *)
   | DoChildrenPost of ('a -> 'a)
   (** visit the children, and apply the given function to the result.
       @plugin development guide *)
   | JustCopy (** visit the children, but only to make the necessary copies
                  (only useful for copy visitor).
-		 @plugin development guide *)
-  | JustCopyPost of ('a -> 'a) 
-  (** same as JustCopy + applies the given function to the result. 
+                 @plugin development guide *)
+  | JustCopyPost of ('a -> 'a)
+  (** same as JustCopy + applies the given function to the result.
       @plugin development guide*)
   | ChangeTo of 'a  (** Replace the expression with the given one.
-			@plugin development guide *)
+                        @plugin development guide *)
   | ChangeToPost of 'a * ('a -> 'a)
   (** applies the expression to the function and gives back the result.
       Useful to insert some actions in an inheritance chain.
       @plugin development guide *)
   | ChangeDoChildrenPost of 'a * ('a -> 'a)
-(** First consider that the entire exp is replaced by the first parameter. Then
-    continue with the children. On return rebuild the node if any of the
-    children has changed and then apply the function on the node. 
-    @plugin development guide *)
+  (** First consider that the entire exp is replaced by the first parameter. Then
+      continue with the children. On return rebuild the node if any of the
+      children has changed and then apply the function on the node.
+      @plugin development guide *)
 
 val mk_behavior :
   ?name:string ->
@@ -1492,14 +1507,14 @@ val mk_behavior :
     empty for behavior named [Cil.default_behavior_name] *)
 
 val default_behavior_name: string
-  (** @since Carbon-20101201  *)
+(** @since Carbon-20101201  *)
 
 val is_default_behavior: behavior -> bool
 val find_default_behavior: funspec -> funbehavior option
-  (** @since Carbon-20101201  *)
+(** @since Carbon-20101201  *)
 
 val find_default_requires: behavior list -> identified_predicate list
-  (** @since Carbon-20101201  *)
+(** @since Carbon-20101201  *)
 
 (* ************************************************************************* *)
 (** {2 Visitor mechanism} *)
@@ -1508,17 +1523,17 @@ val find_default_requires: behavior list -> identified_predicate list
 (** {3 Visitor class} *)
 
 (** A visitor interface for traversing CIL trees. Create instantiations of
-  this type by specializing the class {!nopCilVisitor}. Each of the
-  specialized visiting functions can also call the [queueInstr] to specify
-  that some instructions should be inserted before the current statement.
-  Use syntax like [self#queueInstr] to call a method
-  associated with the current object.
- 
-  {b Important Note for Frama-C Users:} Unless you really know what you are
-  doing, you should probably inherit from the
-  {!Visitor.generic_frama_c_visitor} instead of {!genericCilVisitor} or
+    this type by specializing the class {!nopCilVisitor}. Each of the
+    specialized visiting functions can also call the [queueInstr] to specify
+    that some instructions should be inserted before the current statement.
+    Use syntax like [self#queueInstr] to call a method
+    associated with the current object.
+
+    {b Important Note for Frama-C Users:} Unless you really know what you are
+    doing, you should probably inherit from the
+    {!Visitor.generic_frama_c_visitor} instead of {!genericCilVisitor} or
     {!nopCilVisitor}
-    
+
     @plugin development guide *)
 class type cilVisitor = object
   method behavior: Visitor_behavior.t
@@ -1526,11 +1541,11 @@ class type cilVisitor = object
       @plugin development guide *)
 
   method project: Project.t option
-    (** Project the visitor operates on. Non-nil for copy visitor.
-        @since Oxygen-20120901 *)
+  (** Project the visitor operates on. Non-nil for copy visitor.
+      @since Oxygen-20120901 *)
 
   method plain_copy_visitor: cilVisitor
-    (** a visitor who only does copies of the nodes according to [behavior] *)
+  (** a visitor who only does copies of the nodes according to [behavior] *)
 
   method vfile: file -> file visitAction
   (** visit a whole file.
@@ -1565,7 +1580,7 @@ class type cilVisitor = object
   method voffs: offset -> offset visitAction
   (** Invoked on each offset occurrence that is *not* as part of an
       initializer list specification, i.e. in an lval or recursively inside an
-      offset.  
+      offset.
       @plugin development guide *)
 
   method vinitoffs: offset -> offset visitAction
@@ -1582,13 +1597,13 @@ class type cilVisitor = object
       of the original statement. This is done to preserve the sharing with
       [Goto] and [Case] statements that point to the original statement. If you
       use the [ChangeTo] action then you should take care of preserving that
-      sharing yourself.  
+      sharing yourself.
       @plugin development guide *)
 
   method vblock: block -> block visitAction
   (** Block. *)
-  
-  method vfunc: fundec -> fundec visitAction    
+
+  method vfunc: fundec -> fundec visitAction
   (** Function definition. Replaced in place. *)
 
   method vglob: global -> global list visitAction
@@ -1599,7 +1614,7 @@ class type cilVisitor = object
   (** Initializers. Pass the global where this occurs, and the offset *)
 
   method vlocal_init: varinfo -> local_init -> local_init visitAction
-   (** local initializer. pass the variable under initialization. *)
+  (** local initializer. pass the variable under initialization. *)
 
   method vtype: typ -> typ visitAction
   (** Use of some type. For typedef, struct, union and enum, the visit is
@@ -1607,16 +1622,16 @@ class type cilVisitor = object
       [TComp], [TEnum] and [TNamed] are not visited again. *)
 
   method vcompinfo: compinfo -> compinfo visitAction
-    (** declaration of a struct/union *)
+  (** declaration of a struct/union *)
 
   method venuminfo: enuminfo -> enuminfo visitAction
-    (** declaration of an enumeration *)
+  (** declaration of an enumeration *)
 
   method vfieldinfo: fieldinfo -> fieldinfo visitAction
-    (** visit the declaration of a field of a structure or union *)
+  (** visit the declaration of a field of a structure or union *)
 
   method venumitem: enumitem -> enumitem visitAction
-    (** visit the declaration of an enumeration item *)
+  (** visit the declaration of an enumeration item *)
 
   method vattr: attribute -> attribute list visitAction
   (** Attribute. Each attribute can be replaced by a list *)
@@ -1642,18 +1657,18 @@ class type cilVisitor = object
       [get_stmt] to obtain the corresponding copy) *)
 
   method current_kinstr: kinstr
-    (** [Kstmt stmt] when visiting statement stmt, [Kglobal] when called outside
-        of a statement.
-        @since Carbon-20101201 
-	@plugin development guide *)
+  (** [Kstmt stmt] when visiting statement stmt, [Kglobal] when called outside
+      of a statement.
+      @since Carbon-20101201
+      @plugin development guide *)
 
   method push_stmt : stmt -> unit
   method pop_stmt : stmt -> unit
 
   method current_func: fundec option
-    (** link to the current function being visited.
+  (** link to the current function being visited.
 
-        {b NB:} for copy visitors, the fundec is the original one. *)
+      {b NB:} for copy visitors, the fundec is the original one. *)
   method set_current_func: fundec -> unit
   method reset_current_func: unit -> unit
 
@@ -1734,7 +1749,7 @@ class type cilVisitor = object
 end
 
 (** Indicates how an extended behavior clause is supposed to be visited.
-    The default behavior is [DoChildren], which ends up visiting 
+    The default behavior is [DoChildren], which ends up visiting
     each identified predicate in the list and leave the id as is.
 
     @plugin development guide
@@ -1807,10 +1822,10 @@ val visitCilFileCopy: cilVisitor -> file -> file
 val visitCilFile: cilVisitor -> file -> unit
 
 (** A visitor for the whole file that does not *physically* change the
-   globals (but maybe changes things inside the globals through
-   side-effects). Use this function instead of {!Cil.visitCilFile}
-   whenever appropriate because it is more efficient for long files.
-   @plugin development guide *)
+    globals (but maybe changes things inside the globals through
+    side-effects). Use this function instead of {!Cil.visitCilFile}
+    whenever appropriate because it is more efficient for long files.
+    @plugin development guide *)
 val visitCilFileSameGlobals: cilVisitor -> file -> unit
 
 (** Visit a global *)
@@ -1913,17 +1928,17 @@ val visitCilFrom: cilVisitor -> from -> from
 val visitCilAssigns: cilVisitor -> assigns -> assigns
 
 (** @since Oxygen-20120901
- *)
+*)
 val visitCilFrees:
   cilVisitor -> identified_term list -> identified_term list
 
 (** @since Oxygen-20120901
- *)
+*)
 val visitCilAllocates:
   cilVisitor -> identified_term list -> identified_term list
 
 (** @since Oxygen-20120901
- *)
+*)
 val visitCilAllocation: cilVisitor -> allocation -> allocation
 
 val visitCilFunspec: cilVisitor -> funspec -> funspec
@@ -1934,7 +1949,7 @@ val visitCilBehaviors: cilVisitor -> funbehavior list -> funbehavior list
 (** visit an extended clause of a behavior.
     @since Nitrogen-20111001
     @modify Silicon-20161101
- *)
+*)
 val visitCilExtended: cilVisitor -> acsl_extension -> acsl_extension
 
 val visitCilModelInfo: cilVisitor -> model_info -> model_info
@@ -1955,12 +1970,12 @@ val visitCilTerm: cilVisitor -> term -> term
 
 (** visit identified_term.
     @since Oxygen-20120901
- *)
+*)
 val visitCilIdTerm: cilVisitor -> identified_term -> identified_term
 
 (** visit term_lval.
     @since Nitrogen-20111001
- *)
+*)
 val visitCilTermLval: cilVisitor -> term_lval -> term_lval
 
 val visitCilTermLhost: cilVisitor -> term_lhost -> term_lhost
@@ -2031,7 +2046,7 @@ val uniqueVarNames: file -> unit
     replaces them both. If some replacement happens and [aggressive] is true,
     then the new statements are themselves subject to optimization.  Each
     statement in the list is optimized independently. *)
-val peepHole2: 
+val peepHole2:
   aggressive:bool -> (stmt * stmt -> stmt list option) -> stmt list -> stmt list
 
 (** Similar to [peepHole2] except that the optimization window consists of
@@ -2079,7 +2094,7 @@ val bytesSizeOfInt: ikind -> int
 val bitsSizeOfInt: ikind -> int
 
 (** Returns the signedness of the given integer kind depending
-   on the current machdep. *)
+    on the current machdep. *)
 val isSigned: ikind -> bool
 
 (** Returns the size of the given type, in bits. If this is the type of
@@ -2087,7 +2102,7 @@ val isSigned: ikind -> bool
 val bitsSizeOfBitfield: typ -> int
 
 (** Returns a unique number representing the integer
-   conversion rank. *)
+    conversion rank. *)
 val rank: ikind -> int
 
 (** [intTypeIncluded i1 i2] returns [true] iff the range of values
@@ -2098,35 +2113,41 @@ val intTypeIncluded: ikind -> ikind -> bool
     @since Oxygen-20120901 *)
 val frank: fkind -> int
 
-(** Represents an integer as for a given kind. 
+(** Represents an integer as for a given kind.
  * Returns a flag saying whether the value was changed
  * during truncation (because it was too large to fit in k). *)
 val truncateInteger64: ikind -> Integer.t -> Integer.t * bool
 
 (** Returns the maximal value representable in a signed integer type of the
     given size (in bits)
- *)
+*)
 val max_signed_number: int -> Integer.t
 
 (** Returns the smallest value representable in a signed integer type of the
     given size (in bits)
- *)
+*)
 val min_signed_number: int -> Integer.t
 
 (** Returns the maximal value representable in a unsigned integer type of the
     given size (in bits)
- *)
+*)
 val max_unsigned_number: int -> Integer.t
 
 (** True if the integer fits within the kind's range *)
 val fitsInInt: ikind -> Integer.t -> bool
+
+(** True if the float is finite for the kind's range *)
+val isFiniteFloat: fkind -> float -> bool
+
+(** True if the real constant is an exact float for the given type *)
+val isExactFloat: fkind -> logic_real -> bool
 
 exception Not_representable
 (** raised by {!intKindForValue}. *)
 
 (** @return the smallest kind that will hold the integer's value.
     The kind will be unsigned if the 2nd argument is true.
-    @raise Not_representable if the bigint is not representable. 
+    @raise Not_representable if the bigint is not representable.
     @modify Neon-20130301 may raise Not_representable. *)
 val intKindForValue: Integer.t -> bool -> ikind
 
@@ -2250,18 +2271,18 @@ val extract_free_logicvars_from_predicate :
 
 (** extract [logic_label] elements from a [code_annotation] *)
 val extract_labels_from_annot:
-  code_annotation -> Cil_datatype.Logic_label.Set.t 
+  code_annotation -> Cil_datatype.Logic_label.Set.t
 
 (** extract [logic_label] elements from a [term] *)
-val extract_labels_from_term: term -> Cil_datatype.Logic_label.Set.t 
+val extract_labels_from_term: term -> Cil_datatype.Logic_label.Set.t
 
 (** extract [logic_label] elements from a [pred] *)
-val extract_labels_from_pred: 
-  predicate -> Cil_datatype.Logic_label.Set.t 
+val extract_labels_from_pred:
+  predicate -> Cil_datatype.Logic_label.Set.t
 
 (** extract [stmt] elements from [logic_label] elements *)
 val extract_stmts_from_labels:
- Cil_datatype.Logic_label.Set.t -> Cil_datatype.Stmt.Set.t
+  Cil_datatype.Logic_label.Set.t -> Cil_datatype.Stmt.Set.t
 
 (** creates a visitor that will replace in place uses of var in the first
     list by their counterpart in the second list.
@@ -2284,13 +2305,13 @@ val separate_if_succs: stmt -> stmt * stmt
 (**/**)
 
 val dependency_on_ast: State.t -> unit
-  (** indicates that the given state depends on the AST. *)
+(** indicates that the given state depends on the AST. *)
 
 val set_dependencies_of_ast : State.t -> unit
-  (** Makes all states that have been marked as depending on the AST by
-      {!dependency_on_ast} depend on the given state. Should only be used
-      once when creating the AST state. 
-   *)
+(** Makes all states that have been marked as depending on the AST by
+    {!dependency_on_ast} depend on the given state. Should only be used
+    once when creating the AST state.
+*)
 
 val pp_typ_ref: (Format.formatter -> typ -> unit) ref
 val pp_global_ref: (Format.formatter -> global -> unit) ref

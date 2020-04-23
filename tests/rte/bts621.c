@@ -1,8 +1,10 @@
 /* run.config
    OPT: -print -then -no-print -rte -warn-signed-overflow -then -print
 */
-//@ assigns *p;
-float g(float* p);
+/*@ ghost
+  /@ assigns *p; @/
+  float g(float \ghost* p) ; 
+*/
 
-void f(float a) { /*@ ghost float x = g(&a); */ }
+void f(void) /*@ ghost (float a) */ { /*@ ghost float x = g(&a); */ }
 

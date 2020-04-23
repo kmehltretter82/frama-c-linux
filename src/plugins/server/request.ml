@@ -81,6 +81,31 @@ let check_page page name =
     Senv.warning ~wkey:wkind
       "Request '%s' shall not be published in protocol pages" name
 
+let page_prefix page =
+  match Doc.chapter page with
+  | `Kernel -> "kernel"
+  | `Plugin plugin -> plugin
+  | `Protocol -> "protocol"
+
+(* -------------------------------------------------------------------------- *)
+(* --- Signals                                                            --- *)
+(* -------------------------------------------------------------------------- *)
+
+type signal = Main.signal
+
+let signal ~page ~name ~descr  ?(details=[]) () =
+  let open Markdown in
+  check_name name ;
+  check_page page name ;
+  let title =  Printf.sprintf "`SIG` %s" name in
+  let index = [ Printf.sprintf "%s (`SIGNAL`)" name ] in
+  let contents = [ Block [Text descr] ; Block details] in
+  let _ = Doc.publish ~page ~name ~title ~index ~contents () in
+  Main.signal name
+
+let emit = Main.emit
+let on_signal = Main.on_signal
+
 (* -------------------------------------------------------------------------- *)
 (* --- Multiple Fields Requests                                           --- *)
 (* -------------------------------------------------------------------------- *)
@@ -136,14 +161,14 @@ let doc_input (type a) (input : a rq_input) =
   match input with
   | Pnone -> assert false
   | Pdata _ -> []
-  | Pfields fs -> [Syntax.fields ~title:"Input" (List.rev fs)]
+  | Pfields fs -> [Syntax.fields ~title:"Input Params" (List.rev fs)]
 
 (* json output syntax *)
 let doc_output (type b) (output : b rq_output) =
   match output with
   | Rnone -> assert false
   | Rdata _ -> []
-  | Rfields fs -> [Syntax.fields ~title:"Output" (List.rev fs)]
+  | Rfields fs -> [Syntax.fields ~title:"Output Params" (List.rev fs)]
 
 (* -------------------------------------------------------------------------- *)
 (* --- Multi-Parameters Requests                                          --- *)
@@ -185,7 +210,11 @@ let param (type a b) (s : (unit,b) signature) ~name ~descr
     ?default (input : a input) : a param =
   let module D = (val input) in
   let syntax = if default = None then D.syntax else Syntax.option D.syntax in
-  let fd = Syntax.{ name ; syntax ; descr } in
+  let fd = Syntax.{
+      fd_name = name ;
+      fd_syntax = syntax ;
+      fd_descr = descr ;
+    } in
   s.input <- Pfields (fd :: fds_input s) ;
   fun rq ->
     try D.of_json (Fmap.find name rq.param)
@@ -197,7 +226,11 @@ let param (type a b) (s : (unit,b) signature) ~name ~descr
 let param_opt (type a b) (s : (unit,b) signature) ~name ~descr
     (input : a input) : a option param =
   let module D = (val input) in
-  let fd = Syntax.{ name ; syntax = Syntax.option D.syntax ; descr } in
+  let fd = Syntax.{
+      fd_name = name ;
+      fd_syntax = Syntax.option D.syntax ;
+      fd_descr = descr ;
+    } in
   s.input <- Pfields (fd :: fds_input s) ;
   fun rq ->
     try Some(D.of_json (Fmap.find name rq.param))
@@ -218,7 +251,11 @@ let fds_output s : Syntax.field list =
 let result (type a b) (s : (a,unit) signature) ~name ~descr
     ?default (output : b output) : b result =
   let module D = (val output) in
-  let fd = Syntax.{ name ; syntax = D.syntax ; descr } in
+  let fd = Syntax.{
+      fd_name = name ;
+      fd_syntax = D.syntax ;
+      fd_descr = descr ;
+    } in
   s.output <- Rfields (fd :: fds_output s) ;
   begin
     match default with
@@ -230,7 +267,11 @@ let result (type a b) (s : (a,unit) signature) ~name ~descr
 let result_opt (type a b) (s : (a,unit) signature) ~name ~descr
     (output : b output) : b option result =
   let module D = (val output) in
-  let fd = Syntax.{ name ; syntax = option D.syntax ; descr } in
+  let fd = Syntax.{
+      fd_name = name ;
+      fd_syntax = option D.syntax ;
+      fd_descr = descr ;
+    } in
   s.output <- Rfields (fd :: fds_output s) ;
   fun rq opt ->
     match opt with None -> () | Some v ->
@@ -297,20 +338,15 @@ let register_sig (type a b) (s : (a,b) signature) (process : rq -> a -> b) =
   let skind = Main.string_of_kind s.kind in
   let title =  Printf.sprintf "`%s` %s" skind s.name in
   let index = [ Printf.sprintf "%s (`%s`)" s.name skind ] in
-  let header = [ plain "Input", Center; plain "Output", Center] in
-  let content =
-    [[ Syntax.text @@ sy_input s.input ;
-       Syntax.text @@ sy_output s.output ]]
+  let input =
+    Syntax.define (plain "Input") (Syntax.text @@ sy_input s.input) in
+  let output =
+    Syntax.define (plain "Output") (Syntax.text @@ sy_output s.output) in
+  let contents =
+    Block ( Text s.descr :: input :: output :: s.details ) ::
+    ( doc_input s.input @ doc_output s.output )
   in
-  let synopsis = Table { caption=None ; header; content } in
-  let description =
-    [ Block [Text s.descr ] ; synopsis ; Block s.details] @
-    doc_input s.input @
-    doc_output s.output
-  in
-  let _ =
-    Doc.publish ~page:s.page ~name:s.name ~title ~index description []
-  in
+  let _ = Doc.publish ~page:s.page ~name:s.name ~title ~index ~contents () in
   Main.register s.kind s.name processor ;
   s.defined <- true
 
@@ -322,5 +358,16 @@ let register ~page ~kind ~name ~descr ?details ~input ~output process =
   register_sig
     (signature ~page ~kind ~name ~descr ?details ~input ~output ())
     (fun _rq v -> process v)
+
+let dictionary (d : 'a Data.Enum.dictionary) =
+  let name = Data.Enum.name d in
+  let page = Data.Enum.page d in
+  let descr = Markdown.plain "Returns all tags registered for" @
+              Data.Enum.syntax d in
+  register ~kind:`GET ~page
+    ~name:(Printf.sprintf "%s.dictionary.%s" (page_prefix page) name) ~descr
+    ~input:(module Data.Junit)
+    ~output:(module Data.Tag.Jlist)
+    (fun () -> Data.Enum.tags d)
 
 (* -------------------------------------------------------------------------- *)

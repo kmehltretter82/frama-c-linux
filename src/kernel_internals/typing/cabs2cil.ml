@@ -1349,15 +1349,19 @@ let makeCastT ~(e: exp) ~(oldt: typ) ~(newt: typ) =
 let makeCast ~(e: exp) ~(newt: typ) =
   makeCastT e (typeOf e) newt
 
-(* A cast that is used for conditional expressions. Pointers are Ok.
-   Abort if invalid *)
-let checkBool (ot : typ) (_ : exp) =
-  match unrollType ot with
+let is_scalar_type t =
+  match unrollType t with
   | TInt _
   | TPtr _
   | TEnum _
-  | TFloat _ -> ()
-  |  _ -> Kernel.fatal ~current:true "castToBool %a" Cil_printer.pp_typ ot
+  | TFloat _ -> true
+  | _ -> false
+
+(* A cast that is used for conditional expressions. Pointers are Ok.
+   Abort if invalid *)
+let checkBool (ot : typ) (_ : exp) =
+  if not (is_scalar_type ot) then
+    Kernel.fatal ~current:true "castToBool %a" Cil_printer.pp_typ ot
 
 (* Evaluate constants to CTrue (non-zero) or CFalse (zero) *)
 let rec isConstTrueFalse c: [ `CTrue | `CFalse ] =
@@ -1585,7 +1589,9 @@ struct
           end else SkipChildren
       end
     in
-    let cleanup_var vi = vi.vtype <- Cil.visitCilType cleanup_types vi.vtype in
+    let cleanup_var vi =
+      Cil.update_var_type vi (Cil.visitCilType cleanup_types vi.vtype)
+    in
     List.iter cleanup_var c.locals;
     !currentFunctionFDEC.slocals <- !currentFunctionFDEC.slocals @ !vars;
     let vars = !vars @ c.locals in
@@ -2100,82 +2106,89 @@ struct
         Cil_printer.pp_stmt s l;
     with Found -> ()
 
-  class cleanUnspecified = object(self)
-    inherit nopCilVisitor
-    val unspecified_stack = Stack.create ()
+  class cleanUnspecified =
+    let is_annot_next_stmt = function
+      | [] -> false
+      | { skind = Instr (Code_annot (c,_)) } :: _ ->
+        Logic_utils.is_annot_next_stmt c
+      | _ -> false
+    in
+    object(self)
+      inherit nopCilVisitor
+      val unspecified_stack = Stack.create ()
 
-    val mutable replace_table = []
+      val mutable replace_table = []
 
-    (* we start in a deterministic block. *)
-    initializer Stack.push false unspecified_stack
+      (* we start in a deterministic block. *)
+      initializer Stack.push false unspecified_stack
 
-    method private push: 'a.bool->'a->'a visitAction =
-      fun flag x ->
-      Stack.push flag unspecified_stack;
-      ChangeDoChildrenPost
-        (x,fun x -> ignore(Stack.pop unspecified_stack); x)
+      method private push: 'a.bool->'a->'a visitAction =
+        fun flag x ->
+        Stack.push flag unspecified_stack;
+        ChangeDoChildrenPost
+          (x,fun x -> ignore(Stack.pop unspecified_stack); x)
 
 
-    method! vblock b =
-      b.bstmts <-
-        List.rev
-          (List.fold_left(
-              fun res s ->
-                match s.skind with
-                | Block b when
-                    (not (Stack.top unspecified_stack)) &&
-                    b.battrs = [] && b.blocals = [] &&
-                    s.labels = []
-                  -> List.rev_append b.bstmts res
-                | _ -> s ::res)
-              [] b.bstmts);
-      DoChildren
+      method! vblock b =
+        b.bstmts <-
+          List.rev
+            (List.fold_left(
+                fun res s ->
+                  match s.skind with
+                  | Block b when
+                      (not (Stack.top unspecified_stack)) &&
+                      b.battrs = [] && b.blocals = [] &&
+                      s.labels = [] && not (is_annot_next_stmt res)
+                    -> List.rev_append b.bstmts res
+                  | _ -> s ::res)
+                [] b.bstmts);
+        DoChildren
 
-    method! vstmt s =
-      let ghost = s.ghost in
-      let change_label_stmt s s' =
-        List.iter
-          (function
-            | Label (x,_,_) -> H.replace labelStmt x s'
-            | Case _ | Default _ -> replace_table <- (s, s') :: replace_table
-          ) s.labels;
-        s'.labels <- s.labels @ s'.labels
-      in
-      match s.skind with
-      | UnspecifiedSequence [s',_,_,_,_] ->
-        change_label_stmt s s';
-        ChangeDoChildrenPost(s', fun x -> x)
-      | UnspecifiedSequence [] ->
-        let s' = mkEmptyStmt ~ghost ~valid_sid ~loc:(cabslu "_useq") () in
-        change_label_stmt s s';
-        ChangeTo s';
-      | UnspecifiedSequence _ -> self#push true s
-      | Block { battrs = []; blocals = []; bstmts = [s']} ->
-        change_label_stmt s s';
-        ChangeDoChildrenPost (s', fun x -> x)
-      | Block _ | If _ | Loop _
-      | TryFinally _ | TryExcept _ | Throw _ | TryCatch _ ->
-        self#push false s
-      | Switch _ ->
-        let change_cases stmt =
-          match stmt.skind with
-          | Switch(e,body,cases,loc) ->
-            let newcases =
-              List.map
-                (fun s ->
-                   try List.assq s replace_table
-                   with Not_found -> s)
-                cases
-            in
-            stmt.skind <- Switch(e,body,newcases,loc);
-            ignore (Stack.pop unspecified_stack);
-            stmt
-          | _ -> assert false
-        in Stack.push false unspecified_stack;
-        ChangeDoChildrenPost(s,change_cases)
-      | Instr _ | Return _ | Goto _ | Break _
-      | Continue _ -> DoChildren
-  end
+      method! vstmt s =
+        let ghost = s.ghost in
+        let change_label_stmt s s' =
+          List.iter
+            (function
+              | Label (x,_,_) -> H.replace labelStmt x s'
+              | Case _ | Default _ -> replace_table <- (s, s') :: replace_table
+            ) s.labels;
+          s'.labels <- s.labels @ s'.labels
+        in
+        match s.skind with
+        | UnspecifiedSequence [s',_,_,_,_] ->
+          change_label_stmt s s';
+          ChangeDoChildrenPost(s', fun x -> x)
+        | UnspecifiedSequence [] ->
+          let s' = mkEmptyStmt ~ghost ~valid_sid ~loc:(cabslu "_useq") () in
+          change_label_stmt s s';
+          ChangeTo s';
+        | UnspecifiedSequence _ -> self#push true s
+        | Block { battrs = []; blocals = []; bstmts = [s']} ->
+          change_label_stmt s s';
+          ChangeDoChildrenPost (s', fun x -> x)
+        | Block _ | If _ | Loop _
+        | TryFinally _ | TryExcept _ | Throw _ | TryCatch _ ->
+          self#push false s
+        | Switch _ ->
+          let change_cases stmt =
+            match stmt.skind with
+            | Switch(e,body,cases,loc) ->
+              let newcases =
+                List.map
+                  (fun s ->
+                     try List.assq s replace_table
+                     with Not_found -> s)
+                  cases
+              in
+              stmt.skind <- Switch(e,body,newcases,loc);
+              ignore (Stack.pop unspecified_stack);
+              stmt
+            | _ -> assert false
+          in Stack.push false unspecified_stack;
+          ChangeDoChildrenPost(s,change_cases)
+        | Instr _ | Return _ | Goto _ | Break _
+        | Continue _ -> DoChildren
+    end
 
   let mkFunctionBody ~ghost (c: chunk) : block =
     if c.cases <> [] then
@@ -2829,7 +2842,7 @@ let rec castTo ?context ?(fromsource=false)
     match ot', nt' with
     | TNamed _, _
     | _, TNamed _ -> Kernel.fatal ~current:true "unrollType failed in castTo"
-    | _, TInt(IBool,_) ->
+    | t, TInt(IBool,_) when is_scalar_type t ->
       if is_boolean_result e then result
       else
         nt,
@@ -4325,7 +4338,7 @@ let fixFormalsType formals =
     end
   in
   let treat_one_formal v =
-    v.vtype <- Cil.visitCilType vis v.vtype;
+    Cil.update_var_type v (Cil.visitCilType vis v.vtype);
     Hashtbl.add table v.vname v;
   in
   List.iter treat_one_formal formals
@@ -4780,6 +4793,7 @@ and convertCVtoAttr (src: A.cvspec list) : A.attribute list =
   | CV_VOLATILE :: tl -> ("volatile",[]) :: (convertCVtoAttr tl)
   | CV_RESTRICT :: tl -> ("restrict",[]) :: (convertCVtoAttr tl)
   | CV_ATTRIBUTE_ANNOT a :: tl -> (mkAttrAnnot a, []) :: convertCVtoAttr tl
+  | CV_GHOST    :: tl -> ("ghost",[]) :: (convertCVtoAttr tl)
 
 and makeVarInfoCabs
     ~(ghost:bool)
@@ -4798,6 +4812,17 @@ and makeVarInfoCabs
                                        we do it afterwards *)
       bt (A.PARENTYPE(attrs, ndt, a)) in
   (*Format.printf "Got yp:%a->%a(%a)@." d_type bt d_type vtype d_attrlist nattr;*)
+  if not isgenerated && ghost then begin
+    if hasAttribute "ghost" (Cil.typeAttrs vtype) then
+      Kernel.warning
+        ~wkey:Kernel.wkey_ghost_already_ghost ~once:true ~current:true
+        "'%s' is already ghost" n;
+    if isArrayType vtype then
+      if hasAttribute "ghost" (Cil.typeAttrs (typeOf_array_elem vtype)) then
+        Kernel.warning
+          ~wkey:Kernel.wkey_ghost_already_ghost ~once:true ~current:true
+          "'%s' elements are already ghost" n;
+  end ;
 
   if inline && not (isFunctionType vtype) then
     Kernel.error ~once:true ~current:true "inline for a non-function: %s" n;
@@ -6672,6 +6697,9 @@ and doExp local_env
                   if expected pointer and got null pointer constant => ok *)
                not (Cil.isPointerType texpected && Ast_info.is_null_expr a')
              | false, false ->
+               (* Ghost compatibility is considered 'after_cleanup' *)
+               let texpected = Cil.typeRemoveAttributesDeep [ "ghost" ] texpected in
+               let att = Cil.typeRemoveAttributesDeep [ "ghost" ] att in
                (* pointers: check compatible modulo void ptr and modulo
                   literal strings (too many warnings otherwise) *)
                let ok1 =
@@ -7003,6 +7031,30 @@ and doExp local_env
                 | _ ->
                   Kernel.warning ~current:true
                     "Invalid call to builtin_constant_p")
+             end
+           | "__builtin_offsetof" ->
+             begin
+               match !pargs with
+               | [{ enode = CastE (_, {enode = AddrOf (host, offset)}) } as e] ->
+                 begin
+                   piscall := false;
+                   prestype := Cil.theMachine.Cil.typeOfSizeOf;
+                   let typ = Cil.typeOfLhost host in
+                   try
+                     let start, _width = Cil.bitsOffset typ offset in
+                     if start mod 8 <> 0 then
+                       Kernel.error ~current:true "Using offset of bitfield";
+                     let kind = Cil.theMachine.kindOfSizeOf in
+                     pres := Cil.kinteger ~loc:e.eloc kind (start / 8);
+                   with SizeOfError _ ->
+                     pres := e;
+                     Kernel.error ~once:true ~current:true
+                       "Unable to compute offset %a in type %a"
+                       Cil_datatype.Offset.pretty offset
+                       Cil_datatype.Typ.pretty typ;
+                 end
+               | _ ->
+                 Kernel.abort ~current:true "Invalid call to builtin_offsetof"
              end
            | "__builtin_types_compatible_p" ->
              begin
@@ -8810,9 +8862,9 @@ and createLocal ghost ((_, sto, _, _) as specs)
           (se0 +++ (
               let castloc = CurrentLoc.get () in
               let talloca_size =
-                let telt_size = Logic_utils.expr_to_term ~cast:false elt_size in
-                let tlen = Logic_utils.expr_to_term ~cast:false len in
-                Logic_const.term (TBinOp (Mult,telt_size,tlen)) telt_size.term_type
+                let size = Logic_utils.expr_to_term ~coerce:true elt_size in
+                let tlen = Logic_utils.expr_to_term ~coerce:true len in
+                Logic_const.term (TBinOp (Mult,size,tlen)) Linteger
               in
               let pos_size =
                 let zero =  Logic_const.tinteger ~loc:castloc 0 in

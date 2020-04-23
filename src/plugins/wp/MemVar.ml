@@ -739,6 +739,9 @@ struct
   let fits_inside cond a b n =
     p_leq e_zero a :: p_lt b (e_int n) :: cond
 
+  let fits_off_by_one cond a b n =
+    p_leq e_zero a :: p_leq b (e_int n) :: cond
+
   let stay_outside cond a b n =
     p_lt b e_zero :: p_leq (e_int n) a :: cond
 
@@ -754,6 +757,13 @@ struct
       | Some( _ , None ) -> unsized_array ()
       | None -> raise ShiftMismatch
 
+  (* Append conditions for and array offset (te,k) to fits in obj *)
+  let array_check fitting cond te k obj =
+    match Ctypes.get_array obj with
+    | Some( e , Some n ) when Ctypes.equal e te -> fitting cond k k n
+    | Some( _ , None ) -> unsized_array ()
+    | _ -> block_check fitting cond (obj,1) (te,k,k)
+
   (* Append conditions for [offset] to fits [object], provided [a<=b]. *)
   let rec offset_fits cond obj offset =
     match offset with
@@ -761,14 +771,8 @@ struct
     | Field fd :: ofs ->
         offset_fits cond (Ctypes.object_of fd.ftype) ofs
     | Shift(te,k) :: ofs ->
-        match Ctypes.get_array obj with
-        | Some( e , Some n ) when Ctypes.equal e te ->
-            let cond = p_leq e_zero k :: p_lt k (e_int n) :: cond in
-            offset_fits cond e ofs
-        | Some( _ , None ) -> unsized_array ()
-        | _ ->
-            let cond = block_check fits_inside cond (obj,1) (te,k,k) in
-            offset_fits cond te ofs
+        let cond = array_check fits_inside cond te k obj in
+        offset_fits cond te ofs
 
   (* Append conditions to [cond] for [range=(elt,a,b)], starting at [offset],
      consisting of [a..b] elements with type [elt] to fits inside the block,
@@ -796,19 +800,39 @@ struct
   (* ---  Validity                                                          --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let valid_offset obj ofs =
-    F.p_conj (offset_fits [] obj ofs)
+  let rec last_field_shift acs obj ofs =
+    match acs , obj , ofs with
+    | OBJ , _ , [Shift(te,k)] -> Some(te,k,obj)
+    | OBJ , C_comp c , (Field fd :: ofs) ->
+        begin
+          match List.rev c.cfields with
+          | fd0::_ when Fieldinfo.equal fd fd0 ->
+              last_field_shift acs (Ctypes.object_of fd.ftype) ofs
+          | _ -> None
+        end
+    | _ -> None
 
-  let valid_range obj ofs range =
-    F.p_conj (range_check fits_inside [] (obj,1) ofs range)
+  let valid_offset acs obj ofs =
+    match last_field_shift acs obj ofs with
+    | Some(te,k,obj) ->
+        F.p_conj (array_check fits_off_by_one [] te k obj)
+    | None ->
+        F.p_conj (offset_fits [] obj ofs)
+
+  let valid_range acs obj ofs range =
+    match last_field_shift acs obj ofs with
+    | Some _ ->
+        F.p_conj (range_check fits_off_by_one [] (obj,1) ofs range)
+    | _ ->
+        F.p_conj (range_check fits_inside [] (obj,1) ofs range)
 
   (* varinfo *)
 
   let valid_base sigma acs mem x =
     if x.vglob then
-      if acs = RW && Cil.typeHasQualifier "const" x.vtype
-      then p_false
-      else p_true
+      match acs with
+      | RW -> if Cil.typeHasQualifier "const" x.vtype then p_false else p_true
+      | RD | OBJ -> p_true
     else
       match mem with
       | CVAL | HEAP -> p_bool (ALLOC.value sigma.alloc x)
@@ -819,12 +843,12 @@ struct
   let valid_offset_path sigma acs mem x ofs =
     p_and
       (valid_base sigma acs mem x)
-      (valid_offset (vobject mem x) ofs)
+      (valid_offset acs (vobject mem x) ofs)
 
   let valid_range_path sigma acs mem x ofs rg =
     p_and
       (valid_base sigma acs mem x)
-      (valid_range (vobject mem x) ofs rg)
+      (valid_range acs (vobject mem x) ofs rg)
 
   (* in-model validation *)
 

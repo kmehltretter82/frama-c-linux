@@ -135,6 +135,8 @@
 [eva] tests/float/builtins.c:104: 
   function exp: precondition 'finite_domain' got status valid.
 [eva:alarm] tests/float/builtins.c:107: Warning: 
+  pointer downcast. assert (unsigned int)(&d) ≤ 2147483647;
+[eva:alarm] tests/float/builtins.c:107: Warning: 
   non-finite double value. assert \is_finite((double)((int)(&d)));
 [eva] tests/float/builtins.c:107: Call to builtin log
 [eva:alarm] tests/float/builtins.c:107: Warning: 

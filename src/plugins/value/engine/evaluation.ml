@@ -258,7 +258,7 @@ let indeterminate_copy lval result alarms =
   let reductness = Unreduced in
   let v, origin = match result with
     | `Bottom -> `Bottom, None
-    | `Value (v, origin) -> `Value v, Some origin
+    | `Value (v, origin) -> `Value v, origin
   in
   let value = { v; initialized; escaping } in
   let record = { value; origin; reductness; val_alarms = alarms} in
@@ -477,6 +477,14 @@ module Make
     | "non-finite" -> restrict_float ~assume_finite:true expr fk value
     | _            -> assert false
 
+  let assume_pointer expr value =
+    if Kernel.InvalidPointer.get ()
+    then
+      let truth = Value.assume_pointer value in
+      let alarm () = Alarms.Invalid_pointer expr in
+      interpret_truth ~alarm value truth
+    else return value
+
   let handle_overflow ~may_overflow expr typ value =
     match Eval_typ.classify_as_scalar typ with
     | Some (Eval_typ.TSInt range) ->
@@ -489,31 +497,33 @@ module Make
       then fst (truncate_integer Alarms.Signed expr range value), Alarmset.none
       else handle_integer_overflow expr range value
     | Some (Eval_typ.TSFloat fk) -> remove_special_float expr fk value
-    | Some (Eval_typ.TSPtr _)
+    | Some (Eval_typ.TSPtr _) -> assume_pointer expr value
     | None -> return value
 
-  (* Removes NaN and infinite floats from the value read from a lvalue. *)
-  let remove_special_float_lvalue typ lval res =
+  (* Assumes that [res] is a valid result for the lvalue [lval] of type [typ].
+     Removes NaN and infinite floats and trap representations of bool values. *)
+  let assume_valid_value typ lval res =
     match typ with
     | TFloat (fkind, _) ->
       res >>= fun (value, origin) ->
       let expr = Value_util.lval_to_exp lval in
       remove_special_float expr fkind value >>=: fun new_value ->
       new_value, origin
-    | _ -> res
-
-  (* Removes invalid bool values from a lvalue. *)
-  let assume_valid_bool typ lval res =
-    if not (Kernel.InvalidBool.get ()) then res else
-      match typ with
-      | TInt (IBool, _) ->
+    | TInt (IBool, _) ->
+      if Kernel.InvalidBool.get () then
         res >>= fun (value, origin) ->
         let one = Abstract_value.Int Integer.one in
         let truth = Value.assume_bounded Alarms.Upper_bound one value in
         let alarm () = Alarms.Invalid_bool lval in
         interpret_truth ~alarm value truth >>=: fun new_value ->
         new_value, origin
-      | _ -> res
+      else res
+    | TPtr _ ->
+      res >>= fun (value, origin) ->
+      let expr = Value_util.lval_to_exp lval in
+      assume_pointer expr value >>=: fun new_value ->
+      new_value, origin
+    | _ -> res
 
   (* Reduce the rhs argument of a shift so that it fits inside [size] bits. *)
   let reduce_shift_rhs typ expr value =
@@ -665,7 +675,7 @@ module Make
     in
     cast_integer Alarms.Signed_downcast expr ~src ~dst value
 
-  let cast_int_to_int expr ~src ~dst value =
+  let cast_int_to_int expr ~ptr ~src ~dst value =
     (* Regain some precision in case a transfer function was imprecise.
        This should probably be done in the transfer function, though. *)
     let value =
@@ -675,16 +685,19 @@ module Make
     in
     if Eval_typ.range_inclusion src dst
     then return value (* Upcast, nothing to check. *)
-    else if dst.i_signed then (* Signed downcast. *)
-      if Kernel.SignedDowncast.get ()
-      then cast_integer Alarms.Signed_downcast expr ~src ~dst value
-      else if Value_parameters.WarnSignedConvertedDowncast.get ()
+    else
+      let overflow_kind, warn =
+        if ptr
+        then Alarms.Pointer_downcast, Kernel.PointerDowncast.get
+        else if dst.i_signed
+        then Alarms.Signed_downcast, Kernel.SignedDowncast.get
+        else Alarms.Unsigned_downcast, Kernel.UnsignedDowncast.get
+      in
+      if warn ()
+      then cast_integer overflow_kind expr ~src ~dst value
+      else if dst.i_signed && Value_parameters.WarnSignedConvertedDowncast.get ()
       then relaxed_signed_downcast expr ~src ~dst value
       else return (Value.rewrap_integer dst value)
-    else (* Unsigned downcast. *)
-    if Kernel.UnsignedDowncast.get ()
-    then cast_integer Alarms.Unsigned_downcast expr ~src ~dst value
-    else return (Value.rewrap_integer dst value)
 
   (* Re-export type here *)
   type scalar_typ = Eval_typ.scalar_typ =
@@ -728,15 +741,17 @@ module Make
     | Some src_type, Some dst_type ->
       let value, alarms =
         match src_type, dst_type with
-        | (TSInt src | TSPtr src), (TSInt dst | TSPtr dst) ->
-          cast_int_to_int ~src ~dst expr value
+        | TSPtr src, TSInt dst ->
+          cast_int_to_int ~ptr:true ~src ~dst expr value
+        | TSInt src, (TSInt dst | TSPtr dst) ->
+          cast_int_to_int ~ptr:false ~src ~dst expr value
         | TSFloat src, (TSInt dst | TSPtr dst)  ->
           restrict_float ~reduce:true ~assume_finite:true expr src value >>=
           truncate_float src dst expr
         | (TSInt _ | TSPtr _), TSFloat _ ->
           (* Cannot overflow with 32 bits float. *)
-          `Value value, Alarmset.none
-        | TSFloat _, TSFloat _ -> `Value value, Alarmset.none
+          return value
+        | TSFloat _, TSFloat _ | TSPtr _, TSPtr _ -> return value
       in
       value >>- Value.forward_cast ~src_type ~dst_type, alarms
 
@@ -838,7 +853,6 @@ module Make
             in
             let reduction =
               update_reduction reduction (Value.equal intern_value result)
-            and origin = Some origin
             and value = define_value result in
             (* The proper alarms will be set in the record by forward_eval. *)
             {value; origin; reductness; val_alarms = Alarmset.all},
@@ -869,8 +883,10 @@ module Make
 
     | AddrOf v | StartOf v ->
       lval_to_loc context ~for_writing:false ~reduction:false v
-      >>=: fun (loc, _, _) ->
-      Loc.to_value loc, Neither, false
+      >>= fun (loc, _, _) ->
+      let value = Loc.to_value loc in
+      let v = assume_pointer expr value in
+      compute_reduction v false
 
     | UnOp (op, e, typ) ->
       root_forward_eval context e >>= fun (v, volatile) ->
@@ -892,6 +908,7 @@ module Make
       let v = forward_cast ~dst e value in
       let v = match Cil.unrollType dst with
         | TFloat (fkind, _) -> v >>= remove_special_float expr fkind
+        | TPtr _ -> v >>= assume_pointer expr
         | _ -> v
       in
       compute_reduction v volatile
@@ -1063,11 +1080,9 @@ module Make
       let record, alarms = indeterminate_copy lval v alarms in
       `Value (record, Neither, volatile), alarms
     else
-      let v, alarms = remove_special_float_lvalue typ_lv lval (v, alarms) in
-      let v, alarms = assume_valid_bool typ_lv lval (v, alarms) in
+      let v, alarms = assume_valid_value typ_lv lval (v, alarms) in
       (v, alarms) >>=: fun (value, origin) ->
       let value = define_value value
-      and origin = Some origin
       and reductness, reduction =
         if Alarmset.is_empty alarms then Unreduced, Neither else Reduced, Forward
       in

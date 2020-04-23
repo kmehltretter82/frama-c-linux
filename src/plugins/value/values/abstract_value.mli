@@ -92,6 +92,15 @@ module type S = sig
      floating-point values. *)
   val assume_not_nan: assume_finite:bool -> fkind -> t -> t truth
 
+  (** Assumes that the abstract value only represents well-formed pointer values:
+      pointers either to an element of an array object or one past the last
+      element of an array object. (A pointer to an object that is not an element
+      of an array is viewed as a pointer to the first element of an array of
+      length one with the type of the object as its element type.)
+      The NULL pointer is always a valid pointer value. Function pointers are
+      also considered as valid pointer values for now. *)
+  val assume_pointer: t -> t truth
+
   (* [assume_comparable cmp v1 v2] assumes that the integer or pointer values
      [v1] and [v2] are comparable for [cmp]. Integers are always comparable.
      If one value is a pointer, then both values should be pointers, and:

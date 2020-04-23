@@ -141,6 +141,8 @@
 [eva] done for function main
 [eva] tests/value/const.i:21: 
   assertion 'Eva,mem_access' got final status invalid.
+[eva] tests/value/const.i:26: 
+  assertion 'Eva,mem_access' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function aux_ret_const:
   __retres ∈ {1}

@@ -45,7 +45,7 @@ let unmemoized_extend_ast () =
          (Kernel.Machdep.get ())
          Datatype.Filepath.pp_abs share);
     Kernel.Keep_unused_specified_functions.off ();
-    if Plugin.is_present "variadic-translation" then
+    if Plugin.is_present "variadic" then
       Dynamic.Parameter.Bool.off "-variadic-translation" ();
     let ppc, ppk = File.get_preprocessor_command () in
     let register s =

@@ -31,6 +31,11 @@ void __e_acsl_globals_init(void)
   return;
 }
 
+void __e_acsl_globals_delete(void)
+{
+  __e_acsl_delete_block((void *)(_G));
+}
+
 int main(int argc, char **argv)
 {
   int __retres;
@@ -55,7 +60,7 @@ int main(int argc, char **argv)
   }
   /*@ assert \valid_read(_G[0].str); */ ;
   __retres = 0;
-  __e_acsl_delete_block((void *)(_G));
+  __e_acsl_globals_delete();
   __e_acsl_memory_clean();
   return __retres;
 }

@@ -110,7 +110,7 @@ val eval_tlval_as_zone :
 val eval_predicate :
   eval_env -> predicate -> predicate_status
 
-val predicate_deps: eval_env -> predicate -> logic_deps
+val predicate_deps: eval_env -> predicate -> logic_deps option
 
 val reduce_by_predicate :
   eval_env -> bool -> predicate -> eval_env

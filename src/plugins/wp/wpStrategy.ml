@@ -48,6 +48,9 @@ type annot_kind =
   | AcallPre of bool * kernel_function
   (* annotation is a called function precondition :
      to be considered as hyp, and goal if bool=true *)
+  | AcallPost of kernel_function
+  (* annotation is a called function post check :
+     to be considered as goal only *)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Annotations for one program point.                                 --- *)
@@ -66,6 +69,7 @@ type annots = {
   p_cut : (bool * WpPropId.pred_info) list;
   call_hyp : WpPropId.pred_info list ForCall.t; (* post and pre *)
   call_pre : (bool * WpPropId.pred_info) list ForCall.t; (* goal only *)
+  call_post : WpPropId.pred_info list ForCall.t; (* post goals only (not hyp) *)
   call_asgn : WpPropId.assigns_full_info ForCall.t;
   a_goal : WpPropId.assigns_full_info;
   a_hyp : WpPropId.assigns_full_info;
@@ -82,6 +86,7 @@ let empty_acc =
     call_hyp = ForCall.empty;
     call_pre = ForCall.empty;
     call_asgn = ForCall.empty;
+    call_post = ForCall.empty;
     a_goal = WpPropId.empty_assigns_info;
     a_hyp = WpPropId.empty_assigns_info;
     a_call = WpPropId.empty_assigns_info;
@@ -112,7 +117,7 @@ let add_prop acc kind id p =
     | None -> l
     | Some p -> (goal, p)::l
   in
-  let add_hyp_call fct calls =
+  let add_for_call fct calls =
     let l = try ForCall.find fct calls with Not_found -> [] in
     ForCall.add fct (add_hyp l) calls in
   let add_both_call fct goal calls =
@@ -129,9 +134,11 @@ let add_prop acc kind id p =
     | AcutB goal ->
         goal, { info with p_cut = add_both goal info.p_cut }
     | AcallHyp fct ->
-        false, { info with call_hyp = add_hyp_call fct info.call_hyp }
+        false, { info with call_hyp = add_for_call fct info.call_hyp }
     | AcallPre (goal,fct) ->
         goal, { info with call_pre = add_both_call fct goal info.call_pre }
+    | AcallPost fct ->
+        true, { info with call_post = add_for_call fct info.call_post }
   in let acc = { acc with info = info } in
   if goal then { acc with has_prop_goal = true} else acc
 
@@ -260,10 +267,17 @@ let add_prop_fct_smoke acc kf bhv =
     let doomed = Property.ip_requires_of_behavior kf Kglobal bhv in
     add_smoke acc kf ~id ~doomed ()
 
-let add_prop_loop_smoke acc kf stmt =
-  if not (Wp_parameters.Split.get()) then
-    add_smoke acc kf ~id:"loop_invariant" ~unreachable:stmt ()
-  else acc
+let add_prop_dead_loop acc kf stmt =
+  add_smoke acc kf ~id:"dead_loop" ~unreachable:stmt ()
+
+let add_prop_dead_code acc kf stmt =
+  add_smoke acc kf ~id:"dead_code" ~unreachable:stmt ()
+
+let add_prop_dead_call kf stmt acc_posts acc_exits =
+  let id = WpPropId.mk_smoke kf ~id:"dead_call" ~unreachable:stmt () in
+  let kind = AcallPost kf in
+  let pred = Some Logic_const.pfalse in
+  add_prop acc_posts kind id pred , add_prop acc_exits kind id pred
 
 (* -------------------------------------------------------------------------- *)
 
@@ -435,6 +449,10 @@ let get_call_pre annots fct =
   try filter_both (ForCall.find fct annots.info.call_pre)
   with Not_found -> [],[]
 
+let get_call_post annots fct =
+  try ForCall.find fct annots.info.call_post
+  with Not_found -> []
+
 let get_call_asgn annots = function
   | None -> annots.info.a_call
   | Some fct ->
@@ -498,6 +516,7 @@ let merge_acc acc1 acc2 =
     p_cut = acc1.p_cut @ acc2.p_cut;
     call_hyp = merge_calls (@) acc1.call_hyp acc2.call_hyp;
     call_pre = merge_calls (@) acc1.call_pre acc2.call_pre;
+    call_post = merge_calls (@) acc1.call_post acc2.call_post;
     call_asgn = merge_calls WpPropId.merge_assign_info acc1.call_asgn acc2.call_asgn;
     a_goal = WpPropId.merge_assign_info acc1.a_goal acc2.a_goal;
     a_hyp = WpPropId.merge_assign_info acc1.a_hyp acc2.a_hyp;

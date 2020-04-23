@@ -18,17 +18,17 @@ Assume {
   Type: forall i_1 : Z. let a_4 = A[i_1] in (region(a_4.F1_f.base) <= 0) /\
       (region(a_4.F1_g.base) <= 0).
   (* Initializer *)
-  Init: (a_2.F1_f) = global(G_a_18).
+  Init: (a_2.F1_f) = global(G_a_20).
   (* Initializer *)
-  Init: (a_2.F1_g) = global(G_b_19).
+  Init: (a_2.F1_g) = global(G_b_21).
   (* Initializer *)
-  Init: (a_1.F1_f) = global(G_c_20).
+  Init: (a_1.F1_f) = global(G_c_22).
   (* Initializer *)
-  Init: (a_1.F1_g) = global(G_d_21).
+  Init: (a_1.F1_g) = global(G_d_23).
   (* Initializer *)
-  Init: (a.F1_f) = global(G_e_22).
+  Init: (a.F1_f) = global(G_e_24).
   (* Initializer *)
-  Init: (a.F1_g) = global(G_f_23).
+  Init: (a.F1_g) = global(G_f_25).
   (* Pre-condition *)
   Have: (0 <= i) /\ (i <= 2).
 }
@@ -37,9 +37,9 @@ Prove: (a_3.F1_g) != (a_3.F1_f).
 ------------------------------------------------------------
 
 Goal Post-condition 'ALT' in 'job':
-Let a = global(G_e_22).
-Let a_1 = global(G_c_20).
-Let a_2 = global(G_a_18).
+Let a = global(G_e_24).
+Let a_1 = global(G_c_22).
+Let a_2 = global(G_a_20).
 Let a_3 = A[i].F1_f.
 Assume {
   Type: is_sint32(i).

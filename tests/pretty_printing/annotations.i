@@ -88,7 +88,7 @@ void function_with_ghost(int x) {
       y++;
       /@ assert y <= x ; @/
     }
-    
+
     /@ assert y == x ; @/
 
     /@ requires y == x ;
@@ -105,6 +105,9 @@ void function_with_ghost(int x) {
 */
 
 /*@ ghost
+  /@ requires variable > 0 ;
+     assigns \nothing ;
+  @/
   void function_declaration(int variable) ;
 */
 

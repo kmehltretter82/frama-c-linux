@@ -25,7 +25,7 @@
 
 #ifndef __FC_NETINET_IN
 #define __FC_NETINET_IN
-#include "features.h"
+#include "../features.h"
 __PUSH_FC_STDLIB
 #include "../__fc_inet.h"
 __POP_FC_STDLIB

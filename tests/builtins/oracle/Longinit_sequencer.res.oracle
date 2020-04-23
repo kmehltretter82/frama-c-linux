@@ -2,17 +2,14 @@
 [kernel] Parsing tests/builtins/long_init.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
-[eva] tests/builtins/long_init.c:34: 
-  Assigning imprecise value to garbled_mix.
-  The imprecision originates from Arithmetic {tests/builtins/long_init.c:34}
+[eva:alarm] tests/builtins/long_init.c:34: Warning: 
+  pointer downcast. assert (unsigned int)"abc" ≤ 127;
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
   a1[0..9] ∈ {0}
   stuff ∈ {0}
-  garbled_mix ∈
-             {{ garbled mix of &{"abc"}
-              (origin: Arithmetic {tests/builtins/long_init.c:34}) }}
+  garbled_mix ∈ {{ "abc" }}
   s ∈ {{ "abc" }}
   pr ∈ {0}
   pr2 ∈ {0}
@@ -73,6 +70,8 @@
 [eva] tests/builtins/long_init.c:73: 
   Call to builtin Frama_C_malloc_fresh for function malloc
 [eva] tests/builtins/long_init.c:73: allocating variable __malloc_init_inner_l73
+[eva:alarm] tests/builtins/long_init.c:74: Warning: 
+  pointer downcast. assert (unsigned int)alloc1 ≤ 2147483647;
 [eva] tests/builtins/long_init.c:75: 
   Call to builtin Frama_C_malloc_fresh for function malloc
 [eva] tests/builtins/long_init.c:75: allocating variable __malloc_init_inner_l75
@@ -130,9 +129,7 @@
        .d[7] ∈ {21.875}
        .d[8] ∈ {25.}
        .d[9] ∈ {28.125}
-  garbled_mix ∈
-             {{ garbled mix of &{"abc"}
-              (origin: Arithmetic {tests/builtins/long_init.c:34}) }}
+  garbled_mix ∈ {{ "abc" }}
   s ∈ {{ "abc" }}
   pr ∈ ESCAPINGADDR
   pr2 ∈ ESCAPINGADDR
@@ -170,6 +167,8 @@
 [eva] tests/builtins/long_init.c:104: allocating variable __malloc_main_l104
 [eva] Recording results for main
 [eva] done for function main
+[eva] tests/builtins/long_init.c:34: 
+  cannot evaluate ACSL term, unsupported ACSL construct: constant strings
 [eva] Saving globals state after call to function: init_inner
 Values at end of function dmin:
   __retres ∈ [93.9166666667 .. 110.791666667]
@@ -297,17 +296,14 @@ Values at end of function main:
   __retres ∈ {0}[kernel] Parsing tests/builtins/long_init2.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
-[eva] tests/builtins/long_init2.c:34: 
-  Assigning imprecise value to garbled_mix.
-  The imprecision originates from Arithmetic {tests/builtins/long_init2.c:34}
+[eva:alarm] tests/builtins/long_init2.c:34: Warning: 
+  pointer downcast. assert (unsigned int)"abc" ≤ 127;
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
   a1[0..9] ∈ {0}
   stuff ∈ {0}
-  garbled_mix ∈
-             {{ garbled mix of &{"abc"}
-              (origin: Arithmetic {tests/builtins/long_init2.c:34}) }}
+  garbled_mix ∈ {{ "abc" }}
   s ∈ {{ "abc" }}
   another_global ∈ {42}
   pr ∈ {0}
@@ -325,7 +321,6 @@ Values at end of function main:
   Call to builtin Frama_C_load_state for function init_inner
 [eva] Skipping call to init_inner, loading globals state from file:
   tests/builtins/result/Longinit_sequencer.sav
-[eva] Warning: importing garbled mix, locations may have changed
 [eva] Warning: variable `r' is not global, possibly an escaping value; ignoring
 [eva] Warning: variable `r2' is not global, possibly an escaping value; ignoring
 [eva] Warning: variable `r2' is not global, possibly an escaping value; ignoring
@@ -371,9 +366,7 @@ Values at end of function main:
        .d[7] ∈ {21.875}
        .d[8] ∈ {25.}
        .d[9] ∈ {28.125}
-  garbled_mix ∈
-             {{ garbled mix of &{"abc"}
-              (origin: Arithmetic {tests/builtins/long_init.c:34}) }}
+  garbled_mix ∈ {{ "abc" }}
   s ∈ {{ "abc" }}
   another_global ∈ {42}
   pr ∈ ESCAPINGADDR
@@ -446,6 +439,8 @@ Values at end of function main:
 [eva] tests/builtins/long_init2.c:104: allocating variable __malloc_main_l104
 [eva] Recording results for main
 [eva] done for function main
+[eva] tests/builtins/long_init2.c:34: 
+  cannot evaluate ACSL term, unsupported ACSL construct: constant strings
 [eva] Saving globals state after call to function: init_outer
 
 
@@ -539,17 +534,14 @@ Values at end of function main:
   __retres ∈ {0}[kernel] Parsing tests/builtins/long_init3.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
-[eva] tests/builtins/long_init3.c:34: 
-  Assigning imprecise value to garbled_mix.
-  The imprecision originates from Arithmetic {tests/builtins/long_init3.c:34}
+[eva:alarm] tests/builtins/long_init3.c:34: Warning: 
+  pointer downcast. assert (unsigned int)"abc" ≤ 127;
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
   a1[0..9] ∈ {0}
   stuff ∈ {0}
-  garbled_mix ∈
-             {{ garbled mix of &{"abc"}
-              (origin: Arithmetic {tests/builtins/long_init3.c:34}) }}
+  garbled_mix ∈ {{ "abc" }}
   s ∈ {{ "abc" }}
   another_global ∈ {42}
   yet_another_global ∈ {43}
@@ -566,7 +558,6 @@ Values at end of function main:
   Call to builtin Frama_C_load_state for function init_outer
 [eva] Skipping call to init_outer, loading globals state from file:
   tests/builtins/result/Longinit_sequencer.sav
-[eva] Warning: importing garbled mix, locations may have changed
 [eva] Warning: found new global variable `yet_another_global'
 [eva] tests/builtins/long_init3.c:92: 
   Frama_C_dump_each:
@@ -607,9 +598,7 @@ Values at end of function main:
        .d[7] ∈ {21.875}
        .d[8] ∈ {25.}
        .d[9] ∈ {28.125}
-  garbled_mix ∈
-             {{ garbled mix of &{"abc"}
-              (origin: Arithmetic {tests/builtins/long_init.c:34}) }}
+  garbled_mix ∈ {{ "abc" }}
   s ∈ {{ "abc" }}
   another_global ∈ {42}
   yet_another_global ∈ {43}
@@ -683,6 +672,8 @@ Values at end of function main:
 [eva] tests/builtins/long_init3.c:104: allocating variable __malloc_main_l104
 [eva] Recording results for main
 [eva] done for function main
+[eva] tests/builtins/long_init3.c:34: 
+  cannot evaluate ACSL term, unsupported ACSL construct: constant strings
 
 
 Values at end of function dmin:

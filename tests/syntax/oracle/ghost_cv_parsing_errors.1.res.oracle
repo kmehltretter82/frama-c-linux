@@ -1,0 +1,11 @@
+[kernel] Parsing tests/syntax/ghost_cv_parsing_errors.c (with preprocessing)
+[kernel] tests/syntax/ghost_cv_parsing_errors.c:19: 
+  Use of \ghost out of ghost code:
+  Location: line 19, between columns 0 and 4, before or at token: \ghost
+  17    #ifdef IN_DECL
+  18    
+  19    int \ghost global ;
+        ^^^^^^^^^^^^^^^^^^^
+  20    
+  21    #endif
+[kernel] Frama-C aborted: invalid user input.

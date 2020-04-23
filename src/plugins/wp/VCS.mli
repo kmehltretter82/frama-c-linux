@@ -80,7 +80,6 @@ type verdict =
   | Timeout
   | Stepout
   | Computing of (unit -> unit) (* kill function *)
-  | Checked
   | Valid
   | Failed
 
@@ -96,7 +95,6 @@ type result = {
 
 val no_result : result
 val valid : result
-val checked : result
 val invalid : result
 val unknown : result
 val stepout : int -> result
@@ -114,6 +112,7 @@ val is_valid: result -> bool
 val is_computing: result -> bool
 val is_proved: smoke:bool -> result -> bool
 
+val smoked : verdict -> verdict
 val verdict: smoke:bool -> result -> verdict
 
 val configure : result -> config

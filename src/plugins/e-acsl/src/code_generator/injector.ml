@@ -268,19 +268,6 @@ let add_new_block_in_stmt env kf stmt =
       let b, env =
         Env.pop_and_get env new_stmt ~global_clear:true Env.After
       in
-      if Kernel_function.is_main kf && Mmodel_analysis.use_model () then begin
-        let stmts = b.bstmts in
-        let l = List.rev stmts in
-        match l with
-        | [] -> assert false (* at least the 'return' stmt *)
-        | ret :: l ->
-          let loc = Stmt.loc stmt in
-          let delete_stmts =
-            Global_observer.mk_delete_stmts
-              [ Constructor.mk_rtl_call ~loc "memory_clean" []; ret ]
-          in
-          b.bstmts <- List.rev l @ delete_stmts
-      end;
       let new_stmt = Constructor.mk_block stmt b in
       if not (Cil_datatype.Stmt.equal stmt new_stmt) then begin
         (* move the labels of the return to the new block in order to
@@ -328,6 +315,40 @@ let add_new_block_in_stmt env kf stmt =
   Options.debug ~level:4
     "@[new stmt (from sid %d):@ %a@]" stmt.sid Printer.pp_stmt new_stmt;
   new_stmt, env
+
+(** In the block [outer_block] in the function [kf], this function finds the
+    innermost last statement and insert the list of statements returned by
+    [last_stmts].
+    The function [last_stmts] receives an optional argument [?return_stmt] with
+    the innermost return statement if it exists. In that case the function needs
+    to return this statement as the last statement. *)
+let insert_as_last_stmts_in_innermost_block ~last_stmts kf outer_block =
+  (* Retrieve the last innermost block *)
+  let rec retrieve_innermost_last_return block =
+    let l = List.rev block.bstmts in
+    match l with
+    | [] -> block, [], None
+    | { skind = Return _ } as ret :: rest -> block, rest, Some ret
+    | { skind = Block b } :: _ -> retrieve_innermost_last_return b
+    | _ :: _ -> block, l, None
+  in
+  let inner_block, rev_content, return_stmt =
+    retrieve_innermost_last_return outer_block
+  in
+  (* Create the statements to insert *)
+  let new_stmts = last_stmts ?return_stmt () in
+  (* Move the labels from the return stmt to the stmts to insert *)
+  let new_stmts =
+    match return_stmt with
+    | Some return_stmt ->
+      let b = Cil.mkBlock new_stmts in
+      let new_stmt = Constructor.mk_block return_stmt b in
+      E_acsl_label.move kf return_stmt new_stmt;
+      [ new_stmt ]
+    | None -> new_stmts
+  in
+  (* Insert the statements as the last statements of the innermost block *)
+  inner_block.bstmts <- List.rev_append rev_content new_stmts
 
 (* visit the substmts and build the new skind *)
 let rec inject_in_substmt env kf stmt = match stmt.skind with
@@ -481,7 +502,21 @@ and inject_in_block (env: Env.t) kf blk =
   | [], _ :: _ | _ :: _, [] | _ :: _, _ :: _ ->
     (* [TODO] this piece of code could be improved *)
     (* de-allocate the memory blocks observing locals *)
-    let add_locals stmts =
+    let last_stmts ?return_stmt () =
+      let stmts =
+        match return_stmt with
+        | Some return_stmt ->
+          (* now that [free] stmts for [kf] have been inserted,
+             there is no more need to keep the corresponding entries in the
+             table managing them. *)
+          At_with_lscope.Free.remove_all kf;
+          (* The free statements are passed in the same order than the malloc
+             ones. In order to free the variable in the reverse order, the list
+             is reversed before appending the return statement. Moreover,
+             `rev_append` is tail recursive contrary to `append` *)
+          List.rev_append free_stmts [ return_stmt ]
+        | None -> []
+      in
       if Functions.instrument kf then
         List.fold_left
           (fun acc vi ->
@@ -494,28 +529,8 @@ and inject_in_block (env: Env.t) kf blk =
         stmts
     in
     (* select the precise location to inject these pieces of code *)
-    let rec insert_in_innermost_last_block blk = function
-      | { skind = Return _ } as ret :: ((potential_clean :: tl) as l) ->
-        (* keep the return (enclosed in a generated block) at the end;
-           preceded by clean if any *)
-        let init, tl =
-          if Kernel_function.is_main kf && Mmodel_analysis.use_model () then
-            free_stmts @ [ potential_clean; ret ], tl
-          else
-            free_stmts @ [ ret ], l
-        in
-        (* now that [free] stmts for [kf] have been inserted,
-           there is no more need to keep the corresponding entries in the
-           table managing them. *)
-        At_with_lscope.Free.remove_all kf;
-        blk.bstmts <-
-          List.fold_left (fun acc v -> v :: acc) (add_locals init) tl
-      | { skind = Block b } :: _ ->
-        insert_in_innermost_last_block b (List.rev b.bstmts)
-      | l ->
-        blk.bstmts <- List.fold_left (fun acc v -> v :: acc) (add_locals []) l
-    in
-    insert_in_innermost_last_block blk (List.rev blk.bstmts);
+    insert_as_last_stmts_in_innermost_block ~last_stmts kf blk ;
+    (* allocate the memory blocks observing locals *)
     if Functions.instrument kf then
       blk.bstmts <-
         List.fold_left
@@ -568,9 +583,13 @@ let inject_in_fundec main fundec =
   let kf = try Globals.Functions.get vi with Not_found -> assert false in
   (* convert ghost variables *)
   vi.vghost <- false;
-  List.iter (fun vi -> vi.vghost <- false) fundec.slocals;
+  let unghost_local vi =
+    Cil.update_var_type vi (Cil.typeRemoveAttributesDeep ["ghost"] vi.vtype);
+    vi.vghost <- false
+  in
+  List.iter unghost_local fundec.slocals;
   let unghost_formal vi =
-    vi.vghost <- false ;
+    unghost_local vi ;
     vi.vattr <- Cil.dropAttribute Cil.frama_c_ghost_formal vi.vattr
   in
   List.iter unghost_formal fundec.sformals;
@@ -589,7 +608,7 @@ let inject_in_fundec main fundec =
   add_generated_variables_in_function env fundec;
   add_malloc_and_free_stmts kf fundec;
   (* setting main if necessary *)
-  let main = if Kernel_function.is_main kf then Some fundec else main in
+  let main = if Kernel_function.is_main kf then Some kf else main in
   Options.feedback ~dkey ~level:2 "function %a done."
     Kernel_function.pretty kf;
   env, main
@@ -602,11 +621,12 @@ let unghost_vi vi =
   (* do not convert extern ghost variables, because they can't be linked,
      see bts #1392 *)
   if vi.vstorage <> Extern then vi.vghost <- false;
+  Cil.update_var_type vi (Cil.typeRemoveAttributesDeep ["ghost"] vi.vtype);
   match Cil.unrollType vi.vtype with
   | TFun(res, Some l, va, attr) ->
     (* unghostify function's parameters *)
     let retype (n, t, a) = n, t, Cil.dropAttribute Cil.frama_c_ghost_formal a in
-    vi.vtype <- TFun(res, Some (List.map retype l), va, attr)
+    Cil.update_var_type vi (TFun(res, Some (List.map retype l), va, attr))
   | _ ->
     ()
 
@@ -665,38 +685,90 @@ let inject_in_global (env, main) = function
     ->
     env, main
 
+(* Insert [stmt_begin] as the first statement of [fundec] and insert [stmt_end] as
+   the last before [return] *)
+let surround_function_with kf fundec stmt_begin stmt_end =
+  let body = fundec.sbody in
+  (* Insert last statement *)
+  Extlib.may
+    (fun stmt_end ->
+       let last_stmts ?return_stmt () =
+         match return_stmt with
+         | Some return_stmt -> [ stmt_end; return_stmt ]
+         | None -> [ stmt_end]
+       in
+       insert_as_last_stmts_in_innermost_block ~last_stmts kf body)
+    stmt_end;
+  (* Insert first statement *)
+  body.bstmts <- stmt_begin :: body.bstmts
+
 (* TODO: what about using [file.globalinit]? *)
-let inject_global_initializer file main =
-  Options.feedback ~dkey ~level:2 "building global initializer.";
-  let vi, fundec = Global_observer.mk_init_function () in
-  let cil_fct = GFun(fundec, Location.unknown) in
-  if Mmodel_analysis.use_model () then begin
+(** Add a call to [__e_acsl_globals_init] and [__e_acsl_globals_delete] if the
+    memory model analysis is running.
+    These functions track the usage of globals if the program being analyzed. *)
+let inject_global_handler file main =
+  Options.feedback ~dkey ~level:2 "building global handler.";
+  if Mmodel_analysis.use_model () then
+    (* Create [__e_acsl_globals_init] function *)
+    let vi_init, fundec_init = Global_observer.mk_init_function () in
+    let cil_fct_init = GFun(fundec_init, Location.unknown) in
+    (* Create [__e_acsl_globals_delete] function *)
+    let vi_delete, fundec_delete = Global_observer.mk_delete_function () in
+    let cil_fct_delete = GFun(fundec_delete, Location.unknown) in
     match main with
     | Some main ->
-      let exp = Cil.evar ~loc:Location.unknown vi in
-      (* Create [__e_acsl_globals_init();] call *)
-      let stmt =
-        Cil.mkStmtOneInstr ~valid_sid:true
-          (Call(None, exp, [], Location.unknown))
+      let mk_fct_call vi =
+        let exp = Cil.evar ~loc:Location.unknown vi in
+        let stmt =
+          Cil.mkStmtOneInstr ~valid_sid:true
+            (Call(None, exp, [], Location.unknown))
+        in
+        vi.vreferenced <- true;
+        stmt
       in
-      vi.vreferenced <- true;
-      (* insert [__e_acsl_globals_init ();] as first statement of [main] *)
-      main.sbody.bstmts <- stmt :: main.sbody.bstmts;
+      let main_fundec =
+        try Kernel_function.get_definition main
+        with _ -> assert false (* by construction, the main kf has a fundec *)
+      in
+      (* Create [__e_acsl_globals_init();] call *)
+      let stmt_init = mk_fct_call vi_init in
+      (* Create [__e_acsl_globals_delete();] call *)
+      let stmt_delete =
+        match fundec_delete.sbody.bstmts with
+        | [] -> None
+        | _ -> Some (mk_fct_call vi_delete)
+      in
+      (* Surround the content of main with the calls to
+         [__e_acsl_globals_init();] and [__e_acsl_globals_delete();] *)
+      surround_function_with main main_fundec stmt_init stmt_delete;
+      (* Retrieve all globals except main *)
+      let main_vi = Globals.Functions.get_vi main in
       let new_globals =
         List.fold_left
           (fun acc g -> match g with
-             | GFun({ svar = vi }, _) when Varinfo.equal vi main.svar -> acc
+             | GFun({ svar = vi }, _) when Varinfo.equal vi main_vi -> acc
              | _ -> g :: acc)
           []
           file.globals
       in
+      (* Add the globals functions and re-add main at the end *)
       let new_globals =
         let rec rev_and_extend acc = function
           | [] -> acc
           | f :: l -> rev_and_extend (f :: acc) l
         in
-        (* [__e_acsl_globals_init] and [main] at the end *)
-        rev_and_extend [ cil_fct; GFun(main, Location.unknown) ] new_globals
+        (* [main] at the end *)
+        let globals_to_add = [ GFun(main_fundec, Location.unknown) ] in
+        (* Prepend [__e_acsl_globals_delete] if not empty *)
+        let globals_to_add =
+          match fundec_delete.sbody.bstmts with
+          | [] -> globals_to_add
+          | _ -> cil_fct_delete :: globals_to_add
+        in
+        (* Prepend [__e_acsl_globals_init] *)
+        let globals_to_add = cil_fct_init :: globals_to_add in
+        (* Add these functions to the globals *)
+        rev_and_extend globals_to_add new_globals
       in
       (* add the literal string varinfos as the very first globals *)
       let new_globals =
@@ -707,41 +779,60 @@ let inject_global_initializer file main =
       file.globals <- new_globals
     | None ->
       Kernel.warning "@[no entry point specified:@ \
-                      you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
-        Global_observer.function_name;
-      file.globals <- file.globals @ [ cil_fct ]
-  end
+                      you must call functions `%s', `%s', \
+                      `__e_acsl_memory_init' and `__e_acsl_memory_clean' \
+                      by yourself.@]"
+        Global_observer.function_init_name
+        Global_observer.function_delete_name;
+      let globals_func =
+        match fundec_delete.sbody.bstmts with
+        | [] -> [ cil_fct_init ]
+        | _ -> [ cil_fct_init; cil_fct_delete ]
+      in
+      file.globals <- file.globals @ globals_func
 
-(* Add a call to [__e_acsl_memory_init] that initializes memory storage and
-   potentially records program arguments. Parameters to [__e_acsl_memory_init]
-   are addresses of program arguments or NULLs if [main] is declared without
-   arguments. *)
-let inject_mmodel_initializer main =
-  let loc = Location.unknown in
-  let nulls = [ Cil.zero loc ; Cil.zero loc ] in
-  let handle_main main =
-    let args =
-      (* record arguments only if the second has a pointer type, so argument
-         strings can be recorded. This is sufficient to capture C99 compliant
-         arguments and GCC extensions with environ. *)
-      match main.sformals with
-      | [] ->
-        (* no arguments to main given *)
-        nulls
-      | _argc :: argv :: _ when Cil.isPointerType argv.vtype ->
-        (* grab addresses of arguments for a call to the main initialization
-           function, i.e., [__e_acsl_memory_init] *)
-        List.map Cil.mkAddrOfVi main.sformals;
-      | _ :: _ ->
-        (* some non-standard arguments. *)
-        nulls
+(** Add a call to [__e_acsl_memory_init] and [__e_acsl_memory_clean] if the
+    memory model analysis is running.
+    [__e_acsl_memory_init] initializes memory storage and potentially records
+    program arguments. Parameters to [__e_acsl_memory_init] are addresses of
+    program arguments or NULLs if [main] is declared without arguments.
+    [__e_acsl_memory_clean] clean the memory allocated by
+    [__e_acsl_memory_init]. *)
+let inject_mmodel_handler main =
+  (* Only inject memory init and memory clean if the memory model analysis is
+     running *)
+  if Mmodel_analysis.use_model () then begin
+    let loc = Location.unknown in
+    let nulls = [ Cil.zero loc ; Cil.zero loc ] in
+    let handle_main main =
+      let fundec =
+        try Kernel_function.get_definition main
+        with _ -> assert false (* by construction, the main kf has a fundec *)
+      in
+      let args =
+        (* record arguments only if the second has a pointer type, so argument
+           strings can be recorded. This is sufficient to capture C99 compliant
+           arguments and GCC extensions with environ. *)
+        match fundec.sformals with
+        | [] ->
+          (* no arguments to main given *)
+          nulls
+        | _argc :: argv :: _ when Cil.isPointerType argv.vtype ->
+          (* grab addresses of arguments for a call to the main initialization
+             function, i.e., [__e_acsl_memory_init] *)
+          List.map Cil.mkAddrOfVi fundec.sformals;
+        | _ :: _ ->
+          (* some non-standard arguments. *)
+          nulls
+      in
+      let ptr_size = Cil.sizeOf loc Cil.voidPtrType in
+      let args = args @ [ ptr_size ] in
+      let init = Constructor.mk_rtl_call loc "memory_init" args in
+      let clean = Constructor.mk_rtl_call loc "memory_clean" [] in
+      surround_function_with main fundec init (Some clean)
     in
-    let ptr_size = Cil.sizeOf loc Cil.voidPtrType in
-    let args = args @ [ ptr_size ] in
-    let init = Constructor.mk_rtl_call loc "memory_init" args in
-    main.sbody.bstmts <- init :: main.sbody.bstmts
-  in
-  Extlib.may handle_main main
+    Extlib.may handle_main main
+  end
 
 let inject_in_file file =
   let _env, main =
@@ -750,9 +841,9 @@ let inject_in_file file =
   (* post-treatment *)
   (* extend [main] with forward initialization and put it at end *)
   if not (Global_observer.is_empty () && Literal_strings.is_empty ()) then
-    inject_global_initializer file main;
+    inject_global_handler file main;
   file.globals <- Logic_functions.add_generated_functions file.globals;
-  inject_mmodel_initializer main
+  inject_mmodel_handler main
 
 let reset_all ast =
   (* by default, do not run E-ACSL on the generated code *)

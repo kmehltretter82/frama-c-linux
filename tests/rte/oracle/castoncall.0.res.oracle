@@ -16,6 +16,8 @@ void *nondet_ptr(void *a, void *b)
 {
   void *__retres;
   int tmp;
+  /*@ assert rte: pointer_downcast: (unsigned int)a ≤ 2147483647; */
+  /*@ assert rte: pointer_downcast: (unsigned int)b ≤ 2147483647; */
   tmp = nondet((int)a,(int)b);
   __retres = (void *)tmp;
   return __retres;

@@ -1,0 +1,10 @@
+{
+  "quickstart":  { "order": 1, "title": "Quick Start" },
+  "application": { "order": 2, "title": "Application Design" },
+  "development": { "order": 3, "title": "Application Development" },
+  "hooks":       { "order": 4, "title": "Custom React Hooks" },
+  "hotreload":   { "order": 5, "title": "Live Editing" },
+  "styling":     { "order": 7, "title": "Styling Components" },
+  "icons":       { "order": 8, "title": "Icon Gallery" },
+  "glossary":    { "order": 9, "title": "Glossary" }
+}

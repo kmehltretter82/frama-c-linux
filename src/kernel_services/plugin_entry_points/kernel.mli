@@ -132,6 +132,10 @@ val dkey_visitor: category
 val wkey_annot_error: warn_category
 (** error in annotation. If only a warning, annotation will just be ignored. *)
 
+val wkey_ghost_already_ghost: warn_category
+(** ghost element is qualified with \ghost while this is already the case
+    by default *)
+
 val wkey_ghost_bad_use: warn_category
 (** error in ghost code *)
 
@@ -378,6 +382,9 @@ module CppCommand: Parameter_sig.String
 module CppExtraArgs: Parameter_sig.String_list
 (** Behavior of option "-cpp-extra-args" *)
 
+module CppExtraArgsPerFile: Parameter_sig.Filepath_map with type value = string
+(** Behavior of option "-cpp-extra-args-per-file" *)
+
 module CppGnuLike: Parameter_sig.Bool
 (** Behavior of option "-cpp-frama-c-compliant" *)
 
@@ -533,11 +540,17 @@ module SignedDowncast: Parameter_sig.Bool
 module UnsignedDowncast: Parameter_sig.Bool
 (** Behavior of option "-warn-unsigned-downcast" *)
 
+module PointerDowncast: Parameter_sig.Bool
+(** Behavior of option "-warn-pointer-downcast" *)
+
 module SpecialFloat: Parameter_sig.String
 (** Behavior of option "-warn-special-float" *)
 
 module InvalidBool: Parameter_sig.Bool
 (** Behavior of option "-warn-invalid-bool" *)
+
+module InvalidPointer: Parameter_sig.Bool
+(** Behavior of option "-warn-invalid-pointer" *)
 
 module AbsoluteValidRange: Parameter_sig.String
 (** Behavior of option "-absolute-valid-range" *)

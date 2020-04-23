@@ -154,7 +154,7 @@ let println dot msg =
   Format.kfprintf (fun fmt -> Format.pp_print_newline fmt ()) dot.fmt msg
 
 let push dot f = Queue.push f dot.queue
-let pop_all dot =
+let run dot =
   while not (Queue.is_empty dot.queue) do
     (Queue.pop dot.queue) ()
   done
@@ -342,6 +342,7 @@ struct
       let node = Printf.sprintf "%s%03d" prefix k in
       index := M.add a node !index ; !once a node ; node
 
+  let add a = ignore (get a)
   let node dot a attr = node dot (get a) attr
   let inode dot a attr = inode dot ~id:(get a) attr
 
@@ -353,9 +354,8 @@ struct
 
   let prefix p = prefix := Some p
 
-  let once f = once := f
-  let push dot f = once (fun a n -> push dot (fun () -> f a n))
-  let clear () = index := M.empty ; kid := 0 ; once skip
+  let define dot f = once := fun a n -> push dot (fun () -> f a n)
+  let clear () = index := M.empty ; kid := 0 ; once := skip
 end
 
 (* -------------------------------------------------------------------------- *)

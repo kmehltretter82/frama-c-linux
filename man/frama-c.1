@@ -25,7 +25,7 @@
 .\" using pandoc 2.0 or newer. To modify this file, edit the Markdown file
 .\" and run `make man/frama-c.1`.
 
-.TH FRAMA-C 1 2019-07-29
+.TH FRAMA-C 1 2020-04-02
 .SH NAME
 .PP
 frama\-c[.byte] \- a static analyzer for C programs
@@ -259,6 +259,12 @@ pre\-processed.
 \f[I]args\f[] are used only for the first pass, so that arguments that
 should not be used twice (such as additional include directives or macro
 definitions) must thus go there instead of \f[B]\-cpp\-command\f[].
+.RS
+.RE
+.TP
+.B \-cpp\-extra\-args\-per\-file \f[I]file1:args1,\&...,filen:argsn\f[]
+like \f[B]\-cpp\-extra\-args\f[], but the arguments only apply to the
+specified files.
 .RS
 .RE
 .TP
@@ -731,6 +737,12 @@ parser:decimal\-float=once\f[] (and variants) instead.
 .RS
 .RE
 .TP
+.B [\-no]\-warn\-invalid\-pointer
+generate alarms for invalid pointer arithmetic.
+Defaults to no.
+.RS
+.RE
+.TP
 .B [\-no]\-warn\-left\-shift\-negative
 generate alarms for signed left shifts on negative values.
 Defaults to yes.
@@ -740,6 +752,13 @@ Defaults to yes.
 .B [\-no]\-warn\-right\-shift\-negative
 generate alarms for signed right shifts on negative values.
 Defaults to no.
+.RS
+.RE
+.TP
+.B [\-no]\-warn\-pointer\-downcast
+generates alarms when the downcast of a pointer may exceed the
+destination range.
+Defaults to yes.
 .RS
 .RE
 .TP

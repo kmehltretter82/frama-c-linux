@@ -243,7 +243,8 @@
 %token INT INTEGER REAL BOOLEAN BOOL FLOAT LT GT LE GE EQ NE COMMA ARROW EQUAL
 %token FORALL EXISTS IFF IMPLIES AND OR NOT SEPARATED
 %token TRUE FALSE OLD AT RESULT
-%token BLOCK_LENGTH BASE_ADDR OFFSET VALID VALID_READ VALID_INDEX VALID_RANGE VALID_FUNCTION
+%token BLOCK_LENGTH BASE_ADDR OFFSET VALID VALID_READ VALID_INDEX VALID_RANGE
+%token OBJECT_POINTER VALID_FUNCTION
 %token ALLOCATION STATIC REGISTER AUTOMATIC DYNAMIC UNALLOCATED
 %token ALLOCABLE FREEABLE FRESH
 %token DOLLAR QUESTION MINUS PLUS STAR AMP SLASH PERCENT LSQUARE RSQUARE EOF
@@ -456,6 +457,7 @@ lexpr_inner:
 | NOT lexpr_inner { info (PLnot $2) }
 | TRUE { info PLtrue }
 | FALSE { info PLfalse }
+| OBJECT_POINTER opt_label_1 LPAR lexpr RPAR { info (PLobject_pointer ($2,$4)) }
 | VALID opt_label_1 LPAR lexpr RPAR { info (PLvalid ($2,$4)) }
 | VALID_READ opt_label_1 LPAR lexpr RPAR { info (PLvalid_read ($2,$4)) }
 | VALID_FUNCTION LPAR lexpr RPAR { info (PLvalid_function $3) }
@@ -720,9 +722,12 @@ cv:
 ;
 
 type_spec_cv:
-     type_spec { $1 }
+     type_spec cv_after { $2 $1 }
 |    cv type_spec_cv { LTattribute ($2, $1) }
-|    type_spec_cv cv { LTattribute ($1, $2) }
+
+cv_after:
+  /* empty */ { fun t -> t }
+| cv cv_after { fun t -> $2 (LTattribute (t,$1)) }
 
 cast_logic_type:
  | type_spec_cv abs_spec_cv_option { $2 $1 }
@@ -1932,6 +1937,7 @@ bs_keyword:
 | TYPEOF { () }
 | BSUNION { () }
 | UNALLOCATED { () }
+| OBJECT_POINTER { () }
 | VALID { () }
 | VALID_INDEX { () }
 | VALID_RANGE { () }

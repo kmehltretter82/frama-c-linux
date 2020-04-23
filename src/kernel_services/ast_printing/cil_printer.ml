@@ -54,6 +54,20 @@ module Extensions = struct
 end
 let set_extension_handler = Extensions.set_handler
 
+(* for specific builtin functions that act as placeholder for C macros.
+   For each name f below, pretty-printer will replace f and &f with the
+   corresponding name. Be sure to keep the list in sync with share/libc.
+*)
+let rename_builtins = Datatype.String.Hashtbl.create 17
+
+let () =
+  List.iter (fun (x,y) -> Datatype.String.Hashtbl.add rename_builtins x y)
+    [
+      "__fc_sig_dfl", "SIG_DFL";
+      "__fc_sig_ign", "SIG_IGN";
+      "__fc_sig_err", "SIG_ERR";
+    ]
+
 (* Deprecated functions *)
 let set_deprecated_extension_handler = Extensions.set_deprecated_handler
 
@@ -231,6 +245,7 @@ module Precedence = struct
     | Pfreeable _
     | Pvalid _
     | Pvalid_read _
+    | Pobject_pointer _
     | Pvalid_function _
     | Pinitialized _
     | Pdangling _
@@ -641,7 +656,15 @@ class cil_printer () = object (self)
     | CEnum {einame = s} -> self#varname fmt s
 
   (*** VARIABLES ***)
-  method varname fmt v = pp_print_string fmt v
+  method varname fmt v =
+    let v =
+      if not state.print_cil_as_is &&
+         Datatype.String.Hashtbl.mem rename_builtins v
+      then
+        Datatype.String.Hashtbl.find rename_builtins v
+      else v
+    in
+    pp_print_string fmt v
 
   (* variable use *)
   method varinfo fmt v =
@@ -655,10 +678,18 @@ class cil_printer () = object (self)
     end;
     self#varname fmt v.vname
 
+  method private no_ghost_at_first_level = function
+    | TArray(t, e, b, a) ->
+      let t = Cil.typeRemoveAttributes [ "ghost" ] t in
+      let a = Cil.dropAttribute "ghost" a in
+      TArray (t, e, b, a)
+    | t -> Cil.typeRemoveAttributes [ "ghost" ] t
+
   (* variable declaration *)
   method vdecl fmt (v:varinfo) =
     let stom, rest = Cil.separateStorageModifiers v.vattr in
     let fundecl = if Cil.isFunctionType v.vtype then Some v else None in
+    let v = { v with vtype = self#no_ghost_at_first_level v.vtype } in
     (* First the storage modifiers *)
     fprintf fmt "%s%a%a%s%a%a"
       (if v.vinline then "__inline " else "")
@@ -754,6 +785,9 @@ class cil_printer () = object (self)
        Neither cookie nor keyword for you. *)
     | AlignOf t -> fprintf fmt "__alignof__(%a)" (self#typ None) t
     | AlignOfE e -> fprintf fmt "__alignof__(%a)" self#exp_non_decay e
+    | AddrOf ((Var v, NoOffset))
+      when Datatype.String.Hashtbl.mem rename_builtins v.vname ->
+      self#varinfo fmt v
     | AddrOf lv -> fprintf fmt "& %a" (self#lval_prec Precedence.addrOfLevel) lv
     | StartOf(lv) ->
       if state.print_cil_as_is || non_decay then
@@ -1038,6 +1072,23 @@ class cil_printer () = object (self)
         "__builtin_types_compatible_p: cabs2cil should have added sizeof to \
          the arguments."
 
+    | Call(dest, {enode = Lval (Var vi, NoOffset)}, [ arg ], (l, _))
+      when vi.vname = "__builtin_offsetof"
+        && not state.print_cil_as_is ->
+      begin
+        match arg.enode with
+        | CastE (_, { enode = AddrOf (host, offset) }) ->
+          (* Print the destination *)
+          Extlib.may (fprintf fmt "%a = " self#lval) dest;
+          (* Now the call itself *)
+          fprintf fmt "%a(%a, %a)%s"
+            self#varname "offsetof"
+            (self#typ None) (Cil.typeOfLhost host)
+            self#offset offset
+            instr_terminator
+        | _ -> Kernel.fatal ~source:l "__builtin_offsetof: invalid argument."
+      end
+
     | Call(dest,e,args,_) -> pp_call dest e fmt args
 
     | Asm(attrs, tmpls, ext_asm, l) ->
@@ -1172,6 +1223,9 @@ class cil_printer () = object (self)
 
   method annotated_stmt (next: stmt) fmt (s: stmt) =
     pp_open_hvbox fmt 0;
+    if Kernel.is_debug_key_enabled Kernel.dkey_print_sid then begin
+      Format.fprintf fmt "/* sid:%d */@\n" s.sid;
+    end;
     (* print the statement. *)
     if Cil.is_skip s.skind && not s.ghost && s.sattr = [] then begin
       if verbose || s.labels <> [] then begin
@@ -1961,6 +2015,7 @@ class cil_printer () = object (self)
         | None ->
           let pp_args fmt (aname,atype,aattr) =
             (* The storage modifiers come first *)
+            let atype = self#no_ghost_at_first_level atype in
             let stom, rest = Cil.separateStorageModifiers aattr in
             fprintf fmt "%a%a%a"
               self#attributes stom
@@ -2003,6 +2058,7 @@ class cil_printer () = object (self)
        | "aconst", [] when not (Cil.msvcMode ()) -> fprintf fmt "__const__"; true
        | "thread", [] when not (Cil.msvcMode ()) -> fprintf fmt "__thread"; false
        | "volatile", [] -> self#pp_keyword fmt "volatile"; false
+       | "ghost", [] -> self#pp_keyword fmt "\\ghost"; false
        | "restrict", [] -> fprintf fmt "__restrict"; false
        | "missingproto", [] ->
          if self#display_comment () then fprintf fmt "/* missing proto */";
@@ -2376,7 +2432,14 @@ class cil_printer () = object (self)
     | TBinOp (op,l,r) ->
       fprintf fmt "@[%a@ %a@ %a@]" term l self#term_binop op term r
     | TCastE (ty,e) ->
-      fprintf fmt "(%a)%a" (self#typ None) ty term e
+      begin match ty, t.term_node with
+        | TFloat(fk,_) , TConst(LReal r as cst) when
+            not Kernel.(is_debug_key_enabled dkey_print_logic_coercions) &&
+            Floating_point.has_suffix fk r.r_literal ->
+          self#logic_constant fmt cst
+        | _ ->
+          fprintf fmt "(%a)%a" (self#typ None) ty term e
+      end
     | TAddrOf lv ->
       fprintf fmt "&%a" (self#term_lval_prec Precedence.addrOfLevel) lv
     | TStartOf lv -> fprintf fmt "(%a)%a"
@@ -2713,6 +2776,10 @@ class cil_printer () = object (self)
     | Pvalid_read (l,p) ->
       fprintf fmt "@[%a%a(@[%a@])@]"
         self#pp_acsl_keyword "\\valid_read"
+        self#labels [l] self#term p
+    | Pobject_pointer (l,p) ->
+      fprintf fmt "@[%a%a(@[%a@])@]"
+        self#pp_acsl_keyword "\\object_pointer"
         self#labels [l] self#term p
     | Pvalid_function p ->
       fprintf fmt "@[%a(@[%a@])@]"

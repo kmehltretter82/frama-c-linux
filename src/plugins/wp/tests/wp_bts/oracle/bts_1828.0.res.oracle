@@ -63,7 +63,7 @@ Assume {
   (* Pre-condition *)
   Have: valid_rw(Malloc_0, one_0, 1).
 }
-Prove: global(L_two_22) != one_0.
+Prove: global(L_two_24) != one_0.
 
 ------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'global_frame':

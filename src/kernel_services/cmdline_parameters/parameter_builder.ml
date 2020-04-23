@@ -1418,6 +1418,30 @@ struct
       (V)
       (struct include X let dependencies = [] end)
 
+  module Filepath_map
+      (V: Parameter_sig.Value_datatype with type key = Fc_Filepath.Normalized.t)
+      (X: sig
+         include Parameter_sig.Input_with_arg
+         val existence: Fc_Filepath.existence
+         val default: V.t Datatype.Filepath.Map.t
+       end) =
+    Make_map
+      (struct
+        include Datatype.Filepath
+        let of_string s =
+          try
+            Fc_Filepath.Normalized.of_string ~existence:X.existence s
+          with
+          | Fc_Filepath.No_file ->
+            P.L.abort "file '%s' not found" s
+          | Fc_Filepath.File_exists ->
+            P.L.abort "file '%s' already exists" s
+        let to_string = Fc_Filepath.Normalized.to_pretty_string
+        let of_singleton_string = no_element_of_string
+      end)
+      (V)
+      (struct include X let dependencies = [] end)
+
   module Kernel_function_map
       (V: Parameter_sig.Value_datatype with type key = kernel_function)
       (X: sig
@@ -1553,31 +1577,37 @@ struct
                Text in the value returned by full_split *)
             assert false
         in
+        let apply_to_previous_pairing k f =
+          let keys = k_of_singleton_string k in
+          let key = ref None in
+          let prev =
+            try
+              K.Set.iter
+                (fun k ->
+                   key := Some k;
+                   (* choose any previous value, whatever it is:
+                      don't know which clear semantics one would like *)
+                   try raise (Found (!find_ref k)) with Not_found -> ())
+                keys;
+              None
+            with Found v ->
+              Some v
+          in
+          match !key with
+          | None -> K.Set.empty, []
+          | Some key -> keys, f ~key ~prev
+        in
+        let get_pairing k v l =
+          apply_to_previous_pairing k (parse_values k [] v l)
+        in
         fun s ->
           let (keys, values) =
-            let get_pairing k v l =
-              let keys = k_of_singleton_string k in
-              let key = ref None in
-              let prev =
-                try
-                  K.Set.iter
-                    (fun k ->
-                       key := Some k;
-                       (* choose any previous value, whatever it is:
-                          don't know which clear semantics one would like *)
-                       try raise (Found (!find_ref k)) with Not_found -> ())
-                    keys;
-                  None
-                with Found v ->
-                  Some v
-              in
-              match !key with
-              | None -> K.Set.empty, []
-              | Some key -> keys, parse_values ~key k ~prev [] v l
-            in
             match Str.full_split r s with
             | [] -> cannot_build ("cannot interpret '" ^ s ^ "'")
-            | [Str.Text t] -> k_of_singleton_string t, []
+            | [Str.Text t] ->
+              apply_to_previous_pairing t
+                (fun ~key ~prev ->
+                   remove_none_and_rev [of_val ~key t ~prev None])
             | Str.Delim d :: l ->
               let (f,s) = split_delim d in
               get_pairing f s l

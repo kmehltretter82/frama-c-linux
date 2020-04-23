@@ -220,6 +220,35 @@ let assume_not_nan ~assume_finite fkind v =
       let res = Bottom.non_bottom (backward_propagate kind res) in
       `Unknown (V.inject_float res)
 
+let nearly_valid_bits = function
+  | Base.Empty
+  | Base.Invalid -> Integer.zero, Integer.zero
+  | Base.Known (min, max) | Base.Unknown (min, _, max) -> min, Integer.succ max
+  | Base.Variable variable -> Integer.zero, Integer.succ variable.Base.max_alloc
+
+let nearly_valid_offset base =
+  let min, max = nearly_valid_bits base in
+  let to_byte bound = Some (Integer.e_div bound (Bit_utils.sizeofchar ())) in
+  Ival.inject_range (to_byte min) (to_byte max)
+
+let assume_pointer loc =
+  let aux base ival (acc_v, acc_ok) =
+    let validity = Base.validity base in
+    let nearly_valid_ival = nearly_valid_offset validity in
+    let new_ival = Ival.narrow ival nearly_valid_ival in
+    let ival, ok =
+      if Base.is_null base && Ival.contains_zero ival
+      then Ival.(join zero new_ival), acc_ok && Ival.is_zero ival
+      else new_ival, acc_ok && Ival.equal ival new_ival
+    in
+    Locations.Location_Bytes.add base ival acc_v, ok
+  in
+  try
+    let loc, ok = Cvalue.V.(fold_topset_ok aux loc (bottom, true)) in
+    if Cvalue.V.is_bottom loc then `False
+    else if ok then `True else `Unknown loc
+  with Abstract_interp.Error_Top -> `Unknown loc
+
 (* --------------------------------------------------------------------------
                               Integer overflow
    -------------------------------------------------------------------------- *)

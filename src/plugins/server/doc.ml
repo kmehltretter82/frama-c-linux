@@ -31,6 +31,12 @@ module Pages = Map.Make(String)
 
 type chapter = [ `Protocol | `Kernel | `Plugin of string ]
 
+(* Section contents can be generated statically or dynamically.
+   Typically, general kernel dictionary entries can be extended by plugins.
+   The general case is to have a function that builds the (final) content
+   on demand. *)
+type section = (unit -> Markdown.elements)
+
 type page = {
   path : string ;
   rootdir : string ; (* path to document root *)
@@ -38,7 +44,7 @@ type page = {
   title : string ;
   order : int ;
   intro : Markdown.elements ;
-  mutable sections : Markdown.elements list ;
+  mutable sections : section list ;
 }
 
 let order = ref 0
@@ -82,10 +88,15 @@ let page chapter ~title ~filename =
                  sections=[] } in
     pages := Pages.add path page !pages ; page
 
-let publish ~page ?name ?(index=[]) ~title content sections =
+let static () = []
+
+let publish ~page ?name ?(index=[]) ~title
+    ?(contents=[])
+    ?(generated=static)
+    () =
   let id = match name with Some id -> id | None -> title in
   let href = Section( page.path , id ) in
-  let section = Markdown.section ?name ~title (content @ sections) in
+  let section () = Markdown.section ?name ~title (contents @ generated ()) in
   List.iter (fun entry -> entries := (entry , href) :: !entries) index ;
   page.sections <- section :: page.sections ; href
 
@@ -203,12 +214,15 @@ let pp_one_page ~root ~page ~title body =
   with Sys_error e ->
     Senv.fatal "Could not open file %s for writing: %s" full_path e
 
+(* Build section contents in reverse order *)
+let build d s = List.fold_left (fun d s -> s() :: d) d s
+
 let dump ~root ?(meta=true) () =
   begin
     Pages.iter
       (fun path page ->
          Senv.feedback "[doc] Page: '%s'" path ;
-         let body = Markdown.subsections page.intro (List.rev page.sections) in
+         let body = Markdown.subsections page.intro (build [] page.sections) in
          let title = page.title in
          pp_one_page ~root ~page:path ~title body ;
          if meta then

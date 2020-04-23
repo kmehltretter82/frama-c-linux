@@ -1,7 +1,7 @@
-[eva:experimental] Warning: The traces domain is experimental.
 [kernel] Parsing tests/value/traces/test5.i (no preprocessing)
 [kernel:typing:implicit-function-declaration] tests/value/traces/test5.i:21: Warning: 
   Calling undeclared function my_switch. Old style K&R code?
+[eva:experimental] Warning: The traces domain is experimental.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed

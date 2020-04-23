@@ -261,6 +261,8 @@
 [eva] Done for function bitfields2
 [eva] computing for function escaping <- main.
   Called from tests/builtins/strnlen2.c:522.
+[eva:alarm] tests/builtins/strnlen2.c:196: Warning: 
+  pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
 [eva:locals-escaping] tests/builtins/strnlen2.c:196: Warning: 
   locals {x} escaping the scope of a block of escaping through s
 [eva] tests/builtins/strnlen2.c:199: Call to builtin strnlen

@@ -357,88 +357,42 @@ let shift_overflow_assertion ~signed ~remove_trivial ~on_alarm (exp, op, lexp, r
     end
     else overflow_alarm ()
 
-(* assertion for downcasting an integer to an unsigned integer type
-   without requiring modification of value to reach target domain
-   (well-defined behavior though) *)
-let unsigned_downcast_assertion ~remove_trivial ~on_alarm (ty, exp) =
-  let e_typ = Cil.unrollType (Cil.typeOf exp) in
-  match e_typ with
-  | TInt (kind,_) ->
-    let szTo = Cil.bitsSizeOfBitfield ty in
-    let szFrom = Cil.bitsSizeOf e_typ in
-    (if szTo < szFrom || Cil.isSigned kind then
-       (* case signed to unsigned:
-          requires signed to be >= 0 and also <= max of unsigned size *)
-       (* cast unsigned to unsigned:
-          ok is same bit size ;
-          if target is <, requires <= max target *)
-       let max_ty = Cil.max_unsigned_number szTo in
-       let alarm ?(invalid=false) bk =
-         let b = match bk with
-           | Lower_bound -> Integer.zero
-           | Upper_bound -> max_ty
-         in
-         let a = Alarms.Overflow (Alarms.Unsigned_downcast, exp, b, bk) in
-         on_alarm ~invalid a;
-       in
-       let alarms () =
-         if Cil.isSigned kind then begin (* signed to unsigned *)
-           alarm Upper_bound;
-           alarm Lower_bound;
-         end else (* unsigned to unsigned; cannot overflow in the negative *)
-           alarm Upper_bound;
-       in
-       if remove_trivial then begin
-         match get_expr_val exp with
-         | None -> alarms ()
-         | Some a64 ->
-           if Integer.lt a64 Integer.zero then
-             alarm ~invalid:true Lower_bound
-           else if Integer.gt a64 max_ty then
-             alarm ~invalid:true Upper_bound
-       end
-       else alarms ())
-  | _ -> ()
-
-(* assertion for downcasting an integer to a signed integer type
-   which can raise an implementation defined behavior *)
-let signed_downcast_assertion ~remove_trivial ~on_alarm (ty, exp) =
-  let e_typ = Cil.unrollType (Cil.typeOf exp) in
-  match e_typ with
-  | TInt (kind,_) ->
-    (let szTo = Cil.bitsSizeOfBitfield ty in
-     let szFrom = Cil.bitsSizeOf e_typ in
-     if szTo < szFrom || (szTo == szFrom && not (Cil.isSigned kind)) then
-       (* downcast: the expression result should fit on szTo bits *)
-       let min_ty = Cil.min_signed_number szTo in
-       let max_ty = Cil.max_signed_number szTo in
-       let alarm ?(invalid=false) bk =
-         let b = match bk with
-           | Lower_bound -> min_ty
-           | Upper_bound -> max_ty
-         in
-         let a = Alarms.Overflow (Alarms.Signed_downcast, exp, b, bk) in
-         on_alarm ~invalid a;
-       in
-       let alarms () =
-         if Cil.isSigned kind then begin
-           (* signed to signed *)
-           alarm Upper_bound;
-           alarm Lower_bound
-         end else (* (unsigned to signed; cannot overflow in the negative *)
-           alarm Upper_bound
-       in
-       if remove_trivial then begin
-         match get_expr_val exp with
-         | None -> alarms ()
-         | Some a64 ->
-           (if Integer.lt a64 min_ty then
-              alarm ~invalid:true Lower_bound
-            else if Integer.gt a64 max_ty then
-              alarm ~invalid:true Upper_bound)
-       end
-       else alarms ())
-  | _ -> ()
+(* Assertion for downcasts. *)
+let downcast_assertion ~remove_trivial ~on_alarm (dst_type, exp) =
+  let src_type = Cil.typeOf exp in
+  let src_signed = Cil.isSignedInteger src_type in
+  let dst_signed = Cil.isSignedInteger dst_type in
+  let src_size = Cil.bitsSizeOf src_type in
+  let dst_size = Cil.bitsSizeOfBitfield dst_type in
+  if dst_size < src_size || dst_size == src_size && dst_signed <> src_signed
+  then
+    let dst_min, dst_max =
+      if dst_signed
+      then Cil.min_signed_number dst_size, Cil.max_signed_number dst_size
+      else Integer.zero, Cil.max_unsigned_number dst_size
+    in
+    let overflow_kind =
+      if Cil.isPointerType src_type
+      then Alarms.Pointer_downcast
+      else if dst_signed
+      then Alarms.Signed_downcast
+      else Alarms.Unsigned_downcast
+    in
+    let alarm ?(invalid=false) bound bound_kind =
+      let a = Alarms.Overflow (overflow_kind, exp, bound, bound_kind) in
+      on_alarm ~invalid a;
+    in
+    let alarms () =
+      alarm dst_max Upper_bound;
+      (* unsigned values cannot overflow in the negative *)
+      if src_signed then alarm dst_min Lower_bound;
+    in
+    match remove_trivial, get_expr_val exp with
+    | true, Some a64 ->
+      let invalid = true in
+      if Integer.lt a64 dst_min then alarm ~invalid dst_min  Lower_bound
+      else if Integer.gt a64 dst_max then alarm ~invalid dst_max Upper_bound
+    | _ -> alarms ()
 
 (* assertion for casting a floating-point value to an integer *)
 let float_to_int_assertion ~remove_trivial ~on_alarm (ty, exp) =
@@ -496,6 +450,24 @@ let finite_float_assertion ~remove_trivial:_ ~on_alarm (fkind, exp) =
 (* assertion for a pointer call [( *e )(args)]. *)
 let pointer_call ~remove_trivial:_ ~on_alarm (e, args) =
   on_alarm ~invalid:false (Alarms.Function_pointer (e, Some args))
+
+let is_safe_pointer_value = function
+  | Lval (Var vi, offset) ->
+    (* Reading a pointer variable must emit an alarm if an invalid pointer value
+       could have been written without previous alarm, through:
+       - an union type, in which case [offset] is not NoOffset;
+       - an untyped write, in which case the address of [vi] is taken. *)
+    not vi.vaddrof && offset = NoOffset
+  | AddrOf (_, NoOffset) | StartOf (_, NoOffset) -> true
+  | CastE (_typ, e) ->
+    (* 0 can always be converted into a NULL pointer. *)
+    let v = get_expr_val e in
+    Extlib.may_map ~dft:false Integer.(equal zero) v
+  | _ -> false
+
+let pointer_value ~remove_trivial ~on_alarm expr =
+  if not (remove_trivial && is_safe_pointer_value expr.enode)
+  then on_alarm ~invalid:false (Alarms.Invalid_pointer expr)
 
 let bool_value ~remove_trivial ~on_alarm lv =
   match remove_trivial, lv with

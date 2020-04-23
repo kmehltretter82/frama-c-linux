@@ -90,6 +90,8 @@
 [eva] Done for function main1
 [eva] computing for function main2 <- main.
   Called from tests/value/volatile.c:177.
+[eva:alarm] tests/value/volatile.c:83: Warning: 
+  pointer downcast. assert (unsigned int)(&X) ≤ 2147483647;
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] computing for function main3 <- main.

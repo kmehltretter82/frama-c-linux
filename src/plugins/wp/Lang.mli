@@ -73,6 +73,7 @@ and field =
   | Cfield of fieldinfo
 and tau = (field,adt) Logic.datatype
 
+type t_builtin = E_mdt of mdt | E_poly of (tau list -> tau)
 
 type lfun =
   | ACSL of Cil_types.logic_info (** Registered in Definition.t,
@@ -94,11 +95,9 @@ and source =
   | Extern of Engine.link extern
 
 val mem_builtin_type : name:string -> bool
-val set_builtin_poly : name:string -> (tau list -> tau) -> unit
-val set_builtin_type : name:string -> link:string infoprover -> library:string -> unit
-val get_builtin_type : name:string -> link:string infoprover -> library:string -> adt
 val is_builtin : logic_type_info -> bool
 val is_builtin_type : name:string -> tau -> bool
+val get_builtin_type : name:string -> adt
 val datatype : library:string -> string -> adt
 val record :
   link:string infoprover -> library:string -> (string * tau) list -> adt
@@ -151,6 +150,9 @@ val generated_f : ?context:bool -> ?category:lfun category ->
 
 val generated_p : ?context:bool -> string -> lfun
 
+val extern_t:
+  string -> link:string infoprover -> library:library -> mdt
+
 (** {2 Sorting and Typing} *)
 
 val tau_of_comp : compinfo -> tau
@@ -174,6 +176,7 @@ val t_datatype : adt -> tau list -> tau
 val pointer : (typ -> tau) Context.value (** type of pointers *)
 val floats : (c_float -> tau) Context.value (** type of floats *)
 val poly : string list Context.value (** polymorphism *)
+val builtin_types: (string -> t_builtin) Context.value (* builtin types *)
 val parameters : (lfun -> sort list) -> unit (** definitions *)
 
 val name_of_lfun : lfun -> string

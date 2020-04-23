@@ -1,3 +1,8 @@
+/* run.config
+   STDOPT: +"-kernel-warn-key ghost:bad-use=inactive"
+*/
+// Note: we deactivate "ghost:bad-use" to check that printing goes right
+
 void function(int x) /*@ ghost(int y) */ ;
 int other(int x) /*@ ghost(int y) */ ;
 

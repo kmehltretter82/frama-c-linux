@@ -45,6 +45,8 @@
   Called from tests/value/assigns.i:49.
 [eva] Done for function f
 [eva:alarm] tests/value/assigns.i:51: Warning: 
+  pointer downcast. assert (unsigned int)(&T) ≤ 2147483647;
+[eva:alarm] tests/value/assigns.i:51: Warning: 
   signed overflow. assert -2147483648 ≤ 2 * (int)(&T);
 [eva:alarm] tests/value/assigns.i:51: Warning: 
   signed overflow. assert 2 * (int)(&T) ≤ 2147483647;
@@ -52,6 +54,8 @@
   Called from tests/value/assigns.i:51.
 [eva] using specification for function g
 [eva] Done for function g
+[eva:alarm] tests/value/assigns.i:52: Warning: 
+  pointer downcast. assert (unsigned int)(&t3) ≤ 2147483647;
 [eva:alarm] tests/value/assigns.i:52: Warning: 
   signed overflow. assert -2147483648 ≤ 2 * (int)(&t3);
 [eva:alarm] tests/value/assigns.i:52: Warning: 
@@ -931,9 +935,11 @@ void main1(void)
       i ++;
     }
   }
+  /*@ assert Eva: pointer_downcast: (unsigned int)(&T) ≤ 2147483647; */
   /*@ assert Eva: signed_overflow: -2147483648 ≤ 2 * (int)(&T); */
   /*@ assert Eva: signed_overflow: 2 * (int)(&T) ≤ 2147483647; */
   g(2 * (int)(& T));
+  /*@ assert Eva: pointer_downcast: (unsigned int)(&t3) ≤ 2147483647; */
   /*@ assert Eva: signed_overflow: -2147483648 ≤ 2 * (int)(&t3); */
   /*@ assert Eva: signed_overflow: 2 * (int)(&t3) ≤ 2147483647; */
   h((int *)(2 * (int)(& t3)));

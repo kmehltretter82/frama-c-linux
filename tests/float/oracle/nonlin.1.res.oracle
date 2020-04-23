@@ -177,7 +177,7 @@
 [eva:nonlin] tests/float/nonlin.c:63: subdividing on i
 [eva:alarm] tests/float/nonlin.c:63: Warning: 
   accessing out of bounds index.
-  assert (int)((double)((double)(i * i) + 2.0)) < 10;
+  assert (int)\add_double(\mul_double(i, i), (double)2.0) < 10;
 [eva:nonlin] tests/float/nonlin.c:64: non-linear 's - s', lv 's'
 [eva:nonlin] tests/float/nonlin.c:64: subdividing on s
 [eva:nonlin] tests/float/nonlin.c:65: non-linear 's - s', lv 's'
@@ -243,16 +243,20 @@
 [eva:nonlin] tests/float/nonlin.c:92: subdividing on v1
 [eva:nonlin] tests/float/nonlin.c:92: subdividing on v2
 [eva:alarm] tests/float/nonlin.c:92: Warning: 
-  non-finite float value. assert \is_finite((float)(v1 * v1));
+  non-finite float value. assert \is_finite(\mul_float(v1, v1));
 [eva:alarm] tests/float/nonlin.c:92: Warning: 
-  non-finite float value. assert \is_finite((float)(v2 * v2));
+  non-finite float value. assert \is_finite(\mul_float(v2, v2));
 [eva:alarm] tests/float/nonlin.c:92: Warning: 
   non-finite float value.
-  assert \is_finite((float)((float)(v1 * v1) + (float)(v2 * v2)));
+  assert \is_finite(\add_float(\mul_float(v1, v1), \mul_float(v2, v2)));
 [eva] Recording results for norm
 [eva] Done for function norm
 [eva] computing for function garbled <- main.
   Called from tests/float/nonlin.c:148.
+[eva:alarm] tests/float/nonlin.c:98: Warning: 
+  pointer downcast. assert (unsigned int)(&x_0) ≤ 2147483647;
+[eva:alarm] tests/float/nonlin.c:98: Warning: 
+  pointer downcast. assert (unsigned int)(&x_0 + (int)(&x_0)) ≤ 2147483647;
 [eva:alarm] tests/float/nonlin.c:98: Warning: 
   non-finite float value.
   assert \is_finite((float)((int)(&x_0 + (int)(&x_0))));
@@ -262,7 +266,7 @@
 [eva:alarm] tests/float/nonlin.c:99: Warning: 
   non-finite float value. assert \is_finite(a_0);
 [eva:alarm] tests/float/nonlin.c:99: Warning: 
-  non-finite float value. assert \is_finite((float)(a_0 + a_0));
+  non-finite float value. assert \is_finite(\add_float(a_0, a_0));
 [eva] tests/float/nonlin.c:99: 
   Assigning imprecise value to f.
   The imprecision originates from Arithmetic
@@ -283,7 +287,8 @@
 [eva:nonlin] tests/float/nonlin.c:113: subdividing on f
 [eva:alarm] tests/float/nonlin.c:113: Warning: 
   non-finite float value.
-  assert \is_finite((float)(f1 / (float)((float)((float)(f + f) - f) - f1)));
+  assert
+  \is_finite(\div_float(f1, \sub_float(\sub_float(\add_float(f, f), f), f1)));
 [eva] Recording results for around_zeros
 [eva] Done for function around_zeros
 [eva] computing for function subdivide_strategy <- main.
@@ -304,7 +309,7 @@
 [eva:nonlin] tests/float/nonlin.c:135: subdividing on x_0
 [eva:alarm] tests/float/nonlin.c:135: Warning: 
   non-finite double value.
-  assert \is_finite((double)((double)(x_0 - d_0) * (double)(x_0 - d_0)));
+  assert \is_finite(\mul_double(\sub_double(x_0, d_0), \sub_double(x_0, d_0)));
 [eva] computing for function Frama_C_float_interval <- subdivide_strategy <- main.
   Called from tests/float/nonlin.c:136.
 [eva] tests/float/nonlin.c:136: 

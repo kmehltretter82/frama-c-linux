@@ -64,6 +64,8 @@
   Called from tests/value/symbolic_locs.i:121.
 [eva:alarm] tests/value/symbolic_locs.i:51: Warning: 
   assertion got status unknown.
+[eva:alarm] tests/value/symbolic_locs.i:54: Warning: 
+  pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
 [eva] tests/value/symbolic_locs.i:55: 
   Frama_C_dump_each:
   # Cvalue domain:

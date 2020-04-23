@@ -36,7 +36,7 @@ body {
     height: 100%;
     overflow: hidden;
     font-family: "Verdana", sans;
-    font-size: 12pt;
+    font-size: 10pt;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -72,7 +72,7 @@ body {
     justify-content: left ;
     align-content: center ;
     box-sizing: border-box ;
-    width: 18cm ;
+    width: 22cm ;
     height: 100% ;
     padding: 0cm 1cm 1cm 1cm ;
 }
@@ -81,10 +81,6 @@ body {
 /* --- Navigation                                                         --- */
 /* -------------------------------------------------------------------------- */
 
-#TOC {
-    font-size: smaller ;
-}
-
 #NAVIGATION a {
     color: black ;
 }
@@ -92,7 +88,7 @@ body {
 #NAVIGATION a.root {
     display: block;
     font-family: "Optima", "Verdana", "Arial", sans;
-    font-size: 16pt;
+    font-size: 10pt;
     margin-top: 1cm;
     margin-bottom: 6mm;
 }
@@ -123,7 +119,7 @@ body {
 /* -------------------------------------------------------------------------- */
 
 h1 {
-    width: 18cm;
+    width: 22cm;
     font-family: "Optima", "Verdana", "Arial", sans;
     text-align: left;
     margin-top: 1cm;
@@ -135,13 +131,13 @@ h1 {
 h2 {
     width: 18cm;
     font-family: "Optima", "Verdana", "Arial", sans;
-    margin-top: 5mm;
+    margin-top: 16mm;
     margin-bottom: 2mm;
     border-bottom: solid thin darkred ;
 }
 
 h3 {
-    width: 17cm;
+    width: 18cm;
     font-family: "Optima", "Verdana", "Arial", sans;
     margin-top: 5mm;
     margin-bottom: 3mm;
@@ -158,11 +154,11 @@ h4,h5,h6 {
     font-weight: bold;
 }
 
-p { margin: 6px 0px 6px 0px; width: 15cm; }
+p { margin: 18px 0px 18px 0px; width: 18cm; }
 
 ul,ol,blockquote {
     margin-left: 24px ;
-    width: 13cm;
+    width: 15cm;
 }
 
 li {
@@ -177,7 +173,7 @@ pre {
     background-color: #eef ;
 }
 
-pre,code { font-size: smaller ; color: #106000 }
+pre,code { color: #106000 }
 
 hr {
     border: none ;
@@ -188,10 +184,13 @@ hr {
 
 table {
     border-collapse: collapse ;
+    margin-top: 4mm ;
+    margin-bottom: 4mm ;
     margin-left: 6mm ;
 }
 
 th,td {
+    font-weight: normal ;
     padding: 2px 16px 2px 12px ;
 }
 

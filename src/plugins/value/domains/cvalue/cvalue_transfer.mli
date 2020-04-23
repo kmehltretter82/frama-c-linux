@@ -23,7 +23,7 @@
 (** Transfer functions for the main domain of the Value analysis. *)
 
 type value = Main_values.CVal.t
-type origin = value option
+type origin = value
 type location = Main_locations.PLoc.location
 
 include Abstract_domain.Transfer

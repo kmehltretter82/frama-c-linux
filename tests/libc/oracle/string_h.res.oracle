@@ -51,7 +51,7 @@
   function strstr: precondition 'valid_string_haystack' got status valid.
 [eva] tests/libc/string_h.c:24: 
   function strstr: precondition 'valid_string_needle' got status valid.
-[eva] share/libc/string.h:221: 
+[eva] share/libc/string.h:227: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
 [eva] Done for function strstr
 [eva:alarm] tests/libc/string_h.c:25: Warning: assertion got status unknown.
@@ -330,6 +330,23 @@
 [eva] Done for function strlcpy
 [eva] Recording results for test_strlcpy
 [eva] Done for function test_strlcpy
+[eva] tests/libc/string_h.c:154: Call to builtin strchr
+[eva] tests/libc/string_h.c:154: 
+  function strchr: precondition 'valid_string_s' got status valid.
+[eva] computing for function strchrnul <- main.
+  Called from tests/libc/string_h.c:155.
+[eva] using specification for function strchrnul
+[eva] tests/libc/string_h.c:155: 
+  function strchrnul: precondition 'valid_string_s' got status valid.
+[eva] Done for function strchrnul
+[eva] tests/libc/string_h.c:157: Call to builtin strchr
+[eva] tests/libc/string_h.c:157: 
+  function strchr: precondition 'valid_string_s' got status valid.
+[eva] computing for function strchrnul <- main.
+  Called from tests/libc/string_h.c:158.
+[eva] tests/libc/string_h.c:158: 
+  function strchrnul: precondition 'valid_string_s' got status valid.
+[eva] Done for function strchrnul
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -395,4 +412,10 @@
   a ∈ [--..--]
   b ∈ [--..--]
   strsig ∈ {{ &__fc_strsignal[0] }}
+  c ∈ {{ "haystack" }}
+  d ∈ {97; 110}
+  chr1 ∈ {{ "haystack" + {2; 7} }}
+  nul1 ∈ {{ "haystack" + [0..8] }}
+  chr2 ∈ {{ NULL ; "haystack" + {1} }}
+  nul2 ∈ {{ "haystack" + [0..8] }}
   __retres ∈ {0}

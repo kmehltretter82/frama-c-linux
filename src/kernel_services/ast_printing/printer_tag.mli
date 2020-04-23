@@ -41,7 +41,7 @@ type localizable =
                           definitions. *)
   | PIP of Property.t
 
-module Localizable: Datatype.S with type t = localizable
+module Localizable: Datatype.S_with_collections with type t = localizable
 
 val kf_of_localizable : localizable -> kernel_function option
 val ki_of_localizable : localizable -> kinstr

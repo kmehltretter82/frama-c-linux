@@ -1,5 +1,5 @@
-[eva:experimental] Warning: The traces domain is experimental.
 [kernel] Parsing tests/value/traces/test2.i (no preprocessing)
+[eva:experimental] Warning: The traces domain is experimental.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed

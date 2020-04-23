@@ -14,6 +14,11 @@ void __e_acsl_globals_init(void)
   return;
 }
 
+void __e_acsl_globals_delete(void)
+{
+  __e_acsl_delete_block((void *)(t));
+}
+
 int main(void)
 {
   int __retres;
@@ -39,8 +44,8 @@ int main(void)
   }
   /*@ assert \valid(&t[0 .. 9]); */ ;
   __retres = 0;
-  __e_acsl_delete_block((void *)(t));
   __e_acsl_delete_block((void *)(& p));
+  __e_acsl_globals_delete();
   __e_acsl_memory_clean();
   return __retres;
 }

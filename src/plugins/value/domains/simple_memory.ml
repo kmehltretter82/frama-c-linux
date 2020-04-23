@@ -187,7 +187,7 @@ module Make_Internal (Info: sig val name: string end) (Value: Value) = struct
   type state = t
   type value = Value.t
   type location = Precise_locs.precise_location
-  type origin = unit
+  type origin
 
   let log_category = Value_parameters.register_category ("d-" ^ Info.name)
 
@@ -198,9 +198,9 @@ module Make_Internal (Info: sig val name: string end) (Value: Value) = struct
      evaluation. *)
   let extract_lval _oracle state _lv typ loc =
     let v = find loc typ state in
-    `Value (v, ()), Alarmset.all
+    `Value (v, None), Alarmset.all
 
-  let extract_expr _oracle _state _expr = `Value (Value.top, ()), Alarmset.all
+  let extract_expr _oracle _state _expr = `Value (Value.top, None), Alarmset.all
 
   let backward_location state _lval typ loc _value =
     let new_value = find loc typ state in
@@ -300,7 +300,7 @@ module Make_Internal (Info: sig val name: string end) (Value: Value) = struct
   let incr_loop_counter _ state = state
   let leave_loop _ state = state
 
-  let logic_assign _assign location ~pre:_ state = remove location state
+  let logic_assign _assign location state = remove location state
   let evaluate_predicate _ _ _ = Alarmset.Unknown
   let reduce_by_predicate _ state _ _ = `Value state
 

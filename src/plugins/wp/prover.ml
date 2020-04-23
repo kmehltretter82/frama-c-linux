@@ -97,27 +97,28 @@ let prove wpo ?config ?mode ?start ?progress ?result prover =
 let spawn wpo ~delayed
     ?config ?start ?progress ?result ?success ?pool provers =
   if provers<>[] then
-    let do_monitor on_success wpo = function
-      | None -> on_success wpo None
-      | Some prover ->
-          let r = Wpo.get_result wpo VCS.Qed in
-          let prover =
-            if VCS.( r.verdict == Valid ) then VCS.Qed else prover in
-          on_success wpo (Some prover)
-    in
     let monitor = match success with
       | None -> None
-      | Some on_success -> Some (do_monitor on_success wpo)
-    in
+      | Some on_success ->
+          Some
+            begin function
+              | None -> on_success wpo None
+              | Some prover ->
+                  let r = Wpo.get_result wpo VCS.Qed in
+                  let prover =
+                    if VCS.( r.verdict == Valid ) then VCS.Qed else prover in
+                  on_success wpo (Some prover)
+            end in
     let process (mode,prover) =
       prove wpo ?config ~mode ?start ?progress ?result prover in
-    let canceled =
-      match success with None -> None | Some f -> Some (fun _ -> f wpo None) in
-    ProverTask.spawn ?monitor ?pool
-      (List.map (fun mp -> snd mp ,
-                           if delayed then Task.later ?canceled process mp
-                           else process mp)
-         provers)
+    let all = Wp_parameters.RunAllProvers.get() in
+    ProverTask.spawn ?monitor ?pool ~all
+      (List.map
+         (fun mp ->
+            let prover = snd mp in
+            let task = if delayed then Task.later process mp else process mp in
+            prover , task
+         ) provers)
   else
     let process = simplify ?start ?result wpo in
     let thread = Task.thread process in

@@ -567,6 +567,16 @@ rule initial = parse
 	    end
 	end
     }
+| "\\ghost"
+    { if is_ghost_code () || is_oneline_ghost () then begin
+        GHOST (currentLoc())
+      end else begin
+        let start = Lexing.lexeme_start_p lexbuf in
+        let source = Cil_datatype.Position.of_lexing_pos start in
+        E.parse_error ~source "Use of \\ghost out of ghost code"
+      end
+    }
+
 |		blank			{initial lexbuf}
 |               '\n'                    { E.newline ();
                                           if !pragmaLine then

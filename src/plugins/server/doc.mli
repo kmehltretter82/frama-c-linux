@@ -48,21 +48,20 @@ val page : chapter -> title:string -> filename:string -> page
 
 (** Adds a section in the corresponding page.
     Returns an href to the published section.
-    If index items are provided, they are added
-    to the server documentation index.
+    If index items are provided, they are added to the server documentation
+    index.
 *)
 val publish :
   page:page ->
   ?name:string ->
   ?index:string list ->
   title:string ->
-  Markdown.elements ->
-  Markdown.elements ->
-  Markdown.href
+  ?contents:Markdown.elements ->
+  ?generated:(unit -> Markdown.elements) ->
+  unit -> Markdown.href
 
-(** Dumps all published pages of documentations. Unless [~meta:false],
-    also generates METADATA for each page in
-    [<filename>.json] for each page. *)
+(** Dumps all published pages of documentations. Unless [~meta:false], also
+    generates METADATA for each page in [<filename>.json] for each page. *)
 val dump : root:string -> ?meta:bool -> unit -> unit
 
 (* -------------------------------------------------------------------------- *)

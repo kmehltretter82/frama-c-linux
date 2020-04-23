@@ -25,7 +25,7 @@ open Eval
 open Cvalue.Model
 
 type value = Main_values.CVal.t
-type origin = value option
+type origin = value
 type location = Main_locations.PLoc.location
 
 let unbottomize = function
@@ -71,7 +71,7 @@ let update valuation t =
              included in the other). We use some notion of cardinality of
              abstract values to choose the best value to keep. *)
           match record.origin with
-          | Some (Some previous_v) ->
+          | Some previous_v ->
             let typ = Cil.typeOfLval lv in
             if is_smaller_value typ v previous_v then v else previous_v
           | _ -> v

@@ -27,13 +27,15 @@ open Logic_const
 
 let function_name = "calloc"
 
+let unexpected = Options.fatal "Stdlib.Calloc: unexpected: %s"
+
 let pset_len_to_zero ?loc alloc_type num size =
   let eq_simpl_value ?loc t =
-    let value = match t.term_type with
+    let value = match Logic_utils.unroll_type t.term_type with
       | Ctype(TPtr(_)) -> term Tnull t.term_type
       | Ctype(TFloat(_)) -> treal ?loc 0.
-      | Ctype(TInt(_)) -> tinteger ?loc 0
-      | _ -> assert false
+      | Ctype(TInt(_) | TEnum (_)) -> tinteger ?loc 0
+      | _ -> unexpected "non atomic type during equality generation"
     in
     prel ?loc (Req, t, value)
   in
@@ -62,9 +64,9 @@ let generate_requires ?loc alloc_type num size =
 let pinitialized_len ?loc alloc_type num size =
   let result = tresult ?loc (ptr_of alloc_type) in
   let initialized ?loc t =
-    let t = match t.term_node, t.term_type with
+    let t = match t.term_node, Logic_utils.unroll_type t.term_type with
       | TLval (lv), Ctype t -> taddrof ?loc lv (Ctype (ptr_of t))
-      | _ -> assert false
+      | _ -> unexpected "non lvalue or non c-type during initialized generation"
     in
     pinitialized ?loc (here_label, t)
   in
@@ -108,7 +110,7 @@ let make_behavior_no_allocation loc alloc_type num size =
 let generate_spec alloc_type { svar = vi } loc =
   let (cnum, csize) = match Cil.getFormalsDecl vi with
     | [ cnum ; csize ] -> cnum, csize
-    | _ -> assert false
+    | _ -> unexpected "ill-formed fundec in specification generation"
   in
   let num = tlogic_coerce ~loc (cvar_to_tvar cnum) Linteger in
   let size = tlogic_coerce ~loc (cvar_to_tvar csize) Linteger in
@@ -129,20 +131,21 @@ let generate_prototype alloc_type =
   ] in
   name, (TFun((ptr_of alloc_type), Some params, false, []))
 
-let well_typed_call ret args =
+let well_typed_call ret _fct args =
   match ret, args with
   | Some ret, [ _ ; _ ] ->
     let t = Cil.typeOfLval ret in
-    Cil.isPointerType t && not (Cil.isVoidPtrType t)
+    Cil.isPointerType t && not (Cil.isVoidPtrType t) &&
+    Cil.isCompleteType (Cil.typeOf_pointed t)
   | _ -> false
 
-let key_from_call ret _ =
+let key_from_call ret _fct _ =
   match ret with
   | Some ret ->
     let ret_t = Cil.unrollTypeDeep (Cil.typeOfLval ret) in
     let ret_t = Cil.type_remove_qualifier_attributes_deep ret_t in
     Cil.typeOf_pointed ret_t
-  | None -> assert false
+  | _ -> unexpected "trying to generate a key on an ill-typed call"
 
 let retype_args _typ args = args
 let args_for_original _typ args = args

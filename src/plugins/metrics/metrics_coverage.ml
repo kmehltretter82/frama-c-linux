@@ -394,7 +394,10 @@ class semantic_printer ~libc (cov_metrics : coverage_metrics) = object(self)
     in
     let sum_total, sum_value = List.fold_left
         (fun (at, av) (_, t, v, _) -> at+t, av+v) (0, 0) l in
-    let percent = 100. *. (float_of_int sum_value) /. (float_of_int sum_total) in
+    let percent =
+      if sum_total = 0 then 0.
+      else 100. *. (float_of_int sum_value) /. (float_of_int sum_total)
+    in
     Format.fprintf fmt "@[<v 0>%a@ \
                         %d stmts in analyzed functions, %d stmts analyzed (%.1f%%)@ "
       (Metrics_base.mk_hdr 2) "Statements analyzed by Eva"
