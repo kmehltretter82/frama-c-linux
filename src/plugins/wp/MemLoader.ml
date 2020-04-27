@@ -79,7 +79,7 @@ sig
   val store_float : Sigma.t -> c_float -> loc -> term -> Chunk.t * term
   val store_pointer : Sigma.t -> typ -> loc -> term -> Chunk.t * term
 
-  val init_atom : Sigma.t -> loc -> Chunk.t * term
+  val set_init_atom : Sigma.t -> loc -> term -> Chunk.t * term
   val is_init_atom : Sigma.t -> loc -> term
 
 end
@@ -383,6 +383,76 @@ struct
   let () = initrec := initvalue
 
   (* -------------------------------------------------------------------------- *)
+  (* --- Initialized                                                        --- *)
+  (* -------------------------------------------------------------------------- *)
+
+  let rec on_initialized_terms map on_leave obj terms =
+    match obj with
+    | C_int _ | C_float _ | C_pointer _ -> on_leave terms
+    | C_comp ci ->
+        let initialized_field f =
+          on_initialized_terms map on_leave
+            (object_of f.ftype)
+            (map (fun t -> e_getfield t (Cfield (f, KInit))) terms)
+        in
+        p_conj (List.map initialized_field ci.cfields)
+    | C_array ai ->
+        let obj_e, ds = Matrix.of_array ai in
+        let denv = Matrix.denv ds in
+        let values =
+          map (fun t -> List.fold_left e_get t denv.index_val) terms
+        in
+        let make_subst var value p =
+          match value with
+          | None -> p
+          | Some i -> p_subst_var var (e_int i) p
+        in
+        let substs = List.map2 make_subst denv.size_var ds in
+        let conj =
+          List.fold_left (fun p f -> f p) (p_conj denv.index_range) substs
+        in
+        p_forall denv.index_var
+          (p_imply conj (on_initialized_terms map on_leave obj_e values))
+
+  let initialized_term =
+    on_initialized_terms Extlib.id p_bool
+
+  let initialized_monotonic =
+    on_initialized_terms
+      (fun f (a, b) -> f a, f b)
+      (fun (a, b) -> p_imply (p_bool a) (p_bool b))
+
+  let initialized_loc sigma obj loc =
+    initialized_term obj (initvalue sigma obj loc)
+
+  let initialized sigma = function
+    | Rloc(obj, loc) -> initialized_loc sigma obj loc
+    | Rrange(loc, obj, Some low, Some up) ->
+        let x = Lang.freshvar ~basename:"i" Lang.t_int in
+        let v = e_var x in
+        let hyps = [ p_leq low v ; p_leq v up] in
+        let loc = M.shift loc obj v in
+        p_forall [x] (p_hyps hyps (initialized_loc sigma obj loc))
+    | Rrange(_l, _, low, up) ->
+        Wp_parameters.abort ~current:true
+          "Invalid infinite range @[<hov 2>+@,(%a@,..%a)@]"
+          Vset.pp_bound low Vset.pp_bound up
+
+  let initialized_loc_monotonic seq obj loc =
+    initialized_monotonic
+      obj ((initvalue seq.pre obj loc), (initvalue seq.post obj loc))
+
+  let initialized_range_monotonic s obj loc a b =
+    let i = Lang.freshvar ~basename:"i" Lang.t_int in
+    let init =
+      p_forall [i]
+        (p_imply
+           (p_and (p_leq a (e_var i)) (p_leq (e_var i) b))
+           (initialized_loc_monotonic s obj (M.shift loc obj (e_var i))))
+    in
+    Assert init
+
+  (* -------------------------------------------------------------------------- *)
   (* --- Havocs                                                             --- *)
   (* -------------------------------------------------------------------------- *)
 
@@ -402,65 +472,27 @@ struct
   let havoc seq obj loc = havoc_length seq obj loc F.e_one
 
   (* -------------------------------------------------------------------------- *)
-  (* --- Initialized                                                        --- *)
-  (* -------------------------------------------------------------------------- *)
-
-  let rec initialized_term obj term =
-    match obj with
-    | C_int _ | C_float _ | C_pointer _ -> p_bool term
-    | C_comp ci ->
-        let initialized_field f =
-          initialized_term
-            (object_of f.ftype)
-            (e_getfield term (Cfield (f, KInit)))
-        in
-        p_conj (List.map initialized_field ci.cfields)
-    | C_array ai ->
-        let obj_e, ds = Matrix.of_array ai in
-        let denv = Matrix.denv ds in
-        let values = List.fold_left e_get term denv.index_val in
-        let make_subst var value p =
-          match value with
-          | None -> p
-          | Some i -> p_subst_var var (e_int i) p
-        in
-        let substs = List.map2 make_subst denv.size_var ds in
-        let conj =
-          List.fold_left (fun p f -> f p) (p_conj denv.index_range) substs
-        in
-        p_imply conj (initialized_term obj_e values)
-
-  let initialized_loc sigma obj loc =
-    initialized_term obj (initvalue sigma obj loc)
-
-  let initialized sigma = function
-    | Rloc(obj, loc) -> initialized_loc sigma obj loc
-    | Rrange(loc, obj, Some low, Some up) ->
-        let x = Lang.freshvar ~basename:"i" Lang.t_int in
-        let v = e_var x in
-        let hyps = [ p_leq low v ; p_leq v up] in
-        let loc = M.shift loc obj v in
-        p_forall [x] (p_hyps hyps (initialized_loc sigma obj loc))
-    | Rrange(_l, _, low, up) ->
-        Wp_parameters.abort ~current:true
-          "Invalid infinite range @[<hov 2>+@,(%a@,..%a)@]"
-          Vset.pp_bound low Vset.pp_bound up
-
-  (* -------------------------------------------------------------------------- *)
   (* --- Stored & Copied                                                    --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let updated seq phi_store alpha loc value =
-    let chunk_store,mem_store = phi_store seq.pre alpha loc value in
-    let chunk_init,mem_init = M.init_atom seq.pre loc in
-    [Set(Sigma.value seq.post chunk_store,mem_store) ;
-     Set(Sigma.value seq.post chunk_init,mem_init)]
+  let updated_init seq loc value =
+    let chunk_init,mem_init = M.set_init_atom seq.pre loc value in
+    Set(Sigma.value seq.post chunk_init,mem_init)
+
+  let updated_atom seq obj loc value =
+    let phi_store sigma = match obj with
+      | C_int i -> M.store_int sigma i
+      | C_float f -> M.store_float sigma f
+      | C_pointer ty -> M.store_pointer sigma ty
+      | _ -> failwith "MemLoader updated_atom called on a non atomic type"
+    in
+    let chunk_store,mem_store = phi_store seq.pre loc value in
+    Set(Sigma.value seq.post chunk_store,mem_store)
 
   let stored seq obj loc value =
     match obj with
-    | C_int i -> updated seq M.store_int i loc value
-    | C_float f -> updated seq M.store_float f loc value
-    | C_pointer ty -> updated seq M.store_pointer ty loc value
+    | C_int _ | C_float _ | C_pointer _ ->
+        updated_init seq loc e_true :: [ updated_atom seq obj loc value ]
     | C_comp _ | C_array _ ->
         let init = Cvalues.initialized_obj obj in
         Set(initvalue seq.post obj loc, init) ::
@@ -475,12 +507,17 @@ struct
   let assigned_loc seq obj loc =
     match obj with
     | C_int _ | C_float _ | C_pointer _ ->
-        let x = Lang.freshvar ~basename:"v" (Lang.tau_of_object obj) in
-        stored seq obj loc (e_var x)
+        let value = Lang.freshvar ~basename:"v" (Lang.tau_of_object obj) in
+        let init = Lang.freshvar ~basename:"i" (Lang.init_of_object obj) in
+        [ Assert (initialized_loc_monotonic seq obj loc) ;
+          updated_init seq loc (e_var init) ;
+          updated_atom seq obj loc (e_var value) ]
     | C_comp _ | C_array _ ->
+        Assert (initialized_loc_monotonic seq obj loc) ::
         havoc seq obj loc
 
   let assigned_range s obj l a b =
+    initialized_range_monotonic s obj l a b ::
     havoc_length s obj (M.shift l obj a) (e_range a b)
 
   let assigned seq obj = function
@@ -495,7 +532,12 @@ struct
              let sep_from_all = F.p_forall xs (F.p_imply condition separated) in
              let phi = F.p_forall p (F.p_imply sep_from_all equal) in
              ps := Assert phi :: !ps
-          ) (M.value_footprint obj loc) ; !ps
+          ) (domain obj loc) ;
+        let mono =
+          F.p_forall xs
+            (F.p_imply condition (initialized_loc_monotonic seq obj loc))
+        in
+        Assert mono :: !ps
     | Sarray(loc,obj,n) ->
         assigned_range seq obj loc e_zero (e_int (n-1))
     | Srange(loc,obj,u,v) ->

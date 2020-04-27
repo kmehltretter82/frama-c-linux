@@ -813,7 +813,7 @@ struct
     | Lmem(r,l,rt,(Pointer _ as v)) -> store_mem sigma r rt v l value
     | _ -> error "Can not store pointer values into %a" pretty loc
 
-  let init_atom _ _ = assert false
+  let set_init_atom _ _ _ = assert false
   let is_init_atom _ _ = assert false
 
 end
