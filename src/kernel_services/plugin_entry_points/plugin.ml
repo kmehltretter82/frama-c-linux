@@ -299,13 +299,11 @@ struct
       (D: sig
          val dirs: unit -> string list
          val visible_ref: bool
-         val force_dir: bool
        end)
   =
   struct
 
     let is_visible = D.visible_ref
-    let force_dir = D.force_dir
     let is_kernel = is_kernel () (* the side effect must be applied right now *)
 
     let () =
@@ -323,65 +321,111 @@ struct
           let file_kind = ""
         end)
 
-    exception No_dir
-
     let mk_dir d =
       try
         Extlib.mkdir ~parents:true d 0o755;
         L.warning "creating %s directory `%s'" O.option_name d;
         d
       with Unix.Unix_error _ ->
-        L.warning "cannot create %s directory `%s'" O.option_name d;
-        raise No_dir
+        L.abort "cannot create %s directory `%s'" O.option_name d
 
-    let rec get_and_check_dirs error = function
-      | [] ->
-        raise No_dir
-      | d::l ->
-        if (try Sys.is_directory d with Sys_error _ -> false) then d
-        else
-          get_and_check_dirs error l
+    let set filepath = Dir_name.set filepath
+    let get () = Dir_name.get ()
+    let is_set () = Dir_name.is_set ()
 
-    let get_and_check_dirs ?(error=true) = function
-      | [] ->
-        if error then
-          L.abort "no %s directories to look into" O.option_name
-        else
-          raise No_dir
-      | (first::_) as l ->
-        try
-          get_and_check_dirs error l
-        with
-        | No_dir when error ->
-          L.abort "no %s directory for plug-in `%s' among %a"
-            O.option_name
-            P.name
-            Pretty_utils.(pp_list ~sep:",@ " Format.pp_print_string) l
-        | No_dir when force_dir ->
-          (* create the parent, if it does not exist *)
-          let p = Filename.dirname first in
-          if not (try Sys.is_directory p with Sys_error _ -> false) then
-            ignore (mk_dir p);
-          mk_dir first
-
-    let dir ?error () =
-      (* get the specified dir if any *)
-      let d = if is_visible then (Dir_name.get () :> string) else empty_string in
-      let dirs =
-        if d = empty_string
-        then
-          (* no specified dir: look for the default one. *)
-          if is_kernel
-          then D.dirs ()
-          else List.map (fun x -> x ^ "/" ^ plugin_subpath) (D.dirs ())
-        else
-          [d]
+    let base_dirs () =
+      (* Get the specified dir if any. *)
+      let plugin_base_dir =
+        if is_visible
+        then Dir_name.get ()
+        else Datatype.Filepath.dummy
       in
-      Datatype.Filepath.of_string (get_and_check_dirs ?error dirs)
+      if not (plugin_base_dir = Datatype.Filepath.dummy)
+      then [plugin_base_dir]
+      else begin
+        (* No specified dir: look for the default ones.
+           At least one default value must be in place. *)
+        let dirs = D.dirs () in
+        assert (dirs <> []);
+        if is_kernel
+        then
+          List.map Datatype.Filepath.of_string dirs
+        else
+          List.map
+            (fun x -> Datatype.Filepath.of_string (x ^ "/" ^ plugin_subpath))
+            dirs
+      end
 
-    let file ?error f =
-      let dir = dir ?error () in
-      Datatype.Filepath.concat dir ("/" ^ f)
+    let get_dir ?(mode=`Normalize_only) s =
+      match mode with
+      | `Must_exist ->
+        begin
+          let dir =
+            let exception Found of Datatype.Filepath.t in
+            try
+              List.fold_left
+                (fun dummy d ->
+                   let name = Datatype.Filepath.concat d ("/" ^ s) in
+                   if Sys.file_exists (name :> string)
+                   then raise (Found name)
+                   else dummy)
+                None
+                (base_dirs ())
+            with Found d ->
+              Some d
+          in
+          match dir with
+          | None ->
+            L.abort "no directory %s exist in %s directories" s O.option_name
+          | Some d -> d
+        end
+      | _ ->
+        begin
+          (* In presence of more than one base directory, consider the first to
+             form the resulting [filepath]. *)
+          let filepath =
+            match base_dirs () with
+            | [] -> assert false
+            | d :: _ -> Datatype.Filepath.concat d ("/" ^ s)
+          in
+          match mode with
+          | `Must_exist ->
+            (* Already taken care of. *)
+            assert false
+          | `Normalize_only ->
+            filepath
+          | `Create_path ->
+            begin
+              (try
+                 if not (Sys.is_directory (filepath :> string))
+                 then
+                   (* [filepath] already exists, and it is a file. *)
+                   L.abort
+                     "cannot create directory as file %a already exists"
+                     Datatype.Filepath.pretty filepath
+               with Sys_error _ ->
+                 (* [filepath] does not exist: create the directory path. *)
+                 ignore (mk_dir (filepath :> string)));
+              filepath
+            end
+        end
+
+    let get_file ?(mode=`Normalize_only) s =
+      let s_dirname = Filename.dirname s in
+      let base_dir = get_dir ~mode s_dirname in
+      let s_basename = Filename.basename s in
+      let filepath = Datatype.Filepath.concat base_dir ("/" ^ s_basename) in
+      match mode with
+      | `Must_exist ->
+        if Sys.file_exists (filepath :> string)
+        then filepath
+        else L.abort "no file %s exist in %s directories" s O.option_name
+      | `Normalize_only ->
+        filepath
+      | `Create_path ->
+        (* No need to create anything here, as the path of sub-directories has
+           been already created by [get_dir] for computing [base_dir]. *)
+        filepath
 
   end
 
@@ -396,7 +440,6 @@ struct
       (struct
         let dirs () = Fc_config.datadirs
         let visible_ref = !share_visible_ref
-        let force_dir = false
       end)
 
   module Session =
@@ -413,11 +456,12 @@ struct
             try Sys.getenv "FRAMAC_SESSION"
             with Not_found -> "./.frama-c"]
         let visible_ref = !session_visible_ref
-        let force_dir = true
       end)
   let () =
     if is_kernel ()
-    then Journal.get_session_file := (fun s -> Session.file ~error:false s)
+    then
+      Journal.get_session_file :=
+        (fun s -> Session.get_file ~mode:`Create_path s)
 
   module Config =
     Make_specific_dir
@@ -445,7 +489,6 @@ struct
           d ^ if vis then "/frama-c" else "/.frama-c"
         ]
         let visible_ref = !config_visible_ref
-        let force_dir = true
       end)
 
   let help = add_group "Getting Information"

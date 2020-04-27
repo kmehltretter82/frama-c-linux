@@ -165,7 +165,7 @@ class visitor fmt c =
       let df = D_file f in
       if not (List.mem df deps) then deps <- df :: deps
 
-    method add_shared f = self#add_dfile ((Wp_parameters.Share.file ~error:true f) :> string)
+    method add_shared f = self#add_dfile ((Wp_parameters.Share.get_file ~mode:`Must_exist f) :> string)
     method add_library f = self#add_dfile f
 
     method on_cluster c = deps <- (D_cluster c) :: deps
