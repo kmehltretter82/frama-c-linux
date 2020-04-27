@@ -84,7 +84,8 @@ val get_model : unit -> model
 val get_scope : unit -> scope
 val get_context : unit -> context
 
-val directory : unit -> string (** Current model in ["-wp-out"] directory *)
+val directory : unit -> Datatype.Filepath.t
+(** Current model in ["-wp-out"] directory *)
 
 module type Entries =
 sig

@@ -47,6 +47,6 @@ val smoking : reached -> Cil_types.stmt -> bool
     This is restricted to assignments, returns and calls not dominated
     another smoking statement. *)
 
-val dump : dir:string -> Kernel_function.t -> reached -> unit
+val dump : dir:Datatype.Filepath.t -> Kernel_function.t -> reached -> unit
 
 (* -------------------------------------------------------------------------- *)

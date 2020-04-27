@@ -88,7 +88,7 @@ struct
     let mid = Wp_parameters.get_output_dir (WpContext.MODEL.id model) in
     let buffer = Buffer.create 80 in
     let fmt = Format.formatter_of_buffer buffer in
-    Format.fprintf fmt "%s/%s" mid id ;
+    Format.fprintf fmt "%s/%s" (mid :> string) id ;
     (match prover with None -> () | Some p ->
         Format.fprintf fmt "_%s" (filename_for_prover p)) ;
     (match suffix with None -> () | Some s ->
@@ -143,14 +143,14 @@ struct
   let cache_log ~pid ~model ~prover ~result =
     (*TODO: put a cache here *)
     let dir = Wp_parameters.get_output () in
-    let file = Printf.sprintf "%s/log.txt" dir in
+    let file = Printf.sprintf "%s/log.txt" (dir :> string) in
     Command.print_file file (pretty ~pid ~model ~prover ~result) ;
     file
 
   let cache_descr pretty =
     (*TODO: put a cache here *)
     let dir = Wp_parameters.get_output () in
-    let file = Printf.sprintf "%s/goal.txt" dir in
+    let file = Printf.sprintf "%s/goal.txt" (dir :> string) in
     Command.print_file file (fun fmt -> pretty fmt) ; file
 
 end

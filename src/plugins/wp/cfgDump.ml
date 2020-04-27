@@ -40,7 +40,7 @@ struct
         | None -> Kernel_function.get_name kf
         | Some bname -> Kernel_function.get_name kf ^ "_" ^ bname
       in
-      let file = Filename.concat (Wp_parameters.get_output ()) name in
+      let file = Filename.concat (Wp_parameters.get_output () :> string) name in
       Wp_parameters.feedback "CFG %a -> %s@." Kernel_function.pretty kf name ;
       let fout = open_out (file ^ ".dot") in
       fc := Some (fout,file) ;
