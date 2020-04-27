@@ -279,6 +279,7 @@ share/libc/sys/file.h: CEA_LGPL
 share/libc/sys/ioctl.h: CEA_LGPL
 share/libc/sys/ipc.h: CEA_LGPL
 share/libc/sys/mman.h: CEA_LGPL
+share/libc/sys/param.h: CEA_LGPL
 share/libc/sys/random.h: CEA_LGPL
 share/libc/sys/resource.h: CEA_LGPL
 share/libc/sys/select.h: CEA_LGPL
