@@ -651,14 +651,49 @@ Dome.on(SHUTDOWN, () => {
  *   - `SET` Used to write data into the server
  *   - `EXEC` Used to make the server execute a task
  */
-export enum RqKind {
+enum RqKind {
   GET = 'GET',
   SET = 'SET',
   EXEC = 'EXEC'
 }
 
 /**
- *  @summary Send request to the server.
+ * @typedef ServerRequest
+ * @summary Server request.
+ * @param {string} endpoint - the request identifier
+ * @param {any} params - the request parameters
+ */
+export interface ServerRequest {
+  endpoint: string;
+  params: any;
+}
+
+/**
+ * @summary Get data from the server.
+ * @param sr - the server request description.
+ */
+async function GET(sr: ServerRequest) {
+  return _create(RqKind.GET, sr.endpoint, sr.params);
+}
+
+/**
+ * @summary Set data into the server.
+ * @param sr - the server request description.
+ */
+async function SET(sr: ServerRequest) {
+  return _create(RqKind.SET, sr.endpoint, sr.params);
+}
+
+/**
+ * @summary Make the server execute a task.
+ * @param sr - the server request description.
+ */
+async function EXEC(sr: ServerRequest) {
+  return _create(RqKind.EXEC, sr.endpoint, sr.params);
+}
+
+/**
+ *  @summary Create request to send to the server.
  *  @param {RqKind} kind - the request kind
  *  @param {string} rq - the request identifier
  *  @param {object} params - request parameters
@@ -667,9 +702,9 @@ export enum RqKind {
  *  You may _kill_ the request before its normal termination by
  *  invoking `kill()` on the returned promised.
  */
-function send(kind: RqKind, rq: string, params: any) {
-  if (!isRunning()) return Promise.reject('Server not running');
-  if (!rq) return Promise.reject('Undefined request');
+function _create(kind: RqKind, rq: string, params: any) {
+  if (!isRunning()) return Promise.reject(new Error('Server not running'));
+  if (!rq) return Promise.reject(new Error('Undefined request'));
   const rid = `RQ.${rqid}`;
   rqid += 1;
   const data = JSON.stringify(params);
@@ -830,7 +865,9 @@ export default {
   kill,
   restart,
   clear,
-  send,
+  GET,
+  SET,
+  EXEC,
   onReady,
   onShutdown,
   onActivity,

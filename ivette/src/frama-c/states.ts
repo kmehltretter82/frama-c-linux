@@ -11,7 +11,7 @@
 import _ from 'lodash';
 import React from 'react';
 import Dome from 'dome';
-import Server, { RqKind } from './server';
+import Server, { ServerRequest } from './server';
 
 /**
  *  @event
@@ -40,12 +40,15 @@ let currentProject = '<None>';
 let states: any = {};
 const stateDefaults: any = {};
 
-Server.onReady(() => {
-  Server.send(RqKind.GET, 'kernel.project.getCurrent', null)
-    .then((current: { id: string }) => {
-      currentProject = current.id;
-      Dome.emit(PROJECT);
-    });
+Server.onReady(async () => {
+  const sr: ServerRequest = {
+    endpoint: 'kernel.project.getCurrent',
+    params: {},
+  };
+  const current: { id: string } = await Server.GET(sr);
+  currentProject = current.id;
+  Dome.emit(PROJECT);
+  return;
 });
 
 Server.onShutdown(() => {
@@ -74,11 +77,16 @@ export function useProject() {
  *  Make all states switching to their projectified value.
  *  Emits `PROJECT`.
  */
-export function setProject(project: string) {
+export async function setProject(project: string) {
   if (Server.isRunning()) {
-    Server.send(RqKind.SET, 'kernel.project.setCurrent', project);
+    const sr: ServerRequest = {
+      endpoint: 'kernel.project.setCurrent',
+      params: project,
+    };
+    await Server.SET(sr);
     currentProject = project;
     Dome.emit(PROJECT);
+    return;
   }
 }
 
@@ -153,22 +161,36 @@ export function useState(id: string) {
 export function useRequest(rq: string, params: any, options: any = {}) {
   const project = useProject();
   const [value, setValue] = React.useState(options.offline);
+
   React.useEffect(() => {
     if (project) {
       const pending = options.prending;
-      if (pending !== null) setValue(pending);
-      Server.send(RqKind.GET, rq, params)
-        .then(setValue)
-        .catch((err: string) => {
-          if (Dome.DEVEL) console.warn(`[Server] use request '${rq}':`, err);
+      if (pending !== null) {
+        setValue(pending);
+      }
+      (async () => {
+        try {
+          const sr: ServerRequest = { endpoint: rq, params };
+          const v = await Server.GET(sr);
+          setValue(v);
+        } catch (err) {
+          if (Dome.DEVEL) {
+            console.warn(`[Server] use request '${rq}':`, err);
+          }
           const { error } = options;
-          if (error !== null) setValue(error);
-        });
+          if (error !== null) {
+            setValue(error);
+          }
+        }
+      })();
     } else {
       const v = options.offline;
-      if (value !== v) setValue(v);
+      if (value !== v) {
+        setValue(v);
+      }
     }
   }, [project, rq, JSON.stringify(params)]);
+
   return value;
 }
 
@@ -257,19 +279,20 @@ class SyncState {
     return this.value;
   }
 
-  setValue(v: any) {
+  async setValue(v: any) {
     this.insync = true;
     this.value = v;
-    Server.send(RqKind.SET, this.setRq, v);
+    const sr: ServerRequest = { endpoint: this.setRq, params: v };
+    await Server.SET(sr);
     Dome.emit(this.UPDATE);
   }
 
-  update() {
+  async update() {
     this.insync = true;
-    Server.send(RqKind.GET, this.getRq, null).then((v: any) => {
-      this.value = v;
-      Dome.emit(this.UPDATE);
-    });
+    const sr: ServerRequest = { endpoint: this.getRq, params: {} };
+    const v = await Server.GET(sr);
+    this.value = v;
+    Dome.emit(this.UPDATE);
   }
 }
 
@@ -360,33 +383,35 @@ class SyncArray {
     return _.find(this.index, () => true) !== undefined;
   }
 
-  fetch() {
+  async fetch() {
     this.insync = true;
-    Server.send(RqKind.GET, this.fetchRq, 50)
-      .then(({ reload = false, removed = [], updated = [], pending = 0 }) => {
-        let reloaded = false;
-        if (reload) {
-          reloaded = this.isEmpty();
-          this.index = {};
-        }
-        removed.forEach((key) => {
-          delete this.index[key];
-        });
-        updated.forEach((item: any) => {
-          this.index[item.key] = item;
-        });
-        if (reloaded || removed.length || updated.length) {
-          this.index = { ...this.index };
-          Dome.emit(this.UPDATE);
-        }
-        if (pending > 0) {
-          this.fetch();
-        }
-      });
+    const sr: ServerRequest = { endpoint: this.fetchRq, params: 50 };
+    const data = await Server.GET(sr);
+    const { reload = false, removed = [], updated = [], pending = 0 } = data;
+    let reloaded = false;
+    if (reload) {
+      reloaded = this.isEmpty();
+      this.index = {};
+    }
+    removed.forEach((key: any) => {
+      delete this.index[key];
+    });
+    updated.forEach((item: any) => {
+      this.index[item.key] = item;
+    });
+    if (reloaded || removed.length || updated.length) {
+      this.index = { ...this.index };
+      Dome.emit(this.UPDATE);
+    }
+    if (pending > 0) {
+      this.fetch();
+    }
+    return;
   }
 
-  reload() {
-    Server.send(RqKind.SET, this.reloadRq, null);
+  async reload() {
+    const sr: ServerRequest = { endpoint: this.reloadRq, params: {} };
+    await Server.SET(sr);
     this.index = {};
     this.insync = false;
     Dome.emit(this.UPDATE);

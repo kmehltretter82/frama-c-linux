@@ -3,7 +3,7 @@
 // --------------------------------------------------------------------------
 
 import React from 'react';
-import Server, { RqKind } from 'frama-c/server';
+import Server, { ServerRequest } from 'frama-c/server';
 import States from 'frama-c/states';
 
 import { Vfill } from 'dome/layout/boxes';
@@ -49,15 +49,22 @@ const ASTview = () => {
     buffer.clear();
     if (theFunction) {
       buffer.log('// Loading', theFunction, '…');
-      Server.send(RqKind.GET, 'kernel.ast.printFunction', theFunction)
-        .then((data: string) => {
-          buffer.clear();
-          if (!data) {
-            buffer.log('// No code for function ', theFunction);
-          }
-          print(buffer, data);
-          if (theMarker) buffer.scroll(theMarker, undefined);
-        });
+      (async () => {
+        const sr: ServerRequest = {
+          endpoint: 'kernel.ast.printFunction',
+          params: theFunction,
+        };
+        const data = await Server.GET(sr);
+        buffer.clear();
+        if (!data) {
+          buffer.log('// No code for function ', theFunction);
+        }
+        print(buffer, data);
+        if (theMarker) {
+          buffer.scroll(theMarker, undefined);
+        }
+        return;
+      })();
     }
   }, [theFunction]);
 
