@@ -7,6 +7,7 @@
 [wp] [Qed] Goal typed_globals_check_qed_ok : Valid
 [wp] [Qed] Goal typed_globals_check_qed_ok_2 : Valid
 [wp] [Qed] Goal typed_globals_check_qed_ok_3 : Valid
+[wp] Warning: creating session directory `/home/allanb/Documents/Frama-C/branches/feature/blanchard/wp/initialized/src/plugins/wp/tests/wp_acsl/oracle_qualif/initialized_memvar.0.session'
 [wp] [Alt-Ergo] Goal typed_globals_check_qed_ko : Unsuccess
 [wp] [Qed] Goal typed_globals_check_qed_ok_4 : Valid
 [wp] [Alt-Ergo] Goal typed_globals_check_qed_ko_2 : Unsuccess
