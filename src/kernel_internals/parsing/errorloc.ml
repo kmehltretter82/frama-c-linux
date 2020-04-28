@@ -126,8 +126,14 @@ let pp_context_from_file ?(ctx=2) ?start_line fmt pos =
           | None -> pos.Filepath.pos_lnum, pos.Filepath.pos_lnum
           | Some l -> min l pos.Filepath.pos_lnum, max l pos.Filepath.pos_lnum
         in
+        (* The difference between the first and last error lines can be very
+           large; in this case, we print only the first and last [error_ctx]
+           lines, with "..." between them. *)
         let first_to_print = max (first_error_line-ctx) 1 in
         let last_to_print = last_error_line+ctx in
+        let error_ctx = 3 in
+        let error_height = last_error_line - first_error_line + 1 in
+        let compress_error = error_height > 2 * error_ctx + 1 + 2 in
         let i = ref 1 in
         let error_line_len = ref 0 in
         try
@@ -148,8 +154,16 @@ let pp_context_from_file ?(ctx=2) ?start_line fmt pos =
           (* print error lines *)
           while !i <= last_error_line do
             let line = input_line in_ch in
-            error_line_len := String.length line;
-            Format.fprintf fmt "%-6d%s\n" !i line;
+            if compress_error && !i = first_error_line + error_ctx then
+              Format.fprintf fmt "%d-%d [... omitted ...]\n"
+                (first_error_line + error_ctx) (last_error_line - error_ctx)
+            else if compress_error && !i > first_error_line + error_ctx &&
+                    !i <= last_error_line - error_ctx then
+              () (* ignore line *)
+            else begin
+              error_line_len := String.length line;
+              Format.fprintf fmt "%-6d%s\n" !i line;
+            end;
             incr i
           done;
           (* if more than one line of context, print blank line,
