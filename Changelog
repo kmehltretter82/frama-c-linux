@@ -17,6 +17,8 @@
 Open Source Release <next-release>
 ##################################
 
+o   Kernel    [2020/04/27] Plug-ins specific dirs now use Filepath instead of
+              mere strings.
 -   Eva       [2020/04/10] Fixes the Memexec cache on functions with logical
               annotations about variables unused in the C body of the function.
 -   Eva       [2020/04/06] New option -eva-domains-function to enable domains
