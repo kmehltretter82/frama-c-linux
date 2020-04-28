@@ -1,6 +1,6 @@
 ## Setup
 
-From the `./gui` sub-directory of Frama-C main directory:
+From the `./ivette` sub-directory of Frama-C main directory:
 
 ```
 $ make app
