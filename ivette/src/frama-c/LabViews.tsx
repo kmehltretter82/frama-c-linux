@@ -20,7 +20,8 @@ import {
   Item as ItemToRender,
   Render as RenderItem,
 } from 'dome/layout/dispatch';
-import './labviews.css';
+
+import './style.css';
 
 // --------------------------------------------------------------------------
 // --- Library
