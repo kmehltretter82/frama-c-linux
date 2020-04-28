@@ -72,7 +72,7 @@ let rec locate_error files file line =
 let cluster_file c =
   let dir = WpContext.directory () in
   let base = cluster_id c in
-  Printf.sprintf "%s/%s.ergo" dir base
+  Format.sprintf "%s/%s.ergo" (dir :> string) base
 
 (* -------------------------------------------------------------------------- *)
 (* --- Exporting Formulae to Alt-Ergo                                     --- *)

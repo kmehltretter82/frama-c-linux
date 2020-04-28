@@ -34,7 +34,7 @@ let dkey = Wp_parameters.register_category "prover"
 let cluster_file c =
   let dir = WpContext.directory () in
   let base = cluster_id c in
-  Printf.sprintf "%s/%s.v" dir base
+  Printf.sprintf "%s/%s.v" (dir :> string) base
 
 (* -------------------------------------------------------------------------- *)
 (* --- External Coq Libraries                                             --- *)
@@ -314,8 +314,8 @@ and assemble_coqlib coqcc c =
     begin
       let tgtdir = Wp_parameters.get_output_dir "coqwp" in
       let source = Printf.sprintf "%s/%s" c.c_source c.c_file in
-      let target = Printf.sprintf "%s/%s" tgtdir c.c_file in
-      let dir = Printf.sprintf "%s/%s" tgtdir c.c_path in
+      let target = Printf.sprintf "%s/%s" (tgtdir :> string) c.c_file in
+      let dir = Printf.sprintf "%s/%s" (tgtdir :> string) c.c_path in
       if need_recompile ~source ~target then
         begin
           Wp_parameters.make_output_dir dir ;
@@ -333,7 +333,7 @@ let assemble_goal ~pid axioms prop =
   let title = Pretty_utils.to_string WpPropId.pretty pid in
   let model = WpContext.directory () in
   let id = WpPropId.get_propid pid in
-  let file = Printf.sprintf "%s/%s.coq" model id in
+  let file = Printf.sprintf "%s/%s.coq" (model :> string) id in
   let goal = cluster ~id ~title () in
   let deps = Command.print_file file
       begin fun fmt ->
@@ -359,7 +359,7 @@ let assemble_goal ~pid axioms prop =
       end in
   let coqcc = { marked = Marked.empty ; includes = [] ; sources = [] } in
   List.iter (assemble coqcc) deps ;
-  let includes = (model , "") :: List.rev coqcc.includes in
+  let includes = ((model :> string) , "") :: List.rev coqcc.includes in
   let sources = List.rev coqcc.sources in
   includes , sources , file
 

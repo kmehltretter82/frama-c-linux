@@ -283,7 +283,9 @@ let dump ~dir kf map =
   if Wp.has_dkey dot_key || Wp.has_dkey pdf_key then
     begin
       let name = Kf.get_name kf in
-      let file = Printf.sprintf "%s/%s.dot" dir name in
+      let file =
+        Format.asprintf "%a/%s.dot" Datatype.Filepath.pretty dir name
+      in
       let dot = Dotgraph.open_dot ~attr:[`LR] ~name ~file () in
       dotgraph dot map ;
       Dotgraph.close dot ;

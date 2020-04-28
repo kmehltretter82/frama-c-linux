@@ -50,7 +50,7 @@ let get_why3_env = Env.memoize
       let config = Why3Provers.config () in
       let main = Why3.Whyconf.get_main config in
       let ld =
-        (WpContext.directory ())::
+        (WpContext.directory () :> string)::
         ((Wp_parameters.Share.get_dir ~mode:`Must_exist "why3") :> string)::
         (Why3.Whyconf.loadpath main) in
       Why3.Env.create_env ld
@@ -790,7 +790,7 @@ class visitor (ctx:context) c =
         then
           let tgtdir = WpContext.directory () in
           let why3src = Filename.basename source in
-          let target = Printf.sprintf "%s/%s" tgtdir why3src in
+          let target = Printf.sprintf "%s/%s" (tgtdir :> string) why3src in
           Command.copy source target
       in
       let iter_file opt =
@@ -1238,6 +1238,7 @@ let mark_cache ~mode hash =
 let cleanup_cache ~mode =
   if mode = Cleanup && (!hits > 0 || !miss > 0) then
     let dir = Wp_parameters.get_session_dir ~force:false "cache" in
+    let dir = (dir :> string) in
     try
       if Sys.file_exists dir && Sys.is_directory dir then
         Array.iter
@@ -1361,6 +1362,7 @@ let get_cache_result ~mode hash =
   | NoCache | Rebuild -> VCS.no_result
   | Update | Cleanup | Replay | Offline ->
       let dir = Wp_parameters.get_session_dir ~force:false "cache" in
+      let dir = (dir :> string) in
       if not (Sys.file_exists dir && Sys.is_directory dir) then
         VCS.no_result
       else
@@ -1382,11 +1384,11 @@ let set_cache_result ~mode hash prover result =
   | Rebuild | Update | Cleanup ->
       let dir = Wp_parameters.get_session_dir ~force:true "cache" in
       let hash = Lazy.force hash in
-      let file = Printf.sprintf "%s/%s.json" dir hash in
+      let file = Format.sprintf "%s/%s.json" (dir :> string) hash in
       try
         mark_cache ~mode hash ;
         ProofScript.json_of_result (VCS.Why3 prover) result
-        |> Json.save_file file
+        |> Json.save_file (file :> string)
       with err ->
         Wp_parameters.warning ~current:false ~once:true
           "can not update cache (%s)" (Printexc.to_string err)

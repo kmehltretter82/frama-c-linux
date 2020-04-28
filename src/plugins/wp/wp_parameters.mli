@@ -156,9 +156,9 @@ module SmokeDeadcall: Parameter_sig.Bool
 val has_out : unit -> bool
 val has_session : unit -> bool
 val get_session : force:bool -> unit -> Datatype.Filepath.t
-val get_session_dir : force:bool -> string -> string
-val get_output : unit -> string
-val get_output_dir : string -> string
+val get_session_dir : force:bool -> string -> Datatype.Filepath.t
+val get_output : unit -> Datatype.Filepath.t
+val get_output_dir : string -> Datatype.Filepath.t
 val make_output_dir : string -> unit
 val get_overflows : unit -> bool
 
