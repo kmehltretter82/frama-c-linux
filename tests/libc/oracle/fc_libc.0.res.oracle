@@ -40,7 +40,7 @@
    unsetenv (0 call); wcscat (0 call); wcscpy (0 call); wcslen (2 calls);
    wcsncat (0 call); wcsncpy (0 call); wmemcpy (0 call); wmemset (0 call); 
   
-  Undefined functions (395)
+  Undefined functions (397)
   =========================
    FD_CLR (0 call); FD_ISSET (0 call); FD_SET (0 call); FD_ZERO (0 call);
    Frama_C_int_interval (0 call); Frama_C_long_interval (0 call);
@@ -91,9 +91,9 @@
    flockfile (0 call); floor (0 call); floorf (0 call); floorl (0 call);
    fmod (0 call); fmodf (0 call); fopen (0 call); fork (0 call);
    fputc (0 call); fputs (0 call); fread (0 call); free (1 call);
-   freeaddrinfo (0 call); freopen (0 call); fseek (0 call); fsetpos (0 call);
-   ftell (0 call); ftrylockfile (0 call); funlockfile (0 call);
-   fwrite (0 call); gai_strerror (0 call); getc (0 call);
+   freeaddrinfo (0 call); freopen (0 call); fseek (0 call); fseeko (0 call);
+   fsetpos (0 call); ftell (0 call); ftello (0 call); ftrylockfile (0 call);
+   funlockfile (0 call); fwrite (0 call); gai_strerror (0 call); getc (0 call);
    getc_unlocked (0 call); getchar (0 call); getchar_unlocked (0 call);
    getcwd (0 call); getegid (0 call); geteuid (0 call); getgid (0 call);
    gethostname (0 call); getitimer (0 call); getopt (0 call);
@@ -181,7 +181,7 @@
   Goto = 89
   Assignment = 438
   Exit point = 82
-  Function = 477
+  Function = 479
   Function call = 89
   Pointer dereferencing = 158
   Cyclomatic complexity = 286

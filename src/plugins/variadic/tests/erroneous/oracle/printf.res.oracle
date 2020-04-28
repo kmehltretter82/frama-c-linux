@@ -12,7 +12,7 @@
   Declaration of variadic function sprintf.
 [variadic] FRAMAC_SHARE/libc/stdio.h:217: 
   Declaration of variadic function sscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:521: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:538: 
   Declaration of variadic function dprintf.
 [variadic] tests/erroneous/printf.c:8: Warning: Multiple usage of flag '-'.
 [variadic] tests/erroneous/printf.c:8: Warning: 
