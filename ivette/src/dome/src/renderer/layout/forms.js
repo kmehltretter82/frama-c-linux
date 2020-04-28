@@ -176,7 +176,6 @@ const PERIOD = (latency) => {
 };
 
 /**
-   @class
    @summary Generic context wrapper for field values
    @property {string} [path] - select a property in the context value (and error)
    @property {any} [value] - set the inherited or edited value
@@ -301,7 +300,6 @@ export function Select({
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Form Container
    @property {string} [className] - Container additional class
    @property {object} [style] - Container additional style
@@ -352,7 +350,6 @@ const ERROR_MSG = (error) => {
 };
 
 /**
-   @class
    @summary Warning badge with description
    @property {string} [warn] - the short message (hovered)
    @property {number} [offset] - the label offset (Cf. field)
@@ -384,7 +381,6 @@ const TITLE_ENABLED = 'dome-text-title' ;
 const TITLE_DISABLED = 'dome-text-title dome-disabled' ;
 
 /**
-   @class
    @summary Expandable Section sub-form
    @property {string} label - Section title
    @property {string} [title] - Tooltip text
@@ -434,7 +430,6 @@ export function Section(props)
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Full width form block
    @property {any} [...props] - [Select](module-dome_layout_forms.Select.html) properties
    @property {React.children|function} [children] - Block content
@@ -525,7 +520,6 @@ export class Field extends React.Component
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Field List Container
    @property {string} [label] - Field label
    @property {string} [title] - Field tooltip text
@@ -554,7 +548,6 @@ export const FieldList = ({ label, title, warn=false, children, ...props }) => (
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Text Field
    @property {string} [label] - Field label
    @property {string} [title] - Field tooltip text
@@ -586,7 +579,6 @@ export const FieldText = ({ className, style, latency=true, placeholder, ...prop
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Monospaced Text Field
    @property {string} [label] - Field label
    @property {string} [title] - Field tooltip text
@@ -618,7 +610,6 @@ export const FieldCode = ({ className, style, latency=true, placeholder, ...prop
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Text Area Field
    @property {string} [label] - Field label
    @property {string} [title] - Field tooltip text
@@ -655,7 +646,6 @@ export const FieldTextArea = ({ className, style, cols=35, rows=5,
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Text Area Field
    @property {string} [label] - Field label
    @property {string} [title] - Field tooltip text
@@ -709,7 +699,6 @@ const TEXT_OF_NUMBER = (v) => v===undefined ? '' : PARSE_NUMBER(v,true).toLocale
 const NUMBER_OF_TEXT = (s) => s==='' ? undefined : PARSE_NUMBER(s.replace(/[ ,]/g,''));
 
 /**
-   @class
    @summary Number Field
    @property {string} [label] - Field label
    @property {string} [title] - Field tooltip text
@@ -772,7 +761,6 @@ const INT_RANGE = (min,max,warning) => (v) =>
       warning || 'Range ' + min + '…' + max ;
 
 /**
-   @class
    @summary Spinner Field
    @property {string} [label] - Field label
    @property {string} [title] - Field tooltip text
@@ -870,7 +858,6 @@ class REVEAL extends React.Component {
 
 
 /**
-   @class
    @summary Slider Field
    @property {string} [label] - Field label
    @property {string} [title] - Field tooltip text
@@ -920,7 +907,6 @@ export const FieldSlider =
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Date Field
    @property {string} [label] - Field label
    @property {string} [title] - Field tooltip text
@@ -954,7 +940,6 @@ export const FieldDate = ({ className, style, latency=true, min, max, ...props }
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Time Field
    @property {string} [label] - Field label
    @property {string} [title] - Field tooltip text
@@ -989,7 +974,6 @@ export const FieldTime = ({ className, style, latency=true, min, max, ...props }
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Color Field
    @property {string} [label] - Field label
    @property {string} [title] - Field tooltip text
@@ -1019,7 +1003,6 @@ export const FieldColor = ({ className, style, latency=true, ...props }) => (
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Select Field
    @property {string} [label] - Field label
    @property {string} [title] - Field tooltip text
@@ -1061,7 +1044,6 @@ export const FieldSelect = ({ className, style, children, placeholder, ...props 
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Checkbox Field
    @property {string} [label] - Field label
    @property {string} [title] - Field tooltip text
@@ -1090,7 +1072,6 @@ export const FieldCheckbox = ({ label, title, inverted, ...props }) => {
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Radio Button Field
    @property {string} [label] - Field label
    @property {string} [title] - Field tooltip text

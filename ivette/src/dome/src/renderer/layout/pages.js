@@ -32,7 +32,6 @@ import './pages.css' ;
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @property {object} [style] - additional style elements
    @property {Elements} [children] - page content
    @summary a blank HTML page
@@ -57,7 +56,6 @@ export const Page = ({style,children}) => {
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @property {object} [style] - additional style elements
    @property {Elements} [children] - page content
    @summary a blank HTML textarea

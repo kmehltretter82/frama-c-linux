@@ -267,7 +267,6 @@ function makeChildren( path, children)
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Data Item definition.
    @property {Library} [lib] - data library collecting the item
    @property {string} [id] - item identifier
@@ -297,7 +296,6 @@ export const Item = ( { children, ...props} ) => {
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Data Component definition.
    @property {Library} [lib] - data library collecting the item (default: inherited)
    @property {string} id - item identifier (default: skip item definition)
@@ -334,7 +332,6 @@ export const Component = ( { children, ...props} ) => {
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Recursive Data Item definition.
    @property {Library} [lib] - data library collecting the item (default: inherited)
    @property {string} id - item identifier (default: skip item definition)
@@ -375,7 +372,6 @@ export const Node = ({ children, ...props }) => {
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Ordered Data Collection.
    @property {Library} [lib] - local library to use
    @property {Sortable} [order] - local order to use (default: inherited)

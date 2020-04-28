@@ -128,7 +128,6 @@ const computeWidth = (elt) => {
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Table Column.
    @property {string} id - Column unique identifier (required)
    @property {string} [icon] - Header icon

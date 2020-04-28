@@ -508,7 +508,6 @@ the offsets of the associated D&D event.
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Display a Drag Source with an Overlay.
    @property {Dragging} [dragging] - current dragging event
    @property {string} [className] - source content class
