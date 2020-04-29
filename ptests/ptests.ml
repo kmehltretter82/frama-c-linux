@@ -338,7 +338,7 @@ let rec argspec =
     "-xunit", Arg.Set xunit,
     " Create a xUnit file named xunit.xml collecting results";
     "-error-code", Arg.Set do_error_code,
-    " Exit with error code 1 if tests failed (useful for scripts";
+    " Exit with error code 1 if tests failed (useful for scripts)";
   ]
 and help_msg () = Arg.usage (Arg.align argspec) umsg;;
 

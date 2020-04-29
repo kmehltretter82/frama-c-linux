@@ -710,19 +710,6 @@ possibilities for \texttt{CONFIG\_OPTION}) are detailed in
 Section~\ref{ptests:directives}.
 
 \begin{important}
-Note that some specific configurations require dynamic linking, which
-is not available on all platforms for native code. {\tt ptests} takes
-care of reverting to bytecode when it detects that the {\tt OPT},
-{\tt EXECNOW}, or \texttt{EXEC} options of a test require dynamic linking. This
-occurs currently in the following cases:
-\begin{itemize}
-\item {\tt OPT} contains the option {\tt -load-script}
-\item {\tt OPT} contains the option {\tt -load-module}
-\item {\tt EXECNOW} and \texttt{EXEC} use {\tt make} to create a {\tt .cmxs}
-\end{itemize}
-\end{important}
-
-\begin{important}
   \textbf{Concurrency issues:}
   tests using compiled modules ({\tt -load-script} or {\tt -load-module}) may
   lead to concurrency issues when the same module is used in different test
@@ -740,6 +727,7 @@ occurs currently in the following cases:
   In addition, if the same script {\tt tests/suite/script.ml}
   is shared by several test files, the {\tt EXECNOW} directive should be put
   into {\tt tests/suite/test\_config}.
+  Check the {\tt MODULE} directive for a common solution to this issue.
 
 \end{important}
 
@@ -832,8 +820,10 @@ Figure~\ref{fig:ptests-options} details the options of \ptests.
 & \texttt{-byte} & Use bytecode toplevel & no \\
 & \texttt{-opt} & Use native toplevel & yes \\
 & \texttt{-gui} & Use GUI instead of console-based toplevel & no \\
-\hline \multirow{4}{16mm}{\centering{Behavior}}
+\hline \multirow{5}{16mm}{\centering{Behavior}}
 & \texttt{-run} & Delete current results; run tests and examine results & yes
+\\
+& \texttt{-dry-run} & Print commands, but do not execute them & no
 \\
 & \texttt{-examine} & Only examine current results; do not run tests & no \\
 & \texttt{-show} & Run tests and show results, but do not examine
