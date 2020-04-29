@@ -33,7 +33,7 @@ let add_files (host_window: Design.main_window_extension_points) =
          host_window#reset ()
        end)
 
-let filename: string option ref = ref None
+let filename: Filepath.Normalized.t option ref = ref None
 (* [None] for opening the 'save as' dialog box;
    [Some f] for saving in file [f] *)
 
@@ -94,7 +94,7 @@ let save_file_as (host_window: Design.main_window_extension_points) =
        | `SAVE ->
            Extlib.may
              (save_in host_window (dialog :> GWindow.window_skel))
-             dialog#filename
+             (Extlib.opt_map Filepath.Normalized.of_string dialog#filename)
        | `DELETE_EVENT | `CANCEL -> ());
   dialog#destroy ()
 
@@ -102,7 +102,7 @@ let save_file (host_window: Design.main_window_extension_points) =
   match !filename with
   | None -> save_file_as host_window
   | Some f ->
-      save_in host_window (host_window#main_window :> GWindow.window_skel) f
+    save_in host_window (host_window#main_window :> GWindow.window_skel) f
 
 (** Load a project file *)
 let load_file (host_window: Design.main_window_extension_points) =
@@ -118,7 +118,7 @@ let load_file (host_window: Design.main_window_extension_points) =
            begin match dialog#filename with
              | None -> ()
              | Some f ->
-                 Project.load_all f
+                 Project.load_all (Filepath.Normalized.of_string f)
            end
        | `DELETE_EVENT | `CANCEL -> ());
   dialog#destroy ()

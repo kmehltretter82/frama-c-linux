@@ -69,7 +69,7 @@ let () =
       ()
   in
   let load _rq file =
-    try Project.load_all file; None
+    try Project.load_all (Filepath.Normalized.of_string file); None
     with Project.IOError err -> Some err
   in
   Request.register_sig signature load

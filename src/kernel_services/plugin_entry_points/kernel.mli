@@ -309,7 +309,7 @@ module BigIntsHex: Parameter_sig.Int
 (** {2 Save/Load} *)
 (* ************************************************************************* *)
 
-module SaveState: Parameter_sig.String
+module SaveState: Parameter_sig.Filepath
 (** Behavior of option "-save" *)
 
 module LoadState: Parameter_sig.Filepath

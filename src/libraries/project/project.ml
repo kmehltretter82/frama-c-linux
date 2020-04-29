@@ -520,7 +520,7 @@ let magic = 9 (* magic number *)
 
 let save_projects selection projects filename =
   if Cmdline.use_obj then begin
-    let cout = open_out_bin filename in
+    let cout = open_out_bin (filename : Filepath.Normalized.t :> string) in
     output_value cout Fc_config.version;
     output_value cout magic;
     output_value cout !Graph.Blocks.cpt_vertex;
@@ -541,30 +541,30 @@ let save_projects selection projects filename =
     abort "saving a file is not supported in the 'no obj' mode"
 
 let unjournalized_save selection project filename =
-  guarded_feedback selection 2 "saving project %S into file %S"
-    project.unique_name filename;
+  guarded_feedback selection 2 "saving project %S into file %a"
+    project.unique_name Filepath.Normalized.pretty filename;
   save_projects selection (Q.singleton project) filename
 
 let journalized_save =
   let lbl = Datatype.optlabel_func in
   Journal.register "Project.save"
     (lbl "selection" dft_sel State_selection.ty
-       (lbl "project" current ty (Datatype.func Datatype.string Datatype.unit)))
+       (lbl "project" current ty (Datatype.func Datatype.Filepath.ty Datatype.unit)))
     unjournalized_save
 
 let save ?(selection=State_selection.full) ?(project=current()) filename =
   journalized_save selection project filename
 
 let unjournalized_save_all selection filename =
-  guarded_feedback selection 2 "saving the current session into file %S"
-    filename;
+  guarded_feedback selection 2 "saving the current session into file %a"
+    Filepath.Normalized.pretty filename;
   save_projects selection projects filename
 
 let journalized_save_all =
   let lbl = Datatype.optlabel_func in
   Journal.register "Project.save_all"
     (lbl "selection" dft_sel State_selection.ty
-       (Datatype.func Datatype.string Datatype.unit))
+       (Datatype.func Datatype.Filepath.ty Datatype.unit))
     unjournalized_save_all
 
 let save_all ?(selection=State_selection.full) filename =
@@ -686,12 +686,13 @@ end
 
 let load_projects ~project_under_copy selection ?name filename =
   if Cmdline.use_obj then begin
-    let cin = open_in_bin filename in
+    let cin = open_in_bin (filename : Filepath.Normalized.t :> string) in
     let gen_read f cin =
       try f cin with
       | End_of_file ->
         close_in cin;
-        abort "unexpected end of file while loading '%s'" filename
+        abort "unexpected end of file while loading '%a'"
+          Filepath.Normalized.pretty filename
       | Failure s -> close_in cin; raise (IOError s)
     in
     let read = gen_read input_value in
@@ -745,8 +746,8 @@ let load_projects ~project_under_copy selection ?name filename =
     abort "loading a file is not supported in the 'no obj' mode"
 
 let unjournalized_load ~project_under_copy selection name filename =
-  guarded_feedback selection 2 "loading the project saved in file %S"
-    filename;
+  guarded_feedback selection 2 "loading the project saved in file %a"
+    Filepath.Normalized.pretty filename;
   match load_projects ~project_under_copy selection ?name filename with
   | [ p ] -> p
   | [] | _ :: _ :: _ -> assert false
@@ -756,7 +757,7 @@ let journalized_load =
   Journal.register "Project.load"
     (lbl "selection" dft_sel State_selection.ty
        (lbl "name" (fun () -> None)
-          (Datatype.option Datatype.string) (Datatype.func Datatype.string ty)))
+          (Datatype.option Datatype.string) (Datatype.func Datatype.Filepath.ty ty)))
     (unjournalized_load ~project_under_copy:None)
 
 let load ?(selection=State_selection.full) ?name filename =
@@ -764,7 +765,8 @@ let load ?(selection=State_selection.full) ?name filename =
 
 let unjournalized_load_all selection filename =
   remove_all ();
-  guarded_feedback selection 2 "loading the session saved in file %S" filename;
+  guarded_feedback selection 2 "loading the session saved in file %a"
+    Filepath.Normalized.pretty filename;
   try
     ignore (load_projects ~project_under_copy:None selection filename)
   with IOError _ as e ->
@@ -775,7 +777,7 @@ let journalized_load_all =
   let lbl = Datatype.optlabel_func in
   Journal.register "Project.load_all"
     (lbl "selection" dft_sel State_selection.ty
-       (Datatype.func Datatype.string Datatype.unit))
+       (Datatype.func Datatype.Filepath.ty Datatype.unit))
     unjournalized_load_all
 
 let load_all ?(selection=State_selection.full) filename =
@@ -789,8 +791,9 @@ let unjournalized_create_by_copy selection src last name =
   guarded_feedback selection 2 "creating project %S by copying project %S"
     name (src.unique_name);
   let filename =
-    try Extlib.temp_file_cleanup_at_exit "frama_c_create_by_copy" ".sav"
-    with Extlib.Temp_file_error s -> abort "cannot create temporary file: %s" s
+    Filepath.Normalized.of_string (
+      try Extlib.temp_file_cleanup_at_exit "frama_c_create_by_copy" ".sav"
+      with Extlib.Temp_file_error s -> abort "cannot create temporary file: %s" s)
   in
   save ~selection ~project:src filename;
   try
@@ -798,12 +801,12 @@ let unjournalized_create_by_copy selection src last name =
       unjournalized_load
         ~project_under_copy:(Some src) selection (Some name) filename
     in
-    Extlib.safe_remove filename;
+    Extlib.safe_remove (filename:>string);
     if last then last_created_by_copy_ref := Some prj;
     Create_by_copy_hook.apply (src, prj);
     prj
   with e ->
-    Extlib.safe_remove filename;
+    Extlib.safe_remove (filename:>string);
     raise e
 
 let journalized_create_by_copy =
@@ -826,9 +829,9 @@ let create_by_copy
 module Undo = struct
 
   let short_filename = "frama_c_undo_restore"
-  let filename = ref ""
+  let filename = ref Filepath.Normalized.unknown
 
-  let clear_breakpoint () = Extlib.safe_remove !filename
+  let clear_breakpoint () = Extlib.safe_remove (!filename:>string)
 
   let restore () =
     if Cmdline.use_obj then begin
@@ -844,7 +847,7 @@ module Undo = struct
   let breakpoint () =
     if Cmdline.use_obj then begin
       clear_breakpoint ();
-      filename :=
+      filename := Filepath.Normalized.of_string
         (try Extlib.temp_file_cleanup_at_exit short_filename ".sav"
          with Extlib.Temp_file_error s ->
            abort "cannot create temporary file: %s" s);

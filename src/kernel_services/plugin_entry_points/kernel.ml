@@ -744,10 +744,12 @@ let saveload = add_group "Saving or Loading Data"
 let () = Parameter_customize.set_group saveload
 let () = Parameter_customize.do_not_projectify ()
 module SaveState =
-  P.Empty_string
+  P.Filepath
     (struct
       let option_name = "-save"
       let arg_name = "filename"
+      let existence = Filepath.Indifferent
+      let file_kind = "Frama-C state"
       let help = "at exit, save the session into file <filename>"
     end)
 

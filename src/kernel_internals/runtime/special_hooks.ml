@@ -106,22 +106,23 @@ let () = Extlib.safe_at_exit time
 (* Save Frama-c on disk if required *)
 let save_binary error_extension =
   let filename = Kernel.SaveState.get () in
-  if filename <> "" then begin
+  if not (Filepath.Normalized.is_unknown filename) then begin
     Kernel.SaveState.clear ();
     let realname =
       match error_extension with
       | None -> filename
       | Some err_ext ->
-        let s = filename ^ err_ext in
+        let s = (filename:>string) ^ err_ext in
         Kernel.warning
           "attempting to save on non-zero exit code: \
            modifying filename into `%s'." s;
-        s
+        Filepath.Normalized.of_string s
     in
     try 
       Project.save_all realname
     with Project.IOError s ->
-      Kernel.error "problem while saving to file %s (%s)." realname s
+      Kernel.error "problem while saving to file %a (%s)."
+        Filepath.Normalized.pretty realname s
   end
 let () = 
   (* implement a refinement of the behavior described in BTS #1388:
@@ -140,11 +141,11 @@ let () =
 let load_binary () =
   let filepath = Kernel.LoadState.get () in
   if filepath <> Filepath.Normalized.unknown then begin
-    let filename = Filepath.Normalized.to_pretty_string filepath in
     try
-      Project.load_all filename
+      Project.load_all filepath
     with Project.IOError s ->
-      Kernel.abort "problem while loading file %s (%s)" filename s
+      Kernel.abort "problem while loading file %a (%s)"
+        Filepath.Normalized.pretty filepath s
   end
 let () = Cmdline.run_after_loading_stage load_binary
 
