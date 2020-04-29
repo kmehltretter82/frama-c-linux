@@ -8,7 +8,9 @@ DOME_API=./src/frama-c
 COPYRIGHT=CEA LIST / LSL
 # --------------------------------------------------------------------------
 
-.PHONY: app dev doc dist typecheck lint
+.PHONY: all app dev doc dist typecheck lint
+
+all: typecheck lint app
 
 app: dome-app
 dev: dome-dev
