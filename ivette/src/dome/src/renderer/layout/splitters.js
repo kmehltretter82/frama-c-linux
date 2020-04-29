@@ -89,7 +89,7 @@ const LR = {
 
 /**
    @class
-   @summary Draggable split pane
+   @summary Draggable split pane.
    @property {Direction} [dir]  - Layout and dimensionning strategy
    @property {string} [settings] - User-settings key for persistent splitter position
    @property {number} [margin]  - Minimal margin from container edges

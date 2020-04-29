@@ -17,7 +17,7 @@ const SideBarContext = React.createContext();
 // --------------------------------------------------------------------------
 
 /**
-   @summary Container for sidebar items
+   @summary Container for sidebar items.
    @property {Elements} [children] - Side bar items
    @property {string} [settings] - Side bar items settings
    @property {string} [selection] - Current item selection
@@ -140,6 +140,7 @@ export function Section(props) {
 // --------------------------------------------------------------------------
 
 /**
+   @summary Sidebar Section Items.
    @property {string} [id] - Item identifier
    @property {string} [label] - **Item label**
    @property {string} [icon] - Item icon
@@ -151,7 +152,6 @@ export function Section(props) {
    @property {function} [onContextMenu] - Context Menu callback
    @property {Badge} [badge] - Badge element(s)
    @property {React.Children} [children] - Item additional content
-   @summary Sidebar Section Items
    @description
 
    The item will be highlighted if selected _via_ the `selection` property of the

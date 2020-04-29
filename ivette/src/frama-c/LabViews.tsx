@@ -608,7 +608,7 @@ function CustomizePanel(
 // --------------------------------------------------------------------------
 
 /**
-   @summary Reconfigurable Container (React Component)
+   @summary Reconfigurable Container (React Component).
    @property {boolean} [customize] - show components panel (false by default)
    @property {string} [settings] - window settings to make views persistent
    @property {React.Children} children - the labview content

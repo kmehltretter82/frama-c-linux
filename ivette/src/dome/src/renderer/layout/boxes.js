@@ -64,7 +64,7 @@ const makeBox = ( boxClasses, props, morestyle ) => {
 // --------------------------------------------------------------------------
 
 /**
-   @summary Horizontal box (extends horizontally, no overflow)
+   @summary Horizontal box (extends horizontally, no overflow).
    @property {object} [...props] - Extra properties passed to the `<div>` container
    @description
    <strong>Warning:</strong> large elements will be clipped if they overflow.
@@ -72,7 +72,7 @@ const makeBox = ( boxClasses, props, morestyle ) => {
 export const Hbox = (props) => makeBox( 'dome-xBoxes-hbox dome-xBoxes-box' , props );
 
 /**
-   @summary Vertical box (extends vertically, no overflow)
+   @summary Vertical box (extends vertically, no overflow).
    @property {object} [...props] - Extra properties passed to the `<div>` container
    @description
    <strong>Warning:</strong> large elements will be clipped if they overflow.
@@ -80,7 +80,7 @@ export const Hbox = (props) => makeBox( 'dome-xBoxes-hbox dome-xBoxes-box' , pro
 export const Vbox = (props) => makeBox( 'dome-xBoxes-vbox dome-xBoxes-box' , props );
 
 /**
-   @summary Compact Horizontal box (fixed dimensions, no overflow)
+   @summary Compact Horizontal box (fixed dimensions, no overflow).
    @property {object} [...props] - Extra properties passed to the `<div>` container
    @description
    <strong>Warning:</strong> large elements would be clipped if they overflow.
@@ -88,7 +88,7 @@ export const Vbox = (props) => makeBox( 'dome-xBoxes-vbox dome-xBoxes-box' , pro
 export const Hpack = (props) => makeBox( 'dome-xBoxes-hbox dome-xBoxes-pack' , props );
 
 /**
-   @summary Compact Vertical box (fixed dimensions, no overflow)
+   @summary Compact Vertical box (fixed dimensions, no overflow).
    @property {object} [...props] - Extra properties passed to the `<div>` container
    @description
    <strong>Warning:</strong> large elements will be clipped if they overflow.
@@ -96,7 +96,7 @@ export const Hpack = (props) => makeBox( 'dome-xBoxes-hbox dome-xBoxes-pack' , p
 export const Vpack = (props) => makeBox( 'dome-xBoxes-vbox dome-xBoxes-pack' , props );
 
 /**
-   @summary Horizontally filled box (fixed height, maximal width, no overflow)
+   @summary Horizontally filled box (fixed height, maximal width, no overflow).
    @property {object} [...props] - Extra properties passed to the `<div>` container
    @description
    <strong>Warning:</strong> large elements will be clipped if they overflow.
@@ -104,7 +104,7 @@ export const Vpack = (props) => makeBox( 'dome-xBoxes-vbox dome-xBoxes-pack' , p
 export const Hfill = (props) => makeBox( 'dome-xBoxes-hbox dome-xBoxes-fill' , props );
 
 /**
-   @summary Vertically filled box (fixed width, maximal height, no overflow)
+   @summary Vertically filled box (fixed width, maximal height, no overflow).
    @property {object} [...props] - Extra properties passed to the `<div>` container
    @description
    <strong>Warning:</strong> large elements will be clipped if they overflow.
@@ -116,19 +116,19 @@ export const Vfill = (props) => makeBox( 'dome-xBoxes-vbox dome-xBoxes-fill' , p
 // --------------------------------------------------------------------------
 
 /**
-   @summary Scrolling container
+   @summary Scrolling container.
    @property {object} [...props] - Extra properties passed to the `<div>` container
 */
 export const Scroll = (props) => makeBox( 'dome-xBoxes-scroll dome-container' , props );
 
 /**
-   @summary rigid space between items in a box
+   @summary Rigid space between items in a box.
    @property {object} [...props] - Extra properties passed to the `<div>` separator
 */
 export const Space = (props) => makeBox( 'dome-xBoxes-space' , props );
 
 /**
-   @summary extensible space between items in a box
+   @summary Extensible space between items in a box.
    @property {object} [...props] - Extra properties passed to the `<div>` separator
 */
 export const Filler = (props) => makeBox( 'dome-xBoxes-filler' , props );
@@ -138,7 +138,7 @@ export const Filler = (props) => makeBox( 'dome-xBoxes-filler' , props );
 // --------------------------------------------------------------------------
 
 /**
-   @summary Grid box container
+   @summary Grid box container.
    @property {string} [columns] - Grid column specifications
    @property {object} [...props] - Extra properties passed to the `<div>` container
    @description
@@ -158,7 +158,7 @@ export const Grid = ({columns='auto',...props}) =>
 // --------------------------------------------------------------------------
 
 /**
-   @summary Foldable Vpack box
+   @summary Foldable Vpack box.
    @property {string} label - box label
    @property {string} [title] - box label tooltip
    @property {string} [settings] - window setting to store the fold/unfold state
@@ -167,7 +167,8 @@ export const Grid = ({columns='auto',...props}) =>
    @description
    A vertical `Vpack` box with a clickable head label to fold/unfold its content.
 */
-export function Folder( { settings, defaultUnfold=false, indent=18, label, title, children } )
+export const Folder =
+  ({ settings, defaultUnfold=false, indent=18, label, title, children }) =>
 {
   const [ unfold , setUnfold ] = Dome.useState( settings, defaultUnfold );
   const icon = unfold ? 'TRIANGLE.DOWN' : 'TRIANGLE.RIGHT' ;
@@ -180,7 +181,7 @@ export function Folder( { settings, defaultUnfold=false, indent=18, label, title
       </Vpack>
     </Vpack>
   );
-}
+};
 
 // --------------------------------------------------------------------------
 

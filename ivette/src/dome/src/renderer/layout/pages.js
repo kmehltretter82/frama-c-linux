@@ -32,9 +32,9 @@ import './pages.css' ;
 // --------------------------------------------------------------------------
 
 /**
+   @summary Blank HTML page.
    @property {object} [style] - additional style elements
    @property {Elements} [children] - page content
-   @summary a blank HTML page
    @description
 
    The page has insets and shadows and fills the entire available area.
@@ -56,9 +56,9 @@ export const Page = ({style,children}) => {
 // --------------------------------------------------------------------------
 
 /**
+   @summary Blank HTML textarea.
    @property {object} [style] - additional style elements
    @property {Elements} [children] - page content
-   @summary a blank HTML textarea
    @description
 
    The area has small padding and no margin, and does not scroll its content.

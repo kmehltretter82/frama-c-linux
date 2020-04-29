@@ -176,7 +176,7 @@ const PERIOD = (latency) => {
 };
 
 /**
-   @summary Generic context wrapper for field values
+   @summary Generic context wrapper for field values.
    @property {string} [path] - select a property in the context value (and error)
    @property {any} [value] - set the inherited or edited value
    @property {any} [error] - set the inherited or edited error
@@ -300,7 +300,7 @@ export function Select({
 // --------------------------------------------------------------------------
 
 /**
-   @summary Form Container
+   @summary Form Container.
    @property {string} [className] - Container additional class
    @property {object} [style] - Container additional style
    @property {object} [value] - Set the form context value
@@ -350,7 +350,7 @@ const ERROR_MSG = (error) => {
 };
 
 /**
-   @summary Warning badge with description
+   @summary Warning badge with description.
    @property {string} [warn] - the short message (hovered)
    @property {number} [offset] - the label offset (Cf. field)
    @property {any} [error] - the error description (in tooltip)
@@ -381,7 +381,7 @@ const TITLE_ENABLED = 'dome-text-title' ;
 const TITLE_DISABLED = 'dome-text-title dome-disabled' ;
 
 /**
-   @summary Expandable Section sub-form
+   @summary Expandable Section sub-form.
    @property {string} label - Section title
    @property {string} [title] - Tooltip text
    @property {string} [path] - Fields selection
@@ -430,7 +430,7 @@ export function Section(props)
 // --------------------------------------------------------------------------
 
 /**
-   @summary Full width form block
+   @summary Full width form block.
    @property {any} [...props] - [Select](module-dome_layout_forms.Select.html) properties
    @property {React.children|function} [children] - Block content
    @description
@@ -459,7 +459,7 @@ const FIELD_DISABLED = 'dome-xForm-field dome-text-label dome-disabled';
 
 /**
    @class
-   @summary Generic Custom Field
+   @summary Generic Custom Field.
    @property {string} [label] - Field label
    @property {string} [title] - Field tooltip text
    @property {number} [offset] - Vertical label offset (for baseline alignment)
@@ -520,7 +520,7 @@ export class Field extends React.Component
 // --------------------------------------------------------------------------
 
 /**
-   @summary Field List Container
+   @summary Field List Container.
    @property {string} [label] - Field label
    @property {string} [title] - Field tooltip text
    @property {boolean} [warn] - Display errors (default: `false`)
@@ -548,7 +548,7 @@ export const FieldList = ({ label, title, warn=false, children, ...props }) => (
 // --------------------------------------------------------------------------
 
 /**
-   @summary Text Field
+   @summary Text Field.
    @property {string} [label] - Field label
    @property {string} [title] - Field tooltip text
    @property {string} [placeholder] - Input field place holder
@@ -579,7 +579,7 @@ export const FieldText = ({ className, style, latency=true, placeholder, ...prop
 // --------------------------------------------------------------------------
 
 /**
-   @summary Monospaced Text Field
+   @summary Monospaced Text Field.
    @property {string} [label] - Field label
    @property {string} [title] - Field tooltip text
    @property {string} [placeholder] - Input field place holder
@@ -610,7 +610,7 @@ export const FieldCode = ({ className, style, latency=true, placeholder, ...prop
 // --------------------------------------------------------------------------
 
 /**
-   @summary Text Area Field
+   @summary Text Area Field.
    @property {string} [label] - Field label
    @property {string} [title] - Field tooltip text
    @property {string} [className] - Input field additional class
@@ -646,7 +646,7 @@ export const FieldTextArea = ({ className, style, cols=35, rows=5,
 // --------------------------------------------------------------------------
 
 /**
-   @summary Text Area Field
+   @summary Text Area Field.
    @property {string} [label] - Field label
    @property {string} [title] - Field tooltip text
    @property {string} [className] - Input field additional class
@@ -699,7 +699,7 @@ const TEXT_OF_NUMBER = (v) => v===undefined ? '' : PARSE_NUMBER(v,true).toLocale
 const NUMBER_OF_TEXT = (s) => s==='' ? undefined : PARSE_NUMBER(s.replace(/[ ,]/g,''));
 
 /**
-   @summary Number Field
+   @summary Number Field.
    @property {string} [label] - Field label
    @property {string} [title] - Field tooltip text
    @property {string} [placeholder] - Input field place holder
@@ -761,7 +761,7 @@ const INT_RANGE = (min,max,warning) => (v) =>
       warning || 'Range ' + min + '…' + max ;
 
 /**
-   @summary Spinner Field
+   @summary Spinner Field.
    @property {string} [label] - Field label
    @property {string} [title] - Field tooltip text
    @property {string} [placeholder] - Input field place holder
@@ -858,7 +858,7 @@ class REVEAL extends React.Component {
 
 
 /**
-   @summary Slider Field
+   @summary Slider Field.
    @property {string} [label] - Field label
    @property {string} [title] - Field tooltip text
    @property {number} [min] - Minimum value (default: -24)
@@ -907,7 +907,7 @@ export const FieldSlider =
 // --------------------------------------------------------------------------
 
 /**
-   @summary Date Field
+   @summary Date Field.
    @property {string} [label] - Field label
    @property {string} [title] - Field tooltip text
    @property {string} [min] - Minimum date (default to `undefined`)
@@ -940,7 +940,7 @@ export const FieldDate = ({ className, style, latency=true, min, max, ...props }
 // --------------------------------------------------------------------------
 
 /**
-   @summary Time Field
+   @summary Time Field.
    @property {string} [label] - Field label
    @property {string} [title] - Field tooltip text
    @property {string} [min] - Minimum time (default to `undefined`)
@@ -974,7 +974,7 @@ export const FieldTime = ({ className, style, latency=true, min, max, ...props }
 // --------------------------------------------------------------------------
 
 /**
-   @summary Color Field
+   @summary Color Field.
    @property {string} [label] - Field label
    @property {string} [title] - Field tooltip text
    @property {string} [className] - Input field additional class
@@ -1003,7 +1003,7 @@ export const FieldColor = ({ className, style, latency=true, ...props }) => (
 // --------------------------------------------------------------------------
 
 /**
-   @summary Select Field
+   @summary Select Field.
    @property {string} [label] - Field label
    @property {string} [title] - Field tooltip text
    @property {string} [placeholder] - Selector placeholder
@@ -1044,7 +1044,7 @@ export const FieldSelect = ({ className, style, children, placeholder, ...props 
 // --------------------------------------------------------------------------
 
 /**
-   @summary Checkbox Field
+   @summary Checkbox Field.
    @property {string} [label] - Field label
    @property {string} [title] - Field tooltip text
    @property {boolean} [inverted] - Inverted value (incompatible with `input` and `output` properties)
@@ -1072,7 +1072,7 @@ export const FieldCheckbox = ({ label, title, inverted, ...props }) => {
 // --------------------------------------------------------------------------
 
 /**
-   @summary Radio Button Field
+   @summary Radio Button Field.
    @property {string} [label] - Field label
    @property {string} [title] - Field tooltip text
    @property {any} [value] - Value associated with the radio button

@@ -74,6 +74,8 @@
   ],
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    "src/dome/doc",
+    "src/dome/template"
   ]
 }

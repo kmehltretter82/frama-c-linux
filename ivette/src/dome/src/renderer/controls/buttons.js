@@ -51,7 +51,7 @@ export const LCD = (props) => (
 // --------------------------------------------------------------------------
 
 /**
-   @summary Led indicator
+   @summary Led indicator.
    @property {string} [status] - Led status and color (default: inactive)
    @property {boolean} [blink] - Led blinking (default: false)
    @property {string} [title] - Led tooltip (optional)
@@ -491,7 +491,7 @@ export const Select = (props) => {
 // --------------------------------------------------------------------------
 
 /**
-   @summary Text Field
+   @summary Text Field.
    @property {string} [value] - Field initial content
    @property {string} [edited] - Field current value
    @property {boolean} [enabled] - Defaults to `true`

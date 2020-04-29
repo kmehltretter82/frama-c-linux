@@ -566,7 +566,7 @@ ipcRenderer.on('dome.ipc.href',(href) => emitter.emit('dome.href',href));
 // --------------------------------------------------------------------------
 
 /**
-   @summary Inlined Function React Component
+   @summary Inlined Function React Component.
    @property {function} children - render function as children
    @description
    Allows to define an inlined functional component inside JSX.

@@ -12,7 +12,6 @@ COPYRIGHT=CEA LIST / LSL
 
 app: dome-app
 dev: dome-dev
-doc: dome-doc
 dist: dome-dist
 
 typecheck:
@@ -22,6 +21,28 @@ typecheck:
 lint:
 	@echo "[Ivette] running ts linter"
 	yarn run lint
+
+# --------------------------------------------------------------------------
+# --- Ivette Documentation
+# --------------------------------------------------------------------------
+
+# can also use dome-doc to generate Dome-only documentation
+
+D_JSDOC=$(CURDIR)/node_modules/.bin/jsdoc
+D_ICONS=$(addprefix $(DOME)/doc/template/gallery-, head.html icons.html tail.html)
+D_OUT=./doc/html
+
+doc: $(D_JSDOC) $(D_ICONS)
+	@echo "[Ivette] documentation"
+	@rm -fr ./build ./doc
+	@yarn run build
+	@mkdir -p ./doc/html
+	@(APP=$(APP) COPYRIGHT="$(COPYRIGHT)" DOME=$(DOME) \
+	  yarn exec jsdoc -- -c jsdoc.json -d doc/html)
+	@cat $(D_ICONS) > $(D_OUT)/tutorial-icons.html
+	@cp -f $(DOME)/doc/gallery.css $(D_OUT)/styles/
+	@cp -f $(DOME)/doc/tutorials/*.png $(D_OUT)/
+	@echo "[Ivette]   $(DOME_DOC)/index.html"
 
 # --------------------------------------------------------------------------
 # --- Ivette Plugins

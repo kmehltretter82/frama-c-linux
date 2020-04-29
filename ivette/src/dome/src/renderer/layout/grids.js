@@ -745,7 +745,7 @@ function orderElements( e1 , e2 )
 // --------------------------------------------------------------------------
 
 /**
-   @summary Elementary GridLayout Component
+   @summary Elementary GridLayout Component.
    @property {string} id - Component identifier
    @property {boolean} display - Whether to mount the component
    @property {number} width - Desired component width
@@ -935,7 +935,7 @@ function makeChildrenGrid( dir, items, children, shape )
 
 /**
    @class
-   @summary Grid-based Flexible Container
+   @summary Grid-based Flexible Container.
    @property {direction} [dir] - Default children layout (`'horizontal'` or `'vertical'`)
    @property {number}    [padding] - Padding between items
    @property {Shape}     [shape] - The desired shape (defaults to children grid)
@@ -1097,7 +1097,7 @@ const DRAGGABLEITEM =
 
 /**
    @class
-   @summary Grid Container
+   @summary Grid Container.
    @property {direction} [dir] - Default children layout (`'horizontal'` or `'vertical'`)
    @property {number}    [padding] - Padding between items
    @property {Shape}     [shape] - The desired shape (defaults to children grid)

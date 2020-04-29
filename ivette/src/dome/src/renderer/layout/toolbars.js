@@ -13,7 +13,7 @@ import './toolbars.css' ;
 
 /**
    @class
-   @summary Container for toolbar items
+   @summary Container for toolbar items.
    @description
    See also [Frame](module-dome_layout_frames.Frame.html) containers.
  */
@@ -41,22 +41,22 @@ export class ToolBar extends React.Component {
 // --------------------------------------------------------------------------
 
 /**
-   @summary Fixed (tiny) space
+   @summary Fixed (tiny) space.
 */
 export const Inset = (() => <div className='dome-xToolBar-inset'/>);
 
 /**
-   @summary Fixed space
+   @summary Fixed space.
 */
 export const Space = (() => <div className='dome-xToolBar-space'/>);
 
 /**
-   @summary Extensible space (can be used to right-align controls)
+   @summary Extensible space (can be used to right-align controls).
 */
 export const Filler = (() => <div className='dome-xToolBar-filler'/>);
 
 /**
-   @summary Vertical rule
+   @summary Vertical rule.
 */
 export const Separator = () => (
   <div className='dome-xToolBar-separator'>
@@ -82,6 +82,7 @@ const isDisabled = ( { enabled=true, disabled=false } ) => (disabled || !enabled
 const onClick = ( { onClick , value } ) => onClick ? (() => onClick(value)) : undefined ;
 
 /**
+   @summary Toolbar Button.
    @property {string} [icon] - Button icon name (See [gallery](gallery-icons.html))
    @property {string} [label] - Button label
    @property {string} [title] - Button tooltip
@@ -92,7 +93,6 @@ const onClick = ( { onClick , value } ) => onClick ? (() => onClick(value)) : un
    @property {any} [value] - button's value
    @property {any} [selection] - Currently selected value
    @property {function} [onClick] - Button callback (receives the current value)
-   @summary toolbar button
    @description
 
    By default, the propery `selected` is computed from properties `value`
@@ -125,11 +125,11 @@ export const Button = ( props ) => (
 // --------------------------------------------------------------------------
 
 /**
+   @summary Toolbar Button Group.
    @property {Button[]} children - Buttons in the group
    @property {any} [value] - Passed to children as `selection` property
    @property {any} [onChange] - Passed to children as `onClick` property
    @property {any} [...props] - Properties passed to all children
-   @summary toolbar button group
 */
 export const ButtonGroup = (props) => {
   const { children, value, onChange, ...otherProps } = props;
@@ -147,12 +147,12 @@ export const ButtonGroup = (props) => {
 // --------------------------------------------------------------------------
 
 /**
+   @summary Toolbar Selector Menu.
    @property {any} [value] - selected option's value
    @property {function} [onChange] - selection callback (receives option value)
    @property {boolean} [disabled] - disable the selector (default: `false`)
    @property {boolean} [enabled] - enable the selector (default: `true`)
    @property {option[]} children - Array of menu options
-   @summary Toolbar selector menu
    @description
 
    Behaves likes a standard `<select>` element, except that callback directly
