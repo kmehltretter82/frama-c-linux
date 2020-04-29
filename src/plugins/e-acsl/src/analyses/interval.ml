@@ -253,7 +253,10 @@ let ikind_of_ival iv =
     | None, None -> raise Cil.Not_representable (* GMP *)
     (* TODO: do not raise an exception, but returns a value instead *)
     | None, Some _ | Some _, None ->
-      Kernel.fatal ~current:true "unexpected ival: %a" Ival.pretty iv
+      (* Semi-open interval that can happen when computing the interval of shift
+         operations if the computation overflows *)
+      (* TODO: do not raise an exception, but returns a value instead *)
+      raise Cil.Not_representable (* GMP *)
 
 (* function call profiles (intervals for their formal parameters) *)
 module Profile = struct
@@ -456,9 +459,18 @@ let rec infer t =
     let i1 = infer t1 in
     let i2 = infer t2 in
     lift_binop ~safe_float:false Ival.c_rem i1 i2
-  | TBinOp (Shiftlt , _, _) -> Error.not_yet "right shift"
-  | TBinOp (Shiftrt , _, _) -> Error.not_yet "left shift"
-  | TBinOp (BAnd, _, _) -> Error.not_yet "bitwise and"
+  | TBinOp (Shiftlt, t1, t2) ->
+    let i1 = infer t1 in
+    let i2 = infer t2 in
+    lift_binop ~safe_float:false Ival.shift_left i1 i2
+  | TBinOp (Shiftrt, t1, t2) ->
+    let i1 = infer t1 in
+    let i2 = infer t2 in
+    lift_binop ~safe_float:false Ival.shift_right i1 i2
+  | TBinOp (BAnd, t1, t2) ->
+    let i1 = infer t1 in
+    let i2 = infer t2 in
+    lift_binop ~safe_float:false Ival.bitwise_and i1 i2
   | TBinOp (BXor, t1, t2) ->
     let i1 = infer t1 in
     let i2 = infer t2 in
