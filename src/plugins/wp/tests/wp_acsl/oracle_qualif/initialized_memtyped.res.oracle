@@ -4,7 +4,6 @@
 [wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 [wp] 23 goals scheduled
-[wp] Warning: creating session directory `/home/allanb/Documents/Frama-C/branches/feature/blanchard/wp/initialized/src/plugins/wp/tests/wp_acsl/oracle_qualif/initialized_memtyped.0.session'
 [wp] [Alt-Ergo] Goal typed_test_check_unknown : Unsuccess
 [wp] [Alt-Ergo] Goal typed_test_check_unknown_2 : Unsuccess
 [wp] [Alt-Ergo] Goal typed_test_check_unknown_3 : Unsuccess

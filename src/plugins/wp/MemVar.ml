@@ -1046,12 +1046,13 @@ struct
         let sub = initialized_loc sigma obj x ofs in
         Lang.F.p_forall [v] (p_imply hyp sub)
     | C_comp _ ->
-        let leaf = match Extlib.last ofs with
-          | Field f -> Ctypes.object_of f.ftype
-          | Shift(obj, _) -> obj
+        let hd = match ofs with
+          | Field f :: _ -> Ctypes.object_of f.ftype
+          | Shift(obj, _) :: _ -> obj
+          | [] -> assert false
         in
-        begin match leaf with
-          | C_array _ -> initialized_range sigma leaf x ofs low up
+        begin match hd with
+          | C_array _ -> initialized_range sigma hd x ofs low up
           | _ -> raise ShiftMismatch
         end
     | _ ->
@@ -1192,6 +1193,7 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   let rec assigned_path
+      kind
       (hs : pred list) (* collector of properties *)
       (xs : var list)  (* variable quantifying the assigned location *)
       (ys : var list)  (* variable quantifying others locations *)
@@ -1203,14 +1205,14 @@ struct
       (*TODO: optimized version for terminal [Field _] and [Index _] *)
 
       | Field f :: ofs ->
-          let cf = Cfield (f, KValue) in
+          let cf = Cfield (f, kind) in
           let af = e_getfield a cf in
           let bf = e_getfield b cf in
-          let hs = assigned_path hs xs ys af bf ofs in
+          let hs = assigned_path kind hs xs ys af bf ofs in
           List.fold_left
             (fun hs g ->
                if Fieldinfo.equal f g then hs else
-                 let cg = Cfield (g, KValue) in
+                 let cg = Cfield (g, kind) in
                  let ag = e_getfield a cg in
                  let bg = e_getfield b cg in
                  let eqg = p_forall ys (p_equal ag bg) in
@@ -1225,7 +1227,7 @@ struct
           if List.exists (fun x -> F.occurs x e) xs then
             (* index [e] is covered by [xs]:
                must explore deeper the remaining path. *)
-            assigned_path hs xs (y::ys) ak bk ofs
+            assigned_path kind hs xs (y::ys) ak bk ofs
           else
             (* index [e] is not covered by [xs]:
                any index different from e is disjoint.
@@ -1234,7 +1236,7 @@ struct
             let be = e_get b e in
             let ek = p_neq e k in
             let eqk = p_forall (y::ys) (p_imply ek (p_equal ak bk)) in
-            assigned_path (eqk :: hs) xs ys ae be ofs
+            assigned_path kind (eqk :: hs) xs ys ae be ofs
 
   let assigned_genset s xs mem x ofs p =
     let valid = valid_offset_path s.post Sigs.RW mem x ofs in
@@ -1243,8 +1245,23 @@ struct
     let a_ofs = access a ofs in
     let b_ofs = access b ofs in
     let p_sloc = p_forall xs (p_hyps [valid;p_not p] (p_equal a_ofs b_ofs)) in
-    let conds = assigned_path [p_sloc] xs [] a b ofs in
+    let conds = assigned_path KValue [p_sloc] xs [] a b ofs in
     List.map (fun p -> Assert p) conds
+
+  let monotonic_initialized_genset s xs mem x ofs p =
+    if x.vformal || x.vglob then [Assert p_true]
+    else
+      let valid = valid_offset_path s.post Sigs.RW mem x ofs in
+      let a = get_init_term s.pre x in
+      let b = get_init_term s.post x in
+      let a_ofs = access_init a ofs in
+      let b_ofs = access_init b ofs in
+      let not_p = p_forall xs (p_hyps [valid;p_not p] (p_equal a_ofs b_ofs)) in
+      let exact_p =
+        p_forall xs (p_hyps [valid; p] (p_imply (p_bool a_ofs) (p_bool b_ofs)))
+      in
+      let conds = assigned_path KInit [not_p; exact_p] xs [] a b ofs in
+      List.map (fun p -> Assert p) conds
 
   (* -------------------------------------------------------------------------- *)
   (* ---  Assigned                                                          --- *)
@@ -1263,14 +1280,14 @@ struct
             | None -> unsized_array ()
             | Some { arr_size } -> arr_size
           in
-          let low = (e_int 0) in
-          let up = (e_int (size-1)) in
           let v = Lang.freshvar ~basename:"i" Lang.t_int in
-          let hyp = p_and (p_leq low (e_var v)) (p_leq (e_var v) up) in
           let obj = Ctypes.object_of t in
           let ofs = ofs @ [ Shift(obj, e_var v) ] in
-          let sub = monotonic_initialized seq obj x ofs in
-          Lang.F.p_forall [v] (p_imply hyp sub)
+          let low = Some (e_int 0) in
+          let up = Some (e_int (size-1)) in
+          let hyp = Vset.in_range (e_var v) low up in
+          let in_range = monotonic_initialized seq obj x ofs in
+          Lang.F.p_forall [v] (p_imply hyp in_range)
       | C_comp ci ->
           let mk_pred f =
             let obj = Ctypes.object_of f.ftype in
@@ -1331,10 +1348,7 @@ struct
         let k = Lang.freshvar ~basename:"k" Qed.Logic.Int in
         let p = Vset.in_range (e_var k) a b in
         let ofs = ofs_shift elt (e_var k) ofs in
-        let obj_x = Ctypes.object_of x.vtype in
-        let init = e_var (Lang.freshvar ~basename:"v" (init_of_object obj_x)) in
-        Assert(monotonic_initialized seq obj_x x []) ::
-        (memvar_set_init seq x [] init) @
+        (monotonic_initialized_genset seq [k] m x ofs p) @
         (assigned_genset seq [k] m x ofs p)
 
   let assigned_descr seq obj xs l p =
@@ -1345,10 +1359,7 @@ struct
     | Val((HEAP|CTXT|CARR) as m,x,ofs) ->
         M.assigned (mseq_of_seq seq) obj (Sdescr(xs,mloc_of_path m x ofs,p))
     | Val((CVAL|CREF) as m,x,ofs) ->
-        let obj_x = Ctypes.object_of x.vtype in
-        let init = e_var (Lang.freshvar ~basename:"v" (init_of_object obj_x)) in
-        Assert(monotonic_initialized seq obj_x x []) ::
-        (memvar_set_init seq x [] init) @
+        (monotonic_initialized_genset seq xs m x ofs p) @
         (assigned_genset seq xs m x ofs p)
 
   let assigned seq obj = function

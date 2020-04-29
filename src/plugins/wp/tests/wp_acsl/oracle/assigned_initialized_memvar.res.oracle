@@ -83,10 +83,12 @@ Assume {
   Have: 10 <= i_1.
   (* Loop assigns ... *)
   Have: ((s.F1_S_i) = 0) /\ ((Init_s_0.Init_F1_S_i)=true) /\
-      (forall i_3 : Z. ((0 <= i_3) -> ((i_3 <= 9) -> ((v[i_3]=true) ->
-       (a[i_3]=true))))) /\
       (forall i_3 : Z. ((0 <= i_3) -> ((i_3 <= 9) ->
-       (((i_3 <= 0) \/ (5 <= i_3)) -> ((s.F1_S_a)[i_3] = v_1[i_3]))))).
+       (((i_3 <= 0) \/ (5 <= i_3)) -> ((a[i_3]=true) <-> (v[i_3]=true)))))) /\
+      (forall i_3 : Z. ((0 <= i_3) -> ((i_3 <= 9) ->
+       (((i_3 <= 0) \/ (5 <= i_3)) -> ((s.F1_S_a)[i_3] = v_1[i_3]))))) /\
+      (forall i_3 : Z. ((0 < i_3) -> ((0 <= i_3) -> ((i_3 <= 4) ->
+       ((i_3 <= 9) -> ((v[i_3]=true) -> (a[i_3]=true))))))).
   (* Else *)
   Have: 10 <= i_2.
 }
@@ -109,10 +111,12 @@ Assume {
   Have: 10 <= i_1.
   (* Loop assigns ... *)
   Have: ((s.F1_S_i) = 0) /\ ((Init_s_0.Init_F1_S_i)=true) /\
-      (forall i_4 : Z. ((0 <= i_4) -> ((i_4 <= 9) -> ((v[i_4]=true) ->
-       (a[i_4]=true))))) /\
       (forall i_4 : Z. ((0 <= i_4) -> ((i_4 <= 9) ->
-       (((i_4 <= 0) \/ (5 <= i_4)) -> ((s.F1_S_a)[i_4] = v_1[i_4]))))).
+       (((i_4 <= 0) \/ (5 <= i_4)) -> ((a[i_4]=true) <-> (v[i_4]=true)))))) /\
+      (forall i_4 : Z. ((0 <= i_4) -> ((i_4 <= 9) ->
+       (((i_4 <= 0) \/ (5 <= i_4)) -> ((s.F1_S_a)[i_4] = v_1[i_4]))))) /\
+      (forall i_4 : Z. ((0 < i_4) -> ((0 <= i_4) -> ((i_4 <= 4) ->
+       ((i_4 <= 9) -> ((v[i_4]=true) -> (a[i_4]=true))))))).
   (* Else *)
   Have: 10 <= i_2.
   (* Else *)
@@ -136,10 +140,12 @@ Assume {
   Have: 10 <= i_1.
   (* Loop assigns ... *)
   Have: ((s.F1_S_i) = 0) /\ ((Init_s_0.Init_F1_S_i)=true) /\
-      (forall i_4 : Z. ((0 <= i_4) -> ((i_4 <= 9) -> ((v[i_4]=true) ->
-       (a[i_4]=true))))) /\
       (forall i_4 : Z. ((0 <= i_4) -> ((i_4 <= 9) ->
-       (((i_4 <= 0) \/ (5 <= i_4)) -> ((s.F1_S_a)[i_4] = v_1[i_4]))))).
+       (((i_4 <= 0) \/ (5 <= i_4)) -> ((a[i_4]=true) <-> (v[i_4]=true)))))) /\
+      (forall i_4 : Z. ((0 <= i_4) -> ((i_4 <= 9) ->
+       (((i_4 <= 0) \/ (5 <= i_4)) -> ((s.F1_S_a)[i_4] = v_1[i_4]))))) /\
+      (forall i_4 : Z. ((0 < i_4) -> ((0 <= i_4) -> ((i_4 <= 4) ->
+       ((i_4 <= 9) -> ((v[i_4]=true) -> (a[i_4]=true))))))).
   (* Else *)
   Have: 10 <= i_2.
   (* Else *)
@@ -176,10 +182,12 @@ Assume {
   Have: 10 <= i_1.
   (* Loop assigns ... *)
   Have: ((s.F1_S_i) = 0) /\ ((Init_s_0.Init_F1_S_i)=true) /\
-      (forall i_5 : Z. ((0 <= i_5) -> ((i_5 <= 9) -> ((v_1[i_5]=true) ->
-       (a[i_5]=true))))) /\
       (forall i_5 : Z. ((0 <= i_5) -> ((i_5 <= 9) ->
-       (((i_5 <= 0) \/ (5 <= i_5)) -> ((s.F1_S_a)[i_5] = v_2[i_5]))))).
+       (((i_5 <= 0) \/ (5 <= i_5)) -> ((a[i_5]=true) <-> (v_1[i_5]=true)))))) /\
+      (forall i_5 : Z. ((0 <= i_5) -> ((i_5 <= 9) ->
+       (((i_5 <= 0) \/ (5 <= i_5)) -> ((s.F1_S_a)[i_5] = v_2[i_5]))))) /\
+      (forall i_5 : Z. ((0 < i_5) -> ((0 <= i_5) -> ((i_5 <= 4) ->
+       ((i_5 <= 9) -> ((v_1[i_5]=true) -> (a[i_5]=true))))))).
   (* Else *)
   Have: 10 <= i_2.
   (* Else *)
@@ -212,10 +220,12 @@ Assume {
   Have: 10 <= i_1.
   (* Loop assigns ... *)
   Have: ((s.F1_S_i) = 0) /\ ((Init_s_0.Init_F1_S_i)=true) /\
-      (forall i_6 : Z. ((0 <= i_6) -> ((i_6 <= 9) -> ((v_2[i_6]=true) ->
-       (a[i_6]=true))))) /\
       (forall i_6 : Z. ((0 <= i_6) -> ((i_6 <= 9) ->
-       (((i_6 <= 0) \/ (5 <= i_6)) -> ((s.F1_S_a)[i_6] = v_3[i_6]))))).
+       (((i_6 <= 0) \/ (5 <= i_6)) -> ((a[i_6]=true) <-> (v_2[i_6]=true)))))) /\
+      (forall i_6 : Z. ((0 <= i_6) -> ((i_6 <= 9) ->
+       (((i_6 <= 0) \/ (5 <= i_6)) -> ((s.F1_S_a)[i_6] = v_3[i_6]))))) /\
+      (forall i_6 : Z. ((0 < i_6) -> ((0 <= i_6) -> ((i_6 <= 4) ->
+       ((i_6 <= 9) -> ((v_2[i_6]=true) -> (a[i_6]=true))))))).
   (* Else *)
   Have: 10 <= i_2.
   (* Else *)
@@ -238,6 +248,7 @@ Prove: (v[4 <- v_1][i]=true).
 
 Goal Check (file tests/wp_acsl/assigned_initialized_memvar.i, line 54):
 Let a = Init_s_0.Init_F1_S_a.
+Let m = v_2[4 <- v_3].
 Let a_1 = Init_s_1.Init_F1_S_a.
 Assume {
   Have: 0 <= i.
@@ -253,10 +264,12 @@ Assume {
   Have: 10 <= i_1.
   (* Loop assigns ... *)
   Have: ((s.F1_S_i) = 0) /\ ((Init_s_1.Init_F1_S_i)=true) /\
-      (forall i_7 : Z. ((0 <= i_7) -> ((i_7 <= 9) -> ((v[i_7]=true) ->
-       (a_1[i_7]=true))))) /\
       (forall i_7 : Z. ((0 <= i_7) -> ((i_7 <= 9) ->
-       (((i_7 <= 0) \/ (5 <= i_7)) -> ((s.F1_S_a)[i_7] = v_1[i_7]))))).
+       (((i_7 <= 0) \/ (5 <= i_7)) -> ((a_1[i_7]=true) <-> (v[i_7]=true)))))) /\
+      (forall i_7 : Z. ((0 <= i_7) -> ((i_7 <= 9) ->
+       (((i_7 <= 0) \/ (5 <= i_7)) -> ((s.F1_S_a)[i_7] = v_1[i_7]))))) /\
+      (forall i_7 : Z. ((0 < i_7) -> ((0 <= i_7) -> ((i_7 <= 4) ->
+       ((i_7 <= 9) -> ((v[i_7]=true) -> (a_1[i_7]=true))))))).
   (* Else *)
   Have: 10 <= i_2.
   (* Else *)
@@ -274,11 +287,13 @@ Assume {
   Have: 10 <= i_5.
   (* Loop assigns ... *)
   Have: ((Init_s_0.Init_F1_S_i)=true) /\
-      (forall i_7 : Z. ((0 <= i_7) -> ((i_7 <= 9) ->
-       ((v_2[4 <- v_3][i_7]=true) -> (a[i_7]=true))))) /\
+      (forall i_7 : Z. ((i_7 != 0) -> ((i_7 != 2) -> ((i_7 != 4) ->
+       ((0 <= i_7) -> ((i_7 <= 9) -> ((a[i_7]=true) <-> (m[i_7]=true)))))))) /\
       (forall i_7 : Z. ((i_7 != 0) -> ((i_7 != 2) -> ((i_7 != 4) ->
        ((0 <= i_7) -> ((i_7 <= 9) ->
-       ((s_1.F1_S_a)[i_7] = v_4[4 <- v_5][i_7]))))))).
+       ((s_1.F1_S_a)[i_7] = v_4[4 <- v_5][i_7]))))))) /\
+      (forall i_7 : Z. ((0 <= i_7) -> ((i_7 <= 9) -> ((m[i_7]=true) ->
+       (((i_7 = 0) \/ (i_7 = 2) \/ (i_7 = 4)) -> (a[i_7]=true)))))).
   (* Else *)
   Have: 10 <= i_6.
 }
@@ -287,7 +302,9 @@ Prove: (a[i]=true).
 ------------------------------------------------------------
 
 Goal Check 'SMOKE' (file tests/wp_acsl/assigned_initialized_memvar.i, line 55):
-Let a = Init_s_0.Init_F1_S_a.
+Let a = Init_s_1.Init_F1_S_a.
+Let m = v_2[4 <- v_3].
+Let a_1 = Init_s_0.Init_F1_S_a.
 Assume {
   Type: is_sint32(i) /\ is_sint32(i_1) /\ is_sint32(i_2) /\ is_sint32(i_3) /\
       is_sint32(i_4) /\ is_sint32(i_5).
@@ -300,16 +317,18 @@ Assume {
   Have: 10 <= i.
   (* Loop assigns ... *)
   Have: ((s.F1_S_i) = 0) /\ ((Init_s_0.Init_F1_S_i)=true) /\
-      (forall i_6 : Z. ((0 <= i_6) -> ((i_6 <= 9) -> ((v[i_6]=true) ->
-       (a[i_6]=true))))) /\
       (forall i_6 : Z. ((0 <= i_6) -> ((i_6 <= 9) ->
-       (((i_6 <= 0) \/ (5 <= i_6)) -> ((s.F1_S_a)[i_6] = v_1[i_6]))))).
+       (((i_6 <= 0) \/ (5 <= i_6)) -> ((a_1[i_6]=true) <-> (v[i_6]=true)))))) /\
+      (forall i_6 : Z. ((0 <= i_6) -> ((i_6 <= 9) ->
+       (((i_6 <= 0) \/ (5 <= i_6)) -> ((s.F1_S_a)[i_6] = v_1[i_6]))))) /\
+      (forall i_6 : Z. ((0 < i_6) -> ((0 <= i_6) -> ((i_6 <= 4) ->
+       ((i_6 <= 9) -> ((v[i_6]=true) -> (a_1[i_6]=true))))))).
   (* Else *)
   Have: 10 <= i_1.
   (* Else *)
   Have: 10 <= i_2.
   (* Loop assigns ... *)
-  Have: forall i_6 : Z. ((0 <= i_6) -> ((i_6 <= 9) -> ((a[i_6]=true) ->
+  Have: forall i_6 : Z. ((0 <= i_6) -> ((i_6 <= 9) -> ((a_1[i_6]=true) ->
       (v_2[i_6]=true)))).
   (* Invariant *)
   Have: (0 <= i_3) /\ (i_3 <= 10).
@@ -321,11 +340,13 @@ Assume {
   Have: 10 <= i_4.
   (* Loop assigns ... *)
   Have: ((Init_s_1.Init_F1_S_i)=true) /\
-      (forall i_6 : Z. ((0 <= i_6) -> ((i_6 <= 9) ->
-       ((v_2[4 <- v_3][i_6]=true) -> ((Init_s_1.Init_F1_S_a)[i_6]=true))))) /\
+      (forall i_6 : Z. ((i_6 != 0) -> ((i_6 != 2) -> ((i_6 != 4) ->
+       ((0 <= i_6) -> ((i_6 <= 9) -> ((a[i_6]=true) <-> (m[i_6]=true)))))))) /\
       (forall i_6 : Z. ((i_6 != 0) -> ((i_6 != 2) -> ((i_6 != 4) ->
        ((0 <= i_6) -> ((i_6 <= 9) ->
-       ((s_1.F1_S_a)[i_6] = v_4[4 <- v_5][i_6]))))))).
+       ((s_1.F1_S_a)[i_6] = v_4[4 <- v_5][i_6]))))))) /\
+      (forall i_6 : Z. ((0 <= i_6) -> ((i_6 <= 9) -> ((m[i_6]=true) ->
+       (((i_6 = 0) \/ (i_6 = 2) \/ (i_6 = 4)) -> (a[i_6]=true)))))).
   (* Else *)
   Have: 10 <= i_5.
 }
@@ -377,7 +398,9 @@ Prove: true.
 
 Goal Loop assigns (file tests/wp_acsl/assigned_initialized_memvar.i, line 49) (2/5):
 Effect at line 50
-Let a = Init_s_0.Init_F1_S_a.
+Let a = Init_s_1.Init_F1_S_a.
+Let m = v_2[4 <- v_3].
+Let a_1 = Init_s_0.Init_F1_S_a.
 Assume {
   Type: is_sint32(i_2) /\ is_sint32(i_3) /\ is_sint32(i_4) /\
       is_sint32(i_5) /\ is_sint32(i_6) /\ is_sint32(i_7).
@@ -393,16 +416,18 @@ Assume {
   Have: 10 <= i_2.
   (* Loop assigns ... *)
   Have: ((s.F1_S_i) = 0) /\ ((Init_s_0.Init_F1_S_i)=true) /\
-      (forall i_9 : Z. ((0 <= i_9) -> ((i_9 <= 9) -> ((v[i_9]=true) ->
-       (a[i_9]=true))))) /\
       (forall i_9 : Z. ((0 <= i_9) -> ((i_9 <= 9) ->
-       (((i_9 <= 0) \/ (5 <= i_9)) -> ((s.F1_S_a)[i_9] = v_1[i_9]))))).
+       (((i_9 <= 0) \/ (5 <= i_9)) -> ((a_1[i_9]=true) <-> (v[i_9]=true)))))) /\
+      (forall i_9 : Z. ((0 <= i_9) -> ((i_9 <= 9) ->
+       (((i_9 <= 0) \/ (5 <= i_9)) -> ((s.F1_S_a)[i_9] = v_1[i_9]))))) /\
+      (forall i_9 : Z. ((0 < i_9) -> ((0 <= i_9) -> ((i_9 <= 4) ->
+       ((i_9 <= 9) -> ((v[i_9]=true) -> (a_1[i_9]=true))))))).
   (* Else *)
   Have: 10 <= i_3.
   (* Else *)
   Have: 10 <= i_4.
   (* Loop assigns ... *)
-  Have: forall i_9 : Z. ((0 <= i_9) -> ((i_9 <= 9) -> ((a[i_9]=true) ->
+  Have: forall i_9 : Z. ((0 <= i_9) -> ((i_9 <= 9) -> ((a_1[i_9]=true) ->
       (v_2[i_9]=true)))).
   (* Invariant *)
   Have: (0 <= i_5) /\ (i_5 <= 10).
@@ -414,11 +439,13 @@ Assume {
   Have: 10 <= i_6.
   (* Loop assigns ... *)
   Have: ((Init_s_1.Init_F1_S_i)=true) /\
-      (forall i_9 : Z. ((0 <= i_9) -> ((i_9 <= 9) ->
-       ((v_2[4 <- v_3][i_9]=true) -> ((Init_s_1.Init_F1_S_a)[i_9]=true))))) /\
+      (forall i_9 : Z. ((i_9 != 0) -> ((i_9 != 2) -> ((i_9 != 4) ->
+       ((0 <= i_9) -> ((i_9 <= 9) -> ((a[i_9]=true) <-> (m[i_9]=true)))))))) /\
       (forall i_9 : Z. ((i_9 != 0) -> ((i_9 != 2) -> ((i_9 != 4) ->
        ((0 <= i_9) -> ((i_9 <= 9) ->
-       ((s_1.F1_S_a)[i_9] = v_4[4 <- v_5][i_9]))))))).
+       ((s_1.F1_S_a)[i_9] = v_4[4 <- v_5][i_9]))))))) /\
+      (forall i_9 : Z. ((0 <= i_9) -> ((i_9 <= 9) -> ((m[i_9]=true) ->
+       (((i_9 = 0) \/ (i_9 = 2) \/ (i_9 = 4)) -> (a[i_9]=true)))))).
   (* Then *)
   Have: i_7 <= 9.
 }
