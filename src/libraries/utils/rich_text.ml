@@ -152,12 +152,10 @@ let truncate_text buffer size =
           let n_right = size - n_left - 5 in
           if p > 0 then
             Buffer.blit buffer.content p (Buffer.to_bytes buffer.content) 0 n_left;
-          Buffer.add_substring buffer.content "[...]" n_left 5 ;
-          Buffer.blit
-            buffer.content (q-n_right+1)
-            (Buffer.to_bytes buffer.content) (n_left + 5)
-            n_right ;
-          Buffer.truncate buffer.content size ;
+          let buf_right = Buffer.sub buffer.content (q-n_right+1) n_right in
+          Buffer.truncate buffer.content n_left;
+          Buffer.add_string buffer.content "[...]";
+          Buffer.add_string buffer.content buf_right;
         end
     end
 
