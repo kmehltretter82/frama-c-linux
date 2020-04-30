@@ -163,7 +163,7 @@ let unlink ?(silent = true) file =
     Unix.unlink file
   with
   | Unix_error _ when silent -> ()
-  | Unix_error (ENOENT,_,_) -> () (* Ignore "Not such file or directory" *)
+  | Unix_error (ENOENT,_,_) -> () (* Ignore "No such file or directory" *)
   | Unix_error _ as e -> output_unix_error e
 
 let is_file_empty_or_nonexisting filename =
@@ -338,7 +338,7 @@ let rec argspec =
     "-xunit", Arg.Set xunit,
     " Create a xUnit file named xunit.xml collecting results";
     "-error-code", Arg.Set do_error_code,
-    " Exit with error code 1 if tests failed (useful for scripts";
+    " Exit with error code 1 if tests failed (useful for scripts)";
   ]
 and help_msg () = Arg.usage (Arg.align argspec) umsg;;
 
