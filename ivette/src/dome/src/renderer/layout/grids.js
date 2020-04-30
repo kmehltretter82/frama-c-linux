@@ -4,12 +4,13 @@
 
 /** @module dome/layout/grids */
 
+import _ from 'lodash' ;
 import React from 'react' ;
-import Dome from 'dome' ;
 import { dispatchEvent, DnD, DragSource, DropTarget } from 'dome/dnd' ;
 import { AutoSizer } from 'react-virtualized' ;
 import { DraggableCore } from 'react-draggable' ;
-import _ from 'lodash' ;
+
+import * as Dome from 'dome' ;
 import './grids.css' ;
 
 // --------------------------------------------------------------------------
@@ -1327,18 +1328,5 @@ export class GridLayout extends React.Component
     );
   }
 }
-
-// --------------------------------------------------------------------------
-// --- Defaults
-// --------------------------------------------------------------------------
-
-export default {
-  GridLayout,
-  GridLayoutCore,
-  GridItem, GridBox, GridHbox, GridVbox,
-  iterShape, getShapeItem, removeShapeItem,
-  stringOfShape,
-  makeChildrenShape
-} ;
 
 // --------------------------------------------------------------------------

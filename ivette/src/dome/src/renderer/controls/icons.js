@@ -126,7 +126,6 @@ export function Badge( { value, title, onClick } )
    - `section`: section of the Icons (optional)
    - `viewBox`: svg view-box property (optional, `"0 0 24 24"` by default)
 */
-
 export function register(icon) {
   const { name , ...deficon } = icon ;
   if (!name) console.error(`[Dome] Icon has no name (skipped).`);
@@ -140,15 +139,10 @@ export function register(icon) {
    @description
    See [register](#.register) for properties of the icon objects.
 */
-
 export function forEach(job) {
   for( var name in Icons ) {
     job( Object.assign( { name } , Icons[name] ));
   }
 }
-
-// --------------------------------------------------------------------------
-
-export default { Icon , Badge, SVG, register , forEach } ;
 
 // --------------------------------------------------------------------------

@@ -6,12 +6,12 @@
 
 import _ from 'lodash';
 import React from 'react';
-import Dome from 'dome';
+import * as Dome from 'dome';
 import { Catch } from 'dome/errors';
 import { DnD, DragSource } from 'dome/dnd';
 import { SideBar, Section, Item } from 'dome/layout/sidebars';
 import { Splitter } from 'dome/layout/splitters';
-import Grids, { GridLayout, GridItem } from 'dome/layout/grids';
+import * as Grids from 'dome/layout/grids';
 import { Hbox, Hfill, Vfill } from 'dome/layout/boxes';
 import { IconButton, Field } from 'dome/controls/buttons';
 import { Label } from 'dome/controls/labels';
@@ -311,7 +311,7 @@ const makeGridItem = (customize: any, onClose: any) => (comp: any) => {
     );
   }
   return (
-    <GridItem
+    <Grids.GridItem
       id={id}
       className={properties.className}
       handle={properties.handle}
@@ -338,7 +338,7 @@ const makeGridItem = (customize: any, onClose: any) => (comp: any) => {
           <Catch title={id}>{children}</Catch>
         </TitleContext.Provider>
       </Vfill>
-    </GridItem>
+    </Grids.GridItem>
   );
 };
 
@@ -648,7 +648,7 @@ export function LabView(props: any) {
         {children}
       </UseLibrary>
       <Splitter settings={settingSplit} unfold={customize} dir="RIGHT">
-        <GridLayout
+        <Grids.GridLayout
           dnd={dnd}
           padding={2}
           className="labview-container"
@@ -669,9 +669,5 @@ export function LabView(props: any) {
     </>
   );
 }
-
-// --------------------------------------------------------------------------
-
-export default { LabView, View, Group, Component, TitleBar };
 
 // --------------------------------------------------------------------------

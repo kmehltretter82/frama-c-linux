@@ -3,8 +3,8 @@
 // --------------------------------------------------------------------------
 
 import React from 'react';
-import Server, { ServerRequest } from 'frama-c/server';
-import States from 'frama-c/states';
+import * as Server from 'frama-c/server';
+import * as States from 'frama-c/states';
 
 import { Vfill } from 'dome/layout/boxes';
 import { RichTextBuffer } from 'dome/text/buffers';
@@ -50,7 +50,7 @@ const ASTview = () => {
     if (theFunction) {
       buffer.log('// Loading', theFunction, '…');
       (async () => {
-        const sr: ServerRequest = {
+        const sr: Server.Request = {
           endpoint: 'kernel.ast.printFunction',
           params: theFunction,
         };

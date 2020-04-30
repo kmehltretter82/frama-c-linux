@@ -4,7 +4,7 @@
 
 import _ from 'lodash';
 import React from 'react';
-import States from 'frama-c/states';
+import * as States from 'frama-c/states';
 import { Label, Code } from 'dome/controls/labels';
 import { ArrayModel } from 'dome/table/arrays';
 import { Table, DefineColumn } from 'dome/table/views';

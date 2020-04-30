@@ -17,7 +17,7 @@ This can be also used to display some item among many in one unique place.
 
 import _ from 'lodash' ;
 import React from 'react';
-import Dome from 'dome' ;
+import * as Dome from 'dome' ;
 
 // --------------------------------------------------------------------------
 // --- Global Dispatcher
@@ -108,9 +108,5 @@ export function Render({ id, children=null })
     return content && <React.Fragment>{content}</React.Fragment>;
   }
 }
-
-// --------------------------------------------------------------------------
-
-export default { Item, Render };
 
 // --------------------------------------------------------------------------

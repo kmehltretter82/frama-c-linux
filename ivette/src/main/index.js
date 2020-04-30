@@ -14,6 +14,6 @@
    before or after the call to `Dome.start()`.
 */
 
-import Dome from 'dome' ;
+import * as Dome from 'dome' ;
 Dome.setName('Ivette');
 Dome.start();

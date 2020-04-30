@@ -3,15 +3,14 @@
 // --------------------------------------------------------------------------
 
 import React from 'react';
-import Dome from 'dome';
+import * as Dome from 'dome';
 
 import { Button as ToolButton, ButtonGroup, Space } from 'dome/layout/toolbars';
 import { LED, IconButton } from 'dome/controls/buttons';
 import { Label, Code } from 'dome/controls/labels';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
-
-import Server, { StatusCode, ServerConfiguration } from 'frama-c/server';
+import * as Server from 'frama-c/server';
 import { Component, TitleBar } from 'frama-c/LabViews';
 
 import 'codemirror/theme/ambiance.css';
@@ -20,10 +19,10 @@ import 'codemirror/theme/ambiance.css';
 // --- Configure Server
 // --------------------------------------------------------------------------
 
-let cmdConfig: ServerConfiguration;
+let cmdConfig: Server.Configuration;
 const cmdLine = new RichTextBuffer();
 
-function dumpCmdLine(sc: ServerConfiguration): void {
+function dumpCmdLine(sc: Server.Configuration): void {
   const { cwd, command, sockaddr, params } = sc;
   cmdLine.clear();
   if (cwd) cmdLine.log('--cwd', cwd);
@@ -99,11 +98,11 @@ export const Control = () => {
     { enabled: false, onClick: null };
 
   switch (status) {
-    case StatusCode.OFF:
-    case StatusCode.FAILED:
+    case Server.StatusCode.OFF:
+    case Server.StatusCode.FAILED:
       play = { enabled: true, onClick: Server.start };
       break;
-    case StatusCode.RUNNING:
+    case Server.StatusCode.RUNNING:
       stop = { enabled: true, onClick: Server.stop };
       reload = { enabled: true, onClick: Server.restart };
       break;
@@ -255,25 +254,25 @@ export const Status = () => {
   let blink;
   let error;
   switch (s) {
-    case StatusCode.OFF:
+    case Server.StatusCode.OFF:
       led = 'inactive';
       break;
-    case StatusCode.STARTED:
+    case Server.StatusCode.STARTED:
       led = 'active';
       blink = true;
       break;
-    case StatusCode.RUNNING:
+    case Server.StatusCode.RUNNING:
       led = n > 0 ? 'positive' : 'active';
       break;
-    case StatusCode.KILLING:
+    case Server.StatusCode.KILLING:
       led = 'negative';
       blink = true;
       break;
-    case StatusCode.RESTART:
+    case Server.StatusCode.RESTART:
       led = 'warning';
       blink = true;
       break;
-    case StatusCode.FAILED:
+    case Server.StatusCode.FAILED:
       led = 'negative';
       blink = false;
       error = Server.getError();
@@ -298,17 +297,6 @@ export const Stats = () => {
   Dome.useUpdate(Server.STATUS);
   const n = Server.getPending();
   return n > 0 ? <Code>{n} rq.</Code> : null;
-};
-
-// --------------------------------------------------------------------------
-// --- Controller Exports
-// --------------------------------------------------------------------------
-
-export default {
-  Control,
-  Console,
-  Status,
-  Stats,
 };
 
 // --------------------------------------------------------------------------

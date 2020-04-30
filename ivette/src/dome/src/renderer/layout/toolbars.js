@@ -185,6 +185,4 @@ register( Separator ,  'DOME_TOOLBAR_ITEM' );
 register( Filler , 'DOME_TOOLBAR_ITEM' );
 register( Button , 'DOME_TOOLBAR_ITEM' );
 
-export default { ToolBar , Space , Inset, Separator, Filler, Button, ButtonGroup, Select };
-
 // --------------------------------------------------------------------------

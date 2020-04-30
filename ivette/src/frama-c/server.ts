@@ -9,10 +9,10 @@
 
 import _ from 'lodash';
 import React from 'react';
-import Dome from 'dome';
-import System from 'dome/system';
+import * as Dome from 'dome';
+import * as System from 'dome/system';
 import { RichTextBuffer } from 'dome/text/buffers';
-import { Request } from 'zeromq';
+import { Request as ZmqRequest } from 'zeromq';
 
 // --------------------------------------------------------------------------
 // --- Events
@@ -60,7 +60,7 @@ export const SHUTDOWN = 'frama-c.server.shutdown';
  *  @description
  *  Event `frama-c.server.signal.<id>'` for signal `<id>`.
  */
-const SIGNAL = 'frama-c.server.signal.';
+export const SIGNAL = 'frama-c.server.signal.';
 
 /**
  *  @event
@@ -71,14 +71,14 @@ const SIGNAL = 'frama-c.server.signal.';
  *  @description
  *  Event `frama-c.server.activity.<id>'` for signal `<id>`.
  */
-const ACTIVITY = 'frama-c.server.activity.';
+export const ACTIVITY = 'frama-c.server.activity.';
 
 // --------------------------------------------------------------------------
 // --- Server Status
 // --------------------------------------------------------------------------
 
 /**
- *  @typedef StatusCode
+ *  @typedef Status
  *  @summary Server Status Codes.
  *  @description
  *   - `OFF` Server off
@@ -109,7 +109,7 @@ let queueCmd: any; // Queue of server commands to be sent
 let queueIds: any; // Waiting request ids to be sent
 let polling: any; // Timeout Polling timer
 let flushing: any; // Immediate Flushing timer
-let config: ServerConfiguration;
+let config: Configuration;
 let process: any; // Server process
 let socket: any; // ZMQ (REQ) socket
 let busy: boolean; // ZMQ socket is busy
@@ -119,7 +119,7 @@ let killing: any; // killing timeout
 // --- Server Console
 // --------------------------------------------------------------------------
 
-const buffer = new RichTextBuffer({ maxlines: 200 });
+export const buffer = new RichTextBuffer({ maxlines: 200 });
 
 // --------------------------------------------------------------------------
 // --- Server Status
@@ -131,7 +131,7 @@ const buffer = new RichTextBuffer({ maxlines: 200 });
  *  @description
  *  See [STATUS](module-frama-c_server.html#~STATUS) code definitions.
  */
-function getStatus(): StatusCode { return status; }
+export function getStatus(): StatusCode { return status; }
 
 /**
  *  @summary Hook on current server (Custom React Hook).
@@ -139,25 +139,25 @@ function getStatus(): StatusCode { return status; }
  *  @description
  *  See [STATUS](module-frama-c_server.html#~STATUS) code definitions.
  */
-function useStatus(): StatusCode {
+export function useStatus(): StatusCode {
   Dome.useUpdate(STATUS);
   return status;
 }
 
 /** Return `FAILED` status message. */
-function getError() { return error; }
+export function getError() { return error; }
 
 /**
  *  @summary Frama-C Server is running and ready to handle requests.
  *  @return {boolean} status is `RUNNING`.
  */
-function isRunning(): boolean { return status === StatusCode.RUNNING; }
+export function isRunning(): boolean { return status === StatusCode.RUNNING; }
 
 /**
  *  @summary Number of requests still pending.
  *  @return {number} pending requests
  */
-function getPending(): number {
+export function getPending(): number {
   return _.reduce(pending, (_, n) => n + 1, 0);
 }
 
@@ -165,20 +165,20 @@ function getPending(): number {
  *  @summary Register callback on READY event.
  *  @param {function} callback - invoked when the server enters RUNNING status
  */
-function onReady(callback: any) { Dome.on(READY, callback); }
+export function onReady(callback: any) { Dome.on(READY, callback); }
 
 /**
  *  @summary Register callback on SHUTDOWN event.
  *  @param {function} callback - invoked when the server enters SHUTDOWN status
  */
-function onShutdown(callback: any) { Dome.on(SHUTDOWN, callback); }
+export function onShutdown(callback: any) { Dome.on(SHUTDOWN, callback); }
 
 /**
  *  @summary Register callback on Signal ACTIVITY event.
  *  @*param {string} id - the signal event to listen to
  *  @*param {function} callback - invoked with `callback(signal,active)`
  */
-function onActivity(signal: string, callback: any) {
+export function onActivity(signal: string, callback: any) {
   Dome.on(ACTIVITY + signal, callback);
 }
 
@@ -211,7 +211,7 @@ function _status(newStatus: StatusCode, err?: string) {
  *  If the server is being shutdown, it will reboot.
  *  Otherwise, the Frama-C Server is spawned.
  */
-function start() {
+export function start() {
   switch (status) {
     case StatusCode.OFF:
     case StatusCode.FAILED:
@@ -243,7 +243,7 @@ function start() {
  *  When the server is shutting down, restart is canceled.
  *  Otherwise, this is a no-op.
  */
-function stop() {
+export function stop() {
   switch (status) {
     case StatusCode.STARTED:
       _kill();
@@ -278,7 +278,7 @@ function stop() {
  *  This function is automatically called when the `module` emits the `KILL`
  *  signal.
  */
-function kill() {
+export function kill() {
   switch (status) {
     case StatusCode.STARTED:
     case StatusCode.RUNNING:
@@ -305,7 +305,7 @@ function kill() {
  *  When running, try to gracefully shutdown the Server,
  *  and finally schedule a reboot on exit.
  */
-function restart() {
+export function restart() {
   switch (status) {
     case StatusCode.OFF:
     case StatusCode.FAILED:
@@ -335,7 +335,7 @@ function restart() {
  *  When not running, clear the console and reset any error flag.
  *  Otherwised, do nothing.
  */
-function clear() {
+export function clear() {
   switch (status) {
     case StatusCode.FAILED:
       _status(StatusCode.OFF);
@@ -355,7 +355,7 @@ function clear() {
 // --- Server Configure
 // --------------------------------------------------------------------------
 
-export interface ServerConfiguration {
+export interface Configuration {
   env?: any; // Process environment variables (default: `undefined`)
   cwd?: string; // Working directory (default: current)
   command?: string; // Server command (default: `frama-c`)
@@ -369,9 +369,9 @@ export interface ServerConfiguration {
 
 /**
  *  @summary Configure the Server.
- *  @param {ServerConfiguration} sc - Server Configuration
+ *  @param {Configuration} sc - Server Configuration
  */
-function configure(sc: ServerConfiguration) {
+export function configure(sc: Configuration) {
   config = sc || {};
 }
 
@@ -381,7 +381,7 @@ function configure(sc: ServerConfiguration) {
  *  @description
  *  See `configure()` method.
  */
-function getConfig(): ServerConfiguration {
+export function getConfig(): Configuration {
   return config;
 }
 
@@ -456,7 +456,7 @@ async function _launch() {
     _close(signal || status);
   });
   // Connect to Server
-  socket = new Request();
+  socket = new ZmqRequest();
   busy = false;
   socket.connect(sockaddr);
 }
@@ -601,7 +601,7 @@ function _signal(id: any) {
  *  If the server is not yet listening to this signal, a `SIGON` command is
  *  sent.
  */
-function onSignal(id: string, callback: any) {
+export function onSignal(id: string, callback: any) {
   _signal(id).on(callback);
 }
 
@@ -613,7 +613,7 @@ function onSignal(id: string, callback: any) {
  *  When no more callbacks are listening to this signal for a while,
  *  the server will be notified with a `SIGOFF` command.
  */
-function offSignal(id: string, callback: any) {
+export function offSignal(id: string, callback: any) {
   _signal(id).off(callback);
 }
 
@@ -622,7 +622,7 @@ function offSignal(id: string, callback: any) {
  *  @param {string} id - the signal event to listen to
  *  @param {function} callback - the callback to be called on signal
  */
-function useSignal(id: string, callback: any) {
+export function useSignal(id: string, callback: any) {
   React.useEffect(() => {
     onSignal(id, callback);
     return () => { offSignal(id, callback); };
@@ -651,19 +651,19 @@ Dome.on(SHUTDOWN, () => {
  *   - `SET` Used to write data into the server
  *   - `EXEC` Used to make the server execute a task
  */
-enum RqKind {
+export enum RqKind {
   GET = 'GET',
   SET = 'SET',
   EXEC = 'EXEC'
 }
 
 /**
- * @typedef ServerRequest
+ * @typedef Request
  * @summary Server request.
  * @param {string} endpoint - the request identifier
  * @param {any} params - the request parameters
  */
-export interface ServerRequest {
+export interface Request {
   endpoint: string;
   params: any;
 }
@@ -672,28 +672,28 @@ export interface ServerRequest {
  * @summary Get data from the server.
  * @param sr - the server request description.
  */
-async function GET(sr: ServerRequest) {
-  return _create(RqKind.GET, sr.endpoint, sr.params);
+export async function GET(sr: Request) {
+  return send(RqKind.GET, sr.endpoint, sr.params);
 }
 
 /**
  * @summary Set data into the server.
  * @param sr - the server request description.
  */
-async function SET(sr: ServerRequest) {
-  return _create(RqKind.SET, sr.endpoint, sr.params);
+export async function SET(sr: Request) {
+  return send(RqKind.SET, sr.endpoint, sr.params);
 }
 
 /**
  * @summary Make the server execute a task.
  * @param sr - the server request description.
  */
-async function EXEC(sr: ServerRequest) {
-  return _create(RqKind.EXEC, sr.endpoint, sr.params);
+export async function EXEC(sr: Request) {
+  return send(RqKind.EXEC, sr.endpoint, sr.params);
 }
 
 /**
- *  @summary Create request to send to the server.
+ *  @summary Send a request to the server.
  *  @param {RqKind} kind - the request kind
  *  @param {string} rq - the request identifier
  *  @param {object} params - request parameters
@@ -702,7 +702,7 @@ async function EXEC(sr: ServerRequest) {
  *  You may _kill_ the request before its normal termination by
  *  invoking `kill()` on the returned promised.
  */
-function _create(kind: RqKind, rq: string, params: any) {
+function send(kind: RqKind, rq: string, params: any) {
   if (!isRunning()) return Promise.reject(new Error('Server not running'));
   if (!rq) return Promise.reject(new Error('Undefined request'));
   const rid = `RQ.${rqid}`;
@@ -846,38 +846,5 @@ function _receive(resp: any) {
     else _poll();
   }
 }
-
-// --------------------------------------------------------------------------
-// --- Exports
-// --------------------------------------------------------------------------
-
-export default {
-  configure,
-  getConfig,
-  getStatus,
-  useStatus,
-  buffer,
-  getError,
-  getPending,
-  isRunning,
-  start,
-  stop,
-  kill,
-  restart,
-  clear,
-  GET,
-  SET,
-  EXEC,
-  onReady,
-  onShutdown,
-  onActivity,
-  onSignal,
-  offSignal,
-  useSignal,
-  STATUS,
-  READY,
-  SHUTDOWN,
-  StatusCode,
-};
 
 // --------------------------------------------------------------------------

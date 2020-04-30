@@ -4,12 +4,11 @@
 
 /** @module dome/layout/splitters */
 
-import React from 'react' ;
-import Props from 'prop-types' ;
-import Dome from 'dome' ;
-import { Layout } from 'dome/misc/events' ;
-import './splitters.css' ;
 import _ from 'lodash' ;
+import * as React from 'react' ;
+import * as Dome from 'dome' ;
+import { Layout } from 'dome/misc/layout' ;
+import './splitters.css' ;
 
 // --------------------------------------------------------------------------
 // --- Splitter Layout
@@ -132,7 +131,6 @@ const LR = {
    the left and bottom sides of the views are likely to be cropped.
 
 */
-
 export class Splitter extends React.Component {
 
   // --------------------------------------------------------------------------
@@ -368,22 +366,31 @@ export class Splitter extends React.Component {
 }
 
 // --------------------------------------------------------------------------
-// --- Props & Defaults
+// --- Short Cuts
 // --------------------------------------------------------------------------
 
-Splitter.propTypes = {
-  dir: Props.oneOf(['HORIZONTAL','VERTICAL','LEFT','RIGHT','TOP','BOTTOM']),
-  settings: Props.string,
-  margin: Props.number
-};
+/** @summary Splitter with `dir="HORIZONTAL"`. */
+export const HSplit =
+  ({ children, ...props }) => <Splitter dir="HORIZONTAL" {...props}>{children}</Splitter>;
 
-Splitter.defaultProps = {
-  dir: 'HORIZONTAL',
-  margin: 32
-};
+/** @summary Splitter with `dir="VERTICAL"`. */
+export const VSplit =
+  ({ children, ...props }) => <Splitter dir="VERTICAL" {...props}>{children}</Splitter>;
 
-// --------------------------------------------------------------------------
+/** @summary Splitter with `dir="TOP"`. */
+export const TSplit =
+  ({ children, ...props }) => <Splitter dir="TOP" {...props}>{children}</Splitter>;
 
-export default { Splitter };
+/** @summary Splitter with `dir="BOTTOM"`. */
+export const BSplit =
+  ({ children, ...props }) => <Splitter dir="BOTTOM" {...props}>{children}</Splitter>;
+
+/** @summary Splitter with `dir="LEFT"`. */
+export const LSplit =
+  ({ children, ...props }) => <Splitter dir="LEFT" {...props}>{children}</Splitter>;
+
+/** @summary Splitter with `dir="RIGHT"`. */
+export const RSplit =
+  ({ children, ...props }) => <Splitter dir="RIGHT" {...props}>{children}</Splitter>;
 
 // --------------------------------------------------------------------------

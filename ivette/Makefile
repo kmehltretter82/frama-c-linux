@@ -16,11 +16,11 @@ app: dome-app
 dev: dome-dev
 dist: dome-dist
 
-typecheck:
+typecheck: dome-templ
 	@echo "[Ivette] running ts typechecker"
 	yarn run typecheck
 
-lint:
+lint: dome-templ
 	@echo "[Ivette] running ts linter"
 	yarn run lint
 

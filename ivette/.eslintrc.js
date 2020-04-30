@@ -39,8 +39,8 @@ module.exports = {
     "no-underscore-dangle": "off",
     // Allow return statements even if not strictly needed
     "no-useless-return": "off",
-    // Just warn about shadowing concerning variables
-    "no-shadow": "warn",
+    // Disable warn about shadowing concerning variables
+    "no-shadow": "off",
     "lines-between-class-members": [
       "error", "always", { "exceptAfterSingleLine": true }
     ],

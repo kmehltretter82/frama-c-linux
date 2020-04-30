@@ -40,7 +40,7 @@ natively, place it inside a `<Scroll/>` sub-container.
 */
 
 import React from 'react';
-import Dome from 'dome';
+import * as Dome from 'dome';
 import { Title } from 'dome/controls/labels' ;
 import './boxes.css' ;
 
@@ -182,10 +182,5 @@ export const Folder =
     </Vpack>
   );
 };
-
-// --------------------------------------------------------------------------
-
-export default { Hpack, Vpack, Hbox, Vbox, Hfill, Vfill,
-                 Space, Filler, Scroll, Grid, Folder };
 
 // --------------------------------------------------------------------------

@@ -10,8 +10,8 @@
 
 import _ from 'lodash';
 import React from 'react';
-import Dome from 'dome';
-import Server, { ServerRequest } from './server';
+import * as Dome from 'dome';
+import * as Server from './server';
 
 /**
  *  @event
@@ -41,7 +41,7 @@ let states: any = {};
 const stateDefaults: any = {};
 
 Server.onReady(async () => {
-  const sr: ServerRequest = {
+  const sr: Server.Request = {
     endpoint: 'kernel.project.getCurrent',
     params: {},
   };
@@ -79,7 +79,7 @@ export function useProject() {
  */
 export async function setProject(project: string) {
   if (Server.isRunning()) {
-    const sr: ServerRequest = {
+    const sr: Server.Request = {
       endpoint: 'kernel.project.setCurrent',
       params: project,
     };
@@ -170,7 +170,7 @@ export function useRequest(rq: string, params: any, options: any = {}) {
       }
       (async () => {
         try {
-          const sr: ServerRequest = { endpoint: rq, params };
+          const sr: Server.Request = { endpoint: rq, params };
           const v = await Server.GET(sr);
           setValue(v);
         } catch (err) {
@@ -219,7 +219,11 @@ export function useRequest(rq: string, params: any, options: any = {}) {
  *  by the provided key.
  *  Items in the collection that do have the key are not indexed.
  */
-function useDictionary(rq: string, params: any = null, options: any = {}) {
+export function useDictionary(
+  rq: string,
+  params: any = null,
+  options: any = {},
+) {
   const {
     offline = true,
     pending = true,
@@ -282,14 +286,14 @@ class SyncState {
   async setValue(v: any) {
     this.insync = true;
     this.value = v;
-    const sr: ServerRequest = { endpoint: this.setRq, params: v };
+    const sr: Server.Request = { endpoint: this.setRq, params: v };
     await Server.SET(sr);
     Dome.emit(this.UPDATE);
   }
 
   async update() {
     this.insync = true;
-    const sr: ServerRequest = { endpoint: this.getRq, params: {} };
+    const sr: Server.Request = { endpoint: this.getRq, params: {} };
     const v = await Server.GET(sr);
     this.value = v;
     Dome.emit(this.UPDATE);
@@ -327,7 +331,7 @@ Server.onShutdown(() => (syncStates = {}));
  *  - sends a `<id>.set` request to update the value of the state;
  *  - listens to `<id>.sig` signal to stay in sync with server updates.
  */
-function useSyncState(id: string) {
+export function useSyncState(id: string) {
   const s = getSyncState(id);
   Dome.useUpdate(PROJECT, s.UPDATE);
   Server.useSignal(s.signal, s.update);
@@ -343,7 +347,7 @@ function useSyncState(id: string) {
  *  - sends a `<id>.get` request to obtain the current value of the state;
  *  - listens to `<id>.sig` signal to stay in sync with server updates.
  */
-function useSyncValue(id: string) {
+export function useSyncValue(id: string) {
   const s = getSyncState(id);
   Dome.useUpdate(s.update);
   Server.useSignal(s.signal, s.update);
@@ -385,7 +389,7 @@ class SyncArray {
 
   async fetch() {
     this.insync = true;
-    const sr: ServerRequest = { endpoint: this.fetchRq, params: 50 };
+    const sr: Server.Request = { endpoint: this.fetchRq, params: 50 };
     const data = await Server.GET(sr);
     const { reload = false, removed = [], updated = [], pending = 0 } = data;
     let reloaded = false;
@@ -410,7 +414,7 @@ class SyncArray {
   }
 
   async reload() {
-    const sr: ServerRequest = { endpoint: this.reloadRq, params: {} };
+    const sr: Server.Request = { endpoint: this.reloadRq, params: {} };
     await Server.SET(sr);
     this.index = {};
     this.insync = false;
@@ -486,23 +490,5 @@ export function useSelection() {
   const [state, setState] = useState(SELECTION);
   return [state, (upd: any) => setState({ ...state, ...upd })];
 }
-
-// --------------------------------------------------------------------------
-
-export default {
-  useProject,
-  setProject,
-  setStateDefault,
-  useState,
-  useSyncState,
-  useSyncValue,
-  useSyncArray,
-  reloadArray,
-  useRequest,
-  useDictionary,
-  useSelection,
-  PROJECT,
-  STATE,
-};
 
 // --------------------------------------------------------------------------

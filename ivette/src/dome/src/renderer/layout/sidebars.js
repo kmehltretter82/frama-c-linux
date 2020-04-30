@@ -5,7 +5,7 @@
 /** @module dome/layout/sidebars */
 
 import React from 'react' ;
-import Dome from 'dome' ;
+import * as Dome from 'dome' ;
 import { Badge } from 'dome/controls/icons' ;
 import { Label } from 'dome/controls/labels' ;
 import './sidebars.css' ;
@@ -207,7 +207,5 @@ import { register } from 'dome/misc/register' ;
 register( SideBar, 'DOME_SIDEBAR' );
 register( Section, 'DOME_SIDEBAR_ITEM' );
 register( Item,    'DOME_SIDEBAR_ITEM' );
-
-export default { SideBar, Section, Item } ;
 
 // --------------------------------------------------------------------------

@@ -5,8 +5,8 @@
 /** @module dome/controls/labels */
 
 import React from 'react' ;
-import labels from './labels.css' ;
 import { Icon } from './icons' ;
+import './labels.css' ;
 
 // --------------------------------------------------------------------------
 // --- Generic Label

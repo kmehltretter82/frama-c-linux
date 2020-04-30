@@ -4,8 +4,9 @@
 
 /** @module dome/table/views */
 
+import _ from 'lodash' ;
 import React from 'react' ;
-import Dome from 'dome' ;
+import * as Dome from 'dome' ;
 import { DraggableCore } from 'react-draggable';
 import { SVG } from 'dome/controls/icons' ;
 import {
@@ -14,7 +15,6 @@ import {
   Table as VTable,
   Column as VColumn
 } from 'react-virtualized' ;
-import _ from 'lodash' ;
 import './tables.css' ;
 
 // --------------------------------------------------------------------------
@@ -176,7 +176,8 @@ const computeWidth = (elt) => {
 */
 export const Column = (props) => null;
 // Fake component only used to store props.
-// Virtualized column is rendered with function below:
+// Virtualized column is rendered with function vColumn (see below)
+
 const vColumn = ({
   headerRef,
   columnResize,hasFill,lastElt,
@@ -664,9 +665,5 @@ export class Table extends React.Component {
     );
   }
 }
-
-// --------------------------------------------------------------------------
-
-export default { Table, Column, DefineColumn };
 
 // --------------------------------------------------------------------------

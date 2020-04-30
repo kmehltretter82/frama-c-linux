@@ -118,6 +118,4 @@ import { register } from 'dome/misc/register' ;
 register(TabsBar, 'DOME_TABSBAR');
 register(Tab,     'DOME_TABSBAR_ITEM');
 
-export default { Tab , TabsBar , TabsPane } ;
-
 // --------------------------------------------------------------------------

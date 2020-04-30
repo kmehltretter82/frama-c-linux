@@ -34,11 +34,12 @@
 .labview-titlebar
 {
     background: #ccc ;
+    height: 24px ;
 }
 
 .labview-titlebar .dome-xLabel
 {
-    padding-top: 3px ;
+    padding-top: 4px ;
 }
 
 .labview-handle

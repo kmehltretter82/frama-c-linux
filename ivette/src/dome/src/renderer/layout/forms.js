@@ -4,11 +4,11 @@
 
 /** @module dome/layout/forms */
 
+import _ from 'lodash' ;
 import React from 'react' ;
-import Dome from 'dome' ;
+import * as Dome from 'dome' ;
 import { SVG } from 'dome/controls/icons' ;
 import { Checkbox, Radio, Select as Selector } from 'dome/controls/buttons' ;
-import _ from 'lodash' ;
 import './forms.css' ;
 
 // --------------------------------------------------------------------------
@@ -1097,32 +1097,6 @@ export const FieldRadio = ({ label, title, value, ...props }) => {
       )}
     </Select>
   );
-};
-
-// --------------------------------------------------------------------------
-// --- Exports
-// --------------------------------------------------------------------------
-
-export default {
-  Select,
-  Form,
-  Block,
-  Field,
-  Section,
-  FieldText,
-  FieldCode,
-  FieldTextArea,
-  FieldCodeArea,
-  FieldNumber,
-  FieldSpinner,
-  FieldSlider,
-  FieldDate,
-  FieldTime,
-  FieldColor,
-  FieldSelect,
-  FieldList,
-  FieldCheckbox,
-  FieldRadio
 };
 
 // --------------------------------------------------------------------------

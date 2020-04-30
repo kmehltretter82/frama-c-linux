@@ -18,7 +18,12 @@
 // Enable live-editing in React:
 import 'react-hot-loader/patch' ;
 import React from 'react' ;
-import Dome from 'dome' ;
+import {
+  setApplicationWindow,
+  setPreferencesWindow,
+  isApplicationWindow,
+  isPreferencesWindow,
+} from 'dome' ;
 
 // You can change the name of the main components,
 // provided you define the makefile variable
@@ -29,13 +34,13 @@ import Application from './Application' ;
 import Preferences from './Preferences' ;
 
 // Define the application main components for each window:
-Dome.setApplicationWindow(Application);
-Dome.setPreferencesWindow(Preferences);
+setApplicationWindow(Application);
+setPreferencesWindow(Preferences);
 
 // Mark the main application reloadable and enable live updates:
-module.hot && Dome.isApplicationWindow() &&
-  module.hot.accept('./Application',() => Dome.setApplicationWindow(Application));
-module.hot && Dome.isPreferencesWindow() &&
-  module.hot.accept('./Preferences',() => Dome.setPreferencesWindow(Preferences));
+module.hot && isApplicationWindow() &&
+  module.hot.accept('./Application',() => setApplicationWindow(Application));
+module.hot && isPreferencesWindow() &&
+  module.hot.accept('./Preferences',() => setPreferencesWindow(Preferences));
 
 // --------------------------------------------------------------------------

@@ -5,7 +5,7 @@
 /** @module dome/layout/frames */
 
 import React from 'react' ;
-import Dome from 'dome' ;
+import * as Dome from 'dome' ;
 import { dispatch } from 'dome/misc/register' ;
 import { Vfill } from 'dome/layout/boxes' ;
 import { SideBar } from 'dome/layout/sidebars' ;
@@ -203,9 +203,5 @@ export class Frame extends React.Component
   }
 
 }
-
-// --------------------------------------------------------------------------
-
-export default { Frame };
 
 // --------------------------------------------------------------------------

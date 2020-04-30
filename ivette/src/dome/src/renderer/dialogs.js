@@ -4,8 +4,9 @@
    Various kind of (modal) dialogs attached to the main application window.
  */
 
+import filepath from 'path' ;
 import { remote } from 'electron' ;
-import System from 'dome/system' ;
+import * as System from 'dome/system' ;
 
 // --------------------------------------------------------------------------
 // --- Message Box
@@ -106,7 +107,6 @@ export function showMessageBox( options )
 // --- openFile dialog
 // --------------------------------------------------------------------------
 
-import filepath from 'path' ;
 const defaultPath = (path) => filepath.extname(path) ? filepath.dirname(path) : path ;
 
 /**
@@ -302,17 +302,5 @@ export function showOpenDir( options )
       return undefined ;
   });
 }
-
-// --------------------------------------------------------------------------
-// --- Export
-// --------------------------------------------------------------------------
-
-export default {
-  showMessageBox,
-  showOpenFile,
-  showOpenFiles,
-  showSaveFile,
-  showOpenDir
-} ;
 
 // --------------------------------------------------------------------------

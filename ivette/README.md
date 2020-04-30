@@ -16,6 +16,15 @@ and `web-mode` for `*.tsx` files.
 
 VS-Code is also known to work out of the box.
 
+## Coding Guidelines
+
+- per-directory `style.css` for CSS;
+- caml-cased file names for typescript modules;
+- indentation based on 2 spaces, no tabs;
+- caml-case identifiers for exported members;
+- no `export default` for libs, individual exports only;
+- prefer use of `import * as AbcDef from '<path>/AbcDef'`;
+
 ## Mirroring to Dome/Electron
 
 The content of ./src/dome shall be kept in sync with

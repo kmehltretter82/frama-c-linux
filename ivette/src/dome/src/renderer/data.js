@@ -89,9 +89,8 @@ As an example of use, the introductory example can be implemented as follows:
 
 import _ from 'lodash' ;
 import React from 'react';
-import Dome from 'dome' ;
+import * as Dome from 'dome' ;
 import EventEmitter from 'events' ;
-
 
 // --------------------------------------------------------------------------
 // --- Libraries
@@ -393,17 +392,6 @@ export const Fragment = ({lib:localLib, order, enabled=true, disabled=false, chi
     );
   } else
     return null;
-};
-
-// --------------------------------------------------------------------------
-// --- Exports
-// --------------------------------------------------------------------------
-
-export default {
-  Library,
-  createLibrary, useLibrary,
-  useCurrentLibrary, useLocalLibrary,
-  Item, Component, Node, Fragment
 };
 
 // --------------------------------------------------------------------------

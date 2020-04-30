@@ -3,17 +3,17 @@
 // --------------------------------------------------------------------------
 
 import React from 'react';
-import Dome from 'dome';
+import * as Dome from 'dome';
 import { Vfill } from 'dome/layout/boxes';
 import { Splitter } from 'dome/layout/splitters';
-import Toolbar from 'dome/layout/toolbars';
-import Sidebar from 'dome/layout/sidebars';
+import * as Toolbar from 'dome/layout/toolbars';
+import * as Sidebar from 'dome/layout/sidebars';
 
 import './style.css';
 
 import { LabView, View, Group } from 'frama-c/LabViews';
 import { GridItem } from 'dome/layout/grids';
-import Controller from './Controller';
+import * as Controller from './Controller';
 import Properties from './Properties';
 import ASTview from './ASTview';
 
