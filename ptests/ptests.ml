@@ -163,7 +163,7 @@ let unlink ?(silent = true) file =
     Unix.unlink file
   with
   | Unix_error _ when silent -> ()
-  | Unix_error (ENOENT,_,_) -> () (* Ignore "Not such file or directory" *)
+  | Unix_error (ENOENT,_,_) -> () (* Ignore "No such file or directory" *)
   | Unix_error _ as e -> output_unix_error e
 
 let is_file_empty_or_nonexisting filename =
