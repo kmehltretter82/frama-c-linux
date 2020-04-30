@@ -3,43 +3,48 @@
 [wp] Running WP plugin...
 [wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
-[wp] 32 goals scheduled
-[wp] [Alt-Ergo] Goal typed_main_loop_invariant_preserved : Valid
-[wp] [Qed] Goal typed_main_loop_invariant_established : Valid
-[wp] [Alt-Ergo] Goal typed_main_loop_invariant_2_preserved : Valid
-[wp] [Qed] Goal typed_main_loop_invariant_2_established : Valid
-[wp] [Alt-Ergo] Goal typed_main_check : Valid
-[wp] [Alt-Ergo] Goal typed_main_check_2 : Valid
-[wp] [Alt-Ergo] Goal typed_main_check_3 : Valid
-[wp] [Alt-Ergo] Goal typed_main_loop_invariant_3_preserved : Valid
-[wp] [Qed] Goal typed_main_loop_invariant_3_established : Valid
-[wp] [Alt-Ergo] Goal typed_main_check_4 : Valid
-[wp] [Alt-Ergo] Goal typed_main_check_5 : Valid
-[wp] [Alt-Ergo] Goal typed_main_check_6 : Valid
-[wp] [Alt-Ergo] Goal typed_main_check_SMOKE : Unsuccess
-[wp] [Qed] Goal typed_main_loop_assigns_part1 : Valid
-[wp] [Qed] Goal typed_main_loop_assigns_part2 : Valid
-[wp] [Qed] Goal typed_main_loop_assigns_part3 : Valid
-[wp] [Qed] Goal typed_main_loop_assigns_2_part1 : Valid
-[wp] [Qed] Goal typed_main_loop_assigns_2_part2 : Valid
-[wp] [Qed] Goal typed_main_loop_assigns_2_part3 : Valid
-[wp] [Qed] Goal typed_main_loop_assigns_3_part1 : Valid
-[wp] [Qed] Goal typed_main_loop_assigns_3_part2 : Valid
-[wp] [Qed] Goal typed_main_loop_assigns_4_part1 : Valid
-[wp] [Qed] Goal typed_main_loop_assigns_4_part2 : Valid
-[wp] [Qed] Goal typed_main_loop_assigns_4_part3 : Valid
-[wp] [Qed] Goal typed_main_loop_assigns_5_part1 : Valid
-[wp] [Qed] Goal typed_main_loop_assigns_5_part2 : Valid
-[wp] [Qed] Goal typed_main_loop_assigns_5_part3 : Valid
-[wp] [Qed] Goal typed_main_loop_assigns_6_part1 : Valid
-[wp] [Alt-Ergo] Goal typed_main_loop_assigns_6_part2 : Valid
-[wp] [Qed] Goal typed_main_loop_assigns_6_part3 : Valid
-[wp] [Qed] Goal typed_main_loop_assigns_6_part4 : Valid
-[wp] [Qed] Goal typed_main_loop_assigns_6_part5 : Valid
-[wp] Proved goals:   31 / 32
+[wp] 31 goals scheduled
+[wp] [Alt-Ergo] Goal typed_array_check_CHECK : Valid
+[wp] [Qed] Goal typed_array_loop_assigns_part1 : Valid
+[wp] [Qed] Goal typed_array_loop_assigns_part2 : Valid
+[wp] [Qed] Goal typed_array_loop_assigns_part3 : Valid
+[wp] [Alt-Ergo] Goal typed_comp_check_CHECK : Valid
+[wp] [Qed] Goal typed_comp_loop_assigns_part1 : Valid
+[wp] [Qed] Goal typed_comp_loop_assigns_part2 : Valid
+[wp] [Alt-Ergo] Goal typed_comp_loop_assigns_part3 : Valid
+[wp] [Alt-Ergo] Goal typed_descr_check_CHECK : Valid
+[wp] [Qed] Goal typed_descr_loop_assigns_part1 : Valid
+[wp] [Alt-Ergo] Goal typed_descr_loop_assigns_part2 : Valid
+[wp] [Qed] Goal typed_descr_loop_assigns_part3 : Valid
+[wp] [Qed] Goal typed_descr_loop_assigns_part4 : Valid
+[wp] [Qed] Goal typed_descr_loop_assigns_part5 : Valid
+[wp] [Alt-Ergo] Goal typed_field_check_CHECK : Valid
+[wp] [Qed] Goal typed_field_loop_assigns_part1 : Valid
+[wp] [Qed] Goal typed_field_loop_assigns_part2 : Valid
+[wp] [Alt-Ergo] Goal typed_index_check_CHECK : Valid
+[wp] [Qed] Goal typed_index_loop_assigns_part1 : Valid
+[wp] [Qed] Goal typed_index_loop_assigns_part2 : Valid
+[wp] [Qed] Goal typed_index_loop_assigns_part3 : Valid
+[wp] [Alt-Ergo] Goal typed_initialize_loop_invariant_CHECK_preserved : Valid
+[wp] [Qed] Goal typed_initialize_loop_invariant_CHECK_established : Valid
+[wp] [Alt-Ergo] Goal typed_initialize_check_CHECK : Valid
+[wp] [Qed] Goal typed_initialize_loop_assigns_part1 : Valid
+[wp] [Qed] Goal typed_initialize_loop_assigns_part2 : Valid
+[wp] [Qed] Goal typed_initialize_loop_assigns_part3 : Valid
+[wp] [Alt-Ergo] Goal typed_range_check_CHECK : Valid
+[wp] [Qed] Goal typed_range_loop_assigns_part1 : Valid
+[wp] [Qed] Goal typed_range_loop_assigns_part2 : Valid
+[wp] [Qed] Goal typed_range_loop_assigns_part3 : Valid
+[wp] Proved goals:   31 / 31
   Qed:            21 
-  Alt-Ergo:       10  (unsuccess: 1)
+  Alt-Ergo:       10
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  main                     21       10       32      96.9%
+  initialize                4        2        6       100%
+  range                     3        1        4       100%
+  field                     2        1        3       100%
+  array                     3        1        4       100%
+  index                     3        1        4       100%
+  descr                     4        2        6       100%
+  comp                      2        2        4       100%
 ------------------------------------------------------------

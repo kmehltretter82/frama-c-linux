@@ -1308,7 +1308,8 @@ struct
 
   let assigned_loc seq obj = function
     | Ref x -> noref ~op:"assigns to" x
-    | Val((CVAL|CREF),_,[]) -> [] (* full update *)
+    | Val((CVAL|CREF),x,[]) ->
+        [ Assert (monotonic_initialized seq obj x []) ]
     | Val((CVAL|CREF),_,_) as vloc ->
         let v = Lang.freshvar ~basename:"v" (Lang.tau_of_object obj) in
         memvar_assigned seq obj vloc (e_var v)
@@ -1320,7 +1321,8 @@ struct
   let assigned_array seq obj l elt n =
     match l with
     | Ref x -> noref ~op:"assigns to" x
-    | Val((CVAL|CREF),_,[]) -> [] (* full update *)
+    | Val((CVAL|CREF),x,[]) ->
+        [ Assert (monotonic_initialized seq obj x []) ]
     | Val((CVAL|CREF),x,ofs) as vloc ->
         let te = Lang.tau_of_object elt in
         let v = Lang.freshvar ~basename:"v" Qed.Logic.(Array(Int,te)) in
