@@ -40,7 +40,7 @@
    unsetenv (0 call); wcscat (0 call); wcscpy (0 call); wcslen (2 calls);
    wcsncat (0 call); wcsncpy (0 call); wmemcpy (0 call); wmemset (0 call); 
   
-  Undefined functions (406)
+  Undefined functions (407)
   =========================
    FD_CLR (0 call); FD_ISSET (0 call); FD_SET (0 call); FD_ZERO (0 call);
    Frama_C_int_interval (0 call); Frama_C_long_interval (0 call);
@@ -154,14 +154,15 @@
    syslog (0 call); system (0 call); tcflush (0 call); tcgetattr (0 call);
    tcsetattr (0 call); time (0 call); times (0 call); tmpfile (0 call);
    tmpnam (0 call); trunc (0 call); truncf (0 call); truncl (0 call);
-   ttyname (0 call); tzset (0 call); umask (0 call); ungetc (0 call);
-   unlink (0 call); usleep (0 call); utimes (0 call); vfprintf (0 call);
-   vfscanf (0 call); vprintf (0 call); vscanf (0 call); vsnprintf (0 call);
-   vsprintf (0 call); vsyslog (0 call); wait (0 call); waitpid (0 call);
-   wcschr (0 call); wcscmp (0 call); wcscspn (0 call); wcslcat (0 call);
-   wcslcpy (0 call); wcsncmp (0 call); wcspbrk (0 call); wcsrchr (0 call);
-   wcsspn (0 call); wcsstr (0 call); wcstombs (0 call); wctomb (0 call);
-   wmemchr (0 call); wmemcmp (0 call); wmemmove (0 call); write (0 call); 
+   ttyname (0 call); tzset (0 call); umask (0 call); uname (0 call);
+   ungetc (0 call); unlink (0 call); usleep (0 call); utimes (0 call);
+   vfprintf (0 call); vfscanf (0 call); vprintf (0 call); vscanf (0 call);
+   vsnprintf (0 call); vsprintf (0 call); vsyslog (0 call); wait (0 call);
+   waitpid (0 call); wcschr (0 call); wcscmp (0 call); wcscspn (0 call);
+   wcslcat (0 call); wcslcpy (0 call); wcsncmp (0 call); wcspbrk (0 call);
+   wcsrchr (0 call); wcsspn (0 call); wcsstr (0 call); wcstombs (0 call);
+   wctomb (0 call); wmemchr (0 call); wmemcmp (0 call); wmemmove (0 call);
+   write (0 call); 
   
   'Extern' global variables (16)
   ==============================
@@ -184,7 +185,7 @@
   Goto = 89
   Assignment = 438
   Exit point = 82
-  Function = 488
+  Function = 489
   Function call = 89
   Pointer dereferencing = 158
   Cyclomatic complexity = 286
@@ -244,6 +245,7 @@
 #include "sys/times.h"
 #include "sys/types.h"
 #include "sys/uio.h"
+#include "sys/utsname.h"
 #include "sys/wait.h"
 #include "syslog.h"
 #include "termios.h"

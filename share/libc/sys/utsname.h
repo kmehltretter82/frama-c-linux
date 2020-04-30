@@ -38,6 +38,12 @@ struct utsname
   char machine[_FC_UTSNAME_LENGTH];
 };
 
+/*@ // missing: assigns *name, \result \from "system information"
+  requires valid_name: \valid(name);
+  assigns *name, \result \from \nothing;
+  ensures result_ok_or_error: -1 <= \result;
+  ensures initialization:name:\initialized(name);
+*/
 extern int uname (struct utsname *name);
 
 __POP_FC_STDLIB
