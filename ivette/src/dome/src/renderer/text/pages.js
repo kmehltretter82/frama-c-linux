@@ -3,7 +3,7 @@
 // --------------------------------------------------------------------------
 
 /**
-   @module dome/layout/pages
+   @module dome/text/pages
    @description
    A collection of text area and elements do render textual content.
 
@@ -24,8 +24,8 @@
 */
 
 import React from 'react' ;
-import { AutoSizer } from 'react-virtualized' ;
-import './pages.css' ;
+
+import './style.css' ;
 
 // --------------------------------------------------------------------------
 // --- Page

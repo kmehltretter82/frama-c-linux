@@ -19,7 +19,7 @@ import { AppContainer } from 'react-hot-loader' ;
 import { remote , ipcRenderer } from 'electron';
 import { EventEmitter } from 'events' ;
 import SYS , * as System from 'dome/system' ;
-import './dome.css' ;
+import './style.css' ;
 
 // --------------------------------------------------------------------------
 // --- Context

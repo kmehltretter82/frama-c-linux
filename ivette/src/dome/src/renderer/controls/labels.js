@@ -6,7 +6,7 @@
 
 import React from 'react' ;
 import { Icon } from './icons' ;
-import './labels.css' ;
+import './style.css' ;
 
 // --------------------------------------------------------------------------
 // --- Generic Label

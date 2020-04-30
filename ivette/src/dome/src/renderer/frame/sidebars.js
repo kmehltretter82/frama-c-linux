@@ -2,13 +2,14 @@
 // --- SideBars
 // --------------------------------------------------------------------------
 
-/** @module dome/layout/sidebars */
+/** @module dome/frame/sidebars */
 
 import React from 'react' ;
 import * as Dome from 'dome' ;
 import { Badge } from 'dome/controls/icons' ;
 import { Label } from 'dome/controls/labels' ;
-import './sidebars.css' ;
+
+import './style.css' ;
 
 const SideBarContext = React.createContext();
 

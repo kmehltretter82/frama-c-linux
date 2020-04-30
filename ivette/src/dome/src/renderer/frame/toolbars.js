@@ -2,10 +2,11 @@
 // --- ToolBars
 // --------------------------------------------------------------------------
 
-/** @module dome/layout/toolbars */
+/** @module dome/frame/toolbars */
 
 import React from 'react' ;
-import './toolbars.css' ;
+
+import './style.css' ;
 
 // --------------------------------------------------------------------------
 // --- ToolBar Container

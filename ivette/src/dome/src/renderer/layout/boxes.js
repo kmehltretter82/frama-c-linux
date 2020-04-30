@@ -42,7 +42,7 @@ natively, place it inside a `<Scroll/>` sub-container.
 import React from 'react';
 import * as Dome from 'dome';
 import { Title } from 'dome/controls/labels' ;
-import './boxes.css' ;
+import './style.css' ;
 
 // --------------------------------------------------------------------------
 // --- Generic Box

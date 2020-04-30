@@ -15,7 +15,8 @@ import {
   Table as VTable,
   Column as VColumn
 } from 'react-virtualized' ;
-import './tables.css' ;
+
+import './style.css' ;
 
 // --------------------------------------------------------------------------
 // --- Header Renderer

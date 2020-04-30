@@ -13,7 +13,7 @@
 
 import React from 'react' ;
 import { Icon } from './icons' ;
-import './buttons.css' ;
+import './style.css' ;
 
 const DISABLED = ({ disabled=false, enabled=true }) => !!disabled || !enabled ;
 const TRIGGER = (onClick) => (evt) => {

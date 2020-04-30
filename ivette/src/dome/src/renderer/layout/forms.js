@@ -9,7 +9,7 @@ import React from 'react' ;
 import * as Dome from 'dome' ;
 import { SVG } from 'dome/controls/icons' ;
 import { Checkbox, Radio, Select as Selector } from 'dome/controls/buttons' ;
-import './forms.css' ;
+import './style.css' ;
 
 // --------------------------------------------------------------------------
 // --- Utilities

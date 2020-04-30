@@ -8,7 +8,8 @@ import _ from 'lodash' ;
 import * as React from 'react' ;
 import * as Dome from 'dome' ;
 import { Layout } from 'dome/misc/layout' ;
-import './splitters.css' ;
+
+import './style.css' ;
 
 // --------------------------------------------------------------------------
 // --- Splitter Layout

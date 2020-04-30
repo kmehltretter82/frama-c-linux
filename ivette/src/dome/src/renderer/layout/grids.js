@@ -11,7 +11,8 @@ import { AutoSizer } from 'react-virtualized' ;
 import { DraggableCore } from 'react-draggable' ;
 
 import * as Dome from 'dome' ;
-import './grids.css' ;
+
+import './style.css' ;
 
 // --------------------------------------------------------------------------
 // --- Grid Utilities

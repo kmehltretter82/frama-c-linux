@@ -9,7 +9,7 @@ import React from 'react';
 import * as Dome from 'dome';
 import { Catch } from 'dome/errors';
 import { DnD, DragSource } from 'dome/dnd';
-import { SideBar, Section, Item } from 'dome/layout/sidebars';
+import { SideBar, Section, Item } from 'dome/frame/sidebars';
 import { Splitter } from 'dome/layout/splitters';
 import * as Grids from 'dome/layout/grids';
 import { Hbox, Hfill, Vfill } from 'dome/layout/boxes';

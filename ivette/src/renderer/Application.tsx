@@ -6,8 +6,8 @@ import React from 'react';
 import * as Dome from 'dome';
 import { Vfill } from 'dome/layout/boxes';
 import { Splitter } from 'dome/layout/splitters';
-import * as Toolbar from 'dome/layout/toolbars';
-import * as Sidebar from 'dome/layout/sidebars';
+import * as Toolbar from 'dome/frame/toolbars';
+import * as Sidebar from 'dome/frame/sidebars';
 
 import './style.css';
 

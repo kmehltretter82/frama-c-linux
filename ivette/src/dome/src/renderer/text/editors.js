@@ -8,8 +8,9 @@ import _ from 'lodash' ;
 import React from 'react' ;
 import * as Dome from 'dome' ;
 import CodeMirror from 'codemirror/lib/codemirror.js' ;
+
+import './style.css' ;
 import 'codemirror/lib/codemirror.css' ;
-import './editors.css' ;
 
 const CSS_HOVERED = 'dome-xText-hover' ;
 const CSS_SELECTED = 'dome-xText-select' ;

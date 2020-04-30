@@ -10,10 +10,10 @@
    and [iterate](#.forEach) over the icon base.
 */
 
+import _ from 'lodash' ;
 import React from 'react' ;
 import Icons from './icons.json' ;
-import './icons.css' ;
-import _ from 'lodash' ;
+import './style.css' ;
 
 // --------------------------------------------------------------------------
 // --- Raw SVG element
