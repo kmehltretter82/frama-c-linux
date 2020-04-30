@@ -26,6 +26,7 @@
 #ifndef __FC_GCC_BUILTINS
 #define __FC_GCC_BUILTINS
 #include "features.h"
+#include "__fc_machdep.h"
 
 __PUSH_FC_STDLIB
 
@@ -192,6 +193,66 @@ _Bool __builtin_umull_overflow (unsigned long a, unsigned long b, unsigned long 
   ensures result_overflow: a * b == (unsigned long long)(a * b) ? \result == 0 : \result == 1;
  */
 _Bool __builtin_umulll_overflow (unsigned long long a, unsigned long long b, unsigned long long *res);
+
+/*@
+  requires x_nonzero: x != 0;
+  assigns \result \from indirect:x;
+  ensures result_is_bit_count: 0 <= \result < __CHAR_BIT * sizeof(x);
+ */
+int __builtin_clz (unsigned int x);
+
+/*@
+  requires x_nonzero: x != 0;
+  assigns \result \from indirect:x;
+  ensures result_is_bit_count: 0 <= \result < __CHAR_BIT * sizeof(x);
+ */
+int __builtin_clzl (unsigned long x);
+
+/*@
+  requires x_nonzero: x != 0;
+  assigns \result \from indirect:x;
+  ensures result_is_bit_count: 0 <= \result < __CHAR_BIT * sizeof(x);
+ */
+int __builtin_clzll (unsigned long long x);
+
+/*@
+  requires x_nonzero: x != 0;
+  assigns \result \from indirect:x;
+  ensures result_is_bit_count: 0 <= \result < __CHAR_BIT * sizeof(x);
+ */
+int __builtin_ctz (unsigned int x);
+
+/*@
+  requires x_nonzero: x != 0;
+  assigns \result \from indirect:x;
+  ensures result_is_bit_count: 0 <= \result < __CHAR_BIT * sizeof(x);
+ */
+int __builtin_ctzl (unsigned long x);
+
+/*@
+  requires x_nonzero: x != 0;
+  assigns \result \from indirect:x;
+  ensures result_is_bit_count: 0 <= \result < __CHAR_BIT * sizeof(x);
+ */
+int __builtin_ctzll (unsigned long long x);
+
+/*@
+  assigns \result \from indirect:x;
+  ensures result_is_bit_count: 0 <= \result <= __CHAR_BIT * sizeof(x);
+ */
+int __builtin_popcount (unsigned int x);
+
+/*@
+  assigns \result \from indirect:x;
+  ensures result_is_bit_count: 0 <= \result <= __CHAR_BIT * sizeof(x);
+ */
+int __builtin_popcountl (unsigned long x);
+
+/*@
+  assigns \result \from indirect:x;
+  ensures result_is_bit_count: 0 <= \result <= __CHAR_BIT * sizeof(x);
+ */
+int __builtin_popcountll (unsigned long long x);
 
 __END_DECLS
 

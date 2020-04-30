@@ -2,7 +2,7 @@
    STDOPT: #"-machdep gcc_x86_32"
  */
 
-
+volatile int v;
 #include <limits.h>
 
 int main() {
@@ -42,5 +42,32 @@ int main() {
   r = __builtin_smulll_overflow(-1, LLONG_MIN, &llres);
   //@ assert llres == (long long)(-1 * LLONG_MIN);
   //@ assert r == 1;
+  if (v) {
+    __builtin_clz(0);
+    //@ assert unreachable:\false;
+  }
+  res = __builtin_clz(1);
+  //@ assert 0 <= res < CHAR_BIT * sizeof(int);
+  res = __builtin_clzl(ULONG_MAX);
+  //@ assert 0 <= res < CHAR_BIT * sizeof(long);
+  res = __builtin_clzll(ULLONG_MAX);
+  //@ assert 0 <= res < CHAR_BIT * sizeof(long long);
+  if (v) {
+    __builtin_ctz(0);
+    //@ assert unreachable:\false;
+  }
+  res = __builtin_ctz(42);
+  //@ assert 0 <= res < CHAR_BIT * sizeof(int);
+  res = __builtin_ctzl(1234567);
+  //@ assert 0 <= res < CHAR_BIT * sizeof(long);
+  res = __builtin_ctzll(1);
+  //@ assert 0 <= res < CHAR_BIT * sizeof(long long);
+
+  res = __builtin_popcount(0);
+  //@ assert 0 <= res <= CHAR_BIT * sizeof(int);
+  res = __builtin_popcountl(ULONG_MAX);
+  //@ assert 0 <= res <= CHAR_BIT * sizeof(long);
+  res = __builtin_popcountll(ULLONG_MAX);
+  //@ assert 0 <= res <= CHAR_BIT * sizeof(long long);
   return 0;
 }

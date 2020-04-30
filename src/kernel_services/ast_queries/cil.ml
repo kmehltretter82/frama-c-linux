@@ -4994,13 +4994,7 @@ let initGccBuiltins () : unit =
   add "coshf" floatType [ floatType ] false;
   add "coshl" longDoubleType [ longDoubleType ] false;
 
-  add "clz" intType [ uintType ] false;
-  add "clzl" intType [ ulongType ] false;
-  add "clzll" intType [ ulongLongType ] false;
   add "constant_p" intType [ intType ] false;
-  add "ctz" intType [ uintType ] false;
-  add "ctzl" intType [ ulongType ] false;
-  add "ctzll" intType [ ulongLongType ] false;
 
   add "exp" doubleType [ doubleType ] false;
   add "expf" floatType [ floatType ] false;
@@ -5070,10 +5064,6 @@ let initGccBuiltins () : unit =
   add "parity" intType [ uintType ] false;
   add "parityl" intType [ ulongType ] false;
   add "parityll" intType [ ulongLongType ] false;
-
-  add "popcount" intType [ uintType ] false;
-  add "popcountl" intType [ ulongType ] false;
-  add "popcountll" intType [ ulongLongType ] false;
 
   add "powi" doubleType [ doubleType; intType ] false;
   add "powif" floatType [ floatType; intType ] false;

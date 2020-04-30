@@ -7238,6 +7238,66 @@ _Bool __builtin_umull_overflow(unsigned long a, unsigned long b,
 _Bool __builtin_umulll_overflow(unsigned long long a, unsigned long long b,
                                 unsigned long long *res);
 
+/*@ requires x_nonzero: x ≢ 0;
+    ensures result_is_bit_count: 0 ≤ \result < 8 * sizeof(\old(x));
+    assigns \result;
+    assigns \result \from (indirect: x);
+ */
+int __builtin_clz(unsigned int x);
+
+/*@ requires x_nonzero: x ≢ 0;
+    ensures result_is_bit_count: 0 ≤ \result < 8 * sizeof(\old(x));
+    assigns \result;
+    assigns \result \from (indirect: x);
+ */
+int __builtin_clzl(unsigned long x);
+
+/*@ requires x_nonzero: x ≢ 0;
+    ensures result_is_bit_count: 0 ≤ \result < 8 * sizeof(\old(x));
+    assigns \result;
+    assigns \result \from (indirect: x);
+ */
+int __builtin_clzll(unsigned long long x);
+
+/*@ requires x_nonzero: x ≢ 0;
+    ensures result_is_bit_count: 0 ≤ \result < 8 * sizeof(\old(x));
+    assigns \result;
+    assigns \result \from (indirect: x);
+ */
+int __builtin_ctz(unsigned int x);
+
+/*@ requires x_nonzero: x ≢ 0;
+    ensures result_is_bit_count: 0 ≤ \result < 8 * sizeof(\old(x));
+    assigns \result;
+    assigns \result \from (indirect: x);
+ */
+int __builtin_ctzl(unsigned long x);
+
+/*@ requires x_nonzero: x ≢ 0;
+    ensures result_is_bit_count: 0 ≤ \result < 8 * sizeof(\old(x));
+    assigns \result;
+    assigns \result \from (indirect: x);
+ */
+int __builtin_ctzll(unsigned long long x);
+
+/*@ ensures result_is_bit_count: 0 ≤ \result ≤ 8 * sizeof(\old(x));
+    assigns \result;
+    assigns \result \from (indirect: x);
+ */
+int __builtin_popcount(unsigned int x);
+
+/*@ ensures result_is_bit_count: 0 ≤ \result ≤ 8 * sizeof(\old(x));
+    assigns \result;
+    assigns \result \from (indirect: x);
+ */
+int __builtin_popcountl(unsigned long x);
+
+/*@ ensures result_is_bit_count: 0 ≤ \result ≤ 8 * sizeof(\old(x));
+    assigns \result;
+    assigns \result \from (indirect: x);
+ */
+int __builtin_popcountll(unsigned long long x);
+
 /*@ requires valid_filename: valid_read_string(filename);
     assigns \result;
     assigns \result \from (indirect: *(filename + (0 ..))), (indirect: mode);
