@@ -65,17 +65,15 @@ Goal Check 'CHECK' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 118
 Let m = Init_0[shiftfield_F1_S_i(s) <- true].
 Let a = shiftfield_F1_S_a(s).
 Let a_1 = havoc(Init_undef_1, m, shift_sint32(a, 0), 10).
-Let a_2 = Load_Init_S1_S(s, a_1).
-Let a_3 = Load_Init_S1_S(s, havoc(Init_undef_0, m, s, 11)).
-Let P = a_3.Init_F1_S_i.
-Let a_4 = a_3.Init_F1_S_a.
+Let a_2 = havoc(Init_undef_0, m, s, 11).
+Let a_3 = Load_Init_S1_S(s, a_2).
 Assume {
   Type: is_sint32(i) /\ is_sint32(i_1).
   (* Heap *)
   Type: region(s.base) <= 0.
   (* Loop assigns ... *)
-  Have: forall i_2 : Z. let a_5 = shift_sint32(a, i_2) in ((0 <= i_2) ->
-      ((i_2 <= 9) -> ((m[a_5]=true) -> (a_1[a_5]=true)))).
+  Have: forall i_2 : Z. let a_4 = shift_sint32(a, i_2) in ((0 <= i_2) ->
+      ((i_2 <= 9) -> ((m[a_4]=true) -> (a_1[a_4]=true)))).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10) /\
       (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
@@ -83,16 +81,15 @@ Assume {
   (* Else *)
   Have: 10 <= i.
   (* Loop assigns 'CHECK' *)
-  Have: ((((a_2.Init_F1_S_i)=true) -> (P=true))) /\
-      (forall i_2 : Z. ((0 <= i_2) -> ((i_2 <= 9) ->
-       (((a_2.Init_F1_S_a)[i_2]=true) -> (a_4[i_2]=true))))).
+  Have: Motononic__Init_S1_S(s, a_1, a_2).
   (* Invariant *)
   Have: (0 <= i_1) /\ (i_1 <= 10).
   (* Else *)
   Have: 10 <= i_1.
 }
-Prove: (P=true) /\
-    (forall i_2 : Z. ((0 <= i_2) -> ((i_2 <= 9) -> (a_4[i_2]=true)))).
+Prove: ((a_3.Init_F1_S_i)=true) /\
+    (forall i_2 : Z. ((0 <= i_2) -> ((i_2 <= 9) ->
+     ((a_3.Init_F1_S_a)[i_2]=true)))).
 
 ------------------------------------------------------------
 
@@ -112,8 +109,6 @@ Effect at line 115
 Let m = Init_0[shiftfield_F1_S_i(s) <- true].
 Let a = shiftfield_F1_S_a(s).
 Let a_1 = havoc(Init_undef_0, m, shift_sint32(a, 0), 10).
-Let a_2 = Load_Init_S1_S(s, a_1).
-Let a_3 = Load_Init_S1_S(s, havoc(Init_undef_1, m, s, 11)).
 Assume {
   Type: is_sint32(i_1) /\ is_sint32(i).
   (* Heap *)
@@ -121,8 +116,8 @@ Assume {
   (* Goal *)
   When: !invalid(Malloc_0, shift_sint32(a, i), 1).
   (* Loop assigns ... *)
-  Have: forall i_2 : Z. let a_4 = shift_sint32(a, i_2) in ((0 <= i_2) ->
-      ((i_2 <= 9) -> ((m[a_4]=true) -> (a_1[a_4]=true)))).
+  Have: forall i_2 : Z. let a_2 = shift_sint32(a, i_2) in ((0 <= i_2) ->
+      ((i_2 <= 9) -> ((m[a_2]=true) -> (a_1[a_2]=true)))).
   (* Invariant *)
   Have: (0 <= i_1) /\ (i_1 <= 10) /\
       (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) ->
@@ -130,9 +125,7 @@ Assume {
   (* Else *)
   Have: 10 <= i_1.
   (* Loop assigns 'CHECK' *)
-  Have: ((((a_2.Init_F1_S_i)=true) -> ((a_3.Init_F1_S_i)=true))) /\
-      (forall i_2 : Z. ((0 <= i_2) -> ((i_2 <= 9) ->
-       (((a_2.Init_F1_S_a)[i_2]=true) -> ((a_3.Init_F1_S_a)[i_2]=true))))).
+  Have: Motononic__Init_S1_S(s, a_1, havoc(Init_undef_1, m, s, 11)).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10).
   (* Then *)

@@ -386,22 +386,20 @@ struct
   (* --- Initialized                                                        --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let rec on_initialized_terms map on_leave obj terms =
+  let rec initialized_term obj term =
     match obj with
-    | C_int _ | C_float _ | C_pointer _ -> on_leave terms
+    | C_int _ | C_float _ | C_pointer _ -> p_bool term
     | C_comp ci ->
         let initialized_field f =
-          on_initialized_terms map on_leave
+          initialized_term
             (object_of f.ftype)
-            (map (fun t -> e_getfield t (Cfield (f, KInit))) terms)
+            (e_getfield term (Cfield (f, KInit)))
         in
         p_conj (List.map initialized_field ci.cfields)
     | C_array ai ->
         let obj_e, ds = Matrix.of_array ai in
         let denv = Matrix.denv ds in
-        let values =
-          map (fun t -> List.fold_left e_get t denv.index_val) terms
-        in
+        let values = List.fold_left e_get term denv.index_val in
         let make_subst var value p =
           match value with
           | None -> p
@@ -412,15 +410,7 @@ struct
           List.fold_left (fun p f -> f p) (p_conj denv.index_range) substs
         in
         p_forall denv.index_var
-          (p_imply conj (on_initialized_terms map on_leave obj_e values))
-
-  let initialized_term =
-    on_initialized_terms Extlib.id p_bool
-
-  let initialized_monotonic =
-    on_initialized_terms
-      (fun f (a, b) -> f a, f b)
-      (fun (a, b) -> p_imply (p_bool a) (p_bool b))
+          (p_imply conj (initialized_term obj_e values))
 
   let initialized_loc sigma obj loc =
     initialized_term obj (initvalue sigma obj loc)
@@ -438,9 +428,137 @@ struct
           "Invalid infinite range @[<hov 2>+@,(%a@,..%a)@]"
           Vset.pp_bound low Vset.pp_bound up
 
-  let initialized_loc_monotonic seq obj loc =
-    initialized_monotonic
-      obj ((initvalue seq.pre obj loc), (initvalue seq.post obj loc))
+  (* -------------------------------------------------------------------------- *)
+  (* --- Initialized Motononicity                                           --- *)
+  (* -------------------------------------------------------------------------- *)
+
+  let monotonic_init_rec = ref (fun _ _ _ _ -> assert false)
+
+  module MONOTONIC_INIT_COMP = WpContext.Generator(COMP_KEY)
+      (struct
+        let name = M.name ^ ".MONOTONIC_INIT_COMP"
+        type key = int * compinfo
+        type data = lfun * chunk list * chunk list
+
+        let generate (r,c) =
+          let x = Lang.freshvar ~basename:"p" (Lang.t_addr()) in
+          let v = e_var x in
+          let obj = C_comp c in
+          let loc = M.of_region_pointer r obj v in (* t_pointer -> loc *)
+          let domain = M.init_footprint obj loc in
+          let name =
+            Format.asprintf "Motononic_%a_%s" pp_rid r (Lang.comp_init_id c)
+          in
+          let lfun = Lang.generated_p name in
+          let xs1,chunks1,sigma1 = signature domain in
+          let xs2,chunks2,sigma2 = signature domain in
+          let def =
+            p_conj
+              (List.map
+                 (fun f ->
+                    !monotonic_init_rec
+                      sigma1 sigma2 (object_of f.ftype) (M.field loc f)
+                 ) c.cfields)
+          in
+          let dfun = Definitions.Predicate( Def , def ) in
+          Definitions.define_symbol {
+            d_lfun = lfun ; d_types = 0 ;
+            d_params = x :: xs1 @ xs2 ;
+            d_definition = dfun ;
+            d_cluster = cluster () ;
+          } ;
+          (* frame_lemmas lfun obj loc [v] chunks ; *)
+          lfun, chunks1, chunks2
+
+        let compile = Lang.local generate
+      end)
+
+  module MONOTONIC_INIT_ARRAY = WpContext.Generator(ARRAY_KEY)
+      (struct
+        let name = M.name ^ ".MONOTONIC_INIT_ARRAY"
+        type key = int * arrayinfo * Matrix.matrix
+        type data = lfun * chunk list * chunk list
+
+        let generate (r,ainfo,(obj_e,ds)) =
+          let x = Lang.freshvar ~basename:"p" (Lang.t_addr()) in
+          let v = e_var x in
+          let obj_a = C_array ainfo in
+          let loc = M.of_region_pointer r obj_a v in (* t_pointer -> loc *)
+          let domain = M.init_footprint obj_a loc in
+          let name =
+            Format.asprintf "Motononic_ArrayInit%a%s_%s"
+              pp_rid r (Matrix.id ds) (Matrix.natural_id obj_e)
+          in
+          let lfun = Lang.generated_p name in
+          let xs1,chunks1,sigma1 = signature domain in
+          let xs2,chunks2,sigma2 = signature domain in
+          let compute_range (bs, ks, es, rs) d =
+            let b = Lang.freshvar ~basename:"b" Qed.Logic.Int in
+            let k = Lang.freshvar ~basename:"k" Qed.Logic.Int in
+            let e = Lang.freshvar ~basename:"e" Qed.Logic.Int in
+            let bt = e_var b in
+            let kt = e_var k in
+            let et = e_var e in
+            let range = match d with
+              | None -> p_and (p_leq bt kt) (p_leq kt et)
+              | Some v ->
+                  p_conj
+                    [p_leq e_zero bt ; p_leq bt kt ;
+                     p_leq kt et ; p_lt et (e_int v)]
+            in
+            b :: bs, k :: ks, e :: es, range :: rs
+          in
+          (* Note: all in reverse order *)
+          let bs, ks, es, rs =
+            List.fold_left compute_range ([], [], [], []) ds
+          in
+          let values =
+            List.fold_left (fun loc k -> M.shift loc obj_e (e_var k)) loc ks
+          in
+          let conj = p_conj (List.rev rs) in
+          let def = p_forall (List.rev ks)
+              (p_imply conj (!monotonic_init_rec sigma1 sigma2 obj_e values))
+          in
+          let flat_combine l b e = b :: e :: l in
+          let params = List.fold_left2 flat_combine [] bs es in
+          Definitions.define_symbol {
+            d_lfun = lfun ; d_types = 0 ;
+            d_params = x :: params @ xs1 @ xs2 ;
+            d_definition = Predicate( Def, def) ;
+            d_cluster = cluster () ;
+          } ;
+          lfun, chunks1, chunks2
+
+        let compile = Lang.local generate
+      end)
+
+  let monotonic_init_comp s1 s2 comp loc =
+    let r, p = M.to_region_pointer loc in
+    let f, m1, m2 = MONOTONIC_INIT_COMP.get (r, comp) in
+    p_bool (F.e_fun f (p :: memories s1 m1 @ memories s2 m2))
+
+  let monotonic_init_array s1 s2 a loc =
+    let d = Matrix.of_array a in
+    let r, p = M.to_region_pointer loc in
+    let f, m1, m2 = MONOTONIC_INIT_ARRAY.get (r,a,d) in
+    let range size = [ e_zero ; e_add size e_minus_one ] in
+    let rs = List.(flatten (map range (Matrix.size d))) in
+    let args = p :: rs @ memories s1 m1 @ memories s2 m2 in
+    p_bool (F.e_fun f args)
+
+  let initialized_loc_monotonic s1 s2 obj loc =
+    match obj with
+    | C_int _ | C_float _ | C_pointer _ ->
+        p_imply
+          (p_bool (initvalue s1 obj loc))
+          (p_bool (initvalue s2 obj loc))
+    | C_comp ci -> monotonic_init_comp s1 s2 ci loc
+    | C_array ai -> monotonic_init_array s1 s2 ai loc
+
+  let () = monotonic_init_rec := initialized_loc_monotonic
+
+  let initialized_loc_monotonic seq =
+    initialized_loc_monotonic seq.pre seq.post
 
   let initialized_range_monotonic s obj loc a b =
     let i = Lang.freshvar ~basename:"i" Lang.t_int in
@@ -517,7 +635,6 @@ struct
         havoc seq obj loc
 
   let assigned_range s obj l a b =
-    initialized_range_monotonic s obj l a b ::
     havoc_length s obj (M.shift l obj a) (e_range a b)
 
   let assigned seq obj = function
@@ -539,10 +656,12 @@ struct
         in
         Assert mono :: !ps
     | Sarray(loc,obj,n) ->
+        initialized_range_monotonic seq obj loc e_zero (e_int (n-1)) ::
         assigned_range seq obj loc e_zero (e_int (n-1))
     | Srange(loc,obj,u,v) ->
         let a = match u with Some a -> a | None -> e_zero in
         let b = match v with Some b -> b | None -> M.last seq.pre obj loc in
+        initialized_range_monotonic seq obj loc a b ::
         assigned_range seq obj loc a b
 
   (* -------------------------------------------------------------------------- *)
