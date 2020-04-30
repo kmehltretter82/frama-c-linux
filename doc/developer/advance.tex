@@ -612,6 +612,18 @@ A specific target \texttt{\$(PLUGIN\_NAME)\_TESTS} will specifically run the tes
 of the plugin. One can add new tests as dependencies of this target.
 The default tests are run by the target \texttt{\$(PLUGIN\_NAME)\_DEFAULT\_TESTS}.
 
+Additionally, when running \texttt{make tests} or
+\texttt{make \$(PLUGIN\_NAME)\_TESTS}
+it is possible to pass options to \texttt{ptests.opt} through the
+\texttt{PTESTS\_OPTS} variable.
+
+\begin{example}
+The following command will update the oracles of all tests of the Aoraï plug-in:
+\begin{shell}
+\$ make PTESTS_OPTS=-update Aorai_TESTS
+\end{shell}
+\end{example}
+
 \texttt{ptests.opt} runs tests belonging to a sub-directory 
 of directory \texttt{tests}\codeidx{tests} that is specified in
 \ptests configuration file. This configuration file,
@@ -714,20 +726,31 @@ Section~\ref{ptests:directives}.
   tests using compiled modules ({\tt -load-script} or {\tt -load-module}) may
   lead to concurrency issues when the same module is used in different test
   files, or in different test cases within the same file. One way to avoid
-  issues is to serialize tests via \texttt{EXECNOW} directives, e.g. by using
-  \texttt{make} to compile a \texttt{.cmxs} from the \texttt{.ml} file, and
-  then loading the \texttt{.cmxs} in the test cases, as in the example below.
+  issues is to serialize tests via \texttt{MODULE} directives, which will
+  take care of the compilation and of adding the corresponding
+  \texttt{-load-module} option to further \texttt{OPT} and
+  \texttt{STDOPT} directives:
 
   \begin{listing-nonumber}
-    EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
-    STDOPT: #"-load-module @PTEST_DIR@/@PTEST_NAME.cmxs" ...
-    STDOPT: #"-load-module @PTEST_DIR@/@PTEST_NAME.cmxs" ...
+    MODULE: @PTEST_DIR@/@PTEST_NAME@.cmxs
+    STDOPT: +"-opt1" ...
+    STDOPT: #"-opt2" ...
   \end{listing-nonumber}
 
   In addition, if the same script {\tt tests/suite/script.ml}
-  is shared by several test files, the {\tt EXECNOW} directive should be put
-  into {\tt tests/suite/test\_config}.
-  Check the {\tt MODULE} directive for a common solution to this issue.
+  is shared by several test files in {\tt tests/suite},
+  it is necessary to compile the script once
+  when entering the directory hosting the suite. The {\tt MODULE} directive is
+  not well suited for that, and it is thus needed to resort to an {\tt EXECNOW}
+  directive in {\tt tests/suite/test\_config}:
+
+  \begin{listing-nonumber}
+    EXECNOW: make -s @PTEST_DIR@/common_module.cmxs
+  \end{listing-nonumber}
+
+  It is then necessary to explicitly use
+  {\tt -load-module @PTEST\_DIR@/common\_module.cmxs} in the appropriate
+  {\tt OPT} and {\tt STDOPT} directives.
 
 \end{important}
 
