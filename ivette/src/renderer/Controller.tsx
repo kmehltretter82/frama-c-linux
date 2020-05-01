@@ -99,11 +99,11 @@ export const Control = () => {
     { enabled: false, onClick: null };
 
   switch (status) {
-    case Server.StatusCode.OFF:
-    case Server.StatusCode.FAILED:
+    case Server.Status.OFF:
+    case Server.Status.FAILED:
       play = { enabled: true, onClick: Server.start };
       break;
-    case Server.StatusCode.RUNNING:
+    case Server.Status.RUNNING:
       stop = { enabled: true, onClick: Server.stop };
       reload = { enabled: true, onClick: Server.restart };
       break;
@@ -248,32 +248,31 @@ export const Console = () => (
 // --------------------------------------------------------------------------
 
 export const Status = () => {
-  Dome.useUpdate(Server.STATUS);
-  const s = Server.getStatus();
+  const s = Server.useStatus();
   const n = Server.getPending();
   let led;
   let blink;
   let error;
   switch (s) {
-    case Server.StatusCode.OFF:
+    case Server.Status.OFF:
       led = 'inactive';
       break;
-    case Server.StatusCode.STARTED:
+    case Server.Status.STARTED:
       led = 'active';
       blink = true;
       break;
-    case Server.StatusCode.RUNNING:
+    case Server.Status.RUNNING:
       led = n > 0 ? 'positive' : 'active';
       break;
-    case Server.StatusCode.KILLING:
+    case Server.Status.KILLING:
       led = 'negative';
       blink = true;
       break;
-    case Server.StatusCode.RESTART:
+    case Server.Status.RESTART:
       led = 'warning';
       blink = true;
       break;
-    case Server.StatusCode.FAILED:
+    case Server.Status.FAILED:
       led = 'negative';
       blink = false;
       error = Server.getError();
@@ -295,7 +294,7 @@ export const Status = () => {
 // --------------------------------------------------------------------------
 
 export const Stats = () => {
-  Dome.useUpdate(Server.STATUS);
+  Server.useStatus();
   const n = Server.getPending();
   return n > 0 ? <Code>{n} rq.</Code> : null;
 };

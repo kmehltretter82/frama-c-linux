@@ -24,10 +24,8 @@ import { Request as ZmqRequest } from 'zeromq';
  *  @summary Server Status Notification Event
  *  @description
  *  This event is emitted whenever the server status changes.
- *
- *  Exported as `Server.STATUS' in public API.
  */
-export const STATUS = 'frama-c.server.status';
+const STATUS = 'frama-c.server.status';
 
 /**
  *  @event
@@ -36,10 +34,8 @@ export const STATUS = 'frama-c.server.status';
  *  @description
  *  This event is emitted when ther server _enters_ the `RUNNING` state.
  *  It is now ready to handle requests.
- *
- *  Exported as `Server.READY' in public API.
  */
-export const READY = 'frama-c.server.ready';
+const READY = 'frama-c.server.ready';
 
 /**
  *  @event
@@ -48,10 +44,8 @@ export const READY = 'frama-c.server.ready';
  *  @description
  *  This event is emitted when ther server _leaves_ the `RUNNING` state.
  *  It is no more able to handle requests until re-start.
- *
- *  Exported as `Server.SHUTDOWN' in public API.
  */
-export const SHUTDOWN = 'frama-c.server.shutdown';
+const SHUTDOWN = 'frama-c.server.shutdown';
 
 /**
  *  @event
@@ -60,7 +54,7 @@ export const SHUTDOWN = 'frama-c.server.shutdown';
  *  @description
  *  Event `frama-c.server.signal.<id>'` for signal `<id>`.
  */
-export const SIGNAL = 'frama-c.server.signal.';
+const SIGNAL = 'frama-c.server.signal.';
 
 /**
  *  @event
@@ -71,7 +65,7 @@ export const SIGNAL = 'frama-c.server.signal.';
  *  @description
  *  Event `frama-c.server.activity.<id>'` for signal `<id>`.
  */
-export const ACTIVITY = 'frama-c.server.activity.';
+const ACTIVITY = 'frama-c.server.activity.';
 
 // --------------------------------------------------------------------------
 // --- Server Status
