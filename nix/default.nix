@@ -7,7 +7,7 @@ let mk_buildInputs = { opamPackages ? [], nixPackages ? [] } :
                 { name = "coq"; constraint = "=8.10.2";  }
                 { name = "why3" ; constraint = "=1.3.1"; }
                 { name = "why3-coq" ; constraint = "=1.3.1"; }
-                { name = "menhir"; constraint = "=20200211"; }
+                { name = "menhir"; constraint = "=20190924"; }
                 "camlzip" #so that why3 is always compiled with it
                 ] ++ opamPackages
               );
