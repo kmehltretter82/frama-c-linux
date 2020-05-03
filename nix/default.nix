@@ -4,14 +4,13 @@
 let mk_buildInputs = { opamPackages ? [], nixPackages ? [] } :
     [ pkgs.gnugrep pkgs.gnused  pkgs.autoconf pkgs.gnumake pkgs.gcc pkgs.ncurses pkgs.time pkgs.python3 pkgs.perl pkgs.file] ++ nixPackages ++ opam2nix.build {
            specs = opam2nix.toSpecs ([ "ocamlfind" "zarith" "ocamlgraph" "yojson"
-                { name = "coq"; constraint = "=8.11.0";  }
+                { name = "coq"; constraint = "=8.10.2";  }
                 { name = "why3" ; constraint = "=1.3.1"; }
                 { name = "why3-coq" ; constraint = "=1.3.1"; }
-                { name = "menhir"; constraint = "=20181113"; }
+                { name = "menhir"; constraint = "=20190924"; }
+                { name = "dune"; constraint = "=1.11.4"; }
                 "camlzip" #so that why3 is always compiled with it
-                ] ++ opamPackages ++
-                (if ocaml_version == "pkgs.ocaml-ng.ocamlPackages_4_02.ocaml"
-                then [ { name = "ocamlbuild" ; constraint = "=0"; } ] else [])
+                ] ++ opamPackages
               );
            ocamlAttr = ocaml_version;
         };
