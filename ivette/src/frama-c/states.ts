@@ -158,11 +158,7 @@ export function useState(id: string) {
  *  in case of errors, but will keep the last received value until a new one is
  *  actually received.
  */
-export function useRequest(
-  rq: string,
-  params: any,
-  options: any = {},
-) {
+export function useRequest(rq: string, params: any, options: any = {}) {
   const state = React.useRef<string>();
   const project = useProject();
   const [response, setResponse] = React.useState(options.offline);
