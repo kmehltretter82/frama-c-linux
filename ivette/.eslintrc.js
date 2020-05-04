@@ -17,6 +17,8 @@ module.exports = {
   },
   rules: {
     "react/display-name": "off",
+    // Be more strict on usage of useMemo and useRef
+    "react-hooks/exhaustive-deps": "error",
     // Allow type any, even if it should be avoided
     "@typescript-eslint/no-explicit-any": "off",
     // Allow functions without return type, even if exported function should have one

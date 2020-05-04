@@ -18,13 +18,13 @@ import 'codemirror/theme/ambiance.css';
 // --- Rich Text Printer
 // --------------------------------------------------------------------------
 
-const print = (buffer: any, text: string) => {
+const printAST = (buffer: any, text: string) => {
   if (Array.isArray(text)) {
     const tag = text.shift();
     if (tag !== '') {
       buffer.openTextMarker({ id: tag });
     }
-    text.forEach((txt) => print(buffer, txt));
+    text.forEach((txt) => printAST(buffer, txt));
     if (tag !== '') {
       buffer.closeTextMarker();
     }
@@ -33,45 +33,51 @@ const print = (buffer: any, text: string) => {
   }
 };
 
+async function loadAST(buffer: any, theFunction?: string, theMarker?: string) {
+  buffer.clear();
+  if (theFunction) {
+    buffer.log('// Loading', theFunction, '…');
+    (async () => {
+      const data = await Server.GET({
+        endpoint: 'kernel.ast.printFunction',
+        params: theFunction,
+      });
+      buffer.clear();
+      if (!data)
+        buffer.log('// No code for function ', theFunction);
+      printAST(buffer, data);
+      if (theMarker)
+        buffer.scroll(theMarker, undefined);
+      return;
+    })();
+  }
+}
+
 // --------------------------------------------------------------------------
 // --- AST Printer
 // --------------------------------------------------------------------------
 
 const ASTview = () => {
+
   // Hooks
   const buffer = React.useMemo(() => new RichTextBuffer(), []);
+  const printed = React.useRef();
   const [select, setSelect] = States.useSelection();
   const theFunction = select && select.function;
   const theMarker = select && select.marker;
 
   // Hook: async loading
   React.useEffect(() => {
-    buffer.clear();
-    if (theFunction) {
-      buffer.log('// Loading', theFunction, '…');
-      (async () => {
-        const sr: Server.Request = {
-          endpoint: 'kernel.ast.printFunction',
-          params: theFunction,
-        };
-        const data = await Server.GET(sr);
-        buffer.clear();
-        if (!data) {
-          buffer.log('// No code for function ', theFunction);
-        }
-        print(buffer, data);
-        if (theMarker) {
-          buffer.scroll(theMarker, undefined);
-        }
-        return;
-      })();
+    if (printed.current !== theFunction) {
+      printed.current = theFunction;
+      loadAST(buffer, theFunction, theMarker);
     }
-  }, [theFunction]);
+  });
 
-  // Hook: scrolling
+  // Hook: marker scrolling
   React.useEffect(() => {
     if (theMarker) buffer.scroll(theMarker, undefined);
-  }, [theMarker]);
+  }, [buffer, theMarker]);
 
   // Callbacks
   const onSelection = (marker: any) => setSelect({ marker });
@@ -89,6 +95,7 @@ const ASTview = () => {
       />
     </Vfill>
   );
+
 };
 
 // --------------------------------------------------------------------------

@@ -158,40 +158,42 @@ export function useState(id: string) {
  *  in case of errors, but will keep the last received value until a new one is
  *  actually received.
  */
-export function useRequest(rq: string, params: any, options: any = {}) {
+export function useRequest(
+  rq: string,
+  params: any,
+  options: any = {},
+) {
+  const state = React.useRef<string>();
   const project = useProject();
-  const [value, setValue] = React.useState(options.offline);
+  const [response, setResponse] = React.useState(options.offline);
+  const footprint =
+    project ? JSON.stringify([project, rq, params]) : undefined;
+
+  async function trigger() {
+    if (project) {
+      try {
+        const r = await Server.GET({ endpoint: rq, params });
+        setResponse(r);
+      } catch (errmsg) {
+        if (Dome.DEVEL)
+          console.warn(`[Server] use request '${rq}':`, errmsg);
+        const err = options.error;
+        if (err !== undefined) setResponse(err);
+      }
+    } else {
+      const off = options.offline;
+      if (off !== undefined) setResponse(off);
+    }
+  }
 
   React.useEffect(() => {
-    if (project) {
-      const pending = options.prending;
-      if (pending !== null) {
-        setValue(pending);
-      }
-      (async () => {
-        try {
-          const sr: Server.Request = { endpoint: rq, params };
-          const v = await Server.GET(sr);
-          setValue(v);
-        } catch (err) {
-          if (Dome.DEVEL) {
-            console.warn(`[Server] use request '${rq}':`, err);
-          }
-          const { error } = options;
-          if (error !== null) {
-            setValue(error);
-          }
-        }
-      })();
-    } else {
-      const v = options.offline;
-      if (value !== v) {
-        setValue(v);
-      }
+    if (state.current !== footprint) {
+      state.current = footprint;
+      trigger();
     }
-  }, [project, rq, JSON.stringify(params)]);
+  });
 
-  return value;
+  return response;
 }
 
 // --------------------------------------------------------------------------
@@ -243,7 +245,7 @@ export function useDictionary(
       if (k && (!filter || filter(tg))) d[k] = tg;
     });
     return d;
-  }, [tags, filter]);
+  }, [key, tags, filter]);
   return dict;
 }
 
