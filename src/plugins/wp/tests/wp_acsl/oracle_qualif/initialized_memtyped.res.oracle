@@ -22,15 +22,15 @@
 [wp] [Alt-Ergo] Goal typed_test_check_unknown_9 : Unsuccess
 [wp] [Alt-Ergo] Goal typed_test_check_unknown_10 : Unsuccess
 [wp] [Alt-Ergo] Goal typed_test_check_unknown_11 : Unsuccess
-[wp] [Alt-Ergo] Goal typed_test_check_provable : Valid
+[wp] [Qed] Goal typed_test_check_qed_ok_8 : Valid
 [wp] [Alt-Ergo] Goal typed_test_check_unknown_12 : Unsuccess
-[wp] [Alt-Ergo] Goal typed_test_check_provable_2 : Valid
+[wp] [Alt-Ergo] Goal typed_test_check_provable : Valid
 [wp] [Alt-Ergo] Goal typed_test_check_unknown_13 : Unsuccess
-[wp] [Alt-Ergo] Goal typed_test_check_provable_3 : Valid
+[wp] [Qed] Goal typed_test_check_qed_ok_9 : Valid
 [wp] Proved goals:   10 / 23
-  Qed:             7 
-  Alt-Ergo:        3  (unsuccess: 13)
+  Qed:             9 
+  Alt-Ergo:        1  (unsuccess: 13)
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  test                      7        3       23      43.5%
+  test                      9        1       23      43.5%
 ------------------------------------------------------------

@@ -39,7 +39,7 @@ void test(int* x, int (*a)[2], struct C* c){
   //@ check unknown: \initialized(c);
 
   c->s.y = 1 ;
-  //@ check provable: \initialized(&c->s);
+  //@ check qed_ok: \initialized(&c->s);
   //@ check unknown: \initialized(c);
 
   c->a[0] = c->a[1] = c->a[2] = c->a[3] = c->a[4] = c->a[5] = c->a[6] = c->a[7] = c->a[8] = 1;
@@ -47,5 +47,5 @@ void test(int* x, int (*a)[2], struct C* c){
   //@ check unknown: \initialized(c);
 
   c->a[9] = 1 ;
-  //@ check provable: \initialized(c);
+  //@ check qed_ok: \initialized(c);
 }

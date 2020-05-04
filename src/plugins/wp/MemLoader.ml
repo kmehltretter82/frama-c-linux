@@ -386,22 +386,24 @@ struct
   (* --- Initialized                                                        --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let rec initialized_term obj term =
+  let rec initialized_loc sigma obj loc =
     match obj with
-    | C_int _ | C_float _ | C_pointer _ -> p_bool term
+    | C_int _ | C_float _ | C_pointer _ ->
+        p_bool (initvalue sigma obj loc)
     | C_comp ci ->
         let initialized_field f =
-          initialized_term
-            (object_of f.ftype)
-            (e_getfield term (Cfield (f, KInit)))
+          initialized_loc sigma (object_of f.ftype) (M.field loc f)
         in
         p_conj (List.map initialized_field ci.cfields)
     | C_array ai ->
         let obj_e, ds = Matrix.of_array ai in
         let denv = Matrix.denv ds in
-        let values = List.fold_left e_get term denv.index_val in
-        let make_subst var value p =
-          match value with
+        let access =
+          List.fold_left
+            (fun loc ofs -> M.shift loc obj_e ofs) loc denv.index_val
+        in
+        let make_subst var size p =
+          match size with
           | None -> p
           | Some i -> p_subst_var var (e_int i) p
         in
@@ -410,10 +412,7 @@ struct
           List.fold_left (fun p f -> f p) (p_conj denv.index_range) substs
         in
         p_forall denv.index_var
-          (p_imply conj (initialized_term obj_e values))
-
-  let initialized_loc sigma obj loc =
-    initialized_term obj (initvalue sigma obj loc)
+          (p_imply conj (initialized_loc sigma obj_e access))
 
   let initialized sigma = function
     | Rloc(obj, loc) -> initialized_loc sigma obj loc
