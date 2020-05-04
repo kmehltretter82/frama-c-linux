@@ -82,7 +82,7 @@ const ACTIVITY = 'frama-c.server.activity.';
  *   - `RESTART` Server shutdown, will reboot on exit
  *   - `FAILED` Server halted on error
  */
-export enum StatusCode {
+export enum Status {
   OFF = 'OFF',
   STARTED = 'STARTED',
   RUNNING = 'RUNNING',
@@ -95,7 +95,7 @@ export enum StatusCode {
 // --- Server Global State
 // --------------------------------------------------------------------------
 
-let status = StatusCode.OFF;
+let status = Status.OFF;
 let error: string | undefined; // process error
 let rqid: number; // Request ID
 let pending: any; // Pending promise callbacks
@@ -121,19 +121,19 @@ export const buffer = new RichTextBuffer({ maxlines: 200 });
 
 /**
  *  @summary Current Server Status.
- *  @return {StatusCode} the current server status
+ *  @return {Status} the current server status
  *  @description
  *  See [STATUS](module-frama-c_server.html#~STATUS) code definitions.
  */
-export function getStatus(): StatusCode { return status; }
+export function getStatus(): Status { return status; }
 
 /**
  *  @summary Hook on current server (Custom React Hook).
- *  @return {StatusCode} the current server status
+ *  @return {Status} the current server status
  *  @description
  *  See [STATUS](module-frama-c_server.html#~STATUS) code definitions.
  */
-export function useStatus(): StatusCode {
+export function useStatus(): Status {
   Dome.useUpdate(STATUS);
   return status;
 }
@@ -145,7 +145,7 @@ export function getError() { return error; }
  *  @summary Frama-C Server is running and ready to handle requests.
  *  @return {boolean} status is `RUNNING`.
  */
-export function isRunning(): boolean { return status === StatusCode.RUNNING; }
+export function isRunning(): boolean { return status === Status.RUNNING; }
 
 /**
  *  @summary Number of requests still pending.
@@ -180,7 +180,7 @@ export function onActivity(signal: string, callback: any) {
 // --- Status Update
 // --------------------------------------------------------------------------
 
-function _status(newStatus: StatusCode, err?: string) {
+function _status(newStatus: Status, err?: string) {
   if (Dome.DEVEL && err) {
     console.error('[Server]', err);
   }
@@ -189,8 +189,8 @@ function _status(newStatus: StatusCode, err?: string) {
     status = newStatus;
     error = err ? err.toString() : undefined;
     Dome.emit(STATUS);
-    if (oldStatus === StatusCode.RUNNING) Dome.emit(SHUTDOWN);
-    if (newStatus === StatusCode.RUNNING) Dome.emit(READY);
+    if (oldStatus === Status.RUNNING) Dome.emit(SHUTDOWN);
+    if (newStatus === Status.RUNNING) Dome.emit(READY);
   }
 }
 
@@ -207,19 +207,19 @@ function _status(newStatus: StatusCode, err?: string) {
  */
 export function start() {
   switch (status) {
-    case StatusCode.OFF:
-    case StatusCode.FAILED:
-      _status(StatusCode.STARTED);
+    case Status.OFF:
+    case Status.FAILED:
+      _status(Status.STARTED);
       _launch()
-        .then(() => _status(StatusCode.RUNNING))
-        .catch((error) => _status(StatusCode.FAILED, error));
+        .then(() => _status(Status.RUNNING))
+        .catch((error) => _status(Status.FAILED, error));
       return;
-    case StatusCode.KILLING:
-      _status(StatusCode.RESTART);
+    case Status.KILLING:
+      _status(Status.RESTART);
       return;
-    case StatusCode.STARTED:
-    case StatusCode.RUNNING:
-    case StatusCode.RESTART:
+    case Status.STARTED:
+    case Status.RUNNING:
+    case Status.RESTART:
     default:
       return;
   }
@@ -239,20 +239,20 @@ export function start() {
  */
 export function stop() {
   switch (status) {
-    case StatusCode.STARTED:
+    case Status.STARTED:
       _kill();
-      _status(StatusCode.KILLING);
+      _status(Status.KILLING);
       return;
-    case StatusCode.RUNNING:
+    case Status.RUNNING:
       _shutdown();
-      _status(StatusCode.KILLING);
+      _status(Status.KILLING);
       return;
-    case StatusCode.RESTART:
-      _status(StatusCode.KILLING);
+    case Status.RESTART:
+      _status(Status.KILLING);
       return;
-    case StatusCode.OFF:
-    case StatusCode.FAILED:
-    case StatusCode.KILLING:
+    case Status.OFF:
+    case Status.FAILED:
+    case Status.KILLING:
     default:
       return;
   }
@@ -274,15 +274,15 @@ export function stop() {
  */
 export function kill() {
   switch (status) {
-    case StatusCode.STARTED:
-    case StatusCode.RUNNING:
-    case StatusCode.KILLING:
-    case StatusCode.RESTART:
+    case Status.STARTED:
+    case Status.RUNNING:
+    case Status.KILLING:
+    case Status.RESTART:
       _kill();
-      _status(StatusCode.KILLING);
+      _status(Status.KILLING);
       return;
-    case StatusCode.OFF:
-    case StatusCode.FAILED:
+    case Status.OFF:
+    case Status.FAILED:
     default:
       return;
   }
@@ -301,19 +301,19 @@ export function kill() {
  */
 export function restart() {
   switch (status) {
-    case StatusCode.OFF:
-    case StatusCode.FAILED:
+    case Status.OFF:
+    case Status.FAILED:
       start();
       return;
-    case StatusCode.RUNNING:
+    case Status.RUNNING:
       _shutdown();
-      _status(StatusCode.RESTART);
+      _status(Status.RESTART);
       return;
-    case StatusCode.KILLING:
-      _status(StatusCode.RESTART);
+    case Status.KILLING:
+      _status(Status.RESTART);
       return;
-    case StatusCode.STARTED:
-    case StatusCode.RESTART:
+    case Status.STARTED:
+    case Status.RESTART:
     default:
       return;
   }
@@ -331,12 +331,12 @@ export function restart() {
  */
 export function clear() {
   switch (status) {
-    case StatusCode.FAILED:
-      _status(StatusCode.OFF);
+    case Status.FAILED:
+      _status(Status.OFF);
       buffer.clear();
       Dome.emit(STATUS);
       return;
-    case StatusCode.OFF:
+    case Status.OFF:
       buffer.clear();
       Dome.emit(STATUS);
       return;
@@ -444,7 +444,7 @@ async function _launch() {
     buffer.append('Error:', err, '\n');
     _close(err);
   });
-  process.on('exit', (status: StatusCode, signal: string) => {
+  process.on('exit', (status: Status, signal: string) => {
     if (signal) buffer.log('Signal:', signal);
     if (status) buffer.log('Exit:', status);
     _close(signal || status);
@@ -506,10 +506,10 @@ function _close(error: string) {
     process = undefined;
   }
   if (error) {
-    _status(StatusCode.FAILED, error);
+    _status(Status.FAILED, error);
   } else {
-    if (status === StatusCode.RESTART) setImmediate(start);
-    _status(StatusCode.OFF);
+    if (status === Status.RESTART) setImmediate(start);
+    _status(Status.OFF);
   }
 }
 
