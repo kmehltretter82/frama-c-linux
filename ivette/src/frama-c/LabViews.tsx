@@ -521,9 +521,14 @@ function CustomViews({ settings, shape, setShape, views: libViews }: any) {
 
 const DRAGOVERLAY = { className: 'labview-stock' };
 
-function CustomGroup(
-  { dnd, shape, setDragging, id, title, label, components }: any,
-) {
+function CustomGroup({
+  dnd, shape, setDragging,
+  id: sectionId,
+  title: sectionTitle,
+  label: sectionLabel,
+  components,
+}: any)
+{
   const makeComponent = ({ id, label, title }: any) => {
     const itemId = getItemId('components', id);
     const disabled = Grids.getShapeItem(shape, itemId) !== undefined;
@@ -546,7 +551,7 @@ function CustomGroup(
   };
 
   return (
-    <Section id={id} label={label} title={title}>
+    <Section id={sectionId} label={sectionLabel} title={sectionTitle}>
       {components.map(makeComponent)}
     </Section>
   );

@@ -150,14 +150,14 @@ function execCmdLine(cmd: string) {
 }
 
 const RenderConsole = () => {
-  const [cmd, switchCmd] = Dome.useSwitch();
+  const [command, switchCmd] = Dome.useSwitch();
   const { current, next, prev, index, length, update, insert, clear }: any =
     Dome.useHistory('frama-c.command.history');
 
   const doExec = () => {
-    const cmd = getCmdLine();
-    if (cmd !== current) insert(cmd);
-    execCmdLine(cmd);
+    const cmdline = getCmdLine();
+    if (cmdline !== current) insert(cmdline);
+    execCmdLine(cmdline);
     switchCmd();
   };
   const doNext = () => { cmdLine.getDoc().setValue(next() || ''); };
@@ -169,21 +169,21 @@ const RenderConsole = () => {
   };
   return (
     <>
-      <TitleBar label={cmd ? 'Command Line' : 'Console'}>
-        <Label className="dimmed" display={cmd && length > 0}>
+      <TitleBar label={command ? 'Command Line' : 'Console'}>
+        <Label className="dimmed" display={command && length > 0}>
           {1 + index}/{length}
         </Label>
         <Space />
         <IconButton
           icon="TRASH"
-          display={cmd && clear}
+          display={command && clear}
           disabled={!clear}
           onClick={clear}
           title="Clear History"
         />
         <IconButton
           icon="CROSS"
-          display={cmd && clear}
+          display={command && clear}
           disabled={!current}
           onClick={doDrop}
           title="Remove Command"
@@ -191,20 +191,20 @@ const RenderConsole = () => {
         <Space />
         <IconButton
           icon="MEDIA.PREV"
-          display={cmd}
+          display={command}
           disabled={!prev}
           onClick={doPrev}
           title="Previous Command"
         />
         <IconButton
           icon="RELOAD"
-          display={cmd}
+          display={command}
           onClick={doReload}
           title="Reset Command Line"
         />
         <IconButton
           icon="MEDIA.NEXT"
-          display={cmd}
+          display={command}
           disabled={!next}
           onClick={doNext}
           title="Previous Command"
@@ -212,21 +212,21 @@ const RenderConsole = () => {
         <Space />
         <IconButton
           icon="MEDIA.PLAY"
-          display={cmd}
+          display={command}
           onClick={doExec}
           title="Execute Command Line"
         />
         <IconButton
           icon="EDIT"
-          selected={cmd}
+          selected={command}
           onClick={switchCmd}
           title="Edit Command Line"
         />
       </TitleBar>
       <Text
-        buffer={cmd ? cmdLine : Server.buffer}
+        buffer={command ? cmdLine : Server.buffer}
         mode="text"
-        readOnly={!cmd}
+        readOnly={!command}
         theme="ambiance"
       />
     </>

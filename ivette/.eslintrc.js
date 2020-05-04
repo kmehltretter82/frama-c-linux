@@ -39,11 +39,20 @@ module.exports = {
     "no-underscore-dangle": "off",
     // Allow return statements even if not strictly needed
     "no-useless-return": "off",
-    // Disable warn about shadowing concerning variables
-    "no-shadow": "off",
+    // Forbid shadowing concerning variables
+    "no-shadow": [ "error" ],
+    // Force single class member per line
     "lines-between-class-members": [
       "error", "always", { "exceptAfterSingleLine": true }
     ],
+    // Allow blank line separators for complex blocks
+    "padded-blocks": "off",
+    // Allow braces on their own line
+    "@typescript-eslint/brace-style": "off",
+    // Allow single command after if
+    "curly":"off",
+    // Do not specify position for single commands
+    "nonblock-statement-body-position": "off",
     // Allow ++/-- operators only in for-loops
     "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
     // Just warn about simple promise rejections

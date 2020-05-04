@@ -152,7 +152,7 @@ export function isRunning(): boolean { return status === Status.RUNNING; }
  *  @return {number} pending requests
  */
 export function getPending(): number {
-  return _.reduce(pending, (_, n) => n + 1, 0);
+  return _.reduce(pending, (_rq, n) => n + 1, 0);
 }
 
 /**
@@ -212,7 +212,7 @@ export function start() {
       _status(Status.STARTED);
       _launch()
         .then(() => _status(Status.RUNNING))
-        .catch((error) => _status(Status.FAILED, error));
+        .catch((err) => _status(Status.FAILED, err));
       return;
     case Status.KILLING:
       _status(Status.RESTART);
@@ -444,10 +444,10 @@ async function _launch() {
     buffer.append('Error:', err, '\n');
     _close(err);
   });
-  process.on('exit', (status: Status, signal: string) => {
-    if (signal) buffer.log('Signal:', signal);
-    if (status) buffer.log('Exit:', status);
-    _close(signal || status);
+  process.on('exit', (estatus: Status, esignal: string) => {
+    if (esignal) buffer.log('Signal:', esignal);
+    if (estatus) buffer.log('Exit:', estatus);
+    _close(esignal || estatus);
   });
   // Connect to Server
   socket = new ZmqRequest();
@@ -490,7 +490,7 @@ function _shutdown() {
   }
 }
 
-function _close(error: string) {
+function _close(err: string) {
   _reset();
   if (killing) {
     clearTimeout(killing);
@@ -505,8 +505,8 @@ function _close(error: string) {
     process.kill();
     process = undefined;
   }
-  if (error) {
-    _status(Status.FAILED, error);
+  if (err) {
+    _status(Status.FAILED, err);
   } else {
     if (status === Status.RESTART) setImmediate(start);
     _status(Status.OFF);
@@ -641,14 +641,14 @@ Dome.on(SHUTDOWN, () => {
  *  @typedef RqKind
  *  @summary Request kind.
  *  @description
- *   - `GET` Used to read data from the server
- *   - `SET` Used to write data into the server
- *   - `EXEC` Used to make the server execute a task
+ *   - `R_GET` Used to read data from the server
+ *   - `R_SET` Used to write data into the server
+ *   - `R_EXEC` Used to make the server execute a task
  */
 export enum RqKind {
-  GET = 'GET',
-  SET = 'SET',
-  EXEC = 'EXEC'
+  R_GET = 'GET',
+  R_SET = 'SET',
+  R_EXEC = 'EXEC'
 }
 
 /**
@@ -667,7 +667,7 @@ export interface Request {
  * @param sr - the server request description.
  */
 export async function GET(sr: Request) {
-  return send(RqKind.GET, sr.endpoint, sr.params);
+  return send(RqKind.R_GET, sr.endpoint, sr.params);
 }
 
 /**
@@ -675,7 +675,7 @@ export async function GET(sr: Request) {
  * @param sr - the server request description.
  */
 export async function SET(sr: Request) {
-  return send(RqKind.SET, sr.endpoint, sr.params);
+  return send(RqKind.R_SET, sr.endpoint, sr.params);
 }
 
 /**
@@ -683,7 +683,7 @@ export async function SET(sr: Request) {
  * @param sr - the server request description.
  */
 export async function EXEC(sr: Request) {
-  return send(RqKind.EXEC, sr.endpoint, sr.params);
+  return send(RqKind.R_EXEC, sr.endpoint, sr.params);
 }
 
 /**
@@ -725,11 +725,11 @@ function _resolve(id: string | number, data: string) {
   }
 }
 
-function _reject(id: string | number, error: string) {
+function _reject(id: string | number, err: string) {
   const promise = pending[id];
   if (promise) {
     delete pending[id];
-    promise.reject(error);
+    promise.reject(err);
   }
 }
 
