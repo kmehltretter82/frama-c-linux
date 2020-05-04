@@ -57,8 +57,11 @@ let name_of_mpz_arith_bop = function
   | Mult -> "__gmpz_mul"
   | Div -> "__gmpz_tdiv_q"
   | Mod -> "__gmpz_tdiv_r"
-  | Lt | Gt | Le | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr
-  | Shiftlt | Shiftrt | PlusPI | IndexPI | MinusPI | MinusPP -> assert false
+  | BAnd -> "__gmpz_and"
+  | BOr -> "__gmpz_ior"
+  | BXor -> "__gmpz_xor"
+  | Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr | Shiftlt | Shiftrt | PlusPI
+  | IndexPI | MinusPI | MinusPP -> assert false
 
 (* Type of a string that represents a number.
    Used when a string is required to encode a constant number because it is not
@@ -426,7 +429,15 @@ and context_insensitive_term_to_exp kf env t =
     let e1, env = term_to_exp kf env t1 in
     let e2, env = term_to_exp kf env t2 in
     if Gmp_types.Z.is_t ty then
-      not_yet env "bitwise operator on arbitrary precision"
+      let mk_stmts _v e =
+        let name = name_of_mpz_arith_bop bop in
+        let instr = Constructor.mk_lib_call ~loc name [ e; e1; e2 ] in
+        [ instr ]
+      in
+      let name = Misc.name_of_binop bop in
+      let t = Some t in
+      let _, e, env = Env.new_var_and_mpz_init ~loc ~name env kf t mk_stmts in
+      e, env, C_number, ""
     else begin
       assert (Logic_typing.is_integral_type t.term_type);
       Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)), env, C_number, ""
