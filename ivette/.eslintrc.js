@@ -42,7 +42,7 @@ module.exports = {
     // Allow return statements even if not strictly needed
     "no-useless-return": "off",
     // Forbid shadowing concerning variables
-    "no-shadow": [ "error" ],
+    "no-shadow": "error",
     // Force single class member per line
     "lines-between-class-members": [
       "error", "always", { "exceptAfterSingleLine": true }
@@ -51,14 +51,12 @@ module.exports = {
     "padded-blocks": "off",
     // Allow braces on their own line
     "@typescript-eslint/brace-style": "off",
-    // Allow single command after if
-    "curly":"off",
+    // Allow single command on new line after 'if' statement
+    "curly": "off",
     // Do not specify position for single commands
     "nonblock-statement-body-position": "off",
     // Allow ++/-- operators only in for-loops
     "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
-    // Just warn about simple promise rejections
-    "prefer-promise-reject-errors": "warn",
     // Force code to 80 columns, but for trailing comments
     "max-len": ["error", { "code": 80, "ignoreTrailingComments": true, }],
     // Allow more than one class per file, even if not a good practice
