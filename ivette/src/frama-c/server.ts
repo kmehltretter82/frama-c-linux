@@ -431,7 +431,7 @@ async function _launch() {
     env,
   };
   // Launch Process
-  const process = await System.spawn(command, params, options);
+  process = await System.spawn(command, params, options);
   const logger = (text: string | string[]) => {
     buffer.append(text);
     if (text.indexOf('\n') >= 0) {
