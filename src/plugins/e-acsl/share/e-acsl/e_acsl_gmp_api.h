@@ -296,6 +296,27 @@ extern void __gmpq_div(mpq_t q1, const mpq_t q2, const mpq_t q3)
 
 /*@ requires \valid(z1);
   @ requires \valid_read(z2);
+  @ requires \valid_read(z3);
+  @ assigns *z1 \from *z2, *z3; */
+extern void __gmpz_and(mpz_t z1, const mpz_t z2, const mpz_t z3)
+  __attribute__((FC_BUILTIN));
+
+/*@ requires \valid(z1);
+  @ requires \valid_read(z2);
+  @ requires \valid_read(z3);
+  @ assigns *z1 \from *z2, *z3; */
+extern void __gmpz_ior(mpz_t z1, const mpz_t z2, const mpz_t z3)
+  __attribute__((FC_BUILTIN));
+
+/*@ requires \valid(z1);
+  @ requires \valid_read(z2);
+  @ requires \valid_read(z3);
+  @ assigns *z1 \from *z2, *z3; */
+extern void __gmpz_xor(mpz_t z1, const mpz_t z2, const mpz_t z3)
+  __attribute__((FC_BUILTIN));
+
+/*@ requires \valid(z1);
+  @ requires \valid_read(z2);
   @ assigns *z1 \from *z2;
   @ assigns \result \from *z1,*z2; */
 extern int __gmpz_com(mpz_t z1, const mpz_t z2)
