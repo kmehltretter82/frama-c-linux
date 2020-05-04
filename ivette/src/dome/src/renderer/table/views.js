@@ -651,7 +651,7 @@ export class Table extends React.Component {
             sortDirection={ordering && ordering.sortDirection}
             sort={model.setOrdering.bind(model)}
             scrollToIndex={ scrollToIndex }
-            scrollToAlignment='center'
+            scrollToAlignment='auto'
             >
             {React.Children.map(columns,renderColumn)}
           </VTable>
