@@ -1,6 +1,7 @@
 /* run.config_ci, run.config_dev
    COMMENT: Support of bitwise operations
    STDOPT: #"-warn-right-shift-negative -warn-left-shift-negative"
+   MACRO: ROOT_EACSL_GCC_FC_EXTRA_EXT -warn-right-shift-negative -warn-left-shift-negative
 */
 
 #include <limits.h>
@@ -42,8 +43,6 @@ void g_signed(int a, int b) {
 
     /*@ assert ((ULLONG_MAX + 1) << 1) != 0; */
     /*@ assert ((ULLONG_MAX + 1) >> 1) != 0; */
-    /*@ assert ((LLONG_MIN - 1) << 1) != 0; */
-    /*@ assert ((LLONG_MIN - 1) >> 1) != 0; */
     /*@ assert (1 << 65) != 0; */
     /*@ assert ((ULLONG_MAX + 1) | (LLONG_MIN - 1)) != 0; */
     /*@ assert ((ULLONG_MAX + 1) & (LLONG_MIN - 1)) !=
