@@ -4,7 +4,7 @@
 
 /**
    @packageDocumentation
-   @module dome/data
+   @module dome/data/library
    @description
    This module allows to integrate data definitions within React elements.
 
