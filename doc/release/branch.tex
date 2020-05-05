@@ -32,7 +32,7 @@ opam pin add frama-ci-tools git@git.frama-c.com:frama-c/Frama-CI.git
 \item Run the command
 \begin{shell}
 frama-ci-create-branch --token=\$TOKEN \
---new-branch=stable/release --default-branch
+--name=stable/release --default-branch
 \end{shell}
 This command creates a branch \texttt{stable/release} for frama-c and for
 each plugin tested by the CI — and configures the CI to use these branches
