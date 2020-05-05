@@ -7,7 +7,7 @@ stages:
 
 variables:
     CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "stable/scandium"
+    DEFAULT: "master"
     FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
 
 check-no-old-frama-c:
