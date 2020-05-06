@@ -28,17 +28,9 @@ lint: dome-pkg dome-templ
 # --- Ivette Documentation
 # --------------------------------------------------------------------------
 
-# can also use dome-doc to generate Dome-only documentation
-
-D_ICONS=$(addprefix $(DOME)/doc/template/gallery-, head.html icons.html tail.html)
-D_OUT=doc/html
-
 doc:
 	@echo "[Ivette] documentation"
-	@rm -fr $(D_OUT)
-	@mkdir -p $(D_OUT)
 	@yarn run typedoc
-	@echo "[Ivette]   $(D_OUT)/index.html"
 
 # --------------------------------------------------------------------------
 # --- Ivette Plugins

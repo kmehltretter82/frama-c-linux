@@ -9,8 +9,6 @@ yarn.lock
 yarn-error.log
 /bin
 /dist
-/build
 /doc/html
-/doc/typedoc
 
 # --------------------------------------------------------------------------

@@ -83,7 +83,7 @@
     "includeVersion": true,
     "disableSources": true,
     "mode": "modules",
-    "out": "doc/typedoc",
+    "out": "doc/html",
     "excludePrivate": true,
     "stripInternal": true,
     "readme": "./README.md",
