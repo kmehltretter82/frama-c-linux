@@ -18,8 +18,6 @@ import './style.css' ;
 /**
    @class
    @summary Container for toolbar items.
-   @description
-   See also [[Frame]] containers.
  */
 export class ToolBar extends React.Component {
 

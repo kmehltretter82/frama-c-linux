@@ -25,8 +25,7 @@ const CSS_SELECTED = 'dome-xText-select' ;
 /**
    @class
    @summary Rich Text Editor.
-   @property {Buffer} buffer -
-      associated [[Buffer]] holding the text content
+   @property {Buffer} buffer - associated Buffer holding the text content
    @property {string} className - additional class name(s)
    @property {object} style - additional CSS style
    @property {number} fontSize - editor font-size
@@ -38,7 +37,7 @@ const CSS_SELECTED = 'dome-xText-select' ;
    @description
 
    A component rendering the content of a text buffer, that shall be instances
-   of the [[Buffer]] base class.
+   of the `Buffer` base class.
 
    The view is based on a [CodeMirror](https://codemirror.net) component linked with
    the internal Code Mirror Document from the associated buffer.

@@ -200,7 +200,7 @@ export const dispatchEvent = ( dragging , handlers ) => {
 
    The handler object shall define listeners to the D&D dragging events.
    Each callback is sensible to specific kind of events, as specified
-   in the [[dome/dnd | event listeners]] documentation.
+   in the [[dome/dnd]] documentation.
 
    You need a D&D controller whenever an element can be dragged
    between different containers. D&D controllers also offers an

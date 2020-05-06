@@ -133,8 +133,8 @@ emitted by the `Main` process when the application instance is launched.
 
 See also:
  - [[useCommand]]
- - [[System.getArguments]]
- - [[System.getWorkingDir]]
+ - `System.getArguments`
+ - `System.getWorkingDir`
 */
 export function onCommand(job) { emitter.on('dome.command',job); }
 
@@ -665,7 +665,7 @@ const NULL = {}; // Dummy initial value
    Returns the command-line arguments and working directory for the application
    instance running in the window. Automatically updated on `dome.command` events.
 
-   See also [Dome.onCommand](#.onCommand) event handler.
+   See also [[onCommand]] event handler.
 */
 export function useCommand() {
   useUpdate('dome.command');

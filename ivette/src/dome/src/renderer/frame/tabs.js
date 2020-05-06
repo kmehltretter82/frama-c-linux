@@ -51,7 +51,7 @@ const HIDDEN  = { display: 'none' };
    @property {boolean} [content] - render content instead of tab
    @description
    A single tab selector. Shall only be used as a children
-   of [[TabsBar]] or [[Frame]].
+   of [[TabsBar]].
 
    When `content` is positionned, the component renders
    its content children instead of the tab button. In such a case, content

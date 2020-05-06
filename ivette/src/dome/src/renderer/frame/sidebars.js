@@ -28,7 +28,6 @@ const SideBarContext = React.createContext();
    @property {function} [onSelection] - Selection callback
    @property {function} [onContextMenu] - Context Menu callback
    @description
-   See also [[Frame]] containers.
 
    When a base settings is set on the sidebar, all contained
    sections and items are attributed derived settings based on their identifiers.

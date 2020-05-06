@@ -80,14 +80,21 @@
   ],
   "typedocOptions": {
     "name": "Ivette Documentation",
-    "includeVersion": true,
-    "disableSources": true,
     "mode": "modules",
     "out": "doc/html",
+    "includeVersion": true,
+    "disableSources": true,
     "excludePrivate": true,
+    "excludeNotExported": true,
+    "excludeExternals": true,
+    "categorizeByGroup": false,
+    "categoryOrder": [ "Hooks", "Components", "*", "Other" ],
     "stripInternal": true,
+    "listInvalidSymbolLinks":true,
+    "hideGenerator":true,
     "readme": "./README.md",
     "inputFiles": [
+      "doc/pages",
       "src/frama-c",
       "src/dome/src/renderer"
     ]
