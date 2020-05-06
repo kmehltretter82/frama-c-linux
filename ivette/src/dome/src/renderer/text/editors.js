@@ -2,7 +2,10 @@
 // --- Text Documents
 // --------------------------------------------------------------------------
 
-/** @module dome/text/editors */
+/**
+   @packageDocumentation
+   @module dome/text/editors
+*/
 
 import _ from 'lodash' ;
 import React from 'react' ;
@@ -23,7 +26,7 @@ const CSS_SELECTED = 'dome-xText-select' ;
    @class
    @summary Rich Text Editor.
    @property {Buffer} buffer -
-      associated [Buffer](module-dome_text_buffers.Buffer.html) holding the text content
+      associated [[Buffer]] holding the text content
    @property {string} className - additional class name(s)
    @property {object} style - additional CSS style
    @property {number} fontSize - editor font-size
@@ -35,7 +38,7 @@ const CSS_SELECTED = 'dome-xText-select' ;
    @description
 
    A component rendering the content of a text buffer, that shall be instances
-   of the [Buffer](module-dome_text_buffers.Buffer.html) base class.
+   of the [[Buffer]] base class.
 
    The view is based on a [CodeMirror](https://codemirror.net) component linked with
    the internal Code Mirror Document from the associated buffer.

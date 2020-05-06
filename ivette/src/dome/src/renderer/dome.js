@@ -1,4 +1,5 @@
 /**
+   @packageDocumentation
    @module dome(renderer)
    @description
 
@@ -7,9 +8,13 @@
    This modules manages your main application window
    and its interaction with the main process.
 
-   @example // File 'src/renderer/index.js':
+   Example:
+
+   ```typescript
+   // File 'src/renderer/index.js':
    import Application from './Application.js' ;
    Dome.setContent( Application );
+   ```
  */
 
 import _ from 'lodash' ;
@@ -51,7 +56,7 @@ export const DEVEL = System.DEVEL ;
 
 /** @summary System platform.
     @description
-    Same as [`platform`](module-dome_system.html#.platform) from `dome/system` */
+    Same as `platform` from `dome/system` */
 export const platform = System.platform ;
 
 // --------------------------------------------------------------------------
@@ -127,9 +132,9 @@ Register a callback on [dome.command](#~event:'dome.reload') event,
 emitted by the `Main` process when the application instance is launched.
 
 See also:
- - [Dome.useCommand](#.useCommand)
- - [System.getArguments](module-dome_system.html#.getArguments)
- - [System.getWorkingDir](module-dome_system.html#.getWorkingDir)
+ - [[useCommand]]
+ - [[System.getArguments]]
+ - [[System.getWorkingDir]]
 */
 export function onCommand(job) { emitter.on('dome.command',job); }
 

@@ -1,9 +1,9 @@
 /**
+   @packageDocumentation
    @module dome/dnd
-   @summary Drag & Drop Features.
    @description
 
-## D&D Sequences
+## Drag & Drop
 
 A Drag & Drop sequence is monitored by a D&D controller.
 Drag Sources initiates the a D&D sequence, and the D&D controller will then
@@ -200,8 +200,7 @@ export const dispatchEvent = ( dragging , handlers ) => {
 
    The handler object shall define listeners to the D&D dragging events.
    Each callback is sensible to specific kind of events, as specified
-   in the [event listeners](module-dome_dnd.html)
-   documentation.
+   in the [[dome/dnd | event listeners]] documentation.
 
    You need a D&D controller whenever an element can be dragged
    between different containers. D&D controllers also offers an
@@ -620,17 +619,16 @@ Source element to attach its event handlers into it. You are then fully responsi
 the element both _during_ and _outside_ of a D&D sequence. No internal `<div>` element is inserted for you,
 and the `className`, `style` and `position` properties are ignored.
 
-Finally, you may also use an [Overlay](module-dome_dnd.Overlay.html) component to render
+Finally, you may also use an [[Overlay]] component to render
 your content, by setting `overlay=true` or passing `overlay` the desired properties.
 
-When dragged, the [DnD](module-dome_dnd.DnD.html) controller is informed and dispatches
+When dragged, the [[DnD]] controller is informed and dispatches
 the dragging events to the registered drop targets. The `handle` selector can be used
 to identify which parts of the content may initiate the drag. By default, any drag event
 may initiate the drag.
 
 The `onDnd` event listener receives all D&D events associated to this drop target.
-See [event callbacks](module-dome_dnd.html)
-documentation for more details on other specific event listeners.
+See event callbacks documentation for more details on other specific event listeners.
 
 The `draggable` object, when provided, is used to inject additional properties
 into the internal `Draggable` or `DraggableCore` wrapper used to manage D&D events.
@@ -762,7 +760,7 @@ export class DragSource extends React.Component
    @description
 
 Crates a drop target container and register its callbacks into the specified
-[DnD](module-dome_dnd.DnD.html) controller. In case the DnD controller is undefined,
+[[DnD]] controller. In case the DnD controller is undefined,
 the drag events are just disabled.
 
 The drop target container must inform the D&D controller of its DOM element that is responsible
@@ -778,8 +776,8 @@ will not respond to dragging events.
 In case of custom rendering, the `className` and `style` properties are ignored.
 
 During a D&D sequence, the `onDnd` event listener receives all D&D events associated
-to this drop target. See [event callbacks](module-dome_dnd.html)
-documentation for more details on other specific event listeners.
+to this drop target. See event callbacks documentation for more details on
+other specific event listeners.
 
 */
 export class DropTarget extends React.Component

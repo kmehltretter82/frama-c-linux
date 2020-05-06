@@ -2,7 +2,10 @@
 // --- Grid Layout
 // --------------------------------------------------------------------------
 
-/** @module dome/layout/grids */
+/**
+   @packageDocumentation
+   @module dome/layout/grids
+*/
 
 import _ from 'lodash' ;
 import React from 'react' ;
@@ -790,26 +793,22 @@ It can be used only as direct children of `GridLayout`
 and other `GridBox` containers.
 
 See also:
-  - [GridLayout](module-dome_layout_grids.GridLayout.html) top-level container
-  - [GridItem](module-dome_layout_grids.GridItem.html) elementary component
-  - [GridHbox](module-dome_layout_grids.GridHbox.html) horizontal box
-  - [GridVbox](module-dome_layout_grids.GridVbox.html) vertical box
+  - [[GridLayout]] top-level container
+  - [[GridItem]] elementary component
+  - [[GridHbox]] horizontal box
+  - [[GridVbox]] vertical box
 */
 export const GridBox = (props) => null ;
 
 /**
-   @summary Layout its content in an horizontal box.
+   [[GridBox]] with horizontal layout
    @property {ident} [id] - the box identifier
-   @description
-   See [GridBox](module-dome_layout_grids.GridBox.html)
 */
 export const GridHbox = (props) => null ;
 
 /**
-   @summary Layout its content in a vertical box.
+   [[GridBox]] with vertical layout
    @property {ident} [id] - the box identifier
-   @description
-   See [GridBox](module-dome_layout_grids.GridBox.html)
 */
 export const GridVbox = (props) => null ;
 
@@ -956,7 +955,7 @@ Low-level GridLayout container, with only resizing capabilities.
 Additional rendering options are available:
 
 - `dragged` : item being dragged, materialized with a dragging background;
-- `dragging` : current [D&D](dome-module_dnd.html) event to notify `onTarget()` with;
+- `dragging` : current D&D event to notify `onTarget()` with;
 - `target` : `{at,dir,left,top,width,height}` insertion position to materialize;
 - `shape:Shape` : desired reshaping of the children grid;
 - `onReshape(Shape)` : notified when grid content has been resized;
@@ -1112,14 +1111,14 @@ const DRAGGABLEITEM =
    @property {function}  [onReshape] - Callback on reshaping self content
    @property {function}  [onInsert] - Callback on dropping the holding element
    @property {function}  [onDnd] - Callback on D&D events
-   @property {function}  [onXxx] - Other D&D [callback events](module-dome_dnd.html)
+   @property {function}  [onXxx] - Other D&D callback events
    @description
 
 Layout several components with nested vertical and horizontal boxes.
 
 Direct children of the container must be either:
-- [GridBox](module-dome_layout_grids.GridBox.html) and its derivated
-- [GridItem](module-dome_layout_grids.GridItem.html) for elementary component
+- [[GridBox]] and its derivated
+- [[GridItem]] for elementary component
 
 Top-level children are laidout vertically (default) or horizontally according
 to the `dir` property. Nested boxes of same directions are flattened,
@@ -1136,7 +1135,7 @@ simply ignored from the shape taken into account.
 
 GridLayout containers can be used as drop targets, both for re-arranging
 internal grid items, or to insert external drag sources inside.
-If you supply an external [DnD](module-dome_dnd.DnD.html) controller,
+If you supply an external [[DnD]] controller,
 the GridLayout will register itself as a drop target. Otherwize, it will
 use its own controller.
 

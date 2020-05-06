@@ -1,4 +1,5 @@
 /**
+   @packageDocumentation
    @module dome(main)
    @description
 

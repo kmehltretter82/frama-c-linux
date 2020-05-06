@@ -2,7 +2,10 @@
 // --- ToolBars
 // --------------------------------------------------------------------------
 
-/** @module dome/frame/toolbars */
+/**
+   @packageDocumentation
+   @module dome/frame/toolbars
+*/
 
 import React from 'react' ;
 
@@ -16,7 +19,7 @@ import './style.css' ;
    @class
    @summary Container for toolbar items.
    @description
-   See also [Frame](module-dome_layout_frames.Frame.html) containers.
+   See also [[Frame]] containers.
  */
 export class ToolBar extends React.Component {
 

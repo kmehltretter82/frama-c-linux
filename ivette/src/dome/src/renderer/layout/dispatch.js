@@ -2,17 +2,19 @@
 // --- Dispatch Layout
 // --------------------------------------------------------------------------
 
-/** @module dome/layout/dispatch
-    @description
+/**
+   @packageDocumentation
+   @module dome/layout/dispatch
+   @description
 
-This module allow to declare components anywhere in a component hierarchy
-and to render them a totally different place.
+   This module allows to declare components anywhere in a component hierarchy
+   and to render them a totally different place.
 
-You shall wrap dispatched components inside a `<Dispatch.Item>` container,
-and render them wherever you want with `<Dispatch.Render>`. Each target
-place can display only one uniquely identified item.
+   You shall wrap dispatched components inside a `<Dispatch.Item>` container,
+   and render them wherever you want with `<Dispatch.Render>`. Each target
+   place can display only one uniquely identified item.
 
-This can be also used to display some item among many in one unique place.
+   This can be also used to display some item among many in one unique place.
 */
 
 import _ from 'lodash' ;

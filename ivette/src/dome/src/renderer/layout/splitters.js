@@ -2,7 +2,10 @@
 // --- Splitters
 // --------------------------------------------------------------------------
 
-/** @module dome/layout/splitters */
+/**
+    @packageDocumentation
+    @module dome/layout/splitters
+*/
 
 import _ from 'lodash' ;
 import * as React from 'react' ;

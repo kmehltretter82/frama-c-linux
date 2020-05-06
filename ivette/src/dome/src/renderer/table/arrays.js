@@ -2,7 +2,10 @@
 // --- Table Models
 // --------------------------------------------------------------------------
 
-/** @module dome/table/arrays */
+/**
+   @packageDocumentation
+   @module dome/table/arrays
+*/
 
 import _ from 'lodash' ;
 import React from 'react' ;
@@ -173,11 +176,11 @@ A comparison ring can be used to implement column ordering, where each
 column selection _refines_ the previous ordering.
 
 Hence, the ring holds the current comparison order and it is well suited
-for being used in conjunction with [Table](module-dome_table_views.Table.html)
+for being used in conjunction with [[Table]]
 components.
 
 A comparison specification can be a property name or a function.
-See [compareWith](module-dome_table_arrays.html#compareWith) for more details.
+See [[compareWith]] for more details.
 By default, the ring uses the column identifier as a property name for comparing.
 
 Initially, the ordering is _natural_.
@@ -201,7 +204,7 @@ export class ComparisonRing {
      @description
      Returns the comparison function corresponding to the current order.
      The comparison function is _chainable_, see
-     [compareWith](module-dome_table_arrays.html#compareWith) for more details.
+     [[compareWith]] for more details.
   */
   compareWith()
   {
@@ -303,7 +306,7 @@ export class ComparisonRing {
    @summary A table Model for unsorted datasets.
    @description
 
-   This class implements a simple [Model](module-dome_table_models.Model.html)
+   This class implements a simple [[Model]]
    where item's are identified by their index. Such a model is not adapted to
    re-ordering and filtering, because table views will have no way to synchronize
    the selected index before and after re-ordering, hence the name.
@@ -359,11 +362,10 @@ export class UnsortedModel extends Model {
    @extends Model
    @description
 
-   This class implements a simple [Model](module-dome_table_models.Model.html)
+   This class implements a simple [[Model]]
    implementation where item's are stored in an array. The model supports built-in
    ordering thanks with a
-   [ComparisonRing](module-dome_table_arrays.ComparisonRing.html)
-   with additional filtering capabilities.
+   [[ComparisonRing]] with additional filtering capabilities.
 
    The model keep items in sync with their ordered & filtered index by
    injecting an `index` property in them each time the collection is re-ordered.

@@ -2,7 +2,10 @@
 // --- Text Documents
 // --------------------------------------------------------------------------
 
-/** @module dome/text/buffers */
+/**
+   @packageDocumentation
+   @module dome/text/buffers
+*/
 
 import Emitter from 'events' ;
 import CodeMirror from 'codemirror/lib/codemirror.js' ;

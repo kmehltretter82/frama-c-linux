@@ -3,8 +3,10 @@
 // --------------------------------------------------------------------------
 
 /**
+   @packageDocumentation
    @module dome/text/pages
    @description
+
    A collection of text area and elements do render textual content.
 
    Inside such areas, all elements are styled like a classical web page.
@@ -15,12 +17,11 @@
    most other widget components.
 
    The behaviour of `<a href=...>` elements differs for local links and external URLs.
-   Local links trigger a ['dome.href'](dome_.html#~event:'dome.href') event, that
+   Local links trigger a `'dome.href'` event, that
    you can listen to from the originating renderer process, _eg. by using `Dome.useUpdate()`
    custom hook.
 
    External links launch the user's default browser.
-
 */
 
 import React from 'react' ;

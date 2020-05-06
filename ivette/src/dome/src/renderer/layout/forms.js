@@ -2,7 +2,10 @@
 // --- Form Layout
 // --------------------------------------------------------------------------
 
-/** @module dome/layout/forms */
+/**
+   @packageDocumentation
+   @module dome/layout/forms
+*/
 
 import _ from 'lodash' ;
 import React from 'react' ;
@@ -307,14 +310,14 @@ export function Select({
    @property {object} [error] - Set the form context error
    @property {boolean} [disabled] - Disables the form (default is `false`)
    @property {onChange} [function] - Callback to updated `(value,error)`
-   @property {any} [...props] - [Select](module-dome_layout_forms.Select.html) properties
+   @property {any} [...props] - [[Select]] properties
    @property {React.children|function} [children] - Fields to populate the form
    @description
 
    Setup a form context with the provided values.
    A local state is maintained unless you fully control the `value` and `error`
    properties. You may also specify any other properties of the
-   [Select](module-dome_layout_forms.Select.html) filter component.
+   [[Select]] filter component.
 
 */
 
@@ -387,7 +390,7 @@ const TITLE_DISABLED = 'dome-text-title dome-disabled' ;
    @property {string} [path] - Fields selection
    @property {string} [settings] - User's settings for making fold/unfold state persistent
    @property {boolean} [unfold] - Default fold/unfold state (default is `false`)
-   @property {any} [...props] - [Select](module-dome_layout_forms.Select.html) properties
+   @property {any} [...props] - [[Select]] properties
    @property {React.children|function} [children] - Section field content
    @description
    Wraps some fields inside a foldable section.
@@ -431,7 +434,7 @@ export function Section(props)
 
 /**
    @summary Full width form block.
-   @property {any} [...props] - [Select](module-dome_layout_forms.Select.html) properties
+   @property {any} [...props] - [[Select]] properties
    @property {React.children|function} [children] - Block content
    @description
    Wraps its children inside the entire width of the form.
@@ -464,7 +467,7 @@ const FIELD_DISABLED = 'dome-xForm-field dome-text-label dome-disabled';
    @property {string} [title] - Field tooltip text
    @property {number} [offset] - Vertical label offset (for baseline alignment)
    @property {boolean|string} [warn] - Display errors (default: `true`)
-   @property {any} [...props] - [Select](module-dome_layout_forms.Select.html) properties
+   @property {any} [...props] - [[Select]] properties
    @property {React.children|function} [children] - Custom field content
    @description
 
@@ -472,10 +475,10 @@ Field layout inside a Form container.
 The custom field component is positionned on the left of the label, right-aligned.
 The label itself is left-aligned with the other fields.
 
-The Field component setup a [Select](module-dome_layout_forms.Select.html)
-filter for your custom component. Additionnaly, if you use a custom function rendering,
-the context is enriched with the `id` of the `<label/>` DOM element of the label, that
-you can use with `<input htmlFor={id}/>` as custom field component.
+The Field component setup a [[Select]] filter for your custom
+component. Additionnaly, if you use a custom function rendering, the context is
+enriched with the `id` of the `<label/>` DOM element of the label, that you can
+use with `<input htmlFor={id}/>` as custom field component.
 
 A warning badge is displayed on the right of your custom component, unless `warn:false`
 is specified. When hovered, the badge displays `Error` or the specified `string`. When
@@ -524,7 +527,7 @@ export class Field extends React.Component
    @property {string} [label] - Field label
    @property {string} [title] - Field tooltip text
    @property {boolean} [warn] - Display errors (default: `false`)
-   @property {any} [...props] - [Select](module-dome_layout_forms.Select.html) properties
+   @property {any} [...props] - [[Select]] properties
    @property {React.children|function} [children] - List field content
    @description
 
@@ -554,7 +557,7 @@ export const FieldList = ({ label, title, warn=false, children, ...props }) => (
    @property {string} [placeholder] - Input field place holder
    @property {string} [className] - Input field additional class
    @property {object} [style] - Input field additional style
-   @property {any} [...props] - [Select](module-dome_layout_forms.Select.html) properties
+   @property {any} [...props] - [[Select]] properties
    @description
    Field with a Text Input element. The default latency is set to 600ms.
 */
@@ -585,7 +588,7 @@ export const FieldText = ({ className, style, latency=true, placeholder, ...prop
    @property {string} [placeholder] - Input field place holder
    @property {string} [className] - Input field additional class
    @property {object} [style] - Input field additional style
-   @property {any} [...props] - [Select](module-dome_layout_forms.Select.html) properties
+   @property {any} [...props] - [[Select]] properties
    @description
    Field with a Text Input element. The default latency is set to 600ms.
 */
@@ -618,7 +621,7 @@ export const FieldCode = ({ className, style, latency=true, placeholder, ...prop
    @property {number} [cols] - Number of columns (default 35, min 5)
    @property {number} [rows] - Number of lines (default 5, min 2)
    @property {object} [style] - Input field additional style
-   @property {any} [...props] - [Select](module-dome_layout_forms.Select.html) properties
+   @property {any} [...props] - [[Select]] properties
    @description
    Field with a Text Input element. The default latency is set to 900ms.
 */
@@ -654,7 +657,7 @@ export const FieldTextArea = ({ className, style, cols=35, rows=5,
    @property {number} [cols] - Number of columns (default 35, min 5)
    @property {number} [rows] - Number of lines (default 5, min 2)
    @property {object} [style] - Input field additional style
-   @property {any} [...props] - [Select](module-dome_layout_forms.Select.html) properties
+   @property {any} [...props] - [[Select]] properties
    @description
    Field with a Text Input element. The default latency is set to 900ms.
 */
@@ -706,7 +709,7 @@ const NUMBER_OF_TEXT = (s) => s==='' ? undefined : PARSE_NUMBER(s.replace(/[ ,]/
    @property {string} [units] - Number units or currency
    @property {string} [className] - Input field additional class
    @property {object} [style] - Input field additional style
-   @property {any} [...props] - [Select](module-dome_layout_forms.Select.html) properties
+   @property {any} [...props] - [[Select]] properties
    @description
    Field to edit number values with a Text Input element.
    The default latency is set to 600ms. Numbers are rendered in the english locale, grouping thousands
@@ -772,7 +775,7 @@ const INT_RANGE = (min,max,warning) => (v) =>
    @property {string} [warning] - Out of bound message (default is explaining the range)
    @property {string} [className] - Input field additional class
    @property {object} [style] - Input field additional style
-   @property {any} [...props] - [Select](module-dome_layout_forms.Select.html) properties
+   @property {any} [...props] - [[Select]] properties
    @description
    Field to edit integer numbers with a spinner element.
    The default latency is set to 600ms.
@@ -868,7 +871,7 @@ class REVEAL extends React.Component {
    @property {boolean|function} [show] - Display the selected value on the right (default is `true`)
    @property {string} [className] - Input field additional class
    @property {object} [style] - Input field additional style
-   @property {any} [...props] - [Select](module-dome_layout_forms.Select.html) properties
+   @property {any} [...props] - [[Select]] properties
    @description
    Field to edit integer numbers with a spinner element.
    The default latency is set to 600ms. Double click on the slider reset it
@@ -914,7 +917,7 @@ export const FieldSlider =
    @property {string} [max] - Maximum date (default to `undefined`)
    @property {string} [className] - Input field additional class
    @property {object} [style] - Input field additional style
-   @property {any} [...props] - [Select](module-dome_layout_forms.Select.html) properties
+   @property {any} [...props] - [[Select]] properties
    @description
    Field with a Date Input element. The default latency is set to 600ms.
    The date is presented in english locale, with format `mm/dd/yyyy`, but the internal value
@@ -947,7 +950,7 @@ export const FieldDate = ({ className, style, latency=true, min, max, ...props }
    @property {string} [max] - Maximum time (default to `undefined`)
    @property {string} [className] - Input field additional class
    @property {object} [style] - Input field additional style
-   @property {any} [...props] - [Select](module-dome_layout_forms.Select.html) properties
+   @property {any} [...props] - [[Select]] properties
    @description
    Field with a Time Input element. The default latency is set to 600ms.
    The time is presented in english locale, but its internal value is a string 'hh:mm'
@@ -979,7 +982,7 @@ export const FieldTime = ({ className, style, latency=true, min, max, ...props }
    @property {string} [title] - Field tooltip text
    @property {string} [className] - Input field additional class
    @property {object} [style] - Input field additional style
-   @property {any} [...props] - [Select](module-dome_layout_forms.Select.html) properties
+   @property {any} [...props] - [[Select]] properties
    @description
    Field with a Text Input element. The default latency is set to 600ms.
 */
@@ -1009,7 +1012,7 @@ export const FieldColor = ({ className, style, latency=true, ...props }) => (
    @property {string} [placeholder] - Selector placeholder
    @property {string} [className] - Input field additional class
    @property {object} [style] - Input field additional style
-   @property {any} [...props] - [Select](module-dome_layout_forms.Select.html) properties
+   @property {any} [...props] - [[Select]] properties
    @property {option|optgroup} [children] - HTML options of the `<select>` element
    @description
    Field with a Select element. Children must be standard `<option>` and `<optgroup>` elements.
@@ -1048,7 +1051,7 @@ export const FieldSelect = ({ className, style, children, placeholder, ...props 
    @property {string} [label] - Field label
    @property {string} [title] - Field tooltip text
    @property {boolean} [inverted] - Inverted value (incompatible with `input` and `output` properties)
-   @property {any} [...props] - [Select](module-dome_layout_forms.Select.html) properties
+   @property {any} [...props] - [[Select]] properties
    @description
    A check box field.
 */
@@ -1076,7 +1079,7 @@ export const FieldCheckbox = ({ label, title, inverted, ...props }) => {
    @property {string} [label] - Field label
    @property {string} [title] - Field tooltip text
    @property {any} [value] - Value associated with the radio button
-   @property {any} [...props] - [Select](module-dome_layout_forms.Select.html) properties
+   @property {any} [...props] - [[Select]] properties
    @description
    A radio button field.
 

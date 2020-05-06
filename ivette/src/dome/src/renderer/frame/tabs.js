@@ -2,7 +2,10 @@
 // --- Tabs
 // --------------------------------------------------------------------------
 
-/** @module dome/frame/tabs */
+/**
+   @packageDocumentation
+   @module dome/frame/tabs
+*/
 
 import React from 'react' ;
 import { Icon } from 'dome/controls/icons' ;
@@ -13,7 +16,7 @@ import './style.css' ;
    @class
    @summary Pure Container for tab buttons.
    @description
-   Shall contains [Tab](module-dome_layout_tabs.Tab.html) instances.
+   Shall contains only [[Tab]] instances.
 */
 // --------------------------------------------------------------------------
 // --- Tabs Bar
@@ -48,8 +51,7 @@ const HIDDEN  = { display: 'none' };
    @property {boolean} [content] - render content instead of tab
    @description
    A single tab selector. Shall only be used as a children
-   of [TabsBar](module-dome_layout_tabs.TabsBar.html)
-   or [Frame](module-dome_layout_frames.Frame.html).
+   of [[TabsBar]] or [[Frame]].
 
    When `content` is positionned, the component renders
    its content children instead of the tab button. In such a case, content
@@ -98,7 +100,7 @@ export function Tab(props) {
    @property {string} selection - tab identifier to render
    @property {Tab[]} children - tabs (content) to render
    @description
-   Shall contains [Tab](module-dome_layout_tabs.Tab.html) instances.
+   Shall contains [[Tab]] instances.
    Only the selected tab identifier will be displayed, although all tab
    contents remains properly mounted. If no tab is selected,
    no content is displayed.

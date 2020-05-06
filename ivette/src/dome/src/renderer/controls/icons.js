@@ -3,8 +3,10 @@
 // --------------------------------------------------------------------------
 
 /**
+   @packageDocumentation
    @module dome/controls/icons
    @description
+
    Consult the [Icon Gallery](gallery-icons.html) for default icons.
    You can [register](#.register) new icons or override existing ones
    and [iterate](#.forEach) over the icon base.

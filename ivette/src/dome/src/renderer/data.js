@@ -2,123 +2,124 @@
 // --- Data Collector
 // --------------------------------------------------------------------------
 
-/** @module dome/data
-    @description
+/**
+   @packageDocumentation
+   @module dome/data
+   @description
+   This module allows to integrate data definitions within React elements.
 
-This module allows to integrate data definitions within React elements.
-Typically, you can use it to define your own structure of logical elements
-and display them at different places in the GUI. For instance, you may
-want to define a custom list of elements, where each element
-will be rendered twice: locally with the currenly selected item, and in a side-bar
-or in the menu-bar, or for any other purpose than rendering. You want to declare
-your list like this:
+   Typically, you can use it to define your own structure of logical elements
+   and display them at different places in the GUI. For instance, you may
+   want to define a custom list of elements, where each element
+   will be rendered twice: locally with the currenly selected item, and in a side-bar
+   or in the menu-bar, or for any other purpose than rendering. You want to declare
+   your list like this:
 
-```{jsx}
-    <MyList>
-       <MyItem id={A} ... >...</MyItem>
-       <MyItem id={B} ... >...</MyItem>
-       <MyItem id={C} ... >...</MyItem>
-    </MyList>
-```
+   * ```jsx
+   * <MyList>
+   *   <MyItem id={A} ... >...</MyItem>
+   *   <MyItem id={B} ... >...</MyItem>
+   *   <MyItem id={C} ... >...</MyItem>
+   * </MyList>
+   * ```
 
-Dome data libraries, as provided by this module, allows you to define such
-collection of data mixed with rendered elements.
+   Dome data libraries, as provided by this module, allows you to define such
+   collection of data mixed with rendered elements.
 
-Data are collected through libraries.
-You create libraries with `createLibrary()` or `useLocalLibrary()` and
-then provide them to `<Data.Item>`, `<Data.Component>`, `<Data.Node>` or
-`<Data.Fragment>` elements.
+   Data are collected through libraries.
+   You create libraries with `createLibrary()` or `useLocalLibrary()` and
+   then provide them to `<Data.Item>`, `<Data.Component>`, `<Data.Node>` or
+   `<Data.Fragment>` elements.
 
-At any (other) point of the tree, you can use the collected items
-with the `useLibrary()` custom React hook.
+   At any (other) point of the tree, you can use the collected items
+   with the `useLibrary()` custom React hook.
 
-Libraries are pushed down the React virtual tree _via_ React context,
-so you don't need to re-specify it for children of `<Data.Node/>`
-and `<Data.Fragment/>`.
+   Libraries are pushed down the React virtual tree _via_ React context,
+   so you don't need to re-specify it for children of `<Data.Node/>`
+   and `<Data.Fragment/>`.
 
-Items must be identified with a unique `id` ; they are sorted according
-to their `order` property, although `<Data.Fragment/>` and `<Data.Node/>`
-preserve the order of data collected from each of their children. Items are
-collected when they are actually _mounted_ by React,
-like any other React element.
+   Items must be identified with a unique `id` ; they are sorted according
+   to their `order` property, although `<Data.Fragment/>` and `<Data.Node/>`
+   preserve the order of data collected from each of their children. Items are
+   collected when they are actually _mounted_ by React,
+   like any other React element.
 
-Data elements are normal React element, that might be rendered by
-visible elements in the DOM. You may think of data elements as having a
-double rendering: mounted data items are collected into libraries, and normal visible
-elements are collected into the React virtual DOM. Each kind of data element is
-rendered differenly with this respect:
+   Data elements are normal React element, that might be rendered by
+   visible elements in the DOM. You may think of data elements as having a
+   double rendering: mounted data items are collected into libraries, and normal visible
+   elements are collected into the React virtual DOM. Each kind of data element is
+   rendered differenly with this respect:
 
-- `<Data.Item>` renders its children within a React fragment;
-- `<Data.Node>` is like an item, with its data children stored in the registered item;
-- `<Data.Component>` always renders 'null' and capture its React children elements in the registered item;
-- `<Data.Fragment>` renders its children within a React fragment, with optional context library and specified order.
+   - `<Data.Item>` renders its children within a React fragment;
+   - `<Data.Node>` is like an item, with its data children stored in the registered item;
+   - `<Data.Component>` always renders 'null' and capture its React children elements
+     in the registered item;
+   - `<Data.Fragment>` renders its children within a React fragment, with optional context
+     library and specified order.
 
-See each component for more details.
+   See each component for more details.
 
-As an example of use, the introductory example can be implemented as follows:
+   As an example of use, the introductory example can be implemented as follows:
 
+   ```jsx
+     const lib = createLibrary();
 
-```{jsx}
-    const lib = createLibrary();
-
-    // To be used at any (possibly repeated) place in the hierarchy of react elements
-    // Children items are only added to the library when the list is mounted
-    const MyList = ({ children }) => {
+     // To be used at any (possibly repeated) place in the hierarchy of react elements
+     // Children items are only added to the library when the list is mounted
+     const MyList = ({ children }) => {
        // Actually renders nothing if children only contains items.
        // The fragment makes items keep their declaration ordering.
        return (
           <Data.Fragment lib={lib}>{children}</Data.Fragment>
        );
-    };
+     };
 
-    // To be used also at any (possibly repeated) place in the hierarchy
-    const MyItem = (props) => <Data.Item lib={lib} {...props} /> ;
+     // To be used also at any (possibly repeated) place in the hierarchy
+     const MyItem = (props) => <Data.Item lib={lib} {...props} /> ;
 
-    // To be used for instance at top-level inside a side-bar
-    const MyListIndex = () => {
+     // To be used for instance at top-level inside a side-bar
+     const MyListIndex = () => {
        let items = Data.useLibrary(lib);
        return (
          <ul>
            { items.map(({id,label}) => (<li key={id}>{label}</li>)) }
          </ul>
        );
-    };
-```
-
+     };
+   ```
 */
 
-import _ from 'lodash' ;
+import _ from 'lodash';
 import React from 'react';
-import * as Dome from 'dome' ;
-import EventEmitter from 'events' ;
+import * as Dome from 'dome';
+import EventEmitter from 'events';
 
 // --------------------------------------------------------------------------
 // --- Libraries
 // --------------------------------------------------------------------------
 
 const reOrder = (items) =>
-      _.sortBy( items , [ 'order','id' ] )
-      .map( (item,order) => Object.assign( item, { order } ));
+  _.sortBy(items, ['order', 'id'])
+    .map((item, order) => Object.assign(item, { order }));
 
 /**
     @summary Data Collector.
     @description
     Libraries are used to collect data through the React virtual DOM.
 */
-class Library extends EventEmitter
-{
+class Library extends EventEmitter {
 
   constructor() {
     super();
     this.items = {};
     this.lastItems = {};
-    this._trigger = _.debounce(this._trigger,10);
+    this._trigger = _.debounce(this._trigger, 10);
   }
 
   _trigger() {
-    if (!_.isEqual( this.items , this.lastItems )) {
-      this.lastItems = this.items ;
-      this.sorted = undefined ;
+    if (!_.isEqual(this.items, this.lastItems)) {
+      this.lastItems = this.items;
+      this.sorted = undefined;
       this.emit('trigger');
     }
   };
@@ -128,10 +129,10 @@ class Library extends EventEmitter
      @param {object} item - must have an `'id'` property
    */
   add(item) {
-    const id = item.id ;
+    const id = item.id;
     if (Dome.DEVEL && this.items[id])
       console.warn(`[dome/data] duplicate item identifier (${id})`);
-    this.items[id] = item ;
+    this.items[id] = item;
     this._trigger();
   }
 
@@ -149,20 +150,20 @@ class Library extends EventEmitter
      @return {Array<object>} items array sorted by `'order'` and `'id'` properties.
    */
   contents() {
-    return this.sorted || (this.sorted = reOrder( this.items ));
+    return this.sorted || (this.sorted = reOrder(this.items));
   }
 
   /**
      @summary Register callback.
      @param {function} callback - invoked when library contents changes
   **/
-  on(callback) { this.on('trigger',callback); }
+  on(callback) { this.on('trigger', callback); }
 
   /**
      @summary Un-register callback.
      @param {function} callback - callback to unregister
   **/
-  off(callback) { this.off('trigger',callback); }
+  off(callback) { this.off('trigger', callback); }
 
 }
 
@@ -184,7 +185,7 @@ export function createLibrary() { return new Library(); }
  */
 export function useLibrary(library) {
   const forceUpdate = Dome.useForceUpdate();
-  Dome.useEmitter( library , 'trigger' , forceUpdate );
+  Dome.useEmitter(library, 'trigger', forceUpdate);
   return library.contents();
 }
 
@@ -200,40 +201,39 @@ export function useLibrary(library) {
    ```
  */
 export function useLocalLibrary() {
-  const library = React.useMemo( createLibrary , [] );
-  const items = useLibrary( library );
-  return { library , items };
+  const library = React.useMemo(createLibrary, []);
+  const items = useLibrary(library);
+  return { library, items };
 }
 
 const CurrentLib = React.createContext();
 const CurrentPath = React.createContext([]);
 
-const makePath = (path,order) =>
-      order === undefined ? path : path.slice(0,-1).concat(order);
+const makePath = (path, order) =>
+  order === undefined ? path : path.slice(0, -1).concat(order);
 
 /**
    @summary Current library (Custom React Hook).
    @return {Library} in local context
  */
 export function useCurrentLibrary() {
-  return React.useContext( CurrentLib );
+  return React.useContext(CurrentLib);
 }
 
 // --------------------------------------------------------------------------
 // --- Internals
 // --------------------------------------------------------------------------
 
-function useLocalItem( { lib:localLib, id, order, ...itemProps }, children )
-{
+function useLocalItem({ lib: localLib, id, order, ...itemProps }, children) {
   const currentLib = React.useContext(CurrentLib);
   const currentPath = React.useContext(CurrentPath);
-  const path = makePath( currentPath, order );
-  React.useEffect( () => {
-    const library = localLib || currentLib ;
+  const path = makePath(currentPath, order);
+  React.useEffect(() => {
+    const library = localLib || currentLib;
     if (id && library) {
-      const item = { id, order:path, ...itemProps };
-      if (children) item.children = children ;
-      library.add(item) ;
+      const item = { id, order: path, ...itemProps };
+      if (children) item.children = children;
+      library.add(item);
       return () => library.remove(id);
     } else
       return undefined;
@@ -241,23 +241,22 @@ function useLocalItem( { lib:localLib, id, order, ...itemProps }, children )
   return path;
 };
 
-function makeChildren( path, children)
-{
-  const n = React.Children.count( children );
+function makeChildren(path, children) {
+  const n = React.Children.count(children);
   if (n == 0) return null;
   else {
-    const childContext = (elt,k) => {
+    const childContext = (elt, k) => {
       if (elt) {
-        const newPath = path.concat(1+k);
+        const newPath = path.concat(1 + k);
         return (
           <CurrentPath.Provider value={newPath}>
             {elt}
           </CurrentPath.Provider>
         );
       } else
-        return elt ;
+        return elt;
     };
-    return React.Children.map( children, childContext );
+    return React.Children.map(children, childContext);
   }
 }
 
@@ -285,9 +284,9 @@ function makeChildren( path, children)
    An `<Item/>` element rendres its children in a nested, ordered fragment,
    but with the same current library than the inherited one, if any.
 */
-export const Item = ( { children, ...props} ) => {
-  let path = useLocalItem( props );
-  return (<React.Fragment>{makeChildren(path,children)}</React.Fragment>);
+export const Item = ({ children, ...props }) => {
+  let path = useLocalItem(props);
+  return (<React.Fragment>{makeChildren(path, children)}</React.Fragment>);
 };
 
 // --------------------------------------------------------------------------
@@ -321,8 +320,8 @@ export const Item = ( { children, ...props} ) => {
 
    The component element itself is rendered as `null` when mounted in the virtual DOM by React.
 */
-export const Component = ( { children, ...props} ) => {
-  useLocalItem( props, children );
+export const Component = ({ children, ...props }) => {
+  useLocalItem(props, children);
   return null;
 };
 
@@ -358,10 +357,10 @@ export const Component = ( { children, ...props} ) => {
 */
 export const Node = ({ children, ...props }) => {
   let { library, items } = useLocalLibrary();
-  let path = useLocalItem( props , items );
+  let path = useLocalItem(props, items);
   return (
     <CurrentLib.Provider value={library}>
-      {makeChildren( path, children )}
+      {makeChildren(path, children)}
     </CurrentLib.Provider>
   );
 };
@@ -378,16 +377,15 @@ export const Node = ({ children, ...props }) => {
    @property {boolean} [disabled] - fragment shal not be rendered (default: `false`)
    @property {React.Children} [children] - sub-data and rendering of the data collection
  */
-export const Fragment = ({lib:localLib, order, enabled=true, disabled=false, children, ...localProps}) => {
+export const Fragment = ({ lib: localLib, order, enabled = true, disabled = false, children, ...localProps }) => {
   const currentLib = React.useContext(CurrentLib);
   const currentPath = React.useContext(CurrentPath);
-  const library = localLib || currentLib ;
-  if ( enabled && !disabled && React.Children.count(children) > 0 )
-  {
-    const path = makePath( currentPath, order );
+  const library = localLib || currentLib;
+  if (enabled && !disabled && React.Children.count(children) > 0) {
+    const path = makePath(currentPath, order);
     return (
       <CurrentLib.Provider value={library}>
-        {makeChildren( path, children )}
+        {makeChildren(path, children)}
       </CurrentLib.Provider>
     );
   } else

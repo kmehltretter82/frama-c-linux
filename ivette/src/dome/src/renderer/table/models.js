@@ -2,7 +2,10 @@
 // --- Models
 // --------------------------------------------------------------------------
 
-/** @module dome/table/models */
+/**
+   @packageDocumentation
+   @module dome/table/models
+*/
 
 import _ from 'lodash' ;
 import { SortDirection } from 'react-virtualized' ;
@@ -91,7 +94,7 @@ export const DESC = SortDirection.DESC ;
 
    ##### Model Helpers
 
-   The module [dome/table/arrays](module-dome_table_arrays.html) provides you with
+   The module [[dome/table/arrays]] provides you with
    usefull helpers to implement Models with filtering and ordering features.
 
 */
