@@ -4,59 +4,50 @@
 
 /**
    Data comparisons.
+   @packageDocumentation
+   @module dome/data/compare
 */
 
-/** Interface for comparison functions.
-    These function shall fullfill the following contract:
-     - `compare(x,y) == 0` shall be an equivalence relation (reflexive, symmetric, transitive)
-     - `compare(x,y) <= 0` shall be a complete order (reflexive, antisymetric, transitive)
-     - `compare(x,y) < 0` shall be a complete strict order (anti-reflexive, asymetric, transitive)
+/**
+   Interface for comparison functions.
+   These function shall fullfill the following contract:
+   - `compare(x,y) == 0` shall be an equivalence relation (reflexive, symmetric, transitive)
+   - `compare(x,y) <= 0` shall be a complete order (reflexive, antisymetric, transitive)
+   - `compare(x,y) < 0` shall be a complete strict order (anti-reflexive, asymetric, transitive)
 */
 export interface Compare<A> {
   (x: A, y: A): number;
 }
 
-/** Interface of primitive comparison. */
-export interface Primitive extends
-  Compare<symbol>,
-  Compare<boolean>,
-  Compare<number | bigint>,
-  Compare<string> { };
-
-/**
-    @summary Primitive comparison.
-    @description
-    Can only compare arguments that have
-    exactly the same primitive type.
-*/
-export const primitive: Primitive = (x: any, y: any) => {
-  if (x < y) return -1;
-  if (x > y) return 1;
-  return 0;
-}
+type bignumber = number | bigint
 
 /** Type guard for number or bigint. */
-export function isNumber(x: any): x is number | bigint {
+export function isNumber(x: any): x is bignumber {
   if (typeof x === 'number') return true;
   if (typeof x === 'bigint') return true;
   return false;
 }
 
-/** Primitive comparison for numbers. */
-export const byNumber: Compare<number | bigint> = primitive;
-
-/** Primitive comparison for booleans (`false < true`). */
-export const byBoolean: Compare<boolean> = primitive;
-
-/** Primitive comparison for strings. See also `byAlpha` order. */
-export const byString: Compare<string> = primitive;
+/**
+   Primitive comparison.
+   Can only compare arguments that have
+   exactly the same primitive type.
+*/
+export function primitive(x: symbol, y: symbol): number;
+export function primitive(x: boolean, y: boolean): number;
+export function primitive(x: bignumber, y: bignumber): number;
+export function primitive(x: string, y: string): number;
+export function primitive(x: any, y: any) {
+  if (x < y) return -1;
+  if (x > y) return 1;
+  return 0;
+}
 
 /**
-   @summary Alphabetic comparison for strings.
-   @description
+   Alphabetic comparison for strings.
    Handles case differently than `byString` comparison.
 */
-export const byAlpha: Compare<string> = (x: string, y: string) => {
+export function alpha(x: string, y: string) {
   const cmp = primitive(x.toLowerCase(), y.toLowerCase());
   return cmp != 0 ? cmp : primitive(x, y);
 }
@@ -92,7 +83,7 @@ export function array<A>(order: Compare<A>): Compare<A[]> {
       const cmp = order(x[k], y[k]);
       if (cmp != 0) return cmp;
     }
-    return byNumber(p, q);
+    return p - q;
   };
 }
 
@@ -111,10 +102,20 @@ export function getKeys<T>(a: T): (keyof T)[] {
   return Object.getOwnPropertyNames(a) as (keyof T)[];
 }
 
+/**
+   Maps each field to some _optional_ comparison of the associated type.
+   Hence, `ByFields<{…, f: T, …}>` is `{…, f?: Compare<T>, …}`.
+   See [[fields]] comparison function.
+ */
 type ByFields<A> = {
   [P in keyof A]?: Compare<A[P]>;
 }
 
+/**
+   Maps _all_ fields to a comparison of the associated type.
+   Hence, `ByAllFields<{…, f: T, …}>` is `{…, f: Compare<T>, …}`.
+   See [[fieldsComplete]] comparison function.
+*/
 type ByAllFields<A> = {
   [P in keyof A]: Compare<A[P]>;
 }
@@ -129,17 +130,17 @@ type ByAllFields<A> = {
     fields, you shall provide a comparison function compatible with type
     `undefined`.
 
-    It might be difficult for Typescript to typecheck `byField(…)` expressions
-    when dealing with optional types. In such cases, you shall use `byField<A>(…)`
+    It might be difficult for Typescript to typecheck `fields(…)` expressions
+    when dealing with optional types. In such cases, you shall use `fields<A>(…)`
     and explicitly mention the type of compared values.
 
     Example:
 
         type foo = { id: number, name?: string, descr?: string }
-        const compare = byFields<foo>({ id: byNumber, name: option(byAlpha) });
+        const compare = fields<foo>({ id: byNumber, name: option(byAlpha) });
 
 */
-export function byFields<A>(order: ByFields<A>): Compare<A> {
+export function fields<A>(order: ByFields<A>): Compare<A> {
   return (x: A, y: A) => {
     for (const fd of getKeys(order)) {
       const byFd = order[fd];
@@ -153,10 +154,10 @@ export function byFields<A>(order: ByFields<A>): Compare<A> {
 }
 
 /** Complete object comparison.
-    This is similar to `byField()` comparison, but an ordering function must be
+    This is similar to `fields()` comparison, but an ordering function must be
     provided for _any_ field (optional or not) of the compared values.
 */
-export function byAllFields<A>(order: ByAllFields<A>): Compare<A> {
+export function fieldsComplete<A>(order: ByAllFields<A>): Compare<A> {
   return (x: A, y: A) => {
     for (const fd of getKeys<ByFields<A>>(order)) {
       const byFd = order[fd];
@@ -167,10 +168,73 @@ export function byAllFields<A>(order: ByAllFields<A>): Compare<A> {
   };
 }
 
+/** Pair comparison. */
+export function pair<A, B>(ordA: Compare<A>, ordB: Compare<B>): Compare<[A, B]> {
+  return ([x1, y1], [x2, y2]) => {
+    const cmp = ordA(x1, x2);
+    return cmp != 0 ? cmp : ordB(y1, y2);
+  };
+}
+
+/** Triple comparison. */
+export function triple<A, B, C>(
+  ordA: Compare<A>,
+  ordB: Compare<B>,
+  ordC: Compare<C>,
+): Compare<[A, B, C]> {
+  return ([x1, y1, z1], [x2, y2, z2]) => {
+    const cmp1 = ordA(x1, x2);
+    if (cmp1 != 0) return cmp1;
+    const cmp2 = ordB(y1, y2);
+    if (cmp2 != 0) return cmp2;
+    return ordC(z1, z2);
+  };
+}
+
+/** 4-Tuple comparison. */
+export function tuple4<A, B, C, D>(
+  ordA: Compare<A>,
+  ordB: Compare<B>,
+  ordC: Compare<C>,
+  ordD: Compare<D>,
+): Compare<[A, B, C, D]> {
+  return ([x1, y1, z1, t1], [x2, y2, z2, t2]) => {
+    const cmp1 = ordA(x1, x2);
+    if (cmp1 != 0) return cmp1;
+    const cmp2 = ordB(y1, y2);
+    if (cmp2 != 0) return cmp2;
+    const cmp3 = ordC(z1, z2);
+    if (cmp3 != 0) return cmp3;
+    return ordD(t1, t2);
+  };
+}
+
+/** 5-Tuple comparison. */
+export function tuple5<A, B, C, D, E>(
+  ordA: Compare<A>,
+  ordB: Compare<B>,
+  ordC: Compare<C>,
+  ordD: Compare<D>,
+  ordE: Compare<E>,
+): Compare<[A, B, C, D, E]> {
+  return ([x1, y1, z1, t1, u1], [x2, y2, z2, t2, u2]) => {
+    const cmp1 = ordA(x1, x2);
+    if (cmp1 != 0) return cmp1;
+    const cmp2 = ordB(y1, y2);
+    if (cmp2 != 0) return cmp2;
+    const cmp3 = ordC(z1, z2);
+    if (cmp3 != 0) return cmp3;
+    const cmp4 = ordD(t1, t2);
+    if (cmp4 != 0) return cmp4;
+    return ordE(u1, u2);
+  };
+}
+
 // --------------------------------------------------------------------------
 // --- Structural Comparison
 // --------------------------------------------------------------------------
 
+/** @internal */
 function rank(x: any): number {
   let t = typeof x;
   switch (t) {
@@ -205,30 +269,29 @@ function rank(x: any): number {
 
    All functions are compared equal.
  */
-export const byStructure: Compare<any> =
-  (x, y) => {
-    if (isNumber(x) && isNumber(y)) return byNumber(x, y);
-    if (typeof x === 'symbol' && typeof y === 'symbol') return primitive(x, y);
-    if (typeof x === 'boolean' && typeof y === 'boolean') return byBoolean(x, y);
-    if (typeof x === 'string' && typeof y === 'string') return byString(x, y);
-    if (Array.isArray(x) && Array.isArray(y)) return array(byStructure)(x, y);
-    if (typeof x === 'object' && typeof y === 'object') {
-      const fs = Object.getOwnPropertyNames(x).sort();
-      const gs = Object.getOwnPropertyNames(y).sort();
-      const p = fs.length;
-      const q = gs.length;
-      for (let i = 0, j = 0; i < p && j < q;) {
-        let a = undefined, b = undefined;
-        const f = fs[i];
-        const g = gs[j];
-        if (f <= g) { a = x[f]; i++; }
-        if (g <= f) { b = y[g]; j++; }
-        const cmp = byStructure(a, b);
-        if (cmp != 0) return cmp;
-      }
-      return p - q;
+export function structural(x: any, y: any): number {
+  if (isNumber(x) && isNumber(y)) return primitive(x, y);
+  if (typeof x === 'symbol' && typeof y === 'symbol') return primitive(x, y);
+  if (typeof x === 'boolean' && typeof y === 'boolean') return primitive(x, y);
+  if (typeof x === 'string' && typeof y === 'string') return primitive(x, y);
+  if (Array.isArray(x) && Array.isArray(y)) return array(structural)(x, y);
+  if (typeof x === 'object' && typeof y === 'object') {
+    const fs = Object.getOwnPropertyNames(x).sort();
+    const gs = Object.getOwnPropertyNames(y).sort();
+    const p = fs.length;
+    const q = gs.length;
+    for (let i = 0, j = 0; i < p && j < q;) {
+      let a = undefined, b = undefined;
+      const f = fs[i];
+      const g = gs[j];
+      if (f <= g) { a = x[f]; i++; }
+      if (g <= f) { b = y[g]; j++; }
+      const cmp = structural(a, b);
+      if (cmp != 0) return cmp;
     }
-    return rank(x) - rank(y);
-  };
+    return p - q;
+  }
+  return rank(x) - rank(y);
+};
 
 // --------------------------------------------------------------------------
