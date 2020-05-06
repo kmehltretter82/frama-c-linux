@@ -44,7 +44,12 @@ doc: $(D_JSDOC) $(D_ICONS)
 	@cat $(D_ICONS) > $(D_OUT)/tutorial-icons.html
 	@cp -f $(DOME)/doc/gallery.css $(D_OUT)/styles/
 	@cp -f $(DOME)/doc/tutorials/*.png $(D_OUT)/
-	@echo "[Ivette]   $(DOME_DOC)/index.html"
+	@echo "[Ivette]   $(D_OUT)/index.html"
+
+tdoc:
+	@echo "[Ivette] TypeScript documentation (experimental)"
+	@yarn run typedoc
+	@echo "[Ivette]   doc/typedoc/index.html"
 
 # --------------------------------------------------------------------------
 # --- Ivette Plugins
