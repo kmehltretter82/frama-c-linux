@@ -24,7 +24,7 @@ include Plugin.Register
     (struct
       let name = "report"
       let shortname = "report"
-      let help = "Properties Status Report (experimental)"
+      let help = "Properties Status Report"
     end)
 
 module Print =
