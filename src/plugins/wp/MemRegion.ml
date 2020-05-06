@@ -815,6 +815,7 @@ struct
 
   let set_init_atom _ _ _ = assert false
   let is_init_atom _ _ = assert false
+  let monotonic_init _ _ = assert false
 
 end
 

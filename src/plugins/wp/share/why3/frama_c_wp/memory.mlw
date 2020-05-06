@@ -104,6 +104,9 @@ theory Memory
     { base = p.base ; offset = i } <>
     { base = q.base ; offset = j }
 
+  predicate monotonic_init(m1 m2 : map addr bool) =
+    forall p: addr. m1[p] -> m2[p]
+
   (* Regions *)
 
   function region int : int

@@ -967,6 +967,14 @@ struct
       F.e_fun f_havoc [fresh;current;loc;n]
     else fresh
 
+  let monotonic_init s1 s2 =
+    let m1 = Sigma.value s1 T_init in
+    let m2 = Sigma.value s2 T_init in
+    let p = Lang.freshvar ~basename:"p" t_addr in
+    p_forall [p]
+      (p_imply (p_bool (e_get m1 (e_var p))) (p_bool (e_get m2 (e_var p))))
+    (* F.p_call p_monotonic [m1; m2] *)
+
   let eqmem obj loc _chunk m1 m2 =
     F.p_call p_eqmem [m1;m2;loc;e_int (length_of_object obj)]
 

@@ -68,6 +68,7 @@ let p_separated = Lang.extern_fp ~library "separated"
 let p_included = Lang.extern_fp ~library "included"
 let p_eqmem = Lang.extern_fp ~library "eqmem"
 let f_havoc = Lang.extern_f ~library ~typecheck:ty_havoc ~link:l_havoc "havoc"
+let p_monotonic = Lang.extern_fp ~library "monotonic_init"
 let f_region = Lang.extern_f ~library ~result:L.Int "region" (* base -> region *)
 let p_framed = Lang.extern_fp ~library "framed" (* m-pointer -> prop *)
 let p_linked = Lang.extern_fp ~library "linked" (* allocation-table -> prop *)
