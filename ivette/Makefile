@@ -30,26 +30,15 @@ lint: dome-pkg dome-templ
 
 # can also use dome-doc to generate Dome-only documentation
 
-D_JSDOC=$(CURDIR)/node_modules/.bin/jsdoc
 D_ICONS=$(addprefix $(DOME)/doc/template/gallery-, head.html icons.html tail.html)
-D_OUT=./doc/html
+D_OUT=doc/html
 
-doc: $(D_JSDOC) $(D_ICONS)
+doc:
 	@echo "[Ivette] documentation"
-	@rm -fr ./build ./doc
-	@yarn run build
-	@mkdir -p ./doc/html
-	@(APP=$(APP) COPYRIGHT="$(COPYRIGHT)" DOME=$(DOME) \
-	  yarn exec jsdoc -- -c jsdoc.json -d doc/html)
-	@cat $(D_ICONS) > $(D_OUT)/tutorial-icons.html
-	@cp -f $(DOME)/doc/gallery.css $(D_OUT)/styles/
-	@cp -f $(DOME)/doc/tutorials/*.png $(D_OUT)/
-	@echo "[Ivette]   $(D_OUT)/index.html"
-
-tdoc:
-	@echo "[Ivette] TypeScript documentation (experimental)"
+	@rm -fr $(D_OUT)
+	@mkdir -p $(D_OUT)
 	@yarn run typedoc
-	@echo "[Ivette]   doc/typedoc/index.html"
+	@echo "[Ivette]   $(D_OUT)/index.html"
 
 # --------------------------------------------------------------------------
 # --- Ivette Plugins

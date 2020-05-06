@@ -33,12 +33,6 @@ export const DESC = SortDirection.DESC ;
    with their associated data sets. The model listens for updates, retrieves
    items from their index, and re-render the views when necessary.
 
-
-   Model could be part of the global _Application State_, or part of a
-   statefull React Component, depending on your need as described in
-   the [Application Design](tutorial-application.html) tutorial.
-
-
    Several tables may connect to the same table model, but they will share the
    same number and ordering of items. However, each connected table will only
    render its own range of items and will re-renderer only when impacted by

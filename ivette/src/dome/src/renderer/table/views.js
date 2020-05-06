@@ -156,12 +156,7 @@ const computeWidth = (elt) => {
 
 
    By default, values are obtained from the underlying model by invoking
-   [[Model.getValue]] with the column
-   identifier.
-
-   The default `renderValue` renders the item's value
-   packed in a `<label>` with class `dome-text-data` as described in the
-   [Styling Component](tutorial-styling.html) tutorial.
+   [[Model.getValue]] with the column identifier.
 
    This separation of concerns allows for defining
    Column types, where for instance the renderer is already defined and you only need to
