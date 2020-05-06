@@ -17,7 +17,7 @@ This can be also used to display some item among many in one unique place.
 
 import _ from 'lodash' ;
 import React from 'react';
-import Dome from 'dome' ;
+import * as Dome from 'dome' ;
 
 // --------------------------------------------------------------------------
 // --- Global Dispatcher
@@ -58,8 +58,7 @@ const removeItem = (id) => {
 // --------------------------------------------------------------------------
 
 /**
-   @class
-   @summary Define dispatched item
+   @summary Define dispatched item.
    @property {string} id - the item _global_ unique identifier
    @property {React.Children} {children} - item contents
    @description
@@ -82,8 +81,7 @@ export function Item({ id, children })
 // --------------------------------------------------------------------------
 
 /**
-   @class
-   @summary Render dispatched item
+   @summary Render dispatched item.
    @property {string} id - the item _global_ unique identifier to render
    @property {function|React.Children} {children} - conditional or alternative content (default: `null`)
    @description
@@ -110,9 +108,5 @@ export function Render({ id, children=null })
     return content && <React.Fragment>{content}</React.Fragment>;
   }
 }
-
-// --------------------------------------------------------------------------
-
-export default { Item, Render };
 
 // --------------------------------------------------------------------------

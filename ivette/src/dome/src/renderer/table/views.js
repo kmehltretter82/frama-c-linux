@@ -4,8 +4,9 @@
 
 /** @module dome/table/views */
 
+import _ from 'lodash' ;
 import React from 'react' ;
-import Dome from 'dome' ;
+import * as Dome from 'dome' ;
 import { DraggableCore } from 'react-draggable';
 import { SVG } from 'dome/controls/icons' ;
 import {
@@ -14,8 +15,8 @@ import {
   Table as VTable,
   Column as VColumn
 } from 'react-virtualized' ;
-import _ from 'lodash' ;
-import './tables.css' ;
+
+import './style.css' ;
 
 // --------------------------------------------------------------------------
 // --- Header Renderer
@@ -128,7 +129,6 @@ const computeWidth = (elt) => {
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Table Column.
    @property {string} id - Column unique identifier (required)
    @property {string} [icon] - Header icon
@@ -175,9 +175,10 @@ const computeWidth = (elt) => {
    to force the column to be visible.
 
 */
-export const Column = () => null;
+export const Column = (props) => null;
 // Fake component only used to store props.
-// Virtualized column is rendered with function below:
+// Virtualized column is rendered with function vColumn (see below)
+
 const vColumn = ({
   headerRef,
   columnResize,hasFill,lastElt,
@@ -223,7 +224,6 @@ const defaultVisible = (visible) => {
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Define specific Column instances.
    @param {Object} properties - default Column properties
    @return {Column} a new Column class of Component
@@ -651,7 +651,7 @@ export class Table extends React.Component {
             sortDirection={ordering && ordering.sortDirection}
             sort={model.setOrdering.bind(model)}
             scrollToIndex={ scrollToIndex }
-            scrollToAlignment='center'
+            scrollToAlignment='auto'
             >
             {React.Children.map(columns,renderColumn)}
           </VTable>
@@ -666,9 +666,5 @@ export class Table extends React.Component {
     );
   }
 }
-
-// --------------------------------------------------------------------------
-
-export default { Table, Column, DefineColumn };
 
 // --------------------------------------------------------------------------

@@ -103,12 +103,12 @@ export function doExit() {
 // --- Command Line Arguments
 // --------------------------------------------------------------------------
 
-var command_wdir = undefined ;
-var command_argv = undefined ;
+var COMMAND_WDIR = undefined ;
+var COMMAND_ARGV = undefined ;
 
-function setCommand(argv,wdir) {
-  command_argv = argv ;
-  command_wdir = wdir ;
+function SET_COMMAND(argv,wdir) {
+  COMMAND_ARGV = argv ;
+  COMMAND_WDIR = wdir ;
 }
 
 // --------------------------------------------------------------------------
@@ -141,7 +141,7 @@ export function getDownloads() { return appProxy.getPath('downloads'); }
 
    See also [Dome.onCommand](dome_.html#.onCommand) event handler.
 */
-export function getWorkingDir() { return command_wdir; }
+export function getWorkingDir() { return COMMAND_WDIR; }
 
 /**
    @summary Returns the current process ID.
@@ -160,7 +160,7 @@ export function getPID() { return process.pid; }
 
    See also [Dome.onCommand](dome_.html#.onCommand) event handler.
 */
-export function getArguments() { return command_argv; }
+export function getArguments() { return COMMAND_ARGV; }
 
 /** @summary Returns static assets.
     @param {string} [...path] - a sequecne of path segments
@@ -629,30 +629,11 @@ const WINDOW_APPLICATION_ARGV = '--dome-application-window' ;
 const WINDOW_PREFERENCES_ARGV = '--dome-preferences-window' ;
 
 // --------------------------------------------------------------------------
-// --- Export Default
+// --- Only used for inter-module initialisation
 // --------------------------------------------------------------------------
 
 export default {
-  platform,
-  DEVEL,
-  atExit,
-  atExitForEach,
-  doExit,
-  getHome,
-  getDesktop,
-  getDocuments,
-  getDownloads,
-  getWorkingDir,
-  getArguments,
-  getStatic,
-  getPID,
-  join, resolve, dirname, basename, extname,
-  fileStat,
-  isFile, readFile, writeFile, copyFile,
-  isDirectory, readDir, mkDir, rmDir,
-  rename, remove, exists,
-  spawn,
-  setCommand,
+  SET_COMMAND,
   WINDOW_APPLICATION_ARGV,
   WINDOW_PREFERENCES_ARGV
 };

@@ -1,25 +1,34 @@
 ## Setup
 
-From the `./gui` sub-directory of Frama-C main directory:
+From the `./ivette` sub-directory of Frama-C main directory:
 
 ```
 $ make app
 ```
 
+## Typescript Editors
+
+Emacs mode configuration can be setup with Typescript, Web-mode and Tide packages
+which are all available with MELPA. For configuring your `.emacs` accordingly,
+please look at the `EMACS.el`. This setup the Tide package to work with
+`typescript-mode` for `*.ts` files (see also `tsfmt.json` config file)
+and `web-mode` for `*.tsx` files.
+
+VS-Code is also known to work out of the box.
+
+## Coding Guidelines
+
+- per-directory `style.css` for CSS;
+- caml-cased file names for typescript modules;
+- indentation based on 2 spaces, no tabs;
+- caml-case identifiers for exported members;
+- no `export default` for libs, individual exports only;
+- prefer use of `import * as AbcDef from '<path>/AbcDef'`;
+
 ## Mirroring to Dome/Electron
 
-The content of ./src/dome is git-subtree to be kept in sync
-with Dome/Electron. The related commands must be issued from
-the Frama-C root directory:
-
-1. Importing a branch from dome/electron:
-
-```
-$ git subtree pull -P gui/src/dome git@git.frama-c.com:dome/electron.git <branch>
-```
-
-2. Exporting to a branch into dome/electron:
-
-```
-$ git subtree push -P gui/src/dome git@git.frama-c.com:dome/electron.git <branch>
-```
+The content of ./src/dome shall be kept in sync with
+the public repository for Dome. An experimental support
+for automated synchronisation is available with:
+- `make dome-pull` for pulling Dome updates into Ivette
+- `make dome-push` for pushing local updates into Dome

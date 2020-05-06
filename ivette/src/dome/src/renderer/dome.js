@@ -8,7 +8,6 @@
    and its interaction with the main process.
 
    @example // File 'src/renderer/index.js':
-   import Dome from 'dome';
    import Application from './Application.js' ;
    Dome.setContent( Application );
  */
@@ -18,8 +17,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { AppContainer } from 'react-hot-loader' ;
 import { remote , ipcRenderer } from 'electron';
-import System from 'dome/system' ;
-import './dome.css' ;
+import { EventEmitter } from 'events' ;
+import SYS , * as System from 'dome/system' ;
+import './style.css' ;
 
 // --------------------------------------------------------------------------
 // --- Context
@@ -57,8 +57,6 @@ export const platform = System.platform ;
 // --------------------------------------------------------------------------
 // --- Application Emitter
 // --------------------------------------------------------------------------
-
-import { EventEmitter } from 'events' ;
 
 /** @summary Application Emitter.
     @description
@@ -137,7 +135,7 @@ export function onCommand(job) { emitter.on('dome.command',job); }
 
 ipcRenderer.on('dome.ipc.reload',() => emitter.emit('dome.reload'));
 ipcRenderer.on('dome.ipc.command', (_event,argv,wdir) => {
-  System.setCommand(argv,wdir);
+  SYS.SET_COMMAND(argv,wdir);
   emitter.emit('dome.command',argv,wdir);
 });
 
@@ -151,12 +149,12 @@ ipcRenderer.on('dome.ipc.command', (_event,argv,wdir) => {
 
 export function isApplicationWindow()
 {
-  return process.argv.includes( System.WINDOW_APPLICATION_ARGV );
+  return process.argv.includes( SYS.WINDOW_APPLICATION_ARGV );
 }
 
 export function isPreferencesWindow()
 {
-  return process.argv.includes( System.WINDOW_PREFERENCES_ARGV );
+  return process.argv.includes( SYS.WINDOW_PREFERENCES_ARGV );
 }
 
 // --------------------------------------------------------------------------
@@ -566,8 +564,7 @@ ipcRenderer.on('dome.ipc.href',(href) => emitter.emit('dome.href',href));
 // --------------------------------------------------------------------------
 
 /**
-   @class
-   @summary Inlined Function React Component
+   @summary Inlined Function React Component.
    @property {function} children - render function as children
    @description
    Allows to define an inlined functional component inside JSX.
@@ -1029,34 +1026,5 @@ export function useClock(period,initStart)
     stop: () => { if (running) setTime(-1); }
   };
 }
-
-// --------------------------------------------------------------------------
-// --- Export
-// --------------------------------------------------------------------------
-
-export default {
-  platform,
-  DEVEL,
-  setTitle,
-  setModified,
-  isApplicationWindow, setApplicationWindow,
-  isPreferencesWindow, setPreferencesWindow,
-  isFocused,
-  emitter, emit, on, off,
-  addMenu,
-  addMenuItem,
-  setMenuItem,
-  popupMenu,
-  setWindowSetting, getWindowSetting,
-  setGlobalSetting, getGlobalSetting,
-  update,  onUpdate, onReload, onCommand,
-  State, Render,
-  useForceUpdate,
-  useUpdate, useEvent, useEmitter,
-  useCommand, useClock,
-  useState, useSwitch,
-  useHistory,
-  useGlobalSetting
-} ;
 
 // --------------------------------------------------------------------------

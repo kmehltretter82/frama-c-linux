@@ -9,22 +9,17 @@
 
    @example
    // src/main/index.js:
-   import Dome from 'dome' ;
+   import * as Dome from 'dome' ;
    Dome.start();
 */
-
-import {
-  app,
-  ipcMain,
-  BrowserWindow
-} from 'electron' ;
 
 import _ from 'lodash' ;
 import fs from 'fs' ;
 import path from 'path' ;
-import Menubar from './menubar.js' ;
-import System from 'dome/system' ;
+import { app, ipcMain, BrowserWindow } from 'electron' ;
 import installExtension , { REACT_DEVELOPER_TOOLS } from 'dome/devtools' ;
+import * as Menubar from './menubar.js' ;
+import SYS, * as System from 'dome/system' ;
 
 // --------------------------------------------------------------------------
 // --- System Helpers
@@ -205,8 +200,8 @@ function createBrowserWindow( config, isMain=true )
 {
 
   const argv = isMain
-        ? System.WINDOW_APPLICATION_ARGV
-        : System.WINDOW_PREFERENCES_ARGV ;
+        ? SYS.WINDOW_APPLICATION_ARGV
+        : SYS.WINDOW_PREFERENCES_ARGV ;
 
   const options = _.merge(
     {
@@ -488,19 +483,5 @@ export function setMenuItem( options ) {
 ipcMain.on( 'dome.ipc.menu.addmenu' , addMenu );
 ipcMain.on( 'dome.ipc.menu.addmenuitem' , addMenuItem );
 ipcMain.on( 'dome.ipc.menu.setmenuitem' , setMenuItem );
-
-// --------------------------------------------------------------------------
-// --- Export Default
-// --------------------------------------------------------------------------
-
-export default {
-  platform,
-  DEVEL,
-  setName,
-  start,
-  addMenu,
-  addMenuItem,
-  setMenuItem
-} ;
 
 // --------------------------------------------------------------------------

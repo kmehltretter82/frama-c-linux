@@ -2,13 +2,14 @@
 // --- SideBars
 // --------------------------------------------------------------------------
 
-/** @module dome/layout/sidebars */
+/** @module dome/frame/sidebars */
 
 import React from 'react' ;
-import Dome from 'dome' ;
+import * as Dome from 'dome' ;
 import { Badge } from 'dome/controls/icons' ;
 import { Label } from 'dome/controls/labels' ;
-import './sidebars.css' ;
+
+import './style.css' ;
 
 const SideBarContext = React.createContext();
 
@@ -17,8 +18,7 @@ const SideBarContext = React.createContext();
 // --------------------------------------------------------------------------
 
 /**
-   @class
-   @summary Container for sidebar items
+   @summary Container for sidebar items.
    @property {Elements} [children] - Side bar items
    @property {string} [settings] - Side bar items settings
    @property {string} [selection] - Current item selection
@@ -83,7 +83,6 @@ const disableAll = (children) =>
       React.Children.map( children , (elt) => React.cloneElement( elt , { disabled: true } ) );
 
 /**
-   @class
    @summary Sidebar Section.
    @property {string} [id] - Section identifier (used for derived settings)
    @property {string} label - **Section label**
@@ -142,7 +141,7 @@ export function Section(props) {
 // --------------------------------------------------------------------------
 
 /**
-   @class
+   @summary Sidebar Section Items.
    @property {string} [id] - Item identifier
    @property {string} [label] - **Item label**
    @property {string} [icon] - Item icon
@@ -154,7 +153,6 @@ export function Section(props) {
    @property {function} [onContextMenu] - Context Menu callback
    @property {Badge} [badge] - Badge element(s)
    @property {React.Children} [children] - Item additional content
-   @summary Sidebar Section Items
    @description
 
    The item will be highlighted if selected _via_ the `selection` property of the
@@ -210,7 +208,5 @@ import { register } from 'dome/misc/register' ;
 register( SideBar, 'DOME_SIDEBAR' );
 register( Section, 'DOME_SIDEBAR_ITEM' );
 register( Item,    'DOME_SIDEBAR_ITEM' );
-
-export default { SideBar, Section, Item } ;
 
 // --------------------------------------------------------------------------

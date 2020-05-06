@@ -2,8 +2,8 @@
 // --- Dome Classes
 // --------------------------------------------------------------------------
 
-import React from 'react' ;
 import _ from 'lodash' ;
+import React from 'react' ;
 
 // --------------------------------------------------------------------------
 // --- Register a Dome Class
@@ -92,9 +92,5 @@ export function dispatch(children,filter)
 
   return collected;
 }
-
-// --------------------------------------------------------------------------
-
-export default { register , classOf , dispatch };
 
 // --------------------------------------------------------------------------

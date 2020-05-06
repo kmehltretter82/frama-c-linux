@@ -68,7 +68,7 @@ class Proxy {
 
  */
 
-export class Buffer extends Emitter {
+export class RichTextBuffer extends Emitter {
 
   /**
      @param {object} [props] - Constructor properties (see below)
@@ -450,9 +450,5 @@ is blocked.
   unlinkDoc(doc) { this._doc.unlinkDoc( doc ); }
 
 }
-
-// --------------------------------------------------------------------------
-
-export default { Buffer };
 
 // --------------------------------------------------------------------------

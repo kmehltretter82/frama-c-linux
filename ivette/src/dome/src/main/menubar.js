@@ -3,7 +3,7 @@
 // --------------------------------------------------------------------------
 
 import { app, BrowserWindow, Menu, MenuItem, shell } from 'electron' ;
-import System from 'dome/system' ;
+import * as System from 'dome/system' ;
 
 // --------------------------------------------------------------------------
 // --- Special Callbacks
@@ -374,6 +374,7 @@ function registerCustomItems( menu ) {
   });
 }
 
+// Initialize the menubar machinery
 export function install() {
   updateRequired = true;
   updateTriggered = false;
@@ -391,16 +392,5 @@ function reset() {
   customItems = {} ;
   install();
 }
-
-// --------------------------------------------------------------------------
-// --- Export Default
-// --------------------------------------------------------------------------
-
-export default {
-  install,
-  addMenu,
-  addMenuItem,
-  setMenuItem
-};
 
 // --------------------------------------------------------------------------

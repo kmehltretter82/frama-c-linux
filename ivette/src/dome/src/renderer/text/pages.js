@@ -3,7 +3,7 @@
 // --------------------------------------------------------------------------
 
 /**
-   @module dome/layout/pages
+   @module dome/text/pages
    @description
    A collection of text area and elements do render textual content.
 
@@ -24,18 +24,17 @@
 */
 
 import React from 'react' ;
-import { AutoSizer } from 'react-virtualized' ;
-import './pages.css' ;
+
+import './style.css' ;
 
 // --------------------------------------------------------------------------
 // --- Page
 // --------------------------------------------------------------------------
 
 /**
-   @class
+   @summary Blank HTML page.
    @property {object} [style] - additional style elements
    @property {Elements} [children] - page content
-   @summary a blank HTML page
    @description
 
    The page has insets and shadows and fills the entire available area.
@@ -57,10 +56,9 @@ export const Page = ({style,children}) => {
 // --------------------------------------------------------------------------
 
 /**
-   @class
+   @summary Blank HTML textarea.
    @property {object} [style] - additional style elements
    @property {Elements} [children] - page content
-   @summary a blank HTML textarea
    @description
 
    The area has small padding and no margin, and does not scroll its content.
@@ -71,11 +69,5 @@ export const Note = ({style,children}) => (
     {children}
   </div>
 );
-
-// --------------------------------------------------------------------------
-// Export Default
-// --------------------------------------------------------------------------
-
-export default { Page, Note };
 
 // --------------------------------------------------------------------------

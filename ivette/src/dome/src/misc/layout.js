@@ -3,7 +3,6 @@
 // --------------------------------------------------------------------------
 
 import React from 'react' ;
-import Props from 'prop-types' ;
 
 const SIZED = {
   display: 'block',
@@ -68,14 +67,5 @@ export class Layout extends React.Component {
   }
 
 }
-
-// --------------------------------------------------------------------------
-// --- Props & Defaults
-// --------------------------------------------------------------------------
-
-Layout.propTypes = { onResize: Props.func };
-Layout.defaultProps = { };
-
-export default { Layout };
 
 // --------------------------------------------------------------------------

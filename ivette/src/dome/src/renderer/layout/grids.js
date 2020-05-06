@@ -4,13 +4,15 @@
 
 /** @module dome/layout/grids */
 
+import _ from 'lodash' ;
 import React from 'react' ;
-import Dome from 'dome' ;
 import { dispatchEvent, DnD, DragSource, DropTarget } from 'dome/dnd' ;
 import { AutoSizer } from 'react-virtualized' ;
 import { DraggableCore } from 'react-draggable' ;
-import _ from 'lodash' ;
-import './grids.css' ;
+
+import * as Dome from 'dome' ;
+
+import './style.css' ;
 
 // --------------------------------------------------------------------------
 // --- Grid Utilities
@@ -745,8 +747,7 @@ function orderElements( e1 , e2 )
 // --------------------------------------------------------------------------
 
 /**
-   @class
-   @summary Elementary GridLayout Component
+   @summary Elementary GridLayout Component.
    @property {string} id - Component identifier
    @property {boolean} display - Whether to mount the component
    @property {number} width - Desired component width
@@ -769,19 +770,18 @@ function orderElements( e1 , e2 )
    Direction properties (with type `directions`) can take the following values:
    `'none'`, `'horizontal'`, `'vertical'` or `'both'`.
  */
-export const GridItem = () => null;
+export const GridItem = (props) => null;
 
 // --------------------------------------------------------------------------
 // --- Grid H/V Boxes
 // --------------------------------------------------------------------------
 
 /**
-    @class
-    @property {ident} [id] - the box identifier
-    @property {direction} dir - either `'horizontal'` or `'vertical'`
-    @property {GridContent} [children] - internal grid contents
-    @summary Layout its content in an horizontal or vertical box.
-    @description
+   @property {ident} [id] - the box identifier
+   @property {direction} dir - either `'horizontal'` or `'vertical'`
+   @property {GridContent} [children] - internal grid contents
+   @summary Layout its content in an horizontal or vertical box.
+   @description
 
 This container is a _fake_ component thats simply groups several
 `GridItem`s or `GridBox`es horizontally or vertically.
@@ -795,25 +795,23 @@ See also:
   - [GridHbox](module-dome_layout_grids.GridHbox.html) horizontal box
   - [GridVbox](module-dome_layout_grids.GridVbox.html) vertical box
 */
-export const GridBox = () => null ;
+export const GridBox = (props) => null ;
 
 /**
-    @class
-    @summary Layout its content in an horizontal box.
-    @property {ident} [id] - the box identifier
-    @description
-    See [GridBox](module-dome_layout_grids.GridBox.html)
+   @summary Layout its content in an horizontal box.
+   @property {ident} [id] - the box identifier
+   @description
+   See [GridBox](module-dome_layout_grids.GridBox.html)
 */
-export const GridHbox = () => null ;
+export const GridHbox = (props) => null ;
 
 /**
-    @class
-    @summary Layout its content in a vertical box.
-    @property {ident} [id] - the box identifier
-    @description
-    See [GridBox](module-dome_layout_grids.GridBox.html)
+   @summary Layout its content in a vertical box.
+   @property {ident} [id] - the box identifier
+   @description
+   See [GridBox](module-dome_layout_grids.GridBox.html)
 */
-export const GridVbox = () => null ;
+export const GridVbox = (props) => null ;
 
 // --------------------------------------------------------------------------
 // --- User Grid & Components Extraction
@@ -939,7 +937,7 @@ function makeChildrenGrid( dir, items, children, shape )
 
 /**
    @class
-   @summary Grid-based Flexible Container
+   @summary Grid-based Flexible Container.
    @property {direction} [dir] - Default children layout (`'horizontal'` or `'vertical'`)
    @property {number}    [padding] - Padding between items
    @property {Shape}     [shape] - The desired shape (defaults to children grid)
@@ -1101,7 +1099,7 @@ const DRAGGABLEITEM =
 
 /**
    @class
-   @summary Grid Container
+   @summary Grid Container.
    @property {direction} [dir] - Default children layout (`'horizontal'` or `'vertical'`)
    @property {number}    [padding] - Padding between items
    @property {Shape}     [shape] - The desired shape (defaults to children grid)
@@ -1331,18 +1329,5 @@ export class GridLayout extends React.Component
     );
   }
 }
-
-// --------------------------------------------------------------------------
-// --- Defaults
-// --------------------------------------------------------------------------
-
-export default {
-  GridLayout,
-  GridLayoutCore,
-  GridItem, GridBox, GridHbox, GridVbox,
-  iterShape, getShapeItem, removeShapeItem,
-  stringOfShape,
-  makeChildrenShape
-} ;
 
 // --------------------------------------------------------------------------

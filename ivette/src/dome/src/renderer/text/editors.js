@@ -4,12 +4,13 @@
 
 /** @module dome/text/editors */
 
-import React from 'react' ;
-import Dome from 'dome' ;
-import CodeMirror from 'codemirror/lib/codemirror.js' ;
-import 'codemirror/lib/codemirror.css' ;
-import './editors.css' ;
 import _ from 'lodash' ;
+import React from 'react' ;
+import * as Dome from 'dome' ;
+import CodeMirror from 'codemirror/lib/codemirror.js' ;
+
+import './style.css' ;
+import 'codemirror/lib/codemirror.css' ;
 
 const CSS_HOVERED = 'dome-xText-hover' ;
 const CSS_SELECTED = 'dome-xText-select' ;
@@ -386,9 +387,5 @@ export class Text extends React.Component {
   }
 
 }
-
-// --------------------------------------------------------------------------
-
-export default { Text };
 
 // --------------------------------------------------------------------------

@@ -1,12 +1,13 @@
+// --------------------------------------------------------------------------
+// --- Tabs
+// --------------------------------------------------------------------------
+
+/** @module dome/frame/tabs */
+
 import React from 'react' ;
 import { Icon } from 'dome/controls/icons' ;
-import './tabs.css' ;
 
-/** @module dome/layout/tabs */
-
-// --------------------------------------------------------------------------
-// --- Tabs Bar
-// --------------------------------------------------------------------------
+import './style.css' ;
 
 /**
    @class
@@ -14,6 +15,9 @@ import './tabs.css' ;
    @description
    Shall contains [Tab](module-dome_layout_tabs.Tab.html) instances.
 */
+// --------------------------------------------------------------------------
+// --- Tabs Bar
+// --------------------------------------------------------------------------
 
 export function TabsBar(props) {
   return (
@@ -117,7 +121,5 @@ import { register } from 'dome/misc/register' ;
 
 register(TabsBar, 'DOME_TABSBAR');
 register(Tab,     'DOME_TABSBAR_ITEM');
-
-export default { Tab , TabsBar , TabsPane } ;
 
 // --------------------------------------------------------------------------

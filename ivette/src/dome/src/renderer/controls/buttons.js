@@ -13,7 +13,7 @@
 
 import React from 'react' ;
 import { Icon } from './icons' ;
-import './buttons.css' ;
+import './style.css' ;
 
 const DISABLED = ({ disabled=false, enabled=true }) => !!disabled || !enabled ;
 const TRIGGER = (onClick) => (evt) => {
@@ -28,7 +28,6 @@ const TRIGGER = (onClick) => (evt) => {
 const LCDCLASS = 'dome-xButton dome-xBoxButton dome-text-code dome-xButton-lcd ' ;
 
 /**
-   @class
    @summary Button-like label.
    @property {string} [text] - Textual content (prepend to children components, if any)
    @property {string} [icon] - Label icon (optional, on left side)
@@ -52,8 +51,7 @@ export const LCD = (props) => (
 // --------------------------------------------------------------------------
 
 /**
-   @class
-   @summary Led indicator
+   @summary Led indicator.
    @property {string} [status] - Led status and color (default: inactive)
    @property {boolean} [blink] - Led blinking (default: false)
    @property {string} [title] - Led tooltip (optional)
@@ -92,7 +90,6 @@ const LABEL = ({disabled,label}) => (
 );
 
 /**
-   @class
    @summary Standard Button.
    @property {string} [icon] - Label icon (optional, on left side)
    @property {string} [label] - Button label
@@ -153,7 +150,6 @@ export const Button = (props) => {
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Circled Icon Button.
    @property {string} [icon] - Label icon (optional, on left side)
    @property {string} [title] - Optional tooltip
@@ -178,7 +174,6 @@ export const Button = (props) => {
 
    Buttons without focus can not be triggered with the Enter key.
 */
-
 export const CircButton = (props) => {
   const disabled = DISABLED(props);
   const { focusable=false, kind='default',
@@ -210,7 +205,6 @@ export const CircButton = (props) => {
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Borderless Icon Button.
    @property {string} icon - Icon identifier
    @property {number} size - Icon size (default `12`)
@@ -233,7 +227,6 @@ export const CircButton = (props) => {
    - `'positive'`: positive button, in green;
    - `'negative'`: negative button, in red.
 */
-
 export const IconButton = (props) => {
   const disabled = DISABLED(props);
   const {
@@ -266,7 +259,6 @@ const CHECKBOX_ENABLED = 'dome-control-enabled dome-xCheckbox ' ;
 const CHECKBOX_DISABLED = 'dome-control-disabled dome-xCheckbox ' ;
 
 /**
-   @class
    @summary CheckBox with its label.
    @property {string} [label] - Button label
    @property {string} [title] - Optional tooltip
@@ -301,7 +293,6 @@ export const Checkbox = (props) => {
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Switch with its label.
    @property {string} [label] - Button label
    @property {string} [title] - Optional tooltip
@@ -344,7 +335,6 @@ export const Switch = (props) => {
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Radio Button with its label.
    @property {string} [label] - Button label
    @property {string} [title] - Optional tooltip
@@ -451,7 +441,6 @@ export class RadioGroup extends React.Component {
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Menu Button.
    @property {string} [placeholder] - Label of undefined selection
    @property {string} [title] - Optional tooltip
@@ -502,8 +491,7 @@ export const Select = (props) => {
 // --------------------------------------------------------------------------
 
 /**
-   @class
-   @summary Text Field
+   @summary Text Field.
    @property {string} [value] - Field initial content
    @property {string} [edited] - Field current value
    @property {boolean} [enabled] - Defaults to `true`
@@ -544,17 +532,6 @@ export const Field = (props) => {
            onKeyPress={ONKEYPRESS}
            onChange={ONCHANGE} />
   );
-};
-
-// --------------------------------------------------------------------------
-// --- Exports
-// --------------------------------------------------------------------------
-
-export default {
-  LCD, LED,
-  Button, CircButton, IconButton,
-  Switch, Checkbox, Radio, RadioGroup,
-  Select
 };
 
 // --------------------------------------------------------------------------

@@ -12,7 +12,7 @@
 */
 
 import React from 'react' ;
-import Dome from 'dome' ;
+import * as Dome from 'dome' ;
 import 'dome/misc/exports' ;
 
 export default (() => (

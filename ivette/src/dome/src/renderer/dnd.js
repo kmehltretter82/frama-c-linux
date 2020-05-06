@@ -106,9 +106,9 @@ updates from all participants merged in.
 
 */
 
+import _ from 'lodash' ;
 import React from 'react' ;
 import Draggable, { DraggableCore } from 'react-draggable';
-import _ from 'lodash' ;
 
 const HOLD_TIME = 100 ; /* time in ms */
 const HOLD_FIRE = 6 ;   /* number of HOLD_TIME before « hold » */
@@ -508,7 +508,6 @@ the offsets of the associated D&D event.
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Display a Drag Source with an Overlay.
    @property {Dragging} [dragging] - current dragging event
    @property {string} [className] - source content class
@@ -848,13 +847,5 @@ export class DropTarget extends React.Component
   }
 
 }
-
-// --------------------------------------------------------------------------
-// --- Export
-// --------------------------------------------------------------------------
-
-export default {
-  DnD, DragSource, DropTarget, dispatchEvent
-} ;
 
 // --------------------------------------------------------------------------

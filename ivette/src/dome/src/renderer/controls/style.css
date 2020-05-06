@@ -1,4 +1,63 @@
 /* -------------------------------------------------------------------------- */
+/* --- Styling Labels                                                     --- */
+/* -------------------------------------------------------------------------- */
+
+.dome-xLabel {
+    padding: 2px ;
+    margin: 2px 4px ;
+}
+
+.dome-xLabel .dome-xIcon {
+    margin-right: 4px ;
+}
+
+.dome-xLabel.dome-text-descr {
+    overflow: auto ;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Styling Icons                                                      --- */
+/* -------------------------------------------------------------------------- */
+
+.dome-xIcon {
+    flex: 0 0 auto ;
+    display: inline ;
+    margin: 1px ;
+    padding: 1px 0px 0px 0px ;
+}
+
+.dome-xIcon svg {
+    position:relative ;
+}
+
+.dome-xBadge {
+    flex: 0 0 auto ;
+    display: inline ;
+    margin: 1px ;
+    padding: 1px 6px 1px 6px ;
+    height: 16px ;
+    fill: #dedede ;
+    color: #dedede ;
+    font-family: sans-serif ;
+    font-size: smaller ;
+    font-weight: bold ;
+    border-radius: 8px ;
+    background: #777 ;
+}
+
+.dome-window-inactive .dome-xBadge,
+.dome-disabled .dome-xBadge
+{
+    background: #ccc ;
+    color: #eee ;
+    fill: #eee ;
+}
+
+.dome-xBadge label {
+    position: relative ;
+    bottom: -1px ;
+}
+/* -------------------------------------------------------------------------- */
 /* --- Base Styling                                                       --- */
 /* -------------------------------------------------------------------------- */
 

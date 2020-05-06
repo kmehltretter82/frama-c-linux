@@ -2,10 +2,11 @@
 // --- ToolBars
 // --------------------------------------------------------------------------
 
-/** @module dome/layout/toolbars */
+/** @module dome/frame/toolbars */
 
 import React from 'react' ;
-import './toolbars.css' ;
+
+import './style.css' ;
 
 // --------------------------------------------------------------------------
 // --- ToolBar Container
@@ -13,7 +14,7 @@ import './toolbars.css' ;
 
 /**
    @class
-   @summary Container for toolbar items
+   @summary Container for toolbar items.
    @description
    See also [Frame](module-dome_layout_frames.Frame.html) containers.
  */
@@ -41,26 +42,22 @@ export class ToolBar extends React.Component {
 // --------------------------------------------------------------------------
 
 /**
-   @class
-   @summary Fixed (tiny) space
+   @summary Fixed (tiny) space.
 */
 export const Inset = (() => <div className='dome-xToolBar-inset'/>);
 
 /**
-   @class
-   @summary Fixed space
+   @summary Fixed space.
 */
 export const Space = (() => <div className='dome-xToolBar-space'/>);
 
 /**
-   @class
-   @summary Extensible space (can be used to right-align controls)
+   @summary Extensible space (can be used to right-align controls).
 */
 export const Filler = (() => <div className='dome-xToolBar-filler'/>);
 
 /**
-   @class
-   @summary Vertical rule
+   @summary Vertical rule.
 */
 export const Separator = () => (
   <div className='dome-xToolBar-separator'>
@@ -86,7 +83,7 @@ const isDisabled = ( { enabled=true, disabled=false } ) => (disabled || !enabled
 const onClick = ( { onClick , value } ) => onClick ? (() => onClick(value)) : undefined ;
 
 /**
-   @class
+   @summary Toolbar Button.
    @property {string} [icon] - Button icon name (See [gallery](gallery-icons.html))
    @property {string} [label] - Button label
    @property {string} [title] - Button tooltip
@@ -97,7 +94,6 @@ const onClick = ( { onClick , value } ) => onClick ? (() => onClick(value)) : un
    @property {any} [value] - button's value
    @property {any} [selection] - Currently selected value
    @property {function} [onClick] - Button callback (receives the current value)
-   @summary toolbar button
    @description
 
    By default, the propery `selected` is computed from properties `value`
@@ -130,37 +126,34 @@ export const Button = ( props ) => (
 // --------------------------------------------------------------------------
 
 /**
-   @class
+   @summary Toolbar Button Group.
    @property {Button[]} children - Buttons in the group
    @property {any} [value] - Passed to children as `selection` property
    @property {any} [onChange] - Passed to children as `onClick` property
    @property {any} [...props] - Properties passed to all children
-   @summary toolbar button group
 */
-export const ButtonGroup =
-  ({ children, value, onChange, ...props }) =>
-  {
-    if (value !== undefined ) props.selection = value ;
-    if (onChange !== undefined ) props.onClick = onChange ;
-    return (
-      <div className='dome-xToolBar-Group'>
-        {React.Children.map(children,(elt) => React.cloneElement(elt,props))}
-      </div>
-    );
-  };
+export const ButtonGroup = (props) => {
+  const { children, value, onChange, ...otherProps } = props;
+  if (value !== undefined) otherProps.selection = value;
+  if (onChange !== undefined) otherProps.onClick = onChange;
+  return (
+    <div className='dome-xToolBar-Group'>
+      {React.Children.map(children, (elt) => React.cloneElement(elt, otherProps))}
+    </div>
+  );
+};
 
 // --------------------------------------------------------------------------
 // --- ToolBar Menu
 // --------------------------------------------------------------------------
 
 /**
-   @class
+   @summary Toolbar Selector Menu.
    @property {any} [value] - selected option's value
    @property {function} [onChange] - selection callback (receives option value)
    @property {boolean} [disabled] - disable the selector (default: `false`)
    @property {boolean} [enabled] - enable the selector (default: `true`)
    @property {option[]} children - Array of menu options
-   @summary Toolbar selector menu
    @description
 
    Behaves likes a standard `<select>` element, except that callback directly
@@ -192,7 +185,5 @@ register( Space ,  'DOME_TOOLBAR_ITEM' );
 register( Separator ,  'DOME_TOOLBAR_ITEM' );
 register( Filler , 'DOME_TOOLBAR_ITEM' );
 register( Button , 'DOME_TOOLBAR_ITEM' );
-
-export default { ToolBar , Space , Inset, Separator, Filler, Button, ButtonGroup, Select };
 
 // --------------------------------------------------------------------------
