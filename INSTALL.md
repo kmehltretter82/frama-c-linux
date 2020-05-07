@@ -40,7 +40,8 @@ macOS has opam through Homebrew.
 
 Windows users can install opam via WSL (Windows Subsystem for Linux).
 
-If your system does not have an opam package >= 2.0.0 you can compile it from source,
+If your system does not have an opam package >= 2.0.0, you can
+[compile it from source]((#compiling-from-source)),
 or use the provided opam binaries available at:
 
 http://opam.ocaml.org/doc/Install.html
@@ -64,7 +65,7 @@ administrator rights on the system).
 If your system is not supported by `depext`, you will need to install
 Gtk, GtkSourceView, GnomeCanvas and GMP, including development libraries,
 separately. If you do so, please consider providing the system name and list of
-packages (e.g. via a [Github issue](https://github.com/Frama-C/Frama-C-snapshot/issues/new))
+packages (e.g. via a [Gitlab issue](https://git.frama-c.com/pub/frama-c/issues/new))
 so that we can add it to the Frama-C `depext` package.
 
     # install Frama-C
@@ -72,7 +73,8 @@ so that we can add it to the Frama-C `depext` package.
 
 ### Configuring provers for Frama-C/WP
 
-Frama-C/WP uses the [Why3](http://why3.lri.fr/) platform to run external provers for proving ACSL annotations.
+Frama-C/WP uses the [Why3](http://why3.lri.fr/) platform to run external provers
+for proving ACSL annotations.
 The Why3 platform and the Alt-Ergo prover are automatically installed _via_ opam
 when installing Frama-C.
 
@@ -307,51 +309,41 @@ Arch Linux: `pikaur -S frama-c`
 
 ### Quick Start
 
-1. Install OCaml, OCamlfind, OCamlGraph and Zarith if not already installed.
-   Note that OCaml >= 4.05.0 is needed in order to compile Frama-C.
+1. Install [opam](http://opam.ocaml.org/) and use it to get all of Frama-C's
+   dependencies (including some external ones):
 
-2. (Optional) For the GUI, also install Gtk, GtkSourceView, GnomeCanvas and
-   Lablgtk2 or Lablgtk3 + Lablgtksourceview3 if not already installed.
-   See section 'REQUIREMENTS' below for indications on the names of the
-   packages to install, or use 'opam depext' as explained in section 'Opam'
-   above.
+        opam install depext
+        opam depext frama-c
+        opam install --deps-only frama-c
 
-3. On Linux-like distributions:
+   If not using [opam](http://opam.ocaml.org/), you will need to install
+   the Frama-C dependencies by yourself. The `opam/opam` file in the Frama-C
+   .tar.gz lists the required dependencies (e.g. `ocamlfind`, `ocamlgraph`,
+   `zarith`, etc.). A few of these dependencies are optional, only required
+   for the graphical interface: `lablgtk`, `conf-gnomecanvas` and
+   `conf-gtksourceview` (or the equivalent Gtk+3 packages).
+
+2. On Linux-like distributions:
 
         ./configure && make && sudo make install
 
     See section *Configuration* below for options.
 
-4. On Windows+Cygwin:
+3. On Windows+Cygwin:
 
         ./configure --prefix="$(cygpath -a -m <installation path>)" && make && make install
 
-5. The binary `frama-c` (and `frama-c-gui` if you have lablgtk2) is now installed.
+4. The binary `frama-c` (and `frama-c-gui` if you have lablgtk2) is now installed.
 
 ### Full Compilation Guide
 
 #### Frama-C Requirements
 
-- GNU make version >= 3.81
-- OCaml >= 4.05.0
-- a C compiler with standard C and POSIX headers and libraries
-- [OCamlGraph][OCamlGraph] >= 1.8.8
-- [findlib][findlib] >= 1.6.1
-- [Zarith][Zarith]
+See the `opam/opam` file, section `depends`, for compatible OCaml versions and
+required dependencies (except for those related to `lablgtk`, which are
+required for the GUI but otherwise optional).
 
-The Frama-C GUI also requires:
-- Gtk (>= 2.4)
-- GtkSourceView 2.x or 3.x (compatible with your Gtk version)
-- GnomeCanvas 2.x (only for Gtk 2.x)
-- LablGtk >= 2.18.5 or Lablgtk3 >= beta5 + corresponding Lablgtksourceview3
-
-Plugins may have their own requirements.
-Consult their specific documentations for details.
-
-[OCamlGraph]: http://ocamlgraph.lri.fr
-[findlib]: http://projects.camlcity.org/projects/findlib.html
-[Zarith]: http://github.com/ocaml/Zarith
-
+Section `deptops` lists optional dependencies.
 
 #### Configuration
 
@@ -361,9 +353,8 @@ Frama-C is configured by `./configure [options]`.
 installation directories are available, in particular `--prefix=/path`.
 
 A plugin can be enabled by `--enable-plugin` and disabled by `--disable-plugin`.
-By default, all distributed plugins are enabled. Those who default to 'no'
-are not part of the Frama-C distribution (usually because they are too
-experimental to be released as is).
+By default, all distributed plugins are enabled, unless some optional
+dependencies are not met.
 
 See `./configure --help` for the current list of plugins, and available options.
 
@@ -376,7 +367,7 @@ Use `./configure --prefix="$(cygpath -a -m <installation path>)"`.
 
 #### Compilation
 
-Type `make`.
+Type `make` (you can use `-j` for parallelization).
 
 Some Makefile targets of interest are:
 - `doc`      generates the API documentation.
@@ -404,13 +395,14 @@ Type `make uninstall` to remove Frama-C and all the installed plugins.
 (Depending on the installation directory, this may require superuser
 privileges.)
 
+
 # Testing the Installation
 
 This step is optional.
 
 Download some test files:
 
-    export PREFIX_URL="https://raw.githubusercontent.com/Frama-C/Frama-C-snapshot/master/tests/value/"
+    export PREFIX_URL="https://git.frama-c.com/pub/frama-c/raw/master/tests/value"
     wget -P test ${PREFIX_URL}/CruiseControl.c
     wget -P test ${PREFIX_URL}/CruiseControl_const.c
     wget -P test ${PREFIX_URL}/CruiseControl.h
@@ -448,6 +440,8 @@ available:
 - some image files used by the Frama-C GUI
 - some files for Frama-C/plug-in development (autocomplete scripts,
   Emacs settings, scripts for running Eva, ...)
+- an annotated C standard library (with ACSL annotations) in `libc`
+- plugin-specific files (in directories `wp`, `e-acsl`, etc.)
 
 ## Documentation files: (in `/INSTALL_DIR/share/frama-c/doc`)
 
@@ -461,7 +455,7 @@ available:
 
 - object files of available dynamic plugins
 
-## Man files: (in `/INSTALL_DIR/man/man1`)
+## Man files: (in `/INSTALL_DIR/share/man/man1`)
 
 - `man` files for `frama-c` (and `frama-c-gui` if available)
 
