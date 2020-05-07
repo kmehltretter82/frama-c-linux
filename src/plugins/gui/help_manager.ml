@@ -37,6 +37,7 @@ let show main_ui =
     "Julien Crétin";
     "Pascal Cuoq";
     "Zaynah Dargaye";
+    "Basile Desloges";
     "Jean-Christophe Filliâtre";
     "Philippe Herrmann";
     "Maxime Jacquemin";
