@@ -34,7 +34,6 @@ prefix=framacbook@,
 \RequirePackage{lmodern}
 \RequirePackage[T1]{fontenc}
 \RequirePackage[utf8]{inputenc}
-\RequirePackage[pdftex,pdfstartview=FitH]{hyperref}
 \RequirePackage{amssymb}
 \RequirePackage{xcolor}
 \RequirePackage[pdftex]{graphicx}
@@ -45,6 +44,7 @@ prefix=framacbook@,
 \RequirePackage{fancyhdr}
 \RequirePackage{titlesec}
 \RequirePackage{upquote}
+\RequirePackage[pdftex,pdfstartview=FitH]{hyperref}
 \ifusecc\RequirePackage{doclicense}\else\fi
 % --------------------------------------------------------------------------
 % ---  Page Layout                                                       ---
