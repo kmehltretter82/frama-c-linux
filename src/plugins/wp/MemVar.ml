@@ -1322,6 +1322,8 @@ struct
     match l with
     | Ref x -> noref ~op:"assigns to" x
     | Val((CVAL|CREF),x,[]) ->
+        (* Note that 'obj' above corresponds to the elements *)
+        let obj = Ctypes.object_of x.vtype in
         [ Assert (monotonic_initialized seq obj x []) ]
     | Val((CVAL|CREF),x,ofs) as vloc ->
         let te = Lang.tau_of_object elt in
