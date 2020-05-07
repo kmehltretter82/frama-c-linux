@@ -993,11 +993,7 @@ struct
   let store_float sigma f l v = updated sigma (m_float f) l v
   let store_pointer sigma _ty l v = updated sigma M_pointer l v
 
-  let set_init_atom sigma l v = (* updated sigma T_init l v *)
-    let value = Sigma.value sigma T_init in
-    let current = F.e_get value l in
-    T_init, F.e_set value l (F.e_if current e_true v)
-
+  let set_init_atom sigma l v = updated sigma T_init l v
   let is_init_atom sigma l = F.e_get (Sigma.value sigma T_init) l
 
 end

@@ -455,7 +455,8 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   let updated_init_atom seq loc value =
-    let chunk_init,mem_init = M.set_init_atom seq.pre loc value in
+    let new_value = e_or [M.is_init_atom seq.pre loc ; value ] in
+    let chunk_init,mem_init = M.set_init_atom seq.pre loc new_value in
     Set(Sigma.value seq.post chunk_init,mem_init)
 
   let updated_atom seq obj loc value =
