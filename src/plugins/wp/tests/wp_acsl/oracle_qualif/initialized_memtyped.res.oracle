@@ -13,24 +13,24 @@
 [wp] [Alt-Ergo] Goal typed_test_check_unknown_5 : Unsuccess
 [wp] [Qed] Goal typed_test_check_qed_ok_3 : Valid
 [wp] [Qed] Goal typed_test_check_qed_ok_4 : Valid
+[wp] [Alt-Ergo] Goal typed_test_check_provable : Valid
 [wp] [Qed] Goal typed_test_check_qed_ok_5 : Valid
-[wp] [Qed] Goal typed_test_check_qed_ok_6 : Valid
 [wp] [Alt-Ergo] Goal typed_test_check_unknown_6 : Unsuccess
 [wp] [Alt-Ergo] Goal typed_test_check_unknown_7 : Unsuccess
 [wp] [Alt-Ergo] Goal typed_test_check_unknown_8 : Unsuccess
-[wp] [Qed] Goal typed_test_check_qed_ok_7 : Valid
+[wp] [Qed] Goal typed_test_check_qed_ok_6 : Valid
 [wp] [Alt-Ergo] Goal typed_test_check_unknown_9 : Unsuccess
 [wp] [Alt-Ergo] Goal typed_test_check_unknown_10 : Unsuccess
 [wp] [Alt-Ergo] Goal typed_test_check_unknown_11 : Unsuccess
-[wp] [Qed] Goal typed_test_check_qed_ok_8 : Valid
+[wp] [Alt-Ergo] Goal typed_test_check_provable_2 : Valid
 [wp] [Alt-Ergo] Goal typed_test_check_unknown_12 : Unsuccess
-[wp] [Alt-Ergo] Goal typed_test_check_provable : Valid
+[wp] [Alt-Ergo] Goal typed_test_check_provable_3 : Valid
 [wp] [Alt-Ergo] Goal typed_test_check_unknown_13 : Unsuccess
-[wp] [Qed] Goal typed_test_check_qed_ok_9 : Valid
+[wp] [Alt-Ergo] Goal typed_test_check_provable_4 : Valid
 [wp] Proved goals:   10 / 23
-  Qed:             9 
-  Alt-Ergo:        1  (unsuccess: 13)
+  Qed:             6 
+  Alt-Ergo:        4  (unsuccess: 13)
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  test                      9        1       23      43.5%
+  test                      6        4       23      43.5%
 ------------------------------------------------------------

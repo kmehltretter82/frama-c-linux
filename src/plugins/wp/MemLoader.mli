@@ -75,8 +75,10 @@ sig
   val store_float : Sigma.t -> c_float -> loc -> term -> Chunk.t * term
   val store_pointer : Sigma.t -> typ -> loc -> term -> Chunk.t * term
 
-  val set_init_atom : Sigma.t -> loc -> term -> Chunk.t * term
   val is_init_atom : Sigma.t -> loc -> term
+  val set_init_atom : Sigma.t -> loc -> term -> Chunk.t * term
+  val set_init : c_object -> loc -> length:term ->
+    Chunk.t -> current:term -> term
   val monotonic_init : Sigma.t -> Sigma.t -> pred
 
 end

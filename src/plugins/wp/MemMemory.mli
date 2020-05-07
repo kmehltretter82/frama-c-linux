@@ -49,6 +49,7 @@ val f_global : lfun
 val f_shift : lfun
 val f_offset : lfun
 val f_havoc : lfun
+val f_set_init : lfun
 val f_region : lfun
 val f_addr_of_int : lfun (** Physical address *)
 val f_int_of_addr : lfun (** Physical address *)

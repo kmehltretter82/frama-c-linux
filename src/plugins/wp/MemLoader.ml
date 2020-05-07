@@ -79,8 +79,10 @@ sig
   val store_float : Sigma.t -> c_float -> loc -> term -> Chunk.t * term
   val store_pointer : Sigma.t -> typ -> loc -> term -> Chunk.t * term
 
-  val set_init_atom : Sigma.t -> loc -> term -> Chunk.t * term
   val is_init_atom : Sigma.t -> loc -> term
+  val set_init_atom : Sigma.t -> loc -> term -> Chunk.t * term
+  val set_init : c_object -> loc -> length:term ->
+    Chunk.t -> current:term -> term
   val monotonic_init : Sigma.t -> Sigma.t -> pred
 
 end
@@ -113,7 +115,6 @@ struct
   let pp_rid fmt r = if r <> 0 then Format.fprintf fmt "_R%03d" r
 
   let loadrec = ref (fun _ _ _ -> assert false)
-  let initrec = ref (fun _ _ _ -> assert false)
 
   (* -------------------------------------------------------------------------- *)
   (* --- Frame Lemmas for Compound Access                                   --- *)
@@ -175,18 +176,9 @@ struct
     let pretty fmt (r,c) = Format.fprintf fmt "%d:%a" r Compinfo.pretty c
   end
 
-  module type COMP_CONFIG = sig
-    val name: string
-    val footprint: c_object -> M.loc -> M.Sigma.domain
-    val tau_of: compinfo -> tau
-    val id_of: compinfo -> string
-    val kind: datakind
-    val load: Sigma.t -> c_object -> M.loc -> term
-  end
-
-  module COMPGEN(C: COMP_CONFIG) = WpContext.Generator(COMP_KEY)
+  module COMP = WpContext.Generator(COMP_KEY)
       (struct
-        let name = M.name ^ "." ^ C.name
+        let name = M.name ^ ".COMP"
         type key = int * compinfo
         type data = lfun * chunk list
 
@@ -195,15 +187,17 @@ struct
           let v = e_var x in
           let obj = C_comp c in
           let loc = M.of_region_pointer r obj v in (* t_pointer -> loc *)
-          let domain = C.footprint obj loc in
-          let result = C.tau_of c in
-          let lfun = Lang.generated_f ~result "Load%a_%s" pp_rid r (C.id_of c) in
+          let domain = M.value_footprint obj loc in
+          let result = Lang.tau_of_comp c in
+          let lfun =
+            Lang.generated_f ~result "Load%a_%s" pp_rid r (Lang.comp_id c)
+          in
           (* Since its a generated it is the unique name given *)
           let xms,chunks,sigma = signature domain in
           let def = List.map
               (fun f ->
-                 Cfield (f, C.kind) ,
-                 C.load sigma (object_of f.ftype) (M.field loc f)
+                 Cfield (f, KValue) ,
+                 !loadrec sigma (object_of f.ftype) (M.field loc f)
               ) c.cfields in
           let dfun = Definitions.Function( result , Def , e_record def ) in
           Definitions.define_symbol {
@@ -216,25 +210,6 @@ struct
           lfun , chunks
 
         let compile = Lang.local generate
-      end)
-
-  module COMP = COMPGEN
-      (struct
-        let name = "COMP"
-        let footprint = M.value_footprint
-        let tau_of = Lang.tau_of_comp
-        let id_of = Lang.comp_id
-        let kind = KValue
-        let load sigma = !loadrec sigma
-      end)
-  module COMPINIT = COMPGEN
-      (struct
-        let name = "COMPINIT"
-        let footprint = M.init_footprint
-        let tau_of = Lang.init_of_comp
-        let id_of = Lang.comp_init_id
-        let kind = KInit
-        let load sigma = !initrec sigma
       end)
 
   (* -------------------------------------------------------------------------- *)
@@ -250,18 +225,10 @@ struct
       if r1 = r2 then Matrix.NATURAL.compare m1 m2 else r1-r2
   end
 
-  module type ARRAY_CONFIG = sig
-    val name: string
-    val footprint: c_object -> M.loc -> M.Sigma.domain
-    val tau_of_matrix: c_object -> Matrix.dim list -> tau
-    val fun_ext: string
-    val load: Sigma.t -> c_object -> M.loc -> term
-  end
-
-  module ARRAYGEN(C: ARRAY_CONFIG) = WpContext.Generator(ARRAY_KEY)
+  module ARRAY = WpContext.Generator(ARRAY_KEY)
       (struct
         open Matrix
-        let name = M.name ^ "." ^ C.name
+        let name = M.name ^ ".ARRAY"
         type key = int * arrayinfo * Matrix.matrix
         type data = lfun * chunk list
 
@@ -270,12 +237,11 @@ struct
           let v = e_var x in
           let obj_a = C_array ainfo in
           let loc = M.of_region_pointer r obj_a v in (* t_pointer -> loc *)
-          let domain = C.footprint obj_a loc in
-          let result = C.tau_of_matrix obj_e ds in
+          let domain = M.value_footprint obj_a loc in
+          let result = Matrix.tau obj_e ds in
           let lfun =
-            Lang.generated_f ~result "Array%s%a%s_%s"
-              C.fun_ext pp_rid r
-              (Matrix.id ds) (Matrix.natural_id obj_e)
+            Lang.generated_f ~result "Array%a%s_%s"
+              pp_rid r (Matrix.id ds) (Matrix.natural_id obj_e)
           in
           let prefix = Lang.Fun.debug lfun in
           let axiom = prefix ^ "_access" in
@@ -284,7 +250,7 @@ struct
           let phi = e_fun lfun (v :: denv.size_val @ List.map e_var xmem) in
           let va = List.fold_left e_get phi denv.index_val in
           let ofs = e_sum denv.index_offset in
-          let vm = C.load sigma obj_e (M.shift loc obj_e ofs) in
+          let vm = !loadrec sigma obj_e (M.shift loc obj_e ofs) in
           let lemma = p_hyps denv.index_range (p_equal va vm) in
           let cluster = cluster () in
           Definitions.define_symbol {
@@ -310,25 +276,6 @@ struct
 
         let compile = Lang.local generate
       end)
-
-  module ARRAY = ARRAYGEN
-      (struct
-        let name = "ARRAY"
-        let footprint = M.value_footprint
-        let tau_of_matrix = Matrix.tau
-        let fun_ext = ""
-        let load sigma = !loadrec sigma
-      end)
-
-  module ARRAYINIT = ARRAYGEN
-      (struct
-        let name = "ARRAYINIT"
-        let footprint = M.init_footprint
-        let tau_of_matrix = Matrix.init
-        let fun_ext = "Init"
-        let load sigma = !initrec sigma
-      end)
-
 
   (* -------------------------------------------------------------------------- *)
   (* --- Loader                                                             --- *)
@@ -368,52 +315,92 @@ struct
   (* --- Initialized                                                        --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let initvalue_comp sigma comp loc =
-    let r , p = M.to_region_pointer loc in
-    let f , m = COMPINIT.get (r,comp) in
-    F.e_fun f (p :: memories sigma m)
+  let isinitrec = ref (fun _ _ _ -> assert false)
 
-  let initvalue_array sigma a loc =
+  module IS_INIT_COMP = WpContext.Generator(COMP_KEY)
+      (struct
+        let name = M.name ^ ".IS_INIT_COMP"
+        type key = int * compinfo
+        type data = lfun * chunk list
+
+        let generate (r,c) =
+          let x = Lang.freshvar ~basename:"p" (Lang.t_addr()) in
+          let v = e_var x in
+          let obj = C_comp c in
+          let loc = M.of_region_pointer r obj v in (* t_pointer -> loc *)
+          let domain = M.init_footprint obj loc in
+          let name =
+            Format.asprintf "Is%s%a" (Lang.comp_init_id c) pp_rid r
+          in
+          let lfun = Lang.generated_p name in
+          let xms,chunks,sigma = signature domain in
+          let def = List.map
+              (fun f -> !isinitrec sigma (object_of f.ftype) (M.field loc f))
+              c.cfields
+          in
+          let dfun = Definitions.Predicate(Def , p_conj def ) in
+          Definitions.define_symbol {
+            d_lfun = lfun ; d_types = 0 ;
+            d_params = x :: xms ;
+            d_definition = dfun ;
+            d_cluster = cluster () ;
+          } ;
+          lfun , chunks
+
+        let compile = Lang.local generate
+      end)
+
+  module ARRAYINIT = WpContext.Generator(ARRAY_KEY)
+      (struct
+        open Matrix
+        let name = M.name ^ ".ARRAYINIT"
+        type key = int * arrayinfo * Matrix.matrix
+        type data = lfun * chunk list
+
+        let generate (r,ainfo,(obj_e,ds)) =
+          let x = Lang.freshvar ~basename:"p" (Lang.t_addr()) in
+          let v = e_var x in
+          let obj_a = C_array ainfo in
+          let loc = M.of_region_pointer r obj_a v in (* t_pointer -> loc *)
+          let domain = M.init_footprint obj_a loc in
+          let name = Format.asprintf "IsInitArray%a%s_%s"
+              pp_rid r (Matrix.id ds) (Matrix.natural_id obj_e)
+          in
+          let lfun = Lang.generated_p name in
+          let xmem,chunks,sigma = signature domain in
+          let denv = Matrix.denv ds in
+          let ofs = e_sum denv.index_offset in
+          let vm = !isinitrec sigma obj_e (M.shift loc obj_e ofs) in
+          let def = p_forall denv.index_var (p_hyps denv.index_range vm) in
+          Definitions.define_symbol {
+            d_lfun = lfun ; d_types = 0 ;
+            d_params = x :: denv.size_var @ xmem ;
+            d_definition = Predicate (Def, def) ;
+            d_cluster = cluster () ;
+          } ;
+          lfun , chunks
+
+        let compile = Lang.local generate
+      end)
+
+  let initialized_comp sigma comp loc =
+    let r , p = M.to_region_pointer loc in
+    let f , m = IS_INIT_COMP.get (r,comp) in
+    F.p_call f (p :: memories sigma m)
+
+  let initialized_array sigma a loc =
     let d = Matrix.of_array a in
     let r , p = M.to_region_pointer loc in
     let f , m = ARRAYINIT.get (r,a,d) in
-    F.e_fun f (p :: Matrix.size d @ memories sigma m)
+    F.p_call f (p :: Matrix.size d @ memories sigma m)
 
-  let initvalue sigma obj loc =
+  let initialized_loc sigma obj loc =
     match obj with
-    | C_int _ | C_float _ | C_pointer _ ->  M.is_init_atom sigma loc
-    | C_comp ci -> initvalue_comp sigma ci loc
-    | C_array a -> initvalue_array sigma a loc
+    | C_int _ | C_float _ | C_pointer _ -> p_bool (M.is_init_atom sigma loc)
+    | C_comp ci -> initialized_comp sigma ci loc
+    | C_array a -> initialized_array sigma a loc
 
-  let () = initrec := initvalue
-
-  let rec initialized_loc sigma obj loc =
-    match obj with
-    | C_int _ | C_float _ | C_pointer _ ->
-        p_bool (initvalue sigma obj loc)
-    | C_comp ci ->
-        let initialized_field f =
-          initialized_loc sigma (object_of f.ftype) (M.field loc f)
-        in
-        p_conj (List.map initialized_field ci.cfields)
-    | C_array ai ->
-        let obj_e, ds = Matrix.of_array ai in
-        let denv = Matrix.denv ds in
-        let access =
-          List.fold_left
-            (fun loc ofs -> M.shift loc obj_e ofs) loc denv.index_val
-        in
-        let make_subst var size p =
-          match size with
-          | None -> p
-          | Some i -> p_subst_var var (e_int i) p
-        in
-        let substs = List.map2 make_subst denv.size_var ds in
-        let conj =
-          List.fold_left (fun p f -> f p) (p_conj denv.index_range) substs
-        in
-        p_forall denv.index_var
-          (p_imply conj (initialized_loc sigma obj_e access))
+  let () = isinitrec := initialized_loc
 
   let initialized sigma = function
     | Rloc(obj, loc) -> initialized_loc sigma obj loc
@@ -432,7 +419,7 @@ struct
   (* --- Havocs                                                             --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let havoc_length s obj loc length =
+  let gen_havoc_length get_domain s obj loc length =
     let ps = ref [] in
     Domain.iter
       (fun chunk ->
@@ -443,15 +430,31 @@ struct
          let fresh = F.e_var (Lang.freshvar ~basename tau) in
          let havoc = M.havoc obj loc ~length chunk ~fresh ~current:pre in
          ps := Set(post,havoc) :: !ps
-      ) (domain obj loc) ; !ps
+      ) (get_domain obj loc) ; !ps
 
+  let havoc_length = gen_havoc_length M.value_footprint
   let havoc seq obj loc = havoc_length seq obj loc F.e_one
+
+  let havoc_init_length = gen_havoc_length M.init_footprint
+  let havoc_init seq obj loc = havoc_init_length seq obj loc F.e_one
+
+  let set_init_length s obj loc length =
+    let ps = ref [] in
+    Domain.iter
+      (fun chunk ->
+         let pre = Sigma.value s.pre chunk in
+         let post = Sigma.value s.post chunk in
+         let set = M.set_init obj loc ~length chunk ~current:pre in
+         ps := Set(post,set) :: !ps
+      ) (M.init_footprint obj loc) ; !ps
+
+  let set_init seq obj loc = set_init_length seq obj loc F.e_one
 
   (* -------------------------------------------------------------------------- *)
   (* --- Stored & Copied                                                    --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let updated_init seq loc value =
+  let updated_init_atom seq loc value =
     let chunk_init,mem_init = M.set_init_atom seq.pre loc value in
     Set(Sigma.value seq.post chunk_init,mem_init)
 
@@ -468,11 +471,10 @@ struct
   let stored seq obj loc value =
     match obj with
     | C_int _ | C_float _ | C_pointer _ ->
-        updated_init seq loc e_true :: [ updated_atom seq obj loc value ]
+        updated_atom seq obj loc value :: [ updated_init_atom seq loc e_true ]
     | C_comp _ | C_array _ ->
-        let init = Cvalues.initialized_obj obj in
-        Set(initvalue seq.post obj loc, init) ::
-        Set(loadvalue seq.post obj loc, value) :: havoc seq obj loc
+        let set_value = Set(loadvalue seq.post obj loc, value) in
+        set_value :: havoc seq obj loc @ set_init seq obj loc
 
   let copied s obj p q = stored s obj p (loadvalue s.pre obj q)
 
@@ -485,13 +487,14 @@ struct
     | C_int _ | C_float _ | C_pointer _ ->
         let value = Lang.freshvar ~basename:"v" (Lang.tau_of_object obj) in
         let init = Lang.freshvar ~basename:"i" (Lang.init_of_object obj) in
-        [ updated_init seq loc (e_var init) ;
+        [ updated_init_atom seq loc (e_var init) ;
           updated_atom seq obj loc (e_var value) ]
     | C_comp _ | C_array _ ->
-        havoc seq obj loc
+        havoc seq obj loc @ havoc_init seq obj loc
 
   let assigned_range s obj l a b =
-    havoc_length s obj (M.shift l obj a) (e_range a b)
+    havoc_length s obj (M.shift l obj a) (e_range a b) @
+    havoc_init_length s obj (M.shift l obj a) (e_range a b)
 
   let assigned seq obj sloc =
     Assert (M.monotonic_init seq.pre seq.post) ::

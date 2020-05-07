@@ -814,6 +814,10 @@ struct
     | _ -> error "Can not store pointer values into %a" pretty loc
 
   let set_init_atom _ _ _ = assert false
+  let set_init _obj _loc ~length _chunk ~current =
+    let _ = length in
+    let _ = current in
+    assert false
   let is_init_atom _ _ = assert false
   let monotonic_init _ _ = assert false
 

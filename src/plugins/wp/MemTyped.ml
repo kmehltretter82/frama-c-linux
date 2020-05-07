@@ -967,13 +967,14 @@ struct
       F.e_fun f_havoc [fresh;current;loc;n]
     else fresh
 
+  let set_init obj loc ~length _chunk ~current =
+    let n = F.e_fact (length_of_object obj) length in
+    F.e_fun f_set_init [current;loc;n]
+
   let monotonic_init s1 s2 =
     let m1 = Sigma.value s1 T_init in
     let m2 = Sigma.value s2 T_init in
-    let p = Lang.freshvar ~basename:"p" t_addr in
-    p_forall [p]
-      (p_imply (p_bool (e_get m1 (e_var p))) (p_bool (e_get m2 (e_var p))))
-    (* F.p_call p_monotonic [m1; m2] *)
+    F.p_call p_monotonic [m1; m2]
 
   let eqmem obj loc _chunk m1 m2 =
     F.p_call p_eqmem [m1;m2;loc;e_int (length_of_object obj)]
@@ -992,7 +993,11 @@ struct
   let store_float sigma f l v = updated sigma (m_float f) l v
   let store_pointer sigma _ty l v = updated sigma M_pointer l v
 
-  let set_init_atom sigma l v = updated sigma T_init l v
+  let set_init_atom sigma l v = (* updated sigma T_init l v *)
+    let value = Sigma.value sigma T_init in
+    let current = F.e_get value l in
+    T_init, F.e_set value l (F.e_if current e_true v)
+
   let is_init_atom sigma l = F.e_get (Sigma.value sigma T_init) l
 
 end

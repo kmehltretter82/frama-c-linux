@@ -69,6 +69,11 @@ theory Memory
 
   function havoc (m0 m1 : map addr 'a) (p:addr) (a:int) : map addr 'a
 
+  function set_init (m: map addr bool) (p:addr) (a:int) : map addr bool
+
+  predicate monotonic_init(m1 m2 : map addr bool) =
+    forall p: addr. m1[p] -> m2[p]
+
   predicate valid_rw (m : map int int) (p:addr) (n:int) =
     n > 0 -> (  0 < p.base /\ 0 <= p.offset /\ p.offset + n <= m[p.base] )
 
@@ -103,9 +108,6 @@ theory Memory
     q.offset <= j < q.offset + b ->
     { base = p.base ; offset = i } <>
     { base = q.base ; offset = j }
-
-  predicate monotonic_init(m1 m2 : map addr bool) =
-    forall p: addr. m1[p] -> m2[p]
 
   (* Regions *)
 
@@ -159,7 +161,15 @@ theory Memory
     forall m0 m1 : map addr 'a.
     forall q p : addr.
     forall a : int.
-    (Map.([]) (havoc m0 m1 p a) (q)) = (if (separated q 1 p a) then (Map.([]) (m1) (q)) else (Map.([]) (m0) (q)))
+    (Map.([]) (havoc m0 m1 p a) (q)) =
+      (if (separated q 1 p a) then (Map.([]) (m1) (q)) else (Map.([]) (m0) (q)))
+
+  lemma set_init_access :
+    forall m : map addr bool.
+    forall q p : addr.
+    forall a : int.
+    (Map.([]) (set_init m p a) (q)) =
+      (if (separated q 1 p a) then (Map.([]) (m) (q)) else true)
 
   (* Physical Address *)
 
