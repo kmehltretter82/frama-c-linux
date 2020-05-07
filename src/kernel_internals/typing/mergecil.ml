@@ -2659,7 +2659,7 @@ let update_formals_names merged_vi curr_vi =
        (*existing prototype does not have formals list. Just use current one*)
        Cil.unsafeSetFormalsDecl merged_vi curr_args)
   | exception Not_found -> ()
-    (* current prototype does not have formals list, nothing to merge. *)
+(* current prototype does not have formals list, nothing to merge. *)
 
 (* Now we go once more through the file and we rename the globals that we
  * keep. We also scan the entire body and we replace references to the
