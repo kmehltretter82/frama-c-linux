@@ -24,7 +24,7 @@ include Plugin.Register
   (struct
      let name = "impact"
      let shortname = "impact"
-     let help = "impact analysis (experimental)"
+     let help = "impact analysis"
    end)
 
 module Pragma =
