@@ -18,6 +18,7 @@ Open Source Release <next-release>
 ##################################
 
 -*  Doc       [2020/05/07] Fixes internal refs in generated pdfs (fixes #2505)
+-*  Kernel    [2020/05/04] Accept UCN-encoded unicode char in ACSL (fixes #@849)
 o   Kernel    [2020/04/27] Plug-ins specific dirs now use Filepath instead of
               mere strings.
 -   Eva       [2020/04/10] Fixes the Memexec cache on functions with logical
