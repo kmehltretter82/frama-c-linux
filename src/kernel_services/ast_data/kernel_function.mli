@@ -186,19 +186,19 @@ val is_entry_point: t -> bool
 val is_main: t -> bool
 (** @return true iff the given function is the function called 'main' in the
     program.
-    @since Frama-C+dev *)
+    @since 21.0-Scandium *)
 
 val returns_void : t -> bool
 
 val is_first_stmt: t -> stmt -> bool
   (** @return true iff the statement is the first statement of the given
       function.
-      @since Frama-C+dev *)
+      @since 21.0-Scandium *)
 
 val is_return_stmt: t -> stmt -> bool
   (** @return true iff the statement is the return statement of the given
       function.
-      @since Frama-C+dev *)
+      @since 21.0-Scandium *)
 
 (* ************************************************************************* *)
 (** {2 Getters} *)
@@ -230,7 +230,7 @@ val get_definition : t -> fundec
 
 val has_definition : t -> bool
   (** @return [true] iff the given kernel function has a defintion.
-      @since Frama-C+dev *)
+      @since 21.0-Scandium *)
 
 (* ************************************************************************* *)
 (** {2 Membership of variables} *)

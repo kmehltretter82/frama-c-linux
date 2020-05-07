@@ -1163,7 +1163,7 @@ val has_extern_local_init: block -> bool
 
 (** returns [true] iff the given block is a ghost else block.
 
-    @since Frama-C+dev
+    @since 21.0-Scandium
 *)
 val is_ghost_else: block -> bool
 
@@ -1449,13 +1449,13 @@ val isVolatileTermLval : term_lval -> bool
 val isGhostType : typ -> bool
 (** Check for ["ghost"] qualifier from the type of an l-value (do not follow pointer)
     @return true iff a part of the related l-value has ["ghost"] qualifier
-    @since Frama-C+dev *)
+    @since 21.0-Scandium *)
 
 val isWFGhostType : typ -> bool
 (** Check if the received type is well-formed according to \ghost semantics, that is
     once the type is not ghost anymore, \ghost cannot appear again.
     @return true iff the type is well formed
-    @since Frama-C+dev *)
+    @since 21.0-Scandium *)
 
 (* ************************************************************************* *)
 (** {2 The visitor} *)
@@ -1756,7 +1756,7 @@ end
 
     @since Sodium-20150201
     @modify Silicon-20161101
-    @deprecated Frama-C+dev
+    @deprecated 21.0-Scandium
 *)
 val register_behavior_extension:
   string ->
@@ -2327,7 +2327,7 @@ val set_extension_handler:
   unit
 (** Used to setup a reference related to the handling of ACSL extensions.
     If your name is not [Acsl_extension], do not call this
-    @since Frama-C+dev
+    @since 21.0-Scandium
 *)
 
 val set_deprecated_extension_handler:
