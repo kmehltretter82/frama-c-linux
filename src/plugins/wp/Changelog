@@ -20,6 +20,10 @@
 #   <Prover>: prover
 ###############################################################################
 
+#########################
+Plugin WP 21.0 (Scandium)
+#########################
+
  - WP          [2020-04-10] Full support for Why3 IEEE float library
  - WP          [2020-04-10] Removed option -wp-check
  - WP          [2020-04-09] Added smoke tests for dead call (-wp-smoke-dead-call)
