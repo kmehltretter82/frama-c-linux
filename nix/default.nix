@@ -45,16 +45,16 @@ rec {
         setupHook = pkgs.writeText "setupHook.sh" ''
           addFramaCPath () {
             if test -d "''$1/lib/frama-c/plugins"; then
-              export FRAMAC_PLUGIN="''${FRAMAC_PLUGIN}''${FRAMAC_PLUGIN:+:}''$1/lib/frama-c/plugins"
-              export OCAMLPATH="''${OCAMLPATH}''${OCAMLPATH:+:}''$1/lib/frama-c/plugins"
+              export FRAMAC_PLUGIN="''${FRAMAC_PLUGIN:-}''${FRAMAC_PLUGIN:+:}''$1/lib/frama-c/plugins"
+              export OCAMLPATH="''${OCAMLPATH:-}''${OCAMLPATH:+:}''$1/lib/frama-c/plugins"
             fi
 
             if test -d "''$1/lib/frama-c"; then
-              export OCAMLPATH="''${OCAMLPATH}''${OCAMLPATH:+:}''$1/lib/frama-c"
+              export OCAMLPATH="''${OCAMLPATH:-}''${OCAMLPATH:+:}''$1/lib/frama-c"
             fi
 
             if test -d "''$1/share/frama-c/"; then
-              export FRAMAC_EXTRA_SHARE="''${FRAMAC_EXTRA_SHARE}''${FRAMAC_EXTRA_SHARE:+:}''$1/share/frama-c"
+              export FRAMAC_EXTRA_SHARE="''${FRAMAC_EXTRA_SHARE:-}''${FRAMAC_EXTRA_SHARE:+:}''$1/share/frama-c"
             fi
 
           }
