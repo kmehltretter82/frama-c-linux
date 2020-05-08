@@ -32,6 +32,9 @@ int main(int c) {
   //@ requires after_label: \true;
   y=8;
 
+  /*@ ensures x == 0 || x == 7; */
+  x = (c >= 3) ? 0 : 7;
+
   /*@ requires x == 7;  */
   /*@ ensures x == 7; */
   return 0;

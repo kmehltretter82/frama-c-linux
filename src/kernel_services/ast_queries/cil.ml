@@ -644,6 +644,14 @@ and enforceGhostBlockCoherence ?(force_ghost=false) block =
   let force_ghost = force_ghost || is_ghost_else block  in
   List.iter (enforceGhostStmtCoherence ~force_ghost) block.bstmts
 
+(* makes sure that the type of a C variable and the type of its associated
+   logic variable -if any- stay synchronized. See bts 1538 *)
+let update_var_type v t =
+  v.vtype <- if v.vghost then typeAddGhost t else t;
+  match v.vlogic_var_assoc with
+  | None -> ()
+  | Some lv -> lv.lv_type <- Ctype t
+
 (* Make a varinfo. Used mostly as a helper function below  *)
 let makeVarinfo
     ?(source=true) ?(temp=false) ?(referenced=false) ?(ghost=false) ?(loc=Location.unknown)
@@ -728,10 +736,10 @@ let setFormals (f: fundec) (forms: varinfo list) =
   assert (getFormalsDecl f.svar == f.sformals);
   match unrollType f.svar.vtype with
     TFun(rt, _, isva, fa) ->
-    f.svar.vtype <-
-      TFun(rt,
-           Some (List.map (fun a -> (a.vname, a.vtype, a.vattr)) forms),
-           isva, fa)
+    update_var_type f.svar
+      (TFun(rt,
+            Some (List.map (fun a -> (a.vname, a.vtype, a.vattr)) forms),
+            isva, fa));
   | _ ->
     Kernel.fatal "Set formals. %s does not have function type" f.svar.vname
 
@@ -1868,6 +1876,10 @@ and childrenPredicateNode vis p =
     let s' = visitCilLogicLabel vis s in
     let t' = vTerm t in
     if t' != t || s != s' then Pvalid_read (s',t') else p
+  | Pobject_pointer (s,t) ->
+    let s' = visitCilLogicLabel vis s in
+    let t' = vTerm t in
+    if t' != t || s != s' then Pobject_pointer (s',t') else p
   | Pvalid_function t ->
     let t' = vTerm t in
     if t' != t then Pvalid_function t' else p
@@ -2645,9 +2657,10 @@ and childrenVarDecl (vis : cilVisitor) (v : varinfo) : varinfo =
     let o = Visitor_behavior.Get_orig.logic_var vis#behavior lv in
     visitCilLogicVarDecl vis o
   in
-  v.vtype <- visitCilType vis v.vtype;
+  let typ = visitCilType vis v.vtype in
   v.vattr <- visitCilAttributes vis v.vattr;
   v.vlogic_var_assoc <- optMapNoCopy visit_orig_var_assoc v.vlogic_var_assoc;
+  update_var_type v typ;
   v
 
 and visitCilVarUse vis v =
@@ -3058,6 +3071,17 @@ let intKindForValue i (unsigned: bool) =
   else if fitsInInt ILong i then ILong
   else if fitsInInt ILongLong i then ILongLong
   else raise Not_representable
+
+(* True is an double constant is finite for a kind *)
+let isFiniteFloat fk v =
+  Floating_point.isfinite @@
+  match fk with
+  | FFloat -> Floating_point.round_to_single_precision_float v
+  | _ -> v
+
+
+let isExactFloat fk r =
+  r.r_upper = r.r_lower && isFiniteFloat fk r.r_nearest
 
 (* Construct an integer constant with possible truncation if the kind is not
    specified  *)
@@ -3606,7 +3630,7 @@ let getReturnType t =
 let setReturnTypeVI (v: varinfo) (t: typ) =
   match unrollType v.vtype with
   | TFun (_, args, va, a) ->
-    v.vtype <- TFun (t, args, va, a)
+    update_var_type v (TFun (t, args, va, a));
   | _ -> Kernel.fatal "setReturnType: not a function type"
 
 let setReturnType (f:fundec) (t:typ) =
@@ -3627,7 +3651,7 @@ let typeOf_array_elem t =
 
 let no_op_coerce typ t =
   match typ with
-  | Lreal -> true
+  | Lreal -> isLogicArithmeticType t.term_type
   | Linteger -> isLogicIntegralType t.term_type
   | Ltype _ when Logic_const.is_boolean_type typ ->
     isLogicPureBooleanType t.term_type
@@ -4505,19 +4529,6 @@ and constFold (machdep: bool) (e: exp) : exp =
   | AlignOfE _ | AlignOf _ | SizeOfStr _ | SizeOfE _ | SizeOf _ ->
     e (* Depends on machdep. Do not evaluate in this case*)
 
-  (* Special case to handle the C macro 'offsetof' *)
-  | CastE(it,
-          { enode = AddrOf (Mem ({enode = CastE(TPtr(bt, _), z)}), off)})
-    when machdep && isZero z -> begin
-      try
-        let start, _width = bitsOffset bt off in
-        if start mod 8 <> 0 then
-          Kernel.error ~current:true "Using offset of bitfield" ;
-        constFold machdep
-          (new_exp ~loc (CastE(it, (integer ~loc (start / 8)))))
-      with SizeOfError _ -> e
-    end
-
   | CastE (t, e) -> begin
       Kernel.debug ~dkey "ConstFold CAST to %a@." !pp_typ_ref t ;
       let e = constFold machdep e in
@@ -4983,13 +4994,7 @@ let initGccBuiltins () : unit =
   add "coshf" floatType [ floatType ] false;
   add "coshl" longDoubleType [ longDoubleType ] false;
 
-  add "clz" intType [ uintType ] false;
-  add "clzl" intType [ ulongType ] false;
-  add "clzll" intType [ ulongLongType ] false;
   add "constant_p" intType [ intType ] false;
-  add "ctz" intType [ uintType ] false;
-  add "ctzl" intType [ ulongType ] false;
-  add "ctzll" intType [ ulongLongType ] false;
 
   add "exp" doubleType [ doubleType ] false;
   add "expf" floatType [ floatType ] false;
@@ -5059,10 +5064,6 @@ let initGccBuiltins () : unit =
   add "parity" intType [ uintType ] false;
   add "parityl" intType [ ulongType ] false;
   add "parityll" intType [ ulongLongType ] false;
-
-  add "popcount" intType [ uintType ] false;
-  add "popcountl" intType [ ulongType ] false;
-  add "popcountll" intType [ ulongLongType ] false;
 
   add "powi" doubleType [ doubleType; intType ] false;
   add "powif" floatType [ floatType; intType ] false;
@@ -5208,13 +5209,20 @@ let initVABuiltins () =
 let initMsvcBuiltins () : unit =
   (** Take a number of wide string literals *)
   Builtin_functions.add "__annotation" (voidType, [ ], true)
-;;
+
+let init_common_builtins () =
+  add_builtin
+    "offsetof"
+    theMachine.typeOfSizeOf
+    [ theMachine.typeOfSizeOf ]
+    false
 
 let init_builtins () =
   if not (TheMachine.is_computed ()) then
     Kernel.fatal ~current:true "You must call initCIL before init_builtins" ;
   if Builtin_functions.length () <> 0 then
     Kernel.fatal ~current:true "Cil builtins already initialized." ;
+  init_common_builtins ();
   if msvcMode () then
     initMsvcBuiltins ()
   else begin
@@ -5385,12 +5393,11 @@ let setFunctionType (f: fundec) (t: typ) =
     if List.length f.sformals <> List.length args then
       Kernel.fatal ~current:true "setFunctionType: number of arguments differs from the number of formals" ;
     (* Change the function type. *)
-    f.svar.vtype <- t;
+    update_var_type f.svar t;
     (* Change the sformals and we know that indirectly we'll change the
      * function type *)
     List.iter2
-      (fun (_an,at,aa) f ->
-         f.vtype <- at; f.vattr <- aa)
+      (fun (_an,at,aa) f -> update_var_type f at; f.vattr <- aa)
       args f.sformals
 
   | _ -> Kernel.fatal ~current:true "setFunctionType: not a function type"
@@ -5404,7 +5411,7 @@ let setFunctionTypeMakeFormals (f: fundec) (t: typ) =
       Kernel.fatal ~current:true "setFunctionTypMakeFormals called on function %s with some formals already"
         f.svar.vname ;
     (* Change the function type. *)
-    f.svar.vtype <- t;
+    update_var_type f.svar t;
     f.sformals <-
       List.map (fun (n,t,_a) -> makeLocal ~formal:true f n t) args;
     setFunctionType f t
@@ -6507,14 +6514,6 @@ let is_modifiable_lval lv =
   | _ -> (not (isConstType t)
           || is_mutable_or_initialized lv) && isCompleteType t
 
-(* makes sure that the type of a C variable and the type of its associated
-   logic variable -if any- stay synchronized. See bts 1538 *)
-let update_var_type v t =
-  v.vtype <- if v.vghost then typeAddGhost t else t;
-  match v.vlogic_var_assoc with
-  | None -> ()
-  | Some lv -> lv.lv_type <- Ctype t
-
 (** Uniquefy the variable names *)
 let uniqueVarNames (f: file) : unit =
   (* Setup the alpha conversion table for globals *)
@@ -6945,7 +6944,7 @@ and free_vars_predicate bound_vars p = match p.pred_content with
          Logic_var.Set.union (free_vars_term bound_vars t) acc)
       Logic_var.Set.empty tl
   | Pallocable (_,t) | Pfreeable (_,t)
-  | Pvalid (_,t) | Pvalid_read (_,t) | Pvalid_function t
+  | Pvalid (_,t) | Pvalid_read (_,t) | Pobject_pointer (_, t) | Pvalid_function t
   | Pinitialized (_,t) | Pdangling (_,t) ->
     free_vars_term bound_vars t
   | Pseparated seps ->

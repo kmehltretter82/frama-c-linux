@@ -125,7 +125,7 @@ class visit_adding_code_for_synchronisation =
            - what about varargs?
         *)
         let (rettype,args,varargs,_) = Cil.splitFunctionTypeVI vi_pre in
-        vi_pre.vtype <- TFun(Cil.voidType, args, varargs,[]);
+        Cil.update_var_type vi_pre (TFun(Cil.voidType, args, varargs,[]));
         vi_pre.vattr <- [];
 
         (* in particular get rid of __no_return if set in vi*)

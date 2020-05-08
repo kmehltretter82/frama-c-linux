@@ -28,7 +28,7 @@ module P = Plugin.Register
     (struct
       let name = "Server"
       let shortname = "server"
-      let help = "Frama-C Request Server"
+      let help = "Frama-C Request Server (experimental)"
     end)
 
 include P

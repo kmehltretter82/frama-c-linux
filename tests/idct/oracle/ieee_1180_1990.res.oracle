@@ -1939,13 +1939,38 @@
             by Frama-C kernel.
 
 --------------------------------------------------------------------------------
+--- Properties of Function 'fseeko'
+--------------------------------------------------------------------------------
+
+[ Extern  ] Assigns (file share/libc/stdio.h, line 395)
+            assigns *stream, \result, __fc_errno;
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file share/libc/stdio.h, line 395)
+            assigns *stream
+              \from *stream, (indirect: offset), (indirect: whence);
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file share/libc/stdio.h, line 396)
+            assigns \result
+              \from (indirect: *stream), (indirect: offset),
+                    (indirect: whence);
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file share/libc/stdio.h, line 396)
+            assigns __fc_errno
+              \from (indirect: *stream), (indirect: offset),
+                    (indirect: whence);
+            Unverifiable but considered Valid.
+[  Valid  ] Default behavior
+            default behavior
+            by Frama-C kernel.
+
+--------------------------------------------------------------------------------
 --- Properties of Function 'fsetpos'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 396)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 405)
             assigns *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 396)
+[ Extern  ] Froms (file share/libc/stdio.h, line 405)
             assigns *stream \from *pos;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1962,13 +1987,36 @@
               \result ≡ -1 ∨
               (\result ≥ 0 ∧ __fc_errno ≡ \old(__fc_errno))
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/stdio.h, line 402)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 411)
             assigns \result, __fc_errno;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 402)
+[ Extern  ] Froms (file share/libc/stdio.h, line 411)
             assigns \result \from (indirect: *stream);
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 402)
+[ Extern  ] Froms (file share/libc/stdio.h, line 411)
+            assigns __fc_errno \from (indirect: *stream);
+            Unverifiable but considered Valid.
+[  Valid  ] Default behavior
+            default behavior
+            by Frama-C kernel.
+
+--------------------------------------------------------------------------------
+--- Properties of Function 'ftello'
+--------------------------------------------------------------------------------
+
+[ Extern  ] Post-condition 'success_or_error'
+            ensures
+            success_or_error:
+              \result ≡ -1 ∨
+              (\result ≥ 0 ∧ __fc_errno ≡ \old(__fc_errno))
+            Unverifiable but considered Valid.
+[ Extern  ] Assigns (file share/libc/stdio.h, line 419)
+            assigns \result, __fc_errno;
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file share/libc/stdio.h, line 419)
+            assigns \result \from (indirect: *stream);
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file share/libc/stdio.h, line 419)
             assigns __fc_errno \from (indirect: *stream);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1979,10 +2027,10 @@
 --- Properties of Function 'rewind'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 410)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 427)
             assigns *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 410)
+[ Extern  ] Froms (file share/libc/stdio.h, line 427)
             assigns *stream \from \nothing;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1993,10 +2041,10 @@
 --- Properties of Function 'clearerr'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 416)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 433)
             assigns *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 416)
+[ Extern  ] Froms (file share/libc/stdio.h, line 433)
             assigns *stream \from \nothing;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2010,7 +2058,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 422)
+[ Extern  ] Froms (file share/libc/stdio.h, line 439)
             assigns \result \from (indirect: *stream);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2024,7 +2072,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 428)
+[ Extern  ] Froms (file share/libc/stdio.h, line 445)
             assigns \result \from (indirect: *stream);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2035,10 +2083,10 @@
 --- Properties of Function 'flockfile'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 434)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 451)
             assigns *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 434)
+[ Extern  ] Froms (file share/libc/stdio.h, line 451)
             assigns *stream \from \nothing;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2049,10 +2097,10 @@
 --- Properties of Function 'funlockfile'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 440)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 457)
             assigns *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 440)
+[ Extern  ] Froms (file share/libc/stdio.h, line 457)
             assigns *stream \from \nothing;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2063,13 +2111,13 @@
 --- Properties of Function 'ftrylockfile'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 446)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 463)
             assigns \result, *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 446)
+[ Extern  ] Froms (file share/libc/stdio.h, line 463)
             assigns \result \from \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 446)
+[ Extern  ] Froms (file share/libc/stdio.h, line 463)
             assigns *stream \from \nothing;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2083,7 +2131,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 452)
+[ Extern  ] Froms (file share/libc/stdio.h, line 469)
             assigns \result \from (indirect: *stream);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2094,10 +2142,10 @@
 --- Properties of Function 'perror'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 458)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 475)
             assigns __fc_stdout;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 458)
+[ Extern  ] Froms (file share/libc/stdio.h, line 475)
             assigns __fc_stdout
               \from __fc_errno, *(s + (0 .. strlen{Old}(s)));
             Unverifiable but considered Valid.
@@ -2109,13 +2157,13 @@
 --- Properties of Function 'getc_unlocked'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 464)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 481)
             assigns \result, *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 464)
+[ Extern  ] Froms (file share/libc/stdio.h, line 481)
             assigns \result \from *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 464)
+[ Extern  ] Froms (file share/libc/stdio.h, line 481)
             assigns *stream \from *stream;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2129,7 +2177,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 469)
+[ Extern  ] Froms (file share/libc/stdio.h, line 486)
             assigns \result \from *__fc_stdin;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2140,13 +2188,13 @@
 --- Properties of Function 'putc_unlocked'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 475)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 492)
             assigns *stream, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 475)
+[ Extern  ] Froms (file share/libc/stdio.h, line 492)
             assigns *stream \from c;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 476)
+[ Extern  ] Froms (file share/libc/stdio.h, line 493)
             assigns \result \from (indirect: *stream);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2157,13 +2205,13 @@
 --- Properties of Function 'putchar_unlocked'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 481)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 498)
             assigns *__fc_stdout, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 481)
+[ Extern  ] Froms (file share/libc/stdio.h, line 498)
             assigns *__fc_stdout \from c;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 482)
+[ Extern  ] Froms (file share/libc/stdio.h, line 499)
             assigns \result \from (indirect: *__fc_stdout);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2174,10 +2222,10 @@
 --- Properties of Function 'clearerr_unlocked'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 488)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 505)
             assigns *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 488)
+[ Extern  ] Froms (file share/libc/stdio.h, line 505)
             assigns *stream \from \nothing;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2191,7 +2239,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 494)
+[ Extern  ] Froms (file share/libc/stdio.h, line 511)
             assigns \result \from (indirect: *stream);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2205,7 +2253,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 500)
+[ Extern  ] Froms (file share/libc/stdio.h, line 517)
             assigns \result \from (indirect: *stream);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2219,7 +2267,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 506)
+[ Extern  ] Froms (file share/libc/stdio.h, line 523)
             assigns \result \from (indirect: *stream);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2237,14 +2285,14 @@
               (\subset(\result, &__fc_fopen[0 .. 16 - 1]) ∧
                is_open_pipe(\result))
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/stdio.h, line 533)
+[ Extern  ] Assigns (file share/libc/stdio.h, line 550)
             assigns \result, __fc_fopen[0 ..];
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 533)
+[ Extern  ] Froms (file share/libc/stdio.h, line 550)
             assigns \result
               \from (indirect: *command), (indirect: *type), __fc_p_fopen;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 535)
+[ Extern  ] Froms (file share/libc/stdio.h, line 552)
             assigns __fc_fopen[0 ..]
               \from (indirect: *command), (indirect: *type), __fc_fopen[0 ..];
             Unverifiable but considered Valid.
@@ -2262,7 +2310,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 547)
+[ Extern  ] Froms (file share/libc/stdio.h, line 564)
             assigns \result \from (indirect: *stream);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2291,7 +2339,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 67)
+[ Extern  ] Froms (file share/libc/math.h, line 70)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2335,7 +2383,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 91)
+[ Extern  ] Froms (file share/libc/math.h, line 94)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2367,28 +2415,28 @@
 [ Extern  ] Post-condition for 'domain_error' 'errno_set'
             ensures errno_set: __fc_errno ≡ 1
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/math.h, line 128)
+[ Extern  ] Assigns (file share/libc/math.h, line 131)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 135)
+[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 138)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
 [ Extern  ] Assigns for 'normal' nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 128)
+[ Extern  ] Froms (file share/libc/math.h, line 131)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 128)
+[ Extern  ] Froms (file share/libc/math.h, line 131)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 135)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 138)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 135)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 138)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 131)
+[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 134)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2411,28 +2459,28 @@
 [ Extern  ] Post-condition for 'domain_error' 'errno_set'
             ensures errno_set: __fc_errno ≡ 1
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/math.h, line 142)
+[ Extern  ] Assigns (file share/libc/math.h, line 145)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 149)
+[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 152)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
 [ Extern  ] Assigns for 'normal' nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 142)
+[ Extern  ] Froms (file share/libc/math.h, line 145)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 142)
+[ Extern  ] Froms (file share/libc/math.h, line 145)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 149)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 152)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 149)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 152)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 145)
+[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 148)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2455,28 +2503,28 @@
 [ Extern  ] Post-condition for 'domain_error' 'errno_set'
             ensures errno_set: __fc_errno ≡ 1
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/math.h, line 156)
+[ Extern  ] Assigns (file share/libc/math.h, line 159)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 163)
+[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 166)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
 [ Extern  ] Assigns for 'normal' nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 156)
+[ Extern  ] Froms (file share/libc/math.h, line 159)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 156)
+[ Extern  ] Froms (file share/libc/math.h, line 159)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 163)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 166)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 163)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 166)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 159)
+[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 162)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2499,28 +2547,28 @@
 [ Extern  ] Post-condition for 'domain_error' 'errno_set'
             ensures errno_set: __fc_errno ≡ 1
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/math.h, line 170)
+[ Extern  ] Assigns (file share/libc/math.h, line 173)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 177)
+[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 180)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
 [ Extern  ] Assigns for 'normal' nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 170)
+[ Extern  ] Froms (file share/libc/math.h, line 173)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 170)
+[ Extern  ] Froms (file share/libc/math.h, line 173)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 177)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 180)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 177)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 180)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 173)
+[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 176)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2543,28 +2591,28 @@
 [ Extern  ] Post-condition for 'domain_error' 'errno_set'
             ensures errno_set: __fc_errno ≡ 1
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/math.h, line 184)
+[ Extern  ] Assigns (file share/libc/math.h, line 187)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 191)
+[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 194)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
 [ Extern  ] Assigns for 'normal' nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 184)
+[ Extern  ] Froms (file share/libc/math.h, line 187)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 184)
+[ Extern  ] Froms (file share/libc/math.h, line 187)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 191)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 194)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 191)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 194)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 187)
+[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 190)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2587,28 +2635,28 @@
 [ Extern  ] Post-condition for 'domain_error' 'errno_set'
             ensures errno_set: __fc_errno ≡ 1
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/math.h, line 198)
+[ Extern  ] Assigns (file share/libc/math.h, line 201)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 205)
+[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 208)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
 [ Extern  ] Assigns for 'normal' nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 198)
+[ Extern  ] Froms (file share/libc/math.h, line 201)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 198)
+[ Extern  ] Froms (file share/libc/math.h, line 201)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 205)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 208)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 205)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 208)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 201)
+[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 204)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2634,7 +2682,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 212)
+[ Extern  ] Froms (file share/libc/math.h, line 215)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2654,7 +2702,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 219)
+[ Extern  ] Froms (file share/libc/math.h, line 222)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2674,7 +2722,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 226)
+[ Extern  ] Froms (file share/libc/math.h, line 229)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2691,7 +2739,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 234)
+[ Extern  ] Froms (file share/libc/math.h, line 237)
             assigns \result \from x, y;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2708,7 +2756,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 241)
+[ Extern  ] Froms (file share/libc/math.h, line 244)
             assigns \result \from x, y;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2731,7 +2779,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 249)
+[ Extern  ] Froms (file share/libc/math.h, line 252)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2751,7 +2799,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 256)
+[ Extern  ] Froms (file share/libc/math.h, line 259)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2771,7 +2819,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 263)
+[ Extern  ] Froms (file share/libc/math.h, line 266)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2791,7 +2839,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 270)
+[ Extern  ] Froms (file share/libc/math.h, line 273)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2811,7 +2859,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 277)
+[ Extern  ] Froms (file share/libc/math.h, line 280)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2831,7 +2879,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 284)
+[ Extern  ] Froms (file share/libc/math.h, line 287)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2851,10 +2899,10 @@
 [ Extern  ] Post-condition for 'domain_error' 'errno_set'
             ensures errno_set: __fc_errno ≡ 1
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/math.h, line 295)
+[ Extern  ] Assigns (file share/libc/math.h, line 298)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 306)
+[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 309)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
 [ Extern  ] Assigns for 'infinite' nothing
@@ -2863,22 +2911,22 @@
 [ Extern  ] Assigns for 'normal' nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 295)
+[ Extern  ] Froms (file share/libc/math.h, line 298)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 295)
+[ Extern  ] Froms (file share/libc/math.h, line 298)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 306)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 309)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 306)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 309)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'infinite' (file share/libc/math.h, line 302)
+[ Extern  ] Froms for 'infinite' (file share/libc/math.h, line 305)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 298)
+[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 301)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2907,10 +2955,10 @@
 [ Extern  ] Post-condition for 'domain_error' 'errno_set'
             ensures errno_set: __fc_errno ≡ 1
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/math.h, line 313)
+[ Extern  ] Assigns (file share/libc/math.h, line 316)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 324)
+[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 327)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
 [ Extern  ] Assigns for 'infinite' nothing
@@ -2919,22 +2967,22 @@
 [ Extern  ] Assigns for 'normal' nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 313)
+[ Extern  ] Froms (file share/libc/math.h, line 316)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 313)
+[ Extern  ] Froms (file share/libc/math.h, line 316)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 324)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 327)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 324)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 327)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'infinite' (file share/libc/math.h, line 320)
+[ Extern  ] Froms for 'infinite' (file share/libc/math.h, line 323)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 316)
+[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 319)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2963,10 +3011,10 @@
 [ Extern  ] Post-condition for 'domain_error' 'errno_set'
             ensures errno_set: __fc_errno ≡ 1
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/math.h, line 331)
+[ Extern  ] Assigns (file share/libc/math.h, line 334)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 342)
+[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 345)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
 [ Extern  ] Assigns for 'infinite' nothing
@@ -2975,22 +3023,22 @@
 [ Extern  ] Assigns for 'normal' nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 331)
+[ Extern  ] Froms (file share/libc/math.h, line 334)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 331)
+[ Extern  ] Froms (file share/libc/math.h, line 334)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 342)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 345)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 342)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 345)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'infinite' (file share/libc/math.h, line 338)
+[ Extern  ] Froms for 'infinite' (file share/libc/math.h, line 341)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 334)
+[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 337)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3019,7 +3067,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 370)
+[ Extern  ] Froms (file share/libc/math.h, line 373)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3039,7 +3087,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 378)
+[ Extern  ] Froms (file share/libc/math.h, line 381)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3056,7 +3104,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 408)
+[ Extern  ] Froms (file share/libc/math.h, line 411)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3073,7 +3121,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 415)
+[ Extern  ] Froms (file share/libc/math.h, line 418)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3090,7 +3138,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 422)
+[ Extern  ] Froms (file share/libc/math.h, line 425)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3107,7 +3155,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 429)
+[ Extern  ] Froms (file share/libc/math.h, line 432)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3124,7 +3172,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 436)
+[ Extern  ] Froms (file share/libc/math.h, line 439)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3141,7 +3189,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 443)
+[ Extern  ] Froms (file share/libc/math.h, line 446)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3158,7 +3206,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 454)
+[ Extern  ] Froms (file share/libc/math.h, line 457)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3175,7 +3223,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 461)
+[ Extern  ] Froms (file share/libc/math.h, line 464)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3192,7 +3240,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 468)
+[ Extern  ] Froms (file share/libc/math.h, line 471)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3217,7 +3265,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 494)
+[ Extern  ] Froms (file share/libc/math.h, line 497)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3242,7 +3290,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 502)
+[ Extern  ] Froms (file share/libc/math.h, line 505)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3267,7 +3315,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 510)
+[ Extern  ] Froms (file share/libc/math.h, line 513)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3284,7 +3332,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 523)
+[ Extern  ] Froms (file share/libc/math.h, line 526)
             assigns \result \from x, y;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3301,7 +3349,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 530)
+[ Extern  ] Froms (file share/libc/math.h, line 533)
             assigns \result \from x, y;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3330,7 +3378,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 539)
+[ Extern  ] Froms (file share/libc/math.h, line 542)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3353,7 +3401,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 548)
+[ Extern  ] Froms (file share/libc/math.h, line 551)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3373,7 +3421,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 557)
+[ Extern  ] Froms (file share/libc/math.h, line 560)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3390,7 +3438,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 580)
+[ Extern  ] Froms (file share/libc/math.h, line 583)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3407,7 +3455,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 586)
+[ Extern  ] Froms (file share/libc/math.h, line 589)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3424,7 +3472,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 593)
+[ Extern  ] Froms (file share/libc/math.h, line 596)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3441,7 +3489,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 599)
+[ Extern  ] Froms (file share/libc/math.h, line 602)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3458,7 +3506,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 605)
+[ Extern  ] Froms (file share/libc/math.h, line 608)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3475,7 +3523,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 611)
+[ Extern  ] Froms (file share/libc/math.h, line 614)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3492,7 +3540,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 633)
+[ Extern  ] Froms (file share/libc/math.h, line 636)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3509,7 +3557,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 639)
+[ Extern  ] Froms (file share/libc/math.h, line 642)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3526,7 +3574,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 645)
+[ Extern  ] Froms (file share/libc/math.h, line 648)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3543,7 +3591,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 659)
+[ Extern  ] Froms (file share/libc/math.h, line 662)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3560,7 +3608,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 665)
+[ Extern  ] Froms (file share/libc/math.h, line 668)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3577,7 +3625,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 671)
+[ Extern  ] Froms (file share/libc/math.h, line 674)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3594,7 +3642,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 678)
+[ Extern  ] Froms (file share/libc/math.h, line 681)
             assigns \result \from x, y;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3611,7 +3659,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 685)
+[ Extern  ] Froms (file share/libc/math.h, line 688)
             assigns \result \from x, y;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3628,7 +3676,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 706)
+[ Extern  ] Froms (file share/libc/math.h, line 709)
             assigns \result \from (indirect: *(tagp + (0 ..)));
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3645,7 +3693,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 713)
+[ Extern  ] Froms (file share/libc/math.h, line 716)
             assigns \result \from (indirect: *(tagp + (0 ..)));
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3662,7 +3710,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 720)
+[ Extern  ] Froms (file share/libc/math.h, line 723)
             assigns \result \from (indirect: *(tagp + (0 ..)));
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3679,7 +3727,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 768)
+[ Extern  ] Froms (file share/libc/math.h, line 771)
             assigns \result \from \nothing;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3696,7 +3744,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 774)
+[ Extern  ] Froms (file share/libc/math.h, line 777)
             assigns \result \from \nothing;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -4058,9 +4106,9 @@
 --------------------------------------------------------------------------------
 --- Status Report Summary
 --------------------------------------------------------------------------------
-   179 Completely validated
+   181 Completely validated
     16 Locally validated
-   486 Considered valid
+   494 Considered valid
     56 To be validated
-   737 Total
+   747 Total
 --------------------------------------------------------------------------------

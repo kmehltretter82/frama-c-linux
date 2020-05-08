@@ -2,7 +2,7 @@
    STDOPT: #" -no-eva -rte-select fbug -rte -then -eva"
 */
 
-int x1, y1, z1; volatile int c;
+int x1, y1, z1, z2; volatile int c, nondet;
 
 void f11() {
   x1 = 1;
@@ -111,7 +111,7 @@ void f5() {
   g_f5_2 = c;
   arg = c;
   f5_aux(arg);
-  Frama_C_show_each_f5(arg, g_f5_1, g_f5_2); // Cache, but reduce g_f5_* and arg after the call. Currently does not work for g_f5_1, because dependencies are not taken into account
+  Frama_C_show_each_f5(arg, g_f5_1, g_f5_2); // Cache, but reduce g_f5_* and arg after the call.
 }
 
 struct two_fields { int x; int y; } two_fields;
@@ -150,6 +150,41 @@ void f8() {
   f8_1(&x);
 }
 
+void f9_1() {
+  /*@ assert z2 == 0; */
+}
+
+void f9_2() {
+  /*@ assert \valid(p); */
+}
+
+void f9_3() {
+  /*@ assert \initialized(p); */
+}
+
+void f9_4() {
+  /*@ assert \at(z2, Pre) > 0; */
+}
+
+void f9() {
+  z2 = 1;
+  if (nondet) f9_1(); // Non terminating.
+  z2 = 0;
+  f9_1(); // This call must be terminating.
+  int x;
+  p = 0;
+  if (nondet) f9_2(); // Non terminating.
+  p = &x;
+  f9_2(); // This call must be terminating.
+  if (nondet) f9_3(); // Non terminating.
+  x = 1;
+  f9_3(); // This call must be terminating.
+  z2 = 0;
+  if (nondet) f9_4(); // Non terminating.
+  z2 = 1;
+  f9_4(); // This call must be terminating.
+}
+
 void main () {
   f1 ();
   f2 ();
@@ -160,4 +195,5 @@ void main () {
   f6();
   f7();
   f8();
+  f9();
 }

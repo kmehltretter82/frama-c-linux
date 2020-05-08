@@ -203,13 +203,6 @@ only possible one to define mutually dependent plug-ins while the third one
 (through module \texttt{Db}) is now fully deprecated even if most of the older
 \framac plug-ins are still defined this way.
 
-Plug-ins are usually dynamically linked when \framac is booting, even if some
-older \framac plug-ins are still statically linked. However it is still possible
-to statically link a dynamic plug-in if wanted or required. In particular,
-\ocaml does not support dynamic linking on some hardware
-architecture~\cite{caml}: in this case, you have to statically link all
-plug-ins.
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Libraries}\label{archi:libraries}

@@ -196,7 +196,7 @@ one is valid:
 \item \lstinline|\exists integer x, 1 <= x <= 0 && -1 <= 1/x <= 1|
 \end{itemize}
 In particular, the second one is invalid since the quantification is in fact an
-enumeration over a finite number of elements, it amounts to 
+enumeration over a finite number of elements, it amounts to
 \lstinline|1/-1 > 0 && 1/0 > 0 && 1/1 > 0|. The first atomic proposition is
 invalid, so the rest of the conjunction (and in particular 1/0) is not
 evaluated. The fourth one is invalid since it is an existential quantification
@@ -294,13 +294,12 @@ It is not possible to define logic types introduced by the specification writer
 \label{sec:fn-behavior}
 \index{function contract}\index{contract}
 
-\except{no \lstinline|terminates| and \lstinline|abrupt| clauses}
+\except{no \lstinline|terminates|}
 
 Figure~\ref{fig:gram:contracts} shows grammar of function
 contracts. This is a simplified version of \acsl one without
-\lstinline|terminates| and \lstinline|abrupt|
-clauses. Section~\ref{sec:termination} (resp.~\ref{sec:abrupt}) explains why
-\eacsl has no \lstinline|terminates| (resp. \lstinline|abrupt|) clause.
+\lstinline|terminates| clauses. Section~\ref{sec:termination} explains why
+\eacsl has no \lstinline|terminates| clause.
 
 \begin{figure}[htbp]
   \begin{cadre}
@@ -370,7 +369,7 @@ members easily identifiable.
 
 \begin{notimplementedenv}
 \begin{example}\label{ex:tset}
-The set \lstinlineµ{ x | integer x; 0 <= x <= 9 || 20 <= x <= 29 }µ denotes the
+The set \lstinlineÂµ{ x | integer x; 0 <= x <= 9 || 20 <= x <= 29 }Âµ denotes the
 set of all integers between 0 and 9 and between 20 and 29.
 \end{example}
 \end{notimplementedenv}
@@ -422,7 +421,7 @@ Figure~\ref{fig:gram:assertions} summarizes grammar for assertions.
 \except{loop invariants lose their inductive nature}
 
 Figure~\ref{fig:gram:loops} shows grammar for loop annotations. There is no
-syntactic difference with \acsl. 
+syntactic difference with \acsl.
 \begin{figure}[htbp]
   \begin{cadre}
     \input{loops_modern.bnf}
@@ -453,7 +452,7 @@ In \eacsl, the same loop invariant $I$ is valid if and only if:
 \begin{itemize}
 \item $I$ holds before entering the loop; and
 \item if execution of the loop body in that state ends normally at the end of
-  the body or with a "continue" statement, $I$ is true in the resulting state. 
+  the body or with a "continue" statement, $I$ is true in the resulting state.
 \end{itemize}
 
 Thus the only difference with \acsl is that \eacsl does not assume that the
@@ -543,11 +542,9 @@ definition of its upper bound.
 \label{sec:statement_contract}
 \index{statement contract}\index{contract}
 
-\except{no \lstinline|abrupt| clauses}
+\nodiff
 
-Figure~\ref{fig:gram:contracts} shows grammar of statement contracts. Like
-function contracts, this is a simplified version of \acsl with no
-\lstinline|abrupt| clauses. All other constructs are unchanged.
+Figure~\ref{fig:gram:stcontracts} shows grammar of statement contracts.
 
 \begin{figure}[htbp]
   \begin{cadre}
@@ -706,7 +703,7 @@ predicates which are related to memory location.
 \nodiff
 
 \difficultswhy{\lstinline|\\base\_addr|,
-    \lstinline|\\block\_length|, \lstinline|\\valid|, 
+    \lstinline|\\block\_length|, \lstinline|\\valid|,
     \lstinline|\\valid_read| and
     \lstinline|\\offset|}{the implementation of a memory model}
 
@@ -723,9 +720,7 @@ predicates which are related to memory location.
 \subsection{Allocation and deallocation}
 \difficultswhy{All these constructs}{the implementation of a memory model}
 \label{sec:alloc-dealloc}
-
-\mywarning{this section is still almost experimental in \acsl. Thus it might still
-evolve in the future.}
+\nodiff
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -753,8 +748,21 @@ Figure~\ref{fig:gram:list} shows the notations for built-in lists.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Abrupt termination}\label{sec:abrupt}
-\absentexperimental
+\section{\notimplemented{Abrupt termination}}
+\label{sec:abrupt}
+\index{abrupt termination}
+
+\nodiff
+
+Figure~\ref{fig:gram:abrupt} shows grammar of abrupt termination.
+
+\begin{figure}[htbp]
+  \begin{cadre}
+    \input{abrupt_modern.bnf}
+  \end{cadre}
+  \caption{Grammar of contracts about abrupt terminations}
+  \label{fig:gram:abrupt}
+\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

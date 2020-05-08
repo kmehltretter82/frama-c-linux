@@ -38,7 +38,7 @@ let extended_ast_project: extended_project ref = ref To_be_extended
 
 let unmemoized_extend_ast () =
   let extend () =
-    let share = Options.Share.dir ~error:true () in
+    let share = Options.Share.get_dir ~mode:`Must_exist "." in
     Options.feedback ~level:3 "setting kernel options for E-ACSL.";
     Kernel.CppExtraArgs.add
       (Format.asprintf " -DE_ACSL_MACHDEP=%s -I%a/memory_model"

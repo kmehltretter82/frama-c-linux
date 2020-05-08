@@ -295,33 +295,38 @@ module type Filepath = S with type t = Filepath.Normalized.t
 (** signature for searching files in a specific directory. *)
 module type Specific_dir = sig
 
-  exception No_dir
+  val set: Filepath.Normalized.t -> unit
+  (** Sets the plugin <specific-dir> directory (without creating it). *)
 
-  val force_dir: bool
-  (** For functions below: if [force_dir] is true: if [error] is [false], then
-      creates the directory if it does not exist (or raises No_dir if the
-      directory cannot be created). Otherwise ([force_dir =
-      false]), raise No_dir if [error] is [false].
-      @since Neon-20140301 *)
+  val get: unit -> Filepath.Normalized.t
+  (** @return the plugin <specific-dir> directory (without creating it). *)
 
-  val dir: ?error:bool -> unit -> Filepath.Normalized.t
-  (** [dir ~error ()] returns the specific directory name, if
-      any. Otherwise, Frama-C halts on an user error if [error] or if the
-      behavior depends on [force_dir]. Default of [error] is [true].
-      @raise No_dir if there is no share directory for this plug-in and [not
-      error] and [not force_dir]. *)
+  val is_set: unit -> bool
+  (** @return whether the plugin <specific-dir> has been set. *)
 
-  val file: ?error:bool -> string -> Filepath.Normalized.t
-  (** [file basename] returns the complete filename of a file stored in [dir
-      ()]. If there is no such directory, Frama-C halts on an user error if
-      [error] or if the behavior depends on [force_dir]. Default of [error] is
-      [true].
-      @raise No_dir if there is no share directory for this plug-in and [not
-      error] and [not force_dir].  *)
+  val get_dir:
+    ?mode:[`Normalize_only | `Create_path |  `Must_exist ] ->
+    string ->
+    Filepath.Normalized.t
+  (** [get_dir ?mode p] returns a (local) path [p], i.e. relative to the plugin
+      <specific-dir> directory, of a sub-directory of the plugin <specific-dir>
+      directory.
+      @param mode determines how to handle the resulting path:
+      + [Normalize_only] just normalizes the resulting path (default).
+      + [Create_path] creates the resulting path, if does not exist.
+      + [Must_exist] aborts if the resulting path does not exist. *)
 
-  module Dir_name: Filepath
-  (** Option [-<short-name>-<specific-dir>]. *)
-
+  val get_file:
+    ?mode:[`Normalize_only | `Create_path |  `Must_exist ] ->
+    string ->
+    Filepath.Normalized.t
+    (** [get_file ?mode p] returns a (local) path [p], i.e. relative to the
+        plugin <specific-dir> directory, of a file in the plugin <specific-dir>
+        directory.
+        @param mode determines how to handle the resulting path:
+        + [Normalize_only] just normalizes the resulting path (default).
+        + [Create_path] creates the dirname of resulting path, if does not exist.
+        + [Must_exist] aborts if the resulting path does not exist. *)
 end
 
 (* ************************************************************************** *)

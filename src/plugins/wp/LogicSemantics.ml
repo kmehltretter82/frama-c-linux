@@ -871,6 +871,7 @@ struct
 
     | Pvalid(label,t) -> valid env RW label t
     | Pvalid_read(label,t) -> valid env RD label t
+    | Pobject_pointer(label,t) -> valid env OBJ label t
 
     | Pvalid_function _t ->
         Warning.error
@@ -1026,7 +1027,7 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   let assigned_of_lval env ~unfold (lv : Cil_types.lval) =
-    assignable_lval env ~unfold (Logic_utils.lval_to_term_lval ~cast:false lv)
+    assignable_lval env ~unfold (Logic_utils.lval_to_term_lval lv)
 
   let assigned_of_froms env ~unfold froms =
     List.concat

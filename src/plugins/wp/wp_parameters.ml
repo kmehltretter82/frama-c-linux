@@ -375,6 +375,27 @@ module SmokeTests =
   end)
 
 let () = Parameter_customize.set_group wp_strategy
+module SmokeDeadcode =
+  True(struct
+    let option_name = "-wp-smoke-dead-code"
+    let help = "When generating smoke tests, look for unreachable code"
+  end)
+
+let () = Parameter_customize.set_group wp_strategy
+module SmokeDeadcall =
+  True(struct
+    let option_name = "-wp-smoke-dead-call"
+    let help = "When generating smoke tests, look for non-terminating calls"
+  end)
+
+let () = Parameter_customize.set_group wp_strategy
+module SmokeDeadloop =
+  True(struct
+    let option_name = "-wp-smoke-dead-loop"
+    let help = "When generating smoke tests, look for inconsistent loop invairants"
+  end)
+
+let () = Parameter_customize.set_group wp_strategy
 module Split =
   False(struct
     let option_name = "-wp-split"
@@ -992,16 +1013,6 @@ module OutputDir =
                 Defaults to some temporary directory."
   end)
 
-let () = Parameter_customize.set_group wp_po
-let () = Parameter_customize.do_not_save ()
-module Check =
-  Action(struct
-    let option_name = "-wp-check"
-    let help =
-      "Check the syntax and type of the produced file, instead of proving."
-  end)
-let () = on_reset Print.clear
-
 (* -------------------------------------------------------------------------- *)
 (* --- Overflows                                                          --- *)
 (* -------------------------------------------------------------------------- *)
@@ -1083,8 +1094,8 @@ let base_output () =
                   make_output_dir dir ; dir in
       base_output := Some output;
       Fc_Filepath.add_symbolic_dir "WPOUT" output ;
-      output
-  | Some output -> output
+      Datatype.Filepath.of_string output
+  | Some output -> Datatype.Filepath.of_string output
 
 let get_output () =
   let base = base_output () in
@@ -1092,13 +1103,13 @@ let get_output () =
   let name = Project.get_unique_name project in
   if name = "default" then base
   else
-    let dir = base ^ "/" ^ name in
-    make_output_dir dir ; dir
+    let dir = Datatype.Filepath.concat base ("/" ^ name) in
+    make_output_dir (dir :> string) ; dir
 
 let get_output_dir d =
   let base = get_output () in
-  let path = Printf.sprintf "%s/%s" base d in
-  make_output_dir path ; path
+  let path = Datatype.Filepath.concat base ("/" ^ d) in
+  make_output_dir (path :> string) ; path
 
 (* -------------------------------------------------------------------------- *)
 (* --- Session dir                                                        --- *)
@@ -1107,22 +1118,22 @@ let get_output_dir d =
 let default = Sys.getcwd () ^ "/.frama-c"
 
 let has_session () =
-  Session.Dir_name.is_set () ||
+  Session.is_set () ||
   ( Sys.file_exists default && Sys.is_directory default )
 
 let get_session ~force () =
   if force then
-    Session.dir ~error:false ()
+    Session.get_dir "."
   else
-  if Session.Dir_name.is_set () then
-    Session.Dir_name.get ()
+  if Session.is_set () then
+    Session.get ()
   else
-    Session.dir ~error:false ()
+    Session.get_dir "."
 
 let get_session_dir ~force d =
   let base = get_session ~force () in
-  let path = Format.asprintf "%a/%s" Datatype.Filepath.pp_abs base d in
-  if force then make_output_dir path ; path
+  let path = Datatype.Filepath.concat base ("/" ^ d) in
+  if force then make_output_dir (path :> string) ; path
 
 (* -------------------------------------------------------------------------- *)
 (* --- Print Generated                                                    --- *)

@@ -899,7 +899,7 @@ $(@PLUGIN_NAME@_DIR)/@PLUGIN_NAME@_DEP_REDO $(@PLUGIN_NAME@_DIR)/.depend: \
 	    $(@PLUGIN_NAME@_ML_SRC) \
 	    $(@PLUGIN_NAME@_MLI) \
 	    $(@PLUGIN_NAME@_GUI_MLI)) \
-	  $(foreach d,$(@PLUGIN_NAME@_TESTS_LIB_DIR),\
+	  $(foreach d,$(wildcard $(@PLUGIN_NAME@_TESTS_LIB_DIR)),\
 	    -I $d $d*.ml $d*.mli) \
 	  > $(@PLUGIN_NAME@_DIR)/.depend
 	$(CHMOD_RO) $(@PLUGIN_NAME@_DIR)/.depend

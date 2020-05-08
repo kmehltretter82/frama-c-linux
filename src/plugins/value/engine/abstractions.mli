@@ -25,13 +25,14 @@
 (** {2 Registration of abstractions.} *)
 
 (** Dynamic registration of the abstractions to be used in an Eva analysis:
-    - value abstractions, detailled in the {Abstract_value} signature;
-    - location abstractions, detailled in the {Abstract_location} signature;
-    - state abstractions, or abstract domains, detailled in {Abstract_domain}.
+    - value abstractions, detailed in the {Abstract_value} signature;
+    - location abstractions, detailed in the {Abstract_location} signature;
+    - state abstractions, or abstract domains, detailed in {Abstract_domain}.
 *)
 
 (** Module types of value abstractions: either a single leaf module, or
-    a compound of several modules described by a structure. *)
+    a compound of several modules described by a structure. In this last case,
+    the structure must not contain the Void constructor. *)
 type 'v value =
   | Single of (module Abstract_value.Leaf with type t = 'v)
   | Struct of 'v Abstract.Value.structure
@@ -93,8 +94,7 @@ val register:
     the last argument when starting an analysis, if the -eva-domains option
     has been set to [name]. See function {!register} for more details. *)
 val dynamic_register:
-  name:string -> descr:string -> ?experimental:bool -> ?priority:int ->
-  (unit -> 'v abstraction) -> unit
+  name:string -> descr:string -> (unit -> flag) -> unit
 
 (** Reduced product between two value abstractions, identified by their keys. *)
 type ('a, 'b) value_reduced_product =
@@ -137,9 +137,14 @@ val register_hook: ((module S) -> (module S)) -> unit
 (** {2 Configuration of an analysis.} *)
 
 (** Configuration defining the abstractions to be used in an analysis.
-    A configuration is a set of flags, i.e. a set of enabled abstractions. *)
+    A configuration is a set of flags, i.e. a set of abstract domains. Each flag
+    comes with an optional mode. None is the default mode: the given domain is
+    enabled for the whole analysis. See {!Domain_mode} for more details. *)
 module Config : sig
-  include Set.S with type elt = flag
+  include Set.S with type elt = flag * Domain_mode.t option
+
+  (** Returns true if the given flag is in the configuration. *)
+  val mem: flag -> t -> bool
 
   (** Flags for the standard domains currently provided in Eva. *)
 

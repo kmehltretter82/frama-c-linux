@@ -258,6 +258,7 @@ DISTRIB_FILES:=\
       share/analysis-scripts/cmd-dep.sh                                 \
       share/analysis-scripts/concat-csv.sh                              \
       share/analysis-scripts/clone.sh                                   \
+      share/analysis-scripts/creduce.sh                                 \
       $(wildcard share/analysis-scripts/examples/*)                     \
       share/analysis-scripts/fc_stubs.c                                 \
       share/analysis-scripts/find_fun.py                                \
@@ -318,7 +319,7 @@ DISTRIB_TESTS=$(shell git ls-files \
                   tests \
                   src/plugins/aorai/tests \
                   src/plugins/report/tests \
-                  src/plugins/wp/tests)
+                  src/plugins/wp/tests | $(SED) 's/ /@/g')
 
 
 # files that are needed to compile API documentation of external plugins
@@ -860,7 +861,7 @@ endif
 
 # General rules for ordering files within PLUGIN_CMO:
 # - try to keep the legacy Value before Eva
-PLUGIN_CMO:= partitioning/split_strategy value_parameters \
+PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode value_parameters \
 	utils/value_perf utils/eva_annotations \
 	utils/value_util utils/red_statuses \
 	utils/mark_noresults \
@@ -1412,8 +1413,13 @@ acsl_tests: byte
 	$(PRINT_EXEC) acsl_tests
 	find doc/speclang -name \*.c -exec ./bin/toplevel.byte$(EXE) {} \; > /dev/null
 
-LONELY_TESTS_ML_FILES:=\
-  $(sort $(shell find $(TEST_DIRS_AS_PLUGIN:%=tests/%) -not -path '*/\.*' -name '*.ml'))
+LONELY_TESTS_DIR:=$(wildcard $(TEST_DIRS_AS_PLUGIN:%=tests/%))
+ifeq ($(strip $(LONELY_TESTS_DIR)),)
+  LONELY_TESTS_ML_FILES:=
+else
+  LONELY_TESTS_ML_FILES:=\
+    $(sort $(shell find $(TEST_DIRS_AS_PLUGIN:%=tests/%) -not -path '*/\.*' -name '*.ml'))
+endif
 $(foreach file,$(LONELY_TESTS_ML_FILES),\
   $(eval $(file:%.ml=%.cmo): BFLAGS+=-I $(dir $(file))))
 $(foreach file,$(LONELY_TESTS_ML_FILES),\
@@ -1699,6 +1705,7 @@ check-devguide: $(CHECK_CODE) $(DOC_DEPEND) $(DOC_DIR)/kernel-doc.ocamldoc
 # Note: the find command below is *very* ugly, but it should be POSIX-compliant.
 
 ALL_ML_FILES:=$(shell find src -name '*.ml' -print -o -name '*.mli' -print -o -path '*/tests' -prune '!' -name '*')
+ALL_ML_FILES+=ptests/ptests.ml
 MANUAL_ML_FILES:=$(filter-out $(GENERATED) $(PLUGIN_GENERATED_LIST), $(ALL_ML_FILES))
 
 # Allow control of files to be linted/fixed by external sources
@@ -1932,6 +1939,7 @@ install:: install-lib-$(OCAMLBEST)
 	  share/analysis-scripts/cmd-dep.sh \
 	  share/analysis-scripts/concat-csv.sh \
 	  share/analysis-scripts/clone.sh \
+	  share/analysis-scripts/creduce.sh \
 	  share/analysis-scripts/fc_stubs.c \
 	  share/analysis-scripts/find_fun.py \
 	  share/analysis-scripts/flamegraph.pl \
@@ -2430,7 +2438,7 @@ endif
 	@#although it seems to segfault in 4.0 (but not in 4.1)
 	$(RM) file_list_to_archive.tmp
 	@$(foreach file,$(DISTRIB_FILES) $(DISTRIB_TESTS),\
-			echo $(file) >> file_list_to_archive.tmp$(NEWLINE))
+			echo $(file) | $(SED) 's/@/ /g' >> file_list_to_archive.tmp$(NEWLINE))
 	$(TAR) -cf - --files-from file_list_to_archive.tmp | $(TAR) -C $(CLIENT_DIR) -xf -
 	$(RM) file_list_to_archive.tmp
 	$(PRINT_MAKING) files

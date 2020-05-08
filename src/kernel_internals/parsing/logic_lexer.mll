@@ -71,6 +71,37 @@
     fun s -> try Hashtbl.find h s
     with Not_found -> IDENTIFIER s
 
+  let all_digits s =
+    let is_digit =
+      function
+      | '0'..'9' | 'a'..'f' | 'A'..'F' -> ()
+      | _ -> raise Exit
+    in
+    try String.iter is_digit s; true with Exit -> false
+
+  let is_ucn s =
+    if String.length s <= 2 || s.[0] <> '\\' then false else begin
+      match s.[1] with
+      | 'U' -> String.length s = 10 && all_digits (String.sub s 2 8)
+      | 'u' -> String.length s = 6 && all_digits (String.sub s 2 4)
+      | _ -> false
+    end
+
+  let int_of_digit chr =
+    match chr with
+    | '0'..'9' -> (Char.code chr) - (Char.code '0')
+    | 'a'..'f' -> (Char.code chr) - (Char.code 'a') + 10
+    | 'A'..'F' -> (Char.code chr) - (Char.code 'A') + 10
+    | _ -> assert false
+
+  (* assumes is_ucn s *)
+  let unicode_char s =
+    let code = ref 0 in
+    let add_digit c = code := 16 * !code + int_of_digit c in
+    String.iter add_digit (String.sub s 2 (String.length s - 2));
+    let c = Utf8_logic.from_unichar !code in
+    find_utf8 c
+
   let identifier, is_acsl_keyword =
     let all_kw = Hashtbl.create 37 in
     let c_kw = Hashtbl.create 37 in
@@ -232,6 +263,7 @@
         "\\typeof", TYPEOF;
         "\\unallocated", UNALLOCATED;
         "\\union", BSUNION;
+        "\\object_pointer", OBJECT_POINTER;
         "\\valid", VALID;
         "\\valid_read", VALID_READ;
         "\\valid_index", VALID_INDEX;
@@ -241,18 +273,11 @@
       ];
     fun lexbuf ->
       let s = lexeme lexbuf in
-      try Hashtbl.find h s with Not_found ->
-	if Logic_env.typename_status s then TYPENAME s
-        else
-	  IDENTIFIER s
-
-
-  let int_of_digit chr =
-    match chr with
-        '0'..'9' -> (Char.code chr) - (Char.code '0')
-      | 'a'..'f' -> (Char.code chr) - (Char.code 'a') + 10
-      | 'A'..'F' -> (Char.code chr) - (Char.code 'A') + 10
-      | _ -> assert false
+      if is_ucn s then unicode_char s else begin
+        try Hashtbl.find h s with Not_found ->
+          if Logic_env.typename_status s then TYPENAME s
+          else IDENTIFIER s
+      end
 
   (* Update lexer buffer. *)
   let update_line_loc lexbuf line =

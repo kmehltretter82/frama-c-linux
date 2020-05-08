@@ -10,6 +10,8 @@
   i ∈ {0}
   p ∈ {0}
   q ∈ {0}
+[eva:alarm] tests/value/label.i:14: Warning: 
+  pointer downcast. assert (unsigned int)(&d + 1) ≤ 2147483647;
 [eva] tests/value/label.i:18: 
   Assigning imprecise value to *((char *)(& p) + i)
   (pointing to p with offsets {0}).

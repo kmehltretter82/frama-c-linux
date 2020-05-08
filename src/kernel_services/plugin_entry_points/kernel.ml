@@ -837,9 +837,9 @@ module Journal = struct
         let default =
           let dir =
             (* duplicate code from Plugin.Session *)
-            if Session.Dir_name.is_set ()
+            if Session.is_set ()
             then
-              (Session.Dir_name.get () :> string)
+              (Session.get () :> string)
             else
               try Sys.getenv "FRAMAC_SESSION"
               with Not_found -> "./.frama-c"
@@ -1440,6 +1440,17 @@ module UnsignedDowncast =
                   destination range"
     end)
 
+(* Pointer downcasts are undefined behaviors. *)
+let () = Parameter_customize.set_group analysis_options
+let () = Parameter_customize.do_not_reset_on_copy ()
+module PointerDowncast =
+  True
+    (struct
+      let module_name = "PointerDowncast"
+      let option_name = "-warn-pointer-downcast"
+      let help = "generate alarms when a pointer is converted into an integer \
+                  but may not be in the range of the destination type."
+    end)
 
 (* Not finite floats are ok, but might not always be a behavior the programmer
    wants. *)
@@ -1468,6 +1479,15 @@ module InvalidBool =
                   _Bool lvalues."
     end)
 
+let () = Parameter_customize.set_group analysis_options
+let () = Parameter_customize.do_not_reset_on_copy ()
+module InvalidPointer =
+  False
+    (struct
+      let module_name = "InvalidPointer"
+      let option_name = "-warn-invalid-pointer"
+      let help = "generate alarms when invalid pointers are created."
+    end)
 
 (* ************************************************************************* *)
 (** {2 Sequencing options} *)

@@ -18,21 +18,23 @@
 [eva] Done for function main1
 [eva] computing for function main2 <- main.
   Called from tests/value/sizeof.i:41.
+[eva:alarm] tests/value/sizeof.i:32: Warning: 
+  pointer downcast. assert (unsigned int)(&s1) ≤ 2147483647;
 [eva] tests/value/sizeof.i:32: 
   Assigning imprecise value to p.
   The imprecision originates from Arithmetic {tests/value/sizeof.i:32}
 [eva:alarm] tests/value/sizeof.i:33: Warning: 
   accessing out of bounds index.
-  assert (unsigned int)(sizeof(s1.t) - (unsigned int)i) < 10;
+  assert (unsigned int)(sizeof(int [10]) - (unsigned int)i) < 10;
 [eva:alarm] tests/value/sizeof.i:33: Warning: 
   out of bounds write.
-  assert \valid(&p->t[(unsigned int)(sizeof(s1.t) - (unsigned int)i)]);
+  assert \valid(&p->t[(unsigned int)(sizeof(int [10]) - (unsigned int)i)]);
 [eva:alarm] tests/value/sizeof.i:34: Warning: 
   accessing out of bounds index.
-  assert (unsigned int)(sizeof(s1.t) - (unsigned int)i) < 10;
+  assert (unsigned int)(sizeof(int [10]) - (unsigned int)i) < 10;
 [eva:alarm] tests/value/sizeof.i:34: Warning: 
   out of bounds write.
-  assert \valid(&p->t[(unsigned int)(sizeof(s1.t) - (unsigned int)i)]);
+  assert \valid(&p->t[(unsigned int)(sizeof(int [10]) - (unsigned int)i)]);
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] computing for function f <- main.
@@ -124,21 +126,24 @@ struct s s1;
 int volatile i;
 void main2(void)
 {
+  /*@ assert Eva: pointer_downcast: (unsigned int)(&s1) ≤ 2147483647; */
   struct s *p = (& s1 + (int)(& s1)) - (int)(& s1);
   /*@ assert
-      Eva: index_bound: (unsigned int)(sizeof(s1.t) - (unsigned int)i) < 10;
+      Eva: index_bound:
+        (unsigned int)(sizeof(int [10]) - (unsigned int)i) < 10;
   */
   /*@ assert
       Eva: mem_access:
-        \valid(&p->t[(unsigned int)(sizeof(s1.t) - (unsigned int)i)]);
+        \valid(&p->t[(unsigned int)(sizeof(int [10]) - (unsigned int)i)]);
   */
   p->t[sizeof(s1.t) - (unsigned int)i] = 1;
   /*@ assert
-      Eva: index_bound: (unsigned int)(sizeof(s1.t) - (unsigned int)i) < 10;
+      Eva: index_bound:
+        (unsigned int)(sizeof(int [10]) - (unsigned int)i) < 10;
   */
   /*@ assert
       Eva: mem_access:
-        \valid(&p->t[(unsigned int)(sizeof(s1.t) - (unsigned int)i)]);
+        \valid(&p->t[(unsigned int)(sizeof(int [10]) - (unsigned int)i)]);
   */
   p->t[sizeof(s1.t) - (unsigned int)i] = 2;
   return;

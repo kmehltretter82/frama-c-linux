@@ -27,6 +27,12 @@ void integer(int dest[10]){
   memset(res, 0xFF, 10 * sizeof(int));
 }
 
+enum E { A, B, C } ;
+void with_enum(enum E dest[10]){
+  enum E * res = memset(dest, 0xFF, 10 * sizeof(enum E));
+  memset(res, 0xFF, 10 * sizeof(enum E));
+}
+
 void unsigned_integer(unsigned dest[10]){
   unsigned * res = memset(dest, 0xFF, 10 * sizeof(unsigned));
   memset(res, 0xFF, 10 * sizeof(unsigned));
@@ -81,4 +87,9 @@ void nested(int (*dest)[10], int n){
 void with_void(void* dest){
   void* res = memset(dest, 0xFF, 10);
   memset(res, 0xFF, 10);
+}
+
+void with_null_or_int(void){
+  memset(NULL, 0xFF, 10);
+  memset((int*) 42, 0xFF, 10);
 }

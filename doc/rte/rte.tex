@@ -805,6 +805,9 @@ signed overflows \\
 \lstinline|-warn-signed-downcast| & boolean (false) & Generate annotations for
 signed integer downcast \\
 \hline
+\lstinline|-warn-pointer-downcast| & boolean (true) & Generate annotations for
+downcast of pointer values \\
+\hline
 \lstinline|-warn-left-shift-negative| & boolean (true) & Generate annotations for
 left shift on negative values \\
 \hline
@@ -814,8 +817,11 @@ right shift on negative values \\
 \lstinline|-warn-invalid-bool| & boolean (true) & Generate annotations for
 \lstinline|_Bool| trap representations \\
 \hline
-\lstinline|-warn-special-float| &  string: \lstinline|non-finite|, (\lstinline|nan|) or \lstinline|none|  & generate annotations when
+\lstinline|-warn-special-float| &  string: (\lstinline|non-finite|), \lstinline|nan| or \lstinline|none|  & generate annotations when
 special floats are produced: infinite floats or NaN (by default), only on NaN or never. \\
+\hline
+\lstinline|-warn-invalid-pointer| & boolean (false) & Generate annotations for
+invalid pointer arithmetic \\
 \hline
 \end{tabular}
 \caption{\framac kernel options, impacting \rte{}} \label{kernel}

@@ -694,8 +694,7 @@ let type_expr env ?tr ?current e =
         let e = Cil.parseIntLogic ~loc s in
         env, e, cond
       | PCst (Logic_ptree.FloatConstant str) ->
-          let c = Logic_utils.string_to_float_lconstant str in
-          env, Logic_const.term (TConst c) Lreal, cond
+        env, Logic_utils.parse_float ~loc str, cond
       | PCst (Logic_ptree.StringConstant s) ->
         let t =
           Logic_const.term

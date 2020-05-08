@@ -102,7 +102,6 @@ Print slice = h_slice_1:
 
 /**/int h(void)
 {
-  /* <[---], [---]> */ int __retres;
   /* invisible call */ /* <[---], [---]> */
   /* <[---], [---]> */ int a = f(1);
   /* invisible call */ /* <[---], [---]> */
@@ -117,9 +116,7 @@ Print slice = h_slice_1:
     G = g(c);
   }
   /* <[---], [---]> */
-  __retres = (int)(& g);
-  /* <[---], [---]> */
-  return __retres;
+  return G;
 }
 
 Slicing project worklist [default] =
@@ -223,7 +220,6 @@ Print slice = h_slice_1: (InCtrl: <[---], [ S ]>)
 
 /**/int h(void)
 {
-  /* <[---], [---]> */ int __retres;
   /* sig call:
     (InCtrl: <[---], [ S ]>)
     (In1: <[---], [ S ]>)
@@ -262,9 +258,7 @@ Print slice = h_slice_1: (InCtrl: <[---], [ S ]>)
     G = g(c);
   }
   /* <[---], [---]> */
-  __retres = (int)(& g);
-  /* <[---], [---]> */
-  return __retres;
+  return G;
 }
 
 Slicing project worklist [default] =

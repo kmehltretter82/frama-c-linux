@@ -21,7 +21,7 @@
 
 -* E-ACSL       [2020/03/24] Fix automatic deactivation of plug-in Variadic when
                 E-ACSL is directly called from Frama-C without using
-	        e-acsl-gcc.sh.
+                e-acsl-gcc.sh.
 -  E-ACSL       [2020/03/10] Call E-ACSL's free functions for globals in a
                 separate function at the end of main.
 -  E-ACSL       [2020/03/10] Call `__e_acsl_memory_init` only if the memory

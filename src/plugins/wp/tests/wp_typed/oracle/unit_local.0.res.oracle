@@ -25,6 +25,6 @@ Prove: true.
 Goal Assigns nothing in 'foo' (2/2):
 Effect at line 19
 Assume { (* Heap *) Type: linked(Malloc_0). }
-Prove: invalid(Malloc_0, global(L_a_21), 1).
+Prove: invalid(Malloc_0, global(L_a_23), 1).
 
 ------------------------------------------------------------

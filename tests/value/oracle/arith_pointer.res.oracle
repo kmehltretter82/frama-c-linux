@@ -22,6 +22,8 @@
 [eva:alarm] tests/value/arith_pointer.c:51: Warning: 
   pointer subtraction. assert \base_addr(p2) ≡ \base_addr(p2);
 [eva] tests/value/arith_pointer.c:52: Frama_C_show_each: {0}
+[eva:alarm] tests/value/arith_pointer.c:54: Warning: 
+  pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
 [eva] tests/value/arith_pointer.c:54: 
   Assigning imprecise value to p1.
   The imprecision originates from Arithmetic {tests/value/arith_pointer.c:54}
@@ -148,6 +150,8 @@
   Frama_C_show_each:
   {{ garbled mix of &{x; y}
   (origin: Arithmetic {tests/value/arith_pointer.c:51}) }}
+[eva:alarm] tests/value/arith_pointer.c:54: Warning: 
+  pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
 [eva:alarm] tests/value/arith_pointer.c:56: Warning: 
   signed overflow. assert -2147483648 ≤ p2 - p1;
 [eva:alarm] tests/value/arith_pointer.c:56: Warning: 

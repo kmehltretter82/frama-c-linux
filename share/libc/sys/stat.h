@@ -32,25 +32,58 @@ __BEGIN_DECLS
 extern int    chmod(const char *, mode_t);
 extern int    fchmod(int, mode_t);
 extern int    fstat(int, struct stat *);
-extern int    lstat(const char *, struct stat *);
+
+/*@ // missing: may assign to errno: EACCES, ELOOP, ENAMETOOLONG,
+    //                               ENOENT, ENOMEM, ENOTDIR, EOVERFLOW,
+    //                               EINVAL
+    // missing: assigns \result, *buf \from 'filesystem'
+  requires valid_path: valid_read_string(path);
+  requires valid_buf: \valid(buf);
+  assigns \result, *buf \from indirect:path, indirect:path[0..strlen(path)];
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+*/
+extern int    lstat(const char *path, struct stat *buf);
 
 /*@ // missing: may assign to errno: EACCES, EEXIST, ELOOP, EMLINK,
     //                               ENAMETOOLONG, ENOENT, ENOSPC,
     //                               ENOTDIR, EROFS
     // missing: assigns \result \from 'filesystem'
-  requires valid_string_path: valid_read_string(path);
-  assigns \result \from indirect:path, indirect:path[0..], indirect:mode;
+  requires valid_path: valid_read_string(path);
+  assigns \result \from indirect:path, indirect:path[0..strlen(path)],
+                        indirect:mode;
   ensures result_ok_or_error: \result == 0 || \result == -1;
 */
 extern int    mkdir(const char *path, mode_t mode);
 
-extern int    mkfifo(const char *, mode_t);
-extern int    mknod(const char *, mode_t, dev_t);
+/*@ // missing: may assign to errno: EACCES, EEXIST, ELOOP, ENAMETOOLONG,
+    //                               ENOENT, ENOTDIR, ENOSPC, EROFS
+    // missing: assigns \result \from 'filesystem'
+    // missing: assigns 'filesystem' \from indirect:path,
+    //                                     indirect:path[0..strlen(path)], mode;
+  requires valid_path: valid_read_string(path);
+  assigns \result \from indirect:path, indirect:path[0..strlen(path)],
+                        indirect:mode;
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+*/
+extern int    mkfifo(const char *path, mode_t mode);
+
+/*@ // missing: may assign to errno: EACCES, EEXIST, EINVAL, EIO, ELOOP,
+    //                               ENAMETOOLONG, ENOENT, ENOTDIR, ENOSPC,
+    //                               EPERM, EROFS
+    // missing: assigns \result \from 'filesystem'
+    // missing: assigns 'filesystem' \from indirect:path,
+    //          indirect:path[0..strlen(path)], mode, dev;
+  requires valid_path: valid_read_string(path);
+  assigns \result \from indirect:path, indirect:path[0..strlen(path)],
+                        indirect:mode, indirect:dev;
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+*/
+extern int    mknod(const char *path, mode_t mode, dev_t dev);
 
 /*@ //missing: assigns \from 'filesystem'
   requires valid_pathname: valid_read_string(pathname);
   requires valid_buf: \valid(buf);
-  assigns \result, *buf \from pathname[0..];
+  assigns \result, *buf \from pathname[0..strlen(pathname)];
   ensures result_ok_or_error: \result == 0 || \result == -1;
   ensures init_on_success:initialization:buf:
     \result == 0 ==> \initialized(buf);

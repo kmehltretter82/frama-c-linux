@@ -708,6 +708,7 @@ and named_predicate_content_to_exp ?name kf env p =
     e, env
   | Pseparated _ -> not_yet env "\\separated"
   | Pdangling _ -> not_yet env "\\dangling"
+  | Pobject_pointer _ -> not_yet env "\\object_pointer"
   | Pvalid_function _ -> not_yet env "\\valid_function"
   | Prel(rel, t1, t2) ->
     let ity = Typing.get_integer_op_of_predicate p in

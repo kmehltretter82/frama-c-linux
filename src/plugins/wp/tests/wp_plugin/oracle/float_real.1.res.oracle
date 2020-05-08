@@ -13,11 +13,11 @@
 Goal Post-condition (file tests/wp_plugin/float_real.i, line 14) in 'dequal':
 Assume {
   Type: is_sint32(dequal_0).
-  If lt_f64(add_f64(x, neg_f64(y)),
+  If lt_f64(sub_f64(x, y),
        to_f64((5902958103587057.0/590295810358705651712)))
   Then {
     If lt_f64(to_f64((-5902958103587057.0/590295810358705651712)),
-         add_f64(x, neg_f64(y)))
+         sub_f64(x, y))
     Then { (* Return *) Have: dequal_0 = 1. }
     Else { (* Return *) Have: dequal_0 = 0. }
   }

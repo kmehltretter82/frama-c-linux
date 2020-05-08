@@ -23,4 +23,4 @@
 (* Dump region graphs to dir according to -wp options.
    By default, does nothing. *)
 
-val dump : dir:string -> Kernel_function.t -> Region.map -> unit
+val dump : dir:Datatype.Filepath.t -> Kernel_function.t -> Region.map -> unit

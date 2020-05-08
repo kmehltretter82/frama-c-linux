@@ -31,7 +31,7 @@ class non_zero_divisor prj = object (self)
   (* A division is an expression: we override the vexpr method *)
   method! vexpr e = match e.enode with
   | BinOp((Div|Mod), _, denom, _) ->
-    let logic_denom = Logic_utils.expr_to_term ~cast:true denom in
+    let logic_denom = Logic_utils.expr_to_term ~coerce:false denom in
     let assertion = Logic_const.prel (Rneq, logic_denom, Cil.lzero ()) in
     (* At this point, we have built the assertion we want to insert. It remains
        to attach it to the correct statement. The cil visitor maintains the
@@ -43,7 +43,7 @@ class non_zero_divisor prj = object (self)
       | Kglobal -> assert false
       | Kstmt s -> s
     in
-    let kf = Extlib.the self#current_kf in 
+    let kf = Extlib.the self#current_kf in
     (* The above statement and function are related to the original project. We
        need to attach the new assertion to the corresponding statement and
        function of the new project. Cil provides functions to convert a

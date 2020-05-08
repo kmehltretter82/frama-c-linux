@@ -17,10 +17,36 @@
 Open Source Release <next-release>
 ##################################
 
--   Kernel    [2020/02/20] Add option -cpp-extra-args-per-file
+-*  Doc       [2020/05/07] Fixes internal refs in generated pdfs (fixes #2505)
+-*  Kernel    [2020/05/04] Accept UCN-encoded unicode char in ACSL (fixes #@849)
+o   Kernel    [2020/04/27] Plug-ins specific dirs now use Filepath instead of
+              mere strings.
+-   Eva       [2020/04/10] Fixes the Memexec cache on functions with logical
+              annotations about variables unused in the C body of the function.
+-   Eva       [2020/04/06] New option -eva-domains-function to enable domains
+              only on given functions. Argument <d:f> enables the domain [d]
+              on function [f], while <d:f+> also enables it on all functions
+              called from [f]. <d:f-> disables [d] from function [f].
+-   Eva       [2020/04/03] New experimental builtins for dynamic allocation
+              Frama_C_*alloc_imprecise: faster convergence, but very imprecise.
+-   Kernel    [2020/04/01] Report user errors when keys are not bound to a
+              value for command-line options that require pairs of key:value
+              as arguments. Such keys were silently ignored.
+*!  Kernel    [2020/03/30] Reject labels at end of blocks.
+-   RTE       [2020/03/30] Emits alarm on invalid pointers when option is on
+-   Eva       [2020/03/30] Emits alarm on invalid pointers when option is on
+-   Kernel    [2020/03/30] New option -warn-invalid-pointer (disabled by
+              default) to warn on invalid pointer arithmetics resulting in a
+              pointer that does not point to an object or one past an object.
+-   RTE       [2020/03/27] Emits alarm on pointer downcast when option is on
+-   Eva       [2020/03/27] Emits alarm on pointer downcast when option is on
+-   Kernel    [2020/03/27] New option -warn-pointer-downcast (activated by
+              default), to warn when a conversion between pointer and integer
+              might provoke a loss of precision.
+-   Kernel    [2020/03/20] Add option -cpp-extra-args-per-file
 -*  Kernel    [2020/03/18] Fixes #@823 (-load-module/-load-script now accept
               spaces in filename)
--*  Kernel    [2020/03/18] Fixes #@818 (term generated for downcast alarms) 
+-*  Kernel    [2020/03/18] Fixes #@818 (term generated for downcast alarms)
 -   Eva       [2020/03/17] Supports the ACSL extended quantifiers \min and \max.
 -   Eva       [2020/03/17] deprecate options -eva-*-domain in favor of
               -eva-domains

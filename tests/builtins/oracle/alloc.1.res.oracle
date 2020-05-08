@@ -16,6 +16,8 @@
 [eva] tests/builtins/alloc.c:50: Call to builtin Frama_C_malloc_fresh
 [eva] tests/builtins/alloc.c:50: allocating variable __malloc_main_abs_l50
 [eva:alarm] tests/builtins/alloc.c:51: Warning: 
+  pointer downcast. assert (unsigned int)q ≤ 2147483647;
+[eva:alarm] tests/builtins/alloc.c:51: Warning: 
   signed overflow. assert -2147483648 ≤ -((int)q);
 [eva:alarm] tests/builtins/alloc.c:51: Warning: 
   signed overflow. assert -((int)q) ≤ 2147483647;
@@ -24,6 +26,8 @@
   The imprecision originates from Arithmetic {tests/builtins/alloc.c:51}
 [eva:alarm] tests/builtins/alloc.c:54: Warning: 
   out of bounds write. assert \valid(r);
+[eva:alarm] tests/builtins/alloc.c:54: Warning: 
+  pointer downcast. assert (unsigned int)r ≤ 2147483647;
 [eva:alarm] tests/builtins/alloc.c:56: Warning: 
   signed overflow. assert -2147483648 ≤ *q + 1;
 [eva:alarm] tests/builtins/alloc.c:56: Warning: 

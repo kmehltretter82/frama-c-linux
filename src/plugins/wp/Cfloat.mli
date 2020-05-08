@@ -50,6 +50,7 @@ type op =
   | NE
   | NEG
   | ADD
+  | SUB
   | MUL
   | DIV
   | REAL

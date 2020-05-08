@@ -65,7 +65,7 @@ int main(void)
   uz = (unsigned int)((int)(0x80000000 / 0xffffffff));
   /*@ assert rte: signed_overflow: -2147483648 ≤ x + y; */
   /*@ assert rte: signed_overflow: x + y ≤ 2147483647; */
-  /*@ assert rte: division_by_zero: (int)(x + y) ≢ 0; */
+  /*@ assert rte: division_by_zero: (tint)(x + y) ≢ 0; */
   z = 1 / (x + y);
   /*@ assert rte: signed_overflow: x / (int)(-1) ≤ 2147483647; */
   z = x / -1;

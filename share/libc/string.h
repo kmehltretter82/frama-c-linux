@@ -155,7 +155,7 @@ extern int strncmp (const char *s1, const char *s2, size_t n);
 extern int strcoll (const char *s1, const char *s2);
 
 /*@ requires valid_string_s: valid_read_string(s);
-  @ assigns \result \from s, s[0..],c;
+  @ assigns \result \from s, indirect:s[0..strlen(s)], indirect:c;
   @ behavior found:
   @   assumes char_found: strchr(s,c);
   @   ensures result_char: *\result == (char)c;
@@ -171,6 +171,12 @@ extern int strcoll (const char *s1, const char *s2);
   @     \result == \null || \base_addr(\result) == \base_addr(s);
   @*/
 extern char *strchr(const char *s, int c);
+
+/*@ requires valid_string_s: valid_read_string(s);
+  @ assigns \result \from s, indirect:s[0..strlen(s)], indirect:c;
+  @ ensures result_same_base: \subset(\result, s+(0..strlen(s)));
+  @*/
+extern char *strchrnul(const char *s, int c);
 
 /*@ requires valid_string_s: valid_read_string(s);
   @ assigns \result \from s, s[0..],c;

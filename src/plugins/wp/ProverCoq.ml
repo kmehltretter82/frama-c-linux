@@ -34,7 +34,7 @@ let dkey = Wp_parameters.register_category "prover"
 let cluster_file c =
   let dir = WpContext.directory () in
   let base = cluster_id c in
-  Printf.sprintf "%s/%s.v" dir base
+  Printf.sprintf "%s/%s.v" (dir :> string) base
 
 (* -------------------------------------------------------------------------- *)
 (* --- External Coq Libraries                                             --- *)
@@ -314,8 +314,8 @@ and assemble_coqlib coqcc c =
     begin
       let tgtdir = Wp_parameters.get_output_dir "coqwp" in
       let source = Printf.sprintf "%s/%s" c.c_source c.c_file in
-      let target = Printf.sprintf "%s/%s" tgtdir c.c_file in
-      let dir = Printf.sprintf "%s/%s" tgtdir c.c_path in
+      let target = Printf.sprintf "%s/%s" (tgtdir :> string) c.c_file in
+      let dir = Printf.sprintf "%s/%s" (tgtdir :> string) c.c_path in
       if need_recompile ~source ~target then
         begin
           Wp_parameters.make_output_dir dir ;
@@ -333,7 +333,7 @@ let assemble_goal ~pid axioms prop =
   let title = Pretty_utils.to_string WpPropId.pretty pid in
   let model = WpContext.directory () in
   let id = WpPropId.get_propid pid in
-  let file = Printf.sprintf "%s/%s.coq" model id in
+  let file = Printf.sprintf "%s/%s.coq" (model :> string) id in
   let goal = cluster ~id ~title () in
   let deps = Command.print_file file
       begin fun fmt ->
@@ -359,7 +359,7 @@ let assemble_goal ~pid axioms prop =
       end in
   let coqcc = { marked = Marked.empty ; includes = [] ; sources = [] } in
   List.iter (assemble coqcc) deps ;
-  let includes = (model , "") :: List.rev coqcc.includes in
+  let includes = ((model :> string) , "") :: List.rev coqcc.includes in
   let sources = List.rev coqcc.sources in
   includes , sources , file
 
@@ -435,10 +435,9 @@ class runcoq includes source =
       self#timeout (coq_timeout ()) ;
       Task.call
         (fun () ->
-           if not (Wp_parameters.Check.get ()) then
-             let name = Filename.basename source in
-             Wp_parameters.feedback ~ontty:`Transient
-               "[Coq] Compiling '%s'." name) ()
+           let name = Filename.basename source in
+           Wp_parameters.feedback ~ontty:`Transient
+             "[Coq] Compiling '%s'." name) ()
       >>= self#run ~logout ~logerr
       >>= fun r ->
       if r = 127 then Task.failed "Command '%s' not found" cmd
@@ -523,13 +522,6 @@ type coq_wpo = {
   cw_includes : included list ; (* -R ... ... *)
 }
 
-let make_check w =
-  Command.print_file w.cw_script
-    begin fun fmt ->
-      Command.pp_from_file fmt w.cw_goal ;
-      Format.fprintf fmt "Proof.@\nAdmitted.@\n@." ;
-    end
-
 let make_script w script closing =
   Command.print_file w.cw_script
     begin fun fmt ->
@@ -539,10 +531,6 @@ let make_script w script closing =
 
 let try_script w script closing =
   make_script w script closing ;
-  (new runcoq w.cw_includes w.cw_script)#check
-
-let check_script w =
-  make_check w ;
   (new runcoq w.cw_includes w.cw_script)#check
 
 let rec try_hints w = function
@@ -618,8 +606,6 @@ let prove_session ~mode w =
   end
   >>= Task.call (fun r -> if r then VCS.valid else VCS.unknown)
 
-exception Admitted_not_proved
-
 let gen_session w =
   begin
     make_script w "  ...\n" "Qed." ;
@@ -627,19 +613,9 @@ let gen_session w =
     Task.return VCS.no_result
   end
 
-let check_session w =
-  compile_headers w.cw_includes false w.cw_headers >>=
-  (fun () -> check_script w) >>> function
-  | Task.Result true -> Task.return VCS.checked
-  | Task.Failed e -> Task.raised e
-  | Task.Canceled | Task.Timeout _ | Task.Result false ->
-      Task.raised Admitted_not_proved
-
 let prove_session ~mode w =
   if Wp_parameters.Generate.get () then
     gen_session w
-  else if Wp_parameters.Check.get () then
-    check_session w
   else
     prove_session ~mode w
 

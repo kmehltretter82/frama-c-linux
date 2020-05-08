@@ -105,72 +105,6 @@ int main(void)
   return __retres;
 }
 
-int __gen_e_acsl_f2(int n)
-{
-  int __gen_e_acsl_if_4;
-  if (n < 0) __gen_e_acsl_if_4 = 1;
-  else {
-    int __gen_e_acsl_f2_9;
-    int __gen_e_acsl_f2_11;
-    int __gen_e_acsl_f2_13;
-    __gen_e_acsl_f2_9 = __gen_e_acsl_f2_2(n - 1L);
-    __gen_e_acsl_f2_11 = __gen_e_acsl_f2_2(n - 2L);
-    __gen_e_acsl_f2_13 = __gen_e_acsl_f2_2(n - 3L);
-    __e_acsl_assert(__gen_e_acsl_f2_13 != 0,"RTE","f2",
-                    "division_by_zero: __gen_e_acsl_f2_13 != 0",
-                    "tests/arith/functions_rec.c",10);
-    /*@ assert Eva: division_by_zero: __gen_e_acsl_f2_13 ≢ 0; */
-    /*@ assert
-        Eva: signed_overflow:
-          -2147483648 ≤ __gen_e_acsl_f2_9 * __gen_e_acsl_f2_11;
-    */
-    /*@ assert
-        Eva: signed_overflow:
-          __gen_e_acsl_f2_9 * __gen_e_acsl_f2_11 ≤ 2147483647;
-    */
-    /*@ assert
-        Eva: signed_overflow:
-          (int)(__gen_e_acsl_f2_9 * __gen_e_acsl_f2_11) / __gen_e_acsl_f2_13
-          ≤ 2147483647;
-    */
-    __gen_e_acsl_if_4 = (__gen_e_acsl_f2_9 * __gen_e_acsl_f2_11) / __gen_e_acsl_f2_13;
-  }
-  return __gen_e_acsl_if_4;
-}
-
-int __gen_e_acsl_f2_2(long n)
-{
-  int __gen_e_acsl_if_3;
-  if (n < 0L) __gen_e_acsl_if_3 = 1;
-  else {
-    int __gen_e_acsl_f2_4;
-    int __gen_e_acsl_f2_6;
-    int __gen_e_acsl_f2_8;
-    __gen_e_acsl_f2_4 = __gen_e_acsl_f2_2(n - 1L);
-    __gen_e_acsl_f2_6 = __gen_e_acsl_f2_2(n - 2L);
-    __gen_e_acsl_f2_8 = __gen_e_acsl_f2_2(n - 3L);
-    __e_acsl_assert(__gen_e_acsl_f2_8 != 0,"RTE","f2_2",
-                    "division_by_zero: __gen_e_acsl_f2_8 != 0",
-                    "tests/arith/functions_rec.c",10);
-    /*@ assert Eva: division_by_zero: __gen_e_acsl_f2_8 ≢ 0; */
-    /*@ assert
-        Eva: signed_overflow:
-          -2147483648 ≤ __gen_e_acsl_f2_4 * __gen_e_acsl_f2_6;
-    */
-    /*@ assert
-        Eva: signed_overflow:
-          __gen_e_acsl_f2_4 * __gen_e_acsl_f2_6 ≤ 2147483647;
-    */
-    /*@ assert
-        Eva: signed_overflow:
-          (int)(__gen_e_acsl_f2_4 * __gen_e_acsl_f2_6) / __gen_e_acsl_f2_8
-          ≤ 2147483647;
-    */
-    __gen_e_acsl_if_3 = (__gen_e_acsl_f2_4 * __gen_e_acsl_f2_6) / __gen_e_acsl_f2_8;
-  }
-  return __gen_e_acsl_if_3;
-}
-
 int __gen_e_acsl_g(int n)
 {
   int __retres = 0;
@@ -315,6 +249,72 @@ void __gen_e_acsl_f1_2(__e_acsl_mpz_t *__retres_arg, long n)
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_if));
   __gmpz_clear(__gen_e_acsl_if);
   return;
+}
+
+int __gen_e_acsl_f2(int n)
+{
+  int __gen_e_acsl_if_4;
+  if (n < 0) __gen_e_acsl_if_4 = 1;
+  else {
+    int __gen_e_acsl_f2_9;
+    int __gen_e_acsl_f2_11;
+    int __gen_e_acsl_f2_13;
+    __gen_e_acsl_f2_9 = __gen_e_acsl_f2_2(n - 1L);
+    __gen_e_acsl_f2_11 = __gen_e_acsl_f2_2(n - 2L);
+    __gen_e_acsl_f2_13 = __gen_e_acsl_f2_2(n - 3L);
+    __e_acsl_assert(__gen_e_acsl_f2_13 != 0,"RTE","f2",
+                    "division_by_zero: __gen_e_acsl_f2_13 != 0",
+                    "tests/arith/functions_rec.c",10);
+    /*@ assert Eva: division_by_zero: __gen_e_acsl_f2_13 ≢ 0; */
+    /*@ assert
+        Eva: signed_overflow:
+          -2147483648 ≤ __gen_e_acsl_f2_9 * __gen_e_acsl_f2_11;
+    */
+    /*@ assert
+        Eva: signed_overflow:
+          __gen_e_acsl_f2_9 * __gen_e_acsl_f2_11 ≤ 2147483647;
+    */
+    /*@ assert
+        Eva: signed_overflow:
+          (int)(__gen_e_acsl_f2_9 * __gen_e_acsl_f2_11) / __gen_e_acsl_f2_13
+          ≤ 2147483647;
+    */
+    __gen_e_acsl_if_4 = (__gen_e_acsl_f2_9 * __gen_e_acsl_f2_11) / __gen_e_acsl_f2_13;
+  }
+  return __gen_e_acsl_if_4;
+}
+
+int __gen_e_acsl_f2_2(long n)
+{
+  int __gen_e_acsl_if_3;
+  if (n < 0L) __gen_e_acsl_if_3 = 1;
+  else {
+    int __gen_e_acsl_f2_4;
+    int __gen_e_acsl_f2_6;
+    int __gen_e_acsl_f2_8;
+    __gen_e_acsl_f2_4 = __gen_e_acsl_f2_2(n - 1L);
+    __gen_e_acsl_f2_6 = __gen_e_acsl_f2_2(n - 2L);
+    __gen_e_acsl_f2_8 = __gen_e_acsl_f2_2(n - 3L);
+    __e_acsl_assert(__gen_e_acsl_f2_8 != 0,"RTE","f2_2",
+                    "division_by_zero: __gen_e_acsl_f2_8 != 0",
+                    "tests/arith/functions_rec.c",10);
+    /*@ assert Eva: division_by_zero: __gen_e_acsl_f2_8 ≢ 0; */
+    /*@ assert
+        Eva: signed_overflow:
+          -2147483648 ≤ __gen_e_acsl_f2_4 * __gen_e_acsl_f2_6;
+    */
+    /*@ assert
+        Eva: signed_overflow:
+          __gen_e_acsl_f2_4 * __gen_e_acsl_f2_6 ≤ 2147483647;
+    */
+    /*@ assert
+        Eva: signed_overflow:
+          (int)(__gen_e_acsl_f2_4 * __gen_e_acsl_f2_6) / __gen_e_acsl_f2_8
+          ≤ 2147483647;
+    */
+    __gen_e_acsl_if_3 = (__gen_e_acsl_f2_4 * __gen_e_acsl_f2_6) / __gen_e_acsl_f2_8;
+  }
+  return __gen_e_acsl_if_3;
 }
 
 

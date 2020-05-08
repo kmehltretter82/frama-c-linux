@@ -28,9 +28,13 @@
   Called from tests/value/bitfield.i:164.
 [eva] tests/value/bitfield.i:113: Frama_C_show_each: {1}
 [eva] tests/value/bitfield.i:117: Frama_C_show_each: {3}
+[eva:alarm] tests/value/bitfield.i:123: Warning: 
+  pointer downcast. assert (unsigned int)(&v) ≤ 2147483647;
 [eva] tests/value/bitfield.i:123: 
   Assigning imprecise value to v.c.
   The imprecision originates from Arithmetic {tests/value/bitfield.i:123}
+[eva:alarm] tests/value/bitfield.i:124: Warning: 
+  pointer downcast. assert (unsigned int)(&v + 1) ≤ 2147483647;
 [eva:alarm] tests/value/bitfield.i:125: Warning: 
   signed overflow. assert -2147483648 ≤ (int)v.d + 1;
 [eva:alarm] tests/value/bitfield.i:125: Warning: 
@@ -77,6 +81,8 @@
   signed overflow. assert -2147483648 ≤ foo + foo;
 [eva:alarm] tests/value/bitfield.i:129: Warning: 
   signed overflow. assert foo + foo ≤ 2147483647;
+[eva:alarm] tests/value/bitfield.i:130: Warning: 
+  pointer downcast. assert (unsigned int)(&v + 1) ≤ 2147483647;
 [eva] tests/value/bitfield.i:130: 
   Assigning imprecise value to h.c.
   The imprecision originates from Arithmetic {tests/value/bitfield.i:130}
@@ -207,6 +213,7 @@
 [eva] done for function main
 [eva] tests/value/bitfield.i:102: 
   assertion 'Eva,initialization' got final status invalid.
+[scope:rm_asserts] removing 1 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function char_short:
   S.c ∈ {1}
@@ -550,7 +557,9 @@ void main_old(void)
   else Frama_C_show_each(3);
   VV = (unsigned int)h.a;
   h.a = (unsigned int __attribute__((__FRAMA_C_BITFIELD_SIZE__(2))))VV;
+  /*@ assert Eva: pointer_downcast: (unsigned int)(&v) ≤ 2147483647; */
   v.c = (int __attribute__((__FRAMA_C_BITFIELD_SIZE__(22))))((int)(& v));
+  /*@ assert Eva: pointer_downcast: (unsigned int)(&v + 1) ≤ 2147483647; */
   v.d = (int __attribute__((__FRAMA_C_BITFIELD_SIZE__(32))))((int)(& v + 1));
   /*@ assert Eva: signed_overflow: -2147483648 ≤ (int)v.d + 1; */
   /*@ assert Eva: signed_overflow: (int)v.d + 1 ≤ 2147483647; */
@@ -561,6 +570,7 @@ void main_old(void)
   /*@ assert Eva: signed_overflow: -2147483648 ≤ foo + foo; */
   /*@ assert Eva: signed_overflow: foo + foo ≤ 2147483647; */
   h.b = (int __attribute__((__FRAMA_C_BITFIELD_SIZE__(4))))(((foo + foo) + (int)h.a) + (int)h.b);
+  /*@ assert Eva: pointer_downcast: (unsigned int)(&v + 1) ≤ 2147483647; */
   h.c = (int __attribute__((__FRAMA_C_BITFIELD_SIZE__(22))))((int)(& v + 1));
   k8.b = (int __attribute__((__FRAMA_C_BITFIELD_SIZE__(4))))8;
   tmp = return_8();

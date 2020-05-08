@@ -76,6 +76,19 @@ theory Cfloat
   axiom to_f64_minus_infinity: forall x. x <. -. F64.max_real -> is_negative_infinite_f64 (to_f64 x)
   axiom to_f64_plus_infinity: forall x. x >. F64.max_real -> is_positive_infinite_f64 (to_f64 x)
 
+  (* Note: This is OK as we have in Why3 ieee_float:
+
+     axiom Round_idempotent :
+       forall m1 m2:mode, x:real. round m1 (round m2 x) = round m2 x
+
+     So we can round RNE (to_f32/64 behavior) after any rounding.
+  *)
+  function round_float (m: Rounding.mode) (r: real) : f32 =
+    to_f32 (F32.round m r)
+
+  function round_double (m: Rounding.mode) (r: real) : f64 =
+    to_f64 (F64.round m r)
+
   (* Take care of +0/-0 *)
   axiom is_zero_to_f32_zero: F32.is_zero (to_f32 0.0)
   axiom is_zero_to_f64_zero: F64.is_zero (to_f64 0.0)
@@ -132,10 +145,15 @@ theory Cfloat
   function add_f32 (x:f32) (y:f32) : f32 = F32.(.+) x y
   function add_f64 (x:f64) (y:f64) : f64 = F64.(.+) x y
 
+  (* Substraction *)
+
+  function sub_f32 (x:f32) (y:f32) : f32 = F32.(.-) x y
+  function sub_f64 (x:f64) (y:f64) : f64 = F64.(.-) x y
+
   (* Multiplication *)
 
-  function mul_f32 (x:f32) (y:f32) : f32 = F32.(.-) x y
-  function mul_f64 (x:f64) (y:f64) : f64 = F64.(.-) x y
+  function mul_f32 (x:f32) (y:f32) : f32 = F32.(.*) x y
+  function mul_f64 (x:f64) (y:f64) : f64 = F64.(.*) x y
 
   (* Division *)
 

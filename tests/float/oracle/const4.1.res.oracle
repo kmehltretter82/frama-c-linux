@@ -6,7 +6,7 @@
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva:alarm] tests/float/const4.i:7: Warning: 
-  non-finite float value. assert \is_finite(3.405e38f);
+  non-finite float value. assert \is_finite((float)3.405e38f);
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   f1 ∈ [3.39999995214e+38 .. 3.40000015497e+38]

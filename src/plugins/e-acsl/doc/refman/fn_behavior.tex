@@ -1,6 +1,6 @@
 \begin{syntax}
-  [ function-contract ] ::= requires-clause*;
-                            { decreases-clause? } simple-clause*;
+  [ function-contract ] ::= requires-clause*
+                            { decreases-clause? } simple-clause*
                             named-behavior* { completeness-clause* }
   \
   requires-clause ::= "requires" pred ";"
@@ -8,6 +8,7 @@
   { decreases-clause } ::= { "decreases" term ("for" id)? ";" }
   \
   [ simple-clause ] ::= { assigns-clause } | ensures-clause
+                        | { allocation-clause} | { abrupt-clause }
   \
   { assigns-clause } ::= { "assigns" locations ";" }
   \

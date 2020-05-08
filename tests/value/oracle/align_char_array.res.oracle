@@ -15,25 +15,41 @@
   overlapread2 ∈ {0}
   overlapread3 ∈ {0}
   overlapread4 ∈ {0}
+[eva:alarm] tests/value/align_char_array.c:21: Warning: 
+  pointer downcast. assert (unsigned int)(&S.a) ≤ 2147483647;
+[eva:alarm] tests/value/align_char_array.c:21: Warning: 
+  pointer downcast. assert (unsigned int)(&S.c) ≤ 2147483647;
+[eva:alarm] tests/value/align_char_array.c:23: Warning: 
+  pointer downcast. assert (unsigned int)(&t[2][2]) ≤ 2147483647;
+[eva:alarm] tests/value/align_char_array.c:23: Warning: 
+  pointer downcast. assert (unsigned int)(&t[0][0]) ≤ 2147483647;
+[eva:alarm] tests/value/align_char_array.c:25: Warning: 
+  pointer downcast. assert (unsigned int)((char (*)[10])t) ≤ 2147483647;
 [eva:alarm] tests/value/align_char_array.c:25: Warning: 
   signed overflow. assert -2147483648 ≤ (int)((char (*)[10])t) + 3;
 [eva:alarm] tests/value/align_char_array.c:25: Warning: 
   signed overflow. assert (int)((char (*)[10])t) + 3 ≤ 2147483647;
 [eva:alarm] tests/value/align_char_array.c:26: Warning: 
+  pointer downcast. assert (unsigned int)((char (*)[10])t) ≤ 2147483647;
+[eva:alarm] tests/value/align_char_array.c:26: Warning: 
   signed overflow. assert -2147483648 ≤ (int)((char (*)[10])t) + 3;
 [eva:alarm] tests/value/align_char_array.c:26: Warning: 
   signed overflow. assert (int)((char (*)[10])t) + 3 ≤ 2147483647;
+[eva:alarm] tests/value/align_char_array.c:27: Warning: 
+  pointer downcast. assert (unsigned int)((char (*)[10])t) ≤ 2147483647;
 [eva:alarm] tests/value/align_char_array.c:27: Warning: 
   signed overflow. assert -2147483648 ≤ (int)((char (*)[10])t) + 2;
 [eva:alarm] tests/value/align_char_array.c:27: Warning: 
   signed overflow. assert (int)((char (*)[10])t) + 2 ≤ 2147483647;
+[eva:alarm] tests/value/align_char_array.c:28: Warning: 
+  pointer downcast. assert (unsigned int)((char (*)[10])t) ≤ 2147483647;
 [eva:alarm] tests/value/align_char_array.c:28: Warning: 
   signed overflow. assert -2147483648 ≤ (int)((char (*)[10])t) + 2;
 [eva:alarm] tests/value/align_char_array.c:28: Warning: 
   signed overflow. assert (int)((char (*)[10])t) + 2 ≤ 2147483647;
 [eva] Recording results for main
 [eva] done for function main
-[scope:rm_asserts] removing 4 assertion(s)
+[scope:rm_asserts] removing 7 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   d1 ∈ {1}

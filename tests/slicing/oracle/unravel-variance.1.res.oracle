@@ -21,20 +21,20 @@
 [eva:alarm] tests/slicing/unravel-variance.i:35: Warning: 
   non-finite float value. assert \is_finite(x[i]);
 [eva:alarm] tests/slicing/unravel-variance.i:36: Warning: 
-  non-finite float value. assert \is_finite((float)(x[i] * x[i]));
+  non-finite float value. assert \is_finite(\mul_float(x[i], x[i]));
 [eva] tests/slicing/unravel-variance.i:32: starting to merge loop iterations
 [eva] computing for function scanf <- main.
   Called from tests/slicing/unravel-variance.i:34.
 [eva] Done for function scanf
 [eva:alarm] tests/slicing/unravel-variance.i:35: Warning: 
-  non-finite float value. assert \is_finite((float)(t1 + x[i]));
+  non-finite float value. assert \is_finite(\add_float(t1, x[i]));
 [eva:alarm] tests/slicing/unravel-variance.i:36: Warning: 
   accessing uninitialized left-value. assert \initialized(&x[i]);
 [eva:alarm] tests/slicing/unravel-variance.i:36: Warning: 
   non-finite float value. assert \is_finite(x[i]);
 [eva:alarm] tests/slicing/unravel-variance.i:36: Warning: 
   non-finite float value.
-  assert \is_finite((float)(ssq + (float)(x[i] * x[i])));
+  assert \is_finite(\add_float(ssq, \mul_float(x[i], x[i])));
 [eva] computing for function scanf <- main.
   Called from tests/slicing/unravel-variance.i:34.
 [eva] Done for function scanf
@@ -47,69 +47,75 @@
 [eva:alarm] tests/slicing/unravel-variance.i:35: Warning: 
   accessing out of bounds index. assert i < 1024;
 [eva:alarm] tests/slicing/unravel-variance.i:38: Warning: 
-  non-finite float value. assert \is_finite((float)(t1 / (float)n));
+  non-finite float value. assert \is_finite(\div_float(t1, (float)n));
 [eva:alarm] tests/slicing/unravel-variance.i:39: Warning: 
-  non-finite float value. assert \is_finite((float)((float)n * avg));
+  non-finite float value. assert \is_finite(\mul_float((float)n, avg));
 [eva:alarm] tests/slicing/unravel-variance.i:39: Warning: 
   signed overflow. assert -2147483648 ≤ n - 1;
 [eva:alarm] tests/slicing/unravel-variance.i:39: Warning: 
   non-finite float value.
-  assert \is_finite((float)((float)((float)n * avg) * avg));
-[eva:alarm] tests/slicing/unravel-variance.i:39: Warning: 
-  non-finite float value.
-  assert \is_finite((float)(ssq - (float)((float)((float)n * avg) * avg)));
+  assert \is_finite(\mul_float(\mul_float((float)n, avg), avg));
 [eva:alarm] tests/slicing/unravel-variance.i:39: Warning: 
   non-finite float value.
   assert
-  \is_finite((float)((float)(ssq - (float)((float)((float)n * avg) * avg)) /
-                     (float)((int)(n - 1))));
+  \is_finite(\sub_float(ssq, \mul_float(\mul_float((float)n, avg), avg)));
+[eva:alarm] tests/slicing/unravel-variance.i:39: Warning: 
+  non-finite float value.
+  assert
+  \is_finite(\div_float(\sub_float(ssq,
+                                  \mul_float(\mul_float((float)n, avg), avg)),
+                       (float)((int)(n - 1))));
 [eva:alarm] tests/slicing/unravel-variance.i:40: Warning: 
-  non-finite float value. assert \is_finite((float)(t1 * avg));
+  non-finite float value. assert \is_finite(\mul_float(t1, avg));
 [eva:alarm] tests/slicing/unravel-variance.i:40: Warning: 
-  non-finite float value. assert \is_finite((float)(ssq - (float)(t1 * avg)));
+  non-finite float value.
+  assert \is_finite(\sub_float(ssq, \mul_float(t1, avg)));
 [eva:alarm] tests/slicing/unravel-variance.i:40: Warning: 
   non-finite float value.
   assert
-  \is_finite((float)((float)(ssq - (float)(t1 * avg)) / (float)((int)(n - 1))));
+  \is_finite(\div_float(\sub_float(ssq, \mul_float(t1, avg)),
+                       (float)((int)(n - 1))));
 [eva:alarm] tests/slicing/unravel-variance.i:41: Warning: 
-  non-finite float value. assert \is_finite((float)(t1 * t1));
+  non-finite float value. assert \is_finite(\mul_float(t1, t1));
 [eva:alarm] tests/slicing/unravel-variance.i:41: Warning: 
   non-finite float value.
-  assert \is_finite((float)((float)(t1 * t1) / (float)n));
+  assert \is_finite(\div_float(\mul_float(t1, t1), (float)n));
 [eva:alarm] tests/slicing/unravel-variance.i:42: Warning: 
-  non-finite float value. assert \is_finite((float)(ssq - t1));
+  non-finite float value. assert \is_finite(\sub_float(ssq, t1));
 [eva:alarm] tests/slicing/unravel-variance.i:42: Warning: 
   non-finite float value.
-  assert \is_finite((float)((float)(ssq - t1) / (float)((int)(n - 1))));
+  assert \is_finite(\div_float(\sub_float(ssq, t1), (float)((int)(n - 1))));
 [eva:alarm] tests/slicing/unravel-variance.i:46: Warning: 
   accessing uninitialized left-value. assert \initialized(&x[i]);
 [eva:alarm] tests/slicing/unravel-variance.i:46: Warning: 
   non-finite float value. assert \is_finite(x[i]);
 [eva:alarm] tests/slicing/unravel-variance.i:46: Warning: 
-  non-finite float value. assert \is_finite((float)(x[i] - avg));
+  non-finite float value. assert \is_finite(\sub_float(x[i], avg));
 [eva:alarm] tests/slicing/unravel-variance.i:48: Warning: 
-  non-finite float value. assert \is_finite((float)(dev * dev));
+  non-finite float value. assert \is_finite(\mul_float(dev, dev));
 [eva] tests/slicing/unravel-variance.i:44: starting to merge loop iterations
 [eva:alarm] tests/slicing/unravel-variance.i:47: Warning: 
-  non-finite float value. assert \is_finite((float)(t2 + dev));
+  non-finite float value. assert \is_finite(\add_float(t2, dev));
 [eva:alarm] tests/slicing/unravel-variance.i:48: Warning: 
-  non-finite float value. assert \is_finite((float)(t1 + (float)(dev * dev)));
+  non-finite float value.
+  assert \is_finite(\add_float(t1, \mul_float(dev, dev)));
 [eva:alarm] tests/slicing/unravel-variance.i:50: Warning: 
-  non-finite float value. assert \is_finite((float)(t2 * t2));
+  non-finite float value. assert \is_finite(\mul_float(t2, t2));
 [eva:alarm] tests/slicing/unravel-variance.i:50: Warning: 
   non-finite float value.
-  assert \is_finite((float)((float)(t2 * t2) / (float)n));
+  assert \is_finite(\div_float(\mul_float(t2, t2), (float)n));
 [eva:alarm] tests/slicing/unravel-variance.i:50: Warning: 
   non-finite float value.
-  assert \is_finite((float)(t1 - (float)((float)(t2 * t2) / (float)n)));
+  assert \is_finite(\sub_float(t1, \div_float(\mul_float(t2, t2), (float)n)));
 [eva:alarm] tests/slicing/unravel-variance.i:50: Warning: 
   non-finite float value.
   assert
-  \is_finite((float)((float)(t1 - (float)((float)(t2 * t2) / (float)n)) /
-                     (float)((int)(n - 1))));
+  \is_finite(\div_float(\sub_float(t1,
+                                  \div_float(\mul_float(t2, t2), (float)n)),
+                       (float)((int)(n - 1))));
 [eva:alarm] tests/slicing/unravel-variance.i:51: Warning: 
   non-finite float value.
-  assert \is_finite((float)(t1 / (float)((int)(n - 1))));
+  assert \is_finite(\div_float(t1, (float)((int)(n - 1))));
 [eva:alarm] tests/slicing/unravel-variance.i:52: Warning: 
   overflow in conversion from floating-point to integer.
   assert -2147483649 < var2;

@@ -359,7 +359,8 @@ module rec Transfer
   let register_object kf state_ref = object
     inherit Visitor.frama_c_inplace
     method !vpredicate_node = function
-    | Pvalid(_, t) | Pvalid_read(_, t) | Pvalid_function t
+    | Pvalid(_, t) | Pvalid_read(_, t)
+    | Pobject_pointer(_, t) | Pvalid_function t
     | Pinitialized(_, t) | Pfreeable(_, t) ->
       (*	Options.feedback "REGISTER %a" Cil.d_term t;*)
       state_ref := register_term kf !state_ref t;

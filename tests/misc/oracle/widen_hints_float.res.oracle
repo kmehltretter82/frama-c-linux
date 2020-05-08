@@ -37,7 +37,8 @@
 [eva:alarm] tests/misc/widen_hints_float.c:34: Warning: 
   non-finite double value.
   assert
-  \is_finite((double)((double)(f3 - (double)64) * (double)(f3 - (double)64)));
+  \is_finite(\mul_double(\sub_double(f3, (double)64),
+                        \sub_double(f3, (double)64)));
 [eva] Recording results for parabola
 [eva] Done for function parabola
 [eva] computing for function trigo <- main.

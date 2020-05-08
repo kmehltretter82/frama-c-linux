@@ -138,7 +138,7 @@ let isCrossableAtInit tr func =
       let rec aux t =
         match t.term_node with
         | TConst (LEnum ei) ->
-          aux (Logic_utils.expr_to_term ~cast:false ei.eival)
+          aux (Logic_utils.expr_to_term ei.eival)
         | TLval lv ->
           (match aux_lv lv with
            | Some t -> t
@@ -241,7 +241,7 @@ let isCrossableAtInit tr func =
       and aux_init off initinfo =
         match off, initinfo with
         | TNoOffset, SingleInit e ->
-          Some (aux (Logic_utils.expr_to_term ~cast:false e))
+          Some (aux (Logic_utils.expr_to_term e))
         | TIndex(t,oth), CompoundInit (ct,initl) ->
           (match (aux t).term_node with
            | TConst(Integer(i1,_)) ->
@@ -653,7 +653,7 @@ let one_term () = Cil.lconstant Integer.one
 (** Returns a term representing the variable associated to the given varinfo *)
 let mk_term_from_vi vi =
   Logic_const.term
-    (TLval((Logic_utils.lval_to_term_lval ~cast:true (Cil.var vi))))
+    (TLval((Logic_utils.lval_to_term_lval (Cil.var vi))))
     (Ctype Cil.intType)
 
 (** Given an lval term 'host' and an integer value 'off', it returns a lval term host[off]. *)
@@ -681,8 +681,7 @@ let mk_offseted_array_states_as_enum host off =
     (Ctype Cil.intType)
 
 (** Returns a lval term associated to the curState generated variable. *)
-let host_state_term() =
-  lval_to_term_lval ~cast:true (state_lval())
+let host_state_term() = lval_to_term_lval (state_lval())
 (*
 (** Returns a lval term associated to the curStateOld generated variable. *)
 let host_stateOld_term () =

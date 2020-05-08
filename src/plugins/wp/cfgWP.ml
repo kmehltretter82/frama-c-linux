@@ -76,6 +76,9 @@ struct
     let equal g1 g2 = (compare g1 g2 = 0)
     let prop_id = function Gprop p | Gposteffect p | Geffect(p,_,_) -> p
     let source = function Gprop _ | Gposteffect _ -> None | Geffect(_,s,e) -> Some(s,e)
+    let is_smoke_test = function
+      | Gprop p -> WpPropId.is_smoke_test p
+      | Gposteffect _ | Geffect _ -> false
     let pretty fmt = function
       | Gprop p -> WpPropId.pretty fmt p
       | Geffect(p,s,FromCode) -> Format.fprintf fmt "%a at sid:%d" WpPropId.pretty p s.sid
@@ -344,7 +347,13 @@ struct
     let targets = List.fold_left
         (fun goals vcs -> Gset.union goals (Gmap.domain vcs))
         Gset.empty cases in
-    let goal g vcs = try Gmap.find g vcs with Not_found -> Splitter.empty in
+    let goal g vcs =
+      try
+        let vcs = Gmap.find g vcs in
+        if TARGET.is_smoke_test g
+        then Splitter.unmark merge_vcs vcs
+        else vcs
+      with Not_found -> Splitter.empty in
     Gset.mapping
       (fun g -> Splitter.merge_all merge_vcs (List.map (goal g) cases))
       targets
@@ -749,9 +758,9 @@ struct
   let condition ~descr ?stmt ?warn pa h vc =
     passify_vc pa (assume_vc ?stmt ?warn ~descr h vc)
 
-  let mark m = function
+  let mark ?(smoke=false) m = function
     | None -> Splitter.empty
-    | Some s -> Splitter.group m merge_vcs s
+    | Some s -> if smoke then s else Splitter.group m merge_vcs s
 
   let random () =
     let v = Lang.freshvar ~basename:"cond" Logic.Bool in
@@ -781,12 +790,15 @@ struct
          let vcs =
            if dosplit then
              let cneg = p_not cond in
-             let vcs1 = gmap (condition pa1 ~stmt ~warn ~descr:"Then" [cond]) wp1.vcs in
-             let vcs2 = gmap (condition pa2 ~stmt ~warn ~descr:"Else" [cneg]) wp2.vcs in
+             let vcs1 =
+               gmap (condition pa1 ~stmt ~warn ~descr:"Then" [cond]) wp1.vcs in
+             let vcs2 =
+               gmap (condition pa2 ~stmt ~warn ~descr:"Else" [cneg]) wp2.vcs in
              Gmap.merge
-               (fun _g w1 w2 ->
-                  let s1 = mark (Splitter.if_then stmt) w1 in
-                  let s2 = mark (Splitter.if_else stmt) w2 in
+               (fun g w1 w2 ->
+                  let smoke = TARGET.is_smoke_test g in
+                  let s1 = mark ~smoke (Splitter.if_then stmt) w1 in
+                  let s2 = mark ~smoke (Splitter.if_else stmt) w2 in
                   Some (Splitter.union (merge_vc) s1 s2)
                ) vcs1 vcs2
            else
@@ -1342,7 +1354,7 @@ struct
           else
             Bag.concat trivial_wpo provers_wpo
         in
-        WpAnnot.split
+        WpPropId.split_bag
           begin fun po_pid wpo ->
             let po_sid = WpPropId.get_propid po_pid in
             let po_leg = WpPropId.get_legacy po_pid in

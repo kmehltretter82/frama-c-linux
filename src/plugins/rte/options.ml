@@ -20,8 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let help_msg = "generates annotations for runtime error checking and \
-                preconditions at call sites"
+let help_msg = "generates annotations for runtime error checking"
 
 include Plugin.Register
     (struct

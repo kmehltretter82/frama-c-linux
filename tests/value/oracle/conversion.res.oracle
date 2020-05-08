@@ -57,6 +57,8 @@
   f ∈ [3. .. 5.]
   l ∈ UNINITIALIZED
   ==END OF DUMP==
+[eva:alarm] tests/value/conversion.i:38: Warning: 
+  pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
 [eva] tests/value/conversion.i:40: 
   Frama_C_dump_each:
   # Cvalue domain:
@@ -161,6 +163,8 @@
   f ∈ [3. .. 5.]
   l ∈ UNINITIALIZED
   ==END OF DUMP==
+[eva:alarm] tests/value/conversion.i:38: Warning: 
+  pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
 [eva:alarm] tests/value/conversion.i:39: Warning: 
   non-finite float value. assert \is_finite(*((float *)(&x)));
 [eva] tests/value/conversion.i:39: 

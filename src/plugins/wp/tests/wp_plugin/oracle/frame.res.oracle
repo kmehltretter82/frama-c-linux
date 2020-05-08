@@ -8,7 +8,7 @@
 ------------------------------------------------------------
 
 Goal Post-condition 'KO' in 'alias':
-Let a = global(P_r_39).
+Let a = global(P_r_41).
 Let x = Mint_1[a].
 Let x_1 = Mint_0[a].
 Assume { Type: is_sint32(x) /\ is_sint32(x_1). }

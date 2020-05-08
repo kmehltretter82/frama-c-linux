@@ -4,8 +4,8 @@
  STDOPT: #"-eva-no-builtins-auto -eva-alloc-returns-null -eva-builtin calloc:Frama_C_calloc_by_stack"
  STDOPT: #"-eva-no-builtins-auto -eva-no-alloc-returns-null -eva-builtin calloc:Frama_C_calloc_fresh"
  STDOPT: #"-eva-no-builtins-auto -eva-no-alloc-returns-null -eva-builtin calloc:Frama_C_calloc_by_stack"
+ STDOPT: #"-eva-no-builtins-auto -eva-no-alloc-returns-null -eva-builtin calloc:Frama_C_calloc_imprecise"
  */
-
 #include <stdlib.h>
 #include <stdint.h>
 

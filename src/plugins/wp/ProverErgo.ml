@@ -72,7 +72,7 @@ let rec locate_error files file line =
 let cluster_file c =
   let dir = WpContext.directory () in
   let base = cluster_id c in
-  Printf.sprintf "%s/%s.ergo" dir base
+  Format.sprintf "%s/%s.ergo" (dir :> string) base
 
 (* -------------------------------------------------------------------------- *)
 (* --- Exporting Formulae to Alt-Ergo                                     --- *)
@@ -165,7 +165,7 @@ class visitor fmt c =
       let df = D_file f in
       if not (List.mem df deps) then deps <- df :: deps
 
-    method add_shared f = self#add_dfile ((Wp_parameters.Share.file ~error:true f) :> string)
+    method add_shared f = self#add_dfile ((Wp_parameters.Share.get_file ~mode:`Must_exist f) :> string)
     method add_library f = self#add_dfile f
 
     method on_cluster c = deps <- (D_cluster c) :: deps
@@ -396,37 +396,21 @@ class altergo ~config ~pid ~gui ~file ~lines ~logout ~logerr =
               VCS.result
                 ~time:(if gui then 0.0 else timer)
                 ~steps verdict
-            with
-            | Not_found when Wp_parameters.Check.get () ->
-                if r = 0 then VCS.checked
-                else
-                  begin
-                    if Wp_parameters.verbose_atleast 1 then begin
-                      ProverTask.pp_file ~message:"Alt-Ergo (stdout)" ~file:logout ;
-                      ProverTask.pp_file ~message:"Alt-Ergo (stderr)" ~file:logerr ;
-                    end;
-                    VCS.failed "Alt-Ergo type-checking failed."
-                  end
-            | Not_found ->
-                begin
-                  if Wp_parameters.verbose_atleast 1 then begin
-                    ProverTask.pp_file ~message:"Alt-Ergo (stdout)" ~file:logout ;
-                    ProverTask.pp_file ~message:"Alt-Ergo (stderr)" ~file:logerr ;
-                  end;
-                  if r = 0 then VCS.failed "Unexpected Alt-Ergo output"
-                  else VCS.kfailed "Alt-Ergo exits with status [%d]." r
-                end
+            with Not_found ->
+              begin
+                if Wp_parameters.verbose_atleast 1 then begin
+                  ProverTask.pp_file ~message:"Alt-Ergo (stdout)" ~file:logout ;
+                  ProverTask.pp_file ~message:"Alt-Ergo (stderr)" ~file:logerr ;
+                end;
+                if r = 0 then VCS.failed "Unexpected Alt-Ergo output"
+                else VCS.kfailed "Alt-Ergo exits with status [%d]." r
+              end
 
     method prove =
       files <- lines ;
       if gui then ergo#set_command (Wp_parameters.AltGrErgo.get ()) ;
-      if Wp_parameters.Check.get () then
-        ergo#add ["-type-only"]
-      else
-        begin
-          ergo#add_parameter ~name:"-proof" Wp_parameters.ProofTrace.get ;
-          ergo#add_parameter ~name:"-model" Wp_parameters.ProofTrace.get ;
-        end ;
+      ergo#add_parameter ~name:"-proof" Wp_parameters.ProofTrace.get ;
+      ergo#add_parameter ~name:"-model" Wp_parameters.ProofTrace.get ;
       let flags = List.filter
           (fun p -> p <> "qlet")
           (Wp_parameters.AltErgoFlags.get ()) in

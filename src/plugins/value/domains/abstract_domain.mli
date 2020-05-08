@@ -134,7 +134,8 @@ module type Queries = sig
       - a value for the expression, which can be:
         – `Bottom if its evaluation is infeasible;
         – `Value (v, o) where [v] is an over-approximation of the abstract
-           value of the expression [exp], and [o] is the origin of the value. *)
+           value of the expression [exp], and [o] is the origin of the value,
+           which can be None. *)
 
   (** Query function for compound expressions:
       [eval oracle t exp] returns the known value of [exp] by the state [t].
@@ -143,14 +144,14 @@ module type Queries = sig
       No recursive evaluation should be done by this function. *)
   val extract_expr :
     (exp -> value evaluated) ->
-    state -> exp -> (value * origin) evaluated
+    state -> exp -> (value * origin option) evaluated
 
   (** Query function for lvalues:
       [find oracle t lval typ loc] returns the known value stored at
       the location [loc] of the left value [lval] of type [typ]. *)
   val extract_lval :
     (exp -> value evaluated) ->
-    state -> lval -> typ -> location -> (value * origin) evaluated
+    state -> lval -> typ -> location -> (value * origin option) evaluated
 
   (** [backward_location state lval typ loc v] reduces the location [loc] of the
       lvalue [lval] of type [typ], so that only the locations that may have value
@@ -357,12 +358,13 @@ module type S = sig
   (** Logical evaluation. This API is subject to changes. *)
   (* TODO: cooperative evaluation of predicates in the engine. *)
 
-  (** [logic_assign from loc_asgn pre state] applies the effect of the
-      [assigns ... \from ...] clause [from] to [state]. [pre] is the state
-      before the assign clauses, in which the terms of the clause are evaluated.
-      [loc_asgn] is the result of the evaluation of the [assigns] part of [from]
-      in [pre]. *)
-  val logic_assign: logic_assign -> location -> pre:state -> state -> state
+  (** [logic_assign None loc state] removes from [state] all inferred properties
+      that depend on the memory location [loc].
+      If the first argument is not None, it contains the logical clause being
+      interpreted and the pre-state in which the terms of the clause are
+      evaluated. The clause can be an assigns, allocates or frees clause.
+      [loc] is then the memory location concerned by the clause. *)
+  val logic_assign: (logic_assign * state) option -> location -> state -> state
 
   (** Evaluates a [predicate] to a logical status in the current [state].
       The [logic_environment] contains the states at some labels and the

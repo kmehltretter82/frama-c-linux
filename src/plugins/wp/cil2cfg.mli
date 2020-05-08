@@ -107,7 +107,9 @@ val get_switch_edges : t -> node -> (exp list * edge) list * edge
     but gives the edge to VcallOut first and the edge to Vexit second. *)
 val get_call_out_edges : t -> node -> edge * edge
 
-val blocks_closed_by_edge : t -> edge -> block list
+type block_scope = { b_opened : block list ; b_closed : block list }
+
+val block_scope_for_edge : t -> edge -> block_scope
 
 val is_back_edge : edge -> bool
 

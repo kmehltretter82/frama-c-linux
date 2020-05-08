@@ -124,7 +124,7 @@ export LIBOVERLAY_SCROLLBAR=0
 
 .PHONY: clean
 clean::
-	$(RM) -r *.parse *.eva *.loop
+	$(RM) -r *.parse *.eva
 
 clean-backups:
 	find . -regextype posix-extended \
@@ -218,14 +218,6 @@ SHELL        := /bin/bash
 
 %.gui: %
 	$(FRAMAC_GUI) $(FCGUIFLAGS) -load $^/framac.sav &
-
-# Run loop bound analysis plug-in and store result in *.loop
-%.loop: %
-	@
-	{
-	  $(FRAMAC) $(FCFLAGS) -load $^/framac.sav -loop -loop-no-branches |
-	    sed -e '1,/Add this to your command line:/d'
-	} > $@
 
 # Produce and open an SVG + HTML from raw flamegraph data produced by Eva
 %/flamegraph: %/flamegraph.html

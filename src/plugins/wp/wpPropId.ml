@@ -185,7 +185,7 @@ let mk_smoke kf ~id ?(doomed=[]) ?unreachable () =
     | Some stmt -> Property.OLStmt(kf,stmt)
   in {
     p_kind = PKSmoke;
-    p_prop = Property.ip_other ("smoke_" ^id) oloc ;
+    p_prop = Property.ip_other ("wp_smoke_" ^id) oloc ;
     p_doomed = doomed ;
     p_unreachable = oloc ;
     p_part = None ;
@@ -957,9 +957,13 @@ let pp_axiom_info fmt (id,thm) =
 (* --- Prop Splitter                                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
+(* -------------------------------------------------------------------------- *)
+(* --- Prop Splitter                                                      --- *)
+(* -------------------------------------------------------------------------- *)
+
 (* prop-id splitter *)
 
-let _split job pid goals =
+let split_bag job pid goals =
   let n = Bag.length goals in
   if n <= 1 then Bag.iter (job pid) goals else
     let k = ref 0 in
@@ -968,6 +972,15 @@ let _split job pid goals =
          let pid_k = mk_part pid (!k,n) in
          incr k ; job pid_k g)
       goals
+
+let split_map f pid gs =
+  let n = List.length gs in
+  if n <= 1 then List.map (f pid) gs else
+    let k = ref 0 in
+    List.map (fun g ->
+        let pid_k = mk_part pid (!k,n) in
+        incr k ; f pid_k g
+      ) gs
 
 (*----------------------------------------------------------------------------*)
 (** About proofs *)

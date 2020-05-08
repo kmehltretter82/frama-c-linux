@@ -4,6 +4,31 @@ ojson\chapter{Preparing the Sources}
 This chapter explains how to specify the source files that form the
 basis of an analysis project, and describes options that influence parsing.
 
+\section{Overview of source processing in \FramaC}\label{sec:overview}
+
+For small projects and tests, processing the sources in \FramaC is as simple
+as running \texttt{frama-c *.c}. For more complex projects, however,
+some problems may arise when using this command, and the user must be aware
+of the several steps involved in \FramaC source processing to fix them.
+
+The diagram in Figure~\ref{fig:source-preparation} presents an overview
+of the steps described in this chapter. For comparison purposes, we add
+the equivalent process performed by a compiler such as GCC.
+
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=\textwidth]{source-preparation.pdf}
+    \caption{Overview of source preparation steps: as performed by GCC
+      (top) and as performed by \FramaC (bottom).}
+    \label{fig:source-preparation}
+  \end{center}
+\end{figure}
+
+The following sections describe various options related to the steps shown
+in the figure. Note that some plug-ins, such as \textsf{Variadic}
+(described in chapter~\ref{user-variadic}), perform further AST
+transformations before most analyses are run.
+
 \section{Pre-processing the Source Files}\label{sec:preprocessing}
 
 The list of files to analyze must be provided on the command line, or

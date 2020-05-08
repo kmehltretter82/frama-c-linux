@@ -41,6 +41,10 @@
   Called from tests/builtins/alloc_weak.c:73.
 [eva] tests/builtins/alloc_weak.c:37: Call to builtin malloc
 [eva] tests/builtins/alloc_weak.c:37: allocating variable __malloc_main2_l37
+[eva:alarm] tests/builtins/alloc_weak.c:37: Warning: 
+  pointer downcast.
+  assert (unsigned int)tmp ≤ 2147483647;
+  (tmp from malloc(sizeof(int)))
 [eva] tests/builtins/alloc_weak.c:40: 
   Trace partitioning superposing up to 100 states
 [eva] tests/builtins/alloc_weak.c:40: 

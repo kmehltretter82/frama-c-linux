@@ -29,12 +29,6 @@ let register (module G: Generator_sig) =
   let module Instantiator = Make_instantiator(G) in
   Hashtbl.add base G.function_name (module Instantiator)
 
-let mark_as_computed () =
-  let mark_as_computed _ instantiator =
-    let module I = (val instantiator: Instantiator) in I.mark_as_computed ()
-  in
-  Hashtbl.iter mark_as_computed base
-
 let get_kfs () =
   let get_kfs _ instantiator =
     let module I = (val instantiator: Instantiator) in
@@ -42,6 +36,14 @@ let get_kfs () =
     res
   in
   Hashtbl.fold (fun k v l -> (get_kfs k v) @ l) base []
+
+let clear () =
+  Global_context.clear () ;
+  let clear _ instantiator =
+    let module I = (val instantiator: Instantiator) in
+    I.clear ()
+  in
+  Hashtbl.iter clear base
 
 module VISet = Cil_datatype.Varinfo.Hptset
 
@@ -53,9 +55,9 @@ class transformer = object(self)
 
   method! vfile _ =
     let post f =
+      f.globals <- (Global_context.globals (Cil.CurrentLoc.get())) @ f.globals ;
       Ast.mark_as_changed () ;
       Ast.mark_as_grown () ;
-      mark_as_computed () ;
       f
     in
     Cil.DoChildrenPost post
@@ -90,21 +92,23 @@ class transformer = object(self)
   method private replace_call (lval, fct, args) =
     try
       let module I = (val (self#find_enabled_instantiator fct): Instantiator) in
-      if I.well_typed_call lval args then
-        let key = I.key_from_call lval args in
+      if I.well_typed_call lval fct args then
+        let key = I.key_from_call lval fct args in
         let fundec = I.get_override key in
         let new_args = I.retype_args key args in
         Queue.add fundec used_instantiator_last_kf ;
         (fundec.svar), new_args
       else begin
-        Options.warning ~current:true "Ignore call: not well typed" ;
+        Options.warning
+          ~current:true "%s instantiator cannot replace call" fct.vname ;
         (fct, args)
       end
     with
     | Not_found -> (fct, args)
 
   method! vinst = function
-    | Call(_) | Local_init(_, ConsInit(_, _, Plain_func), _) ->
+    | Call(_, { enode = Lval((Var _), NoOffset)} , _, _)
+    | Local_init(_, ConsInit(_ , _, Plain_func), _) ->
       let change = function
         | [ Call(r, ({ enode = Lval((Var f), NoOffset) } as e), args, loc) ] ->
           let f, args = self#replace_call (r, f, args) in
@@ -125,6 +129,7 @@ let compute_call_preconditions_statuses kf =
   let stmt = Kernel_function.find_first_stmt kf in
   let _ = Kernel_function.find_all_enclosing_blocks stmt in
   match stmt.skind with
+  | Instr (Local_init(_, ConsInit(fct, _, Plain_func), _))
   | Instr (Call(_, { enode = Lval ((Var fct), NoOffset) }, _, _)) ->
     let called_kf = Globals.Functions.get fct in
     Statuses_by_call.setup_all_preconditions_proxies called_kf ;
@@ -132,7 +137,8 @@ let compute_call_preconditions_statuses kf =
         ~warn_missing:true called_kf stmt
     in
     List.iter (fun (_, p) -> validate_property p) reqs ;
-  | _ -> assert false
+  | _ ->
+    Options.fatal "Transformation: unexpected instruction kind on precondition"
 
 let compute_postconditions_statuses kf =
   let posts bhv =
@@ -155,5 +161,7 @@ let compute_statuses_all_kfs () =
   List.iter compute_comp_disj_statuses kfs
 
 let transform file =
+  clear () ;
   Visitor.visitFramacFile (new transformer) file ;
+  File.reorder_ast () ;
   compute_statuses_all_kfs ()

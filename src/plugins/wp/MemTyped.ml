@@ -954,7 +954,11 @@ let loc_diff obj p q =
 (* -------------------------------------------------------------------------- *)
 
 let s_valid sigma acs p n =
-  let p_valid = match acs with RW -> p_valid_rw | RD -> p_valid_rd in
+  let p_valid = match acs with
+    | RW -> p_valid_rw
+    | RD -> p_valid_rd
+    | OBJ -> p_valid_obj
+  in
   p_call p_valid [Sigma.value sigma T_alloc;p;n]
 
 let s_invalid sigma p n =

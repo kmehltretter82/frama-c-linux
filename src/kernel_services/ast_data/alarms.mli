@@ -25,9 +25,10 @@
 
 open Cil_types
 
-(** Only signed overflows int are really RTEs. The other kinds may be
-    meaningful nevertheless. *)
-type overflow_kind = Signed | Unsigned | Signed_downcast | Unsigned_downcast
+(** Only signed overflows and pointer downcasts are really RTEs.
+    The other kinds may be meaningful nevertheless. *)
+type overflow_kind =
+    Signed | Unsigned | Signed_downcast | Unsigned_downcast | Pointer_downcast
 
 type access_kind = For_reading | For_writing
 type bound_kind = Lower_bound | Upper_bound
@@ -39,6 +40,7 @@ type alarm =
   | Index_out_of_bound of
       exp (** index *)
       * exp option (** None = lower bound is zero; Some up = upper bound *)
+  | Invalid_pointer of exp
   | Invalid_shift of exp * int option (** strict upper bound, if any *)
   | Pointer_comparison of
       exp option (** [None] when implicit comparison to NULL pointer *)

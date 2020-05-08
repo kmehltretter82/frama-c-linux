@@ -24,7 +24,7 @@
   Declaration of variadic function sprintf.
 [variadic] FRAMAC_SHARE/libc/stdio.h:217: 
   Declaration of variadic function sscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:521: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:538: 
   Declaration of variadic function dprintf.
 [variadic] tests/known/printf.c:37: 
   Translating call to printf to a call to the specialized version printf_va_1.
@@ -164,6 +164,7 @@
 #include "stdlib.h"
 #include "string.h"
 #include "strings.h"
+#include "sys/types.h"
 #include "time.h"
 #include "wchar.h"
 /*@ requires valid_read_string(format);

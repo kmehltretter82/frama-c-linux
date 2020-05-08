@@ -25,6 +25,8 @@
   function memset: precondition 'valid_s' got status valid.
 [eva] share/libc/string.h:118: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
+[eva:alarm] tests/builtins/memset.c:34: Warning: 
+  pointer downcast. assert (unsigned int)((int *)t2) ≤ 2147483647;
 [eva] tests/builtins/memset.c:34: Call to builtin memset
 [eva:alarm] tests/builtins/memset.c:34: Warning: 
   function memset: precondition 'valid_s' got status unknown.
@@ -42,6 +44,8 @@
 [eva] tests/builtins/memset.c:38: Call to builtin memset
 [eva:alarm] tests/builtins/memset.c:38: Warning: 
   function memset: precondition 'valid_s' got status invalid.
+[eva:alarm] tests/builtins/memset.c:41: Warning: 
+  pointer downcast. assert (unsigned int)((int *)t1) ≤ 2147483647;
 [eva] tests/builtins/memset.c:41: Call to builtin memset
 [eva] tests/builtins/memset.c:41: 
   function memset: precondition 'valid_s' got status valid.

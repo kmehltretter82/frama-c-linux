@@ -67,6 +67,8 @@
 [eva] computing for function g2 <- main.
   Called from tests/value/initialized.c:194.
 [eva:alarm] tests/value/initialized.c:50: Warning: 
+  pointer downcast. assert (unsigned int)(&b4) ≤ 2147483647;
+[eva:alarm] tests/value/initialized.c:50: Warning: 
   signed overflow. assert -2147483648 ≤ (int)(&b4) + (int)(&b4);
 [eva:alarm] tests/value/initialized.c:50: Warning: 
   signed overflow. assert (int)(&b4) + (int)(&b4) ≤ 2147483647;

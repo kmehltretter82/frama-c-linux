@@ -182,8 +182,9 @@ let domains_list () =
       (fun fmt -> Format.pp_print_text fmt descr)
   in
   feedback ~level:0
-    "List of available domains:@. %a@."
-    (Pretty_utils.pp_list ~sep:"@," pp_dom) (List.rev !domains_ref);
+    "List of available domains:@,%a"
+    (Pretty_utils.pp_list ~pre:"@[<v>" ~sep:"@," ~suf:"@]" pp_dom)
+    (List.rev !domains_ref);
   raise Cmdline.Exit
 
 (* Registers a new domain. Updates the help message of -eva-domains. *)
@@ -192,12 +193,6 @@ let register_domain ~name ~descr =
   domains_ref := (name, descr) :: !domains_ref;
   Cmdline.replace_option_help
     Domains.option_name "eva" domains (domains_help ())
-
-let enabled_domains () =
-  let domains = Domains.get () in
-  List.filter
-    (fun (name, _) -> Datatype.String.Set.mem name domains)
-    !domains_ref
 
 (* Checks that a domain has been registered. *)
 let check_domain domain =
@@ -213,10 +208,40 @@ let () =
   Domains.add_set_hook
     (fun _old domains -> Datatype.String.Set.iter check_domain domains)
 
-(* Set of parameters defining the abstractions used in an Eva analysis. *)
-let parameters_abstractions =
-  ref (Typed_parameter.Set.singleton Domains.parameter)
+let () = Parameter_customize.set_group domains
+module DomainsFunction =
+  Make_multiple_map
+    (struct
+      include Datatype.String
+      let of_string str = check_domain str; str
+      let of_singleton_string = no_element_of_string
+      let to_string str = str
+    end)
+    (struct
+      include Domain_mode.Function_Mode
+      let of_string ~key ~prev str =
+        try of_string ~key ~prev str
+        with Invalid_argument msg -> raise (Cannot_build msg)
+    end)
+    (struct
+      let option_name = "-eva-domains-function"
+      let help = "Enables a domain only for the given functions. \
+                  <d:f+> enables the domain [d] from function [f] \
+                  (the domain is enabled in all functions called from [f]). \
+                  <d:f-> disables the domain [d] from function [f]."
+      let arg_name = "d:f"
+      let default = Datatype.String.Map.empty
+      let dependencies = []
+    end)
+let () = add_precision_dep DomainsFunction.parameter
 
+let enabled_domains () =
+  let domains = Domains.get () in
+  let domains_by_fct = DomainsFunction.get () in
+  List.filter
+    (fun (name, _) -> Datatype.String.Set.mem name domains
+                      || Datatype.String.Map.mem name domains_by_fct)
+    !domains_ref
 
 let () = Parameter_customize.set_group domains
 module EqualityCall =
@@ -1525,8 +1550,6 @@ let parameters_correctness =
   Typed_parameter.Set.elements !parameters_correctness
 let parameters_tuning =
   Typed_parameter.Set.elements !parameters_tuning
-let parameters_abstractions =
-  Typed_parameter.Set.elements !parameters_abstractions
 
 
 

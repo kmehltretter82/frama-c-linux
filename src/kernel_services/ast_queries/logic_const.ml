@@ -305,6 +305,9 @@ let tat ?(loc=Cil_datatype.Location.unknown) (t,label) =
 
 let told ?(loc=Cil_datatype.Location.unknown) t = tat ~loc (t,old_label)
 
+let tcast ?(loc=Cil_datatype.Location.unknown) t ct =
+  term ~loc (TCastE (ct, t)) (Ctype ct)
+
 let tlogic_coerce ?(loc=Cil_datatype.Location.unknown) t lt =
   term ~loc (TLogic_coerce (lt, t)) lt
 
@@ -422,6 +425,7 @@ let pallocable ?(loc=Cil_datatype.Location.unknown) (l,p) = unamed ~loc (Palloca
 let pfreeable ?(loc=Cil_datatype.Location.unknown) (l,p) = unamed ~loc (Pfreeable (l,p))
 let pvalid ?(loc=Cil_datatype.Location.unknown) (l,p) = unamed ~loc (Pvalid (l,p))
 let pvalid_read ?(loc=Cil_datatype.Location.unknown) (l,p) = unamed ~loc (Pvalid_read (l,p))
+let pobject_pointer ?(loc=Cil_datatype.Location.unknown) (l,p) = unamed ~loc (Pobject_pointer (l,p))
 let pvalid_function ?(loc=Cil_datatype.Location.unknown) p = unamed ~loc (Pvalid_function p)
 
 (* the index should be an integer or a range of integers *)

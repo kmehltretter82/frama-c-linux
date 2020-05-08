@@ -200,7 +200,7 @@ let rec logic_type_to_typ = function
   | Ctype typ -> typ
   | Linteger -> TInt(ILongLong,[]) (*TODO: to have an unlimited integer type
                                     in the logic interpretation*)
-  | Lreal -> TFloat(FLongDouble,[]) (* TODO: handle reals, not floats... *)
+  | Lreal -> TFloat(FDouble,[]) (* TODO: handle reals, not floats... *)
   | Ltype({lt_name = name},[]) when name = Utf8_logic.boolean  ->
       TInt(ILongLong,[])
   | Ltype({lt_name = "set"},[t]) -> logic_type_to_typ t
@@ -800,7 +800,7 @@ to function contracts."
              taken into account by the functions [from_...] below *)
           DoChildren
 
-      | Pvalid_function _ ->
+      | Pobject_pointer _ | Pvalid_function _ ->
           DoChildren
 
       | Papp _ | Pallocable _ | Pfreeable _ | Pfresh _

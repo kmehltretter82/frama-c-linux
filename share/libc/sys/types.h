@@ -49,6 +49,10 @@ typedef unsigned long u_long;
 typedef unsigned int u_int;
 typedef unsigned short u_short;
 typedef unsigned char u_char;
+
+// Note: makedev (non-POSIX) is usually a macro; in case of problems,
+// consider redefining this.
+/*@ assigns \result \from maj, min; */
 extern dev_t makedev(int maj, int min);
 #define __u_char_defined
 #endif

@@ -1,5 +1,7 @@
+/* run.config
+   STDOPT: #"-warn-special-float none" #"-cpp-extra-args=\"-DNONFINITE\""
+*/
 #include <math.h>
-
 const double pi = 3.14159265358979323846264338327950288;
 const double half_pi = 1.57079632679489661923132169163975144;
 const double e = 2.718281828459045090795598298427648842334747314453125;
@@ -17,6 +19,14 @@ const double minus_zero = -0.0;
 const double one = 1.0;
 const double minus_one = -1.0;
 const double large = 1e38;
+#ifdef NONFINITE
+const double huge_val = HUGE_VAL;
+const float huge_valf = HUGE_VALF;
+const long double huge_vall = HUGE_VALL;
+#endif
+const float infinity = INFINITY;
+const double fp_ilogb0 = FP_ILOGB0;
+const double fp_ilogbnan = FP_ILOGBNAN;
 
 #define TEST_VAL(type,f,c) type f##_##c = f(c)
 

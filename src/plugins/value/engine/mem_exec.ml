@@ -156,8 +156,12 @@ module Make
     | None -> ()
     | Some inout ->
       try
-        let output_bases = bases inout.Inout_type.over_outputs_if_termination
-        and input_bases = bases inout.Inout_type.over_inputs in
+        let output_bases = bases inout.Inout_type.over_outputs_if_termination in
+        let input_bases =
+          let input_bases = bases inout.Inout_type.over_inputs in
+          let logic_input_bases = bases inout.Inout_type.over_logic_inputs in
+          Base.Hptset.union input_bases logic_input_bases
+        in
         (* There are two strategies to compute the 'inputs' for a memexec
            function: either we take all inputs_bases+outputs_bases
            (outputs_bases are important because of weak updates), or we

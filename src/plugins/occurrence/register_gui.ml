@@ -127,7 +127,7 @@ let occurrence_highlighter buffer loc ~start ~stop =
         | PTermLval (_,ki,_,term_lval) ->
             let same_tlval (_kf, k, l) =
               Logic_utils.is_same_tlval
-                (Logic_utils.lval_to_term_lval ~cast:true l)
+                (Logic_utils.lval_to_term_lval l)
                 term_lval
               && Kinstr.equal k ki
             in

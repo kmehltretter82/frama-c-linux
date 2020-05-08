@@ -194,7 +194,6 @@ type verdict =
   | Timeout
   | Stepout
   | Computing of (unit -> unit) (* kill function *)
-  | Checked
   | Valid
   | Failed
 
@@ -209,19 +208,18 @@ type result = {
 }
 
 let is_verdict r = match r.verdict with
-  | Valid | Checked | Unknown | Invalid | Timeout | Stepout | Failed -> true
+  | Valid | Unknown | Invalid | Timeout | Stepout | Failed -> true
   | NoResult | Computing _ -> false
 
 let is_valid = function { verdict = Valid } -> true | _ -> false
 let is_computing = function { verdict=Computing _ } -> true | _ -> false
 
-let verdict ~smoke r =
-  if smoke then
-    match r.verdict with
-    | (Failed | NoResult | Checked | Computing _) as r -> r
-    | Valid -> Invalid
-    | Invalid | Unknown | Timeout | Stepout -> Valid
-  else r.verdict
+let smoked = function
+  | (Failed | NoResult | Computing _) as r -> r
+  | Valid -> Invalid
+  | Invalid | Unknown | Timeout | Stepout -> Valid
+
+let verdict ~smoke r = if smoke then smoked r.verdict else r.verdict
 
 let is_proved ~smoke r = (verdict ~smoke r = Valid)
 
@@ -276,7 +274,6 @@ let result ?(cached=false) ?(solver=0.0) ?(time=0.0) ?(steps=0) verdict =
 
 let no_result = result NoResult
 let valid = result Valid
-let checked = result Checked
 let invalid = result Invalid
 let unknown = result Unknown
 let timeout t = result ~time:(float t) Timeout
@@ -317,7 +314,6 @@ let pp_res ~extended fmt r =
   match r.verdict with
   | NoResult -> Format.pp_print_string fmt (if extended then "No Result" else "-")
   | Computing _ -> Format.pp_print_string fmt "Computing"
-  | Checked -> Format.fprintf fmt "Typechecked"
   | Invalid -> Format.pp_print_string fmt "Invalid"
   | Valid when Wp_parameters.has_dkey dkey_success_only ->
       Format.pp_print_string fmt "Valid"
@@ -340,7 +336,6 @@ let compare p q =
     | Timeout | Stepout -> 3
     | Valid -> 4
     | Invalid -> 5
-    | Checked -> 6
   in
   let r = rank q.verdict - rank p.verdict in
   if r <> 0 then r else

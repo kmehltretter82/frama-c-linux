@@ -12,7 +12,7 @@
 Goal Instance of 'Pre-condition (file tests/wp_bts/issue_715_b.i, line 4) in 'dummy'' in 'foo' at call 'dummy' (file tests/wp_bts/issue_715_b.i, line 11)
 :
 Assume { (* Heap *) Type: linked(Malloc_0). }
-Prove: P_isValid(Malloc_0[L_p_28 <- 1], shift_sint32(global(L_p_28), 0)).
+Prove: P_isValid(Malloc_0[L_p_30 <- 1], shift_sint32(global(L_p_30), 0)).
 
 ------------------------------------------------------------
 

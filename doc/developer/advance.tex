@@ -612,6 +612,18 @@ A specific target \texttt{\$(PLUGIN\_NAME)\_TESTS} will specifically run the tes
 of the plugin. One can add new tests as dependencies of this target.
 The default tests are run by the target \texttt{\$(PLUGIN\_NAME)\_DEFAULT\_TESTS}.
 
+Additionally, when running \texttt{make tests} or
+\texttt{make \$(PLUGIN\_NAME)\_TESTS}
+it is possible to pass options to \texttt{ptests.opt} through the
+\texttt{PTESTS\_OPTS} variable.
+
+\begin{example}
+The following command will update the oracles of all tests of the Aoraï plug-in:
+\begin{shell}
+\$ make PTESTS_OPTS=-update Aorai_TESTS
+\end{shell}
+\end{example}
+
 \texttt{ptests.opt} runs tests belonging to a sub-directory 
 of directory \texttt{tests}\codeidx{tests} that is specified in
 \ptests configuration file. This configuration file,
@@ -710,36 +722,35 @@ possibilities for \texttt{CONFIG\_OPTION}) are detailed in
 Section~\ref{ptests:directives}.
 
 \begin{important}
-Note that some specific configurations require dynamic linking, which
-is not available on all platforms for native code. {\tt ptests} takes
-care of reverting to bytecode when it detects that the {\tt OPT},
-{\tt EXECNOW}, or \texttt{EXEC} options of a test require dynamic linking. This
-occurs currently in the following cases:
-\begin{itemize}
-\item {\tt OPT} contains the option {\tt -load-script}
-\item {\tt OPT} contains the option {\tt -load-module}
-\item {\tt EXECNOW} and \texttt{EXEC} use {\tt make} to create a {\tt .cmxs}
-\end{itemize}
-\end{important}
-
-\begin{important}
   \textbf{Concurrency issues:}
   tests using compiled modules ({\tt -load-script} or {\tt -load-module}) may
   lead to concurrency issues when the same module is used in different test
   files, or in different test cases within the same file. One way to avoid
-  issues is to serialize tests via \texttt{EXECNOW} directives, e.g. by using
-  \texttt{make} to compile a \texttt{.cmxs} from the \texttt{.ml} file, and
-  then loading the \texttt{.cmxs} in the test cases, as in the example below.
+  issues is to serialize tests via \texttt{MODULE} directives, which will
+  take care of the compilation and of adding the corresponding
+  \texttt{-load-module} option to further \texttt{OPT} and
+  \texttt{STDOPT} directives:
 
   \begin{listing-nonumber}
-    EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
-    STDOPT: #"-load-module @PTEST_DIR@/@PTEST_NAME.cmxs" ...
-    STDOPT: #"-load-module @PTEST_DIR@/@PTEST_NAME.cmxs" ...
+    MODULE: @PTEST_DIR@/@PTEST_NAME@.cmxs
+    STDOPT: +"-opt1" ...
+    STDOPT: #"-opt2" ...
   \end{listing-nonumber}
 
   In addition, if the same script {\tt tests/suite/script.ml}
-  is shared by several test files, the {\tt EXECNOW} directive should be put
-  into {\tt tests/suite/test\_config}.
+  is shared by several test files in {\tt tests/suite},
+  it is necessary to compile the script once
+  when entering the directory hosting the suite. The {\tt MODULE} directive is
+  not well suited for that, and it is thus needed to resort to an {\tt EXECNOW}
+  directive in {\tt tests/suite/test\_config}:
+
+  \begin{listing-nonumber}
+    EXECNOW: make -s @PTEST_DIR@/common_module.cmxs
+  \end{listing-nonumber}
+
+  It is then necessary to explicitly use
+  {\tt -load-module @PTEST\_DIR@/common\_module.cmxs} in the appropriate
+  {\tt OPT} and {\tt STDOPT} directives.
 
 \end{important}
 
@@ -832,8 +843,10 @@ Figure~\ref{fig:ptests-options} details the options of \ptests.
 & \texttt{-byte} & Use bytecode toplevel & no \\
 & \texttt{-opt} & Use native toplevel & yes \\
 & \texttt{-gui} & Use GUI instead of console-based toplevel & no \\
-\hline \multirow{4}{16mm}{\centering{Behavior}}
+\hline \multirow{5}{16mm}{\centering{Behavior}}
 & \texttt{-run} & Delete current results; run tests and examine results & yes
+\\
+& \texttt{-dry-run} & Print commands, but do not execute them & no
 \\
 & \texttt{-examine} & Only examine current results; do not run tests & no \\
 & \texttt{-show} & Run tests and show results, but do not examine

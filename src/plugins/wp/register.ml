@@ -351,7 +351,7 @@ let do_wpo_stat goal prover res =
   let smoke = Wpo.is_smoke_test goal in
   let verdict = VCS.verdict ~smoke res in
   match verdict with
-  | Checked | NoResult | Computing _ | Unknown ->
+  | NoResult | Computing _ | Unknown ->
       s.unknown <- succ s.unknown
   | Stepout | Timeout ->
       s.interrupted <- succ s.interrupted
@@ -369,21 +369,17 @@ let do_wpo_stat goal prover res =
 let do_wpo_result goal prover res =
   if VCS.is_verdict res then
     begin
-      if Wp_parameters.Check.get () then
-        begin
-          let open VCS in
-          let ontty = if res.verdict = Checked then `Feedback else `Message in
-          Wp_parameters.feedback ~ontty
-            "[%a] Goal %s : %a"
-            VCS.pp_prover prover (Wpo.get_gid goal)
-            VCS.pp_result res ;
-        end ;
       if prover = VCS.Qed then do_progress goal "Qed" ;
       do_wpo_stat goal prover res ;
     end
 
+let results g =
+  List.filter
+    (fun (_,r) -> VCS.is_verdict r)
+    (Wpo.get_results g)
+
 let do_wpo_failed goal =
-  match Wpo.get_results goal with
+  match results goal with
   | [p,r] ->
       Wp_parameters.result "[%a] Goal %s : %a%a"
         VCS.pp_prover p (Wpo.get_gid goal)
@@ -399,45 +395,45 @@ let do_wpo_failed goal =
             ) pres ;
         end
 
-let do_wpo_smoke goal =
-  let results = Wpo.get_results goal in
-  let verdicts = List.filter (fun (_,r) -> VCS.is_verdict r) results in
-  let proved,unproved = List.partition (fun (_,r) -> VCS.is_valid r) verdicts in
-  let pp_provers fmt = function
-    | [] -> ()
-    | (p,_)::prs ->
-        VCS.pp_prover fmt p ;
-        List.iter (fun (p,_) -> Format.fprintf fmt ", %a" VCS.pp_prover p) prs
-  in
-  if proved <> [] then
-    let loc = Property.location (Wpo.get_target goal) in
-    Wp_parameters.warning ~wkey:wkey_smoke ~source:(fst loc)
-      "Smoke-test %s : Failed (%a)"
-      (Wpo.get_gid goal) pp_provers proved
-  else
-  if unproved <> [] then
-    Wp_parameters.feedback ~ontty:`Silent
-      "Smoke-test %s : Passed (%a)"
-      (Wpo.get_gid goal) pp_provers unproved
-  else
-    let loc = Property.location (Wpo.get_target goal) in
-    Wp_parameters.warning ~source:(fst loc)
-      "Smoke-test %s : Non-conclusive (no-result)"
-      (Wpo.get_gid goal)
+let do_wpo_smoke status goal =
+  Wp_parameters.result "[%s] Smoke-test %s%t"
+    (match status with
+     | `Failed -> "Failed"
+     | `Passed -> "Passed"
+     | `Unknown -> "Partial")
+    (Wpo.get_gid goal)
+    begin fun fmt ->
+      pp_warnings fmt goal ;
+      List.iter
+        (fun (p,r) ->
+           Format.fprintf fmt "@\n%8s: @[<hv>%a@]"
+             (VCS.title_of_prover p)
+             VCS.pp_result r
+        ) (results goal) ;
+    end
 
 let do_wpo_success goal s =
-  if not (Wp_parameters.Check.get ()) then
-    if Wp_parameters.Generate.get () then
-      match s with
-      | None -> ()
-      | Some prover ->
+  if Wp_parameters.Generate.get () then
+    match s with
+    | None -> ()
+    | Some prover ->
+        Wp_parameters.feedback ~ontty:`Silent
+          "[%a] Goal %s : Valid" VCS.pp_prover prover (Wpo.get_gid goal)
+  else
+  if Wpo.is_smoke_test goal then
+    begin match s with
+      | None ->
           Wp_parameters.feedback ~ontty:`Silent
-            "[%a] Goal %s : Valid" VCS.pp_prover prover (Wpo.get_gid goal)
-    else
-    if Wpo.is_smoke_test goal then
-      do_wpo_smoke goal
-    else
-      match s with
+            "[Passed] Smoke-test %s" (Wpo.get_gid goal)
+      | Some _ ->
+          let status,target = Wpo.get_proof goal in
+          do_wpo_smoke status goal ;
+          if status = `Failed then
+            let source = fst (Property.location target) in
+            Wp_parameters.warning ~source "Failed smoke-test"
+    end
+  else
+    begin match s with
       | None -> do_wpo_failed goal
       | Some (VCS.Tactical as script) ->
           Wp_parameters.feedback ~ontty:`Silent
@@ -449,6 +445,7 @@ let do_wpo_success goal s =
             "[%a] Goal %s : %a"
             VCS.pp_prover prover (Wpo.get_gid goal)
             VCS.pp_result result
+    end
 
 let do_report_time fmt s =
   begin
@@ -560,7 +557,7 @@ let spawn_wp_proofs_iter ~mode iter_on_goals =
   if mode.tactical || mode.provers<>[] then
     begin
       let server = ProverTask.server () in
-      ignore (Wp_parameters.Share.dir ()); (* To prevent further errors *)
+      ignore (Wp_parameters.Share.get_dir "."); (* To prevent further errors *)
       iter_on_goals
         (fun goal ->
            if  mode.tactical

@@ -3,7 +3,7 @@
  */
 
 /* run.config_qualif
-   OPT: -wp-driver tests/wp_plugin/bit_test.driver -wp-prover why3:alt-ergo -wp-check
+   OPT: -wp-driver tests/wp_plugin/bit_test.driver -wp-prover why3:alt-ergo
 */
 
 /*@

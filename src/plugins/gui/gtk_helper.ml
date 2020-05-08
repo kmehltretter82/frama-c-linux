@@ -47,8 +47,7 @@ let framac_logo, framac_icon =
 module Configuration = struct
   include Cilconfig
   let configuration_file () =
-    try (Gui_parameters.Config.file ~error:false "frama-c-gui.config")
-    with Gui_parameters.Config.No_dir -> Datatype.Filepath.dummy
+    Gui_parameters.Config.get_file ~mode:`Create_path "frama-c-gui.config"
   let load () = loadConfiguration (configuration_file ())
   let save () = saveConfiguration (configuration_file ())
   let reset () = Extlib.safe_remove (configuration_file () :> string);

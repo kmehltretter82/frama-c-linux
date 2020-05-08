@@ -25,7 +25,7 @@
 .\" using pandoc 2.0 or newer. To modify this file, edit the Markdown file
 .\" and run `make man/frama-c.1`.
 
-.TH FRAMA-C 1 2020-03-05
+.TH FRAMA-C 1 2020-04-02
 .SH NAME
 .PP
 frama\-c[.byte] \- a static analyzer for C programs
@@ -737,6 +737,12 @@ parser:decimal\-float=once\f[] (and variants) instead.
 .RS
 .RE
 .TP
+.B [\-no]\-warn\-invalid\-pointer
+generate alarms for invalid pointer arithmetic.
+Defaults to no.
+.RS
+.RE
+.TP
 .B [\-no]\-warn\-left\-shift\-negative
 generate alarms for signed left shifts on negative values.
 Defaults to yes.
@@ -746,6 +752,13 @@ Defaults to yes.
 .B [\-no]\-warn\-right\-shift\-negative
 generate alarms for signed right shifts on negative values.
 Defaults to no.
+.RS
+.RE
+.TP
+.B [\-no]\-warn\-pointer\-downcast
+generates alarms when the downcast of a pointer may exceed the
+destination range.
+Defaults to yes.
 .RS
 .RE
 .TP

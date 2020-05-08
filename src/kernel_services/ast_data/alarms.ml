@@ -23,7 +23,8 @@
 open Cil_types
 open Cil_datatype
 
-type overflow_kind = Signed | Unsigned | Signed_downcast | Unsigned_downcast
+type overflow_kind =
+    Signed | Unsigned | Signed_downcast | Unsigned_downcast | Pointer_downcast
 type access_kind = For_reading | For_writing
 type bound_kind = Lower_bound | Upper_bound
 
@@ -32,6 +33,7 @@ let string_of_overflow_kind = function
   | Unsigned -> "unsigned_overflow"
   | Signed_downcast -> "signed_downcast"
   | Unsigned_downcast -> "unsigned_downcast"
+  | Pointer_downcast -> "pointer_downcast"
 
 type alarm =
   | Division_by_zero of exp
@@ -39,6 +41,7 @@ type alarm =
   | Index_out_of_bound of
       exp (* index *)
       * exp option (* None = lower bound is zero; Some up = upper bound *)
+  | Invalid_pointer of exp
   | Invalid_shift of exp * int option (* strict upper bound, if any *)
   | Pointer_comparison of
       exp option (* [None] when implicit comparison to 0 *)
@@ -65,7 +68,7 @@ type alarm =
 
 (* If you add one constructor to this type, make sure to add a dummy value
    in the 'reprs' value below, and increase 'nb_alarms' *)
-let nb_alarm_constructors = 17
+let nb_alarm_constructors = 18
 
 module D =
   Datatype.Make_with_collections
@@ -80,6 +83,7 @@ module D =
         [ Division_by_zero e;
           Memory_access (lv, For_reading);
           Index_out_of_bound (e, None);
+          Invalid_pointer e;
           Invalid_shift (e, None);
           Pointer_comparison (None, e);
           Differing_blocks (e, e);
@@ -100,20 +104,21 @@ module D =
         | Division_by_zero _ -> 0
         | Memory_access _ -> 1
         | Index_out_of_bound _ -> 2
-        | Invalid_shift _ -> 3
-        | Pointer_comparison _ -> 4
-        | Overflow _ -> 5
-        | Not_separated _ -> 6
-        | Overlap _ -> 7
-        | Uninitialized _ -> 8
-        | Is_nan_or_infinite _ -> 9
-        | Is_nan _ -> 10
-        | Float_to_int _ -> 11
-        | Differing_blocks _ -> 12
-        | Dangling _ -> 13
-        | Function_pointer _ -> 14
-        | Uninitialized_union _ -> 15
-        | Invalid_bool _ -> 16
+        | Invalid_pointer _ -> 3
+        | Invalid_shift _ -> 4
+        | Pointer_comparison _ -> 5
+        | Overflow _ -> 6
+        | Not_separated _ -> 7
+        | Overlap _ -> 8
+        | Uninitialized _ -> 9
+        | Is_nan_or_infinite _ -> 10
+        | Is_nan _ -> 11
+        | Float_to_int _ -> 12
+        | Differing_blocks _ -> 13
+        | Dangling _ -> 14
+        | Function_pointer _ -> 15
+        | Uninitialized_union _ -> 16
+        | Invalid_bool _ -> 17
 
       let () = (* Lightweight checks *)
         for i = 0 to nb_alarm_constructors - 1 do
@@ -134,6 +139,7 @@ module D =
         | Index_out_of_bound(e11, e12), Index_out_of_bound(e21, e22) ->
           let n = Exp.compare e11 e21 in
           if n = 0 then Extlib.opt_compare Exp.compare e12 e22 else n
+        | Invalid_pointer e1, Invalid_pointer e2 -> Exp.compare e1 e2
         | Invalid_shift(e1, n1), Invalid_shift(e2, n2) ->
           let n = Exp.compare e1 e2 in
           if n = 0 then Extlib.opt_compare Datatype.Int.compare n1 n2 else n
@@ -185,7 +191,8 @@ module D =
           else Extlib.opt_compare (Extlib.list_compare Exp.compare) l1 l2
         | Invalid_bool lv1, Invalid_bool lv2 -> Lval.compare lv1 lv2
         | _, (Division_by_zero _ | Memory_access _ |
-              Index_out_of_bound _ | Invalid_shift _ | Pointer_comparison _ |
+              Index_out_of_bound _ | Invalid_pointer _ |
+              Invalid_shift _ | Pointer_comparison _ |
               Overflow _ | Not_separated _ | Overlap _ | Uninitialized _ |
               Dangling _ | Is_nan_or_infinite _ | Is_nan _ | Float_to_int _ |
               Differing_blocks _ | Function_pointer _ |
@@ -209,6 +216,7 @@ module D =
             (nb a,
              Exp.hash e1,
              match e2 with None -> 0 | Some e -> 17 + Exp.hash e)
+        | Invalid_pointer e -> Hashtbl.hash (nb a, Exp.hash e)
         | Invalid_shift(e, n) -> Hashtbl.hash (nb a, Exp.hash e, n)
         | Pointer_comparison(e1, e2) ->
           Hashtbl.hash
@@ -253,6 +261,8 @@ module D =
             (match e2 with None -> ">=" | Some _ -> "<")
             Printer.pp_exp
             (match e2 with None -> Cil.zero e1.eloc | Some e -> e)
+        | Invalid_pointer e ->
+          Format.fprintf fmt "Invalid_pointer(@[%a@])" Exp.pretty e
         | Invalid_shift(e, n) ->
           Format.fprintf fmt "Invalid_shift(@[%a@]@ %s)"
             Printer.pp_exp e
@@ -391,6 +401,7 @@ let get_name = function
   | Division_by_zero _ -> "division_by_zero"
   | Memory_access _ -> "mem_access"
   | Index_out_of_bound _ -> "index_bound"
+  | Invalid_pointer _ -> "pointer_value"
   | Invalid_shift _ -> "shift"
   | Pointer_comparison _ -> "ptr_comparison"
   | Differing_blocks _ -> "differing_blocks"
@@ -414,6 +425,7 @@ let get_description = function
   | Division_by_zero _ -> "Integer division by zero"
   | Memory_access _ -> "Invalid pointer dereferencing"
   | Index_out_of_bound _ -> "Array access out of bounds"
+  | Invalid_pointer _ -> "Invalid pointer computation"
   | Invalid_shift _ -> "Invalid shift"
   | Pointer_comparison _ -> "Invalid pointer comparison"
   | Differing_blocks _ -> "Operation on pointers within different blocks"
@@ -439,21 +451,21 @@ let overflowed_expr_to_term ~loc e =
   let loc = best_loc ~loc e.eloc in
   match e.enode with
   | UnOp(op, e, ty) ->
-    let t = Logic_utils.expr_to_term ~cast:true e in
-    let ty = Logic_utils.typ_to_logic_type ty in
-    Logic_const.term ~loc (TUnOp(op, t)) ty
+    let t = Logic_utils.expr_to_term ~coerce:true e in
+    let lty = Logic_utils.coerce_type ty in
+    Logic_const.term ~loc (TUnOp(op, t)) lty
   | BinOp(op, e1, e2, ty) ->
-    let t1 = Logic_utils.expr_to_term ~cast:true e1 in
-    let t2 = Logic_utils.expr_to_term ~cast:true e2 in
-    let ty = Logic_utils.typ_to_logic_type ty in
-    Logic_const.term ~loc (TBinOp(op, t1, t2)) ty
-  | _ -> Logic_utils.expr_to_term ~cast:true e
+    let t1 = Logic_utils.expr_to_term ~coerce:true e1 in
+    let t2 = Logic_utils.expr_to_term ~coerce:true e2 in
+    let lty = Logic_utils.coerce_type ty in
+    Logic_const.term ~loc (TBinOp(op, t1, t2)) lty
+  | _ -> Logic_utils.expr_to_term ~coerce:true e
 
 (* Creates \is_finite((fkind)e) or \is_nan((fkind)e) according to
    [predicate]. *)
 let create_special_float_predicate ~loc e fkind predicate =
   let loc = best_loc ~loc e.eloc in
-  let t = Logic_utils.expr_to_term ~cast:true e in
+  let t = Logic_utils.expr_to_term e in
   let typ = match fkind with
     | FFloat -> Cil.floatType
     | FDouble -> Cil.doubleType
@@ -478,7 +490,7 @@ let create_predicate ?(loc=Location.unknown) alarm =
     | Division_by_zero e ->
       (* e != 0 *)
       let loc = best_loc ~loc e.eloc in
-      let t = Logic_utils.expr_to_term ~cast:true e in
+      let t = Logic_utils.expr_to_term ~coerce:true e in
       Logic_const.prel ~loc (Rneq, t, Cil.lzero ())
 
     | Memory_access(lv, read) ->
@@ -488,28 +500,36 @@ let create_predicate ?(loc=Location.unknown) alarm =
         | For_writing -> Logic_const.pvalid
       in
       let e = Cil.mkAddrOrStartOf ~loc lv in
-      let t = Logic_utils.expr_to_term ~cast:true e in
+      let t = Logic_utils.expr_to_term e in
       valid ~loc (Logic_const.here_label, t)
 
     | Index_out_of_bound(e1, e2) ->
       (* 0 <= e1 < e2, left part if None, right part if Some e *)
       let loc = best_loc ~loc e1.eloc in
-      let t1 = Logic_utils.expr_to_term ~cast:true e1 in
+      let t1 = Logic_utils.expr_to_term ~coerce:true e1 in
       (match e2 with
-       | None -> Logic_const.prel ~loc (Rle, Cil.lzero (), t1)
+       | None ->
+         Logic_const.prel ~loc (Rle, Cil.lzero (), t1)
        | Some e2 ->
-         let t2 = Logic_utils.expr_to_term ~cast:true e2 in
+         let t2 = Logic_utils.expr_to_term ~coerce:true e2 in
          Logic_const.prel ~loc (Rlt, t1, t2))
+
+    | Invalid_pointer e ->
+      let loc = best_loc ~loc e.eloc in
+      let t = Logic_utils.expr_to_term e in
+      if Cil.isFunPtrType (Cil.typeOf e)
+      then Logic_const.pvalid_function ~loc t
+      else Logic_const.pobject_pointer ~loc (Logic_const.here_label, t)
 
     | Invalid_shift(e, n) ->
       (* 0 <= e < n *)
       let loc = best_loc ~loc e.eloc in
-      let t = Logic_utils.expr_to_term ~cast:true e in
+      let t = Logic_utils.expr_to_term ~coerce:true e in
       let low_cmp = Logic_const.prel ~loc (Rle, Cil.lzero (), t) in
       (match n with
        | None -> low_cmp
        | Some n ->
-         let tn = Logic_const.tint ~loc (Integer.of_int n) in
+         let tn = Logic_const.tinteger ~loc n in
          let up_cmp = Logic_const.prel ~loc (Rlt, t, tn) in
          Logic_const.pand ~loc (low_cmp, up_cmp))
 
@@ -525,21 +545,21 @@ let create_predicate ?(loc=Location.unknown) alarm =
             let zero = Cil.lzero () in
             Logic_const.term (TCastE (typ, zero)) (Ctype typ)
           end
-        | Some e -> Logic_utils.expr_to_term ~cast:true e
+        | Some e -> Logic_utils.expr_to_term e
       in
-      let t2 = Logic_utils.expr_to_term ~cast:true e2 in
+      let t2 = Logic_utils.expr_to_term e2 in
       Logic_utils.pointer_comparable ~loc t1 t2
 
     | Differing_blocks(e1, e2) ->
       (* \base_addr(e1) == \base_addr(e2) *)
       let loc = best_loc ~loc e1.eloc in
-      let t1 = Logic_utils.expr_to_term ~cast:true e1 in
+      let t1 = Logic_utils.expr_to_term e1 in
       let here = Logic_const.here_label in
       let typ = Ctype Cil.charPtrType in
       let t1 =
         Logic_const.term ~loc:(best_loc loc e1.eloc) (Tbase_addr(here, t1)) typ
       in
-      let t2 = Logic_utils.expr_to_term ~cast:true e2 in
+      let t2 = Logic_utils.expr_to_term e2 in
       let t2 =
         Logic_const.term ~loc:(best_loc loc e2.eloc) (Tbase_addr(here, t2)) typ
       in
@@ -549,8 +569,11 @@ let create_predicate ?(loc=Location.unknown) alarm =
       (* n <= e or e <= n according to bound *)
       let loc = best_loc ~loc e.eloc in
       let t = match kind with
+        | Pointer_downcast ->
+          let t = Logic_utils.expr_to_term e in
+          Logic_const.tcast ~loc t Cil.theMachine.upointType
         | Signed_downcast | Unsigned_downcast ->
-          Logic_utils.expr_to_term ~cast:true e
+          Logic_utils.expr_to_term ~coerce:true e
         | _ ->
           (* For overflows, the computation must be done on mathematical types,
              else the value is necessarily in bounds. *)
@@ -558,7 +581,9 @@ let create_predicate ?(loc=Location.unknown) alarm =
       in
       let tn = Logic_const.tint ~loc n in
       Logic_const.prel ~loc
-        (match bound with Lower_bound -> Rle, tn, t | Upper_bound -> Rle, t, tn)
+        (match bound with
+         | Lower_bound -> Rle, tn, t
+         | Upper_bound -> Rle, t, tn)
 
     | Float_to_int(e, n, bound) ->
       (* n < e or e < n according to bound *)
@@ -566,27 +591,31 @@ let create_predicate ?(loc=Location.unknown) alarm =
       let te = overflowed_expr_to_term ~loc e in
       let t = Logic_const.tlogic_coerce ~loc te Lreal in
       let n =
-        (match bound with Lower_bound -> Integer.sub | Upper_bound -> Integer.add)
+        (match bound with
+         | Lower_bound -> Integer.sub
+         | Upper_bound -> Integer.add)
           n Integer.one
       in
       let tn = Logic_const.tlogic_coerce ~loc (Logic_const.tint ~loc n) Lreal in
       Logic_const.prel ~loc
-        (match bound with Lower_bound -> Rlt, tn, t | Upper_bound -> Rlt, t, tn)
+        (match bound with
+         | Lower_bound -> Rlt, tn, t
+         | Upper_bound -> Rlt, t, tn)
 
     | Not_separated(lv1, lv2) ->
       (* \separated(lv1, lv2) *)
       let e1 = Cil.mkAddrOf ~loc lv1 in
-      let t1 = Logic_utils.expr_to_term ~cast:true e1 in
+      let t1 = Logic_utils.expr_to_term e1 in
       let e2 = Cil.mkAddrOf ~loc lv2 in
-      let t2 = Logic_utils.expr_to_term ~cast:true e2 in
+      let t2 = Logic_utils.expr_to_term e2 in
       Logic_const.pseparated ~loc [ t1; t2 ]
 
     | Overlap(lv1, lv2) ->
       (* (lv1 == lv2) || \separated(lv1, lv2) *)
       let e1 = Cil.mkAddrOf ~loc lv1 in
-      let t1 = Logic_utils.expr_to_term ~cast:true e1 in
+      let t1 = Logic_utils.expr_to_term e1 in
       let e2 = Cil.mkAddrOf ~loc lv2 in
-      let t2 = Logic_utils.expr_to_term ~cast:true e2 in
+      let t2 = Logic_utils.expr_to_term e2 in
       let eq = Logic_const.prel ~loc (Req, t1, t2) in
       let sep = Logic_const.pseparated ~loc [ t1; t2 ] in
       Logic_const.por ~loc (eq, sep)
@@ -594,13 +623,13 @@ let create_predicate ?(loc=Location.unknown) alarm =
     | Uninitialized lv ->
       (* \initialized(lv) *)
       let e = Cil.mkAddrOrStartOf ~loc lv in
-      let t = Logic_utils.expr_to_term ~cast:false e in
+      let t = Logic_utils.expr_to_term e in
       Logic_const.pinitialized ~loc (Logic_const.here_label, t)
 
     | Dangling lv ->
       (* !\dangling(lv) *)
       let e = Cil.mkAddrOrStartOf ~loc lv in
-      let t = Logic_utils.expr_to_term ~cast:false e in
+      let t = Logic_utils.expr_to_term e in
       Logic_const.(pnot ~loc (pdangling ~loc (Logic_const.here_label, t)))
 
     | Is_nan_or_infinite (e, fkind) ->
@@ -626,14 +655,14 @@ let create_predicate ?(loc=Location.unknown) alarm =
              that has unexpected type %a (unrolled as %a)"
             Printer.pp_exp e Printer.pp_typ t Printer.pp_typ t'
       in
-      let t = Logic_utils.expr_to_term ~cast:true e in
+      let t = Logic_utils.expr_to_term e in
       Logic_const.(pvalid_function ~loc t)
 
     | Uninitialized_union llv ->
       (* \initialized(lv_1) || ... || \initialized(lv_n) *)
       let make_lval_predicate lv =
         let e = Cil.mkAddrOrStartOf ~loc lv in
-        let t = Logic_utils.expr_to_term ~cast:false e in
+        let t = Logic_utils.expr_to_term e in
         Logic_const.pinitialized ~loc (Logic_const.here_label, t)
       in
       List.fold_left (fun acc lv ->
@@ -644,7 +673,7 @@ let create_predicate ?(loc=Location.unknown) alarm =
 
     | Invalid_bool lv ->
       let e = Cil.new_exp ~loc (Lval lv) in
-      let t = Logic_utils.expr_to_term ~cast:false e in
+      let t = Logic_utils.expr_to_term ~coerce:true e in
       let zero = Logic_const.prel ~loc (Req, t, Cil.lzero ()) in
       let one = Logic_const.prel ~loc (Req, t, Cil.lone ()) in
       Logic_const.por ~loc (zero, one)

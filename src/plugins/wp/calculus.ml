@@ -420,6 +420,9 @@ module Cfg (W : Mcfg.S) = struct
     | Some _ -> obj
     | None -> assert false
 
+  let add_call_post wenv annots kf obj =
+    List.fold_left (add_goal wenv) obj (WpStrategy.get_call_post annots kf)
+
   let wp_call_kf wenv cenv stmt lval kf args precond ~p_post ~p_exit =
     let call_asgn = WpStrategy.get_call_asgn cenv.post_annots (Some kf) in
     let assigns = match call_asgn with
@@ -428,6 +431,8 @@ module Cfg (W : Mcfg.S) = struct
       | WpPropId.AssignsAny _ -> WritesAny
       | WpPropId.NoAssignsInfo -> assert false (* see above *)
     in
+    let p_post = add_call_post wenv cenv.post_annots kf p_post in
+    let p_exit = add_call_post wenv cenv.exit_annots kf p_exit in
     let pre_hyp, pre_goals = WpStrategy.get_call_pre cenv.pre_annots kf in
     let obj = W.call wenv stmt lval kf args
         ~pre:(pre_hyp)
@@ -494,8 +499,9 @@ module Cfg (W : Mcfg.S) = struct
        | Mcfg.SC_Function_frame -> "function frame"
        | Mcfg.SC_Function_out -> "function out" )
       (Pretty_utils.pp_list  ~sep:", " Printer.pp_varinfo) vars;
-    W.scope wenv vars scope obj
-
+    match scope with
+    | Mcfg.(SC_Block_in | SC_Block_out) when vars = [] -> obj
+    | _ -> W.scope wenv vars scope obj
 
   (** @return the WP stored for edge [e]. Compute it if it is not already
    * there and store it. Also handle the Acut annotations. *)
@@ -564,13 +570,14 @@ module Cfg (W : Mcfg.S) = struct
       | Cil2cfg.VblkIn (Cil2cfg.Bfct, b) ->
           let obj = get_only_succ env cfg v in
           let obj = wp_scope wenv b.blocals Mcfg.SC_Block_in obj in
-          wp_scope wenv formals Mcfg.SC_Function_frame obj
-      | Cil2cfg.VblkIn (_, b) ->
+          let obj = wp_scope wenv formals Mcfg.SC_Function_frame obj in
+          obj
+      | Cil2cfg.VblkOut (Cil2cfg.Bfct, b) ->
           let obj = get_only_succ env cfg v in
-          wp_scope wenv b.blocals Mcfg.SC_Block_in obj
-      | Cil2cfg.VblkOut (_, _b) ->
-          let obj = get_only_succ env cfg v in
-          obj (* cf. blocks_closed_by_edge below *)
+          let obj = wp_scope wenv b.blocals Mcfg.SC_Block_out obj in
+          obj
+      | Cil2cfg.VblkOut _ | Cil2cfg.VblkIn _ ->
+          get_only_succ env cfg v
       | Cil2cfg.Vstmt s ->
           let obj = get_only_succ env cfg v in
           wp_stmt wenv s obj
@@ -605,11 +612,10 @@ module Cfg (W : Mcfg.S) = struct
                     wp_scope wenv formals Mcfg.SC_Function_after_POST obj
           *)
     in
-    let res =
-      let blks = Cil2cfg.blocks_closed_by_edge cfg e in
-      let free_locals res b = wp_scope wenv b.blocals Mcfg.SC_Block_out res in
-      List.fold_left free_locals res blks
-    in
+    let Cil2cfg.{ b_closed ; b_opened } = Cil2cfg.block_scope_for_edge cfg e in
+    let do_block sc res b = wp_scope wenv b.blocals sc res in
+    let res = List.fold_left (do_block Mcfg.SC_Block_in) res b_opened in
+    let res = List.fold_left (do_block Mcfg.SC_Block_out) res b_closed in
     debug "[compute_edge] before %a done@." Cil2cfg.pp_node v;
     Cil.CurrentLoc.set old_loc;
     res

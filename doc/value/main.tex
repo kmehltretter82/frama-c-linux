@@ -31,6 +31,7 @@
 
 \newcommand{\framacversion}%
            {\input{../../VERSION} (\input{../../VERSION_CODENAME}\unskip)}
+\newcommand{\isoc}{\textsf{C99}}
 
 \newcommand{\Eva}{\textsf{Eva}}
 
@@ -630,7 +631,7 @@ no run-time error could happen when running the program.
 The alarm means that \Eva{} could not prove that the value \verb|ks[i]|
 accessed in \verb|skein_block.c:69| was definitely initialized before being
 read. Reading an initialized value is an undefined behavior according to the
-ISO C99 standard (and can even lead to security vulnerabilities).
+\isoc{} standard (and can even lead to security vulnerabilities).
 
 As is often the case, this alarm is related to the approximation introduced
 in \verb|skein_block.c:56|, which is the loop responsible for initializing
@@ -1460,6 +1461,58 @@ to the attitude described in \ref{norme_pratique}. An option
 to warn about these lines could happen if there was demand for
 this feature.
 
+\subsubsection{Invalid pointer arithmetic}
+
+By default, \Eva{} does \emph{not} emit alarms on invalid pointer arithmetic:
+alarms are only emitted when an invalid pointer is dereferenced or wrongly used
+in a comparison, not at the creation of such pointers.
+
+However, if the \lstinline|-warn-invalid-pointer| option is enabled,
+\Eva{} emits an alarm when an operation may create a pointer that does
+not point inside an object or one past an object,
+even if this pointer is not used afterward.
+
+This may happen on:
+\begin{itemize}
+\item addition (or subtraction) of an integer from a pointer, when the analysis
+  is unable to prove that the resulting pointer points inside, or one past,
+  the same object pointed to by the initial pointer.
+  In this case, the emitted alarm reports a possible undefined behavior.
+\item conversion of an integer into a pointer. Except for the constant~0,
+  such a conversion is always an implementation-defined behavior
+  according to the \isoc{} standard. However, a footnote also explains that
+  conversion between pointers and integers is ``\emph{intended to
+  be consistent with the addressing structure of the execution environment}''.
+  This is why Eva also also authorizes conversion of integers:
+  \begin{itemize}
+  \item in the range of valid absolute addresses
+    (according to \texttt{absolute-valid-range})
+  \item computed from the address of an object \lstinline|o| such that the
+    resulting pointer points inside or one past the object \lstinline|o|.
+  \end{itemize}
+  In all other cases, an alarm is emitted, which reports the possible
+  implementation-defined behavior mentioned above.
+\end{itemize}
+
+In the example below, the first increment of the pointer \lstinline|p| is valid,
+although the resulting pointer should not be dereferenced. The second increment
+leads to an invalid alarm when option \lstinline|-warn-invalid-pointer| is on.
+\listinginput{1}{examples/alarms/pointer_arith.c}
+\begin{logs}
+  [eva:alarm] pointer_arith.c:4: Warning:
+    invalid pointer creation. assert \object_pointer(p + 1);
+\end{logs}
+
+In the same way, in the example below, the first conversion at line~5
+does not generate an alarm, but the second conversion leads to an invalid alarm
+with option \lstinline|-warn-invalid-pointer|.
+
+\listinginput{1}{examples/alarms/pointer_conversion.c}
+\begin{logs}
+  [eva:alarm] pointer_arith.c:6: Warning:
+    invalid pointer creation. assert \object_pointer((char *)(a + 2));
+\end{logs}
+
 
 \subsubsection{Division by zero}
 When dividing by an expression that the analysis
@@ -1494,7 +1547,7 @@ simpler than this one. Do not be surprised by them.
 Another arithmetic alarm is the alarm emitted for logical
 shift operations on integers where the second operand may be
 larger than the size in bits of the first operand's type. 
-Such an operation is left undefined by the ISO/IEC 9899:1999 standard, and
+Such an operation is left undefined by the \isoc{} standard, and
 indeed, processors are often built in a way that such an
 operation does not produce the \lstinline|0| or \lstinline|-1|
 result that could have been expected. Here is an example
@@ -1506,7 +1559,7 @@ shift.c:4: ... invalid RHS operand for shift. assert 0 <= c < 32;
 
 \Eva{} also detects shifts on negative integers.
 Left-shifting a negative integer is an undefined behavior according to the
-ISO C99 standard, and leads to an alarm by default.
+\isoc{} standard, and leads to an alarm by default.
 These alarms can be disabled by using the option
 \lstinline|-no-warn-left-shift-negative|.
 Right-shifting a negative integer is an implementation-defined operation,
@@ -1525,7 +1578,7 @@ By default, \Eva{} emits alarms for --- and reduces the
 sets of possible results of --- signed arithmetic computations where
 the possibility of an overflow exists. Indeed,
 such overflows have an undefined behavior according to
-paragraph 6.5.5 of the ISO/IEC 9899:1999 standard.
+paragraph 6.5.5 of the \isoc{} standard.
 %
 If useful, it is also possible to assume that signed integers overflow
 according to a 2's complement representation. The option
@@ -1536,9 +1589,15 @@ as potentially overflowing. This warning can also be disabled by option
 
 By default, no alarm is emitted for arithmetic operations on unsigned integers
 for which an overflow may happen, since such operations have
-defined semantics according to the ISO/IEC 9899:1999 standard.
+defined semantics according to the \isoc{} standard.
 If one wishes to signal and prevent such unsigned overflows,
 option \verb+-warn-unsigned-overflow+ can be used.
+
+By default, Eva emits alarms for downcasts of pointer values to (signed
+or unsigned) integer types. Such downcasts are indeed  undefined behavior
+according to section 6.3.2.3, §6 of the \isoc{} standard.
+However, option \lstinline|-no-warn-pointer-downcast| can be used to disable
+these alarms.
 
 Finally, by default, no alarm is emitted for downcasts to signed or unsigned
 integers. In the signed case, the least significant bits
@@ -1628,13 +1687,25 @@ uninitialized.c:13: ... accessing left-value that contains escaping addresses.
                   assert !\dangling(&p);
 \end{logs}
 
-By default, \Eva{} does not emit an alarm for a copy from memory
-to memory when the copied values include dangling addresses or uninitialized
-contents. This behavior is safe because \Eva{} warns later, as soon
-as an unsafe value is used in a computation --either directly or
-after having been copied from another location.
-The copy operations for which alarms are not emitted are assignments
-from lvalues to lvalues (\lstinline|lv1 = lv2;|), passing lvalues
+By default, \Eva{} emits an alarm as soon as a value that may be uninitialized
+or a dangling address is read, even if this value is not used in any computation.
+
+However, it may be normal for some fields in a struct or union to contain
+such dangerous contents in some cases.
+Thus, \Eva{} \emph{never} emits an alarm for a copy from memory to memory
+of a struct or an union containing dangling addresses or uninitialized contents.
+This behavior is safe because \Eva{} warns later, as soon as an unsafe value is
+used in a computation --either directly or after having been copied from another
+location.
+
+This relaxed behavior on structs and unions can be extended to scalar variables
+with the option \lstinline|-eva-warn-copy-indeterminate|.
+Specifying \lstinline|-eva-warn-copy-indeterminate=-f| on the command-line
+will cause the analyzer to not emit alarms on copy operations occurring in
+function \lstinline|f|. The syntax \lstinline|-@all| can also be used to
+activate this behavior for all functions.
+In this mode, the copy operations for which alarms are not emitted are
+assignments from lvalues to lvalues (\lstinline|lv1 = lv2;|), passing lvalues
 as arguments to functions (\lstinline|f(lv1);|), and returning
 lvalues (\lstinline|return lv1;|). An exception is made
 for lvalues passed as arguments to library functions: in this case,
@@ -1642,22 +1713,11 @@ because the function's code is missing, there is no chance to catch
 the undefined access later; the analyzer emits an alarm at the point
 of the call.
 
-The behavior documented above was implemented to avoid spurious warnings where
-the copied lvalues are structs or unions. In some cases, it may be normal
-for some fields in a struct or union to contain such dangerous contents.
-
-Option \lstinline|-eva-warn-copy-indeterminate| can be used to obtain a
-more aggressive behavior on scalar variables. Specifying \lstinline|-eva-warn-copy-indeterminate f|
-on the command-line will cause the analyzer to also emit an alarm on 
-all dangerous copy operations occurring in function \lstinline|f|, as long as
-the copied lvalues are not structs or unions. The syntax \lstinline|@all|
-can also be used to activate this behavior for all functions.
-
 \subsubsection{Trap representations of \_Bool values}
 
 By default, \Eva{} emits an alarm whenever a trap representation might be read
 from an lvalue of type \texttt{\_Bool}.
-According to the ISO/IEC 9899:1999 standard, the \texttt{\_Bool} type contains
+According to the \isoc{} standard, the \texttt{\_Bool} type contains
 the values 0 and 1, but any other value might be a trap representation, that is,
 an object representation that does not represent a valid value of the type.
 Trap representations can be created through unions or pointer casts.
@@ -1809,7 +1869,7 @@ compiler, if we may ask such a rhetorical
 question, is right? They all are, because the program is undefined.
 When function \lstinline|copy()| is called from \lstinline|main()|,
 the assignment \lstinline|*p = *q;| breaks
-C99's 6.5.16.1:3 rule. This rule states that 
+\isoc{}'s 6.5.16.1:3 rule. This rule states that 
 in an assignment from lvalue to lvalue,
 the left and right lvalues must overlap either exactly or not at all.
 
@@ -2115,7 +2175,7 @@ limited form, but imprecisions may accumulate quickly
 
 \Eva{} does not check all the properties that could be
 expected of it\footnote{There are 245 unspecified or undefined
-  behaviors in Annex J of the ISO C99 standard.}. Support for each of
+  behaviors in Annex J of the \isoc{} standard.}. Support for each of
 these missing features could arrive if the need was expressed. Below
 are some of the existing limitations.
 
@@ -3844,7 +3904,7 @@ with large arrays and matrices, it is worth considering its usage.
 \label{sec:eva}
 
 
-Starting from \FramaC Silicon, new analysis \emph{domains} are
+This section presents the analysis \emph{domains}
 available to improve the precision on specific code constructs.
 They can (and probably should) be enabled at the beginning of the analysis.
 Their only downside is that they increase the analysis time.
@@ -3853,7 +3913,21 @@ These analysis domains are enabled by the option \texttt{-eva-domains}, followed
 by a list of domain names. A list of the available domains, and a short
 description of each one, can be displayed with \texttt{-eva-domains help}.
 
-\emph{Restrictions:}
+Domains can also be enabled for specific functions through option
+\texttt{-eva-domains-function}:
+\begin{itemize}
+\item \texttt{-eva-domains-function d1:f,d1:g,d2:h} enables the domain
+  \texttt{d1} on functions \lstinline+f+ and \lstinline+g+, and the domain
+  \texttt{d2} on function \lstinline+h+.
+\item \texttt{-eva-domains-function d:f+} enables the domain
+  \texttt{d} on function \lstinline+f+ and on any function called
+  from \lstinline+f+.
+\item \texttt{-eva-domains-function d:f-} disables the domain
+  \texttt{d} on function \lstinline+f+ and on any function called
+  from \lstinline+f+.
+\end{itemize}
+
+These analysis domains currently have some restrictions:
 \begin{itemize}
 \item adding a new domain may interact with the \lstinline+slevel+ partitioning
   in unpredictable ways, and new alarms may sometimes appear;

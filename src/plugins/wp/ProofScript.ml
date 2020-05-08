@@ -316,7 +316,7 @@ let tactic_of_json js =
 (* -------------------------------------------------------------------------- *)
 
 let json_of_verdict = function
-  | VCS.NoResult | VCS.Checked | VCS.Computing _ -> `String "none"
+  | VCS.NoResult | VCS.Computing _ -> `String "none"
   | VCS.Valid -> `String "valid"
   | VCS.Unknown -> `String "unknown"
   | VCS.Timeout -> `String "timeout"

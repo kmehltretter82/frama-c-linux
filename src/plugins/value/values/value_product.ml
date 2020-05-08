@@ -81,6 +81,11 @@ module Make
     and right_truth = Right.assume_not_nan ~assume_finite fkind right in
     narrow_truth (left, left_truth) (right, right_truth)
 
+  let assume_pointer (left, right) =
+    let left_truth = Left.assume_pointer left
+    and right_truth = Right.assume_pointer right in
+    narrow_truth (left, left_truth) (right, right_truth)
+
   let assume_comparable op (l1, r1) (l2, r2) =
     let left_truth = Left.assume_comparable op l1 l2
     and right_truth = Right.assume_comparable op r1 r2 in

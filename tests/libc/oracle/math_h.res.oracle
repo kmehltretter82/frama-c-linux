@@ -1,5 +1,5 @@
 [kernel] Parsing tests/libc/math_h.c (with preprocessing)
-[kernel:parser:decimal-float] tests/libc/math_h.c:3: Warning: 
+[kernel:parser:decimal-float] tests/libc/math_h.c:5: Warning: 
   Floating-point constant 3.14159265358979323846264338327950288 is not represented exactly. Will use 0x1.921fb54442d18p1.
   (warn-once: no further messages from category 'parser:decimal-float' will be emitted)
 [eva] Analyzing a complete application starting at main
@@ -23,292 +23,286 @@
   one ∈ {1.}
   minus_one ∈ {-1.}
   large ∈ {1e+38}
+  huge_val ∈ {inf}
+  huge_valf ∈ {inf}
+  huge_vall ∈ {inf}
+  infinity ∈ {inf}
+  fp_ilogb0 ∈ {-2147483648.}
+  fp_ilogbnan ∈ {-2147483648.}
 [eva] computing for function atan <- main.
-  Called from tests/libc/math_h.c:35.
+  Called from tests/libc/math_h.c:45.
 [eva] using specification for function atan
-[eva] tests/libc/math_h.c:35: 
+[eva] tests/libc/math_h.c:45: 
   function atan: precondition 'finite_arg' got status valid.
 [eva] Done for function atan
 [eva] computing for function atan <- main.
-  Called from tests/libc/math_h.c:35.
-[eva] tests/libc/math_h.c:35: 
+  Called from tests/libc/math_h.c:45.
+[eva] tests/libc/math_h.c:45: 
   function atan: precondition 'finite_arg' got status valid.
 [eva] Done for function atan
 [eva] computing for function atan <- main.
-  Called from tests/libc/math_h.c:35.
-[eva] tests/libc/math_h.c:35: 
+  Called from tests/libc/math_h.c:45.
+[eva] tests/libc/math_h.c:45: 
   function atan: precondition 'finite_arg' got status valid.
 [eva] Done for function atan
 [eva] computing for function atan <- main.
-  Called from tests/libc/math_h.c:35.
-[eva] tests/libc/math_h.c:35: 
+  Called from tests/libc/math_h.c:45.
+[eva] tests/libc/math_h.c:45: 
   function atan: precondition 'finite_arg' got status valid.
 [eva] Done for function atan
 [eva] computing for function atan <- main.
-  Called from tests/libc/math_h.c:35.
-[eva] tests/libc/math_h.c:35: 
+  Called from tests/libc/math_h.c:45.
+[eva] tests/libc/math_h.c:45: 
   function atan: precondition 'finite_arg' got status valid.
 [eva] Done for function atan
 [eva] computing for function atan <- main.
-  Called from tests/libc/math_h.c:35.
-[eva] tests/libc/math_h.c:35: 
+  Called from tests/libc/math_h.c:45.
+[eva] tests/libc/math_h.c:45: 
   function atan: precondition 'finite_arg' got status valid.
 [eva] Done for function atan
 [eva] computing for function atan <- main.
-  Called from tests/libc/math_h.c:35.
-[eva] tests/libc/math_h.c:35: 
+  Called from tests/libc/math_h.c:45.
+[eva] tests/libc/math_h.c:45: 
   function atan: precondition 'finite_arg' got status valid.
 [eva] Done for function atan
 [eva] computing for function atan <- main.
-  Called from tests/libc/math_h.c:35.
-[eva] tests/libc/math_h.c:35: 
+  Called from tests/libc/math_h.c:45.
+[eva] tests/libc/math_h.c:45: 
   function atan: precondition 'finite_arg' got status valid.
 [eva] Done for function atan
-[eva:alarm] tests/libc/math_h.c:35: Warning: 
-  non-finite double value. assert \is_finite(top);
 [eva] computing for function atan <- main.
-  Called from tests/libc/math_h.c:35.
-[eva] tests/libc/math_h.c:35: 
-  function atan: precondition 'finite_arg' got status valid.
+  Called from tests/libc/math_h.c:45.
+[eva:alarm] tests/libc/math_h.c:45: Warning: 
+  function atan: precondition 'finite_arg' got status unknown.
 [eva] Done for function atan
 [eva] computing for function atanf <- main.
-  Called from tests/libc/math_h.c:36.
+  Called from tests/libc/math_h.c:46.
 [eva] using specification for function atanf
-[eva] tests/libc/math_h.c:36: 
+[eva] tests/libc/math_h.c:46: 
   function atanf: precondition 'finite_arg' got status valid.
 [eva] Done for function atanf
 [eva] computing for function atanf <- main.
-  Called from tests/libc/math_h.c:36.
-[eva] tests/libc/math_h.c:36: 
+  Called from tests/libc/math_h.c:46.
+[eva] tests/libc/math_h.c:46: 
   function atanf: precondition 'finite_arg' got status valid.
 [eva] Done for function atanf
 [eva] computing for function atanf <- main.
-  Called from tests/libc/math_h.c:36.
-[eva] tests/libc/math_h.c:36: 
+  Called from tests/libc/math_h.c:46.
+[eva] tests/libc/math_h.c:46: 
   function atanf: precondition 'finite_arg' got status valid.
 [eva] Done for function atanf
 [eva] computing for function atanf <- main.
-  Called from tests/libc/math_h.c:36.
-[eva] tests/libc/math_h.c:36: 
+  Called from tests/libc/math_h.c:46.
+[eva] tests/libc/math_h.c:46: 
   function atanf: precondition 'finite_arg' got status valid.
 [eva] Done for function atanf
 [eva] computing for function atanf <- main.
-  Called from tests/libc/math_h.c:36.
-[eva] tests/libc/math_h.c:36: 
+  Called from tests/libc/math_h.c:46.
+[eva] tests/libc/math_h.c:46: 
   function atanf: precondition 'finite_arg' got status valid.
 [eva] Done for function atanf
 [eva] computing for function atanf <- main.
-  Called from tests/libc/math_h.c:36.
-[eva] tests/libc/math_h.c:36: 
+  Called from tests/libc/math_h.c:46.
+[eva] tests/libc/math_h.c:46: 
   function atanf: precondition 'finite_arg' got status valid.
 [eva] Done for function atanf
 [eva] computing for function atanf <- main.
-  Called from tests/libc/math_h.c:36.
-[eva] tests/libc/math_h.c:36: 
+  Called from tests/libc/math_h.c:46.
+[eva] tests/libc/math_h.c:46: 
   function atanf: precondition 'finite_arg' got status valid.
 [eva] Done for function atanf
 [eva] computing for function atanf <- main.
-  Called from tests/libc/math_h.c:36.
-[eva] tests/libc/math_h.c:36: 
+  Called from tests/libc/math_h.c:46.
+[eva] tests/libc/math_h.c:46: 
   function atanf: precondition 'finite_arg' got status valid.
 [eva] Done for function atanf
-[eva:alarm] tests/libc/math_h.c:36: Warning: 
-  non-finite float value. assert \is_finite(f_top);
 [eva] computing for function atanf <- main.
-  Called from tests/libc/math_h.c:36.
-[eva] tests/libc/math_h.c:36: 
-  function atanf: precondition 'finite_arg' got status valid.
+  Called from tests/libc/math_h.c:46.
+[eva:alarm] tests/libc/math_h.c:46: Warning: 
+  function atanf: precondition 'finite_arg' got status unknown.
 [eva] Done for function atanf
 [eva] computing for function atanl <- main.
-  Called from tests/libc/math_h.c:37.
+  Called from tests/libc/math_h.c:47.
 [eva] using specification for function atanl
-[eva] tests/libc/math_h.c:37: 
+[eva] tests/libc/math_h.c:47: 
   function atanl: precondition 'finite_arg' got status valid.
 [eva] Done for function atanl
 [eva] computing for function atanl <- main.
-  Called from tests/libc/math_h.c:37.
-[eva] tests/libc/math_h.c:37: 
+  Called from tests/libc/math_h.c:47.
+[eva] tests/libc/math_h.c:47: 
   function atanl: precondition 'finite_arg' got status valid.
 [eva] Done for function atanl
 [eva] computing for function atanl <- main.
-  Called from tests/libc/math_h.c:37.
-[eva] tests/libc/math_h.c:37: 
+  Called from tests/libc/math_h.c:47.
+[eva] tests/libc/math_h.c:47: 
   function atanl: precondition 'finite_arg' got status valid.
 [eva] Done for function atanl
 [eva] computing for function atanl <- main.
-  Called from tests/libc/math_h.c:37.
-[eva] tests/libc/math_h.c:37: 
+  Called from tests/libc/math_h.c:47.
+[eva] tests/libc/math_h.c:47: 
   function atanl: precondition 'finite_arg' got status valid.
 [eva] Done for function atanl
 [eva] computing for function atanl <- main.
-  Called from tests/libc/math_h.c:37.
-[eva] tests/libc/math_h.c:37: 
+  Called from tests/libc/math_h.c:47.
+[eva] tests/libc/math_h.c:47: 
   function atanl: precondition 'finite_arg' got status valid.
 [eva] Done for function atanl
 [eva] computing for function atanl <- main.
-  Called from tests/libc/math_h.c:37.
-[eva] tests/libc/math_h.c:37: 
+  Called from tests/libc/math_h.c:47.
+[eva] tests/libc/math_h.c:47: 
   function atanl: precondition 'finite_arg' got status valid.
 [eva] Done for function atanl
 [eva] computing for function atanl <- main.
-  Called from tests/libc/math_h.c:37.
-[eva] tests/libc/math_h.c:37: 
+  Called from tests/libc/math_h.c:47.
+[eva] tests/libc/math_h.c:47: 
   function atanl: precondition 'finite_arg' got status valid.
 [eva] Done for function atanl
 [eva] computing for function atanl <- main.
-  Called from tests/libc/math_h.c:37.
-[eva] tests/libc/math_h.c:37: 
+  Called from tests/libc/math_h.c:47.
+[eva] tests/libc/math_h.c:47: 
   function atanl: precondition 'finite_arg' got status valid.
 [eva] Done for function atanl
-[eva:alarm] tests/libc/math_h.c:37: Warning: 
-  non-finite long double value. assert \is_finite(ld_top);
 [eva] computing for function atanl <- main.
-  Called from tests/libc/math_h.c:37.
-[eva:alarm] tests/libc/math_h.c:37: Warning: 
+  Called from tests/libc/math_h.c:47.
+[eva:alarm] tests/libc/math_h.c:47: Warning: 
   function atanl: precondition 'finite_arg' got status unknown.
 [eva] Done for function atanl
 [eva] computing for function fabs <- main.
-  Called from tests/libc/math_h.c:38.
+  Called from tests/libc/math_h.c:48.
 [eva] using specification for function fabs
-[eva] tests/libc/math_h.c:38: 
+[eva] tests/libc/math_h.c:48: 
   function fabs: precondition 'finite_arg' got status valid.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
-  Called from tests/libc/math_h.c:38.
-[eva] tests/libc/math_h.c:38: 
+  Called from tests/libc/math_h.c:48.
+[eva] tests/libc/math_h.c:48: 
   function fabs: precondition 'finite_arg' got status valid.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
-  Called from tests/libc/math_h.c:38.
-[eva] tests/libc/math_h.c:38: 
+  Called from tests/libc/math_h.c:48.
+[eva] tests/libc/math_h.c:48: 
   function fabs: precondition 'finite_arg' got status valid.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
-  Called from tests/libc/math_h.c:38.
-[eva] tests/libc/math_h.c:38: 
+  Called from tests/libc/math_h.c:48.
+[eva] tests/libc/math_h.c:48: 
   function fabs: precondition 'finite_arg' got status valid.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
-  Called from tests/libc/math_h.c:38.
-[eva] tests/libc/math_h.c:38: 
+  Called from tests/libc/math_h.c:48.
+[eva] tests/libc/math_h.c:48: 
   function fabs: precondition 'finite_arg' got status valid.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
-  Called from tests/libc/math_h.c:38.
-[eva] tests/libc/math_h.c:38: 
+  Called from tests/libc/math_h.c:48.
+[eva] tests/libc/math_h.c:48: 
   function fabs: precondition 'finite_arg' got status valid.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
-  Called from tests/libc/math_h.c:38.
-[eva] tests/libc/math_h.c:38: 
+  Called from tests/libc/math_h.c:48.
+[eva] tests/libc/math_h.c:48: 
   function fabs: precondition 'finite_arg' got status valid.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
-  Called from tests/libc/math_h.c:38.
-[eva] tests/libc/math_h.c:38: 
+  Called from tests/libc/math_h.c:48.
+[eva] tests/libc/math_h.c:48: 
   function fabs: precondition 'finite_arg' got status valid.
 [eva] Done for function fabs
-[eva:alarm] tests/libc/math_h.c:38: Warning: 
-  non-finite double value. assert \is_finite(top);
 [eva] computing for function fabs <- main.
-  Called from tests/libc/math_h.c:38.
-[eva] tests/libc/math_h.c:38: 
-  function fabs: precondition 'finite_arg' got status valid.
+  Called from tests/libc/math_h.c:48.
+[eva:alarm] tests/libc/math_h.c:48: Warning: 
+  function fabs: precondition 'finite_arg' got status unknown.
 [eva] Done for function fabs
 [eva] computing for function fabsf <- main.
-  Called from tests/libc/math_h.c:39.
+  Called from tests/libc/math_h.c:49.
 [eva] using specification for function fabsf
-[eva] tests/libc/math_h.c:39: 
+[eva] tests/libc/math_h.c:49: 
   function fabsf: precondition 'finite_arg' got status valid.
 [eva] Done for function fabsf
 [eva] computing for function fabsf <- main.
-  Called from tests/libc/math_h.c:39.
-[eva] tests/libc/math_h.c:39: 
+  Called from tests/libc/math_h.c:49.
+[eva] tests/libc/math_h.c:49: 
   function fabsf: precondition 'finite_arg' got status valid.
 [eva] Done for function fabsf
 [eva] computing for function fabsf <- main.
-  Called from tests/libc/math_h.c:39.
-[eva] tests/libc/math_h.c:39: 
+  Called from tests/libc/math_h.c:49.
+[eva] tests/libc/math_h.c:49: 
   function fabsf: precondition 'finite_arg' got status valid.
 [eva] Done for function fabsf
 [eva] computing for function fabsf <- main.
-  Called from tests/libc/math_h.c:39.
-[eva] tests/libc/math_h.c:39: 
+  Called from tests/libc/math_h.c:49.
+[eva] tests/libc/math_h.c:49: 
   function fabsf: precondition 'finite_arg' got status valid.
 [eva] Done for function fabsf
 [eva] computing for function fabsf <- main.
-  Called from tests/libc/math_h.c:39.
-[eva] tests/libc/math_h.c:39: 
+  Called from tests/libc/math_h.c:49.
+[eva] tests/libc/math_h.c:49: 
   function fabsf: precondition 'finite_arg' got status valid.
 [eva] Done for function fabsf
 [eva] computing for function fabsf <- main.
-  Called from tests/libc/math_h.c:39.
-[eva] tests/libc/math_h.c:39: 
+  Called from tests/libc/math_h.c:49.
+[eva] tests/libc/math_h.c:49: 
   function fabsf: precondition 'finite_arg' got status valid.
 [eva] Done for function fabsf
 [eva] computing for function fabsf <- main.
-  Called from tests/libc/math_h.c:39.
-[eva] tests/libc/math_h.c:39: 
+  Called from tests/libc/math_h.c:49.
+[eva] tests/libc/math_h.c:49: 
   function fabsf: precondition 'finite_arg' got status valid.
 [eva] Done for function fabsf
 [eva] computing for function fabsf <- main.
-  Called from tests/libc/math_h.c:39.
-[eva] tests/libc/math_h.c:39: 
+  Called from tests/libc/math_h.c:49.
+[eva] tests/libc/math_h.c:49: 
   function fabsf: precondition 'finite_arg' got status valid.
 [eva] Done for function fabsf
-[eva:alarm] tests/libc/math_h.c:39: Warning: 
-  non-finite float value. assert \is_finite(f_top);
 [eva] computing for function fabsf <- main.
-  Called from tests/libc/math_h.c:39.
-[eva] tests/libc/math_h.c:39: 
-  function fabsf: precondition 'finite_arg' got status valid.
+  Called from tests/libc/math_h.c:49.
+[eva:alarm] tests/libc/math_h.c:49: Warning: 
+  function fabsf: precondition 'finite_arg' got status unknown.
 [eva] Done for function fabsf
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:40.
+  Called from tests/libc/math_h.c:50.
 [eva] using specification for function fabsl
-[eva] tests/libc/math_h.c:40: 
+[eva] tests/libc/math_h.c:50: 
   function fabsl: precondition 'finite_arg' got status valid.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:40.
-[eva] tests/libc/math_h.c:40: 
+  Called from tests/libc/math_h.c:50.
+[eva] tests/libc/math_h.c:50: 
   function fabsl: precondition 'finite_arg' got status valid.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:40.
-[eva] tests/libc/math_h.c:40: 
+  Called from tests/libc/math_h.c:50.
+[eva] tests/libc/math_h.c:50: 
   function fabsl: precondition 'finite_arg' got status valid.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:40.
-[eva] tests/libc/math_h.c:40: 
+  Called from tests/libc/math_h.c:50.
+[eva] tests/libc/math_h.c:50: 
   function fabsl: precondition 'finite_arg' got status valid.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:40.
-[eva] tests/libc/math_h.c:40: 
+  Called from tests/libc/math_h.c:50.
+[eva] tests/libc/math_h.c:50: 
   function fabsl: precondition 'finite_arg' got status valid.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:40.
-[eva] tests/libc/math_h.c:40: 
+  Called from tests/libc/math_h.c:50.
+[eva] tests/libc/math_h.c:50: 
   function fabsl: precondition 'finite_arg' got status valid.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:40.
-[eva] tests/libc/math_h.c:40: 
+  Called from tests/libc/math_h.c:50.
+[eva] tests/libc/math_h.c:50: 
   function fabsl: precondition 'finite_arg' got status valid.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:40.
-[eva] tests/libc/math_h.c:40: 
+  Called from tests/libc/math_h.c:50.
+[eva] tests/libc/math_h.c:50: 
   function fabsl: precondition 'finite_arg' got status valid.
 [eva] Done for function fabsl
-[eva:alarm] tests/libc/math_h.c:40: Warning: 
-  non-finite long double value. assert \is_finite(ld_top);
 [eva] computing for function fabsl <- main.
-  Called from tests/libc/math_h.c:40.
-[eva:alarm] tests/libc/math_h.c:40: Warning: 
+  Called from tests/libc/math_h.c:50.
+[eva:alarm] tests/libc/math_h.c:50: Warning: 
   function fabsl: precondition 'finite_arg' got status unknown.
 [eva] Done for function fabsl
 [eva] Recording results for main

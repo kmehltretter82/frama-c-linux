@@ -10,12 +10,12 @@
  */
 /*@ predicate eq(char *x, char *y) = x ≡ y;
  */
-/*@ predicate my_null(char *x) = x ≡ (char *)((void *)0);
+/*@ predicate my_null(char *x) = x ≡ (char *)0;
  */
 void f(char *x)
 {
   x = (char *)0;
-  /*@ assert x ≡ (char *)((void *)0); */ ;
+  /*@ assert x ≡ (char *)0; */ ;
   /*@ assert my_null(x); */ ;
   /*@ assert null(x); */ ;
   /*@ assert eq(x, (char *)0); */ ;

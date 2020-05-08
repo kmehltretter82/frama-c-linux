@@ -450,11 +450,18 @@ the case (this is the default).
 **Deprecated**: use **-kernel-warn-key parser:decimal-float=once**
 (and variants) instead.
 
+[-no]-warn-invalid-pointer
+: generate alarms for invalid pointer arithmetic. Defaults to no.
+
 [-no]-warn-left-shift-negative
 : generate alarms for signed left shifts on negative values. Defaults to yes.
 
 [-no]-warn-right-shift-negative
 : generate alarms for signed right shifts on negative values. Defaults to no.
+
+[-no]-warn-pointer-downcast
+: generates alarms when the downcast of a pointer may exceed the destination
+range. Defaults to yes.
 
 [-no]-warn-signed-downcast
 : generates alarms when signed downcasts may exceed the destination range.

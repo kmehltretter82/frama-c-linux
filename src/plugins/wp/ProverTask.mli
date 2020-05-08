@@ -85,8 +85,10 @@ val schedule : 'a Task.task -> unit
 val spawn :
   ?monitor:('a option -> unit) ->
   ?pool:Task.pool ->
+  all:bool ->
   ('a * bool Task.task) list -> unit
+
 (** Spawn all the tasks over the server and retain the first 'validated' one.
     The callback [monitor] is called with [Some] at first success, and [None]
-    if none succeed.
-    An option [pool] task can be passed to register the associated threads. *)
+    if none succeed. An option [pool] task can be passed to register
+    the associated threads. *)

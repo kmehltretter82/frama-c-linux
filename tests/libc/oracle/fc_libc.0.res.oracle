@@ -40,7 +40,7 @@
    unsetenv (0 call); wcscat (0 call); wcscpy (0 call); wcslen (2 calls);
    wcsncat (0 call); wcsncpy (0 call); wmemcpy (0 call); wmemset (0 call); 
   
-  Undefined functions (390)
+  Undefined functions (406)
   =========================
    FD_CLR (0 call); FD_ISSET (0 call); FD_SET (0 call); FD_ZERO (0 call);
    Frama_C_int_interval (0 call); Frama_C_long_interval (0 call);
@@ -51,18 +51,21 @@
    Frama_C_unsigned_long_interval (0 call);
    Frama_C_unsigned_long_long_interval (0 call);
    Frama_C_unsigned_short_interval (0 call); _Exit (0 call);
-   __builtin_abort (1 call); __builtin_sadd_overflow (0 call);
-   __builtin_saddl_overflow (0 call); __builtin_saddll_overflow (0 call);
-   __builtin_smul_overflow (0 call); __builtin_smull_overflow (0 call);
-   __builtin_smulll_overflow (0 call); __builtin_ssub_overflow (0 call);
-   __builtin_ssubl_overflow (0 call); __builtin_ssubll_overflow (0 call);
-   __builtin_uadd_overflow (0 call); __builtin_uaddl_overflow (0 call);
-   __builtin_uaddll_overflow (0 call); __builtin_umul_overflow (0 call);
-   __builtin_umull_overflow (0 call); __builtin_umulll_overflow (0 call);
-   __builtin_usub_overflow (0 call); __builtin_usubl_overflow (0 call);
-   __builtin_usubll_overflow (0 call); __fc_fpclassify (0 call);
-   __fc_fpclassifyf (0 call); __fc_infinity (0 call); __fc_nan (0 call);
-   __va_fcntl_flock (0 call); __va_fcntl_int (0 call);
+   __builtin_abort (1 call); __builtin_clz (0 call); __builtin_clzl (0 call);
+   __builtin_clzll (0 call); __builtin_ctz (0 call); __builtin_ctzl (0 call);
+   __builtin_ctzll (0 call); __builtin_popcount (0 call);
+   __builtin_popcountl (0 call); __builtin_popcountll (0 call);
+   __builtin_sadd_overflow (0 call); __builtin_saddl_overflow (0 call);
+   __builtin_saddll_overflow (0 call); __builtin_smul_overflow (0 call);
+   __builtin_smull_overflow (0 call); __builtin_smulll_overflow (0 call);
+   __builtin_ssub_overflow (0 call); __builtin_ssubl_overflow (0 call);
+   __builtin_ssubll_overflow (0 call); __builtin_uadd_overflow (0 call);
+   __builtin_uaddl_overflow (0 call); __builtin_uaddll_overflow (0 call);
+   __builtin_umul_overflow (0 call); __builtin_umull_overflow (0 call);
+   __builtin_umulll_overflow (0 call); __builtin_usub_overflow (0 call);
+   __builtin_usubl_overflow (0 call); __builtin_usubll_overflow (0 call);
+   __fc_fpclassify (0 call); __fc_fpclassifyf (0 call); __fc_infinity (0 call);
+   __fc_nan (0 call); __va_fcntl_flock (0 call); __va_fcntl_int (0 call);
    __va_fcntl_void (0 call); __va_ioctl_int (0 call); __va_ioctl_ptr (0 call);
    __va_ioctl_void (0 call); __va_open_mode_t (0 call);
    __va_open_void (0 call); __va_openat_mode_t (0 call);
@@ -91,9 +94,9 @@
    flockfile (0 call); floor (0 call); floorf (0 call); floorl (0 call);
    fmod (0 call); fmodf (0 call); fopen (0 call); fork (0 call);
    fputc (0 call); fputs (0 call); fread (0 call); free (1 call);
-   freeaddrinfo (0 call); freopen (0 call); fseek (0 call); fsetpos (0 call);
-   ftell (0 call); ftrylockfile (0 call); funlockfile (0 call);
-   fwrite (0 call); gai_strerror (0 call); getc (0 call);
+   freeaddrinfo (0 call); freopen (0 call); fseek (0 call); fseeko (0 call);
+   fsetpos (0 call); ftell (0 call); ftello (0 call); ftrylockfile (0 call);
+   funlockfile (0 call); fwrite (0 call); gai_strerror (0 call); getc (0 call);
    getc_unlocked (0 call); getchar (0 call); getchar_unlocked (0 call);
    getcwd (0 call); getegid (0 call); geteuid (0 call); getgid (0 call);
    gethostname (0 call); getitimer (0 call); getopt (0 call);
@@ -111,8 +114,9 @@
    localtime (0 call); log (0 call); log10 (0 call); log10f (0 call);
    log10l (0 call); log2 (0 call); log2f (0 call); log2l (0 call);
    logf (0 call); logl (0 call); longjmp (0 call); lrand48 (0 call);
-   lseek (0 call); malloc (7 calls); mblen (0 call); mbstowcs (0 call);
-   mbtowc (0 call); mkdir (0 call); mkstemp (0 call); mktime (0 call);
+   lseek (0 call); lstat (0 call); makedev (0 call); malloc (7 calls);
+   mblen (0 call); mbstowcs (0 call); mbtowc (0 call); mkdir (0 call);
+   mkfifo (0 call); mknod (0 call); mkstemp (0 call); mktime (0 call);
    mrand48 (0 call); nan (0 call); nanf (0 call); nanl (0 call);
    nanosleep (0 call); nrand48 (0 call); ntohl (0 call); ntohs (0 call);
    open (0 call); openat (0 call); opendir (0 call); openlog (0 call);
@@ -141,23 +145,23 @@
    sinf (0 call); sinl (0 call); socket (0 call); socketpair (0 call);
    sqrt (0 call); sqrtf (0 call); sqrtl (0 call); srand (0 call);
    srand48 (0 call); srandom (0 call); stat (0 call); stpcpy (0 call);
-   strcasestr (0 call); strcoll (0 call); strcspn (0 call); strftime (0 call);
-   strlcat (0 call); strlcpy (0 call); strncasecmp (0 call); strpbrk (0 call);
-   strsep (0 call); strspn (0 call); strtod (0 call); strtof (0 call);
-   strtoimax (0 call); strtok (0 call); strtok_r (0 call); strtol (0 call);
-   strtold (0 call); strtoll (0 call); strtoul (0 call); strtoull (0 call);
-   strxfrm (0 call); sync (0 call); sysconf (0 call); syslog (0 call);
-   system (0 call); tcflush (0 call); tcgetattr (0 call); tcsetattr (0 call);
-   time (0 call); times (0 call); tmpfile (0 call); tmpnam (0 call);
-   trunc (0 call); truncf (0 call); truncl (0 call); ttyname (0 call);
-   tzset (0 call); umask (0 call); ungetc (0 call); unlink (0 call);
-   usleep (0 call); utimes (0 call); vfprintf (0 call); vfscanf (0 call);
-   vprintf (0 call); vscanf (0 call); vsnprintf (0 call); vsprintf (0 call);
-   vsyslog (0 call); wait (0 call); waitpid (0 call); wcschr (0 call);
-   wcscmp (0 call); wcscspn (0 call); wcslcat (0 call); wcslcpy (0 call);
-   wcsncmp (0 call); wcspbrk (0 call); wcsrchr (0 call); wcsspn (0 call);
-   wcsstr (0 call); wcstombs (0 call); wctomb (0 call); wmemchr (0 call);
-   wmemcmp (0 call); wmemmove (0 call); write (0 call); 
+   strcasestr (0 call); strchrnul (0 call); strcoll (0 call); strcspn (0 call);
+   strftime (0 call); strlcat (0 call); strlcpy (0 call); strncasecmp (0 call);
+   strpbrk (0 call); strsep (0 call); strspn (0 call); strtod (0 call);
+   strtof (0 call); strtoimax (0 call); strtok (0 call); strtok_r (0 call);
+   strtol (0 call); strtold (0 call); strtoll (0 call); strtoul (0 call);
+   strtoull (0 call); strxfrm (0 call); sync (0 call); sysconf (0 call);
+   syslog (0 call); system (0 call); tcflush (0 call); tcgetattr (0 call);
+   tcsetattr (0 call); time (0 call); times (0 call); tmpfile (0 call);
+   tmpnam (0 call); trunc (0 call); truncf (0 call); truncl (0 call);
+   ttyname (0 call); tzset (0 call); umask (0 call); ungetc (0 call);
+   unlink (0 call); usleep (0 call); utimes (0 call); vfprintf (0 call);
+   vfscanf (0 call); vprintf (0 call); vscanf (0 call); vsnprintf (0 call);
+   vsprintf (0 call); vsyslog (0 call); wait (0 call); waitpid (0 call);
+   wcschr (0 call); wcscmp (0 call); wcscspn (0 call); wcslcat (0 call);
+   wcslcpy (0 call); wcsncmp (0 call); wcspbrk (0 call); wcsrchr (0 call);
+   wcsspn (0 call); wcsstr (0 call); wcstombs (0 call); wctomb (0 call);
+   wmemchr (0 call); wmemcmp (0 call); wmemmove (0 call); write (0 call); 
   
   'Extern' global variables (16)
   ==============================
@@ -180,7 +184,7 @@
   Goto = 89
   Assignment = 438
   Exit point = 82
-  Function = 472
+  Function = 488
   Function call = 89
   Pointer dereferencing = 158
   Cyclomatic complexity = 286

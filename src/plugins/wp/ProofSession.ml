@@ -29,7 +29,8 @@ type script =
 
 let files : (string,script) Hashtbl.t = Hashtbl.create 32
 
-let jsonfile = Printf.sprintf "%s/%s.json"
+let jsonfile (dir:Datatype.Filepath.t) =
+  Format.sprintf "%s/%s.json" (dir :> string)
 
 let filename ~force wpo =
   let dscript = Wp_parameters.get_session_dir ~force "script" in

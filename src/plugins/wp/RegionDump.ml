@@ -261,10 +261,10 @@ let dotgraph dot map =
     G.node_default dot node_default ;
     G.edge_default dot edge_default ;
     R.clear () ;
-    R.push dot (dotregion dot map) ;
+    R.define dot (dotregion dot map) ;
     Region.iter_vars map (dotvar dot) ;
     Region.iter_strings map (dotstr dot) ;
-    G.pop_all dot ;
+    G.run dot ;
     if Wp.has_dkey rid_key then Region.iter map (dotrid dot) ;
     Region.iter_names map (dotlabel dot) ;
     if Region.has_return map then
@@ -276,14 +276,16 @@ let dotgraph dot map =
         else
           dotlabel dot "Fusion (Self)" r
       ) ;
-    G.pop_all dot ;
+    G.run dot ;
   end
 
 let dump ~dir kf map =
   if Wp.has_dkey dot_key || Wp.has_dkey pdf_key then
     begin
       let name = Kf.get_name kf in
-      let file = Printf.sprintf "%s/%s.dot" dir name in
+      let file =
+        Format.asprintf "%a/%s.dot" Datatype.Filepath.pretty dir name
+      in
       let dot = Dotgraph.open_dot ~attr:[`LR] ~name ~file () in
       dotgraph dot map ;
       Dotgraph.close dot ;

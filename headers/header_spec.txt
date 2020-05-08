@@ -114,6 +114,7 @@ ptests/ptests.ml: CEA_LGPL
 share/_frama-c: CEA_LGPL
 share/analysis-scripts/benchmark_database.py: .ignore
 share/analysis-scripts/clone.sh: .ignore
+share/analysis-scripts/creduce.sh: CEA_LGPL
 share/analysis-scripts/fc_stubs.c: .ignore
 share/analysis-scripts/frama-c.mk: CEA_LGPL
 share/analysis-scripts/frama_c_results.py: .ignore
@@ -944,6 +945,8 @@ src/plugins/occurrence/register_gui.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/occurrence/register_gui.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/instantiate/basic_blocks.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/instantiate/basic_blocks.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/instantiate/global_context.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/instantiate/global_context.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/instantiate/Instantiate.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/instantiate/instantiator_builder.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/instantiate/instantiator_builder.mli: CEA_LGPL_OR_PROPRIETARY
@@ -957,6 +960,8 @@ src/plugins/instantiate/stdlib/free.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/instantiate/stdlib/free.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/instantiate/stdlib/malloc.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/instantiate/stdlib/malloc.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/instantiate/string/mem_utils.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/instantiate/string/mem_utils.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/instantiate/string/memcmp.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/instantiate/string/memcmp.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/instantiate/string/memcpy.ml: CEA_LGPL_OR_PROPRIETARY
@@ -1223,6 +1228,8 @@ src/plugins/value/domains/cvalue/locals_scoping.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/cvalue/locals_scoping.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/cvalue/warn.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/cvalue/warn.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/domains/domain_mode.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/domains/domain_mode.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/domain_builder.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/domain_builder.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/domain_lift.ml: CEA_LGPL_OR_PROPRIETARY
@@ -1768,6 +1775,8 @@ src/plugins/wp/wpContext.ml: CEA_WP
 src/plugins/wp/wpContext.mli: CEA_WP
 src/plugins/wp/wpPropId.ml: CEA_WP
 src/plugins/wp/wpPropId.mli: CEA_WP
+src/plugins/wp/wpReached.ml: CEA_WP
+src/plugins/wp/wpReached.mli: CEA_WP
 src/plugins/wp/wpReport.ml: CEA_WP
 src/plugins/wp/wpReport.mli: CEA_WP
 src/plugins/wp/wpRTE.ml: CEA_WP

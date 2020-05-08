@@ -900,8 +900,10 @@ module RteGen : sig
   val get_signed_downCast_status : (unit -> status_accessor) ref
   val get_unsignedOv_status : (unit -> status_accessor) ref
   val get_unsignedDownCast_status : (unit -> status_accessor) ref
+  val get_pointer_downcast_status : (unit -> status_accessor) ref
   val get_float_to_int_status : (unit -> status_accessor) ref
   val get_finite_float_status : (unit -> status_accessor) ref
+  val get_pointer_value_status : (unit -> status_accessor) ref
   val get_bool_value_status : (unit -> status_accessor) ref
 end
 
