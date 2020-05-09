@@ -179,7 +179,7 @@ rec {
 
   e-acsl-tests-dev = stdenv.mkDerivation {
         name = "frama-c-e-acsl-tests-dev";
-        buildInputs = mk_buildInputs { nixPackages = [ pkgs.gmp pkgs.getopt ]; };
+        buildInputs = mk_buildInputs { nixPackages = [ pkgs.gmp pkgs.getopt pkgs.which ]; };
         build_dir = main.build_dir;
         src = main.build_dir + "/dir.tar";
         sourceRoot = ".";
