@@ -2,7 +2,7 @@
 { pkgs, stdenv, src ? ../., opam2nix, ocaml_version ? "ocaml-ng.ocamlPackages_4_05.ocaml", plugins ? { } }:
 
 let mk_buildInputs = { opamPackages ? [], nixPackages ? [] } :
-    [ pkgs.gnugrep pkgs.gnused  pkgs.autoconf pkgs.gnumake pkgs.gcc pkgs.ncurses pkgs.time pkgs.python3 pkgs.perl pkgs.file] ++ nixPackages ++ opam2nix.build {
+    [ pkgs.gnugrep pkgs.gnused  pkgs.autoconf pkgs.gnumake pkgs.gcc pkgs.ncurses pkgs.time pkgs.python3 pkgs.perl pkgs.file pkgs.which] ++ nixPackages ++ opam2nix.build {
            specs = opam2nix.toSpecs ([ "ocamlfind" "zarith" "ocamlgraph" "yojson"
                 { name = "coq"; constraint = "=8.11.1";  }
                 { name = "why3" ; constraint = "=1.3.1"; }
@@ -179,7 +179,7 @@ rec {
 
   e-acsl-tests-dev = stdenv.mkDerivation {
         name = "frama-c-e-acsl-tests-dev";
-        buildInputs = mk_buildInputs { nixPackages = [ pkgs.gmp pkgs.getopt pkgs.which ]; };
+        buildInputs = mk_buildInputs { nixPackages = [ pkgs.gmp pkgs.getopt ]; };
         build_dir = main.build_dir;
         src = main.build_dir + "/dir.tar";
         sourceRoot = ".";
@@ -203,7 +203,7 @@ rec {
         name = "frama-c-internal";
         inherit src;
         buildInputs = (mk_buildInputs { opamPackages = [ "xml-light" ]; } ) ++
-                    [ pkgs.getopt pkgs.which
+                    [ pkgs.getopt
                       pkgs.libxslt pkgs.libxml2 pkgs.autoPatchelfHook stdenv.cc.cc.lib
         ];
         counter_examples_src = plugins.counter-examples.src;
