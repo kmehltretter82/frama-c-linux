@@ -2,9 +2,9 @@
     "select": { "select": "clause-goal",
                 "target": "exists i_0,i_1:int.\n(i_0<=i_156) /\\ (i_1<=i_157) /\\ (0<=i_0) /\\ (i_156<=i_0) /\\ (i_157<=i_1)\n/\\ (i_0<=9)",
                 "pattern": "\\E\\E&<=<=<=<=<=<=#1$i#0$i0#1$i#1" },
-    "children": { "Goal 1/2": [ { "prover": "Alt-Ergo:2.3.0",
-                                  "verdict": "valid", "time": 0.0318,
-                                  "steps": 39 } ],
-                  "Goal 2/2": [ { "prover": "Alt-Ergo:2.3.0",
-                                  "verdict": "valid", "time": 0.562,
-                                  "steps": 414 } ] } } ]
+    "children": { "Goal 1/2": [ { "prover": "Alt-Ergo:2.0.0",
+                                  "verdict": "valid", "time": 0.0078,
+                                  "steps": 9 } ],
+                  "Goal 2/2": [ { "prover": "Alt-Ergo:2.0.0",
+                                  "verdict": "valid", "time": 0.008,
+                                  "steps": 11 } ] } } ]

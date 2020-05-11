@@ -1,6 +1,5 @@
 /* run.config_qualif
-   OPT: -wp-prover alt-ergo -wp-prop=-lack
-   OPT: -wp-prover why3:alt-ergo
+   OPT:
 */
 
 /*@
