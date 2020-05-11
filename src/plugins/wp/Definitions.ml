@@ -404,12 +404,19 @@ class virtual visitor main =
       | Inductive cases -> List.iter (fun l -> self#vdlemma l) cases
 
     method private vdfun d =
+      let old_terms = terms in
+      terms <- Tset.empty ;
       begin
-        List.iter self#vparam d.d_params ;
-        self#vdefinition d.d_definition ;
-        self#vproperties d.d_definition ;
-        self#on_dfun d ;
-      end
+        try
+          List.iter self#vparam d.d_params ;
+          self#vdefinition d.d_definition ;
+          self#vproperties d.d_definition ;
+          self#on_dfun d ;
+        with e ->
+          terms <- old_terms ;
+          raise e
+      end ;
+      terms <- old_terms
 
     method private vlfun f =
       match Symbol.find f with
