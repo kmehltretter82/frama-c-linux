@@ -249,6 +249,14 @@ module Overflows =
   end)
 
 let () = Parameter_customize.set_group wp_model
+module WeakIntModel =
+  False(struct
+    let option_name = "-wp-weak-int-model"
+    let help = "Suppress integral type side conditions within lemmas\n\
+                (possibly unsound)"
+  end)
+
+let () = Parameter_customize.set_group wp_model
 module Literals =
   False(struct
     let option_name = "-wp-literals"
