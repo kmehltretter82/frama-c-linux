@@ -2637,6 +2637,29 @@ let equalInitOpts (x: init option) (y: init option) : bool =
     | _,_ -> false
   end
 
+let merge_arg_names merged_args curr_args =
+  let do_one_arg merged_arg curr_arg =
+    (* if curr_arg is also anonymous, this doesn't do much,
+       but at least doesn't worsen things. *)
+    if merged_arg.vname = "" then merged_arg.vname <- curr_arg.vname
+  in
+  (* if both list have different lengths, merge should have failed earlier. *)
+  List.iter2 do_one_arg merged_args curr_args
+
+let update_formals_names merged_vi curr_vi =
+  (* if the reference varinfo already has formals, everything
+     is renamed accordingly. However, if the old prototype contains
+     anonymous formal declarations, while the corresponding current formal
+     has a name, we keep the new name. *)
+  match Cil.getFormalsDecl curr_vi with
+  | curr_args ->
+    (match Cil.getFormalsDecl merged_vi with
+     | merged_args -> merge_arg_names merged_args curr_args
+     | exception Not_found ->
+       (*existing prototype does not have formals list. Just use current one*)
+       Cil.unsafeSetFormalsDecl merged_vi curr_args)
+  | exception Not_found -> ()
+(* current prototype does not have formals list, nothing to merge. *)
 
 (* Now we go once more through the file and we rename the globals that we
  * keep. We also scan the entire body and we replace references to the
@@ -2730,18 +2753,7 @@ let oneFilePass2 (f: file) =
         if not (is_ignored_vi vi) then begin
           (* Drop the decl, keep the spec *)
           mergeSpec vi' vi spec';
-          (try
-             (* if the reference varinfo already has formals, everything
-                is renamed accordingly. *)
-             ignore (Cil.getFormalsDecl vi')
-           with Not_found ->
-           (* Otherwise, if we have formals here, register them with
-              the reference varinfo *)
-           try
-             let my_formals = Cil.getFormalsDecl vi in
-             Cil.unsafeSetFormalsDecl vi' my_formals
-           with Not_found -> ()
-           (* Neither decl has formals. Do nothing. *));
+          update_formals_names vi' vi;
         end;
         Cil.removeFormalsDecl vi
       end
