@@ -17,8 +17,8 @@ else
   SILENT = -silent
 endif
 
-all: pdf
-pdf: $(TARGET).tex $(FRAMAC_MODERN)
+all: $(TARGET).pdf
+$(TARGET).pdf: $(TARGET).tex $(FRAMAC_MODERN)
 	latexmk $(SILENT) -f -pdf $<
 
 install:
