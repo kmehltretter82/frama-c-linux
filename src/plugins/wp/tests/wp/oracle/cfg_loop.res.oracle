@@ -17,24 +17,8 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp/cfg_loop.i, line 41) (1/2):
+Goal Loop assigns (file tests/wp/cfg_loop.i, line 41):
 Prove: true.
-
-------------------------------------------------------------
-
-Goal Loop assigns (file tests/wp/cfg_loop.i, line 41) (2/2):
-Effect at line 43
-Let a = global(G_a_28).
-Assume {
-  Type: is_sint32(x).
-  (* Heap *)
-  Type: linked(Malloc_0).
-  (* Goal *)
-  When: !invalid(Malloc_0, a, 1).
-  (* Then *)
-  Have: x != 0.
-}
-Prove: a = p.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -102,25 +86,13 @@ Prove: true.
 Goal Loop assigns (file tests/wp/cfg_loop.i, line 14) (3/4):
 Effect at line 16
 Tags: Case 2.
-Assume {
-  (* Heap *)
-  Type: (region(a.base) <= 0) /\ linked(Malloc_0).
-  (* Goal *)
-  When: !invalid(Malloc_0, a, 1).
-}
-Prove: a = a_1.
+Prove: true.
 
 ------------------------------------------------------------
 
 Goal Loop assigns (file tests/wp/cfg_loop.i, line 14) (4/4):
 Effect at line 16
 Tags: Case 1.
-Assume {
-  (* Heap *)
-  Type: (region(a.base) <= 0) /\ linked(Malloc_0).
-  (* Goal *)
-  When: !invalid(Malloc_0, a, 1).
-}
-Prove: a = a_1.
+Prove: true.
 
 ------------------------------------------------------------
