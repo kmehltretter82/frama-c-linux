@@ -13,6 +13,16 @@ import * as Dome from 'dome';
 import * as System from 'dome/system';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Request as ZmqRequest } from 'zeromq';
+import { ChildProcess } from 'child_process';
+
+// --------------------------------------------------------------------------
+// --- Pretty Printing (Browser Console)
+// --------------------------------------------------------------------------
+
+class PP {
+  static warning(t: string) { console.warn(`[Frama-C Server] ${t}.`); }
+  static error(t: string) { console.error(`[Frama-C Server] ${t}.`); }
+}
 
 // --------------------------------------------------------------------------
 // --- Events
@@ -118,18 +128,45 @@ export function hasErrorStatus(s: Status): s is ErrorStatus {
 // --- Server Global State
 // --------------------------------------------------------------------------
 
+/** The current server status. */
 let status: Status = okStatus(Stage.OFF);
-let rqid: number; // Request ID
-let pending: any; // Pending promise callbacks
-let queueCmd: any; // Queue of server commands to be sent
-let queueIds: any; // Waiting request ids to be sent
-let polling: any; // Timeout Polling timer
-let flushing: any; // Immediate Flushing timer
-let config: Configuration;
-let process: any; // Server process
-let socket: any; // ZMQ (REQ) socket
-let busy: boolean; // ZMQ socket is busy
-let killing: any; // killing timeout
+
+/** Request counter. */
+let rqCount = 0;
+
+type IndexedPair<T, U> = {
+  [index: string]: [T, U];
+};
+type ResolvePromise = (value?: any) => void;
+type RejectPromise = (error: Error) => void;
+
+/** Pending promise callbacks (pairs of (resolve, reject)). */
+let pending: IndexedPair<ResolvePromise, RejectPromise> = {};
+
+/** Queue of server commands to be sent. */
+let queueCmd: string[] = [];
+
+/** Waiting request ids to be sent. */
+let queueId: string[] = [];
+
+/** Polling timeout and timer. */
+const pollingTimeout = 50;
+let pollingTimer: NodeJS.Timeout | null = null;
+
+/** Flushing timer. */
+let flushingTimer: NodeJS.Immediate | null = null;
+
+/** Server process. */
+let process: ChildProcess | null = null;
+
+/** Killing timeout and timer for server process hard kill. */
+const killingTimeout = 300;
+let killingTimer: NodeJS.Timeout | null = null;
+
+/** ZMQ (REQ) socket. */
+let zmqSocket: ZmqRequest | null = null;
+/** Flag on whether ZMQ socket is busy. */
+let zmqIsBusy = false;
 
 // --------------------------------------------------------------------------
 // --- Server Console
@@ -171,7 +208,7 @@ export function isRunning() { return status.stage === Stage.ON; }
  *  @return {number} pending requests
  */
 export function getPending(): number {
-  return _.reduce(pending, (_rq, n) => n + 1, 0);
+  return _.reduce(pending, (n) => n + 1, 0);
 }
 
 /**
@@ -201,7 +238,7 @@ export function onActivity(signal: string, callback: any) {
 
 function _status(newStatus: Status) {
   if (Dome.DEVEL && hasErrorStatus(newStatus)) {
-    console.error('[Server]', newStatus.error);
+    PP.error(newStatus.error);
   }
 
   if (newStatus !== status) {
@@ -234,6 +271,7 @@ export async function start() {
         await _launch();
         _status(okStatus(Stage.ON));
       } catch (error) {
+        PP.error(error.toString());
         buffer.append(error.toString(), '\n');
         _exit(error);
       }
@@ -362,24 +400,38 @@ export function clear() {
 // --- Server Configure
 // --------------------------------------------------------------------------
 
+/** Server configuration. */
 export interface Configuration {
-  env?: any; // Process environment variables (default: `undefined`)
-  cwd?: string; // Working directory (default: current)
-  command?: string; // Server command (default: `frama-c`)
-  params: string[]; // Additional server arguments (default: empty)
-  sockaddr?: string; // Server socket (default: `ipc:///.frama-c.<pid>.io`)
-  timeout?: number; // Shutdown timeout before server is hard killed, in milliseconds (default: 300ms)
-  polling?: number; // Server polling period, in milliseconds (default: 50ms)
-  logout?: string; // Process stdout log file (default: `undefined`)
-  logerr?: string; // Process stderr log file (default: `undefined`)
+  /** Process environment variables (default: `undefined`). */
+  env?: any;
+  /** Working directory (default: current). */
+  cwd?: string;
+  /** Server command (default: `frama-c`). */
+  command?: string;
+  /** Additional server arguments (default: empty). */
+  params: string[];
+  /** Server socket (default: `ipc:///.frama-c.<pid>.io`). */
+  sockaddr?: string;
+  /** Shutdown timeout before server is hard killed, in milliseconds
+   *  (default: 300ms). */
+  timeout?: number;
+  /** Server polling period in milliseconds (default: 50ms). */
+  polling?: number;
+  /** Process stdout log file (default: `undefined`). */
+  logout?: string;
+  /** Process stderr log file (default: `undefined`). */
+  logerr?: string;
 }
+
+/** Server current configuration. */
+let config: Configuration = { command: 'frama-c', params: [] };
 
 /**
  *  @summary Configure the Server.
  *  @param {Configuration} sc - Server Configuration
  */
 export function configure(sc: Configuration) {
-  config = sc;
+  config = { ...sc };
 }
 
 /**
@@ -397,15 +449,11 @@ export function getConfig(): Configuration {
 // --------------------------------------------------------------------------
 
 async function _launch() {
-  if (!config) {
-    throw new Error('Frama-C Server not configured');
-  }
-
   let {
     env,
     cwd,
     command = 'frama-c',
-    params = [],
+    params,
     sockaddr,
     logout,
     logerr,
@@ -451,9 +499,11 @@ async function _launch() {
       buffer.scroll(undefined, undefined);
     }
   };
-  process.stdout.on('data', logger);
-  process.stderr.on('data', logger);
-  process.on('exit', (code: number | null, signal: string | null) => {
+  process?.stdout?.on('data', logger);
+  process?.stderr?.on('data', logger);
+  process?.on('exit', (code: number | null, signal: string | null) => {
+    PP.warning('Process exited');
+
     if (signal) {
       // [signal] is non-null.
       buffer.log('Signal:', signal);
@@ -472,9 +522,9 @@ async function _launch() {
     }
   });
   // Connect to Server
-  socket = new ZmqRequest();
-  busy = false;
-  socket.connect(sockaddr);
+  zmqSocket = new ZmqRequest();
+  zmqIsBusy = false;
+  zmqSocket.connect(sockaddr);
 }
 
 // --------------------------------------------------------------------------
@@ -482,48 +532,49 @@ async function _launch() {
 // --------------------------------------------------------------------------
 
 function _reset() {
-  rqid = 0;
+  PP.warning('Reset to initial configuration');
+
+  rqCount = 0;
   queueCmd = [];
-  queueIds = [];
-  _.forEach(pending, ({ reject }) => reject('shutdown'));
+  queueId = [];
+  _.forEach(pending, ([, reject]) => reject(new Error('Server reset')));
   pending = {};
-  if (flushing) {
-    clearImmediate(flushing);
-    flushing = undefined;
+  if (flushingTimer) {
+    clearImmediate(flushingTimer);
+    flushingTimer = null;
   }
-  if (polling) {
-    clearTimeout(polling);
-    polling = undefined;
+  if (pollingTimer) {
+    clearTimeout(pollingTimer);
+    pollingTimer = null;
   }
-  if (killing) {
-    clearTimeout(killing);
-    killing = undefined;
+  if (killingTimer) {
+    clearTimeout(killingTimer);
+    killingTimer = null;
   }
 }
 
 function _kill() {
+  PP.warning('Hard kill');
+
   _reset();
-  if (socket) {
-    socket.close();
-    socket = undefined;
-    busy = false;
-  }
   if (process) {
     process.kill();
   }
 }
 
 async function _shutdown() {
+  PP.warning('Shutdown');
+
   _reset();
   queueCmd.push('SHUTDOWN');
   _flush();
   const killingPromise = new Promise((resolve) => {
-    if (!killing) {
+    if (!killingTimer) {
       if (process) {
-        const timeout = (config && config.timeout) || 300;
-        killing =
+        const timeout = (config && config.timeout) || killingTimeout;
+        killingTimer =
           setTimeout(() => {
-            resolve(process.kill());
+            resolve(process?.kill());
           }, timeout);
       }
     }
@@ -533,7 +584,12 @@ async function _shutdown() {
 
 function _exit(error?: Error) {
   _reset();
-  process = undefined;
+  if (zmqSocket) {
+    zmqSocket.close();
+    zmqSocket = null;
+  }
+  zmqIsBusy = false;
+  process = null;
   if (status.stage === Stage.RESTARTING) {
     setImmediate(start);
   } else if (error) {
@@ -729,42 +785,42 @@ export async function EXEC(sr: Request) {
 function send(kind: RqKind, rq: string, params: any) {
   if (!isRunning()) return Promise.reject(new Error('Server not running'));
   if (!rq) return Promise.reject(new Error('Undefined request'));
-  const rid = `RQ.${rqid}`;
-  rqid += 1;
+  const rid = `RQ.${rqCount}`;
+  rqCount += 1;
   const data = JSON.stringify(params);
   const promise: any = new Promise((resolve, reject) => {
-    pending[rid] = { resolve, reject };
+    pending[rid] = [resolve, reject];
   });
   promise.kill = () => {
-    if (socket && pending[rid]) {
+    if (zmqSocket && pending[rid]) {
       queueCmd.push('KILL', rid);
       _flush();
     }
   };
   queueCmd.push(kind, rid, rq, data);
-  queueIds.push(rid);
+  queueId.push(rid);
   _flush();
   return promise;
 }
 
 function _resolve(id: string | number, data: string) {
-  const promise = pending[id];
-  if (promise) {
+  const [resolve] = pending[id];
+  if (resolve) {
     delete pending[id];
-    promise.resolve(JSON.parse(data));
+    resolve(JSON.parse(data));
   }
 }
 
-function _reject(id: string | number, err: string) {
-  const promise = pending[id];
-  if (promise) {
+function _reject(id: string | number, error: Error) {
+  const [, reject] = pending[id];
+  if (reject) {
     delete pending[id];
-    promise.reject(err);
+    reject(error);
   }
 }
 
 function _cancel(ids: any[]) {
-  ids.forEach((rid) => _reject(rid, 'canceled'));
+  ids.forEach((rid) => _reject(rid, new Error('Canceled request')));
 }
 
 function _waiting() {
@@ -776,19 +832,19 @@ function _waiting() {
 // --------------------------------------------------------------------------
 
 function _flush() {
-  if (!flushing) {
-    flushing = setImmediate(() => {
-      flushing = undefined;
+  if (!flushingTimer) {
+    flushingTimer = setImmediate(() => {
+      flushingTimer = null;
       _send();
     });
   }
 }
 
 function _poll() {
-  if (!polling) {
-    const delay = (config && config.polling) || 50;
-    polling = setTimeout(() => {
-      polling = undefined;
+  if (!pollingTimer) {
+    const delay = (config && config.polling) || pollingTimeout;
+    pollingTimer = setTimeout(() => {
+      pollingTimer = null;
       _send();
     }, delay);
   }
@@ -796,25 +852,25 @@ function _poll() {
 
 function _send() {
   // when busy, will be eventually re-triggered
-  if (!busy) {
+  if (!zmqIsBusy) {
     const cmds = queueCmd;
     if (!cmds.length && _waiting()) cmds.push('POLL');
     if (cmds.length) {
-      const ids = queueIds;
+      const ids = queueId;
       queueCmd = [];
-      queueIds = [];
-      if (socket) {
-        busy = true;
-        socket.send(cmds)
-          .then(() => socket.receive().then((resp: any) => _receive(resp)))
+      queueId = [];
+      if (zmqSocket) {
+        zmqIsBusy = true;
+        zmqSocket.send(cmds)
+          .then(() => zmqSocket?.receive().then((resp: any) => _receive(resp)))
           .catch(() => _cancel(ids))
-          .finally(() => { busy = false; Dome.emit(STATUS); });
+          .finally(() => { zmqIsBusy = false; Dome.emit(STATUS); });
       } else {
         _cancel(ids);
       }
     } else {
       // No pending command nor pending response
-      rqid = 0;
+      rqCount = 0;
     }
     Dome.emit(STATUS);
   }
@@ -840,7 +896,7 @@ function _receive(resp: any) {
           break;
         case 'KILLED':
           rid = shift();
-          _reject(rid, 'killed');
+          _reject(rid, new Error('Killed'));
           break;
         case 'ERROR':
           rid = shift();
@@ -849,7 +905,7 @@ function _receive(resp: any) {
           break;
         case 'REJECTED':
           rid = shift();
-          _reject(rid, 'rejected');
+          _reject(rid, new Error('Rejected'));
           break;
         case 'SIGNAL':
           rid = shift();
@@ -857,10 +913,10 @@ function _receive(resp: any) {
           break;
         case 'WRONG':
           err = shift();
-          console.error('[Frama-C Server] ZMQ Protocol Error:', err);
+          PP.error(`ZMQ Protocol Error: ${err}`);
           break;
         default:
-          console.error('[Frama-C Server] Unknown Response:', cmd);
+          PP.error(`Unknown Response: ${cmd}`);
           unknownResponse = true;
           break;
       }
