@@ -177,7 +177,7 @@ type typing_context = {
     @since Carbon-20101201
     @modify Silicon-20161101 change type of the function
     @modify 19.0-Potassium add [status] argument
-    @deprecated Frama-C+dev
+    @deprecated 21.0-Scandium
 *)
 val register_behavior_extension:
   string -> bool ->
@@ -190,7 +190,7 @@ val register_behavior_extension:
     @plugin development guide
 
     @since 18.0-Argon
-    @deprecated Frama-C+dev
+    @deprecated 21.0-Scandium
 *)
 val register_global_extension:
   string -> bool ->
@@ -204,7 +204,7 @@ val register_global_extension:
     @plugin development guide
 
     @since 18.0-Argon
-    @deprecated Frama-C+dev
+    @deprecated 21.0-Scandium
 *)
 val register_code_annot_extension:
   string -> bool ->
@@ -218,7 +218,7 @@ val register_code_annot_extension:
     @plugin development guide
 
     @since 18.0-Argon
-    @deprecated Frama-C+dev
+    @deprecated 21.0-Scandium
 *)
 val register_code_annot_next_stmt_extension:
   string -> bool ->
@@ -231,7 +231,7 @@ val register_code_annot_next_stmt_extension:
     @plugin development guide
 
     @since 18.0-Argon
-    @deprecated Frama-C+dev
+    @deprecated 21.0-Scandium
 *)
 val register_code_annot_next_loop_extension:
   string -> bool ->
@@ -245,7 +245,7 @@ val register_code_annot_next_loop_extension:
     @plugin development guide
 
     @since 18.0-Argon
-    @deprecated Frama-C+dev
+    @deprecated 21.0-Scandium
 *)
 val register_code_annot_next_both_extension:
   string -> bool ->
@@ -392,7 +392,7 @@ val set_extension_handler:
   unit
 (** Used to setup references related to the handling of ACSL extensions.
     If your name is not [Acsl_extension], do not call this
-    @since Frama-C+dev
+    @since 21.0-Scandium
 *)
 
 (**/**)

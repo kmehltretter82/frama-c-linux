@@ -50,7 +50,7 @@ exception File_exists
       but [normalize] may accept them.
 
     @modify Aluminium-20160501 optional base_name.
-    @modify Frama-C+dev optional existence.
+    @modify 21.0-Scandium optional existence.
 *)
 val normalize: ?existence:existence -> ?base_name:string -> string -> string
 
@@ -99,7 +99,7 @@ module Normalized: sig
 
   (** [of_string s] converts [s] into a normalized path.
       @raise Invalid_argument if [s] is the empty string.
-      @modify Frama-C+dev add optional existence parameter.
+      @modify 21.0-Scandium add optional existence parameter.
   *)
   val of_string: ?existence:existence -> ?base_name:string -> string -> t
 

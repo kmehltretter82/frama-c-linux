@@ -41,7 +41,7 @@ val register_behavior_extension:
    Cil_types.acsl_extension_kind -> unit) -> unit
 (** Register a pretty-printer used for behavior extension.
     @plugin development guide
-    @deprecated Frama-C+dev
+    @deprecated 21.0-Scandium
 *)
 [@@ deprecated "Use Acsl_extension.register_behavior (arg: ~printer) instead"]
 
@@ -51,7 +51,7 @@ val register_global_extension:
    Cil_types.acsl_extension_kind -> unit) -> unit
 (** Register a pretty-printer used for global extension.
     @plugin development guide
-    @deprecated Frama-C+dev
+    @deprecated 21.0-Scandium
 *)
 [@@ deprecated "Use Acsl_extension.register_global (arg: ~printer) instead"]
 
@@ -61,7 +61,7 @@ val register_code_annot_extension:
    Cil_types.acsl_extension_kind -> unit) -> unit
 (** Register a pretty-printer used for code annotation extension.
     @plugin development guide
-    @deprecated Frama-C+dev
+    @deprecated 21.0-Scandium
 *)
 [@@ deprecated "Use Acsl_extension.register_code_annot_<kind> (arg: ~printer) instead"]
 
@@ -71,7 +71,7 @@ val register_loop_annot_extension:
    Cil_types.acsl_extension_kind -> unit) -> unit
 (** Register a pretty-printer used for loop annotation extension.
     @plugin development guide
-    @deprecated Frama-C+dev
+    @deprecated 21.0-Scandium
 *)
 [@@ deprecated "Use Acsl_extension.register_loop_annot (arg: ~printer) instead"]
 
@@ -91,7 +91,7 @@ val set_extension_handler:
   unit
 (** Used to setup a reference related to the handling of ACSL extensions.
     If your name is not [Acsl_extension], do not call this.
-    @since Frama-C+dev
+    @since 21.0-Scandium
 *)
 
 val set_deprecated_extension_handler:

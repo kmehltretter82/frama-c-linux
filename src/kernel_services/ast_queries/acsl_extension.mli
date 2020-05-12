@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (** ACSL extensions registration module
-    @since Frama-C+dev
+    @since 21.0-Scandium
 *)
 
 open Cil_types

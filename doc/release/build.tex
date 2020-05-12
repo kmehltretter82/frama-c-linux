@@ -36,13 +36,13 @@ The procedure for creating the source distribution.
 
 There are many administrative steps, coordinated by the release manager.
 \begin{enumerate}
-\item If a new version of the ACSL manual is to be released, make sure you also
+\item [{\em Non-beta only}] If a new version of the ACSL manual is to be released, make sure you also
   have a clone of the \texttt{acsl} manual Github repository
   (\url{git@github.com:acsl-language/acsl.git}) in the \texttt{doc}
   directory
 \item Update files \texttt{VERSION} and \texttt{VERSION\_CODENAME}
   (for beta releases, add suffix \texttt{-beta})
-\item Update file \texttt{ALL\_VERSIONS} (nothing to do for beta releases). \todo{This section must be put somewhere else in the release manual}
+\item [{\em Non-beta only}] Update file \texttt{ALL\_VERSIONS}. \todo{This section must be put somewhere else in the release manual}
 \item Update files
   \texttt{src/plugins/wp/Changelog} and
   \texttt{src/plugins/e-acsl/doc/Changelog},

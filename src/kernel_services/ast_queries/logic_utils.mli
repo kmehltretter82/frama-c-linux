@@ -86,7 +86,7 @@ val logicCType : logic_type -> typ
 val array_to_ptr : logic_type -> logic_type
 
 (** C type to logic type, with implicit conversion for arithmetic types.
-    @since Frama-C+dev
+    @since 21.0-Scandium
 *)
 val coerce_type : typ -> logic_type
 
@@ -146,7 +146,7 @@ val remove_logic_coerce: term -> term
     set type.
 
     @since Magnesium-20151001
-    @modify Frama-C+dev
+    @modify 21.0-Scandium
 *)
 val numeric_coerce: logic_type -> term -> term
 
@@ -179,7 +179,7 @@ val expr_to_term : ?coerce:bool -> exp -> term
     To obtain a boolean or predicate, use [expr_to_boolean] or
     [expr_to_predicate] instead.
 
-    @modify Frama-C+dev
+    @modify 21.0-Scandium
 *)
 
 val expr_to_predicate: exp -> predicate
@@ -192,7 +192,7 @@ val expr_to_predicate: exp -> predicate
     @raise Fatal error if the expression is not a comparison and cannot be
            compared to zero.
     @since Sulfur-20171101
-    @modify Frama-C+dev
+    @modify 21.0-Scandium
 *)
 
 val expr_to_ipredicate: exp -> identified_predicate
@@ -204,7 +204,7 @@ val expr_to_ipredicate: exp -> identified_predicate
     @raise Fatal error if the expression is not a comparison and cannot be
            compared to zero.
     @since Sulfur-20171101
-    @modify Frama-C+dev
+    @modify 21.0-Scandium
 *)
 
 val expr_to_boolean: exp -> term
@@ -217,7 +217,7 @@ val expr_to_boolean: exp -> term
     @raise Fatal error if the expression is not a comparison and cannot be
            compared to zero.
     @since Sulfur-20171101
-    @modify Frama-C+dev
+    @modify 21.0-Scandium
 *)
 
 val is_zero_comparable: term -> bool
@@ -232,7 +232,7 @@ val scalar_term_to_boolean: term -> term
     to return the result of the comparison [e <> 0] as a boolean term.
 
     @raise Fatal error if the argument cannot be compared to 0
-    @since Frama-C+dev
+    @since 21.0-Scandium
 *)
 
 val scalar_term_to_predicate: term -> predicate
@@ -300,7 +300,7 @@ val is_trivially_false: predicate -> bool
 (** Does the annotation apply to the next statement (e.g. a statement
     contract). Also false for loop-related annotations.
 
-    @since Frama-C+dev
+    @since 21.0-Scandium
 *)
 val is_annot_next_stmt: code_annotation -> bool
 
