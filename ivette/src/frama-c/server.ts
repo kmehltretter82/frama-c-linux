@@ -224,14 +224,19 @@ function _status(newStatus: Status) {
  *  If the server is being shutdown, it will reboot.
  *  Otherwise, the Frama-C Server is spawned.
  */
-export function start() {
+export async function start() {
   switch (status.stage) {
     case Stage.OFF:
     case Stage.FAILURE:
+    case Stage.RESTARTING:
       _status(okStatus(Stage.STARTING));
-      _launch()
-        .then(() => _status(okStatus(Stage.ON)))
-        .catch((error) => _status(errorStatus(error.toString())));
+      try {
+        await _launch();
+        _status(okStatus(Stage.ON));
+      } catch (error) {
+        buffer.append(error.toString(), '\n');
+        _exit(error);
+      }
       return;
     case Stage.HALTING:
       _status(okStatus(Stage.RESTARTING));
@@ -392,10 +397,10 @@ export function getConfig(): Configuration {
 // --------------------------------------------------------------------------
 
 async function _launch() {
-  _reset();
   if (!config) {
     throw new Error('Frama-C Server not configured');
   }
+
   let {
     env,
     cwd,
@@ -448,10 +453,6 @@ async function _launch() {
   };
   process.stdout.on('data', logger);
   process.stderr.on('data', logger);
-  process.on('error', (error: Error) => {
-    buffer.append('Error:', error.toString(), '\n');
-    _exit(error);
-  });
   process.on('exit', (code: number | null, signal: string | null) => {
     if (signal) {
       // [signal] is non-null.
@@ -482,41 +483,26 @@ async function _launch() {
 
 function _reset() {
   rqid = 0;
-  process = undefined;
   queueCmd = [];
   queueIds = [];
   _.forEach(pending, ({ reject }) => reject('shutdown'));
   pending = {};
-  if (flushing) clearImmediate(flushing);
-  flushing = undefined;
-  if (polling) clearTimeout(polling);
-  polling = undefined;
-}
-
-function _kill() {
-  _reset();
-  if (killing) clearTimeout(killing);
-  if (process) process.kill();
-}
-
-function _shutdown() {
-  _reset();
-  queueCmd.push('SHUTDOWN');
-  _flush();
-  if (!killing) {
-    if (process) {
-      const timeout = (config && config.timeout) || 300;
-      killing = setTimeout(() => process.kill(), timeout);
-    }
+  if (flushing) {
+    clearImmediate(flushing);
+    flushing = undefined;
   }
-}
-
-function _exit(error?: Error) {
-  _reset();
+  if (polling) {
+    clearTimeout(polling);
+    polling = undefined;
+  }
   if (killing) {
     clearTimeout(killing);
     killing = undefined;
   }
+}
+
+function _kill() {
+  _reset();
   if (socket) {
     socket.close();
     socket = undefined;
@@ -524,14 +510,35 @@ function _exit(error?: Error) {
   }
   if (process) {
     process.kill();
-    process = undefined;
   }
-  if (error) {
+}
+
+async function _shutdown() {
+  _reset();
+  queueCmd.push('SHUTDOWN');
+  _flush();
+  const killingPromise = new Promise((resolve) => {
+    if (!killing) {
+      if (process) {
+        const timeout = (config && config.timeout) || 300;
+        killing =
+          setTimeout(() => {
+            resolve(process.kill());
+          }, timeout);
+      }
+    }
+  });
+  await killingPromise;
+}
+
+function _exit(error?: Error) {
+  _reset();
+  process = undefined;
+  if (status.stage === Stage.RESTARTING) {
+    setImmediate(start);
+  } else if (error) {
     _status(errorStatus(error.toString()));
   } else {
-    if (status.stage === Stage.RESTARTING) {
-      setImmediate(start);
-    }
     _status(okStatus(Stage.OFF));
   }
 }
