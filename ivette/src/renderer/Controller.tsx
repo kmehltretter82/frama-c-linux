@@ -91,25 +91,23 @@ Dome.onCommand((argv: string[], cwd: string) => {
 export const Control = () => {
   const status = Server.useStatus();
 
-  let play: { enabled: boolean; onClick: any } =
-    { enabled: false, onClick: null };
-  let stop: { enabled: boolean; onClick: any } =
-    { enabled: false, onClick: null };
-  let reload: { enabled: boolean; onClick: any } =
-    { enabled: false, onClick: null };
+  let play = { enabled: false, onClick: () => { } };
+  let stop = { enabled: false, onClick: () => { } };
+  let reload = { enabled: false, onClick: () => { } };
 
-  switch (status) {
-    case Server.Status.OFF:
-    case Server.Status.FAILED:
+  switch (status.stage) {
+    case Server.Stage.OFF:
+    case Server.Stage.FAILURE:
       play = { enabled: true, onClick: Server.start };
       break;
-    case Server.Status.RUNNING:
+    case Server.Stage.ON:
       stop = { enabled: true, onClick: Server.stop };
       reload = { enabled: true, onClick: Server.restart };
       break;
     default:
       break;
   }
+
   return (
     <ButtonGroup>
       <ToolButton
@@ -248,42 +246,45 @@ export const Console = () => (
 // --------------------------------------------------------------------------
 
 export const Status = () => {
-  const s = Server.useStatus();
-  const n = Server.getPending();
+  const status = Server.useStatus();
+  const pending = Server.getPending();
   let led;
   let blink;
   let error;
-  switch (s) {
-    case Server.Status.OFF:
-      led = 'inactive';
-      break;
-    case Server.Status.STARTED:
-      led = 'active';
-      blink = true;
-      break;
-    case Server.Status.RUNNING:
-      led = n > 0 ? 'positive' : 'active';
-      break;
-    case Server.Status.KILLING:
-      led = 'negative';
-      blink = true;
-      break;
-    case Server.Status.RESTART:
-      led = 'warning';
-      blink = true;
-      break;
-    case Server.Status.FAILED:
-      led = 'negative';
-      blink = false;
-      error = Server.getError();
-      break;
-    default:
-      break;
+
+  if (Server.hasErrorStatus(status)) {
+    led = 'negative';
+    blink = false;
+    error = status.error;
+  } else {
+    switch (status.stage) {
+      case Server.Stage.OFF:
+        led = 'inactive';
+        break;
+      case Server.Stage.STARTING:
+        led = 'active';
+        blink = true;
+        break;
+      case Server.Stage.ON:
+        led = pending > 0 ? 'positive' : 'active';
+        break;
+      case Server.Stage.HALTING:
+        led = 'negative';
+        blink = true;
+        break;
+      case Server.Stage.RESTARTING:
+        led = 'warning';
+        blink = true;
+        break;
+      default:
+        break;
+    }
   }
+
   return (
     <>
       <LED status={led} blink={blink} />
-      <Code label={s} />
+      <Code label={status.stage} />
       {error && <Label icon="WARNING" label={error} />}
     </>
   );
@@ -295,8 +296,8 @@ export const Status = () => {
 
 export const Stats = () => {
   Server.useStatus();
-  const n = Server.getPending();
-  return n > 0 ? <Code>{n} rq.</Code> : null;
+  const pending = Server.getPending();
+  return pending > 0 ? <Code>{pending} rq.</Code> : null;
 };
 
 // --------------------------------------------------------------------------

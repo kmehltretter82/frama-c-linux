@@ -13,6 +13,16 @@ import * as Dome from 'dome';
 import * as System from 'dome/system';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Request as ZmqRequest } from 'zeromq';
+import { ChildProcess } from 'child_process';
+
+// --------------------------------------------------------------------------
+// --- Pretty Printing (Browser Console)
+// --------------------------------------------------------------------------
+
+class PP {
+  static warning(t: string) { console.warn(`[Frama-C Server] ${t}.`); }
+  static error(t: string) { console.error(`[Frama-C Server] ${t}.`); }
+}
 
 // --------------------------------------------------------------------------
 // --- Events
@@ -32,7 +42,7 @@ const STATUS = 'frama-c.server.status';
  *  @name 'frama-c.server.ready'
  *  @summary Server is actually started and running.
  *  @description
- *  This event is emitted when ther server _enters_ the `RUNNING` state.
+ *  This event is emitted when ther server _enters_ the `ON` state.
  *  It is now ready to handle requests.
  */
 const READY = 'frama-c.server.ready';
@@ -42,7 +52,7 @@ const READY = 'frama-c.server.ready';
  *  @name 'frama-c.server.shutdown'
  *  @summary Server Status Notification Event
  *  @description
- *  This event is emitted when ther server _leaves_ the `RUNNING` state.
+ *  This event is emitted when ther server _leaves_ the `ON` state.
  *  It is no more able to handle requests until re-start.
  */
 const SHUTDOWN = 'frama-c.server.shutdown';
@@ -71,43 +81,92 @@ const ACTIVITY = 'frama-c.server.activity.';
 // --- Server Status
 // --------------------------------------------------------------------------
 
-/**
- *  @typedef Status
- *  @summary Server Status Codes.
- *  @description
- *   - `OFF` Server off
- *   - `STARTED` Frama-C command launched
- *   - `RUNNING` Server ready
- *   - `KILLING` Server shutdown, waiting for exit
- *   - `RESTART` Server shutdown, will reboot on exit
- *   - `FAILED` Server halted on error
- */
-export enum Status {
+/** Server stages. */
+export enum Stage {
+  /** Server is off. */
   OFF = 'OFF',
-  STARTED = 'STARTED',
-  RUNNING = 'RUNNING',
-  KILLING = 'KILLING',
-  RESTART = 'RESTART',
-  FAILED = 'FAILED'
+  /** Server is starting, but not on yet. */
+  STARTING = 'STARTING',
+  /** Server is on. */
+  ON = 'ON',
+  /** Server is halting, but not off yet. */
+  HALTING = 'HALTING',
+  /** Server is restarting. */
+  RESTARTING = 'RESTARTING',
+  /** Server is off upon failure. */
+  FAILURE = 'FAILURE'
+}
+
+export interface OkStatus {
+  readonly stage:
+  Stage.OFF | Stage.ON | Stage.STARTING | Stage.RESTARTING | Stage.HALTING;
+}
+
+export interface ErrorStatus {
+  readonly stage: Stage.FAILURE;
+  /** Failure message. */
+  readonly error: string;
+}
+
+export type Status = OkStatus | ErrorStatus;
+
+function okStatus(
+  s: Stage.OFF | Stage.ON | Stage.STARTING | Stage.RESTARTING | Stage.HALTING,
+) {
+  return { stage: s };
+}
+
+function errorStatus(error: string): ErrorStatus {
+  return { stage: Stage.FAILURE, error };
+}
+
+export function hasErrorStatus(s: Status): s is ErrorStatus {
+  return (s as ErrorStatus).error !== undefined;
 }
 
 // --------------------------------------------------------------------------
 // --- Server Global State
 // --------------------------------------------------------------------------
 
-let status = Status.OFF;
-let error: string | undefined; // process error
-let rqid: number; // Request ID
-let pending: any; // Pending promise callbacks
-let queueCmd: any; // Queue of server commands to be sent
-let queueIds: any; // Waiting request ids to be sent
-let polling: any; // Timeout Polling timer
-let flushing: any; // Immediate Flushing timer
-let config: Configuration;
-let process: any; // Server process
-let socket: any; // ZMQ (REQ) socket
-let busy: boolean; // ZMQ socket is busy
-let killing: any; // killing timeout
+/** The current server status. */
+let status: Status = okStatus(Stage.OFF);
+
+/** Request counter. */
+let rqCount = 0;
+
+type IndexedPair<T, U> = {
+  [index: string]: [T, U];
+};
+type ResolvePromise = (value?: any) => void;
+type RejectPromise = (error: Error) => void;
+
+/** Pending promise callbacks (pairs of (resolve, reject)). */
+let pending: IndexedPair<ResolvePromise, RejectPromise> = {};
+
+/** Queue of server commands to be sent. */
+let queueCmd: string[] = [];
+
+/** Waiting request ids to be sent. */
+let queueId: string[] = [];
+
+/** Polling timeout and timer. */
+const pollingTimeout = 50;
+let pollingTimer: NodeJS.Timeout | null = null;
+
+/** Flushing timer. */
+let flushingTimer: NodeJS.Immediate | null = null;
+
+/** Server process. */
+let process: ChildProcess | null = null;
+
+/** Killing timeout and timer for server process hard kill. */
+const killingTimeout = 300;
+let killingTimer: NodeJS.Timeout | null = null;
+
+/** ZMQ (REQ) socket. */
+let zmqSocket: ZmqRequest | null = null;
+/** Flag on whether ZMQ socket is busy. */
+let zmqIsBusy = false;
 
 // --------------------------------------------------------------------------
 // --- Server Console
@@ -125,7 +184,7 @@ export const buffer = new RichTextBuffer({ maxlines: 200 });
  *  @description
  *  See [STATUS](module-frama-c_server.html#~STATUS) code definitions.
  */
-export function getStatus(): Status { return status; }
+export function getStatus() { return status; }
 
 /**
  *  @summary Hook on current server (Custom React Hook).
@@ -133,31 +192,28 @@ export function getStatus(): Status { return status; }
  *  @description
  *  See [STATUS](module-frama-c_server.html#~STATUS) code definitions.
  */
-export function useStatus(): Status {
+export function useStatus() {
   Dome.useUpdate(STATUS);
   return status;
 }
 
-/** Return `FAILED` status message. */
-export function getError() { return error; }
-
 /**
  *  @summary Frama-C Server is running and ready to handle requests.
- *  @return {boolean} status is `RUNNING`.
+ *  @return {boolean} Whether status is `ON`.
  */
-export function isRunning(): boolean { return status === Status.RUNNING; }
+export function isRunning() { return status.stage === Stage.ON; }
 
 /**
  *  @summary Number of requests still pending.
  *  @return {number} pending requests
  */
 export function getPending(): number {
-  return _.reduce(pending, (_rq, n) => n + 1, 0);
+  return _.reduce(pending, (n) => n + 1, 0);
 }
 
 /**
  *  @summary Register callback on READY event.
- *  @param {function} callback - invoked when the server enters RUNNING status
+ *  @param {function} callback - invoked when the server enters `ON` status
  */
 export function onReady(callback: any) { Dome.on(READY, callback); }
 
@@ -180,17 +236,17 @@ export function onActivity(signal: string, callback: any) {
 // --- Status Update
 // --------------------------------------------------------------------------
 
-function _status(newStatus: Status, err?: string) {
-  if (Dome.DEVEL && err) {
-    console.error('[Server]', err);
+function _status(newStatus: Status) {
+  if (Dome.DEVEL && hasErrorStatus(newStatus)) {
+    PP.error(newStatus.error);
   }
-  if (newStatus !== status || err) {
+
+  if (newStatus !== status) {
     const oldStatus = status;
     status = newStatus;
-    error = err ? err.toString() : undefined;
     Dome.emit(STATUS);
-    if (oldStatus === Status.RUNNING) Dome.emit(SHUTDOWN);
-    if (newStatus === Status.RUNNING) Dome.emit(READY);
+    if (oldStatus.stage === Stage.ON) Dome.emit(SHUTDOWN);
+    if (newStatus.stage === Stage.ON) Dome.emit(READY);
   }
 }
 
@@ -205,21 +261,24 @@ function _status(newStatus: Status, err?: string) {
  *  If the server is being shutdown, it will reboot.
  *  Otherwise, the Frama-C Server is spawned.
  */
-export function start() {
-  switch (status) {
-    case Status.OFF:
-    case Status.FAILED:
-      _status(Status.STARTED);
-      _launch()
-        .then(() => _status(Status.RUNNING))
-        .catch((err) => _status(Status.FAILED, err));
+export async function start() {
+  switch (status.stage) {
+    case Stage.OFF:
+    case Stage.FAILURE:
+    case Stage.RESTARTING:
+      _status(okStatus(Stage.STARTING));
+      try {
+        await _launch();
+        _status(okStatus(Stage.ON));
+      } catch (error) {
+        PP.error(error.toString());
+        buffer.append(error.toString(), '\n');
+        _exit(error);
+      }
       return;
-    case Status.KILLING:
-      _status(Status.RESTART);
+    case Stage.HALTING:
+      _status(okStatus(Stage.RESTARTING));
       return;
-    case Status.STARTED:
-    case Status.RUNNING:
-    case Status.RESTART:
     default:
       return;
   }
@@ -238,21 +297,18 @@ export function start() {
  *  Otherwise, this is a no-op.
  */
 export function stop() {
-  switch (status) {
-    case Status.STARTED:
+  switch (status.stage) {
+    case Stage.STARTING:
+      _status(okStatus(Stage.HALTING));
       _kill();
-      _status(Status.KILLING);
       return;
-    case Status.RUNNING:
+    case Stage.ON:
+      _status(okStatus(Stage.HALTING));
       _shutdown();
-      _status(Status.KILLING);
       return;
-    case Status.RESTART:
-      _status(Status.KILLING);
+    case Stage.RESTARTING:
+      _status(okStatus(Stage.HALTING));
       return;
-    case Status.OFF:
-    case Status.FAILED:
-    case Status.KILLING:
     default:
       return;
   }
@@ -273,16 +329,14 @@ export function stop() {
  *  signal.
  */
 export function kill() {
-  switch (status) {
-    case Status.STARTED:
-    case Status.RUNNING:
-    case Status.KILLING:
-    case Status.RESTART:
+  switch (status.stage) {
+    case Stage.STARTING:
+    case Stage.ON:
+    case Stage.HALTING:
+    case Stage.RESTARTING:
+      _status(okStatus(Stage.HALTING));
       _kill();
-      _status(Status.KILLING);
       return;
-    case Status.OFF:
-    case Status.FAILED:
     default:
       return;
   }
@@ -300,20 +354,18 @@ export function kill() {
  *  and finally schedule a reboot on exit.
  */
 export function restart() {
-  switch (status) {
-    case Status.OFF:
-    case Status.FAILED:
+  switch (status.stage) {
+    case Stage.OFF:
+    case Stage.FAILURE:
       start();
       return;
-    case Status.RUNNING:
+    case Stage.ON:
+      _status(okStatus(Stage.RESTARTING));
       _shutdown();
-      _status(Status.RESTART);
       return;
-    case Status.KILLING:
-      _status(Status.RESTART);
+    case Stage.HALTING:
+      _status(okStatus(Stage.RESTARTING));
       return;
-    case Status.STARTED:
-    case Status.RESTART:
     default:
       return;
   }
@@ -324,19 +376,18 @@ export function restart() {
 // --------------------------------------------------------------------------
 
 /**
- *  @summary Acknowledge `FAILED` status.
+ *  @summary Acknowledge `FAILURE` status.
  *  @description
  *  When not running, clear the console and reset any error flag.
  *  Otherwised, do nothing.
  */
 export function clear() {
-  switch (status) {
-    case Status.FAILED:
-      _status(Status.OFF);
+  switch (status.stage) {
+    case Stage.FAILURE:
       buffer.clear();
-      Dome.emit(STATUS);
+      _status(okStatus(Stage.OFF));
       return;
-    case Status.OFF:
+    case Stage.OFF:
       buffer.clear();
       Dome.emit(STATUS);
       return;
@@ -349,24 +400,38 @@ export function clear() {
 // --- Server Configure
 // --------------------------------------------------------------------------
 
+/** Server configuration. */
 export interface Configuration {
-  env?: any; // Process environment variables (default: `undefined`)
-  cwd?: string; // Working directory (default: current)
-  command?: string; // Server command (default: `frama-c`)
-  params: string[]; // Additional server arguments (default: empty)
-  sockaddr?: string; // Server socket (default: `ipc:///.frama-c.<pid>.io`)
-  timeout?: number; // Shutdown timeout before server is hard killed, in milliseconds (default: 300ms)
-  polling?: number; // Server polling period, in milliseconds (default: 50ms)
-  logout?: string; // Process stdout log file (default: `undefined`)
-  logerr?: string; // Process stderr log file (default: `undefined`)
+  /** Process environment variables (default: `undefined`). */
+  env?: any;
+  /** Working directory (default: current). */
+  cwd?: string;
+  /** Server command (default: `frama-c`). */
+  command?: string;
+  /** Additional server arguments (default: empty). */
+  params: string[];
+  /** Server socket (default: `ipc:///.frama-c.<pid>.io`). */
+  sockaddr?: string;
+  /** Shutdown timeout before server is hard killed, in milliseconds
+   *  (default: 300ms). */
+  timeout?: number;
+  /** Server polling period in milliseconds (default: 50ms). */
+  polling?: number;
+  /** Process stdout log file (default: `undefined`). */
+  logout?: string;
+  /** Process stderr log file (default: `undefined`). */
+  logerr?: string;
 }
+
+/** Server current configuration. */
+let config: Configuration = { command: 'frama-c', params: [] };
 
 /**
  *  @summary Configure the Server.
  *  @param {Configuration} sc - Server Configuration
  */
 export function configure(sc: Configuration) {
-  config = sc || {};
+  config = { ...sc };
 }
 
 /**
@@ -384,15 +449,11 @@ export function getConfig(): Configuration {
 // --------------------------------------------------------------------------
 
 async function _launch() {
-  _reset();
-  if (!config) {
-    throw new Error('Frama-C Server not configured');
-  }
   let {
     env,
     cwd,
     command = 'frama-c',
-    params = [],
+    params,
     sockaddr,
     logout,
     logerr,
@@ -438,21 +499,32 @@ async function _launch() {
       buffer.scroll(undefined, undefined);
     }
   };
-  process.stdout.on('data', logger);
-  process.stderr.on('data', logger);
-  process.on('error', (err: any) => {
-    buffer.append('Error:', err, '\n');
-    _close(err);
-  });
-  process.on('exit', (estatus: Status, esignal: string) => {
-    if (esignal) buffer.log('Signal:', esignal);
-    if (estatus) buffer.log('Exit:', estatus);
-    _close(esignal || estatus);
+  process?.stdout?.on('data', logger);
+  process?.stderr?.on('data', logger);
+  process?.on('exit', (code: number | null, signal: string | null) => {
+    PP.warning('Process exited');
+
+    if (signal) {
+      // [signal] is non-null.
+      buffer.log('Signal:', signal);
+      const error = new Error(`Process terminated by the signal ${signal}`);
+      _exit(error);
+      return;
+    }
+    // [signal] is null, hence [code] is non-null (cf. NodeJS doc).
+    if (code) {
+      buffer.log('Exit:', code);
+      const error = new Error(`Process exited with code ${code}`);
+      _exit(error);
+    } else {
+      // [code] is zero: normal exit w/o error.
+      _exit();
+    }
   });
   // Connect to Server
-  socket = new ZmqRequest();
-  busy = false;
-  socket.connect(sockaddr);
+  zmqSocket = new ZmqRequest();
+  zmqIsBusy = false;
+  zmqSocket.connect(sockaddr);
 }
 
 // --------------------------------------------------------------------------
@@ -460,56 +532,70 @@ async function _launch() {
 // --------------------------------------------------------------------------
 
 function _reset() {
-  rqid = 0;
-  process = undefined;
+  PP.warning('Reset to initial configuration');
+
+  rqCount = 0;
   queueCmd = [];
-  queueIds = [];
-  _.forEach(pending, ({ reject }) => reject('shutdown'));
+  queueId = [];
+  _.forEach(pending, ([, reject]) => reject(new Error('Server reset')));
   pending = {};
-  if (flushing) clearImmediate(flushing);
-  flushing = undefined;
-  if (polling) clearTimeout(polling);
-  polling = undefined;
+  if (flushingTimer) {
+    clearImmediate(flushingTimer);
+    flushingTimer = null;
+  }
+  if (pollingTimer) {
+    clearTimeout(pollingTimer);
+    pollingTimer = null;
+  }
+  if (killingTimer) {
+    clearTimeout(killingTimer);
+    killingTimer = null;
+  }
 }
 
 function _kill() {
+  PP.warning('Hard kill');
+
   _reset();
-  if (killing) clearTimeout(killing);
-  if (process) process.kill();
+  if (process) {
+    process.kill();
+  }
 }
 
-function _shutdown() {
+async function _shutdown() {
+  PP.warning('Shutdown');
+
   _reset();
   queueCmd.push('SHUTDOWN');
   _flush();
-  if (!killing) {
-    if (process) {
-      const timeout = (config && config.timeout) || 300;
-      killing = setTimeout(() => process.kill(), timeout);
+  const killingPromise = new Promise((resolve) => {
+    if (!killingTimer) {
+      if (process) {
+        const timeout = (config && config.timeout) || killingTimeout;
+        killingTimer =
+          setTimeout(() => {
+            resolve(process?.kill());
+          }, timeout);
+      }
     }
-  }
+  });
+  await killingPromise;
 }
 
-function _close(err: string) {
+function _exit(error?: Error) {
   _reset();
-  if (killing) {
-    clearTimeout(killing);
-    killing = undefined;
+  if (zmqSocket) {
+    zmqSocket.close();
+    zmqSocket = null;
   }
-  if (socket) {
-    socket.close();
-    socket = undefined;
-    busy = false;
-  }
-  if (process) {
-    process.kill();
-    process = undefined;
-  }
-  if (err) {
-    _status(Status.FAILED, err);
+  zmqIsBusy = false;
+  process = null;
+  if (status.stage === Stage.RESTARTING) {
+    setImmediate(start);
+  } else if (error) {
+    _status(errorStatus(error.toString()));
   } else {
-    if (status === Status.RESTART) setImmediate(start);
-    _status(Status.OFF);
+    _status(okStatus(Stage.OFF));
   }
 }
 
@@ -699,42 +785,42 @@ export async function EXEC(sr: Request) {
 function send(kind: RqKind, rq: string, params: any) {
   if (!isRunning()) return Promise.reject(new Error('Server not running'));
   if (!rq) return Promise.reject(new Error('Undefined request'));
-  const rid = `RQ.${rqid}`;
-  rqid += 1;
+  const rid = `RQ.${rqCount}`;
+  rqCount += 1;
   const data = JSON.stringify(params);
   const promise: any = new Promise((resolve, reject) => {
-    pending[rid] = { resolve, reject };
+    pending[rid] = [resolve, reject];
   });
   promise.kill = () => {
-    if (socket && pending[rid]) {
+    if (zmqSocket && pending[rid]) {
       queueCmd.push('KILL', rid);
       _flush();
     }
   };
   queueCmd.push(kind, rid, rq, data);
-  queueIds.push(rid);
+  queueId.push(rid);
   _flush();
   return promise;
 }
 
 function _resolve(id: string | number, data: string) {
-  const promise = pending[id];
-  if (promise) {
+  const [resolve] = pending[id];
+  if (resolve) {
     delete pending[id];
-    promise.resolve(JSON.parse(data));
+    resolve(JSON.parse(data));
   }
 }
 
-function _reject(id: string | number, err: string) {
-  const promise = pending[id];
-  if (promise) {
+function _reject(id: string | number, error: Error) {
+  const [, reject] = pending[id];
+  if (reject) {
     delete pending[id];
-    promise.reject(err);
+    reject(error);
   }
 }
 
 function _cancel(ids: any[]) {
-  ids.forEach((rid) => _reject(rid, 'canceled'));
+  ids.forEach((rid) => _reject(rid, new Error('Canceled request')));
 }
 
 function _waiting() {
@@ -746,19 +832,19 @@ function _waiting() {
 // --------------------------------------------------------------------------
 
 function _flush() {
-  if (!flushing) {
-    flushing = setImmediate(() => {
-      flushing = undefined;
+  if (!flushingTimer) {
+    flushingTimer = setImmediate(() => {
+      flushingTimer = null;
       _send();
     });
   }
 }
 
 function _poll() {
-  if (!polling) {
-    const delay = (config && config.polling) || 50;
-    polling = setTimeout(() => {
-      polling = undefined;
+  if (!pollingTimer) {
+    const delay = (config && config.polling) || pollingTimeout;
+    pollingTimer = setTimeout(() => {
+      pollingTimer = null;
       _send();
     }, delay);
   }
@@ -766,25 +852,25 @@ function _poll() {
 
 function _send() {
   // when busy, will be eventually re-triggered
-  if (!busy) {
+  if (!zmqIsBusy) {
     const cmds = queueCmd;
     if (!cmds.length && _waiting()) cmds.push('POLL');
     if (cmds.length) {
-      const ids = queueIds;
+      const ids = queueId;
       queueCmd = [];
-      queueIds = [];
-      if (socket) {
-        busy = true;
-        socket.send(cmds)
-          .then(() => socket.receive().then((resp: any) => _receive(resp)))
+      queueId = [];
+      if (zmqSocket) {
+        zmqIsBusy = true;
+        zmqSocket.send(cmds)
+          .then(() => zmqSocket?.receive().then((resp: any) => _receive(resp)))
           .catch(() => _cancel(ids))
-          .finally(() => { busy = false; Dome.emit(STATUS); });
+          .finally(() => { zmqIsBusy = false; Dome.emit(STATUS); });
       } else {
         _cancel(ids);
       }
     } else {
       // No pending command nor pending response
-      rqid = 0;
+      rqCount = 0;
     }
     Dome.emit(STATUS);
   }
@@ -810,7 +896,7 @@ function _receive(resp: any) {
           break;
         case 'KILLED':
           rid = shift();
-          _reject(rid, 'killed');
+          _reject(rid, new Error('Killed'));
           break;
         case 'ERROR':
           rid = shift();
@@ -819,7 +905,7 @@ function _receive(resp: any) {
           break;
         case 'REJECTED':
           rid = shift();
-          _reject(rid, 'rejected');
+          _reject(rid, new Error('Rejected'));
           break;
         case 'SIGNAL':
           rid = shift();
@@ -827,10 +913,10 @@ function _receive(resp: any) {
           break;
         case 'WRONG':
           err = shift();
-          console.error('[Frama-C Server] ZMQ Protocol Error:', err);
+          PP.error(`ZMQ Protocol Error: ${err}`);
           break;
         default:
-          console.error('[Frama-C Server] Unknown Response:', cmd);
+          PP.error(`Unknown Response: ${cmd}`);
           unknownResponse = true;
           break;
       }
