@@ -4,6 +4,13 @@
 #include "string.h"
 extern int __e_acsl_sound_verdict;
 
+/*@ requires valid_string_s: valid_read_string(s);
+    ensures acsl_c_equiv: \result ≡ strlen(\old(s));
+    assigns \result;
+    assigns \result \from (indirect: *(s + (0 ..)));
+ */
+size_t __gen_e_acsl_strlen(char const *s);
+
 /*@ requires \valid(&argc);
     requires \valid(&argv); */
 int main(int argc, char **argv);
@@ -194,6 +201,20 @@ int main(int argc, char **argv)
   __retres = __gen_e_acsl_main(argc,argv);
   __e_acsl_delete_block((void *)(& argv));
   __e_acsl_memory_clean();
+  return __retres;
+}
+
+/*@ requires valid_string_s: valid_read_string(s);
+    ensures acsl_c_equiv: \result ≡ strlen(\old(s));
+    assigns \result;
+    assigns \result \from (indirect: *(s + (0 ..)));
+ */
+size_t __gen_e_acsl_strlen(char const *s)
+{
+  size_t __retres;
+  __e_acsl_store_block((void *)(& s),(size_t)8);
+  __retres = strlen(s);
+  __e_acsl_delete_block((void *)(& s));
   return __retres;
 }
 
