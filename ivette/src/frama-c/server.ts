@@ -32,7 +32,7 @@ const STATUS = 'frama-c.server.status';
  *  @name 'frama-c.server.ready'
  *  @summary Server is actually started and running.
  *  @description
- *  This event is emitted when ther server _enters_ the `RUNNING` state.
+ *  This event is emitted when ther server _enters_ the `ON` state.
  *  It is now ready to handle requests.
  */
 const READY = 'frama-c.server.ready';
@@ -42,7 +42,7 @@ const READY = 'frama-c.server.ready';
  *  @name 'frama-c.server.shutdown'
  *  @summary Server Status Notification Event
  *  @description
- *  This event is emitted when ther server _leaves_ the `RUNNING` state.
+ *  This event is emitted when ther server _leaves_ the `ON` state.
  *  It is no more able to handle requests until re-start.
  */
 const SHUTDOWN = 'frama-c.server.shutdown';
@@ -71,32 +71,54 @@ const ACTIVITY = 'frama-c.server.activity.';
 // --- Server Status
 // --------------------------------------------------------------------------
 
-/**
- *  @typedef Status
- *  @summary Server Status Codes.
- *  @description
- *   - `OFF` Server off
- *   - `STARTED` Frama-C command launched
- *   - `RUNNING` Server ready
- *   - `KILLING` Server shutdown, waiting for exit
- *   - `RESTART` Server shutdown, will reboot on exit
- *   - `FAILED` Server halted on error
- */
-export enum Status {
+/** Server stages. */
+export enum Stage {
+  /** Server is off. */
   OFF = 'OFF',
-  STARTED = 'STARTED',
-  RUNNING = 'RUNNING',
-  KILLING = 'KILLING',
-  RESTART = 'RESTART',
-  FAILED = 'FAILED'
+  /** Server is starting, but not on yet. */
+  STARTING = 'STARTING',
+  /** Server is on. */
+  ON = 'ON',
+  /** Server is halting, but not off yet. */
+  HALTING = 'HALTING',
+  /** Server is restarting. */
+  RESTARTING = 'RESTARTING',
+  /** Server is off upon failure. */
+  FAILURE = 'FAILURE'
+}
+
+export interface OkStatus {
+  readonly stage:
+  Stage.OFF | Stage.ON | Stage.STARTING | Stage.RESTARTING | Stage.HALTING;
+}
+
+export interface ErrorStatus {
+  readonly stage: Stage.FAILURE;
+  /** Failure message. */
+  readonly error: string;
+}
+
+export type Status = OkStatus | ErrorStatus;
+
+function okStatus(
+  s: Stage.OFF | Stage.ON | Stage.STARTING | Stage.RESTARTING | Stage.HALTING,
+) {
+  return { stage: s };
+}
+
+function errorStatus(error: string): ErrorStatus {
+  return { stage: Stage.FAILURE, error };
+}
+
+export function hasErrorStatus(s: Status): s is ErrorStatus {
+  return (s as ErrorStatus).error !== undefined;
 }
 
 // --------------------------------------------------------------------------
 // --- Server Global State
 // --------------------------------------------------------------------------
 
-let status = Status.OFF;
-let error: string | undefined; // process error
+let status: Status = okStatus(Stage.OFF);
 let rqid: number; // Request ID
 let pending: any; // Pending promise callbacks
 let queueCmd: any; // Queue of server commands to be sent
@@ -125,7 +147,7 @@ export const buffer = new RichTextBuffer({ maxlines: 200 });
  *  @description
  *  See [STATUS](module-frama-c_server.html#~STATUS) code definitions.
  */
-export function getStatus(): Status { return status; }
+export function getStatus() { return status; }
 
 /**
  *  @summary Hook on current server (Custom React Hook).
@@ -133,19 +155,16 @@ export function getStatus(): Status { return status; }
  *  @description
  *  See [STATUS](module-frama-c_server.html#~STATUS) code definitions.
  */
-export function useStatus(): Status {
+export function useStatus() {
   Dome.useUpdate(STATUS);
   return status;
 }
 
-/** Return `FAILED` status message. */
-export function getError() { return error; }
-
 /**
  *  @summary Frama-C Server is running and ready to handle requests.
- *  @return {boolean} status is `RUNNING`.
+ *  @return {boolean} Whether status is `ON`.
  */
-export function isRunning(): boolean { return status === Status.RUNNING; }
+export function isRunning() { return status.stage === Stage.ON; }
 
 /**
  *  @summary Number of requests still pending.
@@ -157,7 +176,7 @@ export function getPending(): number {
 
 /**
  *  @summary Register callback on READY event.
- *  @param {function} callback - invoked when the server enters RUNNING status
+ *  @param {function} callback - invoked when the server enters `ON` status
  */
 export function onReady(callback: any) { Dome.on(READY, callback); }
 
@@ -180,17 +199,17 @@ export function onActivity(signal: string, callback: any) {
 // --- Status Update
 // --------------------------------------------------------------------------
 
-function _status(newStatus: Status, err?: string) {
-  if (Dome.DEVEL && err) {
-    console.error('[Server]', err);
+function _status(newStatus: Status) {
+  if (Dome.DEVEL && hasErrorStatus(newStatus)) {
+    console.error('[Server]', newStatus.error);
   }
-  if (newStatus !== status || err) {
+
+  if (newStatus !== status) {
     const oldStatus = status;
     status = newStatus;
-    error = err ? err.toString() : undefined;
     Dome.emit(STATUS);
-    if (oldStatus === Status.RUNNING) Dome.emit(SHUTDOWN);
-    if (newStatus === Status.RUNNING) Dome.emit(READY);
+    if (oldStatus.stage === Stage.ON) Dome.emit(SHUTDOWN);
+    if (newStatus.stage === Stage.ON) Dome.emit(READY);
   }
 }
 
@@ -206,20 +225,17 @@ function _status(newStatus: Status, err?: string) {
  *  Otherwise, the Frama-C Server is spawned.
  */
 export function start() {
-  switch (status) {
-    case Status.OFF:
-    case Status.FAILED:
-      _status(Status.STARTED);
+  switch (status.stage) {
+    case Stage.OFF:
+    case Stage.FAILURE:
+      _status(okStatus(Stage.STARTING));
       _launch()
-        .then(() => _status(Status.RUNNING))
-        .catch((err) => _status(Status.FAILED, err));
+        .then(() => _status(okStatus(Stage.ON)))
+        .catch((error) => _status(errorStatus(error.toString())));
       return;
-    case Status.KILLING:
-      _status(Status.RESTART);
+    case Stage.HALTING:
+      _status(okStatus(Stage.RESTARTING));
       return;
-    case Status.STARTED:
-    case Status.RUNNING:
-    case Status.RESTART:
     default:
       return;
   }
@@ -238,21 +254,18 @@ export function start() {
  *  Otherwise, this is a no-op.
  */
 export function stop() {
-  switch (status) {
-    case Status.STARTED:
+  switch (status.stage) {
+    case Stage.STARTING:
+      _status(okStatus(Stage.HALTING));
       _kill();
-      _status(Status.KILLING);
       return;
-    case Status.RUNNING:
+    case Stage.ON:
+      _status(okStatus(Stage.HALTING));
       _shutdown();
-      _status(Status.KILLING);
       return;
-    case Status.RESTART:
-      _status(Status.KILLING);
+    case Stage.RESTARTING:
+      _status(okStatus(Stage.HALTING));
       return;
-    case Status.OFF:
-    case Status.FAILED:
-    case Status.KILLING:
     default:
       return;
   }
@@ -273,16 +286,14 @@ export function stop() {
  *  signal.
  */
 export function kill() {
-  switch (status) {
-    case Status.STARTED:
-    case Status.RUNNING:
-    case Status.KILLING:
-    case Status.RESTART:
+  switch (status.stage) {
+    case Stage.STARTING:
+    case Stage.ON:
+    case Stage.HALTING:
+    case Stage.RESTARTING:
+      _status(okStatus(Stage.HALTING));
       _kill();
-      _status(Status.KILLING);
       return;
-    case Status.OFF:
-    case Status.FAILED:
     default:
       return;
   }
@@ -300,20 +311,18 @@ export function kill() {
  *  and finally schedule a reboot on exit.
  */
 export function restart() {
-  switch (status) {
-    case Status.OFF:
-    case Status.FAILED:
+  switch (status.stage) {
+    case Stage.OFF:
+    case Stage.FAILURE:
       start();
       return;
-    case Status.RUNNING:
+    case Stage.ON:
+      _status(okStatus(Stage.RESTARTING));
       _shutdown();
-      _status(Status.RESTART);
       return;
-    case Status.KILLING:
-      _status(Status.RESTART);
+    case Stage.HALTING:
+      _status(okStatus(Stage.RESTARTING));
       return;
-    case Status.STARTED:
-    case Status.RESTART:
     default:
       return;
   }
@@ -324,19 +333,18 @@ export function restart() {
 // --------------------------------------------------------------------------
 
 /**
- *  @summary Acknowledge `FAILED` status.
+ *  @summary Acknowledge `FAILURE` status.
  *  @description
  *  When not running, clear the console and reset any error flag.
  *  Otherwised, do nothing.
  */
 export function clear() {
-  switch (status) {
-    case Status.FAILED:
-      _status(Status.OFF);
+  switch (status.stage) {
+    case Stage.FAILURE:
       buffer.clear();
-      Dome.emit(STATUS);
+      _status(okStatus(Stage.OFF));
       return;
-    case Status.OFF:
+    case Stage.OFF:
       buffer.clear();
       Dome.emit(STATUS);
       return;
@@ -366,7 +374,7 @@ export interface Configuration {
  *  @param {Configuration} sc - Server Configuration
  */
 export function configure(sc: Configuration) {
-  config = sc || {};
+  config = sc;
 }
 
 /**
@@ -440,14 +448,27 @@ async function _launch() {
   };
   process.stdout.on('data', logger);
   process.stderr.on('data', logger);
-  process.on('error', (err: any) => {
-    buffer.append('Error:', err, '\n');
-    _close(err);
+  process.on('error', (error: Error) => {
+    buffer.append('Error:', error.toString(), '\n');
+    _exit(error);
   });
-  process.on('exit', (estatus: Status, esignal: string) => {
-    if (esignal) buffer.log('Signal:', esignal);
-    if (estatus) buffer.log('Exit:', estatus);
-    _close(esignal || estatus);
+  process.on('exit', (code: number | null, signal: string | null) => {
+    if (signal) {
+      // [signal] is non-null.
+      buffer.log('Signal:', signal);
+      const error = new Error(`Process terminated by the signal ${signal}`);
+      _exit(error);
+      return;
+    }
+    // [signal] is null, hence [code] is non-null (cf. NodeJS doc).
+    if (code) {
+      buffer.log('Exit:', code);
+      const error = new Error(`Process exited with code ${code}`);
+      _exit(error);
+    } else {
+      // [code] is zero: normal exit w/o error.
+      _exit();
+    }
   });
   // Connect to Server
   socket = new ZmqRequest();
@@ -490,7 +511,7 @@ function _shutdown() {
   }
 }
 
-function _close(err: string) {
+function _exit(error?: Error) {
   _reset();
   if (killing) {
     clearTimeout(killing);
@@ -505,11 +526,13 @@ function _close(err: string) {
     process.kill();
     process = undefined;
   }
-  if (err) {
-    _status(Status.FAILED, err);
+  if (error) {
+    _status(errorStatus(error.toString()));
   } else {
-    if (status === Status.RESTART) setImmediate(start);
-    _status(Status.OFF);
+    if (status.stage === Stage.RESTARTING) {
+      setImmediate(start);
+    }
+    _status(okStatus(Stage.OFF));
   }
 }
 
