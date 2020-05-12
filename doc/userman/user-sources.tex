@@ -98,7 +98,9 @@ the compilation database and include associated preprocessing flags,
 as if they had been manually added via \texttt{-cpp-extra-args-per-file}.
 Note: if both \texttt{-cpp-extra-args-per-file} and the JSON compilation
 database specify options for a given file, the former are used and the latter
-are ignored.
+are ignored. Also note that the use of the database simply adds flags
+{\em for the files specified in the command-line}, but these files must still
+be specified by the user.
 
 In all of the above cases,
 \acsl annotations are pre-processed by default (option \optiondef{-}{pp-annot}
