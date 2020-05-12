@@ -2,41 +2,59 @@
 
 cd $(dirname $0)
 
-set -e
-
-build () {
-    if test -z "$2" ; then export NAME="$1"; else export NAME="$2"; fi
-    echo "##### Building $NAME"
-    cd $1
-    make $3 || (echo "######### $NAME failed" ; exit 1)
-    make install
-    echo "##### $NAME done"
-    cd ..
+usage () {
+    echo "usage: $(basename $0) [help|clean|build] (default: build)"
 }
 
-mkdir -p manuals
+if test $# -gt 1; then usage; exit 2; fi;
 
-build userman
-build developer "Developer manual" developer.pdf
+if test $# -eq 1; then
+    case $1 in
+        "help") usage; exit 0;;
+        "clean") rm -f manuals/*.pdf; exit 0;;
+        "build") ;;
+        *) usage; exit 2;;
+    esac
+fi
 
-build rte
-build aorai
-build metrics
-build value
+set -e
+
 if [ ! -e acsl ]; then
     echo "error: 'acsl' not in doc; clone git@github.com:acsl-language/acsl.git"
     exit 1
 fi
-build acsl "ACSL manuals" all
 
-cd ../src/plugins/wp/doc/
+mkdir -p manuals
 
-build manual WP
 
-cd ../../e-acsl/doc
+FC_SUFFIX=$(cat ../VERSION)-$(cat ../VERSION_CODENAME)
+ACSL_SUFFIX=$(grep acslversion acsl/version.tex | sed 's/.*{\([^{}].*\)}.*/\1/')
 
-build userman "E-ACSL userman"
+build () {
 
-build refman "E-ACSL reference"
+    echo "##### Building $1"
+    make -C $(dirname $1) $(basename $1) || \
+         (echo "######### $1 failed" ; exit 1)
+    echo "##### $1 done"
+    MANUAL=$(basename $2 .pdf)-$3.pdf
+    cp -f $1 manuals/$MANUAL
+    echo "##### $MANUAL copied"
+    ln -srf manuals/$MANUAL manuals/$2
+}
 
-cd ../../../..
+EACSL_DOC=../src/plugins/e-acsl/doc
+
+export -f build
+SHELL=(type -p bash) parallel -j 4 --csv build {1} {2} {3} ::: \
+userman/userman.pdf,user-manual.pdf,$FC_SUFFIX \
+developer/developer.pdf,plugin-development-guide.pdf,$FC_SUFFIX \
+rte/main.pdf,rte-manual.pdf,$FC_SUFFIX \
+aorai/main.pdf,aorai-manual.pdf,$FC_SUFFIX \
+value/main.pdf,eva-manual.pdf,$FC_SUFFIX \
+metrics/metrics.pdf,metrics-manual.pdf,$FC_SUFFIX \
+../src/plugins/wp/doc/manual/wp.pdf,wp-manual.pdf,$FC_SUFFIX \
+acsl/acsl-implementation.pdf,acsl-implementation.pdf,$FC_SUFFIX \
+$EACSL_DOC/refman/e-acsl-implementation.pdf,e-acsl-implementation.pdf,$FC_SUFFIX \
+$EACSL_DOC/userman/main.pdf,e-acsl-manual.pdf,$FC_SUFFIX \
+acsl/acsl.pdf,acsl.pdf,$ACSL_SUFFIX \
+$EACSL_DOC/refman/e-acsl.pdf,e-acsl.pdf,$ACSL_SUFFIX
