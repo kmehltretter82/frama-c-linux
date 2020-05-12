@@ -6,13 +6,17 @@ import React from 'react';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 
+import * as Dome from 'dome';
 import { Vfill } from 'dome/layout/boxes';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
-import { Component } from 'frama-c/LabViews';
+import { Select, Switch, IconButton } from 'dome/controls/buttons';
+import * as Toolbars from 'dome/frame/toolbars';
+import { Component, TitleBar } from 'frama-c/LabViews';
 
 import 'codemirror/mode/clike/clike';
 import 'codemirror/theme/ambiance.css';
+import 'codemirror/theme/solarized.css';
 
 // --------------------------------------------------------------------------
 // --- Rich Text Printer
@@ -59,6 +63,10 @@ async function loadAST(buffer: any, theFunction?: string, theMarker?: string) {
 // --- AST Printer
 // --------------------------------------------------------------------------
 
+function useGlobal(param: string, dft: any) {
+  return Dome.useGlobalSetting(`ASTview.${param}`, dft);
+}
+
 const ASTview = () => {
 
   // Hooks
@@ -67,6 +75,9 @@ const ASTview = () => {
   const [select, setSelect] = States.useSelection();
   const theFunction = select && select.function;
   const theMarker = select && select.marker;
+  const [theme, setTheme] = useGlobal('theme', 'default');
+  const [lineWrapping, setLineWrapping] = useGlobal('lineWrapping', false);
+  const [fontSize, setFontSize] = useGlobal('fontSize', 12);
 
   // Hook: async loading
   React.useEffect(() => {
@@ -84,18 +95,55 @@ const ASTview = () => {
   // Callbacks
   const onSelection = (marker: any) => setSelect({ marker });
 
+  const titlebar = (
+    <TitleBar>
+      <Select
+        value={theme}
+        onChange={(name: string) => setTheme(name)}
+      >
+        <option value="default" label="Default" />
+        <option value="ambiance" label="Ambiance" />
+        <option value="solarized light" label="Solarized light" />
+        <option value="solarized dark" label="Solarized dark" />
+      </Select>
+      <Toolbars.Space />
+      <IconButton
+        icon="MINUS"
+        title="Decrease the font size"
+        onClick={() => setFontSize(fontSize - 2)}
+      />
+      <IconButton
+        icon="PLUS"
+        title="increase the font size"
+        onClick={() => setFontSize(fontSize + 2)}
+      />
+      <Toolbars.Space />
+      <Switch
+        label="Line wrapping"
+        title="Change line wrapping mode"
+        value={lineWrapping}
+        onChange={() => setLineWrapping(!lineWrapping)}
+      />
+      <Toolbars.Space />
+    </TitleBar>
+  );
+
   // Component
   return (
-    <Vfill>
-      <Text
-        buffer={buffer}
-        mode="text/x-csrc"
-        theme="ambiance"
-        selection={theMarker}
-        onSelection={onSelection}
-        readOnly
-      />
-    </Vfill>
+    <>
+      {titlebar}
+      <Vfill style={{ fontSize }}>
+        <Text
+          buffer={buffer}
+          mode="text/x-csrc"
+          theme={theme}
+          lineWrapping={lineWrapping}
+          selection={theMarker}
+          onSelection={onSelection}
+          readOnly
+        />
+      </Vfill>
+    </>
   );
 
 };
