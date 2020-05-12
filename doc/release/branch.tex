@@ -16,8 +16,8 @@ $\rightarrow$ Repository $\rightarrow$ Protected Branches.
 \textbf{The \texttt{master} branch must be protected \emph{at all times}.
   Parameters
   \texttt{Allowed to merge} and \texttt{Allowed to push} must be set to
-  \texttt{Developers + Masters} during non-freeze times, and to
-  \texttt{Masters} during freeze time.}
+  \texttt{Developers + Maintainers} during non-freeze times, and to
+  \texttt{Maintainers} during freeze time.}
 
 \section{Creating the branch}
 
@@ -41,14 +41,14 @@ These branches are directly created on the gitlab server.
 \end{enumerate}
 What can be committed in this branch must follow the release schedule,
 and go through Merge-requests. Everything else should go in \texttt{master},
-which can then be reset to standard-level protection (Developers + Masters
+which can then be reset to standard-level protection (Developers + Maintainers
 allowed to push/merge).
 
 \section{Creating the milestones}
 
 Create the milestones for the next release on \textsf{Mantis}
-\expertise{Julien, Boris} and \textsf{Gitlab}
-\expertise{François, Julien, Boris}
+\expertise{Julien} and \textsf{Gitlab}
+\expertise{François, Julien}
 
 
 \section{BTS}
