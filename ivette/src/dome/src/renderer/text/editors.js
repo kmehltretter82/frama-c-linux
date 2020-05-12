@@ -112,7 +112,7 @@ export class Text extends React.Component {
               className,     /* ignored */
               style,         /* ignored */
               ...config } = this.props ;
-      const value = buffer ? buffer.linkedDoc() : "" ;
+      const value = buffer ? buffer.getDoc() : "" ;
       const cm = this.codeMirror = new CodeMirror(elt, { value });
       // Passing all options to constructor does not work (Cf. CodeMirror's BTS)
       for (var opt in config) cm.setOption( opt , config[opt] );
@@ -343,7 +343,7 @@ export class Text extends React.Component {
               selection:newSelect,
               ...newConfig } = newProps ;
       if (oldBuffer !== newBuffer) {
-        const newDoc = newBuffer.linkedDoc();
+        const newDoc = newBuffer.getDoc();
         const oldDoc = cm.swapDoc( newDoc );
         oldBuffer.unlinkDoc( oldDoc );
       }
