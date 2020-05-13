@@ -1,0 +1,126 @@
+# frama-c -wp [...]
+[kernel] Parsing tests/wp/cfg_loop.i (no preprocessing)
+[wp] Running WP plugin...
+[wp] Loading driver 'share/wp.driver'
+[wp] Warning: Missing RTE guards
+------------------------------------------------------------
+  Function loop_continue
+------------------------------------------------------------
+
+Goal Preservation of Invariant (file tests/wp/cfg_loop.i, line 40):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Establishment of Invariant (file tests/wp/cfg_loop.i, line 40):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Loop assigns (file tests/wp/cfg_loop.i, line 41) (1/2):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Loop assigns (file tests/wp/cfg_loop.i, line 41) (2/2):
+Effect at line 43
+Let a = global(G_a_28).
+Assume {
+  Type: is_sint32(x).
+  (* Heap *)
+  Type: linked(Malloc_0).
+  (* Goal *)
+  When: !invalid(Malloc_0, a, 1).
+  (* Then *)
+  Have: x != 0.
+}
+Prove: a = p.
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function loop_switch
+------------------------------------------------------------
+
+Goal Preservation of Invariant (file tests/wp/cfg_loop.i, line 12) (1/3):
+Tags: Default.
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Preservation of Invariant (file tests/wp/cfg_loop.i, line 12) (2/3):
+Tags: Case 2.
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Preservation of Invariant (file tests/wp/cfg_loop.i, line 12) (3/3):
+Tags: Case 1.
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Establishment of Invariant (file tests/wp/cfg_loop.i, line 12):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Preservation of Invariant (file tests/wp/cfg_loop.i, line 13) (1/3):
+Tags: Default.
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Preservation of Invariant (file tests/wp/cfg_loop.i, line 13) (2/3):
+Tags: Case 2.
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Preservation of Invariant (file tests/wp/cfg_loop.i, line 13) (3/3):
+Tags: Case 1.
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Establishment of Invariant (file tests/wp/cfg_loop.i, line 13):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Loop assigns (file tests/wp/cfg_loop.i, line 14) (1/4):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Loop assigns (file tests/wp/cfg_loop.i, line 14) (2/4):
+Effect at line 16
+Tags: Default.
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Loop assigns (file tests/wp/cfg_loop.i, line 14) (3/4):
+Effect at line 16
+Tags: Case 2.
+Assume {
+  (* Heap *)
+  Type: (region(a.base) <= 0) /\ linked(Malloc_0).
+  (* Goal *)
+  When: !invalid(Malloc_0, a, 1).
+}
+Prove: a = a_1.
+
+------------------------------------------------------------
+
+Goal Loop assigns (file tests/wp/cfg_loop.i, line 14) (4/4):
+Effect at line 16
+Tags: Case 1.
+Assume {
+  (* Heap *)
+  Type: (region(a.base) <= 0) /\ linked(Malloc_0).
+  (* Goal *)
+  When: !invalid(Malloc_0, a, 1).
+}
+Prove: a = a_1.
+
+------------------------------------------------------------

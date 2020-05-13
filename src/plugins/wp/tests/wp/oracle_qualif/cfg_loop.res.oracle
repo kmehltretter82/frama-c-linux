@@ -1,0 +1,30 @@
+# frama-c -wp [...]
+[kernel] Parsing tests/wp/cfg_loop.i (no preprocessing)
+[wp] Running WP plugin...
+[wp] Loading driver 'share/wp.driver'
+[wp] Warning: Missing RTE guards
+[wp] 16 goals scheduled
+[wp] [Qed] Goal typed_loop_continue_loop_invariant_preserved : Valid
+[wp] [Qed] Goal typed_loop_continue_loop_invariant_established : Valid
+[wp] [Qed] Goal typed_loop_continue_loop_assigns_part1 : Valid
+[wp] [Alt-Ergo] Goal typed_loop_continue_loop_assigns_part2 : Unsuccess
+[wp] [Qed] Goal typed_loop_switch_loop_invariant_preserved_part1 : Valid
+[wp] [Qed] Goal typed_loop_switch_loop_invariant_preserved_part2 : Valid
+[wp] [Qed] Goal typed_loop_switch_loop_invariant_preserved_part3 : Valid
+[wp] [Qed] Goal typed_loop_switch_loop_invariant_established : Valid
+[wp] [Qed] Goal typed_loop_switch_loop_invariant_2_preserved_part1 : Valid
+[wp] [Qed] Goal typed_loop_switch_loop_invariant_2_preserved_part2 : Valid
+[wp] [Qed] Goal typed_loop_switch_loop_invariant_2_preserved_part3 : Valid
+[wp] [Qed] Goal typed_loop_switch_loop_invariant_2_established : Valid
+[wp] [Qed] Goal typed_loop_switch_loop_assigns_part1 : Valid
+[wp] [Qed] Goal typed_loop_switch_loop_assigns_part2 : Valid
+[wp] [Alt-Ergo] Goal typed_loop_switch_loop_assigns_part3 : Unsuccess
+[wp] [Alt-Ergo] Goal typed_loop_switch_loop_assigns_part4 : Unsuccess
+[wp] Proved goals:   13 / 16
+  Qed:            13 
+  Alt-Ergo:        0  (unsuccess: 3)
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  loop_switch              10        -       12      83.3%
+  loop_continue             3        -        4      75.0%
+------------------------------------------------------------
