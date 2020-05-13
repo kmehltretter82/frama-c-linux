@@ -28,18 +28,8 @@ theory Qed
   use real.FromInt
   use int.ComputerDivision as CD
 
-  (** to be used only for the ACSL ite generation.
-      Something is wrong with "wp/share/ergo/bool.Bool.mlw" (coming from why3),
-      the function match_bool is undefined.  
-      An hack is to give a definition here. *)
-  function match_bool (x : bool) (y z:'a ) : 'a
-  axiom match_bool: forall p:bool, x:'a, y:'a [match_bool p x y].
-   ( p=True /\ match_bool p x y=x ) ||
-   ( p=False /\ match_bool p x y=y )
-  meta "remove_for_why3" axiom match_bool
-
   (** The definitions are in comment because its not useful for coq
-  (no if-then-else on formula) and not tested on automatic provers *)
+      (no if-then-else on formula) and not tested on automatic provers *)
 
   function eqb (x y : 'a) : bool (*= if x = y then True else False*)
   axiom eqb : forall x:'a, y:'a. eqb x y = True <-> x = y
