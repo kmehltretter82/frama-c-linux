@@ -306,6 +306,8 @@ type t = {
   unreachables : node_type list;
   loop_nodes : (node list) option;
   mutable loop_cpt : int;
+  mutable node_break : node option;
+  mutable node_continue : node option;
 }
 
 let new_cfg_env spec_only kf = {
@@ -316,6 +318,8 @@ let new_cfg_env spec_only kf = {
   unreachables = [];
   loop_nodes = None;
   loop_cpt = 0;
+  node_break = None;
+  node_continue = None;
 }
 
 let cfg_kf cfg = cfg.kernel_function
@@ -804,6 +808,15 @@ let get_stmt_node env s =
   | TryExcept _ | TryFinally _ | Throw _ | TryCatch _ ->
       Wp_parameters.not_yet_implemented "[cfg] exception handling"
 
+let cfg_stmt_goto env s next =
+  let node = get_node env (Vstmt s) in
+  add_edge env node Enone next ; node
+
+let get_succ env s =
+  begin match s.succs with
+    | [s'] -> get_stmt_node env s'
+    | _ -> Wp_parameters.fatal "[cfg] jump with more than one successor ?"
+  end
 
 (** build the nodes for the [stmts], connect the last one with [next],
  * and return the node of the first stmt. *)
@@ -827,7 +840,16 @@ and cfg_block env bkind b next =
 and cfg_switch env switch_stmt switch_exp blk case_stmts next =
   let n_switch = get_node env (Vswitch (switch_stmt, switch_exp)) in
   add_edge env n_switch Enext next;
-  let _first = cfg_stmts env blk.bstmts next in
+  begin
+    let s_break = env.node_break in
+    try
+      env.node_break <- Some next ;
+      let _first = cfg_stmts env blk.bstmts next in
+      env.node_break <- s_break ;
+    with e ->
+      env.node_break <- s_break ;
+      raise e
+  end ;
   let branch with_def s =
     let n = get_stmt_node env s in
     let rec find_case l = match l with
@@ -896,21 +918,46 @@ and cfg_stmt env s next =
         n_in
       end
   | Loop(_, b, _, _, _) ->
-      let loop = get_stmt_node env s in
-      add_edge env loop Enext next;
-      let in_b = cfg_block env (Bloop s) b loop in
-      add_edge env loop Enone in_b;
-      loop
-  | Break _ | Continue _ | Goto _ ->
-      let n = get_stmt_node env s in
-      let _ = match s.succs with
-        | [s'] -> add_edge env n Enone (get_stmt_node env s')
-        | _ -> Wp_parameters.fatal "[cfg] jump with more than one successor ?"
-      in n
+      let s_loop = get_stmt_node env s in
+      let b_loop = Bloop s in
+      let s_out = get_node env (VblkOut(b_loop,b)) in
+      let b_in = cfg_block_with
+          ~break:next
+          ~continue:s_out
+          env b_loop b s_loop in
+      add_edge env s_loop Enext next;
+      add_edge env s_loop Enone b_in;
+      s_loop
+  | Break _ ->
+      begin match env.node_break with
+        | None -> Wp_parameters.fatal "[cfg] missing break successor"
+        | Some brk -> cfg_stmt_goto env s brk
+      end
+  | Continue _ ->
+      begin match env.node_continue with
+        | None -> Wp_parameters.fatal "[cfg] missing continue successor"
+        | Some cnt -> cfg_stmt_goto env s cnt
+      end
+  | Goto _ -> cfg_stmt_goto env s (get_succ env s)
   | Switch (e, b, lstmts, _) ->
       cfg_switch env s e b lstmts next
   | TryExcept _ | TryFinally _ | Throw _ | TryCatch _ ->
       Wp_parameters.not_yet_implemented "[cfg] exception handling"
+
+and cfg_block_with ?continue ?break env bkind block next =
+  let s_continue = env.node_continue in
+  let s_break = env.node_break in
+  try
+    if continue <> None then env.node_continue <- continue ;
+    if break <> None then env.node_break <- break ;
+    let head = cfg_block env bkind block next in
+    env.node_continue <- s_continue ;
+    env.node_break <- s_break ;
+    head
+  with e ->
+    env.node_continue <- s_continue ;
+    env.node_break <- s_break ;
+    raise e
 
 (*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*)
 (** {3 Cleaning} remove node and edges that are unreachable *)
@@ -1212,6 +1259,53 @@ let very_strange_loops cfg =
 (*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*)
 (** {3 Create CFG} *)
 
+(*
+Debugging code exporting the CFG in DOT:
+
+let pp_node_type_dot fmt = function
+  | Bstmt { sid } -> Format.fprintf fmt "s%d" sid
+  | Bthen { sid } -> Format.fprintf fmt "then_s%d" sid
+  | Belse { sid } -> Format.fprintf fmt "else_s%d" sid
+  | Bloop { sid } -> Format.fprintf fmt "loop_s%d" sid
+  | Bfct -> Format.fprintf fmt "fct"
+
+let pp_node_dot fmt { kind } =
+  match kind with
+  | Vstart  -> Format.fprintf fmt "START"
+  | Vend -> Format.fprintf fmt "END"
+  | Vexit -> Format.fprintf fmt "EXIT"
+  | VfctIn -> Format.fprintf fmt "FIN"
+  | VfctOut -> Format.fprintf fmt "FOUT"
+  | VblkIn (b,_) -> Format.fprintf fmt "IN_%a" pp_node_type_dot b
+  | VblkOut (b,_) -> Format.fprintf fmt "OUT_%a" pp_node_type_dot b
+  | Vstmt { sid } -> Format.fprintf fmt "STMT_s%d" sid
+  | Vloop(_,{ sid }) -> Format.fprintf fmt "LOOP_s%d" sid
+  | Vloop2(_,k) -> Format.fprintf fmt "LOOP2_%d" k
+  | Vtest(true,{ sid },_) -> Format.fprintf fmt "TEST_IN_s%d" sid
+  | Vtest(false,{ sid },_) -> Format.fprintf fmt "TEST_OUT_s%d" sid
+  | Vswitch({ sid },_) -> Format.fprintf fmt "SWITCH_s%d" sid
+  | Vcall({ sid },_,_,_) -> Format.fprintf fmt "CALL_s%d" sid
+
+let pp_cfg_dot name { kernel_function = kf ; graph } =
+  Command.pp_to_file
+    (Printf.sprintf "%s-%s.dot" (Kernel_function.get_name kf) name)
+    begin fun fmt ->
+      Format.fprintf fmt "digraph %s {@\n" name ;
+      Format.fprintf fmt "  rankdir = TB;@\n" ;
+      CFG.iter_edges_e
+        (fun (s,i,t) ->
+           match !i with
+           | Enext -> ()
+           | Enone ->
+               Format.fprintf fmt " %a -> %a ;@\n" pp_node_dot s pp_node_dot t
+           | info ->
+               Format.fprintf fmt " %a -> %a [ label=\"%a\" ] ;@\n"
+                 pp_node_dot s pp_node_dot t EL.pretty info
+        ) graph ;
+      Format.fprintf fmt "}@." ;
+    end
+*)
+
 let cfg_from_definition kf f =
   let kf_name = Kernel_function.get_name kf in
   let cfg, fct_in, fct_out = init_cfg false kf in
@@ -1273,6 +1367,8 @@ module KfCfg =
                   unreachables = [];
                   loop_nodes = None;
                   loop_cpt = 0;
+                  node_break = None;
+                  node_continue = None;
                 }
              )
              Kernel_function.reprs
