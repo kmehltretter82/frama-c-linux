@@ -34,22 +34,34 @@ export const PROJECT = 'frama-c.project';
 export const STATE = 'frama-c.state.';
 
 // --------------------------------------------------------------------------
+// --- Pretty Printing (Browser Console)
+// --------------------------------------------------------------------------
+
+class PP {
+  static warning(t: string) { console.warn(`[Frama-C States] ${t}.`); }
+  static error(t: string) { console.error(`[Frama-C States] ${t}.`); }
+}
+
+// --------------------------------------------------------------------------
 // --- Synchronized Current Project
 // --------------------------------------------------------------------------
 
-let currentProject = '<None>';
+let currentProject: string | null = null;
 let states: any = {};
 const stateDefaults: any = {};
 
 Server.onReady(async () => {
-  const sr: Server.Request = {
-    endpoint: 'kernel.project.getCurrent',
-    params: {},
-  };
-  const current: { id: string } = await Server.GET(sr);
-  currentProject = current.id;
-  Dome.emit(PROJECT);
-  return;
+  try {
+    const sr: Server.Request = {
+      endpoint: 'kernel.project.getCurrent',
+      params: {},
+    };
+    const current: { id: string } = await Server.GET(sr);
+    currentProject = current.id;
+    Dome.emit(PROJECT);
+  } catch (error) {
+    PP.error(`Fail to retrieve the current project. ${error.toString()}`);
+  }
 });
 
 Server.onShutdown(() => {
@@ -80,14 +92,14 @@ export function useProject() {
  */
 export async function setProject(project: string) {
   if (Server.isRunning()) {
-    const sr: Server.Request = {
-      endpoint: 'kernel.project.setCurrent',
-      params: project,
-    };
-    await Server.SET(sr);
-    currentProject = project;
-    Dome.emit(PROJECT);
-    return;
+    try {
+      const sr = { endpoint: 'kernel.project.setCurrent', params: project };
+      await Server.SET(sr);
+      currentProject = project;
+      Dome.emit(PROJECT);
+    } catch (error) {
+      PP.error(`Fail to set the current project. ${error.toString()}`);
+    }
   }
 }
 
@@ -95,12 +107,12 @@ export async function setProject(project: string) {
 // --- Projectified State
 // --------------------------------------------------------------------------
 
-function getValue(id: string, project: string) {
+function getValue(id: string, project: string | null) {
   if (!project) return undefined;
   return _.get(states, [project, id], stateDefaults[id]);
 }
 
-function setValue(id: string, project: string, value: any) {
+function setValue(id: string, project: string | null, value: any) {
   if (!project) return;
   _.set(states, [project, id], value);
   Dome.emit(STATE + id, value);
@@ -171,9 +183,8 @@ export function useRequest(rq: string, params: any, options: any = {}) {
       try {
         const r = await Server.GET({ endpoint: rq, params });
         setResponse(r);
-      } catch (errmsg) {
-        if (Dome.DEVEL)
-          console.warn(`[Server] use request '${rq}':`, errmsg);
+      } catch (error) {
+        PP.error(`Fail in useRequest '${rq}'. ${error.toString()}`);
         const err = options.error;
         if (err !== undefined) setResponse(err);
       }
@@ -283,19 +294,29 @@ class SyncState {
   }
 
   async setValue(v: any) {
-    this.insync = true;
-    this.value = v;
-    const sr: Server.Request = { endpoint: this.setRq, params: v };
-    await Server.SET(sr);
-    Dome.emit(this.UPDATE);
+    try {
+      this.insync = true;
+      this.value = v;
+      const sr: Server.Request = { endpoint: this.setRq, params: v };
+      await Server.SET(sr);
+      Dome.emit(this.UPDATE);
+    } catch (error) {
+      PP.error(
+        `Fail to set value of syncState '${this.id}'. ${error.toString()}`,
+      );
+    }
   }
 
   async update() {
-    this.insync = true;
-    const sr: Server.Request = { endpoint: this.getRq, params: {} };
-    const v = await Server.GET(sr);
-    this.value = v;
-    Dome.emit(this.UPDATE);
+    try {
+      this.insync = true;
+      const sr: Server.Request = { endpoint: this.getRq, params: {} };
+      const v = await Server.GET(sr);
+      this.value = v;
+      Dome.emit(this.UPDATE);
+    } catch (error) {
+      PP.error(`Fail to update syncState '${this.id}'. ${error.toString()}`);
+    }
   }
 }
 
@@ -359,6 +380,7 @@ export function useSyncValue(id: string) {
 
 // one per project
 class SyncArray {
+  id: string;
   UPDATE: string;
   signal: string;
   fetchRq: string;
@@ -367,6 +389,7 @@ class SyncArray {
   insync: boolean;
 
   constructor(id: string) {
+    this.id = id;
     this.UPDATE = STATE + id;
     this.signal = `${id}.sig`;
     this.fetchRq = `${id}.fetch`;
@@ -387,37 +410,49 @@ class SyncArray {
   }
 
   async fetch() {
-    this.insync = true;
-    const sr: Server.Request = { endpoint: this.fetchRq, params: 50 };
-    const data = await Server.GET(sr);
-    const { reload = false, removed = [], updated = [], pending = 0 } = data;
-    let reloaded = false;
-    if (reload) {
-      reloaded = this.isEmpty();
-      this.index = {};
+    try {
+      this.insync = true;
+      const sr: Server.Request = { endpoint: this.fetchRq, params: 50 };
+      const data = await Server.GET(sr);
+      const { reload = false, removed = [], updated = [], pending = 0 } = data;
+      let reloaded = false;
+      if (reload) {
+        reloaded = this.isEmpty();
+        this.index = {};
+      }
+      removed.forEach((key: any) => {
+        delete this.index[key];
+      });
+      updated.forEach((item: any) => {
+        this.index[item.key] = item;
+      });
+      if (reloaded || removed.length || updated.length) {
+        this.index = { ...this.index };
+        Dome.emit(this.UPDATE);
+      }
+      if (pending > 0) {
+        this.fetch();
+      }
+    } catch (error) {
+      PP.error(
+        `Fail to retrieve the value of syncArray '${this.id}. ` +
+        `${error.toString()}`,
+      );
     }
-    removed.forEach((key: any) => {
-      delete this.index[key];
-    });
-    updated.forEach((item: any) => {
-      this.index[item.key] = item;
-    });
-    if (reloaded || removed.length || updated.length) {
-      this.index = { ...this.index };
-      Dome.emit(this.UPDATE);
-    }
-    if (pending > 0) {
-      this.fetch();
-    }
-    return;
   }
 
   async reload() {
-    const sr: Server.Request = { endpoint: this.reloadRq, params: {} };
-    await Server.SET(sr);
-    this.index = {};
-    this.insync = false;
-    Dome.emit(this.UPDATE);
+    try {
+      const sr: Server.Request = { endpoint: this.reloadRq, params: {} };
+      await Server.SET(sr);
+      this.index = {};
+      this.insync = false;
+      Dome.emit(this.UPDATE);
+    } catch (error) {
+      PP.error(
+        `Fail to set reload of syncArray '${this.id}. ${error.toString()}`,
+      );
+    }
   }
 }
 

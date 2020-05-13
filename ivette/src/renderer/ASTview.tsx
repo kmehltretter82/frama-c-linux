@@ -24,6 +24,15 @@ const THEMES = [
 ];
 
 // --------------------------------------------------------------------------
+// --- Pretty Printing (Browser Console)
+// --------------------------------------------------------------------------
+
+class PP {
+  static warning(t: string) { console.warn(`[AST View] ${t}.`); }
+  static error(t: string) { console.error(`[AST View] ${t}.`); }
+}
+
+// --------------------------------------------------------------------------
 // --- Rich Text Printer
 // --------------------------------------------------------------------------
 
@@ -47,19 +56,25 @@ async function loadAST(buffer: any, theFunction?: string, theMarker?: string) {
   if (theFunction) {
     buffer.log('// Loading', theFunction, '…');
     (async () => {
-      const data = await Server.GET({
-        endpoint: 'kernel.ast.printFunction',
-        params: theFunction,
-      });
-      buffer.operation(() => {
-        buffer.clear();
-        if (!data)
-          buffer.log('// No code for function ', theFunction);
-        printAST(buffer, data);
-        if (theMarker)
-          buffer.scroll(theMarker, undefined);
-      });
-      return;
+      try {
+        const data = await Server.GET({
+          endpoint: 'kernel.ast.printFunction',
+          params: theFunction,
+        });
+        buffer.operation(() => {
+          buffer.clear();
+          if (!data)
+            buffer.log('// No code for function ', theFunction);
+          printAST(buffer, data);
+          if (theMarker)
+            buffer.scroll(theMarker, undefined);
+        });
+      } catch (error) {
+        PP.error(
+          `Fail to retrieve the AST of function ${theFunction}, ` +
+          `on marker ${theMarker}`,
+        );
+      }
     })();
   }
 }

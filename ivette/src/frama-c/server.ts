@@ -862,24 +862,25 @@ function _poll() {
   }
 }
 
-function _send() {
+async function _send() {
   // when busy, will be eventually re-triggered
   if (!zmqIsBusy) {
     const cmds = queueCmd;
     if (!cmds.length && _waiting()) cmds.push('POLL');
     if (cmds.length) {
+      zmqIsBusy = true;
       const ids = queueId;
       queueCmd = [];
       queueId = [];
-      if (zmqSocket) {
-        zmqIsBusy = true;
-        zmqSocket.send(cmds)
-          .then(() => zmqSocket?.receive().then((resp: any) => _receive(resp)))
-          .catch(() => _cancel(ids))
-          .finally(() => { zmqIsBusy = false; Dome.emit(STATUS); });
-      } else {
+      try {
+        await zmqSocket?.send(cmds);
+        const resp = await zmqSocket?.receive();
+        _receive(resp);
+      } catch (error) {
+        PP.error(`Error in send/receive on ZMQ socket. ${error.toString()}`);
         _cancel(ids);
       }
+      zmqIsBusy = false;
     } else {
       // No pending command nor pending response
       rqCount = 0;
