@@ -58,25 +58,7 @@
         <nav class="tsd-navigation secondary menu-sticky">
           <a href="#MAIN"><b>$subtitle$</b></a>
           <ul class="before-current">
-            $if(link)$
-            $if(toc)$
-            $for(link)$
-            $if(link.toc)$
             $table-of-contents$
-            $else$
-            <li><a href="$link.href$.html">$link.title$</a></li>
-            $endif$
-            $endfor$
-            $else$
-            <ul>
-              $for(link)$
-              <li><a href="$link.href$.html">$link.title$</a></li>
-              $endfor$
-              $endif$
-              $else$
-              $table-of-contents$
-              $endif$
-            </ul>
           </ul>
         </nav>
       </div>
