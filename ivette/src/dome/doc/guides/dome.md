@@ -20,6 +20,7 @@ The **Dome** framework provides you with the following facilities:
 - [Live Editing](hotreload.md)
 - [Application Design](application.md)
 - [Application Development](development.md)
+- [Styling Components](styling.md)
 
 ## References
 

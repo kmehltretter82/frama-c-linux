@@ -33,7 +33,7 @@
     <div class="tsd-page-title">
       <div class="container">
         <ul class="tsd-breadcrumb">
-          <li><a href="README.md.html">Guides</a></li>
+          <li><a href="../globals.html">Globals</a></li>
         </ul>
         <h1 id="MAIN">$subtitle$</h1>
       </div>
@@ -48,7 +48,12 @@
       </div>
       <div class="col-4 col-menu menu-sticky-wrap menu-highlight">
         <nav class="tsd-navigation primary">
-          <a class="root" href="../index.html">$title$</a>
+          <ul>
+            <li class="globals"><a href="../index.html"><em>$title$</em></a></li>
+            $for(guides)$
+            <li><a href="$guides.page$.html">$guides.title$</a></li>
+            $endfor$
+          </ul>
         </nav>
         <nav class="tsd-navigation secondary menu-sticky">
           <a href="#MAIN"><b>$subtitle$</b></a>

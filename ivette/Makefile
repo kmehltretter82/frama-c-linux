@@ -35,14 +35,18 @@ doc:
 	@echo "[Ivette] documentation"
 	@yarn run typedoc
 	@mkdir -p doc/html/guides
+	@echo "[Ivette] guides"
 	@find $(GUIDES) -name "*.md" -exec cp -f {} doc/html/guides/ \;
 	@find doc/html/guides -name "*.md" -print -exec pandoc \
 		--standalone --toc --toc-depth=2 --to html \
+		--template doc/pandoc/template.html \
 		--metadata title="Ivette Documentation" \
 		--metadata version="v$(VERSION)" \
-		--template doc/pandoc/template.html \
+		--metadata-file=doc/pandoc/index.json \
 		--lua-filter doc/pandoc/href.lua \
 		{} -o {}.html \; -delete
+	@echo "[Ivette] main page"
+	@echo "   file://$(PWD)/doc/html/index.html"
 
 # --------------------------------------------------------------------------
 # --- Ivette Plugins
