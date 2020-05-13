@@ -94,7 +94,7 @@ struct
       Hashtbl.add locs tag loc ;
       tag
 
-  let lookup = Hashtbl.find (STATE.get()).locs
+  let lookup tag = Hashtbl.find (STATE.get()).locs tag
 
   type t = localizable
   let syntax = Sy.publish ~page:Data.page ~name:"marker"
