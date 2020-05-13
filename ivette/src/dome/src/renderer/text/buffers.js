@@ -82,6 +82,8 @@ export class RichTextBuffer extends Emitter {
     super();
     const { mode , maxlines } = props ;
     this._doc = new CodeMirror.Doc('',mode);
+    this._operations = 0 ;
+    this._editors = [] ;
     this._stacked = [] ;
     this._edited = false ;
     this._focused = false ;
@@ -439,18 +441,76 @@ is blocked.
   // --------------------------------------------------------------------------
 
   /**
-     @summary Linked CodeMirror document.
+     @summary Bind this buffer to a CodeMirror instance.
+     @param {CodeMirror} cm - code mirror instance to link this document in.
+     @return Document previous document of the instance
      @description
-     Returns a CodeMirror document linked to this buffer (with shared history).
+     Returns the CodeMirror document _previously_ linked to the `cm` instance.
   */
-  linkedDoc() { return this._doc.linkedDoc( { sharedHist: true } ); }
+  link(cm) {
+    const newDoc = this._doc.linkedDoc( { sharedHist: true } );
+    const oldDoc = cm.swapDoc( newDoc );
+    this._editors.push(cm);
+    if (this._operations > 0) cm.startOperation();
+    return oldDoc;
+  }
 
   /**
      @summary Release a linked CodeMirror document.
+     @param {CodeMirror} cm - the code mirror instance to unlink
+     @param {Document} previous document of the instance.
      @description
-     Unlinks a CodeMirror document obtained by `linkedDoc()`.
+     Unlinks a CodeMirror document previously linked by `link(cm)`.
   */
-  unlinkDoc(doc) { this._doc.unlinkDoc( doc ); }
+  unlink(cm) {
+    const oldDoc = cm.getDoc();
+    this._doc.unlinkDoc( oldDoc );
+    this._editors = this._editors.filter((cm0) => cm0 !== cm);
+    if (this._operations > 0) cm.endOperation();
+  }
+
+  // --------------------------------------------------------------------------
+  // --- Stacked Operations
+  // --------------------------------------------------------------------------
+
+  /**
+     @summary Batch heavy operations on editors
+     @param {function} job - a function performing the operations (can return a promise)
+     @return {promise} the promised job
+     @description
+     Uses code mirror `cm.operation()` to batch the updating operations performed on the
+     buffer.
+  */
+  operation(job) {
+
+    // Invariant: this._operations is the number of batched job still running
+    // Invariant: when pending job are running, all linked this._editors are started
+    // Second invariant is also maintained by link and unlink methods
+
+    const forEachEditor = (fn) => {
+      this._editors.forEach((cm) => {
+        try { fn(cm); } catch(e) { console.err('[Dome.text.buffers]',e); }
+      });
+    };
+
+    const startOperation = () => {
+      this._operations ++;
+      if (this._operations == 1)
+        forEachEditor((cm) => cm.startOperation());
+    };
+
+    const endOperation = () => {
+      this._operations --;
+      if (this._operations == 0) {
+        forEachEditor((cm) => cm.endOperation());
+      }
+    };
+
+    return Promise.resolve()
+      .then(startOperation)
+      .then(job)
+      .finally(endOperation);
+  }
 
 }
 

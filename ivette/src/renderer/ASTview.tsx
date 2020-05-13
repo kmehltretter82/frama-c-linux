@@ -42,11 +42,7 @@ async function loadAST(buffer: any, theFunction?: string, theMarker?: string) {
         endpoint: 'kernel.ast.printFunction',
         params: theFunction,
       });
-      const doc = buffer.getDoc();
-      const cm = doc.getEditor();
-      /* Buffer all the changes and only update the CodeMirror instance
-         afterwards. This is crucial for performance. */
-      cm.operation(() => {
+      buffer.operation(() => {
         buffer.clear();
         if (!data)
           buffer.log('// No code for function ', theFunction);
