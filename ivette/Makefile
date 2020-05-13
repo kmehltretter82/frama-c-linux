@@ -28,9 +28,21 @@ lint: dome-pkg dome-templ
 # --- Ivette Documentation
 # --------------------------------------------------------------------------
 
+GUIDES= src/dome/doc/guides
+VERSION=$(shell echo "console.log(require('./package.json').version)" | node -)
+
 doc:
 	@echo "[Ivette] documentation"
 	@yarn run typedoc
+	@mkdir -p doc/html/guides
+	@find $(GUIDES) -name "*.md" -exec cp -f {} doc/html/guides/ \;
+	@find doc/html/guides -name "*.md" -print -exec pandoc \
+		--standalone --toc --toc-depth=2 --to html \
+		--metadata title="Ivette Documentation" \
+		--metadata version="v$(VERSION)" \
+		--template doc/pandoc/template.html \
+		--lua-filter doc/pandoc/href.lua \
+		{} -o {}.html \; -delete
 
 # --------------------------------------------------------------------------
 # --- Ivette Plugins
