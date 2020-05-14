@@ -18,16 +18,31 @@ From the `./ivette` sub-directory of Frama-C main directory:
 $ make app
 ```
 
-## Typescript Editors
+## Typescript with Emacs
 
-Emacs mode configuration can be setup with Typescript, Web-mode and Tide packages
-which are all available with MELPA. For configuring your `.emacs` accordingly,
+Emacs mode configuration can be setup with Typescript, Web-mode and Tide packages.
+You can install them with `M-x package-install`:
+
+```
+M-x package-refresh-contents ;; updates your index
+M-x package-install web-mode
+M-x package-install typescript-mode
+M-x package-install tidse
+```
+
+For configuring your `.emacs` accordingly,
 please look at the `share/typescript-config.el` file.
-This setup the Tide package to work with
+It setup the Tide package to work with
 `typescript-mode` for `*.ts` files (see also `tsfmt.json` config file)
 and `web-mode` for `*.tsx` files.
 
-VS-Code is also known to work out of the box.
+Usefull commands:
+```
+M-. goto definition
+M-, back to previous point
+M-x tide-documentation-at-point
+M-x tide-error-at-point
+```
 
 ## Coding Guidelines
 

@@ -19,6 +19,7 @@
 (defun setup-txs-mode ()
   (interactive)
   (when (string-equal "tsx" (file-name-extension buffer-file-name))
+    (setq web-mode-enable-auto-quoting nil)
     (setup-tide-mode)))
 
 ;; aligns annotation to the right hand side
