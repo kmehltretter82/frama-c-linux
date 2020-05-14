@@ -9,6 +9,7 @@ variables:
     CURRENT: $CI_COMMIT_REF_NAME
     DEFAULT: "stable/scandium"
     FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
+    OCAML: "4_08"
 
 check-no-old-frama-c:
   stage: git-update
@@ -21,8 +22,6 @@ check-no-old-frama-c:
 #avoid a nix error https://github.com/NixOS/nix/issues/2087
 git-update:
   stage: git-update
-  variables:
-    OCAML: "4_05"
   script:
    - nix/frama-ci.sh instantiate --eval -A frama-c.src.outPath
   tags:
@@ -30,8 +29,6 @@ git-update:
 
 frama-c:
   stage: build
-  variables:
-    OCAML: "4_05"
   script:
    - nix/frama-ci.sh build -A frama-c.installed
   tags:
@@ -39,8 +36,6 @@ frama-c:
 
 lint:
   stage: build
-  variables:
-    OCAML: "4_05"
   script:
    - nix/frama-ci.sh build -A frama-c.lint
   coverage: '/lint coverage: \d+\.\d+/'
@@ -49,8 +44,6 @@ lint:
 
 tests:
   stage: tests
-  variables:
-    OCAML: "4_05"
   script:
    - nix/frama-ci.sh build -A frama-c.tests
   tags:
@@ -58,8 +51,6 @@ tests:
 
 wp-qualif:
   stage: tests
-  variables:
-    OCAML: "4_05"
   script:
    - nix/frama-ci.sh build -A frama-c.wp-qualif
   tags:
@@ -68,8 +59,6 @@ wp-qualif:
 
 genassigns:
   stage: tests
-  variables:
-    OCAML: "4_05"
   script:
    - nix/frama-ci.sh build -A genassigns.tests
   tags:
@@ -77,8 +66,6 @@ genassigns:
 
 counter-examples:
   stage: tests
-  variables:
-    OCAML: "4_05"
   script:
    - nix/frama-ci.sh build -A counter-examples.tests
   tags:
@@ -86,8 +73,6 @@ counter-examples:
 
 acsl-importer:
   stage: tests
-  variables:
-    OCAML: "4_05"
   script:
    - nix/frama-ci.sh build -A acsl-importer.tests
   tags:
@@ -95,8 +80,6 @@ acsl-importer:
 
 volatile:
   stage: tests
-  variables:
-    OCAML: "4_05"
   script:
    - nix/frama-ci.sh build -A volatile.tests
   tags:
@@ -104,8 +87,6 @@ volatile:
 
 Security:
   stage: tests
-  variables:
-    OCAML: "4_05"
   script:
    - nix/frama-ci.sh build -A security.tests
   tags:
@@ -113,8 +94,6 @@ Security:
 
 CFP:
   stage: tests
-  variables:
-    OCAML: "4_05"
   script:
    - nix/frama-ci.sh build -A context-from-precondition.tests
   tags:
@@ -122,8 +101,6 @@ CFP:
 
 build-distrib-tarball:
   stage: build
-  variables:
-    OCAML: "4_05"
   script:
    - nix/frama-ci.sh build -A frama-c.build-distrib-tarball
   tags:
@@ -131,8 +108,6 @@ build-distrib-tarball:
 
 build-from-distrib-tarball:
   stage: tests
-  variables:
-    OCAML: "4_05"
   script:
    - nix/frama-ci.sh build -A frama-c.build-from-distrib-tarball
   tags:
@@ -140,8 +115,6 @@ build-from-distrib-tarball:
 
 .build_template: &internal_template
   stage: distrib_and_compatibility
-  variables:
-    OCAML: "4_05"
   tags:
    - nix
 
@@ -179,16 +152,14 @@ frama-c-ocaml-4.07:
     OCAML: "4_07"
   <<: *frama-c-ocaml
 
-#frama-c-ocaml-4.08:
-#  variables:
-#    OCAML: "4_08"
-#  <<: *frama-c-ocaml
+frama-c-ocaml-4.05:
+  variables:
+    OCAML: "4_05"
+  <<: *frama-c-ocaml
 
 
 caveat-importer:
   stage: tests
-  variables:
-    OCAML: "4_05"
   script:
    - nix/frama-ci.sh build -A caveat-importer.tests
   tags:
@@ -196,8 +167,6 @@ caveat-importer:
 
 mthread:
   stage: tests
-  variables:
-    OCAML: "4_05"
   script:
    - nix/frama-ci.sh build -A mthread.tests
   tags:
@@ -205,8 +174,6 @@ mthread:
 
 pathcrawler:
   stage: tests
-  variables:
-    OCAML: "4_05"
   script:
    - nix/frama-ci.sh build -A pathcrawler.tests
   tags:
@@ -214,8 +181,6 @@ pathcrawler:
 
 e-acsl-tests-dev:
   stage: tests
-  variables:
-    OCAML: "4_05"
   script:
    - nix/frama-ci.sh build -A frama-c.e-acsl-tests-dev
   tags:

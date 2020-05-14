@@ -145,10 +145,18 @@ wp-qualif: ./bin/toplevel.opt ./bin/ptests.opt
 	./bin/ptests.opt src/plugins/wp/tests -config qualif -error-code
 
 wp-qualif-update: ./bin/toplevel.opt ./bin/ptests.opt
-	FRAMAC_WP_CACHE=update ./bin/ptests.opt src/plugins/wp/tests -config qualif -error-code
+	FRAMAC_WP_CACHE=update \
+		./bin/ptests.opt src/plugins/wp/tests -config qualif
+
+wp-qualif-upgrade: ./bin/toplevel.opt ./bin/ptests.opt
+	FRAMAC_WP_CACHE=update \
+	FRAMAC_WP_SCRIPT=update \
+		./bin/ptests.opt src/plugins/wp/tests -config qualif
 
 wp-qualif-cleanup: ./bin/toplevel.opt ./bin/ptests.opt
-	FRAMAC_WP_CACHE=cleanup ./bin/ptests.opt src/plugins/wp/tests -config qualif -error-code
+	FRAMAC_WP_CACHE=cleanup \
+	FRAMAC_WP_SCRIPT=update \
+		./bin/ptests.opt src/plugins/wp/tests -config qualif
 
 # --------------------------------------------------------------------------
 # --- Dynamic Plugin                                                     ---

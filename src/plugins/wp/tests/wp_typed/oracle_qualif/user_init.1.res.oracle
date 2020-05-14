@@ -36,6 +36,7 @@
   Qed:            11 
   Script:         12 
   Alt-Ergo:        0  (unsuccess: 12)
+[wp] Updated session with 12 new valid scripts.
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   init_t2_v2                3        -        8       100%

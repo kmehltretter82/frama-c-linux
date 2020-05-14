@@ -3,10 +3,10 @@
 */
 
 /* run.config_qualif
-   OPT: -wp-prover=why3:alt-ergo -wp-prop=-lack -wp-timeout 90 -then -wp-rte -wp -wp-prop=-lack
+   OPT: -wp-rte -wp-prover=alt-ergo,script -wp-prop=-lack
 */
 
-// The use '-wp-prover=z3,why3:alt-ergo' gives better results.
+// The use '-wp-prover=z3,why3:alt-ergo' or using Alt-Ergo 2.3.0 gives better results.
 
 typedef unsigned uint32_t ;
 typedef unsigned long long uint64_t ;
