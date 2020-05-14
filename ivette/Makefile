@@ -8,7 +8,7 @@ DOME_API=./src/frama-c
 COPYRIGHT=CEA LIST / LSL
 # --------------------------------------------------------------------------
 
-.PHONY: all app dev doc dist typecheck lint
+.PHONY: all app dev doc serve dist typecheck lint
 
 all: typecheck lint app
 
@@ -31,7 +31,9 @@ lint: dome-pkg dome-templ
 GUIDES= src/dome/doc/guides
 VERSION=$(shell echo "console.log(require('./package.json').version)" | node -)
 
-doc:
+NODEBIN= ./node_modules/.bin
+
+doc: $(NODEBIN)/typedoc
 	@echo "[Ivette] documentation"
 	@yarn run typedoc
 	@mkdir -p doc/html/guides
@@ -47,6 +49,15 @@ doc:
 		{} -o {}.html \; -delete
 	@echo "[Ivette] main page"
 	@echo "   file://$(PWD)/doc/html/index.html"
+
+# For searching the doc
+serve: $(NODEBIN)/serve
+	@echo "[Ivette] serve doc documentation"
+	@yarn run serve doc/html
+
+$(NODEBIN)/%:
+	@echo "[Node] install package $*"
+	yarn add -D $*
 
 # --------------------------------------------------------------------------
 # --- Ivette Plugins
