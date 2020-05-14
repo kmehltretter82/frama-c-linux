@@ -34,10 +34,11 @@ VERSION=$(shell echo "console.log(require('./package.json').version)" | node -)
 NODEBIN= ./node_modules/.bin
 
 doc: $(NODEBIN)/typedoc
-	@echo "[Ivette] documentation"
+	@echo "\n[Ivette] documentation"
+	@rm -fr doc/html
 	@yarn run typedoc
 	@mkdir -p doc/html/guides
-	@echo "[Ivette] guides"
+	@echo "\n[Ivette] guides"
 	@find $(GUIDES) -name "*.md" -exec cp -f {} doc/html/guides/ \;
 	@find doc/html/guides -name "*.md" -print -exec pandoc \
 		--standalone --toc --toc-depth=2 --to html \
@@ -47,7 +48,7 @@ doc: $(NODEBIN)/typedoc
 		--metadata-file=doc/pandoc/index.json \
 		--lua-filter doc/pandoc/href.lua \
 		{} -o {}.html \; -delete
-	@echo "[Ivette] main page"
+	@echo "\n[Ivette] main page"
 	@echo "   file://$(PWD)/doc/html/index.html"
 
 # For searching the doc
