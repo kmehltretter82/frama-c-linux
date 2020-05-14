@@ -18,8 +18,7 @@
 
 (defun setup-txs-mode ()
   (interactive)
-  (when (string-equal "tsx"
-                      (file-name-extension buffer-file-name))
+  (when (string-equal "tsx" (file-name-extension buffer-file-name))
     (setup-tide-mode)))
 
 ;; aligns annotation to the right hand side

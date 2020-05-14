@@ -1,4 +1,7 @@
-/** @module dome/system */
+/**
+   @packageDocumentation
+   @module dome/system
+*/
 
 // --------------------------------------------------------------------------
 // --- Evolved Spawn Process

@@ -2,7 +2,10 @@
 // --- Tables
 // --------------------------------------------------------------------------
 
-/** @module dome/table/views */
+/**
+   @packageDocumentation
+   @module dome/table/views
+*/
 
 import _ from 'lodash' ;
 import React from 'react' ;
@@ -153,17 +156,12 @@ const computeWidth = (elt) => {
 
 
    By default, values are obtained from the underlying model by invoking
-   [Model.getValue](module-dome_table_models.Model.html#getValue) with the column
-   identifier.
-
-   The default `renderValue` renders the item's value
-   packed in a `<label>` with class `dome-text-data` as described in the
-   [Styling Component](tutorial-styling.html) tutorial.
+   [[Model.getValue]] with the column identifier.
 
    This separation of concerns allows for defining
    Column types, where for instance the renderer is already defined and you only need to
    know how to extract the expected value of items.
-   See [DefineColumn](module-dome_table_views.DefineColumn.html)
+   See [[DefineColumn]]
    for more informations and examples.
 
    A table should have at least one extensible column to occupy the available width.
@@ -229,8 +227,7 @@ const defaultVisible = (visible) => {
    @return {Column} a new Column class of Component
    @description
 
-   Allow to define specialized instances of
-   [Column](module-dome_table_views.Column.html)
+   Allow to define specialized instances of [[Column]].
 
    @example // Example of column type
    import { DefineColumn } from 'dome/table/views' ;
@@ -293,11 +290,11 @@ const DEFAULT_STATE = { width:{}, resize:{}, visible:{} };
    datasets.
 
    A table shall be connected to an instance of
-   [Model](module-dome_table_models.Model.html) class to retrieve the data and
+   [[Model]] class to retrieve the data and
    get informed of data updates.
 
    The table columns shall be instances of
-   [Column](module-dome_table_views.Column.html) class.
+   [[Column]] class.
 
    Clicking on table headers trigger re-ordering callback on the model with the
    expected column and direction, unless disabled _via_ the column

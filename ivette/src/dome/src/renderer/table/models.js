@@ -2,7 +2,10 @@
 // --- Models
 // --------------------------------------------------------------------------
 
-/** @module dome/table/models */
+/**
+   @packageDocumentation
+   @module dome/table/models
+*/
 
 import _ from 'lodash' ;
 import { SortDirection } from 'react-virtualized' ;
@@ -29,12 +32,6 @@ export const DESC = SortDirection.DESC ;
    A Model is responsible for keeping the tables and lists views in sync
    with their associated data sets. The model listens for updates, retrieves
    items from their index, and re-render the views when necessary.
-
-
-   Model could be part of the global _Application State_, or part of a
-   statefull React Component, depending on your need as described in
-   the [Application Design](tutorial-application.html) tutorial.
-
 
    Several tables may connect to the same table model, but they will share the
    same number and ordering of items. However, each connected table will only
@@ -91,7 +88,7 @@ export const DESC = SortDirection.DESC ;
 
    ##### Model Helpers
 
-   The module [dome/table/arrays](module-dome_table_arrays.html) provides you with
+   The module [[dome/table/arrays]] provides you with
    usefull helpers to implement Models with filtering and ordering features.
 
 */

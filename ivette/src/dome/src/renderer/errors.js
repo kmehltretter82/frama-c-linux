@@ -2,11 +2,14 @@
 // --- Managing Errors
 // --------------------------------------------------------------------------
 
+/**
+   @packageDocumentation
+   @module dome/errors
+*/
+
 import React from 'react' ;
 import { Label } from 'dome/controls/labels' ;
 import { Button } from 'dome/controls/buttons' ;
-
-/** @module dome/errors */
 
 // --------------------------------------------------------------------------
 // --- Error Boundaries

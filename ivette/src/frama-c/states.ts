@@ -3,10 +3,11 @@
 // --------------------------------------------------------------------------
 
 /**
- *   @module frama-c/states
- *   @description
- *   Manage the current Frama-C project and projectified state values.
- */
+   @packageDocumentation
+   @module frama-c/states
+   @decsription
+   Manage the current Frama-C project and projectified state values.
+*/
 
 import _ from 'lodash';
 import React from 'react';

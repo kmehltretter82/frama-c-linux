@@ -2,7 +2,10 @@
 // --- Labels
 // --------------------------------------------------------------------------
 
-/** @module dome/controls/labels */
+/**
+   @packageDocumentation
+   @module dome/controls/labels
+*/
 
 import React from 'react' ;
 import { Icon } from './icons' ;

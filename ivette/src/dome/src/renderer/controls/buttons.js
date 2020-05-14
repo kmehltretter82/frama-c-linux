@@ -3,6 +3,7 @@
 // --------------------------------------------------------------------------
 
 /**
+   @packageDocumentation
    @module dome/controls/buttons
    @description
 
@@ -346,7 +347,7 @@ export const Switch = (props) => {
    @property {string} [className] - Additional class
    @property {object} [style] - Additional style
    @description
-   See also [RadioGroup](module-dome_controls_buttons.RadioGroup.html).
+   See also [[RadioGroup]].
 
    <strong>Note:</strong> property `value` and `selection` are consistent
    with HTML standards and DOM element properties.
@@ -382,8 +383,7 @@ export const Radio = (props) => {
    @property {string} [className] - Additional class of the container `<div>`
    @property {object} [style] - Additional style of the container `<div>`
    @description
-   Childrens of the `RadioGroup` shall be [Radio](module-dome_controls_buttons.Radio.html)
-   buttons.
+   Childrens of the `RadioGroup` shall be [[Radio]] buttons.
 
    The selected value of the group is broadcasted to the radio buttons. Their
    callbacks are activated _before_ the radio group one, if any.

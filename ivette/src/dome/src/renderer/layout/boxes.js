@@ -2,41 +2,39 @@
 // --- Box Layout
 // --------------------------------------------------------------------------
 
-/** @module dome/layout/boxes
-    @description
+/**
+   @packageDocumentation
+   @module dome/layout/boxes
+   @description
 
-This modules offers several `<div>` containers with various
-predefined layout.
+   This modules offers several `<div>` containers with various
+   predefined layout.
 
-Boxes are the very elementary way to layout components horizontally
-or vertically. The different kinds of proposed boxes differ in how they
-extends in both directions: normal boxes extends
-along their layout direction, _pack_ boxes don't extends and _fill_ boxes
-extends along both directions.
+   Boxes are the very elementary way to layout components horizontally
+   or vertically. The different kinds of proposed boxes differ in how they
+   extends in both directions: normal boxes extends
+   along their layout direction, _pack_ boxes don't extends and _fill_ boxes
+   extends along both directions.
 
-Grids layout their component from left-to-right inside predefined _columns_,
-then vertically by wrapping cells in rows.
+   Grids layout their component from left-to-right inside predefined _columns_,
+   then vertically by wrapping cells in rows.
 
-The various containers are summarized on the table below:
+   The various containers layout and extensibility is listed below:
+    - [[Hbox]] horizontal, fixed height
+    - [[Vbox]] vertical, fixed width
+    - [[Hpack]] horizontal, fixed dimensions
+    - [[Vpack]] vertical, fixed dimensions
+    - [[Hfill]] horizontal, extends in both directions
+    - [[Vfill]] vertical, extends in both directions
+    - [[Grid]] uses CSS grid columns, extends in both directions
+    - [[Scroll]] scrolls its content
 
-| **Box** | Layout | Extends |
-|:-------------:|:-----------:|:----------:|:----------:|
-| [Hbox](module-dome_layout_boxes.Hpack.html) | horiz. | horiz. |
-| [Vbox](module-dome_layout_boxes.Vpack.html) | vert. | vert. |
-| [Hpack](module-dome_layout_boxes.Hpack.html) | horiz. | none |
-| [Vpack](module-dome_layout_boxes.Vpack.html) | vert. | none |
-| [Hfill](module-dome_layout_boxes.Hpack.html) | horiz. | both |
-| [Vfill](module-dome_layout_boxes.Vpack.html) | vert. | both |
-| [Grid](module-dome_layout_boxes.Hpack.html) | columns | both |
-| [Scroll](module-dome_layout_boxes.Scroll.html) | n/a | both |
+   Inside a box, you may add `<Space/>` and `<Filler/>` to separate items.
+   Inside a grid, you may also use `<Space/>` or an empty `<div/>` for empty cells.
 
-Inside a box, you may add `<Space/>` and `<Filler/>` to separate items.
-Inside a grid, you may also use `<Space/>` or an empty `<div/>` for empty cells.
-
-<strong>Warning:</strong> large elements will be clipped if they overflow.
-If you want to add scrolling capabilities to some item that does not manage overflow
-natively, place it inside a `<Scroll/>` sub-container.
-
+   <strong>Warning:</strong> large elements will be clipped if they overflow.
+   If you want to add scrolling capabilities to some item that does not manage overflow
+   natively, place it inside a `<Scroll/>` sub-container.
 */
 
 import React from 'react';

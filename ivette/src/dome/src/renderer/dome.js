@@ -1,4 +1,5 @@
 /**
+   @packageDocumentation
    @module dome(renderer)
    @description
 
@@ -7,9 +8,13 @@
    This modules manages your main application window
    and its interaction with the main process.
 
-   @example // File 'src/renderer/index.js':
+   Example:
+
+   ```typescript
+   // File 'src/renderer/index.js':
    import Application from './Application.js' ;
    Dome.setContent( Application );
+   ```
  */
 
 import _ from 'lodash' ;
@@ -51,7 +56,7 @@ export const DEVEL = System.DEVEL ;
 
 /** @summary System platform.
     @description
-    Same as [`platform`](module-dome_system.html#.platform) from `dome/system` */
+    Same as `platform` from `dome/system` */
 export const platform = System.platform ;
 
 // --------------------------------------------------------------------------
@@ -127,9 +132,9 @@ Register a callback on [dome.command](#~event:'dome.reload') event,
 emitted by the `Main` process when the application instance is launched.
 
 See also:
- - [Dome.useCommand](#.useCommand)
- - [System.getArguments](module-dome_system.html#.getArguments)
- - [System.getWorkingDir](module-dome_system.html#.getWorkingDir)
+ - [[useCommand]]
+ - `System.getArguments`
+ - `System.getWorkingDir`
 */
 export function onCommand(job) { emitter.on('dome.command',job); }
 
@@ -474,7 +479,6 @@ ipcRenderer.on('dome.ipc.settings.update',(sender,patches) => {
     @param {string} key User's Setting Key (`'dome.*'` are reserved keys)
     @param {any} [defaultValue] - default value if the key is not present
     @return {any} associated value of object or `undefined`.
-    @tutorial application
     @description
     This settings are local to the current window, but persistently
     saved in the user's home directory.<br/>
@@ -487,7 +491,6 @@ export function getWindowSetting( key, defaultValue ) {
 /** @summary Set value into local window (persistent) settings.
     @param {string} key to store the data
     @param {any} value associated value or object
-    @tutorial application
     @description
     This settings are local to the current window, but persistently
     saved in the user's home directory.<br/>
@@ -502,7 +505,6 @@ export function setWindowSetting( key , value ) {
     @param {string} key User's Setting Key (`'dome.*'` are reserved keys)
     @param {any} [defaultValue] - default value if the key is not present
     @return {any} associated value of object or `undefined`.
-    @tutorial application
     @description
     These settings are global to the application and persistently
     saved in the user's home directory.<br/>
@@ -515,7 +517,6 @@ export function getGlobalSetting( key, defaultValue ) {
 /** @summary Set value into application (persistent) settings.
     @param {string} key to store the data
     @param {any} value associated value or object
-    @tutorial application
     @description
     These settings are global to the current window, but persistently
     saved in the user's home directory. Updated values are broadcasted
@@ -602,7 +603,6 @@ export function useForceUpdate()
 /**
    @summary Hook to re-render on Dome events (Custom React Hook).
    @param {string} [event,...] - event names (default: `'dome.update'`)
-   @tutorial hooks
    @description
    Returns nothing.
 */
@@ -621,7 +621,6 @@ export function useUpdate(...evts)
    @summary Hook to register callbacks to Dome events (Custom React Hook).
    @param {string} event - Event to register on
    @param {function} callback - The callback to register
-   @tutorial hooks
    @description
    Register the callback on event until the component is unmount.
    Do not force the component to re-render (unless the callback does).<br/>
@@ -640,7 +639,6 @@ export function useEvent(evt,callback)
    @param {EventEmitter} emitter - event emitter
    @param {string} event - Event to register on
    @param {function} callback - The callback to register
-   @tutorial hooks
    @description
    Register the callback on event until the component is unmount.
    Do not force the component to re-render (unless the callback does).<br/>
@@ -663,12 +661,11 @@ const NULL = {}; // Dummy initial value
 /**
    @summary Hook for command-line interface (Custom React Hook).
    @return {array} `[argv,wdir]` command-line arguments and working directory
-   @tutorial hooks
    @description
    Returns the command-line arguments and working directory for the application
    instance running in the window. Automatically updated on `dome.command` events.
 
-   See also [Dome.onCommand](#.onCommand) event handler.
+   See also [[onCommand]] event handler.
 */
 export function useCommand() {
   useUpdate('dome.command');
@@ -711,7 +708,6 @@ function useSettings( local, settings, defaultValue )
    @param {string} [settings] - optional window settings to backup the value
    @param {any} [defaultValue] - the initial (and default) value
    @return {array} `[value,setValue]` of the local state
-   @tutorial hooks
    @description
    Similar to `React.useState()` with persistent _window_ settings.
    When the settings key is undefined, it simply uses a local React state.
@@ -731,7 +727,6 @@ export function useState( settings, defaultValue )
    @param {string} [settings] - optional window settings to backup the value
    @param {boolean} [defaultValue] - the initial value (default is `false`)
    @return {array} `[value,flipValue]` for the local state
-   @tutorial hooks
    @description
    Same as [useState](#.useState) with a boolean value that can be set or flipped:
     - `flipValue()` change the value to its opposite;
@@ -816,7 +811,6 @@ export function useHistory( settings, defaultValue )
    @param {string} settings - global settings for storing the value
    @param {any} [defaultValue] - the initial and default value
    @return {array} `[value,setValue]` of the local state
-   @tutorial hooks
    @description
    Similar to `React.useState()` with persistent _global_ settings.
    When the settings key is undefined, it simply uses a local React state.
@@ -981,7 +975,6 @@ const DEC_CLOCK = (period) => {
    @summary Synchronized start & stop timer (Custom React Hook).
    @param {number} period - timer interval, in milliseconds (ms)
    @param {boolean} [initStart] - whether to initially start the timer (default is `false`)
-   @tutorial hooks
    @return {timer} Timer object
    @description
    Create a local timer, synchronized on a global clock, that can be started

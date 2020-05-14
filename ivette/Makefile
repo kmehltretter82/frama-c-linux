@@ -8,7 +8,7 @@ DOME_API=./src/frama-c
 COPYRIGHT=CEA LIST / LSL
 # --------------------------------------------------------------------------
 
-.PHONY: all app dev doc dist typecheck lint
+.PHONY: all app dev doc serve dist typecheck lint
 
 all: typecheck lint app
 
@@ -28,23 +28,43 @@ lint: dome-pkg dome-templ
 # --- Ivette Documentation
 # --------------------------------------------------------------------------
 
-# can also use dome-doc to generate Dome-only documentation
+VERSION=$(shell echo "console.log(require('./package.json').version)" | node -)
 
-D_JSDOC=$(CURDIR)/node_modules/.bin/jsdoc
-D_ICONS=$(addprefix $(DOME)/doc/template/gallery-, head.html icons.html tail.html)
-D_OUT=./doc/html
+DOC_ICONS_CSS= src/dome/doc/gallery.css
+DOC_ICONS_MAKE= src/dome/doc/iconsmd.js
+DOC_ICONS_DATA= src/dome/src/renderer/controls/icons.json
+DOC_GUIDES= src/dome/doc/guides
 
-doc: $(D_JSDOC) $(D_ICONS)
-	@echo "[Ivette] documentation"
-	@rm -fr ./build ./doc
-	@yarn run build
-	@mkdir -p ./doc/html
-	@(APP=$(APP) COPYRIGHT="$(COPYRIGHT)" DOME=$(DOME) \
-	  yarn exec jsdoc -- -c jsdoc.json -d doc/html)
-	@cat $(D_ICONS) > $(D_OUT)/tutorial-icons.html
-	@cp -f $(DOME)/doc/gallery.css $(D_OUT)/styles/
-	@cp -f $(DOME)/doc/tutorials/*.png $(D_OUT)/
-	@echo "[Ivette]   $(DOME_DOC)/index.html"
+NODEBIN= ./node_modules/.bin
+
+doc: $(NODEBIN)/typedoc
+	@echo "\n[Ivette] documentation"
+	@rm -fr doc/html
+	@yarn run typedoc
+	@mkdir -p doc/html/guides
+	@echo "\n[Ivette] guides"
+	@node $(DOC_ICONS_MAKE) $(DOC_ICONS_DATA) > doc/html/guides/icons.md
+	@cp $(DOC_ICONS_CSS) doc/html/assets/css/
+	@find $(DOC_GUIDES) -name "*.md" -exec cp -f {} doc/html/guides/ \;
+	@find doc/html/guides -name "*.md" -print -exec pandoc \
+		--standalone --toc --toc-depth=2 --to html \
+		--template doc/pandoc/template.html \
+		--metadata title="Ivette Documentation" \
+		--metadata version="v$(VERSION)" \
+		--metadata-file=doc/pandoc/index.json \
+		--lua-filter doc/pandoc/href.lua \
+		{} -o {}.html \; -delete
+	@echo "\n[Ivette] main page"
+	@echo "   file://$(PWD)/doc/html/index.html"
+
+# For searching the doc
+serve: $(NODEBIN)/serve
+	@echo "[Ivette] serve doc documentation"
+	@yarn run serve doc/html
+
+$(NODEBIN)/%:
+	@echo "[Node] install package $*"
+	yarn add -D $*
 
 # --------------------------------------------------------------------------
 # --- Ivette Plugins

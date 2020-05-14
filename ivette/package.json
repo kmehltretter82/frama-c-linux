@@ -44,6 +44,9 @@
     "html-loader": "1.0.0-alpha.0",
     "jsdoc": "^3.6.3",
     "react-hot-loader": "^4.12.20",
+    "serve": "^11.3.0",
+    "typedoc": "^0.17.6",
+    "typedoc-plugin-external-module-name": "^3.1.0",
     "typescript": "^3.8.3",
     "webpack": "^4.41.4"
   },

@@ -1,3 +1,15 @@
+## Dome Framework Guides
+
+- [Dome Framework](guides/dome.md.html)
+- [Quick Start](guides/quickstart.md.html)
+- [Live Editing](guides/hotreload.md.html)
+- [Application Design](guides/application.md.html)
+- [Application Development](guides/development.md.html)
+- [Styling Components](guides/styling.md.html)
+- [Custom Hooks](guides/hooks.md.html)
+- [Icon Gallery](guides/icons.md.html)
+- [Glossary](guides/glossary.md.html)
+
 ## Setup
 
 From the `./ivette` sub-directory of Frama-C main directory:
@@ -10,7 +22,8 @@ $ make app
 
 Emacs mode configuration can be setup with Typescript, Web-mode and Tide packages
 which are all available with MELPA. For configuring your `.emacs` accordingly,
-please look at the `EMACS.el`. This setup the Tide package to work with
+please look at the `share/typescript-config.el` file.
+This setup the Tide package to work with
 `typescript-mode` for `*.ts` files (see also `tsfmt.json` config file)
 and `web-mode` for `*.tsx` files.
 

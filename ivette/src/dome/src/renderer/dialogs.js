@@ -1,4 +1,5 @@
 /**
+   @packageDocumentation
    @module dome/dialogs
    @description
    Various kind of (modal) dialogs attached to the main application window.

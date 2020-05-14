@@ -2,7 +2,10 @@
 // ---  Lab View Component
 // --------------------------------------------------------------------------
 
-/** @module frama-c/labviews */
+/**
+   @packageDocumentation
+   @module frama-c/labviews
+*/
 
 import _ from 'lodash';
 import React from 'react';
@@ -527,8 +530,7 @@ function CustomGroup({
   title: sectionTitle,
   label: sectionLabel,
   components,
-}: any)
-{
+}: any) {
   const makeComponent = ({ id, label, title }: any) => {
     const itemId = getItemId('components', id);
     const disabled = Grids.getShapeItem(shape, itemId) !== undefined;

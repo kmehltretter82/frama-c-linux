@@ -2,7 +2,10 @@
 // --- SideBars
 // --------------------------------------------------------------------------
 
-/** @module dome/frame/sidebars */
+/**
+   @packageDocumentation
+   @module dome/frame/sidebars
+*/
 
 import React from 'react' ;
 import * as Dome from 'dome' ;
@@ -25,7 +28,6 @@ const SideBarContext = React.createContext();
    @property {function} [onSelection] - Selection callback
    @property {function} [onContextMenu] - Context Menu callback
    @description
-   See also [Frame](module-dome_layout_frames.Frame.html) containers.
 
    When a base settings is set on the sidebar, all contained
    sections and items are attributed derived settings based on their identifiers.
@@ -160,7 +162,7 @@ export function Section(props) {
    Context menu callback also triggers the selection callback (first).
    In case callbacks are defined from the englobing sidebar, both are invoked.
 
-   Badges can be single or multiple [Badge](module-dome_controls_icons.Badge.html) values.
+   Badges can be single or multiple [[Badge]] values.
    They are displayed stacked on the right edge of the item.
 
 **/

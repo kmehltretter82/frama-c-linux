@@ -3,9 +3,11 @@
 // --------------------------------------------------------------------------
 
 /**
- *  @module frama-c/server
- *  @description Manage the current Frama-C server/client interface
- */
+   @packageDocumentation
+   @module frama-c/server
+   @description
+   Manage the current Frama-C server/client interface
+*/
 
 import _ from 'lodash';
 import React from 'react';
