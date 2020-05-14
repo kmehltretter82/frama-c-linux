@@ -1,9 +1,11 @@
+default: all
+
+EACSL_DIR=../..
+include $(EACSL_DIR)/doc/Makefile.common
+
 ##########
 # Inputs #
 ##########
-
-VERSION_FILE=$(wildcard ../../../../../VERSION)
-EACSL_VERSION=$(shell cat $(VERSION_FILE))
 
 MAIN=main
 DEPS_MODERN=macros_modern.tex eacslversion.tex biblio.bib \
@@ -22,7 +24,6 @@ DEPS_MODERN=macros_modern.tex eacslversion.tex biblio.bib \
 ##############
 
 .PHONY: all e-acsl default
-default: all
 e-acsl: e-acsl-implementation.pdf e-acsl.pdf
 all: e-acsl
 
@@ -42,18 +43,12 @@ e-acsl.tex: e-acsl-implementation.tex Makefile
 
 $(MAIN).pdf: $(DEPS_MODERN)
 
-EACSL_DIR=../..
 DISTRIB_DIR=$(HOME)/frama-c/doc/www/distrib
 install: e-acsl-implementation.pdf e-acsl.pdf
 	mkdir -p $(EACSL_DIR)/doc/manuals
 	cp -f $^ $(EACSL_DIR)/doc/manuals
 
 include $(EACSL_DIR)/doc/support/MakeLaTeXModern
-
-eacslversion.tex: Makefile $(VERSION_FILE)
-	rm -f $@
-	printf '\\newcommand{\\eacslversion}{$(EACSL_VERSION)}' > $@
-	chmod a-w $@
 
 .PHONY: clean
 clean:
@@ -73,47 +68,3 @@ transf: transf.cmo transfmain.cmo
 	ocamlc -o $@ $^
 
 transfmain.cmo: transf.cmo
-
-#################
-# Generic rules #
-#################
-
-%.1: %.mp
-	mpost -interaction=batchmode $<
-
-%.mps: %.1
-	mv $< $@
-
-%.pp: %.tex pp
-	./pp -utf8 $< > $@
-
-%.pp: %.c pp
-	./pp -utf8 -c $< > $@
-
-%.tex: %.ctex pp
-	rm -f $@
-	./pp $< > $@
-	chmod a-w $@
-
-%.bnf: %.tex transf
-	rm -f $@
-	./transf $< > $@
-	chmod a-w $@
-
-%_modern.bnf: %.tex transf
-	rm -f $@
-	./transf -modern $< > $@
-	chmod a-w $@
-
-%.ml: %.mll
-	ocamllex $<
-
-%.pdf: %.tex
-	pdflatex $*
-	makeindex $*
-	bibtex $*
-	pdflatex $*
-	pdflatex $*
-
-%.cmo: %.ml
-	ocamlc -c $<
