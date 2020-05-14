@@ -443,16 +443,15 @@ is blocked.
   /**
      @summary Bind this buffer to a CodeMirror instance.
      @param {CodeMirror} cm - code mirror instance to link this document in.
-     @return Document previous document of the instance
      @description
-     Returns the CodeMirror document _previously_ linked to the `cm` instance.
+     Uses CodeMirror linked documents to allow several CodeMirror instances to be linked
+     to the same buffer.
   */
   link(cm) {
     const newDoc = this._doc.linkedDoc( { sharedHist: true } );
-    const oldDoc = cm.swapDoc( newDoc );
+    cm.swapDoc( newDoc );
     this._editors.push(cm);
     if (this._operations > 0) cm.startOperation();
-    return oldDoc;
   }
 
   /**
@@ -469,6 +468,16 @@ is blocked.
     if (this._operations > 0) cm.endOperation();
   }
 
+  /**
+     @summary Iterates over each linked CodeMirror instances
+     @description
+     The operation `fn` is performed on each code mirror
+     instance currently linked to this buffer.
+   */
+  forEach(fn) {
+    this._editors.forEach(fn);
+  };
+
   // --------------------------------------------------------------------------
   // --- Stacked Operations
   // --------------------------------------------------------------------------
@@ -478,20 +487,22 @@ is blocked.
      @param {function} job - a function performing the operations (can return a promise)
      @return {promise} the promised job
      @description
-     Uses code mirror `cm.operation()` to batch the updating operations performed on the
-     buffer.
+     Uses code mirror `cm.startOperation()` and `cm.sendOperation()` on all
+     linked editors to batch the updating operations performed on the
+     buffer. The batched updates can run asynchronously.
   */
   operation(job) {
 
-    // Invariant: this._operations is the number of batched job still running
-    // Invariant: when pending job are running, all linked this._editors are started
-    // Second invariant is also maintained by link and unlink methods
-
+    // Protect each start/end call against error
     const forEachEditor = (fn) => {
       this._editors.forEach((cm) => {
         try { fn(cm); } catch(e) { console.err('[Dome.text.buffers]',e); }
       });
     };
+
+    // Invariant: this._operations is the number of batched job still running
+    // Invariant: when pending job are running, all linked this._editors are started
+    // Second invariant is also maintained by link and unlink methods
 
     const startOperation = () => {
       this._operations ++;
