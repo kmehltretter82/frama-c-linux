@@ -25,5 +25,5 @@ The **Dome** framework provides you with the following facilities:
 ## References
 
 - [Custom Hooks](hooks.md)
-- [Icon Gallery](icons.md)
+- [Icons Gallery](icons.md)
 - [Glossary](glossary.md)

@@ -28,8 +28,12 @@ lint: dome-pkg dome-templ
 # --- Ivette Documentation
 # --------------------------------------------------------------------------
 
-GUIDES= src/dome/doc/guides
 VERSION=$(shell echo "console.log(require('./package.json').version)" | node -)
+
+DOC_ICONS_CSS= src/dome/doc/gallery.css
+DOC_ICONS_MAKE= src/dome/doc/iconsmd.js
+DOC_ICONS_DATA= src/dome/src/renderer/controls/icons.json
+DOC_GUIDES= src/dome/doc/guides
 
 NODEBIN= ./node_modules/.bin
 
@@ -39,7 +43,9 @@ doc: $(NODEBIN)/typedoc
 	@yarn run typedoc
 	@mkdir -p doc/html/guides
 	@echo "\n[Ivette] guides"
-	@find $(GUIDES) -name "*.md" -exec cp -f {} doc/html/guides/ \;
+	@node $(DOC_ICONS_MAKE) $(DOC_ICONS_DATA) > doc/html/guides/icons.md
+	@cp $(DOC_ICONS_CSS) doc/html/assets/css/
+	@find $(DOC_GUIDES) -name "*.md" -exec cp -f {} doc/html/guides/ \;
 	@find doc/html/guides -name "*.md" -print -exec pandoc \
 		--standalone --toc --toc-depth=2 --to html \
 		--template doc/pandoc/template.html \
