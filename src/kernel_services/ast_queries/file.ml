@@ -473,7 +473,7 @@ let parse_cabs = function
       else []
     in
     let define_args =
-      if Kernel.FramaCStdLib.get () && not (existing_machdep_macro ())
+      if not (existing_machdep_macro ())
       then [machdep_macro (Kernel.Machdep.get ())]
       else []
     in
