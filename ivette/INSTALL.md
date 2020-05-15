@@ -30,3 +30,13 @@ M-, back to previous point
 M-x tide-documentation-at-point
 M-x tide-error-at-point
 ```
+
+# VS Code
+
+VS Code has native support for Typescript (and JavaScript, of course), in terms
+of code navigation, syntax highlighting and formatting, compiler errors and
+warnings. The same holds for React development.
+
+Useful extensions:
+- `ESlint` provides support for lint errors and warnings;
+- `ES7 React/Redux/GraphQL/React-Native snippets` provides boilerplate snippets;
