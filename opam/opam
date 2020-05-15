@@ -1,7 +1,7 @@
 opam-version: "2.0"
 name: "frama-c"
 synopsis: "Platform dedicated to the analysis of source code written in C"
-version: "20.0"
+version: "21.0+dev"
 maintainer: "francois.bobot@cea.fr"
 authors: [
   "Michele Alberti"
@@ -50,7 +50,7 @@ authors: [
 homepage: "http://frama-c.com/"
 license: "GNU Lesser General Public License version 2.1"
 dev-repo: "git+https://git.frama-c.com/pub/frama-c.git"
-doc: "http://frama-c.com/download/user-manual-20.0-Calcium.pdf"
+doc: "http://frama-c.com/download/user-manual-21.0-Scandium.pdf"
 bug-reports: "https://bts.frama-c.com/"
 tags: [
   "deductive"
