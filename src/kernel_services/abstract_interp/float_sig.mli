@@ -119,5 +119,7 @@ module type S = sig
 
   val cos: round -> prec -> t -> t
   val sin: round -> prec -> t -> t
+  val acos: round -> prec -> t -> t
+  val asin: round -> prec -> t -> t
   val atan2: round -> prec -> t -> t -> t
 end

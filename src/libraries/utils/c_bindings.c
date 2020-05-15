@@ -134,6 +134,20 @@ value c_sinf(value x)
   return caml_copy_double(res);
 }
 
+value c_acosf(value x)
+{
+  float f = Double_val(x);
+  volatile float res = acosf(f); // see remarks above
+  return caml_copy_double(res);
+}
+
+value c_asinf(value x)
+{
+  float f = Double_val(x);
+  volatile float res = asinf(f); // see remarks above
+  return caml_copy_double(res);
+}
+
 value c_atan2f(value x, value y)
 {
   float fx = Double_val(x);

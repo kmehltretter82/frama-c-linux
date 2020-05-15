@@ -222,4 +222,6 @@ let pow round = generate Floating_point.powf ( ** ) round
 
 let cos round = generate Floating_point.cosf cos round
 let sin round = generate Floating_point.sinf sin round
+let acos round = generate Floating_point.acosf acos round
+let asin round = generate Floating_point.asinf asin round
 let atan2 round = generate Floating_point.atan2f atan2 round
