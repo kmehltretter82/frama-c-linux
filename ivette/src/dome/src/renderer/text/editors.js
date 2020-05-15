@@ -10,6 +10,7 @@
 import _ from 'lodash' ;
 import React from 'react' ;
 import * as Dome from 'dome' ;
+import { Vfill } from 'dome/layout/boxes' ;
 import CodeMirror from 'codemirror/lib/codemirror.js' ;
 
 import './style.css' ;
@@ -19,62 +20,10 @@ const CSS_HOVERED = 'dome-xText-hover' ;
 const CSS_SELECTED = 'dome-xText-select' ;
 
 // --------------------------------------------------------------------------
-// --- Text View
+// --- Code Mirror Instance Wrapper
 // --------------------------------------------------------------------------
 
-/**
-   @class
-   @summary Rich Text Editor.
-   @property {Buffer} buffer - associated Buffer holding the text content
-   @property {string} className - additional class name(s)
-   @property {object} style - additional CSS style
-   @property {number} fontSize - editor font-size
-   @property {string} selection - currently selected markder identifier
-   @property {function} onSelection - callback used when an identified marker is clicked
-   @property {function} onContextMenu - selection callback on right-click
-   @property {object} [...options] - additional CodeMirror
-      [configuration](https://codemirror.net/doc/manual.html#config) properties
-   @description
-
-   A component rendering the content of a text buffer, that shall be instances
-   of the `Buffer` base class.
-
-   The view is based on a [CodeMirror](https://codemirror.net) component linked with
-   the internal Code Mirror Document from the associated buffer.
-
-   Multiple views might share the same buffer as source content. The buffer will be
-   kept in sync with all its linked views.
-
-   The Text component never update its mounted NODE element, however, all property
-   modifications (including buffer) are propagated to the internal CodeMirror instance.
-   Undefined properties are set (or reset) to the CodeMirror defaults.
-
-   ##### Themes
-
-   The CodeMirror `theme` option allow you to style your document,
-   especially when using modes.
-   Themes are only accessible if you load the associated CSS style sheet.
-   For instance, to use the `'ambiance'` theme provided with CodeMirror, you shall
-   import `'codemirror/theme/ambiance.css'` somewhere in your application.
-
-   ##### Modes & Adds-On
-
-   You can install modes and adds-on provided by the CodeMirror distribution by
-   simply importing (once, before being used) the associated modules in your
-   application.  For instance, to use the `'javascript'` mode option, you shall
-   import `'codemirror/mode/javascript/javascript.js'` file in your application.
-
-   ##### Further Customization
-
-   You can register your own extensions directly into the global `CodeMirror`
-   class instance.  However, the correct instance must be retrieved by using
-   `import CodeMirror from 'codemirror/lib/codemirror.js'` ; using `from
-   'codemirror'` returns a different instance of `CodeMirror` class and will
-   not work.
-
- */
-
-export class Text extends React.Component {
+class CodeMirrorWrapper extends React.Component {
 
   constructor(props) {
     super(props);
@@ -372,12 +321,8 @@ export class Text extends React.Component {
   }
 
   render() {
-    const { className, fontSize, style } = this.props ;
-    const theStyle = Object.assign( {} , style );
-    if (fontSize) theStyle.fontSize = fontSize ;
     return (
-      <div className={'dome-xText ' + className}
-           style={theStyle}
+      <div className={'dome-xText'}
            ref={this.mountPoint}
            onClick={this.onClick}
            onContextMenu={this.onContextMenu}
@@ -388,6 +333,71 @@ export class Text extends React.Component {
            />);
   }
 
+}
+
+// --------------------------------------------------------------------------
+// --- Text View
+// --------------------------------------------------------------------------
+
+/**
+   @class
+   @summary Rich Text Editor.
+   @property {Buffer} buffer - associated Buffer holding the text content
+   @property {string} className - additional class name(s)
+   @property {object} style - additional CSS style
+   @property {number} fontSize - editor font-size
+   @property {string} selection - currently selected markder identifier
+   @property {function} onSelection - callback used when an identified marker is clicked
+   @property {function} onContextMenu - selection callback on right-click
+   @property {object} [...options] - additional CodeMirror
+      [configuration](https://codemirror.net/doc/manual.html#config) properties
+   @description
+
+   A component rendering the content of a text buffer, that shall be instances
+   of the `Buffer` base class.
+
+   The view is based on a [CodeMirror](https://codemirror.net) component linked with
+   the internal Code Mirror Document from the associated buffer.
+
+   Multiple views might share the same buffer as source content. The buffer will be
+   kept in sync with all its linked views.
+
+   The Text component never update its mounted NODE element, however, all property
+   modifications (including buffer) are propagated to the internal CodeMirror instance.
+   Undefined properties are set (or reset) to the CodeMirror defaults.
+
+   ##### Themes
+
+   The CodeMirror `theme` option allow you to style your document,
+   especially when using modes.
+   Themes are only accessible if you load the associated CSS style sheet.
+   For instance, to use the `'ambiance'` theme provided with CodeMirror, you shall
+   import `'codemirror/theme/ambiance.css'` somewhere in your application.
+
+   ##### Modes & Adds-On
+
+   You can install modes and adds-on provided by the CodeMirror distribution by
+   simply importing (once, before being used) the associated modules in your
+   application.  For instance, to use the `'javascript'` mode option, you shall
+   import `'codemirror/mode/javascript/javascript.js'` file in your application.
+
+   ##### Further Customization
+
+   You can register your own extensions directly into the global `CodeMirror`
+   class instance.  However, the correct instance must be retrieved by using
+   `import CodeMirror from 'codemirror/lib/codemirror.js'` ; using `from
+   'codemirror'` returns a different instance of `CodeMirror` class and will
+   not work.
+
+ */
+export function Text({ className, style, fontSize, ...props }) {
+  const theStyle = Object.assign( {} , style );
+  if (fontSize) theStyle.fontSize = fontSize ;
+  return (
+    <Vfill className={className} style={theStyle}>
+      <CodeMirrorWrapper {...props}/>
+    </Vfill>
+  );
 }
 
 // --------------------------------------------------------------------------
