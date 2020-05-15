@@ -277,29 +277,21 @@
     background: transparent ;
 }
 
-.dome-xIconButton:hover {
-    fill: #00b6ff ;
-}
+.dome-xIconButton:hover { fill: #000 ; }
 
-.dome-xIconButton-default {
-    fill: #777 ;
-}
+.dome-xIconButton-default { fill: #777 ; }
 
-.dome-xIconButton-selected { fill: #449bef ; }
+.dome-xIconButton-selected:not(:hover) { fill: #449bef ; }
+.dome-xIconButton-selected:hover { fill: #c54dae ; }
 
 .dome-xIconButton-positive { fill: #00d000 ; }
 
 .dome-xIconButton-negative { fill: #fb3832 ; }
 
-.dome-xIconButton-warning {
-    fill: #449bef ;
-}
+.dome-xIconButton-warning { fill: orange ; }
 
 .dome-xIconButton.dome-control-disabled,
-.dome-xIconButton.dome-control-disabled:hover
-{
-    fill: #eee ;
-}
+.dome-xIconButton.dome-control-disabled:hover { fill: #ddd ; }
 
 .dome-xIconButton.dome-control-hidden {
     visibility: hidden ;
