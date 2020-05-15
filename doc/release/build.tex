@@ -2,6 +2,16 @@
 
 The procedure for creating the source distribution.
 
+\section{Prerequisites}
+
+\begin{itemize}
+\item All tools needed to compile Frama-C (that you should have anyways)
+\item \texttt{bash} v4.0 or higher
+\item \texttt{git-lfs}
+\item GNU \texttt{parallel}
+\item a \TeX distribution
+\end{itemize}
+
 \section{Final checks}
 
 \begin{itemize}
@@ -137,7 +147,7 @@ manuals.
 %\texttt{install} target below).
 
 Run the script \texttt{doc/build-manuals.sh} to compile and install all manuals,
-even for E-ACSL.
+even for E-ACSL. Note that this script requires \texttt{GNU parallel}.
 
 Otherwise, if you want to do it \textbf{manually}, in each directory:
 \begin{shell}

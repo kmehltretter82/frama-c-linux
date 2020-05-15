@@ -24,8 +24,8 @@
 \usepackage{alltt}
 \makeindex
 
-\newcommand{\acslversion}{1.14\xspace}
-\newcommand{\version}{\acslversion\xspace}
+\newcommand{\eacsllangversion}{1.14\xspace}
+\newcommand{\version}{\eacsllangversion\xspace}
 
 \renewcommand{\textfraction}{0.01}
 \renewcommand{\topfraction}{0.99}
@@ -36,9 +36,9 @@
 \hbadness=10000
 
 \ifthenelse{\boolean{PrintImplementationRq}}%
-  {\coverpage{\vbox{\mbox{E-ACSL Version \version}\\[5mm]
+  {\coverpage{\vbox{\mbox{E-ACSL Version \eacsllangversion}\\[5mm]
 \mbox{\huge{Implementation in Frama-C plug-in E-ACSL}}\\[2mm]
-\mbox{\huge{version \eacslversion{}}}}}}%
+\mbox{\huge{version \eacslpluginversion{}}}}}}%
   {\coverpage{\vbox{\mbox{E-ACSL}\\[2mm]\vbox{\mbox{\huge{Executable ANSI/ISO C
           Specification Language}}}\\[2mm]
         \mbox{Version \version}}}}
@@ -48,7 +48,7 @@
 \vfill
 \title{E-ACSL\\[5mm]\huge{Executable ANSI/ISO C Specification Language}}%
 {Version \version{}\ifthenelse{\boolean{PrintImplementationRq}}%
-{~--~Frama-C plug-in E-ACSL version \eacslversion}{}}
+{~--~Frama-C plug-in E-ACSL version \eacslpluginversion}{}}
 
 \author{Julien Signoles}
 
