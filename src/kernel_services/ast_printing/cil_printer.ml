@@ -2115,6 +2115,9 @@ class cil_printer () = object (self)
            not state.print_cil_as_is &&
            not (Kernel.is_debug_key_enabled Kernel.dkey_print_bitfields) ->
          false
+       | "noreturn", [ ACons ("c11",[]) ]
+         when not state.print_cil_as_is ->
+         fprintf fmt "_Noreturn"; false
        | _ -> (* This is the default case *)
          (* Add underscores to the name *)
          let an' =

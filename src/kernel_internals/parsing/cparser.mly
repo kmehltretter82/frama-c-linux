@@ -1116,7 +1116,8 @@ decl_spec_wo_type:                         /* ISO 6.7 */
 |   REGISTER         { SpecStorage REGISTER, $1}
                                         /* ISO 6.7.4 */
 |   INLINE           { SpecInline, $1 }
-|   NORETURN         { SpecAttr (("noreturn",[])), $1 }
+|   NORETURN         { SpecAttr
+                         (("noreturn",[make_expr (VARIABLE "c11")])), $1 }
 |   cvspec           { $1 }
 |   attribute_nocv   { SpecAttr (fst $1), snd $1 }
 ;
