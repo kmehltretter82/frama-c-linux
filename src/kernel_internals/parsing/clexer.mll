@@ -139,12 +139,28 @@ let init_lexicon _ =
       ("__inline__", fun loc -> INLINE loc);
       ("inline", fun loc -> INLINE loc);
       ("__inline", fun loc -> INLINE loc);
-      ("_inline", fun loc ->
-                      if !Cprint.msvcMode then
-                        INLINE loc
-                      else
-                        IDENT ("_inline"));
-      ("_Noreturn", fun loc -> NORETURN loc);
+      ("_inline",
+       fun loc ->
+         if !Cprint.msvcMode then
+           INLINE loc
+         else begin
+           Kernel.(
+             warning
+               ~wkey:wkey_conditional_feature
+               "_inline is a MSVC keyword, \
+                use a msvc-specific machdep to enable it");
+           IDENT ("_inline")
+         end);
+      ("_Noreturn",
+       fun loc ->
+         if Kernel.C11.get () then NORETURN loc
+         else begin
+           Kernel.(
+             warning
+               ~wkey:wkey_conditional_feature
+               "_Noreturn is a C11 keyword, use -c11 option to enable it");
+           IDENT "_Noreturn"
+         end);
       ("__attribute__", fun loc -> ATTRIBUTE loc);
       ("__attribute", fun loc -> ATTRIBUTE loc);
       ("__blockattribute__", fun _ -> BLOCKATTRIBUTE);
