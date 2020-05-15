@@ -340,7 +340,6 @@ class CodeMirrorWrapper extends React.Component {
 // --------------------------------------------------------------------------
 
 /**
-   @class
    @summary Rich Text Editor.
    @property {Buffer} buffer - associated Buffer holding the text content
    @property {string} className - additional class name(s)
@@ -390,12 +389,13 @@ class CodeMirrorWrapper extends React.Component {
    not work.
 
  */
-export function Text({ className, style, fontSize, ...props }) {
+export function Text(props) {
+  const { className, style, fontSize, ...config } = props ;
   const theStyle = Object.assign( {} , style );
   if (fontSize) theStyle.fontSize = fontSize ;
   return (
     <Vfill className={className} style={theStyle}>
-      <CodeMirrorWrapper {...props}/>
+      <CodeMirrorWrapper {...config}/>
     </Vfill>
   );
 }

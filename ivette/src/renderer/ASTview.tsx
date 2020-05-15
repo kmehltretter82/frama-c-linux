@@ -9,8 +9,7 @@ import * as States from 'frama-c/states';
 import * as Dome from 'dome';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
-import { Select, IconButton } from 'dome/controls/buttons';
-import { Space } from 'dome/frame/toolbars';
+import { IconButton } from 'dome/controls/buttons';
 import { Component, TitleBar } from 'frama-c/LabViews';
 
 import 'codemirror/mode/clike/clike';
@@ -18,10 +17,10 @@ import 'codemirror/theme/ambiance.css';
 import 'codemirror/theme/solarized.css';
 
 const THEMES = [
-  { id: "default", label: "Default" },
-  { id: "ambiance", label: "Ambiance" },
-  { id: "solarized light", label: "Solarized Light" },
-  { id: "solarized dark", label: "Solarized Dark" }
+  { id: 'default', label: 'Default' },
+  { id: 'ambiance', label: 'Ambiance' },
+  { id: 'solarized light', label: 'Solarized Light' },
+  { id: 'solarized dark', label: 'Solarized Dark' },
 ];
 
 // --------------------------------------------------------------------------
@@ -77,7 +76,7 @@ const ASTview = () => {
   const [select, setSelect] = States.useSelection();
   const [theme, setTheme] = Dome.useGlobalSetting('AST.theme', 'default');
   const [fontSize, setFontSize] = Dome.useGlobalSetting('AST.fontSize', 12);
-  const [lineWrapping, setLineWrapping] = Dome.useSwitch('ASTview.lineWrapping', false);
+  const [wrapText, setWrapText] = Dome.useSwitch('ASTview.wrapText', false);
 
   const theFunction = select && select.function;
   const theMarker = select && select.marker;
@@ -102,9 +101,11 @@ const ASTview = () => {
 
   // Theme Popup
 
-  const checkTheme = (th: { id: string }) => ({ checked: th.id === theme, ...th });
   const selectTheme = (id?: string) => id && setTheme(id);
-  const themePopup = () => Dome.popupMenu(THEMES.map(checkTheme), selectTheme);
+  const checkTheme =
+    (th: { id: string }) => ({ checked: th.id === theme, ...th });
+  const themePopup =
+    () => Dome.popupMenu(THEMES.map(checkTheme), selectTheme);
 
   // Component
   return (
@@ -113,14 +114,14 @@ const ASTview = () => {
         <IconButton icon="ZOOM.OUT" onClick={zoomOut} />
         <IconButton icon="ZOOM.IN" onClick={zoomIn} />
         <IconButton icon="CODE" onClick={themePopup} />
-        <IconButton icon="WRAPTEXT" selected={lineWrapping} onClick={setLineWrapping} />
+        <IconButton icon="WRAPTEXT" selected={wrapText} onClick={setWrapText} />
       </TitleBar>
       <Text
         buffer={buffer}
         mode="text/x-csrc"
         theme={theme}
         fontSize={fontSize}
-        lineWrapping={lineWrapping}
+        lineWrapping={wrapText}
         selection={theMarker}
         onSelection={onSelection}
         readOnly
