@@ -7,16 +7,22 @@ import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 
 import * as Dome from 'dome';
-import { Vfill } from 'dome/layout/boxes';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
-import { Select, Switch, IconButton } from 'dome/controls/buttons';
-import * as Toolbars from 'dome/frame/toolbars';
+import { Select, IconButton } from 'dome/controls/buttons';
+import { Space } from 'dome/frame/toolbars';
 import { Component, TitleBar } from 'frama-c/LabViews';
 
 import 'codemirror/mode/clike/clike';
 import 'codemirror/theme/ambiance.css';
 import 'codemirror/theme/solarized.css';
+
+const THEMES = [
+  { id: "default", label: "Default" },
+  { id: "ambiance", label: "Ambiance" },
+  { id: "solarized light", label: "Solarized Light" },
+  { id: "solarized dark", label: "Solarized Dark" }
+];
 
 // --------------------------------------------------------------------------
 // --- Rich Text Printer
@@ -63,21 +69,18 @@ async function loadAST(buffer: any, theFunction?: string, theMarker?: string) {
 // --- AST Printer
 // --------------------------------------------------------------------------
 
-function useGlobal(param: string, dft: any) {
-  return Dome.useGlobalSetting(`ASTview.${param}`, dft);
-}
-
 const ASTview = () => {
 
   // Hooks
   const buffer = React.useMemo(() => new RichTextBuffer(), []);
   const printed = React.useRef();
   const [select, setSelect] = States.useSelection();
+  const [theme, setTheme] = Dome.useGlobalSetting('AST.theme', 'default');
+  const [fontSize, setFontSize] = Dome.useGlobalSetting('AST.fontSize', 12);
+  const [lineWrapping, setLineWrapping] = Dome.useSwitch('ASTview.lineWrapping', false);
+
   const theFunction = select && select.function;
   const theMarker = select && select.marker;
-  const [theme, setTheme] = useGlobal('theme', 'default');
-  const [lineWrapping, setLineWrapping] = useGlobal('lineWrapping', false);
-  const [fontSize, setFontSize] = useGlobal('fontSize', 12);
 
   // Hook: async loading
   React.useEffect(() => {
@@ -93,56 +96,35 @@ const ASTview = () => {
   }, [buffer, theMarker]);
 
   // Callbacks
+  const zoomIn = () => setFontSize(fontSize + 2);
+  const zoomOut = () => setFontSize(fontSize - 2);
   const onSelection = (marker: any) => setSelect({ marker });
 
-  const titlebar = (
-    <TitleBar>
-      <Select
-        value={theme}
-        onChange={(name: string) => setTheme(name)}
-      >
-        <option value="default" label="Default" />
-        <option value="ambiance" label="Ambiance" />
-        <option value="solarized light" label="Solarized light" />
-        <option value="solarized dark" label="Solarized dark" />
-      </Select>
-      <Toolbars.Space />
-      <IconButton
-        icon="MINUS"
-        title="Decrease the font size"
-        onClick={() => setFontSize(fontSize - 2)}
-      />
-      <IconButton
-        icon="PLUS"
-        title="increase the font size"
-        onClick={() => setFontSize(fontSize + 2)}
-      />
-      <Toolbars.Space />
-      <Switch
-        label="Line wrapping"
-        title="Change line wrapping mode"
-        value={lineWrapping}
-        onChange={() => setLineWrapping(!lineWrapping)}
-      />
-      <Toolbars.Space />
-    </TitleBar>
-  );
+  // Theme Popup
+
+  const checkTheme = (th: { id: string }) => ({ checked: th.id === theme, ...th });
+  const selectTheme = (id?: string) => id && setTheme(id);
+  const themePopup = () => Dome.popupMenu(THEMES.map(checkTheme), selectTheme);
 
   // Component
   return (
     <>
-      {titlebar}
-      <Vfill style={{ fontSize }}>
-        <Text
-          buffer={buffer}
-          mode="text/x-csrc"
-          theme={theme}
-          lineWrapping={lineWrapping}
-          selection={theMarker}
-          onSelection={onSelection}
-          readOnly
-        />
-      </Vfill>
+      <TitleBar>
+        <IconButton icon="ZOOM.OUT" onClick={zoomOut} />
+        <IconButton icon="ZOOM.IN" onClick={zoomIn} />
+        <IconButton icon="CODE" onClick={themePopup} />
+        <IconButton icon="WRAPTEXT" selected={lineWrapping} onClick={setLineWrapping} />
+      </TitleBar>
+      <Text
+        buffer={buffer}
+        mode="text/x-csrc"
+        theme={theme}
+        fontSize={fontSize}
+        lineWrapping={lineWrapping}
+        selection={theMarker}
+        onSelection={onSelection}
+        readOnly
+      />
     </>
   );
 
