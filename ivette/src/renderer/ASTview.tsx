@@ -74,8 +74,8 @@ const ASTview = () => {
   const buffer = React.useMemo(() => new RichTextBuffer(), []);
   const printed = React.useRef();
   const [select, setSelect] = States.useSelection();
-  const [theme, setTheme] = Dome.useGlobalSetting('AST.theme', 'default');
-  const [fontSize, setFontSize] = Dome.useGlobalSetting('AST.fontSize', 12);
+  const [theme, setTheme] = Dome.useGlobalSetting('ASTview.theme', 'default');
+  const [fontSize, setFontSize] = Dome.useGlobalSetting('ASTview.fontSize', 12);
   const [wrapText, setWrapText] = Dome.useSwitch('ASTview.wrapText', false);
 
   const theFunction = select && select.function;
