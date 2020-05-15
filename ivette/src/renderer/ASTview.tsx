@@ -95,8 +95,8 @@ const ASTview = () => {
   }, [buffer, theMarker]);
 
   // Callbacks
-  const zoomIn = () => setFontSize(fontSize + 2);
-  const zoomOut = () => setFontSize(fontSize - 2);
+  const zoomIn = () => fontSize < 48 && setFontSize(fontSize + 2);
+  const zoomOut = () => fontSize > 4 && setFontSize(fontSize - 2);
   const onSelection = (marker: any) => setSelect({ marker });
 
   // Theme Popup

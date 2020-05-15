@@ -19,6 +19,15 @@ import 'codemirror/lib/codemirror.css' ;
 const CSS_HOVERED = 'dome-xText-hover' ;
 const CSS_SELECTED = 'dome-xText-select' ;
 
+const getConfig = ({
+  buffer,
+  selection,
+  onSelection,
+  onContextMenu,
+  fontSize,
+  ...config
+}) => config;
+
 // --------------------------------------------------------------------------
 // --- Code Mirror Instance Wrapper
 // --------------------------------------------------------------------------
@@ -53,15 +62,9 @@ class CodeMirrorWrapper extends React.Component {
     this.rootElement = elt ;
     if (elt) {
       // Mounting...
-      const { buffer,
-              selection,     /* ignored */
-              onSelection,   /* ignored */
-              onContextMenu, /* ignored */
-              fontSize,      /* ignored */
-              className,     /* ignored */
-              style,         /* ignored */
-              ...config } = this.props ;
-      const cm = this.codeMirror = new CodeMirror(elt, { value: "" });
+      const { buffer } = this.props;
+      const config = getConfig(this.props);
+      const cm = this.codeMirror = new CodeMirror(elt, { value: '' });
       if (buffer) buffer.link(cm);
       // Passing all options to constructor does not work (Cf. CodeMirror's BTS)
       for (var opt in config) cm.setOption( opt , config[opt] );
@@ -285,17 +288,23 @@ class CodeMirrorWrapper extends React.Component {
     const cm = this.codeMirror ;
     if (cm) {
       // Swap documents if necessary
-      const { buffer:oldBuffer,
-              selection:oldSelect,
-              ...oldConfig } = this.props ;
-      const { buffer:newBuffer,
-              selection:newSelect,
-              ...newConfig } = newProps ;
+      const {
+        buffer:oldBuffer,
+        selection:oldSelect,
+        fontSize:oldFont
+      } = this.props;
+      const {
+        buffer:newBuffer,
+        selection:newSelect,
+        fontSize:newFont
+      } = newProps ;
       if (oldBuffer !== newBuffer) {
         if (oldBuffer) oldBuffer.unlink(cm);
         if (newBuffer) newBuffer.link(cm);
         else cm.clear();
       }
+      const oldConfig =  getConfig(this.props);
+      const newConfig =  getConfig(newProps);
       // Incremental update options
       var opt ;
       for ( opt in oldConfig ) if (!(opt in newConfig)) {
@@ -315,6 +324,8 @@ class CodeMirrorWrapper extends React.Component {
         if (oldSelect) this._unmarkElementsWith( CSS_SELECTED );
         if (newSelect) this._markElementsWith( 'dome-xMark-' + newSelect, CSS_SELECTED );
       }
+      // Refresh on new font
+      if ( oldFont !== newFont ) setImmediate(this.refresh);
     }
     // Keep mounted node unchanged
     return false;
@@ -390,12 +401,14 @@ class CodeMirrorWrapper extends React.Component {
 
  */
 export function Text(props) {
-  const { className, style, fontSize, ...config } = props ;
+  let { className, style, fontSize, ...cmprops } = props ;
+  if (fontSize < 4) fontSize = 4;
+  if (fontSize > 48) fontSize = 48;
   const theStyle = Object.assign( {} , style );
-  if (fontSize) theStyle.fontSize = fontSize ;
+  theStyle.fontSize = fontSize ;
   return (
     <Vfill className={className} style={theStyle}>
-      <CodeMirrorWrapper {...config}/>
+      <CodeMirrorWrapper fontSize={fontSize} {...cmprops}/>
     </Vfill>
   );
 }
