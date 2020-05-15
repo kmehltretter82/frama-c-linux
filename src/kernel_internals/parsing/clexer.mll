@@ -144,6 +144,7 @@ let init_lexicon _ =
                         INLINE loc
                       else
                         IDENT ("_inline"));
+      ("_Noreturn", fun loc -> NORETURN loc);
       ("__attribute__", fun loc -> ATTRIBUTE loc);
       ("__attribute", fun loc -> ATTRIBUTE loc);
       ("__blockattribute__", fun _ -> BLOCKATTRIBUTE);

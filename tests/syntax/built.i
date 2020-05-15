@@ -4,7 +4,7 @@ STDOPT: +"-machdep gcc_x86_32"
 
 extern __attribute__((const, noreturn))
 int ____ilog2_NaN(void);
-
+_Noreturn inline dummy_f(void);
 static inline __attribute__((no_instrument_function)) __attribute__((const))
 int __ilog2_u32(int n);
 
