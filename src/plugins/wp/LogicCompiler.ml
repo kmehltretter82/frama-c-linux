@@ -496,6 +496,8 @@ struct
     let xs,tgs,domain,prop,_ =
       let cc_pred = pred `Positive in
       compile_step name types qs labels cc_pred in_pred prop in
+    let weak = Wp_parameters.WeakIntModel.get () in
+    let lemma = if weak then prop else F.p_hyps domain prop in
     {
       l_name = name ;
       l_types = List.length types ;
@@ -503,7 +505,7 @@ struct
       l_triggers = [tgs] ;
       l_forall = xs ;
       l_cluster = cluster ;
-      l_lemma = F.p_hyps domain prop ;
+      l_lemma = lemma ;
     }
 
   (* -------------------------------------------------------------------------- *)

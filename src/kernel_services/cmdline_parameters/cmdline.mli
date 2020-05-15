@@ -328,7 +328,7 @@ val replace_option_setting:
 val replace_option_help:
   string -> plugin:string -> group:Group.t -> string -> unit
 (** Replace the previously registered option help.
-    @since Frama-C+dev *)
+    @since 21.0-Scandium *)
 
 (* ************************************************************************** *)
 (** {2 Special parameters}

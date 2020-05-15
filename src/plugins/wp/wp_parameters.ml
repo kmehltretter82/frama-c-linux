@@ -249,6 +249,14 @@ module Overflows =
   end)
 
 let () = Parameter_customize.set_group wp_model
+module WeakIntModel =
+  False(struct
+    let option_name = "-wp-weak-int-model"
+    let help = "Suppress integral type side conditions within lemmas\n\
+                (possibly unsound)"
+  end)
+
+let () = Parameter_customize.set_group wp_model
 module Literals =
   False(struct
     let option_name = "-wp-literals"
@@ -1043,7 +1051,7 @@ let make_output_dir dir =
   else
     begin
       try
-        Unix.mkdir dir 0o770 ;
+        Extlib.mkdir ~parents:true dir 0o770 ;
         debug ~dkey "Created output directory '%s'" dir
       with Unix.Unix_error (err,_,_) ->
         let msg = Unix.error_message err in

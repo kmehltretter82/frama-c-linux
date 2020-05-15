@@ -56,8 +56,16 @@ REQUIRE_WHY3=
 USE_WHY3=
 HAS_WHY3=
 
+AC_MSG_CHECKING(for why3 (>= 1.3.1))
+WHY3VERSION=`ocamlfind query -format %v why3 | tr -d '\\r\\n'`
+case $WHY3VERSION in
+      0.* | 1.[[012]].* | 1.3.0)
+        AC_MSG_ERROR(found why3 $WHY3VERSION: requires 1.3.1 or higher.);;
+      *)
+        AC_MSG_RESULT(found $WHY3VERSION: should work);;
+esac
+
 WHY3_PATH=`ocamlfind query why3 | tr -d '\\r\\n'`
-echo "Ocamlfind -> using $WHY3_PATH"
 WHY3PATH_FOR_CONFIGURE=$WHY3_PATH
 
 configure_library([WHY3],
@@ -82,7 +90,7 @@ if test "$ENABLE_WP" != "no"; then
     if test "$COQC" = "yes" ; then
       COQVERSION=`coqc -v | sed -n -e 's|.*version* *\([[^ ]]*\) .*$|\1|p' `
       case $COQVERSION in
-        8.7*|8.8*|8.9*|8.10*|trunk)
+        8.7*|8.8*|8.9*|8.10*|8.11.*|trunk)
           AC_MSG_RESULT(coqc version $COQVERSION found)
           ;;
         *)

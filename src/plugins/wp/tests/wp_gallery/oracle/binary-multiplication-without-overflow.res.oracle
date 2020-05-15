@@ -11,6 +11,7 @@
 [wp] Goal typed_BinaryMultiplication_loop_invariant_inv1_ok_established : not tried
 [wp] Goal typed_BinaryMultiplication_loop_invariant_inv2_ok_deductible_preserved : not tried
 [wp] Goal typed_BinaryMultiplication_loop_invariant_inv2_ok_deductible_established : not tried
+[wp] Goal typed_BinaryMultiplication_assert : not tried
 [wp] Goal typed_BinaryMultiplication_assert_rte_unsigned_overflow : not tried
 [wp] Goal typed_BinaryMultiplication_assert_rte_unsigned_overflow_2 : not tried
 [wp] Goal typed_BinaryMultiplication_assert_rte_unsigned_overflow_3 : not tried

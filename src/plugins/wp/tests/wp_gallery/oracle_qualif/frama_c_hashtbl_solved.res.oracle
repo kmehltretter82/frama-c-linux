@@ -76,7 +76,7 @@
 [wp] [Qed] Goal typed_init_loop_assigns_part2 : Valid
 [wp] [Qed] Goal typed_init_assigns_part1 : Valid
 [wp] [Qed] Goal typed_init_assigns_part2 : Valid
-[wp] [Alt-Ergo] Goal typed_init_assigns_part3 : Valid
+[wp] [Script] Goal typed_init_assigns_part3 : Valid
 [wp] [Qed] Goal typed_init_loop_variant_decrease : Valid
 [wp] [Qed] Goal typed_init_loop_variant_positive : Valid
 [wp] [Alt-Ergo] Goal typed_mem_binding_complete_not_found_found : Valid
@@ -109,13 +109,14 @@
 [wp] [Qed] Goal typed_size_assigns : Valid
 [wp] Proved goals:  102 / 102
   Qed:            69 
-  Alt-Ergo:       33
+  Script:          1 
+  Alt-Ergo:       32
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   eq_string                11        4       15       100%
   hash                      6        1        7       100%
   size                      2        -        2       100%
-  init                      8        5       13       100%
+  init                      8        4       13       100%
   add                      24       15       39       100%
   mem_binding              18        8       26       100%
 ------------------------------------------------------------
@@ -224,7 +225,7 @@
 [wp] [Qed] Goal typed_init_loop_assigns_part2 : Valid
 [wp] [Qed] Goal typed_init_assigns_part1 : Valid
 [wp] [Qed] Goal typed_init_assigns_part2 : Valid
-[wp] [Alt-Ergo] Goal typed_init_assigns_part3 : Valid
+[wp] [Script] Goal typed_init_assigns_part3 : Valid
 [wp] [Qed] Goal typed_init_loop_variant_decrease : Valid
 [wp] [Qed] Goal typed_init_loop_variant_positive : Valid
 [wp] [Alt-Ergo] Goal typed_mem_binding_complete_not_found_found : Valid
@@ -272,13 +273,14 @@
 [wp] [Qed] Goal typed_size_assigns : Valid
 [wp] Proved goals:   74 / 143
   Qed:            16 
-  Alt-Ergo:       58
+  Script:          1 
+  Alt-Ergo:       57
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   eq_string                11        7       18       100%
   hash                      7        3       10       100%
   size                      2        1        3       100%
-  init                     10        8       18       100%
+  init                     10        7       18       100%
   add                      30       24       54       100%
   mem_binding              25       15       40       100%
 ------------------------------------------------------------

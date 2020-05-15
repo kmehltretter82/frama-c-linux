@@ -113,24 +113,6 @@ let t_app ~cnv ~f ~l ~p tl =
 let t_app' ~cnv ~f ~l ~p tl ty =
   Why3.Term.t_app (get_ls ~cnv ~f ~l ~p) tl ty
 
-(** Conversion *)
-
-(** why3 1.3
-    let const_int (z:Z.t) =
-    Why3.(Term.t_const Number.(int_const (BigInt.of_string (Z.to_string z)))) Why3.Ty.ty_int
-
-    let const_real ~cnv (q:Q.t) =
-    let mk_real_int z =
-    let c = Why3.Number.real_const (Why3.BigInt.of_string (Z.to_string z)) in
-    Why3.(Term.t_const c) Why3.Ty.ty_real
-    in
-    if Z.equal Z.one q.den
-    then mk_real_int q.num
-    else
-    t_app ~cnv ~f:["real"] ~l:"Real" ~p:["infix /"] [mk_real_int q.num;mk_real_int q.den]
-
-*)
-
 (** fold map list of at least one element *)
 let fold_map map fold = function
   | [] -> assert false (** absurd: forbidden by qed  *)
@@ -254,51 +236,55 @@ let rec of_tau ~cnv (t:Lang.F.tau) =
   | Record _ ->
       why3_failure "Type %a not (yet) convertible" Lang.F.pp_tau t
 
-module Literal = struct
-  let const_int (z:Z.t) =
-    Why3.(Term.t_const Number.(const_of_big_int (BigInt.of_string (Z.to_string z)))) Why3.Ty.ty_int
+module Literal =
+struct
 
-  let why3_real ty ~use_hex sign integer decimal exp =
-    let rc = Why3.Number.ConstReal {
-        rc_negative = sign ;
-        rc_abs =
-          if use_hex then Why3.Number.real_const_hex integer decimal exp
-          else Why3.Number.real_const_dec integer decimal exp
-      } in
-    Why3.Term.t_const rc ty
+  open Why3
+
+  let const_int (z:Z.t) =
+    let k = BigInt.of_string (Z.to_string z) in
+    Term.t_const (Constant.int_const k) Ty.ty_int
+
+  let why3_real ty ~radix ~neg ~int ?(frac="") ?exp () =
+    let rc = Number.real_literal ~radix ~neg ~int ~frac ~exp in
+    Term.t_const (Constant.ConstReal rc) ty
 
   let const_real ~cnv (q:Q.t) =
     let mk_real_int z =
-      let use_hex = false in
-      let str = Z.to_string (Z.abs z) in
-      why3_real Why3.Ty.ty_real ~use_hex (Z.sign z < 0) str "" None
+      let neg = Z.sign z < 0 in
+      let int = Z.to_string (Z.abs z) in
+      why3_real Why3.Ty.ty_real ~radix:10 ~neg ~int ()
     in
     if Z.equal Z.one q.den
     then mk_real_int q.num
     else
-      t_app ~cnv ~f:["real"] ~l:"Real" ~p:["infix /"] [mk_real_int q.num;mk_real_int q.den]
+      t_app ~cnv ~f:["real"] ~l:"Real" ~p:["infix /"]
+        [mk_real_int q.num;mk_real_int q.den]
 
   let cfloat_of_tau tau =
     if      Lang.F.Tau.equal tau Cfloat.t32 then Ctypes.Float32
     else if Lang.F.Tau.equal tau Cfloat.t64 then Ctypes.Float64
     else raise Not_found
 
+  let re_float = Str.regexp
+      "-?0x\\([0-9a-f]+\\).\\([0-9a-f]+\\)?0*p?\\([+-]?[0-9a-f]+\\)?$"
+
   let float_literal_from_q ~cnv tau q =
     let use_hex = true in
+    let qf = Q.to_float q in
     let f = match cfloat_of_tau tau with
-      | Float32 -> Floating_point.round_to_single_precision_float (Q.to_float q)
-      | Float64 -> Q.to_float q
+      | Float32 -> Floating_point.round_to_single_precision_float qf
+      | Float64 -> qf
     in
-    let s = Format.asprintf "%a" (Floating_point.pretty_normal ~use_hex) f in
-    let re_float =
-      Str.regexp "-?0x\\([0-9a-f]+\\).\\([0-9a-f]+\\)?p?\\([+-]?[0-9a-f]+\\)?$"
-    in
+    let s = Pretty_utils.to_string (Floating_point.pretty_normal ~use_hex) f in
+    let s = String.lowercase_ascii s in
     if Str.string_match re_float s 0 then
       let group n r = try Str.matched_group n r with Not_found -> "" in
-      let (i,d,e) = (group 1 s), (group 2 s), (group 3 s) in
-      let e = if String.equal e "" then None else Some e in
-      let t = Extlib.the (of_tau ~cnv tau) in
-      why3_real t ~use_hex (Q.sign q < 0) i d e
+      let neg = Q.sign q < 0 in
+      let int,frac,exp = (group 1 s), (group 2 s), (group 3 s) in
+      let exp = if String.equal exp "" then None else Some exp in
+      let ty = Extlib.the (of_tau ~cnv tau) in
+      why3_real ty ~radix:16 ~neg ~int ~frac ?exp ()
     else raise Not_found
 
   let const_float ~cnv tau (repr:Lang.F.QED.repr) =
@@ -1180,7 +1166,7 @@ let ping_prover_call p =
       Wp_parameters.debug ~dkey
         "@[@[Why3 result for %a:@] @[%a@] and @[%a@]@."
         Why3.Whyconf.print_prover p.prover
-        (Why3.Call_provers.print_prover_result) pr
+        (Why3.Call_provers.print_prover_result ~json_model:false) pr
         VCS.pp_result r;
       Task.Return (Task.Result r)
 

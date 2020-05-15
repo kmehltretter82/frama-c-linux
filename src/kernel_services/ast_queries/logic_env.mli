@@ -211,7 +211,7 @@ val set_extension_handler:
   unit
 (** Used to setup references related to the handling of ACSL extensions.
     If your name is not [Acsl_extension], do not call this
-    @since Frama-C+dev
+    @since 21.0-Scandium
 *)
 
 val init_dependencies: State.t -> unit

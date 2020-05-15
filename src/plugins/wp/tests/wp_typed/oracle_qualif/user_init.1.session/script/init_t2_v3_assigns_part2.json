@@ -1,0 +1,10 @@
+[ { "header": "Split", "tactic": "Wp.split", "params": {},
+    "select": { "select": "clause-goal",
+                "target": "exists i_0,i_1:int.\n(i_0<=i_148) /\\ (i_1<=i_149) /\\ (0<=i_0) /\\ (i_148<=i_0) /\\ (i_149<=i_1)\n/\\ (i_0<=9)",
+                "pattern": "\\E\\E&<=<=<=<=<=<=#1$i#0$i0#1$i#1" },
+    "children": { "Goal 1/2": [ { "prover": "Alt-Ergo:2.0.0",
+                                  "verdict": "valid", "time": 0.0092,
+                                  "steps": 9 } ],
+                  "Goal 2/2": [ { "prover": "Alt-Ergo:2.0.0",
+                                  "verdict": "valid", "time": 0.0088,
+                                  "steps": 11 } ] } } ]

@@ -28,11 +28,11 @@ properties. Plug-ins can also collaborate via their APIs.
 
 ## Installation
 
-For more detailed information about installing OPAM/Frama-C,
+For more detailed information about installing opam/Frama-C,
 see [INSTALL.md](INSTALL.md).
 
-Frama-C is available through [OPAM](http://opam.ocaml.org/), the
-OCaml Package Manager. This is the preferred installation method. Be sure
+Frama-C is available through [opam](http://opam.ocaml.org/), the
+OCaml package manager. This is the preferred installation method. Be sure
 to install opam v2.0 or higher. Then the following sequence of commands
 should install frama-c and its gui:
 
@@ -105,8 +105,10 @@ via the GUI:
 - The [Frama-c-discuss mailing list](http://lists.gforge.inria.fr/cgi-bin/mailman/listinfo/frama-c-discuss)
   is used for announcements and general discussions.
 
-- The [official bug tracking system](http://bts.frama-c.com/) can be used for
-  bug reports.
+- The [Frama-C public repository](https://git.frama-c.com/pub/frama-c)
+  contains a daily snapshot of the development version of Frama-C, as well as
+  the [issues tracking system](https://git.frama-c.com/pub/frama-c/issues),
+  for reporting bugs.
 
 - The [Frama-C wiki](https://bts.frama-c.com/dokuwiki/doku.php?id=mantis:frama-c:start)
   has some useful information, although it is not entirely up-to-date.
@@ -114,7 +116,3 @@ via the GUI:
 - The [Frama-C blog](http://blog.frama-c.com/) has several posts about
   new developments of Frama-C, as well as general discussions about the C
   language, undefined behavior, floating-point computations, etc.
-
-- The [Github snapshot repository](https://github.com/Frama-C/Frama-C-snapshot)
-  contains the .tar.gz archives of stable Frama-C releases, ready to be cloned.
-  It can also be used for reporting issues and submitting pull requests.

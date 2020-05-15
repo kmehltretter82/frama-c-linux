@@ -2,16 +2,15 @@
 { pkgs, stdenv, src ? ../., opam2nix, ocaml_version ? "ocaml-ng.ocamlPackages_4_05.ocaml", plugins ? { } }:
 
 let mk_buildInputs = { opamPackages ? [], nixPackages ? [] } :
-    [ pkgs.gnugrep pkgs.gnused  pkgs.autoconf pkgs.gnumake pkgs.gcc pkgs.ncurses pkgs.time pkgs.python3 pkgs.perl pkgs.file] ++ nixPackages ++ opam2nix.build {
+    [ pkgs.gnugrep pkgs.gnused  pkgs.autoconf pkgs.gnumake pkgs.gcc pkgs.ncurses pkgs.time pkgs.python3 pkgs.perl pkgs.file pkgs.which] ++ nixPackages ++ opam2nix.build {
            specs = opam2nix.toSpecs ([ "ocamlfind" "zarith" "ocamlgraph" "yojson"
-                { name = "coq"; constraint = "=8.7.2";  }
-                { name = "why3" ; constraint = "=1.2.0"; }
-                { name = "why3-coq" ; constraint = "=1.2.0"; }
-                { name = "menhir"; constraint = "=20181113"; }
-                "camlzip" #so that why3 is always compiled with it
-                ] ++ opamPackages ++
-                (if ocaml_version == "pkgs.ocaml-ng.ocamlPackages_4_02.ocaml"
-                then [ { name = "ocamlbuild" ; constraint = "=0"; } ] else [])
+                { name = "coq"; constraint = "=8.11.1";  }
+                { name = "why3" ; constraint = "=1.3.1"; }
+                { name = "why3-coq" ; constraint = "=1.3.1"; }
+                { name = "menhir"; constraint = "=20190924"; }
+                { name = "dune"; constraint = "=1.11.4"; }
+                { name = "camlzip"; constraint = "=1.07"; }  #so that why3 is always compiled with it
+                ] ++ opamPackages
               );
            ocamlAttr = ocaml_version;
         };
@@ -45,17 +44,17 @@ rec {
         '';
         setupHook = pkgs.writeText "setupHook.sh" ''
           addFramaCPath () {
-            if test -d "''$1/lib/frama-c/plugins"; then
-              export FRAMAC_PLUGIN="''${FRAMAC_PLUGIN}''${FRAMAC_PLUGIN:+:}''$1/lib/frama-c/plugins"
-              export OCAMLPATH="''${OCAMLPATH}''${OCAMLPATH:+:}''$1/lib/frama-c/plugins"
+            if test -d "$1/lib/frama-c/plugins"; then
+              export FRAMAC_PLUGIN="''${FRAMAC_PLUGIN:-}''${FRAMAC_PLUGIN:+:}$1/lib/frama-c/plugins"
+              export OCAMLPATH="''${OCAMLPATH:-}''${OCAMLPATH:+:}$1/lib/frama-c/plugins"
             fi
 
-            if test -d "''$1/lib/frama-c"; then
-              export OCAMLPATH="''${OCAMLPATH}''${OCAMLPATH:+:}''$1/lib/frama-c"
+            if test -d "$1/lib/frama-c"; then
+              export OCAMLPATH="''${OCAMLPATH:-}''${OCAMLPATH:+:}$1/lib/frama-c"
             fi
 
-            if test -d "''$1/share/frama-c/"; then
-              export FRAMAC_EXTRA_SHARE="''${FRAMAC_EXTRA_SHARE}''${FRAMAC_EXTRA_SHARE:+:}''$1/share/frama-c"
+            if test -d "$1/share/frama-c/"; then
+              export FRAMAC_EXTRA_SHARE="''${FRAMAC_EXTRA_SHARE:-}''${FRAMAC_EXTRA_SHARE:+:}$1/share/frama-c"
             fi
 
           }
@@ -170,7 +169,7 @@ rec {
                make create_share_link
                mkdir home
                HOME=$(pwd)/home
-               why3 config
+               why3 config --full-config
                bin/ptests.opt -error-code -config qualif src/plugins/wp/tests
         '';
         installPhase = ''
@@ -204,7 +203,7 @@ rec {
         name = "frama-c-internal";
         inherit src;
         buildInputs = (mk_buildInputs { opamPackages = [ "xml-light" ]; } ) ++
-                    [ pkgs.getopt pkgs.which
+                    [ pkgs.getopt
                       pkgs.libxslt pkgs.libxml2 pkgs.autoPatchelfHook stdenv.cc.cc.lib
         ];
         counter_examples_src = plugins.counter-examples.src;

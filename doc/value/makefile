@@ -1,6 +1,6 @@
-all: main
+all: main.pdf
 
-.PHONY: main
+.PHONY: main.pdf
 
 include ../MakeLaTeXModern
 
@@ -8,7 +8,7 @@ include ../MakeLaTeXModern
 OPENSOURCE?=yes
 export OPENSOURCE
 
-main: ../../VERSION examples/**.c
+main.pdf: ../../VERSION examples/**.c
 	$(MAKE) -C examples/parametrizing
 	$(MAKE) $(FRAMAC_MODERN)
 	latexmk -pdf main.tex

@@ -1339,7 +1339,7 @@ module Derefs : INOUT with type t = Locations.Zone.t
 (** This function should be called from time to time by all analysers taking
     time. In GUI mode, this will make the interface reactive.
     @plugin development guide
-    @deprecated Frama-C+dev *)
+    @deprecated 21.0-Scandium *)
 val progress: (unit -> unit) ref
 [@@ deprecated "Use Db.yield instead."]
 

@@ -61,6 +61,7 @@ module InCtxt : Parameter_sig.String_set
 module ExternArrays: Parameter_sig.Bool
 module Literals : Parameter_sig.Bool
 module Volatile : Parameter_sig.Bool
+module WeakIntModel : Parameter_sig.Bool
 
 module Region: Parameter_sig.Bool
 module Region_rw: Parameter_sig.Bool
