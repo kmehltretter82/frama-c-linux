@@ -4,8 +4,36 @@
 char *__gen_e_acsl_literal_string;
 extern int __e_acsl_sound_verdict;
 
+/*@ requires valid_nptr: \valid_read(nptr);
+    assigns \result;
+    assigns \result \from (indirect: nptr), (indirect: *(nptr + (0 ..)));
+ */
+int __gen_e_acsl_atoi(char const *nptr);
+
 int a;
 char *n = (char *)"134";
+/*@ requires valid_nptr: \valid_read(nptr);
+    assigns \result;
+    assigns \result \from (indirect: nptr), (indirect: *(nptr + (0 ..)));
+ */
+int __gen_e_acsl_atoi(char const *nptr)
+{
+  int __retres;
+  {
+    int __gen_e_acsl_valid_read;
+    __e_acsl_store_block((void *)(& nptr),(size_t)8);
+    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)nptr,
+                                                  sizeof(char const),
+                                                  (void *)nptr,
+                                                  (void *)(& nptr));
+    __e_acsl_assert(__gen_e_acsl_valid_read,"Precondition","atoi",
+                    "\\valid_read(nptr)","FRAMAC_SHARE/libc/stdlib.h",78);
+  }
+  __retres = atoi(nptr);
+  __e_acsl_delete_block((void *)(& nptr));
+  return __retres;
+}
+
 void __e_acsl_globals_init(void)
 {
   static char __e_acsl_already_run = 0;

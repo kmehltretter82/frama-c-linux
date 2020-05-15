@@ -4,6 +4,23 @@
 #include "stdlib.h"
 extern int __e_acsl_sound_verdict;
 
+/*@ requires c_uchar_or_eof: (0 ≤ c ≤ 255) ∨ c ≡ -1;
+    assigns \result;
+    assigns \result \from c;
+    
+    behavior definitely_match:
+      assumes c_upper: 'A' ≤ c ≤ 'Z';
+      ensures nonzero_result: \result < 0 ∨ \result > 0;
+    
+    behavior definitely_not_match:
+      assumes
+        c_non_upper: c ≡ -1 ∨ (0 ≤ c < 'A') ∨ ('Z' < c ≤ 127);
+      ensures zero_result: \result ≡ 0;
+    
+    disjoint behaviors definitely_not_match, definitely_match;
+ */
+int __gen_e_acsl_isupper(int c);
+
 int main(int argc, char const **argv)
 {
   int __retres;
@@ -37,6 +54,81 @@ int main(int argc, char const **argv)
   __e_acsl_delete_block((void *)(& c));
   __e_acsl_memory_clean();
   return __retres;
+}
+
+/*@ requires c_uchar_or_eof: (0 ≤ c ≤ 255) ∨ c ≡ -1;
+    assigns \result;
+    assigns \result \from c;
+    
+    behavior definitely_match:
+      assumes c_upper: 'A' ≤ c ≤ 'Z';
+      ensures nonzero_result: \result < 0 ∨ \result > 0;
+    
+    behavior definitely_not_match:
+      assumes
+        c_non_upper: c ≡ -1 ∨ (0 ≤ c < 'A') ∨ ('Z' < c ≤ 127);
+      ensures zero_result: \result ≡ 0;
+    
+    disjoint behaviors definitely_not_match, definitely_match;
+ */
+int __gen_e_acsl_isupper(int c)
+{
+  int __gen_e_acsl_at_2;
+  int __gen_e_acsl_at;
+  int __retres;
+  {
+    int __gen_e_acsl_and;
+    int __gen_e_acsl_or;
+    if (0 <= c) __gen_e_acsl_and = c <= 255; else __gen_e_acsl_and = 0;
+    if (__gen_e_acsl_and) __gen_e_acsl_or = 1;
+    else __gen_e_acsl_or = c == -1;
+    __e_acsl_assert(__gen_e_acsl_or,"Precondition","isupper",
+                    "(0 <= c <= 255) || c == -1","FRAMAC_SHARE/libc/ctype.h",
+                    174);
+  }
+  {
+    int __gen_e_acsl_or_3;
+    int __gen_e_acsl_or_4;
+    if (c == -1) __gen_e_acsl_or_3 = 1;
+    else {
+      int __gen_e_acsl_and_3;
+      if (0 <= c) __gen_e_acsl_and_3 = c < 65; else __gen_e_acsl_and_3 = 0;
+      __gen_e_acsl_or_3 = __gen_e_acsl_and_3;
+    }
+    if (__gen_e_acsl_or_3) __gen_e_acsl_or_4 = 1;
+    else {
+      int __gen_e_acsl_and_4;
+      if (90 < c) __gen_e_acsl_and_4 = c <= 127; else __gen_e_acsl_and_4 = 0;
+      __gen_e_acsl_or_4 = __gen_e_acsl_and_4;
+    }
+    __gen_e_acsl_at_2 = __gen_e_acsl_or_4;
+  }
+  {
+    int __gen_e_acsl_and_2;
+    if (65 <= c) __gen_e_acsl_and_2 = c <= 90; else __gen_e_acsl_and_2 = 0;
+    __gen_e_acsl_at = __gen_e_acsl_and_2;
+  }
+  __retres = isupper(c);
+  {
+    int __gen_e_acsl_implies;
+    int __gen_e_acsl_implies_2;
+    if (! __gen_e_acsl_at) __gen_e_acsl_implies = 1;
+    else {
+      int __gen_e_acsl_or_2;
+      if (__retres < 0) __gen_e_acsl_or_2 = 1;
+      else __gen_e_acsl_or_2 = __retres > 0;
+      __gen_e_acsl_implies = __gen_e_acsl_or_2;
+    }
+    __e_acsl_assert(__gen_e_acsl_implies,"Postcondition","isupper",
+                    "\\old(\'A\' <= c <= \'Z\') ==> \\result < 0 || \\result > 0",
+                    "FRAMAC_SHARE/libc/ctype.h",178);
+    if (! __gen_e_acsl_at_2) __gen_e_acsl_implies_2 = 1;
+    else __gen_e_acsl_implies_2 = __retres == 0;
+    __e_acsl_assert(__gen_e_acsl_implies_2,"Postcondition","isupper",
+                    "\\old(c == -1 || (0 <= c < \'A\') || (\'Z\' < c <= 127)) ==> \\result == 0",
+                    "FRAMAC_SHARE/libc/ctype.h",181);
+    return __retres;
+  }
 }
 
 

@@ -4,6 +4,34 @@
 #include "string.h"
 extern int __e_acsl_sound_verdict;
 
+/*@ requires valid_dest: valid_or_empty(dest, n);
+    requires valid_src: valid_read_or_empty(src, n);
+    requires
+      separation:
+        \separated((char *)dest + (0 .. n - 1), (char *)src + (0 .. n - 1));
+    ensures
+      copied_contents:
+        memcmp{Post, Pre}((char *)\old(dest), (char *)\old(src), \old(n)) ≡
+        0;
+    ensures result_ptr: \result ≡ \old(dest);
+    assigns *((char *)dest + (0 .. n - 1)), \result;
+    assigns *((char *)dest + (0 .. n - 1))
+      \from *((char *)src + (0 .. n - 1));
+    assigns \result \from dest;
+ */
+void *__gen_e_acsl_memcpy(void * __restrict dest,
+                          void const * __restrict src, size_t n);
+
+/*@ requires valid_s: valid_or_empty(s, n);
+    ensures
+      acsl_c_equiv: memset((char *)\old(s), \old(c), \old(n)) ≡ \true;
+    ensures result_ptr: \result ≡ \old(s);
+    assigns *((char *)s + (0 .. n - 1)), \result;
+    assigns *((char *)s + (0 .. n - 1)) \from c;
+    assigns \result \from s;
+ */
+void *__gen_e_acsl_memset(void *s, int c, size_t n);
+
 int main(void)
 {
   int __retres;
@@ -354,6 +382,66 @@ int main(void)
   __e_acsl_delete_block((void *)(& b));
   __e_acsl_delete_block((void *)(& a));
   __e_acsl_memory_clean();
+  return __retres;
+}
+
+/*@ requires valid_s: valid_or_empty(s, n);
+    ensures
+      acsl_c_equiv: memset((char *)\old(s), \old(c), \old(n)) ≡ \true;
+    ensures result_ptr: \result ≡ \old(s);
+    assigns *((char *)s + (0 .. n - 1)), \result;
+    assigns *((char *)s + (0 .. n - 1)) \from c;
+    assigns \result \from s;
+ */
+void *__gen_e_acsl_memset(void *s, int c, size_t n)
+{
+  void *__gen_e_acsl_at;
+  void *__retres;
+  __e_acsl_store_block((void *)(& s),(size_t)8);
+  __e_acsl_temporal_pull_parameter((void *)(& s),0U,8UL);
+  __e_acsl_temporal_reset_parameters();
+  __e_acsl_temporal_reset_return();
+  __e_acsl_temporal_save_nreferent_parameter((void *)(& s),0U);
+  __e_acsl_temporal_memset(s,c,n);
+  __gen_e_acsl_at = s;
+  __retres = memset(s,c,n);
+  __e_acsl_assert(__retres == __gen_e_acsl_at,"Postcondition","memset",
+                  "\\result == \\old(s)","FRAMAC_SHARE/libc/string.h",119);
+  __e_acsl_delete_block((void *)(& s));
+  return __retres;
+}
+
+/*@ requires valid_dest: valid_or_empty(dest, n);
+    requires valid_src: valid_read_or_empty(src, n);
+    requires
+      separation:
+        \separated((char *)dest + (0 .. n - 1), (char *)src + (0 .. n - 1));
+    ensures
+      copied_contents:
+        memcmp{Post, Pre}((char *)\old(dest), (char *)\old(src), \old(n)) ≡
+        0;
+    ensures result_ptr: \result ≡ \old(dest);
+    assigns *((char *)dest + (0 .. n - 1)), \result;
+    assigns *((char *)dest + (0 .. n - 1))
+      \from *((char *)src + (0 .. n - 1));
+    assigns \result \from dest;
+ */
+void *__gen_e_acsl_memcpy(void * __restrict dest,
+                          void const * __restrict src, size_t n)
+{
+  void *__gen_e_acsl_at;
+  void *__retres;
+  __e_acsl_store_block((void *)(& dest),(size_t)8);
+  __e_acsl_temporal_pull_parameter((void *)(& dest),0U,8UL);
+  __e_acsl_temporal_reset_parameters();
+  __e_acsl_temporal_reset_return();
+  __e_acsl_temporal_save_nreferent_parameter((void *)(& dest),0U);
+  __e_acsl_temporal_memcpy(dest,(void *)src,n);
+  __gen_e_acsl_at = dest;
+  __retres = memcpy(dest,src,n);
+  __e_acsl_assert(__retres == __gen_e_acsl_at,"Postcondition","memcpy",
+                  "\\result == \\old(dest)","FRAMAC_SHARE/libc/string.h",99);
+  __e_acsl_delete_block((void *)(& dest));
   return __retres;
 }
 

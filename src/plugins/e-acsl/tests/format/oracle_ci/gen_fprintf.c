@@ -38,9 +38,175 @@ char *__gen_e_acsl_literal_string_17;
 char *__gen_e_acsl_literal_string_18;
 extern int __e_acsl_sound_verdict;
 
+/*@ exits status: \exit_status ≡ \old(status);
+    ensures never_terminates: \false;
+    
+    assigns \exit_status \from status;
+ */
+void __gen_e_acsl_exit(int status);
+
+/*@ ensures
+      result_null_or_valid_fd:
+        \result ≡ \null ∨ \subset(\result, &__fc_fopen[0 .. 16 - 1]);
+    assigns \result;
+    assigns \result \from __fc_p_fopen;
+ */
+FILE *__gen_e_acsl_tmpfile(void);
+
+/*@ requires valid_stream: \valid(stream);
+    ensures result_zero_or_EOF: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result \from (indirect: stream), (indirect: *stream);
+ */
+int __gen_e_acsl_fclose(FILE *stream);
+
+/*@ ensures result_ok_or_error: \result ≡ -1 ∨ \result ≥ 0;
+    ensures
+      initialization: stat_loc_init_on_success:
+        \result ≥ 0 ∧ \old(stat_loc) ≢ \null ⇒
+        \initialized(\old(stat_loc));
+    assigns \result, *stat_loc;
+    assigns \result \from (indirect: options);
+    assigns *stat_loc \from (indirect: options);
+    
+    behavior stat_loc_null:
+      assumes stat_loc_null: stat_loc ≡ \null;
+      assigns \result;
+      assigns \result \from \nothing;
+    
+    behavior stat_loc_non_null:
+      assumes stat_loc_non_null: stat_loc ≢ \null;
+      requires valid_stat_loc: \valid(stat_loc);
+ */
+pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options);
+
 /*@ assigns \result;
     assigns \result \from \nothing; */
 extern int ( /* missing proto */ fork)(void);
+
+/*@ ensures result_ok_or_error: \result ≡ -1 ∨ \result ≥ 0;
+    ensures
+      initialization: stat_loc_init_on_success:
+        \result ≥ 0 ∧ \old(stat_loc) ≢ \null ⇒
+        \initialized(\old(stat_loc));
+    assigns \result, *stat_loc;
+    assigns \result \from (indirect: options);
+    assigns *stat_loc \from (indirect: options);
+    
+    behavior stat_loc_null:
+      assumes stat_loc_null: stat_loc ≡ \null;
+      assigns \result;
+      assigns \result \from \nothing;
+    
+    behavior stat_loc_non_null:
+      assumes stat_loc_non_null: stat_loc ≢ \null;
+      requires valid_stat_loc: \valid(stat_loc);
+ */
+pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
+{
+  int *__gen_e_acsl_at_2;
+  int *__gen_e_acsl_at;
+  pid_t __retres;
+  {
+    int __gen_e_acsl_implies;
+    __e_acsl_store_block((void *)(& stat_loc),(size_t)8);
+    if (! (stat_loc != (int *)0)) __gen_e_acsl_implies = 1;
+    else {
+      int __gen_e_acsl_valid;
+      __gen_e_acsl_valid = __e_acsl_valid((void *)stat_loc,sizeof(int),
+                                          (void *)stat_loc,
+                                          (void *)(& stat_loc));
+      __gen_e_acsl_implies = __gen_e_acsl_valid;
+    }
+    __e_acsl_assert(__gen_e_acsl_implies,"Precondition","waitpid",
+                    "stat_loc != \\null ==> \\valid(stat_loc)",
+                    "FRAMAC_SHARE/libc/sys/wait.h",92);
+  }
+  __gen_e_acsl_at_2 = stat_loc;
+  __gen_e_acsl_at = stat_loc;
+  __retres = waitpid(pid,stat_loc,options);
+  {
+    int __gen_e_acsl_or;
+    int __gen_e_acsl_and;
+    int __gen_e_acsl_implies_2;
+    if (__retres == -1) __gen_e_acsl_or = 1;
+    else __gen_e_acsl_or = __retres >= 0;
+    __e_acsl_assert(__gen_e_acsl_or,"Postcondition","waitpid",
+                    "\\result == -1 || \\result >= 0",
+                    "FRAMAC_SHARE/libc/sys/wait.h",84);
+    if (__retres >= 0) __gen_e_acsl_and = __gen_e_acsl_at != (int *)0;
+    else __gen_e_acsl_and = 0;
+    if (! __gen_e_acsl_and) __gen_e_acsl_implies_2 = 1;
+    else {
+      int __gen_e_acsl_initialized;
+      __gen_e_acsl_initialized = __e_acsl_initialized((void *)__gen_e_acsl_at_2,
+                                                      sizeof(int));
+      __gen_e_acsl_implies_2 = __gen_e_acsl_initialized;
+    }
+    __e_acsl_assert(__gen_e_acsl_implies_2,"Postcondition","waitpid",
+                    "\\result >= 0 && \\old(stat_loc) != \\null ==> \\initialized(\\old(stat_loc))",
+                    "FRAMAC_SHARE/libc/sys/wait.h",86);
+    __e_acsl_delete_block((void *)(& stat_loc));
+    return __retres;
+  }
+}
+
+/*@ requires valid_stream: \valid(stream);
+    ensures result_zero_or_EOF: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result \from (indirect: stream), (indirect: *stream);
+ */
+int __gen_e_acsl_fclose(FILE *stream)
+{
+  int __retres;
+  {
+    int __gen_e_acsl_valid;
+    __e_acsl_store_block((void *)(& stream),(size_t)8);
+    __gen_e_acsl_valid = __e_acsl_valid((void *)stream,sizeof(FILE),
+                                        (void *)stream,(void *)(& stream));
+    __e_acsl_assert(__gen_e_acsl_valid,"Precondition","fclose",
+                    "\\valid(stream)","FRAMAC_SHARE/libc/stdio.h",120);
+  }
+  __retres = fclose(stream);
+  {
+    int __gen_e_acsl_or;
+    if (__retres == 0) __gen_e_acsl_or = 1;
+    else __gen_e_acsl_or = __retres == -1;
+    __e_acsl_assert(__gen_e_acsl_or,"Postcondition","fclose",
+                    "\\result == 0 || \\result == -1",
+                    "FRAMAC_SHARE/libc/stdio.h",122);
+    __e_acsl_delete_block((void *)(& stream));
+    return __retres;
+  }
+}
+
+/*@ ensures
+      result_null_or_valid_fd:
+        \result ≡ \null ∨ \subset(\result, &__fc_fopen[0 .. 16 - 1]);
+    assigns \result;
+    assigns \result \from __fc_p_fopen;
+ */
+FILE *__gen_e_acsl_tmpfile(void)
+{
+  FILE *__retres;
+  __e_acsl_store_block((void *)(& __retres),(size_t)8);
+  __retres = tmpfile();
+  __e_acsl_delete_block((void *)(& __retres));
+  return __retres;
+}
+
+/*@ exits status: \exit_status ≡ \old(status);
+    ensures never_terminates: \false;
+    
+    assigns \exit_status \from status;
+ */
+void __gen_e_acsl_exit(int status)
+{
+  exit(status);
+  __e_acsl_assert(0,"Postcondition","exit","\\false",
+                  "FRAMAC_SHARE/libc/stdlib.h",473);
+  return;
+}
 
 void __e_acsl_globals_init(void)
 {

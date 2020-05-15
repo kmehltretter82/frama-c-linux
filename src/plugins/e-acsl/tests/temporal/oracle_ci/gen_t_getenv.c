@@ -5,6 +5,48 @@ char *__gen_e_acsl_literal_string_2;
 char *__gen_e_acsl_literal_string;
 extern int __e_acsl_sound_verdict;
 
+/*@ requires valid_name: valid_read_string(name);
+    ensures null_or_valid_result: \result ≡ \null ∨ \valid(\result);
+    assigns \result;
+    assigns \result \from __fc_env[0 ..], (indirect: name), *(name + (0 ..));
+ */
+char *__gen_e_acsl_getenv(char const *name);
+
+/*@ requires valid_name: valid_read_string(name);
+    ensures null_or_valid_result: \result ≡ \null ∨ \valid(\result);
+    assigns \result;
+    assigns \result \from __fc_env[0 ..], (indirect: name), *(name + (0 ..));
+ */
+char *__gen_e_acsl_getenv(char const *name)
+{
+  char *__retres;
+  __e_acsl_store_block((void *)(& __retres),(size_t)8);
+  __e_acsl_temporal_reset_parameters();
+  __e_acsl_temporal_reset_return();
+  __retres = getenv(name);
+  __e_acsl_temporal_store_nblock((void *)(& __retres),(void *)*(& __retres));
+  {
+    int __gen_e_acsl_or;
+    __e_acsl_temporal_save_return((void *)(& __retres));
+    /*@ assert
+        Eva: ptr_comparison: \pointer_comparable((void *)__retres, (void *)0);
+    */
+    if (__retres == (char *)0) __gen_e_acsl_or = 1;
+    else {
+      int __gen_e_acsl_valid;
+      __gen_e_acsl_valid = __e_acsl_valid((void *)__retres,sizeof(char),
+                                          (void *)__retres,
+                                          (void *)(& __retres));
+      __gen_e_acsl_or = __gen_e_acsl_valid;
+    }
+    __e_acsl_assert(__gen_e_acsl_or,"Postcondition","getenv",
+                    "\\result == \\null || \\valid(\\result)",
+                    "FRAMAC_SHARE/libc/stdlib.h",488);
+    __e_acsl_delete_block((void *)(& __retres));
+    return __retres;
+  }
+}
+
 void __e_acsl_globals_init(void)
 {
   static char __e_acsl_already_run = 0;
