@@ -160,7 +160,9 @@ const RenderConsole = () => {
     if (cursor < 0) {
       dumpCmdLine(Server.getConfig());
       const cmd = cmdLine.getDoc().getValue().trim();
-      const hs = history.filter((h: string) => h !== cmd).slice(0, 50);
+      const hs = history
+        .filter((h: string) => h !== cmd && h !== '')
+        .slice(0, 50);
       hs.unshift(cmd);
       scratch.current = hs.slice();
       setHistory(hs);
@@ -172,20 +174,22 @@ const RenderConsole = () => {
     }
   };
 
-  const doMove = (target: number) =>
-    (0 <= target && target < history.length ?
-      () => {
+  const doMove = (target: number) => {
+    if (0 <= target && target < history.length)
+      return () => {
         const doc = cmdLine.getDoc();
         const cmd = scratch.current;
         cmd[cursor] = doc.getValue();
         doc.setValue(cmd[target]);
         setCursor(target);
-      } : undefined);
+      };
+    return undefined;
+  };
 
   const doReload = () => {
     const doc = cmdLine.getDoc();
     const cmd = scratch.current;
-    if (cursor != 0) cmd[cursor] = doc.getValue();
+    if (cursor !== 0) cmd[cursor] = doc.getValue();
     dumpCmdLine(Server.getConfig());
     cmd[0] = doc.getValue();
     setCursor(0);
@@ -203,15 +207,15 @@ const RenderConsole = () => {
       setHistory(hst);
       setCursor(next);
     } else {
-      scratch.current = [""];
-      cmdLine.getDoc().setValue("");
+      scratch.current = [''];
+      cmdLine.getDoc().setValue('');
     }
   };
 
   const doPrev = doMove(cursor + 1);
   const doNext = doMove(cursor - 1);
   const edited = 0 <= cursor;
-  const length = history.length;
+  const n = history.length;
 
   return (
     <>
@@ -235,8 +239,8 @@ const RenderConsole = () => {
           onClick={doPrev}
           title="Previous Command"
         />
-        <Label className="dimmed" display={edited && length > 0}>
-          {1 + cursor}/{length}
+        <Label className="dimmed" display={edited && n > 0}>
+          {1 + cursor}/{n}
         </Label>
         <IconButton
           icon="MEDIA.NEXT"

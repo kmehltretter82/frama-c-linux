@@ -51,6 +51,8 @@ module.exports = {
     "padded-blocks": "off",
     // Allow braces on their own line
     "@typescript-eslint/brace-style": "off",
+    // Allow range conditions such as 0 <= x && x < 10
+    "yoda": [2, "never", { "onlyEquality": true }],
     // Allow single command on new line after 'if' statement
     "curly": "off",
     // Do not specify position for single commands
