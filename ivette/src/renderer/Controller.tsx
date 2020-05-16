@@ -136,13 +136,6 @@ export const Control = () => {
 // --- Server Console
 // --------------------------------------------------------------------------
 
-function execCmdLine(cmd: string) {
-  const argv = cmd.split(/[ \t\n]+/);
-  const cfg = buildServerConfiguration(argv);
-  Server.configure(cfg);
-  Server.restart();
-}
-
 const RenderConsole = () => {
   const scratch = React.useRef([] as string[]);
   const [cursor, setCursor] = React.useState(-1);
@@ -152,7 +145,10 @@ const RenderConsole = () => {
   const doExec = () => {
     const cmd = cmdLine.getDoc().getValue().trim();
     cmdLine.clear();
-    execCmdLine(cmd);
+    const argv = cmd.split(/[ \t\n]+/);
+    const cfg = buildServerConfiguration(argv);
+    Server.configure(cfg);
+    Server.restart();
     setCursor(-1);
   };
 
