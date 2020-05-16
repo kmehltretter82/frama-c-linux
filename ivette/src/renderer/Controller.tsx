@@ -136,10 +136,6 @@ export const Control = () => {
 // --- Server Console
 // --------------------------------------------------------------------------
 
-function getCmdLine() {
-  return cmdLine.getDoc().getValue().trim();
-}
-
 function execCmdLine(cmd: string) {
   const argv = cmd.split(/[ \t\n]+/);
   const cfg = buildServerConfiguration(argv);
@@ -148,87 +144,124 @@ function execCmdLine(cmd: string) {
 }
 
 const RenderConsole = () => {
-  const [command, switchCmd] = Dome.useSwitch();
-  const { current, next, prev, index, length, update, insert, clear }: any =
-    Dome.useHistory('frama-c.command.history');
+  const scratch = React.useRef([] as string[]);
+  const [cursor, setCursor] = React.useState(-1);
+  const [h0, setHistory] = Dome.useState('Controller.history', []);
+  const history = Array.isArray(h0) ? h0 : [];
 
   const doExec = () => {
-    const cmdline = getCmdLine();
-    if (cmdline !== current) insert(cmdline);
-    execCmdLine(cmdline);
-    switchCmd();
-  };
-  const doNext = () => { cmdLine.getDoc().setValue(next() || ''); };
-  const doPrev = () => { cmdLine.getDoc().setValue(prev() || ''); };
-  const doReload = () => { dumpCmdLine(cmdConfig); };
-  const doDrop = () => {
+    const cmd = cmdLine.getDoc().getValue().trim();
     cmdLine.clear();
-    cmdLine.getDoc().setValue(update(undefined) || '');
+    execCmdLine(cmd);
+    setCursor(-1);
   };
+
+  const doEdit = () => {
+    if (cursor < 0) {
+      dumpCmdLine(Server.getConfig());
+      const cmd = cmdLine.getDoc().getValue().trim();
+      const hs = history.filter((h: string) => h !== cmd).slice(0, 50);
+      hs.unshift(cmd);
+      scratch.current = hs.slice();
+      setHistory(hs);
+      setCursor(0);
+    } else {
+      cmdLine.clear();
+      scratch.current = [];
+      setCursor(-1);
+    }
+  };
+
+  const doMove = (target: number) =>
+    (0 <= target && target < history.length ?
+      () => {
+        const doc = cmdLine.getDoc();
+        const cmd = scratch.current;
+        cmd[cursor] = doc.getValue();
+        doc.setValue(cmd[target]);
+        setCursor(target);
+      } : undefined);
+
+  const doReload = () => {
+    const doc = cmdLine.getDoc();
+    const cmd = scratch.current;
+    if (cursor != 0) cmd[cursor] = doc.getValue();
+    dumpCmdLine(Server.getConfig());
+    cmd[0] = doc.getValue();
+    setCursor(0);
+  };
+
+  const doRemove = () => {
+    const n = history.length;
+    if (n > 1) {
+      const hst = history.slice();
+      const cmd = scratch.current;
+      const next = cursor - 1;
+      hst.splice(cursor, 1);
+      cmd.splice(cursor, 1);
+      cmdLine.getDoc().setValue(scratch.current[next]);
+      setHistory(hst);
+      setCursor(next);
+    } else {
+      scratch.current = [""];
+      cmdLine.getDoc().setValue("");
+    }
+  };
+
+  const doPrev = doMove(cursor + 1);
+  const doNext = doMove(cursor - 1);
+  const edited = 0 <= cursor;
+  const length = history.length;
+
   return (
     <>
-      <TitleBar label={command ? 'Command Line' : 'Console'}>
-        <Label
-          className="dimmed"
-          display={command && length > 0}
-          title="Rank in History"
-        >
-          {1 + index}/{length}
-        </Label>
-        <Space />
+      <TitleBar label={edited ? 'Command Line' : 'Console'}>
         <IconButton
           icon="TRASH"
-          display={command && clear}
-          disabled={!clear}
-          onClick={clear}
-          title="Clear History"
-        />
-        <IconButton
-          icon="CROSS"
-          display={command && clear}
-          disabled={!current}
-          onClick={doDrop}
-          title="Remove Command"
+          display={edited}
+          onClick={doRemove}
+          title="Discard Command from History"
         />
         <Space />
         <IconButton
+          icon="RELOAD"
+          display={edited}
+          onClick={doReload}
+          title="Reset Server Command"
+        />
+        <IconButton
           icon="MEDIA.PREV"
-          display={command}
-          disabled={!prev}
+          display={edited}
           onClick={doPrev}
           title="Previous Command"
         />
-        <IconButton
-          icon="RELOAD"
-          display={command}
-          onClick={doReload}
-          title="Reset Command Line"
-        />
+        <Label className="dimmed" display={edited && length > 0}>
+          {1 + cursor}/{length}
+        </Label>
         <IconButton
           icon="MEDIA.NEXT"
-          display={command}
-          disabled={!next}
+          display={edited}
           onClick={doNext}
           title="Next Command"
         />
         <Space />
         <IconButton
           icon="MEDIA.PLAY"
-          display={command}
+          display={edited}
           onClick={doExec}
           title="Execute Command"
         />
         <IconButton
           icon="EDIT"
-          selected={command}
-          onClick={switchCmd}
-          title="Edit Command"
+          selected={edited}
+          onClick={doEdit}
+          title="Edit Command Line"
         />
       </TitleBar>
       <Text
-        buffer={command ? cmdLine : Server.buffer}
+        buffer={edited ? cmdLine : Server.buffer}
         mode="text"
-        readOnly={!command}
+        readOnly={!edited}
         theme="ambiance"
       />
     </>
