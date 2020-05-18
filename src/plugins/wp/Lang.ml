@@ -133,7 +133,7 @@ type adt =
   | Mtype of mdt (* Model type *)
   | Mrecord of mdt * fields (* Model record-type *)
   | Atype of logic_type_info (* Logic Type *)
-  | Comp of (compinfo * datakind) (* C-code struct or union *)
+  | Comp of compinfo * datakind (* C-code struct or union *)
 and mdt = string extern (** name to print to the provers *)
 and 'a extern = {
   ext_id      : int;
@@ -144,7 +144,7 @@ and 'a extern = {
 and fields = { mutable fields : field list }
 and field =
   | Mfield of mdt * fields * string * tau
-  | Cfield of (fieldinfo * datakind)
+  | Cfield of fieldinfo * datakind
 and tau = (field,adt) Logic.datatype
 
 let pointer = Context.create "Lang.pointer"

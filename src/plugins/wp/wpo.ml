@@ -204,6 +204,8 @@ struct
         let fold acc (get,solver) = if get () then solver::acc else acc in
         let solvers = List.fold_left fold [] default_simplifiers in
         apply (Conditions.simplify ~solvers) g ;
+        if Wp_parameters.FilterInit.get ()
+        then apply Conditions.init_filter g ;
         if Wp_parameters.Prune.get ()
         then apply (Conditions.pruning ~solvers) g ;
         if Wp_parameters.Filter.get ()

@@ -240,8 +240,8 @@ new way
 one_assign sequent:
    Assume {
      Have: foo_0 = 42.
-     Have: (ta_d_0=true) /\ (ta_d_1=false).
-     Have: d = c.
+     Have: (Init_d_0=false) /\ (ta_d_0=true) /\ (ta_d_1=false).
+     Have: (Init_d_1=true) /\ (d = c).
    }
 Prove: d = c.
 
@@ -254,7 +254,8 @@ new way
 one_if sequent:
    Assume {
      Have: foo_0 = 42.
-     Have: (ta_retres_0=true) /\ (ta_retres_1=false).
+     Have: (Init_retres_0=false) /\ (ta_retres_0=true) /\
+         (ta_retres_1=false).
    }
 Prove: true.
 
@@ -267,12 +268,18 @@ new way
 some_seq sequent:
    Assume {
      Have: foo_0 = 42.
-     Have: (ta_d_0=true) /\ (ta_d_1=false).
-     Have: d_1 = 0.
+     Have: (Init_d_0=false) /\ (ta_d_0=true) /\ (ta_d_1=false).
+     Have: (Init_d_1=true) /\ (d_1 = 0).
      If c != 0
-     Then { Have: d_1 = d_2. Have: d = 1. }
+     Then {
+       Have: ((Init_d_1=true) <-> (Init_d_2=true)) /\ (d_1 = d_2).
+       Have: (Init_d_3=true) /\ (d = 1).
+     }
      If c = 0
-     Then { Have: d_1 = d_3. Have: d = 2. }
+     Then {
+       Have: ((Init_d_1=true) <-> (Init_d_4=true)) /\ (d_1 = d_3).
+       Have: (Init_d_5=true) /\ (d = 2).
+     }
      Have: ((c != 0) -> (d = 1)).
    }
 Prove: ((c = 0) -> (d = 2)).
@@ -285,12 +292,18 @@ Prove: true.
 some_seq sequent:
    Assume {
      Have: foo_0 = 42.
-     Have: (ta_d_0=true) /\ (ta_d_1=false).
-     Have: d_1 = 0.
+     Have: (Init_d_0=false) /\ (ta_d_0=true) /\ (ta_d_1=false).
+     Have: (Init_d_1=true) /\ (d_1 = 0).
      If c != 0
-     Then { Have: d_1 = d_2. Have: d = 1. }
+     Then {
+       Have: ((Init_d_1=true) <-> (Init_d_2=true)) /\ (d_1 = d_2).
+       Have: (Init_d_3=true) /\ (d = 1).
+     }
      If c = 0
-     Then { Have: d_1 = d_3. Have: d = 2. }
+     Then {
+       Have: ((Init_d_1=true) <-> (Init_d_4=true)) /\ (d_1 = d_3).
+       Have: (Init_d_5=true) /\ (d = 2).
+     }
    }
 Prove: ((c != 0) -> (d = 1)).
 
@@ -303,8 +316,8 @@ new way
 main_ensures_result sequent:
    Assume {
      Have: foo_0 = 42.
-     Have: (ta_retres_0=true) /\ (ta_retres_1=false) /\ (ta_x_0=true) /\
-         (ta_x_1=false).
+     Have: (Init_retres_0=false) /\ (Init_x_0=false) /\ (ta_retres_0=true) /\
+         (ta_retres_1=false) /\ (ta_x_0=true) /\ (ta_x_1=false).
      Have: result_0 = 0.
      Have: x = result_0.
    }
@@ -340,7 +353,7 @@ new way
 main_assigns_global sequent:
    Assume {
      Have: foo_1 = 42.
-     Have: (ta_r_0=true) /\ (ta_r_1=false).
+     Have: (Init_r_0=false) /\ (ta_r_0=true) /\ (ta_r_1=false).
      Have: foo_2 = 1.
      Have: x = result_0.
      Have: x = foo_0.
@@ -358,7 +371,7 @@ Prove: foo_0 = 1.
 main_assigns_global sequent:
    Assume {
      Have: foo_1 = 42.
-     Have: (ta_r_0=true) /\ (ta_r_1=false).
+     Have: (Init_r_0=false) /\ (ta_r_0=true) /\ (ta_r_1=false).
      Have: foo_2 = 1.
      Have: x = result_0.
      Have: x = foo_0.
@@ -375,7 +388,7 @@ Prove: true.
 main_assigns_global sequent:
    Assume {
      Have: foo_1 = 42.
-     Have: (ta_r_0=true) /\ (ta_r_1=false).
+     Have: (Init_r_0=false) /\ (ta_r_0=true) /\ (ta_r_1=false).
      Have: foo_2 = 1.
      Have: x = result_0.
      Have: x = foo_0.
@@ -393,9 +406,9 @@ zloop sequent:
    Assume {
      Have: foo_0 = 42.
      Have: 0 <= x.
-     Have: (ta_i_0=true) /\ (ta_i_1=false).
+     Have: (Init_i_0=false) /\ (ta_i_0=true) /\ (ta_i_1=false).
      Have: i_1 = 0.
-     Have: (1 + i_1) = i_2.
+     Have: (Init_i_1=true) /\ ((1 + i_1) = i_2).
      Have: i_2 <= 10.
      Have: i <= 10.
      Have: 10 <= i.
@@ -416,9 +429,9 @@ zloop sequent:
    Assume {
      Have: foo_0 = 42.
      Have: 0 <= x.
-     Have: (ta_i_0=true) /\ (ta_i_1=false).
+     Have: (Init_i_0=false) /\ (ta_i_0=true) /\ (ta_i_1=false).
      Have: i = 0.
-     Have: (1 + i) = i_1.
+     Have: (Init_i_1=true) /\ ((1 + i) = i_1).
      Have: i_1 <= 10.
      Have: i_2 <= 10.
      Have: 10 <= i_2.
@@ -436,9 +449,9 @@ zloop sequent:
    Assume {
      Have: foo_0 = 42.
      Have: 0 <= x.
-     Have: (ta_i_0=true) /\ (ta_i_1=false).
+     Have: (Init_i_0=false) /\ (ta_i_0=true) /\ (ta_i_1=false).
      Have: i_1 = 0.
-     Have: (1 + i_1) = i_2.
+     Have: (Init_i_1=true) /\ ((1 + i_1) = i_2).
      Have: i_2 <= 10.
      Have: i <= 10.
      Have: 10 <= i.
@@ -455,9 +468,9 @@ zloop sequent:
    Assume {
      Have: foo_0 = 42.
      Have: 0 <= x.
-     Have: (ta_i_0=true) /\ (ta_i_1=false).
+     Have: (Init_i_0=false) /\ (ta_i_0=true) /\ (ta_i_1=false).
      Have: i_1 = 0.
-     Have: (1 + i_1) = i_2.
+     Have: (Init_i_1=true) /\ ((1 + i_1) = i_2).
      Have: i_2 <= 10.
      Have: i <= 10.
      Have: 10 <= i.
@@ -473,9 +486,9 @@ zloop sequent:
    Assume {
      Have: foo_0 = 42.
      Have: 0 <= x.
-     Have: (ta_i_0=true) /\ (ta_i_1=false).
+     Have: (Init_i_0=false) /\ (ta_i_0=true) /\ (ta_i_1=false).
      Have: i_1 = 0.
-     Have: (1 + i_1) = i.
+     Have: (Init_i_1=true) /\ ((1 + i_1) = i).
    }
 Prove: i <= 10.
 
@@ -488,14 +501,14 @@ zloop sequent:
    Assume {
      Have: foo_0 = 42.
      Have: 0 <= x.
-     Have: (ta_i_0=true) /\ (ta_i_1=false).
+     Have: (Init_i_0=false) /\ (ta_i_0=true) /\ (ta_i_1=false).
      Have: i_1 = 0.
-     Have: (1 + i_1) = i_2.
+     Have: (Init_i_1=true) /\ ((1 + i_1) = i_2).
      Have: i_2 <= 10.
      Have: i_3 <= 10.
      Have: i_3 <= 9.
-     Have: (1 + i_3) = i_4.
-     Have: (1 + i_4) = i.
+     Have: (Init_i_2=true) /\ ((1 + i_3) = i_4).
+     Have: (Init_i_3=true) /\ ((1 + i_4) = i).
    }
 Prove: i <= 10.
 
@@ -508,9 +521,9 @@ zloop sequent:
    Assume {
      Have: foo_0 = 42.
      Have: 0 <= x.
-     Have: (ta_i_0=true) /\ (ta_i_1=false).
+     Have: (Init_i_0=false) /\ (ta_i_0=true) /\ (ta_i_1=false).
      Have: i = 0.
-     Have: (1 + i) = i_1.
+     Have: (Init_i_1=true) /\ ((1 + i) = i_1).
      Have: i_1 <= 10.
      Have: i_2 <= 10.
      Have: 10 <= i_2.
@@ -533,8 +546,8 @@ new way
 behavior2 sequent:
    Assume {
      Have: foo_0 = 42.
-     Have: (ta_retres_0=true) /\ (ta_retres_1=false) /\ (ta_x_0=true) /\
-         (ta_x_1=false).
+     Have: (Init_retres_0=false) /\ (Init_x_0=false) /\ (ta_retres_0=true) /\
+         (ta_retres_1=false) /\ (ta_x_0=true) /\ (ta_x_1=false).
      Have: result_0 < 0.
      Have: x = result_0.
    }
@@ -549,8 +562,8 @@ new way
 behavior3 sequent:
    Assume {
      Have: foo_0 = 42.
-     Have: (ta_retres_0=true) /\ (ta_retres_1=false) /\ (ta_x_0=true) /\
-         (ta_x_1=false).
+     Have: (Init_retres_0=false) /\ (Init_x_0=false) /\ (ta_retres_0=true) /\
+         (ta_retres_1=false) /\ (ta_x_0=true) /\ (ta_x_1=false).
      Have: 0 <= result_0.
      Have: x = result_0.
    }
@@ -565,8 +578,8 @@ new way
 behavior4 sequent:
    Assume {
      Have: foo_0 = 42.
-     Have: (ta_retres_0=true) /\ (ta_retres_1=false) /\ (ta_x_0=true) /\
-         (ta_x_1=false).
+     Have: (Init_retres_0=false) /\ (Init_x_0=false) /\ (ta_retres_0=true) /\
+         (ta_retres_1=false) /\ (ta_x_0=true) /\ (ta_x_1=false).
      Have: result_0 <= 0.
      Have: 0 <= result_0.
      Have: x = result_0.
@@ -582,8 +595,8 @@ new way
 behavior5 sequent:
    Assume {
      Have: foo_0 = 42.
-     Have: (ta_retres_0=true) /\ (ta_retres_1=false) /\ (ta_x_0=true) /\
-         (ta_x_1=false).
+     Have: (Init_retres_0=false) /\ (Init_x_0=false) /\ (ta_retres_0=true) /\
+         (ta_retres_1=false) /\ (ta_x_0=true) /\ (ta_x_1=false).
      Have: 0 <= result_0.
      Have: x = result_0.
    }
@@ -599,7 +612,8 @@ new way
 if_assert sequent:
    Assume {
      Have: foo_0 = 42.
-     Have: (ta_retres_0=true) /\ (ta_retres_1=false).
+     Have: (Init_retres_0=false) /\ (ta_retres_0=true) /\
+         (ta_retres_1=false).
      If x < 0
      Then { Have: x = x_1. Have: ((x < 0) -> (x_1 < (y * y))). }
      If 0 <= x
@@ -627,7 +641,8 @@ Prove: false.
 if_assert sequent:
    Assume {
      Have: foo_0 = 42.
-     Have: (ta_retres_0=true) /\ (ta_retres_1=false).
+     Have: (Init_retres_0=false) /\ (ta_retres_0=true) /\
+         (ta_retres_1=false).
      If x_1 < 0
      Then { Have: x_1 = x. Have: ((x_1 < 0) -> (x < (y * y))). }
      If 0 <= x_1
@@ -647,7 +662,8 @@ Prove: true.
 if_assert sequent:
    Assume {
      Have: foo_0 = 42.
-     Have: (ta_retres_0=true) /\ (ta_retres_1=false).
+     Have: (Init_retres_0=false) /\ (ta_retres_0=true) /\
+         (ta_retres_1=false).
      Have: 0 <= x_1.
      Have: (x + x_1) = 0.
    }
@@ -662,7 +678,8 @@ Prove: 0 < (x + (y * y)).
 if_assert sequent:
    Assume {
      Have: foo_0 = 42.
-     Have: (ta_retres_0=true) /\ (ta_retres_1=false).
+     Have: (Init_retres_0=false) /\ (ta_retres_0=true) /\
+         (ta_retres_1=false).
      Have: x < 0.
    }
 Prove: x < (y * y).
@@ -683,7 +700,7 @@ compare sequent:
          ((b = a) /\ (a <= b) /\ (d <= c) /\
           ((b != a) \/ ((b = a) /\ (d <= c)))).
      Have: foo_0 = 42.
-     Have: (ta_r_0=true) /\ (ta_r_1=false).
+     Have: (Init_r_0=false) /\ (ta_r_0=true) /\ (ta_r_1=false).
      If (b < a) \/ ((b = a) /\ (a <= b) /\ (c < d)) \/
          ((b != a) /\ (a <= b) /\ ((b != a) \/ ((b = a) /\ (d <= c)))) \/
          ((b = a) /\ (a <= b) /\ (c < d) /\
@@ -691,33 +708,49 @@ compare sequent:
          ((b = a) /\ (a <= b) /\ (d <= c) /\
           ((b != a) \/ ((b = a) /\ (d <= c))))
      If b < a
-     Then { Have: r_1 = r_2. Have: r = (-1). }
+     Then {
+       Have: ((Init_r_0=true) <-> (Init_r_1=true)) /\ (r_1 = r_2).
+       Have: (Init_r_2=true) /\ (r = (-1)).
+     }
      If a <= b
      Then {
-       Have: r_1 = r_3.
+       Have: ((Init_r_0=true) <-> (Init_r_3=true)) /\ (r_1 = r_3).
        If (b != a) \/ ((b = a) /\ (d <= c))
        Then {
          If b = a
          Then {
-           Have: r_4 = r_5.
+           Have: ((Init_r_4=true) <-> (Init_r_5=true)) /\ (r_4 = r_5).
            If d <= c
-           Then { Have: r_5 = r_6. Have: r = 0. }
+           Then {
+             Have: ((Init_r_5=true) <-> (Init_r_6=true)) /\ (r_5 = r_6).
+             Have: (Init_r_7=true) /\ (r = 0).
+           }
            If c < d
-           Then { Have: r_5 = r_7. Have: r = 1. }
+           Then {
+             Have: ((Init_r_5=true) <-> (Init_r_8=true)) /\ (r_5 = r_7).
+             Have: (Init_r_9=true) /\ (r = 1).
+           }
          }
          If b != a
-         Then { Have: r_4 = r_8. Have: r = 1. }
+         Then {
+           Have: ((Init_r_4=true) <-> (Init_r_10=true)) /\ (r_4 = r_8).
+           Have: (Init_r_11=true) /\ (r = 1).
+         }
        }
        If b = a
        Then {
-         Have: r_3 = r_9.
+         Have: ((Init_r_3=true) <-> (Init_r_12=true)) /\ (r_3 = r_9).
          If c < d
-         Then { Have: r_9 = r_10. Have: r = (-1). }
+         Then {
+           Have: ((Init_r_12=true) <-> (Init_r_13=true)) /\ (r_9 = r_10).
+           Have: (Init_r_14=true) /\ (r = (-1)).
+         }
          If d <= c
-         Then { Have: r_9 = r_4. }
+         Then { Have: ((Init_r_12=true) <-> (Init_r_4=true)) /\ (r_9 = r_4).
+         }
        }
        If b != a
-       Then { Have: r_3 = r_4. }
+       Then { Have: ((Init_r_3=true) <-> (Init_r_4=true)) /\ (r_3 = r_4). }
      }
    }
 Prove: ((a < b) -> (r = 1)).

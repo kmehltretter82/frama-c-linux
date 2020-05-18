@@ -215,7 +215,7 @@ let state (s:sigma) =
   let m = ref Tmap.empty in
   Sigma.iter (fun c x -> m := Tmap.add (F.e_var x) c !m) s ; !m
 
-let imval c = Sigs.Mchunk (Pretty_utils.to_string Chunk.pretty c)
+let imval c = Sigs.Mchunk (Pretty_utils.to_string Chunk.pretty c, KValue)
 let iter f s = Tmap.iter (fun v c -> f (imval c) v) s
 let lookup (s : state) (e : Lang.F.term) = imval (F.Tmap.find e s)
 let apply f s =

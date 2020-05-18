@@ -97,25 +97,16 @@ Prove: true.
 
 Goal Loop assigns 'CHECK' (3/3):
 Effect at line 115
-Let m = Init_0[shiftfield_F1_S_i(s) <- true].
-Let a = shiftfield_F1_S_a(s).
-Let a_1 = havoc(Init_undef_0, m, shift_sint32(a, 0), 10).
 Assume {
   Type: is_sint32(i_1) /\ is_sint32(i).
   (* Heap *)
   Type: (region(s.base) <= 0) /\ linked(Malloc_0).
   (* Goal *)
-  When: !invalid(Malloc_0, shift_sint32(a, i), 1).
-  (* Loop assigns ... *)
-  Have: monotonic_init(m, a_1).
+  When: !invalid(Malloc_0, shift_sint32(shiftfield_F1_S_a(s), i), 1).
   (* Invariant *)
-  Have: (0 <= i_1) /\ (i_1 <= 10) /\
-      (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) ->
-       (a_1[shift_sint32(a, i_2)]=true)))).
+  Have: (0 <= i_1) /\ (i_1 <= 10).
   (* Else *)
   Have: 10 <= i_1.
-  (* Loop assigns 'CHECK' *)
-  Have: monotonic_init(a_1, havoc(Init_undef_1, m, s, 11)).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10).
   (* Then *)
@@ -170,37 +161,25 @@ Prove: true.
 
 Goal Loop assigns 'CHECK' (2/5):
 Effect at line 96
-Let a = shiftfield_F1_S_i(s).
-Let m = Init_0[a <- true].
-Let a_1 = shiftfield_F1_S_a(s).
-Let a_2 = shift_sint32(a_1, 0).
-Let a_3 = havoc(Init_undef_0, m, a_2, 10).
+Let a = shiftfield_F1_S_a(s).
 Assume {
   Type: is_sint32(i_2) /\ is_sint32(i_3).
   (* Heap *)
   Type: (region(s.base) <= 0) /\ linked(Malloc_0).
   (* Goal *)
-  When: (!invalid(Malloc_0, shift_sint32(a_1, i_4), 1)) /\
+  When: (!invalid(Malloc_0, shift_sint32(a, i_4), 1)) /\
       ((i_4 = 0) \/ (i_4 = 2) \/ (i_4 = 4)) /\
       ((i = 0) \/ (i = 2) \/ (i = 4)).
-  (* Loop assigns ... *)
-  Have: monotonic_init(m, a_3).
   (* Invariant *)
-  Have: (0 <= i_2) /\ (i_2 <= 10) /\
-      (forall i_5 : Z. ((0 <= i_5) -> ((i_5 < i_2) ->
-       (a_3[shift_sint32(a_1, i_5)]=true)))).
+  Have: (0 <= i_2) /\ (i_2 <= 10).
   (* Else *)
   Have: 10 <= i_2.
   (* Loop assigns 'CHECK' *)
-  Have: monotonic_init(a_3, Init_1) /\
-      (forall a_4 : addr.
-       ((forall i_5 : Z. (((i_5 = 0) \/ (i_5 = 2) \/ (i_5 = 4)) ->
-         (shift_sint32(a_1, i_5) != a_4))) ->
-       ((a_3[a_4]=true) <-> (Init_1[a_4]=true)))) /\
-      (forall a_4 : addr.
-       ((forall i_5 : Z. (((i_5 = 0) \/ (i_5 = 2) \/ (i_5 = 4)) ->
-         (shift_sint32(a_1, i_5) != a_4))) ->
-       (havoc(Mint_undef_0, Mint_0[a <- 0], a_2, 10)[a_4] = Mint_1[a_4]))).
+  Have: forall a_1 : addr.
+      ((forall i_5 : Z. (((i_5 = 0) \/ (i_5 = 2) \/ (i_5 = 4)) ->
+        (shift_sint32(a, i_5) != a_1))) ->
+      (havoc(Mint_undef_0, Mint_0[shiftfield_F1_S_i(s) <- 0],
+         shift_sint32(a, 0), 10)[a_1] = Mint_1[a_1])).
   (* Then *)
   Have: i_3 <= 9.
 }

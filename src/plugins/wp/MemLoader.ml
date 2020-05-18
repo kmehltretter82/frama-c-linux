@@ -334,15 +334,14 @@ struct
           in
           let lfun = Lang.generated_p name in
           let xms,chunks,sigma = signature domain in
-          let def = List.map
+          let def = p_all
               (fun f -> !isinitrec sigma (object_of f.ftype) (M.field loc f))
               c.cfields
           in
-          let dfun = Definitions.Predicate(Def , p_conj def ) in
           Definitions.define_symbol {
             d_lfun = lfun ; d_types = 0 ;
             d_params = x :: xms ;
-            d_definition = dfun ;
+            d_definition = Predicate(Def , def) ;
             d_cluster = cluster () ;
           } ;
           lfun , chunks

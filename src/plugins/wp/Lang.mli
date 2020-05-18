@@ -63,7 +63,7 @@ type adt = private (** A type is never registered in a Definition.t *)
   | Mtype of mdt (** External type *)
   | Mrecord of mdt * fields (** External record-type *)
   | Atype of logic_type_info (** Logic Type *)
-  | Comp of (compinfo * datakind) (** C-code struct or union *)
+  | Comp of compinfo * datakind (** C-code struct or union *)
 and mdt = string extern (** name to print to the provers *)
 and 'a extern = {
   ext_id     : int;
@@ -74,7 +74,7 @@ and 'a extern = {
 and fields = { mutable fields : field list }
 and field =
   | Mfield of mdt * fields * string * tau
-  | Cfield of (fieldinfo * datakind)
+  | Cfield of fieldinfo * datakind
 and tau = (field,adt) Logic.datatype
 
 type t_builtin = E_mdt of mdt | E_poly of (tau list -> tau)

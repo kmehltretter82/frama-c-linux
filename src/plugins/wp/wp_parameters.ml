@@ -485,6 +485,13 @@ module Prune =
   end)
 
 let () = Parameter_customize.set_group wp_simplifier
+module FilterInit =
+  True(struct
+    let option_name = "-wp-filter-init"
+    let help = "Use aggressive filtering of initialization hypotheses."
+  end)
+
+let () = Parameter_customize.set_group wp_simplifier
 module Clean =
   True(struct
     let option_name = "-wp-clean"

@@ -1575,6 +1575,48 @@ end
 
 let parasite = Parasite.filter
 
+module InitFilter =
+struct
+  let add_state filter s = s :: filter
+
+  let rec collect_step filter s =
+    match s.condition with
+    | State s -> add_state filter s
+    | Have _ | Core _ | Init _ | When _ | Type _ -> filter
+    | Branch(_p,a,b) -> collect_seq (collect_seq filter a) b
+    | Either ws -> List.fold_left collect_seq filter ws
+
+  and collect_seq filter s =
+    List.fold_left collect_step filter s.seq_list
+
+  exception Found
+
+  let has_init filter pred =
+    let rec term_is_init_in_state t s =
+      match Mstate.lookup s t with
+      | Mlval(_, KInit) | Mchunk(_, KInit) -> raise Found
+      | _ -> Lang.F.lc_iter (fun t -> term_is_init_in_state t s) t
+    in
+    try List.iter (term_is_init_in_state (F.e_prop pred)) filter ; false
+    with Found -> true
+
+  let rec do_filter filter p =
+    let on_sub_nodes = do_filter filter in
+    match F.p_expr p with
+    | And ps -> p_all on_sub_nodes ps
+    | Or ps -> p_disj List.(filter (fun p -> p <> p_true) (map on_sub_nodes ps))
+    | If(e,a,b) -> F.p_if e (on_sub_nodes a) (on_sub_nodes b)
+    | _ when has_init filter p -> p_true
+    | _ -> p
+
+  let filter (hs, g) =
+    let filter = collect_seq [] hs in
+    if has_init filter g then (hs, g)
+    else map_sequence (do_filter filter) hs, g
+end
+
+let init_filter = InitFilter.filter
+
 (* -------------------------------------------------------------------------- *)
 (* --- Finalization                                                       --- *)
 (* -------------------------------------------------------------------------- *)

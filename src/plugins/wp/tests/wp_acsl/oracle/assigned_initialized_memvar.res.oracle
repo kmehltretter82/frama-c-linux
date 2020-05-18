@@ -105,7 +105,6 @@ Prove: true.
 
 Goal Loop assigns 'CHECK' (2/5):
 Effect at line 102
-Let a = Init_s_0.Init_F1_S_a.
 Assume {
   Type: is_sint32(i_2) /\ is_sint32(i_3).
   (* Goal *)
@@ -118,13 +117,9 @@ Assume {
   (* Else *)
   Have: 10 <= i_2.
   (* Loop assigns 'CHECK' *)
-  Have: ((s.F1_S_i) = 0) /\ ((Init_s_0.Init_F1_S_i)=true) /\
+  Have: ((s.F1_S_i) = 0) /\
       (forall i_5 : Z. ((i_5 != 0) -> ((i_5 != 2) -> ((i_5 != 4) ->
-       ((0 <= i_5) -> ((i_5 <= 9) -> ((a[i_5]=true) <-> (v[i_5]=true)))))))) /\
-      (forall i_5 : Z. ((i_5 != 0) -> ((i_5 != 2) -> ((i_5 != 4) ->
-       ((0 <= i_5) -> ((i_5 <= 9) -> ((s.F1_S_a)[i_5] = v_1[i_5]))))))) /\
-      (forall i_5 : Z. ((0 <= i_5) -> ((i_5 <= 9) -> ((v[i_5]=true) ->
-       (((i_5 = 0) \/ (i_5 = 2) \/ (i_5 = 4)) -> (a[i_5]=true)))))).
+       ((0 <= i_5) -> ((i_5 <= 9) -> ((s.F1_S_a)[i_5] = v_1[i_5]))))))).
   (* Then *)
   Have: i_3 <= 9.
 }

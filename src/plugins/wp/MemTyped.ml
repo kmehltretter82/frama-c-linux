@@ -1119,14 +1119,20 @@ and lookup_f f es =
 
 and lookup_lv e = try lookup_a e with Not_found -> Sigs.(Mmem e,[])
 
-let mchunk c = Sigs.Mchunk (Pretty_utils.to_string Chunk.pretty c)
+let mchunk c =
+  match c with
+  | T_init -> Sigs.Mchunk (Pretty_utils.to_string Chunk.pretty c, KInit)
+  | _ -> Sigs.Mchunk (Pretty_utils.to_string Chunk.pretty c, KValue)
 
 let lookup s e =
   try mchunk (Tmap.find e s)
   with Not_found ->
   try match F.repr e with
     | L.Fun( f , es ) -> Sigs.Maddr (lookup_f f es)
-    | L.Aget( m , k ) when Tmap.find m s <> T_alloc -> Sigs.Mlval (lookup_lv k)
+    | L.Aget( m , k ) when Tmap.find m s = T_init ->
+        Sigs.Mlval (lookup_lv k, KInit)
+    | L.Aget( m , k ) when Tmap.find m s <> T_alloc ->
+        Sigs.Mlval (lookup_lv k, KValue)
     | _ -> Sigs.Mterm
   with Not_found -> Sigs.Mterm
 

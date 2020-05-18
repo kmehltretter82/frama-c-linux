@@ -375,7 +375,7 @@ struct
   (* ---  State Pretty Printer                                              --- *)
   (* -------------------------------------------------------------------------- *)
 
-  type ichunk = Iref of varinfo | Ivar of varinfo
+  type ichunk = Iref of varinfo | Ivar of varinfo | Iinit of varinfo
 
   type state = {
     svar : ichunk Tmap.t ;
@@ -394,17 +394,23 @@ struct
       if cmp <> 0 then cmp else Varinfo.compare x y
 
     type t = ichunk
-    let hash = function Iref x | Ivar x -> Varinfo.hash x
+    let hash = function
+      | Iref x | Ivar x -> Varinfo.hash x
+      | Iinit x -> 13 * Varinfo.hash x
     let compare x y =
       match x,y with
       | Iref x , Iref y -> Varinfo.compare x y
-      | Iref _ , _ -> (-1)
-      | _ , Iref _ -> 1
       | Ivar x , Ivar y -> compare_var x y
+      | Iinit x, Iinit y -> compare_var x y
+      | Iref _ , _ -> (-1)
+      | Iinit _, _ -> (-1)
+      | _ , Iref _ -> 1
+      | _ , Iinit _ -> 1
+
     let equal x y =
       match x,y with
-      | Iref x , Iref y | Ivar x , Ivar y -> Varinfo.equal x y
-      | Iref _ , Ivar _ | Ivar _ , Iref _ -> false
+      | Iref x, Iref y | Ivar x, Ivar y | Iinit x, Iinit y -> Varinfo.equal x y
+      |  _, _ -> false
 
   end
 
@@ -424,13 +430,20 @@ struct
         let c = match V.param x with ByRef -> Iref x | _ -> Ivar x in
         m := set_chunk (e_var v) c !m
       ) s.vars ;
+    INIT.iter (fun x v ->
+        match V.param x with
+        | ByRef -> ()
+        | _ -> m := set_chunk (e_var v) (Iinit x) !m
+      ) s.init ;
     { svar = !m ; smem = M.state s.mem }
 
   let ilval = function
     | Iref x -> (Mvar x,[Mindex e_zero])
-    | Ivar x -> (Mvar x,[])
+    | Ivar x | Iinit x -> (Mvar x,[])
 
-  let imval c = Sigs.Mlval (ilval c)
+  let imval c = match c with
+    | Iref _ | Ivar _ -> Sigs.Mlval (ilval c, KValue)
+    | Iinit _ -> Sigs.Mlval (ilval c, KInit)
 
   let lookup s e =
     try imval (Tmap.find e s.svar)
