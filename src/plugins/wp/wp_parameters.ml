@@ -641,9 +641,9 @@ module CacheEnv = True
     (struct
       let option_name = "-wp-cache-env"
       let help = "Use environment variables for cache.\n\
-        - FRAMAC_WP_CACHE overrides -wp-cache\n\
-        - FRAMAC_WP_CACHEDIR overrides -wp-cache-dir\n\
-        This is the behavior by default."
+                  - FRAMAC_WP_CACHE overrides -wp-cache\n\
+                  - FRAMAC_WP_CACHEDIR overrides -wp-cache-dir\n\
+                  This is the behavior by default."
     end)
 
 let () = Parameter_customize.set_group wp_prover
