@@ -17,6 +17,8 @@
 Open Source Release <next-release>
 ##################################
 
+-   Kernel    [2020-05-18] Support for C11's _Noreturn function specifier
+
 ###################################
 Open Source Release 21.0 (Scandium)
 ###################################
