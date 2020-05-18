@@ -134,7 +134,7 @@ PLUGIN_TESTS_DIRS:= \
   wp_region
 
 ifeq ($(FRAMAC_INTERNAL),yes)
-Wp_DEFAULT_TESTS: create_share_link $(Wp_DIR)/tests/test_config_qualif
+Wp_DEFAULT_TESTS: create_share_link
 endif
 
 # --------------------------------------------------------------------------
