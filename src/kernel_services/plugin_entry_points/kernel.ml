@@ -142,6 +142,9 @@ let () = set_warn_status wkey_ghost_bad_use Log.Werror
 let wkey_acsl_float_compare = register_warn_category "acsl-float-compare"
 let () = set_warn_status wkey_acsl_float_compare Log.Winactive
 
+let wkey_conditional_feature =
+  register_warn_category "parser:conditional-feature"
+
 let wkey_drop_unused = register_warn_category "linker:drop-conflicting-unused"
 
 let wkey_implicit_conv_void_ptr =

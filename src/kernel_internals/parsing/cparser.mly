@@ -367,7 +367,7 @@ let in_ghost_block ?(battrs=[]) l =
 %token<Cabs.cabsloc> IF TRY EXCEPT FINALLY
 %token ELSE
 
-%token<Cabs.cabsloc> ATTRIBUTE INLINE ASM TYPEOF FUNCTION__ PRETTY_FUNCTION__
+%token<Cabs.cabsloc> ATTRIBUTE INLINE NORETURN ASM TYPEOF FUNCTION__ PRETTY_FUNCTION__
 %token LABEL__
 %token<Cabs.cabsloc> BUILTIN_VA_ARG
 %token BLOCKATTRIBUTE
@@ -1116,6 +1116,8 @@ decl_spec_wo_type:                         /* ISO 6.7 */
 |   REGISTER         { SpecStorage REGISTER, $1}
                                         /* ISO 6.7.4 */
 |   INLINE           { SpecInline, $1 }
+|   NORETURN         { SpecAttr
+                         (("noreturn",[make_expr (VARIABLE "c11")])), $1 }
 |   cvspec           { $1 }
 |   attribute_nocv   { SpecAttr (fst $1), snd $1 }
 ;
