@@ -42,12 +42,14 @@ async function loadAST(buffer: any, theFunction?: string, theMarker?: string) {
         endpoint: 'kernel.ast.printFunction',
         params: theFunction,
       });
-      buffer.clear();
-      if (!data)
-        buffer.log('// No code for function ', theFunction);
-      printAST(buffer, data);
-      if (theMarker)
-        buffer.scroll(theMarker, undefined);
+      buffer.operation(() => {
+        buffer.clear();
+        if (!data)
+          buffer.log('// No code for function ', theFunction);
+        printAST(buffer, data);
+        if (theMarker)
+          buffer.scroll(theMarker, undefined);
+      });
       return;
     })();
   }

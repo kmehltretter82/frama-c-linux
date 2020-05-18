@@ -82,6 +82,8 @@ export class RichTextBuffer extends Emitter {
     super();
     const { mode , maxlines } = props ;
     this._doc = new CodeMirror.Doc('',mode);
+    this._operations = 0 ;
+    this._editors = [] ;
     this._stacked = [] ;
     this._edited = false ;
     this._focused = false ;
@@ -439,18 +441,87 @@ is blocked.
   // --------------------------------------------------------------------------
 
   /**
-     @summary Linked CodeMirror document.
+     @summary Bind this buffer to a CodeMirror instance.
+     @param {CodeMirror} cm - code mirror instance to link this document in.
      @description
-     Returns a CodeMirror document linked to this buffer (with shared history).
+     Uses CodeMirror linked documents to allow several CodeMirror instances to be linked
+     to the same buffer.
   */
-  linkedDoc() { return this._doc.linkedDoc( { sharedHist: true } ); }
+  link(cm) {
+    const newDoc = this._doc.linkedDoc( { sharedHist: true } );
+    cm.swapDoc( newDoc );
+    this._editors.push(cm);
+    if (this._operations > 0) cm.startOperation();
+  }
 
   /**
      @summary Release a linked CodeMirror document.
+     @param {CodeMirror} cm - the code mirror instance to unlink
+     @param {Document} previous document of the instance.
      @description
-     Unlinks a CodeMirror document obtained by `linkedDoc()`.
+     Unlinks a CodeMirror document previously linked by `link(cm)`.
   */
-  unlinkDoc(doc) { this._doc.unlinkDoc( doc ); }
+  unlink(cm) {
+    const oldDoc = cm.getDoc();
+    this._doc.unlinkDoc( oldDoc );
+    this._editors = this._editors.filter((cm0) => cm0 !== cm);
+    if (this._operations > 0) cm.endOperation();
+  }
+
+  /**
+     @summary Iterates over each linked CodeMirror instances
+     @description
+     The operation `fn` is performed on each code mirror
+     instance currently linked to this buffer.
+   */
+  forEach(fn) {
+    this._editors.forEach(fn);
+  };
+
+  // --------------------------------------------------------------------------
+  // --- Stacked Operations
+  // --------------------------------------------------------------------------
+
+  /**
+     @summary Batch heavy operations on editors
+     @param {function} job - a function performing the operations (can return a promise)
+     @return {promise} the promised job
+     @description
+     Uses code mirror `cm.startOperation()` and `cm.sendOperation()` on all
+     linked editors to batch the updating operations performed on the
+     buffer. The batched updates can run asynchronously.
+  */
+  operation(job) {
+
+    // Protect each start/end call against error
+    const forEachEditor = (fn) => {
+      this._editors.forEach((cm) => {
+        try { fn(cm); } catch(e) { console.err('[Dome.text.buffers]',e); }
+      });
+    };
+
+    // Invariant: this._operations is the number of batched job still running
+    // Invariant: when pending job are running, all linked this._editors are started
+    // Second invariant is also maintained by link and unlink methods
+
+    const startOperation = () => {
+      this._operations ++;
+      if (this._operations == 1)
+        forEachEditor((cm) => cm.startOperation());
+    };
+
+    const endOperation = () => {
+      this._operations --;
+      if (this._operations == 0) {
+        forEachEditor((cm) => cm.endOperation());
+      }
+    };
+
+    return Promise.resolve()
+      .then(startOperation)
+      .then(job)
+      .finally(endOperation);
+  }
 
 }
 

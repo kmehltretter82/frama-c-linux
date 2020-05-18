@@ -112,8 +112,8 @@ export class Text extends React.Component {
               className,     /* ignored */
               style,         /* ignored */
               ...config } = this.props ;
-      const value = buffer ? buffer.linkedDoc() : "" ;
-      const cm = this.codeMirror = new CodeMirror(elt, { value });
+      const cm = this.codeMirror = new CodeMirror(elt, { value: "" });
+      if (buffer) buffer.link(cm);
       // Passing all options to constructor does not work (Cf. CodeMirror's BTS)
       for (var opt in config) cm.setOption( opt , config[opt] );
       cm.on('update',this.handleUpdate);
@@ -134,7 +134,7 @@ export class Text extends React.Component {
       Dome.off('dome.update',this.refresh);
       const { buffer } = this.props ;
       if (cm && buffer) {
-        buffer.unlinkDoc(cm.getDoc());
+        buffer.unlink(cm);
         buffer.off('decorated',this.handleUpdate);
         buffer.off('scroll',this.handleScrollTo);
       }
@@ -343,9 +343,9 @@ export class Text extends React.Component {
               selection:newSelect,
               ...newConfig } = newProps ;
       if (oldBuffer !== newBuffer) {
-        const newDoc = newBuffer.linkedDoc();
-        const oldDoc = cm.swapDoc( newDoc );
-        oldBuffer.unlinkDoc( oldDoc );
+        if (oldBuffer) oldBuffer.unlink(cm);
+        if (newBuffer) newBuffer.link(cm);
+        else cm.clear();
       }
       // Incremental update options
       var opt ;
