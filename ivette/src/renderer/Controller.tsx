@@ -171,7 +171,8 @@ const RenderConsole = () => {
         <Label
           className="dimmed"
           display={command && length > 0}
-          title="Rank in History" >
+          title="Rank in History"
+        >
           {1 + index}/{length}
         </Label>
         <Space />
