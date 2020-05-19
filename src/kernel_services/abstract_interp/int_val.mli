@@ -126,6 +126,9 @@ val add_singleton: Integer.t -> t -> t
 val neg: t -> t
 (** Negation of an integer abstraction. *)
 
+val abs: t -> t
+(** Absolute value of an integer abstraction. *)
+
 val scale: Integer.t -> t -> t
 (** [scale f v] returns an abstraction of the integers [f * x]
     for all [x] in [v]. This operation is exact. *)

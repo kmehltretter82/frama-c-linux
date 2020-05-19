@@ -482,6 +482,20 @@ let neg t =
     ~rem:(Int.e_rem (Int.neg t.rem) t.modu)
     ~modu:t.modu
 
+let abs t =
+  match t.min, t.max with
+  | Some mn, _ when Int.(ge mn zero) -> t
+  | _, Some mx when Int.(le mx zero) -> neg t
+  | _, _ ->
+    let max =
+      match t.min, t.max with
+      | Some mn, Some mx -> Some (Int.(max (neg mn) mx))
+      | _, _ -> None
+    in
+    let modu = Int.(pgcd t.modu (add t.rem t.rem)) in
+    let rem = Int.e_rem t.rem modu in
+    build_interval ~min:(Some Int.zero) ~max ~rem ~modu
+
 type ext_value = Ninf | Pinf | Val of Int.t
 let inject_min = function None -> Ninf | Some m -> Val m
 let inject_max = function None -> Pinf | Some m -> Val m
