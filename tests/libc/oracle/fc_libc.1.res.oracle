@@ -363,6 +363,13 @@ struct tms {
    clock_t tms_cutime ;
    clock_t tms_cstime ;
 };
+struct utsname {
+   char sysname[65] ;
+   char nodename[65] ;
+   char release[65] ;
+   char version[65] ;
+   char machine[65] ;
+};
 typedef unsigned int tcflag_t;
 typedef unsigned char cc_t;
 typedef unsigned int speed_t;
@@ -8023,6 +8030,15 @@ extern int setrlimit(int resource, struct rlimit const *rlp);
     assigns *buffer \from __fc_time;
  */
 extern clock_t times(struct tms *buffer);
+
+/*@ requires valid_name: \valid(name);
+    ensures result_ok_or_error: -1 ≤ \result;
+    ensures initialization: name: \initialized(\old(name));
+    assigns *name, \result;
+    assigns *name \from \nothing;
+    assigns \result \from \nothing;
+ */
+extern int uname(struct utsname *name);
 
 /*@ ensures result_ok_or_error: \result ≡ -1 ∨ \result ≥ 0;
     ensures

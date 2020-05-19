@@ -97,6 +97,7 @@ skipping share/libc/complex.h
 [kernel] Parsing share/libc/sys/ioctl.h (with preprocessing)
 [kernel] Parsing share/libc/sys/ipc.h (with preprocessing)
 [kernel] Parsing share/libc/sys/mman.h (with preprocessing)
+[kernel] Parsing share/libc/sys/param.h (with preprocessing)
 [kernel] Parsing share/libc/sys/random.h (with preprocessing)
 [kernel] Parsing share/libc/sys/resource.h (with preprocessing)
 [kernel] Parsing share/libc/sys/select.h (with preprocessing)

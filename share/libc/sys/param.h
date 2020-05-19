@@ -20,31 +20,17 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_SYS_UTSNAME_H__
-#define __FC_SYS_UTSNAME_H__
-
+#ifndef __FC_SYS_PARAM_H__
+#define __FC_SYS_PARAM_H__
 #include "../features.h"
 __PUSH_FC_STDLIB
 
-// Arbitrary length, based on the one used in Linux
-#define _FC_UTSNAME_LENGTH 65
+// Note: sys/param.h is not a POSIX file. This is provided as a best-effort
+// basis to support projects using constants such as PATH_MAX, which should
+// be defined in "limits.h" according to POSIX. For instance, in Linux,
+// PATH_MAX is defined in the non-POSIX file linux/limits.h.
 
-struct utsname
-{
-  char sysname[_FC_UTSNAME_LENGTH];
-  char nodename[_FC_UTSNAME_LENGTH];
-  char release[_FC_UTSNAME_LENGTH];
-  char version[_FC_UTSNAME_LENGTH];
-  char machine[_FC_UTSNAME_LENGTH];
-};
-
-/*@ // missing: assigns *name, \result \from "system information"
-  requires valid_name: \valid(name);
-  assigns *name, \result \from \nothing;
-  ensures result_ok_or_error: -1 <= \result;
-  ensures initialization:name:\initialized(name);
-*/
-extern int uname (struct utsname *name);
+#include "../limits.h"
 
 __POP_FC_STDLIB
 #endif

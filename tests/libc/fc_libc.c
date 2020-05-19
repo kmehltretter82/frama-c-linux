@@ -123,6 +123,7 @@
 #include "sys/ipc.h"
 #include "syslog.h"
 #include "sys/mman.h"
+#include "sys/param.h"
 #include "sys/random.h"
 #include "sys/resource.h"
 #include "sys/select.h"
