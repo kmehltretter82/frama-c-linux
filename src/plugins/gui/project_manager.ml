@@ -76,7 +76,7 @@ let delete_project project =
   end
 
 module Filenames = Hashtbl.Make(Project)
-let filenames : string Filenames.t = Filenames.create 7
+let filenames : Filepath.Normalized.t Filenames.t = Filenames.create 7
 
 let save_in
     (host_window: Design.main_window_extension_points) parent project name =
@@ -102,7 +102,7 @@ let save_project_as (main_ui: Design.main_window_extension_points) project =
        | `SAVE ->
            Extlib.may
              (save_in main_ui (dialog :> GWindow.window_skel) project)
-             dialog#filename
+             (Extlib.opt_map Filepath.Normalized.of_string dialog#filename)
        | `DELETE_EVENT | `CANCEL -> ());
   dialog#destroy ()
 
@@ -130,7 +130,7 @@ let load_project (host_window: Design.main_window_extension_points) =
            begin match dialog#filename with
              | None -> ()
              | Some f ->
-                 (try ignore (Project.load f)
+                 (try ignore (Project.load (Filepath.Normalized.of_string f))
                   with Project.IOError s | Failure s ->
                     host_window#error
                       ~reset:true ~parent:(dialog:>GWindow.window_skel)

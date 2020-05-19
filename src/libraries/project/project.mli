@@ -209,14 +209,14 @@ val register_before_remove_hook: (t -> unit) -> unit
 
 exception IOError of string
 
-val save: ?selection:State_selection.t -> ?project:t -> string -> unit
+val save: ?selection:State_selection.t -> ?project:t -> Filepath.Normalized.t -> unit
   (** Save a given project in a file. Default project is [current ()].
       @raise IOError if the project cannot be saved.
       @modify Carbon-20101201 replace the optional arguments [only] and
       [except] by a single one [selection].
       @plugin development guide *)
 
-val load: ?selection:State_selection.t -> ?name:string -> string -> t
+val load: ?selection:State_selection.t -> ?name:string -> Filepath.Normalized.t -> t
   (** Load a file into a new project given by its name.
       More precisely, [load only except name file]:
       {ol
@@ -232,13 +232,13 @@ val load: ?selection:State_selection.t -> ?name:string -> string -> t
       [except] by a single one [selection].
       @plugin development guide *)
 
-val save_all: ?selection:State_selection.t -> string -> unit
+val save_all: ?selection:State_selection.t -> Filepath.Normalized.t -> unit
   (** Save all the projects in a file.
       @modify Carbon-20101201 replace the optional arguments [only] and
       [except] by a single one [selection].
       @raise IOError a project cannot be saved. *)
 
-val load_all: ?selection:State_selection.t -> string -> unit
+val load_all: ?selection:State_selection.t -> Filepath.Normalized.t -> unit
   (** First remove all the existing project, then load all the projects from a
       file. For each project to load, the specification is the same than
       {!Project.load}. Furthermore, after loading, all the hooks registered by
