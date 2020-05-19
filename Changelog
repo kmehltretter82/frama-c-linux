@@ -3966,9 +3966,9 @@ Binary Release 1.0 (Hydrogen-20080302)
 -* Project    [2008-03-14] Fixed bug with checksum computation during save/load.
 -* Slicing    [2008-02-25] Fixed bug in interprocedural slicing (bts #?201).
 
-#################################################
-First Open Source Release 1.0 (Hydrogen-20080301)
-#################################################
+###########################################
+Open Source Release 1.0 (Hydrogen-20080301)
+###########################################
 
 - First release
 
