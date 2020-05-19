@@ -354,6 +354,89 @@ void min_max_quantifier () {
   /*@ check unknown: \min(i, j, \lambda integer i; t[i]) >= 0; */
 }
 
+#include <stdint.h>
+
+/*@ assigns \result \from x;
+    ensures \result == \abs(x); */
+int abs (int x);
+
+void int_abs () {
+  /* Singletons. */
+  int zero = abs(0);
+  int ten = abs(10);
+  int eleven = abs(-11);
+  int x;
+  /* Tests the set semantics. */
+  x = Frama_C_interval(-10, -5);
+  x = abs(x);
+  Frama_C_show_each_5_10(x);
+  x = Frama_C_interval(-4, 3);
+  x = abs(x);
+  Frama_C_show_each_0_4(x);
+  /* Tests the interval semantics. */
+  x = Frama_C_interval(10, 100);
+  x = abs(x);
+  Frama_C_show_each_10_100(x);
+  x = Frama_C_interval(0, 100);
+  x = abs(x);
+  Frama_C_show_each_0_100(x);
+  x = Frama_C_interval(-20, -10);
+  x = abs(x);
+  Frama_C_show_each_10_20(x);
+  x = Frama_C_interval(-4, 12);
+  x = abs(x);
+  Frama_C_show_each_0_12(x);
+  x = Frama_C_interval(-16, 16);
+  x = abs(x);
+  Frama_C_show_each_0_16(x);
+   /* Tests the congruence semantics. */
+  x = Frama_C_interval(-20, 20);
+  x = 4 * x + 2;
+  x = abs(x);
+  Frama_C_show_each_2_mod_4(x);
+  x = Frama_C_interval(-20, 20);
+  x = 4 * x + 3;
+  x = abs(x);
+  Frama_C_show_each_1_mod_2(x);
+  x = Frama_C_interval(-12, 5);
+  x = 3 * x + 1;
+  x = abs(x);
+  Frama_C_show_each_no_mod(x);
+  /* Tests small intervals becoming small sets. */
+  x = Frama_C_interval(-5, 5);
+  x = abs(x);
+  Frama_C_show_each_set(x);
+  /* Tests address semantics. */
+  x = (uintptr_t)&x;
+  x = abs(x);
+  Frama_C_show_each_gm(x);
+}
+
+/*@ assigns \result \from f;
+    ensures \is_finite(\result) && \result == \abs(f); */
+double fabs(double f);
+
+void float_abs () {
+  /* Singletons. */
+  double zero = fabs(-0.);
+  double ten = fabs(10.);
+  double eleven = fabs(-11.);
+  double x;
+  /* Interval semantics. */
+  x = Frama_C_double_interval(-0., 0.);
+  x = fabs(x);
+  Frama_C_show_each_zero(x);
+  x = Frama_C_double_interval(0.5, 2.);
+  x = fabs(x);
+  Frama_C_show_each_half_two(x);
+  x = Frama_C_double_interval(-10., -0.);
+  x = fabs(x);
+  Frama_C_show_each_0_10(x);
+  x = Frama_C_double_interval(-3., 1.5);
+  x = fabs(x);
+  Frama_C_show_each_0_3(x);
+}
+
 void main () {
   eq_tsets();
   eq_char();
@@ -368,4 +451,6 @@ void main () {
   assign_tsets();
   check_and_assert ();
   min_max_quantifier ();
+  int_abs();
+  float_abs();
 }

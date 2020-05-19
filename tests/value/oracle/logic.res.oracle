@@ -14,7 +14,7 @@
   arr_ptr[0..2] ∈ {0}
   arr_ptr_arr[0..5] ∈ {0}
 [eva] computing for function eq_tsets <- main.
-  Called from tests/value/logic.c:358.
+  Called from tests/value/logic.c:441.
 [eva] tests/value/logic.c:103: 
   cannot evaluate ACSL term, unsupported ACSL construct: == operation on non-supported type set<_#8>
 [eva:alarm] tests/value/logic.c:103: Warning: assertion got status unknown.
@@ -56,20 +56,20 @@
 [eva] Recording results for eq_tsets
 [eva] Done for function eq_tsets
 [eva] computing for function eq_char <- main.
-  Called from tests/value/logic.c:359.
+  Called from tests/value/logic.c:442.
 [eva] tests/value/logic.c:149: Frama_C_show_each: {-126}
 [eva] tests/value/logic.c:150: assertion got status valid.
 [eva] tests/value/logic.c:151: assertion got status valid.
 [eva] Recording results for eq_char
 [eva] Done for function eq_char
 [eva] computing for function casts <- main.
-  Called from tests/value/logic.c:360.
+  Called from tests/value/logic.c:443.
 [eva] tests/value/logic.c:155: assertion got status valid.
 [eva] tests/value/logic.c:156: assertion got status valid.
 [eva] Recording results for casts
 [eva] Done for function casts
 [eva] computing for function empty_tset <- main.
-  Called from tests/value/logic.c:361.
+  Called from tests/value/logic.c:444.
 [eva] computing for function f_empty_tset <- empty_tset <- main.
   Called from tests/value/logic.c:166.
 [eva] using specification for function f_empty_tset
@@ -82,7 +82,7 @@
 [eva] Recording results for empty_tset
 [eva] Done for function empty_tset
 [eva] computing for function reduce_by_equal <- main.
-  Called from tests/value/logic.c:362.
+  Called from tests/value/logic.c:445.
 [eva:alarm] tests/value/logic.c:172: Warning: 
   accessing out of bounds index. assert 0 ≤ v;
 [eva:alarm] tests/value/logic.c:172: Warning: 
@@ -92,7 +92,7 @@
 [eva] Recording results for reduce_by_equal
 [eva] Done for function reduce_by_equal
 [eva] computing for function alarms <- main.
-  Called from tests/value/logic.c:363.
+  Called from tests/value/logic.c:446.
 [eva:alarm] tests/value/logic.c:182: Warning: 
   assertion 'ASSUME' got status unknown.
 [eva:alarm] tests/value/logic.c:184: Warning: 
@@ -124,7 +124,7 @@
 [eva] Recording results for alarms
 [eva] Done for function alarms
 [eva] computing for function cond_in_lval <- main.
-  Called from tests/value/logic.c:364.
+  Called from tests/value/logic.c:447.
 [eva] computing for function select_like <- cond_in_lval <- main.
   Called from tests/value/logic.c:228.
 [eva] using specification for function select_like
@@ -152,7 +152,7 @@
 [eva] Recording results for cond_in_lval
 [eva] Done for function cond_in_lval
 [eva] computing for function pred <- main.
-  Called from tests/value/logic.c:365.
+  Called from tests/value/logic.c:448.
 [eva] tests/value/logic.c:90: assertion got status valid.
 [eva] tests/value/logic.c:91: assertion got status valid.
 [eva] tests/value/logic.c:31: 
@@ -201,7 +201,7 @@
 [eva] Recording results for pred
 [eva] Done for function pred
 [eva] computing for function float_sign <- main.
-  Called from tests/value/logic.c:366.
+  Called from tests/value/logic.c:449.
 [eva] tests/value/logic.c:251: assertion got status valid.
 [eva] tests/value/logic.c:252: assertion got status valid.
 [eva] tests/value/logic.c:253: assertion got status valid.
@@ -210,7 +210,7 @@
 [eva] Recording results for float_sign
 [eva] Done for function float_sign
 [eva] computing for function min_max <- main.
-  Called from tests/value/logic.c:367.
+  Called from tests/value/logic.c:450.
 [eva] computing for function Frama_C_interval <- min_max <- main.
   Called from tests/value/logic.c:274.
 [eva] using specification for function Frama_C_interval
@@ -235,7 +235,7 @@
 [eva] Recording results for min_max
 [eva] Done for function min_max
 [eva] computing for function assign_tsets <- main.
-  Called from tests/value/logic.c:368.
+  Called from tests/value/logic.c:451.
 [eva] computing for function assign_tsets_aux <- assign_tsets <- main.
   Called from tests/value/logic.c:269.
 [eva] using specification for function assign_tsets_aux
@@ -243,7 +243,7 @@
 [eva] Recording results for assign_tsets
 [eva] Done for function assign_tsets
 [eva] computing for function check_and_assert <- main.
-  Called from tests/value/logic.c:369.
+  Called from tests/value/logic.c:452.
 [eva:alarm] tests/value/logic.c:295: Warning: assertion got status unknown.
 [eva] tests/value/logic.c:296: Frama_C_show_each_42: {42}
 [eva] tests/value/logic.c:297: check got status valid.
@@ -258,7 +258,7 @@
 [eva] Recording results for check_and_assert
 [eva] Done for function check_and_assert
 [eva] computing for function min_max_quantifier <- main.
-  Called from tests/value/logic.c:370.
+  Called from tests/value/logic.c:453.
 [eva] tests/value/logic.c:321: check 'valid' got status valid.
 [eva] tests/value/logic.c:322: check 'valid' got status valid.
 [eva] tests/value/logic.c:323: check 'valid' got status valid.
@@ -331,6 +331,188 @@
   check 'unknown' got status unknown.
 [eva] Recording results for min_max_quantifier
 [eva] Done for function min_max_quantifier
+[eva] computing for function int_abs <- main.
+  Called from tests/value/logic.c:454.
+[eva] computing for function abs <- int_abs <- main.
+  Called from tests/value/logic.c:365.
+[eva] using specification for function abs
+[eva] Done for function abs
+[eva] computing for function abs <- int_abs <- main.
+  Called from tests/value/logic.c:366.
+[eva] Done for function abs
+[eva] computing for function abs <- int_abs <- main.
+  Called from tests/value/logic.c:367.
+[eva] Done for function abs
+[eva] computing for function Frama_C_interval <- int_abs <- main.
+  Called from tests/value/logic.c:370.
+[eva] tests/value/logic.c:370: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] computing for function abs <- int_abs <- main.
+  Called from tests/value/logic.c:371.
+[eva] Done for function abs
+[eva] tests/value/logic.c:372: Frama_C_show_each_5_10: {5; 6; 7; 8; 9; 10}
+[eva] computing for function Frama_C_interval <- int_abs <- main.
+  Called from tests/value/logic.c:373.
+[eva] tests/value/logic.c:373: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] computing for function abs <- int_abs <- main.
+  Called from tests/value/logic.c:374.
+[eva] Done for function abs
+[eva] tests/value/logic.c:375: Frama_C_show_each_0_4: {0; 1; 2; 3; 4}
+[eva] computing for function Frama_C_interval <- int_abs <- main.
+  Called from tests/value/logic.c:377.
+[eva] tests/value/logic.c:377: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] computing for function abs <- int_abs <- main.
+  Called from tests/value/logic.c:378.
+[eva] Done for function abs
+[eva] tests/value/logic.c:379: Frama_C_show_each_10_100: [10..100]
+[eva] computing for function Frama_C_interval <- int_abs <- main.
+  Called from tests/value/logic.c:380.
+[eva] tests/value/logic.c:380: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] computing for function abs <- int_abs <- main.
+  Called from tests/value/logic.c:381.
+[eva] Done for function abs
+[eva] tests/value/logic.c:382: Frama_C_show_each_0_100: [0..100]
+[eva] computing for function Frama_C_interval <- int_abs <- main.
+  Called from tests/value/logic.c:383.
+[eva] tests/value/logic.c:383: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] computing for function abs <- int_abs <- main.
+  Called from tests/value/logic.c:384.
+[eva] Done for function abs
+[eva] tests/value/logic.c:385: Frama_C_show_each_10_20: [10..20]
+[eva] computing for function Frama_C_interval <- int_abs <- main.
+  Called from tests/value/logic.c:386.
+[eva] tests/value/logic.c:386: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] computing for function abs <- int_abs <- main.
+  Called from tests/value/logic.c:387.
+[eva] Done for function abs
+[eva] tests/value/logic.c:388: Frama_C_show_each_0_12: [0..12]
+[eva] computing for function Frama_C_interval <- int_abs <- main.
+  Called from tests/value/logic.c:389.
+[eva] tests/value/logic.c:389: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] computing for function abs <- int_abs <- main.
+  Called from tests/value/logic.c:390.
+[eva] Done for function abs
+[eva] tests/value/logic.c:391: Frama_C_show_each_0_16: [0..16]
+[eva] computing for function Frama_C_interval <- int_abs <- main.
+  Called from tests/value/logic.c:393.
+[eva] tests/value/logic.c:393: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] computing for function abs <- int_abs <- main.
+  Called from tests/value/logic.c:395.
+[eva] Done for function abs
+[eva] tests/value/logic.c:396: Frama_C_show_each_2_mod_4: [2..82],2%4
+[eva] computing for function Frama_C_interval <- int_abs <- main.
+  Called from tests/value/logic.c:397.
+[eva] tests/value/logic.c:397: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] computing for function abs <- int_abs <- main.
+  Called from tests/value/logic.c:399.
+[eva] Done for function abs
+[eva] tests/value/logic.c:400: Frama_C_show_each_1_mod_2: [1..83],1%2
+[eva] computing for function Frama_C_interval <- int_abs <- main.
+  Called from tests/value/logic.c:401.
+[eva] tests/value/logic.c:401: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] computing for function abs <- int_abs <- main.
+  Called from tests/value/logic.c:403.
+[eva] Done for function abs
+[eva] tests/value/logic.c:404: Frama_C_show_each_no_mod: [0..35]
+[eva] computing for function Frama_C_interval <- int_abs <- main.
+  Called from tests/value/logic.c:406.
+[eva] tests/value/logic.c:406: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] computing for function abs <- int_abs <- main.
+  Called from tests/value/logic.c:407.
+[eva] Done for function abs
+[eva] tests/value/logic.c:408: Frama_C_show_each_set: {0; 1; 2; 3; 4; 5}
+[eva] computing for function abs <- int_abs <- main.
+  Called from tests/value/logic.c:411.
+[eva] Done for function abs
+[eva] tests/value/logic.c:411: 
+  Assigning imprecise value to x_0.
+  The imprecision originates from Library function {tests/value/logic.c:411}
+[eva] tests/value/logic.c:412: 
+  Frama_C_show_each_gm:
+  {{ garbled mix of &{x_0}
+  (origin: Library function {tests/value/logic.c:411}) }}
+[eva] Recording results for int_abs
+[eva] Done for function int_abs
+[eva] computing for function float_abs <- main.
+  Called from tests/value/logic.c:455.
+[eva] computing for function fabs <- float_abs <- main.
+  Called from tests/value/logic.c:421.
+[eva] using specification for function fabs
+[eva] Done for function fabs
+[eva] computing for function fabs <- float_abs <- main.
+  Called from tests/value/logic.c:422.
+[eva] Done for function fabs
+[eva] computing for function fabs <- float_abs <- main.
+  Called from tests/value/logic.c:423.
+[eva] Done for function fabs
+[eva] computing for function Frama_C_double_interval <- float_abs <- main.
+  Called from tests/value/logic.c:426.
+[eva] using specification for function Frama_C_double_interval
+[eva] tests/value/logic.c:426: 
+  function Frama_C_double_interval: precondition 'finite' got status valid.
+[eva] tests/value/logic.c:426: 
+  function Frama_C_double_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_double_interval
+[eva] computing for function fabs <- float_abs <- main.
+  Called from tests/value/logic.c:427.
+[eva] Done for function fabs
+[eva] tests/value/logic.c:428: Frama_C_show_each_zero: [-0. .. 0.]
+[eva] computing for function Frama_C_double_interval <- float_abs <- main.
+  Called from tests/value/logic.c:429.
+[eva] tests/value/logic.c:429: 
+  function Frama_C_double_interval: precondition 'finite' got status valid.
+[eva] tests/value/logic.c:429: 
+  function Frama_C_double_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_double_interval
+[eva] computing for function fabs <- float_abs <- main.
+  Called from tests/value/logic.c:430.
+[eva] Done for function fabs
+[eva] tests/value/logic.c:431: Frama_C_show_each_half_two: [0.5 .. 2.]
+[eva] computing for function Frama_C_double_interval <- float_abs <- main.
+  Called from tests/value/logic.c:432.
+[eva] tests/value/logic.c:432: 
+  function Frama_C_double_interval: precondition 'finite' got status valid.
+[eva] tests/value/logic.c:432: 
+  function Frama_C_double_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_double_interval
+[eva] computing for function fabs <- float_abs <- main.
+  Called from tests/value/logic.c:433.
+[eva] Done for function fabs
+[eva] tests/value/logic.c:434: Frama_C_show_each_0_10: [-0. .. 10.]
+[eva] computing for function Frama_C_double_interval <- float_abs <- main.
+  Called from tests/value/logic.c:435.
+[eva] tests/value/logic.c:435: 
+  function Frama_C_double_interval: precondition 'finite' got status valid.
+[eva] tests/value/logic.c:435: 
+  function Frama_C_double_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_double_interval
+[eva] computing for function fabs <- float_abs <- main.
+  Called from tests/value/logic.c:436.
+[eva] Done for function fabs
+[eva] tests/value/logic.c:437: Frama_C_show_each_0_3: [-0. .. 3.]
+[eva] Recording results for float_abs
+[eva] Done for function float_abs
 [eva] Recording results for main
 [eva] done for function main
 [scope:rm_asserts] removing 5 assertion(s)
@@ -358,6 +540,12 @@
   temp_2 ∈ {0}
 [eva:final-states] Values at end of function empty_tset:
   T[0] ∈ {2}
+[eva:final-states] Values at end of function float_abs:
+  Frama_C_entropy_source ∈ [--..--]
+  zero ∈ [-0. .. 0.]
+  ten ∈ {10.}
+  eleven ∈ {11.}
+  x_0 ∈ [-0. .. 3.]
 [eva:final-states] Values at end of function float_sign:
   d ∈ [-0. .. 0.]
 [eva:final-states] Values at end of function g:
@@ -372,6 +560,14 @@
   j ∈ {6}
   p ∈ {{ &k }}
   q ∈ {{ &j }}
+[eva:final-states] Values at end of function int_abs:
+  Frama_C_entropy_source ∈ [--..--]
+  zero ∈ {0}
+  ten ∈ {10}
+  eleven ∈ {11}
+  x_0 ∈
+     {{ garbled mix of &{x_0}
+      (origin: Library function {tests/value/logic.c:411}) }}
 [eva:final-states] Values at end of function min_max:
   Frama_C_entropy_source ∈ [--..--]
   x_0 ∈ [3..17]
@@ -501,15 +697,25 @@
 [from] Computing for function f_empty_tset <-empty_tset
 [from] Done for function f_empty_tset
 [from] Done for function empty_tset
+[from] Computing for function float_abs
+[from] Computing for function fabs <-float_abs
+[from] Done for function fabs
+[from] Computing for function Frama_C_double_interval <-float_abs
+[from] Done for function Frama_C_double_interval
+[from] Done for function float_abs
 [from] Computing for function float_sign
 [from] Done for function float_sign
 [from] Computing for function g
 [from] Done for function g
 [from] Computing for function h
 [from] Done for function h
-[from] Computing for function min_max
-[from] Computing for function Frama_C_interval <-min_max
+[from] Computing for function int_abs
+[from] Computing for function abs <-int_abs
+[from] Done for function abs
+[from] Computing for function Frama_C_interval <-int_abs
 [from] Done for function Frama_C_interval
+[from] Done for function int_abs
+[from] Computing for function min_max
 [from] Done for function min_max
 [from] Computing for function min_max_quantifier
 [from] Done for function min_max_quantifier
@@ -527,9 +733,14 @@
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
   These dependencies hold at termination for the executions that terminate:
+[from] Function Frama_C_double_interval:
+  Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
+  \result FROM Frama_C_entropy_source; min; max
 [from] Function Frama_C_interval:
   Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
   \result FROM Frama_C_entropy_source; min; max
+[from] Function abs:
+  \result FROM x
 [from] Function alarms:
   NO EFFECTS
 [from] Function assign_tsets_aux:
@@ -551,12 +762,18 @@
   NO EFFECTS
 [from] Function empty_tset:
   NO EFFECTS
+[from] Function fabs:
+  \result FROM f
+[from] Function float_abs:
+  Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
 [from] Function float_sign:
   NO EFFECTS
 [from] Function g:
   NO EFFECTS
 [from] Function h:
   s1.f1 FROM \nothing
+[from] Function int_abs:
+  Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
 [from] Function min_max:
   Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
 [from] Function min_max_quantifier:
@@ -613,6 +830,10 @@
     T[0]
 [inout] Inputs for function empty_tset:
     \nothing
+[inout] Out (internal) for function float_abs:
+    Frama_C_entropy_source; zero; ten; eleven; x_0
+[inout] Inputs for function float_abs:
+    Frama_C_entropy_source
 [inout] Out (internal) for function float_sign:
     d; tmp
 [inout] Inputs for function float_sign:
@@ -625,6 +846,10 @@
     s1.f1; x_0; y; k; j; p; q
 [inout] Inputs for function h:
     v
+[inout] Out (internal) for function int_abs:
+    Frama_C_entropy_source; zero; ten; eleven; x_0
+[inout] Inputs for function int_abs:
+    Frama_C_entropy_source
 [inout] Out (internal) for function min_max:
     Frama_C_entropy_source; x_0; y; z; r1; r2; r3; r4; a; b; d
 [inout] Inputs for function min_max:
