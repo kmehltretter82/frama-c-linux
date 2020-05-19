@@ -2409,264 +2409,102 @@
 --- Properties of Function 'acos'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Post-condition for 'normal' 'positive_result'
+[ Extern  ] Post-condition 'positive_result'
             ensures positive_result: \is_finite(\result) ∧ \result ≥ 0
             Unverifiable but considered Valid.
-[ Extern  ] Post-condition for 'domain_error' 'errno_set'
-            ensures errno_set: __fc_errno ≡ 1
-            Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/math.h, line 131)
-            assigns __fc_errno, \result;
-            Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 138)
-            assigns __fc_errno, \result;
-            Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'normal' nothing
+[ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 131)
-            assigns __fc_errno \from x;
-            Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 131)
-            assigns \result \from x;
-            Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 138)
-            assigns __fc_errno \from x;
-            Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 138)
-            assigns \result \from x;
-            Unverifiable but considered Valid.
-[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 134)
+[ Extern  ] Froms (file share/libc/math.h, line 132)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             default behavior
-            by Frama-C kernel.
-[  Valid  ] Behavior 'domain_error'
-            behavior domain_error
-            by Frama-C kernel.
-[  Valid  ] Behavior 'normal'
-            behavior normal
             by Frama-C kernel.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'acosf'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Post-condition for 'normal' 'positive_result'
+[ Extern  ] Post-condition 'positive_result'
             ensures positive_result: \is_finite(\result) ∧ \result ≥ 0
             Unverifiable but considered Valid.
-[ Extern  ] Post-condition for 'domain_error' 'errno_set'
-            ensures errno_set: __fc_errno ≡ 1
-            Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/math.h, line 145)
-            assigns __fc_errno, \result;
-            Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 152)
-            assigns __fc_errno, \result;
-            Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'normal' nothing
+[ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 145)
-            assigns __fc_errno \from x;
-            Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 145)
-            assigns \result \from x;
-            Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 152)
-            assigns __fc_errno \from x;
-            Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 152)
-            assigns \result \from x;
-            Unverifiable but considered Valid.
-[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 148)
+[ Extern  ] Froms (file share/libc/math.h, line 138)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             default behavior
-            by Frama-C kernel.
-[  Valid  ] Behavior 'domain_error'
-            behavior domain_error
-            by Frama-C kernel.
-[  Valid  ] Behavior 'normal'
-            behavior normal
             by Frama-C kernel.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'acosl'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Post-condition for 'normal' 'positive_result'
+[ Extern  ] Post-condition 'positive_result'
             ensures positive_result: \is_finite(\result) ∧ \result ≥ 0
             Unverifiable but considered Valid.
-[ Extern  ] Post-condition for 'domain_error' 'errno_set'
-            ensures errno_set: __fc_errno ≡ 1
-            Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/math.h, line 159)
-            assigns __fc_errno, \result;
-            Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 166)
-            assigns __fc_errno, \result;
-            Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'normal' nothing
+[ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 159)
-            assigns __fc_errno \from x;
-            Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 159)
-            assigns \result \from x;
-            Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 166)
-            assigns __fc_errno \from x;
-            Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 166)
-            assigns \result \from x;
-            Unverifiable but considered Valid.
-[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 162)
+[ Extern  ] Froms (file share/libc/math.h, line 144)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             default behavior
-            by Frama-C kernel.
-[  Valid  ] Behavior 'domain_error'
-            behavior domain_error
-            by Frama-C kernel.
-[  Valid  ] Behavior 'normal'
-            behavior normal
             by Frama-C kernel.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'asin'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Post-condition for 'normal' 'finite_result'
+[ Extern  ] Post-condition 'finite_result'
             ensures finite_result: \is_finite(\result)
             Unverifiable but considered Valid.
-[ Extern  ] Post-condition for 'domain_error' 'errno_set'
-            ensures errno_set: __fc_errno ≡ 1
-            Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/math.h, line 173)
-            assigns __fc_errno, \result;
-            Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 180)
-            assigns __fc_errno, \result;
-            Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'normal' nothing
+[ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 173)
-            assigns __fc_errno \from x;
-            Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 173)
-            assigns \result \from x;
-            Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 180)
-            assigns __fc_errno \from x;
-            Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 180)
-            assigns \result \from x;
-            Unverifiable but considered Valid.
-[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 176)
+[ Extern  ] Froms (file share/libc/math.h, line 150)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             default behavior
-            by Frama-C kernel.
-[  Valid  ] Behavior 'domain_error'
-            behavior domain_error
-            by Frama-C kernel.
-[  Valid  ] Behavior 'normal'
-            behavior normal
             by Frama-C kernel.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'asinf'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Post-condition for 'normal' 'finite_result'
+[ Extern  ] Post-condition 'finite_result'
             ensures finite_result: \is_finite(\result)
             Unverifiable but considered Valid.
-[ Extern  ] Post-condition for 'domain_error' 'errno_set'
-            ensures errno_set: __fc_errno ≡ 1
-            Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/math.h, line 187)
-            assigns __fc_errno, \result;
-            Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 194)
-            assigns __fc_errno, \result;
-            Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'normal' nothing
+[ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 187)
-            assigns __fc_errno \from x;
-            Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 187)
-            assigns \result \from x;
-            Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 194)
-            assigns __fc_errno \from x;
-            Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 194)
-            assigns \result \from x;
-            Unverifiable but considered Valid.
-[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 190)
+[ Extern  ] Froms (file share/libc/math.h, line 156)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             default behavior
-            by Frama-C kernel.
-[  Valid  ] Behavior 'domain_error'
-            behavior domain_error
-            by Frama-C kernel.
-[  Valid  ] Behavior 'normal'
-            behavior normal
             by Frama-C kernel.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'asinl'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Post-condition for 'normal' 'finite_result'
+[ Extern  ] Post-condition 'finite_result'
             ensures finite_result: \is_finite(\result)
             Unverifiable but considered Valid.
-[ Extern  ] Post-condition for 'domain_error' 'errno_set'
-            ensures errno_set: __fc_errno ≡ 1
-            Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/math.h, line 201)
-            assigns __fc_errno, \result;
-            Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 208)
-            assigns __fc_errno, \result;
-            Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'normal' nothing
+[ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 201)
-            assigns __fc_errno \from x;
-            Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 201)
-            assigns \result \from x;
-            Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 208)
-            assigns __fc_errno \from x;
-            Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 208)
-            assigns \result \from x;
-            Unverifiable but considered Valid.
-[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 204)
+[ Extern  ] Froms (file share/libc/math.h, line 162)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             default behavior
-            by Frama-C kernel.
-[  Valid  ] Behavior 'domain_error'
-            behavior domain_error
-            by Frama-C kernel.
-[  Valid  ] Behavior 'normal'
-            behavior normal
             by Frama-C kernel.
 
 --------------------------------------------------------------------------------
@@ -2682,7 +2520,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 215)
+[ Extern  ] Froms (file share/libc/math.h, line 168)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2702,7 +2540,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 222)
+[ Extern  ] Froms (file share/libc/math.h, line 175)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2722,7 +2560,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 229)
+[ Extern  ] Froms (file share/libc/math.h, line 182)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2739,7 +2577,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 237)
+[ Extern  ] Froms (file share/libc/math.h, line 190)
             assigns \result \from x, y;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2756,7 +2594,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 244)
+[ Extern  ] Froms (file share/libc/math.h, line 197)
             assigns \result \from x, y;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2779,7 +2617,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 252)
+[ Extern  ] Froms (file share/libc/math.h, line 205)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2799,7 +2637,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 259)
+[ Extern  ] Froms (file share/libc/math.h, line 212)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2819,7 +2657,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 266)
+[ Extern  ] Froms (file share/libc/math.h, line 219)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2839,7 +2677,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 273)
+[ Extern  ] Froms (file share/libc/math.h, line 226)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2859,7 +2697,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 280)
+[ Extern  ] Froms (file share/libc/math.h, line 233)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2879,7 +2717,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 287)
+[ Extern  ] Froms (file share/libc/math.h, line 240)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2899,10 +2737,10 @@
 [ Extern  ] Post-condition for 'domain_error' 'errno_set'
             ensures errno_set: __fc_errno ≡ 1
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/math.h, line 298)
+[ Extern  ] Assigns (file share/libc/math.h, line 251)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 309)
+[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 262)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
 [ Extern  ] Assigns for 'infinite' nothing
@@ -2911,22 +2749,22 @@
 [ Extern  ] Assigns for 'normal' nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 298)
+[ Extern  ] Froms (file share/libc/math.h, line 251)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 298)
+[ Extern  ] Froms (file share/libc/math.h, line 251)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 309)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 262)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 309)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 262)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'infinite' (file share/libc/math.h, line 305)
+[ Extern  ] Froms for 'infinite' (file share/libc/math.h, line 258)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 301)
+[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 254)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2955,10 +2793,10 @@
 [ Extern  ] Post-condition for 'domain_error' 'errno_set'
             ensures errno_set: __fc_errno ≡ 1
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/math.h, line 316)
+[ Extern  ] Assigns (file share/libc/math.h, line 269)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 327)
+[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 280)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
 [ Extern  ] Assigns for 'infinite' nothing
@@ -2967,22 +2805,22 @@
 [ Extern  ] Assigns for 'normal' nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 316)
+[ Extern  ] Froms (file share/libc/math.h, line 269)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 316)
+[ Extern  ] Froms (file share/libc/math.h, line 269)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 327)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 280)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 327)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 280)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'infinite' (file share/libc/math.h, line 323)
+[ Extern  ] Froms for 'infinite' (file share/libc/math.h, line 276)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 319)
+[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 272)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3011,10 +2849,10 @@
 [ Extern  ] Post-condition for 'domain_error' 'errno_set'
             ensures errno_set: __fc_errno ≡ 1
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/math.h, line 334)
+[ Extern  ] Assigns (file share/libc/math.h, line 287)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 345)
+[ Extern  ] Assigns for 'domain_error' (file share/libc/math.h, line 298)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
 [ Extern  ] Assigns for 'infinite' nothing
@@ -3023,22 +2861,22 @@
 [ Extern  ] Assigns for 'normal' nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 334)
+[ Extern  ] Froms (file share/libc/math.h, line 287)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 334)
+[ Extern  ] Froms (file share/libc/math.h, line 287)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 345)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 298)
             assigns __fc_errno \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 345)
+[ Extern  ] Froms for 'domain_error' (file share/libc/math.h, line 298)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'infinite' (file share/libc/math.h, line 341)
+[ Extern  ] Froms for 'infinite' (file share/libc/math.h, line 294)
             assigns \result \from x;
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 337)
+[ Extern  ] Froms for 'normal' (file share/libc/math.h, line 290)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3067,7 +2905,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 373)
+[ Extern  ] Froms (file share/libc/math.h, line 326)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3087,7 +2925,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 381)
+[ Extern  ] Froms (file share/libc/math.h, line 334)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3104,7 +2942,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 411)
+[ Extern  ] Froms (file share/libc/math.h, line 364)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3121,7 +2959,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 418)
+[ Extern  ] Froms (file share/libc/math.h, line 371)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3138,7 +2976,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 425)
+[ Extern  ] Froms (file share/libc/math.h, line 378)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3155,7 +2993,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 432)
+[ Extern  ] Froms (file share/libc/math.h, line 385)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3172,7 +3010,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 439)
+[ Extern  ] Froms (file share/libc/math.h, line 392)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3189,7 +3027,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 446)
+[ Extern  ] Froms (file share/libc/math.h, line 399)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3206,7 +3044,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 457)
+[ Extern  ] Froms (file share/libc/math.h, line 410)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3223,7 +3061,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 464)
+[ Extern  ] Froms (file share/libc/math.h, line 417)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3240,7 +3078,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 471)
+[ Extern  ] Froms (file share/libc/math.h, line 424)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3265,7 +3103,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 497)
+[ Extern  ] Froms (file share/libc/math.h, line 450)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3290,7 +3128,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 505)
+[ Extern  ] Froms (file share/libc/math.h, line 458)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3315,7 +3153,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 513)
+[ Extern  ] Froms (file share/libc/math.h, line 466)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3332,7 +3170,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 526)
+[ Extern  ] Froms (file share/libc/math.h, line 479)
             assigns \result \from x, y;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3349,7 +3187,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 533)
+[ Extern  ] Froms (file share/libc/math.h, line 486)
             assigns \result \from x, y;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3378,7 +3216,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 542)
+[ Extern  ] Froms (file share/libc/math.h, line 495)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3401,7 +3239,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 551)
+[ Extern  ] Froms (file share/libc/math.h, line 504)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3421,7 +3259,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 560)
+[ Extern  ] Froms (file share/libc/math.h, line 513)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3438,7 +3276,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 583)
+[ Extern  ] Froms (file share/libc/math.h, line 536)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3455,7 +3293,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 589)
+[ Extern  ] Froms (file share/libc/math.h, line 542)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3472,7 +3310,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 596)
+[ Extern  ] Froms (file share/libc/math.h, line 549)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3489,7 +3327,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 602)
+[ Extern  ] Froms (file share/libc/math.h, line 555)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3506,7 +3344,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 608)
+[ Extern  ] Froms (file share/libc/math.h, line 561)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3523,7 +3361,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 614)
+[ Extern  ] Froms (file share/libc/math.h, line 567)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3540,7 +3378,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 636)
+[ Extern  ] Froms (file share/libc/math.h, line 589)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3557,7 +3395,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 642)
+[ Extern  ] Froms (file share/libc/math.h, line 595)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3574,7 +3412,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 648)
+[ Extern  ] Froms (file share/libc/math.h, line 601)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3591,7 +3429,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 662)
+[ Extern  ] Froms (file share/libc/math.h, line 615)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3608,7 +3446,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 668)
+[ Extern  ] Froms (file share/libc/math.h, line 621)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3625,7 +3463,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 674)
+[ Extern  ] Froms (file share/libc/math.h, line 627)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3642,7 +3480,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 681)
+[ Extern  ] Froms (file share/libc/math.h, line 634)
             assigns \result \from x, y;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3659,7 +3497,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 688)
+[ Extern  ] Froms (file share/libc/math.h, line 641)
             assigns \result \from x, y;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3676,7 +3514,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 709)
+[ Extern  ] Froms (file share/libc/math.h, line 662)
             assigns \result \from (indirect: *(tagp + (0 ..)));
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3693,7 +3531,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 716)
+[ Extern  ] Froms (file share/libc/math.h, line 669)
             assigns \result \from (indirect: *(tagp + (0 ..)));
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3710,7 +3548,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 723)
+[ Extern  ] Froms (file share/libc/math.h, line 676)
             assigns \result \from (indirect: *(tagp + (0 ..)));
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3727,7 +3565,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 771)
+[ Extern  ] Froms (file share/libc/math.h, line 724)
             assigns \result \from \nothing;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3744,7 +3582,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 777)
+[ Extern  ] Froms (file share/libc/math.h, line 730)
             assigns \result \from \nothing;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -4106,9 +3944,9 @@
 --------------------------------------------------------------------------------
 --- Status Report Summary
 --------------------------------------------------------------------------------
-   181 Completely validated
+   169 Completely validated
     16 Locally validated
-   494 Considered valid
+   452 Considered valid
     56 To be validated
-   747 Total
+   693 Total
 --------------------------------------------------------------------------------
