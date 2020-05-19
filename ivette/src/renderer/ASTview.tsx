@@ -124,7 +124,7 @@ const ASTview = () => {
           title="Zoom Out (decrease font size)"
         />
         <IconButton
-          icon="CODE"
+          icon="PAINTBRUSH"
           onClick={themePopup}
           title="Choose Theme"
         />
