@@ -142,6 +142,7 @@ module type S = sig
   val sin: prec -> t -> t
   val acos: prec -> t -> t
   val asin: prec -> t -> t
+  val atan: prec -> t -> t
   val atan2: prec -> t -> t -> t
 
   val backward_add:

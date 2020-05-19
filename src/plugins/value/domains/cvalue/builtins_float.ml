@@ -123,6 +123,7 @@ let () =
   register_arity1 "sin" Cil_types.FDouble sin;
   register_arity1 "acos" Cil_types.FDouble acos;
   register_arity1 "asin" Cil_types.FDouble asin;
+  register_arity1 "atan" Cil_types.FDouble atan;
   register_arity1 "log" Cil_types.FDouble log;
   register_arity1 "log10" Cil_types.FDouble log10;
   register_arity1 "exp" Cil_types.FDouble exp;
@@ -136,6 +137,7 @@ let () =
   register_arity1 "sinf" Cil_types.FFloat sin;
   register_arity1 "acosf" Cil_types.FFloat acos;
   register_arity1 "asinf" Cil_types.FFloat asin;
+  register_arity1 "atanf" Cil_types.FFloat atan;
   register_arity1 "logf" Cil_types.FFloat log;
   register_arity1 "log10f" Cil_types.FFloat log10;
   register_arity1 "expf" Cil_types.FFloat exp;

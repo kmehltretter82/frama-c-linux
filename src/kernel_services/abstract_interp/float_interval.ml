@@ -1028,6 +1028,9 @@ module Make (F: Float_sig.S) = struct
   let acos = acos_asin ~acos:true
   let asin = acos_asin ~acos:false
 
+  let atan prec t =
+    t >>: approx F.atan prec
+
   let atan2 prec x y =
     (x, y) >>% fun ~nan (b1, e1) (b2, e2) ->
     let op = F.atan2 Near prec in

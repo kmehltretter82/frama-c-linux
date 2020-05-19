@@ -29,98 +29,60 @@
   infinity ∈ {inf}
   fp_ilogb0 ∈ {-2147483648.}
   fp_ilogbnan ∈ {-2147483648.}
-[eva] computing for function atan <- main.
-  Called from tests/libc/math_h.c:45.
-[eva] using specification for function atan
+[eva] tests/libc/math_h.c:45: Call to builtin atan
 [eva] tests/libc/math_h.c:45: 
   function atan: precondition 'finite_arg' got status valid.
-[eva] Done for function atan
-[eva] computing for function atan <- main.
-  Called from tests/libc/math_h.c:45.
+[eva] tests/libc/math_h.c:45: Call to builtin atan
 [eva] tests/libc/math_h.c:45: 
   function atan: precondition 'finite_arg' got status valid.
-[eva] Done for function atan
-[eva] computing for function atan <- main.
-  Called from tests/libc/math_h.c:45.
+[eva] tests/libc/math_h.c:45: Call to builtin atan
 [eva] tests/libc/math_h.c:45: 
   function atan: precondition 'finite_arg' got status valid.
-[eva] Done for function atan
-[eva] computing for function atan <- main.
-  Called from tests/libc/math_h.c:45.
+[eva] tests/libc/math_h.c:45: Call to builtin atan
 [eva] tests/libc/math_h.c:45: 
   function atan: precondition 'finite_arg' got status valid.
-[eva] Done for function atan
-[eva] computing for function atan <- main.
-  Called from tests/libc/math_h.c:45.
+[eva] tests/libc/math_h.c:45: Call to builtin atan
 [eva] tests/libc/math_h.c:45: 
   function atan: precondition 'finite_arg' got status valid.
-[eva] Done for function atan
-[eva] computing for function atan <- main.
-  Called from tests/libc/math_h.c:45.
+[eva] tests/libc/math_h.c:45: Call to builtin atan
 [eva] tests/libc/math_h.c:45: 
   function atan: precondition 'finite_arg' got status valid.
-[eva] Done for function atan
-[eva] computing for function atan <- main.
-  Called from tests/libc/math_h.c:45.
+[eva] tests/libc/math_h.c:45: Call to builtin atan
 [eva] tests/libc/math_h.c:45: 
   function atan: precondition 'finite_arg' got status valid.
-[eva] Done for function atan
-[eva] computing for function atan <- main.
-  Called from tests/libc/math_h.c:45.
+[eva] tests/libc/math_h.c:45: Call to builtin atan
 [eva] tests/libc/math_h.c:45: 
   function atan: precondition 'finite_arg' got status valid.
-[eva] Done for function atan
-[eva] computing for function atan <- main.
-  Called from tests/libc/math_h.c:45.
+[eva] tests/libc/math_h.c:45: Call to builtin atan
 [eva:alarm] tests/libc/math_h.c:45: Warning: 
   function atan: precondition 'finite_arg' got status unknown.
-[eva] Done for function atan
-[eva] computing for function atanf <- main.
-  Called from tests/libc/math_h.c:46.
-[eva] using specification for function atanf
+[eva] tests/libc/math_h.c:46: Call to builtin atanf
 [eva] tests/libc/math_h.c:46: 
   function atanf: precondition 'finite_arg' got status valid.
-[eva] Done for function atanf
-[eva] computing for function atanf <- main.
-  Called from tests/libc/math_h.c:46.
+[eva] tests/libc/math_h.c:46: Call to builtin atanf
 [eva] tests/libc/math_h.c:46: 
   function atanf: precondition 'finite_arg' got status valid.
-[eva] Done for function atanf
-[eva] computing for function atanf <- main.
-  Called from tests/libc/math_h.c:46.
+[eva] tests/libc/math_h.c:46: Call to builtin atanf
 [eva] tests/libc/math_h.c:46: 
   function atanf: precondition 'finite_arg' got status valid.
-[eva] Done for function atanf
-[eva] computing for function atanf <- main.
-  Called from tests/libc/math_h.c:46.
+[eva] tests/libc/math_h.c:46: Call to builtin atanf
 [eva] tests/libc/math_h.c:46: 
   function atanf: precondition 'finite_arg' got status valid.
-[eva] Done for function atanf
-[eva] computing for function atanf <- main.
-  Called from tests/libc/math_h.c:46.
+[eva] tests/libc/math_h.c:46: Call to builtin atanf
 [eva] tests/libc/math_h.c:46: 
   function atanf: precondition 'finite_arg' got status valid.
-[eva] Done for function atanf
-[eva] computing for function atanf <- main.
-  Called from tests/libc/math_h.c:46.
+[eva] tests/libc/math_h.c:46: Call to builtin atanf
 [eva] tests/libc/math_h.c:46: 
   function atanf: precondition 'finite_arg' got status valid.
-[eva] Done for function atanf
-[eva] computing for function atanf <- main.
-  Called from tests/libc/math_h.c:46.
+[eva] tests/libc/math_h.c:46: Call to builtin atanf
 [eva] tests/libc/math_h.c:46: 
   function atanf: precondition 'finite_arg' got status valid.
-[eva] Done for function atanf
-[eva] computing for function atanf <- main.
-  Called from tests/libc/math_h.c:46.
+[eva] tests/libc/math_h.c:46: Call to builtin atanf
 [eva] tests/libc/math_h.c:46: 
   function atanf: precondition 'finite_arg' got status valid.
-[eva] Done for function atanf
-[eva] computing for function atanf <- main.
-  Called from tests/libc/math_h.c:46.
+[eva] tests/libc/math_h.c:46: Call to builtin atanf
 [eva:alarm] tests/libc/math_h.c:46: Warning: 
   function atanf: precondition 'finite_arg' got status unknown.
-[eva] Done for function atanf
 [eva] computing for function atanl <- main.
   Called from tests/libc/math_h.c:47.
 [eva] using specification for function atanl
@@ -309,24 +271,24 @@
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
-  atan_pi ∈ [-1.571 .. 1.571]
-  atan_half_pi ∈ [-1.571 .. 1.571]
-  atan_e ∈ [-1.571 .. 1.571]
-  atan_zero ∈ [-1.571 .. 1.571]
-  atan_minus_zero ∈ [-1.571 .. 1.571]
-  atan_one ∈ [-1.571 .. 1.571]
-  atan_minus_one ∈ [-1.571 .. 1.571]
-  atan_large ∈ [-1.571 .. 1.571]
-  atan_top ∈ [-1.571 .. 1.571]
-  atanf_f_pi ∈ [-1.57099997997 .. 1.57099997997]
-  atanf_f_half_pi ∈ [-1.57099997997 .. 1.57099997997]
-  atanf_f_e ∈ [-1.57099997997 .. 1.57099997997]
-  atanf_zero ∈ [-1.57099997997 .. 1.57099997997]
-  atanf_minus_zero ∈ [-1.57099997997 .. 1.57099997997]
-  atanf_one ∈ [-1.57099997997 .. 1.57099997997]
-  atanf_minus_one ∈ [-1.57099997997 .. 1.57099997997]
-  atanf_large ∈ [-1.57099997997 .. 1.57099997997]
-  atanf_f_top ∈ [-1.57099997997 .. 1.57099997997]
+  atan_pi ∈ {1.26262725568}
+  atan_half_pi ∈ {1.00388482185}
+  atan_e ∈ {1.21828290502}
+  atan_zero ∈ {0}
+  atan_minus_zero ∈ {-0.}
+  atan_one ∈ {0.785398163397}
+  atan_minus_one ∈ {-0.785398163397}
+  atan_large ∈ {1.57079632679}
+  atan_top ∈ [-1.57079632679 .. 1.57079632679] ∪ {NaN}
+  atanf_f_pi ∈ {1.262627244}
+  atanf_f_half_pi ∈ {1.00388479233}
+  atanf_f_e ∈ {1.218282938}
+  atanf_zero ∈ {0}
+  atanf_minus_zero ∈ {-0.}
+  atanf_one ∈ {0.785398185253}
+  atanf_minus_one ∈ {-0.785398185253}
+  atanf_large ∈ {1.57079637051}
+  atanf_f_top ∈ [-1.57079637051 .. 1.57079637051] ∪ {NaN}
   atanl_ld_pi ∈ [-inf .. inf]
   atanl_ld_half_pi ∈ [-inf .. inf]
   atanl_ld_e ∈ [-inf .. inf]
