@@ -20,32 +20,31 @@ import 'codemirror/theme/ambiance.css';
 // --- Configure Server
 // --------------------------------------------------------------------------
 
-let cmdConfig: Server.Configuration;
-const cmdLine = new RichTextBuffer();
+const quoteRe = new RegExp('^[-./:a-zA-Z0-9]+$');
+const quote = (s: string) => (quoteRe.test(s) ? s : `"${s}"`);
 
-function dumpCmdLine(sc: Server.Configuration): void {
+function dumpServerConfig(sc: Server.Configuration): string {
+  let buffer = '';
   const { cwd, command, sockaddr, params } = sc;
-  cmdLine.clear();
-  if (cwd) cmdLine.log('--cwd', cwd);
-  if (command) cmdLine.log('--command', command);
-  if (sockaddr) cmdLine.log('--socket', sockaddr);
+  if (cwd) buffer += `--cwd ${quote(cwd)}\n`;
+  if (command) buffer += `--command ${command}\n`;
+  if (sockaddr) buffer += `--socket ${sockaddr}\n`;
   if (params) {
     params.forEach((v: string, i: number) => {
       if (i > 0) {
         if (v.startsWith('-') || v.endsWith('.c')
           || v.endsWith('.h') || v.endsWith('.i')) {
-          cmdLine.append('\n');
-        } else {
-          cmdLine.append(' ');
-        }
+          buffer += '\n';
+        } else
+          buffer += ' ';
       }
-      cmdLine.append(v);
+      buffer += v;
     });
   }
-  cmdLine.append('\n');
+  return buffer;
 }
 
-function buildServerConfiguration(argv: string[], cwd?: string) {
+function buildServerConfig(argv: string[], cwd?: string) {
   const params = [];
   let command;
   let sockaddr;
@@ -77,10 +76,23 @@ function buildServerConfiguration(argv: string[], cwd?: string) {
   };
 }
 
+function insertConfig(hs: string[], cfg: Server.Configuration) {
+  const cmd = dumpServerConfig(cfg).trim();
+  const newhs = hs
+    .map((h) => h.trim())
+    .filter((h: string) => h !== cmd && h !== '')
+    .slice(0, 50);
+  newhs.unshift(cmd);
+  return newhs;
+}
+
+// --------------------------------------------------------------------------
+// --- Start Server on Command
+// --------------------------------------------------------------------------
+
 Dome.onCommand((argv: string[], cwd: string) => {
-  cmdConfig = buildServerConfiguration(argv, cwd);
-  dumpCmdLine(cmdConfig);
-  Server.configure(cmdConfig);
+  const cfg = buildServerConfig(argv, cwd);
+  Server.configure(cfg);
   Server.start();
 });
 
@@ -136,58 +148,70 @@ export const Control = () => {
 // --- Server Console
 // --------------------------------------------------------------------------
 
+const editor = new RichTextBuffer();
+
 const RenderConsole = () => {
   const scratch = React.useRef([] as string[]);
   const [cursor, setCursor] = React.useState(-1);
-  const [h0, setHistory] = Dome.useState('Controller.history', []);
-  const history = Array.isArray(h0) ? h0 : [];
+  const [H0, setH0] = Dome.useState('Controller.history', []);
+  const [isEmpty, setEmpty] = React.useState(true);
+  Dome.useEmitter(editor, 'change', () => {
+    setEmpty(editor.getValue().trim() === '');
+  });
 
-  const doExec = () => {
-    const cmd = cmdLine.getDoc().getValue().trim();
-    cmdLine.clear();
-    const argv = cmd.split(/[ \t\n]+/);
-    const cfg = buildServerConfiguration(argv);
-    Server.configure(cfg);
-    Server.restart();
-    setCursor(-1);
+  // Cope with merge settings that keeps previous array entries (BUG in DOME)
+  const history = Array.isArray(H0) ? H0.filter((h) => h !== '') : [];
+  const setHistory = (hs: string[]) => {
+    const n = hs.length;
+    setH0(n < 50 ? hs.concat(Array(50 - n).fill('')) : hs);
   };
 
-  const doEdit = () => {
+  const doSwitch = () => {
     if (cursor < 0) {
-      dumpCmdLine(Server.getConfig());
-      const cmd = cmdLine.getDoc().getValue().trim();
-      const hs = history
-        .filter((h: string) => h !== cmd && h !== '')
-        .slice(0, 50);
-      hs.unshift(cmd);
-      scratch.current = hs.slice();
-      setHistory(hs);
+      const cfg = Server.getConfig();
+      const hst = insertConfig(history, cfg);
+      scratch.current = hst.slice();
+      editor.setValue(hst[0]);
+      setHistory(hst);
       setCursor(0);
     } else {
-      cmdLine.clear();
+      editor.clear();
       scratch.current = [];
       setCursor(-1);
     }
   };
 
+  const doExec = () => {
+    const cmd = editor.getValue().trim();
+    const argv = cmd.split(/[ \t\n]+/);
+    const cfg = buildServerConfig(argv);
+    const hst = insertConfig(history, cfg);
+    setHistory(hst);
+    setCursor(-1);
+    editor.clear();
+    Server.configure(cfg);
+    Server.restart();
+  };
+
   const doMove = (target: number) => {
-    if (0 <= target && target < history.length)
+    if (0 <= target && target < history.length && target !== cursor)
       return () => {
-        const doc = cmdLine.getDoc();
-        const cmd = scratch.current;
-        cmd[cursor] = doc.getValue();
-        doc.setValue(cmd[target]);
+        const cmd = editor.getValue();
+        const pad = scratch.current;
+        pad[cursor] = cmd;
+        editor.setValue(pad[target]);
         setCursor(target);
       };
     return undefined;
   };
 
   const doReload = () => {
-    const doc = cmdLine.getDoc();
-    const cmd = scratch.current;
-    if (cursor !== 0) cmd[cursor] = doc.getValue();
-    dumpCmdLine(Server.getConfig());
-    cmd[0] = doc.getValue();
+    const cfg = Server.getConfig();
+    const cmd = dumpServerConfig(cfg);
+    const pad = scratch.current;
+    if (cursor !== 0) pad[cursor] = editor.getValue();
+    pad[0] = cmd;
+    editor.setValue(cmd);
     setCursor(0);
   };
 
@@ -195,16 +219,18 @@ const RenderConsole = () => {
     const n = history.length;
     if (n > 1) {
       const hst = history.slice();
-      const cmd = scratch.current;
-      const next = cursor - 1;
+      const pad = scratch.current;
       hst.splice(cursor, 1);
-      cmd.splice(cursor, 1);
-      cmdLine.getDoc().setValue(scratch.current[next]);
+      pad.splice(cursor, 1);
       setHistory(hst);
+      const next = cursor > 0 ? cursor - 1 : 0;
+      editor.setValue(pad[next]);
       setCursor(next);
     } else {
+      // Do not share the two arrays!
+      setHistory(['']);
       scratch.current = [''];
-      cmdLine.getDoc().setValue('');
+      editor.clear();
     }
   };
 
@@ -213,9 +239,21 @@ const RenderConsole = () => {
   const edited = 0 <= cursor;
   const n = history.length;
 
+  let LABEL = <>Console</>;
+  if (edited) {
+    const RANK = n > 1 ? 'controller-rank' : 'controller-norank';
+    LABEL = (
+      <Label>
+        Command
+        <span className={RANK}>
+          {1 + cursor} / {n}
+        </span>
+      </Label>
+    );
+  }
   return (
     <>
-      <TitleBar label={edited ? 'Command Line' : 'Console'}>
+      <TitleBar label={LABEL}>
         <IconButton
           icon="TRASH"
           display={edited}
@@ -235,13 +273,6 @@ const RenderConsole = () => {
           onClick={doPrev}
           title="Previous Command"
         />
-        <Label
-          className="dimmed"
-          display={edited && n > 0}
-          title="Rank in History"
-        >
-          {1 + cursor}/{n}
-        </Label>
         <IconButton
           icon="MEDIA.NEXT"
           display={edited}
@@ -252,18 +283,19 @@ const RenderConsole = () => {
         <IconButton
           icon="MEDIA.PLAY"
           display={edited}
+          disabled={isEmpty}
           onClick={doExec}
           title="Execute Command"
         />
         <IconButton
           icon="TERMINAL"
           selected={edited}
-          onClick={doEdit}
+          onClick={doSwitch}
           title="Edit Command"
         />
       </TitleBar>
       <Text
-        buffer={edited ? cmdLine : Server.buffer}
+        buffer={edited ? editor : Server.buffer}
         mode="text"
         readOnly={!edited}
         theme="ambiance"
