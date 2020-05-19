@@ -168,7 +168,10 @@ const RenderConsole = () => {
   return (
     <>
       <TitleBar label={command ? 'Command Line' : 'Console'}>
-        <Label className="dimmed" display={command && length > 0}>
+        <Label
+          className="dimmed"
+          display={command && length > 0}
+          title="Rank in History" >
           {1 + index}/{length}
         </Label>
         <Space />
@@ -205,20 +208,20 @@ const RenderConsole = () => {
           display={command}
           disabled={!next}
           onClick={doNext}
-          title="Previous Command"
+          title="Next Command"
         />
         <Space />
         <IconButton
           icon="MEDIA.PLAY"
           display={command}
           onClick={doExec}
-          title="Execute Command Line"
+          title="Execute Command"
         />
         <IconButton
           icon="EDIT"
           selected={command}
           onClick={switchCmd}
-          title="Edit Command Line"
+          title="Edit Command"
         />
       </TitleBar>
       <Text

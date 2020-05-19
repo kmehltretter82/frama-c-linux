@@ -111,10 +111,16 @@ const ASTview = () => {
   return (
     <>
       <TitleBar>
-        <IconButton icon="ZOOM.OUT" onClick={zoomOut} />
-        <IconButton icon="ZOOM.IN" onClick={zoomIn} />
-        <IconButton icon="CODE" onClick={themePopup} />
-        <IconButton icon="WRAPTEXT" selected={wrapText} onClick={setWrapText} />
+        <IconButton icon="ZOOM.OUT" onClick={zoomOut}
+          disabled={!theFunction}
+          title="Zoom In (increase font size)" />
+        <IconButton icon="ZOOM.IN" onClick={zoomIn}
+          disabled={!theFunction}
+          title="Zoom Out (decrease font size)" />
+        <IconButton icon="CODE" onClick={themePopup}
+          title="Choose Theme" />
+        <IconButton icon="WRAPTEXT" selected={wrapText} onClick={setWrapText}
+          title="Wrap Text" />
       </TitleBar>
       <Text
         buffer={buffer}
