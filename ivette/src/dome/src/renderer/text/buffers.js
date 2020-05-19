@@ -95,9 +95,12 @@ export class RichTextBuffer extends Emitter {
     this.setFocused = this.setFocused.bind(this);
     this.clear = this.clear.bind(this);
     this.append = this.append.bind(this);
+    this.setValue = this.setValue.bind(this);
+    this.getValue = this.getValue.bind(this);
     this.log = this.log.bind(this);
     this._doc.on('change', ( _target , { origin } ) => {
       if (origin !== 'buffer') this.setEdited(true);
+      this.emit('change');
     });
   }
 
@@ -119,14 +122,7 @@ export class RichTextBuffer extends Emitter {
   // --------------------------------------------------------------------------
 
   /** Clear buffer contents and resets _edited_ state. */
-  clear() {
-    this._doc.setValue('');
-    this._edited = false;
-    this._stacked = [] ;
-    this._focused = false ;
-    this._markid = 0 ;
-    this._markers = {} ;
-  }
+  clear() { this.setValue(''); }
 
   /**
      @summary Writes in the buffer.
@@ -170,6 +166,27 @@ export class RichTextBuffer extends Emitter {
     this.append(...value,'\n');
     this.scroll();
   }
+
+  /**
+     @summary Replace textual content with the given value.
+     @param {string} [txt] - new text content
+     @description
+     Also remove all markers.
+   */
+  setValue(txt='') {
+    this._doc.setValue(txt);
+    this._edited = false;
+    this._stacked = [] ;
+    this._focused = false ;
+    this._markid = 0 ;
+    this._markers = {} ;
+  }
+
+  /**
+     @summary Return textual content.
+     @return {string}
+  */
+  getValue() { return this._doc.getValue(); }
 
   /**
      @summary Opens a text marker.
