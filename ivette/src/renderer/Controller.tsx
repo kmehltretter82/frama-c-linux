@@ -235,7 +235,11 @@ const RenderConsole = () => {
           onClick={doPrev}
           title="Previous Command"
         />
-        <Label className="dimmed" display={edited && n > 0}>
+        <Label
+          className="dimmed"
+          display={edited && n > 0}
+          title="Rank in History"
+        >
           {1 + cursor}/{n}
         </Label>
         <IconButton
@@ -252,10 +256,10 @@ const RenderConsole = () => {
           title="Execute Command"
         />
         <IconButton
-          icon="EDIT"
+          icon="TERMINAL"
           selected={edited}
           onClick={doEdit}
-          title="Edit Command Line"
+          title="Edit Command"
         />
       </TitleBar>
       <Text
