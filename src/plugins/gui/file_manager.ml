@@ -54,20 +54,20 @@ let reparse (host_window: Design.main_window_extension_points) =
   in
   begin match old_helt, succeeded with
     | None, _ -> (** no history available before reparsing *)
-        host_window#reset ()
+      host_window#reset ()
     | _, None -> (** the user stopped or an error occurred  *)
-        host_window#reset ()
+      host_window#reset ()
     | Some old_helt, Some () ->
-        let new_helt = History.translate_history_elt old_helt in
-        Extlib.may History.push new_helt;
-        host_window#reset ();
-        (** The buffer is not ready yet, modification of its vadjustement
-            is unreliable *)
-        let set () =
-          let adj = host_window#source_viewer_scroll#vadjustment in
-          adj#set_value (old_scroll *. (adj#upper-.adj#lower) +. adj#lower)
-        in
-        Wutil.later set
+      let new_helt = History.translate_history_elt old_helt in
+      Extlib.may History.push new_helt;
+      host_window#reset ();
+      (** The buffer is not ready yet, modification of its vadjustement
+          is unreliable *)
+      let set () =
+        let adj = host_window#source_viewer_scroll#vadjustment in
+        adj#set_value (old_scroll *. (adj#upper-.adj#lower) +. adj#lower)
+      in
+      Wutil.later set
   end
 
 let save_in (host_window: Design.main_window_extension_points) parent name =
@@ -92,9 +92,9 @@ let save_file_as (host_window: Design.main_window_extension_points) =
     (fun () ->
        match dialog#run () with
        | `SAVE ->
-           Extlib.may
-             (save_in host_window (dialog :> GWindow.window_skel))
-             (Extlib.opt_map Filepath.Normalized.of_string dialog#filename)
+         Extlib.may
+           (save_in host_window (dialog :> GWindow.window_skel))
+           (Extlib.opt_map Filepath.Normalized.of_string dialog#filename)
        | `DELETE_EVENT | `CANCEL -> ());
   dialog#destroy ()
 
@@ -115,11 +115,11 @@ let load_file (host_window: Design.main_window_extension_points) =
   host_window#protect ~cancelable:true ~parent:(dialog:>GWindow.window_skel)
     (fun () -> match dialog#run () with
        | `OPEN ->
-           begin match dialog#filename with
-             | None -> ()
-             | Some f ->
-                 Project.load_all (Filepath.Normalized.of_string f)
-           end
+         begin match dialog#filename with
+           | None -> ()
+           | Some f ->
+             Project.load_all (Filepath.Normalized.of_string f)
+         end
        | `DELETE_EVENT | `CANCEL -> ());
   dialog#destroy ()
 

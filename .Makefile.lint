@@ -198,7 +198,6 @@ ML_LINT_KO+=src/plugins/gui/analyses_manager.ml
 ML_LINT_KO+=src/plugins/gui/book_manager.ml
 ML_LINT_KO+=src/plugins/gui/book_manager.mli
 ML_LINT_KO+=src/plugins/gui/design.mli
-ML_LINT_KO+=src/plugins/gui/file_manager.ml
 ML_LINT_KO+=src/plugins/gui/filetree.mli
 ML_LINT_KO+=src/plugins/gui/gtk_form.ml
 ML_LINT_KO+=src/plugins/gui/gtk_form.mli
