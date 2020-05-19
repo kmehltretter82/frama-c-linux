@@ -273,11 +273,12 @@
 /* -------------------------------------------------------------------------- */
 
 .dome-xIconButton {
-    margin: 4px ;
+    margin: 2px ;
+    padding: 2px ;
     background: transparent ;
 }
 
-.dome-xIconButton:hover { fill: #000 ; }
+.dome-xIconButton:hover { fill: #000 ; background: #c0c0c0 ; }
 
 .dome-xIconButton-default { fill: #777 ; }
 
@@ -291,7 +292,10 @@
 .dome-xIconButton-warning { fill: orange ; }
 
 .dome-xIconButton.dome-control-disabled,
-.dome-xIconButton.dome-control-disabled:hover { fill: #ddd ; }
+.dome-xIconButton.dome-control-disabled:hover {
+    fill: #aeafae ;
+    background: inherit ;
+}
 
 .dome-xIconButton.dome-control-hidden {
     visibility: hidden ;
