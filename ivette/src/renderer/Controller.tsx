@@ -166,15 +166,18 @@ const RenderConsole = () => {
     setH0(n < 50 ? hs.concat(Array(50 - n).fill('')) : hs);
   };
 
+  const doReload = () => {
+    const cfg = Server.getConfig();
+    const hst = insertConfig(history, cfg);
+    scratch.current = hst.slice();
+    editor.setValue(hst[0]);
+    setHistory(hst);
+    setCursor(0);
+  };
+
   const doSwitch = () => {
-    if (cursor < 0) {
-      const cfg = Server.getConfig();
-      const hst = insertConfig(history, cfg);
-      scratch.current = hst.slice();
-      editor.setValue(hst[0]);
-      setHistory(hst);
-      setCursor(0);
-    } else {
+    if (cursor < 0) doReload();
+    else {
       editor.clear();
       scratch.current = [];
       setCursor(-1);
@@ -205,16 +208,6 @@ const RenderConsole = () => {
     return undefined;
   };
 
-  const doReload = () => {
-    const cfg = Server.getConfig();
-    const cmd = dumpServerConfig(cfg);
-    const pad = scratch.current;
-    if (cursor !== 0) pad[cursor] = editor.getValue();
-    pad[0] = cmd;
-    editor.setValue(cmd);
-    setCursor(0);
-  };
-
   const doRemove = () => {
     const n = history.length;
     if (n > 1) {
@@ -239,13 +232,12 @@ const RenderConsole = () => {
   const edited = 0 <= cursor;
   const n = history.length;
 
-  let LABEL = <>Console</>;
+  let LABEL: string | JSX.Element = 'Console';
   if (edited) {
-    const RANK = n > 1 ? 'controller-rank' : 'controller-norank';
     LABEL = (
-      <Label>
+      <Label title="Rank in history">
         Command
-        <span className={RANK}>
+        <span className="controller-rank">
           {1 + cursor} / {n}
         </span>
       </Label>
@@ -258,26 +250,26 @@ const RenderConsole = () => {
           icon="TRASH"
           display={edited}
           onClick={doRemove}
-          title="Discard Command from History"
+          title="Discard command from History"
         />
         <Space />
         <IconButton
           icon="RELOAD"
           display={edited}
           onClick={doReload}
-          title="Reset Server Command"
+          title="Discard edited commands"
         />
         <IconButton
           icon="MEDIA.PREV"
           display={edited}
           onClick={doPrev}
-          title="Previous Command"
+          title="Previous command"
         />
         <IconButton
           icon="MEDIA.NEXT"
           display={edited}
           onClick={doNext}
-          title="Next Command"
+          title="Next command"
         />
         <Space />
         <IconButton
