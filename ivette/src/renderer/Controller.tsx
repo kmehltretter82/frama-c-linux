@@ -78,10 +78,10 @@ function buildServerConfig(argv: string[], cwd?: string) {
 
 function insertConfig(hs: string[], cfg: Server.Configuration) {
   const cmd = dumpServerConfig(cfg).trim();
-  const newhs = hs
-    .map((h) => h.trim())
-    .filter((h: string) => h !== cmd && h !== '')
-    .slice(0, 50);
+  const newhs =
+    hs.map((h) => h.trim())
+      .filter((h: string) => h !== cmd && h !== '')
+      .slice(0, 50);
   newhs.unshift(cmd);
   return newhs;
 }
@@ -232,20 +232,9 @@ const RenderConsole = () => {
   const edited = 0 <= cursor;
   const n = history.length;
 
-  let LABEL: string | JSX.Element = 'Console';
-  if (edited) {
-    LABEL = (
-      <Label title="History (last command comes first)">
-        Command
-        <span className="controller-rank">
-          {1 + cursor} / {n}
-        </span>
-      </Label>
-    );
-  }
   return (
     <>
-      <TitleBar label={LABEL}>
+      <TitleBar label={edited ? 'Command line' : 'Console'}>
         <IconButton
           icon="TRASH"
           display={edited}
@@ -273,18 +262,26 @@ const RenderConsole = () => {
           title="Next command"
         />
         <Space />
+        <Label
+          className="controller-rank"
+          title="History (last command first)"
+          display={edited}
+        >
+          {1 + cursor} / {n}
+        </Label>
+        <Space />
         <IconButton
           icon="MEDIA.PLAY"
           display={edited}
           disabled={isEmpty}
           onClick={doExec}
-          title="Execute Command"
+          title="Execute command"
         />
         <IconButton
           icon="TERMINAL"
           selected={edited}
           onClick={doSwitch}
-          title="Edit Command"
+          title="Toggle command line editing"
         />
       </TitleBar>
       <Text
