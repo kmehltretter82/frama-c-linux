@@ -6,13 +6,22 @@ import React from 'react';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 
-import { Vfill } from 'dome/layout/boxes';
+import * as Dome from 'dome';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
-import { Component } from 'frama-c/LabViews';
+import { IconButton } from 'dome/controls/buttons';
+import { Component, TitleBar } from 'frama-c/LabViews';
 
 import 'codemirror/mode/clike/clike';
 import 'codemirror/theme/ambiance.css';
+import 'codemirror/theme/solarized.css';
+
+const THEMES = [
+  { id: 'default', label: 'Default' },
+  { id: 'ambiance', label: 'Ambiance' },
+  { id: 'solarized light', label: 'Solarized Light' },
+  { id: 'solarized dark', label: 'Solarized Dark' },
+];
 
 // --------------------------------------------------------------------------
 // --- Rich Text Printer
@@ -65,6 +74,10 @@ const ASTview = () => {
   const buffer = React.useMemo(() => new RichTextBuffer(), []);
   const printed = React.useRef();
   const [select, setSelect] = States.useSelection();
+  const [theme, setTheme] = Dome.useGlobalSetting('ASTview.theme', 'default');
+  const [fontSize, setFontSize] = Dome.useGlobalSetting('ASTview.fontSize', 12);
+  const [wrapText, setWrapText] = Dome.useSwitch('ASTview.wrapText', false);
+
   const theFunction = select && select.function;
   const theMarker = select && select.marker;
 
@@ -82,20 +95,57 @@ const ASTview = () => {
   }, [buffer, theMarker]);
 
   // Callbacks
+  const zoomIn = () => fontSize < 48 && setFontSize(fontSize + 2);
+  const zoomOut = () => fontSize > 4 && setFontSize(fontSize - 2);
   const onSelection = (marker: any) => setSelect({ marker });
+
+  // Theme Popup
+
+  const selectTheme = (id?: string) => id && setTheme(id);
+  const checkTheme =
+    (th: { id: string }) => ({ checked: th.id === theme, ...th });
+  const themePopup =
+    () => Dome.popupMenu(THEMES.map(checkTheme), selectTheme);
 
   // Component
   return (
-    <Vfill>
+    <>
+      <TitleBar>
+        <IconButton
+          icon="ZOOM.OUT"
+          onClick={zoomOut}
+          disabled={!theFunction}
+          title="Decrease font size"
+        />
+        <IconButton
+          icon="ZOOM.IN"
+          onClick={zoomIn}
+          disabled={!theFunction}
+          title="Increase font size"
+        />
+        <IconButton
+          icon="PAINTBRUSH"
+          onClick={themePopup}
+          title="Choose theme"
+        />
+        <IconButton
+          icon="WRAPTEXT"
+          selected={wrapText}
+          onClick={setWrapText}
+          title="Wrap text"
+        />
+      </TitleBar>
       <Text
         buffer={buffer}
         mode="text/x-csrc"
-        theme="ambiance"
+        theme={theme}
+        fontSize={fontSize}
+        lineWrapping={wrapText}
         selection={theMarker}
         onSelection={onSelection}
         readOnly
       />
-    </Vfill>
+    </>
   );
 
 };

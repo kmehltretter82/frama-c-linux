@@ -431,7 +431,7 @@ const fireSaveSettings = _.debounce(
       ipcRenderer.send( 'dome.ipc.settings.window', settingsPatches ) ;
       settingsPatches = {} ;
     }
-  }, 200
+  }, 100
 );
 
 const fireSaveGlobals = _.debounce(
@@ -440,7 +440,7 @@ const fireSaveGlobals = _.debounce(
       ipcRenderer.send( 'dome.ipc.settings.global', globalPatches ) ;
       globalPatches = {} ;
     }
-  }, 200
+  }, 100
 );
 
 ipcRenderer.on('dome.ipc.closing', (_evt) => {

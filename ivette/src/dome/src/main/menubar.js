@@ -9,13 +9,19 @@ import * as System from 'dome/system' ;
 // --- Special Callbacks
 // --------------------------------------------------------------------------
 
-function reloadWindow(item, focusedWindow)
+function reloadWindow(item)
 {
-  if (focusedWindow) {
-    reset(); // declared below
-    focusedWindow.send('dome.ipc.closing');
-    focusedWindow.reload();
-  }
+  reset(); // declared below
+  BrowserWindow.getAllWindows().forEach((win) => {
+    if (win) {
+      try {
+        win.send('dome.ipc.closing');
+        win.reload();
+      } catch(err) {
+        console.warn('[Reload]',win.id,err);
+      }
+    };
+  });
 }
 
 function toggleFullScreen(item, focusedWindow)

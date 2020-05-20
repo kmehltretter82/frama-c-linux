@@ -24,6 +24,11 @@ lint: dome-pkg dome-templ
 	@echo "[Ivette] running ts linter"
 	yarn run lint
 
+fixlint: dome-pkg dome-templ
+	@echo "[Ivette] running ts linter (with fix)"
+	yarn run lint --fix
+
+
 # --------------------------------------------------------------------------
 # --- Ivette Documentation
 # --------------------------------------------------------------------------
