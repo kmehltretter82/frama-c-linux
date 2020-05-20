@@ -20,32 +20,31 @@ import 'codemirror/theme/ambiance.css';
 // --- Configure Server
 // --------------------------------------------------------------------------
 
-let cmdConfig: Server.Configuration;
-const cmdLine = new RichTextBuffer();
+const quoteRe = new RegExp('^[-./:a-zA-Z0-9]+$');
+const quote = (s: string) => (quoteRe.test(s) ? s : `"${s}"`);
 
-function dumpCmdLine(sc: Server.Configuration): void {
+function dumpServerConfig(sc: Server.Configuration): string {
+  let buffer = '';
   const { cwd, command, sockaddr, params } = sc;
-  cmdLine.clear();
-  if (cwd) cmdLine.log('--cwd', cwd);
-  if (command) cmdLine.log('--command', command);
-  if (sockaddr) cmdLine.log('--socket', sockaddr);
+  if (cwd) buffer += `--cwd ${quote(cwd)}\n`;
+  if (command) buffer += `--command ${command}\n`;
+  if (sockaddr) buffer += `--socket ${sockaddr}\n`;
   if (params) {
     params.forEach((v: string, i: number) => {
       if (i > 0) {
         if (v.startsWith('-') || v.endsWith('.c')
           || v.endsWith('.h') || v.endsWith('.i')) {
-          cmdLine.append('\n');
-        } else {
-          cmdLine.append(' ');
-        }
+          buffer += '\n';
+        } else
+          buffer += ' ';
       }
-      cmdLine.append(v);
+      buffer += v;
     });
   }
-  cmdLine.append('\n');
+  return buffer;
 }
 
-function buildServerConfiguration(argv: string[], cwd?: string) {
+function buildServerConfig(argv: string[], cwd?: string) {
   const params = [];
   let command;
   let sockaddr;
@@ -77,10 +76,23 @@ function buildServerConfiguration(argv: string[], cwd?: string) {
   };
 }
 
+function insertConfig(hs: string[], cfg: Server.Configuration) {
+  const cmd = dumpServerConfig(cfg).trim();
+  const newhs =
+    hs.map((h) => h.trim())
+      .filter((h: string) => h !== cmd && h !== '')
+      .slice(0, 50);
+  newhs.unshift(cmd);
+  return newhs;
+}
+
+// --------------------------------------------------------------------------
+// --- Start Server on Command
+// --------------------------------------------------------------------------
+
 Dome.onCommand((argv: string[], cwd: string) => {
-  cmdConfig = buildServerConfiguration(argv, cwd);
-  dumpCmdLine(cmdConfig);
-  Server.configure(cmdConfig);
+  const cfg = buildServerConfig(argv, cwd);
+  Server.configure(cfg);
   Server.start();
 });
 
@@ -136,99 +148,146 @@ export const Control = () => {
 // --- Server Console
 // --------------------------------------------------------------------------
 
-function getCmdLine() {
-  return cmdLine.getDoc().getValue().trim();
-}
-
-function execCmdLine(cmd: string) {
-  const argv = cmd.split(/[ \t\n]+/);
-  const cfg = buildServerConfiguration(argv);
-  Server.configure(cfg);
-  Server.restart();
-}
+const editor = new RichTextBuffer();
 
 const RenderConsole = () => {
-  const [command, switchCmd] = Dome.useSwitch();
-  const { current, next, prev, index, length, update, insert, clear }: any =
-    Dome.useHistory('frama-c.command.history');
+  const scratch = React.useRef([] as string[]);
+  const [cursor, setCursor] = React.useState(-1);
+  const [H0, setH0] = Dome.useState('Controller.history', []);
+  const [isEmpty, setEmpty] = React.useState(true);
+  const [noTrash, setNoTrash] = React.useState(true);
+
+  // Cope with merge settings that keeps previous array entries (BUG in DOME)
+  const history = Array.isArray(H0) ? H0.filter((h) => h !== '') : [];
+  const setHistory = (hs: string[]) => {
+    const n = hs.length;
+    setH0(n < 50 ? hs.concat(Array(50 - n).fill('')) : hs);
+  };
+
+  Dome.useEmitter(editor, 'change', () => {
+    const cmd = editor.getValue().trim();
+    setEmpty(cmd === '');
+    setNoTrash(cursor === 0 && history.length === 1 && cmd === history[0]);
+  });
+
+  const doReload = () => {
+    const cfg = Server.getConfig();
+    const hst = insertConfig(history, cfg);
+    scratch.current = hst.slice();
+    editor.setValue(hst[0]);
+    setHistory(hst);
+    setCursor(0);
+  };
+
+  const doSwitch = () => {
+    if (cursor < 0) doReload();
+    else {
+      editor.clear();
+      scratch.current = [];
+      setCursor(-1);
+    }
+  };
 
   const doExec = () => {
-    const cmdline = getCmdLine();
-    if (cmdline !== current) insert(cmdline);
-    execCmdLine(cmdline);
-    switchCmd();
+    const cmd = editor.getValue().trim();
+    const argv = cmd.split(/[ \t\n]+/);
+    const cfg = buildServerConfig(argv);
+    const hst = insertConfig(history, cfg);
+    setHistory(hst);
+    setCursor(-1);
+    editor.clear();
+    Server.configure(cfg);
+    Server.restart();
   };
-  const doNext = () => { cmdLine.getDoc().setValue(next() || ''); };
-  const doPrev = () => { cmdLine.getDoc().setValue(prev() || ''); };
-  const doReload = () => { dumpCmdLine(cmdConfig); };
-  const doDrop = () => {
-    cmdLine.clear();
-    cmdLine.getDoc().setValue(update(undefined) || '');
+
+  const doMove = (target: number) => {
+    if (0 <= target && target < history.length && target !== cursor)
+      return () => {
+        const cmd = editor.getValue();
+        const pad = scratch.current;
+        pad[cursor] = cmd;
+        editor.setValue(pad[target]);
+        setCursor(target);
+      };
+    return undefined;
   };
+
+  const doRemove = () => {
+    const n = history.length;
+    if (n <= 1) doReload();
+    else {
+      const hst = history.slice();
+      const pad = scratch.current;
+      hst.splice(cursor, 1);
+      pad.splice(cursor, 1);
+      setHistory(hst);
+      const next = cursor > 0 ? cursor - 1 : 0;
+      editor.setValue(pad[next]);
+      setCursor(next);
+    }
+  };
+
+  const doPrev = doMove(cursor + 1);
+  const doNext = doMove(cursor - 1);
+  const edited = 0 <= cursor;
+  const n = history.length;
+
   return (
     <>
-      <TitleBar label={command ? 'Command Line' : 'Console'}>
-        <Label
-          className="dimmed"
-          display={command && length > 0}
-          title="Rank in History"
-        >
-          {1 + index}/{length}
-        </Label>
-        <Space />
+      <TitleBar label={edited ? 'Command line' : 'Console'}>
         <IconButton
           icon="TRASH"
-          display={command && clear}
-          disabled={!clear}
-          onClick={clear}
-          title="Clear History"
-        />
-        <IconButton
-          icon="CROSS"
-          display={command && clear}
-          disabled={!current}
-          onClick={doDrop}
-          title="Remove Command"
+          display={edited}
+          disabled={noTrash}
+          onClick={doRemove}
+          title="Discard command from history (irreversible)"
         />
         <Space />
         <IconButton
-          icon="MEDIA.PREV"
-          display={command}
-          disabled={!prev}
-          onClick={doPrev}
-          title="Previous Command"
+          icon="RELOAD"
+          display={edited}
+          onClick={doReload}
+          title="Discard changes"
         />
         <IconButton
-          icon="RELOAD"
-          display={command}
-          onClick={doReload}
-          title="Reset Command Line"
+          icon="MEDIA.PREV"
+          display={edited}
+          onClick={doPrev}
+          title="Previous command"
         />
         <IconButton
           icon="MEDIA.NEXT"
-          display={command}
-          disabled={!next}
+          display={edited}
           onClick={doNext}
-          title="Next Command"
+          title="Next command"
         />
+        <Space />
+        <Label
+          className="controller-rank"
+          title="History (last command first)"
+          display={edited}
+        >
+          {1 + cursor} / {n}
+        </Label>
         <Space />
         <IconButton
           icon="MEDIA.PLAY"
-          display={command}
+          display={edited}
+          disabled={isEmpty}
           onClick={doExec}
-          title="Execute Command"
+          title="Execute command"
         />
         <IconButton
-          icon="EDIT"
-          selected={command}
-          onClick={switchCmd}
-          title="Edit Command"
+          icon="TERMINAL"
+          selected={edited}
+          onClick={doSwitch}
+          title="Toggle command line editing"
         />
       </TitleBar>
       <Text
-        buffer={command ? cmdLine : Server.buffer}
+        buffer={edited ? editor : Server.buffer}
         mode="text"
-        readOnly={!command}
+        readOnly={!edited}
         theme="ambiance"
       />
     </>

@@ -118,7 +118,7 @@ const LABEL = ({disabled,label}) => (
    Buttons without focus can not be triggered with the Enter key.
 */
 export const Button = (props) => {
-  const disabled = DISABLED(props);
+  const disabled = props.onClick ? DISABLED(props) : true ;
   const { focusable=false, kind='default',
           visible=true, display=true, blink=false,
           selected, icon, label, className='' } = props;
@@ -176,7 +176,7 @@ export const Button = (props) => {
    Buttons without focus can not be triggered with the Enter key.
 */
 export const CircButton = (props) => {
-  const disabled = DISABLED(props);
+  const disabled = props.onClick ? DISABLED(props) : true ;
   const { focusable=false, kind='default',
           visible=true, display=true,
           selected, icon, label, className='' } = props;
@@ -229,7 +229,7 @@ export const CircButton = (props) => {
    - `'negative'`: negative button, in red.
 */
 export const IconButton = (props) => {
-  const disabled = DISABLED(props);
+  const disabled = props.onClick ? DISABLED(props) : true;
   const {
     icon, size, title,
     visible=true, display=true, selected,
@@ -271,7 +271,7 @@ const CHECKBOX_DISABLED = 'dome-control-disabled dome-xCheckbox ' ;
    @property {object} [style] - Additional style
 */
 export const Checkbox = (props) => {
-  const disabled = DISABLED(props);
+  const disabled = onChange ? DISABLED(props) : true;
   const onChange = props.onChange && ((evt) => props.onChange(evt.target.checked)) ;
   const baseClass = disabled ? CHECKBOX_DISABLED : CHECKBOX_ENABLED ;
   const labelClass = props.className || '' ;
@@ -307,12 +307,11 @@ export const Checkbox = (props) => {
    @property {object} [style] - Additional style
 */
 export const Switch = (props) => {
-  const disabled = DISABLED(props);
+  const disabled = props.onChange ? DISABLED(props) : undefined ;
   const { visible=true, display=true } = props ;
   const onChange = props.onChange && ((evt) => props.onChange(evt.target.checked)) ;
   const iconId = props.value ? 'SWITCH.ON' : 'SWITCH.OFF' ;
-  const onClick = (disabled || !props.onChange)
-        ? undefined : () => props.onChange(!props.value) ;
+  const onClick = disabled ? undefined : () => props.onChange(!props.value) ;
   const className = 'dome-xSwitch '
         + (disabled ? 'dome-control-disabled' : 'dome-control-enabled')
         + (visible ? '' : ' dome-control-hidden')
@@ -353,7 +352,7 @@ export const Switch = (props) => {
    with HTML standards and DOM element properties.
 */
 export const Radio = (props) => {
-  const disabled = DISABLED(props);
+  const disabled = props.onSelection ? DISABLED(props) : true;
   const checked = props.value === props.selection ;
   const onChange = props.onSelection && (() => props.onSelection(props.value)) ;
   const baseClass = disabled ? CHECKBOX_DISABLED : CHECKBOX_ENABLED ;
@@ -363,7 +362,8 @@ export const Radio = (props) => {
       title={props.title}
       style={props.style}
       className={baseClass + labelClass} >
-      <input type="radio" disabled={disabled} checked={checked} onChange={onChange} />
+      <input type="radio"
+             disabled={disabled} checked={checked} onChange={onChange} />
       {props.label}
     </label>
   );
@@ -415,8 +415,9 @@ export class RadioGroup extends React.Component {
   }
 
   render() {
-    const groupdisabled = DISABLED(this.props);
-    const { className='', style } = this.props ;
+    const props = this.props ;
+    const groupdisabled = props.onChange ? DISABLED(props) : true ;
+    const { className='', style } = props ;
     const selection = this.state.value ;
     const makeRadio = (radio) => {
       const disabled = groupdisabled || DISABLED(radio.props) ;
@@ -424,7 +425,7 @@ export class RadioGroup extends React.Component {
       const onSelection =
             onRadioSelect
             ? (v) => { onRadioSelect(v) ; this.onChange(v); }
-            : this.handleSelect ;
+            : this.onChange ;
       return React.cloneElement( radio , { selection , disabled , onSelection } , null );
     } ;
     return (

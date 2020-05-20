@@ -37,11 +37,6 @@
     height: 24px ;
 }
 
-.labview-titlebar .dome-xLabel
-{
-    padding-top: 4px ;
-}
-
 .labview-handle
 {
     flex: 1 1 auto ;
