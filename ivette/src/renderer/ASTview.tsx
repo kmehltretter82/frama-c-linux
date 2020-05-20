@@ -121,7 +121,7 @@ const ASTview = () => {
           icon="ZOOM.IN"
           onClick={zoomIn}
           disabled={!theFunction}
-          title="Increase font size)"
+          title="Increase font size"
         />
         <IconButton
           icon="PAINTBRUSH"
