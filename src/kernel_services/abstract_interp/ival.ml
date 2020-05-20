@@ -445,6 +445,11 @@ let neg_int = function
   | Float _ -> assert false
   | Int i -> inject_int (Int_val.neg i)
 
+let abs_int = function
+  | Bottom -> bottom
+  | Float _ -> assert false
+  | Int i -> inject_int (Int_val.abs i)
+
 let sub_int v1 v2 = add_int v1 (neg_int v2)
 let sub_int_under v1 v2 = add_int_under v1 (neg_int v2)
 

@@ -436,6 +436,10 @@ let neg = function
   | Set s -> Set (Int_set.neg s)
   | Itv i -> Itv (Int_interval.neg i)
 
+let abs = function
+  | Set s -> Set (Int_set.abs s)
+  | Itv i -> inject_itv (Int_interval.abs i)
+
 
 let scale f v =
   if Int.is_zero f

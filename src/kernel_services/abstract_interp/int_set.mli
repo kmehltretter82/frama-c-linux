@@ -117,6 +117,7 @@ val add_singleton: Integer.t -> t -> t
 val add: t -> t -> set_or_top
 val add_under: t -> t -> set_or_top
 val neg: t -> t
+val abs: t -> t
 
 val mul: t -> t -> set_or_top
 val c_rem: t -> t -> set_or_top_or_bottom

@@ -604,6 +604,13 @@ let add_under s1 s2 =
 
 let neg s = map_set_strict_decr Int.neg s
 
+let abs s =
+  if Int.(ge s.(0) zero)
+  then s
+  else if Int.(le s.(Array.length s - 1) zero)
+  then neg s
+  else map Int.abs s
+
 let scale f s =
   if Int.ge f Int.zero
   then apply_bin_1_strict_incr Int.mul f s

@@ -77,6 +77,7 @@ val add_singleton_int: Integer.t -> t -> t
 val add: t -> t -> t
 val add_under: t -> t -> t or_bottom
 val neg: t -> t
+val abs: t -> t
 
 val scale: Integer.t -> t -> t
 val scale_div: pos:bool -> Integer.t -> t -> t

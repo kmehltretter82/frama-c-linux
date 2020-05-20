@@ -720,6 +720,7 @@ let known_logic_funs = [
   "\\sign", ACSL;
   "\\min", ACSL;
   "\\max", ACSL;
+  "\\abs", ACSL;
   "\\neg_float",ACSL;
   "\\add_float",ACSL;
   "\\sub_float",ACSL;
@@ -1410,6 +1411,21 @@ and eval_known_logic_function ~alarm_mode env li labels args =
         in
         eval_quantifier_extremum backward ~min:r1 ~max:r2 eval_term
       | _ -> assert false
+    end
+
+  | "\\abs", Some typ, _, [t] ->
+    begin
+      let r = eval_term ~alarm_mode env t in
+      try
+        let ival = Cvalue.V.project_ival r.eover in
+        let result =
+          match typ with
+          | Linteger -> einteger (Cvalue.V.inject_ival (Ival.abs_int ival))
+          | Lreal -> ereal Fval.(abs Real (Ival.project_float ival))
+          | _ -> assert false
+        in
+        { result with empty = r.empty; ldeps = r.ldeps; }
+      with Cvalue.V.Not_based_on_null -> c_alarm ()
     end
 
   | _ -> assert false

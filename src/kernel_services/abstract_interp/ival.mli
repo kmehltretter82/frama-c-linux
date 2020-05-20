@@ -63,6 +63,8 @@ val add_singleton_int: Integer.t -> t -> t
 
 val neg_int : t -> t
 (** Negation of an integer ival. Exact operation. *)
+val abs_int: t -> t
+(** Absolute value of an integer. *)
 val sub_int : t -> t -> t
 val sub_int_under: t -> t -> t
 
