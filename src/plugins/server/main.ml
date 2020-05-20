@@ -269,7 +269,7 @@ let communicate server =
     let pool = ref [] in
     Queue.iter (fun r -> pool := r :: !pool) server.q_out ;
     Queue.clear server.q_out ;
-    server.s_active <- Sigs.empty ;
+    server.s_signal <- Sigs.empty ;
     message.callback !pool ;
     Extlib.may raise error ; true
 
