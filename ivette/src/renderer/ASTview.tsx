@@ -115,24 +115,24 @@ const ASTview = () => {
           icon="ZOOM.OUT"
           onClick={zoomOut}
           disabled={!theFunction}
-          title="Zoom In (increase font size)"
+          title="Decrease font size"
         />
         <IconButton
           icon="ZOOM.IN"
           onClick={zoomIn}
           disabled={!theFunction}
-          title="Zoom Out (decrease font size)"
+          title="Increase font size)"
         />
         <IconButton
           icon="PAINTBRUSH"
           onClick={themePopup}
-          title="Choose Theme"
+          title="Choose theme"
         />
         <IconButton
           icon="WRAPTEXT"
           selected={wrapText}
           onClick={setWrapText}
-          title="Wrap Text"
+          title="Wrap text"
         />
       </TitleBar>
       <Text
