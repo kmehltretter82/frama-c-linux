@@ -1604,7 +1604,6 @@ struct
     let on_sub_nodes = do_filter filter in
     match F.p_expr p with
     | And ps -> p_all on_sub_nodes ps
-    | Or ps -> p_disj List.(filter (fun p -> p <> p_true) (map on_sub_nodes ps))
     | If(e,a,b) -> F.p_if e (on_sub_nodes a) (on_sub_nodes b)
     | _ when has_init filter p -> p_true
     | _ -> p
