@@ -155,9 +155,7 @@ const RenderConsole = () => {
   const [cursor, setCursor] = React.useState(-1);
   const [H0, setH0] = Dome.useState('Controller.history', []);
   const [isEmpty, setEmpty] = React.useState(true);
-  Dome.useEmitter(editor, 'change', () => {
-    setEmpty(editor.getValue().trim() === '');
-  });
+  const [noTrash, setNoTrash] = React.useState(true);
 
   // Cope with merge settings that keeps previous array entries (BUG in DOME)
   const history = Array.isArray(H0) ? H0.filter((h) => h !== '') : [];
@@ -165,6 +163,12 @@ const RenderConsole = () => {
     const n = hs.length;
     setH0(n < 50 ? hs.concat(Array(50 - n).fill('')) : hs);
   };
+
+  Dome.useEmitter(editor, 'change', () => {
+    const cmd = editor.getValue().trim();
+    setEmpty(cmd === '');
+    setNoTrash(cursor === 0 && history.length === 1 && cmd === history[0]);
+  });
 
   const doReload = () => {
     const cfg = Server.getConfig();
@@ -210,7 +214,8 @@ const RenderConsole = () => {
 
   const doRemove = () => {
     const n = history.length;
-    if (n > 1) {
+    if (n <= 1) doReload();
+    else {
       const hst = history.slice();
       const pad = scratch.current;
       hst.splice(cursor, 1);
@@ -219,11 +224,6 @@ const RenderConsole = () => {
       const next = cursor > 0 ? cursor - 1 : 0;
       editor.setValue(pad[next]);
       setCursor(next);
-    } else {
-      // Do not share the two arrays!
-      setHistory(['']);
-      scratch.current = [''];
-      editor.clear();
     }
   };
 
@@ -235,7 +235,7 @@ const RenderConsole = () => {
   let LABEL: string | JSX.Element = 'Console';
   if (edited) {
     LABEL = (
-      <Label title="Rank in history">
+      <Label title="History (last command comes first)">
         Command
         <span className="controller-rank">
           {1 + cursor} / {n}
@@ -249,15 +249,16 @@ const RenderConsole = () => {
         <IconButton
           icon="TRASH"
           display={edited}
+          disabled={noTrash}
           onClick={doRemove}
-          title="Discard command from History"
+          title="Discard command from history (irreversible)"
         />
         <Space />
         <IconButton
           icon="RELOAD"
           display={edited}
           onClick={doReload}
-          title="Discard edited commands"
+          title="Discard changes"
         />
         <IconButton
           icon="MEDIA.PREV"
