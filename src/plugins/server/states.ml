@@ -159,7 +159,10 @@ let content array =
           updates = Kmap.empty ;
         } in
         Hashtbl.add array.projects prj w ; w
-    in array.current <- Some content ; content
+    in
+    array.current <- Some content ;
+    Request.emit array.signal ;
+    content
 
 let reload array =
   let m = content array in
