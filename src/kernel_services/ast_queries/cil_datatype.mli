@@ -215,7 +215,7 @@ module TypNoUnroll: S_with_collections_pretty with type t = typ
 
 module Typeinfo: S_with_collections with type t = typeinfo
 
-module Varinfo_Id: Hptmap.Id_Datatype
+module Varinfo_Id: Hptmap.Id_Datatype with type t = varinfo
 
 (** @plugin development guide *)
 module Varinfo: sig
