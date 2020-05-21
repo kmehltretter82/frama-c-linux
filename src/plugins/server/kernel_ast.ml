@@ -226,6 +226,23 @@ module Kf = Data.Collection
         with Not_found -> Data.failure "Undefined function '%s'" key
     end)
 
+
+module TypeId =
+  Data.Index (Cil_datatype.Typ.Map)
+    (struct
+      let page = page
+      let name = "type"
+      let descr = Md.plain "C Type"
+    end)
+
+module VarId =
+  Data.Identified (Cil_datatype.Varinfo_Id)
+    (struct
+      let page = page
+      let name = "varinfo"
+      let descr = Md.plain "Varinfo"
+    end)
+
 (* -------------------------------------------------------------------------- *)
 (* --- Functions                                                          --- *)
 (* -------------------------------------------------------------------------- *)
@@ -245,6 +262,138 @@ let () = Request.register ~page
     ~descr:(Md.plain "Print the AST of a function")
     ~input:(module Kf) ~output:(module Jtext)
     (fun kf -> Jbuffer.to_json Printer.pp_global (Kernel_function.get_global kf))
+
+(* -------------------------------------------------------------------------- *)
+(* --- Information                                                        --- *)
+(* -------------------------------------------------------------------------- *)
+
+module TypeInfo = struct
+  type record
+
+  let record : record Record.signature =
+    Record.signature ~page
+      ~name:"type" ~descr:(Md.plain "Information about a C type") ()
+
+  let id = Record.field record ~name:"id"
+      ~descr:(Md.plain "Type id") (module Jint)
+  let name = Record.field record ~name:"name"
+      ~descr:(Md.plain "Type name") (module Jstring)
+  let size = Record.field record ~name:"size"
+      ~descr:(Md.plain "Bit size") (module Jint.Joption)
+
+  module R = (val (Record.publish record) : Record.S with type r = record)
+
+  type t = typ
+  let syntax = R.syntax
+
+  let getSize typ =
+    try Some (Cil.bitsSizeOf typ)
+    with Cil.SizeOfError _ -> None
+
+  let to_json typ =
+    R.default |>
+    R.set id (TypeId.get typ) |>
+    R.set name (Format.asprintf "%a" Printer.pp_typ typ) |>
+    R.set size (getSize typ) |>
+    R.to_json
+
+  let of_json json =
+    let r = R.of_json json in
+    try TypeId.find (R.get id r)
+    with Not_found -> Data.failure "Unknown type"
+end
+
+module VarInfo = struct
+  type record
+
+  let record : record Record.signature =
+    Record.signature ~page
+      ~name:"varinfo" ~descr:(Md.plain "Information about a variable") ()
+
+  let id = Record.field record ~name:"id"
+      ~descr:(Md.plain "Variable id") (module Jint)
+  let name = Record.field record ~name:"name"
+      ~descr:(Md.plain "Variable name") (module Jstring)
+  let typ = Record.field record ~name:"type"
+      ~descr:(Md.plain "Variable type") (module TypeInfo)
+  let fct = Record.field record ~name:"function"
+      ~descr:(Md.plain "Is the variable a function?") (module Jbool)
+  let global = Record.field record ~name:"global"
+      ~descr:(Md.plain "Is the variable global?") (module Jbool)
+  let formal = Record.field record ~name:"formal"
+      ~descr:(Md.plain "Is the variable formal?") (module Jbool)
+  let kf = Record.option record ~name:"defining_function"
+      ~descr:(Md.plain "Function defining the variable") (module Kf)
+  let addrof = Record.field record ~name:"addrof"
+      ~descr:(Md.plain "Is the variable address taken?") (module Jbool)
+  let referenced = Record.field record ~name:"referenced"
+      ~descr:(Md.plain "Is the variable referenced?") (module Jbool)
+  let temp = Record.field record ~name:"temp"
+      ~descr:(Md.plain "Is the variable temporary?") (module Jbool)
+  let descr = Record.option record ~name:"descr"
+      ~descr:(Md.plain "Description of temporary variable") (module Jstring)
+
+  module R = (val (Record.publish record) : Record.S with type r = record)
+
+  type t = varinfo
+  let syntax = R.syntax
+
+  let to_json vi =
+    R.default |>
+    R.set name vi.vname |>
+    R.set typ vi.vtype |>
+    R.set fct (Cil.isFunctionType vi.vtype) |>
+    R.set global vi.vglob |>
+    R.set formal vi.vformal |>
+    R.set kf (Kernel_function.find_defining_kf vi) |>
+    R.set addrof vi.vaddrof |>
+    R.set referenced vi.vreferenced |>
+    R.set temp vi.vtemp |>
+    R.set descr vi.vdescr |>
+    R.to_json
+
+  let of_json json =
+    let r = R.of_json json in
+    try VarId.find (R.get id r)
+    with Not_found -> Data.failure "Unknown varinfo"
+end
+
+module Info = struct
+  type record
+
+  let record : record Record.signature =
+    Record.signature ~page ~name:"information"
+      ~descr:(Md.plain "Information about an AST marker") ()
+
+  let kind = Record.field record ~name:"kind" ~descr:(Md.plain "Kind")
+      (module MarkerKind)
+  let typ = Record.option record ~name:"type" ~descr:(Md.plain "Type")
+      (module TypeInfo)
+  let kf = Record.option record ~name:"function" ~descr:(Md.plain "Function")
+      (module Kf)
+  let varinfo = Record.option record ~name:"varinfo"
+      ~descr:(Md.plain "Varinfo information")
+      (module VarInfo)
+
+  module R = (val (Record.publish record) : Record.S with type r = record)
+
+  type t = Printer_tag.localizable
+  let syntax = R.syntax
+
+  let to_json (loc: t) =
+    R.default |>
+    R.set kind loc |>
+    R.set typ (Printer_tag.typ_of_localizable loc) |>
+    R.set kf (Printer_tag.kf_of_localizable loc) |>
+    R.set varinfo (Printer_tag.varinfo_of_localizable loc) |>
+    R.to_json
+end
+
+let () = Request.register ~page
+    ~kind:`GET ~name:"kernel.ast.info"
+    ~descr:(Md.plain "Get information about a marker")
+    ~input:(module Jstring) ~output:(module Info)
+    Marker.lookup
 
 (* -------------------------------------------------------------------------- *)
 (* --- Files                                                              --- *)
