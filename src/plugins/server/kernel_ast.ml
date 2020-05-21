@@ -41,6 +41,41 @@ let () = Request.register ~page
 (* ---  Printers                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
+(* The kind of a marker. *)
+module MarkerKind = struct
+  let t =
+    Enum.dictionary ~page ~name:"markerkind" ~title:"Marker kind"
+      ~descr:(Md.plain "Marker kind") ()
+
+  let kind name = Enum.tag t ~name ~descr:(Md.plain name) ()
+  let expr = kind "expression"
+  let lval = kind "lvalue"
+  let var = kind "variable"
+  let fct = kind "function"
+  let decl = kind "declaration"
+  let stmt = kind "statement"
+  let glob = kind "global"
+  let term = kind "term"
+  let prop = kind "property"
+
+  let tag =
+    let open Printer_tag in
+    function
+    | PStmt _ -> stmt
+    | PStmtStart _ -> stmt
+    | PVDecl _ -> decl
+    | PLval (_, _, (Var vi, NoOffset)) ->
+      if Cil.isFunctionType vi.vtype then fct else var
+    | PLval _ -> lval
+    | PExp _ -> expr
+    | PTermLval _ -> term
+    | PGlobal _ -> glob
+    | PIP _ -> prop
+
+  let data = Enum.publish t ~tag ()
+  include (val data : S with type t = Printer_tag.localizable)
+end
+
 module Marker =
 struct
 
@@ -75,6 +110,39 @@ struct
         let default = index
       end)
 
+  let get_name = function
+    | PLval (_, _, (Var vi, NoOffset)) -> Some vi.vname
+    | PLval (_, _, lval) -> Some (Format.asprintf "%a" Printer.pp_lval lval)
+    | PExp  (_, _, expr) -> Some (Format.asprintf "%a" Printer.pp_exp expr)
+    | PStmt _ | PStmtStart _ | PVDecl _
+    | PTermLval _ | PGlobal _| PIP _ -> None
+
+  let iter f =
+    Localizable.Hashtbl.iter (fun key str -> f (key, str)) (STATE.get ()).tags
+
+  let array =
+    let model = States.model () in
+    let () =
+      States.column ~model
+        ~name:"kind" ~descr:(Md.plain "Marker kind")
+        ~data:(module MarkerKind) ~get:fst ()
+    in
+    let () =
+      States.column ~model
+        ~name:"name"
+        ~descr:(Md.plain "Marker identifier for the end-user, if any")
+        ~data:(module Jstring.Joption)
+        ~get:(fun (tag, _) -> get_name tag)
+        ()
+    in
+    States.register_array
+      ~page
+      ~name:"kernel.ast.markerKind"
+      ~descr:(Md.plain "Kind of markers")
+      ~key:snd
+      ~iter
+      model
+
   let create_tag = function
     | PStmt(_,s) -> Printf.sprintf "#s%d" s.sid
     | PStmtStart(_,s) -> Printf.sprintf "#k%d" s.sid
@@ -92,6 +160,7 @@ struct
       let tag = create_tag loc in
       Localizable.Hashtbl.add tags loc tag ;
       Hashtbl.add locs tag loc ;
+      States.update array (loc, tag);
       tag
 
   let lookup tag = Hashtbl.find (STATE.get()).locs tag
