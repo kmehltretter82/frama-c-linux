@@ -618,6 +618,7 @@ class Signal {
     this.listen = false;
     this.sigon = this.sigon.bind(this);
     this.sigoff = _.debounce(this.sigoff.bind(this), 1000);
+    this.unplug = this.unplug.bind(this);
   }
 
   on(callback: any) {
@@ -659,11 +660,15 @@ class Signal {
       }
     }
   }
+
+  unplug() {
+    this.listen = false;
+  }
 }
 
 // --- Memo
 
-const signals: any[] = [];
+const signals: { [id: string]: Signal } = {};
 function _signal(id: any) {
   let s = signals[id];
   if (!s) {
@@ -714,11 +719,16 @@ export function useSignal(id: string, callback: any) {
 // --- Server Synchro
 
 Dome.on(READY, () => {
-  _.forEach(signals, (s) => s.sigon());
+  _.forEach(signals, (signal: Signal) => {
+    signal.sigon();
+  });
 });
 
 Dome.on(SHUTDOWN, () => {
-  _.forEach(signals, (s) => s.sigoff.cancel());
+  _.forEach(signals, (signal: Signal) => {
+    signal.unplug();
+    // TODO: signal.sigoff.cancel();
+  });
 });
 
 // --------------------------------------------------------------------------
