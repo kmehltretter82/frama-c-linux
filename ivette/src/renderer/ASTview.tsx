@@ -89,6 +89,7 @@ const ASTview = () => {
   const [theme, setTheme] = Dome.useGlobalSetting('ASTview.theme', 'default');
   const [fontSize, setFontSize] = Dome.useGlobalSetting('ASTview.fontSize', 12);
   const [wrapText, setWrapText] = Dome.useSwitch('ASTview.wrapText', false);
+  const markers = States.useSyncArray('kernel.ast.markerKind');
 
   const theFunction = select && select.function;
   const theMarker = select && select.marker;
@@ -110,6 +111,17 @@ const ASTview = () => {
   const zoomIn = () => fontSize < 48 && setFontSize(fontSize + 2);
   const zoomOut = () => fontSize > 4 && setFontSize(fontSize - 2);
   const onSelection = (marker: any) => setSelect({ marker });
+
+  function contextMenu(id: string) {
+    const marker = markers[id];
+    if (marker && marker.kind === 'function') {
+      const item1 = {
+        label: `Go to definition of ${marker.name}`,
+        onClick: () => setSelect({ function: marker.name }),
+      };
+      Dome.popupMenu([item1]);
+    }
+  }
 
   // Theme Popup
 
@@ -155,6 +167,7 @@ const ASTview = () => {
         lineWrapping={wrapText}
         selection={theMarker}
         onSelection={onSelection}
+        onContextMenu={contextMenu}
         readOnly
       />
     </>
