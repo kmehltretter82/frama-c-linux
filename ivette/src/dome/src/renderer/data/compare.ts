@@ -18,7 +18,7 @@
    - `compare(x,y) < 0` shall be a complete strict order
      (anti-reflexive, asymetric, transitive)
 */
-export interface Compare<A> {
+export interface Order<A> {
   (x: A, y: A): number;
 }
 
@@ -72,18 +72,20 @@ export function alpha(x: string, y: string) {
 }
 
 /** Combine comparison orders in sequence. */
-export function sequence<A>(...orders: Compare<A>[]): Compare<A> {
+export function sequence<A>(...orders: (Order<A> | undefined)[]): Order<A> {
   return (x: A, y: A) => {
     for (const order of orders) {
-      const cmp = order(x, y);
-      if (cmp != 0) return cmp;
+      if (order) {
+        const cmp = order(x, y);
+        if (cmp != 0) return cmp;
+      }
     }
     return 0;
   };
 }
 
 /** Compare optional values. */
-export function option<A>(order: Compare<A>): Compare<undefined | A> {
+export function option<A>(order: Order<A>): Order<undefined | A> {
   return (x?: A, y?: A) => {
     if (x == undefined && y == undefined) return 0;
     if (x == undefined) return -1;
@@ -93,7 +95,7 @@ export function option<A>(order: Compare<A>): Compare<undefined | A> {
 }
 
 /** Lexicographic comparison of array elements. */
-export function array<A>(order: Compare<A>): Compare<A[]> {
+export function array<A>(order: Order<A>): Order<A[]> {
   return (x: A[], y: A[]) => {
     const p = x.length;
     const q = y.length;
@@ -107,12 +109,12 @@ export function array<A>(order: Compare<A>): Compare<A[]> {
 }
 
 /** Direct or reverse direction. */
-export function direction<A>(order: Compare<A>, reverse = false): Compare<A> {
+export function direction<A>(order: Order<A>, reverse = false): Order<A> {
   return (x, y) => reverse ? order(y, x) : order(x, y);
 }
 
 /** By projection. */
-export function lift<A, B>(fn: (x: A) => B, order: Compare<B>): Compare<A> {
+export function lift<A, B>(fn: (x: A) => B, order: Order<B>): Order<A> {
   return (x: A, y: A) => order(fn(x), fn(y));
 }
 
@@ -123,20 +125,20 @@ export function getKeys<T>(a: T): (keyof T)[] {
 
 /**
    Maps each field of `A` to some _optional_ comparison of the associated type.
-   Hence, `ByFields<{…, f: T, …}>` is `{…, f?: Compare<T>, …}`.
+   Hence, `ByFields<{…, f: T, …}>` is `{…, f?: Order<T>, …}`.
    See [[fields]] comparison function.
  */
 type ByFields<A> = {
-  [P in keyof A]?: Compare<A[P]>;
+  [P in keyof A]?: Order<A[P]>;
 }
 
 /**
    Maps each field of `A` to some comparison of the associated type.
-   Hence, `ByAllFields<{…, f: T, …}>` is `{…, f: Compare<T>, …}`.
+   Hence, `ByAllFields<{…, f: T, …}>` is `{…, f: Order<T>, …}`.
    See [[fieldsComplete]] comparison function.
 */
 type ByAllFields<A> = {
-  [P in keyof A]: Compare<A[P]>;
+  [P in keyof A]: Order<A[P]>;
 }
 
 /** Object comparison by (some) fields.
@@ -159,7 +161,7 @@ type ByAllFields<A> = {
         const compare = fields<foo>({ id: number, name: option(alpha) });
 
 */
-export function fields<A>(order: ByFields<A>): Compare<A> {
+export function fields<A>(order: ByFields<A>): Order<A> {
   return (x: A, y: A) => {
     for (const fd of getKeys(order)) {
       const byFd = order[fd];
@@ -176,7 +178,7 @@ export function fields<A>(order: ByFields<A>): Compare<A> {
     This is similar to `fields()` comparison, but an ordering function must be
     provided for _any_ field (optional or not) of the compared values.
 */
-export function fieldsComplete<A>(order: ByAllFields<A>): Compare<A> {
+export function fieldsComplete<A>(order: ByAllFields<A>): Order<A> {
   return (x: A, y: A) => {
     for (const fd of getKeys<ByFields<A>>(order)) {
       const byFd = order[fd];
@@ -188,7 +190,7 @@ export function fieldsComplete<A>(order: ByAllFields<A>): Compare<A> {
 }
 
 /** Pair comparison. */
-export function pair<A, B>(ordA: Compare<A>, ordB: Compare<B>): Compare<[A, B]> {
+export function pair<A, B>(ordA: Order<A>, ordB: Order<B>): Order<[A, B]> {
   return ([x1, y1], [x2, y2]) => {
     const cmp = ordA(x1, x2);
     return cmp != 0 ? cmp : ordB(y1, y2);
@@ -197,10 +199,10 @@ export function pair<A, B>(ordA: Compare<A>, ordB: Compare<B>): Compare<[A, B]> 
 
 /** Triple comparison. */
 export function triple<A, B, C>(
-  ordA: Compare<A>,
-  ordB: Compare<B>,
-  ordC: Compare<C>,
-): Compare<[A, B, C]> {
+  ordA: Order<A>,
+  ordB: Order<B>,
+  ordC: Order<C>,
+): Order<[A, B, C]> {
   return ([x1, y1, z1], [x2, y2, z2]) => {
     const cmp1 = ordA(x1, x2);
     if (cmp1 != 0) return cmp1;
@@ -212,11 +214,11 @@ export function triple<A, B, C>(
 
 /** 4-Tuple comparison. */
 export function tuple4<A, B, C, D>(
-  ordA: Compare<A>,
-  ordB: Compare<B>,
-  ordC: Compare<C>,
-  ordD: Compare<D>,
-): Compare<[A, B, C, D]> {
+  ordA: Order<A>,
+  ordB: Order<B>,
+  ordC: Order<C>,
+  ordD: Order<D>,
+): Order<[A, B, C, D]> {
   return ([x1, y1, z1, t1], [x2, y2, z2, t2]) => {
     const cmp1 = ordA(x1, x2);
     if (cmp1 != 0) return cmp1;
@@ -230,12 +232,12 @@ export function tuple4<A, B, C, D>(
 
 /** 5-Tuple comparison. */
 export function tuple5<A, B, C, D, E>(
-  ordA: Compare<A>,
-  ordB: Compare<B>,
-  ordC: Compare<C>,
-  ordD: Compare<D>,
-  ordE: Compare<E>,
-): Compare<[A, B, C, D, E]> {
+  ordA: Order<A>,
+  ordB: Order<B>,
+  ordC: Order<C>,
+  ordD: Order<D>,
+  ordE: Order<E>,
+): Order<[A, B, C, D, E]> {
   return ([x1, y1, z1, t1, u1], [x2, y2, z2, t2, u2]) => {
     const cmp1 = ordA(x1, x2);
     if (cmp1 != 0) return cmp1;
