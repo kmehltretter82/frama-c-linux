@@ -4,20 +4,17 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
-[eva] tests/builtins/realloc_imprecise.c:10: 
-  Call to builtin Frama_C_malloc_imprecise for function malloc
+[eva] tests/builtins/realloc_imprecise.c:10: Call to builtin malloc
 [eva:malloc:imprecise] tests/builtins/realloc_imprecise.c:10: Warning: 
   allocating a single weak variable for ALL dynamic allocations via malloc/calloc/realloc: __alloc_w_main
 [eva:alarm] tests/builtins/realloc_imprecise.c:11: Warning: 
   out of bounds write. assert \valid(p);
-[eva] tests/builtins/realloc_imprecise.c:13: 
-  Call to builtin Frama_C_realloc_imprecise for function realloc
+[eva] tests/builtins/realloc_imprecise.c:13: Call to builtin realloc
 [eva] tests/builtins/realloc_imprecise.c:13: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc] tests/builtins/realloc_imprecise.c:13: 
   weak free on bases: {__alloc_w_main}
-[eva] tests/builtins/realloc_imprecise.c:15: 
-  Call to builtin Frama_C_realloc_imprecise for function realloc
+[eva] tests/builtins/realloc_imprecise.c:15: Call to builtin realloc
 [eva] tests/builtins/realloc_imprecise.c:15: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc] tests/builtins/realloc_imprecise.c:15: 

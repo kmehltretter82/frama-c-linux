@@ -1,13 +1,7 @@
 /* run.config*
    OPT: -eva @EVA_CONFIG@ -eva-memexec -deps -inout -eva-mlevel 0
 */
-#include <stddef.h>
-//@ assigns \result;
-void *Frama_C_malloc_fresh(size_t n);
-
-//@ assigns \result;
-void *Frama_C_malloc_fresh_weak(size_t n);
-
+#include <stdlib.h>
 
 void f(int *p, int i) {
   *p = i;
@@ -16,7 +10,8 @@ void f(int *p, int i) {
 volatile v;
 
 void main() {
-  int *p = Frama_C_malloc_fresh (4);
+  /*@ eva_allocate fresh; */
+  int *p = malloc (4);
   if (v) {
     f(p, 2);
     f(p, 1); // This call or the corresponding one below could be cached. It is not, because we forbid memexec to take full updates to a strong variable into account for malloced bases, because they may become weak later
@@ -24,7 +19,8 @@ void main() {
     f(p, 1);
   }
 
-  int *q = Frama_C_malloc_fresh_weak (4);
+  /*@ eva_allocate fresh_weak; */
+  int *q = malloc (4);
   if (v) {
     f(q, 2);
     f(q, 1);

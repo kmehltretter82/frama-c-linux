@@ -6,8 +6,7 @@
   v ∈ [--..--]
 [eva] computing for function main1 <- main.
   Called from tests/builtins/realloc.c:160.
-[eva] tests/builtins/realloc.c:12: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/realloc.c:12: Call to builtin malloc
 [eva] tests/builtins/realloc.c:12: allocating variable __malloc_main1_l12
 [eva] tests/builtins/realloc.c:15: 
   Frama_C_dump_each:
@@ -79,8 +78,7 @@
 [eva] tests/builtins/realloc.c:22: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/builtins/realloc.c:23: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/realloc.c:23: Call to builtin malloc
 [eva] tests/builtins/realloc.c:23: allocating variable __malloc_main2_l23
 [eva:alarm] tests/builtins/realloc.c:24: Warning: 
   out of bounds write. assert \valid(r + i);
@@ -126,11 +124,9 @@
 [eva] Done for function main2
 [eva] computing for function main3 <- main.
   Called from tests/builtins/realloc.c:162.
-[eva] tests/builtins/realloc.c:32: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/realloc.c:32: Call to builtin malloc
 [eva] tests/builtins/realloc.c:32: allocating variable __malloc_main3_l32
-[eva] tests/builtins/realloc.c:35: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/realloc.c:35: Call to builtin malloc
 [eva] tests/builtins/realloc.c:35: allocating variable __malloc_main3_l35
 [eva] computing for function Frama_C_interval <- main3 <- main.
   Called from tests/builtins/realloc.c:39.
@@ -235,11 +231,9 @@
 [eva] tests/builtins/realloc.c:54: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/builtins/realloc.c:55: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/realloc.c:55: Call to builtin malloc
 [eva] tests/builtins/realloc.c:55: allocating variable __malloc_main4_l55
-[eva] tests/builtins/realloc.c:56: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/realloc.c:56: Call to builtin malloc
 [eva] tests/builtins/realloc.c:56: allocating variable __malloc_main4_l56
 [eva:alarm] tests/builtins/realloc.c:59: Warning: 
   out of bounds write. assert \valid(q + i);
@@ -362,8 +356,7 @@
 [eva] Done for function main4
 [eva] computing for function main5 <- main.
   Called from tests/builtins/realloc.c:164.
-[eva] tests/builtins/realloc.c:76: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/realloc.c:76: Call to builtin malloc
 [eva] tests/builtins/realloc.c:76: allocating variable __malloc_main5_l76
 [eva] computing for function Frama_C_interval <- main5 <- main.
   Called from tests/builtins/realloc.c:78.
@@ -450,8 +443,7 @@
 [eva] tests/builtins/realloc.c:92: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/builtins/realloc.c:93: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/realloc.c:93: Call to builtin malloc
 [eva] tests/builtins/realloc.c:93: allocating variable __malloc_main6_l93
 [eva] tests/builtins/realloc.c:102: 
   Frama_C_show_each: {{ &x ; &__malloc_main6_l93 + {4} }}
@@ -467,8 +459,7 @@
 [eva] Done for function main6
 [eva] computing for function main7 <- main.
   Called from tests/builtins/realloc.c:166.
-[eva] tests/builtins/realloc.c:110: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/realloc.c:110: Call to builtin malloc
 [eva] tests/builtins/realloc.c:110: allocating variable __malloc_main7_l110
 [eva] tests/builtins/realloc.c:115: Call to builtin realloc
 [eva] tests/builtins/realloc.c:115: 
@@ -537,8 +528,7 @@
 [eva] Done for function main7
 [eva] computing for function main8 <- main.
   Called from tests/builtins/realloc.c:167.
-[eva] tests/builtins/realloc.c:123: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/realloc.c:123: Call to builtin malloc
 [eva] tests/builtins/realloc.c:123: allocating variable __malloc_main8_l123
 [eva] tests/builtins/realloc.c:126: Call to builtin realloc
 [eva] tests/builtins/realloc.c:126: 
@@ -579,8 +569,7 @@
 [eva] Done for function main8
 [eva] computing for function main9 <- main.
   Called from tests/builtins/realloc.c:168.
-[eva] tests/builtins/realloc.c:132: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/realloc.c:132: Call to builtin malloc
 [eva] tests/builtins/realloc.c:132: allocating variable __malloc_main9_l132
 [eva] tests/builtins/realloc.c:135: Call to builtin realloc
 [eva] tests/builtins/realloc.c:135: 
@@ -621,8 +610,7 @@
 [eva] Done for function main9
 [eva] computing for function main10 <- main.
   Called from tests/builtins/realloc.c:169.
-[eva] tests/builtins/realloc.c:147: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/realloc.c:147: Call to builtin malloc
 [eva] tests/builtins/realloc.c:147: allocating variable __malloc_main10_l147
 [eva] tests/builtins/realloc.c:152: Call to builtin realloc
 [eva] tests/builtins/realloc.c:152: 

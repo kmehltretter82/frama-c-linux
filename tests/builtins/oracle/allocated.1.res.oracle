@@ -4,8 +4,7 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
-[eva] tests/builtins/allocated.c:25: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:25: Call to builtin malloc
 [eva] tests/builtins/allocated.c:25: allocating variable __malloc_main_l25
 [eva] tests/builtins/allocated.c:25: assertion got status valid.
 [eva:alarm] tests/builtins/allocated.c:27: Warning: 
@@ -21,8 +20,7 @@
 [eva:malloc] tests/builtins/allocated.c:31: 
   strong free on bases: {__malloc_main_l25}
 [eva] tests/builtins/allocated.c:32: Frama_C_show_each_p_after_free: Bottom
-[eva] tests/builtins/allocated.c:36: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:36: Call to builtin malloc
 [eva] tests/builtins/allocated.c:36: allocating variable __malloc_main_l36
 [eva] tests/builtins/allocated.c:36: assertion got status valid.
 [eva] tests/builtins/allocated.c:40: 
@@ -49,11 +47,9 @@
   assert ¬\dangling(&p);
 [kernel] tests/builtins/allocated.c:46: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
-[eva] tests/builtins/allocated.c:50: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:50: Call to builtin malloc
 [eva] tests/builtins/allocated.c:50: allocating variable __malloc_main_l50
-[eva] tests/builtins/allocated.c:50: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:50: Call to builtin malloc
 [eva] tests/builtins/allocated.c:50: allocating variable __malloc_main_l50_0
 [eva] tests/builtins/allocated.c:50: assertion got status valid.
 [eva:alarm] tests/builtins/allocated.c:53: Warning: 
@@ -70,8 +66,7 @@
   function free: precondition 'freeable' got status valid.
 [eva:malloc] tests/builtins/allocated.c:58: 
   strong free on bases: {__malloc_main_l50_0}
-[eva] tests/builtins/allocated.c:63: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:63: Call to builtin malloc
 [eva] tests/builtins/allocated.c:63: allocating variable __malloc_main_l63
 [eva] tests/builtins/allocated.c:63: assertion got status valid.
 [eva] tests/builtins/allocated.c:65: 
@@ -82,8 +77,7 @@
   function free: precondition 'freeable' got status valid.
 [eva:malloc] tests/builtins/allocated.c:67: 
   strong free on bases: {__malloc_main_l63}
-[eva] tests/builtins/allocated.c:63: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:63: Call to builtin malloc
 [eva] tests/builtins/allocated.c:63: allocating variable __malloc_main_l63_0
 [eva] tests/builtins/allocated.c:65: 
   Frama_C_show_each_p: {{ &__malloc_main_l63_0 }}
@@ -91,8 +85,7 @@
 [eva] tests/builtins/allocated.c:67: Call to builtin free
 [eva:malloc] tests/builtins/allocated.c:67: 
   strong free on bases: {__malloc_main_l63_0}
-[eva] tests/builtins/allocated.c:63: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:63: Call to builtin malloc
 [eva] tests/builtins/allocated.c:63: allocating variable __malloc_main_l63_1
 [eva] tests/builtins/allocated.c:65: 
   Frama_C_show_each_p: {{ &__malloc_main_l63_1 }}
@@ -100,8 +93,7 @@
 [eva] tests/builtins/allocated.c:67: Call to builtin free
 [eva:malloc] tests/builtins/allocated.c:67: 
   strong free on bases: {__malloc_main_l63_1}
-[eva] tests/builtins/allocated.c:63: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:63: Call to builtin malloc
 [eva] tests/builtins/allocated.c:63: allocating variable __malloc_main_l63_2
 [eva] tests/builtins/allocated.c:65: 
   Frama_C_show_each_p: {{ &__malloc_main_l63_2 }}
@@ -109,8 +101,7 @@
 [eva] tests/builtins/allocated.c:67: Call to builtin free
 [eva:malloc] tests/builtins/allocated.c:67: 
   strong free on bases: {__malloc_main_l63_2}
-[eva] tests/builtins/allocated.c:73: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:73: Call to builtin malloc
 [eva] tests/builtins/allocated.c:73: allocating variable __malloc_main_l73
 [eva] tests/builtins/allocated.c:75: 
   Frama_C_show_each_p: {{ &__malloc_main_l73 }}
@@ -120,8 +111,7 @@
   function free: precondition 'freeable' got status valid.
 [eva:malloc] tests/builtins/allocated.c:77: 
   strong free on bases: {__malloc_main_l73}
-[eva] tests/builtins/allocated.c:73: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:73: Call to builtin malloc
 [eva] tests/builtins/allocated.c:73: allocating variable __malloc_main_l73_0
 [eva] tests/builtins/allocated.c:75: 
   Frama_C_show_each_p: {{ &__malloc_main_l73_0 }}
@@ -129,8 +119,7 @@
 [eva] tests/builtins/allocated.c:77: Call to builtin free
 [eva:malloc] tests/builtins/allocated.c:77: 
   strong free on bases: {__malloc_main_l73_0}
-[eva] tests/builtins/allocated.c:73: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:73: Call to builtin malloc
 [eva] tests/builtins/allocated.c:73: allocating variable __malloc_main_l73_1
 [eva] tests/builtins/allocated.c:75: 
   Frama_C_show_each_p: {{ &__malloc_main_l73_1 }}
@@ -138,8 +127,7 @@
 [eva] tests/builtins/allocated.c:77: Call to builtin free
 [eva:malloc] tests/builtins/allocated.c:77: 
   strong free on bases: {__malloc_main_l73_1}
-[eva] tests/builtins/allocated.c:73: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:73: Call to builtin malloc
 [eva] tests/builtins/allocated.c:73: allocating variable __malloc_main_l73_2
 [eva] tests/builtins/allocated.c:75: 
   Frama_C_show_each_p: {{ &__malloc_main_l73_2 }}
@@ -147,8 +135,7 @@
 [eva] tests/builtins/allocated.c:77: Call to builtin free
 [eva:malloc] tests/builtins/allocated.c:77: 
   strong free on bases: {__malloc_main_l73_2}
-[eva] tests/builtins/allocated.c:82: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:82: Call to builtin malloc
 [eva] tests/builtins/allocated.c:82: allocating variable __malloc_main_l82
 [eva] tests/builtins/allocated.c:82: assertion got status valid.
 [eva] tests/builtins/allocated.c:87: Call to builtin free
@@ -156,11 +143,9 @@
   function free: precondition 'freeable' got status valid.
 [eva:malloc] tests/builtins/allocated.c:87: 
   strong free on bases: {__malloc_main_l82}
-[eva] tests/builtins/allocated.c:82: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:82: Call to builtin malloc
 [eva] tests/builtins/allocated.c:82: allocating variable __malloc_main_l82_0
-[eva] tests/builtins/allocated.c:82: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:82: Call to builtin malloc
 [eva] tests/builtins/allocated.c:82: allocating variable __malloc_main_l82_1
 [eva] tests/builtins/allocated.c:87: Call to builtin free
 [eva:malloc] tests/builtins/allocated.c:87: 
@@ -174,20 +159,15 @@
 [eva] tests/builtins/allocated.c:87: Call to builtin free
 [eva:malloc] tests/builtins/allocated.c:87: 
   strong free on bases: {__malloc_main_l82_0}
-[eva] tests/builtins/allocated.c:82: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:82: Call to builtin malloc
 [eva] tests/builtins/allocated.c:82: allocating variable __malloc_main_l82_2
-[eva] tests/builtins/allocated.c:82: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:82: Call to builtin malloc
 [eva] tests/builtins/allocated.c:82: allocating variable __malloc_main_l82_3
-[eva] tests/builtins/allocated.c:82: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:82: Call to builtin malloc
 [eva] tests/builtins/allocated.c:82: allocating variable __malloc_main_l82_4
-[eva] tests/builtins/allocated.c:82: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:82: Call to builtin malloc
 [eva] tests/builtins/allocated.c:82: allocating variable __malloc_main_l82_5
-[eva] tests/builtins/allocated.c:82: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:82: Call to builtin malloc
 [eva] tests/builtins/allocated.c:82: allocating variable __malloc_main_l82_6
 [eva] tests/builtins/allocated.c:87: Call to builtin free
 [eva:malloc] tests/builtins/allocated.c:87: 
@@ -249,77 +229,53 @@
 [eva] tests/builtins/allocated.c:87: Call to builtin free
 [eva:malloc] tests/builtins/allocated.c:87: 
   strong free on bases: {__malloc_main_l82_6}
-[eva] tests/builtins/allocated.c:82: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:82: Call to builtin malloc
 [eva] tests/builtins/allocated.c:82: allocating variable __malloc_main_l82_7
-[eva] tests/builtins/allocated.c:82: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:82: Call to builtin malloc
 [eva] tests/builtins/allocated.c:82: allocating variable __malloc_main_l82_8
-[eva] tests/builtins/allocated.c:82: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:82: Call to builtin malloc
 [eva] tests/builtins/allocated.c:82: allocating variable __malloc_main_l82_9
-[eva] tests/builtins/allocated.c:82: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:82: Call to builtin malloc
 [eva] tests/builtins/allocated.c:82: allocating variable __malloc_main_l82_10
-[eva] tests/builtins/allocated.c:82: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:82: Call to builtin malloc
 [eva] tests/builtins/allocated.c:82: allocating variable __malloc_main_l82_11
-[eva] tests/builtins/allocated.c:82: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:82: Call to builtin malloc
 [eva] tests/builtins/allocated.c:82: allocating variable __malloc_main_l82_12
-[eva] tests/builtins/allocated.c:82: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:82: Call to builtin malloc
 [eva] tests/builtins/allocated.c:82: allocating variable __malloc_main_l82_13
-[eva] tests/builtins/allocated.c:82: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:82: Call to builtin malloc
 [eva] tests/builtins/allocated.c:82: allocating variable __malloc_main_l82_14
-[eva] tests/builtins/allocated.c:82: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:82: Call to builtin malloc
 [eva] tests/builtins/allocated.c:82: allocating variable __malloc_main_l82_15
-[eva] tests/builtins/allocated.c:82: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:82: Call to builtin malloc
 [eva] tests/builtins/allocated.c:82: allocating variable __malloc_main_l82_16
-[eva] tests/builtins/allocated.c:82: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:82: Call to builtin malloc
 [eva] tests/builtins/allocated.c:82: allocating variable __malloc_main_l82_17
-[eva] tests/builtins/allocated.c:82: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:82: Call to builtin malloc
 [eva] tests/builtins/allocated.c:82: allocating variable __malloc_main_l82_18
-[eva] tests/builtins/allocated.c:82: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:82: Call to builtin malloc
 [eva] tests/builtins/allocated.c:82: allocating variable __malloc_main_l82_19
-[eva] tests/builtins/allocated.c:82: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:82: Call to builtin malloc
 [eva] tests/builtins/allocated.c:82: allocating variable __malloc_main_l82_20
-[eva] tests/builtins/allocated.c:82: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:82: Call to builtin malloc
 [eva] tests/builtins/allocated.c:82: allocating variable __malloc_main_l82_21
-[eva] tests/builtins/allocated.c:82: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:82: Call to builtin malloc
 [eva] tests/builtins/allocated.c:82: allocating variable __malloc_main_l82_22
-[eva] tests/builtins/allocated.c:82: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:82: Call to builtin malloc
 [eva] tests/builtins/allocated.c:82: allocating variable __malloc_main_l82_23
-[eva] tests/builtins/allocated.c:82: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:82: Call to builtin malloc
 [eva] tests/builtins/allocated.c:82: allocating variable __malloc_main_l82_24
-[eva] tests/builtins/allocated.c:82: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:82: Call to builtin malloc
 [eva] tests/builtins/allocated.c:82: allocating variable __malloc_main_l82_25
-[eva] tests/builtins/allocated.c:82: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:82: Call to builtin malloc
 [eva] tests/builtins/allocated.c:82: allocating variable __malloc_main_l82_26
-[eva] tests/builtins/allocated.c:82: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:82: Call to builtin malloc
 [eva] tests/builtins/allocated.c:82: allocating variable __malloc_main_l82_27
-[eva] tests/builtins/allocated.c:82: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:82: Call to builtin malloc
 [eva] tests/builtins/allocated.c:82: allocating variable __malloc_main_l82_28
-[eva] tests/builtins/allocated.c:82: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:82: Call to builtin malloc
 [eva] tests/builtins/allocated.c:82: allocating variable __malloc_main_l82_29
-[eva] tests/builtins/allocated.c:82: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:82: Call to builtin malloc
 [eva] tests/builtins/allocated.c:82: allocating variable __malloc_main_l82_30
 [eva] tests/builtins/allocated.c:84: 
   Trace partitioning superposing up to 100 states
@@ -905,8 +861,7 @@
 [eva] tests/builtins/allocated.c:87: Call to builtin free
 [eva:malloc] tests/builtins/allocated.c:87: 
   strong free on bases: {__malloc_main_l82_7}
-[eva] tests/builtins/allocated.c:91: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:91: Call to builtin malloc
 [eva] tests/builtins/allocated.c:91: allocating variable __malloc_main_l91
 [eva] tests/builtins/allocated.c:91: assertion got status valid.
 [eva] tests/builtins/allocated.c:92: Call to builtin free
@@ -916,8 +871,7 @@
   strong free on bases: {__malloc_main_l91}
 [eva:alarm] tests/builtins/allocated.c:96: Warning: 
   assertion 'Assume' got status unknown.
-[eva] tests/builtins/allocated.c:97: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:97: Call to builtin malloc
 [eva] tests/builtins/allocated.c:97: allocating variable __malloc_main_l97
 [eva] tests/builtins/allocated.c:97: Frama_C_show_each: {{ &__malloc_main_l97 }}
 [eva:alarm] tests/builtins/allocated.c:98: Warning: 
@@ -930,8 +884,7 @@
   strong free on bases: {__malloc_main_l97}
 [eva:alarm] tests/builtins/allocated.c:113: Warning: 
   assertion got status unknown.
-[eva] tests/builtins/allocated.c:114: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:114: Call to builtin malloc
 [eva] tests/builtins/allocated.c:114: allocating variable __malloc_main_l114
 [eva] tests/builtins/allocated.c:114: 
   Frama_C_show_each: {{ &__malloc_main_l114 }}
@@ -943,8 +896,7 @@
   function free: precondition 'freeable' got status valid.
 [eva:malloc] tests/builtins/allocated.c:118: 
   strong free on bases: {__malloc_main_l114}
-[eva] tests/builtins/allocated.c:120: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/allocated.c:120: Call to builtin malloc
 [eva] tests/builtins/allocated.c:120: allocating variable __malloc_main_l120
 [eva] tests/builtins/allocated.c:120: 
   Frama_C_show_each: {{ &__malloc_main_l120 }}
@@ -956,84 +908,64 @@
   strong free on bases: {__malloc_main_l120}
 [eva] tests/builtins/allocated.c:127: 
   assertion 'alloca_bounds' got status valid.
-[eva] tests/builtins/allocated.c:127: 
-  Call to builtin Frama_C_malloc_fresh for function __fc_vla_alloc
+[eva] tests/builtins/allocated.c:127: Call to builtin __fc_vla_alloc
 [eva] tests/builtins/allocated.c:127: allocating variable __malloc_main_l127
 [eva] tests/builtins/allocated.c:131: Frama_C_show_each: {0}
-[eva] tests/builtins/allocated.c:127: 
-  Call to builtin Frama_C_vla_free for function __fc_vla_free
+[eva] tests/builtins/allocated.c:127: Call to builtin __fc_vla_free
 [eva:malloc] tests/builtins/allocated.c:127: 
   strong free on bases: {__malloc_main_l127}
-[eva] tests/builtins/allocated.c:127: 
-  Call to builtin Frama_C_malloc_fresh for function __fc_vla_alloc
+[eva] tests/builtins/allocated.c:127: Call to builtin __fc_vla_alloc
 [eva] tests/builtins/allocated.c:127: allocating variable __malloc_main_l127_0
 [eva] tests/builtins/allocated.c:131: Frama_C_show_each: {1}
-[eva] tests/builtins/allocated.c:127: 
-  Call to builtin Frama_C_vla_free for function __fc_vla_free
+[eva] tests/builtins/allocated.c:127: Call to builtin __fc_vla_free
 [eva:malloc] tests/builtins/allocated.c:127: 
   strong free on bases: {__malloc_main_l127_0}
-[eva] tests/builtins/allocated.c:127: 
-  Call to builtin Frama_C_malloc_fresh for function __fc_vla_alloc
+[eva] tests/builtins/allocated.c:127: Call to builtin __fc_vla_alloc
 [eva] tests/builtins/allocated.c:127: allocating variable __malloc_main_l127_1
 [eva] tests/builtins/allocated.c:131: Frama_C_show_each: {2}
-[eva] tests/builtins/allocated.c:127: 
-  Call to builtin Frama_C_vla_free for function __fc_vla_free
+[eva] tests/builtins/allocated.c:127: Call to builtin __fc_vla_free
 [eva:malloc] tests/builtins/allocated.c:127: 
   strong free on bases: {__malloc_main_l127_1}
-[eva] tests/builtins/allocated.c:127: 
-  Call to builtin Frama_C_malloc_fresh for function __fc_vla_alloc
+[eva] tests/builtins/allocated.c:127: Call to builtin __fc_vla_alloc
 [eva] tests/builtins/allocated.c:127: allocating variable __malloc_main_l127_2
 [eva] tests/builtins/allocated.c:131: Frama_C_show_each: {3}
-[eva] tests/builtins/allocated.c:127: 
-  Call to builtin Frama_C_vla_free for function __fc_vla_free
+[eva] tests/builtins/allocated.c:127: Call to builtin __fc_vla_free
 [eva:malloc] tests/builtins/allocated.c:127: 
   strong free on bases: {__malloc_main_l127_2}
-[eva] tests/builtins/allocated.c:127: 
-  Call to builtin Frama_C_malloc_fresh for function __fc_vla_alloc
+[eva] tests/builtins/allocated.c:127: Call to builtin __fc_vla_alloc
 [eva] tests/builtins/allocated.c:127: allocating variable __malloc_main_l127_3
 [eva] tests/builtins/allocated.c:131: Frama_C_show_each: {4}
-[eva] tests/builtins/allocated.c:127: 
-  Call to builtin Frama_C_vla_free for function __fc_vla_free
+[eva] tests/builtins/allocated.c:127: Call to builtin __fc_vla_free
 [eva:malloc] tests/builtins/allocated.c:127: 
   strong free on bases: {__malloc_main_l127_3}
-[eva] tests/builtins/allocated.c:127: 
-  Call to builtin Frama_C_malloc_fresh for function __fc_vla_alloc
+[eva] tests/builtins/allocated.c:127: Call to builtin __fc_vla_alloc
 [eva] tests/builtins/allocated.c:127: allocating variable __malloc_main_l127_4
 [eva] tests/builtins/allocated.c:131: Frama_C_show_each: {5}
-[eva] tests/builtins/allocated.c:127: 
-  Call to builtin Frama_C_vla_free for function __fc_vla_free
+[eva] tests/builtins/allocated.c:127: Call to builtin __fc_vla_free
 [eva:malloc] tests/builtins/allocated.c:127: 
   strong free on bases: {__malloc_main_l127_4}
-[eva] tests/builtins/allocated.c:127: 
-  Call to builtin Frama_C_malloc_fresh for function __fc_vla_alloc
+[eva] tests/builtins/allocated.c:127: Call to builtin __fc_vla_alloc
 [eva] tests/builtins/allocated.c:127: allocating variable __malloc_main_l127_5
 [eva] tests/builtins/allocated.c:131: Frama_C_show_each: {6}
-[eva] tests/builtins/allocated.c:127: 
-  Call to builtin Frama_C_vla_free for function __fc_vla_free
+[eva] tests/builtins/allocated.c:127: Call to builtin __fc_vla_free
 [eva:malloc] tests/builtins/allocated.c:127: 
   strong free on bases: {__malloc_main_l127_5}
-[eva] tests/builtins/allocated.c:127: 
-  Call to builtin Frama_C_malloc_fresh for function __fc_vla_alloc
+[eva] tests/builtins/allocated.c:127: Call to builtin __fc_vla_alloc
 [eva] tests/builtins/allocated.c:127: allocating variable __malloc_main_l127_6
 [eva] tests/builtins/allocated.c:131: Frama_C_show_each: {7}
-[eva] tests/builtins/allocated.c:127: 
-  Call to builtin Frama_C_vla_free for function __fc_vla_free
+[eva] tests/builtins/allocated.c:127: Call to builtin __fc_vla_free
 [eva:malloc] tests/builtins/allocated.c:127: 
   strong free on bases: {__malloc_main_l127_6}
-[eva] tests/builtins/allocated.c:127: 
-  Call to builtin Frama_C_malloc_fresh for function __fc_vla_alloc
+[eva] tests/builtins/allocated.c:127: Call to builtin __fc_vla_alloc
 [eva] tests/builtins/allocated.c:127: allocating variable __malloc_main_l127_7
 [eva] tests/builtins/allocated.c:131: Frama_C_show_each: {8}
-[eva] tests/builtins/allocated.c:127: 
-  Call to builtin Frama_C_vla_free for function __fc_vla_free
+[eva] tests/builtins/allocated.c:127: Call to builtin __fc_vla_free
 [eva:malloc] tests/builtins/allocated.c:127: 
   strong free on bases: {__malloc_main_l127_7}
-[eva] tests/builtins/allocated.c:127: 
-  Call to builtin Frama_C_malloc_fresh for function __fc_vla_alloc
+[eva] tests/builtins/allocated.c:127: Call to builtin __fc_vla_alloc
 [eva] tests/builtins/allocated.c:127: allocating variable __malloc_main_l127_8
 [eva] tests/builtins/allocated.c:131: Frama_C_show_each: {9}
-[eva] tests/builtins/allocated.c:127: 
-  Call to builtin Frama_C_vla_free for function __fc_vla_free
+[eva] tests/builtins/allocated.c:127: Call to builtin __fc_vla_free
 [eva:malloc] tests/builtins/allocated.c:127: 
   strong free on bases: {__malloc_main_l127_8}
 [eva] Recording results for main

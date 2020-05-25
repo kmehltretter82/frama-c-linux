@@ -1,10 +1,10 @@
 /* run.config
-   STDOPT: #"-eva-no-builtins-auto -slevel 10 -eva-builtin calloc:Frama_C_calloc_by_stack -eva-msg-key malloc"
-   STDOPT: #"-eva-no-builtins-auto -slevel 10 -eva-builtin calloc:Frama_C_calloc_by_stack -eva-no-alloc-returns-null -eva-msg-key malloc"
+   STDOPT: #"-eva-no-builtins-auto -slevel 10 -eva-builtin calloc:Frama_C_calloc -eva-alloc-builtin by_stack -eva-msg-key malloc"
+   STDOPT: #"-eva-no-builtins-auto -slevel 10 -eva-builtin calloc:Frama_C_calloc -eva-alloc-builtin by_stack -eva-no-alloc-returns-null -eva-msg-key malloc"
    STDOPT: #"-eva-no-builtins-auto"
 */ // slevel is used to unroll loops
 
-#define malloc(n) Frama_C_malloc_by_stack(n)
+#define malloc(n) Frama_C_malloc(n)
 #include "stdlib.c"
 #include "__fc_builtin.h"
 #include <stdint.h>

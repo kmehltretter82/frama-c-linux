@@ -6,11 +6,9 @@
   
 [eva] computing for function main1 <- main.
   Called from tests/builtins/realloc_multiple.c:75.
-[eva] tests/builtins/realloc_multiple.c:9: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/realloc_multiple.c:9: Call to builtin malloc
 [eva] tests/builtins/realloc_multiple.c:9: allocating variable __malloc_main1_l9
-[eva] tests/builtins/realloc_multiple.c:12: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/realloc_multiple.c:12: Call to builtin malloc
 [eva] tests/builtins/realloc_multiple.c:12: 
   allocating variable __malloc_main1_l12
 [eva] computing for function Frama_C_interval <- main1 <- main.
@@ -45,8 +43,7 @@
   __malloc_main1_l9[0..4] ∈ {5}
   __malloc_main1_l12[0..5] ∈ {6}
   ==END OF DUMP==
-[eva] tests/builtins/realloc_multiple.c:23: 
-  Call to builtin Frama_C_realloc_multiple for function realloc
+[eva] tests/builtins/realloc_multiple.c:23: Call to builtin realloc
 [eva] tests/builtins/realloc_multiple.c:23: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {__malloc_main1_l12}
@@ -97,12 +94,10 @@
 [eva] Done for function main1
 [eva] computing for function main2 <- main.
   Called from tests/builtins/realloc_multiple.c:76.
-[eva] tests/builtins/realloc_multiple.c:30: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/realloc_multiple.c:30: Call to builtin malloc
 [eva] tests/builtins/realloc_multiple.c:30: 
   allocating variable __malloc_main2_l30
-[eva] tests/builtins/realloc_multiple.c:33: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/realloc_multiple.c:33: Call to builtin malloc
 [eva] tests/builtins/realloc_multiple.c:33: 
   allocating variable __malloc_main2_l33
 [eva] computing for function Frama_C_interval <- main2 <- main.
@@ -136,8 +131,7 @@
   __malloc_main2_l30[0..4] ∈ {7}
   __malloc_main2_l33[0..5] ∈ {8}
   ==END OF DUMP==
-[eva] tests/builtins/realloc_multiple.c:45: 
-  Call to builtin Frama_C_realloc_multiple for function realloc
+[eva] tests/builtins/realloc_multiple.c:45: Call to builtin realloc
 [eva] tests/builtins/realloc_multiple.c:45: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {__malloc_main2_l33}
@@ -196,12 +190,10 @@
 [eva] Done for function main2
 [eva] computing for function main3 <- main.
   Called from tests/builtins/realloc_multiple.c:77.
-[eva] tests/builtins/realloc_multiple.c:52: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/realloc_multiple.c:52: Call to builtin malloc
 [eva] tests/builtins/realloc_multiple.c:52: 
   allocating variable __malloc_main3_l52
-[eva] tests/builtins/realloc_multiple.c:53: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/realloc_multiple.c:53: Call to builtin malloc
 [eva] tests/builtins/realloc_multiple.c:53: 
   allocating variable __malloc_main3_l53
 [eva] computing for function Frama_C_interval <- main3 <- main.
@@ -238,8 +230,7 @@
   __malloc_main3_l52 ∈ {{ &x }}
   __malloc_main3_l53 ∈ {{ &y }}
   ==END OF DUMP==
-[eva] tests/builtins/realloc_multiple.c:65: 
-  Call to builtin Frama_C_realloc_multiple for function realloc
+[eva] tests/builtins/realloc_multiple.c:65: Call to builtin realloc
 [eva] tests/builtins/realloc_multiple.c:65: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {__malloc_main3_l53}

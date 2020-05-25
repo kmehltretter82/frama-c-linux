@@ -7,8 +7,7 @@
   A ∈ {0}
   B ∈ {0}
   C ∈ {0}
-[eva] tests/builtins/malloc_individual.c:12: 
-  Call to builtin Frama_C_malloc_fresh
+[eva] tests/builtins/malloc_individual.c:12: Call to builtin malloc
 [eva] tests/builtins/malloc_individual.c:12: 
   allocating variable __malloc_main_l12
 [eva:alarm] tests/builtins/malloc_individual.c:15: Warning: 
@@ -24,12 +23,12 @@
   C ∈ {4}
   __malloc_main_l12 ∈ {3}
 [from] Computing for function main
-[from] Computing for function Frama_C_malloc_fresh <-main
-[from] Done for function Frama_C_malloc_fresh
+[from] Computing for function malloc <-main
+[from] Done for function malloc
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
   These dependencies hold at termination for the executions that terminate:
-[from] Function Frama_C_malloc_fresh:
+[from] Function malloc:
   __fc_heap_status FROM __fc_heap_status; size (and SELF)
   \result FROM __fc_heap_status; size
 [from] Function main:

@@ -1416,6 +1416,25 @@ let () = add_precision_dep ReductionDepth.parameter
 (* -------------------------------------------------------------------------- *)
 
 let () = Parameter_customize.set_group malloc
+module AllocBuiltin =
+  String
+    (struct
+      let option_name = "-eva-alloc-builtin"
+      let help = "Select the behavior of allocation builtins. \
+                  By default, they use up to [-eva-mlevel] bases \
+                  for each callstack (<by_stack>). They can also \
+                  use one <imprecise> base for all allocations, \
+                  create a <fresh> strong base at each call, \
+                  or create a <fresh_weak> base at each call."
+      let default = "by_stack"
+      let arg_name = "imprecise|by_stack|fresh|fresh_weak"
+    end)
+let () = add_precision_dep AllocBuiltin.parameter
+let () =
+  AllocBuiltin.set_possible_values
+    ["imprecise"; "by_stack"; "fresh"; "fresh_weak"]
+
+let () = Parameter_customize.set_group malloc
 module AllocFunctions =
   Filled_string_set
     (struct

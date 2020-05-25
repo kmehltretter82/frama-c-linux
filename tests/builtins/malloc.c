@@ -1,24 +1,23 @@
 /* run.config*
-   OPT: -eva @EVA_CONFIG@ -slevel 10 -eva-mlevel 0
+   OPT: -eva @EVA_CONFIG@ -slevel 10 -eva-mlevel 0 -eva-alloc-builtin by_stack
 */
-#include <stddef.h>
-void *Frama_C_malloc_by_stack(size_t i);
-void *Frama_C_malloc_fresh(size_t i);
-void *Frama_C_malloc_imprecise(size_t i);
+#include <stdlib.h>
+
 void main(int c) {
   int x;
   int *s;
   if(c) {
     x = 1;
-    s = Frama_C_malloc_by_stack(100);
+    s = malloc(100);
   } else {
     x = 2;
     s = 0;
   }
 
-  int *p = Frama_C_malloc_by_stack(c);
-  int *q = Frama_C_malloc_by_stack(12);
-  int *r = Frama_C_malloc_fresh(100);
+  int *p = malloc(c);
+  int *q = malloc(12);
+  /*@ eva_allocate fresh; */
+  int *r = malloc(100);
   *p = 1;
   *(p+2) = 3;
   *(p+24999) = 4;
@@ -30,9 +29,11 @@ void main(int c) {
   *r = 1;
   *(r+2) = 3;
 
-  int *mw = Frama_C_malloc_imprecise(42);
+  /*@ eva_allocate imprecise; */
+  int *mw = malloc(42);
   *mw = 1;
-  int *mw2 = Frama_C_malloc_imprecise(42);
+  /*@ eva_allocate imprecise; */
+  int *mw2 = malloc(42);
   *mw2 = 2;
 
   //  *s = 1;

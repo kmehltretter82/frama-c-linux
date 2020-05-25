@@ -34,6 +34,7 @@ type flow_annotation =
   | FlowSplit of term
   | FlowMerge of term
 
+type allocation_kind = By_stack | Fresh | Fresh_weak | Imprecise
 
 (* We use two representations for annotations :
    - the high level representation (HL) which is exported from this module
@@ -248,3 +249,57 @@ module Subdivision = Register (struct
 
 let get_subdivision_annot = Subdivision.get
 let add_subdivision_annot = Subdivision.add
+
+
+module Allocation = struct
+  let of_string = function
+    | "by_stack"   -> Some By_stack
+    | "fresh"      -> Some Fresh
+    | "fresh_weak" -> Some Fresh_weak
+    | "imprecise"  -> Some Imprecise
+    | _            -> None
+
+  let to_string = function
+    | By_stack   -> "by_stack"
+    | Fresh      -> "fresh"
+    | Fresh_weak -> "fresh_weak"
+    | Imprecise  -> "imprecise"
+
+  include Register (struct
+      type t = allocation_kind
+      let name = "eva_allocate"
+      let is_loop_annot = false
+
+      let parse ~typing_context:_ = function
+        | [{lexpr_node = PLvar s}] -> Extlib.the ~exn:Parse_error (of_string s)
+        | _ -> raise Parse_error
+
+      let export alloc_kind =
+        Ext_terms [Logic_const.tstring (to_string alloc_kind)]
+
+      let import = function
+        | Ext_terms [{term_node}] ->
+          (* Be kind and return By_stack by default. Someone is bound to write a
+             visitor that will simplify our term into something unrecognizable. *)
+          begin match term_node with
+            | TConst (LStr s) -> Extlib.opt_conv By_stack (of_string s)
+            | _ -> By_stack
+          end
+        | _ -> assert false
+
+      let print fmt alloc_kind =
+        Format.pp_print_string fmt (to_string alloc_kind)
+    end)
+
+  let get stmt =
+    match get stmt with
+    | [] -> Extlib.the (of_string (Value_parameters.AllocBuiltin.get ()))
+    | [x] -> x
+    | x :: _ ->
+      Value_parameters.warning ~current:true ~once:true
+        "Several eva_allocate annotations at the same statement; selecting %s\
+         and ignoring the others." (to_string x);
+      x
+end
+
+let get_allocation = Allocation.get

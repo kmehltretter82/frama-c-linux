@@ -67,13 +67,11 @@
 [eva] Done for function subanalyze
 [eva] Recording results for analyze
 [eva] Done for function analyze
-[eva] tests/builtins/long_init.c:73: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/long_init.c:73: Call to builtin malloc
 [eva] tests/builtins/long_init.c:73: allocating variable __malloc_init_inner_l73
 [eva:alarm] tests/builtins/long_init.c:74: Warning: 
   pointer downcast. assert (unsigned int)alloc1 ≤ 2147483647;
-[eva] tests/builtins/long_init.c:75: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/long_init.c:75: Call to builtin malloc
 [eva] tests/builtins/long_init.c:75: allocating variable __malloc_init_inner_l75
 [eva] tests/builtins/long_init.c:77: Call to builtin free
 [eva] tests/builtins/long_init.c:77: 
@@ -162,8 +160,7 @@
   function free: precondition 'freeable' got status valid.
 [eva:malloc] tests/builtins/long_init.c:103: 
   strong free on bases: {__malloc_init_inner_l73}
-[eva] tests/builtins/long_init.c:104: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/long_init.c:104: Call to builtin malloc
 [eva] tests/builtins/long_init.c:104: allocating variable __malloc_main_l104
 [eva] Recording results for main
 [eva] done for function main
@@ -434,8 +431,7 @@ Values at end of function main:
   function free: precondition 'freeable' got status valid.
 [eva:malloc] tests/builtins/long_init2.c:103: 
   strong free on bases: {__malloc_init_inner_l73}
-[eva] tests/builtins/long_init2.c:104: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/long_init2.c:104: Call to builtin malloc
 [eva] tests/builtins/long_init2.c:104: allocating variable __malloc_main_l104
 [eva] Recording results for main
 [eva] done for function main
@@ -667,8 +663,7 @@ Values at end of function main:
   function free: precondition 'freeable' got status valid.
 [eva:malloc] tests/builtins/long_init3.c:103: 
   strong free on bases: {__malloc_init_inner_l73}
-[eva] tests/builtins/long_init3.c:104: 
-  Call to builtin Frama_C_malloc_fresh for function malloc
+[eva] tests/builtins/long_init3.c:104: Call to builtin malloc
 [eva] tests/builtins/long_init3.c:104: allocating variable __malloc_main_l104
 [eva] Recording results for main
 [eva] done for function main

@@ -1,10 +1,10 @@
 /* run.config*
    GCC:
-   STDOPT: #"-eva-no-builtins-auto"
-   STDOPT: #"-eva-no-builtins-auto -absolute-valid-range 0x100-0x200 -main main_abs"
+   STDOPT: #"-eva-alloc-builtin fresh"
+   STDOPT: #"-eva-alloc-builtin fresh -absolute-valid-range 0x100-0x200 -main main_abs"
 */
 
-#define malloc(n) Frama_C_malloc_fresh(n)
+
 #include "share/libc/stdlib.c"
 
 int *p,*q,*r,a,b;

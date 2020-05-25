@@ -1,31 +1,28 @@
 /* run.config*
    OPT: -eva @EVA_CONFIG@ -deps -calldeps -inout -slevel 5 -eva-msg-key malloc
 */
-#include <stddef.h>
-//@ assigns \result \from \nothing;
-void *Frama_C_malloc_fresh(size_t n);
-//@ assigns \result \from \nothing;
-void *Frama_C_malloc_fresh_weak(size_t n);
-//@ assigns \result \from \nothing;
-void *Frama_C_malloc_by_stack(size_t n);
+#include <stdlib.h>
 
 volatile int v;
 void g(int *p, int k) { p[k] = k; }
 
 void main(int i, int j) {
   int *p, *q;
-  p = Frama_C_malloc_fresh_weak(100);
+  /*@ eva_allocate fresh_weak; */
+  p = malloc(100);
   *p = i;
   *p = j; // Cannnot perform strong update for deps, variable is weak
 
-  q = Frama_C_malloc_fresh(100);
+  /*@ eva_allocate fresh; */
+  q = malloc(100);
   *q = i;
   *q = j; // Can perform strong update for deps
 
 
   int *r;
   for (int l=0; l<10; l++) {
-    r = Frama_C_malloc_by_stack((l+1)*4);
+    /*@ eva_allocate by_stack; */
+    r = malloc((l+1)*4);
     g(r, l+v); // Again, we can only perform weak updates (after iteration 1)
   }
 }
