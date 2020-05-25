@@ -11,37 +11,56 @@
 /**
    Interface for comparison functions.
    These function shall fullfill the following contract:
-   - `compare(x,y) == 0` shall be an equivalence relation (reflexive, symmetric, transitive)
-   - `compare(x,y) <= 0` shall be a complete order (reflexive, antisymetric, transitive)
-   - `compare(x,y) < 0` shall be a complete strict order (anti-reflexive, asymetric, transitive)
+   - `compare(x,y) == 0` shall be an equivalence relation
+     (reflexive, symmetric, transitive)
+   - `compare(x,y) <= 0` shall be a complete order
+     (reflexive, antisymetric, transitive)
+   - `compare(x,y) < 0` shall be a complete strict order
+     (anti-reflexive, asymetric, transitive)
 */
 export interface Compare<A> {
   (x: A, y: A): number;
 }
 
-type bignumber = number | bigint
+export type bignum = bigint | number;
 
-/** Type guard for number or bigint. */
-export function isNumber(x: any): x is bignumber {
-  if (typeof x === 'number') return true;
-  if (typeof x === 'bigint') return true;
-  return false;
+/** Non-NaN numbers and big-ints */
+export function isBigNum(x: any): x is bignum {
+  return typeof (x) === 'bigint' || (typeof (x) === 'number' && !Number.isNaN(x));
 }
 
 /**
    Primitive comparison.
    Can only compare arguments that have
-   exactly the same primitive type.
+   comparable primitive type.
+
+   This includes symbols, boolean, non-NaN numbers, bigints and strings.
+   Numbers and big-ints can also be compared with each others.
 */
 export function primitive(x: symbol, y: symbol): number;
 export function primitive(x: boolean, y: boolean): number;
-export function primitive(x: bignumber, y: bignumber): number;
+export function primitive(x: bignum, y: bignum): number;
 export function primitive(x: string, y: string): number;
 export function primitive(x: any, y: any) {
   if (x < y) return -1;
   if (x > y) return 1;
   return 0;
 }
+
+/**
+   Primitive comparison for numbers (NaN included).
+ */
+export function number(x: number, y: number) {
+  const nx = Number.isNaN(x);
+  const ny = Number.isNaN(y);
+  if (nx && ny) return 0;
+  if (nx && !ny) return -1;
+  if (!nx && ny) return 1;
+  if (x < y) return -1;
+  if (x > y) return 1;
+  return 0;
+}
+
 
 /**
    Alphabetic comparison for strings.
@@ -137,7 +156,7 @@ type ByAllFields<A> = {
     Example:
 
         type foo = { id: number, name?: string, descr?: string }
-        const compare = fields<foo>({ id: byNumber, name: option(byAlpha) });
+        const compare = fields<foo>({ id: number, name: option(alpha) });
 
 */
 export function fields<A>(order: ByFields<A>): Compare<A> {
@@ -235,29 +254,36 @@ export function tuple5<A, B, C, D, E>(
 // --------------------------------------------------------------------------
 
 /** @internal */
-function rank(x: any): number {
+enum RANK { UNDEFINED, BOOLEAN, SYMBOL, NAN, BIGNUM, STRING, ARRAY, OBJECT, FUNCTION };
+
+/** @internal */
+function rank(x: any): RANK {
   let t = typeof x;
   switch (t) {
-    case 'undefined': return 0;
-    case 'boolean': return 1;
-    case 'symbol': return 2;
-    case 'number': case 'bigint': return 3;
-    case 'string': return 4;
-    case 'object': return Array.isArray(x) ? 5 : 6;
-    case 'function': return 7;
+    case 'undefined': return RANK.UNDEFINED;
+    case 'boolean': return RANK.BOOLEAN;
+    case 'symbol': return RANK.SYMBOL;
+    case 'number':
+      return Number.isNaN(x) ? RANK.NAN : RANK.BIGNUM;
+    case 'bigint':
+      return RANK.BIGNUM;
+    case 'string': return RANK.STRING;
+    case 'object': return Array.isArray(x) ? RANK.ARRAY : RANK.OBJECT;
+    case 'function': return RANK.FUNCTION;
   }
 }
 
 /**
    Universal structural comparison.
    Values are ordered by _rank_, each being associated with some type of values:
-    - rank 0: undefined values;
-    - rank 1: booleans;
-    - rank 2: symbols;
-    - rank 3: numbers and bigint (See `isNumber()`);
-    - rank 4: arrays (See `Array.isArray()`);
-    - rank 5: objects;
-    - rank 6: functions.
+   1. undefined values;
+   2. booleans;
+   3. symbols;
+   4. NaN numbers;
+   5. non-NaN numbers and bigints;
+   6. arrays;
+   7. objects;
+   8. functions;
 
    For values of same primitive type, primitive ordering is performed.
 
@@ -270,10 +296,11 @@ function rank(x: any): number {
    All functions are compared equal.
  */
 export function structural(x: any, y: any): number {
-  if (isNumber(x) && isNumber(y)) return primitive(x, y);
+  if (x === y) return 0;
   if (typeof x === 'symbol' && typeof y === 'symbol') return primitive(x, y);
   if (typeof x === 'boolean' && typeof y === 'boolean') return primitive(x, y);
   if (typeof x === 'string' && typeof y === 'string') return primitive(x, y);
+  if (isBigNum(x) && isBigNum(y)) return primitive(x, y);
   if (Array.isArray(x) && Array.isArray(y)) return array(structural)(x, y);
   if (typeof x === 'object' && typeof y === 'object') {
     const fs = Object.getOwnPropertyNames(x).sort();
