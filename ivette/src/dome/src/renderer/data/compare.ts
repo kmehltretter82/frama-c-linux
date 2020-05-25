@@ -122,7 +122,7 @@ export function getKeys<T>(a: T): (keyof T)[] {
 }
 
 /**
-   Maps each field to some _optional_ comparison of the associated type.
+   Maps each field of `A` to some _optional_ comparison of the associated type.
    Hence, `ByFields<{…, f: T, …}>` is `{…, f?: Compare<T>, …}`.
    See [[fields]] comparison function.
  */
@@ -131,7 +131,7 @@ type ByFields<A> = {
 }
 
 /**
-   Maps _all_ fields to a comparison of the associated type.
+   Maps each field of `A` to some comparison of the associated type.
    Hence, `ByAllFields<{…, f: T, …}>` is `{…, f: Compare<T>, …}`.
    See [[fieldsComplete]] comparison function.
 */
