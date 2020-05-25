@@ -2605,7 +2605,8 @@ void init_analyzable(void)
 \label{dyn-alloc}
 
 Dynamic allocation is modeled by creating new bases.
-Each call to \lstinline|malloc| and \lstinline|realloc| potentially creates a
+Each call to \lstinline|malloc|/\lstinline|realloc|/\lstinline|calloc|
+potentially creates a
 new base, depending on the \emph{builtins} (described in section~\ref{libc})
 used -- possibly resulting in an unbounded number of such bases.
 Dynamically allocated bases behave mostly like statically allocated ones,
@@ -4975,8 +4976,8 @@ You can also manually specify each builtin to be used with option
 \lstinline|-eva-builtin|, which takes pairs of functions:
 the function to be replaced, and the name of the builtin that replaces it.
 For instance, option
-\lstinline|-eva-builtin malloc:Frama_C_malloc_fresh,free:Frama_C_free| enables
-builtins for the \lstinline|malloc| and \lstinline|free| functions of the
+\lstinline|-eva-builtin sin:Frama_C_sin,strlen:Frama_C_strlen| enables
+builtins for the \lstinline|sin| and \lstinline|strlen| functions of the
 standard library. Note that even if a builtin is specified this way,
 the function still needs to be declared to be used.
 %
@@ -5035,27 +5036,27 @@ and convergence (termination) when needed. Some differences between the
 \emph{strong} and \emph{weak} bases allocated by these builtins are
 explained in section~\ref{dyn-alloc}.
 
-\begin{table}[!ht]
-  \centering
-  \begin{tabular}{|c|c|c|}
-    \hline
-    C library function & Weak (always terminates) & Strong (more precise) \\
-    \hline
-    malloc & \lstinline|Frama_C_malloc_by_stack| & \lstinline|Frama_C_malloc_fresh| \\
-    calloc & \lstinline|Frama_C_calloc_by_stack| & \lstinline|Frama_C_calloc_fresh| \\
-    realloc & \lstinline|Frama_C_realloc| & \lstinline|Frama_C_realloc_multiple| \\
-    free & \multicolumn{2}{c|}{\lstinline|Frama_C_free|} \\
-    \hline
-  \end{tabular}\label{tab:alloc}
-  \caption{\FramaC builtins for dynamic allocation functions}
-\end{table}
+Option \lstinline|-eva-alloc-builtin| selects the behavior for allocation
+builtins, among the following:
 
-Note that function \lstinline|free| has a single builtin for both cases.
+\begin{description}
+\item[\texttt{by\_stack}]: create a few bases per callstack (the exact number
+  is given by option \lstinline|-eva-mlevel|, detailed later).
+  Always converges. This is the default value.
+\item[\texttt{fresh}]: create a new strong base for each call. The most
+  precise builtin, but may not converge (e.g. when called inside a loop).
+\item[\texttt{fresh\_weak}]: like the previous one, but using weak bases.
+\item[\texttt{imprecise}]: use a single, imprecise base, for {\em all}
+  allocations. Always converges.
+\end{description}
 
-Generally speaking, the safest approach is to start with the builtins on the
-left (\emph{weak}), to ensure that the analysis will terminate.
+The behavior of \lstinline|-eva-alloc-builtin| is global, unless overridden by
+{\em allocation annotations}, described below.
+
+Generally speaking, the safest approach is to start with the default builtin
+(\texttt{by\_stack}), to ensure that the analysis will terminate.
 If the results are imprecise, and the allocation function is not called inside
-a loop, then the strong variant may be tried. If you are mistaken, and the
+a loop, then the \texttt{fresh} variant may be tried. If you are mistaken, and the
 analysis starts diverging, it will print (by default) several messages of this
 form:
 
@@ -5068,11 +5069,21 @@ This indicates that new bases are being created.
 You must then manually interrupt the analysis and either unroll the loop
 entirely (see Section~\ref{loop-unroll}) or use a weak variant.
 
-By default, \emph{weak} builtins are used, but usage of
-\lstinline|-eva-builtin| takes precedence over preexisting associations.
-Another possibility is to call e.g. \lstinline|Frama_C_malloc_fresh| manually,
-for the allocations that are guaranteed to occur a finite number of times.
+\paragraph{Dynamic allocation annotations}
 
+The behavior of option \lstinline|-eva-alloc-builtin| can be locally overridden
+via \lstinline|eva_allocate| annotations preceding calls to dynamic allocation
+functions.
+For instance, the following annotation ensures that the call to
+\lstinline|calloc| below will use the \lstinline|fresh| builtin,
+regardless of the value of option \lstinline|-eva-alloc-builtin|:
+
+\begin{lstlisting}
+  /*@ eva_allocate fresh; */
+  part = (char*)calloc(plen + 1, sizeof(*part));
+\end{lstlisting}
+
+Other calls to \lstinline|calloc| will be unaffected by this annotation.
 
 \paragraph{Multiple locations per callstack}
 
@@ -5088,11 +5099,16 @@ termination for other loops.
 
 \paragraph{Memory allocation failure}
 
-By default, the memory allocation builtins in \Eva{} consider that
+By default, stdlib-related memory allocation builtins in \Eva{}
+(that is, \lstinline|malloc|, \lstinline|calloc| and \lstinline|realloc|)
+consider that
 the allocation may fail, thus \lstinline|NULL| is always returned as a possible
 value. To change this behavior (supposing that these functions never fail),
 use option \lstinline|-eva-no-alloc-returns-null|.
 
+Note that other allocation builtins, such as \lstinline|__fc_vla_alloc|
+(for variable-length arrays) and \lstinline|alloca|, {\em never} assume
+allocation fails.
 
 \section{Parameterizing the analysis}
 
