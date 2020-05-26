@@ -12,22 +12,11 @@
 
 import _ from 'lodash';
 import React from 'react';
-import ICONS from './icons.json';
+import Gallery from './gallery.json';
 import './style.css';
 
 /*@ internal */
-interface JsonIcon {
-  viewBox?: string;
-  path: string;
-}
-
-/*@ internal */
-interface JsonIconBase {
-  [id: string]: JsonIcon;
-}
-
-/*@ internal */
-const Icons: JsonIconBase = ICONS;
+const Icons: { [id: string]: { viewBox?: string, path: string } } = Gallery;
 
 // --------------------------------------------------------------------------
 // --- Raw SVG element
