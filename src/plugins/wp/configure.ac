@@ -56,23 +56,22 @@ REQUIRE_WHY3=
 USE_WHY3=
 HAS_WHY3=
 
-AC_MSG_CHECKING(for why3 (>= 1.3.1))
+AC_MSG_CHECKING(why3 version)
 WHY3VERSION=`ocamlfind query -format %v why3 | tr -d '\\r\\n'`
 case $WHY3VERSION in
       0.* | 1.[[012]].* | 1.3.0)
-        AC_MSG_ERROR(found why3 $WHY3VERSION: requires 1.3.1 or higher.);;
+        AC_MSG_RESULT([found $WHY3VERSION: requires 1.3.1+])
+        plugin_disable(wp,[non-supported why3 $WHY3VERSION])
+        ;;
+      1.3.*)
+        AC_MSG_RESULT([found $WHY3VERSION: ok])
+        ;;
       *)
-        AC_MSG_RESULT(found $WHY3VERSION: should work);;
+        AC_MSG_RESULT([found $WHY3VERSION: should work but prefer 1.3.x])
+        ;;
 esac
 
-WHY3_PATH=`ocamlfind query why3 | tr -d '\\r\\n'`
-WHY3PATH_FOR_CONFIGURE=$WHY3_PATH
-
-configure_library([WHY3],
-                  [$WHY3PATH_FOR_CONFIGURE/why3.$LIB_SUFFIX],
-                  [$WHY3PATH_FOR_CONFIGURE/why3.$LIB_SUFFIX not found.],
-                  no)
-
+configure_pkg(why3,[package why3 not found])
 
 plugin_require_external(wp,why3)
 
