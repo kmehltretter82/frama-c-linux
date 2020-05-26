@@ -208,7 +208,7 @@ let init_lexicon _ =
       ("__builtin_offsetof", fun loc -> BUILTIN_OFFSETOF loc);
       ("_Thread_local",
        fun loc ->
-         if Kernel.C11.get () then THREAD loc
+         if Kernel.C11.get () then THREAD_LOCAL loc
          else begin
            Kernel.(
              warning
