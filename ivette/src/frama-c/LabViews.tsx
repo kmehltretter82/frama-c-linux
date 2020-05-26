@@ -472,7 +472,7 @@ function CustomViews({ settings, shape, setShape, views: libViews }: any) {
           placeholder="View Name"
           autoFocus
           value={label}
-          onEnter={RENAMED}
+          onChange={RENAMED}
         />
       );
       return (
