@@ -206,13 +206,28 @@ let init_lexicon _ =
       ("__builtin_va_arg", fun loc -> BUILTIN_VA_ARG loc);
       ("__builtin_types_compatible_p", fun loc -> BUILTIN_TYPES_COMPAT loc);
       ("__builtin_offsetof", fun loc -> BUILTIN_OFFSETOF loc);
-      (* On some versions of GCC __thread is a regular identifier *)
+      ("_Thread_local",
+       fun loc ->
+         if Kernel.C11.get () then THREAD loc
+         else begin
+           Kernel.(
+             warning
+               ~wkey:wkey_conditional_feature
+               "_Thread_local is a C11 keyword, use -c11 option to enable it");
+           IDENT "_Thread_local"
+         end);
+      (* We recognize __thread for GCC machdeps *)
       ("__thread",
-       (fun loc ->
-          if Cil.theMachine.Cil.theMachine.Cil_types.__thread_is_keyword then
-            THREAD loc
-          else
-            IDENT "__thread"));
+       fun loc ->
+         if Cil.gccMode () then
+           THREAD loc
+         else begin
+           Kernel.(
+             warning
+               ~wkey:wkey_conditional_feature
+               "__thread is a GCC extension, use a GCC-based machdep to enable it");
+           IDENT "__thread"
+         end);
       ("__FC_FILENAME__",
        (fun loc ->
           let filename =

@@ -1510,7 +1510,11 @@ attribute_nocv:
 |   DECLSPEC paren_attr_list_ne         { ("__declspec", $2), $1 }
 |   MSATTR                              { (fst $1, []), snd $1 }
                                         /* ISO 6.7.3 */
-|   THREAD                              { ("__thread",[]), $1 }
+|   THREAD                              { ("__thread",
+                                           if Kernel.C11.get() then [make_expr (VARIABLE "c11")]
+                                           else []
+                                          ), $1 }
+
 ;
 
 attribute_nocv_list:

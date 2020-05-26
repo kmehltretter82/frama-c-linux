@@ -2056,6 +2056,9 @@ class cil_printer () = object (self)
        | "const", [] -> self#pp_keyword fmt "const"; false
        (* Put the aconst inside the attribute list *)
        | "aconst", [] when not (Cil.msvcMode ()) -> fprintf fmt "__const__"; true
+       | "thread", [ ACons ("c11",[]) ]
+         when not state.print_cil_as_is ->
+         fprintf fmt "_Thread_local"; false
        | "thread", [] when not (Cil.msvcMode ()) -> fprintf fmt "__thread"; false
        | "volatile", [] -> self#pp_keyword fmt "volatile"; false
        | "ghost", [] -> self#pp_keyword fmt "\\ghost"; false
