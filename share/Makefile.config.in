@@ -149,7 +149,6 @@ EXE		?=@EXE@
 # Required by Cil
 UNDERSCORE_NAME ?=@UNDERSCORE_NAME@
 HAVE_BUILTIN_VA_LIST ?=@HAVE_BUILTIN_VA_LIST@
-THREAD_IS_KEYWORD ?=@THREAD_IS_KEYWORD@
 
 # test directories for ptests configuration
 # Non-plugin test directories containing some ML files to compile

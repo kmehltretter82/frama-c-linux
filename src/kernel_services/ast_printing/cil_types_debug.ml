@@ -1058,7 +1058,7 @@ let pp_mach fmt mach =
      alignof_ptr=%a;alignof_float=%a;alignof_double=%a;alignof_longdouble=%a;\
      alignof_str=%a;alignof_fun=%a;char_is_unsigned=%a;underscore_name=%a;\
      const_string_literals=%a;little_endian=%a;alignof_aligned=%a;\
-     has__builtin_va_list=%a;__thread_is_keyword=%a;compiler=%a;\
+     has__builtin_va_list=%a;compiler=%a;\
      cpp_arch_flags=%a;version=%a}"
     pp_int mach.sizeof_short
     pp_int mach.sizeof_int
@@ -1089,7 +1089,6 @@ let pp_mach fmt mach =
     pp_bool mach.little_endian
     pp_int mach.alignof_aligned
     pp_bool mach.has__builtin_va_list
-    pp_bool mach.__thread_is_keyword
     pp_string mach.compiler
     (pp_list pp_string) mach.cpp_arch_flags
     pp_string mach.version

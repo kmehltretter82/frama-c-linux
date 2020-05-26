@@ -296,8 +296,6 @@ let print_machdep fmt (m : Cil_types.mach) =
       (if m.underscore_name then "have" else "have no") ;
     Format.fprintf fmt "   compiler %s builtin __va_list@\n"
       (if m.has__builtin_va_list then "has" else "has not") ;
-    Format.fprintf fmt "   compiler %s __head as a keyword@\n"
-      (if m.__thread_is_keyword then "uses" else "does not use") ;
   end
 
 module DatatypeMachdep = Datatype.Make_with_collections(struct

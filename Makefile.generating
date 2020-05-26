@@ -116,7 +116,6 @@ $(MACHDEP_PATH)/local_machdep.ml: \
 	$(ECHO) "}"          >>$@
 	$(ECHO) \
 	  "let gccHas__builtin_va_list = $(HAVE_BUILTIN_VA_LIST)" >>$@
-	$(ECHO) "let __thread_is_keyword = $(THREAD_IS_KEYWORD)"  >>$@
 	$(ECHO) \
 	  "$@ generated. You may have this file merged into Frama-C by developers."
 	$(CHMOD_RO) $@

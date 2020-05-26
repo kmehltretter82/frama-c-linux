@@ -17,4 +17,3 @@ Machine: gcc 4.0.3 - X86-32bits mode
    strings are const chars
    assembly names have no leading '_'
    compiler has builtin __va_list
-   compiler uses __head as a keyword

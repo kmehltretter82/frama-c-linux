@@ -79,7 +79,6 @@ let x86_16 = {
   little_endian = true;
   underscore_name = true ;
   has__builtin_va_list = true;
-  __thread_is_keyword = true;
 }
 
 let gcc_x86_16 = { x86_16 with
@@ -120,7 +119,6 @@ let x86_32 = {
   little_endian = true;
   underscore_name = false ;
   has__builtin_va_list = true;
-  __thread_is_keyword = true;
 }
 
 let gcc_x86_32 = { x86_32 with
@@ -161,7 +159,6 @@ let x86_64 = {
   little_endian = true;
   underscore_name = false ;
   has__builtin_va_list = true;
-  __thread_is_keyword = true;
 }
 
 let gcc_x86_64 = { x86_64 with
@@ -202,7 +199,6 @@ let ppc_32 = {
   little_endian = false;
   underscore_name = false ;
   has__builtin_va_list = true;
-  __thread_is_keyword = true;
 }
 
 let msvc_x86_64 = {
@@ -240,5 +236,4 @@ let msvc_x86_64 = {
   little_endian = true;
   underscore_name = false ;
   has__builtin_va_list = false;
-  __thread_is_keyword = false;
 }

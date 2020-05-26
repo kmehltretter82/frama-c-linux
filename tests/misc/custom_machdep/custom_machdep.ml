@@ -34,7 +34,6 @@ let mach =
   little_endian = true;
   underscore_name = false ;
   has__builtin_va_list = true;
-  __thread_is_keyword = true;
 }
 
 let mach2 = { mach with compiler = "baz" }
