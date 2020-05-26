@@ -17,6 +17,8 @@
 Open Source Release <next-release>
 ##################################
 
+-   Kernel    [2020-05-26] New option -explain, which provides help messages
+              for options used on the command line.
 -   Eva       [2020-05-25] New annotation eva_allocate to configure the behavior
               of an allocation builtin for a call, overriding the global option.
 -   Eva       [2020-05-25] New option -eva-alloc-builtin to configure uniformly
