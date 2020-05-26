@@ -167,6 +167,7 @@ $(Wp_DIR)/Makefile: $(WP_CONFIGURE_MAKEFILE)
 .PHONY: wp-qualif wp-qualif-update wp-qualif-cleanup
 
 WP_QUALIF_CACHE?=../wp-cache
+WP_QUALIF_ENTRIES=git -C $(WP_QUALIF_CACHE) ls-files --others --exclude-standard | wc -l
 
 wp-qualif: ./bin/toplevel.opt ./bin/ptests.opt $(WP_QUALIF_CACHE)
 	FRAMAC_WP_CACHE=replay \
@@ -175,6 +176,7 @@ wp-qualif: ./bin/toplevel.opt ./bin/ptests.opt $(WP_QUALIF_CACHE)
 
 wp-qualif-update: ./bin/toplevel.opt ./bin/ptests.opt $(WP_QUALIF_CACHE)
 	@echo "[CACHE] pull cache"
+	@echo "[CACHE] $(WP_QUALIF_CACHE)"
 	git -C $(WP_QUALIF_CACHE) pull --rebase --prune
 	@echo "[TESTS] updating wp-qualif"
 	FRAMAC_WP_CACHE=update \
@@ -182,10 +184,11 @@ wp-qualif-update: ./bin/toplevel.opt ./bin/ptests.opt $(WP_QUALIF_CACHE)
 	  ./bin/ptests.opt src/plugins/wp/tests -config qualif -error-code
 	@echo "[CACHE] cache status"
 	git -C $(WP_QUALIF_CACHE) status -s -b -u no
-	@echo "New entries: `git -C $(WP_QUALIF_CACHE) ls-files --others | wc -l`"
+	@echo "New entries: `$(WP_QUALIF_ENTRIES)`"
 
 wp-qualif-upgrade: ./bin/toplevel.opt ./bin/ptests.opt
 	@echo "[CACHE] pull cache"
+	@echo "[CACHE] repo: $(WP_QUALIF_CACHE)"
 	git -C $(WP_QUALIF_CACHE) pull --rebase --prune
 	@echo "[TESTS] upgrading wp-qualif (cache & scripts)"
 	FRAMAC_WP_CACHE=update \
@@ -194,17 +197,20 @@ wp-qualif-upgrade: ./bin/toplevel.opt ./bin/ptests.opt
 	  ./bin/ptests.opt src/plugins/wp/tests -config qualif -error-code
 	@echo "[CACHE] cache status"
 	git -C $(WP_QUALIF_CACHE) status -s -b -u no
+	@echo "New entries: `$(WP_QUALIF_ENTRIES)`"
 
 wp-qualif-push:
 	@echo "[CACHE] pushing updates"
+	@echo "[CACHE] repo: $(WP_QUALIF_CACHE)"
 	git -C $(WP_QUALIF_CACHE) add -A
 	git -C $(WP_QUALIF_CACHE) commit -m "[wp] cache updates"
 	git -C $(WP_QUALIF_CACHE) push -f
 
 wp-qualif-status:
-	@echo "[CACHE] cache status"
+	@echo "[CACHE] status"
+	@echo "[CACHE] repo: $(WP_QUALIF_CACHE)"
 	git -C $(WP_QUALIF_CACHE) status -s -b -u no
-	@echo "New entries: `git -C $(WP_QUALIF_CACHE) ls-files --others | wc -l`"
+	@echo "New entries: `$(WP_QUALIF_ENTRIES)`"
 
 $(WP_QUALIF_CACHE):
 	@echo "[CACHE] cloning wp global at $(WP_QUALIF_CACHE)..."
