@@ -668,12 +668,12 @@ class Signal {
 
 // --- Memo
 
-const signals: { [id: string]: Signal } = {};
+const signals: Map<string, Signal> = new Map();
 function _signal(id: any) {
-  let s = signals[id];
+  let s = signals.get(id);
   if (!s) {
-    signals[id] = new Signal(id);
-    s = signals[id];
+    s = new Signal(id);
+    signals.set(id, s);
   }
   return s;
 }
@@ -719,15 +719,15 @@ export function useSignal(id: string, callback: any) {
 // --- Server Synchro
 
 Dome.on(READY, () => {
-  _.forEach(signals, (signal: Signal) => {
+  signals.forEach((signal: Signal) => {
     signal.sigon();
   });
 });
 
 Dome.on(SHUTDOWN, () => {
-  _.forEach(signals, (signal: Signal) => {
+  signals.forEach((signal: Signal) => {
     signal.unplug();
-    // TODO: signal.sigoff.cancel();
+    (signal.sigoff as unknown as _.Cancelable).cancel();
   });
 });
 
