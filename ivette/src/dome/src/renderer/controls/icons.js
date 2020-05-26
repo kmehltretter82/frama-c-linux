@@ -14,7 +14,7 @@
 
 import _ from 'lodash' ;
 import React from 'react' ;
-import Icons from './icons.json' ;
+import Icons from './gallery.json' ;
 import './style.css' ;
 
 // --------------------------------------------------------------------------
