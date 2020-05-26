@@ -244,6 +244,8 @@ val list_plugins: unit -> exit
     @since Phosphorus-20170501-beta1 *)
 val list_all_plugin_options : print_invisible:bool -> exit
 
+val explain_cmdline : unit -> exit
+
 val plugin_help: string -> exit
   (** Display the help of the given plug-in (given by its shortname).
       @since Beryllium-20090601-beta1 *)

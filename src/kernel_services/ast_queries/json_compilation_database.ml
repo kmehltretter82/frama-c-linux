@@ -175,7 +175,7 @@ let parse_entry ?(cwd=Sys.getcwd()) r =
     | Undefine s -> s ^ suffix
   in
   (* we must process the arguments in-order, since several -D and -U may
-     exist in the command line *)
+     exist on the command line *)
   (* prev is the prefix of the previous argument (if any) *)
   let _, res =
     List.fold_left (fun (prev, acc_res) arg ->

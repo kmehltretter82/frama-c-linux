@@ -493,7 +493,7 @@ let used_files () =
 
 let pretty_used_files used_files =
   (* Note: used_files may also contain #include'd files,
-           but we only want those given in the command line *)
+           but we only want those given on the command line *)
   let cmdline_files = List.fold_left (fun acc file ->
       Datatype.Filepath.Set.add (
         Datatype.Filepath.of_string (Kernel_file.get_name file)

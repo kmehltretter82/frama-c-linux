@@ -55,6 +55,9 @@ option which has the opposite effect.
 -kernel-help
 : prints the list of options recognized by Frama-C's kernel
 
+-explain
+: prints a help message for each other option given on the command line
+
 -verbose *n*
 : sets verbosity level. Defaults to 1.
 Setting it to 0 will output less progress messages.
