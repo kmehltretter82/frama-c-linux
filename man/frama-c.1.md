@@ -56,7 +56,7 @@ option which has the opposite effect.
 : prints the list of options recognized by Frama-C's kernel
 
 -explain
-: prints a help message for each other option given in the command line
+: prints a help message for each other option given on the command line
 
 -verbose *n*
 : sets verbosity level. Defaults to 1.

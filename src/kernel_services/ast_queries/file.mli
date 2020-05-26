@@ -28,7 +28,7 @@ type cpp_opt_kind = Gnu | Not_gnu | Unknown
 
 (** File type, according to how it will be preprocessed.
     Note: [string] is used here instead of [Filepath], to preserve
-          names given in the command line, without normalization. *)
+          names given on the command line, without normalization. *)
 type file =
   | NeedCPP of Filepath.Normalized.t * string * cpp_opt_kind
       (** The first string is the filename of the [.c] to preprocess.
