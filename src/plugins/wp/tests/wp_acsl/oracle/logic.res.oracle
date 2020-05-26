@@ -71,18 +71,9 @@ Let a = global(G_tr_35).
 Let a_1 = shift___anonstruct_Point_1(a, 2).
 Let a_2 = shift___anonstruct_Point_1(a, 1).
 Let a_3 = shift___anonstruct_Point_1(a, 0).
-Let a_4 = shiftfield_F4_bytes(global(G_buint_41)).
 Let m = Array1_S1(a, 3, Mint_0).
 Assume {
   Type: IsArray1S1(m) /\ IsArray1S1(Array1_S1(a_3, 3, Mint_0)).
-  (* Initializer *)
-  Init: Mint_0[shift_uint8(a_4, 0)] = 1.
-  (* Initializer *)
-  Init: Mint_0[shift_uint8(a_4, 1)] = 2.
-  (* Initializer *)
-  Init: Mint_0[shift_uint8(a_4, 2)] = 4.
-  (* Initializer *)
-  Init: Mint_0[shift_uint8(a_4, 3)] = 8.
   (* Initializer *)
   Init: Mint_0[shiftfield_F1_x(a_3)] = 10.
   (* Initializer *)
@@ -105,18 +96,9 @@ Let a = global(G_tr_35).
 Let a_1 = shift___anonstruct_Point_1(a, 2).
 Let a_2 = shift___anonstruct_Point_1(a, 1).
 Let a_3 = shift___anonstruct_Point_1(a, 0).
-Let a_4 = shiftfield_F4_bytes(global(G_buint_41)).
 Let m = Array1_S1(a, 3, Mint_0).
 Assume {
   Type: IsArray1S1(m) /\ IsArray1S1(Array1_S1(a_3, 3, Mint_0)).
-  (* Initializer *)
-  Init: Mint_0[shift_uint8(a_4, 0)] = 1.
-  (* Initializer *)
-  Init: Mint_0[shift_uint8(a_4, 1)] = 2.
-  (* Initializer *)
-  Init: Mint_0[shift_uint8(a_4, 2)] = 4.
-  (* Initializer *)
-  Init: Mint_0[shift_uint8(a_4, 3)] = 8.
   (* Initializer *)
   Init: Mint_0[shiftfield_F1_x(a_3)] = 10.
   (* Initializer *)
@@ -139,18 +121,9 @@ Let a = global(G_tr_35).
 Let a_1 = shift___anonstruct_Point_1(a, 2).
 Let a_2 = shift___anonstruct_Point_1(a, 1).
 Let a_3 = shift___anonstruct_Point_1(a, 0).
-Let a_4 = shiftfield_F4_bytes(global(G_buint_41)).
 Let m = Array1_S1(a_3, 3, Mint_0).
 Assume {
   Type: IsArray1S1(Array1_S1(a, 3, Mint_0)) /\ IsArray1S1(m).
-  (* Initializer *)
-  Init: Mint_0[shift_uint8(a_4, 0)] = 1.
-  (* Initializer *)
-  Init: Mint_0[shift_uint8(a_4, 1)] = 2.
-  (* Initializer *)
-  Init: Mint_0[shift_uint8(a_4, 2)] = 4.
-  (* Initializer *)
-  Init: Mint_0[shift_uint8(a_4, 3)] = 8.
   (* Initializer *)
   Init: Mint_0[shiftfield_F1_x(a_3)] = 10.
   (* Initializer *)
@@ -220,37 +193,21 @@ Goal Pre-condition 'qed_ok' in 'main':
 tests/wp_acsl/logic.i:55: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast to struct (Buint) from (unsigned int) not implemented yet
-Let a = global(G_tr_35).
-Let a_1 = shift___anonstruct_Point_1(a, 2).
-Let a_2 = shift___anonstruct_Point_1(a, 1).
-Let a_3 = shift___anonstruct_Point_1(a, 0).
-Let a_4 = global(G_buint_41).
-Let a_5 = shiftfield_F4_bytes(a_4).
-Let a_6 = Load_S4(a_4, Mint_0).
+Let a = global(G_buint_41).
+Let a_1 = shiftfield_F4_bytes(a).
+Let a_2 = Load_S4(a, Mint_0).
 Assume {
-  Type: IsS4(a_6).
+  Type: IsS4(a_2).
   (* Initializer *)
-  Init: Mint_0[shift_uint8(a_5, 0)] = 1.
+  Init: Mint_0[shift_uint8(a_1, 0)] = 1.
   (* Initializer *)
-  Init: Mint_0[shift_uint8(a_5, 1)] = 2.
+  Init: Mint_0[shift_uint8(a_1, 1)] = 2.
   (* Initializer *)
-  Init: Mint_0[shift_uint8(a_5, 2)] = 4.
+  Init: Mint_0[shift_uint8(a_1, 2)] = 4.
   (* Initializer *)
-  Init: Mint_0[shift_uint8(a_5, 3)] = 8.
-  (* Initializer *)
-  Init: Mint_0[shiftfield_F1_x(a_3)] = 10.
-  (* Initializer *)
-  Init: Mint_0[shiftfield_F1_y(a_3)] = 11.
-  (* Initializer *)
-  Init: Mint_0[shiftfield_F1_x(a_2)] = 20.
-  (* Initializer *)
-  Init: Mint_0[shiftfield_F1_y(a_2)] = 21.
-  (* Initializer *)
-  Init: Mint_0[shiftfield_F1_x(a_1)] = 30.
-  (* Initializer *)
-  Init: Mint_0[shiftfield_F1_y(a_1)] = 31.
+  Init: Mint_0[shift_uint8(a_1, 3)] = 8.
 }
-Prove: EqS4(a_6, w).
+Prove: EqS4(a_2, w).
 
 ------------------------------------------------------------
 
