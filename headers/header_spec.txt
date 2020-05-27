@@ -251,6 +251,7 @@ share/libc/net/if.h: CEA_LGPL
 share/libc/netdb.c: CEA_LGPL
 share/libc/netdb.h: CEA_LGPL
 share/libc/netinet/in.h: CEA_LGPL
+share/libc/netinet/ip.h: CEA_LGPL
 share/libc/netinet/tcp.h: CEA_LGPL
 share/libc/nl_types.h: CEA_LGPL
 share/libc/poll.h: CEA_LGPL

@@ -25,6 +25,7 @@
 #define Frama_C_INTEGER
 #include "features.h"
 __PUSH_FC_STDLIB
+__BEGIN_DECLS
 
 /*@
 
@@ -32,5 +33,6 @@ __PUSH_FC_STDLIB
 
  */
 
+__END_DECLS
 __POP_FC_STDLIB
 #endif

@@ -25,6 +25,7 @@
 
 #include "../features.h"
 __PUSH_FC_STDLIB
+__BEGIN_DECLS
 
 // Arbitrary length, based on the one used in Linux
 #define _FC_UTSNAME_LENGTH 65
@@ -46,5 +47,6 @@ struct utsname
 */
 extern int uname (struct utsname *name);
 
+__END_DECLS
 __POP_FC_STDLIB
 #endif

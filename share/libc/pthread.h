@@ -25,6 +25,7 @@
 
 #include "features.h"
 __PUSH_FC_STDLIB
+__BEGIN_DECLS
 
 #include "errno.h"
 
@@ -369,5 +370,6 @@ extern void pthread_testcancel(void);
 //              (sched.h has already been included)
 #include "time.h"
 
+__END_DECLS
 __POP_FC_STDLIB
 #endif

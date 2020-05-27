@@ -28,6 +28,7 @@
 #include "../__fc_define_off_t.h"
 #include "../__fc_define_size_t.h"
 __PUSH_FC_STDLIB
+__BEGIN_DECLS
 
 // The values for the constants below are based on an x86 Linux,
 // declared in the order given by POSIX.1-2008.
@@ -92,5 +93,6 @@ extern int posix_madvise (void *__addr, size_t __len, int __advice);
 extern int shm_open (const char *__name, int __oflag, mode_t __mode);
 extern int shm_unlink (const char *__name);
 
+__END_DECLS
 __POP_FC_STDLIB
 #endif

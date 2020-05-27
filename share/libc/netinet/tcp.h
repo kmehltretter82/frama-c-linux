@@ -56,6 +56,7 @@
 
 #include <features.h>
 __PUSH_FC_STDLIB
+__BEGIN_DECLS
 
 /*
  * User-settable options (used with setsockopt).
@@ -342,6 +343,7 @@ struct tcp_cookie_transactions
 
 #endif /* Misc.  */
 
+__END_DECLS
 __POP_FC_STDLIB
 
 #endif /* netinet/tcp.h */
