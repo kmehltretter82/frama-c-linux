@@ -20,6 +20,5 @@
 /doc/*/.make-class
 /doc/*/.make-icons
 /doc/*/.make-images
-/cache
 
 /why3_api.ml
