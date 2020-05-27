@@ -72,8 +72,7 @@ def run_make(framac, benchmark_tag=None):
         bindir = framac + '/build/bin'
         args += [
             'FRAMAC_DIR=' + bindir,
-            'FRAMAC=' + bindir + '/frama-c',
-            'FRAMAC_CONFIG=' + bindir + '/frama-c-config']
+            'FRAMAC=' + bindir + '/frama-c']
     if benchmark_tag is None:
         args += ['-j', '8']
     else:
