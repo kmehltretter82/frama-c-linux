@@ -56,6 +56,8 @@ REQUIRE_WHY3=
 USE_WHY3=
 HAS_WHY3=
 
+configure_pkg(why3,[package why3 not found])
+
 AC_MSG_CHECKING(why3 version)
 WHY3VERSION=`ocamlfind query -format %v why3 | tr -d '\\r\\n'`
 case $WHY3VERSION in
@@ -70,8 +72,6 @@ case $WHY3VERSION in
         AC_MSG_RESULT([found $WHY3VERSION: should work but prefer 1.3.x])
         ;;
 esac
-
-configure_pkg(why3,[package why3 not found])
 
 plugin_require_external(wp,why3)
 
