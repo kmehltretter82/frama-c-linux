@@ -4812,6 +4812,14 @@ and makeVarInfoCabs
                                        we do it afterwards *)
       bt (A.PARENTYPE(attrs, ndt, a)) in
   (*Format.printf "Got yp:%a->%a(%a)@." d_type bt d_type vtype d_attrlist nattr;*)
+  if hasAttribute "thread" nattr then begin
+    let wkey = Kernel.wkey_inconsistent_specifier in
+    let source = fst ldecl in
+    if isFunctionType vtype then
+      Kernel.warning ~wkey ~source "only objects can be thread-local"
+    else if not isglobal && (sto = NoStorage || sto = Register) then
+      Kernel.warning ~wkey ~source "a local object cannot be thread-local";
+  end;
   if not isgenerated && ghost then begin
     if hasAttribute "ghost" (Cil.typeAttrs vtype) then
       Kernel.warning
@@ -9125,6 +9133,11 @@ and doDecl local_env (isglobal: bool) : A.definition -> chunk = function
       let ftyp, funattr =
         doType local_env.is_ghost false
           (AttrName false) bt (A.PARENTYPE(attrs, dt, a)) in
+      if hasAttribute "thread" funattr then begin
+        let wkey = Kernel.wkey_inconsistent_specifier in
+        let source = fst funloc in
+        Kernel.warning ~wkey ~source "only objects can be thread-local"
+      end;
       (* Format.printf "Attrs are %a@." d_attrlist funattr; *)
       Cil.update_var_type !currentFunctionFDEC.svar ftyp;
       !currentFunctionFDEC.svar.vattr <- funattr;
