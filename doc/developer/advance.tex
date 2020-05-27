@@ -199,7 +199,16 @@ on the configuration of new libraries. This is done by calling a
 predefined macro called
 \texttt{configure\_library}\scodeidxdef{configure.in}{configure\_library}\scodeidxdef{configure.in}{configure\_tools}\footnote{For
   tools, there is a macro \texttt{configure\_tool} which works in the
-  same way as \texttt{configure\_library}.}.
+  same way as \texttt{configure\_library}.}, or its more specialized version
+\texttt{configure\_pkg}\scodeidxdef{configure.in}{configure\_pkg}.
+
+\texttt{configure\_pkg} is meant to be used for checking the presence of
+OCaml libraries that are managed as
+\texttt{findlib}\footnote{\url{http://projects.camlcity.org/projects/findlib.html}}
+packages, which is the case for most modern OCaml libraries nowadays.
+It takes two arguments, the name of the package (as known by \texttt{findlib}),
+and a message that will be displayed if the package is not found.
+
 The \texttt{configure\_library} macro takes three arguments. The first one is
 the (uppercase) name of the library, the second one is a filename
 which is used by the script to check the availability of the library.
