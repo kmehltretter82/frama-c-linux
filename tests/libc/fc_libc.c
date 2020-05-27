@@ -98,6 +98,7 @@
 #include "netdb.h"
 #include "net/if.h"
 #include "netinet/in.h"
+#include "netinet/ip.h"
 #include "netinet/tcp.h"
 #include "nl_types.h"
 #include "poll.h"

@@ -73,6 +73,7 @@ skipping share/libc/complex.h
 [kernel] Parsing share/libc/net/if.h (with preprocessing)
 [kernel] Parsing share/libc/netdb.h (with preprocessing)
 [kernel] Parsing share/libc/netinet/in.h (with preprocessing)
+[kernel] Parsing share/libc/netinet/ip.h (with preprocessing)
 [kernel] Parsing share/libc/netinet/tcp.h (with preprocessing)
 [kernel] Parsing share/libc/nl_types.h (with preprocessing)
 [kernel] Parsing share/libc/poll.h (with preprocessing)
