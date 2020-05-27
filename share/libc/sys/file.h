@@ -25,6 +25,7 @@
 
 #include "../features.h"
 __PUSH_FC_STDLIB
+__BEGIN_DECLS
 
 // Note: this file is not C11 nor POSIX, but Linux-specific.
 // The values for the constants below are based on the glibc.
@@ -46,5 +47,6 @@ __PUSH_FC_STDLIB
 */
 extern int flock(int fd, int operation);
 
+__END_DECLS
 __POP_FC_STDLIB
 #endif

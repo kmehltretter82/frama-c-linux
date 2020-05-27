@@ -25,6 +25,7 @@
 
 #include "../features.h"
 __PUSH_FC_STDLIB
+__BEGIN_DECLS
 #include "../time.h"
 
 struct tms
@@ -38,5 +39,7 @@ struct tms
 /*@ requires valid_buffer: \valid(buffer);
     assigns \result, *buffer \from __fc_time; */
 extern clock_t times (struct tms *buffer);
+
+__END_DECLS
 __POP_FC_STDLIB
 #endif
