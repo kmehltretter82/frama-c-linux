@@ -25,51 +25,54 @@ There are two tests configurations:
 - the `qualif` configuration uses the `wp-cache` global cache, `Alt-Ergo` and `Coq`.
 
 The test configurations `tests/test_config` and `tests/test_config_qualif` are
-carefully crafted to fit with the constraints associated to the GitLab
+carefully crafted to fit with the constraints of the GitLab
 Continuous Integration system. In particular, the `qualif` configuration is
-designed for being used with a local clone of the global WP cache, see
-installation instruction below.
+designed for being used with a clone of the global WP cache, see
+installation instructions below.
 
 To re-run tests, use by default the following commands:
 - `make Wp_TESTS` for the default test configuration;
-- `make wp-qualif` for the `qualif` configuration;
+- `make wp-qualif` for the `qualif` configuration.
 
 When using the `wp-qualif` target, it wil clone the global wp-cache at `../wp-cache` by default,
-if not yet present. To choose another place, consult the « Global WP Cache » section below.
-The WP makefile provides several targets to automate the cache management. It is highly
+if not yet present. To choose another place, consult the « Global WP Cache »
+installation instructions below.
+The WP makefile provides several targets to automate cache management. It is highly
 recommanded to use them most of the time:
 
-- `make wp-qualif` re-run qualif tests; no new cache entry is created, though.
-- `make wp-qualif-update` re-run and create missing cache entries.
-- `make wp-qualif-upgrade` create missing cache entries _and_ update tests scripts is necessary.
-- `make wp-qualif-push` commits and push all new cache entries to the GitLab repo.
-- `make wp-qualif-status` display a very short git status of your local clone of wp-cache.
+- `make wp-qualif` re-runs qualif tests; no new cache entry is created, though.
+- `make wp-qualif-update` re-runs and create missing cache entries.
+- `make wp-qualif-upgrade` creates missing cache entries _and_ update tests scripts is necessary.
+- `make wp-qualif-push` commits and pushes all new cache entries to the GitLab repository.
+- `make wp-qualif-status` displays a very short git status of your local wp-cache.
 
-To execute a given test by hand in `qualif` configuration, do the following
-in a local shell:
+To execute a given test by hand in `qualif` configuration, use the following
+commands in a _local_ shell:
 
     $ export FRAMAC_WP_CACHE=update
-    $ export FRAMAC_WP_CACHEDIR=<absolute-dir-to-wp-cache>
+    $ export FRAMAC_WP_CACHEDIR=<path-to-wp-cache>
     $ ./bin/ptests.opt src/plugins/wp/tests/xxx/yyy.i [-show|-update]
 
-It is _not_ recommanded to set the `FRAMAC_WP_xxx` variables globally, to avoid
-adding new cache entries that are non-related to the WP test suite. Consult
-the section « Global WP Cache Setup » below for details.
+It is _highly_ recommanded to _not_ set the `FRAMAC_WP_xxx` variables globally;
+doing so would causing WP to add new cache entries to the global « qualif » cache
+from all your projects around. Consult the section « Global WP Cache Setup »
+below for details.
 
 # Global WP Cache Setup (for wp-qualif)
 
 All prover results for test configuration `qualif` shall be cached in a dedicate GitLab repo.
 This considerally speed-up the process of running those tests, from hours downto minutes.
 
-To ease the management of cache entries accross different Frama-C branches,
-_all_ cache entries are merged into the _same_ master branch of a global
-repository. This strategy prevents merge conflicts related to different cache
+To ease the management of cache entries accross merge requests,
+_all_ cache entries shall be merged into the _same_ master branch of a global
+repository, even if they come from _different_ Frama-C branches.
+This strategy prevents merge conflicts related to different cache
 entries and simplifies the review of MR, especially those modifying the VC
 generation process. The gitLab Frama-CI continuous integration system is aware of
-this this global cache and always use it.
+this strategy and always use the global cache.
 
 By default, the WP makefile will clone a local copy of the wp-cache in `../wp-cache`
-but you can choose another place:
+but you can choose another place with the following commands:
 
     $ git clone git@git.frama-c.com:frama-c/wp-cache.git <your-cache>
     $ export WP_QUALIF_CACHE=<absolute-path-to-your-cache>
@@ -85,5 +88,6 @@ environment. To run individual tests, you may now use:
 As mentionned above, it is _not_ recommanded to globally set the
 `FRAMAC_WP_XXX` variables in your default shell environment, because WP will
 use it by default and would merge any new cache entry there, even those
-non-related to the `qualif` WP test suite. For this reason,
-we recommend to use `WP_QUALIF_CACHE` globally and `FRAMAC_WP_CACHEDIR` locally.
+non-related to the « qualif » test suite. For this reason,
+it is _highly_ recommended to use `WP_QUALIF_CACHE` globally
+and `FRAMAC_WP_CACHEDIR` locally.
