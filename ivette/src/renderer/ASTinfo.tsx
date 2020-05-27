@@ -14,13 +14,13 @@ import { Component } from 'frama-c/LabViews';
 // --- Parsing information from the server
 // --------------------------------------------------------------------------
 
-function addMarker(buffer: any, fct: string) {
+function addMarker(buffer: RichTextBuffer, fct: string) {
   buffer.openTextMarker({ id: fct, css: 'color: blue' });
   buffer.append(fct);
   buffer.closeTextMarker();
 }
 
-function parseVarinfo(buffer: any, data: any) {
+function parseVarinfo(buffer: RichTextBuffer, data: any) {
   buffer.append(`Variable ${data.name} has type '${data.type.name}'.`);
   buffer.flushline();
   if (data.global) {
@@ -41,7 +41,7 @@ function parseVarinfo(buffer: any, data: any) {
   buffer.append(`It is ${ref}referenced and its address is ${taken}taken.`);
 }
 
-function parseInfo(buffer: any, data: any) {
+function parseInfo(buffer: RichTextBuffer, data: any) {
   switch (data.kind) {
     case 'expression':
       buffer.append(`This is a pure C expression of type '${data.type.name}'.`);
