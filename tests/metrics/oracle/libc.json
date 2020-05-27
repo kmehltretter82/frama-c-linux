@@ -87,6 +87,7 @@
     { "isspace": { "calls": 0, "address_taken": false } },
     { "isupper": { "calls": 0, "address_taken": false } },
     { "isxdigit": { "calls": 0, "address_taken": false } },
+    { "link": { "calls": 0, "address_taken": false } },
     { "lseek": { "calls": 0, "address_taken": false } },
     { "pathconf": { "calls": 0, "address_taken": false } },
     { "pclose": { "calls": 0, "address_taken": false } },

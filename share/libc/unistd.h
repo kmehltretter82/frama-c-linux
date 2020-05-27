@@ -947,7 +947,21 @@ extern char        *getwd(char *);
 extern int          isatty(int fd);
 
 extern int          lchown(const char *, uid_t, gid_t);
-extern int          link(const char *, const char *);
+
+/*@ //missing: may assign to errno: EACCES, EEXIST, ELOOP, EMLINK, ENAMETOOLONG,
+    //                              ENOENT, ENOSPC, ENOTDIR, EPERM, EROFS,
+    //                              EXDEV, EBADF, ENOTDIR, EINVAL;
+    // missing: assigns 'filesystem' \from path1[0..strlen(path1)],
+    //                                     path2[0..strlen(path2)];
+    // missing: assigns \result \from 'paths in filesystem'
+  requires valid_path: valid_read_string(path1);
+  requires valid_path: valid_read_string(path2);
+  assigns \result \from indirect:path1[0 .. strlen(path1)],
+                        indirect:path2[0 .. strlen(path2)];
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+ */
+extern int          link(const char *path1, const char *path2);
+
 extern int          lockf(int, int, off_t);
 
 /*@ //missing: may assign to errno: EBADF, EINVAL, EOVERFLOW, ESPIPE, ENXIO (Linux);
@@ -1108,7 +1122,7 @@ extern useconds_t   ualarm(useconds_t, useconds_t);
   // missing: assigns 'filesystem' \from path[0..];
   // missing: assigns \result \from 'filesystem';
   requires valid_string_path: valid_read_string(path);
-  assigns \result \from path[0..];
+  assigns \result \from indirect:path[0..strlen(path)];
   ensures result_ok_or_error: \result == 0 || \result == -1;
  */
 extern int          unlink(const char *path);

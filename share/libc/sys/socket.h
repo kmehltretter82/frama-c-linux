@@ -443,11 +443,10 @@ extern int listen(int sockfd, int backlog);
  */
 extern ssize_t recv(int sockfd, void * buf, size_t len, int flags);
 
-
 /*@
   requires valid_sockfd: 0 <= sockfd < __FC_MAX_OPEN_SOCKETS;
   requires valid_buffer_length: \valid((char *)buf+(0 .. len-1));
-  requires valid_addrbuf_or_null: (\valid(addrbuf_len) &&
+  requires valid_addrbuf_or_null:initialization: (\valid(addrbuf_len) &&
                                    \initialized(addrbuf_len) &&
                                    \valid((char *)addrbuf+(0 .. *addrbuf_len-1)))
                                   || (addrbuf == \null && addrbuf_len == \null);
@@ -503,7 +502,23 @@ extern ssize_t recvmsg(int sockfd, struct msghdr *hdr, int flags);
   ensures error_or_chars_sent: \result == -1 || 0 <= \result <= len;
  */
 extern ssize_t send(int sockfd, const void *buf, size_t len, int flags);
-extern ssize_t sendmsg(int, const struct msghdr *, int);
+
+/*@
+  requires available_sockfd: 0 <= sockfd < __FC_MAX_OPEN_SOCKETS;
+  requires valid_message: \valid_read(message);
+  requires valid_msg_iov:
+    \valid_read(message->msg_iov+(0 .. message->msg_iovlen - 1));
+  assigns __fc_sockfds[sockfd]
+    \from __fc_sockfds[sockfd],
+          indirect:*message,
+          indirect:message->msg_iov[0 .. message->msg_iovlen - 1],
+          indirect:flags;
+  assigns \result \from indirect:sockfd, indirect:__fc_sockfds[sockfd],
+          indirect:*message,
+          indirect:message->msg_iov[0 .. message->msg_iovlen - 1];
+  ensures error_or_chars_sent: \result == -1 || 0 <= \result;
+ */
+extern ssize_t sendmsg(int sockfd, const struct msghdr *message, int flags);
 
 /*@
   requires available_sockfd: 0 <= sockfd < __FC_MAX_OPEN_SOCKETS;

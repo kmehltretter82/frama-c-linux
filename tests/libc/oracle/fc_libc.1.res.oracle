@@ -3098,6 +3098,16 @@ extern uid_t getuid(void);
  */
 extern int isatty(int fd);
 
+/*@ requires valid_path: valid_read_string(path1);
+    requires valid_path: valid_read_string(path2);
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result
+      \from (indirect: *(path1 + (0 .. strlen{Old}(path1)))),
+            (indirect: *(path2 + (0 .. strlen{Old}(path2))));
+ */
+extern int link(char const *path1, char const *path2);
+
 /*@ requires valid_fd: 0 ≤ fd < 1024;
     requires valid_whence: whence ≡ 0 ∨ whence ≡ 1 ∨ whence ≡ 2;
     ensures result_error_or_offset: \result ≡ -1 ∨ 0 ≤ \result;
@@ -3218,7 +3228,7 @@ extern char *ttyname(int fildes);
 /*@ requires valid_string_path: valid_read_string(path);
     ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
     assigns \result;
-    assigns \result \from *(path + (0 ..));
+    assigns \result \from (indirect: *(path + (0 .. strlen{Old}(path))));
  */
 extern int unlink(char const *path);
 
@@ -4772,7 +4782,7 @@ extern ssize_t recv(int sockfd, void *buf, size_t len, int flags);
 /*@ requires valid_sockfd: 0 ≤ sockfd < 1024;
     requires valid_buffer_length: \valid((char *)buf + (0 .. len - 1));
     requires
-      valid_addrbuf_or_null:
+      valid_addrbuf_or_null: initialization:
         (\valid(addrbuf_len) ∧ \initialized(addrbuf_len) ∧
          \valid((char *)addrbuf + (0 .. *addrbuf_len - 1))) ∨
         (addrbuf ≡ \null ∧ addrbuf_len ≡ \null);
@@ -4853,6 +4863,24 @@ extern ssize_t recvmsg(int sockfd, struct msghdr *hdr, int flags);
             (indirect: *((char *)buf + (0 .. len))), (indirect: flags);
  */
 extern ssize_t send(int sockfd, void const *buf, size_t len, int flags);
+
+/*@ requires available_sockfd: 0 ≤ sockfd < 1024;
+    requires valid_message: \valid_read(message);
+    requires
+      valid_msg_iov:
+        \valid_read(message->msg_iov + (0 .. message->msg_iovlen - 1));
+    ensures error_or_chars_sent: \result ≡ -1 ∨ 0 ≤ \result;
+    assigns __fc_sockfds[sockfd], \result;
+    assigns __fc_sockfds[sockfd]
+      \from __fc_sockfds[sockfd], (indirect: *message),
+            (indirect: *(message->msg_iov + (0 .. message->msg_iovlen - 1))),
+            (indirect: flags);
+    assigns \result
+      \from (indirect: sockfd), (indirect: __fc_sockfds[sockfd]),
+            (indirect: *message),
+            (indirect: *(message->msg_iov + (0 .. message->msg_iovlen - 1)));
+ */
+extern ssize_t sendmsg(int sockfd, struct msghdr const *message, int flags);
 
 /*@ requires available_sockfd: 0 ≤ sockfd < 1024;
     requires buf_len_ok: \valid_read((char *)buf + (0 .. len - 1));
