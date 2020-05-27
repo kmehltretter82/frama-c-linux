@@ -44,6 +44,18 @@ export interface Sorting {
 }
 
 // --------------------------------------------------------------------------
+// --- Filtering
+// --------------------------------------------------------------------------
+
+export interface Filter<Key, Row> {
+  (key: Key, row: Row): boolean;
+}
+
+export interface Filtering<Key, Row> {
+  setFiltering(fn?: Filter<Key, Row>): void;
+}
+
+// --------------------------------------------------------------------------
 // --- Collection Model
 // --------------------------------------------------------------------------
 
@@ -73,7 +85,7 @@ export interface Sorting {
 
    When your data change over time, you shall invoke the following methods
    of the model to keep views in sync:
-   - [[update]] or [[updateRange]] when single or contiguous row data changes over time;
+   - [[update]] or [[updateIndex]] when single or contiguous row data changes over time;
    - [[reload]] when the number of rows, their ordering, or (many) row data has been changed.
 
    It is always safe to use `reload` instead of `update` although it might be less performant.
@@ -117,7 +129,7 @@ export abstract class Model<Key, Row> {
 
   /**
      Signal an item update.
-     Default implementation uses [[getInfexOf]] to retrieve the index and then
+     Default implementation uses [[getIndexOf]] to retrieve the index and then
      delegates to [[updateIndex]].
      All views that might be rendering the specified item will be updated.
   */
