@@ -138,27 +138,6 @@ Wp_DEFAULT_TESTS: create_share_link
 endif
 
 # --------------------------------------------------------------------------
-# --- Qualif Tests                                                       ---
-# --------------------------------------------------------------------------
-
-wp-qualif: ./bin/toplevel.opt ./bin/ptests.opt
-	./bin/ptests.opt src/plugins/wp/tests -config qualif -error-code
-
-wp-qualif-update: ./bin/toplevel.opt ./bin/ptests.opt
-	FRAMAC_WP_CACHE=update \
-		./bin/ptests.opt src/plugins/wp/tests -config qualif
-
-wp-qualif-upgrade: ./bin/toplevel.opt ./bin/ptests.opt
-	FRAMAC_WP_CACHE=update \
-	FRAMAC_WP_SCRIPT=update \
-		./bin/ptests.opt src/plugins/wp/tests -config qualif
-
-wp-qualif-cleanup: ./bin/toplevel.opt ./bin/ptests.opt
-	FRAMAC_WP_CACHE=cleanup \
-	FRAMAC_WP_SCRIPT=update \
-		./bin/ptests.opt src/plugins/wp/tests -config qualif
-
-# --------------------------------------------------------------------------
 # --- Dynamic Plugin                                                     ---
 # --------------------------------------------------------------------------
 
@@ -180,6 +159,63 @@ WP_CONFIGURE_MAKEFILE= \
 
 $(Wp_DIR)/Makefile: $(WP_CONFIGURE_MAKEFILE)
 	@cd $(CONFIG_STATUS_DIR) && ./config.status --file $@
+
+# --------------------------------------------------------------------------
+# --- Qualif Tests                                                       ---
+# --------------------------------------------------------------------------
+
+.PHONY: wp-qualif wp-qualif-update wp-qualif-upgrade wp-qualif-push wp-qualif-status
+
+WP_QUALIF_CACHE?=../wp-cache
+WP_QUALIF_ENTRIES=git -C $(WP_QUALIF_CACHE) ls-files --others --exclude-standard | wc -l
+
+wp-qualif: ./bin/toplevel.opt ./bin/ptests.opt $(WP_QUALIF_CACHE)
+	FRAMAC_WP_CACHE=replay \
+	FRAMAC_WP_CACHEDIR=$(WP_QUALIF_CACHE) \
+	  ./bin/ptests.opt src/plugins/wp/tests -config qualif -error-code
+
+wp-qualif-update: ./bin/toplevel.opt ./bin/ptests.opt $(WP_QUALIF_CACHE)
+	@echo "[CACHE] pull cache"
+	@echo "[CACHE] $(WP_QUALIF_CACHE)"
+	git -C $(WP_QUALIF_CACHE) pull --rebase --prune
+	@echo "[TESTS] updating wp-qualif"
+	FRAMAC_WP_CACHE=update \
+	FRAMAC_WP_CACHEDIR=$(WP_QUALIF_CACHE) \
+	  ./bin/ptests.opt src/plugins/wp/tests -config qualif -error-code
+	@echo "[CACHE] cache status"
+	git -C $(WP_QUALIF_CACHE) status -s -b -u no
+	@echo "New entries: `$(WP_QUALIF_ENTRIES)`"
+
+wp-qualif-upgrade: ./bin/toplevel.opt ./bin/ptests.opt
+	@echo "[CACHE] pull cache"
+	@echo "[CACHE] repo: $(WP_QUALIF_CACHE)"
+	git -C $(WP_QUALIF_CACHE) pull --rebase --prune
+	@echo "[TESTS] upgrading wp-qualif (cache & scripts)"
+	FRAMAC_WP_CACHE=update \
+	FRAMAC_WP_SCRIPT=update \
+	FRAMAC_WP_CACHEDIR=$(WP_QUALIF_CACHE) \
+	  ./bin/ptests.opt src/plugins/wp/tests -config qualif -error-code
+	@echo "[CACHE] cache status"
+	git -C $(WP_QUALIF_CACHE) status -s -b -u no
+	@echo "New entries: `$(WP_QUALIF_ENTRIES)`"
+
+wp-qualif-push:
+	@echo "[CACHE] pushing updates"
+	@echo "[CACHE] repo: $(WP_QUALIF_CACHE)"
+	git -C $(WP_QUALIF_CACHE) add -A
+	git -C $(WP_QUALIF_CACHE) commit -m "[wp] cache updates"
+	git -C $(WP_QUALIF_CACHE) push -f
+
+wp-qualif-status:
+	@echo "[CACHE] status"
+	@echo "[CACHE] repo: $(WP_QUALIF_CACHE)"
+	git -C $(WP_QUALIF_CACHE) status -s -b -u no
+	@echo "New entries: `$(WP_QUALIF_ENTRIES)`"
+
+$(WP_QUALIF_CACHE):
+	@echo "[CACHE] cloning wp global at $(WP_QUALIF_CACHE)..."
+	@echo "Use env. variable WP_QUALIF_CACHE to change this location."
+	@git clone "git@git.frama-c.com:frama-c/wp-cache.git" $(WP_QUALIF_CACHE)
 
 # --------------------------------------------------------------------------
 # --- WP API                                                             ---

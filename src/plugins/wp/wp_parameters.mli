@@ -110,6 +110,7 @@ module Provers: Parameter_sig.String_list
 module RunAllProvers: Parameter_sig.Bool
 module Cache: Parameter_sig.String
 module CacheEnv: Parameter_sig.Bool
+module CacheDir: Parameter_sig.String
 module Drivers: Parameter_sig.String_list
 module Script: Parameter_sig.String
 module UpdateScript: Parameter_sig.Bool
