@@ -245,15 +245,30 @@ let () = States.column ~model ~name:"source"
     ~data:(module LogSource)
     ~get:(fun ip -> Property.location ip |> fst) ()
 
+let is_relevant ip =
+  match Property.get_kf ip with
+  | None -> true
+  | Some kf ->
+    not (Ast_info.is_frama_c_builtin (Kernel_function.get_name kf)
+         || Cil.is_unused_builtin (Kernel_function.get_vi kf))
+
+let iter f = Property_status.iter (fun ip -> if is_relevant ip then f ip)
+let add_update_hook f =
+  Property_status.register_property_add_hook
+    (fun ip -> if is_relevant ip then f ip)
+let add_remove_hook f =
+  Property_status.register_property_remove_hook
+    (fun ip -> if is_relevant ip then f ip)
+
 let array =
   States.register_array
     ~page
     ~name:"kernel.properties"
     ~descr:(Md.plain "Registered Properties")
     ~key:(fun ip -> Kernel_ast.Marker.create (PIP ip))
-    ~iter:(Property_status.iter)
-    ~add_update_hook:Property_status.register_property_add_hook
-    ~add_remove_hook:Property_status.register_property_remove_hook
+    ~iter
+    ~add_update_hook
+    ~add_remove_hook
     model
 
 let reload () = States.reload array
