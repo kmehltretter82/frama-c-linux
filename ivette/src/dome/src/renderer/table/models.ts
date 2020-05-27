@@ -7,10 +7,10 @@
    @module dome/table/models
 */
 
-import _ from 'lodash';
+import { SortDirectionType } from 'react-virtualized';
 
 // --------------------------------------------------------------------------
-// --- Sorting
+// --- Listeners
 // --------------------------------------------------------------------------
 
 /** @internal */
@@ -22,6 +22,26 @@ interface Client {
   upper: number,
   trigger: () => void,
 };
+
+// --------------------------------------------------------------------------
+// --- Sorting
+// --------------------------------------------------------------------------
+
+export interface Ordering {
+  /** The column identifier that triggers some sorting. */
+  sortBy: string;
+  /** The requested sorting direction (`'ASC'` or `'DESC'`). */
+  sortDirection: SortDirectionType;
+}
+
+/** Sorting proxy.
+    Can be provided along with Models or in a separate class or object. */
+export interface Sorting {
+  /** Whether the model can be sorted from the `dataKey` column identifier. */
+  hasOrdering(dataKey: string): boolean;
+  /** Callback to respond to sorting requests from columns. */
+  setOrdering(order?: Ordering): void;
+}
 
 // --------------------------------------------------------------------------
 // --- Collection Model
@@ -37,68 +57,77 @@ interface Client {
    render its own range of items and will re-render only when impacted by
    individual updates.
 
-   A Model instance may not hold the data directly. A table or list component
-   uses the model only as a _proxy_ reponsible for fetching the items with respect to
-   some current filtering and ordering selection. The model also serves as
-   a proxy for triggering table re-rendering when table data is updated.
+   The model might not hold the entire collection of data at the same time, but
+   serves as a proxy for fetching data on demand. A model makes a distinction between:
+   - `Key`: a key identifies a given entry in the table at any time;
+   - `Row`: the row data associated to some `Key` at a given time;
 
-   To design your data model, you shall extends the base `Model` class and
-   override the public methods to fit your needs.
+   When row data change over time, the table views associated to the model
+   use `Key` information to keep scrolling and selection states in sync.
 
-   - [[getItemCount]]: the number of items;
-   - [[getItemAt]]: the item at some specified index;
-   - [[getIndexOf]]: the index of some item.
+   The model is responsible for:
+   - providing row data to the views;
+   - informing views of data updates;
+   - compute row ordering with respect to ordering and/or filtering;
+   - lookup key index with respect to ordering and/or filtering;
 
-   Whenever data is added, removed, updated or re-ordered, the model shall be
-   informed by calling one of the following methods:
+   When your data change over time, you shall invoke the following methods
+   of the model to keep views in sync:
+   - [[update]] or [[updateRange]] when single or contiguous row data changes over time;
+   - [[reload]] when the number of rows, their ordering, or (many) row data has been changed.
 
-   - [[updateItem]] when an individual item shall be re-rendered (if ever visible)
-   - [[updateIndex]] when a range of item indices shall be re-rendered (if ever visible)
-   - [[reload]] for all other modifications of the collection, including addition, removal, filtering and re-ordering.
+   It is always safe to use `reload` instead of `update` although it might be less performant.
 
-   Item count and indices shall be consistent with the currently applied filters and ordering, if any.
-
-   @template A - the type of items.
-   Each row in the model shall be uniquely identified by its item value.
-   Values to be displayed in each column of table views shall not be part of the item value.
-   Items will be used to keep track of selection and scrolling during model updates.
-
+   @template Key - identification of some entry
+   @template Row - dynamic row data associated to some key
 */
-export abstract class Model<A> {
+export abstract class Model<Key, Row> {
 
   #clients = new Map<ClientId, Client>();
   #clientId = 0;
 
   /**
-     Shall return the number of items to be displayed by the table.
+     Shall return the number of rows to be currently displayed in the table.
      Negative values are considered as zero.
   */
-  abstract getItemCount(): number;
+  abstract getRowCount(): number;
 
   /**
-     Shall return the item at a given index in the table with respect to
-     current filtering and ordering (if appropriate).
+     Shall return the current row data at a given index in the table, with respect to
+     current filtering and ordering (if any).
+     Might return `undefined` if the index is invalid or not (yet) available.
   */
-  abstract getItemAt(index: number): undefined | A;
+  abstract getRowAt(index: number): undefined | Row;
 
   /**
-     Shall return the index of a given item inside the table with respect to
-     current filtering and ordering, or `undefined` if no such item exists.
-     Any negative returned index would be treated as `undefined`.
+     Shall return the key of the given entry. The specified index and data
+     are those of the last corresponding call to [[getRowAt]].
+     Might return `undefined` if the index is invalid.
   */
-  abstract getIndexOf(item: A): undefined | number;
+  abstract getKeyFor(index: number, data: Row): undefined | Key;
+
+  /**
+     Shall return the index of a given entry in the table, identified by its key, with
+     respect to current filtering and ordering (if any).
+     Shall return `undefined` if the specified key no longer belong to the table or
+     when it is currently filtered out.
+     Out-of-range indices would be treated as `undefined`.
+  */
+  abstract getIndexOf(key: Key): undefined | number;
 
   /**
      Signal an item update.
-     All views that might be rendering the specified item will rerender the associated row.
+     Default implementation uses [[getInfexOf]] to retrieve the index and then
+     delegates to [[updateIndex]].
+     All views that might be rendering the specified item will be updated.
   */
-  updateItem(item: A) {
-    const k = this.getIndexOf(item);
+  update(key: Key) {
+    const k = this.getIndexOf(key);
     if (k !== undefined && 0 <= k) this.updateIndex(k);
   }
 
   /**
-     Signal a range of updates
+     Signal a range of updates.
      @param first - the first updated item index
      @param last - the last updated item index (defaults to `first`)
   */
@@ -110,12 +139,14 @@ export abstract class Model<A> {
     }
   }
 
-  /** Re-render all items */
+  /** Re-render all views. */
   reload() { this.#clients.forEach(({ trigger }) => trigger()); }
 
   /**
      Connect a client view to the model.
      The initial watching range is empty.
+     You normally never call this method directly.
+     It is automatically called by table views.
   */
   bind(trigger: () => void): ClientId {
     const id = "#" + this.#clientId++;
@@ -125,6 +156,8 @@ export abstract class Model<A> {
 
   /**
      Disconnect a client from the model.
+     You normally never call this method directly.
+     It is automatically called by table views.
   */
   remove(id: ClientId) {
     this.#clients.delete(id);
@@ -134,6 +167,8 @@ export abstract class Model<A> {
      Set the current range of items currently watched by the client.
      Data updates that fall outside this range will _not_ trigger
      re-rendering of the client.
+     You normally never call this method directly.
+     It is automatically called by table views.
      @param lower - first item index rendered
      @param upper - last item index rendered
   */
