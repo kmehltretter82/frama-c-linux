@@ -1210,6 +1210,8 @@ src/plugins/value/alarmset.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/alarmset.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/api/general_requests.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/api/general_requests.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/api/values_request.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/api/values_request.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/abstract_domain.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/printer_domain.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/printer_domain.mli: CEA_LGPL_OR_PROPRIETARY
