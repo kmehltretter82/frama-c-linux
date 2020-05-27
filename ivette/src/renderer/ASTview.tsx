@@ -33,7 +33,7 @@ const PP = new Dome.PP('AST View');
 // --- Rich Text Printer
 // --------------------------------------------------------------------------
 
-const printAST = (buffer: any, text: string) => {
+const printAST = (buffer: RichTextBuffer, text: string) => {
   if (Array.isArray(text)) {
     const tag = text.shift();
     if (tag !== '') {
@@ -48,7 +48,9 @@ const printAST = (buffer: any, text: string) => {
   }
 };
 
-async function loadAST(buffer: any, theFunction?: string, theMarker?: string) {
+async function loadAST(
+  buffer: RichTextBuffer, theFunction?: string, theMarker?: string,
+) {
   buffer.clear();
   if (theFunction) {
     buffer.log('// Loading', theFunction, '…');
@@ -124,7 +126,6 @@ const ASTview = () => {
   }
 
   // Theme Popup
-
   const selectTheme = (id?: string) => id && setTheme(id);
   const checkTheme =
     (th: { id: string }) => ({ checked: th.id === theme, ...th });
