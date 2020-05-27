@@ -22,6 +22,8 @@ export interface Order<A> {
   (x: A, y: A): number;
 }
 
+export function equal(_x: any, _y: any): 0 { return 0; }
+
 export type bignum = bigint | number;
 
 /** Non-NaN numbers and big-ints */
@@ -128,7 +130,7 @@ export function getKeys<T>(a: T): (keyof T)[] {
    Hence, `ByFields<{…, f: T, …}>` is `{…, f?: Order<T>, …}`.
    See [[fields]] comparison function.
  */
-type ByFields<A> = {
+export type ByFields<A> = {
   [P in keyof A]?: Order<A[P]>;
 }
 
@@ -137,7 +139,7 @@ type ByFields<A> = {
    Hence, `ByAllFields<{…, f: T, …}>` is `{…, f: Order<T>, …}`.
    See [[fieldsComplete]] comparison function.
 */
-type ByAllFields<A> = {
+export type ByAllFields<A> = {
   [P in keyof A]: Order<A[P]>;
 }
 
