@@ -19,7 +19,6 @@ import {
   Column as VColumn,
   TableHeaderRowProps,
   TableHeaderProps,
-  TableCellProps,
   TableCellDataGetter,
   TableCellRenderer,
 } from 'react-virtualized';
@@ -139,67 +138,6 @@ interface ColumnData {
   contextMenu: () => void;
   headerRef: divRef;
 };
-
-// --------------------------------------------------------------------------
-// --- Header Renderer
-// --------------------------------------------------------------------------
-
-const headerIcon = (icon?: string) => (
-  icon &&
-  (<div className='dome-xTable-header-icon'>
-    <SVG id={icon} />
-  </div>)
-);
-
-const headerLabel = (label?: string) => (
-  label &&
-  (<label className='dome-xTable-header-label dome-text-label'>
-    {label}
-  </label>)
-);
-
-const makeSorter = (id: string) => (
-  <div className='dome-xTable-header-sorter'>
-    <SVG id={id} size={8} />
-  </div>
-);
-
-const sorterASC = makeSorter('ANGLE.UP');
-const sorterDESC = makeSorter('ANGLE.DOWN');
-
-function headerRowRenderer(props: TableHeaderRowProps) {
-  return (
-    <div
-      role="row"
-      className={props.className}
-      style={props.style}
-    >
-      {props.columns}
-    </div>
-  );
-}
-
-function headerRenderer(props: TableHeaderProps) {
-  const { sortBy, sortDirection, dataKey } = props;
-  const data: ColumnData = props.columnData;
-  const { icon, label, title, headerRef, contextMenu } = data;
-  const sorter =
-    dataKey === sortBy
-      ? (sortDirection === SortDirection.ASC ? sorterASC : sorterDESC)
-      : undefined;
-  return (
-    <div
-      className='dome-xTable-header'
-      title={title}
-      ref={headerRef}
-      onContextMenu={contextMenu}
-    >
-      {headerIcon(icon)}
-      {headerLabel(label)}
-      {sorter}
-    </div>
-  );
-}
 
 // --------------------------------------------------------------------------
 // --- Column Utilities
@@ -355,6 +293,154 @@ export function Column<Row, Data>(props: ColumnProps<Row, Data>) {
   const context = React.useContext(ColumnContext);
   React.useEffect(() => context && context.useColumn(props));
   return null;
+}
+
+// --------------------------------------------------------------------------
+// --- Virtualized Column
+// --------------------------------------------------------------------------
+
+function makeDataGetter(
+  getter: ((row: any, dataKey: string) => any),
+  dataKey: string,
+): TableCellDataGetter {
+  return (({ rowData }) => getter(rowData, dataKey));
+}
+
+function makeDataRenderer(
+  render: ((data: any) => React.ReactNode)
+): TableCellRenderer {
+  return (({ cellData }) => render(cellData));
+}
+
+function makeColumn<Row>(
+  state: TableState<Row>,
+  props: ColProps<Row>,
+  forceFill: boolean,
+) {
+  const { id } = props;
+  const align = { textAlign: props.align };
+  const dataKey = props.dataKey ?? id;
+  const columnData: ColumnData = {
+    icon: props.icon,
+    label: props.label,
+    title: props.title,
+    contextMenu: state.contextMenu,
+    headerRef: state.getRef(id),
+  };
+  const width = state.resize.get(id) || props.width || 60;
+  const flexGrow = (forceFill || props.fill) ? 1 : 0;
+  const sorting = state.sorting;
+  const disableSort = props.disableSort || !sorting || !sorting.hasOrdering(dataKey);
+  let getter: TableCellDataGetter;
+  {
+    const g = state.getter.get(id);
+    if (g) getter = g; else {
+      const gc = props.getter ?? ((row: any) => row[dataKey]);
+      getter = makeDataGetter(gc, dataKey);
+      state.getter.set(id, getter);
+    }
+  }
+  let render: TableCellRenderer;
+  {
+    const r = state.render.get(id);
+    if (r) render = r; else {
+      const rc = props.render ?? (state.fields as any)[dataKey];
+      render = makeDataRenderer(rc ?? defaultRenderer);
+      state.render.set(id, render);
+    }
+  }
+  return (
+    <VColumn
+      key={id}
+      width={width}
+      flexGrow={flexGrow}
+      dataKey={dataKey}
+      columnData={columnData}
+      headerRenderer={headerRenderer}
+      cellDataGetter={getter}
+      cellRenderer={render}
+      headerStyle={align}
+      disableSort={disableSort}
+      style={align}
+    />
+  );
+};
+
+function makeColumns<Row>(state: TableState<Row>) {
+  const cols: Cprops[] = [];
+  let hasFill = false;
+  let lastExt: undefined | Cprops;
+  state.getRegistry().forEach((col) => {
+    if (col && isVisible(state.visible, col)) {
+      cols.push(col);
+      if (col.fill) hasFill = true;
+      else if (!col.fixed) lastExt = col;
+    }
+  });
+  const n = cols.length;
+  if (0 < n && !hasFill && !lastExt) lastExt = cols[n - 1];
+  return cols.map((col) => makeColumn(state, col, col === lastExt));
+}
+
+// --------------------------------------------------------------------------
+// --- Header Renderer
+// --------------------------------------------------------------------------
+
+const headerIcon = (icon?: string) => (
+  icon &&
+  (<div className='dome-xTable-header-icon'>
+    <SVG id={icon} />
+  </div>)
+);
+
+const headerLabel = (label?: string) => (
+  label &&
+  (<label className='dome-xTable-header-label dome-text-label'>
+    {label}
+  </label>)
+);
+
+const makeSorter = (id: string) => (
+  <div className='dome-xTable-header-sorter'>
+    <SVG id={id} size={8} />
+  </div>
+);
+
+const sorterASC = makeSorter('ANGLE.UP');
+const sorterDESC = makeSorter('ANGLE.DOWN');
+
+function headerRowRenderer(props: TableHeaderRowProps) {
+  return (
+    <div
+      role="row"
+      className={props.className}
+      style={props.style}
+    >
+      {props.columns}
+    </div>
+  );
+}
+
+function headerRenderer(props: TableHeaderProps) {
+  const { sortBy, sortDirection, dataKey } = props;
+  const data: ColumnData = props.columnData;
+  const { icon, label, title, headerRef, contextMenu } = data;
+  const sorter =
+    dataKey === sortBy
+      ? (sortDirection === SortDirection.ASC ? sorterASC : sorterDESC)
+      : undefined;
+  return (
+    <div
+      className='dome-xTable-header'
+      title={title}
+      ref={headerRef}
+      onContextMenu={contextMenu}
+    >
+      {headerIcon(icon)}
+      {headerLabel(label)}
+      {sorter}
+    </div>
+  );
 }
 
 // --------------------------------------------------------------------------
