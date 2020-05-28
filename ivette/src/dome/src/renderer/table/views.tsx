@@ -444,3 +444,102 @@ function headerRenderer(props: TableHeaderProps) {
 }
 
 // --------------------------------------------------------------------------
+// --- Table Rows
+// --------------------------------------------------------------------------
+
+const rowClassName =
+  (selected?: number) =>
+    ({ index }: { index: number }) =>
+      (selected === index ? 'dome-color-selected' :
+        (index & 1 ? 'dome-xTable-even' : 'dome-xTable-odd'));
+
+// --------------------------------------------------------------------------
+// --- Column Resizer
+// --------------------------------------------------------------------------
+
+const DRAGGING = 'dome-xTable-resizer dome-color-dragging';
+const DRAGZONE = 'dome-xTable-resizer dome-color-dragzone';
+
+interface ResizerProps {
+  id: number;
+  dragging: undefined | number;
+  left: string; // resized column-id on the left
+  right: string; // resized column-id on the right
+  offset: number; // drag-start offset
+  onStart: DraggableEventHandler;
+  onStop: DraggableEventHandler;
+  onDrag: (left: string, right: string, offset: number) => void;
+}
+
+const Resizer = (props: ResizerProps) => (
+  <DraggableCore
+    onStart={props.onStart}
+    onStop={props.onStop}
+    onDrag={(_elt, data) => props.onDrag(props.left, props.right, data.x - props.offset)}
+  >
+    <div
+      className={props.id === props.dragging ? DRAGGING : DRAGZONE}
+      style={{ left: props.offset - 2 }}
+    />
+  </DraggableCore>
+);
+
+const computeWidth = (elt: Element) => {
+  const parent = elt && elt.parentElement;
+  return parent && parent.getBoundingClientRect().width;
+};
+
+// --------------------------------------------------------------------------
+// --- Virtualized Table View
+// --------------------------------------------------------------------------
+
+// Must be kept in sync with table.css
+const CSS_HEADER_HEIGHT = 22;
+const CSS_ROW_HEIGHT = 20;
+
+function makeTable<Key, Row>(
+  size: Size,
+  props: TableProps<Key, Row>,
+  state: TableState<Row>,
+) {
+  const { width, height } = size;
+  const model = props.model;
+  const itemCount = model.getRowCount();
+  const tableHeight = CSS_HEADER_HEIGHT + CSS_ROW_HEIGHT * itemCount;
+  const smallHeight = itemCount > 0 && tableHeight < height;
+  const rowCount = (smallHeight ? itemCount + 1 : itemCount);
+  const selection = props.selection;
+  const selected = selection && model.getIndexOf(selection);
+  const resizers = null; // this.computeResizers(columns);
+  const columns = makeColumns(state);
+  return (
+    <React.Fragment>
+      <VTable
+        ref={state.tableRef}
+        key='table'
+        displayName='React-Virtualized-Table'
+        width={width}
+        height={height}
+        rowCount={rowCount}
+        noRowsRenderer={props.renderEmpty}
+        rowGetter={state.rowGetter}
+        rowClassName={rowClassName(selected)}
+        rowHeight={CSS_ROW_HEIGHT}
+        headerHeight={CSS_HEADER_HEIGHT}
+        headerRowRenderer={headerRowRenderer}
+        onRowsRendered={state.watchRange}
+        onRowClick={onSelection && this.selectRow}
+        sortBy={ordering && ordering.sortBy}
+        sortDirection={ordering && ordering.sortDirection}
+        sort={model.setOrdering.bind(model)}
+        scrollToIndex={scrollToIndex}
+        scrollToAlignment='auto'
+      >
+        {columns}
+      </VTable>
+      {resizers}
+    </React.Fragment>
+  );
+};
+
+// --------------------------------------------------------------------------
