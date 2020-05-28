@@ -319,8 +319,9 @@ extern int pthread_mutex_unlock(pthread_mutex_t *mutex);
 
 /*@
   requires valid_attr: \valid(attr);
-  assigns \result, *attr \from \nothing;
-  ensures success: \result == 0;
+  assigns *attr \from *attr;
+  assigns \result \from indirect:*attr;
+  ensures success_or_error: \result == 0 || \result == EINVAL;
  */
 extern int pthread_mutexattr_destroy(pthread_mutexattr_t *attr);
 
