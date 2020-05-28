@@ -172,8 +172,8 @@ struct
     | M_pointer -> L.Array(t_addr,t_addr)
     | M_f32 -> L.Array(t_addr,Cfloat.tau_of_float Ctypes.Float32)
     | M_f64 -> L.Array(t_addr,Cfloat.tau_of_float Ctypes.Float64)
-    | T_alloc -> L.Array(L.Int,L.Int)
-    | T_init -> L.Array(t_addr,L.Bool)
+    | T_alloc -> t_malloc
+    | T_init -> t_init
   let basename_of_chunk = name
   let is_framed _ = false
 end
@@ -529,6 +529,28 @@ module BASE = WpContext.Generator(Varinfo)
               l_cluster = cluster_globals () ;
             }
 
+      let initialization prefix x base =
+        match sizeof x with
+        | Some size when x.vformal || x.vglob ->
+            let a = Lang.freshvar ~basename:"init" t_init in
+            let m = e_var a in
+            let init_access =
+              if size = 1 then
+                p_bool (F.e_get m (a_addr base e_zero))
+              else
+                F.p_call p_is_init_r [ m ; a_addr base e_zero ; e_int size ]
+            in
+            let m_init = p_call p_cinits [m] in
+            let init_prop = p_forall [a] (p_imply m_init init_access) in
+            Definitions.define_lemma {
+              l_assumed = true ;
+              l_name = prefix ^ "_init" ; l_types = 0 ;
+              l_triggers = [] ; l_forall = [] ;
+              l_lemma = init_prop ;
+              l_cluster = cluster_globals () ;
+            }
+        | _ -> ()
+
       let generate x =
         let acs_rd = Cil.typeHasQualifier "const" x.vtype in
         let prefix =
@@ -550,6 +572,7 @@ module BASE = WpContext.Generator(Varinfo)
         RegisterBASE.define lfun x ;
         region prefix x base ;
         linked prefix x base ;
+        initialization prefix x base ;
         base
 
       let compile = Lang.local generate
@@ -967,15 +990,6 @@ struct
       F.e_fun f_havoc [fresh;current;loc;n]
     else fresh
 
-  let set_init obj loc ~length _chunk ~current =
-    let n = F.e_fact (length_of_object obj) length in
-    F.e_fun f_set_init [current;loc;n]
-
-  let monotonic_init s1 s2 =
-    let m1 = Sigma.value s1 T_init in
-    let m2 = Sigma.value s2 T_init in
-    F.p_call p_monotonic [m1; m2]
-
   let eqmem obj loc _chunk m1 m2 =
     F.p_call p_eqmem [m1;m2;loc;e_int (length_of_object obj)]
 
@@ -995,6 +1009,19 @@ struct
 
   let set_init_atom sigma l v = updated sigma T_init l v
   let is_init_atom sigma l = F.e_get (Sigma.value sigma T_init) l
+
+  let is_init_range sigma obj loc length =
+    let n = F.e_fact (length_of_object obj) length in
+    F.p_call p_is_init_r [ Sigma.value sigma T_init ; loc ; n ]
+
+  let set_init obj loc ~length _chunk ~current =
+    let n = F.e_fact (length_of_object obj) length in
+    F.e_fun f_set_init [current;loc;n]
+
+  let monotonic_init s1 s2 =
+    let m1 = Sigma.value s1 T_init in
+    let m2 = Sigma.value s2 T_init in
+    F.p_call p_monotonic [m1; m2]
 
 end
 
@@ -1063,6 +1090,7 @@ let frame sigma =
     else []
   in
   wellformed_frame p_linked T_alloc @
+  wellformed_frame p_cinits T_init @
   wellformed_frame p_sconst M_char @
   wellformed_frame p_framed M_pointer
 

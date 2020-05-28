@@ -74,8 +74,6 @@ let p_separated = Lang.extern_fp ~library "separated"
 let p_included = Lang.extern_fp ~library "included"
 let p_eqmem = Lang.extern_fp ~library "eqmem"
 let f_havoc = Lang.extern_f ~library ~typecheck:ty_fst_arg ~link:l_havoc "havoc"
-let f_set_init =
-  Lang.extern_f ~library ~typecheck:ty_fst_arg ~link:l_set_init "set_init"
 let p_monotonic = Lang.extern_fp ~library "monotonic_init"
 let f_region = Lang.extern_f ~library ~result:L.Int "region" (* base -> region *)
 let p_framed = Lang.extern_fp ~library "framed" (* m-pointer -> prop *)
@@ -83,6 +81,10 @@ let p_linked = Lang.extern_fp ~library "linked" (* allocation-table -> prop *)
 let p_sconst = Lang.extern_fp ~library "sconst" (* int-memory -> prop *)
 let p_addr_lt = Lang.extern_p ~library ~bool:"addr_lt_bool" ~prop:"addr_lt" ()
 let p_addr_le = Lang.extern_p ~library ~bool:"addr_le_bool" ~prop:"addr_le" ()
+let f_set_init =
+  Lang.extern_f ~library ~typecheck:ty_fst_arg ~link:l_set_init "set_init"
+let p_cinits = Lang.extern_fp ~library "cinits" (* initializaton-table -> prop *)
+let p_is_init_r = Lang.extern_fp ~library "is_init_range"
 
 let f_addr_of_int = Lang.extern_f
     ~category:L.Injection
@@ -98,6 +100,7 @@ let f_int_of_addr = Lang.extern_f
 
 let t_mem t = L.Array(t_addr,t)
 let t_malloc = L.Array(L.Int,L.Int)
+let t_init = L.Array(t_addr,L.Bool)
 
 let a_null = F.constant (e_fun f_null [])
 let a_base p = e_fun f_base [p]

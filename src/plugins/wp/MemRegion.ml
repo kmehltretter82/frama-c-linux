@@ -819,6 +819,7 @@ struct
     let _ = current in
     assert false
   let is_init_atom _ _ = assert false
+  let is_init_range _ _ _ _ = assert false
   let monotonic_init _ _ = assert false
 
 end

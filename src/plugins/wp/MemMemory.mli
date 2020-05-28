@@ -31,6 +31,7 @@ open Lang.F
 
 val t_addr : tau
 val t_malloc : tau (** allocation tables *)
+val t_init : tau (** initialization tables *)
 val t_mem : tau -> tau (** t_addr indexed array *)
 
 val a_null : term (** Null address. Same as [a_addr 0 0] *)
@@ -59,6 +60,8 @@ val p_addr_le : lfun
 val p_linked : lfun
 val p_framed : lfun
 val p_sconst : lfun
+val p_cinits : lfun
+val p_is_init_r : lfun
 val p_separated : lfun
 val p_included : lfun
 val p_valid_rd : lfun

@@ -80,6 +80,7 @@ sig
   val store_pointer : Sigma.t -> typ -> loc -> term -> Chunk.t * term
 
   val is_init_atom : Sigma.t -> loc -> term
+  val is_init_range : Sigma.t -> c_object -> loc -> term -> pred
   val set_init_atom : Sigma.t -> loc -> term -> Chunk.t * term
   val set_init : c_object -> loc -> length:term ->
     Chunk.t -> current:term -> term
@@ -317,6 +318,19 @@ struct
 
   let isinitrec = ref (fun _ _ _ -> assert false)
 
+  let initialization_lemma cluster name (sigma, obj, loc) (lfun, params) =
+    let high = p_call lfun (List.map F.e_var params) in
+    let low = M.is_init_range sigma obj loc e_one in
+    let lemma = p_equiv high low in
+    {
+      l_assumed = true ;
+      l_name = name ^ "_low" ; l_types = 0 ;
+      l_forall = F.p_vars lemma ;
+      l_triggers = [] ;
+      l_lemma = lemma ;
+      l_cluster = cluster ;
+    }
+
   module IS_INIT_COMP = WpContext.Generator(COMP_KEY)
       (struct
         let name = M.name ^ ".IS_INIT_COMP"
@@ -329,6 +343,8 @@ struct
           let obj = C_comp c in
           let loc = M.of_region_pointer r obj v in (* t_pointer -> loc *)
           let domain = M.init_footprint obj loc in
+          let cluster = cluster () in
+          (* Function Is_init *)
           let name =
             Format.asprintf "Is%s%a" (Lang.comp_init_id c) pp_rid r
           in
@@ -342,8 +358,11 @@ struct
             d_lfun = lfun ; d_types = 0 ;
             d_params = x :: xms ;
             d_definition = Predicate(Def , def) ;
-            d_cluster = cluster () ;
+            d_cluster = cluster ;
           } ;
+          (* Lemma for low-level view of the memory *)
+          Definitions.define_lemma
+            (initialization_lemma cluster name (sigma,obj,loc) (lfun,x::xms)) ;
           lfun , chunks
 
         let compile = Lang.local generate
@@ -371,12 +390,18 @@ struct
           let ofs = e_sum denv.index_offset in
           let vm = !isinitrec sigma obj_e (M.shift loc obj_e ofs) in
           let def = p_forall denv.index_var (p_hyps denv.index_range vm) in
+          let cluster = cluster () in
           Definitions.define_symbol {
             d_lfun = lfun ; d_types = 0 ;
             d_params = x :: denv.size_var @ xmem ;
             d_definition = Predicate (Def, def) ;
-            d_cluster = cluster () ;
+            d_cluster = cluster ;
           } ;
+          (* Lemma for low-level view of the memory *)
+          Definitions.define_lemma
+            (initialization_lemma cluster name
+               (sigma, obj_a, loc)
+               (lfun, x :: denv.size_var @ xmem)) ;
           lfun , chunks
 
         let compile = Lang.local generate
@@ -471,7 +496,7 @@ struct
   let stored seq obj loc value =
     match obj with
     | C_int _ | C_float _ | C_pointer _ ->
-        updated_atom seq obj loc value :: [ updated_init_atom seq loc e_true ]
+        [ updated_atom seq obj loc value ; updated_init_atom seq loc e_true ]
     | C_comp _ | C_array _ ->
         let set_value = Set(loadvalue seq.post obj loc, value) in
         set_value :: havoc seq obj loc @ set_init seq obj loc

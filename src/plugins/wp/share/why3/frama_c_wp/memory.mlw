@@ -69,8 +69,6 @@ theory Memory
 
   function havoc (m0 m1 : map addr 'a) (p:addr) (a:int) : map addr 'a
 
-  function set_init (m: map addr bool) (p:addr) (a:int) : map addr bool
-
   predicate monotonic_init(m1 m2 : map addr bool) =
     forall p: addr. m1[p] -> m2[p]
 
@@ -163,6 +161,15 @@ theory Memory
     forall a : int.
     (Map.([]) (havoc m0 m1 p a) (q)) =
       (if (separated q 1 p a) then (Map.([]) (m1) (q)) else (Map.([]) (m0) (q)))
+
+  (* Initialization memory *)
+
+  predicate cinits (map addr bool)
+
+  predicate is_init_range(m: map addr bool) (p: addr) (l: int) =
+    forall i : int. 0 <= i < l -> m[shift p i] = true
+
+  function set_init (m: map addr bool) (p:addr) (a:int) : map addr bool
 
   lemma set_init_access :
     forall m : map addr bool.

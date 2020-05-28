@@ -76,6 +76,7 @@ sig
   val store_pointer : Sigma.t -> typ -> loc -> term -> Chunk.t * term
 
   val is_init_atom : Sigma.t -> loc -> term
+  val is_init_range : Sigma.t -> c_object -> loc -> term -> pred
   val set_init_atom : Sigma.t -> loc -> term -> Chunk.t * term
   val set_init : c_object -> loc -> length:term ->
     Chunk.t -> current:term -> term
