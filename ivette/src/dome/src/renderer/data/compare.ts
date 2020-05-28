@@ -52,7 +52,7 @@ export function primitive(x: any, y: any) {
 /**
    Primitive comparison for numbers (NaN included).
  */
-export function number(x: number, y: number) {
+export function float(x: number, y: number) {
   const nx = Number.isNaN(x);
   const ny = Number.isNaN(y);
   if (nx && ny) return 0;
@@ -62,7 +62,6 @@ export function number(x: number, y: number) {
   if (x > y) return 1;
   return 0;
 }
-
 
 /**
    Alphabetic comparison for strings.
