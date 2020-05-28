@@ -156,6 +156,9 @@ let wkey_incompatible_types_call =
 let wkey_incompatible_pointer_types =
   register_warn_category "typing:incompatible-pointer-types"
 
+let wkey_inconsistent_specifier =
+  register_warn_category "typing:inconsistent-specifier"
+
 let wkey_int_conversion =
   register_warn_category "typing:int-conversion"
 

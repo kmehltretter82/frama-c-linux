@@ -34,7 +34,6 @@ let md = {
 	 wchar_t = "int";
 	 ptrdiff_t = "int";
          has__builtin_va_list = true;
-         __thread_is_keyword = false;
   }
 
 let () =

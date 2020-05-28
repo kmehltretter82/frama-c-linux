@@ -343,15 +343,6 @@ int main() {
 #endif
   }
 
-  // __thread_is_keyword
-  {
-#ifdef THREAD_IS_KEYWORD
-    printf("\t __thread_is_keyword = true;\n");
-#else
-    printf("\t __thread_is_keyword = false;\n");
-#endif
-  }
-
   // underscore_name
   {
 #ifdef UNDERSCORE_NAME

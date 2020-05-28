@@ -334,7 +334,7 @@ let in_ghost_block ?(battrs=[]) l =
 %token<Cabs.cabsloc> ENUM STRUCT TYPEDEF UNION
 %token<Cabs.cabsloc> SIGNED UNSIGNED LONG SHORT
 %token<Cabs.cabsloc> VOLATILE EXTERN STATIC CONST RESTRICT AUTO REGISTER
-%token<Cabs.cabsloc> THREAD
+%token<Cabs.cabsloc> THREAD THREAD_LOCAL
 %token<Cabs.cabsloc> GHOST
 
 %token<Cabs.cabsloc> SIZEOF ALIGNOF
@@ -1510,7 +1510,10 @@ attribute_nocv:
 |   DECLSPEC paren_attr_list_ne         { ("__declspec", $2), $1 }
 |   MSATTR                              { (fst $1, []), snd $1 }
                                         /* ISO 6.7.3 */
-|   THREAD                              { ("__thread",[]), $1 }
+|   THREAD                              { ("__thread", []), $1 }
+|   THREAD_LOCAL                        { ("__thread",
+                                           [make_expr (VARIABLE "c11")]),
+                                          $1 }
 ;
 
 attribute_nocv_list:

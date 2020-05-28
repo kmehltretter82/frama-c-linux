@@ -1912,7 +1912,6 @@ type mach = {
   little_endian: bool; (* whether the machine is little endian *)
   alignof_aligned: int (* Alignment of a type with aligned attribute *);
   has__builtin_va_list: bool (* Whether [__builtin_va_list] is a known type *);
-  __thread_is_keyword: bool (* Whether [__thread] is a keyword *);
   compiler: string;       (* Compiler being used. Currently recognized names
                              are 'gcc', 'msvc' and 'generic'. *)
   cpp_arch_flags: string list;  (* Architecture-specific flags to be given to
