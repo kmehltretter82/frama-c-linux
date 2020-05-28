@@ -74,14 +74,26 @@ endif
 UNAME := $(shell uname -s)
 ifeq ($(UNAME),Darwin)
   SED_UNBUFFERED:=sed
+ifneq (,$(wildcard /usr/bin/time))
 define time_with_output
   /usr/bin/time -p
 endef
 else
+define time_with_output
+  time
+endef
+endif
+else
   SED_UNBUFFERED:=sed --unbuffered
+ifneq (,$(wildcard /usr/bin/time))
 define time_with_output
   /usr/bin/time --format='user_time=%U\nmemory=%M' --output="$(1)"
 endef
+else
+define time_with_output
+  time
+endef
+endif
 endif
 
 # --- Utilities ---
