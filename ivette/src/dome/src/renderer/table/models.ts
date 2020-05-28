@@ -52,11 +52,24 @@ export interface Filter<Key, Row> {
 }
 
 export interface Filtering<Key, Row> {
-  setFiltering(fn?: Filter<Key, Row>): void;
+  setFilter(fn?: Filter<Key, Row>): void;
 }
 
 // --------------------------------------------------------------------------
-// --- Collection Model
+// --- Collection
+// --------------------------------------------------------------------------
+
+/** Convenient type for a collection of items. */
+export type Collection<A> = undefined | null | A | Collection<A>[];
+
+/** Iterator over collection. */
+export function forEach<A>(data: Collection<A>, fn: (elt: A) => void) {
+  if (Array.isArray(data)) data.forEach((e) => forEach(e, fn));
+  else if (data !== undefined && data !== null) fn(data);
+}
+
+// --------------------------------------------------------------------------
+// --- Abstract Model
 // --------------------------------------------------------------------------
 
 /**

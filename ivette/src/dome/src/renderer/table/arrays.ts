@@ -9,7 +9,9 @@
 
 import * as Compare from 'dome/data/compare';
 import type { ByFields, Order } from 'dome/data/compare';
-import { Ordering, Sorting, Filter, Filtering, Model } from './models';
+import {
+  Ordering, Sorting, Filter, Filtering, Model, Collection, forEach
+} from './models';
 
 // --------------------------------------------------------------------------
 // --- Sorting Utilities
@@ -33,8 +35,15 @@ function orderBy<K, R>(fields: ByFields<R>, ord: Ordering): SORT<K, R> {
   return Compare.direction(Compare.sequence(byField, byIndex), rv);
 }
 
-function orderByRing<K, R>(fields: ByFields<R>, ring: Ordering[]): SORT<K, R> {
-  return Compare.sequence(...ring.map((ord) => orderBy(fields, ord)));
+function orderByRing<K, R>(
+  natural: undefined | Order<R>,
+  compare: undefined | ByFields<R>,
+  ring: Ordering[],
+): SORT<K, R> {
+  type D = PACK<K, R>;
+  const byRing = compare ? ring.map((ord) => orderBy(compare, ord)) : [];
+  const byData = natural ? ((x: D, y: D) => natural(x.row, y.row)) : undefined;
+  return Compare.sequence(...byRing, byData);
 }
 
 // --------------------------------------------------------------------------
@@ -45,35 +54,44 @@ type INDEX<K, R> = Map<K, PACK<K, R>>;
 type TABLE<K, R> = PACK<K, R>[];
 
 // --------------------------------------------------------------------------
-// --- Collection Utilities
-// --------------------------------------------------------------------------
-
-export type Collection<A> = undefined | A | A[];
-
-// --------------------------------------------------------------------------
 // --- Array Model
 // --------------------------------------------------------------------------
 
-export class ArrayModel<Key, Row>
+export class MapModel<Key, Row>
   extends Model<Key, Row>
   implements Sorting, Filtering<Key, Row>
 {
 
-  private order: ByFields<Row>;
+  // Hold raw data (unsorted, unfiltered)
   private index: INDEX<Key, Row> = new Map();
-  private table: TABLE<Key, Row> | undefined;
-  private ring: Ordering[] = [];
-  private filter: Filter<Key, Row> | undefined;
 
-  constructor(order?: ByFields<Row>) {
-    super();
-    this.order = order ?? {};
+  // Hold filtered & sorted data (computed on demand)
+  private table?: TABLE<Key, Row>;
+
+  // Filtering function
+  private filter?: Filter<Key, Row>;
+
+  // Natural ordering (if any)
+  private natural?: Order<Row>;
+
+  // Sortable columns and associated ordering (if any)
+  private columns?: ByFields<Row>;
+
+  // Comparison Ring
+  private ring: Ordering[] = [];
+
+  // Consolidated order (computed on demand)
+  private order?: SORT<Key, Row>;
+
+  // Lazily compute order
+  protected sorter(): SORT<Key, Row> {
+    let current = this.order;
+    if (current) return current;
+    current = this.order = orderByRing(this.natural, this.columns, this.ring);
+    return current;
   }
 
-  // Compute order
-  protected ordering(): SORT<Key, Row> { return orderByRing(this.order, this.ring); }
-
-  // Lazy rebuild
+  // Lazily compute table
   protected rebuild(): TABLE<Key, Row> {
     const current = this.table;
     if (current) return current;
@@ -83,8 +101,7 @@ export class ArrayModel<Key, Row>
       const ok = phi ? phi(packed.key, packed.row) : true;
       packed.index = ok ? table.push(packed) - 1 : undefined;
     });
-    if (0 < this.ring.length)
-      table.sort(this.ordering());
+    table.sort(this.sorter());
     return table;
   }
 
@@ -114,8 +131,30 @@ export class ArrayModel<Key, Row>
   // --- Ordering
   // --------------------------------------------------------------------------
 
-  setOrdering(ord?: Ordering) {
+  /** Sets comparison functions for (sortable) columns.
+      This makes the associated columns sortable in views.
+      Finally triggers a reload. */
+  setCompare(columns?: ByFields<Row>) {
+    this.columns = columns;
+    this.reload();
+  }
+
+  /** Sets natural ordering function.
+      This ordering is always used to finally refine
+      column ordering, if any.
+      When `undefined`, the natural order follows data insertion order.
+      Finally triggers a reload. */
+  setNaturalOrder(order?: Order<Row>) {
+    this.natural = order;
+    this.reload();
+  }
+
+  /** Reorder rows with the provided column and direction.
+      Previous ordering is kept and refined by the new one.
+      Use `undefined` or `null` to reset the natural ordering. */
+  setOrdering(ord?: undefined | null | Ordering) {
     if (ord) {
+      const ring = this.ring;
       const cur = this.ring[0];
       const fd = ord.sortBy;
       if (
@@ -123,9 +162,9 @@ export class ArrayModel<Key, Row>
         cur.sortBy !== fd ||
         cur.sortDirection !== ord.sortDirection
       ) {
-        const rg = this.ring.filter((o) => o.sortBy !== fd);
-        rg.unshift(ord);
-        this.ring = rg;
+        const newRing = ring.filter((o) => o.sortBy !== fd);
+        newRing.unshift(ord);
+        this.ring = newRing;
         this.reload();
       }
     } else {
@@ -137,14 +176,15 @@ export class ArrayModel<Key, Row>
   }
 
   hasOrdering(column: string) {
-    return this.order[column as keyof Row] !== undefined;
+    const columns = this.columns as any;
+    return columns[column] !== undefined;
   }
 
   // --------------------------------------------------------------------------
   // --- Filtering
   // --------------------------------------------------------------------------
 
-  setFiltering(fn?: Filter<Key, Row>) {
+  setFilter(fn?: Filter<Key, Row>) {
     const phi = this.filter;
     if (phi !== fn) {
       this.filter = fn;
@@ -158,8 +198,9 @@ export class ArrayModel<Key, Row>
 
   /** Trigger a complete reload of the table. */
   reload() {
-    if (!this.table) {
+    if (!this.table || !this.order) {
       this.table = undefined;
+      this.order = undefined;
       super.reload();
     }
   }
@@ -188,7 +229,7 @@ export class ArrayModel<Key, Row>
     // Case where element was not displayed and will still not be
     if (!old_ok) return false;
     // Detecting if ordering is preserved
-    const order = this.ordering();
+    const order = this.sorter();
     const prev = k - 1;
     if (0 <= prev && order(pack, current[prev]) < 0) return true;
     const next = k + 1;
@@ -293,6 +334,51 @@ export class ArrayModel<Key, Row>
     } else {
       this.index.delete(key);
     }
+  }
+
+  /** Returns the data associated with a key (if any). */
+  getData(key: Key): Row | undefined {
+    return this.index.get(key)?.row;
+  }
+
+}
+
+// --------------------------------------------------------------------------
+// --- Compact Array Model
+// --------------------------------------------------------------------------
+
+export class ArrayModel<Row> extends MapModel<string, Row> {
+
+  private key: keyof Row
+
+  constructor(key: keyof Row) {
+    super();
+    this.key = key;
+  }
+
+  /** Returns the key of data. */
+  getKey(data: Row): string { return (data as any)[this.key]; }
+
+  /** Adds a collection of data. Finally triggers a reload. */
+  add(data: Collection<Row>) {
+    forEach(data, (row: Row) => this.setData(this.getKey(row), row));
+    this.reload();
+  }
+
+  /** Replaces all previous entries with new ones. Finally triggers a reload. */
+  replace(data: Collection<Row>) {
+    this.removeAllData();
+    this.add(data);
+  }
+
+  /** Removes a colllection of data, identified by keys or (key of) rows.
+      Finally triggers a reload. */
+  remove(data: Collection<string | Row>) {
+    forEach(data, e => {
+      const k = typeof e === 'string' ? e : this.getKey(e);
+      this.removeData(k);
+    });
+    this.reload();
   }
 
 }
