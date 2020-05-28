@@ -16,7 +16,7 @@ Let a_3 = havoc(Init_undef_0, m, a_1, 10).
 Assume {
   Type: is_sint32(i) /\ is_sint32(i_1).
   (* Heap *)
-  Type: region(s.base) <= 0.
+  Type: (region(s.base) <= 0) /\ cinits(Init_0).
   (* Loop assigns ... *)
   Have: monotonic_init(m, a_2).
   (* Invariant *)
@@ -53,6 +53,148 @@ Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
+  Function assigned_glob
+------------------------------------------------------------
+
+Goal Check 'CHECK' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 126):
+Assume { (* Heap *) Type: cinits(Init_0). }
+Prove: IsInit_S1_S(global(G_glob_82), Init_0).
+
+------------------------------------------------------------
+
+Goal Preservation of Invariant 'CHECK' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 129):
+Let m = Init_0[shiftfield_F1_S_i(pg_0) <- true].
+Let a = shiftfield_F1_S_a(pg_0).
+Let a_1 = havoc(Init_undef_0, m, shift_sint32(a, 0), 10).
+Assume {
+  Type: is_sint32(i) /\ is_sint32(1 + i).
+  (* Heap *)
+  Type: (region(pg_0.base) <= 0) /\ cinits(Init_0).
+  (* Loop assigns 'CHECK' *)
+  Have: monotonic_init(m, a_1).
+  (* Invariant 'CHECK' *)
+  Have: (0 <= i) /\ (i <= 10) /\
+      (forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+       (a_1[shift_sint32(a, i_1)]=true)))).
+  (* Then *)
+  Have: i <= 9.
+}
+Prove: ((-1) <= i) /\
+    (forall i_1 : Z. ((i_1 <= i) -> ((0 <= i_1) ->
+     (a_1[shift_sint32(a, i) <- true][shift_sint32(a, i_1)]=true)))).
+
+------------------------------------------------------------
+
+Goal Establishment of Invariant 'CHECK' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 129):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'CHECK' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 142):
+Let m = Init_0[shiftfield_F1_S_i(pg_0) <- true].
+Let a = shiftfield_F1_S_a(pg_0).
+Let a_1 = havoc(Init_undef_1, m, shift_sint32(a, 0), 10).
+Let a_2 = havoc(Init_undef_0, m, pg_0, 11).
+Assume {
+  Type: is_sint32(i) /\ is_sint32(i_1).
+  (* Heap *)
+  Type: (region(pg_0.base) <= 0) /\ cinits(Init_0).
+  (* Loop assigns 'CHECK' *)
+  Have: monotonic_init(m, a_1).
+  (* Invariant 'CHECK' *)
+  Have: (0 <= i) /\ (i <= 10) /\
+      (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+       (a_1[shift_sint32(a, i_2)]=true)))).
+  (* Else *)
+  Have: 10 <= i.
+  (* Loop assigns 'CHECK' *)
+  Have: monotonic_init(a_1, a_2).
+  (* Invariant *)
+  Have: (0 <= i_1) /\ (i_1 <= 10).
+  (* Else *)
+  Have: 10 <= i_1.
+}
+Prove: IsInit_S1_S(pg_0, a_2).
+
+------------------------------------------------------------
+
+Goal Check 'CHECK' (file tests/wp_acsl/assigned_initialized_memtyped.i, line 143):
+Let m = Init_0[shiftfield_F1_S_i(pg_0) <- true].
+Let a = shiftfield_F1_S_a(pg_0).
+Let a_1 = havoc(Init_undef_1, m, shift_sint32(a, 0), 10).
+Let a_2 = havoc(Init_undef_0, m, pg_0, 11).
+Assume {
+  Type: is_sint32(i) /\ is_sint32(i_1).
+  (* Heap *)
+  Type: (region(pg_0.base) <= 0) /\ cinits(Init_0).
+  (* Loop assigns 'CHECK' *)
+  Have: monotonic_init(m, a_1).
+  (* Invariant 'CHECK' *)
+  Have: (0 <= i) /\ (i <= 10) /\
+      (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+       (a_1[shift_sint32(a, i_2)]=true)))).
+  (* Else *)
+  Have: 10 <= i.
+  (* Loop assigns 'CHECK' *)
+  Have: monotonic_init(a_1, a_2).
+  (* Invariant *)
+  Have: (0 <= i_1) /\ (i_1 <= 10).
+  (* Else *)
+  Have: 10 <= i_1.
+}
+Prove: IsInit_S1_S(global(G_glob_82), a_2).
+
+------------------------------------------------------------
+
+Goal Loop assigns 'CHECK' (1/3):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Loop assigns 'CHECK' (2/3):
+Effect at line 132
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Loop assigns 'CHECK' (3/3):
+Effect at line 132
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Loop assigns 'CHECK' (1/3):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Loop assigns 'CHECK' (2/3):
+Effect at line 138
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Loop assigns 'CHECK' (3/3):
+Effect at line 139
+Assume {
+  Type: is_sint32(i_1) /\ is_sint32(i).
+  (* Heap *)
+  Type: (region(pg_0.base) <= 0) /\ linked(Malloc_0).
+  (* Goal *)
+  When: !invalid(Malloc_0, shift_sint32(shiftfield_F1_S_a(pg_0), i), 1).
+  (* Invariant 'CHECK' *)
+  Have: (0 <= i_1) /\ (i_1 <= 10).
+  (* Else *)
+  Have: 10 <= i_1.
+  (* Invariant *)
+  Have: (0 <= i) /\ (i <= 10).
+  (* Then *)
+  Have: i <= 9.
+}
+Prove: (-1) <= i.
+
+------------------------------------------------------------
+------------------------------------------------------------
   Function comp
 ------------------------------------------------------------
 
@@ -64,7 +206,7 @@ Let a_2 = havoc(Init_undef_0, m, s, 11).
 Assume {
   Type: is_sint32(i) /\ is_sint32(i_1).
   (* Heap *)
-  Type: region(s.base) <= 0.
+  Type: (region(s.base) <= 0) /\ cinits(Init_0).
   (* Loop assigns ... *)
   Have: monotonic_init(m, a_1).
   (* Invariant *)
@@ -128,7 +270,7 @@ Let a_3 = havoc(Init_undef_0, m, a_2, 10).
 Assume {
   Type: is_sint32(i) /\ is_sint32(i_1).
   (* Heap *)
-  Type: region(s.base) <= 0.
+  Type: (region(s.base) <= 0) /\ cinits(Init_1).
   (* Loop assigns ... *)
   Have: monotonic_init(m, a_3).
   (* Invariant *)
@@ -218,7 +360,7 @@ Let a_3 = a_2[a <- true].
 Assume {
   Type: is_sint32(i) /\ is_sint32(i_1).
   (* Heap *)
-  Type: region(s.base) <= 0.
+  Type: (region(s.base) <= 0) /\ cinits(Init_0).
   (* Loop assigns ... *)
   Have: monotonic_init(m, a_2).
   (* Invariant *)
@@ -259,7 +401,7 @@ Let a_3 = a_1[a_2 <- i | Init_undef_0[a_2]].
 Assume {
   Type: is_sint32(i_1) /\ is_sint32(i_2).
   (* Heap *)
-  Type: region(s.base) <= 0.
+  Type: (region(s.base) <= 0) /\ cinits(Init_0).
   (* Loop assigns ... *)
   Have: monotonic_init(m, a_1).
   (* Invariant *)
@@ -304,7 +446,7 @@ Let a_1 = havoc(Init_undef_0, m, shift_sint32(a, 0), 10).
 Assume {
   Type: is_sint32(i) /\ is_sint32(1 + i).
   (* Heap *)
-  Type: region(s.base) <= 0.
+  Type: (region(s.base) <= 0) /\ cinits(Init_0).
   (* Loop assigns 'CHECK' *)
   Have: monotonic_init(m, a_1).
   (* Invariant 'CHECK' *)
@@ -332,7 +474,7 @@ Let a_1 = havoc(Init_undef_0, m, shift_sint32(a, 0), 10).
 Assume {
   Type: is_sint32(i).
   (* Heap *)
-  Type: region(s.base) <= 0.
+  Type: (region(s.base) <= 0) /\ cinits(Init_0).
   (* Loop assigns 'CHECK' *)
   Have: monotonic_init(m, a_1).
   (* Invariant 'CHECK' *)
@@ -374,7 +516,7 @@ Let a_2 = havoc(Init_undef_0, a_1, shift_sint32(a, 1), 4).
 Assume {
   Type: is_sint32(i) /\ is_sint32(i_1).
   (* Heap *)
-  Type: region(s.base) <= 0.
+  Type: (region(s.base) <= 0) /\ cinits(Init_0).
   (* Loop assigns ... *)
   Have: monotonic_init(m, a_1).
   (* Invariant *)

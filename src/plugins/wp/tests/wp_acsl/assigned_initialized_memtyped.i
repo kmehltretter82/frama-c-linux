@@ -117,3 +117,28 @@ void comp(struct S* s){
   }
   //@ check CHECK: \initialized(s);
 }
+
+struct S glob ;
+struct S * pg = &glob ;
+struct S * const cg = &glob ;
+
+void assigned_glob(void){
+  //@ check CHECK: \initialized(cg);
+  pg->i = 0;
+  /*@
+    loop invariant CHECK: 0 <= i <= 10 && \initialized(&pg->a[0 .. i-1]);
+    loop assigns CHECK: i, pg->a[0 .. 9];
+  */
+  for(int i = 0; i < 10; ++i) pg->a[i] = 0;
+
+  /*@
+    loop invariant 0 <= i <= 10 ;
+    loop assigns CHECK: i, *pg;
+  */
+  for(int i = 0; i < 10; ++i){
+    pg->a[i] = 1 ;
+    pg->i++;
+  }
+  //@ check CHECK: \initialized(pg);
+  //@ check CHECK: \initialized(cg);
+}

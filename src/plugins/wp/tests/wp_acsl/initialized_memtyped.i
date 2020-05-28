@@ -49,3 +49,36 @@ void test(int* x, int (*a)[2], struct C* c){
   c->a[9] = 1 ;
   //@ check provable: \initialized(c);
 }
+
+// MemTyped global init
+
+int gx ;
+int * px = &gx ;
+int * const cx = &gx ;
+
+/*@
+	ensures provable: \initialized(cx);
+	ensures unknown: \initialized(px);
+*/
+void glob_var(void){
+
+}
+
+int ga[5] ;
+int * pga = ga ;
+int * const cga = ga ;
+
+/*@
+	ensures provable: \initialized(&cga[0..4]);
+	ensures unknown: \initialized(&pga[0..4]);
+*/
+void glob_arr(void)
+{
+
+}
+
+void formal(int x)
+{
+	int * p = &x ;
+	//@ assert provable: \initialized(p);
+}

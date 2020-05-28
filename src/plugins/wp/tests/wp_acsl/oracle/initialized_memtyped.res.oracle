@@ -4,23 +4,72 @@
 [wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
+  Function formal
+------------------------------------------------------------
+
+Goal Assertion 'provable' (file tests/wp_acsl/initialized_memtyped.i, line 83):
+Assume { (* Heap *) Type: cinits(Init_0). }
+Prove: (Init_0[global(P_x_59)]=true).
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function glob_arr
+------------------------------------------------------------
+
+Goal Post-condition 'provable' in 'glob_arr':
+Assume {
+  (* Heap *)
+  Type: cinits(Init_0).
+  (* Goal *)
+  When: (0 <= i) /\ (i <= 4).
+}
+Prove: (Init_0[shift_sint32(global(G_ga_47), i)]=true).
+
+------------------------------------------------------------
+
+Goal Post-condition 'unknown' in 'glob_arr':
+Assume {
+  (* Heap *)
+  Type: (region(pga_0.base) <= 0) /\ cinits(Init_0).
+  (* Goal *)
+  When: (0 <= i) /\ (i <= 4).
+}
+Prove: (Init_0[shift_sint32(pga_0, i)]=true).
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function glob_var
+------------------------------------------------------------
+
+Goal Post-condition 'provable' in 'glob_var':
+Assume { (* Heap *) Type: cinits(Init_0). }
+Prove: (Init_0[global(G_gx_41)]=true).
+
+------------------------------------------------------------
+
+Goal Post-condition 'unknown' in 'glob_var':
+Assume { (* Heap *) Type: (region(px_0.base) <= 0) /\ cinits(Init_0). }
+Prove: (Init_0[px_0]=true).
+
+------------------------------------------------------------
+------------------------------------------------------------
   Function test
 ------------------------------------------------------------
 
 Goal Check 'unknown' (file tests/wp_acsl/initialized_memtyped.i, line 12):
-Assume { (* Heap *) Type: region(x.base) <= 0. }
+Assume { (* Heap *) Type: (region(x.base) <= 0) /\ cinits(Init_0). }
 Prove: (Init_0[x]=true).
 
 ------------------------------------------------------------
 
 Goal Check 'unknown' (file tests/wp_acsl/initialized_memtyped.i, line 13):
-Assume { (* Heap *) Type: region(a.base) <= 0. }
+Assume { (* Heap *) Type: (region(a.base) <= 0) /\ cinits(Init_0). }
 Prove: IsInitArray1_int(a, 2, Init_0).
 
 ------------------------------------------------------------
 
 Goal Check 'unknown' (file tests/wp_acsl/initialized_memtyped.i, line 14):
-Assume { (* Heap *) Type: region(c.base) <= 0. }
+Assume { (* Heap *) Type: (region(c.base) <= 0) /\ cinits(Init_0). }
 Prove: IsInit_S2_C(c, Init_0).
 
 ------------------------------------------------------------
@@ -36,13 +85,19 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Check 'unknown' (file tests/wp_acsl/initialized_memtyped.i, line 21):
-Assume { (* Heap *) Type: (region(a.base) <= 0) /\ (region(x.base) <= 0). }
+Assume {
+  (* Heap *)
+  Type: (region(a.base) <= 0) /\ (region(x.base) <= 0) /\ cinits(Init_0).
+}
 Prove: (Init_0[x <- true][shift_sint32(a, 1)]=true).
 
 ------------------------------------------------------------
 
 Goal Check 'unknown' (file tests/wp_acsl/initialized_memtyped.i, line 22):
-Assume { (* Heap *) Type: (region(a.base) <= 0) /\ (region(x.base) <= 0). }
+Assume {
+  (* Heap *)
+  Type: (region(a.base) <= 0) /\ (region(x.base) <= 0) /\ cinits(Init_0).
+}
 Prove: IsInitArray1_int(a, 2, Init_0[x <- true][shift_sint32(a, 0) <- true]).
 
 ------------------------------------------------------------
@@ -58,7 +113,10 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Check 'provable' (file tests/wp_acsl/initialized_memtyped.i, line 27):
-Assume { (* Heap *) Type: (region(a.base) <= 0) /\ (region(x.base) <= 0). }
+Assume {
+  (* Heap *)
+  Type: (region(a.base) <= 0) /\ (region(x.base) <= 0) /\ cinits(Init_0).
+}
 Prove: IsInitArray1_int(a, 2,
          Init_0[x <- true][shift_sint32(a, 0) <- true][shift_sint32(a, 1)
            <- true]).
@@ -74,7 +132,7 @@ Goal Check 'unknown' (file tests/wp_acsl/initialized_memtyped.i, line 31):
 Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(c.base) <= 0) /\
-      (region(x.base) <= 0).
+      (region(x.base) <= 0) /\ cinits(Init_0).
 }
 Prove: IsInit_S1_S(shiftfield_F2_C_s(c),
          Init_0[x <- true][shift_sint32(a, 0) <- true][shift_sint32(a, 1)
@@ -86,7 +144,7 @@ Goal Check 'unknown' (file tests/wp_acsl/initialized_memtyped.i, line 32):
 Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(c.base) <= 0) /\
-      (region(x.base) <= 0).
+      (region(x.base) <= 0) /\ cinits(Init_0).
 }
 Prove: IsInitArray1_int(shiftfield_F2_C_a(c), 10,
          Init_0[x <- true][shift_sint32(a, 0) <- true][shift_sint32(a, 1)
@@ -98,7 +156,7 @@ Goal Check 'unknown' (file tests/wp_acsl/initialized_memtyped.i, line 33):
 Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(c.base) <= 0) /\
-      (region(x.base) <= 0).
+      (region(x.base) <= 0) /\ cinits(Init_0).
 }
 Prove: IsInit_S2_C(c,
          Init_0[x <- true][shift_sint32(a, 0) <- true][shift_sint32(a, 1)
@@ -115,7 +173,7 @@ Goal Check 'unknown' (file tests/wp_acsl/initialized_memtyped.i, line 37):
 Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(c.base) <= 0) /\
-      (region(x.base) <= 0).
+      (region(x.base) <= 0) /\ cinits(Init_0).
 }
 Prove: (Init_0[x <- true][shift_sint32(a, 0) <- true][shift_sint32(a, 1)
           <- true][shiftfield_F1_S_y(shiftfield_F2_C_s(c))]=true).
@@ -127,7 +185,7 @@ Let a_1 = shiftfield_F2_C_s(c).
 Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(c.base) <= 0) /\
-      (region(x.base) <= 0).
+      (region(x.base) <= 0) /\ cinits(Init_0).
 }
 Prove: IsInit_S1_S(a_1,
          Init_0[x <- true][shift_sint32(a, 0) <- true][shift_sint32(a, 1)
@@ -140,7 +198,7 @@ Goal Check 'unknown' (file tests/wp_acsl/initialized_memtyped.i, line 39):
 Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(c.base) <= 0) /\
-      (region(x.base) <= 0).
+      (region(x.base) <= 0) /\ cinits(Init_0).
 }
 Prove: IsInit_S2_C(c,
          Init_0[x <- true][shift_sint32(a, 0) <- true][shift_sint32(a, 1)
@@ -154,7 +212,7 @@ Let a_1 = shiftfield_F2_C_s(c).
 Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(c.base) <= 0) /\
-      (region(x.base) <= 0).
+      (region(x.base) <= 0) /\ cinits(Init_0).
 }
 Prove: IsInit_S1_S(a_1,
          Init_0[x <- true][shift_sint32(a, 0) <- true][shift_sint32(a, 1)
@@ -168,7 +226,7 @@ Let a_1 = shiftfield_F2_C_s(c).
 Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(c.base) <= 0) /\
-      (region(x.base) <= 0).
+      (region(x.base) <= 0) /\ cinits(Init_0).
 }
 Prove: IsInit_S2_C(c,
          Init_0[x <- true][shift_sint32(a, 0) <- true][shift_sint32(a, 1)
@@ -183,7 +241,7 @@ Let a_2 = shiftfield_F2_C_a(c).
 Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(c.base) <= 0) /\
-      (region(x.base) <= 0).
+      (region(x.base) <= 0) /\ cinits(Init_0).
   (* Goal *)
   When: (0 <= i) /\ (i <= 8).
 }
@@ -204,7 +262,7 @@ Let a_2 = shiftfield_F2_C_a(c).
 Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(c.base) <= 0) /\
-      (region(x.base) <= 0).
+      (region(x.base) <= 0) /\ cinits(Init_0).
 }
 Prove: IsInit_S2_C(c,
          Init_0[x <- true][shift_sint32(a, 0) <- true][shift_sint32(a, 1)
@@ -224,7 +282,7 @@ Let a_2 = shiftfield_F2_C_a(c).
 Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(c.base) <= 0) /\
-      (region(x.base) <= 0).
+      (region(x.base) <= 0) /\ cinits(Init_0).
 }
 Prove: IsInit_S2_C(c,
          Init_0[x <- true][shift_sint32(a, 0) <- true][shift_sint32(a, 1)

@@ -3,11 +3,22 @@
 [wp] Running WP plugin...
 [wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
-[wp] 31 goals scheduled
+[wp] 42 goals scheduled
 [wp] [Alt-Ergo] Goal typed_array_check_CHECK : Valid
 [wp] [Qed] Goal typed_array_loop_assigns_part1 : Valid
 [wp] [Qed] Goal typed_array_loop_assigns_part2 : Valid
 [wp] [Qed] Goal typed_array_loop_assigns_part3 : Valid
+[wp] [Alt-Ergo] Goal typed_assigned_glob_check_CHECK : Valid
+[wp] [Alt-Ergo] Goal typed_assigned_glob_loop_invariant_CHECK_preserved : Valid
+[wp] [Qed] Goal typed_assigned_glob_loop_invariant_CHECK_established : Valid
+[wp] [Alt-Ergo] Goal typed_assigned_glob_check_CHECK_2 : Valid
+[wp] [Alt-Ergo] Goal typed_assigned_glob_check_CHECK_3 : Valid
+[wp] [Qed] Goal typed_assigned_glob_loop_assigns_part1 : Valid
+[wp] [Qed] Goal typed_assigned_glob_loop_assigns_part2 : Valid
+[wp] [Qed] Goal typed_assigned_glob_loop_assigns_part3 : Valid
+[wp] [Qed] Goal typed_assigned_glob_loop_assigns_2_part1 : Valid
+[wp] [Qed] Goal typed_assigned_glob_loop_assigns_2_part2 : Valid
+[wp] [Alt-Ergo] Goal typed_assigned_glob_loop_assigns_2_part3 : Valid
 [wp] [Alt-Ergo] Goal typed_comp_check_CHECK : Valid
 [wp] [Qed] Goal typed_comp_loop_assigns_part1 : Valid
 [wp] [Qed] Goal typed_comp_loop_assigns_part2 : Valid
@@ -35,9 +46,9 @@
 [wp] [Qed] Goal typed_range_loop_assigns_part1 : Valid
 [wp] [Qed] Goal typed_range_loop_assigns_part2 : Valid
 [wp] [Qed] Goal typed_range_loop_assigns_part3 : Valid
-[wp] Proved goals:   31 / 31
-  Qed:            21 
-  Alt-Ergo:       10
+[wp] Proved goals:   42 / 42
+  Qed:            27 
+  Alt-Ergo:       15
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   initialize                4        2        6       100%
@@ -47,4 +58,5 @@
   index                     3        1        4       100%
   descr                     4        2        6       100%
   comp                      2        2        4       100%
+  assigned_glob             6        5       11       100%
 ------------------------------------------------------------
