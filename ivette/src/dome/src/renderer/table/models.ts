@@ -13,20 +13,34 @@ import { SortDirectionType } from 'react-virtualized';
 // --- Listeners
 // --------------------------------------------------------------------------
 
-/** @internal */
-type ClientId = string;
+/** Update callback. */
+export type Trigger = () => void;
+
+/** Client Views. */
+export interface Client {
+  /** Set the update callback of the client. */
+  onUpdate(trigger?: Trigger): void;
+  /** Set the reload callback of the client. */
+  onReload(trigger?: Trigger): void;
+  /** Set the watching range of the client. */
+  watch(lower: number, upper: number): void;
+  /** Unlink the client. */
+  unlink(): void;
+}
 
 /** @internal */
-interface Client {
-  lower: number,
-  upper: number,
-  trigger: () => void,
-};
+interface Watcher {
+  lower: number;
+  upper: number;
+  update: undefined | Trigger;
+  reload: undefined | Trigger;
+}
 
 // --------------------------------------------------------------------------
 // --- Sorting
 // --------------------------------------------------------------------------
 
+/** Ordering proxy. */
 export interface Ordering {
   /** The column identifier that triggers some sorting. */
   sortBy: string;
@@ -41,6 +55,14 @@ export interface Sorting {
   hasOrdering(dataKey: string): boolean;
   /** Callback to respond to sorting requests from columns. */
   setOrdering(order?: Ordering): void;
+}
+
+/** Row getter proxy. */
+export interface Fetching<Row> {
+  /** Get row data at index. */
+  getRowAt(index: number): Row | undefined;
+  /** Watchers. */
+  link(): Client;
 }
 
 // --------------------------------------------------------------------------
@@ -106,10 +128,10 @@ export function forEach<A>(data: Collection<A>, fn: (elt: A) => void) {
    @template Key - identification of some entry
    @template Row - dynamic row data associated to some key
 */
-export abstract class Model<Key, Row> {
+export abstract class Model<Key, Row> implements Fetching<Row> {
 
-  #clients = new Map<ClientId, Client>();
-  #clientId = 0;
+  private clients = new Map<number, Watcher>();
+  private clientsId = 0;
 
   /**
      Shall return the number of rows to be currently displayed in the table.
@@ -158,51 +180,39 @@ export abstract class Model<Key, Row> {
   */
   updateIndex(first: number, last = first) {
     if (first <= last) {
-      this.#clients.forEach(({ lower, upper, trigger }) => {
-        if (first <= upper && lower <= last) trigger();
+      this.clients.forEach(({ lower, upper, update }) => {
+        if (update && first <= upper && lower <= last) update();
       });
     }
   }
 
   /** Re-render all views. */
-  reload() { this.#clients.forEach(({ trigger }) => trigger()); }
+  reload() { this.clients.forEach(({ reload }) => reload && reload()); }
 
   /**
      Connect a client view to the model.
-     The initial watching range is empty.
+     The initial watching range is empty with no trigger.
      You normally never call this method directly.
      It is automatically called by table views.
   */
-  bind(trigger: () => void): ClientId {
-    const id = "#" + this.#clientId++;
-    this.#clients.set(id, { lower: 0, upper: 0, trigger });
-    return id;
-  }
-
-  /**
-     Disconnect a client from the model.
-     You normally never call this method directly.
-     It is automatically called by table views.
-  */
-  remove(id: ClientId) {
-    this.#clients.delete(id);
-  }
-
-  /**
-     Set the current range of items currently watched by the client.
-     Data updates that fall outside this range will _not_ trigger
-     re-rendering of the client.
-     You normally never call this method directly.
-     It is automatically called by table views.
-     @param lower - first item index rendered
-     @param upper - last item index rendered
-  */
-  watch(id: ClientId, lower: number, upper: number) {
-    const listener = this.#clients.get(id);
-    if (listener) {
-      listener.lower = lower;
-      listener.upper = upper;
-    }
+  link(): Client {
+    const id = this.clientsId++;
+    const m = this.clients;
+    const w: Watcher & Client = {
+      lower: 0,
+      upper: 0,
+      update: undefined,
+      reload: undefined,
+      onUpdate(s?: Trigger) { w.update = s; },
+      onReload(s?: Trigger) { w.update = s; },
+      unlink() { m.delete(id); },
+      watch(lower: number, upper: number) {
+        w.lower = lower;
+        w.upper = upper;
+      }
+    };
+    m.set(id, w);
+    return w;
   }
 
 }
