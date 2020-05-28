@@ -1592,12 +1592,21 @@ struct
   exception Found
 
   let has_init filter pred =
-    let rec term_is_init_in_state t s =
-      match Mstate.lookup s t with
-      | Mlval(_, KInit) | Mchunk(_, KInit) -> raise Found
-      | _ -> Lang.F.lc_iter (fun t -> term_is_init_in_state t s) t
+    let visited = ref Tset.empty in
+    let rec term_is_init_in_states states t =
+      let raise_if_is_init t s =
+        match Mstate.lookup s t with
+        | Mlval(_, KInit) | Mchunk(_, KInit) -> raise Found
+        | _ -> ()
+      in
+      if Tset.mem t !visited then ()
+      else begin
+        visited := Tset.add t !visited ;
+        List.iter (raise_if_is_init t) states ;
+        Lang.F.lc_iter (term_is_init_in_states states) t
+      end
     in
-    try List.iter (term_is_init_in_state (F.e_prop pred)) filter ; false
+    try term_is_init_in_states filter (F.e_prop pred) ; false
     with Found -> true
 
   let rec do_filter filter p =
