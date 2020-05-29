@@ -77,6 +77,10 @@ export function off(evt,job) { emitter.off(evt,job); }
 /** Same as `emitter.emit` */
 export function emit(evt,...args) { emitter.emit(evt,...args); }
 
+{
+  emitter.setMaxListeners(250);
+}
+
 // --------------------------------------------------------------------------
 // --- Application Events
 // --------------------------------------------------------------------------
