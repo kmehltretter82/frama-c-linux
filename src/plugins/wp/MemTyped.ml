@@ -130,15 +130,22 @@ struct
   let self = "typed"
   let int_rank = function
     | CBool -> 0
-    | k -> Ctypes.i_bytes k * (if Ctypes.signed k then 2 else 1)
+    | UInt8 -> 1
+    | SInt8 -> 2
+    | UInt16 -> 3
+    | SInt16 -> 4
+    | UInt32 -> 5
+    | SInt32 -> 6
+    | UInt64 -> 7
+    | SInt64 -> 8
 
   let rank = function
     | M_char -> -1
     | M_int i -> int_rank i
-    | M_f32 -> 17
-    | M_f64 -> 18
-    | M_pointer -> 19
-    | T_alloc -> 20
+    | M_f32 -> 9
+    | M_f64 -> 10
+    | M_pointer -> 11
+    | T_alloc -> 12
   let hash = rank
   let name = function
     | M_int _ -> "Mint"

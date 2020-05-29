@@ -1,0 +1,41 @@
+# frama-c -wp -wp-rte [...]
+[kernel] Parsing tests/wp_acsl/chunk_typing.i (no preprocessing)
+[wp] Running WP plugin...
+[wp] Loading driver 'share/wp.driver'
+[rte] annotating function function
+[wp] 17 goals scheduled
+[wp] [Alt-Ergo] Goal typed_function_ensures : Valid
+[wp] [Alt-Ergo] Goal typed_function_loop_invariant_preserved : Valid
+[wp] [Qed] Goal typed_function_loop_invariant_established : Valid
+[wp] [Alt-Ergo] Goal typed_function_loop_invariant_2_preserved : Valid
+[wp] [Qed] Goal typed_function_loop_invariant_2_established : Valid
+[wp] [Alt-Ergo] Goal typed_function_loop_invariant_3_preserved : Valid
+[wp] [Qed] Goal typed_function_loop_invariant_3_established : Valid
+[wp] [Alt-Ergo] Goal typed_function_loop_invariant_4_preserved : Valid
+[wp] [Qed] Goal typed_function_loop_invariant_4_established : Valid
+[wp] [Alt-Ergo] Goal typed_function_loop_invariant_5_preserved : Valid
+[wp] [Qed] Goal typed_function_loop_invariant_5_established : Valid
+[wp] [Alt-Ergo] Goal typed_function_loop_invariant_6_preserved : Valid
+[wp] [Qed] Goal typed_function_loop_invariant_6_established : Valid
+[wp] [Alt-Ergo] Goal typed_function_loop_invariant_7_preserved : Valid
+[wp] [Qed] Goal typed_function_loop_invariant_7_established : Valid
+[wp] [Alt-Ergo] Goal typed_function_loop_invariant_8_preserved : Valid
+[wp] [Qed] Goal typed_function_loop_invariant_8_established : Valid
+[wp] Proved goals:   17 / 17
+  Qed:             8 
+  Alt-Ergo:        9
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  function                  8        9       17       100%
+------------------------------------------------------------
+[wp] Warning: Memory model hypotheses for function 'function':
+  /*@
+     behavior typed:
+     requires \separated(x+(..),
+                \union(i8+(..),u8+(..),i16+(..),u16+(..),i32+(..),u32+(..),
+                  i64+(..),u64+(..)));
+     */
+  void function(signed char * /*[10]*/ i8, unsigned char * /*[10]*/ u8,
+                short * /*[10]*/ i16, unsigned short * /*[10]*/ u16,
+                int * /*[10]*/ i32, unsigned int * /*[10]*/ u32,
+                long long * /*[10]*/ i64, unsigned long long * /*[10]*/ u64);
