@@ -42,13 +42,35 @@ let options = Arg.([
   Unit (fun _ -> Format.printf "%s%!" Fc_config.datadir; exit 0),
   " Print the path of Frama-C share directory";
 
+  "-share",
+  Unit (fun _ -> Format.printf "%s%!" Fc_config.datadir; exit 0),
+  " Alias for -print-share-path";
+
+  "-libc",
+  Unit (fun _ -> Format.printf "%s%!"
+           (Filename.concat Fc_config.datadir "libc"); exit 0),
+  " Print the path of Frama-C standard library directory";
+
+  "-scripts",
+  Unit (fun _ -> Format.printf "%s%!"
+           (Filename.concat Fc_config.datadir "analyis-scripts"); exit 0),
+  " Print the path of Frama-C analysis-scripts directory";
+
   "-print-libpath",
   Unit (fun _ -> Format.printf "%s%!" Fc_config.libdir; exit 0),
   " Print the path of Frama-C kernel library";
 
+  "-libpath",
+  Unit (fun _ -> Format.printf "%s%!" Fc_config.libdir; exit 0),
+  " Alias for -print-libpath";
+
   "-print-plugin-path",
   Unit (fun _ -> Format.printf "%s%!" Fc_config.plugin_path; exit 0),
   " Print the path where Frama-C dynamic plug-ins are searched for";
+
+  "-plugin-path",
+  Unit (fun _ -> Format.printf "%s%!" Fc_config.plugin_path; exit 0),
+  " Alias for -print-plugin-path";
 
   "-print-version",
   Unit (fun _ -> Format.printf "%s%!" Fc_config.version; exit 0),
