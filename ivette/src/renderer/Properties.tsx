@@ -15,7 +15,7 @@ import { Component } from 'frama-c/LabViews';
 // --------------------------------------------------------------------------
 
 export const renderCode: Renderer<string> =
-  (text?: string) => text ? <Code>{text}</Code> : null;
+  (text?: string) => (text ? <Code>{text}</Code> : null);
 
 function ColumnCode<Row>(props: ColumnProps<Row, string>) {
   return <Column render={renderCode} {...props} />;
@@ -24,7 +24,7 @@ function ColumnCode<Row>(props: ColumnProps<Row, string>) {
 interface Tag { name: string; label: string; descr: string }
 
 export const renderTag: Renderer<Tag> =
-  (d?: Tag) => d ? <Label label={d.label} title={d.descr} /> : null;
+  (d?: Tag) => (d ? <Label label={d.label} title={d.descr} /> : null);
 
 function ColumnTag<Row>(props: ColumnProps<Row, Tag>) {
   return <Column render={renderTag} {...props} />;

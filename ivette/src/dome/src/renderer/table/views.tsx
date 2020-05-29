@@ -11,7 +11,7 @@ import React from 'react';
 import { debounce } from 'lodash';
 import isEqual from 'react-fast-compare';
 //import * as Dome from 'dome';
-import { Trigger, Client, Sorting, Fetching, Model } from './models';
+import { Trigger, Client, Sorting, Model } from './models';
 //import { DraggableCore, DraggableEventHandler } from 'react-draggable';
 import { SVG as SVGraw } from 'dome/controls/icons';
 import {
@@ -23,6 +23,7 @@ import {
   TableHeaderProps,
   TableCellDataGetter,
   TableCellRenderer,
+  RowMouseEventHandlerParams,
 } from 'react-virtualized';
 
 import './style.css';
@@ -159,15 +160,15 @@ const isVisible = (visible: Cmap<boolean>, col: Cprops) => {
   }
 };
 
-function makeGetter<Row>(fetching?: Fetching<Row>) {
-  return ({ index }: Index) => fetching && fetching.getRowAt(index);
+function makeGetter<Key, Row>(model?: Model<Key, Row>) {
+  return ({ index }: Index) => model && model.getRowAt(index);
 };
 
 // --------------------------------------------------------------------------
 // --- Table State
 // --------------------------------------------------------------------------
 
-class TableState<Row> {
+class TableState<Key, Row> {
 
   signal?: Trigger; // Full reload
   resize: Cmap<number> = new Map(); // Current
@@ -178,7 +179,7 @@ class TableState<Row> {
   render: Cmap<TableCellRenderer> = new Map(); // Computed from registry and getterFields
   rowGetter: (info: Index) => Row | undefined; // Computed from last fetching
   fields?: RenderByFields<Row>; // Last user props used for computing renderers
-  fetching?: Fetching<Row>; // Last user proxy used for computing getter
+  model?: Model<Key, Row>; // Last user proxy used for computing getter
   sorting?: Sorting; // Last user proxy used for sorting
   client?: Client; // Client of last fetching
   columns: ColProps<Row>[] = []; // Currently known columns
@@ -188,6 +189,7 @@ class TableState<Row> {
     this.update = this.update.bind(this);
     this.watchRange = this.watchRange.bind(this);
     this.contextMenu = this.contextMenu.bind(this);
+    this.onRowClick = this.onRowClick.bind(this);
     this.rebuild = debounce(this.rebuild.bind(this), 50);
     this.rowGetter = makeGetter();
   }
@@ -227,19 +229,19 @@ class TableState<Row> {
     }
   }
 
-  setFetching(fetching?: Fetching<Row>) {
-    if (fetching !== this.fetching) {
+  setModel(model?: Model<Key, Row>) {
+    if (model !== this.model) {
       this.client?.unlink();
-      this.fetching = fetching;
-      if (fetching) {
-        const client = fetching.link();
+      this.model = model;
+      if (model) {
+        const client = model.link();
         client.onReload(this.reload);
         client.onUpdate(this.update);
         this.client = client;
       } else {
         this.client = undefined;
       }
-      this.rowGetter = makeGetter(fetching);
+      this.rowGetter = makeGetter(model);
       this.reload();
     }
   }
@@ -250,6 +252,21 @@ class TableState<Row> {
       this.render.clear();
       this.reload();
     }
+  }
+
+  // ---- Selection Management
+
+  onSelection?: (data: Row, key: Key, index: number) => void;
+
+  onRowClick(info: RowMouseEventHandlerParams) {
+    console.log('CLICK', info);
+    const index = info.index;
+    const data = info.rowData as (Row | undefined);
+    const model = this.model;
+    const key = (data !== undefined) ? model?.getKeyFor(index, data) : undefined;
+    const onSelection = this.onSelection;
+    if (key !== undefined && data !== undefined && onSelection)
+      onSelection(data, key, index);
   }
 
   // ---- Context Menu
@@ -291,7 +308,7 @@ class TableState<Row> {
 // --------------------------------------------------------------------------
 
 const ColumnContext =
-  React.createContext<undefined | TableState<any>>(undefined);
+  React.createContext<undefined | TableState<any, any>>(undefined);
 
 /**
    Table Column.
@@ -319,8 +336,8 @@ function makeDataRenderer(
   return (({ cellData }) => render(cellData));
 }
 
-function makeColumn<Row>(
-  state: TableState<Row>,
+function makeColumn<Key, Row>(
+  state: TableState<Key, Row>,
   props: ColProps<Row>,
   forceFill: boolean,
 ) {
@@ -373,7 +390,7 @@ function makeColumn<Row>(
   );
 };
 
-function makeColumns<Row>(state: TableState<Row>) {
+function makeColumns<Key, Row>(state: TableState<Key, Row>) {
   const cols: Cprops[] = [];
   let hasFill = false;
   let lastExt: undefined | Cprops;
@@ -467,7 +484,7 @@ const CSS_ROW_HEIGHT = 20;
 function makeTable<Key, Row>(
   size: Size,
   props: TableProps<Key, Row>,
-  state: TableState<Row>,
+  state: TableState<Key, Row>,
 ) {
   const { width, height } = size;
   const model = props.model;
@@ -494,7 +511,7 @@ function makeTable<Key, Row>(
         headerHeight={CSS_HEADER_HEIGHT}
         headerRowRenderer={headerRowRenderer}
         onRowsRendered={state.watchRange}
-        onRowClick={undefined}
+        onRowClick={state.onRowClick}
         sortBy={undefined}
         sortDirection={undefined}
         sort={undefined}
@@ -562,13 +579,14 @@ function makeTable<Key, Row>(
 
 export function Table<Key, Row>(props: TableProps<Key, Row>) {
 
-  const state = React.useMemo(() => new TableState<Row>(), []);
+  const state = React.useMemo(() => new TableState<Key, Row>(), []);
   const [age, setAge] = React.useState(0);
   React.useEffect(() => {
     state.signal = () => setAge(age + 1);
-    state.setFetching(props.model);
+    state.setModel(props.model);
     state.setSorting(props.sorting);
     state.setRendering(props.rendering);
+    state.onSelection = props.onSelection;
   });
 
   return (

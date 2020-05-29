@@ -57,14 +57,6 @@ export interface Sorting {
   setOrdering(order?: Ordering): void;
 }
 
-/** Row getter proxy. */
-export interface Fetching<Row> {
-  /** Get row data at index. */
-  getRowAt(index: number): Row | undefined;
-  /** Watchers. */
-  link(): Client;
-}
-
 // --------------------------------------------------------------------------
 // --- Filtering
 // --------------------------------------------------------------------------
@@ -128,7 +120,7 @@ export function forEach<A>(data: Collection<A>, fn: (elt: A) => void) {
    @template Key - identification of some entry
    @template Row - dynamic row data associated to some key
 */
-export abstract class Model<Key, Row> implements Fetching<Row> {
+export abstract class Model<Key, Row> {
 
   private clients = new Map<number, Watcher>();
   private clientsId = 0;

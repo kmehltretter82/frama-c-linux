@@ -122,7 +122,7 @@ export class MapModel<Key, Row>
     const pack = this.index.get(key);
     if (!pack) return undefined;
     const k = pack.index;
-    if (k === undefined || 0 < k) return undefined;
+    if (k === undefined || k < 0) return undefined;
     const current = this.table;
     return (current && k < current.length) ? k : undefined;
   }
