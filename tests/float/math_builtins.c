@@ -6,6 +6,8 @@
 #include <math.h>
 
 static volatile int nondet;
+static volatile double any_double;
+static volatile float any_float;
 #define assert_bottom(exp) if (nondet) { exp; Frama_C_show_each_unreachable(); }
 
 double double_interval(double min, double max) {
@@ -23,6 +25,74 @@ void test_sin_det() {
   double x = sin(1.);
   double y = sin(0.);
   double z = sin(-1.);
+}
+
+void test_acos () {
+  double half_pi = acos(0.);
+  double pi = acos(-1.);
+  double zero = acos(1.);
+  double acos_image = acos(any_double);
+  if (nondet) {
+    double bottom = acos(-1.5);
+    Frama_C_show_each_bottom(bottom);
+  }
+  if (nondet) {
+    double bottom = acos(1.5);
+    Frama_C_show_each_bottom(bottom);
+  }
+  double x = acos(0.5);
+  double y = acos(-0.5);
+  double xy = double_interval(-0.5, 0.5);
+  xy = acos(xy);
+  /* Test acosf. */
+  float f32_half_pi = acosf(0.f);
+  float f32_pi = acosf(-1.f);
+  float f32_zero = acosf(1.f);
+  float f32_acosf_image = acosf(any_float);
+  if (nondet) {
+    float bottom = acosf(2.f);
+    Frama_C_show_each_bottom(bottom);
+  }
+}
+
+void test_asin () {
+  double zero = asin(0.);
+  double minus_half_pi = asin(-1.);
+  double half_pi = asin(1.);
+  double asin_image = asin(any_double);
+  if (nondet) {
+    double bottom = asin(-1.5);
+    Frama_C_show_each_bottom(bottom);
+  }
+  if (nondet) {
+    double bottom = asin(1.5);
+    Frama_C_show_each_bottom(bottom);
+  }
+  double x = asin(-0.5);
+  double y = asin(0.5);
+  double xy = double_interval(-0.5, 0.5);
+  xy = asin(xy);
+  /* Test asinf. */
+  float f32_zero = asinf(0.f);
+  float f32_minus_half_pi = asinf(-1.f);
+  float f32_half_pi = asinf(1.f);
+  float f32_asinf_image = asinf(any_float);
+  if (nondet) {
+    float bottom = asinf(2.f);
+    Frama_C_show_each_bottom(bottom);
+  }
+}
+
+void test_atan () {
+  double zero = atan(0.);
+  double atan_image = atan(any_double);
+  double x = atan(-2.);
+  double y = atan(2.);
+  double xy = double_interval(-2., 2.);
+  xy = atan(xy);
+  /* Test atanf. */
+  float f32_zero = atanf(0.f);
+  float f32_atanf_image = atanf(any_float);
 }
 
 void test_atan2_det() {
@@ -655,6 +725,9 @@ void test_roundf() {
 int main() {
   test_cos_det();
   test_sin_det();
+  test_acos();
+  test_asin();
+  test_atan();
   test_atan2_det();
   test_atan2();
   test_pow_det();

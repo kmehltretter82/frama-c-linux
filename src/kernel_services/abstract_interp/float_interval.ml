@@ -80,6 +80,7 @@ module Make (F: Float_sig.S) = struct
     let pos_zero = Cst.pos_zero Float_sig.Single
     let neg_zero = Cst.neg_zero Float_sig.Single
     let one = F.of_float Near Float_sig.Single 1.
+    let minus_one = F.neg one
     let pos_infinity = Cst.pos_infinity Float_sig.Single
     let neg_infinity = Cst.neg_infinity Float_sig.Single
 
@@ -1004,6 +1005,31 @@ module Make (F: Float_sig.S) = struct
 
   let cos prec = cos_sin F.cos prec
   let sin prec = cos_sin F.sin prec
+
+  let acos_asin ~acos prec t =
+    t >>: fun ~nan b e ->
+    if Cmp.(lt e minus_one || gt b one)
+    then FRange.nan
+    else
+      let nan, b =
+        if Cmp.(lt b minus_one)
+        then true, F.of_float Near prec (-1.)
+        else nan, b
+      in
+      let nan, e =
+        if Cmp.(gt e one)
+        then true, F.of_float Near prec 1.
+        else nan, e
+      in
+      if acos
+      then approx F.acos prec ~nan e b
+      else approx F.asin prec ~nan b e
+
+  let acos = acos_asin ~acos:true
+  let asin = acos_asin ~acos:false
+
+  let atan prec t =
+    t >>: approx F.atan prec
 
   let atan2 prec x y =
     (x, y) >>% fun ~nan (b1, e1) (b2, e2) ->

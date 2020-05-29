@@ -127,88 +127,41 @@ int __fc_fpclassify(double x);
 #define isnormal(x) \
   (sizeof(x) == sizeof(float) ? __fc_fpclassifyf(x) == FP_NORMAL : __fc_fpclassify(x) == FP_NORMAL)
 
-/*@
-  assigns __fc_errno, \result \from x;
-  behavior normal:
-    assumes in_domain: \is_finite(x) && \abs(x) <= 1;
+
+/*@ requires in_domain: \is_finite(x) && \abs(x) <= 1;
     assigns \result \from x;
     ensures positive_result: \is_finite(\result) && \result >= 0;
-  behavior domain_error:
-    assumes out_of_domain: \is_infinite(x) || (\is_finite(x) && \abs(x) > 1);
-    assigns __fc_errno, \result \from x;
-    ensures errno_set: __fc_errno == 1;
-  disjoint behaviors;
- */
+*/
 extern double acos(double x);
 
-/*@
-  assigns __fc_errno, \result \from x;
-  behavior normal:
-    assumes in_domain: \is_finite(x) && \abs(x) <= 1;
+/*@ requires in_domain: \is_finite(x) && \abs(x) <= 1;
     assigns \result \from x;
     ensures positive_result: \is_finite(\result) && \result >= 0;
-  behavior domain_error:
-    assumes out_of_domain: \is_infinite(x) || (\is_finite(x) && \abs(x) > 1);
-    assigns __fc_errno, \result \from x;
-    ensures errno_set: __fc_errno == 1;
-  disjoint behaviors;
- */
+*/
 extern float acosf(float x);
 
-/*@
-  assigns __fc_errno, \result \from x;
-  behavior normal:
-    assumes in_domain: \is_finite(x) && \abs(x) <= 1;
+/*@ requires in_domain: \is_finite(x) && \abs(x) <= 1;
     assigns \result \from x;
     ensures positive_result: \is_finite(\result) && \result >= 0;
-  behavior domain_error:
-    assumes out_of_domain: \is_infinite(x) || (\is_finite(x) && \abs(x) > 1);
-    assigns __fc_errno, \result \from x;
-    ensures errno_set: __fc_errno == 1;
-  disjoint behaviors;
- */
+*/
 extern long double acosl(long double x);
 
-/*@
-  assigns __fc_errno, \result \from x;
-  behavior normal:
-    assumes in_domain: \is_finite(x) && \abs(x) <= 1;
+/*@ requires in_domain: \is_finite(x) && \abs(x) <= 1;
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
-  behavior domain_error:
-    assumes out_of_domain: \is_infinite(x) || (\is_finite(x) && \abs(x) > 1);
-    assigns __fc_errno, \result \from x;
-    ensures errno_set: __fc_errno == 1;
-  disjoint behaviors;
- */
+*/
 extern double asin(double x);
 
-/*@
-  assigns __fc_errno, \result \from x;
-  behavior normal:
-    assumes in_domain: \is_finite(x) && \abs(x) <= 1;
+/*@ requires in_domain: \is_finite(x) && \abs(x) <= 1;
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
-  behavior domain_error:
-    assumes out_of_domain: \is_infinite(x) || (\is_finite(x) && \abs(x) > 1);
-    assigns __fc_errno, \result \from x;
-    ensures errno_set: __fc_errno == 1;
-  disjoint behaviors;
- */
+*/
 extern float asinf(float x);
 
-/*@
-  assigns __fc_errno, \result \from x;
-  behavior normal:
-    assumes in_domain: \is_finite(x) && \abs(x) <= 1;
+/*@ requires in_domain: \is_finite(x) && \abs(x) <= 1;
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
-  behavior domain_error:
-    assumes out_of_domain: \is_infinite(x) || (\is_finite(x) && \abs(x) > 1);
-    assigns __fc_errno, \result \from x;
-    ensures errno_set: __fc_errno == 1;
-  disjoint behaviors;
- */
+*/
 extern long double asinl(long double x);
 
 /*@ requires finite_arg: \is_finite(x);
